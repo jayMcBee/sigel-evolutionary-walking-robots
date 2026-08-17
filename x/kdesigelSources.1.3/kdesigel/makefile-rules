@@ -1,0 +1,24 @@
+
+if LINUX
+QTDIR=/usr/lib/qt2/
+endif
+
+if DEBIAN
+QTDIR=/usr/share/qt/
+endif
+
+if SOLARIS
+QTDIR=/app/unido-inf/sun4_56/libqt/2.30/
+endif
+
+all_includes = -I/usr/X11R6/include \
+-I$(QTDIR)/include \
+-I$(top_srcdir)/kdesigel/supportingLibs/Dynamo/Src/Inc \
+-I$(top_srcdir)/kdesigel/supportingLibs/SOLID-2.0/include \
+-I$(top_srcdir)/kdesigel/supportingLibs/pvm3/include \
+-I$(top_srcdir)/kdesigel/supportingLibs/cv97 \
+-I$(top_srcdir)/kdesigel/supportingLibs/newmat09 \
+-I$(top_srcdir)/kdesigel/supportingLibs/dynamechs/dm \
+-I$(top_srcdir)/kdesigel/supportingLibs/qhull \
+-I$(top_srcdir)/kdesigel/supportingLibs/fparser \
+-I$(top_srcdir)/kdesigel/include

@@ -1,0 +1,265 @@
+Microsoft Developer Studio Workspace File, Format Version 6.00
+# WARNUNG: DIESE ARBEITSBEREICHSDATEI DARF NICHT BEARBEITET ODER GELÖSCHT WERDEN!
+
+###############################################################################
+
+Project: "Dynamo"=".\supportingLibs\Dynamo\Dynamo.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "MetaSIGEL"=".\MetaSIGEL.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+    begin source code control
+    "$/MetaSIGEL", CAAAAAAA
+    .
+    end source code control
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "SIGELCommon"=".\SIGELCommon.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+    begin source code control
+    "$/SIGELCommon", MDAAAAAA
+    .
+    end source code control
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name cv97
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name dynamechs
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name Dynamo
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name newmat09
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name qhull
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name SOLID20
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name dm
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name fparser
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name MetaSIGEL
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "SOLID20"=".\supportingLibs\SOLID20\SOLID20.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "Sigel"=".\Sigel.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name cv97
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name dynamechs
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name Dynamo
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name newmat09
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name qhull
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name SOLID20
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name SIGELCommon
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name dm
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name MetaSIGEL
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name pvm
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "cv97"=".\supportingLibs\cv97\cv97.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "dm"=".\supportingLibs\dynamechs\dynamechs.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "fparser"=".\SUPPORTINGLIBS\fparser\fparser.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "manage_dyn_slave"=".\manage_dyn_slave.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "newmat09"=".\supportingLibs\newmat09\newmat09.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "pvm"=".\supportingLibs\pvm\pvm.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "qhull"=".\supportingLibs\qhull\qhull.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "sigel_slave"=".\sigel_slave.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name SIGELCommon
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name cv97
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name dynamechs
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name Dynamo
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name newmat09
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name qhull
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name SOLID20
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name dm
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name MetaSIGEL
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Global:
+
+Package=<5>
+{{{
+}}}
+
+Package=<3>
+{{{
+}}}
+
+###############################################################################
+

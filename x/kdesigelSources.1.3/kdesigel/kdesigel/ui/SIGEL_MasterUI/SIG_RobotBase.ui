@@ -1,0 +1,457 @@
+<!DOCTYPE UI><UI>
+<class>SIG_RobotBase</class>
+<widget>
+    <class>QWidget</class>
+    <property stdset="1">
+        <name>name</name>
+        <cstring>SIG_RobotBase</cstring>
+    </property>
+    <property stdset="1">
+        <name>geometry</name>
+        <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>394</width>
+            <height>549</height>
+        </rect>
+    </property>
+    <property stdset="1">
+        <name>caption</name>
+        <string>Robot</string>
+    </property>
+    <grid>
+        <property stdset="1">
+            <name>margin</name>
+            <number>11</number>
+        </property>
+        <property stdset="1">
+            <name>spacing</name>
+            <number>6</number>
+        </property>
+        <widget row="0"  column="0" >
+            <class>QGroupBox</class>
+            <property stdset="1">
+                <name>name</name>
+                <cstring>groupboxRobotInfo</cstring>
+            </property>
+            <property stdset="1">
+                <name>title</name>
+                <string>Robot Info</string>
+            </property>
+            <vbox>
+                <property stdset="1">
+                    <name>margin</name>
+                    <number>11</number>
+                </property>
+                <property stdset="1">
+                    <name>spacing</name>
+                    <number>6</number>
+                </property>
+                <widget>
+                    <class>QLabel</class>
+                    <property stdset="1">
+                        <name>name</name>
+                        <cstring>textlabelUsedRobot</cstring>
+                    </property>
+                    <property stdset="1">
+                        <name>text</name>
+                        <string>Used Robot:</string>
+                    </property>
+                </widget>
+                <widget>
+                    <class>QLayoutWidget</class>
+                    <property stdset="1">
+                        <name>name</name>
+                        <cstring>Layout16</cstring>
+                    </property>
+                    <grid>
+                        <property stdset="1">
+                            <name>margin</name>
+                            <number>0</number>
+                        </property>
+                        <property stdset="1">
+                            <name>spacing</name>
+                            <number>6</number>
+                        </property>
+                        <widget row="0"  column="2" >
+                            <class>QLayoutWidget</class>
+                            <property stdset="1">
+                                <name>name</name>
+                                <cstring>Layout12</cstring>
+                            </property>
+                            <vbox>
+                                <property stdset="1">
+                                    <name>margin</name>
+                                    <number>0</number>
+                                </property>
+                                <property stdset="1">
+                                    <name>spacing</name>
+                                    <number>6</number>
+                                </property>
+                                <widget>
+                                    <class>QLabel</class>
+                                    <property stdset="1">
+                                        <name>name</name>
+                                        <cstring>textlabelLinks</cstring>
+                                    </property>
+                                    <property stdset="1">
+                                        <name>text</name>
+                                        <string>Links:</string>
+                                    </property>
+                                </widget>
+                                <widget>
+                                    <class>QListBox</class>
+                                    <property stdset="1">
+                                        <name>name</name>
+                                        <cstring>listboxLinks</cstring>
+                                    </property>
+                                    <property stdset="1">
+                                        <name>selectionMode</name>
+                                        <enum>NoSelection</enum>
+                                    </property>
+                                    <property>
+                                        <name>toolTip</name>
+                                        <string>The links of the current robot model</string>
+                                    </property>
+                                </widget>
+                            </vbox>
+                        </widget>
+                        <widget row="0"  column="1" >
+                            <class>QLayoutWidget</class>
+                            <property stdset="1">
+                                <name>name</name>
+                                <cstring>Layout11</cstring>
+                            </property>
+                            <vbox>
+                                <property stdset="1">
+                                    <name>margin</name>
+                                    <number>0</number>
+                                </property>
+                                <property stdset="1">
+                                    <name>spacing</name>
+                                    <number>6</number>
+                                </property>
+                                <widget>
+                                    <class>QLabel</class>
+                                    <property stdset="1">
+                                        <name>name</name>
+                                        <cstring>textlabelMaterials</cstring>
+                                    </property>
+                                    <property stdset="1">
+                                        <name>text</name>
+                                        <string>Materials:</string>
+                                    </property>
+                                </widget>
+                                <widget>
+                                    <class>QListBox</class>
+                                    <property stdset="1">
+                                        <name>name</name>
+                                        <cstring>listboxMaterials</cstring>
+                                    </property>
+                                    <property stdset="1">
+                                        <name>frameShape</name>
+                                        <enum>StyledPanel</enum>
+                                    </property>
+                                    <property stdset="1">
+                                        <name>frameShadow</name>
+                                        <enum>Sunken</enum>
+                                    </property>
+                                    <property stdset="1">
+                                        <name>selectionMode</name>
+                                        <enum>NoSelection</enum>
+                                    </property>
+                                    <property>
+                                        <name>toolTip</name>
+                                        <string>All Materials the current robot model uses</string>
+                                    </property>
+                                </widget>
+                            </vbox>
+                        </widget>
+                        <widget row="0"  column="0" >
+                            <class>QLayoutWidget</class>
+                            <property stdset="1">
+                                <name>name</name>
+                                <cstring>Layout10</cstring>
+                            </property>
+                            <vbox>
+                                <property stdset="1">
+                                    <name>margin</name>
+                                    <number>0</number>
+                                </property>
+                                <property stdset="1">
+                                    <name>spacing</name>
+                                    <number>6</number>
+                                </property>
+                                <widget>
+                                    <class>QLabel</class>
+                                    <property stdset="1">
+                                        <name>name</name>
+                                        <cstring>textlabelBodies</cstring>
+                                    </property>
+                                    <property stdset="1">
+                                        <name>text</name>
+                                        <string>Bodies:</string>
+                                    </property>
+                                </widget>
+                                <widget>
+                                    <class>QListBox</class>
+                                    <property stdset="1">
+                                        <name>name</name>
+                                        <cstring>listboxBodies</cstring>
+                                    </property>
+                                    <property stdset="1">
+                                        <name>selectionMode</name>
+                                        <enum>NoSelection</enum>
+                                    </property>
+                                    <property>
+                                        <name>toolTip</name>
+                                        <string>The bodies used by the current robot model</string>
+                                    </property>
+                                </widget>
+                            </vbox>
+                        </widget>
+                        <widget row="1"  column="2" >
+                            <class>QLayoutWidget</class>
+                            <property stdset="1">
+                                <name>name</name>
+                                <cstring>Layout15</cstring>
+                            </property>
+                            <vbox>
+                                <property stdset="1">
+                                    <name>margin</name>
+                                    <number>0</number>
+                                </property>
+                                <property stdset="1">
+                                    <name>spacing</name>
+                                    <number>6</number>
+                                </property>
+                                <widget>
+                                    <class>QLabel</class>
+                                    <property stdset="1">
+                                        <name>name</name>
+                                        <cstring>textlabelSensors</cstring>
+                                    </property>
+                                    <property stdset="1">
+                                        <name>text</name>
+                                        <string>Sensors:</string>
+                                    </property>
+                                </widget>
+                                <widget>
+                                    <class>QListBox</class>
+                                    <property stdset="1">
+                                        <name>name</name>
+                                        <cstring>listboxSensors</cstring>
+                                    </property>
+                                    <property stdset="1">
+                                        <name>selectionMode</name>
+                                        <enum>NoSelection</enum>
+                                    </property>
+                                    <property>
+                                        <name>toolTip</name>
+                                        <string>The Sensors used, Icons indicate Sensortype&lt;BR&gt;(Joint, Pitch, Roll, Contact)</string>
+                                    </property>
+                                </widget>
+                            </vbox>
+                        </widget>
+                        <widget row="1"  column="0" >
+                            <class>QLayoutWidget</class>
+                            <property stdset="1">
+                                <name>name</name>
+                                <cstring>Layout13</cstring>
+                            </property>
+                            <vbox>
+                                <property stdset="1">
+                                    <name>margin</name>
+                                    <number>0</number>
+                                </property>
+                                <property stdset="1">
+                                    <name>spacing</name>
+                                    <number>6</number>
+                                </property>
+                                <widget>
+                                    <class>QLabel</class>
+                                    <property stdset="1">
+                                        <name>name</name>
+                                        <cstring>textlabelJoints</cstring>
+                                    </property>
+                                    <property stdset="1">
+                                        <name>text</name>
+                                        <string>Joints:</string>
+                                    </property>
+                                </widget>
+                                <widget>
+                                    <class>QListBox</class>
+                                    <property stdset="1">
+                                        <name>name</name>
+                                        <cstring>listboxJoints</cstring>
+                                    </property>
+                                    <property stdset="1">
+                                        <name>selectionMode</name>
+                                        <enum>NoSelection</enum>
+                                    </property>
+                                    <property>
+                                        <name>toolTip</name>
+                                        <string>All joints of the current robot model, Icons indicate type (Rotational, Translational, Cylindrical)</string>
+                                    </property>
+                                </widget>
+                            </vbox>
+                        </widget>
+                        <widget row="1"  column="1" >
+                            <class>QLayoutWidget</class>
+                            <property stdset="1">
+                                <name>name</name>
+                                <cstring>Layout14</cstring>
+                            </property>
+                            <vbox>
+                                <property stdset="1">
+                                    <name>margin</name>
+                                    <number>0</number>
+                                </property>
+                                <property stdset="1">
+                                    <name>spacing</name>
+                                    <number>6</number>
+                                </property>
+                                <widget>
+                                    <class>QLabel</class>
+                                    <property stdset="1">
+                                        <name>name</name>
+                                        <cstring>textlabelDrives</cstring>
+                                    </property>
+                                    <property stdset="1">
+                                        <name>text</name>
+                                        <string>Drives:</string>
+                                    </property>
+                                </widget>
+                                <widget>
+                                    <class>QListBox</class>
+                                    <property stdset="1">
+                                        <name>name</name>
+                                        <cstring>listboxDrives</cstring>
+                                    </property>
+                                    <property stdset="1">
+                                        <name>selectionMode</name>
+                                        <enum>NoSelection</enum>
+                                    </property>
+                                    <property>
+                                        <name>toolTip</name>
+                                        <string>Drives used in the current robot model, Icons indicate type (absolute, relative, force, servo)</string>
+                                    </property>
+                                </widget>
+                            </vbox>
+                        </widget>
+                    </grid>
+                </widget>
+            </vbox>
+        </widget>
+        <widget row="1"  column="0" >
+            <class>QLayoutWidget</class>
+            <property stdset="1">
+                <name>name</name>
+                <cstring>Layout9</cstring>
+            </property>
+            <hbox>
+                <property stdset="1">
+                    <name>margin</name>
+                    <number>0</number>
+                </property>
+                <property stdset="1">
+                    <name>spacing</name>
+                    <number>6</number>
+                </property>
+                <spacer>
+                    <property>
+                        <name>name</name>
+                        <cstring>Spacer1</cstring>
+                    </property>
+                    <property stdset="1">
+                        <name>orientation</name>
+                        <enum>Horizontal</enum>
+                    </property>
+                    <property stdset="1">
+                        <name>sizeType</name>
+                        <enum>Expanding</enum>
+                    </property>
+                    <property>
+                        <name>sizeHint</name>
+                        <size>
+                            <width>20</width>
+                            <height>20</height>
+                        </size>
+                    </property>
+                </spacer>
+                <widget>
+                    <class>QPushButton</class>
+                    <property stdset="1">
+                        <name>name</name>
+                        <cstring>pushbuttonImport</cstring>
+                    </property>
+                    <property stdset="1">
+                        <name>text</name>
+                        <string>Import</string>
+                    </property>
+                    <property>
+                        <name>toolTip</name>
+                        <string>Import a *.rrb file</string>
+                    </property>
+                </widget>
+                <widget>
+                    <class>QPushButton</class>
+                    <property stdset="1">
+                        <name>name</name>
+                        <cstring>pushbuttonLoad</cstring>
+                    </property>
+                    <property stdset="1">
+                        <name>text</name>
+                        <string>Load</string>
+                    </property>
+                    <property>
+                        <name>toolTip</name>
+                        <string>Load a Robot (*.crb Format)</string>
+                    </property>
+                </widget>
+                <widget>
+                    <class>QPushButton</class>
+                    <property stdset="1">
+                        <name>name</name>
+                        <cstring>pushbuttonSave</cstring>
+                    </property>
+                    <property stdset="1">
+                        <name>text</name>
+                        <string>Save</string>
+                    </property>
+                    <property>
+                        <name>toolTip</name>
+                        <string>Save this Robot as Cooked Robotmodel (*.crb)</string>
+                    </property>
+                </widget>
+                <widget>
+                    <class>QPushButton</class>
+                    <property stdset="1">
+                        <name>name</name>
+                        <cstring>pushbuttonRobInfo</cstring>
+                    </property>
+                    <property stdset="1">
+                        <name>text</name>
+                        <string>Info</string>
+                    </property>
+                    <property>
+                        <name>toolTip</name>
+                        <string>Display information about the current robot</string>
+                    </property>
+                </widget>
+            </hbox>
+        </widget>
+    </grid>
+</widget>
+<tabstops>
+    <tabstop>listboxBodies</tabstop>
+    <tabstop>listboxMaterials</tabstop>
+    <tabstop>listboxLinks</tabstop>
+    <tabstop>listboxJoints</tabstop>
+    <tabstop>listboxDrives</tabstop>
+    <tabstop>listboxSensors</tabstop>
+    <tabstop>pushbuttonImport</tabstop>
+    <tabstop>pushbuttonLoad</tabstop>
+    <tabstop>pushbuttonSave</tabstop>
+</tabstops>
+</UI>

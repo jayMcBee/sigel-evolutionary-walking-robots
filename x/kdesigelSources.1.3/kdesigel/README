@@ -1,0 +1,157 @@
+KDESIGEL v1.1 Readme File 
+-----------------------
+
+Contact: sigel@ls11.cs.uni-dortmund.de
+This software is placed under the GNU General Public License.
+
+Welcome to the world of Kdesigel. You want to use it? It's not as difficult
+as baking pancake. Supported operating systems are Solaris (sparc)
+and Linux (x86). All the following steps should be the same for both.
+
+1. Building Kdesigel
+
+If you don't have got a binary distribution and decided to build Kdesigel
+by yourself, you need the gcc 2.95.2 or higher (get yours at www.gnu.org)
+together with the appropriate libstdc++. The only thing you need which
+maybe is not installed on every system is OpenGL. Its header files have
+to be in the /usr/include/GL directory, the .so-files in /usr/openwin/lib
+or /usr/X11R6/lib (in the Solaris respectively Linux case).
+
+Assumed that you have untared the source-distribution, the best way to build Kdesigel is to use
+kdevelop. First select build->autoconf/automake. After that klick on build->configure. Now you can
+build Kdesigel with build->build.
+If you want to build it without kdevelop, you should be familar with the autotools. After running
+"autoconf" and "automake" (at least version 1.5) in the kdesigel-directory, you should
+set "CXXFLAGS" to "-DQT_THREAD_SUPPORT -DQT_ALTERNATE_QTSMANIP -fpermissive"
+and run "./configure". And it should build Kdesigel like kdevelop (tested on Suse and Debian).
+
+Having build Kdesigel, you can delete everything but:
+- the executables "sigel", "sigel_slave" and "manage_dyn_slave" (for dynamic clients, see below)
+- the scripts "sigelLauncher", "povrayLauncher", "sigelDynClient" (for dynamic clients, see below)
+- the file "Terrain.ter"
+- the subdirectory pixmaps
+- the subdirectory supportingLibs/pvm3
+
+Then you should have quite the things as included in the binary distributions.
+Or you could use the shell-script "./makeBinary" which copies all relevant files to
+"/tmp/kdesigel".
+
+2. Getting Kdesigel to work
+
+First of all: Starting just the Kdesigel-executable without argument will start the
+GUI-Version of Kdesigel.
+- Starting it with the "-evolve <filename>" argument will start without a GUI
+  and just evolves the given experiment until all individuals have got a valid fitnessvalue
+  and the termination condition is reached.
+- Starting it with "-devolve <filename>"  Kdesigel evolves with dynamic clients.
+  Thus you can run Kdesigel for example in a batch system. For more information see below (2.6)
+
+But whether you compiled Kdesigel by yourself oder downloaded a binary distribution, you have
+first to do the following things to get Kdesigel to work:
+
+2.1 Environment variables
+
+Some environment variables have to be set in the shell-startup script (.cshrc for example in
+the case you are using the C-Shell) of all hosts that want to take part in the parallel
+evolution computations. The reason is that this variables have to be set when
+the parallel evolution automatically open a remote shell on these hosts.
+
+Variable                     Value
+
+SIGEL_ROOT          Should contain the path to your sigel-installation directory.
+PVM_ROOT             $SIGEL_ROOT/supportingLibs/pvm3
+PVM_ARCHDIR      LINUX (for linux ;-)
+
+If you only want to start Kdesigel locally, you could also use the script "sigelLauncher", which
+sets all the environment variables (see below 2.3).
+
+2.2 The .rhosts file or using ssh for a remote-shell
+
+One method to start evolution computations on other hosts is the use of the rsh (remote-shell) mechanism.
+That means that:
+- This service has to be offered by the host.
+- An appropriate .rhosts file has to grant Kdesigel acces without a password.
+
+Example: If you want to start the Kdesigel-master process on a host named "dagobah" and your
+loginname on this host is "yoda", while you want to use a host called "hoth" for Kdesigel-slave
+computations. Then the .rhosts file on "hoth" has to contain the following line:
+
+dagobah yoda
+
+That means that the user "yoda" may log into from "dagobah" into "hoth" without giving
+a password using the rsh mechanism. You better be careful with the .rhosts file. You find
+more info on that typing "man rhosts".
+
+Because of the security issues of r-commands, PVM and thus Kdesigel supports the use of
+ssh. Therefore you have to set the environment variable
+
+PVM_RSH=path to ssh
+
+in addition to the environment variables in section 2.1. After this kdesigel starts the slave on
+other clients with ssh. You should set up ssh thus you can login to the clients without specifing
+a password.
+It is important to mention it again, if you use Kdesigel with automatic evolution you must set
+the environment variables in your shell configuration file, else it will not run.
+
+2.3 The sigelLauncher script
+
+This script sigelLauncher does the setting of the variables decribed above. It does not
+replace the step 2.1, but is written for the case you want to start sigel through a cronjob.
+The cronjob starts in a "naked" shell. The script contains one line setting the SIGEL_ROOT
+variable. This is the only line you need to modify. Then you can use it for example in the
+folowing crontab-entry:
+
+00      21      20      8       *       /home/sawitzki/sigelLauncher -evolve insectNiceWalkingFitness.exp
+
+2.4 Using gnuplot
+
+It is possible to plot the fitnesscurves with gnuplot directly from Kdesigel. This of course
+works only if gnuplot is found in a directory given in your PATH-variable.
+
+2.5 PovrayLauncher
+
+The Kdesigel distribution contains a script called "povrayLauncher" which calls Povray for
+all .pov-files found in the current directory. Arguments given to the script are reached
+to Povray, which has of course to be found in a directory given in your PATH-variable.
+
+2.6 Dynamic clients and sigelDynClient
+
+This script is used in combination with the dynamic client facility of Kdesigel. It uses the
+program "manage_dyn_slave" which registers itself as a client over a socket to
+a Kdesigel-master, which was started with the argument "-devolve ...". The usage is
+
+sigelDynClient <host name of the master>
+
+The script first copies the Kdesigel-binary Distribution to "/tmp/_SIGEL_EVOLUTION_TEMP". After
+that it registers itself  to the master (manage_dyn_slave) and waits for jobs to calculate the fitness.
+After every generation the master disconnects all dynamic clients, thus the master and pvm could reschedule
+the fitness calculation. At the end the script removes the directory "/tmp/_SIGEL_EVOLUTION_TEMP".
+
+To get this working you have to do the following:
+
+1) First of all you should have compiled Kdesigel (described in section 1).
+
+2) Now it is important to set the environment variables as described in section 2.1. But you must
+    set SIGEL_ROOT to "/tmp/_SIGEL_EVOLUTION_TEMP", because there must be the binary Distribution
+     located.
+
+3) Set the .rhosts or the PVM_RSH variable appropiate (section 2.2).
+
+4) Copy the binary Distribution to your local directory (/home/"your name") on the clients (section 2). Rename the
+    directory to "_SIGEL_EVOLUTION_TEMP". [You get the binary distribution either by downloading it from sourceforge
+    or using the script "makeBinary", which creates a tar.gz-file in /tmp (you have to unpack it into your home directory).]
+
+5) Copy "manage_dyn_slave" and "sigelDynClient" to your local directory.
+
+6) Set up your experiment. The static host of this experiments must have the same
+    directory path as the script (thus "/tmp/_SIGEL_EVOLUTION_TEMP") and the host is the computer you
+    want to start the master.
+
+7) Start Kdesigel on your local host, where the static host is defined (see above 6) with
+     "sigel -devolve <EXPERIMENT>".
+
+8) As soon as "awaiting clients" is shown, you could start the dynamic clients. Either
+    manually with the "sigelDynClient"-script on every client or more comfortable
+    with a batch system:
+    "bsub -o /dev/null -q normal -m "<YOURHOSTS>" "sigelDynClient <MASTERHOST>" "
+

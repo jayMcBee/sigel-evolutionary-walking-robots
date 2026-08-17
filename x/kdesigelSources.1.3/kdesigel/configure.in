@@ -1,0 +1,10 @@
+AC_INIT(dummy.cpp)
+AM_INIT_AUTOMAKE(kdesigel,1.0)
+AC_PROG_CXX
+AC_PROG_CC
+AC_PROG_RANLIB
+AM_CONDITIONAL(LINUX, test "$(grep 'SuSE' /proc/version)")
+AM_CONDITIONAL(DEBIAN, test "$(grep 'Debian' /proc/version)")
+AM_CONDITIONAL(SOLARIS,test "$OSTYPE" = solaris)
+AC_OUTPUT(Makefile kdesigel/Makefile kdesigel/include/SIGEL_CommonGUI/Makefile kdesigel/include/Makefile kdesigel/include/SIGEL_Environment/Makefile kdesigel/include/SIGEL_GP/Makefile kdesigel/include/SIGEL_MasterGUI/Makefile kdesigel/include/SIGEL_Program/Makefile kdesigel/include/SIGEL_RealInterface/Makefile kdesigel/include/SIGEL_Robot/Makefile kdesigel/include/SIGEL_RobotIO/Makefile kdesigel/include/SIGEL_Simulation/Makefile kdesigel/include/SIGEL_SlaveGUI/Makefile kdesigel/include/SIGEL_Tools/Makefile kdesigel/include/SIGEL_Visualisation/Makefile kdesigel/src/SIGEL_CommonGUI/Makefile kdesigel/src/Makefile kdesigel/src/SIGEL_Environment/Makefile kdesigel/src/SIGEL_GP/Makefile kdesigel/src/SIGEL_MasterGUI/Makefile kdesigel/src/SIGEL_Program/Makefile kdesigel/src/SIGEL_RealInterface/Makefile kdesigel/src/SIGEL_Robot/Makefile kdesigel/src/SIGEL_RobotIO/Makefile kdesigel/src/SIGEL_Simulation/Makefile kdesigel/src/SIGEL_SlaveGUI/Makefile kdesigel/src/SIGEL_Tools/Makefile kdesigel/src/SIGEL_Visualisation/Makefile kdesigel/ui/SIGEL_CommonUI/Makefile kdesigel/ui/Makefile kdesigel/doc/Makefile kdesigel/pixmaps/Makefile kdesigel/templates/Makefile kdesigel/ui/SIGEL_SlaveUI/Makefile kdesigel/ui/SIGEL_MasterUI/Makefile kdesigel/include/MT_Control/Makefile kdesigel/include/MT_GUI/Makefile kdesigel/src/MT_Control/Makefile kdesigel/src/MT_GUI/Makefile kdesigel/include/MT_GPSystem/Makefile kdesigel/src/MT_GPSystem/Makefile kdesigel/ui/MT_UI/Makefile )
+

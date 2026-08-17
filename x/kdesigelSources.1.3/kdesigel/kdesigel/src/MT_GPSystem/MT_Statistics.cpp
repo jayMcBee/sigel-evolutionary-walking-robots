@@ -1,0 +1,130 @@
+// MT_Statistics.cpp: Implementierung der Klasse MT_Statistics.
+//
+//////////////////////////////////////////////////////////////////////
+
+#include "MT_GPSystem/MT_Statistics.h"
+
+//////////////////////////////////////////////////////////////////////
+// Konstruktion/Destruktion
+//////////////////////////////////////////////////////////////////////
+
+MT_Statistics::MT_Statistics()
+{
+
+	TotalCrossoverEvent.resize(6);
+
+}
+
+MT_Statistics::~MT_Statistics()
+{
+
+}
+
+MT_Statistics::MT_Statistics(QTextStream & File)
+{
+	
+	TotalCrossoverEvent.resize(6);
+
+	QString Statistics( "Statistics:" );
+	QString PresentLine = File.readLine();
+
+	while ((PresentLine != Statistics) && !(File.atEnd()))
+		PresentLine = File.readLine();
+
+	if (PresentLine == Statistics)
+	{
+		PresentLine = File.readLine();
+		int NumOfEntry = PresentLine.toInt();
+		
+		if ( NumOfEntry == 0)
+		{
+			NumOfSimpleCopyParent =0;
+			NumOfMutateIndividuals =0;
+			NumOfMutateImprovingIndividuals =0;
+			for (int i=0;i<6;i++)
+				TotalCrossoverEvent[i]=0;		
+		}
+		else 
+		{
+			NumOfSimpleCopyParent = (File.readLine()).toUInt();
+			NumOfMutateIndividuals = (File.readLine()).toUInt();
+			NumOfMutateImprovingIndividuals = (File.readLine()).toUInt();
+			for (int i=0;i<6;i++)
+				TotalCrossoverEvent[i]=(File.readLine()).toUInt();
+
+			for (i=0;i<NumOfEntry;i++ )
+				addStatisticElement(new MT_StatisticsElement(File)); 
+						
+		}
+	}
+}
+
+void MT_Statistics::writeToFileMT_Statistics(QTextStream & File)
+{
+
+	File << ("Statistics:\n");
+	File << (StatisticsOfGeneration.count()) <<endl;
+	File << NumOfSimpleCopyParent <<endl;
+	File << NumOfMutateIndividuals <<endl;
+	File << NumOfMutateImprovingIndividuals <<endl;
+	File << TotalCrossoverEvent[0] <<endl;
+	File << TotalCrossoverEvent[1] <<endl;
+	File << TotalCrossoverEvent[2] <<endl;
+	File << TotalCrossoverEvent[3] <<endl;
+	File << TotalCrossoverEvent[4] <<endl;
+	File << TotalCrossoverEvent[5] <<endl;
+	File << endl;
+
+	for (int i=0; i<(StatisticsOfGeneration.count());i++)
+		if (getStatisticElement(i) != NULL)
+			getStatisticElement(i)->writeToFileElement(File);
+	
+}
+
+void MT_Statistics::addStatisticElement(MT_StatisticsElement *Element)
+{
+
+	StatisticsOfGeneration.append(Element);	
+
+}
+
+MT_StatisticsElement * MT_Statistics::getStatisticElement(int ElementOfGeneration)
+{
+
+	return StatisticsOfGeneration.at(ElementOfGeneration);
+
+}
+
+int MT_Statistics::updateStatistics()
+{
+	int Error=0;
+	NumOfSimpleCopyParent =0;  
+	// Achtung: NumOfSimpleCopyParent sammelt nun die Offspringdaten und nicht Elterndaten!!  
+	NumOfMutateIndividuals = 0;
+	NumOfMutateImprovingIndividuals =0;
+
+	for (int i=0; i<6;i++)
+		TotalCrossoverEvent[i] =0;
+
+	MT_StatisticsElement * PresentSElement;
+
+
+	for (i=1; i<StatisticsOfGeneration.count(); i++)
+	{
+	
+		PresentSElement= StatisticsOfGeneration.at(i);
+	
+		NumOfSimpleCopyParent = NumOfSimpleCopyParent + PresentSElement->NumOfSimpleCopyOffspring;
+
+		NumOfMutateIndividuals = NumOfMutateIndividuals + PresentSElement->NumOfMutateOffspring;
+
+		NumOfMutateImprovingIndividuals = NumOfMutateImprovingIndividuals + PresentSElement->NumOfMutateImprovingIndividuals;
+
+		for (int k=0; k<6;k++)
+			TotalCrossoverEvent[k]=TotalCrossoverEvent[k]+PresentSElement->CrossoverEventParent[k];
+			
+	}
+
+	return Error;
+}
+	

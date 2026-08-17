@@ -1,0 +1,54 @@
+// MT_Tournament.h: Schnittstelle für die Klasse MT_Tournament.
+//
+//////////////////////////////////////////////////////////////////////
+
+#if !defined(AFX_MT_TOURNAMENT_H__0A623C55_DEBF_45AE_8F39_4F5AC54F0E85__INCLUDED_)
+#define AFX_MT_TOURNAMENT_H__0A623C55_DEBF_45AE_8F39_4F5AC54F0E85__INCLUDED_
+
+
+
+#include "MT_GPSystem/MT_Population.h"
+
+
+/* This class represent a single GP tournament;
+* it inherited from theMT_Population
+* it determine the tournament winner (s)
+*/
+class MT_Tournament : public MT_Population  
+{
+public:
+	/* realization of a fitness proportional selection
+	* @pre: the tournament member muss inside the tournament
+	* @pre: the fitness of the tournament member muss be estimated bevor
+	* @post: in the WinnerLoser array indicat a one a Winner and a zero a Loser 
+	*/
+	void fitnessProp(MT_Randomizer* Randi, QArray<int> * WinnerLoser);
+	
+	/* realization of a ranking selection
+	* @pre: the tournament menber muss inside the tournament
+	* @pre: the fitness of the tournament menber muss be estimated bevor.   
+	* @post: in the WinnerLoser array indicat a one a Winner and a zero a Loser 
+	*/
+	void ranking(QArray<int> * WinnerLoser);
+
+	void setTypOfIndividual(int Typ);
+
+	/* create a empty tournament of Size "Size" and a "Winner Array" */
+	MT_Tournament(int Size, int num );
+	MT_Tournament();
+	virtual ~MT_Tournament();
+
+private:
+
+	/* the number of winner in this tournament
+	* @pre: NumberOfWinner<= tournament.Size
+	*/
+	int NumberOfWinner;
+		
+	int TypOfIndividual;
+
+	/*  denote which players have gain the present tournaments and which are the loser*/
+	QArray<int> * WinnerLoser;
+};
+
+#endif // !defined(AFX_MT_TOURNAMENT_H__0A623C55_DEBF_45AE_8F39_4F5AC54F0E85__INCLUDED_)

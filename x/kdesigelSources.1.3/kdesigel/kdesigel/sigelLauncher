@@ -1,0 +1,30 @@
+#!/bin/sh
+
+# Just modify the next line.
+SIGEL_ROOT=$PWD;
+
+# Don't change the following lines.
+export SIGEL_ROOT;
+PVM_ROOT=/usr/lib/pvm3;
+
+if [ "`uname`" = "SunOS" ]
+  then PVM_ARCHDIR=SUN4SOL2
+    QTDIR="/app/unido-inf/sun4_56/libqt/2.30/"
+    LD_LIBRARY_PATH="${QTDIR}lib:${LD_LIBRARY_PATH}"
+    export QTDIR
+    export LD_LIBRARY_PATH
+fi
+
+if [ "`uname`" = "Linux" ]
+  then PVM_ARCHDIR=LINUX
+    PVM_ROOT=$PWD/supportingLibs/pvm3
+fi
+
+export PVM_ROOT;
+
+PATH=$PVM_ROOT/bin/$PVM_ARCHDIR:$PVM_ROOT/lib:$PATH;
+export PATH;
+#PVM_DPATH=$PVM_ROOT/lib/pvmd;
+#export PVM_DPATH;
+cd $SIGEL_ROOT;
+./sigel $@;

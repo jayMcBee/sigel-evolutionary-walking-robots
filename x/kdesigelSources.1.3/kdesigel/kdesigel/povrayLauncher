@@ -1,0 +1,6 @@
+#!/bin/sh
+
+for fileName in *.pov
+do
+  povray +I$fileName $@;
+done
