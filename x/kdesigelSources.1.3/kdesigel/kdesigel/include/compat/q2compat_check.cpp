@@ -1,4 +1,4 @@
-// Exit criterion for rung A0 (PORTING.md D11).
+// Exit criterion for step A0 (PORTING.md D11).
 //
 // Two jobs:
 //  1. Explicit instantiation, so -fsyntax-only actually checks the template

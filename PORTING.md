@@ -126,14 +126,14 @@ mismatches.
 
 ---
 
-## 4. Why there is no "start on old Qt" rung
+## 4. Why there is no "start on old Qt" step
 
 | Candidate | Verdict |
 |---|---|
 | Qt 2.3 (bundled) | Won't build on gcc 15. |
 | Qt 3.3.8 | Won't build on gcc 15. |
 | **TQt3** — Trinity's fork, R14.1.4 / Apr 2025 | Builds on modern gcc, but renames every `Q*` → `TQ*`, no compat layer. Candidate as a one-shot tool for the `.ui` files only. |
-| Qt 4 + Qt3Support | Historically exactly this rung — `Q3PtrList`, `Q3ListView`, `Q3PopupMenu`. No maintained Qt 4 on a current toolchain. |
+| Qt 4 + Qt3Support | Historically exactly this step — `Q3PtrList`, `Q3ListView`, `Q3PopupMenu`. No maintained Qt 4 on a current toolchain. |
 | Qt 5.15 | Qt3Support already removed. Nearly as far from Qt 2 as Qt 6. |
 
 This is background for decision **D1**, not a conclusion.
@@ -155,7 +155,7 @@ This is background for decision **D1**, not a conclusion.
 | **D9** | `QListView` → | **(a)** `QTreeWidget` *(applies when Phase C starts)* |
 | **D10** | Back-edge cutting | **(a)** forward-declare where possible — measured: callback needed nowhere |
 | **D11** | Verification depth | **(a)** per-file `g++ -fsyntax-only` against Qt 6; Phase B additionally requires the §9 ownership audit |
-| **D12** | Rung granularity | as listed — **15 rungs** (A0–A9, B1–B5); A9 splits in-flight only if it proves unwieldy |
+| **D12** | Step granularity | as listed — **15 steps** (A0–A9, B1–B5); A9 splits in-flight only if it proves unwieldy |
 
 ### Measured during sign-off
 
@@ -180,7 +180,7 @@ measured; trust them as you would §2.
   headers need only *parse*, not link. This is what makes D11(a) reachable
   while §3 remains out of scope.
 
-**What D11(a) does and does not buy.** Phase A rungs are pure renames under the
+**What D11(a) does and does not buy.** Phase A steps are pure renames under the
 shim, so a syntax check covers the entire error class they can produce. Phase B
 is where ownership becomes hand-written code, and there a syntax check proves
 nothing — both the correct and the double-freeing version compile. The §9 audit
@@ -200,23 +200,23 @@ Every later change diffs against `v1.3-pristine`.
 
 - One branch per phase: `qt6/phase-a-core`, `qt6/phase-b-shim-removal`.
   No `qt6/phase-c-gui` unless D3 is revisited.
-- **One commit per rung**, message prefixed with the rung ID: `A4: SIGEL_Robot
+- **One commit per step**, message prefixed with the step ID: `A4: SIGEL_Robot
   onto q2compat`
-- Tag each completed rung: `rung-A4`
-- No squashing — the per-rung history *is* the progressive record, and is what
-  makes a bad rung bisectable
+- Tag each completed step: `step-A4`
+- No squashing — the per-step history *is* the progressive record, and is what
+  makes a bad step bisectable
 
-**15 checkpoints** across the two authorized phases (D12).
+**15 steps** across the two authorized phases (D12).
 
-## 7. Rungs — AUTHORIZED (Phases A and B)
+## 7. Steps — AUTHORIZED (Phases A and B)
 
-Per **D1(a)**. 15 rungs, per **D12**.
+Per **D1(a)**. 15 steps, per **D12**.
 
-**Exit criterion per rung (D11):** every file touched by the rung passes
-`g++ -fsyntax-only` against Qt 6 headers. Phase B rungs additionally require
+**Exit criterion per step (D11):** every file touched by the step passes
+`g++ -fsyntax-only` against Qt 6 headers. Phase B steps additionally require
 the §9 ownership audit.
 
-### Phase A — core onto Qt 6 (10 checkpoints)
+### Phase A — core onto Qt 6 (10 steps)
 
 | # | Work | LOC |
 |---|---|---|
@@ -239,7 +239,7 @@ rename compiles clean and then double-frees.
 **The 4 back-edges, measured (D10).** Cheaper than the table above implies —
 2 are dead includes and 3 forward-declare. No callback anywhere:
 
-| Rung | Include | Use | Fix |
+| Step | Include | Use | Fix |
 |---|---|---|---|
 | A4 | `src/SIGEL_Robot/SIG_Link.cpp:36` → `SIG_DynaSystem.h` | symbol appears nowhere else in the file | delete the include |
 | A5 | `include/SIGEL_Program/SIG_Program.h:45` → `SIG_GPParameter.h` | `&param` in 2 signatures | forward-declare, include in `.cpp` |
@@ -258,7 +258,7 @@ seam Phase C would reconnect to, so cutting them now costs Phase C nothing.
 
 Phase A exit: core passes `-fsyntax-only` against Qt6Core, headless.
 
-### Phase B — delete the shim (5 checkpoints)
+### Phase B — delete the shim (5 steps)
 
 | # | Class | Sites |
 |---|---|---|
@@ -301,7 +301,7 @@ connections in these files.
 
 ## 8. Effort
 
-| Phase | Checkpoints | Effort | Status |
+| Phase | Steps | Effort | Status |
 |---|---|---|---|
 | A | 10 | 1.5 wk | authorized |
 | B | 5 | 1 wk | authorized |
