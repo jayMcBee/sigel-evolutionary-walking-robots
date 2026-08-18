@@ -6,7 +6,7 @@
 #include <iostream.h>
 
 //////////////////////////////////////////////////////////////////////
-// administrative methoden
+// administrative methods
 //////////////////////////////////////////////////////////////////////
 
 
@@ -59,7 +59,7 @@ MT_Randomizer::~MT_Randomizer()
 
 MT_Randomizer::MT_Randomizer(QTextStream &File)
 {
-	// set seet for the random method
+	// set seed for the random method
 	srand( (unsigned)time( NULL ) );
 
 	LastError =0;
@@ -261,7 +261,7 @@ void MT_Randomizer::writeToFileRandi(QTextStream &File)
 }
 
 //////////////////////////////////////////////////////////////////////
-// normal set/ get mehtod
+// normal set/ get method
 ////////////////////////////////////////////////////////////////////
 
 void MT_Randomizer::returnIndividualsValue(int **Length, int **NumOfVar, QArray<double> **Con, QArray<double> **ProbOfFu)

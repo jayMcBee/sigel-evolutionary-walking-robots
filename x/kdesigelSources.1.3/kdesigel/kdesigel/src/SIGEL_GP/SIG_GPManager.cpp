@@ -1005,7 +1005,7 @@ SIGEL_GP::SIG_GPManager::~SIG_GPManager()
 };
 
 
-//**************************** META methode ************************
+//**************************** META method ************************
 void SIGEL_GP::SIG_GPManager::run(MT_Classifier *MetaClassifier)
 {
 	/*	

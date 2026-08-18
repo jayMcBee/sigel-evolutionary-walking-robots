@@ -30,7 +30,7 @@ public:
 	*/ 
 	int startMatingProcess();
 
-	/* set/get function form up date the GUI or GP systm*/
+	/* set/get function form up date the GUI or GP system*/
 	void setBrutSize(int  SizeOfBrut);
 	int getBrutSize();
 	int getLastError();
@@ -45,11 +45,11 @@ public:
 
 private:
 	
-	/* generate a exact copie of the individuals*/
+	/* generate a exact copy of the individuals*/
 	MT_Individual * reproduce(MT_Individual * Progenitor);
 	/* generate two new individuals form two parents */
 	void crossover(MT_Individual *ParentOne, MT_Individual *ParentTwo);
-	/* generate a mutated copie from a parent*/
+	/* generate a mutated copy from a parent*/
 	MT_Individual * mutate(MT_Individual * Progenitor);
 
 	/*pointer of the offspring population*/

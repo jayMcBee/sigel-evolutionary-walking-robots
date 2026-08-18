@@ -224,7 +224,7 @@ void SIGEL_Simulation::SIG_DynaMechsCommandInterface::moveDrive(int driveNo,
 					<< "registerValue: " << registerValue << "\n" << "maxForce: " << drive->getMaxForce() << "\n";
 #endif
 
-		// we act only if the force is >min. force appliable
+		// we act only if the force is >min. force applicable
 #ifdef _WINDOWS		
 		if (::abs(force) >= drive->getMinForce())	{
 #else

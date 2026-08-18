@@ -386,7 +386,7 @@ int MT_Evaluator::spawnTask(SIGEL_GP::SIG_GPIndividual const& ind)
 
 		double MetaEstimationResult = Interpreter->interpret(translatedSIGProg(ncInd.getProgramPointer()));
 
-		// unlock the interpreter so that the rogram can be updated
+		// unlock the interpreter so that the program can be updated
 #ifdef _WINDOWS
 		ReleaseMutex(interpreterMutex);
 #else

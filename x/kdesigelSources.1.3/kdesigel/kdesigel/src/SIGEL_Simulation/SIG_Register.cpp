@@ -57,7 +57,7 @@ void SIGEL_Simulation::SIG_Register::makeValid()
 void SIGEL_Simulation::SIG_Register::copyReg(SIG_Register const& otherRegister)
 { 
   value=otherRegister.getValue();
-  // makeValid(); superflous
+  // makeValid(); superfluous
 };
 
 void SIGEL_Simulation::SIG_Register::addReg(SIG_Register const& otherRegister)
@@ -97,14 +97,14 @@ void SIGEL_Simulation::SIG_Register::minReg(SIG_Register const& otherRegister)
 {
   if (otherRegister.getValue()<value)
     value=otherRegister.getValue();
-  // makeValid(); superflous
+  // makeValid(); superfluous
 };
 
 void SIGEL_Simulation::SIG_Register::maxReg(SIG_Register const& otherRegister)
 {
   if (otherRegister.getValue()>value)
     value=otherRegister.getValue();
-  // makeValid(); superflous
+  // makeValid(); superfluous
 };
 
 void SIGEL_Simulation::SIG_Register::modReg(SIG_Register const& otherRegister)

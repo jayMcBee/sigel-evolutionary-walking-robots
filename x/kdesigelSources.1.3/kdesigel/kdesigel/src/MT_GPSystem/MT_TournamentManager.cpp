@@ -4,7 +4,7 @@
 
 #include "MT_GPSystem/MT_TournamentManager.h"
 //////////////////////////////////////////////////////////////////////
-//administrative methode 
+//administrative method 
 //////////////////////////////////////////////////////////////////////
 
 MT_TournamentManager::MT_TournamentManager()
@@ -68,7 +68,7 @@ MT_TournamentManager::~MT_TournamentManager()
 
 
 //////////////////////////////////////////////////////////////////////
-//get/set methode 
+//get/set method 
 //////////////////////////////////////////////////////////////////////
 int MT_TournamentManager::getLastError()
 {
@@ -135,7 +135,7 @@ void MT_TournamentManager::setTypOfIndividual(int Typ)
 
 
 //////////////////////////////////////////////////////////////////////
-//special methode 
+//special method 
 //////////////////////////////////////////////////////////////////////
 
 void MT_TournamentManager::createTournaments()
@@ -154,7 +154,7 @@ void MT_TournamentManager::performTournaments()
 	for (int i=0; i<Tournaments.size(); i++)
 		Tournaments[i]->setFreePos(0);
 	
-	// fetch a correct partition for separate the offspring into tournamnets
+	// fetch a correct partition for separate the offspring into tournaments
 	QArray<int>	*Partition = Randi->getRandomTournamentPartition(TournamentNumber);
 
 //int DebugInfo =0;

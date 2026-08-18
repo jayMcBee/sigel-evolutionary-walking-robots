@@ -10,7 +10,7 @@
 
 MT_Substitute::MT_Substitute()
 {
- // overloaded methode
+ // overloaded method
 #ifdef _WINDOWS
 	interpreterMutex = CreateMutex(NULL, false, NULL);
 	tCaseBufferMutex = CreateMutex(NULL, false, NULL);
@@ -179,18 +179,18 @@ void MT_Substitute::getNumOfEstimation(QArray<unsigned int> *MetaEstimation, QAr
 
 void MT_Substitute::loadSetup(QTextStream &File)
 {
-	// overloaded methode
+	// overloaded method
 
 }
 
 void MT_Substitute::writeToFile(QTextStream &File)
 {
-// overloaded methode
+// overloaded method
 }
 
 void MT_Substitute::writeToFileSetup(QTextStream &File)
 {	
-	// overloaded methode
+	// overloaded method
 
 }
 

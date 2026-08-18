@@ -65,7 +65,7 @@ public:
 
 	int getLastError();
 
-	/* this methode are needed for MT_GPManager::exchangeBest()
+	/* this method are needed for MT_GPManager::exchangeBest()
 	* the Substituter needed the both ResultArrys 
 	*/
 	int getPresentTSize();
