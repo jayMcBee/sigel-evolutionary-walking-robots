@@ -1,9 +1,9 @@
 #ifndef Q2COMPAT_H
 #define Q2COMPAT_H
 
-// Qt 2.3 -> Qt 6 compatibility shim.  PORTING.md D1(a), rung A0.
+// Qt 2.3 -> Qt 6 compatibility shim.  PORTING.md D1(a), step A0.
 //
-// Reproduces Qt 2.3 container semantics on top of Qt 6 so that rungs A1-A9 are
+// Reproduces Qt 2.3 container semantics on top of Qt 6 so that steps A1-A9 are
 // pure renames and every ownership decision defers to Phase B, which deletes
 // this file.
 //
@@ -80,7 +80,7 @@ public:
     Q2Array<T> copy() const { Q2Array<T> t; t.m = m; t.m.detach(); return t; }
 
     // Qt 2 hands out a non-const T& from a const array (qarray.h:108-117).
-    // Preserved so A-rung renames stay pure.  See divergence 4 on sharing.
+    // Preserved so A-step renames stay pure.  See divergence 4 on sharing.
     T &at(uint i) const { return const_cast<Q2Array<T> *>(this)->m[qsizetype(i)]; }
     T &operator[](int i) const { return at(uint(i)); }
     T *data() const { return const_cast<Q2Array<T> *>(this)->m.data(); }
