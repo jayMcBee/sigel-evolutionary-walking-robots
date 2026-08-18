@@ -77,7 +77,7 @@ rather than re-scanning.
 
 One qualifier on `QTextStream`: the *API* is unchanged, but the default codec
 is not — Qt 2 defaulted to Latin-1, Qt 6 defaults to UTF-8. A no-op over this
-corpus, which is pure ASCII (§5), but it is the path experiment files are read
+corpus — non-ASCII appears only in comments (§5) — but it is the path experiment files are read
 and written through. Tracked in §9, not scheduled.
 
 **Absent, and these are usually the worst part of a Qt port:**
@@ -155,25 +155,33 @@ This is background for decision **D1**, not a conclusion.
 | **D9** | `QListView` → | **(a)** `QTreeWidget` *(applies when Phase C starts)* |
 | **D10** | Back-edge cutting | **(a)** forward-declare where possible — measured: callback needed nowhere |
 | **D11** | Verification depth | **(a)** per-file `g++ -fsyntax-only` against Qt 6; Phase B additionally requires the §9 ownership audit |
-| **D12** | Step granularity | as listed — **15 steps** (A0–A9, B1–B5); A9 splits in-flight only if it proves unwieldy |
+| **D12** | Step granularity | as listed — **15 steps** (A0–A9, B1–B5), plus Phase 0 per D14; A9 splits in-flight only if it proves unwieldy |
+| **D13** | Qt 2 behaviour that is itself a defect | **fix it, and fix the cause.** Applies to the `memcmp` sort and the out-of-range clamp — see §9. The port is no longer strictly behaviour-preserving; that is deliberate |
+| **D14** | Comment language | translate German → English as **Phase 0**, before A1, in its own commits. Also makes the tree pure ASCII |
+
+Signed off 2026-08-18; **D13/D14 added 2026-08-18** after the A0 review.
 
 ### Measured during sign-off
 
 Facts established while answering the above, not present in §2. These are
 measured; trust them as you would §2.
 
-- **`autoDelete` splits 34 owning / 7 non-owning.** §2's count of 42 includes
-  one *comment* (`src/SIGEL_MasterGUI/SIG_GPParameter.cpp:467`), not a call.
-  All 41 real calls take a literal `TRUE`/`FALSE`, which is what makes D7(a) a
-  lookup rather than a judgement.
+- **`autoDelete` splits 38 owning / 9 non-owning — 47 calls.** All take a
+  literal `TRUE`/`FALSE`, which is what makes D7(a) a lookup rather than a
+  judgement. (An earlier count of 34/7 here was wrong: `grep` in this
+  environment is a wrapper around `ugrep -I`, which classifies the 46
+  Latin-1/CRLF files as binary and skips them silently. Any measurement in this
+  document not taken with `command grep` or Python is suspect for that reason;
+  §2's own figures were spot-checked and hold.)
 - **The back-edges are nearly free.** Of the 5 includes, 2 are dead text and 3
   forward-declare cleanly; none needs a callback. Detail in §7.
-- **The corpus is pure ASCII.** Sources, `.ui` files and the 2003 binary
-  distribution contain zero bytes ≥ 0x80, and no experiment data ships with
-  either. Latin-1 and UTF-8 are byte-identical over everything present — which
-  is why D8 went to `.toUtf8()`: the risk §5 originally warned about is empty
-  for existing data, and all three explicit `.latin1()` sites feed POSIX file
-  paths, where UTF-8 is correct on a modern system.
+- **Non-ASCII exists, but only in comments.** 46 of 380 source files carry
+  Latin-1 German (`ä ö ü ß Ä`) — 119 lines, **every one a comment, none a string
+  literal**, verified byte by byte. So D8's conclusion stands (no runtime string
+  carries a byte ≥ 0x80, making `.toLatin1()` and `.toUtf8()` identical over all
+  real data, and the three explicit `.latin1()` sites feed POSIX paths where
+  UTF-8 is right), but the earlier claim that the corpus was *pure ASCII* was
+  wrong. Phase 0 removes the Latin-1 entirely.
 - **Per-file syntax checking needs nothing from §3.** `SIGEL_Tools` and
   `MT_GPSystem` have zero non-Qt/non-stdlib includes; `SIGEL_Environment` has
   one (`dmEnvironment.hpp`), `SIGEL_Robot` one (`CyberVRML97.h`). Vendored
@@ -216,11 +224,24 @@ Per **D1(a)**. 15 steps, per **D12**.
 `g++ -fsyntax-only` against Qt 6 headers. Phase B steps additionally require
 the §9 ownership audit.
 
+### Phase 0 — comments to English (D14)
+
+Before A1. German comments → English, which also removes the Latin-1 bytes from
+all 46 affected files. No code change whatsoever.
+
+Exit criterion, stronger than D11's and specific to this phase: **strip comments
+from before and after, and diff the remainder — it must be byte-identical.** That
+mechanically proves the phase touched nothing but comments.
+
+It must not be interleaved with A1–A9. The whole value of D1(a) is that each
+Phase A diff is reviewable as a pure rename; mixing comment rewrites into those
+diffs destroys that property.
+
 ### Phase A — core onto Qt 6 (10 steps)
 
 | # | Work | LOC |
 |---|---|---|
-| A0 | Add `compat/q2compat.h`: `Q2Array`, `Q2Dict`, `Q2PtrVector`, `Q2PtrList` with Qt 2 semantics over Qt 6. Nothing uses it yet. | ~400 new |
+| A0 | Add `compat/q2compat.h`: `Q2Array`, `Q2Dict`, `Q2PtrVector`, `Q2PtrList`, `Q2Queue`, `Q2ValueList`, `Q2CString` + iterators, with Qt 2 semantics over Qt 6. Nothing uses it yet. **Done, tagged `step-A0`.** | 541 new |
 | A1 | `SIGEL_Tools` | 666 |
 | A2 | `SIGEL_Environment` | 1,028 |
 | A3 | `MT_GPSystem` | 6,880 |
@@ -321,9 +342,9 @@ Not decisions that were dodged — items measured and consciously left.
 
 The check that substitutes for being unable to run the code. After B4:
 
-- each of the **34** `setAutoDelete(TRUE)` containers has **exactly one**
+- each of the **38** `setAutoDelete(TRUE)` containers has **exactly one**
   `qDeleteAll()` on the owning path
-- none of the **7** `setAutoDelete(FALSE)` containers has one
+- none of the **9** `setAutoDelete(FALSE)` containers has one
 - no `qDeleteAll()` exists that does not trace to a `TRUE` site
 
 Grep-checkable against `v1.3-pristine`. It verifies the *transformation*, not
@@ -332,7 +353,7 @@ the behaviour — that distinction is the accepted limit of D11(a).
 ### `QTextStream` default codec
 
 232 sites. API unchanged, but Qt 2 defaulted to Latin-1 and Qt 6 defaults to
-UTF-8. A no-op over this corpus (pure ASCII, §5), and it is the path experiment
+UTF-8. A no-op over this corpus (non-ASCII only in comments, §5), and it is the path experiment
 files are read and written through. Explicitly **not** folded into D8. Becomes
 a live question the moment a non-ASCII experiment file exists.
 
@@ -379,9 +400,66 @@ the only known source of reference input should output comparison — D11 option
 (c) — ever be reconsidered, and because until they were found there was no way to
 run `-evolve` at all.
 
+**Reference output now exists.** The 2003 i386 binary was brought up on Debian
+woody libraries and all 12 experiments validated end to end. One run is captured
+verbatim (input `.exp`, stdout/stderr, and the population SIGEL wrote back): 13
+generations, 874 slave fitness evaluations, clean termination. Two limits on its
+use as a comparison baseline, both important:
+
+- the run is bounded by **wall-clock, not generation count** — `TERMINATIONMODEL`
+  selects which criterion applies, so generation counts and timings in the log
+  are machine-specific and not reproducible
+- `SAVEEXIT=1` makes SIGEL **overwrite the experiment file it was given**, and
+  re-emit config keys it had defaulted, so an evolved `.exp` is not
+  byte-comparable with its input even ignoring the population
+
 They also **confirm the D8 basis independently**: every `.exp`, `.rrb` and `.wrl`
-is pure ASCII, so the corpus-wide claim in §5 holds against this data too, and the
+is pure ASCII, so no *data* file carries a byte ≥ 0x80 and the
 `QTextStream` codec change above stays a no-op.
+
+### Defects being fixed rather than preserved (D13)
+
+The port deliberately diverges from 2003 behaviour at these points. Each is a
+defect, not a design choice, and two of the three were flagged by SIGEL's own
+authors in comments they shipped.
+
+| Where | 2003 behaviour | Now | Why |
+|---|---|---|---|
+| `Q2Array::sort()` | `memcmp` byte order (`qgarray.cpp:635-640`) | numeric | `SIG_GPManager.cpp:304,311` needs ascending numeric order for a distinct-index algorithm; above population 256 it silently emits duplicate tournament entrants. Cause is Qt 2's type erasure — its own source says *"Qt 3.0: Add a virtual compareItems()"* |
+| out-of-range array write | warn, clamp index to 0 (`qgarray.h:108-117`) | assert | The clamp silently hid the two sites below |
+| `SIG_ProgramLine.cpp:215-224` | writes `element[no]` in the branch entered *because* `no >= size()`; also compares `int` to `uint` | to be fixed | Its own comment is `// ToDo: Exception!` |
+| `SIG_DynaSystem.cpp:266-268` | deletes `dynaJoints[k]` while looping to `dynaDrives.size()` | to be fixed | The two vectors grow independently (`:605`, `:807`) |
+| `sigel_slave`, `getenv("SIGEL_ROOT")` | dereferenced unchecked on the `Terrain.ter` path | to be fixed | Segfaults instantly if unset, and the SIGSEGV handler masks it as "Invalid storage access" with no core. Found by running the 2003 binary |
+
+The last one bites under PVM specifically: `pvm_spawn`'d tasks inherit *pvmd's*
+environment, not the master's.
+
+### The A0 review
+
+A0 was reviewed independently against the vendored Qt 2.3 sources before any
+step depended on it. It found six defects, three of them ownership or state
+divergences that compiled cleanly:
+
+- copy constructor and `operator=` propagated `autoDelete`; `qcollection.h:64` is
+  `QCollection(const QCollection&) { del_item = FALSE; }`, so a Qt 2 copy is
+  always non-owning. The original shim double-freed.
+- the `Q2PtrList` cursor was not moved to the removal site, which `removeAt`
+  does via `locate()` before unlinking.
+- `Q2DictIterator` held a `QMultiHash::const_iterator`, invalidated by any erase
+  or rehash, where Qt 2 repaired its registered iterators.
+
+It also found that `Q2Queue`, `Q2ValueList` and `Q2CString` were missing, which
+would have blocked A2, A3, A8 and A9 from being pure renames — 9 `QQueue`, 9
+`QCString` and 1 `QValueList` site in core, against this document's earlier
+assumption that all were deferrable to B5.
+
+Because a double-free compiles perfectly, `q2compat_check.cpp` carries
+assert-based verification of the ownership, cursor and slot-deletion semantics
+in addition to forcing template instantiation. Reintroducing the copy-constructor
+defect makes it abort, so the check is known to have teeth.
+
+Review is scheduled again for each of B1–B5, where hand-written ownership
+appears and a compile check stops meaning anything.
 
 ### Name collisions that survive into Qt 6
 
