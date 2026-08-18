@@ -365,6 +365,24 @@ in deferred GUI code; both need per-site thought when Phase C starts.
 The other four repeated targets (`pool`, `vertices`, `experimentHistory`,
 `allowedCommands`) only re-set `true` in multiple constructors — blanket-safe.
 
+### Reference data exists, if D11 is ever revisited
+
+The experiment and robot-model files are **not** in any of the tarballs in §1.
+They are separate downloads, verified live 2026-08-18:
+
+- `sigel.sourceforge.net/download/experimente/experiments.tar.gz` — 12 `.exp` files
+- `sigel.sourceforge.net/download/robotermodelle/robots.tar.gz` — 7 models, each
+  `.rrb` + `.wrl` geometry (the `.wrl` files are what cv97 / `CyberVRML97.h` loads)
+
+Not scheduled work, and D11(a) does not use them. They are noted because they are
+the only known source of reference input should output comparison — D11 option
+(c) — ever be reconsidered, and because until they were found there was no way to
+run `-evolve` at all.
+
+They also **confirm the D8 basis independently**: every `.exp`, `.rrb` and `.wrl`
+is pure ASCII, so the corpus-wide claim in §5 holds against this data too, and the
+`QTextStream` codec change above stays a no-op.
+
 ### Name collisions that survive into Qt 6
 
 Both are traps where a Qt 2 name still exists in Qt 6 with different meaning:
