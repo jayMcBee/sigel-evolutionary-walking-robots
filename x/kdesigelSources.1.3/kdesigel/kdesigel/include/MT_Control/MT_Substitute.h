@@ -43,7 +43,7 @@ class MT_Substitute
 
 public:
 	
-	// get/set methode for Parameter update
+	// get/set method for Parameter update
 	void getEstimationParameter(int *EStrategy, double *Tol, int *ReInterval);
 	void setEstimationParameter(int EStrategy, double Tol, int ReInterval);
 	void setInterpreter(int NumOfVariable,  int TimeToInter);

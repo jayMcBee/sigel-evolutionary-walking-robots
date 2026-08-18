@@ -58,9 +58,9 @@ namespace SIGEL_Robot {
                 int cA, cB, cC;
                 // projection integrals (return values)
                 double P1, Pa, Pb, Paa, Pab, Pbb, Paaa, Paab, Pabb, Pbbb;
-                // face integrals (dito)
+                // face integrals (ditto)
                 double Fa, Fb, Fc, Faa, Fbb, Fcc, Faaa, Fbbb, Fccc, Faab, Fbbc, Fcca;
-                // volume integrals (dito, i guess)
+                // volume integrals (ditto, i guess)
                 double T0, T1[3], T2[3], TP[3];
                 // just a flag
                 bool computed;

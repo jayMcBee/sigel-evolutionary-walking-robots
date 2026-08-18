@@ -133,7 +133,7 @@ QVector<SIGEL_GP::SIG_GPIndividual> SIGEL_GP::SIG_GPOperations::crossOver( SIGEL
   SIGEL_Program::SIG_ProgramLine *sourceProgLine = 0;
 
 	// Recombination/Crossover, Variant 1:
-	// (just guessing from the code, obviosly nobody thought it was worth commenting..  -jan)
+	// (just guessing from the code, obviously nobody thought it was worth commenting..  -jan)
 	// Simple 1 point crossover, create two new programs
 	if( generalRecombinationType == 0 )
 	{
@@ -489,7 +489,7 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::mutation( SIGEL_GP::SIG_
       case 1:
 	     // -------------------------------------------------------------------------------
 	     // Mutate a randomly chosen operand. It is important to take care about the
-	     // program line type, because the number of operands is dependend on the program
+	     // program line type, because the number of operands is dependent on the program
 	     // line instruction.
 	     // -------------------------------------------------------------------------------   
             
@@ -545,7 +545,7 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::mutation( SIGEL_GP::SIG_
 	     // -------------------------------------------------------------------------------
 	     // Change the instruction type. It is very important to take care about the
 	     // following case:
-	     // If an instruction is consisting of only one onperand, and it shall be mutated
+	     // If an instruction is consisting of only one operand, and it shall be mutated
 	     // to an instruction that has to contain two operands, the (new) second operand
 	     // needs to be initialized with a (randomly) value!
 	     // -------------------------------------------------------------------------------

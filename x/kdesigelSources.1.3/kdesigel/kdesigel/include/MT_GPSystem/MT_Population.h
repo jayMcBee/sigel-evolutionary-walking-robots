@@ -21,7 +21,7 @@ class MT_Population
 {
 public:
 
-	/* supply a pionter on the best individual*/
+	/* supply a pointer on the best individual*/
 	MT_Individual * getBestIndividual();
 
 	int getLastError();

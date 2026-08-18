@@ -59,7 +59,7 @@ double MT_Interpreter::interpret(MT_TranslatedIndividual *RobProg)
 	// Source and Var serve as index for Operanden catching   
 	int Source;
 	int Var;
-	// Mod1 and Mod2 serve for casting doubel in integer for e.g. mod calculation   
+	// Mod1 and Mod2 serve for casting double in integer for e.g. mod calculation   
 	int Mod1;
 	int Mod2;
 	// in the case of two robot control program, the Offset indicate which robot program
@@ -311,7 +311,7 @@ double MT_Interpreter::interpret(MT_TranslatedIndividual *RobProg)
 					ProgramCounter++;
 				   } break;
 
-/* program controll instruction*/
+/* program control instruction*/
 		case cmp : {
 					Source = (PresentLine ->getSourceOperand())->VariableName;
 									

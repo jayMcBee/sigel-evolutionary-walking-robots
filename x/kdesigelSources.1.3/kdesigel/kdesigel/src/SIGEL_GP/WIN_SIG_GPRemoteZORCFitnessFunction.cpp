@@ -152,7 +152,7 @@ namespace SIGEL_GP
          return -1.0;
       }
 
-		// response, should containg program length !
+		// response, should contain program length !
       ReadFile(fd, &serTxt, 32, &cntRead, &osReader);
 	  WaitForSingleObject(osReader.hEvent, INFINITE);
       if ( sscanf(serTxt, "%d", &recvPrgLen) == 1)

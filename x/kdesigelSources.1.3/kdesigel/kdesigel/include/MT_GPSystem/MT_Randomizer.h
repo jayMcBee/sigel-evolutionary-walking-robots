@@ -25,7 +25,7 @@ class MT_Randomizer
 {
 public:
 
-	/******* administrative methoden *******/
+	/******* administrative methods *******/
 	MT_Randomizer (QTextStream &File);
 	MT_Randomizer();
 	virtual ~MT_Randomizer();
@@ -56,7 +56,7 @@ public:
 	MT_Operand * getRandomVariable();
 	MT_Operand * getRandomOperand ();
 
-	/*  supply the program Length for generating indivduals*/	
+	/*  supply the program Length for generating individuals*/	
 	int getProgLength();
 
 	/*serve the random creat of NumOfConstant Constnant
@@ -73,7 +73,7 @@ public:
 	QArray<int> * getRandomTournamentPartition(int NumberOfTour);
 
 
-	/******* normal set/ get mehtod *******/
+	/******* normal set/ get method *******/
 	
 	/* method for changing information between GUI and Randomizer; this two method bend the given pointer
 	* to the private attribute; so the GUI can change (or get) direct information from the Randomizer
@@ -91,7 +91,7 @@ public:
 	int getProgramLengthMax();
 	int getLastError();
 
-	/* suppy a random unsigned long between 0 an < upperBoundary*/
+	/* supply a random unsigned long between 0 an < upperBoundary*/
 	unsigned long getRandomInteger(unsigned long upperBoundary);
 
 private:
@@ -122,7 +122,7 @@ private:
 	//////////////////////////////////////////////////////////////////////////////////////////////////
 	// a lot of array, which contain the relative probability and not the real probability
 	// that mean e.g. the  probability of the Search Operators are 30,5% (Crossover) 22,25% (Mutation)
-	// and 52,75% Reproduction so are the entrys in the array: 3050 / 2225/ 5275.
+	// and 52,75% Reproduction so are the entries in the array: 3050 / 2225/ 5275.
 	//////////////////////////////////////////////////////////////////////////////////////////////////
 
 	/* contain the probability of the SearchOperators, which are desired from the user

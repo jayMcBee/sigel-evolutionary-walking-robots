@@ -138,7 +138,7 @@ namespace SIGEL_GP
          return -1.0;
       }
 
-		// response, should containg program length !
+		// response, should contain program length !
       read(fd, &serTxt, 32);
       if ( sscanf(serTxt, "%d", &recvPrgLen) == 1)
       {

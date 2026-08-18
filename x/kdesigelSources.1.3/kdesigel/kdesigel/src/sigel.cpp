@@ -121,7 +121,7 @@ int main( int argc, char *argv[] ) {
   // slaves have a priority of 19 when computing to make them behave nice when run in
   // the background using our batchsystem. Since SIGEL is most of the time waiting for
   // the slaves, set priority even lower.
-  // (Don't change this ! Prio.19 was choosen for a very special reason..)
+  // (Don't change this ! Prio.19 was chosen for a very special reason..)
 #ifdef _WINDOWS
 	SetPriorityClass(GetCurrentProcess(), IDLE_PRIORITY_CLASS);
 #else

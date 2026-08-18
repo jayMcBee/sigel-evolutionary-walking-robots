@@ -425,7 +425,7 @@ class SIG_Environment {
   QString floorMaterialName;
   /** the storage for the texture pixmap */
   QString textureFile;
-  /** holds true if the user wants to see the texture else the varible holds false */
+  /** holds true if the user wants to see the texture else the variable holds false */
   bool withTexture;
   /** the storage of the alpha value for the texture */
 	int texAlpha;

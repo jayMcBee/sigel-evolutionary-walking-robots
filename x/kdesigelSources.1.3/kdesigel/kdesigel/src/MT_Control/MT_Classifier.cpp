@@ -485,7 +485,7 @@ bool MT_Classifier::preEvolution(QVector<SIGEL_GP::SIG_GPTournament> *tours, int
 
 		}
 
-// unlock the interpreter so that the rogram can be updated
+// unlock the interpreter so that the program can be updated
 #ifdef _WINDOWS
 		ReleaseMutex(interpreterMutex);
 #else
@@ -538,7 +538,7 @@ bool MT_Classifier::preEvolution(QVector<SIGEL_GP::SIG_GPTournament> *tours, int
 
 		}
 
-// unlock the interpreter so that the rogram can be updated
+// unlock the interpreter so that the program can be updated
 #ifdef _WINDOWS
 		ReleaseMutex(interpreterMutex);
 #else

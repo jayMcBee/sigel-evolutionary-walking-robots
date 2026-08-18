@@ -36,7 +36,7 @@ class MT_GPManager : public QObject
 public:
 
 	
-	/******************** administrative methode ********************/
+	/******************** administrative method ********************/
 
 	MT_GPManager (QTextStream & File ); // the only correct Construktor 
 
@@ -52,8 +52,8 @@ public:
 	void writeToFileGPSystem(QTextStream &File);
 
 
-	/******************** set/ get methode: ********************/
-	/* primary to upadte the GUI after Start/load or to update the GP-System after change by the user*/
+	/******************** set/ get method: ********************/
+	/* primary to update the GUI after Start/load or to update the GP-System after change by the user*/
 
 	/*supply a pointer of the "Generation" S-Element or null if "Generation" out of range (<max.Generation) */
 	MT_Statistics * getGPStatistics();
@@ -89,7 +89,7 @@ public:
 	*/
 	int getLastError();
 
-	/******************** special methode ********************/
+	/******************** special method ********************/
 
 	/* set EvolStopped =true, so that the GP-Evolution will stop*/
 	void stopEvolution();

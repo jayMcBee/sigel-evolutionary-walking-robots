@@ -397,7 +397,7 @@ namespace SIGEL_Environment {
   };
 
 	void SIG_Environment::loadDynaMechsEnvironment(){
-		// before loading the DynaMechsEnvironment first generate an actuell
+		// before loading the DynaMechsEnvironment first generate an actual
    	generateTerrain();
 #ifdef _WINDOWS	
 	  char *sigelRootCString = ::getenv( "SIGEL_ROOT" );
