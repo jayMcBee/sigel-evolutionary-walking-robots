@@ -3,9 +3,9 @@
 **Scope: Qt API migration only.** Not toolchain modernization, not build-system
 work, not reproducibility testing, not PVM. Those are separate jobs; see §3.
 
-**Status: NOT APPROVED. No work starts until §5 decisions are signed off.**
-Everything in §7 is contingent on those answers. A fresh session must not treat
-§7 as authorized.
+**Status: §5 decisions signed off 2026-08-18.** Phases A and B are authorized.
+Phase C is deferred per **D3(b)** and is *not* authorized. §9 lists what is
+deliberately still open.
 
 ---
 
@@ -30,7 +30,7 @@ Everything in §7 is contingent on those answers. A fresh session must not treat
 └── xb/                                     extracted 2003 binary
 ```
 
-Not a git repository yet. git 2.51.0 available. See §6.
+Git repo initialized; pristine source tagged `v1.3-pristine`. See §6.
 
 Upstream: `sourceforge.net/projects/sigel` — SIGEL, Uni Dortmund LS11,
 2001–2003, GPLv2. Genetic programming evolves walking gaits for simulated
@@ -53,7 +53,7 @@ rather than re-scanning.
 | `QVector<T>` | 48 | **array of pointers** in Qt 2 — not Qt 6's `QVector` |
 | `QList<T>` | 37 | **list of pointers** in Qt 2, with `autoDelete()` |
 | `QCString` / `QValueList` / `QQueue` / `QListIterator` | 16 | |
-| `setAutoDelete` / `autoDelete` | 42 | ownership decision points |
+| `setAutoDelete` / `autoDelete` | 42 | 41 calls (34 `TRUE`, 7 `FALSE`) + 1 comment — see §5 |
 | `QString::null` | 42 | |
 | `sprintf` | 23 | |
 | `lower` 5, `findRev` 4, `latin1` 3, `simplifyWhiteSpace` 3, `upper` 2 | 17 | |
@@ -74,6 +74,11 @@ rather than re-scanning.
 `QString` 958, `QTextStream` 232, `QDateTime`/`QTime`/`QDate` 91, `QObject` 28,
 `QFile` 15, `QDir` 14, `QStringList` 12, `QDataStream` 12, `QThread` 3,
 `QTimer` 2 — all carry into Qt 6 essentially as-is.
+
+One qualifier on `QTextStream`: the *API* is unchanged, but the default codec
+is not — Qt 2 defaulted to Latin-1, Qt 6 defaults to UTF-8. A no-op over this
+corpus, which is pure ASCII (§5), but it is the path experiment files are read
+and written through. Tracked in §9, not scheduled.
 
 **Absent, and these are usually the worst part of a Qt port:**
 
@@ -135,63 +140,81 @@ This is background for decision **D1**, not a conclusion.
 
 ---
 
-## 5. Decisions required before any work — YOUR CALL
+## 5. Decisions — SIGNED OFF 2026-08-18
 
-Nothing in §7 is authorized until these are answered. Recommendations are
-marked, not applied.
+| # | Decision | Answer |
+|---|---|---|
+| **D1** | Migration strategy | **(a)** compat shim over Qt 6, ported onto then deleted |
+| **D2** | Target Qt version | **6.9.2** from Ubuntu `qt6-base-dev`; recorded here as the tested-against version, no pinning machinery |
+| **D3** | GUI scope | **(b)** core only, GUI deferred — Phase C not authorized |
+| **D4** | GUI toolkit | **(a)** Qt 6 Widgets *(applies when Phase C starts)* |
+| **D5** | `.ui` handling | **(a)** converter script *(applies when Phase C starts)* |
+| **D6** | Container targets | **(a)** `QList<T*>` |
+| **D7** | The `autoDelete` sites | **(a)** blanket rule from D6; exceptions logged in §9 |
+| **D8** | `QString`→`const char*` | **(b)** `.toUtf8()` |
+| **D9** | `QListView` → | **(a)** `QTreeWidget` *(applies when Phase C starts)* |
+| **D10** | Back-edge cutting | **(a)** forward-declare where possible — measured: callback needed nowhere |
+| **D11** | Verification depth | **(a)** per-file `g++ -fsyntax-only` against Qt 6; Phase B additionally requires the §9 ownership audit |
+| **D12** | Rung granularity | as listed — **15 rungs** (A0–A9, B1–B5); A9 splits in-flight only if it proves unwieldy |
 
-| # | Decision | Options | Rec. |
-|---|---|---|---|
-| **D1** | Migration strategy | (a) compat shim over Qt 6, ported onto then deleted (b) direct per-module rewrite, no shim (c) TQt3 as an intermediate rung | a |
-| **D2** | Target Qt version | 6.x — pin a minor, or track distro | — |
-| **D3** | GUI scope | (a) core + all 4 GUI modules (b) core only, GUI deferred (c) core only, GUI dropped permanently | — |
-| **D4** | GUI toolkit *(if D3 ≠ c)* | (a) Qt 6 Widgets, preserves existing forms (b) QML, forms rewritten | a |
-| **D5** | `.ui` handling *(if D3 ≠ c)* | (a) write a converter script (b) TQt3 Designer open-and-resave (c) hand-rebuild in Designer 6 | a |
-| **D6** | Container targets | (a) `QList<T*>` — stays in Qt idiom (b) `std::vector<std::unique_ptr<T>>` — moves ownership to the type system | — |
-| **D7** | The 42 `autoDelete` sites | (a) blanket rule from D6 (b) case-by-case, each needs your approval | — |
-| **D8** | `QString`→`const char*`, 74 sites | (a) `.toLatin1()` — preserves Qt 2 behaviour exactly (b) `.toUtf8()` — modernizes; **data files and German strings may change meaning** | — |
-| **D9** | `QListView` → | (a) `QTreeWidget` — item-based, closest to Qt 2 (b) `QTreeView` + model — more work, modern idiom | a |
-| **D10** | Back-edge cutting | (a) forward-declare where possible, callback where not (b) callback/observer everywhere | a |
-| **D11** | Verification depth per rung | (a) compiles and links (b) + smoke run (c) + output comparison — needs test scaffolding you have not scoped | — |
-| **D12** | Rung granularity | one commit per rung as listed (24), or finer/coarser | — |
+### Measured during sign-off
 
-**D11 is the one I would not skip.** With (a), a rung being "green" means only
-that it compiles — a rename that silently changes pointer ownership passes.
-That is precisely the failure mode the shim in D1(a) is designed to postpone
-rather than prevent.
+Facts established while answering the above, not present in §2. These are
+measured; trust them as you would §2.
 
----
+- **`autoDelete` splits 34 owning / 7 non-owning.** §2's count of 42 includes
+  one *comment* (`src/SIGEL_MasterGUI/SIG_GPParameter.cpp:467`), not a call.
+  All 41 real calls take a literal `TRUE`/`FALSE`, which is what makes D7(a) a
+  lookup rather than a judgement.
+- **The back-edges are nearly free.** Of the 5 includes, 2 are dead text and 3
+  forward-declare cleanly; none needs a callback. Detail in §7.
+- **The corpus is pure ASCII.** Sources, `.ui` files and the 2003 binary
+  distribution contain zero bytes ≥ 0x80, and no experiment data ships with
+  either. Latin-1 and UTF-8 are byte-identical over everything present — which
+  is why D8 went to `.toUtf8()`: the risk §5 originally warned about is empty
+  for existing data, and all three explicit `.latin1()` sites feed POSIX file
+  paths, where UTF-8 is correct on a modern system.
+- **Per-file syntax checking needs nothing from §3.** `SIGEL_Tools` and
+  `MT_GPSystem` have zero non-Qt/non-stdlib includes; `SIGEL_Environment` has
+  one (`dmEnvironment.hpp`), `SIGEL_Robot` one (`CyberVRML97.h`). Vendored
+  headers need only *parse*, not link. This is what makes D11(a) reachable
+  while §3 remains out of scope.
+
+**What D11(a) does and does not buy.** Phase A rungs are pure renames under the
+shim, so a syntax check covers the entire error class they can produce. Phase B
+is where ownership becomes hand-written code, and there a syntax check proves
+nothing — both the correct and the double-freeing version compile. The §9 audit
+is the substitute, and it is an inspection, not a test. Phase B ships
+correct-by-inspection; that is a known and accepted limit of this plan.
 
 ## 6. Git protocol
 
-Not yet a repo. Proposed, pending **D12**:
+Done — the repo exists, the pristine 2003 source is committed and tagged:
 
 ```
-git init
-git add x/kdesigelSources.1.3/          # pristine 2003 source
-git commit -m "vendor: kdesigel 1.3 sources as released 2003-04-30"
-git tag v1.3-pristine
+0516d62  vendor: kdesigel 1.3 sources as released 2003-04-30   (tag: v1.3-pristine)
+685f04c  docs: Qt 2.3 -> Qt 6 migration plan
 ```
 
 Every later change diffs against `v1.3-pristine`.
 
-- One branch per phase: `qt6/phase-a-core`, `qt6/phase-b-shim-removal`,
-  `qt6/phase-c-gui`
+- One branch per phase: `qt6/phase-a-core`, `qt6/phase-b-shim-removal`.
+  No `qt6/phase-c-gui` unless D3 is revisited.
 - **One commit per rung**, message prefixed with the rung ID: `A4: SIGEL_Robot
   onto q2compat`
 - Tag each completed rung: `rung-A4`
 - No squashing — the per-rung history *is* the progressive record, and is what
   makes a bad rung bisectable
 
-24 checkpoints across the three phases as listed below.
+**15 checkpoints** across the two authorized phases (D12).
 
----
+## 7. Rungs — AUTHORIZED (Phases A and B)
 
-## 7. Rungs — CONTINGENT ON §5
+Per **D1(a)**. 15 rungs, per **D12**.
 
-Written assuming **D1(a)**. If D1 changes, this section is rewritten.
-
-Exit criterion per rung is set by **D11** and currently unanswered.
+**Exit criterion per rung (D11):** every file touched by the rung passes
+`g++ -fsyntax-only` against Qt 6 headers. Phase B rungs additionally require
+the §9 ownership audit.
 
 ### Phase A — core onto Qt 6 (10 checkpoints)
 
@@ -213,7 +236,27 @@ ownership decision to Phase B. The trap it defuses: Qt 2's `QVector`/`QList`
 hold pointers, Qt 6's hold values, **and the names are identical** — a naive
 rename compiles clean and then double-frees.
 
-Phase A exit: core builds against Qt6Core, headless.
+**The 4 back-edges, measured (D10).** Cheaper than the table above implies —
+2 are dead includes and 3 forward-declare. No callback anywhere:
+
+| Rung | Include | Use | Fix |
+|---|---|---|---|
+| A4 | `src/SIGEL_Robot/SIG_Link.cpp:36` → `SIG_DynaSystem.h` | symbol appears nowhere else in the file | delete the include |
+| A5 | `include/SIGEL_Program/SIG_Program.h:45` → `SIG_GPParameter.h` | `&param` in 2 signatures | forward-declare, include in `.cpp` |
+| A8 | `include/MT_Control/MT_Controller.h:4` → `MT_MainWindow.h` | `MT_MainWindow *mainWindow` member | forward-declare |
+| A9 | `include/SIGEL_GP/SIG_GUIGPManager.h:27` → `SIG_Experiment.h` | `&guiExperiment` param + member | forward-declare, include in `.cpp` |
+| A9 | `include/SIGEL_GP/SIG_GPManager.h:29` → `SIG_IndividualListItem.h` | symbol appears nowhere else in the header | delete the include |
+
+The two "dead include" findings are *textual* — no symbol reference in the
+file. Since nothing compiles yet (§3), that is the strongest available claim.
+If one turns out to be load-bearing transitively (e.g. `SIG_DynaSystem.h`
+pulling in dynamechs declarations), the fix is a direct include of whatever it
+was really providing — not a callback.
+
+A8 and A9 point at deferred GUI modules. A forward declaration is exactly the
+seam Phase C would reconnect to, so cutting them now costs Phase C nothing.
+
+Phase A exit: core passes `-fsyntax-only` against Qt6Core, headless.
 
 ### Phase B — delete the shim (5 checkpoints)
 
@@ -222,12 +265,12 @@ Phase A exit: core builds against Qt6Core, headless.
 | B1 | `Q2Array` — value semantics, easiest first | 74 |
 | B2 | `Q2Dict` | 61 |
 | B3 | `Q2PtrVector` | 48 |
-| B4 | `Q2PtrList` — the 42 `autoDelete` sites resolve here per **D7** | 37 |
+| B4 | `Q2PtrList` — the 41 `autoDelete` calls resolve here per **D7**: 34 `TRUE` → `qDeleteAll()` in the owner's destructor, 7 `FALSE` → nothing | 37 |
 | B5 | `Q2CString`, `Q2ValueList`, `Q2Queue`, iterators | 16 |
 
-Phase B exit: `q2compat.h` deleted.
+Phase B exit: `q2compat.h` deleted, and the §9 ownership audit passes.
 
-### Phase C — GUI (9 checkpoints, only if D3 ≠ c)
+### Phase C — GUI — DEFERRED per D3(b), NOT AUTHORIZED
 
 Mechanical and independent items first, to shrink the surface before the
 structural ones.
@@ -256,13 +299,77 @@ connections in these files.
 
 ---
 
-## 8. Effort, contingent
+## 8. Effort
 
-| Phase | Checkpoints | Effort |
+| Phase | Checkpoints | Effort | Status |
+|---|---|---|---|
+| A | 10 | 1.5 wk | authorized |
+| B | 5 | 1 wk | authorized |
+| C | 9 | 2.5–3 wk | deferred, D3(b) |
+
+**~2.5 weeks for the authorized work.** Excludes the §3 precondition (~3 days,
+separate job), which nothing here depends on: D11(a) was chosen precisely so
+Phases A and B can be verified without it.
+
+---
+
+## 9. Open, deliberately
+
+Not decisions that were dodged — items measured and consciously left.
+
+### Phase B ownership audit (D11)
+
+The check that substitutes for being unable to run the code. After B4:
+
+- each of the **34** `setAutoDelete(TRUE)` containers has **exactly one**
+  `qDeleteAll()` on the owning path
+- none of the **7** `setAutoDelete(FALSE)` containers has one
+- no `qDeleteAll()` exists that does not trace to a `TRUE` site
+
+Grep-checkable against `v1.3-pristine`. It verifies the *transformation*, not
+the behaviour — that distinction is the accepted limit of D11(a).
+
+### `QTextStream` default codec
+
+232 sites. API unchanged, but Qt 2 defaulted to Latin-1 and Qt 6 defaults to
+UTF-8. A no-op over this corpus (pure ASCII, §5), and it is the path experiment
+files are read and written through. Explicitly **not** folded into D8. Becomes
+a live question the moment a non-ASCII experiment file exists.
+
+### Ownership handled without the flag
+
+D7(a) assumes the `autoDelete` flag records every ownership decision. One
+counter-example found, and it is a comment rather than a call:
+
+```
+src/SIGEL_MasterGUI/SIG_GPParameter.cpp:467
+  * this is the list of SIG_GPPVMHosts which have to be deleted as
+    setAutoDelete is NOT true
+```
+
+In `SIGEL_MasterGUI`, so outside authorized scope — but proof the pattern
+exists. Phase B should watch for `take()`/`clear()` handoffs on containers whose
+flag stays `TRUE`; those call sites get read during B4 anyway.
+
+### Toggling containers (Phase C)
+
+Two containers flip `autoDelete` at runtime — Qt 2's "remove without deleting"
+idiom, which a single destructor `qDeleteAll` does **not** reproduce. Both are
+in deferred GUI code; both need per-site thought when Phase C starts.
+
+| Container | File | Toggles |
 |---|---|---|
-| A | 10 | 1.5 wk |
-| B | 5 | 1 wk |
-| C | 9 | 2.5–3 wk |
+| `experimentDict` | `src/SIGEL_MasterGUI/SIG_ExperimentListView.cpp` | 3 `false`…`true` pairs (102/110, 229/236, 249/256) |
+| `widgetDict` | `src/SIGEL_MasterGUI/SIG_Experiment.cpp` | 1 pair (206/210) |
 
-**~2.5 weeks headless, ~5.5 weeks complete.** Excludes §3 precondition (~3 days,
-separate job) and any test scaffolding chosen under D11.
+The other four repeated targets (`pool`, `vertices`, `experimentHistory`,
+`allowedCommands`) only re-set `true` in multiple constructors — blanket-safe.
+
+### Name collisions that survive into Qt 6
+
+Both are traps where a Qt 2 name still exists in Qt 6 with different meaning:
+
+- `QVector`/`QList` — pointers in Qt 2, values in Qt 6. **Silent**: compiles
+  clean, then double-frees. This is the trap D1(a)'s shim exists to defuse.
+- `QListView` — a multi-column tree in Qt 2, a flat model-view list in Qt 6.
+  Fails loudly at compile time, but will mislead anyone reading the diff.
