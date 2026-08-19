@@ -1,4 +1,4 @@
-// MT_FitnessTranier.h: Schnittstelle für die Klasse MT_FitnessTranier.
+// MT_FitnessTranier.h: interface for class MT_FitnessTranier.
 //
 //////////////////////////////////////////////////////////////////////
 
@@ -65,7 +65,7 @@ public:
 
 	int getLastError();
 
-	/* this method are needed for MT_GPManager::exchangeBest()
+	/* this method is needed by MT_GPManager::exchangeBest()
 	* the Substituter needed the both ResultArrys 
 	*/
 	int getPresentTSize();

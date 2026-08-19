@@ -1,4 +1,4 @@
-// MT_Operand.h: Schnittstelle für die Klasse MT_Operand.
+// MT_Operand.h: interface for class MT_Operand.
 //
 //////////////////////////////////////////////////////////////////////
 

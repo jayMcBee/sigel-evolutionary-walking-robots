@@ -1,4 +1,4 @@
-// MT_Substitute.h: Schnittstelle für die Klasse MT_Substitute.
+// MT_Substitute.h: interface for class MT_Substitute.
 //
 //////////////////////////////////////////////////////////////////////
 
@@ -7,8 +7,8 @@
 
 
 
-#include "MT_GPSystem/MT_Program.h"	// Hinzugefügt von der Klassenansicht
-#include "MT_GPSystem/MT_Interpreter.h"	// Hinzugefügt von der Klassenansicht
+#include "MT_GPSystem/MT_Program.h"	// Added from the class view
+#include "MT_GPSystem/MT_Interpreter.h"	// Added from the class view
 #include "MT_GPSystem/MT_TranslatedIndividual.h"
 #include "MT_GPSystem/MT_TrainingCase.h"
 #include "MT_GPSystem/MT_TrainingCase.h"
@@ -72,7 +72,7 @@ public:
 	// used for update the MetaError 
 	void changeErrorInfo(QArray<double> * OutCome, QArray<double> * CorrectFit);
 
-	//überladende Methoden 
+	//overriding methods 
 	MT_Substitute();
 	virtual ~MT_Substitute();
 	virtual void loadSetup(QTextStream &File);
@@ -118,13 +118,13 @@ protected:
 	*/ 
 	int Typ;
 
-	/* Gitb die Stratgie vor, wie die Frage zu beantwortet ist, ob Meta oder Simulation zur 
-	* Bestimmung der Sigel-Fitness benutzt werden soll.
-	* Beim Evaluator:
-	* EstimationStrategy = 1 := durchschnitliche Abweichung von der Fitness < Tolerance; Tolerance>=0;
-	* EstimationStrategy = 2 := durchschnitliche Abweichung von der Fitness ohne(***)  < Tolerance;
-	* (***) := die (Anzahl der Fitnessfälle)/10 größten Abweichnungen 
-	* EstimationStrategy = 3 := percentaged Anzahl von falsche Endscheidungen: 0% < Tolerance < 100%
+	/* Prescribes the strategy for deciding whether meta or simulation is used to 
+	* determine the SIGEL fitness.
+	* For the evaluator:
+	* EstimationStrategy = 1 := average deviation from the fitness < Tolerance; Tolerance >= 0;
+	* EstimationStrategy = 2 := average deviation from the fitness excluding (***) < Tolerance;
+	* (***) := the (number of fitness cases)/10 largest deviations 
+	* EstimationStrategy = 3 := percentage of wrong decisions: 0% < Tolerance < 100%
 	* EstimationStrategy = 4 :=
 	* EstimationStrategy sonst := 
 	*/

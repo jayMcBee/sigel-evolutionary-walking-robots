@@ -1,4 +1,4 @@
-// MT_Evaluator.h: Schnittstelle für die Klasse MT_Evaluator.
+// MT_Evaluator.h: interface for class MT_Evaluator.
 //
 //////////////////////////////////////////////////////////////////////
 
@@ -37,17 +37,17 @@ private:
 	int NextFreePos;
 
 	
-	/*create a new TCase from a SIG_Program; 
-	* Attention: there isn't a valid Fitness,
-	* this mus be setting in checkTask   
+	/* Create a training case from a SIG_Program.  Fitness is a -1 placeholder
+	* until checkTask() gets the PVM result; it matches this case by getName(),
+	* which is why PVMTaskID is stored as the Name.
 	*/
 	MT_TrainingCase * createNewTCase(SIGEL_Program::SIG_Program * SIGProg, int PVMTaskID);
 	
-	/*hier findet sich die Kalibrierungstratgie wieder; falls true wird MetaProg zur Fitnessbewertung
-	* des SIGEL Individuums benutzt, sonst Sigel "normal"
+	/*The calibration strategy lives here; if true, MetaProg is used for fitness evaluation
+	* of the SIGEL individual, otherwise SIGEL runs "normally"
 	*/
 	/* EstimationStrategy: if true = the BestMETAProgram will use for estimate the Fitness of the SigelProgram
-	* false = the normal Sigel methode will use to estimate the Fitness
+	* false = the normal SIGEL method will be used to estimate the fitness
 	*/
 	bool evaluationTactic();
 

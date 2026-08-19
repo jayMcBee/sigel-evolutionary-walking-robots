@@ -1,4 +1,4 @@
-// MT_Interpreter.h: Schnittstelle für die Klasse MT_Interpreter.
+// MT_Interpreter.h: interface for class MT_Interpreter.
 //
 //////////////////////////////////////////////////////////////////////
 
