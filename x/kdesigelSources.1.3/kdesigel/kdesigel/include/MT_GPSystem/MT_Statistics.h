@@ -1,4 +1,4 @@
-// MT_Statistics.h: Schnittstelle für die Klasse MT_Statistics.
+// MT_Statistics.h: interface for class MT_Statistics.
 //
 //////////////////////////////////////////////////////////////////////
 

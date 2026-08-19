@@ -1,11 +1,11 @@
-// MT_Statistics.cpp: Implementierung der Klasse MT_Statistics.
+// MT_Statistics.cpp: implementation of class MT_Statistics.
 //
 //////////////////////////////////////////////////////////////////////
 
 #include "MT_GPSystem/MT_Statistics.h"
 
 //////////////////////////////////////////////////////////////////////
-// Konstruktion/Destruktion
+// Construction/destruction
 //////////////////////////////////////////////////////////////////////
 
 MT_Statistics::MT_Statistics()
@@ -99,7 +99,7 @@ int MT_Statistics::updateStatistics()
 {
 	int Error=0;
 	NumOfSimpleCopyParent =0;  
-	// Achtung: NumOfSimpleCopyParent sammelt nun die Offspringdaten und nicht Elterndaten!!  
+	// Note: NumOfSimpleCopyParent now collects offspring data, not parent data  
 	NumOfMutateIndividuals = 0;
 	NumOfMutateImprovingIndividuals =0;
 

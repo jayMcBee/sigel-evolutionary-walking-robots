@@ -244,8 +244,8 @@ namespace SIGEL_GP
 				            return -1;
       }
 
-	  // Baudrate, 8N1, Steuerleitungen ignorieren, Empfang ermoeglichen; 
-	  // ggf. Flusskontrolle
+	  // Baud rate, 8N1, ignore control lines, enable receive; 
+	  // Flow control if needed
 	  dcb.BaudRate = baudcode;		// baudrate
 	  dcb.ByteSize = 8;				// 8Bit char size |
 	  dcb.StopBits = ONESTOPBIT;	// 1 stop bit	  |-> 8N1
@@ -263,7 +263,7 @@ namespace SIGEL_GP
 	  FillMemory(&timeOuts, sizeof(timeOuts), 0);
 	  SetCommTimeouts(fd, &timeOuts);
 
-      // Einstellungen setzen
+      // Apply the settings
 	  FlushFileBuffers(fd);		// flush output buffer; ensures that all pending write
 								// operations are transmitted (equals TCSADRAIN on Linux)
 								// before changing the serial comm settings

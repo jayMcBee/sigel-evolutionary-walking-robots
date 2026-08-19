@@ -1,4 +1,4 @@
-// MT_Search.cpp: Implementierung der Klasse MT_Search.
+// MT_Search.cpp: implementation of class MT_Search.
 //
 //////////////////////////////////////////////////////////////////////
 
@@ -6,7 +6,7 @@
 #include <qfile.h>
 
 //////////////////////////////////////////////////////////////////////
-// Konstruktion/Destruktion
+// Construction/destruction
 //////////////////////////////////////////////////////////////////////
 
 MT_Search::MT_Search()
@@ -86,7 +86,7 @@ MT_Individual * MT_Search::mutate(MT_Individual * Progenitor)
 	{
 		if (Randi->answerMutateLine())
 		{
-			//laufe über Programmzeile
+			//Iterate over the program line
 			for(int k=0; k<3; k++)
 			{
 				
@@ -131,7 +131,7 @@ MT_Individual * MT_Search::mutate(MT_Individual * Progenitor)
 void MT_Search::crossover(MT_Individual * ParentOne, MT_Individual * ParentTwo)
 {
 
-/* ************************* Initialisierungen  **************************/
+/* ************************* Initialisationen  **************************/
 
 	MT_Program * POneProgram = ParentOne->getProgram();
 	MT_Program * PTwoProgram = ParentTwo->getProgram();
@@ -149,7 +149,7 @@ void MT_Search::crossover(MT_Individual * ParentOne, MT_Individual * ParentTwo)
 	* Array[6] = the third XPoint in the second Individual
 	*/
 	
-/* ************************* Neue Individuen mit je den 1. Teil erzeugen **************************/
+/* ************************* Create new individuals, each with the first part **************************/
 
 	MT_Program * ChildOneProgram = new MT_Program(POneProgram,0,(XPoints[1]-1));
 	MT_Program * ChildTwoProgram = new MT_Program(PTwoProgram,0,(XPoints[2]-1));
@@ -161,7 +161,7 @@ void MT_Search::crossover(MT_Individual * ParentOne, MT_Individual * ParentTwo)
 	ChildTwo = new MT_Individual(ChildTwoProgram, false);
 
 
-/* ************************* das/die restliche(n) Programmstück(e) werden an ChildOne und ChildTwo angehängt **************************/
+/* ************************* The remaining program fragment(s) are appended to ChildOne and ChildTwo **************************/
 
 	MT_Program * NextProgPartForChildOne;
 	MT_Program * NextProgPartForChildTwo;
@@ -169,7 +169,7 @@ void MT_Search::crossover(MT_Individual * ParentOne, MT_Individual * ParentTwo)
 	switch (XPoints[0])
 	{
 
-	// nur 1 XPoint wurde gewählt
+	// Only 1 crossover point was chosen
 	case 0:
 		{
 			NextProgPartForChildOne = new MT_Program(PTwoProgram, XPoints[2], (PTwoProgram->getLength()-1));
@@ -186,7 +186,7 @@ void MT_Search::crossover(MT_Individual * ParentOne, MT_Individual * ParentTwo)
 
 		} break;
 	
-	// 2 Xpoints werden benutzt
+	// 2 crossover points are used
 	case 1: 
 		{
 			NextProgPartForChildOne = new MT_Program(PTwoProgram, XPoints[2], (XPoints[4]-1));
@@ -213,7 +213,7 @@ void MT_Search::crossover(MT_Individual * ParentOne, MT_Individual * ParentTwo)
 			
 		} break;
 
-	// 3 XPoints werden benutzt
+	// 3 crossover points are used
 	case 2:
 		{
 			NextProgPartForChildOne = new MT_Program(PTwoProgram, XPoints[2], (XPoints[4]-1));
@@ -261,11 +261,11 @@ MT_Individual*  MT_Search::reproduce(MT_Individual * Progenitor)
 int MT_Search::startMatingProcess()
 {
 
-/* ************************* Initialisierungen  **************************/
+/* ************************* Initialisationen  **************************/
 	int ParentSize = SourcePop->getSize();
 	int OffspringSize = TargetPop->getSize();
 	int FreePos =0; 
-	int ParentPos = Randi->getRandomInteger(ParentSize); // zu betrachtenden Elternteil 
+	int ParentPos = Randi->getRandomInteger(ParentSize); // the parent under consideration 
 
 	ChildOne =0;
 	ChildTwo =0;
@@ -274,7 +274,7 @@ int MT_Search::startMatingProcess()
 
 	bool CrossOver = false;
 
-/* ************************* Kopiere Eltern -Zeiger  in den Offspring **************************/
+/* ************************* Copy parent pointers into the offspring **************************/
 	TargetPop->flush();
 	TargetPop->setFreePos(OffspringSize);
 	
@@ -299,13 +299,13 @@ int MT_Search::startMatingProcess()
 		TargetPop->insertAtPos(Parent,RandomPos);
 	}
 	
-/* ************************** Füge die neu erzeugten Individuen ein ****************** */
+/* ************************** Insert the newly created individuals ****************** */
 	for (FreePos=0;FreePos<OffspringSize;)
 	{
 		switch (Randi->getRandomSOperator())
 		{
 		
-		/* Reproduktion des Elternteil*/
+		/* Reproduction of the parent*/
 		case 3 :
 			{
 				ChildOne= reproduce(SourcePop->getIndividual(ParentPos));
@@ -326,7 +326,7 @@ int MT_Search::startMatingProcess()
 			} break;
 		
 		
-		/* Mutation des Elternteils */
+		/* Mutation of the parent */
 		case 2 :
 			{
 				ChildOne = mutate(SourcePop->getIndividual(ParentPos));
@@ -345,7 +345,7 @@ int MT_Search::startMatingProcess()
 
 			} break;
 		
-		/*Rekombination mit dem Elternteil, falls "Partner" vorhanden */
+		/*Recombination with the parent, if a "partner" is available */
 		case 1 :
 			{
 				if (CrossOver==true)

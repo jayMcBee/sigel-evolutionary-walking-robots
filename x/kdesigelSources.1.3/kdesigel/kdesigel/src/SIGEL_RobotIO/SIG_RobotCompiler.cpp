@@ -154,7 +154,7 @@ namespace SIGEL_RobotIO {
                 QString objectName = expectWord ();
                 expect (RobotSymbol::openingBrace);
 
-                // Einsetzpunkt: Materialobjekt finden oder erstellen.
+                // Insertion point: find or create the material object.
                 mater = materialFind (objectName);
 
                 symstr = expectWord ();
@@ -165,7 +165,7 @@ namespace SIGEL_RobotIO {
                                                myScanner.currentLine ());
                 DL_Scalar dichte = expectNumber ();
                 expect (RobotSymbol::semicolon);
-                // Einsetzpunkt: Dichte des Materials ist bekannt.
+                // Insertion point: the material density is known.
                 materialDensity (mater, dichte);
 
                 myScanner.peekSymbol (symtype, symstr);
@@ -186,7 +186,7 @@ namespace SIGEL_RobotIO {
 
                         expect (RobotSymbol::semicolon);
 
-                        // Einsetzpunkt: Reibungskonstante komplett
+                        // Insertion point: friction constant complete
                         materialFriction (mater, anderes_material, konstante);
                         myScanner.peekSymbol (symtype, symstr);
                 }
@@ -198,7 +198,7 @@ namespace SIGEL_RobotIO {
                         DL_Scalar elas = expectNumber ();
                         expect (RobotSymbol::semicolon);
 
-                        //Einsetzpunkt: Elastizitaetskonstante gegeben
+                        //Insertion point: elasticity constant given
                         materialElasticity (mater, elas);
                         myScanner.peekSymbol (symtype, symstr);
                 }
@@ -231,14 +231,14 @@ namespace SIGEL_RobotIO {
                         blau = expectNumber ();
 
                         expect (RobotSymbol::semicolon);
-                        // Einsetzpunkt: Farbe komplett gelesen
+                        // Insertion point: colour fully read
                         materialColour (mater, rot, gruen, blau);
 
                         myScanner.peekSymbol (symtype, symstr);
                 }
 
                 expect (RobotSymbol::closingBrace);
-                // Einsetzpunkt: Ende Ende Ende
+                // Insertion point: end end end
                 materialFinish (mater);
         }
 
@@ -251,12 +251,12 @@ namespace SIGEL_RobotIO {
                 QString objectName = expectWord ();
                 expect (RobotSymbol::openingBrace);
 
-                // Einsetzungspunkt: Objekt erstellen oder suchen
+                // Insertion point: create or look up the object
                 thema = linkFind (objectName);
 
                 symstr = expectWord ();
                 if (symstr == "torso") {
-                        // Einsetzungspunkt: Rumpfglied
+                        // Insertion point: trunk link
                         linkIsTorso (thema);
                         expect (RobotSymbol::semicolon);
                         symstr = expectWord ();
@@ -268,7 +268,7 @@ namespace SIGEL_RobotIO {
                                                "(unknown)",
                                                myScanner.currentLine ());
                 symstr = expectString ();
-                // Einsetzungspunkt: Geometriedatei
+                // Insertion point: geometry file
                 linkGeometryFile (thema, symstr);
                 expect (RobotSymbol::semicolon);
 
@@ -279,7 +279,7 @@ namespace SIGEL_RobotIO {
                                                "(unknown)",
                                                myScanner.currentLine ());
                 symstr = expectWord ();
-                // Einsetzungspunkt: Material ist bekannt
+                // Insertion point: the material is known
                 linkMaterial (thema, symstr);
                 expect (RobotSymbol::semicolon);
 
@@ -302,7 +302,7 @@ namespace SIGEL_RobotIO {
                         expect (RobotSymbol::closingParen);
                         expect (RobotSymbol::semicolon);
 
-                        // Einsetzungspunkt: Ein Punkt ist bekannt.
+                        // Insertion point: a point is known.
                         linkPoint (thema, pointname, xval, yval, zval);
                         myScanner.peekSymbol (symtype, symstr);
                 }
@@ -315,7 +315,7 @@ namespace SIGEL_RobotIO {
 
                         do {
                                 ncl = expectWord ();
-                                // Einsetzungspunkt: Nichtkollisionsangabe
+                                // Insertion point: non-collision specification
                                 linkNoCollide (thema, ncl);
                                 myScanner.readSymbol (symtype, symstr);
                         } while (symtype == RobotSymbol::comma);
@@ -328,7 +328,7 @@ namespace SIGEL_RobotIO {
                 }
 
                 expect (RobotSymbol::closingBrace);
-                // Einsetzungspunkt: Abschluss des Lesens
+                // Insertion point: end of reading
                 linkFinish (thema);
         }
 

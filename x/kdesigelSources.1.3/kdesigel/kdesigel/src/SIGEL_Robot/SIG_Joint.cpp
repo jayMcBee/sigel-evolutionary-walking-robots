@@ -80,9 +80,9 @@ namespace SIGEL_Robot {
 
         //
         // SIG_Joint::JointType SIG_Joint::getJointType () const
-        // { /* Bitte noch implementieren! */ }
-        // Da hat wohl jemand ausserhalb nicht kapiert, dass diese
-        // Methode ABSTRAKT ist. *kicher*
+        // { /* Please implement this! */ }
+        // Someone out there evidently failed to grasp that this
+        // method is ABSTRACT. *giggle*
         //
 
         void SIG_Joint::setLeftLink (SIG_Link *theLink)
@@ -112,8 +112,8 @@ namespace SIGEL_Robot {
                 return myself == leftLink ? rightLink : leftLink;
         }
 
-        // auch getGeomRelation ist ABSTRAKT!
-        // Gott sei Dank hat noch keiner nach gefragt.
+        // getGeomRelation is ABSTRACT too!
+        // Thank God nobody has asked for it yet.
 
 	void SIG_Joint::getMDH (SIG_Link * & predecessor,
 				double & a, double & alpha,

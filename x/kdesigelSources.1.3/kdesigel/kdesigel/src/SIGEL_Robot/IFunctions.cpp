@@ -322,7 +322,7 @@ namespace SIGEL_Robot {
                                 DL_matrix & _winport_o, DL_vector & _winport_t,
                                 QString someIdentifier)
         {
-                // Punkte abdeckbar machen.
+                // Make the points coverable.
                 DL_vector r, zw;
                 DL_Scalar h1;
                 
@@ -355,7 +355,7 @@ namespace SIGEL_Robot {
                 zw.normalize ();
                 _winportF.assign (&_winportD);
                 _winportF.plusis (&zw);
-                // Ende der Abdeckbarmachung
+                // End of the covering construction
 
 #ifdef SIG_DEBUG
 		SIGEL_Tools::SIG_IO::cerr << "Phat processing of "

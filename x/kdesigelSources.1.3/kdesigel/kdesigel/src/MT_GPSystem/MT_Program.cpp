@@ -1,4 +1,4 @@
-// MT_Program.cpp: Implementierung der Klasse MT_Program.
+// MT_Program.cpp: implementation of class MT_Program.
 //
 //////////////////////////////////////////////////////////////////////
 
@@ -180,7 +180,7 @@ void MT_Program::insertProg(MT_Program *Part)
 	int NewLength = Length+Part->getLength();
 	if (NewLength <= MaxLength)
 	{
-		// whole partprogram have been the right size for insert.     
+		// the whole part-program was the right size to insert.     
 		int oldSize = Length;
 		resize(NewLength);
 		
@@ -194,7 +194,7 @@ void MT_Program::insertProg(MT_Program *Part)
 	{
 		int oldSize = Length;
 		resize(MaxLength);
-		NewLength= MaxLength-oldSize; // beschreibt wieviel neue ProgZeilen eingefügen werden könnnen bis MxLenght erreicht!
+		NewLength= MaxLength-oldSize; // How many new program lines can be inserted before MaxLength is reached
 
 		for(int i=0; i<NewLength; i++)
 			Program[oldSize+i] = Part->getProgramLine(i);

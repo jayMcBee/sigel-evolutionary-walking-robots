@@ -57,7 +57,7 @@ namespace SIGEL_Robot
                 SIG_Link *leftLink, *rightLink;
 		double mdh_a, mdh_alpha, mdh_d, mdh_theta;
 		double mdh_screw_d, mdh_screw_theta, mechsMinPos, mechsMaxPos;
-		int mdh_predecessor_is_left; // nur 0 oder 1 !!!!!
+		int mdh_predecessor_is_left; // Only 0 or 1
   
         public:
                 /**

@@ -1,4 +1,4 @@
-// MT_TournamentManager.h: Schnittstelle für die Klasse MT_TournamentManager.
+// MT_TournamentManager.h: interface for class MT_TournamentManager.
 //
 //////////////////////////////////////////////////////////////////////
 

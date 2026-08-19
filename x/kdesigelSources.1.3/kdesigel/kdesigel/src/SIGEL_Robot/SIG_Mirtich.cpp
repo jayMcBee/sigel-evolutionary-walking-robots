@@ -227,8 +227,8 @@ namespace SIGEL_Robot {
 
                 compVolumeIntegrals (&p);
 
-                // na toll, muehsam aufgebaut, ein Aufruf, und jetzt
-                // kann ich den ganzen Scheiss wieder loeschen.
+                // Great - painstakingly built up, one call, and now
+                // I get to delete the whole damn thing again.
 
                 for (int j = 0; j < p.numFaces; j++)
                         delete [] p.faces [j].verts;

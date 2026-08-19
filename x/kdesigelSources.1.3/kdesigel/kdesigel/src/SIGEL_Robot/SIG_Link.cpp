@@ -62,7 +62,7 @@ namespace SIGEL_Robot {
                 QString tmpstr;
                 int anum;
                 
-                // "Link" wurde bereits von SIG_Robot gelesen.
+                // "Link" has already been read by SIG_Robot.
                 tx >> name >> number;
 
                 tx >> anum;

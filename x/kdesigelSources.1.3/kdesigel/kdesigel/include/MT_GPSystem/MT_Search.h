@@ -1,4 +1,4 @@
-// MT_Search.h: Schnittstelle für die Klasse MT_Search.
+// MT_Search.h: interface for class MT_Search.
 //
 //////////////////////////////////////////////////////////////////////
 
@@ -30,7 +30,7 @@ public:
 	*/ 
 	int startMatingProcess();
 
-	/* set/get function form up date the GUI or GP system*/
+	/* set/get functions used to update the GUI or the GP system*/
 	void setBrutSize(int  SizeOfBrut);
 	int getBrutSize();
 	int getLastError();
@@ -39,7 +39,7 @@ public:
 	MT_Search(MT_Population * ParentPop, MT_Population * OffspringPop, MT_Randomizer * _Randi);
 	MT_Search();
 	virtual ~MT_Search();
-	/* für Brut Suche !
+	/* For brute-force search!
 	*	MT_Search(MT_Population * ParentPop, MT_Population * OffspringPop, MT_Randomizer * Randi, MT_FitnessTranier * Fit Trainer);
 	*/
 

@@ -1,4 +1,4 @@
-// MT_Evaluator.cpp: Implementierung der Klasse MT_Evaluator.
+// MT_Evaluator.cpp: implementation of class MT_Evaluator.
 //
 //////////////////////////////////////////////////////////////////////
 
@@ -14,7 +14,7 @@ MT_Evaluator::MT_Evaluator(SIGEL_GP::SIG_GPExperiment& exp, QTextStream &File) :
 	
 	Typ=1;
 	AverageSigelFitness = 0.01; 
-	Interpreter= new MT_Interpreter(10,100); // ACHTUNG Parameter müssen noch geändert werden! setInterpreter(int NumOfVariable,  int TimeToInter)
+	Interpreter= new MT_Interpreter(10,100); // WARNING: parameters still need changing! setInterpreter(int NumOfVariable, int TimeToInter)
 	BestMETAProgram =0;
 	CorrectFitness.resize(0);
 	AssumedFitness.resize(0);
@@ -258,7 +258,7 @@ bool MT_Evaluator::evaluationTactic()
 
 			if ((SigelGeneration >5.0) && (ToleranceNew<500.0)) // 500 = 0.05*10000;
 			{
-				// nach Anzahl der Generationen wird die Tolerance gewichtet!
+				// Tolerance is weighted by generation count
 				if (SigelGeneration <= 150.0)
 				{
 					double Rate =  (500.0 - ToleranceNew) / 145.0;
@@ -448,7 +448,7 @@ double MT_Evaluator::checkTask(int taskId)
 
 	if(taskId <-1)
 	{
-		// Fitness wurde mit MetaProgram bestimmt
+		// Fitness was determined using the meta program
 		int Index = (taskId *(-1))-2;
 		MetaFitness = MT_ResultBuffer[Index];
 		MT_ResultBuffer[Index] = -1.0;

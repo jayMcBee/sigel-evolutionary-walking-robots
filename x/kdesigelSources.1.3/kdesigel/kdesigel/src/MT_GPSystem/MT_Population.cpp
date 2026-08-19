@@ -1,11 +1,11 @@
-// MT_Population.cpp: Implementierung der Klasse MT_Population.
+// MT_Population.cpp: implementation of class MT_Population.
 //
 //////////////////////////////////////////////////////////////////////
 
 #include "MT_GPSystem/MT_Population.h"
 
 //////////////////////////////////////////////////////////////////////
-// Konstruktion/Destruktion
+// Construction/destruction
 //////////////////////////////////////////////////////////////////////
 
 MT_Population::MT_Population()
@@ -80,7 +80,7 @@ int MT_Population::loadPop(QTextStream &File)
 	
 	if ((PresentLine == PopulationString) && !(File.atEnd()))
 	{
-		changePopSize(0); // hier werden die Individuen gelöscht! 
+		changePopSize(0); // The individuals are deleted here 
 
 		PopSize = (File.readLine()).toInt();
 		FirstFreePos =(File.readLine()).toInt();
@@ -158,7 +158,7 @@ MT_Individual * MT_Population::getIndividual(int Pos)
 		return 0;
 }
 
-// ************************ zufälliges Erzeugen 
+// ************************ random generation 
 
 void MT_Population::createNewIndis(int NumberOfNewIndi, MT_Randomizer *Randi)
 {

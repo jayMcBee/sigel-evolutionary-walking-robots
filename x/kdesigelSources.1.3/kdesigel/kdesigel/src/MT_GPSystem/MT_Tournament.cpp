@@ -1,4 +1,4 @@
-// MT_Tournament.cpp: Implementierung der Klasse MT_Tournament.
+// MT_Tournament.cpp: implementation of class MT_Tournament.
 //
 //////////////////////////////////////////////////////////////////////
 
@@ -52,22 +52,22 @@ void MT_Tournament::ranking(QArray<int> * WinnerLoser)
 	double SmallestFit =0.0;
 	int PosSmallestFit =0;
 	
-	QArray <double> FitValue;	// gibt die Fitness des Individuum an der Position Pos[i] an...
+	QArray <double> FitValue;	// Gives the fitness of the individual at position Pos[i]
 	FitValue.resize(NumberOfWinner);
 	for (i=0; i<NumberOfWinner; i++)
 		FitValue[i]=0.0;
 
-	QArray <int> Position;	// gibt die Position des Individuums in der Population an
+	QArray <int> Position;	// Gives the individual's position in the population
 	Position.resize(NumberOfWinner);
 	for (i=0; i<NumberOfWinner; i++)
 		Position[i]=0;
 
-	// Suche die NumberOfWinner fittesten Individuen 
+	// Find the NumberOfWinner fittest individuals 
 	for (i=0; i<PopSize; i++)
 	{
 		PresentFit = Individuals[i]->getFitness();
 		
-		// Suche nach der kleinsten Fitness im FitValue und die Position!
+		// Find the smallest fitness in FitValue and its position
 
 		PosSmallestFit = 0;
 		SmallestFit = FitValue[0];
@@ -143,7 +143,7 @@ int DebugIn = 1;
 	}
 
 	
-	// Ermittlung der Gewinner mit Hilfe des Randis
+	// Determine the winners using the randomizer
 int DebugNumber = 0;
 QArray<int> DebugArray;
 
@@ -156,7 +156,7 @@ QArray<int> DebugArray;
 		}
 		
 		(*WinnerLoser)[Winner]=1;
-		// Sieger darf nicht mehr am weiterem Turnier teilnehmen;
+		// A winner may not take part in any further tournament
 		ProporFit[Winner] =0;
 		
 		DebugNumber ++;

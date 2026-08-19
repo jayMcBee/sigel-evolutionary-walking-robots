@@ -132,7 +132,7 @@ void SIGEL_Simulation::SIG_DynaLink::updateDynaCompanion(DL_dyna* d)
   position.assign(d->get_position());
   orientation.assign(d->get_orientation());
   
-  // SOLID updaten (fuer naechsten Frame)
+  // Update SOLID (for the next frame)
   DL_point nextPosition;
   nextPosition.assign(d->get_next_position());
   DL_matrix nextOrientation;
@@ -157,10 +157,10 @@ void SIGEL_Simulation::SIG_DynaLink::updateDynaCompanion(DL_dyna* d)
 void SIGEL_Simulation::SIG_DynaLink::getFirstGeoInfo(DL_geo* g)
 {
   getNewGeoInfo(g);
-  // hier koennten spaeter initiale Geschwindigkeiten eingestellt werden.
+  // Initial velocities could be set here later.
 };
 
 void SIGEL_Simulation::SIG_DynaLink::checkInertiaTensor(DL_dyna* d)
 {
-  // Wird noch nicht implementiert, wird nur fuer Verformungen benoetigt
+  // Not implemented yet; only needed for deformations
 };

@@ -1,4 +1,4 @@
-// MT_Randomizer.cpp: Implementierung der Klasse MT_Randomizer.
+// MT_Randomizer.cpp: implementation of class MT_Randomizer.
 //
 //////////////////////////////////////////////////////////////////////
 
@@ -122,13 +122,13 @@ MT_Randomizer::MT_Randomizer(QTextStream &File)
 
 			if (PresentLine == "newConstant")
 			{
-				// es werden Konstanten neu erzeugt - für Standart Konstruktor 
+				// Constants are newly generated - for the default constructor 
 				PresentLine = File.readLine();
 				createConstant (PresentLine.toInt(), true , 0, 1000);
 			}
 			else
 			{
-				// sonst beschreibt die betrachtete Zeile die Anzahl der noch zu ladenden Konstanten			
+				// Otherwise the current line gives the number of constants still to be loaded			
 				int NumOfConst = PresentLine.toInt();
 				
 				Constant.resize(NumOfConst);
@@ -340,15 +340,15 @@ void MT_Randomizer::createConstant(int NumOfConstant, bool Integer, double under
 
 	if (Integer)
 	{
-		// Erzeuge zufällig Integer Konstanten
+		// Randomly generate integer constants
 		for(int i=0; i<NumOfConstant; i++)
 			Constant[i]= underBoun+getRandomInteger(RangeInt);
 		
 	}
 	else
 	{
-		// Problem falls double aus großen Bereich gewählt wird !!!
-		// RangeDouble <65  .... drei Stellen hinter dem Komma)
+		// Problem if a double is drawn from a large range
+		// RangeDouble < 65 ... three decimal places
 		for(int i=0; i<NumOfConstant; i++)
 		{	
 			Constant[i]= (double) underBoun + fabs((double)getRandomInteger(RangeDouble*1000) / 1000.0);
@@ -383,15 +383,15 @@ bool MT_Randomizer::answerMutateElement()
 
 QArray <int> * MT_Randomizer::getRandomTournamentPartition(int NumberOfTour)
 {
-	// Array welches sich die Anzahl der momnetanen Spieler pro Turnier merkt
+	// Array holding the current number of players per tournament
 	QArray<int> Index;
 	Index.resize(NumberOfTour);
 	for (int k =0; k<NumberOfTour; k++)
 		Index[k]=0;
 
-	// Angabe des Turniers anwelchem der Speiler teilnehmen soll
+	// Index of the tournament the player should take part in
 	int IndexOfTour =0;
-	// Anzahl der Spieler pro Turnier, also Turniergröße !
+	// Number of players per tournament, i.e. the tournament size
 	int MaxPlayers = (OffspringSize/ NumberOfTour);
 
 
@@ -401,14 +401,14 @@ QArray <int> * MT_Randomizer::getRandomTournamentPartition(int NumberOfTour)
 			
 		if (Index[IndexOfTour] < MaxPlayers)
 		{
-			// im "IndexOfTour" Turnier ist noch ein Platz frei
+			// There is still a free slot in tournament "IndexOfTour"
 			TournamentPartition[i]=IndexOfTour;
 			Index[IndexOfTour]++;
 		
 		}
 		else 
 		{
-			// das "IndexOfTour" Turnier ist voll! dann ...
+			// Tournament "IndexOfTour" is full - then ...
 			while (IndexOfTour !=-1)
 			{
 				IndexOfTour = (IndexOfTour+1)%NumberOfTour;
@@ -529,7 +529,7 @@ QArray <int> * MT_Randomizer::getRandomXPoints(int SizeIndi1, int SizeIndi2)
 		}
 	}
 	else 
-		NumberofXPoints =0; // da die Individuen so klein sind, wird nur ein XPunkt gewählt
+		NumberofXPoints =0; // Since the individuals are so small, only one crossover point is chosen
 
 
 	RandomXPoints[0]=NumberofXPoints;

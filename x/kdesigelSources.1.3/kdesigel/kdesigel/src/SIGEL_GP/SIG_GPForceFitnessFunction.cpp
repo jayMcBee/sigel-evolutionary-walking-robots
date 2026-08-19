@@ -53,7 +53,7 @@ double SIGEL_GP::SIG_GPForceFitnessFunction::evalFitness() {
 
   SIGEL_Simulation::SIG_Simulation *simulation = new SIGEL_Simulation::SIG_Simulation( rob, environment, program, simparameter, recorder );
 
-  // fuer die NiceWalkingFitnessFunction
+  // For the NiceWalkingFitnessFunction
   double const toleranceBandWidth = 0.5;
 
   double fitness = 0;
@@ -86,22 +86,22 @@ double SIGEL_GP::SIG_GPForceFitnessFunction::evalFitness() {
 
     double fitnessGes = distance / simulatedSeconds;
 
-// falls der Fitnesswert resetet wurde, dann berechne die Kraft
+// If the fitness value was reset, compute the force
 //  if ( (resetEveryGeneration != 0) && (actGeneration%(resetEveryGeneration*5) < resetEveryGeneration)) {
 
-      // die Liste listForces geht über die verschiedenen frames
-      // innerhalb der Liste stehen arrays, die den 6-dim Vektor für jedes einzelne Gelenk beinhalten
+      // The list listForces runs over the individual frames
+      // the list holds arrays containing the 6-dimensional vector for each individual joint
       vector<double*>* usedForce = recorder.listForces.first() ;
 
       frames = recorder.listForces.count()-1;
 
-      // der erste wert ist immer mist, somit hol ich mir gleich den zweiten aus der liste
-      // while schleife holt immer den naechsten Frame
+      // The first value is always garbage, so take the second from the list straight away
+      // The while loop always fetches the next frame
       while ( (usedForce = recorder.listForces.next()) != 0 ) {
         double betrag = 0;
         double durchschnittProGelenk = 0;
         vector<double> betraege;
-        // usedForce.size() gibt die Anzahl der Gelenke an
+        // usedForce.size() gives the number of joints
         for (unsigned int i=0;i<(*usedForce).size();++i) {
           momentX = (*usedForce)[i][0];
           momentY = (*usedForce)[i][1];
@@ -109,34 +109,34 @@ double SIGEL_GP::SIG_GPForceFitnessFunction::evalFitness() {
           betrag = sqrt( pow(momentX,2) + pow(momentY,2) + pow(momentZ,2) );
           betraege.push_back(betrag);
 
-          // berechne die durchschnittliche Kraft pro Gelenk
+          // Compute the average force per joint
           durchschnittProGelenk += betrag/((*usedForce).size());
-        } // ende for-schleife
+        } // end of for loop
 
         double varianz = 0;
         for (unsigned int i=0;i<(*usedForce).size();++i) {
           varianz += fabs(betraege[i]-durchschnittProGelenk);
         }
         variance.push_back(varianz);
-      } // ende while-schleife [hole naechsten Frame]
+      } // end of while loop [fetch next frame]
 
-      // den Durchschnitt der Varianz über alle Frames
+      // The mean of the variance over all frames
       for (unsigned int i=0;i<(variance.size());++i) {
         fitness += variance[i]/(frames*distance)*simulatedSeconds;
       }
 
      if (finite(fitness)!=0) {
-        // Reziprokwert berechnen (falls nicht durch 0 geteilt wird), da Maximierungsproblem
+        // Compute the reciprocal (guarding against division by zero), since this is a maximisation problem
         fitness!=0 ? fitness = 1/fitness : fitness=0;
       }
       else {
-        // falls Kraft Unendlich oder NaN - Fitnesswert null
+        // If the force is infinite or NaN, the fitness value is zero
         fitness = 0;
       }
 
-//  } // grosse if schleife
-//  else { // ansonsten berechne die Geschwindgkeit
-// einen Teil des Blocks habe ich nach oben verschoben
+//  } // large if block
+//  else { // otherwise compute the velocity
+// I moved part of this block further up
 
     DL_vector *endPosition = new DL_vector();
     *endPosition = recorder.endPosition;

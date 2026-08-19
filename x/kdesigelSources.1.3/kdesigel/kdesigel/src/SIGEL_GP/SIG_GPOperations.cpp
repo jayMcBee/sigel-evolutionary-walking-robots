@@ -545,7 +545,7 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::mutation( SIGEL_GP::SIG_
 	     // -------------------------------------------------------------------------------
 	     // Change the instruction type. It is very important to take care about the
 	     // following case:
-	     // If an instruction is consisting of only one operand, and it shall be mutated
+	     // If an instruction consists of only one operand and is to be mutated
 	     // to an instruction that has to contain two operands, the (new) second operand
 	     // needs to be initialized with a (randomly) value!
 	     // -------------------------------------------------------------------------------
@@ -716,7 +716,7 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::reproduction( SIGEL_GP::
 
   reproducedInd->addReproductionInfo( winner.getName(), actTime );
 
-  // Das reproduzierte Individuum wird zurueckgegeben
+  // The reproduced individual is returned
 
 #ifdef SIG_DEBUG
 

@@ -1,11 +1,11 @@
-// MT_Programline.cpp: Implementierung der Klasse MT_Programline.
+// MT_Programline.cpp: implementation of class MT_Programline.
 //
 //////////////////////////////////////////////////////////////////////
 
 #include "MT_GPSystem/MT_Programline.h"
 
 //////////////////////////////////////////////////////////////////////
-// Konstruktion/Destruktion
+// Construction/destruction
 //////////////////////////////////////////////////////////////////////
 
 MT_Programline::MT_Programline()
@@ -70,7 +70,7 @@ MT_Programline::MT_Programline(QString & File)
 	if (PartOfLine == "lum")
 		Instruction = lum;
 
-	// 1. Operand ist immer eine Variable!
+	// The first operand is always a variable
 	PartOfLine = File.mid(4,5);
 	OperandA = new MT_Operand(1,-1,PartOfLine.toInt());
 	
@@ -103,7 +103,7 @@ void MT_Programline::writeToFileProgramLine(QTextStream &File)
 {
 
 	// Aufbau Programmzeile Beispiel"
-	//"swp 4    V 5"  oder "cop 1245 C 12.34565567"
+	//"swp 4    V 5"  or  "cop 1245 C 12.34565567"
 
 	if (Instruction == swi)
 			File <<"swt";

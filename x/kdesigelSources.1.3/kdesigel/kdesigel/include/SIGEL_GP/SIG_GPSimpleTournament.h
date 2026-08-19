@@ -36,8 +36,8 @@ namespace SIGEL_GP
 
 /**
 * This class defineds the tournament with a reproduction of the winner as the tournament price. It uses
-* the randomizer and the fitnesstrainer for randompoint creation und fitnessvalue computation.
-* It inherites from SIG_GPTournament so please look ther for further details.
+* the randomizer and the fitnesstrainer for randompoint creation and fitnessvalue computation.
+* It inherits from SIG_GPTournament, so see there for further details.
 */
 
 class SIG_GPSimpleTournament : public SIGEL_GP::SIG_GPTournament
@@ -82,7 +82,7 @@ SIG_GPSimpleTournament( SIGEL_Tools::SIG_Randomizer& randomizer,
 virtual ~SIG_GPSimpleTournament();
 
 /**
-* This virtual methode executes the tournament.
+* This virtual method executes the tournament.
 */
  public:
 virtual bool run();
@@ -116,14 +116,14 @@ private:
 #endif //  SIGEL_GP_SIG_GPSIMPLETOURNAMENT_H
 
 
- //********************META Änderungen**************************************************
+ //********************META changeen**************************************************
   /*zwei neue Methoden: 
 	bool runMetaClassifier(*Classifier) 
-		-> führt ein Turnier ohne exakte Fitness aus, mit MetaClassifier!
-		benötig Classifer für double classifer (*SigProgOne, SigProgTwo)
+		-> runs a tournament without exact fitness, using the MetaClassifier!
+		requires Classifer for double classifer (*SigProgOne, SigProgTwo)
  
 	bool runMetaCorrect(*Classifier)
-		-> dient der Erzeugung neuer T-Fälle!
+		-> serves to create new training cases!
 		createNewTCase(*SigOne,SigTwo)
 
 

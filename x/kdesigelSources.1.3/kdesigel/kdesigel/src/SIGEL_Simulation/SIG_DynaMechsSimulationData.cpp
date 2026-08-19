@@ -202,8 +202,8 @@ void SIGEL_Simulation::SIG_DynaMechsSimulationData::simulationProgress()
 {
   Float stepSize = static_cast< Float >(simulationParameter.getStepSize());
 
-  // hier findet der eigentliche Simulationsprozeß statt!
-  // ebenfalls wird hier der ABDynamics-Algorithmus aufgerufen, der in dmSystem steht.
+  // The actual simulation process happens here
+  // The ABDynamics algorithm in dmSystem is also invoked here.
   dynaMechsIntegrator->simulate( stepSize );
 
   for (int i = 0; i < drives.size(); i++) {

@@ -1,4 +1,4 @@
-// MT_StatisticsElement.h: Schnittstelle für die Klasse MT_StatisticsElement.
+// MT_StatisticsElement.h: interface for class MT_StatisticsElement.
 //
 //////////////////////////////////////////////////////////////////////
 
@@ -33,12 +33,12 @@ public:
 	double MaxFitness; 
 
 	
- 	int NumOfCrossoverEvent; // Eltern durch Crossover  
+ 	int NumOfCrossoverEvent; // Parents by crossover  
 
 	int NumOfElementMutationParent; 
 	int NumOfMutateIndividuals;   // Eltern druch Mutation 
 	
-	int NumOfSimpleCopyParent;  // Elern durch einfache Kopie
+	int NumOfSimpleCopyParent;  // Parents by simple copy
 
 
 	/**************** only this parameter of the offspring population ****************/
@@ -67,31 +67,31 @@ public:
 /*
 
 
-NumOfSimpleCopyParent := Anzahl der Nachkommen die aus Elternpop in die nächste Generation durch einfaches kopieren übernohmmen wurden
- ...Parameter nur für diese Generation 
-NumOfCrossoverEvent := Anzahl der XOver Ereignisse
+NumOfSimpleCopyParent := number of offspring carried from the parent population into the next generation by simple copying
+ ...parameter for this generation only 
+NumOfCrossoverEvent := number of crossover events
 
-NumOfMutateIndividuals :=  siehe MT_Statistics.h ...Parameter nur für diese Generation    
-NumOfElementMutationParent := Anzahl der elementaren Punktmutationen
+NumOfMutateIndividuals :=  see MT_Statistics.h ...parameter for this generation only    
+NumOfElementMutationParent := number of elementary point mutations
 
 
-  NumOfSimpleCopyParent := NumOfMutateIndividuals := Anzahl der Nachkommen ... durch Mutation ...
-NumOfMutateImprovingIndividuals :=  Anzahl der mutierten Nachkommen, die besser sind als der Elter es war!
+  NumOfSimpleCopyParent := NumOfMutateIndividuals := number of offspring ... by mutation ...
+NumOfMutateImprovingIndividuals := number of mutated offspring that are better than the parent was
 
 
 
   
 	
 	  
-Parameter über den Offspring!
+Parameters concerning the offspring.
 
-CrossoverEventParent  := beschreibt den Erfolg der verschiedenen XOver Arten  ...Parameter nur für diese Generation 
-NumOfSimpleCopyOffspring :=  Anzahl der einfachen Kopier-Ereignisse
+CrossoverEventParent  := describes the success of the different crossover kinds  ...parameter for this generation only 
+NumOfSimpleCopyOffspring := number of simple copy events
 
-NumOfTotalElementMutation: = Anzahl der elementatren Mutationen/ Punktmutationen 
-NumOfMutateOffspring := Anzahl der mutierten Individuen
--> richtet sich nach der Suchoperatorwahrscheinlichkeit "Mutation" 
-NumOfMutateImprovingIndividuals := verbesserte mutierte Indis...Parameter nur für diese Generation 
+NumOfTotalElementMutation := number of elementary mutations / point mutations 
+NumOfMutateOffspring := number of mutated individuals
+-> governed by the search-operator probability "Mutation" 
+NumOfMutateImprovingIndividuals := improved mutated individuals...parameter for this generation only 
 
 
 

@@ -222,7 +222,7 @@ SIGEL_Simulation::SIG_DynaSystem::SIG_DynaSystem(SIGEL_Environment::SIG_Environm
 
 SIGEL_Simulation::SIG_DynaSystem::~SIG_DynaSystem()
 {
-  //Dynamo beenden und zerstoeren
+  //Shut down and destroy Dynamo
   clearAllDynamics();
   delete constraintManager;
   delete dynaSystem;
@@ -232,7 +232,7 @@ SIGEL_Simulation::SIG_DynaSystem::~SIG_DynaSystem()
 
 void SIGEL_Simulation::SIG_DynaSystem::initializeFloor()
 {
- //Als "Grund"-Boden wird ein riesiges Polygon erzeugt
+ //A huge polygon is created as the base ground
  double y=environment.getYPlaneLevel();
   
  floor=dtNewComplexShape();
@@ -249,7 +249,7 @@ void SIGEL_Simulation::SIG_DynaSystem::initializeFloor()
 void SIGEL_Simulation::SIG_DynaSystem::clearAllDynamics()
 {
  rootLinkNo=-1;
- //alle DynaObjekte zerstoeren
+ //Destroy all Dyna objects
  dtDeleteObject(0);
  int sz=dynaLinks.size();
  for (int i=0; i<sz; i++)
@@ -297,16 +297,16 @@ void SIGEL_Simulation::SIG_DynaSystem::collisionResponse(void * client_data,
  normal.normalize();
 
  if ((dlObj1!=0)&&(dlObj2!=0))
- // Kollision zweier Objekte
+ // Collision of two objects
  {
 //  SIGEL_Tools::SIG_IO::cerr << "Kollision zweier Objekte\n";
-  //Ist die Geschwindigkeit gross genug, wird die Kollision erzeugt,
-  // ansonsten wird die Geschwindigkeit geloescht.
+  //If the velocity is large enough the collision is generated,
+  // otherwise the velocity is cleared.
   if ((dlObj1->dyna->get_velocity()->norm()>min_geschwindigkeit)
     ||(dlObj2->dyna->get_velocity()->norm()>min_geschwindigkeit)
     ||(dlObj1->dyna->get_angvelocity()->norm()>min_geschwindigkeit)
     ||(dlObj2->dyna->get_angvelocity()->norm()>min_geschwindigkeit))
-  //Geschwindigkeit gross genug  
+  //velocity large enough  
   {
 //   SIGEL_Tools::SIG_IO::cerr << "-Geschwindigkeit gross genug\n";
    normal=unNaN(normal);
@@ -314,7 +314,7 @@ void SIGEL_Simulation::SIG_DynaSystem::collisionResponse(void * client_data,
     return;
 //   SIGEL_Tools::SIG_IO::cerr << "N(w) x:" << normal.x << " y:" << normal.y << " z:" << normal.z << "\n";
        
-    //Bewegen sich die Objekte aufeinander zu?
+    //Are the objects moving towards each other?
    DL_point p1,p2,p1n,p2n,p1w,p2w,p1nw,p2nw;
    DL_vector v1,v2,v1n,v2n,d,dn;
    p1=(dlObj1->dyna->get_position());
@@ -333,7 +333,7 @@ void SIGEL_Simulation::SIG_DynaSystem::collisionResponse(void * client_data,
    if (d.norm()>dn.norm())
     //Duerfen sie ueberhaupt kollidieren?
     if (/*true*/(dlObj1->link->getNoCollides().find(dlObj2->link))!=-1)
-    //Kollision erlaubt
+    //collision permitted
     {
 //     SIGEL_Tools::SIG_IO::cerr << "--Bewegen sich aufeinander zu und Kollision erlaubt\n";
      DL_vector F;
@@ -344,11 +344,11 @@ void SIGEL_Simulation::SIG_DynaSystem::collisionResponse(void * client_data,
      DL_Scalar Flength=F.inprod(&normal);
      DL_vector Fnormal(&normal);
  
-     Fnormal.timesis(Flength);  //Normalenkraftvektor
+     Fnormal.timesis(Flength);  //Normal force vector
      DL_vector Fortho(&F);
-     Fortho.minusis(&Fnormal);  //Restkraftvektor
+     Fortho.minusis(&Fnormal);  //Residual force vector
      DL_vector newFortho(&Fortho);
-     // Kraft mit mue
+     // Force scaled by mu
      newFortho.normalize();
      DL_Scalar mue=dlObj1->link->getMaterial()->getFrictionValue(const_cast<SIGEL_Robot::SIG_Material*>(dlObj2->link->getMaterial()));
      DL_Scalar FRlength=Fnormal.norm()*mue;
@@ -361,11 +361,11 @@ void SIGEL_Simulation::SIG_DynaSystem::collisionResponse(void * client_data,
      dlObj2->dyna->applyforce(&point2,dlObj2->dyna,&newFortho);
      DL_collision* collConstr=new DL_collision(dlObj1->dyna,&point1,dlObj2->dyna,&point2,&normal,2); 
     }; 
-    //Ende Kollision erlaubt
+    //end: collision permitted
   }
-  //Ende Geschwindigkeit gross genug 
+  //end: velocity large enough 
   else
-  //Geschwindigkeit zu klein
+  //velocity too small
   { 
    DL_vector nullvektor(0,0,0);
    dlObj1->dyna->set_velocity(&nullvektor);
@@ -373,14 +373,14 @@ void SIGEL_Simulation::SIG_DynaSystem::collisionResponse(void * client_data,
    dlObj1->dyna->set_angvelocity(&nullvektor);
    dlObj2->dyna->set_angvelocity(&nullvektor);
   };
-  //Ende Geschwindigkeit zu klein
+  //end: velocity too small
  } 
- //Ende Kollision zweier Objekte
+ //end: collision of two objects
  else
   if ((dlObj1==0)||(dlObj2==0))
- //Kollision mit Boden 
+ //Collision with the ground 
  {   
-  //ist allerdings einer der pointer 0, so war dies eine Kollision mit dem Boden.
+  //but if one of the pointers is 0 this was a collision with the ground.
   SIG_DynaLink* theDlObj;
   DL_point* thePoint;
   if (dlObj1==0)
@@ -397,18 +397,18 @@ void SIGEL_Simulation::SIG_DynaSystem::collisionResponse(void * client_data,
   DL_point theWorldPoint,theWorldPointN;
   theDlObj->dyna->to_world(thePoint,&theWorldPoint);
   theDlObj->dyna->new_toworld(thePoint,&theWorldPointN);
-  //und zwar im (lokalen) Punkt thePoint des DynaLinks theDlObj
-  //nun muss die noch wirkende Kraft auf das Objekt geloescht werden und
-  //aus dem Normalenvektor der Kollision sowie der Gravitation die neue
-  //Gegenkraefte abzueglich der Reibung errechnet werden.
-  //Fuer das Zwischenziel reicht allerdings eine simple Gegenkraft...
-  //Ist die Geschwindigkeit gross genug, wird die Kollision erzeugt,
-  // ansonsten wird die Geschwindigkeit geloescht.
+  //specifically at the (local) point thePoint of the DynaLink theDlObj
+  //The force still acting on the object must now be cleared, and
+  //from the collision normal and gravity the new
+  //counter-forces, less friction, must be computed.
+  //For the interim goal a simple counter-force is sufficient.
+  //If the velocity is large enough the collision is generated,
+  // otherwise the velocity is cleared.
   if ((theDlObj->dyna->get_velocity()->norm()>min_geschwindigkeit)
     ||(theDlObj->dyna->get_angvelocity()->norm()>min_geschwindigkeit))
-  //Geschwindigkeit gross genug
+  //velocity large enough
   {
-   //Bewegt sich das Objekt auf den Boden zu?
+   //Is the object moving towards the ground?
    DL_point pw,pnw;
    theDlObj->dyna->to_world(thePoint,&pw);
    theDlObj->dyna->new_toworld(thePoint,&pnw);
@@ -427,11 +427,11 @@ void SIGEL_Simulation::SIG_DynaSystem::collisionResponse(void * client_data,
     DL_Scalar Flength=F.inprod(&normal);
     DL_vector Fnormal(&normal);
  
-    Fnormal.timesis(Flength);  //Normalenkraftvektor
+    Fnormal.timesis(Flength);  //Normal force vector
     DL_vector Fortho(&F);
-    Fortho.minusis(&Fnormal);  //Restkraftvektor
+    Fortho.minusis(&Fnormal);  //Residual force vector
     DL_vector newFortho(&Fortho);
-    // Gegenkraft mit mue
+    // Counter-force scaled by mu
     newFortho.normalize();
     DL_Scalar mue=theDlObj->link->getMaterial()->getFrictionValue(theDlObj->floorMaterial);
     DL_Scalar FRlength=Fnormal.norm()*mue;
@@ -443,15 +443,15 @@ void SIGEL_Simulation::SIG_DynaSystem::collisionResponse(void * client_data,
     DL_collision* collConstr=new DL_collision(theDlObj->dyna,thePoint,0,&theWorldPoint,&normal,1);
    };  
   }
-  //Ende Geschwindigkeit gross genug
+  //end: velocity large enough
   else
-  //Geschwindigkeit zu klein
+  //velocity too small
   {
    DL_vector nullvektor(0,0,0);
    theDlObj->dyna->set_velocity(&nullvektor);
    theDlObj->dyna->set_angvelocity(&nullvektor);
   };
-  //Ende Geschwindigkeit zu klein
+  //end: velocity too small
   /*
   if (theWorldPointN.y<0)
   {
@@ -481,7 +481,7 @@ SIGEL_Tools::SIG_IO::cerr << "Force Point X:" << Fp.x << " Y:" << Fp.y << " Z:" 
    }; 
   }; */
  };
- //Ende Kollision mit Boden
+ //End of ground collision handling
 };
 
 void SIGEL_Simulation::SIG_DynaSystem::msgFunction(QString theMessage)
@@ -515,7 +515,7 @@ void SIGEL_Simulation::SIG_DynaSystem::newLink(SIGEL_Robot::SIG_Link& theLink)
  }
 
 
- //Wenn RootLink, dann eintragen
+ //If it is the root link, register it
  if (theLink.isRootLink())
   rootLinkNo=theLink.getNumber();
  //Link in DynaLink umwandeln
@@ -524,10 +524,10 @@ void SIGEL_Simulation::SIG_DynaSystem::newLink(SIGEL_Robot::SIG_Link& theLink)
  DL_matrix orient2,orient; 
  
 
- // Holgers Vars
- DL_Scalar m;   // (wie Masse)
- DL_vector com; // (wie Centre Of Mass)
- DL_matrix it,it2;  // (wie inertia tensor)
+ // Holger's vars
+ DL_Scalar m;   // (as for mass)
+ DL_vector com; // (as for centre of mass)
+ DL_matrix it,it2;  // (as for inertia tensor)
   
  theLink.getInitialLocation(pos,orient2);
  orient=unNaN(orient2);
@@ -611,7 +611,7 @@ void SIGEL_Simulation::SIG_DynaSystem::newJoint(SIGEL_Robot::SIG_Joint& theJoint
  SIGEL_Robot::SIG_Link const * rLink=theJoint.getRightLink();
  SIG_DynaLink & ldLink = getLink(lLink->getNumber());
  SIG_DynaLink & rdLink = getLink(rLink->getNumber());
- //passende DL_constraint herausfinden und erzeugen
+ //Determine and create the matching DL_constraint
  switch (theJoint.getJointType()) {
  
   //------------- ROTATIONAL JOINT --------------------------------------------------  
@@ -619,10 +619,10 @@ void SIGEL_Simulation::SIG_DynaSystem::newJoint(SIGEL_Robot::SIG_Joint& theJoint
   {
    //casten
    SIGEL_Robot::SIG_RotationalJoint & rotationalJoint = dynamic_cast<SIGEL_Robot::SIG_RotationalJoint&> (theJoint);
-   //Joint auswerten und die constraint erzeugen
+   //Evaluate the joint and create the constraint
    DL_linehinge * dynarot;
    dynarot=new DL_linehinge();
-   //Punkte auslesen
+   //Read out the points
    DL_vector vlbase,vldir,vrbase,vrdir,vlhand,vrhand;
    vlbase=rotationalJoint.getLeftBase();
    vldir=rotationalJoint.getLeftDir();
@@ -630,7 +630,7 @@ void SIGEL_Simulation::SIG_DynaSystem::newJoint(SIGEL_Robot::SIG_Joint& theJoint
    vrbase=rotationalJoint.getRightBase();
    vrdir=rotationalJoint.getRightDir();
    vrhand=rotationalJoint.getRightHand();
-   //Abstand zwischen Dir1 und Dir2 anpassen
+   //Adjust the distance between Dir1 and Dir2
    DL_vector nvldir(&vldir);
    nvldir.minusis(&vlbase);
    nvldir.normalize();
@@ -639,7 +639,7 @@ void SIGEL_Simulation::SIG_DynaSystem::newJoint(SIGEL_Robot::SIG_Joint& theJoint
    nvrdir.minusis(&vrbase);
    nvrdir.normalize();
    nvrdir.plusis(&vrbase);
-   //Constraint erzeugen
+   //Create the constraint
    DL_point lbase,rbase,ldir,rdir;
    vlbase.topoint(&lbase);
    nvldir.topoint(&ldir);
@@ -678,10 +678,10 @@ void SIGEL_Simulation::SIG_DynaSystem::newJoint(SIGEL_Robot::SIG_Joint& theJoint
   {
    //casten
    SIGEL_Robot::SIG_TranslationalJoint & translationalJoint = dynamic_cast<SIGEL_Robot::SIG_TranslationalJoint&> (theJoint);
-   //Joint auswerten und die constraint erzeugen
+   //Evaluate the joint and create the constraint
    DL_pris * dynatrans;
    dynatrans=new DL_pris();
-   //Punkte auslesen
+   //Read out the points
    DL_vector vlbase,vldir,vrbase,vrdir,vlfix,vrfix;
    vlbase=translationalJoint.getLeftBase();
    vldir=translationalJoint.getLeftDir();
@@ -689,12 +689,12 @@ void SIGEL_Simulation::SIG_DynaSystem::newJoint(SIGEL_Robot::SIG_Joint& theJoint
    vrbase=translationalJoint.getRightBase();
    vrdir=translationalJoint.getRightDir();
    vrfix=translationalJoint.getRightFix();
-   //Umrechnen der Fix/Dir-Punkte auf Vektoren
+   //Convert the fix/dir points into vectors
    vldir.minusis(&vlbase);
    vlfix.minusis(&vlbase);
    vrdir.minusis(&vrbase);
    vrfix.minusis(&vrbase);
-   //Constraint erzeugen
+   //Create the constraint
    DL_point lbase,rbase,ldir,rdir,lfix,rfix;
    vlbase.topoint(&lbase);
    vrbase.topoint(&rbase);
@@ -730,14 +730,14 @@ void SIGEL_Simulation::SIG_DynaSystem::newJoint(SIGEL_Robot::SIG_Joint& theJoint
   {
    //casten
    SIGEL_Robot::SIG_GlueJoint & glueJoint = dynamic_cast<SIGEL_Robot::SIG_GlueJoint&> (theJoint);
-   //Joint auswerten und die constraint erzeugen
+   //Evaluate the joint and create the constraint
    DL_connector * dynaglue;
    dynaglue=new DL_connector();
-   //Punkte auslesen
+   //Read out the points
    DL_vector a1,a2,a3,b1,b2,b3;
    glueJoint.getPlaneA(a1,a2,a3);
    glueJoint.getPlaneB(b1,b2,b3);
-   //Constraint erzeugen
+   //Create the constraint
    DL_point pa1,pa2,pa3,pb1,pb2,pb3;
    a1.topoint(&pa1);
    a2.topoint(&pa2);
@@ -816,7 +816,7 @@ void SIGEL_Simulation::SIG_DynaSystem::newDrive(SIGEL_Robot::SIG_Drive& theDrive
 SIGEL_Simulation::SIG_DynaLink& SIGEL_Simulation::SIG_DynaSystem::getLink(int number)
   throw(SIG_DynaSystemWrongNumberException)
 {
- //DynaLink aus QVector holen
+ //Fetch the DynaLink from the vector
  int sz=dynaLinks.size();
  for (int i=0; i<sz; i++)
   if (dynaLinks[i]->number==number)
@@ -829,7 +829,7 @@ SIGEL_Simulation::SIG_DynaLink& SIGEL_Simulation::SIG_DynaSystem::getLink(int nu
 SIGEL_Simulation::SIG_DynaJoint& SIGEL_Simulation::SIG_DynaSystem::getJoint(int number)
   throw(SIG_DynaSystemWrongNumberException)
 {
- //DynaJoint aus QVector holen
+ //Fetch the DynaJoint from the vector
  int sz=dynaJoints.size();
  for (int i=0; i<sz; i++)
   if (dynaJoints[i]->number==number)
@@ -840,7 +840,7 @@ SIGEL_Simulation::SIG_DynaJoint& SIGEL_Simulation::SIG_DynaSystem::getJoint(int 
 SIGEL_Simulation::SIG_DynaDrive& SIGEL_Simulation::SIG_DynaSystem::getDrive(int number)
   throw(SIG_DynaSystemWrongNumberException)
 {
- //DynaDrive aus QVector holen
+ //Fetch the DynaDrive from the vector
  int sz=dynaDrives.size();
  for (int i=0; i<sz; i++)
   if (dynaDrives[i]->number==number)
@@ -851,7 +851,7 @@ SIGEL_Simulation::SIG_DynaDrive& SIGEL_Simulation::SIG_DynaSystem::getDrive(int 
 SIGEL_Simulation::SIG_DynaSensor& SIGEL_Simulation::SIG_DynaSystem::getSensor(int number)
   throw(SIG_DynaSystemWrongNumberException)
 {
- //DynaSensor aus QVector holen
+ //Fetch the DynaSensor from the vector
  int sz=dynaSensors.size();
  for (int i=0; i<sz; i++)
   if (dynaSensors[i]->number==number)

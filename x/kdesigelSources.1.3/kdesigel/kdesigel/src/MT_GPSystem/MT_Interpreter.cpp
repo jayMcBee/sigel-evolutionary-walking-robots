@@ -1,11 +1,11 @@
-// MT_Interpreter.cpp: Implementierung der Klasse MT_Interpreter.
+// MT_Interpreter.cpp: implementation of class MT_Interpreter.
 //
 //////////////////////////////////////////////////////////////////////
 
 #include "MT_GPSystem/MT_Interpreter.h"
 
 //////////////////////////////////////////////////////////////////////
-// Konstruktion/Destruktion
+// Construction/destruction
 //////////////////////////////////////////////////////////////////////
 
 MT_Interpreter::MT_Interpreter()
@@ -94,8 +94,8 @@ double MT_Interpreter::interpret(MT_TranslatedIndividual *RobProg)
 
 	resetMachine();
 
-// getSourceOperand and getTargetOperand sind vom Name her nicht gut gewählt:
-// getSourceOperand := erster Operand -> auch evtl. Ziel oder immer? 
+// getSourceOperand and getTargetOperand are poorly named:
+// getSourceOperand := first operand -> possibly also the target, or always? 
 // getTargetOperand:= zweiter Operand  
 
 	for (int i=0; i<DurationToInterpret; i++)
@@ -133,7 +133,7 @@ double MT_Interpreter::interpret(MT_TranslatedIndividual *RobProg)
 								Offset =0;
 							else 
 								Offset = StartPosOfTwo;
-							// StartPosOfTwo ist 0 falls SigProLengthTwo =0 --> nur ein SIGELProg im T-Case --> NOP ! 
+							// StartPosOfTwo is 0 if SigProLengthTwo == 0 --> only one SIGEL program in the training case --> NOP 
 						}
 						ProgramCounter++;
 					 }break;
@@ -568,7 +568,7 @@ if ((Mod1 >= RobProg->MetaData->size())||(Mod1<0))
 		}
 		
 		if (ProgramCounter>= NumOfInstruction)
-			i = DurationToInterpret;		// Programm ist zu Ende, Schleife kann verlassen werden
+			i = DurationToInterpret;		// End of program - the loop can be exited
 		
 	}
 
