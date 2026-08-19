@@ -134,7 +134,7 @@ SIG_GPFitnessTrainer(SIG_GPExperiment& exp);
    * @param ind
    * The individual, which containes the robot controll programm.
    * @return
-   * An integer, which represents the TID of the PVM-task. If an error occured at the spawning
+   * An integer, which represents the TID of the PVM-task. If an error occurred at the spawning
    * process, the returned integer has the value -1.
    */
  public:
@@ -153,7 +153,7 @@ virtual int spawnTask(SIG_GPIndividual const& ind);
    * The TID of a PVM-task.
    * @return
    * The fitnessvalue of the evaluated robot controll programm or -1 as a sign that an error 
-   * occured.
+   * occurred.
    */
  public:
 virtual double checkTask(int task);

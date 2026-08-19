@@ -35,17 +35,17 @@ public:
 	*/
 	bool preEvolution(QVector<SIGEL_GP::SIG_GPTournament> *  tours, int PosBest);
 	
-	/* Method serves Tournament.run(Classifer)
+	/* Method serves Tournament.run(Classifier)
 	* Runs the tournament normally, i.e. on exact fitness; 
 	* creates a training case 
 	*/
 	void createNewTCase(SIGEL_Program::SIG_Program * SigProgOne, SIGEL_Program::SIG_Program * SigProgTwo, double FitDifference);
 	
-	/* Method serves Tournament.classifer(Classifer)
+	/* Method serves Tournament.classifier(Classifier)
 	* Runs the tournament using the classifier.
-	* Tournament.classifer(Classifer) is called via preEvolution  
+	* Tournament.classifier(Classifier) is called via preEvolution  
 	*/
-	double classifer(SIGEL_Program::SIG_Program * SigProgOne, SIGEL_Program::SIG_Program * SigProgTwo);	
+	double classifier(SIGEL_Program::SIG_Program * SigProgOne, SIGEL_Program::SIG_Program * SigProgTwo);	
 	
 
 private:

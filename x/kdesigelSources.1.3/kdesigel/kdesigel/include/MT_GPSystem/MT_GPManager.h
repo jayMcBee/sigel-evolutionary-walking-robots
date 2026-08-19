@@ -13,7 +13,7 @@
 #include "MT_GPSystem/MT_Statistics.h"
 #include "MT_GPSystem/MT_Randomizer.h"
 #include "MT_GPSystem/MT_Search.h"
-#include "MT_GPSystem/MT_FitnessTranier.h"
+#include "MT_GPSystem/MT_FitnessTrainer.h"
 #include "MT_GPSystem/MT_TournamentManager.h"	// Added from the class view
 
 #ifdef _WINDOWS
@@ -153,7 +153,7 @@ private:
 	
 	
 	/* appraise the offspring*/
-	MT_FitnessTranier * FitnessTrainer;
+	MT_FitnessTrainer * FitnessTrainer;
 
 	/* manage and collected  information for evaluation of a SIGEL&META run*/
 	MT_Statistics * Statistics;

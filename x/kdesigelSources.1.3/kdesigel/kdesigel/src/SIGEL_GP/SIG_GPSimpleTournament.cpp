@@ -186,7 +186,7 @@ bool SIGEL_GP::SIG_GPSimpleTournament::classify(MT_Classifier *MetaClassifier)
 
     // Determine the tournament winner via the classifier;
    // FitDiff < 0 -> indi2 wins;  FitDiff >= 0 -> indi1 wins
-	double  FitDiff = MetaClassifier->classifer(&const_cast<SIGEL_Program::SIG_Program&>(ind1.getProgram()), &const_cast<SIGEL_Program::SIG_Program&>(ind2.getProgram()));	
+	double  FitDiff = MetaClassifier->classifier(&const_cast<SIGEL_Program::SIG_Program&>(ind1.getProgram()), &const_cast<SIGEL_Program::SIG_Program&>(ind2.getProgram()));	
 
   //The tournament action
    

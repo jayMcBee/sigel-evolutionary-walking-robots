@@ -136,7 +136,7 @@ void MT_Search::crossover(MT_Individual * ParentOne, MT_Individual * ParentTwo)
 	MT_Program * POneProgram = ParentOne->getProgram();
 	MT_Program * PTwoProgram = ParentTwo->getProgram();
 
-	int MaxLenght = POneProgram->getMaxLength();
+	int MaxLength = POneProgram->getMaxLength();
 
 	QArray<int> XPoints = *(Randi->getRandomXPoints(POneProgram->getLength(),PTwoProgram->getLength()));
 	/* contain the position for a crossover Event
@@ -154,8 +154,8 @@ void MT_Search::crossover(MT_Individual * ParentOne, MT_Individual * ParentTwo)
 	MT_Program * ChildOneProgram = new MT_Program(POneProgram,0,(XPoints[1]-1));
 	MT_Program * ChildTwoProgram = new MT_Program(PTwoProgram,0,(XPoints[2]-1));
 	
-	ChildOneProgram->changeMaxProgLen(MaxLenght);
-	ChildTwoProgram->changeMaxProgLen(MaxLenght);
+	ChildOneProgram->changeMaxProgLen(MaxLength);
+	ChildTwoProgram->changeMaxProgLen(MaxLength);
 
 	ChildOne = new MT_Individual(ChildOneProgram, false);
 	ChildTwo = new MT_Individual(ChildTwoProgram, false);

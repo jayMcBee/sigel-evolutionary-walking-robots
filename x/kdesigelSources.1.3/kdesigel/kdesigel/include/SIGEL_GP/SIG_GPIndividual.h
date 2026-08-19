@@ -132,7 +132,7 @@ class SIG_GPIndividual{
  /**
  * The constructor of an individual, used for the creation of an individual after a genetic operation.
  * @pre 
- * There must be a pool to place the individual and a genetic operation occured.
+ * There must be a pool to place the individual and a genetic operation occurred.
  * @post
  * An individual object is created correctly and it is placed in the correct position of the pool. The
  * history is composed of the birthtime and the constant reference to the history of the forefather.
@@ -368,13 +368,13 @@ class SIG_GPIndividual{
  * program of the considered individual object to the object.
  * @pre
  * A mutation of the robot control program of the considered individual has
- * occured.
+ * occurred.
  * @post
  * The information is added to the history.
  * @param name
  * The name of the individual.
  * @param time
- * The time of the occured mutation.
+ * The time of the occurred mutation.
  * @param mutpoint
  * The mutation point, given as an integer.
  */
@@ -391,7 +391,7 @@ class SIG_GPIndividual{
  * This function adds informations about the crossover of two robot control
  * programs, of two individual objects to one of them.
  * @pre A crossover of two robot control programs of two individual has
- * occured.
+ * occurred.
  * @post
  * The information is added to the history of the considered individual.
  * @param name1
@@ -461,13 +461,13 @@ class SIG_GPIndividual{
    * control program of the considered individual object to the object.
    * @pre
    * A reproduktion of the robot control program of the considered individual 
-   * has occured.
+   * has occurred.
    * @post
    * The information is added to the history.
    * @param name
    * The name of the individual.
    * @param time
-   * The time of the occured mutation.
+   * The time of the occurred mutation.
    */
 
  public:

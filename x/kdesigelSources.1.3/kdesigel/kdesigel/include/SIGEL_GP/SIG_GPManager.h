@@ -197,7 +197,7 @@ namespace SIGEL_GP
     * The GPManager is configured correctly, the population is initialized
     * and the fitnesstrainer is ready to run. 
     * @post
-    * The evolution process, which is called genetic programming, has occured.
+    * The evolution process, which is called genetic programming, has occurred.
     * It runed until a terminationcondition was fulfilled. 
     */
  private:

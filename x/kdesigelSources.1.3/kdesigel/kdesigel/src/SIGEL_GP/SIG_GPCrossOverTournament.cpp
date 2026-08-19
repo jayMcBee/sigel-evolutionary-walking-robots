@@ -265,8 +265,8 @@ bool  SIGEL_GP::SIG_GPCrossOverTournament::classify(MT_Classifier *MetaClassifie
    
   // Tournament winner determined via the classifier;
    // FitDiff < 0 -> indi2 wins;  FitDiff >= 0 -> indi1 wins
-	double  FitDiff1 = MetaClassifier->classifer(&const_cast<SIGEL_Program::SIG_Program&>(ind1_1.getProgram()), &const_cast<SIGEL_Program::SIG_Program&>(ind1_2.getProgram()));	
-  	double  FitDiff2 = MetaClassifier->classifer(&const_cast<SIGEL_Program::SIG_Program&>(ind2_1.getProgram()), &const_cast<SIGEL_Program::SIG_Program&>(ind2_2.getProgram()));	
+	double  FitDiff1 = MetaClassifier->classifier(&const_cast<SIGEL_Program::SIG_Program&>(ind1_1.getProgram()), &const_cast<SIGEL_Program::SIG_Program&>(ind1_2.getProgram()));	
+  	double  FitDiff2 = MetaClassifier->classifier(&const_cast<SIGEL_Program::SIG_Program&>(ind2_1.getProgram()), &const_cast<SIGEL_Program::SIG_Program&>(ind2_2.getProgram()));	
   
    if (FitDiff1 >= 0)
      {

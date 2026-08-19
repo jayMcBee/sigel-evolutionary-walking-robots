@@ -58,7 +58,7 @@ public:
 	* about a SIGEL robot control program
 	* Metadata are the lenght of the Sigel Program and the 
 	* number of the difference Instructions
-	* in the case of the classifer: 
+	* in the case of the classifier: 
 	*/
 	QArray<int> * MetaData;
 
