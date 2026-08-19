@@ -199,7 +199,7 @@ void MT_Program::insertProg(MT_Program *Part)
 		for(int i=0; i<NewLength; i++)
 			Program[oldSize+i] = Part->getProgramLine(i);
 				
-		for(i=NewLength; i<Part->getLength(); i++)
+		for(int i=NewLength; i<Part->getLength(); i++)
 			delete (Part->getProgramLine(i));
 		
 		Part->clearProgram();
@@ -244,7 +244,7 @@ void MT_Program::resize(int nSize)
 			
 			Length = nSize; 
 			// copy the data to the resized array
-			for(i=0; i<nSize; i++)
+			for(int i=0; i<nSize; i++)
 			{
 				tmpArray[i] = Program[i];
 				Program[i] =0;
@@ -260,7 +260,7 @@ void MT_Program::resize(int nSize)
 				Program[i] =0;
 			}
 			// initialize the empty slots with null
-			for(i=Length; i<nSize; i++)
+			for(int i=Length; i<nSize; i++)
 				tmpArray[i] = 0;
 		}
 	

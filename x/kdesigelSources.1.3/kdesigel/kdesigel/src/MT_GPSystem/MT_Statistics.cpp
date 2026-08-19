@@ -52,7 +52,7 @@ MT_Statistics::MT_Statistics(QTextStream & File)
 			for (int i=0;i<6;i++)
 				TotalCrossoverEvent[i]=(File.readLine()).toUInt();
 
-			for (i=0;i<NumOfEntry;i++ )
+			for (int i=0;i<NumOfEntry;i++ )
 				addStatisticElement(new MT_StatisticsElement(File)); 
 						
 		}
@@ -109,7 +109,7 @@ int MT_Statistics::updateStatistics()
 	MT_StatisticsElement * PresentSElement;
 
 
-	for (i=1; i<StatisticsOfGeneration.count(); i++)
+	for (int i=1; i<StatisticsOfGeneration.count(); i++)
 	{
 	
 		PresentSElement= StatisticsOfGeneration.at(i);

@@ -54,16 +54,16 @@ void MT_Tournament::ranking(QArray<int> * WinnerLoser)
 	
 	QArray <double> FitValue;	// Gives the fitness of the individual at position Pos[i]
 	FitValue.resize(NumberOfWinner);
-	for (i=0; i<NumberOfWinner; i++)
+	for (int i=0; i<NumberOfWinner; i++)
 		FitValue[i]=0.0;
 
 	QArray <int> Position;	// Gives the individual's position in the population
 	Position.resize(NumberOfWinner);
-	for (i=0; i<NumberOfWinner; i++)
+	for (int i=0; i<NumberOfWinner; i++)
 		Position[i]=0;
 
 	// Find the NumberOfWinner fittest individuals 
-	for (i=0; i<PopSize; i++)
+	for (int i=0; i<PopSize; i++)
 	{
 		PresentFit = Individuals[i]->getFitness();
 		
@@ -113,7 +113,7 @@ int DebugIn = 1;
 	
 	if (TypOfIndividual == 0)		// Evaluator Meta System;
 	{
-		for(i=0; i<PopSize; i++)
+		for(int i=0; i<PopSize; i++)
 		{
 			FitTemp = 100.0*Individuals[i]->getFitness();	
 			ProporFit[i]= FitTemp;
@@ -123,7 +123,7 @@ int DebugIn = 1;
 	}
 	else						// Classifier Meta System;
 	{
-		for(i=0; i<PopSize; i++)
+		for(int i=0; i<PopSize; i++)
 		{
 	DebugInfo = Individuals[i]->getFitness();
 		
@@ -147,7 +147,7 @@ int DebugIn = 1;
 int DebugNumber = 0;
 QArray<int> DebugArray;
 
-	for(i=0; i<NumberOfWinner; i++)
+	for(int i=0; i<NumberOfWinner; i++)
 	{
 		Winner = Randi->getProportionalWinner(&ProporFit);
 		if ((*WinnerLoser)[Winner] !=0)

@@ -792,7 +792,7 @@ void MT_GPManager::collectParentParameter(MT_StatisticsElement * SElement)
 
 	SElement->AverageFitness= (SElement->AverageFitness)/Parent->getSize();
 
-	for (i=0; i<ParentSize; i++)
+	for (int i=0; i<ParentSize; i++)
 		SElement->Varianz = SElement->Varianz + (((Parent->getIndividual(i))->getFitness()) - SElement->AverageFitness)*(((Parent->getIndividual(i))->getFitness()) - SElement->AverageFitness);
 
 	SElement->Varianz = SElement->Varianz/ Parent->getSize();

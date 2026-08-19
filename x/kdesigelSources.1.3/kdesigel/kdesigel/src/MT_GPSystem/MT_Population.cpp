@@ -90,7 +90,7 @@ int MT_Population::loadPop(QTextStream &File)
 		for (int i=0; i<FirstFreePos; i++)
 			Individuals[i]= new MT_Individual(File);
 
-		for (i=0; i<FirstFreePos; i++)
+		for (int i=0; i<FirstFreePos; i++)
 			Individuals[i]->setNewName(i);
 	}
 	else
