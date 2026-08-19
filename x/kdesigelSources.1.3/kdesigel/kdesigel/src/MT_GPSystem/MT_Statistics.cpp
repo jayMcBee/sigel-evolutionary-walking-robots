@@ -63,17 +63,17 @@ void MT_Statistics::writeToFileMT_Statistics(QTextStream & File)
 {
 
 	File << ("Statistics:\n");
-	File << (StatisticsOfGeneration.count()) <<endl;
-	File << NumOfSimpleCopyParent <<endl;
-	File << NumOfMutateIndividuals <<endl;
-	File << NumOfMutateImprovingIndividuals <<endl;
-	File << TotalCrossoverEvent[0] <<endl;
-	File << TotalCrossoverEvent[1] <<endl;
-	File << TotalCrossoverEvent[2] <<endl;
-	File << TotalCrossoverEvent[3] <<endl;
-	File << TotalCrossoverEvent[4] <<endl;
-	File << TotalCrossoverEvent[5] <<endl;
-	File << endl;
+	File << (StatisticsOfGeneration.count()) <<Qt::endl;
+	File << NumOfSimpleCopyParent <<Qt::endl;
+	File << NumOfMutateIndividuals <<Qt::endl;
+	File << NumOfMutateImprovingIndividuals <<Qt::endl;
+	File << TotalCrossoverEvent[0] <<Qt::endl;
+	File << TotalCrossoverEvent[1] <<Qt::endl;
+	File << TotalCrossoverEvent[2] <<Qt::endl;
+	File << TotalCrossoverEvent[3] <<Qt::endl;
+	File << TotalCrossoverEvent[4] <<Qt::endl;
+	File << TotalCrossoverEvent[5] <<Qt::endl;
+	File << Qt::endl;
 
 	for (int i=0; i<(StatisticsOfGeneration.count());i++)
 		if (getStatisticElement(i) != NULL)

@@ -97,14 +97,14 @@ void MT_Individual::writeToFileIndi(QTextStream &File)
 {
 
 	File << "Individual:\n";
-	File << Name << endl;
-	File << Age << endl;
-	File << Fitness << endl;
-	File << Position << endl;
-	File << TSetName << endl;
-	File << FitnessOfParent << endl;
-	File << TspOfGenesis << endl;
-	File << endl;
+	File << Name << Qt::endl;
+	File << Age << Qt::endl;
+	File << Fitness << Qt::endl;
+	File << Position << Qt::endl;
+	File << TSetName << Qt::endl;
+	File << FitnessOfParent << Qt::endl;
+	File << TspOfGenesis << Qt::endl;
+	File << Qt::endl;
 	
 	if (Program !=NULL)
 		Program->writeToFileProgram(File);
@@ -300,7 +300,7 @@ QString MT_Individual::printProgramLine(int index)
 	LineAsString += " ";
 	QString OpA;
 	OpA.setNum((Line->getSourceOperand())->VariableName);
-	LineAsString += OpA.leftJustify (5,' ', true);
+	LineAsString += OpA.leftJustified(5,' ', true);
 
 	QString OpB;
 	
@@ -308,7 +308,7 @@ QString MT_Individual::printProgramLine(int index)
 	{
 		OpB.setNum((Line->getTargetOperand())->VariableName);
 		LineAsString += "  V ";
-		LineAsString +=  OpB.leftJustify (5,' ', true);
+		LineAsString +=  OpB.leftJustified(5,' ', true);
 
 	}
 	else

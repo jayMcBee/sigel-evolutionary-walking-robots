@@ -5,14 +5,13 @@
 #if !defined(AFX_MT_POPULATION_H__76BD10AD_932E_42FC_BDD3_85DD57B1D541__INCLUDED_)
 #define AFX_MT_POPULATION_H__76BD10AD_932E_42FC_BDD3_85DD57B1D541__INCLUDED_
 
+#include "compat/q2compat.h"
 #include "MT_GPSystem/MT_Program.h"
 #include "MT_GPSystem/MT_Individual.h"
 #include "MT_GPSystem/MT_Randomizer.h"	
 
 #include <qstring.h>
 #include <qtextstream.h>
-#include <qqueue.h> 
-#include <qarray.h> 
 
 
 /* this class administer the Individuals from the META - GP-System
@@ -121,7 +120,7 @@ protected:
 	* Attention: the population dosen't completed filled !
 	* If a Population represent the parents it's should be !
 	*/
-	QArray<MT_Individual*> Individuals;
+	Q2Array<MT_Individual*> Individuals;
 };
 
 #endif // !defined(AFX_MT_POPULATION_H__76BD10AD_932E_42FC_BDD3_85DD57B1D541__INCLUDED_)

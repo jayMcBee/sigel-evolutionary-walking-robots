@@ -5,9 +5,9 @@
 #if !defined(AFX_MT_PROGRAM_H__D3578776_1315_4C75_B00A_E11B559B7314__INCLUDED_)
 #define AFX_MT_PROGRAM_H__D3578776_1315_4C75_B00A_E11B559B7314__INCLUDED_
 
+#include "compat/q2compat.h"
 #include <qstring.h>
 #include <qtextstream.h>
-#include <qvector.h> 
 #include "MT_GPSystem/MT_Programline.h"
 #include "MT_GPSystem/MT_Randomizer.h"	
 
@@ -83,7 +83,7 @@ private:
 	int LastError;
 	int MaxLength;
 	int Length;
-//	QVector<MT_Programline> Program;
+//	Q2PtrVector<MT_Programline> Program;
 	MT_Programline **Program;
 
 	void resize(int nSize);

@@ -50,7 +50,7 @@ public:
 	* for load a program line  and a standard constructor
 	*/
 	MT_Programline(MT_Programline *Line);
-	MT_Programline (QString &File);
+	MT_Programline (const QString &File);
 	MT_Programline (MT_Randomizer *Randi);
 	MT_Programline();
 

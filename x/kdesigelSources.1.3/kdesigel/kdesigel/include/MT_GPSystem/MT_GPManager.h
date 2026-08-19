@@ -5,7 +5,8 @@
 #if !defined(AFX_MT_GPMANAGER_H__0590D02D_760F_43CC_B902_EA5EE0196061__INCLUDED_)
 #define AFX_MT_GPMANAGER_H__0590D02D_760F_43CC_B902_EA5EE0196061__INCLUDED_
 
-#include "MT_Control/MT_Substitute.h"
+#include "compat/q2compat.h"
+class MT_Substitute;
 
 #include "MT_GPSystem/MT_Population.h"
 #include "MT_GPSystem/MT_Individual.h"
@@ -24,8 +25,6 @@
 
 #include <qstring.h>
 #include <qtextstream.h>
-#include <qqueue.h> 
-#include <qarray.h>
 
 
 /* GP-Manager manage the Evolution !*/

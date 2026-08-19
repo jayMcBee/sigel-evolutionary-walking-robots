@@ -67,14 +67,14 @@ MT_Randomizer::MT_Randomizer(QTextStream &File)
 	for (int i=0; i<7; i++)
 		RandomXPoints[i]=0;
 
-	cerr << ">>> im Randomizer <<<" << endl;
+	cerr << ">>> im Randomizer <<<" << Qt::endl;
 	QString Randomizer( "Randomizer:" );
 	QString PresentLine = File.readLine();
-	cerr << PresentLine << endl;
+	cerr << PresentLine.toStdString() << endl;
 	
 	while ((PresentLine != Randomizer) && !(File.atEnd())){
 		PresentLine = File.readLine();
-		cerr << PresentLine << endl;
+		cerr << PresentLine.toStdString() << endl;
 	}
 
 	if ((PresentLine == Randomizer) && !(File.atEnd()))
@@ -183,7 +183,7 @@ void MT_Randomizer::loadSetup(QTextStream &File)
 			ProbInstruktion[i]=(File.readLine()).toDouble();
 
 		PresentLine = File.readLine();
-		if (PresentLine >= 1.0)
+		if (PresentLine.toDouble() >= 1.0)
 		{
 			ProbInstruktion[17]=PresentLine.toDouble();
 			PresentLine = File.readLine();
@@ -230,33 +230,33 @@ void MT_Randomizer::writeToFileRandi(QTextStream &File)
 {
 
 	File << ("Randomizer:\n");
-	File << ParentSize << endl;
-	File << OffspringSize << endl;
-	File << NumberOfVariables << endl;
-	File << ProgramLengthMax << endl;
+	File << ParentSize << Qt::endl;
+	File << OffspringSize << Qt::endl;
+	File << NumberOfVariables << Qt::endl;
+	File << ProgramLengthMax << Qt::endl;
 	
-	File << ProbSearchOperator[0] << endl;
-	File << ProbSearchOperator[1] << endl;
-	File << ProbSearchOperator[2] << endl;
+	File << ProbSearchOperator[0] << Qt::endl;
+	File << ProbSearchOperator[1] << Qt::endl;
+	File << ProbSearchOperator[2] << Qt::endl;
 
-	File << ProbMutationPower[0] << endl;
-	File << ProbMutationPower[1] << endl;
+	File << ProbMutationPower[0] << Qt::endl;
+	File << ProbMutationPower[1] << Qt::endl;
 	
-	File << ProbCrossOverPoints[0] << endl;
-	File << ProbCrossOverPoints[1] << endl;
-	File << ProbCrossOverPoints[2] << endl;
+	File << ProbCrossOverPoints[0] << Qt::endl;
+	File << ProbCrossOverPoints[1] << Qt::endl;
+	File << ProbCrossOverPoints[2] << Qt::endl;
 
 	for (int i=0; i<18; i++)
-		File << ProbInstruktion[i] <<endl;
+		File << ProbInstruktion[i] <<Qt::endl;
 	
-	File << endl;
+	File << Qt::endl;
 
-	File << ("Constant:") << endl;
-	File << Constant.size() << endl;
+	File << ("Constant:") << Qt::endl;
+	File << Constant.size() << Qt::endl;
 	for(int i=0; i<Constant.size(); i++)
-		File << Constant[i] << endl;
+		File << Constant[i] << Qt::endl;
 
-	File << endl;
+	File << Qt::endl;
 
 }
 
@@ -264,7 +264,7 @@ void MT_Randomizer::writeToFileRandi(QTextStream &File)
 // normal set/ get method
 ////////////////////////////////////////////////////////////////////
 
-void MT_Randomizer::returnIndividualsValue(int **Length, int **NumOfVar, QArray<double> **Con, QArray<double> **ProbOfFu)
+void MT_Randomizer::returnIndividualsValue(int **Length, int **NumOfVar, Q2Array<double> **Con, Q2Array<double> **ProbOfFu)
 {
 
 	*Length= &ProgramLengthMax;
@@ -275,7 +275,7 @@ void MT_Randomizer::returnIndividualsValue(int **Length, int **NumOfVar, QArray<
 
 }
 
-void MT_Randomizer::returnSearchValue(QArray<double> **ProbMPower, QArray<double> **ProbSOperator, QArray<double> **ProbXPoints)
+void MT_Randomizer::returnSearchValue(Q2Array<double> **ProbMPower, Q2Array<double> **ProbSOperator, Q2Array<double> **ProbXPoints)
 {	
 	*ProbMPower = &ProbMutationPower; 
 	*ProbSOperator = &ProbSearchOperator;
@@ -381,10 +381,10 @@ bool MT_Randomizer::answerMutateElement()
 }
 
 
-QArray <int> * MT_Randomizer::getRandomTournamentPartition(int NumberOfTour)
+Q2Array<int> * MT_Randomizer::getRandomTournamentPartition(int NumberOfTour)
 {
 	// Array holding the current number of players per tournament
-	QArray<int> Index;
+	Q2Array<int> Index;
 	Index.resize(NumberOfTour);
 	for (int k =0; k<NumberOfTour; k++)
 		Index[k]=0;
@@ -425,9 +425,9 @@ QArray <int> * MT_Randomizer::getRandomTournamentPartition(int NumberOfTour)
 	return &TournamentPartition;
 }
 
-int MT_Randomizer::getProportionalWinner(QArray<int> * Players)
+int MT_Randomizer::getProportionalWinner(Q2Array<int> * Players)
 {
-	QArray<int> PlayersProportional; 
+	Q2Array<int> PlayersProportional; 
 	PlayersProportional.resize(Players->size());
 	int Total = 0;
 
@@ -512,7 +512,7 @@ int MT_Randomizer::getRandomSOperator()
 	return Choice;
 }
 
-QArray <int> * MT_Randomizer::getRandomXPoints(int SizeIndi1, int SizeIndi2)
+Q2Array<int> * MT_Randomizer::getRandomXPoints(int SizeIndi1, int SizeIndi2)
 {	
 	int NumberofXPoints;
 	unsigned int Random = getRandomInteger(ProbCrossOverPoints[2]);

@@ -97,11 +97,11 @@ void MT_FitnessTrainer::loadSetup(QTextStream &File)
 void MT_FitnessTrainer::writeToFileSetup(QTextStream &File)
 {
 	File << ("FitnessTranier:\n");
-	File << FitnessFunction << endl;
-	File << PresentTSize << endl;
-	File << TSetSize << endl;
-	File << Interpreter.getDuration() << endl;
-	File << Interpreter.getVariableNumber() << endl << endl;
+	File << FitnessFunction << Qt::endl;
+	File << PresentTSize << Qt::endl;
+	File << TSetSize << Qt::endl;
+	File << Interpreter.getDuration() << Qt::endl;
+	File << Interpreter.getVariableNumber() << Qt::endl << Qt::endl;
 }
 
 
@@ -109,11 +109,11 @@ void MT_FitnessTrainer::writeToFileTrainer(QTextStream &File)
 {
 	
 	File << ("FitnessTranier:\n");
-	File << FitnessFunction << endl;
-	File << PresentTSize << endl;
-	File << TSetSize << endl;
-	File << Interpreter.getDuration() << endl;
-	File << Interpreter.getVariableNumber() << endl << endl;
+	File << FitnessFunction << Qt::endl;
+	File << PresentTSize << Qt::endl;
+	File << TSetSize << Qt::endl;
+	File << Interpreter.getDuration() << Qt::endl;
+	File << Interpreter.getVariableNumber() << Qt::endl << Qt::endl;
 
 	TSet->writeToFileTSet(File);
 
@@ -156,7 +156,7 @@ void MT_FitnessTrainer::setNumberOfVariables(int varNumber)
 	Interpreter.setVariableNumber(varNumber);
 }
 
-int MT_FitnessTrainer::insertNewTCases(QQueue<MT_TrainingCase> *NewTCase)
+int MT_FitnessTrainer::insertNewTCases(Q2Queue<MT_TrainingCase> *NewTCase)
 {
 	TSet->updateTSet(NewTCase);
 	
@@ -293,12 +293,12 @@ int MT_FitnessTrainer::getPresentTSize()
 	return PresentTSize;
 }
 
-QArray<double> * MT_FitnessTrainer::getResultIstArray()
+Q2Array<double> * MT_FitnessTrainer::getResultIstArray()
 {
 	return &ResultIst;
 }
 
-QArray<double> * MT_FitnessTrainer::getResultArray()
+Q2Array<double> * MT_FitnessTrainer::getResultArray()
 {
 	return &Result;
 }

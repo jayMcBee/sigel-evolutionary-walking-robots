@@ -3,6 +3,7 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "MT_GPSystem/MT_GPManager.h"
+#include "MT_Control/MT_Substitute.h"
 #include <iostream.h>
 #ifdef _WINDOWS
 #include <windows.h>
@@ -238,9 +239,9 @@ void MT_GPManager::loadSetup(QTextStream &File)
 
 void MT_GPManager::writeToFileGPSystem(QTextStream &File)
 {
-	File << endl <<endl;
+	File << Qt::endl <<Qt::endl;
 	File << ("Generation:\n");
-	File << GenerationNumber << endl << endl;
+	File << GenerationNumber << Qt::endl << Qt::endl;
 
 	BestIndividual->writeToFileIndi(File);
 
@@ -249,12 +250,12 @@ void MT_GPManager::writeToFileGPSystem(QTextStream &File)
 	Statistics->writeToFileMT_Statistics(File);
 
 	File << ("OffspringSize:\n");
-	File << (Offspring->getSize()) << endl << endl;
+	File << (Offspring->getSize()) << Qt::endl << Qt::endl;
 
 	Parent->writeToFilePop(File);
 
 	File << ("BrutSize:\n");
-	File << (Seeker->getBrutSize()) << endl << endl;
+	File << (Seeker->getBrutSize()) << Qt::endl << Qt::endl;
 
 	Selector->writeToFileSetup(File);
 
@@ -270,7 +271,7 @@ void MT_GPManager::writeToFileGPSystem(QTextStream &File)
 	int PresentTSize = FitnessTrainer->getPresentTSize();
 	MT_Individual * NewBestIndi= Parent->getBestIndividual();
 
-	File << "beste Fitness vor Berechnung: " << NewBestIndi->getFitness() << endl;
+	File << "beste Fitness vor Berechnung: " << NewBestIndi->getFitness() << Qt::endl;
 	NewBestIndi->setTrainingsSet(-1);
 	int fitFct, tDur, tSize;
 	FitnessTrainer->getSelektionValue(&fitFct, &tDur, &tSize);
@@ -314,8 +315,8 @@ void MT_GPManager::writeToFileGPSystem(QTextStream &File)
 			}break;
 	}
 
-	QArray<double> * Outcome =FitnessTrainer->getResultIstArray();
-	QArray<double> * CorrectFit =FitnessTrainer->getResultArray();
+	Q2Array<double> * Outcome =FitnessTrainer->getResultIstArray();
+	Q2Array<double> * CorrectFit =FitnessTrainer->getResultArray();
 	int NumOfPositivSigelFit =0; 
 	int FitArrayLEnght = Outcome->count();
 
@@ -324,18 +325,18 @@ void MT_GPManager::writeToFileGPSystem(QTextStream &File)
 		if ((*CorrectFit)[k]>=0.0)
 			NumOfPositivSigelFit ++;
 		
-		File << "Nr.: " << k << endl;
-		File << " Sigel Fitness/Sieger : " << (*CorrectFit)[k] << endl;
-		File << " Meta Vorhersage      : " << (*Outcome)[k] << endl;
+		File << "Nr.: " << k << Qt::endl;
+		File << " Sigel Fitness/Sieger : " << (*CorrectFit)[k] << Qt::endl;
+		File << " Meta Vorhersage      : " << (*Outcome)[k] << Qt::endl;
 	}
 	
-	File << "#CorrectFit >=0 : " << NumOfPositivSigelFit << endl << endl;
+	File << "#CorrectFit >=0 : " << NumOfPositivSigelFit << Qt::endl << Qt::endl;
 
-	File << "Generation: "<< GenerationNumber <<endl;
-	File << "max.Fitness   : " << corFitValue << endl; 
-	File << "simple max.Fit: " << NewBestIndi->getFitness() << endl;
-	File << "durch.Fitness: " << Statistics->getStatisticElement(GenerationNumber-2)->AverageFitness << endl;
-	File << "average Error/ Percent of Correct Estimation: " << ErrorCorrect << endl;
+	File << "Generation: "<< GenerationNumber <<Qt::endl;
+	File << "max.Fitness   : " << corFitValue << Qt::endl; 
+	File << "simple max.Fit: " << NewBestIndi->getFitness() << Qt::endl;
+	File << "durch.Fitness: " << Statistics->getStatisticElement(GenerationNumber-2)->AverageFitness << Qt::endl;
+	File << "average Error/ Percent of Correct Estimation: " << ErrorCorrect << Qt::endl;
 
 	
 	FitnessTrainer->setSelektionValue(fitFct, tDur, tSize);
@@ -348,14 +349,14 @@ void MT_GPManager::writeToFileSetup(QTextStream &File)
 	Randi->writeToFileRandi(File);
 
 	File << ("OffspringSize:\n");
-	File << (Offspring->getSize()) << endl << endl;
+	File << (Offspring->getSize()) << Qt::endl << Qt::endl;
 
 	File << ("Population:\n");
-	File << (Parent->getSize()) << endl << endl;
+	File << (Parent->getSize()) << Qt::endl << Qt::endl;
 
 
 	File << ("BrutSize:\n");
-	File << (Seeker->getBrutSize()) << endl << endl;
+	File << (Seeker->getBrutSize()) << Qt::endl << Qt::endl;
 
 	Selector->writeToFileSetup(File);
 
@@ -607,8 +608,8 @@ void MT_GPManager::exchangeBest()
 	{
 		bool ChangeNecessary = false;
 
-		QArray<double> * Outcome =FitnessTrainer->getResultIstArray();
-		QArray<double> * CorrectFit =FitnessTrainer->getResultArray();
+		Q2Array<double> * Outcome =FitnessTrainer->getResultIstArray();
+		Q2Array<double> * CorrectFit =FitnessTrainer->getResultArray();
 		int PresentTSize = FitnessTrainer->getPresentTSize();
 
 		

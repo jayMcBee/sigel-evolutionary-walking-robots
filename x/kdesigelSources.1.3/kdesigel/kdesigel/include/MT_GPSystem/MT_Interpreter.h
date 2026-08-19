@@ -6,8 +6,8 @@
 #define AFX_MT_INTERPRETER_H__EFC222FF_DB14_461C_AE1C_69076695F31B__INCLUDED_
 
 
+#include "compat/q2compat.h"
 #include "MT_GPSystem/MT_TranslatedIndividual.h"
-#include <qarray.h>
 #include "MT_GPSystem/MT_Program.h"
 
 /* This class interpret the MT_Program of the SIGLE translated Individual
@@ -20,7 +20,7 @@ private:
 	/* Variables is a array of double with Size NumberVariable. 
 	* It's represent the variable/ register which can use a MT_Program
 	*/
-	QArray <double> Variables;
+	Q2Array<double> Variables;
 
 	int NumberVariable;
 	

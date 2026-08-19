@@ -5,9 +5,9 @@
 #if !defined(AFX_MT_TRANSLATEDINDIVIDUAL_H__5C48785A_CF39_45EF_9A94_1214783FF5E3__INCLUDED_)
 #define AFX_MT_TRANSLATEDINDIVIDUAL_H__5C48785A_CF39_45EF_9A94_1214783FF5E3__INCLUDED_
 
+#include "compat/q2compat.h"
 #include <qstring.h>
 #include <qtextstream.h>
-#include <qarray.h> 
 
 /*
 * This class is a simplifiy representation of a SIGEL individual
@@ -35,7 +35,7 @@ public:
 	* @pre: the MT_Translator produce this array
 	* @post: the destructor of this class must destroy this array
 	*/
-	QArray<int> * T_Instruktion;
+	Q2Array<int> * T_Instruktion;
 	
 	/* An array of integer represent the first operands
 	* of a SIGEL robot control program.
@@ -43,7 +43,7 @@ public:
 	* @pre: the MT_Translator produce this array
 	* @post: the destructor of this class must destroy this array
 	*/
-	QArray<int> * T_Operand1;
+	Q2Array<int> * T_Operand1;
 
 	/* An array of integer represent the second operands
 	* of a SIGEL robot control program.
@@ -51,7 +51,7 @@ public:
 	* @pre: the MT_Translator produce this array
 	* @post: the destructor of this class must destroy this array
 	*/
-	QArray<int> * T_Operand2;
+	Q2Array<int> * T_Operand2;
 
 
 	/* An array of integer represent the MetaData
@@ -60,7 +60,7 @@ public:
 	* number of the difference Instructions
 	* in the case of the classifier: 
 	*/
-	QArray<int> * MetaData;
+	Q2Array<int> * MetaData;
 
 	
 	/* constructor
@@ -71,7 +71,7 @@ public:
 	* representing the SIGEL robot control program thought the MT_Translator 
 	* @pre the three arrays must existed 
 	*/
-	MT_TranslatedIndividual (QArray <int> * T_Instruk, QArray<int> * T_OperOne, QArray<int>  * T_OperTwo, QArray<int>  * MData );
+	MT_TranslatedIndividual (Q2Array<int> * T_Instruk, Q2Array<int> * T_OperOne, Q2Array<int>  * T_OperTwo, Q2Array<int>  * MData );
 
 	/* The constructor of a translated individual, used for initializing
 	* a translated individual with data from a Qstring, by loading an experiment.

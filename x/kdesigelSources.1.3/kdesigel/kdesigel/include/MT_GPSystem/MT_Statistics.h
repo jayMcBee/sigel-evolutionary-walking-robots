@@ -5,8 +5,8 @@
 #if !defined(AFX_MT_STATISTICS_H__010CEA5A_30F4_406B_93E1_DD5D57975FE5__INCLUDED_)
 #define AFX_MT_STATISTICS_H__010CEA5A_30F4_406B_93E1_DD5D57975FE5__INCLUDED_
 
+#include "compat/q2compat.h"
 #include "MT_GPSystem/MT_StatisticsElement.h"
-#include <qlist.h>
 
 
 
@@ -39,7 +39,7 @@ public:
 	* Array[4] indicate the Number of total Crossover with three X Point; 
 	* Array[5] indicate the Number of successful Crossover with three X Point;
 	*/
-	QArray<unsigned int> TotalCrossoverEvent;
+	Q2Array<unsigned int> TotalCrossoverEvent;
 	unsigned int NumOfSimpleCopyParent; // not Parent - Offspring !!!
 	unsigned int NumOfMutateIndividuals; 
 	unsigned int NumOfMutateImprovingIndividuals; 
@@ -47,7 +47,7 @@ public:
 
 	/* This QList is a recording of  MT_StatisicsElement per Generation;
 	* the first Element of the List belonging to the first Generation, and so on*/
-	QList<MT_StatisticsElement>  StatisticsOfGeneration;
+	Q2PtrList<MT_StatisticsElement>  StatisticsOfGeneration;
 
 
 };

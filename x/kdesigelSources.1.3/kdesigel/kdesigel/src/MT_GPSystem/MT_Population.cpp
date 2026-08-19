@@ -61,8 +61,8 @@ void MT_Population::writeToFilePop(QTextStream &File)
 {
 	
 	File << ("Population:\n");
-	File << PopSize << endl;
-	File << FirstFreePos << endl << endl;
+	File << PopSize << Qt::endl;
+	File << FirstFreePos << Qt::endl << Qt::endl;
 	
 	for (int i=0; i<FirstFreePos; i++)
 		if (Individuals[i] != NULL)

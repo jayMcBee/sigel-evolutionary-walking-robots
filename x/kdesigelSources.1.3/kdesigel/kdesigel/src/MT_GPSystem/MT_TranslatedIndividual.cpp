@@ -30,7 +30,7 @@ MT_TranslatedIndividual::~MT_TranslatedIndividual()
 		
 }
 
-MT_TranslatedIndividual::MT_TranslatedIndividual(QArray<int> *T_Instruk, QArray<int> *T_OperOne, QArray<int> *T_OperTwo, QArray<int> *MData )
+MT_TranslatedIndividual::MT_TranslatedIndividual(Q2Array<int> *T_Instruk, Q2Array<int> *T_OperOne, Q2Array<int> *T_OperTwo, Q2Array<int> *MData )
 {
 
 	T_Instruktion= T_Instruk;
@@ -55,10 +55,10 @@ MT_TranslatedIndividual::MT_TranslatedIndividual(QTextStream &File)
 		T_length = (File.readLine()).toInt();
 		Boundary = (File.readLine()).toInt();
 
-		T_Instruktion = new QArray<int>;
-		T_Operand1 = new QArray<int>;
-		T_Operand2 = new QArray<int>;
-		MetaData = new QArray<int>;
+		T_Instruktion = new Q2Array<int>;
+		T_Operand1 = new Q2Array<int>;
+		T_Operand2 = new Q2Array<int>;
+		MetaData = new Q2Array<int>;
 
 		if (Boundary <= 0)
 			MetaData->resize(16);
@@ -129,8 +129,8 @@ MT_TranslatedIndividual::MT_TranslatedIndividual(QTextStream &File)
 void MT_TranslatedIndividual::writeToFileTransIndi(QTextStream &File)
 {
 	File << ("TranslatedIndividual:\n");
-	File << T_length << endl;
-	File << Boundary << endl;
+	File << T_length << Qt::endl;
+	File << Boundary << Qt::endl;
 
 	QString PartOfLine;
 
@@ -140,21 +140,21 @@ void MT_TranslatedIndividual::writeToFileTransIndi(QTextStream &File)
 	for (int i=0; i<T_length;i++)
 	{
 		PartOfLine.setNum((*T_Instruktion)[i]);
-		File<<PartOfLine.leftJustify (4,' ', true);
+		File<<PartOfLine.leftJustified(4,' ', true);
 
 		PartOfLine.setNum((*T_Operand1)[i]);
-		File<<PartOfLine.leftJustify (7,' ', true);
+		File<<PartOfLine.leftJustified(7,' ', true);
 		
 		PartOfLine.setNum((*T_Operand2)[i]);
-		File<<PartOfLine.leftJustify (7,' ', true) << endl;
+		File<<PartOfLine.leftJustified(7,' ', true) << Qt::endl;
 		
 	}
-	File << "MetaData:" << endl;
+	File << "MetaData:" << Qt::endl;
 	
 	for (int i=0; i< MetaData->size(); i++)
-		File << (*MetaData)[i] << endl;
+		File << (*MetaData)[i] << Qt::endl;
 	
 	
-	File<<endl;
+	File<<Qt::endl;
 
 }
