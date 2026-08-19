@@ -29,20 +29,20 @@ MT_Randomizer::MT_Randomizer()
 	TournamentPartition.resize(OffspringSize);
 
 	ProbSearchOperator.resize(3);
-	for (i=0; i<3; i++)
+	for (int i=0; i<3; i++)
 		ProbSearchOperator[i]=0;	
 		
 
 	ProbMutationPower.resize(2);
-	for (i=0; i<2; i++)
+	for (int i=0; i<2; i++)
 		ProbMutationPower[i]=0;
 
 	ProbCrossOverPoints.resize(3);
-	for (i=0; i<3; i++)
+	for (int i=0; i<3; i++)
 		ProbCrossOverPoints[i]=0;
 
 	ProbInstruktion.resize(18);
-	for (i=0; i<18; i++)
+	for (int i=0; i<18; i++)
 		ProbInstruktion[i]=0;
 
 	createConstant (50, true , 0, 1000);
@@ -86,19 +86,19 @@ MT_Randomizer::MT_Randomizer(QTextStream &File)
 		TournamentPartition.resize(OffspringSize);
 		
 		ProbSearchOperator.resize(3);
-		for (i=0; i<3; i++)
+		for (int i=0; i<3; i++)
 			ProbSearchOperator[i]=(File.readLine()).toDouble();
 		
 		ProbMutationPower.resize(2);
-		for (i=0; i<2; i++)
+		for (int i=0; i<2; i++)
 			ProbMutationPower[i]=(File.readLine()).toDouble();
 		
 		ProbCrossOverPoints.resize(3);
-		for (i=0; i<3; i++)
+		for (int i=0; i<3; i++)
 			ProbCrossOverPoints[i]=(File.readLine()).toDouble();
 	
 		ProbInstruktion.resize(18);
-		for (i=0; i<17; i++)
+		for (int i=0; i<17; i++)
 			ProbInstruktion[i]=(File.readLine()).toDouble();
 
 		PresentLine = File.readLine();
@@ -132,7 +132,7 @@ MT_Randomizer::MT_Randomizer(QTextStream &File)
 				int NumOfConst = PresentLine.toInt();
 				
 				Constant.resize(NumOfConst);
-				for (i=0; i<NumOfConst; i++)
+				for (int i=0; i<NumOfConst; i++)
 				{
 					PresentLine = File.readLine();	
 					Constant[i]= PresentLine.toDouble();
@@ -173,13 +173,13 @@ void MT_Randomizer::loadSetup(QTextStream &File)
 		for (int i=0; i<3; i++)
 			ProbSearchOperator[i]=(File.readLine()).toDouble();
 		
-		for (i=0; i<2; i++)
+		for (int i=0; i<2; i++)
 			ProbMutationPower[i]=(File.readLine()).toDouble();
 		
-		for (i=0; i<3; i++)
+		for (int i=0; i<3; i++)
 			ProbCrossOverPoints[i]=(File.readLine()).toDouble();
 	
-		for (i=0; i<17; i++)
+		for (int i=0; i<17; i++)
 			ProbInstruktion[i]=(File.readLine()).toDouble();
 
 		PresentLine = File.readLine();
@@ -210,7 +210,7 @@ void MT_Randomizer::loadSetup(QTextStream &File)
 				int NumOfConst = PresentLine.toInt();
 				
 				Constant.resize(NumOfConst);
-				for (i=0; i<NumOfConst; i++)
+				for (int i=0; i<NumOfConst; i++)
 				{
 					PresentLine = File.readLine();	
 					Constant[i]= PresentLine.toDouble();
@@ -253,7 +253,7 @@ void MT_Randomizer::writeToFileRandi(QTextStream &File)
 
 	File << ("Constant:") << endl;
 	File << Constant.size() << endl;
-	for(i=0; i<Constant.size(); i++)
+	for(int i=0; i<Constant.size(); i++)
 		File << Constant[i] << endl;
 
 	File << endl;
@@ -439,7 +439,7 @@ int MT_Randomizer::getProportionalWinner(QArray<int> * Players)
 	
 	int Winner = getRandomInteger(Total);
 
-	for(i=0; i<(*Players).size();i++)
+	for(int i=0; i<(*Players).size();i++)
 	{
 		if (Winner<=PlayersProportional[i])
 		{

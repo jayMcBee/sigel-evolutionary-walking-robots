@@ -45,7 +45,7 @@ MT_Trainingset::MT_Trainingset(QTextStream &File)
 		for(int i=0; i<TSize; i++)
 		TCases[i]=0;
 
-		for (i=0; i<PresentTSize; i++)
+		for (int i=0; i<PresentTSize; i++)
 			TCases[i] = new MT_TrainingCase(File);
 		
 		FreePosition=PresentTSize;

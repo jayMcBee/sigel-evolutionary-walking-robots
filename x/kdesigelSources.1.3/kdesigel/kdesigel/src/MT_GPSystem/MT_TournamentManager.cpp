@@ -164,7 +164,7 @@ void MT_TournamentManager::performTournaments()
 //MT_Individual *DebugIndi = 0;
 
 	// Now insert all offspring individuals into a tournament 
-	for (i=0; i<OffspringSize; i++)
+	for (int i=0; i<OffspringSize; i++)
 	{
 //		DebugIndi = OffspringPop->getIndividual(i); 
 		Tournaments[Partition->at(i)]->insertIndividual(OffspringPop->getIndividual(i));
@@ -175,7 +175,7 @@ void MT_TournamentManager::performTournaments()
 
 	OffspringPop->flush();
 
-//for(i=0;i<TournamentNumber; i++)
+//for(int i=0;i<TournamentNumber; i++)
 //		for (g=0; g<WinnerLoser.size();g++)
 //			DebugIndi= Tournaments[i]->getIndividual(g);
 
@@ -188,7 +188,7 @@ void MT_TournamentManager::performTournaments()
 
 	if (SMethod == 1)
 	{
-		for(i=0;i<TournamentNumber; i++)
+		for(int i=0;i<TournamentNumber; i++)
 		{
 			Tournaments[i]->ranking(&WinnerLoser);
 
@@ -225,7 +225,7 @@ void MT_TournamentManager::performTournaments()
 				
 			}
 
-			for(k=0;k<WinnerLoser.size();k++)
+			for(int k=0;k<WinnerLoser.size();k++)
 			{
 				Winner = Tournaments[i]->insertAtPos(0,k);
 				delete Winner; 
@@ -239,7 +239,7 @@ void MT_TournamentManager::performTournaments()
 	}
 	else 
 	{
-		for(i=0;i<TournamentNumber; i++)
+		for(int i=0;i<TournamentNumber; i++)
 		{
 			Tournaments[i]->fitnessProp(Randi, &WinnerLoser);
 			

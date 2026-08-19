@@ -118,7 +118,7 @@ MT_TranslatedIndividual::MT_TranslatedIndividual(QTextStream &File)
 					(*MetaData)[(*T_Instruktion)[k]] ++;
 
 				(*MetaData)[16] = T_length-Boundary;
-				for (k=Boundary; k< T_Instruktion->size(); k++)
+				for (int k=Boundary; k< T_Instruktion->size(); k++)
 					(*MetaData)[16+(*T_Instruktion)[k]] ++;
 
 			}
@@ -151,7 +151,7 @@ void MT_TranslatedIndividual::writeToFileTransIndi(QTextStream &File)
 	}
 	File << "MetaData:" << endl;
 	
-	for (i=0; i< MetaData->size(); i++)
+	for (int i=0; i< MetaData->size(); i++)
 		File << (*MetaData)[i] << endl;
 	
 	
