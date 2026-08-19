@@ -29,7 +29,7 @@ MT_Programline::MT_Programline(MT_Randomizer *Randi)
 
 }
 
-MT_Programline::MT_Programline(QString & File)
+MT_Programline::MT_Programline (const QString & File)
 {
 	QString PartOfLine = File.mid(0,3);
 
@@ -147,7 +147,7 @@ void MT_Programline::writeToFileProgramLine(QTextStream &File)
 
 	QString OpA;
  	OpA.setNum(OperandA->VariableName);
-	OpA = OpA.leftJustify (5,' ', true);
+	OpA = OpA.leftJustified(5,' ', true);
 	File << OpA;
 
 	QString OpB;
@@ -155,14 +155,14 @@ void MT_Programline::writeToFileProgramLine(QTextStream &File)
 	if (OperandB->OPType ==1)
 	{
 		OpB.setNum(OperandB->VariableName);
-		OpB = OpB.leftJustify (5,' ', true);
-		File <<"V " << OpB << endl;
+		OpB = OpB.leftJustified(5,' ', true);
+		File <<"V " << OpB << Qt::endl;
 
 	}
 	else
 	{
 		OpB.setNum(OperandB->Data);
-		File <<"C " << OpB << endl;
+		File <<"C " << OpB << Qt::endl;
 	}
 
 }

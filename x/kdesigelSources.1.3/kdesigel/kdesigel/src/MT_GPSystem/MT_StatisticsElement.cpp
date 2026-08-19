@@ -83,24 +83,24 @@ void MT_StatisticsElement::writeToFileElement(QTextStream &File)
 {
 	
 	File << ("StatisticsElement:\n");
-	File << Generation <<endl;
-	File << Varianz <<endl;
-	File << AverageFitness <<endl;
-	File << MaxFitness <<endl;
-	File << NumOfSimpleCopyParent <<endl;
-	File << NumOfElementMutationParent <<endl;
-	File << NumOfMutateIndividuals <<endl;
-	File << NumOfMutateImprovingIndividuals <<endl;
-	File << CrossoverEventParent[0] <<endl;
-	File << CrossoverEventParent[1] <<endl;
-	File << CrossoverEventParent[2] <<endl;
-	File << CrossoverEventParent[3] <<endl;
-	File << CrossoverEventParent[4] <<endl;
-	File << CrossoverEventParent[5] <<endl;
-	File << NumOfTotalElementMutation <<endl;
-	File << NumOfSimpleCopyOffspring <<endl;
-	File << NumOfCrossoverEvent <<endl;
-	File << NumOfMutateOffspring <<endl;
-	File << endl;
+	File << Generation <<Qt::endl;
+	File << Varianz <<Qt::endl;
+	File << AverageFitness <<Qt::endl;
+	File << MaxFitness <<Qt::endl;
+	File << NumOfSimpleCopyParent <<Qt::endl;
+	File << NumOfElementMutationParent <<Qt::endl;
+	File << NumOfMutateIndividuals <<Qt::endl;
+	File << NumOfMutateImprovingIndividuals <<Qt::endl;
+	File << CrossoverEventParent[0] <<Qt::endl;
+	File << CrossoverEventParent[1] <<Qt::endl;
+	File << CrossoverEventParent[2] <<Qt::endl;
+	File << CrossoverEventParent[3] <<Qt::endl;
+	File << CrossoverEventParent[4] <<Qt::endl;
+	File << CrossoverEventParent[5] <<Qt::endl;
+	File << NumOfTotalElementMutation <<Qt::endl;
+	File << NumOfSimpleCopyOffspring <<Qt::endl;
+	File << NumOfCrossoverEvent <<Qt::endl;
+	File << NumOfMutateOffspring <<Qt::endl;
+	File << Qt::endl;
 
 }

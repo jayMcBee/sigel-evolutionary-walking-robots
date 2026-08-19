@@ -7,9 +7,9 @@
 
 
 
+#include "compat/q2compat.h"
 #include <qstring.h>
 #include <qtextstream.h>
-#include <qarray.h> 
 
 
 /* This class contain all Information, that could be arise from the GP-System 
@@ -51,7 +51,7 @@ public:
 	* Array[4] indicate the Number of total Crossover with three X Point; 
 	* Array[5] indicate the Number of successful Crossover with three X Point;
 	*/
-	QArray<int> CrossoverEventParent;  
+	Q2Array<int> CrossoverEventParent;  
 
 	int NumOfTotalElementMutation;
 	int NumOfMutateOffspring;

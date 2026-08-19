@@ -155,7 +155,7 @@ void MT_TournamentManager::performTournaments()
 		Tournaments[i]->setFreePos(0);
 	
 	// fetch a correct partition for separate the offspring into tournaments
-	QArray<int>	*Partition = Randi->getRandomTournamentPartition(TournamentNumber);
+	Q2Array<int>	*Partition = Randi->getRandomTournamentPartition(TournamentNumber);
 
 //int DebugInfo =0;
 //for (int g=0; g < OffspringSize;g++)
@@ -292,7 +292,7 @@ void MT_TournamentManager::writeToFileSetup(QTextStream &File)
 {
 
 	File << ("TournamentManager:\n");
-	File << SMethod << endl;
-	File << TournamentSize << endl << endl;
+	File << SMethod << Qt::endl;
+	File << TournamentSize << Qt::endl << Qt::endl;
 
 }

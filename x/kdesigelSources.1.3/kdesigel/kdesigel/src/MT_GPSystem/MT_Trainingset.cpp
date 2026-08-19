@@ -75,9 +75,9 @@ void MT_Trainingset::writeToFileTSet(QTextStream &File)
 {
 	
 	File << ("Trainingset:\n");
-	File << TSetName << endl;
-	File << TSize << endl;
-	File << PresentTSize << endl << endl;
+	File << TSetName << Qt::endl;
+	File << TSize << Qt::endl;
+	File << PresentTSize << Qt::endl << Qt::endl;
 
 	for (int i=0; i<PresentTSize; i++)
 		if(TCases[i] != NULL)
@@ -108,7 +108,7 @@ void MT_Trainingset::changeTSize(int NewTSize)
 
 }
 
-void MT_Trainingset::updateTSet(QQueue<MT_TrainingCase> *NewTCases)
+void MT_Trainingset::updateTSet(Q2Queue<MT_TrainingCase> *NewTCases)
 {
 	int NumOfNew = NewTCases->count();
 	if (NumOfNew !=0)

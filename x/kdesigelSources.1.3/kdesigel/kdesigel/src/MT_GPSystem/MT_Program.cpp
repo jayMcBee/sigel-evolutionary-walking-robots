@@ -100,15 +100,15 @@ MT_Program::MT_Program(MT_Program *Prog, int Start, int End)
 void MT_Program::writeToFileProgram(QTextStream &File)
 {
 	File << "Program:\n";
-	File << MaxLength << endl;
-	File << Length << endl;
+	File << MaxLength << Qt::endl;
+	File << Length << Qt::endl;
 
 	if (Program != NULL)
 		for (int i=0; i<Length; i++)
 			if (Program[i] != NULL)
 				(Program[i])->writeToFileProgramLine(File);
 
-	File << endl;
+	File << Qt::endl;
 }
 
 //////////////////////////////////////////////////////////////////////

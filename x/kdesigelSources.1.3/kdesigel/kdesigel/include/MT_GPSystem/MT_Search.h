@@ -6,11 +6,10 @@
 #define AFX_MT_SEARCH_H__B5BB118D_7ED8_4086_8D30_BFC22C562A0F__INCLUDED_
 
 
+#include "compat/q2compat.h"
 #include "MT_GPSystem/MT_Population.h"
 #include "MT_GPSystem/MT_Randomizer.h"	
 
-#include <qqueue.h> 
-#include <qarray.h> 
 
 /* This class manage the GP variation;
 * another search points in the search space were determinate.

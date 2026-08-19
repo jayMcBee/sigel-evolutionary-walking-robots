@@ -53,9 +53,9 @@ MT_TrainingCase::MT_TrainingCase(double Fit, MT_TranslatedIndividual *TransIndi,
 void MT_TrainingCase::writeToFileTCase(QTextStream &File)
 {
 	File << ("TrainingCases:\n");
-	File << Name << endl;
-	File << Fitness << endl;
-	File << Boundary << endl << endl;
+	File << Name << Qt::endl;
+	File << Fitness << Qt::endl;
+	File << Boundary << Qt::endl << Qt::endl;
 
 	TranslateIndividual->writeToFileTransIndi(File);
 }

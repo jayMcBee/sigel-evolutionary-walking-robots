@@ -6,11 +6,11 @@
 #define AFX_MT_TOURNAMENTMANAGER_H__8202A42C_476B_4AD2_8E67_442E97B3C8BF__INCLUDED_
 
 
+#include "compat/q2compat.h"
 #include "MT_GPSystem/MT_Population.h"
 #include "MT_GPSystem/MT_Tournament.h"
 
 
-#include <qarray.h>
 
 
 /* This class manage the GP tournament;
@@ -72,10 +72,10 @@ private:
 	/* denote which players have gain the present tournaments and which are the loser
 	* 0 indicate a Loser
 	*/
-	QArray<int>  WinnerLoser;
+	Q2Array<int>  WinnerLoser;
 
 	/* contain pointer of the single tournaments */
-	QArray<MT_Tournament*> Tournaments;
+	Q2Array<MT_Tournament*> Tournaments;
 	
 	/* indicate the selection method 
 	* 1 = Ranking Selection

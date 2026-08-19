@@ -5,9 +5,9 @@
 #if !defined(AFX_MT_INDIVIDUAL_H__630909EE_4F20_4811_94CA_2F9AB46D6046__INCLUDED_)
 #define AFX_MT_INDIVIDUAL_H__630909EE_4F20_4811_94CA_2F9AB46D6046__INCLUDED_
 
+#include "compat/q2compat.h"
 #include <qstring.h>
 #include <qtextstream.h>
-#include <qarray.h> 
 #include "MT_GPSystem/MT_Program.h"
 #include "MT_GPSystem/MT_Randomizer.h"	
 
