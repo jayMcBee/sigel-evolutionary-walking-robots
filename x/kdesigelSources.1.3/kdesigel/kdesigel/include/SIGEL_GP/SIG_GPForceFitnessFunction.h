@@ -80,7 +80,7 @@ virtual ~SIG_GPForceFitnessFunction();
  * @post
  * The fitnessvalue is computed and returned, the object of the fitness function is destructed.
  * @return
- * A double is returned, which represents the fitnessvalue. If an error has occured, the returnvalue of
+ * A double is returned, which represents the fitnessvalue. If an error has occurred, the returnvalue of
  * the double is -1.
  */
 public:

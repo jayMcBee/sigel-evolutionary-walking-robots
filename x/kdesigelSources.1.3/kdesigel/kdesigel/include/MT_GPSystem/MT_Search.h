@@ -40,7 +40,7 @@ public:
 	MT_Search();
 	virtual ~MT_Search();
 	/* For brute-force search!
-	*	MT_Search(MT_Population * ParentPop, MT_Population * OffspringPop, MT_Randomizer * Randi, MT_FitnessTranier * Fit Trainer);
+	*	MT_Search(MT_Population * ParentPop, MT_Population * OffspringPop, MT_Randomizer * Randi, MT_FitnessTrainer * Fit Trainer);
 	*/
 
 private:

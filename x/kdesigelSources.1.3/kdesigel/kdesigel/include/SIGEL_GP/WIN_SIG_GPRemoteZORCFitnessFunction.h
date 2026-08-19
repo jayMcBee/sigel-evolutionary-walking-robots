@@ -84,7 +84,7 @@ namespace SIGEL_GP
 
     /**
       * Set some parameters of the serial device for proper operation with ZORC.
-      * Returns -1 in case any error occured.
+      * Returns -1 in case any error occurred.
       */
       int      SetSerial(HANDLE fd, long baud, int handshake);
 

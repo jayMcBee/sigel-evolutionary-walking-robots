@@ -38,9 +38,9 @@ namespace SIGEL_Tools
       /**
        * This constructor should be used when throwing a new Exception.
        *
-       * @param filename The filename where the exception occured.
+       * @param filename The filename where the exception occurred.
        *                 The macro __FILE__ should be inserted here.
-       * @param line     The line of code where the exception occured.
+       * @param line     The line of code where the exception occurred.
        *                 The macro __LINE__ should be inserted here.
        * @param message  A short description of the exception.
        */
@@ -58,9 +58,9 @@ namespace SIGEL_Tools
        * created exception containing the accumulated messages can
        * be thrown again.
        *
-       * @param fileName The filename where the exception occured.
+       * @param fileName The filename where the exception occurred.
        *                 The macro __FILE__ should be inserted here.
-       * @param line     The line of code where the exception occured.
+       * @param line     The line of code where the exception occurred.
        *                 The macro __LINE__ should be inserted here.
        * @param message  A short description of the exception.
        * @prevException  The catched exception whose message

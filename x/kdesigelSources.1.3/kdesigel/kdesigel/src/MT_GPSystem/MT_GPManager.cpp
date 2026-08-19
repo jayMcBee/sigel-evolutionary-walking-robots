@@ -111,7 +111,7 @@ MT_GPManager::MT_GPManager(QTextStream &File) : QObject()
 	Selector = new MT_TournamentManager (Parent, Offspring, Randi, File);
 	if(Selector->getLastError() != 0)
 		LastError = Selector->getLastError();
-	FitnessTrainer = new MT_FitnessTranier(File);
+	FitnessTrainer = new MT_FitnessTrainer(File);
 	if(FitnessTrainer->getLastError() != 0)
 		LastError = FitnessTrainer->getLastError();
 
@@ -130,7 +130,7 @@ MT_GPManager::MT_GPManager(MT_Substitute *Substitue) : QObject()
 
 	Randi = new MT_Randomizer();
 	Statistics = new MT_Statistics();
-	FitnessTrainer = new MT_FitnessTranier();
+	FitnessTrainer = new MT_FitnessTrainer();
 	
 	Parent= new MT_Population(Randi, 10);
 	Offspring= new MT_Population ();

@@ -115,7 +115,7 @@ void MT_Classifier::writeToFileSetup(QTextStream &File)
 // functionally method 
 //////////////////////////////////////////////////////////////////////
 
-double MT_Classifier::classifer(SIGEL_Program::SIG_Program * SigProgOne, SIGEL_Program::SIG_Program * SigProgTwo)
+double MT_Classifier::classifier(SIGEL_Program::SIG_Program * SigProgOne, SIGEL_Program::SIG_Program * SigProgTwo)
 {
 
 		double MetaEstimationResult = Interpreter->interpret(createDoubleTransIndi(SigProgOne, SigProgTwo));

@@ -152,7 +152,7 @@ void MT_Program::changeMaxProgLen(int NewLen)
 {
 	MaxLength = NewLen;
 
-// if the MaxLenght reduce, the excess programline will delete!
+// if the MaxLength reduce, the excess programline will delete!
 	if (MaxLength < Length)
 	{
 		for (int i=MaxLength; i<Length; i++) 

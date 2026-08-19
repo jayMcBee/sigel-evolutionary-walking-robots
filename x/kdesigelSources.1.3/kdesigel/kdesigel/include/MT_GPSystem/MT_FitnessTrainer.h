@@ -1,9 +1,9 @@
-// MT_FitnessTranier.h: interface for class MT_FitnessTranier.
+// MT_FitnessTrainer.h: interface for class MT_FitnessTrainer.
 //
 //////////////////////////////////////////////////////////////////////
 
-#if !defined(AFX_MT_FITNESSTRANIER_H__8C160767_FE7C_4FFF_B2EC_DFA03F1E983A__INCLUDED_)
-#define AFX_MT_FITNESSTRANIER_H__8C160767_FE7C_4FFF_B2EC_DFA03F1E983A__INCLUDED_
+#if !defined(AFX_MT_FITNESSTRAINER_H__8C160767_FE7C_4FFF_B2EC_DFA03F1E983A__INCLUDED_)
+#define AFX_MT_FITNESSTRAINER_H__8C160767_FE7C_4FFF_B2EC_DFA03F1E983A__INCLUDED_
 
 #include "MT_GPSystem/MT_TranslatedIndividual.h"
 #include "MT_GPSystem/MT_TrainingCase.h"
@@ -22,7 +22,7 @@
 
 /*This  class manages the fitness calculation of the MT_Individuals. 
 */
-class MT_FitnessTranier  
+class MT_FitnessTrainer  
 {
 
 private:
@@ -32,15 +32,15 @@ private:
 	/*Indicate which FitnessFunktion is choose for the fitness calculation
 	@param: 1 = fitSimpleError for the evaluator  approach 
 	@param: 2 = fitSquareError for the evaluator  approach 
-	@param: 3 = simpleYesNo  for the classifer approach 
-	@param: 4 = weightYesNo  for the classifer approach 
+	@param: 3 = simpleYesNo  for the classifier approach 
+	@param: 4 = weightYesNo  for the classifier approach 
 	*/
 	int FitnessFunction;
 	
 	/* for the evaluator  approach:
 	* the both Result arrays serve for storing the fitness value
 	* of the single fitness cases (exact and by the MT_Program)
-	* for the classifer approach:
+	* for the classifier approach:
 	* the both Resultarray contain: (Fitness of the first SigelProgram) -(Fitness of the second SigelProgram)
 	* so if the value negative the second SigelProgram is the tournament winner, else the fist Program ...   
 	*/
@@ -80,9 +80,9 @@ public:
 	* @post: a new Trainer is created from the data.
 	*/
 
-	MT_FitnessTranier();
-	virtual ~MT_FitnessTranier();
-	MT_FitnessTranier (QTextStream &File);
+	MT_FitnessTrainer();
+	virtual ~MT_FitnessTrainer();
+	MT_FitnessTrainer (QTextStream &File);
 
 	/* calculate the fitness of a given MT_Population
 	* set the new calculate fitness directly in the Individual
@@ -130,7 +130,7 @@ public:
 	void writeToFileSetup(QTextStream &File);
 
 private:
-	// fitnessfunction for the classifer approach 
+	// fitnessfunction for the classifier approach 
 	// @pre: PresentTSize>0; else div by Null!
 	double weightYesNo();
 	double simpleYesNo();
@@ -141,4 +141,4 @@ private:
 
 };
 
-#endif // !defined(AFX_MT_FITNESSTRANIER_H__8C160767_FE7C_4FFF_B2EC_DFA03F1E983A__INCLUDED_)
+#endif // !defined(AFX_MT_FITNESSTRAINER_H__8C160767_FE7C_4FFF_B2EC_DFA03F1E983A__INCLUDED_)

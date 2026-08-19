@@ -70,7 +70,7 @@ public:
 	*/
 	void changeMaxNumVariable(int NewNum);
 
-	/* change the max Program lenght of the program, if the MaxLenght reduce,
+	/* change the max Program lenght of the program, if the MaxLength reduce,
 	* the excess programline will delete!
 	*/
 	void changeMaxProgLen(int NewLen);

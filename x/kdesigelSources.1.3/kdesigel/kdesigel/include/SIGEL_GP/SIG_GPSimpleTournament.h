@@ -120,7 +120,7 @@ private:
   /*zwei neue Methoden: 
 	bool runMetaClassifier(*Classifier) 
 		-> runs a tournament without exact fitness, using the MetaClassifier!
-		requires Classifer for double classifer (*SigProgOne, SigProgTwo)
+		requires Classifier for double classifier (*SigProgOne, SigProgTwo)
  
 	bool runMetaCorrect(*Classifier)
 		-> serves to create new training cases!
