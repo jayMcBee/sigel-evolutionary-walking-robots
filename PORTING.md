@@ -417,6 +417,44 @@ They also **confirm the D8 basis independently**: every `.exp`, `.rrb` and `.wrl
 is pure ASCII, so no *data* file carries a byte ≥ 0x80 and the
 `QTextStream` codec change above stays a no-op.
 
+### DEBT — core error reporting (opened at A2)
+
+`SIG_Environment.cpp` opened three `QMessageBox` warning dialogs on terrain
+load failure. Core cannot do that: it must build against Qt6Core alone, and
+`-evolve` has no `QApplication`, so the dialog could never have worked headless
+anyway. A2 replaced them with `SIGEL_Tools::SIG_IO::cerr`.
+
+**This is a stopgap, not a solution.** A GUI user now gets no dialog — the
+message goes to a console they may not be watching. That is a regression in GUI
+behaviour and it is accepted deliberately, for now.
+
+**Required follow-up, after the core migration:** a real error-reporting
+strategy for core — something core can call without knowing whether a GUI
+exists, which the GUI can surface as a dialog and headless runs can print. A
+callback, a signal, or an error sink handed in at construction. Do not settle
+this per-site.
+
+§2 counts 7 core files touching dialogs, so the same decision recurs. Known
+sites: `SIG_Environment.cpp` (done), `MT_Controller.cpp`, `SIG_GPFitnessTrainer.cpp`,
+`SIG_GPRemoteZORCFitnessFunction.cpp` (+ WIN variant, + both headers).
+
+### TRAP — `toUtf8()` returns a temporary (all 74 D8 sites)
+
+Qt 2's `latin1()` returned a pointer into the QString's own buffer, so
+`const char *p = s.latin1();` was valid for as long as the string lived. Qt 6's
+`toUtf8()` returns a **temporary `QByteArray`**, so the same line dangles at
+once:
+
+```cpp
+const char *p = s.toUtf8();                 // DANGLES
+const QByteArray b = s.toUtf8();            // correct
+const char *p = b.constData();
+foo(s.toUtf8().constData());                // also fine: one full expression
+```
+
+`toLatin1()` behaves identically, so D8's choice does not affect this. Hit at
+`SIG_Environment.cpp:459` in A2. Check every D8 site for a stored `const char *`.
+
 ### Defects being fixed rather than preserved (D13)
 
 The port deliberately diverges from 2003 behaviour at these points. Each is a
