@@ -22,8 +22,8 @@
 */
 #include "SIGEL_Tools/SIG_IO.h"
 
-QTextStream SIGEL_Tools::SIG_IO::cin(stdin, IO_ReadOnly);
+QTextStream SIGEL_Tools::SIG_IO::cin(stdin, QIODeviceBase::ReadOnly);
 
-QTextStream SIGEL_Tools::SIG_IO::cout(stdout, IO_WriteOnly);
+QTextStream SIGEL_Tools::SIG_IO::cout(stdout, QIODeviceBase::WriteOnly);
 
-QTextStream SIGEL_Tools::SIG_IO::cerr(stderr, IO_WriteOnly);
+QTextStream SIGEL_Tools::SIG_IO::cerr(stderr, QIODeviceBase::WriteOnly);
