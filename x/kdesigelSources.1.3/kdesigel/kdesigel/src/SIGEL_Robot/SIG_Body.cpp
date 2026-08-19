@@ -38,7 +38,7 @@ namespace SIGEL_Robot
                 : parent (par)
         {
                 QString tmpstr;
-                // "Body" wurde bereits in SIG_Robot gelesen.
+                // "Body" has already been read in SIG_Robot.
                 tx >> geometryFile;
                 tx >> directory;
                 tx >> tmpstr;

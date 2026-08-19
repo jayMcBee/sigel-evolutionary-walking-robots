@@ -1,18 +1,18 @@
-// MT_Classifier.cpp: Implementierung der Klasse MT_Classifier.
+// MT_Classifier.cpp: implementation of class MT_Classifier.
 //
 //////////////////////////////////////////////////////////////////////
 
 #include "MT_Control/MT_Classifier.h"
 
 //////////////////////////////////////////////////////////////////////
-// Konstruktion/Destruktion
+// Construction/destruction
 //////////////////////////////////////////////////////////////////////
 
 MT_Classifier::MT_Classifier(QTextStream &File) : MT_Substitute()
 {
 	Typ=2;
 	AverageSigelFitness = 0.01;
-	Interpreter= new MT_Interpreter(10,100); // ACHTUNG Parameter müssen noch geändert werden! setInterpreter(int NumOfVariable,  int TimeToInter)
+	Interpreter= new MT_Interpreter(10,100); // WARNING: parameters still need changing! setInterpreter(int NumOfVariable, int TimeToInter)
 	BestMETAProgram =0;
 	CorrectFitness.resize(0);
 	AssumedFitness.resize(0);
@@ -155,7 +155,7 @@ void MT_Classifier::createNewTCase(SIGEL_Program::SIG_Program * SigProgOne, SIGE
 
 int MT_Classifier::evaluationTactic(int ToursSize)
 {
-	int NumOfClassi=0; //die Anzahl der Turnier die mit dem Classi ausgeführt werden sollen 
+	int NumOfClassi=0; //Number of tournaments to be run with the classifier 
 	double Num =0.0;
 	double SigelGeneration = GenerationNumber;
 	if (SigelGeneration <1.0)
@@ -195,7 +195,7 @@ int MT_Classifier::evaluationTactic(int ToursSize)
 	
 	case 4: 
 		{
-			// nach Anzahl der SigelGenerationen gewichtete Bewertungsstrategie
+			// Evaluation strategy weighted by SIGEL generation count
 			double ToleranceNew = Tolerance;
 			if(MetaProgError == -1.0)
 			{
@@ -210,7 +210,7 @@ int MT_Classifier::evaluationTactic(int ToursSize)
 			if (SigelGeneration >5.0)
 			{
 			
-				// nach Anzahl der Generationen wird die Tolerance gewichtet!
+				// Tolerance is weighted by generation count
 				if (SigelGeneration <= 150.0)
 				{
 					double Rate = (40.0 - Tolerance) / 145.0;
@@ -235,7 +235,7 @@ int MT_Classifier::evaluationTactic(int ToursSize)
 		}break;
 	case 5: 
 		{
-			// nach Sigel Fitness gewichtete Bewertungsstrategie!
+			// Evaluation strategy weighted by SIGEL fitness
 
 			double ToleranceNew = Tolerance;
 
@@ -249,7 +249,7 @@ int MT_Classifier::evaluationTactic(int ToursSize)
 				MetaProgError = (MetaProgError/ CorrectFitness.size())*100.0;  //MetaProgError := prozentualer Fehler 
 			}
 
-		// Gewichtung  der Tolerance AverageSigelFitness !! 
+		// Tolerance weighting: AverageSigelFitness 
 			if (AverageSigelFitness>0.1)
 			{
 				if(AverageSigelFitness<1.0)
@@ -332,12 +332,12 @@ MT_TranslatedIndividual * MT_Classifier::createDoubleTransIndi(SIGEL_Program::SI
 	
 	SIGEL_Program::SIG_ProgramLine * SIG_ProLine;
 
-// erste Sigel Programm wird übersetzt 
+// First SIGEL program is translated 
 	for (int i=0; i<SigProgOneSize;i++)
 	{
 
-		// ACHTUNG: falls SIGEL Befehl von SIGProg = JMP X, NOP, Sense ...
-		// wird für den oder die nicht vorhanden Operanten eine 0 gesetzt - Alternativ?
+		// WARNING: if the SIGEL instruction from SIGProg is JMP X, NOP, Sense ...
+		// a 0 is substituted for the missing operand(s). Any alternative?
 
 		SIG_ProLine= SigProgOne->getLine(i);
 		(*OperandOne)[i]= SIG_ProLine->getElement(0);
@@ -384,11 +384,11 @@ MT_TranslatedIndividual * MT_Classifier::createDoubleTransIndi(SIGEL_Program::SI
 
 	}
 
-// zweites Sigel Programm wird übersetzt 
+// Second SIGEL program is translated 
 	for (i=0; i<SigProgTwoSize;i++)
 	{
-		// ACHTUNG: falls SIGEL Befehl von SIGProg = JMP X, NOP, Sense ...
-		// wird für den oder die nicht vorhanden Operanten eine 0 gesetzt - Alternativ?
+		// WARNING: if the SIGEL instruction from SIGProg is JMP X, NOP, Sense ...
+		// a 0 is substituted for the missing operand(s). Any alternative?
 
 		SIG_ProLine= SigProgTwo->getLine(i);
 		(*OperandOne)[i+SigProgOneSize]= SIG_ProLine->getElement(0);
@@ -518,7 +518,7 @@ bool MT_Classifier::preEvolution(QVector<SIGEL_GP::SIG_GPTournament> *tours, int
 			ToursWBestIndi[i] =0;
 
 		int NewNumOfClassi = evalNeededTours(tours, & ToursWBestIndi, PosBest);
-		if (NewNumOfClassi <=0)			// kein Turnier soll klassifiert werden;
+		if (NewNumOfClassi <=0)			// No tournament is to be classified
 			return Change;  
 
 #ifdef _WINDOWS
@@ -545,13 +545,13 @@ bool MT_Classifier::preEvolution(QVector<SIGEL_GP::SIG_GPTournament> *tours, int
 		pthread_mutex_unlock(&interpreterMutex);
 #endif
 
-// für Marco:  :-)	
-// falls Turnier per Klassi ausgeführt wurden,
-// soll hier nun tours verkleinert werden, und die noch nicht gelaufenden
-// Turnier soll noch übernommen werden, also alle am Anfang von tours stehene
-// damit man dann einfach 	tours->resize(TourSize-NumOfClassi); durchführen kann 
+// for Marco :-)	
+// If tournaments were run via the classifier,
+// tours should now be shrunk and the tournaments not yet run
+// should be carried over, i.e. all those at the start of tours,
+// so that tours->resize(TourSize-NumOfClassi) can simply be called 
 
-		int NumOfTour = TourSize - NewNumOfClassi; // Anzahl der Turnier, die normal ausgeführt werden soll
+		int NumOfTour = TourSize - NewNumOfClassi; // Number of tournaments to be run normally
 		for( i=0; i<NumOfTour; i++)
 		{
 			Tourna = tours->at(i);
@@ -624,8 +624,8 @@ int MT_Classifier::evalNeededTours(QVector<SIGEL_GP::SIG_GPTournament> *  tours,
 	}
 
 
-	// falls das beste Sigel Individuum selten an Turnieren teilnimmt 
-	// werden weiter Turnier zu Kalibrierung herangezogen
+	// If the best SIGEL individual rarely takes part in tournaments, 
+	// further tournaments are used for calibration
 
 	if(RefreshInterval == 0)
 		RefreshInterval = 10;

@@ -1,4 +1,4 @@
-// MT_Programline.h: Schnittstelle für die Klasse MT_Programline.
+// MT_Programline.h: interface for class MT_Programline.
 //
 //////////////////////////////////////////////////////////////////////
 

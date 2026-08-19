@@ -46,10 +46,10 @@ void SIGEL_Simulation::SIG_TranslationalController::init(SIG_DynaJoint * theJoin
 
 void SIGEL_Simulation::SIG_TranslationalController::calculate_and_apply()
 {
-  /* Hier muss nun der Abstand zwischen den beiden Fix-Vektoren in Weltkoordinaten gemessen werden,
-   * danach sollte ueberprueft werden, ob eine der Grenzen ueberschritten ist.
-   * Zum Schluss sollte auf die beiden Dynas eine Kraft einwirken 
-   * Diese Kraft errechnet sich irgendwie aus der in den beiden Punkten wirkenden Geschwindigkeit
+  /* The distance between the two fix-vectors must now be measured in world coordinates,
+   * after which it should be checked whether one of the limits has been exceeded.
+   * Finally a force should act on the two Dynas 
+   * This force is computed somehow from the velocity acting at the two points
    */
  DL_point lFix,rFix,nextlFix,nextrFix;
  joint->leftDyna->dyna->to_world(&joint->leftFix,&lFix);  

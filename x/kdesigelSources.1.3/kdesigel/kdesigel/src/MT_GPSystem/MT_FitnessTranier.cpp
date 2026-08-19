@@ -1,11 +1,11 @@
-// MT_FitnessTranier.cpp: Implementierung der Klasse MT_FitnessTranier.
+// MT_FitnessTranier.cpp: implementation of class MT_FitnessTranier.
 //
 //////////////////////////////////////////////////////////////////////
 
 #include "MT_GPSystem/MT_FitnessTranier.h"
 
 //////////////////////////////////////////////////////////////////////
-// Konstruktion/Destruktion
+// Construction/destruction
 //////////////////////////////////////////////////////////////////////
 
 MT_FitnessTranier::MT_FitnessTranier(QTextStream &File)
@@ -325,7 +325,7 @@ double MT_FitnessTranier::weightYesNo()
 	for (int i=0; i<PresentTSize; i++)
 	{
 		DiffResult = fabs(Result[i]);
-		// Erinnerung Result[i] enthält Fitnessdifferenz der beiden Sigel Individuen
+		// Reminder: Result[i] holds the fitness difference of the two SIGEL individuals
 	
 		if( ((ResultIst[i]<0.0)&&(Result[i]<0.0)) || ((ResultIst[i]>0.0)&&(Result[i]>0.0)) )
 		{	

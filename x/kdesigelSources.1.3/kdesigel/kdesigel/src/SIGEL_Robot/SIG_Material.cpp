@@ -40,7 +40,7 @@ namespace SIGEL_Robot {
                 QString tmpstr;
                 int zahl;
 
-                // "Material" wurde bereits von SIG_Robot gelesen.
+                // "Material" has already been read by SIG_Robot.
                 tx >> name
                    >> elasticity
                    >> density;
@@ -53,7 +53,7 @@ namespace SIGEL_Robot {
 
                         tx >> fname;
                         tx >> fval;
-                        // Fuer folgendes, siehe mein Paper. Holger.
+                        // For the following, see my paper. - Holger
                         if (fother = parent->lookupMaterial (fname))
                                 setFrictionValue (fother, fval);
                 }

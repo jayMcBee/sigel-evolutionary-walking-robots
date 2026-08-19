@@ -1,4 +1,4 @@
-// MT_GPManager.cpp: Implementierung der Klasse MT_GPManager.
+// MT_GPManager.cpp: implementation of class MT_GPManager.
 //
 //////////////////////////////////////////////////////////////////////
 
@@ -17,7 +17,7 @@ MT_GPManager::MT_GPManager(QTextStream &File) : QObject()
 {
 
 	/* 
-	Reihenfolge der Initialisierung:
+	Order of initialisation:
 	Substituter
 	GenerationNumber
 	BestIndividual
@@ -120,7 +120,7 @@ MT_GPManager::MT_GPManager(QTextStream &File) : QObject()
 
 MT_GPManager::MT_GPManager(MT_Substitute *Substitue) : QObject()
 {
-	// nicht nutzbar, nur LadeKonstruktor benutzen 
+	// Not usable - use the loading constructor only 
 /*
 	Substituter = _Substitue;
 
@@ -262,7 +262,7 @@ void MT_GPManager::writeToFileGPSystem(QTextStream &File)
 
 
 	//**************************
-	// zusätzliche Informationen über die Fitnessberechnung ... wird nicht geladen  
+	// Additional information about the fitness computation ... is not loaded  
 	//**************************
 	if(!GenerationNumber)
 		return;
@@ -461,13 +461,13 @@ void MT_GPManager::setPopAndTournamentSize(int NewPopSize, int NewTournamentSize
 
 void MT_GPManager::startEvolution(MT_Substitute *Substitute)
 {
-/*************************** Initialisierung ***************************/
+/*************************** Initialisation ***************************/
 /*	#ifdef _WINDOWS
 	Beep(3500,500);
 	#endif
 */
 	Substituter = Substitute;
-	// nun werden die Parameter im Interpreter vom Substituter aktualisiert!
+	// The interpreter's parameters are now updated by the substituter
 	if (Substituter !=0)
 		Substitute->setInterpreter(Randi->getNumOfVari(), FitnessTrainer->getTDuration());
 	else
@@ -578,7 +578,7 @@ void MT_GPManager::startEvolution(MT_Substitute *Substitute)
 
 	}
 	
-//*************************** Nachbearbeitung   ***************************
+//*************************** Post-processing   ***************************
 
 
 	emit metaEvolutionRunning(false);
@@ -612,10 +612,10 @@ void MT_GPManager::exchangeBest()
 		int PresentTSize = FitnessTrainer->getPresentTSize();
 
 		
-		// erst wenn die Trainingsmenge vollständig gefüllt ist, kann das BestMETAProgram ausgetauscht werden
-		// solang zeigt BestMETAProgram im Substituter auf 0; damit auch keine Schätzung!
-		// PresentTSize := aktuelle Anzahl der T-fälle in der TMenge
-		// Outcome->size() := max. erlaubte Anzahl von T-fälle in T-Menge 
+		// BestMETAProgram can only be replaced once the training set is completely filled
+		// until then BestMETAProgram in the substituter points to 0, so no estimation happens
+		// PresentTSize := current number of training cases in the training set
+		// Outcome->size() := maximum permitted number of training cases in the training set 
 
 		if (PresentTSize==Outcome->size()) 	
 		{
@@ -629,7 +629,7 @@ void MT_GPManager::exchangeBest()
 				BestIndividual->setFitness(NewBestIndi->getFitness());
 				BestIndividual->setNewAge(0);
 		
-				// erneute Berechnung,damit Outcome/ CorrectFit richtige Werte haben und nicht vom letzten bestIndividual... 
+				// Recompute so that Outcome/CorrectFit hold correct values, not those of the previous bestIndividual 
 				BestIndividual->setTrainingsSet(-1);
 				FitnessTrainer->calculateFitness(BestIndividual);
 

@@ -1,4 +1,4 @@
-// MT_Tournament.h: Schnittstelle für die Klasse MT_Tournament.
+// MT_Tournament.h: interface for class MT_Tournament.
 //
 //////////////////////////////////////////////////////////////////////
 
@@ -18,15 +18,15 @@ class MT_Tournament : public MT_Population
 {
 public:
 	/* realization of a fitness proportional selection
-	* @pre: the tournament member muss inside the tournament
-	* @pre: the fitness of the tournament member muss be estimated bevor
+	* @pre: the tournament member must be inside the tournament
+	* @pre: the fitness of the tournament member must be estimated beforehand
 	* @post: in the WinnerLoser array indicat a one a Winner and a zero a Loser 
 	*/
 	void fitnessProp(MT_Randomizer* Randi, QArray<int> * WinnerLoser);
 	
 	/* realization of a ranking selection
-	* @pre: the tournament menber muss inside the tournament
-	* @pre: the fitness of the tournament menber muss be estimated bevor.   
+	* @pre: the tournament member must be inside the tournament
+	* @pre: the fitness of the tournament member must be estimated beforehand.   
 	* @post: in the WinnerLoser array indicat a one a Winner and a zero a Loser 
 	*/
 	void ranking(QArray<int> * WinnerLoser);

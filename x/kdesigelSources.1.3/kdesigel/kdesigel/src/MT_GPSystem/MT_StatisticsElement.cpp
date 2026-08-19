@@ -1,11 +1,11 @@
-// MT_StatisticsElement.cpp: Implementierung der Klasse MT_StatisticsElement.
+// MT_StatisticsElement.cpp: implementation of class MT_StatisticsElement.
 //
 //////////////////////////////////////////////////////////////////////
 
 #include "MT_GPSystem/MT_StatisticsElement.h"
 
 //////////////////////////////////////////////////////////////////////
-// Konstruktion/Destruktion
+// Construction/destruction
 //////////////////////////////////////////////////////////////////////
 
 MT_StatisticsElement::MT_StatisticsElement(QTextStream &File)

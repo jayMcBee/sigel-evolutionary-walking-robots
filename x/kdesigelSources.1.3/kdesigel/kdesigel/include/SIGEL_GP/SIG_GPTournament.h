@@ -141,7 +141,7 @@ SIG_GPTournament(SIGEL_Tools::SIG_Randomizer& randomizer,
  virtual ~SIG_GPTournament();
 
   /**
-   * This methode is virtual for definition in the inherited class.
+   * This method is virtual, for definition in the inherited class.
    */
  public:
  virtual bool run();

@@ -114,8 +114,8 @@ namespace SIGEL_Robot {
         {
                 links.insert (l->getName (), l);
                 if (isroot) {
-                        // Hier scheint etwas zu fehlen, aber ich habe keinen
-                        // Schimmer mehr, was.
+                        // Something seems to be missing here, but I no longer
+                        // have the faintest idea what.
                 }
         }
 

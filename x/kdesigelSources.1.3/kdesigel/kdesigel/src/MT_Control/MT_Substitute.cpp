@@ -1,11 +1,11 @@
-// MT_Substitute.cpp: Implementierung der Klasse MT_Substitute.
+// MT_Substitute.cpp: implementation of class MT_Substitute.
 //
 //////////////////////////////////////////////////////////////////////
 
 #include "MT_Control/MT_Substitute.h"
 
 //////////////////////////////////////////////////////////////////////
-// Konstruktion/Destruktion
+// Construction/destruction
 //////////////////////////////////////////////////////////////////////
 
 MT_Substitute::MT_Substitute()
@@ -93,8 +93,8 @@ MT_TranslatedIndividual * MT_Substitute::translatedSIGProg(SIGEL_Program::SIG_Pr
 		
 	for (int i=0; i<ProgSize;i++)
 	{
-		// ACHTUNG: falls SIGEL Befehl von SIGProg = JMP X, NOP, Sense ...
-		// wird für den oder die nicht vorhanden Operanten eine 0 gesetzt - Alternativ?
+		// WARNING: if the SIGEL instruction from SIGProg is JMP X, NOP, Sense ...
+		// a 0 is substituted for the missing operand(s). Any alternative?
 
 		SIG_ProLine= SIGProg->getLine(i);
 		(*OperandOne)[i]= SIG_ProLine->getElement(0);

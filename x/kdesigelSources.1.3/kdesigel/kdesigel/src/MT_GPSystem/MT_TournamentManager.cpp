@@ -1,4 +1,4 @@
-// MT_TournamentManager.cpp: Implementierung der Klasse MT_TournamentManager.
+// MT_TournamentManager.cpp: implementation of class MT_TournamentManager.
 //
 //////////////////////////////////////////////////////////////////////
 
@@ -53,9 +53,9 @@ MT_TournamentManager::MT_TournamentManager(MT_Population *PPop, MT_Population *O
 
 MT_TournamentManager::~MT_TournamentManager()
 {
-	// Achtung: im Array Pointer auf Tournament = Population
-	// Population muss clean sein, also keine Individuen 
-	// besitzen !!! Verantwortung darfür performaTournaments()!
+	// Note: the array holds pointers to Tournament = Population
+	// The population must be clean, i.e. contain no individuals 
+	// own them! performaTournaments() is responsible for that.
 	if(TournamentSize !=0)
 	{
 		for(int i=0; i<Tournaments.size(); i++)
@@ -107,9 +107,9 @@ void MT_TournamentManager::setTournamentSize(int SizeOfT)
 		for(int i=0; i<TournamentNumber; i++)
 			delete Tournaments[i];
 
-		// Tournaments müssen immmer vollständig gelöscht werden
-		// obwohl evtl. TournamentSize nicht geändert hat 
-		// allerdings kann sich ParentSize oder OffspringSize geändert haben!!!
+		// Tournaments must always be deleted completely
+		// even though TournamentSize may not have changed 
+		// but ParentSize or OffspringSize may well have changed
 
 	}
 
@@ -148,7 +148,7 @@ void MT_TournamentManager::createTournaments()
 void MT_TournamentManager::performTournaments()
 {
 
-// ************************ Vorbereitung/ Einteilung der Offspring Individuen in Turniere ************************ //
+// ************************ Prepare and distribute the offspring individuals into tournaments ************************ //
 	int OffspringSize = OffspringPop->getSize();
 
 	for (int i=0; i<Tournaments.size(); i++)
@@ -163,7 +163,7 @@ void MT_TournamentManager::performTournaments()
 
 //MT_Individual *DebugIndi = 0;
 
-	// füge nun alle O-Individuen in ein Turnier ein! 
+	// Now insert all offspring individuals into a tournament 
 	for (i=0; i<OffspringSize; i++)
 	{
 //		DebugIndi = OffspringPop->getIndividual(i); 
@@ -181,7 +181,7 @@ void MT_TournamentManager::performTournaments()
 
 
 		
-// ************************ Ausführung der Turniere / Aktualisierung der Eltern  ************************ //
+// ************************ Run the tournaments / update the parents  ************************ //
 
 	int ParentPos =0;
 	MT_Individual * Winner;
@@ -203,7 +203,7 @@ void MT_TournamentManager::performTournaments()
 				if (WinnerLoser[k]!=0)
 				{
 					// Winner = (Tournaments[i]->getIndividual(k));
-					 // Neu: Verantwort auf Winner übertragen;
+					 // New: transfer ownership to the winner
 				
 					Winner = Tournaments[i]->insertAtPos(0,k);
 				

@@ -64,13 +64,13 @@ SIGEL_GP::SIG_GPManager::SIG_GPManager(SIGEL_GP::SIG_GPExperiment &experiment)
 };
 
 
-//Diese Methode gibt einen Referenz auf Trainer des aktuellen Experiments zurueck
+//Returns a reference to the current experiment's trainer
 SIGEL_GP::SIG_GPFitnessTrainer &SIGEL_GP::SIG_GPManager::getActTrainer()
 {
   return *trainer;
 };
 
- //Diese Methode gibt einen Referenz auf Experiment zurueck
+ //Returns a reference to the experiment
 SIGEL_GP::SIG_GPExperiment &SIGEL_GP::SIG_GPManager::getActExperiment()
 {
   return actExperiment;
@@ -231,10 +231,10 @@ void SIGEL_GP::SIG_GPManager::createTours(int quantity) {
     << " Tournaments.\n";
 #endif
 
-  //Die Population des Experemints
+  //The experiment's population
   SIG_GPPopulation &pop = actExperiment.population;
 
-  //Groesse des Tourssets wird festgelegt
+  //The tournament set size is fixed
   tours.clear();
   tours.resize(quantity);
 
@@ -356,10 +356,10 @@ void SIGEL_GP::SIG_GPManager::evalNewIndis() {
   QList< QArray<int> > fitTaskList;
   fitTaskList.setAutoDelete( true );
 
-  //Die Population des Experemints
+  //The experiment's population
   SIG_GPPopulation &pop=actExperiment.population;
 
-  //Die Populationsgroesse wird bestimmt
+  //The population size is determined
   int poolSize=pop.getSize();
 
   for (int i=0;i<poolSize;i++) {
@@ -381,7 +381,7 @@ void SIGEL_GP::SIG_GPManager::evalNewIndis() {
     if (actInd.getFitness() < 0.0)
 	  upToDate = false;
 
-    //aktualisiere die Fitnesswerte fuer die Individuen, die nicht UpToDate sind
+    //Update the fitness values for individuals that are not up to date
     if(!upToDate) {
 #ifdef SIG_DEBUG
       SIGEL_Tools::SIG_IO::cerr << "SIG_GPManager: Individual Number "
@@ -462,7 +462,7 @@ void SIGEL_GP::SIG_GPManager::calcInitTourSet() {
 
     taskCanDoList.clear();
 
-    // Die Population des Experiments
+    // The experiment's population
     SIG_GPPopulation &pop=getActExperiment().population;
 
     QArray<int> lastAccesses( pop.getSize() );
@@ -477,7 +477,7 @@ void SIGEL_GP::SIG_GPManager::calcInitTourSet() {
 				  << i << ".\n";
 #endif
 
-        // Das Aktuelle Tournament
+        // The current tournament
 
 	SIG_GPTournament &actTour=*tours[i];
 
@@ -546,8 +546,8 @@ bool SIGEL_GP::SIG_GPManager::checkTerminationConditions(bool generationBreak) {
 
   // ToDo: Check for maxFitness
 
-  //Je Nach Bedingung wird die evolutionschleife verlassen
-  //bei der Zeit oder das Ereichen des maximalen Individuums
+  //The evolution loop is exited depending on the condition,
+  //either on time or on reaching the maximum individual
 
   if (userTerminated)
     return true;
@@ -644,10 +644,10 @@ void SIGEL_GP::SIG_GPManager::run() {
     if (schlussJetzt)
       return;
 
-    // Alle "resetGeneration" wird der Fitnesswert aller Individuen einer Population auf -1 gesetzt, so dass sie in evalNewIndis()
-    // neu berechnet werden. Falls die Fitnessfunktion dies unterstützt kann man dadurch alle "resetGeneration" ein anderes
-    // Fitnesskriterium anwenden.
-    // nicht durch null teilen
+    // Every "resetGeneration" generations all fitness values are set to -1 so that evalNewIndis()
+    // recomputes them. If the fitness function supports it, this allows a different target every "resetGeneration" generations
+    // Apply the fitness criterion.
+    // Do not divide by zero
     if ( actExperiment.gpParameter.getResetEveryGeneration() != 0) {
       if ( (actExperiment.population.getPoolGeneration() % actExperiment.gpParameter.getResetEveryGeneration()) == 0)
         actExperiment.population.resetPool();
@@ -1009,17 +1009,17 @@ SIGEL_GP::SIG_GPManager::~SIG_GPManager()
 void SIGEL_GP::SIG_GPManager::run(MT_Classifier *MetaClassifier)
 {
 	/*	
-		Meta Reihenfolge/ Änderungen
-		0) wie Sigel ...
+		Meta ordering / changes
+		0) as for SIGEL ...
 		1) createTours
 		2) MT_Classifier.preEvolution  --->klassifiziert SigelTurnier; verkleinert evtl. tours(!)
 		3) calcInitTourSet()
-		4) evalNeededIndis() --> Neue Methode: nur Fitness von Sigel Individuen berechnen,
-		die auch noch in tours vorkommen!!!!
-		5) evolutionLoop(MT_Classifier) ------>Neue Methode: nur Fitness von Sigel Individuen berechnen,
-		die auch noch in tours vorkommen!!!! MT_Classifier für Turniere benutzten !
+		4) evalNeededIndis() --> new method: compute fitness only for those SIGEL individuals
+		which still appear in tours!
+		5) evolutionLoop(MT_Classifier) ------> new method: compute fitness only for those SIGEL individuals
+		which still appear in tours! Use MT_Classifier for tournaments!
 		6) MT_Classifier.nextSIGGeneration() 
-		7) durchschnittlich Fitness nur von exakt berechneten SIGEL Individuen bestimmen  	
+		7) determine average fitness only from exactly computed SIGEL individuals  	
 	*/
 
 	/***************************************
@@ -1075,7 +1075,7 @@ void SIGEL_GP::SIG_GPManager::run(MT_Classifier *MetaClassifier)
 // NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU
 // NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU 
 // NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU 
-	// Findung der Populationsposition des besten Sigel Individuums  
+	// Find the population position of the best SIGEL individual  
 	int PosBestSigelIndi =0;
 	double BestFitness =-1.0;
 	double PresentFitness =0.0;
@@ -1124,8 +1124,8 @@ void SIGEL_GP::SIG_GPManager::run(MT_Classifier *MetaClassifier)
 	double minFitness = actExperiment.population.getWorstFitness( true );
 
 	// double averageFitness = actExperiment.population.getAverageFitness();
-	// die durchschnittliche Fitness wird beim MetaKlassi Ansatz über die
-	// SIG_Individuals bestimmt, bei den die Fitness exakt (per Simulation) berechnet wurde
+	// In the meta-classifier approach the average fitness is computed over those
+	// SIG_Individuals whose fitness was computed exactly, by simulation
 	double averageFitness = 0.0;
 	double Fitt = 0.0;
 	double NumOfCorrectFit = 0.0;
@@ -1249,10 +1249,10 @@ void SIGEL_GP::SIG_GPManager::run(MT_Classifier *MetaClassifier)
 void SIGEL_GP::SIG_GPManager::evolutionLoop(MT_Classifier *MetaClassifier)
 {
 	/**
-	*	Änderungen zur "normalen" evolutionLoop():
+	*	Changes relative to the "normal" evolutionLoop():
 	*	1) actTour.run(MetaClassifier); anstatt actTour.run();
-	*	2) falls Turnierteilnehmer an keinem weiterem Turnier teilnimmt,
-	*		muss seine Fitness auch nicht mehr berechnet werden! 
+	*	2) if a tournament participant takes part in no further tournament,
+	*		its fitness no longer needs computing. 
 	*/
 
 
@@ -1335,7 +1335,7 @@ void SIGEL_GP::SIG_GPManager::evolutionLoop(MT_Classifier *MetaClassifier)
 					    << *canDoIter
 					    << "\n";
 #endif
-//*********************** META Änderung 1)
+//*********************** META change 1)
 		  actTour.run(MetaClassifier);
 
 		  for (int i = 0; i < actIndiNumber; i++)
@@ -1368,7 +1368,7 @@ void SIGEL_GP::SIG_GPManager::evolutionLoop(MT_Classifier *MetaClassifier)
 						    << " is not up to date.\n";
 #endif
 
-//*********************** META Änderung 2) :=  if(actTour.indis[i]->successor != -1)
+//*********************** META change 2) :=  if(actTour.indis[i]->successor != -1)
 			  if(actTour.indis[i]->successor != -1)
 			  {
 				  actTour.justWaiting = true;
@@ -1433,16 +1433,16 @@ void SIGEL_GP::SIG_GPManager::evalNeededIndis()
   QList< QArray<int> > fitTaskList;
   fitTaskList.setAutoDelete( true );
 
-  //Die Population des Experemints
+  //The experiment's population
   SIG_GPPopulation &pop=actExperiment.population;
 
-  //Die Populationsgroesse wird bestimmt
+  //The population size is determined
   int poolSize=pop.getSize();
 
 
-// ********************* META Änderung
+// ********************* META change
 	QArray<int> ToursParticipant;
-	ToursParticipant.resize(poolSize); // Position i = Anzahl der Turniere an den Indi i teilnimmt
+	ToursParticipant.resize(poolSize); // Position i = number of tournaments individual i takes part in
 	for(int l=0; l<poolSize;l++)
 		ToursParticipant[l]=0;
 int DebugInfo =0;
@@ -1463,7 +1463,7 @@ int DebugInfo =0;
 		}
 	
 	}
-// ********************* Ende der Anpassung für Meta
+// ********************* End of the meta adaptation
 
 
   for (int i=0;i<poolSize;i++)
@@ -1479,9 +1479,9 @@ int DebugInfo =0;
 
       bool upToDate = actInd.upToDate();
 
-      //aktualisiere die Fitnesswerte fuer die Individuen, die UpToDate sind
+      //Update the fitness values for individuals that are up to date
 
-// ********************* META Änderung - nur wenn Indi im Turnierplan vorkommt!
+// ********************* META change - only if the individual appears in the tournament schedule
 	  if((!upToDate)&&(ToursParticipant[i]!=0))
 		{
 		  QArray<int> *actFitTask = new QArray<int>(2);

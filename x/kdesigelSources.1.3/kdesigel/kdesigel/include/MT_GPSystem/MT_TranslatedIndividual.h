@@ -1,4 +1,4 @@
-// MT_TranslatedIndividual.h: Schnittstelle für die Klasse MT_TranslatedIndividual.
+// MT_TranslatedIndividual.h: interface for class MT_TranslatedIndividual.
 //
 //////////////////////////////////////////////////////////////////////
 
@@ -21,7 +21,7 @@ class MT_TranslatedIndividual
 {
 public:
 	
-	/* indicate that die TIndividual exist of one (-1) or two (>0) robot control progam
+	/* indicates whether the TIndividual consists of one (-1) or two (>0) robot control programs
 	*  in the case of two, the bondary supply the beginning of the second robot control program
 	*/
 	int Boundary;

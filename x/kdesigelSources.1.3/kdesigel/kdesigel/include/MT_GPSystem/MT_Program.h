@@ -1,4 +1,4 @@
-// MT_Program.h: Schnittstelle für die Klasse MT_Program.
+// MT_Program.h: interface for class MT_Program.
 //
 //////////////////////////////////////////////////////////////////////
 

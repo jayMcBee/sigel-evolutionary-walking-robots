@@ -137,7 +137,7 @@ void SIGEL_Simulation::SIG_Simulation::makeTimeSteps(int numTimeSteps)
 
 void SIGEL_Simulation::SIG_Simulation::slotDynamoMessage(QString theMessage)
 {
-  // theMessage verarbeiten, momentan wird immer abgebrochen
+  // Process theMessage; currently it always aborts
 #ifdef SIG_DEBUG
   SIGEL_Tools::SIG_IO::cout << theMessage;
 #endif

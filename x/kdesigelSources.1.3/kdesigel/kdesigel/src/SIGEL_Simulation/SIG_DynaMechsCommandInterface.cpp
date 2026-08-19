@@ -107,13 +107,13 @@ void SIGEL_Simulation::SIG_DynaMechsCommandInterface::moveDrive(int driveNo,
 
 	  // SERVO-TYPE:  Interprete register value as angle
 	  // THIS IS HOW WE INTERPRETE THIS TYPE OF MOTOR:
-	  // (ich mach jetzt auf german weiter..)
-	  // -> ein 'schieb in auf den Weg' motor -- wir duerfen im Befehl praktisch keine Zeit
-	  //    verbringen, also nicht warten bis der Endwinkel erreicht wurde.
-	  // Der Motor wird auf den richtigen Weg geschickt, immer mit maximalkraft.
-	  // Die Endposition wird durch Manipulation der min/max-werte des Joints erreicht, also
-	  // durch 'anschlag'. Dadurch wird in der Position der Motor zum einen von der Beschraenkung
-	  // und zum anderen durch die aktive Motorkraft gehalten ... hope that works..!
+	  // (switching to German from here on...)
+	  // -> a 'push it on its way' motor. We may spend practically no time in the command,
+	  //    so we do not wait until the final angle has been reached.
+	  // The motor is sent on its way, always at maximum force.
+	  // The end position is reached by manipulating the joint's min/max values, i.e.
+	  // by a hard stop. In that position the motor is held partly by the constraint
+	  // and partly by the active motor force ... hope that works..!
 	 if (drive->getMode() == SIGEL_Robot::SIG_Drive::tServoSimpleMode)
 	 {
 		//printf("tServoSimpleMode Drive '%s'\n", (const char *)drive->getName());

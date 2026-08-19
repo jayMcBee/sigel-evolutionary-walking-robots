@@ -289,7 +289,7 @@ namespace SIGEL_GP
   bool checkTerminationConditions(bool generationBreak);
 
    /**
-    * This methode starts the GPManager. Thats why the GPManager inherites 
+    * This method starts the GPManager. That is why the GPManager inherits 
     * from QThread.
     * @pre
     * The GPManager object is created.

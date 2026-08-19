@@ -47,10 +47,10 @@ void SIGEL_Simulation::SIG_RotationalController::init(SIG_DynaJoint * theJoint, 
 
 void SIGEL_Simulation::SIG_RotationalController::calculate_and_apply()
 {
-  /* Hier muss nun der Winkel zwischen den beiden up-Vektoren in Weltkoordinaten gemessen werden,
-   * danach sollte ueberprueft werden, ob eine der Grenzen ueberschritten ist.
-   * Zum Schluss sollte auf die beiden Dynas eine Kraft einwirken 
-   * Diese Kraft errechnet sich irgendwie aus der in den beiden Punkten wirkenden Geschwindigkeit
+  /* The angle between the two up-vectors must now be measured in world coordinates,
+   * after which it should be checked whether one of the limits has been exceeded.
+   * Finally a force should act on the two Dynas 
+   * This force is computed somehow from the velocity acting at the two points
    */
 
  /* Daten auslesen */
@@ -73,7 +73,7 @@ void SIGEL_Simulation::SIG_RotationalController::calculate_and_apply()
  nextrUp.normalize();
  nextdir.normalize();
  
- /* Winkel berechnen */
+ /* Compute the angle */
  DL_Scalar prod=lUp.inprod(&rUp);
  DL_Scalar nextprod=nextlUp.inprod(&nextrUp);
 #ifdef _WINDOWS
@@ -84,7 +84,7 @@ void SIGEL_Simulation::SIG_RotationalController::calculate_and_apply()
  double angle=acos(prod)*180/pi;
  double nextangle=acos(nextprod)*180/pi;
  
- /* Herausfinden, ob der Winkel groesser als 180 Grad ist */
+ /* Determine whether the angle is greater than 180 degrees */
  DL_vector x,nextx;
  dir.crossprod(&lUp,&x);
  DL_Scalar sp=x.inprod(&rUp);
@@ -95,7 +95,7 @@ void SIGEL_Simulation::SIG_RotationalController::calculate_and_apply()
  if (nextsp>0)
   nextangle=360-nextangle;
  
- /* Angriffspunkt und Richtung der Gegenkraft errechnen */
+ /* Compute the point of application and direction of the counter-force */
  DL_point lpoint(&joint->leftFix);
  DL_vector lup(&joint->leftUp);
  lup.normalize();

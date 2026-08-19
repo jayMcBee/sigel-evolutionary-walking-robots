@@ -56,14 +56,14 @@ bool SIGEL_GP::SIG_GPCrossOverTournament::run()
   SIG_GPIndividual &ind2_1 = gpPool.getIndividual( indis[2]->indNumber );
   SIG_GPIndividual &ind2_2 = gpPool.getIndividual( indis[3]->indNumber );
 
-   //Die  Hilfe-Positionen der verschiedenen Individuen
+   //Helper positions of the individuals
    
    int popos1_1=ind1_1.getPoolPos();
    int popos1_2=ind1_2.getPoolPos();
    int popos2_1=ind2_1.getPoolPos();
    int popos2_2=ind2_2.getPoolPos();
 
-   //Die Fitnesswerte der verschiedenen Individuen
+   //Fitness values of the individuals
 
    double fitness1_1=ind1_1.getFitness();
    double fitness1_2=ind1_2.getFitness();
@@ -95,7 +95,7 @@ bool SIGEL_GP::SIG_GPCrossOverTournament::run()
    int winnerPos1 = 0;
    int winnerPos2 = 0;
 
-   //Die Tournament-Aktion
+   //The tournament action
    
 
    if (fitness1_1 >= fitness1_2)
@@ -163,21 +163,21 @@ bool SIGEL_GP::SIG_GPCrossOverTournament::run(MT_Classifier *MetaClassifier)
   SIG_GPIndividual &ind2_1 = gpPool.getIndividual( indis[2]->indNumber );
   SIG_GPIndividual &ind2_2 = gpPool.getIndividual( indis[3]->indNumber );
 
-   //Die  Hilfe-Positionen der verschiedenen Individuen
+   //Helper positions of the individuals
    
    int popos1_1=ind1_1.getPoolPos();
    int popos1_2=ind1_2.getPoolPos();
    int popos2_1=ind2_1.getPoolPos();
    int popos2_2=ind2_2.getPoolPos();
 
-   //Die Fitnesswerte der verschiedenen Individuen
+   //Fitness values of the individuals
 
    double fitness1_1=ind1_1.getFitness();
    double fitness1_2=ind1_2.getFitness();
    double fitness2_1=ind2_1.getFitness();
    double fitness2_2=ind2_2.getFitness();
    
-   	// Erzeugung zweier Trainingsfäll für das Meta GP-System;
+   	// Creates two training cases for the meta GP system
    MetaClassifier->createNewTCase(&const_cast<SIGEL_Program::SIG_Program&>(ind1_1.getProgram()), &const_cast<SIGEL_Program::SIG_Program&>(ind1_2.getProgram()),fitness1_1-fitness1_2);
    MetaClassifier->createNewTCase(&const_cast<SIGEL_Program::SIG_Program&>(ind2_1.getProgram()), &const_cast<SIGEL_Program::SIG_Program&>(ind2_2.getProgram()),fitness2_1-fitness2_2);
    
@@ -188,7 +188,7 @@ bool SIGEL_GP::SIG_GPCrossOverTournament::run(MT_Classifier *MetaClassifier)
    int winnerPos1 = 0;
    int winnerPos2 = 0;
 
-   //Die Tournament-Aktion
+   //The tournament action
    
    if (fitness1_1 >= fitness1_2)
      {
@@ -247,7 +247,7 @@ bool  SIGEL_GP::SIG_GPCrossOverTournament::classify(MT_Classifier *MetaClassifie
   SIG_GPIndividual &ind2_1 = gpPool.getIndividual( indis[2]->indNumber );
   SIG_GPIndividual &ind2_2 = gpPool.getIndividual( indis[3]->indNumber );
 
-   //Die  Hilfe-Positionen der verschiedenen Individuen
+   //Helper positions of the individuals
    
    int popos1_1=ind1_1.getPoolPos();
    int popos1_2=ind1_2.getPoolPos();
@@ -261,10 +261,10 @@ bool  SIGEL_GP::SIG_GPCrossOverTournament::classify(MT_Classifier *MetaClassifie
    int winnerPos1 = 0;
    int winnerPos2 = 0;
 
-   //Die Tournament-Aktion
+   //The tournament action
    
-  // Turnier Sieger mittels Classifer bestimmt;
-   // FitDiff < 0 -> indi2 ist Sieger;  FitDiff >= 0 -> indi1 ist Sieger
+  // Tournament winner determined via the classifier;
+   // FitDiff < 0 -> indi2 wins;  FitDiff >= 0 -> indi1 wins
 	double  FitDiff1 = MetaClassifier->classifer(&const_cast<SIGEL_Program::SIG_Program&>(ind1_1.getProgram()), &const_cast<SIGEL_Program::SIG_Program&>(ind1_2.getProgram()));	
   	double  FitDiff2 = MetaClassifier->classifer(&const_cast<SIGEL_Program::SIG_Program&>(ind2_1.getProgram()), &const_cast<SIGEL_Program::SIG_Program&>(ind2_2.getProgram()));	
   

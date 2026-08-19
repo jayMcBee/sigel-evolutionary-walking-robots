@@ -26,7 +26,7 @@
 #include <qstring.h>
 #include "SIGEL_Tools/SIG_Exception.h"
 
-/* Kommentare fallen wegen Dringlichkeit heute mal aus. */
+/* No comments today - too urgent. */
 
 using SIGEL_Tools::SIG_Exception;
 

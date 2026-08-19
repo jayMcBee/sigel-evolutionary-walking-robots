@@ -1,16 +1,16 @@
-// MT_TrainingCase.h: Schnittstelle für die Klasse MT_TrainingCase.
+// MT_TrainingCase.h: interface for class MT_TrainingCase.
 //
 //////////////////////////////////////////////////////////////////////
 
 #if !defined(AFX_MT_TRAININGCASE_H__A1E78B17_E63C_4CF7_9AC7_A9BE752FF329__INCLUDED_)
 #define AFX_MT_TRAININGCASE_H__A1E78B17_E63C_4CF7_9AC7_A9BE752FF329__INCLUDED_
 
-#include "MT_GPSystem/MT_TranslatedIndividual.h"	// Hinzugefügt von der Klassenansicht
+#include "MT_GPSystem/MT_TranslatedIndividual.h"	// Added from the class view
 #include <qstring.h>
 #include <qtextstream.h>
 
 /* This class contain a trainingcase for the GP-System;
-* it exist of a translated SIGEL Individual (respectively the robot control program)
+* It consists of a translated SIGEL individual (i.e. the robot control program)
 * and additional Information e.g. the precisely fitness of the SIGEL Individual.
 */
 

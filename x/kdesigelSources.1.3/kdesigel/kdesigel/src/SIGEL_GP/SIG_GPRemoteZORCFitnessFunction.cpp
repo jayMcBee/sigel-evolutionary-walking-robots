@@ -225,7 +225,7 @@ namespace SIGEL_GP
 				            return -1;
       }
 
-		// Baudrate, 8N1, Steuerleitungen ignorieren, Empfang ermoeglichen; ggf. Flusskontrolle
+		// Baud rate, 8N1, ignore control lines, enable receive; flow control if needed
       tio.c_cflag = baudcode | CS8 | CLOCAL | CREAD;
       if (handshake) tio.c_cflag |= CRTSCTS;
 
@@ -235,14 +235,14 @@ namespace SIGEL_GP
       // Raw output
       tio.c_oflag = 0;
 
-      // Kein Echo
+      // No echo
       tio.c_lflag = 0;
 
       // blocking read until 1 char arrives
       tio.c_cc[VMIN] = 1;
       tio.c_cc[VTIME] = 0;
 
-      // Einstellungen setzen
+      // Apply the settings
       if (tcsetattr(fd, TCSADRAIN, &tio) < 0)
       {  fprintf(stderr, "Serial initialization -- tcsetattr() -- failed");
          return -1;

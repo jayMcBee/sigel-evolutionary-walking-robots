@@ -1,16 +1,16 @@
-// MT_TranslatedIndividual.cpp: Implementierung der Klasse MT_TranslatedIndividual.
+// MT_TranslatedIndividual.cpp: implementation of class MT_TranslatedIndividual.
 //
 //////////////////////////////////////////////////////////////////////
 
 #include "MT_GPSystem/MT_TranslatedIndividual.h"
 
 //////////////////////////////////////////////////////////////////////
-// Konstruktion/Destruktion
+// Construction/destruction
 //////////////////////////////////////////////////////////////////////
 
 MT_TranslatedIndividual::MT_TranslatedIndividual()
 {
-	//nicht benutzen 
+	//Do not use 
 
 	T_Instruktion=0;
 	T_Operand1 = 0;
@@ -70,7 +70,7 @@ MT_TranslatedIndividual::MT_TranslatedIndividual(QTextStream &File)
 		T_Operand2->resize(T_length);
 
 		QString PartOfLine;
-		// Aufbau einer Zeile: z.B.: "1234 1234567 1234567" <- Länge 18  	
+		// Line layout, e.g. "1234 1234567 1234567" <- length 18  	
 		for (int i=0; i<T_length;i++)
 		{
 			PresentLine = File.readLine();
@@ -100,18 +100,18 @@ MT_TranslatedIndividual::MT_TranslatedIndividual(QTextStream &File)
 					
 
 		else
-			// MetaDaten Erzeugen .... 
+			// Generate metadata .... 
 		{
 			for (int i=0; i<MetaData->size(); i++)
 				(*MetaData)[i] =0;
 
-			if (Boundary <=0)		// für den Bewerter
+			if (Boundary <=0)		// For the evaluator
 			{
 				(*MetaData)[0] = T_length;
 				for (int k=0; k< T_Instruktion->size(); k++)
 					(*MetaData)[(*T_Instruktion)[k]] ++;		
 			}
-			else						// für den Klassi
+			else						// For the classifier
 			{
 				(*MetaData)[0] = Boundary;
 				for (int k=0; k< Boundary; k++)
@@ -134,7 +134,7 @@ void MT_TranslatedIndividual::writeToFileTransIndi(QTextStream &File)
 
 	QString PartOfLine;
 
-	// Aufbau einer Zeile: z.B.: "123 123456 1234567" <- Länge 18 
+	// Line layout, e.g. "123 123456 1234567" <- length 18 
 
 
 	for (int i=0; i<T_length;i++)

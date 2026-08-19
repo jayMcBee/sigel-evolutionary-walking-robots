@@ -1,4 +1,4 @@
-// MT_Trainingset.h: Schnittstelle für die Klasse MT_Trainingset.
+// MT_Trainingset.h: interface for class MT_Trainingset.
 //
 //////////////////////////////////////////////////////////////////////
 

@@ -1,4 +1,4 @@
-// MT_Randomizer.h: Schnittstelle für die Klasse MT_Randomizer.
+// MT_Randomizer.h: interface for class MT_Randomizer.
 //
 //////////////////////////////////////////////////////////////////////
 
@@ -91,7 +91,7 @@ public:
 	int getProgramLengthMax();
 	int getLastError();
 
-	/* supply a random unsigned long between 0 an < upperBoundary*/
+	/* supply a random unsigned long in [0, upperBoundary)*/
 	unsigned long getRandomInteger(unsigned long upperBoundary);
 
 private:
