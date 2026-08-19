@@ -1,4 +1,4 @@
-// MT_Population.h: Schnittstelle für die Klasse MT_Population.
+// MT_Population.h: interface for class MT_Population.
 //
 //////////////////////////////////////////////////////////////////////
 
@@ -29,7 +29,7 @@ public:
 	/* change the present PopSize to NewPopSize
 	* this is a special method for the offspring population
 	* ATTENTION:
-	* @pre: the population muss be empty!
+	* @pre: the population must be empty.
 	* @post: the population were resised; 
 	*/	
 	bool changePopSize(int NewPopSize);
@@ -42,7 +42,7 @@ public:
 	*@post: all individuals have correct variable names !*/
 	void changeMaxNumVariable(int NewNum);
 
-	/* change the max, length which can a individual reach, maybe individuals mus reduced  */
+	/* Change the maximum length an individual may reach; individuals may need shortening  */
 	void setMaxProgLen(int NewLen);
 
 	/* all pointer of population are setting of nil,

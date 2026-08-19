@@ -1,4 +1,4 @@
-// MT_Classifier.h: Schnittstelle für die Klasse MT_Classifier.
+// MT_Classifier.h: interface for class MT_Classifier.
 //
 //////////////////////////////////////////////////////////////////////
 
@@ -15,7 +15,7 @@
 
 #include "SIGEL_Program/SIG_Program.h"
 #include "SIGEL_Program/SIG_ProgramLine.h"
-#include "MT_GPSystem/MT_TranslatedIndividual.h"	// Hinzugefügt von der Klassenansicht
+#include "MT_GPSystem/MT_TranslatedIndividual.h"	// Added from the class view
 
 
 
@@ -35,15 +35,15 @@ public:
 	*/
 	bool preEvolution(QVector<SIGEL_GP::SIG_GPTournament> *  tours, int PosBest);
 	
-	/* Methode dient für Tournament.run(Classifer)
-	* führt Turnier normal aus, also anhand der Fitness; 
-	* erzeugt T-fall 
+	/* Method serves Tournament.run(Classifer)
+	* Runs the tournament normally, i.e. on exact fitness; 
+	* creates a training case 
 	*/
 	void createNewTCase(SIGEL_Program::SIG_Program * SigProgOne, SIGEL_Program::SIG_Program * SigProgTwo, double FitDifference);
 	
-	/* Methode dient für Tournament.classifer(Classifer)
-	* führt Turnier  mit Hilfe des Classifier aus !
-	* Tournament.classifer(Classifer) wird über preEvolution aufgerufen  
+	/* Method serves Tournament.classifer(Classifer)
+	* Runs the tournament using the classifier.
+	* Tournament.classifer(Classifer) is called via preEvolution  
 	*/
 	double classifer(SIGEL_Program::SIG_Program * SigProgOne, SIGEL_Program::SIG_Program * SigProgTwo);	
 	
@@ -52,16 +52,16 @@ private:
 
 	MT_TranslatedIndividual* createDoubleTransIndi(SIGEL_Program::SIG_Program * SigProgOne, SIGEL_Program::SIG_Program * SigProgTwo);
 
-	// rückgabewert gibt aufschluss wie viele Sigel Turnier klassifiziert anstatt per exakte Fitness
-	// ausgeführt werden sollen 
+	// Return value indicates how many SIGEL tournaments should be classified rather than run by exact fitness
+	//  
 	int evaluationTactic(int ToursSize);
 
 
-	// zur Bestimmung an welchen Turnieren das beste Sigel Individuum teilnimmt; 
-	// Ändert ToursWBestIndi; ToursWBestIndi[i] == 1 genau dann wenn in Turnier i das beste Sigel Individuum
-	// vorkommt! Ausnahme: kommt das beste Individuum in keine Turnier vor, so wird 
-	// ToursWBestIndi[tours.size-1] == 1 trotzdem gesetzt, so dass das letzte Turnier nicht mit dem Klassi
-	// durchgeführt wird, sondern normal durch exakte Fitness; dient der Kalibrierung!
+	// Determines which tournaments the best SIGEL individual takes part in 
+	// Modifies ToursWBestIndi; ToursWBestIndi[i] == 1 exactly when the best SIGEL individual appears
+	// in tournament i. Exception: if the best individual appears in no tournament, 
+	// ToursWBestIndi[tours.size-1] == 1 is set anyway, so that the last tournament is not run with the
+	// classifier but normally by exact fitness. This serves as calibration.
 	//
 	int evalNeededTours(QVector<SIGEL_GP::SIG_GPTournament> *  tours, QArray<int> * ToursWBestIndi, int PosBest);
 };

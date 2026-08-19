@@ -1,4 +1,4 @@
-// MT_Individual.h: Schnittstelle für die Klasse MT_Individual.
+// MT_Individual.h: interface for class MT_Individual.
 //
 //////////////////////////////////////////////////////////////////////
 

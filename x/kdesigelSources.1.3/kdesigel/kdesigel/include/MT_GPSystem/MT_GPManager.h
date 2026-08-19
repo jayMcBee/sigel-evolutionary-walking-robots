@@ -1,4 +1,4 @@
-// MT_GPManager.h: Schnittstelle für die Klasse MT_GPManager.
+// MT_GPManager.h: interface for class MT_GPManager.
 //
 //////////////////////////////////////////////////////////////////////
 
@@ -14,7 +14,7 @@
 #include "MT_GPSystem/MT_Randomizer.h"
 #include "MT_GPSystem/MT_Search.h"
 #include "MT_GPSystem/MT_FitnessTranier.h"
-#include "MT_GPSystem/MT_TournamentManager.h"	// Hinzugefügt von der Klassenansicht
+#include "MT_GPSystem/MT_TournamentManager.h"	// Added from the class view
 
 #ifdef _WINDOWS
 #include <windows.h>
@@ -64,7 +64,7 @@ public:
 
 	/* update the Gp-System with the given SelektionValue
 	* there are involved the class 
-	* @pre: the Offspring muss be empty !! flush it !!*/
+	* @pre: the Offspring must be empty! Flush it first.*/
 	void setSelektionValue( int _OffspringSize, int _TournamentSize, int _SMethod, int _FitnessFunction, int _TrainingSetSize, int _TrainingDuration);
 	
 	/* for update the Selektion-Window;
@@ -84,8 +84,8 @@ public:
 
 	void setInterpreterNumVar(int NewSize);		
 
-	/* liefer Ergebniss != 0 falls irgendwo im Meta GP-System ein Fehler auftrat;
-	* falls != 0, dann gibt Wert an um welchen Fehler es sich handelt
+	/* Returns a result != 0 if an error occurred anywhere in the meta GP system;
+	* if != 0, the value indicates which error it was
 	*/
 	int getLastError();
 
@@ -129,7 +129,7 @@ private:
 	bool EvolStopped;
 	bool sepEvolPossible;
 	
-	/* falls irgendwo im GP-System ein Fehler auftritt, wird LastError != 0 gesetzt 
+	/* if an error occurs anywhere in the GP system, LastError is set != 0 
 	*/
 	int LastError;
 
