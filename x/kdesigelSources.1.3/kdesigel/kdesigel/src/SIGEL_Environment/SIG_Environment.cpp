@@ -22,13 +22,14 @@
 */
 #include "SIGEL_Environment/SIG_Environment.h"
 #include "fparser.h"
+#include "compat/q2compat.h"
+#include "SIGEL_Tools/SIG_IO.h"
 
 #ifdef _WINDOWS
 using namespace std;
 #else
 #include "stdlib.h"
 #endif
-#include "qmessagebox.h"
 
 namespace SIGEL_Environment {
 
@@ -218,13 +219,13 @@ namespace SIGEL_Environment {
 		file << "FLOORPICTUREFILE\n";
 		file << floorPictureFile << "\n";
   	file << "FLOORFUNCSELECTED\n";
-   	file << floorFuncSelected << endl;
-		file << "TEXTUREFILE" << endl;
-		file << textureFile << endl;
-		file << "TEXALPHA" << endl;
-		file << texAlpha << endl;
-		file << "WITHTEXTURE" << endl;
-		file << withTexture << endl;
+   	file << floorFuncSelected << Qt::endl;
+		file << "TEXTUREFILE" << Qt::endl;
+		file << textureFile << Qt::endl;
+		file << "TEXALPHA" << Qt::endl;
+		file << texAlpha << Qt::endl;
+		file << "WITHTEXTURE" << Qt::endl;
+		file << withTexture << Qt::endl;
     file << "FLOORMATERIALNAME\n";
     file << floorMaterialName << "\n";
     file << "AUTOSAVETIME\n";
@@ -409,7 +410,7 @@ namespace SIGEL_Environment {
 
   	QString terrainDataFileName = sigelRootString + "/Terrain.ter";
 
-  	QCString terrainDataFileNameQCString = terrainDataFileName.utf8();
+  	Q2CString terrainDataFileNameQCString = terrainDataFileName.toUtf8();
 	  char const *terrainDataFileNameCString = terrainDataFileNameQCString;
 
   	dynaMechsEnvironment.loadTerrainData( terrainDataFileNameCString );
@@ -447,7 +448,7 @@ namespace SIGEL_Environment {
   	terrain += "/Terrain.ter";
   	
   	
-  	std::ofstream ausgabeTerrain(terrain.c_str(), ios::trunc+ios::out);
+  	std::ofstream ausgabeTerrain(terrain.c_str(), std::ios::trunc | std::ios::out);
   	
   	if (floorFuncSelected) {
   		QString str = floorFunction;
@@ -456,12 +457,12 @@ namespace SIGEL_Environment {
   		// it specifies the dimensions in x and z direction and the dimension of the grid (always 1)
   		ausgabeTerrain << floorDimensionX << " " << floorDimensionZ << " " << 1 << endl;
   	
-  		const char* func = str.latin1();
+  		const QByteArray funcBytes = str.toUtf8();
+		const char* func = funcBytes.constData();
 
   		FunctionParser fp;
   		if (fp.Parse(func,"xz") != -1) {
-  			QMessageBox warn("Warning", "The specified terrain-function could not be parsed!\nPossible errors:\n  - the function must depend on x and z\n  - the function should only contain valid expression\n    (please refer to the doc in supportingLibs/fparser)",QMessageBox::Warning, QMessageBox::Retry, QMessageBox::NoButton,QMessageBox::NoButton);
-  			warn.exec();
+  			SIGEL_Tools::SIG_IO::cerr << "Warning: the specified terrain function could not be parsed. It must depend on x and z, and contain only valid expressions -- see the documentation in supportingLibs/fparser.\n";
   			return false;
   		}
   	
@@ -482,10 +483,9 @@ namespace SIGEL_Environment {
   	
   	else { // a pictureFile is specified
   		QString input = floorPictureFile;
-  		std::ifstream pgm(input.latin1());
+  		std::ifstream pgm(input.toUtf8().constData());
   		if (!pgm) {
-  			QMessageBox warn("Warning", "The specified terrain-file does not exist!",QMessageBox::Warning, QMessageBox::Retry, QMessageBox::NoButton,QMessageBox::NoButton);
-  			warn.exec();
+  			SIGEL_Tools::SIG_IO::cerr << "Warning: the specified terrain file does not exist.\n";
   			return false;
   		}
   		
@@ -503,8 +503,7 @@ namespace SIGEL_Environment {
     				switch(counter) {
     					case 0: // Magic Key
     						if (s.compare("P2")!=0) {
-									QMessageBox warn("Warning", "The specified picture-file is not in pgm-format!",QMessageBox::Warning, QMessageBox::Retry, QMessageBox::NoButton,QMessageBox::NoButton);
-									warn.exec();
+									SIGEL_Tools::SIG_IO::cerr << "Warning: the specified picture file is not in PGM format.\n";
 									return false;
     						}
 								else ++counter;
