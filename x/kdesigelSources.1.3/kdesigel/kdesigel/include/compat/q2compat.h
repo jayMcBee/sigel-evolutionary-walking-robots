@@ -33,7 +33,9 @@
 //     done in the shim rather than left to Q_ASSERT, which compiles to nothing
 //     under QT_NO_DEBUG and would make a release build corrupt memory silently
 //     where 2003 merely returned a wrong value. Call sites are still being
-//     fixed; the clamp is a floor, not a licence.
+//     fixed; the clamp is a floor, not a licence. Three cases, deliberately
+//     different: clamp to 0 (non-empty Q2Array), abort (empty Q2Array -- Qt 2
+//     crashed there too), null (empty Q2PtrVector, where null is a normal slot).
 //  3. resize() value-initialises new elements where Qt 2 left raw memory.
 //  Two Qt 2 quirks are deliberately NOT reproduced, because no SIGEL code can
 //  reach them and both are defects rather than behaviour:
@@ -42,8 +44,8 @@
 //      model name, insert() is unguarded, and no shipped .rrb file contains a
 //      duplicate name.
 //    - Qt 2's QValueList::contains returns an occurrence count; Qt 6's returns
-//      bool. Q2ValueList has exactly one declaration in SIGEL and contains() is
-//      never called on it.
+//      bool. Q2ValueList has three declarations in SIGEL and contains() is
+//      never called on any of them.
 //
 //  4. Q2Array is copy-on-write; Qt 2's QArray is TRULY shared, with no COW at
 //     all (qgarray.cpp:134-138, 284-294).  In Qt 2, `b = a; b.at(0) = 9;` is
@@ -121,10 +123,12 @@ public:
 
     // Qt 2 hands out a non-const T& from a const array (qarray.h:108-117).
     // Preserved so A-step renames stay pure.  See divergence 4 on sharing.
-    // qgarray.h:108-117 -- Qt 2 warns and CLAMPS the index to 0 rather than
+    // qarray.h:96-99 -- Qt 2 warns and CLAMPS the index to 0 rather than
     // failing. Reproduced here rather than left to Q_ASSERT, which compiles to
     // nothing under QT_NO_DEBUG and would give silent corruption in a release
-    // build. An empty array has no element to clamp to, so it yields a dummy.
+    // build. An EMPTY array has no element 0 to clamp to: Qt 2 dereferenced a
+    // null pointer there, i.e. it crashed, so this aborts rather than inventing
+    // a shared dummy object.
     T &at(uint i) const
     {
         Q2Array<T> *self = const_cast<Q2Array<T> *>(this);
@@ -132,10 +136,8 @@ public:
             return self->m[qsizetype(i)];
         qWarning("Q2Array::at: index %u out of range (size %lld)",
                  i, static_cast<long long>(self->m.size()));
-        if (self->m.isEmpty()) {
-            static T dummy = T();
-            return dummy;
-        }
+        if (self->m.isEmpty())
+            qFatal("Q2Array::at: index %u on an empty array", i);
         return self->m[0];
     }
     T &operator[](int i) const { return at(uint(i)); }
@@ -219,6 +221,8 @@ public:
         h.erase(it);
         return v;
     }
+
+    T *operator[](const QString &k) const { return find(k); }   // qdict.h:67-68
 
     void clear() { if (del) qDeleteAll(h); h.clear(); }
     void resize(uint n) { buckets = n; h.reserve(qsizetype(n)); }
@@ -543,8 +547,8 @@ public:
 
     uint count() const { return uint(v->size()); }
     bool isEmpty() const { return v->isEmpty(); }
-    bool atFirst() const { return v->isEmpty() || i == 0; }   // qglist.h:246-249
-    bool atLast() const { return v->isEmpty() || i == v->size() - 1; }   // qglist.h:246-249
+    bool atFirst() const { return v->isEmpty() || i == 0; }   // qglist.h:241-244
+    bool atLast() const { return v->isEmpty() || i == v->size() - 1; }   // qglist.h:241-244
 
     T *current() const { return (i >= 0 && i < v->size()) ? v->at(i) : nullptr; }
     T *toFirst() { i = 0; return current(); }
@@ -577,9 +581,10 @@ public:
 
     void enqueue(const T *d) { l.append(d); }
 
-    // Unlinks even when the head is null, as QGList::dequeue does
-    // (qglist.cpp:623-630). Returning early on a null head would make
-    // 'while (!isEmpty()) dequeue();' spin forever.
+    // Unlinks even when the head is null. Qt 2's QQueue::dequeue is
+    // QGList::takeFirst (qqueue.h:59), which removes the first NODE regardless
+    // of whether the item it holds is null. Testing the item instead would make
+    // 'while (!isEmpty()) dequeue();' spin forever on a queued null.
     T *dequeue()
     {
         if (l.isEmpty())
@@ -627,14 +632,23 @@ public:
 
     // Qt 2's QCString is a QArray<char> whose buffer INCLUDES the terminating
     // NUL (qcstring.h:156,175), so size() and count() are length()+1 for a
-    // non-null string. These hide QByteArray's versions deliberately; that is
-    // only safe because SIGEL never handles one through a QByteArray reference.
+    // non-null string. These hide QByteArray's versions, which is NOT fully
+    // safe: SIG_GPFitnessTrainer.cpp:317 streams one into a QTextStream and
+    // overload resolution binds the QByteArray& overload, so that path sees
+    // QByteArray::size(). Benign there, but the hiding IS visible via a base
+    // reference.
     uint size() const { return isNull() ? 0u : uint(QByteArray::size()) + 1u; }
     uint count() const { return size(); }
     bool resize(uint n) { QByteArray::resize(n ? qsizetype(n) - 1 : 0); return true; }
 
     // Qt 2 returns the number of occurrences, not a bool.
     uint contains(char c) const { return uint(QByteArray::count(c)); }
+
+    // NOTE: operator[] is QByteArray's, bounds-checked against
+    // QByteArray::size() -- one LESS than the size() above. Indexing the
+    // terminating NUL, which Qt 2 allowed, therefore asserts. No SIGEL site
+    // indexes a QCString; if one appears, give it its own operator[] rather
+    // than relying on this.
 
     // qcstring.h:310 returns data(), which is null for a null string.
     operator const char *() const { return isNull() ? nullptr : constData(); }

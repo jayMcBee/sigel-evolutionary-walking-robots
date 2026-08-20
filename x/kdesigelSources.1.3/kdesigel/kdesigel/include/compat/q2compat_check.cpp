@@ -12,6 +12,10 @@
 //   run:     g++ -std=c++17 -I<inc> -I<qt6> this -lQt6Core -o chk && ./chk
 
 #include "compat/q2compat.h"
+// Asserts must survive NDEBUG: this file IS the check.
+#ifdef NDEBUG
+#undef NDEBUG
+#endif
 #include <cassert>
 #include <cstdio>
 
@@ -106,6 +110,113 @@ int main()
         a.sort();
         assert(a[0] == 1 && a[1] == 2 && a[2] == 100 && a[3] == 300);
     }
+
+
+    // --- behaviours corrected after review; previously untested -------------
+    {   // Q2Queue::dequeue must unlink even when the head is null (qglist.cpp:623)
+        Q2Queue<Thing> q; Thing a(1);
+        q.enqueue(nullptr); q.enqueue(&a);
+        int guard = 0;
+        while (!q.isEmpty() && ++guard < 10) q.dequeue();
+        assert(guard < 10);                       // used to spin forever
+        assert(q.isEmpty());
+    }
+    {   // Q2Queue::remove exists in Qt 2 (qqueue.h:60) and MT_GUI calls it
+        Q2Queue<Thing> q; Thing a(1), b(2);
+        q.enqueue(&a); q.enqueue(&b);
+        assert(q.remove()); assert(q.count() == 1); assert(q.head() == &b);
+    }
+    {   // Q2PtrList::remove(null): Qt 2 does not search, it removes current
+        Thing a(1), b(2), c(3);
+        Q2PtrList<Thing> l; l.append(&a); l.append(&b); l.append(&c);
+        l.at(1);                                  // current = b
+        const Thing *nothing = nullptr;
+        assert(l.remove(nothing));
+        assert(l.count() == 2 && l.getFirst() == &a && l.getLast() == &c);
+    }
+    {   // Q2ListIterator stays dead once off the end (qglist.cpp:1166)
+        Thing a(1);
+        Q2PtrList<Thing> l; l.append(&a);
+        Q2ListIterator<Thing> it(l);
+        assert(it.current() == &a);
+        assert(it.operator++() == nullptr);
+        assert(it.operator++() == nullptr);        // must not revive
+        Q2PtrList<Thing> empty;
+        Q2ListIterator<Thing> e(empty);
+        assert(e.atFirst() && e.atLast());         // both true on empty in Qt 2
+    }
+    {   // Q2DictIterator::count() reads the live dict, not the snapshot
+        Q2Dict<Thing> d; Thing a(1), b(2);
+        d.insert("a", &a);
+        Q2DictIterator<Thing> it(d);
+        d.insert("b", &b);
+        assert(it.count() == 2);
+    }
+    {   // Q2CString: Qt 2's buffer includes the terminating NUL
+        Q2CString s("abc");
+        assert(s.size() == 4 && s.count() == 4);
+        assert(s[0] == 'a');
+        // NOT s[s.size()-1]: size() counts the NUL as Qt 2 did, but operator[]
+        // is QByteArray's and is bounds-checked against QByteArray::size().
+        // Indexing the NUL asserts in a debug build. Documented in q2compat.h.
+        assert(s.length() == 3);
+        assert(s.contains('a') == 1);
+        Q2CString n;
+        assert(n.size() == 0);
+        assert(static_cast<const char *>(n) == nullptr);
+    }
+    {   // out-of-range warns and clamps to index 0, as QGArray did
+        Q2Array<int> a(3); a[0] = 10; a[1] = 11; a[2] = 12;
+        assert(a.at(99) == 10);
+        Thing t(1);
+        Q2PtrVector<Thing> v(2); v.insert(0, &t);
+        assert(v.at(99) == &t);
+        Q2PtrVector<Thing> ve;
+        assert(ve.at(0) == nullptr);
+    }
+    {   // copy ctor clears ownership; assignment keeps the destination's
+        Q2PtrList<Thing> a; a.setAutoDelete(true);
+        Q2PtrList<Thing> b; b.setAutoDelete(false);
+        b = a;
+        assert(!b.autoDelete());   // assignment keeps the DESTINATION's flag
+        Q2Array<int> e;
+        assert(static_cast<const int *>(e) == nullptr);   // null when empty
+    }
+
+
+    // --- owners must actually delete (M2: none of this was covered) ---------
+    {   Q2PtrList<Thing> l; l.setAutoDelete(true);
+        l.append(new Thing(1)); l.append(new Thing(2));
+        assert(Thing::live == 2);
+        l.remove(0u);              assert(Thing::live == 1);   // remove deletes
+        Thing *t = l.take(0u);     assert(Thing::live == 1);   // take does NOT
+        delete t;                  assert(Thing::live == 0);
+        l.append(new Thing(3)); l.clear(); assert(Thing::live == 0); }  // clear deletes
+    {   Q2PtrVector<Thing> v(3); v.setAutoDelete(true);
+        v.insert(0, new Thing(1)); v.insert(1, new Thing(2));
+        assert(Thing::live == 2);
+        v.remove(0);               assert(Thing::live == 1);
+        Thing *t = v.take(1);      assert(Thing::live == 1);
+        delete t;
+        v.insert(2, new Thing(4)); v.clear(); assert(Thing::live == 0); }
+    {   Q2Dict<Thing> d; d.setAutoDelete(true);
+        d.insert("a", new Thing(1)); d.insert("b", new Thing(2));
+        assert(Thing::live == 2);
+        d.remove("a");             assert(Thing::live == 1);
+        Thing *t = d.take("b");    assert(Thing::live == 1);
+        delete t;
+        d.insert("c", new Thing(3)); d.clear(); assert(Thing::live == 0); }
+    {   Q2Queue<Thing> q; q.setAutoDelete(true);
+        q.enqueue(new Thing(1));
+        Thing *t = q.dequeue();    assert(Thing::live == 1);   // dequeue must not delete
+        delete t;
+        q.enqueue(new Thing(2)); q.clear(); assert(Thing::live == 0); }
+    assert(Thing::live == 0);
+    {   // H1: Qt 2's QDict::operator[] is find() (qdict.h:67-68)
+        Q2Dict<Thing> d; Thing a(7);
+        d.insert("k", &a);
+        assert(d["k"] == &a);
+        assert(d["absent"] == nullptr); }
 
     std::printf("q2compat self-check: all assertions passed\n");
     return 0;

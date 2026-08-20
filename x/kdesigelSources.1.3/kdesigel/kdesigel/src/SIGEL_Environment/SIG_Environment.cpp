@@ -444,7 +444,16 @@ namespace SIGEL_Environment {
 #else  	
   	char *sigelRootCString = std::getenv( "SIGEL_ROOT" );
 #endif  	
-  	string terrain(sigelRootCString);
+	// std::string(nullptr) is undefined behaviour, and SIGEL_ROOT is genuinely
+	// unset in some launches -- pvm_spawn'd tasks inherit pvmd's environment,
+	// not the master's, which is how this bites in practice.
+  	if (sigelRootCString == 0) {
+  		SIGEL_Tools::SIG_IO::cerr
+  			<< "Generate terrain: SIGEL_ROOT is not set, cannot locate Terrain.ter."
+  			<< Qt::endl;
+  		return false;
+  	}
+  	std::string terrain(sigelRootCString);
   	terrain += "/Terrain.ter";
   	
   	
@@ -489,7 +498,7 @@ namespace SIGEL_Environment {
   			return false;
   		}
   		
-  		string s;
+  		std::string s;
   		QString str;
 			double max = 0;
 			int counter = 0;

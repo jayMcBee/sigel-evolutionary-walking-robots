@@ -266,7 +266,8 @@ void SIGEL_Simulation::SIG_DynaSystem::clearAllDynamics()
  sz=dynaDrives.size();
  for (int k=0; k<sz; k++)
   if (dynaDrives[k]!=0)
-   delete dynaJoints[k];
+   delete dynaDrives[k];   // 2003 deleted dynaJoints[k] here: every joint was
+                           // freed twice and every drive leaked (D13)
  sz=dynaSensors.size();
  for (int l=0; l<sz; l++)
   if (dynaSensors[l]!=0)

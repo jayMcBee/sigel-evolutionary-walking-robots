@@ -220,9 +220,20 @@ Every later change diffs against `v1.3-pristine`.
 
 Per **D1(a)**. 15 steps, per **D12**.
 
-**Exit criterion per step (D11):** every file touched by the step passes
-`g++ -fsyntax-only` against Qt 6 headers. Phase B steps additionally require
-the §9 ownership audit.
+**Exit criterion per step (D11):** run `./check.sh` at the repo root. It is the
+D11 criterion made reproducible — before it existed, the flags lived only in
+this session's shell history and could not be re-run by anyone else.
+
+It compiles every converted module, compiles every converted header standalone,
+and runs the shim self-check. Vendored headers are `-isystem`, so the ~12,979
+warnings they generate do not bury the ~300 in code we are responsible for.
+
+**Warnings are part of the criterion.** They were not read up to A8, and that
+cost: the `Qt::endl`-on-`std::cerr` regression in A3 was reported by this very
+command at the step that introduced it, and the step recorded "0 errors" and
+shipped. A reviewer found it four commits later.
+
+Phase B steps additionally require the §9 ownership audit.
 
 ### Phase 0 — comments to English (D14)
 
