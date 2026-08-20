@@ -22,6 +22,7 @@
 */
 
 #include "SIGEL_GP/SIG_GPFullDataRecorder.h"
+#include <exception>
 #include "SIGEL_Tools/SIG_IO.h"
 
 #include <cmath>
@@ -45,6 +46,10 @@ namespace SIGEL_GP
 
   void SIG_GPFullDataRecorder::init()
   {
+    // See SIG_GPSimpleRecorder::init -- this one is also reached from
+    // SIG_Simulation's constructor, outside every fitness function's try.
+    try {
+
 #ifdef _WINDOWS
     SIG_Recorder::init();
 #else
@@ -52,6 +57,11 @@ namespace SIGEL_GP
 #endif
 
     record();
+  
+    }
+    catch (SIGEL_Simulation::SIG_RecorderNoQueriesSetException &) { throw; }
+    catch (SIGEL_Simulation::SIG_RecorderBadRecordingOrderException &) { throw; }
+    catch (...) { std::terminate(); }
   };
 
 

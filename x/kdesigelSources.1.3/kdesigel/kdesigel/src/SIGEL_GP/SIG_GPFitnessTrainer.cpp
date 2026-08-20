@@ -177,7 +177,7 @@ void SIGEL_GP::SIG_GPFitnessTrainer::flushAllDynHosts( void ) {
 
         if (dHostQstr == pHost->name) {
           res = true;
-          sprintf(cStrName, pHost->name.toUtf8().constData());
+          sprintf(cStrName, pHost->name.toLatin1().constData());
         }
       }
 
@@ -291,27 +291,27 @@ int SIGEL_GP::SIG_GPFitnessTrainer::spawnTask(SIGEL_GP::SIG_GPIndividual const& 
 
         switch(taskId) {
           case PvmBadParam :
-            errorText = errorText = QString::asprintf("Invalid parameter in call to pvm_spawn.");
+            errorText = QString::asprintf("Invalid parameter in call to pvm_spawn.");
              break;
           case PvmNoHost :
-            errorText = errorText = QString::asprintf("Host %s is not in the virtual machine.", hostNameCString);
+            errorText = QString::asprintf("Host %s is not in the virtual machine.", hostNameCString);
             break;
           case PvmNoFile :
-            errorText = errorText = QString::asprintf("Executable %s is not found on host %s.",executableNameCString,hostNameCString);
+            errorText = QString::asprintf("Executable %s is not found on host %s.",executableNameCString,hostNameCString);
             break;
           case PvmNoMem :
-            errorText = errorText = QString::asprintf("Malloc failed. Not enough memory on host %s.",hostNameCString);
+            errorText = QString::asprintf("Malloc failed. Not enough memory on host %s.",hostNameCString);
             break;
           case PvmSysErr :
-            errorText = errorText = QString::asprintf("pvmd is not responding.");
+            errorText = QString::asprintf("pvmd is not responding.");
             break;
           case PvmOutOfRes :
-            errorText = errorText = QString::asprintf("Out of resources on host %s.",hostNameCString);
+            errorText = QString::asprintf("Out of resources on host %s.",hostNameCString);
             break;
           default:
-            errorText = errorText = QString::asprintf("Unknown error occurred.");
+            errorText = QString::asprintf("Unknown error occurred.");
         };
-        //errorText = errorText = QString::asprintf("pvm_spawn() failed on %s (%d/%d) %s.",hostNameQCString,spawnInfo,taskId,errorText);
+        //errorText = QString::asprintf("pvm_spawn() failed on %s (%d/%d) %s.",hostNameQCString,spawnInfo,taskId,errorText);
         //QMessageBox warn("Error", errorText ,QMessageBox::Warning, QMessageBox::Retry, QMessageBox::NoButton,QMessageBox::NoButton);
         //warn.exec();
         SIGEL_Tools::SIG_IO::cerr << "pvm_spawn() failed on \"" << hostNameQCString << "\"   (" << spawnInfo << "/" << taskId << ") - " << errorText.toUtf8() << "\n";
@@ -524,7 +524,7 @@ int SIGEL_GP::SIG_GPFitnessTrainer::getNextHost() {
     pvmHosts.resize( pvmHosts.size() + 1 );
     pvmHosts.insert( pvmHosts.size()-1, new SIG_GPActivePVMHost(*freshHost) );
 
-    sprintf(cStrName, "%s", freshHost->name.toUtf8().constData());
+    sprintf(cStrName, "%s", freshHost->name.toLatin1().constData());
 
     int singleInfo = 0;
     int info = pvm_addhosts(&cStrName , 1, &singleInfo );

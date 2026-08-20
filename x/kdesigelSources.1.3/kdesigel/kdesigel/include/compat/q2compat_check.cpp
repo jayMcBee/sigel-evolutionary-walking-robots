@@ -218,6 +218,22 @@ int main()
         assert(d["k"] == &a);
         assert(d["absent"] == nullptr); }
 
+
+    {   // Q2ValueList iterators must survive an append, as Qt 2's linked list did.
+        // SIG_GPManager.cpp:106-217 appends while iterating and then passes the
+        // iterator to remove(); on a contiguous QList that is a use-after-free.
+        Q2ValueList<int> v;
+        for (int i = 0; i < 4; ++i) v << i;
+        Q2ValueList<int>::Iterator it = v.begin();
+        ++it;                                   // points at 1
+        for (int i = 0; i < 2000; ++i) v << i;  // forces any reallocation
+        assert(*it == 1);                       // iterator still valid
+        it = v.remove(it);                      // Qt 2 returns the next one
+        assert(*it == 2);
+        assert(v.count() == 2003);
+        assert(v.contains(0) == 2);             // Qt 2 returns a count
+    }
+
     std::printf("q2compat self-check: all assertions passed\n");
     return 0;
 }

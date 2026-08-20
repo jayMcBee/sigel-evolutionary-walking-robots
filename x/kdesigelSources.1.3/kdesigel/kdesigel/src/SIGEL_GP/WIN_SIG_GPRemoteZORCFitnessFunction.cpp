@@ -85,14 +85,14 @@ namespace SIGEL_GP
 	  char gszPort[9] = "COM1";
 	  fd = CreateFile((unsigned short*)gszPort, GENERIC_READ | GENERIC_WRITE, 0, 0, OPEN_EXISTING, FILE_FLAG_OVERLAPPED, 0);
       if (fd == INVALID_HANDLE_VALUE)
-      {  SIGEL_Tools::SIG_IO::cerr << "Serial Device can't be opened: The serial device \\"/dev/modem\\" couldn't be opened to transmit the program to ZORC.Program evaluation was canceled." << Qt::endl;
+      {  SIGEL_Tools::SIG_IO::cerr << "Serial Device can't be opened: The serial device \"/dev/modem\" couldn't be opened to transmit the program to ZORC.Program evaluation was canceled." << Qt::endl;
          fprintf(stderr, "Serial interface can't be opened");
          return -1.0;
       }
 
       // set parameters for serial device and catch errors
 	  if (SetSerial(fd, BaudRate, 1) < 0)
-      {  SIGEL_Tools::SIG_IO::cerr << "Error setting Parameters of Serial Device: Failed to set the parameters of serial device \\"/dev/modem\\".Program evaluation was canceled." << Qt::endl;
+      {  SIGEL_Tools::SIG_IO::cerr << "Error setting Parameters of Serial Device: Failed to set the parameters of serial device \"/dev/modem\".Program evaluation was canceled." << Qt::endl;
          fprintf(stderr, "Failed to set parameters of serial device");
          return -1.0;
       }
@@ -164,7 +164,7 @@ namespace SIGEL_GP
          {  char  errMsg[256];
 
             sprintf(errMsg, "<BIG><B>Program length received by ZORC [%d] doesn't match the original SIGEL-Program length [%d].</B></BIG><BR><BR>Please retry..", recvPrgLen, program.getProgramLength());
-            SIGEL_Tools::SIG_IO::cerr << "Error transmitting program" << Qt::endl;
+            SIGEL_Tools::SIG_IO::cerr << "Error transmitting program: " << errMsg << Qt::endl;
             fprintf(stderr, errMsg);
             return -1.0;
          }

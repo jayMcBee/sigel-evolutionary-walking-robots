@@ -213,7 +213,11 @@ bool MT_Evaluator::evaluationTactic()
 
 				PresentError = WorseError[0];
 				for(int k=1; k<NumOfWorseError; k++)
-					PresentError = PresentError + WorseError[i];
+					// 2003 wrote WorseError[i]. Pre-standard for-scope left i at
+					// CorrectFitness.size() from the loop above, and WorseError holds
+					// only size()/10 entries, so this read past the end every time.
+					// k is plainly what the loop means. (D13)
+					PresentError = PresentError + WorseError[k];
 			
 				MetaProgError = (MetaProgError-PresentError)/ (CorrectFitness.size()-NumOfWorseError);
 			}
