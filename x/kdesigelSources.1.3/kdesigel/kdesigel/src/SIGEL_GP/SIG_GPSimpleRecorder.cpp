@@ -33,8 +33,6 @@ SIGEL_GP::SIG_GPSimpleRecorder::SIG_GPSimpleRecorder()
 };
 
 void SIGEL_GP::SIG_GPSimpleRecorder::init()
-  throw (SIGEL_Simulation::SIG_RecorderNoQueriesSetException,
-	 SIGEL_Simulation::SIG_RecorderBadRecordingOrderException)
 {
   		SIG_Recorder::init();
 
@@ -46,13 +44,9 @@ void SIGEL_GP::SIG_GPSimpleRecorder::init()
 };
 
 void SIGEL_GP::SIG_GPSimpleRecorder::record()
-  throw (SIGEL_Simulation::SIG_RecorderNoQueriesSetException,
-	 SIGEL_Simulation::SIG_RecorderBadRecordingOrderException)
 { };
 
 void SIGEL_GP::SIG_GPSimpleRecorder::finish()
-  throw (SIGEL_Simulation::SIG_RecorderNoQueriesSetException,
-	 SIGEL_Simulation::SIG_RecorderBadRecordingOrderException)
 {
   SIG_Recorder::finish();
 

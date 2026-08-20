@@ -45,14 +45,11 @@ namespace SIGEL_GP
 
       SIG_GPFullDataRecorder( int recordingFrequency );
 
-      void init() throw (SIGEL_Simulation::SIG_RecorderNoQueriesSetException,
-          SIGEL_Simulation::SIG_RecorderBadRecordingOrderException);
+      void init();
 
-      void record() throw (SIGEL_Simulation::SIG_RecorderNoQueriesSetException,
-          SIGEL_Simulation::SIG_RecorderBadRecordingOrderException);
+      void record();
 
-      void finish() throw (SIGEL_Simulation::SIG_RecorderNoQueriesSetException,
-          SIGEL_Simulation::SIG_RecorderBadRecordingOrderException);
+      void finish();
 
       QList< DL_vector > positions;
       QList< DL_matrix > rotations;
