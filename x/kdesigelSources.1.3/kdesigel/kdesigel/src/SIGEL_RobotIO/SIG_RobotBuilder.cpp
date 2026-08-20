@@ -59,10 +59,10 @@ namespace SIGEL_RobotIO {
         QString SIG_RobotBuilder::loadFile (QString name)
         {
                 QFile f;
-                f.setName (name);
-                f.open (IO_ReadOnly);
+                f.setFileName (name);
+                f.open (QIODeviceBase::ReadOnly);
                 QTextStream ts (&f);
-                QString stri = ts.read ();
+                QString stri = ts.readAll ();
                 f.close ();
                 return stri;
         }
@@ -70,7 +70,7 @@ namespace SIGEL_RobotIO {
         void SIG_RobotBuilder::firstPass (void)
         {
                 QString homepath;
-                int occ = filename.findRev ('/');
+                int occ = filename.lastIndexOf ('/');
                 if (occ < 0)
                         homepath = "./";
                 else
@@ -88,7 +88,7 @@ namespace SIGEL_RobotIO {
         void SIG_RobotBuilder::secondPass (void)
         {
                 QString homepath;
-                int occ = filename.findRev ('/');
+                int occ = filename.lastIndexOf ('/');
                 if (occ < 0)
                         homepath = "./";
                 else
