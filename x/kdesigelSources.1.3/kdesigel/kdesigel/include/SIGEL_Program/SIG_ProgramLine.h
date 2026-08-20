@@ -33,8 +33,7 @@
 #if !defined(SIGEL_PROGRAMPACKAGE_SIG_PROGRAMLINE_H) 
 #define SIGEL_PROGRAMPACKAGE_SIG_PROGRAMLINE_H
 
-#include<qlist.h>
-#include<qarray.h>
+#include "compat/q2compat.h"
 #include<qtextstream.h>
 #include<qstring.h>
 
@@ -99,7 +98,7 @@ class SIG_ProgramLine
  */
 
    protected:
-   QArray< int > element;
+   Q2Array< int > element;
    
 
 /**
@@ -119,7 +118,7 @@ class SIG_ProgramLine
    public:
    SIG_ProgramLine( SIGEL_Tools::SIG_Randomizer &r, 
 		    SIGEL_Robot::SIG_LanguageParameters &languageP,
-		    QArray< int > &prob );
+		    Q2Array< int > &prob );
  
 /**
  * An empty destructor.
@@ -139,7 +138,7 @@ class SIG_ProgramLine
    public:
    void generateRandomRobotInstruction( SIGEL_Robot::SIG_LanguageParameters &languageP,
 				        SIGEL_Tools::SIG_Randomizer &r,
-                                        QArray< int > &prob  );
+                                        Q2Array< int > &prob  );
           
 /**
  * This function deletes the data of a program line completely.
@@ -171,7 +170,7 @@ class SIG_ProgramLine
    public:
    void randomRobotinstruction( SIGEL_Robot::SIG_LanguageParameters &languageP,
 			        SIGEL_Tools::SIG_Randomizer &r,
-			        QArray< int > &prob );
+			        Q2Array< int > &prob );
 /**
  * This function is only for test purposes and prints a program line.
  */
@@ -244,7 +243,7 @@ class SIG_ProgramLine
  */
 
    public:
-   QArray< int > getElementsArray();
+   Q2Array< int > getElementsArray();
 
 
 /**

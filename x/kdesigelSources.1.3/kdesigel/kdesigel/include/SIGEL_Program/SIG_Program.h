@@ -33,8 +33,7 @@
 #define SIGEL_PROGRAMPACKAGE_SIG_PROGRAM_H
 
 
-#include<qvector.h>
-#include<qarray.h>
+#include "compat/q2compat.h"
 #include<qtextstream.h>
 #include<qstring.h>
 
@@ -42,7 +41,7 @@
 
 #include "SIG_ProgramLine.h"
 #include "SIGEL_Tools/SIG_Randomizer.h"
-#include "SIGEL_GP/SIG_GPParameter.h"
+namespace SIGEL_GP { class SIG_GPParameter; }
 #include "SIGEL_Robot/SIG_LanguageParameters.h"
 #include "SIGEL_Tools/SIG_IO.h"
 
@@ -281,7 +280,7 @@ class SIG_Program
 		     long maximum,
 		     SIGEL_Tools::SIG_Randomizer &r, 
 		     SIGEL_Robot::SIG_LanguageParameters &languageP,
-		     QArray< int > &prob,
+		     Q2Array< int > &prob,
 		     int &historyInfo );
    };
 
