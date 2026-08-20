@@ -177,7 +177,7 @@ namespace SIGEL_Robot {
 
         void SIG_LanguageParameters::writeToFileTransfer (QTextStream & tx) const
         {
-                QDictIterator<SIG_CommandParameters> cmditer (allowedCommands);
+                Q2DictIterator<SIG_CommandParameters> cmditer (allowedCommands);
                 
                 tx << "LanguageParameters " << bitsPerRegister << ' ' << memSize << ' ' << maximalDelayTime << ' ';
                 tx << allowedCommands.count () << '\n';

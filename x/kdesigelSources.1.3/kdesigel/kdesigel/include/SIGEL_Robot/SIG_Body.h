@@ -24,12 +24,11 @@
 #define SIGEL_ROBOT_SIG_BODY_H
 
 namespace SIGEL_Robot { class SIG_Body; }
+#include "compat/q2compat.h"
 #include <qstring.h>
 #include <CyberVRML97.h>
 #include <newmat.h>
 #include <cstdlib>
-#include <qlist.h>
-#include <qvector.h>
 #include <pointvector.h>
 #include <matrix.h>
 #include "SIGEL_Robot/SIG_Robot.h"
@@ -50,7 +49,7 @@ namespace SIGEL_Robot
         class SIG_Body {
         private:
                 SIG_Robot *parent;
-                QList<SIG_Link> usedByLinks;
+                Q2PtrList<SIG_Link> usedByLinks;
                 QString geometryFile, directory;
                 SIG_Geometry *geometry;
    
@@ -92,7 +91,7 @@ namespace SIGEL_Robot
                  *
                  * @param rotation The rotation given in VRML notation.
                  */
-                NEWMAT::Matrix SIG_Body::createRotationMatrix( QArray< float > rotation );
+                NEWMAT::Matrix createRotationMatrix( Q2Array< float > rotation );
                 
                 /**
                  * Help method to traverse the VRML scene graph.

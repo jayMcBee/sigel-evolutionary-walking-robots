@@ -112,7 +112,7 @@ namespace SIGEL_Robot {
                 return appending_position;
         }
 
-        QVector<DL_vector> const & SIG_Geometry::getVertices (void) const
+        Q2PtrVector<DL_vector> const & SIG_Geometry::getVertices (void) const
         {
                 return vertices;
         }
