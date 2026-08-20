@@ -39,7 +39,7 @@ namespace SIGEL_Robot {
                 
         private:
                 SIG_Geometry *myGeometry;
-                QArray<int> vertices;
+                Q2Array<int> vertices;
 
         protected:
                 /**

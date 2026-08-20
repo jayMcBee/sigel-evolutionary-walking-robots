@@ -25,8 +25,8 @@
 
 namespace SIGEL_Robot { class SIG_Link; }
 
+#include "compat/q2compat.h"
 #include <qstring.h>
-#include <qlist.h>
 #include <qtextstream.h>
 #include <pointvector.h>
 #include "SIGEL_Robot/SIG_Robot.h"
@@ -66,7 +66,7 @@ namespace SIGEL_Robot
       void addPoint (QString pointname, DL_vector point);
       DL_vector getPoint (QString id) const;
       bool hasPoint (QString pointname) const;
-      QDictIterator<DL_vector> getPointIter (void) const;
+      Q2DictIterator<DL_vector> getPointIter (void) const;
       int getNrOfPoints (void) const;
 
       void instantiateGeometry (void);
@@ -85,9 +85,9 @@ namespace SIGEL_Robot
        *                  link.
        */
       void addNoCollide (SIG_Link *link, bool negotiate = true);
-      QList<SIG_Link> getNoCollides () const;
+      Q2PtrList<SIG_Link> getNoCollides () const;
       void addJoint (SIG_Joint *joint);
-      QList<SIG_Joint> getJoints () const;
+      Q2PtrList<SIG_Joint> getJoints () const;
 
       SIG_Geometry const *getGeometry (void) const;
       SIG_Mirtich const *getMirtich( void )  { return mirtich; }
@@ -116,9 +116,9 @@ namespace SIGEL_Robot
       SIG_Geometry *geometry;
       SIG_Mirtich *mirtich;
       SIG_Material *material;
-      QDict<DL_vector> points;
-      QList<SIG_Joint> adjacentJoints;
-      QList<SIG_Link> noCollide;
+      Q2Dict<DL_vector> points;
+      Q2PtrList<SIG_Joint> adjacentJoints;
+      Q2PtrList<SIG_Link> noCollide;
       DL_vector initialLocation;
       DL_matrix initialOrientation;
       bool initiated, mdh_visited;

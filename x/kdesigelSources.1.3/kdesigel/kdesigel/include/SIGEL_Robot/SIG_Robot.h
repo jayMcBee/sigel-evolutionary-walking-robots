@@ -25,6 +25,7 @@
 
 namespace SIGEL_Robot { class SIG_Robot; }
 
+#include "compat/q2compat.h"
 #include "SIGEL_Robot/SIG_LanguageParameters.h"
 #include "SIGEL_Robot/SIG_Body.h"
 #include "SIGEL_Robot/SIG_Material.h"
@@ -32,7 +33,6 @@ namespace SIGEL_Robot { class SIG_Robot; }
 #include "SIGEL_Robot/SIG_Joint.h"
 #include "SIGEL_Robot/SIG_Drive.h"
 #include "SIGEL_Robot/SIG_Sensor.h"
-#include <qdict.h>
 #include <qtextstream.h>
 
 /**
@@ -57,12 +57,12 @@ namespace SIGEL_Robot
   private:
     SIG_LanguageParameters *language;
     SIG_Link *rootlink;
-    QDict<SIG_Body> bodies;
-    QDict<SIG_Material> materials;
-    QDict<SIG_Link> links;
-    QDict<SIG_Joint> joints;
-    QDict<SIG_Drive> drives;
-    QDict<SIG_Sensor> sensors;
+    Q2Dict<SIG_Body> bodies;
+    Q2Dict<SIG_Material> materials;
+    Q2Dict<SIG_Link> links;
+    Q2Dict<SIG_Joint> joints;
+    Q2Dict<SIG_Drive> drives;
+    Q2Dict<SIG_Sensor> sensors;
 
   public:
     /**
@@ -182,42 +182,42 @@ namespace SIGEL_Robot
      * This is a QDictIterator. Please read the Qt Library documentation
      * to get informed about the usage of the iterator.
      */
-    QDictIterator<SIG_Body> getBodyIter (void) const;
+    Q2DictIterator<SIG_Body> getBodyIter (void) const;
     /**
      * Returns an iterator over all SIG_Material objects.
      *
      * This is a QDictIterator. Please read the Qt Library documentation
      * to get informed about the usage of the iterator.
      */
-    QDictIterator<SIG_Material> getMaterialIter (void) const;
+    Q2DictIterator<SIG_Material> getMaterialIter (void) const;
     /**
      * Returns an iterator over all SIG_Link objects.
      *
      * This is a QDictIterator. Please read the Qt Library documentation
      * to get informed about the usage of the iterator.
      */
-    QDictIterator<SIG_Link> getLinkIter (void) const;
+    Q2DictIterator<SIG_Link> getLinkIter (void) const;
     /**
      * Returns an iterator over all SIG_Joint objects.
      *
      * This is a QDictIterator. Please read the Qt Library documentation
      * to get informed about the usage of the iterator.
      */
-    QDictIterator<SIG_Joint> getJointIter (void) const;
+    Q2DictIterator<SIG_Joint> getJointIter (void) const;
     /**
      * Returns an iterator over all SIG_Drive objects.
      *
      * This is a QDictIterator. Please read the Qt Library documentation
      * to get informed about the usage of the iterator.
      */
-    QDictIterator<SIG_Drive> getDriveIter (void) const;
+    Q2DictIterator<SIG_Drive> getDriveIter (void) const;
     /**
      * Returns an iterator over all SIG_Sensor objects.
      *
      * This is a QDictIterator. Please read the Qt Library documentation
      * to get informed about the usage of the iterator.
      */
-    QDictIterator<SIG_Sensor> getSensorIter (void) const;
+    Q2DictIterator<SIG_Sensor> getSensorIter (void) const;
     /**
      * Returns the root link.
      *

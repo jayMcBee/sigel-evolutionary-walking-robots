@@ -60,7 +60,7 @@ namespace SIGEL_Robot
                 usedByLinks.append (user);
         };
 
-        NEWMAT::Matrix SIG_Body::createRotationMatrix( QArray< float > rotation )
+        NEWMAT::Matrix SIG_Body::createRotationMatrix( Q2Array< float > rotation )
         {
                 NEWMAT::Matrix rotationMatrix(4,4);
                 double const x = rotation[0];
@@ -98,7 +98,7 @@ namespace SIGEL_Robot
                         if (node->isTransformNode()) {
                                 TransformNode *transformNode = static_cast<TransformNode*> (node);
                                 
-                                QArray< float > buffer(4);
+                                Q2Array< float > buffer(4);
 
                                 NEWMAT::Matrix identity(4,4);
                                 identity = 0;
@@ -158,11 +158,11 @@ namespace SIGEL_Robot
                                         if (coordinateNode) {
                                                 int noOfVertices = coordinateNode->getNPoints();
                                                 int noOfIndices = indexedFaceSetNode->getNCoordIndexes();
-                                                QVector< DL_vector > vertices( noOfVertices );
+                                                Q2PtrVector< DL_vector > vertices( noOfVertices );
                                                 vertices.setAutoDelete( true );
 
                                                 for (int i=0; i < noOfVertices; i++) {
-                                                        QArray< float > coords(3);
+                                                        Q2Array< float > coords(3);
                                                         
                                                         coordinateNode->getPoint( i, coords.data() );
                                                         
@@ -211,7 +211,8 @@ namespace SIGEL_Robot
                 SceneGraph *bodyScene = new SceneGraph();
                 // Load expects a char*, so a const_cast is necessary.
                 
-                bodyScene->load( const_cast<char*>( getGeometryFile ().latin1() ) );
+                QByteArray geometryFileBytes = getGeometryFile ().toUtf8();
+		bodyScene->load( geometryFileBytes.data() );
                 
                 NEWMAT::Matrix identity(4,4);
                 identity = 0;

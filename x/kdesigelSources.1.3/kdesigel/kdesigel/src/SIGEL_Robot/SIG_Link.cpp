@@ -33,7 +33,6 @@
 #include <cmath>
 #include <cstdio>
 
-#include "SIGEL_Simulation/SIG_DynaSystem.h"
 
 using namespace SIGEL_Tools;
 
@@ -168,9 +167,9 @@ namespace SIGEL_Robot {
                 return (points.find (id) != 0);
         }
 
-        QDictIterator<DL_vector> SIG_Link::getPointIter (void) const
+        Q2DictIterator<DL_vector> SIG_Link::getPointIter (void) const
         {
-                return QDictIterator<DL_vector> (points);
+                return Q2DictIterator<DL_vector> (points);
         }
 
         int SIG_Link::getNrOfPoints (void) const
@@ -199,7 +198,7 @@ namespace SIGEL_Robot {
 
         void SIG_Link::transformPoints (DL_vector mov, DL_matrix rot)
         {
-                QDictIterator<DL_vector> pit (points);
+                Q2DictIterator<DL_vector> pit (points);
                 DL_vector *pt;
                 while (pt = pit.current ()) {
                         pt->plusis (&mov);
@@ -208,7 +207,7 @@ namespace SIGEL_Robot {
                         ++pit;
                 }
 
-                QListIterator<SIG_Joint> jit (adjacentJoints);
+                Q2ListIterator<SIG_Joint> jit (adjacentJoints);
                 SIG_Joint *j;
                 while (j = jit.current ()) {
                         j->transformPoints (this, mov, rot);
@@ -225,7 +224,7 @@ namespace SIGEL_Robot {
                 }
         }
         
-        QList<SIG_Link> SIG_Link::getNoCollides () const
+        Q2PtrList<SIG_Link> SIG_Link::getNoCollides () const
         {
                 return noCollide;
         }
@@ -235,7 +234,7 @@ namespace SIGEL_Robot {
                 adjacentJoints.append (joint);
         }
         
-        QList<SIG_Joint> SIG_Link::getJoints () const
+        Q2PtrList<SIG_Joint> SIG_Link::getJoints () const
         {
                 return adjacentJoints;
         }
@@ -261,7 +260,7 @@ namespace SIGEL_Robot {
 
                 SIG_Joint *j;
                 SIG_Link *l;
-                QListIterator<SIG_Joint> li (adjacentJoints);
+                Q2ListIterator<SIG_Joint> li (adjacentJoints);
                 while (j = li.current ()) {
                         DL_vector transla, fglobtransla;
                         DL_matrix rota, fglobrota;
@@ -319,8 +318,8 @@ namespace SIGEL_Robot {
 
         void SIG_Link::writeToFileTransfer (QTextStream & tx) const
         {
-                QDictIterator<DL_vector> piter (points);
-                QListIterator<SIG_Link> nciter (noCollide);
+                Q2DictIterator<DL_vector> piter (points);
+                Q2ListIterator<SIG_Link> nciter (noCollide);
                 tx << "Link "
                    << getName () << ' '
                    << getNumber () << ' '
@@ -366,7 +365,7 @@ namespace SIGEL_Robot {
 
 	  mdh_visited = true;
 
-	  QList< SIG_Joint > successors;
+	  Q2PtrList< SIG_Joint > successors;
 
 	  SIG_Joint *actAdjacentJoint = adjacentJoints.first();
 
@@ -705,7 +704,7 @@ namespace SIGEL_Robot {
 		SIGEL_Tools::SIG_IO::cerr << " " << translation( i );
 	      SIGEL_Tools::SIG_IO::cerr << "\n";
 	      SIGEL_Tools::SIG_IO::cerr << "Transformed points:\n";
-	      QDictIterator< DL_vector > pit( points );
+	      Q2DictIterator< DL_vector > pit( points );
 	      pit.toFirst();
 	      while (pit.current())
 		{

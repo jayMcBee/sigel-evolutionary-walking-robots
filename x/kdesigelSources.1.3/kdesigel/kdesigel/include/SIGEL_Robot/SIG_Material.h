@@ -50,7 +50,7 @@ namespace SIGEL_Robot
           SIG_Robot *parent;
           QString name;
           DL_Scalar elasticity, density;
-          QList<FrictionValue> friction;
+          Q2PtrList<FrictionValue> friction;
           DL_vector colour;
   public:
           /**

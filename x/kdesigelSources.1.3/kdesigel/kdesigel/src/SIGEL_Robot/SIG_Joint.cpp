@@ -752,7 +752,7 @@ namespace SIGEL_Robot {
 	     break;
 	   };
 
-	 QList< SIG_Joint > joints = successor->getJoints();
+	 Q2PtrList< SIG_Joint > joints = successor->getJoints();
 
 	 SIG_Joint *actJoint = joints.first();
 

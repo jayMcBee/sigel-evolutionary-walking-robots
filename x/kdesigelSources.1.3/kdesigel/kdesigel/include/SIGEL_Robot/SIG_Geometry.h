@@ -25,8 +25,8 @@
 
 namespace SIGEL_Robot { class SIG_Geometry; }
 
+#include "compat/q2compat.h"
 #include <qstring.h>
-#include <qvector.h>
 #include <pointvector.h>
 #include <matrix.h>
 #include "SIGEL_Robot/SIG_Robot.h"
@@ -49,8 +49,8 @@ namespace SIGEL_Robot {
     friend class SIG_GeometryIterator;
     friend class SIG_Polygon;
   private:
-    QVector<SIG_Polygon> polygons;
-    QVector<DL_vector> vertices;
+    Q2PtrVector<SIG_Polygon> polygons;
+    Q2PtrVector<DL_vector> vertices;
 
   protected:
     /**
@@ -113,7 +113,7 @@ namespace SIGEL_Robot {
     /**
      * Returns the vector of vertices.
      */
-    QVector<DL_vector> const & getVertices (void) const;
+    Q2PtrVector<DL_vector> const & getVertices (void) const;
     /**
      * Returns the number of vertices.
      */

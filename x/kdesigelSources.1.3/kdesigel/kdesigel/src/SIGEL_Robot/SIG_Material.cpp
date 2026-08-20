@@ -104,7 +104,7 @@ namespace SIGEL_Robot {
                                              DL_Scalar fricval,
                                              bool negotiate)
         {
-                QListIterator<FrictionValue> li (friction);
+                Q2ListIterator<FrictionValue> li (friction);
                 while (li.current ()) {
                         if (li.current ()->otherSide == otherObj) {
                                 li.current ()->value = fricval;
@@ -126,7 +126,7 @@ namespace SIGEL_Robot {
 
         DL_Scalar SIG_Material::getFrictionValue (SIG_Material *otherObj) const
         {
-                QListIterator<FrictionValue> li (friction);
+                Q2ListIterator<FrictionValue> li (friction);
                 while (li.current ()) {
                         if (li.current ()->otherSide == otherObj)
                                 return li.current ()->value;
@@ -137,7 +137,7 @@ namespace SIGEL_Robot {
 
         void SIG_Material::writeToFileTransfer (QTextStream & tx) const
         {
-                QListIterator<FrictionValue> li (friction);
+                Q2ListIterator<FrictionValue> li (friction);
                 
                 tx << "Material" << ' '
                    << getName () << ' '

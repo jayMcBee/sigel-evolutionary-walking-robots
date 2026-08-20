@@ -25,7 +25,7 @@
 
 namespace SIGEL_Robot { class SIG_LanguageParameters; }
 
-#include <qdict.h>
+#include "compat/q2compat.h"
 #include <qtextstream.h>
 #include <qstring.h>
 #include "SIGEL_Robot/SIG_CommandParameters.h"
@@ -44,7 +44,7 @@ namespace SIGEL_Robot {
                  * A dictionary of the commands allowed in the
                  * control language of the particular robot.
                  */
-                QDict<SIG_CommandParameters> allowedCommands;
+                Q2Dict<SIG_CommandParameters> allowedCommands;
                 /**
                  * The width of the registers of the robot's
                  * memory.
