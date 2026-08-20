@@ -27,12 +27,13 @@
 //     is typed, so std::sort with operator< removes the cause.  Affects
 //     SIG_GPManager.cpp:304,311 and SIG_AllIndividualsView.cpp:240, all of
 //     which need ascending numeric order and silently break above 256.
-//  2. Out-of-range indexing asserts instead of Qt 2's behaviour, which differs
-//     by container: QGArray::at warns and CLAMPS the index to 0
-//     (qgarray.h:108-117); QGVector::at warns and reads out of range anyway
-//     (qgvector.h:85-92). Both silently hid real defects; the call sites are
-//     being fixed instead. NOTE: Q_ASSERT compiles to nothing under QT_NO_DEBUG,
-//     so in a release build this is silent undefined behaviour, not an abort.
+//  2. Out-of-range indexing warns and clamps to index 0, as Qt 2's QGArray::at
+//     did (qgarray.h:108-117). Qt 2's QGVector::at only warned and then read out
+//     of range anyway (qgvector.h:85-92); clamping is used for both. This is
+//     done in the shim rather than left to Q_ASSERT, which compiles to nothing
+//     under QT_NO_DEBUG and would make a release build corrupt memory silently
+//     where 2003 merely returned a wrong value. Call sites are still being
+//     fixed; the clamp is a floor, not a licence.
 //  3. resize() value-initialises new elements where Qt 2 left raw memory.
 //  Two Qt 2 quirks are deliberately NOT reproduced, because no SIGEL code can
 //  reach them and both are defects rather than behaviour:
@@ -54,6 +55,7 @@
 //     refcount is 1, and no raw pointer is held across a copy.
 
 #include <QByteArray>
+#include <QDebug>
 #include <QHashSeed>
 #include <QList>
 #include <QMultiHash>
@@ -119,7 +121,23 @@ public:
 
     // Qt 2 hands out a non-const T& from a const array (qarray.h:108-117).
     // Preserved so A-step renames stay pure.  See divergence 4 on sharing.
-    T &at(uint i) const { return const_cast<Q2Array<T> *>(this)->m[qsizetype(i)]; }
+    // qgarray.h:108-117 -- Qt 2 warns and CLAMPS the index to 0 rather than
+    // failing. Reproduced here rather than left to Q_ASSERT, which compiles to
+    // nothing under QT_NO_DEBUG and would give silent corruption in a release
+    // build. An empty array has no element to clamp to, so it yields a dummy.
+    T &at(uint i) const
+    {
+        Q2Array<T> *self = const_cast<Q2Array<T> *>(this);
+        if (qsizetype(i) < self->m.size())
+            return self->m[qsizetype(i)];
+        qWarning("Q2Array::at: index %u out of range (size %lld)",
+                 i, static_cast<long long>(self->m.size()));
+        if (self->m.isEmpty()) {
+            static T dummy = T();
+            return dummy;
+        }
+        return self->m[0];
+    }
     T &operator[](int i) const { return at(uint(i)); }
     T *data() const { return const_cast<Q2Array<T> *>(this)->m.data(); }
     operator const T *() const { return m.isEmpty() ? nullptr : m.constData(); }
@@ -345,8 +363,18 @@ public:
 
     void clear() { if (del) deleteAll(); v.clear(); }
 
-    T *at(uint i) const { return v.at(qsizetype(i)); }        // asserts, divergence 2
-    T *operator[](int i) const { return v.at(qsizetype(i)); }
+    // As Q2Array::at above: warn and clamp instead of relying on Q_ASSERT.
+    // A null slot is already normal for this container, so an empty vector
+    // yields null -- there is no element to clamp to.
+    T *at(uint i) const
+    {
+        if (qsizetype(i) < v.size())
+            return v.at(qsizetype(i));
+        qWarning("Q2PtrVector::at: index %u out of range (size %lld)",
+                 i, static_cast<long long>(v.size()));
+        return v.isEmpty() ? nullptr : v.at(0);
+    }
+    T *operator[](int i) const { return at(uint(i)); }
 
     int find(const T *d, uint i = 0) const { return int(v.indexOf(const_cast<T *>(d), qsizetype(i))); }
     int findRef(const T *d, uint i = 0) const { return find(d, i); }
