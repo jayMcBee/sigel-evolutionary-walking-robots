@@ -20,6 +20,7 @@
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
+#include "SIGEL_GP/SIG_GPParameter.h"
 #include "SIGEL_Program/SIG_Program.h"
 #include "SIGEL_Program/SIG_ProgramLine.h"
 #include "SIGEL_Tools/SIG_Randomizer.h"
@@ -145,7 +146,7 @@ void SIGEL_Program::SIG_Program::readFromFile( QTextStream &file )
 
 #endif
    
-   while((pos=prg.find('\n',oldpos,false))!=-1)
+   while((pos=prg.indexOf(QChar('\n'), oldpos, Qt::CaseInsensitive))!=-1)
      {
         tmpLine = prg.mid( oldpos, pos - oldpos );
         prgLine = new SIGEL_Program::SIG_ProgramLine();
@@ -275,7 +276,7 @@ void SIGEL_Program::SIG_Program::checkLength( long minimumLength,
 					      long maximumLength, 
 					      SIGEL_Tools::SIG_Randomizer &r, 
 					      SIGEL_Robot::SIG_LanguageParameters &languageP,
-					      QArray< int > &prob,
+					      Q2Array< int > &prob,
 					      int &historyInfo )
 {
   long prgLength = getProgramLength();
