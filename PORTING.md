@@ -438,6 +438,39 @@ this per-site.
 sites: `SIG_Environment.cpp` (done), `MT_Controller.cpp`, `SIG_GPFitnessTrainer.cpp`,
 `SIG_GPRemoteZORCFitnessFunction.cpp` (+ WIN variant, + both headers).
 
+### DEBT — SIGEL needs a real logging system (opened at review of A1–A6)
+
+Qt 2's `QTextStream` wrote through to unbuffered `stderr` on every `<<`. Qt 6
+buffers 16 KB and flushes only on `flush()`, `Qt::endl`, overflow or
+destruction. A trailing `"\n"` does **not** flush.
+
+SIGEL has **509 `SIG_IO::cerr`/`cout` statements; 9 of them flush.** So most
+diagnostics now sit in a buffer and are lost if the process dies — including on
+the SIGSEGV path, which is exactly when they are wanted.
+
+Fixed so far: only the three A2 terrain warnings, which now use `Qt::endl`.
+
+**Required after the Qt migration:** a proper logging system. Levels, one place
+that decides where output goes and when it is flushed, and something the GUI can
+display. This replaces both `SIG_IO` and the console-warning stopgap recorded
+below. Do not fix this by adding `Qt::endl` to 500 call sites.
+
+### Determinism — fixed hash seed (resolved)
+
+Qt 6 randomises the `QHash` seed per process, so `Q2Dict` iteration order varied
+between runs. Qt 2's `QGDict` was deterministic for a given insertion sequence.
+
+This mattered: `SIG_Robot`'s copy constructor round-trips through a text
+serialisation that walks six dictionaries (`SIG_Robot.cpp:295-335`), and reading
+back registers joints with their links in encounter order. Joint ordering, and
+with it DynaMechs link numbering, would change run to run — a fixed `RANDOMSEED`
+would no longer reproduce a run.
+
+`compat/q2compat.h` now calls `QHashSeed::setDeterministicGlobalSeed()` during
+static initialisation. Verified: identical iteration order across runs.
+`main()` should call it explicitly too, once `sigel.cpp` and `sigel_slave.cpp`
+are ported — static initialisation order is unspecified.
+
 ### TRAP — `toUtf8()` returns a temporary (all 74 D8 sites)
 
 Qt 2's `latin1()` returned a pointer into the QString's own buffer, so

@@ -34,6 +34,16 @@
 //     being fixed instead. NOTE: Q_ASSERT compiles to nothing under QT_NO_DEBUG,
 //     so in a release build this is silent undefined behaviour, not an abort.
 //  3. resize() value-initialises new elements where Qt 2 left raw memory.
+//  Two Qt 2 quirks are deliberately NOT reproduced, because no SIGEL code can
+//  reach them and both are defects rather than behaviour:
+//    - Copying a Qt 2 QDict REVERSES the order of same-key entries, so find()
+//      returns the oldest afterwards. Unreachable here: every dict is keyed by a
+//      model name, insert() is unguarded, and no shipped .rrb file contains a
+//      duplicate name.
+//    - Qt 2's QValueList::contains returns an occurrence count; Qt 6's returns
+//      bool. Q2ValueList has exactly one declaration in SIGEL and contains() is
+//      never called on it.
+//
 //  4. Q2Array is copy-on-write; Qt 2's QArray is TRULY shared, with no COW at
 //     all (qgarray.cpp:134-138, 284-294).  In Qt 2, `b = a; b.at(0) = 9;` is
 //     visible through `a`, and data() hands out the shared buffer.  Under this
@@ -44,11 +54,33 @@
 //     refcount is 1, and no raw pointer is held across a copy.
 
 #include <QByteArray>
+#include <QHashSeed>
 #include <QList>
 #include <QMultiHash>
 #include <QPair>
 #include <QString>
 #include <algorithm>
+
+// ---------------------------------------------------------------------------
+// Qt 6 randomises the QHash seed once per process, so Q2Dict iteration order
+// differs between runs. Qt 2's QGDict walked its buckets in a fixed order for a
+// given insertion sequence, and SIGEL depends on that: SIG_Robot's copy
+// constructor is a serialise/deserialise round-trip that iterates six dicts
+// (SIG_Robot.cpp:295-335), and reading back registers joints with their links
+// in encounter order. Without a fixed seed, adjacentJoints ordering -- and with
+// it the MDH traversal and DynaMechs link numbering -- varies run to run, so a
+// fixed RANDOMSEED no longer reproduces a run.
+//
+// One object per translation unit; the call is idempotent. main() should call
+// QHashSeed::setDeterministicGlobalSeed() explicitly as well, once sigel.cpp and
+// sigel_slave.cpp are ported -- static initialisation order is unspecified, so
+// this cannot protect a QHash built by another static constructor.
+namespace {
+struct Q2DeterministicHashSeed {
+    Q2DeterministicHashSeed() { QHashSeed::setDeterministicGlobalSeed(); }
+};
+const Q2DeterministicHashSeed q2DeterministicHashSeedInit;
+}
 
 // ---------------------------------------------------------------------------
 // Q2Array<T>  <- Qt 2 QArray<T> (QMemArray): value array.
