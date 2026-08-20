@@ -192,7 +192,10 @@ bool MT_Evaluator::evaluationTactic()
 				int PosOfSmallestError =0;
 				Q2Array<double> WorseError;
 				WorseError.resize(NumOfWorseError);
-				for (int i=0; i<CorrectFitness.size(); i++)
+				// 2003 zero-filled to CorrectFitness.size() into an array that holds
+				// only NumOfWorseError entries -- every iteration past the tenth
+				// wrote out of range. (D13)
+				for (int i=0; i<NumOfWorseError; i++)
 					WorseError[i] = 0.0;
 				
 
@@ -203,8 +206,10 @@ bool MT_Evaluator::evaluationTactic()
 					
 					for(int k=0; k<NumOfWorseError; k++)
 					{
-						if (WorseError[PosOfSmallestError]>WorseError[i])
-							PosOfSmallestError = i;
+						// 2003 used i, the OUTER loop variable, to index WorseError.
+						// k is the index this loop scans. (D13)
+						if (WorseError[PosOfSmallestError]>WorseError[k])
+							PosOfSmallestError = k;
 					}
 
 					if (WorseError[PosOfSmallestError]<PresentError)

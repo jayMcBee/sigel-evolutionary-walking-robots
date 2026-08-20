@@ -38,7 +38,7 @@ public:
 	MT_Search(MT_Population * ParentPop, MT_Population * OffspringPop, MT_Randomizer * _Randi);
 	MT_Search();
 	virtual ~MT_Search();
-	/* For brute-force search!
+	/* For brood search (see BrutSize/setBrutSize)
 	*	MT_Search(MT_Population * ParentPop, MT_Population * OffspringPop, MT_Randomizer * Randi, MT_FitnessTrainer * Fit Trainer);
 	*/
 

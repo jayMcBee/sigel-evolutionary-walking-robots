@@ -2,6 +2,7 @@
 #define MT_CONTROLLER_H
 
 #include "compat/q2compat.h"
+#include <QFile>
 class MT_MainWindow;
 #include "MT_Control/MT_Substitute.h"
 #include "MT_GPSystem/MT_GPManager.h"

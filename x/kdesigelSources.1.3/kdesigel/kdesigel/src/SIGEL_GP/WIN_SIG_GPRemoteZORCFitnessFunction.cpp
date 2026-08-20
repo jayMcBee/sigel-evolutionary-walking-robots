@@ -44,7 +44,7 @@ namespace SIGEL_GP
 	   osReader.hEvent = CreateEvent(NULL, true, false, NULL);
 
 	   if(osReader.hEvent == NULL){
-			SIGEL_Tools::SIG_IO::cerr << "Creation error.: <BIG><B>Couldn't create event for overlapped communication.</B></BIG><BR><BR>Program evaluation was canceled." << Qt::endl;
+			SIGEL_Tools::SIG_IO::cerr << "Creation error: Couldn't create event for overlapped communication. Program evaluation was canceled." << Qt::endl;
 			fprintf(stderr, "Cannot create com-event.");
       }
 
@@ -85,14 +85,14 @@ namespace SIGEL_GP
 	  char gszPort[9] = "COM1";
 	  fd = CreateFile((unsigned short*)gszPort, GENERIC_READ | GENERIC_WRITE, 0, 0, OPEN_EXISTING, FILE_FLAG_OVERLAPPED, 0);
       if (fd == INVALID_HANDLE_VALUE)
-      {  SIGEL_Tools::SIG_IO::cerr << "Serial Device can't be opened: The serial device \"/dev/modem\" couldn't be opened to transmit the program to ZORC.Program evaluation was canceled." << Qt::endl;
+      {  SIGEL_Tools::SIG_IO::cerr << "Serial Device can't be opened: The serial device \"/dev/modem\" couldn't be opened to transmit the program to ZORC. Program evaluation was canceled." << Qt::endl;
          fprintf(stderr, "Serial interface can't be opened");
          return -1.0;
       }
 
       // set parameters for serial device and catch errors
 	  if (SetSerial(fd, BaudRate, 1) < 0)
-      {  SIGEL_Tools::SIG_IO::cerr << "Error setting Parameters of Serial Device: Failed to set the parameters of serial device \"/dev/modem\".Program evaluation was canceled." << Qt::endl;
+      {  SIGEL_Tools::SIG_IO::cerr << "Error setting Parameters of Serial Device: Failed to set the parameters of serial device \"/dev/modem\". Program evaluation was canceled." << Qt::endl;
          fprintf(stderr, "Failed to set parameters of serial device");
          return -1.0;
       }
@@ -107,7 +107,7 @@ namespace SIGEL_GP
       if (! timedSerialWait(fd, 2) )
       {
          // ZORC didn't respond for 2 seconds -- not connected ?!
-         SIGEL_Tools::SIG_IO::cerr << "Serial Connection Failed: <BIG><B>Connection to ZORC can't be established using interface \"/dev/modem\".</B></BIG><BR><BR>The RS-232 Ping failed. Possibly the menu on ZORC wasn't reset to the toplevel ? Please check !" << Qt::endl;
+         SIGEL_Tools::SIG_IO::cerr << "Serial Connection Failed: Connection to ZORC can't be established using interface \"/dev/modem\". The RS-232 Ping failed. Possibly the menu on ZORC wasn't reset to the toplevel ? Please check !" << Qt::endl;
          fprintf(stderr, "Can't establish connection to ZORC -- RS232-Ping failed");
 
          return -1.0;
@@ -121,7 +121,7 @@ namespace SIGEL_GP
 		{
 			if (recvPrgLen != 8)
 			{	// bad response from ZORC..
-         	SIGEL_Tools::SIG_IO::cerr << "Problem with Serial Connection: <BIG><B>The connection to ZORC could be established but the response was incorrect.</B></BIG><BR><BR>Please check !" << Qt::endl;
+         	SIGEL_Tools::SIG_IO::cerr << "Problem with Serial Connection: The connection to ZORC could be established but the response was incorrect. Please check !" << Qt::endl;
 	         fprintf(stderr, "The connection to ZORC could be established but the response was incorrect.");
    	      return -1.0;
 			}
@@ -132,7 +132,7 @@ namespace SIGEL_GP
 		}
 
       else
-      {  SIGEL_Tools::SIG_IO::cerr << "Bad Response from ZORC: Got bad response from ZORC.Evaluation canceled, Please retry.." << Qt::endl;
+      {  SIGEL_Tools::SIG_IO::cerr << "Bad Response from ZORC: Got bad response from ZORC. Evaluation canceled, Please retry.." << Qt::endl;
          fprintf(stderr, "Bad response from ZORC");
          return -1.0;
       }
@@ -149,7 +149,7 @@ namespace SIGEL_GP
       if (! timedSerialWait(fd, 2) )
       {
          // ZORC didn't respond for 2 seconds -- not connected ?!
-         SIGEL_Tools::SIG_IO::cerr << "Serial Connection Failed: <BIG><B>Connection to ZORC can't be established using interface \"/dev/modem\".</B></BIG><BR><BR>Evaluation canceled, Please check !" << Qt::endl;
+         SIGEL_Tools::SIG_IO::cerr << "Serial Connection Failed: Connection to ZORC can't be established using interface \"/dev/modem\". Evaluation canceled, Please check !" << Qt::endl;
          fprintf(stderr, "Can't establish connection to ZORC");
          return -1.0;
       }
@@ -171,7 +171,7 @@ namespace SIGEL_GP
       }
 
       else
-      {  SIGEL_Tools::SIG_IO::cerr << "Bad Response from ZORC: Got bad response from ZORC.Bad response after program transmission. Evaluation was canceled, Please retry.." << Qt::endl;
+      {  SIGEL_Tools::SIG_IO::cerr << "Bad Response from ZORC: Got bad response from ZORC. Bad response after program transmission. Evaluation was canceled, Please retry.." << Qt::endl;
          fprintf(stderr, "Bad response from ZORC");
          return -1.0;
       }

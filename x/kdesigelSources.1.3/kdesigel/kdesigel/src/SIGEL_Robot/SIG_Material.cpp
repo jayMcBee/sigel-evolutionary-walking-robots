@@ -62,7 +62,7 @@ namespace SIGEL_Robot {
 
         SIG_Material::~SIG_Material (void)
         {
-                friction.setAutoDelete (TRUE);
+                friction.setAutoDelete (true);
         }
 
         QString SIG_Material::getName (void) const

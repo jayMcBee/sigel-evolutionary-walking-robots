@@ -79,8 +79,8 @@ namespace SIGEL_Robot {
 
         SIG_Geometry::~SIG_Geometry (void)
         {
-                polygons.setAutoDelete (TRUE);
-                vertices.setAutoDelete (TRUE);
+                polygons.setAutoDelete (true);
+                vertices.setAutoDelete (true);
                 /* If someone insisted on doing it manually, we would be able to do so.
                 int i, size;
 

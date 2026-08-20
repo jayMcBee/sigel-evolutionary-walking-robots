@@ -63,7 +63,7 @@ namespace SIGEL_Simulation
       {
 	remainingLastCommandTime -= timeAccountSize;
 #ifdef SIG_DEBUG
-	SIGEL_Tools::SIG_IO::cerr << "Remaining Last Command Time: " << remainingLastCommandTime << endl;
+	SIGEL_Tools::SIG_IO::cerr << "Remaining Last Command Time: " << remainingLastCommandTime << Qt::endl;
 #endif
       }
     else
@@ -82,8 +82,8 @@ namespace SIGEL_Simulation
 	     */
 #ifdef SIG_DEBUG
 	    SIGEL_Tools::SIG_IO::cerr << "--------------------------------------------------------\n";
-	    SIGEL_Tools::SIG_IO::cerr << "Remaining Time:" << timeAccountSize<< endl;
-	    SIGEL_Tools::SIG_IO::cerr << "PC: " << programCounter << endl;
+	    SIGEL_Tools::SIG_IO::cerr << "Remaining Time:" << timeAccountSize<< Qt::endl;
+	    SIGEL_Tools::SIG_IO::cerr << "PC: " << programCounter << Qt::endl;
 	    if( compareFlag )
 	      SIGEL_Tools::SIG_IO::cerr << "CF: 1\n";
 	    else
@@ -96,7 +96,7 @@ namespace SIGEL_Simulation
 	      {
 		SIGEL_Tools::SIG_IO::cerr << "R" << loop << ":" << registers[loop]->getValue() << "  ";
 	      }
-	    SIGEL_Tools::SIG_IO::cerr << endl;
+	    SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 #endif
 
 	    // what command was fetched?
@@ -523,7 +523,7 @@ namespace SIGEL_Simulation
 	      } // close switch
 	  } // close while
 #ifdef SIG_DEBUG
-	SIGEL_Tools::SIG_IO::cerr << "Remaining Last Command Time: " << remainingLastCommandTime << endl; // debug! delete!
+	SIGEL_Tools::SIG_IO::cerr << "Remaining Last Command Time: " << remainingLastCommandTime << Qt::endl; // debug! delete!
 #endif
       } // close else
   };
