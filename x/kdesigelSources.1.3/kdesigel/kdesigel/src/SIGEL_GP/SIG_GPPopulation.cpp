@@ -20,7 +20,7 @@
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-#include <QCoreApplication>   // qApp; was reached via SIG_Program.h before A7
+#include <QApplication>   // qApp->wakeUpGuiThread() and QProgressDialog need QtWidgets
 #include "SIGEL_GP/SIG_GPPopulation.h"
 
 #include<iostream>

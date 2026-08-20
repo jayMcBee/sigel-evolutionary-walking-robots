@@ -80,7 +80,7 @@ int SIGEL_Simulation::SIG_DynaMoSimulationQueries::getRootNumber() const
   return simulationData.dynaSystem.rootLinkNo;
 };
 
-vector<double*>* SIGEL_Simulation::SIG_DynaMoSimulationQueries::getUsedForces() const
+std::vector<double*>* SIGEL_Simulation::SIG_DynaMoSimulationQueries::getUsedForces() const
 {
   // has to be implemented properly!
   return 0;

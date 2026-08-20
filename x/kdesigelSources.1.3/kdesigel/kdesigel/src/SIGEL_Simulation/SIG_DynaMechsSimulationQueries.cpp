@@ -399,9 +399,9 @@ int SIGEL_Simulation::SIG_DynaMechsSimulationQueries::getRootNumber() const
   return simulationData.robot.getRootLink()->getNumber();
 }
 
-vector<double*>* SIGEL_Simulation::SIG_DynaMechsSimulationQueries::getUsedForces() const {
+std::vector<double*>* SIGEL_Simulation::SIG_DynaMechsSimulationQueries::getUsedForces() const {
 
-	vector<double*>* forceList = simulationData.dynaMechsSystem.getForces();
+	std::vector<double*>* forceList = simulationData.dynaMechsSystem.getForces();
 
   return forceList;
 }

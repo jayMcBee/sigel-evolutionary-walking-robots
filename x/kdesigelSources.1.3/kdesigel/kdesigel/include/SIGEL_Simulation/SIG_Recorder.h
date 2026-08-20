@@ -24,7 +24,6 @@
 #define SIGEL_SIMULATION_SIG_RECORDER_H
 
 #ifdef _WINDOWS
-#pragma warning( disable : 4290 )
 #endif
 
 #include "SIGEL_Simulation/SIG_SimulationQueries.h"

@@ -24,7 +24,6 @@
 #define SIGEL_SIMULATION_SIG_DYNASYSTEM_H
 
 #ifdef _WINDOWS
-#pragma warning( disable : 4290 )
 #endif
 
 namespace SIGEL_Simulation { class SIG_DynaCallbacks; };

@@ -5,7 +5,7 @@
 xb/
 
 # throwaway header shims from the initial analysis
-shim/
+
 
 # vendored deps (Qt 2.3, dynamechs, SOLID, cv97, newmat09, qhull, fparser,
 # Dynamo, pvm3) — separate upstream tarball, out of scope for the Qt port.

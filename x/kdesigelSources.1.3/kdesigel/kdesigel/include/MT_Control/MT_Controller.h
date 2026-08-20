@@ -7,7 +7,6 @@ class MT_MainWindow;
 #include "MT_GPSystem/MT_GPManager.h"
 
 #include <qtimer.h>
-#include <qaction.h>
 #include <qstring.h>
 #include <qtextstream.h>
 #ifdef _WINDOWS
