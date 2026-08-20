@@ -958,7 +958,7 @@ void SIGEL_GP::SIG_GPManager::RegisterDynPVMClients( void ) {
       // be sure all clients have been removed from the pvmHost list !
       myInt = kSuicidalRequest;
 
-      for (i=0; i<clientSockets.count(); i++) {
+      for (int i=0; i<clientSockets.count(); i++) {
         send( clientSockets[i], &myInt, sizeof(myInt), 0);
 #ifdef _WINDOWS
         closesocket(clientSockets[i]);
@@ -1130,7 +1130,7 @@ void SIGEL_GP::SIG_GPManager::run(MT_Classifier *MetaClassifier)
 	double Fitt = 0.0;
 	double NumOfCorrectFit = 0.0;
 
-	for ( i=0; i<actExperiment.population.getSize(); i++)
+	for ( int i=0; i<actExperiment.population.getSize(); i++)
 	{
 		Fitt= actExperiment.population.getIndividualPointer(i)->getFitness();
 		if (Fitt >= 0.0)
@@ -1449,7 +1449,7 @@ int DebugInfo =0;
 
 	SIG_GPTournamentIndividual * PresentIndi =0;
 	SIG_GPTournament *PresentTour =0;
-	for(l=0; l<tours.size();l++)
+	for(int l=0; l<tours.size();l++)
 	{	
 		PresentTour = tours[l];
 		for(int k=0; k<PresentTour->indis.size(); k++)

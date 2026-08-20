@@ -44,8 +44,6 @@ namespace SIGEL_GP
 
 
   void SIG_GPFullDataRecorder::init()
-    throw (SIGEL_Simulation::SIG_RecorderNoQueriesSetException,
-	   SIGEL_Simulation::SIG_RecorderBadRecordingOrderException)
   {
 #ifdef _WINDOWS
     SIG_Recorder::init();
@@ -58,7 +56,6 @@ namespace SIGEL_GP
 
 
   void SIG_GPFullDataRecorder::record()
-    throw (SIGEL_Simulation::SIG_RecorderNoQueriesSetException, SIGEL_Simulation::SIG_RecorderBadRecordingOrderException)
   {
     int *curTD;
 
@@ -94,8 +91,6 @@ namespace SIGEL_GP
 
 
 void SIG_GPFullDataRecorder::finish()
-  throw (SIGEL_Simulation::SIG_RecorderNoQueriesSetException,
-	 SIGEL_Simulation::SIG_RecorderBadRecordingOrderException)
 {
 #ifdef _WINDOWS
   SIG_Recorder::finish();
