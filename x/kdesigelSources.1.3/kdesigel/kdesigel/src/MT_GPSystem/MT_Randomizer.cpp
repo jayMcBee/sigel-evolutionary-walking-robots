@@ -67,7 +67,7 @@ MT_Randomizer::MT_Randomizer(QTextStream &File)
 	for (int i=0; i<7; i++)
 		RandomXPoints[i]=0;
 
-	cerr << ">>> im Randomizer <<<" << Qt::endl;
+	cerr << ">>> im Randomizer <<<" << endl;
 	QString Randomizer( "Randomizer:" );
 	QString PresentLine = File.readLine();
 	cerr << PresentLine.toStdString() << endl;

@@ -462,7 +462,7 @@ namespace SIGEL_Environment {
 
   		FunctionParser fp;
   		if (fp.Parse(func,"xz") != -1) {
-  			SIGEL_Tools::SIG_IO::cerr << "Warning: the specified terrain function could not be parsed. It must depend on x and z, and contain only valid expressions -- see the documentation in supportingLibs/fparser.\n";
+  			SIGEL_Tools::SIG_IO::cerr << "Warning: the specified terrain function could not be parsed. It must depend on x and z, and contain only valid expressions -- see the documentation in supportingLibs/fparser." << Qt::endl;
   			return false;
   		}
   	
@@ -485,7 +485,7 @@ namespace SIGEL_Environment {
   		QString input = floorPictureFile;
   		std::ifstream pgm(input.toUtf8().constData());
   		if (!pgm) {
-  			SIGEL_Tools::SIG_IO::cerr << "Warning: the specified terrain file does not exist.\n";
+  			SIGEL_Tools::SIG_IO::cerr << "Warning: the specified terrain file does not exist." << Qt::endl;
   			return false;
   		}
   		
@@ -503,7 +503,7 @@ namespace SIGEL_Environment {
     				switch(counter) {
     					case 0: // Magic Key
     						if (s.compare("P2")!=0) {
-									SIGEL_Tools::SIG_IO::cerr << "Warning: the specified picture file is not in PGM format.\n";
+									SIGEL_Tools::SIG_IO::cerr << "Warning: the specified picture file is not in PGM format." << Qt::endl;
 									return false;
     						}
 								else ++counter;

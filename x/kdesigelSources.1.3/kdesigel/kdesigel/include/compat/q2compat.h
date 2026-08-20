@@ -19,23 +19,29 @@
 // Every semantic below was read out of the vendored Qt 2.3 sources under
 // x/supportingLibs/supportingLibs/qt/src/tools/ rather than recalled.
 //
-// DELIBERATE DIVERGENCES FROM Qt 2 -- all four are decisions, see PORTING.md §9:
+// DELIBERATE DIVERGENCES FROM Qt 2 -- all four are decisions, see PORTING.md section 9:
 //
 //  1. sort() is numeric, not memcmp byte order.  Qt 2's QGArray is a type-erased
 //     byte buffer whose sort cannot know it holds int (qgarray.cpp:635-640; the
 //     Qt source itself notes "Qt 3.0: Add a virtual compareItems()").  Q2Array<T>
 //     is typed, so std::sort with operator< removes the cause.  Affects
-//     SIG_GPManager.cpp:304,311, where a distinct-index algorithm requires
-//     ascending numeric order and silently breaks above population 256.
-//  2. Out-of-range indexing asserts instead of clamping to 0 with a warning
-//     (qgarray.h:108-117).  Qt 2's clamp silently hid two real defects; the
-//     call sites are being fixed rather than the behaviour preserved.
+//     SIG_GPManager.cpp:304,311 and SIG_AllIndividualsView.cpp:240, all of
+//     which need ascending numeric order and silently break above 256.
+//  2. Out-of-range indexing asserts instead of Qt 2's behaviour, which differs
+//     by container: QGArray::at warns and CLAMPS the index to 0
+//     (qgarray.h:108-117); QGVector::at warns and reads out of range anyway
+//     (qgvector.h:85-92). Both silently hid real defects; the call sites are
+//     being fixed instead. NOTE: Q_ASSERT compiles to nothing under QT_NO_DEBUG,
+//     so in a release build this is silent undefined behaviour, not an abort.
 //  3. resize() value-initialises new elements where Qt 2 left raw memory.
 //  4. Q2Array is copy-on-write; Qt 2's QArray is TRULY shared, with no COW at
 //     all (qgarray.cpp:134-138, 284-294).  In Qt 2, `b = a; b.at(0) = 9;` is
 //     visible through `a`, and data() hands out the shared buffer.  Under this
-//     shim each holder gets its own copy on first write.  Verified safe: all 14
-//     .data() sites read only, and no raw pointer is held across a copy.
+//     shim each holder gets its own copy on first write.  at()/operator[]/data()
+//     are declared const but call non-const QList members, so even a READ
+//     detaches where Qt 2 never did.  Verified safe today: of the 14 .data()
+//     sites at least eight write through the pointer, but each does so while the
+//     refcount is 1, and no raw pointer is held across a copy.
 
 #include <QByteArray>
 #include <QList>
@@ -84,7 +90,7 @@ public:
     T &at(uint i) const { return const_cast<Q2Array<T> *>(this)->m[qsizetype(i)]; }
     T &operator[](int i) const { return at(uint(i)); }
     T *data() const { return const_cast<Q2Array<T> *>(this)->m.data(); }
-    operator const T *() const { return m.constData(); }
+    operator const T *() const { return m.isEmpty() ? nullptr : m.constData(); }
 
     int find(const T &d, uint i = 0) const { return int(m.indexOf(d, qsizetype(i))); }
     int contains(const T &d) const { return int(m.count(d)); }
@@ -119,7 +125,7 @@ public:
     // autoDelete), copy, and leave the destination's flag untouched.
     Q2Dict &operator=(const Q2Dict &o)
     {
-        if (this != &o) { clear(); h = o.h; buckets = o.buckets; }
+        if (this != &o) { clear(); h = o.h; }   // Qt 2 leaves vlen untouched
         return *this;
     }
 
@@ -193,7 +199,7 @@ template <class T>
 class Q2DictIterator
 {
 public:
-    Q2DictIterator(const Q2Dict<T> &d) : i(0)
+    Q2DictIterator(const Q2Dict<T> &d) : dict(&d), i(0)
     {
         const typename Q2Dict<T>::HashType &h = d.constHash();
         snap.reserve(h.size());
@@ -202,8 +208,9 @@ public:
             snap.append(qMakePair(it.key(), it.value()));
     }
 
-    uint count() const { return uint(snap.size()); }
-    bool isEmpty() const { return snap.isEmpty(); }
+    // Qt 2 answers these from the live dict, not from the iteration position
+    uint count() const { return dict->count(); }
+    bool isEmpty() const { return dict->count() == 0; }
 
     T *current() const { return valid() ? snap.at(i).second : nullptr; }
     QString currentKey() const { return valid() ? snap.at(i).first : QString(); }
@@ -215,6 +222,7 @@ public:
 
 private:
     bool valid() const { return i >= 0 && i < snap.size(); }
+    const Q2Dict<T> *dict;
     QList<QPair<QString, T *> > snap;
     qsizetype i;
 };
@@ -412,8 +420,11 @@ public:
         return true;
     }
     bool remove() { return valid() ? remove(uint(cur)) : false; }
+    // qglist.cpp:504-509 -- a null argument does NOT search; it removes current.
     bool remove(const T *d)
     {
+        if (!d)
+            return remove();
         const qsizetype i = v.indexOf(const_cast<T *>(d));
         return i < 0 ? false : remove(uint(i));
     }
@@ -432,7 +443,11 @@ public:
     T *take() { return valid() ? take(uint(cur)) : nullptr; }
 
     void clear() { if (del) qDeleteAll(v); v.clear(); cur = -1; }
-    void sort() { std::sort(v.begin(), v.end()); }
+    // No sort(): Qt 2's QGList::sort uses compareItems, which for QList<T> is
+    // 'item1 != item2' and never returns negative (qglist.cpp:125-128), so it
+    // produces an arbitrary permutation. Sorting by pointer address would be a
+    // different arbitrary one. No SIGEL caller exists; add a real comparator if
+    // one ever does.
 
     const QList<T *> &constList() const { return v; }   // for Q2ListIterator
 
@@ -468,16 +483,18 @@ public:
 
     uint count() const { return uint(v->size()); }
     bool isEmpty() const { return v->isEmpty(); }
-    bool atFirst() const { return !v->isEmpty() && i == 0; }
+    bool atFirst() const { return v->isEmpty() || i == 0; }   // qglist.h:246-249
     bool atLast() const { return v->isEmpty() || i == v->size() - 1; }   // qglist.h:246-249
 
     T *current() const { return (i >= 0 && i < v->size()) ? v->at(i) : nullptr; }
     T *toFirst() { i = 0; return current(); }
     T *toLast() { i = v->size() - 1; return current(); }
 
-    T *operator++() { ++i; return current(); }
-    T *operator--() { --i; return current(); }
-    T *operator()() { T *p = current(); ++i; return p; }
+    // Once off either end the iterator stays dead, as in Qt 2: every mover
+    // there begins 'if (!curNode) return 0' (qglist.cpp:1166-1211).
+    T *operator++() { if (!current()) return nullptr; ++i; return current(); }
+    T *operator--() { if (!current()) return nullptr; --i; return current(); }
+    T *operator()() { T *p = current(); if (p) ++i; return p; }
 
 private:
     const QList<T *> *v;
@@ -499,8 +516,21 @@ public:
     bool autoDelete() const { return l.autoDelete(); }
 
     void enqueue(const T *d) { l.append(d); }
-    T *dequeue() { T *p = l.getFirst(); if (p) l.take(0u); return p; }
+
+    // Unlinks even when the head is null, as QGList::dequeue does
+    // (qglist.cpp:623-630). Returning early on a null head would make
+    // 'while (!isEmpty()) dequeue();' spin forever.
+    T *dequeue()
+    {
+        if (l.isEmpty())
+            return nullptr;
+        return l.take(0u);
+    }
+
+    bool remove() { return l.removeFirst(); }   // qqueue.h:60
     T *head() const { return l.getFirst(); }
+    T *current() const { return l.getFirst(); }
+    operator T *() const { return l.getFirst(); }
     void clear() { l.clear(); }
 
 private:
@@ -535,7 +565,19 @@ public:
     Q2CString(const QByteArray &b) : QByteArray(b) {}
     Q2CString(const char *s) : QByteArray(s) {}
 
-    operator const char *() const { return constData(); }
+    // Qt 2's QCString is a QArray<char> whose buffer INCLUDES the terminating
+    // NUL (qcstring.h:156,175), so size() and count() are length()+1 for a
+    // non-null string. These hide QByteArray's versions deliberately; that is
+    // only safe because SIGEL never handles one through a QByteArray reference.
+    uint size() const { return isNull() ? 0u : uint(QByteArray::size()) + 1u; }
+    uint count() const { return size(); }
+    bool resize(uint n) { QByteArray::resize(n ? qsizetype(n) - 1 : 0); return true; }
+
+    // Qt 2 returns the number of occurrences, not a bool.
+    uint contains(char c) const { return uint(QByteArray::count(c)); }
+
+    // qcstring.h:310 returns data(), which is null for a null string.
+    operator const char *() const { return isNull() ? nullptr : constData(); }
 };
 
 #endif // Q2COMPAT_H

@@ -463,7 +463,7 @@ authors in comments they shipped.
 
 | Where | 2003 behaviour | Now | Why |
 |---|---|---|---|
-| `Q2Array::sort()` | `memcmp` byte order (`qgarray.cpp:635-640`) | numeric | `SIG_GPManager.cpp:304,311` needs ascending numeric order for a distinct-index algorithm; above population 256 it silently emits duplicate tournament entrants. Cause is Qt 2's type erasure — its own source says *"Qt 3.0: Add a virtual compareItems()"* |
+| `Q2Array::sort()` | `memcmp` byte order (`qgarray.cpp:635-640`) | numeric | Three sites need ascending numeric order and break above 256: `SIG_GPManager.cpp:304,311` (distinct tournament indices) and `SIG_AllIndividualsView.cpp:240` (feeds `deleteIndividual(positions[n] - n)`). Cause is Qt 2's type erasure — its own source says *"Qt 3.0: Add a virtual compareItems()"* |
 | out-of-range array write | warn, clamp index to 0 (`qgarray.h:108-117`) | assert | The clamp silently hid the two sites below |
 | `SIG_ProgramLine.cpp:215-224` | writes `element[no]` in the branch entered *because* `no >= size()`; also compares `int` to `uint` | to be fixed | Its own comment is `// ToDo: Exception!` |
 | `SIG_DynaSystem.cpp:266-268` | deletes `dynaJoints[k]` while looping to `dynaDrives.size()` | to be fixed | The two vectors grow independently (`:605`, `:807`) |
