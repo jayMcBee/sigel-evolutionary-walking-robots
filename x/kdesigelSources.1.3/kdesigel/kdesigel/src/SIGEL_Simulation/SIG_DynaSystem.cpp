@@ -21,9 +21,9 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-#ifdef _WINDOWS
-#pragma warning( disable : 4290 )
 #include "compat/q2compat.h"
+
+#ifdef _WINDOWS
 #include <float.h>
 #endif
 
