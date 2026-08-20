@@ -149,8 +149,7 @@ namespace SIGEL_Simulation
    * @returns
    * a reference to the link
    */
-  SIG_DynaLink& getLink(int number)
-    throw(SIG_DynaSystemWrongNumberException);
+  SIG_DynaLink& getLink(int number);
 
   /** Gets a joint to examine its data
    *
@@ -159,8 +158,7 @@ namespace SIGEL_Simulation
    * @returns
    * a reference to the joint
    */
-  SIG_DynaJoint& getJoint(int number)
-    throw(SIG_DynaSystemWrongNumberException);
+  SIG_DynaJoint& getJoint(int number);
 
   /** Gets a drive to examine its data
    *
@@ -169,8 +167,7 @@ namespace SIGEL_Simulation
    * @returns
    * a reference to the drive
    */
-  SIG_DynaDrive& getDrive(int number)
-    throw(SIG_DynaSystemWrongNumberException);
+  SIG_DynaDrive& getDrive(int number);
 
   /** Gets a sensor to examine its data
    *
@@ -179,8 +176,7 @@ namespace SIGEL_Simulation
    * @returns
    * a reference to the sensor
    */
-  SIG_DynaSensor& getSensor(int number)
-    throw(SIG_DynaSystemWrongNumberException);
+  SIG_DynaSensor& getSensor(int number);
 
   /** here the dynasystem remembers the number of the root link in the static robot modell */
   int rootLinkNo;

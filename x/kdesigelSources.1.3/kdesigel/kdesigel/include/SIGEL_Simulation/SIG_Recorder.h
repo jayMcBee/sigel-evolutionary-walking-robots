@@ -78,9 +78,7 @@ class SIG_Recorder {
    * @post The bool initialized is set to true.
    * @post The bool finished is (still) false.
    */
-  virtual void init()
-    throw(SIG_RecorderNoQueriesSetException,
-          SIG_RecorderBadRecordingOrderException);
+  virtual void init();
 
   /**
    * Will be called in each timeframe by the simulator.
@@ -105,9 +103,7 @@ class SIG_Recorder {
    *      been executed).
    * @pre finished has to be false (meaning that finished hasn't executed yet).
    */
-  virtual void record()
-    throw(SIG_RecorderNoQueriesSetException,
-          SIG_RecorderBadRecordingOrderException);
+  virtual void record();
 
   /**
    * Is called after all the data-recording is done (for example
@@ -129,9 +125,7 @@ class SIG_Recorder {
    * @pre finished has to be false (meaning that this is the first time
    *      finishe is called).
    */
-  virtual void finish()
-    throw(SIG_RecorderNoQueriesSetException,
-	  SIG_RecorderBadRecordingOrderException);
+  virtual void finish();
 
   /**
    * This sets the simulationQueries pointer.
