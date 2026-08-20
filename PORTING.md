@@ -349,17 +349,50 @@ Phases A and B can be verified without it.
 
 Not decisions that were dodged — items measured and consciously left.
 
-### Phase B ownership audit (D11)
+### Phase B ownership audit (D11) — CRITERION REWRITTEN
 
-The check that substitutes for being unable to run the code. After B4:
+The earlier version of this section said: *"each of the 38 `setAutoDelete(TRUE)`
+containers has exactly one `qDeleteAll()` on the owning path"*. **That criterion
+is unsatisfiable, and the numbers behind it were misread.**
 
-- each of the **38** `setAutoDelete(TRUE)` containers has **exactly one**
-  `qDeleteAll()` on the owning path
-- none of the **9** `setAutoDelete(FALSE)` containers has one
-- no `qDeleteAll()` exists that does not trace to a `TRUE` site
+What is actually there, verified with Python over the tree as it stands:
 
-Grep-checkable against `v1.3-pristine`. It verifies the *transformation*, not
-the behaviour — that distinction is the accepted limit of D11(a).
+| | |
+|---|---|
+| `setAutoDelete` calls | 47 — 38 `TRUE`, 9 `FALSE`, as stated |
+| …but in **deferred GUI modules** | **16**, which Phase B cannot touch |
+| distinct owning containers in scope | **22** (21 live) — 38 was a *call* count |
+| of those, with exactly one free site | **6** |
+| pointer containers carrying ownership with **no flag at all** | **21** — D7 says nothing about these |
+
+So "exactly one `qDeleteAll`" describes 6 of 22 containers. The rest free their
+items somewhere else, or nowhere.
+
+**Three things that will cause a double free or a leak**, all verified:
+
+1. **The free is hidden inside a container operation.** Eight `Q2PtrVector`
+   sites where `insert()` or a shrinking `resize()` *is* the only delete, and
+   the word `delete` appears nowhere. `SIG_GPPopulation.cpp:168` —
+   `pool.insert(poolpos,&indi)` frees the losing individual, reached from 12 call
+   sites — plus `:275,:278,:346,:417` and `SIG_GPFitnessTrainer.cpp:190,351,374`.
+   Remove the shim and the free silently disappears with it.
+2. **Twelve owning containers have no free path at all** — freed today only by
+   `~Q2PtrList`/`~Q2PtrVector`. `~SIG_GPFitnessTrainer` deletes none of the five
+   it owns; `SIG_GPFullDataRecorder` and `SIG_DynaMechsSimulationData` have no
+   destructor whatsoever.
+3. **`SIG_Robot::clear()`** deletes the contents of six dictionaries by hand and
+   then calls `clear()` on them twelve lines later. That is safe only because
+   those dicts carry no flag. Give `clear()` teeth during B2 and it becomes six
+   double frees.
+
+**Revised exit criterion for each Phase B step:** the shim self-check must build
+and run clean under ASan and UBSan, `check.sh` now does that rather than merely
+syntax-checking it, and each converted container gets an assertion covering the
+free path it actually uses. Verified to have teeth: removing `~Q2PtrList`'s
+`qDeleteAll` makes the check abort.
+
+The old grep-the-counts audit stays as a secondary check, but it is not
+sufficient and was never going to be.
 
 ### `QTextStream` default codec
 
@@ -379,9 +412,19 @@ src/SIGEL_MasterGUI/SIG_GPParameter.cpp:467
     setAutoDelete is NOT true
 ```
 
-In `SIGEL_MasterGUI`, so outside authorized scope — but proof the pattern
-exists. Phase B should watch for `take()`/`clear()` handoffs on containers whose
-flag stays `TRUE`; those call sites get read during B4 anyway.
+**That 2003 comment is false, and so was the conclusion drawn from it here.**
+`SIGEL_GP/SIG_GPParameter.cpp:53` does `hostList.setAutoDelete( true )`. The
+code at `:506` calls `hostList2.remove( … )`, and on an owning list `remove()`
+*is* the delete — nothing is freed twice and nothing is leaked. The comment
+describes an arrangement that is not there.
+
+Recorded because it is a trap, not because it is a defect: anyone who read that
+comment, or the earlier version of this note, and added a manual `delete` would
+have created a double free. Phase B must check `setAutoDelete` in the source,
+never a comment about it.
+
+The real version of this concern is different and larger — see the Phase B
+inventory below.
 
 ### Toggling containers (Phase C)
 
