@@ -23,8 +23,8 @@
 #ifndef SIGEL_SIMULATION_SIG_SIMULATIONQUERIES_H
 #define SIGEL_SIMULATION_SIG_SIMULATIONQUERIES_H
 
+#include "compat/q2compat.h"
 #include "SIGEL_Simulation/SIG_Register.h"
-#include <qvector.h>
 #include <pointvector.h>
 #include <matrix.h>
 #include <qdatetime.h>
@@ -64,7 +64,7 @@ class SIG_SimulationQueries {
   SIG_SimulationQueries();
 
   /** Interprets the SENSE command and writes the results into the registers */
-  virtual void sense(int sensorNo,QVector<SIG_Register> & registers) const = 0;
+  virtual void sense(int sensorNo,Q2PtrVector<SIG_Register> & registers) const = 0;
 
   /** gets the actual simulation time which is calculated frame*stepsize
    * @pre

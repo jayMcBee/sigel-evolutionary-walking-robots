@@ -20,6 +20,7 @@
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
+#include "compat/q2compat.h"
 #include "SIGEL_Simulation/SIG_DynaMoCommandInterface.h"
 #include "SIGEL_Tools/SIG_IO.h"
 #include "pointvector.h"
@@ -31,7 +32,7 @@ SIGEL_Simulation::SIG_DynaMoCommandInterface::SIG_DynaMoCommandInterface(SIG_Dyn
 
 void SIGEL_Simulation::SIG_DynaMoCommandInterface::moveDrive
 (int driveNo,
- QVector<SIG_Register> const& registers)
+ Q2PtrVector<SIG_Register> const& registers)
 {
 #ifdef SIG_DEBUG
   simulationData.gptestvalue=registers[0]->getValue();

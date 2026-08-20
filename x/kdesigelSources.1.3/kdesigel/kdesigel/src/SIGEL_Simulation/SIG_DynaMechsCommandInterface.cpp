@@ -20,6 +20,7 @@
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
+#include "compat/q2compat.h"
 #include "SIGEL_Simulation/SIG_DynaMechsCommandInterface.h"
 #include "SIGEL_Tools/SIG_IO.h"
 #include "SIGEL_Robot/SIG_Joint.h"
@@ -36,7 +37,7 @@ SIGEL_Simulation::SIG_DynaMechsCommandInterface::SIG_DynaMechsCommandInterface(S
 { };
 
 void SIGEL_Simulation::SIG_DynaMechsCommandInterface::moveDrive(int driveNo,
-								QVector<SIG_Register> const& registers)
+								Q2PtrVector<SIG_Register> const& registers)
 {
 #ifdef SIG_DEBUG
   SIGEL_Tools::SIG_IO::cerr << "entering method moveDrive\n";

@@ -20,6 +20,7 @@
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
+#include "compat/q2compat.h"
 #include "SIGEL_Simulation/SIG_DynaMechsSimulationData.h"
 
 #include "SIGEL_Robot/SIG_Drive.h"
@@ -94,7 +95,7 @@ SIGEL_Simulation::SIG_DynaMechsSimulationData::SIG_DynaMechsSimulationData( SIGE
 
   initializeArticulation();
 
-  QDictIterator< SIGEL_Robot::SIG_Drive > driveIt = robot.getDriveIter();
+  Q2DictIterator< SIGEL_Robot::SIG_Drive > driveIt = robot.getDriveIter();
 
   driveIt.toFirst();
 
@@ -135,7 +136,7 @@ SIGEL_Simulation::SIG_DynaMechsSimulationData::SIG_DynaMechsSimulationData( SIGE
       ++driveIt;
     };
 
-  QDictIterator< SIGEL_Robot::SIG_Sensor > sensorIt = robot.getSensorIter();
+  Q2DictIterator< SIGEL_Robot::SIG_Sensor > sensorIt = robot.getSensorIter();
 
   sensorIt.toFirst();
 
@@ -276,7 +277,7 @@ void SIGEL_Simulation::SIG_DynaMechsSimulationData::initializeEnvironment()
 
   QString terrainDataFileName = sigelRootString + "/Terrain.ter";
 
-  QCString terrainDataFileNameQCString = terrainDataFileName.utf8();
+  Q2CString terrainDataFileNameQCString = terrainDataFileName.toUtf8();
   char const *terrainDataFileNameCString = terrainDataFileNameQCString;
 
   dynaMechsEnvironment.loadTerrainData( terrainDataFileNameCString );
@@ -338,7 +339,7 @@ void SIGEL_Simulation::SIG_DynaMechsSimulationData::initializeArticulation()
 
   dynaMechsSystem.addLink( internalRootLink, 0 );
 
-  QList< SIGEL_Robot::SIG_Joint > rootJoints = rootLink->getJoints();
+  Q2PtrList< SIGEL_Robot::SIG_Joint > rootJoints = rootLink->getJoints();
 
   SIGEL_Robot::SIG_Joint *actJoint = rootJoints.first();
 
@@ -474,7 +475,7 @@ SIGEL_Simulation::SIG_DynaMechsLink *SIGEL_Simulation::SIG_DynaMechsSimulationDa
   else
     dynaMechsSystem.addLink( internalDynaMechsLink, internalPredecessor );
 
-  QList< SIGEL_Robot::SIG_Joint > joints = link->getJoints();
+  Q2PtrList< SIGEL_Robot::SIG_Joint > joints = link->getJoints();
 
   SIGEL_Robot::SIG_Joint *actJoint = joints.first();
 

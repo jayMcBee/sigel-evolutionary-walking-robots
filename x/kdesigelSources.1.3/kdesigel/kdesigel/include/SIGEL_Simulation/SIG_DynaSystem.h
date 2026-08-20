@@ -29,11 +29,11 @@
 
 namespace SIGEL_Simulation { class SIG_DynaCallbacks; };
 
+#include "compat/q2compat.h"
 #include "rungekutta4.h"
 #include "constraint.h"
 #include "constraint_manager.h"
 #include <SOLID/solid.h>
-#include <qvector.h>
 #include <qstring.h>
 #include <qobject.h>
 #include "SIGEL_Simulation/SIG_DynaCallbacks.h"
@@ -191,16 +191,16 @@ namespace SIGEL_Simulation
   DtShapeRef floor;
 
   /** storage for the SIG_DynaLinks */
-  QVector<SIG_DynaLink> dynaLinks;
+  Q2PtrVector<SIG_DynaLink> dynaLinks;
 
   /** storage for the SIG_DynaJoints */
-  QVector<SIG_DynaJoint> dynaJoints;
+  Q2PtrVector<SIG_DynaJoint> dynaJoints;
 
   /** storage for the SIG_DynaSensors */
-  QVector<SIG_DynaSensor> dynaSensors;
+  Q2PtrVector<SIG_DynaSensor> dynaSensors;
 
   /** storage for the SIG_DynaDrives */
-  QVector<SIG_DynaDrive> dynaDrives;
+  Q2PtrVector<SIG_DynaDrive> dynaDrives;
 
   /** The Collision callback of SOLID
    *

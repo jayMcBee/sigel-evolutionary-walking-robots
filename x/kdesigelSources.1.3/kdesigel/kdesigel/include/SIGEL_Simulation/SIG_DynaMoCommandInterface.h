@@ -23,7 +23,7 @@
 #ifndef SIGEL_SIMULATOR_SIG_DYNAMOCOMMANDINTERFACE_H
 #define SIGEL_SIMULATOR_SIG_DYNAMOCOMMANDINTERFACE_H
 
-#include <qvector.h>
+#include "compat/q2compat.h"
 #include "SIGEL_Simulation/SIG_DynaMoSimulationData.h"
 #include "SIGEL_Simulation/SIG_Register.h"
 #include "SIGEL_Simulation/SIG_CommandInterface.h"
@@ -70,7 +70,7 @@ namespace SIGEL_Simulation
    *  first (n) registers.
    */
   void moveDrive(int driveNo,
-                 QVector<SIG_Register> const& registers);
+                 Q2PtrVector<SIG_Register> const& registers);
 
 };
 

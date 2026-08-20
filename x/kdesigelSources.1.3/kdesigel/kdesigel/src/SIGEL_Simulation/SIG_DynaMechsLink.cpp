@@ -20,6 +20,7 @@
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
+#include "compat/q2compat.h"
 #include "SIGEL_Simulation/SIG_DynaMechsLink.h"
 
 #include "SIGEL_Tools/SIG_TypeConverter.h"
@@ -102,7 +103,7 @@ namespace SIGEL_Simulation
 
     dmContactModel *contactModel = new dmContactModel();
 
-    QVector< DL_vector > vertices = geometry->getVertices();
+    Q2PtrVector< DL_vector > vertices = geometry->getVertices();
 
     int noOfContactPoints = vertices.size();
 
@@ -133,9 +134,9 @@ namespace SIGEL_Simulation
   {
     if (!caller)
       {
-	QArray< double > q( 7 );
+	Q2Array< double > q( 7 );
 
-	QArray< double > qd( 6 );
+	Q2Array< double > qd( 6 );
 
 	dynaMechsLink->getState( q.data(), qd.data() );
 

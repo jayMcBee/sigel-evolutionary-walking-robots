@@ -23,6 +23,7 @@
 
 #ifdef _WINDOWS
 #pragma warning( disable : 4290 )
+#include "compat/q2compat.h"
 #include <float.h>
 #endif
 
@@ -506,7 +507,7 @@ void SIGEL_Simulation::SIG_DynaSystem::doCollisionDetection()
 void SIGEL_Simulation::SIG_DynaSystem::newLink(SIGEL_Robot::SIG_Link& theLink)
 {
  SIGEL_Tools::SIG_IO::cerr << "Link " << theLink.getNumber() << " : " << theLink.getName() << "\n";
- QDictIterator<DL_vector> pts=theLink.getPointIter();
+ Q2DictIterator<DL_vector> pts=theLink.getPointIter();
  int n=theLink.getNrOfPoints();
  while (pts.current()) {
   DL_vector p=(pts.current());

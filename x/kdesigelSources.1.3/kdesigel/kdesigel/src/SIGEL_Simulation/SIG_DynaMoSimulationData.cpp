@@ -20,6 +20,7 @@
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
+#include "compat/q2compat.h"
 #include "SIGEL_Simulation/SIG_DynaMoSimulationData.h"
 
 SIGEL_Simulation::SIG_DynaMoSimulationData::SIG_DynaMoSimulationData( SIGEL_Robot::SIG_Robot const& robot,
@@ -29,25 +30,25 @@ SIGEL_Simulation::SIG_DynaMoSimulationData::SIG_DynaMoSimulationData( SIGEL_Robo
     dynaSystem( environment, simulationParameter)
 {
   dynaSystem.floorMaterial=robot.lookupMaterial(environment.getFloorMaterialName());
-  QDictIterator<SIGEL_Robot::SIG_Link> linkIt=robot.getLinkIter();
+  Q2DictIterator<SIGEL_Robot::SIG_Link> linkIt=robot.getLinkIter();
   while (linkIt.current()) 
   {
     dynaSystem.newLink( (*linkIt.current()) );    
     ++linkIt;
   };
-  QDictIterator<SIGEL_Robot::SIG_Joint> jointIt=robot.getJointIter();
+  Q2DictIterator<SIGEL_Robot::SIG_Joint> jointIt=robot.getJointIter();
   while (jointIt.current()) 
   {
     dynaSystem.newJoint( (*jointIt.current()) );    
     ++jointIt;
   };
-  QDictIterator<SIGEL_Robot::SIG_Sensor> sensorIt=robot.getSensorIter();
+  Q2DictIterator<SIGEL_Robot::SIG_Sensor> sensorIt=robot.getSensorIter();
   while (sensorIt.current()) 
   {
     dynaSystem.newSensor( (*sensorIt.current()) );    
     ++sensorIt;
   };
-  QDictIterator<SIGEL_Robot::SIG_Drive> driveIt=robot.getDriveIter();
+  Q2DictIterator<SIGEL_Robot::SIG_Drive> driveIt=robot.getDriveIter();
   while (driveIt.current()) 
   {
     dynaSystem.newDrive( (*driveIt.current()) );    

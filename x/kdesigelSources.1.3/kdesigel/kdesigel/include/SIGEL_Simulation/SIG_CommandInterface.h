@@ -23,7 +23,7 @@
 #ifndef SIGEL_SIMULATOR_SIG_COMMANDINTERFACE_H
 #define SIGEL_SIMULATOR_SIG_COMMANDINTERFACE_H
 
-#include <qvector.h>
+#include "compat/q2compat.h"
 #include "SIGEL_Simulation/SIG_Register.h"
 
 namespace SIGEL_Simulation
@@ -63,7 +63,7 @@ class SIG_CommandInterface {
    *  first (n) registers.
    */
   virtual void moveDrive(int driveNo,
-			 QVector<SIG_Register> const& registers) = 0;
+			 Q2PtrVector<SIG_Register> const& registers) = 0;
 
 };
 
