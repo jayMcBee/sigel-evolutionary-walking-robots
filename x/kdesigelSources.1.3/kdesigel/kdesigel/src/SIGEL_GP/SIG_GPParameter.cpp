@@ -20,6 +20,7 @@
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
+#include "compat/q2compat.h"
 #include "SIGEL_GP/SIG_GPParameter.h"
 
 
@@ -727,12 +728,12 @@ void SIGEL_GP::SIG_GPParameter::writeToFile(QTextStream & file)
 };
 
 
-QList< SIGEL_GP::SIG_GPPVMHost > const &SIGEL_GP::SIG_GPParameter::getHostList() const
+Q2PtrList< SIGEL_GP::SIG_GPPVMHost > const &SIGEL_GP::SIG_GPParameter::getHostList() const
 {
   return hostList;
 };
 
-QList< SIGEL_GP::SIG_GPPVMHost > &SIGEL_GP::SIG_GPParameter::getHostList()
+Q2PtrList< SIGEL_GP::SIG_GPPVMHost > &SIGEL_GP::SIG_GPParameter::getHostList()
 {
   return hostList;
 };
@@ -891,7 +892,7 @@ int  SIGEL_GP::SIG_GPParameter::getProbability( SIGEL_Program::Robotinstruction 
 
 }
 
-QArray< int >& SIGEL_GP::SIG_GPParameter::getInstructionProbabilities()
+Q2Array< int >& SIGEL_GP::SIG_GPParameter::getInstructionProbabilities()
 {
   return instructionProb;
 }

@@ -20,13 +20,13 @@
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
+#include "compat/q2compat.h"
 #include <pvm3.h>
 #include "SIGEL_GP/SIG_GPFitnessTrainer.h"
 #include "SIGEL_Program/SIG_Program.h"
 #include "SIGEL_Tools/SIG_Randomizer.h"
 
 #include "SIGEL_Tools/SIG_IO.h"
-#include "qmessagebox.h"
 
 SIGEL_GP::SIG_GPFitnessTrainer::SIG_GPFitnessTrainer(SIGEL_GP::SIG_GPExperiment& exp)
   :exp(exp),
@@ -93,7 +93,7 @@ SIGEL_GP::SIG_GPFitnessTrainer::SIG_GPFitnessTrainer(SIGEL_GP::SIG_GPExperiment&
     if (actHost->enabled) {
       pvmHosts.insert( hostCounter, new SIG_GPActivePVMHost( *actHost ) );
 
-      QCString actHostNameQCString = actHost->name.utf8();
+      Q2CString actHostNameQCString = actHost->name.toUtf8();
 
       char const *actHostNameCString = actHostNameQCString;
 
@@ -102,7 +102,7 @@ SIGEL_GP::SIG_GPFitnessTrainer::SIG_GPFitnessTrainer(SIGEL_GP::SIG_GPExperiment&
 #ifdef _WINDOWS
 	  int info = pvm_addhosts( const_cast< char** >(&actHostNameCString), 1, &singleInfo );
 #else
-	  int info = pvm_addhosts( &const_cast< char* >(actHostNameCString), 1, &singleInfo );
+	  int info = pvm_addhosts( const_cast< char** >(&actHostNameCString), 1, &singleInfo );
 #endif
 
       hostCounter++;
@@ -116,7 +116,7 @@ SIGEL_GP::SIG_GPFitnessTrainer::~SIG_GPFitnessTrainer() {
   for (unsigned int i=0; i<pvmHosts.size(); i++) {
       SIG_GPActivePVMHost *actHost = pvmHosts[i];
 
-      QCString actHostNameQCString = actHost->name.utf8();
+      Q2CString actHostNameQCString = actHost->name.toUtf8();
 
       char const *actHostNameCString = actHostNameQCString;
 
@@ -125,7 +125,7 @@ SIGEL_GP::SIG_GPFitnessTrainer::~SIG_GPFitnessTrainer() {
 #ifdef _WINDOWS
       int info = pvm_delhosts( const_cast< char** >(&actHostNameCString), 1, &singleInfo );
 #else
-      int info = pvm_delhosts( &const_cast< char* >(actHostNameCString), 1, &singleInfo );
+      int info = pvm_delhosts( const_cast< char** >(&actHostNameCString), 1, &singleInfo );
 #endif
     };
 };
@@ -177,7 +177,7 @@ void SIGEL_GP::SIG_GPFitnessTrainer::flushAllDynHosts( void ) {
 
         if (dHostQstr == pHost->name) {
           res = true;
-          sprintf(cStrName, (const char *)pHost->name);
+          sprintf(cStrName, pHost->name.toUtf8().constData());
         }
       }
 
@@ -234,7 +234,7 @@ int SIGEL_GP::SIG_GPFitnessTrainer::spawnTask(SIGEL_GP::SIG_GPIndividual const& 
   if (hostNumber != -1) {
       SIG_GPActivePVMHost *usedHost = pvmHosts[ hostNumber ];
 
-      QCString hostNameQCString = usedHost->name.utf8();
+      Q2CString hostNameQCString = usedHost->name.toUtf8();
       char const *hostNameCString = hostNameQCString;
 
       QString executableName;
@@ -252,7 +252,7 @@ int SIGEL_GP::SIG_GPFitnessTrainer::spawnTask(SIGEL_GP::SIG_GPIndividual const& 
 #else
 		executableName = usedHost->executableDir.path() + "/sigel_slave";
 #endif		
-      QCString executableNameQCString = executableName.utf8();
+      Q2CString executableNameQCString = executableName.toUtf8();
 
       char const *executableNameCString = executableNameQCString;
 
@@ -278,7 +278,7 @@ int SIGEL_GP::SIG_GPFitnessTrainer::spawnTask(SIGEL_GP::SIG_GPIndividual const& 
         usedHost->noOfSlaves++;
 
         QString senderStr;
-        QTextStream qts( &senderStr, IO_ReadWrite );
+        QTextStream qts( &senderStr, QIODeviceBase::ReadWrite );
         SIGEL_Program::SIG_Program const &program = ind.getProgram();
         PVMData.setActGeneration(exp.population.getPoolGeneration());
         PVMData.setResetEveryGeneration(exp.gpParameter.getResetEveryGeneration());
@@ -291,36 +291,36 @@ int SIGEL_GP::SIG_GPFitnessTrainer::spawnTask(SIGEL_GP::SIG_GPIndividual const& 
 
         switch(taskId) {
           case PvmBadParam :
-            errorText = errorText.sprintf("Invalid parameter in call to pvm_spawn.");
+            errorText = errorText = QString::asprintf("Invalid parameter in call to pvm_spawn.");
              break;
           case PvmNoHost :
-            errorText = errorText.sprintf("Host %s is not in the virtual machine.", hostNameCString);
+            errorText = errorText = QString::asprintf("Host %s is not in the virtual machine.", hostNameCString);
             break;
           case PvmNoFile :
-            errorText = errorText.sprintf("Executable %s is not found on host %s.",executableNameCString,hostNameCString);
+            errorText = errorText = QString::asprintf("Executable %s is not found on host %s.",executableNameCString,hostNameCString);
             break;
           case PvmNoMem :
-            errorText = errorText.sprintf("Malloc failed. Not enough memory on host %s.",hostNameCString);
+            errorText = errorText = QString::asprintf("Malloc failed. Not enough memory on host %s.",hostNameCString);
             break;
           case PvmSysErr :
-            errorText = errorText.sprintf("pvmd is not responding.");
+            errorText = errorText = QString::asprintf("pvmd is not responding.");
             break;
           case PvmOutOfRes :
-            errorText = errorText.sprintf("Out of resources on host %s.",hostNameCString);
+            errorText = errorText = QString::asprintf("Out of resources on host %s.",hostNameCString);
             break;
           default:
-            errorText = errorText.sprintf("Unknown error occurred.");
+            errorText = errorText = QString::asprintf("Unknown error occurred.");
         };
-        //errorText = errorText.sprintf("pvm_spawn() failed on %s (%d/%d) %s.",hostNameQCString,spawnInfo,taskId,errorText);
+        //errorText = errorText = QString::asprintf("pvm_spawn() failed on %s (%d/%d) %s.",hostNameQCString,spawnInfo,taskId,errorText);
         //QMessageBox warn("Error", errorText ,QMessageBox::Warning, QMessageBox::Retry, QMessageBox::NoButton,QMessageBox::NoButton);
         //warn.exec();
-        SIGEL_Tools::SIG_IO::cerr << "pvm_spawn() failed on \"" << hostNameQCString << "\"   (" << spawnInfo << "/" << taskId << ") - " << errorText.utf8() << "\n";
+        SIGEL_Tools::SIG_IO::cerr << "pvm_spawn() failed on \"" << hostNameQCString << "\"   (" << spawnInfo << "/" << taskId << ") - " << errorText.toUtf8() << "\n";
       }
 
   };
 
   if (!success) {
-      QArray<int> *toSpawn = new QArray<int>(2);
+      Q2Array<int> *toSpawn = new Q2Array<int>(2);
       (*toSpawn)[0] = actId;
       (*toSpawn)[1] = ind.getPoolPos();
       toSpawnList.append( toSpawn );
@@ -365,7 +365,7 @@ double SIGEL_GP::SIG_GPFitnessTrainer::checkTask(int taskId)
 
 		  		pvm_kill( pvmTask->pvmTaskId );
 		  		pvmTask->host.noOfSlaves--;
-		  		QArray<int> *toSpawn = new QArray<int>(2);
+		  		Q2Array<int> *toSpawn = new Q2Array<int>(2);
 		  		(*toSpawn)[0] = taskId;
 		  		(*toSpawn)[1] = pvmTask->indPosition;
 
@@ -405,8 +405,8 @@ void SIGEL_GP::SIG_GPFitnessTrainer::stopTrainersSlaves()
 
 void SIGEL_GP::SIG_GPFitnessTrainer::sweepToSpawn()
 {
-  QArray< int > *actJob = toSpawnList.first();
-  QArray< int > *prevJob = 0;
+  Q2Array< int > *actJob = toSpawnList.first();
+  Q2Array< int > *prevJob = 0;
 
 #ifdef SIG_DEBUG
   SIGEL_Tools::SIG_IO::cerr << "Sweeping to spawn!\n";
@@ -426,7 +426,7 @@ void SIGEL_GP::SIG_GPFitnessTrainer::sweepToSpawn()
 	{
 	  SIG_GPActivePVMHost *usedHost = pvmHosts[ hostNumber ];
 
-	  QCString usedHostNameQCString = usedHost->name.utf8();
+	  Q2CString usedHostNameQCString = usedHost->name.toUtf8();
 	  char const *usedHostNameCString = usedHostNameQCString;
 
 	  QString executableName;
@@ -439,7 +439,7 @@ void SIGEL_GP::SIG_GPFitnessTrainer::sweepToSpawn()
 #else
 	  executableName = usedHost->executableDir.path() + "/sigel_slave";
 #endif	
-	  QCString executableNameQCString = executableName.utf8();
+	  Q2CString executableNameQCString = executableName.toUtf8();
 
 	  char const *executableNameCString = executableNameQCString;
 
@@ -471,7 +471,7 @@ void SIGEL_GP::SIG_GPFitnessTrainer::sweepToSpawn()
 	      usedHost->noOfSlaves++;
 
 	      QString senderStr;
-	      QTextStream qts( &senderStr, IO_ReadWrite );
+	      QTextStream qts( &senderStr, QIODeviceBase::ReadWrite );
 	      SIGEL_Program::SIG_Program const &program = ind.getProgram();
          PVMData.setActGeneration(exp.population.getPoolGeneration());
          PVMData.setResetEveryGeneration(exp.gpParameter.getResetEveryGeneration());
@@ -524,7 +524,7 @@ int SIGEL_GP::SIG_GPFitnessTrainer::getNextHost() {
     pvmHosts.resize( pvmHosts.size() + 1 );
     pvmHosts.insert( pvmHosts.size()-1, new SIG_GPActivePVMHost(*freshHost) );
 
-    sprintf(cStrName, "%s", (const char *)freshHost->name);
+    sprintf(cStrName, "%s", freshHost->name.toUtf8().constData());
 
     int singleInfo = 0;
     int info = pvm_addhosts(&cStrName , 1, &singleInfo );

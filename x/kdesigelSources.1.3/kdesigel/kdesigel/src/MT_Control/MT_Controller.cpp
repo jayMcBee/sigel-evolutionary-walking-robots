@@ -765,10 +765,10 @@ void MT_Controller::saveCache(QTextStream &File)
 		File << ("Evaluator:\n");
 		break;
 	}
-	File << substCache.strategy <<endl;
-	File << substCache.tolerance <<endl;
-	File << substCache.refreshInt <<endl;
-	File << substCache.genNumber <<endl;
+	File << substCache.strategy <<Qt::endl;
+	File << substCache.tolerance <<Qt::endl;
+	File << substCache.refreshInt <<Qt::endl;
+	File << substCache.genNumber <<Qt::endl;
 	if(substCache.genNumber != 0){
 		for(int i=0; i< substCache.genNumber; i++){
 			File << correctEst[i] << "\n";

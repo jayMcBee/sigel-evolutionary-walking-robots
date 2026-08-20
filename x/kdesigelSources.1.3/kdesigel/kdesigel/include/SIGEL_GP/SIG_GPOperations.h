@@ -23,12 +23,12 @@
 #ifndef SIGEL_GP_SIG_GPOPERATIONS_H
 #define SIGEL_GP_SIG_GPOPERATIONS_H
 
+#include "compat/q2compat.h"
 #include "SIGEL_Tools/SIG_Randomizer.h"
 #include "SIGEL_GP/SIG_GPIndividual.h"
 #include "SIGEL_GP/SIG_GPParameter.h"
 #include "SIGEL_Robot/SIG_LanguageParameters.h"
 #include <qstring.h>
-#include <qvector.h>
 
 
 namespace SIGEL_GP
@@ -70,7 +70,7 @@ class SIG_GPOperations
 * The offspring is returned as complete individuals in a Qvector.
 */
  public:
-  static QVector<SIGEL_GP::SIG_GPIndividual> crossOver( SIGEL_GP::SIG_GPIndividual& winner1,
+  static Q2PtrVector<SIGEL_GP::SIG_GPIndividual> crossOver( SIGEL_GP::SIG_GPIndividual& winner1,
 							int poolPos1,
 							SIG_GPIndividual& winner2,
 							int poolPos2,

@@ -23,6 +23,7 @@
 #ifndef SIGEL_GP_SIG_GPPOPULATION_H
 #define SIGEL_GP_SIG_GPPOPULATION_H
 
+#include "compat/q2compat.h"
 #include "SIGEL_GP/SIG_GPIndividual.h"
 #include "SIGEL_Tools/SIG_Randomizer.h"
 #include"../SIGEL_GP/SIG_GPParameter.h"
@@ -30,9 +31,7 @@
 
 
 #include <qstring.h>
-#include <qvector.h>
 #include <qtextstream.h>
-#include <qprogressdialog.h>
 
 namespace SIGEL_GP
 {
@@ -53,7 +52,7 @@ class SIG_GPPopulation
      * holds the individual objects, which contains the robot control program.
      */
   private:
-    QVector<SIG_GPIndividual> pool;
+    Q2PtrVector<SIG_GPIndividual> pool;
 
     /**
      * The is a refernce of the SIG_Randomizer object of the GPManager. It is

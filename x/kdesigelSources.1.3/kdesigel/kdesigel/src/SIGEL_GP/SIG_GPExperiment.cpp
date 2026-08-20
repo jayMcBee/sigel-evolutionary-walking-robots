@@ -66,11 +66,11 @@ void SIGEL_GP::SIG_GPExperiment::loadExperiment(QTextStream & file)
   // check if there's a file for the meta-system to be loaded
   QString metaFileString = cutAfterFiveHashes( file );
 
-  QTextStream metaFileStream( &metaFileString, IO_ReadOnly );
+  QTextStream metaFileStream( &metaFileString, QIODeviceBase::ReadOnly );
 
   if(metaFileStream.readLine() == "MetaInUse"){
 	QString tmpFileString = metaFileStream.readLine();
-	if(int index = tmpFileString.find("fileName=") != -1 ){
+	if(int index = tmpFileString.indexOf("fileName=") != -1 ){
 		mtController->readFromFile( tmpFileString.mid(index+8) );
 	}
 
@@ -85,12 +85,12 @@ void SIGEL_GP::SIG_GPExperiment::loadExperiment(QTextStream & file)
   QString robotString = cutAfterFiveHashes( file );
   QString experimentHistoryString = cutAfterFiveHashes( file );
 
-  QTextStream simParStream( &simParString, IO_ReadOnly );
-  QTextStream environmentStream( &environmentString, IO_ReadOnly );
-  QTextStream gpParameterStream( &gpParameterString, IO_ReadOnly );
-  QTextStream populationStream( &populationString, IO_ReadOnly );
-  QTextStream robotStream( &robotString, IO_ReadOnly );
-  QTextStream experimentHistoryStream( &experimentHistoryString, IO_ReadOnly );
+  QTextStream simParStream( &simParString, QIODeviceBase::ReadOnly );
+  QTextStream environmentStream( &environmentString, QIODeviceBase::ReadOnly );
+  QTextStream gpParameterStream( &gpParameterString, QIODeviceBase::ReadOnly );
+  QTextStream populationStream( &populationString, QIODeviceBase::ReadOnly );
+  QTextStream robotStream( &robotString, QIODeviceBase::ReadOnly );
+  QTextStream experimentHistoryStream( &experimentHistoryString, QIODeviceBase::ReadOnly );
 
   simulationParameter.readFromFile( simParStream );
   environment.readFromFile( environmentStream );
@@ -99,7 +99,7 @@ void SIGEL_GP::SIG_GPExperiment::loadExperiment(QTextStream & file)
   robot.readFromFileTransfer( robotStream );
   readHistoryFromFileTransfer( experimentHistoryStream );
 
-  comment = file.read();
+  comment = file.readAll();
 };
 
 void SIGEL_GP::SIG_GPExperiment::saveExperiment(QTextStream & file)
@@ -178,7 +178,7 @@ void SIGEL_GP::SIG_GPExperiment::exportExperimentHistoryToGNUPlot( QString fileN
 {
   QFile gnuPlotFile( fileName );
 
-  if (gnuPlotFile.open( IO_WriteOnly ))
+  if (gnuPlotFile.open( QIODeviceBase::WriteOnly ))
     {
       QTextStream gnuPlotStream( &gnuPlotFile );
 

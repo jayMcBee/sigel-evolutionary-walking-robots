@@ -23,8 +23,9 @@
 #ifndef SIGEL_GP_SIG_GUIGPMANAGER_H
 #define SIGEL_GP_SIG_GUIGPMANAGER_H
 
+#include "compat/q2compat.h"
 #include "SIGEL_GP/SIG_GPManager.h"
-#include "SIGEL_MasterGUI/SIG_Experiment.h"
+namespace SIGEL_MasterGUI { class SIG_Experiment; class SIG_IndividualListItem; }
 
 namespace SIGEL_GP
 {
@@ -36,7 +37,7 @@ namespace SIGEL_GP
       SIG_GUIGPManager( SIGEL_MasterGUI::SIG_Experiment &guiExperiment );
 
     private:
-      QVector< SIGEL_MasterGUI::SIG_IndividualListItem > individualItems;
+      Q2PtrVector< SIGEL_MasterGUI::SIG_IndividualListItem > individualItems;
 
       SIGEL_MasterGUI::SIG_Experiment &guiExperiment;
 

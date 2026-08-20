@@ -23,18 +23,15 @@
 #ifndef SIGEL_GP_SIG_GPMANAGER_H
 #define SIGEL_GP_SIG_GPMANAGER_H
 
+#include "compat/q2compat.h"
 #include "SIGEL_GP/SIG_GPFitnessTrainer.h"
 #include "SIGEL_GP/SIG_GPTournament.h"
 #include "SIGEL_Tools/SIG_Randomizer.h"
-#include "SIGEL_MasterGUI/SIG_IndividualListItem.h"
 
 #include "MT_Control/MT_Classifier.h"
 #include "MT_Control/MT_Evaluator.h"
 
-#include <qvector.h>
-#include <qvaluelist.h>
 #include <qdatetime.h>
-#include <qlistview.h>
 
 #include <qthread.h>
 
@@ -125,7 +122,7 @@ namespace SIGEL_GP
    * that are free to start or that are waiting for the calculation
    * of fitness values for individuals that were created by them.
    */
-  QValueList<int> taskCanDoList;
+  Q2ValueList<int> taskCanDoList;
 
   /**
    * The experiment object, which contains all the data related to the
@@ -152,7 +149,7 @@ namespace SIGEL_GP
    * generation.
    */
  private:
-  QVector<SIG_GPTournament> tours;
+  Q2PtrVector<SIG_GPTournament> tours;
 
   /**
    * The randomizer object, used to create randomseeds for the evolution.

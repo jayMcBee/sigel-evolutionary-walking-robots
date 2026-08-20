@@ -88,15 +88,15 @@ void MT_Classifier::loadSetup(QTextStream &File)
 void MT_Classifier::writeToFile(QTextStream &File)
 {
 	File << ("Classifier:\n");
-	File << EstimationStrategy <<endl;
-	File << Tolerance <<endl;
-	File << RefreshInterval <<endl;
-	File << GenerationNumber <<endl;
+	File << EstimationStrategy <<Qt::endl;
+	File << Tolerance <<Qt::endl;
+	File << RefreshInterval <<Qt::endl;
+	File << GenerationNumber <<Qt::endl;
 
 	for(int i=0; i< GenerationNumber; i++)
 		{
-			File << NumOfCorrectEstimation[i] <<endl;
-			File << NumOfMetaEstimation[i] << endl;
+			File << NumOfCorrectEstimation[i] <<Qt::endl;
+			File << NumOfMetaEstimation[i] << Qt::endl;
 		}
 
 }
@@ -104,11 +104,11 @@ void MT_Classifier::writeToFile(QTextStream &File)
 void MT_Classifier::writeToFileSetup(QTextStream &File)
 {
 	File << ("Evaluator:\n");
-	File << EstimationStrategy <<endl;
-	File << Tolerance <<endl;
-	File << RefreshInterval <<endl;
+	File << EstimationStrategy <<Qt::endl;
+	File << Tolerance <<Qt::endl;
+	File << RefreshInterval <<Qt::endl;
 	int GenNum =0;
-	File << GenNum <<endl;
+	File << GenNum <<Qt::endl;
 
 }
 
@@ -386,7 +386,7 @@ MT_TranslatedIndividual * MT_Classifier::createDoubleTransIndi(SIGEL_Program::SI
 	}
 
 // Second SIGEL program is translated 
-	for (i=0; i<SigProgTwoSize;i++)
+	for (int i=0; i<SigProgTwoSize;i++)
 	{
 		// WARNING: if the SIGEL instruction from SIGProg is JMP X, NOP, Sense ...
 		// a 0 is substituted for the missing operand(s). Any alternative?
@@ -493,7 +493,7 @@ bool MT_Classifier::preEvolution(Q2PtrVector<SIGEL_GP::SIG_GPTournament> *tours,
 		pthread_mutex_unlock(&interpreterMutex);
 #endif
 	
-		for( i=0; i<TourSize-NumOfClassi; i++)
+		for( int i=0; i<TourSize-NumOfClassi; i++)
 		{
 			Tourna = tours->take(i+NumOfClassi); 
 			tours->insert(i,Tourna);
@@ -527,7 +527,7 @@ bool MT_Classifier::preEvolution(Q2PtrVector<SIGEL_GP::SIG_GPTournament> *tours,
 #else
 		pthread_mutex_lock(&interpreterMutex);
 #endif
-		for(i=0; i<TourSize; i++)
+		for(int i=0; i<TourSize; i++)
 		{	
 			if(ToursWBestIndi[i] == 0)
 			{
@@ -553,7 +553,7 @@ bool MT_Classifier::preEvolution(Q2PtrVector<SIGEL_GP::SIG_GPTournament> *tours,
 // so that tours->resize(TourSize-NumOfClassi) can simply be called 
 
 		int NumOfTour = TourSize - NewNumOfClassi; // Number of tournaments to be run normally
-		for( i=0; i<NumOfTour; i++)
+		for( int i=0; i<NumOfTour; i++)
 		{
 			Tourna = tours->at(i);
 			if(Tourna == NULL)

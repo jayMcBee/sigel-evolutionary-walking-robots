@@ -21,6 +21,8 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 #include "SIGEL_GP/SIG_GUIGPManager.h"
+#include "SIGEL_MasterGUI/SIG_Experiment.h"
+#include "SIGEL_MasterGUI/SIG_IndividualListItem.h"
 
 #include <qapplication.h>
 #include <qlcdnumber.h>

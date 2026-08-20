@@ -20,6 +20,7 @@
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
+#include "compat/q2compat.h"
 #include "SIGEL_GP/SIG_GPManager.h"
 
 #ifndef _WINDOWS
@@ -27,7 +28,6 @@
 #else
 #include <pvm3.h>
 #endif
-#include <qarray.h>
 #include <qfile.h>
 #include <qdir.h>
 #include "SIGEL_Tools/SIG_IO.h"
@@ -103,7 +103,7 @@ void SIGEL_GP::SIG_GPManager::evolutionLoop() {
 
       int touchsCounter = 0;
 
-      QValueListIterator<int> canDoIter = taskCanDoList.begin();
+      Q2ValueList<int>::Iterator canDoIter = taskCanDoList.begin();
 
       while (canDoIter != taskCanDoList.end()) {
       // this loop implements some sort of busy-waiting;
@@ -239,7 +239,7 @@ void SIGEL_GP::SIG_GPManager::createTours(int quantity) {
   tours.resize(quantity);
 
   for(int i=0;i<quantity;i++) {
-    QArray< int > poolPositions( 2 );
+    Q2Array< int > poolPositions( 2 );
 
     poolPositions[0] = randomizer.getRandomInt( pop.getSize() );
     poolPositions[1] = randomizer.getRandomInt( pop.getSize() - 1 );
@@ -353,7 +353,7 @@ void SIGEL_GP::SIG_GPManager::evalNewIndis() {
   SIGEL_Tools::SIG_IO::cerr << "SIG_GPManager evaluates new Individuals.\n";
 #endif
 
-  QList< QArray<int> > fitTaskList;
+  Q2PtrList< Q2Array<int> > fitTaskList;
   fitTaskList.setAutoDelete( true );
 
   //The experiment's population
@@ -389,7 +389,7 @@ void SIGEL_GP::SIG_GPManager::evalNewIndis() {
         << " hasn't an actual fitness value and will be evaluated.\n";
 #endif
 
-      QArray<int> *actFitTask = new QArray<int>(2);
+      Q2Array<int> *actFitTask = new Q2Array<int>(2);
       (*actFitTask)[0] = trainer->spawnTask(actInd);
       (*actFitTask)[1] = actInd.getPoolPos();
 
@@ -411,8 +411,8 @@ void SIGEL_GP::SIG_GPManager::evalNewIndis() {
     haveABreak();
 
     trainer->sweepToSpawn();
-    QArray<int> *actFitTask = fitTaskList.first();
-    QArray<int> *prevFitTask = 0;
+    Q2Array<int> *actFitTask = fitTaskList.first();
+    Q2Array<int> *prevFitTask = 0;
 
     while (actFitTask) {
       double actFitness = trainer->checkTask( (*actFitTask)[0] );
@@ -465,7 +465,7 @@ void SIGEL_GP::SIG_GPManager::calcInitTourSet() {
     // The experiment's population
     SIG_GPPopulation &pop=getActExperiment().population;
 
-    QArray<int> lastAccesses( pop.getSize() );
+    Q2Array<int> lastAccesses( pop.getSize() );
 
     for (int l=0; l < pop.getSize(); l++)
       lastAccesses[l] = -1;
@@ -726,7 +726,7 @@ void SIGEL_GP::SIG_GPManager::run() {
 
       QFile poolImage( poolImageName );
 
-      if (poolImage.open( IO_WriteOnly )) {
+      if (poolImage.open( QIODeviceBase::WriteOnly )) {
         QTextStream buffer( &poolImage );
 
         actExperiment.getPopulation().writeToFile( buffer );
@@ -745,7 +745,7 @@ void SIGEL_GP::SIG_GPManager::run() {
       // only save if the modulo rest is zero
       if ( (actExperiment.population.poolGeneration%actExperiment.environment.getAutosave())==0) {
         QFile file( actExperiment.getPath() );
-        if (file.open(IO_WriteOnly)) {
+        if (file.open(QIODeviceBase::WriteOnly)) {
           QTextStream stream(&file);
           actExperiment.saveExperiment(stream);
           file.close();
@@ -799,7 +799,7 @@ void SIGEL_GP::SIG_GPManager::RegisterDynPVMClients( void ) {
 
   fd_set mySet;
   struct sockaddr_in  sad, caddr;
-  QArray<int> clientSockets(0);
+  Q2Array<int> clientSockets(0);
   //struct hostent *ptrh;
   struct protoent *ptrp;
   int i;
@@ -836,7 +836,7 @@ void SIGEL_GP::SIG_GPManager::RegisterDynPVMClients( void ) {
   sad.sin_addr.s_addr = INADDR_ANY;
 
   // map TCP protocol number
-  if (((int)(ptrp = getprotobyname("tcp"))) == 0) {
+  if ((ptrp = getprotobyname("tcp")) == 0) {
     fprintf(stderr, "ERR:   Can't map 'tcp' to a protocol number\n");
 #ifdef _WINDOWS
     WSACleanup();
@@ -1174,7 +1174,7 @@ void SIGEL_GP::SIG_GPManager::run(MT_Classifier *MetaClassifier)
 
 	  QFile poolImage( poolImageName );
 
-	  if (poolImage.open( IO_WriteOnly )) {
+	  if (poolImage.open( QIODeviceBase::WriteOnly )) {
 			QTextStream buffer( &poolImage );
 
 			actExperiment.getPopulation().writeToFile( buffer );
@@ -1193,7 +1193,7 @@ void SIGEL_GP::SIG_GPManager::run(MT_Classifier *MetaClassifier)
 			// only save if the modulo rest is zero
 			if ( (actExperiment.population.poolGeneration%actExperiment.environment.getAutosave())==0) {
 				QFile file( actExperiment.getPath() );
-				if (file.open(IO_WriteOnly)) {
+				if (file.open(QIODeviceBase::WriteOnly)) {
 					QTextStream stream(&file);
 					actExperiment.saveExperiment(stream);
 					file.close();
@@ -1285,7 +1285,7 @@ void SIGEL_GP::SIG_GPManager::evolutionLoop(MT_Classifier *MetaClassifier)
 
     	  int touchsCounter = 0;
 
-  	  QValueListIterator<int> canDoIter = taskCanDoList.begin();
+  	  Q2ValueList<int>::Iterator canDoIter = taskCanDoList.begin();
 
   	  while (canDoIter != taskCanDoList.end())
 	    {
@@ -1430,7 +1430,7 @@ void SIGEL_GP::SIG_GPManager::evolutionLoop(MT_Classifier *MetaClassifier)
 
 void SIGEL_GP::SIG_GPManager::evalNeededIndis()
 {
-  QList< QArray<int> > fitTaskList;
+  Q2PtrList< Q2Array<int> > fitTaskList;
   fitTaskList.setAutoDelete( true );
 
   //The experiment's population
@@ -1441,7 +1441,7 @@ void SIGEL_GP::SIG_GPManager::evalNeededIndis()
 
 
 // ********************* META change
-	QArray<int> ToursParticipant;
+	Q2Array<int> ToursParticipant;
 	ToursParticipant.resize(poolSize); // Position i = number of tournaments individual i takes part in
 	for(int l=0; l<poolSize;l++)
 		ToursParticipant[l]=0;
@@ -1484,7 +1484,7 @@ int DebugInfo =0;
 // ********************* META change - only if the individual appears in the tournament schedule
 	  if((!upToDate)&&(ToursParticipant[i]!=0))
 		{
-		  QArray<int> *actFitTask = new QArray<int>(2);
+		  Q2Array<int> *actFitTask = new Q2Array<int>(2);
 		  (*actFitTask)[0] = trainer->spawnTask(actInd);
 		  (*actFitTask)[1] = actInd.getPoolPos();
 
@@ -1503,8 +1503,8 @@ int DebugInfo =0;
 	haveABreak();
 
 	trainer->sweepToSpawn();
-	QArray<int> *actFitTask = fitTaskList.first();
-	QArray<int> *prevFitTask = 0;
+	Q2Array<int> *actFitTask = fitTaskList.first();
+	Q2Array<int> *prevFitTask = 0;
 
 	while (actFitTask)
 	  {

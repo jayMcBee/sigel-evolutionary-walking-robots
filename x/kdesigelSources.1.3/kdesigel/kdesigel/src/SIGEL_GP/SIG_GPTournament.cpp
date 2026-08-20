@@ -74,7 +74,7 @@ void SIGEL_GP::SIG_GPTournament::inhume( SIG_GPIndividual &corps )
 
       QFile corpsFile( corpsFileName );
 
-      if (corpsFile.open( IO_WriteOnly ))
+      if (corpsFile.open( QIODeviceBase::WriteOnly ))
 	{
 	  QTextStream buffer( &corpsFile );
 	  corps.writeToFile( buffer,true );

@@ -29,7 +29,6 @@
 #include "stdlib.h"
 #include "iostream.h" 
 
-#include <qprogressdialog.h> 
 
 #ifdef _WINDOWS
 using namespace std;
@@ -137,7 +136,7 @@ void SIGEL_Program::SIG_Program::readFromFile( QTextStream &file )
 
    if( getProgramLength() > 0 ) clear();
    
-   prg=file.read();
+   prg=file.readAll();
 
 #ifdef SIG_DEBUG
 
@@ -226,7 +225,7 @@ void SIGEL_Program::SIG_Program::importProgram( QString& filename )
 {
    QFile prgFile( filename );
 
-   if( prgFile.open( IO_ReadOnly ) )
+   if( prgFile.open( QIODeviceBase::ReadOnly ) )
      {
        clear();
        QTextStream buffer( &prgFile );
@@ -244,7 +243,7 @@ void SIGEL_Program::SIG_Program::exportProgram( QString& filename )
 {
    QFile prgFile( filename );
 
-   if( prgFile.open( IO_WriteOnly ) )
+   if( prgFile.open( QIODeviceBase::WriteOnly ) )
      {
        QTextStream buffer( &prgFile );
        writeToFile( buffer );

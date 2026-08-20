@@ -20,16 +20,16 @@
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
+#include "compat/q2compat.h"
 #include "SIGEL_GP/SIG_GPOperations.h"
 #include "SIGEL_Program/SIG_Program.h"
 #include "SIGEL_GP/SIG_GPPopulation.h"
 #include "SIGEL_Tools/SIG_IO.h"
-#include <qarray.h>
 #include <qstringlist.h>
 
 /*------------------------------------------Crossover-----------------------------------------*/
 
-QVector<SIGEL_GP::SIG_GPIndividual> SIGEL_GP::SIG_GPOperations::crossOver( SIGEL_GP::SIG_GPIndividual& winner1,
+Q2PtrVector<SIGEL_GP::SIG_GPIndividual> SIGEL_GP::SIG_GPOperations::crossOver( SIGEL_GP::SIG_GPIndividual& winner1,
 									   int poolPos1,
 									   SIG_GPIndividual& winner2,
 									   int poolPos2,
@@ -356,7 +356,7 @@ QVector<SIGEL_GP::SIG_GPIndividual> SIGEL_GP::SIG_GPOperations::crossOver( SIGEL
 				   fitness1,
 				   fitness2 );
 
-  QVector< SIG_GPIndividual > crossedInds( 2 );
+  Q2PtrVector< SIG_GPIndividual > crossedInds( 2 );
   crossedInds.insert( 0, crossoverInd1 );
   crossedInds.insert( 1, crossoverInd2 );
 

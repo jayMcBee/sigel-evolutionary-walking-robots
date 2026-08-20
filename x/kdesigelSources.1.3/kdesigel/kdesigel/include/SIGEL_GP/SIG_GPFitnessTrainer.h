@@ -23,14 +23,13 @@
 #ifndef SIGEL_GP_SIG_GPFITNESSTRAINER_H
 #define SIGEL_GP_SIG_GPFITNESSTRAINER_H
 
+#include "compat/q2compat.h"
 #include "SIGEL_GP/SIG_GPExperiment.h"
 #include "SIGEL_GP/SIG_GPIndividual.h"
 #include "SIGEL_GP/SIG_GPPVMData.h"
 #include "SIGEL_GP/SIG_GPActivePVMHost.h"
 #include "SIGEL_GP/SIG_GPPVMTask.h"
 
-#include <qarray.h>
-#include <qlist.h>
 
 
 namespace SIGEL_GP
@@ -53,23 +52,23 @@ class SIG_GPFitnessTrainer
    * The array of TIDs from PVM, to identify the PVMtasks.
    */
  private:
-  QVector< SIG_GPPVMTask > pvmTasks;
+  Q2PtrVector< SIG_GPPVMTask > pvmTasks;
 
  /**
   * our hosts participating in fitness calculations
   */
  private:
-  QVector< SIG_GPActivePVMHost > pvmHosts;
+  Q2PtrVector< SIG_GPActivePVMHost > pvmHosts;
 
  /**
   * Names of all dynamic hosts, which are valid for a single evaluation period
   */
-  QList< QString > dynHosts;
+  Q2PtrList< QString > dynHosts;
 
  /**
   * New dynamic hosts that have registered but were not yet added to 'pvmHosts'.
   */
-  QList< SIG_GPPVMHost > freshDynHosts;
+  Q2PtrList< SIG_GPPVMHost > freshDynHosts;
 
  private:
   int nextHostNumber;
@@ -78,7 +77,7 @@ class SIG_GPFitnessTrainer
    * The array of indices, representing the position of the individual in the pool, which is to simulate.
    */
  private:
-QList< QArray<int> > toSpawnList;
+Q2PtrList< Q2Array<int> > toSpawnList;
 
 
 /**
