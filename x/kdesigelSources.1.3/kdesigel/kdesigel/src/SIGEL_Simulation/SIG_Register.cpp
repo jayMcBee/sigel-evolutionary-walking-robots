@@ -28,7 +28,6 @@
 #include <cmath> // needed for computing the power of a number
 
 SIGEL_Simulation::SIG_Register::SIG_Register(int size)
-  throw(SIGEL_Simulation::SIG_RegisterWrongSizeException)
   : value(0)
 {
   if ( (size>0) && (size<100) )

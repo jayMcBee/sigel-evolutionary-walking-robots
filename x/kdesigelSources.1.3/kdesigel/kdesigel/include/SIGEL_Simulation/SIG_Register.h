@@ -56,8 +56,7 @@ class SIG_Register {
    * @param size The desired size of this SIG_Register in Bits.
    *             Has to be @f$>0@f$ and @f$<100@f$.
    */
-  SIG_Register(int size)
-    throw(SIG_RegisterWrongSizeException);
+  SIG_Register(int size);
 
   /**
    * Copies the value of the supplied SIG_Register

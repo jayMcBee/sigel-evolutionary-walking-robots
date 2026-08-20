@@ -86,7 +86,6 @@ SIGEL_Simulation::SIG_Simulation::~SIG_Simulation()
 { };
 
 void SIGEL_Simulation::SIG_Simulation::start()
-  throw(SIGEL_Simulation::SIG_SimulationCannotSolveException)
 {
   // max is the time which is specified in "Simulation Parameters"-"General Settings"-"Time To Simulate"
   QTime max=simulationData->simulationParameter.getTimeToSimulate();
@@ -111,7 +110,6 @@ void SIGEL_Simulation::SIG_Simulation::start()
 
 
 void SIGEL_Simulation::SIG_Simulation::makeTimeSteps(int numTimeSteps)
-  throw(SIGEL_Simulation::SIG_SimulationCannotSolveException)
 {
   for(int i=0;i<numTimeSteps;i++)  {
       interpreter->interprete( simulationData->simulationParameter.getStepSize() );

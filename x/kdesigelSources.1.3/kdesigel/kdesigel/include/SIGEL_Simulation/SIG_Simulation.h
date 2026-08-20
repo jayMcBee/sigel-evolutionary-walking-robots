@@ -93,8 +93,7 @@ namespace SIGEL_Simulation
        *
        * @post The complete simulation is performed.
        */
-      void start()
-	throw(SIGEL_Simulation::SIG_SimulationCannotSolveException);
+      void start();
       
       /**
        * Performs a certain number of time steps given by numTimeSteps.
@@ -108,8 +107,7 @@ namespace SIGEL_Simulation
        * @param numTimeSteps The number of time steps that are performed.
        * @post numTimeStep time steps are performed.
        */
-      void makeTimeSteps( int numTimeSteps )
-	throw(SIGEL_Simulation::SIG_SimulationCannotSolveException);
+      void makeTimeSteps( int numTimeSteps );
 
       /**
        * Inherited classes override this method to prematurely terminate the

@@ -814,7 +814,6 @@ void SIGEL_Simulation::SIG_DynaSystem::newDrive(SIGEL_Robot::SIG_Drive& theDrive
 };
 
 SIGEL_Simulation::SIG_DynaLink& SIGEL_Simulation::SIG_DynaSystem::getLink(int number)
-  throw(SIG_DynaSystemWrongNumberException)
 {
  //Fetch the DynaLink from the vector
  int sz=dynaLinks.size();
@@ -827,7 +826,6 @@ SIGEL_Simulation::SIG_DynaLink& SIGEL_Simulation::SIG_DynaSystem::getLink(int nu
 };
 
 SIGEL_Simulation::SIG_DynaJoint& SIGEL_Simulation::SIG_DynaSystem::getJoint(int number)
-  throw(SIG_DynaSystemWrongNumberException)
 {
  //Fetch the DynaJoint from the vector
  int sz=dynaJoints.size();
@@ -838,7 +836,6 @@ SIGEL_Simulation::SIG_DynaJoint& SIGEL_Simulation::SIG_DynaSystem::getJoint(int 
 };
 
 SIGEL_Simulation::SIG_DynaDrive& SIGEL_Simulation::SIG_DynaSystem::getDrive(int number)
-  throw(SIG_DynaSystemWrongNumberException)
 {
  //Fetch the DynaDrive from the vector
  int sz=dynaDrives.size();
@@ -849,7 +846,6 @@ SIGEL_Simulation::SIG_DynaDrive& SIGEL_Simulation::SIG_DynaSystem::getDrive(int 
 };
 
 SIGEL_Simulation::SIG_DynaSensor& SIGEL_Simulation::SIG_DynaSystem::getSensor(int number)
-  throw(SIG_DynaSystemWrongNumberException)
 {
  //Fetch the DynaSensor from the vector
  int sz=dynaSensors.size();
