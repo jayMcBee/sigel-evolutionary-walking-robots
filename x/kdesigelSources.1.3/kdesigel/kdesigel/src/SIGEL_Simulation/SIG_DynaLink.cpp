@@ -20,11 +20,11 @@
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
+#include "compat/q2compat.h"
 #include "SIGEL_Simulation/SIG_DynaLink.h"
 #include "SIGEL_Simulation/SIG_Dyna.h"
 #include "SIGEL_Simulation/SIG_DynaSystem.h"
 #include "SIGEL_Tools/SIG_IO.h"
-#include <qarray.h>
 #ifdef _WINDOWS
 #include <float.h>
 #endif
@@ -142,7 +142,7 @@ void SIGEL_Simulation::SIG_DynaLink::updateDynaCompanion(DL_dyna* d)
   nextPosition.tovector(&pos2);
   dtSelectObject(this);
   dtLoadIdentity();
-  QArray<double> rotmat(16);
+  Q2Array<double> rotmat(16);
   for (int j=0; j<3; j++)
     rotmat[ (j * 4) + 3 ] = 0;
     rotmat[ 15 ] = 1; 

@@ -23,13 +23,13 @@
 #ifndef SIGEL_SIMULATION_SIG_DYNAMECHSLINK_H
 #define SIGEL_SIMULATION_SIG_DYNAMECHSLINK_H
 
+#include "compat/q2compat.h"
 #include "SIGEL_Robot/SIG_Link.h"
 
 #include <dm.h>
 #include <dmRigidBody.hpp>
 #include <dmZScrewTxLink.hpp>
 
-#include <qlist.h>
 
 namespace SIGEL_Simulation
 {
@@ -59,7 +59,7 @@ class SIG_DynaMechsLink
 
     NEWMAT::Matrix transformation;
 
-    QList< SIG_DynaMechsLink > successors;
+    Q2PtrList< SIG_DynaMechsLink > successors;
 
     void forwardKinematics( SIG_DynaMechsLink *caller );
 

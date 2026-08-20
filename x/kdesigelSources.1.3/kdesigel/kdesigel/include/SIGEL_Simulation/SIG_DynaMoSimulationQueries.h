@@ -23,8 +23,8 @@
 #ifndef SIGEL_SIMULATION_SIG_DYNAMOSIMULATIONQUERIES_H
 #define SIGEL_SIMULATION_SIG_DYNAMOSIMULATIONQUERIES_H
 
+#include "compat/q2compat.h"
 #include "SIGEL_Simulation/SIG_Register.h"
-#include <qvector.h>
 #include <qdatetime.h>
 #include "SIGEL_Simulation/SIG_DynaMoSimulationData.h"
 #include "SIGEL_Simulation/SIG_SimulationQueries.h"
@@ -70,7 +70,7 @@ namespace SIGEL_Simulation
   SIG_DynaMoSimulationQueries(SIG_DynaMoSimulationData& theSimulationData);
 
   /** Interprets the SENSE command and writes the results into the registers */
-  void sense(int sensorNo,QVector<SIG_Register> & registers) const;
+  void sense(int sensorNo,Q2PtrVector<SIG_Register> & registers) const;
 
   /** gets the actual simulation time which is calculated frame*stepsize
    * @pre

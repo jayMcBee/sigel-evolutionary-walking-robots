@@ -23,7 +23,7 @@
 #ifndef SIGEL_SIMULATION_SIG_DYNALINK_H
 #define SIGEL_SIMULATION_SIG_DYNALINK_H
 
-#include <qvector.h>
+#include "compat/q2compat.h"
 #include "constraint.h"
 #include "ptp.h"
 #include <SOLID/solid.h>

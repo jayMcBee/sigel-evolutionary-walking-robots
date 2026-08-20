@@ -23,6 +23,7 @@
 #ifndef SIGEL_SIMULATION_SIG_DYNAMECHSSIMULATIONDATA_H
 #define SIGEL_SIMULATION_SIG_DYNAMECHSSIMULATIONDATA_H
 
+#include "compat/q2compat.h"
 #include "SIGEL_Simulation/SIG_SimulationData.h"
 #include "SIGEL_Simulation/SIG_DynaMechsLink.h"
 
@@ -32,7 +33,6 @@
 #include <dmLink.hpp>
 #include <dmIntegrator.hpp>
 
-#include <qvector.h>
 
 namespace SIGEL_Simulation
 {
@@ -76,15 +76,15 @@ namespace SIGEL_Simulation
 
       dmIntegrator *dynaMechsIntegrator;
 
-      QVector< SIG_DynaMechsLink > dynaMechsLinks;
+      Q2PtrVector< SIG_DynaMechsLink > dynaMechsLinks;
 
-      QArray< int > jointIndices;
+      Q2Array< int > jointIndices;
 
-      QVector< SIGEL_Robot::SIG_Drive > drives;
+      Q2PtrVector< SIGEL_Robot::SIG_Drive > drives;
 
-      QArray< double > driveForcesTimeAccounts;
+      Q2Array< double > driveForcesTimeAccounts;
 
-      QVector< SIGEL_Robot::SIG_Sensor > sensors;
+      Q2PtrVector< SIGEL_Robot::SIG_Sensor > sensors;
 
       int noOfDrives;
 

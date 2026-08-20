@@ -23,7 +23,7 @@
 #ifndef SIGEL_SIMULATOR_SIG_DYNAMECHSCOMMANDINTERFACE_H
 #define SIGEL_SIMULATOR_SIG_DYNAMECHSCOMMANDINTERFACE_H
 
-#include <qvector.h>
+#include "compat/q2compat.h"
 #include "SIGEL_Simulation/SIG_DynaMechsSimulationData.h"
 #include "SIGEL_Simulation/SIG_Register.h"
 #include "SIGEL_Simulation/SIG_CommandInterface.h"
@@ -74,7 +74,7 @@ namespace SIGEL_Simulation
    *  Other types of drives currently don't work with DynaMechs.
    */
   void moveDrive(int driveNo,
-		 QVector<SIG_Register> const& registers);
+		 Q2PtrVector<SIG_Register> const& registers);
 
 };
 

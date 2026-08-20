@@ -20,6 +20,7 @@
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
+#include "compat/q2compat.h"
 #include "SIGEL_Simulation/SIG_DynaMoSimulationQueries.h"
 #include <qdatetime.h>
 #include "matrix.h"
@@ -36,7 +37,7 @@ SIGEL_Simulation::SIG_DynaMoSimulationQueries::SIG_DynaMoSimulationQueries(SIG_D
  : simulationData(theSimulationData)
 { };  
 
-void SIGEL_Simulation::SIG_DynaMoSimulationQueries::sense(int sensorNo,QVector<SIG_Register> & registers) const
+void SIGEL_Simulation::SIG_DynaMoSimulationQueries::sense(int sensorNo,Q2PtrVector<SIG_Register> & registers) const
 {
  if (simulationData.dynaSystem.dynaSensors.size()==0) return;
  int modSensorNo=sensorNo % simulationData.dynaSystem.dynaSensors.size();
