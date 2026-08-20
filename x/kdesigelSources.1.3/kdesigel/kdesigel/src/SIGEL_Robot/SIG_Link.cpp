@@ -102,9 +102,9 @@ namespace SIGEL_Robot {
 
         SIG_Link::~SIG_Link()
         {
-                points.setAutoDelete (TRUE);
-                adjacentJoints.setAutoDelete (FALSE);
-                noCollide.setAutoDelete (FALSE);
+                points.setAutoDelete (true);
+                adjacentJoints.setAutoDelete (false);
+                noCollide.setAutoDelete (false);
 
                 if (geometry) {
                         delete mirtich;

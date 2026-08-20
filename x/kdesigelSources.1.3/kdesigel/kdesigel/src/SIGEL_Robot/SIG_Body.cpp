@@ -51,7 +51,7 @@ namespace SIGEL_Robot
 
         SIG_Body::~SIG_Body(void)
         {
-                usedByLinks.setAutoDelete (FALSE);
+                usedByLinks.setAutoDelete (false);
                 delete geometry;
         };
         
@@ -209,7 +209,6 @@ namespace SIGEL_Robot
                 geometry = new SIG_Geometry ();
                 
                 SceneGraph *bodyScene = new SceneGraph();
-                // Load expects a char*, so a const_cast is necessary.
                 
                 QByteArray geometryFileBytes = getGeometryFile ().toUtf8();
                 bodyScene->load( geometryFileBytes.data() );
@@ -235,7 +234,11 @@ namespace SIGEL_Robot
 
         QString SIG_Body::getGeometryFile (void) const
         {
-                if (geometryFile.at (0) == '/')
+                // Qt 2's QString::at(uint) was bounds-safe -- it returned QChar::null past
+		// the end (qstring.h:483). Qt 6's asserts, and on a null string it
+		// dereferences a null pointer. SIG_Robot.cpp:365 produces a null
+		// geometryFile from a truncated stream. (D13)
+		if (!geometryFile.isEmpty() && geometryFile.at (0) == '/')
                         return geometryFile;
                 else {
                         QString retval;
