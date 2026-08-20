@@ -153,7 +153,7 @@ bool MT_Controller::startEvolution()
 			}
 			if(!substitution){
 				if(guiEnabled)
-					SIGEL_Tools::SIG_IO::cerr << "critical: Creating Meta GP-System Couldn't create a substituter." << Qt::endl;
+					SIGEL_Tools::SIG_IO::cerr << "Creating Meta GP-System: couldn't create a substituter." << Qt::endl;
 				return false;
 			}
 		}
@@ -333,11 +333,12 @@ bool MT_Controller::createGPSystem()
 	// make sure we have a gp-manager
 	if(!gpManager){
 		if(!(gpManager = new MT_GPManager(confStrm))){
-			SIGEL_Tools::SIG_IO::cerr << "critical: Creating Meta GP-System Couldn't create GP-Manager." << Qt::endl;
+			SIGEL_Tools::SIG_IO::cerr << "Creating Meta GP-System: couldn't create GP-Manager." << Qt::endl;
 			return false;
 		} else {
 			if(int error = gpManager->getLastError() && guiEnabled){
-				SIGEL_Tools::SIG_IO::cerr << "warning: " << error << Qt::endl;
+				SIGEL_Tools::SIG_IO::cerr << "Creating GP-System: error in creating Meta-GP-System. Error no: "
+						<< error << Qt::endl;
 			}
 		}
 	}
@@ -369,13 +370,13 @@ void MT_Controller::configureSystem()
 
 	if(!gpManager || !substCache.inUse){
 		if(!createGPSystem()){
-			SIGEL_Tools::SIG_IO::cerr << "critical: Configure meta system Couldn't create the gp-system." << Qt::endl;
+			SIGEL_Tools::SIG_IO::cerr << "Configure meta system: couldn't create the GP system." << Qt::endl;
 			return;
 		}
 	}
 	if(!mainWindow){
 		if(!(mainWindow = new MT_MainWindow(this, gpManager, &substCache, 0, "MTMainWindow"))){
-			SIGEL_Tools::SIG_IO::cerr << "critical: Configure meta system Couldn't open the configuration window." << Qt::endl;
+			SIGEL_Tools::SIG_IO::cerr << "Configure meta system: couldn't open the configuration window." << Qt::endl;
 			return;
 		}
 	}
@@ -439,7 +440,8 @@ bool MT_Controller::readFromFile(QString fileName)
 				if(!confFile.open(IO_ReadOnly)){
 
 					// oops, couldn't open default configuration file
-					SIGEL_Tools::SIG_IO::cerr << "critical: Loading experiment Couldn't load default settings." << Qt::endl;
+					SIGEL_Tools::SIG_IO::cerr << "Loading experiment: couldn't load default settings. "
+						"The meta system will be disabled." << Qt::endl;
 				} else {
 					break;
 				}
@@ -500,7 +502,8 @@ bool MT_Controller::readFromFile(QString fileName)
 
 	if(error){
 		if(guiEnabled)
-			SIGEL_Tools::SIG_IO::cerr << "critical: Loading Experiment Error in loading experiment" << Qt::endl;
+			SIGEL_Tools::SIG_IO::cerr << "Loading experiment: error in loading experiment. "
+						"The meta experiment file is corrupted. Disabling the meta system." << Qt::endl;
 		useMeta(false);
 		return false;
 	}
@@ -626,7 +629,7 @@ bool MT_Controller::saveSystem(QString sigExpName)
 	} else {
 		// oops, something went wrong
 		if(guiEnabled)
-			SIGEL_Tools::SIG_IO::cerr << "critical: Saving experiment Couldn't save the experiment!" << Qt::endl;
+			SIGEL_Tools::SIG_IO::cerr << "Saving experiment: couldn't save the experiment." << Qt::endl;
 		return false;
 	}
 
@@ -835,7 +838,7 @@ void MT_Controller::slotLoadDefault()
 		file.close();
 
 	} else {		// read error
-		SIGEL_Tools::SIG_IO::cerr << "warning: Load setup Couldn't load default setup. Abort operation." << Qt::endl;
+		SIGEL_Tools::SIG_IO::cerr << "Load setup: couldn't load default setup. Aborting operation." << Qt::endl;
 	}
 }
 
@@ -881,7 +884,7 @@ void MT_Controller::slotLoadSetup()
 		file.close();
 
 	} else {		// read error
-		SIGEL_Tools::SIG_IO::cerr << "warning: Load setup Couldn't open specified file. Abort operation." << Qt::endl;
+		SIGEL_Tools::SIG_IO::cerr << "Load setup: couldn't open specified file. Aborting operation." << Qt::endl;
 	}
 }
 
@@ -926,6 +929,6 @@ void MT_Controller::slotSaveSetup()
 		mainWindow->enforceUpdate(true);		// enforce an update of the GUI
 
 	} else {
-		SIGEL_Tools::SIG_IO::cerr << "warning: Load setup Couldn't open specified file. Abort operation." << Qt::endl;
+		SIGEL_Tools::SIG_IO::cerr << "Load setup: couldn't open specified file. Aborting operation." << Qt::endl;
 	}
 }
