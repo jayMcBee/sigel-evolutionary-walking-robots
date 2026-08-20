@@ -497,7 +497,7 @@ authors in comments they shipped.
 | Where | 2003 behaviour | Now | Why |
 |---|---|---|---|
 | `Q2Array::sort()` | `memcmp` byte order (`qgarray.cpp:635-640`) | numeric | Three sites need ascending numeric order and break above 256: `SIG_GPManager.cpp:304,311` (distinct tournament indices) and `SIG_AllIndividualsView.cpp:240` (feeds `deleteIndividual(positions[n] - n)`). Cause is Qt 2's type erasure — its own source says *"Qt 3.0: Add a virtual compareItems()"* |
-| out-of-range array write | warn, clamp index to 0 (`qgarray.h:108-117`) | assert | The clamp silently hid the two sites below |
+| out-of-range array access | warn, clamp index to 0 (`qgarray.h:108-117`) | **warn, clamp — same as 2003** | Done in the shim, not via `Q_ASSERT`: that compiles to nothing under `QT_NO_DEBUG`, so a release build would corrupt memory silently where 2003 returned a wrong value. Verified with `-DQT_NO_DEBUG`. The bad call sites are still being fixed |
 | `SIG_ProgramLine.cpp:215-224` | writes `element[no]` in the branch entered *because* `no >= size()`; also compares `int` to `uint` | to be fixed | Its own comment is `// ToDo: Exception!` |
 | `SIG_DynaSystem.cpp:266-268` | deletes `dynaJoints[k]` while looping to `dynaDrives.size()` | to be fixed | The two vectors grow independently (`:605`, `:807`) |
 | `sigel_slave`, `getenv("SIGEL_ROOT")` | dereferenced unchecked on the `Terrain.ter` path | to be fixed | Segfaults instantly if unset, and the SIGSEGV handler masks it as "Invalid storage access" with no core. Found by running the 2003 binary |
