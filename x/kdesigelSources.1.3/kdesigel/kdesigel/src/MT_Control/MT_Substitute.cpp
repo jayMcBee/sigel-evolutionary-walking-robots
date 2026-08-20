@@ -2,6 +2,7 @@
 //
 //////////////////////////////////////////////////////////////////////
 
+#include "compat/q2compat.h"
 #include "MT_Control/MT_Substitute.h"
 
 //////////////////////////////////////////////////////////////////////
@@ -52,7 +53,7 @@ void MT_Substitute::changeBest(MT_Program * MetaProg)
 // NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU 
 // NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU 
 
-void MT_Substitute::changeErrorInfo(QArray<double> * OutCome, QArray<double> * CorrectFit)
+void MT_Substitute::changeErrorInfo(Q2Array<double> * OutCome, Q2Array<double> * CorrectFit)
 {
 	if (CorrectFitness.size() < CorrectFit->size())
 	{
@@ -75,10 +76,10 @@ MT_TranslatedIndividual * MT_Substitute::translatedSIGProg(SIGEL_Program::SIG_Pr
 {
 	int ProgSize = SIGProg->getProgramLength();
 
-	QArray<int> * Instruktion = new QArray<int>;
-	QArray<int> * OperandOne = new QArray<int>;
-	QArray<int> * OperandTwo = new QArray<int>;
-	QArray<int> * MData = new QArray<int>;
+	Q2Array<int> * Instruktion = new Q2Array<int>;
+	Q2Array<int> * OperandOne = new Q2Array<int>;
+	Q2Array<int> * OperandTwo = new Q2Array<int>;
+	Q2Array<int> * MData = new Q2Array<int>;
 
 	(*Instruktion).resize(ProgSize);
 	(*OperandOne).resize(ProgSize);
@@ -149,7 +150,7 @@ void MT_Substitute::setInterpreter(int NumOfVariable, int TimeToInter)
 #endif
 }
 
-QQueue<MT_TrainingCase> * MT_Substitute::changeTCases()
+Q2Queue<MT_TrainingCase> * MT_Substitute::changeTCases()
 {	
 	return &TCaseBuffer;
 }
@@ -170,7 +171,7 @@ void MT_Substitute::getEstimationParameter(int *EStrategy, double *Tol, int *ReI
 }
 
 
-void MT_Substitute::getNumOfEstimation(QArray<unsigned int> *MetaEstimation, QArray<unsigned int> *CorrectEstimation)
+void MT_Substitute::getNumOfEstimation(Q2Array<unsigned int> *MetaEstimation, Q2Array<unsigned int> *CorrectEstimation)
 {
 	MetaEstimation = &NumOfMetaEstimation;
 	CorrectEstimation =  &NumOfCorrectEstimation;

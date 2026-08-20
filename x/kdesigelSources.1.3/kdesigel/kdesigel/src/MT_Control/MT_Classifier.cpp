@@ -2,6 +2,7 @@
 //
 //////////////////////////////////////////////////////////////////////
 
+#include "compat/q2compat.h"
 #include "MT_Control/MT_Classifier.h"
 
 //////////////////////////////////////////////////////////////////////
@@ -315,10 +316,10 @@ MT_TranslatedIndividual * MT_Classifier::createDoubleTransIndi(SIGEL_Program::SI
 	int SigProgTwoSize = SigProgTwo->getProgramLength();
 	int TransIndiSize = SigProgOneSize + SigProgTwoSize;
 
-	QArray<int> * Instruktion = new QArray<int>;
-	QArray<int> * OperandOne = new QArray<int>;
-	QArray<int> * OperandTwo = new QArray<int>;
-	QArray<int> * MData = new QArray<int>;
+	Q2Array<int> * Instruktion = new Q2Array<int>;
+	Q2Array<int> * OperandOne = new Q2Array<int>;
+	Q2Array<int> * OperandTwo = new Q2Array<int>;
+	Q2Array<int> * MData = new Q2Array<int>;
 
 	(*Instruktion).resize(TransIndiSize);
 	(*OperandOne).resize(TransIndiSize);
@@ -444,7 +445,7 @@ MT_TranslatedIndividual * MT_Classifier::createDoubleTransIndi(SIGEL_Program::SI
 
 }
 
-bool MT_Classifier::preEvolution(QVector<SIGEL_GP::SIG_GPTournament> *tours, int PosBest)
+bool MT_Classifier::preEvolution(Q2PtrVector<SIGEL_GP::SIG_GPTournament> *tours, int PosBest)
 {
 	SIGEL_GP::SIG_GPTournament *Tourna;
 
@@ -512,7 +513,7 @@ bool MT_Classifier::preEvolution(QVector<SIGEL_GP::SIG_GPTournament> *tours, int
 
 	if (NumOfClassi == -1)  
 	{
-		QArray<int> ToursWBestIndi;
+		Q2Array<int> ToursWBestIndi;
 		ToursWBestIndi.resize(tours->size());
 		for(int i=0; i<ToursWBestIndi.size(); i++)
 			ToursWBestIndi[i] =0;
@@ -601,7 +602,7 @@ for(int d=0; d < tours->size();d++)
 // NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU 
 // NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU 
 
-int MT_Classifier::evalNeededTours(QVector<SIGEL_GP::SIG_GPTournament> *  tours, QArray<int> * ToursWBestIndi, int PosBest)
+int MT_Classifier::evalNeededTours(Q2PtrVector<SIGEL_GP::SIG_GPTournament> *  tours, Q2Array<int> * ToursWBestIndi, int PosBest)
 {
 	SIGEL_GP::SIG_GPTournament *Tourna =NULL;
 	int NumClassi=0;

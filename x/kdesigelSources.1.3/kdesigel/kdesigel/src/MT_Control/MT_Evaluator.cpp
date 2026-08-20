@@ -2,6 +2,7 @@
 //
 //////////////////////////////////////////////////////////////////////
 
+#include "compat/q2compat.h"
 #include "MT_Control/MT_Evaluator.h"
 
 
@@ -189,7 +190,7 @@ bool MT_Evaluator::evaluationTactic()
 				int NumOfWorseError = CorrectFitness.size()/10;
 				double PresentError =0.0;
 				int PosOfSmallestError =0;
-				QArray<double> WorseError;
+				Q2Array<double> WorseError;
 				WorseError.resize(NumOfWorseError);
 				for (int i=0; i<CorrectFitness.size(); i++)
 					WorseError[i] = 0.0;
