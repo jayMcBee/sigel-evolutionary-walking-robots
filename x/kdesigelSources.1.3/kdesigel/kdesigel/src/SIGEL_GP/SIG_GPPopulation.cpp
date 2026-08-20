@@ -393,8 +393,8 @@ void SIGEL_GP::SIG_GPPopulation::readFromFile(QTextStream &file)
           {  
              tmpStr1.setNum(x); 
 	     
-             pos  = populationStr.find("INDIVIDUAL("+tmpStr1+") BEGIN{",pos2,false); 
-	     pos2 = populationStr.find("}INDIVIDUAL("+tmpStr1+") END",pos2,false); 
+             pos  = populationStr.indexOf("INDIVIDUAL("+tmpStr1+") BEGIN{", pos2, Qt::CaseInsensitive); 
+	     pos2 = populationStr.indexOf("}INDIVIDUAL("+tmpStr1+") END", pos2, Qt::CaseInsensitive); 
              
 	     
              pool.insert(x,new SIGEL_GP::SIG_GPIndividual());  

@@ -21,6 +21,7 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 #include "SIGEL_GP/SIG_GPSimpleRecorder.h"
+#include <exception>
 
 #include <cmath>
 
@@ -34,6 +35,15 @@ SIGEL_GP::SIG_GPSimpleRecorder::SIG_GPSimpleRecorder()
 
 void SIGEL_GP::SIG_GPSimpleRecorder::init()
 {
+  // NOTE: 2003 declared throw(SIG_RecorderNoQueriesSetException,
+  // SIG_RecorderBadRecordingOrderException) here. Unlike record() and
+  // finish(), init() is called from SIG_Simulation's CONSTRUCTOR, which
+  // every fitness function builds OUTSIDE its own try block. Without this
+  // boundary a SIG_DynaSystemWrongNumberException from
+  // simulationQueries->getLinkPosition() escapes to sigel_slave.cpp:361,
+  // which reports fitness 0.0 and the master accepts it as a real result.
+  try {
+
   		SIG_Recorder::init();
 
   int rootLinkNumber = simulationQueries->getRootNumber();
@@ -41,6 +51,11 @@ void SIGEL_GP::SIG_GPSimpleRecorder::init()
   start = simulationQueries->getLinkPosition( rootLinkNumber );
 
   startRotation = simulationQueries->getLinkOrientation( rootLinkNumber );
+
+  }
+  catch (SIGEL_Simulation::SIG_RecorderNoQueriesSetException &) { throw; }
+  catch (SIGEL_Simulation::SIG_RecorderBadRecordingOrderException &) { throw; }
+  catch (...) { std::terminate(); }
 };
 
 void SIGEL_GP::SIG_GPSimpleRecorder::record()

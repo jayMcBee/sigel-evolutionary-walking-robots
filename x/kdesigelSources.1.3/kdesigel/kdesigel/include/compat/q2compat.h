@@ -64,6 +64,7 @@
 #include <QPair>
 #include <QString>
 #include <algorithm>
+#include <list>
 
 // ---------------------------------------------------------------------------
 // Qt 6 randomises the QHash seed once per process, so Q2Dict iteration order
@@ -603,19 +604,59 @@ private:
 };
 
 // ---------------------------------------------------------------------------
-// Q2ValueList<T>  <- Qt 2 QValueList<T>: a VALUE list, so Qt 6's QList already
-// matches.  Only remove(iterator) differs -- Qt 2 returns the following
-// iterator, Qt 6 spells that erase().
+// Q2ValueList<T>  <- Qt 2 QValueList<T>: a VALUE list, but a doubly-LINKED one
+// (qvaluelist.h:51-62), so an iterator stays valid when the list is modified
+// elsewhere. Qt 6's QList is contiguous and reallocates, which invalidates
+// every iterator into it.
+//
+// That difference is not academic here: SIG_GPManager.cpp:106-217 walks
+// taskCanDoList with an iterator while APPENDING to the same list inside the
+// loop, then passes the iterator to remove(). Backed by QList that is a
+// use-after-free. std::list reproduces Qt 2's node semantics exactly.
 // ---------------------------------------------------------------------------
 template <class T>
-class Q2ValueList : public QList<T>
+class Q2ValueList
 {
-public:
-    typedef typename QList<T>::iterator Iterator;
-    typedef typename QList<T>::const_iterator ConstIterator;
+    std::list<T> l;
 
-    Iterator remove(Iterator it) { return QList<T>::erase(it); }
-    void remove(const T &d) { QList<T>::removeAll(d); }
+public:
+    typedef typename std::list<T>::iterator Iterator;
+    typedef typename std::list<T>::const_iterator ConstIterator;
+    typedef T ValueType;
+
+    Iterator begin() { return l.begin(); }
+    Iterator end() { return l.end(); }
+    ConstIterator begin() const { return l.begin(); }
+    ConstIterator end() const { return l.end(); }
+
+    uint count() const { return uint(l.size()); }
+    uint size() const { return uint(l.size()); }
+    bool isEmpty() const { return l.empty(); }
+    void clear() { l.clear(); }
+
+    void append(const T &d) { l.push_back(d); }
+    void prepend(const T &d) { l.push_front(d); }
+    Q2ValueList<T> &operator<<(const T &d) { l.push_back(d); return *this; }
+
+    T &first() { return l.front(); }
+    T &last() { return l.back(); }
+
+    // Qt 2 returns the following iterator (qvaluelist.h:399-404)
+    Iterator remove(Iterator it) { return l.erase(it); }
+    void remove(const T &d) { l.remove(d); }
+
+    uint contains(const T &d) const   // Qt 2 returns a COUNT, not a bool
+    {
+        uint n = 0;
+        for (ConstIterator i = l.begin(); i != l.end(); ++i)
+            if (*i == d)
+                ++n;
+        return n;
+    }
+
+    // SIG_AllIndividualsView.cpp:119 and SIG_MainWindow.cpp:64 hand one of
+    // these to QSplitter::setSizes, which wants a QList.
+    operator QList<T>() const { return QList<T>(l.begin(), l.end()); }
 };
 
 // ---------------------------------------------------------------------------
