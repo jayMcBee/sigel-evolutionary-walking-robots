@@ -72,7 +72,7 @@ class SIG_Program
 {
 
  protected:
- vector< SIGEL_Program::SIG_ProgramLine* > lines;
+ std::vector< SIGEL_Program::SIG_ProgramLine* > lines;
 
 /**
  * This operator copies a complete program.
@@ -117,7 +117,7 @@ class SIG_Program
  */
  
  public:
- vector< SIGEL_Program::SIG_ProgramLine* > &getPrgLines();
+ std::vector< SIGEL_Program::SIG_ProgramLine* > &getPrgLines();
 
 
 /**

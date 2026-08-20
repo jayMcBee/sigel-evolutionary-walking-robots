@@ -7,6 +7,7 @@
 
 
 
+#include "compat/q2compat.h"
 #include "MT_GPSystem/MT_Program.h"	// Added from the class view
 #include "MT_GPSystem/MT_Interpreter.h"	// Added from the class view
 #include "MT_GPSystem/MT_TranslatedIndividual.h"
@@ -24,8 +25,6 @@
 
 #include <qstring.h>
 #include <qtextstream.h>
-#include <qqueue.h> 
-#include <qarray.h>
 #include <math.h>
 
 struct subst_cache {
@@ -34,8 +33,8 @@ struct subst_cache {
 	int refreshInt;
 	double tolerance;
 	unsigned int genNumber;
-	QArray<unsigned int> *numCorrectEst;
-	QArray<unsigned int> *numMetaEst;
+	Q2Array<unsigned int> *numCorrectEst;
+	Q2Array<unsigned int> *numMetaEst;
 };
 
 class MT_Substitute  
@@ -47,7 +46,7 @@ public:
 	void getEstimationParameter(int *EStrategy, double *Tol, int *ReInterval);
 	void setEstimationParameter(int EStrategy, double Tol, int ReInterval);
 	void setInterpreter(int NumOfVariable,  int TimeToInter);
-	void getNumOfEstimation(QArray<unsigned int> *  MetaEstimation, QArray<unsigned int>  *  CorrectEstimation);
+	void getNumOfEstimation(Q2Array<unsigned int> *  MetaEstimation, Q2Array<unsigned int>  *  CorrectEstimation);
 	int getTyp();
 
 	/*nextSIGGeneration() indicate the evaluator, that a new SIGEL Generation started */
@@ -64,13 +63,13 @@ public:
 #endif
 
 	// changeTCases() supply the new TrainingCases for the Meta GP-System
-	QQueue<MT_TrainingCase> * changeTCases();
+	Q2Queue<MT_TrainingCase> * changeTCases();
 
 	// update the BestMETAProgram;  
 	void changeBest(MT_Program * MetaProg);
 
 	// used for update the MetaError 
-	void changeErrorInfo(QArray<double> * OutCome, QArray<double> * CorrectFit);
+	void changeErrorInfo(Q2Array<double> * OutCome, Q2Array<double> * CorrectFit);
 
 	//overriding methods 
 	MT_Substitute();
@@ -100,15 +99,15 @@ protected:
 	double MetaProgError;
 	
 	// for EstimationStrategy: to determinate the MetaProgError, the Trainingsdata are needed  
-	QArray<double> CorrectFitness;
-	QArray<double> AssumedFitness; 
+	Q2Array<double> CorrectFitness;
+	Q2Array<double> AssumedFitness; 
 
 	// the AverageFitness of the Sigel GP Population for the last Generation
 	// supply for the evaluationTactic
 	double AverageSigelFitness;
 	
 	// buffer the New MT_TrainingCase;
-	QQueue<MT_TrainingCase> TCaseBuffer;
+	Q2Queue<MT_TrainingCase> TCaseBuffer;
 
 	// to interpret a SigelProgram on the BestMETAProgram
 	MT_Interpreter * Interpreter;
@@ -135,8 +134,8 @@ protected:
 	int RefreshInterval;
 
 	// different variable for count; 
-	QArray<unsigned int> NumOfCorrectEstimation;
-	QArray<unsigned int> NumOfMetaEstimation;
+	Q2Array<unsigned int> NumOfCorrectEstimation;
+	Q2Array<unsigned int> NumOfMetaEstimation;
 
 };
 

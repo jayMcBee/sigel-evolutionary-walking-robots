@@ -1,12 +1,12 @@
 #ifndef MT_CONTROLLER_H
 #define MT_CONTROLLER_H
 
-#include "MT_GUI/MT_MainWindow.h"
+#include "compat/q2compat.h"
+class MT_MainWindow;
 #include "MT_Control/MT_Substitute.h"
 #include "MT_GPSystem/MT_GPManager.h"
 
 #include <qtimer.h>
-#include <qarray.h>
 #include <qaction.h>
 #include <qstring.h>
 #include <qtextstream.h>
@@ -64,8 +64,8 @@ private:
 	MT_Substitute *substitution;
 	SIGEL_GP::SIG_GPExperiment &sigExp;
 	QObject *sigMainWindow;
-	QArray<unsigned int> correctEst;
-	QArray<unsigned int> metaEst;
+	Q2Array<unsigned int> correctEst;
+	Q2Array<unsigned int> metaEst;
 
 #ifdef _WINDOWS
 	HANDLE meta_thread;

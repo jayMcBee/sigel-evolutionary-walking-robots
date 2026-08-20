@@ -1,4 +1,6 @@
-#include <QApplication>   // qApp; was reached via SIG_Program.h before A7
+#include <QCoreApplication>   // qApp; was reached via SIG_Program.h before A7
+#include "SIGEL_Tools/SIG_IO.h"
+#include "MT_GUI/MT_MainWindow.h"
 #include "MT_Control/MT_Controller.h"
 #include "MT_Control/MT_Classifier.h"
 #include "MT_Control/MT_Evaluator.h"
@@ -151,7 +153,7 @@ bool MT_Controller::startEvolution()
 			}
 			if(!substitution){
 				if(guiEnabled)
-					QMessageBox::critical(0, "Creating Meta GP-System", "Couldn't create a substituter.", "Ok");
+					SIGEL_Tools::SIG_IO::cerr << "critical: Creating Meta GP-System Couldn't create a substituter." << Qt::endl;
 				return false;
 			}
 		}
@@ -331,11 +333,11 @@ bool MT_Controller::createGPSystem()
 	// make sure we have a gp-manager
 	if(!gpManager){
 		if(!(gpManager = new MT_GPManager(confStrm))){
-			QMessageBox::critical(0, "Creating Meta GP-System", "Couldn't create GP-Manager.", "Ok");
+			SIGEL_Tools::SIG_IO::cerr << "critical: Creating Meta GP-System Couldn't create GP-Manager." << Qt::endl;
 			return false;
 		} else {
 			if(int error = gpManager->getLastError() && guiEnabled){
-				QMessageBox::warning(0, "Creating GP-System", QString("Error in creating Meta-GP-System.\n Error no: %1").arg(error), "Ok");
+				SIGEL_Tools::SIG_IO::cerr << "warning: " << error << Qt::endl;
 			}
 		}
 	}
@@ -367,13 +369,13 @@ void MT_Controller::configureSystem()
 
 	if(!gpManager || !substCache.inUse){
 		if(!createGPSystem()){
-			QMessageBox::critical(0, "Configure meta system", "Couldn't create the gp-system.", "Ok");
+			SIGEL_Tools::SIG_IO::cerr << "critical: Configure meta system Couldn't create the gp-system." << Qt::endl;
 			return;
 		}
 	}
 	if(!mainWindow){
 		if(!(mainWindow = new MT_MainWindow(this, gpManager, &substCache, 0, "MTMainWindow"))){
-			QMessageBox::critical(0, "Configure meta system", "Couldn't open the configuration window.", "Ok");
+			SIGEL_Tools::SIG_IO::cerr << "critical: Configure meta system Couldn't open the configuration window." << Qt::endl;
 			return;
 		}
 	}
@@ -437,9 +439,7 @@ bool MT_Controller::readFromFile(QString fileName)
 				if(!confFile.open(IO_ReadOnly)){
 
 					// oops, couldn't open default configuration file
-					QMessageBox::critical(0, "Loading experiment", 
-						"Couldn't load default settings.\n"
-						"The Meta-System will be disabled.", "Ok");
+					SIGEL_Tools::SIG_IO::cerr << "critical: Loading experiment Couldn't load default settings." << Qt::endl;
 				} else {
 					break;
 				}
@@ -500,9 +500,7 @@ bool MT_Controller::readFromFile(QString fileName)
 
 	if(error){
 		if(guiEnabled)
-			QMessageBox::critical(0, "Loading Experiment", "Error in loading experiment\n"
-						"The meta experiment file is corrupted.\n"
-						"Disabling the meta system.", "Ok");
+			SIGEL_Tools::SIG_IO::cerr << "critical: Loading Experiment Error in loading experiment" << Qt::endl;
 		useMeta(false);
 		return false;
 	}
@@ -628,7 +626,7 @@ bool MT_Controller::saveSystem(QString sigExpName)
 	} else {
 		// oops, something went wrong
 		if(guiEnabled)
-			QMessageBox::critical(0, "Saving experiment", "Couldn't save the experiment!", "Ok");
+			SIGEL_Tools::SIG_IO::cerr << "critical: Saving experiment Couldn't save the experiment!" << Qt::endl;
 		return false;
 	}
 
@@ -837,7 +835,7 @@ void MT_Controller::slotLoadDefault()
 		file.close();
 
 	} else {		// read error
-		QMessageBox::warning(mainWindow, "Load setup", "Couldn't load default setup.\nAbort operation.", "Ok");
+		SIGEL_Tools::SIG_IO::cerr << "warning: Load setup Couldn't load default setup. Abort operation." << Qt::endl;
 	}
 }
 
@@ -883,7 +881,7 @@ void MT_Controller::slotLoadSetup()
 		file.close();
 
 	} else {		// read error
-		QMessageBox::warning(mainWindow, "Load setup", "Couldn't open specified file.\nAbort operation.", "Ok");
+		SIGEL_Tools::SIG_IO::cerr << "warning: Load setup Couldn't open specified file. Abort operation." << Qt::endl;
 	}
 }
 
@@ -928,6 +926,6 @@ void MT_Controller::slotSaveSetup()
 		mainWindow->enforceUpdate(true);		// enforce an update of the GUI
 
 	} else {
-		QMessageBox::warning(mainWindow, "Load setup", "Couldn't open specified file.\nAbort operation.", "Ok");
+		SIGEL_Tools::SIG_IO::cerr << "warning: Load setup Couldn't open specified file. Abort operation." << Qt::endl;
 	}
 }

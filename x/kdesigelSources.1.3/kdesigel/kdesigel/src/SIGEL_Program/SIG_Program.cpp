@@ -80,7 +80,7 @@ long SIGEL_Program::SIG_Program::getProgramLength()
      return lines.size();
 }
 
-vector<SIGEL_Program::SIG_ProgramLine*> &SIGEL_Program::SIG_Program::getPrgLines()
+std::vector< SIGEL_Program::SIG_ProgramLine* > &SIGEL_Program::SIG_Program::getPrgLines()
 {
      return lines;
 }

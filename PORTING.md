@@ -471,6 +471,31 @@ static initialisation. Verified: identical iteration order across runs.
 `main()` should call it explicitly too, once `sigel.cpp` and `sigel_slave.cpp`
 are ported — static initialisation order is unspecified.
 
+### PLAN CORRECTION — `MT_Control` is not headless (found at A8)
+
+§7 lists A8 as "`MT_Control` + cut back-edge → `MT_GUI` (1 include)". Cutting the
+header include is correct and done — `MT_Controller.h` used `MT_MainWindow` only
+as a pointer, so it forward-declares.
+
+But **`MT_Controller.cpp` is deeply coupled to the GUI**: 23 `mainWindow->`
+member accesses, and it constructs `new MT_MainWindow` itself. It wires up
+toolbar actions (`mtStartEvolutionAction`, `mtStopEvolutionAction`, …) with
+`connect`/`disconnect`. That is not one include; it is a controller that owns
+its window.
+
+So `MT_Controller.cpp` cannot compile against Qt6Core alone, and cannot until
+`MT_GUI` is ported in Phase C. The other three files in the module do.
+
+This matters because `sigel.cpp:272` reaches `MT_Controller::startTimedEvolution`
+on the headless `-me` path, so a headless build genuinely needs this class.
+Either the GUI wiring moves out of `MT_Controller` into `MT_GUI`, or `MT_Control`
+is reclassified as a GUI module. Not decided.
+
+Related, same module: 4 of its 15 `QMessageBox` calls are **interactive** — the
+return value drives a `switch` or an `if`, i.e. they ask the user a question.
+The other 11 were converted to console output as at A2. The 4 cannot be, and are
+listed in the error-reporting debt above.
+
 ### TRAP — `toUtf8()` returns a temporary (all 74 D8 sites)
 
 Qt 2's `latin1()` returned a pointer into the QString's own buffer, so
