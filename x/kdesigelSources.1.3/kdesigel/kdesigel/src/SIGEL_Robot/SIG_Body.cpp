@@ -212,7 +212,7 @@ namespace SIGEL_Robot
                 // Load expects a char*, so a const_cast is necessary.
                 
                 QByteArray geometryFileBytes = getGeometryFile ().toUtf8();
-		bodyScene->load( geometryFileBytes.data() );
+                bodyScene->load( geometryFileBytes.data() );
                 
                 NEWMAT::Matrix identity(4,4);
                 identity = 0;

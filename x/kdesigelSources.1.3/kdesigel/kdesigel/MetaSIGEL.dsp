@@ -440,11 +440,11 @@ SOURCE=.\include\MT_Control\MT_Substitute.h
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=.\src\MT_GPSystem\MT_FitnessTranier.cpp
+SOURCE=.\src\MT_GPSystem\MT_FitnessTrainer.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\include\MT_GPSystem\MT_FitnessTranier.h
+SOURCE=.\include\MT_GPSystem\MT_FitnessTrainer.h
 # End Source File
 # Begin Source File
 

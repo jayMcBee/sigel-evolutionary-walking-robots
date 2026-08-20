@@ -166,7 +166,7 @@ SIGEL_Program::Robotinstruction SIGEL_Program::SIG_ProgramLine::getRobotinstruct
 
 int SIGEL_Program::SIG_ProgramLine::getInstructionElement( int no )
 {
-  if( no < element.size() )
+  if( no >= 0 && no < int(element.size()) )
     {
       return element[no];
     }
@@ -192,7 +192,7 @@ Q2Array< int > SIGEL_Program::SIG_ProgramLine::getElementsArray()
 
 int SIGEL_Program::SIG_ProgramLine::getElement( int no )
 {
-  if( no < element.size() )
+  if( no >= 0 && no < int(element.size()) )
     {
       return element[no];
     }
@@ -214,7 +214,7 @@ int SIGEL_Program::SIG_ProgramLine::getElement( int no )
 
 void SIGEL_Program::SIG_ProgramLine::setElement(int no, int value)
 {
-  if( no < element.size() )
+  if( no >= 0 && no < int(element.size()) )
     {
      element[no] = value;
     }

@@ -185,7 +185,7 @@ files=kdesigel/include/MT_Control/MT_Controller.h,kdesigel/include/MT_Control/MT
 sub_dirs=
 type=normal
 
-[kdesigel/include/MT_GPSystem/MT_FitnessTranier.h]
+[kdesigel/include/MT_GPSystem/MT_FitnessTrainer.h]
 dist=true
 install=false
 install_location=
@@ -300,7 +300,7 @@ install_location=
 type=HEADER
 
 [kdesigel/include/MT_GPSystem/Makefile.am]
-files=kdesigel/include/MT_GPSystem/MT_FitnessTranier.h,kdesigel/include/MT_GPSystem/MT_GPManager.h,kdesigel/include/MT_GPSystem/MT_Individual.h,kdesigel/include/MT_GPSystem/MT_Instruction.h,kdesigel/include/MT_GPSystem/MT_Interpreter.h,kdesigel/include/MT_GPSystem/MT_Operand.h,kdesigel/include/MT_GPSystem/MT_Population.h,kdesigel/include/MT_GPSystem/MT_Program.h,kdesigel/include/MT_GPSystem/MT_Programline.h,kdesigel/include/MT_GPSystem/MT_Randomizer.h,kdesigel/include/MT_GPSystem/MT_Search.h,kdesigel/include/MT_GPSystem/MT_SelectionMethod.h,kdesigel/include/MT_GPSystem/MT_Statistics.h,kdesigel/include/MT_GPSystem/MT_StatisticsElement.h,kdesigel/include/MT_GPSystem/MT_Tournament.h,kdesigel/include/MT_GPSystem/MT_TournamentManager.h,kdesigel/include/MT_GPSystem/MT_TrainingCase.h,kdesigel/include/MT_GPSystem/MT_Trainingset.h,kdesigel/include/MT_GPSystem/MT_TranslatedIndividual.h
+files=kdesigel/include/MT_GPSystem/MT_FitnessTrainer.h,kdesigel/include/MT_GPSystem/MT_GPManager.h,kdesigel/include/MT_GPSystem/MT_Individual.h,kdesigel/include/MT_GPSystem/MT_Instruction.h,kdesigel/include/MT_GPSystem/MT_Interpreter.h,kdesigel/include/MT_GPSystem/MT_Operand.h,kdesigel/include/MT_GPSystem/MT_Population.h,kdesigel/include/MT_GPSystem/MT_Program.h,kdesigel/include/MT_GPSystem/MT_Programline.h,kdesigel/include/MT_GPSystem/MT_Randomizer.h,kdesigel/include/MT_GPSystem/MT_Search.h,kdesigel/include/MT_GPSystem/MT_SelectionMethod.h,kdesigel/include/MT_GPSystem/MT_Statistics.h,kdesigel/include/MT_GPSystem/MT_StatisticsElement.h,kdesigel/include/MT_GPSystem/MT_Tournament.h,kdesigel/include/MT_GPSystem/MT_TournamentManager.h,kdesigel/include/MT_GPSystem/MT_TrainingCase.h,kdesigel/include/MT_GPSystem/MT_Trainingset.h,kdesigel/include/MT_GPSystem/MT_TranslatedIndividual.h
 sub_dirs=
 type=normal
 
@@ -1591,7 +1591,7 @@ sharedlib_rootname=MT_Control
 sub_dirs=
 type=static_library
 
-[kdesigel/src/MT_GPSystem/MT_FitnessTranier.cpp]
+[kdesigel/src/MT_GPSystem/MT_FitnessTrainer.cpp]
 dist=true
 install=false
 install_location=
@@ -1694,7 +1694,7 @@ install_location=
 type=SOURCE
 
 [kdesigel/src/MT_GPSystem/Makefile.am]
-files=kdesigel/src/MT_GPSystem/MT_FitnessTranier.cpp,kdesigel/src/MT_GPSystem/MT_GPManager.cpp,kdesigel/src/MT_GPSystem/MT_Individual.cpp,kdesigel/src/MT_GPSystem/MT_Interpreter.cpp,kdesigel/src/MT_GPSystem/MT_Operand.cpp,kdesigel/src/MT_GPSystem/MT_Population.cpp,kdesigel/src/MT_GPSystem/MT_Program.cpp,kdesigel/src/MT_GPSystem/MT_Programline.cpp,kdesigel/src/MT_GPSystem/MT_Randomizer.cpp,kdesigel/src/MT_GPSystem/MT_Search.cpp,kdesigel/src/MT_GPSystem/MT_Statistics.cpp,kdesigel/src/MT_GPSystem/MT_StatisticsElement.cpp,kdesigel/src/MT_GPSystem/MT_Tournament.cpp,kdesigel/src/MT_GPSystem/MT_TournamentManager.cpp,kdesigel/src/MT_GPSystem/MT_TrainingCase.cpp,kdesigel/src/MT_GPSystem/MT_Trainingset.cpp,kdesigel/src/MT_GPSystem/MT_TranslatedIndividual.cpp
+files=kdesigel/src/MT_GPSystem/MT_FitnessTrainer.cpp,kdesigel/src/MT_GPSystem/MT_GPManager.cpp,kdesigel/src/MT_GPSystem/MT_Individual.cpp,kdesigel/src/MT_GPSystem/MT_Interpreter.cpp,kdesigel/src/MT_GPSystem/MT_Operand.cpp,kdesigel/src/MT_GPSystem/MT_Population.cpp,kdesigel/src/MT_GPSystem/MT_Program.cpp,kdesigel/src/MT_GPSystem/MT_Programline.cpp,kdesigel/src/MT_GPSystem/MT_Randomizer.cpp,kdesigel/src/MT_GPSystem/MT_Search.cpp,kdesigel/src/MT_GPSystem/MT_Statistics.cpp,kdesigel/src/MT_GPSystem/MT_StatisticsElement.cpp,kdesigel/src/MT_GPSystem/MT_Tournament.cpp,kdesigel/src/MT_GPSystem/MT_TournamentManager.cpp,kdesigel/src/MT_GPSystem/MT_TrainingCase.cpp,kdesigel/src/MT_GPSystem/MT_Trainingset.cpp,kdesigel/src/MT_GPSystem/MT_TranslatedIndividual.cpp
 sharedlib_LDFLAGS=-version-info 0:0:1
 sharedlib_rootname=MT_GPSystem
 sub_dirs=
