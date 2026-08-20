@@ -23,9 +23,9 @@
 #ifndef SIGEL_GP_SIG_GPFULLDATARECORDER_H
 #define SIGEL_GP_SIG_GPFULLDATARECORDER_H
 
+#include "compat/q2compat.h"
 #include "SIGEL_Simulation/SIG_Recorder.h"
 
-#include <qlist.h>
 
 namespace SIGEL_GP
 {
@@ -51,9 +51,9 @@ namespace SIGEL_GP
 
       void finish();
 
-      QList< DL_vector > positions;
-      QList< DL_matrix > rotations;
-      QList< int > touchdowns;
+      Q2PtrList< DL_vector > positions;
+      Q2PtrList< DL_matrix > rotations;
+      Q2PtrList< int > touchdowns;
 
 
     private:
@@ -61,7 +61,7 @@ namespace SIGEL_GP
       DL_vector endPosition;
       DL_matrix endRotation;
 
-      QList< std::vector<double*> > listForces;
+      Q2PtrList< std::vector<double*> > listForces;
       int numLinks;
       int recordingFrequency;
       int frameCounter;

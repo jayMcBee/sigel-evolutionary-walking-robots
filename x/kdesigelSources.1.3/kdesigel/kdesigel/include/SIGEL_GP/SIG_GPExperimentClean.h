@@ -23,6 +23,7 @@
 #ifndef SIGEL_GP_SIG_GPEXPERIMENT_H
 #define SIGEL_GP_SIG_GPEXPERIMENT_H
 
+#include "compat/q2compat.h"
 #include "SIGEL_Robot/SIG_Robot.h"
 #include "SIGEL_GP/SIG_GPParameter.h"
 #include "SIGEL_Environment/SIG_Environment.h"
@@ -34,7 +35,6 @@
 
 #include <qstring.h>
 #include <qtextstream.h>
-#include <qlist.h>
 
 /**
  * The namespace SIGEL_GP represents the classes of genetic programming and
@@ -105,7 +105,7 @@ class SIG_GPExperiment {
   QString comment;
 
  public:
-  QList< SIG_GPExperimentHistoryEntry > experimentHistory;
+  Q2PtrList< SIG_GPExperimentHistoryEntry > experimentHistory;
 
  private: 	
  	/**
@@ -139,7 +139,7 @@ class SIG_GPExperiment {
   ~SIG_GPExperiment();
 
  public:
-  QString SIGEL_GP::SIG_GPExperiment::cutAfterFiveHashes(QTextStream& source);
+  QString cutAfterFiveHashes(QTextStream& source);
 
   /**
    * This sets experimentdatas from a QDataStream to the attributes of an

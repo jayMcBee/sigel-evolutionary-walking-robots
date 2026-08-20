@@ -81,15 +81,15 @@ MT_Evaluator::~MT_Evaluator()
 void MT_Evaluator::writeToFile(QTextStream & File)
 {
 	File << ("Evaluator:\n");
-	File << EstimationStrategy <<endl;
-	File << Tolerance <<endl;
-	File << RefreshInterval <<endl;
-	File << GenerationNumber <<endl;
+	File << EstimationStrategy <<Qt::endl;
+	File << Tolerance <<Qt::endl;
+	File << RefreshInterval <<Qt::endl;
+	File << GenerationNumber <<Qt::endl;
 
 	for(int i=0; i< GenerationNumber; i++)
 		{
-			File << NumOfCorrectEstimation[i] <<endl;
-			File << NumOfMetaEstimation[i] << endl;
+			File << NumOfCorrectEstimation[i] <<Qt::endl;
+			File << NumOfMetaEstimation[i] << Qt::endl;
 		}
 }
 
@@ -97,11 +97,11 @@ void MT_Evaluator::writeToFile(QTextStream & File)
 void MT_Evaluator::writeToFileSetup(QTextStream & File)
 {
 	File << ("Evaluator:\n");
-	File << EstimationStrategy <<endl;
-	File << Tolerance <<endl;
-	File << RefreshInterval <<endl;
+	File << EstimationStrategy <<Qt::endl;
+	File << Tolerance <<Qt::endl;
+	File << RefreshInterval <<Qt::endl;
 	int GenNum =0;
-	File << GenNum <<endl;
+	File << GenNum <<Qt::endl;
 }
 	
 void MT_Evaluator::loadSetup(QTextStream &File)
@@ -196,7 +196,7 @@ bool MT_Evaluator::evaluationTactic()
 					WorseError[i] = 0.0;
 				
 
-				for (i=0; i<CorrectFitness.size();i++)
+				for (int i=0; i<CorrectFitness.size();i++)
 				{
 					PresentError = fabs(AssumedFitness[i]-CorrectFitness[i]);
 					MetaProgError = MetaProgError + PresentError;

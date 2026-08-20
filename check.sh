@@ -25,11 +25,11 @@ QTINC=$(qmake6 -query QT_INSTALL_HEADERS)
 
 FLAGS="-fsyntax-only -std=c++17 -Wall -Wextra -Wno-error=template-body -DMINMAX_H"
 INCS="-I$ROOT/shim -I$SRC/include -isystem $QTINC -isystem $QTINC/QtCore"
-for d in newmat09 dynamechs/dm Dynamo/Src/Inc fparser cv97 SOLID-2.0/include; do
+for d in newmat09 dynamechs/dm Dynamo/Src/Inc fparser cv97 SOLID-2.0/include pvm3/include; do
     INCS="$INCS -isystem $SL/$d"
 done
 
-MODULES="${1:-SIGEL_Tools SIGEL_Environment MT_GPSystem SIGEL_Robot SIGEL_Program SIGEL_RobotIO SIGEL_Simulation MT_Control}"
+MODULES="${1:-SIGEL_Tools SIGEL_Environment MT_GPSystem SIGEL_Robot SIGEL_Program SIGEL_RobotIO SIGEL_Simulation MT_Control SIGEL_GP}"
 pass=0; fail=0; warn=0
 
 # The shim self-check instantiates every Q2* member; 56 of them are reached by

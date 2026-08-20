@@ -46,7 +46,7 @@ namespace SIGEL_GP
 
   SIG_GPPVMHost::SIG_GPPVMHost( QString input )
   {
-    QTextStream inputStream( &input, IO_ReadOnly );
+    QTextStream inputStream( &input, QIODeviceBase::ReadOnly );
 
     int enabledInt = 0;
 
@@ -74,7 +74,7 @@ namespace SIGEL_GP
   {
     QString result;
 
-    QTextStream resultStream( &result, IO_WriteOnly );
+    QTextStream resultStream( &result, QIODeviceBase::WriteOnly );
 
     resultStream << name
 		 << " "

@@ -3,6 +3,9 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "MT_GPSystem/MT_GPManager.h"
+#ifndef _WINDOWS
+#include <unistd.h>   // sleep(); Qt 2 pulled this in transitively
+#endif
 #include "MT_Control/MT_Substitute.h"
 #include <iostream.h>
 #ifdef _WINDOWS

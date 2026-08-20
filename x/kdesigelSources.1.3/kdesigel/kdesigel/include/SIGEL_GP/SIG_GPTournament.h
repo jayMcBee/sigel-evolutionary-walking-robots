@@ -23,6 +23,7 @@
 #ifndef SIGEL_GP_SIG_GPTOURNAMENT_H
 #define SIGEL_GP_SIG_GPTOURNAMENT_H
 
+#include "compat/q2compat.h"
 #include "SIGEL_Tools/SIG_Randomizer.h"
 #include "SIGEL_GP/SIG_GPFitnessTrainer.h"
 #include "SIGEL_GP/SIG_GPTournamentIndividual.h"
@@ -33,7 +34,6 @@
 
 //#include "MT_Control/MT_Classifier.h"
 
-#include <qvector.h>
 
 class MT_Classifier;
 
@@ -78,7 +78,7 @@ SIG_GPFitnessTrainer& trainer;
    * pvm-task given from the fitnesstrainer.
    */
  public:
-QVector<SIG_GPTournamentIndividual> indis;
+Q2PtrVector<SIG_GPTournamentIndividual> indis;
 
   /**
    * The flag signals if the tournament can be played or have to wait for earlier tournaments.

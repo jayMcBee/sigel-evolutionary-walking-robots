@@ -22,6 +22,8 @@
 */
 
 #include "SIGEL_GP/SIG_GPRemoteZORCFitnessFunction.h"
+#include <QInputDialog>   // widget used in this file only
+#include "SIGEL_Tools/SIG_IO.h"
 
 
 namespace SIGEL_GP
@@ -61,7 +63,7 @@ namespace SIGEL_GP
 
 
       // make a textstream object from langParmLines to get the language parameters in the string
-      QTextStream lpTs( &langParmLines, IO_WriteOnly );
+      QTextStream lpTs( &langParmLines, QIODeviceBase::WriteOnly );
 
       // fetch current program as string
       program.printToString(prgLines);
@@ -72,14 +74,14 @@ namespace SIGEL_GP
    	// Open the serial device (might differ on your computer !)
       fd = open("/dev/modem", O_RDWR | O_NOCTTY);
       if (fd < 0)
-      {  QMessageBox::critical(NULL, "Serial Device can't be opened", "<BIG><B>The serial device \"/dev/modem\" couldn't be opened to transmit the program to ZORC.</B></BIG><BR><BR>Program evaluation was canceled.");
+      {  SIGEL_Tools::SIG_IO::cerr << "Serial Device can't be opened: The serial device \\"/dev/modem\\" couldn't be opened to transmit the program to ZORC.Program evaluation was canceled." << Qt::endl;
          fprintf(stderr, "Serial interface can't be opened");
          return -1.0;
       }
 
       // set parameters for serial device and catch errors
 	   if (SetSerial(fd, BaudRate, 1) < 0)
-      {  QMessageBox::critical(NULL, "Error setting Parameters of Serial Device", "<BIG><B>Failed to set the parameters of serial device \"/dev/modem\".</B></BIG><BR><BR>Program evaluation was canceled.");
+      {  SIGEL_Tools::SIG_IO::cerr << "Error setting Parameters of Serial Device: Failed to set the parameters of serial device \\"/dev/modem\\".Program evaluation was canceled." << Qt::endl;
          fprintf(stderr, "Failed to set parameters of serial device");
          return -1.0;
       }
@@ -93,7 +95,7 @@ namespace SIGEL_GP
       if (! timedSerialWait(fd, 2) )
       {
          // ZORC didn't respond for 2 seconds -- not connected ?!
-         QMessageBox::critical(NULL, "Serial Connection Failed", "<BIG><B>Connection to ZORC can't be established using interface \"/dev/modem\".</B></BIG><BR><BR>The RS-232 Ping failed. Possibly the menu on ZORC wasn't reset to the toplevel ? Please check !");
+         SIGEL_Tools::SIG_IO::cerr << "Serial Connection Failed: <BIG><B>Connection to ZORC can't be established using interface \"/dev/modem\".</B></BIG><BR><BR>The RS-232 Ping failed. Possibly the menu on ZORC wasn't reset to the toplevel ? Please check !" << Qt::endl;
          fprintf(stderr, "Can't establish connection to ZORC -- RS232-Ping failed");
 
          return -1.0;
@@ -105,7 +107,7 @@ namespace SIGEL_GP
 		{
 			if (recvPrgLen != 8)
 			{	// bad response from ZORC..
-         	QMessageBox::critical(NULL, "Problem with Serial Connection", "<BIG><B>The connection to ZORC could be established but the response was incorrect.</B></BIG><BR><BR>Please check !");
+         	SIGEL_Tools::SIG_IO::cerr << "Problem with Serial Connection: <BIG><B>The connection to ZORC could be established but the response was incorrect.</B></BIG><BR><BR>Please check !" << Qt::endl;
 	         fprintf(stderr, "The connection to ZORC could be established but the response was incorrect.");
    	      return -1.0;
 			}
@@ -116,7 +118,7 @@ namespace SIGEL_GP
 		}
 
       else
-      {  QMessageBox::critical(NULL, "Bad Response from ZORC", "<BIG><B>Got bad response from ZORC.</B></BIG><BR><BR>Evaluation canceled, Please retry..");
+      {  SIGEL_Tools::SIG_IO::cerr << "Bad Response from ZORC: Got bad response from ZORC.Evaluation canceled, Please retry.." << Qt::endl;
          fprintf(stderr, "Bad response from ZORC");
          return -1.0;
       }
@@ -133,7 +135,7 @@ namespace SIGEL_GP
       if (! timedSerialWait(fd, 2) )
       {
          // ZORC didn't respond for 2 seconds -- not connected ?!
-         QMessageBox::critical(NULL, "Serial Connection Failed", "<BIG><B>Connection to ZORC can't be established using interface \"/dev/modem\".</B></BIG><BR><BR>Evaluation canceled, Please check !");
+         SIGEL_Tools::SIG_IO::cerr << "Serial Connection Failed: <BIG><B>Connection to ZORC can't be established using interface \"/dev/modem\".</B></BIG><BR><BR>Evaluation canceled, Please check !" << Qt::endl;
          fprintf(stderr, "Can't establish connection to ZORC");
          return -1.0;
       }
@@ -147,14 +149,14 @@ namespace SIGEL_GP
          {  char  errMsg[256];
 
             sprintf(errMsg, "<BIG><B>Program length received by ZORC [%d] doesn't match the original SIGEL-Program length [%d].</B></BIG><BR><BR>Please retry..", recvPrgLen, program.getProgramLength());
-            QMessageBox::critical(NULL, "Error transmitting program", QString(errMsg));
+            SIGEL_Tools::SIG_IO::cerr << "Error transmitting program" << Qt::endl;
             fprintf(stderr, errMsg);
             return -1.0;
          }
       }
 
       else
-      {  QMessageBox::critical(NULL, "Bad Response from ZORC", "<BIG><B>Got bad response from ZORC.</B></BIG><BR><BR>Bad response after program transmission. Evaluation was canceled, Please retry..");
+      {  SIGEL_Tools::SIG_IO::cerr << "Bad Response from ZORC: Got bad response from ZORC.Bad response after program transmission. Evaluation was canceled, Please retry.." << Qt::endl;
          fprintf(stderr, "Bad response from ZORC");
          return -1.0;
       }

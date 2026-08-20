@@ -239,7 +239,7 @@ void SIGEL_GP::SIG_GPIndividual::loadIndividual(QString data)
 QString SIGEL_GP::SIG_GPIndividual::saveIndividual(bool history)
 {
   QString                     str;
-  QTextStream                 outputFile(&str, IO_WriteOnly);
+  QTextStream                 outputFile(&str, QIODeviceBase::WriteOnly);
 
   writeToFile(outputFile,history);
 
@@ -461,11 +461,11 @@ void SIGEL_GP::SIG_GPIndividual::importIndividual( QString& filename )
    QFile   indFile( filename );
    QString indString;
 
-   if( indFile.open( IO_ReadOnly ) )
+   if( indFile.open( QIODeviceBase::ReadOnly ) )
      {
        addPreparationOfHistoryInfo();
        QTextStream buffer( &indFile );
-       indString = buffer.read();
+       indString = buffer.readAll();
        readFromFile( indString );
        indFile.close();
        addImportIndividualInfo( QDateTime::currentDateTime() );
@@ -482,7 +482,7 @@ void SIGEL_GP::SIG_GPIndividual::exportIndividual( QString& filename )
 {
    QFile indFile( filename );
 
-   if( indFile.open( IO_WriteOnly ) )
+   if( indFile.open( QIODeviceBase::WriteOnly ) )
      {
        QTextStream buffer( &indFile );
        writeToFile( buffer,true );
@@ -580,57 +580,57 @@ void SIGEL_GP::SIG_GPIndividual::readFromFile(QString indStr)
 
   QString                     prgStr;
   QString                     histStr;
-  QTextStream                 outputFile(&prgStr, IO_WriteOnly);  
-  QTextStream                 inputFile(&prgStr, IO_ReadOnly);
+  QTextStream                 outputFile(&prgStr, QIODeviceBase::WriteOnly);  
+  QTextStream                 inputFile(&prgStr, QIODeviceBase::ReadOnly);
 
 
   // cout<<"Received string:\n"<<indStr<<"\n";  
   
 
-  if((pos=indStr.find("NAME='",0,false))!=-1)
+  if((pos=indStr.indexOf("NAME='", 0, Qt::CaseInsensitive))!=-1)
     {
-      // cout<<indStr.mid(pos+6,indStr.find("'",pos+7,false)-pos-6);
-      setName(indStr.mid(pos+6,indStr.find("'",pos+7,false)-pos-6));
+      // cout<<indStr.mid(pos+6,indStr.indexOf("'", pos+7, Qt::CaseInsensitive)-pos-6);
+      setName(indStr.mid(pos+6,indStr.indexOf("'", pos+7, Qt::CaseInsensitive)-pos-6));
     }
   else
     {
       
     }
 
-  if((pos=indStr.find("POOLPOS=",0,false))!=-1)
+  if((pos=indStr.indexOf("POOLPOS=", 0, Qt::CaseInsensitive))!=-1)
     {
-      //cout<<indStr.mid(pos+8,indStr.find(";",pos+9,false)-pos-8);
-      setPoolPos((indStr.mid(pos+8,indStr.find(";",pos+9,false)-pos-8)).toLong());
+      //cout<<indStr.mid(pos+8,indStr.indexOf(";", pos+9, Qt::CaseInsensitive)-pos-8);
+      setPoolPos((indStr.mid(pos+8,indStr.indexOf(";", pos+9, Qt::CaseInsensitive)-pos-8)).toLong());
     }
   else
     {
       
     }  
 
-  if((pos=indStr.find("FITNESS=",0,false))!=-1)
+  if((pos=indStr.indexOf("FITNESS=", 0, Qt::CaseInsensitive))!=-1)
     {
-      //cout<<indStr.mid(pos+8,indStr.find(";",pos+9,false)-pos-8);
-      setFitness((indStr.mid(pos+8,indStr.find(";",pos+9,false)-pos-8)).toDouble());
+      //cout<<indStr.mid(pos+8,indStr.indexOf(";", pos+9, Qt::CaseInsensitive)-pos-8);
+      setFitness((indStr.mid(pos+8,indStr.indexOf(";", pos+9, Qt::CaseInsensitive)-pos-8)).toDouble());
     }
   else
     {
       
     }
 
-  if((pos=indStr.find("AGE=",0,false))!=-1)
+  if((pos=indStr.indexOf("AGE=", 0, Qt::CaseInsensitive))!=-1)
     {
-      //cout<<indStr.mid(pos+4,indStr.find(";",pos+5,false)-pos-4);
-      setAge((indStr.mid(pos+4,indStr.find(";",pos+5,false)-pos-4)).toLong());
+      //cout<<indStr.mid(pos+4,indStr.indexOf(";", pos+5, Qt::CaseInsensitive)-pos-4);
+      setAge((indStr.mid(pos+4,indStr.indexOf(";", pos+5, Qt::CaseInsensitive)-pos-4)).toLong());
     }
   else
     {
       
     }  
   
-  if((pos=indStr.find("PROGRAM BEGIN{",0,false))!=-1)
+  if((pos=indStr.indexOf("PROGRAM BEGIN{", 0, Qt::CaseInsensitive))!=-1)
     {
-      //cout<<indStr.mid(pos+14,indStr.find("}PROGRAM END",pos+15,false)-pos-14);
-      prgStr=indStr.mid(pos+15,indStr.find("}PROGRAM END",pos+16,false)-pos-14);
+      //cout<<indStr.mid(pos+14,indStr.indexOf("}PROGRAM END", pos+15, Qt::CaseInsensitive)-pos-14);
+      prgStr=indStr.mid(pos+15,indStr.indexOf("}PROGRAM END", pos+16, Qt::CaseInsensitive)-pos-14);
       getProgramPointer()->clear();
       getProgramPointer()->readFromFile(inputFile);
  
@@ -641,10 +641,10 @@ void SIGEL_GP::SIG_GPIndividual::readFromFile(QString indStr)
       
     } 
   
-  if((pos=indStr.find("HISTORY BEGIN{",0,false))!=-1)
+  if((pos=indStr.indexOf("HISTORY BEGIN{", 0, Qt::CaseInsensitive))!=-1)
     {
        // history.clear();
-       histStr=indStr.mid(pos+14,indStr.find("}HISTORY END",pos+15,false)-pos-14);
+       histStr=indStr.mid(pos+14,indStr.indexOf("}HISTORY END", pos+15, Qt::CaseInsensitive)-pos-14);
        history.append(histStr);
     }
   else

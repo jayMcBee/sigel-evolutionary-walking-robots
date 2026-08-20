@@ -48,7 +48,7 @@ namespace SIGEL_GP
     int minute = 0;
     int second = 0;
 
-    QTextStream entryStream( &entryString, IO_ReadOnly );
+    QTextStream entryStream( &entryString, QIODeviceBase::ReadOnly );
 
     entryStream >> generationNo
 		>> year
@@ -87,7 +87,7 @@ namespace SIGEL_GP
   QString SIG_GPExperimentHistoryEntry::print() const
   {
     QString result;
-    QTextStream resultStream( &result, IO_WriteOnly );
+    QTextStream resultStream( &result, QIODeviceBase::WriteOnly );
 
     resultStream << generationNo
 		 << " "

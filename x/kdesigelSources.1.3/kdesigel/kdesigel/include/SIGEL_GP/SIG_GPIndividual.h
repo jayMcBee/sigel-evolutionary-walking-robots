@@ -415,7 +415,7 @@ class SIG_GPIndividual{
   */
 
  public:
- void SIGEL_GP::SIG_GPIndividual::addCrossOverInfo(QString name1, 
+ void addCrossOverInfo(QString name1, 
                                                   QString name2, 
                                                   QDateTime time, 
                                                   int xoverpnt1, 

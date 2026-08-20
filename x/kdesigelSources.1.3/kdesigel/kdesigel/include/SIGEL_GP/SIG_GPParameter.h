@@ -23,6 +23,7 @@
 #ifndef SIGEL_GP_SIG_GPPARAMETER_H
 #define SIGEL_GP_SIG_GPPARAMETER_H
 
+#include "compat/q2compat.h"
 #include "SIGEL_GP/SIG_GPPVMHost.h"
 #include "SIGEL_Program/SIG_ProgramLine.h"
 
@@ -31,7 +32,6 @@
 #include <qdatetime.h>
 #include <qdir.h>
 #include <qstringlist.h>
-#include <qarray.h>
  
 namespace SIGEL_GP
 {
@@ -326,13 +326,13 @@ namespace SIGEL_GP
    */
 
   private:
-  QArray< int > instructionProb;
+  Q2Array< int > instructionProb;
 
   private:
   QString fitnessName;
 
   private:
-  QList< SIG_GPPVMHost > hostList;
+  Q2PtrList< SIG_GPPVMHost > hostList;
 
   private:
   int timeOutMinutes;
@@ -424,10 +424,10 @@ namespace SIGEL_GP
  int getMinIndLength() const;
 
   public:
- QList< SIG_GPPVMHost > const &getHostList() const;
+ Q2PtrList< SIG_GPPVMHost > const &getHostList() const;
 
   public:
-  QList< SIG_GPPVMHost > &getHostList();
+  Q2PtrList< SIG_GPPVMHost > &getHostList();
 
  /**
  * This sets the max length of an individual of the parameter.
@@ -883,7 +883,7 @@ namespace SIGEL_GP
   int  getProbability( SIGEL_Program::Robotinstruction instruction );
 
   public:
-  QArray< int > &getInstructionProbabilities();
+  Q2Array< int > &getInstructionProbabilities();
 
   public:
   int getTimeOutMinutes();

@@ -25,8 +25,6 @@
 
 #include "SIGEL_GP/SIG_GPFitnessFunction.h"
 
-#include "qinputdialog.h"
-#include "qmessagebox.h"
 
 //#include <unistd.h>
 #include <fcntl.h>

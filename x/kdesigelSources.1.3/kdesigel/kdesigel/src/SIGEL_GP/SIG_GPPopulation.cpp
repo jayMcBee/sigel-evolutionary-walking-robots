@@ -21,6 +21,7 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 #include <QApplication>   // qApp->wakeUpGuiThread() and QProgressDialog need QtWidgets
+#include <QProgressDialog>   // widget used in this file only
 #include "SIGEL_GP/SIG_GPPopulation.h"
 
 #include<iostream>
@@ -64,7 +65,7 @@ SIGEL_GP::SIG_GPPopulation::SIG_GPPopulation(int size)
     
 SIGEL_GP::SIG_GPPopulation::SIG_GPPopulation(QString data)
 {
-   QTextStream                 inputFile(&data, IO_ReadOnly);
+   QTextStream                 inputFile(&data, QIODeviceBase::ReadOnly);
 
    history = true;
 
@@ -180,7 +181,7 @@ void SIGEL_GP::SIG_GPPopulation::addRandomIndividuals(int quantity,
    QProgressDialog *progress;
    
    if( qApp ) progress = new QProgressDialog ( "Progress:", "Cancel", quantity,
-                                               0, "Progress", TRUE );
+                                               0, "Progress", true );
    if( qApp ) progress->setCaption( "Generating" );
    
    for( int x = maxPos; x<maxPos + quantity; x++ )
@@ -326,7 +327,7 @@ void SIGEL_GP::SIG_GPPopulation::readFromFile(QTextStream &file)
 		else history = true;
 	}
 
-  QString          populationStr=file.read();
+  QString          populationStr=file.readAll();
   QString          tmpStr1, indStr;
   long             pos, pos2;
   QProgressDialog *progress;
@@ -339,9 +340,9 @@ void SIGEL_GP::SIG_GPPopulation::readFromFile(QTextStream &file)
   
   //cout<<"TEST Population : \n"<<populationStr<<"\n\n";  
 	     
-  if( (pos=populationStr.find("POPULATIONSIZE=",0,false) )!=-1 ) 
+  if( (pos=populationStr.indexOf("POPULATIONSIZE=", 0, Qt::CaseInsensitive) )!=-1 ) 
     { 
-        pos2=populationStr.find( ";", pos + 16, false ); 
+        pos2=populationStr.indexOf(";", pos + 16, Qt::CaseInsensitive); 
         pool.resize((populationStr.mid(pos+15,pos2-pos-15)).toLong());
 
 #ifdef SIG_DEBUG
@@ -354,11 +355,11 @@ void SIGEL_GP::SIG_GPPopulation::readFromFile(QTextStream &file)
 
         if( qApp ) 
            progress = new QProgressDialog( "Progress:", "Cancel", getSize(), 
-					   0, "Progress", TRUE );
+					   0, "Progress", true );
         if( qApp ) progress->setCaption( "Loading" );
 
-        pos2=populationStr.find( ";", pos2+1, false );
-        if( (pos=populationStr.find("NEXTIDENTIFIER=",0,false))!=-1 )
+        pos2=populationStr.indexOf(";", pos2+1, Qt::CaseInsensitive);
+        if( (pos=populationStr.indexOf("NEXTIDENTIFIER=", 0, Qt::CaseInsensitive))!=-1 )
           {
 
 #ifdef SIG_DEBUG
@@ -374,8 +375,8 @@ void SIGEL_GP::SIG_GPPopulation::readFromFile(QTextStream &file)
 	     setNextIdentifier(QString::number(0));
         
 
-        pos2=populationStr.find( ";", pos2+1, false );
-        if( (pos=populationStr.find("POOLGENERATION=",0,false))!=-1 ) 
+        pos2=populationStr.indexOf(";", pos2+1, Qt::CaseInsensitive);
+        if( (pos=populationStr.indexOf("POOLGENERATION=", 0, Qt::CaseInsensitive))!=-1 ) 
 	  {
 #ifdef SIG_DEBUG
 

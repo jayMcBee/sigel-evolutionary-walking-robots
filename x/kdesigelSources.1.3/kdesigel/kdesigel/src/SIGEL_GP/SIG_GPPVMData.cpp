@@ -20,6 +20,7 @@
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
+#include "compat/q2compat.h"
 #include "SIGEL_GP/SIG_GPPVMData.h"
 
 #include <qtextstream.h>
@@ -52,7 +53,7 @@ void SIGEL_GP::SIG_GPPVMData::sendQStringToPVM(QString str, int taskId, int mess
   pvm_initsend(PvmDataDefault);
   pvm_pkint(&finalLength,1,1);
 
-  QCString qCStringBuffer = str.utf8();
+  Q2CString qCStringBuffer = str.toUtf8();
   char const *cStringBuffer = qCStringBuffer;
   pvm_pkstr( const_cast<char*>( cStringBuffer ) );
   pvm_send(taskId, messageId);
@@ -64,7 +65,7 @@ QString SIGEL_GP::SIG_GPPVMData::getQStringFromPVM(int taskId, int messageId) {
   pvm_recv(taskId,messageId);
   pvm_upkint(&length,1,1);
 
-  QArray< char > buffer( length );
+  Q2Array< char > buffer( length );
 
   pvm_upkstr( buffer.data() );
 
@@ -88,7 +89,7 @@ QString SIGEL_GP::SIG_GPPVMData::cutAfterFiveHashes(QTextStream& source)
 void SIGEL_GP::SIG_GPPVMData::loadPVMDataTransfer(QTextStream & file,
         SIGEL_Program::SIG_Program & program)
 {
-  file.precision( 50 );
+  file.setRealNumberPrecision( 50 );
 
   QString simParString = cutAfterFiveHashes( file );
   QString environmentString = cutAfterFiveHashes( file );
@@ -96,11 +97,11 @@ void SIGEL_GP::SIG_GPPVMData::loadPVMDataTransfer(QTextStream & file,
   QString robotString = cutAfterFiveHashes( file );
   QString miscString = cutAfterFiveHashes( file );
 
-  QTextStream simParStream( &simParString, IO_ReadOnly );
-  QTextStream environmentStream( &environmentString, IO_ReadOnly );
-  QTextStream programStream( &programString, IO_ReadOnly );
-  QTextStream robotStream( &robotString, IO_ReadOnly );
-  QTextStream miscStream( &miscString, IO_ReadOnly );
+  QTextStream simParStream( &simParString, QIODeviceBase::ReadOnly );
+  QTextStream environmentStream( &environmentString, QIODeviceBase::ReadOnly );
+  QTextStream programStream( &programString, QIODeviceBase::ReadOnly );
+  QTextStream robotStream( &robotString, QIODeviceBase::ReadOnly );
+  QTextStream miscStream( &miscString, QIODeviceBase::ReadOnly );
 
   simulationParameter.readFromFile( simParStream );
   environment.readFromFile( environmentStream );
@@ -129,7 +130,7 @@ void SIGEL_GP::SIG_GPPVMData::loadPVMDataTransfer(QTextStream & file,
 void SIGEL_GP::SIG_GPPVMData::savePVMDataTransfer(QTextStream & file,
 						  SIGEL_Program::SIG_Program const &program)
 {
-  file.precision( 50 );
+  file.setRealNumberPrecision( 50 );
 
   SIGEL_Program::SIG_Program &usedProgram = const_cast< SIGEL_Program::SIG_Program& >(program);
 

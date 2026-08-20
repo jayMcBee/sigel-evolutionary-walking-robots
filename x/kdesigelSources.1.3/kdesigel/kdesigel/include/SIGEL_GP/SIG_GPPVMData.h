@@ -105,7 +105,7 @@ namespace SIGEL_GP
      *
      */
    public:
-    void SIGEL_GP::SIG_GPPVMData::loadPVMDataTransfer(QTextStream & file,
+    void loadPVMDataTransfer(QTextStream & file,
   						    SIGEL_Program::SIG_Program & program);
 
     /**
@@ -118,7 +118,7 @@ namespace SIGEL_GP
      * have to be there as a parameter, all other needed datas are given as referneces.
      */
    public:
-    void SIGEL_GP::SIG_GPPVMData::savePVMDataTransfer(QTextStream & file,
+    void savePVMDataTransfer(QTextStream & file,
   						    SIGEL_Program::SIG_Program const &program);
 
     /**
@@ -127,7 +127,7 @@ namespace SIGEL_GP
      * The value of visualize.
      */
    public:
-    void SIGEL_GP::SIG_GPPVMData::setVisualize(bool visu);
+    void setVisualize(bool visu);
 
     /**
      * This operation gets the value of the visualize-flag.
@@ -135,7 +135,7 @@ namespace SIGEL_GP
      * The value of the visualize-flag.
      */
    public:
-    bool SIGEL_GP::SIG_GPPVMData::getVisualize();
+    bool getVisualize();
 
    public:
     QString getFitnessFunctionName();
