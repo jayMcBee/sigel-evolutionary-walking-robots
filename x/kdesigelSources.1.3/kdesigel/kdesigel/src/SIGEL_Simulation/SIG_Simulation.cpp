@@ -21,6 +21,7 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 #include "SIGEL_Simulation/SIG_Simulation.h"
+#include <exception>
 
 #include "SIGEL_Simulation/SIG_DynaMoSimulationData.h"
 #include "SIGEL_Simulation/SIG_DynaMechsSimulationData.h"
@@ -85,8 +86,17 @@ SIGEL_Simulation::SIG_Simulation::SIG_Simulation(SIGEL_Robot::SIG_Robot const & 
 SIGEL_Simulation::SIG_Simulation::~SIG_Simulation()
 { };
 
+// NOTE: in 2003 this carried throw(SIG_SimulationCannotSolveException).
+// C++17 removed dynamic exception specifications, but removing it outright
+// would change behaviour: SIG_Recorder and SIG_DynaSystem can throw other
+// SIG_Exception subclasses through this frame, which the old specification
+// turned into terminate(). Every caller is a GP fitness function that does
+// catch (SIG_Exception &) { }, so without the boundary those become a
+// silently wrong fitness value instead of a crash. The guarantee is kept
+// explicitly below.
 void SIGEL_Simulation::SIG_Simulation::start()
 {
+  try {
   // max is the time which is specified in "Simulation Parameters"-"General Settings"-"Time To Simulate"
   QTime max=simulationData->simulationParameter.getTimeToSimulate();
   QTime act=simulationQueries->getActualSimulationTime();
@@ -106,11 +116,29 @@ void SIGEL_Simulation::SIG_Simulation::start()
   while (act<max);
 
   recorder.finish();
-}
+  }
+  catch (SIGEL_Simulation::SIG_SimulationCannotSolveException &) {
+    throw;                     // the one type the 2003 specification allowed
+  }
+  catch (...) {
+    // Anything else reached terminate() in 2003. Preserved deliberately: the
+    // alternative is a fitness function silently scoring a partial run.
+    std::terminate();
+  }
+};
 
 
+// NOTE: in 2003 this carried throw(SIG_SimulationCannotSolveException).
+// C++17 removed dynamic exception specifications, but removing it outright
+// would change behaviour: SIG_Recorder and SIG_DynaSystem can throw other
+// SIG_Exception subclasses through this frame, which the old specification
+// turned into terminate(). Every caller is a GP fitness function that does
+// catch (SIG_Exception &) { }, so without the boundary those become a
+// silently wrong fitness value instead of a crash. The guarantee is kept
+// explicitly below.
 void SIGEL_Simulation::SIG_Simulation::makeTimeSteps(int numTimeSteps)
 {
+  try {
   for(int i=0;i<numTimeSteps;i++)  {
       interpreter->interprete( simulationData->simulationParameter.getStepSize() );
 
@@ -131,6 +159,15 @@ void SIGEL_Simulation::SIG_Simulation::makeTimeSteps(int numTimeSteps)
 
       recorder.record();
     };
+  }
+  catch (SIGEL_Simulation::SIG_SimulationCannotSolveException &) {
+    throw;                     // the one type the 2003 specification allowed
+  }
+  catch (...) {
+    // Anything else reached terminate() in 2003. Preserved deliberately: the
+    // alternative is a fitness function silently scoring a partial run.
+    std::terminate();
+  }
 };
 
 void SIGEL_Simulation::SIG_Simulation::slotDynamoMessage(QString theMessage)

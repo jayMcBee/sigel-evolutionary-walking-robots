@@ -1,3 +1,4 @@
+#include <QApplication>   // qApp; was reached via SIG_Program.h before A7
 #include "MT_Control/MT_Controller.h"
 #include "MT_Control/MT_Classifier.h"
 #include "MT_Control/MT_Evaluator.h"
