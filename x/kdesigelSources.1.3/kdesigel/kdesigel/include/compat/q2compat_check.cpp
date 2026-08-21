@@ -12,6 +12,7 @@
 //   run:     g++ -std=c++17 -I<inc> -I<qt6> this -lQt6Core -o chk && ./chk
 
 #include "compat/q2compat.h"
+#include <QStringList>
 // Asserts must survive NDEBUG: this file IS the check.
 #ifdef NDEBUG
 #undef NDEBUG
@@ -279,6 +280,35 @@ int main()
         observing.insert("a", &a); observing.insert("b", &b);
     }                                          // must not free a or b
     assert(Thing::live == 0);
+
+
+    {   // B: an owner must free on EVERY path, not only in its destructor.
+        // 2003 armed setAutoDelete in the constructor, so remove() freed too;
+        // a destructor-only conversion silently loses that.
+        Q2Dict<Thing> d;
+        d.insert("a", new Thing(1));
+        d.insert("b", new Thing(2));
+        assert(Thing::live == 2);
+        delete d.take("a");                 // the mid-life free path
+        assert(Thing::live == 1);
+        d.deleteContents();
+        assert(Thing::live == 0);
+    }
+    {   // resize() must preserve Qt 2's chain order (qgdict.cpp:508-560):
+        // buckets 0..old-1, head to tail. Walking backwards reverses them.
+        Q2Dict<Thing> d(17); Thing a(1), b(2), c(3);
+        d.insert("k1", &a); d.insert("k4", &b); d.insert("k7", &c);
+        d.resize(3);                        // all three collide at vlen 3
+        QStringList got;
+        for (Q2DictIterator<Thing> it(d); it.current(); ++it) got << it.currentKey();
+        assert(got.join(',') == QLatin1String("k7,k4,k1"));
+    }
+    {   // assignment keeps the DESTINATION's table size (qgdict.cpp:280-302)
+        Q2Dict<Thing> src(31), dst(17); Thing a(1);
+        src.insert("x", &a);
+        dst = src;
+        assert(dst.size() == 17 && dst.count() == 1 && dst.find("x") == &a);
+    }
 
     std::printf("q2compat self-check: all assertions passed\n");
     return 0;

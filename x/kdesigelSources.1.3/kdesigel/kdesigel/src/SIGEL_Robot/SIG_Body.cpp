@@ -159,7 +159,6 @@ namespace SIGEL_Robot
                                                 int noOfVertices = coordinateNode->getNPoints();
                                                 int noOfIndices = indexedFaceSetNode->getNCoordIndexes();
                                                 Q2PtrVector< DL_vector > vertices( noOfVertices );
-                                                vertices.setAutoDelete( true );
 
                                                 for (int i=0; i < noOfVertices; i++) {
                                                         Q2Array< float > coords(3);
