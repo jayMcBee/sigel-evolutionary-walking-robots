@@ -492,6 +492,40 @@ this per-site.
 sites: `SIG_Environment.cpp` (done), `MT_Controller.cpp`, `SIG_GPFitnessTrainer.cpp`,
 `SIG_GPRemoteZORCFitnessFunction.cpp` (+ WIN variant, + both headers).
 
+### DEBT — drop the Qt 2 emulation once the port is trusted
+
+**Do this after the port is confirmed to produce valid results, not before.**
+
+Phase B deletes `compat/q2compat.h`, but a lot of Qt 2's behaviour has been
+deliberately reproduced rather than replaced, and Phase B as planned keeps most
+of it. The emulation currently carried:
+
+| | why it exists |
+|---|---|
+| Qt 2's hash order in `Q2Dict` | iteration order numbers the links, so the shipped experiments depend on it |
+| `size()` ≠ `count()` on `Q2PtrVector` | allocated slots vs occupied slots, with null holes |
+| the internal cursor on `Q2PtrList` | `first()`/`next()` walks are real state |
+| `insert()` deletes the occupant, shrinking `resize()` deletes the tail | the only free path at 8 sites |
+| clamp-on-out-of-range | matches `QGArray::at`, and hides several real defects |
+
+None of that is how anyone would write this today. It exists so the port could
+be checked against 2003 behaviour.
+
+**The clean-up, once there is confidence in the results:**
+
+1. Replace the emulation with straightforward containers — insertion-ordered
+   maps, plain `QList<T*>`, explicit deletes, indexed loops instead of a cursor.
+2. **Migrate the data files at the same time** so the experiments keep working:
+   7 `.rrb` and 12 `.exp` (the robots are embedded in the experiments too).
+   Rewrite each so declaration order *is* the order the simulation uses. The
+   hash in `Q2Dict::hash` is exactly the function that generates that ordering —
+   keep it until the migration is done, then delete it.
+3. Re-verify against the captured 2003 run. That baseline is the whole reason
+   for doing step 1 second rather than first.
+
+Sequenced this way the ordering stops being a hidden property of a hash function
+and becomes visible in the data, and nothing has to be taken on trust.
+
 ### DEBT — SIGEL needs a real logging system (opened at review of A1–A6)
 
 Qt 2's `QTextStream` wrote through to unbuffered `stderr` on every `<<`. Qt 6
