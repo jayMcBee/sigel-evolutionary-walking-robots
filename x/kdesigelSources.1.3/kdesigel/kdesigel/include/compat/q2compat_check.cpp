@@ -282,6 +282,60 @@ int main()
     assert(Thing::live == 0);
 
 
+    {   // B3: Q2PtrList owners. Every list converted in B3 frees with
+        // deleteContents() both mid-life (where 2003 called clear()) and in
+        // its owner's destructor.
+        Q2PtrList<Thing> owned;
+        owned.append(new Thing(1));
+        owned.append(new Thing(2));
+        assert(Thing::live == 2);
+        owned.deleteContents();               // stands in for the old clear()
+        assert(Thing::live == 0 && owned.count() == 0);
+        owned.append(new Thing(3));
+        assert(Thing::live == 1);
+        owned.deleteContents();               // stands in for the destructor
+        assert(Thing::live == 0);
+        owned.deleteContents();               // idempotent
+        assert(Thing::live == 0);
+    }
+    {   Thing a(1), b(2);
+        Q2PtrList<Thing> observing;           // no flag, no deleteContents call
+        observing.append(&a); observing.append(&b);
+    }                                          // must not free a or b
+    assert(Thing::live == 0);
+    {   // The mid-life free path a converted list still needs: 2003's
+        // remove() on an owning list was a delete.
+        Q2PtrList<Thing> owned;
+        owned.append(new Thing(1));
+        owned.append(new Thing(2));
+        owned.first();
+        delete owned.take();                  // take() at the cursor
+        assert(Thing::live == 1 && owned.count() == 1);
+        owned.deleteContents();
+        assert(Thing::live == 0);
+    }
+
+    {   // B4: Q2PtrVector owners. insert() over an occupied slot was a delete
+        // under the flag, so a converted caller must free the slot first.
+        Q2PtrVector<Thing> owned(2);
+        owned.insert(0, new Thing(1));
+        owned.insert(1, new Thing(2));
+        assert(Thing::live == 2);
+        delete owned.take(0);                 // the free that insert() did
+        owned.insert(0, new Thing(3));
+        assert(Thing::live == 2);
+        owned.deleteContents();
+        assert(Thing::live == 0);
+        assert(owned.size() == 2);            // slots kept, callers index them
+        owned.deleteContents();               // idempotent
+        assert(Thing::live == 0);
+    }
+    {   Thing a(1), b(2);
+        Q2PtrVector<Thing> observing(2);      // no flag, no deleteContents call
+        observing.insert(0, &a); observing.insert(1, &b);
+    }                                          // must not free a or b
+    assert(Thing::live == 0);
+
     {   // B: an owner must free on EVERY path, not only in its destructor.
         // 2003 armed setAutoDelete in the constructor, so remove() freed too;
         // a destructor-only conversion silently loses that.
