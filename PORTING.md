@@ -307,6 +307,31 @@ So Phase B does the half that is genuinely blocked on it, and no more:
 - the shim classes survive as thin ordering and semantics adapters, owning
   nothing
 
+**STATUS after B1–B5 — this is NOT met, and stopping here is an open
+decision, not a finished phase.** Eight containers are converted. Six still
+carry the flag, in ten places:
+
+| container | file | why it was left |
+|---|---|---|
+| `pool` | `SIG_GPPopulation.cpp:37,50,96,116` | 9 sites; `insert()` frees the losing individual |
+| `pvmTasks` | `SIG_GPFitnessTrainer.cpp:48` | 7 sites; `insert(id, 0)` frees a slot |
+| `pvmHosts` | `SIG_GPFitnessTrainer.cpp:49` | 5 sites |
+| `toSpawnList` | `SIG_GPFitnessTrainer.cpp:47` | `remove()` at `:489` is the free |
+| `tours` | `SIG_GPManager.cpp:63` | 7 sites, compacted across a module boundary by `MT_Classifier` |
+| `fitTaskList` | `SIG_GPManager.cpp:357,1434` | **locals** — see below |
+
+The first five are one decision: 28 hand-written frees in the core GP loop,
+each of which compiles whether it is right or wrong, with no run to check them
+against. Every review round so far has found a real defect in the *easy*
+conversions.
+
+`fitTaskList` is a different case and should stay as it is. On a **local**
+container the flag is the RAII: it frees at scope exit, including on the early
+`return` at `SIG_GPManager.cpp:404` and on anything thrown out of `checkTask`.
+Writing those frees by hand loses the unwinding path and gains nothing.
+`SIG_Body.cpp`'s local `vertices` was converted in B2 before this was
+understood and has been put back on the flag for the same reason.
+
 The post-migration clean-up in §9 then deletes them along with the data
 migration, and `q2compat.h` goes with it.
 
@@ -386,6 +411,7 @@ What is actually there, verified with Python over the tree as it stands:
 | | |
 |---|---|
 | `setAutoDelete` calls | 47 — 38 `TRUE`, 9 `FALSE`, as stated |
+| …**after B1–B5** | 28 — 21 `TRUE`, 7 `FALSE`; 12 in core |
 | …but in **deferred GUI modules** | **16**, which Phase B cannot touch |
 | distinct owning containers in scope | **22** (21 live) — 38 was a *call* count |
 | of those, with exactly one free site | **6** |
@@ -400,16 +426,32 @@ items somewhere else, or nowhere.
    sites where `insert()` or a shrinking `resize()` *is* the only delete, and
    the word `delete` appears nowhere. `SIG_GPPopulation.cpp:168` —
    `pool.insert(poolpos,&indi)` frees the losing individual, reached from 12 call
-   sites — plus `:275,:278,:346,:417` and `SIG_GPFitnessTrainer.cpp:190,351,374`.
-   Remove the shim and the free silently disappears with it.
+   sites — plus `:275,:278,:346,:417` and `SIG_GPFitnessTrainer.cpp:194,355,378`
+   (**renumbered** — B3 added four lines to that file's destructor; they were
+   190, 351, 374 before). Remove the shim and the free silently disappears with
+   it.
+
+   Two `Q2PtrList` sites belong on this list and were missed: `remove()` at
+   `SIG_GPManager.cpp:437` and `:1519` (`fitTaskList`) and at
+   `SIG_GPFitnessTrainer.cpp:489` (`toSpawnList`).
 2. **Twelve owning containers have no free path at all** — freed today only by
    `~Q2PtrList`/`~Q2PtrVector`. `~SIG_GPFitnessTrainer` deletes none of the five
    it owns; `SIG_GPFullDataRecorder` and `SIG_DynaMechsSimulationData` have no
    destructor whatsoever.
+
+   **Fixed by B1–B5** for the eight converted containers: both classes now have
+   a destructor (`SIG_GPFullDataRecorder.cpp:46`,
+   `SIG_DynaMechsSimulationData.cpp:226`) and `~SIG_GPFitnessTrainer` frees two
+   of its five (`:117-118`). The three it still leaves are `pvmHosts`,
+   `pvmTasks` and `toSpawnList`, all still on the flag.
 3. **`SIG_Robot::clear()`** deletes the contents of six dictionaries by hand and
    then calls `clear()` on them twelve lines later. That is safe only because
    those dicts carry no flag. Give `clear()` teeth during B2 and it becomes six
    double frees.
+
+   The self-check now asserts exactly this: `clear()` on a `Q2Dict`,
+   `Q2PtrList` or `Q2PtrVector` that does not own must free nothing. Before
+   that assertion existed, arming `clear()` unconditionally passed the suite.
 
 **Revised exit criterion for each Phase B step:** the shim self-check must build
 and run clean under ASan and UBSan, `check.sh` now does that rather than merely
@@ -469,6 +511,8 @@ in deferred GUI code; both need per-site thought when Phase C starts.
 
 The other four repeated targets (`pool`, `vertices`, `experimentHistory`,
 `allowedCommands`) only re-set `true` in multiple constructors — blanket-safe.
+After B1–B5 only `pool` still carries a flag; `vertices` carries one again and
+deliberately, as a local (see §7).
 
 ### Reference data exists, if D11 is ever revisited
 
@@ -558,9 +602,10 @@ Out of scope for the Qt port — do not fix here.
 
 **Do this after the port is confirmed to produce valid results, not before.**
 
-Phase B deletes `compat/q2compat.h`, but a lot of Qt 2's behaviour has been
-deliberately reproduced rather than replaced, and Phase B as planned keeps most
-of it. The emulation currently carried:
+Phase B does **not** delete `compat/q2compat.h` — see §7, which corrects an
+earlier version of this plan that said it would. A lot of Qt 2's behaviour has
+been deliberately reproduced rather than replaced, and Phase B keeps all of it.
+The emulation currently carried:
 
 | | why it exists |
 |---|---|

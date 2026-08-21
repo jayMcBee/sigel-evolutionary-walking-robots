@@ -158,7 +158,11 @@ namespace SIGEL_Robot
                                         if (coordinateNode) {
                                                 int noOfVertices = coordinateNode->getNPoints();
                                                 int noOfIndices = indexedFaceSetNode->getNCoordIndexes();
+                                                // This local owns the vertices it builds. The flag stays: on a local it
+                                                // IS the RAII, and the NEWMAT multiply and the SIG_Polygon allocations
+                                                // below can throw. Writing the free out by hand drops the unwinding path.
                                                 Q2PtrVector< DL_vector > vertices( noOfVertices );
+                                                vertices.setAutoDelete( true );
 
                                                 for (int i=0; i < noOfVertices; i++) {
                                                         Q2Array< float > coords(3);
@@ -194,8 +198,6 @@ namespace SIGEL_Robot
                                                                 actPolygon->appendVertex( *vertices[ actIndex ] );
                                                         };
                                                 };
-                                        	// B2: this local owns the vertices it built.
-                                        	vertices.deleteContents ();
                                         };
                                 };
                 };
