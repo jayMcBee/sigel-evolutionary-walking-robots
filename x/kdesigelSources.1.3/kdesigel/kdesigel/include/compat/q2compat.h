@@ -421,6 +421,13 @@ public:
 
     void clear() { if (del) deleteAll(); v.clear(); }
 
+    // Phase B: the owner frees its items explicitly. Slots stay, as clear()
+    // does not -- callers index this container by slot number.
+    void deleteContents()
+    {
+        for (qsizetype i = 0; i < v.size(); ++i) { delete v.at(i); v[i] = nullptr; }
+    }
+
     // As Q2Array::at above: warn and clamp instead of relying on Q_ASSERT.
     // A null slot is already normal for this container, so an empty vector
     // yields null -- there is no element to clamp to.
@@ -561,6 +568,9 @@ public:
     T *take() { return valid() ? take(uint(cur)) : nullptr; }
 
     void clear() { if (del) qDeleteAll(v); v.clear(); cur = -1; }
+
+    // Phase B: the owner frees its items explicitly.
+    void deleteContents() { qDeleteAll(v); v.clear(); cur = -1; }
     // No sort(): Qt 2's QGList::sort uses compareItems, which for QList<T> is
     // 'item1 != item2' and never returns negative (qglist.cpp:125-128), so it
     // produces an arbitrary permutation. Sorting by pointer address would be a
