@@ -50,7 +50,6 @@ SIGEL_GP::SIG_GPParameter::SIG_GPParameter()
   hostList(),
   timeOutMinutes(0)
 {
-  hostList.setAutoDelete( true );
   terminationTime=terminationTime.currentDateTime();
   setPriority(veryLow);
   instructionProb.resize( 15 );
@@ -61,7 +60,10 @@ SIGEL_GP::SIG_GPParameter::SIG_GPParameter(QString parameter)
 { };
 
 SIGEL_GP::SIG_GPParameter::~SIG_GPParameter()
-{ };
+{
+  // This class owns the hosts in hostList.
+  hostList.deleteContents();
+};
 
 void SIGEL_GP::SIG_GPParameter::setRandomSeed (int seed)
 {
@@ -376,7 +378,7 @@ void SIGEL_GP::SIG_GPParameter::setFitnessName(QString name)
 void SIGEL_GP::SIG_GPParameter::readFromFile(QTextStream & file)
 {
   QString s;
-  hostList.clear();
+  hostList.deleteContents();
 
   while (!file.atEnd()) {
    s = file.readLine();

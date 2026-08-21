@@ -47,8 +47,6 @@ SIGEL_GP::SIG_GPFitnessTrainer::SIG_GPFitnessTrainer(SIGEL_GP::SIG_GPExperiment&
   toSpawnList.setAutoDelete( true );
   pvmTasks.setAutoDelete( true );
   pvmHosts.setAutoDelete( true );
-  dynHosts.setAutoDelete( true );
-  freshDynHosts.setAutoDelete( true );
 
   switch (exp.simulationParameter.getSimulationLibrary()) {
     case SIGEL_Simulation::SIG_SimulationParameters::DynaMo:
@@ -128,6 +126,10 @@ SIGEL_GP::SIG_GPFitnessTrainer::~SIG_GPFitnessTrainer() {
       int info = pvm_delhosts( const_cast< char** >(&actHostNameCString), 1, &singleInfo );
 #endif
     };
+
+  // This class owns the entries of both dynamic host lists.
+  dynHosts.deleteContents();
+  freshDynHosts.deleteContents();
 };
 
 
@@ -198,12 +200,12 @@ void SIGEL_GP::SIG_GPFitnessTrainer::flushAllDynHosts( void ) {
       }
     }
     // dynHosts has become obsolete
-    dynHosts.clear();
+    dynHosts.deleteContents();
     delete[] cStrName;
 
     // unfortunately that's it also for our new hosts, else we have a conflict
     // with our server thread cutting _all_ connections, known or unknown to dynHosts
-    freshDynHosts.clear();
+    freshDynHosts.deleteContents();
 
     SIGEL_Tools::SIG_IO::cerr << "\t(all " << dynDelNum << " dynamic hosts removed | " <<  pvmHosts.size() << " static hosts remaining)\n\n";
   }
@@ -532,7 +534,7 @@ int SIGEL_GP::SIG_GPFitnessTrainer::getNextHost() {
     fprintf(stderr, "\to new host added to pvmHosts: \"%s\"\n", cStrName);
   }
 
-  freshDynHosts.clear();
+  freshDynHosts.deleteContents();
   delete[] cStrName;
 
 #ifdef _WINDOWS
