@@ -36,11 +36,13 @@ gpParameter(gpParameter),
 randomizer(randomizer),
 languageP(languageP)
 {   
-  indis.setAutoDelete( true );
 };
 
 SIGEL_GP::SIG_GPTournament::~SIG_GPTournament()
-{ };
+{
+  // This class owns the tournament individuals its subclasses build.
+  indis.deleteContents();
+};
 
 bool SIGEL_GP::SIG_GPTournament::run()
 { return true; };
