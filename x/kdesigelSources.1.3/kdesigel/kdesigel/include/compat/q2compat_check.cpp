@@ -330,6 +330,16 @@ int main()
         owned.deleteContents();               // idempotent
         assert(Thing::live == 0);
     }
+    {   // A Q2PtrVector normally has null holes -- dynaMechsLinks and tours
+        // both do -- so deleteContents() must walk size(), the allocated
+        // slots, not count(), the occupied ones.
+        Q2PtrVector<Thing> holed(3);
+        holed.insert(0, new Thing(1));
+        holed.insert(2, new Thing(2));        // slot 1 stays null
+        assert(Thing::live == 2 && holed.size() == 3 && holed.count() == 2);
+        holed.deleteContents();
+        assert(Thing::live == 0);
+    }
     {   Thing a(1), b(2);
         Q2PtrVector<Thing> observing(2);      // no flag, no deleteContents call
         observing.insert(0, &a); observing.insert(1, &b);

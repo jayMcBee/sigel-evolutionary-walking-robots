@@ -508,9 +508,12 @@ void SIG_GPParameter::slotDeleteHost()
   QListIterator<SIGEL_GP::SIG_GPPVMHost> hostIt( deleteListHosts );
   for( ; hostIt.current(); ++hostIt )
     {
+      // deleteListHosts can hold the same pointer twice: the search above
+      // matches on name, and nothing forbids two hosts with one name. Only
+      // the removal that actually unlinked may free.
       SIGEL_GP::SIG_GPPVMHost *host = hostIt.current();
-      hostList2.remove( host );
-      delete host;
+      if ( hostList2.remove( host ) )
+	delete host;
     }
   QListIterator<QListViewItem> itemIt( deleteListViewItems );
   for( ; itemIt.current(); ++itemIt )
