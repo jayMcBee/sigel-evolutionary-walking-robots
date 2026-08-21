@@ -111,6 +111,12 @@ SIGEL_GP::SIG_GPFitnessTrainer::SIG_GPFitnessTrainer(SIGEL_GP::SIG_GPExperiment&
 };
 
 SIGEL_GP::SIG_GPFitnessTrainer::~SIG_GPFitnessTrainer() {
+  // This class owns the entries of both dynamic host lists. Freed first so
+  // that an exception out of the PVM loop below cannot skip them; Qt 2 freed
+  // them during unwinding.
+  dynHosts.deleteContents();
+  freshDynHosts.deleteContents();
+
   for (unsigned int i=0; i<pvmHosts.size(); i++) {
       SIG_GPActivePVMHost *actHost = pvmHosts[i];
 
@@ -126,10 +132,6 @@ SIGEL_GP::SIG_GPFitnessTrainer::~SIG_GPFitnessTrainer() {
       int info = pvm_delhosts( const_cast< char** >(&actHostNameCString), 1, &singleInfo );
 #endif
     };
-
-  // This class owns the entries of both dynamic host lists.
-  dynHosts.deleteContents();
-  freshDynHosts.deleteContents();
 };
 
 

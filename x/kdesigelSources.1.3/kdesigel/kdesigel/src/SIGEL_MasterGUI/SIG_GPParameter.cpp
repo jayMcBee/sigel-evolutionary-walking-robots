@@ -464,8 +464,12 @@ void SIG_GPParameter::slotEditHost()
 void SIG_GPParameter::slotDeleteHost()
 {
   /*
-   * this is the list of SIG_GPPVMHosts which have to be deleted as setAutoDelete is NOT true
-   * in the host list. we don't delete the host directly as the iterator would get confused.
+   * this is the list of SIG_GPPVMHosts which have to be deleted. we don't
+   * delete the host directly as the iterator would get confused.
+   *
+   * NOTE: the 2003 comment here said setAutoDelete was not true on the host
+   * list. It was (SIG_GPParameter.cpp, constructor), so remove() below was
+   * the delete. The flag is gone and the delete is now written out.
    */
   QList<SIGEL_GP::SIG_GPPVMHost> deleteListHosts;
   QList<QListViewItem> deleteListViewItems;
@@ -503,7 +507,11 @@ void SIG_GPParameter::slotDeleteHost()
   QList<SIGEL_GP::SIG_GPPVMHost> &hostList2 = theExperiment.gpParameter.getHostList();
   QListIterator<SIGEL_GP::SIG_GPPVMHost> hostIt( deleteListHosts );
   for( ; hostIt.current(); ++hostIt )
-    hostList2.remove( hostIt.current() );
+    {
+      SIGEL_GP::SIG_GPPVMHost *host = hostIt.current();
+      hostList2.remove( host );
+      delete host;
+    }
   QListIterator<QListViewItem> itemIt( deleteListViewItems );
   for( ; itemIt.current(); ++itemIt )
     listviewHosts->takeItem( itemIt.current() );

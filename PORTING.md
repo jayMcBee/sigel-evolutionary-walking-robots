@@ -438,19 +438,23 @@ src/SIGEL_MasterGUI/SIG_GPParameter.cpp:467
     setAutoDelete is NOT true
 ```
 
-**That 2003 comment is false, and so was the conclusion drawn from it here.**
-`SIGEL_GP/SIG_GPParameter.cpp:53` does `hostList.setAutoDelete( true )`. The
-code at `:506` calls `hostList2.remove( … )`, and on an owning list `remove()`
-*is* the delete — nothing is freed twice and nothing is leaked. The comment
-describes an arrangement that is not there.
+**That 2003 comment was false.** `hostList` *was* armed, in the
+`SIG_GPParameter` constructor, so `hostList2.remove( … )` at `:506` was the
+delete — `hostList2` is the same object, returned by reference from
+`getHostList()`.
 
-Recorded because it is a trap, not because it is a defect: anyone who read that
-comment, or the earlier version of this note, and added a manual `delete` would
-have created a double free. Phase B must check `setAutoDelete` in the source,
-never a comment about it.
+**UPDATED at the review of B3.** B3 removed that flag and converted the two
+free sites it could see, both in `SIGEL_GP/SIG_GPParameter.cpp`. It missed
+`:506`, which is in `SIGEL_MasterGUI` — a module not yet ported, so nothing
+built today reaches it. The review found the leak and it is now written out as
+an explicit `delete`.
 
-The real version of this concern is different and larger — see the Phase B
-inventory below.
+Two lessons, both general:
+
+- A `getFoo()` returning a container **by reference** puts free sites in other
+  modules. Grep the accessor, not just the member name.
+- Unported modules are not out of reach. They do not compile yet, but they
+  still hold free sites that a Phase B conversion can silently remove.
 
 ### Toggling containers (Phase C)
 
