@@ -37,13 +37,14 @@ SIGEL_GP::SIG_GPExperiment::SIG_GPExperiment(QString exp) //: mtController(*this
 
 SIGEL_GP::SIG_GPExperiment::SIG_GPExperiment() //: mtController(*this)
 {
-  experimentHistory.setAutoDelete( true );
   autosavePath = "new";
   mtController = new MT_Controller(*this);
 };
 
 SIGEL_GP::SIG_GPExperiment::~SIG_GPExperiment()
 {
+	// This class owns its history entries.
+	experimentHistory.deleteContents();
 	delete mtController;
 };
 
@@ -140,7 +141,7 @@ void SIGEL_GP::SIG_GPExperiment::writeHistoryToFileTransfer( QTextStream &file )
 
 void SIGEL_GP::SIG_GPExperiment::readHistoryFromFileTransfer( QTextStream &file )
 {
-  experimentHistory.clear();
+  experimentHistory.deleteContents();
 
   QString buffer = file.readLine();
 
