@@ -219,6 +219,16 @@ public:
     }
     T *operator[](const QString &k) const { return find(k); }   // qdict.h:67-68
 
+    // Phase B: the owner frees its items explicitly instead of arming a flag.
+    void deleteContents()
+    {
+        for (const QList<Node> &c : buckets)
+            for (const Node &nd : c)
+                delete nd.val;
+        for (QList<Node> &c : buckets) c.clear();
+        items = 0;
+    }
+
     bool remove(const QString &k)               // Qt 2 removes ONE, the newest
     {
         QList<Node> &c = buckets[qsizetype(hash(k))];

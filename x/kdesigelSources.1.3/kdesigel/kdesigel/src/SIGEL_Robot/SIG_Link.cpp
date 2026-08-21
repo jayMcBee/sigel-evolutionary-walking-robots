@@ -102,9 +102,10 @@ namespace SIGEL_Robot {
 
         SIG_Link::~SIG_Link()
         {
-                points.setAutoDelete (true);
-                adjacentJoints.setAutoDelete (false);
-                noCollide.setAutoDelete (false);
+                // B1: SIG_Link owns its points and nothing else. 2003 armed
+                // autoDelete here in the destructor and let ~QDict do the work;
+                // the free is now stated where the ownership is.
+                points.deleteContents ();
 
                 if (geometry) {
                         delete mirtich;

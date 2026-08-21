@@ -261,6 +261,25 @@ int main()
         assert(d.count() == 2 && d.find("k") == &b);
     }
 
+
+    {   // B1: an owner that frees explicitly must free exactly once, and a
+        // dictionary with no flag must free nothing.
+        Q2Dict<Thing> owned;
+        owned.insert("a", new Thing(1));
+        owned.insert("b", new Thing(2));
+        assert(Thing::live == 2);
+        owned.deleteContents();
+        assert(Thing::live == 0);
+        assert(owned.count() == 0);
+        owned.deleteContents();               // idempotent: no double free
+        assert(Thing::live == 0);
+    }
+    {   Thing a(1), b(2);
+        Q2Dict<Thing> observing;              // no flag, no deleteContents call
+        observing.insert("a", &a); observing.insert("b", &b);
+    }                                          // must not free a or b
+    assert(Thing::live == 0);
+
     std::printf("q2compat self-check: all assertions passed\n");
     return 0;
 }

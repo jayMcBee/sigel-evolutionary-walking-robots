@@ -91,7 +91,6 @@ namespace SIGEL_Robot {
 	  commandParameters->setDuration( 0.001 );
 	  this->addCommand( "SUB", commandParameters );
 
-	  allowedCommands.setAutoDelete( true );
 	}
 
         SIG_LanguageParameters::SIG_LanguageParameters (QTextStream & tx,
@@ -117,11 +116,13 @@ namespace SIGEL_Robot {
                         tx >> tmpstr;
                         allowedCommands.insert (tmpstr, new SIG_CommandParameters (tx));
                 }
-		allowedCommands.setAutoDelete( true );
         }
 
         SIG_LanguageParameters::~SIG_LanguageParameters (void)
         {
+		// B1: this class owns the SIG_CommandParameters it inserted.
+		allowedCommands.deleteContents ();
+
 	  
         }
 
