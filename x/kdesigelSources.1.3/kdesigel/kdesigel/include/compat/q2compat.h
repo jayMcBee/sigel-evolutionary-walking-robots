@@ -39,10 +39,11 @@
 //  3. resize() value-initialises new elements where Qt 2 left raw memory.
 //  Two Qt 2 quirks are deliberately NOT reproduced, because no SIGEL code can
 //  reach them and both are defects rather than behaviour:
-//    - Copying a Qt 2 QDict REVERSES the order of same-key entries, so find()
-//      returns the oldest afterwards. Unreachable here: every dict is keyed by a
-//      model name, insert() is unguarded, and no shipped .rrb file contains a
-//      duplicate name.
+//    - Copying a Qt 2 QDict re-inserts every item into a prepending table, so
+//      it REVERSES every colliding chain -- distinct keys sharing a bucket come
+//      out in the opposite order, not just same-key runs. Unreachable here: no
+//      Q2Dict is copy-constructed or assigned anywhere. SIG_Robot's copy ctor
+//      round-trips through its own serialise/deserialise, not through the dict.
 //    - Qt 2's QValueList::contains returns an occurrence count; Qt 6's returns
 //      bool. Q2ValueList has three declarations in SIGEL and contains() is
 //      never called on any of them.
@@ -60,21 +61,16 @@
 #include <QDebug>
 #include <QHashSeed>
 #include <QList>
-#include <QMultiHash>
 #include <QPair>
 #include <QString>
 #include <algorithm>
 #include <list>
 
 // ---------------------------------------------------------------------------
-// Qt 6 randomises the QHash seed once per process, so Q2Dict iteration order
-// differs between runs. Qt 2's QGDict walked its buckets in a fixed order for a
-// given insertion sequence, and SIGEL depends on that: SIG_Robot's copy
-// constructor is a serialise/deserialise round-trip that iterates six dicts
-// (SIG_Robot.cpp:295-335), and reading back registers joints with their links
-// in encounter order. Without a fixed seed, adjacentJoints ordering -- and with
-// it the MDH traversal and DynaMechs link numbering -- varies run to run, so a
-// fixed RANDOMSEED no longer reproduces a run.
+// Q2Dict reproduces Qt 2's own hash table, so its order no longer depends on
+// QHash at all. This remains for every OTHER QHash in the process: Qt 6
+// randomises the seed once per run, and SIGEL is expected to reproduce a run
+// from a fixed RANDOMSEED.
 //
 // One object per translation unit; the call is idempotent. main() should call
 // QHashSeed::setDeterministicGlobalSeed() explicitly as well, once sigel.cpp and
@@ -188,7 +184,12 @@ public:
     // qgdict.cpp:280-302 -- clear the destination honouring ITS flag, keep the flag
     Q2Dict &operator=(const Q2Dict &o)
     {
-        if (this != &o) { clear(); buckets = o.buckets; vlen = o.vlen; items = o.items; }
+        if (this != &o) {
+            clear();                        // Qt 2 keeps the destination's vlen
+            for (const QList<Node> &c : o.buckets)
+                for (const Node &nd : c)
+                    insert(nd.key, nd.val);
+        }
         return *this;
     }
 
@@ -260,11 +261,11 @@ public:
 
     void resize(uint n)                         // Qt 2 rehashes into n buckets
     {
-        if (n == 0 || n == vlen) return;
-        QList<Node> all;
-        for (qsizetype i = buckets.size() - 1; i >= 0; --i)
-            for (qsizetype j = buckets.at(i).size() - 1; j >= 0; --j)
-                all.append(buckets.at(i).at(j));
+        if (n == 0) return;             // Qt 2 rebuilds even when n == vlen
+        QList<Node> all;                    // qgdict.cpp:508-560 order
+        for (const QList<Node> &c : buckets)
+            for (const Node &nd : c)
+                all.append(nd);
         buckets = QList<QList<Node> >(qsizetype(n));
         vlen = n; items = 0;
         for (const Node &nd : all) insert(nd.key, nd.val);

@@ -133,7 +133,9 @@ namespace SIGEL_Robot {
 
         void SIG_LanguageParameters::removeCommand( QString name )
 	{
-	  allowedCommands.remove( name );
+	  // This class owns its commands, so removing one frees it. 2003 armed
+	  // autoDelete in the constructor, which made QDict::remove() delete.
+	  delete allowedCommands.take( name );
 	}
 
         bool SIG_LanguageParameters::hasCommand (QString name) const
