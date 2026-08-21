@@ -45,6 +45,10 @@ namespace SIGEL_GP
 
       SIG_GPFullDataRecorder( int recordingFrequency );
 
+      /** B2: this recorder owns its positions, rotations and touchdowns. */
+
+      ~SIG_GPFullDataRecorder();
+
       void init();
 
       void record();

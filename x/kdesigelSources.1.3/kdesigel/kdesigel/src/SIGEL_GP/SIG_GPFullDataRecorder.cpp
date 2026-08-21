@@ -34,13 +34,20 @@ namespace SIGEL_GP
     : SIGEL_Simulation::SIG_Recorder(), recordingFrequency( recordingFrequency ),
     frameCounter( 0 )
   {
-    positions.setAutoDelete( true );
-    rotations.setAutoDelete( true );
-    touchdowns.setAutoDelete( true );
 
     if (recordingFrequency <= 0) {
       recordingFrequency = 1;
     }
+  };
+
+  // B2: 2003 armed autoDelete in the constructor and let the member
+  // destructors free. This class had no destructor at all, so the
+  // ownership was stated nowhere.
+  SIG_GPFullDataRecorder::~SIG_GPFullDataRecorder()
+  {
+    positions.deleteContents();
+    rotations.deleteContents();
+    touchdowns.deleteContents();
   };
 
 

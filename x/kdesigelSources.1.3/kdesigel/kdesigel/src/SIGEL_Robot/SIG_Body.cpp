@@ -195,6 +195,8 @@ namespace SIGEL_Robot
                                                                 actPolygon->appendVertex( *vertices[ actIndex ] );
                                                         };
                                                 };
+                                        	// B2: this local owns the vertices it built.
+                                        	vertices.deleteContents ();
                                         };
                                 };
                 };
