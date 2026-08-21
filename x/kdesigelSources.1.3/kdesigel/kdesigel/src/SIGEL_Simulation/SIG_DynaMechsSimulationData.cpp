@@ -53,8 +53,11 @@ namespace {
   /*
    * Qt 2's autoDelete freed dynaMechsLinks when this constructor threw: a
    * constructor that throws does not run its own destructor, but its members'
-   * destructors do run, and QPtrVector's honoured the flag. Removing the flag
-   * dropped that path, so it is restored here.
+   * destructors do run, and Qt 2's QVector honoured the flag. Removing the
+   * flag dropped that path, so it is restored here.
+
+   * Reachable, not theoretical: SIG_Mirtich.cpp throws SIG_CannotMirtich on a
+   * NaN mass or inertia, from computePhysics inside the link constructor.
    *
    * Disarm by clearing 'links' once the object is fully built.
    */

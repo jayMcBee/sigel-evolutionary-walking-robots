@@ -509,8 +509,13 @@ void SIG_GPParameter::slotDeleteHost()
   for( ; hostIt.current(); ++hostIt )
     {
       // deleteListHosts can hold the same pointer twice: the search above
-      // matches on name, and nothing forbids two hosts with one name. Only
-      // the removal that actually unlinked may free.
+      // matches on name and breaks at the first hit, and nothing forbids two
+      // hosts with one name. Only the removal that actually unlinked may free.
+      //
+      // The same 2003 defect also orphans the second host of such a pair: both
+      // rows leave the list view, but only the first host leaves hostList, so
+      // the trainer still spawns on it and writeToFile still persists it.
+      // Left as it was -- fixing it means changing what the GUI does.
       SIGEL_GP::SIG_GPPVMHost *host = hostIt.current();
       if ( hostList2.remove( host ) )
 	delete host;

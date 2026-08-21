@@ -537,9 +537,17 @@ One simulation object is built per fitness evaluation, so a GP run leaks the
 whole physics backend thousands of times.
 
 Consequence for B4: the destructor added to `SIG_DynaMechsSimulationData` is
-correct but **does not run today**. The only live free path for `dynaMechsLinks`
-was `insert()` over an occupied slot, which is why B4 converted the two insert
-sites as well.
+correct but **does not run today**. `dynaMechsLinks` has two other free paths,
+both converted:
+
+- `insert()` over an occupied slot, which fires only for a robot with two
+  joints between the same pair of links — no shipped robot has one;
+- **the constructor throwing**, which is the one that actually happens.
+  `SIG_Mirtich.cpp` throws on a NaN mass or inertia, from `computePhysics`
+  inside the `SIG_DynaMechsLink` constructor. Qt 2 freed the links while
+  unwinding, because a constructor that throws does not run its own destructor
+  but its members' destructors do run. A scope guard in the constructor
+  restores that. **Do not delete it as redundant.**
 
 Base `SIG_SimulationData` also has no virtual destructor, so fixing the leak
 means adding one first.
