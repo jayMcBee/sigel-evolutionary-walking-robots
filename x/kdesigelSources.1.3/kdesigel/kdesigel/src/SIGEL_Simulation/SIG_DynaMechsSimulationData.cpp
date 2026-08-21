@@ -66,8 +66,6 @@ SIGEL_Simulation::SIG_DynaMechsSimulationData::SIG_DynaMechsSimulationData( SIGE
   for (int i=0; i<dynaMechsLinks.size(); i++)
     dynaMechsLinks.insert( i, 0 );
 
-  dynaMechsLinks.setAutoDelete( true );
-
   jointIndices.fill( 0 );
 
   driveForcesTimeAccounts.fill( 0 );
@@ -198,6 +196,12 @@ SIGEL_Simulation::SIG_DynaMechsSimulationData::SIG_DynaMechsSimulationData( SIGE
 
 void SIGEL_Simulation::SIG_DynaMechsSimulationData::setNewFrame( bool newValue )
 { };
+
+SIGEL_Simulation::SIG_DynaMechsSimulationData::~SIG_DynaMechsSimulationData()
+{
+  // This class owns the links it built; drives and sensors belong to the robot.
+  dynaMechsLinks.deleteContents();
+};
 
 void SIGEL_Simulation::SIG_DynaMechsSimulationData::simulationProgress()
 {
@@ -335,6 +339,9 @@ void SIGEL_Simulation::SIG_DynaMechsSimulationData::initializeArticulation()
 								0,
 								0 );
 
+  // Qt 2's autoDelete made insert() free whatever occupied the slot. Link
+  // numbers are unique, so this frees nothing in practice.
+  delete dynaMechsLinks.take( rootLink->getNumber() );
   dynaMechsLinks.insert( rootLink->getNumber(), dynaMechsRootLink );
 
   dynaMechsSystem.addLink( internalRootLink, 0 );
@@ -457,6 +464,7 @@ SIGEL_Simulation::SIG_DynaMechsLink *SIGEL_Simulation::SIG_DynaMechsSimulationDa
 							    screwD,
 							    screwTheta );
 
+  delete dynaMechsLinks.take( link->getNumber() );
   dynaMechsLinks.insert( link->getNumber(), dynaMechsLink );
 
   jointIndices[ joint->getNumber() ] = link->getNumber();
