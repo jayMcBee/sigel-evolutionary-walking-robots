@@ -48,6 +48,25 @@
 
 using namespace SIGEL_Tools;
 
+namespace {
+
+  /*
+   * Qt 2's autoDelete freed dynaMechsLinks when this constructor threw: a
+   * constructor that throws does not run its own destructor, but its members'
+   * destructors do run, and QPtrVector's honoured the flag. Removing the flag
+   * dropped that path, so it is restored here.
+   *
+   * Disarm by clearing 'links' once the object is fully built.
+   */
+  struct DynaMechsLinkGuard
+    {
+      Q2PtrVector< SIGEL_Simulation::SIG_DynaMechsLink > *links;
+
+      ~DynaMechsLinkGuard() { if (links) links->deleteContents(); }
+    };
+
+};
+
 SIGEL_Simulation::SIG_DynaMechsSimulationData::SIG_DynaMechsSimulationData( SIGEL_Robot::SIG_Robot const& robot,
 							  SIGEL_Environment::SIG_Environment const& environment,
 							  SIGEL_Simulation::SIG_SimulationParameters const& simulationParameter)
@@ -65,6 +84,8 @@ SIGEL_Simulation::SIG_DynaMechsSimulationData::SIG_DynaMechsSimulationData( SIGE
 {
   for (int i=0; i<dynaMechsLinks.size(); i++)
     dynaMechsLinks.insert( i, 0 );
+
+  DynaMechsLinkGuard linkGuard = { &dynaMechsLinks };
 
   jointIndices.fill( 0 );
 
@@ -192,6 +213,8 @@ SIGEL_Simulation::SIG_DynaMechsSimulationData::SIG_DynaMechsSimulationData( SIGE
   }
 
   dynaMechsIntegrator->setSystem( &dynaMechsSystem );
+
+  linkGuard.links = 0;
 };
 
 void SIGEL_Simulation::SIG_DynaMechsSimulationData::setNewFrame( bool newValue )
@@ -339,8 +362,12 @@ void SIGEL_Simulation::SIG_DynaMechsSimulationData::initializeArticulation()
 								0,
 								0 );
 
-  // Qt 2's autoDelete made insert() free whatever occupied the slot. Link
-  // numbers are unique, so this frees nothing in practice.
+  // Qt 2's autoDelete made insert() free whatever occupied the slot. Kept
+  // exactly, including its consequences: two joints between the same pair of
+  // links both pass SIG_Joint::continuable, so the second build frees a link
+  // that is already in its parent's successors list and already registered
+  // with dynaMechsSystem. That use-after-free predates the port; no shipped
+  // robot has such a pair.
   delete dynaMechsLinks.take( rootLink->getNumber() );
   dynaMechsLinks.insert( rootLink->getNumber(), dynaMechsRootLink );
 
