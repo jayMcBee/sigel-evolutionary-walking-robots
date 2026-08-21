@@ -135,6 +135,21 @@ int main()
         assert(l.remove(nothing));
         assert(l.count() == 2 && l.getFirst() == &a && l.getLast() == &c);
     }
+    {   // Q2PtrList::remove(ptr) removes THAT pointer, reports whether it
+        // unlinked anything, and never frees while the list does not own.
+        // SIGEL_MasterGUI/SIG_GPParameter.cpp deletes on a true return, so
+        // all three properties are load-bearing.
+        Thing a(1), b(2), absent(3);
+        Q2PtrList<Thing> l; l.append(&a); l.append(&b);
+        l.first();                                // current = a
+        assert(l.remove(&b));                     // removes b, not current
+        assert(l.count() == 1 && l.getFirst() == &a);
+        assert(!l.remove(&absent));               // absent: false, no removal
+        assert(l.count() == 1);
+        assert(!l.remove(&b));                    // already gone: false
+        assert(l.count() == 1);
+        assert(Thing::live == 3);                 // flagless: freed nothing
+    }
     {   // Q2ListIterator stays dead once off the end (qglist.cpp:1166)
         Thing a(1);
         Q2PtrList<Thing> l; l.append(&a);
