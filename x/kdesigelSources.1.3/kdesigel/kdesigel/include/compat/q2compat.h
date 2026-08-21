@@ -26,7 +26,8 @@
 //     Qt source itself notes "Qt 3.0: Add a virtual compareItems()").  Q2Array<T>
 //     is typed, so std::sort with operator< removes the cause.  Affects
 //     SIG_GPManager.cpp:304,311 and SIG_AllIndividualsView.cpp:240, all of
-//     which need ascending numeric order and silently break above 256.
+//     which need ascending numeric order and silently break once any element
+//     reaches 256.
 //  2. Out-of-range indexing warns and clamps to index 0, as Qt 2's QGArray::at
 //     did (qgarray.h:108-117). Qt 2's QGVector::at only warned and then read out
 //     of range anyway (qgvector.h:85-92); clamping is used for both. This is
@@ -36,7 +37,8 @@
 //     fixed; the clamp is a floor, not a licence. Three cases, deliberately
 //     different: clamp to 0 (non-empty Q2Array), abort (empty Q2Array -- Qt 2
 //     crashed there too), null (empty Q2PtrVector, where null is a normal slot).
-//  3. resize() value-initialises new elements where Qt 2 left raw memory.
+//  3. resize() value-initialises new elements where Qt 2 left raw memory, and
+//     so does the sized constructor Q2Array(int) (qgarray.cpp:110-127).
 //  Two Qt 2 quirks are deliberately NOT reproduced, because no SIGEL code can
 //  reach them and both are defects rather than behaviour:
 //    - Copying a Qt 2 QDict re-inserts every item into a prepending table, so
@@ -44,9 +46,27 @@
 //      out in the opposite order, not just same-key runs. Unreachable here: no
 //      Q2Dict is copy-constructed or assigned anywhere. SIG_Robot's copy ctor
 //      round-trips through its own serialise/deserialise, not through the dict.
-//    - Qt 2's QValueList::contains returns an occurrence count; Qt 6's returns
-//      bool. Q2ValueList has three declarations in SIGEL and contains() is
-//      never called on any of them.
+//  Q2ValueList::contains DOES reproduce Qt 2, returning an occurrence count
+//  rather than Qt 6's bool (qvaluelist.h:260-268). An earlier version of this
+//  note claimed the opposite.
+//
+//  Four smaller divergences are known and left as they are. All four were
+//  confirmed by running the same operations against the vendored Qt 2.3
+//  sources, and NO SIGEL caller reaches any of them. Listed so that a future
+//  conversion which does reach one finds it recorded rather than by surprise:
+//
+//    - An out-of-range at()/insert()/remove()/take() on a Q2PtrList leaves the
+//      cursor dead. Qt 2's locate() revives it at element 0 before the range
+//      check (qglist.cpp:275-292). No SIGEL site indexes a list out of range.
+//    - Q2CString::resize(0) leaves a non-null string; Qt 2 freed the buffer and
+//      the string became null (qcstring.cpp:568-583). All nine Q2CString sites
+//      only take a const char* out of a toUtf8().
+//    - Q2Array::data() is non-null after resize(0); Qt 2 returned 0
+//      (qgarray.cpp:213-216). isNull() and operator const T* still agree with
+//      Qt 2. All 14 data() sites are on locals sized immediately before.
+//    - Q2PtrVector's insert/remove/take are silent when the index is out of
+//      range; Qt 2 emitted a qWarning (qgvector.cpp:254-314). Return values and
+//      resulting state are identical.
 //
 //  4. Q2Array is copy-on-write; Qt 2's QArray is TRULY shared, with no COW at
 //     all (qgarray.cpp:134-138, 284-294).  In Qt 2, `b = a; b.at(0) = 9;` is
@@ -118,9 +138,9 @@ public:
     void detach() { m.detach(); }
     Q2Array<T> copy() const { Q2Array<T> t; t.m = m; t.m.detach(); return t; }
 
-    // Qt 2 hands out a non-const T& from a const array (qarray.h:108-117).
+    // Qt 2 hands out a non-const T& from a const array (qarray.h:96-99).
     // Preserved so A-step renames stay pure.  See divergence 4 on sharing.
-    // qarray.h:96-99 -- Qt 2 warns and CLAMPS the index to 0 rather than
+    // qgarray.h:108-117 -- Qt 2 warns and CLAMPS the index to 0 rather than
     // failing. Reproduced here rather than left to Q_ASSERT, which compiles to
     // nothing under QT_NO_DEBUG and would give silent corruption in a release
     // build. An EMPTY array has no element 0 to clamp to: Qt 2 dereferenced a
@@ -546,13 +566,16 @@ public:
         return true;
     }
     bool remove() { return valid() ? remove(uint(cur)) : false; }
-    // qglist.cpp:504-509 -- a null argument does NOT search; it removes current.
+    // qglist.cpp:504-516 -- a null argument does NOT search; it removes
+    // current. A failed search goes through find(), which kills the cursor
+    // (qglist.cpp:683-726), so at() == -1 and current() == 0 afterwards.
     bool remove(const T *d)
     {
         if (!d)
             return remove();
         const qsizetype i = v.indexOf(const_cast<T *>(d));
-        return i < 0 ? false : remove(uint(i));
+        if (i < 0) { cur = -1; return false; }
+        return remove(uint(i));
     }
     bool removeRef(const T *d) { return remove(d); }
     bool removeFirst() { return v.isEmpty() ? false : remove(0u); }
@@ -613,7 +636,7 @@ public:
     uint count() const { return uint(v->size()); }
     bool isEmpty() const { return v->isEmpty(); }
     bool atFirst() const { return v->isEmpty() || i == 0; }   // qglist.h:241-244
-    bool atLast() const { return v->isEmpty() || i == v->size() - 1; }   // qglist.h:241-244
+    bool atLast() const { return v->isEmpty() || i == v->size() - 1; }   // qglist.h:246-249
 
     T *current() const { return (i >= 0 && i < v->size()) ? v->at(i) : nullptr; }
     T *toFirst() { i = 0; return current(); }
@@ -705,7 +728,7 @@ public:
     T &first() { return l.front(); }
     T &last() { return l.back(); }
 
-    // Qt 2 returns the following iterator (qvaluelist.h:399-404)
+    // Qt 2 returns the following iterator (qvaluelist.h:375, body 225-234)
     Iterator remove(Iterator it) { return l.erase(it); }
     void remove(const T &d) { l.remove(d); }
 
@@ -738,7 +761,7 @@ public:
     // Qt 2's QCString is a QArray<char> whose buffer INCLUDES the terminating
     // NUL (qcstring.h:156,175), so size() and count() are length()+1 for a
     // non-null string. These hide QByteArray's versions, which is NOT fully
-    // safe: SIG_GPFitnessTrainer.cpp:317 streams one into a QTextStream and
+    // safe: SIG_GPFitnessTrainer.cpp:319 streams one into a QTextStream and
     // overload resolution binds the QByteArray& overload, so that path sees
     // QByteArray::size(). Benign there, but the hiding IS visible via a base
     // reference.

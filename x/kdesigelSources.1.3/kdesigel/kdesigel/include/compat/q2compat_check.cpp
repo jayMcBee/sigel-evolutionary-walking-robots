@@ -146,6 +146,9 @@ int main()
         assert(l.count() == 1 && l.getFirst() == &a);
         assert(!l.remove(&absent));               // absent: false, no removal
         assert(l.count() == 1);
+        // A failed search goes through find(), which kills the cursor
+        // (qglist.cpp:683-726): at() == -1 and current() == 0 afterwards.
+        assert(l.at() == -1 && l.current() == nullptr);
         assert(!l.remove(&b));                    // already gone: false
         assert(l.count() == 1);
         assert(Thing::live == 3);                 // flagless: freed nothing
