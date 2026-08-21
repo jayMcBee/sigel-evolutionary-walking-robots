@@ -66,6 +66,15 @@ namespace SIGEL_Simulation
 				   SIGEL_Environment::SIG_Environment const & environment,
 				   SIG_SimulationParameters const & simulationParameter );
 
+      /**
+       * Frees the links in dynaMechsLinks, which this class owns.
+       *
+       * NOTE: nothing deletes the SIG_SimulationData object that
+       * SIG_Simulation::SIG_Simulation() allocates, so this destructor does
+       * not run today. That leak predates the Qt 6 port.
+       */
+      ~SIG_DynaMechsSimulationData();
+
       void simulationProgress();
 
       void setNewFrame( bool newValue );

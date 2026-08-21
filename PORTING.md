@@ -518,6 +518,30 @@ this per-site.
 sites: `SIG_Environment.cpp` (done), `MT_Controller.cpp`, `SIG_GPFitnessTrainer.cpp`,
 `SIG_GPRemoteZORCFitnessFunction.cpp` (+ WIN variant, + both headers).
 
+### PRE-EXISTING LEAK — the simulation backend is never freed (found at B4)
+
+Not a port matter. Recorded because B4 tripped over it and the next person will
+too.
+
+`SIG_Simulation.cpp:65` allocates a `SIG_DynaMechsSimulationData` (or the Dynamo
+equivalent) with `new` and stores it in `SIG_Simulation::simulationData`.
+`~SIG_Simulation()` at `SIG_Simulation.cpp:86` is empty. Nothing anywhere deletes
+it — verified across `src/`. The same holds for `simulationQueries` and the
+command interface.
+
+One simulation object is built per fitness evaluation, so a GP run leaks the
+whole physics backend thousands of times.
+
+Consequence for B4: the destructor added to `SIG_DynaMechsSimulationData` is
+correct but **does not run today**. The only live free path for `dynaMechsLinks`
+was `insert()` over an occupied slot, which is why B4 converted the two insert
+sites as well.
+
+Base `SIG_SimulationData` also has no virtual destructor, so fixing the leak
+means adding one first.
+
+Out of scope for the Qt port — do not fix here.
+
 ### DEBT — drop the Qt 2 emulation once the port is trusted
 
 **Do this after the port is confirmed to produce valid results, not before.**
