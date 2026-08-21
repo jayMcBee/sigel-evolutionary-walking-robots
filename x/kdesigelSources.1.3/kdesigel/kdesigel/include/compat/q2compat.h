@@ -158,97 +158,142 @@ private:
 
 // ---------------------------------------------------------------------------
 // Q2Dict<T>  <- Qt 2 QDict<T>: QString-keyed dictionary of *pointers*.
-// qdict.h: count() is the item count, size() is the hash table size.
-// Duplicate keys are allowed and stack newest-first (qgdict.cpp:379-386),
-// hence QMultiHash.
+//
+// This reproduces Qt 2's hash table structure, not just its interface, because
+// ITERATION ORDER IS OBSERVABLE and the shipped experiments depend on it:
+// SIG_DynaMoSimulationData.cpp:33-51 calls newLink/newJoint/newSensor/newDrive
+// in iteration order, and that assigns the object numbers. SIG_Robot.cpp:295
+// serialises in the same order. Backed by a QHash the numbering differs from
+// 2003 for six of the seven shipped robots -- the insect's links come out
+// body,foot1..foot6,leg1..leg6 under Qt 2 but body,leg1,foot1,... by insertion.
+//
+// Qt 2, from qgdict.cpp:
+//   hashKeyString  :87-103   ELF hash over each QChar's low byte
+//   bucket index   :356      hash % vlen, vlen from the constructor (default 17)
+//   insert         :379-386  PREPENDS, so a chain is newest-first
+//   iteration      :1132-1151, :1157-1180   buckets 0..vlen-1, chain in order
+//   count() is the item count, size() is vlen -- not the same thing
 // ---------------------------------------------------------------------------
 template <class T>
 class Q2Dict
 {
 public:
-    typedef QMultiHash<QString, T *> HashType;
+    struct Node { QString key; T *val; };
 
-    explicit Q2Dict(int size = 17) : buckets(uint(size)) {}
+    explicit Q2Dict(int size = 17) : buckets(size > 0 ? size : 17), vlen(uint(size > 0 ? size : 17)) {}
 
-    // qcollection.h:64 -- QCollection(const QCollection&) { del_item = FALSE; }
-    // A Qt 2 copy is ALWAYS non-owning.  Omitting this is a double-free.
-    Q2Dict(const Q2Dict &o) : h(o.h), buckets(o.buckets), del(false) {}
+    // qcollection.h:64 -- a Qt 2 copy is ALWAYS non-owning
+    Q2Dict(const Q2Dict &o) : buckets(o.buckets), vlen(o.vlen), items(o.items), del(false) {}
 
-    // qgdict.cpp:280-302 -- clear() the destination first (honouring ITS
-    // autoDelete), copy, and leave the destination's flag untouched.
+    // qgdict.cpp:280-302 -- clear the destination honouring ITS flag, keep the flag
     Q2Dict &operator=(const Q2Dict &o)
     {
-        if (this != &o) { clear(); h = o.h; }   // Qt 2 leaves vlen untouched
+        if (this != &o) { clear(); buckets = o.buckets; vlen = o.vlen; items = o.items; }
         return *this;
     }
 
-    ~Q2Dict() { if (del) qDeleteAll(h); }
+    ~Q2Dict() { if (del) deleteAll(); }
 
-    uint count() const { return uint(h.size()); }
-    uint size() const { return buckets; }   // hash table size, not item count
-    bool isEmpty() const { return h.isEmpty(); }
+    uint count() const { return items; }
+    uint size() const { return vlen; }          // the table size, not the item count
+    bool isEmpty() const { return items == 0; }
 
     void setAutoDelete(bool enable) { del = enable; }
     bool autoDelete() const { return del; }
 
-    void insert(const QString &k, const T *d) { h.insert(k, const_cast<T *>(d)); }
+    void insert(const QString &k, const T *d)
+    {
+        buckets[qsizetype(hash(k))].prepend(Node{k, const_cast<T *>(d)});   // newest first
+        ++items;
+    }
 
-    void replace(const QString &k, const T *d) { remove(k); h.insert(k, const_cast<T *>(d)); }
+    void replace(const QString &k, const T *d) { remove(k); insert(k, d); }
 
     T *find(const QString &k) const
     {
-        typename HashType::const_iterator it = h.constFind(k);
-        return it == h.constEnd() ? nullptr : it.value();
+        const QList<Node> &c = buckets.at(qsizetype(hash(k)));
+        for (const Node &n : c)
+            if (n.key == k)
+                return n.val;                   // newest wins, as in Qt 2
+        return nullptr;
     }
+    T *operator[](const QString &k) const { return find(k); }   // qdict.h:67-68
 
-    // Qt 2 removes ONE item (the most recent for that key), not all of them.
-    bool remove(const QString &k)
+    bool remove(const QString &k)               // Qt 2 removes ONE, the newest
     {
-        typename HashType::iterator it = h.find(k);
-        if (it == h.end())
-            return false;
-        if (del)
-            delete it.value();
-        h.erase(it);
-        return true;
+        QList<Node> &c = buckets[qsizetype(hash(k))];
+        for (qsizetype i = 0; i < c.size(); ++i)
+            if (c.at(i).key == k) {
+                if (del) delete c.at(i).val;
+                c.removeAt(i); --items; return true;
+            }
+        return false;
     }
 
     T *take(const QString &k)
     {
-        typename HashType::iterator it = h.find(k);
-        if (it == h.end())
-            return nullptr;
-        T *v = it.value();
-        h.erase(it);
-        return v;
+        QList<Node> &c = buckets[qsizetype(hash(k))];
+        for (qsizetype i = 0; i < c.size(); ++i)
+            if (c.at(i).key == k) {
+                T *v = c.at(i).val;
+                c.removeAt(i); --items; return v;
+            }
+        return nullptr;
     }
 
-    T *operator[](const QString &k) const { return find(k); }   // qdict.h:67-68
+    void clear()
+    {
+        if (del) deleteAll();
+        for (QList<Node> &c : buckets) c.clear();
+        items = 0;
+    }
 
-    void clear() { if (del) qDeleteAll(h); h.clear(); }
-    void resize(uint n) { buckets = n; h.reserve(qsizetype(n)); }
+    void resize(uint n)                         // Qt 2 rehashes into n buckets
+    {
+        if (n == 0 || n == vlen) return;
+        QList<Node> all;
+        for (qsizetype i = buckets.size() - 1; i >= 0; --i)
+            for (qsizetype j = buckets.at(i).size() - 1; j >= 0; --j)
+                all.append(buckets.at(i).at(j));
+        buckets = QList<QList<Node> >(qsizetype(n));
+        vlen = n; items = 0;
+        for (const Node &nd : all) insert(nd.key, nd.val);
+    }
 
-    const HashType &constHash() const { return h; }   // for Q2DictIterator
+    const QList<QList<Node> > &constBuckets() const { return buckets; }   // for the iterator
 
 private:
-    HashType h;
-    uint buckets;
+    // qgdict.cpp:87-103, case-sensitive branch. cell() is the QChar's low byte.
+    uint hash(const QString &k) const
+    {
+        uint h = 0, g;
+        for (int i = 0; i < k.length(); ++i) {
+            h = (h << 4) + (k.at(i).unicode() & 0xff);
+            if ((g = h & 0xf0000000u) != 0)
+                h ^= g >> 24;
+            h &= ~g;
+        }
+        return h % vlen;
+    }
+    void deleteAll() { for (const QList<Node> &c : buckets) for (const Node &n : c) delete n.val; }
+
+    QList<QList<Node> > buckets;
+    uint vlen;
+    uint items = 0;
     bool del = false;
 };
 
 // ---------------------------------------------------------------------------
 // Q2DictIterator<T>  <- Qt 2 QDictIterator<T>.
 //
-// Qt 2 registers every iterator with its dict and repairs them on mutation
-// (qgdict.cpp:583-590), so a Qt 2 iterator survives erase and returns 0 rather
-// than dereferencing freed memory.  Qt 6's QMultiHash iterators are simply
-// invalidated by any erase or rehash -- use-after-free, not a graceful null.
+// Walks buckets 0..vlen-1, each chain newest-first (qgdict.cpp:1132-1180) --
+// the order the shipped experiments were numbered in.
 //
-// This snapshots the dict at construction instead.  No core site mutates a
-// dict while iterating it, so behaviour is identical for every real use, and
-// it is crash-safe rather than undefined if one is ever added.  Being a value
-// makes it trivially copyable, which SIG_Link::getPointIter needs -- it
-// returns an iterator BY VALUE.
+// Qt 2 registered each iterator with its dict and repaired them on erase
+// (qgdict.cpp:583-590). This snapshots instead: no SIGEL site mutates a dict
+// while iterating it, and a snapshot is crash-safe rather than undefined if one
+// is ever added. Being a value makes it copyable, which SIG_Link::getPointIter
+// needs -- it returns an iterator BY VALUE.
 // ---------------------------------------------------------------------------
 template <class T>
 class Q2DictIterator
@@ -256,14 +301,12 @@ class Q2DictIterator
 public:
     Q2DictIterator(const Q2Dict<T> &d) : dict(&d), i(0)
     {
-        const typename Q2Dict<T>::HashType &h = d.constHash();
-        snap.reserve(h.size());
-        for (typename Q2Dict<T>::HashType::const_iterator it = h.constBegin();
-             it != h.constEnd(); ++it)
-            snap.append(qMakePair(it.key(), it.value()));
+        for (const QList<typename Q2Dict<T>::Node> &c : d.constBuckets())
+            for (const typename Q2Dict<T>::Node &n : c)
+                snap.append(qMakePair(n.key, n.val));
     }
 
-    // Qt 2 answers these from the live dict, not from the iteration position
+    // Qt 2 answers these from the live dict, not the iteration position
     uint count() const { return dict->count(); }
     bool isEmpty() const { return dict->count() == 0; }
 
@@ -272,8 +315,8 @@ public:
 
     T *toFirst() { i = 0; return current(); }
 
-    T *operator++() { if (i < snap.size()) ++i; return current(); }          // advance, return new
-    T *operator()() { T *v = current(); if (i < snap.size()) ++i; return v; } // return old, advance
+    T *operator++() { if (i < snap.size()) ++i; return current(); }
+    T *operator()() { T *v = current(); if (i < snap.size()) ++i; return v; }
 
 private:
     bool valid() const { return i >= 0 && i < snap.size(); }
