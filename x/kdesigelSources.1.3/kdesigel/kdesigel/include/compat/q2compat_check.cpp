@@ -234,6 +234,33 @@ int main()
         assert(v.contains(0) == 2);             // Qt 2 returns a count
     }
 
+
+    {   // Qt 2 iteration order, checked against the real insect robot.
+        // qgdict.cpp:87-103 hash, %17 buckets, chains newest-first. This order
+        // is what numbers links in SIG_DynaMoSimulationData.cpp:33-51, so the
+        // shipped experiments depend on it.
+        const char *ins[] = { "body","leg1","foot1","leg2","foot2","leg3","foot3",
+                              "leg4","foot4","leg5","foot5","leg6","foot6" };
+        const char *want[] = { "body","foot1","foot2","foot3","foot4","foot5","foot6",
+                               "leg1","leg2","leg3","leg4","leg5","leg6" };
+        Thing store[13];
+        Q2Dict<Thing> d;
+        for (int i = 0; i < 13; ++i) d.insert(QString::fromLatin1(ins[i]), &store[i]);
+        int n = 0;
+        for (Q2DictIterator<Thing> it(d); it.current(); ++it, ++n)
+            assert(it.currentKey() == QLatin1String(want[n]));
+        assert(n == 13);
+        assert(d.count() == 13);
+        assert(d.size() == 17);          // table size, not item count
+    }
+    {   // duplicate keys: newest wins, remove() takes one (qgdict.cpp:379-386)
+        Q2Dict<Thing> d(31); Thing a(1), b(2), c(3);
+        d.insert("k", &a); d.insert("k", &b); d.insert("k", &c);
+        assert(d.count() == 3 && d.find("k") == &c);
+        d.remove("k");
+        assert(d.count() == 2 && d.find("k") == &b);
+    }
+
     std::printf("q2compat self-check: all assertions passed\n");
     return 0;
 }
