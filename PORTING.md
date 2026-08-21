@@ -290,7 +290,33 @@ seam Phase C would reconnect to, so cutting them now costs Phase C nothing.
 
 Phase A exit: core passes `-fsyntax-only` against Qt6Core, headless.
 
-### Phase B — delete the shim (5 steps)
+### Phase B — make ownership explicit (5 steps)
+
+**Revised.** This section previously said Phase B *deletes* `q2compat.h`. It
+cannot: three of the shim's behaviours are load-bearing and cannot go until the
+data migration recorded in §9 — `Q2Dict`'s hash order numbers the links,
+`Q2PtrVector`'s `size()`/`count()` split and null slots, and `insert()` /
+shrinking `resize()` being the only free path at 8 sites.
+
+So Phase B does the half that is genuinely blocked on it, and no more:
+
+- every owning container frees its items **explicitly, at the owner**, via
+  `deleteContents()` — not by arming `setAutoDelete` and relying on a member
+  destructor
+- `setAutoDelete` disappears container by container as each is converted
+- the shim classes survive as thin ordering and semantics adapters, owning
+  nothing
+
+The post-migration clean-up in §9 then deletes them along with the data
+migration, and `q2compat.h` goes with it.
+
+**Exit criterion per step:** the shim self-check builds and runs clean under
+ASan and UBSan, with an assertion per converted container covering the free path
+it actually uses — that an owner frees exactly once and is idempotent, and that
+a non-owning container frees nothing. Verified to have teeth: removing the free
+from `Q2Dict::deleteContents` makes the check abort.
+
+### Phase B — original plan, superseded (5 steps)
 
 | # | Class | Sites |
 |---|---|---|
