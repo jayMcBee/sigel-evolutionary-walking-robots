@@ -361,6 +361,56 @@ int main()
     }                                          // must not free a or b
     assert(Thing::live == 0);
 
+    {   // deleteContents() must free EVERY entry of a bucket, not just the
+        // head or the tail. ADD, DELAY and MIN all hash to bucket 14 at the
+        // default vlen of 17 -- that is the real chain in the default
+        // SIG_LanguageParameters dictionary.
+        Q2Dict<Thing> d;
+        d.insert("ADD", new Thing(1));
+        d.insert("DELAY", new Thing(2));
+        d.insert("MIN", new Thing(3));
+        d.insert("MAX", new Thing(4));        // bucket 15, on its own
+        assert(Thing::live == 4);
+        d.deleteContents();
+        assert(Thing::live == 0 && d.count() == 0);
+    }
+    {   // take() must drop the item count. SIG_LanguageParameters writes
+        // count() as a record count and the reader consumes exactly that
+        // many, so a stale count corrupts every saved experiment.
+        Q2Dict<Thing> d;
+        d.insert("ADD", new Thing(1));
+        d.insert("DELAY", new Thing(2));
+        d.insert("MIN", new Thing(3));
+        assert(d.count() == 3);
+        delete d.take("DELAY");               // from the middle of a chain
+        assert(d.count() == 2 && Thing::live == 2);
+        assert(d.find("ADD") && d.find("MIN") && !d.find("DELAY"));
+        d.deleteContents();
+        assert(Thing::live == 0);
+    }
+
+    {   // clear() on a container that does NOT own must free nothing.
+        // SIG_Robot.cpp hand-deletes six dictionaries' contents and then
+        // calls clear() on each; giving clear() teeth is six double frees.
+        Thing a(1), b(2), c(3);
+        Q2Dict<Thing> d;      d.insert("ADD", &a); d.insert("DELAY", &b);
+        Q2PtrList<Thing> l;   l.append(&a); l.append(&b);
+        Q2PtrVector<Thing> v(2); v.insert(0, &a); v.insert(1, &b);
+        d.clear(); l.clear(); v.clear();
+        assert(Thing::live == 3);
+        assert(d.count() == 0 && l.count() == 0 && v.count() == 0);
+    }
+    {   // Same for the vector paths where Qt 2's flag was the delete:
+        // insert() over an occupied slot, remove(), and a shrinking resize().
+        Thing a(1), b(2), c(3);
+        Q2PtrVector<Thing> v(3);
+        v.insert(0, &a); v.insert(1, &b); v.insert(2, &c);
+        v.insert(0, &c);                      // overwrite an occupied slot
+        v.remove(1);
+        v.resize(1);                          // truncate the tail
+        assert(Thing::live == 3);
+    }
+
     {   // B: an owner must free on EVERY path, not only in its destructor.
         // 2003 armed setAutoDelete in the constructor, so remove() freed too;
         // a destructor-only conversion silently loses that.

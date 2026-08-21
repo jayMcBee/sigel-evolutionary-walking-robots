@@ -111,9 +111,7 @@ SIGEL_GP::SIG_GPFitnessTrainer::SIG_GPFitnessTrainer(SIGEL_GP::SIG_GPExperiment&
 };
 
 SIGEL_GP::SIG_GPFitnessTrainer::~SIG_GPFitnessTrainer() {
-  // This class owns the entries of both dynamic host lists. Freed first so
-  // that an exception out of the PVM loop below cannot skip them; Qt 2 freed
-  // them during unwinding.
+  // This class owns the entries of both dynamic host lists.
   dynHosts.deleteContents();
   freshDynHosts.deleteContents();
 
