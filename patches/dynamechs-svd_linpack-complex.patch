@@ -1,0 +1,11 @@
+--- a/dynamechs/dm/svd_linpack.cpp
++++ b/dynamechs/dm/svd_linpack.cpp
+@@ -177,7 +177,7 @@
+ 	/* longint j; */
+ 	real r;
+ 	doublereal d;
+-	complex c;
++	::complex c;
+ 	doublecomplex z;
+ 	};
+ 

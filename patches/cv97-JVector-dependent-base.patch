@@ -1,0 +1,11 @@
+--- a/cv97/JVector.h
++++ b/cv97/JVector.h
+@@ -26,7 +26,7 @@
+ 		setObject(obj);
+ 	}
+ 	~JVectorElement() { 
+-		remove();
++		this->remove();
+ 		if (mbDeleteObject)
+ 			delete mObj;
+ 	}
