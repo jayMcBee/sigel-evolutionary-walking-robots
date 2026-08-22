@@ -3,9 +3,29 @@
 **Scope: Qt API migration only.** Not toolchain modernization, not build-system
 work, not reproducibility testing, not PVM. Those are separate jobs; see §3.
 
-**Status: §5 decisions signed off 2026-08-18.** Phases A and B are authorized.
-Phase C is deferred per **D3(b)** and is *not* authorized. §9 lists what is
-deliberately still open.
+**Decisions signed off 2026-08-18** (§5). Phases A and B authorized; Phase C
+deferred per **D3(b)** and *not* authorized.
+
+**Status — 2026-08-22**
+
+| phase | state |
+|---|---|
+| 0 — comments to English | done for the 9 core modules. 9 GUI files still hold Latin-1 bytes |
+| A — core onto Qt 6 | **done**, tags `step-A0`…`step-A9`. `./check.sh`: 117 files compile, 5 fail, all needing a GUI |
+| B — ownership explicit | **8 of 14 containers.** 5 still on `setAutoDelete` — an open decision, see §7 |
+| C — GUI | not started |
+
+Five independent review rounds have run over Phases A and B and over the shim
+itself. Between them they found 2 leaks, 1 double free, 1 free lost on the
+exception path, 9 gaps where the self-check passed on broken code, and 13 false
+statements in the code comments and in this file. All fixed.
+
+**Needs a decision from Jan:** the 5 containers still on the flag (§7), whether
+`QTextStream` no longer printing `-0` matters (§9), and the order of any
+remaining Phase B work.
+
+§9 lists what is deliberately still open, including 4 items recorded for after
+the port.
 
 ---
 
@@ -340,18 +360,6 @@ ASan and UBSan, with an assertion per converted container covering the free path
 it actually uses — that an owner frees exactly once and is idempotent, and that
 a non-owning container frees nothing. Verified to have teeth: removing the free
 from `Q2Dict::deleteContents` makes the check abort.
-
-### Phase B — original plan, superseded (5 steps)
-
-| # | Class | Sites |
-|---|---|---|
-| B1 | `Q2Array` — value semantics, easiest first | 74 |
-| B2 | `Q2Dict` | 61 |
-| B3 | `Q2PtrVector` | 48 |
-| B4 | `Q2PtrList` — the 41 `autoDelete` calls resolve here per **D7**: 34 `TRUE` → `qDeleteAll()` in the owner's destructor, 7 `FALSE` → nothing | 37 |
-| B5 | `Q2CString`, `Q2ValueList`, `Q2Queue`, iterators | 16 |
-
-Phase B exit: `q2compat.h` deleted, and the §9 ownership audit passes.
 
 ### Phase C — GUI — DEFERRED per D3(b), NOT AUTHORIZED
 
