@@ -11,15 +11,15 @@ interface migration (Phase C) follows.
 | 0 — comments to English | done for the 9 core modules; 9 GUI files still hold Latin-1 |
 | A — core onto Qt 6 | **done**, tags `step-A0`…`step-A9`. `./check.sh`: 117 pass, 5 fail (all need a GUI) |
 | B — ownership explicit | **8 of 14 containers**. 5 still on `setAutoDelete` — open, §7 |
-| R — build and run | core builds and runs; all 12 experiments execute clean under ASan and UBSan. **Results not yet validated — no usable baseline on this machine, §7** |
+| R — build and run | core builds and runs. **8 of 14 experiments reproduce the 2003 result within 8%; 6 do not** — §7 |
 | C — GUI | not started, not authorized |
 
 **Order of work, agreed 2026-08-22:**
 
 1. ~~Build core plus a small program that runs one fitness evaluation, under
-   AddressSanitizer.~~ **Built and running.** Correctness unverified: the `.exp`
-   fitness turned out to be a stale oracle and the captured 2003 run is not on
-   this machine — §7.
+   AddressSanitizer.~~ **Built and running.** 8 of 14 experiments reproduce the
+   2003 result within 8%; the 6 that do not are all gaits that drive a joint
+   into its limits — §7.
 2. Fix PVM — 40/40 files fail because glibc dropped `rpc/types.h`.
 3. Full headless run, compared against the captured 2003 run.
 4. Convert the last 5 containers, now testable (§7).
@@ -394,50 +394,77 @@ qhull and the f2c translation of `ssvdc`, and `vptr` in cv97.
 §10's pre-existing leak — `SIG_Simulation` is `new`ed and never deleted, and
 its destructor is empty. Gate on ASan and UBSan errors, not on this.
 
-### Results against the 2003 record — the `.exp` fitness is NOT a valid oracle
+### Results against the 2003 record — 8 of 14 reproduce, 6 do not
 
-**Do not use the fitness stored in an `.exp` as the reference.** In
-`twoBasesHighMutationRate.exp`, individuals 1, 3, 4, 5 and 6 all carry
-`FITNESS=1.02726` and all five have **different programs**. That value is
-inherited from a parent and written out before re-evaluation. Comparing a
-re-run against it measures nothing.
+Every individual of every experiment, `.exp` best against ours:
 
-This invalidates the earlier "6 of 12 match" reading, which only ever looked at
-individual 0. Across individuals the picture is that whoever barely moved in
-2003 reproduces to 3–10 significant figures, and whoever walked well now covers
-roughly 1/100 of the distance.
+| experiment | K_spring | 2003 best | ours | ratio |
+|---|---|---|---|---|
+| octopusSimpleFitness | 100 | 0.82998 | 0.84063 | 1.013 |
+| shortHammerNiceWalkingFitness | 100 | 0.49015 | 0.49085 | 1.001 |
+| hammerNiceWalkingFitness | 100 | 0.45972 | 0.45668 | 0.993 |
+| octopusNiceWalkingFitness | 100 | 0.52013 | 0.51471 | 0.990 |
+| runnerSimpleFitness | 100 | 0.75156 | 0.73395 | 0.977 |
+| insectNiceWalkingFitness | 500 | 0.63896 | 0.61079 | 0.956 |
+| walkerNiceWalkingFitness | 500 | 0.27548 | 0.25485 | 0.925 |
+| twoBasesHardlyReducedIS | **25000** | 0.56965 | 0.05330 | **0.094** |
+| twoBasesReducedInstructionSet | **25000** | 0.93897 | 0.08370 | **0.089** |
+| twoBasesSimpleFitness2 | **25000** | 1.14820 | 0.10055 | **0.088** |
+| twoBasesHighMutationRate | **25000** | 1.02730 | 0.05132 | **0.050** |
+| twoBasesSimpleFitness1 | **25000** | 0.84221 | 0.03150 | **0.037** |
+| twoBasesHighCrossOverRate | **25000** | 0.84221 | 0.03150 | **0.037** |
+| runnerNiceWalkingFitness | 100 | 0.91951 | 0.08312 | **0.090** |
 
-What has been ruled out as the cause:
+**The failures correlate exactly with `JOINTLIMITSK_SPRING = 25000`**, with one
+outlier — `runnerNiceWalkingFitness`, whose parameters match the passing
+`runnerSimpleFitness` on the same robot.
+
+**The `.exp` fitness is a sound oracle in aggregate**, contrary to an earlier
+note here. The endbericht's §5.2 *is* `twoBasesHighMutationRate` and states an
+average fitness of "ca. 0,9 m/s"; the file's mean over 100 individuals is 0.777.
+§5.10 *is* `walkerNiceWalkingFitness` and states 0.26 m/s; the file's best is
+0.275 and ours is 0.255. Fitness is metres per second, and our harness measures
+the same quantity the report does. Individual fitness fields *are* partly stale
+— five individuals in `twoBasesHighMutationRate` share `FITNESS=1.02726` with
+five different programs — so compare bests and means over the whole population,
+never one individual.
+
+**Where the failing case actually goes wrong.** `twoBases` is two boxes on one
+hinge limited to ±85°, and its gait works by driving the hinge into its stops.
+In our run the joint angle stays within **2.77 .. 3.92 rad against limits of
+1.66 .. 4.63** — it never reaches a stop. Perturbing `JOINTLIMITSK_SPRING` by
+1e-4 leaves the result **bit-identical**, confirming the limit spring is never
+engaged. The stiff spring is therefore a marker for "gait depends on the stops",
+not itself the fault. The hinge is being driven with a mean \|torque\| of 333
+against a maximum of 800 and still only swings ±33°.
+
+Ruled out, each by measurement:
 
 | | |
 |---|---|
-| chaotic divergence | results are **bit-identical** at `-O1` with FMA contraction and at `-O2` with `-ffp-contract=off` |
-| early termination | every run completes all 18,001 frames |
-| link, joint, drive or sensor numbering | the drive and sensor vectors are dense, `size() == count()`, in declaration order |
-| actuation not reaching the physics | `twoBases` individual 1 issues 18,046 `moveDrive` calls, mean \|force\| 333, and still ends at x = −1.45 |
-| out-of-range container access | no `qWarning` from the shim on any run |
+| chaotic divergence | bit-identical at `-O1` with FMA and `-O2` with `-ffp-contract=off` |
+| early termination | all runs complete every frame |
+| link, joint, drive, sensor numbering | vectors dense, `size() == count()`, declaration order |
+| actuation not reaching the physics | 18,046 `moveDrive` calls, mean \|force\| 333 |
+| out-of-range containers | no `qWarning` from the shim on any run |
 | memory errors | clean under ASan and UBSan |
+| floor friction | `GPSconst`/`GNSconst`/`GPDconst`/`GNDconst`/`USFcoeff`/`UKFcoeff` identical in a passing and a failing experiment; the differing `FLOORMATERIALNAME` is cosmetic under DynaMechs |
+| command durations mis-parsed | `MOVE` is 0.01 s for `twoBases` and 0.1 s for `octopus`, both as stored |
 
-The `invalid sensor` messages come only from `hammer`, which has no joint
-sensors and which reproduces its 2003 value — so they are 2003 behaviour, not a
-regression.
+Next: why the hinge does not reach its stops under that torque. The remaining
+untested links in that chain are `SIG_DynaMechsLink`'s joint axis and the
+`transformToDynaMechs` branch that produced these limits, and DynaMechs'
+`dmRevoluteLink` joint friction (`JOINTFRICTIONU_C`, 0.35).
 
-**What is needed to settle it:** the 2003 i386 binary run on the same input on
-the x86 box —
+### Reference material — all of it, downloaded 2026-08-22
 
-```
-sigel_slave -v <experiment>.exp        # or the equivalent single evaluation
-```
-
-for `twoBasesSimpleFitness1` individuals 0, 1 and 3. If it reproduces 0.842208
-for individual 1, the port has a real defect and the trace narrows it. If it
-does not, the stored numbers are stale and the only usable baseline is the
-captured run. `qemu-user-static` is not installable here, so the i386 binary
-cannot be emulated on this machine.
-
-The captured 2003 run (13 generations, 874 evaluations) is **not in this repo
-and not on this machine.** It is the only sound baseline and it needs to be put
-somewhere the build can reach.
+`sigel.sourceforge.net/seiten/ergebnisse_de.html` carries the published results:
+14 `*Experiment.tar.gz` (the same 12 `.exp` as `experiments.tar.gz`, **plus
+`runnerNiceWalkingFitness` and `runnerSimpleFitness`, which are not in it**), 9
+`.mpg` films of the evolved gaits, and the per-robot model archives.
+`.../berichte/endbericht.pdf` is the project's final report, and its chapter 5
+documents these experiments one by one with fitness curves and stated speeds —
+the only independent numeric oracle available. All in `data/`, untracked.
 
 ### Phase C — GUI — DEFERRED per D3(b), NOT AUTHORIZED
 

@@ -23,7 +23,9 @@
 #include "SIGEL_GP/SIG_GPNiceWalkingFitnessFunction.h"
 #include "SIGEL_GP/SIG_GPSimpleFitnessFunction.h"
 #include "SIGEL_GP/SIG_GPFullDataRecorder.h"
+#include "SIGEL_Robot/SIG_CommandParameters.h"
 #include "SIGEL_Robot/SIG_Joint.h"
+#include "SIGEL_Robot/SIG_LanguageParameters.h"
 #include "SIGEL_Robot/SIG_Link.h"
 #include "SIGEL_Simulation/SIG_Simulation.h"
 #include "SIGEL_Simulation/SIG_SimulationParameters.h"
@@ -82,6 +84,17 @@ int main(int argc, char *argv[])
   catch (SIGEL_Tools::SIG_Exception &e) {
     fprintf(stderr, "preparing the robot: %s\n", qPrintable(e.getMessage()));
     return 1;
+  }
+
+  if (verbose) {
+    const char *cmds[] = { "MOVE", "COPY", "ADD", "SENSE", "JUMP", "DELAY", 0 };
+    for (int c = 0; cmds[c]; c++)
+      if (robot.getLangParam()->hasCommand(cmds[c]))
+        printf("  command %-6s duration %g\n", cmds[c],
+               robot.getLangParam()->getCommand(cmds[c])->getDuration());
+    printf("  maximalDelayTime %d  registerWidth %d\n",
+           robot.getLangParam()->getMaximalDelayTime(),
+           robot.getLangParam()->getRegisterWidth());
   }
 
   if (verbose) {
