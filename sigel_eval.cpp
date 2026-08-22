@@ -22,6 +22,10 @@
 #include "SIGEL_GP/SIG_GPExperiment.h"
 #include "SIGEL_GP/SIG_GPNiceWalkingFitnessFunction.h"
 #include "SIGEL_GP/SIG_GPSimpleFitnessFunction.h"
+#include "SIGEL_GP/SIG_GPFullDataRecorder.h"
+#include "SIGEL_Robot/SIG_Joint.h"
+#include "SIGEL_Robot/SIG_Link.h"
+#include "SIGEL_Simulation/SIG_Simulation.h"
 #include "SIGEL_Simulation/SIG_SimulationParameters.h"
 #include "SIGEL_Tools/SIG_Exception.h"
 
@@ -33,8 +37,11 @@ int main(int argc, char *argv[])
   // static initialisation order across translation units is unspecified.
   QHashSeed::setDeterministicGlobalSeed();
 
+  bool verbose = false;
+  if (argc > 1 && QString(argv[1]) == "-v") { verbose = true; argv++; argc--; }
+
   if (argc < 2 || argc > 3) {
-    fprintf(stderr, "usage: %s <experiment.exp> [individual, default 0]\n", argv[0]);
+    fprintf(stderr, "usage: %s [-v] <experiment.exp> [individual, default 0]\n", argv[0]);
     return 2;
   }
 
@@ -77,6 +84,19 @@ int main(int argc, char *argv[])
     return 1;
   }
 
+  if (verbose) {
+    // The robot as the simulation sees it: Q2Dict iteration order is what
+    // numbers the DynaMechs links -- PORTING.md §9, §10.
+    Q2DictIterator<SIGEL_Robot::SIG_Link> li = robot.getLinkIter();
+    int n = 0;
+    for (; li.current(); ++li)
+      printf("  link  %2d  %s\n", n++, qPrintable(li.currentKey()));
+    Q2DictIterator<SIGEL_Robot::SIG_Joint> ji = robot.getJointIter();
+    n = 0;
+    for (; ji.current(); ++ji)
+      printf("  joint %2d  %s\n", n++, qPrintable(ji.currentKey()));
+  }
+
   SIGEL_GP::SIG_GPIndividual &individual = experiment.population.getIndividual(index);
   const QString name = experiment.gpParameter.getFitnessName();
 
@@ -97,6 +117,30 @@ int main(int argc, char *argv[])
 
   const double recorded = individual.getFitness();
   const double fitness = fitnessFunction->evalFitness();
+
+  if (verbose) {
+    // Re-run with a recorder we can read, to see the trajectory the fitness
+    // function saw. NiceWalking returns 0 the moment height leaves its band.
+    SIGEL_GP::SIG_GPFullDataRecorder trace(1);
+    SIGEL_Simulation::SIG_Simulation sim(robot, experiment.environment,
+                                         individual.getProgramVar(),
+                                         experiment.simulationParameter, trace);
+    try { sim.start(); }
+    catch (SIGEL_Tools::SIG_Exception &e) {
+      printf("  simulation threw: %s\n", qPrintable(e.getMessage()));
+    }
+    double lo = 1e300, hi = -1e300;
+    int frames = 0;
+    DL_vector last;
+    for (DL_vector *p = trace.positions.first(); p; p = trace.positions.next()) {
+      if (p->y < lo) lo = p->y;
+      if (p->y > hi) hi = p->y;
+      last = *p;
+      frames++;
+    }
+    printf("  frames %d  height %.6g .. %.6g  last (%.6g, %.6g, %.6g)\n",
+           frames, lo, hi, last.x, last.y, last.z);
+  }
   delete fitnessFunction;
 
   printf("%s individual %d  %s\n", argv[1], index, qPrintable(name));

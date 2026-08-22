@@ -11,14 +11,15 @@ interface migration (Phase C) follows.
 | 0 — comments to English | done for the 9 core modules; 9 GUI files still hold Latin-1 |
 | A — core onto Qt 6 | **done**, tags `step-A0`…`step-A9`. `./check.sh`: 117 pass, 5 fail (all need a GUI) |
 | B — ownership explicit | **8 of 14 containers**. 5 still on `setAutoDelete` — open, §7 |
-| R — build and run | **done**. `make` builds and `build/sigel_eval` runs one fitness evaluation under ASan and UBSan. All 12 experiments run |
+| R — build and run | core builds and runs; all 12 experiments execute clean under ASan and UBSan. **Results not yet validated — no usable baseline on this machine, §7** |
 | C — GUI | not started, not authorized |
 
 **Order of work, agreed 2026-08-22:**
 
 1. ~~Build core plus a small program that runs one fitness evaluation, under
-   AddressSanitizer.~~ **Done.** All 12 experiments run clean; 6 of 12 match the
-   fitness recorded in the `.exp`, 6 do not — §7.
+   AddressSanitizer.~~ **Built and running.** Correctness unverified: the `.exp`
+   fitness turned out to be a stale oracle and the captured 2003 run is not on
+   this machine — §7.
 2. Fix PVM — 40/40 files fail because glibc dropped `rpc/types.h`.
 3. Full headless run, compared against the captured 2003 run.
 4. Convert the last 5 containers, now testable (§7).
@@ -393,30 +394,50 @@ qhull and the f2c translation of `ssvdc`, and `vptr` in cv97.
 §10's pre-existing leak — `SIG_Simulation` is `new`ed and never deleted, and
 its destructor is empty. Gate on ASan and UBSan errors, not on this.
 
-### Results against the 2003 record — input to order item 3
+### Results against the 2003 record — the `.exp` fitness is NOT a valid oracle
 
-Each `.exp` stores every individual's program next to the fitness it scored in
-2003, so re-evaluating individual 0 is a direct comparison. **Six of twelve
-land within 3%. Six do not, and that is the next thing to explain.**
+**Do not use the fitness stored in an `.exp` as the reference.** In
+`twoBasesHighMutationRate.exp`, individuals 1, 3, 4, 5 and 6 all carry
+`FITNESS=1.02726` and all five have **different programs**. That value is
+inherited from a parent and written out before re-evaluation. Comparing a
+re-run against it measures nothing.
 
-| experiment | 2003 | this run |
-|---|---|---|
-| twoBasesSimpleFitness1 | 4.19675e-05 | 4.14683e-05 |
-| twoBasesHighCrossOverRate | 4.19675e-05 | 4.14683e-05 |
-| twoBasesSimpleFitness2 | 3.09259e-05 | 3.44056e-05 |
-| hammerNiceWalkingFitness | 0.351217 | 0.351968 |
-| octopusNiceWalkingFitness | 0.513724 | 0.501264 |
-| walkerNiceWalkingFitness | 0 | 0 |
-| octopusSimpleFitness | 0.829977 | **0.700325** |
-| twoBasesHardlyReducedIS | 0.563401 | **0.00458028** |
-| twoBasesHighMutationRate | 1.00387 | **0.00742228** |
-| twoBasesReducedInstructionSet | 0.000130268 | **0.0190602** |
-| insectNiceWalkingFitness | 0.621285 | **0** |
-| shortHammerNiceWalkingFitness | 0.490151 | **0** |
+This invalidates the earlier "6 of 12 match" reading, which only ever looked at
+individual 0. Across individuals the picture is that whoever barely moved in
+2003 reproduces to 3–10 significant figures, and whoever walked well now covers
+roughly 1/100 of the distance.
 
-The captured 2003 run is the better baseline than these stored numbers — it was
-produced by the binary in one sitting, whereas an `.exp` was written across many
-generations. Compare against it before drawing conclusions.
+What has been ruled out as the cause:
+
+| | |
+|---|---|
+| chaotic divergence | results are **bit-identical** at `-O1` with FMA contraction and at `-O2` with `-ffp-contract=off` |
+| early termination | every run completes all 18,001 frames |
+| link, joint, drive or sensor numbering | the drive and sensor vectors are dense, `size() == count()`, in declaration order |
+| actuation not reaching the physics | `twoBases` individual 1 issues 18,046 `moveDrive` calls, mean \|force\| 333, and still ends at x = −1.45 |
+| out-of-range container access | no `qWarning` from the shim on any run |
+| memory errors | clean under ASan and UBSan |
+
+The `invalid sensor` messages come only from `hammer`, which has no joint
+sensors and which reproduces its 2003 value — so they are 2003 behaviour, not a
+regression.
+
+**What is needed to settle it:** the 2003 i386 binary run on the same input on
+the x86 box —
+
+```
+sigel_slave -v <experiment>.exp        # or the equivalent single evaluation
+```
+
+for `twoBasesSimpleFitness1` individuals 0, 1 and 3. If it reproduces 0.842208
+for individual 1, the port has a real defect and the trace narrows it. If it
+does not, the stored numbers are stale and the only usable baseline is the
+captured run. `qemu-user-static` is not installable here, so the i386 binary
+cannot be emulated on this machine.
+
+The captured 2003 run (13 generations, 874 evaluations) is **not in this repo
+and not on this machine.** It is the only sound baseline and it needs to be put
+somewhere the build can reach.
 
 ### Phase C — GUI — DEFERRED per D3(b), NOT AUTHORIZED
 
