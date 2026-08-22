@@ -11,6 +11,7 @@ interface migration (Phase C) follows.
 | 0 — comments to English | done for the 9 core modules; 9 GUI files still hold Latin-1 |
 | A — core onto Qt 6 | **done**, tags `step-A0`…`step-A9`. `./check.sh`: 117 pass, 5 fail (all need a GUI) |
 | B — ownership explicit | **8 of 14 containers**. 5 still on `setAutoDelete` — open, §7 |
+| R — build and run | **R1 done**, tag `step-R1`: the 7 vendored libraries. R2, R3 next |
 | C — GUI | not started, not authorized |
 
 **Order of work, agreed 2026-08-22:**
@@ -54,6 +55,11 @@ and 13 false statements in the code and in this file. All fixed.
 /home/jan/Downloads/sigel/
 ├── PORTING.md                              this file
 ├── check.sh                                the exit criterion, §7
+├── Makefile                                the build, §7 Phase R
+├── patches/                                3 patches to the vendored tree
+├── shim/                                   pre-standard C++ headers
+├── build/                                  untracked, `make clean` removes it
+├── data/                                   untracked, 7 robots and 12 experiments
 ├── kdesigelSources.1.3.tar.gz              upstream source (2003-04-30)
 ├── supportingLibs.tar.gz                   vendored deps
 ├── kbin.tar.gz                             2003 i386 binary, reference only
@@ -198,6 +204,15 @@ dropped Qt3Support. TQt3 (Trinity, R14.1.4) builds but renames every `Q*` →
 | **D13** | Qt 2 behaviour that is itself a defect | **fix it, and fix the cause** — §9 |
 | **D14** | Comment language | German → English as **Phase 0**, before A1 |
 
+## 5a. Decisions — signed off 2026-08-22, for Phase R
+
+| # | Decision | Answer |
+|---|---|---|
+| **D15** | Where the robot models come from | downloaded from `sigel.sourceforge.net`, §9. Untracked, in `data/` |
+| **D16** | The Dynamo branch in `SIG_Simulation.cpp` | **build Dynamo, SOLID and qhull**. No source change, so `physics_backends.md` stays a separate decision |
+| **D17** | Build system | **plain `Makefile`** at the repo root. Phase C can bring its own for `moc` and `uic` |
+| **D18** | What "runs clean under ASan" means for R3 | ASan and UBSan errors are pass/fail; LeakSanitizer output is a recorded baseline, because §10's leaks are out of scope |
+
 Established while answering these:
 
 - **`autoDelete` splits 38 owning / 9 non-owning**, all literal `TRUE`/`FALSE`,
@@ -309,6 +324,39 @@ actually uses — owner frees exactly once and is idempotent, non-owner frees
 nothing. Verified to have teeth: every assertion added has been checked by
 breaking the shim and confirming the check aborts.
 
+### Phase R — build and run (§3, order item 1)
+
+| # | Work | State |
+|---|---|---|
+| R1 | the 7 vendored libraries | **done** |
+| R2 | the 9 core modules into static archives | next |
+| R3 | a driver that runs one fitness evaluation, under ASan and UBSan | |
+
+**R1.** `make` at the repo root builds `libnewmat`, `libdm`, `libcv97`,
+`libdynalib`, `libsolid`, `libqhull` and `libfparser` — 262 objects, 21 s from
+a pristine tree.
+
+`x/supportingLibs/` is not tracked, so the three edits gcc 15 needs are
+`patches/*.patch`, applied by `make` against a stamp file inside that tree:
+
+| patch | why |
+|---|---|
+| `cv97/JVector.h:29` | `remove()` is a member of the dependent base `CLinkedListNode<T>`; two-phase lookup binds it to `::remove(const char *)` instead. `this->remove()` |
+| `dynamechs/dm/svd_linpack.cpp:180` | the f2c header's `struct complex` is ambiguous with `std::complex` under the `using namespace std` the pre-standard `<iomanip.h>` carried. `::complex` |
+| `SOLID-2.0/include/3D/Basic.h:40,43` | `INFINITY` is a C99 macro from `<math.h>`; `abs(double)` is now declared in the global namespace, so SOLID's own is a redefinition and its uses are ambiguous |
+
+Two shim headers changed with it: `new.h` is new (5 SOLID sources include it),
+and `iomanip.h` now includes `<iostream>`, which the pre-standard header did —
+`svd_linpack.cpp` names `cout` with no other include.
+
+Vendored code is built `-w -fpermissive`, which SIGEL's own code does not get.
+`-fpermissive` covers exactly `newmat1.cpp` (string literal to `char *`) and
+`newmat9.cpp` (`long` to `ios_base::fmtflags`).
+
+Vendored objects carry AddressSanitizer but **not** UndefinedBehaviorSanitizer:
+qhull and the f2c translation of LINPACK's `ssvdc` report misaligned access and
+signed overflow throughout, which would bury the reports from SIGEL's own code.
+
 ### Phase C — GUI — DEFERRED per D3(b), NOT AUTHORIZED
 
 | # | Work | Sites |
@@ -402,6 +450,9 @@ Experiment and robot files are **not** in any tarball — separate downloads,
 verified live 2026-08-18:
 `sigel.sourceforge.net/download/experimente/experiments.tar.gz` (12 `.exp`) and
 `.../robotermodelle/robots.tar.gz` (7 models, `.rrb` + `.wrl`).
+
+Both downloaded 2026-08-22 to `data/`, which is untracked: `data/Experiments/`
+holds the 12 `.exp`, and one directory per robot holds its `.rrb` and `.wrl`.
 
 The 2003 i386 binary runs on Debian woody libraries; all 12 experiments
 validated end to end, one run captured verbatim (13 generations, 874 slave
