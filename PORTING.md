@@ -11,7 +11,7 @@ interface migration (Phase C) follows.
 | 0 — comments to English | done for the 9 core modules; 9 GUI files still hold Latin-1 |
 | A — core onto Qt 6 | **done**, tags `step-A0`…`step-A9`. `./check.sh`: 117 pass, 5 fail (all need a GUI) |
 | B — ownership explicit | **8 of 14 containers**. 5 still on `setAutoDelete` — open, §7 |
-| R — build and run | core builds and runs. **8 of 14 experiments reproduce the 2003 result within 8%; 6 do not** — §7 |
+| R — build and run | core builds and runs. **`./replicate.sh`: 11 of 14 experiments reproduce the 2003 result within 10%** — §7 |
 | C — GUI | not started, not authorized |
 
 **Order of work, agreed 2026-08-22:**
@@ -57,6 +57,7 @@ and 13 false statements in the code and in this file. All fixed.
 /home/jan/Downloads/sigel/
 ├── PORTING.md                              this file
 ├── check.sh                                the exit criterion, §7
+├── replicate.sh                            the 14 experiments vs 2003, §7
 ├── Makefile                                the build, §7 Phase R
 ├── sigel_eval.cpp                          one fitness evaluation, §7 Phase R
 ├── patches/                                5 patches to the vendored tree
@@ -394,65 +395,62 @@ qhull and the f2c translation of `ssvdc`, and `vptr` in cv97.
 §10's pre-existing leak — `SIG_Simulation` is `new`ed and never deleted, and
 its destructor is empty. Gate on ASan and UBSan errors, not on this.
 
-### Results against the 2003 record — 8 of 14 reproduce, 6 do not
+### Results against the 2003 record — 11 of 14 replicate
 
-Every individual of every experiment, `.exp` best against ours:
+`./replicate.sh` runs every individual of all 14 published experiments and
+compares best-of-population against the fitness stored in the `.exp`. Exit
+status is non-zero while any experiment is outside 10%.
 
-| experiment | K_spring | 2003 best | ours | ratio |
-|---|---|---|---|---|
-| octopusSimpleFitness | 100 | 0.82998 | 0.84063 | 1.013 |
-| shortHammerNiceWalkingFitness | 100 | 0.49015 | 0.49085 | 1.001 |
-| hammerNiceWalkingFitness | 100 | 0.45972 | 0.45668 | 0.993 |
-| octopusNiceWalkingFitness | 100 | 0.52013 | 0.51471 | 0.990 |
-| runnerSimpleFitness | 100 | 0.75156 | 0.73395 | 0.977 |
-| insectNiceWalkingFitness | 500 | 0.63896 | 0.61079 | 0.956 |
-| walkerNiceWalkingFitness | 500 | 0.27548 | 0.25485 | 0.925 |
-| twoBasesHardlyReducedIS | **25000** | 0.56965 | 0.05330 | **0.094** |
-| twoBasesReducedInstructionSet | **25000** | 0.93897 | 0.08370 | **0.089** |
-| twoBasesSimpleFitness2 | **25000** | 1.14820 | 0.10055 | **0.088** |
-| twoBasesHighMutationRate | **25000** | 1.02730 | 0.05132 | **0.050** |
-| twoBasesSimpleFitness1 | **25000** | 0.84221 | 0.03150 | **0.037** |
-| twoBasesHighCrossOverRate | **25000** | 0.84221 | 0.03150 | **0.037** |
-| runnerNiceWalkingFitness | 100 | 0.91951 | 0.08312 | **0.090** |
+| experiment | 2003 best | ours | ratio |
+|---|---|---|---|
+| octopusSimpleFitness | 0.82998 | 0.84063 | 1.013 |
+| twoBasesHighMutationRate | 1.02730 | 1.04340 | 1.016 |
+| twoBasesHardlyReducedIS | 0.56965 | 0.57356 | 1.007 |
+| shortHammerNiceWalkingFitness | 0.49015 | 0.49085 | 1.001 |
+| runnerNiceWalkingFitness | 0.91951 | 0.91951 | 1.000 |
+| hammerNiceWalkingFitness | 0.45972 | 0.45668 | 0.993 |
+| octopusNiceWalkingFitness | 0.52013 | 0.51471 | 0.990 |
+| twoBasesSimpleFitness2 | 1.14820 | 1.13560 | 0.989 |
+| runnerSimpleFitness | 0.75156 | 0.73395 | 0.977 |
+| insectNiceWalkingFitness | 0.63896 | 0.61079 | 0.956 |
+| walkerNiceWalkingFitness | 0.27548 | 0.25485 | 0.925 |
+| twoBasesHighCrossOverRate | 0.84221 | 0.68955 | **0.819** |
+| twoBasesSimpleFitness1 | 0.84221 | 0.68955 | **0.819** |
+| twoBasesReducedInstructionSet | 0.93897 | 0.67740 | **0.721** |
 
-**The failures correlate exactly with a 3-bit register width.** All six
-3-bit experiments fail; all eight 8-bit ones pass. One outlier either way:
-`runnerNiceWalkingFitness`, 8-bit, which fails where `runnerSimpleFitness` on
-the same robot at the same settings passes. `JOINTLIMITSK_SPRING = 25000`
-correlates equally well but is confounded — every 3-bit experiment is a
-`twoBases` one.
+Identical sanitized and not.
 
-Register width is the more useful correlate because it suggests a **relative**
-error in the register-to-force mapping: at 3 bits an off-by-one in the range is
-a sixth of full scale and destroys a gait, at 8 bits it is 1/254 and hides
-inside the 1–8% by which the passing experiments already differ. Note that
-`sense()` uses `minRegisterValue = -2^(w-1)` and `moveDrive()` uses
-`-(2^(w-1) - 1)` — both as written in 2003, but worth confirming against a
-trace before assuming they were always consistent.
+**THE JOINT SENSOR RETURNED A SAWTOOTH.** `SIG_DynaMechsSimulationQueries.cpp`
+built `scaledState` as a fraction of the joint's travel, but converted only the
+numerator to degrees:
 
-**The physics is healthy.** Raising `maximalforce` on the `twoBases` drive from
-800 through 2400 and 8000 to 80000 scales the motion smoothly and at 80000 the
-robot is thrown to a height of 36 with a fitness of 2.30. Torque produces
-motion, so the fault is in what the control asks for, not in the simulator.
+```cpp
+scaledState  = (q - minPos);
+scaledState *= 360.0 / (2.0*3.14159265);   // numerator now degrees
+scaledState /= posRange;                   // denominator still radians
+```
 
-**The `.exp` fitness is a sound oracle in aggregate**, contrary to an earlier
-note here. The endbericht's §5.2 *is* `twoBasesHighMutationRate` and states an
-average fitness of "ca. 0,9 m/s"; the file's mean over 100 individuals is 0.777.
-§5.10 *is* `walkerNiceWalkingFitness` and states 0.26 m/s; the file's best is
-0.275 and ours is 0.255. Fitness is metres per second, and our harness measures
-the same quantity the report does. Individual fitness fields *are* partly stale
-— five individuals in `twoBasesHighMutationRate` share `FITNESS=1.02726` with
-five different programs — so compare bests and means over the whole population,
-never one individual.
+`q`, `minPos` and `posRange` are all radians — `getMechsMinPos`/`getMechsMaxPos`
+are built in radians at `SIG_Joint.cpp:661` because `dmRevoluteLink` wants
+radians. So the fraction came out **57.3 times too large**, wrapped in
+`SIG_Register::makeValid`, and every joint sensor reported a sawtooth of about
+57 cycles across the joint's travel instead of its angle. The
+`tPitchRollSensor` branch twelve lines below is the correct pattern: convert,
+clamp, then divide by 180.
 
-**Where the failing case actually goes wrong.** `twoBases` is two boxes on one
-hinge limited to ±85°, and its gait works by driving the hinge into its stops.
-In our run the joint angle stays within **2.77 .. 3.92 rad against limits of
-1.66 .. 4.63** — it never reaches a stop. Perturbing `JOINTLIMITSK_SPRING` by
-1e-4 leaves the result **bit-identical**, confirming the limit spring is never
-engaged. The stiff spring is therefore a marker for "gait depends on the stops",
-not itself the fault. The hinge is being driven with a mean \|torque\| of 333
-against a maximum of 800 and still only swings ±33°.
+Removing the conversion took replication from **7 of 14 to 11 of 14**, moved
+four experiments from catastrophic to within 2%, resolved
+`runnerNiceWalkingFitness` from 0.090 to exactly 1.000, and changed **nothing**
+in the eleven that already passed.
+
+**How it was found.** Not by reading. Scaling the `twoBases` drive force through
+2400, 8000 and 80000 made the robot fly, proving the simulator healthy and the
+fault upstream in the control. The failures then correlated perfectly with a
+3-bit register width — 6 of 6 fail, 8 of 8 pass — which pointed at the register
+path rather than the physics.
+
+**Three still outside 10%**, all `twoBases`, at 0.72–0.82. No longer a
+different order of magnitude. Unexplained.
 
 Ruled out, each by measurement:
 
@@ -461,16 +459,19 @@ Ruled out, each by measurement:
 | chaotic divergence | bit-identical at `-O1` with FMA and `-O2` with `-ffp-contract=off` |
 | early termination | all runs complete every frame |
 | link, joint, drive, sensor numbering | vectors dense, `size() == count()`, declaration order |
-| actuation not reaching the physics | 18,046 `moveDrive` calls, mean \|force\| 333 |
+| the simulator | force 800 → 80000 scales the motion smoothly, fitness 0.031 → 2.30 |
 | out-of-range containers | no `qWarning` from the shim on any run |
 | memory errors | clean under ASan and UBSan |
-| floor friction | `GPSconst`/`GNSconst`/`GPDconst`/`GNDconst`/`USFcoeff`/`UKFcoeff` identical in a passing and a failing experiment; the differing `FLOORMATERIALNAME` is cosmetic under DynaMechs |
-| command durations mis-parsed | `MOVE` is 0.01 s for `twoBases` and 0.1 s for `octopus`, both as stored |
+| floor friction | the six friction constants are identical in a passing and a failing experiment |
+| command durations, register width | parsed exactly as stored |
 
-Next: why the hinge does not reach its stops under that torque. The remaining
-untested links in that chain are `SIG_DynaMechsLink`'s joint axis and the
-`transformToDynaMechs` branch that produced these limits, and DynaMechs'
-`dmRevoluteLink` joint friction (`JOINTFRICTIONU_C`, 0.35).
+**The `.exp` fitness is a sound oracle in aggregate.** The endbericht's §5.2 *is*
+`twoBasesHighMutationRate` and states "ca. 0,9 m/s"; the file's mean is 0.777.
+§5.10 *is* `walkerNiceWalkingFitness` and states 0.26 m/s; the file's best is
+0.275. Fitness is metres per second. Individual fitness fields are partly stale
+— five individuals in `twoBasesHighMutationRate` share `FITNESS=1.02726` with
+five different programs — so compare bests over the whole population, never one
+individual.
 
 ### Reference material — all of it, downloaded 2026-08-22
 

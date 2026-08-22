@@ -129,8 +129,16 @@ void SIGEL_Simulation::SIG_DynaMechsSimulationQueries::sense(int sensorNo,
 																q = minPos;
 														};
 
+														// scaledState must come out as a 0..1 fraction of the
+														// joint's travel, the way the tPitchRollSensor branch
+														// below builds it. q, minPos and posRange are all in
+														// radians -- getMechsMinPos/MaxPos are built in radians
+														// at SIG_Joint.cpp:661 because dmRevoluteLink wants
+														// radians. Converting only the numerator to degrees
+														// made this 360/2pi = 57.3 times too large, so the
+														// value wrapped in SIG_Register::makeValid and the
+														// sensor returned a sawtooth instead of the joint angle.
 														scaledState  = (q - minPos);
-														scaledState *= 360.0 / (2.0*3.14159265);
 
 														scaledState /= posRange;
 
