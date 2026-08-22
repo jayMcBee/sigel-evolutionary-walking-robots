@@ -415,9 +415,25 @@ Every individual of every experiment, `.exp` best against ours:
 | twoBasesHighCrossOverRate | **25000** | 0.84221 | 0.03150 | **0.037** |
 | runnerNiceWalkingFitness | 100 | 0.91951 | 0.08312 | **0.090** |
 
-**The failures correlate exactly with `JOINTLIMITSK_SPRING = 25000`**, with one
-outlier — `runnerNiceWalkingFitness`, whose parameters match the passing
-`runnerSimpleFitness` on the same robot.
+**The failures correlate exactly with a 3-bit register width.** All six
+3-bit experiments fail; all eight 8-bit ones pass. One outlier either way:
+`runnerNiceWalkingFitness`, 8-bit, which fails where `runnerSimpleFitness` on
+the same robot at the same settings passes. `JOINTLIMITSK_SPRING = 25000`
+correlates equally well but is confounded — every 3-bit experiment is a
+`twoBases` one.
+
+Register width is the more useful correlate because it suggests a **relative**
+error in the register-to-force mapping: at 3 bits an off-by-one in the range is
+a sixth of full scale and destroys a gait, at 8 bits it is 1/254 and hides
+inside the 1–8% by which the passing experiments already differ. Note that
+`sense()` uses `minRegisterValue = -2^(w-1)` and `moveDrive()` uses
+`-(2^(w-1) - 1)` — both as written in 2003, but worth confirming against a
+trace before assuming they were always consistent.
+
+**The physics is healthy.** Raising `maximalforce` on the `twoBases` drive from
+800 through 2400 and 8000 to 80000 scales the motion smoothly and at 80000 the
+robot is thrown to a height of 36 with a fitness of 2.30. Torque produces
+motion, so the fault is in what the control asks for, not in the simulator.
 
 **The `.exp` fitness is a sound oracle in aggregate**, contrary to an earlier
 note here. The endbericht's §5.2 *is* `twoBasesHighMutationRate` and states an
