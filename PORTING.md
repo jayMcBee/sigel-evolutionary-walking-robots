@@ -1,7 +1,8 @@
 # SIGEL — Qt 2.3 → Qt 6 migration plan
 
-**Scope: Qt API only.** Not toolchain, build system, PVM or reproducibility
-testing — see §3.
+**Scope widened 2026-08-22.** Was Qt API only. Now also covers getting SIGEL to
+build and run, because nothing else can be verified without it — see §3. The
+interface migration (Phase C) follows.
 
 **Status — 2026-08-22**
 
@@ -12,8 +13,16 @@ testing — see §3.
 | B — ownership explicit | **8 of 14 containers**. 5 still on `setAutoDelete` — open, §7 |
 | C — GUI | not started, not authorized |
 
-**Needs a decision:** the 5 containers still using `setAutoDelete` (§7);
-whether
+**Order of work, agreed 2026-08-22:**
+
+1. Build core plus a small program that runs one fitness evaluation, under
+   AddressSanitizer. No PVM, no interface. Verifies the 8 converted containers.
+2. Fix PVM — 40/40 files fail because glibc dropped `rpc/types.h`.
+3. Full headless run, compared against the captured 2003 run.
+4. Convert the last 5 containers, now testable (§7).
+5. Phase C — the interface.
+
+**Still needs a decision:** whether
 `QTextStream` no longer printing `-0` matters (§9); the order of remaining
 Phase B work.
 
@@ -131,17 +140,33 @@ SIGEL_Visualisation, SIGEL_CommonGUI, MT_GUI, SIGEL_MasterGUI, SIGEL_SlaveGUI
 
 ---
 
-## 3. Out of scope
+## 3. Build and run — AUTHORIZED 2026-08-22
 
-Stated once, not to be started as part of this job: vendored libs on gcc 15;
-PVM (40/40 files fail — glibc dropped `rpc/types.h`); a build system to replace
-a `configure.in` that detects the OS by grepping `/proc/version` for `SuSE`;
-pre-standard `for`-scope in `MT_*`.
+Previously out of scope. Authorized because the port cannot be checked without
+it: `check.sh` runs `g++ -fsyntax-only` and never links or executes SIGEL, so
+every ownership change made in Phase B is verified only by inspection and
+review. A missing `delete` and a doubled `delete` both compile.
+
+Known work:
+
+- vendored libraries on gcc 15
+- PVM — 40/40 files fail, glibc dropped `rpc/types.h`; `libtirpc` is the likely
+  answer
+- a build system to replace a `configure.in` that detects the OS by grepping
+  `/proc/version` for `SuSE`
+- pre-standard `for`-scope in `MT_*`
 
 **LP64 portability is clean** — 2 pointer-to-`int` casts, nothing else.
 
-Per-file syntax checking needs none of it: vendored headers only have to
-*parse*, not link. That is what makes D11(a) reachable.
+**The first milestone needs none of that.** The seven fitness functions run a
+simulation locally, with no PVM and no interface. A small program that loads a
+robot and runs one evaluation exercises `SIG_Robot`, `SIG_Body`, the six
+dictionaries, `SIG_DynaMechsSimulationData` and the recorders — 8 of the 14
+containers, everything Phase B has converted. Do that before touching PVM.
+
+The other 5 containers (`pool`, `tours` in the master's evolution loop;
+`pvmHosts`, `pvmTasks`, `toSpawnList` in the PVM trainer) only run during a full
+distributed evolution, which is why they are last.
 
 ---
 
