@@ -86,7 +86,7 @@ namespace SIGEL_GP
 
     double distance = distanceVector.norm();
 
-    int simulatedSeconds = QTime().secsTo( simparameter.getTimeToSimulate() );
+    int simulatedSeconds = QTime( 0, 0 ).secsTo( simparameter.getTimeToSimulate() );
 
     fitness = distance / simulatedSeconds;
 

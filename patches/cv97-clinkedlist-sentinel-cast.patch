@@ -1,0 +1,13 @@
+--- a/cv97/CLinkedList.h
++++ b/cv97/CLinkedList.h
+@@ -34,7 +34,9 @@
+ 	}
+ 
+ 	T *getRootNode () {
+-		return (T *)mHeaderNode;
++		// The header node is a bare CLinkedListNode<T>, never a T, and callers
++		// only compare the result. (T *) is a downcast that never holds.
++		return reinterpret_cast<T *>(mHeaderNode);
+ 	}
+ 
+ 	T *getNodes () {

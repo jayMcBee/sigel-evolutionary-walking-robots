@@ -82,7 +82,7 @@ double SIGEL_GP::SIG_GPForceFitnessFunction::evalFitness() {
 
     double distance = distanceVector.norm();
 
-    int simulatedSeconds = QTime().secsTo( simparameter.getTimeToSimulate() );
+    int simulatedSeconds = QTime( 0, 0 ).secsTo( simparameter.getTimeToSimulate() );
 
     double fitnessGes = distance / simulatedSeconds;
 

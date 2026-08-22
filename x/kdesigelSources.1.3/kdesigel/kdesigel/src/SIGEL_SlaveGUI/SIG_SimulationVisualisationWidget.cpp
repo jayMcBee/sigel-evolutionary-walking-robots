@@ -384,7 +384,7 @@
 
     simulationVisualisation.setPlaneColor( planeColor );
 
-    emit signalSimulationProgress( QTime() );
+    emit signalSimulationProgress( QTime( 0, 0 ) );
 
     initFloatingTextWidgets();
 

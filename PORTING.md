@@ -11,13 +11,14 @@ interface migration (Phase C) follows.
 | 0 — comments to English | done for the 9 core modules; 9 GUI files still hold Latin-1 |
 | A — core onto Qt 6 | **done**, tags `step-A0`…`step-A9`. `./check.sh`: 117 pass, 5 fail (all need a GUI) |
 | B — ownership explicit | **8 of 14 containers**. 5 still on `setAutoDelete` — open, §7 |
-| R — build and run | **R1 done**, tag `step-R1`: the 7 vendored libraries. R2, R3 next |
+| R — build and run | **done**. `make` builds and `build/sigel_eval` runs one fitness evaluation under ASan and UBSan. All 12 experiments run |
 | C — GUI | not started, not authorized |
 
 **Order of work, agreed 2026-08-22:**
 
-1. Build core plus a small program that runs one fitness evaluation, under
-   AddressSanitizer. No PVM, no interface. Verifies the 8 converted containers.
+1. ~~Build core plus a small program that runs one fitness evaluation, under
+   AddressSanitizer.~~ **Done.** All 12 experiments run clean; 6 of 12 match the
+   fitness recorded in the `.exp`, 6 do not — §7.
 2. Fix PVM — 40/40 files fail because glibc dropped `rpc/types.h`.
 3. Full headless run, compared against the captured 2003 run.
 4. Convert the last 5 containers, now testable (§7).
@@ -56,7 +57,8 @@ and 13 false statements in the code and in this file. All fixed.
 ├── PORTING.md                              this file
 ├── check.sh                                the exit criterion, §7
 ├── Makefile                                the build, §7 Phase R
-├── patches/                                3 patches to the vendored tree
+├── sigel_eval.cpp                          one fitness evaluation, §7 Phase R
+├── patches/                                5 patches to the vendored tree
 ├── shim/                                   pre-standard C++ headers
 ├── build/                                  untracked, `make clean` removes it
 ├── data/                                   untracked, 7 robots and 12 experiments
@@ -129,7 +131,7 @@ all still valid — string-based connect was never removed.
 |---|---|
 | Core files needing **no** container work | **210 of 266** |
 | Core files touching dead Qt 2 containers | 56 — worst is `SIG_Robot.cpp` (30) |
-| `Q_OBJECT` in core | 3 |
+| `Q_OBJECT` in core | 4 — `SIG_Simulation`, `SIG_DynaSystem`, `MT_GPManager`, `MT_Controller` |
 | Core files touching dialogs | 7 |
 | Core → GUI back-edges | 4 edges, 5 includes |
 
@@ -324,38 +326,97 @@ actually uses — owner frees exactly once and is idempotent, non-owner frees
 nothing. Verified to have teeth: every assertion added has been checked by
 breaking the shim and confirming the check aborts.
 
-### Phase R — build and run (§3, order item 1)
+### Phase R — build and run (§3, order item 1) — DONE
 
-| # | Work | State |
-|---|---|---|
-| R1 | the 7 vendored libraries | **done** |
-| R2 | the 9 core modules into static archives | next |
-| R3 | a driver that runs one fitness evaluation, under ASan and UBSan | |
+`make` at the repo root builds 251 vendored objects, 118 of SIGEL's 122 core
+sources, three moc outputs and `build/sigel_eval`. 93 s from clean at `-j4`.
+`make B=build-fast SAN= SIGSAN=` gives the same thing without the sanitizers,
+in its own directory.
 
-**R1.** `make` at the repo root builds `libnewmat`, `libdm`, `libcv97`,
-`libdynalib`, `libsolid`, `libqhull` and `libfparser` — 262 objects, 21 s from
-a pristine tree.
+```
+SIGEL_ROOT=$PWD/x/kdesigelSources.1.3/kdesigel/kdesigel \
+  ./build/sigel_eval data/Experiments/twoBasesSimpleFitness1.exp 0
+```
 
-`x/supportingLibs/` is not tracked, so the three edits gcc 15 needs are
-`patches/*.patch`, applied by `make` against a stamp file inside that tree:
+One evaluation is 0.2 s. **All 12 shipped experiments run clean under
+AddressSanitizer and UndefinedBehaviorSanitizer**, with identical results
+sanitized and not.
+
+**The one defect that stood between building and running.** Qt 2's `QTime()`
+was 00:00:00.000 and valid. Qt 6's is null: `addSecs` returns another null
+`QTime`, `secsTo` returns 0, and a null `QTime` holds -1 ms, which is less than
+every real time. So `SIG_DynaMechsSimulationQueries::getActualSimulationTime`
+returned null, `SIG_Simulation::start`'s `while (act < max)` never ended, and
+`fitness = distance / simulatedSeconds` was a division by zero. **11 sites**,
+all now `QTime( 0, 0 )` — 9 fitness functions, the queries object and one
+`SIGEL_SlaveGUI` signal. This is the shape §9 warns about: same API, same
+compile, different behaviour.
+
+`SIG_GPPopulation.cpp` also moved off the Qt 2 `QProgressDialog`:
+`setProgress` → `setValue`, `wasCancelled` → `wasCanceled`, `setCaption` →
+`setWindowTitle`, the 6-argument constructor to Qt 6's, and
+`qApp->wakeUpGuiThread()` deleted, which Qt 6 has no equivalent for. Its
+`if (qApp)` guards mean none of it runs headless, but it has to compile:
+`SIG_GPExperiment` holds a `SIG_GPPopulation` by value.
+
+**Four core files still do not build.** `MT_Controller.cpp` constructs an
+`MT_MainWindow`; `SIG_GUIGPManager.cpp` is its counterpart; both ZORC fitness
+files ask the user for the distance walked through `QInputDialog` and are still
+on the Qt 2 API. None is on the evaluation path.
+
+**Four vendored patches**, applied by `make` against a stamp inside the
+untracked tree:
 
 | patch | why |
 |---|---|
-| `cv97/JVector.h:29` | `remove()` is a member of the dependent base `CLinkedListNode<T>`; two-phase lookup binds it to `::remove(const char *)` instead. `this->remove()` |
-| `dynamechs/dm/svd_linpack.cpp:180` | the f2c header's `struct complex` is ambiguous with `std::complex` under the `using namespace std` the pre-standard `<iomanip.h>` carried. `::complex` |
-| `SOLID-2.0/include/3D/Basic.h:40,43` | `INFINITY` is a C99 macro from `<math.h>`; `abs(double)` is now declared in the global namespace, so SOLID's own is a redefinition and its uses are ambiguous |
+| `cv97/JVector.h:29` | `remove()` is a member of the dependent base `CLinkedListNode<T>`; two-phase lookup binds it to `::remove(const char *)`. `this->remove()` |
+| `cv97/CLinkedList.h:37` | the list header node is a bare `CLinkedListNode<T>`, so `(T *)` is a downcast that never holds and UndefinedBehaviorSanitizer reports it. `reinterpret_cast` |
+| `dynamechs/dm/svd_linpack.cpp:180` | the inlined copy of `f2c.h` declares `struct complex`, ambiguous with `std::complex` under the `using namespace std` the pre-standard `<iomanip.h>` carried. `::complex` |
+| `Dynamo/Src/Inc/containerlist.h` | `NULL` with no `#include <cstddef>`. `-fpermissive` was hiding this, which is why it is a patch and not a flag |
+| `SOLID-2.0/include/3D/Basic.h:40,43` | `INFINITY` is a C99 macro from `<math.h>`; `abs(double)` is now declared in the global namespace, so SOLID's own conflicts with it |
 
-Two shim headers changed with it: `new.h` is new (5 SOLID sources include it),
-and `iomanip.h` now includes `<iostream>`, which the pre-standard header did —
-`svd_linpack.cpp` names `cout` with no other include.
+Two shim headers went with them: `new.h` is new (5 SOLID sources include it),
+and `iomanip.h` now includes `<iostream>`, which the pre-standard header did.
 
-Vendored code is built `-w -fpermissive`, which SIGEL's own code does not get.
-`-fpermissive` covers exactly `newmat1.cpp` (string literal to `char *`) and
-`newmat9.cpp` (`long` to `ios_base::fmtflags`).
+**OpenGL is on the link line and is never called.** `dmLink::draw()` is pure
+virtual and every override lives in `gldraw.cpp`, so every `dm*` vtable
+references it and the linker pulls it in. `-lGL`, no `-lGLU` — nothing
+references GLU.
 
-Vendored objects carry AddressSanitizer but **not** UndefinedBehaviorSanitizer:
-qhull and the f2c translation of LINPACK's `ssvdc` report misaligned access and
-signed overflow throughout, which would bury the reports from SIGEL's own code.
+**Sanitizer split.** SIGEL's own code gets `-Wall -Wextra`, no `-fpermissive`
+and the full AddressSanitizer plus UndefinedBehaviorSanitizer. The vendored
+libraries get `-w -fpermissive` and UndefinedBehaviorSanitizer minus three
+checks they trip by construction: alignment and signed overflow throughout
+qhull and the f2c translation of `ssvdc`, and `vptr` in cv97.
+
+**Leak baseline (D18): 41,374 bytes in 117 allocations** per evaluation, from
+§10's pre-existing leak — `SIG_Simulation` is `new`ed and never deleted, and
+its destructor is empty. Gate on ASan and UBSan errors, not on this.
+
+### Results against the 2003 record — input to order item 3
+
+Each `.exp` stores every individual's program next to the fitness it scored in
+2003, so re-evaluating individual 0 is a direct comparison. **Six of twelve
+land within 3%. Six do not, and that is the next thing to explain.**
+
+| experiment | 2003 | this run |
+|---|---|---|
+| twoBasesSimpleFitness1 | 4.19675e-05 | 4.14683e-05 |
+| twoBasesHighCrossOverRate | 4.19675e-05 | 4.14683e-05 |
+| twoBasesSimpleFitness2 | 3.09259e-05 | 3.44056e-05 |
+| hammerNiceWalkingFitness | 0.351217 | 0.351968 |
+| octopusNiceWalkingFitness | 0.513724 | 0.501264 |
+| walkerNiceWalkingFitness | 0 | 0 |
+| octopusSimpleFitness | 0.829977 | **0.700325** |
+| twoBasesHardlyReducedIS | 0.563401 | **0.00458028** |
+| twoBasesHighMutationRate | 1.00387 | **0.00742228** |
+| twoBasesReducedInstructionSet | 0.000130268 | **0.0190602** |
+| insectNiceWalkingFitness | 0.621285 | **0** |
+| shortHammerNiceWalkingFitness | 0.490151 | **0** |
+
+The captured 2003 run is the better baseline than these stored numbers — it was
+produced by the binary in one sitting, whereas an `.exp` was written across many
+generations. Compare against it before drawing conclusions.
 
 ### Phase C — GUI — DEFERRED per D3(b), NOT AUTHORIZED
 
@@ -513,6 +574,12 @@ every D8 site for a stored `const char *`.
 | `SIG_ProgramLine.cpp:215-224` | writes `element[no]` in the branch entered *because* `no >= size()` | to be fixed | Its own comment is `// ToDo: Exception!` |
 | `SIG_DynaSystem.cpp:266-268` | deletes `dynaJoints[k]` while looping to `dynaDrives.size()` | to be fixed | The two vectors grow independently |
 | `sigel_slave`, `getenv("SIGEL_ROOT")` | dereferenced unchecked | to be fixed | Segfaults if unset; the SIGSEGV handler masks it with no core. Bites under PVM specifically — spawned tasks inherit *pvmd's* environment, not the master's |
+| `SIG_Environment` terrain load | `getenv("SIGEL_ROOT")` unchecked | already checked, message on stderr | `sigel_eval` says "SIGEL_ROOT is not set, cannot locate Terrain.ter" instead of reading `/Terrain.ter` |
+
+**Open, from the R1 review:** SOLID is built without the `-DNDEBUG` its own
+`Make-config` sets, so eight `assert(!eqz(x))` guards ahead of a division are
+live that were not in 2003. Right under a sanitizer, but it can abort where the
+2003 binary divided by nearly zero. Not yet decided.
 
 ### Name collisions that survive into Qt 6
 
@@ -520,6 +587,10 @@ every D8 site for a stored `const char *`.
   clean, then double-frees. The trap the shim exists to defuse.
 - `QListView` — a multi-column tree in Qt 2, a flat model-view list in Qt 6.
   Fails loudly, but misleads anyone reading the diff.
+- **`QTime()`** — 00:00:00.000 and valid in Qt 2, null in Qt 6. Compiles, runs,
+  and hangs: `addSecs` on a null `QTime` gives another null, `secsTo` gives 0,
+  and a null `QTime` holds -1 ms so it sorts before every real time. Fixed at
+  11 sites; found only by running, which is the argument for §3.
 
 ---
 

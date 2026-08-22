@@ -19,3 +19,4 @@ build/
 
 # reference data -- separate downloads from sigel.sourceforge.net, see PORTING.md §9
 data/
+build-fast/

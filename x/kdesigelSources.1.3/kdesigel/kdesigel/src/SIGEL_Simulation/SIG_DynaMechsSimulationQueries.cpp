@@ -300,7 +300,7 @@ QTime SIGEL_Simulation::SIG_DynaMechsSimulationQueries::getActualSimulationTime(
 {
   int secs = static_cast< int >(simulationData.actualFrame * simulationData.simulationParameter.getStepSize());
 
-  QTime time = QTime().addSecs( secs );
+  QTime time = QTime( 0, 0 ).addSecs( secs );
 
   return time;
 };

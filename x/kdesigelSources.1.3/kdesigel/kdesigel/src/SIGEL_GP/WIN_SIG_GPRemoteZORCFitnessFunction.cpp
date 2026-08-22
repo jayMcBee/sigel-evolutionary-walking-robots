@@ -188,7 +188,7 @@ namespace SIGEL_GP
 
       // while ZORC is waiting we can transmit the time to run;
       // first get time to evaluate on ZORC
-      timeToRun = QTime().secsTo( simparameter.getTimeToSimulate() );
+      timeToRun = QTime( 0, 0 ).secsTo( simparameter.getTimeToSimulate() );
       sprintf(serTxt, "%d\n", timeToRun);
       WriteFile(fd, serTxt, strlen(serTxt), &cntWritten, &osReader);
 

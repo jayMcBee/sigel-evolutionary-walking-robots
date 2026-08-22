@@ -10,7 +10,7 @@
 # A3 Qt::endl regression was reported by this command at the step that
 # introduced it and went unread.
 #
-# -Wno-error=template-body replaces the blanket -fpermissive used up to A8. It
+# replaces the blanket -fpermissive used up to A8. It
 # suppresses exactly one vendored defect (cv97/JVector.h:29 calls a base-class
 # member unqualified from a class template) instead of downgrading errors
 # everywhere. Verified identical pass/fail across all 90 files.
@@ -23,7 +23,7 @@ SRC=$ROOT/x/kdesigelSources.1.3/kdesigel/kdesigel
 SL=$ROOT/x/supportingLibs/supportingLibs
 QTINC=$(qmake6 -query QT_INSTALL_HEADERS)
 
-FLAGS="-fsyntax-only -std=c++17 -Wall -Wextra -Wno-error=template-body -DMINMAX_H"
+FLAGS="-fsyntax-only -std=c++17 -Wall -Wextra -DMINMAX_H"
 INCS="-I$ROOT/shim -I$SRC/include -isystem $QTINC -isystem $QTINC/QtCore"
 for d in newmat09 dynamechs/dm Dynamo/Src/Inc fparser cv97 SOLID-2.0/include pvm3/include; do
     INCS="$INCS -isystem $SL/$d"

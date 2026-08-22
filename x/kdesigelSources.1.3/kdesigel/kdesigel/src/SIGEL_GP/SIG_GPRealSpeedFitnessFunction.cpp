@@ -109,7 +109,7 @@ namespace SIGEL_GP
       actRotation = recorder.rotations.next();
     };
 
-    int simulatedSeconds = QTime().secsTo( simparameter.getTimeToSimulate() );
+    int simulatedSeconds = QTime( 0, 0 ).secsTo( simparameter.getTimeToSimulate() );
 
     fitness = totalDistance / simulatedSeconds;
 

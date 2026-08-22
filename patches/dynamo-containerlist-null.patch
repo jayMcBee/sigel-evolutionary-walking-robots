@@ -1,0 +1,11 @@
+--- a/Dynamo/Src/Inc/containerlist.h
++++ b/Dynamo/Src/Inc/containerlist.h
+@@ -41,6 +41,8 @@
+ #ifndef DL_CONTAINERLISTH
+ #define DL_CONTAINERLISTH
+ 
++#include <cstddef>   // NULL
++
+ template <class T>
+ class DL_ListElemContainer {
+   public:

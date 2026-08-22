@@ -20,7 +20,7 @@
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-#include <QApplication>   // qApp->wakeUpGuiThread() and QProgressDialog need QtWidgets
+#include <QApplication>   // qApp and QProgressDialog need QtWidgets
 #include <QProgressDialog>   // widget used in this file only
 #include "SIGEL_GP/SIG_GPPopulation.h"
 
@@ -180,9 +180,9 @@ void SIGEL_GP::SIG_GPPopulation::addRandomIndividuals(int quantity,
 
    QProgressDialog *progress;
    
-   if( qApp ) progress = new QProgressDialog ( "Progress:", "Cancel", quantity,
-                                               0, "Progress", true );
-   if( qApp ) progress->setCaption( "Generating" );
+   if( qApp ) progress = new QProgressDialog( "Progress:", "Cancel", 0, quantity );
+   if( qApp ) progress->setWindowModality( Qt::ApplicationModal );
+   if( qApp ) progress->setWindowTitle( "Generating" );
    
    for( int x = maxPos; x<maxPos + quantity; x++ )
      { 
@@ -193,10 +193,10 @@ void SIGEL_GP::SIG_GPPopulation::addRandomIndividuals(int quantity,
 
        if( qApp )
 	 {
-           progress->setProgress( x - maxPos );
+           progress->setValue( x - maxPos );
            qApp->processEvents(); 
 
-           if( progress->wasCancelled() )
+           if( progress->wasCanceled() )
              {
 	       // The process has been canceled. Because of process preparations the system may crash if
 	       // these preparation are not made undone:
@@ -354,9 +354,9 @@ void SIGEL_GP::SIG_GPPopulation::readFromFile(QTextStream &file)
 #endif
 
         if( qApp ) 
-           progress = new QProgressDialog( "Progress:", "Cancel", getSize(), 
-					   0, "Progress", true );
-        if( qApp ) progress->setCaption( "Loading" );
+           progress = new QProgressDialog( "Progress:", "Cancel", 0, getSize() );
+        if( qApp ) progress->setWindowModality( Qt::ApplicationModal );
+        if( qApp ) progress->setWindowTitle( "Loading" );
 
         pos2=populationStr.indexOf(";", pos2+1, Qt::CaseInsensitive);
         if( (pos=populationStr.indexOf("NEXTIDENTIFIER=", 0, Qt::CaseInsensitive))!=-1 )
@@ -405,10 +405,10 @@ void SIGEL_GP::SIG_GPPopulation::readFromFile(QTextStream &file)
 
              if( qApp )
 	      {
-                progress->setProgress( x );
+                progress->setValue( x );
                 qApp->processEvents(); 
 
-                if ( progress->wasCancelled() )
+                if ( progress->wasCanceled() )
 		  {
 
 		    // The process has been canceled. Because of process preparations the system may crash if
@@ -461,7 +461,6 @@ void SIGEL_GP::SIG_GPPopulation::writeToFile(QTextStream &file)
 
         if( qApp )
           {
-            qApp->wakeUpGuiThread();
             qApp->processEvents();
           }  
     }
