@@ -201,7 +201,8 @@ public:
     // qcollection.h:64 -- a Qt 2 copy is ALWAYS non-owning
     Q2Dict(const Q2Dict &o) : buckets(o.buckets), vlen(o.vlen), items(o.items), del(false) {}
 
-    // qgdict.cpp:280-302 -- clear the destination honouring ITS flag, keep the flag
+    // qgdict.cpp:280-302 -- clear the destination honouring ITS autoDelete
+    // setting, and keep that setting
     Q2Dict &operator=(const Q2Dict &o)
     {
         if (this != &o) {

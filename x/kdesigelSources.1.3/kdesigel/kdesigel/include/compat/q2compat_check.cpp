@@ -151,7 +151,7 @@ int main()
         assert(l.at() == -1 && l.current() == nullptr);
         assert(!l.remove(&b));                    // already gone: false
         assert(l.count() == 1);
-        assert(Thing::live == 3);                 // flagless: freed nothing
+        assert(Thing::live == 3);                 // does not own: freed nothing
     }
     {   // Q2ListIterator stays dead once off the end (qglist.cpp:1166)
         Thing a(1);
@@ -334,7 +334,7 @@ int main()
     }
 
     {   // B4: Q2PtrVector owners. insert() over an occupied slot was a delete
-        // under the flag, so a converted caller must free the slot first.
+        // under setAutoDelete, so a converted caller must free the slot first.
         Q2PtrVector<Thing> owned(2);
         owned.insert(0, new Thing(1));
         owned.insert(1, new Thing(2));

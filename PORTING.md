@@ -12,7 +12,8 @@ testing — see §3.
 | B — ownership explicit | **8 of 14 containers**. 5 still on `setAutoDelete` — open, §7 |
 | C — GUI | not started, not authorized |
 
-**Needs a decision:** the 5 containers still on the flag (§7); whether
+**Needs a decision:** the 5 containers still using `setAutoDelete` (§7);
+whether
 `QTextStream` no longer printing `-0` matters (§9); the order of remaining
 Phase B work.
 
@@ -270,11 +271,12 @@ Goal: every owning container frees its items explicitly at the owner, via
 wrong, with no run to check against. Every review round has found a real defect
 in the *easy* conversions.
 
-**`fitTaskList` (`SIG_GPManager.cpp:357,1434`) stays on the flag permanently.**
-On a **local** container the flag is the RAII: it frees at scope exit, including
+**`fitTaskList` (`SIG_GPManager.cpp:357,1434`) keeps `setAutoDelete`
+permanently.** On a **local** container, letting the container delete its own
+items is the right answer: it frees at scope exit, including
 the early `return` at `:404` and anything thrown out of `checkTask`. Writing
 those frees by hand loses the unwinding path. `SIG_Body.cpp`'s local `vertices`
-was converted in B2 before this was understood and is back on the flag.
+was converted in B2 before this was understood, and uses `setAutoDelete` again.
 
 **Exit criterion per step:** the self-check builds and runs clean under ASan and
 UBSan, with an assertion covering the free path each converted container
@@ -341,7 +343,7 @@ depends on.
    (`fitTaskList`) and `SIG_GPFitnessTrainer.cpp:489` (`toSpawnList`).
 2. **Owning containers with no free path**, relying on `~Q2PtrList` /
    `~Q2PtrVector`. Fixed for the 8 converted; `~SIG_GPFitnessTrainer` still
-   leaves `pvmHosts`, `pvmTasks` and `toSpawnList` on the flag.
+   leaves `pvmHosts`, `pvmTasks` and `toSpawnList` to `setAutoDelete`.
 3. **`SIG_Robot::clear()`** hand-deletes six dictionaries' contents and calls
    `clear()` on them twelve lines later. Safe only because those dicts carry no
    flag. The self-check now asserts that `clear()` on a non-owning container
