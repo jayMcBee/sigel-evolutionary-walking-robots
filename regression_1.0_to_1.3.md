@@ -9,9 +9,9 @@ Written 2026-08-23. **Independent of the port — do not mix its commits with
 
 ## Why this document exists
 
-While validating the Qt 6 port I used the 14 published experiments as the
-oracle. They are not one. **They were produced in August 2001 by SIGEL 1.0; the
-source being ported is 1.3, dated 2003-04-30.** Every 1.0 → 1.3 change therefore
+While validating the Qt 6 port I compared our numbers against the 14 published
+experiments. That comparison is not valid. **Those files were produced in August
+2001 by SIGEL 1.0. The source being ported is 1.3, dated 2003-04-30.** Every 1.0 → 1.3 change therefore
 shows up as a "port failure" that has nothing to do with Qt.
 
 Dates, verified:

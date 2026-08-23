@@ -430,7 +430,7 @@ as a fitness of 0, which made the headline number load-dependent.
 §10's pre-existing leak — `SIG_Simulation` is `new`ed and never deleted, and
 its destructor is empty. Gate on ASan and UBSan errors, not on this.
 
-### Replication — no oracle yet
+### Replication — nothing to compare against yet
 
 `./replicate.sh` runs every individual of every published experiment. It is
 **not currently a test of this port**, because the 14 published `.exp` files
@@ -496,7 +496,7 @@ than inspection:
 `.mpg` films of the evolved gaits, and the per-robot model archives.
 `.../berichte/endbericht.pdf` is the project's final report, and its chapter 5
 documents these experiments one by one with fitness curves and stated speeds —
-the only independent numeric oracle available. All in `data/`, untracked.
+the only independent source of numbers. All in `data/`, untracked.
 
 ### Phase C — GUI — DEFERRED per D3(b), NOT AUTHORIZED
 
