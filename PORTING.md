@@ -65,7 +65,14 @@ experiments — which is what produced the scope note above. All fixed.
 - Source root: `x/kdesigelSources.1.3/kdesigel/kdesigel/`
 - The shim: `include/compat/q2compat.h`; its self-check:
   `include/compat/q2compat_check.cpp`
-- Verify: `./check.sh` from the repo root. Takes several minutes.
+- Build: `make` at the repo root gives `build/sigel_eval` under ASan and UBSan.
+  `make B=build-fast SAN= SIGSAN=` gives an unsanitised build about 15x faster,
+  in its own directory.
+- Verify: `./check.sh` from the repo root compiles every module and header and
+  runs the shim self-check. Takes several minutes.
+- Run the published experiments: `./replicate.sh build-fast`. Read the scope
+  note at the top of this file first — those experiments are from SIGEL 1.0 and
+  do not test this port.
 - **After every step, an independent agent reviews the diff with fresh eyes.**
   Not optional — every round so far has found a real defect, and a compile check
   proves nothing about ownership.
@@ -83,14 +90,17 @@ experiments — which is what produced the scope note above. All fixed.
 ```
 /home/jan/Downloads/sigel/
 ├── PORTING.md                              this file
-├── check.sh                                the exit criterion, §7
-├── replicate.sh                            the 14 experiments vs 2003, §7
+├── check.sh                                per-file compile check, §7
+├── replicate.sh                            runs the published experiments, §7
 ├── Makefile                                the build, §7 Phase R
 ├── sigel_eval.cpp                          one fitness evaluation, §7 Phase R
+├── future_refactorings.md                  sibling doc, independent of the port
+├── physics_backends.md                     sibling doc, independent of the port
+├── regression_1.0_to_1.3.md                sibling doc, DEFERRED
 ├── patches/                                5 patches to the vendored tree
 ├── shim/                                   pre-standard C++ headers
 ├── build/                                  untracked, `make clean` removes it
-├── data/                                   untracked, 7 robots and 12 experiments
+├── data/                                   untracked, 7 robots and 14 experiments
 ├── kdesigelSources.1.3.tar.gz              upstream source (2003-04-30)
 ├── supportingLibs.tar.gz                   vendored deps
 ├── kbin.tar.gz                             2003 i386 binary, reference only
@@ -367,19 +377,21 @@ SIGEL_ROOT=$PWD/x/kdesigelSources.1.3/kdesigel/kdesigel \
   ./build/sigel_eval data/Experiments/twoBasesSimpleFitness1.exp 0
 ```
 
-One evaluation is 0.2 s. **All 12 shipped experiments run clean under
+One evaluation is 0.2 s. **All 14 published experiments run clean under
 AddressSanitizer and UndefinedBehaviorSanitizer**, with identical results
-sanitized and not.
+sanitized and not. `replicate.sh` sets `SIGEL_ROOT` itself.
 
-**The one defect that stood between building and running.** Qt 2's `QTime()`
+**The defect that stood between building and running.** Qt 2's `QTime()`
 was 00:00:00.000 and valid. Qt 6's is null: `addSecs` returns another null
 `QTime`, `secsTo` returns 0, and a null `QTime` holds -1 ms, which is less than
 every real time. So `SIG_DynaMechsSimulationQueries::getActualSimulationTime`
 returned null, `SIG_Simulation::start`'s `while (act < max)` never ended, and
-`fitness = distance / simulatedSeconds` was a division by zero. **11 sites**,
+`fitness = distance / simulatedSeconds` was a division by zero. **12 sites**,
 all now `QTime( 0, 0 )` — 9 fitness functions, the queries object and one
-`SIGEL_SlaveGUI` signal. This is the shape §9 warns about: same API, same
-compile, different behaviour.
+`SIGEL_SlaveGUI` signal, plus a twelfth found later by review —
+`SIG_EarlyRunTermSimulation.cpp:97` declared `QTime zeroHour;`, which the first
+sweep's pattern missed because it is a declaration rather than a call. This is
+the shape §9 warns about: same API, same compile, different behaviour.
 
 `SIG_GPPopulation.cpp` also moved off the Qt 2 `QProgressDialog`:
 `setProgress` → `setValue`, `wasCancelled` → `wasCanceled`, `setCaption` →
@@ -653,7 +665,6 @@ every D8 site for a stored `const char *`.
 | out-of-range array access | warn, clamp to 0 | same, in the shim | Not via `Q_ASSERT`, which compiles to nothing under `QT_NO_DEBUG` — a release build would corrupt memory silently where 2003 returned a wrong value |
 | `SIG_ProgramLine.cpp:215-224` | writes `element[no]` in the branch entered *because* `no >= size()` | to be fixed | Its own comment is `// ToDo: Exception!` |
 | `SIG_DynaSystem.cpp:266-268` | deletes `dynaJoints[k]` while looping to `dynaDrives.size()` | to be fixed | The two vectors grow independently |
-| `SIG_DynaMechsSimulationQueries::sense` | 1.3 scaled the joint sensor by `360/2pi` | restored 1.0's plain ratio | A 1.3 regression that postdates the published record: the sensor reported a ~57-cycle sawtooth instead of the joint angle. Replication 7/13 -> 11/13, `runnerNiceWalkingFitness` to 100/100. **HEAD therefore reproduces SIGEL 1.0, not the 1.3 binary** |
 | `SIG_EarlyRunTermSimulation.cpp:97` | `QTime zeroHour;` | `QTime( 0, 0 )` | Same class as the other 11 `QTime()` sites but a declaration, so the first sweep's pattern missed it. `getMaxRecorderSteps` returned 2 instead of 182 — a factor of 91 on the denominator of three fitness functions. No shipped experiment selects them, so `replicate.sh` cannot see it |
 | `sigel_slave`, `getenv("SIGEL_ROOT")` | dereferenced unchecked | to be fixed | Segfaults if unset; the SIGSEGV handler masks it with no core. Bites under PVM specifically — spawned tasks inherit *pvmd's* environment, not the master's |
 | `SIG_Environment` terrain load | `getenv("SIGEL_ROOT")` unchecked | already checked, message on stderr | `sigel_eval` says "SIGEL_ROOT is not set, cannot locate Terrain.ter" instead of reading `/Terrain.ter` |
@@ -672,7 +683,7 @@ live that were not in 2003. Right under a sanitizer, but it can abort where the
 - **`QTime()`** — 00:00:00.000 and valid in Qt 2, null in Qt 6. Compiles, runs,
   and hangs: `addSecs` on a null `QTime` gives another null, `secsTo` gives 0,
   and a null `QTime` holds -1 ms so it sorts before every real time. Fixed at
-  11 sites; found only by running, which is the argument for §3.
+  12 sites; found only by running, which is the argument for §3.
 
 ---
 
