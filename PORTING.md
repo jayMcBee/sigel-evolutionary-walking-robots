@@ -4,14 +4,14 @@
 build and run, because nothing else can be verified without it — see §3. The
 interface migration (Phase C) follows.
 
-**Status — 2026-08-22**
+**Status — 2026-08-23**
 
 | phase | state |
 |---|---|
 | 0 — comments to English | done for the 9 core modules; 9 GUI files still hold Latin-1 |
 | A — core onto Qt 6 | **done**, tags `step-A0`…`step-A9`. `./check.sh`: 117 pass, 5 fail (all need a GUI) |
 | B — ownership explicit | **8 of 14 containers**. 5 still on `setAutoDelete` — open, §7 |
-| R — build and run | core builds and runs, faithful to 1.3. **No port oracle yet** — needs 1.3 reference numbers from the x86 box, §7 |
+| R — build and run | core builds and runs, faithful to 1.3. **No way to check it yet** — needs fitness numbers from the 1.3 binary on the x86 box, §7 |
 | C — GUI | not started, not authorized |
 
 **SCOPE — DECIDED 2026-08-23. Read this before changing anything.**
@@ -21,7 +21,7 @@ interface migration (Phase C) follows.
 through the `sigel-x86` Claude session. A port must not change results, so the
 target is that our build reproduces what the 1.3 binary does.
 
-**The 14 published experiments are NOT the oracle.** They were produced in
+**The 14 published experiments cannot check this port.** They were produced in
 August 2001 by SIGEL 1.0. Validating a port of 1.3 against them measures every
 1.0 → 1.3 change as though it were ours. That mistake cost most of 2026-08-22
 and produced a second project by accident.
@@ -52,10 +52,13 @@ Three jobs, in order, no overlap:
 `QTextStream` no longer printing `-0` matters (§9); the order of remaining
 Phase B work.
 
-Five independent review rounds have run over Phases A and B and over the shim
-against the vendored Qt 2.3 sources. They found 2 leaks, 1 double free, 1 free
-lost on the exception path, 9 gaps where the self-check passed on broken code,
-and 13 false statements in the code and in this file. All fixed.
+Seven independent review rounds have run. They found 2 leaks, 1 double free, 1
+free lost on the exception path, 9 gaps where the self-check passed on broken
+code, and 17 false statements in the code and in this file. Round 6 found a
+missing `#include <cstddef>` that `-fpermissive` was hiding, and that `-lGL` is
+not optional. Round 7 found a twelfth `QTime()` site, a race in `replicate.sh`
+that scored crashed evaluations as zero, and the 2001 date of the published
+experiments — which is what produced the scope note above. All fixed.
 
 ## 0. Working on this
 
