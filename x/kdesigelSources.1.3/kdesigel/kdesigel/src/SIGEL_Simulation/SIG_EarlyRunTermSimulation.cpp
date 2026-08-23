@@ -94,7 +94,7 @@ DL_vector SIGEL_Simulation::SIG_EarlyRunTermSimulation::normalizeRobotPosition( 
 
 
 int SIGEL_Simulation::SIG_EarlyRunTermSimulation::getMaxRecorderSteps(int inRecFrequency)
-{  QTime zeroHour;
+{  QTime zeroHour( 0, 0 );   // Qt 2's default QTime was midnight; Qt 6's is null
    double tts;
    int    steps;
 

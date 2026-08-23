@@ -11,15 +11,15 @@ interface migration (Phase C) follows.
 | 0 — comments to English | done for the 9 core modules; 9 GUI files still hold Latin-1 |
 | A — core onto Qt 6 | **done**, tags `step-A0`…`step-A9`. `./check.sh`: 117 pass, 5 fail (all need a GUI) |
 | B — ownership explicit | **8 of 14 containers**. 5 still on `setAutoDelete` — open, §7 |
-| R — build and run | core builds and runs. **`./replicate.sh`: 11 of 14 experiments reproduce the 2003 result within 10%** — §7 |
+| R — build and run | core builds and runs. **`./replicate.sh`: 11 of 13 distinct experiments within 10%; `runnerNiceWalkingFitness` exact on all 100** — §7 |
 | C — GUI | not started, not authorized |
 
 **Order of work, agreed 2026-08-22:**
 
 1. ~~Build core plus a small program that runs one fitness evaluation, under
-   AddressSanitizer.~~ **Built and running.** 8 of 14 experiments reproduce the
-   2003 result within 8%; the 6 that do not are all gaits that drive a joint
-   into its limits — §7.
+   AddressSanitizer.~~ **Built and running.** `./replicate.sh`: 11 of 13
+   distinct experiments within 10%, one of them exact on all 100 individuals.
+   The oracle is SIGEL 1.0, not the 1.3 source being ported — §7.
 2. Fix PVM — 40/40 files fail because glibc dropped `rpc/types.h`.
 3. Full headless run, compared against the captured 2003 run.
 4. Convert the last 5 containers, now testable (§7).
@@ -391,37 +391,60 @@ libraries get `-w -fpermissive` and UndefinedBehaviorSanitizer minus three
 checks they trip by construction: alignment and signed overflow throughout
 qhull and the f2c translation of `ssvdc`, and `vptr` in cv97.
 
+**AddressSanitizer.** Clean, but only with one `SIGEL_ROOT` per worker.
+`SIG_Environment::generateTerrain` rewrites `$SIGEL_ROOT/Terrain.ter` on **every
+evaluation** and reads it straight back, so workers sharing a root read it
+half-written, get a zero-size grid, and take a real heap-buffer-overflow in
+`dmEnvironment::getGroundElevation`. `replicate.sh` gives each worker its own
+root and treats a non-zero exit as an error; an earlier version scored crashes
+as a fitness of 0, which made the headline number load-dependent.
+
 **Leak baseline (D18): 41,374 bytes in 117 allocations** per evaluation, from
 §10's pre-existing leak — `SIG_Simulation` is `new`ed and never deleted, and
 its destructor is empty. Gate on ASan and UBSan errors, not on this.
 
-### Results against the 2003 record — 11 of 14 replicate
+### Results against the 2001 record — 11 of 13, and the oracle is SIGEL 1.0
 
-`./replicate.sh` runs every individual of all 14 published experiments and
-compares best-of-population against the fitness stored in the `.exp`. Exit
-status is non-zero while any experiment is outside 10%.
+`./replicate.sh` runs every individual of every published experiment. Two of the
+14 files are byte-identical (`twoBasesSimpleFitness1` and
+`twoBasesHighCrossOverRate`), so there are **13 distinct experiments**.
 
-| experiment | 2003 best | ours | ratio |
-|---|---|---|---|
-| octopusSimpleFitness | 0.82998 | 0.84063 | 1.013 |
-| twoBasesHighMutationRate | 1.02730 | 1.04340 | 1.016 |
-| twoBasesHardlyReducedIS | 0.56965 | 0.57356 | 1.007 |
-| shortHammerNiceWalkingFitness | 0.49015 | 0.49085 | 1.001 |
-| runnerNiceWalkingFitness | 0.91951 | 0.91951 | 1.000 |
-| hammerNiceWalkingFitness | 0.45972 | 0.45668 | 0.993 |
-| octopusNiceWalkingFitness | 0.52013 | 0.51471 | 0.990 |
-| twoBasesSimpleFitness2 | 1.14820 | 1.13560 | 0.989 |
-| runnerSimpleFitness | 0.75156 | 0.73395 | 0.977 |
-| insectNiceWalkingFitness | 0.63896 | 0.61079 | 0.956 |
-| walkerNiceWalkingFitness | 0.27548 | 0.25485 | 0.925 |
-| twoBasesHighCrossOverRate | 0.84221 | 0.68955 | **0.819** |
-| twoBasesSimpleFitness1 | 0.84221 | 0.68955 | **0.819** |
-| twoBasesReducedInstructionSet | 0.93897 | 0.67740 | **0.721** |
+| experiment | 2001 best | ours | best | match |
+|---|---|---|---|---|
+| runnerNiceWalkingFitness | 0.91951 | 0.91951 | 1.000 | **100/100** |
+| octopusSimpleFitness | 0.82998 | 0.84063 | 1.013 | 0/100 |
+| twoBasesHighMutationRate | 1.02730 | 1.04340 | 1.016 | 8/100 |
+| twoBasesHardlyReducedIS | 0.56965 | 0.57356 | 1.007 | 16/100 |
+| shortHammerNiceWalkingFitness | 0.49015 | 0.49085 | 1.001 | 30/100 |
+| hammerNiceWalkingFitness | 0.45972 | 0.45668 | 0.993 | 10/100 |
+| octopusNiceWalkingFitness | 0.52013 | 0.51471 | 0.990 | 38/100 |
+| twoBasesSimpleFitness2 | 1.14820 | 1.13560 | 0.989 | 20/120 |
+| runnerSimpleFitness | 0.75156 | 0.73395 | 0.977 | 1/100 |
+| insectNiceWalkingFitness | 0.63896 | 0.61079 | 0.956 | 5/100 |
+| walkerNiceWalkingFitness | 0.27548 | 0.25485 | 0.925 | 12/100 |
+| twoBasesHighCrossOverRate | 0.84221 | 0.68955 | **0.819** | 12/100 |
+| twoBasesReducedInstructionSet | 0.93897 | 0.67740 | **0.721** | 7/100 |
 
-Identical sanitized and not.
+`best` compares best-of-population and is a **loose** test — the more
+individuals share the recorded best, the more chances `max()` has to hit it.
+`match` counts individuals reproducing their own recorded value to 0.1%, which
+is far sharper, but the stored per-individual `FITNESS` fields are partly
+inherited from parents rather than measured, so a low count is not by itself a
+defect. **`runnerNiceWalkingFitness` reproduces 100 of 100 exactly**, which is
+the strongest evidence the ported simulation is faithful.
 
-**THE JOINT SENSOR RETURNED A SAWTOOTH.** `SIG_DynaMechsSimulationQueries.cpp`
-built `scaledState` as a fraction of the joint's travel, but converted only the
+**THE ORACLE IS SIGEL 1.0, NOT THE 1.3 SOURCE BEING PORTED.** The 14 `.exp`
+files are dated 2001-08-10 to 2001-09-06. `sigelSourceDistribution.1.0` was
+rolled 2001-09-06, one hour after the last of them. KDE-SIGEL 1.3's `ChangeLog`
+starts 2001-12-18 and its binaries are dated 2003-04-30. So every 1.0 → 1.3
+change is a confound in this comparison, and the two remaining failures should
+be hunted in the **1.0 → 1.3 diff**, not in the port. Ranked by changed lines on
+the evaluation path: `SIG_DynaMechsCommandInterface.cpp` (+116, the whole
+`tServoSimpleMode` block is new in 1.3), `SIG_DynaMechsSimulationData.cpp`
+(+83), `SIG_Robot.cpp` (+46), `SIG_Joint.cpp` (+23).
+
+**THE JOINT SENSOR — a 1.3 regression, not a port defect.** 1.3's `sense()`
+built `scaledState` as a fraction of joint travel but converted only the
 numerator to degrees:
 
 ```cpp
@@ -430,48 +453,55 @@ scaledState *= 360.0 / (2.0*3.14159265);   // numerator now degrees
 scaledState /= posRange;                   // denominator still radians
 ```
 
-`q`, `minPos` and `posRange` are all radians — `getMechsMinPos`/`getMechsMaxPos`
-are built in radians at `SIG_Joint.cpp:661` because `dmRevoluteLink` wants
-radians. So the fraction came out **57.3 times too large**, wrapped in
-`SIG_Register::makeValid`, and every joint sensor reported a sawtooth of about
-57 cycles across the joint's travel instead of its angle. The
-`tPitchRollSensor` branch twelve lines below is the correct pattern: convert,
-clamp, then divide by 180.
+1.0's `SIG_DynaMechsSimulationQueries.cpp:95` is simply
+`double scaledState = (q - minPos) / posRange;` and the constant
+`360.0/(2.0*3.14159265)` appears **nowhere** in 1.0. The multiply arrived with
+the pitch/roll and contact sensor branches — the source's own comment reads
+*"Changed to handle different types of sensors (jb, 12/2001)"* — and was
+evidently copied from the pitch/roll pattern, where converting to degrees is
+correct because that branch divides by 180.
 
-Removing the conversion took replication from **7 of 14 to 11 of 14**, moved
-four experiments from catastrophic to within 2%, resolved
-`runnerNiceWalkingFitness` from 0.090 to exactly 1.000, and changed **nothing**
-in the eleven that already passed.
+The line is genuinely compiled into the 2003 binary: `xb/kdesigel/sigel_slave`
+at `0x080b1f08` loads the constant `57.29577957855229` — the folded value of
+`360.0/(2.0*3.14159265)`, distinguishable from exact `180/pi` because the source
+truncates pi. So 1.3 really did behave this way; it simply postdates the record.
+
+With the multiply in place the sensor value ran 20.7–40.8 where it should be
+0.36–0.71, wrapped modulo 8 in `SIG_Register::makeValid`, and every joint sensor
+reported a sawtooth of about 57 cycles across the joint's travel instead of the
+angle. Restoring 1.0's line took replication from 7/13 to 11/13 and took
+`runnerNiceWalkingFitness` to 100/100.
+
+**This is a deliberate departure from the source being ported.** See D13 in §9.
 
 **How it was found.** Not by reading. Scaling the `twoBases` drive force through
 2400, 8000 and 80000 made the robot fly, proving the simulator healthy and the
 fault upstream in the control. The failures then correlated perfectly with a
 3-bit register width — 6 of 6 fail, 8 of 8 pass — which pointed at the register
-path rather than the physics.
-
-**Three still outside 10%**, all `twoBases`, at 0.72–0.82. No longer a
-different order of magnitude. Unexplained.
+path.
 
 Ruled out, each by measurement:
 
 | | |
 |---|---|
-| chaotic divergence | bit-identical at `-O1` with FMA and `-O2` with `-ffp-contract=off` |
+| chaotic divergence *of the comparison* | see below — the metric is chaotic, the code is deterministic |
 | early termination | all runs complete every frame |
-| link, joint, drive, sensor numbering | vectors dense, `size() == count()`, declaration order |
+| `Q2Dict` hash order | the shim reproduces Qt 2's ELF hash, seed, shift, mask and ascending bucket walk exactly; link and joint order verified against an independent model of Qt 2's table for all 7 robots |
+| `SIG_Randomizer` | identical sequence; the LCG's extracted bits 16..30 are unaffected by `unsigned long` widening. And `replicate.sh` re-evaluates stored individuals, so no RNG is on the measured path |
+| `QTextStream` double formatting | byte-identical to Qt 2's `%.6lg` over 200,000 random bit patterns, except `-0`, which appears in no shipped robot stream |
 | the simulator | force 800 → 80000 scales the motion smoothly, fitness 0.031 → 2.30 |
-| out-of-range containers | no `qWarning` from the shim on any run |
-| memory errors | clean under ASan and UBSan |
 | floor friction | the six friction constants are identical in a passing and a failing experiment |
 | command durations, register width | parsed exactly as stored |
 
-**The `.exp` fitness is a sound oracle in aggregate.** The endbericht's §5.2 *is*
-`twoBasesHighMutationRate` and states "ca. 0,9 m/s"; the file's mean is 0.777.
-§5.10 *is* `walkerNiceWalkingFitness` and states 0.26 m/s; the file's best is
-0.275. Fitness is metres per second. Individual fitness fields are partly stale
-— five individuals in `twoBasesHighMutationRate` share `FITNESS=1.02726` with
-five different programs — so compare bests over the whole population, never one
-individual.
+**Fitness is a chaotic metric and cannot be a fidelity test.** A 1-ULP change to
+the robot's start height moves an individual's fitness by 45% and
+best-of-100 by up to 18%. The 2003 build was i386 using 80-bit x87 registers;
+this is aarch64 with IEEE doubles. Bit-exact agreement on a long run is not
+achievable and its absence proves nothing. What *is* sound: short trajectory
+traces before divergence grows, and the deterministic non-integrating quantities
+— link and joint numbering, the register value a given joint angle produces, the
+force a given register value produces. Those must match exactly, and would have
+caught the sawtooth immediately.
 
 ### Reference material — all of it, downloaded 2026-08-22
 
@@ -638,6 +668,8 @@ every D8 site for a stored `const char *`.
 | out-of-range array access | warn, clamp to 0 | same, in the shim | Not via `Q_ASSERT`, which compiles to nothing under `QT_NO_DEBUG` — a release build would corrupt memory silently where 2003 returned a wrong value |
 | `SIG_ProgramLine.cpp:215-224` | writes `element[no]` in the branch entered *because* `no >= size()` | to be fixed | Its own comment is `// ToDo: Exception!` |
 | `SIG_DynaSystem.cpp:266-268` | deletes `dynaJoints[k]` while looping to `dynaDrives.size()` | to be fixed | The two vectors grow independently |
+| `SIG_DynaMechsSimulationQueries::sense` | 1.3 scaled the joint sensor by `360/2pi` | restored 1.0's plain ratio | A 1.3 regression that postdates the published record: the sensor reported a ~57-cycle sawtooth instead of the joint angle. Replication 7/13 -> 11/13, `runnerNiceWalkingFitness` to 100/100. **HEAD therefore reproduces SIGEL 1.0, not the 1.3 binary** |
+| `SIG_EarlyRunTermSimulation.cpp:97` | `QTime zeroHour;` | `QTime( 0, 0 )` | Same class as the other 11 `QTime()` sites but a declaration, so the first sweep's pattern missed it. `getMaxRecorderSteps` returned 2 instead of 182 — a factor of 91 on the denominator of three fitness functions. No shipped experiment selects them, so `replicate.sh` cannot see it |
 | `sigel_slave`, `getenv("SIGEL_ROOT")` | dereferenced unchecked | to be fixed | Segfaults if unset; the SIGSEGV handler masks it with no core. Bites under PVM specifically — spawned tasks inherit *pvmd's* environment, not the master's |
 | `SIG_Environment` terrain load | `getenv("SIGEL_ROOT")` unchecked | already checked, message on stderr | `sigel_eval` says "SIGEL_ROOT is not set, cannot locate Terrain.ter" instead of reading `/Terrain.ter` |
 
