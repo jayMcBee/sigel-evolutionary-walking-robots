@@ -30,7 +30,7 @@ build and run, because nothing else can be verified without it — see §3.
 | B — ownership explicit | **8 of 14 containers**. 5 still on `setAutoDelete` — open, §7 |
 | R — build and run | core builds and runs, faithful to 1.3. **No way to check it yet** — needs fitness numbers from the 1.3 binary on the x86 box, §7 |
 | T — old-Qt tool container | **done 2026-08-27.** `tools/qtmig`, §4 |
-| D — delete the shim, migrate the data | **D1 done 2026-08-27** — `linkorder.sh` + `linkorder.txt`, the baseline everything else gates on. Required by D25, ordered before C. §10 |
+| D — delete the shim, migrate the data | **D1 done 2026-08-27**, then rebuilt the same day after review found it blind — `linkorder.sh` + `linkorder.txt`. Required by D25, ordered before C. §10 |
 | C — GUI | **not started, AUTHORIZED 2026-08-27 per D24.** ~450 Qt 2 sites + 20 forms |
 
 **SCOPE — DECIDED 2026-08-23. Read this before changing anything.**
@@ -66,7 +66,7 @@ ported interface has nothing to drive.
    AddressSanitizer.~~ **Built and running**, faithful to 1.3. Validating it
    needs reference numbers from the 1.3 binary — §7.
 2. ~~**Stand up the old-Qt container**~~ — **done**, `tools/qtmig`. §4.
-3. **Phase D — delete the shim.** Migrate the 7 `.rrb` and 12 `.exp` so
+3. **Phase D — delete the shim.** Migrate the 7 `.rrb` and 14 `.exp` so
    declaration order *is* simulation order, drop `q2compat.h`, put core on plain
    Qt 6 containers per D6. Ordered here by **D25** so Phase C ports the
    interface once, to the final target. §10.
@@ -941,10 +941,46 @@ binary until the x86 box gives us fitness numbers (§7). The link-order half
 ./linkorder.sh | diff -u linkorder.txt -
 ```
 
-`sigel_eval -v` already walks `Q2Dict` and prints the numbering, so this needed
-no new program. `linkorder.txt` is 174 lines: the link and joint order of all
-14 experiments, which covers all 7 robots. Every later Phase D step has to leave
-that diff empty.
+`linkorder.txt` is **2,189 lines over 21 blocks** — 14 experiments and 7 `.rrb`.
+Every later Phase D step has to leave that diff empty.
+
+**The first version of D1 was blind, and review caught it.** It dumped links and
+joints only. `SIG_Robot` holds **six** `Q2Dict`s (`SIG_Robot.h:60-65`) — bodies,
+materials, links, joints, drives, sensors — all six written in iteration order
+by `writeToFileTransfer` and read back in that order by
+`SIG_DynaMoSimulationData`, which is the site that numbers the DynaMechs bodies.
+`SIG_Link::points` is a seventh, one per link. Rebuilding the core with
+`h % vlen` perturbed to `(h + 1u) % vlen` changed the ordering in 8 of 14
+experiments and the old gate fired on **2**. It now fires on all 8, plus 6 of
+the 7 `.rrb`. `twoBases` does not move, and should not: 2 links, 1 joint.
+
+**Three load paths, three different orders, all three recorded:**
+
+| tag | what |
+|---|---|
+| `loaded` | the robot as the `.exp` deserialises it |
+| `copy` | after `SIG_Robot`'s copy constructor |
+| `rrb` | the standalone model, read in declaration order by `SIGEL_RobotIO` |
+
+`loaded` and `copy` are not the same order for 4 of the 14. The copy constructor
+round-trips through `writeToFileTransfer`/`readFromFileTransfer`, and
+`Q2Dict::insert` prepends, so re-inserting in iteration order **reverses every
+colliding chain**. `q2compat.h`'s header comment claims this is unreachable
+because no `Q2Dict` is copy-constructed; the round-trip has the same effect, so
+that reasoning is wrong. Once the shim goes, load and save become
+order-preserving and all three collapse into one — a baseline that recorded only
+`copy` could not have seen `loaded` move.
+
+**The script refuses to run** unless it finds exactly 14 `.exp` and 7 `.rrb`,
+and it inspects `sigel_eval`'s stderr instead of discarding it. Both were real
+holes: the previous version exited 0 on a missing build directory, a missing
+`data/`, and a wrong `SIGEL_ROOT`, emitting a short file each time — and
+Phase D re-captures this baseline at every step, so a silent short run would
+have overwritten it and reported success.
+
+**`data/` needs 14 `.exp`, and `experiments.tar.gz` carries 12.** The two
+`runner*.exp` come from `data/results/runner*Experiment.tar.gz` (§7). Provision
+`data/` the way §9 describes and the baseline is 6 robots, not 7.
 
 **The order is genuine hash order, not something simpler.** Checked before
 trusting the baseline: **11 of the 28 link/joint groups are not in ascending
@@ -968,7 +1004,7 @@ The clean-up, in this order:
 1. Replace the emulation with straightforward containers — insertion-ordered
    maps, plain `QList<T*>`, explicit deletes, indexed loops instead of a cursor.
 2. **Migrate the data files at the same time** so the experiments keep working:
-   7 `.rrb` and 12 `.exp` (robots are embedded in the experiments too). Rewrite
+   7 `.rrb` and 14 `.exp` (robots are embedded in the experiments too). Rewrite
    each so declaration order *is* the order the simulation uses. `Q2Dict::hash`
    is the function that generates that ordering — keep it until the migration is
    done, then delete it.

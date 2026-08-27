@@ -26,12 +26,56 @@
 #include "SIGEL_Robot/SIG_CommandParameters.h"
 #include "SIGEL_Robot/SIG_Joint.h"
 #include "SIGEL_Robot/SIG_LanguageParameters.h"
+#include "SIGEL_RobotIO/SIG_RobotBuilder.h"
+#include "SIGEL_Robot/SIG_Body.h"
+#include "SIGEL_Robot/SIG_Drive.h"
 #include "SIGEL_Robot/SIG_Link.h"
+#include "SIGEL_Robot/SIG_Material.h"
+#include "SIGEL_Robot/SIG_Sensor.h"
 #include "SIGEL_Simulation/SIG_Simulation.h"
 #include "SIGEL_Simulation/SIG_SimulationParameters.h"
 #include "SIGEL_Tools/SIG_Exception.h"
 
 using SIGEL_Simulation::SIG_SimulationParameters;
+
+// Every Q2Dict whose iteration order reaches the simulation -- PORTING.md
+// Phase D. SIG_Robot holds six (SIG_Robot.h:60-65); all six are written in
+// iteration order by SIG_Robot::writeToFileTransfer and read back in that
+// order by SIG_DynaMoSimulationData, which is what numbers the DynaMechs
+// bodies. SIG_Link::points is a seventh, one per link.
+//
+// D1 first dumped only links and joints. A review rebuilt the core with a
+// perturbed Q2Dict::hash and found 6 of 14 experiments whose order changed
+// while the diff stayed empty -- the four unwatched dicts were carrying it.
+static void dumpOrder(const SIGEL_Robot::SIG_Robot &r, const char *which)
+{
+#define SIG_DUMP(label, Type, iter)                                        \
+  do {                                                                     \
+    Q2DictIterator<Type> it = r.iter();                                    \
+    int n = 0;                                                             \
+    for (; it.current(); ++it)                                             \
+      printf("  %-8s %-9s %2d  %s\n", which, label, n++,                   \
+             qPrintable(it.currentKey()));                                 \
+  } while (0)
+
+  SIG_DUMP("body",     SIGEL_Robot::SIG_Body,     getBodyIter);
+  SIG_DUMP("material", SIGEL_Robot::SIG_Material, getMaterialIter);
+  SIG_DUMP("link",     SIGEL_Robot::SIG_Link,     getLinkIter);
+  SIG_DUMP("joint",    SIGEL_Robot::SIG_Joint,    getJointIter);
+  SIG_DUMP("drive",    SIGEL_Robot::SIG_Drive,    getDriveIter);
+  SIG_DUMP("sensor",   SIGEL_Robot::SIG_Sensor,   getSensorIter);
+#undef SIG_DUMP
+
+  // Each link carries its own dict of significant points, in its own order.
+  Q2DictIterator<SIGEL_Robot::SIG_Link> li = r.getLinkIter();
+  for (; li.current(); ++li) {
+    Q2DictIterator<DL_vector> pi = li.current()->getPointIter();
+    int n = 0;
+    for (; pi.current(); ++pi)
+      printf("  %-8s point %s %2d  %s\n", which,
+             qPrintable(li.currentKey()), n++, qPrintable(pi.currentKey()));
+  }
+}
 
 int main(int argc, char *argv[])
 {
@@ -45,6 +89,23 @@ int main(int argc, char *argv[])
   if (argc < 2 || argc > 3) {
     fprintf(stderr, "usage: %s [-v] <experiment.exp> [individual, default 0]\n", argv[0]);
     return 2;
+  }
+
+  // A .rrb is the robot model as SIGEL_RobotIO reads it -- scanner, compiler,
+  // builder, inserting in declaration order, which is not the order the
+  // serialised copy inside an .exp comes back in. Phase D has to migrate both,
+  // so the baseline has to watch both.
+  if (QString(argv[1]).endsWith(".rrb")) {
+    try {
+      SIGEL_RobotIO::SIG_RobotBuilder builder(argv[1]);
+      SIGEL_Robot::SIG_Robot *r = builder.build();
+      dumpOrder(*r, "rrb");
+      delete r;
+    } catch (SIGEL_Tools::SIG_Exception &e) {
+      fprintf(stderr, "loading %s: %s\n", argv[1], qPrintable(e.getMessage()));
+      return 1;
+    }
+    return 0;
   }
 
   QFile file(argv[1]);
@@ -77,6 +138,15 @@ int main(int argc, char *argv[])
     return 1;
   }
 
+  // Both orders, because they are not the same one. SIG_Robot's copy ctor
+  // round-trips through writeToFileTransfer/readFromFileTransfer, and
+  // Q2Dict::insert prepends, so re-inserting in iteration order reverses every
+  // colliding chain. They differ for 4 of the 14 experiments. After the shim
+  // goes, load and save become order-preserving and the two collapse into one,
+  // so a baseline that records only the copy cannot see experiment.robot move.
+  if (verbose)
+    dumpOrder(experiment.robot, "loaded");
+
   SIGEL_Robot::SIG_Robot robot(experiment.robot);
   try {
     robot.prepareDynaMechs();
@@ -97,18 +167,8 @@ int main(int argc, char *argv[])
            robot.getLangParam()->getRegisterWidth());
   }
 
-  if (verbose) {
-    // The robot as the simulation sees it: Q2Dict iteration order is what
-    // numbers the DynaMechs links -- PORTING.md §9, §10.
-    Q2DictIterator<SIGEL_Robot::SIG_Link> li = robot.getLinkIter();
-    int n = 0;
-    for (; li.current(); ++li)
-      printf("  link  %2d  %s\n", n++, qPrintable(li.currentKey()));
-    Q2DictIterator<SIGEL_Robot::SIG_Joint> ji = robot.getJointIter();
-    n = 0;
-    for (; ji.current(); ++ji)
-      printf("  joint %2d  %s\n", n++, qPrintable(ji.currentKey()));
-  }
+  if (verbose)
+    dumpOrder(robot, "copy");
 
   SIGEL_GP::SIG_GPIndividual &individual = experiment.population.getIndividual(index);
   const QString name = experiment.gpParameter.getFitnessName();

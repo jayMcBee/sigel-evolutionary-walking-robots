@@ -1,174 +1,2189 @@
 == hammerNiceWalkingFitness.exp
-link   0  base
-link   1  hammer
-link   2  middle1
-link   3  middle2
-link   4  middle3
-joint  0  hinge1
-joint  1  hinge2
-joint  2  hinge3
-joint  3  hinge4
+loaded   body       0  base.wrl
+loaded   body       1  effector.wrl
+loaded   body       2  middle.wrl
+loaded   material   0  plastic
+loaded   material   1  rubber
+loaded   material   2  metal
+loaded   link       0  base
+loaded   link       1  hammer
+loaded   link       2  middle1
+loaded   link       3  middle2
+loaded   link       4  middle3
+loaded   joint      0  hinge1
+loaded   joint      1  hinge2
+loaded   joint      2  hinge3
+loaded   joint      3  hinge4
+loaded   drive      0  hinge1Drive
+loaded   drive      1  hinge3Drive
+loaded   drive      2  hinge2Drive
+loaded   drive      3  hinge4Drive
+loaded   point base  0  BaseAxisSuccNormal
+loaded   point base  1  BaseAxisSuccDir
+loaded   point base  2  BaseAxisSuccBase
+loaded   point hammer  0  HammerPredAxisBase
+loaded   point hammer  1  HammerPredAxisDir
+loaded   point hammer  2  HammerPredAxisNormal
+loaded   point middle1  0  Middle1SuccAxisBase
+loaded   point middle1  1  Middle1PredAxisNormal
+loaded   point middle1  2  Middle1PredAxisBase
+loaded   point middle1  3  Middle1SuccAxisNormal
+loaded   point middle1  4  Middle1SuccAxisDir
+loaded   point middle1  5  Middle1PredAxisDir
+loaded   point middle2  0  Middle2PredAxisDir
+loaded   point middle2  1  Middle2PredAxisNormal
+loaded   point middle2  2  Middle2SuccAxisNormal
+loaded   point middle2  3  Middle2SuccAxisBase
+loaded   point middle2  4  Middle2PredAxisBase
+loaded   point middle2  5  Middle2SuccAxisDir
+loaded   point middle3  0  Middle3PredAxisNormal
+loaded   point middle3  1  Middle3SuccAxisBase
+loaded   point middle3  2  Middle3SuccAxisNormal
+loaded   point middle3  3  Middle3SuccAxisDir
+loaded   point middle3  4  Middle3PredAxisDir
+loaded   point middle3  5  Middle3PredAxisBase
+copy     body       0  base.wrl
+copy     body       1  middle.wrl
+copy     body       2  effector.wrl
+copy     material   0  plastic
+copy     material   1  metal
+copy     material   2  rubber
+copy     link       0  base
+copy     link       1  hammer
+copy     link       2  middle1
+copy     link       3  middle2
+copy     link       4  middle3
+copy     joint      0  hinge1
+copy     joint      1  hinge2
+copy     joint      2  hinge3
+copy     joint      3  hinge4
+copy     drive      0  hinge1Drive
+copy     drive      1  hinge3Drive
+copy     drive      2  hinge2Drive
+copy     drive      3  hinge4Drive
+copy     point base  0  BaseAxisSuccNormal
+copy     point base  1  BaseAxisSuccDir
+copy     point base  2  BaseAxisSuccBase
+copy     point hammer  0  HammerPredAxisBase
+copy     point hammer  1  HammerPredAxisDir
+copy     point hammer  2  HammerPredAxisNormal
+copy     point middle1  0  Middle1SuccAxisBase
+copy     point middle1  1  Middle1PredAxisNormal
+copy     point middle1  2  Middle1PredAxisBase
+copy     point middle1  3  Middle1SuccAxisNormal
+copy     point middle1  4  Middle1SuccAxisDir
+copy     point middle1  5  Middle1PredAxisDir
+copy     point middle2  0  Middle2PredAxisDir
+copy     point middle2  1  Middle2PredAxisNormal
+copy     point middle2  2  Middle2SuccAxisNormal
+copy     point middle2  3  Middle2SuccAxisBase
+copy     point middle2  4  Middle2PredAxisBase
+copy     point middle2  5  Middle2SuccAxisDir
+copy     point middle3  0  Middle3PredAxisNormal
+copy     point middle3  1  Middle3SuccAxisBase
+copy     point middle3  2  Middle3SuccAxisDir
+copy     point middle3  3  Middle3SuccAxisNormal
+copy     point middle3  4  Middle3PredAxisDir
+copy     point middle3  5  Middle3PredAxisBase
 == insectNiceWalkingFitness.exp
-link   0  body
-link   1  foot1
-link   2  foot2
-link   3  foot3
-link   4  foot4
-link   5  foot5
-link   6  foot6
-link   7  leg1
-link   8  leg2
-link   9  leg3
-link  10  leg4
-link  11  leg5
-link  12  leg6
-joint  0  leg5Joint2
-joint  1  leg6Joint1
-joint  2  leg6Joint2
-joint  3  leg1Joint1
-joint  4  leg1Joint2
-joint  5  leg2Joint1
-joint  6  leg2Joint2
-joint  7  leg3Joint1
-joint  8  leg3Joint2
-joint  9  leg4Joint1
-joint 10  leg4Joint2
-joint 11  leg5Joint1
+loaded   body       0  foot.wrl
+loaded   body       1  body.wrl
+loaded   body       2  leg.wrl
+loaded   material   0  footMaterial
+loaded   material   1  legMaterial
+loaded   material   2  bodyMaterial
+loaded   link       0  body
+loaded   link       1  foot1
+loaded   link       2  foot2
+loaded   link       3  foot3
+loaded   link       4  foot4
+loaded   link       5  foot5
+loaded   link       6  foot6
+loaded   link       7  leg1
+loaded   link       8  leg2
+loaded   link       9  leg3
+loaded   link      10  leg4
+loaded   link      11  leg5
+loaded   link      12  leg6
+loaded   joint      0  leg6Joint1
+loaded   joint      1  leg5Joint2
+loaded   joint      2  leg6Joint2
+loaded   joint      3  leg1Joint1
+loaded   joint      4  leg2Joint1
+loaded   joint      5  leg1Joint2
+loaded   joint      6  leg3Joint1
+loaded   joint      7  leg2Joint2
+loaded   joint      8  leg4Joint1
+loaded   joint      9  leg3Joint2
+loaded   joint     10  leg5Joint1
+loaded   joint     11  leg4Joint2
+loaded   drive      0  leg5Joint2Drive
+loaded   drive      1  leg4Joint1Drive
+loaded   drive      2  leg1Joint1Drive
+loaded   drive      3  leg2Joint1Drive
+loaded   drive      4  leg2Joint2Drive
+loaded   drive      5  leg1Joint2Drive
+loaded   drive      6  leg5Joint1Drive
+loaded   drive      7  leg4Joint2Drive
+loaded   drive      8  leg6Joint1Drive
+loaded   drive      9  leg3Joint2Drive
+loaded   drive     10  leg6Joint2Drive
+loaded   drive     11  leg3Joint1Drive
+loaded   sensor     0  leg6Joint2Sensor
+loaded   sensor     1  leg5Joint1Sensor
+loaded   sensor     2  leg6Joint1Sensor
+loaded   sensor     3  leg5Joint2Sensor
+loaded   sensor     4  leg4Joint2Sensor
+loaded   sensor     5  leg3Joint1Sensor
+loaded   sensor     6  leg4Joint1Sensor
+loaded   sensor     7  leg3Joint2Sensor
+loaded   sensor     8  leg2Joint2Sensor
+loaded   sensor     9  leg1Joint1Sensor
+loaded   sensor    10  leg2Joint1Sensor
+loaded   sensor    11  leg1Joint2Sensor
+loaded   point body  0  bodyLeg4Normal
+loaded   point body  1  bodyLeg6Dir
+loaded   point body  2  bodyLeg5Base
+loaded   point body  3  bodyLeg4Dir
+loaded   point body  4  bodyLeg4Base
+loaded   point body  5  bodyLeg6Normal
+loaded   point body  6  bodyLeg5Dir
+loaded   point body  7  bodyLeg1Normal
+loaded   point body  8  bodyLeg6Base
+loaded   point body  9  bodyLeg3Normal
+loaded   point body 10  bodyLeg2Normal
+loaded   point body 11  bodyLeg1Base
+loaded   point body 12  bodyLeg3Base
+loaded   point body 13  bodyLeg2Base
+loaded   point body 14  bodyLeg2Dir
+loaded   point body 15  bodyLeg3Dir
+loaded   point body 16  bodyLeg5Normal
+loaded   point body 17  bodyLeg1Dir
+loaded   point foot1  0  foot1PredBase
+loaded   point foot1  1  foot1PredDir
+loaded   point foot1  2  foot1PredNormal
+loaded   point foot2  0  foot2PredBase
+loaded   point foot2  1  foot2PredDir
+loaded   point foot2  2  foot2PredNormal
+loaded   point foot3  0  foot3PredDir
+loaded   point foot3  1  foot3PredBase
+loaded   point foot3  2  foot3PredNormal
+loaded   point foot4  0  foot4PredDir
+loaded   point foot4  1  foot4PredBase
+loaded   point foot4  2  foot4PredNormal
+loaded   point foot5  0  foot5PredDir
+loaded   point foot5  1  foot5PredNormal
+loaded   point foot5  2  foot5PredBase
+loaded   point foot6  0  foot6PredDir
+loaded   point foot6  1  foot6PredNormal
+loaded   point foot6  2  foot6PredBase
+loaded   point leg1  0  leg1PredNormal
+loaded   point leg1  1  leg1SuccNormal
+loaded   point leg1  2  leg1SuccBase
+loaded   point leg1  3  leg1SuccDir
+loaded   point leg1  4  leg1PredDir
+loaded   point leg1  5  leg1PredBase
+loaded   point leg2  0  leg2PredNormal
+loaded   point leg2  1  leg2SuccDir
+loaded   point leg2  2  leg2SuccNormal
+loaded   point leg2  3  leg2SuccBase
+loaded   point leg2  4  leg2PredDir
+loaded   point leg2  5  leg2PredBase
+loaded   point leg3  0  leg3SuccNormal
+loaded   point leg3  1  leg3SuccDir
+loaded   point leg3  2  leg3PredDir
+loaded   point leg3  3  leg3SuccBase
+loaded   point leg3  4  leg3PredNormal
+loaded   point leg3  5  leg3PredBase
+loaded   point leg4  0  leg4SuccNormal
+loaded   point leg4  1  leg4SuccDir
+loaded   point leg4  2  leg4PredDir
+loaded   point leg4  3  leg4SuccBase
+loaded   point leg4  4  leg4PredNormal
+loaded   point leg4  5  leg4PredBase
+loaded   point leg5  0  leg5PredBase
+loaded   point leg5  1  leg5SuccNormal
+loaded   point leg5  2  leg5SuccDir
+loaded   point leg5  3  leg5PredDir
+loaded   point leg5  4  leg5PredNormal
+loaded   point leg5  5  leg5SuccBase
+loaded   point leg6  0  leg6PredBase
+loaded   point leg6  1  leg6SuccNormal
+loaded   point leg6  2  leg6SuccDir
+loaded   point leg6  3  leg6PredDir
+loaded   point leg6  4  leg6PredNormal
+loaded   point leg6  5  leg6SuccBase
+copy     body       0  foot.wrl
+copy     body       1  body.wrl
+copy     body       2  leg.wrl
+copy     material   0  legMaterial
+copy     material   1  footMaterial
+copy     material   2  bodyMaterial
+copy     link       0  body
+copy     link       1  foot1
+copy     link       2  foot2
+copy     link       3  foot3
+copy     link       4  foot4
+copy     link       5  foot5
+copy     link       6  foot6
+copy     link       7  leg1
+copy     link       8  leg2
+copy     link       9  leg3
+copy     link      10  leg4
+copy     link      11  leg5
+copy     link      12  leg6
+copy     joint      0  leg5Joint2
+copy     joint      1  leg6Joint1
+copy     joint      2  leg6Joint2
+copy     joint      3  leg1Joint1
+copy     joint      4  leg1Joint2
+copy     joint      5  leg2Joint1
+copy     joint      6  leg2Joint2
+copy     joint      7  leg3Joint1
+copy     joint      8  leg3Joint2
+copy     joint      9  leg4Joint1
+copy     joint     10  leg4Joint2
+copy     joint     11  leg5Joint1
+copy     drive      0  leg4Joint1Drive
+copy     drive      1  leg5Joint2Drive
+copy     drive      2  leg1Joint1Drive
+copy     drive      3  leg2Joint1Drive
+copy     drive      4  leg2Joint2Drive
+copy     drive      5  leg1Joint2Drive
+copy     drive      6  leg4Joint2Drive
+copy     drive      7  leg5Joint1Drive
+copy     drive      8  leg3Joint2Drive
+copy     drive      9  leg6Joint1Drive
+copy     drive     10  leg3Joint1Drive
+copy     drive     11  leg6Joint2Drive
+copy     sensor     0  leg5Joint1Sensor
+copy     sensor     1  leg6Joint2Sensor
+copy     sensor     2  leg5Joint2Sensor
+copy     sensor     3  leg6Joint1Sensor
+copy     sensor     4  leg3Joint1Sensor
+copy     sensor     5  leg4Joint2Sensor
+copy     sensor     6  leg3Joint2Sensor
+copy     sensor     7  leg4Joint1Sensor
+copy     sensor     8  leg1Joint1Sensor
+copy     sensor     9  leg2Joint2Sensor
+copy     sensor    10  leg1Joint2Sensor
+copy     sensor    11  leg2Joint1Sensor
+copy     point body  0  bodyLeg4Normal
+copy     point body  1  bodyLeg6Dir
+copy     point body  2  bodyLeg5Base
+copy     point body  3  bodyLeg4Base
+copy     point body  4  bodyLeg4Dir
+copy     point body  5  bodyLeg1Normal
+copy     point body  6  bodyLeg5Dir
+copy     point body  7  bodyLeg6Normal
+copy     point body  8  bodyLeg6Base
+copy     point body  9  bodyLeg3Normal
+copy     point body 10  bodyLeg1Base
+copy     point body 11  bodyLeg2Normal
+copy     point body 12  bodyLeg3Base
+copy     point body 13  bodyLeg2Base
+copy     point body 14  bodyLeg2Dir
+copy     point body 15  bodyLeg3Dir
+copy     point body 16  bodyLeg1Dir
+copy     point body 17  bodyLeg5Normal
+copy     point foot1  0  foot1PredBase
+copy     point foot1  1  foot1PredDir
+copy     point foot1  2  foot1PredNormal
+copy     point foot2  0  foot2PredBase
+copy     point foot2  1  foot2PredDir
+copy     point foot2  2  foot2PredNormal
+copy     point foot3  0  foot3PredDir
+copy     point foot3  1  foot3PredBase
+copy     point foot3  2  foot3PredNormal
+copy     point foot4  0  foot4PredDir
+copy     point foot4  1  foot4PredBase
+copy     point foot4  2  foot4PredNormal
+copy     point foot5  0  foot5PredDir
+copy     point foot5  1  foot5PredNormal
+copy     point foot5  2  foot5PredBase
+copy     point foot6  0  foot6PredDir
+copy     point foot6  1  foot6PredNormal
+copy     point foot6  2  foot6PredBase
+copy     point leg1  0  leg1PredNormal
+copy     point leg1  1  leg1SuccBase
+copy     point leg1  2  leg1SuccNormal
+copy     point leg1  3  leg1SuccDir
+copy     point leg1  4  leg1PredBase
+copy     point leg1  5  leg1PredDir
+copy     point leg2  0  leg2PredNormal
+copy     point leg2  1  leg2SuccDir
+copy     point leg2  2  leg2PredDir
+copy     point leg2  3  leg2SuccBase
+copy     point leg2  4  leg2SuccNormal
+copy     point leg2  5  leg2PredBase
+copy     point leg3  0  leg3SuccNormal
+copy     point leg3  1  leg3SuccDir
+copy     point leg3  2  leg3PredDir
+copy     point leg3  3  leg3SuccBase
+copy     point leg3  4  leg3PredNormal
+copy     point leg3  5  leg3PredBase
+copy     point leg4  0  leg4SuccDir
+copy     point leg4  1  leg4SuccNormal
+copy     point leg4  2  leg4PredDir
+copy     point leg4  3  leg4SuccBase
+copy     point leg4  4  leg4PredNormal
+copy     point leg4  5  leg4PredBase
+copy     point leg5  0  leg5PredBase
+copy     point leg5  1  leg5SuccNormal
+copy     point leg5  2  leg5SuccDir
+copy     point leg5  3  leg5PredDir
+copy     point leg5  4  leg5PredNormal
+copy     point leg5  5  leg5SuccBase
+copy     point leg6  0  leg6PredBase
+copy     point leg6  1  leg6SuccDir
+copy     point leg6  2  leg6SuccNormal
+copy     point leg6  3  leg6PredDir
+copy     point leg6  4  leg6PredNormal
+copy     point leg6  5  leg6SuccBase
 == octopusNiceWalkingFitness.exp
-link   0  thirdFootLink
-link   1  firstFootLink
-link   2  base
-link   3  firstLegLink1
-link   4  firstLegLink2
-link   5  secondFootLink
-link   6  secondLegLink1
-link   7  secondLegLink2
-link   8  thirdLegLink1
-link   9  thirdLegLink2
-joint  0  secondLegJoint1
-joint  1  secondLegJoint2
-joint  2  thirdLegJoint1
-joint  3  secondLegJoint3
-joint  4  thirdLegJoint2
-joint  5  thirdLegJoint3
-joint  6  firstLegJoint1
-joint  7  firstLegJoint2
-joint  8  firstLegJoint3
+loaded   body       0  footLink.wrl
+loaded   body       1  legLink.wrl
+loaded   body       2  tripleBase.wrl
+loaded   material   0  greenPlastic
+loaded   material   1  bluePlastic
+loaded   material   2  redPlastic
+loaded   link       0  thirdFootLink
+loaded   link       1  firstFootLink
+loaded   link       2  base
+loaded   link       3  firstLegLink1
+loaded   link       4  firstLegLink2
+loaded   link       5  secondFootLink
+loaded   link       6  secondLegLink1
+loaded   link       7  secondLegLink2
+loaded   link       8  thirdLegLink1
+loaded   link       9  thirdLegLink2
+loaded   joint      0  secondLegJoint1
+loaded   joint      1  thirdLegJoint1
+loaded   joint      2  secondLegJoint2
+loaded   joint      3  thirdLegJoint2
+loaded   joint      4  secondLegJoint3
+loaded   joint      5  thirdLegJoint3
+loaded   joint      6  firstLegJoint1
+loaded   joint      7  firstLegJoint2
+loaded   joint      8  firstLegJoint3
+loaded   drive      0  firstLegJoint2Drive
+loaded   drive      1  firstLegJoint1Drive
+loaded   drive      2  secondLegJoint1Drive
+loaded   drive      3  thirdLegJoint2Drive
+loaded   drive      4  secondLegJoint3Drive
+loaded   drive      5  thirdLegJoint3Drive
+loaded   drive      6  secondLegJoint2Drive
+loaded   drive      7  thirdLegJoint1Drive
+loaded   drive      8  firstLegJoint3Drive
+loaded   sensor     0  thirdLegJoint3Sensor
+loaded   sensor     1  secondLegJoint1Sensor
+loaded   sensor     2  secondLegJoint2Sensor
+loaded   sensor     3  firstLegJoint3Sensor
+loaded   sensor     4  thirdLegJoint2Sensor
+loaded   sensor     5  secondLegJoint3Sensor
+loaded   sensor     6  thirdLegJoint1Sensor
+loaded   sensor     7  firstLegJoint1Sensor
+loaded   sensor     8  firstLegJoint2Sensor
+loaded   point thirdFootLink  0  thirdFootLinkNormal
+loaded   point thirdFootLink  1  thirdFootLinkDir
+loaded   point thirdFootLink  2  thirdFootLinkBase
+loaded   point firstFootLink  0  firstFootLinkNormal
+loaded   point firstFootLink  1  firstFootLinkDir
+loaded   point firstFootLink  2  firstFootLinkBase
+loaded   point base  0  baseSecondBase
+loaded   point base  1  baseSecondNormal
+loaded   point base  2  baseSecondDir
+loaded   point base  3  baseThirdDir
+loaded   point base  4  baseFirstNormal
+loaded   point base  5  baseFirstBase
+loaded   point base  6  baseThirdNormal
+loaded   point base  7  baseThirdBase
+loaded   point base  8  baseFirstDir
+loaded   point firstLegLink1  0  firstLegLink1PredDir
+loaded   point firstLegLink1  1  firstLegLink1PredBase
+loaded   point firstLegLink1  2  firstLegLink1SuccBase
+loaded   point firstLegLink1  3  firstLegLink1SuccNormal
+loaded   point firstLegLink1  4  firstLegLink1PredNormal
+loaded   point firstLegLink1  5  firstLegLink1SuccDir
+loaded   point firstLegLink2  0  firstLegLink2PredDir
+loaded   point firstLegLink2  1  firstLegLink2PredBase
+loaded   point firstLegLink2  2  firstLegLink2SuccBase
+loaded   point firstLegLink2  3  firstLegLink2SuccNormal
+loaded   point firstLegLink2  4  firstLegLink2SuccDir
+loaded   point firstLegLink2  5  firstLegLink2PredNormal
+loaded   point secondFootLink  0  secondFootLinkDir
+loaded   point secondFootLink  1  secondFootLinkBase
+loaded   point secondFootLink  2  secondFootLinkNormal
+loaded   point secondLegLink1  0  secondLegLink1PredNormal
+loaded   point secondLegLink1  1  secondLegLink1PredBase
+loaded   point secondLegLink1  2  secondLegLink1SuccNormal
+loaded   point secondLegLink1  3  secondLegLink1SuccDir
+loaded   point secondLegLink1  4  secondLegLink1SuccBase
+loaded   point secondLegLink1  5  secondLegLink1PredDir
+loaded   point secondLegLink2  0  secondLegLink2PredNormal
+loaded   point secondLegLink2  1  secondLegLink2PredBase
+loaded   point secondLegLink2  2  secondLegLink2SuccDir
+loaded   point secondLegLink2  3  secondLegLink2SuccNormal
+loaded   point secondLegLink2  4  secondLegLink2SuccBase
+loaded   point secondLegLink2  5  secondLegLink2PredDir
+loaded   point thirdLegLink1  0  thirdLegLink1PredBase
+loaded   point thirdLegLink1  1  thirdLegLink1SuccNormal
+loaded   point thirdLegLink1  2  thirdLegLink1PredDir
+loaded   point thirdLegLink1  3  thirdLegLink1SuccDir
+loaded   point thirdLegLink1  4  thirdLegLink1SuccBase
+loaded   point thirdLegLink1  5  thirdLegLink1PredNormal
+loaded   point thirdLegLink2  0  thirdLegLink2PredBase
+loaded   point thirdLegLink2  1  thirdLegLink2SuccNormal
+loaded   point thirdLegLink2  2  thirdLegLink2PredDir
+loaded   point thirdLegLink2  3  thirdLegLink2SuccBase
+loaded   point thirdLegLink2  4  thirdLegLink2SuccDir
+loaded   point thirdLegLink2  5  thirdLegLink2PredNormal
+copy     body       0  legLink.wrl
+copy     body       1  footLink.wrl
+copy     body       2  tripleBase.wrl
+copy     material   0  greenPlastic
+copy     material   1  bluePlastic
+copy     material   2  redPlastic
+copy     link       0  thirdFootLink
+copy     link       1  firstFootLink
+copy     link       2  base
+copy     link       3  firstLegLink1
+copy     link       4  firstLegLink2
+copy     link       5  secondFootLink
+copy     link       6  secondLegLink1
+copy     link       7  secondLegLink2
+copy     link       8  thirdLegLink1
+copy     link       9  thirdLegLink2
+copy     joint      0  secondLegJoint1
+copy     joint      1  secondLegJoint2
+copy     joint      2  thirdLegJoint1
+copy     joint      3  secondLegJoint3
+copy     joint      4  thirdLegJoint2
+copy     joint      5  thirdLegJoint3
+copy     joint      6  firstLegJoint1
+copy     joint      7  firstLegJoint2
+copy     joint      8  firstLegJoint3
+copy     drive      0  firstLegJoint2Drive
+copy     drive      1  firstLegJoint1Drive
+copy     drive      2  secondLegJoint1Drive
+copy     drive      3  secondLegJoint3Drive
+copy     drive      4  thirdLegJoint2Drive
+copy     drive      5  secondLegJoint2Drive
+copy     drive      6  thirdLegJoint3Drive
+copy     drive      7  thirdLegJoint1Drive
+copy     drive      8  firstLegJoint3Drive
+copy     sensor     0  secondLegJoint1Sensor
+copy     sensor     1  thirdLegJoint3Sensor
+copy     sensor     2  secondLegJoint2Sensor
+copy     sensor     3  firstLegJoint3Sensor
+copy     sensor     4  secondLegJoint3Sensor
+copy     sensor     5  thirdLegJoint2Sensor
+copy     sensor     6  thirdLegJoint1Sensor
+copy     sensor     7  firstLegJoint1Sensor
+copy     sensor     8  firstLegJoint2Sensor
+copy     point thirdFootLink  0  thirdFootLinkNormal
+copy     point thirdFootLink  1  thirdFootLinkDir
+copy     point thirdFootLink  2  thirdFootLinkBase
+copy     point firstFootLink  0  firstFootLinkDir
+copy     point firstFootLink  1  firstFootLinkNormal
+copy     point firstFootLink  2  firstFootLinkBase
+copy     point base  0  baseSecondBase
+copy     point base  1  baseSecondNormal
+copy     point base  2  baseSecondDir
+copy     point base  3  baseFirstNormal
+copy     point base  4  baseThirdDir
+copy     point base  5  baseFirstBase
+copy     point base  6  baseThirdNormal
+copy     point base  7  baseThirdBase
+copy     point base  8  baseFirstDir
+copy     point firstLegLink1  0  firstLegLink1PredDir
+copy     point firstLegLink1  1  firstLegLink1PredBase
+copy     point firstLegLink1  2  firstLegLink1SuccBase
+copy     point firstLegLink1  3  firstLegLink1SuccNormal
+copy     point firstLegLink1  4  firstLegLink1PredNormal
+copy     point firstLegLink1  5  firstLegLink1SuccDir
+copy     point firstLegLink2  0  firstLegLink2PredDir
+copy     point firstLegLink2  1  firstLegLink2PredBase
+copy     point firstLegLink2  2  firstLegLink2SuccBase
+copy     point firstLegLink2  3  firstLegLink2SuccNormal
+copy     point firstLegLink2  4  firstLegLink2PredNormal
+copy     point firstLegLink2  5  firstLegLink2SuccDir
+copy     point secondFootLink  0  secondFootLinkDir
+copy     point secondFootLink  1  secondFootLinkBase
+copy     point secondFootLink  2  secondFootLinkNormal
+copy     point secondLegLink1  0  secondLegLink1PredNormal
+copy     point secondLegLink1  1  secondLegLink1PredBase
+copy     point secondLegLink1  2  secondLegLink1SuccNormal
+copy     point secondLegLink1  3  secondLegLink1SuccBase
+copy     point secondLegLink1  4  secondLegLink1SuccDir
+copy     point secondLegLink1  5  secondLegLink1PredDir
+copy     point secondLegLink2  0  secondLegLink2PredNormal
+copy     point secondLegLink2  1  secondLegLink2PredBase
+copy     point secondLegLink2  2  secondLegLink2SuccDir
+copy     point secondLegLink2  3  secondLegLink2SuccNormal
+copy     point secondLegLink2  4  secondLegLink2SuccBase
+copy     point secondLegLink2  5  secondLegLink2PredDir
+copy     point thirdLegLink1  0  thirdLegLink1PredBase
+copy     point thirdLegLink1  1  thirdLegLink1PredDir
+copy     point thirdLegLink1  2  thirdLegLink1SuccNormal
+copy     point thirdLegLink1  3  thirdLegLink1SuccDir
+copy     point thirdLegLink1  4  thirdLegLink1SuccBase
+copy     point thirdLegLink1  5  thirdLegLink1PredNormal
+copy     point thirdLegLink2  0  thirdLegLink2PredBase
+copy     point thirdLegLink2  1  thirdLegLink2SuccNormal
+copy     point thirdLegLink2  2  thirdLegLink2PredDir
+copy     point thirdLegLink2  3  thirdLegLink2SuccBase
+copy     point thirdLegLink2  4  thirdLegLink2SuccDir
+copy     point thirdLegLink2  5  thirdLegLink2PredNormal
 == octopusSimpleFitness.exp
-link   0  thirdFootLink
-link   1  firstFootLink
-link   2  base
-link   3  firstLegLink1
-link   4  firstLegLink2
-link   5  secondFootLink
-link   6  secondLegLink1
-link   7  secondLegLink2
-link   8  thirdLegLink1
-link   9  thirdLegLink2
-joint  0  secondLegJoint1
-joint  1  thirdLegJoint1
-joint  2  secondLegJoint2
-joint  3  thirdLegJoint2
-joint  4  secondLegJoint3
-joint  5  thirdLegJoint3
-joint  6  firstLegJoint1
-joint  7  firstLegJoint2
-joint  8  firstLegJoint3
+loaded   body       0  legLink.wrl
+loaded   body       1  footLink.wrl
+loaded   body       2  tripleBase.wrl
+loaded   material   0  greenPlastic
+loaded   material   1  bluePlastic
+loaded   material   2  redPlastic
+loaded   link       0  thirdFootLink
+loaded   link       1  firstFootLink
+loaded   link       2  base
+loaded   link       3  firstLegLink1
+loaded   link       4  firstLegLink2
+loaded   link       5  secondFootLink
+loaded   link       6  secondLegLink1
+loaded   link       7  secondLegLink2
+loaded   link       8  thirdLegLink1
+loaded   link       9  thirdLegLink2
+loaded   joint      0  secondLegJoint1
+loaded   joint      1  secondLegJoint2
+loaded   joint      2  thirdLegJoint1
+loaded   joint      3  secondLegJoint3
+loaded   joint      4  thirdLegJoint2
+loaded   joint      5  thirdLegJoint3
+loaded   joint      6  firstLegJoint1
+loaded   joint      7  firstLegJoint2
+loaded   joint      8  firstLegJoint3
+loaded   drive      0  firstLegJoint2Drive
+loaded   drive      1  firstLegJoint1Drive
+loaded   drive      2  secondLegJoint1Drive
+loaded   drive      3  secondLegJoint3Drive
+loaded   drive      4  thirdLegJoint2Drive
+loaded   drive      5  secondLegJoint2Drive
+loaded   drive      6  thirdLegJoint3Drive
+loaded   drive      7  thirdLegJoint1Drive
+loaded   drive      8  firstLegJoint3Drive
+loaded   sensor     0  secondLegJoint1Sensor
+loaded   sensor     1  thirdLegJoint3Sensor
+loaded   sensor     2  secondLegJoint2Sensor
+loaded   sensor     3  firstLegJoint3Sensor
+loaded   sensor     4  secondLegJoint3Sensor
+loaded   sensor     5  thirdLegJoint2Sensor
+loaded   sensor     6  thirdLegJoint1Sensor
+loaded   sensor     7  firstLegJoint1Sensor
+loaded   sensor     8  firstLegJoint2Sensor
+loaded   point thirdFootLink  0  thirdFootLinkNormal
+loaded   point thirdFootLink  1  thirdFootLinkDir
+loaded   point thirdFootLink  2  thirdFootLinkBase
+loaded   point firstFootLink  0  firstFootLinkDir
+loaded   point firstFootLink  1  firstFootLinkNormal
+loaded   point firstFootLink  2  firstFootLinkBase
+loaded   point base  0  baseSecondBase
+loaded   point base  1  baseSecondNormal
+loaded   point base  2  baseSecondDir
+loaded   point base  3  baseFirstNormal
+loaded   point base  4  baseThirdDir
+loaded   point base  5  baseFirstBase
+loaded   point base  6  baseThirdNormal
+loaded   point base  7  baseThirdBase
+loaded   point base  8  baseFirstDir
+loaded   point firstLegLink1  0  firstLegLink1PredDir
+loaded   point firstLegLink1  1  firstLegLink1PredBase
+loaded   point firstLegLink1  2  firstLegLink1SuccBase
+loaded   point firstLegLink1  3  firstLegLink1SuccNormal
+loaded   point firstLegLink1  4  firstLegLink1PredNormal
+loaded   point firstLegLink1  5  firstLegLink1SuccDir
+loaded   point firstLegLink2  0  firstLegLink2PredDir
+loaded   point firstLegLink2  1  firstLegLink2PredBase
+loaded   point firstLegLink2  2  firstLegLink2SuccBase
+loaded   point firstLegLink2  3  firstLegLink2SuccNormal
+loaded   point firstLegLink2  4  firstLegLink2PredNormal
+loaded   point firstLegLink2  5  firstLegLink2SuccDir
+loaded   point secondFootLink  0  secondFootLinkDir
+loaded   point secondFootLink  1  secondFootLinkBase
+loaded   point secondFootLink  2  secondFootLinkNormal
+loaded   point secondLegLink1  0  secondLegLink1PredNormal
+loaded   point secondLegLink1  1  secondLegLink1PredBase
+loaded   point secondLegLink1  2  secondLegLink1SuccNormal
+loaded   point secondLegLink1  3  secondLegLink1SuccBase
+loaded   point secondLegLink1  4  secondLegLink1SuccDir
+loaded   point secondLegLink1  5  secondLegLink1PredDir
+loaded   point secondLegLink2  0  secondLegLink2PredNormal
+loaded   point secondLegLink2  1  secondLegLink2PredBase
+loaded   point secondLegLink2  2  secondLegLink2SuccDir
+loaded   point secondLegLink2  3  secondLegLink2SuccNormal
+loaded   point secondLegLink2  4  secondLegLink2SuccBase
+loaded   point secondLegLink2  5  secondLegLink2PredDir
+loaded   point thirdLegLink1  0  thirdLegLink1PredBase
+loaded   point thirdLegLink1  1  thirdLegLink1PredDir
+loaded   point thirdLegLink1  2  thirdLegLink1SuccNormal
+loaded   point thirdLegLink1  3  thirdLegLink1SuccDir
+loaded   point thirdLegLink1  4  thirdLegLink1SuccBase
+loaded   point thirdLegLink1  5  thirdLegLink1PredNormal
+loaded   point thirdLegLink2  0  thirdLegLink2PredBase
+loaded   point thirdLegLink2  1  thirdLegLink2SuccNormal
+loaded   point thirdLegLink2  2  thirdLegLink2PredDir
+loaded   point thirdLegLink2  3  thirdLegLink2SuccBase
+loaded   point thirdLegLink2  4  thirdLegLink2SuccDir
+loaded   point thirdLegLink2  5  thirdLegLink2PredNormal
+copy     body       0  footLink.wrl
+copy     body       1  legLink.wrl
+copy     body       2  tripleBase.wrl
+copy     material   0  greenPlastic
+copy     material   1  bluePlastic
+copy     material   2  redPlastic
+copy     link       0  thirdFootLink
+copy     link       1  firstFootLink
+copy     link       2  base
+copy     link       3  firstLegLink1
+copy     link       4  firstLegLink2
+copy     link       5  secondFootLink
+copy     link       6  secondLegLink1
+copy     link       7  secondLegLink2
+copy     link       8  thirdLegLink1
+copy     link       9  thirdLegLink2
+copy     joint      0  secondLegJoint1
+copy     joint      1  thirdLegJoint1
+copy     joint      2  secondLegJoint2
+copy     joint      3  thirdLegJoint2
+copy     joint      4  secondLegJoint3
+copy     joint      5  thirdLegJoint3
+copy     joint      6  firstLegJoint1
+copy     joint      7  firstLegJoint2
+copy     joint      8  firstLegJoint3
+copy     drive      0  firstLegJoint2Drive
+copy     drive      1  firstLegJoint1Drive
+copy     drive      2  secondLegJoint1Drive
+copy     drive      3  thirdLegJoint2Drive
+copy     drive      4  secondLegJoint3Drive
+copy     drive      5  thirdLegJoint3Drive
+copy     drive      6  secondLegJoint2Drive
+copy     drive      7  thirdLegJoint1Drive
+copy     drive      8  firstLegJoint3Drive
+copy     sensor     0  thirdLegJoint3Sensor
+copy     sensor     1  secondLegJoint1Sensor
+copy     sensor     2  secondLegJoint2Sensor
+copy     sensor     3  firstLegJoint3Sensor
+copy     sensor     4  thirdLegJoint2Sensor
+copy     sensor     5  secondLegJoint3Sensor
+copy     sensor     6  thirdLegJoint1Sensor
+copy     sensor     7  firstLegJoint1Sensor
+copy     sensor     8  firstLegJoint2Sensor
+copy     point thirdFootLink  0  thirdFootLinkNormal
+copy     point thirdFootLink  1  thirdFootLinkDir
+copy     point thirdFootLink  2  thirdFootLinkBase
+copy     point firstFootLink  0  firstFootLinkNormal
+copy     point firstFootLink  1  firstFootLinkDir
+copy     point firstFootLink  2  firstFootLinkBase
+copy     point base  0  baseSecondBase
+copy     point base  1  baseSecondNormal
+copy     point base  2  baseSecondDir
+copy     point base  3  baseThirdDir
+copy     point base  4  baseFirstNormal
+copy     point base  5  baseFirstBase
+copy     point base  6  baseThirdNormal
+copy     point base  7  baseThirdBase
+copy     point base  8  baseFirstDir
+copy     point firstLegLink1  0  firstLegLink1PredDir
+copy     point firstLegLink1  1  firstLegLink1PredBase
+copy     point firstLegLink1  2  firstLegLink1SuccBase
+copy     point firstLegLink1  3  firstLegLink1SuccNormal
+copy     point firstLegLink1  4  firstLegLink1PredNormal
+copy     point firstLegLink1  5  firstLegLink1SuccDir
+copy     point firstLegLink2  0  firstLegLink2PredDir
+copy     point firstLegLink2  1  firstLegLink2PredBase
+copy     point firstLegLink2  2  firstLegLink2SuccBase
+copy     point firstLegLink2  3  firstLegLink2SuccNormal
+copy     point firstLegLink2  4  firstLegLink2SuccDir
+copy     point firstLegLink2  5  firstLegLink2PredNormal
+copy     point secondFootLink  0  secondFootLinkDir
+copy     point secondFootLink  1  secondFootLinkBase
+copy     point secondFootLink  2  secondFootLinkNormal
+copy     point secondLegLink1  0  secondLegLink1PredNormal
+copy     point secondLegLink1  1  secondLegLink1PredBase
+copy     point secondLegLink1  2  secondLegLink1SuccNormal
+copy     point secondLegLink1  3  secondLegLink1SuccDir
+copy     point secondLegLink1  4  secondLegLink1SuccBase
+copy     point secondLegLink1  5  secondLegLink1PredDir
+copy     point secondLegLink2  0  secondLegLink2PredNormal
+copy     point secondLegLink2  1  secondLegLink2PredBase
+copy     point secondLegLink2  2  secondLegLink2SuccDir
+copy     point secondLegLink2  3  secondLegLink2SuccNormal
+copy     point secondLegLink2  4  secondLegLink2SuccBase
+copy     point secondLegLink2  5  secondLegLink2PredDir
+copy     point thirdLegLink1  0  thirdLegLink1PredBase
+copy     point thirdLegLink1  1  thirdLegLink1SuccNormal
+copy     point thirdLegLink1  2  thirdLegLink1PredDir
+copy     point thirdLegLink1  3  thirdLegLink1SuccDir
+copy     point thirdLegLink1  4  thirdLegLink1SuccBase
+copy     point thirdLegLink1  5  thirdLegLink1PredNormal
+copy     point thirdLegLink2  0  thirdLegLink2PredBase
+copy     point thirdLegLink2  1  thirdLegLink2SuccNormal
+copy     point thirdLegLink2  2  thirdLegLink2PredDir
+copy     point thirdLegLink2  3  thirdLegLink2SuccBase
+copy     point thirdLegLink2  4  thirdLegLink2SuccDir
+copy     point thirdLegLink2  5  thirdLegLink2PredNormal
 == runnerNiceWalkingFitness.exp
-link   0  firstFootLink
-link   1  base
-link   2  firstLegLink1
-link   3  firstLegLink2
-link   4  secondFootLink
-link   5  secondLegLink1
-link   6  secondLegLink2
-joint  0  secondLegJoint1
-joint  1  secondLegJoint2
-joint  2  secondLegJoint3
-joint  3  firstLegJoint1
-joint  4  firstLegJoint2
-joint  5  firstLegJoint3
+loaded   body       0  legLink.wrl
+loaded   body       1  footLink.wrl
+loaded   body       2  base.wrl
+loaded   material   0  greenPlastic
+loaded   material   1  bluePlastic
+loaded   material   2  redPlastic
+loaded   link       0  firstFootLink
+loaded   link       1  base
+loaded   link       2  firstLegLink1
+loaded   link       3  firstLegLink2
+loaded   link       4  secondFootLink
+loaded   link       5  secondLegLink1
+loaded   link       6  secondLegLink2
+loaded   joint      0  secondLegJoint1
+loaded   joint      1  secondLegJoint2
+loaded   joint      2  secondLegJoint3
+loaded   joint      3  firstLegJoint1
+loaded   joint      4  firstLegJoint2
+loaded   joint      5  firstLegJoint3
+loaded   drive      0  firstLegJoint2Drive
+loaded   drive      1  firstLegJoint1Drive
+loaded   drive      2  secondLegJoint1Drive
+loaded   drive      3  secondLegJoint3Drive
+loaded   drive      4  secondLegJoint2Drive
+loaded   drive      5  firstLegJoint3Drive
+loaded   sensor     0  secondLegJoint1Sensor
+loaded   sensor     1  secondLegJoint2Sensor
+loaded   sensor     2  firstLegJoint3Sensor
+loaded   sensor     3  secondLegJoint3Sensor
+loaded   sensor     4  firstLegJoint1Sensor
+loaded   sensor     5  firstLegJoint2Sensor
+loaded   point firstFootLink  0  firstFootLinkDir
+loaded   point firstFootLink  1  firstFootLinkNormal
+loaded   point firstFootLink  2  firstFootLinkBase
+loaded   point base  0  baseSecondBase
+loaded   point base  1  baseSecondNormal
+loaded   point base  2  baseSecondDir
+loaded   point base  3  baseFirstNormal
+loaded   point base  4  baseFirstBase
+loaded   point base  5  baseFirstDir
+loaded   point firstLegLink1  0  firstLegLink1PredDir
+loaded   point firstLegLink1  1  firstLegLink1PredBase
+loaded   point firstLegLink1  2  firstLegLink1SuccBase
+loaded   point firstLegLink1  3  firstLegLink1SuccNormal
+loaded   point firstLegLink1  4  firstLegLink1PredNormal
+loaded   point firstLegLink1  5  firstLegLink1SuccDir
+loaded   point firstLegLink2  0  firstLegLink2PredDir
+loaded   point firstLegLink2  1  firstLegLink2PredBase
+loaded   point firstLegLink2  2  firstLegLink2SuccBase
+loaded   point firstLegLink2  3  firstLegLink2SuccNormal
+loaded   point firstLegLink2  4  firstLegLink2PredNormal
+loaded   point firstLegLink2  5  firstLegLink2SuccDir
+loaded   point secondFootLink  0  secondFootLinkDir
+loaded   point secondFootLink  1  secondFootLinkBase
+loaded   point secondFootLink  2  secondFootLinkNormal
+loaded   point secondLegLink1  0  secondLegLink1PredNormal
+loaded   point secondLegLink1  1  secondLegLink1PredBase
+loaded   point secondLegLink1  2  secondLegLink1SuccNormal
+loaded   point secondLegLink1  3  secondLegLink1SuccBase
+loaded   point secondLegLink1  4  secondLegLink1SuccDir
+loaded   point secondLegLink1  5  secondLegLink1PredDir
+loaded   point secondLegLink2  0  secondLegLink2PredNormal
+loaded   point secondLegLink2  1  secondLegLink2PredBase
+loaded   point secondLegLink2  2  secondLegLink2SuccDir
+loaded   point secondLegLink2  3  secondLegLink2SuccNormal
+loaded   point secondLegLink2  4  secondLegLink2SuccBase
+loaded   point secondLegLink2  5  secondLegLink2PredDir
+copy     body       0  footLink.wrl
+copy     body       1  legLink.wrl
+copy     body       2  base.wrl
+copy     material   0  greenPlastic
+copy     material   1  bluePlastic
+copy     material   2  redPlastic
+copy     link       0  firstFootLink
+copy     link       1  base
+copy     link       2  firstLegLink1
+copy     link       3  firstLegLink2
+copy     link       4  secondFootLink
+copy     link       5  secondLegLink1
+copy     link       6  secondLegLink2
+copy     joint      0  secondLegJoint1
+copy     joint      1  secondLegJoint2
+copy     joint      2  secondLegJoint3
+copy     joint      3  firstLegJoint1
+copy     joint      4  firstLegJoint2
+copy     joint      5  firstLegJoint3
+copy     drive      0  firstLegJoint2Drive
+copy     drive      1  firstLegJoint1Drive
+copy     drive      2  secondLegJoint1Drive
+copy     drive      3  secondLegJoint3Drive
+copy     drive      4  secondLegJoint2Drive
+copy     drive      5  firstLegJoint3Drive
+copy     sensor     0  secondLegJoint1Sensor
+copy     sensor     1  secondLegJoint2Sensor
+copy     sensor     2  firstLegJoint3Sensor
+copy     sensor     3  secondLegJoint3Sensor
+copy     sensor     4  firstLegJoint1Sensor
+copy     sensor     5  firstLegJoint2Sensor
+copy     point firstFootLink  0  firstFootLinkNormal
+copy     point firstFootLink  1  firstFootLinkDir
+copy     point firstFootLink  2  firstFootLinkBase
+copy     point base  0  baseSecondBase
+copy     point base  1  baseSecondNormal
+copy     point base  2  baseSecondDir
+copy     point base  3  baseFirstNormal
+copy     point base  4  baseFirstBase
+copy     point base  5  baseFirstDir
+copy     point firstLegLink1  0  firstLegLink1PredDir
+copy     point firstLegLink1  1  firstLegLink1PredBase
+copy     point firstLegLink1  2  firstLegLink1SuccBase
+copy     point firstLegLink1  3  firstLegLink1SuccNormal
+copy     point firstLegLink1  4  firstLegLink1PredNormal
+copy     point firstLegLink1  5  firstLegLink1SuccDir
+copy     point firstLegLink2  0  firstLegLink2PredDir
+copy     point firstLegLink2  1  firstLegLink2PredBase
+copy     point firstLegLink2  2  firstLegLink2SuccBase
+copy     point firstLegLink2  3  firstLegLink2SuccNormal
+copy     point firstLegLink2  4  firstLegLink2SuccDir
+copy     point firstLegLink2  5  firstLegLink2PredNormal
+copy     point secondFootLink  0  secondFootLinkDir
+copy     point secondFootLink  1  secondFootLinkBase
+copy     point secondFootLink  2  secondFootLinkNormal
+copy     point secondLegLink1  0  secondLegLink1PredNormal
+copy     point secondLegLink1  1  secondLegLink1PredBase
+copy     point secondLegLink1  2  secondLegLink1SuccNormal
+copy     point secondLegLink1  3  secondLegLink1SuccDir
+copy     point secondLegLink1  4  secondLegLink1SuccBase
+copy     point secondLegLink1  5  secondLegLink1PredDir
+copy     point secondLegLink2  0  secondLegLink2PredNormal
+copy     point secondLegLink2  1  secondLegLink2PredBase
+copy     point secondLegLink2  2  secondLegLink2SuccDir
+copy     point secondLegLink2  3  secondLegLink2SuccNormal
+copy     point secondLegLink2  4  secondLegLink2SuccBase
+copy     point secondLegLink2  5  secondLegLink2PredDir
 == runnerSimpleFitness.exp
-link   0  firstFootLink
-link   1  base
-link   2  firstLegLink1
-link   3  firstLegLink2
-link   4  secondFootLink
-link   5  secondLegLink1
-link   6  secondLegLink2
-joint  0  secondLegJoint1
-joint  1  secondLegJoint2
-joint  2  secondLegJoint3
-joint  3  firstLegJoint1
-joint  4  firstLegJoint2
-joint  5  firstLegJoint3
+loaded   body       0  footLink.wrl
+loaded   body       1  legLink.wrl
+loaded   body       2  base.wrl
+loaded   material   0  greenPlastic
+loaded   material   1  bluePlastic
+loaded   material   2  redPlastic
+loaded   link       0  firstFootLink
+loaded   link       1  base
+loaded   link       2  firstLegLink1
+loaded   link       3  firstLegLink2
+loaded   link       4  secondFootLink
+loaded   link       5  secondLegLink1
+loaded   link       6  secondLegLink2
+loaded   joint      0  secondLegJoint1
+loaded   joint      1  secondLegJoint2
+loaded   joint      2  secondLegJoint3
+loaded   joint      3  firstLegJoint1
+loaded   joint      4  firstLegJoint2
+loaded   joint      5  firstLegJoint3
+loaded   drive      0  firstLegJoint2Drive
+loaded   drive      1  firstLegJoint1Drive
+loaded   drive      2  secondLegJoint1Drive
+loaded   drive      3  secondLegJoint3Drive
+loaded   drive      4  secondLegJoint2Drive
+loaded   drive      5  firstLegJoint3Drive
+loaded   sensor     0  secondLegJoint1Sensor
+loaded   sensor     1  secondLegJoint2Sensor
+loaded   sensor     2  firstLegJoint3Sensor
+loaded   sensor     3  secondLegJoint3Sensor
+loaded   sensor     4  firstLegJoint1Sensor
+loaded   sensor     5  firstLegJoint2Sensor
+loaded   point firstFootLink  0  firstFootLinkNormal
+loaded   point firstFootLink  1  firstFootLinkDir
+loaded   point firstFootLink  2  firstFootLinkBase
+loaded   point base  0  baseSecondBase
+loaded   point base  1  baseSecondNormal
+loaded   point base  2  baseSecondDir
+loaded   point base  3  baseFirstNormal
+loaded   point base  4  baseFirstBase
+loaded   point base  5  baseFirstDir
+loaded   point firstLegLink1  0  firstLegLink1PredDir
+loaded   point firstLegLink1  1  firstLegLink1PredBase
+loaded   point firstLegLink1  2  firstLegLink1SuccBase
+loaded   point firstLegLink1  3  firstLegLink1SuccNormal
+loaded   point firstLegLink1  4  firstLegLink1PredNormal
+loaded   point firstLegLink1  5  firstLegLink1SuccDir
+loaded   point firstLegLink2  0  firstLegLink2PredDir
+loaded   point firstLegLink2  1  firstLegLink2PredBase
+loaded   point firstLegLink2  2  firstLegLink2SuccBase
+loaded   point firstLegLink2  3  firstLegLink2SuccNormal
+loaded   point firstLegLink2  4  firstLegLink2SuccDir
+loaded   point firstLegLink2  5  firstLegLink2PredNormal
+loaded   point secondFootLink  0  secondFootLinkDir
+loaded   point secondFootLink  1  secondFootLinkBase
+loaded   point secondFootLink  2  secondFootLinkNormal
+loaded   point secondLegLink1  0  secondLegLink1PredNormal
+loaded   point secondLegLink1  1  secondLegLink1PredBase
+loaded   point secondLegLink1  2  secondLegLink1SuccNormal
+loaded   point secondLegLink1  3  secondLegLink1SuccDir
+loaded   point secondLegLink1  4  secondLegLink1SuccBase
+loaded   point secondLegLink1  5  secondLegLink1PredDir
+loaded   point secondLegLink2  0  secondLegLink2PredNormal
+loaded   point secondLegLink2  1  secondLegLink2PredBase
+loaded   point secondLegLink2  2  secondLegLink2SuccDir
+loaded   point secondLegLink2  3  secondLegLink2SuccNormal
+loaded   point secondLegLink2  4  secondLegLink2SuccBase
+loaded   point secondLegLink2  5  secondLegLink2PredDir
+copy     body       0  legLink.wrl
+copy     body       1  footLink.wrl
+copy     body       2  base.wrl
+copy     material   0  greenPlastic
+copy     material   1  bluePlastic
+copy     material   2  redPlastic
+copy     link       0  firstFootLink
+copy     link       1  base
+copy     link       2  firstLegLink1
+copy     link       3  firstLegLink2
+copy     link       4  secondFootLink
+copy     link       5  secondLegLink1
+copy     link       6  secondLegLink2
+copy     joint      0  secondLegJoint1
+copy     joint      1  secondLegJoint2
+copy     joint      2  secondLegJoint3
+copy     joint      3  firstLegJoint1
+copy     joint      4  firstLegJoint2
+copy     joint      5  firstLegJoint3
+copy     drive      0  firstLegJoint2Drive
+copy     drive      1  firstLegJoint1Drive
+copy     drive      2  secondLegJoint1Drive
+copy     drive      3  secondLegJoint3Drive
+copy     drive      4  secondLegJoint2Drive
+copy     drive      5  firstLegJoint3Drive
+copy     sensor     0  secondLegJoint1Sensor
+copy     sensor     1  secondLegJoint2Sensor
+copy     sensor     2  firstLegJoint3Sensor
+copy     sensor     3  secondLegJoint3Sensor
+copy     sensor     4  firstLegJoint1Sensor
+copy     sensor     5  firstLegJoint2Sensor
+copy     point firstFootLink  0  firstFootLinkDir
+copy     point firstFootLink  1  firstFootLinkNormal
+copy     point firstFootLink  2  firstFootLinkBase
+copy     point base  0  baseSecondBase
+copy     point base  1  baseSecondNormal
+copy     point base  2  baseSecondDir
+copy     point base  3  baseFirstNormal
+copy     point base  4  baseFirstBase
+copy     point base  5  baseFirstDir
+copy     point firstLegLink1  0  firstLegLink1PredDir
+copy     point firstLegLink1  1  firstLegLink1PredBase
+copy     point firstLegLink1  2  firstLegLink1SuccBase
+copy     point firstLegLink1  3  firstLegLink1SuccNormal
+copy     point firstLegLink1  4  firstLegLink1PredNormal
+copy     point firstLegLink1  5  firstLegLink1SuccDir
+copy     point firstLegLink2  0  firstLegLink2PredDir
+copy     point firstLegLink2  1  firstLegLink2PredBase
+copy     point firstLegLink2  2  firstLegLink2SuccBase
+copy     point firstLegLink2  3  firstLegLink2SuccNormal
+copy     point firstLegLink2  4  firstLegLink2PredNormal
+copy     point firstLegLink2  5  firstLegLink2SuccDir
+copy     point secondFootLink  0  secondFootLinkDir
+copy     point secondFootLink  1  secondFootLinkBase
+copy     point secondFootLink  2  secondFootLinkNormal
+copy     point secondLegLink1  0  secondLegLink1PredNormal
+copy     point secondLegLink1  1  secondLegLink1PredBase
+copy     point secondLegLink1  2  secondLegLink1SuccNormal
+copy     point secondLegLink1  3  secondLegLink1SuccBase
+copy     point secondLegLink1  4  secondLegLink1SuccDir
+copy     point secondLegLink1  5  secondLegLink1PredDir
+copy     point secondLegLink2  0  secondLegLink2PredNormal
+copy     point secondLegLink2  1  secondLegLink2PredBase
+copy     point secondLegLink2  2  secondLegLink2SuccDir
+copy     point secondLegLink2  3  secondLegLink2SuccNormal
+copy     point secondLegLink2  4  secondLegLink2SuccBase
+copy     point secondLegLink2  5  secondLegLink2PredDir
 == shortHammerNiceWalkingFitness.exp
-link   0  base
-link   1  hammer
-link   2  middle1
-link   3  middle2
-joint  0  hinge1
-joint  1  hinge2
-joint  2  hinge3
+loaded   body       0  base.wrl
+loaded   body       1  effector.wrl
+loaded   body       2  middle.wrl
+loaded   material   0  plastic
+loaded   material   1  rubber
+loaded   material   2  metal
+loaded   link       0  base
+loaded   link       1  hammer
+loaded   link       2  middle1
+loaded   link       3  middle2
+loaded   joint      0  hinge1
+loaded   joint      1  hinge2
+loaded   joint      2  hinge3
+loaded   drive      0  hinge1Drive
+loaded   drive      1  hinge3Drive
+loaded   drive      2  hinge2Drive
+loaded   point base  0  BaseAxisSuccNormal
+loaded   point base  1  BaseAxisSuccDir
+loaded   point base  2  BaseAxisSuccBase
+loaded   point hammer  0  HammerPredAxisBase
+loaded   point hammer  1  HammerPredAxisDir
+loaded   point hammer  2  HammerPredAxisNormal
+loaded   point middle1  0  Middle1SuccAxisBase
+loaded   point middle1  1  Middle1PredAxisNormal
+loaded   point middle1  2  Middle1PredAxisBase
+loaded   point middle1  3  Middle1SuccAxisNormal
+loaded   point middle1  4  Middle1SuccAxisDir
+loaded   point middle1  5  Middle1PredAxisDir
+loaded   point middle2  0  Middle2PredAxisDir
+loaded   point middle2  1  Middle2PredAxisNormal
+loaded   point middle2  2  Middle2SuccAxisNormal
+loaded   point middle2  3  Middle2SuccAxisBase
+loaded   point middle2  4  Middle2PredAxisBase
+loaded   point middle2  5  Middle2SuccAxisDir
+copy     body       0  base.wrl
+copy     body       1  middle.wrl
+copy     body       2  effector.wrl
+copy     material   0  plastic
+copy     material   1  metal
+copy     material   2  rubber
+copy     link       0  base
+copy     link       1  hammer
+copy     link       2  middle1
+copy     link       3  middle2
+copy     joint      0  hinge1
+copy     joint      1  hinge2
+copy     joint      2  hinge3
+copy     drive      0  hinge1Drive
+copy     drive      1  hinge3Drive
+copy     drive      2  hinge2Drive
+copy     point base  0  BaseAxisSuccNormal
+copy     point base  1  BaseAxisSuccDir
+copy     point base  2  BaseAxisSuccBase
+copy     point hammer  0  HammerPredAxisBase
+copy     point hammer  1  HammerPredAxisDir
+copy     point hammer  2  HammerPredAxisNormal
+copy     point middle1  0  Middle1SuccAxisBase
+copy     point middle1  1  Middle1PredAxisNormal
+copy     point middle1  2  Middle1PredAxisBase
+copy     point middle1  3  Middle1SuccAxisNormal
+copy     point middle1  4  Middle1SuccAxisDir
+copy     point middle1  5  Middle1PredAxisDir
+copy     point middle2  0  Middle2PredAxisDir
+copy     point middle2  1  Middle2PredAxisNormal
+copy     point middle2  2  Middle2SuccAxisNormal
+copy     point middle2  3  Middle2SuccAxisBase
+copy     point middle2  4  Middle2PredAxisBase
+copy     point middle2  5  Middle2SuccAxisDir
 == twoBasesHardlyReducedIS.exp
-link   0  base1
-link   1  base2
-joint  0  hinge1
+loaded   body       0  base.wrl
+loaded   material   0  metal
+loaded   link       0  base1
+loaded   link       1  base2
+loaded   joint      0  hinge1
+loaded   drive      0  hinge1Drive
+loaded   sensor     0  hinge1Sensor
+loaded   point base1  0  Base1AxisSuccNormal
+loaded   point base1  1  Base1AxisSuccBase
+loaded   point base1  2  Base1AxisSuccDir
+loaded   point base2  0  Base2AxisSuccNormal
+loaded   point base2  1  Base2AxisSuccBase
+loaded   point base2  2  Base2AxisSuccDir
+copy     body       0  base.wrl
+copy     material   0  metal
+copy     link       0  base1
+copy     link       1  base2
+copy     joint      0  hinge1
+copy     drive      0  hinge1Drive
+copy     sensor     0  hinge1Sensor
+copy     point base1  0  Base1AxisSuccNormal
+copy     point base1  1  Base1AxisSuccBase
+copy     point base1  2  Base1AxisSuccDir
+copy     point base2  0  Base2AxisSuccNormal
+copy     point base2  1  Base2AxisSuccBase
+copy     point base2  2  Base2AxisSuccDir
 == twoBasesHighCrossOverRate.exp
-link   0  base1
-link   1  base2
-joint  0  hinge1
+loaded   body       0  base.wrl
+loaded   material   0  metal
+loaded   link       0  base1
+loaded   link       1  base2
+loaded   joint      0  hinge1
+loaded   drive      0  hinge1Drive
+loaded   sensor     0  hinge1Sensor
+loaded   point base1  0  Base1AxisSuccNormal
+loaded   point base1  1  Base1AxisSuccBase
+loaded   point base1  2  Base1AxisSuccDir
+loaded   point base2  0  Base2AxisSuccNormal
+loaded   point base2  1  Base2AxisSuccBase
+loaded   point base2  2  Base2AxisSuccDir
+copy     body       0  base.wrl
+copy     material   0  metal
+copy     link       0  base1
+copy     link       1  base2
+copy     joint      0  hinge1
+copy     drive      0  hinge1Drive
+copy     sensor     0  hinge1Sensor
+copy     point base1  0  Base1AxisSuccNormal
+copy     point base1  1  Base1AxisSuccBase
+copy     point base1  2  Base1AxisSuccDir
+copy     point base2  0  Base2AxisSuccNormal
+copy     point base2  1  Base2AxisSuccBase
+copy     point base2  2  Base2AxisSuccDir
 == twoBasesHighMutationRate.exp
-link   0  base1
-link   1  base2
-joint  0  hinge1
+loaded   body       0  base.wrl
+loaded   material   0  metal
+loaded   link       0  base1
+loaded   link       1  base2
+loaded   joint      0  hinge1
+loaded   drive      0  hinge1Drive
+loaded   sensor     0  hinge1Sensor
+loaded   point base1  0  Base1AxisSuccNormal
+loaded   point base1  1  Base1AxisSuccBase
+loaded   point base1  2  Base1AxisSuccDir
+loaded   point base2  0  Base2AxisSuccNormal
+loaded   point base2  1  Base2AxisSuccBase
+loaded   point base2  2  Base2AxisSuccDir
+copy     body       0  base.wrl
+copy     material   0  metal
+copy     link       0  base1
+copy     link       1  base2
+copy     joint      0  hinge1
+copy     drive      0  hinge1Drive
+copy     sensor     0  hinge1Sensor
+copy     point base1  0  Base1AxisSuccNormal
+copy     point base1  1  Base1AxisSuccBase
+copy     point base1  2  Base1AxisSuccDir
+copy     point base2  0  Base2AxisSuccNormal
+copy     point base2  1  Base2AxisSuccBase
+copy     point base2  2  Base2AxisSuccDir
 == twoBasesReducedInstructionSet.exp
-link   0  base1
-link   1  base2
-joint  0  hinge1
+loaded   body       0  base.wrl
+loaded   material   0  metal
+loaded   link       0  base1
+loaded   link       1  base2
+loaded   joint      0  hinge1
+loaded   drive      0  hinge1Drive
+loaded   sensor     0  hinge1Sensor
+loaded   point base1  0  Base1AxisSuccNormal
+loaded   point base1  1  Base1AxisSuccBase
+loaded   point base1  2  Base1AxisSuccDir
+loaded   point base2  0  Base2AxisSuccNormal
+loaded   point base2  1  Base2AxisSuccBase
+loaded   point base2  2  Base2AxisSuccDir
+copy     body       0  base.wrl
+copy     material   0  metal
+copy     link       0  base1
+copy     link       1  base2
+copy     joint      0  hinge1
+copy     drive      0  hinge1Drive
+copy     sensor     0  hinge1Sensor
+copy     point base1  0  Base1AxisSuccNormal
+copy     point base1  1  Base1AxisSuccBase
+copy     point base1  2  Base1AxisSuccDir
+copy     point base2  0  Base2AxisSuccNormal
+copy     point base2  1  Base2AxisSuccBase
+copy     point base2  2  Base2AxisSuccDir
 == twoBasesSimpleFitness1.exp
-link   0  base1
-link   1  base2
-joint  0  hinge1
+loaded   body       0  base.wrl
+loaded   material   0  metal
+loaded   link       0  base1
+loaded   link       1  base2
+loaded   joint      0  hinge1
+loaded   drive      0  hinge1Drive
+loaded   sensor     0  hinge1Sensor
+loaded   point base1  0  Base1AxisSuccNormal
+loaded   point base1  1  Base1AxisSuccBase
+loaded   point base1  2  Base1AxisSuccDir
+loaded   point base2  0  Base2AxisSuccNormal
+loaded   point base2  1  Base2AxisSuccBase
+loaded   point base2  2  Base2AxisSuccDir
+copy     body       0  base.wrl
+copy     material   0  metal
+copy     link       0  base1
+copy     link       1  base2
+copy     joint      0  hinge1
+copy     drive      0  hinge1Drive
+copy     sensor     0  hinge1Sensor
+copy     point base1  0  Base1AxisSuccNormal
+copy     point base1  1  Base1AxisSuccBase
+copy     point base1  2  Base1AxisSuccDir
+copy     point base2  0  Base2AxisSuccNormal
+copy     point base2  1  Base2AxisSuccBase
+copy     point base2  2  Base2AxisSuccDir
 == twoBasesSimpleFitness2.exp
-link   0  base1
-link   1  base2
-joint  0  hinge1
+loaded   body       0  base.wrl
+loaded   material   0  metal
+loaded   link       0  base1
+loaded   link       1  base2
+loaded   joint      0  hinge1
+loaded   drive      0  hinge1Drive
+loaded   sensor     0  hinge1Sensor
+loaded   point base1  0  Base1AxisSuccNormal
+loaded   point base1  1  Base1AxisSuccBase
+loaded   point base1  2  Base1AxisSuccDir
+loaded   point base2  0  Base2AxisSuccNormal
+loaded   point base2  1  Base2AxisSuccBase
+loaded   point base2  2  Base2AxisSuccDir
+copy     body       0  base.wrl
+copy     material   0  metal
+copy     link       0  base1
+copy     link       1  base2
+copy     joint      0  hinge1
+copy     drive      0  hinge1Drive
+copy     sensor     0  hinge1Sensor
+copy     point base1  0  Base1AxisSuccNormal
+copy     point base1  1  Base1AxisSuccBase
+copy     point base1  2  Base1AxisSuccDir
+copy     point base2  0  Base2AxisSuccNormal
+copy     point base2  1  Base2AxisSuccBase
+copy     point base2  2  Base2AxisSuccDir
 == walkerNiceWalkingFitness.exp
-link   0  shoulder5
-link   1  body
-link   2  shoulder6
-link   3  foot1
-link   4  foot2
-link   5  foot3
-link   6  foot4
-link   7  foot5
-link   8  foot6
-link   9  leg1
-link  10  leg2
-link  11  leg3
-link  12  leg4
-link  13  leg5
-link  14  leg6
-link  15  shoulder1
-link  16  shoulder2
-link  17  shoulder3
-link  18  shoulder4
-joint  0  leg6Joint1
-joint  1  leg5Joint2
-joint  2  leg4Joint3
-joint  3  leg6Joint2
-joint  4  leg5Joint3
-joint  5  leg6Joint3
-joint  6  leg1Joint1
-joint  7  leg2Joint1
-joint  8  leg1Joint2
-joint  9  leg3Joint1
-joint 10  leg2Joint2
-joint 11  leg1Joint3
-joint 12  leg4Joint1
-joint 13  leg3Joint2
-joint 14  leg2Joint3
-joint 15  leg5Joint1
-joint 16  leg4Joint2
-joint 17  leg3Joint3
+loaded   body       0  foot.wrl
+loaded   body       1  body.wrl
+loaded   body       2  shoulder.wrl
+loaded   body       3  leg.wrl
+loaded   material   0  legMaterial
+loaded   material   1  footMaterial
+loaded   material   2  bodyMaterial
+loaded   material   3  shoulderMaterial
+loaded   link       0  body
+loaded   link       1  shoulder5
+loaded   link       2  foot1
+loaded   link       3  shoulder6
+loaded   link       4  foot2
+loaded   link       5  foot3
+loaded   link       6  foot4
+loaded   link       7  foot5
+loaded   link       8  foot6
+loaded   link       9  leg1
+loaded   link      10  leg2
+loaded   link      11  leg3
+loaded   link      12  leg4
+loaded   link      13  leg5
+loaded   link      14  leg6
+loaded   link      15  shoulder1
+loaded   link      16  shoulder2
+loaded   link      17  shoulder3
+loaded   link      18  shoulder4
+loaded   joint      0  leg4Joint3
+loaded   joint      1  leg5Joint2
+loaded   joint      2  leg6Joint1
+loaded   joint      3  leg5Joint3
+loaded   joint      4  leg6Joint2
+loaded   joint      5  leg6Joint3
+loaded   joint      6  leg1Joint1
+loaded   joint      7  leg1Joint2
+loaded   joint      8  leg2Joint1
+loaded   joint      9  leg1Joint3
+loaded   joint     10  leg2Joint2
+loaded   joint     11  leg3Joint1
+loaded   joint     12  leg2Joint3
+loaded   joint     13  leg3Joint2
+loaded   joint     14  leg4Joint1
+loaded   joint     15  leg3Joint3
+loaded   joint     16  leg4Joint2
+loaded   joint     17  leg5Joint1
+loaded   drive      0  leg4Joint1Drive
+loaded   drive      1  leg5Joint2Drive
+loaded   drive      2  leg6Joint3Drive
+loaded   drive      3  leg1Joint1Drive
+loaded   drive      4  leg2Joint1Drive
+loaded   drive      5  leg1Joint3Drive
+loaded   drive      6  leg2Joint2Drive
+loaded   drive      7  leg1Joint2Drive
+loaded   drive      8  leg2Joint3Drive
+loaded   drive      9  leg3Joint3Drive
+loaded   drive     10  leg4Joint2Drive
+loaded   drive     11  leg5Joint1Drive
+loaded   drive     12  leg3Joint2Drive
+loaded   drive     13  leg4Joint3Drive
+loaded   drive     14  leg6Joint1Drive
+loaded   drive     15  leg3Joint1Drive
+loaded   drive     16  leg5Joint3Drive
+loaded   drive     17  leg6Joint2Drive
+loaded   sensor     0  leg5Joint1Sensor
+loaded   sensor     1  leg6Joint2Sensor
+loaded   sensor     2  leg5Joint2Sensor
+loaded   sensor     3  leg6Joint1Sensor
+loaded   sensor     4  leg1Joint3Sensor
+loaded   sensor     5  leg3Joint1Sensor
+loaded   sensor     6  leg4Joint2Sensor
+loaded   sensor     7  leg2Joint3Sensor
+loaded   sensor     8  leg3Joint2Sensor
+loaded   sensor     9  leg4Joint1Sensor
+loaded   sensor    10  leg1Joint1Sensor
+loaded   sensor    11  leg2Joint2Sensor
+loaded   sensor    12  leg3Joint3Sensor
+loaded   sensor    13  leg1Joint2Sensor
+loaded   sensor    14  leg2Joint1Sensor
+loaded   sensor    15  leg4Joint3Sensor
+loaded   sensor    16  leg5Joint3Sensor
+loaded   sensor    17  leg6Joint3Sensor
+loaded   point body  0  bodyLeg4Normal
+loaded   point body  1  bodyLeg6Dir
+loaded   point body  2  bodyLeg5Base
+loaded   point body  3  bodyLeg4Base
+loaded   point body  4  bodyLeg4Dir
+loaded   point body  5  bodyLeg1Normal
+loaded   point body  6  bodyLeg5Dir
+loaded   point body  7  bodyLeg6Normal
+loaded   point body  8  bodyLeg6Base
+loaded   point body  9  bodyLeg3Normal
+loaded   point body 10  bodyLeg1Base
+loaded   point body 11  bodyLeg2Normal
+loaded   point body 12  bodyLeg3Base
+loaded   point body 13  bodyLeg2Base
+loaded   point body 14  bodyLeg2Dir
+loaded   point body 15  bodyLeg3Dir
+loaded   point body 16  bodyLeg1Dir
+loaded   point body 17  bodyLeg5Normal
+loaded   point shoulder5  0  shoulder5PredDir
+loaded   point shoulder5  1  shoulder5SuccNormal
+loaded   point shoulder5  2  shoulder5PredBase
+loaded   point shoulder5  3  shoulder5SuccDir
+loaded   point shoulder5  4  shoulder5PredNormal
+loaded   point shoulder5  5  shoulder5SuccBase
+loaded   point foot1  0  foot1PredBase
+loaded   point foot1  1  foot1PredDir
+loaded   point foot1  2  foot1PredNormal
+loaded   point shoulder6  0  shoulder6SuccBase
+loaded   point shoulder6  1  shoulder6PredDir
+loaded   point shoulder6  2  shoulder6SuccNormal
+loaded   point shoulder6  3  shoulder6PredBase
+loaded   point shoulder6  4  shoulder6SuccDir
+loaded   point shoulder6  5  shoulder6PredNormal
+loaded   point foot2  0  foot2PredBase
+loaded   point foot2  1  foot2PredDir
+loaded   point foot2  2  foot2PredNormal
+loaded   point foot3  0  foot3PredDir
+loaded   point foot3  1  foot3PredBase
+loaded   point foot3  2  foot3PredNormal
+loaded   point foot4  0  foot4PredDir
+loaded   point foot4  1  foot4PredBase
+loaded   point foot4  2  foot4PredNormal
+loaded   point foot5  0  foot5PredDir
+loaded   point foot5  1  foot5PredNormal
+loaded   point foot5  2  foot5PredBase
+loaded   point foot6  0  foot6PredDir
+loaded   point foot6  1  foot6PredNormal
+loaded   point foot6  2  foot6PredBase
+loaded   point leg1  0  leg1PredNormal
+loaded   point leg1  1  leg1SuccBase
+loaded   point leg1  2  leg1SuccNormal
+loaded   point leg1  3  leg1SuccDir
+loaded   point leg1  4  leg1PredBase
+loaded   point leg1  5  leg1PredDir
+loaded   point leg2  0  leg2PredNormal
+loaded   point leg2  1  leg2SuccDir
+loaded   point leg2  2  leg2PredDir
+loaded   point leg2  3  leg2SuccBase
+loaded   point leg2  4  leg2SuccNormal
+loaded   point leg2  5  leg2PredBase
+loaded   point leg3  0  leg3SuccNormal
+loaded   point leg3  1  leg3SuccDir
+loaded   point leg3  2  leg3PredDir
+loaded   point leg3  3  leg3SuccBase
+loaded   point leg3  4  leg3PredNormal
+loaded   point leg3  5  leg3PredBase
+loaded   point leg4  0  leg4SuccDir
+loaded   point leg4  1  leg4SuccNormal
+loaded   point leg4  2  leg4PredDir
+loaded   point leg4  3  leg4SuccBase
+loaded   point leg4  4  leg4PredNormal
+loaded   point leg4  5  leg4PredBase
+loaded   point leg5  0  leg5PredBase
+loaded   point leg5  1  leg5SuccNormal
+loaded   point leg5  2  leg5SuccDir
+loaded   point leg5  3  leg5PredDir
+loaded   point leg5  4  leg5PredNormal
+loaded   point leg5  5  leg5SuccBase
+loaded   point leg6  0  leg6PredBase
+loaded   point leg6  1  leg6SuccDir
+loaded   point leg6  2  leg6SuccNormal
+loaded   point leg6  3  leg6PredDir
+loaded   point leg6  4  leg6PredNormal
+loaded   point leg6  5  leg6SuccBase
+loaded   point shoulder1  0  shoulder1SuccDir
+loaded   point shoulder1  1  shoulder1SuccBase
+loaded   point shoulder1  2  shoulder1PredNormal
+loaded   point shoulder1  3  shoulder1PredBase
+loaded   point shoulder1  4  shoulder1PredDir
+loaded   point shoulder1  5  shoulder1SuccNormal
+loaded   point shoulder2  0  shoulder2SuccDir
+loaded   point shoulder2  1  shoulder2SuccBase
+loaded   point shoulder2  2  shoulder2PredNormal
+loaded   point shoulder2  3  shoulder2PredBase
+loaded   point shoulder2  4  shoulder2PredDir
+loaded   point shoulder2  5  shoulder2SuccNormal
+loaded   point shoulder3  0  shoulder3PredDir
+loaded   point shoulder3  1  shoulder3SuccNormal
+loaded   point shoulder3  2  shoulder3SuccBase
+loaded   point shoulder3  3  shoulder3SuccDir
+loaded   point shoulder3  4  shoulder3PredNormal
+loaded   point shoulder3  5  shoulder3PredBase
+loaded   point shoulder4  0  shoulder4SuccNormal
+loaded   point shoulder4  1  shoulder4SuccBase
+loaded   point shoulder4  2  shoulder4SuccDir
+loaded   point shoulder4  3  shoulder4PredNormal
+loaded   point shoulder4  4  shoulder4PredBase
+loaded   point shoulder4  5  shoulder4PredDir
+copy     body       0  foot.wrl
+copy     body       1  body.wrl
+copy     body       2  shoulder.wrl
+copy     body       3  leg.wrl
+copy     material   0  footMaterial
+copy     material   1  legMaterial
+copy     material   2  bodyMaterial
+copy     material   3  shoulderMaterial
+copy     link       0  shoulder5
+copy     link       1  body
+copy     link       2  shoulder6
+copy     link       3  foot1
+copy     link       4  foot2
+copy     link       5  foot3
+copy     link       6  foot4
+copy     link       7  foot5
+copy     link       8  foot6
+copy     link       9  leg1
+copy     link      10  leg2
+copy     link      11  leg3
+copy     link      12  leg4
+copy     link      13  leg5
+copy     link      14  leg6
+copy     link      15  shoulder1
+copy     link      16  shoulder2
+copy     link      17  shoulder3
+copy     link      18  shoulder4
+copy     joint      0  leg6Joint1
+copy     joint      1  leg5Joint2
+copy     joint      2  leg4Joint3
+copy     joint      3  leg6Joint2
+copy     joint      4  leg5Joint3
+copy     joint      5  leg6Joint3
+copy     joint      6  leg1Joint1
+copy     joint      7  leg2Joint1
+copy     joint      8  leg1Joint2
+copy     joint      9  leg3Joint1
+copy     joint     10  leg2Joint2
+copy     joint     11  leg1Joint3
+copy     joint     12  leg4Joint1
+copy     joint     13  leg3Joint2
+copy     joint     14  leg2Joint3
+copy     joint     15  leg5Joint1
+copy     joint     16  leg4Joint2
+copy     joint     17  leg3Joint3
+copy     drive      0  leg6Joint3Drive
+copy     drive      1  leg5Joint2Drive
+copy     drive      2  leg4Joint1Drive
+copy     drive      3  leg1Joint1Drive
+copy     drive      4  leg2Joint1Drive
+copy     drive      5  leg2Joint2Drive
+copy     drive      6  leg1Joint3Drive
+copy     drive      7  leg2Joint3Drive
+copy     drive      8  leg1Joint2Drive
+copy     drive      9  leg5Joint1Drive
+copy     drive     10  leg4Joint2Drive
+copy     drive     11  leg3Joint3Drive
+copy     drive     12  leg6Joint1Drive
+copy     drive     13  leg4Joint3Drive
+copy     drive     14  leg3Joint2Drive
+copy     drive     15  leg6Joint2Drive
+copy     drive     16  leg5Joint3Drive
+copy     drive     17  leg3Joint1Drive
+copy     sensor     0  leg6Joint2Sensor
+copy     sensor     1  leg5Joint1Sensor
+copy     sensor     2  leg6Joint1Sensor
+copy     sensor     3  leg5Joint2Sensor
+copy     sensor     4  leg4Joint2Sensor
+copy     sensor     5  leg3Joint1Sensor
+copy     sensor     6  leg1Joint3Sensor
+copy     sensor     7  leg4Joint1Sensor
+copy     sensor     8  leg3Joint2Sensor
+copy     sensor     9  leg2Joint3Sensor
+copy     sensor    10  leg3Joint3Sensor
+copy     sensor    11  leg2Joint2Sensor
+copy     sensor    12  leg1Joint1Sensor
+copy     sensor    13  leg4Joint3Sensor
+copy     sensor    14  leg2Joint1Sensor
+copy     sensor    15  leg1Joint2Sensor
+copy     sensor    16  leg5Joint3Sensor
+copy     sensor    17  leg6Joint3Sensor
+copy     point shoulder5  0  shoulder5SuccNormal
+copy     point shoulder5  1  shoulder5PredDir
+copy     point shoulder5  2  shoulder5PredBase
+copy     point shoulder5  3  shoulder5SuccDir
+copy     point shoulder5  4  shoulder5PredNormal
+copy     point shoulder5  5  shoulder5SuccBase
+copy     point body  0  bodyLeg4Normal
+copy     point body  1  bodyLeg6Dir
+copy     point body  2  bodyLeg5Base
+copy     point body  3  bodyLeg4Dir
+copy     point body  4  bodyLeg4Base
+copy     point body  5  bodyLeg6Normal
+copy     point body  6  bodyLeg5Dir
+copy     point body  7  bodyLeg1Normal
+copy     point body  8  bodyLeg6Base
+copy     point body  9  bodyLeg3Normal
+copy     point body 10  bodyLeg2Normal
+copy     point body 11  bodyLeg1Base
+copy     point body 12  bodyLeg3Base
+copy     point body 13  bodyLeg2Base
+copy     point body 14  bodyLeg2Dir
+copy     point body 15  bodyLeg3Dir
+copy     point body 16  bodyLeg5Normal
+copy     point body 17  bodyLeg1Dir
+copy     point shoulder6  0  shoulder6SuccBase
+copy     point shoulder6  1  shoulder6PredDir
+copy     point shoulder6  2  shoulder6SuccNormal
+copy     point shoulder6  3  shoulder6SuccDir
+copy     point shoulder6  4  shoulder6PredBase
+copy     point shoulder6  5  shoulder6PredNormal
+copy     point foot1  0  foot1PredBase
+copy     point foot1  1  foot1PredDir
+copy     point foot1  2  foot1PredNormal
+copy     point foot2  0  foot2PredBase
+copy     point foot2  1  foot2PredDir
+copy     point foot2  2  foot2PredNormal
+copy     point foot3  0  foot3PredDir
+copy     point foot3  1  foot3PredBase
+copy     point foot3  2  foot3PredNormal
+copy     point foot4  0  foot4PredDir
+copy     point foot4  1  foot4PredBase
+copy     point foot4  2  foot4PredNormal
+copy     point foot5  0  foot5PredDir
+copy     point foot5  1  foot5PredNormal
+copy     point foot5  2  foot5PredBase
+copy     point foot6  0  foot6PredDir
+copy     point foot6  1  foot6PredNormal
+copy     point foot6  2  foot6PredBase
+copy     point leg1  0  leg1PredNormal
+copy     point leg1  1  leg1SuccNormal
+copy     point leg1  2  leg1SuccBase
+copy     point leg1  3  leg1SuccDir
+copy     point leg1  4  leg1PredDir
+copy     point leg1  5  leg1PredBase
+copy     point leg2  0  leg2PredNormal
+copy     point leg2  1  leg2SuccDir
+copy     point leg2  2  leg2SuccNormal
+copy     point leg2  3  leg2SuccBase
+copy     point leg2  4  leg2PredDir
+copy     point leg2  5  leg2PredBase
+copy     point leg3  0  leg3SuccNormal
+copy     point leg3  1  leg3SuccDir
+copy     point leg3  2  leg3PredDir
+copy     point leg3  3  leg3SuccBase
+copy     point leg3  4  leg3PredNormal
+copy     point leg3  5  leg3PredBase
+copy     point leg4  0  leg4SuccNormal
+copy     point leg4  1  leg4SuccDir
+copy     point leg4  2  leg4PredDir
+copy     point leg4  3  leg4SuccBase
+copy     point leg4  4  leg4PredNormal
+copy     point leg4  5  leg4PredBase
+copy     point leg5  0  leg5PredBase
+copy     point leg5  1  leg5SuccNormal
+copy     point leg5  2  leg5SuccDir
+copy     point leg5  3  leg5PredDir
+copy     point leg5  4  leg5PredNormal
+copy     point leg5  5  leg5SuccBase
+copy     point leg6  0  leg6PredBase
+copy     point leg6  1  leg6SuccNormal
+copy     point leg6  2  leg6SuccDir
+copy     point leg6  3  leg6PredDir
+copy     point leg6  4  leg6PredNormal
+copy     point leg6  5  leg6SuccBase
+copy     point shoulder1  0  shoulder1SuccDir
+copy     point shoulder1  1  shoulder1SuccBase
+copy     point shoulder1  2  shoulder1PredNormal
+copy     point shoulder1  3  shoulder1PredBase
+copy     point shoulder1  4  shoulder1PredDir
+copy     point shoulder1  5  shoulder1SuccNormal
+copy     point shoulder2  0  shoulder2SuccDir
+copy     point shoulder2  1  shoulder2SuccBase
+copy     point shoulder2  2  shoulder2PredNormal
+copy     point shoulder2  3  shoulder2PredBase
+copy     point shoulder2  4  shoulder2PredDir
+copy     point shoulder2  5  shoulder2SuccNormal
+copy     point shoulder3  0  shoulder3SuccNormal
+copy     point shoulder3  1  shoulder3PredDir
+copy     point shoulder3  2  shoulder3SuccBase
+copy     point shoulder3  3  shoulder3SuccDir
+copy     point shoulder3  4  shoulder3PredNormal
+copy     point shoulder3  5  shoulder3PredBase
+copy     point shoulder4  0  shoulder4SuccNormal
+copy     point shoulder4  1  shoulder4SuccBase
+copy     point shoulder4  2  shoulder4SuccDir
+copy     point shoulder4  3  shoulder4PredNormal
+copy     point shoulder4  4  shoulder4PredBase
+copy     point shoulder4  5  shoulder4PredDir
+== hammer.rrb
+rrb      body       0  base.wrl
+rrb      body       1  effector.wrl
+rrb      body       2  middle.wrl
+rrb      material   0  plastic
+rrb      material   1  rubber
+rrb      material   2  metal
+rrb      link       0  base
+rrb      link       1  hammer
+rrb      link       2  middle1
+rrb      link       3  middle2
+rrb      link       4  middle3
+rrb      joint      0  hinge1
+rrb      joint      1  hinge2
+rrb      joint      2  hinge3
+rrb      joint      3  hinge4
+rrb      drive      0  hinge1Drive
+rrb      drive      1  hinge3Drive
+rrb      drive      2  hinge2Drive
+rrb      drive      3  hinge4Drive
+rrb      point base  0  BaseAxisSuccNormal
+rrb      point base  1  BaseAxisSuccDir
+rrb      point base  2  BaseAxisSuccBase
+rrb      point hammer  0  HammerPredAxisBase
+rrb      point hammer  1  HammerPredAxisDir
+rrb      point hammer  2  HammerPredAxisNormal
+rrb      point middle1  0  Middle1SuccAxisBase
+rrb      point middle1  1  Middle1PredAxisNormal
+rrb      point middle1  2  Middle1PredAxisBase
+rrb      point middle1  3  Middle1SuccAxisNormal
+rrb      point middle1  4  Middle1SuccAxisDir
+rrb      point middle1  5  Middle1PredAxisDir
+rrb      point middle2  0  Middle2PredAxisDir
+rrb      point middle2  1  Middle2PredAxisNormal
+rrb      point middle2  2  Middle2SuccAxisNormal
+rrb      point middle2  3  Middle2SuccAxisBase
+rrb      point middle2  4  Middle2PredAxisBase
+rrb      point middle2  5  Middle2SuccAxisDir
+rrb      point middle3  0  Middle3PredAxisNormal
+rrb      point middle3  1  Middle3SuccAxisBase
+rrb      point middle3  2  Middle3SuccAxisNormal
+rrb      point middle3  3  Middle3SuccAxisDir
+rrb      point middle3  4  Middle3PredAxisDir
+rrb      point middle3  5  Middle3PredAxisBase
+== insect.rrb
+rrb      body       0  foot.wrl
+rrb      body       1  body.wrl
+rrb      body       2  leg.wrl
+rrb      material   0  footMaterial
+rrb      material   1  legMaterial
+rrb      material   2  bodyMaterial
+rrb      link       0  body
+rrb      link       1  foot1
+rrb      link       2  foot2
+rrb      link       3  foot3
+rrb      link       4  foot4
+rrb      link       5  foot5
+rrb      link       6  foot6
+rrb      link       7  leg1
+rrb      link       8  leg2
+rrb      link       9  leg3
+rrb      link      10  leg4
+rrb      link      11  leg5
+rrb      link      12  leg6
+rrb      joint      0  leg6Joint1
+rrb      joint      1  leg5Joint2
+rrb      joint      2  leg6Joint2
+rrb      joint      3  leg1Joint1
+rrb      joint      4  leg2Joint1
+rrb      joint      5  leg1Joint2
+rrb      joint      6  leg3Joint1
+rrb      joint      7  leg2Joint2
+rrb      joint      8  leg4Joint1
+rrb      joint      9  leg3Joint2
+rrb      joint     10  leg5Joint1
+rrb      joint     11  leg4Joint2
+rrb      drive      0  leg5Joint2Drive
+rrb      drive      1  leg4Joint1Drive
+rrb      drive      2  leg1Joint1Drive
+rrb      drive      3  leg2Joint1Drive
+rrb      drive      4  leg2Joint2Drive
+rrb      drive      5  leg1Joint2Drive
+rrb      drive      6  leg5Joint1Drive
+rrb      drive      7  leg4Joint2Drive
+rrb      drive      8  leg6Joint1Drive
+rrb      drive      9  leg3Joint2Drive
+rrb      drive     10  leg6Joint2Drive
+rrb      drive     11  leg3Joint1Drive
+rrb      sensor     0  leg6Joint2Sensor
+rrb      sensor     1  leg5Joint1Sensor
+rrb      sensor     2  leg6Joint1Sensor
+rrb      sensor     3  leg5Joint2Sensor
+rrb      sensor     4  leg4Joint2Sensor
+rrb      sensor     5  leg3Joint1Sensor
+rrb      sensor     6  leg4Joint1Sensor
+rrb      sensor     7  leg3Joint2Sensor
+rrb      sensor     8  leg2Joint2Sensor
+rrb      sensor     9  leg1Joint1Sensor
+rrb      sensor    10  leg2Joint1Sensor
+rrb      sensor    11  leg1Joint2Sensor
+rrb      point body  0  bodyLeg4Normal
+rrb      point body  1  bodyLeg6Dir
+rrb      point body  2  bodyLeg5Base
+rrb      point body  3  bodyLeg4Dir
+rrb      point body  4  bodyLeg4Base
+rrb      point body  5  bodyLeg6Normal
+rrb      point body  6  bodyLeg5Dir
+rrb      point body  7  bodyLeg1Normal
+rrb      point body  8  bodyLeg6Base
+rrb      point body  9  bodyLeg3Normal
+rrb      point body 10  bodyLeg2Normal
+rrb      point body 11  bodyLeg1Base
+rrb      point body 12  bodyLeg3Base
+rrb      point body 13  bodyLeg2Base
+rrb      point body 14  bodyLeg2Dir
+rrb      point body 15  bodyLeg3Dir
+rrb      point body 16  bodyLeg5Normal
+rrb      point body 17  bodyLeg1Dir
+rrb      point foot1  0  foot1PredBase
+rrb      point foot1  1  foot1PredDir
+rrb      point foot1  2  foot1PredNormal
+rrb      point foot2  0  foot2PredBase
+rrb      point foot2  1  foot2PredDir
+rrb      point foot2  2  foot2PredNormal
+rrb      point foot3  0  foot3PredDir
+rrb      point foot3  1  foot3PredBase
+rrb      point foot3  2  foot3PredNormal
+rrb      point foot4  0  foot4PredDir
+rrb      point foot4  1  foot4PredBase
+rrb      point foot4  2  foot4PredNormal
+rrb      point foot5  0  foot5PredDir
+rrb      point foot5  1  foot5PredNormal
+rrb      point foot5  2  foot5PredBase
+rrb      point foot6  0  foot6PredDir
+rrb      point foot6  1  foot6PredNormal
+rrb      point foot6  2  foot6PredBase
+rrb      point leg1  0  leg1PredNormal
+rrb      point leg1  1  leg1SuccNormal
+rrb      point leg1  2  leg1SuccBase
+rrb      point leg1  3  leg1SuccDir
+rrb      point leg1  4  leg1PredDir
+rrb      point leg1  5  leg1PredBase
+rrb      point leg2  0  leg2PredNormal
+rrb      point leg2  1  leg2SuccDir
+rrb      point leg2  2  leg2SuccNormal
+rrb      point leg2  3  leg2SuccBase
+rrb      point leg2  4  leg2PredDir
+rrb      point leg2  5  leg2PredBase
+rrb      point leg3  0  leg3SuccNormal
+rrb      point leg3  1  leg3SuccDir
+rrb      point leg3  2  leg3PredDir
+rrb      point leg3  3  leg3SuccBase
+rrb      point leg3  4  leg3PredNormal
+rrb      point leg3  5  leg3PredBase
+rrb      point leg4  0  leg4SuccNormal
+rrb      point leg4  1  leg4SuccDir
+rrb      point leg4  2  leg4PredDir
+rrb      point leg4  3  leg4SuccBase
+rrb      point leg4  4  leg4PredNormal
+rrb      point leg4  5  leg4PredBase
+rrb      point leg5  0  leg5PredBase
+rrb      point leg5  1  leg5SuccNormal
+rrb      point leg5  2  leg5SuccDir
+rrb      point leg5  3  leg5PredDir
+rrb      point leg5  4  leg5PredNormal
+rrb      point leg5  5  leg5SuccBase
+rrb      point leg6  0  leg6PredBase
+rrb      point leg6  1  leg6SuccNormal
+rrb      point leg6  2  leg6SuccDir
+rrb      point leg6  3  leg6PredDir
+rrb      point leg6  4  leg6PredNormal
+rrb      point leg6  5  leg6SuccBase
+== octopus.rrb
+rrb      body       0  footLink.wrl
+rrb      body       1  legLink.wrl
+rrb      body       2  tripleBase.wrl
+rrb      material   0  greenPlastic
+rrb      material   1  bluePlastic
+rrb      material   2  redPlastic
+rrb      link       0  thirdFootLink
+rrb      link       1  firstFootLink
+rrb      link       2  base
+rrb      link       3  firstLegLink1
+rrb      link       4  firstLegLink2
+rrb      link       5  secondFootLink
+rrb      link       6  secondLegLink1
+rrb      link       7  secondLegLink2
+rrb      link       8  thirdLegLink1
+rrb      link       9  thirdLegLink2
+rrb      joint      0  secondLegJoint1
+rrb      joint      1  thirdLegJoint1
+rrb      joint      2  secondLegJoint2
+rrb      joint      3  thirdLegJoint2
+rrb      joint      4  secondLegJoint3
+rrb      joint      5  thirdLegJoint3
+rrb      joint      6  firstLegJoint1
+rrb      joint      7  firstLegJoint2
+rrb      joint      8  firstLegJoint3
+rrb      drive      0  firstLegJoint2Drive
+rrb      drive      1  firstLegJoint1Drive
+rrb      drive      2  secondLegJoint1Drive
+rrb      drive      3  thirdLegJoint2Drive
+rrb      drive      4  secondLegJoint3Drive
+rrb      drive      5  thirdLegJoint3Drive
+rrb      drive      6  secondLegJoint2Drive
+rrb      drive      7  thirdLegJoint1Drive
+rrb      drive      8  firstLegJoint3Drive
+rrb      sensor     0  thirdLegJoint3Sensor
+rrb      sensor     1  secondLegJoint1Sensor
+rrb      sensor     2  secondLegJoint2Sensor
+rrb      sensor     3  firstLegJoint3Sensor
+rrb      sensor     4  thirdLegJoint2Sensor
+rrb      sensor     5  secondLegJoint3Sensor
+rrb      sensor     6  thirdLegJoint1Sensor
+rrb      sensor     7  firstLegJoint1Sensor
+rrb      sensor     8  firstLegJoint2Sensor
+rrb      point thirdFootLink  0  thirdFootLinkNormal
+rrb      point thirdFootLink  1  thirdFootLinkDir
+rrb      point thirdFootLink  2  thirdFootLinkBase
+rrb      point firstFootLink  0  firstFootLinkNormal
+rrb      point firstFootLink  1  firstFootLinkDir
+rrb      point firstFootLink  2  firstFootLinkBase
+rrb      point base  0  baseSecondBase
+rrb      point base  1  baseSecondNormal
+rrb      point base  2  baseSecondDir
+rrb      point base  3  baseThirdDir
+rrb      point base  4  baseFirstNormal
+rrb      point base  5  baseFirstBase
+rrb      point base  6  baseThirdNormal
+rrb      point base  7  baseThirdBase
+rrb      point base  8  baseFirstDir
+rrb      point firstLegLink1  0  firstLegLink1PredDir
+rrb      point firstLegLink1  1  firstLegLink1PredBase
+rrb      point firstLegLink1  2  firstLegLink1SuccBase
+rrb      point firstLegLink1  3  firstLegLink1SuccNormal
+rrb      point firstLegLink1  4  firstLegLink1PredNormal
+rrb      point firstLegLink1  5  firstLegLink1SuccDir
+rrb      point firstLegLink2  0  firstLegLink2PredDir
+rrb      point firstLegLink2  1  firstLegLink2PredBase
+rrb      point firstLegLink2  2  firstLegLink2SuccBase
+rrb      point firstLegLink2  3  firstLegLink2SuccNormal
+rrb      point firstLegLink2  4  firstLegLink2SuccDir
+rrb      point firstLegLink2  5  firstLegLink2PredNormal
+rrb      point secondFootLink  0  secondFootLinkDir
+rrb      point secondFootLink  1  secondFootLinkBase
+rrb      point secondFootLink  2  secondFootLinkNormal
+rrb      point secondLegLink1  0  secondLegLink1PredNormal
+rrb      point secondLegLink1  1  secondLegLink1PredBase
+rrb      point secondLegLink1  2  secondLegLink1SuccNormal
+rrb      point secondLegLink1  3  secondLegLink1SuccDir
+rrb      point secondLegLink1  4  secondLegLink1SuccBase
+rrb      point secondLegLink1  5  secondLegLink1PredDir
+rrb      point secondLegLink2  0  secondLegLink2PredNormal
+rrb      point secondLegLink2  1  secondLegLink2PredBase
+rrb      point secondLegLink2  2  secondLegLink2SuccDir
+rrb      point secondLegLink2  3  secondLegLink2SuccNormal
+rrb      point secondLegLink2  4  secondLegLink2SuccBase
+rrb      point secondLegLink2  5  secondLegLink2PredDir
+rrb      point thirdLegLink1  0  thirdLegLink1PredBase
+rrb      point thirdLegLink1  1  thirdLegLink1SuccNormal
+rrb      point thirdLegLink1  2  thirdLegLink1PredDir
+rrb      point thirdLegLink1  3  thirdLegLink1SuccDir
+rrb      point thirdLegLink1  4  thirdLegLink1SuccBase
+rrb      point thirdLegLink1  5  thirdLegLink1PredNormal
+rrb      point thirdLegLink2  0  thirdLegLink2PredBase
+rrb      point thirdLegLink2  1  thirdLegLink2SuccNormal
+rrb      point thirdLegLink2  2  thirdLegLink2PredDir
+rrb      point thirdLegLink2  3  thirdLegLink2SuccBase
+rrb      point thirdLegLink2  4  thirdLegLink2SuccDir
+rrb      point thirdLegLink2  5  thirdLegLink2PredNormal
+== runner.rrb
+rrb      body       0  footLink.wrl
+rrb      body       1  legLink.wrl
+rrb      body       2  base.wrl
+rrb      material   0  greenPlastic
+rrb      material   1  bluePlastic
+rrb      material   2  redPlastic
+rrb      link       0  firstFootLink
+rrb      link       1  base
+rrb      link       2  firstLegLink1
+rrb      link       3  firstLegLink2
+rrb      link       4  secondFootLink
+rrb      link       5  secondLegLink1
+rrb      link       6  secondLegLink2
+rrb      joint      0  secondLegJoint1
+rrb      joint      1  secondLegJoint2
+rrb      joint      2  secondLegJoint3
+rrb      joint      3  firstLegJoint1
+rrb      joint      4  firstLegJoint2
+rrb      joint      5  firstLegJoint3
+rrb      drive      0  firstLegJoint2Drive
+rrb      drive      1  firstLegJoint1Drive
+rrb      drive      2  secondLegJoint1Drive
+rrb      drive      3  secondLegJoint3Drive
+rrb      drive      4  secondLegJoint2Drive
+rrb      drive      5  firstLegJoint3Drive
+rrb      sensor     0  secondLegJoint1Sensor
+rrb      sensor     1  secondLegJoint2Sensor
+rrb      sensor     2  firstLegJoint3Sensor
+rrb      sensor     3  secondLegJoint3Sensor
+rrb      sensor     4  firstLegJoint1Sensor
+rrb      sensor     5  firstLegJoint2Sensor
+rrb      point firstFootLink  0  firstFootLinkNormal
+rrb      point firstFootLink  1  firstFootLinkDir
+rrb      point firstFootLink  2  firstFootLinkBase
+rrb      point base  0  baseSecondBase
+rrb      point base  1  baseSecondNormal
+rrb      point base  2  baseSecondDir
+rrb      point base  3  baseFirstNormal
+rrb      point base  4  baseFirstBase
+rrb      point base  5  baseFirstDir
+rrb      point firstLegLink1  0  firstLegLink1PredDir
+rrb      point firstLegLink1  1  firstLegLink1PredBase
+rrb      point firstLegLink1  2  firstLegLink1SuccBase
+rrb      point firstLegLink1  3  firstLegLink1SuccNormal
+rrb      point firstLegLink1  4  firstLegLink1PredNormal
+rrb      point firstLegLink1  5  firstLegLink1SuccDir
+rrb      point firstLegLink2  0  firstLegLink2PredDir
+rrb      point firstLegLink2  1  firstLegLink2PredBase
+rrb      point firstLegLink2  2  firstLegLink2SuccBase
+rrb      point firstLegLink2  3  firstLegLink2SuccNormal
+rrb      point firstLegLink2  4  firstLegLink2SuccDir
+rrb      point firstLegLink2  5  firstLegLink2PredNormal
+rrb      point secondFootLink  0  secondFootLinkDir
+rrb      point secondFootLink  1  secondFootLinkBase
+rrb      point secondFootLink  2  secondFootLinkNormal
+rrb      point secondLegLink1  0  secondLegLink1PredNormal
+rrb      point secondLegLink1  1  secondLegLink1PredBase
+rrb      point secondLegLink1  2  secondLegLink1SuccNormal
+rrb      point secondLegLink1  3  secondLegLink1SuccDir
+rrb      point secondLegLink1  4  secondLegLink1SuccBase
+rrb      point secondLegLink1  5  secondLegLink1PredDir
+rrb      point secondLegLink2  0  secondLegLink2PredNormal
+rrb      point secondLegLink2  1  secondLegLink2PredBase
+rrb      point secondLegLink2  2  secondLegLink2SuccDir
+rrb      point secondLegLink2  3  secondLegLink2SuccNormal
+rrb      point secondLegLink2  4  secondLegLink2SuccBase
+rrb      point secondLegLink2  5  secondLegLink2PredDir
+== shortHammer.rrb
+rrb      body       0  base.wrl
+rrb      body       1  effector.wrl
+rrb      body       2  middle.wrl
+rrb      material   0  plastic
+rrb      material   1  rubber
+rrb      material   2  metal
+rrb      link       0  base
+rrb      link       1  hammer
+rrb      link       2  middle1
+rrb      link       3  middle2
+rrb      joint      0  hinge1
+rrb      joint      1  hinge2
+rrb      joint      2  hinge3
+rrb      drive      0  hinge1Drive
+rrb      drive      1  hinge3Drive
+rrb      drive      2  hinge2Drive
+rrb      point base  0  BaseAxisSuccNormal
+rrb      point base  1  BaseAxisSuccDir
+rrb      point base  2  BaseAxisSuccBase
+rrb      point hammer  0  HammerPredAxisBase
+rrb      point hammer  1  HammerPredAxisDir
+rrb      point hammer  2  HammerPredAxisNormal
+rrb      point middle1  0  Middle1SuccAxisBase
+rrb      point middle1  1  Middle1PredAxisNormal
+rrb      point middle1  2  Middle1PredAxisBase
+rrb      point middle1  3  Middle1SuccAxisNormal
+rrb      point middle1  4  Middle1SuccAxisDir
+rrb      point middle1  5  Middle1PredAxisDir
+rrb      point middle2  0  Middle2PredAxisDir
+rrb      point middle2  1  Middle2PredAxisNormal
+rrb      point middle2  2  Middle2SuccAxisNormal
+rrb      point middle2  3  Middle2SuccAxisBase
+rrb      point middle2  4  Middle2PredAxisBase
+rrb      point middle2  5  Middle2SuccAxisDir
+== twoBases.rrb
+rrb      body       0  base.wrl
+rrb      material   0  metal
+rrb      link       0  base1
+rrb      link       1  base2
+rrb      joint      0  hinge1
+rrb      drive      0  hinge1Drive
+rrb      sensor     0  hinge1Sensor
+rrb      point base1  0  Base1AxisSuccNormal
+rrb      point base1  1  Base1AxisSuccBase
+rrb      point base1  2  Base1AxisSuccDir
+rrb      point base2  0  Base2AxisSuccNormal
+rrb      point base2  1  Base2AxisSuccBase
+rrb      point base2  2  Base2AxisSuccDir
+== walker.rrb
+rrb      body       0  foot.wrl
+rrb      body       1  body.wrl
+rrb      body       2  shoulder.wrl
+rrb      body       3  leg.wrl
+rrb      material   0  footMaterial
+rrb      material   1  legMaterial
+rrb      material   2  bodyMaterial
+rrb      material   3  shoulderMaterial
+rrb      link       0  shoulder5
+rrb      link       1  body
+rrb      link       2  shoulder6
+rrb      link       3  foot1
+rrb      link       4  foot2
+rrb      link       5  foot3
+rrb      link       6  foot4
+rrb      link       7  foot5
+rrb      link       8  foot6
+rrb      link       9  leg1
+rrb      link      10  leg2
+rrb      link      11  leg3
+rrb      link      12  leg4
+rrb      link      13  leg5
+rrb      link      14  leg6
+rrb      link      15  shoulder1
+rrb      link      16  shoulder2
+rrb      link      17  shoulder3
+rrb      link      18  shoulder4
+rrb      joint      0  leg6Joint1
+rrb      joint      1  leg5Joint2
+rrb      joint      2  leg4Joint3
+rrb      joint      3  leg6Joint2
+rrb      joint      4  leg5Joint3
+rrb      joint      5  leg6Joint3
+rrb      joint      6  leg1Joint1
+rrb      joint      7  leg2Joint1
+rrb      joint      8  leg1Joint2
+rrb      joint      9  leg3Joint1
+rrb      joint     10  leg2Joint2
+rrb      joint     11  leg1Joint3
+rrb      joint     12  leg4Joint1
+rrb      joint     13  leg3Joint2
+rrb      joint     14  leg2Joint3
+rrb      joint     15  leg5Joint1
+rrb      joint     16  leg4Joint2
+rrb      joint     17  leg3Joint3
+rrb      drive      0  leg6Joint3Drive
+rrb      drive      1  leg5Joint2Drive
+rrb      drive      2  leg4Joint1Drive
+rrb      drive      3  leg1Joint1Drive
+rrb      drive      4  leg2Joint1Drive
+rrb      drive      5  leg2Joint2Drive
+rrb      drive      6  leg1Joint3Drive
+rrb      drive      7  leg2Joint3Drive
+rrb      drive      8  leg1Joint2Drive
+rrb      drive      9  leg5Joint1Drive
+rrb      drive     10  leg4Joint2Drive
+rrb      drive     11  leg3Joint3Drive
+rrb      drive     12  leg6Joint1Drive
+rrb      drive     13  leg4Joint3Drive
+rrb      drive     14  leg3Joint2Drive
+rrb      drive     15  leg6Joint2Drive
+rrb      drive     16  leg5Joint3Drive
+rrb      drive     17  leg3Joint1Drive
+rrb      sensor     0  leg6Joint2Sensor
+rrb      sensor     1  leg5Joint1Sensor
+rrb      sensor     2  leg6Joint1Sensor
+rrb      sensor     3  leg5Joint2Sensor
+rrb      sensor     4  leg4Joint2Sensor
+rrb      sensor     5  leg3Joint1Sensor
+rrb      sensor     6  leg1Joint3Sensor
+rrb      sensor     7  leg4Joint1Sensor
+rrb      sensor     8  leg3Joint2Sensor
+rrb      sensor     9  leg2Joint3Sensor
+rrb      sensor    10  leg3Joint3Sensor
+rrb      sensor    11  leg2Joint2Sensor
+rrb      sensor    12  leg1Joint1Sensor
+rrb      sensor    13  leg4Joint3Sensor
+rrb      sensor    14  leg2Joint1Sensor
+rrb      sensor    15  leg1Joint2Sensor
+rrb      sensor    16  leg5Joint3Sensor
+rrb      sensor    17  leg6Joint3Sensor
+rrb      point shoulder5  0  shoulder5SuccNormal
+rrb      point shoulder5  1  shoulder5PredDir
+rrb      point shoulder5  2  shoulder5PredBase
+rrb      point shoulder5  3  shoulder5SuccDir
+rrb      point shoulder5  4  shoulder5PredNormal
+rrb      point shoulder5  5  shoulder5SuccBase
+rrb      point body  0  bodyLeg4Normal
+rrb      point body  1  bodyLeg6Dir
+rrb      point body  2  bodyLeg5Base
+rrb      point body  3  bodyLeg4Dir
+rrb      point body  4  bodyLeg4Base
+rrb      point body  5  bodyLeg6Normal
+rrb      point body  6  bodyLeg5Dir
+rrb      point body  7  bodyLeg1Normal
+rrb      point body  8  bodyLeg6Base
+rrb      point body  9  bodyLeg3Normal
+rrb      point body 10  bodyLeg2Normal
+rrb      point body 11  bodyLeg1Base
+rrb      point body 12  bodyLeg3Base
+rrb      point body 13  bodyLeg2Base
+rrb      point body 14  bodyLeg2Dir
+rrb      point body 15  bodyLeg3Dir
+rrb      point body 16  bodyLeg5Normal
+rrb      point body 17  bodyLeg1Dir
+rrb      point shoulder6  0  shoulder6SuccBase
+rrb      point shoulder6  1  shoulder6PredDir
+rrb      point shoulder6  2  shoulder6SuccNormal
+rrb      point shoulder6  3  shoulder6SuccDir
+rrb      point shoulder6  4  shoulder6PredBase
+rrb      point shoulder6  5  shoulder6PredNormal
+rrb      point foot1  0  foot1PredBase
+rrb      point foot1  1  foot1PredDir
+rrb      point foot1  2  foot1PredNormal
+rrb      point foot2  0  foot2PredBase
+rrb      point foot2  1  foot2PredDir
+rrb      point foot2  2  foot2PredNormal
+rrb      point foot3  0  foot3PredDir
+rrb      point foot3  1  foot3PredBase
+rrb      point foot3  2  foot3PredNormal
+rrb      point foot4  0  foot4PredDir
+rrb      point foot4  1  foot4PredBase
+rrb      point foot4  2  foot4PredNormal
+rrb      point foot5  0  foot5PredDir
+rrb      point foot5  1  foot5PredNormal
+rrb      point foot5  2  foot5PredBase
+rrb      point foot6  0  foot6PredDir
+rrb      point foot6  1  foot6PredNormal
+rrb      point foot6  2  foot6PredBase
+rrb      point leg1  0  leg1PredNormal
+rrb      point leg1  1  leg1SuccNormal
+rrb      point leg1  2  leg1SuccBase
+rrb      point leg1  3  leg1SuccDir
+rrb      point leg1  4  leg1PredDir
+rrb      point leg1  5  leg1PredBase
+rrb      point leg2  0  leg2PredNormal
+rrb      point leg2  1  leg2SuccDir
+rrb      point leg2  2  leg2SuccNormal
+rrb      point leg2  3  leg2SuccBase
+rrb      point leg2  4  leg2PredDir
+rrb      point leg2  5  leg2PredBase
+rrb      point leg3  0  leg3SuccNormal
+rrb      point leg3  1  leg3SuccDir
+rrb      point leg3  2  leg3PredDir
+rrb      point leg3  3  leg3SuccBase
+rrb      point leg3  4  leg3PredNormal
+rrb      point leg3  5  leg3PredBase
+rrb      point leg4  0  leg4SuccNormal
+rrb      point leg4  1  leg4SuccDir
+rrb      point leg4  2  leg4PredDir
+rrb      point leg4  3  leg4SuccBase
+rrb      point leg4  4  leg4PredNormal
+rrb      point leg4  5  leg4PredBase
+rrb      point leg5  0  leg5PredBase
+rrb      point leg5  1  leg5SuccNormal
+rrb      point leg5  2  leg5SuccDir
+rrb      point leg5  3  leg5PredDir
+rrb      point leg5  4  leg5PredNormal
+rrb      point leg5  5  leg5SuccBase
+rrb      point leg6  0  leg6PredBase
+rrb      point leg6  1  leg6SuccNormal
+rrb      point leg6  2  leg6SuccDir
+rrb      point leg6  3  leg6PredDir
+rrb      point leg6  4  leg6PredNormal
+rrb      point leg6  5  leg6SuccBase
+rrb      point shoulder1  0  shoulder1SuccDir
+rrb      point shoulder1  1  shoulder1SuccBase
+rrb      point shoulder1  2  shoulder1PredNormal
+rrb      point shoulder1  3  shoulder1PredBase
+rrb      point shoulder1  4  shoulder1PredDir
+rrb      point shoulder1  5  shoulder1SuccNormal
+rrb      point shoulder2  0  shoulder2SuccDir
+rrb      point shoulder2  1  shoulder2SuccBase
+rrb      point shoulder2  2  shoulder2PredNormal
+rrb      point shoulder2  3  shoulder2PredBase
+rrb      point shoulder2  4  shoulder2PredDir
+rrb      point shoulder2  5  shoulder2SuccNormal
+rrb      point shoulder3  0  shoulder3SuccNormal
+rrb      point shoulder3  1  shoulder3PredDir
+rrb      point shoulder3  2  shoulder3SuccBase
+rrb      point shoulder3  3  shoulder3SuccDir
+rrb      point shoulder3  4  shoulder3PredNormal
+rrb      point shoulder3  5  shoulder3PredBase
+rrb      point shoulder4  0  shoulder4SuccNormal
+rrb      point shoulder4  1  shoulder4SuccBase
+rrb      point shoulder4  2  shoulder4SuccDir
+rrb      point shoulder4  3  shoulder4PredNormal
+rrb      point shoulder4  4  shoulder4PredBase
+rrb      point shoulder4  5  shoulder4PredDir
