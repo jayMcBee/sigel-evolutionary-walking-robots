@@ -191,6 +191,12 @@ namespace SIGEL_Robot {
 	  return maximalDelayTime;
 	}
 
+        const QList<SIG_LanguageParameters::NamedCommand> &
+        SIG_LanguageParameters::getCommands (void) const
+        {
+                return allowedCommands;
+        }
+
         void SIG_LanguageParameters::writeToFileTransfer (QTextStream & tx) const
         {
                 tx << "LanguageParameters " << bitsPerRegister << ' ' << memSize << ' ' << maximalDelayTime << ' ';

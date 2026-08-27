@@ -76,6 +76,17 @@ static void dumpOrder(const SIGEL_Robot::SIG_Robot &r, const char *which)
   SIG_DUMP("sensor",   SIGEL_Robot::SIG_Sensor,   getSensors);
 #undef SIG_DUMP
 
+  // The eighth ordered container, missed by the first enumeration: it rides
+  // inside every .exp and every PVM transfer through writeToFileTransfer.
+  // Nothing numbers commands -- they are looked up by name -- so like bodies
+  // and materials its order reaches only the serialised bytes.
+  {
+    int n = 0;
+    for (const SIGEL_Robot::SIG_LanguageParameters::NamedCommand &c :
+         r.getLangParam()->getCommands())
+      printf("  %-8s command   %2d      %s\n", which, n++, qPrintable(c.name));
+  }
+
   // Each link carries its own dict of significant points, in its own order.
   for (SIGEL_Robot::SIG_Link *l : r.getLinks()) {
     int n = 0;
@@ -83,6 +94,54 @@ static void dumpOrder(const SIGEL_Robot::SIG_Robot &r, const char *which)
       printf("  %-8s point %s %2d  %s\n", which,
              qPrintable(l->getName()), n++, qPrintable(p.name));
   }
+}
+
+// Duplicate-key tie-breaking, which neither gate can see.
+//
+// Qt 2's QDict returned the NEWEST binding for a duplicate key, and the Q2Dict
+// that replaced it did the same. Phase D replaced Q2Dict with plain QList and
+// eight hand-written lookups, and D4's six scanned FORWARD -- oldest wins, a
+// silent flip found by review. An independent rebuild confirmed that flipping
+// them back leaves dictorder-baseline.txt and fitness-baseline.txt both empty:
+// no shipped robot has a duplicate name, so nothing in the data can catch it.
+// Hence this, run by fitness-check.sh before the evaluations.
+static int selfcheck()
+{
+  int bad = 0;
+#define SIG_WANT(cond)                                                     \
+  do { if (!(cond)) { printf("selfcheck FAILED: %s\n", #cond); ++bad; } }  \
+  while (0)
+
+  {   // SIG_LanguageParameters: newest wins, and removeCommand frees THAT one.
+    SIGEL_Robot::SIG_LanguageParameters lp;
+    SIGEL_Robot::SIG_CommandParameters *first  = new SIGEL_Robot::SIG_CommandParameters();
+    SIGEL_Robot::SIG_CommandParameters *second = new SIGEL_Robot::SIG_CommandParameters();
+    lp.addCommand("DUP", first);
+    lp.addCommand("DUP", second);
+    SIG_WANT(lp.getCommand("DUP") == second);
+    lp.removeCommand("DUP");
+    SIG_WANT(lp.getCommand("DUP") == first);
+    lp.removeCommand("DUP");
+    SIG_WANT(lp.getCommand("DUP") == 0);
+  }
+  {   // SIG_Link::getPoint, same rule.
+    SIGEL_Robot::SIG_Link link(0, "L", 0);
+    link.addPoint("P", DL_vector(1, 0, 0));
+    link.addPoint("P", DL_vector(2, 0, 0));
+    SIG_WANT(link.getPoint("P").x == 2);
+  }
+  {   // SIG_Robot's six lookups, checked through one of them.
+    SIGEL_Robot::SIG_Robot robot;
+    SIGEL_Robot::SIG_Link *a = new SIGEL_Robot::SIG_Link(&robot, "SAME", 0);
+    SIGEL_Robot::SIG_Link *b = new SIGEL_Robot::SIG_Link(&robot, "SAME", 1);
+    robot.addLink(a);
+    robot.addLink(b);
+    SIG_WANT(robot.lookupLink("SAME") == b);
+    SIG_WANT(robot.lookupLink("MISSING") == 0);
+  }
+#undef SIG_WANT
+  printf(bad ? "selfcheck: %d FAILED\n" : "selfcheck: ok\n", bad);
+  return bad ? 1 : 0;
 }
 
 int main(int argc, char *argv[])
@@ -93,6 +152,7 @@ int main(int argc, char *argv[])
 
   bool verbose = false;
   if (argc > 1 && QString(argv[1]) == "-v") { verbose = true; argv++; argc--; }
+  if (argc > 1 && QString(argv[1]) == "-selfcheck") return selfcheck();
 
   if (argc < 2 || argc > 3) {
     fprintf(stderr, "usage: %s [-v] <experiment.exp> [individual, default 0]\n", argv[0]);

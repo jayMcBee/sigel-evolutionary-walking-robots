@@ -112,6 +112,26 @@ Additive only — nothing changes at runtime. The value is that failures are
 
 ---
 
+## 4 · Program display
+
+- [ ] **9. Syntax-highlight the program view** — needs Phase C, GUI not built yet
+
+  New function `programToHtml(const SIG_Program&, const SIG_LanguageParameters&)`
+  returning a `QString`. `printToString()` stays as the ZORC serial format
+  (`SIG_GPRemoteZORCFitnessFunction.cpp:69`).
+
+  - `<pre>` wrapper, one `<span>` per token.
+  - Colour opcodes by group: arithmetic `ADD SUB MUL DIV MOD MIN MAX`,
+    data `COPY LOAD`, control `CMP JMP`, robot `MOVE SENSE DELAY`.
+  - Register operands print as `R0`–`R7`, computed as `element % getMemorySize()`.
+    `LOAD` operand 2 and `JMP` operand 1 print as literals.
+  - Line number in a leading `<span>` per line.
+
+  Feed it to `QTextBrowser::setHtml()` at `SIG_SimulationWidget.cpp:234`,
+  `SIG_IndividualView.cpp:51`, `SIG_AllIndividualsView.cpp:394`.
+
+---
+
 ## What is measured vs. proposed
 
 - **Measured** (trust as fact): every site count, file path and line number above.

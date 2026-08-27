@@ -104,6 +104,9 @@ namespace SIGEL_Robot {
                  */
                 SIG_CommandParameters *getCommand (QString name) const;
 
+                /** All allowed commands, in declaration order. */
+                const QList<NamedCommand> &getCommands (void) const;
+
                 /**
                  * Sets the width of the memory cells
                  * within the robots control unit.

@@ -158,9 +158,12 @@ namespace SIGEL_Robot {
         {
                 DL_vector tmp;
                 DL_vector *t;
+                // Backwards, for the newest binding -- see SIG_Robot::lookupLink.
+                // This used to rely on a forward loop with no break, which is
+                // the same answer but one "optimisation" away from flipping.
                 t = 0;
-                for (const NamedPoint &p : points)
-                        if (p.name == id) t = p.value;
+                for (qsizetype i = points.size () - 1; i >= 0; --i)
+                        if (points.at (i).name == id) { t = points.at (i).value; break; }
                 if (t)
                         tmp = *t;
                 return tmp;

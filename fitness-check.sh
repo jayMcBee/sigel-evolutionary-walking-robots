@@ -17,6 +17,10 @@ DATA=${2:-data-reordered}
 [ -x "$ROOT/$B/sigel_eval" ] || { echo "no $ROOT/$B/sigel_eval" >&2; exit 1; }
 SIGEL_ROOT=$ROOT/x/kdesigelSources.1.3/kdesigel/kdesigel
 export SIGEL_ROOT
+# Duplicate-key tie-breaking, which no amount of shipped data can exercise --
+# no robot has a duplicate name, so both baselines stay empty when it breaks.
+"$ROOT/$B/sigel_eval" -selfcheck >&2 || exit 1
+
 n=$(find "$ROOT/$DATA/Experiments" -name '*.exp' | wc -l)
 [ "$n" -eq 14 ] || { echo "expected 14 .exp under $DATA/, found $n" >&2; exit 1; }
 for f in $(find "$ROOT/$DATA/Experiments" -name '*.exp' | sort); do

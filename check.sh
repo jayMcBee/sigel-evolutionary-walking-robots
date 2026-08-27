@@ -24,7 +24,11 @@ SL=$ROOT/x/supportingLibs/supportingLibs
 QTINC=$(qmake6 -query QT_INSTALL_HEADERS)
 
 FLAGS="-fsyntax-only -std=c++17 -Wall -Wextra -DMINMAX_H"
+# QtGui and QtWidgets are here because the Makefile has them: without them
+# SIG_GPPopulation.cpp fails on <QApplication> and this script reported a
+# "failure" the real build does not have. Found by review.
 INCS="-I$ROOT/shim -I$SRC/include -isystem $QTINC -isystem $QTINC/QtCore"
+INCS="$INCS -isystem $QTINC/QtGui -isystem $QTINC/QtWidgets"
 for d in newmat09 dynamechs/dm Dynamo/Src/Inc fparser cv97 SOLID-2.0/include pvm3/include; do
     INCS="$INCS -isystem $SL/$d"
 done

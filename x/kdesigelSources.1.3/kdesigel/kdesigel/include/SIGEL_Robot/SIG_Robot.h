@@ -108,7 +108,7 @@ namespace SIGEL_Robot
      * Adds the geometry information.
      *
      * This adds a geometry information object of class SIG_Body. It is
-     * stored with the DXF Filename as its key.
+     * stored under its DXF filename.
      */
     void addBody (SIG_Body *b);
     /**
@@ -181,44 +181,38 @@ namespace SIGEL_Robot
     SIG_Sensor *lookupSensor (QString n) const;
 
     /**
-     * Returns an iterator over all SIG_Body objects.
+     * Returns, in order, all SIG_Body objects.
      *
-     * This is a QDictIterator. Please read the Qt Library documentation
      * to get informed about the usage of the iterator.
      */
     const QList<SIG_Body *> &getBodies (void) const;
     /**
-     * Returns an iterator over all SIG_Material objects.
+     * Returns, in order, all SIG_Material objects.
      *
-     * This is a QDictIterator. Please read the Qt Library documentation
      * to get informed about the usage of the iterator.
      */
     const QList<SIG_Material *> &getMaterials (void) const;
     /**
-     * Returns an iterator over all SIG_Link objects.
+     * Returns, in order, all SIG_Link objects.
      *
-     * This is a QDictIterator. Please read the Qt Library documentation
      * to get informed about the usage of the iterator.
      */
     const QList<SIG_Link *> &getLinks (void) const;
     /**
-     * Returns an iterator over all SIG_Joint objects.
+     * Returns, in order, all SIG_Joint objects.
      *
-     * This is a QDictIterator. Please read the Qt Library documentation
      * to get informed about the usage of the iterator.
      */
     const QList<SIG_Joint *> &getJoints (void) const;
     /**
-     * Returns an iterator over all SIG_Drive objects.
+     * Returns, in order, all SIG_Drive objects.
      *
-     * This is a QDictIterator. Please read the Qt Library documentation
      * to get informed about the usage of the iterator.
      */
     const QList<SIG_Drive *> &getDrives (void) const;
     /**
-     * Returns an iterator over all SIG_Sensor objects.
+     * Returns, in order, all SIG_Sensor objects.
      *
-     * This is a QDictIterator. Please read the Qt Library documentation
      * to get informed about the usage of the iterator.
      */
     const QList<SIG_Sensor *> &getSensors (void) const;

@@ -56,8 +56,6 @@ int main()
       assert(Thing::live == 1); }
     assert(Thing::live == 0);
 
-    assert(Thing::live == 0);
-
     // --- qglist.cpp:364-376, 436-473 -- cursor placement --------------------
     {
         Thing t0(0), t1(1), t2(2), t3(3);
@@ -85,7 +83,6 @@ int main()
         assert(Thing::live == 0);
     }
 
-    // --- qgdict.cpp:379-386 -- duplicate keys stack newest-first ------------
 
     // --- divergence 1 -- numeric sort, not memcmp byte order ----------------
 
@@ -276,6 +273,19 @@ int main()
         assert(Thing::live == 3);
     }
 
+
+    {   // clear() on a container that does NOT own must free nothing. This
+        // went out with the Q2Dict block it shared, but both these types
+        // survive and SIG_Robot::clear() still relies on the property.
+        Thing a(1), b(2);
+        Q2PtrList<Thing> l;   l.append(&a);
+        Q2PtrVector<Thing> v(4); v.insert(0, &b);
+        assert(l.autoDelete() == false && v.autoDelete() == false);
+        l.clear(); v.clear();
+        assert(Thing::live == 2);        // both still alive
+        assert(l.count() == 0 && v.count() == 0);
+    }
+    assert(Thing::live == 0);
 
     std::printf("q2compat self-check: all assertions passed\n");
     return 0;

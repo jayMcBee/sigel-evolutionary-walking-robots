@@ -7,8 +7,6 @@
 // pure renames and every ownership decision defers to Phase B, which deletes
 // this file.
 //
-//   QArray      -> Q2Array          QVector     -> Q2PtrVector
-//   QDict       -> Q2Dict           QList       -> Q2PtrList
 //   QCString    -> Q2CString        QQueue      -> Q2Queue
 //   QValueList  -> Q2ValueList      + matching iterators
 //
@@ -39,7 +37,7 @@
 //     crashed there too), null (empty Q2PtrVector, where null is a normal slot).
 //  3. resize() value-initialises new elements where Qt 2 left raw memory, and
 //     so does the sized constructor Q2Array(int) (qgarray.cpp:110-127).
-//  Two Qt 2 quirks are deliberately NOT reproduced, because no SIGEL code can
+//  One Qt 2 quirk is deliberately NOT reproduced, because no SIGEL code can
 //  reach them and both are defects rather than behaviour:
 //    - Copying a Qt 2 QDict re-inserts every item into a prepending table, so
 //      it REVERSES every colliding chain -- distinct keys sharing a bucket come
@@ -87,7 +85,7 @@
 #include <list>
 
 // ---------------------------------------------------------------------------
-// Q2Dict reproduces Qt 2's own hash table, so its order no longer depends on
+// Q2Dict reproduced Qt 2's own hash table (deleted in Phase D), so its order no longer depends on
 // QHash at all. This remains for every OTHER QHash in the process: Qt 6
 // randomises the seed once per run, and SIGEL is expected to reproduce a run
 // from a fixed RANDOMSEED.

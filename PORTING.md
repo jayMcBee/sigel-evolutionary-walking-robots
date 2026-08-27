@@ -1206,6 +1206,47 @@ rather than silently wrong, which AddressSanitizer catches in `build/` but a
 release build would not. Nothing in the evaluation path reaches it. The
 evolution loop cannot be exercised until PVM builds.
 
+### What review found in D4–D6, and what it changed
+
+**A silent semantic flip, now fixed.** `Q2Dict::find()` returned the **newest**
+binding for a duplicate key. D4's six replacements —
+`SIG_Robot::lookupBody/Material/Link/Joint/Drive/Sensor` — scanned forward and
+returned the **first**, and the D5 commit claimed all lookups scanned backwards
+when only the two in `SIG_LanguageParameters` did. All eight now scan backwards.
+No shipped robot has a duplicate name (0 across all 438 name-groups), so nothing
+in the data could have caught it.
+
+**Which is exactly why there is now a check that can.** `sigel_eval -selfcheck`
+asserts newest-wins for `SIG_LanguageParameters`, `SIG_Link::points` and
+`SIG_Robot`'s lookups, and that `removeCommand` frees the newest.
+`fitness-check.sh` runs it before the evaluations. **Verified to have teeth:**
+flipping `lookupLink` back to first-wins makes it fail while
+`dictorder-baseline.txt` and `fitness-baseline.txt` both stay empty.
+
+**The eighth container is in the gate now.** `allowedCommands` order is dumped
+alongside the other seven — 469 lines added to the baseline. Nothing *numbers*
+commands (they are looked up by name), so like bodies and materials its order
+reaches only the serialised bytes.
+
+**`check.sh` was reporting a failure the real build does not have.** Its include
+path stopped at `QtCore` while the Makefile adds `QtGui` and `QtWidgets`, so
+`SIG_GPPopulation.cpp` failed on `<QApplication>`. Fixed: **118 pass, 4 fail**,
+and the 4 are exactly the files the Makefile excludes. The long-quoted
+"117 pass, 5 fail" baseline was always one part harness artifact.
+
+**Coverage lost with the deleted types, restored.** The block asserting that
+`clear()` on a *non-owning* container frees nothing was shared with the `Q2Dict`
+tests and went out with them, although `Q2PtrList` and `Q2PtrVector` still rely
+on it — `SIG_Robot::clear()` depends on the property. Re-added for both.
+
+**Pre-existing, not ours, recorded:** the `.rrb` load path takes a
+**heap-buffer-overflow inside vendored cv97** — `JString::regionMatches`, from
+`SceneGraph::SceneGraph()` via `SIG_Body::load()`. It aborts under
+AddressSanitizer, so `.rrb` loading has no sanitized coverage at all, and
+neither gate can run against `build/` for that reason plus the known leak.
+Vendored code, out of scope for the Qt port, but it is why the ASan claims in
+D4–D6 mean "the 14 `.exp`, by hand, with leak detection off".
+
 **Formats, both pure permutations.** `.rrb` is block-structured with exactly five
 top-level kinds — `material`, `link`, `joint <subtype>`, `drive`, `sensor`, all
 `<kind> [<subtype>] <name> { … }`, with `point` lines nested inside links and no
@@ -1234,17 +1275,18 @@ What the shim currently carries, and why:
 
 The clean-up, in this order:
 
-1. Replace the emulation with straightforward containers — insertion-ordered
-   maps, plain `QList<T*>`, explicit deletes, indexed loops instead of a cursor.
-2. **Migrate the data files at the same time** so the experiments keep working:
-   7 `.rrb` and 14 `.exp` (robots are embedded in the experiments too). Rewrite
-   each so declaration order *is* the order the simulation uses. `Q2Dict::hash`
-   is the function that generates that ordering — keep it until the migration is
-   done, then delete it.
-3. Re-verify against the captured 2003 run.
+1. ~~Replace the emulation with straightforward containers.~~ **In progress —
+   D3–D6 done.** `Q2Dict`, `Q2DictIterator` and `Q2Array` are deleted; their
+   users are plain `QList`. Left: `Q2PtrVector`, `Q2PtrList`, `Q2Queue`,
+   `Q2ListIterator`, which are the pointer containers with ownership.
+2. ~~**Migrate the data files at the same time.**~~ **Done, D2.** Only the 7
+   `.rrb` needed it — the 14 `.exp` already stored the order the simulation
+   used. `Q2Dict::hash` generated that ordering and is deleted.
+3. Re-verify against the captured 2003 run. **Not done**, and it still needs
+   the x86 box's numbers (§7).
 
-Sequenced this way the ordering stops being a hidden property of a hash function
-and becomes visible in the data.
+Sequenced this way the ordering stopped being a hidden property of a hash
+function and became visible in the data.
 
 ### A logging system
 
