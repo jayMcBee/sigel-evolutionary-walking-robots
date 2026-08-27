@@ -32,8 +32,6 @@ int Thing::live = 0;
 
 template class Q2Array<double>;
 template class Q2Array<int>;
-template class Q2Dict<Thing>;
-template class Q2DictIterator<Thing>;
 template class Q2PtrVector<Thing>;
 template class Q2PtrList<Thing>;
 template class Q2ListIterator<Thing>;
@@ -60,9 +58,6 @@ int main()
       assert(Thing::live == 1); }
     assert(Thing::live == 0);
 
-    { Q2Dict<Thing> a; a.setAutoDelete(true); a.insert("k", new Thing(1));
-      { Q2Dict<Thing> b(a); assert(!b.autoDelete()); }
-      assert(Thing::live == 1); }
     assert(Thing::live == 0);
 
     // --- qglist.cpp:364-376, 436-473 -- cursor placement --------------------
@@ -93,16 +88,6 @@ int main()
     }
 
     // --- qgdict.cpp:379-386 -- duplicate keys stack newest-first ------------
-    {
-        Q2Dict<Thing> d(31);
-        Thing a(1), b(2), c(3);
-        d.insert("k", &a); d.insert("k", &b); d.insert("k", &c);
-        assert(d.count() == 3);                  // items
-        assert(d.size() == 31);                  // buckets, NOT items
-        assert(d.find("k") == &c);               // newest
-        d.remove("k");
-        assert(d.count() == 2);                  // one, not all
-    }
 
     // --- divergence 1 -- numeric sort, not memcmp byte order ----------------
     {
@@ -164,13 +149,6 @@ int main()
         Q2ListIterator<Thing> e(empty);
         assert(e.atFirst() && e.atLast());         // both true on empty in Qt 2
     }
-    {   // Q2DictIterator::count() reads the live dict, not the snapshot
-        Q2Dict<Thing> d; Thing a(1), b(2);
-        d.insert("a", &a);
-        Q2DictIterator<Thing> it(d);
-        d.insert("b", &b);
-        assert(it.count() == 2);
-    }
     {   // Q2CString: Qt 2's buffer includes the terminating NUL
         Q2CString s("abc");
         assert(s.size() == 4 && s.count() == 4);
@@ -218,24 +196,12 @@ int main()
         Thing *t = v.take(1);      assert(Thing::live == 1);
         delete t;
         v.insert(2, new Thing(4)); v.clear(); assert(Thing::live == 0); }
-    {   Q2Dict<Thing> d; d.setAutoDelete(true);
-        d.insert("a", new Thing(1)); d.insert("b", new Thing(2));
-        assert(Thing::live == 2);
-        d.remove("a");             assert(Thing::live == 1);
-        Thing *t = d.take("b");    assert(Thing::live == 1);
-        delete t;
-        d.insert("c", new Thing(3)); d.clear(); assert(Thing::live == 0); }
     {   Q2Queue<Thing> q; q.setAutoDelete(true);
         q.enqueue(new Thing(1));
         Thing *t = q.dequeue();    assert(Thing::live == 1);   // dequeue must not delete
         delete t;
         q.enqueue(new Thing(2)); q.clear(); assert(Thing::live == 0); }
     assert(Thing::live == 0);
-    {   // H1: Qt 2's QDict::operator[] is find() (qdict.h:67-68)
-        Q2Dict<Thing> d; Thing a(7);
-        d.insert("k", &a);
-        assert(d["k"] == &a);
-        assert(d["absent"] == nullptr); }
 
 
     {   // Q2ValueList iterators must survive an append, as Qt 2's linked list did.
@@ -254,50 +220,8 @@ int main()
     }
 
 
-    {   // PHASE D: iteration order is INSERTION order. This assertion used to
-        // pin Qt 2's hash order for the real insect robot -- the order that
-        // numbered links in SIG_DynaMoSimulationData.cpp:33-51. That order now
-        // comes from the data files instead, so what has to hold here is that
-        // the container itself reorders nothing.
-        const char *ins[] = { "body","leg1","foot1","leg2","foot2","leg3","foot3",
-                              "leg4","foot4","leg5","foot5","leg6","foot6" };
-        Thing store[13];
-        Q2Dict<Thing> d;
-        for (int i = 0; i < 13; ++i) d.insert(QString::fromLatin1(ins[i]), &store[i]);
-        int n = 0;
-        for (Q2DictIterator<Thing> it(d); it.current(); ++it, ++n) {
-            assert(it.currentKey() == QLatin1String(ins[n]));
-            assert(it.current() == &store[n]);
-        }
-        assert(n == 13);
-        assert(d.count() == 13);
-        assert(d.size() == 17);          // table size, not item count
-    }
-    {   // duplicate keys: newest wins, remove() takes one (qgdict.cpp:379-386)
-        Q2Dict<Thing> d(31); Thing a(1), b(2), c(3);
-        d.insert("k", &a); d.insert("k", &b); d.insert("k", &c);
-        assert(d.count() == 3 && d.find("k") == &c);
-        d.remove("k");
-        assert(d.count() == 2 && d.find("k") == &b);
-    }
 
 
-    {   // B1: an owner that frees explicitly must free exactly once, and a
-        // dictionary with no flag must free nothing.
-        Q2Dict<Thing> owned;
-        owned.insert("a", new Thing(1));
-        owned.insert("b", new Thing(2));
-        assert(Thing::live == 2);
-        owned.deleteContents();
-        assert(Thing::live == 0);
-        assert(owned.count() == 0);
-        owned.deleteContents();               // idempotent: no double free
-        assert(Thing::live == 0);
-    }
-    {   Thing a(1), b(2);
-        Q2Dict<Thing> observing;              // no flag, no deleteContents call
-        observing.insert("a", &a); observing.insert("b", &b);
-    }                                          // must not free a or b
     assert(Thing::live == 0);
 
 
@@ -365,45 +289,7 @@ int main()
     }                                          // must not free a or b
     assert(Thing::live == 0);
 
-    {   // deleteContents() must free EVERY entry of a bucket, not just the
-        // head or the tail. ADD, DELAY and MIN all hash to bucket 14 at the
-        // default vlen of 17 -- that is the real chain in the default
-        // SIG_LanguageParameters dictionary.
-        Q2Dict<Thing> d;
-        d.insert("ADD", new Thing(1));
-        d.insert("DELAY", new Thing(2));
-        d.insert("MIN", new Thing(3));
-        d.insert("MAX", new Thing(4));        // bucket 15, on its own
-        assert(Thing::live == 4);
-        d.deleteContents();
-        assert(Thing::live == 0 && d.count() == 0);
-    }
-    {   // take() must drop the item count. SIG_LanguageParameters writes
-        // count() as a record count and the reader consumes exactly that
-        // many, so a stale count corrupts every saved experiment.
-        Q2Dict<Thing> d;
-        d.insert("ADD", new Thing(1));
-        d.insert("DELAY", new Thing(2));
-        d.insert("MIN", new Thing(3));
-        assert(d.count() == 3);
-        delete d.take("DELAY");               // from the middle of a chain
-        assert(d.count() == 2 && Thing::live == 2);
-        assert(d.find("ADD") && d.find("MIN") && !d.find("DELAY"));
-        d.deleteContents();
-        assert(Thing::live == 0);
-    }
 
-    {   // clear() on a container that does NOT own must free nothing.
-        // SIG_Robot.cpp hand-deletes six dictionaries' contents and then
-        // calls clear() on each; giving clear() teeth is six double frees.
-        Thing a(1), b(2), c(3);
-        Q2Dict<Thing> d;      d.insert("ADD", &a); d.insert("DELAY", &b);
-        Q2PtrList<Thing> l;   l.append(&a); l.append(&b);
-        Q2PtrVector<Thing> v(2); v.insert(0, &a); v.insert(1, &b);
-        d.clear(); l.clear(); v.clear();
-        assert(Thing::live == 3);
-        assert(d.count() == 0 && l.count() == 0 && v.count() == 0);
-    }
     {   // Same for the vector paths where Qt 2's flag was the delete:
         // insert() over an occupied slot, remove(), and a shrinking resize().
         Thing a(1), b(2), c(3);
@@ -415,35 +301,6 @@ int main()
         assert(Thing::live == 3);
     }
 
-    {   // B: an owner must free on EVERY path, not only in its destructor.
-        // 2003 armed setAutoDelete in the constructor, so remove() freed too;
-        // a destructor-only conversion silently loses that.
-        Q2Dict<Thing> d;
-        d.insert("a", new Thing(1));
-        d.insert("b", new Thing(2));
-        assert(Thing::live == 2);
-        delete d.take("a");                 // the mid-life free path
-        assert(Thing::live == 1);
-        d.deleteContents();
-        assert(Thing::live == 0);
-    }
-    {   // PHASE D: resize() no longer places anything -- there is one chain --
-        // so it must leave insertion order alone. It used to have to reproduce
-        // Qt 2's rehash, which yielded k7,k4,k1.
-        Q2Dict<Thing> d(17); Thing a(1), b(2), c(3);
-        d.insert("k1", &a); d.insert("k4", &b); d.insert("k7", &c);
-        d.resize(3);
-        QStringList got;
-        for (Q2DictIterator<Thing> it(d); it.current(); ++it) got << it.currentKey();
-        assert(got.join(',') == QLatin1String("k1,k4,k7"));
-        assert(d.count() == 3 && d.find("k4") == &b);
-    }
-    {   // assignment keeps the DESTINATION's table size (qgdict.cpp:280-302)
-        Q2Dict<Thing> src(31), dst(17); Thing a(1);
-        src.insert("x", &a);
-        dst = src;
-        assert(dst.size() == 17 && dst.count() == 1 && dst.find("x") == &a);
-    }
 
     std::printf("q2compat self-check: all assertions passed\n");
     return 0;

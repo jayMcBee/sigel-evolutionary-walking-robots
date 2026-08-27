@@ -114,38 +114,51 @@ namespace SIGEL_Robot {
                 tx >> zahl;
                 for (int i = 0; i < zahl; i++) {
                         tx >> tmpstr;
-                        allowedCommands.insert (tmpstr, new SIG_CommandParameters (tx));
+                        allowedCommands.append (NamedCommand{ tmpstr, new SIG_CommandParameters (tx) });
                 }
         }
 
         SIG_LanguageParameters::~SIG_LanguageParameters (void)
         {
 		// B1: this class owns the SIG_CommandParameters it inserted.
-		allowedCommands.deleteContents ();
+		for (const NamedCommand &c : allowedCommands) delete c.value;
+		allowedCommands.clear ();
 
 	  
         }
 
         void SIG_LanguageParameters::addCommand (QString name, SIG_CommandParameters *cmdP)
         {
-                allowedCommands.insert (name, cmdP);
+                allowedCommands.append (NamedCommand{ name, cmdP });
         }
 
         void SIG_LanguageParameters::removeCommand( QString name )
 	{
 	  // This class owns its commands, so removing one frees it. 2003 armed
 	  // autoDelete in the constructor, which made QDict::remove() delete.
-	  delete allowedCommands.take( name );
+	  // Removes the LAST match, which is what Qt 2's newest-wins take() did.
+	  for (qsizetype i = allowedCommands.size() - 1; i >= 0; --i)
+	    if (allowedCommands.at(i).name == name) {
+	      delete allowedCommands.at(i).value;
+	      allowedCommands.removeAt(i);
+	      return;
+	    }
 	}
 
         bool SIG_LanguageParameters::hasCommand (QString name) const
         {
-                return (allowedCommands.find (name) != 0);
+                for (const NamedCommand &c : allowedCommands)
+                        if (c.name == name) return true;
+                return false;
         }
         
         SIG_CommandParameters *SIG_LanguageParameters::getCommand (QString name) const
         {
-                return allowedCommands.find (name);
+                // Last match wins, as Qt 2's QDict did.
+                for (qsizetype i = allowedCommands.size() - 1; i >= 0; --i)
+                        if (allowedCommands.at(i).name == name)
+                                return allowedCommands.at(i).value;
+                return 0;
         }
 
         void SIG_LanguageParameters::setRegisterWidth (int width)
@@ -180,14 +193,11 @@ namespace SIGEL_Robot {
 
         void SIG_LanguageParameters::writeToFileTransfer (QTextStream & tx) const
         {
-                Q2DictIterator<SIG_CommandParameters> cmditer (allowedCommands);
-                
                 tx << "LanguageParameters " << bitsPerRegister << ' ' << memSize << ' ' << maximalDelayTime << ' ';
                 tx << allowedCommands.count () << '\n';
-                while (cmditer.current ()) {
-                        tx << cmditer.currentKey () << ' ';
-                        cmditer.current ()->writeToFileTransfer (tx);
-                        ++cmditer;
+                for (const NamedCommand &c : allowedCommands) {
+                        tx << c.name << ' ';
+                        c.value->writeToFileTransfer (tx);
                 }
         }
 }

@@ -51,6 +51,10 @@ namespace SIGEL_Robot
   class SIG_Link
     {
     public:
+      /** A significant point on the link, with the name it is declared under. */
+      struct NamedPoint { QString name; DL_vector *value; };
+
+    public:
       SIG_Link (SIG_Robot *par, QString n, int nr);
       SIG_Link (SIG_Robot *par, QTextStream & tx);
       ~SIG_Link (void);
@@ -66,7 +70,7 @@ namespace SIGEL_Robot
       void addPoint (QString pointname, DL_vector point);
       DL_vector getPoint (QString id) const;
       bool hasPoint (QString pointname) const;
-      Q2DictIterator<DL_vector> getPointIter (void) const;
+      const QList<NamedPoint> &getPoints (void) const;
       int getNrOfPoints (void) const;
 
       void instantiateGeometry (void);
@@ -116,7 +120,9 @@ namespace SIGEL_Robot
       SIG_Geometry *geometry;
       SIG_Mirtich *mirtich;
       SIG_Material *material;
-      Q2Dict<DL_vector> points;
+      // Phase D. Was Q2Dict<DL_vector>. A DL_vector has no name of its own,
+      // so unlike SIG_Robot's six lists this one needs to carry the key.
+      QList<NamedPoint> points;
       Q2PtrList<SIG_Joint> adjacentJoints;
       Q2PtrList<SIG_Link> noCollide;
       DL_vector initialLocation;

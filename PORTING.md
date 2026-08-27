@@ -30,7 +30,7 @@ build and run, because nothing else can be verified without it — see §3.
 | B — ownership explicit | **8 of 14 containers**. 5 still on `setAutoDelete` — open, §7 |
 | R — build and run | core builds and runs, faithful to 1.3. **No way to check it yet** — needs fitness numbers from the 1.3 binary on the x86 box, §7 |
 | T — old-Qt tool container | **done 2026-08-27.** `tools/qtmig`, §4 |
-| D — delete the shim, migrate the data | **D1–D4 done 2026-08-27.** Hash order gone, `SIG_Robot`'s six dicts are plain `QList<T*>`. Both gates clean throughout. Remaining: `SIG_Link::points`, then `Q2PtrList`/`Q2PtrVector`/`Q2Array`/`Q2Queue`, then delete the header. §10 |
+| D — delete the shim, migrate the data | **D1–D5 done 2026-08-27. `Q2Dict` and `Q2DictIterator` are deleted** — shim 806 → 609 lines. Remaining: `Q2Array` 180, `Q2PtrVector` 68, `Q2PtrList` 61, `Q2Queue` 16, `Q2ListIterator` 14, then the header goes. §10 |
 | C — GUI | **not started, AUTHORIZED 2026-08-27 per D24.** ~450 Qt 2 sites + 20 forms |
 
 **SCOPE — DECIDED 2026-08-23. Read this before changing anything.**
@@ -1158,6 +1158,28 @@ allocations as *the* per-evaluation leak. That holds only for small robots.
 pre-existing, not from this change: byte-for-byte identical on the commit
 before. The leak scales with links and simulated frames, which §10's "one
 simulation object per fitness evaluation" does not convey.
+
+### D5 — the dictionary type is gone
+
+All eight users are plain Qt 6 now. `SIG_Robot`'s six were D4; this step did the
+other two, both of which needed the key carried explicitly because the value has
+no name of its own:
+
+| | |
+|---|---|
+| `SIG_Link::points` | `QList<NamedPoint>`, `struct NamedPoint { QString name; DL_vector *value; }` |
+| `SIG_LanguageParameters::allowedCommands` | `QList<NamedCommand>`, same shape |
+
+`allowedCommands` is the **eighth** order-carrying dictionary, and the earlier
+"six dicts plus points is seven" missed it — found by review. Its order rides
+inside every `.exp` and every PVM transfer through `writeToFileTransfer`.
+
+Both lookups scan **backwards**, because Qt 2's `QDict` returned the newest
+binding for a duplicate key and `removeCommand` has to free that same one. This
+is the semantic that broke in D3 and was caught by the shim's self-check.
+
+`Q2Dict` and `Q2DictIterator` are deleted from `q2compat.h`, and the 15 test
+blocks that exercised them are deleted from the self-check, which still passes.
 
 **Formats, both pure permutations.** `.rrb` is block-structured with exactly five
 top-level kinds — `material`, `link`, `joint <subtype>`, `drive`, `sensor`, all

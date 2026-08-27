@@ -508,12 +508,11 @@ void SIGEL_Simulation::SIG_DynaSystem::doCollisionDetection()
 void SIGEL_Simulation::SIG_DynaSystem::newLink(SIGEL_Robot::SIG_Link& theLink)
 {
  SIGEL_Tools::SIG_IO::cerr << "Link " << theLink.getNumber() << " : " << theLink.getName() << "\n";
- Q2DictIterator<DL_vector> pts=theLink.getPointIter();
+ const QList<SIGEL_Robot::SIG_Link::NamedPoint> &pts=theLink.getPoints();
  int n=theLink.getNrOfPoints();
- while (pts.current()) {
-  DL_vector p=(pts.current());
-  SIGEL_Tools::SIG_IO::cerr << " " << pts.currentKey() << " X:" << p.x << " Y:" << p.y << " Z:" << p.z << "\n";
-  ++pts;
+ for (const SIGEL_Robot::SIG_Link::NamedPoint &np : pts) {
+  DL_vector p=(np.value);
+  SIGEL_Tools::SIG_IO::cerr << " " << np.name << " X:" << p.x << " Y:" << p.y << " Z:" << p.z << "\n";
  }
 
 

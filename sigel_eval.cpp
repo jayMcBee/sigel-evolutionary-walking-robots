@@ -78,11 +78,10 @@ static void dumpOrder(const SIGEL_Robot::SIG_Robot &r, const char *which)
 
   // Each link carries its own dict of significant points, in its own order.
   for (SIGEL_Robot::SIG_Link *l : r.getLinks()) {
-    Q2DictIterator<DL_vector> pi = l->getPointIter();
     int n = 0;
-    for (; pi.current(); ++pi)
+    for (const SIGEL_Robot::SIG_Link::NamedPoint &p : l->getPoints())
       printf("  %-8s point %s %2d  %s\n", which,
-             qPrintable(l->getName()), n++, qPrintable(pi.currentKey()));
+             qPrintable(l->getName()), n++, qPrintable(p.name));
   }
 }
 

@@ -69,7 +69,7 @@ namespace SIGEL_Robot {
                         tx >> tmpstr;
                         DL_vector *dl = new DL_vector
                                 (SIG_Robot::streamToVector (tx));
-                        points.insert (tmpstr, dl);
+                        points.append (NamedPoint{ tmpstr, dl });
                 }
 
                 // To understand this, please read my paper. Holger.
@@ -105,7 +105,8 @@ namespace SIGEL_Robot {
                 // B1: SIG_Link owns its points and nothing else. 2003 armed
                 // autoDelete here in the destructor and let ~QDict do the work;
                 // the free is now stated where the ownership is.
-                points.deleteContents ();
+                for (const NamedPoint &p : points) delete p.value;
+                points.clear ();
 
                 if (geometry) {
                         delete mirtich;
@@ -150,14 +151,16 @@ namespace SIGEL_Robot {
 
         void SIG_Link::addPoint (QString pointname, DL_vector point)
         {
-                points.insert (pointname, new DL_vector (&point));
+                points.append (NamedPoint{ pointname, new DL_vector (&point) });
         }
         
         DL_vector SIG_Link::getPoint (QString id) const
         {
                 DL_vector tmp;
                 DL_vector *t;
-                t = points.find (id);
+                t = 0;
+                for (const NamedPoint &p : points)
+                        if (p.name == id) t = p.value;
                 if (t)
                         tmp = *t;
                 return tmp;
@@ -165,12 +168,14 @@ namespace SIGEL_Robot {
 
         bool SIG_Link::hasPoint (QString id) const
         {
-                return (points.find (id) != 0);
+                for (const NamedPoint &p : points)
+                        if (p.name == id) return true;
+                return false;
         }
 
-        Q2DictIterator<DL_vector> SIG_Link::getPointIter (void) const
+        const QList<SIG_Link::NamedPoint> &SIG_Link::getPoints (void) const
         {
-                return Q2DictIterator<DL_vector> (points);
+                return points;
         }
 
         int SIG_Link::getNrOfPoints (void) const
@@ -199,13 +204,10 @@ namespace SIGEL_Robot {
 
         void SIG_Link::transformPoints (DL_vector mov, DL_matrix rot)
         {
-                Q2DictIterator<DL_vector> pit (points);
-                DL_vector *pt;
-                while (pt = pit.current ()) {
-                        pt->plusis (&mov);
-                        DL_vector v (pt);
-                        rot.times (&v, pt);
-                        ++pit;
+                for (const NamedPoint &p : points) {
+                        p.value->plusis (&mov);
+                        DL_vector v (p.value);
+                        rot.times (&v, p.value);
                 }
 
                 Q2ListIterator<SIG_Joint> jit (adjacentJoints);
@@ -319,16 +321,14 @@ namespace SIGEL_Robot {
 
         void SIG_Link::writeToFileTransfer (QTextStream & tx) const
         {
-                Q2DictIterator<DL_vector> piter (points);
                 Q2ListIterator<SIG_Link> nciter (noCollide);
                 tx << "Link "
                    << getName () << ' '
                    << getNumber () << ' '
                    << points.count () << ' ';
-                while (piter.current ()) {
-                        tx << piter.currentKey () << ' ';
-                        SIG_Robot::vectorToStream (tx, *piter.current ());
-                        ++piter;
+                for (const NamedPoint &p : points) {
+                        tx << p.name << ' ';
+                        SIG_Robot::vectorToStream (tx, *p.value);
                 }
                 tx << noCollide.count () << ' ';
                 while (nciter.current ()) {
@@ -705,14 +705,11 @@ namespace SIGEL_Robot {
 		SIGEL_Tools::SIG_IO::cerr << " " << translation( i );
 	      SIGEL_Tools::SIG_IO::cerr << "\n";
 	      SIGEL_Tools::SIG_IO::cerr << "Transformed points:\n";
-	      Q2DictIterator< DL_vector > pit( points );
-	      pit.toFirst();
-	      while (pit.current())
+	      for (const NamedPoint &p : points)
 		{
 		  for (int i=0; i<3; i++)
-		    SIGEL_Tools::SIG_IO::cerr << " " << pit.current()->get( i );
+		    SIGEL_Tools::SIG_IO::cerr << " " << p.value->get( i );
 		  SIGEL_Tools::SIG_IO::cerr << "\n";
-		  ++pit;
 		};
 #endif	      
 
