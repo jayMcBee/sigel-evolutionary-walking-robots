@@ -992,10 +992,20 @@ and the only clean original we have.
 **Only four of the six dicts are numbered.** `SIG_DynaMoSimulationData.cpp:33-55`
 walks, in this order, **links → joints → sensors → drives**, calling
 `dynaSystem.newLink/newJoint/newSensor/newDrive`. Those four orders are the ones
-a migration must reproduce exactly. Bodies and materials are **free**: bodies are
-touched only by `loadGeometries` (`SIG_Robot.cpp:242-249`), which calls `load()`
-on each and does not care in what order, and materials only through
-`lookupMaterial(name)`.
+a migration must reproduce exactly.
+
+Bodies and materials are free of *numbering* — but an earlier draft said they
+were "touched only by `loadGeometries`" and "only through `lookupMaterial`",
+**and that was wrong**: both are also iterated by
+`SIG_Robot::writeToFileTransfer`, so their order reaches `.exp` bytes, the PVM
+stream (`SIG_GPPVMData.cpp:144`) and the POV-Ray export
+(`SIG_RobotRenderer.cpp:218`). No index, number or DynaMechs registration comes
+from either, so the conclusion holds and no fitness moves — but for a different
+reason than the one given. One latent path: `SIG_Material.cpp:57` records a
+friction pair only if the partner is already loaded, so an **asymmetric**
+friction graph would lose pairs as a function of write order. Every material in
+all 14 `.exp` has `nfric == 0` and no `.rrb` declares `friction`, so it is
+latent, not live.
 
 That matters because the two are not simultaneously satisfiable. The bodies dict
 is filled as links are processed, so once it becomes insertion-ordered its order
@@ -1022,9 +1032,16 @@ the order the simulation uses.
 
 Why, and it is not luck. `Q2Dict::insert` prepends, so reading a file in order
 *F* builds every colliding chain backwards and iteration yields some order *L*.
-Saving writes *L*; loading that reverses each chain again and returns *F*. The
-round trip is self-inverse, so `copy` — which is `hash(hash(file))` — equals the
-file order exactly. Verified on `walker`, where `loaded` ≠ `copy`:
+Saving writes *L*; loading that reverses each chain again and returns *F*.
+
+**Narrower than it first looks, and the first draft overstated it.** `hash ∘
+hash` is not self-inverse in general — it is a stable sort by bucket, and is the
+identity only on an order that is already bucket-grouped. It holds here because
+every shipped file order is itself an iteration order, written by the 2003
+binary. It does **not** license hand-editing an `.exp` and expecting the
+property to survive. `copy` — `hash(hash(file))` — equals the
+file order exactly, verified for all 14 files, every kind and all 87 point
+lists, 0 mismatches. Verified on `walker`, where `loaded` ≠ `copy`:
 file order is `shoulder5, body, shoulder6, …`, `copy` is identical, `loaded`
 is `body, shoulder5, foot1, …`. So once the containers are insertion-ordered,
 loading an `.exp` gives the order the simulation already ran on, and **not one
@@ -1034,14 +1051,42 @@ The 7 `.rrb` do need it: `SIG_RobotCompilerObjects.cpp:89` inserts in
 declaration order, which the same prepend then reverses, so the file has to be
 written in today's `rrb` order for the flip to preserve it.
 
-**Link numbers shift in the `.rrb`, and that is safe — checked, not assumed.**
-`SIG_Link` numbers come from `linknumber++` at declaration
-(`SIG_RobotCompilerObjects.cpp:89`), so reordering renumbers. Nothing indexes by
-that number: `SIG_DynaSystem::getJoint(int)` (`SIG_DynaSystem.cpp:830-838`) is a
-**linear search** for a matching stored number, not an array subscript, and the
-DynaMechs body index comes from call order, which is the order we preserve. In
-the `.exp` path numbers are not touched at all — `SIG_Link.cpp:65` reads
-`tx >> name >> number` straight back, so every number stays as 2001 wrote it.
+**Link numbers shift in the `.rrb`. An earlier draft here said that was safe
+because "nothing indexes by that number". THAT WAS WRONG** — corrected by
+review, and the correction contradicts nothing else in this file only because
+the risk was already stated two paragraphs up.
+
+`SIG_DynaSystem::getJoint(int)` really is a linear search rather than a
+subscript, but the search *key is the number*, so that fact settles nothing.
+Four containers are subscripted by it directly —
+`SIG_DynaMechsSimulationData.cpp:148` `drives.insert(getNumber(), …)`, `:170`,
+`:183`, `:197` for sensors, and `:486-489` `jointIndices[joint->getNumber()]` —
+and an evolved program's operand resolves straight through them:
+`SIG_DynaMechsSimulationQueries.cpp:93-95` does
+`sensorIndex = absoluteSensorNo % sensors.size()`, and
+`SIG_DynaMechsCommandInterface.cpp:74` the same for drives.
+
+**Measured: 185 of 212 stored numbers in the reordered tree now name a different
+entity.** `walker` drive `#0` was `leg1Joint1Drive` and is now `leg6Joint3Drive`;
+sensor `#0` was `leg1Joint1Sensor`, now `leg6Joint2Sensor`. So `MOVE 0` on a
+`.rrb`-loaded walker drives a different actuator than it did in 2003.
+
+**Iteration order and numbering cannot both be preserved for a `.rrb`**, because
+the number *is* the declaration position (`SIG_RobotCompilerObjects.cpp:89`,
+`linknumber++`) and the file has nowhere to record a number independently. The
+migration chose **iteration order**, which is what §10 asks for and what feeds
+the DynaMechs body index. That choice was made silently and should not have
+been; it is written down now, and it is **open to reversal** — leaving the 7
+`.rrb` untouched would instead give declaration order = position = number =
+iteration order, fully self-consistent, at the cost of changing the order the
+1.3 binary would have used.
+
+**Nothing shipped is affected either way.** The 14 `.exp` embed their own robot
+with its own stored numbers, are never reconciled against a `.rrb`
+(`SIG_GPExperiment.cpp:86-101`), and `SIG_Link.cpp:65` reads
+`tx >> name >> number` straight back — every number stays as 2001 wrote it.
+`dictorder-dump.sh` now prints the stored number next to the position (`#N`) so
+this is visible to the gate instead of invisible to it.
 
 ### D3 — the flip, done 2026-08-27
 
@@ -1059,9 +1104,14 @@ by hash any more.
 | check | result |
 |---|---|
 | `copy` order, the order the simulation runs on | **0 of 14 blocks changed** |
-| `rrb` order | **0 of 7 changed** |
+| `rrb` order, the four numbered kinds and all 60 point lists | **0 of 7 changed** |
 | fitness, 3 individuals × 14 experiments | **identical on all 42** |
-| `loaded` order | 7 of 14 changed — **correct**, see below |
+| `loaded` order | **8** of 14 changed — **correct**, see below |
+| `rrb` body and material order | 6 of 7 changed — free, see above |
+
+The first draft of this table said "`rrb` 0 of 7" and "`loaded` 7 of 14" without
+qualification. Both were wrong as written: 6 of 7 `rrb` blocks changed in the
+free dicts, and `loaded` moved for 8 blocks, not 7.
 
 `loaded` had to move. It was `hash(file)` and is now file order, which is
 exactly what collapses it onto `copy` — the three load paths becoming one order

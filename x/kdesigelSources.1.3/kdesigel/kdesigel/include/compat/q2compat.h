@@ -267,10 +267,14 @@ public:
         items = 0;
     }
 
+    // Scans BACKWARDS, like find(). Under the old prepend the newest node was
+    // at index 0 and a forward scan found it; appending put the newest at the
+    // end, so a forward scan started removing the OLDEST -- find() and take()
+    // stopped agreeing on which node they meant, which in Qt 2 they always did.
     bool remove(const QString &k)               // Qt 2 removes ONE, the newest
     {
         QList<Node> &c = buckets[0];
-        for (qsizetype i = 0; i < c.size(); ++i)
+        for (qsizetype i = c.size() - 1; i >= 0; --i)
             if (c.at(i).key == k) {
                 if (del) delete c.at(i).val;
                 c.removeAt(i); --items; return true;
@@ -278,10 +282,10 @@ public:
         return false;
     }
 
-    T *take(const QString &k)
+    T *take(const QString &k)                   // newest, as remove() above
     {
         QList<Node> &c = buckets[0];
-        for (qsizetype i = 0; i < c.size(); ++i)
+        for (qsizetype i = c.size() - 1; i >= 0; --i)
             if (c.at(i).key == k) {
                 T *v = c.at(i).val;
                 c.removeAt(i); --items; return v;

@@ -1,23 +1,23 @@
 == hammerNiceWalkingFitness.exp
-loaded   body       0  base.wrl
-loaded   body       1  middle.wrl
-loaded   body       2  effector.wrl
-loaded   material   0  plastic
-loaded   material   1  metal
-loaded   material   2  rubber
-loaded   link       0  base
-loaded   link       1  hammer
-loaded   link       2  middle1
-loaded   link       3  middle2
-loaded   link       4  middle3
-loaded   joint      0  hinge1
-loaded   joint      1  hinge2
-loaded   joint      2  hinge3
-loaded   joint      3  hinge4
-loaded   drive      0  hinge1Drive
-loaded   drive      1  hinge3Drive
-loaded   drive      2  hinge2Drive
-loaded   drive      3  hinge4Drive
+loaded   body       0 #-1  base.wrl
+loaded   body       1 #-1  middle.wrl
+loaded   body       2 #-1  effector.wrl
+loaded   material   0 #-1  plastic
+loaded   material   1 #-1  metal
+loaded   material   2 #-1  rubber
+loaded   link       0 #0   base
+loaded   link       1 #4   hammer
+loaded   link       2 #1   middle1
+loaded   link       3 #2   middle2
+loaded   link       4 #3   middle3
+loaded   joint      0 #0   hinge1
+loaded   joint      1 #1   hinge2
+loaded   joint      2 #2   hinge3
+loaded   joint      3 #3   hinge4
+loaded   drive      0 #0   hinge1Drive
+loaded   drive      1 #2   hinge3Drive
+loaded   drive      2 #1   hinge2Drive
+loaded   drive      3 #3   hinge4Drive
 loaded   point base  0  BaseAxisSuccNormal
 loaded   point base  1  BaseAxisSuccDir
 loaded   point base  2  BaseAxisSuccBase
@@ -42,25 +42,25 @@ loaded   point middle3  2  Middle3SuccAxisDir
 loaded   point middle3  3  Middle3SuccAxisNormal
 loaded   point middle3  4  Middle3PredAxisDir
 loaded   point middle3  5  Middle3PredAxisBase
-copy     body       0  base.wrl
-copy     body       1  middle.wrl
-copy     body       2  effector.wrl
-copy     material   0  plastic
-copy     material   1  metal
-copy     material   2  rubber
-copy     link       0  base
-copy     link       1  hammer
-copy     link       2  middle1
-copy     link       3  middle2
-copy     link       4  middle3
-copy     joint      0  hinge1
-copy     joint      1  hinge2
-copy     joint      2  hinge3
-copy     joint      3  hinge4
-copy     drive      0  hinge1Drive
-copy     drive      1  hinge3Drive
-copy     drive      2  hinge2Drive
-copy     drive      3  hinge4Drive
+copy     body       0 #-1  base.wrl
+copy     body       1 #-1  middle.wrl
+copy     body       2 #-1  effector.wrl
+copy     material   0 #-1  plastic
+copy     material   1 #-1  metal
+copy     material   2 #-1  rubber
+copy     link       0 #0   base
+copy     link       1 #4   hammer
+copy     link       2 #1   middle1
+copy     link       3 #2   middle2
+copy     link       4 #3   middle3
+copy     joint      0 #0   hinge1
+copy     joint      1 #1   hinge2
+copy     joint      2 #2   hinge3
+copy     joint      3 #3   hinge4
+copy     drive      0 #0   hinge1Drive
+copy     drive      1 #2   hinge3Drive
+copy     drive      2 #1   hinge2Drive
+copy     drive      3 #3   hinge4Drive
 copy     point base  0  BaseAxisSuccNormal
 copy     point base  1  BaseAxisSuccDir
 copy     point base  2  BaseAxisSuccBase
@@ -86,61 +86,61 @@ copy     point middle3  3  Middle3SuccAxisNormal
 copy     point middle3  4  Middle3PredAxisDir
 copy     point middle3  5  Middle3PredAxisBase
 == insectNiceWalkingFitness.exp
-loaded   body       0  foot.wrl
-loaded   body       1  body.wrl
-loaded   body       2  leg.wrl
-loaded   material   0  legMaterial
-loaded   material   1  footMaterial
-loaded   material   2  bodyMaterial
-loaded   link       0  body
-loaded   link       1  foot1
-loaded   link       2  foot2
-loaded   link       3  foot3
-loaded   link       4  foot4
-loaded   link       5  foot5
-loaded   link       6  foot6
-loaded   link       7  leg1
-loaded   link       8  leg2
-loaded   link       9  leg3
-loaded   link      10  leg4
-loaded   link      11  leg5
-loaded   link      12  leg6
-loaded   joint      0  leg5Joint2
-loaded   joint      1  leg6Joint1
-loaded   joint      2  leg6Joint2
-loaded   joint      3  leg1Joint1
-loaded   joint      4  leg1Joint2
-loaded   joint      5  leg2Joint1
-loaded   joint      6  leg2Joint2
-loaded   joint      7  leg3Joint1
-loaded   joint      8  leg3Joint2
-loaded   joint      9  leg4Joint1
-loaded   joint     10  leg4Joint2
-loaded   joint     11  leg5Joint1
-loaded   drive      0  leg4Joint1Drive
-loaded   drive      1  leg5Joint2Drive
-loaded   drive      2  leg1Joint1Drive
-loaded   drive      3  leg2Joint1Drive
-loaded   drive      4  leg2Joint2Drive
-loaded   drive      5  leg1Joint2Drive
-loaded   drive      6  leg4Joint2Drive
-loaded   drive      7  leg5Joint1Drive
-loaded   drive      8  leg3Joint2Drive
-loaded   drive      9  leg6Joint1Drive
-loaded   drive     10  leg3Joint1Drive
-loaded   drive     11  leg6Joint2Drive
-loaded   sensor     0  leg5Joint1Sensor
-loaded   sensor     1  leg6Joint2Sensor
-loaded   sensor     2  leg5Joint2Sensor
-loaded   sensor     3  leg6Joint1Sensor
-loaded   sensor     4  leg3Joint1Sensor
-loaded   sensor     5  leg4Joint2Sensor
-loaded   sensor     6  leg3Joint2Sensor
-loaded   sensor     7  leg4Joint1Sensor
-loaded   sensor     8  leg1Joint1Sensor
-loaded   sensor     9  leg2Joint2Sensor
-loaded   sensor    10  leg1Joint2Sensor
-loaded   sensor    11  leg2Joint1Sensor
+loaded   body       0 #-1  foot.wrl
+loaded   body       1 #-1  body.wrl
+loaded   body       2 #-1  leg.wrl
+loaded   material   0 #-1  legMaterial
+loaded   material   1 #-1  footMaterial
+loaded   material   2 #-1  bodyMaterial
+loaded   link       0 #0   body
+loaded   link       1 #2   foot1
+loaded   link       2 #4   foot2
+loaded   link       3 #6   foot3
+loaded   link       4 #8   foot4
+loaded   link       5 #10  foot5
+loaded   link       6 #12  foot6
+loaded   link       7 #1   leg1
+loaded   link       8 #3   leg2
+loaded   link       9 #5   leg3
+loaded   link      10 #7   leg4
+loaded   link      11 #9   leg5
+loaded   link      12 #11  leg6
+loaded   joint      0 #9   leg5Joint2
+loaded   joint      1 #10  leg6Joint1
+loaded   joint      2 #11  leg6Joint2
+loaded   joint      3 #0   leg1Joint1
+loaded   joint      4 #1   leg1Joint2
+loaded   joint      5 #2   leg2Joint1
+loaded   joint      6 #3   leg2Joint2
+loaded   joint      7 #4   leg3Joint1
+loaded   joint      8 #5   leg3Joint2
+loaded   joint      9 #6   leg4Joint1
+loaded   joint     10 #7   leg4Joint2
+loaded   joint     11 #8   leg5Joint1
+loaded   drive      0 #6   leg4Joint1Drive
+loaded   drive      1 #9   leg5Joint2Drive
+loaded   drive      2 #0   leg1Joint1Drive
+loaded   drive      3 #2   leg2Joint1Drive
+loaded   drive      4 #3   leg2Joint2Drive
+loaded   drive      5 #1   leg1Joint2Drive
+loaded   drive      6 #7   leg4Joint2Drive
+loaded   drive      7 #8   leg5Joint1Drive
+loaded   drive      8 #5   leg3Joint2Drive
+loaded   drive      9 #10  leg6Joint1Drive
+loaded   drive     10 #4   leg3Joint1Drive
+loaded   drive     11 #11  leg6Joint2Drive
+loaded   sensor     0 #8   leg5Joint1Sensor
+loaded   sensor     1 #11  leg6Joint2Sensor
+loaded   sensor     2 #9   leg5Joint2Sensor
+loaded   sensor     3 #10  leg6Joint1Sensor
+loaded   sensor     4 #4   leg3Joint1Sensor
+loaded   sensor     5 #7   leg4Joint2Sensor
+loaded   sensor     6 #5   leg3Joint2Sensor
+loaded   sensor     7 #6   leg4Joint1Sensor
+loaded   sensor     8 #0   leg1Joint1Sensor
+loaded   sensor     9 #3   leg2Joint2Sensor
+loaded   sensor    10 #1   leg1Joint2Sensor
+loaded   sensor    11 #2   leg2Joint1Sensor
 loaded   point body  0  bodyLeg4Normal
 loaded   point body  1  bodyLeg6Dir
 loaded   point body  2  bodyLeg5Base
@@ -213,61 +213,61 @@ loaded   point leg6  2  leg6SuccNormal
 loaded   point leg6  3  leg6PredDir
 loaded   point leg6  4  leg6PredNormal
 loaded   point leg6  5  leg6SuccBase
-copy     body       0  foot.wrl
-copy     body       1  body.wrl
-copy     body       2  leg.wrl
-copy     material   0  legMaterial
-copy     material   1  footMaterial
-copy     material   2  bodyMaterial
-copy     link       0  body
-copy     link       1  foot1
-copy     link       2  foot2
-copy     link       3  foot3
-copy     link       4  foot4
-copy     link       5  foot5
-copy     link       6  foot6
-copy     link       7  leg1
-copy     link       8  leg2
-copy     link       9  leg3
-copy     link      10  leg4
-copy     link      11  leg5
-copy     link      12  leg6
-copy     joint      0  leg5Joint2
-copy     joint      1  leg6Joint1
-copy     joint      2  leg6Joint2
-copy     joint      3  leg1Joint1
-copy     joint      4  leg1Joint2
-copy     joint      5  leg2Joint1
-copy     joint      6  leg2Joint2
-copy     joint      7  leg3Joint1
-copy     joint      8  leg3Joint2
-copy     joint      9  leg4Joint1
-copy     joint     10  leg4Joint2
-copy     joint     11  leg5Joint1
-copy     drive      0  leg4Joint1Drive
-copy     drive      1  leg5Joint2Drive
-copy     drive      2  leg1Joint1Drive
-copy     drive      3  leg2Joint1Drive
-copy     drive      4  leg2Joint2Drive
-copy     drive      5  leg1Joint2Drive
-copy     drive      6  leg4Joint2Drive
-copy     drive      7  leg5Joint1Drive
-copy     drive      8  leg3Joint2Drive
-copy     drive      9  leg6Joint1Drive
-copy     drive     10  leg3Joint1Drive
-copy     drive     11  leg6Joint2Drive
-copy     sensor     0  leg5Joint1Sensor
-copy     sensor     1  leg6Joint2Sensor
-copy     sensor     2  leg5Joint2Sensor
-copy     sensor     3  leg6Joint1Sensor
-copy     sensor     4  leg3Joint1Sensor
-copy     sensor     5  leg4Joint2Sensor
-copy     sensor     6  leg3Joint2Sensor
-copy     sensor     7  leg4Joint1Sensor
-copy     sensor     8  leg1Joint1Sensor
-copy     sensor     9  leg2Joint2Sensor
-copy     sensor    10  leg1Joint2Sensor
-copy     sensor    11  leg2Joint1Sensor
+copy     body       0 #-1  foot.wrl
+copy     body       1 #-1  body.wrl
+copy     body       2 #-1  leg.wrl
+copy     material   0 #-1  legMaterial
+copy     material   1 #-1  footMaterial
+copy     material   2 #-1  bodyMaterial
+copy     link       0 #0   body
+copy     link       1 #2   foot1
+copy     link       2 #4   foot2
+copy     link       3 #6   foot3
+copy     link       4 #8   foot4
+copy     link       5 #10  foot5
+copy     link       6 #12  foot6
+copy     link       7 #1   leg1
+copy     link       8 #3   leg2
+copy     link       9 #5   leg3
+copy     link      10 #7   leg4
+copy     link      11 #9   leg5
+copy     link      12 #11  leg6
+copy     joint      0 #9   leg5Joint2
+copy     joint      1 #10  leg6Joint1
+copy     joint      2 #11  leg6Joint2
+copy     joint      3 #0   leg1Joint1
+copy     joint      4 #1   leg1Joint2
+copy     joint      5 #2   leg2Joint1
+copy     joint      6 #3   leg2Joint2
+copy     joint      7 #4   leg3Joint1
+copy     joint      8 #5   leg3Joint2
+copy     joint      9 #6   leg4Joint1
+copy     joint     10 #7   leg4Joint2
+copy     joint     11 #8   leg5Joint1
+copy     drive      0 #6   leg4Joint1Drive
+copy     drive      1 #9   leg5Joint2Drive
+copy     drive      2 #0   leg1Joint1Drive
+copy     drive      3 #2   leg2Joint1Drive
+copy     drive      4 #3   leg2Joint2Drive
+copy     drive      5 #1   leg1Joint2Drive
+copy     drive      6 #7   leg4Joint2Drive
+copy     drive      7 #8   leg5Joint1Drive
+copy     drive      8 #5   leg3Joint2Drive
+copy     drive      9 #10  leg6Joint1Drive
+copy     drive     10 #4   leg3Joint1Drive
+copy     drive     11 #11  leg6Joint2Drive
+copy     sensor     0 #8   leg5Joint1Sensor
+copy     sensor     1 #11  leg6Joint2Sensor
+copy     sensor     2 #9   leg5Joint2Sensor
+copy     sensor     3 #10  leg6Joint1Sensor
+copy     sensor     4 #4   leg3Joint1Sensor
+copy     sensor     5 #7   leg4Joint2Sensor
+copy     sensor     6 #5   leg3Joint2Sensor
+copy     sensor     7 #6   leg4Joint1Sensor
+copy     sensor     8 #0   leg1Joint1Sensor
+copy     sensor     9 #3   leg2Joint2Sensor
+copy     sensor    10 #1   leg1Joint2Sensor
+copy     sensor    11 #2   leg2Joint1Sensor
 copy     point body  0  bodyLeg4Normal
 copy     point body  1  bodyLeg6Dir
 copy     point body  2  bodyLeg5Base
@@ -341,49 +341,49 @@ copy     point leg6  3  leg6PredDir
 copy     point leg6  4  leg6PredNormal
 copy     point leg6  5  leg6SuccBase
 == octopusNiceWalkingFitness.exp
-loaded   body       0  legLink.wrl
-loaded   body       1  footLink.wrl
-loaded   body       2  tripleBase.wrl
-loaded   material   0  greenPlastic
-loaded   material   1  bluePlastic
-loaded   material   2  redPlastic
-loaded   link       0  thirdFootLink
-loaded   link       1  firstFootLink
-loaded   link       2  base
-loaded   link       3  firstLegLink1
-loaded   link       4  firstLegLink2
-loaded   link       5  secondFootLink
-loaded   link       6  secondLegLink1
-loaded   link       7  secondLegLink2
-loaded   link       8  thirdLegLink1
-loaded   link       9  thirdLegLink2
-loaded   joint      0  secondLegJoint1
-loaded   joint      1  secondLegJoint2
-loaded   joint      2  thirdLegJoint1
-loaded   joint      3  secondLegJoint3
-loaded   joint      4  thirdLegJoint2
-loaded   joint      5  thirdLegJoint3
-loaded   joint      6  firstLegJoint1
-loaded   joint      7  firstLegJoint2
-loaded   joint      8  firstLegJoint3
-loaded   drive      0  firstLegJoint2Drive
-loaded   drive      1  firstLegJoint1Drive
-loaded   drive      2  secondLegJoint1Drive
-loaded   drive      3  secondLegJoint3Drive
-loaded   drive      4  thirdLegJoint2Drive
-loaded   drive      5  secondLegJoint2Drive
-loaded   drive      6  thirdLegJoint3Drive
-loaded   drive      7  thirdLegJoint1Drive
-loaded   drive      8  firstLegJoint3Drive
-loaded   sensor     0  secondLegJoint1Sensor
-loaded   sensor     1  thirdLegJoint3Sensor
-loaded   sensor     2  secondLegJoint2Sensor
-loaded   sensor     3  firstLegJoint3Sensor
-loaded   sensor     4  secondLegJoint3Sensor
-loaded   sensor     5  thirdLegJoint2Sensor
-loaded   sensor     6  thirdLegJoint1Sensor
-loaded   sensor     7  firstLegJoint1Sensor
-loaded   sensor     8  firstLegJoint2Sensor
+loaded   body       0 #-1  legLink.wrl
+loaded   body       1 #-1  footLink.wrl
+loaded   body       2 #-1  tripleBase.wrl
+loaded   material   0 #-1  greenPlastic
+loaded   material   1 #-1  bluePlastic
+loaded   material   2 #-1  redPlastic
+loaded   link       0 #9   thirdFootLink
+loaded   link       1 #3   firstFootLink
+loaded   link       2 #0   base
+loaded   link       3 #1   firstLegLink1
+loaded   link       4 #2   firstLegLink2
+loaded   link       5 #6   secondFootLink
+loaded   link       6 #4   secondLegLink1
+loaded   link       7 #5   secondLegLink2
+loaded   link       8 #7   thirdLegLink1
+loaded   link       9 #8   thirdLegLink2
+loaded   joint      0 #3   secondLegJoint1
+loaded   joint      1 #4   secondLegJoint2
+loaded   joint      2 #6   thirdLegJoint1
+loaded   joint      3 #5   secondLegJoint3
+loaded   joint      4 #7   thirdLegJoint2
+loaded   joint      5 #8   thirdLegJoint3
+loaded   joint      6 #0   firstLegJoint1
+loaded   joint      7 #1   firstLegJoint2
+loaded   joint      8 #2   firstLegJoint3
+loaded   drive      0 #1   firstLegJoint2Drive
+loaded   drive      1 #0   firstLegJoint1Drive
+loaded   drive      2 #3   secondLegJoint1Drive
+loaded   drive      3 #5   secondLegJoint3Drive
+loaded   drive      4 #7   thirdLegJoint2Drive
+loaded   drive      5 #4   secondLegJoint2Drive
+loaded   drive      6 #8   thirdLegJoint3Drive
+loaded   drive      7 #6   thirdLegJoint1Drive
+loaded   drive      8 #2   firstLegJoint3Drive
+loaded   sensor     0 #3   secondLegJoint1Sensor
+loaded   sensor     1 #8   thirdLegJoint3Sensor
+loaded   sensor     2 #4   secondLegJoint2Sensor
+loaded   sensor     3 #2   firstLegJoint3Sensor
+loaded   sensor     4 #5   secondLegJoint3Sensor
+loaded   sensor     5 #7   thirdLegJoint2Sensor
+loaded   sensor     6 #6   thirdLegJoint1Sensor
+loaded   sensor     7 #0   firstLegJoint1Sensor
+loaded   sensor     8 #1   firstLegJoint2Sensor
 loaded   point thirdFootLink  0  thirdFootLinkNormal
 loaded   point thirdFootLink  1  thirdFootLinkDir
 loaded   point thirdFootLink  2  thirdFootLinkBase
@@ -438,49 +438,49 @@ loaded   point thirdLegLink2  2  thirdLegLink2PredDir
 loaded   point thirdLegLink2  3  thirdLegLink2SuccBase
 loaded   point thirdLegLink2  4  thirdLegLink2SuccDir
 loaded   point thirdLegLink2  5  thirdLegLink2PredNormal
-copy     body       0  legLink.wrl
-copy     body       1  footLink.wrl
-copy     body       2  tripleBase.wrl
-copy     material   0  greenPlastic
-copy     material   1  bluePlastic
-copy     material   2  redPlastic
-copy     link       0  thirdFootLink
-copy     link       1  firstFootLink
-copy     link       2  base
-copy     link       3  firstLegLink1
-copy     link       4  firstLegLink2
-copy     link       5  secondFootLink
-copy     link       6  secondLegLink1
-copy     link       7  secondLegLink2
-copy     link       8  thirdLegLink1
-copy     link       9  thirdLegLink2
-copy     joint      0  secondLegJoint1
-copy     joint      1  secondLegJoint2
-copy     joint      2  thirdLegJoint1
-copy     joint      3  secondLegJoint3
-copy     joint      4  thirdLegJoint2
-copy     joint      5  thirdLegJoint3
-copy     joint      6  firstLegJoint1
-copy     joint      7  firstLegJoint2
-copy     joint      8  firstLegJoint3
-copy     drive      0  firstLegJoint2Drive
-copy     drive      1  firstLegJoint1Drive
-copy     drive      2  secondLegJoint1Drive
-copy     drive      3  secondLegJoint3Drive
-copy     drive      4  thirdLegJoint2Drive
-copy     drive      5  secondLegJoint2Drive
-copy     drive      6  thirdLegJoint3Drive
-copy     drive      7  thirdLegJoint1Drive
-copy     drive      8  firstLegJoint3Drive
-copy     sensor     0  secondLegJoint1Sensor
-copy     sensor     1  thirdLegJoint3Sensor
-copy     sensor     2  secondLegJoint2Sensor
-copy     sensor     3  firstLegJoint3Sensor
-copy     sensor     4  secondLegJoint3Sensor
-copy     sensor     5  thirdLegJoint2Sensor
-copy     sensor     6  thirdLegJoint1Sensor
-copy     sensor     7  firstLegJoint1Sensor
-copy     sensor     8  firstLegJoint2Sensor
+copy     body       0 #-1  legLink.wrl
+copy     body       1 #-1  footLink.wrl
+copy     body       2 #-1  tripleBase.wrl
+copy     material   0 #-1  greenPlastic
+copy     material   1 #-1  bluePlastic
+copy     material   2 #-1  redPlastic
+copy     link       0 #9   thirdFootLink
+copy     link       1 #3   firstFootLink
+copy     link       2 #0   base
+copy     link       3 #1   firstLegLink1
+copy     link       4 #2   firstLegLink2
+copy     link       5 #6   secondFootLink
+copy     link       6 #4   secondLegLink1
+copy     link       7 #5   secondLegLink2
+copy     link       8 #7   thirdLegLink1
+copy     link       9 #8   thirdLegLink2
+copy     joint      0 #3   secondLegJoint1
+copy     joint      1 #4   secondLegJoint2
+copy     joint      2 #6   thirdLegJoint1
+copy     joint      3 #5   secondLegJoint3
+copy     joint      4 #7   thirdLegJoint2
+copy     joint      5 #8   thirdLegJoint3
+copy     joint      6 #0   firstLegJoint1
+copy     joint      7 #1   firstLegJoint2
+copy     joint      8 #2   firstLegJoint3
+copy     drive      0 #1   firstLegJoint2Drive
+copy     drive      1 #0   firstLegJoint1Drive
+copy     drive      2 #3   secondLegJoint1Drive
+copy     drive      3 #5   secondLegJoint3Drive
+copy     drive      4 #7   thirdLegJoint2Drive
+copy     drive      5 #4   secondLegJoint2Drive
+copy     drive      6 #8   thirdLegJoint3Drive
+copy     drive      7 #6   thirdLegJoint1Drive
+copy     drive      8 #2   firstLegJoint3Drive
+copy     sensor     0 #3   secondLegJoint1Sensor
+copy     sensor     1 #8   thirdLegJoint3Sensor
+copy     sensor     2 #4   secondLegJoint2Sensor
+copy     sensor     3 #2   firstLegJoint3Sensor
+copy     sensor     4 #5   secondLegJoint3Sensor
+copy     sensor     5 #7   thirdLegJoint2Sensor
+copy     sensor     6 #6   thirdLegJoint1Sensor
+copy     sensor     7 #0   firstLegJoint1Sensor
+copy     sensor     8 #1   firstLegJoint2Sensor
 copy     point thirdFootLink  0  thirdFootLinkNormal
 copy     point thirdFootLink  1  thirdFootLinkDir
 copy     point thirdFootLink  2  thirdFootLinkBase
@@ -536,49 +536,49 @@ copy     point thirdLegLink2  3  thirdLegLink2SuccBase
 copy     point thirdLegLink2  4  thirdLegLink2SuccDir
 copy     point thirdLegLink2  5  thirdLegLink2PredNormal
 == octopusSimpleFitness.exp
-loaded   body       0  footLink.wrl
-loaded   body       1  legLink.wrl
-loaded   body       2  tripleBase.wrl
-loaded   material   0  greenPlastic
-loaded   material   1  bluePlastic
-loaded   material   2  redPlastic
-loaded   link       0  thirdFootLink
-loaded   link       1  firstFootLink
-loaded   link       2  base
-loaded   link       3  firstLegLink1
-loaded   link       4  firstLegLink2
-loaded   link       5  secondFootLink
-loaded   link       6  secondLegLink1
-loaded   link       7  secondLegLink2
-loaded   link       8  thirdLegLink1
-loaded   link       9  thirdLegLink2
-loaded   joint      0  secondLegJoint1
-loaded   joint      1  thirdLegJoint1
-loaded   joint      2  secondLegJoint2
-loaded   joint      3  thirdLegJoint2
-loaded   joint      4  secondLegJoint3
-loaded   joint      5  thirdLegJoint3
-loaded   joint      6  firstLegJoint1
-loaded   joint      7  firstLegJoint2
-loaded   joint      8  firstLegJoint3
-loaded   drive      0  firstLegJoint2Drive
-loaded   drive      1  firstLegJoint1Drive
-loaded   drive      2  secondLegJoint1Drive
-loaded   drive      3  thirdLegJoint2Drive
-loaded   drive      4  secondLegJoint3Drive
-loaded   drive      5  thirdLegJoint3Drive
-loaded   drive      6  secondLegJoint2Drive
-loaded   drive      7  thirdLegJoint1Drive
-loaded   drive      8  firstLegJoint3Drive
-loaded   sensor     0  thirdLegJoint3Sensor
-loaded   sensor     1  secondLegJoint1Sensor
-loaded   sensor     2  secondLegJoint2Sensor
-loaded   sensor     3  firstLegJoint3Sensor
-loaded   sensor     4  thirdLegJoint2Sensor
-loaded   sensor     5  secondLegJoint3Sensor
-loaded   sensor     6  thirdLegJoint1Sensor
-loaded   sensor     7  firstLegJoint1Sensor
-loaded   sensor     8  firstLegJoint2Sensor
+loaded   body       0 #-1  footLink.wrl
+loaded   body       1 #-1  legLink.wrl
+loaded   body       2 #-1  tripleBase.wrl
+loaded   material   0 #-1  greenPlastic
+loaded   material   1 #-1  bluePlastic
+loaded   material   2 #-1  redPlastic
+loaded   link       0 #9   thirdFootLink
+loaded   link       1 #3   firstFootLink
+loaded   link       2 #0   base
+loaded   link       3 #1   firstLegLink1
+loaded   link       4 #2   firstLegLink2
+loaded   link       5 #6   secondFootLink
+loaded   link       6 #4   secondLegLink1
+loaded   link       7 #5   secondLegLink2
+loaded   link       8 #7   thirdLegLink1
+loaded   link       9 #8   thirdLegLink2
+loaded   joint      0 #3   secondLegJoint1
+loaded   joint      1 #6   thirdLegJoint1
+loaded   joint      2 #4   secondLegJoint2
+loaded   joint      3 #7   thirdLegJoint2
+loaded   joint      4 #5   secondLegJoint3
+loaded   joint      5 #8   thirdLegJoint3
+loaded   joint      6 #0   firstLegJoint1
+loaded   joint      7 #1   firstLegJoint2
+loaded   joint      8 #2   firstLegJoint3
+loaded   drive      0 #1   firstLegJoint2Drive
+loaded   drive      1 #0   firstLegJoint1Drive
+loaded   drive      2 #3   secondLegJoint1Drive
+loaded   drive      3 #7   thirdLegJoint2Drive
+loaded   drive      4 #5   secondLegJoint3Drive
+loaded   drive      5 #8   thirdLegJoint3Drive
+loaded   drive      6 #4   secondLegJoint2Drive
+loaded   drive      7 #6   thirdLegJoint1Drive
+loaded   drive      8 #2   firstLegJoint3Drive
+loaded   sensor     0 #8   thirdLegJoint3Sensor
+loaded   sensor     1 #3   secondLegJoint1Sensor
+loaded   sensor     2 #4   secondLegJoint2Sensor
+loaded   sensor     3 #2   firstLegJoint3Sensor
+loaded   sensor     4 #7   thirdLegJoint2Sensor
+loaded   sensor     5 #5   secondLegJoint3Sensor
+loaded   sensor     6 #6   thirdLegJoint1Sensor
+loaded   sensor     7 #0   firstLegJoint1Sensor
+loaded   sensor     8 #1   firstLegJoint2Sensor
 loaded   point thirdFootLink  0  thirdFootLinkNormal
 loaded   point thirdFootLink  1  thirdFootLinkDir
 loaded   point thirdFootLink  2  thirdFootLinkBase
@@ -633,49 +633,49 @@ loaded   point thirdLegLink2  2  thirdLegLink2PredDir
 loaded   point thirdLegLink2  3  thirdLegLink2SuccBase
 loaded   point thirdLegLink2  4  thirdLegLink2SuccDir
 loaded   point thirdLegLink2  5  thirdLegLink2PredNormal
-copy     body       0  footLink.wrl
-copy     body       1  legLink.wrl
-copy     body       2  tripleBase.wrl
-copy     material   0  greenPlastic
-copy     material   1  bluePlastic
-copy     material   2  redPlastic
-copy     link       0  thirdFootLink
-copy     link       1  firstFootLink
-copy     link       2  base
-copy     link       3  firstLegLink1
-copy     link       4  firstLegLink2
-copy     link       5  secondFootLink
-copy     link       6  secondLegLink1
-copy     link       7  secondLegLink2
-copy     link       8  thirdLegLink1
-copy     link       9  thirdLegLink2
-copy     joint      0  secondLegJoint1
-copy     joint      1  thirdLegJoint1
-copy     joint      2  secondLegJoint2
-copy     joint      3  thirdLegJoint2
-copy     joint      4  secondLegJoint3
-copy     joint      5  thirdLegJoint3
-copy     joint      6  firstLegJoint1
-copy     joint      7  firstLegJoint2
-copy     joint      8  firstLegJoint3
-copy     drive      0  firstLegJoint2Drive
-copy     drive      1  firstLegJoint1Drive
-copy     drive      2  secondLegJoint1Drive
-copy     drive      3  thirdLegJoint2Drive
-copy     drive      4  secondLegJoint3Drive
-copy     drive      5  thirdLegJoint3Drive
-copy     drive      6  secondLegJoint2Drive
-copy     drive      7  thirdLegJoint1Drive
-copy     drive      8  firstLegJoint3Drive
-copy     sensor     0  thirdLegJoint3Sensor
-copy     sensor     1  secondLegJoint1Sensor
-copy     sensor     2  secondLegJoint2Sensor
-copy     sensor     3  firstLegJoint3Sensor
-copy     sensor     4  thirdLegJoint2Sensor
-copy     sensor     5  secondLegJoint3Sensor
-copy     sensor     6  thirdLegJoint1Sensor
-copy     sensor     7  firstLegJoint1Sensor
-copy     sensor     8  firstLegJoint2Sensor
+copy     body       0 #-1  footLink.wrl
+copy     body       1 #-1  legLink.wrl
+copy     body       2 #-1  tripleBase.wrl
+copy     material   0 #-1  greenPlastic
+copy     material   1 #-1  bluePlastic
+copy     material   2 #-1  redPlastic
+copy     link       0 #9   thirdFootLink
+copy     link       1 #3   firstFootLink
+copy     link       2 #0   base
+copy     link       3 #1   firstLegLink1
+copy     link       4 #2   firstLegLink2
+copy     link       5 #6   secondFootLink
+copy     link       6 #4   secondLegLink1
+copy     link       7 #5   secondLegLink2
+copy     link       8 #7   thirdLegLink1
+copy     link       9 #8   thirdLegLink2
+copy     joint      0 #3   secondLegJoint1
+copy     joint      1 #6   thirdLegJoint1
+copy     joint      2 #4   secondLegJoint2
+copy     joint      3 #7   thirdLegJoint2
+copy     joint      4 #5   secondLegJoint3
+copy     joint      5 #8   thirdLegJoint3
+copy     joint      6 #0   firstLegJoint1
+copy     joint      7 #1   firstLegJoint2
+copy     joint      8 #2   firstLegJoint3
+copy     drive      0 #1   firstLegJoint2Drive
+copy     drive      1 #0   firstLegJoint1Drive
+copy     drive      2 #3   secondLegJoint1Drive
+copy     drive      3 #7   thirdLegJoint2Drive
+copy     drive      4 #5   secondLegJoint3Drive
+copy     drive      5 #8   thirdLegJoint3Drive
+copy     drive      6 #4   secondLegJoint2Drive
+copy     drive      7 #6   thirdLegJoint1Drive
+copy     drive      8 #2   firstLegJoint3Drive
+copy     sensor     0 #8   thirdLegJoint3Sensor
+copy     sensor     1 #3   secondLegJoint1Sensor
+copy     sensor     2 #4   secondLegJoint2Sensor
+copy     sensor     3 #2   firstLegJoint3Sensor
+copy     sensor     4 #7   thirdLegJoint2Sensor
+copy     sensor     5 #5   secondLegJoint3Sensor
+copy     sensor     6 #6   thirdLegJoint1Sensor
+copy     sensor     7 #0   firstLegJoint1Sensor
+copy     sensor     8 #1   firstLegJoint2Sensor
 copy     point thirdFootLink  0  thirdFootLinkNormal
 copy     point thirdFootLink  1  thirdFootLinkDir
 copy     point thirdFootLink  2  thirdFootLinkBase
@@ -731,37 +731,37 @@ copy     point thirdLegLink2  3  thirdLegLink2SuccBase
 copy     point thirdLegLink2  4  thirdLegLink2SuccDir
 copy     point thirdLegLink2  5  thirdLegLink2PredNormal
 == runnerNiceWalkingFitness.exp
-loaded   body       0  footLink.wrl
-loaded   body       1  legLink.wrl
-loaded   body       2  base.wrl
-loaded   material   0  greenPlastic
-loaded   material   1  bluePlastic
-loaded   material   2  redPlastic
-loaded   link       0  firstFootLink
-loaded   link       1  base
-loaded   link       2  firstLegLink1
-loaded   link       3  firstLegLink2
-loaded   link       4  secondFootLink
-loaded   link       5  secondLegLink1
-loaded   link       6  secondLegLink2
-loaded   joint      0  secondLegJoint1
-loaded   joint      1  secondLegJoint2
-loaded   joint      2  secondLegJoint3
-loaded   joint      3  firstLegJoint1
-loaded   joint      4  firstLegJoint2
-loaded   joint      5  firstLegJoint3
-loaded   drive      0  firstLegJoint2Drive
-loaded   drive      1  firstLegJoint1Drive
-loaded   drive      2  secondLegJoint1Drive
-loaded   drive      3  secondLegJoint3Drive
-loaded   drive      4  secondLegJoint2Drive
-loaded   drive      5  firstLegJoint3Drive
-loaded   sensor     0  secondLegJoint1Sensor
-loaded   sensor     1  secondLegJoint2Sensor
-loaded   sensor     2  firstLegJoint3Sensor
-loaded   sensor     3  secondLegJoint3Sensor
-loaded   sensor     4  firstLegJoint1Sensor
-loaded   sensor     5  firstLegJoint2Sensor
+loaded   body       0 #-1  footLink.wrl
+loaded   body       1 #-1  legLink.wrl
+loaded   body       2 #-1  base.wrl
+loaded   material   0 #-1  greenPlastic
+loaded   material   1 #-1  bluePlastic
+loaded   material   2 #-1  redPlastic
+loaded   link       0 #3   firstFootLink
+loaded   link       1 #0   base
+loaded   link       2 #1   firstLegLink1
+loaded   link       3 #2   firstLegLink2
+loaded   link       4 #6   secondFootLink
+loaded   link       5 #4   secondLegLink1
+loaded   link       6 #5   secondLegLink2
+loaded   joint      0 #3   secondLegJoint1
+loaded   joint      1 #4   secondLegJoint2
+loaded   joint      2 #5   secondLegJoint3
+loaded   joint      3 #0   firstLegJoint1
+loaded   joint      4 #1   firstLegJoint2
+loaded   joint      5 #2   firstLegJoint3
+loaded   drive      0 #1   firstLegJoint2Drive
+loaded   drive      1 #0   firstLegJoint1Drive
+loaded   drive      2 #3   secondLegJoint1Drive
+loaded   drive      3 #5   secondLegJoint3Drive
+loaded   drive      4 #4   secondLegJoint2Drive
+loaded   drive      5 #2   firstLegJoint3Drive
+loaded   sensor     0 #3   secondLegJoint1Sensor
+loaded   sensor     1 #4   secondLegJoint2Sensor
+loaded   sensor     2 #2   firstLegJoint3Sensor
+loaded   sensor     3 #5   secondLegJoint3Sensor
+loaded   sensor     4 #0   firstLegJoint1Sensor
+loaded   sensor     5 #1   firstLegJoint2Sensor
 loaded   point firstFootLink  0  firstFootLinkNormal
 loaded   point firstFootLink  1  firstFootLinkDir
 loaded   point firstFootLink  2  firstFootLinkBase
@@ -798,37 +798,37 @@ loaded   point secondLegLink2  2  secondLegLink2SuccDir
 loaded   point secondLegLink2  3  secondLegLink2SuccNormal
 loaded   point secondLegLink2  4  secondLegLink2SuccBase
 loaded   point secondLegLink2  5  secondLegLink2PredDir
-copy     body       0  footLink.wrl
-copy     body       1  legLink.wrl
-copy     body       2  base.wrl
-copy     material   0  greenPlastic
-copy     material   1  bluePlastic
-copy     material   2  redPlastic
-copy     link       0  firstFootLink
-copy     link       1  base
-copy     link       2  firstLegLink1
-copy     link       3  firstLegLink2
-copy     link       4  secondFootLink
-copy     link       5  secondLegLink1
-copy     link       6  secondLegLink2
-copy     joint      0  secondLegJoint1
-copy     joint      1  secondLegJoint2
-copy     joint      2  secondLegJoint3
-copy     joint      3  firstLegJoint1
-copy     joint      4  firstLegJoint2
-copy     joint      5  firstLegJoint3
-copy     drive      0  firstLegJoint2Drive
-copy     drive      1  firstLegJoint1Drive
-copy     drive      2  secondLegJoint1Drive
-copy     drive      3  secondLegJoint3Drive
-copy     drive      4  secondLegJoint2Drive
-copy     drive      5  firstLegJoint3Drive
-copy     sensor     0  secondLegJoint1Sensor
-copy     sensor     1  secondLegJoint2Sensor
-copy     sensor     2  firstLegJoint3Sensor
-copy     sensor     3  secondLegJoint3Sensor
-copy     sensor     4  firstLegJoint1Sensor
-copy     sensor     5  firstLegJoint2Sensor
+copy     body       0 #-1  footLink.wrl
+copy     body       1 #-1  legLink.wrl
+copy     body       2 #-1  base.wrl
+copy     material   0 #-1  greenPlastic
+copy     material   1 #-1  bluePlastic
+copy     material   2 #-1  redPlastic
+copy     link       0 #3   firstFootLink
+copy     link       1 #0   base
+copy     link       2 #1   firstLegLink1
+copy     link       3 #2   firstLegLink2
+copy     link       4 #6   secondFootLink
+copy     link       5 #4   secondLegLink1
+copy     link       6 #5   secondLegLink2
+copy     joint      0 #3   secondLegJoint1
+copy     joint      1 #4   secondLegJoint2
+copy     joint      2 #5   secondLegJoint3
+copy     joint      3 #0   firstLegJoint1
+copy     joint      4 #1   firstLegJoint2
+copy     joint      5 #2   firstLegJoint3
+copy     drive      0 #1   firstLegJoint2Drive
+copy     drive      1 #0   firstLegJoint1Drive
+copy     drive      2 #3   secondLegJoint1Drive
+copy     drive      3 #5   secondLegJoint3Drive
+copy     drive      4 #4   secondLegJoint2Drive
+copy     drive      5 #2   firstLegJoint3Drive
+copy     sensor     0 #3   secondLegJoint1Sensor
+copy     sensor     1 #4   secondLegJoint2Sensor
+copy     sensor     2 #2   firstLegJoint3Sensor
+copy     sensor     3 #5   secondLegJoint3Sensor
+copy     sensor     4 #0   firstLegJoint1Sensor
+copy     sensor     5 #1   firstLegJoint2Sensor
 copy     point firstFootLink  0  firstFootLinkNormal
 copy     point firstFootLink  1  firstFootLinkDir
 copy     point firstFootLink  2  firstFootLinkBase
@@ -866,37 +866,37 @@ copy     point secondLegLink2  3  secondLegLink2SuccNormal
 copy     point secondLegLink2  4  secondLegLink2SuccBase
 copy     point secondLegLink2  5  secondLegLink2PredDir
 == runnerSimpleFitness.exp
-loaded   body       0  legLink.wrl
-loaded   body       1  footLink.wrl
-loaded   body       2  base.wrl
-loaded   material   0  greenPlastic
-loaded   material   1  bluePlastic
-loaded   material   2  redPlastic
-loaded   link       0  firstFootLink
-loaded   link       1  base
-loaded   link       2  firstLegLink1
-loaded   link       3  firstLegLink2
-loaded   link       4  secondFootLink
-loaded   link       5  secondLegLink1
-loaded   link       6  secondLegLink2
-loaded   joint      0  secondLegJoint1
-loaded   joint      1  secondLegJoint2
-loaded   joint      2  secondLegJoint3
-loaded   joint      3  firstLegJoint1
-loaded   joint      4  firstLegJoint2
-loaded   joint      5  firstLegJoint3
-loaded   drive      0  firstLegJoint2Drive
-loaded   drive      1  firstLegJoint1Drive
-loaded   drive      2  secondLegJoint1Drive
-loaded   drive      3  secondLegJoint3Drive
-loaded   drive      4  secondLegJoint2Drive
-loaded   drive      5  firstLegJoint3Drive
-loaded   sensor     0  secondLegJoint1Sensor
-loaded   sensor     1  secondLegJoint2Sensor
-loaded   sensor     2  firstLegJoint3Sensor
-loaded   sensor     3  secondLegJoint3Sensor
-loaded   sensor     4  firstLegJoint1Sensor
-loaded   sensor     5  firstLegJoint2Sensor
+loaded   body       0 #-1  legLink.wrl
+loaded   body       1 #-1  footLink.wrl
+loaded   body       2 #-1  base.wrl
+loaded   material   0 #-1  greenPlastic
+loaded   material   1 #-1  bluePlastic
+loaded   material   2 #-1  redPlastic
+loaded   link       0 #3   firstFootLink
+loaded   link       1 #0   base
+loaded   link       2 #1   firstLegLink1
+loaded   link       3 #2   firstLegLink2
+loaded   link       4 #6   secondFootLink
+loaded   link       5 #4   secondLegLink1
+loaded   link       6 #5   secondLegLink2
+loaded   joint      0 #3   secondLegJoint1
+loaded   joint      1 #4   secondLegJoint2
+loaded   joint      2 #5   secondLegJoint3
+loaded   joint      3 #0   firstLegJoint1
+loaded   joint      4 #1   firstLegJoint2
+loaded   joint      5 #2   firstLegJoint3
+loaded   drive      0 #1   firstLegJoint2Drive
+loaded   drive      1 #0   firstLegJoint1Drive
+loaded   drive      2 #3   secondLegJoint1Drive
+loaded   drive      3 #5   secondLegJoint3Drive
+loaded   drive      4 #4   secondLegJoint2Drive
+loaded   drive      5 #2   firstLegJoint3Drive
+loaded   sensor     0 #3   secondLegJoint1Sensor
+loaded   sensor     1 #4   secondLegJoint2Sensor
+loaded   sensor     2 #2   firstLegJoint3Sensor
+loaded   sensor     3 #5   secondLegJoint3Sensor
+loaded   sensor     4 #0   firstLegJoint1Sensor
+loaded   sensor     5 #1   firstLegJoint2Sensor
 loaded   point firstFootLink  0  firstFootLinkDir
 loaded   point firstFootLink  1  firstFootLinkNormal
 loaded   point firstFootLink  2  firstFootLinkBase
@@ -933,37 +933,37 @@ loaded   point secondLegLink2  2  secondLegLink2SuccDir
 loaded   point secondLegLink2  3  secondLegLink2SuccNormal
 loaded   point secondLegLink2  4  secondLegLink2SuccBase
 loaded   point secondLegLink2  5  secondLegLink2PredDir
-copy     body       0  legLink.wrl
-copy     body       1  footLink.wrl
-copy     body       2  base.wrl
-copy     material   0  greenPlastic
-copy     material   1  bluePlastic
-copy     material   2  redPlastic
-copy     link       0  firstFootLink
-copy     link       1  base
-copy     link       2  firstLegLink1
-copy     link       3  firstLegLink2
-copy     link       4  secondFootLink
-copy     link       5  secondLegLink1
-copy     link       6  secondLegLink2
-copy     joint      0  secondLegJoint1
-copy     joint      1  secondLegJoint2
-copy     joint      2  secondLegJoint3
-copy     joint      3  firstLegJoint1
-copy     joint      4  firstLegJoint2
-copy     joint      5  firstLegJoint3
-copy     drive      0  firstLegJoint2Drive
-copy     drive      1  firstLegJoint1Drive
-copy     drive      2  secondLegJoint1Drive
-copy     drive      3  secondLegJoint3Drive
-copy     drive      4  secondLegJoint2Drive
-copy     drive      5  firstLegJoint3Drive
-copy     sensor     0  secondLegJoint1Sensor
-copy     sensor     1  secondLegJoint2Sensor
-copy     sensor     2  firstLegJoint3Sensor
-copy     sensor     3  secondLegJoint3Sensor
-copy     sensor     4  firstLegJoint1Sensor
-copy     sensor     5  firstLegJoint2Sensor
+copy     body       0 #-1  legLink.wrl
+copy     body       1 #-1  footLink.wrl
+copy     body       2 #-1  base.wrl
+copy     material   0 #-1  greenPlastic
+copy     material   1 #-1  bluePlastic
+copy     material   2 #-1  redPlastic
+copy     link       0 #3   firstFootLink
+copy     link       1 #0   base
+copy     link       2 #1   firstLegLink1
+copy     link       3 #2   firstLegLink2
+copy     link       4 #6   secondFootLink
+copy     link       5 #4   secondLegLink1
+copy     link       6 #5   secondLegLink2
+copy     joint      0 #3   secondLegJoint1
+copy     joint      1 #4   secondLegJoint2
+copy     joint      2 #5   secondLegJoint3
+copy     joint      3 #0   firstLegJoint1
+copy     joint      4 #1   firstLegJoint2
+copy     joint      5 #2   firstLegJoint3
+copy     drive      0 #1   firstLegJoint2Drive
+copy     drive      1 #0   firstLegJoint1Drive
+copy     drive      2 #3   secondLegJoint1Drive
+copy     drive      3 #5   secondLegJoint3Drive
+copy     drive      4 #4   secondLegJoint2Drive
+copy     drive      5 #2   firstLegJoint3Drive
+copy     sensor     0 #3   secondLegJoint1Sensor
+copy     sensor     1 #4   secondLegJoint2Sensor
+copy     sensor     2 #2   firstLegJoint3Sensor
+copy     sensor     3 #5   secondLegJoint3Sensor
+copy     sensor     4 #0   firstLegJoint1Sensor
+copy     sensor     5 #1   firstLegJoint2Sensor
 copy     point firstFootLink  0  firstFootLinkDir
 copy     point firstFootLink  1  firstFootLinkNormal
 copy     point firstFootLink  2  firstFootLinkBase
@@ -1001,22 +1001,22 @@ copy     point secondLegLink2  3  secondLegLink2SuccNormal
 copy     point secondLegLink2  4  secondLegLink2SuccBase
 copy     point secondLegLink2  5  secondLegLink2PredDir
 == shortHammerNiceWalkingFitness.exp
-loaded   body       0  base.wrl
-loaded   body       1  middle.wrl
-loaded   body       2  effector.wrl
-loaded   material   0  plastic
-loaded   material   1  metal
-loaded   material   2  rubber
-loaded   link       0  base
-loaded   link       1  hammer
-loaded   link       2  middle1
-loaded   link       3  middle2
-loaded   joint      0  hinge1
-loaded   joint      1  hinge2
-loaded   joint      2  hinge3
-loaded   drive      0  hinge1Drive
-loaded   drive      1  hinge3Drive
-loaded   drive      2  hinge2Drive
+loaded   body       0 #-1  base.wrl
+loaded   body       1 #-1  middle.wrl
+loaded   body       2 #-1  effector.wrl
+loaded   material   0 #-1  plastic
+loaded   material   1 #-1  metal
+loaded   material   2 #-1  rubber
+loaded   link       0 #0   base
+loaded   link       1 #3   hammer
+loaded   link       2 #1   middle1
+loaded   link       3 #2   middle2
+loaded   joint      0 #0   hinge1
+loaded   joint      1 #1   hinge2
+loaded   joint      2 #2   hinge3
+loaded   drive      0 #0   hinge1Drive
+loaded   drive      1 #2   hinge3Drive
+loaded   drive      2 #1   hinge2Drive
 loaded   point base  0  BaseAxisSuccNormal
 loaded   point base  1  BaseAxisSuccDir
 loaded   point base  2  BaseAxisSuccBase
@@ -1035,22 +1035,22 @@ loaded   point middle2  2  Middle2SuccAxisNormal
 loaded   point middle2  3  Middle2SuccAxisBase
 loaded   point middle2  4  Middle2PredAxisBase
 loaded   point middle2  5  Middle2SuccAxisDir
-copy     body       0  base.wrl
-copy     body       1  middle.wrl
-copy     body       2  effector.wrl
-copy     material   0  plastic
-copy     material   1  metal
-copy     material   2  rubber
-copy     link       0  base
-copy     link       1  hammer
-copy     link       2  middle1
-copy     link       3  middle2
-copy     joint      0  hinge1
-copy     joint      1  hinge2
-copy     joint      2  hinge3
-copy     drive      0  hinge1Drive
-copy     drive      1  hinge3Drive
-copy     drive      2  hinge2Drive
+copy     body       0 #-1  base.wrl
+copy     body       1 #-1  middle.wrl
+copy     body       2 #-1  effector.wrl
+copy     material   0 #-1  plastic
+copy     material   1 #-1  metal
+copy     material   2 #-1  rubber
+copy     link       0 #0   base
+copy     link       1 #3   hammer
+copy     link       2 #1   middle1
+copy     link       3 #2   middle2
+copy     joint      0 #0   hinge1
+copy     joint      1 #1   hinge2
+copy     joint      2 #2   hinge3
+copy     drive      0 #0   hinge1Drive
+copy     drive      1 #2   hinge3Drive
+copy     drive      2 #1   hinge2Drive
 copy     point base  0  BaseAxisSuccNormal
 copy     point base  1  BaseAxisSuccDir
 copy     point base  2  BaseAxisSuccBase
@@ -1070,26 +1070,26 @@ copy     point middle2  3  Middle2SuccAxisBase
 copy     point middle2  4  Middle2PredAxisBase
 copy     point middle2  5  Middle2SuccAxisDir
 == twoBasesHardlyReducedIS.exp
-loaded   body       0  base.wrl
-loaded   material   0  metal
-loaded   link       0  base1
-loaded   link       1  base2
-loaded   joint      0  hinge1
-loaded   drive      0  hinge1Drive
-loaded   sensor     0  hinge1Sensor
+loaded   body       0 #-1  base.wrl
+loaded   material   0 #-1  metal
+loaded   link       0 #0   base1
+loaded   link       1 #1   base2
+loaded   joint      0 #0   hinge1
+loaded   drive      0 #0   hinge1Drive
+loaded   sensor     0 #0   hinge1Sensor
 loaded   point base1  0  Base1AxisSuccNormal
 loaded   point base1  1  Base1AxisSuccBase
 loaded   point base1  2  Base1AxisSuccDir
 loaded   point base2  0  Base2AxisSuccNormal
 loaded   point base2  1  Base2AxisSuccBase
 loaded   point base2  2  Base2AxisSuccDir
-copy     body       0  base.wrl
-copy     material   0  metal
-copy     link       0  base1
-copy     link       1  base2
-copy     joint      0  hinge1
-copy     drive      0  hinge1Drive
-copy     sensor     0  hinge1Sensor
+copy     body       0 #-1  base.wrl
+copy     material   0 #-1  metal
+copy     link       0 #0   base1
+copy     link       1 #1   base2
+copy     joint      0 #0   hinge1
+copy     drive      0 #0   hinge1Drive
+copy     sensor     0 #0   hinge1Sensor
 copy     point base1  0  Base1AxisSuccNormal
 copy     point base1  1  Base1AxisSuccBase
 copy     point base1  2  Base1AxisSuccDir
@@ -1097,26 +1097,26 @@ copy     point base2  0  Base2AxisSuccNormal
 copy     point base2  1  Base2AxisSuccBase
 copy     point base2  2  Base2AxisSuccDir
 == twoBasesHighCrossOverRate.exp
-loaded   body       0  base.wrl
-loaded   material   0  metal
-loaded   link       0  base1
-loaded   link       1  base2
-loaded   joint      0  hinge1
-loaded   drive      0  hinge1Drive
-loaded   sensor     0  hinge1Sensor
+loaded   body       0 #-1  base.wrl
+loaded   material   0 #-1  metal
+loaded   link       0 #0   base1
+loaded   link       1 #1   base2
+loaded   joint      0 #0   hinge1
+loaded   drive      0 #0   hinge1Drive
+loaded   sensor     0 #0   hinge1Sensor
 loaded   point base1  0  Base1AxisSuccNormal
 loaded   point base1  1  Base1AxisSuccBase
 loaded   point base1  2  Base1AxisSuccDir
 loaded   point base2  0  Base2AxisSuccNormal
 loaded   point base2  1  Base2AxisSuccBase
 loaded   point base2  2  Base2AxisSuccDir
-copy     body       0  base.wrl
-copy     material   0  metal
-copy     link       0  base1
-copy     link       1  base2
-copy     joint      0  hinge1
-copy     drive      0  hinge1Drive
-copy     sensor     0  hinge1Sensor
+copy     body       0 #-1  base.wrl
+copy     material   0 #-1  metal
+copy     link       0 #0   base1
+copy     link       1 #1   base2
+copy     joint      0 #0   hinge1
+copy     drive      0 #0   hinge1Drive
+copy     sensor     0 #0   hinge1Sensor
 copy     point base1  0  Base1AxisSuccNormal
 copy     point base1  1  Base1AxisSuccBase
 copy     point base1  2  Base1AxisSuccDir
@@ -1124,26 +1124,26 @@ copy     point base2  0  Base2AxisSuccNormal
 copy     point base2  1  Base2AxisSuccBase
 copy     point base2  2  Base2AxisSuccDir
 == twoBasesHighMutationRate.exp
-loaded   body       0  base.wrl
-loaded   material   0  metal
-loaded   link       0  base1
-loaded   link       1  base2
-loaded   joint      0  hinge1
-loaded   drive      0  hinge1Drive
-loaded   sensor     0  hinge1Sensor
+loaded   body       0 #-1  base.wrl
+loaded   material   0 #-1  metal
+loaded   link       0 #0   base1
+loaded   link       1 #1   base2
+loaded   joint      0 #0   hinge1
+loaded   drive      0 #0   hinge1Drive
+loaded   sensor     0 #0   hinge1Sensor
 loaded   point base1  0  Base1AxisSuccNormal
 loaded   point base1  1  Base1AxisSuccBase
 loaded   point base1  2  Base1AxisSuccDir
 loaded   point base2  0  Base2AxisSuccNormal
 loaded   point base2  1  Base2AxisSuccBase
 loaded   point base2  2  Base2AxisSuccDir
-copy     body       0  base.wrl
-copy     material   0  metal
-copy     link       0  base1
-copy     link       1  base2
-copy     joint      0  hinge1
-copy     drive      0  hinge1Drive
-copy     sensor     0  hinge1Sensor
+copy     body       0 #-1  base.wrl
+copy     material   0 #-1  metal
+copy     link       0 #0   base1
+copy     link       1 #1   base2
+copy     joint      0 #0   hinge1
+copy     drive      0 #0   hinge1Drive
+copy     sensor     0 #0   hinge1Sensor
 copy     point base1  0  Base1AxisSuccNormal
 copy     point base1  1  Base1AxisSuccBase
 copy     point base1  2  Base1AxisSuccDir
@@ -1151,26 +1151,26 @@ copy     point base2  0  Base2AxisSuccNormal
 copy     point base2  1  Base2AxisSuccBase
 copy     point base2  2  Base2AxisSuccDir
 == twoBasesReducedInstructionSet.exp
-loaded   body       0  base.wrl
-loaded   material   0  metal
-loaded   link       0  base1
-loaded   link       1  base2
-loaded   joint      0  hinge1
-loaded   drive      0  hinge1Drive
-loaded   sensor     0  hinge1Sensor
+loaded   body       0 #-1  base.wrl
+loaded   material   0 #-1  metal
+loaded   link       0 #0   base1
+loaded   link       1 #1   base2
+loaded   joint      0 #0   hinge1
+loaded   drive      0 #0   hinge1Drive
+loaded   sensor     0 #0   hinge1Sensor
 loaded   point base1  0  Base1AxisSuccNormal
 loaded   point base1  1  Base1AxisSuccBase
 loaded   point base1  2  Base1AxisSuccDir
 loaded   point base2  0  Base2AxisSuccNormal
 loaded   point base2  1  Base2AxisSuccBase
 loaded   point base2  2  Base2AxisSuccDir
-copy     body       0  base.wrl
-copy     material   0  metal
-copy     link       0  base1
-copy     link       1  base2
-copy     joint      0  hinge1
-copy     drive      0  hinge1Drive
-copy     sensor     0  hinge1Sensor
+copy     body       0 #-1  base.wrl
+copy     material   0 #-1  metal
+copy     link       0 #0   base1
+copy     link       1 #1   base2
+copy     joint      0 #0   hinge1
+copy     drive      0 #0   hinge1Drive
+copy     sensor     0 #0   hinge1Sensor
 copy     point base1  0  Base1AxisSuccNormal
 copy     point base1  1  Base1AxisSuccBase
 copy     point base1  2  Base1AxisSuccDir
@@ -1178,26 +1178,26 @@ copy     point base2  0  Base2AxisSuccNormal
 copy     point base2  1  Base2AxisSuccBase
 copy     point base2  2  Base2AxisSuccDir
 == twoBasesSimpleFitness1.exp
-loaded   body       0  base.wrl
-loaded   material   0  metal
-loaded   link       0  base1
-loaded   link       1  base2
-loaded   joint      0  hinge1
-loaded   drive      0  hinge1Drive
-loaded   sensor     0  hinge1Sensor
+loaded   body       0 #-1  base.wrl
+loaded   material   0 #-1  metal
+loaded   link       0 #0   base1
+loaded   link       1 #1   base2
+loaded   joint      0 #0   hinge1
+loaded   drive      0 #0   hinge1Drive
+loaded   sensor     0 #0   hinge1Sensor
 loaded   point base1  0  Base1AxisSuccNormal
 loaded   point base1  1  Base1AxisSuccBase
 loaded   point base1  2  Base1AxisSuccDir
 loaded   point base2  0  Base2AxisSuccNormal
 loaded   point base2  1  Base2AxisSuccBase
 loaded   point base2  2  Base2AxisSuccDir
-copy     body       0  base.wrl
-copy     material   0  metal
-copy     link       0  base1
-copy     link       1  base2
-copy     joint      0  hinge1
-copy     drive      0  hinge1Drive
-copy     sensor     0  hinge1Sensor
+copy     body       0 #-1  base.wrl
+copy     material   0 #-1  metal
+copy     link       0 #0   base1
+copy     link       1 #1   base2
+copy     joint      0 #0   hinge1
+copy     drive      0 #0   hinge1Drive
+copy     sensor     0 #0   hinge1Sensor
 copy     point base1  0  Base1AxisSuccNormal
 copy     point base1  1  Base1AxisSuccBase
 copy     point base1  2  Base1AxisSuccDir
@@ -1205,26 +1205,26 @@ copy     point base2  0  Base2AxisSuccNormal
 copy     point base2  1  Base2AxisSuccBase
 copy     point base2  2  Base2AxisSuccDir
 == twoBasesSimpleFitness2.exp
-loaded   body       0  base.wrl
-loaded   material   0  metal
-loaded   link       0  base1
-loaded   link       1  base2
-loaded   joint      0  hinge1
-loaded   drive      0  hinge1Drive
-loaded   sensor     0  hinge1Sensor
+loaded   body       0 #-1  base.wrl
+loaded   material   0 #-1  metal
+loaded   link       0 #0   base1
+loaded   link       1 #1   base2
+loaded   joint      0 #0   hinge1
+loaded   drive      0 #0   hinge1Drive
+loaded   sensor     0 #0   hinge1Sensor
 loaded   point base1  0  Base1AxisSuccNormal
 loaded   point base1  1  Base1AxisSuccBase
 loaded   point base1  2  Base1AxisSuccDir
 loaded   point base2  0  Base2AxisSuccNormal
 loaded   point base2  1  Base2AxisSuccBase
 loaded   point base2  2  Base2AxisSuccDir
-copy     body       0  base.wrl
-copy     material   0  metal
-copy     link       0  base1
-copy     link       1  base2
-copy     joint      0  hinge1
-copy     drive      0  hinge1Drive
-copy     sensor     0  hinge1Sensor
+copy     body       0 #-1  base.wrl
+copy     material   0 #-1  metal
+copy     link       0 #0   base1
+copy     link       1 #1   base2
+copy     joint      0 #0   hinge1
+copy     drive      0 #0   hinge1Drive
+copy     sensor     0 #0   hinge1Sensor
 copy     point base1  0  Base1AxisSuccNormal
 copy     point base1  1  Base1AxisSuccBase
 copy     point base1  2  Base1AxisSuccDir
@@ -1232,87 +1232,87 @@ copy     point base2  0  Base2AxisSuccNormal
 copy     point base2  1  Base2AxisSuccBase
 copy     point base2  2  Base2AxisSuccDir
 == walkerNiceWalkingFitness.exp
-loaded   body       0  foot.wrl
-loaded   body       1  body.wrl
-loaded   body       2  shoulder.wrl
-loaded   body       3  leg.wrl
-loaded   material   0  footMaterial
-loaded   material   1  legMaterial
-loaded   material   2  bodyMaterial
-loaded   material   3  shoulderMaterial
-loaded   link       0  shoulder5
-loaded   link       1  body
-loaded   link       2  shoulder6
-loaded   link       3  foot1
-loaded   link       4  foot2
-loaded   link       5  foot3
-loaded   link       6  foot4
-loaded   link       7  foot5
-loaded   link       8  foot6
-loaded   link       9  leg1
-loaded   link      10  leg2
-loaded   link      11  leg3
-loaded   link      12  leg4
-loaded   link      13  leg5
-loaded   link      14  leg6
-loaded   link      15  shoulder1
-loaded   link      16  shoulder2
-loaded   link      17  shoulder3
-loaded   link      18  shoulder4
-loaded   joint      0  leg6Joint1
-loaded   joint      1  leg5Joint2
-loaded   joint      2  leg4Joint3
-loaded   joint      3  leg6Joint2
-loaded   joint      4  leg5Joint3
-loaded   joint      5  leg6Joint3
-loaded   joint      6  leg1Joint1
-loaded   joint      7  leg2Joint1
-loaded   joint      8  leg1Joint2
-loaded   joint      9  leg3Joint1
-loaded   joint     10  leg2Joint2
-loaded   joint     11  leg1Joint3
-loaded   joint     12  leg4Joint1
-loaded   joint     13  leg3Joint2
-loaded   joint     14  leg2Joint3
-loaded   joint     15  leg5Joint1
-loaded   joint     16  leg4Joint2
-loaded   joint     17  leg3Joint3
-loaded   drive      0  leg6Joint3Drive
-loaded   drive      1  leg5Joint2Drive
-loaded   drive      2  leg4Joint1Drive
-loaded   drive      3  leg1Joint1Drive
-loaded   drive      4  leg2Joint1Drive
-loaded   drive      5  leg2Joint2Drive
-loaded   drive      6  leg1Joint3Drive
-loaded   drive      7  leg2Joint3Drive
-loaded   drive      8  leg1Joint2Drive
-loaded   drive      9  leg5Joint1Drive
-loaded   drive     10  leg4Joint2Drive
-loaded   drive     11  leg3Joint3Drive
-loaded   drive     12  leg6Joint1Drive
-loaded   drive     13  leg4Joint3Drive
-loaded   drive     14  leg3Joint2Drive
-loaded   drive     15  leg6Joint2Drive
-loaded   drive     16  leg5Joint3Drive
-loaded   drive     17  leg3Joint1Drive
-loaded   sensor     0  leg6Joint2Sensor
-loaded   sensor     1  leg5Joint1Sensor
-loaded   sensor     2  leg6Joint1Sensor
-loaded   sensor     3  leg5Joint2Sensor
-loaded   sensor     4  leg4Joint2Sensor
-loaded   sensor     5  leg3Joint1Sensor
-loaded   sensor     6  leg1Joint3Sensor
-loaded   sensor     7  leg4Joint1Sensor
-loaded   sensor     8  leg3Joint2Sensor
-loaded   sensor     9  leg2Joint3Sensor
-loaded   sensor    10  leg3Joint3Sensor
-loaded   sensor    11  leg2Joint2Sensor
-loaded   sensor    12  leg1Joint1Sensor
-loaded   sensor    13  leg4Joint3Sensor
-loaded   sensor    14  leg2Joint1Sensor
-loaded   sensor    15  leg1Joint2Sensor
-loaded   sensor    16  leg5Joint3Sensor
-loaded   sensor    17  leg6Joint3Sensor
+loaded   body       0 #-1  foot.wrl
+loaded   body       1 #-1  body.wrl
+loaded   body       2 #-1  shoulder.wrl
+loaded   body       3 #-1  leg.wrl
+loaded   material   0 #-1  footMaterial
+loaded   material   1 #-1  legMaterial
+loaded   material   2 #-1  bodyMaterial
+loaded   material   3 #-1  shoulderMaterial
+loaded   link       0 #13  shoulder5
+loaded   link       1 #0   body
+loaded   link       2 #16  shoulder6
+loaded   link       3 #3   foot1
+loaded   link       4 #6   foot2
+loaded   link       5 #9   foot3
+loaded   link       6 #12  foot4
+loaded   link       7 #15  foot5
+loaded   link       8 #18  foot6
+loaded   link       9 #2   leg1
+loaded   link      10 #5   leg2
+loaded   link      11 #8   leg3
+loaded   link      12 #11  leg4
+loaded   link      13 #14  leg5
+loaded   link      14 #17  leg6
+loaded   link      15 #1   shoulder1
+loaded   link      16 #4   shoulder2
+loaded   link      17 #7   shoulder3
+loaded   link      18 #10  shoulder4
+loaded   joint      0 #15  leg6Joint1
+loaded   joint      1 #13  leg5Joint2
+loaded   joint      2 #11  leg4Joint3
+loaded   joint      3 #16  leg6Joint2
+loaded   joint      4 #14  leg5Joint3
+loaded   joint      5 #17  leg6Joint3
+loaded   joint      6 #0   leg1Joint1
+loaded   joint      7 #3   leg2Joint1
+loaded   joint      8 #1   leg1Joint2
+loaded   joint      9 #6   leg3Joint1
+loaded   joint     10 #4   leg2Joint2
+loaded   joint     11 #2   leg1Joint3
+loaded   joint     12 #9   leg4Joint1
+loaded   joint     13 #7   leg3Joint2
+loaded   joint     14 #5   leg2Joint3
+loaded   joint     15 #12  leg5Joint1
+loaded   joint     16 #10  leg4Joint2
+loaded   joint     17 #8   leg3Joint3
+loaded   drive      0 #17  leg6Joint3Drive
+loaded   drive      1 #13  leg5Joint2Drive
+loaded   drive      2 #9   leg4Joint1Drive
+loaded   drive      3 #0   leg1Joint1Drive
+loaded   drive      4 #3   leg2Joint1Drive
+loaded   drive      5 #4   leg2Joint2Drive
+loaded   drive      6 #2   leg1Joint3Drive
+loaded   drive      7 #5   leg2Joint3Drive
+loaded   drive      8 #1   leg1Joint2Drive
+loaded   drive      9 #12  leg5Joint1Drive
+loaded   drive     10 #10  leg4Joint2Drive
+loaded   drive     11 #8   leg3Joint3Drive
+loaded   drive     12 #15  leg6Joint1Drive
+loaded   drive     13 #11  leg4Joint3Drive
+loaded   drive     14 #7   leg3Joint2Drive
+loaded   drive     15 #16  leg6Joint2Drive
+loaded   drive     16 #14  leg5Joint3Drive
+loaded   drive     17 #6   leg3Joint1Drive
+loaded   sensor     0 #16  leg6Joint2Sensor
+loaded   sensor     1 #12  leg5Joint1Sensor
+loaded   sensor     2 #15  leg6Joint1Sensor
+loaded   sensor     3 #13  leg5Joint2Sensor
+loaded   sensor     4 #10  leg4Joint2Sensor
+loaded   sensor     5 #6   leg3Joint1Sensor
+loaded   sensor     6 #2   leg1Joint3Sensor
+loaded   sensor     7 #9   leg4Joint1Sensor
+loaded   sensor     8 #7   leg3Joint2Sensor
+loaded   sensor     9 #5   leg2Joint3Sensor
+loaded   sensor    10 #8   leg3Joint3Sensor
+loaded   sensor    11 #4   leg2Joint2Sensor
+loaded   sensor    12 #0   leg1Joint1Sensor
+loaded   sensor    13 #11  leg4Joint3Sensor
+loaded   sensor    14 #3   leg2Joint1Sensor
+loaded   sensor    15 #1   leg1Joint2Sensor
+loaded   sensor    16 #14  leg5Joint3Sensor
+loaded   sensor    17 #17  leg6Joint3Sensor
 loaded   point shoulder5  0  shoulder5SuccNormal
 loaded   point shoulder5  1  shoulder5PredDir
 loaded   point shoulder5  2  shoulder5PredBase
@@ -1421,87 +1421,87 @@ loaded   point shoulder4  2  shoulder4SuccDir
 loaded   point shoulder4  3  shoulder4PredNormal
 loaded   point shoulder4  4  shoulder4PredBase
 loaded   point shoulder4  5  shoulder4PredDir
-copy     body       0  foot.wrl
-copy     body       1  body.wrl
-copy     body       2  shoulder.wrl
-copy     body       3  leg.wrl
-copy     material   0  footMaterial
-copy     material   1  legMaterial
-copy     material   2  bodyMaterial
-copy     material   3  shoulderMaterial
-copy     link       0  shoulder5
-copy     link       1  body
-copy     link       2  shoulder6
-copy     link       3  foot1
-copy     link       4  foot2
-copy     link       5  foot3
-copy     link       6  foot4
-copy     link       7  foot5
-copy     link       8  foot6
-copy     link       9  leg1
-copy     link      10  leg2
-copy     link      11  leg3
-copy     link      12  leg4
-copy     link      13  leg5
-copy     link      14  leg6
-copy     link      15  shoulder1
-copy     link      16  shoulder2
-copy     link      17  shoulder3
-copy     link      18  shoulder4
-copy     joint      0  leg6Joint1
-copy     joint      1  leg5Joint2
-copy     joint      2  leg4Joint3
-copy     joint      3  leg6Joint2
-copy     joint      4  leg5Joint3
-copy     joint      5  leg6Joint3
-copy     joint      6  leg1Joint1
-copy     joint      7  leg2Joint1
-copy     joint      8  leg1Joint2
-copy     joint      9  leg3Joint1
-copy     joint     10  leg2Joint2
-copy     joint     11  leg1Joint3
-copy     joint     12  leg4Joint1
-copy     joint     13  leg3Joint2
-copy     joint     14  leg2Joint3
-copy     joint     15  leg5Joint1
-copy     joint     16  leg4Joint2
-copy     joint     17  leg3Joint3
-copy     drive      0  leg6Joint3Drive
-copy     drive      1  leg5Joint2Drive
-copy     drive      2  leg4Joint1Drive
-copy     drive      3  leg1Joint1Drive
-copy     drive      4  leg2Joint1Drive
-copy     drive      5  leg2Joint2Drive
-copy     drive      6  leg1Joint3Drive
-copy     drive      7  leg2Joint3Drive
-copy     drive      8  leg1Joint2Drive
-copy     drive      9  leg5Joint1Drive
-copy     drive     10  leg4Joint2Drive
-copy     drive     11  leg3Joint3Drive
-copy     drive     12  leg6Joint1Drive
-copy     drive     13  leg4Joint3Drive
-copy     drive     14  leg3Joint2Drive
-copy     drive     15  leg6Joint2Drive
-copy     drive     16  leg5Joint3Drive
-copy     drive     17  leg3Joint1Drive
-copy     sensor     0  leg6Joint2Sensor
-copy     sensor     1  leg5Joint1Sensor
-copy     sensor     2  leg6Joint1Sensor
-copy     sensor     3  leg5Joint2Sensor
-copy     sensor     4  leg4Joint2Sensor
-copy     sensor     5  leg3Joint1Sensor
-copy     sensor     6  leg1Joint3Sensor
-copy     sensor     7  leg4Joint1Sensor
-copy     sensor     8  leg3Joint2Sensor
-copy     sensor     9  leg2Joint3Sensor
-copy     sensor    10  leg3Joint3Sensor
-copy     sensor    11  leg2Joint2Sensor
-copy     sensor    12  leg1Joint1Sensor
-copy     sensor    13  leg4Joint3Sensor
-copy     sensor    14  leg2Joint1Sensor
-copy     sensor    15  leg1Joint2Sensor
-copy     sensor    16  leg5Joint3Sensor
-copy     sensor    17  leg6Joint3Sensor
+copy     body       0 #-1  foot.wrl
+copy     body       1 #-1  body.wrl
+copy     body       2 #-1  shoulder.wrl
+copy     body       3 #-1  leg.wrl
+copy     material   0 #-1  footMaterial
+copy     material   1 #-1  legMaterial
+copy     material   2 #-1  bodyMaterial
+copy     material   3 #-1  shoulderMaterial
+copy     link       0 #13  shoulder5
+copy     link       1 #0   body
+copy     link       2 #16  shoulder6
+copy     link       3 #3   foot1
+copy     link       4 #6   foot2
+copy     link       5 #9   foot3
+copy     link       6 #12  foot4
+copy     link       7 #15  foot5
+copy     link       8 #18  foot6
+copy     link       9 #2   leg1
+copy     link      10 #5   leg2
+copy     link      11 #8   leg3
+copy     link      12 #11  leg4
+copy     link      13 #14  leg5
+copy     link      14 #17  leg6
+copy     link      15 #1   shoulder1
+copy     link      16 #4   shoulder2
+copy     link      17 #7   shoulder3
+copy     link      18 #10  shoulder4
+copy     joint      0 #15  leg6Joint1
+copy     joint      1 #13  leg5Joint2
+copy     joint      2 #11  leg4Joint3
+copy     joint      3 #16  leg6Joint2
+copy     joint      4 #14  leg5Joint3
+copy     joint      5 #17  leg6Joint3
+copy     joint      6 #0   leg1Joint1
+copy     joint      7 #3   leg2Joint1
+copy     joint      8 #1   leg1Joint2
+copy     joint      9 #6   leg3Joint1
+copy     joint     10 #4   leg2Joint2
+copy     joint     11 #2   leg1Joint3
+copy     joint     12 #9   leg4Joint1
+copy     joint     13 #7   leg3Joint2
+copy     joint     14 #5   leg2Joint3
+copy     joint     15 #12  leg5Joint1
+copy     joint     16 #10  leg4Joint2
+copy     joint     17 #8   leg3Joint3
+copy     drive      0 #17  leg6Joint3Drive
+copy     drive      1 #13  leg5Joint2Drive
+copy     drive      2 #9   leg4Joint1Drive
+copy     drive      3 #0   leg1Joint1Drive
+copy     drive      4 #3   leg2Joint1Drive
+copy     drive      5 #4   leg2Joint2Drive
+copy     drive      6 #2   leg1Joint3Drive
+copy     drive      7 #5   leg2Joint3Drive
+copy     drive      8 #1   leg1Joint2Drive
+copy     drive      9 #12  leg5Joint1Drive
+copy     drive     10 #10  leg4Joint2Drive
+copy     drive     11 #8   leg3Joint3Drive
+copy     drive     12 #15  leg6Joint1Drive
+copy     drive     13 #11  leg4Joint3Drive
+copy     drive     14 #7   leg3Joint2Drive
+copy     drive     15 #16  leg6Joint2Drive
+copy     drive     16 #14  leg5Joint3Drive
+copy     drive     17 #6   leg3Joint1Drive
+copy     sensor     0 #16  leg6Joint2Sensor
+copy     sensor     1 #12  leg5Joint1Sensor
+copy     sensor     2 #15  leg6Joint1Sensor
+copy     sensor     3 #13  leg5Joint2Sensor
+copy     sensor     4 #10  leg4Joint2Sensor
+copy     sensor     5 #6   leg3Joint1Sensor
+copy     sensor     6 #2   leg1Joint3Sensor
+copy     sensor     7 #9   leg4Joint1Sensor
+copy     sensor     8 #7   leg3Joint2Sensor
+copy     sensor     9 #5   leg2Joint3Sensor
+copy     sensor    10 #8   leg3Joint3Sensor
+copy     sensor    11 #4   leg2Joint2Sensor
+copy     sensor    12 #0   leg1Joint1Sensor
+copy     sensor    13 #11  leg4Joint3Sensor
+copy     sensor    14 #3   leg2Joint1Sensor
+copy     sensor    15 #1   leg1Joint2Sensor
+copy     sensor    16 #14  leg5Joint3Sensor
+copy     sensor    17 #17  leg6Joint3Sensor
 copy     point shoulder5  0  shoulder5SuccNormal
 copy     point shoulder5  1  shoulder5PredDir
 copy     point shoulder5  2  shoulder5PredBase
@@ -1611,25 +1611,25 @@ copy     point shoulder4  3  shoulder4PredNormal
 copy     point shoulder4  4  shoulder4PredBase
 copy     point shoulder4  5  shoulder4PredDir
 == hammer.rrb
-rrb      body       0  base.wrl
-rrb      body       1  effector.wrl
-rrb      body       2  middle.wrl
-rrb      material   0  metal
-rrb      material   1  plastic
-rrb      material   2  rubber
-rrb      link       0  base
-rrb      link       1  hammer
-rrb      link       2  middle1
-rrb      link       3  middle2
-rrb      link       4  middle3
-rrb      joint      0  hinge1
-rrb      joint      1  hinge2
-rrb      joint      2  hinge3
-rrb      joint      3  hinge4
-rrb      drive      0  hinge1Drive
-rrb      drive      1  hinge3Drive
-rrb      drive      2  hinge2Drive
-rrb      drive      3  hinge4Drive
+rrb      body       0 #-1  base.wrl
+rrb      body       1 #-1  effector.wrl
+rrb      body       2 #-1  middle.wrl
+rrb      material   0 #-1  metal
+rrb      material   1 #-1  plastic
+rrb      material   2 #-1  rubber
+rrb      link       0 #0   base
+rrb      link       1 #1   hammer
+rrb      link       2 #2   middle1
+rrb      link       3 #3   middle2
+rrb      link       4 #4   middle3
+rrb      joint      0 #0   hinge1
+rrb      joint      1 #1   hinge2
+rrb      joint      2 #2   hinge3
+rrb      joint      3 #3   hinge4
+rrb      drive      0 #0   hinge1Drive
+rrb      drive      1 #1   hinge3Drive
+rrb      drive      2 #2   hinge2Drive
+rrb      drive      3 #3   hinge4Drive
 rrb      point base  0  BaseAxisSuccNormal
 rrb      point base  1  BaseAxisSuccDir
 rrb      point base  2  BaseAxisSuccBase
@@ -1655,61 +1655,61 @@ rrb      point middle3  3  Middle3SuccAxisDir
 rrb      point middle3  4  Middle3PredAxisDir
 rrb      point middle3  5  Middle3PredAxisBase
 == insect.rrb
-rrb      body       0  body.wrl
-rrb      body       1  foot.wrl
-rrb      body       2  leg.wrl
-rrb      material   0  bodyMaterial
-rrb      material   1  legMaterial
-rrb      material   2  footMaterial
-rrb      link       0  body
-rrb      link       1  foot1
-rrb      link       2  foot2
-rrb      link       3  foot3
-rrb      link       4  foot4
-rrb      link       5  foot5
-rrb      link       6  foot6
-rrb      link       7  leg1
-rrb      link       8  leg2
-rrb      link       9  leg3
-rrb      link      10  leg4
-rrb      link      11  leg5
-rrb      link      12  leg6
-rrb      joint      0  leg6Joint1
-rrb      joint      1  leg5Joint2
-rrb      joint      2  leg6Joint2
-rrb      joint      3  leg1Joint1
-rrb      joint      4  leg2Joint1
-rrb      joint      5  leg1Joint2
-rrb      joint      6  leg3Joint1
-rrb      joint      7  leg2Joint2
-rrb      joint      8  leg4Joint1
-rrb      joint      9  leg3Joint2
-rrb      joint     10  leg5Joint1
-rrb      joint     11  leg4Joint2
-rrb      drive      0  leg5Joint2Drive
-rrb      drive      1  leg4Joint1Drive
-rrb      drive      2  leg1Joint1Drive
-rrb      drive      3  leg2Joint1Drive
-rrb      drive      4  leg2Joint2Drive
-rrb      drive      5  leg1Joint2Drive
-rrb      drive      6  leg5Joint1Drive
-rrb      drive      7  leg4Joint2Drive
-rrb      drive      8  leg6Joint1Drive
-rrb      drive      9  leg3Joint2Drive
-rrb      drive     10  leg6Joint2Drive
-rrb      drive     11  leg3Joint1Drive
-rrb      sensor     0  leg6Joint2Sensor
-rrb      sensor     1  leg5Joint1Sensor
-rrb      sensor     2  leg6Joint1Sensor
-rrb      sensor     3  leg5Joint2Sensor
-rrb      sensor     4  leg4Joint2Sensor
-rrb      sensor     5  leg3Joint1Sensor
-rrb      sensor     6  leg4Joint1Sensor
-rrb      sensor     7  leg3Joint2Sensor
-rrb      sensor     8  leg2Joint2Sensor
-rrb      sensor     9  leg1Joint1Sensor
-rrb      sensor    10  leg2Joint1Sensor
-rrb      sensor    11  leg1Joint2Sensor
+rrb      body       0 #-1  body.wrl
+rrb      body       1 #-1  foot.wrl
+rrb      body       2 #-1  leg.wrl
+rrb      material   0 #-1  bodyMaterial
+rrb      material   1 #-1  legMaterial
+rrb      material   2 #-1  footMaterial
+rrb      link       0 #0   body
+rrb      link       1 #1   foot1
+rrb      link       2 #2   foot2
+rrb      link       3 #3   foot3
+rrb      link       4 #4   foot4
+rrb      link       5 #5   foot5
+rrb      link       6 #6   foot6
+rrb      link       7 #7   leg1
+rrb      link       8 #8   leg2
+rrb      link       9 #9   leg3
+rrb      link      10 #10  leg4
+rrb      link      11 #11  leg5
+rrb      link      12 #12  leg6
+rrb      joint      0 #0   leg6Joint1
+rrb      joint      1 #1   leg5Joint2
+rrb      joint      2 #2   leg6Joint2
+rrb      joint      3 #3   leg1Joint1
+rrb      joint      4 #4   leg2Joint1
+rrb      joint      5 #5   leg1Joint2
+rrb      joint      6 #6   leg3Joint1
+rrb      joint      7 #7   leg2Joint2
+rrb      joint      8 #8   leg4Joint1
+rrb      joint      9 #9   leg3Joint2
+rrb      joint     10 #10  leg5Joint1
+rrb      joint     11 #11  leg4Joint2
+rrb      drive      0 #0   leg5Joint2Drive
+rrb      drive      1 #1   leg4Joint1Drive
+rrb      drive      2 #2   leg1Joint1Drive
+rrb      drive      3 #3   leg2Joint1Drive
+rrb      drive      4 #4   leg2Joint2Drive
+rrb      drive      5 #5   leg1Joint2Drive
+rrb      drive      6 #6   leg5Joint1Drive
+rrb      drive      7 #7   leg4Joint2Drive
+rrb      drive      8 #8   leg6Joint1Drive
+rrb      drive      9 #9   leg3Joint2Drive
+rrb      drive     10 #10  leg6Joint2Drive
+rrb      drive     11 #11  leg3Joint1Drive
+rrb      sensor     0 #0   leg6Joint2Sensor
+rrb      sensor     1 #1   leg5Joint1Sensor
+rrb      sensor     2 #2   leg6Joint1Sensor
+rrb      sensor     3 #3   leg5Joint2Sensor
+rrb      sensor     4 #4   leg4Joint2Sensor
+rrb      sensor     5 #5   leg3Joint1Sensor
+rrb      sensor     6 #6   leg4Joint1Sensor
+rrb      sensor     7 #7   leg3Joint2Sensor
+rrb      sensor     8 #8   leg2Joint2Sensor
+rrb      sensor     9 #9   leg1Joint1Sensor
+rrb      sensor    10 #10  leg2Joint1Sensor
+rrb      sensor    11 #11  leg1Joint2Sensor
 rrb      point body  0  bodyLeg4Normal
 rrb      point body  1  bodyLeg6Dir
 rrb      point body  2  bodyLeg5Base
@@ -1783,49 +1783,49 @@ rrb      point leg6  3  leg6PredDir
 rrb      point leg6  4  leg6PredNormal
 rrb      point leg6  5  leg6SuccBase
 == octopus.rrb
-rrb      body       0  footLink.wrl
-rrb      body       1  tripleBase.wrl
-rrb      body       2  legLink.wrl
-rrb      material   0  bluePlastic
-rrb      material   1  greenPlastic
-rrb      material   2  redPlastic
-rrb      link       0  thirdFootLink
-rrb      link       1  firstFootLink
-rrb      link       2  base
-rrb      link       3  firstLegLink1
-rrb      link       4  firstLegLink2
-rrb      link       5  secondFootLink
-rrb      link       6  secondLegLink1
-rrb      link       7  secondLegLink2
-rrb      link       8  thirdLegLink1
-rrb      link       9  thirdLegLink2
-rrb      joint      0  secondLegJoint1
-rrb      joint      1  thirdLegJoint1
-rrb      joint      2  secondLegJoint2
-rrb      joint      3  thirdLegJoint2
-rrb      joint      4  secondLegJoint3
-rrb      joint      5  thirdLegJoint3
-rrb      joint      6  firstLegJoint1
-rrb      joint      7  firstLegJoint2
-rrb      joint      8  firstLegJoint3
-rrb      drive      0  firstLegJoint2Drive
-rrb      drive      1  firstLegJoint1Drive
-rrb      drive      2  secondLegJoint1Drive
-rrb      drive      3  thirdLegJoint2Drive
-rrb      drive      4  secondLegJoint3Drive
-rrb      drive      5  thirdLegJoint3Drive
-rrb      drive      6  secondLegJoint2Drive
-rrb      drive      7  thirdLegJoint1Drive
-rrb      drive      8  firstLegJoint3Drive
-rrb      sensor     0  thirdLegJoint3Sensor
-rrb      sensor     1  secondLegJoint1Sensor
-rrb      sensor     2  secondLegJoint2Sensor
-rrb      sensor     3  firstLegJoint3Sensor
-rrb      sensor     4  thirdLegJoint2Sensor
-rrb      sensor     5  secondLegJoint3Sensor
-rrb      sensor     6  thirdLegJoint1Sensor
-rrb      sensor     7  firstLegJoint1Sensor
-rrb      sensor     8  firstLegJoint2Sensor
+rrb      body       0 #-1  footLink.wrl
+rrb      body       1 #-1  tripleBase.wrl
+rrb      body       2 #-1  legLink.wrl
+rrb      material   0 #-1  bluePlastic
+rrb      material   1 #-1  greenPlastic
+rrb      material   2 #-1  redPlastic
+rrb      link       0 #0   thirdFootLink
+rrb      link       1 #1   firstFootLink
+rrb      link       2 #2   base
+rrb      link       3 #3   firstLegLink1
+rrb      link       4 #4   firstLegLink2
+rrb      link       5 #5   secondFootLink
+rrb      link       6 #6   secondLegLink1
+rrb      link       7 #7   secondLegLink2
+rrb      link       8 #8   thirdLegLink1
+rrb      link       9 #9   thirdLegLink2
+rrb      joint      0 #0   secondLegJoint1
+rrb      joint      1 #1   thirdLegJoint1
+rrb      joint      2 #2   secondLegJoint2
+rrb      joint      3 #3   thirdLegJoint2
+rrb      joint      4 #4   secondLegJoint3
+rrb      joint      5 #5   thirdLegJoint3
+rrb      joint      6 #6   firstLegJoint1
+rrb      joint      7 #7   firstLegJoint2
+rrb      joint      8 #8   firstLegJoint3
+rrb      drive      0 #0   firstLegJoint2Drive
+rrb      drive      1 #1   firstLegJoint1Drive
+rrb      drive      2 #2   secondLegJoint1Drive
+rrb      drive      3 #3   thirdLegJoint2Drive
+rrb      drive      4 #4   secondLegJoint3Drive
+rrb      drive      5 #5   thirdLegJoint3Drive
+rrb      drive      6 #6   secondLegJoint2Drive
+rrb      drive      7 #7   thirdLegJoint1Drive
+rrb      drive      8 #8   firstLegJoint3Drive
+rrb      sensor     0 #0   thirdLegJoint3Sensor
+rrb      sensor     1 #1   secondLegJoint1Sensor
+rrb      sensor     2 #2   secondLegJoint2Sensor
+rrb      sensor     3 #3   firstLegJoint3Sensor
+rrb      sensor     4 #4   thirdLegJoint2Sensor
+rrb      sensor     5 #5   secondLegJoint3Sensor
+rrb      sensor     6 #6   thirdLegJoint1Sensor
+rrb      sensor     7 #7   firstLegJoint1Sensor
+rrb      sensor     8 #8   firstLegJoint2Sensor
 rrb      point thirdFootLink  0  thirdFootLinkNormal
 rrb      point thirdFootLink  1  thirdFootLinkDir
 rrb      point thirdFootLink  2  thirdFootLinkBase
@@ -1881,37 +1881,37 @@ rrb      point thirdLegLink2  3  thirdLegLink2SuccBase
 rrb      point thirdLegLink2  4  thirdLegLink2SuccDir
 rrb      point thirdLegLink2  5  thirdLegLink2PredNormal
 == runner.rrb
-rrb      body       0  footLink.wrl
-rrb      body       1  base.wrl
-rrb      body       2  legLink.wrl
-rrb      material   0  bluePlastic
-rrb      material   1  greenPlastic
-rrb      material   2  redPlastic
-rrb      link       0  firstFootLink
-rrb      link       1  base
-rrb      link       2  firstLegLink1
-rrb      link       3  firstLegLink2
-rrb      link       4  secondFootLink
-rrb      link       5  secondLegLink1
-rrb      link       6  secondLegLink2
-rrb      joint      0  secondLegJoint1
-rrb      joint      1  secondLegJoint2
-rrb      joint      2  secondLegJoint3
-rrb      joint      3  firstLegJoint1
-rrb      joint      4  firstLegJoint2
-rrb      joint      5  firstLegJoint3
-rrb      drive      0  firstLegJoint2Drive
-rrb      drive      1  firstLegJoint1Drive
-rrb      drive      2  secondLegJoint1Drive
-rrb      drive      3  secondLegJoint3Drive
-rrb      drive      4  secondLegJoint2Drive
-rrb      drive      5  firstLegJoint3Drive
-rrb      sensor     0  secondLegJoint1Sensor
-rrb      sensor     1  secondLegJoint2Sensor
-rrb      sensor     2  firstLegJoint3Sensor
-rrb      sensor     3  secondLegJoint3Sensor
-rrb      sensor     4  firstLegJoint1Sensor
-rrb      sensor     5  firstLegJoint2Sensor
+rrb      body       0 #-1  footLink.wrl
+rrb      body       1 #-1  base.wrl
+rrb      body       2 #-1  legLink.wrl
+rrb      material   0 #-1  bluePlastic
+rrb      material   1 #-1  greenPlastic
+rrb      material   2 #-1  redPlastic
+rrb      link       0 #0   firstFootLink
+rrb      link       1 #1   base
+rrb      link       2 #2   firstLegLink1
+rrb      link       3 #3   firstLegLink2
+rrb      link       4 #4   secondFootLink
+rrb      link       5 #5   secondLegLink1
+rrb      link       6 #6   secondLegLink2
+rrb      joint      0 #0   secondLegJoint1
+rrb      joint      1 #1   secondLegJoint2
+rrb      joint      2 #2   secondLegJoint3
+rrb      joint      3 #3   firstLegJoint1
+rrb      joint      4 #4   firstLegJoint2
+rrb      joint      5 #5   firstLegJoint3
+rrb      drive      0 #0   firstLegJoint2Drive
+rrb      drive      1 #1   firstLegJoint1Drive
+rrb      drive      2 #2   secondLegJoint1Drive
+rrb      drive      3 #3   secondLegJoint3Drive
+rrb      drive      4 #4   secondLegJoint2Drive
+rrb      drive      5 #5   firstLegJoint3Drive
+rrb      sensor     0 #0   secondLegJoint1Sensor
+rrb      sensor     1 #1   secondLegJoint2Sensor
+rrb      sensor     2 #2   firstLegJoint3Sensor
+rrb      sensor     3 #3   secondLegJoint3Sensor
+rrb      sensor     4 #4   firstLegJoint1Sensor
+rrb      sensor     5 #5   firstLegJoint2Sensor
 rrb      point firstFootLink  0  firstFootLinkNormal
 rrb      point firstFootLink  1  firstFootLinkDir
 rrb      point firstFootLink  2  firstFootLinkBase
@@ -1949,22 +1949,22 @@ rrb      point secondLegLink2  3  secondLegLink2SuccNormal
 rrb      point secondLegLink2  4  secondLegLink2SuccBase
 rrb      point secondLegLink2  5  secondLegLink2PredDir
 == shortHammer.rrb
-rrb      body       0  base.wrl
-rrb      body       1  effector.wrl
-rrb      body       2  middle.wrl
-rrb      material   0  metal
-rrb      material   1  plastic
-rrb      material   2  rubber
-rrb      link       0  base
-rrb      link       1  hammer
-rrb      link       2  middle1
-rrb      link       3  middle2
-rrb      joint      0  hinge1
-rrb      joint      1  hinge2
-rrb      joint      2  hinge3
-rrb      drive      0  hinge1Drive
-rrb      drive      1  hinge3Drive
-rrb      drive      2  hinge2Drive
+rrb      body       0 #-1  base.wrl
+rrb      body       1 #-1  effector.wrl
+rrb      body       2 #-1  middle.wrl
+rrb      material   0 #-1  metal
+rrb      material   1 #-1  plastic
+rrb      material   2 #-1  rubber
+rrb      link       0 #0   base
+rrb      link       1 #1   hammer
+rrb      link       2 #2   middle1
+rrb      link       3 #3   middle2
+rrb      joint      0 #0   hinge1
+rrb      joint      1 #1   hinge2
+rrb      joint      2 #2   hinge3
+rrb      drive      0 #0   hinge1Drive
+rrb      drive      1 #1   hinge3Drive
+rrb      drive      2 #2   hinge2Drive
 rrb      point base  0  BaseAxisSuccNormal
 rrb      point base  1  BaseAxisSuccDir
 rrb      point base  2  BaseAxisSuccBase
@@ -1984,13 +1984,13 @@ rrb      point middle2  3  Middle2SuccAxisBase
 rrb      point middle2  4  Middle2PredAxisBase
 rrb      point middle2  5  Middle2SuccAxisDir
 == twoBases.rrb
-rrb      body       0  base.wrl
-rrb      material   0  metal
-rrb      link       0  base1
-rrb      link       1  base2
-rrb      joint      0  hinge1
-rrb      drive      0  hinge1Drive
-rrb      sensor     0  hinge1Sensor
+rrb      body       0 #-1  base.wrl
+rrb      material   0 #-1  metal
+rrb      link       0 #0   base1
+rrb      link       1 #1   base2
+rrb      joint      0 #0   hinge1
+rrb      drive      0 #0   hinge1Drive
+rrb      sensor     0 #0   hinge1Sensor
 rrb      point base1  0  Base1AxisSuccNormal
 rrb      point base1  1  Base1AxisSuccBase
 rrb      point base1  2  Base1AxisSuccDir
@@ -1998,87 +1998,87 @@ rrb      point base2  0  Base2AxisSuccNormal
 rrb      point base2  1  Base2AxisSuccBase
 rrb      point base2  2  Base2AxisSuccDir
 == walker.rrb
-rrb      body       0  shoulder.wrl
-rrb      body       1  body.wrl
-rrb      body       2  foot.wrl
-rrb      body       3  leg.wrl
-rrb      material   0  bodyMaterial
-rrb      material   1  shoulderMaterial
-rrb      material   2  legMaterial
-rrb      material   3  footMaterial
-rrb      link       0  shoulder5
-rrb      link       1  body
-rrb      link       2  shoulder6
-rrb      link       3  foot1
-rrb      link       4  foot2
-rrb      link       5  foot3
-rrb      link       6  foot4
-rrb      link       7  foot5
-rrb      link       8  foot6
-rrb      link       9  leg1
-rrb      link      10  leg2
-rrb      link      11  leg3
-rrb      link      12  leg4
-rrb      link      13  leg5
-rrb      link      14  leg6
-rrb      link      15  shoulder1
-rrb      link      16  shoulder2
-rrb      link      17  shoulder3
-rrb      link      18  shoulder4
-rrb      joint      0  leg6Joint1
-rrb      joint      1  leg5Joint2
-rrb      joint      2  leg4Joint3
-rrb      joint      3  leg6Joint2
-rrb      joint      4  leg5Joint3
-rrb      joint      5  leg6Joint3
-rrb      joint      6  leg1Joint1
-rrb      joint      7  leg2Joint1
-rrb      joint      8  leg1Joint2
-rrb      joint      9  leg3Joint1
-rrb      joint     10  leg2Joint2
-rrb      joint     11  leg1Joint3
-rrb      joint     12  leg4Joint1
-rrb      joint     13  leg3Joint2
-rrb      joint     14  leg2Joint3
-rrb      joint     15  leg5Joint1
-rrb      joint     16  leg4Joint2
-rrb      joint     17  leg3Joint3
-rrb      drive      0  leg6Joint3Drive
-rrb      drive      1  leg5Joint2Drive
-rrb      drive      2  leg4Joint1Drive
-rrb      drive      3  leg1Joint1Drive
-rrb      drive      4  leg2Joint1Drive
-rrb      drive      5  leg2Joint2Drive
-rrb      drive      6  leg1Joint3Drive
-rrb      drive      7  leg2Joint3Drive
-rrb      drive      8  leg1Joint2Drive
-rrb      drive      9  leg5Joint1Drive
-rrb      drive     10  leg4Joint2Drive
-rrb      drive     11  leg3Joint3Drive
-rrb      drive     12  leg6Joint1Drive
-rrb      drive     13  leg4Joint3Drive
-rrb      drive     14  leg3Joint2Drive
-rrb      drive     15  leg6Joint2Drive
-rrb      drive     16  leg5Joint3Drive
-rrb      drive     17  leg3Joint1Drive
-rrb      sensor     0  leg6Joint2Sensor
-rrb      sensor     1  leg5Joint1Sensor
-rrb      sensor     2  leg6Joint1Sensor
-rrb      sensor     3  leg5Joint2Sensor
-rrb      sensor     4  leg4Joint2Sensor
-rrb      sensor     5  leg3Joint1Sensor
-rrb      sensor     6  leg1Joint3Sensor
-rrb      sensor     7  leg4Joint1Sensor
-rrb      sensor     8  leg3Joint2Sensor
-rrb      sensor     9  leg2Joint3Sensor
-rrb      sensor    10  leg3Joint3Sensor
-rrb      sensor    11  leg2Joint2Sensor
-rrb      sensor    12  leg1Joint1Sensor
-rrb      sensor    13  leg4Joint3Sensor
-rrb      sensor    14  leg2Joint1Sensor
-rrb      sensor    15  leg1Joint2Sensor
-rrb      sensor    16  leg5Joint3Sensor
-rrb      sensor    17  leg6Joint3Sensor
+rrb      body       0 #-1  shoulder.wrl
+rrb      body       1 #-1  body.wrl
+rrb      body       2 #-1  foot.wrl
+rrb      body       3 #-1  leg.wrl
+rrb      material   0 #-1  bodyMaterial
+rrb      material   1 #-1  shoulderMaterial
+rrb      material   2 #-1  legMaterial
+rrb      material   3 #-1  footMaterial
+rrb      link       0 #0   shoulder5
+rrb      link       1 #1   body
+rrb      link       2 #2   shoulder6
+rrb      link       3 #3   foot1
+rrb      link       4 #4   foot2
+rrb      link       5 #5   foot3
+rrb      link       6 #6   foot4
+rrb      link       7 #7   foot5
+rrb      link       8 #8   foot6
+rrb      link       9 #9   leg1
+rrb      link      10 #10  leg2
+rrb      link      11 #11  leg3
+rrb      link      12 #12  leg4
+rrb      link      13 #13  leg5
+rrb      link      14 #14  leg6
+rrb      link      15 #15  shoulder1
+rrb      link      16 #16  shoulder2
+rrb      link      17 #17  shoulder3
+rrb      link      18 #18  shoulder4
+rrb      joint      0 #0   leg6Joint1
+rrb      joint      1 #1   leg5Joint2
+rrb      joint      2 #2   leg4Joint3
+rrb      joint      3 #3   leg6Joint2
+rrb      joint      4 #4   leg5Joint3
+rrb      joint      5 #5   leg6Joint3
+rrb      joint      6 #6   leg1Joint1
+rrb      joint      7 #7   leg2Joint1
+rrb      joint      8 #8   leg1Joint2
+rrb      joint      9 #9   leg3Joint1
+rrb      joint     10 #10  leg2Joint2
+rrb      joint     11 #11  leg1Joint3
+rrb      joint     12 #12  leg4Joint1
+rrb      joint     13 #13  leg3Joint2
+rrb      joint     14 #14  leg2Joint3
+rrb      joint     15 #15  leg5Joint1
+rrb      joint     16 #16  leg4Joint2
+rrb      joint     17 #17  leg3Joint3
+rrb      drive      0 #0   leg6Joint3Drive
+rrb      drive      1 #1   leg5Joint2Drive
+rrb      drive      2 #2   leg4Joint1Drive
+rrb      drive      3 #3   leg1Joint1Drive
+rrb      drive      4 #4   leg2Joint1Drive
+rrb      drive      5 #5   leg2Joint2Drive
+rrb      drive      6 #6   leg1Joint3Drive
+rrb      drive      7 #7   leg2Joint3Drive
+rrb      drive      8 #8   leg1Joint2Drive
+rrb      drive      9 #9   leg5Joint1Drive
+rrb      drive     10 #10  leg4Joint2Drive
+rrb      drive     11 #11  leg3Joint3Drive
+rrb      drive     12 #12  leg6Joint1Drive
+rrb      drive     13 #13  leg4Joint3Drive
+rrb      drive     14 #14  leg3Joint2Drive
+rrb      drive     15 #15  leg6Joint2Drive
+rrb      drive     16 #16  leg5Joint3Drive
+rrb      drive     17 #17  leg3Joint1Drive
+rrb      sensor     0 #0   leg6Joint2Sensor
+rrb      sensor     1 #1   leg5Joint1Sensor
+rrb      sensor     2 #2   leg6Joint1Sensor
+rrb      sensor     3 #3   leg5Joint2Sensor
+rrb      sensor     4 #4   leg4Joint2Sensor
+rrb      sensor     5 #5   leg3Joint1Sensor
+rrb      sensor     6 #6   leg1Joint3Sensor
+rrb      sensor     7 #7   leg4Joint1Sensor
+rrb      sensor     8 #8   leg3Joint2Sensor
+rrb      sensor     9 #9   leg2Joint3Sensor
+rrb      sensor    10 #10  leg3Joint3Sensor
+rrb      sensor    11 #11  leg2Joint2Sensor
+rrb      sensor    12 #12  leg1Joint1Sensor
+rrb      sensor    13 #13  leg4Joint3Sensor
+rrb      sensor    14 #14  leg2Joint1Sensor
+rrb      sensor    15 #15  leg1Joint2Sensor
+rrb      sensor    16 #16  leg5Joint3Sensor
+rrb      sensor    17 #17  leg6Joint3Sensor
 rrb      point shoulder5  0  shoulder5SuccNormal
 rrb      point shoulder5  1  shoulder5PredDir
 rrb      point shoulder5  2  shoulder5PredBase

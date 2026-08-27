@@ -23,3 +23,6 @@ build-fast/
 
 # Phase D working copy of data/ -- the migrated robot ordering, PORTING.md
 data-reordered/
+
+# python bytecode
+__pycache__/

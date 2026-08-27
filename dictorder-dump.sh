@@ -48,15 +48,25 @@ for f in $exps $rrbs; do
 	# prints routine diagnostics there ("attempt to read invalid sensor"),
 	# but a sanitizer report would land there too, and an earlier version of
 	# this script sent all of it to /dev/null.
-	err=$(mktemp)
-	if ! "$EVAL" -v "$f" 0 2>"$err" |
-	     sed -n 's/^  \(loaded\|copy\|rrb\) /\1 /p'; then
-		echo "$(basename "$f"): sigel_eval failed" >&2
-		cat "$err" >&2; rm -f "$err"; exit 1
+	# Do NOT pipe sigel_eval straight into sed: the pipeline's status is
+	# sed's, so a segfaulting sigel_eval gave exit 0 and a header-only file.
+	# An earlier version of this script had exactly that hole while claiming
+	# to have closed it. Capture, test the status, then filter.
+	out=$(mktemp); err=$(mktemp)
+	rc=0; "$EVAL" -v "$f" 0 >"$out" 2>"$err" || rc=$?
+	if [ "$rc" -ne 0 ]; then
+		echo "$(basename "$f"): sigel_eval exited $rc" >&2
+		cat "$err" >&2; rm -f "$out" "$err"; exit 1
 	fi
 	if grep -qE 'AddressSanitizer|LeakSanitizer|runtime error:' "$err"; then
 		echo "$(basename "$f"): sanitizer report" >&2
-		cat "$err" >&2; rm -f "$err"; exit 1
+		cat "$err" >&2; rm -f "$out" "$err"; exit 1
 	fi
-	rm -f "$err"
+	# A run that produced no order lines at all is a failure, not an empty diff.
+	if ! sed -n 's/^  \(loaded\|copy\|rrb\) /\1 /p' "$out" | grep -q .; then
+		echo "$(basename "$f"): no order lines -- did it load?" >&2
+		cat "$err" >&2; rm -f "$out" "$err"; exit 1
+	fi
+	sed -n 's/^  \(loaded\|copy\|rrb\) /\1 /p' "$out"
+	rm -f "$out" "$err"
 done

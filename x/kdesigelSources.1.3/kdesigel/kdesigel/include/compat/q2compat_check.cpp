@@ -254,20 +254,21 @@ int main()
     }
 
 
-    {   // Qt 2 iteration order, checked against the real insect robot.
-        // qgdict.cpp:87-103 hash, %17 buckets, chains newest-first. This order
-        // is what numbers links in SIG_DynaMoSimulationData.cpp:33-51, so the
-        // shipped experiments depend on it.
+    {   // PHASE D: iteration order is INSERTION order. This assertion used to
+        // pin Qt 2's hash order for the real insect robot -- the order that
+        // numbered links in SIG_DynaMoSimulationData.cpp:33-51. That order now
+        // comes from the data files instead, so what has to hold here is that
+        // the container itself reorders nothing.
         const char *ins[] = { "body","leg1","foot1","leg2","foot2","leg3","foot3",
                               "leg4","foot4","leg5","foot5","leg6","foot6" };
-        const char *want[] = { "body","foot1","foot2","foot3","foot4","foot5","foot6",
-                               "leg1","leg2","leg3","leg4","leg5","leg6" };
         Thing store[13];
         Q2Dict<Thing> d;
         for (int i = 0; i < 13; ++i) d.insert(QString::fromLatin1(ins[i]), &store[i]);
         int n = 0;
-        for (Q2DictIterator<Thing> it(d); it.current(); ++it, ++n)
-            assert(it.currentKey() == QLatin1String(want[n]));
+        for (Q2DictIterator<Thing> it(d); it.current(); ++it, ++n) {
+            assert(it.currentKey() == QLatin1String(ins[n]));
+            assert(it.current() == &store[n]);
+        }
         assert(n == 13);
         assert(d.count() == 13);
         assert(d.size() == 17);          // table size, not item count
@@ -426,14 +427,16 @@ int main()
         d.deleteContents();
         assert(Thing::live == 0);
     }
-    {   // resize() must preserve Qt 2's chain order (qgdict.cpp:508-560):
-        // buckets 0..old-1, head to tail. Walking backwards reverses them.
+    {   // PHASE D: resize() no longer places anything -- there is one chain --
+        // so it must leave insertion order alone. It used to have to reproduce
+        // Qt 2's rehash, which yielded k7,k4,k1.
         Q2Dict<Thing> d(17); Thing a(1), b(2), c(3);
         d.insert("k1", &a); d.insert("k4", &b); d.insert("k7", &c);
-        d.resize(3);                        // all three collide at vlen 3
+        d.resize(3);
         QStringList got;
         for (Q2DictIterator<Thing> it(d); it.current(); ++it) got << it.currentKey();
-        assert(got.join(',') == QLatin1String("k7,k4,k1"));
+        assert(got.join(',') == QLatin1String("k1,k4,k7"));
+        assert(d.count() == 3 && d.find("k4") == &b);
     }
     {   // assignment keeps the DESTINATION's table size (qgdict.cpp:280-302)
         Q2Dict<Thing> src(31), dst(17); Thing a(1);

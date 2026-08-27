@@ -47,14 +47,25 @@ using SIGEL_Simulation::SIG_SimulationParameters;
 // D1 first dumped only links and joints. A review rebuilt the core with a
 // perturbed Q2Dict::hash and found 6 of 14 experiments whose order changed
 // while the diff stayed empty -- the four unwatched dicts were carrying it.
+// SIG_Body and SIG_Material carry no number; the other four do.
+template <typename T> static int SIG_NUMBER_OF(const T *e) { return e->getNumber(); }
+static int SIG_NUMBER_OF(const SIGEL_Robot::SIG_Body *)     { return -1; }
+static int SIG_NUMBER_OF(const SIGEL_Robot::SIG_Material *) { return -1; }
+
 static void dumpOrder(const SIGEL_Robot::SIG_Robot &r, const char *which)
 {
+// Position AND stored number. The two are independent: position becomes the
+// DynaMechs body index, while the stored number is what an evolved program's
+// SENSE and MOVE operands resolve through (SIG_DynaMechsSimulationQueries.cpp:
+// 93-95, SIG_DynaMechsCommandInterface.cpp:74). Reordering a .rrb changes the
+// number; reordering an .exp would change the position. A gate that watched
+// only position could not see the first.
 #define SIG_DUMP(label, Type, accessor)                                    \
   do {                                                                     \
     int n = 0;                                                             \
     for (Type *e : r.accessor())                                           \
-      printf("  %-8s %-9s %2d  %s\n", which, label, n++,                   \
-             qPrintable(e->getName()));                                    \
+      printf("  %-8s %-9s %2d #%-3d %s\n", which, label, n++,               \
+             SIG_NUMBER_OF(e), qPrintable(e->getName()));                  \
   } while (0)
 
   SIG_DUMP("body",     SIGEL_Robot::SIG_Body,     getBodies);
