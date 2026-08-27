@@ -28,10 +28,11 @@ build and run, because nothing else can be verified without it — see §3.
 | 0 — comments to English | done for the 9 core modules; 9 GUI files still hold Latin-1 |
 | A — core onto Qt 6 | **done**, tags `step-A0`…`step-A9`. `./check.sh`: 117 pass, 5 fail (all need a GUI) |
 | B — ownership explicit | **8 of 14 containers**. 5 still on `setAutoDelete` — open, §7 |
-| R — build and run | core builds and runs, faithful to 1.3. **No way to check it yet** — needs fitness numbers from the 1.3 binary on the x86 box, §7 |
+| R — build and run | core builds and runs, faithful to 1.3. **Checked only against itself** — Phase V supplies the comparison against 1.3, §7 |
 | T — old-Qt tool container | **done 2026-08-27.** `tools/qtmig`, §4 |
 | D — delete the shim, migrate the data | **D1–D6 done 2026-08-27. `Q2Dict`, `Q2DictIterator` and `Q2Array` deleted** — shim 806 → **530** lines, `./check.sh` **118 pass / 4 fail** / 341 warnings. Remaining: `Q2PtrVector` 69, `Q2PtrList` 62, `Q2CString` 21, `Q2Queue` 16, `Q2ListIterator` 14, `Q2ValueList` 12. §10 |
 | C — GUI | **not started, AUTHORIZED 2026-08-27 per D24.** ~450 Qt 2 sites + 20 forms |
+| V — check against the 1.3 binary | **not started, NEW 2026-08-27.** The only equivalence check in the plan — every other gate compares the port against itself. §7 |
 
 **SCOPE — DECIDED 2026-08-23. Read this before changing anything.**
 
@@ -347,6 +348,7 @@ D20 supersedes D5, D24 supersedes D3.
 | **D22** | The Qt 2 style classes | **`QStyleFactory::create("Fusion")` for the `#else` (Motif) branch.** `QMotifPlusStyle` has no successor in Qt 6; Fusion is the closest it offers. Chosen 2026-08-27 after comparing the two styles Qt 6.9 offers here. **The `#ifdef _WINDOWS` branch keeps Windows** — `QWindowsStyle` is no longer a public class but Qt 6 still creates that style by name, so under D21 its nearest equivalent is `QStyleFactory::create("Windows")`, not Fusion |
 | **D23** | Phase C granularity | **one module or one form at a time**, each its own commit, each independently reviewable. No API-wide sweeps across modules |
 | **D24** | GUI scope | **Phase C is authorized.** Supersedes D3(b), which scoped the interface out. Named separately because D19–D23 did not carry it and the status table cited a struck-through row |
+| **D26** | What the 1.3 binary is asked for | **structure and arithmetic, not fitness equality.** Three tiers, in descending confidence: the container ordering and numbering, which compare exactly (V1, V2); per-individual fitness, which is chaotic across architectures and is therefore a judgement (V4); the non-integrating quantities, which compare exactly but need `gdb` (V5). Bit-exact agreement on an integrated trajectory is **not** a target and its absence proves nothing — §7. Recorded because this file repeatedly described the missing reference as "fitness numbers", which is the one thing that binary cannot usefully give |
 | **D25** | What "done" means | **Plain modern Qt 6, nothing left over.** `q2compat.h` deleted, no Qt3Support class anywhere, no compatibility flag on SIGEL's own code. This moves §10's "drop the Qt 2 emulation" from optional debt into a **required phase**, and with it the data migration that section describes — the shim exists because `Q2Dict`'s hash order numbers the links, so the 7 `.rrb` and 12 `.exp` files must be rewritten before it can go. **Ordered before Phase C**, so the 466 GUI sites are ported once, to the final target, instead of twice. Vendored third-party code is out of scope for this rule: qhull, cv97, Dynamo and PVM keep `-w -fpermissive` |
 
 ## 5a. Decisions — signed off 2026-08-22, for Phase R
@@ -561,11 +563,11 @@ See the scope note at the top and `regression_1.0_to_1.3.md`.
 Against those 2001 files the current 1.3-faithful build gets 7 of 13 distinct
 experiments within 10%. That number measures the 1.0 → 1.3 regression, not us.
 
-**What is needed to make this a port test:** the fitness the 1.3 binary on the
-x86 box computes for a set of individuals of one published `.exp`. Then
-`replicate.sh` compares our build against 1.3 instead of against 1.0, which is
-the only comparison that says anything about the port. Everything else is in
-place — the harness, the data and the driver.
+**What is needed to make this a port test is Phase V**, below. Not fitness:
+fitness is chaotic across architectures — the next paragraph measures it — and
+the 1.3 binary never prints one anyway (§9). What compares exactly is the
+container ordering the robot serialisation carries, and Phase V starts there.
+Everything else is already in place: the harness, the data and the driver.
 
 **Fitness is a chaotic metric.** A 1-ULP change to the robot's start height
 moves an individual's fitness by 45% and best-of-100 by up to 18%. The 2003
@@ -608,6 +610,53 @@ than inspection:
   the first sweep because it is a declaration rather than a call. Fixed. It made
   `getMaxRecorderSteps` return 2 instead of 182 for three fitness functions no
   shipped experiment selects.
+
+### Phase V — check against the 1.3 binary — NEW 2026-08-27
+
+Replication above says what is missing: **every gate in this repo compares the
+port against itself.** `dictorder-baseline.txt` and `fitness-baseline.txt` both
+prove that nothing changed, not that anything matches 1.3. Phase V supplies the
+other side of the comparison, from the 1.3 binary on the x86 box, reachable
+through the `sigel-x86` session.
+
+**Capture once, diff for ever.** 1.3 is frozen, so its output for a given input
+never changes. Each step captures a reference file once, commits it under
+`reference/`, and every later step diffs against it locally. The x86 box is
+needed **once per quantity, not once per step** — after V1 this is another line
+in `check.sh`, not a remote call.
+
+| # | Step | What it checks |
+|---|---|---|
+| V1 | Capture 1.3's load-and-save round trip for three shipped `.exp` — `twoBases` as the control, `octopus` and `walker` for their colliding names. Commit under `reference/` | the `Q2Dict` hash, all 8 order-carrying containers, the parser and the serialiser |
+| V2 | Our half: a save path in `sigel_eval`, the same round trip locally, diffed against V1. Becomes a gate | equivalence instead of self-consistency |
+| V3 | Determinism on the x86 box — one experiment run twice, both `RANDOMSEED`s pinned | gates everything numeric; never tested there |
+| V4 | Force re-evaluation of a shipped population by setting its `FITNESS` fields to `-1`, harvest 1.3's per-individual fitness, compare against `sigel_eval` | the number this file has been asking for. **Judgement, not a gate** |
+| V5 | **Conditional on `gdb` reaching that box (§9).** Breakpoint probes for the non-integrating quantities: the sensor value a joint angle produces, the force a register value produces, the MDH parameters | the port's **arithmetic**, which V1–V4 never touch |
+
+**Why the round trip is the sharp test.** The `.exp` carries the robot as a
+`StreamedRobot` block, and that block *is* dict iteration order —
+`SIG_Robot::writeToFileTransfer` walks the six dicts to write it. Loading
+inserts each entity into a `QDict`; saving iterates it back out. Qt 2's
+`QDict::insert` **prepends**, so every bucket holding more than one name comes
+back reversed. Load-and-save is therefore not the identity but a permutation,
+and which permutation is a fingerprint of the hash. That makes the prediction
+falsifiable in advance: `twoBases` has 2 links and 1 joint, so it must come back
+**identical**, while `octopus` and `walker` must come back **permuted**. The
+`LanguageParameters` command list rides along in the same artifact — shipped, it
+reads `MUL MOVE CMP COPY LOAD SENSE SUB DIV MIN DELAY ADD MOD MAX`, which is
+neither alphabetical nor declaration order, so it is hash order too.
+
+**Why this is urgent rather than eventual.** `q2compat.h`'s hash was only ever
+checked against a second reimplementation of `qgdict.cpp` by the same hand — two
+readings that share one mistake agree perfectly. `Q2Dict` is already deleted
+(D5), so the ordering it produced survives only in `data-reordered/` and
+`dictorder-baseline.txt`, with D7 built on top. Every further step stacks work
+on a foundation checked against nothing but itself, and V1 is three short runs.
+
+**V1 has a trap.** `SAVEEXIT=1` rewrites the `.exp` in place, so every run works
+on a copy — never on the pristine download. `PVMHOST`, `POOLIMAGEDIRECTORY` and
+`GRAVEYARDDIRECTORY` all name `/home/pg368b/ross/projects/sigel`, a Dortmund
+host from 2003, and have to be repointed first.
 
 ### Reference material — all of it, downloaded 2026-08-22
 
@@ -758,15 +807,24 @@ custom signals and slots, and there are 49 across the 20 forms.
 
 ---
 
-## 8. Effort
+## 8. Steps and status
 
-| Phase | Steps | Effort | Status |
-|---|---|---|---|
-| A | 10 | 1.5 wk | done |
-| B | 5 | 1 wk | 8 of 14 containers |
-| T | 2 | 2–3 days | **not started** — blocks C |
-| C | 10 | 2.5–3 wk | **not started, authorized 2026-08-27** |
-| PVM | — | ~3 days | not started, §3 |
+| Phase | Steps | Status |
+|---|---|---|
+| A | 10 | done |
+| B | 5 | 8 of 14 containers |
+| T | 2 | **done 2026-08-27** (§4) |
+| C | 10 | **not started, authorized 2026-08-27** |
+| V | 5 | **not started**, V5 conditional on `gdb` — §7 |
+| PVM | — | not started, §3 |
+
+**The effort column is gone, 2026-08-27, and the section is no longer called
+Effort.** It carried "1.5 wk", "1 wk", "2–3 days", "2.5–3 wk" and "~3 days".
+None of those was measured or derived from anything — they were invented. A plan
+whose every other number is counted from the tree should not carry six that are
+guessed. Step counts are real and stay. **Do not put estimates back.** The same
+row also claimed Phase T was "not started" while the status table at the top of
+this file had it done; corrected here.
 
 Phase T is new as of 2026-08-27 (§4). Phase C was rebuilt around modules and
 forms. The PVM row was previously described as a separate job "which nothing
@@ -853,6 +911,31 @@ evaluations). Two limits as a baseline:
 - `SAVEEXIT=1` makes SIGEL **overwrite the experiment file it was given** and
   re-emit defaulted keys, so an evolved `.exp` is not byte-comparable with its
   input
+
+**What the x86 box can and cannot be asked — inventoried 2026-08-27** by the
+`sigel-x86` session, recorded so it is not re-derived:
+
+| | |
+|---|---|
+| an instrumented rebuild | **impossible, permanently.** There is no SIGEL source on that machine at all — only the compiled 1.3 release. Not a toolchain problem, so no `-DSIG_DEBUG` build of the reference is ever available |
+| the binaries | **not stripped.** 11,709 symbols in `sigel`, 10,936 in `sigel_slave`, 1,760 of them `SIG_*` with full g++ 2.95 mangling. This is what makes V5 possible without a rebuild |
+| `gdb`, `strace`, `ltrace` | **absent**, and installing needs root and network there. V5 is blocked on that decision and nothing else |
+| PVM | **works.** Four evolutions have completed, up to 300 generations at 8 concurrent slaves. `SIGEL_ROOT` must be in **pvmd's** environment, not the shell's, or every slave segfaults with the master idling |
+| the master's output | one line per generation, and nothing else. **No fitness value is ever printed.** Fitness lives only in the `.pol` pool images and the rewritten `.exp`, as `FITNESS=<value>`; `-1` means unevaluated, which is what V4 exploits |
+| per-step trajectories | POV-Ray export exists only in `sigel_slave`'s visualiser widget and is driven through its GUI. **Not reachable headlessly** |
+| how the binaries run | natively on x86-64 — woody's own loader invoked explicitly against unpacked woody `.deb`s. No chroot, no container, no root |
+
+**`twoTri` on that box is not reference material.** It is not in
+`robots.tar.gz`, which holds exactly the 7 models named above, and it appears
+nowhere in `data/`; verified 2026-08-27. That box's own experiments, modified
+robots and render pipeline are likewise out of scope — its render path
+deliberately alters SIGEL's POV output.
+
+**There are two `RANDOMSEED` keys, not one** — `SIG_SimulationParameters`
+(`:102`) and `SIG_GPParameter` (`:386`) each parse their own, with different
+values in the same shipped `.exp`. Both are already handled; any determinism
+claim has to pin both. `q2compat.h:77` still says "a fixed `RANDOMSEED`",
+singular, which is stale phrasing rather than a defect.
 
 ### Determinism — resolved
 
@@ -1270,7 +1353,21 @@ byte with no ASan or UBSan report. So all 42 evaluations plus the duplicate-key
 self-check have full sanitized coverage today. Only `dictorder-dump.sh` is
 blocked, and only because it also loads the 7 `.rrb`.
 
-### D7 — `Q2PtrVector` off the simulation path
+### D7 — `Q2PtrVector`: `SIG_Geometry` and `SIG_Body` only
+
+**The commit subject for this step overstated it.** `Q2PtrVector` is *not* off
+the simulation path. Still on it, and executing on every fitness evaluation:
+`SIG_DynaMechsSimulationData.h:88,92,96` — `dynaMechsLinks`, `drives`,
+`sensors`, together with the `DynaMechsLinkGuard` whose whole purpose is
+`deleteContents()` on the unwinding path, which is the most ownership-sensitive
+one in executed code — and `SIG_Interpreter.h:125`'s `registers`, indexed on
+every interpreted instruction. `SIG_SimulationQueries.h:67` and
+`SIG_CommandInterface.h:66` are pure-virtual signatures taking
+`Q2PtrVector<SIG_Register> &`, three implementations each, so that one has to
+flip in a single commit. `SIG_DynaSystem.h:193-202` has four more on the Dynamo
+backend, and `SIG_GPOperations.h:73` and `SIG_GPTournament.h:81` mean the four
+evolution-loop users named in the commit message are not the whole remainder
+either.
 
 `Q2PtrVector` splits in two. The **simulation side** is covered by both gates
 and by AddressSanitizer; the **evolution loop** — `SIG_GPPopulation`,
@@ -1284,25 +1381,59 @@ can run it until PVM builds. This step does the covered half only.
 | `SIG_Body`'s local `vertices` | **`QList<DL_vector>` — values, not pointers.** There is no polymorphism, so the ownership question disappears rather than moving |
 
 **A latent null dereference, removed rather than preserved.**
-`SIG_DynaMechsLink.cpp:108` iterates `getVertices()` to **`size()`** — the
+`SIG_DynaMechsLink.cpp:118` iterates `getVertices()` to **`size()`** — the
 capacity — and dereferences every slot, so any unfilled capacity would have
-crashed it. Instrumented across all 14 experiments: `size() == count()` every
-time, because `addVertex` has no caller outside `SIG_Geometry` and both fill
-paths fill exactly. With `QList` the two are the same number by construction.
-The same line also took the whole vector **by value** on every link
-construction; it is a const reference now.
+crashed it. With `QList` the two are the same number by construction. The same
+line also took the whole vector **by value** on every link construction; it is a
+const reference now.
 
-**`SIG_Body` was the one container §7 said must keep `setAutoDelete`** — a local
-whose flag *is* the RAII, because the NEWMAT multiply and the `SIG_Polygon`
-allocations below it can throw and a hand-written free would drop the unwinding
-path. That reasoning was right for pointers. Values retire it: nothing is owned,
-so nothing leaks on unwind. `actIndex` there comes straight out of the VRML file
-and used to be absorbed by the clamp, so it is bounds-checked explicitly now.
+**The first version of this paragraph justified that with two false claims**,
+both corrected by review. There is no `addVertex` — the appending method is
+`getOrAddVertex`, it is **public**, and it *is* called from outside
+`SIG_Geometry` (`SIG_Polygon.cpp:66`, reached from `SIG_Body.cpp` and
+`SIG_RobotCompilerObjects.cpp:374`). And it did **not** fill exactly: it grew
+capacity to `max(16, 2·size)`, so `size() > count()` from the first vertex on —
+measured at **289 of 298 calls** across the 7 `.rrb`.
 
-Verified: both gates clean, `./check.sh` 118 pass / 4 fail, all 14 experiments
-clean under AddressSanitizer and UndefinedBehaviorSanitizer, and the leak total
-is **unchanged at 41,374 bytes in 117 allocations** — no free dropped, none
-doubled.
+The real reason the link site was safe is narrower: `SIG_Link.cpp:196`
+deep-copies the body's geometry through `SIG_Geometry(const SIG_Geometry *)`,
+which sized to `count()` and so **compacted the holes away**. The simulation only
+ever sees compacted copies — 87 observations across all 14 experiments, all
+`size() == count()`, and `getOrAddVertex` called 0 times on any `.exp`.
+
+**`SIG_Body`'s local is *a* container §7 said should keep `setAutoDelete`** —
+not *the* one, which is `fitTaskList` (`SIG_GPManager.cpp:357,1434`) and is
+untouched. On a local the flag *is* the RAII, because the NEWMAT multiply and
+the `SIG_Polygon` allocations below it can throw. That reasoning was right for
+pointers; values retire it, since nothing is owned.
+
+**The bounds check first added here made things worse, and is fixed.**
+`SIG_Polygon` self-registers with the geometry in its constructor, so creating
+one and then skipping every out-of-range vertex left a **0-vertex face** behind —
+which the Qt 2 clamp could never produce, because it appended vertex 0 instead.
+`SIG_Mirtich::compFaceNormal` reads `verts[0..2]` unconditionally out of a
+`new int[numVerts]`. The check now runs **before** the polygon is created, and
+`compFaceNormal` refuses a face with fewer than three vertices and a zero-length
+normal rather than dividing by it. Inert on shipped data — the branch fires 0
+times across all 7 `.rrb` — but the failure mode had moved the wrong way for a
+step whose point was removing a latent dereference.
+
+**`SIG_Geometry`'s copy constructor and assignment are now `= delete`.** Both
+lists own raw pointers that the destructor `qDeleteAll`s, so a generated copy
+would free twice. Not a regression — `Q2PtrVector`'s copy set `del = false` but
+`~SIG_Geometry` called `deleteContents()` unconditionally, so the hazard was
+identical — and nothing in the tree copies one by value.
+
+**The geometry hunks were covered by nothing, and now are.** Review injected a
+doubling of every VRML vertex and both baselines stayed byte-identical: the
+`.exp` path never runs the VRML reader, and the dump recorded only names and
+numbers. `dumpOrder` now emits a per-body vertex count, polygon count and
+coordinate checksum. Re-run with the same injection, the order gate **fires**.
+
+Verified: both gates clean, `./check.sh` 118 pass / 4 fail / 338 warnings, all
+14 experiments clean under AddressSanitizer and UndefinedBehaviorSanitizer, and
+the leak total **unchanged at 41,374 bytes in 117 allocations** for `twoBases`,
+35,802,566 in 630,138 for `walker` — no free dropped, none doubled.
 
 **Formats, both pure permutations.** `.rrb` is block-structured with exactly five
 top-level kinds — `material`, `link`, `joint <subtype>`, `drive`, `sensor`, all

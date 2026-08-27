@@ -57,6 +57,18 @@ namespace SIGEL_Robot {
     QList<SIG_Polygon *> polygons;
     QList<DL_vector *> vertices;
 
+public:
+    // Both lists own raw pointers that ~SIG_Geometry qDeleteAll's, so a
+    // compiler-generated copy would shallow-copy them and free twice. Nothing
+    // in the tree copies a SIG_Geometry by value -- every one of the ~60
+    // references goes through a pointer -- and the hazard predates Phase D,
+    // but there is no reason to leave it available. Use
+    // SIG_Geometry(const SIG_Geometry *) for a deep copy.
+    SIG_Geometry (const SIG_Geometry &) = delete;
+    SIG_Geometry &operator= (const SIG_Geometry &) = delete;
+
+private:
+
   protected:
     /**
      * Adds a polygon.

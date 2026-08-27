@@ -78,6 +78,22 @@ static void dumpOrder(const SIGEL_Robot::SIG_Robot &r, const char *which)
   SIG_DUMP("sensor",   SIGEL_Robot::SIG_Sensor,   getSensors);
 #undef SIG_DUMP
 
+  // Geometry digest. Review showed that doubling every VRML vertex left both
+  // baselines byte-identical: the .exp path never runs the VRML reader, and the
+  // dump recorded only names and numbers, nothing derived from a coordinate.
+  // A count and a checksum per body close that, and cost one line each.
+  for (SIGEL_Robot::SIG_Body *b : r.getBodies()) {
+    const SIGEL_Robot::SIG_Geometry *g = b->getGeometry();
+    if (!g) { printf("  %-8s geom      -  %s  (none)\n", which, qPrintable(b->getName())); continue; }
+    double sum = 0.0;
+    for (int i = 0; i < g->getNumVertices(); ++i) {
+      DL_vector v = g->getVertex(i);
+      sum += v.get(0) * 1.0 + v.get(1) * 2.0 + v.get(2) * 3.0;
+    }
+    printf("  %-8s geom   %4d v %4d p  %+.9e  %s\n", which,
+           g->getNumVertices(), g->getNumPolygons(), sum, qPrintable(b->getName()));
+  }
+
   // The eighth ordered container, missed by the first enumeration: it rides
   // inside every .exp and every PVM transfer through writeToFileTransfer.
   // Nothing numbers commands -- they are looked up by name -- so like bodies

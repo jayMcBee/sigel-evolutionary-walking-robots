@@ -186,17 +186,20 @@ namespace SIGEL_Robot
                                                 for (int j=0; j < noOfIndices; j++) {
                                                         int actIndex = indexedFaceSetNode->getCoordIndex(j);
                                                         
+                                                        // actIndex comes straight out of the VRML file, and a
+                                                        // negative one ends the face. Q2PtrVector::at used to
+                                                        // clamp an out-of-range index to 0; QList does not.
+                                                        // The check has to come BEFORE the polygon is created:
+                                                        // SIG_Polygon self-registers with the geometry in its
+                                                        // constructor, so creating one and then skipping every
+                                                        // vertex leaves a 0-vertex face behind, which
+                                                        // SIG_Mirtich::compFaceNormal reads verts[0..2] from.
                                                         if (actIndex < 0)
                                                                 actPolygon = 0;
-                                                        else {
+                                                        else if ( actIndex < vertices.size() ) {
                                                                 if (!actPolygon)
                                                                         actPolygon = new SIG_Polygon( geometry );
-                                                                
-                                                                // actIndex comes straight out of the VRML file.
-                                                                // Q2PtrVector::at clamped an out-of-range index;
-                                                                // QList does not, so check it here.
-                                                                if ( actIndex < vertices.size() )
-                                                                        actPolygon->appendVertex( vertices[ actIndex ] );
+                                                                actPolygon->appendVertex( vertices[ actIndex ] );
                                                         };
                                                 };
                                         };

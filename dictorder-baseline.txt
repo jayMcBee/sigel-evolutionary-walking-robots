@@ -18,6 +18,9 @@ loaded   drive      0 #0   hinge1Drive
 loaded   drive      1 #2   hinge3Drive
 loaded   drive      2 #1   hinge2Drive
 loaded   drive      3 #3   hinge4Drive
+loaded   geom     10 v   11 p  -5.999868000e+00  base.wrl
+loaded   geom      8 v   10 p  +0.000000000e+00  middle.wrl
+loaded   geom     18 v   21 p  +5.019037200e+01  effector.wrl
 loaded   command    0      MUL
 loaded   command    1      MOVE
 loaded   command    2      CMP
@@ -74,6 +77,9 @@ copy     drive      0 #0   hinge1Drive
 copy     drive      1 #2   hinge3Drive
 copy     drive      2 #1   hinge2Drive
 copy     drive      3 #3   hinge4Drive
+copy     geom     10 v   11 p  -5.999868000e+00  base.wrl
+copy     geom      8 v   10 p  +0.000000000e+00  middle.wrl
+copy     geom     18 v   21 p  +5.019037200e+01  effector.wrl
 copy     command    0      MUL
 copy     command    1      MOVE
 copy     command    2      CMP
@@ -167,6 +173,9 @@ loaded   sensor     8 #0   leg1Joint1Sensor
 loaded   sensor     9 #3   leg2Joint2Sensor
 loaded   sensor    10 #1   leg1Joint2Sensor
 loaded   sensor    11 #2   leg2Joint1Sensor
+loaded   geom     24 v   29 p  -5.188400000e-01  foot.wrl
+loaded   geom     24 v   32 p  +3.054881000e+00  body.wrl
+loaded   geom     12 v   12 p  -2.109000000e-02  leg.wrl
 loaded   command    0      MUL
 loaded   command    1      CMP
 loaded   command    2      MOVE
@@ -307,6 +316,9 @@ copy     sensor     8 #0   leg1Joint1Sensor
 copy     sensor     9 #3   leg2Joint2Sensor
 copy     sensor    10 #1   leg1Joint2Sensor
 copy     sensor    11 #2   leg2Joint1Sensor
+copy     geom     24 v   29 p  -5.188400000e-01  foot.wrl
+copy     geom     24 v   32 p  +3.054881000e+00  body.wrl
+copy     geom     12 v   12 p  -2.109000000e-02  leg.wrl
 copy     command    0      MUL
 copy     command    1      CMP
 copy     command    2      MOVE
@@ -436,6 +448,9 @@ loaded   sensor     5 #7   thirdLegJoint2Sensor
 loaded   sensor     6 #6   thirdLegJoint1Sensor
 loaded   sensor     7 #0   firstLegJoint1Sensor
 loaded   sensor     8 #1   firstLegJoint2Sensor
+loaded   geom      8 v   10 p  +6.000000001e-06  legLink.wrl
+loaded   geom     18 v   21 p  +1.558927200e+01  footLink.wrl
+loaded   geom     12 v   14 p  +2.626250000e-01  tripleBase.wrl
 loaded   command    0      MUL
 loaded   command    1      MOVE
 loaded   command    2      CMP
@@ -546,6 +561,9 @@ copy     sensor     5 #7   thirdLegJoint2Sensor
 copy     sensor     6 #6   thirdLegJoint1Sensor
 copy     sensor     7 #0   firstLegJoint1Sensor
 copy     sensor     8 #1   firstLegJoint2Sensor
+copy     geom      8 v   10 p  +6.000000001e-06  legLink.wrl
+copy     geom     18 v   21 p  +1.558927200e+01  footLink.wrl
+copy     geom     12 v   14 p  +2.626250000e-01  tripleBase.wrl
 copy     command    0      MUL
 copy     command    1      MOVE
 copy     command    2      CMP
@@ -657,6 +675,9 @@ loaded   sensor     5 #5   secondLegJoint3Sensor
 loaded   sensor     6 #6   thirdLegJoint1Sensor
 loaded   sensor     7 #0   firstLegJoint1Sensor
 loaded   sensor     8 #1   firstLegJoint2Sensor
+loaded   geom     18 v   21 p  +1.558927200e+01  footLink.wrl
+loaded   geom      8 v   10 p  +6.000000001e-06  legLink.wrl
+loaded   geom     12 v   14 p  +2.626250000e-01  tripleBase.wrl
 loaded   command    0      MUL
 loaded   command    1      CMP
 loaded   command    2      MOVE
@@ -767,6 +788,9 @@ copy     sensor     5 #5   secondLegJoint3Sensor
 copy     sensor     6 #6   thirdLegJoint1Sensor
 copy     sensor     7 #0   firstLegJoint1Sensor
 copy     sensor     8 #1   firstLegJoint2Sensor
+copy     geom     18 v   21 p  +1.558927200e+01  footLink.wrl
+copy     geom      8 v   10 p  +6.000000001e-06  legLink.wrl
+copy     geom     12 v   14 p  +2.626250000e-01  tripleBase.wrl
 copy     command    0      MUL
 copy     command    1      CMP
 copy     command    2      MOVE
@@ -866,6 +890,9 @@ loaded   sensor     2 #2   firstLegJoint3Sensor
 loaded   sensor     3 #5   secondLegJoint3Sensor
 loaded   sensor     4 #0   firstLegJoint1Sensor
 loaded   sensor     5 #1   firstLegJoint2Sensor
+loaded   geom     18 v   21 p  +1.558927200e+01  footLink.wrl
+loaded   geom      8 v   10 p  +6.000000001e-06  legLink.wrl
+loaded   geom     12 v   16 p  +2.464880000e-01  base.wrl
 loaded   command    0      MUL
 loaded   command    1      CMP
 loaded   command    2      MOVE
@@ -946,6 +973,9 @@ copy     sensor     2 #2   firstLegJoint3Sensor
 copy     sensor     3 #5   secondLegJoint3Sensor
 copy     sensor     4 #0   firstLegJoint1Sensor
 copy     sensor     5 #1   firstLegJoint2Sensor
+copy     geom     18 v   21 p  +1.558927200e+01  footLink.wrl
+copy     geom      8 v   10 p  +6.000000001e-06  legLink.wrl
+copy     geom     12 v   16 p  +2.464880000e-01  base.wrl
 copy     command    0      MUL
 copy     command    1      CMP
 copy     command    2      MOVE
@@ -1027,6 +1057,9 @@ loaded   sensor     2 #2   firstLegJoint3Sensor
 loaded   sensor     3 #5   secondLegJoint3Sensor
 loaded   sensor     4 #0   firstLegJoint1Sensor
 loaded   sensor     5 #1   firstLegJoint2Sensor
+loaded   geom      8 v   10 p  +6.000000001e-06  legLink.wrl
+loaded   geom     18 v   21 p  +1.558927200e+01  footLink.wrl
+loaded   geom     12 v   16 p  +2.464880000e-01  base.wrl
 loaded   command    0      MUL
 loaded   command    1      MOVE
 loaded   command    2      CMP
@@ -1107,6 +1140,9 @@ copy     sensor     2 #2   firstLegJoint3Sensor
 copy     sensor     3 #5   secondLegJoint3Sensor
 copy     sensor     4 #0   firstLegJoint1Sensor
 copy     sensor     5 #1   firstLegJoint2Sensor
+copy     geom      8 v   10 p  +6.000000001e-06  legLink.wrl
+copy     geom     18 v   21 p  +1.558927200e+01  footLink.wrl
+copy     geom     12 v   16 p  +2.464880000e-01  base.wrl
 copy     command    0      MUL
 copy     command    1      MOVE
 copy     command    2      CMP
@@ -1173,6 +1209,9 @@ loaded   joint      2 #2   hinge3
 loaded   drive      0 #0   hinge1Drive
 loaded   drive      1 #2   hinge3Drive
 loaded   drive      2 #1   hinge2Drive
+loaded   geom     10 v   11 p  -5.999868000e+00  base.wrl
+loaded   geom      8 v   10 p  +0.000000000e+00  middle.wrl
+loaded   geom     18 v   21 p  +5.019037200e+01  effector.wrl
 loaded   command    0      MUL
 loaded   command    1      MOVE
 loaded   command    2      CMP
@@ -1220,6 +1259,9 @@ copy     joint      2 #2   hinge3
 copy     drive      0 #0   hinge1Drive
 copy     drive      1 #2   hinge3Drive
 copy     drive      2 #1   hinge2Drive
+copy     geom     10 v   11 p  -5.999868000e+00  base.wrl
+copy     geom      8 v   10 p  +0.000000000e+00  middle.wrl
+copy     geom     18 v   21 p  +5.019037200e+01  effector.wrl
 copy     command    0      MUL
 copy     command    1      MOVE
 copy     command    2      CMP
@@ -1259,6 +1301,7 @@ loaded   link       1 #1   base2
 loaded   joint      0 #0   hinge1
 loaded   drive      0 #0   hinge1Drive
 loaded   sensor     0 #0   hinge1Sensor
+loaded   geom     10 v   11 p  -5.999868000e+00  base.wrl
 loaded   command    0      MUL
 loaded   command    1      CMP
 loaded   command    2      MOVE
@@ -1285,6 +1328,7 @@ copy     link       1 #1   base2
 copy     joint      0 #0   hinge1
 copy     drive      0 #0   hinge1Drive
 copy     sensor     0 #0   hinge1Sensor
+copy     geom     10 v   11 p  -5.999868000e+00  base.wrl
 copy     command    0      MUL
 copy     command    1      CMP
 copy     command    2      MOVE
@@ -1312,6 +1356,7 @@ loaded   link       1 #1   base2
 loaded   joint      0 #0   hinge1
 loaded   drive      0 #0   hinge1Drive
 loaded   sensor     0 #0   hinge1Sensor
+loaded   geom     10 v   11 p  -5.999868000e+00  base.wrl
 loaded   command    0      MUL
 loaded   command    1      MOVE
 loaded   command    2      CMP
@@ -1338,6 +1383,7 @@ copy     link       1 #1   base2
 copy     joint      0 #0   hinge1
 copy     drive      0 #0   hinge1Drive
 copy     sensor     0 #0   hinge1Sensor
+copy     geom     10 v   11 p  -5.999868000e+00  base.wrl
 copy     command    0      MUL
 copy     command    1      MOVE
 copy     command    2      CMP
@@ -1365,6 +1411,7 @@ loaded   link       1 #1   base2
 loaded   joint      0 #0   hinge1
 loaded   drive      0 #0   hinge1Drive
 loaded   sensor     0 #0   hinge1Sensor
+loaded   geom     10 v   11 p  -5.999868000e+00  base.wrl
 loaded   command    0      MUL
 loaded   command    1      MOVE
 loaded   command    2      CMP
@@ -1391,6 +1438,7 @@ copy     link       1 #1   base2
 copy     joint      0 #0   hinge1
 copy     drive      0 #0   hinge1Drive
 copy     sensor     0 #0   hinge1Sensor
+copy     geom     10 v   11 p  -5.999868000e+00  base.wrl
 copy     command    0      MUL
 copy     command    1      MOVE
 copy     command    2      CMP
@@ -1418,6 +1466,7 @@ loaded   link       1 #1   base2
 loaded   joint      0 #0   hinge1
 loaded   drive      0 #0   hinge1Drive
 loaded   sensor     0 #0   hinge1Sensor
+loaded   geom     10 v   11 p  -5.999868000e+00  base.wrl
 loaded   command    0      MUL
 loaded   command    1      CMP
 loaded   command    2      MOVE
@@ -1444,6 +1493,7 @@ copy     link       1 #1   base2
 copy     joint      0 #0   hinge1
 copy     drive      0 #0   hinge1Drive
 copy     sensor     0 #0   hinge1Sensor
+copy     geom     10 v   11 p  -5.999868000e+00  base.wrl
 copy     command    0      MUL
 copy     command    1      CMP
 copy     command    2      MOVE
@@ -1471,6 +1521,7 @@ loaded   link       1 #1   base2
 loaded   joint      0 #0   hinge1
 loaded   drive      0 #0   hinge1Drive
 loaded   sensor     0 #0   hinge1Sensor
+loaded   geom     10 v   11 p  -5.999868000e+00  base.wrl
 loaded   command    0      MUL
 loaded   command    1      MOVE
 loaded   command    2      CMP
@@ -1497,6 +1548,7 @@ copy     link       1 #1   base2
 copy     joint      0 #0   hinge1
 copy     drive      0 #0   hinge1Drive
 copy     sensor     0 #0   hinge1Sensor
+copy     geom     10 v   11 p  -5.999868000e+00  base.wrl
 copy     command    0      MUL
 copy     command    1      MOVE
 copy     command    2      CMP
@@ -1524,6 +1576,7 @@ loaded   link       1 #1   base2
 loaded   joint      0 #0   hinge1
 loaded   drive      0 #0   hinge1Drive
 loaded   sensor     0 #0   hinge1Sensor
+loaded   geom     10 v   11 p  -5.999868000e+00  base.wrl
 loaded   command    0      MUL
 loaded   command    1      MOVE
 loaded   command    2      CMP
@@ -1550,6 +1603,7 @@ copy     link       1 #1   base2
 copy     joint      0 #0   hinge1
 copy     drive      0 #0   hinge1Drive
 copy     sensor     0 #0   hinge1Sensor
+copy     geom     10 v   11 p  -5.999868000e+00  base.wrl
 copy     command    0      MUL
 copy     command    1      MOVE
 copy     command    2      CMP
@@ -1651,6 +1705,10 @@ loaded   sensor    14 #3   leg2Joint1Sensor
 loaded   sensor    15 #1   leg1Joint2Sensor
 loaded   sensor    16 #14  leg5Joint3Sensor
 loaded   sensor    17 #17  leg6Joint3Sensor
+loaded   geom     24 v   29 p  -5.188400000e-01  foot.wrl
+loaded   geom     36 v   32 p  -5.046000000e-03  body.wrl
+loaded   geom      8 v    8 p  -8.822000000e-03  shoulder.wrl
+loaded   geom     12 v   12 p  -2.109000000e-02  leg.wrl
 loaded   command    0      MUL
 loaded   command    1      MOVE
 loaded   command    2      CMP
@@ -1853,6 +1911,10 @@ copy     sensor    14 #3   leg2Joint1Sensor
 copy     sensor    15 #1   leg1Joint2Sensor
 copy     sensor    16 #14  leg5Joint3Sensor
 copy     sensor    17 #17  leg6Joint3Sensor
+copy     geom     24 v   29 p  -5.188400000e-01  foot.wrl
+copy     geom     36 v   32 p  -5.046000000e-03  body.wrl
+copy     geom      8 v    8 p  -8.822000000e-03  shoulder.wrl
+copy     geom     12 v   12 p  -2.109000000e-02  leg.wrl
 copy     command    0      MUL
 copy     command    1      MOVE
 copy     command    2      CMP
@@ -1994,6 +2056,9 @@ rrb      drive      0 #0   hinge1Drive
 rrb      drive      1 #1   hinge3Drive
 rrb      drive      2 #2   hinge2Drive
 rrb      drive      3 #3   hinge4Drive
+rrb      geom     10 v   11 p  -5.999867885e+00  base.wrl
+rrb      geom     18 v   21 p  +5.019037135e+01  effector.wrl
+rrb      geom      8 v   10 p  +0.000000000e+00  middle.wrl
 rrb      command    0      ADD
 rrb      command    1      CMP
 rrb      command    2      COPY
@@ -2089,6 +2154,9 @@ rrb      sensor     8 #8   leg2Joint2Sensor
 rrb      sensor     9 #9   leg1Joint1Sensor
 rrb      sensor    10 #10  leg2Joint1Sensor
 rrb      sensor    11 #11  leg1Joint2Sensor
+rrb      geom     24 v   32 p  +3.054880857e+00  body.wrl
+rrb      geom     24 v   29 p  -5.188399195e-01  foot.wrl
+rrb      geom     12 v   12 p  -2.109004059e-02  leg.wrl
 rrb      command    0      ADD
 rrb      command    1      CMP
 rrb      command    2      COPY
@@ -2220,6 +2288,9 @@ rrb      sensor     5 #5   secondLegJoint3Sensor
 rrb      sensor     6 #6   thirdLegJoint1Sensor
 rrb      sensor     7 #7   firstLegJoint1Sensor
 rrb      sensor     8 #8   firstLegJoint2Sensor
+rrb      geom     18 v   21 p  +1.558927200e+01  footLink.wrl
+rrb      geom     12 v   14 p  +2.626249902e-01  tripleBase.wrl
+rrb      geom      8 v   10 p  +5.900859833e-06  legLink.wrl
 rrb      command    0      ADD
 rrb      command    1      CMP
 rrb      command    2      COPY
@@ -2321,6 +2392,9 @@ rrb      sensor     2 #2   firstLegJoint3Sensor
 rrb      sensor     3 #3   secondLegJoint3Sensor
 rrb      sensor     4 #4   firstLegJoint1Sensor
 rrb      sensor     5 #5   firstLegJoint2Sensor
+rrb      geom     18 v   21 p  +1.558927200e+01  footLink.wrl
+rrb      geom     12 v   16 p  +2.464880198e-01  base.wrl
+rrb      geom      8 v   10 p  +5.900859833e-06  legLink.wrl
 rrb      command    0      ADD
 rrb      command    1      CMP
 rrb      command    2      COPY
@@ -2389,6 +2463,9 @@ rrb      joint      2 #2   hinge3
 rrb      drive      0 #0   hinge1Drive
 rrb      drive      1 #1   hinge3Drive
 rrb      drive      2 #2   hinge2Drive
+rrb      geom     10 v   11 p  -5.999867885e+00  base.wrl
+rrb      geom     18 v   21 p  +5.019037135e+01  effector.wrl
+rrb      geom      8 v   10 p  +0.000000000e+00  middle.wrl
 rrb      command    0      ADD
 rrb      command    1      CMP
 rrb      command    2      COPY
@@ -2430,6 +2507,7 @@ rrb      link       1 #1   base2
 rrb      joint      0 #0   hinge1
 rrb      drive      0 #0   hinge1Drive
 rrb      sensor     0 #0   hinge1Sensor
+rrb      geom     10 v   11 p  -5.999867885e+00  base.wrl
 rrb      command    0      ADD
 rrb      command    1      CMP
 rrb      command    2      COPY
@@ -2533,6 +2611,10 @@ rrb      sensor    14 #14  leg2Joint1Sensor
 rrb      sensor    15 #15  leg1Joint2Sensor
 rrb      sensor    16 #16  leg5Joint3Sensor
 rrb      sensor    17 #17  leg6Joint3Sensor
+rrb      geom      8 v    8 p  -8.821989701e-03  shoulder.wrl
+rrb      geom     36 v   32 p  -5.045691971e-03  body.wrl
+rrb      geom     24 v   29 p  -5.188399195e-01  foot.wrl
+rrb      geom     12 v   12 p  -2.109004059e-02  leg.wrl
 rrb      command    0      ADD
 rrb      command    1      CMP
 rrb      command    2      COPY
