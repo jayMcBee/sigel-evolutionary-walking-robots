@@ -1,10 +1,24 @@
 # SIGEL — Qt 2.3 → Qt 6 migration plan
 
-**Scope widened 2026-08-22.** Was Qt API only. Now also covers getting SIGEL to
-build and run, because nothing else can be verified without it — see §3. The
-interface migration (Phase C) follows.
+**THE GOAL — restated 2026-08-27, and it governs every decision below.**
 
-**Status — 2026-08-23**
+**SIGEL runs under modern Qt 6, complete, with its original interface migrated
+progressively from Qt 2 to Qt 6.** Not the core alone. Not a rewritten
+interface — the 2003 forms and widgets, carried forward.
+
+Two rules follow from it:
+
+- **No rebuilding.** The interface is ported, not redesigned. Every dialog,
+  form and widget arrives at Qt 6 as the same interface it was in Qt 2.
+- **Use Qt's own migration tools.** Qt shipped a converter for each generation:
+  `qt20fix` (Qt 2 → Qt 3), `qt3to4` and `uic3 -convert` (Qt 3 → Qt 4). They run
+  in a container with an old toolchain. Hand-written substitutes are a last
+  resort, for what the tools leave behind — see D1, D5 and §4.
+
+**Scope widened 2026-08-22.** Was Qt API only. Now also covers getting SIGEL to
+build and run, because nothing else can be verified without it — see §3.
+
+**Status — 2026-08-27**
 
 | phase | state |
 |---|---|
@@ -12,7 +26,8 @@ interface migration (Phase C) follows.
 | A — core onto Qt 6 | **done**, tags `step-A0`…`step-A9`. `./check.sh`: 117 pass, 5 fail (all need a GUI) |
 | B — ownership explicit | **8 of 14 containers**. 5 still on `setAutoDelete` — open, §7 |
 | R — build and run | core builds and runs, faithful to 1.3. **No way to check it yet** — needs fitness numbers from the 1.3 binary on the x86 box, §7 |
-| C — GUI | not started, not authorized |
+| T — old-Qt tool container | **not started.** Blocks all of Phase C, §4 |
+| C — GUI | **not started, AUTHORIZED 2026-08-27 per D3.** 317 Qt 2 sites + 20 forms |
 
 **SCOPE — DECIDED 2026-08-23. Read this before changing anything.**
 
@@ -32,21 +47,28 @@ mixed into these commits, until the Qt port is complete.
 
 Three jobs, in order, no overlap:
 
-1. **The Qt port** — PVM, then Phase C, the interface. This is the work.
+1. **The Qt port** — the interface (Phase C), and PVM so the app can actually
+   evolve a gait. This is the work.
 2. **The 1.0 → 1.3 regression** — after, if wanted.
 3. **The diagnostics wishlist** from the `sigel-x86` session — 9 items on
    validating robot models at load. Recorded in `regression_1.0_to_1.3.md`.
    Not part of either job above.
 
-**Order of work, agreed 2026-08-22:**
+**Order of work, revised 2026-08-27.** Reordered around the goal above: the
+interface is the work, so it goes first, and PVM follows because without it the
+ported interface has nothing to drive.
 
 1. ~~Build core plus a small program that runs one fitness evaluation, under
    AddressSanitizer.~~ **Built and running**, faithful to 1.3. Validating it
    needs reference numbers from the 1.3 binary — §7.
-2. Fix PVM — 40/40 files fail because glibc dropped `rpc/types.h`.
-3. Full headless run, compared against the captured 2003 run.
-4. Convert the last 5 containers, now testable (§7).
-5. Phase C — the interface.
+2. **Stand up the old-Qt container** — Qt 3 and Qt 4 as *tools*, not as build
+   targets. §4. Nothing else in Phase C can start without it.
+3. **Phase C — the interface**, one module at a time, tools first and hand work
+   only for what they leave behind. §7.
+4. Fix PVM — 23 of 39 files fail because glibc dropped `rpc/types.h`, the rest
+   on gcc 14's promoted C errors and two real defects. §3.
+5. Full headless run, compared against the captured 2003 run.
+6. Convert the last 5 containers, now testable (§7).
 
 **Still needs a decision:** whether
 `QTextStream` no longer printing `-0` matters (§9); the order of remaining
@@ -197,8 +219,16 @@ review. A missing `delete` and a doubled `delete` both compile.
 Known work:
 
 - vendored libraries on gcc 15
-- PVM — 40/40 files fail, glibc dropped `rpc/types.h`; `libtirpc` is the likely
-  answer
+- PVM — all 39 `.c` in `pvm3/src` fail. **Measured 2026-08-27, three causes,
+  not one:** 23 on `rpc/types.h`, which glibc dropped (`libtirpc`, whose `-dev`
+  package is not installed here); 9 on errors gcc 14 promoted from warnings
+  (`-std=gnu17 -fpermissive` clears these — verified, it takes 7 files from
+  failing to clean); and two real defects no flag fixes — `global.h:314`
+  declares `extern struct Pvmtevdid pvmtevdidlist[]` relying on the includer
+  having pulled in `pvmtev.h`, and `pvmlog.c:421` uses `sys_nerr` /
+  `sys_errlist`, removed in glibc 2.32. A socket build needs 15 objects for
+  `libpvm3.a` and ~24 for `pvmd3`; the MPP and shared-memory files, where 5 of
+  the 7 `Pvmtevdid` failures live, are in neither list
 - a build system to replace a `configure.in` that detects the OS by grepping
   `/proc/version` for `SuSE`
 - pre-standard `for`-scope in `MT_*`
@@ -217,12 +247,40 @@ distributed evolution, which is why they are last.
 
 ---
 
-## 4. No "start on old Qt" step
+## 4. Old Qt as a tool, not as a build target — REVISED 2026-08-27
 
-Qt 2.3 and Qt 3.3.8 do not build on gcc 15. Qt 4 + Qt3Support was historically
-this step but has no maintained build on a current toolchain. Qt 5.15 already
-dropped Qt3Support. TQt3 (Trinity, R14.1.4) builds but renames every `Q*` →
-`TQ*` — possible one-shot tool for the `.ui` files only.
+**This section previously said "No 'start on old Qt' step" and was wrong.** Its
+reasoning was that Qt 2.3 and Qt 3.3.8 do not build on gcc 15, and it concluded
+that the staged migration was therefore unavailable. That does not follow. Qt 3
+and Qt 4 do not have to build on gcc 15 — they have to **run**, once, as
+converters. An old toolchain in a container is where they run.
+
+The project already has a precedent: the 2003 i386 binary runs against Debian
+woody libraries on the x86 box (§9).
+
+**The staged path, which is the plan (D1):**
+
+```
+Qt 2.3  --qt20fix-->  Qt 3  --qt3to4, uic3 -convert-->  Qt 4 + Qt3Support  --hand-->  Qt 6
+```
+
+Each arrow is a mechanical, reviewable transform with a tool behind it. The
+first three legs are Qt's own converters. Only the last is hand work.
+
+**The honest limit.** Qt 5 removed Qt3Support, so `qt3to4` output — `Q3PtrList`,
+`Q3ListView`, `Q3PopupMenu` — cannot be the destination. The final leg off
+Qt3Support onto Qt 6 is hand work whatever we do. What the tools buy is the
+mechanical bulk and, above all, **the 20 `.ui` forms**, for which there is
+otherwise no path at all short of writing a Qt 2 form parser (old C7).
+
+**What the container needs:** Qt 3.3.8 with `qt20fix`, and Qt 4.8 with `qt3to4`
+and `uic3`. Both were packaged by every distribution of their era; a Debian
+image of the right vintage is the least work. It is a build-time tool only —
+nothing from it ships, and nothing in the repo links against it.
+
+**TQt3** (Trinity, R14.1.4) builds on a current toolchain but renames every
+`Q*` → `TQ*`. Fallback if the container proves harder than expected, not the
+first choice, because the rename has to be undone afterwards.
 
 ---
 
@@ -230,11 +288,11 @@ dropped Qt3Support. TQt3 (Trinity, R14.1.4) builds but renames every `Q*` →
 
 | # | Decision | Answer |
 |---|---|---|
-| **D1** | Migration strategy | **(a)** compat shim over Qt 6 |
+| **D1** | Migration strategy | ~~**(a)** compat shim over Qt 6~~ — **superseded 2026-08-27 by D19** |
 | **D2** | Target Qt version | **6.9.2**, Ubuntu `qt6-base-dev`; recorded, not pinned |
-| **D3** | GUI scope | **(b)** core only; Phase C not authorized |
+| **D3** | GUI scope | ~~**(b)** core only~~ — **superseded 2026-08-27: Phase C is the goal and is AUTHORIZED** |
 | **D4** | GUI toolkit | **(a)** Qt 6 Widgets *(Phase C)* |
-| **D5** | `.ui` handling | **(a)** converter script *(Phase C)* |
+| **D5** | `.ui` handling | ~~**(a)** converter script~~ — **superseded 2026-08-27 by D20**: `uic3 -convert` |
 | **D6** | Container targets | **(a)** `QList<T*>` |
 | **D7** | The `autoDelete` sites | **(a)** blanket rule from D6; exceptions in §9 |
 | **D8** | `QString`→`const char*` | **(b)** `.toUtf8()` |
@@ -244,6 +302,19 @@ dropped Qt3Support. TQt3 (Trinity, R14.1.4) builds but renames every `Q*` →
 | **D12** | Step granularity | **15 steps** — A0–A9, B1–B5, plus Phase 0 per D14 |
 | **D13** | Qt 2 behaviour that is itself a defect | **fix it, and fix the cause** — §9 |
 | **D14** | Comment language | German → English as **Phase 0**, before A1 |
+
+## 5b. Decisions — signed off 2026-08-27, for the interface
+
+These restate the goal at the top of this file as decisions, and supersede D1,
+D3 and D5.
+
+| # | Decision | Answer |
+|---|---|---|
+| **D19** | Migration strategy | **staged and tool-assisted.** Qt 2 → Qt 3 → Qt 4 → Qt 6, using Qt's own converters at each generation, in a container (§4). Supersedes D1(a). The existing `q2compat.h` shim **stays** — the core is already through it and works; it is not extended to the interface |
+| **D20** | `.ui` handling | **`uic3 -convert` in the container**, plus whatever uplift Qt 2 → Qt 3 form format needs. Supersedes D5(a). No hand-written form parser |
+| **D21** | Interface fidelity | **ported, not redesigned.** The 2003 interface arrives at Qt 6 as itself. A widget with no Qt 6 successor gets the nearest equivalent, recorded here — not a redesign |
+| **D22** | The Qt 2 style classes | **`QStyleFactory::create("Fusion")`.** `QMotifPlusStyle` has no successor in Qt 6; `QWindowsStyle` is no longer public. Fusion is the closest thing Qt 6 offers to the 2003 Motif look. Chosen 2026-08-27 after comparing the two styles Qt 6.9 actually offers here |
+| **D23** | Phase C granularity | **one module or one form at a time**, each its own commit, each independently reviewable. No module-wide sweeps |
 
 ## 5a. Decisions — signed off 2026-08-22, for Phase R
 
@@ -289,6 +360,11 @@ so their ~12,979 warnings do not bury the ~373 in our own code.
 **Warnings count.** They were not read up to A8, and the `Qt::endl`-on-
 `std::cerr` regression in A3 was reported by this very command at the step that
 introduced it, then shipped as "0 errors".
+
+**`check.sh` does not yet cover Phase C.** Its module list is the 9 core
+modules, and it compiles nothing under `src/` at top level — so
+`sigel.cpp`, `sigel_slave.cpp` and all 5 GUI modules are checked by nothing
+today. Extending it is part of the first Phase C step, not an afterthought.
 
 ### Phase 0 — comments to English (D14)
 
@@ -510,26 +586,49 @@ than inspection:
 documents these experiments one by one with fitness curves and stated speeds —
 the only independent source of numbers. All in `data/`, untracked.
 
-### Phase C — GUI — DEFERRED per D3(b), NOT AUTHORIZED
+### Phase T — the old-Qt tool container — §4, blocks all of Phase C
+
+| # | Work |
+|---|---|
+| T1 | A container image with Qt 3.3.8 (`qt20fix`) and Qt 4.8 (`qt3to4`, `uic3`), and a one-line way to run each against a path in this repo |
+| T2 | Prove it on one file and one form, round-tripped, output read by hand |
+
+Build-time only. Nothing ships from it and nothing links against it.
+
+### Phase C — the interface — AUTHORIZED 2026-08-27
+
+Per **D23**, one module or one form per commit. Measured 2026-08-27: **317 Qt 2
+call sites across the 5 GUI modules**, 9 more in `sigel.cpp` and
+`sigel_slave.cpp`, and 2 left in core (both in files the build excludes).
 
 | # | Work | Sites |
 |---|---|---|
+| C0 | `sigel.cpp`, `sigel_slave.cpp` — styles per **D22**, `setMainWidget`, `QApplication(argc, argv, bool)` | 9 |
 | C1 | `WFlags` / `WType_*` / `WStyle_*` → `Qt::WindowFlags`, `Qt::WA_*` | 60 |
 | C2 | `setCaption` → `setWindowTitle`; `QApplication`, `qApp` | 44 |
 | C3 | `QGLWidget` → `QOpenGLWidget` | 6 |
 | C4 | `QMultiLineEdit` → `QTextEdit` | 6 |
 | C5 | `QPopupMenu` → `QMenu`; `insertItem` → `addAction`/`addItem` | 79 |
 | C6 | `QListView` → per **D9** | 105 |
-| C7 | `.ui` conversion per **D5**, prototyped on one form | 1 |
+| C7 | `.ui` conversion per **D20**, prototyped on one form | 1 |
 | C8 | Remaining 19 forms | 19 |
-| C9 | The four GUI modules build and run | 14.6k |
+| C9 | The five GUI modules build and run | 14.6k |
+
+**C0 was missed by the original C1–C9 table.** Found 2026-08-27: both top-level
+programs fail to compile on `qmotifplusstyle.h`, and both also call
+`setMainWidget`, removed in Qt 4. `sigel.cpp:255` constructs
+`QApplication(argc, argv, false)` — the Qt 2 spelling of "no GUI" — which is
+`QCoreApplication` in Qt 6, and it is on the headless `-me` path. Neither file
+can compile past its GUI includes until C9 regardless, so C0 does not stand
+alone; it is listed so the sites are not lost.
 
 **C7 context:** the files are Qt **2** format, one generation below what Qt 4's
 `uic3 -convert` accepts, and Qt 6's `uic` requires `version="4.0"`. Small
 vocabulary — ~30 XML elements, 20 widget classes, 19 of them standard. Two
 transforms: Qt 2 nests properties as children where Qt 4/6 uses attributes, and
 108 `QLayoutWidget` pseudo-widgets flatten into real `<layout>` elements.
-`uic3 -convert` discards custom signals and slots — there are 49 connections.
+`uic3 -convert` discards custom signals and slots — there are 49 connections,
+which is the part of each form to check by hand after conversion.
 
 ---
 
@@ -539,10 +638,14 @@ transforms: Qt 2 nests properties as children where Qt 4/6 uses attributes, and
 |---|---|---|---|
 | A | 10 | 1.5 wk | done |
 | B | 5 | 1 wk | 8 of 14 containers |
-| C | 9 | 2.5–3 wk | deferred |
+| T | 2 | 2–3 days | **not started** — blocks C |
+| C | 10 | 2.5–3 wk | **not started, authorized 2026-08-27** |
+| PVM | — | ~3 days | not started, §3 |
 
-Excludes the §3 precondition (~3 days, separate job), which nothing here
-depends on.
+Phase T is new as of 2026-08-27 (§4). Phase C gained C0. The PVM row was
+previously described as a separate job "which nothing here depends on" — that
+is false and is corrected: SIGEL has no local evaluation path, so without PVM
+the ported interface has nothing to drive.
 
 ---
 
