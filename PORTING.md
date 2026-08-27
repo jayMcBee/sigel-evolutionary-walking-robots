@@ -586,14 +586,51 @@ than inspection:
 documents these experiments one by one with fitness curves and stated speeds —
 the only independent source of numbers. All in `data/`, untracked.
 
-### Phase T — the old-Qt tool container — §4, blocks all of Phase C
+### Phase T — the old-Qt tool container — §4 — T1, T2 DONE 2026-08-27
 
-| # | Work |
-|---|---|
-| T1 | A container image with Qt 3.3.8 (`qt20fix`) and Qt 4.8 (`qt3to4`, `uic3`), and a one-line way to run each against a path in this repo |
-| T2 | Prove it on one file and one form, round-tripped, output read by hand |
+| # | Work | state |
+|---|---|---|
+| T1 | `tools/Dockerfile.qtmig` + `tools/qtmig`: Qt 4.8's `uic3` and `qt3to4` over this repo | **done** |
+| T2 | Prove it on one form, then all 20 | **done** |
 
 Build-time only. Nothing ships from it and nothing links against it.
+
+**Debian jessie is the last release that packages Qt 4's migration tools *and*
+has an arm64 port**, so this runs natively — no qemu, no x86 emulation, which
+is not registered on this host anyway. `libqt4-dev-bin` carries `uic3` and
+`qt3to4`; `libqt4-dev` carries `/usr/share/qt4/q3porting.xml`, the class-rename
+rules. Without `QTDIR` pointing at it, `uic3` warns once and then leaves every
+widget class unmapped. `/usr/bin/uic3` is a qtchooser stub — the image puts
+`/usr/lib/aarch64-linux-gnu/qt4/bin` first on `PATH` to skip it.
+
+**T2 result — `uic3 -convert` reads the Qt 2 forms directly.** All 20 convert,
+0 failures, no warnings, output `version="4.0"`, which Qt 6's `uic` accepts.
+
+**This corrects a false claim in the previous C7 paragraph**, which said the
+files were "one generation below what `uic3 -convert` accepts" and concluded a
+Qt 2 → Qt 3 leg was needed first. Measured 2026-08-27: it is not, for forms.
+Whether `qt3to4` needs one for *sources* is untested and is the next question.
+
+**The residue is a 6-entry substitution table, not a parser.** `uic3` maps Qt 2
+widgets onto Qt3Support classes, which Qt 5 deleted, so Qt 6's `uic` accepts
+the XML but the generated header fails to compile on `#include <q3listview.h>`.
+Across all 20 forms, in full:
+
+| class | uses | Qt 6 |
+|---|---|---|
+| `Q3GroupBox` | 48 | `QGroupBox` |
+| `Q3ListBox` | 7 | `QListWidget` |
+| `Q3ButtonGroup` | 7 | `QGroupBox` + a `QButtonGroup` for the exclusivity |
+| `Q3MultiLineEdit` | 6 | `QTextEdit` — same as C4 |
+| `Q3ListView` | 5 | `QTreeWidget` — same as D9 |
+| `Q3ProgressBar` | 1 | `QProgressBar` |
+
+Two non-standard classes survive conversion and are not Qt's:
+`SIG_SimulationVisualisationWidget`, SIGEL's own OpenGL widget (C3), and
+`Line`, which is Qt Designer's separator and becomes a `QFrame`.
+
+One warning from Qt 6's `uic`: `qPixmapFromMimeSource` is obsolete. Not yet
+looked at.
 
 ### Phase C — the interface — AUTHORIZED 2026-08-27
 
@@ -622,13 +659,12 @@ programs fail to compile on `qmotifplusstyle.h`, and both also call
 can compile past its GUI includes until C9 regardless, so C0 does not stand
 alone; it is listed so the sites are not lost.
 
-**C7 context:** the files are Qt **2** format, one generation below what Qt 4's
-`uic3 -convert` accepts, and Qt 6's `uic` requires `version="4.0"`. Small
-vocabulary — ~30 XML elements, 20 widget classes, 19 of them standard. Two
-transforms: Qt 2 nests properties as children where Qt 4/6 uses attributes, and
-108 `QLayoutWidget` pseudo-widgets flatten into real `<layout>` elements.
-`uic3 -convert` discards custom signals and slots — there are 49 connections,
-which is the part of each form to check by hand after conversion.
+**C7 context — rewritten 2026-08-27 after T2 measured it.** The previous text
+here was wrong on its central claim; see Phase T above. `uic3 -convert` handles
+the Qt 2 → Qt 4 XML in one step, including the property nesting and the
+`QLayoutWidget` flattening it described. What is left per form is the 6-class
+substitution in the Phase T table, and checking the connections: `uic3` discards
+custom signals and slots, and there are 49 across the 20 forms.
 
 ---
 

@@ -1,0 +1,29 @@
+# Qt's own migration tools, for PORTING.md Phase T / §4.
+#
+# Qt 4.8's uic3 and qt3to4 are what carry the 2003 forms and sources forward.
+# Neither exists in any current distribution -- Qt 5 dropped Qt3Support and
+# everything built on it. Debian jessie is the LAST release that packages them
+# AND has an arm64 port, so this runs natively here with no emulation.
+#
+# Build-time only. Nothing from this image ships and nothing links against it.
+#
+#   docker build -t sigel-qtmig -f tools/Dockerfile.qtmig tools
+#   ./tools/qtmig uic3 -convert ui/MT_UI/MT_ExperimentWidgetBase.ui
+#
+FROM debian/eol:jessie
+
+# jessie left the mirrors; archive.debian.org still carries it, with an expired
+# Release file, hence Check-Valid-Until.
+RUN echo "deb http://archive.debian.org/debian jessie main" > /etc/apt/sources.list \
+ && echo "Acquire::Check-Valid-Until false;" > /etc/apt/apt.conf.d/10no-check-valid \
+ && apt-get -qq update \
+ && apt-get -qq -y --no-install-recommends install libqt4-dev-bin libqt4-dev \
+ && rm -rf /var/lib/apt/lists/*
+
+# /usr/bin/uic3 is a qtchooser stub that execs this directory; putting it first
+# skips qtchooser entirely.
+ENV PATH=/usr/lib/aarch64-linux-gnu/qt4/bin:$PATH
+# uic3 and qt3to4 look for their class-rename rules under $QTDIR/q3porting.xml.
+# Without it uic3 silently leaves every widget class unmapped.
+ENV QTDIR=/usr/share/qt4
+WORKDIR /w

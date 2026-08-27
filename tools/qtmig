@@ -1,0 +1,11 @@
+#!/bin/sh
+# Run one of Qt 4.8's migration tools over this repo -- PORTING.md Phase T.
+# The repo is mounted at /w, so paths are relative to the repo root.
+#
+#   ./tools/qtmig uic3 -convert x/.../ui/MT_UI/MT_ExperimentWidgetBase.ui
+#   ./tools/qtmig qt3to4 x/.../src/SIGEL_CommonGUI
+#
+# Writes as the invoking user, not root, so converted files stay editable.
+set -e
+ROOT=$(cd "$(dirname "$0")/.." && pwd)
+exec docker run --rm -i -v "$ROOT:/w" -w /w -u "$(id -u):$(id -g)" sigel-qtmig "$@"
