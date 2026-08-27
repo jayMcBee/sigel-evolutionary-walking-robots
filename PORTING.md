@@ -1445,6 +1445,36 @@ byte with no ASan or UBSan report. So all 42 evaluations plus the duplicate-key
 self-check have full sanitized coverage today. Only `dictorder-dump.sh` is
 blocked, and only because it also loads the 7 `.rrb`.
 
+### D8 — the `SIG_Register` cluster, and a leak that had no free path at all
+
+`Q2PtrVector<SIG_Register>` crossed a module boundary — a member on
+`SIG_Interpreter` plus two pure-virtual signatures on `SIG_SimulationQueries`
+and `SIG_CommandInterface`, four implementations between them — so it had to
+flip in one commit. 12 files.
+
+**`SIG_Register` is two ints**, no destructor, no pointers. So it becomes
+`QList<SIG_Register>` **by value**, the same move as `SIG_Body`'s local in D7:
+the ownership question disappears rather than moving. It has no default
+constructor, so the register file is built with `append`, not `resize`.
+
+**That fixed a leak with no free path anywhere.** `SIG_Interpreter` has no
+destructor, never called `setAutoDelete` and never called `deleteContents`, so
+the `Q2PtrVector` default of `del = false` meant **every interpreter leaked its
+entire register file** — one interpreter per fitness evaluation, for the life of
+the project. Measured, and the accounting is exact:
+
+| | before | after |
+|---|---|---|
+| `twoBases` | 41,374 B / 117 allocs | **41,254 B / 109** |
+| `walker` | 35,802,566 B / 630,138 | **35,802,446 B / 630,130** |
+
+Both are exactly **8 allocations** less, and both robots declare `memSize 8` in
+their `LanguageParameters` line — one allocation per register, gone. Fitness
+identical on all 42, both gates clean, `./check.sh` 118 pass / 4 fail.
+
+**§7's leak baseline changes to 41,254 bytes in 109 allocations** for a small
+robot. It was never a constant anyway — `walker` is 866× it, recorded at D4.
+
 ### D7 — `Q2PtrVector`: `SIG_Geometry` and `SIG_Body` only
 
 **The commit subject for this step overstated it.** `Q2PtrVector` is *not* off

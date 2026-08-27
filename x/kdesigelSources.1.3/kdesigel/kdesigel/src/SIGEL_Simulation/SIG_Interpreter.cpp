@@ -42,10 +42,16 @@ namespace SIGEL_Simulation
   {
     int numberOfRegisters = langParams.getMemorySize();
     int registerWidth = langParams.getRegisterWidth();
-    registers.resize( numberOfRegisters );
+    // Phase D. Was a Q2PtrVector of new'ed SIG_Register with no autoDelete,
+    // no destructor and no deleteContents anywhere -- so every interpreter
+    // leaked its whole register file. SIG_Register is two ints with no
+    // destructor and no pointers, so values remove the ownership question and
+    // the leak together. It has no default constructor, hence append rather
+    // than resize.
+    registers.reserve( numberOfRegisters );
     for( int count = 0; count < numberOfRegisters; count++ )
       {
-	registers.insert( count, new SIGEL_Simulation::SIG_Register(registerWidth) );
+	registers.append( SIGEL_Simulation::SIG_Register(registerWidth) );
       }
   };
 
@@ -94,7 +100,7 @@ namespace SIGEL_Simulation
 	    SIGEL_Tools::SIG_IO::cerr << "Registers:\n";
 	    for( int loop=0; loop < numberOfRegisters; loop++ )
 	      {
-		SIGEL_Tools::SIG_IO::cerr << "R" << loop << ":" << registers[loop]->getValue() << "  ";
+		SIGEL_Tools::SIG_IO::cerr << "R" << loop << ":" << registers[loop].getValue() << "  ";
 	      }
 	    SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 #endif
@@ -109,7 +115,7 @@ namespace SIGEL_Simulation
 		    // do it!
 		    int reg0 = theLine->getInstructionElement(0) % numberOfRegisters;
 		    int reg1 = theLine->getInstructionElement(1) % numberOfRegisters;
-		    registers[reg0]->copyReg( *registers[reg1] );
+		    registers[reg0].copyReg( registers[reg1] );
 		    programCounter = (programCounter + 1) % programLength;
 		    
 		    // subtract the needed time for the command
@@ -137,7 +143,7 @@ namespace SIGEL_Simulation
 		    // do it!
 		    int reg0 = theLine->getInstructionElement(0) % numberOfRegisters;
 		    int value = theLine->getInstructionElement(1);
-		    registers[reg0]->loadValue( value );
+		    registers[reg0].loadValue( value );
 		    programCounter = (programCounter + 1) % programLength;
 
 		    // subtract the needed time for the command
@@ -163,7 +169,7 @@ namespace SIGEL_Simulation
 		    // do it!
 		    int reg0 = theLine->getInstructionElement(0) % numberOfRegisters;
 		    int reg1 = theLine->getInstructionElement(1) % numberOfRegisters;
-		    registers[reg0]->addReg( *registers[reg1] );
+		    registers[reg0].addReg( registers[reg1] );
 		    programCounter = (programCounter + 1) % programLength;
 
 		    // subtract the needed time for the command
@@ -189,7 +195,7 @@ namespace SIGEL_Simulation
 		    // do it!
 		    int reg0 = theLine->getInstructionElement(0) % numberOfRegisters;
 		    int reg1 = theLine->getInstructionElement(1) % numberOfRegisters;
-		    registers[reg0]->subReg( *registers[reg1] );
+		    registers[reg0].subReg( registers[reg1] );
 		    programCounter = (programCounter + 1) % programLength;
 
 		    // subtract the needed time for the command
@@ -215,7 +221,7 @@ namespace SIGEL_Simulation
 		    // do it!
 		    int reg0 = theLine->getInstructionElement(0) % numberOfRegisters;
 		    int reg1 = theLine->getInstructionElement(1) % numberOfRegisters;
-		    registers[reg0]->mulReg( *registers[reg1] );
+		    registers[reg0].mulReg( registers[reg1] );
 		    programCounter = (programCounter + 1) % programLength;
 
 		    // subtract the needed time for the command
@@ -241,7 +247,7 @@ namespace SIGEL_Simulation
 		    // do it!
 		    int reg0 = theLine->getInstructionElement(0) % numberOfRegisters;
 		    int reg1 = theLine->getInstructionElement(1) % numberOfRegisters;
-		    registers[reg0]->divReg( *registers[reg1] );
+		    registers[reg0].divReg( registers[reg1] );
 		    programCounter = (programCounter + 1) % programLength;
 
 		    // subtract the needed time for the command
@@ -267,7 +273,7 @@ namespace SIGEL_Simulation
 		    // do it!
 		    int reg0 = theLine->getInstructionElement(0) % numberOfRegisters;
 		    int reg1 = theLine->getInstructionElement(1) % numberOfRegisters;
-		    registers[reg0]->modReg( *registers[reg1] );
+		    registers[reg0].modReg( registers[reg1] );
 		    programCounter = (programCounter + 1) % programLength;
 
 		    // subtract the needed time for the command
@@ -293,7 +299,7 @@ namespace SIGEL_Simulation
 		    // do it!
 		    int reg0 = theLine->getInstructionElement(0) % numberOfRegisters;
 		    int reg1 = theLine->getInstructionElement(1) % numberOfRegisters;
-		    registers[reg0]->minReg( *registers[reg1] );
+		    registers[reg0].minReg( registers[reg1] );
 		    programCounter = (programCounter + 1) % programLength;
 
 		    // subtract the needed time for the command
@@ -319,7 +325,7 @@ namespace SIGEL_Simulation
 		    // do it!
 		    int reg0 = theLine->getInstructionElement(0) % numberOfRegisters;
 		    int reg1 = theLine->getInstructionElement(1) % numberOfRegisters;
-		    registers[reg0]->maxReg( *registers[reg1] );
+		    registers[reg0].maxReg( registers[reg1] );
 		    programCounter = (programCounter + 1) % programLength;
 
 		    // subtract the needed time for the command
@@ -345,7 +351,7 @@ namespace SIGEL_Simulation
 		    // do it!
 		    int reg0 = theLine->getInstructionElement(0) % numberOfRegisters;
 		    int reg1 = theLine->getInstructionElement(1) % numberOfRegisters;
-		    if ( registers[reg0]->getValue() <= registers[reg1]->getValue() )
+		    if ( registers[reg0].getValue() <= registers[reg1].getValue() )
 		      compareFlag = true;
 		    else
 		      compareFlag = false;
@@ -406,7 +412,7 @@ namespace SIGEL_Simulation
 		    // do it!
 		    int reg0 = theLine->getInstructionElement(0) % numberOfRegisters;
 
-		    int numberOfSensor = registers[reg0]->getValue();
+		    int numberOfSensor = registers[reg0].getValue();
 		    simulationQueries.sense( numberOfSensor, registers );
 		    programCounter = (programCounter + 1) % programLength;
 
@@ -432,7 +438,7 @@ namespace SIGEL_Simulation
 		  {
 		    // do it!
 		    int reg0 = theLine->getInstructionElement(0) % numberOfRegisters;
-		    int numberOfJoint = registers[reg0]->getValue();
+		    int numberOfJoint = registers[reg0].getValue();
 #ifdef SIG_DEBUG
 		    SIGEL_Tools::SIG_IO::cerr << "Moving drive " << numberOfJoint << ".\n";
 #endif
@@ -463,7 +469,7 @@ namespace SIGEL_Simulation
 		    // int readOut = theLine->getInstructionElement(0);
 		    // get the register
 		    int reg = theLine->getInstructionElement(0) % numberOfRegisters;
-		    int readOut = registers[reg]->getValue();
+		    int readOut = registers[reg].getValue();
 		    double delayTime = static_cast<double>( readOut ) * 0.001;
 #ifdef _WINDOWS
 		    delayTime = ::abs( delayTime );

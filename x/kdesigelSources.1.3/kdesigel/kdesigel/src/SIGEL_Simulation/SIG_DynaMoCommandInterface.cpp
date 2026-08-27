@@ -32,10 +32,10 @@ SIGEL_Simulation::SIG_DynaMoCommandInterface::SIG_DynaMoCommandInterface(SIG_Dyn
 
 void SIGEL_Simulation::SIG_DynaMoCommandInterface::moveDrive
 (int driveNo,
- Q2PtrVector<SIG_Register> const& registers)
+ QList<SIG_Register> const& registers)
 {
 #ifdef SIG_DEBUG
-  simulationData.gptestvalue=registers[0]->getValue();
+  simulationData.gptestvalue=registers[0].getValue();
 #endif
 
  if (simulationData.dynaSystem.dynaDrives.size()==0) return;
@@ -44,10 +44,10 @@ void SIGEL_Simulation::SIG_DynaMoCommandInterface::moveDrive
   
  DL_Scalar maxforce=drive.drive->getMaxForce();
  DL_Scalar minforce=drive.drive->getMinForce();
- DL_Scalar regsize1=registers[0]->getMaxValue();
- DL_Scalar regsize2=registers[1]->getMaxValue();
- DL_Scalar force1=registers[0]->getValue()*maxforce/regsize1;
- DL_Scalar force2=registers[1]->getValue()*maxforce/regsize2;
+ DL_Scalar regsize1=registers[0].getMaxValue();
+ DL_Scalar regsize2=registers[1].getMaxValue();
+ DL_Scalar force1=registers[0].getValue()*maxforce/regsize1;
+ DL_Scalar force2=registers[1].getValue()*maxforce/regsize2;
  if (fabs(force1)<minforce) force1=minforce*force1/fabs(force1);
  if (fabs(force2)<minforce) force2=minforce*force2/fabs(force2);
  

@@ -48,7 +48,7 @@ SIGEL_Simulation::SIG_DynaMechsSimulationQueries::SIG_DynaMechsSimulationQueries
 { };
 
 void SIGEL_Simulation::SIG_DynaMechsSimulationQueries::sense(int sensorNo,
-							     Q2PtrVector<SIG_Register> & registers) const
+							     QList<SIG_Register> & registers) const
 {
 	SIGEL_Robot::SIG_Sensor		*sensor = 0;
 	SIGEL_Robot::SIG_JointSensor	*jointSensor;
@@ -82,10 +82,10 @@ void SIGEL_Simulation::SIG_DynaMechsSimulationQueries::sense(int sensorNo,
     {
 #ifdef _WINDOWS
       long double minRegisterValue = ::pow( static_cast<long double>(2),
-					       static_cast<long double>(registers[0]->getSize() - 1) );
+					       static_cast<long double>(registers[0].getSize() - 1) );
 #else
       long double minRegisterValue = std::pow( static_cast<long double>(2),
-					       static_cast<long double>(registers[0]->getSize() - 1) );
+					       static_cast<long double>(registers[0].getSize() - 1) );
 #endif					
 
       int absoluteSensorNo = sensorNo + static_cast< int >(minRegisterValue);
@@ -139,10 +139,10 @@ void SIGEL_Simulation::SIG_DynaMechsSimulationQueries::sense(int sensorNo,
 
 #ifdef _WINDOWS
 														minRegisterValue = - ::pow( static_cast<long double>(2),
-																			static_cast<long double>(registers[0]->getSize() - 1) );
+																			static_cast<long double>(registers[0].getSize() - 1) );
 #else
 														minRegisterValue = - std::pow( static_cast<long double>(2),
-																			static_cast<long double>(registers[0]->getSize() - 1) );
+																			static_cast<long double>(registers[0].getSize() - 1) );
 #endif																			
 
 														registerValueRange = - minRegisterValue * 2;
@@ -197,10 +197,10 @@ void SIGEL_Simulation::SIG_DynaMechsSimulationQueries::sense(int sensorNo,
 
 #ifdef _WINDOWS
 														minRegisterValue = - ::pow( static_cast<long double>(2),
-																			static_cast<long double>(registers[0]->getSize() - 1) );
+																			static_cast<long double>(registers[0].getSize() - 1) );
 #else
 														minRegisterValue = - std::pow( static_cast<long double>(2),
-																			static_cast<long double>(registers[0]->getSize() - 1) );
+																			static_cast<long double>(registers[0].getSize() - 1) );
 #endif																			
 
 														registerValueRange = - minRegisterValue * 2;
@@ -249,10 +249,10 @@ void SIGEL_Simulation::SIG_DynaMechsSimulationQueries::sense(int sensorNo,
 
 #ifdef _WINDOWS
 														minRegisterValue = - ::pow( static_cast<long double>(2),
-																			static_cast<long double>(registers[0]->getSize() - 1) );
+																			static_cast<long double>(registers[0].getSize() - 1) );
 #else
 														minRegisterValue = - std::pow( static_cast<long double>(2),
-																			static_cast<long double>(registers[0]->getSize() - 1) );
+																			static_cast<long double>(registers[0].getSize() - 1) );
 #endif																			
 
 														registerValueRange = - minRegisterValue * 2;
@@ -296,7 +296,7 @@ void SIGEL_Simulation::SIG_DynaMechsSimulationQueries::sense(int sensorNo,
 				<< "\n";
 #endif
 
-      registers[0]->loadValue( registerValue );
+      registers[0].loadValue( registerValue );
 };
 
 QTime SIGEL_Simulation::SIG_DynaMechsSimulationQueries::getActualSimulationTime() const

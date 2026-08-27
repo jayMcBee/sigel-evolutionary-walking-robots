@@ -37,14 +37,14 @@ SIGEL_Simulation::SIG_DynaMoSimulationQueries::SIG_DynaMoSimulationQueries(SIG_D
  : simulationData(theSimulationData)
 { };  
 
-void SIGEL_Simulation::SIG_DynaMoSimulationQueries::sense(int sensorNo,Q2PtrVector<SIG_Register> & registers) const
+void SIGEL_Simulation::SIG_DynaMoSimulationQueries::sense(int sensorNo,QList<SIG_Register> & registers) const
 {
  if (simulationData.dynaSystem.dynaSensors.size()==0) return;
  int modSensorNo=sensorNo % simulationData.dynaSystem.dynaSensors.size();
  SIG_DynaSensor sensor=simulationData.dynaSystem.getSensor(modSensorNo);
- registers[0]->loadValue(sensor.senseJoint1());
+ registers[0].loadValue(sensor.senseJoint1());
  if (sensor.joint->joint->getJointType()==SIGEL_Robot::SIG_Joint::tCylindricalJoint)
-  registers[1]->loadValue(sensor.senseJoint2());
+  registers[1].loadValue(sensor.senseJoint2());
 };
 
 

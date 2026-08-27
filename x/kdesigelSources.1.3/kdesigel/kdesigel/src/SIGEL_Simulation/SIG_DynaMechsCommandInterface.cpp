@@ -37,7 +37,7 @@ SIGEL_Simulation::SIG_DynaMechsCommandInterface::SIG_DynaMechsCommandInterface(S
 { };
 
 void SIGEL_Simulation::SIG_DynaMechsCommandInterface::moveDrive(int driveNo,
-								Q2PtrVector<SIG_Register> const& registers)
+								QList<SIG_Register> const& registers)
 {
 #ifdef SIG_DEBUG
   SIGEL_Tools::SIG_IO::cerr << "entering method moveDrive\n";
@@ -63,10 +63,10 @@ void SIGEL_Simulation::SIG_DynaMechsCommandInterface::moveDrive(int driveNo,
     {
 #ifdef _WINDOWS
       long double minRegisterValue = - ::pow( static_cast<long double>(2),
-						 static_cast<long double>(registers[0]->getSize() - 1) );
+						 static_cast<long double>(registers[0].getSize() - 1) );
 #else
       long double minRegisterValue = - std::pow( static_cast<long double>(2),
-						 static_cast<long double>(registers[0]->getSize() - 1) );
+						 static_cast<long double>(registers[0].getSize() - 1) );
 #endif						
 
       int absoluteDriveNo = driveNo - static_cast< int >(minRegisterValue);
@@ -91,17 +91,17 @@ void SIGEL_Simulation::SIG_DynaMechsCommandInterface::moveDrive(int driveNo,
 
 #ifdef _WINDOWS
       long double minRegisterValue = - ( ::pow( static_cast<long double>(2),
-						   static_cast<long double>(registers[0]->getSize() - 1) )
+						   static_cast<long double>(registers[0].getSize() - 1) )
 	                                 - 1 );
 #else
       long double minRegisterValue = - ( std::pow( static_cast<long double>(2),
-						   static_cast<long double>(registers[0]->getSize() - 1) )
+						   static_cast<long double>(registers[0].getSize() - 1) )
 	                                 - 1 );
 #endif	
 
       long double registerValueRange = - minRegisterValue * 2;
 
-      int registerValue = registers[0]->getValue();
+      int registerValue = registers[0].getValue();
 
       long double absoluteRegisterValue = registerValue - minRegisterValue;
 

@@ -122,7 +122,7 @@ class SIG_Interpreter
   /**
    * The set of registers modeling the robots register-machine.
    */
-  Q2PtrVector<SIG_Register> registers;
+  QList<SIG_Register> registers;
 
   /**
    * The number of the next command to execute.

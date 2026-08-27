@@ -70,7 +70,7 @@ namespace SIGEL_Simulation
    *  first (n) registers.
    */
   void moveDrive(int driveNo,
-                 Q2PtrVector<SIG_Register> const& registers);
+                 QList<SIG_Register> const& registers);
 
 };
 

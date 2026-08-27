@@ -64,7 +64,7 @@ class SIG_SimulationQueries {
   SIG_SimulationQueries();
 
   /** Interprets the SENSE command and writes the results into the registers */
-  virtual void sense(int sensorNo,Q2PtrVector<SIG_Register> & registers) const = 0;
+  virtual void sense(int sensorNo,QList<SIG_Register> & registers) const = 0;
 
   /** gets the actual simulation time which is calculated frame*stepsize
    * @pre

@@ -63,7 +63,7 @@ class SIG_CommandInterface {
    *  first (n) registers.
    */
   virtual void moveDrive(int driveNo,
-			 Q2PtrVector<SIG_Register> const& registers) = 0;
+			 QList<SIG_Register> const& registers) = 0;
 
 };
 
