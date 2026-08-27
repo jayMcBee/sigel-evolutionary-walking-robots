@@ -30,7 +30,7 @@ build and run, because nothing else can be verified without it — see §3.
 | B — ownership explicit | **8 of 14 containers**. 5 still on `setAutoDelete` — open, §7 |
 | R — build and run | core builds and runs, faithful to 1.3. **No way to check it yet** — needs fitness numbers from the 1.3 binary on the x86 box, §7 |
 | T — old-Qt tool container | **done 2026-08-27.** `tools/qtmig`, §4 |
-| D — delete the shim, migrate the data | **not started.** Required by D25, ordered before C. §10 |
+| D — delete the shim, migrate the data | **D1 done 2026-08-27** — `linkorder.sh` + `linkorder.txt`, the baseline everything else gates on. Required by D25, ordered before C. §10 |
 | C — GUI | **not started, AUTHORIZED 2026-08-27 per D24.** ~450 Qt 2 sites + 20 forms |
 
 **SCOPE — DECIDED 2026-08-23. Read this before changing anything.**
@@ -935,8 +935,23 @@ is in scope rather than "after, if wanted".
 
 The one thing that has not changed: this cannot be verified against the 1.3
 binary until the x86 box gives us fitness numbers (§7). The link-order half
-*can* be self-checked — dump link and joint order from the current shim build,
-migrate the data, dump again, compare — and that is the check Phase D gates on.
+*can* be self-checked, and **that check now exists — step D1, done 2026-08-27**:
+
+```
+./linkorder.sh | diff -u linkorder.txt -
+```
+
+`sigel_eval -v` already walks `Q2Dict` and prints the numbering, so this needed
+no new program. `linkorder.txt` is 174 lines: the link and joint order of all
+14 experiments, which covers all 7 robots. Every later Phase D step has to leave
+that diff empty.
+
+**The order is genuine hash order, not something simpler.** Checked before
+trusting the baseline: **11 of the 28 link/joint groups are not in ascending
+name order** — `octopus` links start `thirdFootLink, firstFootLink, base`, and
+`walker` joints start `leg6Joint1, leg5Joint2, leg4Joint3`. So the migration
+cannot be replaced by sorting; the order has to be written into the `.rrb` and
+`.exp` files, which is what §10 step 2 says.
 
 What the shim currently carries, and why:
 
