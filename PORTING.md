@@ -10,6 +10,10 @@ Two rules follow from it:
 
 - **No rebuilding.** The interface is ported, not redesigned. Every dialog,
   form and widget arrives at Qt 6 as the same interface it was in Qt 2.
+- **The end state is plain, clean, modern Qt 6.** No `q2compat.h`, no
+  Qt3Support, no compatibility flags in SIGEL's own code. Stepping stones are
+  allowed — the shim and Qt3Support are both stepping stones — but the port is
+  not finished while any of them is still in the tree. See D25 and §10.
 - **Use Qt's own migration tools.** `qt3to4` and `uic3 -convert`, from Qt 4.8,
   run in a container with an old toolchain (§4). Hand-written substitutes are a
   last resort, for what the tools leave behind — see D19, D20 and §4.
@@ -25,7 +29,8 @@ build and run, because nothing else can be verified without it — see §3.
 | A — core onto Qt 6 | **done**, tags `step-A0`…`step-A9`. `./check.sh`: 117 pass, 5 fail (all need a GUI) |
 | B — ownership explicit | **8 of 14 containers**. 5 still on `setAutoDelete` — open, §7 |
 | R — build and run | core builds and runs, faithful to 1.3. **No way to check it yet** — needs fitness numbers from the 1.3 binary on the x86 box, §7 |
-| T — old-Qt tool container | **not started.** Blocks all of Phase C, §4 |
+| T — old-Qt tool container | **done 2026-08-27.** `tools/qtmig`, §4 |
+| D — delete the shim, migrate the data | **not started.** Required by D25, ordered before C. §10 |
 | C — GUI | **not started, AUTHORIZED 2026-08-27 per D24.** ~450 Qt 2 sites + 20 forms |
 
 **SCOPE — DECIDED 2026-08-23. Read this before changing anything.**
@@ -60,14 +65,16 @@ ported interface has nothing to drive.
 1. ~~Build core plus a small program that runs one fitness evaluation, under
    AddressSanitizer.~~ **Built and running**, faithful to 1.3. Validating it
    needs reference numbers from the 1.3 binary — §7.
-2. **Stand up the old-Qt container** — Qt 3 and Qt 4 as *tools*, not as build
-   targets. §4. Nothing else in Phase C can start without it.
-3. **Phase C — the interface**, one module at a time, tools first and hand work
-   only for what they leave behind. §7.
-4. Fix PVM — 23 of 39 files fail because glibc dropped `rpc/types.h`, the rest
+2. ~~**Stand up the old-Qt container**~~ — **done**, `tools/qtmig`. §4.
+3. **Phase D — delete the shim.** Migrate the 7 `.rrb` and 12 `.exp` so
+   declaration order *is* simulation order, drop `q2compat.h`, put core on plain
+   Qt 6 containers per D6. Ordered here by **D25** so Phase C ports the
+   interface once, to the final target. §10.
+4. **Phase C — the interface**, one module or one form at a time. §7.
+5. Fix PVM — 23 of 39 files fail because glibc dropped `rpc/types.h`, the rest
    on gcc 14's promoted C errors and two real defects. §3.
-5. Full headless run, compared against the captured 2003 run.
-6. Convert the last 5 containers, now testable (§7).
+6. Full headless run, compared against the captured 2003 run.
+7. Convert the last 5 containers, now testable (§7).
 
 **Still needs a decision:** whether
 `QTextStream` no longer printing `-0` matters (§9); the order of remaining
@@ -334,12 +341,13 @@ D20 supersedes D5, D24 supersedes D3.
 | # | Decision | Answer |
 |---|---|---|
 | **D19** | Migration strategy | **staged and tool-assisted.** Qt 2 → Qt 4 + Qt3Support → Qt 6, via `uic3 -convert` and `qt3to4` in a container (§4). Supersedes D1(a). The existing `q2compat.h` shim **stays** for the core, which is already through it and works |
-| **D19a** | The core/GUI boundary — **OPEN, must be settled before the first GUI module** | **44 core headers expose `Q2*` types in their public API**, e.g. `SIG_GPParameter.h:427` returns `Q2PtrList<SIG_GPPVMHost>&`, which `SIGEL_MasterGUI/SIG_GPParameter.cpp:376,417` calls. `qt3to4` will rewrite the caller to `Q3PtrList<…>&`, which binds to neither. So either the interface compiles against the shim after all, or those 44 headers get re-ported. D19 as first written said "not extended to the interface", which is not a third option. **Not decided** |
+| **D19a** | The core/GUI boundary | **SETTLED 2026-08-27 by D25: delete the shim from core first, then port the GUI once, straight to clean Qt 6.** Measured, not assumed: `qt3to4` leaves Qt 2's `QList`/`QDict`/`QArray`/`QVector` **completely untouched** — 9 `QList<>` in `SIG_GPParameter.cpp` before, 9 after, 0 `Q3PtrList`. Qt 3 had already renamed `QList` to `QPtrList`, so `q3porting.xml` maps *that*; our Qt 2 spelling reads to it as a Qt 4 class. So the boundary fails loudly at compile time (Qt 6's `QList` is a value list) rather than silently, and the choice is real: spread the shim to 466 more GUI sites and remove it twice, or remove it once, first |
 | **D20** | `.ui` handling | **`uic3 -convert` in the container**, straight from the Qt 2 form — measured in Phase T, no Qt 3 uplift needed. Supersedes D5(a). No hand-written form parser |
 | **D21** | Interface fidelity | **ported, not redesigned.** The 2003 interface arrives at Qt 6 as itself. A widget with no Qt 6 successor gets the nearest equivalent, recorded here — not a redesign |
 | **D22** | The Qt 2 style classes | **`QStyleFactory::create("Fusion")` for the `#else` (Motif) branch.** `QMotifPlusStyle` has no successor in Qt 6; Fusion is the closest it offers. Chosen 2026-08-27 after comparing the two styles Qt 6.9 offers here. **The `#ifdef _WINDOWS` branch keeps Windows** — `QWindowsStyle` is no longer a public class but Qt 6 still creates that style by name, so under D21 its nearest equivalent is `QStyleFactory::create("Windows")`, not Fusion |
 | **D23** | Phase C granularity | **one module or one form at a time**, each its own commit, each independently reviewable. No API-wide sweeps across modules |
 | **D24** | GUI scope | **Phase C is authorized.** Supersedes D3(b), which scoped the interface out. Named separately because D19–D23 did not carry it and the status table cited a struck-through row |
+| **D25** | What "done" means | **Plain modern Qt 6, nothing left over.** `q2compat.h` deleted, no Qt3Support class anywhere, no compatibility flag on SIGEL's own code. This moves §10's "drop the Qt 2 emulation" from optional debt into a **required phase**, and with it the data migration that section describes — the shim exists because `Q2Dict`'s hash order numbers the links, so the 7 `.rrb` and 12 `.exp` files must be rewritten before it can go. **Ordered before Phase C**, so the 466 GUI sites are ported once, to the final target, instead of twice. Vendored third-party code is out of scope for this rule: qhull, cv97, Dynamo and PVM keep `-w -fpermissive` |
 
 ## 5a. Decisions — signed off 2026-08-22, for Phase R
 
@@ -896,10 +904,19 @@ live that were not in 2003. Right under a sanitizer, but it can abort where the
 
 ## 10. Debt — after the port is trusted
 
-### Drop the Qt 2 emulation
+### Drop the Qt 2 emulation — REQUIRED, not optional (D25)
 
-**After the port is confirmed to produce valid results, not before.** What the
-shim currently carries, and why:
+**Promoted 2026-08-27 from debt to Phase D**, and ordered before Phase C so the
+interface is ported once. D25 says the finished port contains no `q2compat.h`,
+no Qt3Support and no compatibility flag on SIGEL's own code, so everything below
+is in scope rather than "after, if wanted".
+
+The one thing that has not changed: this cannot be verified against the 1.3
+binary until the x86 box gives us fitness numbers (§7). The link-order half
+*can* be self-checked — dump link and joint order from the current shim build,
+migrate the data, dump again, compare — and that is the check Phase D gates on.
+
+What the shim currently carries, and why:
 
 | | why it exists |
 |---|---|
