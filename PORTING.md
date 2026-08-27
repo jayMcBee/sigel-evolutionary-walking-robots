@@ -1016,6 +1016,33 @@ program's `SENSE` indexes and drive numbers index the actuators, which is the
 | `.exp` | today's **`copy`** order — the simulation runs on `SIG_Robot robot(experiment.robot)`, not on `experiment.robot` |
 | `.rrb` | today's **`rrb`** order — declaration order once the loader preserves it |
 
+**Result — the 14 `.exp` need no migration at all.** `dictorder-reorder.py`
+rewrote 7 of 7 `.rrb` and **0 of 14 `.exp`**: their stored order already *is*
+the order the simulation uses.
+
+Why, and it is not luck. `Q2Dict::insert` prepends, so reading a file in order
+*F* builds every colliding chain backwards and iteration yields some order *L*.
+Saving writes *L*; loading that reverses each chain again and returns *F*. The
+round trip is self-inverse, so `copy` — which is `hash(hash(file))` — equals the
+file order exactly. Verified on `walker`, where `loaded` ≠ `copy`:
+file order is `shoulder5, body, shoulder6, …`, `copy` is identical, `loaded`
+is `body, shoulder5, foot1, …`. So once the containers are insertion-ordered,
+loading an `.exp` gives the order the simulation already ran on, and **not one
+byte of the shipped experiments changes**.
+
+The 7 `.rrb` do need it: `SIG_RobotCompilerObjects.cpp:89` inserts in
+declaration order, which the same prepend then reverses, so the file has to be
+written in today's `rrb` order for the flip to preserve it.
+
+**Link numbers shift in the `.rrb`, and that is safe — checked, not assumed.**
+`SIG_Link` numbers come from `linknumber++` at declaration
+(`SIG_RobotCompilerObjects.cpp:89`), so reordering renumbers. Nothing indexes by
+that number: `SIG_DynaSystem::getJoint(int)` (`SIG_DynaSystem.cpp:830-838`) is a
+**linear search** for a matching stored number, not an array subscript, and the
+DynaMechs body index comes from call order, which is the order we preserve. In
+the `.exp` path numbers are not touched at all — `SIG_Link.cpp:65` reads
+`tx >> name >> number` straight back, so every number stays as 2001 wrote it.
+
 **Formats, both pure permutations.** `.rrb` is block-structured with exactly five
 top-level kinds — `material`, `link`, `joint <subtype>`, `drive`, `sensor`, all
 `<kind> [<subtype>] <name> { … }`, with `point` lines nested inside links and no
