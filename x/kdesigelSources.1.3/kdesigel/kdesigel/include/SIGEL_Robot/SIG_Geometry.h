@@ -49,8 +49,13 @@ namespace SIGEL_Robot {
     friend class SIG_GeometryIterator;
     friend class SIG_Polygon;
   private:
-    Q2PtrVector<SIG_Polygon> polygons;
-    Q2PtrVector<DL_vector> vertices;
+    // Phase D. Were Q2PtrVector, used as grow-by-doubling append buffers
+    // where size() was capacity and count() was fill. QList appends natively,
+    // so the two are now always equal -- which also removes a latent null
+    // dereference: SIG_DynaMechsLink.cpp:108 iterates to size() and
+    // dereferences every slot, so any unfilled capacity would have crashed it.
+    QList<SIG_Polygon *> polygons;
+    QList<DL_vector *> vertices;
 
   protected:
     /**
@@ -113,7 +118,7 @@ namespace SIGEL_Robot {
     /**
      * Returns the vector of vertices.
      */
-    Q2PtrVector<DL_vector> const & getVertices (void) const;
+    QList<DL_vector *> const & getVertices (void) const;
     /**
      * Returns the number of vertices.
      */

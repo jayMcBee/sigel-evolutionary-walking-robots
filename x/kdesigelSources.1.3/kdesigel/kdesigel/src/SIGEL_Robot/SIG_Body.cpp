@@ -158,11 +158,12 @@ namespace SIGEL_Robot
                                         if (coordinateNode) {
                                                 int noOfVertices = coordinateNode->getNPoints();
                                                 int noOfIndices = indexedFaceSetNode->getNCoordIndexes();
-                                                // This local owns the vertices it builds. The flag stays: on a local it
-                                                // IS the RAII, and the NEWMAT multiply and the SIG_Polygon allocations
-                                                // below can throw. Writing the free out by hand drops the unwinding path.
-                                                Q2PtrVector< DL_vector > vertices( noOfVertices );
-                                                vertices.setAutoDelete( true );
+                                                // Phase D. Was an owning Q2PtrVector of DL_vector*, kept on
+                                                // setAutoDelete because the NEWMAT multiply and the SIG_Polygon
+                                                // allocations below can throw and a hand-written free would drop
+                                                // the unwinding path. There is no polymorphism here, so values
+                                                // remove the question entirely -- nothing to own, nothing to free.
+                                                QList< DL_vector > vertices( noOfVertices );
 
                                                 for (int i=0; i < noOfVertices; i++) {
                                                         QList< float > coords(3);
@@ -176,12 +177,8 @@ namespace SIGEL_Robot
                                                         
                                                         actVertex = transformation * actVertex;
                                                         
-                                                        DL_vector *finalVertex = new DL_vector();
-                                                        
                                                         for (int k = 0; k<3; k++)
-                                                                finalVertex->set( k, actVertex( k+1 ) );
-                                                        
-                                                        vertices.insert( i, finalVertex );
+                                                                vertices[ i ].set( k, actVertex( k+1 ) );
                                                 };
                                                 
                                                 SIG_Polygon *actPolygon = 0;
@@ -195,7 +192,11 @@ namespace SIGEL_Robot
                                                                 if (!actPolygon)
                                                                         actPolygon = new SIG_Polygon( geometry );
                                                                 
-                                                                actPolygon->appendVertex( *vertices[ actIndex ] );
+                                                                // actIndex comes straight out of the VRML file.
+                                                                // Q2PtrVector::at clamped an out-of-range index;
+                                                                // QList does not, so check it here.
+                                                                if ( actIndex < vertices.size() )
+                                                                        actPolygon->appendVertex( vertices[ actIndex ] );
                                                         };
                                                 };
                                         };

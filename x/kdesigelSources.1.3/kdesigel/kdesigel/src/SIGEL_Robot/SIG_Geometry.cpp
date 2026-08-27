@@ -26,12 +26,7 @@
 namespace SIGEL_Robot {
         void SIG_Geometry::addPolygon (SIG_Polygon *p)
         {
-	  if (polygons.count () >= polygons.size ()) {
-	    int newsize = polygons.size () * 2;
-	    if (newsize < 16) newsize = 16;
-	    polygons.resize (newsize);
-	  }
-	  polygons.insert( polygons.count(), p );
+	  polygons.append (p);
         }
 
         SIG_Polygon const *SIG_Geometry::getPolygon (int i) const
@@ -45,13 +40,11 @@ namespace SIGEL_Robot {
 
         SIG_Geometry::SIG_Geometry (const SIG_Geometry *geom)
         {
-                vertices.resize (geom->vertices.count ());
-                for (int i = 0; i < geom->vertices.count (); i++)
-                        vertices.insert (i, new DL_vector (geom->vertices.at (i)));
+                for (DL_vector *v : geom->vertices)
+                        vertices.append (new DL_vector (v));
 
-                polygons.resize (geom->polygons.count ());
-                for (int j = 0; j < geom->polygons.count (); j++)
-                        polygons.insert (j, new SIG_Polygon (this, geom->polygons.at (j)));
+                for (SIG_Polygon *p : geom->polygons)
+                        polygons.append (new SIG_Polygon (this, p));
         }
 
         SIG_Geometry::SIG_Geometry (QTextStream & tx)
@@ -65,61 +58,41 @@ namespace SIGEL_Robot {
                         ;
 
                 tx >> zahl;
-                vertices.resize (zahl);
                 for (int i = 0; i < zahl; i++) {
                         DL_vector d = SIG_Robot::streamToVector (tx);
-                        vertices.insert (i, new DL_vector (&d));
+                        vertices.append (new DL_vector (&d));
                 }
 
                 tx >> zahl;
-                polygons.resize (zahl);
                 for (int j = 0; j < zahl; j++)
-                        polygons.insert (j, new SIG_Polygon (this, tx));
+                        polygons.append (new SIG_Polygon (this, tx));
         }
 
         SIG_Geometry::~SIG_Geometry (void)
         {
-                polygons.deleteContents ();
-                vertices.deleteContents ();
-                /* If someone insisted on doing it manually, we would be able to do so.
-                int i, size;
-
-                size = polygons.count ();
-                for (i = 0; i < size; i++)
-                        delete polygons [i];
-                polygons.clear ();
-
-                size = vertices.count ();
-                for (i = 0; i < size; i++)
-                        delete vertices [i];
-                vertices.clear ();
-                */
+                qDeleteAll (polygons);
+                qDeleteAll (vertices);
         }
         
         int SIG_Geometry::getOrAddVertex (DL_vector vertex)
         {
-                int appending_position = vertices.count ();
+                int appending_position = vertices.size ();
                 for (int i = 0; i < appending_position; i++) {
                         if (vertex.equal (vertices [i]))
                                 return i;
                 }
-                if (vertices.count () >= vertices.size ()) {
-                        int newsize = vertices.size () * 2;
-                        if (newsize < 16) newsize = 16;
-                        vertices.resize (newsize);
-                }
-                vertices.insert (appending_position, new DL_vector (&vertex));
+                vertices.append (new DL_vector (&vertex));
                 return appending_position;
         }
 
-        Q2PtrVector<DL_vector> const & SIG_Geometry::getVertices (void) const
+        QList<DL_vector *> const & SIG_Geometry::getVertices (void) const
         {
                 return vertices;
         }
         
         int SIG_Geometry::getNumVertices (void) const
         {
-                return vertices.count ();
+                return vertices.size ();
         }
         
         DL_vector SIG_Geometry::getVertex (int i) const
@@ -129,7 +102,7 @@ namespace SIGEL_Robot {
 
         int SIG_Geometry::getNumPolygons (void) const
         {
-                return polygons.count ();
+                return polygons.size ();
         }
         
         void SIG_Geometry::translate (DL_vector dir)

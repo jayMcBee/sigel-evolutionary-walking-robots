@@ -1270,6 +1270,40 @@ byte with no ASan or UBSan report. So all 42 evaluations plus the duplicate-key
 self-check have full sanitized coverage today. Only `dictorder-dump.sh` is
 blocked, and only because it also loads the 7 `.rrb`.
 
+### D7 — `Q2PtrVector` off the simulation path
+
+`Q2PtrVector` splits in two. The **simulation side** is covered by both gates
+and by AddressSanitizer; the **evolution loop** — `SIG_GPPopulation`,
+`SIG_GPFitnessTrainer`, `SIG_GPManager`, `MT_Classifier` — is the 8 sites §9
+lists where `insert()` or a shrinking `resize()` *is* the only free, and nothing
+can run it until PVM builds. This step does the covered half only.
+
+| | |
+|---|---|
+| `SIG_Geometry::polygons`, `::vertices` | `QList<T *>`. They were grow-by-doubling append buffers, where `size()` was capacity and `count()` was fill; `QList::append` is that natively, so the doubling dance is deleted outright |
+| `SIG_Body`'s local `vertices` | **`QList<DL_vector>` — values, not pointers.** There is no polymorphism, so the ownership question disappears rather than moving |
+
+**A latent null dereference, removed rather than preserved.**
+`SIG_DynaMechsLink.cpp:108` iterates `getVertices()` to **`size()`** — the
+capacity — and dereferences every slot, so any unfilled capacity would have
+crashed it. Instrumented across all 14 experiments: `size() == count()` every
+time, because `addVertex` has no caller outside `SIG_Geometry` and both fill
+paths fill exactly. With `QList` the two are the same number by construction.
+The same line also took the whole vector **by value** on every link
+construction; it is a const reference now.
+
+**`SIG_Body` was the one container §7 said must keep `setAutoDelete`** — a local
+whose flag *is* the RAII, because the NEWMAT multiply and the `SIG_Polygon`
+allocations below it can throw and a hand-written free would drop the unwinding
+path. That reasoning was right for pointers. Values retire it: nothing is owned,
+so nothing leaks on unwind. `actIndex` there comes straight out of the VRML file
+and used to be absorbed by the clamp, so it is bounds-checked explicitly now.
+
+Verified: both gates clean, `./check.sh` 118 pass / 4 fail, all 14 experiments
+clean under AddressSanitizer and UndefinedBehaviorSanitizer, and the leak total
+is **unchanged at 41,374 bytes in 117 allocations** — no free dropped, none
+doubled.
+
 **Formats, both pure permutations.** `.rrb` is block-structured with exactly five
 top-level kinds — `material`, `link`, `joint <subtype>`, `drive`, `sensor`, all
 `<kind> [<subtype>] <name> { … }`, with `point` lines nested inside links and no
