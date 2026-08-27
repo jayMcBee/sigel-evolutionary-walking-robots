@@ -627,7 +627,7 @@ in `check.sh`, not a remote call.
 
 | # | Step | What it checks |
 |---|---|---|
-| V1 | Capture 1.3's load-and-save round trip for three shipped `.exp` — `twoBases` as the control, `octopus` and `walker` for their colliding names. Commit under `reference/` | the `Q2Dict` hash, all 8 order-carrying containers, the parser and the serialiser |
+| V1 | ~~Capture 1.3's load-and-save round trip for three shipped `.exp`~~ **DONE 2026-08-27** — `reference/v1-1.3-roundtrip.txt` | the `Q2Dict` hash, all order-carrying containers, the parser and the serialiser |
 | V2 | Our half: a save path in `sigel_eval`, the same round trip locally, diffed against V1. Becomes a gate | equivalence instead of self-consistency |
 | V3 | Determinism on the x86 box — one experiment run twice, both `RANDOMSEED`s pinned | gates everything numeric; never tested there |
 | V4 | Force re-evaluation of a shipped population by setting its `FITNESS` fields to `-1`, harvest 1.3's per-individual fitness, compare against `sigel_eval` | the number this file has been asking for. **Judgement, not a gate** |
@@ -653,10 +653,65 @@ readings that share one mistake agree perfectly. `Q2Dict` is already deleted
 `dictorder-baseline.txt`, with D7 built on top. Every further step stacks work
 on a foundation checked against nothing but itself, and V1 is three short runs.
 
+### V1 RESULT — the hash model is confirmed against the real binary
+
+**10 of 10 container orders match, 0 differ**, plus the two containers V1
+discovered that this plan did not model. Compared: 1.3's *saved* order against
+the `loaded` order our `Q2Dict` produced, recovered from the pre-flip baseline
+at `7f7410a:linkorder.txt`. 105 entities across `octopus` and `walker`.
+
+| container | result |
+|---|---|
+| `octopus` joint, drive, sensor, material, link | **match** |
+| `walker` link, material, joint, drive, sensor | **match** |
+| `walker` `leg1` axis points — a **ninth** container, inside the Link line | **match** |
+| `octopus` body emission order — a **tenth** | **match** |
+
+**The prediction held in advance**, which is what makes this evidence rather
+than agreement: `twoBases` came back with its robot block byte-identical, and
+`octopus` and `walker` came back permuted. **This is the first thing in this
+repo checked against something other than itself.** Until now `q2compat.h`'s
+hash had only ever been checked against a second reading of `qgdict.cpp` by the
+same hand, and D2–D7 are all stacked on it.
+
+The **round trip is an involution** — an order-2 permutation, exactly what
+bucket reversal on prepend predicts. It also independently confirms D2's finding
+that the 14 `.exp` needed no migration.
+
+**Two containers this plan never enumerated.** The per-link axis points inside
+each `Link` line permute independently — 8 of `walker`'s 19 links and 5 of
+`octopus`'s 10 — and so does the Body/Geometry emission order. Both are already
+in `dictorder-baseline.txt` and both match, so nothing is owed; the count of
+"eight order-carrying containers" was wrong and is **ten**.
+
+**Corrections to this section from the run, both ours:**
+
+- **The dead 2003 paths differ per experiment.** `twoBases*` use
+  `/home/pg368b/ross/projects/sigel`. `octopus*` and `walker*` use a different
+  2001 author — `/home/pg368/sawitzki/sigel`, note `pg368` not `pg368b` — plus
+  a separate model directory, `/home/pg368/sawitzki/octopus/` and
+  `.../walker/`, on the `Body` lines. The trap note below covered the
+  `twoBases` family only. One of those occurrences is *inside* the
+  `StreamedRobot` block, so repointing necessarily edits what is being
+  compared; V1 diffed edited-input against output for that reason.
+- **`twoBases` is a control for the robot containers only.** Its command list
+  permuted too, because that dict holds 13 entries whatever the robot's size.
+
+**Also learned, and worth not rediscovering:** SIGEL **traps SIGTERM**, so only
+SIGKILL stops it — and SIGKILL means `SAVEEXIT` never runs and there is no
+output file, so a kill-based fallback yields nothing. All three shipped
+populations are already fully evaluated with a 2001 termination date, which is
+why load/save exits immediately. And with no `pvmd` running, every
+`pvm_addhosts` fails and SIGEL loads, saves and exits 0 regardless — evaluation
+impossible rather than merely disabled, which made V1 cleaner than specified.
+
+**When comparing, compare name→value, not whole lines.** A naive
+`sort | diff` reports false differences, because a `Link` line's text changes
+when its own internal point order permutes.
+
 **V1 has a trap.** `SAVEEXIT=1` rewrites the `.exp` in place, so every run works
-on a copy — never on the pristine download. `PVMHOST`, `POOLIMAGEDIRECTORY` and
-`GRAVEYARDDIRECTORY` all name `/home/pg368b/ross/projects/sigel`, a Dortmund
-host from 2003, and have to be repointed first.
+on a copy — never on the pristine download. The 2003 paths listed above have to
+be repointed first.
 
 ### Reference material — all of it, downloaded 2026-08-22
 
