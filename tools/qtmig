@@ -6,6 +6,14 @@
 #   ./tools/qtmig qt3to4 x/.../src/SIGEL_CommonGUI
 #
 # Writes as the invoking user, not root, so converted files stay editable.
-set -e
+# uic3 -convert writes the form to STDOUT and its warnings to stderr. Keep them
+# apart: folding stderr into the redirect puts the warning on line 1 of the .ui
+# and the file stops being XML. Run on an already-converted file it exits 0 and
+# writes nothing, so an exit code alone does not tell you it worked.
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
+[ $# -gt 0 ] || { echo "usage: $0 <uic3|qt3to4> [args]   (paths relative to repo root)" >&2; exit 2; }
+docker image inspect sigel-qtmig >/dev/null 2>&1 || {
+	echo "image missing -- run: docker build -t sigel-qtmig -f tools/Dockerfile.qtmig tools" >&2
+	exit 1
+}
 exec docker run --rm -i -v "$ROOT:/w" -w /w -u "$(id -u):$(id -g)" sigel-qtmig "$@"

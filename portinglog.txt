@@ -1,0 +1,25 @@
+Log for qt3to4 on Thu Aug 27 13:51:48 2026. Number of log entries: 1
+User skipped file /w/.q34tmp/SIG_GPParameter.cpp
+
+Log for qt3to4 on Thu Aug 27 13:51:58 2026. Number of log entries: 19
+In file /w/.q34tmp/SIG_GPParameter.cpp at line 25 column 21: qfiledialog.h -> q3filedialog.h
+In file /w/.q34tmp/SIG_GPParameter.cpp at line 52 column 76: WFlags -> Qt::WFlags
+In file /w/.q34tmp/SIG_GPParameter.cpp at line 60 column 42: QListViewItem -> Q3ListViewItem
+In file /w/.q34tmp/SIG_GPParameter.cpp at line 61 column 48: QListViewItem -> Q3ListViewItem
+In file /w/.q34tmp/SIG_GPParameter.cpp at line 72 column 44: QFileDialog -> Q3FileDialog
+In file /w/.q34tmp/SIG_GPParameter.cpp at line 77 column 44: QFileDialog -> Q3FileDialog
+In file /w/.q34tmp/SIG_GPParameter.cpp at line 380 column 19: QListViewItem -> Q3ListViewItem
+In file /w/.q34tmp/SIG_GPParameter.cpp at line 380 column 48: QListViewItem -> Q3ListViewItem
+In file /w/.q34tmp/SIG_GPParameter.cpp at line 435 column 16: QListViewItem -> Q3ListViewItem
+In file /w/.q34tmp/SIG_GPParameter.cpp at line 435 column 53: QListViewItem -> Q3ListViewItem
+In file /w/.q34tmp/SIG_GPParameter.cpp at line 465 column 21: QListViewItem -> Q3ListViewItem
+In file /w/.q34tmp/SIG_GPParameter.cpp at line 468 column 23: QListViewItemIterator -> Q3ListViewItemIterator
+In file /w/.q34tmp/SIG_GPParameter.cpp at line 510 column 29: QListViewItem -> Q3ListViewItem
+In file /w/.q34tmp/SIG_GPParameter.cpp at line 524 column 23: QListViewItemIterator -> Q3ListViewItemIterator
+In file /w/.q34tmp/SIG_GPParameter.cpp at line 539 column 23: QListViewItemIterator -> Q3ListViewItemIterator
+In file /w/.q34tmp/SIG_GPParameter.cpp at line 546 column 58: QListViewItem -> Q3ListViewItem
+In file /w/.q34tmp/SIG_GPParameter.cpp at line 552 column 27: QListViewItemIterator -> Q3ListViewItemIterator
+In file /w/.q34tmp/SIG_GPParameter.cpp at line 649 column 28: QListViewItemIterator -> Q3ListViewItemIterator
+In file /w/.q34tmp/SIG_GPParameter.cpp: Added the following include directives:
+	#include <QPixmap> 
+

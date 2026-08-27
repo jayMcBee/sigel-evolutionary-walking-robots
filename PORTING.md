@@ -637,17 +637,38 @@ widget class unmapped. `/usr/bin/uic3` is a qtchooser stub — the image puts
 `/usr/lib/aarch64-linux-gnu/qt4/bin` first on `PATH` to skip it.
 
 **T2 result — `uic3 -convert` reads the Qt 2 forms directly.** All 20 convert,
-0 failures, no warnings, output `version="4.0"`, which Qt 6's `uic` accepts.
+0 failures, output `version="4.0"`, which Qt 6's `uic` accepts.
+
+**"No warnings" was wrong** — corrected by review. `uic3` writes the form to
+stdout and warnings to stderr; the first measurement kept only exit codes. There
+are **28 warnings across 7 forms**. Redirecting stderr into the same file puts a
+warning on line 1 and the output stops being XML.
 
 **This corrects a false claim in the previous C7 paragraph**, which said the
 files were "one generation below what `uic3 -convert` accepts" and concluded a
 Qt 2 → Qt 3 leg was needed first. Measured 2026-08-27: it is not, for forms.
 Whether `qt3to4` needs one for *sources* is untested and is the next question.
 
-**The residue is a 6-entry substitution table, not a parser.** `uic3` maps Qt 2
-widgets onto Qt3Support classes, which Qt 5 deleted, so Qt 6's `uic` accepts
-the XML but the generated header fails to compile on `#include <q3listview.h>`.
-Across all 20 forms, in full:
+**The residue is larger than the 6-entry table first claimed here.** `uic3` maps
+Qt 2 widgets onto Qt3Support classes, which Qt 5 deleted, so Qt 6's `uic`
+accepts the XML but 19 of 20 generated headers fail to compile. Corrected by
+review, the full residue is:
+
+| | |
+|---|---|
+| 6 Qt3Support widget classes | the table below |
+| 11 Qt3Support **enum values** | `Q3ListBox::NoSelection` ×6, `Q3ListView::Extended` ×4, `Q3ListBox::Extended` ×1. Qt 6's are a different enum *and* a different value name — `QAbstractItemView::ExtendedSelection` |
+| 27 custom **slot declarations**, silently dropped | in 6 forms. The 49 `<connection>` elements all survive; what goes is the `<slot>` declarations. Qt 6's `uic` then resolves the slot against the widget's Qt base class and emits `qOverload<>(&QDialog::slotFoo)` — **25 hard compile errors** |
+| 18 `qPixmapFromMimeSource` | Qt3Support, removed, not merely obsolete |
+| 9 embedded images in 2 forms | **the dangerous one.** Qt 6's `uic` omits `<images>` and emits `setIcon(QPixmap("image0"))`, which compiles clean and renders a blank button at runtime |
+| 4 real size constraints, silently dropped | `QLayoutWidget` → `<layout>` discards them: `MT_IndividualWidgetBase` `Layout32`/`Layout33`/`Layout28` lose `maximumSize 130×32767`, `MT_PopulationWidgetBase` `Layout60` loses `minimumSize 200×0` |
+| 11 widgets renamed by Qt 6's `uic` | duplicate names — `tab`→`tab1`… in 5 forms. Breaks any hand-written subclass referring to them |
+
+Verified preserved: tab order 143/143, combo and list box items 47/47, list view
+columns 15/15, layout margins and spacing 196/196, and all seven property
+renames. No buddies exist in the source.
+
+The 6 widget classes, across all 20 forms:
 
 | class | uses | Qt 6 |
 |---|---|---|
@@ -662,8 +683,9 @@ Two non-standard classes survive conversion and are not Qt's:
 `SIG_SimulationVisualisationWidget`, SIGEL's own OpenGL widget (C5), and
 `Line`, which is Qt Designer's separator and becomes a `QFrame`.
 
-One warning from Qt 6's `uic`: `qPixmapFromMimeSource` is obsolete. Not yet
-looked at.
+Qt 6's `uic` emits **53 warning lines over the 20 forms**, not the one an
+earlier draft claimed: 20 obsolete-pixmap-function, 21 `QLCDNumber::numDigits`,
+11 duplicate-name renames, 2 omitted `<images>`, 1 omitted `<sizepolicy>`.
 
 ### Phase C — the interface — AUTHORIZED 2026-08-27
 
@@ -698,7 +720,7 @@ modules include the headers `uic` generates from them.
 
 | # | Work | Size |
 |---|---|---|
-| C1 | One form end to end — settles the 6-class substitution table | 1 form |
+| C1 | One form end to end — settles the residue table above, including the dropped slot declarations and the embedded images | 1 form |
 | C2 | The remaining 19 forms | 19 forms |
 | C3 | `SIGEL_CommonGUI` | 665 LOC, 2 files |
 | C4 | `SIGEL_SlaveGUI` | 2,145 LOC, 5 files |

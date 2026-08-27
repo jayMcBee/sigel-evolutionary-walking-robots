@@ -17,13 +17,17 @@ FROM debian/eol:jessie
 RUN echo "deb http://archive.debian.org/debian jessie main" > /etc/apt/sources.list \
  && echo "Acquire::Check-Valid-Until false;" > /etc/apt/apt.conf.d/10no-check-valid \
  && apt-get -qq update \
- && apt-get -qq -y --no-install-recommends install libqt4-dev-bin libqt4-dev \
+ && apt-get -qq -y --no-install-recommends install libqt4-dev-bin libqt4-dev dpkg-dev \
  && rm -rf /var/lib/apt/lists/*
 
-# /usr/bin/uic3 is a qtchooser stub that execs this directory; putting it first
-# skips qtchooser entirely.
-ENV PATH=/usr/lib/aarch64-linux-gnu/qt4/bin:$PATH
-# uic3 and qt3to4 look for their class-rename rules under $QTDIR/q3porting.xml.
-# Without it uic3 silently leaves every widget class unmapped.
-ENV QTDIR=/usr/share/qt4
+# Debian puts both tools under a multiarch triplet and ships no /usr/bin/qt3to4
+# at all -- only a qtchooser stub for uic3. Hardcoding the aarch64 triplet made
+# qt3to4 unreachable on an x86 host, so resolve it at build time instead.
+# (An earlier comment here claimed QTDIR was needed for the q3porting.xml rules
+# file. It is not: the path is compiled into both tools, and the converted
+# output is byte-identical with QTDIR unset.)
+RUN ln -s /usr/lib/$(dpkg-architecture -qDEB_HOST_MULTIARCH)/qt4/bin/uic3 \
+          /usr/local/bin/uic3 \
+ && ln -s /usr/lib/$(dpkg-architecture -qDEB_HOST_MULTIARCH)/qt4/bin/qt3to4 \
+          /usr/local/bin/qt3to4
 WORKDIR /w
