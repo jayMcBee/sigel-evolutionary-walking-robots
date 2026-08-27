@@ -175,6 +175,22 @@ private:
 // ---------------------------------------------------------------------------
 // Q2Dict<T>  <- Qt 2 QDict<T>: QString-keyed dictionary of *pointers*.
 //
+// PHASE D, 2026-08-27: THE HASH ORDER IS GONE. Q2Dict is now insertion-ordered
+// -- one chain, appended to, walked in order. hash() survives only because
+// resize()/size() are still part of the interface; nothing calls it for
+// placement any more, and it goes with the rest of the class.
+//
+// What made this safe: the 14 .exp already stored the robot in the order the
+// simulation used (Q2Dict::insert prepended, so a save/load round trip reversed
+// each chain twice), so not one byte of them changed. The 7 .rrb were permuted
+// by dictorder-reorder.py. Proof: copy order 0 of 14 blocks changed, rrb order
+// 0 of 7, and fitness identical on all 42 evaluations. `loaded` order moved for
+// 7 blocks and had to -- it was hash(file) and is now file order, which is what
+// collapses it onto `copy`.
+//
+// The comment below describes what this class WAS. Kept because the data files
+// still carry that order and the reasoning explains why they look as they do.
+//
 // This reproduces Qt 2's hash table structure, not just its interface, because
 // ITERATION ORDER IS OBSERVABLE and the shipped experiments depend on it:
 // SIG_DynaMoSimulationData.cpp:33-51 calls newLink/newJoint/newSensor/newDrive
@@ -196,7 +212,7 @@ class Q2Dict
 public:
     struct Node { QString key; T *val; };
 
-    explicit Q2Dict(int size = 17) : buckets(size > 0 ? size : 17), vlen(uint(size > 0 ? size : 17)) {}
+    explicit Q2Dict(int size = 17) : buckets(1), vlen(uint(size > 0 ? size : 17)) {}
 
     // qcollection.h:64 -- a Qt 2 copy is ALWAYS non-owning
     Q2Dict(const Q2Dict &o) : buckets(o.buckets), vlen(o.vlen), items(o.items), del(false) {}
@@ -225,7 +241,7 @@ public:
 
     void insert(const QString &k, const T *d)
     {
-        buckets[qsizetype(hash(k))].prepend(Node{k, const_cast<T *>(d)});   // newest first
+        buckets[0].append(Node{k, const_cast<T *>(d)});   // insertion order
         ++items;
     }
 
@@ -233,10 +249,10 @@ public:
 
     T *find(const QString &k) const
     {
-        const QList<Node> &c = buckets.at(qsizetype(hash(k)));
-        for (const Node &n : c)
-            if (n.key == k)
-                return n.val;                   // newest wins, as in Qt 2
+        const QList<Node> &c = buckets.at(0);
+        for (auto it = c.rbegin(); it != c.rend(); ++it)
+            if (it->key == k)
+                return it->val;                 // newest wins, as in Qt 2
         return nullptr;
     }
     T *operator[](const QString &k) const { return find(k); }   // qdict.h:67-68
@@ -253,7 +269,7 @@ public:
 
     bool remove(const QString &k)               // Qt 2 removes ONE, the newest
     {
-        QList<Node> &c = buckets[qsizetype(hash(k))];
+        QList<Node> &c = buckets[0];
         for (qsizetype i = 0; i < c.size(); ++i)
             if (c.at(i).key == k) {
                 if (del) delete c.at(i).val;
@@ -264,7 +280,7 @@ public:
 
     T *take(const QString &k)
     {
-        QList<Node> &c = buckets[qsizetype(hash(k))];
+        QList<Node> &c = buckets[0];
         for (qsizetype i = 0; i < c.size(); ++i)
             if (c.at(i).key == k) {
                 T *v = c.at(i).val;
@@ -287,7 +303,7 @@ public:
         for (const QList<Node> &c : buckets)
             for (const Node &nd : c)
                 all.append(nd);
-        buckets = QList<QList<Node> >(qsizetype(n));
+        buckets = QList<QList<Node> >(1);
         vlen = n; items = 0;
         for (const Node &nd : all) insert(nd.key, nd.val);
     }

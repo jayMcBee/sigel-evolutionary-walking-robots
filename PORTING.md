@@ -30,7 +30,7 @@ build and run, because nothing else can be verified without it — see §3.
 | B — ownership explicit | **8 of 14 containers**. 5 still on `setAutoDelete` — open, §7 |
 | R — build and run | core builds and runs, faithful to 1.3. **No way to check it yet** — needs fitness numbers from the 1.3 binary on the x86 box, §7 |
 | T — old-Qt tool container | **done 2026-08-27.** `tools/qtmig`, §4 |
-| D — delete the shim, migrate the data | **D1 done 2026-08-27**, then rebuilt the same day after review found it blind — `dictorder-dump.sh` + `dictorder-baseline.txt`. Required by D25, ordered before C. §10 |
+| D — delete the shim, migrate the data | **D1–D3 done 2026-08-27.** `Q2Dict`'s hash order is gone; the containers are insertion-ordered and the data carries the order. Fitness identical on 42 evaluations. Remaining: the other `Q2*` types, then delete the header. §10 |
 | C — GUI | **not started, AUTHORIZED 2026-08-27 per D24.** ~450 Qt 2 sites + 20 forms |
 
 **SCOPE — DECIDED 2026-08-23. Read this before changing anything.**
@@ -1042,6 +1042,38 @@ that number: `SIG_DynaSystem::getJoint(int)` (`SIG_DynaSystem.cpp:830-838`) is a
 DynaMechs body index comes from call order, which is the order we preserve. In
 the `.exp` path numbers are not touched at all — `SIG_Link.cpp:65` reads
 `tx >> name >> number` straight back, so every number stays as 2001 wrote it.
+
+### D3 — the flip, done 2026-08-27
+
+`Q2Dict` is now **insertion-ordered**: one chain, appended to, walked in order.
+`find` searches it backwards so newest still wins, as Qt 2 did. Nothing places
+by hash any more.
+
+**Two gates, both committed, both clean:**
+
+```
+./dictorder-dump.sh   | diff -u dictorder-baseline.txt -
+./fitness-check.sh    | diff -u fitness-baseline.txt -
+```
+
+| check | result |
+|---|---|
+| `copy` order, the order the simulation runs on | **0 of 14 blocks changed** |
+| `rrb` order | **0 of 7 changed** |
+| fitness, 3 individuals × 14 experiments | **identical on all 42** |
+| `loaded` order | 7 of 14 changed — **correct**, see below |
+
+`loaded` had to move. It was `hash(file)` and is now file order, which is
+exactly what collapses it onto `copy` — the three load paths becoming one order
+is the point of the exercise, not a regression. `body` and `material` order
+moved with it, and nothing numbers either.
+
+`fitness-baseline.txt` pins this machine against itself and is **not** a
+cross-machine reference: §7 measures a 1-ULP change in start height moving an
+individual by 45%, and the 2003 build was i386 x87.
+
+`data/` stays the pristine download and is never written; `data-reordered/` is
+what the build reads, and both scripts default to it.
 
 **Formats, both pure permutations.** `.rrb` is block-structured with exactly five
 top-level kinds — `material`, `link`, `joint <subtype>`, `drive`, `sensor`, all

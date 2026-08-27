@@ -21,6 +21,7 @@
 set -eu
 ROOT=$(cd "$(dirname "$0")" && pwd)
 B=${1:-build-fast}
+DATA=${2:-data-reordered}   # data/ is the pristine download, never written
 EVAL=$ROOT/$B/sigel_eval
 [ -x "$EVAL" ] || { echo "no $EVAL -- make B=$B SAN= SIGSAN=" >&2; exit 1; }
 SIGEL_ROOT=$ROOT/x/kdesigelSources.1.3/kdesigel/kdesigel
@@ -29,11 +30,11 @@ export SIGEL_ROOT
 # A silently short dump is the dangerous failure: Phase D re-captures this file
 # at every step, so an empty run that exited 0 would overwrite the baseline and
 # report success. Count what we expect to find and refuse to run if it is off.
-exps=$(find "$ROOT/data/Experiments" -name '*.exp' | sort)
-rrbs=$(find "$ROOT/data" -name '*.rrb' | sort)
+exps=$(find "$ROOT/$DATA/Experiments" -name '*.exp' | sort)
+rrbs=$(find "$ROOT/$DATA" -name '*.rrb' | sort)
 ne=$(echo "$exps" | grep -c . || true); nr=$(echo "$rrbs" | grep -c . || true)
 [ "$ne" -eq 14 ] && [ "$nr" -eq 7 ] || {
-	echo "expected 14 .exp and 7 .rrb under data/, found $ne and $nr." >&2
+	echo "expected 14 .exp and 7 .rrb under $DATA/, found $ne and $nr." >&2
 	echo "PORTING.md §7: experiments.tar.gz carries only 12 -- the two runner" >&2
 	echo ".exp come from data/results/runner*Experiment.tar.gz." >&2
 	exit 1
