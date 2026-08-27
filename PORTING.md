@@ -32,7 +32,7 @@ build and run, because nothing else can be verified without it — see §3.
 | T — old-Qt tool container | **done 2026-08-27.** `tools/qtmig`, §4 |
 | D — delete the shim, migrate the data | **D1–D6 done 2026-08-27. `Q2Dict`, `Q2DictIterator` and `Q2Array` deleted** — shim 806 → **530** lines, `./check.sh` **118 pass / 4 fail** / 341 warnings. Remaining: `Q2PtrVector` 69, `Q2PtrList` 62, `Q2CString` 21, `Q2Queue` 16, `Q2ListIterator` 14, `Q2ValueList` 12. §10 |
 | C — GUI | **not started, AUTHORIZED 2026-08-27 per D24.** ~450 Qt 2 sites + 20 forms |
-| V — check against the 1.3 binary | **not started, NEW 2026-08-27.** The only equivalence check in the plan — every other gate compares the port against itself. §7 |
+| V — check against the 1.3 binary | **V1 done 2026-08-27** — the hash model is confirmed against the real binary, 10 of 10 container orders. `gdb` is installed, so V5 is unblocked and running. §7 |
 
 **SCOPE — DECIDED 2026-08-23. Read this before changing anything.**
 
@@ -631,7 +631,7 @@ in `check.sh`, not a remote call.
 | V2 | Our half: a save path in `sigel_eval`, the same round trip locally, diffed against V1. Becomes a gate | equivalence instead of self-consistency |
 | V3 | Determinism on the x86 box — one experiment run twice, both `RANDOMSEED`s pinned | gates everything numeric; never tested there |
 | V4 | Force re-evaluation of a shipped population by setting its `FITNESS` fields to `-1`, harvest 1.3's per-individual fitness, compare against `sigel_eval` | the number this file has been asking for. **Judgement, not a gate** |
-| V5 | **Conditional on `gdb` reaching that box (§9).** Breakpoint probes for the non-integrating quantities: the sensor value a joint angle produces, the force a register value produces, the MDH parameters | the port's **arithmetic**, which V1–V4 never touch |
+| V5 | **Unblocked 2026-08-27 — `gdb` installed (§9).** Breakpoint probes for the non-integrating quantities: the sensor value a joint angle produces, the force a register value produces, the MDH parameters | the port's **arithmetic**, which V1–V4 never touch |
 
 **Why the round trip is the sharp test.** The `.exp` carries the robot as a
 `StreamedRobot` block, and that block *is* dict iteration order —
@@ -704,6 +704,43 @@ populations are already fully evaluated with a 2001 termination date, which is
 why load/save exits immediately. And with no `pvmd` running, every
 `pvm_addhosts` fails and SIGEL loads, saves and exits 0 regardless — evaluation
 impossible rather than merely disabled, which made V1 cleaner than specified.
+
+### V5 method — settled before the first probe, 2026-08-27
+
+`gdb` was installed on the x86 box on 2026-08-27, so V5 is no longer
+conditional. Four decisions, made once so they are not re-argued per probe:
+
+- **Function boundaries only.** The binaries carry `.symtab` but **no DWARF**,
+  so there is no type information. A breakpoint can read arguments off the
+  stack and a return value out of a register; it cannot print a C++ object
+  field by field or walk a container. Every probe must therefore pick a
+  function that carries the wanted value across its own boundary as a plain
+  `double`.
+- **Compare raw IEEE 754 bits, never decimal.** i386 from 2003 against aarch64
+  from today: a decimal rendering can hide a last-bit difference, or invent one
+  that is not there. Both sides print the 8 bytes.
+- **Report by name, not by index.** Keying each value to its entity name makes
+  the probe independent of container order, which is what lets V5 run alongside
+  V1–V4 instead of behind them.
+- **The 2003 binary uses Qt 2's own class names** — `QVector`, `QList`,
+  `QDict` — not our renamed `Q2PtrVector`, `Q2PtrList`, `Q2Dict`. Searching its
+  symbol table for our spellings finds nothing.
+
+Three targets, best first:
+
+| target | value | why |
+|---|---|---|
+| `dmMDHLink::setMDHParameters` | 4 doubles per joint, at setup | computed from the robot geometry by short arithmetic at `SIG_DynaMechsSimulationData.cpp:397` and passed in at `:442`. Nothing integrates, so no tolerance is arguable. A DynaMechs symbol, not a `SIG_` one |
+| `SIG_DynaSensor::senseJoint1` / `senseJoint2` | returns one `DL_Scalar` | the sensor value a joint angle produces. The 1.0 → 1.3 regression lives in exactly this calculation, and the port must reproduce 1.3 **including** that defect |
+| `SIG_DynaDrive::applyForce(double, double)` | 2 doubles | the force a register value produces |
+
+Not a target: `SIG_DynaMechsSimulationQueries::sense(int, …)` writes into a
+register object rather than returning a value, which is awkward with no type
+information. `senseJoint1`/`senseJoint2` give the same number more cheaply.
+
+**In progress:** the first probe is `twoBases` — 2 links and 1 joint, so
+exactly one call and no ordering ambiguity — proving the method before it is
+pointed at a robot with 18 joints.
 
 **When comparing, compare name→value, not whole lines.** A naive
 `sort | diff` reports false differences, because a `Link` line's text changes
@@ -870,7 +907,7 @@ custom signals and slots, and there are 49 across the 20 forms.
 | B | 5 | 8 of 14 containers |
 | T | 2 | **done 2026-08-27** (§4) |
 | C | 10 | **not started, authorized 2026-08-27** |
-| V | 5 | **not started**, V5 conditional on `gdb` — §7 |
+| V | 5 | **V1 done 2026-08-27**, V5 in progress — §7 |
 | PVM | — | not started, §3 |
 
 **The effort column is gone, 2026-08-27, and the section is no longer called
@@ -974,7 +1011,7 @@ evaluations). Two limits as a baseline:
 |---|---|
 | an instrumented rebuild | **impossible, permanently.** There is no SIGEL source on that machine at all — only the compiled 1.3 release. Not a toolchain problem, so no `-DSIG_DEBUG` build of the reference is ever available |
 | the binaries | **not stripped.** 11,709 symbols in `sigel`, 10,936 in `sigel_slave`, 1,760 of them `SIG_*` with full g++ 2.95 mangling. This is what makes V5 possible without a rebuild |
-| `gdb`, `strace`, `ltrace` | **absent**, and installing needs root and network there. V5 is blocked on that decision and nothing else |
+| `gdb` | **installed 2026-08-27**, so V5 is unblocked. `strace` and `ltrace` are still absent, and no probe needs them |
 | PVM | **works.** Four evolutions have completed, up to 300 generations at 8 concurrent slaves. `SIGEL_ROOT` must be in **pvmd's** environment, not the shell's, or every slave segfaults with the master idling |
 | the master's output | one line per generation, and nothing else. **No fitness value is ever printed.** Fitness lives only in the `.pol` pool images and the rewritten `.exp`, as `FITNESS=<value>`; `-1` means unevaluated, which is what V4 exploits |
 | per-step trajectories | POV-Ray export exists only in `sigel_slave`'s visualiser widget and is driven through its GUI. **Not reachable headlessly** |
