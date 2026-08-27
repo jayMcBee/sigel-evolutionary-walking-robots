@@ -4,10 +4,10 @@
 # Q2Dict's hash order numbers the links, joints, bodies, materials, drives,
 # sensors and each link's significant points. DynaMechs numbers its bodies from
 # that. Phase D deletes the shim, so the order has to move into the data files.
-# This prints the order the current build produces; linkorder.txt is that
+# This prints the order the current build produces; dictorder-baseline.txt is that
 # output, committed. The check is a diff:
 #
-#   ./linkorder.sh | diff -u linkorder.txt -
+#   ./dictorder-dump.sh | diff -u dictorder-baseline.txt -
 #
 # Watches all three load paths, because they give three different orders:
 #   loaded   the robot as the .exp deserialises it

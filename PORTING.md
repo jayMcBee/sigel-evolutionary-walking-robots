@@ -30,7 +30,7 @@ build and run, because nothing else can be verified without it — see §3.
 | B — ownership explicit | **8 of 14 containers**. 5 still on `setAutoDelete` — open, §7 |
 | R — build and run | core builds and runs, faithful to 1.3. **No way to check it yet** — needs fitness numbers from the 1.3 binary on the x86 box, §7 |
 | T — old-Qt tool container | **done 2026-08-27.** `tools/qtmig`, §4 |
-| D — delete the shim, migrate the data | **D1 done 2026-08-27**, then rebuilt the same day after review found it blind — `linkorder.sh` + `linkorder.txt`. Required by D25, ordered before C. §10 |
+| D — delete the shim, migrate the data | **D1 done 2026-08-27**, then rebuilt the same day after review found it blind — `dictorder-dump.sh` + `dictorder-baseline.txt`. Required by D25, ordered before C. §10 |
 | C — GUI | **not started, AUTHORIZED 2026-08-27 per D24.** ~450 Qt 2 sites + 20 forms |
 
 **SCOPE — DECIDED 2026-08-23. Read this before changing anything.**
@@ -938,10 +938,10 @@ binary until the x86 box gives us fitness numbers (§7). The link-order half
 *can* be self-checked, and **that check now exists — step D1, done 2026-08-27**:
 
 ```
-./linkorder.sh | diff -u linkorder.txt -
+./dictorder-dump.sh | diff -u dictorder-baseline.txt -
 ```
 
-`linkorder.txt` is **2,189 lines over 21 blocks** — 14 experiments and 7 `.rrb`.
+`dictorder-baseline.txt` is **2,189 lines over 21 blocks** — 14 experiments and 7 `.rrb`.
 Every later Phase D step has to leave that diff empty.
 
 **The first version of D1 was blind, and review caught it.** It dumped links and
@@ -981,6 +981,49 @@ have overwritten it and reported success.
 **`data/` needs 14 `.exp`, and `experiments.tar.gz` carries 12.** The two
 `runner*.exp` come from `data/results/runner*Experiment.tar.gz` (§7). Provision
 `data/` the way §9 describes and the baseline is 6 robots, not 7.
+
+### D2 — what the migration actually has to preserve
+
+Names, so this stops being ambiguous: `dictorder-dump.sh` produces the order,
+`dictorder-baseline.txt` is the committed reference, and **`data-reordered/`**
+is the working copy. `data/` is never written to — it is the untracked download
+and the only clean original we have.
+
+**Only four of the six dicts are numbered.** `SIG_DynaMoSimulationData.cpp:33-55`
+walks, in this order, **links → joints → sensors → drives**, calling
+`dynaSystem.newLink/newJoint/newSensor/newDrive`. Those four orders are the ones
+a migration must reproduce exactly. Bodies and materials are **free**: bodies are
+touched only by `loadGeometries` (`SIG_Robot.cpp:242-249`), which calls `load()`
+on each and does not care in what order, and materials only through
+`lookupMaterial(name)`.
+
+That matters because the two are not simultaneously satisfiable. The bodies dict
+is filled as links are processed, so once it becomes insertion-ordered its order
+follows link order. `octopus` wants links `firstFootLink, base, firstLegLink1…`
+and bodies `footLink.wrl, legLink.wrl, base.wrl`; writing the links in their
+target order yields bodies `footLink, base, legLink`. Since body order reaches
+nothing, the link order wins and the conflict is not real. Had this gone
+unchecked the tool would have been built around an impossible constraint.
+
+**Sensor and drive order is not cosmetic.** Sensor numbers are what an evolved
+program's `SENSE` indexes and drive numbers index the actuators, which is the
+"register value a given joint angle produces" determinism §7 relies on.
+
+**Two target orders, both already in the baseline:**
+
+| file | target |
+|---|---|
+| `.exp` | today's **`copy`** order — the simulation runs on `SIG_Robot robot(experiment.robot)`, not on `experiment.robot` |
+| `.rrb` | today's **`rrb`** order — declaration order once the loader preserves it |
+
+**Formats, both pure permutations.** `.rrb` is block-structured with exactly five
+top-level kinds — `material`, `link`, `joint <subtype>`, `drive`, `sensor`, all
+`<kind> [<subtype>] <name> { … }`, with `point` lines nested inside links and no
+stray top-level lines in any of the 7 files. The `.exp` carries the robot as a
+line-oriented `StreamedRobot` block: `Body`, `Material`, `Link`, `…Joint`,
+`Drive`, `…Sensor`, one entity per line except joints and sensors, which take
+two. So the tool reorders whole units and invents nothing, and the check with
+teeth is that the multiset of lines in equals the multiset of lines out.
 
 **The order is genuine hash order, not something simpler.** Checked before
 trusting the baseline: **11 of the 28 link/joint groups are not in ascending
