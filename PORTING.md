@@ -549,7 +549,7 @@ half-written, get a zero-size grid, and take a real heap-buffer-overflow in
 root and treats a non-zero exit as an error; an earlier version scored crashes
 as a fitness of 0, which made the headline number load-dependent.
 
-**Leak baseline (D18): 41,374 bytes in 117 allocations** per evaluation, from
+**Leak baseline (D18): 41,254 bytes in 109 allocations** per evaluation, from
 §10's pre-existing leak — `SIG_Simulation` is `new`ed and never deleted, and
 its destructor is empty. Gate on ASan and UBSan errors, not on this.
 
@@ -585,7 +585,7 @@ half-written, get a zero-size grid, and take a real heap-buffer-overflow in
 `dmEnvironment::getGroundElevation`. `replicate.sh` gives each worker its own
 root and treats a non-zero exit as an error.
 
-**Leak baseline (D18): 41,374 bytes in 117 allocations** per evaluation, from
+**Leak baseline (D18): 41,254 bytes in 109 allocations** per evaluation, from
 §10's pre-existing leak — `SIG_Simulation` is `new`ed and never deleted, and its
 destructor is empty. Gate on ASan and UBSan errors, not on this.
 
@@ -1445,36 +1445,6 @@ byte with no ASan or UBSan report. So all 42 evaluations plus the duplicate-key
 self-check have full sanitized coverage today. Only `dictorder-dump.sh` is
 blocked, and only because it also loads the 7 `.rrb`.
 
-### D8 — the `SIG_Register` cluster, and a leak that had no free path at all
-
-`Q2PtrVector<SIG_Register>` crossed a module boundary — a member on
-`SIG_Interpreter` plus two pure-virtual signatures on `SIG_SimulationQueries`
-and `SIG_CommandInterface`, four implementations between them — so it had to
-flip in one commit. 12 files.
-
-**`SIG_Register` is two ints**, no destructor, no pointers. So it becomes
-`QList<SIG_Register>` **by value**, the same move as `SIG_Body`'s local in D7:
-the ownership question disappears rather than moving. It has no default
-constructor, so the register file is built with `append`, not `resize`.
-
-**That fixed a leak with no free path anywhere.** `SIG_Interpreter` has no
-destructor, never called `setAutoDelete` and never called `deleteContents`, so
-the `Q2PtrVector` default of `del = false` meant **every interpreter leaked its
-entire register file** — one interpreter per fitness evaluation, for the life of
-the project. Measured, and the accounting is exact:
-
-| | before | after |
-|---|---|---|
-| `twoBases` | 41,374 B / 117 allocs | **41,254 B / 109** |
-| `walker` | 35,802,566 B / 630,138 | **35,802,446 B / 630,130** |
-
-Both are exactly **8 allocations** less, and both robots declare `memSize 8` in
-their `LanguageParameters` line — one allocation per register, gone. Fitness
-identical on all 42, both gates clean, `./check.sh` 118 pass / 4 fail.
-
-**§7's leak baseline changes to 41,254 bytes in 109 allocations** for a small
-robot. It was never a constant anyway — `walker` is 866× it, recorded at D4.
-
 ### D7 — `Q2PtrVector`: `SIG_Geometry` and `SIG_Body` only
 
 **The commit subject for this step overstated it.** `Q2PtrVector` is *not* off
@@ -1598,6 +1568,70 @@ The clean-up, in this order:
 
 Sequenced this way the ordering stopped being a hidden property of a hash
 function and became visible in the data.
+### D8 — the `SIG_Register` cluster, and a leak that had no free path at all
+
+`Q2PtrVector<SIG_Register>` crossed a module boundary — a member on
+`SIG_Interpreter` plus two pure-virtual signatures on `SIG_SimulationQueries`
+and `SIG_CommandInterface`, four implementations between them — so it had to
+flip in one commit. 12 files.
+
+**`SIG_Register` is two ints**, no destructor, no pointers. So it becomes
+`QList<SIG_Register>` **by value**, the same move as `SIG_Body`'s local in D7:
+the ownership question disappears rather than moving. It has no default
+constructor, so the register file is built with `append`, not `resize`.
+
+**That fixed a leak with no free path anywhere.** `SIG_Interpreter` has no
+destructor, never called `setAutoDelete` and never called `deleteContents`, so
+the `Q2PtrVector` default of `del = false` meant **every interpreter leaked its
+entire register file** — one interpreter per fitness evaluation, for the life of
+the project. Measured, and the accounting is exact:
+
+| | before | after |
+|---|---|---|
+| `twoBases` | 41,374 B / 117 allocs | **41,254 B / 109** |
+| `walker` | 35,802,566 B / 630,138 | **35,802,446 B / 630,130** |
+
+Both lose exactly **8 allocations**, and both robots declare `memSize 8` in
+their `LanguageParameters` line — one allocation per register, gone. The write
+order is `bitsPerRegister memSize maximalDelayTime`, and `twoBases` has
+`bitsPerRegister` 3 against `walker`'s 8 while both lose 8, which rules out the
+8 being register width.
+
+**The byte figure is not 8 registers, and an earlier draft implied it was.**
+Corrected by review, from the leak records: of the 120 bytes, only **64** are a
+leak removed — the 8 × `new SIG_Register`. The other 56 are the same memory
+still leaking, smaller: the container's heap buffer went 128 B → 80 B because
+`resize` took Qt's growth policy to 14 slots where `reserve(8)` allocates
+exactly, and the `SIG_Interpreter` object went 88 B → 80 B because the member
+shrank from 32 to 24 bytes.
+
+**So the register file still leaks** — as one 80-byte buffer instead of nine
+allocations — because `new SIG_Interpreter` is never deleted. That is §10's
+pre-existing leak and is out of scope. What D8 fixed is the register *objects*,
+which had no free path of their own; the *file* still rides the larger leak.
+
+**The clamp went too, and D6's precedent says to say so.** `Q2PtrVector`'s
+`at()` warned and clamped an out-of-range index — or a negative one, via the
+`uint` wrap — to element 0 and returned a valid pointer. `QList::operator[]`
+asserts in these builds and, under `-DQT_NO_DEBUG`, reads out of bounds
+silently. Checked the way D6 was: **`Q2PtrVector::at` warns in none of the 42
+evaluations**. At-risk sites, all latent: `registers[1]` in both DynaMo files,
+which needs `memSize` ≥ 2, and `registers[reg]` where
+`reg = getInstructionElement(n) % numberOfRegisters`, which is negative if any
+program element is — the header documents elements as 0..MAXINT.
+
+Fitness identical on all 42, both gates clean, `./check.sh` 118 pass / 4 fail.
+
+**The seven headers now include `<QList>` directly.** They had been getting it
+from `compat/q2compat.h`, and after this step none of them uses a `Q2*` type at
+all — so the commit would have left an implicit dependency on the very header
+Phase D exists to delete.
+
+**Leak byte totals are sensitive to the repo path length**, because a copy of
+`$SIGEL_ROOT` is among the leaked blocks. The figures above reproduce exactly at
+a 25-character repo root; at a longer path they shift by the difference. The
+allocation *counts* are stable.
+
 
 ### A logging system
 

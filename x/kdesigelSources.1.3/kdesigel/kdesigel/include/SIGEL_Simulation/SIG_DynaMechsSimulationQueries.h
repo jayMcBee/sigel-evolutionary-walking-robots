@@ -23,7 +23,7 @@
 #ifndef SIGEL_SIMULATION_SIG_DYNAMECHSSIMULATIONQUERIES_H
 #define SIGEL_SIMULATION_SIG_DYNAMECHSSIMULATIONQUERIES_H
 
-#include "compat/q2compat.h"
+#include <QList>
 #include "SIGEL_Simulation/SIG_DynaMechsSimulationData.h"
 #include "SIGEL_Simulation/SIG_Register.h"
 #include "SIGEL_Simulation/SIG_SimulationQueries.h"

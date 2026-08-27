@@ -23,7 +23,7 @@
 #ifndef SIGEL_SIMULATION_SIG_INTERPRETER_H
 #define SIGEL_SIMULATION_SIG_INTERPRETER_H
 
-#include "compat/q2compat.h"
+#include <QList>
 #include "SIGEL_Simulation/SIG_Interpreter.h"
 #include "SIGEL_Simulation/SIG_CommandInterface.h"
 #include "SIGEL_Simulation/SIG_SimulationQueries.h"

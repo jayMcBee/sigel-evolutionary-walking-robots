@@ -23,7 +23,7 @@
 #ifndef SIGEL_SIMULATOR_SIG_DYNAMOCOMMANDINTERFACE_H
 #define SIGEL_SIMULATOR_SIG_DYNAMOCOMMANDINTERFACE_H
 
-#include "compat/q2compat.h"
+#include <QList>
 #include "SIGEL_Simulation/SIG_DynaMoSimulationData.h"
 #include "SIGEL_Simulation/SIG_Register.h"
 #include "SIGEL_Simulation/SIG_CommandInterface.h"

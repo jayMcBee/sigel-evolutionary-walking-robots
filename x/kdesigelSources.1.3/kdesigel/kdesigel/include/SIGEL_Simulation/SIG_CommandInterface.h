@@ -23,7 +23,7 @@
 #ifndef SIGEL_SIMULATOR_SIG_COMMANDINTERFACE_H
 #define SIGEL_SIMULATOR_SIG_COMMANDINTERFACE_H
 
-#include "compat/q2compat.h"
+#include <QList>
 #include "SIGEL_Simulation/SIG_Register.h"
 
 namespace SIGEL_Simulation
