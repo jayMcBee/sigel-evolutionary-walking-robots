@@ -61,7 +61,13 @@ void MT_Substitute::changeErrorInfo(QList<double> * OutCome, QList<double> * Cor
 		AssumedFitness.resize(OutCome->size());
 	}
 
-	for (int i=0; i<CorrectFitness.size();i++)
+	// CorrectFitness only ever grows -- it is a high-water mark -- so looping
+	// to its size read past both arguments once the training set shrank, which
+	// it does whenever the user lowers the selection size. Q2Array::at clamped
+	// that to index 0; plain QList does not.
+	const int n = qMin(CorrectFitness.size(),
+	                   qMin(CorrectFit->size(), OutCome->size()));
+	for (int i=0; i<n; i++)
 	{
 		CorrectFitness[i]=(*CorrectFit)[i];
 		AssumedFitness[i]=(*OutCome)[i];

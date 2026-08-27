@@ -30,7 +30,7 @@ build and run, because nothing else can be verified without it — see §3.
 | B — ownership explicit | **8 of 14 containers**. 5 still on `setAutoDelete` — open, §7 |
 | R — build and run | core builds and runs, faithful to 1.3. **No way to check it yet** — needs fitness numbers from the 1.3 binary on the x86 box, §7 |
 | T — old-Qt tool container | **done 2026-08-27.** `tools/qtmig`, §4 |
-| D — delete the shim, migrate the data | **D1–D6 done 2026-08-27. `Q2Dict`, `Q2DictIterator` and `Q2Array` deleted** — shim 806 → 546 lines, `./check.sh` 117 pass / 5 fail / 337 warnings. Remaining: `Q2PtrVector` 68, `Q2PtrList` 61, `Q2Queue` 16, `Q2ListIterator` 14. §10 |
+| D — delete the shim, migrate the data | **D1–D6 done 2026-08-27. `Q2Dict`, `Q2DictIterator` and `Q2Array` deleted** — shim 806 → **530** lines, `./check.sh` **118 pass / 4 fail** / 341 warnings. Remaining: `Q2PtrVector` 69, `Q2PtrList` 62, `Q2CString` 21, `Q2Queue` 16, `Q2ListIterator` 14, `Q2ValueList` 12. §10 |
 | C — GUI | **not started, AUTHORIZED 2026-08-27 per D24.** ~450 Qt 2 sites + 20 forms |
 
 **SCOPE — DECIDED 2026-08-23. Read this before changing anything.**
@@ -1217,11 +1217,24 @@ No shipped robot has a duplicate name (0 across all 438 name-groups), so nothing
 in the data could have caught it.
 
 **Which is exactly why there is now a check that can.** `sigel_eval -selfcheck`
-asserts newest-wins for `SIG_LanguageParameters`, `SIG_Link::points` and
-`SIG_Robot`'s lookups, and that `removeCommand` frees the newest.
-`fitness-check.sh` runs it before the evaluations. **Verified to have teeth:**
-flipping `lookupLink` back to first-wins makes it fail while
-`dictorder-baseline.txt` and `fitness-baseline.txt` both stay empty.
+asserts newest-wins for **all eight** lookups — `SIG_LanguageParameters`,
+`SIG_Link::points` and each of `SIG_Robot`'s six — and that `removeCommand`
+frees the newest. `fitness-check.sh` runs it before the evaluations.
+
+**Verified to have teeth, one lookup at a time.** Flipping any single one back
+to first-wins makes the self-check fail, while `dictorder-baseline.txt` and
+`fitness-baseline.txt` both stay empty. The first version of this check asserted
+only `lookupLink`, leaving five of the six able to flip silently — the same hole
+it was written to close, found by review.
+
+**Two real out-of-range accesses, previously absorbed by the clamp `Q2Array`
+provided and now fixed.** Both are off the 42-evaluation path, so no gate saw
+them:
+
+| | |
+|---|---|
+| `MT_FitnessTrainer.cpp:88` | `loadSetup` sized `Result`/`ResultIst` from the stale member `TSetSize` while giving the training set the file's `NewTSetSize`. Any setup file with a larger set made `calculateFitness` **write past both arrays**. `setSelektionValue` in the same file always did it correctly |
+| `MT_Substitute.cpp:64` | `changeErrorInfo` looped to `CorrectFitness.size()`, a high-water mark that only grows, while indexing the caller's arrays — which shrink whenever the selection size is lowered. Now bounded by the smallest of the three |
 
 **The eighth container is in the gate now.** `allowedCommands` order is dumped
 alongside the other seven — 469 lines added to the baseline. Nothing *numbers*
@@ -1242,10 +1255,20 @@ on it — `SIG_Robot::clear()` depends on the property. Re-added for both.
 **Pre-existing, not ours, recorded:** the `.rrb` load path takes a
 **heap-buffer-overflow inside vendored cv97** — `JString::regionMatches`, from
 `SceneGraph::SceneGraph()` via `SIG_Body::load()`. It aborts under
-AddressSanitizer, so `.rrb` loading has no sanitized coverage at all, and
-neither gate can run against `build/` for that reason plus the known leak.
-Vendored code, out of scope for the Qt port, but it is why the ASan claims in
-D4–D6 mean "the 14 `.exp`, by hand, with leak detection off".
+AddressSanitizer, so `.rrb` loading has no sanitized coverage. Vendored code,
+out of scope for the Qt port.
+
+**But the fitness gate does run sanitized, and an earlier draft here said no
+gate could.** Measured:
+
+```
+ASAN_OPTIONS=detect_leaks=0 ./fitness-check.sh build
+```
+
+exits 0, runs the self-check, and reproduces `fitness-baseline.txt` byte for
+byte with no ASan or UBSan report. So all 42 evaluations plus the duplicate-key
+self-check have full sanitized coverage today. Only `dictorder-dump.sh` is
+blocked, and only because it also loads the 7 `.rrb`.
 
 **Formats, both pure permutations.** `.rrb` is block-structured with exactly five
 top-level kinds — `material`, `link`, `joint <subtype>`, `drive`, `sensor`, all
@@ -1277,8 +1300,9 @@ The clean-up, in this order:
 
 1. ~~Replace the emulation with straightforward containers.~~ **In progress —
    D3–D6 done.** `Q2Dict`, `Q2DictIterator` and `Q2Array` are deleted; their
-   users are plain `QList`. Left: `Q2PtrVector`, `Q2PtrList`, `Q2Queue`,
-   `Q2ListIterator`, which are the pointer containers with ownership.
+   users are plain `QList`. Left, measured 2026-08-27: `Q2PtrVector` 69,
+   `Q2PtrList` 62, `Q2CString` 21, `Q2Queue` 16, `Q2ListIterator` 14,
+   `Q2ValueList` 12. An earlier version of this list omitted the last two.
 2. ~~**Migrate the data files at the same time.**~~ **Done, D2.** Only the 7
    `.rrb` needed it — the 14 `.exp` already stored the order the simulation
    used. `Q2Dict::hash` generated that ordering and is deleted.

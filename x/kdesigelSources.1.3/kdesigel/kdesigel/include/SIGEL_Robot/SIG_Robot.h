@@ -182,38 +182,26 @@ namespace SIGEL_Robot
 
     /**
      * Returns, in order, all SIG_Body objects.
-     *
-     * to get informed about the usage of the iterator.
      */
     const QList<SIG_Body *> &getBodies (void) const;
     /**
      * Returns, in order, all SIG_Material objects.
-     *
-     * to get informed about the usage of the iterator.
      */
     const QList<SIG_Material *> &getMaterials (void) const;
     /**
      * Returns, in order, all SIG_Link objects.
-     *
-     * to get informed about the usage of the iterator.
      */
     const QList<SIG_Link *> &getLinks (void) const;
     /**
      * Returns, in order, all SIG_Joint objects.
-     *
-     * to get informed about the usage of the iterator.
      */
     const QList<SIG_Joint *> &getJoints (void) const;
     /**
      * Returns, in order, all SIG_Drive objects.
-     *
-     * to get informed about the usage of the iterator.
      */
     const QList<SIG_Drive *> &getDrives (void) const;
     /**
      * Returns, in order, all SIG_Sensor objects.
-     *
-     * to get informed about the usage of the iterator.
      */
     const QList<SIG_Sensor *> &getSensors (void) const;
     /**

@@ -4,7 +4,7 @@
 // Qt 2.3 -> Qt 6 compatibility shim.  PORTING.md D1(a), step A0.
 //
 // Reproduces Qt 2.3 container semantics on top of Qt 6 so that steps A1-A9 are
-// pure renames and every ownership decision defers to Phase B, which deletes
+// pure renames and every ownership decision defers to Phase B. Phase D deletes
 // this file.
 //
 //   QCString    -> Q2CString        QQueue      -> Q2Queue
@@ -17,33 +17,21 @@
 // Every semantic below was read out of the vendored Qt 2.3 sources under
 // x/supportingLibs/supportingLibs/qt/src/tools/ rather than recalled.
 //
-// DELIBERATE DIVERGENCES FROM Qt 2 -- all four are decisions, see PORTING.md section 9:
+// DELIBERATE DIVERGENCES FROM Qt 2 -- see PORTING.md section 9:
 //
-//  1. sort() is numeric, not memcmp byte order.  Qt 2's QGArray is a type-erased
-//     byte buffer whose sort cannot know it holds int (qgarray.cpp:635-640; the
-//     Qt source itself notes "Qt 3.0: Add a virtual compareItems()").  Q2Array<T>
-//     is typed, so std::sort with operator< removes the cause.  Affects
-//     SIG_GPManager.cpp:304,311 and SIG_AllIndividualsView.cpp:240, all of
-//     which need ascending numeric order and silently break once any element
-//     reaches 256.
-//  2. Out-of-range indexing warns and clamps to index 0, as Qt 2's QGArray::at
+//  1. Out-of-range indexing warns and clamps to index 0, as Qt 2's QGArray::at
 //     did (qgarray.h:108-117). Qt 2's QGVector::at only warned and then read out
 //     of range anyway (qgvector.h:85-92); clamping is used for both. This is
-//     done in the shim rather than left to Q_ASSERT, which compiles to nothing
-//     under QT_NO_DEBUG and would make a release build corrupt memory silently
-//     where 2003 merely returned a wrong value. Call sites are still being
-//     fixed; the clamp is a floor, not a licence. Three cases, deliberately
-//     different: clamp to 0 (non-empty Q2Array), abort (empty Q2Array -- Qt 2
-//     crashed there too), null (empty Q2PtrVector, where null is a normal slot).
-//  3. resize() value-initialises new elements where Qt 2 left raw memory, and
-//     so does the sized constructor Q2Array(int) (qgarray.cpp:110-127).
-//  One Qt 2 quirk is deliberately NOT reproduced, because no SIGEL code can
-//  reach them and both are defects rather than behaviour:
-//    - Copying a Qt 2 QDict re-inserts every item into a prepending table, so
-//      it REVERSES every colliding chain -- distinct keys sharing a bucket come
-//      out in the opposite order, not just same-key runs. Unreachable here: no
-//      Q2Dict is copy-constructed or assigned anywhere. SIG_Robot's copy ctor
-//      round-trips through its own serialise/deserialise, not through the dict.
+//     done here rather than left to Q_ASSERT, which compiles to nothing under
+//     QT_NO_DEBUG and would make a release build corrupt memory silently where
+//     2003 merely returned a wrong value. Two cases: clamp to 0, or null for an
+//     empty Q2PtrVector, where null is a normal slot.
+//
+//  The numeric-sort and resize()/Q2Array(int) divergences were about Q2Array,
+//  deleted in Phase D. Its two sort callers are now std::sort directly;
+//  SIG_AllIndividualsView.cpp:240 still uses a raw Qt 2 QArray and will fail
+//  loudly in Phase C. The Q2Dict copy divergence went with Q2Dict.
+//
 //  Q2ValueList::contains DOES reproduce Qt 2, returning an occurrence count
 //  rather than Qt 6's bool (qvaluelist.h:260-268). An earlier version of this
 //  note claimed the opposite.
@@ -79,9 +67,7 @@
 #include <QDebug>
 #include <QHashSeed>
 #include <QList>
-#include <QPair>
 #include <QString>
-#include <algorithm>
 #include <list>
 
 // ---------------------------------------------------------------------------
@@ -142,7 +128,7 @@ public:
     uint size() const { return uint(v.size()); }
 
     // ponytail: O(n) scan rather than a maintained counter -- cannot fall out of
-    // sync, and this class dies in Phase B.  Two hot spots if that ever matters:
+    // sync, and this class dies in Phase D.  Two hot spots if that ever matters:
     // SIG_Geometry.cpp:49,53 use it as a re-evaluated loop bound, making model
     // load O(n^2) over VRML meshes.
     uint count() const

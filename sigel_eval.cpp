@@ -28,6 +28,8 @@
 #include "SIGEL_Robot/SIG_LanguageParameters.h"
 #include "SIGEL_RobotIO/SIG_RobotBuilder.h"
 #include "SIGEL_Robot/SIG_Body.h"
+#include "SIGEL_Robot/SIG_ContactSensor.h"
+#include "SIGEL_Robot/SIG_GlueJoint.h"
 #include "SIGEL_Robot/SIG_Drive.h"
 #include "SIGEL_Robot/SIG_Link.h"
 #include "SIGEL_Robot/SIG_Material.h"
@@ -130,13 +132,34 @@ static int selfcheck()
     link.addPoint("P", DL_vector(2, 0, 0));
     SIG_WANT(link.getPoint("P").x == 2);
   }
-  {   // SIG_Robot's six lookups, checked through one of them.
+  {   // All six of SIG_Robot's lookups. Checking only one left the other five
+      // able to flip back to oldest-wins with every check silent -- which is
+      // precisely the hole this whole self-check exists to close.
     SIGEL_Robot::SIG_Robot robot;
-    SIGEL_Robot::SIG_Link *a = new SIGEL_Robot::SIG_Link(&robot, "SAME", 0);
-    SIGEL_Robot::SIG_Link *b = new SIGEL_Robot::SIG_Link(&robot, "SAME", 1);
-    robot.addLink(a);
-    robot.addLink(b);
-    SIG_WANT(robot.lookupLink("SAME") == b);
+    SIGEL_Robot::SIG_Body     *b1 = new SIGEL_Robot::SIG_Body(&robot, "S", "d");
+    SIGEL_Robot::SIG_Body     *b2 = new SIGEL_Robot::SIG_Body(&robot, "S", "d");
+    SIGEL_Robot::SIG_Material *m1 = new SIGEL_Robot::SIG_Material(&robot, "S");
+    SIGEL_Robot::SIG_Material *m2 = new SIGEL_Robot::SIG_Material(&robot, "S");
+    SIGEL_Robot::SIG_Link     *l1 = new SIGEL_Robot::SIG_Link(&robot, "S", 0);
+    SIGEL_Robot::SIG_Link     *l2 = new SIGEL_Robot::SIG_Link(&robot, "S", 1);
+    SIGEL_Robot::SIG_Joint    *j1 = new SIGEL_Robot::SIG_GlueJoint(&robot, "S", 0);
+    SIGEL_Robot::SIG_Joint    *j2 = new SIGEL_Robot::SIG_GlueJoint(&robot, "S", 1);
+    SIGEL_Robot::SIG_Drive    *d1 = new SIGEL_Robot::SIG_Drive(&robot, "S", 0);
+    SIGEL_Robot::SIG_Drive    *d2 = new SIGEL_Robot::SIG_Drive(&robot, "S", 1);
+    SIGEL_Robot::SIG_Sensor   *s1 = new SIGEL_Robot::SIG_ContactSensor(&robot, "S", 0);
+    SIGEL_Robot::SIG_Sensor   *s2 = new SIGEL_Robot::SIG_ContactSensor(&robot, "S", 1);
+    robot.addBody(b1);     robot.addBody(b2);
+    robot.addMaterial(m1); robot.addMaterial(m2);
+    robot.addLink(l1);     robot.addLink(l2);
+    robot.addJoint(j1);    robot.addJoint(j2);
+    robot.addDrive(d1);    robot.addDrive(d2);
+    robot.addSensor(s1);   robot.addSensor(s2);
+    SIG_WANT(robot.lookupBody("S")     == b2);
+    SIG_WANT(robot.lookupMaterial("S") == m2);
+    SIG_WANT(robot.lookupLink("S")     == l2);
+    SIG_WANT(robot.lookupJoint("S")    == j2);
+    SIG_WANT(robot.lookupDrive("S")    == d2);
+    SIG_WANT(robot.lookupSensor("S")   == s2);
     SIG_WANT(robot.lookupLink("MISSING") == 0);
   }
 #undef SIG_WANT

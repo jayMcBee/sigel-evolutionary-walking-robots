@@ -84,7 +84,7 @@ int main()
     }
 
 
-    // --- divergence 1 -- numeric sort, not memcmp byte order ----------------
+    // --- Q2PtrVector clamps, Q2PtrList assignment keeps the destination flag, not memcmp byte order ----------------
 
 
     // --- behaviours corrected after review; previously untested -------------
@@ -286,6 +286,20 @@ int main()
         assert(l.count() == 0 && v.count() == 0);
     }
     assert(Thing::live == 0);
+
+    {   // Both went out with D6 because their blocks happened to contain one
+        // Q2Array line. Both types are still live and both properties are
+        // still relied on, so they are back.
+        Thing t(1);
+        Q2PtrVector<Thing> v(2); v.insert(0, &t);
+        assert(v.at(99) == &t);          // clamps to 0 and warns, as QGArray did
+        Q2PtrVector<Thing> ve;
+        assert(ve.at(0) == nullptr);     // empty: nothing to clamp to
+        Q2PtrList<Thing> a; a.setAutoDelete(true);
+        Q2PtrList<Thing> b;              // b does NOT own
+        b = a;
+        assert(b.autoDelete() == false); // assignment keeps the DESTINATION's flag
+    }
 
     std::printf("q2compat self-check: all assertions passed\n");
     return 0;
