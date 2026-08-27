@@ -87,11 +87,11 @@ namespace SIGEL_Simulation
 
       Q2PtrVector< SIG_DynaMechsLink > dynaMechsLinks;
 
-      Q2Array< int > jointIndices;
+      QList< int > jointIndices;
 
       Q2PtrVector< SIGEL_Robot::SIG_Drive > drives;
 
-      Q2Array< double > driveForcesTimeAccounts;
+      QList< double > driveForcesTimeAccounts;
 
       Q2PtrVector< SIGEL_Robot::SIG_Sensor > sensors;
 

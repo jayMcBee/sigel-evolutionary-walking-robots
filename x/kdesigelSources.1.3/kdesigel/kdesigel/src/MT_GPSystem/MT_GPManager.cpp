@@ -318,8 +318,8 @@ void MT_GPManager::writeToFileGPSystem(QTextStream &File)
 			}break;
 	}
 
-	Q2Array<double> * Outcome =FitnessTrainer->getResultIstArray();
-	Q2Array<double> * CorrectFit =FitnessTrainer->getResultArray();
+	QList<double> * Outcome =FitnessTrainer->getResultIstArray();
+	QList<double> * CorrectFit =FitnessTrainer->getResultArray();
 	int NumOfPositivSigelFit =0; 
 	int FitArrayLEnght = Outcome->count();
 
@@ -611,8 +611,8 @@ void MT_GPManager::exchangeBest()
 	{
 		bool ChangeNecessary = false;
 
-		Q2Array<double> * Outcome =FitnessTrainer->getResultIstArray();
-		Q2Array<double> * CorrectFit =FitnessTrainer->getResultArray();
+		QList<double> * Outcome =FitnessTrainer->getResultIstArray();
+		QList<double> * CorrectFit =FitnessTrainer->getResultArray();
 		int PresentTSize = FitnessTrainer->getPresentTSize();
 
 		

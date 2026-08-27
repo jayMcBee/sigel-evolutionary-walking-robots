@@ -43,8 +43,8 @@ private:
 	* the both Resultarray contain: (Fitness of the first SigelProgram) -(Fitness of the second SigelProgram)
 	* so if the value negative the second SigelProgram is the tournament winner, else the fist Program ...   
 	*/
-	Q2Array<double> Result;
-	Q2Array<double> ResultIst;
+	QList<double> Result;
+	QList<double> ResultIst;
 
 	/* the Tset contain the T-cases*/
 	MT_Trainingset * TSet;
@@ -68,8 +68,8 @@ public:
 	* the Substituter needed the both ResultArrys 
 	*/
 	int getPresentTSize();
-	Q2Array<double> * getResultArray();
-	Q2Array<double> * getResultIstArray();
+	QList<double> * getResultArray();
+	QList<double> * getResultIstArray();
 
 	int getTDuration();
 

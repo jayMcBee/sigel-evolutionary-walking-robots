@@ -51,7 +51,7 @@ public:
 	* Array[4] indicate the Number of total Crossover with three X Point; 
 	* Array[5] indicate the Number of successful Crossover with three X Point;
 	*/
-	Q2Array<int> CrossoverEventParent;  
+	QList<int> CrossoverEventParent;  
 
 	int NumOfTotalElementMutation;
 	int NumOfMutateOffspring;

@@ -326,7 +326,7 @@ namespace SIGEL_GP
    */
 
   private:
-  Q2Array< int > instructionProb;
+  QList< int > instructionProb;
 
   private:
   QString fitnessName;
@@ -883,7 +883,7 @@ namespace SIGEL_GP
   int  getProbability( SIGEL_Program::Robotinstruction instruction );
 
   public:
-  Q2Array< int > &getInstructionProbabilities();
+  QList< int > &getInstructionProbabilities();
 
   public:
   int getTimeOutMinutes();

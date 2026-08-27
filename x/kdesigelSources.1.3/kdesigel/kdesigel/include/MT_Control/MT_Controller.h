@@ -64,8 +64,8 @@ private:
 	MT_Substitute *substitution;
 	SIGEL_GP::SIG_GPExperiment &sigExp;
 	QObject *sigMainWindow;
-	Q2Array<unsigned int> correctEst;
-	Q2Array<unsigned int> metaEst;
+	QList<unsigned int> correctEst;
+	QList<unsigned int> metaEst;
 
 #ifdef _WINDOWS
 	HANDLE meta_thread;

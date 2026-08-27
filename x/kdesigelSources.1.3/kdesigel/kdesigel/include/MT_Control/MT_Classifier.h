@@ -63,7 +63,7 @@ private:
 	// ToursWBestIndi[tours.size-1] == 1 is set anyway, so that the last tournament is not run with the
 	// classifier but normally by exact fitness. This serves as calibration.
 	//
-	int evalNeededTours(Q2PtrVector<SIGEL_GP::SIG_GPTournament> *  tours, Q2Array<int> * ToursWBestIndi, int PosBest);
+	int evalNeededTours(Q2PtrVector<SIGEL_GP::SIG_GPTournament> *  tours, QList<int> * ToursWBestIndi, int PosBest);
 };
 
 #endif // !defined(AFX_MT_CLASSIFIER_H__22632809_B47E_418D_8C86_EDE8B998506D__INCLUDED_)

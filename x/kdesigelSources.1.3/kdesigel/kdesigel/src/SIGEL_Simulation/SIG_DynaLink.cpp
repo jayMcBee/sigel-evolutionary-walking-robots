@@ -142,7 +142,7 @@ void SIGEL_Simulation::SIG_DynaLink::updateDynaCompanion(DL_dyna* d)
   nextPosition.tovector(&pos2);
   dtSelectObject(this);
   dtLoadIdentity();
-  Q2Array<double> rotmat(16);
+  QList<double> rotmat(16);
   for (int j=0; j<3; j++)
     rotmat[ (j * 4) + 3 ] = 0;
     rotmat[ 15 ] = 1; 

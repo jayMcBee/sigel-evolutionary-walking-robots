@@ -30,7 +30,7 @@ build and run, because nothing else can be verified without it — see §3.
 | B — ownership explicit | **8 of 14 containers**. 5 still on `setAutoDelete` — open, §7 |
 | R — build and run | core builds and runs, faithful to 1.3. **No way to check it yet** — needs fitness numbers from the 1.3 binary on the x86 box, §7 |
 | T — old-Qt tool container | **done 2026-08-27.** `tools/qtmig`, §4 |
-| D — delete the shim, migrate the data | **D1–D5 done 2026-08-27. `Q2Dict` and `Q2DictIterator` are deleted** — shim 806 → 609 lines. Remaining: `Q2Array` 180, `Q2PtrVector` 68, `Q2PtrList` 61, `Q2Queue` 16, `Q2ListIterator` 14, then the header goes. §10 |
+| D — delete the shim, migrate the data | **D1–D6 done 2026-08-27. `Q2Dict`, `Q2DictIterator` and `Q2Array` deleted** — shim 806 → 546 lines, `./check.sh` 117 pass / 5 fail / 337 warnings. Remaining: `Q2PtrVector` 68, `Q2PtrList` 61, `Q2Queue` 16, `Q2ListIterator` 14. §10 |
 | C — GUI | **not started, AUTHORIZED 2026-08-27 per D24.** ~450 Qt 2 sites + 20 forms |
 
 **SCOPE — DECIDED 2026-08-23. Read this before changing anything.**
@@ -1180,6 +1180,31 @@ is the semantic that broke in D3 and was caught by the shim's self-check.
 
 `Q2Dict` and `Q2DictIterator` are deleted from `q2compat.h`, and the 15 test
 blocks that exercised them are deleted from the self-check, which still passes.
+
+### D6 — `Q2Array` is gone, all 180 sites are plain `QList`
+
+It was a value array over `QList` the whole time, so 40 files renamed and only
+**two** compile errors came out — both the one real divergence: Qt 2 handed out
+a **writable** `T &` from a *const* array, so `MT_Classifier.cpp:617,648` assign
+through `at()`. `QList::at()` is const; those two are now `(*p)[i]`.
+
+Two behaviours went with the type:
+
+| | |
+|---|---|
+| `sort()` was numeric, per D13 | `std::sort` at `SIG_GPManager.cpp:304,311`, the only two callers |
+| `at()` **clamped** an out-of-range index instead of failing | dropped |
+
+Dropping the clamp is safe here and was checked rather than assumed. Both
+defects §9 lists it as masking are already fixed —
+`SIG_ProgramLine.cpp:215` drops the out-of-range write, `SIG_DynaSystem.cpp:266`
+deletes the right vector. And the clamp **fired in none of the 42 evaluations**;
+`Q2Array::at: index … out of range` appears nowhere in their output.
+
+The residual risk is stated plainly: an out-of-range index is now undefined
+rather than silently wrong, which AddressSanitizer catches in `build/` but a
+release build would not. Nothing in the evaluation path reaches it. The
+evolution loop cannot be exercised until PVM builds.
 
 **Formats, both pure permutations.** `.rrb` is block-structured with exactly five
 top-level kinds — `material`, `link`, `joint <subtype>`, `drive`, `sensor`, all

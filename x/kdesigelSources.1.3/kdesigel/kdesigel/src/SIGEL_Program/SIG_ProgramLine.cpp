@@ -55,7 +55,7 @@ void SIGEL_Program::SIG_ProgramLine::clearLine()
 
 SIGEL_Program::SIG_ProgramLine::SIG_ProgramLine(SIGEL_Tools::SIG_Randomizer &r, 
 					        SIGEL_Robot::SIG_LanguageParameters &languageP,
-						Q2Array< int > &prob )
+						QList< int > &prob )
 {
    generateRandomRobotInstruction(languageP, r, prob );
 }
@@ -185,7 +185,7 @@ int SIGEL_Program::SIG_ProgramLine::getInstructionElement( int no )
     }  
 }
 
-Q2Array< int > SIGEL_Program::SIG_ProgramLine::getElementsArray()
+QList< int > SIGEL_Program::SIG_ProgramLine::getElementsArray()
 {
      return element;
 }
@@ -681,9 +681,9 @@ void  SIGEL_Program::SIG_ProgramLine::writeToFile(QTextStream &file)
 
 void SIGEL_Program::SIG_ProgramLine::randomRobotinstruction(SIGEL_Robot::SIG_LanguageParameters &languageP,
 							    SIGEL_Tools::SIG_Randomizer &r,
-							    Q2Array< int > &prob   )
+							    QList< int > &prob   )
 {
-     // Q2Array<int> instr;
+     // QList<int> instr;
 
      int          maximum = 32000; 
      int          op1 = 0, 
@@ -694,7 +694,7 @@ void SIGEL_Program::SIG_ProgramLine::randomRobotinstruction(SIGEL_Robot::SIG_Lan
                   randomValue = 0,
                   accuValue = 0;
      bool         cont = true;
-     Q2Array<bool> hasCommand;
+     QList<bool> hasCommand;
 
      hasCommand.resize( 15 );
      hasCommand.fill( false );
@@ -873,7 +873,7 @@ void SIGEL_Program::SIG_ProgramLine::randomRobotinstruction(SIGEL_Robot::SIG_Lan
 
 void SIGEL_Program::SIG_ProgramLine::generateRandomRobotInstruction(SIGEL_Robot::SIG_LanguageParameters &languageP,
 								    SIGEL_Tools::SIG_Randomizer &r,
-								    Q2Array< int > &prob   )
+								    QList< int > &prob   )
 {
      randomRobotinstruction(languageP, r, prob);
 }

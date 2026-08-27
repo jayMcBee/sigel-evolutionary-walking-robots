@@ -190,7 +190,7 @@ bool MT_Evaluator::evaluationTactic()
 				int NumOfWorseError = CorrectFitness.size()/10;
 				double PresentError =0.0;
 				int PosOfSmallestError =0;
-				Q2Array<double> WorseError;
+				QList<double> WorseError;
 				WorseError.resize(NumOfWorseError);
 				// 2003 zero-filled to CorrectFitness.size() into an array that holds
 				// only NumOfWorseError entries -- every iteration past the tenth

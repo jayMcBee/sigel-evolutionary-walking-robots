@@ -22,14 +22,14 @@ public:
 	* @pre: the fitness of the tournament member must be estimated beforehand
 	* @post: in the WinnerLoser array indicat a one a Winner and a zero a Loser 
 	*/
-	void fitnessProp(MT_Randomizer* Randi, Q2Array<int> * WinnerLoser);
+	void fitnessProp(MT_Randomizer* Randi, QList<int> * WinnerLoser);
 	
 	/* realization of a ranking selection
 	* @pre: the tournament member must be inside the tournament
 	* @pre: the fitness of the tournament member must be estimated beforehand.   
 	* @post: in the WinnerLoser array indicat a one a Winner and a zero a Loser 
 	*/
-	void ranking(Q2Array<int> * WinnerLoser);
+	void ranking(QList<int> * WinnerLoser);
 
 	void setTypOfIndividual(int Typ);
 
@@ -48,7 +48,7 @@ private:
 	int TypOfIndividual;
 
 	/*  denote which players have gain the present tournaments and which are the loser*/
-	Q2Array<int> * WinnerLoser;
+	QList<int> * WinnerLoser;
 };
 
 #endif // !defined(AFX_MT_TOURNAMENT_H__0A623C55_DEBF_45AE_8F39_4F5AC54F0E85__INCLUDED_)

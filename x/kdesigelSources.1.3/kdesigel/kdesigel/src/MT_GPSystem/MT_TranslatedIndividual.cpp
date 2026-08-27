@@ -30,7 +30,7 @@ MT_TranslatedIndividual::~MT_TranslatedIndividual()
 		
 }
 
-MT_TranslatedIndividual::MT_TranslatedIndividual(Q2Array<int> *T_Instruk, Q2Array<int> *T_OperOne, Q2Array<int> *T_OperTwo, Q2Array<int> *MData )
+MT_TranslatedIndividual::MT_TranslatedIndividual(QList<int> *T_Instruk, QList<int> *T_OperOne, QList<int> *T_OperTwo, QList<int> *MData )
 {
 
 	T_Instruktion= T_Instruk;
@@ -55,10 +55,10 @@ MT_TranslatedIndividual::MT_TranslatedIndividual(QTextStream &File)
 		T_length = (File.readLine()).toInt();
 		Boundary = (File.readLine()).toInt();
 
-		T_Instruktion = new Q2Array<int>;
-		T_Operand1 = new Q2Array<int>;
-		T_Operand2 = new Q2Array<int>;
-		MetaData = new Q2Array<int>;
+		T_Instruktion = new QList<int>;
+		T_Operand1 = new QList<int>;
+		T_Operand2 = new QList<int>;
+		MetaData = new QList<int>;
 
 		if (Boundary <= 0)
 			MetaData->resize(16);

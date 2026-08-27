@@ -322,7 +322,7 @@ int SIGEL_GP::SIG_GPFitnessTrainer::spawnTask(SIGEL_GP::SIG_GPIndividual const& 
   };
 
   if (!success) {
-      Q2Array<int> *toSpawn = new Q2Array<int>(2);
+      QList<int> *toSpawn = new QList<int>(2);
       (*toSpawn)[0] = actId;
       (*toSpawn)[1] = ind.getPoolPos();
       toSpawnList.append( toSpawn );
@@ -367,7 +367,7 @@ double SIGEL_GP::SIG_GPFitnessTrainer::checkTask(int taskId)
 
 		  		pvm_kill( pvmTask->pvmTaskId );
 		  		pvmTask->host.noOfSlaves--;
-		  		Q2Array<int> *toSpawn = new Q2Array<int>(2);
+		  		QList<int> *toSpawn = new QList<int>(2);
 		  		(*toSpawn)[0] = taskId;
 		  		(*toSpawn)[1] = pvmTask->indPosition;
 
@@ -407,8 +407,8 @@ void SIGEL_GP::SIG_GPFitnessTrainer::stopTrainersSlaves()
 
 void SIGEL_GP::SIG_GPFitnessTrainer::sweepToSpawn()
 {
-  Q2Array< int > *actJob = toSpawnList.first();
-  Q2Array< int > *prevJob = 0;
+  QList< int > *actJob = toSpawnList.first();
+  QList< int > *prevJob = 0;
 
 #ifdef SIG_DEBUG
   SIGEL_Tools::SIG_IO::cerr << "Sweeping to spawn!\n";

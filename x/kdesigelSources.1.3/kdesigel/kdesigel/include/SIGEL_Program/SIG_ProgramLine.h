@@ -98,7 +98,7 @@ class SIG_ProgramLine
  */
 
    protected:
-   Q2Array< int > element;
+   QList< int > element;
    
 
 /**
@@ -118,7 +118,7 @@ class SIG_ProgramLine
    public:
    SIG_ProgramLine( SIGEL_Tools::SIG_Randomizer &r, 
 		    SIGEL_Robot::SIG_LanguageParameters &languageP,
-		    Q2Array< int > &prob );
+		    QList< int > &prob );
  
 /**
  * An empty destructor.
@@ -138,7 +138,7 @@ class SIG_ProgramLine
    public:
    void generateRandomRobotInstruction( SIGEL_Robot::SIG_LanguageParameters &languageP,
 				        SIGEL_Tools::SIG_Randomizer &r,
-                                        Q2Array< int > &prob  );
+                                        QList< int > &prob  );
           
 /**
  * This function deletes the data of a program line completely.
@@ -170,7 +170,7 @@ class SIG_ProgramLine
    public:
    void randomRobotinstruction( SIGEL_Robot::SIG_LanguageParameters &languageP,
 			        SIGEL_Tools::SIG_Randomizer &r,
-			        Q2Array< int > &prob );
+			        QList< int > &prob );
 /**
  * This function is only for test purposes and prints a program line.
  */
@@ -243,7 +243,7 @@ class SIG_ProgramLine
  */
 
    public:
-   Q2Array< int > getElementsArray();
+   QList< int > getElementsArray();
 
 
 /**

@@ -275,7 +275,7 @@ void SIGEL_Program::SIG_Program::checkLength( long minimumLength,
 					      long maximumLength, 
 					      SIGEL_Tools::SIG_Randomizer &r, 
 					      SIGEL_Robot::SIG_LanguageParameters &languageP,
-					      Q2Array< int > &prob,
+					      QList< int > &prob,
 					      int &historyInfo )
 {
   long prgLength = getProgramLength();

@@ -155,7 +155,7 @@ void MT_TournamentManager::performTournaments()
 		Tournaments[i]->setFreePos(0);
 	
 	// fetch a correct partition for separate the offspring into tournaments
-	Q2Array<int>	*Partition = Randi->getRandomTournamentPartition(TournamentNumber);
+	QList<int>	*Partition = Randi->getRandomTournamentPartition(TournamentNumber);
 
 //int DebugInfo =0;
 //for (int g=0; g < OffspringSize;g++)

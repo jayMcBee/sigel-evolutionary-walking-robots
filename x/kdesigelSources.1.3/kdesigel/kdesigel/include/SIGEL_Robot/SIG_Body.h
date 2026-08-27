@@ -91,7 +91,7 @@ namespace SIGEL_Robot
                  *
                  * @param rotation The rotation given in VRML notation.
                  */
-                NEWMAT::Matrix createRotationMatrix( Q2Array< float > rotation );
+                NEWMAT::Matrix createRotationMatrix( QList< float > rotation );
                 
                 /**
                  * Help method to traverse the VRML scene graph.

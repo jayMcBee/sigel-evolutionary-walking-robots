@@ -293,12 +293,12 @@ int MT_FitnessTrainer::getPresentTSize()
 	return PresentTSize;
 }
 
-Q2Array<double> * MT_FitnessTrainer::getResultIstArray()
+QList<double> * MT_FitnessTrainer::getResultIstArray()
 {
 	return &ResultIst;
 }
 
-Q2Array<double> * MT_FitnessTrainer::getResultArray()
+QList<double> * MT_FitnessTrainer::getResultArray()
 {
 	return &Result;
 }

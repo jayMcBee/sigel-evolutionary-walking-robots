@@ -20,6 +20,7 @@
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
+#include <algorithm>   // std::sort -- QList::sort was numeric (D13)
 #include "compat/q2compat.h"
 #include "SIGEL_GP/SIG_GPManager.h"
 
@@ -239,7 +240,7 @@ void SIGEL_GP::SIG_GPManager::createTours(int quantity) {
   tours.resize(quantity);
 
   for(int i=0;i<quantity;i++) {
-    Q2Array< int > poolPositions( 2 );
+    QList< int > poolPositions( 2 );
 
     poolPositions[0] = randomizer.getRandomInt( pop.getSize() );
     poolPositions[1] = randomizer.getRandomInt( pop.getSize() - 1 );
@@ -301,14 +302,14 @@ void SIGEL_GP::SIG_GPManager::createTours(int quantity) {
     else {
       int newPoolPos = randomizer.getRandomInt( pop.getSize() - 2 );
 
-      poolPositions.sort();
+      std::sort( poolPositions.begin(), poolPositions.end() );
 
       newPoolPos = (newPoolPos >= poolPositions[0]) ? newPoolPos + 1 : newPoolPos;
       newPoolPos = (newPoolPos >= poolPositions[1]) ? newPoolPos + 1 : newPoolPos;
 
       poolPositions.resize( 3 );
       poolPositions[2] = newPoolPos;
-      poolPositions.sort();
+      std::sort( poolPositions.begin(), poolPositions.end() );
 
       newPoolPos = randomizer.getRandomInt( pop.getSize() - 3 );
 
@@ -353,7 +354,7 @@ void SIGEL_GP::SIG_GPManager::evalNewIndis() {
   SIGEL_Tools::SIG_IO::cerr << "SIG_GPManager evaluates new Individuals.\n";
 #endif
 
-  Q2PtrList< Q2Array<int> > fitTaskList;
+  Q2PtrList< QList<int> > fitTaskList;
   fitTaskList.setAutoDelete( true );
 
   //The experiment's population
@@ -389,7 +390,7 @@ void SIGEL_GP::SIG_GPManager::evalNewIndis() {
         << " hasn't an actual fitness value and will be evaluated.\n";
 #endif
 
-      Q2Array<int> *actFitTask = new Q2Array<int>(2);
+      QList<int> *actFitTask = new QList<int>(2);
       (*actFitTask)[0] = trainer->spawnTask(actInd);
       (*actFitTask)[1] = actInd.getPoolPos();
 
@@ -411,8 +412,8 @@ void SIGEL_GP::SIG_GPManager::evalNewIndis() {
     haveABreak();
 
     trainer->sweepToSpawn();
-    Q2Array<int> *actFitTask = fitTaskList.first();
-    Q2Array<int> *prevFitTask = 0;
+    QList<int> *actFitTask = fitTaskList.first();
+    QList<int> *prevFitTask = 0;
 
     while (actFitTask) {
       double actFitness = trainer->checkTask( (*actFitTask)[0] );
@@ -465,7 +466,7 @@ void SIGEL_GP::SIG_GPManager::calcInitTourSet() {
     // The experiment's population
     SIG_GPPopulation &pop=getActExperiment().population;
 
-    Q2Array<int> lastAccesses( pop.getSize() );
+    QList<int> lastAccesses( pop.getSize() );
 
     for (int l=0; l < pop.getSize(); l++)
       lastAccesses[l] = -1;
@@ -799,7 +800,7 @@ void SIGEL_GP::SIG_GPManager::RegisterDynPVMClients( void ) {
 
   fd_set mySet;
   struct sockaddr_in  sad, caddr;
-  Q2Array<int> clientSockets(0);
+  QList<int> clientSockets(0);
   //struct hostent *ptrh;
   struct protoent *ptrp;
   int i;
@@ -1430,7 +1431,7 @@ void SIGEL_GP::SIG_GPManager::evolutionLoop(MT_Classifier *MetaClassifier)
 
 void SIGEL_GP::SIG_GPManager::evalNeededIndis()
 {
-  Q2PtrList< Q2Array<int> > fitTaskList;
+  Q2PtrList< QList<int> > fitTaskList;
   fitTaskList.setAutoDelete( true );
 
   //The experiment's population
@@ -1441,7 +1442,7 @@ void SIGEL_GP::SIG_GPManager::evalNeededIndis()
 
 
 // ********************* META change
-	Q2Array<int> ToursParticipant;
+	QList<int> ToursParticipant;
 	ToursParticipant.resize(poolSize); // Position i = number of tournaments individual i takes part in
 	for(int l=0; l<poolSize;l++)
 		ToursParticipant[l]=0;
@@ -1484,7 +1485,7 @@ int DebugInfo =0;
 // ********************* META change - only if the individual appears in the tournament schedule
 	  if((!upToDate)&&(ToursParticipant[i]!=0))
 		{
-		  Q2Array<int> *actFitTask = new Q2Array<int>(2);
+		  QList<int> *actFitTask = new QList<int>(2);
 		  (*actFitTask)[0] = trainer->spawnTask(actInd);
 		  (*actFitTask)[1] = actInd.getPoolPos();
 
@@ -1503,8 +1504,8 @@ int DebugInfo =0;
 	haveABreak();
 
 	trainer->sweepToSpawn();
-	Q2Array<int> *actFitTask = fitTaskList.first();
-	Q2Array<int> *prevFitTask = 0;
+	QList<int> *actFitTask = fitTaskList.first();
+	QList<int> *prevFitTask = 0;
 
 	while (actFitTask)
 	  {

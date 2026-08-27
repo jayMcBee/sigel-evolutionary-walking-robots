@@ -102,75 +102,12 @@ struct Q2DeterministicHashSeed {
 };
 const Q2DeterministicHashSeed q2DeterministicHashSeedInit;
 }
-
-// ---------------------------------------------------------------------------
-// Q2Array<T>  <- Qt 2 QArray<T> (QMemArray): value array.
-// qarray.h: size() == count() == element count.
-// ---------------------------------------------------------------------------
-template <class T>
-class Q2Array
-{
-public:
-    typedef T *Iterator;
-    typedef const T *ConstIterator;
-    typedef T ValueType;
-
-    Q2Array() {}
-    explicit Q2Array(int size) { if (size > 0) m.resize(size); }  // Qt 2 clamps <0 to 0
-
-    uint size() const { return uint(m.size()); }
-    uint count() const { return uint(m.size()); }
-    bool isEmpty() const { return m.isEmpty(); }
-    bool isNull() const { return m.isEmpty(); }
-
-    bool resize(uint size) { m.resize(qsizetype(size)); return true; }      // divergence 3
-    bool truncate(uint pos) { m.resize(qsizetype(pos)); return true; }
-
-    bool fill(const T &d, int size = -1)
-    {
-        if (size >= 0)
-            m.resize(qsizetype(size));
-        m.fill(d);
-        return true;
-    }
-
-    void clear() { m.clear(); }
-    void detach() { m.detach(); }
-    Q2Array<T> copy() const { Q2Array<T> t; t.m = m; t.m.detach(); return t; }
-
-    // Qt 2 hands out a non-const T& from a const array (qarray.h:96-99).
-    // Preserved so A-step renames stay pure.  See divergence 4 on sharing.
-    // qgarray.h:108-117 -- Qt 2 warns and CLAMPS the index to 0 rather than
-    // failing. Reproduced here rather than left to Q_ASSERT, which compiles to
-    // nothing under QT_NO_DEBUG and would give silent corruption in a release
-    // build. An EMPTY array has no element 0 to clamp to: Qt 2 dereferenced a
-    // null pointer there, i.e. it crashed, so this aborts rather than inventing
-    // a shared dummy object.
-    T &at(uint i) const
-    {
-        Q2Array<T> *self = const_cast<Q2Array<T> *>(this);
-        if (qsizetype(i) < self->m.size())
-            return self->m[qsizetype(i)];
-        qWarning("Q2Array::at: index %u out of range (size %lld)",
-                 i, static_cast<long long>(self->m.size()));
-        if (self->m.isEmpty())
-            qFatal("Q2Array::at: index %u on an empty array", i);
-        return self->m[0];
-    }
-    T &operator[](int i) const { return at(uint(i)); }
-    T *data() const { return const_cast<Q2Array<T> *>(this)->m.data(); }
-    operator const T *() const { return m.isEmpty() ? nullptr : m.constData(); }
-
-    int find(const T &d, uint i = 0) const { return int(m.indexOf(d, qsizetype(i))); }
-    int contains(const T &d) const { return int(m.count(d)); }
-    void sort() { std::sort(m.begin(), m.end()); }                          // divergence 1
-
-    bool operator==(const Q2Array<T> &a) const { return m == a.m; }
-    bool operator!=(const Q2Array<T> &a) const { return m != a.m; }
-
-private:
-    QList<T> m;
-};
+// Q2Array was here. DELETED in Phase D, 2026-08-27: it was a value array over
+// QList all along, so its 180 sites are now plain QList. Two behaviours went
+// with it -- sort() was numeric (D13) and is now std::sort at the two sites
+// that used it, and at() clamped an out-of-range index instead of failing.
+// The clamp fired in none of 42 evaluations, and both defects it was masking
+// (SIG_ProgramLine.cpp:215, SIG_DynaSystem.cpp:266) were already fixed.
 
 // ---------------------------------------------------------------------------
 // Q2Dict<T>  <- Qt 2 QDict<T>: QString-keyed dictionary of *pointers*.

@@ -120,7 +120,7 @@ protected:
 	* Attention: the population dosen't completed filled !
 	* If a Population represent the parents it's should be !
 	*/
-	Q2Array<MT_Individual*> Individuals;
+	QList<MT_Individual*> Individuals;
 };
 
 #endif // !defined(AFX_MT_POPULATION_H__76BD10AD_932E_42FC_BDD3_85DD57B1D541__INCLUDED_)

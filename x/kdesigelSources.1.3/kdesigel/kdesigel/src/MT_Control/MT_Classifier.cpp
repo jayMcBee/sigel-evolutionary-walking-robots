@@ -316,10 +316,10 @@ MT_TranslatedIndividual * MT_Classifier::createDoubleTransIndi(SIGEL_Program::SI
 	int SigProgTwoSize = SigProgTwo->getProgramLength();
 	int TransIndiSize = SigProgOneSize + SigProgTwoSize;
 
-	Q2Array<int> * Instruktion = new Q2Array<int>;
-	Q2Array<int> * OperandOne = new Q2Array<int>;
-	Q2Array<int> * OperandTwo = new Q2Array<int>;
-	Q2Array<int> * MData = new Q2Array<int>;
+	QList<int> * Instruktion = new QList<int>;
+	QList<int> * OperandOne = new QList<int>;
+	QList<int> * OperandTwo = new QList<int>;
+	QList<int> * MData = new QList<int>;
 
 	(*Instruktion).resize(TransIndiSize);
 	(*OperandOne).resize(TransIndiSize);
@@ -513,7 +513,7 @@ bool MT_Classifier::preEvolution(Q2PtrVector<SIGEL_GP::SIG_GPTournament> *tours,
 
 	if (NumOfClassi == -1)  
 	{
-		Q2Array<int> ToursWBestIndi;
+		QList<int> ToursWBestIndi;
 		ToursWBestIndi.resize(tours->size());
 		for(int i=0; i<ToursWBestIndi.size(); i++)
 			ToursWBestIndi[i] =0;
@@ -602,7 +602,7 @@ for(int d=0; d < tours->size();d++)
 // NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU 
 // NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU 
 
-int MT_Classifier::evalNeededTours(Q2PtrVector<SIGEL_GP::SIG_GPTournament> *  tours, Q2Array<int> * ToursWBestIndi, int PosBest)
+int MT_Classifier::evalNeededTours(Q2PtrVector<SIGEL_GP::SIG_GPTournament> *  tours, QList<int> * ToursWBestIndi, int PosBest)
 {
 	SIGEL_GP::SIG_GPTournament *Tourna =NULL;
 	int NumClassi=0;
@@ -614,7 +614,8 @@ int MT_Classifier::evalNeededTours(Q2PtrVector<SIGEL_GP::SIG_GPTournament> *  to
 		for (int k=0; k <Tourna->indis.size();k++)
 		{
 			if(PosBest == Tourna->indis.at(k)->indNumber){
-				ToursWBestIndi->at(i) = 1;
+				// at() was writable on Qt 2's const QArray; QList's is not.
+				(*ToursWBestIndi)[i] = 1;
 				break;
 			}
 		}
@@ -645,7 +646,7 @@ int MT_Classifier::evalNeededTours(Q2PtrVector<SIGEL_GP::SIG_GPTournament> *  to
 			{
 				if(ToursWBestIndi->at(l)==0)
 				{
-					ToursWBestIndi->at(l)= 1;
+					(*ToursWBestIndi)[l] = 1;
 					NumClassi--;
 					break;
 

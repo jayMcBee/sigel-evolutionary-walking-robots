@@ -35,7 +35,7 @@ public:
 	* @pre: the MT_Translator produce this array
 	* @post: the destructor of this class must destroy this array
 	*/
-	Q2Array<int> * T_Instruktion;
+	QList<int> * T_Instruktion;
 	
 	/* An array of integer represent the first operands
 	* of a SIGEL robot control program.
@@ -43,7 +43,7 @@ public:
 	* @pre: the MT_Translator produce this array
 	* @post: the destructor of this class must destroy this array
 	*/
-	Q2Array<int> * T_Operand1;
+	QList<int> * T_Operand1;
 
 	/* An array of integer represent the second operands
 	* of a SIGEL robot control program.
@@ -51,7 +51,7 @@ public:
 	* @pre: the MT_Translator produce this array
 	* @post: the destructor of this class must destroy this array
 	*/
-	Q2Array<int> * T_Operand2;
+	QList<int> * T_Operand2;
 
 
 	/* An array of integer represent the MetaData
@@ -60,7 +60,7 @@ public:
 	* number of the difference Instructions
 	* in the case of the classifier: 
 	*/
-	Q2Array<int> * MetaData;
+	QList<int> * MetaData;
 
 	
 	/* constructor
@@ -71,7 +71,7 @@ public:
 	* representing the SIGEL robot control program thought the MT_Translator 
 	* @pre the three arrays must existed 
 	*/
-	MT_TranslatedIndividual (Q2Array<int> * T_Instruk, Q2Array<int> * T_OperOne, Q2Array<int>  * T_OperTwo, Q2Array<int>  * MData );
+	MT_TranslatedIndividual (QList<int> * T_Instruk, QList<int> * T_OperOne, QList<int>  * T_OperTwo, QList<int>  * MData );
 
 	/* The constructor of a translated individual, used for initializing
 	* a translated individual with data from a Qstring, by loading an experiment.

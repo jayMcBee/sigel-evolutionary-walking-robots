@@ -134,9 +134,9 @@ namespace SIGEL_Simulation
   {
     if (!caller)
       {
-	Q2Array< double > q( 7 );
+	QList< double > q( 7 );
 
-	Q2Array< double > qd( 6 );
+	QList< double > qd( 6 );
 
 	dynaMechsLink->getState( q.data(), qd.data() );
 

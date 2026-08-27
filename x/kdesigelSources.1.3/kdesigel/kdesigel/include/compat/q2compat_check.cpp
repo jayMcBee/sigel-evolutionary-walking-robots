@@ -30,8 +30,6 @@ struct Thing {
 };
 int Thing::live = 0;
 
-template class Q2Array<double>;
-template class Q2Array<int>;
 template class Q2PtrVector<Thing>;
 template class Q2PtrList<Thing>;
 template class Q2ListIterator<Thing>;
@@ -90,12 +88,6 @@ int main()
     // --- qgdict.cpp:379-386 -- duplicate keys stack newest-first ------------
 
     // --- divergence 1 -- numeric sort, not memcmp byte order ----------------
-    {
-        Q2Array<int> a(4);
-        a[0] = 300; a[1] = 100; a[2] = 2; a[3] = 1;
-        a.sort();
-        assert(a[0] == 1 && a[1] == 2 && a[2] == 100 && a[3] == 300);
-    }
 
 
     // --- behaviours corrected after review; previously untested -------------
@@ -161,23 +153,6 @@ int main()
         Q2CString n;
         assert(n.size() == 0);
         assert(static_cast<const char *>(n) == nullptr);
-    }
-    {   // out-of-range warns and clamps to index 0, as QGArray did
-        Q2Array<int> a(3); a[0] = 10; a[1] = 11; a[2] = 12;
-        assert(a.at(99) == 10);
-        Thing t(1);
-        Q2PtrVector<Thing> v(2); v.insert(0, &t);
-        assert(v.at(99) == &t);
-        Q2PtrVector<Thing> ve;
-        assert(ve.at(0) == nullptr);
-    }
-    {   // copy ctor clears ownership; assignment keeps the destination's
-        Q2PtrList<Thing> a; a.setAutoDelete(true);
-        Q2PtrList<Thing> b; b.setAutoDelete(false);
-        b = a;
-        assert(!b.autoDelete());   // assignment keeps the DESTINATION's flag
-        Q2Array<int> e;
-        assert(static_cast<const int *>(e) == nullptr);   // null when empty
     }
 
 

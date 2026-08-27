@@ -72,10 +72,10 @@ private:
 	/* denote which players have gain the present tournaments and which are the loser
 	* 0 indicate a Loser
 	*/
-	Q2Array<int>  WinnerLoser;
+	QList<int>  WinnerLoser;
 
 	/* contain pointer of the single tournaments */
-	Q2Array<MT_Tournament*> Tournaments;
+	QList<MT_Tournament*> Tournaments;
 	
 	/* indicate the selection method 
 	* 1 = Ranking Selection

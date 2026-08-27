@@ -20,7 +20,7 @@ private:
 	/* Variables is a array of double with Size NumberVariable. 
 	* It's represent the variable/ register which can use a MT_Program
 	*/
-	Q2Array<double> Variables;
+	QList<double> Variables;
 
 	int NumberVariable;
 	

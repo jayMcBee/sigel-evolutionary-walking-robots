@@ -33,8 +33,8 @@ struct subst_cache {
 	int refreshInt;
 	double tolerance;
 	unsigned int genNumber;
-	Q2Array<unsigned int> *numCorrectEst;
-	Q2Array<unsigned int> *numMetaEst;
+	QList<unsigned int> *numCorrectEst;
+	QList<unsigned int> *numMetaEst;
 };
 
 class MT_Substitute  
@@ -46,7 +46,7 @@ public:
 	void getEstimationParameter(int *EStrategy, double *Tol, int *ReInterval);
 	void setEstimationParameter(int EStrategy, double Tol, int ReInterval);
 	void setInterpreter(int NumOfVariable,  int TimeToInter);
-	void getNumOfEstimation(Q2Array<unsigned int> *  MetaEstimation, Q2Array<unsigned int>  *  CorrectEstimation);
+	void getNumOfEstimation(QList<unsigned int> *  MetaEstimation, QList<unsigned int>  *  CorrectEstimation);
 	int getTyp();
 
 	/*nextSIGGeneration() indicate the evaluator, that a new SIGEL Generation started */
@@ -69,7 +69,7 @@ public:
 	void changeBest(MT_Program * MetaProg);
 
 	// used for update the MetaError 
-	void changeErrorInfo(Q2Array<double> * OutCome, Q2Array<double> * CorrectFit);
+	void changeErrorInfo(QList<double> * OutCome, QList<double> * CorrectFit);
 
 	//overriding methods 
 	MT_Substitute();
@@ -99,8 +99,8 @@ protected:
 	double MetaProgError;
 	
 	// for EstimationStrategy: to determinate the MetaProgError, the Trainingsdata are needed  
-	Q2Array<double> CorrectFitness;
-	Q2Array<double> AssumedFitness; 
+	QList<double> CorrectFitness;
+	QList<double> AssumedFitness; 
 
 	// the AverageFitness of the Sigel GP Population for the last Generation
 	// supply for the evaluationTactic
@@ -134,8 +134,8 @@ protected:
 	int RefreshInterval;
 
 	// different variable for count; 
-	Q2Array<unsigned int> NumOfCorrectEstimation;
-	Q2Array<unsigned int> NumOfMetaEstimation;
+	QList<unsigned int> NumOfCorrectEstimation;
+	QList<unsigned int> NumOfMetaEstimation;
 
 };
 

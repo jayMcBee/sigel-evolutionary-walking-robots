@@ -894,7 +894,7 @@ int  SIGEL_GP::SIG_GPParameter::getProbability( SIGEL_Program::Robotinstruction 
 
 }
 
-Q2Array< int >& SIGEL_GP::SIG_GPParameter::getInstructionProbabilities()
+QList< int >& SIGEL_GP::SIG_GPParameter::getInstructionProbabilities()
 {
   return instructionProb;
 }

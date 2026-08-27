@@ -264,7 +264,7 @@ void MT_Randomizer::writeToFileRandi(QTextStream &File)
 // normal set/ get method
 ////////////////////////////////////////////////////////////////////
 
-void MT_Randomizer::returnIndividualsValue(int **Length, int **NumOfVar, Q2Array<double> **Con, Q2Array<double> **ProbOfFu)
+void MT_Randomizer::returnIndividualsValue(int **Length, int **NumOfVar, QList<double> **Con, QList<double> **ProbOfFu)
 {
 
 	*Length= &ProgramLengthMax;
@@ -275,7 +275,7 @@ void MT_Randomizer::returnIndividualsValue(int **Length, int **NumOfVar, Q2Array
 
 }
 
-void MT_Randomizer::returnSearchValue(Q2Array<double> **ProbMPower, Q2Array<double> **ProbSOperator, Q2Array<double> **ProbXPoints)
+void MT_Randomizer::returnSearchValue(QList<double> **ProbMPower, QList<double> **ProbSOperator, QList<double> **ProbXPoints)
 {	
 	*ProbMPower = &ProbMutationPower; 
 	*ProbSOperator = &ProbSearchOperator;
@@ -381,10 +381,10 @@ bool MT_Randomizer::answerMutateElement()
 }
 
 
-Q2Array<int> * MT_Randomizer::getRandomTournamentPartition(int NumberOfTour)
+QList<int> * MT_Randomizer::getRandomTournamentPartition(int NumberOfTour)
 {
 	// Array holding the current number of players per tournament
-	Q2Array<int> Index;
+	QList<int> Index;
 	Index.resize(NumberOfTour);
 	for (int k =0; k<NumberOfTour; k++)
 		Index[k]=0;
@@ -425,9 +425,9 @@ Q2Array<int> * MT_Randomizer::getRandomTournamentPartition(int NumberOfTour)
 	return &TournamentPartition;
 }
 
-int MT_Randomizer::getProportionalWinner(Q2Array<int> * Players)
+int MT_Randomizer::getProportionalWinner(QList<int> * Players)
 {
-	Q2Array<int> PlayersProportional; 
+	QList<int> PlayersProportional; 
 	PlayersProportional.resize(Players->size());
 	int Total = 0;
 
@@ -512,7 +512,7 @@ int MT_Randomizer::getRandomSOperator()
 	return Choice;
 }
 
-Q2Array<int> * MT_Randomizer::getRandomXPoints(int SizeIndi1, int SizeIndi2)
+QList<int> * MT_Randomizer::getRandomXPoints(int SizeIndi1, int SizeIndi2)
 {	
 	int NumberofXPoints;
 	unsigned int Random = getRandomInteger(ProbCrossOverPoints[2]);

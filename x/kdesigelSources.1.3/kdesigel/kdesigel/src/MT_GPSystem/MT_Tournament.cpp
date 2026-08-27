@@ -40,7 +40,7 @@ void MT_Tournament::setTypOfIndividual(int Typ)
 	TypOfIndividual = Typ;
 }
 
-void MT_Tournament::ranking(Q2Array<int> * WinnerLoser)
+void MT_Tournament::ranking(QList<int> * WinnerLoser)
 {
 	int WinnerLoseSize = WinnerLoser->size();
 
@@ -52,12 +52,12 @@ void MT_Tournament::ranking(Q2Array<int> * WinnerLoser)
 	double SmallestFit =0.0;
 	int PosSmallestFit =0;
 	
-	Q2Array<double> FitValue;	// Gives the fitness of the individual at position Pos[i]
+	QList<double> FitValue;	// Gives the fitness of the individual at position Pos[i]
 	FitValue.resize(NumberOfWinner);
 	for (int i=0; i<NumberOfWinner; i++)
 		FitValue[i]=0.0;
 
-	Q2Array<int> Position;	// Gives the individual's position in the population
+	QList<int> Position;	// Gives the individual's position in the population
 	Position.resize(NumberOfWinner);
 	for (int i=0; i<NumberOfWinner; i++)
 		Position[i]=0;
@@ -95,7 +95,7 @@ void MT_Tournament::ranking(Q2Array<int> * WinnerLoser)
 
 
 
-void MT_Tournament::fitnessProp(MT_Randomizer* Randi, Q2Array<int> * WinnerLoser)
+void MT_Tournament::fitnessProp(MT_Randomizer* Randi, QList<int> * WinnerLoser)
 {
 
 	int WinnerLoseSize = WinnerLoser->size();
@@ -108,7 +108,7 @@ void MT_Tournament::fitnessProp(MT_Randomizer* Randi, Q2Array<int> * WinnerLoser
 double DebugInfo = 0.0;
 int DebugIn = 1;
 
-	Q2Array<int> ProporFit;
+	QList<int> ProporFit;
 	ProporFit.resize(PopSize);
 	
 	if (TypOfIndividual == 0)		// Evaluator Meta System;
@@ -145,7 +145,7 @@ int DebugIn = 1;
 	
 	// Determine the winners using the randomizer
 int DebugNumber = 0;
-Q2Array<int> DebugArray;
+QList<int> DebugArray;
 
 	for(int i=0; i<NumberOfWinner; i++)
 	{

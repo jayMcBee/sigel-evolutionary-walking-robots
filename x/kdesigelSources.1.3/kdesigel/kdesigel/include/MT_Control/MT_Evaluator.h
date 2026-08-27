@@ -33,7 +33,7 @@ private:
 	
 	// for internal use 
 	Q2PtrList<MT_TrainingCase> TmpBuffer;
-	Q2Array<double> MT_ResultBuffer; 
+	QList<double> MT_ResultBuffer; 
 	int MT_ResultSize;
 	int NextFreePos;
 

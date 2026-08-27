@@ -65,7 +65,7 @@ QString SIGEL_GP::SIG_GPPVMData::getQStringFromPVM(int taskId, int messageId) {
   pvm_recv(taskId,messageId);
   pvm_upkint(&length,1,1);
 
-  Q2Array< char > buffer( length );
+  QList< char > buffer( length );
 
   pvm_upkstr( buffer.data() );
 

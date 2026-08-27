@@ -60,7 +60,7 @@ namespace SIGEL_Robot
                 usedByLinks.append (user);
         };
 
-        NEWMAT::Matrix SIG_Body::createRotationMatrix( Q2Array< float > rotation )
+        NEWMAT::Matrix SIG_Body::createRotationMatrix( QList< float > rotation )
         {
                 NEWMAT::Matrix rotationMatrix(4,4);
                 double const x = rotation[0];
@@ -98,7 +98,7 @@ namespace SIGEL_Robot
                         if (node->isTransformNode()) {
                                 TransformNode *transformNode = static_cast<TransformNode*> (node);
                                 
-                                Q2Array< float > buffer(4);
+                                QList< float > buffer(4);
 
                                 NEWMAT::Matrix identity(4,4);
                                 identity = 0;
@@ -165,7 +165,7 @@ namespace SIGEL_Robot
                                                 vertices.setAutoDelete( true );
 
                                                 for (int i=0; i < noOfVertices; i++) {
-                                                        Q2Array< float > coords(3);
+                                                        QList< float > coords(3);
                                                         
                                                         coordinateNode->getPoint( i, coords.data() );
                                                         

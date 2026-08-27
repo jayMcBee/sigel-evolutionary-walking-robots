@@ -42,7 +42,7 @@ public:
 	
 	/* supply a ppinter of the XPointarray, which contain the posistion for a crossover event
 	*/
-	Q2Array<int>* getRandomXPoints (int SizeIndi1, int SizeIndi2);
+	QList<int>* getRandomXPoints (int SizeIndi1, int SizeIndi2);
 	
 	/* serve the random mutate;
 	* supply an answer, if a program line or element of a line should mutate */
@@ -64,12 +64,12 @@ public:
 	
 	/* method for fitness proportional selection,
 	* supply the position of the winner*/
-	int getProportionalWinner (Q2Array<int> * Players);
+	int getProportionalWinner (QList<int> * Players);
 	
 	/* supply a partition of the offspring into tournaments
 	* a entry (0-(num-1)) indicate in which tournament separate a individual form the offspring
 	*/
-	Q2Array<int> * getRandomTournamentPartition(int NumberOfTour);
+	QList<int> * getRandomTournamentPartition(int NumberOfTour);
 
 
 	/******* normal set/ get method *******/
@@ -77,8 +77,8 @@ public:
 	/* method for changing information between GUI and Randomizer; this two method bend the given pointer
 	* to the private attribute; so the GUI can change (or get) direct information from the Randomizer
 	*/
-	void returnSearchValue(Q2Array<double>  **ProbMPower, Q2Array<double>  **ProbSOperator, Q2Array<double> **ProbXPoints);
-	void returnIndividualsValue(int **Length, int **NumOfVar, Q2Array<double> **Con, Q2Array<double> **ProbOfFu);
+	void returnSearchValue(QList<double>  **ProbMPower, QList<double>  **ProbSOperator, QList<double> **ProbXPoints);
+	void returnIndividualsValue(int **Length, int **NumOfVar, QList<double> **Con, QList<double> **ProbOfFu);
 
 	/* change the Offspring Size*/
 	void setOffspringSize (int setOffSize);
@@ -106,11 +106,11 @@ private:
 	* Array[5] = the third XPoint in the first Individual
 	* Array[6] = the third XPoint in the second Individual
 	*/
-	Q2Array<int> RandomXPoints;
+	QList<int> RandomXPoints;
 
 	
 	/* this array serve for indicate the tournament member of a tournament */
-	Q2Array<int> TournamentPartition;
+	QList<int> TournamentPartition;
 	
 	/* a lot of size of variously GP object */
 	int NumberOfVariables;
@@ -129,24 +129,24 @@ private:
 	* ProbSearchOperator[1]= probability of Mutation
 	* ProbSearchOperator[2]= probability of Reproduction
 	*/
-	Q2Array<double> ProbSearchOperator;
+	QList<double> ProbSearchOperator;
 		
 	/* contain the probability of occurrence of a mutation which are desired from the user,
 	* ProbMutationPower[0] = the probability, that a program line will choose for mutation.
 	* ProbMutationPower[1] = the probability, that a element of a program line will choose for mutation
 	* @pre: 0<= Entry <=1000
 	*/
-	Q2Array<double> ProbMutationPower;
+	QList<double> ProbMutationPower;
 
 	/* contain the probability for chosen the Number of X-Points during a crossover event
 	*ProbCrossOverPoints[0]= the probaility of 1 Crossover Point
 	*ProbCrossOverPoints[1]= the probaility of 2 Crossover Point
 	*ProbCrossOverPoints[2]= the probaility of 3 Crossover Point
 	*/
-	Q2Array<double> ProbCrossOverPoints;
+	QList<double> ProbCrossOverPoints;
 	
 	/* contain all constant, which the GP-System allow to use. */
-	Q2Array<double> Constant;
+	QList<double> Constant;
 
 	/* contain the probability for chosen a Instruction 
 	* by the mutation or the generation of a program line
@@ -162,7 +162,7 @@ private:
 	* ProbInstruktion[14] = probability of LUI ;ProbInstruktion[15]= probability of LUS
  	* ProbInstruktion[16] = probability of LUT ; ProbInstruktion[17] = probability of LUM ;
 	*/
-	Q2Array<double> ProbInstruktion;
+	QList<double> ProbInstruktion;
 
 
 };

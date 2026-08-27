@@ -279,7 +279,7 @@ class SIG_Program
 		     long maximum,
 		     SIGEL_Tools::SIG_Randomizer &r, 
 		     SIGEL_Robot::SIG_LanguageParameters &languageP,
-		     Q2Array< int > &prob,
+		     QList< int > &prob,
 		     int &historyInfo );
    };
 

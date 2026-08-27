@@ -85,7 +85,7 @@ private:
 	/* The name serve for identification of the T-Set by fitness estimation*/ 
 	int TSetName;
 	/* The TCases is a QArray which contain pointers  the current T-cases */
-	Q2Array<MT_TrainingCase *> TCases;
+	QList<MT_TrainingCase *> TCases;
 	/* The TSize denote the max number of the T-Cases in the QArray */
 	int TSize;
 };
