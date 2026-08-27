@@ -71,13 +71,6 @@ namespace SIGEL_Robot {
 
         void SIG_Robot::clear ()
         {
-                Q2DictIterator<SIG_Body> itbody (bodies);
-                Q2DictIterator<SIG_Material> itmaterial (materials);
-                Q2DictIterator<SIG_Link> itlink (links);
-                Q2DictIterator<SIG_Joint> itjoint (joints);
-                Q2DictIterator<SIG_Drive> itdrive (drives);
-                Q2DictIterator<SIG_Sensor> itsensor (sensors);
-
 		initialLocation = DL_vector (0, 0, 0);
 		initialOrientation.makeone ();
 
@@ -85,12 +78,13 @@ namespace SIGEL_Robot {
                 language = new SIG_LanguageParameters ();
                 rootlink = 0;
 
-                while (itsensor.current ()) { delete itsensor.current (); ++itsensor; }
-                while (itdrive.current ()) { delete itdrive.current (); ++itdrive; }
-                while (itjoint.current ()) { delete itjoint.current (); ++itjoint; }
-                while (itlink.current ()) { delete itlink.current (); ++itlink; }
-                while (itmaterial.current ()) { delete itmaterial.current (); ++itmaterial; }
-                while (itbody.current ()) { delete itbody.current (); ++itbody; }
+                // Freed in the reverse of construction order, as before.
+                qDeleteAll (sensors);
+                qDeleteAll (drives);
+                qDeleteAll (joints);
+                qDeleteAll (links);
+                qDeleteAll (materials);
+                qDeleteAll (bodies);
 
                 sensors.clear ();
                 drives.clear ();
@@ -102,17 +96,17 @@ namespace SIGEL_Robot {
 
         void SIG_Robot::addBody (SIG_Body *b)
         {
-                bodies.insert (b->getName (), b);
+                bodies.append (b);
         }
 
         void SIG_Robot::addMaterial (SIG_Material *m)
         {
-                materials.insert (m->getName (), m);
+                materials.append (m);
         }
 
         void SIG_Robot::addLink (SIG_Link *l, bool isroot)
         {
-                links.insert (l->getName (), l);
+                links.append (l);
                 if (isroot) {
                         // Something seems to be missing here, but I no longer
                         // have the faintest idea what.
@@ -121,17 +115,17 @@ namespace SIGEL_Robot {
 
         void SIG_Robot::addJoint (SIG_Joint *j)
         {
-                joints.insert (j->getName (), j);
+                joints.append (j);
         }
 
         void SIG_Robot::addDrive (SIG_Drive *d)
         {
-                drives.insert (d->getName (), d);
+                drives.append (d);
         }
 
         void SIG_Robot::addSensor (SIG_Sensor *s)
         {
-                sensors.insert (s->getName (), s);
+                sensors.append (s);
         }
 
         void SIG_Robot::setLangParam (SIG_LanguageParameters *lp, int delprev)
@@ -148,62 +142,80 @@ namespace SIGEL_Robot {
 
         SIG_Body *SIG_Robot::lookupBody (QString n) const
         {
-                return bodies.find (n);
+                for (SIG_Body *e : bodies)
+                        if (e->getName () == n)
+                                return e;
+                return 0;
         }
 
         SIG_Material *SIG_Robot::lookupMaterial (QString n) const
         {
-                return materials.find (n);
+                for (SIG_Material *e : materials)
+                        if (e->getName () == n)
+                                return e;
+                return 0;
         }
 
         SIG_Link *SIG_Robot::lookupLink (QString n) const
         {
-                return links.find (n);
+                for (SIG_Link *e : links)
+                        if (e->getName () == n)
+                                return e;
+                return 0;
         }
 
         SIG_Joint *SIG_Robot::lookupJoint (QString n) const
         {
-                return joints.find (n);
+                for (SIG_Joint *e : joints)
+                        if (e->getName () == n)
+                                return e;
+                return 0;
         }
 
         SIG_Drive *SIG_Robot::lookupDrive (QString n) const
         {
-                return drives.find (n);
+                for (SIG_Drive *e : drives)
+                        if (e->getName () == n)
+                                return e;
+                return 0;
         }
 
         SIG_Sensor *SIG_Robot::lookupSensor (QString n) const
         {
-                return sensors.find (n);
+                for (SIG_Sensor *e : sensors)
+                        if (e->getName () == n)
+                                return e;
+                return 0;
         }
 
-        Q2DictIterator<SIG_Body> SIG_Robot::getBodyIter (void) const
+        const QList<SIG_Body *> &SIG_Robot::getBodies (void) const
         {
-                return Q2DictIterator<SIG_Body> (bodies);
+                return bodies;
         }
 
-        Q2DictIterator<SIG_Material> SIG_Robot::getMaterialIter (void) const
+        const QList<SIG_Material *> &SIG_Robot::getMaterials (void) const
         {
-                return Q2DictIterator<SIG_Material> (materials);
+                return materials;
         }
 
-        Q2DictIterator<SIG_Link> SIG_Robot::getLinkIter (void) const
+        const QList<SIG_Link *> &SIG_Robot::getLinks (void) const
         {
-                return Q2DictIterator<SIG_Link> (links);
+                return links;
         }
 
-        Q2DictIterator<SIG_Joint> SIG_Robot::getJointIter (void) const
+        const QList<SIG_Joint *> &SIG_Robot::getJoints (void) const
         {
-                return Q2DictIterator<SIG_Joint> (joints);
+                return joints;
         }
 
-        Q2DictIterator<SIG_Drive> SIG_Robot::getDriveIter (void) const
+        const QList<SIG_Drive *> &SIG_Robot::getDrives (void) const
         {
-                return Q2DictIterator<SIG_Drive> (drives);
+                return drives;
         }
 
-        Q2DictIterator<SIG_Sensor> SIG_Robot::getSensorIter (void) const
+        const QList<SIG_Sensor *> &SIG_Robot::getSensors (void) const
         {
-                return Q2DictIterator<SIG_Sensor> (sensors);
+                return sensors;
         }
 
         SIG_Link const *SIG_Robot::getRootLink (void) const
@@ -214,12 +226,8 @@ namespace SIGEL_Robot {
         int SIG_Robot::getNrOfPoints (void) const
         {
                 int summa = 0;
-                Q2DictIterator<SIG_Link> lit (links);
-                SIG_Link *l;
-                while (l = lit.current ()) {
+                for (SIG_Link *l : links)
                         summa += l->getNrOfPoints ();
-                        ++lit;
-                }
                 return summa;
         }
 
@@ -241,31 +249,22 @@ namespace SIGEL_Robot {
 
         void SIG_Robot::loadGeometries (void)
         {
-                Q2DictIterator<SIG_Body> iter = getBodyIter ();
-                while (iter.current ()) {
-                        iter.current()->load ();
-                        ++iter;
-                }
+                for (SIG_Body *b : bodies)
+                        b->load ();
         }
 
         void SIG_Robot::instantiateGeometries (void)
         {
-                Q2DictIterator<SIG_Link> iter = getLinkIter ();
-                while (iter.current ()) {
-                        iter.current ()->instantiateGeometry ();
-                        ++iter;
-                }
+                for (SIG_Link *l : links)
+                        l->instantiateGeometry ();
         }
 
         void SIG_Robot::prepareDynaMo (void)
         {
                 instantiateGeometries ();
 
-                Q2DictIterator<SIG_Link> iter (links);
-                while (iter.current ()) {
-                        iter.current ()->transformToDynaMo ();
-                        ++iter;
-                }
+                for (SIG_Link *l : links)
+                        l->transformToDynaMo ();
 
 		initiate();
         }
@@ -292,47 +291,28 @@ namespace SIGEL_Robot {
 
         void SIG_Robot::writeToFileTransfer (QTextStream & tx) const
         {
-                Q2DictIterator<SIG_Body> itbody (bodies);
-                Q2DictIterator<SIG_Material> itmaterial (materials);
-                Q2DictIterator<SIG_Link> itlink (links);
-                Q2DictIterator<SIG_Joint> itjoint (joints);
-                Q2DictIterator<SIG_Drive> itdrive (drives);
-                Q2DictIterator<SIG_Sensor> itsensor (sensors);
-
                 tx << "StreamedRobot\n";
 
 		vectorToStream (tx, initialLocation);
 		matrixToStream (tx, initialOrientation);
                 
-                while (itbody.current ()) {
-                        itbody.current ()->writeToFileTransfer (tx);
-                        ++itbody;
-                }
+                for (SIG_Body *e : bodies)
+                        e->writeToFileTransfer (tx);
                 
-                while (itmaterial.current ()) {
-                        itmaterial.current ()->writeToFileTransfer (tx);
-                        ++itmaterial;
-                }
+                for (SIG_Material *e : materials)
+                        e->writeToFileTransfer (tx);
 
-                while (itlink.current ()) {
-                        itlink.current ()->writeToFileTransfer (tx);
-                        ++itlink;
-                }
+                for (SIG_Link *e : links)
+                        e->writeToFileTransfer (tx);
 
-                while (itjoint.current ()) {
-                        itjoint.current ()->writeToFileTransfer (tx);
-                        ++itjoint;
-                }
+                for (SIG_Joint *e : joints)
+                        e->writeToFileTransfer (tx);
 
-                while (itdrive.current ()) {
-                        itdrive.current ()->writeToFileTransfer (tx);
-                        ++itdrive;
-                }
+                for (SIG_Drive *e : drives)
+                        e->writeToFileTransfer (tx);
 
-                while (itsensor.current ()) {
-                        itsensor.current ()->writeToFileTransfer (tx);
-                        ++itsensor;
-                }
+                for (SIG_Sensor *e : sensors)
+                        e->writeToFileTransfer (tx);
 
                 tx << "RobotComplete\n";
 
@@ -391,7 +371,7 @@ namespace SIGEL_Robot {
                 if (tmpstr == "-")
                         rootlink = 0;
                 else
-                        rootlink = links.find (tmpstr);
+                        rootlink = lookupLink (tmpstr);
 
                 tx >> tmpstr;
                 if (tmpstr == "LanguageParameters") {
@@ -446,25 +426,23 @@ namespace SIGEL_Robot {
 	  // copy robot or it will be shred..
 	  SIG_Robot modRob( *this );
 	  modRob.prepareDynaMechs();
-	  Q2DictIterator<SIG_Link> itlink (modRob.links);
-
 	  tot_mass = 0;
 	  sprintf(outStr, "<B><U>Link Information</U></B><BR><UL>");
 
 	  // first get the mass for all links
-	  while (itlink.current())
+	  for (SIG_Link *link : modRob.links)
 	    {
 	      // get link info
-	      itlink.current()->getPhysics(link_mass, com, it);
+	      link->getPhysics(link_mass, com, it);
 	      tot_mass += link_mass;
 
 	      // compute volume
-	      dens = (itlink.current()->getMaterial())->getDensity();
+	      dens = (link->getMaterial())->getDensity();
 	      link_vol = link_mass/dens;
 
 	      // append link info to string
 	      sprintf(hlp_txt, "<LI><B>\"%s\":</B> &nbsp; Mass: %5.2f kg, &nbsp; Volume: %4.5f m^3, &nbsp; Density: %5.1f kg/m^3</LI>",
-		      itlink.current()->getName().toUtf8().constData(), link_mass, link_vol, dens);
+		      link->getName().toUtf8().constData(), link_mass, link_vol, dens);
 
 	      // not too long?
 	      if ( strlen(outStr)+strlen(hlp_txt) < maxOutLen)
@@ -473,8 +451,6 @@ namespace SIGEL_Robot {
 	      else
 	      { break;
 	      }
-
-	      ++itlink;
 	    }
 
 	  if (strlen(outStr)+16 < maxOutLen)

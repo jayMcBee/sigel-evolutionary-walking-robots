@@ -30,30 +30,14 @@ SIGEL_Simulation::SIG_DynaMoSimulationData::SIG_DynaMoSimulationData( SIGEL_Robo
     dynaSystem( environment, simulationParameter)
 {
   dynaSystem.floorMaterial=robot.lookupMaterial(environment.getFloorMaterialName());
-  Q2DictIterator<SIGEL_Robot::SIG_Link> linkIt=robot.getLinkIter();
-  while (linkIt.current()) 
-  {
-    dynaSystem.newLink( (*linkIt.current()) );    
-    ++linkIt;
-  };
-  Q2DictIterator<SIGEL_Robot::SIG_Joint> jointIt=robot.getJointIter();
-  while (jointIt.current()) 
-  {
-    dynaSystem.newJoint( (*jointIt.current()) );    
-    ++jointIt;
-  };
-  Q2DictIterator<SIGEL_Robot::SIG_Sensor> sensorIt=robot.getSensorIter();
-  while (sensorIt.current()) 
-  {
-    dynaSystem.newSensor( (*sensorIt.current()) );    
-    ++sensorIt;
-  };
-  Q2DictIterator<SIGEL_Robot::SIG_Drive> driveIt=robot.getDriveIter();
-  while (driveIt.current()) 
-  {
-    dynaSystem.newDrive( (*driveIt.current()) );    
-    ++driveIt;
-  };
+  for (SIGEL_Robot::SIG_Link *l : robot.getLinks())
+    dynaSystem.newLink( *l );
+  for (SIGEL_Robot::SIG_Joint *j : robot.getJoints())
+    dynaSystem.newJoint( *j );
+  for (SIGEL_Robot::SIG_Sensor *s : robot.getSensors())
+    dynaSystem.newSensor( *s );
+  for (SIGEL_Robot::SIG_Drive *d : robot.getDrives())
+    dynaSystem.newDrive( *d );
 };
 
 void SIGEL_Simulation::SIG_DynaMoSimulationData::setNewFrame( bool newValue )

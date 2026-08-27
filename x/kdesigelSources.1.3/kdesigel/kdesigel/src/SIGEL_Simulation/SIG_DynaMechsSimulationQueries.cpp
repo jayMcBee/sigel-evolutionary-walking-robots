@@ -413,7 +413,7 @@ std::vector<double*>* SIGEL_Simulation::SIG_DynaMechsSimulationQueries::getUsedF
 int SIGEL_Simulation::SIG_DynaMechsSimulationQueries::getLinkCount() const
 {
   //return simulationData.dynaMechsSystem.getNumLinks();
-  return simulationData.robot.getLinkIter().count();
+  return simulationData.robot.getLinks().count();
 }
 
 

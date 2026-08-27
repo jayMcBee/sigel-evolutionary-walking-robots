@@ -57,12 +57,16 @@ namespace SIGEL_Robot
   private:
     SIG_LanguageParameters *language;
     SIG_Link *rootlink;
-    Q2Dict<SIG_Body> bodies;
-    Q2Dict<SIG_Material> materials;
-    Q2Dict<SIG_Link> links;
-    Q2Dict<SIG_Joint> joints;
-    Q2Dict<SIG_Drive> drives;
-    Q2Dict<SIG_Sensor> sensors;
+    // Phase D. These were Q2Dict, whose hash order numbered the links and
+    // joints; the order now comes from the data files, so a plain ordered list
+    // of pointers is the whole requirement. The key was always x->getName()
+    // (every insert site did exactly that), so nothing is lost by dropping it.
+    QList<SIG_Body *> bodies;
+    QList<SIG_Material *> materials;
+    QList<SIG_Link *> links;
+    QList<SIG_Joint *> joints;
+    QList<SIG_Drive *> drives;
+    QList<SIG_Sensor *> sensors;
 
   public:
     /**
@@ -182,42 +186,42 @@ namespace SIGEL_Robot
      * This is a QDictIterator. Please read the Qt Library documentation
      * to get informed about the usage of the iterator.
      */
-    Q2DictIterator<SIG_Body> getBodyIter (void) const;
+    const QList<SIG_Body *> &getBodies (void) const;
     /**
      * Returns an iterator over all SIG_Material objects.
      *
      * This is a QDictIterator. Please read the Qt Library documentation
      * to get informed about the usage of the iterator.
      */
-    Q2DictIterator<SIG_Material> getMaterialIter (void) const;
+    const QList<SIG_Material *> &getMaterials (void) const;
     /**
      * Returns an iterator over all SIG_Link objects.
      *
      * This is a QDictIterator. Please read the Qt Library documentation
      * to get informed about the usage of the iterator.
      */
-    Q2DictIterator<SIG_Link> getLinkIter (void) const;
+    const QList<SIG_Link *> &getLinks (void) const;
     /**
      * Returns an iterator over all SIG_Joint objects.
      *
      * This is a QDictIterator. Please read the Qt Library documentation
      * to get informed about the usage of the iterator.
      */
-    Q2DictIterator<SIG_Joint> getJointIter (void) const;
+    const QList<SIG_Joint *> &getJoints (void) const;
     /**
      * Returns an iterator over all SIG_Drive objects.
      *
      * This is a QDictIterator. Please read the Qt Library documentation
      * to get informed about the usage of the iterator.
      */
-    Q2DictIterator<SIG_Drive> getDriveIter (void) const;
+    const QList<SIG_Drive *> &getDrives (void) const;
     /**
      * Returns an iterator over all SIG_Sensor objects.
      *
      * This is a QDictIterator. Please read the Qt Library documentation
      * to get informed about the usage of the iterator.
      */
-    Q2DictIterator<SIG_Sensor> getSensorIter (void) const;
+    const QList<SIG_Sensor *> &getSensors (void) const;
     /**
      * Returns the root link.
      *

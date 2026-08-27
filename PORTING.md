@@ -30,7 +30,7 @@ build and run, because nothing else can be verified without it — see §3.
 | B — ownership explicit | **8 of 14 containers**. 5 still on `setAutoDelete` — open, §7 |
 | R — build and run | core builds and runs, faithful to 1.3. **No way to check it yet** — needs fitness numbers from the 1.3 binary on the x86 box, §7 |
 | T — old-Qt tool container | **done 2026-08-27.** `tools/qtmig`, §4 |
-| D — delete the shim, migrate the data | **D1–D3 done 2026-08-27.** `Q2Dict`'s hash order is gone; the containers are insertion-ordered and the data carries the order. Fitness identical on 42 evaluations. Remaining: the other `Q2*` types, then delete the header. §10 |
+| D — delete the shim, migrate the data | **D1–D4 done 2026-08-27.** Hash order gone, `SIG_Robot`'s six dicts are plain `QList<T*>`. Both gates clean throughout. Remaining: `SIG_Link::points`, then `Q2PtrList`/`Q2PtrVector`/`Q2Array`/`Q2Queue`, then delete the header. §10 |
 | C — GUI | **not started, AUTHORIZED 2026-08-27 per D24.** ~450 Qt 2 sites + 20 forms |
 
 **SCOPE — DECIDED 2026-08-23. Read this before changing anything.**
@@ -1074,6 +1074,40 @@ individual by 45%, and the 2003 build was i386 x87.
 
 `data/` stays the pristine download and is never written; `data-reordered/` is
 what the build reads, and both scripts default to it.
+
+### D4 — `SIG_Robot`'s six dicts are plain Qt 6
+
+`Q2Dict<T>` → **`QList<T *>`** for all six. No new container type, nothing that
+emulates Qt 2, and the header shrinks by that much.
+
+What made it a rename rather than a redesign: **every insert site keyed on the
+object's own name** — `bodies.insert(b->getName(), b)` and the five like it
+(`SIG_Robot.cpp:105-134`), so the key was derivable and the dictionary was
+carrying nothing the list does not. `lookupX(name)` became a linear scan, over
+at most 19 links.
+
+`getXIter()` is replaced by `getXs()` returning `const QList<T *> &`. That breaks
+**22 call sites in `SIGEL_Visualisation` and `SIGEL_MasterGUI`** — both already
+fail to build, both are rewritten in Phase C, and per D25 they should meet the
+plain accessor rather than a shim one.
+
+`clear()`'s six hand-written delete loops became `qDeleteAll`, in the same
+reverse-of-construction order.
+
+Counts: `Q2Dict` 42 → 37, `Q2DictIterator` 57 → 16. What is left is
+`SIG_Link::points`, which maps a name to a `DL_vector` that has no name field,
+so it needs an actual key and is its own step.
+
+**Checked under AddressSanitizer**, because this changed a free path: no
+use-after-free, no double-free. `octopus` and `twoBases` leak exactly the
+documented 41,374 bytes in 117 allocations.
+
+**Correction to that baseline, found here.** §7 states 41,374 bytes / 117
+allocations as *the* per-evaluation leak. That holds only for small robots.
+`walker` leaks **35,802,566 bytes in 630,138 allocations** — 866× — and it is
+pre-existing, not from this change: byte-for-byte identical on the commit
+before. The leak scales with links and simulated frames, which §10's "one
+simulation object per fitness evaluation" does not convey.
 
 **Formats, both pure permutations.** `.rrb` is block-structured with exactly five
 top-level kinds — `material`, `link`, `joint <subtype>`, `drive`, `sensor`, all

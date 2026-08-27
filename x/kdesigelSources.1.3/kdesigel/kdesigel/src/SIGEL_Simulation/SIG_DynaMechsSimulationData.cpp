@@ -74,11 +74,11 @@ SIGEL_Simulation::SIG_DynaMechsSimulationData::SIG_DynaMechsSimulationData( SIGE
 							  SIGEL_Environment::SIG_Environment const& environment,
 							  SIGEL_Simulation::SIG_SimulationParameters const& simulationParameter)
   : SIG_SimulationData( robot, environment, simulationParameter ),
-    dynaMechsLinks( robot.getLinkIter().count() ),
-    jointIndices( robot.getJointIter().count() ),
-    drives( robot.getDriveIter().count() ),
-    driveForcesTimeAccounts( robot.getDriveIter().count() ),
-    sensors( robot.getSensorIter().count() ),
+    dynaMechsLinks( robot.getLinks().count() ),
+    jointIndices( robot.getJoints().count() ),
+    drives( robot.getDrives().count() ),
+    driveForcesTimeAccounts( robot.getDrives().count() ),
+    sensors( robot.getSensors().count() ),
 #ifdef _WINDOWS
     pi( ::atan( 1 ) * 4 )
 #else
@@ -117,13 +117,8 @@ SIGEL_Simulation::SIG_DynaMechsSimulationData::SIG_DynaMechsSimulationData( SIGE
 
   initializeArticulation();
 
-  Q2DictIterator< SIGEL_Robot::SIG_Drive > driveIt = robot.getDriveIter();
-
-  driveIt.toFirst();
-
-  while (driveIt.current())
+  for (SIGEL_Robot::SIG_Drive *actDrive : robot.getDrives())
     {
-      SIGEL_Robot::SIG_Drive *actDrive = driveIt.current();
 
       switch (actDrive->getMode())
 	{
@@ -155,22 +150,17 @@ SIGEL_Simulation::SIG_DynaMechsSimulationData::SIG_DynaMechsSimulationData( SIGE
 	  };
 	  break;
 	};
-      ++driveIt;
     };
 
-  Q2DictIterator< SIGEL_Robot::SIG_Sensor > sensorIt = robot.getSensorIter();
-
-  sensorIt.toFirst();
-
-  while (sensorIt.current())
+  for (SIGEL_Robot::SIG_Sensor *actSensorBase : robot.getSensors())
   {
-	switch (sensorIt.current()->getSensorType())
+	switch (actSensorBase->getSensorType())
 	{
 
 	 // tJointSensor:
 	  case SIGEL_Robot::SIG_Sensor::tJointSensor:
 	  {
-	    SIGEL_Robot::SIG_JointSensor *actSensor = static_cast< SIGEL_Robot::SIG_JointSensor* >(sensorIt.current());
+	    SIGEL_Robot::SIG_JointSensor *actSensor = static_cast< SIGEL_Robot::SIG_JointSensor* >(actSensorBase);
 
 	    SIGEL_Robot::SIG_Joint const *joint = actSensor->getJoint();
 
@@ -186,7 +176,7 @@ SIGEL_Simulation::SIG_DynaMechsSimulationData::SIG_DynaMechsSimulationData( SIGE
 	 // tPitchRollSensor
 	  case SIGEL_Robot::SIG_Sensor::tPitchRollSensor:
 	  {
-	    SIGEL_Robot::SIG_PitchRollSensor *actSensor = static_cast< SIGEL_Robot::SIG_PitchRollSensor* >(sensorIt.current());
+	    SIGEL_Robot::SIG_PitchRollSensor *actSensor = static_cast< SIGEL_Robot::SIG_PitchRollSensor* >(actSensorBase);
 	    SIGEL_Robot::SIG_Link const *link = actSensor->getLink();
 
 	    if (dynaMechsLinks[ link->getNumber() ])
@@ -200,7 +190,7 @@ SIGEL_Simulation::SIG_DynaMechsSimulationData::SIG_DynaMechsSimulationData( SIGE
 	 // tContactSensor
 	  case SIGEL_Robot::SIG_Sensor::tContactSensor:
 	  {
-	    SIGEL_Robot::SIG_ContactSensor *actSensor = static_cast< SIGEL_Robot::SIG_ContactSensor* >(sensorIt.current());
+	    SIGEL_Robot::SIG_ContactSensor *actSensor = static_cast< SIGEL_Robot::SIG_ContactSensor* >(actSensorBase);
 	    SIGEL_Robot::SIG_Link const *link = actSensor->getLink();
 
 	    if (dynaMechsLinks[ link->getNumber() ])
@@ -212,7 +202,6 @@ SIGEL_Simulation::SIG_DynaMechsSimulationData::SIG_DynaMechsSimulationData( SIGE
 	  break;
 }
 
-	++sensorIt;
   }
 
   dynaMechsIntegrator->setSystem( &dynaMechsSystem );

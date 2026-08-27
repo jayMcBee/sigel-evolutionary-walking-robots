@@ -49,31 +49,29 @@ using SIGEL_Simulation::SIG_SimulationParameters;
 // while the diff stayed empty -- the four unwatched dicts were carrying it.
 static void dumpOrder(const SIGEL_Robot::SIG_Robot &r, const char *which)
 {
-#define SIG_DUMP(label, Type, iter)                                        \
+#define SIG_DUMP(label, Type, accessor)                                    \
   do {                                                                     \
-    Q2DictIterator<Type> it = r.iter();                                    \
     int n = 0;                                                             \
-    for (; it.current(); ++it)                                             \
+    for (Type *e : r.accessor())                                           \
       printf("  %-8s %-9s %2d  %s\n", which, label, n++,                   \
-             qPrintable(it.currentKey()));                                 \
+             qPrintable(e->getName()));                                    \
   } while (0)
 
-  SIG_DUMP("body",     SIGEL_Robot::SIG_Body,     getBodyIter);
-  SIG_DUMP("material", SIGEL_Robot::SIG_Material, getMaterialIter);
-  SIG_DUMP("link",     SIGEL_Robot::SIG_Link,     getLinkIter);
-  SIG_DUMP("joint",    SIGEL_Robot::SIG_Joint,    getJointIter);
-  SIG_DUMP("drive",    SIGEL_Robot::SIG_Drive,    getDriveIter);
-  SIG_DUMP("sensor",   SIGEL_Robot::SIG_Sensor,   getSensorIter);
+  SIG_DUMP("body",     SIGEL_Robot::SIG_Body,     getBodies);
+  SIG_DUMP("material", SIGEL_Robot::SIG_Material, getMaterials);
+  SIG_DUMP("link",     SIGEL_Robot::SIG_Link,     getLinks);
+  SIG_DUMP("joint",    SIGEL_Robot::SIG_Joint,    getJoints);
+  SIG_DUMP("drive",    SIGEL_Robot::SIG_Drive,    getDrives);
+  SIG_DUMP("sensor",   SIGEL_Robot::SIG_Sensor,   getSensors);
 #undef SIG_DUMP
 
   // Each link carries its own dict of significant points, in its own order.
-  Q2DictIterator<SIGEL_Robot::SIG_Link> li = r.getLinkIter();
-  for (; li.current(); ++li) {
-    Q2DictIterator<DL_vector> pi = li.current()->getPointIter();
+  for (SIGEL_Robot::SIG_Link *l : r.getLinks()) {
+    Q2DictIterator<DL_vector> pi = l->getPointIter();
     int n = 0;
     for (; pi.current(); ++pi)
       printf("  %-8s point %s %2d  %s\n", which,
-             qPrintable(li.currentKey()), n++, qPrintable(pi.currentKey()));
+             qPrintable(l->getName()), n++, qPrintable(pi.currentKey()));
   }
 }
 
