@@ -1,0 +1,53 @@
+# Phase V5, OUR half -- the MDH parameters our Qt 6 build computes, captured
+# 2026-08-27. The other half comes from gdb on the 1.3 binary on the x86 box.
+#
+# WHY BIT PATTERNS. These are non-integrating: they come from the robot model by
+# fixed arithmetic with no simulation loop, so unlike fitness they must agree
+# with 1.3 EXACTLY. Decimal printing hides the last few bits, which is precisely
+# where a porting error would show. Raw IEEE 754, big-endian hex.
+#
+# WHY KEYED BY NAME. So the comparison does not depend on container order --
+# V1 already checks ordering separately, and this must not re-test it.
+#
+# CALL COUNT IS ITSELF A CHECK. setMDHParameters sits in
+# SIG_DynaMechsSimulationData::initializeJoint below "if (predecessor != caller)
+# return 0", so it fires once per JOINT from its predecessor side, not once per
+# link. twoBases 1, octopus 9, walker 18 -- confirmed on this build. A count
+# mismatch on the 1.3 side is a finding on its own.
+#
+# Reproduce:  SIGEL_MDH=1 ./build-fast/sigel_eval <exp> 0 | grep '^mdh '
+# Columns:    mdh <jointName> <a> <alpha> <d> <theta>
+
+== twoBasesSimpleFitness1.exp
+mdh hinge1               3ff0000000000000 0000000000000000 0000000000000000 400921fb54442d18
+
+== octopusSimpleFitness.exp
+mdh firstLegJoint1       3fe2e1f964590ae3 400921fb54442d18 3c7a000000000000 3fe9acd0e00cb439
+mdh firstLegJoint2       3ff0000000000000 4012d97c7f3321d2 3ca0000000000000 0000000000000000
+mdh firstLegJoint3       3ff0000000000000 4012d97c7f3321d2 bfd7ae147ae147ac 3fe0c152382d7366
+mdh secondLegJoint1      3f847ae147ae1473 3ff0d38f2c5ba09f bfd548cc070d99c3 4002d97c7f3321d3
+mdh secondLegJoint2      3ff0000000000000 4012d97c7f3321d2 0000000000000000 0000000000000000
+mdh secondLegJoint3      3fefffffffffffff 4012d97c7f3321d2 bfd7ae147ae147ad 3fe0c152382d7362
+mdh thirdLegJoint1       3f847ae147ae1461 4014f942da491ef8 3fd632111a8045f1 4002d97c7f3321d2
+mdh thirdLegJoint2       3ff0000000000001 4012d97c7f3321d2 3ca0000000000000 0000000000000000
+mdh thirdLegJoint3       3ff0000000000000 4012d97c7f3321d2 bfd7ae147ae147ad 3fe0c152382d7362
+
+== walkerNiceWalkingFitness.exp
+mdh leg1Joint1           3fe947ae147ae148 4012d97c7f3321d2 3c9f883b5b71f228 0000000000000000
+mdh leg1Joint2           3fc999999999999c 3ff921fb54442d18 bfcd70a3d70a3d71 4015fdbbe9bba775
+mdh leg1Joint3           3fea3d70a3d70a3d 0000000000000000 0000000000000000 4012d97c7f3321d2
+mdh leg2Joint1           3fe947ae147ae148 4012d97c7f3321d2 3c9be2acfec920c4 0000000000000000
+mdh leg2Joint2           3fc999999999999c 3ff921fb54442d18 bfcd70a3d70a3d70 4015fdbbe9bba775
+mdh leg2Joint3           3fea3d70a3d70a3d 0000000000000000 0000000000000000 4012d97c7f3321d2
+mdh leg3Joint1           3fe947ae147ae148 4012d97c7f3321d2 3c9be2acfec920c4 0000000000000000
+mdh leg3Joint2           3fc999999999999c 3ff921fb54442d18 bfcd70a3d70a3d70 4015fdbbe9bba775
+mdh leg3Joint3           3fea3d70a3d70a3d 0000000000000000 0000000000000000 4012d97c7f3321d2
+mdh leg4Joint1           3fe947ae147ae148 3ff921fb54442d17 0000000000000000 0000000000000000
+mdh leg4Joint2           3fc9999999999998 3ff921fb54442d18 bfcd70a3d70a3d70 4015fdbbe9bba775
+mdh leg4Joint3           3fea3d70a3d70a3f 0000000000000000 3ca0000000000000 4012d97c7f3321d2
+mdh leg5Joint1           3fe947ae147ae148 3ff921fb54442d17 0000000000000000 0000000000000000
+mdh leg5Joint2           3fc9999999999998 3ff921fb54442d18 bfcd70a3d70a3d70 4015fdbbe9bba775
+mdh leg5Joint3           3fea3d70a3d70a3f 0000000000000000 3ca0000000000000 4012d97c7f3321d2
+mdh leg6Joint1           3fe947ae147ae148 3ff921fb54442d17 3c8d70a3d70a3d71 0000000000000000
+mdh leg6Joint2           3fc9999999999998 3ff921fb54442d18 bfcd70a3d70a3d71 4015fdbbe9bba775
+mdh leg6Joint3           3fea3d70a3d70a3f 0000000000000000 3ca0000000000000 4012d97c7f3321d2

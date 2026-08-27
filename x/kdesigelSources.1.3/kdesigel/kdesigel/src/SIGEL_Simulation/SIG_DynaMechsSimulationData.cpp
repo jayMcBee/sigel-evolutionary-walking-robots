@@ -20,6 +20,8 @@
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
+#include <cstring>
+#include <cstdlib>
 #include "compat/q2compat.h"
 #include "SIGEL_Simulation/SIG_DynaMechsSimulationData.h"
 
@@ -443,6 +445,23 @@ SIGEL_Simulation::SIG_DynaMechsLink *SIGEL_Simulation::SIG_DynaMechsSimulationDa
 					   alpha,
 					   d,
 					   theta);
+
+  // Phase V5, our half. The MDH parameters are non-integrating: they come from
+  // the robot model by fixed arithmetic, so unlike fitness they must agree with
+  // 1.3 exactly rather than approximately. Raw IEEE 754 bit patterns, because
+  // decimal printing hides the last few bits, and keyed by joint NAME so the
+  // comparison does not depend on container order. Off unless SIGEL_MDH is set.
+  if (getenv("SIGEL_MDH")) {
+    const double mdh[4] = { a, alpha, d, theta };
+    printf("mdh %-20s", qPrintable(joint->getName()));
+    for (int q = 0; q < 4; ++q) {
+      unsigned long long bits;
+      memcpy(&bits, &mdh[q], sizeof bits);
+      printf(" %016llx", bits);
+    }
+    printf("\n");
+    fflush(stdout);
+  }
 
 #ifdef SIG_DEBUG
   SIGEL_Tools::SIG_IO::cerr << "MDH Parameters of joint "
