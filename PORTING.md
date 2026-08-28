@@ -414,6 +414,13 @@ self-check and independent review are the substitute.
 - No squashing — the per-step history is what makes a bad step bisectable.
 - Commit messages: subject plus 3–5 lines. The code is the commit.
 
+**Phase P departed from this, on instruction.** No `step-P*` tags exist — the
+session owner asked for none, so the last tags are `step-R1` and `step-A9`. P1's
+commit is not prefixed either. And each step has **two** commits, not one: the
+step, then the fix for what its review found. Every round found something, so
+folding the fix into the step would have hidden it. Eight commits, `ee981a1`
+through `f0f2daa`.
+
 ---
 
 ## 7. Steps
@@ -696,7 +703,8 @@ This document is the handover. A new session should read §0, this section, and
 the phase it is taking on.
 
 **The `sigel-x86` channel** reaches the machine holding the 1.3 reference binary
-and a working PVM. It is currently owned by the Qt 6 session. If it transfers,
+and a working PVM. **That PVM is no longer the only one** — this machine has had
+one since Phase P — so the channel's value is now the 1.3 binary alone. It is currently owned by the Qt 6 session. If it transfers,
 identify yourself to it by **verifiable facts** — repo path, recent commit
 hashes, a reference file you authored — never by a session name, because names
 are assigned per side and neither end sees the other's.
@@ -711,6 +719,11 @@ are assigned per side and neither end sees the other's.
 
 Never edit a baseline to make a diff go away. If a change moves one, that is the
 finding.
+
+**`./pvm-check.sh` is a fourth check but not a fourth gate.** It has no baseline
+— it prints PASS/FAIL and exits non-zero if either half fails. Needs
+`make pvm && make pvm-link` first. Run it after touching PVM, `SIG_GPPVMData` or
+`SIG_GPFitnessTrainer`; the three gates above cannot see any of them.
 
 ---
 
@@ -1460,6 +1473,7 @@ every D8 site for a stored `const char *`.
 | ~~`SIG_DynaSystem.cpp:266-268`~~ | deletes `dynaJoints[k]` while looping to `dynaDrives.size()` | **moot 2026-08-28** — the file is deleted with the Dynamo backend, `physics_backends.md` | The two vectors grew independently |
 | `SIG_EarlyRunTermSimulation.cpp:97` | `QTime zeroHour;` | `QTime( 0, 0 )` | Same class as the other 11 `QTime()` sites but a declaration, so the first sweep's pattern missed it. `getMaxRecorderSteps` returned 2 instead of 182 — a factor of 91 on the denominator of three fitness functions. No shipped experiment selects them, so `replicate.sh` cannot see it |
 | `sigel_slave`, `getenv("SIGEL_ROOT")` | dereferenced unchecked | to be fixed | Segfaults if unset; the SIGSEGV handler masks it with no core. Bites under PVM specifically — spawned tasks inherit *pvmd's* environment, not the master's |
+| `SIG_GPPVMData.cpp:51` `sendQStringToPVM` | sends `str.length() + 1`, a **character** count, then sends `str.toUtf8()`, up to 4x longer in bytes | `qCStringBuffer.size() + 1` | `getQStringFromPVM` sizes its receive buffer from that count and lets `pvm_upkstr` write the bytes in. 20 `ü` gives `heap-buffer-overflow ... in byteupk` under ASan; short strings survive only because `QList` over-allocates. Qt 2's `length()` was the Latin-1 byte count, so 2003 was right for its own data. **Changes the wire format for non-ASCII** — safe only because both ends are this file and no distributed run exists. Found by Phase P's P4, regression-tested by `pvm_link.cpp` |
 | `SIG_Environment` terrain load | `getenv("SIGEL_ROOT")` unchecked | already checked, message on stderr | `sigel_eval` says "SIGEL_ROOT is not set, cannot locate Terrain.ter" instead of reading `/Terrain.ter` |
 
 ~~**Open, from the R1 review:** SOLID is built without the `-DNDEBUG` its own
@@ -1769,7 +1783,9 @@ with the Dynamo backend on 2026-08-28 (`physics_backends.md`). And the clamp **f
 The residual risk is stated plainly: an out-of-range index is now undefined
 rather than silently wrong, which AddressSanitizer catches in `build/` but a
 release build would not. Nothing in the evaluation path reaches it. The
-evolution loop cannot be exercised until PVM builds.
+evolution loop cannot be exercised — as written, "until PVM builds"; **still
+true after Phase P**, because the loop spawns `sigel_slave`, which Phase C
+blocks.
 
 ### What review found in D4–D6, and what it changed
 
@@ -1856,7 +1872,8 @@ message are not the whole remainder either.
 and by AddressSanitizer; the **evolution loop** — `SIG_GPPopulation`,
 `SIG_GPFitnessTrainer`, `SIG_GPManager`, `MT_Classifier` — is the 8 sites §9
 lists where `insert()` or a shrinking `resize()` *is* the only free, and nothing
-can run it until PVM builds. This step does the covered half only.
+can run it — as written, "until PVM builds"; **still true after Phase P**, the
+blocker being Phase C. This step does the covered half only.
 
 | | |
 |---|---|
