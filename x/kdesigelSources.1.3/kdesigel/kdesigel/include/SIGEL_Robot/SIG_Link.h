@@ -25,7 +25,7 @@
 
 namespace SIGEL_Robot { class SIG_Link; }
 
-#include "compat/q2compat.h"
+#include <QList>
 #include <qstring.h>
 #include <qtextstream.h>
 #include <pointvector.h>
@@ -89,9 +89,9 @@ namespace SIGEL_Robot
        *                  link.
        */
       void addNoCollide (SIG_Link *link, bool negotiate = true);
-      Q2PtrList<SIG_Link> getNoCollides () const;
+      QList<SIG_Link *> getNoCollides () const;
       void addJoint (SIG_Joint *joint);
-      Q2PtrList<SIG_Joint> getJoints () const;
+      QList<SIG_Joint *> getJoints () const;
 
       SIG_Geometry const *getGeometry (void) const;
       SIG_Mirtich const *getMirtich( void )  { return mirtich; }
@@ -123,8 +123,8 @@ namespace SIGEL_Robot
       // Phase D. Was Q2Dict<DL_vector>. A DL_vector has no name of its own,
       // so unlike SIG_Robot's six lists this one needs to carry the key.
       QList<NamedPoint> points;
-      Q2PtrList<SIG_Joint> adjacentJoints;
-      Q2PtrList<SIG_Link> noCollide;
+      QList<SIG_Joint *> adjacentJoints;
+      QList<SIG_Link *> noCollide;
       DL_vector initialLocation;
       DL_matrix initialOrientation;
       bool initiated, mdh_visited;

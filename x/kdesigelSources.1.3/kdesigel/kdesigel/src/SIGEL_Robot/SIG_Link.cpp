@@ -213,24 +213,20 @@ namespace SIGEL_Robot {
                         rot.times (&v, p.value);
                 }
 
-                Q2ListIterator<SIG_Joint> jit (adjacentJoints);
-                SIG_Joint *j;
-                while (j = jit.current ()) {
+                for (SIG_Joint *j : adjacentJoints)
                         j->transformPoints (this, mov, rot);
-                        ++jit;
-                }
         }
         
         void SIG_Link::addNoCollide (SIG_Link *link, bool negotiate)
         {
-                if (noCollide.containsRef (link) == 0) {
+                if (!noCollide.contains (link)) {
                         noCollide.append (link);
                         if (negotiate)
                                 link->addNoCollide (this, false);
                 }
         }
         
-        Q2PtrList<SIG_Link> SIG_Link::getNoCollides () const
+        QList<SIG_Link *> SIG_Link::getNoCollides () const
         {
                 return noCollide;
         }
@@ -240,7 +236,7 @@ namespace SIGEL_Robot {
                 adjacentJoints.append (joint);
         }
         
-        Q2PtrList<SIG_Joint> SIG_Link::getJoints () const
+        QList<SIG_Joint *> SIG_Link::getJoints () const
         {
                 return adjacentJoints;
         }
@@ -264,10 +260,8 @@ namespace SIGEL_Robot {
                 // to recursion.
                 initiated = true;
 
-                SIG_Joint *j;
                 SIG_Link *l;
-                Q2ListIterator<SIG_Joint> li (adjacentJoints);
-                while (j = li.current ()) {
+                for (SIG_Joint *j : adjacentJoints) {
                         DL_vector transla, fglobtransla;
                         DL_matrix rota, fglobrota;
 
@@ -281,8 +275,6 @@ namespace SIGEL_Robot {
 
                                 l->setInitialLocation (fglobtransla, fglobrota, this);
                         }
-
-                        ++li;
                 }
         }
         
@@ -324,7 +316,6 @@ namespace SIGEL_Robot {
 
         void SIG_Link::writeToFileTransfer (QTextStream & tx) const
         {
-                Q2ListIterator<SIG_Link> nciter (noCollide);
                 tx << "Link "
                    << getName () << ' '
                    << getNumber () << ' '
@@ -334,10 +325,8 @@ namespace SIGEL_Robot {
                         SIG_Robot::vectorToStream (tx, *p.value);
                 }
                 tx << noCollide.count () << ' ';
-                while (nciter.current ()) {
-                        tx << nciter.current ()->getName () << ' ';
-                        ++nciter;
-                }
+                for (const SIG_Link *nc : noCollide)
+                        tx << nc->getName () << ' ';
                 SIG_Robot::vectorToStream (tx, initialLocation);
                 SIG_Robot::matrixToStream (tx, initialOrientation);
                 tx << (initiated ? "y " : "n ");
@@ -369,19 +358,17 @@ namespace SIGEL_Robot {
 
 	  mdh_visited = true;
 
-	  Q2PtrList< SIG_Joint > successors;
+	  QList< SIG_Joint * > successors;
 
-	  SIG_Joint *actAdjacentJoint = adjacentJoints.first();
+	  for (SIG_Joint *actAdjacentJoint : adjacentJoints)
+	    if (actAdjacentJoint->continuable( this ))
+	      successors.append( actAdjacentJoint );
 
-	  while (actAdjacentJoint)
-	    {
-	      if (actAdjacentJoint->continuable( this ))
-		successors.append( actAdjacentJoint );
-
-	      actAdjacentJoint = adjacentJoints.next();
-	    };
-
-	  SIG_Joint *realSuccessor = successors.first();
+	  // value() yields null past the end, which is what Q2PtrList::first()
+	  // and next() did.  The do-while below MUST still run its body once
+	  // when successors is empty -- actSuccessor is null there, the body
+	  // has an explicit "without successor" path, and transformX is false.
+	  SIG_Joint *realSuccessor = successors.value( 0 );
 
 	  bool transformZ = predecessor;
 	  bool transformX = realSuccessor;
@@ -392,7 +379,8 @@ namespace SIGEL_Robot {
 
 	  DL_vector realNewOrigin;
 
-	  SIG_Joint *actSuccessor = successors.first();
+	  qsizetype successorPos = 0;
+	  SIG_Joint *actSuccessor = successors.value( successorPos );
 
 	  do
 	    {
@@ -642,7 +630,7 @@ namespace SIGEL_Robot {
 						      screwD,
 						      screwTheta );
 
-		  actSuccessor = successors.next();
+		  actSuccessor = successors.value( ++successorPos );
 		};
 	    }
 	  while (actSuccessor);

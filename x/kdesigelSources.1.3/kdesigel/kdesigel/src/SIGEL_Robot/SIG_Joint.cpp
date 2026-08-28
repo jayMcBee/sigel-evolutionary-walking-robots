@@ -752,16 +752,10 @@ namespace SIGEL_Robot {
 	     break;
 	   };
 
-	 Q2PtrList< SIG_Joint > joints = successor->getJoints();
+	 const QList< SIG_Joint * > joints = successor->getJoints();
 
-	 SIG_Joint *actJoint = joints.first();
-
-	 while (actJoint)
-	   {
-	     actJoint->calculateMDH( successor );
-
-	     actJoint = joints.next();
-	   };
+	 for (SIG_Joint *actJoint : joints)
+	   actJoint->calculateMDH( successor );
        };
 
        void SIG_Joint::calculateCut( DL_vector a,

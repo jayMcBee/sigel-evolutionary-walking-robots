@@ -367,18 +367,14 @@ void SIGEL_Simulation::SIG_DynaMechsSimulationData::initializeArticulation()
 
   dynaMechsSystem.addLink( internalRootLink, 0 );
 
-  Q2PtrList< SIGEL_Robot::SIG_Joint > rootJoints = rootLink->getJoints();
+  const QList< SIGEL_Robot::SIG_Joint * > rootJoints = rootLink->getJoints();
 
-  SIGEL_Robot::SIG_Joint *actJoint = rootJoints.first();
-
-  while (actJoint)
+  for (SIGEL_Robot::SIG_Joint *actJoint : rootJoints)
     {
       SIG_DynaMechsLink *newDynaMechsLink = initializeJoint( actJoint, rootLink );
 
       if (newDynaMechsLink)
 	dynaMechsRootLink->successors.append( newDynaMechsLink );
-
-      actJoint = rootJoints.next();
     };
 
   dynaMechsRootLink->forwardKinematics( 0 );
@@ -521,18 +517,14 @@ SIGEL_Simulation::SIG_DynaMechsLink *SIGEL_Simulation::SIG_DynaMechsSimulationDa
   else
     dynaMechsSystem.addLink( internalDynaMechsLink, internalPredecessor );
 
-  Q2PtrList< SIGEL_Robot::SIG_Joint > joints = link->getJoints();
+  const QList< SIGEL_Robot::SIG_Joint * > joints = link->getJoints();
 
-  SIGEL_Robot::SIG_Joint *actJoint = joints.first();
-
-  while (actJoint)
+  for (SIGEL_Robot::SIG_Joint *actJoint : joints)
     {
       SIG_DynaMechsLink *newSuccessor = initializeJoint( actJoint, link );
 
       if (newSuccessor)
 	dynaMechsLink->successors.append( newSuccessor );
-
-      actJoint = joints.next();
     };
 
   return dynaMechsLink;

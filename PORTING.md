@@ -30,7 +30,7 @@ build and run, because nothing else can be verified without it — see §3.
 | B — ownership explicit | **subsumed by Phase D**, which deletes the containers rather than converting them. **12** `setAutoDelete` left in core, re-measured 2026-08-28 — 10 in `SIGEL_GP`, 1 in `SIGEL_Robot`, 1 in `MT_Control`. The row said 13 and put 2 in `SIGEL_Robot`; there is one, `SIG_Body.cpp:54`, and it is `FALSE`. Everything owning is in the evolution loop, which Phase C still blocks even though PVM now runs |
 | R — build and run | core builds and runs. **No longer checked only against itself** — Phase V has confirmed both the ordering and the arithmetic against the 1.3 binary, §7 |
 | T — old-Qt tool container | **done 2026-08-27.** `tools/qtmig`, §4 |
-| D — delete the shim, migrate the data | **D1–D9 done.** `Q2Dict`, `Q2DictIterator` and `Q2Array` gone from all code; **`Q2PtrVector` is off the executed path entirely** as of D9. Shim 806 → **530** lines. Remaining, measured 2026-08-28 after D9: `Q2PtrList` 60, `Q2PtrVector` 48, `Q2CString` 21, `Q2Queue` 16, `Q2ListIterator` 14, `Q2ValueList` 12. The first two read 62 and 53 here and were each stale by 2 before D9 touched anything. §10 |
+| D — delete the shim, migrate the data | **D1–D10 done.** `Q2Dict`, `Q2DictIterator` and `Q2Array` gone from all code; **`Q2PtrVector` is off the executed path entirely** as of D9. Shim 806 → **530** lines. Remaining, measured 2026-08-28 after D10: `Q2PtrList` 50, `Q2PtrVector` 49, `Q2CString` 21, `Q2Queue` 16, `Q2ListIterator` 11, `Q2ValueList` 12. **The executed path is down to 8 live sites** — `SIG_Material::friction` (4), `SIG_Body::usedByLinks`, `SIG_DynaMechsLink::successors`, and 2 `Q2CString`. §10 |
 | P — PVM | **DONE 2026-08-28.** Vendored 3.4.3 replaced by upstream 3.4.6; nine patches carry the four config lines and Debian's eight source fixes; `libpvm3.a` and `pvmd3` build; SIGEL's two PVM objects link against them and `SIG_GPPVMData` round-trips through real PVM. `sigel`/`sigel_slave` still need Phase C. §7 |
 | C — GUI | **not started, AUTHORIZED 2026-08-27 per D24.** ~450 Qt 2 sites + 20 forms |
 | V — check against the 1.3 binary | **V1 and V5's MDH probe both done and both PASS.** Ordering: 10 of 10 container orders match. Arithmetic: `twoBases` exact bit for bit, `octopus` 9/9 with three joints exact and 5 ulp worst. V2–V4 not started; V5's sensor and force probes are **invalid as specified** — both target Dynamo-only functions, deleted 2026-08-28. §7 |
@@ -2139,6 +2139,61 @@ Verified: `./check.sh` 105 pass / 4 fail, **317 warnings, down from 322** — th
 `ASAN_OPTIONS=detect_leaks=0 ./fitness-check.sh build` reproduces
 `fitness-baseline.txt` with no ASan or UBSan report.
 
+
+### D10 — `SIG_Link`'s two lists, and a `do`/`while` that must run on empty
+
+`adjacentJoints` and `noCollide` become `QList<T *>`, with `getJoints()` and
+`getNoCollides()`. Both accessors return **by value**, as they did in 2003;
+Qt 6's `QList` is implicitly shared, so a caller still gets its own list and
+the copy costs a refcount. Neither list ever owned anything — no
+`setAutoDelete` on either, and `~SIG_Robot`'s `qDeleteAll` frees the joints and
+the links — so no ownership moved.
+
+The return types drag four caller sites into the same commit:
+`SIG_Robot.cpp:292`, `SIG_Joint.cpp:755` and
+`SIG_DynaMechsSimulationData.cpp:368,522`, all `first()`/`next()` walks over
+their own copy, all now range-for. `getNoCollides()` has **no caller anywhere
+in the tree**, GUI included; it is ported rather than deleted, per D21.
+
+**The one site that is not mechanical, and it is load-bearing on every robot.**
+`SIG_Link::transformToDynaMechs` builds a local `successors` list and walks it
+with a `do`/`while`:
+
+```cpp
+SIG_Joint *actSuccessor = successors.first();      // null when empty
+do { … if (actSuccessor) { …; actSuccessor = successors.next(); } }
+while (actSuccessor);
+```
+
+On an **empty** list the body still runs **once**, with `actSuccessor` null —
+the body has an explicit "without successor" branch, and `transformX` is false
+there. A range-for rewrite drops that pass silently. It is now an index with
+`QList::value()`, which yields null past the end exactly as `first()`/`next()`
+did, and the reason sits in a comment above it.
+
+**Verified to have teeth, not argued.** Replacing the `do`/`while` with a plain
+`while` — precisely what a careless rewrite produces — makes **every** robot
+abort: `terminate called after throwing an instance of
+'SIGEL_Robot::SIG_CannotMirtich'`, `sigel_eval exited 134`, and both gates go
+from empty to reporting every block missing. The empty-successors pass is what
+transforms every leaf link; it is not an edge case.
+
+**D9's lesson applied before building, not after.** D9 was caught out by
+`int % qsizetype`, which `gcc` does not warn about, so this step grepped every
+`count()` and `size()` on these two lists rather than trusting the warning
+delta. There is exactly one, `noCollide.count()` streamed at
+`SIG_Link.cpp:327`: `uint` → `qsizetype`, same decimal, and covered twice over
+because `writeToFileTransfer` feeds the copy constructor on every evaluation as
+well as the `.exp` bytes.
+
+`containsRef(link) == 0` became `!contains(link)` — Qt 2's default
+`compareItems` is pointer identity, which is what `QList::contains` does on a
+pointer, and the call was only ever tested against zero.
+
+`SIG_Link.h` now includes `<QList>` rather than `compat/q2compat.h`.
+
+Verified: `./check.sh` 105 pass / 4 fail, **315 warnings, down from 317**; both
+gates byte-identical; sanitized fitness run clean.
 
 ### A logging system
 
