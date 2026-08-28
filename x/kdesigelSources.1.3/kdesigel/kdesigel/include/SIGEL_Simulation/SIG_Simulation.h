@@ -120,9 +120,19 @@ namespace SIGEL_Simulation
 
 
     public slots:
-      /** This slot will catch a message from Dynamo
+      /** ORPHANED since 2026-08-28 -- physics_backends.md.
        *
-       * (which was thrown in SIG_DynaSystem) */
+       * This slot caught a message from Dynamo, emitted by SIG_DynaSystem.
+       * That class and the one connect() that wired this up went with the
+       * Dynamo backend, so nothing can invoke it any more. It is the only
+       * slot on this class and there are no signals, so Q_OBJECT and the
+       * surviving moc target now exist for this alone. It is also the only
+       * writer of stopSimulation, which makes makeTimeSteps' throw of
+       * SIG_SimulationCannotSolveException unreachable.
+       *
+       * Kept rather than removed: dropping it changes the Qt surface of a
+       * class Phase C still has to port, which is a separate decision from
+       * deleting the physics backend. */
       void slotDynamoMessage(QString theMessage);
 
 

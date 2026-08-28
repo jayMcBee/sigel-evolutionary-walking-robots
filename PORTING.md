@@ -30,9 +30,9 @@ build and run, because nothing else can be verified without it — see §3.
 | B — ownership explicit | **subsumed by Phase D**, which deletes the containers rather than converting them. 13 `setAutoDelete` left in core — 10 in `SIGEL_GP`, 2 in `SIGEL_Robot`, 1 in `MT_Control`, all in the evolution loop that nothing can run until PVM builds |
 | R — build and run | core builds and runs. **No longer checked only against itself** — Phase V has confirmed both the ordering and the arithmetic against the 1.3 binary, §7 |
 | T — old-Qt tool container | **done 2026-08-27.** `tools/qtmig`, §4 |
-| D — delete the shim, migrate the data | **D1–D8 done.** `Q2Dict`, `Q2DictIterator` and `Q2Array` gone from all code; `Q2PtrVector` off `SIG_Geometry`, `SIG_Body` and the `SIG_Register` cluster. Shim 806 → **530** lines. Remaining, measured 2026-08-28: `Q2PtrList` 62, `Q2PtrVector` 57, `Q2CString` 21, `Q2Queue` 16, `Q2ListIterator` 14, `Q2ValueList` 12. §10 |
+| D — delete the shim, migrate the data | **D1–D8 done.** `Q2Dict`, `Q2DictIterator` and `Q2Array` gone from all code; `Q2PtrVector` off `SIG_Geometry`, `SIG_Body` and the `SIG_Register` cluster. Shim 806 → **530** lines. Remaining, measured 2026-08-28: `Q2PtrList` 62, `Q2PtrVector` 53, `Q2CString` 21, `Q2Queue` 16, `Q2ListIterator` 14, `Q2ValueList` 12. §10 |
 | C — GUI | **not started, AUTHORIZED 2026-08-27 per D24.** ~450 Qt 2 sites + 20 forms |
-| V — check against the 1.3 binary | **V1 and V5's MDH probe both done and both PASS.** Ordering: 10 of 10 container orders match. Arithmetic: `twoBases` exact bit for bit, `octopus` 9/9 with three joints exact and 5 ulp worst. V2–V4 not started; V5's sensor and force probes open. §7 |
+| V — check against the 1.3 binary | **V1 and V5's MDH probe both done and both PASS.** Ordering: 10 of 10 container orders match. Arithmetic: `twoBases` exact bit for bit, `octopus` 9/9 with three joints exact and 5 ulp worst. V2–V4 not started; V5's sensor and force probes are **invalid as specified** — both target Dynamo-only functions, deleted 2026-08-28. §7 |
 
 **SCOPE — DECIDED 2026-08-23. Read this before changing anything.**
 
@@ -117,7 +117,8 @@ experiments — which is what produced the scope note above. All fixed.
 - When adding a shim assertion, break the shim and confirm the check aborts.
   Nine assertions have passed on broken code.
 - Sibling docs, both independent of this port: `future_refactorings.md` (C++
-  language level) and `physics_backends.md` (whether to delete the Dynamo path).
+  language level) and `physics_backends.md` (**decided and executed 2026-08-28**:
+  the Dynamo backend is deleted, the Dynamo maths library stays).
   Do not mix their commits with this work. Third sibling:
   `regression_1.0_to_1.3.md`, deferred until the port is done.
 
@@ -208,7 +209,7 @@ all still valid — string-based connect was never removed.
 |---|---|
 | Core files needing **no** container work | **210 of 266** |
 | Core files touching dead Qt 2 containers | 56 — worst is `SIG_Robot.cpp` (30) |
-| `Q_OBJECT` in core | 4 — `SIG_Simulation`, `SIG_DynaSystem`, `MT_GPManager`, `MT_Controller` |
+| `Q_OBJECT` in core | **3** — `SIG_Simulation`, `MT_GPManager`, `MT_Controller`. Was 4; `SIG_DynaSystem` went with the Dynamo backend, `physics_backends.md` |
 | Core files touching dialogs | 7 |
 | Core → GUI back-edges | 4 edges, 5 includes |
 
@@ -365,7 +366,7 @@ D20 supersedes D5, D24 supersedes D3.
 | # | Decision | Answer |
 |---|---|---|
 | **D15** | Where the robot models come from | downloaded from `sigel.sourceforge.net`, §9. Untracked, in `data/` |
-| **D16** | The Dynamo branch in `SIG_Simulation.cpp` | **build Dynamo, SOLID and qhull**. No source change, so `physics_backends.md` stays a separate decision |
+| **D16** | The Dynamo branch in `SIG_Simulation.cpp` | ~~build Dynamo, SOLID and qhull~~ **superseded 2026-08-28.** `physics_backends.md` was decided and executed: the branch and its 13 file pairs are deleted, `SIMULATIONLIBRARY 0` now fails loudly, and the Dynamo archive is cut to the maths objects. SOLID is still built and is now dead weight |
 | **D17** | Build system | **plain `Makefile`** at the repo root. Phase C can bring its own for `moc` and `uic` |
 | **D18** | What "runs clean under ASan" means for R3 | ASan and UBSan errors are pass/fail; LeakSanitizer output is a recorded baseline, because §10's leaks are out of scope |
 
@@ -396,10 +397,13 @@ self-check and independent review are the substitute.
 
 ## 7. Steps
 
-**Exit criterion per step:** `./check.sh` at the repo root — **118 pass, 4 fail,
-338 warnings** as of 2026-08-28. The 4 failures are exactly the files the
-Makefile excludes. Two gates run alongside it, both committed and both required
-to stay empty: `./dictorder-dump.sh | diff -u dictorder-baseline.txt -` and
+**Exit criterion per step:** `./check.sh` at the repo root — **105 pass, 4 fail,
+322 warnings** as of 2026-08-28. The 4 failures are exactly the files the
+Makefile excludes. It was 118/4/338 until the Dynamo backend was deleted
+(`physics_backends.md`); the pass count and "headers standalone" each fall by
+exactly 13, one per deleted file pair, and the failing files are unchanged.
+
+Two gates run alongside it, both committed and both required to stay empty: `./dictorder-dump.sh | diff -u dictorder-baseline.txt -` and
 `./fitness-check.sh | diff -u fitness-baseline.txt -`, the second of which runs
 `sigel_eval -selfcheck` first. It compiles every
 converted module, compiles every converted header standalone, and builds and
@@ -492,8 +496,11 @@ breaking the shim and confirming the check aborts.
 
 ### Phase R — build and run (§3, order item 1) — DONE
 
-`make` at the repo root builds 251 vendored objects, 118 of SIGEL's 122 core
-sources, three moc outputs and `build/sigel_eval`. 93 s from clean at `-j4`.
+`make` at the repo root builds 205 vendored objects, 105 of SIGEL's 109 core
+sources, two moc outputs and `build/sigel_eval`. Was 251 / 118 of 122 / three
+until the Dynamo backend was deleted (`physics_backends.md`): 46 vendored
+Dynamo `.cpp`, 13 of SIGEL's own and the `SIG_DynaSystem` moc target went with
+it.
 `make B=build-fast SAN= SIGSAN=` gives the same thing without the sanitizers,
 in its own directory.
 
@@ -538,7 +545,7 @@ untracked tree:
 | `cv97/JVector.h:29` | `remove()` is a member of the dependent base `CLinkedListNode<T>`; two-phase lookup binds it to `::remove(const char *)`. `this->remove()` |
 | `cv97/CLinkedList.h:37` | the list header node is a bare `CLinkedListNode<T>`, so `(T *)` is a downcast that never holds and UndefinedBehaviorSanitizer reports it. `reinterpret_cast` |
 | `dynamechs/dm/svd_linpack.cpp:180` | the inlined copy of `f2c.h` declares `struct complex`, ambiguous with `std::complex` under the `using namespace std` the pre-standard `<iomanip.h>` carried. `::complex` |
-| `Dynamo/Src/Inc/containerlist.h` | `NULL` with no `#include <cstddef>`. `-fpermissive` was hiding this, which is why it is a patch and not a flag |
+| `Dynamo/Src/Inc/containerlist.h` | `NULL` with no `#include <cstddef>`. `-fpermissive` was hiding this, which is why it is a patch and not a flag. **No longer load-bearing as of 2026-08-28**: `containerlist.h` is included only by `containerlist.cpp`, one of the 46 vendored Dynamo sources the backend deletion stopped compiling. It still applies cleanly, so it is left in place |
 | `SOLID-2.0/include/3D/Basic.h:40,43` | `INFINITY` is a C99 macro from `<math.h>`; `abs(double)` is now declared in the global namespace, so SOLID's own conflicts with it |
 
 Two shim headers went with them: `new.h` is new (5 SOLID sources include it),
@@ -713,9 +720,13 @@ minimising the difference under test.**
 
 **Open on the 1.3 side, reported as open rather than glossed:** the `applyForce`
 probe armed and took zero hits in a session where the MDH breakpoint fired 18
-times, so the harness was live and the non-hit is real but unexplained;
-`senseJoint1/2` were not attempted, because they return in `st(0)` and need a
-finish-style capture; `walker` has not been run.
+times, so the harness was live and the non-hit is real. **Explained 2026-08-28,
+by the Dynamo deletion:** `SIG_DynaDrive::applyForce` has exactly one caller,
+`SIG_DynaMoCommandInterface.cpp:54`, on the Dynamo path — and all 14 shipped
+experiments carry `SIMULATIONLIBRARY 1`. The breakpoint was on a function the
+run could not reach. `senseJoint1/2` are the same case and were never
+attempted; both probes need re-pointing at the DynaMechs classes. `walker` has
+not been run.
 
 **What made V5 work, after two failed routes.** Under woody's loader there is no
 exec event at all — `ld-linux.so.2` maps `sigel_slave` and jumps to it, so every
@@ -804,8 +815,8 @@ Three targets, best first:
 | target | value | why |
 |---|---|---|
 | `dmMDHLink::setMDHParameters` | 4 doubles per joint, at setup | computed from the robot geometry by short arithmetic at `SIG_DynaMechsSimulationData.cpp:397` and passed in at `:442`. Nothing integrates, so no tolerance is arguable. A DynaMechs symbol, not a `SIG_` one |
-| `SIG_DynaSensor::senseJoint1` / `senseJoint2` | returns one `DL_Scalar` | the sensor value a joint angle produces. The 1.0 → 1.3 regression lives in exactly this calculation, and the port must reproduce 1.3 **including** that defect |
-| `SIG_DynaDrive::applyForce(double, double)` | 2 doubles | the force a register value produces |
+| ~~`SIG_DynaSensor::senseJoint1` / `senseJoint2`~~ | returns one `DL_Scalar` | **INVALID, 2026-08-28.** Called only from `SIG_DynaMoSimulationQueries.cpp:45,47` — the **Dynamo** path, which no shipped experiment selects and which is now deleted. Re-point at `SIG_DynaMechsSimulationQueries` |
+| ~~`SIG_DynaDrive::applyForce(double, double)`~~ | 2 doubles | **INVALID, same reason.** Called only from `SIG_DynaMoCommandInterface.cpp:54`. This is why the probe took zero hits — see the V5 result below |
 
 Not a target: `SIG_DynaMechsSimulationQueries::sense(int, …)` writes into a
 register object rather than returning a value, which is awkward with no type
@@ -1149,7 +1160,7 @@ every D8 site for a stored `const char *`.
 | `Q2Array::sort()` | `memcmp` byte order | numeric | Three sites need ascending numeric order and break once any element reaches 256: `SIG_GPManager.cpp:304,311`, `SIG_AllIndividualsView.cpp:240`. Qt 2's own source says *"Qt 3.0: Add a virtual compareItems()"* |
 | out-of-range array access | warn, clamp to 0 | same, in the shim | Not via `Q_ASSERT`, which compiles to nothing under `QT_NO_DEBUG` — a release build would corrupt memory silently where 2003 returned a wrong value |
 | `SIG_ProgramLine.cpp:215-224` | writes `element[no]` in the branch entered *because* `no >= size()` | to be fixed | Its own comment is `// ToDo: Exception!` |
-| `SIG_DynaSystem.cpp:266-268` | deletes `dynaJoints[k]` while looping to `dynaDrives.size()` | to be fixed | The two vectors grow independently |
+| ~~`SIG_DynaSystem.cpp:266-268`~~ | deletes `dynaJoints[k]` while looping to `dynaDrives.size()` | **moot 2026-08-28** — the file is deleted with the Dynamo backend, `physics_backends.md` | The two vectors grew independently |
 | `SIG_EarlyRunTermSimulation.cpp:97` | `QTime zeroHour;` | `QTime( 0, 0 )` | Same class as the other 11 `QTime()` sites but a declaration, so the first sweep's pattern missed it. `getMaxRecorderSteps` returned 2 instead of 182 — a factor of 91 on the denominator of three fitness functions. No shipped experiment selects them, so `replicate.sh` cannot see it |
 | `sigel_slave`, `getenv("SIGEL_ROOT")` | dereferenced unchecked | to be fixed | Segfaults if unset; the SIGSEGV handler masks it with no core. Bites under PVM specifically — spawned tasks inherit *pvmd's* environment, not the master's |
 | `SIG_Environment` terrain load | `getenv("SIGEL_ROOT")` unchecked | already checked, message on stderr | `sigel_eval` says "SIGEL_ROOT is not set, cannot locate Terrain.ter" instead of reading `/Terrain.ter` |
@@ -1195,8 +1206,10 @@ Every later Phase D step has to leave that diff empty.
 **The first version of D1 was blind, and review caught it.** It dumped links and
 joints only. `SIG_Robot` holds **six** `Q2Dict`s (`SIG_Robot.h:60-65`) — bodies,
 materials, links, joints, drives, sensors — all six written in iteration order
-by `writeToFileTransfer` and read back in that order by
-`SIG_DynaMoSimulationData`, which is the site that numbers the DynaMechs bodies.
+by `writeToFileTransfer` and read back in that order by the simulation-data
+class — cited here as `SIG_DynaMoSimulationData` until 2026-08-28, which was
+the **Dynamo** one and is deleted; the live site is
+`SIG_DynaMechsSimulationData`.
 `SIG_Link::points` is a seventh, one per link. Rebuilding the core with
 `h % vlen` perturbed to `(h + 1u) % vlen` changed the ordering in 8 of 14
 experiments and the old gate fired on **2**. It now fires on all 8, plus 6 of
@@ -1237,10 +1250,15 @@ Names, so this stops being ambiguous: `dictorder-dump.sh` produces the order,
 is the working copy. `data/` is never written to — it is the untracked download
 and the only clean original we have.
 
-**Only four of the six dicts are numbered.** `SIG_DynaMoSimulationData.cpp:33-55`
-walks, in this order, **links → joints → sensors → drives**, calling
-`dynaSystem.newLink/newJoint/newSensor/newDrive`. Those four orders are the ones
-a migration must reproduce exactly.
+**Only four of the six dicts are numbered.** The walk is, in this order,
+**links → joints → sensors → drives**, and those four orders are the ones a
+migration must reproduce exactly. **The citation here was wrong and is corrected
+2026-08-28:** it named `SIG_DynaMoSimulationData.cpp:33-55`
+(`dynaSystem.newLink/newJoint/newSensor/newDrive`), which is the **Dynamo**
+class, deleted with that backend. Both backends walked the same four dicts in
+the same order, so nothing this section concludes changes and
+`dictorder-baseline.txt` did not move — but the live file is
+`SIG_DynaMechsSimulationData.cpp`.
 
 Bodies and materials are free of *numbering* — but an earlier draft said they
 were "touched only by `loadGeometries`" and "only through `lookupMaterial`",
@@ -1445,8 +1463,9 @@ Two behaviours went with the type:
 
 Dropping the clamp is safe here and was checked rather than assumed. Both
 defects §9 lists it as masking are already fixed —
-`SIG_ProgramLine.cpp:215` drops the out-of-range write, `SIG_DynaSystem.cpp:266`
-deletes the right vector. And the clamp **fired in none of the 42 evaluations**;
+`SIG_ProgramLine.cpp:215` drops the out-of-range write, and
+`SIG_DynaSystem.cpp:266` deleted the right vector before that whole file went
+with the Dynamo backend on 2026-08-28 (`physics_backends.md`). And the clamp **fired in none of the 42 evaluations**;
 `Q2Array::at: index … out of range` appears nowhere in their output.
 
 The residual risk is stated plainly: an out-of-range index is now undefined
@@ -1529,10 +1548,11 @@ one in executed code — and `SIG_Interpreter.h:125`'s `registers`, indexed on
 every interpreted instruction. `SIG_SimulationQueries.h:67` and
 `SIG_CommandInterface.h:66` are pure-virtual signatures taking
 `Q2PtrVector<SIG_Register> &`, three implementations each, so that one has to
-flip in a single commit. `SIG_DynaSystem.h:193-202` has four more on the Dynamo
-backend, and `SIG_GPOperations.h:73` and `SIG_GPTournament.h:81` mean the four
-evolution-loop users named in the commit message are not the whole remainder
-either.
+flip in a single commit. `SIG_DynaSystem.h:193-202` had four more on the Dynamo
+backend — **gone 2026-08-28 with that backend, which is the whole of
+`Q2PtrVector` 57 → 53** — and `SIG_GPOperations.h:73` and
+`SIG_GPTournament.h:81` mean the four evolution-loop users named in the commit
+message are not the whole remainder either.
 
 `Q2PtrVector` splits in two. The **simulation side** is covered by both gates
 and by AddressSanitizer; the **evolution loop** — `SIG_GPPopulation`,

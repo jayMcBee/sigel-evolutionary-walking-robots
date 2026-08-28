@@ -2,7 +2,7 @@
 """Rewrite robot data so declaration order IS the order the simulation uses.
 
 PORTING.md Phase D. Q2Dict's hash order currently numbers the links, joints,
-sensors and drives (SIG_DynaMoSimulationData.cpp:33-55). Deleting the shim makes
+sensors and drives (SIG_DynaMechsSimulationData.cpp). Deleting the shim makes
 the containers insertion-ordered, so that numbering has to come from the file
 instead. This permutes each file's declarations into the order the shim produces
 today, taken from dictorder-baseline.txt.
@@ -115,7 +115,7 @@ def rewrite_rrb(text, target):
 # Stored numbers are read straight back by SIG_Link's stream constructor
 # (SIG_Link.cpp:65 "tx >> name >> number"), so permuting lines leaves every
 # number exactly as 2001 wrote it. Only the order changes, which is the thing
-# SIG_DynaMoSimulationData turns into the DynaMechs body index.
+# SIG_DynaMechsSimulationData turns into the DynaMechs body index.
 EXP_UNITS = {          # leading token -> (name field, extra continuation lines)
     "Link": (1, 0),
     "RotationalJoint": (2, 1),

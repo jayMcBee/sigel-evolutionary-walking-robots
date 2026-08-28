@@ -22,13 +22,12 @@
 */
 #include "SIGEL_Simulation/SIG_Simulation.h"
 #include <exception>
+#include <iostream>
 
-#include "SIGEL_Simulation/SIG_DynaMoSimulationData.h"
 #include "SIGEL_Simulation/SIG_DynaMechsSimulationData.h"
-#include "SIGEL_Simulation/SIG_DynaMoSimulationQueries.h"
 #include "SIGEL_Simulation/SIG_DynaMechsSimulationQueries.h"
-#include "SIGEL_Simulation/SIG_DynaMoCommandInterface.h"
 #include "SIGEL_Simulation/SIG_DynaMechsCommandInterface.h"
+#include "SIGEL_Tools/SIG_Exception.h"
 #include "SIGEL_Tools/SIG_IO.h"
 
 SIGEL_Simulation::SIG_Simulation::SIG_Simulation(SIGEL_Robot::SIG_Robot const & robot,
@@ -42,24 +41,6 @@ SIGEL_Simulation::SIG_Simulation::SIG_Simulation(SIGEL_Robot::SIG_Robot const & 
 {
   switch (simulationParameter.getSimulationLibrary())
     {
-    case SIG_SimulationParameters::DynaMo:
-      {
-	SIG_DynaMoSimulationData *dynaMoSimulationData = new SIG_DynaMoSimulationData( robot,
-										       environment,
-										       simulationParameter );
-
-	simulationData = dynaMoSimulationData;
-	simulationQueries = new SIG_DynaMoSimulationQueries( *dynaMoSimulationData );
-	commandInterface = new SIG_DynaMoCommandInterface( *dynaMoSimulationData );
-
-#ifdef SIG_DEBUG 
-// dynamic_cast<SIG_DynaMoSimulationQueries*>(simulationQueries)->printDynaDatas();
-#endif
-	connect( &dynaMoSimulationData->dynaSystem,
-		 SIGNAL(signalDynamoMessage(QString)),
-		 SLOT(slotDynamoMessage(QString)) );
-      };
-      break;
     case SIG_SimulationParameters::DynaMechs:
       {
 	SIG_DynaMechsSimulationData *dynaMechsSimulationData = new SIG_DynaMechsSimulationData( robot,
@@ -71,6 +52,37 @@ SIGEL_Simulation::SIG_Simulation::SIG_Simulation(SIGEL_Robot::SIG_Robot const & 
 	commandInterface = new SIG_DynaMechsCommandInterface( *dynaMechsSimulationData );
       };
       break;
+
+    // The Dynamo backend was deleted on 2026-08-28 -- physics_backends.md.
+    // SIMULATIONLIBRARY 0 therefore names a simulator that no longer exists,
+    // and this case must not be allowed to fall through: the three interface
+    // pointers below would stay uninitialised, and silently constructing a
+    // DynaMechs simulation instead would answer with a fitness from a
+    // different physics engine than the file asked for. All 14 shipped
+    // experiments carry SIMULATIONLIBRARY 1.
+    //
+    // The printed line is load-bearing, not decoration, and an earlier
+    // version of this comment had the reason backwards. The throw does clear
+    // all six fitness functions, which construct SIG_Simulation OUTSIDE their
+    // own try block -- but one frame further out sigel_slave.cpp:361-367
+    // wraps evalFitness() in catch (SIG_Exception &) { fitnessValue = 0; }.
+    // So under PVM the throw is swallowed and the individual scores 0.0 as
+    // though it had been evaluated, which is exactly the failure
+    // SIG_GPSimpleRecorder.cpp:42 describes. The message is then the only
+    // evidence that reaches anyone. It goes to std::cerr rather than
+    // SIG_IO::cerr because SIG_IO buffers and flushes on destruction
+    // (PORTING.md 10). Under sigel_eval, which has no such catch, the throw
+    // reaches terminate() and aborts.
+    default:
+      std::cerr << "SIG_Simulation: SIMULATIONLIBRARY "
+		<< static_cast<int>( simulationParameter.getSimulationLibrary() )
+		<< " selects the Dynamo backend, which was removed. Only"
+		   " SIMULATIONLIBRARY 1 (DynaMechs) is supported."
+		<< std::endl;
+      throw SIGEL_Tools::SIG_Exception( __FILE__, __LINE__,
+					"SIMULATIONLIBRARY selects the removed Dynamo"
+					" backend; only DynaMechs (SIMULATIONLIBRARY 1)"
+					" is supported" );
     };
 
   recorder.setSimulationQueries( *simulationQueries );
@@ -88,8 +100,9 @@ SIGEL_Simulation::SIG_Simulation::~SIG_Simulation()
 
 // NOTE: in 2003 this carried throw(SIG_SimulationCannotSolveException).
 // C++17 removed dynamic exception specifications, but removing it outright
-// would change behaviour: SIG_Recorder and SIG_DynaSystem can throw other
-// SIG_Exception subclasses through this frame, which the old specification
+// would change behaviour: SIG_Recorder and the simulation backend can throw
+// other SIG_Exception subclasses through this frame, which the old
+// specification
 // turned into terminate(). Every caller is a GP fitness function that does
 // catch (SIG_Exception &) { }, so without the boundary those become a
 // silently wrong fitness value instead of a crash. The guarantee is kept
@@ -130,8 +143,9 @@ void SIGEL_Simulation::SIG_Simulation::start()
 
 // NOTE: in 2003 this carried throw(SIG_SimulationCannotSolveException).
 // C++17 removed dynamic exception specifications, but removing it outright
-// would change behaviour: SIG_Recorder and SIG_DynaSystem can throw other
-// SIG_Exception subclasses through this frame, which the old specification
+// would change behaviour: SIG_Recorder and the simulation backend can throw
+// other SIG_Exception subclasses through this frame, which the old
+// specification
 // turned into terminate(). Every caller is a GP fitness function that does
 // catch (SIG_Exception &) { }, so without the boundary those become a
 // silently wrong fitness value instead of a crash. The guarantee is kept
@@ -146,11 +160,14 @@ void SIGEL_Simulation::SIG_Simulation::makeTimeSteps(int numTimeSteps)
 		
       simulationData->simulationProgress();
 
-#ifdef SIG_DEBUG
-// dynamic_cast<SIG_DynaMoSimulationQueries*>(simulationQueries)->printDynaDatas();
-#endif
       simulationQueries->checkDynas();
 
+      // UNREACHABLE since 2026-08-28. slotDynamoMessage was the only writer
+      // of stopSimulation and the Dynamo signal that invoked it is deleted,
+      // so this is the sole throw site of SIG_SimulationCannotSolveException
+      // in the tree and it can no longer fire. Left in place: removing it
+      // would change the exception surface of a class Phase C still has to
+      // port. See physics_backends.md, "Dead but not deleted".
       if (stopSimulation)
         throw SIG_SimulationCannotSolveException( __FILE__, __LINE__,
                                                                                                   "Dynamo produced an Cannot Solve Constraints Error" );

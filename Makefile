@@ -105,9 +105,51 @@ $(LIB)/libcv97.a: INCS := -I$(SL)/cv97 -I$(SHIM)
 $(LIB)/libcv97.a: $(patsubst $(SL)/%.cpp,$(OBJ)/%.o,\
   $(filter-out $(SL)/cv97/Sample.cpp,$(wildcard $(SL)/cv97/*.cpp)))
 
-# Dynamo. -ldynalib is the name the 2003 link line uses.
+# Dynamo -- the maths library and what it drags with it. -ldynalib is the name
+# the 2003 link line uses.
+#
+# SIGEL's Dynamo BACKEND was deleted on 2026-08-28 (physics_backends.md), but
+# Dynamo is also the maths library the whole of SIGEL is built on: DL_vector,
+# DL_point, DL_matrix, DL_Scalar, 1,101 references across 93 files. So the
+# archive stays; what changes is which of its 60 .cpp go into it.
+#
+# 14 compiled, of which the linker actually pulls 12. pointvector.cpp and
+# list.cpp really are empty -- "no non-inline methods", zero defined symbols,
+# never extracted -- and they are here only so the maths half of the library is
+# named rather than implied. The 12 that matter are where the "maths half /
+# physics half" story breaks: matrix.cpp carries 27
+# out-of-line DL_matrix members, all of which sigel_eval links, AND it includes
+# dyna_system.h so that DL_matrix::invert can report a singular matrix through
+# the physics engine's global callback:
+#
+#   matrix.cpp:233  DL_dsystem->get_companion()->Msg("singular matrix ...")
+#
+# That one call, plus the DL_geo vtable matrix.o emits, is an undefined
+# reference to dyna_system.o and geo.o, and their closure is nine more physics
+# translation units. Measured with nm over all 60 objects, not guessed; each
+# entry below the blank line names the symbol that pulled it in:
+#
+#   dyna_system  DL_dsystem            geo          DL_geo::move
+#   dyna         DL_dyna::newkinenergy constraint   DL_constraint::reset_undo
+#   constraint_manager DL_constraints  euler        DL_euler::DL_euler
+#   m_integrator DL_m_integrator::stepsize          supvec  DL_supvec::A2q
+#   force_drawable DL_force_drawable::get_fd_info   vector4 DL_vector4::assign
+#   largematrix  DL_largematrix::prep_for_solve
+#
+# So the two halves are NOT cleanly separable, and this list is the honest
+# answer rather than the three-file one. 46 of the 60 stop being compiled,
+# 10,084 of 13,567 lines; of the 3,483 still compiled, 3,056 are physics that
+# only DL_matrix::invert's error path can reach. Nothing here is stubbed and no
+# symbol is defined away -- breaking the coupling would mean patching a
+# vendored diagnostic out, which is a separate decision.
+#
+# The whole of Dynamo/Src/Inc stays on the include path: the maths headers live
+# there next to the physics ones.
+dynamo_SRC := pointvector matrix list \
+              constraint constraint_manager dyna dyna_system euler \
+              force_drawable geo largematrix m_integrator supvec vector4
 $(LIB)/libdynalib.a: INCS := -I$(SL)/Dynamo/Src/Inc -I$(SHIM)
-$(LIB)/libdynalib.a: $(patsubst $(SL)/%.cpp,$(OBJ)/%.o,$(wildcard $(SL)/Dynamo/Src/Cpp/*.cpp))
+$(LIB)/libdynalib.a: $(patsubst %,$(OBJ)/Dynamo/Src/Cpp/%.o,$(dynamo_SRC))
 
 # SOLID, with the qhull convex hull path its Make-config recommends.
 $(LIB)/libsolid.a: INCS := -I$(SL)/SOLID-2.0/include -I$(SL)/SOLID-2.0/src \
@@ -166,11 +208,10 @@ $(OBJ)/sigel/%.o: $(SRC)/src/%.cpp $(STAMP)
 	@mkdir -p $(dir $@)
 	$(SIGCXX) -MMD -MP $(SIGINC) -c $< -o $@
 
-# The four Q_OBJECT classes in core. Their vtable and typeinfo live in the
-# generated code, so without these the link fails on SIG_Simulation and
-# SIG_DynaSystem. MT_Controller.h is here for completeness -- its .cpp is
-# excluded above, so nothing references its vtable yet.
-MOC_HDRS := MT_GPSystem/MT_GPManager.h SIGEL_Simulation/SIG_DynaSystem.h \
+# The Q_OBJECT classes in core. Their vtable and typeinfo live in the generated
+# code, so without these the link fails on SIG_Simulation. SIG_DynaSystem.h was
+# the third entry until the Dynamo backend was deleted (physics_backends.md).
+MOC_HDRS := MT_GPSystem/MT_GPManager.h \
             SIGEL_Simulation/SIG_Simulation.h
 MOC_OBJS := $(patsubst %.h,$(OBJ)/moc/%.o,$(MOC_HDRS))
 

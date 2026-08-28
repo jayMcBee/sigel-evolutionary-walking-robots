@@ -641,10 +641,6 @@ SOURCE=.\include\SIGEL_RobotIO\SIG_UnstreamerScanner.h
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=.\src\SIGEL_Simulation\moc_SIG_DynaSystem.cpp
-# End Source File
-# Begin Source File
-
 SOURCE=.\src\SIGEL_Simulation\moc_SIG_Simulation.cpp
 # End Source File
 # Begin Source File
@@ -654,46 +650,6 @@ SOURCE=.\src\SIGEL_Simulation\SIG_CommandInterface.cpp
 # Begin Source File
 
 SOURCE=.\include\SIGEL_Simulation\SIG_CommandInterface.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\SIGEL_Simulation\SIG_Dyna.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\include\SIGEL_Simulation\SIG_Dyna.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\SIGEL_Simulation\SIG_DynaCallbacks.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\include\SIGEL_Simulation\SIG_DynaCallbacks.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\SIGEL_Simulation\SIG_DynaDrive.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\include\SIGEL_Simulation\SIG_DynaDrive.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\SIGEL_Simulation\SIG_DynaJoint.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\include\SIGEL_Simulation\SIG_DynaJoint.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\SIGEL_Simulation\SIG_DynaLink.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\include\SIGEL_Simulation\SIG_DynaLink.h
 # End Source File
 # Begin Source File
 
@@ -726,81 +682,6 @@ SOURCE=.\src\SIGEL_Simulation\SIG_DynaMechsSimulationQueries.cpp
 # Begin Source File
 
 SOURCE=.\include\SIGEL_Simulation\SIG_DynaMechsSimulationQueries.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\SIGEL_Simulation\SIG_DynaMoCommandInterface.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\include\SIGEL_Simulation\SIG_DynaMoCommandInterface.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\SIGEL_Simulation\SIG_DynaMoSimulationData.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\include\SIGEL_Simulation\SIG_DynaMoSimulationData.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\SIGEL_Simulation\SIG_DynaMoSimulationQueries.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\include\SIGEL_Simulation\SIG_DynaMoSimulationQueries.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\SIGEL_Simulation\SIG_DynaSensor.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\include\SIGEL_Simulation\SIG_DynaSensor.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\SIGEL_Simulation\SIG_DynaSystem.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\include\SIGEL_Simulation\SIG_DynaSystem.h
-
-!IF  "$(CFG)" == "SIGELCommon - Win32 Release"
-
-# Begin Custom Build - moc'ing $(InputName)
-ProjDir=.
-InputPath=.\include\SIGEL_Simulation\SIG_DynaSystem.h
-InputName=SIG_DynaSystem
-
-"$(ProjDir)\src\SIGEL_Simulation\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(QTDIR)\bin\moc $(InputPath) -o $(ProjDir)\src\SIGEL_Simulation\moc_$(InputName).cpp
-
-# End Custom Build
-
-!ELSEIF  "$(CFG)" == "SIGELCommon - Win32 Debug"
-
-# Begin Custom Build - moc'ing $(InputName)
-ProjDir=.
-InputPath=.\include\SIGEL_Simulation\SIG_DynaSystem.h
-InputName=SIG_DynaSystem
-
-"$(ProjDir)\src\SIGEL_Simulation\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	$(QTDIR)\bin\moc $(InputPath) -o $(ProjDir)\src\SIGEL_Simulation\moc_$(InputName).cpp
-
-# End Custom Build
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\SIGEL_Simulation\SIG_DynaSystemWrongNumberException.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\include\SIGEL_Simulation\SIG_DynaSystemWrongNumberException.h
 # End Source File
 # Begin Source File
 
@@ -857,14 +738,6 @@ SOURCE=.\src\SIGEL_Simulation\SIG_RegisterWrongSizeException.cpp
 # Begin Source File
 
 SOURCE=.\include\SIGEL_Simulation\SIG_RegisterWrongSizeException.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\SIGEL_Simulation\SIG_RotationalController.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\include\SIGEL_Simulation\SIG_RotationalController.h
 # End Source File
 # Begin Source File
 
@@ -932,14 +805,6 @@ SOURCE=.\src\SIGEL_Simulation\SIG_SimulationQueries.cpp
 # Begin Source File
 
 SOURCE=.\include\SIGEL_Simulation\SIG_SimulationQueries.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\SIGEL_Simulation\SIG_TranslationalController.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\include\SIGEL_Simulation\SIG_TranslationalController.h
 # End Source File
 # End Group
 # Begin Group "Tools"

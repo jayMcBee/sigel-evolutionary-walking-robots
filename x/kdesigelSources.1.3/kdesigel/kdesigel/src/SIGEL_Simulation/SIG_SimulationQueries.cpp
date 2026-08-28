@@ -25,9 +25,6 @@
 #include <qdatetime.h>
 #include "matrix.h"
 #include "pointvector.h"
-#include "SIGEL_Simulation/SIG_DynaLink.h"
-#include "SIGEL_Simulation/SIG_Dyna.h"
-#include "SIGEL_Simulation/SIG_DynaSensor.h"
 #include <cmath>
 #include "NaN.h"
 #include "SIGEL_Tools/SIG_IO.h"

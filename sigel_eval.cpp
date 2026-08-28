@@ -43,8 +43,11 @@ using SIGEL_Simulation::SIG_SimulationParameters;
 // Every Q2Dict whose iteration order reaches the simulation -- PORTING.md
 // Phase D. SIG_Robot holds six (SIG_Robot.h:60-65); all six are written in
 // iteration order by SIG_Robot::writeToFileTransfer and read back in that
-// order by SIG_DynaMoSimulationData, which is what numbers the DynaMechs
-// bodies. SIG_Link::points is a seventh, one per link.
+// order by SIG_DynaMechsSimulationData, which is what numbers the DynaMechs
+// bodies. (This named SIG_DynaMoSimulationData until 2026-08-28 -- that was
+// the Dynamo class, deleted with that backend. Both walked the same four
+// dicts in the same order, so the ordering this gate protects is unchanged.)
+// SIG_Link::points is a seventh, one per link.
 //
 // D1 first dumped only links and joints. A review rebuilt the core with a
 // perturbed Q2Dict::hash and found 6 of 14 experiments whose order changed

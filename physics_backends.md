@@ -1,8 +1,10 @@
 # SIGEL physics backends — Dynamo or DynaMechs?
 
-**Status: analysis only. Nothing decided, nothing deleted.**
-Written 2026-08-20 during the Qt 6 port. Independent of that port — but the
-decision changes how much code the port has to carry.
+**Status: DONE. The Dynamo backend was deleted on 2026-08-28.**
+Written 2026-08-20 during the Qt 6 port, executed 2026-08-28. Independent of
+that port — the analysis below is kept as written so the decision can be
+re-read; what actually happened, and where the analysis was wrong, is in
+**"What was actually done"** immediately after the recommendation.
 
 ---
 
@@ -31,7 +33,233 @@ Three reasons, in order of weight:
 
 1. **The Dynamo path crashes on most of the shipped robots.**
 2. The original authors marked it "not recommended" in the GUI.
-3. All 12 shipped experiments select DynaMechs.
+3. All 14 shipped experiments select DynaMechs. Re-measured 2026-08-28:
+   `SIMULATIONLIBRARY` is `1` in 14 of 14 `.exp`, no exceptions.
+
+---
+
+## What was actually done — 2026-08-28
+
+### Deleted
+
+**SIGEL's 13 Dynamo file pairs, 26 files, 3,226 lines.** `SIG_Dyna`,
+`SIG_DynaCallbacks`, `SIG_DynaDrive`, `SIG_DynaJoint`, `SIG_DynaLink`,
+`SIG_DynaMoCommandInterface`, `SIG_DynaMoSimulationData`,
+`SIG_DynaMoSimulationQueries`, `SIG_DynaSensor`, `SIG_DynaSystem`,
+`SIG_DynaSystemWrongNumberException`, `SIG_RotationalController`,
+`SIG_TranslationalController` — every one of them `.cpp` and `.h`.
+
+**3,226, not the 3,247 counted above.** The list of files was right; four of
+them changed size between 2026-08-20 and the deletion, all in Phase D:
+`SIG_DynaSystem` −8, `SIG_DynaMoSimulationData` −15,
+`SIG_DynaMoSimulationQueries` +1, `SIG_DynaMoCommandInterface` +1.
+
+**The backend switch.** `SIG_Simulation.cpp` keeps its `DynaMechs` case and
+gains a `default:` that prints to `std::cerr` and throws. It does not fall
+through — the previous switch had no `default` at all, so an unknown library
+would have left `simulationData`, `simulationQueries` and `commandInterface`
+uninitialised. Verified by building a copy of `sigel_eval` without its own
+`SIMULATIONLIBRARY` guard (`sigel_eval.cpp:242`) and running an `.exp` edited to
+`SIMULATIONLIBRARY 0`: one line of diagnostic, then abort, exit 134. It never
+falls through and never runs DynaMechs.
+
+**But "loud" is only true of `sigel_eval`, and the first draft of this entry
+and of the code comment both had the reason backwards.** The throw clears all
+six fitness functions, which construct `SIG_Simulation` outside their own `try`
+— but one frame further out `sigel_slave.cpp:361-367` wraps `evalFitness()` in
+`catch (SIG_Exception &) { fitnessValue = 0; }`. So under PVM the exception is
+swallowed and the individual is scored 0.0 as though it had been evaluated,
+which is precisely the failure `SIG_GPSimpleRecorder.cpp:42` documents. That
+makes the printed line the only evidence that reaches anyone, and it is why the
+message goes to `std::cerr` rather than the buffered `SIG_IO::cerr` — a reason
+this change got right by accident and now states correctly. Hardening that
+swallow is a pre-existing defect and out of scope here.
+
+**Three dead includes and one wrong one.** `SIG_SimulationQueries.cpp` included
+`SIG_DynaLink.h`, `SIG_Dyna.h` and `SIG_DynaSensor.h` and used none of them.
+`SIG_Environment.h:26` included `<constraint.h>`, a Dynamo *physics* header,
+only to reach `DL_vector`; it is `<pointvector.h>` now, as this document asked.
+
+**One `moc` target.** `SIG_DynaSystem.h` is off `MOC_HDRS`.
+
+**`SIG_Simulation` stays a `QObject`, and that is now vestigial — recorded
+rather than glossed.** The deleted `connect()` was the only thing that wired
+`slotDynamoMessage`, which is the class's only slot; it declares no signals. So
+`Q_OBJECT`, the `QObject` base and the surviving `moc` target exist for a slot
+nothing can invoke. Two consequences follow and are annotated in the source:
+`stopSimulation` had no other writer, so `makeTimeSteps`' `if (stopSimulation)`
+is permanently false — and that is the **only** throw site of
+`SIG_SimulationCannotSolveException` in the tree, which makes the 2003-behaviour
+boundary around `start()` and `makeTimeSteps()` guard a type that can no longer
+arrive. All of it is left in place: removing a slot changes the Qt surface of a
+class Phase C still has to port, which is a different decision from deleting a
+physics backend.
+
+**46 of the 60 vendored Dynamo `.cpp` stop being compiled**, 10,084 of 13,567
+lines. Nothing vendored is *deleted* — that tree is untracked and comes out of
+a tarball — only the `dynamo_SRC` list the build feeds `ar`.
+
+**Three build files.** Both `Makefile.am` in `SIGEL_Simulation` lose the 39
+filenames that no longer exist, and `SIGELCommon.dsp` — the 2003 Visual Studio
+project — loses 27 `Source File` blocks: the 26 files plus
+`moc_SIG_DynaSystem.cpp` and its two custom-build rules.
+
+### Kept, and why
+
+**The maths library, and more of Dynamo than this document predicted.** The
+prediction was `Cpp/{pointvector,matrix,list}.cpp`. That is wrong, and the
+measurement is the useful part of this entry:
+
+- `pointvector.cpp` and `list.cpp` are genuinely empty — "no non-inline
+  methods". `DL_vector` and `DL_point` really are header-only.
+- **`matrix.cpp` is not.** It carries 27 out-of-line `DL_matrix` members, all 28
+  of its symbols link into `sigel_eval`, so `libdynalib.a` **cannot** be dropped
+  from the link line. Tested, not assumed.
+- **`matrix.cpp` is not pure maths either.** It `#include`s `dyna_system.h` so
+  that `DL_matrix::invert` can report a singular matrix through the physics
+  engine's global callback: `matrix.cpp:233`,
+  `DL_dsystem->get_companion()->Msg("singular matrix can't be inverted\n")`.
+  That call, plus the `DL_geo` vtable `matrix.o` emits, is an undefined
+  reference to `dyna_system.o` and `geo.o`, whose closure is nine more physics
+  translation units.
+
+So **the maths and the physics are not cleanly separable**. The archive holds
+14 objects and **the linker pulls 12 of them**: `pointvector.o` and `list.o`
+define no symbols at all and are never extracted, so they are compiled only to
+keep the maths half of the library named rather than implied. The 11 physics
+objects below are all pulled. Measured with `nm` over all 60 objects and
+confirmed against a linker map; each entry names the symbol that pulled it in:
+
+| object | pulled in by |
+|---|---|
+| `dyna_system` | `DL_dsystem` |
+| `geo` | `DL_geo::move` |
+| `dyna` | `DL_dyna::newkinenergy` |
+| `constraint` | `DL_constraint::reset_undo` |
+| `constraint_manager` | `DL_constraints` |
+| `euler` | `DL_euler::DL_euler` |
+| `m_integrator` | `DL_m_integrator::stepsize` |
+| `largematrix` | `DL_largematrix::prep_for_solve` |
+| `supvec` | `DL_supvec::A2q` |
+| `force_drawable` | `DL_force_drawable::get_fd_info` |
+| `vector4` | `DL_vector4::assign` |
+
+3,056 lines of physics survive for one error message. Nothing is stubbed and no
+symbol is defined away: breaking the coupling means patching a diagnostic out of
+a vendored file, which is a separate decision and was not taken.
+
+**The whole Dynamo include path.** `-isystem .../Dynamo/Src/Inc` stays on both
+the build and `check.sh`: the maths headers live in the same directory as the
+physics ones.
+
+**`patches/dynamo-containerlist-null.patch` is now dead but kept.**
+`containerlist.h` is included by `containerlist.cpp` and by nothing else, and
+that is one of the 46 sources no longer compiled. The patch still applies
+cleanly against the untracked tree, so it was left alone rather than removed in
+this changeset.
+
+**SOLID is still built and still linked.** This document claimed SOLID would go
+with Dynamo. Its 15 API references were indeed all in deleted files, but
+removing `libsolid.a` was outside the brief for this change and was not
+attempted. It is now dead weight — ~4,800 lines and a vendored patch — and
+dropping it is a one-line follow-up, to be measured the way `libdynalib.a` was.
+
+### Gates — all clean, which is the point
+
+| gate | result |
+|---|---|
+| `dictorder-dump.sh` vs baseline | **empty diff** |
+| `fitness-check.sh` vs baseline | **empty diff**, 42 of 42 |
+| `sigel_eval -selfcheck` | pass |
+| sanitized `fitness-check.sh build` | **empty diff**, no ASan or UBSan report |
+| `check.sh` | **105 pass, 4 fail**, 322 warnings |
+
+`check.sh` was 118 pass, 4 fail, 338 warnings. The pass count falls by exactly
+13 because 13 fewer `.cpp` exist, and "headers standalone" by exactly 13 for the
+same reason. **The 4 failures are the same 4 files** — `MT_Controller.cpp`,
+`SIG_GUIGPManager.cpp` and the two ZORC files — and the one header failure is
+the same one. No fitness value and no line of container ordering moved, which
+is what "dead code" was supposed to mean.
+
+### Dead but not deleted — the predictions, re-measured
+
+| predicted | measured 2026-08-28 |
+|---|---|
+| `SIG_GlueJoint`, `SIG_CylindricalJoint` | **holds.** Both still parsed (`SIG_Robot.cpp:367,369`), still compiled by `SIGEL_RobotIO`, still listed by `SIG_RobotView.cpp:110`. No simulator reads either |
+| `getFrictionValue`, `getElasticity`, `getVeloDamping` | **holds, exactly.** Zero call sites anywhere in the tree; only the definition and the declaration remain |
+| `getYPlaneLevel` | survives, as predicted — `SIG_EnvironmentRenderer.cpp:58` and `SIG_EnvironmentView.cpp:148` |
+| the six simulation parameters | **holds, with a correction.** `getAnalytical`, `getIntegrator`, `getMaximalIterations`, `getMaximalCollisionLoops`, `getSkipFrames` and `getSolveMode` lose their only *simulation* reader, but each is still read by `SIG_SimulationParameter.cpp` to fill its dialog. They are now exactly as dead as `getMaximalError` and `getMaximalSOLIDIterations` already were: parsed, displayed, editable, simulated by nothing |
+
+**Three things the prediction missed, found by review of the change:**
+
+| now dead | where |
+|---|---|
+| `SIG_Robot::prepareDynaMo` and `SIG_Link::transformToDynaMo` | `SIG_Robot.cpp:274`, `SIG_Link.cpp:200` (~45 lines). Their only callers are the three surviving `case DynaMo:` arms below |
+| three `case DynaMo:` arms | `SIG_GPFitnessTrainer.cpp:52`, `sigel_slave.cpp:252`, `SIG_AllIndividualsView.cpp:311`. Each transforms the robot for a simulation that now always throws. Left because the `SimulationLibrary` enum has to survive — the parser, the GUI and four other switches name it |
+| `SIG_Simulation::slotDynamoMessage`, `stopSimulation`, and the only throw of `SIG_SimulationCannotSolveException` | see "One `moc` target" above |
+
+### Follow-up this change deliberately did not take
+
+1. **`libsolid.a`.** Dead since the only 15 SOLID API references went with
+   `SIG_DynaSystem` and `SIG_DynaLink`. ~4,800 lines and one vendored patch.
+   Measure it the way `libdynalib.a` was measured, then drop it.
+2. **The GUI can still author an experiment that now aborts.**
+   `SIG_SimulationParameter.cpp:121` calls `setSimulationLibrary(DynaMo)` and
+   `SIG_SimulationParameterBase.ui:143` still offers "Dynamo  (not
+   recommended)". Nothing is broken today — Phase C has not started — but the
+   radio button has to go with the backend.
+3. **`SIG_SimulationQueries.cpp` has four more dead includes** — `matrix.h`,
+   `pointvector.h`, `NaN.h` and `SIG_SimulationCannotSolveException.h`. The
+   file is a licence header, seven includes and an empty constructor; it
+   compiles clean without any of them. This change removed only the three that
+   named deleted files.
+4. **`future_refactorings.md` cites deleted code** — `:31` names
+   `SIG_DynaMoSimulationQueries.h:34`, and `:48`'s "6 file pairs" of dynamic
+   exception specifications counts `SIG_DynaSystem`. Left because that document
+   is a separate decision and its commits are not to be mixed with this one.
+
+### Two corrections this deletion forces on PORTING.md
+
+**`SIG_DynaMoSimulationData` is not "the site that numbers the DynaMechs
+bodies"** (§10 D1, §10 D2, `sigel_eval.cpp:46`). It was the **Dynamo** site.
+Both backends walked links → joints → sensors → drives in that order, so the
+orders the gate protects are unchanged and `dictorder-baseline.txt` is
+untouched — but the file those sections cite is the wrong one, and it no longer
+exists. The live site is `SIG_DynaMechsSimulationData.cpp`.
+
+**V5's zero-hit `applyForce` probe is explained.** §7 records the `applyForce`
+breakpoint arming and taking no hits "in a session where the MDH breakpoint
+fired 18 times ... real but unexplained". `SIG_DynaDrive::applyForce` is called
+from exactly one place, `SIG_DynaMoCommandInterface.cpp:54`, on the **Dynamo**
+path. Every shipped experiment selects DynaMechs, so that breakpoint could
+never fire. The same holds for the other open probe:
+`SIG_DynaSensor::senseJoint1`/`senseJoint2` are called only from
+`SIG_DynaMoSimulationQueries.cpp:45,47`. **Both remaining V5 probes were aimed
+at code no shipped experiment executes**, and have to be re-pointed at
+`SIG_DynaMechsSimulationQueries` / `SIG_DynaMechsCommandInterface` before they
+can say anything about this port.
+
+### Corrections to the frozen analysis below
+
+The analysis from 2026-08-20 is kept verbatim so the decision can be re-read.
+Five of its claims did not survive execution, and one of its section headings
+is wrong; all six are measured, and none of them changes the decision.
+
+| claim below | measured 2026-08-28 |
+|---|---|
+| "**~21,100 lines of Dynamo deleted**", and the "Deleted" heading above covering the vendored `.cpp` | **Nothing vendored was deleted.** The tarball tree is untracked and is left exactly as it extracts; 10,084 lines merely stopped being compiled. `diff -rq` against a fresh extract shows one difference, the recorded `containerlist.h` patch |
+| "**SOLID deleted entirely**, ~4,800 lines" | **not done.** `libsolid.a` is still built and still linked. Its 15 API references really were all in deleted files, so it is dead weight — see the follow-up list above |
+| "**8 old-style exception specifications gone**" | **this deletion gained none.** All 8 were on `SIG_DynaSystem`, and the port had already removed every one of them before 2026-08-28. The statement was true of the 2003 tarball, not of `HEAD` |
+| "`SIG_DynaSystem.cpp:268` … Double free" | **already fixed** by D13 before the deletion — the line read `delete dynaDrives[k];` with the 2003 behaviour in a comment. It was not a live defect being removed |
+| "the DynaMechs adapters we keep total **2,013** lines" | **2,077.** They grew with Phase V5's MDH probe. The Dynamo side of the comparison was re-measured for this entry and the DynaMechs side was not |
+| `SIG_DynaSystem.cpp:800`, `SIG_DynaMoSimulationQueries.cpp:45` | off by one — the null assignment was at `:801` and the dereference of `sensor.joint->joint` at `:46`. The defects are real and were read correctly; only the line numbers drifted |
+
+### Still not fixed, deliberately
+
+The `exit(1)` a glue joint would reach under DynaMechs is at
+**`SIG_DynaMechsSimulationData.cpp:424`**, not `:394` as recorded above — the
+line moved with Phase V5's probe. It is still an `exit(1)` and should still
+become a thrown exception. Left alone to keep this changeset single-purpose.
 
 ---
 
@@ -236,7 +464,7 @@ Worse in every direction, and the survivor is the broken one.
 - `SIG_Environment` **holds a `dmEnvironment` by value** (`SIG_Environment.h:29,447`).
   DynaMechs is in the core domain model, not just an adapter.
 - `SIG_EnvironmentRenderer.cpp:129,507` renders terrain through it.
-- All 12 experiments would point at a backend that crashes on 5 of 7 robots.
+- All 14 experiments would point at a backend that crashes on 5 of 7 robots.
 - 2,013 lines removed instead of 3,247 — **less code deleted, more capability
   lost.**
 

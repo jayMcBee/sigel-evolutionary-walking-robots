@@ -23,7 +23,9 @@
 #ifndef SIGEL_ENVIRONMENT_SIG_ENVIRONMENT_H
 #define SIGEL_ENVIRONMENT_SIG_ENVIRONMENT_H
 
-#include <constraint.h>
+// DL_vector only -- this was <constraint.h>, a Dynamo physics header,
+// until the Dynamo backend was deleted (physics_backends.md).
+#include <pointvector.h>
 #include <qtextstream.h>
 #include <qstring.h>
 #include <dmEnvironment.hpp>
