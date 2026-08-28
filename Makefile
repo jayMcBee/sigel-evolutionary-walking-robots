@@ -46,9 +46,16 @@ VCC  := gcc -std=gnu17 -O1 -g -w $(SAN)
 STAMP := $(SL)/.sigel-patched
 PATCHES := $(wildcard patches/*.patch)
 
+# SOLID and qhull went with the Dynamo backend on 2026-08-28
+# (physics_backends.md). SOLID was the collision library the Dynamo path used;
+# qhull was built only to give SOLID its convex hulls, which is what -DQHULL
+# selected. Measured before removing: zero dt* API calls left anywhere in
+# SIGEL, zero in vendored DynaMechs, and zero qh_* references outside qhull
+# itself. The only surviving "SOLID" in the tree is the maximalSOLIDIterations
+# parameter, a number still parsed and written but read by nothing -- dead the
+# same way six other simulation parameters now are.
 VENDOR_LIBS := $(LIB)/libnewmat.a $(LIB)/libdm.a $(LIB)/libcv97.a \
-               $(LIB)/libdynalib.a $(LIB)/libsolid.a $(LIB)/libqhull.a \
-               $(LIB)/libfparser.a
+               $(LIB)/libdynalib.a $(LIB)/libfparser.a
 
 .PHONY: all vendor core clean unpatch
 all: $(B)/sigel_eval
@@ -150,16 +157,6 @@ dynamo_SRC := pointvector matrix list \
               force_drawable geo largematrix m_integrator supvec vector4
 $(LIB)/libdynalib.a: INCS := -I$(SL)/Dynamo/Src/Inc -I$(SHIM)
 $(LIB)/libdynalib.a: $(patsubst %,$(OBJ)/Dynamo/Src/Cpp/%.o,$(dynamo_SRC))
-
-# SOLID, with the qhull convex hull path its Make-config recommends.
-$(LIB)/libsolid.a: INCS := -I$(SL)/SOLID-2.0/include -I$(SL)/SOLID-2.0/src \
-                           -I$(SL)/qhull -I$(SHIM) -DQHULL
-$(LIB)/libsolid.a: $(patsubst $(SL)/%.cpp,$(OBJ)/%.o,$(wildcard $(SL)/SOLID-2.0/src/*.cpp))
-
-# qhull. unix.c, rbox.c and the two user_eg*.c are programs, not library code.
-qhull_SRC := geom geom2 global io mem merge poly poly2 qhull qset stat user
-$(LIB)/libqhull.a: INCS := -I$(SL)/qhull
-$(LIB)/libqhull.a: $(patsubst %,$(OBJ)/qhull/%.o,$(qhull_SRC))
 
 # fparser. The 2003 Makefile.am compiles this straight into each program.
 $(LIB)/libfparser.a: INCS := -I$(SL)/fparser -I$(SHIM)

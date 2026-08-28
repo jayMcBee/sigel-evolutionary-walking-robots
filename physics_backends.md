@@ -25,6 +25,29 @@ Do we keep both?
 
 ---
 
+## DONE 2026-08-28 — and SOLID and qhull went with it
+
+The Dynamo backend was deleted in `5addd66`. **SOLID and qhull followed in a
+separate commit**, because their only caller was the deleted code:
+
+| library | files | lines no longer compiled |
+|---|---|---|
+| SOLID | 16 | 1,999 |
+| qhull | 11 | 20,705 |
+| **total** | **27** | **22,704** |
+
+Measured before removing, not assumed: **zero `dt*` SOLID API calls anywhere in
+SIGEL, zero in vendored DynaMechs, and zero `qh_*` references outside qhull
+itself.** qhull existed only to give SOLID its convex hulls — that is what the
+`-DQHULL` flag selected — so it could not outlive it.
+
+The one surviving mention is `maximalSOLIDIterations`, a simulation parameter
+still parsed, stored and written back but now read by nothing. It joins the six
+others the Dynamo removal left in that state.
+
+`libdynalib.a` is the one that could **not** go: see the deletion commit. Its
+maths half is not separable from its physics half.
+
 ## Recommendation
 
 **Delete the Dynamo physics code. Keep DynaMechs. Keep Dynamo's maths headers.**
