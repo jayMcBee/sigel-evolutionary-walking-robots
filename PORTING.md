@@ -27,10 +27,10 @@ build and run, because nothing else can be verified without it — see §3.
 |---|---|
 | 0 — comments to English | done for the 9 core modules; 9 GUI files still hold Latin-1 |
 | A — core onto Qt 6 | **done**, tags `step-A0`…`step-A9` |
-| B — ownership explicit | **subsumed by Phase D**, which deletes the containers rather than converting them. 13 `setAutoDelete` left in core — 10 in `SIGEL_GP`, 2 in `SIGEL_Robot`, 1 in `MT_Control`, all in the evolution loop, which Phase C still blocks even though PVM now runs |
+| B — ownership explicit | **subsumed by Phase D**, which deletes the containers rather than converting them. **12** `setAutoDelete` left in core, re-measured 2026-08-28 — 10 in `SIGEL_GP`, 1 in `SIGEL_Robot`, 1 in `MT_Control`. The row said 13 and put 2 in `SIGEL_Robot`; there is one, `SIG_Body.cpp:54`, and it is `FALSE`. Everything owning is in the evolution loop, which Phase C still blocks even though PVM now runs |
 | R — build and run | core builds and runs. **No longer checked only against itself** — Phase V has confirmed both the ordering and the arithmetic against the 1.3 binary, §7 |
 | T — old-Qt tool container | **done 2026-08-27.** `tools/qtmig`, §4 |
-| D — delete the shim, migrate the data | **D1–D8 done.** `Q2Dict`, `Q2DictIterator` and `Q2Array` gone from all code; `Q2PtrVector` off `SIG_Geometry`, `SIG_Body` and the `SIG_Register` cluster. Shim 806 → **530** lines. Remaining, measured 2026-08-28: `Q2PtrList` 62, `Q2PtrVector` 53, `Q2CString` 21, `Q2Queue` 16, `Q2ListIterator` 14, `Q2ValueList` 12. §10 |
+| D — delete the shim, migrate the data | **D1–D9 done.** `Q2Dict`, `Q2DictIterator` and `Q2Array` gone from all code; **`Q2PtrVector` is off the executed path entirely** as of D9. Shim 806 → **530** lines. Remaining, measured 2026-08-28 after D9: `Q2PtrList` 60, `Q2PtrVector` 48, `Q2CString` 21, `Q2Queue` 16, `Q2ListIterator` 14, `Q2ValueList` 12. The first two read 62 and 53 here and were each stale by 2 before D9 touched anything. §10 |
 | P — PVM | **DONE 2026-08-28.** Vendored 3.4.3 replaced by upstream 3.4.6; nine patches carry the four config lines and Debian's eight source fixes; `libpvm3.a` and `pvmd3` build; SIGEL's two PVM objects link against them and `SIG_GPPVMData` round-trips through real PVM. `sigel`/`sigel_slave` still need Phase C. §7 |
 | C — GUI | **not started, AUTHORIZED 2026-08-27 per D24.** ~450 Qt 2 sites + 20 forms |
 | V — check against the 1.3 binary | **V1 and V5's MDH probe both done and both PASS.** Ordering: 10 of 10 container orders match. Arithmetic: `twoBases` exact bit for bit, `octopus` 9/9 with three joints exact and 5 ulp worst. V2–V4 not started; V5's sensor and force probes are **invalid as specified** — both target Dynamo-only functions, deleted 2026-08-28. §7 |
@@ -1964,10 +1964,11 @@ What the shim currently carries, and why:
 The clean-up, in this order:
 
 1. ~~Replace the emulation with straightforward containers.~~ **In progress —
-   D3–D6 done.** `Q2Dict`, `Q2DictIterator` and `Q2Array` are deleted; their
-   users are plain `QList`. Left, measured 2026-08-27: `Q2PtrVector` 69,
-   `Q2PtrList` 62, `Q2CString` 21, `Q2Queue` 16, `Q2ListIterator` 14,
-   `Q2ValueList` 12. An earlier version of this list omitted the last two.
+   D3–D9 done.** `Q2Dict`, `Q2DictIterator` and `Q2Array` are deleted; their
+   users are plain `QList`. Left, measured 2026-08-28 after D9: `Q2PtrList` 60,
+   `Q2PtrVector` 48, `Q2CString` 21, `Q2Queue` 16, `Q2ListIterator` 14,
+   `Q2ValueList` 12. An earlier version of this list omitted the last two, and
+   read `Q2PtrVector` 69 / `Q2PtrList` 62 where the tree held 51 and 60.
 2. ~~**Migrate the data files at the same time.**~~ **Done, D2.** Only the 7
    `.rrb` needed it — the 14 `.exp` already stored the order the simulation
    used. `Q2Dict::hash` generated that ordering and is deleted.
@@ -2039,6 +2040,55 @@ Phase D exists to delete.
 `$SIGEL_ROOT` is among the leaked blocks. The figures above reproduce exactly at
 a 25-character repo root; at a longer path they shift by the difference. The
 allocation *counts* are stable.
+
+### D9 — `Q2PtrVector` off the executed path, and the unwinding guard with it
+
+D7 did the covered half of `Q2PtrVector` for `SIG_Geometry` and `SIG_Body`, and
+its own text listed what it left behind on the simulation path:
+`SIG_DynaMechsSimulationData`'s `dynaMechsLinks`, `drives` and `sensors`. This
+step does those three. **`Q2PtrVector` now appears in no executed code at all** —
+its 17 remaining code sites are the evolution loop, which nothing can run.
+
+All three are **slot-indexed with null holes**, sized once from the robot and
+never resized, so `QList<T *>` sized by `QList(qsizetype)` and filled with
+`fill(0)` is the same container. `insert(i, p)` becomes `v[i] = p` and
+`take(i)` disappears into the `delete` that already preceded it.
+
+| | |
+|---|---|
+| `drives`, `sensors` | non-owning. `Q2PtrVector`'s `del` was never set, so `insert()` over an occupied slot never freed and the assignment is exact |
+| `dynaMechsLinks` | owning, and its three free paths were **already explicit** before this step — `delete` before each of the two `insert`s, `deleteContents()` in the destructor, and `DynaMechsLinkGuard` on the unwinding path. So this step moved no ownership; it only changed the spelling |
+
+**The guard is now the only free while unwinding, and that is a widening.**
+`~Q2PtrVector` freed nothing either — `del` was false — so the guard was already
+load-bearing. But `Q2PtrVector` at least *had* a flag someone could set;
+`~QList` can never free, so the guard has no fallback of any kind. Its comment
+says so now. It was verified reachable in Phase B and is not redundant.
+
+**The three `insert(i, 0)` null-fill loops in the constructor were already
+no-ops** — `Q2PtrVector(uint)` null-filled on construction, as `QList(qsizetype)`
+value-initialises now. They are `fill( 0 )`, one line each, matching the
+`jointIndices.fill( 0 )` two lines below rather than relying on the subtlety.
+
+**The clamp went, as in D6 and D8, and the gates cover it here.**
+`Q2PtrVector::at()` warned and clamped an out-of-range index to element 0, and
+`insert()`/`take()` were silent no-ops out of range; `QList::operator[]` is
+neither. The indices are stored link, drive and sensor numbers read from the
+data files, so a file could in principle carry one past the end. All 14 `.exp`
+run under AddressSanitizer in `fitness-check.sh` and all 21 files load in
+`dictorder-dump.sh`: **0 sanitizer reports, both gates byte-identical.** No
+bounds check was added — D7's review is the precedent for not moving a failure
+mode sideways on a step that has coverage.
+
+`SIG_DynaMechsSimulationData.h` now includes `<QList>` directly instead of
+`compat/q2compat.h`. It uses no `Q2*` type after this step, and it already held
+two `QList` members that were reaching the header through the shim.
+
+Verified: `./check.sh` 105 pass / 4 fail, **317 warnings, down from 322** — the
+5 are `-Wsign-compare` in `SIGEL_Simulation`, from `int i < size()` against
+`Q2PtrVector`'s `uint size()`. Both gates empty, and
+`ASAN_OPTIONS=detect_leaks=0 ./fitness-check.sh build` reproduces
+`fitness-baseline.txt` with no ASan or UBSan report.
 
 
 ### A logging system

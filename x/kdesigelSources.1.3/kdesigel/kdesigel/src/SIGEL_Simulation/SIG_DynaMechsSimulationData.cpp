@@ -56,7 +56,8 @@ namespace {
    * Qt 2's autoDelete freed dynaMechsLinks when this constructor threw: a
    * constructor that throws does not run its own destructor, but its members'
    * destructors do run, and Qt 2's QVector honoured the flag. Removing the
-   * flag dropped that path, so it is restored here.
+   * flag dropped that path, so it is restored here. ~QList frees no pointer
+   * either, so this guard is still the only free on the unwinding path.
 
    * Reachable, not theoretical: SIG_Mirtich.cpp throws SIG_CannotMirtich on a
    * NaN mass or inertia, from computePhysics inside the link constructor.
@@ -65,9 +66,9 @@ namespace {
    */
   struct DynaMechsLinkGuard
     {
-      Q2PtrVector< SIGEL_Simulation::SIG_DynaMechsLink > *links;
+      QList< SIGEL_Simulation::SIG_DynaMechsLink * > *links;
 
-      ~DynaMechsLinkGuard() { if (links) links->deleteContents(); }
+      ~DynaMechsLinkGuard() { if (links) { qDeleteAll( *links ); links->fill( 0 ); } }
     };
 
 };
@@ -87,8 +88,7 @@ SIGEL_Simulation::SIG_DynaMechsSimulationData::SIG_DynaMechsSimulationData( SIGE
     pi( std::atan( 1 ) * 4 )
 #endif
 {
-  for (int i=0; i<dynaMechsLinks.size(); i++)
-    dynaMechsLinks.insert( i, 0 );
+  dynaMechsLinks.fill( 0 );
 
   DynaMechsLinkGuard linkGuard = { &dynaMechsLinks };
 
@@ -96,11 +96,9 @@ SIGEL_Simulation::SIG_DynaMechsSimulationData::SIG_DynaMechsSimulationData( SIGE
 
   driveForcesTimeAccounts.fill( 0 );
 
-  for (int j=0; j<drives.size(); j++)
-    drives.insert( j, 0 );
+  drives.fill( 0 );
 
-  for (int k=0; k<sensors.size(); k++)
-    sensors.insert( k, 0 );
+  sensors.fill( 0 );
 
   initializeEnvironment();
 
@@ -147,7 +145,7 @@ SIGEL_Simulation::SIG_DynaMechsSimulationData::SIG_DynaMechsSimulationData( SIGE
 					  << ".\n";
 #endif
 
-		drives.insert( actDrive->getNumber(), actDrive );
+		drives[ actDrive->getNumber() ] = actDrive;
 	      };
 	  };
 	  break;
@@ -169,7 +167,7 @@ SIGEL_Simulation::SIG_DynaMechsSimulationData::SIG_DynaMechsSimulationData( SIGE
 	    int linkNumber = jointIndices[ joint->getNumber() ];
 
 	    if (dynaMechsLinks[ linkNumber ])
-		{	sensors.insert( actSensor->getNumber(), actSensor );
+		{	sensors[ actSensor->getNumber() ] = actSensor;
 		}
 		else SIGEL_Tools::SIG_IO::cerr << "Houston, we've got a problem here !  No link, no fun in  SIG_DynaMechsSimulationData (1)\n";
 	  }
@@ -182,7 +180,7 @@ SIGEL_Simulation::SIG_DynaMechsSimulationData::SIG_DynaMechsSimulationData( SIGE
 	    SIGEL_Robot::SIG_Link const *link = actSensor->getLink();
 
 	    if (dynaMechsLinks[ link->getNumber() ])
-		{	sensors.insert( actSensor->getNumber(), actSensor );
+		{	sensors[ actSensor->getNumber() ] = actSensor;
 		}
 		else SIGEL_Tools::SIG_IO::cerr << "Houston, we've got a problem here !  No link, no fun in  SIG_DynaMechsSimulationData (2)\n";
 
@@ -196,7 +194,7 @@ SIGEL_Simulation::SIG_DynaMechsSimulationData::SIG_DynaMechsSimulationData( SIGE
 	    SIGEL_Robot::SIG_Link const *link = actSensor->getLink();
 
 	    if (dynaMechsLinks[ link->getNumber() ])
-		{	sensors.insert( actSensor->getNumber(), actSensor );
+		{	sensors[ actSensor->getNumber() ] = actSensor;
 		}
 		else SIGEL_Tools::SIG_IO::cerr << "Houston, we've got a problem here !  No link, no fun in  SIG_DynaMechsSimulationData (3)\n";
 
@@ -217,7 +215,8 @@ void SIGEL_Simulation::SIG_DynaMechsSimulationData::setNewFrame( bool newValue )
 SIGEL_Simulation::SIG_DynaMechsSimulationData::~SIG_DynaMechsSimulationData()
 {
   // This class owns the links it built; drives and sensors belong to the robot.
-  dynaMechsLinks.deleteContents();
+  qDeleteAll( dynaMechsLinks );
+  dynaMechsLinks.fill( 0 );
 };
 
 void SIGEL_Simulation::SIG_DynaMechsSimulationData::simulationProgress()
@@ -356,14 +355,15 @@ void SIGEL_Simulation::SIG_DynaMechsSimulationData::initializeArticulation()
 								0,
 								0 );
 
-  // Qt 2's autoDelete made insert() free whatever occupied the slot. Kept
-  // exactly, including its consequences: two joints between the same pair of
+  // Qt 2's autoDelete made Q2PtrVector::insert() free whatever occupied the
+  // slot; the delete below is that same free, written out. Kept exactly,
+  // including its consequences: two joints between the same pair of
   // links both pass SIG_Joint::continuable, so the second build frees a link
   // that is already in its parent's successors list and already registered
   // with dynaMechsSystem. That use-after-free predates the port; no shipped
   // robot has such a pair.
-  delete dynaMechsLinks.take( rootLink->getNumber() );
-  dynaMechsLinks.insert( rootLink->getNumber(), dynaMechsRootLink );
+  delete dynaMechsLinks[ rootLink->getNumber() ];
+  dynaMechsLinks[ rootLink->getNumber() ] = dynaMechsRootLink;
 
   dynaMechsSystem.addLink( internalRootLink, 0 );
 
@@ -502,8 +502,8 @@ SIGEL_Simulation::SIG_DynaMechsLink *SIGEL_Simulation::SIG_DynaMechsSimulationDa
 							    screwD,
 							    screwTheta );
 
-  delete dynaMechsLinks.take( link->getNumber() );
-  dynaMechsLinks.insert( link->getNumber(), dynaMechsLink );
+  delete dynaMechsLinks[ link->getNumber() ];
+  dynaMechsLinks[ link->getNumber() ] = dynaMechsLink;
 
   jointIndices[ joint->getNumber() ] = link->getNumber();
 

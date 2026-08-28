@@ -23,9 +23,10 @@
 #ifndef SIGEL_SIMULATION_SIG_DYNAMECHSSIMULATIONDATA_H
 #define SIGEL_SIMULATION_SIG_DYNAMECHSSIMULATIONDATA_H
 
-#include "compat/q2compat.h"
 #include "SIGEL_Simulation/SIG_SimulationData.h"
 #include "SIGEL_Simulation/SIG_DynaMechsLink.h"
+
+#include <QList>
 
 #include <dm.h>
 #include <dmArticulation.hpp>
@@ -85,15 +86,15 @@ namespace SIGEL_Simulation
 
       dmIntegrator *dynaMechsIntegrator;
 
-      Q2PtrVector< SIG_DynaMechsLink > dynaMechsLinks;
+      QList< SIG_DynaMechsLink * > dynaMechsLinks;
 
       QList< int > jointIndices;
 
-      Q2PtrVector< SIGEL_Robot::SIG_Drive > drives;
+      QList< SIGEL_Robot::SIG_Drive * > drives;
 
       QList< double > driveForcesTimeAccounts;
 
-      Q2PtrVector< SIGEL_Robot::SIG_Sensor > sensors;
+      QList< SIGEL_Robot::SIG_Sensor * > sensors;
 
       int noOfDrives;
 
