@@ -1,31 +1,31 @@
-# SIGEL physics backends — Dynamo or DynaMechs?
+# SIGEL physics backends — Dynamo removed, DynaMechs kept
 
-**Status: DONE. The Dynamo backend was deleted on 2026-08-28.**
-Written 2026-08-20 during the Qt 6 port, executed 2026-08-28. Independent of
-that port — the analysis below is kept as written so the decision can be
-re-read; what actually happened, and where the analysis was wrong, is in
-**"What was actually done"** immediately after the recommendation.
+**DONE.** Analysed 2026-08-20, executed 2026-08-28, independently of the Qt 6
+port. SIGEL shipped two physics engines and chose one at run time. Dynamo
+crashed on most shipped robots, its own authors labelled it "not recommended",
+and all 14 shipped experiments selected DynaMechs. It is gone.
 
----
-
-## The question
-
-SIGEL ships two physics engines and picks one at run time:
-
-- **Dynamo** — "Dynamic Motion library", Bart Barenbrug, TU Eindhoven, 1996–1999.
-  Constraint-based. LGPL. Vendored at `x/supportingLibs/supportingLibs/Dynamo/`.
-- **DynaMechs** — Scott McMillan. Articulated-body (Featherstone).
-  Vendored at `x/supportingLibs/supportingLibs/dynamechs/`.
-
-Both implement the same three interfaces — `SIG_SimulationData`,
-`SIG_SimulationQueries`, `SIG_CommandInterface` — and `SIG_Simulation.cpp`
-switches between them.
-
-Do we keep both?
+**Read "What was actually done" and stop.** Everything from "Why the Dynamo path
+is not usable" onward is the frozen 2026-08-20 case for the decision, kept so it
+can be re-read, corrected in place where execution proved it wrong.
 
 ---
 
-## DONE 2026-08-28 — and SOLID and qhull went with it
+## The two engines
+
+- **Dynamo** — "Dynamic Motion library", Bart Barenbrug, TU Eindhoven,
+  1996–1999. Constraint-based. LGPL. **Deleted.**
+- **DynaMechs** — Scott McMillan. Articulated-body (Featherstone). **Kept.**
+
+Both implemented `SIG_SimulationData`, `SIG_SimulationQueries` and
+`SIG_CommandInterface`; `SIG_Simulation.cpp` switched between them at run time
+on the `SIMULATIONLIBRARY` key, which is `1` in 14 of 14 shipped `.exp`.
+
+---
+
+## What was actually done — 2026-08-28
+
+### SOLID and qhull went too
 
 The Dynamo backend was deleted in `5addd66`. **SOLID and qhull followed in a
 separate commit**, because their only caller was the deleted code:
@@ -47,21 +47,6 @@ others the Dynamo removal left in that state.
 
 `libdynalib.a` is the one that could **not** go: see the deletion commit. Its
 maths half is not separable from its physics half.
-
-## Recommendation
-
-**Delete the Dynamo physics code. Keep DynaMechs. Keep Dynamo's maths headers.**
-
-Three reasons, in order of weight:
-
-1. **The Dynamo path crashes on most of the shipped robots.**
-2. The original authors marked it "not recommended" in the GUI.
-3. All 14 shipped experiments select DynaMechs. Re-measured 2026-08-28:
-   `SIMULATIONLIBRARY` is `1` in 14 of 14 `.exp`, no exceptions.
-
----
-
-## What was actually done — 2026-08-28
 
 ### Deleted
 
@@ -223,9 +208,8 @@ is what "dead code" was supposed to mean.
 
 ### Follow-up this change deliberately did not take
 
-1. **`libsolid.a`.** Dead since the only 15 SOLID API references went with
-   `SIG_DynaSystem` and `SIG_DynaLink`. ~4,800 lines and one vendored patch.
-   Measure it the way `libdynalib.a` was measured, then drop it.
+1. ~~**`libsolid.a`.**~~ **DONE** — see "SOLID and qhull went too" above. qhull
+   went with it, because it existed only to give SOLID its convex hulls.
 2. **The GUI can still author an experiment that now aborts.**
    `SIG_SimulationParameter.cpp:121` calls `setSimulationLibrary(DynaMo)` and
    `SIG_SimulationParameterBase.ui:143` still offers "Dynamo  (not
@@ -236,10 +220,36 @@ is what "dead code" was supposed to mean.
    file is a licence header, seven includes and an empty constructor; it
    compiles clean without any of them. This change removed only the three that
    named deleted files.
-4. **`future_refactorings.md` cites deleted code** — `:31` names
-   `SIG_DynaMoSimulationQueries.h:34`, and `:48`'s "6 file pairs" of dynamic
-   exception specifications counts `SIG_DynaSystem`. Left because that document
-   is a separate decision and its commits are not to be mixed with this one.
+4. ~~**`future_refactorings.md` cites deleted code**~~ — corrected 2026-08-28.
+
+5. **Extract the maths into a small local header, and drop `libdynalib.a`.**
+   *Decided 2026-08-28, deliberately not now.* The archive survives at 14
+   objects — ~3,000 lines of physics — for **one line**: `DL_matrix::invert`
+   reports a singular matrix through the physics engine's global system object
+   (`matrix.cpp:233`), and that call plus the `DL_geo` vtable pulls in ten more
+   translation units.
+
+   The API is tiny: `DL_vector` is 18 methods in 296 lines, `DL_matrix` 81
+   lines, and the whole vocabulary is get/set a component, add and subtract in
+   place, scale, negate, norm, normalise, inner and cross product, multiply,
+   invert. A 3-vector and a 3×3 matrix.
+
+   **Pragmatic and minimal: a local header, not a dependency.** Boost's real
+   candidate would be QVM rather than uBLAS, and Eigen would be the better
+   library — but the port's direction is removing 2003 dependencies, not
+   swapping them, and NEWMAT is already compiled and linked and used in 13
+   files, so the tree already carries two matrix libraries. Replacing both with
+   ~250 lines we own removes the last of Dynamo and adds nothing.
+
+   **After Phase C, not before.** It is mechanical across ~1,100 references in
+   93 files, and the payoff today is zero: the surviving objects link and
+   nothing calls them. Doing it during the interface port would collide two
+   large mechanical diffs in the same files.
+
+   One thing to check when it happens: `matrix.cpp:233` is live code on a real
+   error path, now calling into an engine with no running system behind it. It
+   should be established whether that is a null dereference or something
+   quieter.
 
 ### Two corrections this deletion forces on PORTING.md
 

@@ -147,8 +147,9 @@ experiments — which is what produced the scope note above. All fixed.
 │   ├── src/       19 module dirs           ~40k LOC
 │   ├── include/   16 module dirs           ~25k LOC
 │   └── ui/        20 .ui files             Qt 2 Designer format
-├── x/supportingLibs/supportingLibs/        Qt 2.3, dynamechs, SOLID, cv97,
-│                                           newmat09, qhull, fparser, Dynamo, pvm3
+├── x/supportingLibs/supportingLibs/        Qt 2.3, dynamechs, cv97, newmat09,
+│                                           fparser, pvm3, Dynamo (maths only),
+│                                           SOLID + qhull (present, not built)
 └── xb/                                     extracted 2003 binary
 ```
 
@@ -546,7 +547,7 @@ untracked tree:
 | `cv97/CLinkedList.h:37` | the list header node is a bare `CLinkedListNode<T>`, so `(T *)` is a downcast that never holds and UndefinedBehaviorSanitizer reports it. `reinterpret_cast` |
 | `dynamechs/dm/svd_linpack.cpp:180` | the inlined copy of `f2c.h` declares `struct complex`, ambiguous with `std::complex` under the `using namespace std` the pre-standard `<iomanip.h>` carried. `::complex` |
 | `Dynamo/Src/Inc/containerlist.h` | `NULL` with no `#include <cstddef>`. `-fpermissive` was hiding this, which is why it is a patch and not a flag. **No longer load-bearing as of 2026-08-28**: `containerlist.h` is included only by `containerlist.cpp`, one of the 46 vendored Dynamo sources the backend deletion stopped compiling. It still applies cleanly, so it is left in place |
-| `SOLID-2.0/include/3D/Basic.h:40,43` | `INFINITY` is a C99 macro from `<math.h>`; `abs(double)` is now declared in the global namespace, so SOLID's own conflicts with it |
+| `SOLID-2.0/include/3D/Basic.h:40,43` | `INFINITY` is a C99 macro from `<math.h>`; `abs(double)` is now declared in the global namespace, so SOLID's own conflicts with it. **No longer load-bearing as of 2026-08-28** — SOLID went with the Dynamo backend. Left in place because it still applies cleanly |
 
 Two shim headers went with them: `new.h` is new (5 SOLID sources include it),
 and `iomanip.h` now includes `<iostream>`, which the pre-standard header did.
@@ -559,8 +560,10 @@ references GLU.
 **Sanitizer split.** SIGEL's own code gets `-Wall -Wextra`, no `-fpermissive`
 and the full AddressSanitizer plus UndefinedBehaviorSanitizer. The vendored
 libraries get `-w -fpermissive` and UndefinedBehaviorSanitizer minus three
-checks they trip by construction: alignment and signed overflow throughout
-qhull and the f2c translation of `ssvdc`, and `vptr` in cv97.
+checks they trip by construction: alignment and signed overflow in the f2c
+translation of `ssvdc`, and `vptr` in cv97. The exemptions were written for
+qhull too, which is no longer compiled as of 2026-08-28; they are left in place
+because `ssvdc` still needs them.
 
 **AddressSanitizer.** Clean, but only with one `SIGEL_ROOT` per worker.
 `SIG_Environment::generateTerrain` rewrites `$SIGEL_ROOT/Terrain.ter` on **every
@@ -1165,10 +1168,11 @@ every D8 site for a stored `const char *`.
 | `sigel_slave`, `getenv("SIGEL_ROOT")` | dereferenced unchecked | to be fixed | Segfaults if unset; the SIGSEGV handler masks it with no core. Bites under PVM specifically — spawned tasks inherit *pvmd's* environment, not the master's |
 | `SIG_Environment` terrain load | `getenv("SIGEL_ROOT")` unchecked | already checked, message on stderr | `sigel_eval` says "SIGEL_ROOT is not set, cannot locate Terrain.ter" instead of reading `/Terrain.ter` |
 
-**Open, from the R1 review:** SOLID is built without the `-DNDEBUG` its own
+~~**Open, from the R1 review:** SOLID is built without the `-DNDEBUG` its own
 `Make-config` sets, so eight `assert(!eqz(x))` guards ahead of a division are
-live that were not in 2003. Right under a sanitizer, but it can abort where the
-2003 binary divided by nearly zero. Not yet decided.
+live that were not in 2003.~~ **Moot as of 2026-08-28** — SOLID is no longer
+compiled at all. It went with the Dynamo backend, its only caller
+(`physics_backends.md`).
 
 ### Name collisions that survive into Qt 6
 

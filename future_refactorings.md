@@ -28,7 +28,8 @@ Review is reading the diff.
   src/SIGEL_RobotIO/SIG_RobotScanner.cpp:26
   include/SIGEL_Simulation/SIG_SimulationQueries.h:34
   include/SIGEL_Simulation/SIG_DynaMechsSimulationQueries.h:34
-  include/SIGEL_Simulation/SIG_DynaMoSimulationQueries.h:34
+  (was SIG_DynaMoSimulationQueries.h:34 -- file deleted 2026-08-28,
+   physics_backends.md; re-measure this count)
   ```
   Also retires `shim/`, which exists only to fake these.
 
@@ -45,7 +46,8 @@ Review is reading the diff.
 
 - [ ] **4. Dynamic exception specifications** — 6 file pairs (.h + .cpp)
   ```
-  SIGEL_Simulation   SIG_Simulation, SIG_DynaSystem, SIG_Register, SIG_Recorder
+  SIGEL_Simulation   SIG_Simulation, SIG_Register, SIG_Recorder
+                     (SIG_DynaSystem was here; deleted 2026-08-28)
   SIGEL_GP           SIG_GPSimpleRecorder, SIG_GPFullDataRecorder
   SIGEL_Visualisation SIG_RenderRecorder, SIG_SimulationVisualisation
   ```
