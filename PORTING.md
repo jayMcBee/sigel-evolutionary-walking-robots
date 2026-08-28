@@ -75,8 +75,8 @@ ported interface has nothing to drive.
    the header. Ordered before C by **D25** so the interface is ported once, to
    the final target. §10.
 5. **Phase C — the interface**, one module or one form at a time. §7.
-6. Fix PVM — 23 of 39 files fail because glibc dropped `rpc/types.h`, the rest
-   on gcc 14's promoted C errors and two real defects. §3.
+6. Fix PVM — **superseded 2026-08-28.** That count measured the vendored 3.4.3,
+   now replaced by upstream 3.4.6: four config lines, no source edits. Phase P.
 7. Full headless run, compared against the captured 2003 run.
 8. The evolution-loop containers, testable only once PVM runs (§7).
 
@@ -238,7 +238,14 @@ review. A missing `delete` and a doubled `delete` both compile.
 Known work:
 
 - vendored libraries on gcc 15
-- PVM — all 39 `.c` in `pvm3/src` fail. **Measured 2026-08-27, corrected by
+- PVM — **HISTORICAL, 2026-08-28. This whole item measured the vendored 3.4.3,
+  which Phase P deleted; its line numbers no longer resolve.** Kept because it
+  is what the 3.4.6 decision was argued against. Where it cites a line, 3.4.6
+  reads: `global.h:321`, not 314; `pvmlog.c:503-504`, not 421-422, and there
+  now behind `#ifndef USESTRERROR`, which `conf/LINUX64.def` defines — so that
+  defect is gone. The 23 on `rpc/types.h` still holds in 3.4.6. See Phase P.
+
+  All 39 `.c` in `pvm3/src` fail. **Measured 2026-08-27, corrected by
   review. Four causes, partitioning exactly: 23 + 8 + 7 + 1 = 39.**
   - **23** on `rpc/types.h`, which glibc dropped. `libtirpc` is the answer;
     its `-dev` package is not installed here.
@@ -430,12 +437,28 @@ against it.
 **P4 is not `sigel` and `sigel_slave`.** Both need Qt 2 GUI modules that Phase C
 has not ported — `sigel.cpp:40` wants `SIGEL_MasterGUI/SIG_MainWindow.h`,
 `sigel_slave.cpp:39` wants `SIGEL_SlaveGUI/SIG_SimulationWindow.h`, and the 2003
-`Makefile.am:52-70` names eight GUI and UI archives in a shared `LDADD`. So P4
-force-links the four objects that call `pvm_*` — `SIG_GPFitnessTrainer` (18
-calls), `SIG_GPPVMData` (7), `SIG_GPManager` (1), `SIG_Environment` (1) —
-against the real `libpvm3.a`, resolving the 13 undefined `pvm_*` symbols
-`libSIGEL_GP.a` carries today. That proves the library and SIGEL's own PVM code
-agree, which is the part PVM can prove without Phase C.
+`x/kdesigelSources.1.3/kdesigel/kdesigel/Makefile.am:53-70` names eight GUI and
+UI archives in a shared `LDADD`. So P4 force-links the objects that call
+`pvm_*` against the real `libpvm3.a`.
+
+**There are two of them, not four.** Counted with `nm` over the built archive,
+which is the only count that matters for a link:
+
+```
+SIG_GPFitnessTrainer.o   7  addhosts delhosts kill probe recv spawn upkdouble
+SIG_GPPVMData.o          7  initsend pkint pkstr recv send upkint upkstr
+```
+
+13 distinct symbols, `pvm_recv` being the shared one. **An earlier draft here
+said four objects and 27 calls, from `grep -c pvm_` over the sources.** That
+count is wrong three ways: it counts comments and diagnostic strings, it counts
+both arms of `#ifdef _WINDOWS`, and it credited `SIG_GPManager` and
+`SIG_Environment` with a call each — the first has only a `pvm_halt()` inside
+`#ifdef _WINDOWS`, the second only the token inside a `//` comment. Neither
+object carries an undefined `pvm_*` symbol. Do not re-derive this with `grep`.
+
+That link proves the library and SIGEL's own PVM code agree, which is the part
+PVM can prove without Phase C.
 
 **P1, done.** `x/supportingLibs/supportingLibs/pvm3/` is now upstream 3.4.6, 844
 files where 3.4.3 had 576. `pvm3.4.6.tgz` is committed at the repo root, md5
@@ -449,8 +472,12 @@ are both 576 files, and diffing them gives **one** genuine changed line, a
 357 differing files are CVS `$Id:`/`$Log:` keyword expansion from SIGEL's import
 of 2001-11-20, 68 of them carrying only the German commit line *"Erste
 lauffähige Sigel-Version für KDevelop"* into a `$Log:` block. `patches/` has
-never held a PVM patch. So the vendored PVM was stock upstream with a rewritten
-RCS header, and replacing it loses nothing.
+never held a PVM patch, over the whole history of that directory.
+
+**The limit of that proof.** It compares the two *tarballs*. The directory `rm
+-rf` destroyed was untracked and is now unrecoverable, so nothing can compare
+against it directly; what is shown is that the tarball it came from held stock
+upstream, and that no patch in this repo ever touched it.
 
 **The supporting libraries were a separate download for 1.3.**
 `kdesigelSources.1.3.tar.gz` carries four entries under `supportingLibs/` — the
@@ -458,15 +485,46 @@ directory and three Makefiles, with `SUBDIRS = fparser dynamechs cv97`. The
 libraries came in `supportingLibs.tar.gz`. Only the 1.0 distribution bundled
 them, all eight, inside the source tree.
 
-**Why 3.4.3 could not simply be patched.** It has no `conf/LINUX64.def` at all
-and zero `aarch64` in `lib/pvmgetarch` — it cannot name this machine.
+**Why 3.4.3 could not simply be patched.** It has no `conf/LINUX64.def` at all,
+so there is no LINUX64 build to configure. That is the whole of the difference.
+**`lib/pvmgetarch` is not part of it** — measured, both versions contain zero
+`aarch64`, because 3.4.6's nearest line is `Linux,arm* ) ARCH=LINUXARM`, which
+does not glob-match `aarch64`. That is precisely why the `Linux,aarch64` line is
+one of the four config lines below: the version bump does not supply it. An
+earlier draft of this section, and of the P1 commit message, offered it as a
+reason to prefer 3.4.6, which it is not.
 
-**The Makefile guards the swap** (`Makefile:49-68`). Re-extracting
+**The Makefile guards the swap** (`Makefile:54-83`). Re-extracting
 `supportingLibs.tar.gz` over the tree puts 3.4.3 back with no error, no missing
 file and a plausible file count, because `tar` overwrites but never deletes. The
 guard reads `PVM_VER` out of `include/pvm3.h` on every `make` — not from the
-patch stamp, which survives exactly this accident. Broken deliberately and
-confirmed to abort, per §0.
+patch stamp, which survives exactly this accident.
+
+Broken deliberately and confirmed, per §0, in all four states: right version,
+every target runs; wrong version, `all`/`vendor`/`core` abort while `clean` and
+`unpatch` still run, because those two are how you recover; header present but
+unparseable, abort; tree absent entirely, pass, and the build reports the
+missing files itself.
+
+**OPEN for P2 — "one Debian patch" is not measured.** Debian's series holds 26
+patches. Four are source fixes that apply cleanly to this tree, tested:
+`09-explicitly-declare-pvmnametag`, `17-fix-implicit-global-declarations`,
+`23-fix_trunc`, `24-include-unistd`. Only the last is in the plan below.
+`23-fix_trunc` matters most on its face: `src/lpvm.c:3120` and
+`src/tdpro.c:595` both open the task-authentication file `O_RDONLY|O_CREAT|
+O_EXCL|O_TRUNC` and then write to it, and Debian changes both to `O_RDWR`. That
+is on the `pvm_spawn` path SIGEL uses. **Ask before choosing** — this widens the
+"no source edits" claim.
+
+**And the reason given for needing no source edits is half wrong.** §3 named two
+defects that 3.4.6 was said to already contain fixes for. Measured:
+`sys_errlist` **is** fixed — `pvmlog.c:499-505` is now guarded by
+`USESTRERROR`, which `conf/LINUX64.def` defines. The `pvmtev.h` include is
+**not** — `src/global.h:321` still declares `extern struct Pvmtevdid
+pvmtevdidlist[]` with no include, exactly as 3.4.3 did, and Debian's patch 17 is
+what adds it. It compiles anyway: `pvmcruft.c` and `pvmerr.c` both give 0 errors
+under the four config lines, because an `extern` array of an incomplete struct
+type is legal C. So the conclusion holds and the reason does not.
 
 **Correction to the research below: the verified 3.4.6 build did not carry the
 Debian patch.** `src/ddpro.c:1509` calls `getcwd` with no `<unistd.h>` in scope,
@@ -513,8 +571,9 @@ still working as a safety net.
 §3, and the two patches needed are confirmed correct, because Fedora shipped the
 same two (`strerror` for `sys_errlist`, and the `pvmtev.h` include) before
 retiring the package in 2015. 3.4.6 already contains both, which is why it needs
-no source edits. **Nothing is maintained anywhere:** Fedora retired 2015, Debian
-removed 2024, no other distribution packages it.
+no source edits. **No distribution maintains it:** Fedora retired 2015, Debian removed 2024.
+(Not *nothing anywhere* — an AUR `PKGBUILD` for 3.4.6 is still current at
+`pkgrel=10`. It is not an upstream, but it is not nothing either.)
 
 **Why this is worth doing before the rest of Phase D.** 52 of the 83 remaining
 shim sites are in the evolution loop, which nothing can execute while PVM does

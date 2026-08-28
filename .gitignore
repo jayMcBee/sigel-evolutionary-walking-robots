@@ -2,9 +2,10 @@
 *.tar.gz
 
 # pvm3.4.6.tgz is deliberately NOT here. It replaces the vendored PVM 3.4.3
-# (PORTING.md Phase P) and it is the one vendored tarball with no upstream
-# left: Fedora retired PVM in 2015, Debian removed it in 2024, netlib is the
-# only copy. The rest are still on sourceforge, so they stay untracked.
+# (PORTING.md Phase P) and netlib is the only host still publishing it: Fedora
+# retired PVM in 2015 and Debian removed it in 2024. Copies survive elsewhere
+# -- Debian's pvm_3.4.6.orig.tar.gz, an AUR PKGBUILD -- but no upstream does.
+# The other tarballs are still on sourceforge, so they stay untracked.
 
 # extracted 2003 i386 binary, reference only
 xb/
@@ -13,8 +14,9 @@ xb/
 
 
 # vendored deps (Qt 2.3, dynamechs, SOLID, cv97, newmat09, qhull, fparser,
-# Dynamo, pvm3) — separate upstream tarball, out of scope for the Qt port.
-# Add deliberately if the build ever needs them tracked.
+# Dynamo) — separate upstream tarball, out of scope for the Qt port.
+# Add deliberately if the build ever needs them tracked. pvm3/ lives here too
+# but comes from pvm3.4.6.tgz above, not from supportingLibs.tar.gz.
 x/supportingLibs/
 
 # older 1.0 release, not used

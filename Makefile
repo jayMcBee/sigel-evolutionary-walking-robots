@@ -13,11 +13,16 @@
 # separate directory. One evaluation is 0.2 s either way.
 #
 # The vendored tree is not tracked (it comes out of supportingLibs.tar.gz), so
-# the three edits gcc 15 needs live in patches/ and are applied here against a
+# the five edits gcc 15 needs live in patches/ and are applied here against a
 # stamp file inside that tree. tar does not delete files it does not carry, so
 # re-extracting the tarball over the tree leaves the stamp behind: rm -rf the
 # vendored tree first, or the build silently keeps objects built from patched
 # sources.
+#
+# ONE EXCEPTION: pvm3/ no longer comes from supportingLibs.tar.gz. It is
+# upstream PVM 3.4.6 out of the tracked pvm3.4.6.tgz, and that tarball still
+# carries 3.4.3. So after any rm -rf of the vendored tree, restore pvm3/ from
+# pvm3.4.6.tgz as well -- the guard below tells you so if you forget.
 #
 # Vendored code is built with -w -fpermissive, which SIGEL's own code does not
 # get: check.sh already treats these headers as -isystem for the same reason.
@@ -47,8 +52,10 @@ STAMP := $(SL)/.sigel-patched
 PATCHES := $(wildcard patches/*.patch)
 
 # PVM: the vendored 3.4.3 was replaced by upstream 3.4.6 -- PORTING.md Phase P.
-# 3.4.3 has no conf/LINUX64.def and no aarch64 in lib/pvmgetarch, so it cannot
-# name this machine at all; 3.4.6 needs four config lines and one Debian patch.
+# 3.4.3 has no conf/LINUX64.def at all, so it cannot describe this machine.
+# (It has no aarch64 in lib/pvmgetarch either, but neither has 3.4.6 -- that
+# line is one of the four config lines Phase P adds, not something the version
+# bump supplies.)
 #
 # Re-extract supportingLibs.tar.gz over the tree and 3.4.3 comes back: tar
 # overwrites but never deletes, the paths and the file count both still look
@@ -56,14 +63,22 @@ PATCHES := $(wildcard patches/*.patch)
 # the patch stamp -- the stamp file survives exactly this accident, which is
 # the same trap the header above warns about for the patches.
 #
-# An absent header is somebody who has not extracted the vendored tree yet;
-# that is not this accident, and the build says so on its own.
+# An absent pvm3/include/pvm3.h is somebody who has not extracted the vendored
+# tree at all; that is not this accident, so it passes and the build says so on
+# its own. A header that is present but unparseable IS a fault and stops here.
+#
+# clean and unpatch are exempt. They are how you recover from the accident this
+# guard reports, and refusing to run them until PVM is fixed by hand is the
+# wrong way round.
+PVM_GUARD := $(filter-out clean unpatch,$(or $(MAKECMDGOALS),all))
+ifneq ($(PVM_GUARD),)
+ifneq ($(wildcard $(SL)/pvm3/include/pvm3.h),)
 PVM_VERSION := $(shell sed -n 's/^\#define[[:space:]]*PVM_VER[[:space:]]*"\(.*\)"/\1/p' \
-                       $(SL)/pvm3/include/pvm3.h 2>/dev/null)
-ifneq ($(PVM_VERSION),)
+                       $(SL)/pvm3/include/pvm3.h)
 ifneq ($(PVM_VERSION),3.4.6)
-$(error vendored pvm3 is $(PVM_VERSION), expected 3.4.6 -- \
+$(error vendored pvm3 is "$(PVM_VERSION)", expected 3.4.6 -- \
         rm -rf $(SL)/pvm3 && tar xzf pvm3.4.6.tgz -C $(SL) --strip-components=1 ./pvm3)
+endif
 endif
 endif
 
