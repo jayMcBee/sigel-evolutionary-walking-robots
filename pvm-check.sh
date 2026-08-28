@@ -1,18 +1,21 @@
 #!/bin/sh
 # Does PVM work?  PORTING.md Phase P, steps P3 and P4.
 #
-#   ./pvm-check.sh
+#   ./pvm-check.sh [builddir]        default build
 #
-# Builds nothing: run `make pvm && make pvm-link' first.  Starts its own pvmd3
-# and runs two round trips against it, then stops it again:
+# Run `make pvm && make pvm-link' first.  Compiles pvm_smoke.c, then starts its
+# own pvmd3 and runs two round trips against it before stopping it again:
 #
 #   pvm_smoke   PVM alone, C, no SIGEL and no sanitizers      -- step P3
-#   pvm_link    SIGEL's SIG_GPFitnessTrainer.o and
-#               SIG_GPPVMData.o linked against real PVM       -- step P4
+#   pvm_link    SIGEL's SIG_GPPVMData calling real PVM        -- step P4
 #
-# Two programs rather than one so a failure says which half broke.  Prints
-# PASS or FAIL for each.  build/pvm_link is optional: skipped with a note if
-# it has not been built, because P3 stands on its own.
+# Two programs so a failure says which half broke, and BOTH always run: a P3
+# failure must not hide P4's result. Exit status is non-zero if either failed.
+#
+# It refuses to run rather than skipping when <builddir>/pvm_link is missing or
+# out of date. An earlier version skipped it with a note and exited 0, so the
+# documented `make && make pvm && ./pvm-check.sh' reported success having
+# proved only P3 -- `make' does not build pvm_link.
 #
 # Not one of the three checks that must stay green -- it has no baseline to
 # diff against, it is pass/fail.  It exists because the Phase P research
@@ -34,14 +37,20 @@
 # sprintf's into a char buf[128] -- but nothing ever reaches it, because the
 # strcpy above aborts first.  None of the 26 Debian patches that apply to 3.4.6
 # fixes either one; the 8 that touch what we compile are in patches/.
-set -eu
+set -u
 
 ROOT=$(cd "$(dirname "$0")" && pwd)
 PVM=$ROOT/x/supportingLibs/supportingLibs/pvm3
 BIN=$PVM/lib/LINUX64
+B=${1:-build}
+LINK=$ROOT/$B/pvm_link
 
 [ -f "$BIN/libpvm3.a" ] && [ -x "$BIN/pvmd3" ] || {
 	echo "no libpvm3.a or pvmd3 -- run 'make pvm' first" >&2; exit 1; }
+[ -x "$LINK" ] || {
+	echo "no $LINK -- run 'make B=$B pvm-link' first" >&2; exit 1; }
+make -q B="$B" pvm-link 2>/dev/null || {
+	echo "$LINK is out of date -- run 'make B=$B pvm-link'" >&2; exit 1; }
 
 # Own directory by default.  An override is honoured but never rm -rf'd: this
 # script deletes the files PVM makes, not whatever directory it was pointed at.
@@ -70,7 +79,19 @@ cleanup() {
 trap cleanup EXIT INT TERM
 
 cc -I"$PVM/include" "$ROOT/pvm_smoke.c" "$BIN/libpvm3.a" -ltirpc \
-	-o "$PVM_TMP/pvm_smoke"
+	-o "$PVM_TMP/pvm_smoke" || exit 1
+
+# pvm_link constructs a SIG_Environment, whose default constructor loads
+# terrain through vendored DynaMechs and leaks 20,400 bytes in 51 allocations
+# (dmEnvironment.cpp:110, via SIG_Environment.cpp:416). Suppress that one
+# function rather than turning leak detection off: a leak on the PVM path is
+# exactly what this check should still catch.
+cat > "$PVM_TMP/lsan.supp" <<'SUPP'
+leak:dmEnvironment::loadTerrainData
+SUPP
+SIGEL_ROOT=$ROOT/x/kdesigelSources.1.3/kdesigel/kdesigel
+LSAN_OPTIONS=suppressions=$PVM_TMP/lsan.supp
+export SIGEL_ROOT LSAN_OPTIONS
 
 "$BIN/pvmd3" > "$PVM_TMP/pvmd.out" 2>&1 &
 pvmd_pid=$!
@@ -91,12 +112,13 @@ echo "pvmd3          running, pid $pvmd_pid"
 
 echo
 echo "P3  PVM alone"
-"$PVM_TMP/pvm_smoke"
+"$PVM_TMP/pvm_smoke"; p3=$?
 
 echo
-if [ -x "$ROOT/build/pvm_link" ]; then
-	echo "P4  SIGEL's PVM code against real PVM"
-	"$ROOT/build/pvm_link"
-else
-	echo "P4  skipped -- run 'make pvm-link' to build build/pvm_link"
-fi
+echo "P4  SIGEL's SIG_GPPVMData against real PVM"
+"$LINK"; p4=$?
+
+echo
+[ "$p3" -eq 0 ] && [ "$p4" -eq 0 ] || {
+	echo "FAILED: P3 exit $p3, P4 exit $p4" >&2; exit 1; }
+echo "both PASS"

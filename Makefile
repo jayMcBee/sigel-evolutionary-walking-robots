@@ -335,6 +335,10 @@ $(B)/sigel_eval: sigel_eval.cpp $(MOC_OBJS) $(CORE_LIBS) $(VENDOR_LIBS)
 # distinct. The rest of the core and the vendored libraries follow because
 # those two drag in most of SIGEL.
 #
+# That list is hand-written, so the recipe asserts it is still complete: if any
+# other core object gains a pvm_* call it would sit unreferenced in its archive,
+# never be linked, and P4 would stay green while covering less.
+#
 # -ltirpc is NOT optional even though the link succeeds without it. libasan
 # exports weak xdr_double, xdr_int, xdrmem_create and friends as interceptors,
 # so under the sanitizers PVM's XDR references bind to those with nothing
@@ -345,10 +349,17 @@ PVM_OBJS := $(OBJ)/sigel/SIGEL_GP/SIG_GPFitnessTrainer.o \
             $(OBJ)/sigel/SIGEL_GP/SIG_GPPVMData.o
 
 $(B)/pvm_link: pvm_link.cpp $(PVM_OBJS) $(MOC_OBJS) $(CORE_LIBS) $(VENDOR_LIBS) \
-               $(PVM_LIB)
+               $(PVM_LIB) $(PVM_D)
 	$(SIGCXX) $(SIGINC) $< $(PVM_OBJS) $(MOC_OBJS) -o $@ \
 	  -Wl,--start-group $(CORE_LIBS) $(VENDOR_LIBS) -Wl,--end-group \
 	  $(PVM_LIB) -ltirpc \
 	  -L$(QTLIB) -lQt6Widgets -lQt6Gui -lQt6Core -lGL -lm
+	@bad=`nm --undefined-only --print-file-name $(CORE_LIBS) 2>/dev/null \
+	      | sed -n 's/.*:\(.*\.o\): *U pvm_.*/\1/p' | sort -u \
+	      | grep -v -e SIG_GPFitnessTrainer.o -e SIG_GPPVMData.o`; \
+	  test -z "$$bad" || { \
+	    echo "PVM_OBJS is out of date: these also need pvm_* and are not" \
+	         "on the link line, so P4 no longer covers them:" >&2; \
+	    echo "$$bad" >&2; exit 1; }
 
 -include $(shell find $(OBJ) -name '*.d' 2>/dev/null)

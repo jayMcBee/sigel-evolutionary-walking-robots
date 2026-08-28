@@ -27,11 +27,11 @@ build and run, because nothing else can be verified without it — see §3.
 |---|---|
 | 0 — comments to English | done for the 9 core modules; 9 GUI files still hold Latin-1 |
 | A — core onto Qt 6 | **done**, tags `step-A0`…`step-A9` |
-| B — ownership explicit | **subsumed by Phase D**, which deletes the containers rather than converting them. 13 `setAutoDelete` left in core — 10 in `SIGEL_GP`, 2 in `SIGEL_Robot`, 1 in `MT_Control`, all in the evolution loop that nothing can run until PVM builds |
+| B — ownership explicit | **subsumed by Phase D**, which deletes the containers rather than converting them. 13 `setAutoDelete` left in core — 10 in `SIGEL_GP`, 2 in `SIGEL_Robot`, 1 in `MT_Control`, all in the evolution loop, which Phase C still blocks even though PVM now runs |
 | R — build and run | core builds and runs. **No longer checked only against itself** — Phase V has confirmed both the ordering and the arithmetic against the 1.3 binary, §7 |
 | T — old-Qt tool container | **done 2026-08-27.** `tools/qtmig`, §4 |
 | D — delete the shim, migrate the data | **D1–D8 done.** `Q2Dict`, `Q2DictIterator` and `Q2Array` gone from all code; `Q2PtrVector` off `SIG_Geometry`, `SIG_Body` and the `SIG_Register` cluster. Shim 806 → **530** lines. Remaining, measured 2026-08-28: `Q2PtrList` 62, `Q2PtrVector` 53, `Q2CString` 21, `Q2Queue` 16, `Q2ListIterator` 14, `Q2ValueList` 12. §10 |
-| P — PVM | **DONE 2026-08-28.** Vendored 3.4.3 replaced by upstream 3.4.6; nine patches carry the four config lines and Debian's eight source fixes; `libpvm3.a` and `pvmd3` build, and SIGEL's two PVM objects link and round-trip against them. `sigel`/`sigel_slave` still need Phase C. §7 |
+| P — PVM | **DONE 2026-08-28.** Vendored 3.4.3 replaced by upstream 3.4.6; nine patches carry the four config lines and Debian's eight source fixes; `libpvm3.a` and `pvmd3` build; SIGEL's two PVM objects link against them and `SIG_GPPVMData` round-trips through real PVM. `sigel`/`sigel_slave` still need Phase C. §7 |
 | C — GUI | **not started, AUTHORIZED 2026-08-27 per D24.** ~450 Qt 2 sites + 20 forms |
 | V — check against the 1.3 binary | **V1 and V5's MDH probe both done and both PASS.** Ordering: 10 of 10 container orders match. Arithmetic: `twoBases` exact bit for bit, `octopus` 9/9 with three joints exact and 5 ulp worst. V2–V4 not started; V5's sensor and force probes are **invalid as specified** — both target Dynamo-only functions, deleted 2026-08-28. §7 |
 
@@ -78,14 +78,17 @@ ported interface has nothing to drive.
 6. Fix PVM — **superseded 2026-08-28.** That count measured the vendored 3.4.3,
    now replaced by upstream 3.4.6: four config lines, no source edits. Phase P.
 7. Full headless run, compared against the captured 2003 run.
-8. The evolution-loop containers, testable only once PVM runs (§7).
+8. The evolution-loop containers, still untestable — PVM runs as of Phase P, but Phase C blocks the loop (§7).
 
 **A caveat that governs the order of what is left.** Everything after Phase D's
-simulation-side work is in the **evolution loop**, which nothing can execute
-until PVM builds: the 13 remaining `setAutoDelete` sites, `Q2PtrList`'s
-`fitTaskList` and `toSpawnList`, and the rest of `Q2PtrVector`. Both gates and
-AddressSanitizer reach none of it. Converting those blind is the largest
-remaining risk in this plan, and item 6 is what retires it.
+simulation-side work is in the **evolution loop**, which nothing can execute:
+the 13 remaining `setAutoDelete` sites, `Q2PtrList`'s `fitTaskList` and
+`toSpawnList`, and the rest of `Q2PtrVector`. Both gates and AddressSanitizer
+reach none of it. Converting those blind is the largest remaining risk in this
+plan. **Phase P was expected to retire it and did not.** PVM builds and runs as
+of 2026-08-28, but `SIG_GPFitnessTrainer` dispatches through `pvm_spawn` of
+`sigel_slave`, and Phase C has to build `sigel_slave` first. The blocker moved;
+it did not lift.
 
 **Still needs a decision:** whether
 `QTextStream` no longer printing `-0` matters (§9); the order of remaining
@@ -109,6 +112,9 @@ experiments — which is what produced the scope note above. All fixed.
   in its own directory.
 - Verify: `./check.sh` from the repo root compiles every module and header and
   runs the shim self-check. Takes several minutes.
+- PVM: `make pvm && make pvm-link`, then `./pvm-check.sh` starts a daemon and
+  runs both round trips. Not one of the three checks below — it has no baseline,
+  it is PASS/FAIL.
 - Run the published experiments: `./replicate.sh build-fast`. Read the scope
   note at the top of this file first — those experiments are from SIGEL 1.0 and
   do not test this port.
@@ -131,6 +137,8 @@ experiments — which is what produced the scope note above. All fixed.
 /home/jan/Downloads/sigel/
 ├── PORTING.md                              this file
 ├── check.sh                                per-file compile check, §7
+├── dictorder-dump.sh                       dictionary-order check, §7
+├── fitness-check.sh                        fitness check, §7
 ├── pvm-check.sh                            does PVM run? Phase P, P3 and P4
 ├── pvm_link.cpp                            SIGEL's PVM objects vs real PVM
 ├── pvm_smoke.c                             one PVM round trip, driven by it
@@ -142,11 +150,12 @@ experiments — which is what produced the scope note above. All fixed.
 ├── regression_1.0_to_1.3.md                sibling doc, DEFERRED
 ├── patches/                                14 patches to the vendored tree
 ├── shim/                                   pre-standard C++ headers
-├── build/                                  untracked, `make clean` removes it
+├── build/                                  untracked, removed by `make clean`
 ├── data/                                   untracked, 7 robots and 14 experiments
 ├── kdesigelSources.1.3.tar.gz              upstream source (2003-04-30)
 ├── supportingLibs.tar.gz                   vendored deps
 ├── kbin.tar.gz                             2003 i386 binary, reference only
+├── pvm3.4.6.tgz                            upstream PVM, tracked -- Phase P
 ├── x/kdesigelSources.1.3/kdesigel/kdesigel/
 │   ├── src/       19 module dirs           ~40k LOC
 │   ├── include/   16 module dirs           ~25k LOC
@@ -430,295 +439,222 @@ introduced it, then shipped as "0 errors".
 modules, and it compiles nothing under `src/` at top level — so
 `sigel.cpp`, `sigel_slave.cpp` and all 5 GUI modules are checked by nothing
 today. Extending it is part of the first Phase C step, not an afterthought.
+The repo-root programs are in the same hole: `sigel_eval.cpp`, `pvm_smoke.c`
+and `pvm_link.cpp` are compiled only by their own targets, never by `check.sh`.
+A break in them shows up as a build failure rather than a check failure.
 
-### Phase P — PVM — DONE 2026-08-28, all four steps
+### Phase P — PVM — DONE 2026-08-28
 
-**Steps:** P1 replace the vendored tree · P2 the config lines and Debian's
-source patches · P3 build `libpvm3.a` and `pvmd3` · P4 link the PVM-calling
-core against it.
-
-**P4 is not `sigel` and `sigel_slave`.** Both need Qt 2 GUI modules that Phase C
-has not ported — `sigel.cpp:40` wants `SIGEL_MasterGUI/SIG_MainWindow.h`,
-`sigel_slave.cpp:39` wants `SIGEL_SlaveGUI/SIG_SimulationWindow.h`, and the 2003
-`x/kdesigelSources.1.3/kdesigel/kdesigel/Makefile.am:53-70` names eight GUI and
-UI archives in a shared `LDADD`. So P4 force-links the objects that call
-`pvm_*` against the real `libpvm3.a`.
-
-**There are two of them, not four.** Counted with `nm` over the built archive,
-which is the only count that matters for a link:
+Upstream PVM 3.4.6 replaces the vendored 3.4.3. `libpvm3.a` and `pvmd3` build
+and run; SIGEL's PVM code links against them and `SIG_GPPVMData` round-trips
+through a live daemon. **`sigel` and `sigel_slave` still do not link** — they
+need the Qt 2 GUI modules Phase C has not ported, so the evolution loop stays
+unreachable. The blocker moved from PVM to Phase C; it did not lift.
 
 ```
-SIG_GPFitnessTrainer.o   7  addhosts delhosts kill probe recv spawn upkdouble
-SIG_GPPVMData.o          7  initsend pkint pkstr recv send upkint upkstr
+make pvm         libpvm3.a, pvmd3         28 objects, 0 errors, 6 warnings
+make pvm-link    build/pvm_link           P4's link and round trip
+./pvm-check.sh   starts a daemon, runs both, PASS/FAIL, non-zero if either fails
 ```
 
-13 distinct symbols, `pvm_recv` being the shared one. **An earlier draft here
-said four objects and 27 calls, from `grep -c pvm_` over the sources.** That
-count is wrong three ways: it counts comments and diagnostic strings, it counts
-both arms of `#ifdef _WINDOWS`, and it credited `SIG_GPManager` and
-`SIG_Environment` with a call each — the first has only a `pvm_halt()` inside
-`#ifdef _WINDOWS`, the second only the token inside a `//` comment. Neither
-object carries an undefined `pvm_*` symbol. Do not re-derive this with `grep`.
+#### P1 — the tree
 
-That link proves the library and SIGEL's own PVM code agree, which is the part
-PVM can prove without Phase C.
+`x/supportingLibs/supportingLibs/pvm3/` is upstream 3.4.6, 844 files where
+3.4.3 had 576. `pvm3.4.6.tgz` is committed at the repo root, md5
+`7b5f0c80ea50b6b4b10b6128e197747b`, identical to netlib's and to Debian's
+`.orig`. It is the one tarball tracked here: netlib is the only host still
+publishing it, Fedora retired PVM in 2015 and Debian removed it in 2024.
 
-**P1, done.** `x/supportingLibs/supportingLibs/pvm3/` is now upstream 3.4.6, 844
-files where 3.4.3 had 576. `pvm3.4.6.tgz` is committed at the repo root, md5
-`7b5f0c80ea50b6b4b10b6128e197747b`, identical to netlib's download and to
-Debian's `pvm_3.4.6.orig.tar.gz`.
+**3.4.3 could not have been patched instead: it has no `conf/LINUX64.def`.**
+`lib/pvmgetarch` is not part of that — measured, *both* versions contain zero
+`aarch64`, which is why the `Linux,aarch64` line is one of the four config
+lines below.
 
-**Nothing of SIGEL's was discarded.** Measured, not assumed: the PVM bundled in
-`sigelSourceDistribution.1.0.tar.gz` and the one from `supportingLibs.tar.gz`
-are both 576 files, and diffing them gives **one** genuine changed line, a
-`- cd lib/$(PVM_ARCH) && rm -f *` clean rule added to `Makefile.aimk`. The other
-357 differing files are CVS `$Id:`/`$Log:` keyword expansion from SIGEL's import
-of 2001-11-20, 68 of them carrying only the German commit line *"Erste
-lauffähige Sigel-Version für KDevelop"* into a `$Log:` block. `patches/` has
-never held a PVM patch, over the whole history of that directory.
+**Nothing of SIGEL's was discarded.** The PVM in
+`sigelSourceDistribution.1.0.tar.gz` and the one in `supportingLibs.tar.gz` are
+both 576 files, and differ in **one** genuine line — a clean rule added to
+`Makefile.aimk`. The other 357 differing files are CVS `$Id:`/`$Log:` keyword
+expansion from SIGEL's import of 2001-11-20. `patches/` never held a PVM patch.
+That compares the two *tarballs*; the untracked directory `rm -rf` destroyed
+cannot be compared against, so this is provenance, not a byte-for-byte proof.
 
-**The limit of that proof.** It compares the two *tarballs*. The directory `rm
--rf` destroyed was untracked and is now unrecoverable, so nothing can compare
-against it directly; what is shown is that the tarball it came from held stock
-upstream, and that no patch in this repo ever touched it.
-
-**The supporting libraries were a separate download for 1.3.**
+For 1.3 the supporting libraries were a **separate download**:
 `kdesigelSources.1.3.tar.gz` carries four entries under `supportingLibs/` — the
-directory and three Makefiles, with `SUBDIRS = fparser dynamechs cv97`. The
-libraries came in `supportingLibs.tar.gz`. Only the 1.0 distribution bundled
-them, all eight, inside the source tree.
-
-**Why 3.4.3 could not simply be patched.** It has no `conf/LINUX64.def` at all,
-so there is no LINUX64 build to configure. That is the whole of the difference.
-**`lib/pvmgetarch` is not part of it** — measured, both versions contain zero
-`aarch64`, because 3.4.6's nearest line is `Linux,arm* ) ARCH=LINUXARM`, which
-does not glob-match `aarch64`. That is precisely why the `Linux,aarch64` line is
-one of the four config lines below: the version bump does not supply it. An
-earlier draft of this section, and of the P1 commit message, offered it as a
-reason to prefer 3.4.6, which it is not.
+directory and three Makefiles. Only the 1.0 distribution bundled them.
 
 **The Makefile guards the swap** (`Makefile:54-83`). Re-extracting
-`supportingLibs.tar.gz` over the tree puts 3.4.3 back with no error, no missing
-file and a plausible file count, because `tar` overwrites but never deletes. The
-guard reads `PVM_VER` out of `include/pvm3.h` on every `make` — not from the
-patch stamp, which survives exactly this accident.
+`supportingLibs.tar.gz` over the tree restores 3.4.3 with no error and a
+plausible file count, because `tar` overwrites but never deletes. The guard
+reads `PVM_VER` from `include/pvm3.h` on every `make`, not from the patch stamp,
+which survives exactly this accident. Confirmed in four states: right version,
+everything runs; wrong version, build targets abort while `clean` and `unpatch`
+still run, because those two are how you recover; header unparseable, abort;
+tree absent, pass.
 
-Broken deliberately and confirmed, per §0, in all four states: right version,
-every target runs; wrong version, `all`/`vendor`/`core` abort while `clean` and
-`unpatch` still run, because those two are how you recover; header present but
-unparseable, abort; tree absent entirely, pass, and the build reports the
-missing files itself.
+#### P2 — nine patches
 
-**P2, done 2026-08-28. Nine patches.** The plan said one. **The first attempt
-at correcting that said four, and was also wrong** — four was the number a
-review happened to name, not a measurement. Measured against a pristine 3.4.6:
-Debian's `series` has **29 entries**, 26 apply cleanly, **10 touch `.c`/`.h`,
-and 8 of those touch a file in `src/Makefile.aimk`'s object lists** — the 28
-objects that build `libpvm3.a` and `pvmd3`. **All 8 are applied, signed off
+The plan said one Debian patch. Measured against a pristine 3.4.6: the `series`
+has 29 entries, 26 apply, 10 touch `.c`/`.h`, and **8 touch a file in the 28
+objects** that build `libpvm3.a` and `pvmd3`. **All 8 are applied, signed off
 2026-08-28**, on the rule that a maintained distribution's judgement beats ours
 on a package nobody maintains. The ninth patch carries the four config lines.
 
-The rule is "everything Debian applies that we compile", so the column below is
-a record, not the reason any of them is there.
+The rule is "everything Debian applies that we compile", so this column is a
+record, not the reason any of them is there. Line numbers are **pre-patch**.
 
 | `patches/` file | Debian | Fixes something here? |
 |---|---|---|
 | `pvm3-linux64-aarch64-tirpc` | ours | n/a — this is the port |
-| `pvm3-debian24-ddpro-unistd-include` | 24 | **yes.** Without it `ddpro.c:1509` casts `getcwd`'s implicit `int` back to a pointer — gcc says `-Wint-to-pointer-cast`, and on 64-bit the address is cut in half |
-| `pvm3-debian06-ctime-r` | 06 | **yes.** `pvmd.c:1738` passes `ctime()`'s result to `pvmlogprintf` as a format string; also `ctime` → `ctime_r` |
-| `pvm3-debian22-exec-path-sized` | 22 | **yes.** `pvmd.c:3855` builds an exec path in a fixed `char path[MAXPATHLEN]` with `strcpy`/`strcat`; Debian sizes the buffer |
-| `pvm3-debian09-pvmnametag-prototype` | 09 | no. It adds parameter types to a K&R declaration; `-std=gnu17` keeps `char *pvmnametag();` legal. Debian patched only `lpvmgen.c:683`, leaving the same declaration in seven other files |
-| `pvm3-debian17-global-h-pvmtev-include` | 17 | no. Measured: all 28 objects compile without it |
-| `pvm3-debian23-auth-file-o-rdwr` | 23 | no. See below |
-| `pvm3-debian16-default-pvmroot` | 16 | no — the whole hunk is inside `#ifdef PVM_DEFAULT_ROOT`, which nothing here defines |
-| `pvm3-debian20-kfreebsd-ifflags` | 20 | no — the whole hunk is inside `#ifdef __FreeBSD_kernel__` |
+| `pvm3-debian24-ddpro-unistd-include` | 24 | **yes.** `ddpro.c:1509` casts `getcwd`'s implicit `int` back to a pointer; on 64-bit the address is cut in half |
+| `pvm3-debian06-ctime-r` | 06 | **yes.** `pvmd.c:1738` passes `ctime()`'s result to `pvmlogprintf` as a format string |
+| `pvm3-debian22-exec-path-sized` | 22 | **yes.** `pvmd.c:3855` builds an exec path in a fixed `char path[MAXPATHLEN]` with `strcpy`/`strcat` |
+| `pvm3-debian09-pvmnametag-prototype` | 09 | no. `-std=gnu17` keeps `char *pvmnametag();` legal, and Debian patched only `lpvmgen.c:683` of eight such declarations |
+| `pvm3-debian17-global-h-pvmtev-include` | 17 | no. All 28 objects compile without it |
+| `pvm3-debian23-auth-file-o-rdwr` | 23 | no. The descriptor at `lpvm.c:3120` is only read and closed; the write at `:3181` goes to a different one opened `O_WRONLY`. Debian's reason is that `O_TRUNC` without write access is undefined in POSIX |
+| `pvm3-debian16-default-pvmroot` | 16 | no — the hunk is inside `#ifdef PVM_DEFAULT_ROOT` |
+| `pvm3-debian20-kfreebsd-ifflags` | 20 | no — the hunk is inside `#ifdef __FreeBSD_kernel__` |
 
-The two Debian source patches **not** taken, `03-new-readline-api` and
-`25-format-security`, touch only `console/`, `tracer/`, `hoster/` and
-`src/OS2/`. Neither is in the 28. (`06` also touches `tracer/trcutil.c`, which
-is not in the 28 either; it comes along with the `pvmd.c` hunk.)
+`03-new-readline-api` and `25-format-security` touch only `console/`,
+`tracer/`, `hoster/` and `src/OS2/`. Neither is in the 28.
 
-**All 28 objects compile with all nine applied: 0 errors.**
+**All 28 objects compile with all nine applied: 0 errors.** `lib/pvmgetarch`
+answers `LINUX64`, which is the single fact the config patch exists for.
 
-**`make unpatch` was reversing in the wrong order** and this is what exposed it.
-It undid patches in application order, so with `06` and `22` both touching
-`pvm3/src/pvmd.c`, undoing `06` first shifted the file and `22` came off with
-`offset -2` on all five hunks plus a `pvmd.c.orig` backup. It landed, but a
-larger shift would not. `unpatch` now reverses the list. Verified: apply all 14,
-`make unpatch`, no offset and no backup file, and the tree comes back
-byte-identical to `pvm3.4.6.tgz`; re-apply, and a forced second run reports all
-14 already applied.
+**`make unpatch` was reversing in application order.** With `06` and `22` both
+touching `pvmd.c`, undoing `06` first shifted the file and `22` came off with
+`offset -2` and a `.orig` backup. It landed; a larger shift would not. It now
+reverses the list, and the round trip is byte-identical to the tarball.
 
-**CORRECTION — patch 23 does not fix a write to a read-only descriptor.** An
-earlier draft of this table said it did, and that was never measured. The
-descriptor opened at `lpvm.c:3120` is only `read` (3160) and closed (3170); the
-`write` at 3181 goes to a *different* descriptor re-opened `O_WRONLY` at 3174.
-In `tdpro.c` the descriptor opened at 595 is only `read` (698) and closed (708).
-Each side reads its own auth file; the peer writes it through a separate
-`O_WRONLY` open. Debian's own reason, from its changelog, is that `O_TRUNC`
-without write access is **undefined behaviour in POSIX** — it came in with the
-Hurd build fixes. On Linux the unpatched code works.
+§3's PVM analysis measured 3.4.3 and is marked historical. Of the two defects
+it said 3.4.6 already fixed, only `sys_errlist` was: `pvmlog.c:499-505` is
+guarded by `USESTRERROR`, which `conf/LINUX64.def` defines. The `pvmtev.h`
+include was **not** in vanilla 3.4.6 — patch 17 adds it — but all 28 objects
+compile without it, so the conclusion held and the reason did not. Separately,
+the research build that was reported "verified by building and running it" did
+not carry patch 24, so the binary verified still had the `getcwd` truncation.
 
-**Line numbers in this section are pre-patch**, against the vanilla tarball,
-because that is the state each patch describes. After P2 the same lines are
-`lpvm.c:3117`, `tdpro.c:594`, `ddpro.c:1510`, `global.h:326`.
+#### P3 — build and run
 
-**`lib/pvmgetarch` now answers `LINUX64` on this machine.** That is the single
-fact the whole config patch exists for, and it is the check that it worked.
+`make pvm` drives PVM's own build, target `s`, which is `src` only. `default`
+is `s c f g` and `c` is `s t`, so it would also build the console, the tracer,
+`libfpvm` and `libgpvm3`; SIGEL's 2003 link line names `-lpvm3` and nothing
+else. **PVM is the one vendored library we do not compile ourselves**: its own
+build works once patched, and `pvmd3` is a daemon `libpvm3` locates under
+`$PVM_ROOT/lib/$PVM_ARCH`, so the products must sit in that layout inside the
+vendored tree rather than in `build/`. `make clean` names them, or they would
+survive it.
 
-
-**And the reason given for needing no source edits is half wrong.** §3 named two
-defects that 3.4.6 was said to already contain fixes for. Measured against the
-vanilla tarball: `sys_errlist` **is** fixed — `pvmlog.c:499-505` is guarded by
-`USESTRERROR`, which `conf/LINUX64.def` defines. The `pvmtev.h` include is
-**not** — vanilla `src/global.h:321` declares `extern struct Pvmtevdid
-pvmtevdidlist[]` with no include, exactly as 3.4.3 did. It compiles anyway: all
-28 objects build without it, because an `extern` array of an incomplete struct
-type is legal C. So the conclusion held and the reason did not. P2 applies
-Debian's patch 17 regardless, so the include is present now.
-
-**Correction to the research below: the verified 3.4.6 build did not carry the
-Debian patch.** vanilla `src/ddpro.c:1509` calls `getcwd` with no `<unistd.h>` in
-scope, and the config's own `-Wno-implicit-function-declaration` is what lets
-it through — so the binary that was verified still had the truncation bug the patch
-fixes. The patch is right; P2 applies it. A second tree in the research
-scratchpad also added `-Wno-error=int-conversion`,
-`-Wno-error=incompatible-pointer-types` and `-Wno-error=return-mismatch`; those
-are the classes this section says must stay hard errors, and that tree is not
-what P2 uses.
-
----
-
-**P3, done 2026-08-28. `libpvm3.a` and `pvmd3` build, and PVM runs.**
-
-`make pvm` builds them; `./pvm-check.sh` starts the daemon and runs one round
-trip. **PVM is the one vendored library we do not compile ourselves.** Its own
-build works once patched, so an object list here would be a reimplementation;
-and `pvmd3` is a daemon `libpvm3` locates by path under `$PVM_ROOT/lib/
-$PVM_ARCH`, so the products must sit in that layout inside the vendored tree
-rather than in `build/`. The target is PVM's `s`, which builds `src` only —
-`default` is `s c f g`, and `c` is itself `s t`, so it would also build the
-console, the tracer, `libfpvm` and `libgpvm3`. None is named on SIGEL's 2003
-link line, which is `-lpvm3` and nothing else. (Not readline, though: an
-earlier draft said the console needs it, and `cons.c` guards every use with
-`#ifdef HASREADLINE`, which `conf/LINUX64.def` does not define.)
+`LINUX64` is hardcoded because a target name expands before `patches/` is
+applied. On another supported arch PVM builds into `lib/<thatarch>` and make
+does not check that a recipe made its targets, so the recipe tests for the
+products explicitly — without that, `make pvm` would exit 0 having produced
+nothing.
 
 ```
-28 objects, 0 errors, 6 warnings          439 KB libpvm3.a, 235 KB pvmd3
+439 KB libpvm3.a, 235 KB pvmd3
 all 13 pvm_* symbols the built core leaves undefined: defined
-XDR round trip: double, int and string all exact
 ```
 
-**13 is the core's number, not the whole application's.** It counts the
-undefined `pvm_*` in `build/lib/lib*.a` as built today, which is what P4 links.
-`sigel.cpp` and `sigel_slave.cpp` — the two programs Phase C is needed for —
-add six more: `pvm_halt`, `pvm_mytid`, `pvm_parent`, `pvm_exit`,
-`pvm_pkdouble`, `pvm_start_pvmd`. All six are in `libpvm3.a` too, so nothing is
-missing; the figure just measures less than it sounds like.
+`./pvm-check.sh` runs `pvm_smoke.c` against a live daemon: double, int and
+string exact. **The round trip really goes through XDR** — `pvm_send` to one's
+own tid does not short-circuit, measured with
+`-Wl,--wrap=xdr_double,--wrap=xdr_int` at 2 and 30 calls. **And it fails when it
+should:** a `--wrap` swallowing `pvm_send` gives `nothing arrived in 10 s` and
+exit 1 rather than hanging, because it uses `pvm_trecv`; a `--wrap` adding 1.0
+to `xdr_double` on decode gives `DIFFERS`.
 
-**The round trip really does go through XDR.** `pvm_send` to one's own tid does
-not short-circuit — measured by linking `pvm_smoke.c` with
-`-Wl,--wrap=xdr_double,--wrap=xdr_int`: 2 and 30 calls. `PvmDataDefault`
-encodes on pack and decodes on unpack, through the daemon.
+**`-ltirpc` is required.** `libpvm3.a` leaves 9 XDR symbols undefined —
+`xdrmem_create`, `xdr_double`, `xdr_int`, `xdr_float`, `xdr_long`, `xdr_short`
+and the unsigned forms — because glibc dropped `rpc/types.h`. The plain C link
+of `pvm_smoke.c` fails without it with 50 undefined references. **P4's
+sanitized C++ link does not fail**, and that trap is described under P4.
 
-**And the check fails when it should**, which is the part that matters. Proved
-by breaking it two ways: a `--wrap` that swallows `pvm_send` gives
-`pvm_trecv FAILED, nothing arrived in 10 s` and exit 1 — it does **not** hang,
-because `pvm_smoke.c` uses `pvm_trecv` with a timeout rather than `pvm_recv`,
-which blocks for ever. A `--wrap` that adds 1.0 to `xdr_double` on decode gives
-`DIFFERS` and exit 1. Every PVM call's return code is checked.
-
-**`-ltirpc` is required at link time, not only at compile time.** `libpvm3.a`
-leaves `xdrmem_create`, `xdr_double`, `xdr_int`, `xdr_float`, `xdr_long`,
-`xdr_short` and their unsigned forms undefined; glibc dropped them with
-`rpc/types.h`. That is what `ARCHLIB = -ltirpc` in the config patch is for, and
-**P4's link line needs it too** — without it the link of `pvm_smoke.c` fails
-with 50 undefined XDR references across those 9 symbols.
-
-**DEFECT FOUND, not fixed: `PVM_TMP` longer than 92 characters kills the
-daemon.** `mksocs()` does
+**DEFECT, not fixed: `PVM_TMP` longer than 92 characters kills the daemon.**
 
 ```
 pvmd.c:5066   (void)PVMTMPNAMFUN(spath);      /* char spath[PVMTMPNAMLEN=128] */
 pvmd.c:5067   strcpy(uns.sun_path, spath);    /* sockaddr_un.sun_path[108]    */
 ```
 
-and `pvmtmpnam` (`pvmcruft.c:760`) builds `"$PVM_TMP/pvmtmp%06d.%d"` from the
-pid and a counter. `sun_path` holds 107 characters plus the NUL, so `PVM_TMP`
-gets 107 minus that suffix. **Measured, not reasoned:** a 92-character
-`PVM_TMP` gives a 107-character path and the daemon starts; 93 gives 108 and
-glibc aborts it with `*** buffer overflow detected ***` before it prints
-anything. `pvm-check.sh` refuses at 88, the worst case with a 7-digit pid and a
-4-digit counter.
+`pvmtmpnam` (`pvmcruft.c:760`) builds `"$PVM_TMP/pvmtmp%06d.%d"`. `sun_path`
+holds 107 characters plus the NUL. Measured: 92 starts, 93 aborts with
+`*** buffer overflow detected ***` before the daemon prints anything.
+`pvm-check.sh` refuses at 88, the worst case with a 7-digit pid and a 4-digit
+counter. **None of the 26 applicable Debian patches fixes it.** Left alone
+because it needs a source edit nobody upstream has made and the default
+`/tmp/pvm-sigel-<uid>` is 20 characters — raise it if a real run ever sets
+`PVM_TMP` somewhere deep.
 
-**CORRECTION — an earlier draft named the wrong line.** It said `pvmd.c:5178`,
-`sprintf(buf, "PVMSOCK=%s", p)` into a `char buf[128]`, and put the limit near
-110. That `sprintf` is real, and gcc does warn about it —
+*The first diagnosis named `pvmd.c:5178`, `sprintf(buf, "PVMSOCK=%s", p)` into a
+`char buf[128]`, and put the limit near 110. gcc does warn about that line, and
+that warning is what misled it — nothing reaches it, because 108 is the lower
+ceiling. The guard built from it measured `$PVM_TMP/pvmd.<uid>`, a different and
+shorter path, so every `PVM_TMP` from 93 to 109 passed the guard and killed the
+daemon anyway.*
 
-```
-pvmd.c:5178:31: warning: '%s' directive writing up to 127 bytes
-                into a region of size 120 [-Wformat-overflow=]
-```
+#### P4 — SIGEL against real PVM
 
-— but **nothing ever reaches it**, because the `strcpy` 111 lines earlier
-aborts first: 108 is a lower ceiling than 120. The compiler warning is what
-misled the first diagnosis. A backtrace ends in `__strcpy_chk`, not `sprintf`.
-The guard built from that draft measured `$PVM_TMP/pvmd.<uid>`, which is the
-*address* file from `pvmdsockfile()` — a different, shorter path — so every
-`PVM_TMP` between 93 and 109 characters passed the guard and then killed the
-daemon anyway. Both are fixed.
+**Linked: all 13 symbols.** `SIG_GPFitnessTrainer.o` and `SIG_GPPVMData.o` are
+named on the link line rather than left to the archive, so the linker takes
+them regardless. Those two are the whole of it — every object in the built core
+leaving a `pvm_*` undefined, seven each with `pvm_recv` shared, verified with
+`nm` over all 14 archives and all 284 objects. **The recipe asserts it**, so a
+core file that later gains a `pvm_*` call fails the build by name instead of
+quietly dropping out of coverage; broken deliberately with a probe in
+`SIG_IO.cpp` and confirmed to fire.
 
-**No Debian patch fixes either overflow.** Of the 26 that apply to 3.4.6, the 8
-touching what we compile are in `patches/`; none addresses `mksocs()`. Left
-unfixed because it needs a source edit nobody upstream has made, and the
-default `/tmp/pvm-sigel-<uid>` is 20 characters — **raise it if a real run ever
-sets `PVM_TMP` somewhere deep.**
+**Run: 7 of the 13, through SIGEL's own code.** `pvm_link.cpp` constructs a
+`SIG_GPPVMData` and round-trips a `QString` through its `sendQStringToPVM` and
+`getQStringFromPVM` — its own `pvm_initsend`, `pvm_pkint`, `pvm_pkstr`,
+`pvm_send`, `pvm_recv`, `pvm_upkint`, `pvm_upkstr`. The other six are
+`SIG_GPFitnessTrainer`'s — `pvm_addhosts`, `pvm_delhosts`, `pvm_kill`,
+`pvm_probe`, `pvm_spawn`, `pvm_upkdouble` — and they spawn and manage
+`sigel_slave`, which Phase C blocks. **Those six are link-checked only.**
 
-**`make clean` now also removes `pvm3/lib/LINUX64` and `pvm3/src/LINUX64`.**
-PVM's objects are the only vendored ones outside `build/`, so without that they
-would survive a clean.
+**Why it runs and does not merely link.** `libasan.so` exports weak
+`xdr_double`, `xdr_int`, `xdrmem_create` and the rest as interceptors, so under
+the sanitizers PVM's XDR references bind to those and **the link succeeds with
+no `-ltirpc` and nothing behind them**. glibc keeps the same names only as
+compat symbols (`xdr_double@GLIBC_2.17`) that `ld` will not bind. Built without
+`-ltirpc` and run: `SEGV on unknown address 0x0, pc 0x0` in `enc_xdr_init`.
+
+Dropping `libpvm3.a` gives 28 undefined references — not to be read against the
+13: 11 are `pvm_link.cpp`'s own calls, across 17 distinct symbols.
+
+**Cost of running SIGEL's code: one suppressed leak.** `SIG_Environment`'s
+default constructor loads terrain through vendored DynaMechs and leaks 20,400
+bytes in 51 allocations, `dmEnvironment.cpp:110` via `SIG_Environment.cpp:416` —
+pre-existing, unrelated to PVM. `pvm-check.sh` suppresses that one function by
+name rather than turning leak detection off, and prints what it suppressed.
+
+#### FIXED — `sendQStringToPVM` overflowed on multi-byte strings
+
+Found by P4 once it ran SIGEL's own code. `SIG_GPPVMData.cpp` sent
+`finalLength = str.length() + 1` — a **character** count — then sent
+`str.toUtf8()`, up to four times longer in bytes. `getQStringFromPVM` sized its
+receive buffer from that count and let `pvm_upkstr` write the bytes into it.
+Measured under ASan: 20 `ü` gave `heap-buffer-overflow ... in byteupk`; short
+strings survived only because `QList` over-allocates.
+
+**Upstream's, not a port regression.** `v1.3-pristine` has the identical defect
+with `str.utf8()` and `QArray<char>`. Qt 2's `QString::length()` was the Latin-1
+byte count, so the 2003 code was right for its own data.
+
+**Fixed 2026-08-28** — `qCStringBuffer.size() + 1`, taken from the same
+`Q2CString` the call already builds, so no extra conversion and no temporary.
+`pvm_link.cpp` round-trips 200 `ü` plus 50 `€` (250 characters, 550 bytes) as
+the regression test; reverting the line reproduces the overflow and fails the
+check. This changes the wire format for non-ASCII, which is safe only because
+both ends are this same file and no distributed run exists yet.
 
 ---
 
-**P4, done 2026-08-28. SIGEL's own PVM code links and runs against real PVM.**
+#### Phase P research — 2026-08-28, superseded by the record above
 
-`make pvm-link` builds `build/pvm_link`; `./pvm-check.sh` runs it after the
-P3 round trip. `SIG_GPFitnessTrainer.o` and `SIG_GPPVMData.o` are named on the
-link line rather than left to the archive, so the linker takes them whether or
-not anything references them. **Those two are the whole of it** — every object
-in the built core that leaves a `pvm_*` undefined, seven symbols each with
-`pvm_recv` shared, 13 distinct.
+Kept because the decision it argued for is the one that was taken, and because
+two of its claims turned out to be wrong.
 
-```
-undefined pvm_* remaining in build/pvm_link:  0
-drop libpvm3.a from the line:                28 undefined references to pvm_*
-round trip through SIGEL's own objects:      double, int and string all exact
-```
-
-**It runs rather than only linking, because here a successful link proves
-nothing.** `libasan.so` exports weak `xdr_double`, `xdr_int`, `xdrmem_create`
-and the rest as interceptors, so under the sanitizers PVM's XDR references
-bind to those and the link succeeds **with no `-ltirpc` and no implementation
-behind them**. glibc still carries the same names, but only as compat symbols
-(`xdr_double@GLIBC_2.17`) that `ld` will not bind a new reference to — a plain
-C link without `-ltirpc` fails with 50 undefined references, which is how this
-was found in P3, and the C++ sanitized link silently does not. So `-ltirpc` is
-on the line and the program does a real round trip.
-
-**This is not `sigel` and `sigel_slave`, and cannot be.** Both need Qt 2 GUI
-modules Phase C has not ported — see the head of this section. Between them
-they name six `pvm_*` beyond the 13 (`pvm_halt`, `pvm_mytid`, `pvm_parent`,
-`pvm_exit`, `pvm_pkdouble`, `pvm_start_pvmd`), all of which `libpvm3.a`
-defines, so nothing about PVM blocks them. **Phase C is what blocks them.**
-
-
----
-
-#### Phase P research — 2026-08-28
-
-**Decision: use upstream PVM 3.4.6. No source edits.** Four configuration lines
-and one upstream patch line. Researched and *verified by building and running
-it*, not estimated.
+**Decision: upstream PVM 3.4.6, four config lines, no source edits.**
 
 ```
 conf/LINUX64.def   ARCHCFLAGS += -I/usr/include/tirpc -std=gnu17 \
@@ -728,34 +664,23 @@ conf/LINUX64.def   ARCHCFLAGS += -I/usr/include/tirpc -std=gnu17 \
 lib/pvmgetarch     Linux,aarch64 )  ARCH=LINUX64 ;;
 ```
 
-plus Debian's one-line `24-include-unistd.patch`. `libtirpc-dev` is installed.
+**The flag choice matters, and this reasoning holds.** `getcwd` is used without
+its header, so its return truncates to `int` on a 64-bit machine.
+`-fpermissive` would also demote `int-conversion`,
+`incompatible-pointer-types` and `return-mismatch` — the gcc-14 error classes
+that catch exactly that. The two targeted `-Wno-` flags silence only the K&R-era
+classes and leave truncation a hard error.
 
-**Verified:** library and daemon build; 3 of 3 worker spawns return the correct
-fitness; a 25-generation loop runs with no anomalies; XDR round-trips are
-bit-exact for doubles, ints and floats.
+**Wrong: "one upstream patch line."** Eight Debian source patches touch what we
+compile; all eight are applied. See P2.
 
-**The aarch64 risk was real, and it is why the flag choice matters.** `getcwd`
-is used without its header, so its return truncates to `int` on a 64-bit
-machine — a live pointer-truncation bug, and Debian's patch is the fix. The
-obvious `-fpermissive` would also demote `int-conversion`,
-`incompatible-pointer-types` and `return-mismatch`, which are exactly the gcc-14
-error classes that catch that bug. The two targeted `-Wno-` flags silence only
-the K&R-era classes and leave truncation a hard error. Same binary, compiler
-still working as a safety net.
+**Wrong: "verified by building and running it."** That build did not carry patch
+24, so it still had the `getcwd` truncation the research itself identified.
 
-**Our vendored 3.4.3 would also work** — its four failure groups are recorded in
-§3, and the two patches needed are confirmed correct, because Fedora shipped the
-same two (`strerror` for `sys_errlist`, and the `pvmtev.h` include) before
-retiring the package in 2015. 3.4.6 already contains both, which is why it needs
-no source edits. **No distribution maintains it:** Fedora retired 2015, Debian removed 2024.
-(Not *nothing anywhere* — an AUR `PKGBUILD` for 3.4.6 is still current at
-`pkgrel=10`. It is not an upstream, but it is not nothing either.)
-
-**Why this is worth doing before the rest of Phase D.** 52 of the 83 remaining
-shim sites are in the evolution loop, which nothing can execute while PVM does
-not build. They are the ownership-heavy ones, where a mistake is a double free
-rather than a compile error — the class every review round has caught. No gate,
-no sanitizer and no baseline can see them today.
+**Also stated there:** vendored 3.4.3 would work with two patches Fedora shipped
+before retiring the package in 2015. 3.4.6 contains one of the two — see P2.
+No distribution maintains PVM: Fedora retired 2015, Debian removed 2024. An AUR
+`PKGBUILD` for 3.4.6 is current at `pkgrel=10`; not an upstream, but not nothing.
 
 ---
 

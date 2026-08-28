@@ -48,12 +48,18 @@ SIGEL_GP::SIG_GPPVMData::~SIG_GPPVMData() {};
 
 void SIGEL_GP::SIG_GPPVMData::sendQStringToPVM(QString str, int taskId, int messageId)
 {
-  int finalLength = str.length() + 1;
+  // finalLength sizes the receiver's buffer, so it must count the BYTES that
+  // go on the wire, not the characters. It was str.length() + 1 here and in
+  // the 2003 original, which is the same number only for ASCII: 20 'u'-umlauts
+  // are 20 characters and 40 UTF-8 bytes, and getQStringFromPVM() below then
+  // let pvm_upkstr write 41 bytes into a 21-byte buffer. Confirmed as a
+  // heap-buffer-overflow under AddressSanitizer -- PORTING.md Phase P.
+  Q2CString qCStringBuffer = str.toUtf8();
+  int finalLength = qCStringBuffer.size() + 1;
 
   pvm_initsend(PvmDataDefault);
   pvm_pkint(&finalLength,1,1);
 
-  Q2CString qCStringBuffer = str.toUtf8();
   char const *cStringBuffer = qCStringBuffer;
   pvm_pkstr( const_cast<char*>( cStringBuffer ) );
   pvm_send(taskId, messageId);

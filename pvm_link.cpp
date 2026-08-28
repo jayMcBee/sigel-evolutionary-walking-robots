@@ -1,49 +1,46 @@
 /* Does SIGEL's own PVM code link and run against real PVM? -- PORTING.md
    Phase P, step P4.  Driven by pvm-check.sh, which owns the daemon.
 
-   The Makefile links this with SIG_GPFitnessTrainer.o and SIG_GPPVMData.o
-   named on the command line, so both are pulled in whether or not anything
-   here calls them.  Between them they are every object in the built core that
-   leaves a pvm_* symbol undefined -- 13 of them, seven each, pvm_recv shared.
-   If the library and SIGEL disagree, the link fails.
+   WHAT IS LINKED.  The Makefile names SIG_GPFitnessTrainer.o and
+   SIG_GPPVMData.o on the link line, so the linker takes them whether or not
+   anything references them.  Those two are every object in the built core
+   that leaves a pvm_* symbol undefined -- seven each, pvm_recv shared, 13
+   distinct.  If SIGEL and libpvm3.a disagree, the link fails.
 
-   WHY IT ALSO RUNS.  A link alone is not enough here.  libasan.so exports weak
+   WHAT IS RUN, which is less.  This calls SIG_GPPVMData::sendQStringToPVM and
+   ::getQStringFromPVM twice, once ASCII and once multi-byte -- SIGEL's own
+   wire format, its own pvm_initsend,
+   pvm_pkint, pvm_pkstr, pvm_send, pvm_recv, pvm_upkint, pvm_upkstr.  That is
+   7 of the 13.  The other 6 are SIG_GPFitnessTrainer's -- pvm_addhosts,
+   pvm_delhosts, pvm_kill, pvm_probe, pvm_spawn, pvm_upkdouble -- and they
+   spawn and manage sigel_slave, which cannot be built until Phase C.  Those
+   six are link-checked only.  Do not read a PASS as more than that.
+
+   WHY IT RUNS AT ALL, rather than only linking.  libasan.so exports weak
    xdr_double, xdr_int, xdrmem_create and the rest as interceptors, so under
-   the sanitizers PVM's XDR references resolve against those and the link
-   succeeds with no -ltirpc and no real implementation behind them.  glibc
-   keeps the same names as compat symbols (xdr_double@GLIBC_2.17), which a
-   plain link will not bind to.  So the honest check is a round trip: pack,
-   send, receive, unpack, compare.
+   the sanitizers PVM's XDR references bind to those and the link succeeds
+   with no -ltirpc and nothing behind them.  Running catches it: without
+   -ltirpc the first PVM call dies with SEGV at pc 0 inside enc_xdr_init.
 
-   The values are the three types SIG_GPPVMData actually moves. */
+   The three constructor arguments are default-constructed.  SIG_Environment's
+   default constructor loads terrain through vendored DynaMechs and leaks
+   20,400 bytes in 51 allocations -- pre-existing, nothing to do with PVM, and
+   why pvm-check.sh suppresses that one leak by function name rather than
+   turning leak detection off. */
 
 #include <cstdio>
-#include <cstring>
-#include <sys/time.h>
 #include <pvm3.h>
 
-#define RECV_TIMEOUT_S	10
+#include "SIGEL_Robot/SIG_Robot.h"
+#include "SIGEL_Environment/SIG_Environment.h"
+#include "SIGEL_Simulation/SIG_SimulationParameters.h"
+#include "SIGEL_GP/SIG_GPPVMData.h"
 
-static int fail = 0;
-
-static int check(const char *what, int rc)
-{
-	if (rc < 0) {
-		std::printf("%-14s FAILED, pvm returned %d\n", what, rc);
-		fail = 1;
-	}
-	return rc;
-}
+#define TAG	1
 
 int main()
 {
-	struct timeval tmo = { RECV_TIMEOUT_S, 0 };
-	double d_in = 9876.54321098765, d_out = 0;
-	int    i_in = 31337,             i_out = 0;
-	char   s_in[] = "sigel-core", s_out[32] = { 0 };
-	int    tid, rc;
-
-	tid = pvm_mytid();
+	int tid = pvm_mytid();
 	if (tid < 0) {
 		std::printf("pvm_mytid      FAILED, pvm returned %d\n", tid);
 		std::printf("FAIL\n");
@@ -51,36 +48,38 @@ int main()
 	}
 	std::printf("tid            %#x\n", tid);
 
-	check("pvm_initsend",  pvm_initsend(PvmDataDefault));
-	check("pvm_pkdouble",  pvm_pkdouble(&d_in, 1, 1));
-	check("pvm_pkint",     pvm_pkint(&i_in, 1, 1));
-	check("pvm_pkstr",     pvm_pkstr(s_in));
-	check("pvm_send",      pvm_send(tid, 1));
+	SIGEL_Robot::SIG_Robot robot;
+	SIGEL_Environment::SIG_Environment environment;
+	SIGEL_Simulation::SIG_SimulationParameters parameters;
+	SIGEL_GP::SIG_GPPVMData data(robot, environment, parameters,
+			QString("simple"), false);
 
-	rc = check("pvm_trecv", pvm_trecv(tid, 1, &tmo));
-	if (rc == 0) {
-		std::printf("pvm_trecv      FAILED, nothing arrived in %d s\n",
-				RECV_TIMEOUT_S);
-		fail = 1;
-	}
+	std::printf("fitness name   \"%s\"\n",
+			data.getFitnessFunctionName().toUtf8().constData());
 
-	if (!fail) {
-		check("pvm_upkdouble", pvm_upkdouble(&d_out, 1, 1));
-		check("pvm_upkint",    pvm_upkint(&i_out, 1, 1));
-		check("pvm_upkstr",    pvm_upkstr(s_out));
+	/* Two strings.  The second is multi-byte on purpose: sendQStringToPVM
+	   used to size the receiver's buffer by character count while sending
+	   UTF-8 bytes, so 200 u-umlauts wrote 401 bytes into 201 and ASan called
+	   it a heap-buffer-overflow.  Fixed 2026-08-28; this is the regression
+	   test, and it only bites under the sanitizers. */
+	const QString ascii("sigel gp individual 0 fitness 0.0");
+	const QString utf8 = QString(200, QChar(0x00FC)) + QString(50, QChar(0x20AC));
 
-		std::printf("double         %.17g %s\n", d_out,
-				d_out == d_in ? "exact" : "DIFFERS");
-		std::printf("int            %d %s\n", i_out,
-				i_out == i_in ? "exact" : "DIFFERS");
-		std::printf("string         \"%s\" %s\n", s_out,
-				std::strcmp(s_out, s_in) ? "DIFFERS" : "exact");
-
-		if (d_out != d_in || i_out != i_in || std::strcmp(s_out, s_in))
-			fail = 1;
+	bool ok = true;
+	const struct { const char *what; const QString &s; } cases[] = {
+		{ "ascii", ascii }, { "utf-8", utf8 },
+	};
+	for (const auto &c : cases) {
+		data.sendQStringToPVM(c.s, tid, TAG);
+		const QString got = data.getQStringFromPVM(tid, TAG);
+		const bool same = (got == c.s);
+		std::printf("%-14s %lld chars / %lld bytes  %s\n", c.what,
+				(long long)c.s.length(), (long long)c.s.toUtf8().size(),
+				same ? "exact" : "DIFFERS");
+		ok = ok && same;
 	}
 
 	pvm_exit();
-	std::printf("%s\n", fail ? "FAIL" : "PASS");
-	return fail;
+	std::printf("%s\n", ok ? "PASS" : "FAIL");
+	return !ok;
 }
