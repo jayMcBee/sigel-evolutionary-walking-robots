@@ -31,6 +31,7 @@ build and run, because nothing else can be verified without it — see §3.
 | R — build and run | core builds and runs. **No longer checked only against itself** — Phase V has confirmed both the ordering and the arithmetic against the 1.3 binary, §7 |
 | T — old-Qt tool container | **done 2026-08-27.** `tools/qtmig`, §4 |
 | D — delete the shim, migrate the data | **D1–D8 done.** `Q2Dict`, `Q2DictIterator` and `Q2Array` gone from all code; `Q2PtrVector` off `SIG_Geometry`, `SIG_Body` and the `SIG_Register` cluster. Shim 806 → **530** lines. Remaining, measured 2026-08-28: `Q2PtrList` 62, `Q2PtrVector` 53, `Q2CString` 21, `Q2Queue` 16, `Q2ListIterator` 14, `Q2ValueList` 12. §10 |
+| P — PVM | **researched 2026-08-28, not started.** Upstream 3.4.6, four config lines, one patch, no source edits — verified by building and running it. §7 |
 | C — GUI | **not started, AUTHORIZED 2026-08-27 per D24.** ~450 Qt 2 sites + 20 forms |
 | V — check against the 1.3 binary | **V1 and V5's MDH probe both done and both PASS.** Ordering: 10 of 10 container orders match. Arithmetic: `twoBases` exact bit for bit, `octopus` 9/9 with three joints exact and 5 ulp worst. V2–V4 not started; V5's sensor and force probes are **invalid as specified** — both target Dynamo-only functions, deleted 2026-08-28. §7 |
 
@@ -419,6 +420,80 @@ introduced it, then shipped as "0 errors".
 modules, and it compiles nothing under `src/` at top level — so
 `sigel.cpp`, `sigel_slave.cpp` and all 5 GUI modules are checked by nothing
 today. Extending it is part of the first Phase C step, not an afterthought.
+
+### Phase P — PVM — RESEARCHED 2026-08-28, not started
+
+**Decision: use upstream PVM 3.4.6. No source edits.** Four configuration lines
+and one upstream patch line. Researched and *verified by building and running
+it*, not estimated.
+
+```
+conf/LINUX64.def   ARCHCFLAGS += -I/usr/include/tirpc -std=gnu17 \
+                                 -Wno-implicit-function-declaration -Wno-implicit-int
+                   ARCHDLIB   = -ltirpc
+                   ARCHLIB    = -ltirpc
+lib/pvmgetarch     Linux,aarch64 )  ARCH=LINUX64 ;;
+```
+
+plus Debian's one-line `24-include-unistd.patch`. `libtirpc-dev` is installed.
+
+**Verified:** library and daemon build; 3 of 3 worker spawns return the correct
+fitness; a 25-generation loop runs with no anomalies; XDR round-trips are
+bit-exact for doubles, ints and floats.
+
+**The aarch64 risk was real, and it is why the flag choice matters.** `getcwd`
+is used without its header, so its return truncates to `int` on a 64-bit
+machine — a live pointer-truncation bug, and Debian's patch is the fix. The
+obvious `-fpermissive` would also demote `int-conversion`,
+`incompatible-pointer-types` and `return-mismatch`, which are exactly the gcc-14
+error classes that catch that bug. The two targeted `-Wno-` flags silence only
+the K&R-era classes and leave truncation a hard error. Same binary, compiler
+still working as a safety net.
+
+**Our vendored 3.4.3 would also work** — its four failure groups are recorded in
+§3, and the two patches needed are confirmed correct, because Fedora shipped the
+same two (`strerror` for `sys_errlist`, and the `pvmtev.h` include) before
+retiring the package in 2015. 3.4.6 already contains both, which is why it needs
+no source edits. **Nothing is maintained anywhere:** Fedora retired 2015, Debian
+removed 2024, no other distribution packages it.
+
+**Why this is worth doing before the rest of Phase D.** 52 of the 83 remaining
+shim sites are in the evolution loop, which nothing can execute while PVM does
+not build. They are the ownership-heavy ones, where a mistake is a double free
+rather than a compile error — the class every review round has caught. No gate,
+no sanitizer and no baseline can see them today.
+
+---
+
+### Handover — one owner at a time
+
+**Never two sessions on this repository at once.** On 2026-08-27 three sessions
+were commissioning the x86 reference box, two of them describing themselves in
+identical words, and one was this session under a display name it could not see.
+It cost hours and nearly corrupted a reference capture. Sequential sessions are
+fine; concurrent ones are not.
+
+This document is the handover. A new session should read §0, this section, and
+the phase it is taking on.
+
+**The `sigel-x86` channel** reaches the machine holding the 1.3 reference binary
+and a working PVM. It is currently owned by the Qt 6 session. If it transfers,
+identify yourself to it by **verifiable facts** — repo path, recent commit
+hashes, a reference file you authored — never by a session name, because names
+are assigned per side and neither end sees the other's.
+
+**Gates any session must keep green**, all committed:
+
+```
+./check.sh                                            105 pass, 4 fail
+./dictorder-dump.sh | diff -u dictorder-baseline.txt -    empty
+./fitness-check.sh  | diff -u fitness-baseline.txt -      empty
+```
+
+Never edit a baseline to make a diff go away. If a change moves one, that is the
+finding.
+
+---
 
 ### Phase 0 — comments to English (D14)
 
