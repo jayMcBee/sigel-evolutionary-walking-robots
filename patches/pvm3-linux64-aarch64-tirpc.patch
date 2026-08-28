@@ -1,0 +1,28 @@
+--- a/pvm3/conf/LINUX64.def
++++ b/pvm3/conf/LINUX64.def
+@@ -35,10 +35,12 @@
+ ARCHCFLAGS	=	-DSYSVSIGNAL -DNOWAIT3 -DRSHCOMMAND=\"/usr/bin/rsh\" \
+ 				-DNEEDENDIAN -DFDSETNOTSTRUCT -DHASERRORVARS \
+ 				-DHASSTDLIB -DCTIMEISTIMET -DSYSERRISCONST -DNOTMPNAM \
+-				-DSYSVSTR -DUSESTRERROR $(SHAREDCFLAGS)
+-ARCHDLIB	=
++				-DSYSVSTR -DUSESTRERROR $(SHAREDCFLAGS) \
++				-I/usr/include/tirpc -std=gnu17 \
++				-Wno-implicit-function-declaration -Wno-implicit-int
++ARCHDLIB	=	-ltirpc
+ ARCHDOBJ	=
+-ARCHLIB		=
++ARCHLIB		=	-ltirpc
+ HASRANLIB	=	t
+ AR			=	ar
+ PVM_ARCH	=	LINUX64
+--- a/pvm3/lib/pvmgetarch
++++ b/pvm3/lib/pvmgetarch
+@@ -70,6 +70,7 @@
+ 	Linux,i[3456]86 )       ARCH=LINUX ;;
+ 	Linux,ia64 )            ARCH=LINUX64 ;;
+ 	Linux,x86_64 )          ARCH=LINUX64 ;;
++	Linux,aarch64 )         ARCH=LINUX64 ;;
+ 	Linux,alpha )           ARCH=LINUXALPHA ;;
+ 	Linux,arm* )            ARCH=LINUXARM ;;
+ 	Linux,sparc* )          ARCH=LINUXSPARC ;;

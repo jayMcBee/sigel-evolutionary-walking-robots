@@ -1,0 +1,48 @@
+--- a/pvm3/misc/group-hack-337
++++ b/pvm3/misc/group-hack-337
+@@ -165,7 +165,7 @@
+   	tp->t_authnam = TALLOC(LEN_OF_TMP_NAM, char, "auth");
+   	(void)TMPNAMFUN(tp->t_authnam);
+   
+-! 	if ((tp->t_authfd = open(tp->t_authnam, O_RDONLY|O_CREAT|O_TRUNC, 0600))
++! 	if ((tp->t_authfd = open(tp->t_authnam, O_RDWR|O_CREAT|O_TRUNC, 0600))
+ ! 	== -1) {
+   		pvmlogperror("tm_connect() can't create d-auth file");
+   		PVM_FREE(tp->t_authnam);
+@@ -178,7 +178,7 @@
+   	tp->t_authnam = TALLOC(LEN_OF_TMP_NAM, char, "auth");
+   	(void)TMPNAMFUN(tp->t_authnam);
+   
+-! 	if ((tp->t_authfd = open(tp->t_authnam, O_RDONLY|O_CREAT|O_TRUNC, 0600)) == -1) {
++! 	if ((tp->t_authfd = open(tp->t_authnam, O_RDWR|O_CREAT|O_TRUNC, 0600)) == -1) {
+   		pvmlogperror("tm_connect() can't create d-auth file");
+   		PVM_FREE(tp->t_authnam);
+   		tp->t_authnam = 0;
+--- a/pvm3/src/lpvm.c
++++ b/pvm3/src/lpvm.c
+@@ -3114,11 +3114,7 @@
+ #ifndef IMA_MPP
+ #ifndef NOPROT
+ 	(void)PVMTMPNAMFUN(authfn);
+-#ifdef IMA_OS2
+ 	if ((authfd = open(authfn, O_RDWR|O_CREAT|O_EXCL|O_TRUNC, 0600)) == -1)
+-#else
+-	if ((authfd = open(authfn, O_RDONLY|O_CREAT|O_EXCL|O_TRUNC, 0600)) == -1)
+-#endif
+ 	{
+ 		pvmlogperror(authfn);
+ 		pvmlogerror("pvmbeatask() can't creat t-auth file\n");
+--- a/pvm3/src/tdpro.c
++++ b/pvm3/src/tdpro.c
+@@ -591,11 +591,7 @@
+ 	tp->t_authnam = TALLOC(PVMTMPNAMLEN, char, "auth");
+ 	(void)PVMTMPNAMFUN(tp->t_authnam);
+ 
+-#ifndef IMA_OS2
+-	if ((tp->t_authfd = open(tp->t_authnam, O_RDONLY|O_CREAT|O_EXCL|O_TRUNC, 0600)) == -1)
+-#else
+ 	if ((tp->t_authfd = open(tp->t_authnam, O_RDWR|O_CREAT|O_EXCL|O_TRUNC, 0600)) == -1)
+-#endif
+ 	{
+ 		pvmlogperror("tm_connect() can't create d-auth file");
+ 		PVM_FREE(tp->t_authnam);

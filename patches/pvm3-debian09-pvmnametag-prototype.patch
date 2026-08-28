@@ -1,0 +1,11 @@
+--- a/pvm3/src/lpvmgen.c
++++ b/pvm3/src/lpvmgen.c
+@@ -685,6 +685,8 @@
+ 
+ struct pmsg *midtobuf();
+ 
++char *pvmnametag(int tag, int *found);
++
+ 
+ /***************
+  **  Private  **

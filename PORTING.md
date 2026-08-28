@@ -31,7 +31,7 @@ build and run, because nothing else can be verified without it — see §3.
 | R — build and run | core builds and runs. **No longer checked only against itself** — Phase V has confirmed both the ordering and the arithmetic against the 1.3 binary, §7 |
 | T — old-Qt tool container | **done 2026-08-27.** `tools/qtmig`, §4 |
 | D — delete the shim, migrate the data | **D1–D8 done.** `Q2Dict`, `Q2DictIterator` and `Q2Array` gone from all code; `Q2PtrVector` off `SIG_Geometry`, `SIG_Body` and the `SIG_Register` cluster. Shim 806 → **530** lines. Remaining, measured 2026-08-28: `Q2PtrList` 62, `Q2PtrVector` 53, `Q2CString` 21, `Q2Queue` 16, `Q2ListIterator` 14, `Q2ValueList` 12. §10 |
-| P — PVM | **P1 done 2026-08-28.** The vendored 3.4.3 is replaced by upstream 3.4.6; four config lines, one Debian patch and no source edits still to come. §7 |
+| P — PVM | **P1, P2 done 2026-08-28.** Vendored 3.4.3 replaced by upstream 3.4.6; five patches in `patches/` carry the four config lines and Debian's four source fixes. Build and link remain. §7 |
 | C — GUI | **not started, AUTHORIZED 2026-08-27 per D24.** ~450 Qt 2 sites + 20 forms |
 | V — check against the 1.3 binary | **V1 and V5's MDH probe both done and both PASS.** Ordering: 10 of 10 container orders match. Arithmetic: `twoBases` exact bit for bit, `octopus` 9/9 with three joints exact and 5 ulp worst. V2–V4 not started; V5's sensor and force probes are **invalid as specified** — both target Dynamo-only functions, deleted 2026-08-28. §7 |
 
@@ -428,7 +428,7 @@ modules, and it compiles nothing under `src/` at top level — so
 `sigel.cpp`, `sigel_slave.cpp` and all 5 GUI modules are checked by nothing
 today. Extending it is part of the first Phase C step, not an afterthought.
 
-### Phase P — PVM — P1 DONE 2026-08-28
+### Phase P — PVM — P1, P2 DONE 2026-08-28
 
 **Steps:** P1 replace the vendored tree · P2 the four config lines and the
 Debian patch · P3 build `libpvm3.a` and `pvmd3` · P4 link the PVM-calling core
@@ -506,15 +506,26 @@ every target runs; wrong version, `all`/`vendor`/`core` abort while `clean` and
 unparseable, abort; tree absent entirely, pass, and the build reports the
 missing files itself.
 
-**OPEN for P2 — "one Debian patch" is not measured.** Debian's series holds 26
-patches. Four are source fixes that apply cleanly to this tree, tested:
-`09-explicitly-declare-pvmnametag`, `17-fix-implicit-global-declarations`,
-`23-fix_trunc`, `24-include-unistd`. Only the last is in the plan below.
-`23-fix_trunc` matters most on its face: `src/lpvm.c:3120` and
-`src/tdpro.c:595` both open the task-authentication file `O_RDONLY|O_CREAT|
-O_EXCL|O_TRUNC` and then write to it, and Debian changes both to `O_RDWR`. That
-is on the `pvm_spawn` path SIGEL uses. **Ask before choosing** — this widens the
-"no source edits" claim.
+**P2, done 2026-08-28. Five patches, not one.** "One Debian patch" was never
+measured. Debian's series holds 26; four are source fixes that apply cleanly
+here, and **all four are taken — signed off 2026-08-28**, on the grounds that a
+maintained distribution's judgement beats ours on a package nobody maintains.
+The fifth patch carries the four config lines, which are edits to the vendored
+tree like any other and belong in `patches/` for the same reason.
+
+| `patches/` file | What it does | Fixes a real defect here? |
+|---|---|---|
+| `pvm3-linux64-aarch64-tirpc` | the four config lines | n/a — this is the port |
+| `pvm3-debian24-ddpro-unistd-include` | `<unistd.h>` in `ddpro.c` | **yes** — `getcwd` truncates to `int` without it |
+| `pvm3-debian23-auth-file-o-rdwr` | `O_RDONLY` → `O_RDWR` | **yes** — `lpvm.c:3117` and `tdpro.c:594` open the task-auth file read-only and then write it, on the `pvm_spawn` path SIGEL uses |
+| `pvm3-debian09-pvmnametag-prototype` | argument types on a declaration | no — `lpvmgen.c:683` already gives the `char *` return |
+| `pvm3-debian17-global-h-pvmtev-include` | `"pvmtev.h"` in `global.h` | no — measured, `pvmcruft.c` and `pvmerr.c` give 0 errors without it |
+
+The last two are carried because Debian carries them, not because anything here
+needs them. That is recorded so nobody re-derives it as a defect.
+
+**`lib/pvmgetarch` now answers `LINUX64` on this machine.** That is the single
+fact the whole config patch exists for, and it is the check that it worked.
 
 **And the reason given for needing no source edits is half wrong.** §3 named two
 defects that 3.4.6 was said to already contain fixes for. Measured:
@@ -1188,7 +1199,7 @@ custom signals and slots, and there are 49 across the 20 forms.
 | T | 2 | **done 2026-08-27** (§4) |
 | C | 10 | **not started, authorized 2026-08-27** |
 | V | 5 | **V1 done 2026-08-27**, V5 in progress — §7 |
-| P | 4 | **P1 done 2026-08-28** — §7 |
+| P | 4 | **P1, P2 done 2026-08-28** — §7 |
 
 **The effort column is gone, 2026-08-27, and the section is no longer called
 Effort.** It carried "1.5 wk", "1 wk", "2–3 days", "2.5–3 wk" and "~3 days".

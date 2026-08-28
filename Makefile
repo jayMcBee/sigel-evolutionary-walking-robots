@@ -13,7 +13,7 @@
 # separate directory. One evaluation is 0.2 s either way.
 #
 # The vendored tree is not tracked (it comes out of supportingLibs.tar.gz), so
-# the five edits gcc 15 needs live in patches/ and are applied here against a
+# the edits gcc 15 needs live in patches/ and are applied here against a
 # stamp file inside that tree. tar does not delete files it does not carry, so
 # re-extracting the tarball over the tree leaves the stamp behind: rm -rf the
 # vendored tree first, or the build silently keeps objects built from patched
@@ -23,6 +23,10 @@
 # upstream PVM 3.4.6 out of the tracked pvm3.4.6.tgz, and that tarball still
 # carries 3.4.3. So after any rm -rf of the vendored tree, restore pvm3/ from
 # pvm3.4.6.tgz as well -- the guard below tells you so if you forget.
+#
+# patches/pvm3-*.patch are the five that make PVM build here: the four config
+# lines, and Debian's four source fixes. They go through the same stamp as the
+# rest, so nothing below needed changing to pick them up.
 #
 # Vendored code is built with -w -fpermissive, which SIGEL's own code does not
 # get: check.sh already treats these headers as -isystem for the same reason.

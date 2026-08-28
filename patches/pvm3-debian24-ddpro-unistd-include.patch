@@ -1,0 +1,10 @@
+--- a/pvm3/src/ddpro.c
++++ b/pvm3/src/ddpro.c
+@@ -419,6 +419,7 @@
+ 
+ #include <errno.h>
+ #include <stdio.h>
++#include <unistd.h>
+ 
+ #include <pvm3.h>
+ #include <pvmproto.h>
