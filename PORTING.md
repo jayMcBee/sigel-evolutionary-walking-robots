@@ -1361,6 +1361,38 @@ modules**, including modules that do not compile yet. Grep the accessor, not
 just the member name. `SIG_GPParameter::getHostList()` is how B3 leaked into
 `SIGEL_MasterGUI`.
 
+### The register-to-index modulus, and the overflow under it
+
+`SIG_DynaMechsCommandInterface.cpp:74` and `SIG_DynaMechsSimulationQueries.cpp:93`
+map a register value onto a drive or sensor slot:
+
+```cpp
+int absoluteDriveNo = driveNo - static_cast< int >(minRegisterValue);
+driveIndex = absoluteDriveNo % static_cast< uint >(simulationData.drives.size());
+```
+
+**The `uint` cast is load-bearing and D9 nearly lost it.** `Q2PtrVector::size()`
+returned `uint`, so this modulus was unsigned and its result was always in
+`[0, size)`. `QList::size()` is signed. D9 converted both containers and left
+the expression alone, which silently turned a negative `absoluteDriveNo` into a
+negative index — read into `drives[]`/`sensors[]`, and **write** into
+`driveForcesTimeAccounts[]` at `SIG_DynaMechsCommandInterface.cpp:208,249`.
+Found by the D9 review, restored, and the cast now carries a comment saying why.
+It is the `Q2Array`/`Q2PtrVector` clamp story again in a place no clamp was
+visible: `gcc` does not warn on `int % qsizetype`, so the five vanished
+`-Wsign-compare` warnings were **not** the full inventory of `uint size()`
+dependencies, and treating them as one was the mistake.
+
+**Under it sits a real defect, preserved not fixed.** `minRegisterValue` is
+`-2^(w-1)` for register width `w`, and `SIG_LanguageParameters`'s default
+constructor sets `bitsPerRegister (32)` (`SIG_LanguageParameters.cpp:29`). At
+`w = 32`, `driveNo - (int)(-2^31)` overflows `int` for every non-negative
+`driveNo` — undefined behaviour, and the wrapped result is what the modulus then
+folds back into range. All 14 shipped `.exp` carry `w` of 3 or 8, where
+`absoluteDriveNo` stays in `[0, 2^w)` and nothing overflows, so no gate sees it.
+**Not fixed here**: the wrap decides which actuator a `MOVE` drives, so changing
+it changes simulation results against 1.3. It predates the port.
+
 ### `QTextStream` default codec
 
 232 sites. API unchanged, but Qt 2 defaulted to Latin-1 and Qt 6 to UTF-8. A
@@ -1968,7 +2000,11 @@ The clean-up, in this order:
    users are plain `QList`. Left, measured 2026-08-28 after D9: `Q2PtrList` 60,
    `Q2PtrVector` 48, `Q2CString` 21, `Q2Queue` 16, `Q2ListIterator` 14,
    `Q2ValueList` 12. An earlier version of this list omitted the last two, and
-   read `Q2PtrVector` 69 / `Q2PtrList` 62 where the tree held 51 and 60.
+   read `Q2PtrVector` 69 / `Q2PtrList` 62 where the tree at that commit
+   (`46d5ba2`) held **67** and 60. *A first draft of this correction compared
+   69 against 51 — a count taken a day later, after D7 and D8 had legitimately
+   removed 16 more sites — and so overstated the error eightfold. Corrected by
+   review.*
 2. ~~**Migrate the data files at the same time.**~~ **Done, D2.** Only the 7
    `.rrb` needed it — the 14 `.exp` already stored the order the simulation
    used. `Q2Dict::hash` generated that ordering and is deleted.
@@ -2046,8 +2082,13 @@ allocation *counts* are stable.
 D7 did the covered half of `Q2PtrVector` for `SIG_Geometry` and `SIG_Body`, and
 its own text listed what it left behind on the simulation path:
 `SIG_DynaMechsSimulationData`'s `dynaMechsLinks`, `drives` and `sensors`. This
-step does those three. **`Q2PtrVector` now appears in no executed code at all** —
-its 17 remaining code sites are the evolution loop, which nothing can run.
+step does those three. **`Q2PtrVector` is now out of every path the gates
+run.** Its remaining **16** live code sites are 15 in the evolution loop and one,
+`SIG_GUIGPManager.h:40`, in a GUI class Phase C owns. Of the 23 lines `grep`
+still matches, 6 are prose and one (`MT_Program.h:86`) is commented out.
+*Two corrections by review: the count was given as 17, and "appears in no
+executed code at all" was false — `q2compat_check.cpp` still exercises
+`Q2PtrVector`, and `check.sh` builds and runs it under ASan and UBSan.*
 
 All three are **slot-indexed with null holes**, sized once from the robot and
 never resized, so `QList<T *>` sized by `QList(qsizetype)` and filled with
@@ -2079,6 +2120,14 @@ run under AddressSanitizer in `fitness-check.sh` and all 21 files load in
 `dictorder-dump.sh`: **0 sanitizer reports, both gates byte-identical.** No
 bounds check was added — D7's review is the precedent for not moving a failure
 mode sideways on a step that has coverage.
+
+**And that coverage is sharper than it looks.** Neither the `Makefile` nor
+`check.sh` defines `QT_NO_DEBUG` or `NDEBUG`, so `QList::operator[]`'s
+`Q_ASSERT_X` is **live** in both `build/` and `build-fast/` — established by
+review, confirmed to abort on a negative index. An out-of-range index anywhere
+in the covered runs would have aborted rather than been absorbed. The residual
+risk is a release build alone, which is exactly the case `q2compat.h:24-26`
+says the clamp existed for.
 
 `SIG_DynaMechsSimulationData.h` now includes `<QList>` directly instead of
 `compat/q2compat.h`. It uses no `Q2*` type after this step, and it already held

@@ -90,7 +90,8 @@ void SIGEL_Simulation::SIG_DynaMechsSimulationQueries::sense(int sensorNo,
 
       int absoluteSensorNo = sensorNo + static_cast< int >(minRegisterValue);
 
-      int sensorIndex = absoluteSensorNo % simulationData.sensors.size();
+      // Unsigned on purpose, as in SIG_DynaMechsCommandInterface::moveDrive.
+      int sensorIndex = absoluteSensorNo % static_cast< uint >(simulationData.sensors.size());
 
       sensor = simulationData.sensors[ sensorIndex ];
     }
