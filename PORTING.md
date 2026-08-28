@@ -565,48 +565,6 @@ because that is the state each patch describes. After P2 the same lines are
 **`lib/pvmgetarch` now answers `LINUX64` on this machine.** That is the single
 fact the whole config patch exists for, and it is the check that it worked.
 
----
-
-**P3, done 2026-08-28. `libpvm3.a` and `pvmd3` build, and PVM runs.**
-
-`make pvm` builds them; `./pvm-check.sh` starts the daemon and runs one round
-trip. **PVM is the one vendored library we do not compile ourselves.** Its own
-build works once patched, so an object list here would be a reimplementation;
-and `pvmd3` is a daemon `libpvm3` locates by path under `$PVM_ROOT/lib/
-$PVM_ARCH`, so the products must sit in that layout inside the vendored tree
-rather than in `build/`. The target is PVM's `s`, which builds `src` only —
-`default` would also want the console (and readline), `libfpvm` and
-`libgpvm3`, none of which SIGEL's 2003 link line names.
-
-```
-28 objects, 0 errors, 6 warnings          439 KB libpvm3.a, 235 KB pvmd3
-all 13 pvm_* symbols SIGEL needs: defined
-XDR round trip: double, int and string all exact
-```
-
-**`-ltirpc` is required at link time, not only at compile time.** `libpvm3.a`
-leaves `xdrmem_create`, `xdr_double`, `xdr_int`, `xdr_float`, `xdr_long`,
-`xdr_short` and their unsigned forms undefined; glibc dropped them with
-`rpc/types.h`. That is what `ARCHLIB = -ltirpc` in the config patch is for, and
-**P4's link line needs it too** — without it the link fails with 40-odd
-undefined XDR references.
-
-**DEFECT FOUND, not fixed: `PVM_TMP` longer than about 110 characters kills the
-daemon.** `mksocs()` in `pvmd.c:4865` declares `char buf[128]` and line 5178
-does `sprintf(buf, "PVMSOCK=%s", p)` with the socket path. gcc says so at
-compile time — *"'%s' directive writing up to 127 bytes into a region of size
-120"* — and glibc turns it into `*** buffer overflow detected ***` before the
-daemon prints anything. Found by pointing `PVM_TMP` at this repo's scratchpad.
-**No Debian patch fixes it**; all 26 that apply are already in `patches/`.
-`pvm-check.sh` refuses to run rather than crash, and the default `/tmp` is far
-inside the limit. Left unfixed because it needs a source edit nobody upstream
-has made, and nothing here goes near the limit — **raise it if a real run
-ever sets `PVM_TMP` somewhere deep.**
-
-**`make clean` now also removes `pvm3/lib/LINUX64` and `pvm3/src/LINUX64`.**
-PVM's objects are the only vendored ones outside `build/`, so without that they
-would survive a clean.
-
 
 **And the reason given for needing no source edits is half wrong.** §3 named two
 defects that 3.4.6 was said to already contain fixes for. Measured against the
@@ -627,6 +585,97 @@ scratchpad also added `-Wno-error=int-conversion`,
 `-Wno-error=incompatible-pointer-types` and `-Wno-error=return-mismatch`; those
 are the classes this section says must stay hard errors, and that tree is not
 what P2 uses.
+
+---
+
+**P3, done 2026-08-28. `libpvm3.a` and `pvmd3` build, and PVM runs.**
+
+`make pvm` builds them; `./pvm-check.sh` starts the daemon and runs one round
+trip. **PVM is the one vendored library we do not compile ourselves.** Its own
+build works once patched, so an object list here would be a reimplementation;
+and `pvmd3` is a daemon `libpvm3` locates by path under `$PVM_ROOT/lib/
+$PVM_ARCH`, so the products must sit in that layout inside the vendored tree
+rather than in `build/`. The target is PVM's `s`, which builds `src` only —
+`default` is `s c f g`, and `c` is itself `s t`, so it would also build the
+console, the tracer, `libfpvm` and `libgpvm3`. None is named on SIGEL's 2003
+link line, which is `-lpvm3` and nothing else. (Not readline, though: an
+earlier draft said the console needs it, and `cons.c` guards every use with
+`#ifdef HASREADLINE`, which `conf/LINUX64.def` does not define.)
+
+```
+28 objects, 0 errors, 6 warnings          439 KB libpvm3.a, 235 KB pvmd3
+all 13 pvm_* symbols the built core leaves undefined: defined
+XDR round trip: double, int and string all exact
+```
+
+**13 is the core's number, not the whole application's.** It counts the
+undefined `pvm_*` in `build/lib/lib*.a` as built today, which is what P4 links.
+`sigel.cpp` and `sigel_slave.cpp` — the two programs Phase C is needed for —
+add six more: `pvm_halt`, `pvm_mytid`, `pvm_parent`, `pvm_exit`,
+`pvm_pkdouble`, `pvm_start_pvmd`. All six are in `libpvm3.a` too, so nothing is
+missing; the figure just measures less than it sounds like.
+
+**The round trip really does go through XDR.** `pvm_send` to one's own tid does
+not short-circuit — measured by linking `pvm_smoke.c` with
+`-Wl,--wrap=xdr_double,--wrap=xdr_int`: 2 and 30 calls. `PvmDataDefault`
+encodes on pack and decodes on unpack, through the daemon.
+
+**And the check fails when it should**, which is the part that matters. Proved
+by breaking it two ways: a `--wrap` that swallows `pvm_send` gives
+`pvm_trecv FAILED, nothing arrived in 10 s` and exit 1 — it does **not** hang,
+because `pvm_smoke.c` uses `pvm_trecv` with a timeout rather than `pvm_recv`,
+which blocks for ever. A `--wrap` that adds 1.0 to `xdr_double` on decode gives
+`DIFFERS` and exit 1. Every PVM call's return code is checked.
+
+**`-ltirpc` is required at link time, not only at compile time.** `libpvm3.a`
+leaves `xdrmem_create`, `xdr_double`, `xdr_int`, `xdr_float`, `xdr_long`,
+`xdr_short` and their unsigned forms undefined; glibc dropped them with
+`rpc/types.h`. That is what `ARCHLIB = -ltirpc` in the config patch is for, and
+**P4's link line needs it too** — without it the link of `pvm_smoke.c` fails
+with 50 undefined XDR references across those 9 symbols.
+
+**DEFECT FOUND, not fixed: `PVM_TMP` longer than 92 characters kills the
+daemon.** `mksocs()` does
+
+```
+pvmd.c:5066   (void)PVMTMPNAMFUN(spath);      /* char spath[PVMTMPNAMLEN=128] */
+pvmd.c:5067   strcpy(uns.sun_path, spath);    /* sockaddr_un.sun_path[108]    */
+```
+
+and `pvmtmpnam` (`pvmcruft.c:760`) builds `"$PVM_TMP/pvmtmp%06d.%d"` from the
+pid and a counter. `sun_path` holds 107 characters plus the NUL, so `PVM_TMP`
+gets 107 minus that suffix. **Measured, not reasoned:** a 92-character
+`PVM_TMP` gives a 107-character path and the daemon starts; 93 gives 108 and
+glibc aborts it with `*** buffer overflow detected ***` before it prints
+anything. `pvm-check.sh` refuses at 88, the worst case with a 7-digit pid and a
+4-digit counter.
+
+**CORRECTION — an earlier draft named the wrong line.** It said `pvmd.c:5178`,
+`sprintf(buf, "PVMSOCK=%s", p)` into a `char buf[128]`, and put the limit near
+110. That `sprintf` is real, and gcc does warn about it —
+
+```
+pvmd.c:5178:31: warning: '%s' directive writing up to 127 bytes
+                into a region of size 120 [-Wformat-overflow=]
+```
+
+— but **nothing ever reaches it**, because the `strcpy` 111 lines earlier
+aborts first: 108 is a lower ceiling than 120. The compiler warning is what
+misled the first diagnosis. A backtrace ends in `__strcpy_chk`, not `sprintf`.
+The guard built from that draft measured `$PVM_TMP/pvmd.<uid>`, which is the
+*address* file from `pvmdsockfile()` — a different, shorter path — so every
+`PVM_TMP` between 93 and 109 characters passed the guard and then killed the
+daemon anyway. Both are fixed.
+
+**No Debian patch fixes either overflow.** Of the 26 that apply to 3.4.6, the 8
+touching what we compile are in `patches/`; none addresses `mksocs()`. Left
+unfixed because it needs a source edit nobody upstream has made, and the
+default `/tmp/pvm-sigel-<uid>` is 20 characters — **raise it if a real run ever
+sets `PVM_TMP` somewhere deep.**
+
+**`make clean` now also removes `pvm3/lib/LINUX64` and `pvm3/src/LINUX64`.**
+PVM's objects are the only vendored ones outside `build/`, so without that they
+would survive a clean.
 
 ---
 

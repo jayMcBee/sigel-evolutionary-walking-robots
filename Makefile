@@ -25,6 +25,13 @@
 # carries 3.4.3. So after any rm -rf of the vendored tree, restore pvm3/ from
 # pvm3.4.6.tgz as well -- the guard below tells you so if you forget.
 #
+# ALWAYS rm -rf pvm3/ before re-extracting, never extract over it. PVM builds
+# in its own tree, and pvm3.4.6.tgz carries 1997-2007 mtimes -- older than any
+# object. Extracting over the top restores vanilla sources, leaves lib/LINUX64
+# and src/LINUX64 in place, and `make pvm' then says "Nothing to be done" while
+# libpvm3.a still holds objects built from patched sources that are no longer
+# there. The version guard cannot see this: the header still reads 3.4.6.
+#
 # patches/pvm3-*.patch are the nine that make PVM build here: the four config
 # lines, and every Debian source patch that touches one of the 28 objects PVM
 # compiles. They go through the same stamp as the rest, so nothing below needed
@@ -112,9 +119,13 @@ VENDOR_LIBS := $(LIB)/libnewmat.a $(LIB)/libdm.a $(LIB)/libcv97.a \
 #
 # LINUX64 is hardcoded rather than read from lib/pvmgetarch, because a target
 # name is expanded when this file is read -- before patches/ has been applied,
-# and the aarch64 line is one of those patches. Both x86_64 and aarch64 map to
-# LINUX64. On anything else the build stops at "no rule to make target", which
-# is the loud failure we want.
+# and the aarch64 line is one of those patches. ia64, x86_64 and aarch64 all
+# map to LINUX64 (lib/pvmgetarch:71-74).
+#
+# On any OTHER arch PVM's build succeeds into lib/$(PVM_ARCH) and leaves
+# lib/LINUX64 empty -- and make does not check that a recipe made its targets,
+# so `make pvm' would exit 0 having produced nothing. Hence the test after the
+# recipe: without it that failure is silent.
 PVM_DIR  := $(SL)/pvm3
 PVM_LIB  := $(PVM_DIR)/lib/LINUX64/libpvm3.a
 PVM_D    := $(PVM_DIR)/lib/LINUX64/pvmd3
@@ -128,6 +139,10 @@ pvm: $(PVM_LIB) $(PVM_D)
 # the patch stamp is what rebuilds this when a patches/pvm3-*.patch changes.
 $(PVM_LIB) $(PVM_D) &: $(STAMP)
 	cd $(PVM_DIR) && PVM_ROOT=$$PWD $(MAKE) s
+	@test -f $(PVM_LIB) && test -x $(PVM_D) || { \
+	  echo "PVM built nothing in lib/LINUX64 -- this machine's" \
+	       "lib/pvmgetarch says $$($(PVM_DIR)/lib/pvmgetarch)." >&2; \
+	  exit 1; }
 
 # A patch that reverse-applies cleanly is already in the tree; skip it. Anything
 # else that will not apply is a real error and stops the build.
