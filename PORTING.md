@@ -21,18 +21,18 @@ Two rules follow from it:
 **Scope widened 2026-08-22.** Was Qt API only. Now also covers getting SIGEL to
 build and run, because nothing else can be verified without it — see §3.
 
-**Status — 2026-08-27**
+**Status — 2026-08-28**
 
 | phase | state |
 |---|---|
 | 0 — comments to English | done for the 9 core modules; 9 GUI files still hold Latin-1 |
-| A — core onto Qt 6 | **done**, tags `step-A0`…`step-A9`. `./check.sh`: 117 pass, 5 fail (all need a GUI) |
-| B — ownership explicit | **8 of 14 containers**. 5 still on `setAutoDelete` — open, §7 |
-| R — build and run | core builds and runs, faithful to 1.3. **Checked only against itself** — Phase V supplies the comparison against 1.3, §7 |
+| A — core onto Qt 6 | **done**, tags `step-A0`…`step-A9` |
+| B — ownership explicit | **subsumed by Phase D**, which deletes the containers rather than converting them. 13 `setAutoDelete` left in core — 10 in `SIGEL_GP`, 2 in `SIGEL_Robot`, 1 in `MT_Control`, all in the evolution loop that nothing can run until PVM builds |
+| R — build and run | core builds and runs. **No longer checked only against itself** — Phase V has confirmed both the ordering and the arithmetic against the 1.3 binary, §7 |
 | T — old-Qt tool container | **done 2026-08-27.** `tools/qtmig`, §4 |
-| D — delete the shim, migrate the data | **D1–D6 done 2026-08-27. `Q2Dict`, `Q2DictIterator` and `Q2Array` deleted** — shim 806 → **530** lines, `./check.sh` **118 pass / 4 fail** / 341 warnings. Remaining: `Q2PtrVector` 69, `Q2PtrList` 62, `Q2CString` 21, `Q2Queue` 16, `Q2ListIterator` 14, `Q2ValueList` 12. §10 |
+| D — delete the shim, migrate the data | **D1–D8 done.** `Q2Dict`, `Q2DictIterator` and `Q2Array` gone from all code; `Q2PtrVector` off `SIG_Geometry`, `SIG_Body` and the `SIG_Register` cluster. Shim 806 → **530** lines. Remaining, measured 2026-08-28: `Q2PtrList` 62, `Q2PtrVector` 57, `Q2CString` 21, `Q2Queue` 16, `Q2ListIterator` 14, `Q2ValueList` 12. §10 |
 | C — GUI | **not started, AUTHORIZED 2026-08-27 per D24.** ~450 Qt 2 sites + 20 forms |
-| V — check against the 1.3 binary | **V1 done 2026-08-27** — the hash model is confirmed against the real binary, 10 of 10 container orders. `gdb` is installed, so V5 is unblocked and running. §7 |
+| V — check against the 1.3 binary | **V1 and V5's MDH probe both done and both PASS.** Ordering: 10 of 10 container orders match. Arithmetic: `twoBases` exact bit for bit, `octopus` 9/9 with three joints exact and 5 ulp worst. V2–V4 not started; V5's sensor and force probes open. §7 |
 
 **SCOPE — DECIDED 2026-08-23. Read this before changing anything.**
 
@@ -64,18 +64,27 @@ interface is the work, so it goes first, and PVM follows because without it the
 ported interface has nothing to drive.
 
 1. ~~Build core plus a small program that runs one fitness evaluation, under
-   AddressSanitizer.~~ **Built and running**, faithful to 1.3. Validating it
-   needs reference numbers from the 1.3 binary — §7.
+   AddressSanitizer.~~ **Done.**
 2. ~~**Stand up the old-Qt container**~~ — **done**, `tools/qtmig`. §4.
-3. **Phase D — delete the shim.** Migrate the 7 `.rrb` and 14 `.exp` so
-   declaration order *is* simulation order, drop `q2compat.h`, put core on plain
-   Qt 6 containers per D6. Ordered here by **D25** so Phase C ports the
-   interface once, to the final target. §10.
-4. **Phase C — the interface**, one module or one form at a time. §7.
-5. Fix PVM — 23 of 39 files fail because glibc dropped `rpc/types.h`, the rest
+3. ~~**Get a reference from the 1.3 binary**~~ — **V1 and V5's MDH probe done,
+   both pass.** This was item 1's missing half and is no longer outstanding.
+4. **Phase D — delete the shim.** *In progress, D1–D8.* The data migration is
+   done and only the 7 `.rrb` needed it. Remaining: `Q2PtrList`, the rest of
+   `Q2PtrVector`, `Q2CString`, `Q2Queue`, `Q2ListIterator`, `Q2ValueList`, then
+   the header. Ordered before C by **D25** so the interface is ported once, to
+   the final target. §10.
+5. **Phase C — the interface**, one module or one form at a time. §7.
+6. Fix PVM — 23 of 39 files fail because glibc dropped `rpc/types.h`, the rest
    on gcc 14's promoted C errors and two real defects. §3.
-6. Full headless run, compared against the captured 2003 run.
-7. Convert the last 5 containers, now testable (§7).
+7. Full headless run, compared against the captured 2003 run.
+8. The evolution-loop containers, testable only once PVM runs (§7).
+
+**A caveat that governs the order of what is left.** Everything after Phase D's
+simulation-side work is in the **evolution loop**, which nothing can execute
+until PVM builds: the 13 remaining `setAutoDelete` sites, `Q2PtrList`'s
+`fitTaskList` and `toSpawnList`, and the rest of `Q2PtrVector`. Both gates and
+AddressSanitizer reach none of it. Converting those blind is the largest
+remaining risk in this plan, and item 6 is what retires it.
 
 **Still needs a decision:** whether
 `QTextStream` no longer printing `-0` matters (§9); the order of remaining
@@ -387,7 +396,12 @@ self-check and independent review are the substitute.
 
 ## 7. Steps
 
-**Exit criterion per step:** `./check.sh` at the repo root. It compiles every
+**Exit criterion per step:** `./check.sh` at the repo root — **118 pass, 4 fail,
+338 warnings** as of 2026-08-28. The 4 failures are exactly the files the
+Makefile excludes. Two gates run alongside it, both committed and both required
+to stay empty: `./dictorder-dump.sh | diff -u dictorder-baseline.txt -` and
+`./fitness-check.sh | diff -u fitness-baseline.txt -`, the second of which runs
+`sigel_eval -selfcheck` first. It compiles every
 converted module, compiles every converted header standalone, and builds and
 runs the shim self-check under ASan and UBSan. Vendored headers are `-isystem`,
 so their ~12,979 warnings do not bury the ~373 in our own code.
