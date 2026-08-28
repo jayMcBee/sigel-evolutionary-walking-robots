@@ -31,7 +31,7 @@ build and run, because nothing else can be verified without it — see §3.
 | R — build and run | core builds and runs. **No longer checked only against itself** — Phase V has confirmed both the ordering and the arithmetic against the 1.3 binary, §7 |
 | T — old-Qt tool container | **done 2026-08-27.** `tools/qtmig`, §4 |
 | D — delete the shim, migrate the data | **D1–D8 done.** `Q2Dict`, `Q2DictIterator` and `Q2Array` gone from all code; `Q2PtrVector` off `SIG_Geometry`, `SIG_Body` and the `SIG_Register` cluster. Shim 806 → **530** lines. Remaining, measured 2026-08-28: `Q2PtrList` 62, `Q2PtrVector` 53, `Q2CString` 21, `Q2Queue` 16, `Q2ListIterator` 14, `Q2ValueList` 12. §10 |
-| P — PVM | **P1, P2, P3 done 2026-08-28.** Vendored 3.4.3 replaced by upstream 3.4.6; nine patches in `patches/` carry the four config lines and Debian's eight source fixes; `libpvm3.a` and `pvmd3` build and run. P4, the link, remains. §7 |
+| P — PVM | **DONE 2026-08-28.** Vendored 3.4.3 replaced by upstream 3.4.6; nine patches carry the four config lines and Debian's eight source fixes; `libpvm3.a` and `pvmd3` build, and SIGEL's two PVM objects link and round-trip against them. `sigel`/`sigel_slave` still need Phase C. §7 |
 | C — GUI | **not started, AUTHORIZED 2026-08-27 per D24.** ~450 Qt 2 sites + 20 forms |
 | V — check against the 1.3 binary | **V1 and V5's MDH probe both done and both PASS.** Ordering: 10 of 10 container orders match. Arithmetic: `twoBases` exact bit for bit, `octopus` 9/9 with three joints exact and 5 ulp worst. V2–V4 not started; V5's sensor and force probes are **invalid as specified** — both target Dynamo-only functions, deleted 2026-08-28. §7 |
 
@@ -131,7 +131,8 @@ experiments — which is what produced the scope note above. All fixed.
 /home/jan/Downloads/sigel/
 ├── PORTING.md                              this file
 ├── check.sh                                per-file compile check, §7
-├── pvm-check.sh                            does PVM run? Phase P step P3
+├── pvm-check.sh                            does PVM run? Phase P, P3 and P4
+├── pvm_link.cpp                            SIGEL's PVM objects vs real PVM
 ├── pvm_smoke.c                             one PVM round trip, driven by it
 ├── replicate.sh                            runs the published experiments, §7
 ├── Makefile                                the build, §7 Phase R
@@ -430,7 +431,7 @@ modules, and it compiles nothing under `src/` at top level — so
 `sigel.cpp`, `sigel_slave.cpp` and all 5 GUI modules are checked by nothing
 today. Extending it is part of the first Phase C step, not an afterthought.
 
-### Phase P — PVM — P1, P2, P3 DONE 2026-08-28
+### Phase P — PVM — DONE 2026-08-28, all four steps
 
 **Steps:** P1 replace the vendored tree · P2 the config lines and Debian's
 source patches · P3 build `libpvm3.a` and `pvmd3` · P4 link the PVM-calling
@@ -676,6 +677,40 @@ sets `PVM_TMP` somewhere deep.**
 **`make clean` now also removes `pvm3/lib/LINUX64` and `pvm3/src/LINUX64`.**
 PVM's objects are the only vendored ones outside `build/`, so without that they
 would survive a clean.
+
+---
+
+**P4, done 2026-08-28. SIGEL's own PVM code links and runs against real PVM.**
+
+`make pvm-link` builds `build/pvm_link`; `./pvm-check.sh` runs it after the
+P3 round trip. `SIG_GPFitnessTrainer.o` and `SIG_GPPVMData.o` are named on the
+link line rather than left to the archive, so the linker takes them whether or
+not anything references them. **Those two are the whole of it** — every object
+in the built core that leaves a `pvm_*` undefined, seven symbols each with
+`pvm_recv` shared, 13 distinct.
+
+```
+undefined pvm_* remaining in build/pvm_link:  0
+drop libpvm3.a from the line:                28 undefined references to pvm_*
+round trip through SIGEL's own objects:      double, int and string all exact
+```
+
+**It runs rather than only linking, because here a successful link proves
+nothing.** `libasan.so` exports weak `xdr_double`, `xdr_int`, `xdrmem_create`
+and the rest as interceptors, so under the sanitizers PVM's XDR references
+bind to those and the link succeeds **with no `-ltirpc` and no implementation
+behind them**. glibc still carries the same names, but only as compat symbols
+(`xdr_double@GLIBC_2.17`) that `ld` will not bind a new reference to — a plain
+C link without `-ltirpc` fails with 50 undefined references, which is how this
+was found in P3, and the C++ sanitized link silently does not. So `-ltirpc` is
+on the line and the program does a real round trip.
+
+**This is not `sigel` and `sigel_slave`, and cannot be.** Both need Qt 2 GUI
+modules Phase C has not ported — see the head of this section. Between them
+they name six `pvm_*` beyond the 13 (`pvm_halt`, `pvm_mytid`, `pvm_parent`,
+`pvm_exit`, `pvm_pkdouble`, `pvm_start_pvmd`), all of which `libpvm3.a`
+defines, so nothing about PVM blocks them. **Phase C is what blocks them.**
+
 
 ---
 
@@ -1329,7 +1364,7 @@ custom signals and slots, and there are 49 across the 20 forms.
 | T | 2 | **done 2026-08-27** (§4) |
 | C | 10 | **not started, authorized 2026-08-27** |
 | V | 5 | **V1 done 2026-08-27**, V5 in progress — §7 |
-| P | 4 | **P1, P2, P3 done 2026-08-28** — §7 |
+| P | 4 | **done 2026-08-28** — §7 |
 
 **The effort column is gone, 2026-08-27, and the section is no longer called
 Effort.** It carried "1.5 wk", "1 wk", "2–3 days", "2.5–3 wk" and "~3 days".

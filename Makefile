@@ -6,6 +6,7 @@
 #   make            build/sigel_eval -- one fitness evaluation
 #   make vendor     the five vendored libraries only
 #   make pvm        libpvm3.a and pvmd3, built by PVM's own make
+#   make pvm-link   build/pvm_link -- SIGEL's PVM code against real PVM
 #   make core       the nine SIGEL core modules only
 #   make clean      remove build/ and PVM's products
 #   make unpatch    revert the vendored tree to the tarball contents
@@ -130,10 +131,11 @@ PVM_DIR  := $(SL)/pvm3
 PVM_LIB  := $(PVM_DIR)/lib/LINUX64/libpvm3.a
 PVM_D    := $(PVM_DIR)/lib/LINUX64/pvmd3
 
-.PHONY: all vendor core clean unpatch pvm
+.PHONY: all vendor core clean unpatch pvm pvm-link
 all: $(B)/sigel_eval
 vendor: $(VENDOR_LIBS)
 pvm: $(PVM_LIB) $(PVM_D)
+pvm-link: $(B)/pvm_link
 
 # One rule for both products; PVM's own make builds them together. Depending on
 # the patch stamp is what rebuilds this when a patches/pvm3-*.patch changes.
@@ -320,6 +322,33 @@ $(foreach m,$(CORE),$(eval $(call core_lib,$(m))))
 $(B)/sigel_eval: sigel_eval.cpp $(MOC_OBJS) $(CORE_LIBS) $(VENDOR_LIBS)
 	$(SIGCXX) $(SIGINC) $< $(MOC_OBJS) -o $@ \
 	  -Wl,--start-group $(CORE_LIBS) $(VENDOR_LIBS) -Wl,--end-group \
+	  -L$(QTLIB) -lQt6Widgets -lQt6Gui -lQt6Core -lGL -lm
+
+# ---------------------------------------------------------------------------
+# Does SIGEL's own PVM code link and run against real PVM? -- PORTING.md
+# Phase P, step P4.  ./pvm-check.sh runs this.
+#
+# The two objects are named on the command line rather than left to the
+# archive, so the linker takes them whether or not anything references them.
+# They are every object in the built core with an undefined pvm_*: measured
+# with nm over build/lib/lib*.a, seven symbols each and pvm_recv shared, 13
+# distinct. The rest of the core and the vendored libraries follow because
+# those two drag in most of SIGEL.
+#
+# -ltirpc is NOT optional even though the link succeeds without it. libasan
+# exports weak xdr_double, xdr_int, xdrmem_create and friends as interceptors,
+# so under the sanitizers PVM's XDR references bind to those with nothing
+# behind them. glibc still has the same names but only as compat symbols
+# (xdr_double@GLIBC_2.17), which ld will not bind a new reference to. Hence
+# the program runs a round trip rather than only linking.
+PVM_OBJS := $(OBJ)/sigel/SIGEL_GP/SIG_GPFitnessTrainer.o \
+            $(OBJ)/sigel/SIGEL_GP/SIG_GPPVMData.o
+
+$(B)/pvm_link: pvm_link.cpp $(PVM_OBJS) $(MOC_OBJS) $(CORE_LIBS) $(VENDOR_LIBS) \
+               $(PVM_LIB)
+	$(SIGCXX) $(SIGINC) $< $(PVM_OBJS) $(MOC_OBJS) -o $@ \
+	  -Wl,--start-group $(CORE_LIBS) $(VENDOR_LIBS) -Wl,--end-group \
+	  $(PVM_LIB) -ltirpc \
 	  -L$(QTLIB) -lQt6Widgets -lQt6Gui -lQt6Core -lGL -lm
 
 -include $(shell find $(OBJ) -name '*.d' 2>/dev/null)

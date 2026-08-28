@@ -1,10 +1,18 @@
 #!/bin/sh
-# Does PVM work?  PORTING.md Phase P, step P3.
+# Does PVM work?  PORTING.md Phase P, steps P3 and P4.
 #
 #   ./pvm-check.sh
 #
-# Builds nothing: run `make pvm' first.  Starts its own pvmd3, runs one round
-# trip through pvm_smoke.c, stops it again.  Prints PASS or FAIL.
+# Builds nothing: run `make pvm && make pvm-link' first.  Starts its own pvmd3
+# and runs two round trips against it, then stops it again:
+#
+#   pvm_smoke   PVM alone, C, no SIGEL and no sanitizers      -- step P3
+#   pvm_link    SIGEL's SIG_GPFitnessTrainer.o and
+#               SIG_GPPVMData.o linked against real PVM       -- step P4
+#
+# Two programs rather than one so a failure says which half broke.  Prints
+# PASS or FAIL for each.  build/pvm_link is optional: skipped with a note if
+# it has not been built, because P3 stands on its own.
 #
 # Not one of the three checks that must stay green -- it has no baseline to
 # diff against, it is pass/fail.  It exists because the Phase P research
@@ -81,4 +89,14 @@ done
 	exit 1; }
 echo "pvmd3          running, pid $pvmd_pid"
 
+echo
+echo "P3  PVM alone"
 "$PVM_TMP/pvm_smoke"
+
+echo
+if [ -x "$ROOT/build/pvm_link" ]; then
+	echo "P4  SIGEL's PVM code against real PVM"
+	"$ROOT/build/pvm_link"
+else
+	echo "P4  skipped -- run 'make pvm-link' to build build/pvm_link"
+fi
