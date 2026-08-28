@@ -31,7 +31,7 @@ build and run, because nothing else can be verified without it — see §3.
 | R — build and run | core builds and runs. **No longer checked only against itself** — Phase V has confirmed both the ordering and the arithmetic against the 1.3 binary, §7 |
 | T — old-Qt tool container | **done 2026-08-27.** `tools/qtmig`, §4 |
 | D — delete the shim, migrate the data | **D1–D8 done.** `Q2Dict`, `Q2DictIterator` and `Q2Array` gone from all code; `Q2PtrVector` off `SIG_Geometry`, `SIG_Body` and the `SIG_Register` cluster. Shim 806 → **530** lines. Remaining, measured 2026-08-28: `Q2PtrList` 62, `Q2PtrVector` 53, `Q2CString` 21, `Q2Queue` 16, `Q2ListIterator` 14, `Q2ValueList` 12. §10 |
-| P — PVM | **P1, P2 done 2026-08-28.** Vendored 3.4.3 replaced by upstream 3.4.6; five patches in `patches/` carry the four config lines and Debian's four source fixes. Build and link remain. §7 |
+| P — PVM | **P1, P2 done 2026-08-28.** Vendored 3.4.3 replaced by upstream 3.4.6; nine patches in `patches/` carry the four config lines and Debian's eight source fixes. Build and link remain. §7 |
 | C — GUI | **not started, AUTHORIZED 2026-08-27 per D24.** ~450 Qt 2 sites + 20 forms |
 | V — check against the 1.3 binary | **V1 and V5's MDH probe both done and both PASS.** Ordering: 10 of 10 container orders match. Arithmetic: `twoBases` exact bit for bit, `octopus` 9/9 with three joints exact and 5 ulp worst. V2–V4 not started; V5's sensor and force probes are **invalid as specified** — both target Dynamo-only functions, deleted 2026-08-28. §7 |
 
@@ -137,7 +137,7 @@ experiments — which is what produced the scope note above. All fixed.
 ├── future_refactorings.md                  sibling doc, independent of the port
 ├── physics_backends.md                     sibling doc, independent of the port
 ├── regression_1.0_to_1.3.md                sibling doc, DEFERRED
-├── patches/                                5 patches to the vendored tree
+├── patches/                                14 patches to the vendored tree
 ├── shim/                                   pre-standard C++ headers
 ├── build/                                  untracked, `make clean` removes it
 ├── data/                                   untracked, 7 robots and 14 experiments
@@ -430,9 +430,9 @@ today. Extending it is part of the first Phase C step, not an afterthought.
 
 ### Phase P — PVM — P1, P2 DONE 2026-08-28
 
-**Steps:** P1 replace the vendored tree · P2 the four config lines and the
-Debian patch · P3 build `libpvm3.a` and `pvmd3` · P4 link the PVM-calling core
-against it.
+**Steps:** P1 replace the vendored tree · P2 the config lines and Debian's
+source patches · P3 build `libpvm3.a` and `pvmd3` · P4 link the PVM-calling
+core against it.
 
 **P4 is not `sigel` and `sigel_slave`.** Both need Qt 2 GUI modules that Phase C
 has not ported — `sigel.cpp:40` wants `SIGEL_MasterGUI/SIG_MainWindow.h`,
@@ -506,41 +506,77 @@ every target runs; wrong version, `all`/`vendor`/`core` abort while `clean` and
 unparseable, abort; tree absent entirely, pass, and the build reports the
 missing files itself.
 
-**P2, done 2026-08-28. Five patches, not one.** "One Debian patch" was never
-measured. Debian's series holds 26; four are source fixes that apply cleanly
-here, and **all four are taken — signed off 2026-08-28**, on the grounds that a
-maintained distribution's judgement beats ours on a package nobody maintains.
-The fifth patch carries the four config lines, which are edits to the vendored
-tree like any other and belong in `patches/` for the same reason.
+**P2, done 2026-08-28. Nine patches.** The plan said one. **The first attempt
+at correcting that said four, and was also wrong** — four was the number a
+review happened to name, not a measurement. Measured against a pristine 3.4.6:
+Debian's `series` has **29 entries**, 26 apply cleanly, **10 touch `.c`/`.h`,
+and 8 of those touch a file in `src/Makefile.aimk`'s object lists** — the 28
+objects that build `libpvm3.a` and `pvmd3`. **All 8 are applied, signed off
+2026-08-28**, on the rule that a maintained distribution's judgement beats ours
+on a package nobody maintains. The ninth patch carries the four config lines.
 
-| `patches/` file | What it does | Fixes a real defect here? |
+The rule is "everything Debian applies that we compile", so the column below is
+a record, not the reason any of them is there.
+
+| `patches/` file | Debian | Fixes something here? |
 |---|---|---|
-| `pvm3-linux64-aarch64-tirpc` | the four config lines | n/a — this is the port |
-| `pvm3-debian24-ddpro-unistd-include` | `<unistd.h>` in `ddpro.c` | **yes** — `getcwd` truncates to `int` without it |
-| `pvm3-debian23-auth-file-o-rdwr` | `O_RDONLY` → `O_RDWR` | **yes** — `lpvm.c:3117` and `tdpro.c:594` open the task-auth file read-only and then write it, on the `pvm_spawn` path SIGEL uses |
-| `pvm3-debian09-pvmnametag-prototype` | argument types on a declaration | no — `lpvmgen.c:683` already gives the `char *` return |
-| `pvm3-debian17-global-h-pvmtev-include` | `"pvmtev.h"` in `global.h` | no — measured, `pvmcruft.c` and `pvmerr.c` give 0 errors without it |
+| `pvm3-linux64-aarch64-tirpc` | ours | n/a — this is the port |
+| `pvm3-debian24-ddpro-unistd-include` | 24 | **yes.** Without it `ddpro.c:1509` casts `getcwd`'s implicit `int` back to a pointer — gcc says `-Wint-to-pointer-cast`, and on 64-bit the address is cut in half |
+| `pvm3-debian06-ctime-r` | 06 | **yes.** `pvmd.c:1738` passes `ctime()`'s result to `pvmlogprintf` as a format string; also `ctime` → `ctime_r` |
+| `pvm3-debian22-exec-path-sized` | 22 | **yes.** `pvmd.c:3855` builds an exec path in a fixed `char path[MAXPATHLEN]` with `strcpy`/`strcat`; Debian sizes the buffer |
+| `pvm3-debian09-pvmnametag-prototype` | 09 | no. It adds parameter types to a K&R declaration; `-std=gnu17` keeps `char *pvmnametag();` legal. Debian patched only `lpvmgen.c:683`, leaving the same declaration in seven other files |
+| `pvm3-debian17-global-h-pvmtev-include` | 17 | no. Measured: all 28 objects compile without it |
+| `pvm3-debian23-auth-file-o-rdwr` | 23 | no. See below |
+| `pvm3-debian16-default-pvmroot` | 16 | no — the whole hunk is inside `#ifdef PVM_DEFAULT_ROOT`, which nothing here defines |
+| `pvm3-debian20-kfreebsd-ifflags` | 20 | no — the whole hunk is inside `#ifdef __FreeBSD_kernel__` |
 
-The last two are carried because Debian carries them, not because anything here
-needs them. That is recorded so nobody re-derives it as a defect.
+The two Debian source patches **not** taken, `03-new-readline-api` and
+`25-format-security`, touch only `console/`, `tracer/`, `hoster/` and
+`src/OS2/`. Neither is in the 28. (`06` also touches `tracer/trcutil.c`, which
+is not in the 28 either; it comes along with the `pvmd.c` hunk.)
+
+**All 28 objects compile with all nine applied: 0 errors.**
+
+**`make unpatch` was reversing in the wrong order** and this is what exposed it.
+It undid patches in application order, so with `06` and `22` both touching
+`pvm3/src/pvmd.c`, undoing `06` first shifted the file and `22` came off with
+`offset -2` on all five hunks plus a `pvmd.c.orig` backup. It landed, but a
+larger shift would not. `unpatch` now reverses the list. Verified: apply all 14,
+`make unpatch`, no offset and no backup file, and the tree comes back
+byte-identical to `pvm3.4.6.tgz`; re-apply, and a forced second run reports all
+14 already applied.
+
+**CORRECTION — patch 23 does not fix a write to a read-only descriptor.** An
+earlier draft of this table said it did, and that was never measured. The
+descriptor opened at `lpvm.c:3120` is only `read` (3160) and closed (3170); the
+`write` at 3181 goes to a *different* descriptor re-opened `O_WRONLY` at 3174.
+In `tdpro.c` the descriptor opened at 595 is only `read` (698) and closed (708).
+Each side reads its own auth file; the peer writes it through a separate
+`O_WRONLY` open. Debian's own reason, from its changelog, is that `O_TRUNC`
+without write access is **undefined behaviour in POSIX** — it came in with the
+Hurd build fixes. On Linux the unpatched code works.
+
+**Line numbers in this section are pre-patch**, against the vanilla tarball,
+because that is the state each patch describes. After P2 the same lines are
+`lpvm.c:3117`, `tdpro.c:594`, `ddpro.c:1510`, `global.h:326`.
 
 **`lib/pvmgetarch` now answers `LINUX64` on this machine.** That is the single
 fact the whole config patch exists for, and it is the check that it worked.
 
 **And the reason given for needing no source edits is half wrong.** §3 named two
-defects that 3.4.6 was said to already contain fixes for. Measured:
-`sys_errlist` **is** fixed — `pvmlog.c:499-505` is now guarded by
+defects that 3.4.6 was said to already contain fixes for. Measured against the
+vanilla tarball: `sys_errlist` **is** fixed — `pvmlog.c:499-505` is guarded by
 `USESTRERROR`, which `conf/LINUX64.def` defines. The `pvmtev.h` include is
-**not** — `src/global.h:321` still declares `extern struct Pvmtevdid
-pvmtevdidlist[]` with no include, exactly as 3.4.3 did, and Debian's patch 17 is
-what adds it. It compiles anyway: `pvmcruft.c` and `pvmerr.c` both give 0 errors
-under the four config lines, because an `extern` array of an incomplete struct
-type is legal C. So the conclusion holds and the reason does not.
+**not** — vanilla `src/global.h:321` declares `extern struct Pvmtevdid
+pvmtevdidlist[]` with no include, exactly as 3.4.3 did. It compiles anyway: all
+28 objects build without it, because an `extern` array of an incomplete struct
+type is legal C. So the conclusion held and the reason did not. P2 applies
+Debian's patch 17 regardless, so the include is present now.
 
 **Correction to the research below: the verified 3.4.6 build did not carry the
-Debian patch.** `src/ddpro.c:1509` calls `getcwd` with no `<unistd.h>` in scope,
-and the config's own `-Wno-implicit-function-declaration` is what lets it
-through — so the binary that was verified still had the truncation bug the patch
+Debian patch.** vanilla `src/ddpro.c:1509` calls `getcwd` with no `<unistd.h>` in
+scope, and the config's own `-Wno-implicit-function-declaration` is what lets
+it through — so the binary that was verified still had the truncation bug the patch
 fixes. The patch is right; P2 applies it. A second tree in the research
 scratchpad also added `-Wno-error=int-conversion`,
 `-Wno-error=incompatible-pointer-types` and `-Wno-error=return-mismatch`; those

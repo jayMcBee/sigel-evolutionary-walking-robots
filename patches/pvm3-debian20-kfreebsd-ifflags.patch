@@ -1,0 +1,14 @@
+--- a/pvm3/src/host.c
++++ b/pvm3/src/host.c
+@@ -1011,7 +1011,11 @@
+ 		}
+ 		/* On some FreeBSD systems: */
+ 		/* if (IFF_UP & req.ifr_flags) { */
++#ifdef __FreeBSD_kernel__
++		if (IFF_UP & req.ifr_flags) {
++#else		
+ 		if (IFF_UP & req.ifr_ifru.ifru_flags) {
++#endif		
+ 			if (nip > 0 && !(nip % 10))
+ 				iplist = TREALLOC(iplist, (nip + 10), struct in_addr);
+ 			iplist[nip++] =

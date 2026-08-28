@@ -1,0 +1,31 @@
+--- a/pvm3/tracer/trcutil.c
++++ b/pvm3/tracer/trcutil.c
+@@ -2904,7 +2904,7 @@
+ 
+ 	time( &t );
+ 
+-	sprintf( tmp, "%s", ctime( &t ) );
++	ctime_r( &t, tmp );
+ 
+ 	result = tmp;
+ 
+--- a/pvm3/src/pvmd.c
++++ b/pvm3/src/pvmd.c
+@@ -1728,6 +1728,7 @@
+ 	gettimeofday(&tnow, (struct timezone*)0);
+ 	if (pvmdebmask || myhostpart) {
+ 		PVM_TIMET time_temp;
++		char retbuf[32];
+ 		pvmlogprintf("%s (%s) %s %s\n",
+ 				hosts->ht_hosts[hosts->ht_local]->hd_name,
+ 				inadport_decimal(&hosts->ht_hosts[hosts->ht_local]->hd_sad),
+@@ -1735,7 +1736,8 @@
+ 				PVM_VER);
+ 		pvmlogprintf("ready ");
+ 		time_temp = (PVM_TIMET) tnow.tv_sec;
+-		pvmlogprintf(ctime(&time_temp));
++		ctime_r(&time_temp, retbuf);
++		pvmlogprintf(retbuf);
+ 	}
+ 
+ 	/*

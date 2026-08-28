@@ -4,7 +4,7 @@
 # program that runs one fitness evaluation.
 #
 #   make            build/sigel_eval -- one fitness evaluation
-#   make vendor     the seven vendored libraries only
+#   make vendor     the five vendored libraries only
 #   make core       the nine SIGEL core modules only
 #   make clean      remove build/
 #   make unpatch    revert the vendored tree to the tarball contents
@@ -24,9 +24,10 @@
 # carries 3.4.3. So after any rm -rf of the vendored tree, restore pvm3/ from
 # pvm3.4.6.tgz as well -- the guard below tells you so if you forget.
 #
-# patches/pvm3-*.patch are the five that make PVM build here: the four config
-# lines, and Debian's four source fixes. They go through the same stamp as the
-# rest, so nothing below needed changing to pick them up.
+# patches/pvm3-*.patch are the nine that make PVM build here: the four config
+# lines, and every Debian source patch that touches one of the 28 objects PVM
+# compiles. They go through the same stamp as the rest, so nothing below needed
+# changing to pick them up.
 #
 # Vendored code is built with -w -fpermissive, which SIGEL's own code does not
 # get: check.sh already treats these headers as -isystem for the same reason.
@@ -113,8 +114,11 @@ $(STAMP): $(PATCHES)
 	done
 	@touch $@
 
+# Reverse order. Two patches touch pvm3/src/pvmd.c, so undoing them in
+# application order leaves the second one's hunks shifted -- it still lands, with
+# an offset and a .orig backup, and a larger shift would miss outright.
 unpatch:
-	@for p in $(PATCHES); do patch -R -p1 -d $(SL) < $$p; done
+	@for p in $$(printf '%s\n' $(PATCHES) | tac); do patch -R -p1 -d $(SL) < $$p; done
 	rm -f $(STAMP)
 
 clean:
