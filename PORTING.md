@@ -631,7 +631,7 @@ in `check.sh`, not a remote call.
 | V2 | Our half: a save path in `sigel_eval`, the same round trip locally, diffed against V1. Becomes a gate | equivalence instead of self-consistency |
 | V3 | Determinism on the x86 box — one experiment run twice, both `RANDOMSEED`s pinned | gates everything numeric; never tested there |
 | V4 | Force re-evaluation of a shipped population by setting its `FITNESS` fields to `-1`, harvest 1.3's per-individual fitness, compare against `sigel_eval` | the number this file has been asking for. **Judgement, not a gate** |
-| V5 | **Unblocked 2026-08-27 — `gdb` installed (§9).** Breakpoint probes for the non-integrating quantities: the sensor value a joint angle produces, the force a register value produces, the MDH parameters | the port's **arithmetic**, which V1–V4 never touch |
+| V5 | **MDH probe DONE 2026-08-27, PASS** — `reference/v5-1.3-mdh-compared.txt`. The sensor and force probes remain open | the port's **arithmetic**, which V1–V4 never touch |
 
 **Why the round trip is the sharp test.** The `.exp` carries the robot as a
 `StreamedRobot` block, and that block *is* dict iteration order —
@@ -652,6 +652,49 @@ readings that share one mistake agree perfectly. `Q2Dict` is already deleted
 (D5), so the ordering it produced survives only in `data-reordered/` and
 `dictorder-baseline.txt`, with D7 built on top. Every further step stacks work
 on a foundation checked against nothing but itself, and V1 is three short runs.
+
+### V5 RESULT — the arithmetic agrees with 1.3
+
+**`twoBases` is exact, bit for bit, all four fields. `octopus` agrees on all 9
+joints, `alpha` is bit-identical on every one, and the worst real disagreement
+is 5 ulp.** No high-bit disagreement in any field of any joint. With V1 covering
+ordering, the port is now checked against 1.3 on both ordering and arithmetic.
+
+The call counts came out **2 and 18** — the corrected figures, each real call
+preceded by `dmMDHLink`'s own constructor call of
+`setMDHParameters(0,0,0,0)`, alternating without exception, so nothing was
+filtered.
+
+**The one substantive disagreement is a near-zero residual, and it points our
+way.** `secondLegJoint2`'s `d` should be zero: ours is exactly
+`0000000000000000`, 1.3's is `3ca6a09e667f3bcd` = 1.57e-16. The 2003 build
+carries the crumb, from an x87 80-bit intermediate failing to round to zero the
+way an IEEE double does. That direction was predicted in advance, which is what
+makes it confirmation rather than a defect.
+
+**Their row matching had to be redone, and the lesson generalises.** The x86
+side matched rows to joint names by `alpha`, "which is unique per joint". It is
+not — **6 of octopus's 9 joints share `alpha = 4012d97c7f3321d2`**. Rematched by
+call order, which both sides emit natively and which V1 already gates, two
+attributions swap (`secondLegJoint3` and `thirdLegJoint3`) and the near-zero
+residual proves to be on one joint rather than two. The verdict is unchanged;
+the per-joint table was not. **Match reference data by a key something else
+already checks, not by a field that merely looks distinctive.**
+
+**Open on the 1.3 side, reported as open rather than glossed:** the `applyForce`
+probe armed and took zero hits in a session where the MDH breakpoint fired 18
+times, so the harness was live and the non-hit is real but unexplained;
+`senseJoint1/2` were not attempted, because they return in `st(0)` and need a
+finish-style capture; `walker` has not been run.
+
+**What made V5 work, after two failed routes.** Under woody's loader there is no
+exec event at all — `ld-linux.so.2` maps `sigel_slave` and jumps to it, so every
+breakpoint gdb places before start-up is silently never inserted, which is why
+`main` never fired either. The fix is to let the slave start and **attach to the
+running pid**. Then, because `-visualize` builds the simulation during start-up,
+attaching after the window appears has already missed it: **stop, then play**
+forces a full reconstruction. A live `pvmd` is required or the slave exits at
+once.
 
 ### V1 RESULT — the hash model is confirmed against the real binary
 
