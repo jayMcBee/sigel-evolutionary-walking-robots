@@ -5,8 +5,9 @@
 #
 #   make            build/sigel_eval -- one fitness evaluation
 #   make vendor     the five vendored libraries only
+#   make pvm        libpvm3.a and pvmd3, built by PVM's own make
 #   make core       the nine SIGEL core modules only
-#   make clean      remove build/
+#   make clean      remove build/ and PVM's products
 #   make unpatch    revert the vendored tree to the tarball contents
 #
 # make B=build-fast SAN= SIGSAN=   the same thing without the sanitizers, in a
@@ -98,9 +99,35 @@ endif
 VENDOR_LIBS := $(LIB)/libnewmat.a $(LIB)/libdm.a $(LIB)/libcv97.a \
                $(LIB)/libdynalib.a $(LIB)/libfparser.a
 
-.PHONY: all vendor core clean unpatch
+# PVM is the one vendored library we do NOT compile ourselves -- PORTING.md
+# Phase P. Two reasons. Its own build already works once patched, so an object
+# list here would be a reimplementation with nothing to gain; and pvmd3 is a
+# daemon that libpvm3 starts by path, looking under $PVM_ROOT/lib/$PVM_ARCH,
+# so the products have to sit in that layout inside the vendored tree rather
+# than in build/ with everything else.
+#
+# The `s' target builds src only. PVM's `default' would also build the console
+# (which wants readline), libfpvm and libgpvm3; SIGEL's 2003 link line names
+# -lpvm3 and nothing else, so none of those is built.
+#
+# LINUX64 is hardcoded rather than read from lib/pvmgetarch, because a target
+# name is expanded when this file is read -- before patches/ has been applied,
+# and the aarch64 line is one of those patches. Both x86_64 and aarch64 map to
+# LINUX64. On anything else the build stops at "no rule to make target", which
+# is the loud failure we want.
+PVM_DIR  := $(SL)/pvm3
+PVM_LIB  := $(PVM_DIR)/lib/LINUX64/libpvm3.a
+PVM_D    := $(PVM_DIR)/lib/LINUX64/pvmd3
+
+.PHONY: all vendor core clean unpatch pvm
 all: $(B)/sigel_eval
 vendor: $(VENDOR_LIBS)
+pvm: $(PVM_LIB) $(PVM_D)
+
+# One rule for both products; PVM's own make builds them together. Depending on
+# the patch stamp is what rebuilds this when a patches/pvm3-*.patch changes.
+$(PVM_LIB) $(PVM_D) &: $(STAMP)
+	cd $(PVM_DIR) && PVM_ROOT=$$PWD $(MAKE) s
 
 # A patch that reverse-applies cleanly is already in the tree; skip it. Anything
 # else that will not apply is a real error and stops the build.
@@ -121,8 +148,11 @@ unpatch:
 	@for p in $$(printf '%s\n' $(PATCHES) | tac); do patch -R -p1 -d $(SL) < $$p; done
 	rm -f $(STAMP)
 
+# PVM's objects and products live in the vendored tree, not in build/, so they
+# need naming here or `make clean' would leave them.
 clean:
 	rm -rf $(B)
+	rm -rf $(PVM_DIR)/lib/LINUX64 $(PVM_DIR)/src/LINUX64
 
 $(OBJ)/%.o: $(SL)/%.cpp $(STAMP)
 	@mkdir -p $(dir $@)

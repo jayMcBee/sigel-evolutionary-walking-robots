@@ -31,7 +31,7 @@ build and run, because nothing else can be verified without it — see §3.
 | R — build and run | core builds and runs. **No longer checked only against itself** — Phase V has confirmed both the ordering and the arithmetic against the 1.3 binary, §7 |
 | T — old-Qt tool container | **done 2026-08-27.** `tools/qtmig`, §4 |
 | D — delete the shim, migrate the data | **D1–D8 done.** `Q2Dict`, `Q2DictIterator` and `Q2Array` gone from all code; `Q2PtrVector` off `SIG_Geometry`, `SIG_Body` and the `SIG_Register` cluster. Shim 806 → **530** lines. Remaining, measured 2026-08-28: `Q2PtrList` 62, `Q2PtrVector` 53, `Q2CString` 21, `Q2Queue` 16, `Q2ListIterator` 14, `Q2ValueList` 12. §10 |
-| P — PVM | **P1, P2 done 2026-08-28.** Vendored 3.4.3 replaced by upstream 3.4.6; nine patches in `patches/` carry the four config lines and Debian's eight source fixes. Build and link remain. §7 |
+| P — PVM | **P1, P2, P3 done 2026-08-28.** Vendored 3.4.3 replaced by upstream 3.4.6; nine patches in `patches/` carry the four config lines and Debian's eight source fixes; `libpvm3.a` and `pvmd3` build and run. P4, the link, remains. §7 |
 | C — GUI | **not started, AUTHORIZED 2026-08-27 per D24.** ~450 Qt 2 sites + 20 forms |
 | V — check against the 1.3 binary | **V1 and V5's MDH probe both done and both PASS.** Ordering: 10 of 10 container orders match. Arithmetic: `twoBases` exact bit for bit, `octopus` 9/9 with three joints exact and 5 ulp worst. V2–V4 not started; V5's sensor and force probes are **invalid as specified** — both target Dynamo-only functions, deleted 2026-08-28. §7 |
 
@@ -131,6 +131,8 @@ experiments — which is what produced the scope note above. All fixed.
 /home/jan/Downloads/sigel/
 ├── PORTING.md                              this file
 ├── check.sh                                per-file compile check, §7
+├── pvm-check.sh                            does PVM run? Phase P step P3
+├── pvm_smoke.c                             one PVM round trip, driven by it
 ├── replicate.sh                            runs the published experiments, §7
 ├── Makefile                                the build, §7 Phase R
 ├── sigel_eval.cpp                          one fitness evaluation, §7 Phase R
@@ -428,7 +430,7 @@ modules, and it compiles nothing under `src/` at top level — so
 `sigel.cpp`, `sigel_slave.cpp` and all 5 GUI modules are checked by nothing
 today. Extending it is part of the first Phase C step, not an afterthought.
 
-### Phase P — PVM — P1, P2 DONE 2026-08-28
+### Phase P — PVM — P1, P2, P3 DONE 2026-08-28
 
 **Steps:** P1 replace the vendored tree · P2 the config lines and Debian's
 source patches · P3 build `libpvm3.a` and `pvmd3` · P4 link the PVM-calling
@@ -562,6 +564,49 @@ because that is the state each patch describes. After P2 the same lines are
 
 **`lib/pvmgetarch` now answers `LINUX64` on this machine.** That is the single
 fact the whole config patch exists for, and it is the check that it worked.
+
+---
+
+**P3, done 2026-08-28. `libpvm3.a` and `pvmd3` build, and PVM runs.**
+
+`make pvm` builds them; `./pvm-check.sh` starts the daemon and runs one round
+trip. **PVM is the one vendored library we do not compile ourselves.** Its own
+build works once patched, so an object list here would be a reimplementation;
+and `pvmd3` is a daemon `libpvm3` locates by path under `$PVM_ROOT/lib/
+$PVM_ARCH`, so the products must sit in that layout inside the vendored tree
+rather than in `build/`. The target is PVM's `s`, which builds `src` only —
+`default` would also want the console (and readline), `libfpvm` and
+`libgpvm3`, none of which SIGEL's 2003 link line names.
+
+```
+28 objects, 0 errors, 6 warnings          439 KB libpvm3.a, 235 KB pvmd3
+all 13 pvm_* symbols SIGEL needs: defined
+XDR round trip: double, int and string all exact
+```
+
+**`-ltirpc` is required at link time, not only at compile time.** `libpvm3.a`
+leaves `xdrmem_create`, `xdr_double`, `xdr_int`, `xdr_float`, `xdr_long`,
+`xdr_short` and their unsigned forms undefined; glibc dropped them with
+`rpc/types.h`. That is what `ARCHLIB = -ltirpc` in the config patch is for, and
+**P4's link line needs it too** — without it the link fails with 40-odd
+undefined XDR references.
+
+**DEFECT FOUND, not fixed: `PVM_TMP` longer than about 110 characters kills the
+daemon.** `mksocs()` in `pvmd.c:4865` declares `char buf[128]` and line 5178
+does `sprintf(buf, "PVMSOCK=%s", p)` with the socket path. gcc says so at
+compile time — *"'%s' directive writing up to 127 bytes into a region of size
+120"* — and glibc turns it into `*** buffer overflow detected ***` before the
+daemon prints anything. Found by pointing `PVM_TMP` at this repo's scratchpad.
+**No Debian patch fixes it**; all 26 that apply are already in `patches/`.
+`pvm-check.sh` refuses to run rather than crash, and the default `/tmp` is far
+inside the limit. Left unfixed because it needs a source edit nobody upstream
+has made, and nothing here goes near the limit — **raise it if a real run
+ever sets `PVM_TMP` somewhere deep.**
+
+**`make clean` now also removes `pvm3/lib/LINUX64` and `pvm3/src/LINUX64`.**
+PVM's objects are the only vendored ones outside `build/`, so without that they
+would survive a clean.
+
 
 **And the reason given for needing no source edits is half wrong.** §3 named two
 defects that 3.4.6 was said to already contain fixes for. Measured against the
@@ -1235,7 +1280,7 @@ custom signals and slots, and there are 49 across the 20 forms.
 | T | 2 | **done 2026-08-27** (§4) |
 | C | 10 | **not started, authorized 2026-08-27** |
 | V | 5 | **V1 done 2026-08-27**, V5 in progress — §7 |
-| P | 4 | **P1, P2 done 2026-08-28** — §7 |
+| P | 4 | **P1, P2, P3 done 2026-08-28** — §7 |
 
 **The effort column is gone, 2026-08-27, and the section is no longer called
 Effort.** It carried "1.5 wk", "1 wk", "2–3 days", "2.5–3 wk" and "~3 days".
