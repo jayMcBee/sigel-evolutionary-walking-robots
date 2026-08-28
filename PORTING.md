@@ -31,7 +31,7 @@ build and run, because nothing else can be verified without it — see §3.
 | R — build and run | core builds and runs. **No longer checked only against itself** — Phase V has confirmed both the ordering and the arithmetic against the 1.3 binary, §7 |
 | T — old-Qt tool container | **done 2026-08-27.** `tools/qtmig`, §4 |
 | D — delete the shim, migrate the data | **D1–D8 done.** `Q2Dict`, `Q2DictIterator` and `Q2Array` gone from all code; `Q2PtrVector` off `SIG_Geometry`, `SIG_Body` and the `SIG_Register` cluster. Shim 806 → **530** lines. Remaining, measured 2026-08-28: `Q2PtrList` 62, `Q2PtrVector` 53, `Q2CString` 21, `Q2Queue` 16, `Q2ListIterator` 14, `Q2ValueList` 12. §10 |
-| P — PVM | **researched 2026-08-28, not started.** Upstream 3.4.6, four config lines, one patch, no source edits — verified by building and running it. §7 |
+| P — PVM | **P1 done 2026-08-28.** The vendored 3.4.3 is replaced by upstream 3.4.6; four config lines, one Debian patch and no source edits still to come. §7 |
 | C — GUI | **not started, AUTHORIZED 2026-08-27 per D24.** ~450 Qt 2 sites + 20 forms |
 | V — check against the 1.3 binary | **V1 and V5's MDH probe both done and both PASS.** Ordering: 10 of 10 container orders match. Arithmetic: `twoBases` exact bit for bit, `octopus` 9/9 with three joints exact and 5 ulp worst. V2–V4 not started; V5's sensor and force probes are **invalid as specified** — both target Dynamo-only functions, deleted 2026-08-28. §7 |
 
@@ -421,7 +421,66 @@ modules, and it compiles nothing under `src/` at top level — so
 `sigel.cpp`, `sigel_slave.cpp` and all 5 GUI modules are checked by nothing
 today. Extending it is part of the first Phase C step, not an afterthought.
 
-### Phase P — PVM — RESEARCHED 2026-08-28, not started
+### Phase P — PVM — P1 DONE 2026-08-28
+
+**Steps:** P1 replace the vendored tree · P2 the four config lines and the
+Debian patch · P3 build `libpvm3.a` and `pvmd3` · P4 link the PVM-calling core
+against it.
+
+**P4 is not `sigel` and `sigel_slave`.** Both need Qt 2 GUI modules that Phase C
+has not ported — `sigel.cpp:40` wants `SIGEL_MasterGUI/SIG_MainWindow.h`,
+`sigel_slave.cpp:39` wants `SIGEL_SlaveGUI/SIG_SimulationWindow.h`, and the 2003
+`Makefile.am:52-70` names eight GUI and UI archives in a shared `LDADD`. So P4
+force-links the four objects that call `pvm_*` — `SIG_GPFitnessTrainer` (18
+calls), `SIG_GPPVMData` (7), `SIG_GPManager` (1), `SIG_Environment` (1) —
+against the real `libpvm3.a`, resolving the 13 undefined `pvm_*` symbols
+`libSIGEL_GP.a` carries today. That proves the library and SIGEL's own PVM code
+agree, which is the part PVM can prove without Phase C.
+
+**P1, done.** `x/supportingLibs/supportingLibs/pvm3/` is now upstream 3.4.6, 844
+files where 3.4.3 had 576. `pvm3.4.6.tgz` is committed at the repo root, md5
+`7b5f0c80ea50b6b4b10b6128e197747b`, identical to netlib's download and to
+Debian's `pvm_3.4.6.orig.tar.gz`.
+
+**Nothing of SIGEL's was discarded.** Measured, not assumed: the PVM bundled in
+`sigelSourceDistribution.1.0.tar.gz` and the one from `supportingLibs.tar.gz`
+are both 576 files, and diffing them gives **one** genuine changed line, a
+`- cd lib/$(PVM_ARCH) && rm -f *` clean rule added to `Makefile.aimk`. The other
+357 differing files are CVS `$Id:`/`$Log:` keyword expansion from SIGEL's import
+of 2001-11-20, 68 of them carrying only the German commit line *"Erste
+lauffähige Sigel-Version für KDevelop"* into a `$Log:` block. `patches/` has
+never held a PVM patch. So the vendored PVM was stock upstream with a rewritten
+RCS header, and replacing it loses nothing.
+
+**The supporting libraries were a separate download for 1.3.**
+`kdesigelSources.1.3.tar.gz` carries four entries under `supportingLibs/` — the
+directory and three Makefiles, with `SUBDIRS = fparser dynamechs cv97`. The
+libraries came in `supportingLibs.tar.gz`. Only the 1.0 distribution bundled
+them, all eight, inside the source tree.
+
+**Why 3.4.3 could not simply be patched.** It has no `conf/LINUX64.def` at all
+and zero `aarch64` in `lib/pvmgetarch` — it cannot name this machine.
+
+**The Makefile guards the swap** (`Makefile:49-68`). Re-extracting
+`supportingLibs.tar.gz` over the tree puts 3.4.3 back with no error, no missing
+file and a plausible file count, because `tar` overwrites but never deletes. The
+guard reads `PVM_VER` out of `include/pvm3.h` on every `make` — not from the
+patch stamp, which survives exactly this accident. Broken deliberately and
+confirmed to abort, per §0.
+
+**Correction to the research below: the verified 3.4.6 build did not carry the
+Debian patch.** `src/ddpro.c:1509` calls `getcwd` with no `<unistd.h>` in scope,
+and the config's own `-Wno-implicit-function-declaration` is what lets it
+through — so the binary that was verified still had the truncation bug the patch
+fixes. The patch is right; P2 applies it. A second tree in the research
+scratchpad also added `-Wno-error=int-conversion`,
+`-Wno-error=incompatible-pointer-types` and `-Wno-error=return-mismatch`; those
+are the classes this section says must stay hard errors, and that tree is not
+what P2 uses.
+
+---
+
+#### Phase P research — 2026-08-28
 
 **Decision: use upstream PVM 3.4.6. No source edits.** Four configuration lines
 and one upstream patch line. Researched and *verified by building and running
@@ -1070,7 +1129,7 @@ custom signals and slots, and there are 49 across the 20 forms.
 | T | 2 | **done 2026-08-27** (§4) |
 | C | 10 | **not started, authorized 2026-08-27** |
 | V | 5 | **V1 done 2026-08-27**, V5 in progress — §7 |
-| PVM | — | not started, §3 |
+| P | 4 | **P1 done 2026-08-28** — §7 |
 
 **The effort column is gone, 2026-08-27, and the section is no longer called
 Effort.** It carried "1.5 wk", "1 wk", "2–3 days", "2.5–3 wk" and "~3 days".

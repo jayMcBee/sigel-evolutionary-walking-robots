@@ -1,6 +1,11 @@
 # upstream tarballs — re-downloadable from sourceforge.net/projects/sigel
 *.tar.gz
 
+# pvm3.4.6.tgz is deliberately NOT here. It replaces the vendored PVM 3.4.3
+# (PORTING.md Phase P) and it is the one vendored tarball with no upstream
+# left: Fedora retired PVM in 2015, Debian removed it in 2024, netlib is the
+# only copy. The rest are still on sourceforge, so they stay untracked.
+
 # extracted 2003 i386 binary, reference only
 xb/
 

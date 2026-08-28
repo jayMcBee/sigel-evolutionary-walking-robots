@@ -46,6 +46,27 @@ VCC  := gcc -std=gnu17 -O1 -g -w $(SAN)
 STAMP := $(SL)/.sigel-patched
 PATCHES := $(wildcard patches/*.patch)
 
+# PVM: the vendored 3.4.3 was replaced by upstream 3.4.6 -- PORTING.md Phase P.
+# 3.4.3 has no conf/LINUX64.def and no aarch64 in lib/pvmgetarch, so it cannot
+# name this machine at all; 3.4.6 needs four config lines and one Debian patch.
+#
+# Re-extract supportingLibs.tar.gz over the tree and 3.4.3 comes back: tar
+# overwrites but never deletes, the paths and the file count both still look
+# right, and nothing errors. So check the version on every make rather than in
+# the patch stamp -- the stamp file survives exactly this accident, which is
+# the same trap the header above warns about for the patches.
+#
+# An absent header is somebody who has not extracted the vendored tree yet;
+# that is not this accident, and the build says so on its own.
+PVM_VERSION := $(shell sed -n 's/^\#define[[:space:]]*PVM_VER[[:space:]]*"\(.*\)"/\1/p' \
+                       $(SL)/pvm3/include/pvm3.h 2>/dev/null)
+ifneq ($(PVM_VERSION),)
+ifneq ($(PVM_VERSION),3.4.6)
+$(error vendored pvm3 is $(PVM_VERSION), expected 3.4.6 -- \
+        rm -rf $(SL)/pvm3 && tar xzf pvm3.4.6.tgz -C $(SL) --strip-components=1 ./pvm3)
+endif
+endif
+
 # SOLID and qhull went with the Dynamo backend on 2026-08-28
 # (physics_backends.md). SOLID was the collision library the Dynamo path used;
 # qhull was built only to give SOLID its convex hulls, which is what -DQHULL
