@@ -656,9 +656,13 @@ on a foundation checked against nothing but itself, and V1 is three short runs.
 ### V5 RESULT — the arithmetic agrees with 1.3
 
 **`twoBases` is exact, bit for bit, all four fields. `octopus` agrees on all 9
-joints, `alpha` is bit-identical on every one, and the worst real disagreement
-is 5 ulp.** No high-bit disagreement in any field of any joint. With V1 covering
-ordering, the port is now checked against 1.3 on both ordering and arithmetic.
+joints, `alpha` is bit-identical on every one, three joints are exact in all
+four fields, and the worst real disagreement is 5 ulp.** No high-bit
+disagreement anywhere. With V1 covering ordering, the port is now checked
+against 1.3 on both ordering and arithmetic.
+
+Exact in all four fields: `thirdLegJoint2`, `thirdLegJoint3`, `firstLegJoint2`.
+Five joints within 1–5 ulp, one near-zero residual.
 
 The call counts came out **2 and 18** — the corrected figures, each real call
 preceded by `dmMDHLink`'s own constructor call of
@@ -672,14 +676,26 @@ carries the crumb, from an x87 80-bit intermediate failing to round to zero the
 way an IEEE double does. That direction was predicted in advance, which is what
 makes it confirmation rather than a defect.
 
-**Their row matching had to be redone, and the lesson generalises.** The x86
-side matched rows to joint names by `alpha`, "which is unique per joint". It is
-not — **6 of octopus's 9 joints share `alpha = 4012d97c7f3321d2`**. Rematched by
-call order, which both sides emit natively and which V1 already gates, two
-attributions swap (`secondLegJoint3` and `thirdLegJoint3`) and the near-zero
-residual proves to be on one joint rather than two. The verdict is unchanged;
-the per-joint table was not. **Match reference data by a key something else
-already checks, not by a field that merely looks distinctive.**
+**The row matching had to be redone, and the reason generalises past this
+project.** The first table came from a **greedy minimum-total-ulp assignment**
+across all four fields — described at the time as "matched by `alpha`, which is
+unique per joint", which is doubly wrong: `alpha` is shared by **6 of octopus's
+9 joints**, and the matcher was not using it.
+
+A minimum-difference assignment **optimises for the quantity the comparison
+exists to measure**. It picks whichever pairing makes the two sides agree best,
+so it cannot report a large disagreement even when one is there. It is circular,
+and it fails silently and in the flattering direction.
+
+Rematched by call order — which both sides emit natively and which V1 already
+gates independently — two attributions swap and the near-zero residual proves to
+be on one joint rather than two. **And three joints are exact rather than one:**
+the mis-assignment had spread two exact rows onto their neighbours, so the
+circular method also made the result look *worse* than it was. The verdict never
+moved; the per-joint table did, twice.
+
+**Match reference data by a key something else already checks — never by
+minimising the difference under test.**
 
 **Open on the 1.3 side, reported as open rather than glossed:** the `applyForce`
 probe armed and took zero hits in a session where the MDH breakpoint fired 18
