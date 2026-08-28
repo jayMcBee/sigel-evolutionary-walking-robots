@@ -107,10 +107,21 @@ physics backend.
 lines. Nothing vendored is *deleted* — that tree is untracked and comes out of
 a tarball — only the `dynamo_SRC` list the build feeds `ar`.
 
-**Three build files.** Both `Makefile.am` in `SIGEL_Simulation` lose the 39
-filenames that no longer exist, and `SIGELCommon.dsp` — the 2003 Visual Studio
-project — loses 27 `Source File` blocks: the 26 files plus
-`moc_SIG_DynaSystem.cpp` and its two custom-build rules.
+**Four build files, and the fourth is the one that matters.** Both `Makefile.am`
+in `SIGEL_Simulation` lose the 39 filenames that no longer exist, and
+`SIGELCommon.dsp` — the 2003 Visual Studio project — loses 27 `Source File`
+blocks: the 26 files plus `moc_SIG_DynaSystem.cpp` and its two custom-build
+rules.
+
+The deletion commit said "three" and **missed `kdesigel.kdevprj`**, found by
+review and fixed after. That file is not a leftover: both `Makefile.am` carry
+the marker `####### kdevelop will overwrite this part!!! (begin)`, so the
+`.kdevprj` is what KDevelop 2 **regenerates them from**. Left alone, the next
+regeneration would put `SIG_DynaSystem.cpp` and its twelve siblings back into
+`libSIGEL_Simulation_a_SOURCES` and the autotools build would fail on missing
+files. It named the 26 deleted files in 28 places — two `files=` manifests and
+26 per-file sections, all now removed. The other four `.dsp` projects were
+checked and never named them.
 
 ### Kept, and why
 
@@ -202,7 +213,7 @@ is what "dead code" was supposed to mean.
 
 | now dead | where |
 |---|---|
-| `SIG_Robot::prepareDynaMo` and `SIG_Link::transformToDynaMo` | `SIG_Robot.cpp:274`, `SIG_Link.cpp:200` (~45 lines). Their only callers are the three surviving `case DynaMo:` arms below |
+| `SIG_Robot::prepareDynaMo` and `SIG_Link::transformToDynaMo` | `SIG_Robot.cpp:274-282` and `SIG_Link.cpp:200-206` — **16 lines of definition, 23 with the declarations and their doxygen blocks.** An earlier draft said "~45", which was a guess; this project's rule is that only measured figures go in a planning document. Their only callers are the three surviving `case DynaMo:` arms below |
 | three `case DynaMo:` arms | `SIG_GPFitnessTrainer.cpp:52`, `sigel_slave.cpp:252`, `SIG_AllIndividualsView.cpp:311`. Each transforms the robot for a simulation that now always throws. Left because the `SimulationLibrary` enum has to survive — the parser, the GUI and four other switches name it |
 | `SIG_Simulation::slotDynamoMessage`, `stopSimulation`, and the only throw of `SIG_SimulationCannotSolveException` | see "One `moc` target" above |
 
@@ -211,15 +222,30 @@ is what "dead code" was supposed to mean.
 1. ~~**`libsolid.a`.**~~ **DONE** — see "SOLID and qhull went too" above. qhull
    went with it, because it existed only to give SOLID its convex hulls.
 2. **The GUI can still author an experiment that now aborts.**
-   `SIG_SimulationParameter.cpp:121` calls `setSimulationLibrary(DynaMo)` and
-   `SIG_SimulationParameterBase.ui:143` still offers "Dynamo  (not
-   recommended)". Nothing is broken today — Phase C has not started — but the
-   radio button has to go with the backend.
-3. **`SIG_SimulationQueries.cpp` has four more dead includes** — `matrix.h`,
-   `pointvector.h`, `NaN.h` and `SIG_SimulationCannotSolveException.h`. The
-   file is a licence header, seven includes and an empty constructor; it
-   compiles clean without any of them. This change removed only the three that
-   named deleted files.
+   **Four surviving surfaces, not one** — the first draft named only the radio
+   button. `SIG_SimulationParameter.cpp:121` calls
+   `setSimulationLibrary(DynaMo)`; `:224-225` reads the value back to re-check
+   that button; `SIG_SimulationParameterBase.ui:143` offers "Dynamo  (not
+   recommended)" and `:566-568` is a whole tab titled `DynaMo`; and
+   `SIG_EnvironmentBase.ui:916-918` is a second such tab. Removing only the
+   radio button leaves two dead tabs and a read-back for a value nothing can
+   set.
+
+   **And the throw has a second consequence the first draft missed.**
+   `SIG_SimulationVisualisationWidget.cpp:376-381` does
+   `delete visualisation;` and then assigns the result of a constructor that
+   now throws — so `visualisation` keeps a freed pointer. Ten sites in that
+   widget test `if (visualisation)` and then dereference it, so the guard
+   passes and each is a use-after-free; `renderRecorder` leaks with it. The
+   path pre-existed — Dynamo's own constructor could throw — but this change
+   turns a conditional hazard into a certain one for every robot. It is
+   unreachable today only because `SIGEL_SlaveGUI` does not compile. The Phase
+   C fix is `visualisation = nullptr;` between the delete and the new.
+3. **`SIG_SimulationQueries.cpp`: all seven non-self includes are dead**, not
+   the four an earlier draft listed. Verified by compiling a translation unit
+   holding only the class's own header and the empty constructor, under
+   `check.sh`'s full flags: it passes. `<qdatetime.h>` and `SIGEL_Tools/SIG_IO.h`
+   are dead too. This change removed only the three that named deleted files.
 4. ~~**`future_refactorings.md` cites deleted code**~~ — corrected 2026-08-28.
 
 5. **Extract the maths into a small local header, and drop `libdynalib.a`.**
@@ -280,7 +306,7 @@ is wrong; all six are measured, and none of them changes the decision.
 
 | claim below | measured 2026-08-28 |
 |---|---|
-| "**~21,100 lines of Dynamo deleted**", and the "Deleted" heading above covering the vendored `.cpp` | **Nothing vendored was deleted.** The tarball tree is untracked and is left exactly as it extracts; 10,084 lines merely stopped being compiled. `diff -rq` against a fresh extract shows one difference, the recorded `containerlist.h` patch |
+| "**~21,100 lines of Dynamo deleted**", and the "Deleted" heading above covering the vendored `.cpp` | **Nothing vendored was deleted.** The tarball tree is untracked and is left exactly as it extracts; 10,084 lines merely stopped being compiled. `diff -rq` against a fresh extract shows one difference **within `Dynamo/`** — the recorded `containerlist.h` patch. Across the whole vendored tree it shows five, the other four being the other recorded patches, plus the `.sigel-patched` stamp and three stale `.rej` files left from 2026-08-22 (`cv97/JVector.h.rej`, `dynamechs/dm/svd_linpack.cpp.rej`, `SOLID-2.0/include/3D/Basic.h.rej`). The `.rej` files pre-date this change but mean the `make unpatch` / re-extract cycle is not as clean as PORTING.md describes |
 | "**SOLID deleted entirely**, ~4,800 lines" | **not done.** `libsolid.a` is still built and still linked. Its 15 API references really were all in deleted files, so it is dead weight — see the follow-up list above |
 | "**8 old-style exception specifications gone**" | **this deletion gained none.** All 8 were on `SIG_DynaSystem`, and the port had already removed every one of them before 2026-08-28. The statement was true of the 2003 tarball, not of `HEAD` |
 | "`SIG_DynaSystem.cpp:268` … Double free" | **already fixed** by D13 before the deletion — the line read `delete dynaDrives[k];` with the 2003 behaviour in a comment. It was not a live defect being removed |
