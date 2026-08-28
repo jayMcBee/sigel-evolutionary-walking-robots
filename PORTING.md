@@ -27,7 +27,7 @@ build and run, because nothing else can be verified without it — see §3.
 |---|---|
 | 0 — comments to English | done for the 9 core modules; 9 GUI files still hold Latin-1 |
 | A — core onto Qt 6 | **done**, tags `step-A0`…`step-A9` |
-| B — ownership explicit | **subsumed by Phase D**, which deletes the containers rather than converting them. **12** `setAutoDelete` left in core, re-measured 2026-08-28 — 10 in `SIGEL_GP`, 1 in `SIGEL_Robot`, 1 in `MT_Control`. The row said 13 and put 2 in `SIGEL_Robot`; there is one, `SIG_Body.cpp:54`, and it is `FALSE`. Everything owning is in the evolution loop, which Phase C still blocks even though PVM now runs |
+| B — ownership explicit | **subsumed by Phase D**, which deletes the containers rather than converting them. **12** `setAutoDelete` left in core, re-measured 2026-08-28 — 10 in `SIGEL_GP`, 1 in `SIGEL_Robot`, 1 in `MT_Control`. The row said 13 and put 2 in `SIGEL_Robot`; there is one, `SIG_Body.cpp:54`, and it is `FALSE`. **Not all of them are unreachable, and an earlier version of this row said they were.** `SIG_GPPopulation::pool` is owning, is constructed on every `sigel_eval` run and takes 100 `insert()`s inside both gates — see "What the gates actually reach" in §10. The 7 in `SIG_GPFitnessTrainer` and `SIG_GPManager` are the ones Phase C still blocks |
 | R — build and run | core builds and runs. **No longer checked only against itself** — Phase V has confirmed both the ordering and the arithmetic against the 1.3 binary, §7 |
 | T — old-Qt tool container | **done 2026-08-27.** `tools/qtmig`, §4 |
 | D — delete the shim, migrate the data | **D1–D10 done.** `Q2Dict`, `Q2DictIterator` and `Q2Array` gone from all code; `Q2PtrVector` is off `SIG_Geometry`, `SIG_Body`, the `SIG_Register` cluster and `SIG_DynaMechsSimulationData`. Shim 806 → **530** lines. Remaining, measured 2026-08-28 after D10: `Q2PtrList` 50, `Q2PtrVector` 49, `Q2CString` 21, `Q2Queue` 16, `Q2ListIterator` 11, `Q2ValueList` 12. **Which of those the gates execute is now measured, not assumed** — see "What the gates actually reach" in §10. §10 |
@@ -1376,7 +1376,7 @@ returned `uint`, so this modulus was unsigned and its result was always in
 `[0, size)`. `QList::size()` is signed. D9 converted both containers and left
 the expression alone, which silently turned a negative `absoluteDriveNo` into a
 negative index — read into `drives[]`/`sensors[]`, and **write** into
-`driveForcesTimeAccounts[]` at `SIG_DynaMechsCommandInterface.cpp:208,249`.
+`driveForcesTimeAccounts[]` at `SIG_DynaMechsCommandInterface.cpp:217,257`.
 Found by the D9 review, restored, and the cast now carries a comment saying why.
 It is the `Q2Array`/`Q2PtrVector` clamp story again in a place no clamp was
 visible: `gcc` does not warn on `int % qsizetype`, so the five vanished
@@ -2084,8 +2084,8 @@ D7 did the covered half of `Q2PtrVector` for `SIG_Geometry` and `SIG_Body`, and
 its own text listed what it left behind on the simulation path:
 `SIG_DynaMechsSimulationData`'s `dynaMechsLinks`, `drives` and `sensors`. This
 step does those three, which are the last `Q2PtrVector` in `SIGEL_Simulation`.
-Of the 23 lines `grep` still matches, 6 are prose and one (`MT_Program.h:86`) is
-commented out, leaving 16 live sites; one of those, `SIG_GUIGPManager.h:40`, is
+Of the 24 lines `grep` matches at HEAD, 7 are prose and one
+(`MT_Program.h:86`) is commented out, leaving 16 live sites; one of those, `SIG_GUIGPManager.h:40`, is
 a GUI class Phase C owns.
 
 **THIS STEP CLAIMED `Q2PtrVector` WAS NOW OUT OF EVERY PATH THE GATES RUN. THAT
@@ -2112,7 +2112,20 @@ never resized, so `QList<T *>` sized by `QList(qsizetype)` and filled with
 `~Q2PtrVector` freed nothing either — `del` was false — so the guard was already
 load-bearing. But `Q2PtrVector` at least *had* a flag someone could set;
 `~QList` can never free, so the guard has no fallback of any kind. Its comment
-says so now. It was verified reachable in Phase B and is not redundant.
+says so now.
+
+**And this step could not test the one line it most needed to.** An earlier
+draft here said the guard "was verified reachable in Phase B and is not
+redundant". That is true only of `sigel_slave`, which Phase C blocks. In
+`sigel_eval` — the only binary that exists, and the whole of both gates — the
+throw has **nowhere to land**: `evalFitness()` is called with no `try`
+(`sigel_eval.cpp:303`), and inside it the `new SIG_Simulation` sits *before* the
+`try`, which wraps only `simulation->start()`. `sigel_eval.cpp:309` is the same
+shape. So `SIG_CannotMirtich` from the constructor reaches `std::terminate` with
+no handler, and this toolchain does not unwind in that case — the guard's
+destructor never runs. It is a converted free path with **zero coverage**, kept
+because `sigel_slave` does wrap the call (`sigel_slave.cpp:253-266`) and will
+need it. See the list below.
 
 **The three `insert(i, 0)` null-fill loops in the constructor were already
 no-ops** — `Q2PtrVector(uint)` null-filled on construction, as `QList(qsizetype)`
@@ -2190,7 +2203,7 @@ transforms every leaf link; it is not an edge case.
 `int % qsizetype`, which `gcc` does not warn about, so this step grepped every
 `count()` and `size()` on these two lists rather than trusting the warning
 delta. There is exactly one, `noCollide.count()` streamed at
-`SIG_Link.cpp:327`. `qsizetype` is `long long` here and `QTextStream` has a
+`SIG_Link.cpp:326`. `qsizetype` is `long long` here and `QTextStream` has a
 `qlonglong` overload, so no conversion happens at all — confirmed by compiling
 the file with `-Wconversion -Wsign-conversion`, which says nothing about that
 line.
@@ -2220,16 +2233,28 @@ Phase C. **That split is wrong**, and D9 and D10 both leaned on it. Found by the
 D10 review, then measured directly: a counter was put in each shim class's
 constructor, the gates were run, and the counter was read back.
 
-Per run of `sigel_eval`, which is the whole of both gates:
+Constructions per `sigel_eval` run, **measured over all 14 experiments** and
+given as the range, because the counts scale with the robot:
 
 | type | one evaluation | with `-v`, which `dictorder-dump.sh` uses |
 |---|---|---|
-| `Q2PtrList` | **24** | **38** |
-| `Q2ListIterator` | 3 | 3 |
+| `Q2PtrList` | **8 – 41** | **14 – 64** |
+| `Q2ListIterator` | 1 – 4 | 1 – 4 |
 | `Q2CString` | 3 | 4 |
 | `Q2PtrVector` | **1** | **1** |
-| `Q2Queue` | 0 | 0 |
-| `Q2ValueList` | 0 | 0 |
+| `Q2Queue` | **0** | **0** |
+| `Q2ValueList` | **0** | **0** |
+
+*A first version of this table gave single figures — 24 and 38 — under the
+heading "per run of `sigel_eval`". Those are `octopusSimpleFitness` alone;
+`twoBases` gives 8/14 and `walkerNiceWalkingFitness` 41/64. Two experiments
+were sampled and one of them tabulated as though it were the run. Caught by
+review, re-measured here over all 14 in both modes. The conclusions below did
+not move.*
+
+`Q2PtrList` counts one construction per `SIG_DynaMechsLink` — its `successors`
+member — plus one per material and body, so it tracks robot size.
+`Q2ListIterator` counts `SIG_Material::friction` walks.
 
 **Four of the six types execute under the gates, not three.** The single
 `Q2PtrVector` is `SIG_GPPopulation::pool`, which the "evolution loop" label had
@@ -2244,6 +2269,23 @@ applies, and they are the two to leave for last and treat as the risk.
 
 The probe was temporary and is not committed; the shim was restored from a copy
 and both trees rebuilt before the gates were re-run.
+
+**Converted code the gates do not exercise — keep this list growing.** Type
+coverage above is necessary, not sufficient: a type can be constructed on every
+run while a particular converted *branch* is never taken. Everything here was
+converted in Phase D and is correct by inspection only. Two entries were found
+by review after the step that introduced them claimed coverage it did not have,
+which is why the list exists.
+
+| what | why nothing reaches it |
+|---|---|
+| `DynaMechsLinkGuard`'s free, D9 | no shipped robot throws from the constructor, **and `sigel_eval` has no handler anywhere on that path** — see D9 |
+| `sensors[…] = …` on the `tPitchRollSensor` and `tContactSensor` branches, D9 (`SIG_DynaMechsSimulationData.cpp:183,197`), and the two `dynaMechsLinks[…]` reads guarding them (`:182,:196`) | **0 `PitchRollSensor` and 0 `ContactSensor` in any shipped file** — 66 sensors, all `JointSensor`. Two of the four converted indexed writes in that constructor |
+| `delete dynaMechsLinks[…]` on a **non-null** slot (`:365,:501`), D9 | needs two joints between one pair of links; no shipped robot has one. Only `delete nullptr` ever runs |
+| the restored `uint` modulus, D9 | needs `bitsPerRegister` 32; all 14 `.exp` carry 3 or 8 |
+| `SIG_Link::addNoCollide`, `getNoCollides()`, the `noCollide` write loop, D10 | **0 `nocollide` in all 7 `.rrb`, and `noCollideCount` is 0 in all 261 `Link` records**. `getNoCollides()` has no caller in the tree at all |
+| `SIG_Material::friction` — three walks and the owning free, D11 | **0 friction declarations in any `.rrb`, and `nfric` is 0 on all 31 `Material` lines**. The list is empty on every gate run |
+| `SIG_Body::usedByLinks`, D11 | appended on every `.rrb` load and **read nowhere in the tree** |
 
 ### A logging system
 
