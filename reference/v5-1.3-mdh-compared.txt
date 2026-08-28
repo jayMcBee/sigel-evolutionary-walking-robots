@@ -1,0 +1,53 @@
+# Phase V5 RESULT -- our Qt 6 build against the 1.3 binary, 2026-08-27.
+# Their half captured by gdb on the x86 box; ours from `sigel_eval -selfcheck`'s
+# sibling probe, SIGEL_MDH=1. Full method in PORTING.md Phase V.
+#
+# VERDICT: PASS. No high-bit disagreement in any field of any joint.
+#
+#   twoBasesSimpleFitness1   EXACT, bit for bit, all four fields
+#   octopusSimpleFitness     9/9 joints agree; alpha BIT-IDENTICAL on all 9;
+#                            worst real disagreement 5 ulp
+#
+# ROWS ARE MATCHED BY CALL ORDER, NOT BY alpha. The x86 side matched by alpha
+# "which is unique per joint" -- it is not: 6 of octopus's 9 joints share
+# alpha = 4012d97c7f3321d2. That mis-attributed two joints (see below). Both
+# sides emit in call order natively, and the order is a property this repo
+# already gates, so it is the sound key.
+#
+# ulp distance per field, ours vs 1.3, in call order:
+#
+#   joint                 a  alpha    d  theta
+#   secondLegJoint1       3      0    0      1
+#   secondLegJoint2       0      0    ~      0    <- near-zero residual, see below
+#   secondLegJoint3       1      0    2      2
+#   thirdLegJoint1        5      0    1      0
+#   thirdLegJoint2        0      0    0      0
+#   thirdLegJoint3        0      0    0      0
+#   firstLegJoint1        0      0    0      1
+#   firstLegJoint2        0      0    0      0
+#   firstLegJoint3        0      0    0      2
+#
+# CORRECTION TO THEIR TABLE. Two attributions swap once matched by call order:
+#   secondLegJoint3  call order [1,0,2,2]   they reported [1,0,0,0]
+#   thirdLegJoint3   call order [0,0,0,0]   they reported [0,0,2,2]
+# They also reported the near-zero residual on TWO joints; by call order it is
+# on one. firstLegJoint2 is exact in all four fields.
+#
+# THE NEAR-ZERO RESIDUAL is not an ulp difference and counting it as one is
+# meaningless. secondLegJoint2's d should be zero:
+#   ours 0000000000000000 = 0        1.3  3ca6a09e667f3bcd = 1.570092e-16
+# The 2003 build is the one carrying the crumb, not ours -- an x87 80-bit
+# intermediate failing to round to zero the way an IEEE double does. That is
+# the direction predicted in advance, which is why it reads as confirmation
+# rather than as a defect.
+#
+# Largest real disagreement: thirdLegJoint1's a, 5 ulp, relative 8.7e-16.
+#
+# STILL OPEN on their side, reported as open rather than glossed:
+#   applyForce      breakpoint armed, zero hits in a session where the MDH
+#                   breakpoint fired 18 times, so the harness was live. Their
+#                   untested guess is that the standalone visualiser steps
+#                   physics without running the evolved program. NOT verified.
+#   senseJoint1/2   not attempted; they return in st(0), so a stack read does
+#                   not work and a finish-style capture is needed.
+#   walker          36 expected; same recipe, not run.
