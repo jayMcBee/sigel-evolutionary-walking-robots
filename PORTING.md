@@ -30,7 +30,7 @@ build and run, because nothing else can be verified without it — see §3.
 | B — ownership explicit | **subsumed by Phase D**, which deletes the containers rather than converting them. **12** `setAutoDelete` left in core, re-measured 2026-08-28 — 10 in `SIGEL_GP`, 1 in `SIGEL_Robot`, 1 in `MT_Control`. The row said 13 and put 2 in `SIGEL_Robot`; there is one, `SIG_Body.cpp:54`, and it is `FALSE`. Everything owning is in the evolution loop, which Phase C still blocks even though PVM now runs |
 | R — build and run | core builds and runs. **No longer checked only against itself** — Phase V has confirmed both the ordering and the arithmetic against the 1.3 binary, §7 |
 | T — old-Qt tool container | **done 2026-08-27.** `tools/qtmig`, §4 |
-| D — delete the shim, migrate the data | **D1–D10 done.** `Q2Dict`, `Q2DictIterator` and `Q2Array` gone from all code; **`Q2PtrVector` is off the executed path entirely** as of D9. Shim 806 → **530** lines. Remaining, measured 2026-08-28 after D10: `Q2PtrList` 50, `Q2PtrVector` 49, `Q2CString` 21, `Q2Queue` 16, `Q2ListIterator` 11, `Q2ValueList` 12. **The executed path is down to 8 live sites** — `SIG_Material::friction` (4), `SIG_Body::usedByLinks`, `SIG_DynaMechsLink::successors`, and 2 `Q2CString`. §10 |
+| D — delete the shim, migrate the data | **D1–D10 done.** `Q2Dict`, `Q2DictIterator` and `Q2Array` gone from all code; `Q2PtrVector` is off `SIG_Geometry`, `SIG_Body`, the `SIG_Register` cluster and `SIG_DynaMechsSimulationData`. Shim 806 → **530** lines. Remaining, measured 2026-08-28 after D10: `Q2PtrList` 50, `Q2PtrVector` 49, `Q2CString` 21, `Q2Queue` 16, `Q2ListIterator` 11, `Q2ValueList` 12. **Which of those the gates execute is now measured, not assumed** — see "What the gates actually reach" in §10. §10 |
 | P — PVM | **DONE 2026-08-28.** Vendored 3.4.3 replaced by upstream 3.4.6; nine patches carry the four config lines and Debian's eight source fixes; `libpvm3.a` and `pvmd3` build; SIGEL's two PVM objects link against them and `SIG_GPPVMData` round-trips through real PVM. `sigel`/`sigel_slave` still need Phase C. §7 |
 | C — GUI | **not started, AUTHORIZED 2026-08-27 per D24.** ~450 Qt 2 sites + 20 forms |
 | V — check against the 1.3 binary | **V1 and V5's MDH probe both done and both PASS.** Ordering: 10 of 10 container orders match. Arithmetic: `twoBases` exact bit for bit, `octopus` 9/9 with three joints exact and 5 ulp worst. V2–V4 not started; V5's sensor and force probes are **invalid as specified** — both target Dynamo-only functions, deleted 2026-08-28. §7 |
@@ -1996,10 +1996,11 @@ What the shim currently carries, and why:
 The clean-up, in this order:
 
 1. ~~Replace the emulation with straightforward containers.~~ **In progress —
-   D3–D9 done.** `Q2Dict`, `Q2DictIterator` and `Q2Array` are deleted; their
-   users are plain `QList`. Left, measured 2026-08-28 after D9: `Q2PtrList` 60,
-   `Q2PtrVector` 48, `Q2CString` 21, `Q2Queue` 16, `Q2ListIterator` 14,
-   `Q2ValueList` 12. An earlier version of this list omitted the last two, and
+   D3–D10 done.** `Q2Dict`, `Q2DictIterator` and `Q2Array` are deleted; their
+   users are plain `QList`. Left, measured 2026-08-28 after D10: `Q2PtrList` 50,
+   `Q2PtrVector` 49, `Q2CString` 21, `Q2Queue` 16, `Q2ListIterator` 11,
+   `Q2ValueList` 12. *D9's row here said `Q2PtrVector` 48 where the tree held
+   49; re-measured by review.* An earlier version of this list omitted the last two, and
    read `Q2PtrVector` 69 / `Q2PtrList` 62 where the tree at that commit
    (`46d5ba2`) held **67** and 60. *A first draft of this correction compared
    69 against 51 — a count taken a day later, after D7 and D8 had legitimately
@@ -2082,13 +2083,20 @@ allocation *counts* are stable.
 D7 did the covered half of `Q2PtrVector` for `SIG_Geometry` and `SIG_Body`, and
 its own text listed what it left behind on the simulation path:
 `SIG_DynaMechsSimulationData`'s `dynaMechsLinks`, `drives` and `sensors`. This
-step does those three. **`Q2PtrVector` is now out of every path the gates
-run.** Its remaining **16** live code sites are 15 in the evolution loop and one,
-`SIG_GUIGPManager.h:40`, in a GUI class Phase C owns. Of the 23 lines `grep`
-still matches, 6 are prose and one (`MT_Program.h:86`) is commented out.
-*Two corrections by review: the count was given as 17, and "appears in no
-executed code at all" was false — `q2compat_check.cpp` still exercises
-`Q2PtrVector`, and `check.sh` builds and runs it under ASan and UBSan.*
+step does those three, which are the last `Q2PtrVector` in `SIGEL_Simulation`.
+Of the 23 lines `grep` still matches, 6 are prose and one (`MT_Program.h:86`) is
+commented out, leaving 16 live sites; one of those, `SIG_GUIGPManager.h:40`, is
+a GUI class Phase C owns.
+
+**THIS STEP CLAIMED `Q2PtrVector` WAS NOW OUT OF EVERY PATH THE GATES RUN. THAT
+WAS FALSE, TWICE OVER**, and D10 repeated it in the status table before review
+caught it. `q2compat_check.cpp` exercises `Q2PtrVector` and `check.sh` builds
+and *runs* it under ASan and UBSan. Worse, `SIG_GPPopulation::pool`
+(`SIG_GPPopulation.h:55`) is a `Q2PtrVector` with `setAutoDelete(true)`, and
+`SIG_GPExperiment::loadExperiment` calls `population.readFromFile`
+(`SIG_GPExperiment.cpp:99`), whose `pool.insert` runs for every individual —
+**on every `.exp` load, in both gates.** Measured, not argued: see "What the
+gates actually reach" below. The step itself stands; the boast did not.
 
 All three are **slot-indexed with null holes**, sized once from the robot and
 never resized, so `QList<T *>` sized by `QList(qsizetype)` and filled with
@@ -2151,7 +2159,7 @@ the links — so no ownership moved.
 
 The return types drag four caller sites into the same commit:
 `SIG_Robot.cpp:292`, `SIG_Joint.cpp:755` and
-`SIG_DynaMechsSimulationData.cpp:368,522`, all `first()`/`next()` walks over
+`SIG_DynaMechsSimulationData.cpp:370,520`, all `first()`/`next()` walks over
 their own copy, all now range-for. `getNoCollides()` has **no caller anywhere
 in the tree**, GUI included; it is ported rather than deleted, per D21.
 
@@ -2182,9 +2190,18 @@ transforms every leaf link; it is not an edge case.
 `int % qsizetype`, which `gcc` does not warn about, so this step grepped every
 `count()` and `size()` on these two lists rather than trusting the warning
 delta. There is exactly one, `noCollide.count()` streamed at
-`SIG_Link.cpp:327`: `uint` → `qsizetype`, same decimal, and covered twice over
-because `writeToFileTransfer` feeds the copy constructor on every evaluation as
-well as the `.exp` bytes.
+`SIG_Link.cpp:327`. `qsizetype` is `long long` here and `QTextStream` has a
+`qlonglong` overload, so no conversion happens at all — confirmed by compiling
+the file with `-Wconversion -Wsign-conversion`, which says nothing about that
+line.
+
+**But no gate sees it, and a first draft here claimed it was "covered twice
+over".** Corrected by review, by measurement: **no shipped robot declares
+`nocollide`** — 0 matches across all 7 `.rrb`, and every `Link` record in all 14
+`.exp` carries `noCollideCount = 0`. So `noCollide` is empty on every gate run.
+The count only ever streams `0`, the loop below it never iterates, and
+`addNoCollide` with its `!contains` is **executed by no gate at all**. The
+conversion is right by inspection; it is not right by test.
 
 `containsRef(link) == 0` became `!contains(link)` — Qt 2's default
 `compareItems` is pointer identity, which is what `QList::contains` does on a
@@ -2194,6 +2211,39 @@ pointer, and the call was only ever tested against zero.
 
 Verified: `./check.sh` 105 pass / 4 fail, **315 warnings, down from 317**; both
 gates byte-identical; sanitized fitness run clean.
+
+### What the gates actually reach — measured 2026-08-28, not assumed
+
+This plan has described the remaining shim work as a **31 / 52 split**: 31 sites
+the gates can execute and 52 in the evolution loop that nothing can run until
+Phase C. **That split is wrong**, and D9 and D10 both leaned on it. Found by the
+D10 review, then measured directly: a counter was put in each shim class's
+constructor, the gates were run, and the counter was read back.
+
+Per run of `sigel_eval`, which is the whole of both gates:
+
+| type | one evaluation | with `-v`, which `dictorder-dump.sh` uses |
+|---|---|---|
+| `Q2PtrList` | **24** | **38** |
+| `Q2ListIterator` | 3 | 3 |
+| `Q2CString` | 3 | 4 |
+| `Q2PtrVector` | **1** | **1** |
+| `Q2Queue` | 0 | 0 |
+| `Q2ValueList` | 0 | 0 |
+
+**Four of the six types execute under the gates, not three.** The single
+`Q2PtrVector` is `SIG_GPPopulation::pool`, which the "evolution loop" label had
+written off. `sigel_eval` builds a whole `SIG_GPExperiment`, so
+`SIG_GPParameter::hostList` (every shipped `.exp` carries 20 or 21 `PVMHOST`
+lines), `SIG_GPExperiment::experimentHistory` and, on the `-v` path,
+`SIG_GPFullDataRecorder`'s four lists are all live too.
+
+**`Q2Queue` and `Q2ValueList` are the genuinely blind ones** — 0 constructions
+in either gate. They are where the caveat at the top of this file actually
+applies, and they are the two to leave for last and treat as the risk.
+
+The probe was temporary and is not committed; the shim was restored from a copy
+and both trees rebuilt before the gates were re-run.
 
 ### A logging system
 

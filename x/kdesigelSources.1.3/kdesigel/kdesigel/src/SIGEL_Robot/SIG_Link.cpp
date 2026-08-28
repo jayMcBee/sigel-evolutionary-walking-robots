@@ -260,12 +260,11 @@ namespace SIGEL_Robot {
                 // to recursion.
                 initiated = true;
 
-                SIG_Link *l;
                 for (SIG_Joint *j : adjacentJoints) {
                         DL_vector transla, fglobtransla;
                         DL_matrix rota, fglobrota;
 
-                        l = j->otherSide (this);
+                        SIG_Link *l = j->otherSide (this);
                         if (l != comingfrom) {
                                 j->getGeomRelation (transla, rota, this);
 
