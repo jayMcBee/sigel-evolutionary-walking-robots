@@ -63,14 +63,26 @@ the section marker offsets, which shift by exactly +100 lines per pass across
 A line-shaped defect is what breaks a readLine() loop, which is why this
 matters.
 
-THE ARITHMETIC IN THAT TABLE DOES NOT CLOSE, and the discrepancy is recorded
-rather than smoothed over. Markers 4, 5 and 6 move +121 on pass 1, not +100.
-The named one-off reshaping (65->82 and 190->209) accounts for +19 of it, so
-the population section grew 102 lines on pass 1 and 100 on passes 2 and 3.
-Two lines of pass-1 growth are unexplained. The "+100 per pass across 100
-individuals" reading holds for passes 2 and 3 and is one line per individual
-per save; pass 1 has two extra that nothing here accounts for. Cannot be
-re-measured from this side -- sigel_eval has no save path (V2). The appended line lands at the END of each block, immediately before
+The growth is UNIFORM. Counting lines between HISTORY BEGIN{ and
+}HISTORY END; per block, input against pass 1: all 100 blocks gain exactly
+one line, none gains two. One line per individual per save.
+
+    per-block growth: Counter({1: 100})
+
+A first reading of the marker offsets gave "+100 per pass" for every pass.
+Pass 1 is +121. Full per-section decomposition, which closes it:
+
+    section          input    pass1    pass2    pass3    p1-in  p2-p1  p3-p2
+    s1 (pre-#1)         36       36       36       36        0      0      0
+    s2                  27       44       44       44       17      0      0
+    s3                 124      126      126      126        2      0      0
+    s4 population    75051    75153    75253    75353      102    100    100
+    s5                  86       86       86       86        0      0      0
+    s6 exp-history     161      161      161      161        0      0      0
+    TOTAL            75485    75606    75706    75806      121    100    100
+
+Section 4's 102 is 100 history lines plus 2 one-off. Passes 2 and 3 are +100,
+all of it history. The appended line lands at the END of each block, immediately before
 }HISTORY END;, so nothing is stranded behind it. The second and third markers
 also move once, 65->82 and 190->209, then never again -- the one-off reshaping
 from the first save.
@@ -151,3 +163,35 @@ loops "while (!buffer.isEmpty())" over readLine(), so it terminates there and
 no entry is ever behind it. Nothing can silently truncate the list.
 
 Captured before D14 converted the container.
+
+RESULT 5 -- THE FIRST SAVE IS A FORMAT UPGRADE
+----------------------------------------------
+The shipped .exp are a 2001-era format revision. The 2003 binary writes ten
+keys they predate, adding them with defaults on the FIRST save and then
+holding steady. This is what the 21 non-history lines of pass-1 growth are:
+
+    s2, 17 lines, eight keys
+        FLOORDIMENSION / 50 / 50      FLOORFUNCTION / 0
+        FLOORPICTUREFILE / <blank>    FLOORFUNCSELECTED / 1
+        TEXTUREFILE / <blank>         TEXALPHA / 255
+        WITHTEXTURE / 0               AUTOSAVETIME / 0
+    s3, 2 lines    RESEVGEN / 0
+    s4, 2 lines    WITHHISTORY / 1, at the top of the section
+
+WITHHISTORY is absent from all twelve shipped experiments, is added on first
+save, and stays at exactly one occurrence through passes 2 and 3. The same
+holds for the other nine.
+
+CONSEQUENCE FOR ANY ROUND-TRIP GATE, INCLUDING V2
+-------------------------------------------------
+A round trip of any shipped .exp differs from its input by those ten keys on
+the first save, no matter how correct the port is. A gate that compares a
+shipped file against its own round trip WILL FAIL, and will be right to.
+
+Compare pass 1 against pass 2, not input against pass 1 -- or expect the ten
+additions explicitly. Note also that the per-individual history grows one line
+per block per save even between passes 2 and 3, so a pass-1-vs-pass-2 gate
+must still normalise trailing whitespace inside HISTORY blocks (result 2).
+
+The only parts stable from the input onward are the ones measured above:
+PVMHOST order, experiment-history contents, and section 6 as a whole.
