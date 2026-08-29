@@ -1557,8 +1557,9 @@ every D8 site for a stored `const char *`.
 | ~~`SIG_DynaSystem.cpp:266-268`~~ | deletes `dynaJoints[k]` while looping to `dynaDrives.size()` | **moot 2026-08-28** — the file is deleted with the Dynamo backend, `physics_backends.md` | The two vectors grew independently |
 | `SIG_EarlyRunTermSimulation.cpp:97` | `QTime zeroHour;` | `QTime( 0, 0 )` | Same class as the other 11 `QTime()` sites but a declaration, so the first sweep's pattern missed it. `getMaxRecorderSteps` returned 2 instead of 182 — a factor of 91 on the denominator of three fitness functions. No shipped experiment selects them, so `replicate.sh` cannot see it |
 | `sigel_slave`, `getenv("SIGEL_ROOT")` | dereferenced unchecked | to be fixed | Segfaults if unset; the SIGSEGV handler masks it with no core. Bites under PVM specifically — spawned tasks inherit *pvmd's* environment, not the master's |
-| `SIG_GPPVMData.cpp:51` `sendQStringToPVM` | sends `str.length() + 1`, a **character** count, then sends `str.toUtf8()`, up to 4x longer in bytes | `qCStringBuffer.size() + 1` | `getQStringFromPVM` sizes its receive buffer from that count and lets `pvm_upkstr` write the bytes in. 20 `ü` gives `heap-buffer-overflow ... in byteupk` under ASan; short strings survive only because `QList` over-allocates. Qt 2's `length()` was the Latin-1 byte count, so 2003 was right for its own data. **Changes the wire format for non-ASCII** — safe only because both ends are this file and no distributed run exists. Found by Phase P's P4, regression-tested by `pvm_link.cpp` |
+| `SIG_GPPVMData.cpp:51` `sendQStringToPVM` | sends `str.length() + 1`, a **character** count, then sends `str.toUtf8()`, up to 4x longer in bytes | `qCStringBuffer.size() + 2` (D21; was `+ 1` on a `Q2CString`) | `getQStringFromPVM` sizes its receive buffer from that count and lets `pvm_upkstr` write the bytes in. 20 `ü` gives `heap-buffer-overflow ... in byteupk` under ASan; short strings survive only because `QList` over-allocates. Qt 2's `length()` was the Latin-1 byte count, so 2003 was right for its own data. **Changes the wire format for non-ASCII** — safe only because both ends are this file and no distributed run exists. Found by Phase P's P4, regression-tested by `pvm_link.cpp` |
 | `SIG_GPIndividual.cpp:557-559` / `:647` | the writer emits `"\n      "` before `}HISTORY END;`; the reader takes everything up to that marker as content, so the separator becomes data | **preserved, not fixed** | Every save grows every `HISTORY` block by 7 bytes, linearly and without limit — 100 blocks is ~700 bytes per round trip. Measured on the 1.3 binary over three consecutive round trips (V8) and confirmed to be the same code here. Fixing it would change file bytes against 1.3. Any gate that diffs a round-tripped `.exp` must normalise trailing whitespace inside these blocks |
+| `SIG_GPPVMData::sendQStringToPVM`, a **null** `QString` | `Q2CString`'s `const char *` conversion gave `nullptr`, and `pvm_pkstr` does `strlen(cp)` unguarded — a segfault | `constData()` gives `""`; an empty string is sent | Found by the D21 review, which showed the `+ 2` does not reproduce the old length for a null string. It never could: the old path died before the length was used. Unreachable today — the two live callers pass a string built by `savePVMDataTransfer` — but it is a crash removed, not a value preserved, and D21 first claimed otherwise |
 | `SIG_GPForceFitnessFunction`'s cleanup loop | a `do`/`while` dereferencing `listForces.first()` **before** testing it | a range-for | `Q2PtrList::first()` returned null on an empty list, so an evaluation that recorded no frames took a null dereference **while freeing memory**. Identical with frames, a no-op without. Contrast D10, where the same shape's once-through was load-bearing and had to be kept — which side of the null the body is written for must be read each time, not pattern-matched |
 | `SIG_Environment` terrain load | `getenv("SIGEL_ROOT")` unchecked | already checked, message on stderr | `sigel_eval` says "SIGEL_ROOT is not set, cannot locate Terrain.ter" instead of reading `/Terrain.ter` |
 
@@ -2436,6 +2437,8 @@ which is why the list exists.
 | both `wasCanceled()` shrinks, D15 | need a `QApplication`; `sigel_eval` has none, so `if (qApp)` is false |
 | `readFromFile`'s shrink loop, D15 | the function runs on every load, but always on an **empty** pool, so the loop body never executes |
 | `sort`, D15 | no caller anywhere |
+| all six `Q2CString` sites in `SIG_GPFitnessTrainer`, D21 | zero trainer symbols in `sigel_eval`; `pvm_link` links the object but never constructs a trainer, so they are **link-checked and never run** |
+| `SIG_GPPVMData`'s `+ 2`, D21 | `pvm_link` runs the function, but `pvm-check.sh` passes with `+ 1` **and** `+ 0` — `QList` over-allocation hides a shortfall under about 8 bytes |
 | all five **unlinked** fitness functions' walks, D20 — `Adaptive`, `Zorc`, `Stepper`, `RealSpeed`, `Force` — plus `SIG_EarlyRunTermSimulation` | `nm` finds 0 symbols for each in `sigel_eval`. `Stepper` is the **only reader of `touchdowns`** in the tree; `Force` the only reader of `listForces` and the only code that ever frees a force vector |
 | `sigel_eval`'s trace walk, D20 | runs on all 21 dictorder inputs; its output is dropped by the gate's `sed`, so only a crash or a sanitizer report would show |
 | `SIG_GPNiceWalkingFitnessFunction`'s walk, D20 | runs for 18 individuals, but the gate has **one bit** of discrimination — an off-by-one in the index is invisible to it |
@@ -3046,22 +3049,37 @@ Q2CString qCStringBuffer = str.toUtf8();
 int finalLength = qCStringBuffer.size() + 1;      // NOT byte length + 1
 ```
 
-`Q2CString::size()` reported `QByteArray::size() + 1`, because Qt 2's
-`QCString` counted the terminating NUL in its length. So that line sent **byte
-length + 2**: one byte for the NUL `pvm_upkstr` writes, and one spare.
-`QByteArray::size()` is the plain byte count, so reproducing the same wire
-value needs `+ 2` — and a mechanical `Q2CString` → `QByteArray` rename with the
-`+ 1` left alone would have quietly shortened every message by a byte.
+`Q2CString::size()` reported `QByteArray::size() + 1` **for a non-null
+string**, because Qt 2's `QCString` counted the terminating NUL in its length.
+So that line sent **byte length + 2**: one byte for the NUL `pvm_upkstr`
+writes, and one spare. `QByteArray::size()` is the plain byte count, so
+reproducing that needs `+ 2` — and a mechanical rename with the `+ 1` left
+alone would have quietly shortened every message by a byte.
+
+**One input does not follow that rule, and D21 stated it flatly.** `size()`
+**special-cases a null string to 0**, not to `size()+1` — the shim's own
+self-check asserts it (`q2compat_check.cpp:151`). So for a null `QString` the
+old value was 1 and the new one is 2. *It never reached the wire:*
+`Q2CString`'s `const char *` conversion returned **nullptr** for a null string
+and `pvm_pkstr` does `strlen(cp)` unguarded, so the old code **segfaulted**.
+The new code sends an empty string. That is a crash removed, not a value
+changed — logged in §9's D13 table.
 
 **Preserved rather than tightened.** `+ 1` would fit exactly and is arguably
 what the Phase P fix meant; `+ 2` is what has been on the wire. Dropping the
 margin is a behaviour change and not this step's to make. The `+ 2` carries a
 comment saying it is not a typo.
 
-**Verified by the one check that can see it.** `pvm-check.sh` round-trips a
-string through a live PVM daemon — including the non-ASCII regression case
-Phase P added — and passes both halves. None of the three main gates touches
-this file.
+**NOTHING VERIFIES THE `+ 2`, and D21 claimed `pvm-check.sh` did.** Measured
+by review: with `+ 1` it passes, and with `+ 0` — one byte *shorter* than
+`pvm_upkstr` writes — it **also passes, with no sanitizer report**. `QList`
+over-allocates, which §7 already records, so the check is blind to a shortfall
+of one to seven bytes; it only fails at about eight. It proves the file links
+and round-trips. It says nothing about the constant this step is named for.
+
+None of the three main gates touches this file either, and the six trainer
+sites are **link-checked only** — `pvm_link` links the object but never
+constructs a trainer.
 
 `Q2CString` now appears in no code outside the shim. Both files dropped
 `compat/q2compat.h`; its reach falls **35 → 33** files.

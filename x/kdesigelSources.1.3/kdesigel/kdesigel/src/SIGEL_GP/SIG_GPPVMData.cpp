@@ -65,6 +65,13 @@ void SIGEL_GP::SIG_GPPVMData::sendQStringToPVM(QString str, int taskId, int mess
   // this number and pvm_upkstr writes byte length + 1, so + 1 would fit
   // exactly and + 2 leaves one byte of margin. Dropping that margin is a
   // behaviour change on the wire, and not this step's to make.
+  //
+  // ONE INPUT DIFFERS, and it is a crash removed rather than a value changed.
+  // Q2CString::size() special-cased a NULL string to 0, not to size()+1, so
+  // the old finalLength was 1 there and this is 2. It never reached the wire:
+  // Q2CString's const char* conversion returned nullptr for a null string and
+  // pvm_pkstr does strlen(cp) unguarded, so the old code segfaulted. This
+  // sends an empty string instead. Section 9, D13.
   const QByteArray qCStringBuffer = str.toUtf8();
   int finalLength = qCStringBuffer.size() + 2;
 

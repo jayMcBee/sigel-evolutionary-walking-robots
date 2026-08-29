@@ -45,13 +45,13 @@
 //      cursor dead. Qt 2's locate() revives it at element 0 before the range
 //      check (qglist.cpp:275-292). No SIGEL site indexes a list out of range.
 //    - Q2CString::resize(0) leaves a non-null string; Qt 2 freed the buffer and
-//      the string became null (qcstring.cpp:568-583). SEVEN Q2CString sites are
-//      left after D12, all in PVM code, and six of them only take a const char*
-//      out of a toUtf8(). The seventh does NOT: SIG_GPPVMData.cpp:57 calls
-//      qCStringBuffer.size(), which is the HIDDEN size() below -- length+1 --
-//      and is load-bearing, since that is the PVM string-length fix. This note
-//      said "all nine ... only take a const char* out", which was stale after
-//      D12 and was never fully true. Both corrections by the D12 review.
+//      the string became null (qcstring.cpp:568-583). **ZERO Q2CString sites
+//      remain outside this file as of D21** -- all seven were converted, so
+//      this divergence and the hidden size() below now have no caller at all.
+//      This note previously said "seven ... all in PVM code" and named
+//      SIG_GPPVMData.cpp:57 as depending on the hidden size(); that dependency
+//      is what D21 had to translate into an explicit + 2.
+
 //    - Q2Array::data() is non-null after resize(0); Qt 2 returned 0
 //      (qgarray.cpp:213-216). isNull() and operator const T* still agree with
 //      Qt 2. All 14 data() sites are on locals sized immediately before.
@@ -514,7 +514,8 @@ public:
     // safe: SIG_GPFitnessTrainer.cpp:319 streams one into a QTextStream and
     // overload resolution binds the QByteArray& overload, so that path sees
     // QByteArray::size(). Benign there, but the hiding IS visible via a base
-    // reference.
+    // reference. STALE as of D21: that site is a plain const QByteArray now,
+    // and no caller of this class remains outside this file.
     uint size() const { return isNull() ? 0u : uint(QByteArray::size()) + 1u; }
     uint count() const { return size(); }
     bool resize(uint n) { QByteArray::resize(n ? qsizetype(n) - 1 : 0); return true; }
