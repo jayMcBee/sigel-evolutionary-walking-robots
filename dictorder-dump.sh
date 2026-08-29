@@ -24,6 +24,17 @@ B=${1:-build-fast}
 DATA=${2:-data-reordered}   # data/ is the pristine download, never written
 EVAL=$ROOT/$B/sigel_eval
 [ -x "$EVAL" ] || { echo "no $EVAL -- make B=$B SAN= SIGSAN=" >&2; exit 1; }
+
+# A failed `make` stops at the first bad compile and leaves the PREVIOUS
+# sigel_eval in place, so a test-for-existence passes and the gate silently
+# scores a stale binary. That happened during D13: the build failed on two
+# sites, the gates were run straight after, and both came back green against
+# the binary from before the change. Gate results mean nothing unless the
+# build that produced them succeeded. pvm-check.sh has carried this guard
+# from the start; these two did not.
+make -q B="$B" 2>/dev/null || {
+	echo ""$EVAL" is out of date -- run 'make B=$B SAN= SIGSAN='" >&2; exit 1; }
+
 SIGEL_ROOT=$ROOT/x/kdesigelSources.1.3/kdesigel/kdesigel
 export SIGEL_ROOT
 

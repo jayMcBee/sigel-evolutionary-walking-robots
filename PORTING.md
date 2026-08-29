@@ -685,6 +685,14 @@ identify yourself to it by **verifiable facts** — repo path, recent commit
 hashes, a reference file you authored — never by a session name, because names
 are assigned per side and neither end sees the other's.
 
+**A failed `make` leaves the previous binary in place.** All three scripts now
+run `make -q` first and refuse a stale binary, because a test for existence
+passes on one. D13 hit this: its build failed on two sites, the gates were run
+straight after, and both came back green against the binary from before the
+change. `pvm-check.sh` had carried the guard from the start; the other two did
+not. **Gate results mean nothing unless the build that produced them
+succeeded.**
+
 **Gates any session must keep green**, all committed:
 
 ```
@@ -1542,6 +1550,26 @@ compiled at all. It went with the Dynamo backend, its only caller
   and a null `QTime` holds -1 ms so it sorts before every real time. Fixed at
   12 sites; found only by running, which is the argument for §3.
 
+- **`QListIterator`** — a Qt 2 cursor iterator with `current()` and
+  `operator++`; Qt 6's namesake is a Java-style iterator with neither. Fails
+  loudly. Eight sites in `SIGEL_MasterGUI/SIG_GPParameter.cpp` alone, and
+  Phase C's count of 75 container sites includes them without noting the
+  interface changed.
+- **`QList::remove`** — Qt 2's `Q2PtrList::remove(T *)` removed by value and
+  returned `bool`. Qt 6 has only `remove(qsizetype, qsizetype)`. Fails loudly,
+  which is lucky: `SIGEL_MasterGUI/SIG_GPParameter.cpp:520` does
+  `if (hostList2.remove(host)) delete host;`. The equivalent is
+  **`removeOne`** — returns `bool`, does not delete. `removeAll` would be
+  wrong.
+- **`QList::first()` on an empty list** — `Q2PtrList::first()` returned
+  `nullptr`; Qt 6's returns `T &` and is **undefined behaviour**. It compiles
+  either way, so a `first()`/`next()` walk converts silently while only the
+  `.next()` fails to build. Live at the next step:
+  `writeHistoryToFileTransfer` opens with `experimentHistory.first()`
+  (`SIG_GPExperiment.cpp:133`, `SIG_GPExperimentClean.cpp:109,162`). All 14
+  shipped `.exp` have a non-empty history, but an experiment saved before any
+  generation runs does not. Use `value(0)` or a range-for.
+
 ### `SIG_GPExperiment` is defined twice, on purpose — do not "fix" it
 
 **Two files define `SIGEL_GP::SIG_GPExperiment`**, with different bodies:
@@ -2334,7 +2362,7 @@ corrected by review.
 **Four of the six types execute under the gates, not three.** The single
 `Q2PtrVector` is `SIG_GPPopulation::pool`, which the "evolution loop" label had
 written off. `sigel_eval` builds a whole `SIG_GPExperiment`, so
-`SIG_GPParameter::hostList` (every shipped `.exp` carries 20 or 21 `PVMHOST`
+`SIG_GPParameter::hostList` (the shipped `.exp` carry 20, 21 or **8** `PVMHOST`
 lines), `SIG_GPExperiment::experimentHistory` and, on the `-v` path,
 `SIG_GPFullDataRecorder`'s four lists are all live too.
 
@@ -2361,6 +2389,9 @@ which is why the list exists.
 | `SIG_Link::addNoCollide`, `getNoCollides()`, the `noCollide` write loop, D10 | **0 `nocollide` in all 7 `.rrb`, and `noCollideCount` is 0 in all 87 `Link` records of the 14 `.exp`** (348 over `data/` and `data-reordered/` together; an earlier draft said 261, which is neither scope). `getNoCollides()` has no caller in the tree at all |
 | `SIG_Material::friction` — three walks and the owning free, D11 | **0 friction declarations in any `.rrb`, and `nfric` is 0 on all 31 `Material` lines**. The list is empty on every gate run |
 | `SIG_Body::usedByLinks`, D11 | appended on every `.rrb` load and **read nowhere in the tree** |
+| both `SIG_GPFitnessTrainer` host walks, D13 | that object is **not linked into `sigel_eval` at all** |
+| `SIG_GPParameter::writeToFile`'s `PVMHOST` loop, D13 | linked, never called — no gate saves an `.exp` |
+| `readFromFile`'s `qDeleteAll` + `clear`, D13 | runs every load, always on an **empty** list |
 
 ### D11 — the last three lists on the executed path, and a check that can see them
 
@@ -2483,6 +2514,49 @@ loop as this plan long assumed.
 
 Verified: `./check.sh` 105 pass / 4 fail / 315 warnings, both gates
 byte-identical, sanitized fitness run clean, self-check ok.
+
+### D13 — `hostList`, and the first conversion checked before it was made
+
+`SIG_GPParameter::hostList` becomes `QList<SIG_GPPVMHost *>`. First container
+in the evolution loop, and the first converted against a 1.3 reference captured
+**before** the work: V8 measured `PVMHOST` order stable at 20 of 20 over three
+round trips, which is what the write path has to preserve.
+
+It owns its hosts, so both `deleteContents()` become `qDeleteAll` + `clear()`.
+Three cursor walks become range-for — one in `writeToFile`, two in
+`SIG_GPFitnessTrainer` that the accessor return type drags in. Precisely: the
+trainer's `.first()` would have compiled, its `.next()` would not.
+
+**A trap preserved rather than tidied.** This reads wrong and is not:
+
+```cpp
+while (actHost) {
+  if (actHost->enabled)
+    noOfActiveHosts++;
+    actHost = ...next();
+  };
+```
+
+The assignment is **not** inside the `if` — no braces, one governed statement —
+so the loop advanced correctly. Verified against the pristine tarball bytes,
+not inferred from the layout. `gcc` was flagging it: the 315 → 314 warning drop
+is that `-Wmisleading-indentation`.
+
+`getHostList()` now returns `QList<SIG_GPPVMHost *>&`, which affects 7 call
+sites in `SIGEL_MasterGUI`. None was *broken* by this — that module did not
+compile before it either — and D4 set the precedent that they meet the plain
+accessor.
+
+**None of the three converted walks is executed by any gate.**
+`SIG_GPFitnessTrainer` is not even linked into `sigel_eval`;
+`writeToFile`'s loop is linked and never called; `readFromFile`'s free always
+runs on an empty list. Coverage is `check.sh`'s syntax check, plus a throwaway
+probe that round-tripped four experiments and confirmed `PVMHOST` order matches
+V8's recorded 1.3 order exactly. **Nothing committed checks it.**
+
+**`pvm-check.sh` was not run for this step and should have been** — §7 says to
+run it after touching `SIG_GPFitnessTrainer`. Run afterwards by review: both
+halves PASS, so nothing was hidden, but the step's verification was incomplete.
 
 ### A logging system
 
