@@ -160,3 +160,32 @@ is appended on every one of the 7 `.rrb` loads and read nowhere in the tree.
   tree — GUI included — ever reads it back. The member, the method and the one
   call could all go. Asked directly during D11, the answer was convert, not
   delete.
+
+## Rename the two `SIG_GPExperiment` variants — after the Qt 6 port
+
+Two files define `SIGEL_GP::SIG_GPExperiment` with different bodies, one per
+binary: `SIG_GPExperiment.cpp` for `sigel`, `SIG_GPExperimentClean.cpp` for
+`sigel_slave`. Their headers share the include guard
+`SIGEL_GP_SIG_GPEXPERIMENT_H`. See PORTING.md §9.
+
+The arrangement works and is deliberate, but nothing in the source says so.
+It has already been misread once as an accidental duplicate, with deletion of
+one of the pair proposed as the fix. The name is the whole problem: "Clean"
+says nothing about `MT_Controller`, and the identical class name hides that
+there are two.
+
+**Do:** give the two classes distinct names — the master's keeps
+`SIG_GPExperiment`, the slave's becomes something that says what it is, and the
+headers get matching distinct guards. Then the compiler enforces what the build
+files currently only imply.
+
+**Not before Phase C.** The master variant is the one that constructs
+`MT_Controller`, and `MT_Controller.cpp` does not compile yet, so the master
+half cannot be built or tested until the interface is ported. Renaming a class
+nothing can compile is how a rename goes wrong.
+
+**Also fix while there:** our `Makefile` globs `src/<module>/*.cpp`, so it
+compiles both variants into `libSIGEL_GP.a` where 2003 compiled them into
+separate targets. The unused object is harmless today only because the linker
+cannot extract it — `SIG_GPExperiment.o` needs `MT_Controller`, which the build
+excludes. That is luck, not design.

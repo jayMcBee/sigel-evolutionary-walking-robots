@@ -1542,6 +1542,38 @@ compiled at all. It went with the Dynamo backend, its only caller
   and a null `QTime` holds -1 ms so it sorts before every real time. Fixed at
   12 sites; found only by running, which is the argument for §3.
 
+### `SIG_GPExperiment` is defined twice, on purpose — do not "fix" it
+
+**Two files define `SIGEL_GP::SIG_GPExperiment`**, with different bodies:
+`src/SIGEL_GP/SIG_GPExperiment.cpp` and `SIG_GPExperimentClean.cpp`. Their two
+headers share one include guard, `SIGEL_GP_SIG_GPEXPERIMENT_H`, so a
+translation unit only ever sees one of them.
+
+**This is deliberate 2003 design, one variant per binary:**
+
+| target | variant | how |
+|---|---|---|
+| `sigel` | `SIG_GPExperiment.cpp` | out of `libSIGEL_GP.a` |
+| `sigel_slave` | `SIG_GPExperimentClean.cpp` | named in `sigel_slave_SOURCES`, compiled into the target |
+
+They never collide: the slave's own object satisfies the symbols, so the
+archive member is never extracted. The only difference is `MT_Controller` —
+the master's constructors do `mtController = new MT_Controller(*this)` and the
+slave's do not. "Clean" means "without the GUI controller".
+
+`sigel_eval` is the slave's role and links the slave's variant, which is right.
+
+**Recorded because it was nearly broken.** Scoping the `experimentHistory`
+conversion, this was read as a duplicate definition and an ODR violation, and
+deleting one of the pair was put forward as an option. `SIG_GPExperiment.cpp`
+is the one that would have gone — the file `sigel` needs, which Phase C has to
+build. The build files are what settle it, not the source: our `Makefile`
+globs `*.cpp`, so it compiles both into one archive where 2003 compiled them
+into separate targets, and that glob is what made the pair look accidental.
+
+**When converting anything in this class, change both files and both headers.**
+Renaming them so the pair is self-evident is in `future_refactorings.md`.
+
 ---
 
 ## 10. Debt — after the port is trusted
