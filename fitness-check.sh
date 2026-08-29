@@ -19,7 +19,16 @@ SIGEL_ROOT=$ROOT/x/kdesigelSources.1.3/kdesigel/kdesigel
 export SIGEL_ROOT
 # Duplicate-key tie-breaking, which no amount of shipped data can exercise --
 # no robot has a duplicate name, so both baselines stay empty when it breaks.
+# Run the self-check twice. The second run turns LeakSanitizer ON, which the
+# evaluations below cannot afford -- they carry a documented 41 KB baseline
+# leak (PORTING.md D18). The self-check allocates and frees everything it
+# touches, so it CAN be leak-checked, and that is the only thing standing
+# between a dropped qDeleteAll in ~SIG_Material and a clean run of every gate.
+# Found by the D11 review as a coverage gap; kept as a separate invocation so
+# a leak here is not confused with the baseline.
 "$ROOT/$B/sigel_eval" -selfcheck >&2 || exit 1
+ASAN_OPTIONS=detect_leaks=1 "$ROOT/$B/sigel_eval" -selfcheck >/dev/null 2>&1 \
+	|| { echo "selfcheck leaked under LeakSanitizer" >&2; exit 1; }
 
 n=$(find "$ROOT/$DATA/Experiments" -name '*.exp' | wc -l)
 [ "$n" -eq 14 ] || { echo "expected 14 .exp under $DATA/, found $n" >&2; exit 1; }

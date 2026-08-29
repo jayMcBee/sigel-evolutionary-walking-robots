@@ -229,7 +229,11 @@ static int selfcheck()
     l1.addNoCollide(&l2);                         // negotiates both directions
     SIG_WANT(l1.getNoCollides().count() == 1);
     SIG_WANT(l2.getNoCollides().count() == 1);
-    SIG_WANT(l1.getNoCollides().at(0) == &l2);
+    SIG_WANT(l1.getNoCollides().value(0) == &l2);   // value(), not at():
+    SIG_WANT(l2.getNoCollides().value(0) == &l1);   // SIG_WANT continues after
+                                                   // a failure, so at() would
+                                                   // abort the block instead
+                                                   // of reporting the rest.
 
     l1.addNoCollide(&l2);                         // the duplicate guard
     SIG_WANT(l1.getNoCollides().count() == 1);

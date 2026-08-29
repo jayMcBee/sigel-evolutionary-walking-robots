@@ -1,0 +1,92 @@
+V6 — friction and no-collide negotiation, checked against the 1.3 binary
+========================================================================
+Captured 2026-08-29 on the x86 reference box, through the sigel-x86 session.
+Capture once, diff for ever: 1.3 is frozen, so this file does not change.
+
+WHY THIS EXISTS
+---------------
+Phase D converted SIG_Material::friction (D11) and SIG_Link::noCollide (D10)
+off the Qt 2 container shim.  Neither is exercised by any shipped data:
+
+    friction     0 declarations in all 7 .rrb; nfric == 0 on all 31
+                 Material lines across the 14 Experiments/*.exp
+    noCollide    0 'nocollide' in all 7 .rrb; noCollideCount == 0 in all
+                 261 Link records
+
+So both were correct by inspection and by a self-check we wrote ourselves,
+which is the weakest evidence this project accepts.  This is the other side
+of the comparison.
+
+INPUT
+-----
+A copy of hammerNiceWalkingFitness.exp, both dead 2003 roots repointed
+(/home/pg368/sawitzki/sigel and /home/pg368/sawitzki/hammer/ are DISTINCT --
+the second is on the Body lines, one of which sits inside the StreamedRobot
+block).  Two mechanical edits inside that block, each asserting t[n] == '0'
+before substituting rather than trusting the index:
+
+    Material rubber 1 1 0 1 0 0      ->  Material rubber 1 1 1 metal 0.25 1 0 0
+    Link middle1 ... <t[28] == '0'>  ->  ... 1 base ...
+
+rubber is the LAST material to load and metal is already loaded by then; the
+parser drops a pair whose partner is not yet loaded, so the ordering is
+load-bearing.  Likewise base precedes middle1.
+
+Run with no pvmd: every pvm_addhosts fails and SIGEL loads, saves and exits 0
+having evaluated ZERO generations.  Evaluation impossible rather than merely
+skipped, which makes this a pure load/save.  Pristine download verified
+byte-unchanged by md5 afterwards.
+
+PREDICTION, STATED BEFORE THE RUN
+---------------------------------
+Both setters negotiate by default in our build -- setFrictionValue recurses
+once with negotiate=false, addNoCollide likewise -- so loading a pair declared
+on ONE side must add the reverse entry to the partner, and the saved file must
+show pairs on BOTH sides.
+
+RESULT — 5 of 5, prediction holds
+---------------------------------
+    plastic   nfric 0, no pairs                    PREDICTED, HOLDS
+    metal     nfric 0 -> 1, pair "rubber 0.25"     PREDICTED, HOLDS  <- gained
+    rubber    nfric 1, pair "metal 0.25"           PREDICTED, HOLDS
+    base      nNoCollide 0 -> 1, names middle1     PREDICTED, HOLDS  <- gained
+    middle1   nNoCollide 1, names base             PREDICTED, HOLDS
+
+**Negotiation is upstream behaviour, not ours.**  No divergence to fix.
+
+The five lines from the rewritten file, verbatim:
+
+    Material plastic 1 1.5 0 0 1 0
+    Material rubber  1 1 1 metal 0.25 1 0 0
+    Material metal   1 2 1 rubber 0.25 0 0 1
+
+    Link base    0 3 BaseAxisSuccNormal 2 0 0 BaseAxisSuccDir 1 0 1 BaseAxisSuccBase 1 0 0 1 middle1 0 0 0 1 0 0 0 1 0 0 0 1 n n base.wrl metal n
+    Link middle1 1 6 Middle1SuccAxisBase 1 0 0 Middle1PredAxisNormal 0 0 0 Middle1PredAxisBase -1 0 0 Middle1SuccAxisNormal 2 0 0 Middle1SuccAxisDir 1 1 0 Middle1PredAxisDir -1 0 1 1 base 0 0 0 1 0 0 0 1 0 0 0 1 n n middle.wrl plastic n
+
+Colours survived unchanged in all three materials (plastic 0 1 0, rubber
+1 0 0, metal 0 0 1), so the pairs were inserted before the colour triplet
+exactly as the format states and nothing was corrupted by the parse.
+
+THE TRAP FIRED, AND IT IS THE LESSON
+------------------------------------
+The Material container PERMUTED on the round trip: in as plastic, metal,
+rubber; out as plastic, RUBBER, METAL.  The request originally asked for
+"the three Material lines" -- i.e. by position.  Read that way, the second
+line reads rubber where metal was expected and the comparison comes out
+against the wrong material.  The x86 side caught this before the run and the
+request was amended to report per NAMED material.
+
+The reordering is the known Q2Dict behaviour V1 already documented on walker,
+and carries no information about friction.  The Link lines did not move.
+
+This is V5's mistake in a new costume: match reference data by a key something
+else already checks -- here the entity name, which V1 gates independently --
+never by position and never by minimising the difference under test.
+
+FREE OBSERVATION FROM THE X86 SIDE, WORTH KEEPING
+-------------------------------------------------
+nfric and the pair list are serialised for BOTH partners, so one declared
+friction pair costs two entries on save.  A serialiser that wrote the pair
+only from the declaring side would make any file round-tripped through 1.3
+appear to gain an entry -- a spurious diff that is really just negotiation.
+Ours writes both, so this is confirmation rather than a warning.

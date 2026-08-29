@@ -143,8 +143,15 @@ Additive only — nothing changes at runtime. The value is that failures are
 ## Left by the Qt port, deliberately — Phase D11, 2026-08-29
 
 Both were converted rather than changed, because the port's rule is to move the
-Qt API and nothing else. Neither is reachable by any gate, which is exactly why
-neither was touched on a whim.
+Qt API and nothing else.
+
+*An earlier version of this paragraph said "neither is reachable by any gate".
+That is wrong both ways and was corrected by review.* `usedByLinks` is
+**appended on every one of the 7 `.rrb` loads** `dictorder-dump.sh` performs; it
+is never *read*, which is the actual point. `friction` is constructed per
+material and walked by `writeToFileTransfer` on every gate run; the list is
+always **empty**, which is again the actual point. Neither is unreachable — both
+are unobservable, and `PORTING.md`'s own rows word it correctly.
 
 - **`SIG_Material::FrictionValue` could be a value type.** It is two words —
   `SIG_Material *otherSide` and a `DL_Scalar` — held as `QList<FrictionValue *>`

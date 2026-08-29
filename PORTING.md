@@ -27,13 +27,13 @@ build and run, because nothing else can be verified without it — see §3.
 |---|---|
 | 0 — comments to English | done for the 9 core modules; 9 GUI files still hold Latin-1 |
 | A — core onto Qt 6 | **done**, tags `step-A0`…`step-A9` |
-| B — ownership explicit | **subsumed by Phase D**, which deletes the containers rather than converting them. **12** `setAutoDelete` left in core, re-measured 2026-08-28 — 10 in `SIGEL_GP`, 1 in `SIGEL_Robot`, 1 in `MT_Control`. The row said 13 and put 2 in `SIGEL_Robot`; there is one, `SIG_Body.cpp:54`, and it is `FALSE`. **Not all of them are unreachable, and an earlier version of this row said they were.** `SIG_GPPopulation::pool` is owning, is constructed on every `sigel_eval` run and takes 100 `insert()`s inside both gates — see "What the gates actually reach" in §10. The 7 in `SIG_GPFitnessTrainer` and `SIG_GPManager` are the ones Phase C still blocks |
+| B — ownership explicit | **subsumed by Phase D**, which deletes the containers rather than converting them. **11** `setAutoDelete` left in core, re-measured 2026-08-29 after D11 — 10 in `SIGEL_GP`, 1 in `MT_Control`, **0 in `SIGEL_Robot`**: D11 deleted `SIG_Body.cpp:54`, the last one, and left this row saying 12. *Before that it read 13 with 2 in `SIGEL_Robot`, where there was one. Three readings of the same row, three corrections, each by review.* **Not all of them are unreachable, and an earlier version of this row said they were.** `SIG_GPPopulation::pool` is owning, is constructed on every `sigel_eval` run and takes 100 `insert()`s inside both gates — see "What the gates actually reach" in §10. The 7 in `SIG_GPFitnessTrainer` and `SIG_GPManager` are the ones Phase C still blocks |
 | R — build and run | core builds and runs. **No longer checked only against itself** — Phase V has confirmed both the ordering and the arithmetic against the 1.3 binary, §7 |
 | T — old-Qt tool container | **done 2026-08-27.** `tools/qtmig`, §4 |
 | D — delete the shim, migrate the data | **D1–D12 done.** `Q2Dict`, `Q2DictIterator` and `Q2Array` gone from all code; `Q2PtrVector` is off `SIG_Geometry`, `SIG_Body`, the `SIG_Register` cluster and `SIG_DynaMechsSimulationData`. Shim 806 → **530** lines. Remaining, measured 2026-08-29 after D12: `Q2PtrList` 47, `Q2PtrVector` 49, `Q2CString` 19, `Q2Queue` 16, `Q2ListIterator` 8, `Q2ValueList` 12. **No live shim code is left in `SIGEL_Robot`, `SIGEL_Simulation` or `SIGEL_Environment` — only prose comments.** What remains is `SIGEL_GP`, `MT_Control` and `MT_GPSystem`, part of which the gates do execute (§10). **Which of those the gates execute is now measured, not assumed** — see "What the gates actually reach" in §10. §10 |
 | P — PVM | **DONE 2026-08-28.** Vendored 3.4.3 replaced by upstream 3.4.6; nine patches carry the four config lines and Debian's eight source fixes; `libpvm3.a` and `pvmd3` build; SIGEL's two PVM objects link against them and `SIG_GPPVMData` round-trips through real PVM. `sigel`/`sigel_slave` still need Phase C. §7 |
 | C — GUI | **not started, AUTHORIZED 2026-08-27 per D24.** ~450 Qt 2 sites + 20 forms |
-| V — check against the 1.3 binary | **V1 and V5's MDH probe both done and both PASS.** Ordering: 10 of 10 container orders match. Arithmetic: `twoBases` exact bit for bit, `octopus` 9/9 with three joints exact and 5 ulp worst. V2–V4 not started; V5's sensor and force probes are **invalid as specified** — both target Dynamo-only functions, deleted 2026-08-28. §7 |
+| V — check against the 1.3 binary | **V1, V5's MDH probe and V6 all done, all PASS.** Ordering: 10 of 10 container orders match. Arithmetic: `twoBases` exact bit for bit, `octopus` 9/9 with three joints exact and 5 ulp worst. **V6 2026-08-29: friction and no-collide negotiation confirmed against 1.3, 5 of 5** — `reference/v6-1.3-friction-nocollide.txt`. V2–V4 not started; V5's sensor and force probes are **invalid as specified** — both target Dynamo-only functions, deleted 2026-08-28. §7 |
 
 **SCOPE — DECIDED 2026-08-23. Read this before changing anything.**
 
@@ -963,6 +963,7 @@ in `check.sh`, not a remote call.
 | V3 | Determinism on the x86 box — one experiment run twice, both `RANDOMSEED`s pinned | gates everything numeric; never tested there |
 | V4 | Force re-evaluation of a shipped population by setting its `FITNESS` fields to `-1`, harvest 1.3's per-individual fitness, compare against `sigel_eval` | the number this file has been asking for. **Judgement, not a gate** |
 | V5 | **MDH probe DONE 2026-08-27, PASS** — `reference/v5-1.3-mdh-compared.txt`. The sensor and force probes remain open | the port's **arithmetic**, which V1–V4 never touch |
+| V6 | **DONE 2026-08-29, PASS, 5 of 5** — `reference/v6-1.3-friction-nocollide.txt` | the two Phase D paths **no shipped data exercises**: friction pairs and no-collide pairs, and whether both setters negotiate |
 
 **Why the round trip is the sharp test.** The `.exp` carries the robot as a
 `StreamedRobot` block, and that block *is* dict iteration order —
@@ -1046,6 +1047,51 @@ running pid**. Then, because `-visualize` builds the simulation during start-up,
 attaching after the window appears has already missed it: **stop, then play**
 forces a full reconstruction. A live `pvmd` is required or the slave exits at
 once.
+
+### V6 RESULT — friction and no-collide negotiate in 1.3 too
+
+**5 of 5, prediction held.** `reference/v6-1.3-friction-nocollide.txt`.
+
+D10 converted `SIG_Link::noCollide` and D11 `SIG_Material::friction`, and
+**neither is touched by any shipped data** — 0 `nocollide` in all 7 `.rrb` and
+`noCollideCount` 0 in all 261 `Link` records; 0 friction declarations and
+`nfric` 0 on all 31 `Material` lines. Both were correct by inspection and by a
+self-check we wrote ourselves. This is the other side of the comparison, and it
+is the first thing in Phase D checked against something that is not us.
+
+A copy of `hammerNiceWalkingFitness.exp` was edited to declare one friction
+pair (`rubber` → `metal`) and one no-collide pair (`middle1` → `base`), then
+loaded and saved by the 1.3 binary with no `pvmd`, so it evaluated **zero**
+generations — evaluation impossible rather than skipped. The prediction, made
+in advance: both setters negotiate, so the partner gains the reverse entry.
+
+| | |
+|---|---|
+| `metal` | `nfric` 0 → **1**, pair `rubber 0.25` — **gained by negotiation** |
+| `base` | `nNoCollide` 0 → **1**, names `middle1` — **gained by negotiation** |
+| `plastic`, and the two declaring sides | unchanged, as predicted |
+
+**Negotiation is upstream behaviour, not ours.** Nothing to fix, and the
+self-check's `negotiate` assertions are now backed by the reference rather than
+by our own reading.
+
+**The trap fired, and it is the reason this is a lesson and not just a pass.**
+The Material container **permuted** on the round trip — in as `plastic, metal,
+rubber`, out as `plastic, rubber, metal`. The request originally asked for "the
+three Material lines", by position. Read that way, the second line is `rubber`
+where `metal` was expected and the comparison lands on the wrong material. The
+x86 side caught it **before** the run and the request was amended to report per
+named entity. That is V5's error in a new costume: *match reference data by a
+key something else already checks — here the name, which V1 gates
+independently — never by position, and never by minimising the difference under
+test.* The reordering is the known `Q2Dict` behaviour V1 documented on `walker`
+and says nothing about friction.
+
+**One thing learned for free, worth keeping.** `nfric` and the pair list are
+serialised for **both** partners, so one declared pair costs two entries on
+save. A serialiser writing the pair only from the declaring side would make any
+file round-tripped through 1.3 appear to gain an entry — a spurious diff that
+is really negotiation. Ours writes both.
 
 ### V1 RESULT — the hash model is confirmed against the real binary
 
@@ -2317,6 +2363,26 @@ that must **not** append, and `addNoCollide`'s duplicate guard. It runs inside
 iterator walk produces — and dropping `addNoCollide`'s `!contains` guard makes
 the self-check fail with 3 assertions and exit 1.
 
+**Two holes in that check, both found by review and both closed.**
+
+- It asserted `getNoCollides().at(0)`. `SIG_WANT` records and continues, so a
+  regression that stopped `addNoCollide` appending reached `at(0)` on an **empty
+  list** and the block died with `ASSERT failure in QList::at` and a core dump
+  instead of reporting. Worse, it is the exact shape `q2compat.h:24-30` says not
+  to leave to `Q_ASSERT`, which vanishes under `QT_NO_DEBUG`. Now `value(0)`,
+  and with the guard broken the block reports **6** failures cleanly where it
+  previously aborted after 2.
+- **Nothing asserted that `~SIG_Material` still frees.** The self-check
+  exercises the free but had no way to see it, and the prescribed sanitized gate
+  runs `detect_leaks=0`, so a future rewrite that dropped the `qDeleteAll` would
+  have passed `check.sh`, both baselines, the sanitized run *and* the
+  self-check. `fitness-check.sh` now runs the self-check a **second** time under
+  `detect_leaks=1` — it can afford to, because unlike the evaluations it frees
+  everything it allocates. Broken deliberately: dropping the `qDeleteAll` gives
+  `80 byte(s) leaked in 5 allocation(s)`, every frame named to
+  `SIG_Material::setFrictionValue`, and exit 1, while the plain run still says
+  `ok`.
+
 **And one of those assertions is the only one that catches it.** With the
 append bug in place, `getFrictionValue` still returns the *right value*: the
 in-place update happens and the stray duplicate is appended after it, so a
@@ -2325,13 +2391,26 @@ moves, from 2 to 3. A self-check that asserted values alone would have passed
 on broken code — which is the ninth time this project has hit that shape, and
 the reason the count assertion is there.
 
-Three headers now include `<QList>` instead of `compat/q2compat.h`, which falls
-from 49 files to 47.
+Three headers now name `<QList>` directly, but only **two** of them dropped
+`compat/q2compat.h` for it — `SIG_Body.h` and `SIG_DynaMechsLink.h`.
+`SIG_Material.h` never included the shim; it had been getting `Q2PtrList`
+transitively through `SIG_Robot.h`. The shim's reach falls from 49 files to 47,
+which is what says two rather than three.
 
 Verified: `./check.sh` 105 pass / 4 fail / 315 warnings, both gates
 byte-identical, sanitized fitness run clean, self-check ok.
 
 ### D12 — `Q2CString`, and the executed path is clear
+
+**D11's commit message is false in one sentence and cannot be amended.** It says
+"only D12's two `Q2CString` sites are left there", and the status row said the
+same until this step rewrote it. Both were wrong: `sigel_eval` constructs a
+whole `SIG_GPExperiment`, so `SIG_GPParameter::hostList`,
+`SIG_GPExperiment::experimentHistory` and `SIG_GPPopulation::pool` all run on
+every gate — a `gdb` backtrace in the D11 review puts `hostList.append` at
+`SIG_GPParameter.cpp:615` under `loadExperiment` under `main`. The sentence is
+recorded here because git history is not editable and this file is where the
+plan is read from.
 
 Two sites, identical, both building the `Terrain.ter` path for DynaMechs:
 `SIG_Environment.cpp:413` and `SIG_DynaMechsSimulationData.cpp:300`.
