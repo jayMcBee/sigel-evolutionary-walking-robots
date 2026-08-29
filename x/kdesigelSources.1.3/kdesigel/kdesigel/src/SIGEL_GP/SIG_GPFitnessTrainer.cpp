@@ -145,6 +145,14 @@ SIGEL_GP::SIG_GPFitnessTrainer::~SIG_GPFitnessTrainer() {
       int info = pvm_delhosts( const_cast< char** >(&actHostNameCString), 1, &singleInfo );
 #endif
     };
+
+  // ~Q2PtrVector with autoDelete freed these. D19 removed the flag and gave
+  // pvmTasks an explicit qDeleteAll but not pvmHosts, so every active host
+  // leaked. The loop above only tells PVM to drop the host; it never owned
+  // the object. Found by review, over a 19,500-scenario sweep against the
+  // shim -- it was the ONLY behavioural difference in the whole conversion.
+  qDeleteAll( pvmHosts );
+  pvmHosts.clear();
 };
 
 

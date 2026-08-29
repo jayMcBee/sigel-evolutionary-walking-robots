@@ -1396,11 +1396,13 @@ windows, and nothing happens behind the Start button.
    `:355`, `:378` remain. Line numbers here were pre-D15 and are not maintained;
    find these by name, not by line.
    Two `Q2PtrList` sites belong here too: `SIG_GPManager.cpp:437`, `:1519`
-   (`fitTaskList`). *`toSpawnList` was a third and is done — D18.*
+   (`fitTaskList`). *`toSpawnList` was a third and is done — D18. The three
+   `SIG_GPFitnessTrainer` sites are done — D19.*
 2. **Owning containers with no free path**, relying on `~Q2PtrList` /
-   `~Q2PtrVector`. `~SIG_GPFitnessTrainer` still leaves **`pvmHosts` and
-   `pvmTasks`** to `setAutoDelete`. *`toSpawnList` was the third and is done —
-   D18 made its free explicit.*
+   `~Q2PtrVector`. *All of `~SIG_GPFitnessTrainer`'s are now explicit —
+   `toSpawnList` in D18, `pvmTasks` and `pvmHosts` in D19, the last of which
+   D19 forgot and a review caught. What remains in this class is
+   `SIG_GPManager`, which cannot be compiled.*
 3. **`SIG_Robot::clear()`** hand-deletes six dictionaries' contents and calls
    `clear()` on them twelve lines later. Safe only because those dicts carry no
    flag. The self-check now asserts that `clear()` on a non-owning container
@@ -2433,7 +2435,7 @@ which is why the list exists.
 | both `wasCanceled()` shrinks, D15 | need a `QApplication`; `sigel_eval` has none, so `if (qApp)` is false |
 | `readFromFile`'s shrink loop, D15 | the function runs on every load, but always on an **empty** pool, so the loop body never executes |
 | `sort`, D15 | no caller anywhere |
-| **everything D17 and D18 changed** in `SIG_GPFitnessTrainer` | `nm -C build/sigel_eval \| grep -c SIG_GPFitnessTrainer` is **0**. `pvm_link` links the object but never constructs a trainer, so it is link-checked and never run. The rewritten walk needs a live `pvm_spawn`; `flushAllDynHosts` is `-devolve`-only; the destructor's three `qDeleteAll` run for no gate |
+| **everything D17, D18 and D19 changed** in `SIG_GPFitnessTrainer` — including all six `delete v[i]`, `resizeOwningHosts`, both `qDeleteAll` in the destructor and both `static_cast<uint>` moduli | `nm -C build/sigel_eval \| grep -c SIG_GPFitnessTrainer` is **0**. `pvm_link` links the object but never constructs a trainer, so it is link-checked and never run. The rewritten walk needs a live `pvm_spawn`; `flushAllDynHosts` is `-devolve`-only; the destructor's three `qDeleteAll` run for no gate |
 
 ### D11 — the last three lists on the executed path, and a check that can see them
 
@@ -2895,13 +2897,25 @@ what each became:
 
 | trap | handling |
 |---|---|
-| `insert(i, d)` **deletes the occupant and does not shift** | `delete v[i]; v[i] = d;` at all six sites. Where the slot is known null the delete is a no-op, so one spelling is exact everywhere |
+| `insert(i, d)` **deletes the occupant and does not shift** | **eight** sites, not the six this row first claimed. Six became `delete v[i]; v[i] = d;`. Two — the two null-fill loops — became `fill(0)` and a plain `v[i] = 0`, because `insert` deleted nothing there: the slots had just been value-initialised. Behaviourally exact either way, but "one spelling is exact everywhere" is not what the file does |
 | `pvmHosts.resize( size-1 )` **is the free** | `resizeOwningHosts()`, the same four-line helper shape D15 used. The only shrink in the file |
 | `nextHostNumber % pvmHosts.size()` was **unsigned** | `static_cast<uint>` at both sites, preserving the wrap. This is D9's defect exactly, and it is the second time this port has had to write that cast |
 | `isEmpty()` meant `count()==0`, occupied slots | `pvmHosts` has no null slots — every slot is filled by the loop that sizes it — so `QList::isEmpty()` agrees. **`pvmTasks` is full of null slots**, but nothing calls `isEmpty()` or `count()` on it |
 
 **Both were §9 item 2 sites**: `setAutoDelete(true)` was their only free, and
 nothing in the file frees either. The destructor now does, explicitly.
+
+**D19 SHIPPED A LEAK AND THIS SENTENCE WAS HALF FALSE.** It removed the flag
+from both and gave **only `pvmTasks`** a `qDeleteAll`. `pvmHosts` was left with
+no free anywhere — the destructor's loop tells PVM to drop each host but never
+owned the object, and `resizeOwningHosts` frees only the dynamic tail. Every
+enabled `PVMHOST` leaked one `SIG_GPActivePVMHost` per trainer destruction, and
+all 56 shipped `.exp` have at least one. Found by review, over a
+**19,500-scenario sweep** against the shim: as committed, 41 scenarios diverged,
+the smallest being one static host and no spawns. With the one missing
+`delete` added, **all 19,500 agree** on host-vector contents, `getNextHost`'s
+full result sequence, `nextHostNumber` and free accounting. **It was the only
+behavioural difference in the entire conversion.**
 
 **`pvmTasks` grows without bound, and that is pre-existing.** It is indexed by
 `nextFreeNumber`, which starts at 0, increments once per spawn, and is
@@ -2922,13 +2936,21 @@ the whole grown array rather than the live tasks — **O(total spawns ever)**,
 scanning tens of thousands of mostly-null slots on a long run. Harmless, and
 the second place the unbounded index reaches behaviour.
 
-**A warning-count drift this step did not cause.** `check.sh` reports 315, and
-`SIGEL_RobotIO` accounts for the change — a module D19 does not touch.
-Measured by stashing: **D19 adds zero warnings**, and 315 is reproducible twice
-at `HEAD` without it. One commit earlier the file recorded 314, independently
-verified. So the number moved by one for a reason outside this change that
-could not be attributed. Recorded rather than quietly restated, because this
-plan treats these counts as measured facts.
+**There was no drift, and the number I chased never existed.** D19 adds zero
+warnings — that part was right. But "one commit earlier the file recorded 314"
+was a **mis-count of my own**, propagated forward. Re-measured at three
+commits, each from a clean checkout:
+
+```
+c318166  pre-D13   316 warnings
+865b41e  D13       315
+ea39f5d  D17/D18   315
+```
+
+So D13's real drop was **316 → 315**, not 315 → 314, and `SIGEL_RobotIO` is
+innocent — 133 warnings with byte-identical text at every point measured. The
+figures recorded for D11, D12 and D13 are each one low for the same reason.
+**315 is the number; it has not moved since D13.**
 
 ### A logging system
 
