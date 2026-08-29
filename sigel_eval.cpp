@@ -20,6 +20,10 @@
 #include <QTextStream>
 
 #include "SIGEL_GP/SIG_GPExperiment.h"
+#include "SIGEL_GP/SIG_GPPopulation.h"
+#include "SIGEL_GP/SIG_GPParameter.h"
+#include "SIGEL_GP/SIG_GPIndividual.h"
+#include "SIGEL_Tools/SIG_Randomizer.h"
 #include "SIGEL_GP/SIG_GPNiceWalkingFitnessFunction.h"
 #include "SIGEL_GP/SIG_GPSimpleFitnessFunction.h"
 #include "SIGEL_GP/SIG_GPFullDataRecorder.h"
@@ -273,6 +277,57 @@ static int selfcheck()
       // 0.6 is the not-found default: the pair was dropped, not stored.
       SIG_WANT(early->getFrictionValue(known) == 0.6);
     }
+  }
+  {   // THE EVOLUTION LOOP'S OWNING CONTAINER, D15.
+      //
+      // Six of SIG_GPPopulation's nine frees are in functions no gate enters:
+      // setIndividual (12 tournament call sites), deleteIndividual,
+      // addRandomIndividuals, importNewIndividual. D15 shipped a real leak in
+      // readFromFile's cancel path and every gate reported it clean -- both
+      // diffs, the sanitized run, the self-check and the 41,254-byte leak
+      // baseline. That baseline comes from the default constructor,
+      // readFromFile on an EMPTY pool, and the destructor, so nothing here
+      // moves it. fitness-check.sh runs the self-check a second time under
+      // LeakSanitizer, and that is what judges these blocks.
+      //
+      // Built on the DEFAULT constructor. The two sized ones are unused and
+      // both defective -- see PORTING.md section 9.
+    SIGEL_GP::SIG_GPParameter param;
+    SIGEL_Robot::SIG_LanguageParameters langParams;
+
+    SIGEL_GP::SIG_GPPopulation pop;
+    pop.addRandomIndividuals( 4, param, langParams );
+    SIG_WANT(pop.getSize() == 4);
+
+    // deleteIndividual frees the victim and shifts the rest down. The free
+    // is invisible to any assertion, which is why the leak-checked run is
+    // the real judge; these pin the shift, which is what a careless rewrite
+    // breaks.
+    SIGEL_GP::SIG_GPIndividual *third = pop.getIndividualPointer( 2 );
+    SIGEL_GP::SIG_GPIndividual *last  = pop.getIndividualPointer( 3 );
+    pop.deleteIndividual( 1 );
+    SIG_WANT(pop.getSize() == 3);
+    SIG_WANT(pop.getIndividualPointer( 1 ) == third);
+    SIG_WANT(pop.getIndividualPointer( 2 ) == last);
+    SIG_WANT(pop.getIndividualPointer( 1 )->getPoolPos() == 1);
+    SIG_WANT(pop.getIndividualPointer( 2 )->getPoolPos() == 2);
+
+    pop.deleteIndividual( pop.getSize() - 1 );   // last: the shift loop is empty
+    SIG_WANT(pop.getSize() == 2);
+
+    // setIndividual frees the loser and takes ownership of the caller's
+    // object. Deliberately not deleted here -- the pool must free it.
+    SIGEL_GP::SIG_GPIndividual *winner = new SIGEL_GP::SIG_GPIndividual();
+    pop.setIndividual( *winner, 0 );
+    SIG_WANT(pop.getIndividualPointer( 0 ) == winner);
+    SIG_WANT(pop.getSize() == 2);
+
+    pop.resetPool();
+    SIG_WANT(pop.getIndividualPointer( 0 )->getFitness() == -1);
+
+    pop.deleteIndividual( 0 );
+    pop.deleteIndividual( 0 );                   // drain to empty
+    SIG_WANT(pop.getSize() == 0);
   }
 #undef SIG_WANT
   printf(bad ? "selfcheck: %d FAILED\n" : "selfcheck: ok\n", bad);

@@ -2704,6 +2704,45 @@ does nothing at all. Good for this conversion — the pool is never reordered, s
 V8's captured order covers it — but a reader could implement it and silently
 renumber every individual, and every stored `poolPos` with them.
 
+### D16 — a check the evolution loop's containers cannot pass by accident
+
+**Built before converting anything else, because D15 proved the gates cannot
+see this code.** D15 shipped a real 4,850-byte leak that `check.sh`, both
+diffs, the sanitized run, the self-check *and* the leak baseline all reported
+clean. Three review rounds have now found real defects by writing a throwaway
+probe and deleting it. This commits one.
+
+`sigel_eval -selfcheck` now drives `SIG_GPPopulation` through the functions no
+gate enters: `addRandomIndividuals`, `deleteIndividual` at a middle position
+and at the last, `setIndividual`, `resetPool`, and a drain to empty.
+`fitness-check.sh` already runs the whole self-check a second time under
+LeakSanitizer, and **that is what judges it** — the frees here are invisible to
+any assertion, so the assertions pin the *shift* and the sanitizer pins the
+*ownership*.
+
+**Verified to have teeth, against the exact failure D15 shipped.** Removing
+`deleteIndividual`'s `delete pool[poolpos]`:
+
+| | |
+|---|---|
+| `sigel_eval -selfcheck` | **`selfcheck: ok`** |
+| `./fitness-check.sh` and both diffs | **pass, empty** |
+| the same self-check under `detect_leaks=1` | **fires**, naming `addRandomIndividuals` as the allocation site |
+
+**Two pre-existing defects found by writing it**, both in `SIG_GPPopulation`
+constructors that **no code in the tree calls**:
+
+| | |
+|---|---|
+| `SIG_GPPopulation(int size, SIG_Randomizer &r)` | stores `&r` via `setRandomizer` and `~SIG_GPPopulation` **deletes it**. Constructing one with a stack or borrowed randomizer is a bad free — ASan: `attempting free on address which was not malloc()-ed`. Found on the test's first run |
+| `SIG_GPPopulation(int size)` | **has no member initialiser list**, so `randomizer` is uninitialised. Its own `if (getRandomizerPointer()==0)` guard reads that uninitialised pointer, almost never sees 0, and the loop then dereferences it |
+
+Neither is reachable — the only constructors used are the default one and
+`SIG_GPPopulation(QString)`. Not fixed: both are Phase C's to settle when the
+GUI that would call them is ported, and fixing an unused constructor is not
+this phase's business. The test is built on the default constructor and says
+so.
+
 ### A logging system
 
 Qt 2's `QTextStream` wrote through to unbuffered `stderr` on every `<<`. Qt 6
