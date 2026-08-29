@@ -30,7 +30,7 @@ build and run, because nothing else can be verified without it — see §3.
 | B — ownership explicit | **subsumed by Phase D**, which deletes the containers rather than converting them. **11** `setAutoDelete` left in core, re-measured 2026-08-29 after D11 — 10 in `SIGEL_GP`, 1 in `MT_Control`, **0 in `SIGEL_Robot`**: D11 deleted `SIG_Body.cpp:54`, the last one, and left this row saying 12. *Before that it read 13 with 2 in `SIGEL_Robot`, where there was one. Three readings of the same row, three corrections, each by review.* **Not all of them are unreachable, and an earlier version of this row said they were.** `SIG_GPPopulation::pool` is owning, is constructed on every `sigel_eval` run and takes 100 `insert()`s inside both gates — see "What the gates actually reach" in §10. The **6** in `SIG_GPFitnessTrainer` and `SIG_GPManager` are the ones Phase C still blocks; the row said 7, which did not even add up against the 10 in the same sentence |
 | R — build and run | core builds and runs. **No longer checked only against itself** — Phase V has confirmed both the ordering and the arithmetic against the 1.3 binary, §7 |
 | T — old-Qt tool container | **done 2026-08-27.** `tools/qtmig`, §4 |
-| D — delete the shim, migrate the data | **D1–D23 done.** `Q2Dict`, `Q2DictIterator`, `Q2Array` and `Q2CString` gone from all code; the simulation path, `SIG_GPFitnessTrainer`, `SIG_GPFullDataRecorder` and `crossOver` all converted. Shim 806 → **530** lines, included by **26** files. Remaining, measured 2026-08-29 after D23: `Q2PtrList` 39, `Q2PtrVector` 46, `Q2Queue` **9**, `Q2ValueList` 12, `Q2ListIterator` 8, `Q2CString` 15 — **lines containing the name, in the source tree only**: the shim's own header and self-check are included, `sigel_eval.cpp` and `verification-against-sigel-1.3/` are not. State the scope when you re-measure; the same six names give 46/46/9/12/8/15 if `sigel_eval.cpp` and the captures are counted, and 48/48/9/12/8/15 if you count occurrences instead of lines. The `Q2PtrVector` bulk is `SIG_GPManager::tours`, which **cannot be linked** until Phase C. §10 |
+| D — delete the shim, migrate the data | **D1–D23 done.** `Q2Dict`, `Q2DictIterator`, `Q2Array` and `Q2CString` gone from all code; the simulation path, `SIG_GPFitnessTrainer`, `SIG_GPFullDataRecorder` and `crossOver` all converted. Shim 806 → **536** lines, included by **26** files. Remaining, measured 2026-08-29 after D23: `Q2PtrList` 39, `Q2PtrVector` 46, `Q2Queue` **9**, `Q2ValueList` 12, `Q2ListIterator` 8, `Q2CString` 15 — **lines containing the name, in the source tree only**: the shim's own header and self-check are included, `sigel_eval.cpp` and `verification-against-sigel-1.3/` are not. State the scope when you re-measure; the same six names give 46/46/9/12/8/15 if `sigel_eval.cpp` and the captures are counted, and 48/48/9/12/8/15 if you count occurrences instead of lines. The `Q2PtrVector` bulk is `SIG_GPManager::tours`, which **cannot be linked** until Phase C. §10 |
 | P — PVM | **DONE 2026-08-28.** Vendored 3.4.3 replaced by upstream 3.4.6; nine patches carry the four config lines and Debian's eight source fixes; `libpvm3.a` and `pvmd3` build; SIGEL's two PVM objects link against them and `SIG_GPPVMData` round-trips through real PVM. `sigel`/`sigel_slave` still need Phase C. §7 |
 | C — GUI | **not started, AUTHORIZED 2026-08-27 per D24.** ~450 Qt 2 sites + 20 forms |
 | V — check against the 1.3 binary | **V1, V5's MDH probe, V6, V7 and V8 all done, all PASS.** Ordering: 10 of 10 container orders match. Arithmetic: `twoBases` exact bit for bit, `octopus` 9/9 with three joints exact and 5 ulp worst. **V6, V7 and V8 done 2026-08-29** — friction and no-collide negotiation, their four remaining rules, and the GP parameter blocks captured *before* their conversion. `verification-against-sigel-1.3/v6`, `v7`, `v8`. V2–V4 not started; V5's sensor and force probes are **invalid as specified** — both target Dynamo-only functions, deleted 2026-08-28. §7 |
@@ -937,6 +937,17 @@ never changes. Each step captures a reference file once, commits it under
 needed **once per quantity, not once per step** — after V1 this is another line
 in `check.sh`, not a remote call.
 
+**The 1.3 binary is in this repository, and static inspection does not need the
+remote box at all.** `xb/kdesigel/sigel` — ELF 32-bit i386, **not stripped**,
+dated 30 April 2003. `nm` and `objdump -d` run on it locally on x86-64. Verified
+by reproducing the remote session's figures exactly: 24 `MT_FitnessTranier`,
+0 `MT_FitnessTrainer`, 22 `SIG_GPFitnessTrainer`, 0
+`SIG_GPEnergyFitnessFunction`. *Several V9 questions were sent to the remote
+session that could have been answered here in seconds.* The remote box is still
+required for anything that must **run** — 32-bit execution against Qt 2.3 shared
+libraries, PVM, and every behavioural capture V1 and V5–V8 rest on. Symbols and
+disassembly are local.
+
 | # | Step | What it checks |
 |---|---|---|
 | V1 | ~~Capture 1.3's load-and-save round trip for three shipped `.exp`~~ **DONE 2026-08-27** — `verification-against-sigel-1.3/v1-1.3-roundtrip.txt` | the `Q2Dict` hash, all order-carrying containers, the parser and the serialiser |
@@ -952,8 +963,9 @@ in `check.sh`, not a remote call.
 **SCOPE — the 1.3 source and the 1.3 binary are not the same revision.**
 Everything above treats `x/kdesigelSources.1.3/` and the frozen binary as one
 reference. **They are not.** `nm sigel | grep -c MT_FitnessTranier` returns
-**24**; `MT_FitnessTrainer` returns **0**. Our source has 38 correct
-occurrences and **zero** misspellings, with the typo surviving only as a config
+**24**; `MT_FitnessTrainer` returns **0**. Our source has **38 lines** carrying the correct
+spelling (43 occurrences, over `src/` and `include/`) and **zero**
+misspellings, with the typo surviving only as a config
 token (`stdConf.mt:71`) and four string literals in `MT_FitnessTrainer.cpp`,
 where `:15` says it is kept deliberately. `SIG_GPFitnessTrainer` is spelled
 correctly in the same binary, so this is not a general mangling artifact.
@@ -999,15 +1011,43 @@ matter. Both riders check out against
 | shift must be logical, or sign bits reach the mask | `shr` | `next` is `unsigned long`, so `/ 65536` is unsigned division | safe **only because `% 32768` discards bits 31 and up**. If that mask ever moves or widens, the two part |
 | reduction sign | `idivl`, signed | `int % int`, signed | matches. `randomNumber` is always in `[0, 32767]`, so a negative `maximum` yields a non-negative result on both |
 
-**Seed 0 means "seed from the clock", and every shipped experiment uses it.**
-1.3's `setNewSeed(0)` computes `QTime(0,0,0,0).secsTo(QTime::currentTime())` —
-seconds since midnight. Ours is the same code
-(`SIG_Randomizer.cpp:39-47`), and `QTime(0,0)` is explicitly constructed, so
-§9's `QTime()` collision does not touch it. **All 12 shipped experiments carry
-`RANDOMSEED 0`, so as distributed they are clock-seeded.** This confirms the
-hypothesis formed during the determinism work, where seed 0 gave markedly less
-run-to-run agreement than 12345 and could not be explained at the time. V3 is
-right to pin both seeds.
+**Seed 0 means "seed from the clock".** 1.3's `setNewSeed(0)` computes
+`QTime(0,0,0,0).secsTo(QTime::currentTime())` — seconds since midnight. Ours is
+the same code (`SIG_Randomizer.cpp:39-47`), and `QTime(0,0)` is explicitly
+constructed, so §9's `QTime()` collision does not touch it. That much is solid,
+and it is **original 2001 code**, identical in `x/sigelSourceDistribution.1.0` —
+not something the port introduced.
+
+**What this section first concluded from that was false, and it cited the wrong
+key.** It said "all 12 shipped experiments carry `RANDOMSEED 0`, so as
+distributed they are clock-seeded", and used it to close out the determinism
+question. Both halves are wrong.
+
+**There are two `RANDOMSEED` keys per `.exp`, and only one of them seeds
+anything.** This is stated in §10 and the write-up ignored it. Measured over all
+14 files in `data/Experiments/`:
+
+| key | line | value | reaches a randomizer? |
+|---|---|---|---|
+| `SIG_SimulationParameters` | 10 | **0 in all 14** | **no.** Its only consumer in the tree is a GUI spinbox, `SIGEL_MasterGUI/SIG_SimulationParameter.cpp:168` |
+| `SIG_GPParameter` | 66 | **1 in 8, 0 in 6** | **yes** — `SIG_GPManager.cpp:52`, `randomizer( actExperiment.gpParameter.getRandomSeed() )` |
+
+So the key that is 0 everywhere is the one that seeds nothing, and the key that
+actually feeds `SIG_Randomizer` is **1** in 8 of the 14. "As distributed they are
+clock-seeded" is false for a majority of the corpus. *The count was wrong too —
+14 shipped `.exp`, as the rest of this file says; 12 is the tarball.*
+
+**There is a genuine unconditional clock seed, and it is not the one that was
+cited.** `SIG_GPPopulation.cpp:33` — the default constructor — builds
+`new SIGEL_Tools::SIG_Randomizer()`, which runs `setNewSeed(0)` and therefore
+the clock, **regardless of any `.exp` key**. That is a stronger explanation for
+run-to-run disagreement than the false one it replaces, and it does not depend
+on the file contents at all.
+
+**Consequence for V3.** Pinning "both `RANDOMSEED`s" is not sufficient and one
+of the two is not even necessary. A determinism run has to pin the **GP** key,
+and must also account for `SIG_GPPopulation`'s own randomizer, which no key
+reaches.
 
 **2. `SIG_GPPopulation::deleteIndividual` — D15 was written against the right
 reference.** Outer loop from `poolpos` to `size-2`; fetch successor,
@@ -1683,7 +1723,8 @@ compiled at all. It went with the Dynamo backend, its only caller
 - **`QQueue` on an empty queue** — the same trap one level up, and it caught
   D23's write-up backwards. Qt 2's `dequeue()` returned 0: it is
   `QGList::takeFirst` (`qqueue.h:59`), whose `unlink()` opens
-  `if ( curNode == 0 ) return 0;` (`qglist.cpp:436`). `head()`, `current()` and
+  `if ( curNode == 0 ) return 0;` (`qglist.cpp:438-439`; :436 is the
+  signature). `head()`, `current()` and
   `operator type *()` all route through `cfirst()` (`qglist.h:188`), also 0 on
   empty. **Every one of them asserts in Qt 6** — `dequeue()` is
   `QList::takeFirst()`, `head()` is `QList::first()`. Measured: abort at
@@ -2531,7 +2572,7 @@ which is why the list exists.
 | both `wasCanceled()` shrinks, D15 | need a `QApplication`; `sigel_eval` has none, so `if (qApp)` is false |
 | `readFromFile`'s shrink loop, D15 | the function runs on every load, but always on an **empty** pool, so the loop body never executes |
 | `sort`, D15 | no caller anywhere |
-| all **seven** D23 sites | linked and never called. `MT_Substitute`, `MT_Trainingset` and `MT_FitnessTrainer` **are** in `sigel_eval` and `pvm_link` — 59 symbols, pulled in by `moc/MT_GPSystem/MT_GPManager.o` on the link line — but `gdb` breakpoints on all three converted functions and on `MT_GPManager::checkForNewTCase` were not hit across a full evaluation. The classes that never link are **`MT_Classifier` and `MT_Evaluator`**, the queue's two fillers, both evolution-loop. *This row previously said the first three were the unlinked ones: inverted, and asserted without running the `nm` the D22 row had already established for exactly this* |
+| all **seven** D23 sites | linked and never called — *in `sigel_eval`, which is a test harness, not the program*. 1.3's master links the whole MT subsystem (`MT_Evaluator` 16 symbols, `MT_Classifier` 25, `MT_Statistics` 83, `MT_Substitute` 20, `MT_TrainingCase` 46, `MT_Trainingset` 14; all 0 in `sigel_slave`), so "never linked" is a fact about our harness and Phase C will link these. Detail: `MT_Substitute`, `MT_Trainingset` and `MT_FitnessTrainer` **are** in `sigel_eval` and `pvm_link` — 59 symbols, pulled in by `moc/MT_GPSystem/MT_GPManager.o` on the link line — but `gdb` breakpoints on all three converted functions and on `MT_GPManager::checkForNewTCase` were not hit across a full evaluation. The classes that never link are **`MT_Classifier` and `MT_Evaluator`**, the queue's two fillers, both evolution-loop. *This row previously said the first three were the unlinked ones: inverted, and asserted without running the `nm` the D22 row had already established for exactly this* |
 | **all six D22 sites** | `nm -C build/sigel_eval` finds **0** `SIG_GPOperations::` and **0** `SIG_GPCrossOverTournament::`, and the same in `pvm_link`. The objects are archived in `libSIGEL_GP.a` and never pulled into a link. The evolution loop needs `sigel`, which Phase C blocks |
 | all six `Q2CString` sites in `SIG_GPFitnessTrainer`, D21 | zero trainer symbols in `sigel_eval`; `pvm_link` links the object but never constructs a trainer, so they are **link-checked and never run** |
 | `SIG_GPPVMData`'s `+ 2`, D21 | `pvm_link` runs the function, but `pvm-check.sh` passes with `+ 1` **and** `+ 0` — `QList` over-allocation hides a shortfall under about 8 bytes |
@@ -3238,8 +3279,11 @@ version of this line said six and six, counting files instead of sites.*
 **The shim's `Q2Queue` had eleven methods; `TCaseBuffer` uses three.** *An
 earlier version of this line said eight, omitting `isEmpty`, `setAutoDelete`
 and `autoDelete` — the last two being the ownership pair this same step reasons
-about below.* `current`, `clear` and the implicit `operator T *` have no caller
-anywhere in the tree. **`head` and `remove` do**: `MT_GUI/MT_ExperimentWidget.cpp`
+about below.* `current` and the implicit `operator T *` have no caller anywhere in the
+tree. **`clear` does** — `q2compat_check.cpp:175`, in the self-check this same
+row declares in scope. *The first correction of this sentence fixed `head` and
+`remove` and left `clear` wrong, in the same clause, contradicted by the file
+it cites as authority one sentence later.* **`head` and `remove` do**: `MT_GUI/MT_ExperimentWidget.cpp`
 calls `remove()` at `:43` and `:51` and `head()` at `:48`. An earlier version
 said all five were callerless and the question of reproducing them was moot;
 that was wrong, and `q2compat_check.cpp:99` had already recorded the `remove`
@@ -3248,15 +3292,17 @@ half in the tree.
 **The divergence runs the other way from what this section first claimed.**
 Qt 2's `dequeue()` on an empty queue returned 0 and carried on:
 `QQueue::dequeue` is `QGList::takeFirst` (`qqueue.h:59`), which calls `unlink()`,
-which opens `if ( curNode == 0 ) return 0;` (`qglist.cpp:436`). The shim
+which opens `if ( curNode == 0 ) return 0;` (`qglist.cpp:438-439`; :436 is the
+signature). `takeFirst` is null-safe twice over — `Item d = n ? n->data : 0;`.
+The shim
 reproduced that faithfully. **Qt 6's `QQueue::dequeue()` is `QList::takeFirst()`,
 which is `Q_ASSERT(!isEmpty())`** — measured here: abort at `-O1 -g`, segfault
 under `-DQT_NO_DEBUG`. So the shim matched the reference and *`QQueue` is the
 divergence*, against the rule in SCOPE.
 
 It cannot fire through the only drain today. `MT_Trainingset::updateTSet`
-dequeues `count()` items, recounts, then dequeues the remainder: exactly the
-whole queue, never one more. **Confirmed by differential probe**, not by
+dequeues `count() - TSize` items, recounts, then dequeues the remainder:
+exactly the whole queue, never one more. **Confirmed by differential probe**, not by
 reading alone — `updateTSet`, `insertTCase` and `~MT_Trainingset` transcribed
 verbatim, templated over the queue type, and run against `Q2Queue<Case>` and
 `QQueue<Case *>` side by side under ASan and UBSan with a live-object counter:
@@ -3274,15 +3320,17 @@ returned 0 in 2003 and will abort under Qt 6. `MT_GUI` is in neither
 it. Recorded in §9's name-collision table.
 
 **The queue never owned its contents and still does not.** No `setAutoDelete`
-anywhere, so `~Q2Queue` freed nothing and `~QQueue` frees nothing.
+on `TCaseBuffer` — the self-check does call it, at `q2compat_check.cpp:171`, so
+"anywhere" was wrong — hence `~Q2Queue` freed nothing and `~QQueue` frees
+nothing.
 `dequeue()` transfers ownership out, and `updateTSet` either `delete`s the
 excess explicitly or hands each case to `insertTCase`. `~MT_Substitute`
-(`MT_Substitute.cpp:27`) touches only its three mutexes. **Anything left in the
+(`MT_Substitute.cpp:26`) touches only its three mutexes. **Anything left in the
 queue at destruction leaks** — pre-existing, unchanged, and now written down.
 
 **The drain runs under a real lock, and the conversion is neutral on it.**
 `MT_Substitute::tCaseBufferMutex` is a `pthread_mutex_t` (`MT_Substitute.h:61`),
-initialised at `MT_Substitute.cpp:22`, taken by both producers
+initialised at `MT_Substitute.cpp:21`, taken by both producers
 (`MT_Classifier.cpp:137/151`, `MT_Evaluator.cpp:498/507`) and by the drain
 (`MT_GPManager.cpp:705/713`). `Q2Queue` was already implemented over
 `Q2PtrList`, whose storage is `QList<T *>`, so storage, reallocation and
