@@ -5,9 +5,9 @@ port. SIGEL shipped two physics engines and chose one at run time. Dynamo
 crashed on most shipped robots, its own authors labelled it "not recommended",
 and all 14 shipped experiments selected DynaMechs. It is gone.
 
-**Read "What was actually done" and stop.** Everything from "Why the Dynamo path
-is not usable" onward is the frozen 2026-08-20 case for the decision, kept so it
-can be re-read, corrected in place where execution proved it wrong.
+This file records what was removed, what was deliberately kept and why, and the
+three follow-ups that were not taken. It is not a proposal — the decision has
+shipped.
 
 ---
 
@@ -71,17 +71,14 @@ uninitialised. Verified by building a copy of `sigel_eval` without its own
 `SIMULATIONLIBRARY 0`: one line of diagnostic, then abort, exit 134. It never
 falls through and never runs DynaMechs.
 
-**But "loud" is only true of `sigel_eval`, and the first draft of this entry
-and of the code comment both had the reason backwards.** The throw clears all
-six fitness functions, which construct `SIG_Simulation` outside their own `try`
-— but one frame further out `sigel_slave.cpp:361-367` wraps `evalFitness()` in
+**"Loud" is true of `sigel_eval` only.** The throw clears all six fitness
+functions, which construct `SIG_Simulation` outside their own `try` — but one
+frame further out, `sigel_slave.cpp:361-367` wraps `evalFitness()` in
 `catch (SIG_Exception &) { fitnessValue = 0; }`. So under PVM the exception is
-swallowed and the individual is scored 0.0 as though it had been evaluated,
-which is precisely the failure `SIG_GPSimpleRecorder.cpp:42` documents. That
-makes the printed line the only evidence that reaches anyone, and it is why the
-message goes to `std::cerr` rather than the buffered `SIG_IO::cerr` — a reason
-this change got right by accident and now states correctly. Hardening that
-swallow is a pre-existing defect and out of scope here.
+swallowed and the individual is scored 0.0 as though evaluated, the failure
+`SIG_GPSimpleRecorder.cpp:42` documents. The printed line is therefore the only
+evidence anyone gets, which is why it goes to `std::cerr` and not the buffered
+`SIG_IO::cerr`. Hardening that `catch` is pre-existing and out of scope.
 
 **Three dead includes and one wrong one.** `SIG_SimulationQueries.cpp` included
 `SIG_DynaLink.h`, `SIG_Dyna.h` and `SIG_DynaSensor.h` and used none of them.
@@ -113,8 +110,7 @@ in `SIGEL_Simulation` lose the 39 filenames that no longer exist, and
 blocks: the 26 files plus `moc_SIG_DynaSystem.cpp` and its two custom-build
 rules.
 
-The deletion commit said "three" and **missed `kdesigel.kdevprj`**, found by
-review and fixed after. That file is not a leftover: both `Makefile.am` carry
+**`kdesigel.kdevprj` is the fourth, and it is not a leftover.** Both `Makefile.am` carry
 the marker `####### kdevelop will overwrite this part!!! (begin)`, so the
 `.kdevprj` is what KDevelop 2 **regenerates them from**. Left alone, the next
 regeneration would put `SIG_DynaSystem.cpp` and its twelve siblings back into
@@ -125,9 +121,7 @@ checked and never named them.
 
 ### Kept, and why
 
-**The maths library, and more of Dynamo than this document predicted.** The
-prediction was `Cpp/{pointvector,matrix,list}.cpp`. That is wrong, and the
-measurement is the useful part of this entry:
+**The maths library, and more of Dynamo than expected.**
 
 - `pointvector.cpp` and `list.cpp` are genuinely empty — "no non-inline
   methods". `DL_vector` and `DL_point` really are header-only.
@@ -191,11 +185,12 @@ dropping it is a one-line follow-up, to be measured the way `libdynalib.a` was.
 | `fitness-check.sh` vs baseline | **empty diff**, 42 of 42 |
 | `sigel_eval -selfcheck` | pass |
 | sanitized `fitness-check.sh build` | **empty diff**, no ASan or UBSan report |
-| `check.sh` | **105 pass, 4 fail**, 322 warnings |
+| `check.sh` | **105 pass, 4 fail** |
 
-`check.sh` was 118 pass, 4 fail, 338 warnings. The pass count falls by exactly
-13 because 13 fewer `.cpp` exist, and "headers standalone" by exactly 13 for the
-same reason. **The 4 failures are the same 4 files** — `MT_Controller.cpp`,
+`check.sh` was 118 pass, 4 fail before this change. The pass count falls by
+exactly 13 because 13 fewer `.cpp` exist, and "headers standalone" by exactly 13
+for the same reason. The warning count is not quoted here because Phase D keeps
+moving it; §7 of PORTING.md has the current figure. **The 4 failures are the same 4 files** — `MT_Controller.cpp`,
 `SIG_GUIGPManager.cpp` and the two ZORC files — and the one header failure is
 the same one. No fitness value and no line of container ordering moved, which
 is what "dead code" was supposed to mean.
@@ -219,11 +214,8 @@ is what "dead code" was supposed to mean.
 
 ### Follow-up this change deliberately did not take
 
-1. ~~**`libsolid.a`.**~~ **DONE** — see "SOLID and qhull went too" above. qhull
-   went with it, because it existed only to give SOLID its convex hulls.
-2. **The GUI can still author an experiment that now aborts.**
-   **Four surviving surfaces, not one** — the first draft named only the radio
-   button. `SIG_SimulationParameter.cpp:121` calls
+1. **The GUI can still author an experiment that now aborts.**
+   **Four surviving surfaces**: `SIG_SimulationParameter.cpp:121` calls
    `setSimulationLibrary(DynaMo)`; `:224-225` reads the value back to re-check
    that button; `SIG_SimulationParameterBase.ui:143` offers "Dynamo  (not
    recommended)" and `:566-568` is a whole tab titled `DynaMo`; and
@@ -231,7 +223,7 @@ is what "dead code" was supposed to mean.
    radio button leaves two dead tabs and a read-back for a value nothing can
    set.
 
-   **And the throw has a second consequence the first draft missed.**
+   **The throw has a second consequence.**
    `SIG_SimulationVisualisationWidget.cpp:376-381` does
    `delete visualisation;` and then assigns the result of a constructor that
    now throws — so `visualisation` keeps a freed pointer. Ten sites in that
@@ -241,14 +233,12 @@ is what "dead code" was supposed to mean.
    turns a conditional hazard into a certain one for every robot. It is
    unreachable today only because `SIGEL_SlaveGUI` does not compile. The Phase
    C fix is `visualisation = nullptr;` between the delete and the new.
-3. **`SIG_SimulationQueries.cpp`: all seven non-self includes are dead**, not
-   the four an earlier draft listed. Verified by compiling a translation unit
+2. **`SIG_SimulationQueries.cpp`: all seven non-self includes are dead.**
+   Verified by compiling a translation unit
    holding only the class's own header and the empty constructor, under
    `check.sh`'s full flags: it passes. `<qdatetime.h>` and `SIGEL_Tools/SIG_IO.h`
    are dead too. This change removed only the three that named deleted files.
-4. ~~**`future_refactorings.md` cites deleted code**~~ — corrected 2026-08-28.
-
-5. **Extract the maths into a small local header, and drop `libdynalib.a`.**
+3. **Extract the maths into a small local header, and drop `libdynalib.a`.**
    *Decided 2026-08-28, deliberately not now.* The archive survives at 14
    objects — ~3,000 lines of physics — for **one line**: `DL_matrix::invert`
    reports a singular matrix through the physics engine's global system object
@@ -298,20 +288,19 @@ at code no shipped experiment executes**, and have to be re-pointed at
 `SIG_DynaMechsSimulationQueries` / `SIG_DynaMechsCommandInterface` before they
 can say anything about this port.
 
-### Corrections to the frozen analysis below
+### Two repo-state findings from checking this work
 
-The analysis from 2026-08-20 is kept verbatim so the decision can be re-read.
-Five of its claims did not survive execution, and one of its section headings
-is wrong; all six are measured, and none of them changes the decision.
+**Nothing vendored was deleted.** That tree is untracked and is left exactly as
+it extracts; 10,084 lines merely stopped being compiled. `diff -rq` against a
+fresh extract shows five differences across the whole vendored tree: the four
+recorded patches, plus the `.sigel-patched` stamp — **and three stale `.rej`
+files** left from 2026-08-22 (`cv97/JVector.h.rej`,
+`dynamechs/dm/svd_linpack.cpp.rej`, `SOLID-2.0/include/3D/Basic.h.rej`). Those
+pre-date this work but mean the `make unpatch` and re-extract cycle is not as
+clean as PORTING.md describes.
 
-| claim below | measured 2026-08-28 |
-|---|---|
-| "**~21,100 lines of Dynamo deleted**", and the "Deleted" heading above covering the vendored `.cpp` | **Nothing vendored was deleted.** The tarball tree is untracked and is left exactly as it extracts; 10,084 lines merely stopped being compiled. `diff -rq` against a fresh extract shows one difference **within `Dynamo/`** — the recorded `containerlist.h` patch. Across the whole vendored tree it shows five, the other four being the other recorded patches, plus the `.sigel-patched` stamp and three stale `.rej` files left from 2026-08-22 (`cv97/JVector.h.rej`, `dynamechs/dm/svd_linpack.cpp.rej`, `SOLID-2.0/include/3D/Basic.h.rej`). The `.rej` files pre-date this change but mean the `make unpatch` / re-extract cycle is not as clean as PORTING.md describes |
-| "**SOLID deleted entirely**, ~4,800 lines" | **not done.** `libsolid.a` is still built and still linked. Its 15 API references really were all in deleted files, so it is dead weight — see the follow-up list above |
-| "**8 old-style exception specifications gone**" | **this deletion gained none.** All 8 were on `SIG_DynaSystem`, and the port had already removed every one of them before 2026-08-28. The statement was true of the 2003 tarball, not of `HEAD` |
-| "`SIG_DynaSystem.cpp:268` … Double free" | **already fixed** by D13 before the deletion — the line read `delete dynaDrives[k];` with the 2003 behaviour in a comment. It was not a live defect being removed |
-| "the DynaMechs adapters we keep total **2,013** lines" | **2,077.** They grew with Phase V5's MDH probe. The Dynamo side of the comparison was re-measured for this entry and the DynaMechs side was not |
-| `SIG_DynaSystem.cpp:800`, `SIG_DynaMoSimulationQueries.cpp:45` | off by one — the null assignment was at `:801` and the dereference of `sensor.joint->joint` at `:46`. The defects are real and were read correctly; only the line numbers drifted |
+**The DynaMechs adapters are 2,077 lines**, not the 2,013 measured on
+2026-08-20. They grew with Phase V5's MDH probe.
 
 ### Still not fixed, deliberately
 
@@ -322,220 +311,52 @@ become a thrown exception. Left alone to keep this changeset single-purpose.
 
 ---
 
-## Why the Dynamo path is not usable
+## What was given up
 
-### It crashes on any robot with a joint sensor
+Measured 2026-08-20, before the decision, and unchanged by it.
 
-`SIG_DynaSystem.cpp:800` creates a sensor and sets its joint pointer to zero:
+**Two joint types become dead data.** `SIG_GlueJoint` (186 lines) is still
+parsed and still editable, and no simulator reads it. `SIG_CylindricalJoint`
+(219) was already dead — both backends dropped it to `default:`. No shipped
+robot uses either: all joints in all 7 `.rrb` are rotational — 18, 12, 9, 6, 4,
+3, 1.
 
-```cpp
-dynaSensors[sz]->joint = 0;
-```
+**Four properties lose their only reader.** `SIG_Material::getFrictionValue`,
+`getElasticity` and `SIG_Environment::getVeloDamping` were read by
+`SIG_DynaSystem.cpp` alone and are now write-only: parsed, editable, read by
+nothing. `getYPlaneLevel` survives for the two renderers. DynaMechs uses global
+friction constants rather than a per-material-pair table, so **per-material
+friction is the one genuine capability loss.**
 
-Nothing ever assigns it. Then `SIG_DynaSensor.cpp:28` does:
+**Six simulation parameters become dead**: `getAnalytical`, `getIntegrator`,
+`getMaximalIterations`, `getMaximalCollisionLoops`, `getSkipFrames`,
+`getSolveMode`. They join `getMaximalError` and `getMaximalSOLIDIterations`,
+which were already parsed, displayed, editable and simulated by nothing.
 
-```cpp
-switch (joint->joint->getJointType())
-```
+**In full:** glue joints, closed kinematic loops, link-to-link self-collision,
+mesh-accurate collision geometry, per-material-pair friction. **None of it is
+used by any shipped robot or experiment.**
 
-and `SIG_DynaMoSimulationQueries.cpp:45` dereferences `sensor.joint->joint`
-directly. **Null pointer dereference on the first SENSE instruction.**
+---
 
-Joint sensors per shipped robot:
+## Why Dynamo was the one to go
 
-| robot | joint sensors |
-|---|---|
-| walker | 18 |
-| insect | 12 |
-| octopus | 9 |
-| runner | 6 |
-| twoBases | 1 |
-| hammer | 0 |
-| shortHammer | 0 |
+**It crashes on any robot with a joint sensor.** `SIG_DynaSystem.cpp:801` sets
+a new sensor's joint pointer to zero and nothing ever assigns it. Then
+`SIG_DynaSensor.cpp:28` does `switch (joint->joint->getJointType())`, and
+`SIG_DynaMoSimulationQueries.cpp:46` dereferences `sensor.joint->joint`
+directly. A null dereference on the first `SENSE` instruction.
 
-**5 of 7 robots cannot run on Dynamo at all.**
+Joint sensors per shipped robot: walker 18, insect 12, octopus 9, runner 6,
+twoBases 1, hammer 0, shortHammer 0. **5 of 7 robots could not run on Dynamo at
+all.**
 
-### Other defects in the same files
+Two more defects in the same files: `SIG_DynaSystem.cpp:335` inverts the
+no-collision test, permitting collision precisely when the pair is on the
+must-not-collide list; and `SIG_Simulation.cpp:120-149` throws on every Dynamo
+diagnostic, including plain `"Warning:"` lines.
 
-- `SIG_DynaSystem.cpp:268` — `clearAllDynamics` deletes `dynaJoints[k]` inside
-  the loop over *drives*. The two arrays grow independently. Double free.
-- `SIG_DynaSystem.cpp:335` — the no-collision test is inverted:
-  `if (getNoCollides().find(other) != -1)` permits collision precisely when the
-  pair is on the must-not-collide list.
-- `SIG_Simulation.cpp:120-149` — every Dynamo diagnostic, including plain
-  `"Warning:"` lines, sets `stopSimulation = true` and throws.
-
-### The authors' own verdict
-
-`ui/SIGEL_MasterUI/SIG_SimulationParameterBase.ui:143,154`:
-
-```
-"Dynamo  (not recommended)"
-"DynaMechs   (preferred)"
-```
-
+**The authors agreed.** `SIG_SimulationParameterBase.ui:143,154` labels the two
+choices `"Dynamo  (not recommended)"` and `"DynaMechs   (preferred)"`, and
 `SIG_Experiment.cpp:630` refuses to open the Robot Information dialog unless
-DynaMechs is selected.
-
----
-
-## WHAT WE THROW AWAY ON THE SIGEL SIDE
-
-This is the part that matters. Deleting a vendored library is easy; deleting our
-own code is the decision.
-
-### 1. Thirteen file pairs — 3,247 lines, verified
-
-All in `SIGEL_Simulation`. These exist only to drive Dynamo:
-
-| file pair | lines |
-|---|---|
-| `SIG_DynaSystem` | **1,092** |
-| `SIG_DynaMoSimulationQueries` | 329 |
-| `SIG_DynaLink` | 282 |
-| `SIG_RotationalController` | 247 |
-| `SIG_DynaDrive` | 183 |
-| `SIG_DynaSensor` | 175 |
-| `SIG_TranslationalController` | 172 |
-| `SIG_DynaCallbacks` | 163 |
-| `SIG_DynaMoSimulationData` | 145 |
-| `SIG_DynaMoCommandInterface` | 136 |
-| `SIG_Dyna` | 122 |
-| `SIG_DynaSystemWrongNumberException` | 102 |
-| `SIG_DynaJoint` | 99 |
-| **total** | **3,247** |
-
-For comparison, the DynaMechs adapters we keep total 2,013 lines.
-
-### 2. Two robot joint types become dead data
-
-| class | lines | status after |
-|---|---|---|
-| `SIG_GlueJoint` | 186 | still parsed, still editable, no simulator reads it |
-| `SIG_CylindricalJoint` | 219 | already dead — both backends drop it to `default:` |
-
-**No shipped robot uses either.** All joints in all 7 `.rrb` models are
-rotational: 18, 12, 9, 6, 4, 3, 1 — zero glue, zero cylindrical, zero
-translational.
-
-The robot compiler still accepts glue joints (`SIG_RobotCompiler.cpp:535`) and
-would reach DynaMechs' `exit(1)` at
-`SIG_DynaMechsSimulationData.cpp:394`. **That `exit(1)` should become a thrown
-exception first, whatever we decide.**
-
-### 3. Four material and environment properties lose their only reader
-
-| property | read today by |
-|---|---|
-| `SIG_Material::getFrictionValue` | `SIG_DynaSystem.cpp` only |
-| `SIG_Material::getElasticity` | `SIG_DynaSystem.cpp` only |
-| `SIG_Environment::getVeloDamping` | `SIG_DynaSystem.cpp` only |
-| `SIG_Environment::getYPlaneLevel` | `SIG_DynaSystem.cpp` + the two renderers |
-
-The first three become write-only: parsed from the robot file, editable in the
-GUI, read by nothing. `getYPlaneLevel` survives for rendering.
-
-DynaMechs uses global friction constants instead of a per-material-pair table,
-so **per-material friction is the one genuine capability loss.**
-
-### 4. Six simulation parameters become dead
-
-`getAnalytical`, `getIntegrator`, `getMaximalIterations`,
-`getMaximalCollisionLoops`, `getSkipFrames`, `getSolveMode`.
-
-Two more — `getMaximalError`, `getMaximalSOLIDIterations` — are written by the
-GUI and read by nobody **today**. They are already dead.
-
-### 5. Summary of capability lost
-
-Glue joints · closed kinematic loops · link-to-link self-collision ·
-mesh-accurate collision geometry · per-material-pair friction.
-
-**None of it is used by any shipped robot or experiment.**
-
----
-
-## What we gain
-
-- **3,247 lines of our own code deleted**, including the single largest file in
-  `SIGEL_Simulation`.
-- **~21,100 lines of Dynamo deleted** — only the maths headers stay.
-- **SOLID deleted entirely**, ~4,800 lines. Verified: 15 references in exactly 3
-  files, all Dynamo (`SIG_DynaSystem.cpp/.h`, `SIG_DynaLink.h`).
-- **8 old-style exception specifications gone.** C++17 rejects these. This
-  already bit the port: step A4 had to delete `SIG_Link.cpp`'s include of
-  `SIG_DynaSystem.h` for exactly this reason. The DynaMechs adapters have zero.
-- **One `moc` target gone** — `SIG_DynaSystem` is a `QObject`.
-
----
-
-## What Dynamo does that DynaMechs cannot, and the reverse
-
-| | Dynamo | DynaMechs |
-|---|---|---|
-| Joints | rotational, translational, **glue** | rotational, translational only |
-| Topology | closed loops possible | tree only |
-| Sensors | joint only — **and it crashes** | joint, **pitch/roll**, **contact** |
-| Drives | force only | force **and positional servo** |
-| Collision | SOLID, full mesh, link↔link and link↔ground | penalty springs, **ground only** |
-| Ground | flat plane | **terrain heightfield** |
-| Friction | **per material pair** | global constants |
-| Integrators | Euler, DoubleEuler, RK2, RK4 | Euler, RK4, **RK45** |
-| `getUsedForces()` | `return 0;` — never implemented | real |
-| `getNumberOfTouchdowns()` | `return 0;` — never implemented | real |
-
-Because of those last two, `StepperFitnessFunction` and `ForceFitnessFunction`
-silently return zero under Dynamo.
-
----
-
-## Why we cannot simply drop Dynamo
-
-**Dynamo is also the maths library for the entire codebase.**
-
-| use | references |
-|---|---|
-| `DL_vector` | 606 |
-| `DL_Scalar` | 308 (it is `#define DL_Scalar double`) |
-| `DL_matrix` | 138 |
-| `DL_point` | 49 |
-| **maths total** | **1,101 across 93 files** |
-| physics total | 41 across 12 files |
-
-The maths subset is self-contained and contains no physics:
-
-```
-Inc/{pointvector,matrix,scalar,boolean,list,NaN}.h
-Cpp/{pointvector,matrix,list}.cpp          ~1,133 lines
-```
-
-Keep that. Delete the rest of `Dynamo/Src`.
-
-One edit needed: `SIG_Environment.h:26` includes `<constraint.h>` only to reach
-`DL_vector`. Change it to `<pointvector.h>`.
-
----
-
-## If we dropped DynaMechs instead
-
-Worse in every direction, and the survivor is the broken one.
-
-- `SIG_Environment` **holds a `dmEnvironment` by value** (`SIG_Environment.h:29,447`).
-  DynaMechs is in the core domain model, not just an adapter.
-- `SIG_EnvironmentRenderer.cpp:129,507` renders terrain through it.
-- All 14 experiments would point at a backend that crashes on 5 of 7 robots.
-- 2,013 lines removed instead of 3,247 — **less code deleted, more capability
-  lost.**
-
----
-
-## Evidence quality
-
-**Verified** — file contents, line numbers and all counts, measured with Python
-and `command grep`. Note: plain `grep` in this environment wraps `ugrep -I`,
-which silently skips Latin-1 and CRLF files; many SIGEL files are exactly that,
-so plain `grep` counts are not trustworthy.
-
-**Inferred, not observed** — the null dereference and the double free are read
-from the source. Nothing was built or run. The 2003 binary does run on
-`sigel-x86`, so both could be confirmed there if the decision needs it.
+DynaMechs is selected. All 14 shipped experiments carry `SIMULATIONLIBRARY 1`.
