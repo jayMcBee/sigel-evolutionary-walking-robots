@@ -30,7 +30,7 @@ build and run, because nothing else can be verified without it — see §3.
 | B — ownership explicit | **subsumed by Phase D**, which deletes the containers rather than converting them. **11** `setAutoDelete` left in core, re-measured 2026-08-29 after D11 — 10 in `SIGEL_GP`, 1 in `MT_Control`, **0 in `SIGEL_Robot`**: D11 deleted `SIG_Body.cpp:54`, the last one, and left this row saying 12. *Before that it read 13 with 2 in `SIGEL_Robot`, where there was one. Three readings of the same row, three corrections, each by review.* **Not all of them are unreachable, and an earlier version of this row said they were.** `SIG_GPPopulation::pool` is owning, is constructed on every `sigel_eval` run and takes 100 `insert()`s inside both gates — see "What the gates actually reach" in §10. The **6** in `SIG_GPFitnessTrainer` and `SIG_GPManager` are the ones Phase C still blocks; the row said 7, which did not even add up against the 10 in the same sentence |
 | R — build and run | core builds and runs. **No longer checked only against itself** — Phase V has confirmed both the ordering and the arithmetic against the 1.3 binary, §7 |
 | T — old-Qt tool container | **done 2026-08-27.** `tools/qtmig`, §4 |
-| D — delete the shim, migrate the data | **D1–D20 done.** `Q2Dict`, `Q2DictIterator` and `Q2Array` gone; `Q2PtrVector` off the simulation path; `SIG_GPFitnessTrainer` and `SIG_GPFullDataRecorder` fully converted. Shim 806 → **530** lines, included by **34** files (whole-repo count). Remaining, measured 2026-08-29 after D20: `Q2PtrList` 39, `Q2PtrVector` 52, `Q2CString` 19, `Q2Queue` 16, `Q2ListIterator` 8, `Q2ValueList` 12 — the `Q2PtrVector` bulk is `SIG_GPManager::tours`, which **cannot be compiled** until Phase C. §10 |
+| D — delete the shim, migrate the data | **D1–D22 done.** `Q2Dict`, `Q2DictIterator`, `Q2Array` and `Q2CString` gone from all code; the simulation path, `SIG_GPFitnessTrainer`, `SIG_GPFullDataRecorder` and `crossOver` all converted. Shim 806 → **530** lines, included by **30** files. Remaining, measured 2026-08-29 after D22: `Q2PtrList` 39, `Q2PtrVector` 46, `Q2Queue` 16, `Q2ValueList` 12, `Q2ListIterator` 8, `Q2CString` 15 — all six figures include the shim's own header and self-check. The `Q2PtrVector` bulk is `SIG_GPManager::tours`, which **cannot be linked** until Phase C. §10 |
 | P — PVM | **DONE 2026-08-28.** Vendored 3.4.3 replaced by upstream 3.4.6; nine patches carry the four config lines and Debian's eight source fixes; `libpvm3.a` and `pvmd3` build; SIGEL's two PVM objects link against them and `SIG_GPPVMData` round-trips through real PVM. `sigel`/`sigel_slave` still need Phase C. §7 |
 | C — GUI | **not started, AUTHORIZED 2026-08-27 per D24.** ~450 Qt 2 sites + 20 forms |
 | V — check against the 1.3 binary | **V1, V5's MDH probe, V6, V7 and V8 all done, all PASS.** Ordering: 10 of 10 container orders match. Arithmetic: `twoBases` exact bit for bit, `octopus` 9/9 with three joints exact and 5 ulp worst. **V6, V7 and V8 done 2026-08-29** — friction and no-collide negotiation, their four remaining rules, and the GP parameter blocks captured *before* their conversion. `verification-against-sigel-1.3/v6`, `v7`, `v8`. V2–V4 not started; V5's sensor and force probes are **invalid as specified** — both target Dynamo-only functions, deleted 2026-08-28. §7 |
@@ -2437,6 +2437,7 @@ which is why the list exists.
 | both `wasCanceled()` shrinks, D15 | need a `QApplication`; `sigel_eval` has none, so `if (qApp)` is false |
 | `readFromFile`'s shrink loop, D15 | the function runs on every load, but always on an **empty** pool, so the loop body never executes |
 | `sort`, D15 | no caller anywhere |
+| **all six D22 sites** | `nm -C build/sigel_eval` finds **0** `SIG_GPOperations::` and **0** `SIG_GPCrossOverTournament::`, and the same in `pvm_link`. The objects are archived in `libSIGEL_GP.a` and never pulled into a link. The evolution loop needs `sigel`, which Phase C blocks |
 | all six `Q2CString` sites in `SIG_GPFitnessTrainer`, D21 | zero trainer symbols in `sigel_eval`; `pvm_link` links the object but never constructs a trainer, so they are **link-checked and never run** |
 | `SIG_GPPVMData`'s `+ 2`, D21 | `pvm_link` runs the function, but `pvm-check.sh` passes with `+ 1` **and** `+ 0` — `QList` over-allocation hides a shortfall under about 8 bytes |
 | all five **unlinked** fitness functions' walks, D20 — `Adaptive`, `Zorc`, `Stepper`, `RealSpeed`, `Force` — plus `SIG_EarlyRunTermSimulation` | `nm` finds 0 symbols for each in `sigel_eval`. `Stepper` is the **only reader of `touchdowns`** in the tree; `Force` the only reader of `listForces` and the only code that ever frees a force vector |
@@ -3096,20 +3097,33 @@ copy freed nothing while the original might.
 both destructors freed nothing. The two individuals are handed to
 `SIG_GPPopulation::setIndividual`, which takes ownership — the same call whose
 free of the losing individual D15 had to write out. `QList` never frees a
-pointer, so this conversion moves **no ownership at all**, which is the first
-time in Phase D that has been true of an owning-looking container.
+pointer, so this conversion moves **no ownership at all**.
+
+*D22 called that "the first time in Phase D". It is not — **D9 already did
+exactly this** for `drives` and `sensors`, same type, same `del`-never-set
+finding, same `insert`→assignment rewrite, and its own text says "this step
+moved no ownership; it only changed the spelling". D11 adds two more. What is
+actually new here is **returned by value**, not "owned nothing".*
 
 `insert(0, x)` and `insert(1, x)` go into slots a `QList(2)` has just
 value-initialised to null, so `insert` deleted nothing and a plain assignment
 is exact.
 
-Six sites, three files. `SIG_GPOperations.cpp` and
-`SIG_GPCrossOverTournament.cpp` both dropped `compat/q2compat.h`; its reach
-falls **33 → 30** files.
+Six sites, three files — and **all three** dropped `compat/q2compat.h`,
+including `SIG_GPOperations.h`, which is why its reach falls by three:
+**33 → 30**. *D22 named only the two `.cpp`, so its enumeration and its
+arithmetic contradicted each other.*
 
-**Nothing executes any of it.** Neither file is linked into `sigel_eval` —
-crossover only runs during an evolution, which needs `sigel_slave`, which needs
-Phase C. Coverage is `check.sh`'s syntax pass and nothing else.
+**Nothing executes any of it**, and the accurate statement is one notch
+stronger than D22's "syntax pass": both files are **fully compiled under ASan
+and UBSan into `libSIGEL_GP.a`, archived, and never pulled into a link**. `nm`
+finds zero symbols from either class in `sigel_eval` and in `pvm_link`.
+
+*D22 also pointed at the wrong binary.* `SIG_GPCrossOverTournament` is
+constructed by `SIG_GPManager.cpp:336`, which is **master-side** — the binary
+that would run `crossOver` is `sigel`, not `sigel_slave`. The conclusion holds,
+since neither links, but the reasoning was borrowed from D21's trainer and does
+not transfer.
 
 **Nothing here was worth asking the 1.3 binary.** `crossOver` touches no file
 and produces no observable output; its crossover points come from the
