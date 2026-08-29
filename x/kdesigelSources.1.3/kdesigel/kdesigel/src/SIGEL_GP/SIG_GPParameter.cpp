@@ -62,7 +62,8 @@ SIGEL_GP::SIG_GPParameter::SIG_GPParameter(QString parameter)
 SIGEL_GP::SIG_GPParameter::~SIG_GPParameter()
 {
   // This class owns the hosts in hostList.
-  hostList.deleteContents();
+  qDeleteAll( hostList );
+  hostList.clear();
 };
 
 void SIGEL_GP::SIG_GPParameter::setRandomSeed (int seed)
@@ -378,7 +379,8 @@ void SIGEL_GP::SIG_GPParameter::setFitnessName(QString name)
 void SIGEL_GP::SIG_GPParameter::readFromFile(QTextStream & file)
 {
   QString s;
-  hostList.deleteContents();
+  qDeleteAll( hostList );
+  hostList.clear();
 
   while (!file.atEnd()) {
    s = file.readLine();
@@ -717,25 +719,21 @@ void SIGEL_GP::SIG_GPParameter::writeToFile(QTextStream & file)
   file << "TERMINATIONDURATIONSECONDS\n";
   file << getTerminationDurationSeconds() << "\n";
 
-  SIGEL_GP::SIG_GPPVMHost *actHost = hostList.first();
-
-  while (actHost)
+  for (SIGEL_GP::SIG_GPPVMHost *actHost : hostList)
     {
       file << "PVMHOST\n";
       file << actHost->print();
-
-      actHost = hostList.next();
     };
 
 };
 
 
-Q2PtrList< SIGEL_GP::SIG_GPPVMHost > const &SIGEL_GP::SIG_GPParameter::getHostList() const
+QList< SIGEL_GP::SIG_GPPVMHost * > const &SIGEL_GP::SIG_GPParameter::getHostList() const
 {
   return hostList;
 };
 
-Q2PtrList< SIGEL_GP::SIG_GPPVMHost > &SIGEL_GP::SIG_GPParameter::getHostList()
+QList< SIGEL_GP::SIG_GPPVMHost * > &SIGEL_GP::SIG_GPParameter::getHostList()
 {
   return hostList;
 };

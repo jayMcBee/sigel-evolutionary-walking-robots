@@ -73,21 +73,15 @@ SIGEL_GP::SIG_GPFitnessTrainer::SIG_GPFitnessTrainer(SIGEL_GP::SIG_GPExperiment&
     pvmTasks.insert( i, 0 );
 
   int noOfActiveHosts = 0;
-  SIG_GPPVMHost *actHost = exp.gpParameter.getHostList().first();
-
-  while (actHost) {
-
+  for (SIG_GPPVMHost *actHost : exp.gpParameter.getHostList())
     if (actHost->enabled)
       noOfActiveHosts++;
-      actHost = exp.gpParameter.getHostList().next();
-    };
 
   pvmHosts.resize( noOfActiveHosts );
 
   int hostCounter = 0;
-  actHost = exp.gpParameter.getHostList().first();
 
-  while (actHost) {
+  for (SIG_GPPVMHost *actHost : exp.gpParameter.getHostList()) {
     if (actHost->enabled) {
       pvmHosts.insert( hostCounter, new SIG_GPActivePVMHost( *actHost ) );
 
@@ -105,8 +99,6 @@ SIGEL_GP::SIG_GPFitnessTrainer::SIG_GPFitnessTrainer(SIGEL_GP::SIG_GPExperiment&
 
       hostCounter++;
     };
-
-    actHost = exp.gpParameter.getHostList().next();
   };
 };
 

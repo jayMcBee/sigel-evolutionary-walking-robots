@@ -23,7 +23,7 @@
 #ifndef SIGEL_GP_SIG_GPPARAMETER_H
 #define SIGEL_GP_SIG_GPPARAMETER_H
 
-#include "compat/q2compat.h"
+#include <QList>
 #include "SIGEL_GP/SIG_GPPVMHost.h"
 #include "SIGEL_Program/SIG_ProgramLine.h"
 
@@ -332,7 +332,7 @@ namespace SIGEL_GP
   QString fitnessName;
 
   private:
-  Q2PtrList< SIG_GPPVMHost > hostList;
+  QList< SIG_GPPVMHost * > hostList;
 
   private:
   int timeOutMinutes;
@@ -424,10 +424,10 @@ namespace SIGEL_GP
  int getMinIndLength() const;
 
   public:
- Q2PtrList< SIG_GPPVMHost > const &getHostList() const;
+ QList< SIG_GPPVMHost * > const &getHostList() const;
 
   public:
-  Q2PtrList< SIG_GPPVMHost > &getHostList();
+  QList< SIG_GPPVMHost * > &getHostList();
 
  /**
  * This sets the max length of an individual of the parameter.
