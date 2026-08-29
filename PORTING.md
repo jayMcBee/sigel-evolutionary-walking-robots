@@ -1395,11 +1395,12 @@ windows, and nothing happens behind the Start button.
    D15, and D15 missed one of them; see there.** `SIG_GPFitnessTrainer.cpp:194`,
    `:355`, `:378` remain. Line numbers here were pre-D15 and are not maintained;
    find these by name, not by line.
-   Three `Q2PtrList` sites belong here too: `SIG_GPManager.cpp:437`, `:1519`
-   (`fitTaskList`) and `SIG_GPFitnessTrainer.cpp:489` (`toSpawnList`).
+   Two `Q2PtrList` sites belong here too: `SIG_GPManager.cpp:437`, `:1519`
+   (`fitTaskList`). *`toSpawnList` was a third and is done — D18.*
 2. **Owning containers with no free path**, relying on `~Q2PtrList` /
-   `~Q2PtrVector`. Fixed for the 8 converted; `~SIG_GPFitnessTrainer` still
-   leaves `pvmHosts`, `pvmTasks` and `toSpawnList` to `setAutoDelete`.
+   `~Q2PtrVector`. `~SIG_GPFitnessTrainer` still leaves **`pvmHosts` and
+   `pvmTasks`** to `setAutoDelete`. *`toSpawnList` was the third and is done —
+   D18 made its free explicit.*
 3. **`SIG_Robot::clear()`** hand-deletes six dictionaries' contents and calls
    `clear()` on them twelve lines later. Safe only because those dicts carry no
    flag. The self-check now asserts that `clear()` on a non-owning container
@@ -2432,6 +2433,7 @@ which is why the list exists.
 | both `wasCanceled()` shrinks, D15 | need a `QApplication`; `sigel_eval` has none, so `if (qApp)` is false |
 | `readFromFile`'s shrink loop, D15 | the function runs on every load, but always on an **empty** pool, so the loop body never executes |
 | `sort`, D15 | no caller anywhere |
+| **everything D17 and D18 changed** in `SIG_GPFitnessTrainer` | `nm -C build/sigel_eval \| grep -c SIG_GPFitnessTrainer` is **0**. `pvm_link` links the object but never constructs a trainer, so it is link-checked and never run. The rewritten walk needs a live `pvm_spawn`; `flushAllDynHosts` is `-devolve`-only; the destructor's three `qDeleteAll` run for no gate |
 
 ### D11 — the last three lists on the executed path, and a check that can see them
 
@@ -2762,9 +2764,14 @@ path the guard was written for.
 ### D17 — the trainer's two host lists, and what the 1.3 binary says about them
 
 `SIG_GPFitnessTrainer::dynHosts` and `freshDynHosts` become `QList<T *>`. Both
-are plain index loops — `count()` and `at(i)`, no cursor — and neither ever had
-`setAutoDelete`, so their four `deleteContents()` were already the explicit
-free and become `qDeleteAll` + `clear()`.
+are plain index loops — `count()` and `at(i)`, no cursor — and their **five**
+`deleteContents()` (`:107`, `:108`, `:195`, `:200`, `:529`) become
+`qDeleteAll` + `clear()`.
+
+*D17 said four, and said neither list "ever had `setAutoDelete`". Both wrong.
+Pristine 1.3 sets it on both (`SIG_GPFitnessTrainer.cpp:50-51`); commit
+`14bc134` removed the flags and made the frees explicit, so the statement was
+true of the tree D17 started from and false of the code being ported.*
 
 **Established from the 1.3 binaries, by symbol table and disassembly**, because
 none of these containers reaches a file and nothing here can be diffed:
@@ -2772,7 +2779,7 @@ none of these containers reaches a file and nothing here can be diffed:
 | | |
 |---|---|
 | `addDynHost` | present and **referenced**, one call site. Reached only through `SIG_GPManager::RegisterDynPVMClients`, which is a **thread entry point** — its address is pushed to `pthread_create`, so a naive caller search misses it — behind the `-devolve` flag |
-| `flushAllDynHosts` | **not gated.** Called from both `SIG_GPManager::run` overloads, so it is entered on **every** run, `-evolve` included |
+| `flushAllDynHosts` | called from both `SIG_GPManager::run` overloads — but **both calls sit behind `if (serverIsUp)`** (`SIG_GPManager.cpp:761`, `:1209`), and `serverIsUp` is `false` at `:47` and set true in exactly one place, `:822`, inside the `-devolve` thread. **So it is never entered under `-evolve`** |
 | `getNextHost` | called from `spawnTask` and `sweepToSpawn` |
 
 The binary's own usage text is the confirmation: `-devolve` is "Evolve with
@@ -2783,10 +2790,15 @@ dynamic clients", `-evolve` is "Evolve without GUI".
 can run — the dynamic-host thread never starts and `addDynHost` is never
 called. Under `-devolve` it is live. Recording it as "dead" would be wrong.
 
-`flushAllDynHosts` is the case to be careful with: it is entered every run, and
-its whole body including the `pvmHosts.resize( size-1 )` sits behind
-`if (dynHosts.count() > 0)`. So the *function* is exercised constantly and the
-*shrink* never is.
+*D17 recorded `flushAllDynHosts` as "not gated … entered on every run,
+`-evolve` included", and that the function was "exercised constantly". **Both
+are wrong**, found by review checking the source against the binary reading:
+the two call sites are guarded by `serverIsUp`, which only the `-devolve`
+thread sets. Under `-evolve` the function is not entered at all. The error is
+in the safe direction — less exercised than claimed — but a coverage statement
+this file carries for the next owner has to be right.* Its body is
+additionally behind `if (dynHosts.count() > 0)`, so the
+`pvmHosts.resize( size-1 )` inside it is doubly unreachable here.
 
 **And the modulus concern cannot be settled from the reference machine.** All
 four evolutions used exactly **one** `PVMHOST` — the `8` in those lines is the
@@ -2820,12 +2832,61 @@ self-check now runs the **same sequence of operations against both** and
 requires they agree at every step: same values, same null-ness, same count.
 The block dies with the shim, by which time the conversion is proven.
 
-**Verified to have teeth, and the first version had a gap.** Dropping
-`cursorAfterRemoval`'s step-back is caught. Making `next()` advance a dead
-cursor was **not** — the walk exits at the first null and never reaches that
-branch, the same shape of gap the D16 review found in the D16 block. The check
-now drives the cursor off the end deliberately and calls `next()` three times
-past it; with that, both mutations fail it.
+**The self-check tests a TRANSCRIPTION, not `sweepToSpawn`.** It copies the
+index logic rather than calling it, because `SIG_GPFitnessTrainer` is not
+linked into `sigel_eval`. Demonstrated by review, not argued: dropping
+`cursorAfterRemoval`'s step-back **in production `sweepToSpawn`** leaves
+`check.sh`, `-selfcheck` and `pvm-check.sh` all passing, while the identical
+mutation in the self-check's copy fails it. So "verified to have teeth" is true
+of the copy and **false of the shipped function**. What the block is genuinely
+worth is pinning the *shim's* semantics while the shim still exists.
+
+**The evidence that the shipped rewrite is correct is the review's, not the
+self-check's.** It transcribed the production statements verbatim and drove
+them exhaustively against `Q2PtrList`: list sizes 0–6 × all 4096 twelve-step
+success/failure scripts = **28,672 walks under ASan and UBSan, 0 divergences**
+in visit order, free order, surviving list, iteration count and break
+behaviour. That covers removal of the first, a middle and the last element, the
+list emptied, the single-element case, the dead cursor, and the
+`actJob == prevJob` break. Mutation-tested: dropping the step-back gives 8,256
+divergences, advancing after removal 12,544.
+
+Two gaps in the block itself, both found by that review and both now closed:
+its 10-step script **breaks at step 7** so its last three removals never ran
+and the list was never emptied — the one case this section's own prose singles
+out — and `next()` on a dead cursor was unreachable. It now drains a
+two-element list to empty and drives the cursor three steps past the end.
+
+*One honest note on that second one: `sweepToSpawn`'s `while (actJob)` means
+the dead-cursor branch cannot be reached from the walk at all, so that guard is
+unreachable in production. It is kept because it documents the shim, not
+because it covers anything.*
+
+### What `pvmTasks` and `pvmHosts` will need — before touching them
+
+Established by the D17/D18 review, so the next step does not re-derive it.
+
+- **`nextHostNumber % pvmHosts.size()`** (`:562`, `:571`) is `int % uint`, so
+  the modulus is **unsigned** and the result is always in range. `QList::size()`
+  is signed and flips it. This is D9's defect exactly. It differs only if
+  `nextHostNumber` goes negative, which needs an `int` overflow after ~2^31
+  spawns — and the reference machine cannot test it either, because all four of
+  its evolutions had one host and `% 1` is always 0. **Preserve the cast; do
+  not let it flip by accident.**
+- **`Q2PtrVector::isEmpty()` is `count()==0`** — *occupied* slots, an O(n)
+  scan — not `size()==0`. `while (!pvmHosts.isEmpty())` at `:169` with
+  `int i = pvmHosts.size()-1` at `:166` coincide today because nothing nulls a
+  `pvmHosts` slot. **`pvmTasks` is full of null holes** (`:72`, `:233`, `:353`,
+  `:376`), so the same idiom on it would change meaning. Note also that
+  `size()-1` is `uint` arithmetic: at size 0 it is `0xFFFFFFFF`, saved only by
+  the `isEmpty()` guard.
+- **`Q2PtrVector::insert(i, d)` deletes the previous occupant and does not
+  shift**, and returns false — silently leaking `d` — when `i >= size()`.
+  `QList::insert` grows and shifts. Eight sites: `:72`, `:85`, `:233`, `:278`,
+  `:353`, `:376`, `:478`, `:540`. **A naive rename corrupts every `pvmTasks`
+  index.**
+- **`pvmHosts.resize( size-1 )`** at `:190` is a free with no `delete`
+  keyword — the §9 item 1 site still outstanding in this file.
 
 ### A logging system
 

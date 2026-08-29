@@ -393,6 +393,35 @@ static int selfcheck()
     }
     SIG_WANT(shim.count() == uint(mine.size()));
 
+    // Drain a short list to EMPTY. The script above breaks at step 7 on a
+    // null cursor, so its last three removals never run and the list is
+    // never emptied -- which is the one case D18's own prose singles out,
+    // "dies if the list emptied". Found by review. Two elements, both
+    // removed, so cursorAfterRemoval takes its cur = -1 branch.
+    Q2PtrList<int> dshim;
+    QList<int *>   dmine;
+    for (int i = 0; i < 2; i++) { dshim.append(new int(i)); dmine.append(new int(i)); }
+    dshim.setAutoDelete(true);
+
+    int *dS = dshim.first();
+    qsizetype dcur = dmine.isEmpty() ? -1 : 0;
+    int *dM = (dcur < 0) ? 0 : dmine.at(dcur);
+
+    for (int k = 0; k < 3; k++) {
+      SIG_WANT((dS == 0) == (dM == 0));
+      if (!dS || !dM) break;
+      SIG_WANT(*dS == *dM);
+      dshim.remove();
+      dS = dshim.current();
+      delete dmine.takeAt(dcur);
+      if (dcur >= dmine.size())
+        dcur = dmine.isEmpty() ? -1 : dmine.size() - 1;
+      dM = (dcur < 0) ? 0 : dmine.at(dcur);
+    }
+    SIG_WANT(dshim.count() == 0);
+    SIG_WANT(dmine.isEmpty());
+    SIG_WANT(dcur == -1);
+
     // Drive the cursor off the end and keep going. Qt 2's next() leaves a
     // DEAD cursor dead and does not advance it, so a second call must also
     // give null rather than wrapping or walking off. The loop above exits at
