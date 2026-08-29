@@ -11,7 +11,9 @@ off the Qt 2 container shim.  Neither is exercised by any shipped data:
     friction     0 declarations in all 7 .rrb; nfric == 0 on all 31
                  Material lines across the 14 Experiments/*.exp
     noCollide    0 'nocollide' in all 7 .rrb; noCollideCount == 0 in all
-                 261 Link records
+                 87 Link records in those same 14 files (348 counting
+                 data/ and data-reordered/ together -- an earlier draft
+                 said 261, which is neither scope)
 
 So both were correct by inspection and by a self-check we wrote ourselves,
 which is the weakest evidence this project accepts.  This is the other side
@@ -21,8 +23,8 @@ INPUT
 -----
 A copy of hammerNiceWalkingFitness.exp, both dead 2003 roots repointed
 (/home/pg368/sawitzki/sigel and /home/pg368/sawitzki/hammer/ are DISTINCT --
-the second is on the Body lines, one of which sits inside the StreamedRobot
-block).  Two mechanical edits inside that block, each asserting t[n] == '0'
+the second is on the Body lines, ALL THREE of which sit inside the
+StreamedRobot block, which opens at line 75243).  Two mechanical edits inside that block, each asserting t[n] == '0'
 before substituting rather than trusting the index:
 
     Material rubber 1 1 0 1 0 0      ->  Material rubber 1 1 1 metal 0.25 1 0 0

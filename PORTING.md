@@ -27,7 +27,7 @@ build and run, because nothing else can be verified without it — see §3.
 |---|---|
 | 0 — comments to English | done for the 9 core modules; 9 GUI files still hold Latin-1 |
 | A — core onto Qt 6 | **done**, tags `step-A0`…`step-A9` |
-| B — ownership explicit | **subsumed by Phase D**, which deletes the containers rather than converting them. **11** `setAutoDelete` left in core, re-measured 2026-08-29 after D11 — 10 in `SIGEL_GP`, 1 in `MT_Control`, **0 in `SIGEL_Robot`**: D11 deleted `SIG_Body.cpp:54`, the last one, and left this row saying 12. *Before that it read 13 with 2 in `SIGEL_Robot`, where there was one. Three readings of the same row, three corrections, each by review.* **Not all of them are unreachable, and an earlier version of this row said they were.** `SIG_GPPopulation::pool` is owning, is constructed on every `sigel_eval` run and takes 100 `insert()`s inside both gates — see "What the gates actually reach" in §10. The 7 in `SIG_GPFitnessTrainer` and `SIG_GPManager` are the ones Phase C still blocks |
+| B — ownership explicit | **subsumed by Phase D**, which deletes the containers rather than converting them. **11** `setAutoDelete` left in core, re-measured 2026-08-29 after D11 — 10 in `SIGEL_GP`, 1 in `MT_Control`, **0 in `SIGEL_Robot`**: D11 deleted `SIG_Body.cpp:54`, the last one, and left this row saying 12. *Before that it read 13 with 2 in `SIGEL_Robot`, where there was one. Three readings of the same row, three corrections, each by review.* **Not all of them are unreachable, and an earlier version of this row said they were.** `SIG_GPPopulation::pool` is owning, is constructed on every `sigel_eval` run and takes 100 `insert()`s inside both gates — see "What the gates actually reach" in §10. The **6** in `SIG_GPFitnessTrainer` and `SIG_GPManager` are the ones Phase C still blocks; the row said 7, which did not even add up against the 10 in the same sentence |
 | R — build and run | core builds and runs. **No longer checked only against itself** — Phase V has confirmed both the ordering and the arithmetic against the 1.3 binary, §7 |
 | T — old-Qt tool container | **done 2026-08-27.** `tools/qtmig`, §4 |
 | D — delete the shim, migrate the data | **D1–D12 done.** `Q2Dict`, `Q2DictIterator` and `Q2Array` gone from all code; `Q2PtrVector` is off `SIG_Geometry`, `SIG_Body`, the `SIG_Register` cluster and `SIG_DynaMechsSimulationData`. Shim 806 → **530** lines. Remaining, measured 2026-08-29 after D12: `Q2PtrList` 47, `Q2PtrVector` 49, `Q2CString` 19, `Q2Queue` 16, `Q2ListIterator` 8, `Q2ValueList` 12. **No live shim code is left in `SIGEL_Robot`, `SIGEL_Simulation` or `SIGEL_Environment` — only prose comments.** What remains is `SIGEL_GP`, `MT_Control` and `MT_GPSystem`, part of which the gates do execute (§10). **Which of those the gates execute is now measured, not assumed** — see "What the gates actually reach" in §10. §10 |
@@ -1054,7 +1054,7 @@ once.
 
 D10 converted `SIG_Link::noCollide` and D11 `SIG_Material::friction`, and
 **neither is touched by any shipped data** — 0 `nocollide` in all 7 `.rrb` and
-`noCollideCount` 0 in all 261 `Link` records; 0 friction declarations and
+`noCollideCount` 0 in all **87** `Link` records of those 14 files; 0 friction declarations and
 `nfric` 0 on all 31 `Material` lines. Both were correct by inspection and by a
 self-check we wrote ourselves. This is the other side of the comparison, and it
 is the first thing in Phase D checked against something that is not us.
@@ -1086,6 +1086,39 @@ key something else already checks — here the name, which V1 gates
 independently — never by position, and never by minimising the difference under
 test.* The reordering is the known `Q2Dict` behaviour V1 documented on `walker`
 and says nothing about friction.
+
+**V6 ALSO CAUGHT US, INCIDENTALLY, AND IT IS THE MOST IMPORTANT THING IN IT.**
+Found by the D12 review, not by the run's authors. The captured output records
+1.3 emitting hammer's materials as **`plastic, rubber, metal`**. Our tree emits
+**`plastic, metal, rubber`** — from `data/` and `data-reordered/` alike, loaded
+and copy.
+
+The write-up filed the permutation as "the known `Q2Dict` behaviour, carries no
+information about friction", which is true of the *permutation* and misses what
+the bytes prove. `git show 5ebc9a8:dictorder-baseline.txt` has hammer as
+`plastic, rubber, metal`: **the shim-era build matched 1.3 exactly, and D3's
+flip to insertion order moved us off it.** So V6 has produced the first 1.3
+observation of hammer's material order — an experiment `v1-1.3-roundtrip.txt`
+never covered, since V1 took twoBases, octopus twice and walker — and our build
+does not reproduce it.
+
+This was a deliberate choice, not an accident: D3 records that `loaded` had to
+move and that body and material order moved with it, on the argument that
+nothing numbers either. That argument still holds, and `dictorder-reorder.py`
+leaves both alone on purpose. What is new is that we now have the reference
+saying otherwise for a container we chose not to preserve, where before we only
+had our own reasoning that it did not matter.
+
+**And it composes with V7, which is why it is recorded rather than noted.**
+Material order decides which friction declarations are forward references, and
+a forward reference is dropped in silence and then *refilled* by negotiation
+carrying the other side's value (V7). So a file with friction pairs, written by
+us and read by 1.3 or the reverse, can differ in which pair is dropped and what
+value refills it — with the structure symmetric and correct at both ends. Latent
+only because **no shipped file declares friction at all**. The reviewer's read
+is that it cannot bite today and I agree; it is here because the argument for
+the current order is now weaker than it was this morning, and D3 should not be
+revisited without this on the table.
 
 **One thing learned for free, worth keeping.** `nfric` and the pair list are
 serialised for **both** partners, so one declared pair costs two entries on
@@ -2286,7 +2319,7 @@ given as the range, because the counts scale with the robot:
 |---|---|---|
 | `Q2PtrList` | **8 – 41** | **14 – 64** |
 | `Q2ListIterator` | 1 – 4 | 1 – 4 |
-| `Q2CString` | 3 | 4 |
+| `Q2CString` | ~~3~~ **0** | ~~4~~ **0** |
 | `Q2PtrVector` | **1** | **1** |
 | `Q2Queue` | **0** | **0** |
 | `Q2ValueList` | **0** | **0** |
@@ -2301,6 +2334,13 @@ not move.*
 `Q2PtrList` counts one construction per `SIG_DynaMechsLink` — its `successors`
 member — plus one per material and body, so it tracks robot size.
 `Q2ListIterator` counts `SIG_Material::friction` walks.
+
+**`Q2CString`'s row was zeroed by D12 and is struck through above.** Its 3 and 4
+were `SIG_Environment.cpp:416` — the constructor *and* `readFromFile` — and
+`SIG_DynaMechsSimulationData.cpp:303`, which were the only `Q2CString` the gates
+ever constructed. The 7 that survive are PVM code `sigel_eval` never runs. D12
+took the row to zero and left it standing while citing the table as current;
+corrected by review.
 
 **Four of the six types execute under the gates, not three.** The single
 `Q2PtrVector` is `SIG_GPPopulation::pool`, which the "evolution loop" label had
@@ -2329,7 +2369,7 @@ which is why the list exists.
 | `sensors[…] = …` on the `tPitchRollSensor` and `tContactSensor` branches, D9 (`SIG_DynaMechsSimulationData.cpp:183,197`), and the two `dynaMechsLinks[…]` reads guarding them (`:182,:196`) | **0 `PitchRollSensor` and 0 `ContactSensor` in any shipped file** — 66 sensors, all `JointSensor`. Two of the four converted indexed writes in that constructor |
 | `delete dynaMechsLinks[…]` on a **non-null** slot (`:365,:501`), D9 | needs two joints between one pair of links; no shipped robot has one. Only `delete nullptr` ever runs |
 | the restored `uint` modulus, D9 | needs `bitsPerRegister` 32; all 14 `.exp` carry 3 or 8 |
-| `SIG_Link::addNoCollide`, `getNoCollides()`, the `noCollide` write loop, D10 | **0 `nocollide` in all 7 `.rrb`, and `noCollideCount` is 0 in all 261 `Link` records**. `getNoCollides()` has no caller in the tree at all |
+| `SIG_Link::addNoCollide`, `getNoCollides()`, the `noCollide` write loop, D10 | **0 `nocollide` in all 7 `.rrb`, and `noCollideCount` is 0 in all 87 `Link` records of the 14 `.exp`** (348 over `data/` and `data-reordered/` together; an earlier draft said 261, which is neither scope). `getNoCollides()` has no caller in the tree at all |
 | `SIG_Material::friction` — three walks and the owning free, D11 | **0 friction declarations in any `.rrb`, and `nfric` is 0 on all 31 `Material` lines**. The list is empty on every gate run |
 | `SIG_Body::usedByLinks`, D11 | appended on every `.rrb` load and **read nowhere in the tree** |
 
@@ -2434,10 +2474,20 @@ load terrain on every evaluation, so this is covered rather than argued.
 Both files drop `compat/q2compat.h` for `<QByteArray>`; the shim's reach falls
 from 47 files to 45.
 
-**With this, no live shim code remains in `SIGEL_Robot`, `SIGEL_Simulation` or
-`SIGEL_Environment`** — six prose comments naming the old types are all that
+**With this, no shim TYPE is used in `SIGEL_Robot`, `SIGEL_Simulation` or
+`SIGEL_Environment`.** Eight prose comments naming the old types are all that
 `grep` finds there, and they are kept because they explain why the code reads as
-it does. **The shim cannot be deleted yet**: `SIGEL_GP`, `MT_Control` and
+it does.
+
+*D12 claimed more than that and was wrong.* It said "no live shim code is left …
+six prose comments are all `grep` finds". **Six live `#include "compat/q2compat.h"`
+remained** — `SIG_Geometry.h`, `SIG_LanguageParameters.h`, `SIG_Robot.h`,
+`SIG_DynaMechsCommandInterface.cpp`, `SIG_DynaMechsLink.cpp` and
+`SIG_DynaMechsSimulationQueries.cpp` — every one of them reaching `QList`
+through the shim rather than any `Q2*` type. Found by the D12 review, which also
+established all six were removable with an identical 105/4. They now include
+`<QList>` directly and the shim's reach falls **45 → 39**. The comment count was
+also wrong: eight, not six. **The shim cannot be deleted yet**: `SIGEL_GP`, `MT_Control` and
 `MT_GPSystem` still hold it, and, per "What the gates actually reach" above,
 part of that is executed on every run rather than being unreachable evolution
 loop as this plan long assumed.

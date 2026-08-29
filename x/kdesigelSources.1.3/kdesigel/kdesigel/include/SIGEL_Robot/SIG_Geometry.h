@@ -25,7 +25,7 @@
 
 namespace SIGEL_Robot { class SIG_Geometry; }
 
-#include "compat/q2compat.h"
+#include <QList>
 #include <qstring.h>
 #include <pointvector.h>
 #include <matrix.h>

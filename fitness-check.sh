@@ -21,14 +21,30 @@ export SIGEL_ROOT
 # no robot has a duplicate name, so both baselines stay empty when it breaks.
 # Run the self-check twice. The second run turns LeakSanitizer ON, which the
 # evaluations below cannot afford -- they carry a documented 41 KB baseline
-# leak (PORTING.md D18). The self-check allocates and frees everything it
-# touches, so it CAN be leak-checked, and that is the only thing standing
-# between a dropped qDeleteAll in ~SIG_Material and a clean run of every gate.
-# Found by the D11 review as a coverage gap; kept as a separate invocation so
-# a leak here is not confused with the baseline.
+# leak (PORTING.md D18). The self-check frees everything it allocates, so it
+# CAN be leak-checked, and that is what stands between a dropped qDeleteAll in
+# ~SIG_Material and a clean run. Added after the D11 review found that hole.
+#
+# IT ONLY WORKS ON A SANITIZED BUILD, and the default B is build-fast, which is
+# built with SAN= and has no sanitizer at all. The first version of this ran
+# there anyway: ASAN_OPTIONS was an ignored environment variable, the "second"
+# run was the first one again with its output thrown away, and deleting the
+# qDeleteAll left ./fitness-check.sh exiting 0 with a byte-identical baseline.
+# It was inert in the exact invocation PORTING.md prescribes. Found by the D12
+# review. So test the binary rather than assume, and SAY when it is skipped --
+# a check that quietly does nothing is worse than no check, because the
+# operator believes it ran.
 "$ROOT/$B/sigel_eval" -selfcheck >&2 || exit 1
-ASAN_OPTIONS=detect_leaks=1 "$ROOT/$B/sigel_eval" -selfcheck >/dev/null 2>&1 \
-	|| { echo "selfcheck leaked under LeakSanitizer" >&2; exit 1; }
+if nm -C "$ROOT/$B/sigel_eval" 2>/dev/null | grep -q __asan_init; then
+	leaks=$(ASAN_OPTIONS=detect_leaks=1 "$ROOT/$B/sigel_eval" -selfcheck 2>&1 >/dev/null) || {
+		echo "selfcheck LEAKED under LeakSanitizer:" >&2
+		echo "$leaks" >&2
+		exit 1
+	}
+else
+	echo "note: $B has no sanitizer, so the self-check leak test was SKIPPED." >&2
+	echo "      run 'ASAN_OPTIONS=detect_leaks=0 ./fitness-check.sh build' for it." >&2
+fi
 
 n=$(find "$ROOT/$DATA/Experiments" -name '*.exp' | wc -l)
 [ "$n" -eq 14 ] || { echo "expected 14 .exp under $DATA/, found $n" >&2; exit 1; }

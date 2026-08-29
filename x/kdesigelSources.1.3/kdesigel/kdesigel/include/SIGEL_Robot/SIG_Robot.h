@@ -25,7 +25,7 @@
 
 namespace SIGEL_Robot { class SIG_Robot; }
 
-#include "compat/q2compat.h"
+#include <QList>
 #include "SIGEL_Robot/SIG_LanguageParameters.h"
 #include "SIGEL_Robot/SIG_Body.h"
 #include "SIGEL_Robot/SIG_Material.h"

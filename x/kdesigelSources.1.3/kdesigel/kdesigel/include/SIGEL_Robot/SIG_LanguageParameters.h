@@ -25,7 +25,7 @@
 
 namespace SIGEL_Robot { class SIG_LanguageParameters; }
 
-#include "compat/q2compat.h"
+#include <QList>
 #include <qtextstream.h>
 #include <qstring.h>
 #include "SIGEL_Robot/SIG_CommandParameters.h"

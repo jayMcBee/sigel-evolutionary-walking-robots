@@ -45,8 +45,13 @@
 //      cursor dead. Qt 2's locate() revives it at element 0 before the range
 //      check (qglist.cpp:275-292). No SIGEL site indexes a list out of range.
 //    - Q2CString::resize(0) leaves a non-null string; Qt 2 freed the buffer and
-//      the string became null (qcstring.cpp:568-583). All nine Q2CString sites
-//      only take a const char* out of a toUtf8().
+//      the string became null (qcstring.cpp:568-583). SEVEN Q2CString sites are
+//      left after D12, all in PVM code, and six of them only take a const char*
+//      out of a toUtf8(). The seventh does NOT: SIG_GPPVMData.cpp:57 calls
+//      qCStringBuffer.size(), which is the HIDDEN size() below -- length+1 --
+//      and is load-bearing, since that is the PVM string-length fix. This note
+//      said "all nine ... only take a const char* out", which was stale after
+//      D12 and was never fully true. Both corrections by the D12 review.
 //    - Q2Array::data() is non-null after resize(0); Qt 2 returned 0
 //      (qgarray.cpp:213-216). isNull() and operator const T* still agree with
 //      Qt 2. All 14 data() sites are on locals sized immediately before.
