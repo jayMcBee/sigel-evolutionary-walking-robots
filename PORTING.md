@@ -44,8 +44,7 @@ target is that our build reproduces what the 1.3 binary does.
 
 **The 14 published experiments cannot check this port.** They were produced in
 August 2001 by SIGEL 1.0. Validating a port of 1.3 against them measures every
-1.0 → 1.3 change as though it were ours. That mistake cost most of 2026-08-22
-and produced a second project by accident.
+1.0 → 1.3 change as though it were ours.
 
 **The 1.0 → 1.3 regression is real, pre-dates this migration, and is DEFERRED.**
 Written up in `regression_1.0_to_1.3.md`. Not to be worked on, and not to be
@@ -94,13 +93,10 @@ it did not lift.
 `QTextStream` no longer printing `-0` matters (§9); the order of remaining
 Phase B work.
 
-Seven independent review rounds have run. They found 2 leaks, 1 double free, 1
-free lost on the exception path, 9 gaps where the self-check passed on broken
-code, and 17 false statements in the code and in this file. Round 6 found a
-missing `#include <cstddef>` that `-fpermissive` was hiding, and that `-lGL` is
-not optional. Round 7 found a twelfth `QTime()` site, a race in `replicate.sh`
-that scored crashed evaluations as zero, and the 2001 date of the published
-experiments — which is what produced the scope note above. All fixed.
+Every step is reviewed by an independent agent, and every round so far has
+found a real defect — among them a missing `#include <cstddef>` hidden by
+`-fpermissive`, that `-lGL` is not optional, a twelfth `QTime()` site, and a
+race in `replicate.sh` that scored crashed evaluations as zero. All fixed.
 
 ## 0. Working on this
 
@@ -250,29 +246,11 @@ review. A missing `delete` and a doubled `delete` both compile.
 Known work:
 
 - vendored libraries on gcc 15
-- PVM — **HISTORICAL, 2026-08-28. This whole item measured the vendored 3.4.3,
-  which Phase P deleted; its line numbers no longer resolve.** Kept because it
-  is what the 3.4.6 decision was argued against. Where it cites a line, 3.4.6
-  reads: `global.h:321`, not 314; `pvmlog.c:503-504`, not 421-422, and there
-  now behind `#ifndef USESTRERROR`, which `conf/LINUX64.def` defines — so that
-  defect is gone. The 23 on `rpc/types.h` still holds in 3.4.6. See Phase P.
+- PVM. **Superseded by Phase P**, which replaced the vendored 3.4.3 with
+  upstream 3.4.6. In 3.4.6 `pvmlog.c:499-505` is guarded by `USESTRERROR`,
+  which `conf/LINUX64.def` defines, so the `sys_errlist` defect is gone. The 23
+  failures on `rpc/types.h` still hold and `-ltirpc` is the answer. §7 Phase P.
 
-  All 39 `.c` in `pvm3/src` fail. **Measured 2026-08-27, corrected by
-  review. Four causes, partitioning exactly: 23 + 8 + 7 + 1 = 39.**
-  - **23** on `rpc/types.h`, which glibc dropped. `libtirpc` is the answer;
-    its `-dev` package is not installed here.
-  - **8** on errors gcc 14 promoted from warnings — `imalloc`, `lmsg`,
-    `nmdclass`, `pkt`, `pvmalloc`, `pvmdabuf`, `pvmfrag`, `pvmlog`.
-    `-std=gnu17 -fpermissive` clears all 8.
-  - **7** on `global.h:314`, which declares
-    `extern struct Pvmtevdid pvmtevdidlist[]` and relies on the includer having
-    pulled in `pvmtev.h` first. **5 of the 7 are MPP or shared-memory files in
-    neither Linux object list**; only `pvmcruft.c` and `pvmerr.c` matter.
-  - **1** — `pvmwin.c` wants Win32's `<process.h>`. In no Unix object list.
-
-  `pvmlog.c:421-422` additionally uses `sys_nerr` / `sys_errlist`, removed in
-  glibc 2.32 — a second, real defect inside the 8. A socket build needs 15
-  objects for `libpvm3.a` and ~24 for `pvmd3`
 - a build system to replace a `configure.in` that detects the OS by grepping
   `/proc/version` for `SuSE`
 - pre-standard `for`-scope in `MT_*`
@@ -693,11 +671,9 @@ No distribution maintains PVM: Fedora retired 2015, Debian removed 2024. An AUR
 
 ### Handover — one owner at a time
 
-**Never two sessions on this repository at once.** On 2026-08-27 three sessions
-were commissioning the x86 reference box, two of them describing themselves in
-identical words, and one was this session under a display name it could not see.
-It cost hours and nearly corrupted a reference capture. Sequential sessions are
-fine; concurrent ones are not.
+**Never two sessions on this repository at once.** Sequential is fine;
+concurrent is not. On 2026-08-27 three concurrent sessions nearly corrupted a
+reference capture.
 
 This document is the handover. A new session should read §0, this section, and
 the phase it is taking on.
@@ -909,17 +885,6 @@ and the deterministic non-integrating quantities — link and joint numbering, t
 register value a given joint angle produces, the force a given register value
 produces.
 
-**AddressSanitizer.** Clean, but only with one `SIGEL_ROOT` per worker.
-`SIG_Environment::generateTerrain` rewrites `$SIGEL_ROOT/Terrain.ter` on **every
-evaluation** and reads it straight back, so workers sharing a root read it
-half-written, get a zero-size grid, and take a real heap-buffer-overflow in
-`dmEnvironment::getGroundElevation`. `replicate.sh` gives each worker its own
-root and treats a non-zero exit as an error.
-
-**Leak baseline (D18): 41,254 bytes in 109 allocations** per evaluation, from
-§10's pre-existing leak — `SIG_Simulation` is `new`ed and never deleted, and its
-destructor is empty. Gate on ASan and UBSan errors, not on this.
-
 **Verified faithful to Qt 2 by independent audit**, each by measurement rather
 than inspection:
 
@@ -1052,130 +1017,53 @@ once.
 
 ### V7 and V8 RESULTS — the rules, and a reference captured in advance
 
-Full detail in `verification-against-sigel-1.3/v7-…` and `verification-against-sigel-1.3/v8-…`. Six findings, four of
-which change what this repo does.
+Full captures: `verification-against-sigel-1.3/v7-…txt` and `v8-…txt`.
 
-**V7, on `walker`, four runs.** Multiple partners work and each keeps its own
-value. A duplicate partner is refused on **both** sides, which confirms D10's
-`!contains` and D11's append-versus-update as upstream rather than ours.
+**V7, four runs on `walker`.** Multiple partners work, each keeping its own
+value. A duplicate partner is refused on both sides, confirming D10's
+`!contains` and D11's append-versus-update as upstream. **A partner not yet
+loaded is dropped in silence** — `walker`'s `body` is its second link, so
+`body → foot1 leg1` lost both entries with no warning and exit 0.
 
-**A partner that is not yet loaded is dropped, in silence.** `walker`'s `body`
-is its second link, so `body → foot1 leg1` lost both entries with no warning
-and exit 0. V6 missed it only because `middle1` named `base`, hammer's first
-link. Negotiation is *not* order-limited — the back-reference is installed into
-an earlier entity that was parsed before the entry existed.
+**And the drop is worse than a loss.** The valid declaration from the other
+side refills the emptied slot with *its* value: `bodyMaterial → shoulderMaterial`
+was written as `0.3` and came back `0.7`. Present, correctly named, `nfric`
+right, symmetric — and the value is somebody else's. A count check cannot see
+that; only a value check can. Our self-check could not: it read the partner
+after the first set and never after an update.
+`SIG_WANT(b.getFrictionValue(&a) == 0.75)` is added, and moving
+`setFrictionValue`'s negotiate call inside its `if (!found)` makes exactly that
+one assertion fail.
 
-**And the drop is worse than a loss.** A forward reference is dropped, then the
-valid declaration from the other side *refills the same slot with its own
-value*:
+**V8 was captured before the conversion it serves.** `PVMHOST` order is stable,
+20 of 20 over three round trips, as predicted from `hostList` being a
+`Q2PtrList` that appends rather than hashes — D13 converted it against this.
+`HISTORY` blocks grow 7 bytes per save without limit; the defect is in §9 and
+the measurement in `v8-…txt`.
 
-```
-wrote:  bodyMaterial -> shoulderMaterial 0.3
-got:    bodyMaterial -> shoulderMaterial 0.7
-```
+### V6 RESULT — negotiation is upstream, and our material order is not
 
-Present, correctly named, `nfric` right, symmetric — and the value is somebody
-else's. Not "an entry disappears", which a count catches, but "an entry
-survives with the wrong value", which only a value check catches. **Our
-self-check could not see it**: it read the partner after the first set and
-never again after an update. `SIG_WANT(b.getFrictionValue(&a) == 0.75)` is
-added, and moving `setFrictionValue`'s negotiate call inside its `if (!found)`
-block makes exactly that one assertion fail while the count and name checks
-all pass.
+Full capture: `verification-against-sigel-1.3/v6-…txt`. 5 of 5, prediction held.
+Both setters negotiate in 1.3, so the partner gains the reverse entry. Nothing
+to fix in D10 or D11.
 
-**V8 was captured before the conversion, not after**, which V6 and V7 were not
-— it cannot be tuned to agree with code that does not exist yet.
-**`PVMHOST` order is stable**: 20 of 20 identical across three round trips, as
-predicted from `hostList` being a `Q2PtrList` that appends rather than hashes.
-`hostList` can be converted against it.
+**Our build does not reproduce 1.3's material order for hammer.** 1.3 emits
+`plastic, rubber, metal`. We emit `plastic, metal, rubber`, from `data/` and
+`data-reordered/` alike, `loaded` and `copy`.
+`git show 5ebc9a8:dictorder-baseline.txt` has `plastic, rubber, metal`, so the
+shim-era build matched and D3's flip to insertion order moved us off it. V1
+never covered hammer, so this is the first 1.3 observation of that order.
 
-**`HISTORY` blocks grow 7 bytes per save, without limit.** Count, position and
-the individual `NAME` sequence are all preserved, so the population container
-does not reorder — but the content is not stable. `SIG_GPIndividual.cpp:559`
-writes `"\n      "` before `}HISTORY END;`, and `:647` reads everything up to
-that marker back as content. The writer's own separator becomes data. **Ours is
-the same code with the same defect** — upstream, not a port regression, and
-**not fixed**, because changing it would change file bytes against 1.3. It
-means any future gate diffing a round-tripped file must normalise trailing
-whitespace inside `HISTORY` blocks first, or it is noise that grows each run.
+D3 chose it deliberately: `loaded` had to move, body and material order moved
+with it, and nothing numbers either. `dictorder-reorder.py` leaves both alone
+on purpose.
 
-### V6 RESULT — friction and no-collide negotiate in 1.3 too
-
-**5 of 5, prediction held.** `verification-against-sigel-1.3/v6-1.3-friction-nocollide.txt`.
-
-D10 converted `SIG_Link::noCollide` and D11 `SIG_Material::friction`, and
-**neither is touched by any shipped data** — 0 `nocollide` in all 7 `.rrb` and
-`noCollideCount` 0 in all **87** `Link` records of those 14 files; 0 friction declarations and
-`nfric` 0 on all 31 `Material` lines. Both were correct by inspection and by a
-self-check we wrote ourselves. This is the other side of the comparison, and it
-is the first thing in Phase D checked against something that is not us.
-
-A copy of `hammerNiceWalkingFitness.exp` was edited to declare one friction
-pair (`rubber` → `metal`) and one no-collide pair (`middle1` → `base`), then
-loaded and saved by the 1.3 binary with no `pvmd`, so it evaluated **zero**
-generations — evaluation impossible rather than skipped. The prediction, made
-in advance: both setters negotiate, so the partner gains the reverse entry.
-
-| | |
-|---|---|
-| `metal` | `nfric` 0 → **1**, pair `rubber 0.25` — **gained by negotiation** |
-| `base` | `nNoCollide` 0 → **1**, names `middle1` — **gained by negotiation** |
-| `plastic`, and the two declaring sides | unchanged, as predicted |
-
-**Negotiation is upstream behaviour, not ours.** Nothing to fix, and the
-self-check's `negotiate` assertions are now backed by the reference rather than
-by our own reading.
-
-**The trap fired, and it is the reason this is a lesson and not just a pass.**
-The Material container **permuted** on the round trip — in as `plastic, metal,
-rubber`, out as `plastic, rubber, metal`. The request originally asked for "the
-three Material lines", by position. Read that way, the second line is `rubber`
-where `metal` was expected and the comparison lands on the wrong material. The
-x86 side caught it **before** the run and the request was amended to report per
-named entity. That is V5's error in a new costume: *match reference data by a
-key something else already checks — here the name, which V1 gates
-independently — never by position, and never by minimising the difference under
-test.* The reordering is the known `Q2Dict` behaviour V1 documented on `walker`
-and says nothing about friction.
-
-**V6 ALSO CAUGHT US, INCIDENTALLY, AND IT IS THE MOST IMPORTANT THING IN IT.**
-Found by the D12 review, not by the run's authors. The captured output records
-1.3 emitting hammer's materials as **`plastic, rubber, metal`**. Our tree emits
-**`plastic, metal, rubber`** — from `data/` and `data-reordered/` alike, loaded
-and copy.
-
-The write-up filed the permutation as "the known `Q2Dict` behaviour, carries no
-information about friction", which is true of the *permutation* and misses what
-the bytes prove. `git show 5ebc9a8:dictorder-baseline.txt` has hammer as
-`plastic, rubber, metal`: **the shim-era build matched 1.3 exactly, and D3's
-flip to insertion order moved us off it.** So V6 has produced the first 1.3
-observation of hammer's material order — an experiment `v1-1.3-roundtrip.txt`
-never covered, since V1 took twoBases, octopus twice and walker — and our build
-does not reproduce it.
-
-This was a deliberate choice, not an accident: D3 records that `loaded` had to
-move and that body and material order moved with it, on the argument that
-nothing numbers either. That argument still holds, and `dictorder-reorder.py`
-leaves both alone on purpose. What is new is that we now have the reference
-saying otherwise for a container we chose not to preserve, where before we only
-had our own reasoning that it did not matter.
-
-**And it composes with V7, which is why it is recorded rather than noted.**
-Material order decides which friction declarations are forward references, and
-a forward reference is dropped in silence and then *refilled* by negotiation
-carrying the other side's value (V7). So a file with friction pairs, written by
-us and read by 1.3 or the reverse, can differ in which pair is dropped and what
-value refills it — with the structure symmetric and correct at both ends. Latent
-only because **no shipped file declares friction at all**. The reviewer's read
-is that it cannot bite today and I agree; it is here because the argument for
-the current order is now weaker than it was this morning, and D3 should not be
-revisited without this on the table.
-
-**One thing learned for free, worth keeping.** `nfric` and the pair list are
-serialised for **both** partners, so one declared pair costs two entries on
-save. A serialiser writing the pair only from the declaring side would make any
-file round-tripped through 1.3 appear to gain an entry — a spurious diff that
-is really negotiation. Ours writes both.
+**It composes with V7.** Material order decides which friction declarations are
+forward references; a forward reference is dropped and then refilled by
+negotiation with the other side's value. A file with friction pairs written by
+us and read by 1.3, or the reverse, can differ in which pair is dropped and
+what refills it, with the structure symmetric at both ends. No shipped file
+declares friction, so this is latent. **Do not revisit D3 without it.**
 
 ### V1 RESULT — the hash model is confirmed against the real binary
 
@@ -1434,11 +1322,9 @@ custom signals and slots, and there are 49 across the 20 forms.
 | V | 5 | **V1 done 2026-08-27**, V5 in progress — §7 |
 | P | 4 | **done 2026-08-28** — §7 |
 
-**The effort column is gone, 2026-08-27, and the section is no longer called
-Effort.** It carried "1.5 wk", "1 wk", "2–3 days", "2.5–3 wk" and "~3 days".
-None of those was measured or derived from anything — they were invented. A plan
-whose every other number is counted from the tree should not carry six that are
-guessed. Step counts are real and stay. **Do not put estimates back.** The same
+**No effort estimates in this file.** The column that held them carried six
+invented figures. Step counts are counted and stay. **Do not put estimates
+back.** The same
 row also claimed Phase T was "not started" while the status table at the top of
 this file had it done; corrected here.
 
@@ -1987,9 +1873,10 @@ reaches only the serialised bytes.
 
 **`check.sh` was reporting a failure the real build does not have.** Its include
 path stopped at `QtCore` while the Makefile adds `QtGui` and `QtWidgets`, so
-`SIG_GPPopulation.cpp` failed on `<QApplication>`. Fixed: **118 pass, 4 fail**,
-and the 4 are exactly the files the Makefile excludes. The long-quoted
-"117 pass, 5 fail" baseline was always one part harness artifact.
+`SIG_GPPopulation.cpp` failed on `<QApplication>`. Fixed; the 4 remaining
+failures are exactly the files the Makefile excludes. *The pass count quoted
+here was 118, which the Dynamo deletion made stale — see §7 for the current
+figure, and do not quote a count from a step write-up.*
 
 **Coverage lost with the deleted types, restored.** The block asserting that
 `clear()` on a *non-owning* container frees nothing was shared with the `Q2Dict`

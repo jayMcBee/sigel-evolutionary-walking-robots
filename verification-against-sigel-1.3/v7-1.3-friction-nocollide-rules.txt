@@ -1,96 +1,74 @@
-V7 — friction and no-collide rules, checked against the 1.3 binary
-==================================================================
+V7 -- friction and no-collide rules, from the SIGEL 1.3 binary
+=============================================================
 Captured 2026-08-29 on the x86 reference box, through the sigel-x86 session.
-Four runs on walker, following V6's two on hammer. Capture once, diff for ever.
+Four runs on walkerNiceWalkingFitness.exp. V6 covered hammer.
 
-WHY
----
-D10 converted SIG_Link::noCollide and D11 SIG_Material::friction. No shipped
-file exercises either: 0 friction declarations and 0 'nocollide' in all 7
-.rrb, nfric 0 on all 31 Material lines and noCollideCount 0 on all 87 Link
-records of the 14 .exp. V6 confirmed negotiation on hammer. These four runs
-close the remaining rules.
-
-Walker is the stronger subject: 4 materials, 19 links. Runs declared TWO
-partners where possible, so the inner lists are exercised as containers.
-
-RESULTS
+SUBJECT
 -------
-1. MULTIPLE PARTNERS WORK, AND EACH KEEPS ITS OWN VALUE.
-   shoulderMaterial declared "footMaterial 0.3 bodyMaterial 0.7".
-   Both reverse entries appeared, 0.3 on foot and 0.7 on body -- not swapped,
-   not averaged. Pair order preserved. legMaterial, uninvolved, stayed at 0.
+walker has 4 materials and 19 links. Load order:
 
-2. A PARTNER THAT IS NOT YET LOADED IS DROPPED, SILENTLY.
-   walker's link order is shoulder5, body, shoulder6, foot1..6, leg1..6,
-   shoulder1..4. body is SECOND, so "body -> foot1 leg1" lost both entries.
-   No warning, no error, exit 0. V6 missed this only because middle1 named
-   base, and base is hammer's FIRST link.
-   Confirmed valid ordering works: leg1 -> body kept, shoulder4 -> body foot1
-   kept both. So multiplicity is fine; the rule is purely "already loaded".
-   Negotiation is NOT order-limited -- the back-reference is installed into an
-   earlier link that was parsed before the entry existed.
+  materials  footMaterial legMaterial bodyMaterial shoulderMaterial
+  links      shoulder5 body shoulder6 foot1..foot6 leg1..leg6 shoulder1..shoulder4
 
-3. A DUPLICATE PARTNER IS REFUSED, ON BOTH SIDES.
-   "footMaterial 0.3 footMaterial 0.7" saved as nfric 1, value 0.7 -- the
-   second declaration UPDATED the first, last wins.
-   "body body" saved as nNoCollide 1. The negotiated reverse is de-duplicated
-   too: body came back with ONE entry, not two.
-   Both confirm code Phase D converted: D10's containsRef(x)==0 -> !contains(x)
-   and D11's append-versus-update walk. Both are upstream, not ours.
-
-4. A DROPPED FORWARD REFERENCE IS NOT RESURRECTED -- AND THIS IS THE ONE THAT
-   MATTERS.
-   bodyMaterial (3rd) declared "shoulderMaterial 0.3"   -- forward, dropped
-   shoulderMaterial (4th) declared "bodyMaterial 0.7"   -- valid, negotiates
-
-   Result:  bodyMaterial   nfric 1   shoulderMaterial 0.7
-
-       wrote:  bodyMaterial -> shoulderMaterial 0.3
-       got:    bodyMaterial -> shoulderMaterial 0.7
-
-   The pair is present. The partner name is right. nfric is right. It is
-   symmetric. Every structural check passes -- AND THE VALUE IS SOMEBODY
-   ELSE'S. The 0.3 is gone, with no warning and exit 0.
-
-   nfric is 1 and not 2, so the back-reference is a fresh insertion, not a
-   repair of the dropped one. Nothing remembers the discarded declaration.
-
-WHAT THIS COST US, AND WHAT IT BOUGHT
--------------------------------------
-Result 4 is not "an entry disappears", which a count would catch. It is "an
-entry survives with the wrong value", which only a value check catches. The
-negotiation REPAIRS the structure the drop broke, so structural checks are not
-merely passing, they are actively restored into passing.
-
-Our self-check had no assertion that could see it. It checked the partner
-after the first set and never re-read it after an update. Added:
-
-    SIG_WANT(b.getFrictionValue(&a) == 0.75);
-
-Verified to have teeth: moving setFrictionValue's negotiate call inside its
-"if (!found)" block -- which reads like a tidy -- makes exactly that one
-assertion fail. The count assertion and the name checks all still pass.
-
-CONSEQUENCE FOR THE PORT
-------------------------
-V1 established the link and material containers permute on EVERY round trip.
-Once friction or no-collide entries exist, a permutation can move a partner
-from before its declaring entity to after it, and the entry is then dropped
-on the next load and refilled by negotiation with a different value. So
-emission order stops being cosmetic. Nothing shipped declares either, so this
-is latent -- but it weakens the argument behind PORTING.md section 10's choice
-of iteration order over numbering for .rrb files.
+Runs declared two partners wherever the format allows, so the inner lists are
+exercised as containers.
 
 METHOD
 ------
-Scratch copies only; pristine walker md5-verified unchanged after every run.
-Both dead 2003 roots repointed separately. No pvmd running, so every
-pvm_addhosts failed and SIGEL loaded, saved and exited 0 having evaluated
-zero generations -- evaluation impossible rather than skipped. Edits applied
-mechanically, asserting the expected token before substituting.
+Scratch copies. The pristine walker was md5-verified unchanged after each run.
+The two dead 2003 roots were repointed separately. Each edit asserted the
+expected token before substituting it. No pvmd, so each run is a pure load and
+save with zero generations evaluated.
 
-Results reported per NAMED entity, never by position. See V6 for why.
+Results are keyed to named entities. The containers permute on a round trip
+(V1), so a position is not a key.
 
-Source: the sigel-x86 session, which designed runs 2 and 4 itself and found
-result 2 without being asked for it.
+RESULT 1 -- multiple partners work, each keeping its own value
+--------------------------------------------------------------
+  wrote  shoulderMaterial -> footMaterial 0.3 bodyMaterial 0.7
+  got    footMaterial  nfric 1  shoulderMaterial 0.3
+         bodyMaterial  nfric 1  shoulderMaterial 0.7
+         legMaterial   nfric 0
+
+Not swapped, not averaged. Pair order preserved.
+
+RESULT 2 -- a partner not yet loaded is dropped, with no message
+----------------------------------------------------------------
+  wrote  body -> foot1 leg1        got  body nNoCollide 0   both lost
+  wrote  leg1 -> body              got  kept
+  wrote  shoulder4 -> body foot1   got  both kept
+
+body is the second link loaded, so foot1 and leg1 are forward references. No
+warning, no error, exit 0. The rule is "partner already loaded", not "one
+partner only". Negotiation itself is not order-limited: the reverse entry is
+installed into a link parsed before the declaration existed.
+
+RESULT 3 -- a duplicate partner is refused, on both sides
+----------------------------------------------------------
+  wrote  footMaterial 0.3 footMaterial 0.7   got  nfric 1, value 0.7
+  wrote  body body                           got  nNoCollide 1
+
+The second declaration updates the first; last wins. The negotiated reverse
+entry is de-duplicated too -- body came back with one entry, not two. This is
+the behaviour D10 and D11 converted: D10's containsRef(x)==0 -> !contains(x),
+D11's append-versus-update walk. Both are upstream.
+
+RESULT 4 -- a dropped forward reference is not resurrected
+-----------------------------------------------------------
+  wrote  bodyMaterial     (3rd) -> shoulderMaterial 0.3   forward, dropped
+  wrote  shoulderMaterial (4th) -> bodyMaterial 0.7       valid, negotiates
+  got    bodyMaterial  nfric 1  shoulderMaterial 0.7
+
+The pair is present, the partner name is right, nfric is right and the graph
+is symmetric. The value is the other side's. The 0.3 is gone, no warning,
+exit 0. nfric is 1 and not 2, so the reverse entry is a fresh insertion, not a
+repair. Nothing records the discarded declaration. A count check cannot see
+this; only a value check can.
+
+CONSEQUENCE
+-----------
+Once friction or no-collide entries exist, emission order decides which
+entries survive a load. A permutation that moves a partner after its declaring
+entity drops that entry, and negotiation then refills it with the other side's
+value. Nothing shipped declares either, so this is latent. It bears on
+PORTING.md section 10's choice of iteration order over numbering for .rrb.

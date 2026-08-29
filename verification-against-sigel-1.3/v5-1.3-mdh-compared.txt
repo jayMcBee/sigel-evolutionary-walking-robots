@@ -14,16 +14,13 @@
 # V1 gates that order independently, so it is a key something else already
 # checks.
 #
-# THE METHOD THIS REPLACED WAS CIRCULAR, which is the part worth remembering.
-# The x86 side first described its matching as "by alpha, which is unique per
-# joint" -- alpha is not unique, 6 of the 9 share 4012d97c7f3321d2 -- and on
-# re-examination it had actually used a greedy minimum-total-ulp assignment
-# across all four fields. That method chooses whichever pairing makes the two
-# sides agree best, so it cannot produce a large disagreement even when one
-# exists: it optimises for the very quantity the comparison is trying to
-# measure. It swapped secondLegJoint3 with thirdLegJoint3 and spread two exact
-# rows onto their neighbours, which is why the first table reported one exact
-# joint where there are three.
+# Rows are keyed by CALL ORDER, which V1 gates independently.
+#
+# The first table used a greedy minimum-total-ulp assignment, described at the
+# time as "by alpha, which is unique per joint". alpha is not unique -- 6 of
+# the 9 share 4012d97c7f3321d2. That method swapped secondLegJoint3 with
+# thirdLegJoint3 and spread two exact rows onto their neighbours, reporting
+# one exact joint where there are three.
 #
 # NEVER key reference data by minimising the difference under test.
 #
