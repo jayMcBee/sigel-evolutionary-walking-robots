@@ -1571,6 +1571,24 @@ build. The build files are what settle it, not the source: our `Makefile`
 globs `*.cpp`, so it compiles both into one archive where 2003 compiled them
 into separate targets, and that glob is what made the pair look accidental.
 
+**Confirmed against the 1.3 binaries, 2026-08-29**, by symbol table and
+disassembly on the x86 box — static only, nothing run. Both failure hypotheses
+are excluded:
+
+| | `sigel` | `sigel_slave` |
+|---|---|---|
+| `MT_*` symbols | **168** | **0** |
+| `SIG_GPExperiment()` calls to `MT_Controller` | 1 | 0 |
+| `SIG_GPExperiment(QString)` calls | 1 | 0 |
+
+The slave contains **no `MT_Controller`, `MT_GPSystem` or any `MT_*` symbol at
+all** — not an unused copy, absent. So the slave did not link the library's
+variant, and the master did not use `Clean`. The master's call site
+disassembles to `__builtin_new(248)` followed by
+`__13MT_ControllerRQ28SIGEL_GP16SIG_GPExperiment`, which is
+`MT_Controller::MT_Controller(SIG_GPExperiment &)` — a reference, matching
+`new MT_Controller(*this)` as written.
+
 **When converting anything in this class, change both files and both headers.**
 Renaming them so the pair is self-evident is in `future_refactorings.md`.
 
