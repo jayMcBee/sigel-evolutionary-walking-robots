@@ -20,7 +20,7 @@
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-#include "compat/q2compat.h"
+#include <QList>
 #include "SIGEL_GP/SIG_GPOperations.h"
 #include "SIGEL_Program/SIG_Program.h"
 #include "SIGEL_GP/SIG_GPPopulation.h"
@@ -29,7 +29,7 @@
 
 /*------------------------------------------Crossover-----------------------------------------*/
 
-Q2PtrVector<SIGEL_GP::SIG_GPIndividual> SIGEL_GP::SIG_GPOperations::crossOver( SIGEL_GP::SIG_GPIndividual& winner1,
+QList<SIGEL_GP::SIG_GPIndividual *> SIGEL_GP::SIG_GPOperations::crossOver( SIGEL_GP::SIG_GPIndividual& winner1,
 									   int poolPos1,
 									   SIG_GPIndividual& winner2,
 									   int poolPos2,
@@ -356,9 +356,9 @@ Q2PtrVector<SIGEL_GP::SIG_GPIndividual> SIGEL_GP::SIG_GPOperations::crossOver( S
 				   fitness1,
 				   fitness2 );
 
-  Q2PtrVector< SIG_GPIndividual > crossedInds( 2 );
-  crossedInds.insert( 0, crossoverInd1 );
-  crossedInds.insert( 1, crossoverInd2 );
+  QList< SIG_GPIndividual * > crossedInds( 2 );
+  crossedInds[ 0 ] = crossoverInd1;   // insert() into a null slot: no free
+  crossedInds[ 1 ] = crossoverInd2;
 
   return crossedInds;
 };

@@ -3084,6 +3084,39 @@ constructs a trainer.
 `Q2CString` now appears in no code outside the shim. Both files dropped
 `compat/q2compat.h`; its reach falls **35 → 33** files.
 
+### D22 — `crossOver`, an owning container returned by value that owned nothing
+
+`SIG_GPOperations::crossOver` returned `Q2PtrVector<SIG_GPIndividual>` **by
+value**, and three tournament sites received the copy. That is the shape the
+shim exists to defuse — Qt 2's copy constructor cleared `del` on the copy, so a
+copy freed nothing while the original might.
+
+**Here neither end ever owned anything.** No `setAutoDelete` on the local
+`crossedInds`, none on the caller's `cinds`, so `del` was false throughout and
+both destructors freed nothing. The two individuals are handed to
+`SIG_GPPopulation::setIndividual`, which takes ownership — the same call whose
+free of the losing individual D15 had to write out. `QList` never frees a
+pointer, so this conversion moves **no ownership at all**, which is the first
+time in Phase D that has been true of an owning-looking container.
+
+`insert(0, x)` and `insert(1, x)` go into slots a `QList(2)` has just
+value-initialised to null, so `insert` deleted nothing and a plain assignment
+is exact.
+
+Six sites, three files. `SIG_GPOperations.cpp` and
+`SIG_GPCrossOverTournament.cpp` both dropped `compat/q2compat.h`; its reach
+falls **33 → 30** files.
+
+**Nothing executes any of it.** Neither file is linked into `sigel_eval` —
+crossover only runs during an evolution, which needs `sigel_slave`, which needs
+Phase C. Coverage is `check.sh`'s syntax pass and nothing else.
+
+**Nothing here was worth asking the 1.3 binary.** `crossOver` touches no file
+and produces no observable output; its crossover points come from the
+randomiser, which is item 8 of the validation list and a separate job. Recorded
+because the standing instruction is to use that machine wherever it can help,
+and saying "not here" is part of following it.
+
 ### A logging system
 
 Qt 2's `QTextStream` wrote through to unbuffered `stderr` on every `<<`. Qt 6

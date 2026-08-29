@@ -20,7 +20,7 @@
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-#include "compat/q2compat.h"
+#include <QList>
 #include "SIGEL_GP/SIG_GPCrossOverTournament.h"
 #include "SIGEL_Tools/SIG_IO.h"
 
@@ -128,7 +128,7 @@ bool SIGEL_GP::SIG_GPCrossOverTournament::run()
    SIGEL_Tools::SIG_IO::cerr <<"\nthe Individuals " <<winnerPos1<<" and "<<winnerPos2<<" winns the Tournament and will be crossed..\n";
 #endif
 
-   Q2PtrVector< SIG_GPIndividual > cinds = SIG_GPOperations::crossOver(*winner1,
+   QList< SIG_GPIndividual * > cinds = SIG_GPOperations::crossOver(*winner1,
 								   looserPos1,
 								   *winner2,
 								   looserPos2,
@@ -216,7 +216,7 @@ bool SIGEL_GP::SIG_GPCrossOverTournament::run(MT_Classifier *MetaClassifier)
        looserPos2 = popos2_1;
      };
 
-   Q2PtrVector< SIG_GPIndividual > cinds = SIG_GPOperations::crossOver(*winner1,
+   QList< SIG_GPIndividual * > cinds = SIG_GPOperations::crossOver(*winner1,
 								   looserPos1,
 								   *winner2,
 								   looserPos2,
@@ -294,7 +294,7 @@ bool  SIGEL_GP::SIG_GPCrossOverTournament::classify(MT_Classifier *MetaClassifie
        looserPos2 = popos2_1;
      };
 
-   Q2PtrVector< SIG_GPIndividual > cinds = SIG_GPOperations::crossOver(*winner1,
+   QList< SIG_GPIndividual * > cinds = SIG_GPOperations::crossOver(*winner1,
 								   looserPos1,
 								   *winner2,
 								   looserPos2,
