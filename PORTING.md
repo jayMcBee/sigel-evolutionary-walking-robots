@@ -30,7 +30,7 @@ build and run, because nothing else can be verified without it — see §3.
 | B — ownership explicit | **subsumed by Phase D**, which deletes the containers rather than converting them. **11** `setAutoDelete` left in core, re-measured 2026-08-29 after D11 — 10 in `SIGEL_GP`, 1 in `MT_Control`, **0 in `SIGEL_Robot`**: D11 deleted `SIG_Body.cpp:54`, the last one, and left this row saying 12. *Before that it read 13 with 2 in `SIGEL_Robot`, where there was one. Three readings of the same row, three corrections, each by review.* **Not all of them are unreachable, and an earlier version of this row said they were.** `SIG_GPPopulation::pool` is owning, is constructed on every `sigel_eval` run and takes 100 `insert()`s inside both gates — see "What the gates actually reach" in §10. The **6** in `SIG_GPFitnessTrainer` and `SIG_GPManager` are the ones Phase C still blocks; the row said 7, which did not even add up against the 10 in the same sentence |
 | R — build and run | core builds and runs. **No longer checked only against itself** — Phase V has confirmed both the ordering and the arithmetic against the 1.3 binary, §7 |
 | T — old-Qt tool container | **done 2026-08-27.** `tools/qtmig`, §4 |
-| D — delete the shim, migrate the data | **D1–D23 done.** `Q2Dict`, `Q2DictIterator`, `Q2Array` and `Q2CString` gone from all code; the simulation path, `SIG_GPFitnessTrainer`, `SIG_GPFullDataRecorder` and `crossOver` all converted. Shim 806 → **536** lines, included by **26** files. Remaining, measured 2026-08-29 after D23: `Q2PtrList` 39, `Q2PtrVector` 46, `Q2Queue` **9**, `Q2ValueList` 12, `Q2ListIterator` 8, `Q2CString` 15 — **lines containing the name, in the source tree only**: the shim's own header and self-check are included, `sigel_eval.cpp` and `verification-against-sigel-1.3/` are not. State the scope when you re-measure; the same six names give 46/46/9/12/8/15 if `sigel_eval.cpp` and the captures are counted, and 48/48/9/12/8/15 if you count occurrences instead of lines. The `Q2PtrVector` bulk is `SIG_GPManager::tours`, which **cannot be linked** until Phase C. §10 |
+| D — delete the shim, migrate the data | **D1–D24 done.** `Q2Dict`, `Q2DictIterator`, `Q2Array` and `Q2CString` gone from all code; the simulation path, `SIG_GPFitnessTrainer`, `SIG_GPFullDataRecorder` and `crossOver` all converted. Shim 806 → **536** lines, included by **24** files. Remaining, measured 2026-08-30 after D24: `Q2PtrList` **37**, `Q2PtrVector` 46, `Q2Queue` **9**, `Q2ValueList` 12, `Q2ListIterator` 8, `Q2CString` 15 — **lines containing the name, in the source tree only**: the shim's own header and self-check are included, `sigel_eval.cpp` and `verification-against-sigel-1.3/` are not. State the scope when you re-measure; the same six names give 46/46/9/12/8/15 if `sigel_eval.cpp` and the captures are counted, and 48/48/9/12/8/15 if you count occurrences instead of lines. The `Q2PtrVector` bulk is `SIG_GPManager::tours`, which **cannot be linked** until Phase C. §10 |
 | P — PVM | **DONE 2026-08-28.** Vendored 3.4.3 replaced by upstream 3.4.6; nine patches carry the four config lines and Debian's eight source fixes; `libpvm3.a` and `pvmd3` build; SIGEL's two PVM objects link against them and `SIG_GPPVMData` round-trips through real PVM. `sigel`/`sigel_slave` still need Phase C. §7 |
 | C — GUI | **not started, AUTHORIZED 2026-08-27 per D24.** ~450 Qt 2 sites + 20 forms |
 | V — check against the 1.3 binary | **V1, V5's MDH probe, V6, V7 and V8 all done, all PASS.** Ordering: 10 of 10 container orders match. Arithmetic: `twoBases` exact bit for bit, `octopus` 9/9 with three joints exact and 5 ulp worst. **V6, V7 and V8 done 2026-08-29** — friction and no-collide negotiation, their four remaining rules, and the GP parameter blocks captured *before* their conversion. `verification-against-sigel-1.3/v6`, `v7`, `v8`. V2–V4 not started; V5's sensor and force probes are **invalid as specified** — both target Dynamo-only functions, deleted 2026-08-28. §7 |
@@ -404,7 +404,9 @@ through `f0f2daa`.
 ## 7. Steps
 
 **Exit criterion per step:** `./check.sh` at the repo root — **105 pass, 4 fail,
-322 warnings** as of 2026-08-28. The 4 failures are exactly the files the
+313 warnings** as of 2026-08-30 (322 on 2026-08-28; the drops are recorded per
+step and each is explained — a step that silently loses a warning has hidden
+something). The 4 failures are exactly the files the
 Makefile excludes. It was 118/4/338 until the Dynamo backend was deleted
 (`physics_backends.md`); the pass count and "headers standalone" each fall by
 exactly 13, one per deleted file pair, and the failing files are unchanged.
@@ -3358,6 +3360,96 @@ these files, so coverage is compile-and-archive only", and the coverage table
 row named the three linked classes as the unlinked ones. That is exactly
 inverted, and it was asserted without running the `nm` the previous step's row
 had already established as the way to measure this.*
+
+### D24 — `MT_Evaluator::TmpBuffer` and `MT_Statistics::StatisticsOfGeneration`
+
+Both are `Q2PtrList`; both become `QList<T *>`. Two headers, two bodies, seven
+call sites. **Checked against the 1.3 binary before writing**, which is a first
+for a `Q2PtrList` step.
+
+**`TmpBuffer` — the loop is not what the plan said it was.** The note carried
+from D23 described "a `take` and a conditional re-`insert`, in a loop that
+changes its own bound while indices shift underneath". Reading it
+(`MT_Evaluator.cpp:478-514`), both halves are wrong:
+
+```cpp
+int TmpBufferSize = TmpBuffer.count();     // snapshot, never re-read
+for (int i = 0; i < TmpBufferSize; i++) {
+    TCases = TmpBuffer.take(i);            // removes, shifts down
+    if (TCases->getName() == taskId) {
+        TmpBufferSize--;                   // dead: break follows
+        ...enqueue on TCaseBuffer...
+        break;
+    } else
+        TmpBuffer.insert(i, TCases);       // puts it straight back at i
+}
+```
+
+The bound is a snapshot and the index advances normally. It is safe because the
+non-matching branch reinserts at the same position, so `take`-then-`insert` is a
+round trip and the indices never actually shift. Only the matching element stays
+removed, and the loop breaks on it. It is a linear search written as
+remove-and-maybe-replace. `TmpBufferSize--` is dead — `break` is three lines
+later and the variable is never read again.
+
+**The 1.3 binary confirms all of it, including the dead code.** The back-edge
+targets the comparison, not the `count()` call, so the bound is snapshotted
+once. And `decl -0x10(%ebp)` — the dead decrement — **is present in the 2003
+build**, at exactly the position our source puts it, on the matching branch,
+before `setFitness`. gcc 2.95 did not eliminate it. *A dead store surviving in
+both is stronger evidence of a common source than any live path, because no
+behaviour forces it to agree.* That matters here beyond D24: it is the first
+hard evidence that the `MT_` half of the tree, where the only confirmed
+source/binary divergence lives, is otherwise common. **It does not license
+generalising to all of `MT_`** — one function is one function.
+
+**`setAutoDelete(false)` is dropped, and that is safe because it was a no-op.**
+It is the only such call on `TmpBuffer`, nothing ever sets it true, and Qt 2's
+default is already false. `QList` has no equivalent. The 1.3 binary calls it
+with `pushw $0x0`, confirming the argument. So the container never owned its
+items before or after.
+
+**`StatisticsOfGeneration` carries the `at()` trap.** `Q2PtrList::at(i)` returns
+**nullptr** out of range (`q2compat.h:270`); `QList::at(i)` is undefined
+behaviour. `MT_Statistics.cpp:79` writes
+`if (getStatisticElement(i) != NULL)`, and `getStatisticElement` is nothing but
+`return StatisticsOfGeneration.at(...)` — so the 2003 author relied on that null
+defensively, and it is a public accessor any caller can pass anything. **Both
+`at()` sites become `value()`**, which returns a default-constructed `T *`, i.e.
+nullptr, out of range. `at()` would have compiled silently and been UB on the
+path the original guards.
+
+| site | was | now |
+|---|---|---|
+| `MT_Statistics.cpp:66,78,112` | `count()` | `size()` |
+| `MT_Statistics.cpp:87` | `append` | unchanged |
+| `MT_Statistics.cpp:94,115` | `at(i)` | **`value(i)`** |
+| `MT_Evaluator.cpp:447` | `append` | unchanged |
+| `MT_Evaluator.cpp:478` | `setAutoDelete(false)` | **deleted**, no-op |
+| `MT_Evaluator.cpp:479` | `count()` | `int( size() )` |
+| `MT_Evaluator.cpp:485` | `take(i)` | `takeAt(i)` |
+| `MT_Evaluator.cpp:512` | `insert(i, p)` | unchanged |
+
+**Warnings fall 315 → 313, and the two lost are accounted for.** Both were
+`-Wsign-compare` at `MT_Statistics.cpp:78` and `:112` — `int i < uint count()`.
+Qt 6's `size()` is signed `qsizetype`, so the comparison is signed-vs-signed and
+the warning is correct to disappear. No behaviour change: for `i >= 0` the
+Qt 2 form converted `i` to unsigned and compared equal. *A step that loses a
+warning without naming it has hidden something; these two are named.*
+
+**Ownership is unchanged and still leaks, in both trees.** `TmpBuffer` holds
+cases allocated at `MT_Evaluator.cpp:447`; `~MT_Evaluator` (`:73`) deletes only
+`Interpreter` and `BestMETAProgram`. `StatisticsOfGeneration` holds elements
+allocated at `MT_Statistics.cpp:56`; `~MT_Statistics` (`:18`) is **empty**.
+Neither container ever owned its items, so nothing frees them. Pre-existing,
+unreachable while the subsystem does not run, and recorded rather than fixed —
+a leak fix is not a port change.
+
+`MT_Statistics.cpp` is a **CRLF** file. Verified byte-exact: every changed line
+carries `^M` on both sides of the diff, and no line I did not edit moved.
+
+Shim reach falls **26 → 24**; `Q2PtrList` 39 → **37** (scope as in the status
+table: lines, source tree only).
 
 ### A logging system
 

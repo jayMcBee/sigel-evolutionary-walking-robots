@@ -5,7 +5,7 @@
 #if !defined(AFX_MT_STATISTICS_H__010CEA5A_30F4_406B_93E1_DD5D57975FE5__INCLUDED_)
 #define AFX_MT_STATISTICS_H__010CEA5A_30F4_406B_93E1_DD5D57975FE5__INCLUDED_
 
-#include "compat/q2compat.h"
+#include <QList>
 #include "MT_GPSystem/MT_StatisticsElement.h"
 
 
@@ -47,7 +47,7 @@ public:
 
 	/* This QList is a recording of  MT_StatisicsElement per Generation;
 	* the first Element of the List belonging to the first Generation, and so on*/
-	Q2PtrList<MT_StatisticsElement>  StatisticsOfGeneration;
+	QList<MT_StatisticsElement *>  StatisticsOfGeneration;
 
 
 };

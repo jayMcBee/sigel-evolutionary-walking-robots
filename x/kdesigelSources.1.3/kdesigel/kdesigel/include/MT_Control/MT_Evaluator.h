@@ -6,7 +6,7 @@
 #define AFX_MT_EVALUATOR_H__090E0ACB_93A0_4093_95C2_57A10AEBBAE5__INCLUDED_
 
 
-#include "compat/q2compat.h"
+#include <QList>
 #include "MT_Control/MT_Substitute.h"
 #include "SIGEL_GP/SIG_GPFitnessTrainer.h"
 //#include <pvm3.h>
@@ -32,7 +32,7 @@ public:
 private:
 	
 	// for internal use 
-	Q2PtrList<MT_TrainingCase> TmpBuffer;
+	QList<MT_TrainingCase *> TmpBuffer;
 	QList<double> MT_ResultBuffer; 
 	int MT_ResultSize;
 	int NextFreePos;

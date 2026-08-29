@@ -63,7 +63,7 @@ void MT_Statistics::writeToFileMT_Statistics(QTextStream & File)
 {
 
 	File << ("Statistics:\n");
-	File << (StatisticsOfGeneration.count()) <<Qt::endl;
+	File << (StatisticsOfGeneration.size()) <<Qt::endl;
 	File << NumOfSimpleCopyParent <<Qt::endl;
 	File << NumOfMutateIndividuals <<Qt::endl;
 	File << NumOfMutateImprovingIndividuals <<Qt::endl;
@@ -75,7 +75,7 @@ void MT_Statistics::writeToFileMT_Statistics(QTextStream & File)
 	File << TotalCrossoverEvent[5] <<Qt::endl;
 	File << Qt::endl;
 
-	for (int i=0; i<(StatisticsOfGeneration.count());i++)
+	for (int i=0; i<(StatisticsOfGeneration.size());i++)
 		if (getStatisticElement(i) != NULL)
 			getStatisticElement(i)->writeToFileElement(File);
 	
@@ -91,7 +91,7 @@ void MT_Statistics::addStatisticElement(MT_StatisticsElement *Element)
 MT_StatisticsElement * MT_Statistics::getStatisticElement(int ElementOfGeneration)
 {
 
-	return StatisticsOfGeneration.at(ElementOfGeneration);
+	return StatisticsOfGeneration.value(ElementOfGeneration);
 
 }
 
@@ -109,10 +109,10 @@ int MT_Statistics::updateStatistics()
 	MT_StatisticsElement * PresentSElement;
 
 
-	for (int i=1; i<StatisticsOfGeneration.count(); i++)
+	for (int i=1; i<StatisticsOfGeneration.size(); i++)
 	{
 	
-		PresentSElement= StatisticsOfGeneration.at(i);
+		PresentSElement= StatisticsOfGeneration.value(i);
 	
 		NumOfSimpleCopyParent = NumOfSimpleCopyParent + PresentSElement->NumOfSimpleCopyOffspring;
 

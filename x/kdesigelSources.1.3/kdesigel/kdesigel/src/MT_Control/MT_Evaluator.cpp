@@ -475,14 +475,13 @@ double MT_Evaluator::checkTask(int taskId)
 //DebugInfo = NumOfCorrectEstimation[GenerationNumber];
 		
 			MT_TrainingCase * TCases;
-			TmpBuffer.setAutoDelete(false);
-			int TmpBufferSize = TmpBuffer.count();
+			int TmpBufferSize = int( TmpBuffer.size() );
 
 			for (int i=0; i< TmpBufferSize; i++) 
 			{
 
 //DebugInfo= TmpBuffer.count();
-				TCases=TmpBuffer.take(i);
+				TCases=TmpBuffer.takeAt(i);
 //DebugInfo= TmpBuffer.count();
 
 				if(TCases->getName() == taskId)
