@@ -6,7 +6,7 @@
 #define AFX_MT_TRAININGSET_H__EAB6FC95_1FB5_4AF2_851B_A67AFC617337__INCLUDED_
 
 
-#include "compat/q2compat.h"
+#include <QQueue>
 #include "MT_GPSystem/MT_TranslatedIndividual.h"
 #include "MT_GPSystem/MT_TrainingCase.h"
 #include <qstring.h>
@@ -40,7 +40,7 @@ public:
 	/* updateTSet receive a pointer of a QQueue, which contain new T-cases. 
 	*The new T-cases result from the MT_Substitute. 
 	*/
-	void updateTSet (Q2Queue<MT_TrainingCase> *NewTCases);
+	void updateTSet (QQueue<MT_TrainingCase *> *NewTCases);
 	
 	/* changeTSize change the Size of T-set especially
 	* the Size of the QArray and the TSize.

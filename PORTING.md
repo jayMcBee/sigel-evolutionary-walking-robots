@@ -2437,6 +2437,7 @@ which is why the list exists.
 | both `wasCanceled()` shrinks, D15 | need a `QApplication`; `sigel_eval` has none, so `if (qApp)` is false |
 | `readFromFile`'s shrink loop, D15 | the function runs on every load, but always on an **empty** pool, so the loop body never executes |
 | `sort`, D15 | no caller anywhere |
+| all six D23 sites | `MT_Substitute`, `MT_Trainingset` and `MT_FitnessTrainer` are not linked into `sigel_eval`; the queue is filled only by `MT_Classifier` and `MT_Evaluator`, both evolution-loop |
 | **all six D22 sites** | `nm -C build/sigel_eval` finds **0** `SIG_GPOperations::` and **0** `SIG_GPCrossOverTournament::`, and the same in `pvm_link`. The objects are archived in `libSIGEL_GP.a` and never pulled into a link. The evolution loop needs `sigel`, which Phase C blocks |
 | all six `Q2CString` sites in `SIG_GPFitnessTrainer`, D21 | zero trainer symbols in `sigel_eval`; `pvm_link` links the object but never constructs a trainer, so they are **link-checked and never run** |
 | `SIG_GPPVMData`'s `+ 2`, D21 | `pvm_link` runs the function, but `pvm-check.sh` passes with `+ 1` **and** `+ 0` — `QList` over-allocation hides a shortfall under about 8 bytes |
@@ -3130,6 +3131,35 @@ and produces no observable output; its crossover points come from the
 randomiser, which is item 8 of the validation list and a separate job. Recorded
 because the standing instruction is to use that machine wherever it can help,
 and saying "not here" is part of following it.
+
+### D23 — `Q2Queue` becomes `QQueue`, and the API used is three methods
+
+`MT_Substitute::TCaseBuffer` and the two parameter types become
+`QQueue<MT_TrainingCase *>`. Qt 6 has a real `QQueue`, so `enqueue`, `dequeue`
+and `count` keep their names and only the type spelling changes: six type
+sites across six files, no call site touched.
+
+**The shim's `Q2Queue` had eight methods; SIGEL uses three.** `head`,
+`current`, `remove`, `clear` and the implicit `operator T *` have no caller
+anywhere in the tree, so the whole question of reproducing them is moot.
+
+**One divergence, and it cannot fire.** The shim's `dequeue()` returned null
+on an empty queue — deliberately, because Qt 2's `QGList::takeFirst` removed
+the first *node* regardless. `QQueue::dequeue()` is `takeFirst()`, which
+asserts. The only drain is `MT_Trainingset::updateTSet`, which dequeues
+`count()` items, recounts, then dequeues the remainder: exactly the whole
+queue, never one more.
+
+**The queue never owned its contents and still does not.** No `setAutoDelete`
+anywhere, so `~Q2Queue` freed nothing and `~QQueue` frees nothing.
+`dequeue()` transfers ownership out, and `updateTSet` either `delete`s the
+excess explicitly or hands each case to `insertTCase`. **Anything left in the
+queue at destruction leaks** — pre-existing, unchanged, and now written down.
+
+Four of the six files dropped `compat/q2compat.h`; its reach falls **30 → 26**.
+
+`Q2Queue` appears in no code outside the shim. Nothing links any of these
+files, so coverage is compile-and-archive only.
 
 ### A logging system
 

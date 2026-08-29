@@ -2,7 +2,8 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#include "compat/q2compat.h"
+#include <QQueue>
+#include <QQueue>
 #include "MT_Control/MT_Substitute.h"
 
 //////////////////////////////////////////////////////////////////////
@@ -156,7 +157,7 @@ void MT_Substitute::setInterpreter(int NumOfVariable, int TimeToInter)
 #endif
 }
 
-Q2Queue<MT_TrainingCase> * MT_Substitute::changeTCases()
+QQueue<MT_TrainingCase *> * MT_Substitute::changeTCases()
 {	
 	return &TCaseBuffer;
 }

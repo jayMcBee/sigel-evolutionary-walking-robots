@@ -7,7 +7,7 @@
 
 
 
-#include "compat/q2compat.h"
+#include <QQueue>
 #include "MT_GPSystem/MT_Program.h"	// Added from the class view
 #include "MT_GPSystem/MT_Interpreter.h"	// Added from the class view
 #include "MT_GPSystem/MT_TranslatedIndividual.h"
@@ -63,7 +63,7 @@ public:
 #endif
 
 	// changeTCases() supply the new TrainingCases for the Meta GP-System
-	Q2Queue<MT_TrainingCase> * changeTCases();
+	QQueue<MT_TrainingCase *> * changeTCases();
 
 	// update the BestMETAProgram;  
 	void changeBest(MT_Program * MetaProg);
@@ -107,7 +107,7 @@ protected:
 	double AverageSigelFitness;
 	
 	// buffer the New MT_TrainingCase;
-	Q2Queue<MT_TrainingCase> TCaseBuffer;
+	QQueue<MT_TrainingCase *> TCaseBuffer;
 
 	// to interpret a SigelProgram on the BestMETAProgram
 	MT_Interpreter * Interpreter;

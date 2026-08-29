@@ -108,7 +108,7 @@ void MT_Trainingset::changeTSize(int NewTSize)
 
 }
 
-void MT_Trainingset::updateTSet(Q2Queue<MT_TrainingCase> *NewTCases)
+void MT_Trainingset::updateTSet(QQueue<MT_TrainingCase *> *NewTCases)
 {
 	int NumOfNew = NewTCases->count();
 	if (NumOfNew !=0)

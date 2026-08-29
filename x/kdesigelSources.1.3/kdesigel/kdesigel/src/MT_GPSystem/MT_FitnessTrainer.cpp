@@ -162,7 +162,7 @@ void MT_FitnessTrainer::setNumberOfVariables(int varNumber)
 	Interpreter.setVariableNumber(varNumber);
 }
 
-int MT_FitnessTrainer::insertNewTCases(Q2Queue<MT_TrainingCase> *NewTCase)
+int MT_FitnessTrainer::insertNewTCases(QQueue<MT_TrainingCase *> *NewTCase)
 {
 	TSet->updateTSet(NewTCase);
 	

@@ -5,7 +5,7 @@
 #if !defined(AFX_MT_FITNESSTRAINER_H__8C160767_FE7C_4FFF_B2EC_DFA03F1E983A__INCLUDED_)
 #define AFX_MT_FITNESSTRAINER_H__8C160767_FE7C_4FFF_B2EC_DFA03F1E983A__INCLUDED_
 
-#include "compat/q2compat.h"
+#include <QQueue>
 #include "MT_GPSystem/MT_TranslatedIndividual.h"
 #include "MT_GPSystem/MT_TrainingCase.h"
 #include "MT_GPSystem/MT_Interpreter.h"	
@@ -98,7 +98,7 @@ public:
 	/* update the TSet,
 	* receive a pointer of a QQueue, which contain new T-cases. 
 	* The new T-cases result from the MT_Substitute.*/
-	int insertNewTCases(Q2Queue<MT_TrainingCase> *NewTCase);
+	int insertNewTCases(QQueue<MT_TrainingCase *> *NewTCase);
 	
 	/* change the Number of Variables, which the Interpreter allowed to use. */
 	void setNumberOfVariables(int varNumber);
