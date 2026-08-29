@@ -34,7 +34,6 @@ SIGEL_GP::SIG_GPPopulation::SIG_GPPopulation()
     nextIdentifier( QString::number( 0 ) ),
     poolGeneration(0)
 {  
-  pool.setAutoDelete(true);
   history = true;
 };
 
@@ -47,7 +46,6 @@ SIGEL_GP::SIG_GPPopulation::SIG_GPPopulation(int size)
        // ToDo: Exception
      }
 
-   pool.setAutoDelete( true );
    pool.resize( size );
 
    history = true;
@@ -57,7 +55,8 @@ SIGEL_GP::SIG_GPPopulation::SIG_GPPopulation(int size)
    
    for( int x=0; x<getSize(); x++ ) 
      { 
-       pool.insert( x, new SIGEL_GP::SIG_GPIndividual( *getRandomizerPointer() ) );
+       delete pool[ x ];
+       pool[ x ] = new SIGEL_GP::SIG_GPIndividual( *getRandomizerPointer() );
        getIndividualPointer( x )->setPoolPos( x );
      }  
 };
@@ -93,7 +92,6 @@ SIGEL_GP::SIG_GPPopulation::SIG_GPPopulation(int size,
 {
    setRandomizer( &r );
 
-   pool.setAutoDelete( true );
    pool.resize( size );
 
    history = true;
@@ -103,7 +101,8 @@ SIGEL_GP::SIG_GPPopulation::SIG_GPPopulation(int size,
 
    for( int x=0; x<getSize(); x++ )
      { 
-       pool.insert( x, new SIGEL_GP::SIG_GPIndividual( r, param, languageP ) );
+       delete pool[ x ];
+       pool[ x ] = new SIGEL_GP::SIG_GPIndividual( r, param, languageP );
        getIndividualPointer( x )->setPoolPos( x );
      }
 }  
@@ -113,14 +112,14 @@ SIGEL_GP::SIG_GPPopulation::SIG_GPPopulation(int size,
 {
    setRandomizer( &r );
 
-   pool.setAutoDelete( true );
    pool.resize( size );
 
    history = true;
    
    for( int x=0; x<getSize(); x++ )
      { 
-       pool.insert( x, new SIGEL_GP::SIG_GPIndividual( r ) );
+       delete pool[ x ];
+       pool[ x ] = new SIGEL_GP::SIG_GPIndividual( r );
        getIndividualPointer( x )->setPoolPos( x );
      }
 }  
@@ -134,6 +133,7 @@ SIGEL_GP::SIG_GPPopulation::~SIG_GPPopulation()
 
 #endif
 
+  qDeleteAll( pool );
   pool.clear();
   delete randomizer;
 };
@@ -165,7 +165,11 @@ void SIGEL_GP::SIG_GPPopulation::setIndividual(SIG_GPIndividual& indi,
 					       int poolpos)
 {
   // pool.resize(getSize()+1);
-  pool.insert( poolpos, &indi );
+  // insert() freed the individual already in this slot -- the LOSER of a
+  // tournament. This delete is that free. The pool then owns a pointer the
+  // caller allocated, which is how 2003 wrote it.
+  delete pool[ poolpos ];
+  pool[ poolpos ] = &indi;
 };
 
    
@@ -188,7 +192,8 @@ void SIGEL_GP::SIG_GPPopulation::addRandomIndividuals(int quantity,
      { 
        SIG_GPIndividual *newInd = new SIG_GPIndividual( *getRandomizerPointer(), param, languageP );
        newInd->setName( getNextIdentifier() );
-       pool.insert( x, newInd );
+       delete pool[ x ];
+       pool[ x ] = newInd;
        getIndividualPointer( x )->setPoolPos( x );
 
        if( qApp )
@@ -213,7 +218,7 @@ void SIGEL_GP::SIG_GPPopulation::addRandomIndividuals(int quantity,
     
 int SIGEL_GP::SIG_GPPopulation::getSize()
 {
-    return pool.size();
+    return int( pool.size() );
 };
 
     
@@ -267,15 +272,19 @@ void SIGEL_GP::SIG_GPPopulation::deleteIndividual(int poolpos)
 
    SIGEL_GP::SIG_GPIndividual *tmpInd;
 
+   // The victim. Q2PtrVector::insert() freed it on the first iteration below;
+   // take() then nulled each source slot, so the resize at the end truncated
+   // a null and freed nothing. Exactly one delete, and this is it.
+   delete pool[ poolpos ];
+
    for( int x=poolpos; x<getSize()-1; x++ )
      { 
-       //pool.remove(poolpos);
        tmpInd = getIndividualPointer( x + 1 );
        tmpInd->setPoolPos( x );
-       pool.insert( x, pool.take( x+1 ) );
+       pool[ x ] = pool[ x+1 ];
      }
 
-   pool.resize( getSize() - 1 );
+   pool.removeLast();
 }
 
 
@@ -311,7 +320,8 @@ void SIGEL_GP::SIG_GPPopulation::importNewIndividual( QString& filename )
    // we don't know where this individual came from -> void fitness !
    newInd->setFitness(-1.0);
 
-   pool.insert( lastPos, newInd );
+   delete pool[ lastPos ];
+   pool[ lastPos ] = newInd;
 }
 
 void SIGEL_GP::SIG_GPPopulation::readFromFile(QTextStream &file)
@@ -343,7 +353,16 @@ void SIGEL_GP::SIG_GPPopulation::readFromFile(QTextStream &file)
   if( (pos=populationStr.indexOf("POPULATIONSIZE=", 0, Qt::CaseInsensitive) )!=-1 ) 
     { 
         pos2=populationStr.indexOf(";", pos + 16, Qt::CaseInsensitive); 
-        pool.resize((populationStr.mid(pos+15,pos2-pos-15)).toLong());
+        {
+          // Q2PtrVector::resize() freed every truncated item. QList does not,
+          // so a shrink here would leak. Reached with an empty pool today --
+          // SIG_GPExperiment builds a fresh population -- but the file states
+          // this size, so it is the one shrink that is not provably null.
+          const qsizetype want = (populationStr.mid(pos+15,pos2-pos-15)).toLong();
+          for (qsizetype i = want; i < pool.size(); i++)
+            delete pool[ i ];
+          pool.resize( want );
+        }
 
 #ifdef SIG_DEBUG
 
@@ -397,7 +416,8 @@ void SIGEL_GP::SIG_GPPopulation::readFromFile(QTextStream &file)
 	     pos2 = populationStr.indexOf("}INDIVIDUAL("+tmpStr1+") END", pos2, Qt::CaseInsensitive); 
              
 	     
-             pool.insert(x,new SIGEL_GP::SIG_GPIndividual());  
+             delete pool[ x ];
+             pool[ x ] = new SIGEL_GP::SIG_GPIndividual();  
 
              indStr = populationStr.mid(pos+19+tmpStr1.length(),pos2-pos-20-tmpStr1.length()); 
              

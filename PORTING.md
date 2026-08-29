@@ -2631,6 +2631,51 @@ counts: the growth is in a different container, and the one blank line in the
 experiment-history section is the last, present in the pristine file, and does
 not multiply.
 
+### D15 — `SIG_GPPopulation::pool`, where the container operation *was* the free
+
+The most ownership-sensitive container in the plan. §9 lists eight sites where
+`insert()` or a shrinking `resize()` is the only `delete` and the word appears
+nowhere; five of them are this one. `pool` becomes
+`QList<SIG_GPIndividual *>` and **every one of those frees is written out**.
+
+| was | now | why |
+|---|---|---|
+| `insert(x, p)` ×6 | `delete pool[x]; pool[x] = p;` | `Q2PtrVector::insert` freed the occupant first. Where the slot is known null the `delete` is a no-op, so one spelling is exact everywhere |
+| `clear()` in `~SIG_GPPopulation` | `qDeleteAll` + `clear()` | `del` was true, so `clear()` freed all |
+| `setAutoDelete(true)` ×4 | deleted | the flag *was* the ownership; the frees above are now it |
+| `insert(x, take(x+1))` | `delete pool[poolpos]` once, then a plain shift | see below |
+| `resize()` from the file | an explicit delete loop, then `resize` | the one shrink not provably null |
+
+**`deleteIndividual` is the subtle one.** It shifted every later element down
+with `pool.insert(x, pool.take(x+1))` and then shrank by one. `take` nulled
+each source slot, so the shrink truncated a null and freed nothing; the *first*
+`insert` freed the victim, because that slot still held it. Every later
+`insert` saw a null and freed nothing. **Exactly one delete, and nothing in the
+function says so.** It is now `delete pool[poolpos]` before the loop, a plain
+assignment shift, and `removeLast()`.
+
+**`setIndividual` is the 12-call-site one.** `pool.insert(poolpos, &indi)` freed
+the tournament loser and then stored a pointer the *caller* allocated. Both
+halves preserved; the mixed ownership is 2003's and is not this step's to fix.
+
+**Checked by measurement, not by reading.** The leak total is byte-identical
+before and after: **41,254 bytes in 109 allocations** for `twoBases`, the
+documented D18 baseline. Verified to have teeth — dropping the destructor's
+`qDeleteAll` gives **4,398,620 bytes in 68,853 allocations**, 106× the
+baseline.
+
+**But no committed gate would have caught that.** D18 makes the leak figure a
+recorded baseline rather than a gate, so a dropped free here fires nothing.
+The 42 evaluations pass, both diffs stay empty, and the sanitized run is clean
+because it sets `detect_leaks=0`. That policy is deliberate and out of scope
+here; it is recorded because this is the step where it bites hardest.
+
+**`SIG_GPPopulation::sort()` has an empty body.** Its header comment says it
+sorts the pool by fitness so that the best individual is at position zero. It
+does nothing at all. Good for this conversion — the pool is never reordered, so
+V8's captured order covers it — but a reader could implement it and silently
+renumber every individual, and every stored `poolPos` with them.
+
 ### A logging system
 
 Qt 2's `QTextStream` wrote through to unbuffered `stderr` on every `<<`. Qt 6
