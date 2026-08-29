@@ -208,7 +208,7 @@ static int selfcheck()
     // The partner must be updated too, not left at 0.25. setFrictionValue's
     // negotiate call sits OUTSIDE its "if (!found)" block for this reason.
     // Move it inside -- which reads like a tidy -- and a keeps 0.75 while b
-    // keeps 0.25. Confirmed against the 1.3 binary: reference/v7.
+    // keeps 0.25. Confirmed against the 1.3 binary: verification-against-sigel-1.3/v7.
     //
     // This is the ONLY assertion here that can see that failure. The count
     // and the name both still pass, because the entry is present, correctly
@@ -250,7 +250,7 @@ static int selfcheck()
     SIG_WANT(l2.getNoCollides().count() == 1);
   }
   {   // The parser DROPS a friction or no-collide partner that is not loaded
-      // yet, silently. Confirmed against the 1.3 binary (reference/v7): it is
+      // yet, silently. Confirmed against the 1.3 binary (verification-against-sigel-1.3/v7): it is
       // upstream behaviour, not ours, and nothing warns. Both parsers register
       // the object only AFTER constructing it, so a name can only refer
       // backwards. No shipped file exercises this -- none declares either.

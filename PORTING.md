@@ -33,7 +33,7 @@ build and run, because nothing else can be verified without it — see §3.
 | D — delete the shim, migrate the data | **D1–D12 done.** `Q2Dict`, `Q2DictIterator` and `Q2Array` gone from all code; `Q2PtrVector` is off `SIG_Geometry`, `SIG_Body`, the `SIG_Register` cluster and `SIG_DynaMechsSimulationData`. Shim 806 → **530** lines. Remaining, measured 2026-08-29 after D12: `Q2PtrList` 47, `Q2PtrVector` 49, `Q2CString` 19, `Q2Queue` 16, `Q2ListIterator` 8, `Q2ValueList` 12. **No live shim code is left in `SIGEL_Robot`, `SIGEL_Simulation` or `SIGEL_Environment` — only prose comments.** What remains is `SIGEL_GP`, `MT_Control` and `MT_GPSystem`, part of which the gates do execute (§10). **Which of those the gates execute is now measured, not assumed** — see "What the gates actually reach" in §10. §10 |
 | P — PVM | **DONE 2026-08-28.** Vendored 3.4.3 replaced by upstream 3.4.6; nine patches carry the four config lines and Debian's eight source fixes; `libpvm3.a` and `pvmd3` build; SIGEL's two PVM objects link against them and `SIG_GPPVMData` round-trips through real PVM. `sigel`/`sigel_slave` still need Phase C. §7 |
 | C — GUI | **not started, AUTHORIZED 2026-08-27 per D24.** ~450 Qt 2 sites + 20 forms |
-| V — check against the 1.3 binary | **V1, V5's MDH probe, V6, V7 and V8 all done, all PASS.** Ordering: 10 of 10 container orders match. Arithmetic: `twoBases` exact bit for bit, `octopus` 9/9 with three joints exact and 5 ulp worst. **V6, V7 and V8 done 2026-08-29** — friction and no-collide negotiation, their four remaining rules, and the GP parameter blocks captured *before* their conversion. `reference/v6`, `v7`, `v8`. V2–V4 not started; V5's sensor and force probes are **invalid as specified** — both target Dynamo-only functions, deleted 2026-08-28. §7 |
+| V — check against the 1.3 binary | **V1, V5's MDH probe, V6, V7 and V8 all done, all PASS.** Ordering: 10 of 10 container orders match. Arithmetic: `twoBases` exact bit for bit, `octopus` 9/9 with three joints exact and 5 ulp worst. **V6, V7 and V8 done 2026-08-29** — friction and no-collide negotiation, their four remaining rules, and the GP parameter blocks captured *before* their conversion. `verification-against-sigel-1.3/v6`, `v7`, `v8`. V2–V4 not started; V5's sensor and force probes are **invalid as specified** — both target Dynamo-only functions, deleted 2026-08-28. §7 |
 
 **SCOPE — DECIDED 2026-08-23. Read this before changing anything.**
 
@@ -952,20 +952,20 @@ through the `sigel-x86` session.
 
 **Capture once, diff for ever.** 1.3 is frozen, so its output for a given input
 never changes. Each step captures a reference file once, commits it under
-`reference/`, and every later step diffs against it locally. The x86 box is
+`verification-against-sigel-1.3/`, and every later step diffs against it locally. The x86 box is
 needed **once per quantity, not once per step** — after V1 this is another line
 in `check.sh`, not a remote call.
 
 | # | Step | What it checks |
 |---|---|---|
-| V1 | ~~Capture 1.3's load-and-save round trip for three shipped `.exp`~~ **DONE 2026-08-27** — `reference/v1-1.3-roundtrip.txt` | the `Q2Dict` hash, all order-carrying containers, the parser and the serialiser |
+| V1 | ~~Capture 1.3's load-and-save round trip for three shipped `.exp`~~ **DONE 2026-08-27** — `verification-against-sigel-1.3/v1-1.3-roundtrip.txt` | the `Q2Dict` hash, all order-carrying containers, the parser and the serialiser |
 | V2 | Our half: a save path in `sigel_eval`, the same round trip locally, diffed against V1. Becomes a gate | equivalence instead of self-consistency |
 | V3 | Determinism on the x86 box — one experiment run twice, both `RANDOMSEED`s pinned | gates everything numeric; never tested there |
 | V4 | Force re-evaluation of a shipped population by setting its `FITNESS` fields to `-1`, harvest 1.3's per-individual fitness, compare against `sigel_eval` | the number this file has been asking for. **Judgement, not a gate** |
-| V5 | **MDH probe DONE 2026-08-27, PASS** — `reference/v5-1.3-mdh-compared.txt`. The sensor and force probes remain open | the port's **arithmetic**, which V1–V4 never touch |
-| V6 | **DONE 2026-08-29, PASS, 5 of 5** — `reference/v6-1.3-friction-nocollide.txt` | the two Phase D paths **no shipped data exercises**: friction pairs and no-collide pairs, and whether both setters negotiate |
-| V7 | **DONE 2026-08-29, 4 runs on `walker`** — `reference/v7-1.3-friction-nocollide-rules.txt` | the remaining rules for those two paths: multiple partners, unloaded partners, duplicates, and whether a dropped entry is resurrected |
-| V8 | **DONE 2026-08-29, captured BEFORE the conversion** — `reference/v8-1.3-gp-blocks.txt` | `SIG_GPParameter::hostList` and `SIG_GPExperiment::experimentHistory`, the two `Q2PtrList` the gates run on every load and the next to convert |
+| V5 | **MDH probe DONE 2026-08-27, PASS** — `verification-against-sigel-1.3/v5-1.3-mdh-compared.txt`. The sensor and force probes remain open | the port's **arithmetic**, which V1–V4 never touch |
+| V6 | **DONE 2026-08-29, PASS, 5 of 5** — `verification-against-sigel-1.3/v6-1.3-friction-nocollide.txt` | the two Phase D paths **no shipped data exercises**: friction pairs and no-collide pairs, and whether both setters negotiate |
+| V7 | **DONE 2026-08-29, 4 runs on `walker`** — `verification-against-sigel-1.3/v7-1.3-friction-nocollide-rules.txt` | the remaining rules for those two paths: multiple partners, unloaded partners, duplicates, and whether a dropped entry is resurrected |
+| V8 | **DONE 2026-08-29, captured BEFORE the conversion** — `verification-against-sigel-1.3/v8-1.3-gp-blocks.txt` | `SIG_GPParameter::hostList` and `SIG_GPExperiment::experimentHistory`, the two `Q2PtrList` the gates run on every load and the next to convert |
 
 **Why the round trip is the sharp test.** The `.exp` carries the robot as a
 `StreamedRobot` block, and that block *is* dict iteration order —
@@ -1052,7 +1052,7 @@ once.
 
 ### V7 and V8 RESULTS — the rules, and a reference captured in advance
 
-Full detail in `reference/v7-…` and `reference/v8-…`. Six findings, four of
+Full detail in `verification-against-sigel-1.3/v7-…` and `verification-against-sigel-1.3/v8-…`. Six findings, four of
 which change what this repo does.
 
 **V7, on `walker`, four runs.** Multiple partners work and each keeps its own
@@ -1101,7 +1101,7 @@ whitespace inside `HISTORY` blocks first, or it is noise that grows each run.
 
 ### V6 RESULT — friction and no-collide negotiate in 1.3 too
 
-**5 of 5, prediction held.** `reference/v6-1.3-friction-nocollide.txt`.
+**5 of 5, prediction held.** `verification-against-sigel-1.3/v6-1.3-friction-nocollide.txt`.
 
 D10 converted `SIG_Link::noCollide` and D11 `SIG_Material::friction`, and
 **neither is touched by any shipped data** — 0 `nocollide` in all 7 `.rrb` and
