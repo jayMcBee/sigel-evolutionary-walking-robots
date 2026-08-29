@@ -139,3 +139,21 @@ Additive only — nothing changes at runtime. The value is that failures are
 - **Measured** (trust as fact): every site count, file path and line number above.
 - **Proposed** (yours to approve): the three-section ordering, the per-module
   split of item 5, and item 8's blocked status.
+
+## Left by the Qt port, deliberately — Phase D11, 2026-08-29
+
+Both were converted rather than changed, because the port's rule is to move the
+Qt API and nothing else. Neither is reachable by any gate, which is exactly why
+neither was touched on a whim.
+
+- **`SIG_Material::FrictionValue` could be a value type.** It is two words —
+  `SIG_Material *otherSide` and a `DL_Scalar` — held as `QList<FrictionValue *>`
+  with a `new` per entry and a `qDeleteAll` in `~SIG_Material`. Values would
+  delete both. D8 made exactly this move for `SIG_Register` and it removed a
+  real leak; here the destructor already frees, so there is nothing to fix and
+  the change would only be tidier.
+- **`SIG_Body::usedByLinks` is dead.** `addUsingLink` appends to it from
+  `SIG_RobotCompilerObjects.cpp:112` on every model load, and nothing in the
+  tree — GUI included — ever reads it back. The member, the method and the one
+  call could all go. Asked directly during D11, the answer was convert, not
+  delete.

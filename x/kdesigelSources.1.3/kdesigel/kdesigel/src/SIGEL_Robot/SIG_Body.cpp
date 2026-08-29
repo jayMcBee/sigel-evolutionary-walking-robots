@@ -51,7 +51,6 @@ namespace SIGEL_Robot
 
         SIG_Body::~SIG_Body(void)
         {
-                usedByLinks.setAutoDelete (false);
                 delete geometry;
         };
         

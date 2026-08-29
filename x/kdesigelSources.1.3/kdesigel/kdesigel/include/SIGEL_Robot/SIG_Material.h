@@ -25,6 +25,7 @@
 
 namespace SIGEL_Robot { class SIG_Material; }
 
+#include <QList>
 #include <qstring.h>
 #include <qtextstream.h>
 #include <pointvector.h>
@@ -50,7 +51,7 @@ namespace SIGEL_Robot
           SIG_Robot *parent;
           QString name;
           DL_Scalar elasticity, density;
-          Q2PtrList<FrictionValue> friction;
+          QList<FrictionValue *> friction;
           DL_vector colour;
   public:
           /**

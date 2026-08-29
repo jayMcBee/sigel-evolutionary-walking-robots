@@ -24,7 +24,7 @@
 #define SIGEL_ROBOT_SIG_BODY_H
 
 namespace SIGEL_Robot { class SIG_Body; }
-#include "compat/q2compat.h"
+#include <QList>
 #include <qstring.h>
 #include <CyberVRML97.h>
 #include <newmat.h>
@@ -49,7 +49,7 @@ namespace SIGEL_Robot
         class SIG_Body {
         private:
                 SIG_Robot *parent;
-                Q2PtrList<SIG_Link> usedByLinks;
+                QList<SIG_Link *> usedByLinks;
                 QString geometryFile, directory;
                 SIG_Geometry *geometry;
    

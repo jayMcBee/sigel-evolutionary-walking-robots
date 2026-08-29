@@ -30,7 +30,7 @@ build and run, because nothing else can be verified without it — see §3.
 | B — ownership explicit | **subsumed by Phase D**, which deletes the containers rather than converting them. **12** `setAutoDelete` left in core, re-measured 2026-08-28 — 10 in `SIGEL_GP`, 1 in `SIGEL_Robot`, 1 in `MT_Control`. The row said 13 and put 2 in `SIGEL_Robot`; there is one, `SIG_Body.cpp:54`, and it is `FALSE`. **Not all of them are unreachable, and an earlier version of this row said they were.** `SIG_GPPopulation::pool` is owning, is constructed on every `sigel_eval` run and takes 100 `insert()`s inside both gates — see "What the gates actually reach" in §10. The 7 in `SIG_GPFitnessTrainer` and `SIG_GPManager` are the ones Phase C still blocks |
 | R — build and run | core builds and runs. **No longer checked only against itself** — Phase V has confirmed both the ordering and the arithmetic against the 1.3 binary, §7 |
 | T — old-Qt tool container | **done 2026-08-27.** `tools/qtmig`, §4 |
-| D — delete the shim, migrate the data | **D1–D10 done.** `Q2Dict`, `Q2DictIterator` and `Q2Array` gone from all code; `Q2PtrVector` is off `SIG_Geometry`, `SIG_Body`, the `SIG_Register` cluster and `SIG_DynaMechsSimulationData`. Shim 806 → **530** lines. Remaining, measured 2026-08-28 after D10: `Q2PtrList` 50, `Q2PtrVector` 49, `Q2CString` 21, `Q2Queue` 16, `Q2ListIterator` 11, `Q2ValueList` 12. **Which of those the gates execute is now measured, not assumed** — see "What the gates actually reach" in §10. §10 |
+| D — delete the shim, migrate the data | **D1–D11 done.** `Q2Dict`, `Q2DictIterator` and `Q2Array` gone from all code; `Q2PtrVector` is off `SIG_Geometry`, `SIG_Body`, the `SIG_Register` cluster and `SIG_DynaMechsSimulationData`. Shim 806 → **530** lines. Remaining, measured 2026-08-29 after D11: `Q2PtrList` 47, `Q2PtrVector` 49, `Q2CString` 21, `Q2Queue` 16, `Q2ListIterator` 8, `Q2ValueList` 12. **The executed path is down to the 2 `Q2CString` sites of D12.** **Which of those the gates execute is now measured, not assumed** — see "What the gates actually reach" in §10. §10 |
 | P — PVM | **DONE 2026-08-28.** Vendored 3.4.3 replaced by upstream 3.4.6; nine patches carry the four config lines and Debian's eight source fixes; `libpvm3.a` and `pvmd3` build; SIGEL's two PVM objects link against them and `SIG_GPPVMData` round-trips through real PVM. `sigel`/`sigel_slave` still need Phase C. §7 |
 | C — GUI | **not started, AUTHORIZED 2026-08-27 per D24.** ~450 Qt 2 sites + 20 forms |
 | V — check against the 1.3 binary | **V1 and V5's MDH probe both done and both PASS.** Ordering: 10 of 10 container orders match. Arithmetic: `twoBases` exact bit for bit, `octopus` 9/9 with three joints exact and 5 ulp worst. V2–V4 not started; V5's sensor and force probes are **invalid as specified** — both target Dynamo-only functions, deleted 2026-08-28. §7 |
@@ -1996,9 +1996,9 @@ What the shim currently carries, and why:
 The clean-up, in this order:
 
 1. ~~Replace the emulation with straightforward containers.~~ **In progress —
-   D3–D10 done.** `Q2Dict`, `Q2DictIterator` and `Q2Array` are deleted; their
-   users are plain `QList`. Left, measured 2026-08-28 after D10: `Q2PtrList` 50,
-   `Q2PtrVector` 49, `Q2CString` 21, `Q2Queue` 16, `Q2ListIterator` 11,
+   D3–D11 done.** `Q2Dict`, `Q2DictIterator` and `Q2Array` are deleted; their
+   users are plain `QList`. Left, measured 2026-08-29 after D11: `Q2PtrList` 47,
+   `Q2PtrVector` 49, `Q2CString` 21, `Q2Queue` 16, `Q2ListIterator` 8,
    `Q2ValueList` 12. *D9's row here said `Q2PtrVector` 48 where the tree held
    49; re-measured by review.* An earlier version of this list omitted the last two, and
    read `Q2PtrVector` 69 / `Q2PtrList` 62 where the tree at that commit
@@ -2286,6 +2286,50 @@ which is why the list exists.
 | `SIG_Link::addNoCollide`, `getNoCollides()`, the `noCollide` write loop, D10 | **0 `nocollide` in all 7 `.rrb`, and `noCollideCount` is 0 in all 261 `Link` records**. `getNoCollides()` has no caller in the tree at all |
 | `SIG_Material::friction` — three walks and the owning free, D11 | **0 friction declarations in any `.rrb`, and `nfric` is 0 on all 31 `Material` lines**. The list is empty on every gate run |
 | `SIG_Body::usedByLinks`, D11 | appended on every `.rrb` load and **read nowhere in the tree** |
+
+### D11 — the last three lists on the executed path, and a check that can see them
+
+`SIG_Material::friction`, `SIG_Body::usedByLinks` and
+`SIG_DynaMechsLink::successors` become `QList<T *>`. `Q2ListIterator` is gone
+from every module the gates run.
+
+| container | ownership | shape |
+|---|---|---|
+| `SIG_Material::friction` | **owning** — `~SIG_Material` already freed it explicitly, so `deleteContents()` became `qDeleteAll` + `clear()`. No leak to fix and none introduced | 3 iterator walks → range-for |
+| `SIG_Body::usedByLinks` | non-owning | its `setAutoDelete(false)` was a **no-op** — `Q2PtrList` and Qt 2's `QList` both default to false — and `QList` has no such method, so the line goes |
+| `SIG_DynaMechsLink::successors` | non-owning; the links belong to `dynaMechsLinks`. No destructor, no flag | one `first()`/`next()` walk in `forwardKinematics` → range-for |
+
+**`friction` stays a list of pointers.** D8 turned `SIG_Register` into values and
+that fixed a real leak; here there is none, so a value type would move ownership
+on a path nothing can test, for tidiness. Recorded in `future_refactorings.md`
+instead. `usedByLinks` is **converted, not deleted**, though nothing in the tree
+reads it — same reasoning, same place.
+
+**Two of the three are exercised by no gate, so a check was written that can
+see them.** `sigel_eval -selfcheck` now covers `SIG_Material::friction` and —
+retrospectively — D10's `SIG_Link::noCollide`, using only public API:
+the not-found default of 0.6, `negotiate` setting the reverse pair, an update
+that must **not** append, and `addNoCollide`'s duplicate guard. It runs inside
+`fitness-check.sh`, ahead of the evaluations.
+
+**Verified to have teeth, both paths, the way this file requires.** Dropping
+`setFrictionValue`'s "already present" test — what a careless rewrite of the
+iterator walk produces — and dropping `addNoCollide`'s `!contains` guard makes
+the self-check fail with 3 assertions and exit 1.
+
+**And one of those assertions is the only one that catches it.** With the
+append bug in place, `getFrictionValue` still returns the *right value*: the
+in-place update happens and the stray duplicate is appended after it, so a
+forward scan finds the correct entry first. Only the serialised `nfric` count
+moves, from 2 to 3. A self-check that asserted values alone would have passed
+on broken code — which is the ninth time this project has hit that shape, and
+the reason the count assertion is there.
+
+Three headers now include `<QList>` instead of `compat/q2compat.h`, which falls
+from 49 files to 47.
+
+Verified: `./check.sh` 105 pass / 4 fail / 315 warnings, both gates
+byte-identical, sanitized fitness run clean, self-check ok.
 
 ### A logging system
 

@@ -194,14 +194,8 @@ namespace SIGEL_Simulation
 
       };
 
-    SIG_DynaMechsLink *actSuccessor = successors.first();
-
-    while (actSuccessor)
-      {
-	actSuccessor->forwardKinematics( this );
-
-	actSuccessor = successors.next();
-      };
+    for (SIG_DynaMechsLink *actSuccessor : successors)
+      actSuccessor->forwardKinematics( this );
   };
 
   NEWMAT::Matrix SIG_DynaMechsLink::buildXRotationMatrix( double angle )

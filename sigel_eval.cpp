@@ -181,6 +181,60 @@ static int selfcheck()
     SIG_WANT(robot.lookupSensor("S")   == s2);
     SIG_WANT(robot.lookupLink("MISSING") == 0);
   }
+  {   // SIG_Material::friction, D11.  No shipped robot declares friction at
+      // all -- 0 in all 7 .rrb, and nfric is 0 on all 31 Material lines -- so
+      // both gates run this list empty and neither can see the conversion.
+      // setFrictionValue's walk decides whether to append, which is exactly
+      // the semantic a careless rewrite drops.
+    SIGEL_Robot::SIG_Robot robot;
+    SIGEL_Robot::SIG_Material a(&robot, "a");
+    SIGEL_Robot::SIG_Material b(&robot, "b");
+    SIGEL_Robot::SIG_Material c(&robot, "c");
+
+    SIG_WANT(a.getFrictionValue(&b) == 0.6);      // the not-found default
+
+    a.setFrictionValue(&b, 0.25);                 // negotiates by default
+    SIG_WANT(a.getFrictionValue(&b) == 0.25);
+    SIG_WANT(b.getFrictionValue(&a) == 0.25);
+
+    a.setFrictionValue(&c, 0.5);
+    SIG_WANT(a.getFrictionValue(&b) == 0.25);     // still there, not overwritten
+    SIG_WANT(a.getFrictionValue(&c) == 0.5);
+
+    a.setFrictionValue(&b, 0.75);                 // UPDATE, must not append
+    SIG_WANT(a.getFrictionValue(&b) == 0.75);
+    SIG_WANT(a.getFrictionValue(&c) == 0.5);
+
+    // The serialiser is the only public window on the list's length, and
+    // its walk is itself converted code no gate reaches.
+    // "Material a <elasticity> <density> <nfric> b 0.75 c 0.5 <colour>"
+    QString written;
+    { QTextStream ts(&written); a.writeToFileTransfer(ts); }
+    SIG_WANT(written.split(' ').value(4) == "2");   // 3 would be the append bug
+    SIG_WANT(written.contains("b 0.75"));
+    SIG_WANT(written.contains("c 0.5"));
+
+    a.setFrictionValue(&a, 0.1);                  // self: must not recurse
+    SIG_WANT(a.getFrictionValue(&a) == 0.1);
+  }
+  {   // SIG_Link::noCollide, D10.  Also unreachable from the data: 0
+      // 'nocollide' in all 7 .rrb and noCollideCount 0 in all 261 .exp Link
+      // records.  addNoCollide's !contains guard is what stops the pair being
+      // added twice, and nothing else tests it.
+    SIGEL_Robot::SIG_Robot robot;
+    SIGEL_Robot::SIG_Link l1(&robot, "l1", 0);
+    SIGEL_Robot::SIG_Link l2(&robot, "l2", 1);
+
+    SIG_WANT(l1.getNoCollides().count() == 0);
+    l1.addNoCollide(&l2);                         // negotiates both directions
+    SIG_WANT(l1.getNoCollides().count() == 1);
+    SIG_WANT(l2.getNoCollides().count() == 1);
+    SIG_WANT(l1.getNoCollides().at(0) == &l2);
+
+    l1.addNoCollide(&l2);                         // the duplicate guard
+    SIG_WANT(l1.getNoCollides().count() == 1);
+    SIG_WANT(l2.getNoCollides().count() == 1);
+  }
 #undef SIG_WANT
   printf(bad ? "selfcheck: %d FAILED\n" : "selfcheck: ok\n", bad);
   return bad ? 1 : 0;

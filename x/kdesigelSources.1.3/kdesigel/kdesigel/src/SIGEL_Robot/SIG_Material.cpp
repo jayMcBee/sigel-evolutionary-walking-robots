@@ -62,7 +62,8 @@ namespace SIGEL_Robot {
 
         SIG_Material::~SIG_Material (void)
         {
-                friction.deleteContents ();
+                qDeleteAll (friction);
+                friction.clear ();
         }
 
         QString SIG_Material::getName (void) const
@@ -104,16 +105,15 @@ namespace SIGEL_Robot {
                                              DL_Scalar fricval,
                                              bool negotiate)
         {
-                Q2ListIterator<FrictionValue> li (friction);
-                while (li.current ()) {
-                        if (li.current ()->otherSide == otherObj) {
-                                li.current ()->value = fricval;
+                FrictionValue *found = 0;
+                for (FrictionValue *fv : friction)
+                        if (fv->otherSide == otherObj) {
+                                fv->value = fricval;
+                                found = fv;
                                 break;
                         }
-                        ++li;
-                }
 
-                if (!li.current ()) {
+                if (!found) {
                         FrictionValue *fv = new FrictionValue;
                         fv->otherSide = otherObj;
                         fv->value = fricval;
@@ -126,30 +126,22 @@ namespace SIGEL_Robot {
 
         DL_Scalar SIG_Material::getFrictionValue (SIG_Material *otherObj) const
         {
-                Q2ListIterator<FrictionValue> li (friction);
-                while (li.current ()) {
-                        if (li.current ()->otherSide == otherObj)
-                                return li.current ()->value;
-                        ++li;
-                }
+                for (const FrictionValue *fv : friction)
+                        if (fv->otherSide == otherObj)
+                                return fv->value;
                 return 0.6;
         }
 
         void SIG_Material::writeToFileTransfer (QTextStream & tx) const
         {
-                Q2ListIterator<FrictionValue> li (friction);
-                
                 tx << "Material" << ' '
                    << getName () << ' '
                    << elasticity << ' '
                    << density << ' '
                    << friction.count () << ' ';
-                while (li.current ()) {
-                        FrictionValue *fv = li.current ();
+                for (const FrictionValue *fv : friction)
                         tx << fv->otherSide->getName () << ' '
                            << fv->value << ' ';
-                        ++li;
-                }
                 SIG_Robot::vectorToStream (tx, colour);
                 tx << '\n';
         }
