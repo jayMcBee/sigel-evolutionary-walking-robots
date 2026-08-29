@@ -38,6 +38,7 @@ SIGEL_GP::SIG_GPPopulation::SIG_GPPopulation()
 };
 
 SIGEL_GP::SIG_GPPopulation::SIG_GPPopulation(int size)
+  : randomizer( 0 )   // was uninitialised; the guard below reads it
 {
    if( getRandomizerPointer()==0 )
      {
@@ -63,6 +64,7 @@ SIGEL_GP::SIG_GPPopulation::SIG_GPPopulation(int size)
 
     
 SIGEL_GP::SIG_GPPopulation::SIG_GPPopulation(QString data)
+  : randomizer( 0 )   // was uninitialised; the guard below reads it
 {
    QTextStream                 inputFile(&data, QIODeviceBase::ReadOnly);
 

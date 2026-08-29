@@ -132,6 +132,12 @@ static void dumpOrder(const SIGEL_Robot::SIG_Robot &r, const char *which)
 // Hence this, run by fitness-check.sh before the evaluations.
 static int selfcheck()
 {
+  // Line-buffer stdout. SIG_WANT records and continues, but a wrong size can
+  // abort a later index, and a block-buffered stdout then discards the
+  // "selfcheck FAILED:" line that says which assertion went. The gate still
+  // fails; the operator just cannot see why.
+  setvbuf( stdout, 0, _IOLBF, 0 );
+
   int bad = 0;
 #define SIG_WANT(cond)                                                     \
   do { if (!(cond)) { printf("selfcheck FAILED: %s\n", #cond); ++bad; } }  \
@@ -281,8 +287,10 @@ static int selfcheck()
   {   // THE EVOLUTION LOOP'S OWNING CONTAINER, D15.
       //
       // Six of SIG_GPPopulation's nine frees are in functions no gate enters:
-      // setIndividual (12 tournament call sites), deleteIndividual,
-      // addRandomIndividuals, importNewIndividual. D15 shipped a real leak in
+      // setIndividual (12 tournament call sites) and deleteIndividual.
+      // addRandomIndividuals is driven for its allocations, not its frees --
+      // its delete pool[x] is always delete nullptr, because resize() just
+      // created those slots. D15 shipped a real leak in
       // readFromFile's cancel path and every gate reported it clean -- both
       // diffs, the sanitized run, the self-check and the 41,254-byte leak
       // baseline. That baseline comes from the default constructor,
@@ -322,12 +330,21 @@ static int selfcheck()
     SIG_WANT(pop.getIndividualPointer( 0 ) == winner);
     SIG_WANT(pop.getSize() == 2);
 
+    // Every SIG_GPIndividual constructor already sets fitness to -1, so
+    // asserting -1 on a fresh pool cannot fail. Move one off it first, and
+    // check BOTH slots -- a resetPool that reset only the first would pass.
+    pop.getIndividualPointer( 0 )->setFitness( 3.5 );
+    pop.getIndividualPointer( 1 )->setFitness( 7.5 );
     pop.resetPool();
     SIG_WANT(pop.getIndividualPointer( 0 )->getFitness() == -1);
+    SIG_WANT(pop.getIndividualPointer( 1 )->getFitness() == -1);
 
+    // Leave the pool NON-EMPTY. Draining it made ~SIG_GPPopulation's
+    // qDeleteAll run on an empty list, so removing that free -- the largest
+    // in the class, 4,398,620 bytes per evaluation -- was invisible to every
+    // gate including this one. Found by review of D16 itself.
     pop.deleteIndividual( 0 );
-    pop.deleteIndividual( 0 );                   // drain to empty
-    SIG_WANT(pop.getSize() == 0);
+    SIG_WANT(pop.getSize() == 1);
   }
 #undef SIG_WANT
   printf(bad ? "selfcheck: %d FAILED\n" : "selfcheck: ok\n", bad);

@@ -699,7 +699,15 @@ succeeded.**
 ./check.sh                                            105 pass, 4 fail
 ./dictorder-dump.sh | diff -u dictorder-baseline.txt -    empty
 ./fitness-check.sh  | diff -u fitness-baseline.txt -      empty
+ASAN_OPTIONS=detect_leaks=0 ./fitness-check.sh build      exit 0
 ```
+
+**The fourth line is not optional and was missing from this list until
+2026-08-29.** The default `fitness-check.sh` runs `build-fast`, which has no
+sanitizer, so it **skips the self-check's leak test** — and says so on stderr,
+which `| diff` discards. The self-check is what covers the evolution loop's
+ownership (D16), so without that fourth line a dropped free passes everything
+here.
 
 Never edit a baseline to make a diff go away. If a change moves one, that is the
 finding.
@@ -2420,10 +2428,10 @@ which is why the list exists.
 | **all four sites in `SIG_GPExperiment.cpp`**, D14 | the master variant is compiled into `libSIGEL_GP.a` and **never linked** — `SIG_GPExperimentClean.o` satisfies the symbols first. `readelf --debug-dump=info` on `sigel_eval` has a CU for Clean and none for the master |
 | `writeHistoryToFileTransfer`, D14 | linked, never called — no gate saves an `.exp` |
 | `exportExperimentHistoryToGNUPlot`, D14 | linked; its only caller is `SIG_Experiment.cpp:567`, Phase C |
-| **six of D15's nine `delete pool[…]`** | in functions no gate enters: the three sized constructors, `setIndividual`, `deleteIndividual`, `addRandomIndividuals`, `importNewIndividual` |
+| **five of D15's eight `delete pool[…]`** | the three sized constructors, `importNewIndividual`, and `addRandomIndividuals`' — which is `delete nullptr` on every possible call, since `resize()` just made those slots. *D16 said six of nine; nine was a `grep` hit that counted a comment, and three of the eight are entered by the self-check as of D16* |
 | both `wasCanceled()` shrinks, D15 | need a `QApplication`; `sigel_eval` has none, so `if (qApp)` is false |
 | `readFromFile`'s shrink loop, D15 | the function runs on every load, but always on an **empty** pool, so the loop body never executes |
-| `resetPool`, `sort`, D15 | no caller reached from a gate |
+| `sort`, D15 | no caller anywhere |
 
 ### D11 — the last three lists on the executed path, and a check that can see them
 
@@ -2720,7 +2728,11 @@ LeakSanitizer, and **that is what judges it** — the frees here are invisible t
 any assertion, so the assertions pin the *shift* and the sanitizer pins the
 *ownership*.
 
-**Verified to have teeth, against the exact failure D15 shipped.** Removing
+**Verified to have teeth.** *An earlier draft said "against the exact failure
+D15 shipped". It is not: that failure was `readFromFile`'s `wasCanceled()`
+shrink, which sits behind `if (qApp)` and is unreachable headless — reverting
+all three `resizeOwning` calls still passes every gate including this one.
+What follows is a fair analogue, not the same defect.* Removing
 `deleteIndividual`'s `delete pool[poolpos]`:
 
 | | |
@@ -2729,19 +2741,23 @@ any assertion, so the assertions pin the *shift* and the sanitizer pins the
 | `./fitness-check.sh` and both diffs | **pass, empty** |
 | the same self-check under `detect_leaks=1` | **fires**, naming `addRandomIndividuals` as the allocation site |
 
-**Two pre-existing defects found by writing it**, both in `SIG_GPPopulation`
-constructors that **no code in the tree calls**:
+**Four pre-existing defects found by writing it**, all in `SIG_GPPopulation`
+constructors. *D16 named two and said the other two were the ones in use.
+**Only the default constructor is used** — an exhaustive grep over the whole
+1.3 tree and the 1.0 distribution finds zero calls to any other.*
 
-| | |
-|---|---|
-| `SIG_GPPopulation(int size, SIG_Randomizer &r)` | stores `&r` via `setRandomizer` and `~SIG_GPPopulation` **deletes it**. Constructing one with a stack or borrowed randomizer is a bad free — ASan: `attempting free on address which was not malloc()-ed`. Found on the test's first run |
-| `SIG_GPPopulation(int size)` | **has no member initialiser list**, so `randomizer` is uninitialised. Its own `if (getRandomizerPointer()==0)` guard reads that uninitialised pointer, almost never sees 0, and the loop then dereferences it |
+| constructor | defect | fixed? |
+|---|---|---|
+| `(int, SIG_Randomizer &r)` | stores `&r` via `setRandomizer`; `~SIG_GPPopulation` **deletes it**. A stack or borrowed randomizer is a bad free — ASan `attempting free on address which was not malloc()-ed`. Found on the test's first run | **no** |
+| `(int, SIG_Randomizer&, SIG_GPParameter&, SIG_LanguageParameters&)` | identical, same `setRandomizer(&r)` | **no** |
+| `(int)` | **no member initialiser list**, so `randomizer` is uninitialised and the `if (getRandomizerPointer()==0)` guard reads it | **yes**, `: randomizer( 0 )` |
+| `(QString)` | same, and `~SIG_GPPopulation` then frees garbage | **yes**, `: randomizer( 0 )` |
 
-Neither is reachable — the only constructors used are the default one and
-`SIG_GPPopulation(QString)`. Not fixed: both are Phase C's to settle when the
-GUI that would call them is ported, and fixing an unused constructor is not
-this phase's business. The test is built on the default constructor and says
-so.
+The two borrowed-randomizer ones are **not fixed**: repairing them means
+choosing an ownership policy, which is a design decision for whoever ports the
+GUI that would call them. The two missing initialiser lists **are** fixed —
+two tokens, no caller, and it turns undefined behaviour into the deterministic
+path the guard was written for.
 
 ### A logging system
 
