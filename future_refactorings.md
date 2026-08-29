@@ -38,7 +38,7 @@ Review is reading the diff.
 
 - [ ] **3. Loop-variable scope leaks** — 13 files in `src/MT_GPSystem/`
   `for (int i=…){…}` then `i` used after the loop. Hoist the declaration.
-  Files: `MT_FitnessTranier`, `MT_GPManager`, `MT_Interpreter`, `MT_Population`,
+  Files: `MT_FitnessTrainer`, `MT_GPManager`, `MT_Interpreter`, `MT_Population`,
   `MT_Program`, `MT_Randomizer`, `MT_Search`, `MT_Statistics`,
   `MT_StatisticsElement`, `MT_Tournament`, `MT_TournamentManager`,
   `MT_TranslatedIndividual`, `MT_Trainingset`
