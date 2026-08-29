@@ -124,6 +124,26 @@ SIGEL_GP::SIG_GPPopulation::SIG_GPPopulation(int size,
      }
 }  
     
+namespace {
+
+// Q2PtrVector::resize() DELETED every truncated item when autoDelete was set,
+// and that was the only free at three sites in this file (PORTING.md section
+// 9). QList::resize() frees nothing. Written out once rather than three times.
+//
+// Negative sizes are clamped. Q2PtrVector took a uint, so a negative reached
+// it as a huge value and the allocation simply failed; QList takes a signed
+// qsizetype, where a negative index would reach delete pool[-3].
+void resizeOwning( QList< SIGEL_GP::SIG_GPIndividual * > &v, qsizetype want )
+{
+  if (want < 0)
+    want = 0;
+  for (qsizetype i = want; i < v.size(); i++)
+    delete v[ i ];
+  v.resize( want );
+}
+
+}
+
 SIGEL_GP::SIG_GPPopulation::~SIG_GPPopulation()
 {
 
@@ -206,7 +226,10 @@ void SIGEL_GP::SIG_GPPopulation::addRandomIndividuals(int quantity,
 	       // The process has been canceled. Because of process preparations the system may crash if
 	       // these preparation are not made undone:
 
-               pool.resize( x + 1 );
+               // Truncates slots this loop never filled, so it frees nothing
+               // -- but spelled like the other two so no shrink here is a
+               // special case a later reader has to re-derive.
+               resizeOwning( pool, x + 1 );
   
                break;
 	     }
@@ -353,16 +376,7 @@ void SIGEL_GP::SIG_GPPopulation::readFromFile(QTextStream &file)
   if( (pos=populationStr.indexOf("POPULATIONSIZE=", 0, Qt::CaseInsensitive) )!=-1 ) 
     { 
         pos2=populationStr.indexOf(";", pos + 16, Qt::CaseInsensitive); 
-        {
-          // Q2PtrVector::resize() freed every truncated item. QList does not,
-          // so a shrink here would leak. Reached with an empty pool today --
-          // SIG_GPExperiment builds a fresh population -- but the file states
-          // this size, so it is the one shrink that is not provably null.
-          const qsizetype want = (populationStr.mid(pos+15,pos2-pos-15)).toLong();
-          for (qsizetype i = want; i < pool.size(); i++)
-            delete pool[ i ];
-          pool.resize( want );
-        }
+        resizeOwning( pool, (populationStr.mid(pos+15,pos2-pos-15)).toLong() );
 
 #ifdef SIG_DEBUG
 
@@ -434,7 +448,10 @@ void SIGEL_GP::SIG_GPPopulation::readFromFile(QTextStream &file)
 		    // The process has been canceled. Because of process preparations the system may crash if
 		    // these preparation are not made undone:
 
-		    pool.resize( x + 1 );
+		    // Slots above x still hold the individuals from before this
+		    // load -- the replace loop only reached x -- so this shrink
+		    // frees them. It is the section 9 site D15 missed.
+		    resizeOwning( pool, x + 1 );
                     
 		    break;
 		  }

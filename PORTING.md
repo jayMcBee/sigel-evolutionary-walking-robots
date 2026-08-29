@@ -1383,9 +1383,10 @@ windows, and nothing happens behind the Start button.
 
 1. **The free is hidden inside a container operation.** Eight `Q2PtrVector`
    sites where `insert()` or a shrinking `resize()` *is* the only delete and the
-   word `delete` appears nowhere: `SIG_GPPopulation.cpp:168` (frees the losing
-   individual, reached from 12 call sites), `:275`, `:278`, `:346`, `:417`, and
-   `SIG_GPFitnessTrainer.cpp:194`, `:355`, `:378`.
+   word `delete` appears nowhere. **The five in `SIG_GPPopulation` are done —
+   D15, and D15 missed one of them; see there.** `SIG_GPFitnessTrainer.cpp:194`,
+   `:355`, `:378` remain. Line numbers here were pre-D15 and are not maintained;
+   find these by name, not by line.
    Three `Q2PtrList` sites belong here too: `SIG_GPManager.cpp:437`, `:1519`
    (`fitTaskList`) and `SIG_GPFitnessTrainer.cpp:489` (`toSpawnList`).
 2. **Owning containers with no free path**, relying on `~Q2PtrList` /
@@ -2419,6 +2420,10 @@ which is why the list exists.
 | **all four sites in `SIG_GPExperiment.cpp`**, D14 | the master variant is compiled into `libSIGEL_GP.a` and **never linked** — `SIG_GPExperimentClean.o` satisfies the symbols first. `readelf --debug-dump=info` on `sigel_eval` has a CU for Clean and none for the master |
 | `writeHistoryToFileTransfer`, D14 | linked, never called — no gate saves an `.exp` |
 | `exportExperimentHistoryToGNUPlot`, D14 | linked; its only caller is `SIG_Experiment.cpp:567`, Phase C |
+| **six of D15's nine `delete pool[…]`** | in functions no gate enters: the three sized constructors, `setIndividual`, `deleteIndividual`, `addRandomIndividuals`, `importNewIndividual` |
+| both `wasCanceled()` shrinks, D15 | need a `QApplication`; `sigel_eval` has none, so `if (qApp)` is false |
+| `readFromFile`'s shrink loop, D15 | the function runs on every load, but always on an **empty** pool, so the loop body never executes |
+| `resetPool`, `sort`, D15 | no caller reached from a gate |
 
 ### D11 — the last three lists on the executed path, and a check that can see them
 
@@ -2640,11 +2645,11 @@ nowhere; five of them are this one. `pool` becomes
 
 | was | now | why |
 |---|---|---|
-| `insert(x, p)` ×6 | `delete pool[x]; pool[x] = p;` | `Q2PtrVector::insert` freed the occupant first. Where the slot is known null the `delete` is a no-op, so one spelling is exact everywhere |
+| `insert(x, p)` ×**7** | `delete pool[x]; pool[x] = p;` | `Q2PtrVector::insert` freed the occupant first. Where the slot is known null the `delete` is a no-op, so one spelling is exact everywhere. *D15 said six. There are seven — the old file has eight `pool.insert`, one of which is the shift below. An off-by-one in a step whose whole premise is an exhaustive count of hidden frees* |
 | `clear()` in `~SIG_GPPopulation` | `qDeleteAll` + `clear()` | `del` was true, so `clear()` freed all |
 | `setAutoDelete(true)` ×4 | deleted | the flag *was* the ownership; the frees above are now it |
 | `insert(x, take(x+1))` | `delete pool[poolpos]` once, then a plain shift | see below |
-| `resize()` from the file | an explicit delete loop, then `resize` | the one shrink not provably null |
+| all three shrinking `resize()` | `resizeOwning()`, a four-line static helper | `Q2PtrVector::resize` freed every truncated item. Written once rather than three times, so no shrink is a special case a later reader has to re-derive |
 
 **`deleteIndividual` is the subtle one.** It shifted every later element down
 with `pool.insert(x, pool.take(x+1))` and then shrank by one. `take` nulled
@@ -2657,6 +2662,29 @@ assignment shift, and `removeLast()`.
 **`setIndividual` is the 12-call-site one.** `pool.insert(poolpos, &indi)` freed
 the tournament loser and then stored a pointer the *caller* allocated. Both
 halves preserved; the mixed ownership is 2003's and is not this step's to fix.
+
+**D15 MISSED ONE OF THE FIVE, AND REVIEW CAUGHT IT.** `readFromFile`'s
+`wasCanceled()` branch shrinks with `pool.resize( x + 1 )` — §9's `:417`, listed
+there precisely because that `resize` was the only `delete`. D15 converted the
+other four and asserted the `POPULATIONSIZE` shrink was "the one not provably
+null", silently reclassifying this one. It is not null: slots above `x` still
+hold the individuals from **before** the load, because the replace loop only
+reached `x`. Measured on a pool of 6 cancelled at the first individual —
+pre-D15 no leak, post-D15 **4,850 bytes in 45 allocations**, every block traced
+to the population constructor.
+
+Reachable from `SIG_Experiment.cpp:505`, `slotPopulationImport`, which is the
+one caller that reaches `readFromFile` with a **full** pool. Dead today only
+because `sigel_eval` has no `QApplication`, so `if (qApp)` is false; live the
+moment Phase C compiles `SIGEL_MasterGUI`. The comment D15 added — "reached
+with an empty pool today" — was true only of code that currently compiles.
+
+**The copy hazard `Q2PtrVector` carried is gone, so it is now a compile error.**
+Its copy constructor cleared `del` on the copy, as Qt 2's `QCollection` did, so
+a copied population freed nothing and could not double-free. A raw `QList` plus
+an unconditional `qDeleteAll` removes that. `SIG_GPPopulation`'s copy
+constructor and assignment are `= delete`, the same move D7 made for
+`SIG_Geometry`. Nothing in the tree copies a population.
 
 **Checked by measurement, not by reading.** The leak total is byte-identical
 before and after: **41,254 bytes in 109 allocations** for `twoBases`, the
