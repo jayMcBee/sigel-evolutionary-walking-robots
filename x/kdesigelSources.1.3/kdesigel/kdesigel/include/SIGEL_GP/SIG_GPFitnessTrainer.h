@@ -63,12 +63,12 @@ class SIG_GPFitnessTrainer
  /**
   * Names of all dynamic hosts, which are valid for a single evaluation period
   */
-  Q2PtrList< QString > dynHosts;
+  QList< QString * > dynHosts;
 
  /**
   * New dynamic hosts that have registered but were not yet added to 'pvmHosts'.
   */
-  Q2PtrList< SIG_GPPVMHost > freshDynHosts;
+  QList< SIG_GPPVMHost * > freshDynHosts;
 
  private:
   int nextHostNumber;

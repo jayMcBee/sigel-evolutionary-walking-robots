@@ -2759,6 +2759,44 @@ GUI that would call them. The two missing initialiser lists **are** fixed —
 two tokens, no caller, and it turns undefined behaviour into the deterministic
 path the guard was written for.
 
+### D17 — the trainer's two host lists, and what the 1.3 binary says about them
+
+`SIG_GPFitnessTrainer::dynHosts` and `freshDynHosts` become `QList<T *>`. Both
+are plain index loops — `count()` and `at(i)`, no cursor — and neither ever had
+`setAutoDelete`, so their four `deleteContents()` were already the explicit
+free and become `qDeleteAll` + `clear()`.
+
+**Established from the 1.3 binaries, by symbol table and disassembly**, because
+none of these containers reaches a file and nothing here can be diffed:
+
+| | |
+|---|---|
+| `addDynHost` | present and **referenced**, one call site. Reached only through `SIG_GPManager::RegisterDynPVMClients`, which is a **thread entry point** — its address is pushed to `pthread_create`, so a naive caller search misses it — behind the `-devolve` flag |
+| `flushAllDynHosts` | **not gated.** Called from both `SIG_GPManager::run` overloads, so it is entered on **every** run, `-evolve` included |
+| `getNextHost` | called from `spawnTask` and `sweepToSpawn` |
+
+The binary's own usage text is the confirmation: `-devolve` is "Evolve with
+dynamic clients", `-evolve` is "Evolve without GUI".
+
+**So this code is unexercised, not dead, and the difference matters.** Under
+`-evolve` — the four completed reference evolutions, and everything this port
+can run — the dynamic-host thread never starts and `addDynHost` is never
+called. Under `-devolve` it is live. Recording it as "dead" would be wrong.
+
+`flushAllDynHosts` is the case to be careful with: it is entered every run, and
+its whole body including the `pvmHosts.resize( size-1 )` sits behind
+`if (dynHosts.count() > 0)`. So the *function* is exercised constantly and the
+*shrink* never is.
+
+**And the modulus concern cannot be settled from the reference machine.** All
+four evolutions used exactly **one** `PVMHOST` — the `8` in those lines is the
+slave-slot count on a single host, not eight hosts. So `pvmHosts.size()` was 1
+throughout and `nextHostNumber % 1` is 0 on every one of the ~56,000 spawns in
+the longest run. **Host rotation has never been exercised by anything**, and
+the unsigned-wrap question D9 raised stays open for `getNextHost` until an
+experiment with two live hosts exists. That box has one machine; the rest of
+the 2003 cluster is gone.
+
 ### A logging system
 
 Qt 2's `QTextStream` wrote through to unbuffered `stderr` on every `<<`. Qt 6

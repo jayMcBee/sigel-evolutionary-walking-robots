@@ -104,8 +104,10 @@ SIGEL_GP::SIG_GPFitnessTrainer::SIG_GPFitnessTrainer(SIGEL_GP::SIG_GPExperiment&
 
 SIGEL_GP::SIG_GPFitnessTrainer::~SIG_GPFitnessTrainer() {
   // This class owns the entries of both dynamic host lists.
-  dynHosts.deleteContents();
-  freshDynHosts.deleteContents();
+  qDeleteAll( dynHosts );
+  dynHosts.clear();
+  qDeleteAll( freshDynHosts );
+  freshDynHosts.clear();
 
   for (unsigned int i=0; i<pvmHosts.size(); i++) {
       SIG_GPActivePVMHost *actHost = pvmHosts[i];
@@ -192,12 +194,14 @@ void SIGEL_GP::SIG_GPFitnessTrainer::flushAllDynHosts( void ) {
       }
     }
     // dynHosts has become obsolete
-    dynHosts.deleteContents();
+    qDeleteAll( dynHosts );
+    dynHosts.clear();
     delete[] cStrName;
 
     // unfortunately that's it also for our new hosts, else we have a conflict
     // with our server thread cutting _all_ connections, known or unknown to dynHosts
-    freshDynHosts.deleteContents();
+    qDeleteAll( freshDynHosts );
+    freshDynHosts.clear();
 
     SIGEL_Tools::SIG_IO::cerr << "\t(all " << dynDelNum << " dynamic hosts removed | " <<  pvmHosts.size() << " static hosts remaining)\n\n";
   }
@@ -526,7 +530,8 @@ int SIGEL_GP::SIG_GPFitnessTrainer::getNextHost() {
     fprintf(stderr, "\to new host added to pvmHosts: \"%s\"\n", cStrName);
   }
 
-  freshDynHosts.deleteContents();
+  qDeleteAll( freshDynHosts );
+  freshDynHosts.clear();
   delete[] cStrName;
 
 #ifdef _WINDOWS
