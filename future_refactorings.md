@@ -210,3 +210,32 @@ nobody can check.
 
 Same reason as the `SIG_GPExperiment` rename above, and worth doing in the same
 pass.
+
+## Set the version to 2.0 — the LAST step of the port
+
+Do this only once the port is complete, running and validated against the 1.3
+binary. It is the marker that the Qt 6 result is a different thing from what
+2003 shipped, and it should be the final commit, not an early one.
+
+**Where the version actually lives, measured — it is not where anyone would
+look, and the tree disagrees with itself:**
+
+| place | says | note |
+|---|---|---|
+| `kdesigel/configure.in:2` | `AM_INIT_AUTOMAKE(kdesigel,1.0)` | **the only real version declaration in the whole tree.** The 1.3 release still calls itself 1.0 here |
+| `kdesigel/README:1` | `KDESIGEL v1.1 Readme File` | a third number, in the file a user reads first |
+| `kdesigel/kdesigel.kdevprj:36` | `kdevprj_version=1.3` | **not SIGEL's version.** This is KDevelop's own project-file format version, which happens to also be 1.3. **Do not touch it** |
+| the source | nothing | there is no version constant, and no binary prints one |
+
+So "1.3" exists only in the tarball name and the directory name. Three files
+carry three different numbers and none of them is 1.3.
+
+**Do:** set `configure.in` to 2.0, and the README's heading with it. Then
+decide whether the code should carry a version at all — today nothing prints
+one, so `sigel --version` does not exist and a user cannot tell which build
+they are running. Adding one is a small job and would be worth doing in the
+same commit, but it is a new feature rather than a rename, so it is a separate
+decision.
+
+**Do not** change `kdevprj_version`. It describes the file's own format and
+KDevelop reads it.
