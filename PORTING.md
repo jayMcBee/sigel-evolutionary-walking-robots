@@ -2952,6 +2952,48 @@ innocent — 133 warnings with byte-identical text at every point measured. The
 figures recorded for D11, D12 and D13 are each one low for the same reason.
 **315 is the number; it has not moved since D13.**
 
+### D20 — the full-data recorder, and the first converted walk a gate runs
+
+Four lists in `SIG_GPFullDataRecorder` become `QList<T *>`. The type change
+forces **eight files** in one commit: the recorder, six fitness functions and
+`SIG_EarlyRunTermSimulation`, plus `sigel_eval`'s own trace walk. Seven friend
+classes read these lists directly, so there is no accessor to hide behind.
+
+Every walk is the same shape — `positions.first()` and `rotations.first()`,
+then `next()` on both in lockstep — so one index with `QList::value()` is
+exact: `value()` yields null past the end exactly as `first()`/`next()` did,
+and the two lists are appended together so they cannot fall out of step.
+
+| list | ownership |
+|---|---|
+| `positions`, `rotations`, `touchdowns` | **owned.** 1.3 set `setAutoDelete(true)`; the port had already replaced that with `deleteContents()`, now `qDeleteAll` + `clear()` |
+| `listForces` | **not owned, and never was** — no `setAutoDelete` even in 1.3. The force vectors belong to `SIG_GPForceFitnessFunction`, which frees them at the end of its evaluation. The recorder only clears |
+
+**At last, a converted walk something actually runs.**
+`SIG_GPNiceWalkingFitnessFunction` is linked into `sigel_eval` and evaluates 18
+of the 42 gate individuals, so its rewritten `positions`/`rotations` walk
+executes on every gate run. That is the first time since D16 that a conversion
+in this half of the tree has had real coverage rather than inspection. The
+other five fitness functions and `SIG_EarlyRunTermSimulation` are **not**
+linked.
+
+**A null dereference fixed rather than reproduced, per D13.**
+`SIG_GPForceFitnessFunction`'s cleanup loop was a `do`/`while` that
+dereferenced before testing:
+
+```cpp
+vector<double*>* p = recorder.listForces.first();   // null if no frames
+do { ...p->size()... } while ((p = recorder.listForces.next()) != 0);
+```
+
+`Q2PtrList::first()` returned null on an empty list, so an evaluation that
+recorded no frames took a null dereference while freeing. It is a range-for
+now: identical with frames present, a no-op with none. Same shape as
+`SIG_Link`'s `do`/`while` in D10 — but there the once-through was
+**load-bearing** and had to be preserved, and here it is a crash. The
+difference is which side of the null the body is written for, and it has to be
+read each time rather than pattern-matched.
+
 ### A logging system
 
 Qt 2's `QTextStream` wrote through to unbuffered `stderr` on every `<<`. Qt 6

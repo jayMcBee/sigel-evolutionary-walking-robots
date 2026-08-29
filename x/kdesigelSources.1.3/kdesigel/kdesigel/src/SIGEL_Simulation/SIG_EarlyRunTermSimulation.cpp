@@ -53,7 +53,7 @@ bool SIGEL_Simulation::SIG_EarlyRunTermSimulation::prematureTermination( void )
     // nothing was computed yet, but do we have anything recorded yet ?
     if (ertRecorder->positions.count() > 0)
     {
-       DL_vector realStartPosition = normalizeRobotPosition( *ertRecorder->positions.first(), *ertRecorder->rotations.first() );
+       DL_vector realStartPosition = normalizeRobotPosition( *ertRecorder->positions.value( 0 ), *ertRecorder->rotations.value( 0 ) );
        ertStartHeight = realStartPosition.y;
     }
   }
@@ -62,8 +62,8 @@ bool SIGEL_Simulation::SIG_EarlyRunTermSimulation::prematureTermination( void )
   else
   {
       // check current y-position of robot
-      DL_vector *actPosition = ertRecorder->positions.last();
-      DL_matrix *actRotation = ertRecorder->rotations.last();
+      DL_vector *actPosition = ertRecorder->positions.value( ertRecorder->positions.size() - 1 );
+      DL_matrix *actRotation = ertRecorder->rotations.value( ertRecorder->rotations.size() - 1 );
       DL_vector actRobPos = normalizeRobotPosition( *actPosition, *actRotation );
 
       // lower than 1/2 of startheight ? Let's stop evaluation here!

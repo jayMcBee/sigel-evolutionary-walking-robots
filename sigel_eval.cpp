@@ -573,7 +573,7 @@ int main(int argc, char *argv[])
     double lo = 1e300, hi = -1e300;
     int frames = 0;
     DL_vector last;
-    for (DL_vector *p = trace.positions.first(); p; p = trace.positions.next()) {
+    for (const DL_vector *p : trace.positions) {
       if (p->y < lo) lo = p->y;
       if (p->y > hi) hi = p->y;
       last = *p;

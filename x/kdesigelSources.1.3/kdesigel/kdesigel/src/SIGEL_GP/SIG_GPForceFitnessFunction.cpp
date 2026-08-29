@@ -70,7 +70,7 @@ double SIGEL_GP::SIG_GPForceFitnessFunction::evalFitness() {
 
   // delete simulation;
 
-    DL_vector realStartPosition = normalizeRobotPosition( *recorder.positions.first(),  *recorder.rotations.first() );
+    DL_vector realStartPosition = normalizeRobotPosition( *recorder.positions.value( 0 ),  *recorder.rotations.value( 0 ) );
     DL_vector realEndPosition = normalizeRobotPosition( recorder.endPosition, recorder.endRotation );
 
     double const optimalHeight = realStartPosition.y;
@@ -91,13 +91,14 @@ double SIGEL_GP::SIG_GPForceFitnessFunction::evalFitness() {
 
       // The list listForces runs over the individual frames
       // the list holds arrays containing the 6-dimensional vector for each individual joint
-      vector<double*>* usedForce = recorder.listForces.first() ;
+      qsizetype forceIdx = 0;
+      vector<double*>* usedForce = recorder.listForces.value( forceIdx );
 
       frames = recorder.listForces.count()-1;
 
       // The first value is always garbage, so take the second from the list straight away
       // The while loop always fetches the next frame
-      while ( (usedForce = recorder.listForces.next()) != 0 ) {
+      while ( (usedForce = recorder.listForces.value( ++forceIdx )) != 0 ) {
         double betrag = 0;
         double durchschnittProGelenk = 0;
         vector<double> betraege;
@@ -147,8 +148,9 @@ double SIGEL_GP::SIG_GPForceFitnessFunction::evalFitness() {
     recorder.positions.append( endPosition );
     recorder.rotations.append( endRotation );
 
-    DL_vector *actPosition = recorder.positions.first();
-    DL_matrix *actRotation = recorder.rotations.first();
+    qsizetype recIdx = 0;
+    DL_vector *actPosition = recorder.positions.value( recIdx );
+    DL_matrix *actRotation = recorder.rotations.value( recIdx );
 
     while (actPosition) {
       DL_vector actRealPosition = normalizeRobotPosition( *actPosition, *actRotation );
@@ -163,20 +165,23 @@ double SIGEL_GP::SIG_GPForceFitnessFunction::evalFitness() {
         break;
       };
 
-      actPosition = recorder.positions.next();
-      actRotation = recorder.rotations.next();
+      ++recIdx;
+			actPosition = recorder.positions.value( recIdx );
+      actRotation = recorder.rotations.value( recIdx );
     };
 //  }
 
   // now we have to clean up the memory
   // the forces-Array are created with "new" in dmArticulation::getForces()
-  vector<double*>* usedForceLoes = recorder.listForces.first() ;
-  do {
-   for (unsigned int i=0; i<usedForceLoes->size(); ++i) {
-     delete[] (*usedForceLoes)[i];
-   }
-   delete usedForceLoes;
-  } while ( (usedForceLoes = recorder.listForces.next()) != 0 );
+  // A do-while that dereferenced before testing. Q2PtrList::first() returned
+  // null on an empty list, so an evaluation that recorded no frames took a
+  // null dereference here. Fixed per D13 rather than reproduced: with frames
+  // present the behaviour is identical, and with none it is now a no-op.
+  for (vector<double*> *usedForceLoes : recorder.listForces) {
+    for (unsigned int i=0; i<usedForceLoes->size(); ++i)
+      delete[] (*usedForceLoes)[i];
+    delete usedForceLoes;
+  }
 
   return fitness;
 };

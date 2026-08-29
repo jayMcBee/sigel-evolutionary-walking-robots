@@ -70,8 +70,8 @@ namespace SIGEL_GP
     // (usually number of elements in recorder-obj., but we may have terminated earlier)
     steps = simulation->getMaxRecorderSteps(100);
 
-    DL_vector realStartPosition = normalizeRobotPosition( *recorder.positions.first(),
-							  *recorder.rotations.first() );
+    DL_vector realStartPosition = normalizeRobotPosition( *recorder.positions.value( 0 ),
+							  *recorder.rotations.value( 0 ) );
 
     DL_vector realEndPosition = normalizeRobotPosition( recorder.endPosition,
 							recorder.endRotation );
@@ -96,8 +96,9 @@ namespace SIGEL_GP
     recorder.positions.append( endPosition );
     recorder.rotations.append( endRotation );
 
-    DL_vector *actPosition = recorder.positions.first();
-    DL_matrix *actRotation = recorder.rotations.first();
+    qsizetype recIdx = 0;
+    DL_vector *actPosition = recorder.positions.value( recIdx );
+    DL_matrix *actRotation = recorder.rotations.value( recIdx );
 
         // iterate through recorded positions and evaluate !
     while (actPosition)
@@ -133,8 +134,9 @@ namespace SIGEL_GP
 			}
 
 			perfSteps++;
-			actPosition = recorder.positions.next();
-			actRotation = recorder.rotations.next();
+			++recIdx;
+			actPosition = recorder.positions.value( recIdx );
+			actRotation = recorder.rotations.value( recIdx );
  		}
 
 		fprintf(stderr, "\t(Calculated %d steps out of %d)\n", perfSteps, steps);

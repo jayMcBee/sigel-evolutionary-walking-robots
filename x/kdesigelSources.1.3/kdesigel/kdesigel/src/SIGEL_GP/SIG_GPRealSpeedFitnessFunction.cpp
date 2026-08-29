@@ -76,8 +76,9 @@ namespace SIGEL_GP
 
     double totalDistance = 0;
 
-    DL_vector *actPosition = recorder.positions.first();
-    DL_matrix *actRotation = recorder.rotations.first();
+    qsizetype recIdx = 0;
+    DL_vector *actPosition = recorder.positions.value( recIdx );
+    DL_matrix *actRotation = recorder.rotations.value( recIdx );
 
     DL_vector lastRealPosition = normalizeRobotPosition( *actPosition, *actRotation );
 
@@ -105,8 +106,9 @@ namespace SIGEL_GP
         break;
       };
 
-      actPosition = recorder.positions.next();
-      actRotation = recorder.rotations.next();
+      ++recIdx;
+			actPosition = recorder.positions.value( recIdx );
+      actRotation = recorder.rotations.value( recIdx );
     };
 
     int simulatedSeconds = QTime( 0, 0 ).secsTo( simparameter.getTimeToSimulate() );

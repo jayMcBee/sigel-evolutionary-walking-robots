@@ -45,9 +45,13 @@ namespace SIGEL_GP
   // ownership was stated nowhere.
   SIG_GPFullDataRecorder::~SIG_GPFullDataRecorder()
   {
-    positions.deleteContents();
-    rotations.deleteContents();
-    touchdowns.deleteContents();
+    qDeleteAll( positions );   positions.clear();
+    qDeleteAll( rotations );   rotations.clear();
+    qDeleteAll( touchdowns );  touchdowns.clear();
+    // listForces is NOT freed here and never was, even in 1.3: the force
+    // vectors belong to SIG_GPForceFitnessFunction, which frees them at the
+    // end of its evaluation. Recorded rather than "fixed".
+    listForces.clear();
   };
 
 
