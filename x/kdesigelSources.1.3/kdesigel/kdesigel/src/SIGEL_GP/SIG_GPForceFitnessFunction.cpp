@@ -94,7 +94,10 @@ double SIGEL_GP::SIG_GPForceFitnessFunction::evalFitness() {
       qsizetype forceIdx = 0;
       vector<double*>* usedForce = recorder.listForces.value( forceIdx );
 
-      frames = recorder.listForces.count()-1;
+      // count() was uint and is now qsizetype, so this narrows where it did
+      // not. The value is identical either way -- empty gives 4294967295 in
+      // both, n>=1 gives n-1 -- and the cast says the narrowing is meant.
+      frames = static_cast< unsigned int >( recorder.listForces.count() ) - 1;
 
       // The first value is always garbage, so take the second from the list straight away
       // The while loop always fetches the next frame
@@ -166,7 +169,7 @@ double SIGEL_GP::SIG_GPForceFitnessFunction::evalFitness() {
       };
 
       ++recIdx;
-			actPosition = recorder.positions.value( recIdx );
+      actPosition = recorder.positions.value( recIdx );
       actRotation = recorder.rotations.value( recIdx );
     };
 //  }

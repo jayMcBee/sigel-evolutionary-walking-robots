@@ -116,7 +116,7 @@ namespace SIGEL_GP
 	  };
 
 	++recIdx;
-			actPosition = recorder.positions.value( recIdx );
+	actPosition = recorder.positions.value( recIdx );
 	actRotation = recorder.rotations.value( recIdx );
       };
 

@@ -30,7 +30,7 @@ build and run, because nothing else can be verified without it — see §3.
 | B — ownership explicit | **subsumed by Phase D**, which deletes the containers rather than converting them. **11** `setAutoDelete` left in core, re-measured 2026-08-29 after D11 — 10 in `SIGEL_GP`, 1 in `MT_Control`, **0 in `SIGEL_Robot`**: D11 deleted `SIG_Body.cpp:54`, the last one, and left this row saying 12. *Before that it read 13 with 2 in `SIGEL_Robot`, where there was one. Three readings of the same row, three corrections, each by review.* **Not all of them are unreachable, and an earlier version of this row said they were.** `SIG_GPPopulation::pool` is owning, is constructed on every `sigel_eval` run and takes 100 `insert()`s inside both gates — see "What the gates actually reach" in §10. The **6** in `SIG_GPFitnessTrainer` and `SIG_GPManager` are the ones Phase C still blocks; the row said 7, which did not even add up against the 10 in the same sentence |
 | R — build and run | core builds and runs. **No longer checked only against itself** — Phase V has confirmed both the ordering and the arithmetic against the 1.3 binary, §7 |
 | T — old-Qt tool container | **done 2026-08-27.** `tools/qtmig`, §4 |
-| D — delete the shim, migrate the data | **D1–D12 done.** `Q2Dict`, `Q2DictIterator` and `Q2Array` gone from all code; `Q2PtrVector` is off `SIG_Geometry`, `SIG_Body`, the `SIG_Register` cluster and `SIG_DynaMechsSimulationData`. Shim 806 → **530** lines. Remaining, measured 2026-08-29 after D12: `Q2PtrList` 47, `Q2PtrVector` 49, `Q2CString` 19, `Q2Queue` 16, `Q2ListIterator` 8, `Q2ValueList` 12. **No live shim code is left in `SIGEL_Robot`, `SIGEL_Simulation` or `SIGEL_Environment` — only prose comments.** What remains is `SIGEL_GP`, `MT_Control` and `MT_GPSystem`, part of which the gates do execute (§10). **Which of those the gates execute is now measured, not assumed** — see "What the gates actually reach" in §10. §10 |
+| D — delete the shim, migrate the data | **D1–D20 done.** `Q2Dict`, `Q2DictIterator` and `Q2Array` gone; `Q2PtrVector` off the simulation path; `SIG_GPFitnessTrainer` and `SIG_GPFullDataRecorder` fully converted. Shim 806 → **530** lines, included by **34** files (whole-repo count). Remaining, measured 2026-08-29 after D20: `Q2PtrList` 39, `Q2PtrVector` 52, `Q2CString` 19, `Q2Queue` 16, `Q2ListIterator` 8, `Q2ValueList` 12 — the `Q2PtrVector` bulk is `SIG_GPManager::tours`, which **cannot be compiled** until Phase C. §10 |
 | P — PVM | **DONE 2026-08-28.** Vendored 3.4.3 replaced by upstream 3.4.6; nine patches carry the four config lines and Debian's eight source fixes; `libpvm3.a` and `pvmd3` build; SIGEL's two PVM objects link against them and `SIG_GPPVMData` round-trips through real PVM. `sigel`/`sigel_slave` still need Phase C. §7 |
 | C — GUI | **not started, AUTHORIZED 2026-08-27 per D24.** ~450 Qt 2 sites + 20 forms |
 | V — check against the 1.3 binary | **V1, V5's MDH probe, V6, V7 and V8 all done, all PASS.** Ordering: 10 of 10 container orders match. Arithmetic: `twoBases` exact bit for bit, `octopus` 9/9 with three joints exact and 5 ulp worst. **V6, V7 and V8 done 2026-08-29** — friction and no-collide negotiation, their four remaining rules, and the GP parameter blocks captured *before* their conversion. `verification-against-sigel-1.3/v6`, `v7`, `v8`. V2–V4 not started; V5's sensor and force probes are **invalid as specified** — both target Dynamo-only functions, deleted 2026-08-28. §7 |
@@ -1559,6 +1559,7 @@ every D8 site for a stored `const char *`.
 | `sigel_slave`, `getenv("SIGEL_ROOT")` | dereferenced unchecked | to be fixed | Segfaults if unset; the SIGSEGV handler masks it with no core. Bites under PVM specifically — spawned tasks inherit *pvmd's* environment, not the master's |
 | `SIG_GPPVMData.cpp:51` `sendQStringToPVM` | sends `str.length() + 1`, a **character** count, then sends `str.toUtf8()`, up to 4x longer in bytes | `qCStringBuffer.size() + 1` | `getQStringFromPVM` sizes its receive buffer from that count and lets `pvm_upkstr` write the bytes in. 20 `ü` gives `heap-buffer-overflow ... in byteupk` under ASan; short strings survive only because `QList` over-allocates. Qt 2's `length()` was the Latin-1 byte count, so 2003 was right for its own data. **Changes the wire format for non-ASCII** — safe only because both ends are this file and no distributed run exists. Found by Phase P's P4, regression-tested by `pvm_link.cpp` |
 | `SIG_GPIndividual.cpp:557-559` / `:647` | the writer emits `"\n      "` before `}HISTORY END;`; the reader takes everything up to that marker as content, so the separator becomes data | **preserved, not fixed** | Every save grows every `HISTORY` block by 7 bytes, linearly and without limit — 100 blocks is ~700 bytes per round trip. Measured on the 1.3 binary over three consecutive round trips (V8) and confirmed to be the same code here. Fixing it would change file bytes against 1.3. Any gate that diffs a round-tripped `.exp` must normalise trailing whitespace inside these blocks |
+| `SIG_GPForceFitnessFunction`'s cleanup loop | a `do`/`while` dereferencing `listForces.first()` **before** testing it | a range-for | `Q2PtrList::first()` returned null on an empty list, so an evaluation that recorded no frames took a null dereference **while freeing memory**. Identical with frames, a no-op without. Contrast D10, where the same shape's once-through was load-bearing and had to be kept — which side of the null the body is written for must be read each time, not pattern-matched |
 | `SIG_Environment` terrain load | `getenv("SIGEL_ROOT")` unchecked | already checked, message on stderr | `sigel_eval` says "SIGEL_ROOT is not set, cannot locate Terrain.ter" instead of reading `/Terrain.ter` |
 
 ~~**Open, from the R1 review:** SOLID is built without the `-DNDEBUG` its own
@@ -2435,6 +2436,9 @@ which is why the list exists.
 | both `wasCanceled()` shrinks, D15 | need a `QApplication`; `sigel_eval` has none, so `if (qApp)` is false |
 | `readFromFile`'s shrink loop, D15 | the function runs on every load, but always on an **empty** pool, so the loop body never executes |
 | `sort`, D15 | no caller anywhere |
+| all five **unlinked** fitness functions' walks, D20 — `Adaptive`, `Zorc`, `Stepper`, `RealSpeed`, `Force` — plus `SIG_EarlyRunTermSimulation` | `nm` finds 0 symbols for each in `sigel_eval`. `Stepper` is the **only reader of `touchdowns`** in the tree; `Force` the only reader of `listForces` and the only code that ever frees a force vector |
+| `sigel_eval`'s trace walk, D20 | runs on all 21 dictorder inputs; its output is dropped by the gate's `sed`, so only a crash or a sanitizer report would show |
+| `SIG_GPNiceWalkingFitnessFunction`'s walk, D20 | runs for 18 individuals, but the gate has **one bit** of discrimination — an off-by-one in the index is invisible to it |
 | **everything D17, D18 and D19 changed** in `SIG_GPFitnessTrainer` — including all six `delete v[i]`, `resizeOwningHosts`, both `qDeleteAll` in the destructor and both `static_cast<uint>` moduli | `nm -C build/sigel_eval \| grep -c SIG_GPFitnessTrainer` is **0**. `pvm_link` links the object but never constructs a trainer, so it is link-checked and never run. The rewritten walk needs a live `pvm_spawn`; `flushAllDynHosts` is `-devolve`-only; the destructor's three `qDeleteAll` run for no gate |
 
 ### D11 — the last three lists on the executed path, and a check that can see them
@@ -2955,27 +2959,60 @@ figures recorded for D11, D12 and D13 are each one low for the same reason.
 ### D20 — the full-data recorder, and the first converted walk a gate runs
 
 Four lists in `SIG_GPFullDataRecorder` become `QList<T *>`. The type change
-forces **eight files** in one commit: the recorder, six fitness functions and
-`SIG_EarlyRunTermSimulation`, plus `sigel_eval`'s own trace walk. Seven friend
-classes read these lists directly, so there is no accessor to hide behind.
+forces **ten** files in one commit: the recorder's header and source, six
+fitness functions, `SIG_EarlyRunTermSimulation`, and `sigel_eval`'s trace walk.
 
-Every walk is the same shape — `positions.first()` and `rotations.first()`,
-then `next()` on both in lockstep — so one index with `QList::value()` is
-exact: `value()` yields null past the end exactly as `first()`/`next()` did,
-and the two lists are appended together so they cannot fall out of step.
+*This section first said eight, and said "seven friend classes read these lists
+directly, so there is no accessor to hide behind". Three errors, all found by
+review. **`positions`, `rotations` and `touchdowns` are `public`** — friendship
+is not what grants access, and only `listForces` is private. Two of the readers
+are **not** friends at all (`SIG_EarlyRunTermSimulation`, `sigel_eval`). And
+one of the seven friends, `SIG_GPEnergyFitnessFunction`, **does not exist
+anywhere in the tree** — its only appearance is the `friend` line itself.*
+
+**Most** walks are the same shape — `positions.first()` and
+`rotations.first()`, then `next()` on both in lockstep — so one index with
+`QList::value()` is exact: `value()` yields null past the end exactly as
+`first()`/`next()` did, and the two lists are appended together so they cannot
+fall out of step. *Two are not that shape, and "every walk" was wrong:*
+`SIG_GPForceFitnessFunction` walks a single list and deliberately skips its
+first element, and `SIG_GPStepperFitnessFunction` carries a **third**,
+`touchdowns`, on the same index — sound because `record()` appends all four
+inside one block.
 
 | list | ownership |
 |---|---|
 | `positions`, `rotations`, `touchdowns` | **owned.** 1.3 set `setAutoDelete(true)`; the port had already replaced that with `deleteContents()`, now `qDeleteAll` + `clear()` |
-| `listForces` | **not owned, and never was** — no `setAutoDelete` even in 1.3. The force vectors belong to `SIG_GPForceFitnessFunction`, which frees them at the end of its evaluation. The recorder only clears |
+| `listForces` | **not owned, and never was** — no `setAutoDelete` even in 1.3, verified against the pristine tarball. The recorder only clears |
 
-**At last, a converted walk something actually runs.**
-`SIG_GPNiceWalkingFitnessFunction` is linked into `sigel_eval` and evaluates 18
-of the 42 gate individuals, so its rewritten `positions`/`rotations` walk
-executes on every gate run. That is the first time since D16 that a conversion
-in this half of the tree has had real coverage rather than inspection. The
-other five fitness functions and `SIG_EarlyRunTermSimulation` are **not**
-linked.
+**But do not read that row as saying the memory is accounted for.** Only
+**one of the six** fitness functions frees the force vectors, and `record()`
+allocates a `vector<double*>` plus a `new double[6]` per link on **every**
+recorded frame regardless of which fitness function is running. Measured on one
+`-v` run of `hammer`: **11,891,420 bytes in 252,265 allocations**, the
+overwhelming majority from `dmArticulation::getForces`. That is the leak §D4
+already records as scaling with links and frames. D20 touched exactly the list
+that causes it and left the attribution alone, which is right under the
+governing rule — but the first version of this row read as though the vectors
+were freed, and for five of six fitness functions they are not.
+
+**A converted walk that runs — but the coverage is one bit wide.**
+`SIG_GPNiceWalkingFitnessFunction` is linked and evaluates 18 of the 42 gate
+individuals, so its rewritten walk executes on every gate run. *D20 called that
+"real coverage rather than inspection". **It is not, and the review measured it
+both ways.*** Setting the walk's index to 1 instead of 0 — dropping the first
+recorded frame, the classic error for exactly this conversion — leaves the
+fitness gate **byte-identical across all 42 individuals**. Setting it so the
+loop never runs *does* move 9 rows. So the gate discriminates only "the walk
+found an invalid frame" from "it did not", one bit per individual. It cannot
+see which frame, how many, or in what order.
+
+**And `sigel_eval`'s trace walk is exercised but unchecked.**
+`dictorder-dump.sh` filters stdout with `sed`, and the only thing that loop
+produces — the `frames … height … last …` line — is dropped by that filter.
+Patching the loop to skip its first element leaves the dictorder gate empty.
+The five other fitness functions and `SIG_EarlyRunTermSimulation` are not
+linked at all.
 
 **A null dereference fixed rather than reproduced, per D13.**
 `SIG_GPForceFitnessFunction`'s cleanup loop was a `do`/`while` that
