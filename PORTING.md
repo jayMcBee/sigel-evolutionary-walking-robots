@@ -1617,6 +1617,14 @@ disassembles to `__builtin_new(248)` followed by
 `MT_Controller::MT_Controller(SIG_GPExperiment &)` — a reference, matching
 `new MT_Controller(*this)` as written.
 
+**`sigel_eval.cpp:22` includes the MASTER header while linking the Clean
+implementation.** Measured: `sizeof` is 1176 against 1168, and
+`experimentHistory` sits at offset 1120 under both — benign **only because
+`mtController` is the last member**. Convert one header and not the other and
+that member changes size, every later member shifts, and the build still links
+in silence. That is the concrete reason the rule below is load-bearing rather
+than tidiness.
+
 **When converting anything in this class, change both files and both headers.**
 Renaming them so the pair is self-evident is in `future_refactorings.md`.
 
@@ -2392,6 +2400,9 @@ which is why the list exists.
 | both `SIG_GPFitnessTrainer` host walks, D13 | that object is **not linked into `sigel_eval` at all** |
 | `SIG_GPParameter::writeToFile`'s `PVMHOST` loop, D13 | linked, never called — no gate saves an `.exp` |
 | `readFromFile`'s `qDeleteAll` + `clear`, D13 | runs every load, always on an **empty** list |
+| **all four sites in `SIG_GPExperiment.cpp`**, D14 | the master variant is compiled into `libSIGEL_GP.a` and **never linked** — `SIG_GPExperimentClean.o` satisfies the symbols first. `readelf --debug-dump=info` on `sigel_eval` has a CU for Clean and none for the master |
+| `writeHistoryToFileTransfer`, D14 | linked, never called — no gate saves an `.exp` |
+| `exportExperimentHistoryToGNUPlot`, D14 | linked; its only caller is `SIG_Experiment.cpp:567`, Phase C |
 
 ### D11 — the last three lists on the executed path, and a check that can see them
 
@@ -2563,8 +2574,14 @@ halves PASS, so nothing was hidden, but the step's verification was incomplete.
 `SIG_GPExperiment::experimentHistory` becomes
 `QList<SIG_GPExperimentHistoryEntry *>`. Changed in **both** files and **both**
 headers, per the rule above: `SIG_GPExperiment.cpp` for `sigel` and
-`SIG_GPExperimentClean.cpp` for `sigel_slave`. Their history code is
-byte-identical, so the edit is the same in each.
+`SIG_GPExperimentClean.cpp` for `sigel_slave`.
+
+*This step claimed their history code was "byte-identical, so the edit is the
+same in each". Three of the four sites were; **the destructor was not** — the
+master's is tab-indented with CRLF endings and also does `delete mtController`.
+That is precisely the line the first edit attempt failed on, so the claim was
+wrong about the one line that mattered. The edits are right; the reason given
+for them was not.*
 
 It owns its entries, so both `deleteContents()` become `qDeleteAll` +
 `clear()`. Two cursor walks become range-for — the file writer and the gnuplot
@@ -2572,8 +2589,10 @@ export.
 
 **`first()` was not used**, because `QList::first()` on an empty list is
 undefined where `Q2PtrList::first()` returned null, and it compiles either way
-(§9). A shipped `.exp` always has entries; an experiment saved before any
-generation runs does not.
+(§9). *The trap was theoretical here, and an earlier draft implied otherwise:
+the old `first()`/`while` walk already emitted nothing on an empty list, so the
+range-for preserves behaviour exactly rather than repairing it. It is still the
+right spelling — the next walk of this shape may not be so lucky.*
 
 **`SIG_GPExperiment.cpp:47` has CRLF line endings and a tab indent** where the
 rest of the file has LF and spaces. The edit was applied with `newline=''` and

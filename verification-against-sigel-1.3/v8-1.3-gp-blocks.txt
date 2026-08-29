@@ -61,7 +61,16 @@ the section marker offsets, which shift by exactly +100 lines per pass across
     pass 3         at 37 82 209 75563 75650 75812
 
 A line-shaped defect is what breaks a readLine() loop, which is why this
-matters. The appended line lands at the END of each block, immediately before
+matters.
+
+THE ARITHMETIC IN THAT TABLE DOES NOT CLOSE, and the discrepancy is recorded
+rather than smoothed over. Markers 4, 5 and 6 move +121 on pass 1, not +100.
+The named one-off reshaping (65->82 and 190->209) accounts for +19 of it, so
+the population section grew 102 lines on pass 1 and 100 on passes 2 and 3.
+Two lines of pass-1 growth are unexplained. The "+100 per pass across 100
+individuals" reading holds for passes 2 and 3 and is one line per individual
+per save; pass 1 has two extra that nothing here accounts for. Cannot be
+re-measured from this side -- sigel_eval has no save path (V2). The appended line lands at the END of each block, immediately before
 }HISTORY END;, so nothing is stranded behind it. The second and third markers
 also move once, 65->82 and 190->209, then never again -- the one-off reshaping
 from the first save.
@@ -124,8 +133,12 @@ It is a different container from the per-individual HISTORY blocks above.
 Byte-identical: same md5 for the whole section in the input and all three
 passes. First and last entries unchanged:
 
-    1   2001 8 8 21 13 32 0.0821164 0 0.00939138
-    160 2001 8 9 7 30 45  0.45972   0 0.3833
+    1 2001 8 8 21 13 32 0.0821164 0 0.00939138
+    160 2001 8 9 7 30 45 0.45972 0 0.3833
+
+(single-spaced, as in the file -- an earlier draft column-aligned these inside
+a paragraph asserting byte-identity, which is exactly the wrong place to
+re-space a quotation)
 
 So it behaves as a plain appending list. Order and count preserved, contents
 stable under repeated save, and the growth defect in result 2 does not reach
