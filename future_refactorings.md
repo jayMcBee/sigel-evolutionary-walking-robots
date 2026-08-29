@@ -189,3 +189,24 @@ compiles both variants into `libSIGEL_GP.a` where 2003 compiled them into
 separate targets. The unused object is harmless today only because the linker
 cannot extract it — `SIG_GPExperiment.o` needs `MT_Controller`, which the build
 excludes. That is luck, not design.
+
+## Rename `tours` to `tournaments` — after the Qt 6 port is complete and validated
+
+`SIG_GPManager::tours` holds every `SIG_GPTournament` for one generation. The
+name reads as travel, or as a shortening of nothing in particular. The type it
+holds already says the word.
+
+**Do:** rename the member to `tournaments`. It is private
+(`SIG_GPManager.h:152`) and used in one file, so the change is contained. The
+two doxygen comments that call it "the QArray tours" (`SIG_GPManager.h:216`,
+`:250`) go with it — and they are wrong twice over, since it is not a `QArray`
+and has not been one for some time.
+
+**Not before the port is complete AND validated.** `SIG_GPManager` cannot be
+compiled today: its constructor reads `actExperiment.mtController`, a member of
+only the master variant of `SIG_GPExperiment`, which needs `MT_Controller`,
+which does not build. A rename inside a file nothing can compile is a rename
+nobody can check.
+
+Same reason as the `SIG_GPExperiment` rename above, and worth doing in the same
+pass.
