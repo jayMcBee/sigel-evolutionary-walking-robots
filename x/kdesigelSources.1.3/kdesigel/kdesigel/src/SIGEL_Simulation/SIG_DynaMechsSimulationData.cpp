@@ -22,7 +22,7 @@
 */
 #include <cstring>
 #include <cstdlib>
-#include "compat/q2compat.h"
+#include <QByteArray>
 #include "SIGEL_Simulation/SIG_DynaMechsSimulationData.h"
 
 #include "SIGEL_Robot/SIG_Drive.h"
@@ -297,8 +297,8 @@ void SIGEL_Simulation::SIG_DynaMechsSimulationData::initializeEnvironment()
 
   QString terrainDataFileName = sigelRootString + "/Terrain.ter";
 
-  Q2CString terrainDataFileNameQCString = terrainDataFileName.toUtf8();
-  char const *terrainDataFileNameCString = terrainDataFileNameQCString;
+  const QByteArray terrainDataFileNameQCString = terrainDataFileName.toUtf8();
+  char const *terrainDataFileNameCString = terrainDataFileNameQCString.constData();
 
   dynaMechsEnvironment.loadTerrainData( terrainDataFileNameCString );
 

@@ -30,7 +30,7 @@ build and run, because nothing else can be verified without it — see §3.
 | B — ownership explicit | **subsumed by Phase D**, which deletes the containers rather than converting them. **12** `setAutoDelete` left in core, re-measured 2026-08-28 — 10 in `SIGEL_GP`, 1 in `SIGEL_Robot`, 1 in `MT_Control`. The row said 13 and put 2 in `SIGEL_Robot`; there is one, `SIG_Body.cpp:54`, and it is `FALSE`. **Not all of them are unreachable, and an earlier version of this row said they were.** `SIG_GPPopulation::pool` is owning, is constructed on every `sigel_eval` run and takes 100 `insert()`s inside both gates — see "What the gates actually reach" in §10. The 7 in `SIG_GPFitnessTrainer` and `SIG_GPManager` are the ones Phase C still blocks |
 | R — build and run | core builds and runs. **No longer checked only against itself** — Phase V has confirmed both the ordering and the arithmetic against the 1.3 binary, §7 |
 | T — old-Qt tool container | **done 2026-08-27.** `tools/qtmig`, §4 |
-| D — delete the shim, migrate the data | **D1–D11 done.** `Q2Dict`, `Q2DictIterator` and `Q2Array` gone from all code; `Q2PtrVector` is off `SIG_Geometry`, `SIG_Body`, the `SIG_Register` cluster and `SIG_DynaMechsSimulationData`. Shim 806 → **530** lines. Remaining, measured 2026-08-29 after D11: `Q2PtrList` 47, `Q2PtrVector` 49, `Q2CString` 21, `Q2Queue` 16, `Q2ListIterator` 8, `Q2ValueList` 12. **The executed path is down to the 2 `Q2CString` sites of D12.** **Which of those the gates execute is now measured, not assumed** — see "What the gates actually reach" in §10. §10 |
+| D — delete the shim, migrate the data | **D1–D12 done.** `Q2Dict`, `Q2DictIterator` and `Q2Array` gone from all code; `Q2PtrVector` is off `SIG_Geometry`, `SIG_Body`, the `SIG_Register` cluster and `SIG_DynaMechsSimulationData`. Shim 806 → **530** lines. Remaining, measured 2026-08-29 after D12: `Q2PtrList` 47, `Q2PtrVector` 49, `Q2CString` 19, `Q2Queue` 16, `Q2ListIterator` 8, `Q2ValueList` 12. **No live shim code is left in `SIGEL_Robot`, `SIGEL_Simulation` or `SIGEL_Environment` — only prose comments.** What remains is `SIGEL_GP`, `MT_Control` and `MT_GPSystem`, part of which the gates do execute (§10). **Which of those the gates execute is now measured, not assumed** — see "What the gates actually reach" in §10. §10 |
 | P — PVM | **DONE 2026-08-28.** Vendored 3.4.3 replaced by upstream 3.4.6; nine patches carry the four config lines and Debian's eight source fixes; `libpvm3.a` and `pvmd3` build; SIGEL's two PVM objects link against them and `SIG_GPPVMData` round-trips through real PVM. `sigel`/`sigel_slave` still need Phase C. §7 |
 | C — GUI | **not started, AUTHORIZED 2026-08-27 per D24.** ~450 Qt 2 sites + 20 forms |
 | V — check against the 1.3 binary | **V1 and V5's MDH probe both done and both PASS.** Ordering: 10 of 10 container orders match. Arithmetic: `twoBases` exact bit for bit, `octopus` 9/9 with three joints exact and 5 ulp worst. V2–V4 not started; V5's sensor and force probes are **invalid as specified** — both target Dynamo-only functions, deleted 2026-08-28. §7 |
@@ -1996,9 +1996,9 @@ What the shim currently carries, and why:
 The clean-up, in this order:
 
 1. ~~Replace the emulation with straightforward containers.~~ **In progress —
-   D3–D11 done.** `Q2Dict`, `Q2DictIterator` and `Q2Array` are deleted; their
-   users are plain `QList`. Left, measured 2026-08-29 after D11: `Q2PtrList` 47,
-   `Q2PtrVector` 49, `Q2CString` 21, `Q2Queue` 16, `Q2ListIterator` 8,
+   D3–D12 done.** `Q2Dict`, `Q2DictIterator` and `Q2Array` are deleted; their
+   users are plain `QList`. Left, measured 2026-08-29 after D12: `Q2PtrList` 47,
+   `Q2PtrVector` 49, `Q2CString` 19, `Q2Queue` 16, `Q2ListIterator` 8,
    `Q2ValueList` 12. *D9's row here said `Q2PtrVector` 48 where the tree held
    49; re-measured by review.* An earlier version of this list omitted the last two, and
    read `Q2PtrVector` 69 / `Q2PtrList` 62 where the tree at that commit
@@ -2327,6 +2327,41 @@ the reason the count assertion is there.
 
 Three headers now include `<QList>` instead of `compat/q2compat.h`, which falls
 from 49 files to 47.
+
+Verified: `./check.sh` 105 pass / 4 fail / 315 warnings, both gates
+byte-identical, sanitized fitness run clean, self-check ok.
+
+### D12 — `Q2CString`, and the executed path is clear
+
+Two sites, identical, both building the `Terrain.ter` path for DynaMechs:
+`SIG_Environment.cpp:413` and `SIG_DynaMechsSimulationData.cpp:300`.
+
+```cpp
+const QByteArray b = terrainDataFileName.toUtf8();
+char const *p = b.constData();          // was: Q2CString's implicit conversion
+```
+
+`Q2CString` existed for one reason — Qt 2's `QCString` converts implicitly to
+`const char *` and `QByteArray` does not. Both sites already stored the byte
+array in a **named local**, so neither was ever the §9 dangling-temporary trap;
+the pointer stays valid for the local's lifetime, before and after.
+
+**The one divergence cannot fire here.** `Q2CString::operator const char *`
+returns `nullptr` for a null string, where `QByteArray::constData()` returns a
+pointer to an empty string. `terrainDataFileName` is `sigelRootString +
+"/Terrain.ter"`, so it is never empty and `toUtf8()` is never null. Both gates
+load terrain on every evaluation, so this is covered rather than argued.
+
+Both files drop `compat/q2compat.h` for `<QByteArray>`; the shim's reach falls
+from 47 files to 45.
+
+**With this, no live shim code remains in `SIGEL_Robot`, `SIGEL_Simulation` or
+`SIGEL_Environment`** — six prose comments naming the old types are all that
+`grep` finds there, and they are kept because they explain why the code reads as
+it does. **The shim cannot be deleted yet**: `SIGEL_GP`, `MT_Control` and
+`MT_GPSystem` still hold it, and, per "What the gates actually reach" above,
+part of that is executed on every run rather than being unreachable evolution
+loop as this plan long assumed.
 
 Verified: `./check.sh` 105 pass / 4 fail / 315 warnings, both gates
 byte-identical, sanitized fitness run clean, self-check ok.

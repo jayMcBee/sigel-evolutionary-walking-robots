@@ -22,7 +22,7 @@
 */
 #include "SIGEL_Environment/SIG_Environment.h"
 #include "fparser.h"
-#include "compat/q2compat.h"
+#include <QByteArray>
 #include "SIGEL_Tools/SIG_IO.h"
 
 #ifdef _WINDOWS
@@ -410,8 +410,8 @@ namespace SIGEL_Environment {
 
   	QString terrainDataFileName = sigelRootString + "/Terrain.ter";
 
-  	Q2CString terrainDataFileNameQCString = terrainDataFileName.toUtf8();
-	  char const *terrainDataFileNameCString = terrainDataFileNameQCString;
+  	const QByteArray terrainDataFileNameQCString = terrainDataFileName.toUtf8();
+	  char const *terrainDataFileNameCString = terrainDataFileNameQCString.constData();
 
   	dynaMechsEnvironment.loadTerrainData( terrainDataFileNameCString );
 
