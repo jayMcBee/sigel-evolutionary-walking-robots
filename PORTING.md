@@ -33,7 +33,7 @@ build and run, because nothing else can be verified without it — see §3.
 | D — delete the shim, migrate the data | **D1–D12 done.** `Q2Dict`, `Q2DictIterator` and `Q2Array` gone from all code; `Q2PtrVector` is off `SIG_Geometry`, `SIG_Body`, the `SIG_Register` cluster and `SIG_DynaMechsSimulationData`. Shim 806 → **530** lines. Remaining, measured 2026-08-29 after D12: `Q2PtrList` 47, `Q2PtrVector` 49, `Q2CString` 19, `Q2Queue` 16, `Q2ListIterator` 8, `Q2ValueList` 12. **No live shim code is left in `SIGEL_Robot`, `SIGEL_Simulation` or `SIGEL_Environment` — only prose comments.** What remains is `SIGEL_GP`, `MT_Control` and `MT_GPSystem`, part of which the gates do execute (§10). **Which of those the gates execute is now measured, not assumed** — see "What the gates actually reach" in §10. §10 |
 | P — PVM | **DONE 2026-08-28.** Vendored 3.4.3 replaced by upstream 3.4.6; nine patches carry the four config lines and Debian's eight source fixes; `libpvm3.a` and `pvmd3` build; SIGEL's two PVM objects link against them and `SIG_GPPVMData` round-trips through real PVM. `sigel`/`sigel_slave` still need Phase C. §7 |
 | C — GUI | **not started, AUTHORIZED 2026-08-27 per D24.** ~450 Qt 2 sites + 20 forms |
-| V — check against the 1.3 binary | **V1, V5's MDH probe and V6 all done, all PASS.** Ordering: 10 of 10 container orders match. Arithmetic: `twoBases` exact bit for bit, `octopus` 9/9 with three joints exact and 5 ulp worst. **V6 2026-08-29: friction and no-collide negotiation confirmed against 1.3, 5 of 5** — `reference/v6-1.3-friction-nocollide.txt`. V2–V4 not started; V5's sensor and force probes are **invalid as specified** — both target Dynamo-only functions, deleted 2026-08-28. §7 |
+| V — check against the 1.3 binary | **V1, V5's MDH probe, V6, V7 and V8 all done, all PASS.** Ordering: 10 of 10 container orders match. Arithmetic: `twoBases` exact bit for bit, `octopus` 9/9 with three joints exact and 5 ulp worst. **V6, V7 and V8 done 2026-08-29** — friction and no-collide negotiation, their four remaining rules, and the GP parameter blocks captured *before* their conversion. `reference/v6`, `v7`, `v8`. V2–V4 not started; V5's sensor and force probes are **invalid as specified** — both target Dynamo-only functions, deleted 2026-08-28. §7 |
 
 **SCOPE — DECIDED 2026-08-23. Read this before changing anything.**
 
@@ -964,6 +964,8 @@ in `check.sh`, not a remote call.
 | V4 | Force re-evaluation of a shipped population by setting its `FITNESS` fields to `-1`, harvest 1.3's per-individual fitness, compare against `sigel_eval` | the number this file has been asking for. **Judgement, not a gate** |
 | V5 | **MDH probe DONE 2026-08-27, PASS** — `reference/v5-1.3-mdh-compared.txt`. The sensor and force probes remain open | the port's **arithmetic**, which V1–V4 never touch |
 | V6 | **DONE 2026-08-29, PASS, 5 of 5** — `reference/v6-1.3-friction-nocollide.txt` | the two Phase D paths **no shipped data exercises**: friction pairs and no-collide pairs, and whether both setters negotiate |
+| V7 | **DONE 2026-08-29, 4 runs on `walker`** — `reference/v7-1.3-friction-nocollide-rules.txt` | the remaining rules for those two paths: multiple partners, unloaded partners, duplicates, and whether a dropped entry is resurrected |
+| V8 | **DONE 2026-08-29, captured BEFORE the conversion** — `reference/v8-1.3-gp-blocks.txt` | `SIG_GPParameter::hostList` and `SIG_GPExperiment::experimentHistory`, the two `Q2PtrList` the gates run on every load and the next to convert |
 
 **Why the round trip is the sharp test.** The `.exp` carries the robot as a
 `StreamedRobot` block, and that block *is* dict iteration order —
@@ -1047,6 +1049,55 @@ running pid**. Then, because `-visualize` builds the simulation during start-up,
 attaching after the window appears has already missed it: **stop, then play**
 forces a full reconstruction. A live `pvmd` is required or the slave exits at
 once.
+
+### V7 and V8 RESULTS — the rules, and a reference captured in advance
+
+Full detail in `reference/v7-…` and `reference/v8-…`. Six findings, four of
+which change what this repo does.
+
+**V7, on `walker`, four runs.** Multiple partners work and each keeps its own
+value. A duplicate partner is refused on **both** sides, which confirms D10's
+`!contains` and D11's append-versus-update as upstream rather than ours.
+
+**A partner that is not yet loaded is dropped, in silence.** `walker`'s `body`
+is its second link, so `body → foot1 leg1` lost both entries with no warning
+and exit 0. V6 missed it only because `middle1` named `base`, hammer's first
+link. Negotiation is *not* order-limited — the back-reference is installed into
+an earlier entity that was parsed before the entry existed.
+
+**And the drop is worse than a loss.** A forward reference is dropped, then the
+valid declaration from the other side *refills the same slot with its own
+value*:
+
+```
+wrote:  bodyMaterial -> shoulderMaterial 0.3
+got:    bodyMaterial -> shoulderMaterial 0.7
+```
+
+Present, correctly named, `nfric` right, symmetric — and the value is somebody
+else's. Not "an entry disappears", which a count catches, but "an entry
+survives with the wrong value", which only a value check catches. **Our
+self-check could not see it**: it read the partner after the first set and
+never again after an update. `SIG_WANT(b.getFrictionValue(&a) == 0.75)` is
+added, and moving `setFrictionValue`'s negotiate call inside its `if (!found)`
+block makes exactly that one assertion fail while the count and name checks
+all pass.
+
+**V8 was captured before the conversion, not after**, which V6 and V7 were not
+— it cannot be tuned to agree with code that does not exist yet.
+**`PVMHOST` order is stable**: 20 of 20 identical across three round trips, as
+predicted from `hostList` being a `Q2PtrList` that appends rather than hashes.
+`hostList` can be converted against it.
+
+**`HISTORY` blocks grow 7 bytes per save, without limit.** Count, position and
+the individual `NAME` sequence are all preserved, so the population container
+does not reorder — but the content is not stable. `SIG_GPIndividual.cpp:559`
+writes `"\n      "` before `}HISTORY END;`, and `:647` reads everything up to
+that marker back as content. The writer's own separator becomes data. **Ours is
+the same code with the same defect** — upstream, not a port regression, and
+**not fixed**, because changing it would change file bytes against 1.3. It
+means any future gate diffing a round-tripped file must normalise trailing
+whitespace inside `HISTORY` blocks first, or it is noise that grows each run.
 
 ### V6 RESULT — friction and no-collide negotiate in 1.3 too
 
@@ -1585,6 +1636,7 @@ every D8 site for a stored `const char *`.
 | `SIG_EarlyRunTermSimulation.cpp:97` | `QTime zeroHour;` | `QTime( 0, 0 )` | Same class as the other 11 `QTime()` sites but a declaration, so the first sweep's pattern missed it. `getMaxRecorderSteps` returned 2 instead of 182 — a factor of 91 on the denominator of three fitness functions. No shipped experiment selects them, so `replicate.sh` cannot see it |
 | `sigel_slave`, `getenv("SIGEL_ROOT")` | dereferenced unchecked | to be fixed | Segfaults if unset; the SIGSEGV handler masks it with no core. Bites under PVM specifically — spawned tasks inherit *pvmd's* environment, not the master's |
 | `SIG_GPPVMData.cpp:51` `sendQStringToPVM` | sends `str.length() + 1`, a **character** count, then sends `str.toUtf8()`, up to 4x longer in bytes | `qCStringBuffer.size() + 1` | `getQStringFromPVM` sizes its receive buffer from that count and lets `pvm_upkstr` write the bytes in. 20 `ü` gives `heap-buffer-overflow ... in byteupk` under ASan; short strings survive only because `QList` over-allocates. Qt 2's `length()` was the Latin-1 byte count, so 2003 was right for its own data. **Changes the wire format for non-ASCII** — safe only because both ends are this file and no distributed run exists. Found by Phase P's P4, regression-tested by `pvm_link.cpp` |
+| `SIG_GPIndividual.cpp:557-559` / `:647` | the writer emits `"\n      "` before `}HISTORY END;`; the reader takes everything up to that marker as content, so the separator becomes data | **preserved, not fixed** | Every save grows every `HISTORY` block by 7 bytes, linearly and without limit — 100 blocks is ~700 bytes per round trip. Measured on the 1.3 binary over three consecutive round trips (V8) and confirmed to be the same code here. Fixing it would change file bytes against 1.3. Any gate that diffs a round-tripped `.exp` must normalise trailing whitespace inside these blocks |
 | `SIG_Environment` terrain load | `getenv("SIGEL_ROOT")` unchecked | already checked, message on stderr | `sigel_eval` says "SIGEL_ROOT is not set, cannot locate Terrain.ter" instead of reading `/Terrain.ter` |
 
 ~~**Open, from the R1 review:** SOLID is built without the `-DNDEBUG` its own

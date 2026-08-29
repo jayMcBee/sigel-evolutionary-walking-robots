@@ -205,6 +205,16 @@ static int selfcheck()
     SIG_WANT(a.getFrictionValue(&b) == 0.75);
     SIG_WANT(a.getFrictionValue(&c) == 0.5);
 
+    // The partner must be updated too, not left at 0.25. setFrictionValue's
+    // negotiate call sits OUTSIDE its "if (!found)" block for this reason.
+    // Move it inside -- which reads like a tidy -- and a keeps 0.75 while b
+    // keeps 0.25. Confirmed against the 1.3 binary: reference/v7.
+    //
+    // This is the ONLY assertion here that can see that failure. The count
+    // and the name both still pass, because the entry is present, correctly
+    // named and symmetric -- only its value is wrong.
+    SIG_WANT(b.getFrictionValue(&a) == 0.75);
+
     // The serialiser is the only public window on the list's length, and
     // its walk is itself converted code no gate reaches.
     // "Material a <elasticity> <density> <nfric> b 0.75 c 0.5 <colour>"
@@ -238,6 +248,31 @@ static int selfcheck()
     l1.addNoCollide(&l2);                         // the duplicate guard
     SIG_WANT(l1.getNoCollides().count() == 1);
     SIG_WANT(l2.getNoCollides().count() == 1);
+  }
+  {   // The parser DROPS a friction or no-collide partner that is not loaded
+      // yet, silently. Confirmed against the 1.3 binary (reference/v7): it is
+      // upstream behaviour, not ours, and nothing warns. Both parsers register
+      // the object only AFTER constructing it, so a name can only refer
+      // backwards. No shipped file exercises this -- none declares either.
+    SIGEL_Robot::SIG_Robot robot;
+    SIGEL_Robot::SIG_Material *known = new SIGEL_Robot::SIG_Material(&robot, "known");
+    robot.addMaterial(known);
+
+    QString text = "later 1 1 1 known 0.25 0 0 0 ";
+    { QTextStream ts(&text, QIODevice::ReadOnly);
+      SIGEL_Robot::SIG_Material *later = new SIGEL_Robot::SIG_Material(&robot, ts);
+      robot.addMaterial(later);
+      SIG_WANT(later->getFrictionValue(known) == 0.25);   // backward ref kept
+      SIG_WANT(known->getFrictionValue(later) == 0.25);   // and negotiated
+    }
+
+    QString fwd = "early 1 1 1 notYetLoaded 0.9 0 0 0 ";
+    { QTextStream ts(&fwd, QIODevice::ReadOnly);
+      SIGEL_Robot::SIG_Material *early = new SIGEL_Robot::SIG_Material(&robot, ts);
+      robot.addMaterial(early);
+      // 0.6 is the not-found default: the pair was dropped, not stored.
+      SIG_WANT(early->getFrictionValue(known) == 0.6);
+    }
   }
 #undef SIG_WANT
   printf(bad ? "selfcheck: %d FAILED\n" : "selfcheck: ok\n", bad);

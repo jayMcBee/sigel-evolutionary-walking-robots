@@ -1,0 +1,102 @@
+V8 — the GP parameter blocks, captured BEFORE the conversion
+=============================================================
+Captured 2026-08-29 on the x86 reference box, through the sigel-x86 session.
+Capture once, diff for ever.
+
+WHY, AND WHY NOW
+----------------
+The container shim is out of all simulation code. What remains is 51 places in
+SIGEL_GP, MT_Control and MT_GPSystem. Two of those run on EVERY test:
+
+    SIG_GPParameter::hostList          Q2PtrList, filled from PVMHOST lines
+    SIG_GPExperiment::experimentHistory Q2PtrList, filled from HISTORY blocks
+
+sigel_eval builds a whole SIG_GPExperiment, so both are exercised by both
+gates. Both write their order into the saved .exp. Both are next to convert.
+
+V6 and V7 were captured AFTER their conversions and confirmed them. This one
+is captured BEFORE, which is better: it cannot be tuned to agree with code
+that does not exist yet.
+
+INPUT
+-----
+hammerNiceWalkingFitness.exp, UNMODIFIED except the two dead 2003 roots.
+No content edits. Loaded and saved three times in succession, which is what
+turned up result 2.
+
+RESULT 1 — PVMHOST ORDER IS STABLE. 20 of 20, three round trips.
+----------------------------------------------------------------
+    herz pappel platane birke eiche wickie urobe sven hamlet honi
+    kunibert moritz zehn koenig pik bube kreuz bolte laempel esche
+
+Identical in the input and in passes 1, 2 and 3. No permutation, no loss,
+count stays 20.
+
+PREDICTED IN ADVANCE and holds: hostList is a Q2PtrList, which appends and
+does not hash, unlike the Q2Dict containers that permute. hostList can be
+converted against this.
+
+RESULT 2 — HISTORY BLOCKS GROW 7 BYTES PER SAVE, WITHOUT LIMIT.
+---------------------------------------------------------------
+Count and position are preserved: 100 blocks in, 100 out, every pass, and the
+individual NAME sequence is byte-identical. So the population container does
+not reorder and block n still belongs to individual n.
+
+The CONTENT is not stable. First block, successive passes:
+
+    input   10574 chars     file 1553928 bytes
+    pass 1  10581           file 1554783
+    pass 2  10588           file 1555483
+    pass 3  10595           file 1556183
+
++7 characters per block per save. The appended text is exactly "\n      " --
+a newline and six spaces. The preceding 10574 characters are byte-identical,
+so nothing is rewritten; it is a pure append. At 100 blocks that is ~700 bytes
+per round trip, linear and unbounded.
+
+CAUSE, found on our side afterwards -- SIG_GPIndividual.cpp:
+
+    write  :557   file << "\n      HISTORY BEGIN{";
+           :558   file << history.join("\n");
+           :559   file << "\n      }HISTORY END;";
+
+    read   :647   histStr = indStr.mid(pos+14,
+                      indStr.indexOf("}HISTORY END", pos+15) - pos - 14);
+           :648   history.append(histStr);
+
+The reader takes everything between "HISTORY BEGIN{" and "}HISTORY END" --
+which INCLUDES the "\n      " the writer emitted before the closing marker.
+The writer's own separator is read back as content, then written again with a
+fresh separator. Hence +7 per save.
+
+OURS IS THE SAME CODE AND HAS THE SAME DEFECT. Upstream, not a port
+regression. NOT FIXED: changing it would change file bytes against 1.3, and
+the port's rule is to preserve behaviour. Recorded in PORTING.md section 9.
+
+CONSEQUENCE: a gate that diffs a round-tripped file against a reference will
+differ on every run even when the containers are perfect, and the difference
+will grow each time. Any such gate must normalise trailing whitespace inside
+HISTORY blocks first. V1's involution finding is about container ORDER and
+still holds exactly; history CONTENT is outside it and only ever grows.
+
+RESULT 3 — V6's MATERIAL FINDING, WITH THE CONFOUND CLEARED.
+-----------------------------------------------------------
+V6's run had an EDITED rubber line, so it was fair to ask whether the edit
+caused the material ordering. It did not. This unmodified file gives:
+
+    input   plastic metal rubber
+    pass 1  plastic rubber metal
+    pass 2  plastic metal rubber
+    pass 3  plastic rubber metal
+
+1.3 emits plastic, rubber, metal for hammer with no edits of any kind, and the
+order toggles cleanly -- which also confirms V1's involution directly, on four
+consecutive states rather than by inference from two files.
+
+Our build emits plastic, metal, rubber. The shim-era baseline
+(5ebc9a8:dictorder-baseline.txt) has plastic, rubber, metal, so the OLD build
+matched 1.3 and D3's flip to insertion order moved us off it. Deliberate, and
+nothing shipped is affected. See PORTING.md V6 RESULT.
+
+Source: the sigel-x86 session, which ran the file three times rather than once
+without being asked, which is the only reason result 2 exists.
