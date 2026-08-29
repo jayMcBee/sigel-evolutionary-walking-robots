@@ -932,7 +932,7 @@ in `check.sh`, not a remote call.
 | # | Step | What it checks |
 |---|---|---|
 | V1 | ~~Capture 1.3's load-and-save round trip for three shipped `.exp`~~ **DONE 2026-08-27** — `verification-against-sigel-1.3/v1-1.3-roundtrip.txt` | the `Q2Dict` hash, all order-carrying containers, the parser and the serialiser |
-| V2 | Our half: a save path in `sigel_eval`, the same round trip locally, diffed against V1. Becomes a gate | equivalence instead of self-consistency |
+| V2 | Our half: a save path in `sigel_eval`, the same round trip locally, diffed against V1. Becomes a gate. **Read V8 result 5 first** — a shipped `.exp` round-tripped through 1.3 differs from its input by ten keys, so an input-vs-pass-1 gate fails however correct the port is | equivalence instead of self-consistency |
 | V3 | Determinism on the x86 box — one experiment run twice, both `RANDOMSEED`s pinned | gates everything numeric; never tested there |
 | V4 | Force re-evaluation of a shipped population by setting its `FITNESS` fields to `-1`, harvest 1.3's per-individual fitness, compare against `sigel_eval` | the number this file has been asking for. **Judgement, not a gate** |
 | V5 | **MDH probe DONE 2026-08-27, PASS** — `verification-against-sigel-1.3/v5-1.3-mdh-compared.txt`. The sensor and force probes remain open | the port's **arithmetic**, which V1–V4 never touch |
@@ -1046,8 +1046,24 @@ one assertion fail.
 **V8 was captured before the conversion it serves.** `PVMHOST` order is stable,
 20 of 20 over three round trips, as predicted from `hostList` being a
 `Q2PtrList` that appends rather than hashes — D13 converted it against this.
-`HISTORY` blocks grow 7 bytes per save without limit; the defect is in §9 and
+`HISTORY` blocks grow **one line** per save without limit — uniformly, all 100
+by exactly one, counted per block. The defect is in §9 and
 the measurement in `v8-…txt`.
+
+**V8 result 5 — the first save is a format upgrade, and it will break V2 if
+built naively.** The shipped `.exp` are a 2001 format revision; the 2003 binary
+adds **ten keys** they predate — `FLOORDIMENSION`, `FLOORFUNCTION`,
+`FLOORPICTUREFILE`, `FLOORFUNCSELECTED`, `TEXTUREFILE`, `TEXALPHA`,
+`WITHTEXTURE`, `AUTOSAVETIME`, `RESEVGEN`, `WITHHISTORY` — with defaults, on
+the **first save only**, then holds. So **a gate comparing a shipped file
+against its own round trip fails no matter how correct the port is.** Compare
+pass 1 against pass 2, and still normalise trailing whitespace inside `HISTORY`
+blocks. This also closed a discrepancy in V8's own arithmetic: pass 1
+decomposes as 17 + 2 + 102, where section 4's 102 is 100 history lines plus 2
+one-off; passes 2 and 3 are +100, all history.
+
+Stable from the input onward, and therefore safe to gate on directly:
+`PVMHOST` order, experiment-history contents, and section 6 as a whole.
 
 ### V6 RESULT — negotiation is upstream, and our material order is not
 
