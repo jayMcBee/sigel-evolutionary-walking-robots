@@ -2888,6 +2888,48 @@ Established by the D17/D18 review, so the next step does not re-derive it.
 - **`pvmHosts.resize( size-1 )`** at `:190` is a free with no `delete`
   keyword — the §9 item 1 site still outstanding in this file.
 
+### D19 — `pvmTasks` and `pvmHosts`, the last containers in the trainer
+
+Both become `QList<T *>`. The four traps §10 recorded before this step, and
+what each became:
+
+| trap | handling |
+|---|---|
+| `insert(i, d)` **deletes the occupant and does not shift** | `delete v[i]; v[i] = d;` at all six sites. Where the slot is known null the delete is a no-op, so one spelling is exact everywhere |
+| `pvmHosts.resize( size-1 )` **is the free** | `resizeOwningHosts()`, the same four-line helper shape D15 used. The only shrink in the file |
+| `nextHostNumber % pvmHosts.size()` was **unsigned** | `static_cast<uint>` at both sites, preserving the wrap. This is D9's defect exactly, and it is the second time this port has had to write that cast |
+| `isEmpty()` meant `count()==0`, occupied slots | `pvmHosts` has no null slots — every slot is filled by the loop that sizes it — so `QList::isEmpty()` agrees. **`pvmTasks` is full of null slots**, but nothing calls `isEmpty()` or `count()` on it |
+
+**Both were §9 item 2 sites**: `setAutoDelete(true)` was their only free, and
+nothing in the file frees either. The destructor now does, explicitly.
+
+**`pvmTasks` grows without bound, and that is pre-existing.** It is indexed by
+`nextFreeNumber`, which starts at 0, increments once per spawn, and is
+**never reset** — confirmed against the 1.3 binary, which has exactly two
+writes to that member: `movl $0x0` in the constructor and `incl` in
+`spawnTask`. No reset is compiled from anywhere. The array grows by one
+population's worth whenever the index catches up, and never shrinks.
+
+For the reference machine's longest run — 56,333 spawns at `POPULATIONSIZE`
+250 — that is about 225 growths ending near 56,500 slots, **~226 KB** on the
+2003 i386 build. **Arithmetic, not measurement**: no RSS, `ps` line or memory
+note survives in any of the four run logs, and the processes are long gone.
+Recorded as inferred from source.
+
+**A second consequence, found by the same binary work and not by us.**
+`stopTrainersSlaves` uses `nextFreeNumber` as its loop bound, so shutdown walks
+the whole grown array rather than the live tasks — **O(total spawns ever)**,
+scanning tens of thousands of mostly-null slots on a long run. Harmless, and
+the second place the unbounded index reaches behaviour.
+
+**A warning-count drift this step did not cause.** `check.sh` reports 315, and
+`SIGEL_RobotIO` accounts for the change — a module D19 does not touch.
+Measured by stashing: **D19 adds zero warnings**, and 315 is reproducible twice
+at `HEAD` without it. One commit earlier the file recorded 314, independently
+verified. So the number moved by one for a reason outside this change that
+could not be attributed. Recorded rather than quietly restated, because this
+plan treats these counts as measured facts.
+
 ### A logging system
 
 Qt 2's `QTextStream` wrote through to unbuffered `stderr` on every `<<`. Qt 6

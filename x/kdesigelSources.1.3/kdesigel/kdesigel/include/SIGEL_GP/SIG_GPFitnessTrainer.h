@@ -52,13 +52,13 @@ class SIG_GPFitnessTrainer
    * The array of TIDs from PVM, to identify the PVMtasks.
    */
  private:
-  Q2PtrVector< SIG_GPPVMTask > pvmTasks;
+  QList< SIG_GPPVMTask * > pvmTasks;
 
  /**
   * our hosts participating in fitness calculations
   */
  private:
-  Q2PtrVector< SIG_GPActivePVMHost > pvmHosts;
+  QList< SIG_GPActivePVMHost * > pvmHosts;
 
  /**
   * Names of all dynamic hosts, which are valid for a single evaluation period

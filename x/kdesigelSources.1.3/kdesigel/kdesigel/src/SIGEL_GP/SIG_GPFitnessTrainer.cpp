@@ -44,8 +44,6 @@ SIGEL_GP::SIG_GPFitnessTrainer::SIG_GPFitnessTrainer(SIGEL_GP::SIG_GPExperiment&
    modifiedRobot( exp.robot ),
    nextFreeNumber(0)
 {
-  pvmTasks.setAutoDelete( true );
-  pvmHosts.setAutoDelete( true );
 
   switch (exp.simulationParameter.getSimulationLibrary()) {
     case SIGEL_Simulation::SIG_SimulationParameters::DynaMo:
@@ -68,8 +66,7 @@ SIGEL_GP::SIG_GPFitnessTrainer::SIG_GPFitnessTrainer(SIGEL_GP::SIG_GPExperiment&
       break;
     };
 
-  for (unsigned int i=0; i<pvmTasks.size(); i++)
-    pvmTasks.insert( i, 0 );
+  pvmTasks.fill( 0 );
 
   int noOfActiveHosts = 0;
   for (SIG_GPPVMHost *actHost : exp.gpParameter.getHostList())
@@ -82,7 +79,8 @@ SIGEL_GP::SIG_GPFitnessTrainer::SIG_GPFitnessTrainer(SIGEL_GP::SIG_GPExperiment&
 
   for (SIG_GPPVMHost *actHost : exp.gpParameter.getHostList()) {
     if (actHost->enabled) {
-      pvmHosts.insert( hostCounter, new SIG_GPActivePVMHost( *actHost ) );
+      delete pvmHosts[ hostCounter ];
+      pvmHosts[ hostCounter ] = new SIG_GPActivePVMHost( *actHost );
 
       Q2CString actHostNameQCString = actHost->name.toUtf8();
 
@@ -101,6 +99,21 @@ SIGEL_GP::SIG_GPFitnessTrainer::SIG_GPFitnessTrainer(SIGEL_GP::SIG_GPExperiment&
   };
 };
 
+namespace {
+
+// Q2PtrVector::resize() deleted every truncated item when autoDelete was set.
+// QList::resize() frees nothing. One site here shrinks: flushAllDynHosts.
+void resizeOwningHosts( QList< SIGEL_GP::SIG_GPActivePVMHost * > &v, qsizetype want )
+{
+  if (want < 0)
+    want = 0;
+  for (qsizetype i = want; i < v.size(); i++)
+    delete v[ i ];
+  v.resize( want );
+}
+
+}
+
 SIGEL_GP::SIG_GPFitnessTrainer::~SIG_GPFitnessTrainer() {
   // This class owns its dynamic host lists and its pending-spawn jobs.
   // toSpawnList had no deleteContents anywhere: setAutoDelete(true) was its
@@ -112,6 +125,10 @@ SIGEL_GP::SIG_GPFitnessTrainer::~SIG_GPFitnessTrainer() {
   dynHosts.clear();
   qDeleteAll( freshDynHosts );
   freshDynHosts.clear();
+
+  // setAutoDelete was the only free for both of these -- section 9 item 2.
+  qDeleteAll( pvmTasks );
+  pvmTasks.clear();
 
   for (unsigned int i=0; i<pvmHosts.size(); i++) {
       SIG_GPActivePVMHost *actHost = pvmHosts[i];
@@ -187,7 +204,7 @@ void SIGEL_GP::SIG_GPFitnessTrainer::flushAllDynHosts( void ) {
         // int singleInfo = 0;
         // int info = pvm_delhosts( &cStrName, 1, &singleInfo );
 
-        pvmHosts.resize( pvmHosts.size()-1 );
+        resizeOwningHosts( pvmHosts, pvmHosts.size()-1 );
         dynDelNum++;
         i--;
       }
@@ -229,8 +246,8 @@ int SIGEL_GP::SIG_GPFitnessTrainer::spawnTask(SIGEL_GP::SIG_GPIndividual const& 
   int oldMaxIndex = oldSize - 1;
   if ( oldMaxIndex < (nextFreeNumber + 1) ) {
       pvmTasks.resize( oldSize + exp.population.getSize() );
-      for (unsigned int i=oldSize; i<pvmTasks.size(); i++)
-        pvmTasks.insert( i, 0 );
+      for (qsizetype i=oldSize; i<pvmTasks.size(); i++)
+        pvmTasks[ i ] = 0;
   };
 
   if (hostNumber != -1) {
@@ -275,7 +292,8 @@ int SIGEL_GP::SIG_GPFitnessTrainer::spawnTask(SIGEL_GP::SIG_GPIndividual const& 
 						      ind.getPoolPos(),
 						      QDateTime::currentDateTime() );
 
-        pvmTasks.insert( actId, newTask );
+        delete pvmTasks[ actId ];
+        pvmTasks[ actId ] = newTask;
 
         usedHost->noOfSlaves++;
 
@@ -350,7 +368,8 @@ double SIGEL_GP::SIG_GPFitnessTrainer::checkTask(int taskId)
 	  	pvm_upkdouble(&result,1,1);
 
 	  	pvmTask->host.noOfSlaves--;
-	  	pvmTasks.insert( taskId, 0 );
+	  	delete pvmTasks[ taskId ];   // insert() freed the finished task
+	  	pvmTasks[ taskId ] = 0;
 		}
 
     else
@@ -373,7 +392,8 @@ double SIGEL_GP::SIG_GPFitnessTrainer::checkTask(int taskId)
 
 		  		toSpawnList.append( toSpawn );
 
-		  		pvmTasks.insert( taskId, 0 );
+		  		delete pvmTasks[ taskId ];   // insert() freed the finished task
+		  		pvmTasks[ taskId ] = 0;
 				}
 			}
 		}
@@ -475,7 +495,8 @@ void SIGEL_GP::SIG_GPFitnessTrainer::sweepToSpawn()
 							  individualNumber,
 							  QDateTime::currentDateTime() );
 
-	      pvmTasks.insert( internalId, newTask );
+	      delete pvmTasks[ internalId ];
+	      pvmTasks[ internalId ] = newTask;
 
 	      usedHost->noOfSlaves++;
 
@@ -537,7 +558,8 @@ int SIGEL_GP::SIG_GPFitnessTrainer::getNextHost() {
     freshHost = freshDynHosts.at(i);
 
     pvmHosts.resize( pvmHosts.size() + 1 );
-    pvmHosts.insert( pvmHosts.size()-1, new SIG_GPActivePVMHost(*freshHost) );
+    delete pvmHosts[ pvmHosts.size()-1 ];
+    pvmHosts[ pvmHosts.size()-1 ] = new SIG_GPActivePVMHost(*freshHost);
 
     sprintf(cStrName, "%s", freshHost->name.toLatin1().constData());
 
@@ -559,7 +581,7 @@ int SIGEL_GP::SIG_GPFitnessTrainer::getNextHost() {
 
   // nextHostNumber might refer to a host that's no longer available !
   if(pvmHosts.size() != 0)
-    nextHostNumber = nextHostNumber%pvmHosts.size();
+    nextHostNumber = nextHostNumber % static_cast< uint >(pvmHosts.size());
 
   // this thing seems to check all hosts in our active-host-list whether they
   // have the resources to start another sigel_slave
@@ -568,7 +590,7 @@ int SIGEL_GP::SIG_GPFitnessTrainer::getNextHost() {
       if (nextHost->noOfSlaves < nextHost->maxSlaves)
 	   result = nextHostNumber;
 
-      nextHostNumber = ++nextHostNumber % pvmHosts.size();
+      nextHostNumber = ++nextHostNumber % static_cast< uint >(pvmHosts.size());
 
       if (result != -1)
         break;
