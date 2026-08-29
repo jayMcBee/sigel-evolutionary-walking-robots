@@ -3031,6 +3031,41 @@ now: identical with frames present, a no-op with none. Same shape as
 difference is which side of the null the body is written for, and it has to be
 read each time rather than pattern-matched.
 
+### D21 — `Q2CString` is gone, and a `+ 1` that was really a `+ 2`
+
+Seven sites, all in PVM code. Six in `SIG_GPFitnessTrainer` are the same
+shape — a named local and an implicit conversion to `const char *`, which is
+the only thing `Q2CString` ever provided — and become
+`const QByteArray` + `.constData()`.
+
+**The seventh is the PVM string-length fix and it is not trivial.**
+`SIG_GPPVMData.cpp` computes the wire length that sizes the receiver's buffer:
+
+```cpp
+Q2CString qCStringBuffer = str.toUtf8();
+int finalLength = qCStringBuffer.size() + 1;      // NOT byte length + 1
+```
+
+`Q2CString::size()` reported `QByteArray::size() + 1`, because Qt 2's
+`QCString` counted the terminating NUL in its length. So that line sent **byte
+length + 2**: one byte for the NUL `pvm_upkstr` writes, and one spare.
+`QByteArray::size()` is the plain byte count, so reproducing the same wire
+value needs `+ 2` — and a mechanical `Q2CString` → `QByteArray` rename with the
+`+ 1` left alone would have quietly shortened every message by a byte.
+
+**Preserved rather than tightened.** `+ 1` would fit exactly and is arguably
+what the Phase P fix meant; `+ 2` is what has been on the wire. Dropping the
+margin is a behaviour change and not this step's to make. The `+ 2` carries a
+comment saying it is not a typo.
+
+**Verified by the one check that can see it.** `pvm-check.sh` round-trips a
+string through a live PVM daemon — including the non-ASCII regression case
+Phase P added — and passes both halves. None of the three main gates touches
+this file.
+
+`Q2CString` now appears in no code outside the shim. Both files dropped
+`compat/q2compat.h`; its reach falls **35 → 33** files.
+
 ### A logging system
 
 Qt 2's `QTextStream` wrote through to unbuffered `stderr` on every `<<`. Qt 6

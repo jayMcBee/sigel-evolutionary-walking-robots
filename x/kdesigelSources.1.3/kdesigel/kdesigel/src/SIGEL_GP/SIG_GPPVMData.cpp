@@ -20,7 +20,8 @@
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-#include "compat/q2compat.h"
+#include <QByteArray>
+#include <QList>
 #include "SIGEL_GP/SIG_GPPVMData.h"
 
 #include <qtextstream.h>
@@ -54,13 +55,23 @@ void SIGEL_GP::SIG_GPPVMData::sendQStringToPVM(QString str, int taskId, int mess
   // are 20 characters and 40 UTF-8 bytes, and getQStringFromPVM() below then
   // let pvm_upkstr write 41 bytes into a 21-byte buffer. Confirmed as a
   // heap-buffer-overflow under AddressSanitizer -- PORTING.md Phase P.
-  Q2CString qCStringBuffer = str.toUtf8();
-  int finalLength = qCStringBuffer.size() + 1;
+  // NOTE THE + 2, which is not a typo. Q2CString::size() reported
+  // QByteArray::size() + 1, because Qt 2's QCString counted the terminating
+  // NUL in its length. So "size() + 1" here was byte length + TWO: one byte
+  // for the NUL that pvm_upkstr writes, and one spare. QByteArray::size() is
+  // the plain byte count, so the same wire value needs + 2.
+  //
+  // Preserved rather than tightened. The receiver below sizes its buffer from
+  // this number and pvm_upkstr writes byte length + 1, so + 1 would fit
+  // exactly and + 2 leaves one byte of margin. Dropping that margin is a
+  // behaviour change on the wire, and not this step's to make.
+  const QByteArray qCStringBuffer = str.toUtf8();
+  int finalLength = qCStringBuffer.size() + 2;
 
   pvm_initsend(PvmDataDefault);
   pvm_pkint(&finalLength,1,1);
 
-  char const *cStringBuffer = qCStringBuffer;
+  char const *cStringBuffer = qCStringBuffer.constData();
   pvm_pkstr( const_cast<char*>( cStringBuffer ) );
   pvm_send(taskId, messageId);
 };

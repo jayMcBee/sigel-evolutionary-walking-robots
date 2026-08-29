@@ -20,7 +20,8 @@
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-#include "compat/q2compat.h"
+#include <QByteArray>
+#include <QList>
 #include <pvm3.h>
 #include "SIGEL_GP/SIG_GPFitnessTrainer.h"
 #include "SIGEL_Program/SIG_Program.h"
@@ -82,9 +83,9 @@ SIGEL_GP::SIG_GPFitnessTrainer::SIG_GPFitnessTrainer(SIGEL_GP::SIG_GPExperiment&
       delete pvmHosts[ hostCounter ];
       pvmHosts[ hostCounter ] = new SIG_GPActivePVMHost( *actHost );
 
-      Q2CString actHostNameQCString = actHost->name.toUtf8();
+      const QByteArray actHostNameQCString = actHost->name.toUtf8();
 
-      char const *actHostNameCString = actHostNameQCString;
+      char const *actHostNameCString = actHostNameQCString.constData();
 
       int singleInfo = 0;
 
@@ -133,9 +134,9 @@ SIGEL_GP::SIG_GPFitnessTrainer::~SIG_GPFitnessTrainer() {
   for (unsigned int i=0; i<pvmHosts.size(); i++) {
       SIG_GPActivePVMHost *actHost = pvmHosts[i];
 
-      Q2CString actHostNameQCString = actHost->name.toUtf8();
+      const QByteArray actHostNameQCString = actHost->name.toUtf8();
 
-      char const *actHostNameCString = actHostNameQCString;
+      char const *actHostNameCString = actHostNameQCString.constData();
 
       int singleInfo = 0;
 
@@ -261,8 +262,8 @@ int SIGEL_GP::SIG_GPFitnessTrainer::spawnTask(SIGEL_GP::SIG_GPIndividual const& 
   if (hostNumber != -1) {
       SIG_GPActivePVMHost *usedHost = pvmHosts[ hostNumber ];
 
-      Q2CString hostNameQCString = usedHost->name.toUtf8();
-      char const *hostNameCString = hostNameQCString;
+      const QByteArray hostNameQCString = usedHost->name.toUtf8();
+      char const *hostNameCString = hostNameQCString.constData();
 
       QString executableName;
 #ifdef _WINDOWS
@@ -279,9 +280,9 @@ int SIGEL_GP::SIG_GPFitnessTrainer::spawnTask(SIGEL_GP::SIG_GPIndividual const& 
 #else
 		executableName = usedHost->executableDir.path() + "/sigel_slave";
 #endif		
-      Q2CString executableNameQCString = executableName.toUtf8();
+      const QByteArray executableNameQCString = executableName.toUtf8();
 
-      char const *executableNameCString = executableNameQCString;
+      char const *executableNameCString = executableNameQCString.constData();
 
       int taskId = 0;
       int spawnInfo = pvm_spawn( const_cast< char* >( executableNameCString ),
@@ -463,8 +464,8 @@ void SIGEL_GP::SIG_GPFitnessTrainer::sweepToSpawn()
 	{
 	  SIG_GPActivePVMHost *usedHost = pvmHosts[ hostNumber ];
 
-	  Q2CString usedHostNameQCString = usedHost->name.toUtf8();
-	  char const *usedHostNameCString = usedHostNameQCString;
+	  const QByteArray usedHostNameQCString = usedHost->name.toUtf8();
+	  char const *usedHostNameCString = usedHostNameQCString.constData();
 
 	  QString executableName;
 #ifdef _WINDOWS	
@@ -476,9 +477,9 @@ void SIGEL_GP::SIG_GPFitnessTrainer::sweepToSpawn()
 #else
 	  executableName = usedHost->executableDir.path() + "/sigel_slave";
 #endif	
-	  Q2CString executableNameQCString = executableName.toUtf8();
+	  const QByteArray executableNameQCString = executableName.toUtf8();
 
-	  char const *executableNameCString = executableNameQCString;
+	  char const *executableNameCString = executableNameQCString.constData();
 
 	  int taskId = 0;
 	  int spawnInfo = pvm_spawn( const_cast< char* >( executableNameCString ),
