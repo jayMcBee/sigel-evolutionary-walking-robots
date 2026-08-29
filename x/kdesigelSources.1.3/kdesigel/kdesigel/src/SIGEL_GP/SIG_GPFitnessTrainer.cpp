@@ -44,7 +44,6 @@ SIGEL_GP::SIG_GPFitnessTrainer::SIG_GPFitnessTrainer(SIGEL_GP::SIG_GPExperiment&
    modifiedRobot( exp.robot ),
    nextFreeNumber(0)
 {
-  toSpawnList.setAutoDelete( true );
   pvmTasks.setAutoDelete( true );
   pvmHosts.setAutoDelete( true );
 
@@ -103,7 +102,12 @@ SIGEL_GP::SIG_GPFitnessTrainer::SIG_GPFitnessTrainer(SIGEL_GP::SIG_GPExperiment&
 };
 
 SIGEL_GP::SIG_GPFitnessTrainer::~SIG_GPFitnessTrainer() {
-  // This class owns the entries of both dynamic host lists.
+  // This class owns its dynamic host lists and its pending-spawn jobs.
+  // toSpawnList had no deleteContents anywhere: setAutoDelete(true) was its
+  // only ownership, so ~Q2PtrList was the free. Section 9 item 2.
+  qDeleteAll( toSpawnList );
+  toSpawnList.clear();
+
   qDeleteAll( dynHosts );
   dynHosts.clear();
   qDeleteAll( freshDynHosts );
@@ -403,7 +407,14 @@ void SIGEL_GP::SIG_GPFitnessTrainer::stopTrainersSlaves()
 
 void SIGEL_GP::SIG_GPFitnessTrainer::sweepToSpawn()
 {
-  QList< int > *actJob = toSpawnList.first();
+  // Q2PtrList's internal cursor, written out. remove() took the CURRENT
+  // element and freed it, then left the cursor on whatever slid into that
+  // slot -- or on the new last element if the removed one was last, or dead
+  // if the list emptied. current() and next() read that cursor. It is the one
+  // shim behaviour with no QList equivalent, so it is spelled out here rather
+  // than approximated.
+  qsizetype cur = toSpawnList.isEmpty() ? -1 : 0;
+  QList< int > *actJob = (cur < 0) ? 0 : toSpawnList.at( cur );
   QList< int > *prevJob = 0;
 
 #ifdef SIG_DEBUG
@@ -480,15 +491,21 @@ void SIGEL_GP::SIG_GPFitnessTrainer::sweepToSpawn()
 
       if (success)
 	{
-	  toSpawnList.remove();
-	  actJob = toSpawnList.current();
+	  delete toSpawnList.takeAt( cur );      // remove() freed it
+	  if (cur >= toSpawnList.size())         // Q2PtrList::cursorAfterRemoval
+	    cur = toSpawnList.isEmpty() ? -1 : toSpawnList.size() - 1;
+	  actJob = (cur < 0) ? 0 : toSpawnList.at( cur );
 	  if (actJob == prevJob)
 	    break;
 	}
       else
 	{
 	  prevJob = actJob;
-	  actJob = toSpawnList.next();
+	  // next(): a dead cursor stays dead and does NOT advance.
+	  if (cur < 0 || ++cur >= toSpawnList.size())
+	    { cur = -1; actJob = 0; }
+	  else
+	    actJob = toSpawnList.at( cur );
 	};
     };
 };

@@ -77,7 +77,7 @@ class SIG_GPFitnessTrainer
    * The array of indices, representing the position of the individual in the pool, which is to simulate.
    */
  private:
-Q2PtrList< QList<int> > toSpawnList;
+QList< QList<int> * > toSpawnList;
 
 
 /**

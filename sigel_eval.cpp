@@ -19,6 +19,8 @@
 #include <QHashSeed>
 #include <QTextStream>
 
+#include "compat/q2compat.h"
+
 #include "SIGEL_GP/SIG_GPExperiment.h"
 #include "SIGEL_GP/SIG_GPPopulation.h"
 #include "SIGEL_GP/SIG_GPParameter.h"
@@ -345,6 +347,68 @@ static int selfcheck()
     // gate including this one. Found by review of D16 itself.
     pop.deleteIndividual( 0 );
     SIG_WANT(pop.getSize() == 1);
+  }
+  {   // THE CURSOR WALK, D18 -- checked against the shim it replaced.
+      //
+      // SIG_GPFitnessTrainer::sweepToSpawn walked toSpawnList with
+      // Q2PtrList's internal cursor and removed the CURRENT element while
+      // iterating. D18 rewrote that as an explicit index. Nothing executes
+      // sweepToSpawn -- it needs a live PVM spawn -- so the rewrite would
+      // otherwise ship unverified.
+      //
+      // Q2PtrList is still in the tree, so run the same sequence against
+      // both and require they agree at every step. This block dies with the
+      // shim, by which time the conversion is proven.
+    const int script[] = { 0, 1, 1, 0, 0, 1, 0, 1, 1, 1 };   // 1 = remove
+    Q2PtrList<int> shim;
+    QList<int *>   mine;
+    for (int i = 0; i < 6; i++) { shim.append(new int(i)); mine.append(new int(i)); }
+    shim.setAutoDelete(true);
+
+    int *sJob = shim.first();
+    qsizetype cur = mine.isEmpty() ? -1 : 0;
+    int *mJob = (cur < 0) ? 0 : mine.at(cur);
+
+    for (int step = 0; step < 10; step++) {
+      // the values must match, not just the null-ness
+      SIG_WANT((sJob == 0) == (mJob == 0));
+      if (!sJob || !mJob) break;
+      SIG_WANT(*sJob == *mJob);
+      SIG_WANT(shim.count() == uint(mine.size()));
+
+      if (script[step]) {                       // the success branch
+        shim.remove();
+        sJob = shim.current();
+
+        delete mine.takeAt(cur);
+        if (cur >= mine.size())
+          cur = mine.isEmpty() ? -1 : mine.size() - 1;
+        mJob = (cur < 0) ? 0 : mine.at(cur);
+      } else {                                  // the failure branch
+        sJob = shim.next();
+
+        if (cur < 0 || ++cur >= mine.size()) { cur = -1; mJob = 0; }
+        else mJob = mine.at(cur);
+      }
+    }
+    SIG_WANT(shim.count() == uint(mine.size()));
+
+    // Drive the cursor off the end and keep going. Qt 2's next() leaves a
+    // DEAD cursor dead and does not advance it, so a second call must also
+    // give null rather than wrapping or walking off. The loop above exits at
+    // the first null and never reaches this, which is the same shape of gap
+    // the D16 review found -- so it is exercised deliberately here.
+    shim.last();
+    cur = mine.isEmpty() ? -1 : mine.size() - 1;
+    for (int k = 0; k < 3; k++) {
+      int *sN = shim.next();
+      int *mN;
+      if (cur < 0 || ++cur >= mine.size()) { cur = -1; mN = 0; }
+      else mN = mine.at(cur);
+      SIG_WANT((sN == 0) == (mN == 0));
+      if (sN && mN) SIG_WANT(*sN == *mN);
+    }
+    qDeleteAll(mine);
   }
 #undef SIG_WANT
   printf(bad ? "selfcheck: %d FAILED\n" : "selfcheck: ok\n", bad);

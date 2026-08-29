@@ -2797,6 +2797,36 @@ the unsigned-wrap question D9 raised stays open for `getNextHost` until an
 experiment with two live hosts exists. That box has one machine; the rest of
 the 2003 cluster is gone.
 
+### D18 — the cursor walk, checked against the shim it replaces
+
+`toSpawnList` becomes `QList<QList<int> *>`. It is the hardest container in
+the plan: `sweepToSpawn` walked it with `Q2PtrList`'s **internal cursor** and
+removed the **current** element while iterating, which is the one shim
+behaviour `QList` has no equivalent for.
+
+The cursor is written out as an explicit index, reproducing
+`cursorAfterRemoval` exactly: after a removal the cursor stays on whatever slid
+into the slot, steps back to the new last element if the removed one was last,
+and dies if the list emptied. `next()` on a dead cursor stays dead and does
+**not** advance.
+
+**`setAutoDelete(true)` was its only ownership** — there is no
+`deleteContents()` anywhere in the file, so `~Q2PtrList` was the free. That is
+§9 item 2, and the destructor now does it explicitly.
+
+**Nothing executes `sweepToSpawn`** — it needs a live PVM spawn — so the
+rewrite would have shipped unverified. `Q2PtrList` is still in the tree, so the
+self-check now runs the **same sequence of operations against both** and
+requires they agree at every step: same values, same null-ness, same count.
+The block dies with the shim, by which time the conversion is proven.
+
+**Verified to have teeth, and the first version had a gap.** Dropping
+`cursorAfterRemoval`'s step-back is caught. Making `next()` advance a dead
+cursor was **not** — the walk exits at the first null and never reaches that
+branch, the same shape of gap the D16 review found in the D16 block. The check
+now drives the cursor off the end deliberately and calls `next()` three times
+past it; with that, both mutations fail it.
+
 ### A logging system
 
 Qt 2's `QTextStream` wrote through to unbuffered `stderr` on every `<<`. Qt 6
