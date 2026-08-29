@@ -50,6 +50,22 @@ a newline and six spaces. The preceding 10574 characters are byte-identical,
 so nothing is rewritten; it is a pure append. At 100 blocks that is ~700 bytes
 per round trip, linear and unbounded.
 
+IT IS ONE WHOLE LINE, not merely 7 bytes, because the appended text starts
+with a newline. Each block gains a whitespace-only line per save. Visible in
+the section marker offsets, which shift by exactly +100 lines per pass across
+100 individuals:
+
+    input   #####  at 37 65 190 75242 75329 75491
+    pass 1         at 37 82 209 75363 75450 75612
+    pass 2         at 37 82 209 75463 75550 75712
+    pass 3         at 37 82 209 75563 75650 75812
+
+A line-shaped defect is what breaks a readLine() loop, which is why this
+matters. The appended line lands at the END of each block, immediately before
+}HISTORY END;, so nothing is stranded behind it. The second and third markers
+also move once, 65->82 and 190->209, then never again -- the one-off reshaping
+from the first save.
+
 CAUSE, found on our side afterwards -- SIG_GPIndividual.cpp:
 
     write  :557   file << "\n      HISTORY BEGIN{";
@@ -93,3 +109,32 @@ Our build emits plastic, metal, rubber. The shim-era baseline
 (5ebc9a8:dictorder-baseline.txt) has plastic, rubber, metal, so the OLD build
 matched 1.3 and D3's flip to insertion order moved us off it. Deliberate, and
 nothing shipped is affected. See PORTING.md V6 RESULT.
+
+RESULT 4 -- the EXPERIMENT history is byte-stable
+-------------------------------------------------
+A second, different history lives in the same file: the sixth and last #####
+section, one line per generation, held by SIG_GPExperiment::experimentHistory.
+It is a different container from the per-individual HISTORY blocks above.
+
+    input   161 lines / 160 entries
+    pass 1  161 / 160     generation numbers 1..160, in order
+    pass 2  161 / 160     same
+    pass 3  161 / 160     same
+
+Byte-identical: same md5 for the whole section in the input and all three
+passes. First and last entries unchanged:
+
+    1   2001 8 8 21 13 32 0.0821164 0 0.00939138
+    160 2001 8 9 7 30 45  0.45972   0 0.3833
+
+So it behaves as a plain appending list. Order and count preserved, contents
+stable under repeated save, and the growth defect in result 2 does not reach
+it.
+
+The section holds exactly ONE blank line, the last, between entry 160 and the
+closing #####. It is in the pristine input too, so it is part of the format
+rather than something a save introduces, and it does not multiply. The reader
+loops "while (!buffer.isEmpty())" over readLine(), so it terminates there and
+no entry is ever behind it. Nothing can silently truncate the list.
+
+Captured before D14 converted the container.

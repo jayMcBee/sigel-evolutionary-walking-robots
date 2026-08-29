@@ -23,7 +23,7 @@
 #ifndef SIGEL_GP_SIG_GPEXPERIMENT_H
 #define SIGEL_GP_SIG_GPEXPERIMENT_H
 
-#include "compat/q2compat.h"
+#include <QList>
 #include "SIGEL_Robot/SIG_Robot.h"
 #include "SIGEL_GP/SIG_GPParameter.h"
 #include "SIGEL_Environment/SIG_Environment.h"
@@ -105,7 +105,7 @@ class SIG_GPExperiment {
   QString comment;
 
  public:
-  Q2PtrList< SIG_GPExperimentHistoryEntry > experimentHistory;
+  QList< SIG_GPExperimentHistoryEntry * > experimentHistory;
 
  private: 	
  	/**

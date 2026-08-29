@@ -2558,6 +2558,44 @@ V8's recorded 1.3 order exactly. **Nothing committed checks it.**
 run it after touching `SIG_GPFitnessTrainer`. Run afterwards by review: both
 halves PASS, so nothing was hidden, but the step's verification was incomplete.
 
+### D14 — `experimentHistory`, in both variants of the class
+
+`SIG_GPExperiment::experimentHistory` becomes
+`QList<SIG_GPExperimentHistoryEntry *>`. Changed in **both** files and **both**
+headers, per the rule above: `SIG_GPExperiment.cpp` for `sigel` and
+`SIG_GPExperimentClean.cpp` for `sigel_slave`. Their history code is
+byte-identical, so the edit is the same in each.
+
+It owns its entries, so both `deleteContents()` become `qDeleteAll` +
+`clear()`. Two cursor walks become range-for — the file writer and the gnuplot
+export.
+
+**`first()` was not used**, because `QList::first()` on an empty list is
+undefined where `Q2PtrList::first()` returned null, and it compiles either way
+(§9). A shipped `.exp` always has entries; an experiment saved before any
+generation runs does not.
+
+**`SIG_GPExperiment.cpp:47` has CRLF line endings and a tab indent** where the
+rest of the file has LF and spaces. The edit was applied with `newline=''` and
+`latin-1` so the line ending survives. This is one of the 46 mixed-encoding
+files §2 warns about, and it is why that section says to measure with
+`command grep`.
+
+**Confirmed against 1.3 before the change, not after** — `v8-…txt` result 4.
+The 160 shipped entries come back byte-identical over three round trips,
+generation numbers 1…160 in order, count unchanged. So the container is a
+plain appending list.
+
+**And the defect next door does not reach it.** The *per-individual* `HISTORY`
+blocks in the same file grow **one whole line** per save — the correction to
+V8's original "7 bytes", which understated it: the appended text begins with a
+newline, so each block gains a whitespace-only line, +100 lines per pass across
+100 individuals. A line-shaped defect is exactly what breaks a `readLine()`
+loop, and `readHistoryFromFileTransfer` is such a loop. It is safe here on two
+counts: the growth is in a different container, and the one blank line in the
+experiment-history section is the last, present in the pristine file, and does
+not multiply.
+
 ### A logging system
 
 Qt 2's `QTextStream` wrote through to unbuffered `stderr` on every `<<`. Qt 6

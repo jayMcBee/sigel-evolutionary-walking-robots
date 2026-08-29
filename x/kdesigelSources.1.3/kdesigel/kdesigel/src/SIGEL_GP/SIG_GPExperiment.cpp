@@ -44,7 +44,8 @@ SIGEL_GP::SIG_GPExperiment::SIG_GPExperiment() //: mtController(*this)
 SIGEL_GP::SIG_GPExperiment::~SIG_GPExperiment()
 {
 	// This class owns its history entries.
-	experimentHistory.deleteContents();
+	qDeleteAll( experimentHistory );
+	experimentHistory.clear();
 	delete mtController;
 };
 
@@ -130,18 +131,16 @@ void SIGEL_GP::SIG_GPExperiment::saveExperiment(QTextStream & file)
 
 void SIGEL_GP::SIG_GPExperiment::writeHistoryToFileTransfer( QTextStream &file )
 {
-  SIG_GPExperimentHistoryEntry *actEntry = experimentHistory.first();
-
-  while (actEntry)
-    {
-      file << actEntry->print();
-      actEntry = experimentHistory.next();
-    };
+  // Not first(): Q2PtrList::first() returned null on an empty list, QList's
+  // is undefined there and still compiles. PORTING.md section 9.
+  for (const SIG_GPExperimentHistoryEntry *actEntry : experimentHistory)
+    file << actEntry->print();
 };
 
 void SIGEL_GP::SIG_GPExperiment::readHistoryFromFileTransfer( QTextStream &file )
 {
-  experimentHistory.deleteContents();
+  qDeleteAll( experimentHistory );
+  experimentHistory.clear();
 
   QString buffer = file.readLine();
 
@@ -183,21 +182,15 @@ void SIGEL_GP::SIG_GPExperiment::exportExperimentHistoryToGNUPlot( QString fileN
     {
       QTextStream gnuPlotStream( &gnuPlotFile );
 
-      SIG_GPExperimentHistoryEntry *actEntry = experimentHistory.first();
-
-      while (actEntry)
-	{
-	  gnuPlotStream << actEntry->getGenerationNo()
-			<< " "
-			<< actEntry->getMaxFitness()
-			<< " "
-			<< actEntry->getMinFitness()
-			<< " "
-			<< actEntry->getAverageFitness()
-			<< "\n";
-
-	  actEntry = experimentHistory.next();
-	};
+      for (const SIG_GPExperimentHistoryEntry *actEntry : experimentHistory)
+	gnuPlotStream << actEntry->getGenerationNo()
+		      << " "
+		      << actEntry->getMaxFitness()
+		      << " "
+		      << actEntry->getMinFitness()
+		      << " "
+		      << actEntry->getAverageFitness()
+		      << "\n";
 
       gnuPlotFile.close();
   }
