@@ -1829,6 +1829,48 @@ could undo that without noticing.
 *The sweep is a candidate list, not a proof of absence — its window is seven
 instructions, so it misses any site that stores the result and tests it later.*
 
+#### The sensor conversion constant is deliberately wrong, and we match it exactly
+
+**`SIG_DynaSensor::senseJoint1` is the wrong function to look at** — the same
+referent error as Phase V item 4, and it recurred one message after the table
+above was written. In `sigel_slave`, `senseJoint1` (`0x080c2d60`) has exactly one
+caller: `SIG_DynaMoSimulationQueries::sense`. **DynaMo**, which no shipped
+experiment selects. It is not in our tree at all — deleted with the backend on
+2026-08-28 — and §7 already marks that probe INVALID for this reason.
+
+**The live path is `SIG_DynaMechsSimulationQueries::sense`** (`0x080b1b8c`,
+extent to `getActualSimulationTime` at `0x080b2580`). It calls
+`getMechsMinPos`/`getMechsMaxPos` — the joint range, which is the denominator
+half nobody had located — and references five doubles:
+
+    0x81ec308 = 2.0
+    0x81ec320 = 57.295779578552292      <- the radians-to-degrees factor
+    0x81ec328 = 360.0
+    0x81ec330 = 90.0
+    0x81ec338 = -90.0
+
+**That factor is not 180/π.** True 180/π is `57.295779513082323`; 1.3's is
+`57.295779578552292`, a **1.14e-09 relative error**. It is `180 / 3.14159265` —
+π truncated to eight decimals.
+
+**Our source reproduces it bit-for-bit, by accident of writing the same
+expression.** `SIG_DynaMechsSimulationQueries.cpp:137,179,182` all write
+`360.0 / (2.0*3.14159265)`, which constant-folds to `0x404ca5dc1af05a77` —
+**the identical bit pattern** to the constant baked into the 1.3 binary.
+Verified, not assumed.
+
+**DO NOT "FIX" THIS.** Replacing `3.14159265` with `M_PI` or `4*atan(1)` shifts
+every joint-sensor reading by ~1.1e-9 relative. That is invisible in a
+6-significant-digit file and irrelevant to a static comparison — **and it feeds
+the simulation**, where it is exactly the kind of perturbation that amplifies.
+Evolved programs in the shipped `.exp` were selected against sensor values
+carrying this error.
+
+The surrounding arithmetic must be preserved with it: `fmod(angle, 360.0)`, the
+clamp to ±90 (`:190-196`), and `(angle + 90) / 180` (`:197`). *The DynaMo
+function's `360 - angle` reflex wrap and its `pi = 4*atan(1)` idiom belong to
+the dead backend and are not ours to reproduce.*
+
 #### The one gap that is structural: 80-bit intermediates in `moveDrive`
 
 **`SIG_DynaMechsCommandInterface::moveDrive` holds its intermediates in
