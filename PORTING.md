@@ -967,12 +967,100 @@ disassembly are local.
 | V1 | ~~Capture 1.3's load-and-save round trip for three shipped `.exp`~~ **DONE 2026-08-27** — `verification-against-sigel-1.3/v1-1.3-roundtrip.txt` | the `Q2Dict` hash, all order-carrying containers, the parser and the serialiser |
 | V2 | Our half: a save path in `sigel_eval`, the same round trip locally, diffed against V1. Becomes a gate. **Read V8 result 5 first** — a shipped `.exp` round-tripped through 1.3 differs from its input by ten keys, so an input-vs-pass-1 gate fails however correct the port is | equivalence instead of self-consistency |
 | V3 | Determinism on the x86 box — one experiment run twice, both `RANDOMSEED`s pinned | gates everything numeric; never tested there |
-| V4 | Force re-evaluation of a shipped population by setting its `FITNESS` fields to `-1`, harvest 1.3's per-individual fitness, compare against `sigel_eval` | the number this file has been asking for. **Judgement, not a gate** |
+| V4 | **REFERENCE CAPTURED 2026-08-30, before this build can run it.** Two whole-run digests — `twoBases` and `octopus` — each validated across two independent 1.3 runs. Supersedes the single-individual fitness harvest and its tolerance argument | the interpreter, physics, genetic operators, selection and RNG **in composition**, over 300 evaluations, as an exact yes/no. **A real gate, not judgement** |
 | V5 | **MDH probe DONE 2026-08-27, PASS** — `verification-against-sigel-1.3/v5-1.3-mdh-compared.txt`. The sensor and force probes remain open | the port's **arithmetic**, which V1–V4 never touch |
 | V6 | **DONE 2026-08-29, PASS, 5 of 5** — `verification-against-sigel-1.3/v6-1.3-friction-nocollide.txt` | the two Phase D paths **no shipped data exercises**: friction pairs and no-collide pairs, and whether both setters negotiate |
 | V7 | **DONE 2026-08-29, 4 runs on `walker`** — `verification-against-sigel-1.3/v7-1.3-friction-nocollide-rules.txt` | the remaining rules for those two paths: multiple partners, unloaded partners, duplicates, and whether a dropped entry is resurrected |
 | V8 | **DONE 2026-08-29, captured BEFORE the conversion** — `verification-against-sigel-1.3/v8-1.3-gp-blocks.txt` | `SIG_GPParameter::hostList` and `SIG_GPExperiment::experimentHistory`, the two `Q2PtrList` the gates run on every load and the next to convert |
 | V9 | **DONE 2026-08-29, 3 of 3** — three function *bodies* disassembled, recorded below rather than as a capture file | whether a reworked body hides under an unchanged name. Symbol lookups cannot see that |
+
+### V4 — the whole-run gate, captured 2026-08-30 before this build can run it
+
+**Two reference captures, each validated across two independent 1.3 runs.** This
+replaces the single-individual fitness check V4 originally proposed, and the
+tolerance argument that came with it.
+
+**Digest construction.** Per pool snapshot: one line per individual,
+`NAME|FITNESS|sha256(program)`, **in pool order**; then sha256 over the whole
+block.
+
+**`twoBasesSimpleFitness1`** — 2 links, 1 joint, 100 individuals per snapshot:
+
+    snapshot 1  eec007b386aa97cd977ce61c9d18138493cace77b3e74520eee21c01e8c07856
+    snapshot 2  bc2ad371e65afac762f29e6d1bd5b5852994b74bee4bf70c24d3d55f1eccab51
+    snapshot 3  1771c69f7e15b98401c735da204fa24f554b17da8937afe433b966f329c4618b
+
+    spot check, first five of snapshot 1 (NAME|FITNESS):
+    12354|0.0106312  12040|0.842208  11958|0.560132  12291|0.246616  12326|0.704262
+
+**`octopusSimpleFitness`** — 10 links, 9 joints, 100 individuals per snapshot:
+
+    snapshot 1  db5b486ba5ebb0e071dd07611b6e7889e93488de5fb75ba669b3169882038551
+    snapshot 2  3895888944f94319ae5334beb4290dbe9342d7cdad89de013a647aaba9501378
+    snapshot 3  632ec0847c3e2fd44203dd1095f1b8ba6d0c6e5fee83e26d041cef5b94950e53
+
+    spot check, first five of snapshot 1:
+    5367|0.829977  5192|0.789198  5220|0.701824  5438|1.08944  5437|0.624343
+
+**Reproduction spec — identical for both.** Start from the shipped `.exp` and
+change exactly these; the population is unchanged:
+
+| key | shipped | gate |
+|---|---|---|
+| `TIMETOSIMULATE` | `0 3 0 0` | `0 0 5 0` (3 min → 5 s) |
+| `RANDOMSEED`, **both keys** | `0`, `0` | `12345`, `12345` |
+| `TERMINATIONUSESDATE` | 1 | 0 |
+| `TERMINATIONMODEL` | 0 | 2 (generation) |
+| `TERMINATIONGENERATIONNO` | 0 | 3 |
+| `TERMINATIONTIME` year | 2001 | 2030 |
+| `TERMINATIONDURATIONDAYS` | 0 | 30 — **must not be 0** |
+| `POOLIMAGEGENERATION` | 0 | 1 |
+| `PVMHOST` | 8 dead hosts | one host, **slot count 1** |
+| `GRAVEYARDDIRECTORY`, `POOLIMAGEDIRECTORY` | dead paths | writable local |
+
+**The slot count of 1 is load-bearing.** At 8 the run is not reproducible and the
+digests mean nothing.
+
+**Octopus has TWO dead 2003 roots, not one.** `/home/pg368/sawitzki/octopus/` on
+the `Body` lines and `/home/pg368/sawitzki/sigel` for the directories — where
+twoBases has only `/home/pg368b/ross/projects/sigel`. A repointing tool that
+knows one root silently fixes nothing. Both were normalised onto the twoBases
+root before capture.
+
+**Why two gates rather than one — they discriminate.** twoBases has one MDH
+call, one drive, one sensor, and no container-ordering effects at all: nothing
+can collide in its hash, which is why its robot block round-trips byte-identical
+(V1). Octopus is where V1 found Joint, Drive **and** Sensor orders permuting and
+where V5 found nine MDH triples including the one-ULP near-misses. Nine joints
+means nine MDH sets and nine sensor readings per step — and **the truncated-π
+constant feeds every one of them**, compounded over 500 steps and 300
+evaluations. So **twoBases green with octopus red points at geometry and
+container ordering, not at the interpreter, RNG or selection.** One gate cannot
+say that.
+
+**What a match proves:** the interpreter executed 300 programs identically, the
+physics integrated them identically, the genetic operators picked the same
+parents, crossover and mutation points, selection ranked identically, and the
+RNG produced the same stream — *in composition*. With the 6-significant-digit
+format result, a match means the `.pol` files are byte-identical bar timestamps.
+
+**What a mismatch gives:** the three snapshots localise in time, and the
+per-individual rows are held on the reference side, so a failure narrows to
+which individuals differ and whether it is the program, the fitness or the
+ordering. Ask for the diff at whatever granularity helps.
+
+**Limits, stated rather than implied.** Two experiments, two robots, three
+generations, a **5-second** window chosen for runtime — not the shipped 180.
+Neither exercises friction or no-collide (every shipped robot has `nfric 0`).
+`SLAVES=1` only: nothing here bears on the concurrent path, where two runs
+genuinely differ. **A strong gate on the machinery, not a certificate on the
+robot corpus.** `walker` (19 links, 0.002 step ⇒ 2,500 steps per individual) is
+deliberately uncaptured — it is the expensive one and is better taken once this
+build can be compared against something.
+
+**This also strengthens V3.** The determinism result no longer rests on one
+case: **two experiments, two robots (2 links and 10), two fitness functions**,
+all exactly reproducible at `SLAVES=1` with both seeds pinned.
 
 **SCOPE — the 1.3 source and the 1.3 binary are not the same revision.**
 Everything above treats `x/kdesigelSources.1.3/` and the frozen binary as one
