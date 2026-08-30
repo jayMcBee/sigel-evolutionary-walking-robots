@@ -1530,7 +1530,7 @@ across all five modules — exactly what D23 forbids — and their Sites column 
 | category | sites | |
 |---|---|---|
 | `QListView` / `QListViewItem` | 128 | D9 → `QTreeWidget` |
-| containers — `QArray` `QDict` `QVector` `QList` `QCString` `QValueList` `QListIterator` | 75 | **owned by no step until now** |
+| containers — `QArray` `QDict` `QVector` `QList` `QCString` `QValueList` `QListIterator` | 75 | **owned by no step until now.** *Re-measured 2026-08-30 after Phase D and this row does not reproduce: the listed types give **63**, and **78** if `QDictIterator` is included. The other seven rows all reproduce exactly, so this is a scope or pattern question, not drift. **Re-measure at C1 and state the pattern.*** |
 | `insertItem` | 66 | menus, combos, list boxes |
 | `WFlags` / `WType_*` / `WStyle_*` | 63 | → `Qt::WindowFlags`, `Qt::WA_*` |
 | `QString::null` | 42 | → `QString()` |
