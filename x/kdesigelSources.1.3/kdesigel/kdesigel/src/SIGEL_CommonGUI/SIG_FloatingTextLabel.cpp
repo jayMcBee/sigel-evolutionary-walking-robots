@@ -27,8 +27,11 @@ namespace SIGEL_CommonGUI
 
   SIG_FloatingTextLabel::SIG_FloatingTextLabel( QWidget * parent,
 						const char * name )
-    : QLabel( parent, name )
-  { };
+    : QLabel( parent )
+  {
+    if ( name )
+      setObjectName( QString::fromUtf8( name ) );
+  };
 
   void SIG_FloatingTextLabel::mousePressEvent( QMouseEvent *e )
   {

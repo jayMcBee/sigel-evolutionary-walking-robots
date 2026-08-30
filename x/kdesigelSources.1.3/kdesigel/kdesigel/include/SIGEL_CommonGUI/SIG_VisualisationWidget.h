@@ -23,7 +23,8 @@
 #ifndef SIGEL_COMMONGUI_SIG_VISUALISATIONWIDGET_H
 #define SIGEL_COMMONGUI_SIG_VISUALISATIONWIDGET_H
 
-#include <qgl.h>
+#include <QList>
+#include <QOpenGLWidget>
 #include <qlabel.h>
 
 #include "SIGEL_Visualisation/SIG_Visualisation.h"
@@ -44,7 +45,7 @@ using namespace SIGEL_CommonGUI;
    * be used to integrate the OpenGL-Visualisation-classes
    * into the GUI.
    *
-   * It inherits from QGLWidget and extends it with functionality
+   * It inherits from QOpenGLWidget and extends it with functionality
    * used in all subclasses, which finally are instantiated in the
    * GUI widgets that contain 3D views of a robot, an environment
    * or a simulation. This includes easily changing the eyepoint
@@ -54,7 +55,7 @@ using namespace SIGEL_CommonGUI;
    * that have all visualisation-classes in common. That's why
    * this class aggregates a pointer to the SIG_Visualisation superclass.
    */
-  class SIG_VisualisationWidget : public QGLWidget
+  class SIG_VisualisationWidget : public QOpenGLWidget
     {
       Q_OBJECT
 
@@ -72,7 +73,7 @@ using namespace SIGEL_CommonGUI;
        */
       SIG_VisualisationWidget( QWidget *parent=0,
 			       char const *name=0,
-			       WFlags f=0 );
+			       Qt::WindowFlags f = Qt::WindowFlags() );
 
       /**
        * The destructor of the SIG_VisualisationWidget.
@@ -153,7 +154,7 @@ using namespace SIGEL_CommonGUI;
       /**
        * Initaliazes some OpenGL stuff.
        *
-       * This method is inherited from the QGLWidget.
+       * This method is inherited from the QOpenGLWidget.
        * It is called automatically by the QT runtime system.
        * Because some initialization is already done in
        * the constructor of the contained SIG_Visualisation,
@@ -165,7 +166,7 @@ using namespace SIGEL_CommonGUI;
       /**
        * Resizes the contents of this widget.
        *
-       * This methid is inherited from the QGLWidget.
+       * This methid is inherited from the QOpenGLWidget.
        * It is called automatically by the QT runtime system.
        * The OpenGL viewport is resizes. If visualisation
        * points to a SIG_Visualisation object,
@@ -180,7 +181,7 @@ using namespace SIGEL_CommonGUI;
        * Refreshes the contents of this widget by initiating
        * the execution of appropriate OpenGL drawing commands.
        *
-       * This methid is inherited from the QGLWidget.
+       * This methid is inherited from the QOpenGLWidget.
        * It is called automatically by the QT runtime system.
        * In some cases it is also called by other methods
        * (when changing the eyepoint while automaticRefresh
@@ -286,7 +287,7 @@ using namespace SIGEL_CommonGUI;
        */
       double const pi;
 
-      QVector< SIGEL_CommonGUI::SIG_FloatingTextLabel > floatingTextWidgets;
+      QList< SIGEL_CommonGUI::SIG_FloatingTextLabel * > floatingTextWidgets;
 
       QSize floatingTextsSize;
 

@@ -20,6 +20,7 @@
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
+#include <QMouseEvent>
 #include "SIGEL_CommonGUI/SIG_VisualisationWidget.h"
 
 #include <cmath>
@@ -31,8 +32,8 @@
 
   SIG_VisualisationWidget::SIG_VisualisationWidget( QWidget *parent,
 						    char const *name,
-						    WFlags f )
-    : QGLWidget(parent, name, 0, f),
+						    Qt::WindowFlags f )
+    : QOpenGLWidget(parent, f),
       visualisation(0),
       floatingTextWidgets(),
       floatingTextsSize(),
@@ -50,12 +51,22 @@
       pi( std::atan(1) * 4 )
 #endif
   {
-    floatingTextWidgets.setAutoDelete( true );
+    if ( name )
+      setObjectName( QString::fromUtf8( name ) );
   };
 
   SIG_VisualisationWidget::~SIG_VisualisationWidget()
   {
     delete visualisation;
+
+    // The labels are Qt CHILDREN of this widget and were ALSO owned by the
+    // Qt 2 vector's autoDelete. That was not a double free: the member is
+    // destroyed before the QWidget base, so each label unparented itself and
+    // ~QWidget then found no children left. Disassembly of the 1.3 slave shows
+    // exactly that order at 0x0806edd7 -- ~QVector, then ~QGLWidget. This body
+    // runs before the base destructor, so the order is preserved.
+    qDeleteAll( floatingTextWidgets );
+    floatingTextWidgets.clear();
   };
 
   void SIG_VisualisationWidget::setRenderMode( const QString & string )
@@ -69,7 +80,7 @@
 	else if (string == "Gouraudshaded")
 	  visualisation->viewSettings.renderMode = SIGEL_Visualisation::SIG_ViewSettings::garoudShaded;
 	if (automaticRefresh)
-	  updateGL();
+	  update();
       };
   };
 
@@ -84,7 +95,7 @@
 					     ambientSceneColor );
 
 	if (automaticRefresh)
-	  updateGL();
+	  update();
       };
   };
 
@@ -100,7 +111,7 @@
 
     showAncorPointsState = state;
 
-    updateGL();
+    update();
   };
 
   void SIG_VisualisationWidget::setYaw( double yyaw )
@@ -177,7 +188,7 @@
 	visualisation->viewSettings.up.set(2, upZ);
 
 	if (automaticRefresh)
-	  updateGL();
+	  update();
       };
   };
 
@@ -185,13 +196,17 @@
   {
     if (visualisation)
       {
+	// clear() with autoDelete was the free for the previous labels; without
+	// it they would survive as children of this widget and stay on screen.
+	qDeleteAll( floatingTextWidgets );
 	floatingTextWidgets.clear();
 	floatingTextWidgets.resize( visualisation->floatingTexts.size() );
 
 	for (int i=0; i<floatingTextWidgets.size(); i++)
 	  {
 	    SIG_FloatingTextLabel *newLabel = new SIG_FloatingTextLabel( this );
-	    floatingTextWidgets.insert( i, newLabel );
+	    // Qt 2's QVector::insert overwrote slot i; QList::insert SHIFTS.
+	    floatingTextWidgets[ i ] = newLabel;
 	    newLabel->raise();
 	  };
       };
@@ -208,10 +223,10 @@
     int deltaX = static_cast<int>( (event->x() - mouseXPos) * mouseSensity );
     int deltaY = static_cast<int>( (event->y() - mouseYPos) * mouseSensity );
 
-    if (event->state() & LeftButton)
+    if (event->buttons() & Qt::LeftButton)
       emit signalMouseRotation( deltaX, deltaY );
 
-    if (event->state() & RightButton)
+    if (event->buttons() & Qt::RightButton)
       emit signalMouseZoom( deltaY );
 
     mouseXPos = event->x();

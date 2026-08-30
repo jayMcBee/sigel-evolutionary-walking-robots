@@ -409,8 +409,9 @@ through `f0f2daa`.
 
 ## 7. Steps
 
-**Exit criterion per step:** `./check.sh` at the repo root — **203 pass, 4 fail,
-309 warnings** as of 2026-08-30, C2 (105/4/309 before Phase C; 322 warnings on
+**Exit criterion per step:** `./check.sh` at the repo root — **217 pass, 4 fail,
+341 warnings** as of 2026-08-30, C3 (203/4/309 at C2; the rise is
+`SIGEL_Visualisation` 22 + `SIGEL_CommonGUI` 10, both newly covered) (105/4/309 before Phase C; 322 warnings on
 2026-08-28 — the drops are recorded per step and each is explained, because a
 step that silently loses a warning has hidden something). The 4 failures are
 exactly the files the Makefile excludes. **The 98 new passes are the
@@ -431,9 +432,10 @@ our own code.
 `std::cerr` regression in A3 was reported by this very command at the step that
 introduced it, then shipped as "0 errors".
 
-**`check.sh` covers Phase C as of C1, but only the converted forms.** Its
-module list is still the 9 core modules, so `sigel.cpp`, `sigel_slave.cpp` and
-all 5 GUI modules remain checked by nothing — a GUI module can only join
+**`check.sh` covers Phase C as of C1.** Its module list is the 9 core modules
+plus `SIGEL_Visualisation` (C5) and `SIGEL_CommonGUI` (C3) — a GUI module joins
+only when every file in it compiles. `sigel.cpp`, `sigel_slave.cpp` and the
+three remaining GUI modules are still checked by nothing — a GUI module can only join
 `MODULES` when every file in it compiles, which is C3–C7. What C1 added is a
 `forms (Phase C)` section listing the forms converted so far and, per form,
 running `uic`, compiling the generated header standalone, compiling the
@@ -690,7 +692,7 @@ succeeded.**
 **Gates any session must keep green**, all committed:
 
 ```
-./check.sh                                            203 pass, 4 fail
+./check.sh                                            217 pass, 4 fail
 ./dictorder-dump.sh | diff -u dictorder-baseline.txt -    empty
 ./fitness-check.sh  | diff -u fitness-baseline.txt -      empty
 ASAN_OPTIONS=detect_leaks=0 ./fitness-check.sh build      exit 0
@@ -1573,9 +1575,9 @@ modules include the headers `uic` generates from them.
 |---|---|---|
 | C1 | **DONE 2026-08-30.** `SIG_GPParameterBase`, the only form with both an embedded image and dropped slots. Settles the residue table, the base-class question, and the build and check wiring — see below | 1 form |
 | C2 | **DONE 2026-08-30.** The remaining 19 forms. All 20 are Qt 6; 19 of 20 generated headers compile, the 20th blocked on C3 — see below | 19 forms |
-| C3 | `SIGEL_CommonGUI` — carries **all 6** `QGLWidget` sites, 2 in code and 4 in comments, all in `SIG_VisualisationWidget` | 665 LOC, 2 files |
+| C3 | **DONE 2026-08-30.** `SIGEL_CommonGUI` — the `QGLWidget` → `QOpenGLWidget` step; all 6 sites are here, 2 in code. In `check.sh` | 665 LOC, 2 sources |
 | C4 | `SIGEL_SlaveGUI` | 2,145 LOC, 5 files |
-| C5 | **IN PROGRESS 2026-08-30, done FIRST — it is the dependency root.** `SIGEL_Visualisation`, 23 Qt 2 sites; 11 of 12 sources compile, the 12th blocked on a missing `GL/glu.h`. *This row said it carries all 6 `QGLWidget` sites; it carries **none** — all 6 are C3's* | 3,564 LOC, 12 sources |
+| C5 | **DONE 2026-08-30, done FIRST — it is the dependency root.** `SIGEL_Visualisation`, 23 Qt 2 sites, 12/12 sources and headers compile, in `check.sh` | 3,564 LOC, 12 sources |
 | C6 | `MT_GUI` | 3,911 LOC, 14 files |
 | C7 | `SIGEL_MasterGUI` | 7,717 LOC, 20 files |
 | C8 | `sigel.cpp`, `sigel_slave.cpp` | 15 sites |
@@ -2009,11 +2011,12 @@ dropping a `Line`'s orientation gives 92/1, and a `.qrc` naming a missing file
 stops `make forms` and reports which checks did not run.
 
 
-#### C5 — `SIGEL_Visualisation` — IN PROGRESS, BLOCKED ON A MISSING PACKAGE
+#### C5 — `SIGEL_Visualisation` — DONE 2026-08-30
 
 **Done first, not third, because the step order was wrong** — see the dependency
-table above. 23 Qt 2 code sites converted, **11 of the 12 sources compile**;
-`SIG_Visualisation.cpp` is blocked on `GL/glu.h`.
+table above. 23 Qt 2 code sites converted; **12 of 12 sources and 12 of 12
+headers compile**, once `libglu1-mesa-dev` was installed. The module is in
+`check.sh`'s `MODULES` and contributes 22 warnings.
 
 **`-lGLU` IS REQUIRED, AND §7 SAYS IT IS NOT.** Phase R records "`-lGL`, no
 `-lGLU` — nothing references GLU", which was measured on the **core** build and
@@ -2172,6 +2175,59 @@ that would be a behaviour change nobody can currently detect either way. *Also
 learned: that box's SIGEL visualisation has always meant the **POV-Ray export**,
 which computes geometry and writes files without the GL view displaying. The
 on-screen GL side of the 1.3 binary is effectively untested there.*
+
+
+#### C3 — `SIGEL_CommonGUI`: `QGLWidget` → `QOpenGLWidget`
+
+Two sources, 665 LOC, done after C5 because it reads C5's `floatingTexts`.
+
+| was | now |
+|---|---|
+| `class … : public QGLWidget`, `#include <qgl.h>` | `QOpenGLWidget`, `<QOpenGLWidget>`. The three virtuals `initializeGL`/`resizeGL`/`paintGL` are unchanged, and raw GL calls still work because the context is current inside them |
+| `QGLWidget(parent, name, 0, f)` | `QOpenGLWidget(parent, f)` + `setObjectName` |
+| `updateGL()` ×4 | `update()` |
+| `WFlags` ×2 | `Qt::WindowFlags` |
+| `QVector<SIG_FloatingTextLabel>` + `setAutoDelete(true)` | `QList<SIG_FloatingTextLabel *>` with the frees written out |
+| `QLabel( parent, name )` | `QLabel( parent )` + `setObjectName` |
+| `LeftButton`, `RightButton` | `Qt::LeftButton`, `Qt::RightButton` — Qt 2's button constants were global |
+| `QMouseEvent::state()` | **`buttons()`**. Safe only because both uses are in `mouseMoveEvent`, where the two agree; on press and release Qt 2's `state()` was the state *before* the event |
+
+**The double ownership is real and was safe by destruction order.** The labels
+are Qt **children** of the widget *and* were owned by the vector's
+`autoDelete`. Not a double free: the member is destroyed before the `QWidget`
+base, so each label unparented itself and `~QWidget` found none left —
+disassembly of the 1.3 slave shows exactly that at `0x0806edd7`, `~QVector`
+then `~QGLWidget`. The `qDeleteAll` is in the destructor **body**, which runs
+before the base, so the order is preserved. `initFloatingTextWidgets`'
+`clear()` was likewise the free for the previous labels; without an explicit
+`qDeleteAll` they would survive as children and **stay on screen**.
+
+*The fill loop uses slot assignment, not `insert` — C5's review found exactly
+that mistake one file away.*
+
+**The x86 box's open question is answered here, locally.** It could not
+establish whether the anchor-points checkbox has a third state. The form says
+so: `showAncorPointsCheckBox` carries `tristate=true`, so the 0/1/2 our source
+branches on are `QCheckBox`'s Unchecked / PartiallyChecked / Checked, and
+**only the fully-checked state shows the labels** (`showAncorPointsState == 2`).
+The box observed a two-state toggle, which is one click on a tristate box.
+
+**What is still unverified, and it is the honest limit of this step.** Whether
+those labels were ever *visible* over the GL view in 2003 is unknown — see the
+oracle exchange under C5. `QOpenGLWidget` composites children correctly where
+`QGLWidget`, a native child window, often did not, so this port may well make
+them **more** visible than Qt 2 did. Nobody can currently detect that in either
+direction, and C9 is the first step that could.
+
+**`SIG_SimulationWidgetBase`'s form is still blocked, but on C4 now, not C3** —
+its custom widget's own header (`SIGEL_SlaveGUI/SIG_SimulationVisualisationWidget.h`)
+still declares `WFlags`. `check.sh` names the new blocking step.
+
+**Gates: `./check.sh` 217 pass, 4 fail, 341 warnings.** The 4 failures are the
+same Makefile-excluded files. **Warnings rise 309 → 341, and the arithmetic is
+exact**: `SIGEL_Visualisation` 22 + `SIGEL_CommonGUI` 10, both newly covered;
+nothing in previously covered code moved. Both baselines byte-identical,
+sanitized run clean.
 
 
 ---

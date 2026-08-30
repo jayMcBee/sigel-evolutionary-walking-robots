@@ -29,11 +29,15 @@ FLAGS="-fsyntax-only -std=c++17 -Wall -Wextra -DMINMAX_H"
 # "failure" the real build does not have. Found by review.
 INCS="-I$ROOT/shim -I$SRC/include -isystem $QTINC -isystem $QTINC/QtCore"
 INCS="$INCS -isystem $QTINC/QtGui -isystem $QTINC/QtWidgets"
+# QOpenGLWidget arrived with C3's SIG_VisualisationWidget.
+INCS="$INCS -isystem $QTINC/QtOpenGL -isystem $QTINC/QtOpenGLWidgets"
 for d in newmat09 dynamechs/dm Dynamo/Src/Inc fparser cv97 SOLID-2.0/include pvm3/include; do
     INCS="$INCS -isystem $SL/$d"
 done
 
-MODULES="${1:-SIGEL_Tools SIGEL_Environment MT_GPSystem SIGEL_Robot SIGEL_Program SIGEL_RobotIO SIGEL_Simulation MT_Control SIGEL_GP}"
+# SIGEL_Visualisation joined at C5 and SIGEL_CommonGUI at C3 -- a GUI module
+# joins this list only when EVERY file in it compiles.
+MODULES="${1:-SIGEL_Tools SIGEL_Environment MT_GPSystem SIGEL_Robot SIGEL_Program SIGEL_RobotIO SIGEL_Simulation MT_Control SIGEL_GP SIGEL_Visualisation SIGEL_CommonGUI}"
 pass=0; fail=0; warn=0
 
 # The shim self-check was here: it built and RAN q2compat_check.cpp under
@@ -107,7 +111,7 @@ FORM_LIST="MT_UI/MT_AddConstantsWidgetBase:MT_GUI \
             SIGEL_MasterUI/SIG_RobotBase:SIGEL_MasterGUI \
             SIGEL_MasterUI/SIG_SimulationParameterBase:SIGEL_MasterGUI \
             SIGEL_SlaveUI/SIG_MovieSettingsDialogBase:SIGEL_SlaveGUI \
-            SIGEL_SlaveUI/SIG_SimulationWidgetBase:SIGEL_SlaveGUI:C3"
+            SIGEL_SlaveUI/SIG_SimulationWidgetBase:SIGEL_SlaveGUI:C4"
 
 MOCBIN=$(qmake6 -query QT_INSTALL_LIBEXECS)/moc
 fp=0; ff=0; fw=0
