@@ -104,9 +104,9 @@ void SIGEL_GP::SIG_GPManager::evolutionLoop() {
 
       int touchsCounter = 0;
 
-      Q2ValueList<int>::Iterator canDoIter = taskCanDoList.begin();
+      qsizetype canDoIdx = 0;   // was an iterator: Qt 2's list was linked
 
-      while (canDoIter != taskCanDoList.end()) {
+      while (canDoIdx < taskCanDoList.size()) {
       // this loop implements some sort of busy-waiting;
       // experiments show gain in performance when we add some minor delay !
 #ifdef _WINDOWS
@@ -119,12 +119,12 @@ void SIGEL_GP::SIG_GPManager::evolutionLoop() {
         break;
       }
 
-      SIG_GPTournament &actTour=*tours[ *canDoIter ];
+      SIG_GPTournament &actTour=*tours[ taskCanDoList.at( canDoIdx ) ];
       int actIndiNumber = actTour.indis.size();
 
 #ifdef SIG_DEBUG
       SIGEL_Tools::SIG_IO::cerr << "SIG_GPManager inspecting tournament No. "
-        << *canDoIter
+        << taskCanDoList.at( canDoIdx )
         << ".\n"
         << "justWaiting: "
         << actTour.justWaiting
@@ -148,7 +148,7 @@ void SIGEL_GP::SIG_GPManager::evolutionLoop() {
       if (!actTour.justWaiting) {
 #ifdef SIG_DEBUG
         SIGEL_Tools::SIG_IO::cerr << "Playing tournament "
-          << *canDoIter
+          << taskCanDoList.at( canDoIdx )
           << "\n";
 #endif
 
@@ -215,9 +215,9 @@ void SIGEL_GP::SIG_GPManager::evolutionLoop() {
        };
      }; // for (int j=0;...) - loop
         if (!actTour.justWaiting)
-          canDoIter = taskCanDoList.remove( canDoIter );
+          taskCanDoList.removeAt( canDoIdx );   // next slides into canDoIdx
         else
-          ++canDoIter;
+          ++canDoIdx;
 
         touchsCounter++;
       };
@@ -1286,9 +1286,9 @@ void SIGEL_GP::SIG_GPManager::evolutionLoop(MT_Classifier *MetaClassifier)
 
     	  int touchsCounter = 0;
 
-  	  Q2ValueList<int>::Iterator canDoIter = taskCanDoList.begin();
+  	  qsizetype canDoIdx = 0;   // was an iterator: Qt 2's list was linked
 
-  	  while (canDoIter != taskCanDoList.end())
+  	  while (canDoIdx < taskCanDoList.size())
 	    {
 				// this loop implements some sort of busy-waiting;
 				// experiments show gain in performance when we add some minor delay !
@@ -1302,12 +1302,12 @@ void SIGEL_GP::SIG_GPManager::evolutionLoop(MT_Classifier *MetaClassifier)
 				{  break;
 				}
 
-	      SIG_GPTournament &actTour=*tours[ *canDoIter ];
+	      SIG_GPTournament &actTour=*tours[ taskCanDoList.at( canDoIdx ) ];
 	      int actIndiNumber = actTour.indis.size();
 
 #ifdef SIG_DEBUG
 	      SIGEL_Tools::SIG_IO::cerr << "SIG_GPManager inspecting tournament No. "
-					<< *canDoIter
+					<< taskCanDoList.at( canDoIdx )
 					<< ".\n"
 					<< "justWaiting: "
 					<< actTour.justWaiting
@@ -1333,7 +1333,7 @@ void SIGEL_GP::SIG_GPManager::evolutionLoop(MT_Classifier *MetaClassifier)
 		{
 #ifdef SIG_DEBUG
 		  SIGEL_Tools::SIG_IO::cerr << "Playing tournament "
-					    << *canDoIter
+					    << taskCanDoList.at( canDoIdx )
 					    << "\n";
 #endif
 //*********************** META change 1)
@@ -1418,9 +1418,9 @@ void SIGEL_GP::SIG_GPManager::evolutionLoop(MT_Classifier *MetaClassifier)
 		    };
 		};
 	      if (!actTour.justWaiting)
-      		canDoIter = taskCanDoList.remove( canDoIter );
+      		taskCanDoList.removeAt( canDoIdx );   // next slides into canDoIdx
 	      else
-      		++canDoIter;
+      		++canDoIdx;
 
 	      touchsCounter++;
 	    };

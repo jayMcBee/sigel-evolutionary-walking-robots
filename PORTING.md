@@ -3544,6 +3544,68 @@ carries `^M` on both sides of the diff, and no line I did not edit moved.
 Shim reach falls **26 → 24**; `Q2PtrList` 39 → **37** (scope as in the status
 table: lines, source tree only).
 
+### D25a — `taskCanDoList`, and why the iterator had to go
+
+`SIG_GPManager::taskCanDoList` is `Q2ValueList<int>` → `QList<int>`. One header
+line, fourteen body lines, two identical loops (`evalNewIndis` around `:107`,
+`evalNeededIndis` around `:1289`).
+
+**A direct iterator-for-iterator conversion here would have been a
+use-after-free.** Qt 2's `QValueList` is a **doubly-linked** list
+(`qvaluelist.h:51-62`) — the shim models it as `std::list<T>` for exactly this
+reason — so an iterator stays valid when the list is modified elsewhere. The
+loop relies on that:
+
+```cpp
+Q2ValueList<int>::Iterator canDoIter = taskCanDoList.begin();
+while (canDoIter != taskCanDoList.end()) {
+    ...
+    taskCanDoList << actSuccessor;                    // :171 and :209 -- APPEND
+    ...                                               // while canDoIter is live
+    if (!actTour.justWaiting)
+        canDoIter = taskCanDoList.remove( canDoIter );  // returns the next
+    else
+        ++canDoIter;
+}
+```
+
+`QList` is contiguous. That append can reallocate, and then `canDoIter`
+dangles. This is not a null-versus-UB hazard like the ones in §9 — it is
+**iterator invalidation**, a different member of the same family: *Qt 2 defined
+it, Qt 6 does not.*
+
+**The faithful conversion is an index walk**, because the container is
+contiguous and every append goes to the end:
+
+| was | now | why it matches |
+|---|---|---|
+| `Iterator canDoIter = begin()` | `qsizetype canDoIdx = 0` | |
+| `while (canDoIter != end())` | `while (canDoIdx < size())` | `end()` was re-read each pass, so growth extended the loop; `size()` does the same |
+| `*canDoIter` | `taskCanDoList.at( canDoIdx )` | six sites |
+| `canDoIter = remove(canDoIter)` | `removeAt( canDoIdx )`, **no advance** | Qt 2's `remove` returned the *next* iterator; after `removeAt` the next element slides into the same index |
+| `++canDoIter` | `++canDoIdx` | |
+
+Appends stay correct: a forward iterator over a linked list eventually reaches
+an element appended behind it, and so does an index walk over a growing array.
+
+**No gate reaches this.** `nm -C build/sigel_eval | grep -c 'SIG_GPManager::'`
+is **0** — the object is not linked, exactly as with `MT_Evaluator` in D24. The
+three green baselines say nothing about this change; `check.sh`'s
+`-fsyntax-only` is again the only mechanical check. **Whether the append ever
+actually fires during a sweep is a question only a real run answers**, and that
+needs the x86 box.
+
+`Q2ValueList` now appears in **no user code at all** — only the shim and its
+self-check (12 → 9 lines, narrow scope). The `q2compat.h` include stays in
+`SIG_GPManager.h` because `tours` is still `Q2PtrVector`; `<QList>` is now
+included explicitly rather than arriving through the shim.
+
+**D25 is three commits, not one**, because it is three container types with
+three different hazards: this one, then the two `fitTaskList` (`Q2PtrList` with
+`setAutoDelete(true)` — an owning container, §7), then `tours`
+(`Q2PtrVector`, whose `insert` and shrinking `resize` are **hidden frees** and
+whose `size()` means allocated slots, not element count).
+
 ### A logging system
 
 Qt 2's `QTextStream` wrote through to unbuffered `stderr` on every `<<`. Qt 6

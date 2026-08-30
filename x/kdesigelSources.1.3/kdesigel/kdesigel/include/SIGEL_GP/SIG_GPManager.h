@@ -23,6 +23,7 @@
 #ifndef SIGEL_GP_SIG_GPMANAGER_H
 #define SIGEL_GP_SIG_GPMANAGER_H
 
+#include <QList>
 #include "compat/q2compat.h"
 #include "SIGEL_GP/SIG_GPFitnessTrainer.h"
 #include "SIGEL_GP/SIG_GPTournament.h"
@@ -122,7 +123,7 @@ namespace SIGEL_GP
    * that are free to start or that are waiting for the calculation
    * of fitness values for individuals that were created by them.
    */
-  Q2ValueList<int> taskCanDoList;
+  QList<int> taskCanDoList;
 
   /**
    * The experiment object, which contains all the data related to the
