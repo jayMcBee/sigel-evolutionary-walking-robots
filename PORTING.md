@@ -27,10 +27,10 @@ build and run, because nothing else can be verified without it — see §3.
 |---|---|
 | 0 — comments to English | done for the 9 core modules; 9 GUI files still hold Latin-1 |
 | A — core onto Qt 6 | **done**, tags `step-A0`…`step-A9` |
-| B — ownership explicit | **subsumed by Phase D**, which deletes the containers rather than converting them. **1** `setAutoDelete` call left in core, re-measured 2026-08-30 after D25b — `SIG_GPManager.cpp:64`, `tours`, which is D25c. *D25b removed the two `fitTaskList` calls and replaced them with an RAII guard; before that it was 3.* **0 in `MT_Control`** (D24 deleted the last) and **0 in `SIGEL_Robot`**. *This row said 11 with 10 in `SIGEL_GP` and 1 in `MT_Control`. The two `setAutoDelete` in `SIG_GPFitnessTrainer.cpp` are comments, not calls, and 10 was never a core figure — `SIGEL_MasterGUI` has 11. Fourth correction of this row, fourth by review.*: D11 deleted `SIG_Body.cpp:54`, the last one, and left this row saying 12. *Before that it read 13 with 2 in `SIGEL_Robot`, where there was one. Three readings of the same row, three corrections, each by review.* **Not all of them are unreachable, and an earlier version of this row said they were.** `SIG_GPPopulation::pool` is owning, is constructed on every `sigel_eval` run and takes 100 `insert()`s inside both gates — see "What the gates actually reach" in §10. The **6** in `SIG_GPFitnessTrainer` and `SIG_GPManager` are the ones Phase C still blocks; the row said 7, which did not even add up against the 10 in the same sentence |
+| B — ownership explicit | **subsumed by Phase D**, which deletes the containers rather than converting them. **1** `setAutoDelete` call left in core, re-measured 2026-08-30 after D25b — `SIG_GPManager.cpp:64`, `tours`, which is D25c. *D25b removed the two `fitTaskList` calls and replaced them with an RAII guard; before that it was 3.* **0 in `MT_Control`** (D24 deleted the last) and **0 in `SIGEL_Robot`**. *This row said 11 with 10 in `SIGEL_GP` and 1 in `MT_Control`. The two `setAutoDelete` in `SIG_GPFitnessTrainer.cpp` are comments, not calls, and 10 was never a core figure — `SIGEL_MasterGUI` has 11. Fourth correction of this row, fourth by review.*: D11 deleted `SIG_Body.cpp:54`, the last one, and left this row saying 12. *Before that it read 13 with 2 in `SIGEL_Robot`, where there was one. Three readings of the same row, three corrections, each by review.* **Not all of them are unreachable, and an earlier version of this row said they were.** `SIG_GPPopulation::pool` is owning, is constructed on every `sigel_eval` run and takes 100 `insert()`s inside both gates — see "What the gates actually reach" in §10. *The tail of this row used to say "the **6** in `SIG_GPFitnessTrainer` and `SIG_GPManager` are the ones Phase C still blocks". That is now arithmetically impossible against the core total of 1 above, and is struck: `SIG_GPFitnessTrainer` has no `setAutoDelete` call left at all, only two comments* |
 | R — build and run | core builds and runs. **No longer checked only against itself** — Phase V has confirmed both the ordering and the arithmetic against the 1.3 binary, §7 |
 | T — old-Qt tool container | **done 2026-08-27.** `tools/qtmig`, §4 |
-| D — delete the shim, migrate the data | **D1–D24 done, D25a and D25b done.** `Q2Dict`, `Q2DictIterator`, `Q2Array` and `Q2CString` gone from all code; the simulation path, `SIG_GPFitnessTrainer`, `SIG_GPFullDataRecorder` and `crossOver` all converted. Shim 806 → **536** lines, included by **23** files — *files that actually `#include` it: 22 in the source tree plus `sigel_eval.cpp`. A `git grep -l q2compat.h` returns 24 because it counts `PORTING.md`, which merely names the header.* Remaining, measured 2026-08-30 after D24: `Q2PtrList` **36**, `Q2PtrVector` 46, `Q2Queue` **9**, `Q2ValueList` **9**, `Q2ListIterator` 8, `Q2CString` 15 — **lines containing the name, in the source tree only**: the shim's own header and self-check are included, `sigel_eval.cpp` and `verification-against-sigel-1.3/` are not. State the scope when you re-measure; the same six names give **44**/46/9/12/8/15 if `sigel_eval.cpp` and the captures are counted, and **46**/48/9/12/8/15 if you count occurrences instead of lines. *Both broad figures were left at their pre-D24 values when the narrow one was updated in the same sentence.* The `Q2PtrVector` bulk is `SIG_GPManager::tours`, which **cannot be linked** until Phase C. §10 |
+| D — delete the shim, migrate the data | **D1–D24 done, D25a and D25b done.** `Q2Dict`, `Q2DictIterator`, `Q2Array` and `Q2CString` gone from all code; the simulation path, `SIG_GPFitnessTrainer`, `SIG_GPFullDataRecorder` and `crossOver` all converted. Shim 806 → **539** lines, included by **23** files — *files that actually `#include` it: 22 in the source tree plus `sigel_eval.cpp`. A `git grep -l q2compat.h` returns 24 because it counts `PORTING.md`, which merely names the header.* Remaining, measured 2026-08-30 after **D25b**: `Q2PtrList` **36**, `Q2PtrVector` 46, `Q2Queue` **9**, `Q2ValueList` **9**, `Q2ListIterator` 8, `Q2CString` 15 — **lines containing the name, in the source tree only**: the shim's own header and self-check are included, `sigel_eval.cpp` and `verification-against-sigel-1.3/` are not. State the scope when you re-measure; the same six names give **43**/46/9/**9**/8/15 if `sigel_eval.cpp` and the captures are counted, and **45**/48/9/**9**/8/15 if you count occurrences instead of lines. *Left stale twice now — at D24 and again at D25b — each time by updating the narrow figure in this sentence and not the broad ones beside it. If you change one, re-measure all three.* The `Q2PtrVector` bulk is `SIG_GPManager::tours`, which **cannot be linked** until Phase C. §10 |
 | P — PVM | **DONE 2026-08-28.** Vendored 3.4.3 replaced by upstream 3.4.6; nine patches carry the four config lines and Debian's eight source fixes; `libpvm3.a` and `pvmd3` build; SIGEL's two PVM objects link against them and `SIG_GPPVMData` round-trips through real PVM. `sigel`/`sigel_slave` still need Phase C. §7 |
 | C — GUI | **not started, AUTHORIZED 2026-08-27 per D24.** ~450 Qt 2 sites + 20 forms |
 | V — check against the 1.3 binary | **V1, V5's MDH probe, V6, V7 and V8 all done, all PASS.** Ordering: 10 of 10 container orders match. Arithmetic: `twoBases` exact bit for bit, `octopus` 9/9 with three joints exact and 5 ulp worst. **V6, V7 and V8 done 2026-08-29** — friction and no-collide negotiation, their four remaining rules, and the GP parameter blocks captured *before* their conversion. `verification-against-sigel-1.3/v6`, `v7`, `v8`. V2–V4 not started; V5's sensor and force probes are **invalid as specified** — both target Dynamo-only functions, deleted 2026-08-28. §7 |
@@ -783,11 +783,15 @@ Goal: every owning container frees its items explicitly at the owner, via
 wrong, with no run to check against. Every review round has found a real defect
 in the *easy* conversions.
 
-**`fitTaskList` (`SIG_GPManager.cpp:357,1434`) keeps `setAutoDelete`
-permanently.** On a **local** container, letting the container delete its own
-items is the right answer: it frees at scope exit, including
-the early `return` at `:404` and anything thrown out of `checkTask`. Writing
-those frees by hand loses the unwinding path. `SIG_Body.cpp`'s local `vertices`
+**~~`fitTaskList` keeps `setAutoDelete` permanently.~~ Superseded by D25b.**
+The reasoning below was right; the conclusion could not survive the shim's
+removal. On a **local** container, letting the container delete its own items is
+the right answer — it frees at scope exit, including the early returns and
+anything thrown out of `checkTask`, and writing those frees by hand loses the
+unwinding path. **D25b keeps that property without the flag**, using an RAII
+guard (`FitTaskListGuard`, `SIG_GPManager.cpp:358`) rather than hand-written
+frees, so the unwind path is still covered — confirmed by the 1.3 binary, which
+has a fourth `~QList` call site on the unwind path before `__throw`. `SIG_Body.cpp`'s local `vertices`
 was converted in B2 before this was understood, and uses `setAutoDelete` again.
 
 **Exit criterion per step:** the self-check builds and runs clean under ASan and
@@ -1770,7 +1774,7 @@ tracked anywhere:
 
 | site | state | why it matters |
 |---|---|---|
-| **`SIG_GPManager.cpp:415` and `:1507`** | `fitTaskList` is still `Q2PtrList` (`:357`, `:1434`), so **safe today** | `QList<int> *actFitTask = fitTaskList.first();` then `while (actFitTask)` — **the loop terminates on the null**. This is core code that compiles and links, and `SIG_GPManager` is **D25, the next step**. It must become `value(0)` or a range-for; a direct rename turns a correct empty-list exit into UB |
+| ~~`SIG_GPManager.cpp:415` and `:1507`~~ **CLOSED by D25b** | `fitTaskList` is now `QList< QList<int> * >` (`:373`, `:1460`) and the walk is index-based | The hazard was real: `fitTaskList.first()` then `while (actFitTask)` — **the loop terminated on the null**, and Qt 6's `first()` is UB on empty. It became a cursor index (`isEmpty() ? -1 : 0`, then `at()`), not `value(0)` or a range-for, because the walk also needs `remove`/`current`/`next` semantics. This row is why the step was written the way it was |
 | `SIG_ExperimentView.cpp:91`, `:105`, `:119` | `experimentHistory` is **already** `QList<T *>`; `.first()` unguarded | converted-code UB, latent only because `SIGEL_MasterGUI` is not in the build. Phase C |
 | `SIG_EnvironmentRenderer` `robotPathPoints` | **unconverted Qt 2** `QList<DL_vector>` under `#include <qlist.h>` (`:30`), walked with `.first()`/`.next()` into a `DL_vector *` | the central pointer-versus-value trap, sitting unconverted. Under Qt 6 the same declaration is a *value* list. Phase C |
 
@@ -2251,8 +2255,8 @@ ever sees compacted copies — 87 observations across all 14 experiments, all
 `size() == count()`, and `getOrAddVertex` called 0 times on any `.exp`.
 
 **`SIG_Body`'s local is *a* container §7 said should keep `setAutoDelete`** —
-not *the* one, which is `fitTaskList` (`SIG_GPManager.cpp:357,1434`) and is
-untouched. On a local the flag *is* the RAII, because the NEWMAT multiply and
+not *the* one, which was `fitTaskList` — **converted in D25b**, which replaced
+the flag with an RAII guard rather than dropping the ownership. On a local the flag *is* the RAII, because the NEWMAT multiply and
 the `SIG_Polygon` allocations below it can throw. That reasoning was right for
 pointers; values retire it, since nothing is owned.
 
@@ -3554,8 +3558,9 @@ table: lines, source tree only).
 two walks with an **identical 14-line skeleton** — in `evolutionLoop()`
 (`:80`, walk at `:107`) and `evolutionLoop(MT_Classifier *)` (`:1250`, walk at
 `:1289`). *An earlier draft named these `evalNewIndis` and `evalNeededIndis`.
-Those are at `:351` and `:1432`, they hold `fitTaskList`, and neither contains a
-`taskCanDoList` walk at all. The 1.3 binary settles it: the sweep's
+Those are at `:367` and `:1458` after D25b inserted a guard above the first of
+them (`:351` and `:1432` before it), they hold `fitTaskList`, and neither
+contains a `taskCanDoList` walk at all. The 1.3 binary settles it: the sweep's
 `usleep(300000)` appears at exactly two call sites, both inside
 `evolutionLoop`.* The **bodies** differ — `:156 actTour.run()` against
 `:1342 actTour.run(MetaClassifier)`, and the second carries an extra
@@ -3673,8 +3678,21 @@ populated**:
 
 | function | populate | early returns inside the populated region |
 |---|---|---|
-| `evalNewIndis` | `:413` append | `:386` (inside the `poolSize` loop, so non-empty from the second iteration) and `:426` (inside the sweep `while`) |
-| `evalNeededIndis` | `:1508` append | `:1491` and `:1518`, same two shapes |
+| `evalNewIndis` | `:413` append | `:386` (inside the `poolSize` loop) and `:426` (inside the sweep `while`) |
+| `evalNeededIndis` (`:1460`) | `:1518` append | `:1501` and `:1528`, same two shapes |
+
+*Every `evalNeededIndis` figure in the first draft of this table was exactly ten
+low — `:1450`/`:1508`/`:1491`/`:1518` — because that function's numbers were not
+rebased after the guard block was inserted above `evalNewIndis`, and `:1518`,
+cited there as an early return, is the **populate** line. The `evalNewIndis`
+figures were right.*
+
+**The two `poolSize`-loop returns are *conditional* leak paths, not certain
+ones.** The append at `:413`/`:1518` is gated on `!upToDate`, so if every
+individual is already up to date the list is still empty when `:386`/`:1501` is
+reached and nothing leaks. *An earlier draft said "non-empty from the second
+iteration", which overstates it.* The two sweep-loop returns (`:426`, `:1528`)
+sit inside `while (!fitTaskList.isEmpty())` and are unconditional.
 
 A plain container swap loses all four. The fix is an RAII guard, following
 `DynaMechsLinkGuard` from D9 rather than inventing a second pattern:
@@ -3702,17 +3720,40 @@ plan was written around:
 | `fitTaskList.current()` | `cursorAfterRemoval`: `if (fitCur >= size()) fitCur = isEmpty() ? -1 : size()-1;` then `at(fitCur)` |
 | `fitTaskList.next()` | `if (fitCur < 0 \|\| ++fitCur >= size()) { fitCur = -1; actFitTask = 0; }` — a dead cursor stays dead and does **not** advance |
 
-**One pathology preserved deliberately.** `prevFitTask` can hold a pointer whose
-object was freed by a later `delete`, and the loop then evaluates
-`actFitTask == prevFitTask`. It is a comparison, never a dereference, and 1.3
-did exactly the same under `setAutoDelete` — the pointer was already dangling
-there. Converted as-is.
+**A pathology this section first claimed to be preserving does not exist.**
+An earlier draft said `prevFitTask` could hold a pointer whose object a later
+`delete` had freed. It cannot, in either version. `prevFitTask` is assigned only
+in the else branch, to the item at index *p*, after which the cursor moves to
+*p+1*; deletions happen only at the cursor; `cursorAfterRemoval` from an index
+≥ *p+1* yields a cursor ≥ *p*; and the moment it reaches *p* the
+`actFitTask == prevFitTask` test fires and breaks **before** any further delete.
+Measured too: 0 dangling comparisons over 155,641 exhaustive schedules, in the
+original as well as the conversion. Keeping the comparison is right — it is the
+loop's termination condition — but the justification was invented.
 
 `Q2PtrList` 37 → 36. **`setAutoDelete` in core falls 3 → 1**: only
 `tours.setAutoDelete( true )` at `:64` remains, and that is D25c.
 
-**No gate reaches this either** — same as D25a: compiled, archived, linked into
-nothing.
+**Compiled twice, archived, linked into nothing** — same as D25a.
+`-fsyntax-only` by `check.sh`, a real `-c` by the Makefile into both `build` and
+`build-fast`, then archived; `nm -C` gives 0 `SIG_GPManager::` in
+`build/sigel_eval`, `build-fast/sigel_eval` and `build/pvm_link`. Nothing
+executes it. **The whole ownership change is checked by the type system and by
+review alone.**
+
+**Review supplied the execution the gates cannot.** A differential harness ran
+the *real shim* `Q2PtrList` walk against the *verbatim converted* index walk over
+the same oracle, exhaustively — list sizes 0–6 × every readiness bit-schedule,
+**155,641 cases** under ASan and UBSan: `diffs=0`, `oobAt=0`, `danglingPrev=0`,
+no leaks. A separate ASan test drove the guard through early return, a throw
+mid-loop, and the `takeAt`-then-`delete` sequence: no leak, no double free.
+
+Two residual notes, neither a present defect. `delete fitTaskList.takeAt(fitCur)`
+is unguarded where Qt 2's `remove()` was a silent no-op on an invalid cursor, so
+a future edit that mutates the list mid-loop turns a no-op into UB. And
+`FitTaskListGuard` is copyable while holding a raw owning pointer — inherited
+from `DynaMechsLinkGuard`, and worth fixing in both at once rather than
+diverging them.
 
 ### A logging system
 
