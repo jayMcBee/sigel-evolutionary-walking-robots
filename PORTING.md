@@ -1797,6 +1797,60 @@ could undo that without noticing.
 *The sweep is a candidate list, not a proof of absence — its window is seven
 instructions, so it misses any site that stores the result and tests it later.*
 
+#### The one gap that is structural: 80-bit intermediates in `moveDrive`
+
+**`SIG_DynaMechsCommandInterface::moveDrive` holds its intermediates in
+`long double`, and what that means depends on the machine.** This is the first
+place where the architecture difference is unavoidable rather than incidental,
+and it sits upstream of every simulation step, because it turns the
+interpreter's register output into the force the physics integrates.
+
+*It also corrects Phase V item 4, which named the wrong function.*
+`SIG_DynaDrive::applyForce` has exactly one caller —
+`SIG_DynaMoCommandInterface::moveDrive` — and **every shipped experiment sets
+`SIMULATIONLIBRARY 1`**, which is DynaMechs, so the DynaMo interface is never
+constructed. A breakpoint on `applyForce` was watching a function that is dead
+in the selected backend. The live `SIG_DynaMechsCommandInterface::moveDrive`
+calls no `applyForce` at all; it computes the drive value inline.
+
+**Verified locally against `xb/kdesigel/sigel_slave`** — a second unstripped 1.3
+binary in this repository, alongside `xb/kdesigel/sigel`. `moveDrive` is at
+`0x080b787c`:
+
+| claim | measured |
+|---|---|
+| extended-precision ops | **5 `fstpt` + 4 `fldt`** at `0x80b790f`–`0x80b7a50`. *Reported to me as "seven pairs"; it is nine ops, unpaired.* |
+| the exponent | **`getSize() - 1`**, from `lea -0x1(%eax),%edx` at `0x80b78d8`. *Reported as `pow(2.0, size)`, which is one instruction short.* Our source has `getSize() - 1` at `SIG_DynaMechsCommandInterface.cpp:66,69,103,107` — **it matches the binary** |
+| `pow` itself | called with **doubles** (`fstpl`, 64-bit, at `0x80b78f6`/`0x80b7902`), not extended. Only the surrounding intermediates are 80-bit |
+
+**Our source really does use `long double`** — the only `long double` in the
+whole tree, at `SIG_DynaMechsCommandInterface.cpp:49,65-69,102-111`.
+
+**And on this machine it is *more* precise, not less:**
+
+| platform | `long double` | mantissa |
+|---|---|---|
+| 1.3 on i386 | x87 extended | **64 bits** |
+| this build, aarch64 | IEEE binary128 | **113 bits** |
+| a build on x86-64 Linux | x87 extended | **64 bits** |
+
+So the port does not lose precision here; it gains it, and therefore cannot be
+bit-identical. **But the third row is the practical point: an x86-64 build gets
+x87 `long double` back and closes this gap exactly.** That is worth knowing
+before anyone concludes the difference is inherent to the port rather than to
+the machine it was built on.
+
+**How to compare it.** Treat `moveDrive` as a function of its inputs — feed a
+known register value and width, capture the drive value on both sides — rather
+than expecting bit equality. Given the 6-significant-digit finding above,
+agreement to 6 figures is very likely and is the gate that matters. **Measure it
+before the trajectory comparison**, because a difference here propagates into
+every step downstream.
+
+**Item ordering changes:** this belongs with item 5 (mass properties) as
+non-integrating arithmetic to pin *before* items 1 and 2 — not after items 3 and
+4 as a sensor-adjacent afterthought.
+
 #### The fourth family: numeric text on serialisation — CHECKED, no divergence
 
 **Structurally invisible to every comparison run so far.** V1, V6, V7 and V8 all
