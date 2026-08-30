@@ -51,6 +51,12 @@
 # header node is a bare CLinkedListNode<T> that CLinkedList.h:37 downcasts to T.
 # SIGEL's own code gets the full set.
 
+# A recipe that fails AFTER creating its target leaves that target on disk,
+# newer than its prerequisites -- so the next make says "up to date" and the
+# check never runs again. sigel_eval's SIG_GPExperiment assertion is exactly
+# that shape. Found by the C5 review.
+.DELETE_ON_ERROR:
+
 SL   := x/supportingLibs/supportingLibs
 SHIM := shim
 B    := build

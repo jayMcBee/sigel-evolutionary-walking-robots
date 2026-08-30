@@ -59,6 +59,15 @@ Three jobs, in order, no overlap:
    validating robot models at load. Recorded in `regression_1.0_to_1.3.md`.
    Not part of either job above.
 
+**Still needs a decision:** whether `QTextStream` no longer printing `-0`
+matters. *This was struck during the 2026-08-30 streamlining on the grounds that
+§9 says `-0` "appears in no shipped stream" — but that scope is the shipped
+`.exp` and `.rrb`. **POV-Ray output is a third stream**, generated per frame,
+never shipped, unmeasured, and per the x86 box it is the path that produced
+every published film. C5 converted its writer. Restored, correctly scoped.*
+And with it the larger question the fourth family reopens: whether to route
+every real number through `snprintf` to match 1.3's tie rounding.
+
 **Order of work, revised 2026-08-27.** Reordered around the goal above: the
 interface is the work, so it goes first, and PVM follows because without it the
 ported interface has nothing to drive.
@@ -871,7 +880,7 @@ than inspection:
 |---|---|
 | `Q2Dict` hash order | the shim reproduces Qt 2's ELF hash, seed, shift, mask and ascending bucket walk exactly; link and joint order checked against an independent model of Qt 2's table for all 7 robots |
 | `SIG_Randomizer` | identical sequence — the LCG's extracted bits 16..30 are unaffected by `unsigned long` widening. **Confirmed against the 1.3 binary 2026-08-29, no longer audit-only** — see V9 |
-| `QTextStream` double formatting | byte-identical to Qt 2's `%.6lg` over 200,000 random bit patterns, except `-0`, which appears in no shipped robot stream |
+| `QTextStream` double formatting | byte-identical to Qt 2's `%.6lg` over 200,000 random bit patterns, except `-0`. **That sample cannot see exact decimal ties, where Qt 6 and Qt 2 round differently — see the fourth family, reopened at C5** |
 | `Q2PtrVector`, `Q2PtrList` | size/count/insert/remove/resize and the internal cursor checked against `qgvector.cpp` and `qglist.cpp` |
 
 **Still open, found by audit, not yet acted on:**
@@ -1597,7 +1606,10 @@ containers across the boundary and leaving C5 half-converted.
 step IDs stay bound to their modules — "C5" always means `SIGEL_Visualisation` —
 because renumbering would strand every earlier reference. *"Smallest first" was
 also measuring the wrong thing: C5 is the largest by LOC (3,564) and among the
-smallest by work — **23 Qt 2 code sites** against C3's 9.*
+smallest by work — **23 Qt 2 code sites** — 19 container-type occurrences in code plus 4
+`setAutoDelete` — against C3's **6** on the same unit. *An earlier version of
+this sentence gave C3 as 9, which is a different unit from the 23 beside it:
+exactly what C1's note about stating the unit was written to stop.*
 
 **C8 detail.** Both programs fail to compile on `qmotifplusstyle.h`. 15 sites:
 4 style includes, 6 `setStyle` constructions (`sigel.cpp:193,195`;
@@ -2020,14 +2032,50 @@ quoted forward as a fact about the tree — §9's shape.*
 | `SIG_RenderRecorder::robotLinks` | `setAutoDelete(true)`, and the class has **no destructor at all** | owning → a destructor added, declared and defined |
 | `SIG_EnvironmentRenderer::robotPathPoints` | `setAutoDelete(true)`, empty destructor | owning → `qDeleteAll`. §9 flags this member by name as "the central pointer-versus-value trap, sitting unconverted" |
 
+**All three classes that gained an owning destructor are now non-copyable.**
+Qt 2's `QGVector` copy constructor cleared `del_item` (`qcollection.h`), so a
+copy freed nothing; a `QList` copy shares the raw pointers and **both**
+destructors `qDeleteAll`. `SIG_Renderer`, `SIG_EnvironmentRenderer` and
+`SIG_RenderRecorder` get `= delete` on copy and assignment, as **D7**
+(`SIG_Geometry`), **D15** (`SIG_GPPopulation`) and **D25c** (`SIG_GPManager`)
+each did. *C5 first added the destructors and left the classes copyable —
+the fourth time this file has recorded that precedent and the third time it was
+not applied. Found by review; no copy site exists today, but C3 and C4 write new
+code against exactly these classes.*
+
+**THE ONE `insert` IN THE MODULE WAS MISSED, AND REVIEW CAUGHT IT.**
+`SIG_SimulationVisualisation.cpp:63` fills `SIG_Visualisation::floatingTexts`
+with `insert( i, … )`. Qt 2's `QVector::insert` **overwrites** slot `i`; Qt 6's
+`QList::insert` **shifts** — so the list came out **twice its size with a null
+tail**, and C3's `paintGL` indexes it against a widget list sized from
+`floatingTexts.size()` and dereferences without a null check. Live code: the
+x86 box measured `paintGL` at 1785 hits. Now a slot assignment. *The sweep was
+keyed on the container **type** and not on the operations performed on it —
+§9's "a sweep keyed on container type name" failure, verbatim, in the step whose
+own table cites D25c's insert/shift row.*
+
+**A range check was lost at a file-driven index, and D6, D8, D9 and D25c all say
+to record that.** `sceneObjects.insert( number, … )` became
+`delete sceneObjects[ number ]; sceneObjects[ number ] = …` at
+`SIG_RobotRenderer.cpp:46`, where `number = actLink.getNumber()` is **read from
+the model file** (`SIG_Link.cpp:65`). Qt 2's `QGVector::insert` was
+range-checked and returned false; `QList::operator[]` asserts in these builds
+and is an out-of-bounds write under `-DQT_NO_DEBUG`. Latent — the compiler
+numbers links contiguously from 0 — but it is a file-data index, not a derived
+one.
+
 The two `robotPathPoints` cursor walks became index walks; both were guarded by
 `count() >= 2`, which is what kept `first()` off an empty list — UB in Qt 6.
 
 **Seven `QDictIterator` walks became range-for** over D4's `getLinks()`,
 `getMaterials()` and D5's `getPoints()`. The dict **key** is the point's name,
 so `pointIter.currentKey()` is `NamedPoint::name` and `*pointIter.current()` is
-`*NamedPoint::value`. `robot.getLinkIter().count()` → `getLinks().size()`, 6
-sites.
+`*NamedPoint::value`. `robot.getLinkIter().count()` → `getLinks().size()`, **8**
+sites — 4 in `SIG_RobotRenderer.cpp` and 4 in `SIG_SimulationVisualisation.cpp`,
+plus a ninth `iter.count()` in `SIG_RobotVisualisation.cpp`. *Recorded as 6;
+all were converted, only the figure was wrong.* `QDictIterator::count()` is the
+dict size and is position-independent (`qdict.h`), so the exhausted-iterator
+call maps correctly.
 
 **`QArray<T>` → `QList<T>` by value**, 7 sites feeding GL through `.data()`.
 *Qt 2's `QArray(n)` left the elements **uninitialised**; `QList(n)`
@@ -2048,7 +2096,14 @@ one the x86 box confirms actually works and produced every published film.*
 **Four core getters gained `const`** — `SIG_Environment::getWithTexture`,
 `getDMEnvironment`, `getTexAlpha`, `getTextureFile` — because a `const
 SIG_Environment &` cannot call a non-const getter. Adding `const` to a getter
-cannot change behaviour; all three gates confirm it moved nothing.
+cannot change behaviour, and the three gates stayed green.
+*But "all three gates confirm it moved nothing", as this said, is a wrong
+referent: **no gate calls any of the four.** Their only callers are
+`SIG_EnvironmentRenderer.cpp` and `SIG_EnvironmentView.cpp`, neither of which is
+built. What the gates confirm is that the header change broke nothing that IS
+built. The `const` is safe by inspection — header and definition agree at all
+four, `SIG_Environment` has no derived class and no const/non-const overload
+pair — not by test. Found by review.*
 
 #### The build was choosing between the two `SIG_GPExperiment` variants by luck
 
@@ -2056,16 +2111,27 @@ cannot change behaviour; all three gates confirm it moved nothing.
 the class is defined twice on purpose — `SIG_GPExperiment.cpp` for `sigel`,
 `SIG_GPExperimentClean.cpp` for the slave, differing in whether the constructor
 builds an `MT_Controller` — and asserts that `sigel_eval` links Clean. **Nothing
-enforced that.** Both objects go into `libSIGEL_GP.a`, the linker takes the
-first member defining the symbol, and the Makefile's `$(wildcard)` does not sort:
+enforced that.** Both objects go into `libSIGEL_GP.a` and the linker takes the
+first member defining the symbol.
+
+**THE VARIABLE IS THE LOCALE.** `$(wildcard)` *does* sort — by `strcoll`, which
+is locale-dependent — and the two names order differently either side of the
+`Clean` suffix:
 
 ```
-clean build        ar t libSIGEL_GP.a -> SIG_GPExperimentClean.o, SIG_GPExperiment.o
-incremental build                     -> SIG_GPExperiment.o, SIG_GPExperimentClean.o  -> LINK FAILS
+LC_ALL=C          SIG_GPExperiment.cpp, SIG_GPExperimentClean.cpp   -> master first -> LINK FAILS
+LC_ALL=en_US.UTF-8  SIG_GPExperimentClean.cpp, SIG_GPExperiment.cpp -> Clean first  -> links
 ```
 
-Touching any header `SIG_GPExperiment.h` includes is enough to flip it. **And
-sorting would be worse**: alphabetically the master wins. `SIG_GPExperimentClean.o`
+*This section first blamed clean-versus-incremental builds and said
+"`$(wildcard)` does not sort" and "sorting would be worse — alphabetically the
+master wins". All three are wrong, and the archive recipe cannot produce that
+flip at all: it does `$(RM) $@` then `ar crs $@ $^` every time, from a fixed
+order. What actually differed between my two builds was `LC_ALL=C`, exported in
+one command and not the other — I attributed the result to the variable I
+changed deliberately rather than the one I changed by accident. Found by
+review.* A future reader chasing a recurrence should look at the environment,
+not at build freshness. `SIG_GPExperimentClean.o`
 is now named explicitly ahead of the archives, as 2003 compiled it into the
 slave target, with an assertion after the link. Today the linker fails first on
 the master's undefined `MT_Controller`; **the assertion becomes the only guard
@@ -2134,8 +2200,9 @@ windows, and nothing happens behind the Start button.
 
 ### Ownership hazards Phase C inherits (was: the Phase B audit)
 
-**16 `setAutoDelete`/`autoDelete` calls remain, all in GUI modules** — core is
-0. Two of them flip the flag at runtime; §9 "Toggling containers" names both.
+**11 `setAutoDelete` calls remain, all in GUI modules** — core is 0, and C5
+removed 4. *Counted as calls, not lines: a `command grep` for the word returns
+13, two of which are comments.* Two of them flip the flag at runtime; §9 "Toggling containers" names both.
 **21 pointer containers own with no flag at all**, measured on the pristine
 tree and **not re-measured for the GUI** — D7's blanket rule says nothing about
 that class, so each GUI container needs its ownership read rather than inferred
@@ -2444,7 +2511,7 @@ tracked anywhere:
 |---|---|---|
 | ~~`SIG_GPManager.cpp:415` and `:1507`~~ **CLOSED by D25b** | `fitTaskList` is now `QList< QList<int> * >` (`:373`, `:1460`) and the walk is index-based | The hazard was real: `fitTaskList.first()` then `while (actFitTask)` — **the loop terminated on the null**, and Qt 6's `first()` is UB on empty. It became a cursor index (`isEmpty() ? -1 : 0`, then `at()`), not `value(0)` or a range-for, because the walk also needs `remove`/`current`/`next` semantics. This row is why the step was written the way it was |
 | `SIG_ExperimentView.cpp:91`, `:105`, `:119` | `experimentHistory` is **already** `QList<T *>`; `.first()` unguarded | converted-code UB, latent only because `SIGEL_MasterGUI` is not in the build. Phase C |
-| `SIG_EnvironmentRenderer` `robotPathPoints` | **unconverted Qt 2** `QList<DL_vector>` under `#include <qlist.h>` (`:30`), walked with `.first()`/`.next()` into a `DL_vector *` | the central pointer-versus-value trap, sitting unconverted. Under Qt 6 the same declaration is a *value* list. Phase C |
+| ~~`SIG_EnvironmentRenderer` `robotPathPoints`~~ **CLOSED by C5** | was **unconverted Qt 2** `QList<DL_vector>` under `#include <qlist.h>`, walked with `.first()`/`.next()` into a `DL_vector *` | the central pointer-versus-value trap. Now `QList<DL_vector *>` with index walks and an explicit `qDeleteAll`; both walks were guarded by `count() >= 2`, which is what kept `first()` off an empty list |
 
 **`SIG_Robot::prepareDynaMechs` and the joint walks are safe here by accident.**
 The 1.3 sweep flags them, and they were `first()`/`next()` cursor walks; the
@@ -2647,7 +2714,7 @@ every step downstream.
 non-integrating arithmetic to pin *before* items 1 and 2 — not after items 3 and
 4 as a sensor-adjacent afterthought.
 
-#### The fourth family: numeric text on serialisation — CHECKED, no divergence
+#### The fourth family: numeric text on serialisation — REOPENED AT C5
 
 **Structurally invisible to every comparison run so far.** V1, V6, V7 and V8 all
 compared 1.3 against 1.3, so both sides came from the same writer. A difference
@@ -2674,9 +2741,32 @@ trailing zero after the point anywhere.
 | the seven boundary values, including the **exponent −4 case** that stays decimal under `%g` and would differ on 2,036 corpus values if a writer switched to scientific one exponent early | **7 of 7 identical** to 1.3 and to `%g` |
 | every distinct decimal literal in `data/Experiments/*.exp` and `data/Robots/*.rrb` — parse to `double`, write back through `QTextStream`, compare text | **4,330 literals, 0 differ** |
 
-Together with the existing 200,000-random-bit-pattern audit against Qt 2's
-`%.6lg` (§ replication table), which covers values the corpus does not contain,
-this family is closed for everything the port can write. *`-0` remains the one
+**THIS FAMILY IS NOT CLOSED, AND THE AUDIT'S METHOD IS WHY IT LOOKED CLOSED.**
+Qt 2 wrote through `sprintf("%.*lg")` (`qtextstream.cpp:1776-1805`, vendored
+source). glibc rounds an exact decimal tie **half to even**; Qt 6's
+`QTextStream` rounds **half away from zero**. Measured at C5:
+
+| sample | precision 6 | precision 5 |
+|---|---|---|
+| 200,000 random bit patterns | **0 differ** | 0 differ |
+| 50,000 values on a 1/10000 decimal grid | **0 differ** | 0 differ |
+| 50,000 multiples of **1/16** | **7,850 differ** | 4,285 differ |
+
+`100.3125` is `100.313` in Qt 6 and `100.312` in Qt 2. **A random 64-bit double
+essentially never lands on an exact tie at 5–6 significant digits**, so the
+200,000-pattern audit — and the 4,330-literal corpus test — are both structurally
+blind to the entire class, while exact binary fractions hit it constantly and
+are exactly what geometry is made of.
+
+**What is still established:** 0 differences over the shipped corpus, so nothing
+we *read back* moves. **What is not:** any file this port *writes* whose values
+are exact binary fractions. That covers the V2 save path, `.pol` pool images and
+the POV-Ray export. Not fixed here — `QTextStream` has no tie-breaking control,
+so matching 1.3 would mean routing every real number through `snprintf("%.*lg")`,
+which is a change to every writer and needs deciding, not assuming.
+*Found by the C5 review. The audit was correct and its sampling method could not
+see the failure — §9's "test with a representative value, not an extreme", in
+the other direction.* *`-0` remains the one
 known exception and appears in no shipped stream.*
 
 **A consequence that sharpens V4.** The file format carries only 6 significant
@@ -2691,6 +2781,32 @@ time, not about representation.
 
 *Scope: this characterises decimal literals in the shipped `.exp` and `.rrb`.
 Integers and any binary-format path are outside it.*
+
+**THERE ARE THREE PRECISIONS ON THREE PATHS, NOT ONE.** Confirmed from
+`xb/kdesigel/sigel_slave`: `QTextStream::precision(int)` has exactly three call
+sites, and the 22 other hits are qhull's unrelated `qh_precision`.
+
+| call site | precision | path |
+|---|---|---|
+| *(none — the default)* | **6** | `.exp`, `.rrb`, `.pol` |
+| `SIG_Renderer::vectorToPovray` | **5** | POV-Ray export |
+| `SIG_GPPVMData::savePVMDataTransfer` / `loadPVMDataTransfer` | **50** | the PVM wire |
+
+*This section said "nothing in the tree sets `setRealNumberPrecision` … on a
+file stream — only `SIG_GPPVMData` does". True as worded — `vectorToPovray`
+writes to a `QString` stream — but it reads as "1.3 writes doubles at precision
+6", and someone porting `vectorToPovray` against that would have written the
+wrong thing. C5 was porting exactly that function.* Precision 5 and 6 differ on
+most values: `0.842208` against `0.84221`.
+
+**And it sharpens V4 in a direction that was missed.** The
+"6-significant-digit granularity" argument is about **storage**. Fitness crosses
+the PVM wire at **precision 50**, so the master compares full-precision values
+and truncates only when writing: two builds can agree to six figures in the
+`.pol` and still make different selection decisions. V4's digests survive that —
+they cover names and programs, so a selection difference surfaces as a different
+population at the next snapshot — but "agree to six figures and the files are
+byte-identical" is not a statement about what the algorithm consumed.
 
 #### The third family: iterate and mutate the same container
 

@@ -60,6 +60,13 @@ namespace SIGEL_Visualisation
        * the free is written out -- PORTING.md Phase C, C5.
        */
       ~SIG_RenderRecorder();
+      // This class owns raw pointers in a QList and frees them in its
+      // destructor, so a copy would free them twice. Qt 2's QGVector copy
+      // cleared del_item and freed nothing -- the hazard is new with the
+      // conversion, not inherited. D7, D15 and D25c did the same.
+      SIG_RenderRecorder( const SIG_RenderRecorder & ) = delete;
+      SIG_RenderRecorder &operator=( const SIG_RenderRecorder & ) = delete;
+
 
       /**
        * Initalizes the start positions and rotations of
