@@ -40,10 +40,10 @@ SIGEL_GP::SIG_GPCrossOverTournament::SIG_GPCrossOverTournament(SIGEL_Tools::SIG_
     name2( actPool.getNextIdentifier() )
 {
   indis.resize( 4 );
-  indis.insert( 0, new SIG_GPTournamentIndividual( indPos1 ) );
-  indis.insert( 1, new SIG_GPTournamentIndividual( indPos2 ) );
-  indis.insert( 2, new SIG_GPTournamentIndividual( indPos3 ) );
-  indis.insert( 3, new SIG_GPTournamentIndividual( indPos4 ) );
+  indis[ 0 ] = new SIG_GPTournamentIndividual( indPos1 );
+  indis[ 1 ] = new SIG_GPTournamentIndividual( indPos2 );
+  indis[ 2 ] = new SIG_GPTournamentIndividual( indPos3 );
+  indis[ 3 ] = new SIG_GPTournamentIndividual( indPos4 );
 };
 
 SIGEL_GP::SIG_GPCrossOverTournament::~SIG_GPCrossOverTournament()

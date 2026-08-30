@@ -78,7 +78,7 @@ SIG_GPFitnessTrainer& trainer;
    * pvm-task given from the fitnesstrainer.
    */
  public:
-Q2PtrVector<SIG_GPTournamentIndividual> indis;
+QList<SIG_GPTournamentIndividual *> indis;
 
   /**
    * The flag signals if the tournament can be played or have to wait for earlier tournaments.

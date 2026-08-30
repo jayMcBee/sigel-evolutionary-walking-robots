@@ -37,7 +37,7 @@ namespace SIGEL_GP
       SIG_GUIGPManager( SIGEL_MasterGUI::SIG_Experiment &guiExperiment );
 
     private:
-      Q2PtrVector< SIGEL_MasterGUI::SIG_IndividualListItem > individualItems;
+      QList< SIGEL_MasterGUI::SIG_IndividualListItem * > individualItems;
 
       SIGEL_MasterGUI::SIG_Experiment &guiExperiment;
 

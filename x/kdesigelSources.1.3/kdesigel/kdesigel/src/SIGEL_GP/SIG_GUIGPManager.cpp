@@ -45,7 +45,10 @@ namespace SIGEL_GP
       {
 	SIGEL_MasterGUI::SIG_IndividualListItem *actItem =
 	  static_cast<SIGEL_MasterGUI::SIG_IndividualListItem*>( listIter.current() );
-	individualItems.insert( actItem->poolPosition, actItem );
+	// insert(): a slot assignment. This container has no setAutoDelete, so
+	// Qt 2 deleted nothing here -- the items belong to the list view.
+	if (actItem->poolPosition < individualItems.size())
+	  individualItems[ actItem->poolPosition ] = actItem;
 	++listIter;
       };
   };

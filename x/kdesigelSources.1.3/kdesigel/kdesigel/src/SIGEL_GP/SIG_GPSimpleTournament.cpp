@@ -36,8 +36,8 @@ SIGEL_GP::SIG_GPSimpleTournament::SIG_GPSimpleTournament(SIGEL_Tools::SIG_Random
     name(actPool.getNextIdentifier())
 {
   indis.resize( 2 );
-  indis.insert( 0, new SIG_GPTournamentIndividual( ppos1 ) );
-  indis.insert( 1, new SIG_GPTournamentIndividual( ppos2 ) );
+  indis[ 0 ] = new SIG_GPTournamentIndividual( ppos1 );
+  indis[ 1 ] = new SIG_GPTournamentIndividual( ppos2 );
 };
 
 SIGEL_GP::SIG_GPSimpleTournament::~SIG_GPSimpleTournament()

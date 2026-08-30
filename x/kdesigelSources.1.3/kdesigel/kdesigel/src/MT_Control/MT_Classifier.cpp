@@ -628,7 +628,7 @@ int MT_Classifier::evalNeededTours(QList<SIGEL_GP::SIG_GPTournament *> *  tours,
 		Tourna = tours->value(i);
 		for (int k=0; k <Tourna->indis.size();k++)
 		{
-			if(PosBest == Tourna->indis.at(k)->indNumber){
+			if(PosBest == Tourna->indis.value(k)->indNumber){
 				// at() was writable on Qt 2's const QArray; QList's is not.
 				(*ToursWBestIndi)[i] = 1;
 				break;

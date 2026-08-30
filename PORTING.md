@@ -30,7 +30,7 @@ build and run, because nothing else can be verified without it — see §3.
 | B — ownership explicit | **subsumed by Phase D**, which deletes the containers rather than converting them. **0 `setAutoDelete` calls left in core**, re-measured 2026-08-30 after D25c: D11 removed the last in `SIGEL_Robot`, D24 the last in `MT_Control`, D25b replaced the two `fitTaskList` calls with an RAII guard, and D25c wrote out `tours`' two real frees at their sites. Every remaining call in the tree is in `SIGEL_MasterGUI`, `SIGEL_Visualisation`, `SIGEL_CommonGUI` or `MT_GUI` — Phase C. *This row has been corrected five times, each time by review: it has read 13, 12, 11, 3 and 1. The recurring errors were counting comments as calls and quoting a `SIGEL_MasterGUI` figure as a core one.* **Not all of these were unreachable, and an earlier version of this row said they were** — `SIG_GPPopulation::pool` is owning, is constructed on every `sigel_eval` run, and takes 100 `insert()`s inside both gates; see "What the gates actually reach" in §10 |
 | R — build and run | core builds and runs. **No longer checked only against itself** — Phase V has confirmed both the ordering and the arithmetic against the 1.3 binary, §7 |
 | T — old-Qt tool container | **done 2026-08-27.** `tools/qtmig`, §4 |
-| D — delete the shim, migrate the data | **D1–D25 done** (D25a, D25b, D25c). `Q2Dict`, `Q2DictIterator`, `Q2Array` and `Q2CString` gone from all code; the simulation path, `SIG_GPFitnessTrainer`, `SIG_GPFullDataRecorder` and `crossOver` all converted. Shim 806 → **539** lines, included by **21** files — *files that actually `#include` it: **20** in the source tree plus `sigel_eval.cpp`. A `git grep -l q2compat.h` returns **22** because it counts `PORTING.md`, which merely names the header.* Remaining, measured 2026-08-30 after **D25c**: `Q2PtrList` **36**, `Q2PtrVector` **43**, `Q2Queue` **9**, `Q2ValueList` **9**, `Q2ListIterator` 8, `Q2CString` 15 — **lines containing the name, in the source tree only**: the shim's own header and self-check are included, `sigel_eval.cpp` and `verification-against-sigel-1.3/` are not. State the scope when you re-measure; the same six names give 43/**43**/9/9/8/15 if `sigel_eval.cpp` and the captures are counted, and 45/**45**/9/9/8/15 if you count occurrences instead of lines. *Left stale three commits running — D24, D25b, D25c — every time by updating one figure in this sentence and not the others beside it. Re-measure all three scopes or change none.* *This row used to end "the `Q2PtrVector` bulk is `SIG_GPManager::tours`, which cannot be linked until Phase C". D25c converted it; what remains of the type is `SIG_GUIGPManager::individualItems` and `SIG_GPTournament::indis`, both D26.* §10 |
+| D — delete the shim, migrate the data | **D1–D26 done.** **No shim type has a live use anywhere in the code** — every remaining `Q2*` occurrence outside `compat/` is a comment. `Q2Dict`, `Q2DictIterator`, `Q2Array` and `Q2CString` gone from all code; the simulation path, `SIG_GPFitnessTrainer`, `SIG_GPFullDataRecorder` and `crossOver` all converted. Shim 806 → **539** lines, included by **21** files — *files that actually `#include` it: **20** in the source tree plus `sigel_eval.cpp`. A `git grep -l q2compat.h` returns **22** because it counts `PORTING.md`, which merely names the header.* Remaining, measured 2026-08-30 after **D25c**: `Q2PtrList` **36**, `Q2PtrVector` **43**, `Q2Queue` **9**, `Q2ValueList` **9**, `Q2ListIterator` 8, `Q2CString` 15 — **lines containing the name, in the source tree only**: the shim's own header and self-check are included, `sigel_eval.cpp` and `verification-against-sigel-1.3/` are not. State the scope when you re-measure; the same six names give 43/**43**/9/9/8/15 if `sigel_eval.cpp` and the captures are counted, and 45/**45**/9/9/8/15 if you count occurrences instead of lines. *Left stale three commits running — D24, D25b, D25c — every time by updating one figure in this sentence and not the others beside it. Re-measure all three scopes or change none.* *This row used to end "the `Q2PtrVector` bulk is `SIG_GPManager::tours`, which cannot be linked until Phase C". D25c converted it; what remains of the type is `SIG_GUIGPManager::individualItems` and `SIG_GPTournament::indis`, both D26.* §10 |
 | P — PVM | **DONE 2026-08-28.** Vendored 3.4.3 replaced by upstream 3.4.6; nine patches carry the four config lines and Debian's eight source fixes; `libpvm3.a` and `pvmd3` build; SIGEL's two PVM objects link against them and `SIG_GPPVMData` round-trips through real PVM. `sigel`/`sigel_slave` still need Phase C. §7 |
 | C — GUI | **not started, AUTHORIZED 2026-08-27 per D24.** ~450 Qt 2 sites + 20 forms |
 | V — check against the 1.3 binary | **V1, V5's MDH probe, V6, V7 and V8 all done, all PASS.** Ordering: 10 of 10 container orders match. Arithmetic: `twoBases` exact bit for bit, `octopus` 9/9 with three joints exact and 5 ulp worst. **V6, V7 and V8 done 2026-08-29** — friction and no-collide negotiation, their four remaining rules, and the GP parameter blocks captured *before* their conversion. `verification-against-sigel-1.3/v6`, `v7`, `v8`. V2–V4 not started; V5's sensor and force probes are **invalid as specified** — both target Dynamo-only functions, deleted 2026-08-28. §7 |
@@ -4213,6 +4213,46 @@ still use the type — D26.
 
 **No gate reaches this either.** `MT_Classifier` and `SIG_GPManager` are both
 linked into nothing.
+
+### D26 — the last two containers, and the shim has no users left
+
+`SIG_GPTournament::indis` and `SIG_GUIGPManager::individualItems`, both
+`Q2PtrVector`, become `QList<T *>`.
+
+**Both are simpler than `tours` for one reason: neither is flag-owning.** The
+shim's `insert` deletes the previous occupant only `if (v.at(i) && del)`, and
+`del` is false for both — no `setAutoDelete` call exists on either. So **none of
+the eight `insert`s and three `resize`s has a hidden free to reproduce**, and
+each `insert` is a plain slot assignment. Every `insert` also follows its
+`resize` by three lines in the same function, so the slot is null anyway.
+
+| container | ownership | conversion |
+|---|---|---|
+| `indis` | explicit — `~SIG_GPTournament` calls `deleteContents()` (`:44`), which *is* the whole ownership | `qDeleteAll( indis ); indis.clear();` |
+| `individualItems` | **not owning** — the items belong to the list view | assignment only; nothing to free |
+
+The three tournament builders (`SIG_GPSimpleTournament.cpp:38-40`,
+`SIG_GPMutationTournament.cpp:38-40`, `SIG_GPCrossOverTournament.cpp:42-46`) all
+`resize` then fill, so `indis.insert( i, new … )` becomes `indis[ i ] = new … ;`.
+`MT_Classifier.cpp:631`'s `indis.at(k)` becomes `value(k)` for the §9 reason.
+`SIG_GUIGPManager.cpp:48` gains the range guard `Q2PtrVector::insert` had.
+
+**Warnings fall 311 → 309**, both the same `-Wsign-compare` between `int` and
+`uint` on a `size()` loop bound, one in `MT_Classifier.cpp` and one in
+`SIG_GPManager.cpp`, correct to disappear now that `size()` is signed. Verified
+by a locale-safe multiset diff over all six touched files: **2 removed, 0
+added.** *The first attempt at that diff used a locale-sensitive `sort` and
+`comm` warned it was unordered — the result looked right and was not
+trustworthy, so it was redone under `LC_ALL=C`.*
+
+**`Q2PtrVector` is gone from all code, and so is every other shim type.** Every
+remaining `Q2*` occurrence outside `compat/` is in a **comment** explaining what
+the Qt 2 original did — 44 such lines for `Q2PtrVector` alone, none of them a
+type use. The 21 files that still `#include "compat/q2compat.h"` no longer need
+it; only `q2compat_check.cpp` uses the shim, and it exists to test it.
+
+**The shim is now deletable.** That is the next step, together with the 20 dead
+includes.
 
 ### A logging system
 

@@ -41,7 +41,10 @@ languageP(languageP)
 SIGEL_GP::SIG_GPTournament::~SIG_GPTournament()
 {
   // This class owns the tournament individuals its subclasses build.
-  indis.deleteContents();
+  // deleteContents() was the free: no setAutoDelete on this container, so
+  // ~Q2PtrVector freed nothing and this call was the whole ownership.
+  qDeleteAll( indis );
+  indis.clear();
 };
 
 bool SIGEL_GP::SIG_GPTournament::run()
