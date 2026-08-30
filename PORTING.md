@@ -92,14 +92,8 @@ of 2026-08-28, but `SIG_GPFitnessTrainer` dispatches through `pvm_spawn` of
 `sigel_slave`, and Phase C has to build `sigel_slave` first. The blocker moved;
 it did not lift.
 
-**Still needs a decision:** whether
-`QTextStream` no longer printing `-0` matters (§9); the order of remaining
-Phase B work.
-
-Every step is reviewed by an independent agent, and every round so far has
-found a real defect — among them a missing `#include <cstddef>` hidden by
-`-fpermissive`, that `-lGL` is not optional, a twelfth `QTime()` site, and a
-race in `replicate.sh` that scored crashed evaluations as zero. All fixed.
+**Every step is reviewed by an independent agent, and every round so far has
+found a real defect.** §0 has the rule; it is not optional.
 
 ## 0. Working on this
 
@@ -196,7 +190,7 @@ times.
 | `QVector<T>` | 48 | **array of pointers** in Qt 2 — not Qt 6's `QVector` |
 | `QList<T>` | 37 | **list of pointers** in Qt 2, with `autoDelete()` |
 | `QCString` / `QValueList` / `QQueue` / `QListIterator` | 16 | |
-| `setAutoDelete` / `autoDelete` | 47 | 38 `TRUE`, 9 `FALSE`; 28 remain after B1–B5 |
+| `setAutoDelete` / `autoDelete` | 47 | 38 `TRUE`, 9 `FALSE`. *Pristine-tree figures.* Today: **0 in core, 16 in the GUI modules** |
 | `QString::null` | 42 | |
 | `sprintf` | 23 | |
 | `lower` 5, `findRev` 4, `latin1` 3, `simplifyWhiteSpace` 3, `upper` 2 | 17 | |
@@ -280,22 +274,16 @@ distributed evolution, which is why they are last.
 
 ## 4. Old Qt as a tool, not as a build target — REVISED 2026-08-27
 
-**This section previously said "No 'start on old Qt' step" and was wrong.** Its
-reasoning was that Qt 2.3 and Qt 3.3.8 do not build on gcc 15, and it concluded
-that the staged migration was therefore unavailable. That does not follow. Qt 3
-and Qt 4 do not have to build on gcc 15 — they have to **run**, once, as
-converters. An old toolchain in a container is where they run.
-
-The project already has a precedent: the 2003 i386 binary runs against Debian
+Qt 3 and Qt 4 do not have to **build** on gcc 15 — they have to **run**, once,
+as converters, and an old toolchain in a container is where they run. The
+project already has the precedent: the 2003 i386 binary runs against Debian
 woody libraries on the x86 box (§9).
 
-**CORRECTED 2026-08-27 by review.** An earlier draft of this section had a
-three-leg path starting `Qt 2.3 --qt20fix--> Qt 3`. **`qt20fix` is not a
-Qt 2 → Qt 3 tool.** It is Qt 2's own Qt **1.x** → Qt **2.x** script, and the
-proof is vendored in this repo:
+**`qt20fix` is not a Qt 2 → Qt 3 tool**, and nobody should go looking for one.
+It is Qt 2's own Qt **1.x** → Qt **2.x** script; the proof is vendored here —
 `x/supportingLibs/supportingLibs/qt/src/doc/porting.doc` is headed *"Help with
 porting from Qt 1.x to Qt 2.x"* and line 156 points at `qt/bin/qt20fix`. The
-"20" is "2.0". **Qt never shipped a Qt 2 → Qt 3 converter at all** — Qt 3's
+"20" is "2.0". **Qt never shipped a Qt 2 → Qt 3 converter at all**; Qt 3's
 porting guidance is a manual change list plus the `QT_COMPAT` headers.
 
 **The staged path (D19):**
@@ -421,11 +409,11 @@ exactly the files the Makefile excludes. **The 6 new passes are C1's
 (`physics_backends.md`); the pass count and "headers standalone" each fall by
 exactly 13, one per deleted file pair, and the failing files are unchanged.
 
-Two gates run alongside it, both committed and both required to stay empty: `./dictorder-dump.sh | diff -u dictorder-baseline.txt -` and
-`./fitness-check.sh | diff -u fitness-baseline.txt -`, the second of which runs
-`sigel_eval -selfcheck` first. It compiles every
-converted module and compiles every converted header standalone. **It runs no
-code** — D27 deleted the shim self-check, which was the only step that did.
+**There are four gates, not three, and the full list with its caveats is in
+"Handover" below — use that one.** `check.sh` compiles every converted module
+and every converted header standalone, and since C1 also runs `uic`, `moc` and
+`rcc` over the converted forms; **it executes no SIGEL code**, D27 having
+deleted the shim self-check that was the only step which did.
 Vendored headers are `-isystem`, so their warnings do not bury the **309** in
 our own code.
 
@@ -632,32 +620,19 @@ name rather than turning leak detection off, and prints what it suppressed.
 
 #### FIXED — `sendQStringToPVM` overflowed on multi-byte strings
 
-Found by P4 once it ran SIGEL's own code. `SIG_GPPVMData.cpp` sent
-`finalLength = str.length() + 1` — a **character** count — then sent
-`str.toUtf8()`, up to four times longer in bytes. `getQStringFromPVM` sized its
-receive buffer from that count and let `pvm_upkstr` write the bytes into it.
-Measured under ASan: 20 `ü` gave `heap-buffer-overflow ... in byteupk`; short
-strings survived only because `QList` over-allocates.
-
-**Upstream's, not a port regression.** `v1.3-pristine` has the identical defect
-with `str.utf8()` and `QArray<char>`. Qt 2's `QString::length()` was the Latin-1
-byte count, so the 2003 code was right for its own data.
-
-**Fixed 2026-08-28** — `qCStringBuffer.size() + 1`, taken from the same
-`Q2CString` the call already builds, so no extra conversion and no temporary.
-`pvm_link.cpp` round-trips 200 `ü` plus 50 `€` (250 characters, 550 bytes) as
-the regression test; reverting the line reproduces the overflow and fails the
-check. This changes the wire format for non-ASCII, which is safe only because
-both ends are this same file and no distributed run exists yet.
+Found by P4 once it ran SIGEL's own code: the wire length was a **character**
+count and the payload was UTF-8 bytes. Full entry, with the measurement and the
+wire-format caveat, is in §9's "Defects fixed rather than preserved" table —
+`SIG_GPPVMData.cpp:51`. **Upstream's defect, not a port regression**:
+`v1.3-pristine` has it identically with `str.utf8()` and `QArray<char>`, because
+Qt 2's `QString::length()` was the Latin-1 byte count. `pvm_link.cpp`
+round-trips 200 `ü` plus 50 `€` as the regression test.
 
 ---
 
-#### Phase P research — 2026-08-28, superseded by the record above
+#### Phase P research — 2026-08-28, superseded by P1–P4 above
 
-Kept because the decision it argued for is the one that was taken, and because
-two of its claims turned out to be wrong.
-
-**Decision: upstream PVM 3.4.6, four config lines, no source edits.**
+Kept for one thing only: **the flag choice, which must not be simplified.**
 
 ```
 conf/LINUX64.def   ARCHCFLAGS += -I/usr/include/tirpc -std=gnu17 \
@@ -667,23 +642,14 @@ conf/LINUX64.def   ARCHCFLAGS += -I/usr/include/tirpc -std=gnu17 \
 lib/pvmgetarch     Linux,aarch64 )  ARCH=LINUX64 ;;
 ```
 
-**The flag choice matters, and this reasoning holds.** `getcwd` is used without
-its header, so its return truncates to `int` on a 64-bit machine.
-`-fpermissive` would also demote `int-conversion`,
-`incompatible-pointer-types` and `return-mismatch` — the gcc-14 error classes
+`getcwd` is used without its header, so its return truncates to `int` on a
+64-bit machine. **`-fpermissive` would demote `int-conversion`,
+`incompatible-pointer-types` and `return-mismatch`** — the gcc-14 error classes
 that catch exactly that. The two targeted `-Wno-` flags silence only the K&R-era
-classes and leave truncation a hard error.
+classes and leave truncation a hard error. They are not interchangeable.
 
-**Wrong: "one upstream patch line."** Eight Debian source patches touch what we
-compile; all eight are applied. See P2.
-
-**Wrong: "verified by building and running it."** That build did not carry patch
-24, so it still had the `getcwd` truncation the research itself identified.
-
-**Also stated there:** vendored 3.4.3 would work with two patches Fedora shipped
-before retiring the package in 2015. 3.4.6 contains one of the two — see P2.
-No distribution maintains PVM: Fedora retired 2015, Debian removed 2024. An AUR
-`PKGBUILD` for 3.4.6 is current at `pkgrel=10`; not an upstream, but not nothing.
+*The rest of that research — its two wrong claims, and the vendored-3.4.3
+alternative — is superseded by P1 and P2, which measured it.*
 
 ---
 
@@ -771,54 +737,27 @@ double-frees.
 
 Back-edges cost nothing: 2 were dead includes, 3 forward-declare.
 
-**5 files still fail**, all needing a `QApplication`: `MT_Controller.cpp`,
-`SIG_GPPopulation.cpp`, `SIG_GUIGPManager.cpp`, and both ZORC fitness files.
-Blocked on Phase C.
+**4 files still fail**, and they are exactly the ones the Makefile excludes —
+`MT_Controller.cpp`, `SIG_GUIGPManager.cpp` and both ZORC fitness files. Blocked
+on Phase C; the site counts are in §7 C8. *This said 5 and listed
+`SIG_GPPopulation.cpp`, which Phase R fixed.*
 
-### Phase B — make ownership explicit
+### Phase B — make ownership explicit — SUBSUMED BY PHASE D
 
-Phase B does **not** delete `q2compat.h`. Three of its behaviours are
-load-bearing until the data migration in §10: the `Q2Dict` hash order that
-numbers the links, the `Q2PtrVector` `size()`/`count()` split with null slots,
-and `insert()`/shrinking `resize()` being the only free path at 8 sites.
+Goal was: every owning container frees its items explicitly at the owner, and
+`setAutoDelete` disappears container by container. **14 of 14 core containers
+done**, the last five in D15, D18, D19 and D25c; the per-container record is in
+those D-steps. **`setAutoDelete` in core is 0** — 2 apparent hits are inside
+comments, which is the miscount this file has made five times.
 
-Goal: every owning container frees its items explicitly at the owner, via
-`deleteContents()`, and `setAutoDelete` disappears container by container.
+**16 calls remain, every one in a GUI module, and Phase C owns them** — §7's
+C1 table. Two of them flip the flag at runtime, which a single destructor free
+does not reproduce; §9 "Toggling containers" names both.
 
-**14 of 14 done. ~~Five containers are an open decision~~ — all five were
-converted: `pool` in D15, `toSpawnList` in D18, `pvmTasks` and `pvmHosts` in
-D19, `tours` in D25c. The table below is kept as the record of why each was
-held back, and its `SIG_GPManager.cpp:63` was always off by one — the
-`setAutoDelete` was at `:64`.**
-
-| container | file | why left |
-|---|---|---|
-| `pool` | `SIG_GPPopulation.cpp:37,50,96,116` | 9 sites; `insert()` frees the losing individual |
-| `pvmTasks` | `SIG_GPFitnessTrainer.cpp:48` | 7 sites; `insert(id, 0)` frees a slot |
-| `pvmHosts` | `SIG_GPFitnessTrainer.cpp:49` | 5 sites |
-| `toSpawnList` | `SIG_GPFitnessTrainer.cpp:47` | `remove()` at `:489` is the free |
-| `tours` | `SIG_GPManager.cpp:63` | 7 sites, compacted by `MT_Classifier` across a module boundary |
-
-28 hand-written frees in the core GP loop, each compiling whether right or
-wrong, with no run to check against. Every review round has found a real defect
-in the *easy* conversions.
-
-**~~`fitTaskList` keeps `setAutoDelete` permanently.~~ Superseded by D25b.**
-The reasoning below was right; the conclusion could not survive the shim's
-removal. On a **local** container, letting the container delete its own items is
-the right answer — it frees at scope exit, including the early returns and
-anything thrown out of `checkTask`, and writing those frees by hand loses the
-unwinding path. **D25b keeps that property without the flag**, using an RAII
-guard (`FitTaskListGuard`, `SIG_GPManager.cpp:358`) rather than hand-written
-frees, so the unwind path is still covered — confirmed by the 1.3 binary, which
-has a fourth `~QList` call site on the unwind path before `__throw`. `SIG_Body.cpp`'s local `vertices`
-was converted in B2 before this was understood, and uses `setAutoDelete` again.
-
-**Exit criterion per step:** the self-check builds and runs clean under ASan and
-UBSan, with an assertion covering the free path each converted container
-actually uses — owner frees exactly once and is idempotent, non-owner frees
-nothing. Verified to have teeth: every assertion added has been checked by
-breaking the shim and confirming the check aborts.
+*This section used to carry the five-container deferral table, its exit
+criterion, and a note that `SIG_Body.cpp`'s local `vertices` "uses
+`setAutoDelete` again". That last is false — D7 made it a `QList<DL_vector>` by
+value and the only match in the file today is a comment.*
 
 ### Phase R — build and run (§3, order item 1) — DONE
 
@@ -839,17 +778,12 @@ One evaluation is 0.2 s. **All 14 published experiments run clean under
 AddressSanitizer and UndefinedBehaviorSanitizer**, with identical results
 sanitized and not. `replicate.sh` sets `SIGEL_ROOT` itself.
 
-**The defect that stood between building and running.** Qt 2's `QTime()`
-was 00:00:00.000 and valid. Qt 6's is null: `addSecs` returns another null
-`QTime`, `secsTo` returns 0, and a null `QTime` holds -1 ms, which is less than
-every real time. So `SIG_DynaMechsSimulationQueries::getActualSimulationTime`
-returned null, `SIG_Simulation::start`'s `while (act < max)` never ended, and
-`fitness = distance / simulatedSeconds` was a division by zero. **12 sites**,
-all now `QTime( 0, 0 )` — 9 fitness functions, the queries object and one
-`SIGEL_SlaveGUI` signal, plus a twelfth found later by review —
-`SIG_EarlyRunTermSimulation.cpp:97` declared `QTime zeroHour;`, which the first
-sweep's pattern missed because it is a declaration rather than a call. This is
-the shape §9 warns about: same API, same compile, different behaviour.
+**The defect that stood between building and running** was Qt 2's `QTime()`
+being 00:00:00.000 and valid where Qt 6's is null. `SIG_Simulation::start`'s
+`while (act < max)` never ended and `fitness = distance / simulatedSeconds`
+divided by zero. **12 sites, all now `QTime( 0, 0 )`** — the hazard class and
+the twelfth site are in §9's name-collision table, which is the register Phase C
+reads.
 
 `SIG_GPPopulation.cpp` also moved off the Qt 2 `QProgressDialog`:
 `setProgress` → `setValue`, `wasCancelled` → `wasCanceled`, `setCaption` →
@@ -1149,14 +1083,8 @@ constructed, so §9's `QTime()` collision does not touch it. That much is solid,
 and it is **original 2001 code**, identical in `x/sigelSourceDistribution.1.0` —
 not something the port introduced.
 
-**What this section first concluded from that was false, and it cited the wrong
-key.** It said "all 12 shipped experiments carry `RANDOMSEED 0`, so as
-distributed they are clock-seeded", and used it to close out the determinism
-question. Both halves are wrong.
-
 **There are two `RANDOMSEED` keys per `.exp`, and only one of them seeds
-anything.** This is stated in §10 and the write-up ignored it. Measured over all
-14 files in `data/Experiments/`:
+anything.** Measured over all 14 files in `data/Experiments/`:
 
 | key | line | value | reaches a randomizer? |
 |---|---|---|---|
@@ -1164,12 +1092,11 @@ anything.** This is stated in §10 and the write-up ignored it. Measured over al
 | `SIG_GPParameter` | 66 | **1 in 8, 0 in 6** | **yes** — `SIG_GPManager.cpp:52`, `randomizer( actExperiment.gpParameter.getRandomSeed() )` |
 
 So the key that is 0 everywhere is the one that seeds nothing, and the key that
-actually feeds `SIG_Randomizer` is **1** in 8 of the 14. "As distributed they are
-clock-seeded" is false for a majority of the corpus. *The count was wrong too —
-14 shipped `.exp`, as the rest of this file says; 12 is the tarball.*
+actually feeds `SIG_Randomizer` is **1** in 8 of the 14 — so "as distributed
+they are clock-seeded" is false for a majority of the corpus.
 
-**There is a genuine unconditional clock seed, and it is not the one that was
-cited.** `SIG_GPPopulation.cpp:33` — the default constructor — builds
+**There is a genuine unconditional clock seed.** `SIG_GPPopulation.cpp:33` —
+the default constructor — builds
 `new SIGEL_Tools::SIG_Randomizer()`, which runs `setNewSeed(0)` and therefore
 the clock, **regardless of any `.exp` key**. That is a stronger explanation for
 run-to-run disagreement than the false one it replaces, and it does not depend
@@ -1476,11 +1403,9 @@ Build-time only. Nothing ships from it and nothing links against it.
 has an arm64 port**, so this runs natively — no qemu, no x86 emulation, which
 is not registered on this host anyway. `libqt4-dev-bin` carries `uic3` and
 `qt3to4`; `libqt4-dev` carries `/usr/share/qt4/q3porting.xml`, the class-rename
-rules. *This paragraph said `uic3` needs `QTDIR` pointing at that file or it
-"warns once and then leaves every widget class unmapped". **It does not** — the
-path is compiled into both tools and the converted output is byte-identical with
-`QTDIR` unset. `tools/Dockerfile.qtmig` records the correction; this section had
-not.* `/usr/bin/uic3` is a qtchooser stub — the image puts
+rules. **`QTDIR` is not needed** — the path is compiled into both tools and the
+converted output is byte-identical with `QTDIR` unset.
+`/usr/bin/uic3` is a qtchooser stub — the image puts
 `/usr/lib/aarch64-linux-gnu/qt4/bin` first on `PATH` to skip it, and it resolves
 the multiarch triplet at build time rather than hardcoding aarch64.
 
@@ -1492,10 +1417,8 @@ stdout and warnings to stderr; the first measurement kept only exit codes. There
 are **28 warnings across 7 forms**. Redirecting stderr into the same file puts a
 warning on line 1 and the output stops being XML.
 
-**This corrects a false claim in the previous C7 paragraph**, which said the
-files were "one generation below what `uic3 -convert` accepts" and concluded a
-Qt 2 → Qt 3 leg was needed first. Measured 2026-08-27: it is not, for forms.
-Whether `qt3to4` needs one for *sources* is untested and is the next question.
+**No Qt 2 → Qt 3 leg is needed for forms** — measured 2026-08-27. Whether
+`qt3to4` needs one for *sources* is untested.
 
 **The residue is larger than the 6-entry table first claimed here.** `uic3` maps
 Qt 2 widgets onto Qt3Support classes, which Qt 5 deleted, so Qt 6's `uic`
@@ -1509,6 +1432,7 @@ review, the full residue is:
 | 27 custom **slot declarations**, silently dropped | in 6 forms. The 49 `<connection>` elements all survive; what goes is the `<slot>` declarations. Qt 6's `uic` then resolves the slot against the widget's Qt base class and emits `qOverload<>(&QDialog::slotFoo)` — **25 hard compile errors** |
 | 18 `qPixmapFromMimeSource` | Qt3Support, removed, not merely obsolete |
 | 9 embedded images in 2 forms | **the dangerous one.** Qt 6's `uic` omits `<images>` and emits `setIcon(QPixmap("image0"))`, which compiles clean and renders a blank button at runtime |
+| **`Line` `orientation`, silently dropped** | `uic3` emits `<widget class="Line" name="X"/>` with no properties, and `orientation` is the only thing Qt 6's `uic` reads to pick a frame shape — so the separator becomes a bare `QFrame`, i.e. `NoFrame`, and paints nothing. **6 `Line` widgets across 3 forms, all 6 affected**: `MT_StatisticsWidgetBase` ×4, `SIG_LanguageParametersBase` ×1, `SIG_GPParameterBase` ×1 (fixed at C1). `check.sh` now counts them |
 | 4 real size constraints, silently dropped | `QLayoutWidget` → `<layout>` discards them: `MT_IndividualWidgetBase` `Layout32`/`Layout33`/`Layout28` lose `maximumSize 130×32767`, `MT_PopulationWidgetBase` `Layout60` loses `minimumSize 200×0` |
 | 11 widgets renamed by Qt 6's `uic` | duplicate names — `tab`→`tab1`… in 5 forms. Breaks any hand-written subclass referring to them |
 
@@ -1522,7 +1446,7 @@ The 6 widget classes, across all 20 forms:
 |---|---|---|
 | `Q3GroupBox` | 48 | `QGroupBox` |
 | `Q3ListBox` | 7 | `QListWidget` |
-| `Q3ButtonGroup` | 7 | `QGroupBox` + a `QButtonGroup` for the exclusivity |
+| `Q3ButtonGroup` | 7 | `QGroupBox`, **plus a `QButtonGroup` only if the children need exclusivity** — C1's two needed none. Read the children per form |
 | `Q3MultiLineEdit` | 6 | `QTextEdit`. All 6 live here, none in module code |
 | `Q3ListView` | 5 | `QTreeWidget` — same as D9 |
 | `Q3ProgressBar` | 1 | `QProgressBar` |
@@ -1599,18 +1523,14 @@ total moved up rather than down.* It cannot see the silent collisions —
 `QList`, `QVector`, `QListIterator`, `QQueue` all still exist in Qt 6 meaning
 something else — but those are exactly what the containers row already covers.
 
-**THE `QListView` ROW WAS 128 AND MY CORRECTION TO 106 WAS THE ERROR, NOT THE
-ROW.** This section said 128 "is not a measurement of this tree at all" and
-that a whole-directory grep returning 117 proved no scope could reach it. Both
-statements were wrong, and wrongly reasoned: 117 was **my own word-bounded
-pattern**, not a maximum. Measured as a **substring**, `QListView` over exactly
-the stated scope returns **128** on the pre-C1 tree — `QListView` 18 +
-`QListViewItem` 93 + `QListViewItemIterator` 17. The original count was right
-and included a class this plan has never named; `\b…\b` silently dropped 15
-live iterator sites. *This is §9's characteristic failure committed **in the
-paragraph that invokes it**: I refuted a figure by measuring a different pattern
-and called the figure unreachable. Found by the C1 review.* (Today the substring
-count is 129: C1's own base class carries the word in a comment.)
+**The original 128 was right; a "correction" of it to 106 was the error.**
+Measured as a **substring** over exactly the stated scope, `QListView` returns
+**128** on the pre-C1 tree — `QListView` 18 + `QListViewItem` 93 +
+`QListViewItemIterator` 17. A `\b…\b` pattern silently drops the 15 live
+iterator sites, and refuting the row with that pattern is §9's characteristic
+failure. **Match the pattern to the question before concluding a count is
+unreachable.** (Today the substring count is 129: C1's own base class carries
+the word in a comment.)
 
 **`75` still does not reproduce**, and that half stands — verified again by the
 review independently. The GUI tree is **byte-identical** to commit `ba25643`,
@@ -1909,31 +1829,19 @@ have reached it is one extra `-I` on `SIGINC`.
 
 ## 8. Steps and status
 
-| Phase | Steps | Status |
-|---|---|---|
-| A | 10 | done |
-| B | 5 | 8 of 14 containers |
-| T | 2 | **done 2026-08-27** (§4) |
-| C | 10 | **C1 done 2026-08-30** — §7 |
-| V | 5 | **V1 done 2026-08-27**, V5 in progress — §7 |
-| P | 4 | **done 2026-08-28** — §7 |
+**Phase status is the table at the top of this file.** A second one lived here
+and drifted: it had Phase B at "8 of 14", Phase C at 10 steps and Phase V at 5
+where §7 defines C1–C9 and V1–V9, and it omitted Phases D and R entirely.
 
 **No effort estimates in this file.** The column that held them carried six
 invented figures. Step counts are counted and stay. **Do not put estimates
-back.** The same
-row also claimed Phase T was "not started" while the status table at the top of
-this file had it done; corrected here.
+back.**
 
-Phase T is new as of 2026-08-27 (§4). Phase C was rebuilt around modules and
-forms. The PVM row was previously described as a separate job "which nothing
-here depends on" — that is false and is corrected.
-
-**Precisely, because an earlier draft overstated this.** A single fitness
-evaluation *does* run locally with no PVM — that is what `sigel_eval` and all
-of Phase R do. What has no local path is the **evolution loop**:
+**A single fitness evaluation runs locally with no PVM** — that is `sigel_eval`
+and all of Phase R. What has no local path is the **evolution loop**:
 `SIG_GPFitnessTrainer` dispatches every evaluation through `pvm_spawn` of
-`sigel_slave` with no in-process fallback, and the one method that looks like
-one, `SIG_GPExperiment::calculateFitness` (`SIG_GPExperiment.cpp:158`), is a
+`sigel_slave` with no in-process fallback, and the one method that looks like a
+fallback, `SIG_GPExperiment::calculateFitness` (`SIG_GPExperiment.cpp:158`), is a
 stub that returns 0. So without PVM the ported interface builds and shows its
 windows, and nothing happens behind the Start button.
 
@@ -1941,44 +1849,25 @@ windows, and nothing happens behind the Start button.
 
 ## 9. Open
 
-### Phase B ownership audit (D11)
+### Ownership hazards Phase C inherits (was: the Phase B audit)
 
-| | |
-|---|---|
-| `setAutoDelete` calls | 47 — 38 `TRUE`, 9 `FALSE` |
-| after B1–B5 | 28 — 21 `TRUE`, 7 `FALSE`; 12 in core |
-| in deferred GUI modules | 16, which Phase B cannot touch |
-| distinct owning containers in scope | 22 |
-| pointer containers owning with **no flag at all** | 21 — D7 says nothing about these |
-
-**Three things that cause a double free or a leak:**
-
-1. **The free is hidden inside a container operation.** Eight `Q2PtrVector`
-   sites where `insert()` or a shrinking `resize()` *is* the only delete and the
-   word `delete` appears nowhere. **The five in `SIG_GPPopulation` are done —
-   D15, and D15 missed one of them; see there.** `SIG_GPFitnessTrainer.cpp:194`,
-   `:355`, `:378` remain. Line numbers here were pre-D15 and are not maintained;
-   find these by name, not by line.
-   Two `Q2PtrList` sites belong here too: `SIG_GPManager.cpp:437`, `:1519`
-   (`fitTaskList`). *`toSpawnList` was a third and is done — D18. The three
-   `SIG_GPFitnessTrainer` sites are done — D19.*
-2. **Owning containers with no free path**, relying on `~Q2PtrList` /
-   `~Q2PtrVector`. *All of `~SIG_GPFitnessTrainer`'s are now explicit —
-   `toSpawnList` in D18, `pvmTasks` and `pvmHosts` in D19, the last of which
-   D19 forgot and a review caught. ~~What remains in this class is `SIG_GPManager`,
-   which cannot be compiled.~~ **Nothing remains: D25c made `tours`' two real
-   frees explicit.** And "cannot be compiled" was already false —
-   `SIG_GPManager.cpp` passes `check.sh` and the Makefile archives its object;
-   what it cannot do is **link**.*
-3. **`SIG_Robot::clear()`** hand-deletes six dictionaries' contents and calls
-   `clear()` on them twelve lines later. Safe only because those dicts carry no
-   flag. The self-check now asserts that `clear()` on a non-owning container
-   frees nothing.
+**16 `setAutoDelete`/`autoDelete` calls remain, all in GUI modules** — core is
+0. Two of them flip the flag at runtime; §9 "Toggling containers" names both.
+**21 pointer containers own with no flag at all**, measured on the pristine
+tree and **not re-measured for the GUI** — D7's blanket rule says nothing about
+that class, so each GUI container needs its ownership read rather than inferred
+from a flag.
 
 **A `getFoo()` returning a container by reference puts free sites in other
 modules**, including modules that do not compile yet. Grep the accessor, not
 just the member name. `SIG_GPParameter::getHostList()` is how B3 leaked into
-`SIGEL_MasterGUI`.
+`SIGEL_MasterGUI`, and C7 meets it again.
+
+*This section carried the pre-Phase-D audit — a 47/38/9 `setAutoDelete` split,
+a count of hidden-free sites and a list of owning containers with no free path.
+Every entry is closed: the hidden frees in D15, D18, D19, D25b and D25c, the
+no-free-path class by D25c, and `SIG_Robot::clear()` by D4. The per-container
+record is in those D-steps and the pristine-tree counts are in §2.*
 
 ### The register-to-index modulus, and the overflow under it
 
@@ -2631,17 +2520,16 @@ binary until the x86 box gives us fitness numbers (§7). The link-order half
 `dictorder-baseline.txt` is **2,189 lines over 21 blocks** — 14 experiments and 7 `.rrb`.
 Every later Phase D step has to leave that diff empty.
 
-**The first version of D1 was blind, and review caught it.** It dumped links and
-joints only. `SIG_Robot` holds **six** `Q2Dict`s (`SIG_Robot.h:60-65`) — bodies,
-materials, links, joints, drives, sensors — all six written in iteration order
-by `writeToFileTransfer` and read back in that order by the simulation-data
-class — cited here as `SIG_DynaMoSimulationData` until 2026-08-28, which was
-the **Dynamo** one and is deleted; the live site is
-`SIG_DynaMechsSimulationData`.
-`SIG_Link::points` is a seventh, one per link. Rebuilding the core with
-`h % vlen` perturbed to `(h + 1u) % vlen` changed the ordering in 8 of 14
-experiments and the old gate fired on **2**. It now fires on all 8, plus 6 of
-the 7 `.rrb`. `twoBases` does not move, and should not: 2 links, 1 joint.
+**What the gate covers.** `SIG_Robot`'s **six** `Q2Dict`s (`SIG_Robot.h:60-65`)
+— bodies, materials, links, joints, drives, sensors — all written in iteration
+order by `writeToFileTransfer` and read back in that order by
+`SIG_DynaMechsSimulationData`, plus `SIG_Link::points`, one per link.
+**The order-carrying containers number ten, not seven or eight** — V1 measured
+that against the 1.3 binary and found two this plan never enumerated.
+
+**Verified to have teeth:** rebuilding the core with `h % vlen` perturbed to
+`(h + 1u) % vlen` fires the gate on **8 of 14** experiments and **6 of 7**
+`.rrb`. `twoBases` does not move, and should not: 2 links, 1 joint.
 
 **Three load paths, three different orders, all three recorded:**
 
@@ -2728,8 +2616,7 @@ Why, and it is not luck. `Q2Dict::insert` prepends, so reading a file in order
 *F* builds every colliding chain backwards and iteration yields some order *L*.
 Saving writes *L*; loading that reverses each chain again and returns *F*.
 
-**Narrower than it first looks, and the first draft overstated it.** `hash ∘
-hash` is not self-inverse in general — it is a stable sort by bucket, and is the
+**Narrower than it looks.** `hash ∘ hash` is not self-inverse in general — it is a stable sort by bucket, and is the
 identity only on an order that is already bucket-grouped. It holds here because
 every shipped file order is itself an iteration order, written by the 2003
 binary. It does **not** license hand-editing an `.exp` and expecting the
@@ -2803,10 +2690,6 @@ by hash any more.
 | `loaded` order | **8** of 14 changed — **correct**, see below |
 | `rrb` body and material order | 6 of 7 changed — free, see above |
 
-The first draft of this table said "`rrb` 0 of 7" and "`loaded` 7 of 14" without
-qualification. Both were wrong as written: 6 of 7 `rrb` blocks changed in the
-free dicts, and `loaded` moved for 8 blocks, not 7.
-
 `loaded` had to move. It was `hash(file)` and is now file order, which is
 exactly what collapses it onto `copy` — the three load paths becoming one order
 is the point of the exercise, not a regression. `body` and `material` order
@@ -2864,9 +2747,9 @@ no name of its own:
 | `SIG_Link::points` | `QList<NamedPoint>`, `struct NamedPoint { QString name; DL_vector *value; }` |
 | `SIG_LanguageParameters::allowedCommands` | `QList<NamedCommand>`, same shape |
 
-`allowedCommands` is the **eighth** order-carrying dictionary, and the earlier
-"six dicts plus points is seven" missed it — found by review. Its order rides
-inside every `.exp` and every PVM transfer through `writeToFileTransfer`.
+`allowedCommands` is another order-carrying dictionary — its order rides inside
+every `.exp` and every PVM transfer through `writeToFileTransfer`. **The total
+is ten; V1 has the count, measured against the binary.**
 
 Both lookups scan **backwards**, because Qt 2's `QDict` returned the newest
 binding for a duplicate key and `removeCommand` has to free that same one. This
@@ -2933,8 +2816,7 @@ them:
 | `MT_FitnessTrainer.cpp:88` | `loadSetup` sized `Result`/`ResultIst` from the stale member `TSetSize` while giving the training set the file's `NewTSetSize`. Any setup file with a larger set made `calculateFitness` **write past both arrays**. `setSelektionValue` in the same file always did it correctly |
 | `MT_Substitute.cpp:64` | `changeErrorInfo` looped to `CorrectFitness.size()`, a high-water mark that only grows, while indexing the caller's arrays — which shrink whenever the selection size is lowered. Now bounded by the smallest of the three |
 
-**The eighth container is in the gate now.** `allowedCommands` order is dumped
-alongside the other seven — 469 lines added to the baseline. Nothing *numbers*
+**`allowedCommands` is in the gate now**, dumped alongside the others — 469 lines added to the baseline. Nothing *numbers*
 commands (they are looked up by name), so like bodies and materials its order
 reaches only the serialised bytes.
 
@@ -3004,9 +2886,8 @@ crashed it. With `QList` the two are the same number by construction. The same
 line also took the whole vector **by value** on every link construction; it is a
 const reference now.
 
-**The first version of this paragraph justified that with two false claims**,
-both corrected by review. There is no `addVertex` — the appending method is
-`getOrAddVertex`, it is **public**, and it *is* called from outside
+**The appending method is `getOrAddVertex`, it is public, and it *is* called
+from outside**
 `SIG_Geometry` (`SIG_Polygon.cpp:66`, reached from `SIG_Body.cpp` and
 `SIG_RobotCompilerObjects.cpp:374`). And it did **not** fill exactly: it grew
 capacity to `max(16, 2·size)`, so `size() > count()` from the first vertex on —
@@ -3084,13 +2965,9 @@ The clean-up, in this order:
    D3–D12 done.** `Q2Dict`, `Q2DictIterator` and `Q2Array` are deleted; their
    users are plain `QList`. Left, measured 2026-08-29 after D12: `Q2PtrList` 47,
    `Q2PtrVector` 49, `Q2CString` 19, `Q2Queue` 16, `Q2ListIterator` 8,
-   `Q2ValueList` 12. *D9's row here said `Q2PtrVector` 48 where the tree held
-   49; re-measured by review.* An earlier version of this list omitted the last two, and
-   read `Q2PtrVector` 69 / `Q2PtrList` 62 where the tree at that commit
-   (`46d5ba2`) held **67** and 60. *A first draft of this correction compared
-   69 against 51 — a count taken a day later, after D7 and D8 had legitimately
-   removed 16 more sites — and so overstated the error eightfold. Corrected by
-   review.*
+   `Q2ValueList` 12. *Every count in this list has to name the commit it was
+   taken at: comparing one to a count taken a day later, after two steps had
+   legitimately removed sites, once overstated an error eightfold.*
 2. ~~**Migrate the data files at the same time.**~~ **Done, D2.** Only the 7
    `.rrb` needed it — the 14 `.exp` already stored the order the simulation
    used. `Q2Dict::hash` generated that ordering and is deleted.
@@ -3128,8 +3005,7 @@ order is `bitsPerRegister memSize maximalDelayTime`, and `twoBases` has
 `bitsPerRegister` 3 against `walker`'s 8 while both lose 8, which rules out the
 8 being register width.
 
-**The byte figure is not 8 registers, and an earlier draft implied it was.**
-Corrected by review, from the leak records: of the 120 bytes, only **64** are a
+**The byte figure is not 8 registers.** From the leak records: of the 120 bytes, only **64** are a
 leak removed — the 8 × `new SIG_Register`. The other 56 are the same memory
 still leaking, smaller: the container's heap buffer went 128 B → 80 B because
 `resize` took Qt's growth policy to 14 slots where `reserve(8)` allocates
@@ -3293,8 +3169,7 @@ delta. There is exactly one, `noCollide.count()` streamed at
 the file with `-Wconversion -Wsign-conversion`, which says nothing about that
 line.
 
-**But no gate sees it, and a first draft here claimed it was "covered twice
-over".** Corrected by review, by measurement: **no shipped robot declares
+**But no gate sees it.** Measured: **no shipped robot declares
 `nocollide`** — 0 matches across all 7 `.rrb`, and every `Link` record in all 14
 `.exp` carries `noCollideCount = 0`. So `noCollide` is empty on every gate run.
 The count only ever streams `0`, the loop below it never iterates, and
@@ -3330,12 +3205,9 @@ given as the range, because the counts scale with the robot:
 | `Q2Queue` | **0** | **0** |
 | `Q2ValueList` | **0** | **0** |
 
-*A first version of this table gave single figures — 24 and 38 — under the
-heading "per run of `sigel_eval`". Those are `octopusSimpleFitness` alone;
-`twoBases` gives 8/14 and `walkerNiceWalkingFitness` 41/64. Two experiments
-were sampled and one of them tabulated as though it were the run. Caught by
-review, re-measured here over all 14 in both modes. The conclusions below did
-not move.*
+*Given as ranges because they scale with the robot: an earlier single figure
+was `octopusSimpleFitness` alone, tabulated as though it were the run. Sample
+the corpus, not one member of it.*
 
 `Q2PtrList` counts one construction per `SIG_DynaMechsLink` — its `successors`
 member — plus one per material and body, so it tracks robot size.
@@ -3464,8 +3336,7 @@ the reason the count assertion is there.
 Three headers now name `<QList>` directly, but only **two** of them dropped
 `compat/q2compat.h` for it — `SIG_Body.h` and `SIG_DynaMechsLink.h`.
 `SIG_Material.h` never included the shim; it had been getting `Q2PtrList`
-transitively through `SIG_Robot.h`. The shim's reach falls from 49 files to 47,
-which is what says two rather than three.
+transitively through `SIG_Robot.h`.
 
 Verified: `./check.sh` 105 pass / 4 fail / 315 warnings, both gates
 byte-identical, sanitized fitness run clean, self-check ok.
@@ -3501,23 +3372,21 @@ pointer to an empty string. `terrainDataFileName` is `sigelRootString +
 "/Terrain.ter"`, so it is never empty and `toUtf8()` is never null. Both gates
 load terrain on every evaluation, so this is covered rather than argued.
 
-Both files drop `compat/q2compat.h` for `<QByteArray>`; the shim's reach falls
-from 47 files to 45.
+Both files drop `compat/q2compat.h` for `<QByteArray>`.
 
 **With this, no shim TYPE is used in `SIGEL_Robot`, `SIGEL_Simulation` or
 `SIGEL_Environment`.** Eight prose comments naming the old types are all that
 `grep` finds there, and they are kept because they explain why the code reads as
 it does.
 
-*D12 claimed more than that and was wrong.* It said "no live shim code is left …
-six prose comments are all `grep` finds". **Six live `#include "compat/q2compat.h"`
-remained** — `SIG_Geometry.h`, `SIG_LanguageParameters.h`, `SIG_Robot.h`,
+*A `grep` for shim **types** says nothing about shim **includes**.* Six live
+`#include "compat/q2compat.h"` remained after the type sweep came back clean —
+`SIG_Geometry.h`, `SIG_LanguageParameters.h`, `SIG_Robot.h`,
 `SIG_DynaMechsCommandInterface.cpp`, `SIG_DynaMechsLink.cpp` and
 `SIG_DynaMechsSimulationQueries.cpp` — every one of them reaching `QList`
 through the shim rather than any `Q2*` type. Found by the D12 review, which also
 established all six were removable with an identical 105/4. They now include
-`<QList>` directly and the shim's reach falls **45 → 39**. The comment count was
-also wrong: eight, not six. **The shim cannot be deleted yet**: `SIGEL_GP`, `MT_Control` and
+`<QList>` directly. The comment count was also wrong: eight, not six. **The shim cannot be deleted yet**: `SIGEL_GP`, `MT_Control` and
 `MT_GPSystem` still hold it, and, per "What the gates actually reach" above,
 part of that is executed on every run rather than being unreachable evolution
 loop as this plan long assumed.
@@ -3557,12 +3426,10 @@ sites in `SIGEL_MasterGUI`. None was *broken* by this — that module did not
 compile before it either — and D4 set the precedent that they meet the plain
 accessor.
 
-**None of the three converted walks is executed by any gate.**
-`SIG_GPFitnessTrainer` is not even linked into `sigel_eval`;
-`writeToFile`'s loop is linked and never called; `readFromFile`'s free always
-runs on an empty list. Coverage is `check.sh`'s syntax check, plus a throwaway
-probe that round-tripped four experiments and confirmed `PVMHOST` order matches
-V8's recorded 1.3 order exactly. **Nothing committed checks it.**
+**No gate executes any of the three walks** — see "What the gates actually
+reach". Coverage is `check.sh`'s syntax check plus a throwaway probe that
+round-tripped four experiments and confirmed `PVMHOST` order matches V8's
+recorded 1.3 order exactly. **Nothing committed checks it.**
 
 **`pvm-check.sh` was not run for this step and should have been** — §7 says to
 run it after touching `SIG_GPFitnessTrainer`. Run afterwards by review: both
@@ -3698,11 +3565,10 @@ LeakSanitizer, and **that is what judges it** — the frees here are invisible t
 any assertion, so the assertions pin the *shift* and the sanitizer pins the
 *ownership*.
 
-**Verified to have teeth.** *An earlier draft said "against the exact failure
-D15 shipped". It is not: that failure was `readFromFile`'s `wasCanceled()`
-shrink, which sits behind `if (qApp)` and is unreachable headless — reverting
-all three `resizeOwning` calls still passes every gate including this one.
-What follows is a fair analogue, not the same defect.* Removing
+**Verified to have teeth — by an analogue, not by the defect D15 shipped.**
+That one was `readFromFile`'s `wasCanceled()` shrink, behind `if (qApp)` and
+unreachable headless: **reverting all three `resizeOwning` calls still passes
+every gate including this one.** Removing
 `deleteIndividual`'s `delete pool[poolpos]`:
 
 | | |
@@ -3736,10 +3602,10 @@ are plain index loops — `count()` and `at(i)`, no cursor — and their **five*
 `deleteContents()` (`:107`, `:108`, `:195`, `:200`, `:529`) become
 `qDeleteAll` + `clear()`.
 
-*D17 said four, and said neither list "ever had `setAutoDelete`". Both wrong.
-Pristine 1.3 sets it on both (`SIG_GPFitnessTrainer.cpp:50-51`); commit
-`14bc134` removed the flags and made the frees explicit, so the statement was
-true of the tree D17 started from and false of the code being ported.*
+*Provenance: pristine 1.3 sets `setAutoDelete` on **both** lists
+(`SIG_GPFitnessTrainer.cpp:50-51`); commit `14bc134` removed the flags and made
+the frees explicit. A statement true of the tree a step starts from can be false
+of the code being ported — say which one you mean.*
 
 **Established from the 1.3 binaries, by symbol table and disassembly**, because
 none of these containers reaches a file and nothing here can be diffed:
@@ -3830,32 +3696,6 @@ the dead-cursor branch cannot be reached from the walk at all, so that guard is
 unreachable in production. It is kept because it documents the shim, not
 because it covers anything.*
 
-### What `pvmTasks` and `pvmHosts` will need — before touching them
-
-Established by the D17/D18 review, so the next step does not re-derive it.
-
-- **`nextHostNumber % pvmHosts.size()`** (`:562`, `:571`) is `int % uint`, so
-  the modulus is **unsigned** and the result is always in range. `QList::size()`
-  is signed and flips it. This is D9's defect exactly. It differs only if
-  `nextHostNumber` goes negative, which needs an `int` overflow after ~2^31
-  spawns — and the reference machine cannot test it either, because all four of
-  its evolutions had one host and `% 1` is always 0. **Preserve the cast; do
-  not let it flip by accident.**
-- **`Q2PtrVector::isEmpty()` is `count()==0`** — *occupied* slots, an O(n)
-  scan — not `size()==0`. `while (!pvmHosts.isEmpty())` at `:169` with
-  `int i = pvmHosts.size()-1` at `:166` coincide today because nothing nulls a
-  `pvmHosts` slot. **`pvmTasks` is full of null holes** (`:72`, `:233`, `:353`,
-  `:376`), so the same idiom on it would change meaning. Note also that
-  `size()-1` is `uint` arithmetic: at size 0 it is `0xFFFFFFFF`, saved only by
-  the `isEmpty()` guard.
-- **`Q2PtrVector::insert(i, d)` deletes the previous occupant and does not
-  shift**, and returns false — silently leaking `d` — when `i >= size()`.
-  `QList::insert` grows and shifts. Eight sites: `:72`, `:85`, `:233`, `:278`,
-  `:353`, `:376`, `:478`, `:540`. **A naive rename corrupts every `pvmTasks`
-  index.**
-- **`pvmHosts.resize( size-1 )`** at `:190` is a free with no `delete`
-  keyword — the §9 item 1 site still outstanding in this file.
-
 ### D19 — `pvmTasks` and `pvmHosts`, the last containers in the trainer
 
 Both become `QList<T *>`. The four traps §10 recorded before this step, and
@@ -3902,21 +3742,9 @@ the whole grown array rather than the live tasks — **O(total spawns ever)**,
 scanning tens of thousands of mostly-null slots on a long run. Harmless, and
 the second place the unbounded index reaches behaviour.
 
-**There was no drift, and the number I chased never existed.** D19 adds zero
-warnings — that part was right. But "one commit earlier the file recorded 314"
-was a **mis-count of my own**, propagated forward. Re-measured at three
-commits, each from a clean checkout:
-
-```
-c318166  pre-D13   316 warnings
-865b41e  D13       315
-ea39f5d  D17/D18   315
-```
-
-So D13's real drop was **316 → 315**, not 315 → 314, and `SIGEL_RobotIO` is
-innocent — 133 warnings with byte-identical text at every point measured. The
-figures recorded for D11, D12 and D13 are each one low for the same reason.
-**315 is the number; it has not moved since D13.**
+*The warning figures recorded for D11, D12 and D13 are each one low, from a
+mis-count propagated forward. The current count is in §7; do not quote one from
+a step write-up.*
 
 ### D20 — the full-data recorder, and the first converted walk a gate runs
 
@@ -3924,13 +3752,10 @@ Four lists in `SIG_GPFullDataRecorder` become `QList<T *>`. The type change
 forces **ten** files in one commit: the recorder's header and source, six
 fitness functions, `SIG_EarlyRunTermSimulation`, and `sigel_eval`'s trace walk.
 
-*This section first said eight, and said "seven friend classes read these lists
-directly, so there is no accessor to hide behind". Three errors, all found by
-review. **`positions`, `rotations` and `touchdowns` are `public`** — friendship
-is not what grants access, and only `listForces` is private. Two of the readers
-are **not** friends at all (`SIG_EarlyRunTermSimulation`, `sigel_eval`). And
-one of the seven friends, `SIG_GPEnergyFitnessFunction`, **does not exist
-anywhere in the tree** — its only appearance is the `friend` line itself.*
+*`positions`, `rotations` and `touchdowns` are **public** — friendship is not
+what grants access, and only `listForces` is private. Two readers are not
+friends at all (`SIG_EarlyRunTermSimulation`, `sigel_eval`), and one listed
+friend, `SIG_GPEnergyFitnessFunction`, **does not exist anywhere in the tree**.*
 
 **Most** walks are the same shape — `positions.first()` and
 `rotations.first()`, then `next()` on both in lockstep — so one index with
@@ -4036,12 +3861,9 @@ over-allocates, which §7 already records, so the check is blind to a shortfall
 of one to seven bytes; it only fails at about eight. It proves the file links
 and round-trips. It says nothing about the constant this step is named for.
 
-None of the three main gates touches this file either, and the six trainer
-sites are **link-checked only** — `pvm_link` links the object but never
-constructs a trainer.
+No gate touches this file — see "What the gates actually reach".
 
-`Q2CString` now appears in no code outside the shim. Both files dropped
-`compat/q2compat.h`; its reach falls **35 → 33** files.
+`Q2CString` now appears in no code outside the shim.
 
 ### D22 — `crossOver`, an owning container returned by value that owned nothing
 
@@ -4067,15 +3889,11 @@ actually new here is **returned by value**, not "owned nothing".*
 value-initialised to null, so `insert` deleted nothing and a plain assignment
 is exact.
 
-Six sites, three files — and **all three** dropped `compat/q2compat.h`,
-including `SIG_GPOperations.h`, which is why its reach falls by three:
-**33 → 30**. *D22 named only the two `.cpp`, so its enumeration and its
-arithmetic contradicted each other.*
+Six sites, three files — and **all three** dropped `compat/q2compat.h`, including `SIG_GPOperations.h`.
 
 **Nothing executes any of it**, and the accurate statement is one notch
-stronger than D22's "syntax pass": both files are **fully compiled under ASan
-and UBSan into `libSIGEL_GP.a`, archived, and never pulled into a link**. `nm`
-finds zero symbols from either class in `sigel_eval` and in `pvm_link`.
+stronger than D22's "syntax pass": both files are fully compiled under ASan and
+UBSan into `libSIGEL_GP.a`, archived, and never pulled into a link.
 
 *D22 also pointed at the wrong binary.* `SIG_GPCrossOverTournament` is
 constructed by `SIG_GPManager.cpp:336`, which is **master-side** — the binary
@@ -4083,35 +3901,22 @@ that would run `crossOver` is `sigel`, not `sigel_slave`. The conclusion holds,
 since neither links, but the reasoning was borrowed from D21's trainer and does
 not transfer.
 
-**Nothing here was worth asking the 1.3 binary.** `crossOver` touches no file
-and produces no observable output; its crossover points come from the
-randomiser, which is item 8 of the validation list and a separate job. Recorded
-because the standing instruction is to use that machine wherever it can help,
-and saying "not here" is part of following it.
-
 ### D23 — `Q2Queue` becomes `QQueue`, and the API used is three methods
 
 `MT_Substitute::TCaseBuffer` and the two parameter types become
 `QQueue<MT_TrainingCase *>`. Qt 6 has a real `QQueue`, so `enqueue`, `dequeue`
 and `count` keep their names and only the type spelling changes: **seven** type
-sites across six files, no call site touched. *`MT_Substitute.h` carries two —
-the `changeTCases()` return type at `:66` and the member at `:110`. The first
-version of this line said six and six, counting files instead of sites.*
+sites across six files, no call site touched — `MT_Substitute.h` carries two,
+the `changeTCases()` return type at `:66` and the member at `:110`. *Count
+sites, not files.*
 
-**The shim's `Q2Queue` had eleven methods; `TCaseBuffer` uses three.** *An
-earlier version of this line said eight, omitting `isEmpty`, `setAutoDelete`
-and `autoDelete` — the last two being the ownership pair this same step reasons
-about below.* `current` and the implicit `operator T *` have no caller anywhere in the
-tree. **`clear` does** — `q2compat_check.cpp:175`, in the self-check this same
-row declares in scope. *The first correction of this sentence fixed `head` and
-`remove` and left `clear` wrong, in the same clause, contradicted by the file
-it cites as authority one sentence later.* **`head` and `remove` do**: `MT_GUI/MT_ExperimentWidget.cpp`
-calls `remove()` at `:43` and `:51` and `head()` at `:48`. An earlier version
-said all five were callerless and the question of reproducing them was moot;
-that was wrong, and `q2compat_check.cpp:99` had already recorded the `remove`
-half in the tree.
+**The shim's `Q2Queue` had eleven methods; `TCaseBuffer` uses three.**
+`current` and the implicit `operator T *` have no caller anywhere in the tree.
+**`clear`, `head` and `remove` do** — `MT_GUI/MT_ExperimentWidget.cpp` calls
+`remove()` at `:43` and `:51` and `head()` at `:48`, which is what makes the
+`head()`-on-empty hazard below live for Phase C.
 
-**The divergence runs the other way from what this section first claimed.**
+**The divergence runs the other way round from the obvious guess.**
 Qt 2's `dequeue()` on an empty queue returned 0 and carried on:
 `QQueue::dequeue` is `QGList::takeFirst` (`qqueue.h:59`), which calls `unlink()`,
 which opens `if ( curNode == 0 ) return 0;` (`qglist.cpp:438-439`; :436 is the
@@ -4163,23 +3968,11 @@ does not mention that a concurrent producer exists; it survives either way,
 since a producer only grows the queue and so neither `count()` read can
 over-report.*
 
-Four of the six files dropped `compat/q2compat.h`; its reach falls **30 → 26**.
+Four of the six files dropped `compat/q2compat.h`. `Q2Queue` appears in no code outside the shim.
 
-`Q2Queue` appears in no code outside the shim.
-
-**Coverage: compiled, archived, linked into both binaries, never executed.**
-`nm -C build/sigel_eval | grep -c "MT_Substitute::\|MT_Trainingset::\|MT_FitnessTrainer::"`
-returns **59**, including all three converted functions and their caller
-`MT_GPManager::checkForNewTCase`; they are dragged in by
-`build/obj/moc/MT_GPSystem/MT_GPManager.o`, which sits on the link line.
-`gdb` breakpoints on all four were **not hit** across a full `sigel_eval`
-evaluation. The two classes that genuinely never link are **`MT_Classifier` and
-`MT_Evaluator`** — `nm -C build/sigel_eval | grep -c "MT_Classifier::\|MT_Evaluator::"`
-returns **0**. *An earlier version of this section said "nothing links any of
-these files, so coverage is compile-and-archive only", and the coverage table
-row named the three linked classes as the unlinked ones. That is exactly
-inverted, and it was asserted without running the `nm` the previous step's row
-had already established as the way to measure this.*
+**Coverage: compiled, archived, linked into both binaries, never executed** —
+the figures and the classes that do and do not link are in "What the gates
+actually reach", which is also where an inverted version of them was corrected.
 
 ### D24 — `MT_Evaluator::TmpBuffer` and `MT_Statistics::StatisticsOfGeneration`
 
@@ -4189,7 +3982,7 @@ call-site lines (7 conversions plus the `setAutoDelete` deletion), the table
 below enumerates **11** uses, and the tree holds **20** — because
 `MT_GUI/MT_StatisticsWidget.cpp` makes nine further `.count()` calls on
 `StatisticsOfGeneration` that this step does not touch and nothing compiles.
-*An earlier draft said "seven call sites", which matches none of the three.* **Checked against the 1.3 binary before writing**, which is a first
+**Checked against the 1.3 binary before writing**, which is a first
 for a `Q2PtrList` step.
 
 **`TmpBuffer` — the loop is not what the plan said it was.** The note carried
@@ -4229,9 +4022,8 @@ decrement, on the same frame slot `count` wrote — sits on the matching side of
 stronger evidence of a common source than any live path, because no behaviour
 forces it to agree.* **Do not read this as a compiler result**: the 1.3 build is
 plainly unoptimised — `mov %eax,%eax`, every local reloaded through the frame —
-so nothing was eliminated anywhere, and an earlier draft's "gcc 2.95 did not
-eliminate it" claimed a decision that was never made. The evidence is about the
-source text, not the compiler. That matters here beyond D24: it is the first
+so nothing was eliminated anywhere — the evidence is about the source text, not
+about a compiler decision that was never made. That matters here beyond D24: it is the first
 hard evidence that the `MT_` half of the tree, where the only confirmed
 source/binary divergence lives, is otherwise common. **It does not license
 generalising to all of `MT_`** — one function is one function.
@@ -4263,8 +4055,7 @@ path the original guards.
 | `MT_Evaluator.cpp:484` | `take(i)` | `takeAt(i)` |
 | `MT_Evaluator.cpp:511` | `insert(i, p)` | textually unchanged, **semantically not** — see below |
 
-**Two more silent null-to-UB upgrades in this same step, which the first draft
-did not name even while making a centrepiece of `at()`.** Both are unreachable
+**Two more silent null-to-UB upgrades in this same step.** Both are unreachable
 today; both belong on the §9 list, because the rule is the hazard class, not the
 individual site.
 
@@ -4299,8 +4090,7 @@ though: it is enqueued on `TCaseBuffer`, which reaches
 `MT_Trainingset::updateTSet`, and that deletes at `MT_Trainingset.cpp:120`
 (`delete (NewTCases->dequeue());`) and `:145` (`delete TCases[FreePosition];`).
 So what leaks is the **never-matched** remainder left sitting in `TmpBuffer`, not
-every case. *An earlier draft said "nothing frees them", which is false for this
-container.*
+every case.
 
 `StatisticsOfGeneration`'s elements are `new`'d at `MT_Statistics.cpp:56` on the
 load-from-file path **and at `MT_GPManager.cpp:557` on the live path** (appended
@@ -4312,8 +4102,7 @@ and recorded rather than fixed — a leak fix is not a port change.
 `MT_Statistics.cpp` is a **CRLF** file. Verified byte-exact: every changed line
 carries `^M` on both sides of the diff, and no line I did not edit moved.
 
-Shim reach falls **26 → 24**; `Q2PtrList` 39 → **37** (scope as in the status
-table: lines, source tree only).
+`Q2PtrList` 39 → **37** (lines, source tree only).
 
 ### D25a — `taskCanDoList`, and why the iterator had to go
 
@@ -4368,14 +4157,9 @@ contiguous and every append goes to the end:
 Appends stay correct: a forward iterator over a linked list eventually reaches
 an element appended behind it, and so does an index walk over a growing array.
 
-**Compiled and archived, never linked.** The file is fully compiled with
-codegen, `-Wall -Wextra` and the sanitizers, and archived —
-`nm -C build/lib/libSIGEL_GP.a | grep -c 'SIG_GPManager::'` is **21**. But
-nothing pulls the member out: `nm -C` gives **0** for `build/sigel_eval`,
-`build-fast/sigel_eval` **and** `build/pvm_link`. So the three green baselines
-say nothing about this change. *An earlier draft said `-fsyntax-only` was the
-only mechanical check, which undersold it — a full sanitized compile is not
-nothing, it just is not execution.* **The append does fire, and the trap was live rather than latent.** Measured on
+**Compiled under the sanitizers and archived, linked into nothing** — see
+"What the gates actually reach". A full sanitized compile is not nothing; it
+just is not execution. **The append does fire, and the trap was live rather than latent.** Measured on
 the 1.3 binary under gdb, two generations of `twoBasesSimpleFitness1`, 100
 individuals, `SLAVES=8`:
 
@@ -4446,11 +4230,8 @@ populated**:
 | `evalNewIndis` | `:413` append | `:386` (inside the `poolSize` loop) and `:426` (inside the sweep `while`) |
 | `evalNeededIndis` (`:1460`) | `:1518` append | `:1501` and `:1528`, same two shapes |
 
-*Every `evalNeededIndis` figure in the first draft of this table was exactly ten
-low — `:1450`/`:1508`/`:1491`/`:1518` — because that function's numbers were not
-rebased after the guard block was inserted above `evalNewIndis`, and `:1518`,
-cited there as an early return, is the **populate** line. The `evalNewIndis`
-figures were right.*
+*`evalNeededIndis`'s line numbers are post-guard-block; `:1518` is the populate
+line, not an early return.*
 
 **The two `poolSize`-loop returns are *conditional* leak paths, not certain
 ones.** The append at `:413`/`:1518` is gated on `!upToDate`, so if every
@@ -4485,9 +4266,9 @@ plan was written around:
 | `fitTaskList.current()` | `cursorAfterRemoval`: `if (fitCur >= size()) fitCur = isEmpty() ? -1 : size()-1;` then `at(fitCur)` |
 | `fitTaskList.next()` | `if (fitCur < 0 \|\| ++fitCur >= size()) { fitCur = -1; actFitTask = 0; }` — a dead cursor stays dead and does **not** advance |
 
-**A pathology this section first claimed to be preserving does not exist.**
-An earlier draft said `prevFitTask` could hold a pointer whose object a later
-`delete` had freed. It cannot, in either version. `prevFitTask` is assigned only
+**A pathology that looks like it needs preserving does not exist.**
+`prevFitTask` cannot hold a pointer whose object a later `delete` has freed, in
+either version. `prevFitTask` is assigned only
 in the else branch, to the item at index *p*, after which the cursor moves to
 *p+1*; deletions happen only at the cursor; `cursorAfterRemoval` from an index
 ≥ *p+1* yields a cursor ≥ *p*; and the moment it reaches *p* the
@@ -4544,8 +4325,7 @@ same name:
 | shrinking `resize(n)` | **deletes the truncated tail** | delete `[n, size)` then `resize(n)` |
 
 **All six hidden-free sites are provably no-ops — four in `MT_Classifier`, two
-in `SIG_GPManager`.** *An earlier draft said "five … in `MT_Classifier`",
-which miscounted and put `SIG_GPManager.cpp:240` in the wrong file.* This was
+in `SIG_GPManager`.** This was
 worth proving rather than assuming, because it is the difference between a
 delete that must be reproduced and one that must not fire twice:
 
@@ -4565,8 +4345,7 @@ delete that must be reproduced and one that must not fire twice:
   truncates nothing.
 - `insert` at `SIG_GPManager.cpp:347` — `clear()` then `resize(quantity)` null
   every slot and the fill loop writes each exactly once, so the occupant is
-  always null. *An earlier draft listed this among the **real** frees; it is a
-  no-op like the rest. Two frees are real, not three.*
+  always null. **Two frees are real, not three.**
 
 **The deletes are written out anyway.** Preserving the *semantics* rather than
 the current behaviour: if a later edit breaks one of those proofs, the code
@@ -4596,18 +4375,15 @@ away.** Qt 2's is `count() == 0` — *no non-null slots* — while
 `QList::isEmpty()` is `size() == 0`. The four call sites use a file-local
 `toursAreEmpty()` that counts non-null slots.
 
-*The first draft kept `isEmpty()` and justified it, and every part of the
-justification was wrong.* It said all four sites are in `run()` — two
-(`:1057`, `:1078`) are in the overload `run(MT_Classifier *)`. It said `run()`
-"executes once", which is contradicted by the statement at one of those very
-sites, `"SIG_GPManager::run() wurde mehr als einmal aufgerufen!"`, whose whole
-purpose is to detect a second call. It named `calcInitTourSet` as the boundary;
-the boundary is **`createTours`**. And it put the divergence window between
-`resize(quantity)` and the fill loop, when `createTours`' `!totalProbCount`
-early return (`:262`) also leaves the vector resized and entirely null **after
-the function returns**.
+*Precisely, because a first reading of this got all four details wrong:* two of
+the four sites (`:1057`, `:1078`) are in the overload `run(MT_Classifier *)`,
+not `run()`; `run()` does **not** execute once, and the German message at one of
+those very sites exists to detect a second call; the boundary is **`createTours`**,
+not `calcInitTourSet`; and `createTours`' `!totalProbCount` early return
+(`:262`) leaves the vector resized and entirely null **after the function
+returns**, which the divergence window has to include.
 
-**The conclusion survived all four errors.** `start()` has exactly two callers
+**The conclusion survives all four.** `start()` has exactly two callers
 in the 1.3 binary — `main`, which calls it once with no backward jump reaching
 the call site, and `SIG_Experiment::slotStartEvolution`, which does
 `delete gpManager; gpManager = new SIG_GUIGPManager(...)` before every
@@ -4646,8 +4422,7 @@ same `-Wsign-compare` between `int` and `uint` on a `tours.size()` loop bound �
 that `size()` is signed. Verified by diffing the normalised warning multiset of
 both files before and after: one removal each, zero additions.
 
-`Q2PtrVector` 46 → 43. Shim reach 23 → **21**: both `SIG_GPManager.h` and
-`MT_Classifier.h` dropped the include entirely. **`setAutoDelete` in core is now
+`Q2PtrVector` 46 → 43; both `SIG_GPManager.h` and `MT_Classifier.h` dropped the include entirely. **`setAutoDelete` in core is now
 0.** Only `SIG_GUIGPManager::individualItems` and `SIG_GPTournament::indis`
 still use the type — D26.
 
@@ -4713,10 +4488,9 @@ guarantees in range, so nothing changes; the cited reason was wrong.
 `uint` on a `size()` loop bound — `MT_Classifier.cpp:629` and
 `SIG_GPManager.cpp:1516` — correct to disappear now that `size()` is signed.
 
-*The stated verification was impossible as described.* It claimed a multiset
-diff "over all six touched files", but one of the two removals is in
-`SIG_GPManager.cpp`, which this commit does not touch — its warning moved
-because the **header** changed. Re-measured over the whole tree, `LC_ALL=C`:
+*A warning can move because a **header** changed, so a multiset diff scoped to
+the touched `.cpp` files cannot see it.* Re-measured over the whole tree,
+`LC_ALL=C`:
 
 | scope | removed | added |
 |---|---|---|
@@ -4741,13 +4515,10 @@ draft said 44; that was the whole-tree count, and 25 of those lines are inside
 differential check, which walks the shim's cursor beside the rewritten one. That
 file is built by `make` and **is the dictorder and fitness gate binary**.
 *The false claim came from grepping `src/` and `include/` and reporting the
-result as "all code"; the repository root was never in scope.* Another instance of the failure tabulated in §9 — *earlier drafts numbered
-these and the numbering was wrong: the table has six rows, and the rows
-themselves describe more occurrences than they have entries, so no count is
-meaningful. They are a pattern, not a tally* — and this is **the sharpest form
-of it**: the scope that
+result as "all code"; the repository root was never in scope.* Another instance
+of the failure tabulated in §9, and **the sharpest form of it**: the scope that
 was too narrow happened to exclude *the file the gates run in*. Not merely
-missed coverage; the omitted file was the one being certified.
+missed coverage — the omitted file was the one being certified.
 
 **Three things must happen before the shim can go:**
 
