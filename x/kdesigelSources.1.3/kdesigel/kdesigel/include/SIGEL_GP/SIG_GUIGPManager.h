@@ -23,7 +23,7 @@
 #ifndef SIGEL_GP_SIG_GUIGPMANAGER_H
 #define SIGEL_GP_SIG_GUIGPMANAGER_H
 
-#include "compat/q2compat.h"
+#include <QList>
 #include "SIGEL_GP/SIG_GPManager.h"
 namespace SIGEL_MasterGUI { class SIG_Experiment; class SIG_IndividualListItem; }
 

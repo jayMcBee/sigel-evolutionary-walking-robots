@@ -5,7 +5,9 @@
 #if !defined(AFX_MT_TRANSLATEDINDIVIDUAL_H__5C48785A_CF39_45EF_9A94_1214783FF5E3__INCLUDED_)
 #define AFX_MT_TRANSLATEDINDIVIDUAL_H__5C48785A_CF39_45EF_9A94_1214783FF5E3__INCLUDED_
 
-#include "compat/q2compat.h"
+#include <QList>
+#include <QString>
+#include <QTextStream>
 #include <qstring.h>
 #include <qtextstream.h>
 

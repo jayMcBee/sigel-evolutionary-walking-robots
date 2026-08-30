@@ -23,7 +23,7 @@
 #ifndef SIGEL_GP_SIG_GPTOURNAMENT_H
 #define SIGEL_GP_SIG_GPTOURNAMENT_H
 
-#include "compat/q2compat.h"
+#include <QList>
 #include "SIGEL_Tools/SIG_Randomizer.h"
 #include "SIGEL_GP/SIG_GPFitnessTrainer.h"
 #include "SIGEL_GP/SIG_GPTournamentIndividual.h"

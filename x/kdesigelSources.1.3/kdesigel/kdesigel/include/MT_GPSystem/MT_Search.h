@@ -6,7 +6,7 @@
 #define AFX_MT_SEARCH_H__B5BB118D_7ED8_4086_8D30_BFC22C562A0F__INCLUDED_
 
 
-#include "compat/q2compat.h"
+#include <QTextStream>
 #include "MT_GPSystem/MT_Population.h"
 #include "MT_GPSystem/MT_Randomizer.h"	
 

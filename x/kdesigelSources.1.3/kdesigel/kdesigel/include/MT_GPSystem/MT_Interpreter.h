@@ -6,7 +6,7 @@
 #define AFX_MT_INTERPRETER_H__EFC222FF_DB14_461C_AE1C_69076695F31B__INCLUDED_
 
 
-#include "compat/q2compat.h"
+#include <QList>
 #include "MT_GPSystem/MT_TranslatedIndividual.h"
 #include "MT_GPSystem/MT_Program.h"
 

@@ -36,26 +36,11 @@ done
 MODULES="${1:-SIGEL_Tools SIGEL_Environment MT_GPSystem SIGEL_Robot SIGEL_Program SIGEL_RobotIO SIGEL_Simulation MT_Control SIGEL_GP}"
 pass=0; fail=0; warn=0
 
-# The shim self-check instantiates every Q2* member; 56 of them are reached by
-# no converted .cpp, so without this half the shim is never type-checked.
-# The self-check has a main(), a live-object counter and ~40 assertions. Syntax
-# checking it proves nothing: LINK AND RUN IT. This is the only mechanical check
-# that can see an ownership error, which is the whole risk in Phase B.
-printf '%-22s ' "compat (shim)"
-QTLIB=$(qmake6 -query QT_INSTALL_LIBS)
-if g++ -std=c++17 -fPIC -g -fsanitize=address,undefined -Wall -Wextra \
-       -I$SRC/include -isystem "$QTINC" -isystem "$QTINC/QtCore" \
-       "$SRC/include/compat/q2compat_check.cpp" -L"$QTLIB" -lQt6Core \
-       -o /tmp/q2chk.$$ 2>/tmp/chk.$$; then
-    if /tmp/q2chk.$$ >/tmp/run.$$ 2>&1; then
-        printf 'ok   (built and RUN under ASan+UBSan)\n'
-    else
-        printf 'FAIL at runtime\n'; cat /tmp/run.$$; fail=$((fail+1))
-    fi
-    rm -f /tmp/q2chk.$$ /tmp/run.$$
-else
-    printf 'FAIL to build\n'; cat /tmp/chk.$$; fail=$((fail+1))
-fi
+# The shim self-check was here: it built and RAN q2compat_check.cpp under
+# ASan+UBSan, and was the only mechanical check that could see an ownership
+# error. Deleted with the shim -- it only ever tested the compatibility
+# layer, so nothing is left for it to check. It was reported separately and
+# never counted in the module totals, so 105/4 is unchanged by its removal.
 
 for m in $MODULES; do
     mp=0; mf=0; mw=0

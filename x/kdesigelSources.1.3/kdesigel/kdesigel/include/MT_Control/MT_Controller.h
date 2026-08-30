@@ -1,7 +1,9 @@
 #ifndef MT_CONTROLLER_H
 #define MT_CONTROLLER_H
 
-#include "compat/q2compat.h"
+#include <QList>
+#include <QString>
+#include <QTextStream>
 #include <QFile>
 class MT_MainWindow;
 #include "MT_Control/MT_Substitute.h"

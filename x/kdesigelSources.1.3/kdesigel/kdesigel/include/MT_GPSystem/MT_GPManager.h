@@ -5,7 +5,7 @@
 #if !defined(AFX_MT_GPMANAGER_H__0590D02D_760F_43CC_B902_EA5EE0196061__INCLUDED_)
 #define AFX_MT_GPMANAGER_H__0590D02D_760F_43CC_B902_EA5EE0196061__INCLUDED_
 
-#include "compat/q2compat.h"
+#include <QTextStream>
 #include <QObject>
 class MT_Substitute;
 

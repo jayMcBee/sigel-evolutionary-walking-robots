@@ -5,7 +5,8 @@
 #if !defined(AFX_MT_RANDOMIZER_H__65257FEF_679C_4B32_853B_E2AE4688CAD6__INCLUDED_)
 #define AFX_MT_RANDOMIZER_H__65257FEF_679C_4B32_853B_E2AE4688CAD6__INCLUDED_
 
-#include "compat/q2compat.h"
+#include <QTextStream>
+#include <QList>
 #include "MT_GPSystem/MT_Operand.h"	
 #include "MT_GPSystem/MT_Instruction.h"
 

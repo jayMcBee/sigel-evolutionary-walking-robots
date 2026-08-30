@@ -23,7 +23,8 @@
 #ifndef SIGEL_GP_SIG_GPFITNESSTRAINER_H
 #define SIGEL_GP_SIG_GPFITNESSTRAINER_H
 
-#include "compat/q2compat.h"
+#include <QList>
+#include <QString>
 #include "SIGEL_GP/SIG_GPExperiment.h"
 #include "SIGEL_GP/SIG_GPIndividual.h"
 #include "SIGEL_GP/SIG_GPPVMData.h"

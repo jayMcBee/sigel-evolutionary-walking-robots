@@ -33,7 +33,9 @@
 #define SIGEL_PROGRAMPACKAGE_SIG_PROGRAM_H
 
 
-#include "compat/q2compat.h"
+#include <QList>
+#include <QString>
+#include <QTextStream>
 #include<qtextstream.h>
 #include<qstring.h>
 

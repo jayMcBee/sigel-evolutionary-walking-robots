@@ -5,7 +5,7 @@
 #if !defined(AFX_MT_PROGRAM_H__D3578776_1315_4C75_B00A_E11B559B7314__INCLUDED_)
 #define AFX_MT_PROGRAM_H__D3578776_1315_4C75_B00A_E11B559B7314__INCLUDED_
 
-#include "compat/q2compat.h"
+#include <QTextStream>
 #include <qstring.h>
 #include <qtextstream.h>
 #include "MT_GPSystem/MT_Programline.h"

@@ -12,14 +12,16 @@
   The experiment file already records the fitness each individual scored in
   2003, so `sigel_eval <exp> <n>` prints the new value next to the old one.
 */
+#include <QList>
+#include <QString>
 #include <cstdio>
 #include <cstdlib>
+#include <vector>
 
 #include <QFile>
 #include <QHashSeed>
 #include <QTextStream>
 
-#include "compat/q2compat.h"
 
 #include "SIGEL_GP/SIG_GPExperiment.h"
 #include "SIGEL_GP/SIG_GPPopulation.h"
@@ -348,6 +350,62 @@ static int selfcheck()
     pop.deleteIndividual( 0 );
     SIG_WANT(pop.getSize() == 1);
   }
+  // ---------------------------------------------------------------------
+  // Qt2CursorList -- a model of Qt 2's QList cursor, for the test below.
+  //
+  // The test compares D18's rewritten cursor walk against the semantics it
+  // replaced. Those semantics used to come from Q2PtrList, but the shim is
+  // being deleted, so the reference has to outlive it.
+  //
+  // Written from the vendored Qt 2.3 source, not from the shim:
+  //   first/next/last/current   qglist.cpp:203-260, qglist.h:186-196
+  //   remove()                  qglist.cpp:504-516 -- removes CURRENT
+  //   the cursor after removal  qglist.cpp:436-473 -- unlink() sets
+  //                             curNode = n->next, or n->prev with
+  //                             curIndex-- when the last node goes
+  //   autoDelete                qlist.h:100 -- deleteItem frees if del_item
+  //
+  // Backed by std::vector on purpose: it shares no implementation with
+  // either QList or the shim, so agreement means agreement.
+  // ---------------------------------------------------------------------
+  struct Qt2CursorList
+  {
+    std::vector< int * > v;
+    long                 cur = -1;
+    bool                 del = false;
+
+    ~Qt2CursorList() { if (del) for (int *p : v) delete p; }
+
+    void setAutoDelete(bool e) { del = e; }
+    unsigned count() const     { return unsigned(v.size()); }
+    bool valid() const         { return cur >= 0 && cur < long(v.size()); }
+
+    void append(int *p) { v.push_back(p); cur = long(v.size()) - 1; }
+
+    int *current() const { return valid() ? v[size_t(cur)] : nullptr; }
+    int *first()   { cur = v.empty() ? -1 : 0;             return current(); }
+    int *last()    { cur = long(v.size()) - 1;             return current(); }
+
+    int *next()
+    {
+      if (cur < 0) return nullptr;                 // a dead cursor stays dead
+      if (++cur >= long(v.size())) { cur = -1; return nullptr; }
+      return v[size_t(cur)];
+    }
+
+    bool remove()                                  // removes the CURRENT item
+    {
+      if (!valid()) return false;
+      const long i = cur;
+      if (del) delete v[size_t(i)];
+      v.erase(v.begin() + i);
+      if (i < long(v.size()))        cur = i;      // whatever slid in
+      else if (!v.empty())           cur = long(v.size()) - 1;   // stepped back
+      else                           cur = -1;
+      return true;
+    }
+  };
+
   {   // THE CURSOR WALK, D18 -- checked against the shim it replaced.
       //
       // SIG_GPFitnessTrainer::sweepToSpawn walked toSpawnList with
@@ -356,11 +414,13 @@ static int selfcheck()
       // sweepToSpawn -- it needs a live PVM spawn -- so the rewrite would
       // otherwise ship unverified.
       //
-      // Q2PtrList is still in the tree, so run the same sequence against
-      // both and require they agree at every step. This block dies with the
-      // shim, by which time the conversion is proven.
+      // Run the same sequence against the rewrite and against Qt2CursorList
+      // above -- a model of the Qt 2 semantics taken from the vendored
+      // source -- and require they agree at every step. This used to compare
+      // against the shim; the model replaces it so the check outlives the
+      // shim's deletion.
     const int script[] = { 0, 1, 1, 0, 0, 1, 0, 1, 1, 1 };   // 1 = remove
-    Q2PtrList<int> shim;
+    Qt2CursorList  shim;
     QList<int *>   mine;
     for (int i = 0; i < 6; i++) { shim.append(new int(i)); mine.append(new int(i)); }
     shim.setAutoDelete(true);
@@ -398,7 +458,7 @@ static int selfcheck()
     // never emptied -- which is the one case D18's own prose singles out,
     // "dies if the list emptied". Found by review. Two elements, both
     // removed, so cursorAfterRemoval takes its cur = -1 branch.
-    Q2PtrList<int> dshim;
+    Qt2CursorList  dshim;
     QList<int *>   dmine;
     for (int i = 0; i < 2; i++) { dshim.append(new int(i)); dmine.append(new int(i)); }
     dshim.setAutoDelete(true);
@@ -446,7 +506,7 @@ static int selfcheck()
 
 int main(int argc, char *argv[])
 {
-  // PORTING.md §9. q2compat.h calls this during static initialisation, but
+  // PORTING.md §9. The deleted shim called this during static initialisation;
   // static initialisation order across translation units is unspecified.
   QHashSeed::setDeterministicGlobalSeed();
 

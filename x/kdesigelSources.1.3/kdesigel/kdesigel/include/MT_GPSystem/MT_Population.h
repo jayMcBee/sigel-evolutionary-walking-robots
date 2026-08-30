@@ -5,7 +5,8 @@
 #if !defined(AFX_MT_POPULATION_H__76BD10AD_932E_42FC_BDD3_85DD57B1D541__INCLUDED_)
 #define AFX_MT_POPULATION_H__76BD10AD_932E_42FC_BDD3_85DD57B1D541__INCLUDED_
 
-#include "compat/q2compat.h"
+#include <QList>
+#include <QTextStream>
 #include "MT_GPSystem/MT_Program.h"
 #include "MT_GPSystem/MT_Individual.h"
 #include "MT_GPSystem/MT_Randomizer.h"	

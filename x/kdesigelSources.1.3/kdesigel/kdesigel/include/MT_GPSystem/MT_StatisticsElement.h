@@ -7,7 +7,8 @@
 
 
 
-#include "compat/q2compat.h"
+#include <QTextStream>
+#include <QList>
 #include <qstring.h>
 #include <qtextstream.h>
 

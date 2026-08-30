@@ -6,7 +6,8 @@
 #define AFX_MT_TOURNAMENTMANAGER_H__8202A42C_476B_4AD2_8E67_442E97B3C8BF__INCLUDED_
 
 
-#include "compat/q2compat.h"
+#include <QList>
+#include <QTextStream>
 #include "MT_GPSystem/MT_Population.h"
 #include "MT_GPSystem/MT_Tournament.h"
 
