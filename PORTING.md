@@ -4390,7 +4390,9 @@ differential check, which walks the shim's cursor beside the rewritten one. That
 file is built by `make` and **is the dictorder and fitness gate binary**.
 *The false claim came from grepping `src/` and `include/` and reporting the
 result as "all code"; the repository root was never in scope.* Ninth instance of
-the failure tabulated in §9.
+the failure tabulated in §9 — and **the sharpest form of it**: the scope that
+was too narrow happened to exclude *the file the gates run in*. Not merely
+missed coverage; the omitted file was the one being certified.
 
 **Three things must happen before the shim can go:**
 
@@ -4402,12 +4404,45 @@ the failure tabulated in §9.
    through the shim**. Dropping their include without adding it breaks **8**
    headers standalone; adding it to exactly those two restores 111 pass / 1
    fail. So the dead-include count is **19**, not 21 and not 20.
-3. **The shim installs deterministic hash seeding as a side effect**
-   (`q2compat.h:88-91`, a per-TU `Q2DeterministicHashSeed`), which §9's
-   "Determinism — resolved" depends on. `sigel_eval.cpp:451` calls
-   `setDeterministicGlobalSeed()` itself, so the dictorder gate survives — but
-   `sigel.cpp:98` and `sigel_slave.cpp:111` do **not**, and will need it before
-   they link. **The shim is not only types.**
+3. ~~**The shim installs deterministic hash seeding as a side effect**~~
+   (`q2compat.h:88-91`, a per-TU `Q2DeterministicHashSeed`). **Measured, and it
+   is vestigial** — see below. It should still move to `sigel.cpp` /
+   `sigel_slave.cpp` as defence when they link, but it is not a correctness
+   blocker.
+
+**Why the seeding is vestigial, and how that was established without any
+reference.** The worry was sharp: **V1 proved container iteration order is
+serialised into the `.exp`** — Material, Link, Joint, Drive and Sensor orders
+are all observable in a saved file — so on that path order is *output*, not an
+internal detail. Qt 6 randomises `QHash` iteration per process unless seeded, so
+losing the seed would not give a wrong-but-stable order; it would give **a
+different order on every run of the same binary**.
+
+Two measurements settle it:
+
+| check | result |
+|---|---|
+| `QHash`/`QSet`/`QMultiHash` anywhere outside `compat/` | **none.** D3 replaced the six `Q2Dict`s with `QList<T *>`, which is insertion-ordered by construction |
+| the same binary under `QT_HASH_SEED` = 0, 1, 12345, 999999 | **dictorder digest identical across all four**; fitness identical across both tested |
+
+So no hashed container's order reaches a file, and the seed cannot affect
+output. *The shim's own comment already anticipated the move to `main()`; what
+it could not know is that D3 would remove every hash the seed protected.*
+
+**Self-consistency before fidelity — the order matters and it is cheap.** The
+V4 digests invite starting at the wrong end. The correct sequence:
+
+1. **Run this build twice on the same input and compare it against itself.** No
+   reference needed. Done: three consecutive `dictorder-dump.sh` runs and three
+   `fitness-check.sh` runs, identical digests each.
+2. **Only then compare against the 1.3 digests.** A mismatch at step 2 with a
+   randomised seed underneath would look exactly like a fidelity failure and
+   send someone hunting through the interpreter and the physics for what is
+   actually one missing seed call.
+
+*This is the same discipline that made the V4 captures gates rather than
+fingerprints: the reference side validated each digest across two independent
+runs before shipping it.*
 
 **No gate reaches any of this** — the D25c section says so and D26's first draft
 omitted it. `SIG_GUIGPManager.cpp` is not even syntax-checked: `Makefile:288`
