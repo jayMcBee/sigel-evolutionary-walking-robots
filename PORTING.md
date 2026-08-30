@@ -30,7 +30,7 @@ build and run, because nothing else can be verified without it — see §3.
 | B — ownership explicit | **subsumed by Phase D**, which deletes the containers rather than converting them. **0 `setAutoDelete` calls left in core**, re-measured 2026-08-30 after D25c: D11 removed the last in `SIGEL_Robot`, D24 the last in `MT_Control`, D25b replaced the two `fitTaskList` calls with an RAII guard, and D25c wrote out `tours`' two real frees at their sites. Every remaining call in the tree is in `SIGEL_MasterGUI`, `SIGEL_Visualisation`, `SIGEL_CommonGUI` or `MT_GUI` — Phase C. *This row has been corrected five times, each time by review: it has read 13, 12, 11, 3 and 1. The recurring errors were counting comments as calls and quoting a `SIGEL_MasterGUI` figure as a core one.* **Not all of these were unreachable, and an earlier version of this row said they were** — `SIG_GPPopulation::pool` is owning, is constructed on every `sigel_eval` run, and takes 100 `insert()`s inside both gates; see "What the gates actually reach" in §10 |
 | R — build and run | core builds and runs. **No longer checked only against itself** — Phase V has confirmed both the ordering and the arithmetic against the 1.3 binary, §7 |
 | T — old-Qt tool container | **done 2026-08-27.** `tools/qtmig`, §4 |
-| D — delete the shim, migrate the data | **DONE 2026-08-30.** `q2compat.h` and `q2compat_check.cpp` deleted; `include/compat/` is empty; **no Qt 2 container type exists anywhere in the tree**. D1–D27. The shim's own self-check step is gone from `check.sh` with it. §10 |
+| D — delete the shim, migrate the data | **DONE 2026-08-30.** `q2compat.h` and `q2compat_check.cpp` deleted; `include/compat/` gone; **no `Q2*` shim type is used anywhere**. D1–D27. *This is not "no Qt 2 container exists" — the unported GUI modules still declare **71 lines** of `QArray`, `QDict`, `QList`-as-pointer-list and friends, all of which Phase C must convert. See D27.* The shim's self-check step is gone from `check.sh`, which now runs no code. §10 |
 | P — PVM | **DONE 2026-08-28.** Vendored 3.4.3 replaced by upstream 3.4.6; nine patches carry the four config lines and Debian's eight source fixes; `libpvm3.a` and `pvmd3` build; SIGEL's two PVM objects link against them and `SIG_GPPVMData` round-trips through real PVM. `sigel`/`sigel_slave` still need Phase C. §7 |
 | C — GUI | **not started, AUTHORIZED 2026-08-27 per D24.** ~450 Qt 2 sites + 20 forms |
 | V — check against the 1.3 binary | **V1, V5's MDH probe, V6, V7 and V8 all done, all PASS.** Ordering: 10 of 10 container orders match. Arithmetic: `twoBases` exact bit for bit, `octopus` 9/9 with three joints exact and 5 ulp worst. **V6, V7 and V8 done 2026-08-29** — friction and no-collide negotiation, their four remaining rules, and the GP parameter blocks captured *before* their conversion. `verification-against-sigel-1.3/v6`, `v7`, `v8`. V2–V4 not started; V5's sensor and force probes are **invalid as specified** — both target Dynamo-only functions, deleted 2026-08-28. §7 |
@@ -68,10 +68,9 @@ ported interface has nothing to drive.
 2. ~~**Stand up the old-Qt container**~~ — **done**, `tools/qtmig`. §4.
 3. ~~**Get a reference from the 1.3 binary**~~ — **V1 and V5's MDH probe done,
    both pass.** This was item 1's missing half and is no longer outstanding.
-4. **Phase D — delete the shim.** *In progress, D1–D8.* The data migration is
-   done and only the 7 `.rrb` needed it. Remaining: `Q2PtrList`, the rest of
-   `Q2PtrVector`, `Q2CString`, `Q2Queue`, `Q2ListIterator`, `Q2ValueList`, then
-   the header. Ordered before C by **D25** so the interface is ported once, to
+4. **Phase D — delete the shim.** **DONE 2026-08-30, D1–D27.** The data
+   migration is done and only the 7 `.rrb` needed it. All six container types
+   and the header itself are gone. Ordered before C by **D25** so the interface is ported once, to
    the final target. §10.
 5. **Phase C — the interface**, one module or one form at a time. §7.
 6. Fix PVM — **superseded 2026-08-28.** That count measured the vendored 3.4.3,
@@ -83,9 +82,10 @@ ported interface has nothing to drive.
 simulation-side work is in the **evolution loop**, which nothing can execute:
 ~~the 13 remaining `setAutoDelete` sites, `Q2PtrList`'s `fitTaskList` and
 `toSpawnList`, and the rest of `Q2PtrVector`~~ — **all converted as of D25c;
-core `setAutoDelete` is 0.** What is left of the shim is two GUI-side members,
-D26. Both gates and AddressSanitizer reach none of that code, so it was
-converted blind, which was the largest risk in this plan. It was met by
+core `setAutoDelete` is 0, and D26 converted the last two GUI-side members.
+The shim itself was deleted in D27.** Both gates and AddressSanitizer reach
+none of that code, so it was converted blind, which was the largest risk in
+this plan. It was met by
 per-step review with differential harnesses against the shim, and by the 1.3
 binary; the record of what that caught is in the step sections. **Phase P was expected to retire it and did not.** PVM builds and runs as
 of 2026-08-28, but `SIG_GPFitnessTrainer` dispatches through `pvm_spawn` of
@@ -104,13 +104,17 @@ race in `replicate.sh` that scored crashed evaluations as zero. All fixed.
 ## 0. Working on this
 
 - Source root: `x/kdesigelSources.1.3/kdesigel/kdesigel/`
-- The shim: `include/compat/q2compat.h`; its self-check:
-  `include/compat/q2compat_check.cpp`
+- ~~The shim: `include/compat/q2compat.h`; its self-check:
+  `include/compat/q2compat_check.cpp`~~ **Both deleted in D27.** Recover them
+  from git history if you need the Qt 2 semantics they recorded — see D27 for
+  the four that unported code still depends on.
 - Build: `make` at the repo root gives `build/sigel_eval` under ASan and UBSan.
   `make B=build-fast SAN= SIGSAN=` gives an unsanitised build about 15x faster,
   in its own directory.
-- Verify: `./check.sh` from the repo root compiles every module and header and
-  runs the shim self-check. Takes several minutes.
+- Verify: `./check.sh` from the repo root compiles every module and header.
+  Takes several minutes. **It runs no code** — D27 removed the only step that
+  did. Execution happens in `./fitness-check.sh`, which runs
+  `sigel_eval -selfcheck`.
 - PVM: `make pvm && make pvm-link`, then `./pvm-check.sh` starts a daemon and
   runs both round trips. Not one of the three checks below — it has no baseline,
   it is PASS/FAIL.
@@ -120,8 +124,10 @@ race in `replicate.sh` that scored crashed evaluations as zero. All fixed.
 - **After every step, an independent agent reviews the diff with fresh eyes.**
   Not optional — every round so far has found a real defect, and a compile check
   proves nothing about ownership.
-- When adding a shim assertion, break the shim and confirm the check aborts.
-  Nine assertions have passed on broken code.
+- When adding an assertion to `sigel_eval -selfcheck`, break the code it covers
+  and confirm the check aborts. Nine assertions have passed on broken code.
+  *This rule was written for the shim self-check, deleted in D27; it applies
+  unchanged to its successor.*
 - Sibling docs, both independent of this port: `future_refactorings.md` (C++
   language level) and `physics_backends.md` (**decided and executed 2026-08-28**:
   the Dynamo backend is deleted, the Dynamo maths library stays).
@@ -1756,9 +1762,20 @@ This mattered because `SIG_Robot`'s copy constructor round-trips through a text
 serialisation that walks six dictionaries, and joint order determines DynaMechs
 link numbering — a fixed `RANDOMSEED` would not have reproduced a run.
 
-`q2compat.h` calls `QHashSeed::setDeterministicGlobalSeed()` during static
-initialisation. `main()` should call it explicitly too once `sigel.cpp` and
-`sigel_slave.cpp` are ported — static initialisation order is unspecified.
+~~`q2compat.h` calls `QHashSeed::setDeterministicGlobalSeed()` during static
+initialisation.~~ **D27 deleted the shim, so nothing seeds implicitly any more.**
+
+`sigel_eval.cpp` calls it as the first statement of `main()`, which is why the
+dictorder gate is unaffected. **`build/pvm_link` lost it** — `nm -C` finds the
+symbol once in `sigel_eval` and **zero** times in `pvm_link`, because
+`SIG_GPFitnessTrainer.o` used to pull the shim's per-TU initialiser onto that
+link line. Unobservable today: **0 `QHash`/`QSet`/`QMultiHash` in the converted
+core**, measured, and a build with a genuinely random seed reproduces
+`dictorder-baseline.txt` exactly (D26 review action).
+
+**PHASE C MUST ADD `QHashSeed::setDeterministicGlobalSeed()` TO `sigel.cpp` AND
+`sigel_slave.cpp`**, as the first statement of each `main()`. Neither has it,
+and both will link containers this port has not yet seen.
 
 ### `MT_Control` is not headless
 
@@ -4477,17 +4494,28 @@ compiled into archives and linked into nothing — `nm -C` finds no
 
 ### D27 — the compatibility layer is deleted
 
-**`q2compat.h` and `q2compat_check.cpp` are gone.** `include/compat/` is empty.
-No Qt 2 container type exists anywhere in the tree. This is what Phase D was
-for.
+**`q2compat.h` and `q2compat_check.cpp` are gone.** `include/compat/` no longer
+exists. **No `Q2*` shim type is used anywhere** — every remaining `Q2` mention is
+a comment recording what the Qt 2 original did.
+
+**That is NOT "no Qt 2 container exists".** The unported modules still declare
+**71 lines** of them, across 22 files in `MT_GUI`, `SIGEL_MasterGUI`,
+`SIGEL_CommonGUI`, `SIGEL_SlaveGUI`, `SIGEL_Visualisation` and
+`SIGEL_RealInterface` — `QArray` 21, `QList` (pointer list) 15, `QDictIterator`
+15, `QListIterator` 10, `QVector` 5, `QDict` 3, `QValueList` 2, `QQueue` 1.
+**Phase C must convert every one.** *An earlier version of this section, of the
+commit message and of the Phase D status row all said "no Qt 2 container type
+exists anywhere in the tree" — false, and it reads as "Phase C has no containers
+to port". Same too-narrow scope as §9's table, in the paragraph that names it.*
+`sigel.cpp` and `sigel_slave.cpp` have none.
 
 **The two blockers, cleared in order.**
 
 **1. `sigel_eval.cpp` tested the D18 cursor rewrite against `Q2PtrList`.** That
 check could not simply be deleted — nothing executes `sweepToSpawn` (it needs a
 live PVM spawn), so the walk has no other verification at all. It is now
-compared against **`Qt2CursorList`**, a 40-line model of the Qt 2 cursor written
-in `sigel_eval.cpp` from the vendored source, with the line references kept:
+compared against **`Qt2CursorList`**, a **37**-line model of the Qt 2 cursor
+(`sigel_eval.cpp:371-407`) written from the vendored source, with the line references kept:
 `first`/`next`/`last`/`current` from `qglist.cpp:203-260`, `remove()` from
 `:504-516`, the cursor-after-removal rule from `:436-473`, `autoDelete` from
 `qlist.h:100`. **Backed by `std::vector`, not `QList`** — it shares no
@@ -4495,20 +4523,60 @@ implementation with either side, so agreement means agreement. A differential
 test needs a reference independent of the code under test; that is what the
 model is, and it is not a second shim.
 
-**2. Nineteen files got `<QList>` (and often `<QString>`, `<QTextStream>`) only
-through the shim.** The D26 review found two headers; the real number is
-**nineteen files**, found by removing the include and letting the compiler say
-so — 30 errors on the first attempt. Each now includes what it uses. *My first
+**2. Twenty files got `<QList>` (and often `<QString>`, `<QTextStream>`) only
+through the shim** — 16 headers and 3 `.cpp` under `src/`, **plus
+`sigel_eval.cpp` at the repository root**. The D26 review found two headers.
+Found by removing the include and letting the compiler answer: **175 error
+diagnostics**, `check.sh` down to 94 pass / 15 fail. *An earlier draft said
+"nineteen files, 30 errors" — the first omits the root file, the second is
+reproducible under no scope I can construct.* Each now includes what it uses. *My first
 sweep tested only for shim **types** and missed every file that used a plain Qt
 6 type transitively — the same "too narrow a scope" shape as §9's table.*
 
 **`check.sh` lost its shim self-check step.** That step built and **ran**
 `q2compat_check.cpp` under ASan and UBSan, and was described in the script as
 the only mechanical check that could see an ownership error. It only ever
-tested the compatibility layer, so nothing remains for it to check. *It was
-reported separately and never counted in the module totals, so 105/4 is
-unchanged by its removal — an earlier version of the replacement comment
-claimed the count would drop by one.*
+tested the compatibility layer, so nothing remains for it to check. *It fed only
+the grand `fail` counter, never `pass`, so 105/4 is unchanged — verified by
+running the parent's `check.sh` on the parent's tree. An earlier version of the
+replacement comment claimed the count would drop by one.*
+
+**`check.sh` now executes no code at all** — it is `-fsyntax-only` plus the
+standalone-header pass. The deleted step was the only one that linked and ran
+anything. So **ownership of the evolution-loop containers (`fitTaskList`,
+`toSpawnList`, `tours`), which no gate can reach, now has no mechanical coverage
+of any kind.** `sigel_eval -selfcheck` still runs, but from `fitness-check.sh`,
+not `check.sh`.
+
+**Nothing that covered live converted code was lost.** All 19 assertion blocks
+were classified against the recovered file: every one tested a `Q2*` type that
+no longer exists, and the two behaviours the converted code reproduces by hand
+are now covered *better* — `Q2CString::size()` counting the NUL is checked by
+`pvm-check.sh` through **real PVM**, and the copy-constructor ownership hazard is
+enforced at **compile time** (`= delete`) instead of by a runtime assertion.
+
+**But it was also an executable specification for four Qt 2 semantics that
+UNPORTED code still depends on**, and those consumers are still on the Qt 2 API.
+Phase C now has to re-derive these from `qglist.cpp` instead of reading a
+reviewed, runnable spec — **recover the file from git history rather than
+guessing**:
+
+| semantic | consumer still on the Qt 2 API |
+|---|---|
+| `QQueue::dequeue` must unlink on a **null head** — the self-check noted it "used to spin forever" otherwise | the `MT_GUI` queue |
+| `QQueue::remove()` exists (`qqueue.h:60`), and `head()` after it | `MT_GUI/MT_ExperimentWidget.cpp:43,51` |
+| **`remove(ptr)`: removes *that* pointer not the current one, reports whether it unlinked, never frees while non-owning, and a failed search KILLS the cursor.** The self-check called all three "load-bearing" | `SIGEL_MasterGUI/SIG_GPParameter.cpp:520` — `if ( hostList2.remove( host ) ) delete host;` |
+| `QListIterator` stays dead off the end; `atFirst()`/`atLast()` both true on empty | the 10 remaining `QListIterator` lines |
+
+**`Qt2CursorList` was verified, not assumed.** Review checked it line by line
+against vendored `qglist.cpp`, ran it against the recovered `Q2PtrList` over
+**20,000 randomised trials × 40 operations** comparing full state after every
+step (0 divergences), repeated that against an independent node-for-node
+`QGList` transcription so a *shared misreading* would surface (0 divergences),
+and mutation-tested both the probe and the shipped check — perturbing D18's
+index walk makes `-selfcheck` fail and exit 1. It covers 6 operations where the
+self-check covered 11; the missing five (`prepend`, `at(i)`, `remove(idx)`,
+`removeFirst`, `removeLast`) have no converted consumer.
 
 **Gates unchanged: 105 pass, 4 fail, 309 warnings, both baselines empty,
 sanitized clean, PVM both PASS, `sigel_eval -selfcheck` ok.**
@@ -4516,9 +4584,11 @@ sanitized clean, PVM both PASS, `sigel_eval -selfcheck` ok.**
 **What the layer was.** 806 lines at its peak, 539 at deletion; six container
 types reproducing Qt 2.3 semantics on Qt 6. It existed so the port could convert
 one container at a time with both halves of the tree compiling throughout, and
-so that the differential tests had something to compare against. Twenty-seven
-steps used it. Its own self-check caught ownership errors that no gate could
-reach.
+so that the differential tests had something to compare against. **23 commits
+changed `q2compat.h` and 20 changed the self-check** — *an earlier draft said
+"twenty-seven steps used it", which is not measurable as stated.* The self-check
+held **80** assertions, not the "~40" the deleted `check.sh` comment claimed and
+this section repeated without measuring.
 
 ### A logging system
 

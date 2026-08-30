@@ -1,7 +1,7 @@
 #!/bin/sh
 # Exit criterion for the Qt 6 port (PORTING.md D11).
 #
-#   ./check.sh                 all converted modules + the shim self-check
+#   ./check.sh                 all converted modules, syntax only
 #   ./check.sh MT_GPSystem     one module
 #
 # Vendored headers use -isystem so their warnings do not drown SIGEL's own:
