@@ -414,9 +414,14 @@ through `f0f2daa`.
 `SIGEL_Visualisation` 22 + `SIGEL_CommonGUI` 10, both newly covered) (105/4/309 before Phase C; 322 warnings on
 2026-08-28 — the drops are recorded per step and each is explained, because a
 step that silently loses a warning has hidden something). The 4 failures are
-exactly the files the Makefile excludes. **The 98 new passes are the
-`forms (Phase C)` section**, six checks over each of the 20 forms — not new
-module coverage. A GUI module still joins `MODULES` only at C3–C7. It was 118/4/338 until the Dynamo backend was deleted
+exactly the files the Makefile excludes. Of the 112 passes added since Phase C began, **98 are the `forms (Phase C)`
+section** — six checks over each of the 20 forms — and **14 are genuine new
+module coverage**: `SIGEL_Visualisation` (12) joined `MODULES` at C5 and
+`SIGEL_CommonGUI` (2) at C3. A GUI module joins only when every file in it
+compiles. *This paragraph said "not new module coverage… a GUI module still
+joins only at C3–C7" while the paragraph fifteen lines below already said the
+opposite. It is the exit criterion, which is the first thing §0 sends a new
+session to.* It was 118/4/338 until the Dynamo backend was deleted
 (`physics_backends.md`); the pass count and "headers standalone" each fall by
 exactly 13, one per deleted file pair, and the failing files are unchanged.
 
@@ -425,7 +430,7 @@ exactly 13, one per deleted file pair, and the failing files are unchanged.
 and every converted header standalone, and since C1 also runs `uic`, `moc` and
 `rcc` over the converted forms; **it executes no SIGEL code**, D27 having
 deleted the shim self-check that was the only step which did.
-Vendored headers are `-isystem`, so their warnings do not bury the **309** in
+Vendored headers are `-isystem`, so their warnings do not bury the **341** in
 our own code.
 
 **Warnings count.** They were not read up to A8, and the `Qt::endl`-on-
@@ -2021,8 +2026,8 @@ headers compile**, once `libglu1-mesa-dev` was installed. The module is in
 **`-lGLU` IS REQUIRED, AND §7 SAYS IT IS NOT.** Phase R records "`-lGL`, no
 `-lGLU` — nothing references GLU", which was measured on the **core** build and
 is false for the interface: `SIG_Visualisation.cpp` calls **`gluPerspective`**
-and **`gluLookAt`**. `libglu1-mesa-dev` is not installed here, so that one file
-cannot compile and C9's link line will need `-lGLU`. *A measurement of core
+and **`gluLookAt`**. `libglu1-mesa-dev` had to be installed — it was not, which is what blocked that
+one file — and **C9's link line needs `-lGLU`**, which the Makefile now carries. *A measurement of core
 quoted forward as a fact about the tree — §9's shape.*
 
 **Ownership settled from the 1.3 binary before writing anything**, which is what
@@ -2185,7 +2190,7 @@ Two sources, 665 LOC, done after C5 because it reads C5's `floatingTexts`.
 |---|---|
 | `class … : public QGLWidget`, `#include <qgl.h>` | `QOpenGLWidget`, `<QOpenGLWidget>`. The three virtuals `initializeGL`/`resizeGL`/`paintGL` are unchanged, and raw GL calls still work because the context is current inside them |
 | `QGLWidget(parent, name, 0, f)` | `QOpenGLWidget(parent, f)` + `setObjectName` |
-| `updateGL()` ×4 | `update()` |
+| `updateGL()` ×4 | `update()` — **and these are not equivalent.** Qt 2's `updateGL()` **is** `glDraw()`: `makeCurrent(); paintGL(); swapBuffers();`, all before the call returns (`qgl.cpp:1394,1600-1618`). Qt 6's `update()` posts a paint event. Safe at C3's four sites — none reads back anything `paintGL` produces — but **C4 has 16 more and one is on the movie path**: `SIG_SimulationVisualisationWidget::slotSimulationProgress` does `makeTimeSteps(1); updateGL();` where `makeTimeSteps` grabs the frame *before* the redraw. C4 must decide that deliberately |
 | `WFlags` ×2 | `Qt::WindowFlags` |
 | `QVector<SIG_FloatingTextLabel>` + `setAutoDelete(true)` | `QList<SIG_FloatingTextLabel *>` with the frees written out |
 | `QLabel( parent, name )` | `QLabel( parent )` + `setObjectName` |
@@ -2196,8 +2201,13 @@ Two sources, 665 LOC, done after C5 because it reads C5's `floatingTexts`.
 are Qt **children** of the widget *and* were owned by the vector's
 `autoDelete`. Not a double free: the member is destroyed before the `QWidget`
 base, so each label unparented itself and `~QWidget` found none left —
-disassembly of the 1.3 slave shows exactly that at `0x0806edd7`, `~QVector`
-then `~QGLWidget`. The `qDeleteAll` is in the destructor **body**, which runs
+disassembly of the 1.3 slave shows exactly that — **`~QVector` at `0x0806edec`,
+then `~QGLWidget` at `0x0806edfc`**. *This cited `0x0806edd7`, in three places
+at once including a permanent source comment. That address is the `call *%esi`
+that dispatches `delete visualisation` and has nothing to do with either
+destructor: the claim was true and its only evidence pointed elsewhere, so
+anyone re-deriving it would have landed on the wrong instruction and concluded
+the record was invented. Found by review.* The `qDeleteAll` is in the destructor **body**, which runs
 before the base, so the order is preserved. `initFloatingTextWidgets`'
 `clear()` was likewise the free for the previous labels; without an explicit
 `qDeleteAll` they would survive as children and **stay on screen**.
@@ -2218,6 +2228,32 @@ oracle exchange under C5. `QOpenGLWidget` composites children correctly where
 `QGLWidget`, a native child window, often did not, so this port may well make
 them **more** visible than Qt 2 did. Nobody can currently detect that in either
 direction, and C9 is the first step that could.
+
+**C3 introduces a new Qt module dependency, and C9 needs it on the link line.**
+`<QOpenGLWidget>` resolves only via `QtOpenGLWidgets`. That went into `check.sh`
+and, until review caught it, nowhere else — the Makefile's `SIGINC` still named
+only `QtCore QtGui QtWidgets` and neither link line had `-lQt6OpenGLWidgets`.
+Both now carry the include paths and `-lQt6OpenGLWidgets -lQt6OpenGL … -lGLU`,
+verified by a from-scratch build of both trees. *`check.sh` carries a comment
+warning that disagreeing with the Makefile about flags has already produced one
+phantom failure; C5 wrote a whole paragraph for exactly this shape of forward
+requirement and C3 wrote none.*
+
+**The module's 10 new warnings, named, because §7 says warnings are part of the
+criterion.** Six are `QMouseEvent::x()`/`y()`, kept verbatim — correct and
+widget-relative in Qt 6.10, but `QT_DEPRECATED_VERSION_X_6_0("Use position()")`.
+Three are one pre-existing `-Wreorder` from the 2003 initialiser list, and one
+is an unused parameter in `SIG_FloatingTextLabel::mousePressEvent`. So C3 owns
+7 of the 10, and the `x()`/`y()` six are a **deferred conversion**, not a clean
+port.
+
+**A build churn that could have made a gate lie, fixed.** `make` treats the
+generated `moc/*.cpp` as **intermediate** and deletes them after linking, so the
+next `make` regenerates them, recompiles the objects and relinks — leaving
+`sigel_eval` newer than nothing and older than its own prerequisites. The three
+gate scripts run `make -q` first and refuse a stale binary (the D13 trap), so
+this shows up as "is out of date" on a tree where nothing changed. `.SECONDARY`
+keeps them; `make -q` is now clean after a second `make`.
 
 **`SIG_SimulationWidgetBase`'s form is still blocked, but on C4 now, not C3** —
 its custom widget's own header (`SIGEL_SlaveGUI/SIG_SimulationVisualisationWidget.h`)
@@ -2505,6 +2541,37 @@ are more dangerous than arithmetic errors because the result looks clean.
 **The shape is always the same:** a bounded observation reported as a general
 one, or a proxy measured in place of the thing it stands for.
 
+**A sharper form of it, learned 2026-08-30 and worth more than the individual
+findings it came from: an audit whose reference implementation shares the
+property under test cannot see divergence in that property.** Two independent
+audits of `QTextStream`'s double formatting both returned clean and both were
+blind in the same place — the x86 side validated 1.3 against Python's `%g`,
+which shares glibc's round-half-to-even, so a tie-rule difference was
+unreachable by construction; this side sampled 200,000 random bit patterns,
+which essentially never land on an exact tie. Neither method was wrong. **A
+differential test is only as good as the difference between the two
+implementations you chose**, and a random sample is only as good as the density
+of the failure class within it.
+
+**And its companion, from the same day: validate a parser on TWO independent
+quantities.** A joint-limit sweep that reproduced the known record count of 61
+was trusted, and undercounted the distinct limit pairs 4 against 7; the error
+surfaced only when a second, independently derived figure disagreed. A single
+agreeing number is consistent with a parser wrong in a way that number cannot
+see. *One of the two regexes involved failed because it encoded an unstated
+belief about the data — that these records end in zero — and then silently
+enforced it. It did not error and it did not warn; it returned a smaller,
+self-consistent, entirely plausible answer.*
+
+**Which findings rest on what.** This file mixes two kinds of evidence and the
+difference matters when deciding how much weight to put on one:
+
+| evidence | examples | strength |
+|---|---|---|
+| **a running gate** | the `initial` rest angle, the `Q2Dict` ordering, the 42 fitness evaluations, the eight duplicate-key lookups | strongest available here — byte-identical across five phases |
+| **the 1.3 binary, statically** | the randomiser's constants, `setAutoDelete` per constructor, destruction order, the truncated-π factor | strong, and the only route to code no gate reaches |
+| **inspection and review alone** | the evolution-loop containers, the `±DBL_MAX` sentinel, the `-0` question, the tie class | weakest — and these are latent *precisely because* no gate reaches them, which is why they needed the binary rather than a test suite |
+
 **A second shape, found late: facts filed separately that are only wrong
 together.** The `±DBL_MAX` sentinel was correctly recorded. The `%g` precision-6
 writer was correctly recorded. The multiply-before-divide 1.3 regression was
@@ -2685,10 +2752,41 @@ in `double`. So x87-versus-SSE genuinely does not matter for this one.
 writes with the same `%g` at precision 6 (§ the fourth-family finding) and makes
 the same `==` comparison against the same two constants at `0x81ec310` and
 `0x81ec318`. **Latent in both**, confirmed from two sides: `grep` finds `1.79769e+308` in
-**no** shipped `.exp` or `.rrb`, and all **61** `RotationalJoint` records in the
-shipped experiments carry finite limits — only four distinct pairs across the
-whole corpus, `0/35`, `-45/45`, `-85/85`, `-90/90`. No distributed model has an
-unbounded joint to lose.
+**no** shipped `.exp` or `.rrb`. **Re-measured 2026-08-30 over all 14 `.exp`:
+73 `RotationalJoint` records, every limit finite, no sentinel.**
+
+*Two corrections, both found by cross-checking against the x86 box.* The old
+figures were **61 records and four distinct pairs** — 61 is right for the **12**
+experiments in `experiments.tar.gz`, and this file has **14**: the two
+`runner*.exp` come from `data/results/`. And the pairs are **seven**, not four:
+
+    -45/45  26    0/35  12    45/80  11    -90/-50  10    -90/90  7    -85/85  6    0/90  1
+
+The three that were missing — `45/80`, `-90/-50`, `0/90` — account for 18 of the
+original 61. The 7 `.rrb` models agree independently: 53 rotational joints, the
+same seven pairs, spelled `minimal`/`maximal`.
+
+**A joint record is TWO lines and the limits are on the second.** The first
+carries `mechsMinPos`/`mechsMaxPos`, the DynaMechs-frame values, which are `0 0`
+in every shipped file and are recomputed by `transformToDynaMechs` before use.
+Parsing the first line yields `(0,0)` for all 73 and looks like a finding; it is
+not. *The parser that produced the seven pairs was validated by reproducing the
+known record count of 61 first — and the count agreeing while the pairs did not
+is what exposed the error. Validate a parser on two independent quantities: a
+single agreeing number is consistent with a parser wrong in a way that number
+cannot see.*
+
+**The third field on that second line is `initial`** — the joint's rest angle,
+confirmed from `SIG_RotationalJoint::writeToFileTransfer` (`:180`), its reader
+(`:42`) and the `.rrb` keyword `init`. It is **live**: `getGeomRelation`
+(`:133-150`) feeds it to `calculateAnyJoint` as the rotation between the two
+links, so it sets the pose DynaMechs starts from. 24 of 73 records carry a
+non-zero value (±45, −30) across the four multi-limb robots. **Unlike everything
+else in this section it is gate-covered** — fitness is distance-over-time from
+that pose, and `fitness-check.sh` has been byte-identical across 3 individuals ×
+14 experiments through Phases A, D, P and C1–C5.
+
+No distributed model has an unbounded joint to lose.
 
 **Do not "fix" it.** The three tempting repairs all change behaviour against the
 reference: widening the write precision alters every number in every file;

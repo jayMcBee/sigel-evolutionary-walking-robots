@@ -25,7 +25,7 @@
 
 #include <QList>
 #include <QOpenGLWidget>
-#include <qlabel.h>
+#include <QLabel>
 
 #include "SIGEL_Visualisation/SIG_Visualisation.h"
 #include "SIGEL_CommonGUI/SIG_FloatingTextLabel.h"
@@ -186,7 +186,7 @@ using namespace SIGEL_CommonGUI;
        * In some cases it is also called by other methods
        * (when changing the eyepoint while automaticRefresh
        * being true). This is only done indirectly by calling
-       * the method updateGL.
+       * the method update.
        */
       virtual void paintGL();
 

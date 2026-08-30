@@ -279,7 +279,8 @@ RCC   := $(QTBIN)/rcc
 
 SIGSAN := -fsanitize=address,undefined -fno-omit-frame-pointer
 SIGINC := -Ishim -I$(SRC)/include -I$(B)/ui -isystem $(QTINC) \
-          $(addprefix -isystem $(QTINC)/,QtCore QtGui QtWidgets) \
+          $(addprefix -isystem $(QTINC)/,QtCore QtGui QtWidgets \
+                                        QtOpenGL QtOpenGLWidgets) \
           $(addprefix -isystem $(SL)/,newmat09 dynamechs/dm Dynamo/Src/Inc \
                                       fparser cv97 SOLID-2.0/include pvm3/include)
 SIGCXX := g++ -std=c++17 -O1 -g -Wall -Wextra \
@@ -384,6 +385,12 @@ MOC_HDRS := MT_GPSystem/MT_GPManager.h \
             SIGEL_Simulation/SIG_Simulation.h
 MOC_OBJS := $(patsubst %.h,$(OBJ)/moc/%.o,$(MOC_HDRS))
 
+# make treats these as intermediate and DELETES them after linking, so the next
+# make regenerates the .cpp, recompiles the .o, and relinks -- which leaves the
+# binary looking out of date to the gate scripts' `make -q' guard even though
+# nothing changed. Keep them.
+.SECONDARY: $(patsubst %.h,$(B)/moc/%.cpp,$(MOC_HDRS))
+
 $(B)/moc/%.cpp: $(SRC)/include/%.h
 	@mkdir -p $(dir $@)
 	$(MOC) $(subst -isystem ,-I,$(SIGINC)) $< -o $@   # moc rejects -isystem
@@ -423,7 +430,7 @@ CLEAN_OBJ := $(OBJ)/sigel/SIGEL_GP/SIG_GPExperimentClean.o
 $(B)/sigel_eval: sigel_eval.cpp $(MOC_OBJS) $(CLEAN_OBJ) $(CORE_LIBS) $(VENDOR_LIBS)
 	$(SIGCXX) $(SIGINC) $< $(MOC_OBJS) $(CLEAN_OBJ) -o $@ \
 	  -Wl,--start-group $(CORE_LIBS) $(VENDOR_LIBS) -Wl,--end-group \
-	  -L$(QTLIB) -lQt6Widgets -lQt6Gui -lQt6Core -lGL -lm
+	  -L$(QTLIB) -lQt6OpenGLWidgets -lQt6OpenGL -lQt6Widgets -lQt6Gui -lQt6Core -lGL -lGLU -lm
 	@n=`nm -C $@ | grep -c 'MT_Controller' || true`; \
 	 test "$$n" -eq 0 || { \
 	   echo "sigel_eval linked the MASTER SIG_GPExperiment: $$n MT_Controller" \
@@ -458,7 +465,7 @@ $(B)/pvm_link: pvm_link.cpp $(PVM_OBJS) $(MOC_OBJS) $(CORE_LIBS) $(VENDOR_LIBS) 
 	$(SIGCXX) $(SIGINC) $< $(PVM_OBJS) $(MOC_OBJS) -o $@ \
 	  -Wl,--start-group $(CORE_LIBS) $(VENDOR_LIBS) -Wl,--end-group \
 	  $(PVM_LIB) -ltirpc \
-	  -L$(QTLIB) -lQt6Widgets -lQt6Gui -lQt6Core -lGL -lm
+	  -L$(QTLIB) -lQt6OpenGLWidgets -lQt6OpenGL -lQt6Widgets -lQt6Gui -lQt6Core -lGL -lGLU -lm
 	@bad=`nm --undefined-only --print-file-name $(CORE_LIBS) 2>/dev/null \
 	      | sed -n 's/.*:\(.*\.o\): *U pvm_.*/\1/p' | sort -u \
 	      | grep -v -e SIG_GPFitnessTrainer.o -e SIG_GPPVMData.o`; \

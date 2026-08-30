@@ -23,7 +23,7 @@
 #ifndef SIGEL_COMMONGUI_SIG_FLOATINGTEXTLABEL_H
 #define SIGEL_COMMONGUI_SIG_FLOATINGTEXTLABEL_H
 
-#include <qlabel.h>
+#include <QLabel>
 
 namespace SIGEL_CommonGUI
 {
