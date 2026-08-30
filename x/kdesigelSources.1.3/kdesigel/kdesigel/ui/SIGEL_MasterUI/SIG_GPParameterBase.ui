@@ -1971,7 +1971,11 @@
                           </widget>
                         </item>
                         <item>
-                          <widget class="Line" name="Line2"/>
+                          <widget class="Line" name="Line2">
+                            <property name="orientation">
+                              <enum>Qt::Horizontal</enum>
+                            </property>
+                          </widget>
                         </item>
                         <item>
                           <widget class="QPushButton" name="pushbuttonEnableAll">

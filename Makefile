@@ -320,10 +320,15 @@ UI_HDRS  := $(patsubst %,$(B)/ui/ui_%.h,$(notdir $(FORMS)))
 QRC_OBJS := $(patsubst %,$(OBJ)/qrc/%.o,$(notdir $(QRCS)))
 
 # The qrc objects are built here, not just generated, so that check.sh covers
-# rcc: a .qrc naming a file that is not there, or a malformed one, fails the
-# gate instead of waiting for C7 to link. C7 must name these on the link line
-# EXPLICITLY -- a resource object that ends up inside a static archive with
-# nothing referencing it is dropped, and the icons silently vanish again.
+# rcc at all: a malformed .qrc fails the gate instead of waiting for C7 to link.
+# It does NOT catch a .qrc naming a missing file -- this rule depends on the
+# .qrc, not on the files listed inside it, so a deleted image leaves the stale
+# object in place and make exits 0. check.sh's forward resource check is what
+# fires there. (An earlier version of this comment claimed the rule covered it;
+# corrected by the C1 review, which measured it.)
+# C7 must name these on the link line EXPLICITLY -- a resource object that ends
+# up inside a static archive with nothing referencing it is dropped, and the
+# icons silently vanish again.
 .PHONY: forms
 forms: $(UI_HDRS) $(QRC_OBJS)
 

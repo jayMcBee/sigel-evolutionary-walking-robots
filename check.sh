@@ -73,13 +73,17 @@ printf '%-22s %2d pass  %2d fail\n' "headers standalone" "$hp" "$hf"
 # so far would be covered by nothing at all, and §7 says extending this script
 # is part of the first Phase C step rather than an afterthought.
 #
-# Four things per form, because three of them can break independently:
+# Six things per form, because they break independently:
 #   1. Qt 6's uic accepts the converted .ui           (make forms)
 #   2. the generated ui_<Form>.h compiles standalone
 #   3. the committed QWidget-derived base class compiles
 #   4. moc accepts that base class and its output compiles
+#   5. the .qrc and the generated header agree, in BOTH directions
+#   6. every Designer Line still carries an orientation
 # (4) is here because nothing links SIGEL_MasterGUI yet, so a Q_OBJECT that moc
-# chokes on would otherwise not be found until C7.
+# chokes on would otherwise not be found until C7. (5) and (6) cover the two
+# losses that are silent everywhere else -- a dropped image and a dropped
+# separator orientation both compile, run, and just render wrong.
 #
 # Generation is delegated to the Makefile rather than repeated here: check.sh
 # disagreeing with the Makefile about flags has already produced one phantom
@@ -88,8 +92,12 @@ FORM_LIST="SIGEL_MasterUI/SIG_GPParameterBase:SIGEL_MasterGUI"
 
 MOCBIN=$(qmake6 -query QT_INSTALL_LIBEXECS)/moc
 fp=0; ff=0; fw=0
+# `forms' runs uic AND rcc AND compiles the resource object, so a failure here
+# is not necessarily uic's -- calling it "uic FAIL" sent the reader after the
+# wrong tool. It also skips checks 2-6, so say that rather than let six passes
+# quietly disappear from the total. Found by the C1 review.
 if ! make -s -C "$ROOT" forms >/tmp/uic.$$ 2>&1; then
-    echo "  uic FAIL:"; cat /tmp/uic.$$; ff=$((ff+1))
+    echo "  make forms FAILED -- checks 2-6 below did not run:"; cat /tmp/uic.$$; ff=$((ff+1))
 else
     # uic writes warnings to stderr and still exits 0 -- a dropped <images>
     # block or a renamed duplicate widget is reported exactly this way, and
@@ -128,7 +136,14 @@ else
         # LOST its images passes trivially, because there is then no ":/..." to
         # check -- which is exactly the failure this exists to catch.
         qrc="$SRC/ui/$form.qrc"
-        pfx=$(sed -n 's/.*<qresource prefix="\([^"]*\)".*/\1/p' "$qrc" 2>/dev/null)
+        # `pfx=$(sed ...)' takes sed's exit status, and sed on a missing file
+        # exits 2 -- so under `set -e' this killed the script before the
+        # [ -f "$qrc" ] guard below, which exists for exactly that case, could
+        # run. 19 of the 20 forms have no .qrc, so C2's first added form would
+        # have aborted the gate with no forms line and no total printed.
+        # Found by the C1 review.
+        pfx=
+        [ -f "$qrc" ] && pfx=$(sed -n 's/.*<qresource prefix="\([^"]*\)".*/\1/p' "$qrc")
         for want in $(grep -o ':/[A-Za-z0-9_/.-]*' "$ROOT/build/ui/ui_$base.h" | sort -u); do
             [ -f "$qrc" ] || { ff=$((ff+1)); echo "  form FAIL: $want but no $form.qrc"; continue; }
             rel=${want#:$pfx/}
@@ -143,6 +158,18 @@ else
                 else ff=$((ff+1)); echo "  form FAIL: $form.qrc carries $have, ui_$base.h never uses it"; fi
             done
         fi
+        # 6. every Designer separator still says which way it runs.
+        # `uic3 -convert' DROPS a Line's `orientation', and that property is the
+        # only thing Qt 6's uic reads to choose a frame shape: without it the
+        # widget is a bare QFrame, i.e. NoFrame, and the separator paints
+        # nothing. Invisible to every other check here -- it cost C1 one
+        # separator, and 5 more Lines are waiting in 2 of C2's forms.
+        # Found by the C1 review.
+        nline=$(grep -c '<widget class="Line"' "$SRC/ui/$form.ui" || true)
+        norient=$(grep -A3 '<widget class="Line"' "$SRC/ui/$form.ui" \
+                  | grep -c '<property name="orientation">' || true)
+        if [ "$nline" -eq "$norient" ]; then fp=$((fp+1))
+        else ff=$((ff+1)); echo "  form FAIL: $form.ui has $nline Line widgets but $norient orientations"; fi
     done
 fi
 printf '%-22s %2d pass  %2d fail  %3d warnings\n' "forms (Phase C)" "$fp" "$ff" "$fw"
