@@ -1,7 +1,8 @@
 # C++ modernization — working list
 
-**Scope: C++ language level only.** Independent of the Qt port; do not combine
-commits across the two.
+**Scope: C++ language level (§1–§4), plus the deferred renames, the German
+translation and the version bump below.** Independent of the Qt port; do not
+combine commits across the two.
 
 **Protocol:** one commit per item. Jan reviews and approves each. Items 1–2 are
 purely mechanical; everything from 3 on gets reviewed and discussed before it
@@ -210,6 +211,75 @@ nobody can check.
 
 Same reason as the `SIG_GPExperiment` rename above, and worth doing in the same
 pass.
+
+## Translate the German — after the Qt 6 port is complete and validated
+
+SIGEL was written at Uni Dortmund and parts of it are in German, against the
+English of the rest of the tree. This is 2003 upstream, not debt the port
+created. Counts measured 2026-08-30 by grep over the extracted 1.3 tree.
+
+**The umlauts are Latin-1 bytes, not UTF-8.** A UTF-8 grep misses them.
+
+**Three phases, one commit per phase, in this order.**
+
+- [ ] **10. Comments** — 118 lines in 46 files
+  Includes 15 `NEU NEU NEU…` banner lines (`MT_Classifier.cpp`,
+  `MT_Substitute.cpp`, `SIG_GPManager.cpp`) and 6 MSVC German-locale file
+  headers (`Schnittstelle für die Klasse` / `Implementierung der Klasse` /
+  `Konstruktion/Destruktion`, all five `MT_GUI` pairs plus `MT_Tournament.cpp`).
+  Nothing to verify — nothing executes.
+
+- [ ] **11. Strings** — 11 lines in 4 files
+  `MT_GPManager.cpp:277,332,333,341`, `SIG_GPIndividual.cpp:384,385`,
+  `SIG_GPManager.cpp:627,1053`, `SIG_GPOperations.cpp:697`.
+
+  **No compiler and no gate checks this phase.** All three persisted paths were
+  checked and all three are safe:
+  - `SIG_GPIndividual::writeToFile` writes history; `readFromFile` parses only
+    `NAME='`, `POOLPOS=`, `FITNESS=`, `AGE=`, `PROGRAM BEGIN{`. History is never
+    read back.
+  - The `MT_GPManager` block sits after that file's own marker
+    *"Additional information about the fitness computation ... is not loaded"*.
+    Write-only.
+  - The ZORC serial format (`printToString()`) carries no German.
+
+- [ ] **12. Symbols** — 217 lines in 39 files, not user-visible
+  Every miss is a compile error, so `./check.sh` verifies this phase in full.
+
+  | symbol | where |
+  |---|---|
+  | `schlussJetzt` | `SIG_GPManager.h:136` + 5 uses |
+  | `liesdas` (ctor param) | `SIG_Scanner.h:43`, `SIG_RobotScanner.h:48`, `SIG_UnstreamerScanner.h:34` + 3 `.cpp` |
+  | `getRandomInstruktion`, `ProbInstruktion` | `MT_Randomizer.h:54,165` |
+  | `T_Instruktion`, `T_Instruk` | `MT_TranslatedIndividual.h:38,74` |
+  | `Instruktion` | `MT_Classifier.cpp:319` |
+  | `set`/`getSelektionValue` | `MT_FitnessTrainer.h:109,115`, `MT_GPManager.h:68` |
+  | `Varianz` | `MT_StatisticsElement.h:31` |
+  | `winkel`, `verschiebung`, `schiebung`, `drehmatrix`, `hilf`, `stflorianhilf` | `IFunctions.h:38`, `IFunctions.cpp:321,380–397` |
+  | `masse` | `SIG_Mirtich.h:80`, `.cpp:265,330` |
+  | `dichte`, `konstante`, `anderes_material`, `rot`/`gruen`/`blau` | `SIG_RobotCompiler.cpp:167–236` |
+  | `betrag`, `betraege`, `varianz`, `durchschnittProGelenk` | `SIG_GPForceFitnessFunction.cpp:105–122` |
+  | `ausgabeTerrain` | `SIG_Environment.cpp:460–536` |
+  | `zeiger` | `SIG_EnvironmentRenderer.cpp:447–455` |
+  | `zahl` | `SIG_Geometry.cpp:53` |
+
+  **The robot description grammar is entirely English** — `density`, `red`,
+  `green`, `blue`, `friction`, `minimal_rot`. So the German names in
+  `SIG_RobotCompiler.cpp` are locals holding the value of an English keyword and
+  the target name is already written in the grammar. `rot` elsewhere
+  (`getMinRot`, `rotMin`) is rotation, not the colour — leave it.
+
+**Do not translate:** `Sigel.mak`, `sigel_slave.mak`, `manage_dyn_slave.mak`,
+`Sigel.dsw`. MSVC-generated German, not built by this port. Delete them or leave
+them; do not hand-edit generated files.
+
+**Gate:** `./check.sh` after each phase, `./dictorder-dump.sh | diff -u
+dictorder-baseline.txt -` empty, `fitness-check.sh` clean. Phase 10 cannot move
+any of them, which is why it goes first.
+
+**Not before Phase C and validation.** `MT_GPManager`, `MT_Classifier` and
+`SIG_GPManager` carry most of the German and none of them compiles today — the
+same bar as the two renames above.
 
 ## Set the version to 2.0 — the LAST step of the port
 
