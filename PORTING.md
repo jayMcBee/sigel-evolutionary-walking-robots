@@ -32,7 +32,7 @@ build and run, because nothing else can be verified without it — see §3.
 | T — old-Qt tool container | **done 2026-08-27.** `tools/qtmig`, §4 |
 | D — delete the shim, migrate the data | **DONE 2026-08-30.** `q2compat.h` and `q2compat_check.cpp` deleted; `include/compat/` gone; **no `Q2*` shim type is used anywhere**. D1–D27. *This is not "no Qt 2 container exists" — the unported GUI modules still declare **71 lines** of `QArray`, `QDict`, `QList`-as-pointer-list and friends, all of which Phase C must convert. See D27.* The shim's self-check step is gone from `check.sh`, which now runs no code. §10 |
 | P — PVM | **DONE 2026-08-28.** Vendored 3.4.3 replaced by upstream 3.4.6; nine patches carry the four config lines and Debian's eight source fixes; `libpvm3.a` and `pvmd3` build; SIGEL's two PVM objects link against them and `SIG_GPPVMData` round-trips through real PVM. `sigel`/`sigel_slave` still need Phase C. §7 |
-| C — GUI | **not started, AUTHORIZED 2026-08-27 per D24.** ~450 Qt 2 sites + 20 forms |
+| C — GUI | **C1 DONE 2026-08-30**, AUTHORIZED 2026-08-27 per D24. **436 Qt 2 code sites** in the 5 GUI modules plus 9 container `#include`s, re-measured at C1 with the pattern stated — the old 466 rested on two rows that do not reproduce, one of which exceeds the whole tree. 20 forms, 1 converted. §7 |
 | V — check against the 1.3 binary | **V1, V5's MDH probe, V6, V7 and V8 all done, all PASS.** Ordering: 10 of 10 container orders match. Arithmetic: `twoBases` exact bit for bit, `octopus` 9/9 with three joints exact and 5 ulp worst. **V6, V7 and V8 done 2026-08-29** — friction and no-collide negotiation, their four remaining rules, and the GP parameter blocks captured *before* their conversion. `verification-against-sigel-1.3/v6`, `v7`, `v8`. V2–V4 not started; V5's sensor and force probes are **invalid as specified** — both target Dynamo-only functions, deleted 2026-08-28. §7 |
 
 **SCOPE — DECIDED 2026-08-23. Read this before changing anything.**
@@ -338,7 +338,7 @@ first choice, because the rename has to be undone afterwards.
 | # | Decision | Answer |
 |---|---|---|
 | **D1** | Migration strategy | ~~**(a)** compat shim over Qt 6~~ — **superseded 2026-08-27 by D19** |
-| **D2** | Target Qt version | **6.9.2**, Ubuntu `qt6-base-dev`; recorded, not pinned |
+| **D2** | Target Qt version | **6.9.2**, Ubuntu `qt6-base-dev`; recorded, not pinned. `qmake6 -query QT_VERSION` and `uic --version` both say **6.10.2** on 2026-08-30 at C1. Why it moved from the recorded 6.9.2 is not established here; what is measured is that nothing was changed to follow it and all four gates reproduce, warning count included |
 | **D3** | GUI scope | ~~**(b)** core only~~ — **superseded 2026-08-27: Phase C is the goal and is AUTHORIZED** |
 | **D4** | GUI toolkit | **(a)** Qt 6 Widgets *(Phase C)* |
 | **D5** | `.ui` handling | ~~**(a)** converter script~~ — **superseded 2026-08-27 by D20**: `uic3 -convert` |
@@ -360,14 +360,14 @@ D20 supersedes D5, D24 supersedes D3.
 | # | Decision | Answer |
 |---|---|---|
 | **D19** | Migration strategy | **staged and tool-assisted.** Qt 2 → Qt 4 + Qt3Support → Qt 6, via `uic3 -convert` and `qt3to4` in a container (§4). Supersedes D1(a). The existing `q2compat.h` shim **stays** for the core, which is already through it and works |
-| **D19a** | The core/GUI boundary | **SETTLED 2026-08-27 by D25: delete the shim from core first, then port the GUI once, straight to clean Qt 6.** Measured, not assumed: `qt3to4` leaves Qt 2's `QList`/`QDict`/`QArray`/`QVector` **completely untouched** — 9 `QList<>` in `SIG_GPParameter.cpp` before, 9 after, 0 `Q3PtrList`. Qt 3 had already renamed `QList` to `QPtrList`, so `q3porting.xml` maps *that*; our Qt 2 spelling reads to it as a Qt 4 class. So the boundary fails loudly at compile time (Qt 6's `QList` is a value list) rather than silently, and the choice is real: spread the shim to 466 more GUI sites and remove it twice, or remove it once, first |
+| **D19a** | The core/GUI boundary | **SETTLED 2026-08-27 by D25: delete the shim from core first, then port the GUI once, straight to clean Qt 6.** Measured, not assumed: `qt3to4` leaves Qt 2's `QList`/`QDict`/`QArray`/`QVector` **completely untouched** — 9 `QList<>` in `SIG_GPParameter.cpp` before, 9 after, 0 `Q3PtrList`. Qt 3 had already renamed `QList` to `QPtrList`, so `q3porting.xml` maps *that*; our Qt 2 spelling reads to it as a Qt 4 class. So the boundary fails loudly at compile time (Qt 6's `QList` is a value list) rather than silently, and the choice is real: spread the shim to 466 more GUI sites (**436**, re-measured at C1 — §7) and remove it twice, or remove it once, first |
 | **D20** | `.ui` handling | **`uic3 -convert` in the container**, straight from the Qt 2 form — measured in Phase T, no Qt 3 uplift needed. Supersedes D5(a). No hand-written form parser |
 | **D21** | Interface fidelity | **ported, not redesigned.** The 2003 interface arrives at Qt 6 as itself. A widget with no Qt 6 successor gets the nearest equivalent, recorded here — not a redesign |
 | **D22** | The Qt 2 style classes | **`QStyleFactory::create("Fusion")` for the `#else` (Motif) branch.** `QMotifPlusStyle` has no successor in Qt 6; Fusion is the closest it offers. Chosen 2026-08-27 after comparing the two styles Qt 6.9 offers here. **The `#ifdef _WINDOWS` branch keeps Windows** — `QWindowsStyle` is no longer a public class but Qt 6 still creates that style by name, so under D21 its nearest equivalent is `QStyleFactory::create("Windows")`, not Fusion |
 | **D23** | Phase C granularity | **one module or one form at a time**, each its own commit, each independently reviewable. No API-wide sweeps across modules |
 | **D24** | GUI scope | **Phase C is authorized.** Supersedes D3(b), which scoped the interface out. Named separately because D19–D23 did not carry it and the status table cited a struck-through row |
 | **D26** | What the 1.3 binary is asked for | **structure and arithmetic, not fitness equality.** Three tiers, in descending confidence: the container ordering and numbering, which compare exactly (V1, V2); per-individual fitness, which is chaotic across architectures and is therefore a judgement (V4); the non-integrating quantities, which compare exactly but need `gdb` (V5). Bit-exact agreement on an integrated trajectory is **not** a target and its absence proves nothing — §7. Recorded because this file repeatedly described the missing reference as "fitness numbers", which is the one thing that binary cannot usefully give |
-| **D25** | What "done" means | **Plain modern Qt 6, nothing left over.** `q2compat.h` deleted, no Qt3Support class anywhere, no compatibility flag on SIGEL's own code. This moves §10's "drop the Qt 2 emulation" from optional debt into a **required phase**, and with it the data migration that section describes — the shim exists because `Q2Dict`'s hash order numbers the links, so the 7 `.rrb` and 12 `.exp` files must be rewritten before it can go. **Ordered before Phase C**, so the 466 GUI sites are ported once, to the final target, instead of twice. Vendored third-party code is out of scope for this rule: qhull, cv97, Dynamo and PVM keep `-w -fpermissive` |
+| **D25** | What "done" means | **Plain modern Qt 6, nothing left over.** `q2compat.h` deleted, no Qt3Support class anywhere, no compatibility flag on SIGEL's own code. This moves §10's "drop the Qt 2 emulation" from optional debt into a **required phase**, and with it the data migration that section describes — the shim exists because `Q2Dict`'s hash order numbers the links, so the 7 `.rrb` and 12 `.exp` files must be rewritten before it can go. **Ordered before Phase C**, so the GUI sites (466 as counted then, **436** re-measured at C1 — §7) are ported once, to the final target, instead of twice. Vendored third-party code is out of scope for this rule: qhull, cv97, Dynamo and PVM keep `-w -fpermissive` |
 
 ## 5a. Decisions — signed off 2026-08-22, for Phase R
 
@@ -412,11 +412,12 @@ through `f0f2daa`.
 
 ## 7. Steps
 
-**Exit criterion per step:** `./check.sh` at the repo root — **105 pass, 4 fail,
-309 warnings** as of 2026-08-30 (322 on 2026-08-28; the drops are recorded per
-step and each is explained — a step that silently loses a warning has hidden
-something). The 4 failures are exactly the files the
-Makefile excludes. It was 118/4/338 until the Dynamo backend was deleted
+**Exit criterion per step:** `./check.sh` at the repo root — **110 pass, 4 fail,
+309 warnings** as of 2026-08-30, C1 (105/4/309 before it; 322 warnings on
+2026-08-28 — the drops are recorded per step and each is explained, because a
+step that silently loses a warning has hidden something). The 4 failures are
+exactly the files the Makefile excludes. **The 5 new passes are C1's
+`forms (Phase C)` section**, not new module coverage. It was 118/4/338 until the Dynamo backend was deleted
 (`physics_backends.md`); the pass count and "headers standalone" each fall by
 exactly 13, one per deleted file pair, and the failing files are unchanged.
 
@@ -432,11 +433,16 @@ our own code.
 `std::cerr` regression in A3 was reported by this very command at the step that
 introduced it, then shipped as "0 errors".
 
-**`check.sh` does not yet cover Phase C.** Its module list is the 9 core
-modules, and it compiles nothing under `src/` at top level — so
-`sigel.cpp`, `sigel_slave.cpp` and all 5 GUI modules are checked by nothing
-today. Extending it is part of the first Phase C step, not an afterthought.
-The repo-root programs are in the same hole: `sigel_eval.cpp`, `pvm_smoke.c`
+**`check.sh` covers Phase C as of C1, but only the converted forms.** Its
+module list is still the 9 core modules, so `sigel.cpp`, `sigel_slave.cpp` and
+all 5 GUI modules remain checked by nothing — a GUI module can only join
+`MODULES` when every file in it compiles, which is C3–C7. What C1 added is a
+`forms (Phase C)` section listing the forms converted so far and, per form,
+running `uic`, compiling the generated header standalone, compiling the
+committed base class, running `moc` over it, and checking the `.qrc` against
+the header in both directions. Extending it further is part of each step, not
+an afterthought.
+The repo-root programs are still in the hole: `sigel_eval.cpp`, `pvm_smoke.c`
 and `pvm_link.cpp` are compiled only by their own targets, never by `check.sh`.
 A break in them shows up as a build failure rather than a check failure.
 
@@ -708,7 +714,7 @@ succeeded.**
 **Gates any session must keep green**, all committed:
 
 ```
-./check.sh                                            105 pass, 4 fail
+./check.sh                                            110 pass, 4 fail
 ./dictorder-dump.sh | diff -u dictorder-baseline.txt -    empty
 ./fitness-check.sh  | diff -u fitness-baseline.txt -      empty
 ASAN_OPTIONS=detect_leaks=0 ./fitness-check.sh build      exit 0
@@ -1457,15 +1463,26 @@ the only independent source of numbers. All in `data/`, untracked.
 | T1 | `tools/Dockerfile.qtmig` + `tools/qtmig`: Qt 4.8's `uic3` and `qt3to4` over this repo | **done** |
 | T2 | Prove it on one form, then all 20 | **done** |
 
+**T2 EXERCISED ONE OF `uic3`'s FIVE MODES.** Everything below, and the residue
+table, is about `-convert`. The tool also has declaration, implementation,
+subclass and image-extraction modes, and three of them answer residue rows this
+plan was treating as hand work — including the QWidget-derived base class, whose
+absence from Qt 6's `uic` this section never noticed. Found at **C1**; the table
+is there, not repeated here.
+
 Build-time only. Nothing ships from it and nothing links against it.
 
 **Debian jessie is the last release that packages Qt 4's migration tools *and*
 has an arm64 port**, so this runs natively — no qemu, no x86 emulation, which
 is not registered on this host anyway. `libqt4-dev-bin` carries `uic3` and
 `qt3to4`; `libqt4-dev` carries `/usr/share/qt4/q3porting.xml`, the class-rename
-rules. Without `QTDIR` pointing at it, `uic3` warns once and then leaves every
-widget class unmapped. `/usr/bin/uic3` is a qtchooser stub — the image puts
-`/usr/lib/aarch64-linux-gnu/qt4/bin` first on `PATH` to skip it.
+rules. *This paragraph said `uic3` needs `QTDIR` pointing at that file or it
+"warns once and then leaves every widget class unmapped". **It does not** — the
+path is compiled into both tools and the converted output is byte-identical with
+`QTDIR` unset. `tools/Dockerfile.qtmig` records the correction; this section had
+not.* `/usr/bin/uic3` is a qtchooser stub — the image puts
+`/usr/lib/aarch64-linux-gnu/qt4/bin` first on `PATH` to skip it, and it resolves
+the multiarch triplet at build time rather than hardcoding aarch64.
 
 **T2 result — `uic3 -convert` reads the Qt 2 forms directly.** All 20 convert,
 0 failures, output `version="4.0"`, which Qt 6's `uic` accepts.
@@ -1524,25 +1541,69 @@ earlier draft claimed: 20 obsolete-pixmap-function, 21 `QLCDNumber::numDigits`,
 across all five modules — exactly what D23 forbids — and their Sites column was
 §2's tree-wide count, which includes sites Phase A already converted in core.
 
-**Measured 2026-08-27** over the 5 GUI modules, 117 files, Latin-1 safe:
-**466 Qt 2 sites.**
+**RE-MEASURED 2026-08-30 AT C1, AND THE PATTERN IS NOW STATED**, because the
+container row did not reproduce and neither did one other. The old figure was
+"466 Qt 2 sites, measured 2026-08-27 over the 5 GUI modules, 117 files,
+Latin-1 safe", which names the scope but not the unit — and the unit is where
+both errors are.
 
-| category | sites | |
-|---|---|---|
-| `QListView` / `QListViewItem` | 128 | D9 → `QTreeWidget` |
-| containers — `QArray` `QDict` `QVector` `QList` `QCString` `QValueList` `QListIterator` | 75 | **owned by no step until now.** *Re-measured 2026-08-30 after Phase D and this row does not reproduce: the listed types give **63**, and **78** if `QDictIterator` is included. The other seven rows all reproduce exactly, so this is a scope or pattern question, not drift. **Re-measure at C1 and state the pattern.*** |
-| `insertItem` | 66 | menus, combos, list boxes |
-| `WFlags` / `WType_*` / `WStyle_*` | 63 | → `Qt::WindowFlags`, `Qt::WA_*` |
-| `QString::null` | 42 | → `QString()` |
-| `QPopupMenu` | 40 | → `QMenu` |
-| `qApp` / `setCaption` / `QApplication` | 22 | |
-| `setAutoDelete` / `autoDelete` | 17 | **owned by no step until now** |
-| `QGLWidget` | 6 | → `QOpenGLWidget` |
-| `sprintf` 4, string methods 3 | 7 | |
-| `QMultiLineEdit` | **0** | all 6 are in `.ui` files, not in module code |
+- **Scope:** the 5 GUI modules, `src/<m>` and `include/<m>`, **117 files**.
+  `SIGEL_RealInterface` is a sixth GUI directory that is in **neither** this
+  table nor §2's module list; it contributes **0** to every row, so it is not
+  the gap it looks like. D27 counted it and got the same numbers.
+- **Tool:** `command grep -a` under `LC_ALL=C`. Plain `grep` wraps `ugrep -I`
+  and silently skips the Latin-1/CRLF files — §2 says so and it still bites.
+- **Unit: occurrences, not lines.** 8 of the 11 rows agree with occurrences and
+  disagree with lines, so that is the table's convention.
+- **`code` excludes a line whose only match is inside a comment**; `raw` counts
+  everything. Both are given because the difference is 17 sites and one row is
+  two-thirds comment.
 
-**The 92 container and `autoDelete` sites are the largest thing this plan has
-been missing.** Phase B covers the 14 *core* containers; D6/D7 were decided for
+| category | code | raw | |
+|---|---|---|---|
+| `QListView` / `QListViewItem` | **106** | 111 | D9 → `QTreeWidget`. *Was **128**, which is not a measurement of this tree at all — see below* |
+| containers — 9 Qt 2 types, **22 files** | **73** | 79 | `QArray` 21, `QDictIterator` 15, `QList` 14, `QListIterator` 10, `QVector` 5, `QDict` 3, `QValueList` 2, `QCString` 1, `QQueue` 1 — as **lines**, 72; one line carries two `QList`. *Was **75***. Still owned by no step but C3–C7 |
+| `insertItem` | 66 | 66 | menus, combos, list boxes |
+| `WFlags` / `WType_*` / `WStyle_*` | 63 | 63 | → `Qt::WindowFlags`, `Qt::WA_*` |
+| `QString::null` | 41 | 42 | → `QString()` |
+| `QPopupMenu` | 40 | 40 | → `QMenu` |
+| `qApp` / `setCaption` / `QApplication` | 22 | 22 | |
+| `setAutoDelete` / `autoDelete` | 16 | 17 | **owned by no step until C3–C7.** The 17th is a comment this port wrote |
+| `sprintf` 4, `.lower`/`.findRev`/`.upper` 3 | 7 | 7 | reproduces **only** call-shaped: the bare words give 12, mostly prose |
+| `QGLWidget` | **2** | 6 | → `QOpenGLWidget`. *4 of the 6 are comments; the code is one base-class clause and one constructor initialiser, both in `SIG_VisualisationWidget`* |
+| `QMultiLineEdit` | 0 | 0 | all 6 are in `.ui` files, not in module code |
+| Qt 2 container `#include`s | 9 | 9 | `<qarray.h>` and friends. A new row: they carry no type name, so no row above counted them, and every one has to go |
+| **total** | **445** | 462 | *was **466***, and that total was the sum of the rows rather than its own measurement |
+
+**Why 75 never reproduced, and why that is not drift.** The GUI tree is
+**byte-identical** to commit `ba25643`, which wrote this table — checked by
+extracting `src/` and `include/` at that commit with `git archive` and counting
+there: the same 62/63 for the seven listed types, 78/79 with `QDictIterator`
+and `QQueue`. Phase D changed no GUI file. So 75 is not a stale count of
+something that has since moved; it is not a count of these types under any
+scope or pattern I can construct.
+
+**`QListView`'s 128 is the sharper case: it exceeds the maximum.** A `grep` for
+`QListView|QListViewItem` over the **entire** `kdesigel` directory — every file,
+sources, headers, forms, project files — returns **117**. No subset of this tree
+can yield 128, so no scope argument can rescue it. *The note that stood here
+until this step said "the other seven rows all reproduce exactly", which made
+the container row look like an isolated slip. It was not: two rows were wrong,
+and the note asserting the others were fine had not checked them.* This is §9's
+characteristic failure once more — a figure quoted forward without its scope,
+and a claim about a set made without measuring the set.
+
+**D27's `71 lines` is right and its breakdown is not.** It gives `QList 15`
+where that type is 14 lines and 15 occurrences, so its own column sums to 72
+against a stated total of 71. It also omits `QCString` from its type list
+entirely. Lines, all 9 types, comments excluded: **72**.
+
+**The 89 container and `autoDelete` sites are the largest thing this plan has
+been missing** — 73 and 16 as re-measured above, plus the 9 `#include` lines.
+**No tool touches any of them**, which is what makes this row the work: D19a
+measured that `qt3to4` leaves Qt 2's `QList`/`QDict`/`QArray`/`QVector`
+completely untouched, and C1 confirms `uic3` is a *form* converter that never
+reads a `.cpp` at all. Phase B covers the 14 *core* containers; D6/D7 were decided for
 core *with the shim*, which D19 does not extend to the interface. They are now
 part of each module's step below, and D19a has to be settled first.
 
@@ -1551,11 +1612,11 @@ modules include the headers `uic` generates from them.
 
 | # | Work | Size |
 |---|---|---|
-| C1 | One form end to end — settles the residue table above, including the dropped slot declarations and the embedded images | 1 form |
+| C1 | **DONE 2026-08-30.** `SIG_GPParameterBase`, the only form with both an embedded image and dropped slots. Settles the residue table, the base-class question, and the build and check wiring — see below | 1 form |
 | C2 | The remaining 19 forms | 19 forms |
-| C3 | `SIGEL_CommonGUI` | 665 LOC, 2 files |
+| C3 | `SIGEL_CommonGUI` — carries **all 6** `QGLWidget` sites, 2 in code and 4 in comments, all in `SIG_VisualisationWidget` | 665 LOC, 2 files |
 | C4 | `SIGEL_SlaveGUI` | 2,145 LOC, 5 files |
-| C5 | `SIGEL_Visualisation` — carries all 6 `QGLWidget` sites | 3,544 LOC, 12 files |
+| C5 | `SIGEL_Visualisation` — *this row said it carries all 6 `QGLWidget` sites. It carries **none**: measured per module 2026-08-30, all 6 are C3's `SIGEL_CommonGUI`* | 3,544 LOC, 12 files |
 | C6 | `MT_GUI` | 3,911 LOC, 14 files |
 | C7 | `SIGEL_MasterGUI` | 7,717 LOC, 20 files |
 | C8 | `sigel.cpp`, `sigel_slave.cpp` | 15 sites |
@@ -1587,6 +1648,197 @@ the Qt 2 → Qt 4 XML in one step, including the property nesting and the
 substitution in the Phase T table, and checking the connections: `uic3` discards
 custom signals and slots, and there are 49 across the 20 forms.
 
+#### C1 — one form end to end, and the four `uic3` modes Phase T never ran
+
+**The form is `SIGEL_MasterUI/SIG_GPParameterBase.ui`**, chosen by measurement
+rather than by size: of the 20 it is the **only one carrying both an embedded
+image and dropped slot declarations**, which are the two categories §7 names for
+this step. 3,149 lines, 26 connections, 10 custom slots, 9 `QGroupBox`, 2
+`QButtonGroup`, 1 `QListView`, 1 image. It is also the form behind
+`SIG_GPParameter.cpp`, the file §9 calls a knot of three separate hazards.
+
+**PHASE T MEASURED ONE OF `uic3`'s FIVE MODES, AND §4 AND THE RESIDUE TABLE ARE
+BUILT ON THAT ONE.** `-convert` is not the whole tool. Three residue rows were
+being planned as hand work that Qt already does:
+
+| mode | what it produces |
+|---|---|
+| `uic3 <form>.ui` | **the QWidget-derived base class.** Qt 6's `uic` emits only `Ui_<Form>`, a struct with `setupUi()`, so the class the 20 hand-written subclasses inherit from had no source. This plan had not noticed the gap at all |
+| `uic3 -impl <hdr> <form>.ui` | its constructor, `languageChange()` → `retranslateUi`, and a `qWarning("Not implemented yet")` stub per custom slot |
+| `uic3 -convert -extract <f>.qrc` | the embedded images as real files plus a `.qrc`, and `<images>` rewritten to `<resources>` |
+| `uic3 -subdecl` / `-subimpl` | the *subclass* skeleton. Not used — all 20 subclasses exist and are the port's actual work |
+
+Qt 6's `uic` adds a fifth answer: **`--connections string`** emits string-based
+`SIGNAL`/`SLOT` for every connection, which is what 2003 had. **Not used**, and
+the reason is typing: restoring the `<slots>` block instead leaves `uic` free to
+emit pointer-to-member for the 16 connections it *can* resolve and string-based
+for only the 10 it cannot. Compile-time checking on 16 beats a flag.
+
+**The base class — the decision this step actually settled.**
+`uic3`'s declaration mode picks the shape, so it is not an invention of this
+port:
+
+```cpp
+class SIG_GPParameterBase : public QWidget, public Ui::SIG_GPParameterBase
+{ Q_OBJECT
+public:
+  SIG_GPParameterBase( QWidget *parent = 0, const char *name = 0,
+                       Qt::WindowFlags fl = 0 );
+public slots:
+  virtual void slotAddHost();          // …all 10
+protected slots:
+  virtual void languageChange();
+};
+```
+
+It keeps the **three-argument constructor**, so `SIG_GPParameter.cpp`'s
+`: SIG_GPParameterBase( parent, name, fl )` needs no change and C3–C7 stay about
+Qt 2 API sites instead of also rewriting 20 class hierarchies. The alternative —
+each subclass becoming `public QWidget, private Ui::<Form>` with `setupUi(this)`
+— is the modern idiom and adds no files, but it is a hierarchy change Qt's own
+converter does not ask for.
+
+It is **committed**, per form, as `include/<Module>/<Form>.h` and
+`src/<Module>/<Form>.cpp` — exactly where 2003's build generated them. It cannot
+be generated at build time: Qt 6's `uic` cannot produce it and requiring docker
+for every build is not acceptable. Three Qt 6 adjustments to `uic3`'s output,
+all marked in the files:
+
+| `uic3` emits | Qt 6 |
+|---|---|
+| `Qt::WindowFlags fl = 0` | `= Qt::WindowFlags()` — `QFlags` has no converting constructor from `0` |
+| `: QWidget(parent, name, fl)` | `: QWidget(parent, fl)` plus `setObjectName(name)`. The name argument was `QT3_SUPPORT` and did exactly this |
+| `protected slots: languageChange()` | kept, and driven from a `changeEvent` override. Qt 3 called it itself; Qt 6 has no such hook, so without the override the slot would be dead code rather than a port |
+
+**Three corrections to the Phase T residue table, all found by doing it.**
+
+- **The embedded image is worse than recorded.** The table says Qt 6's `uic`
+  "emits `setIcon(QPixmap("image0"))`, which compiles clean and renders a blank
+  button". Here the pixmap is on a **`QComboBox` item**, and `uic` emits
+  `addItem(QString())` — no icon, no `QPixmap`, no trace. There is nothing in the
+  generated code to grep for, which is why the check below tests the `.qrc` in
+  **both** directions.
+- **`Q3ButtonGroup` does not always need a `QButtonGroup`.** The table says
+  "`QGroupBox` + a `QButtonGroup` for the exclusivity". Both uses in this form
+  are plain `QGroupBox`: `buttongroupByTime` holds the form's only two
+  `QRadioButton`s as direct children, and Qt's auto-exclusivity is per parent
+  widget; `buttongroupGraveyard` holds a `QCheckBox` and no exclusive buttons at
+  all. **The other 5 uses are in other forms and each needs its children read** —
+  this is not a blanket rule either way.
+- **Restoring the `<slots>` block verbatim is not enough.** Qt 6's `uic` matches
+  a declaration against a `<connection>`'s `<slot>` **as a string**. This form
+  declares `slotCrossoverChanged( int )` and `slotMutationChanged( int )` while
+  connecting `slotCrossoverChanged(int)` — Qt 2's own uic did not care, Qt 6's
+  silently falls back to `&QWidget::slotCrossoverChanged`, which is a hard
+  compile error. Two of ten. The declarations are now re-spelled from the
+  connection that uses them. **C2 must expect this in the other 5 slot-carrying
+  forms.**
+
+**A sorting divergence, measured on both sides.** `listviewHosts`'s four columns
+are all `clickable` in Q3Header, which has no per-column Qt 6 spelling; the
+equivalent is `QTreeView::sortingEnabled`, now set in the form. But Qt 2's
+`QListView` **also sorted by column 0 ascending by default** —
+`qlistview.cpp:1836-1837` in the vendored source sets `sortcolumn = 0;
+ascending = TRUE`. Qt 6's `setSortingEnabled(true)` leaves the indicator on
+column 0 **descending**: measured with a `QTreeWidget` probe, section 0 and
+`Qt::DescendingOrder` before and after the call. Restored with an explicit
+`sortByColumn( 0, Qt::AscendingOrder )` in the base class, because nothing in
+the `.ui` can express it and nothing in SIGEL calls `setSorting` on this view.
+*Row order is unaffected on shipped data* — column 0 holds a pixmap and no text,
+so every sort key is empty. What differs is the indicator arrow and therefore
+which way the user's first header click sorts. `resizable` needed nothing:
+`QHeaderView`'s default resize mode is already Interactive.
+
+*Two other views do call it —* `SIG_ExperimentListView.cpp:51` and
+`MT_GUI/MT_ExperimentWidget.cpp:11` both `setSorting( -1 )`, which is Qt 2's
+`Unsorted`, i.e. `setSortingEnabled( false )`. C6 and C7.
+
+**The conversion was checked for content loss, not just for compiling.**
+Comparing the committed Qt 6 form against `HEAD`'s Qt 2 form:
+
+| | |
+|---|---|
+| widget and object names | 163, all present, after writing `uic`'s four duplicate-`tab` renames into the form |
+| visible `<string>`s | 98, all present but one: `sliderMOD`'s **empty** `caption`, a window title on a child widget. Dropped by `uic3`, inert |
+| tab stops | 47 = 47 |
+| connections | 26 = 26 |
+| combo and list items | 16 = 16 |
+| list view columns | 4 = 4 |
+| widget classes | identical after the two documented remaps, with 7 `QLayoutWidget` flattened to `<layout>` |
+
+**None of those 7 `QLayoutWidget`s carried a property besides its name**, so the
+"4 real size constraints, silently dropped" row of the residue table is entirely
+in other forms and stands. *The first version of the item comparison read 16
+against 82 and looked like a catastrophe; Qt 4's `<item>` is also a layout item,
+so it was counting two different things. §9's wrong-referent shape, caught by
+looking rather than by reporting it.*
+
+**The duplicate `tab` names are written into the form rather than left to
+`uic`.** Five widgets are named `tab`; `uic` renames the last four to
+`tab1`…`tab4`, variable **and** `setObjectName`, and warns four times. Writing
+those names in produces **byte-identical** generated code — verified by `cmp` —
+and takes `uic`'s warning count on this form to **zero**, which is what lets the
+check below treat any `uic` output as a failure.
+
+**Build wiring.** `make forms` runs Qt 6's `uic` over `FORMS`, which lists the
+**converted** forms only, so an unconverted one cannot be fed to it by accident.
+`rcc` compiles the extracted image **into the binary**, which is what Qt 2 did
+and what a runtime file path would not do — verified by loading
+`:/SIG_GPParameterBase/images/image0.xpm` from the linked resource: present, 688
+bytes, and a non-null 16×16 `QPixmap`. The extracted XPM is **byte-faithful to
+the embedded one** — payload compared row by row. It is *not* interchangeable
+with `pixmaps/ZORC_connected.xpm`, which is the same icon re-quantised and
+differs in **94 of 256 pixels**; using the on-disk file would have been a
+redesign under D21.
+
+**`check.sh` now covers Phase C, per §7's requirement that this is part of the
+first step.** A `forms (Phase C)` section, five checks per form, because they
+break independently: `uic` accepts the form and says nothing; the generated
+`ui_<Form>.h` compiles standalone; the committed base class compiles; `moc`
+accepts it and its output compiles; and the `.qrc` agrees with the header in
+**both** directions. Generation is delegated to the Makefile rather than
+repeated, because `check.sh` disagreeing with the Makefile about flags has
+already produced one phantom failure.
+
+**The reverse resource direction is the one that matters**, and the first draft
+of the check did not have it. Checking only that a referenced `:/…` is backed by
+the `.qrc` passes trivially on a form that **lost** its images — there is then no
+path to check, which is precisely the failure the check exists for.
+
+**Verified to have teeth, one mutation at a time**, as §0 requires. Baseline
+`5 pass 0 fail`:
+
+| mutation | result |
+|---|---|
+| `<slots>` block removed | **2 pass 3 fail** |
+| iconset path typo | **3 pass 2 fail** |
+| `icon` property dropped — the silent one | **3 pass 1 fail** |
+| header and implementation disagree on a slot name | **4 pass 1 fail** |
+| `Q_OBJECT` removed | **3 pass 2 fail** |
+| wrong `Ui::` base class | **3 pass 2 fail** |
+| a duplicate widget name reintroduced | **5 pass 1 fail** |
+
+*A sixth mutation did **not** fire and is recorded because it was nearly reported
+as a pass: deleting `#include <QEvent>` from the base header changes nothing,
+because `ui_<Form>.h` pulls `<QtWidgets/QApplication>` and `QEvent` arrives
+transitively. The include is kept — a header should include what it uses — but
+no check can see it.*
+
+**What C1 does NOT cover, and C9 must.** Nothing renders this form. The gates
+prove the form generates, compiles, mocs and that its resource path resolves;
+they cannot see layout, tab order, the sort indicator, or whether the icon
+reaches the widget on screen. `qrc_SIG_GPParameterBase.o` also has to be named
+explicitly on the link line at C7 — a resource object that ends up inside a
+static archive with nothing referencing it is dropped, and the icon then
+silently disappears again.
+
+**Gates: `./check.sh` 110 pass, 4 fail, 309 warnings** — the 4 failures are the
+same Makefile-excluded files, the warning count has not moved, and the 5 new
+passes are the forms section. Both baselines byte-identical, and
+`ASAN_OPTIONS=detect_leaks=0 ./fitness-check.sh build` reproduces
+`fitness-baseline.txt`. C1 touches no core code; the Makefile change that could
+have reached it is one extra `-I` on `SIGINC`.
+
 ---
 
 ## 8. Steps and status
@@ -1596,7 +1848,7 @@ custom signals and slots, and there are 49 across the 20 forms.
 | A | 10 | done |
 | B | 5 | 8 of 14 containers |
 | T | 2 | **done 2026-08-27** (§4) |
-| C | 10 | **not started, authorized 2026-08-27** |
+| C | 10 | **C1 done 2026-08-30** — §7 |
 | V | 5 | **V1 done 2026-08-27**, V5 in progress — §7 |
 | P | 4 | **done 2026-08-28** — §7 |
 

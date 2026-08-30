@@ -266,10 +266,13 @@ $(LIB)/libfparser.a: $(OBJ)/fparser/fparser.o
 SRC   := x/kdesigelSources.1.3/kdesigel/kdesigel
 QTINC := $(shell qmake6 -query QT_INSTALL_HEADERS)
 QTLIB := $(shell qmake6 -query QT_INSTALL_LIBS)
-MOC   := $(shell qmake6 -query QT_INSTALL_LIBEXECS)/moc
+QTBIN := $(shell qmake6 -query QT_INSTALL_LIBEXECS)
+MOC   := $(QTBIN)/moc
+UIC   := $(QTBIN)/uic
+RCC   := $(QTBIN)/rcc
 
 SIGSAN := -fsanitize=address,undefined -fno-omit-frame-pointer
-SIGINC := -Ishim -I$(SRC)/include -isystem $(QTINC) \
+SIGINC := -Ishim -I$(SRC)/include -I$(B)/ui -isystem $(QTINC) \
           $(addprefix -isystem $(QTINC)/,QtCore QtGui QtWidgets) \
           $(addprefix -isystem $(SL)/,newmat09 dynamechs/dm Dynamo/Src/Inc \
                                       fparser cv97 SOLID-2.0/include pvm3/include)
@@ -293,6 +296,56 @@ CORE_LIBS := $(patsubst %,$(LIB)/lib%.a,$(CORE))
 core: $(CORE_LIBS)
 
 $(OBJ)/sigel/%.o: $(SRC)/src/%.cpp $(STAMP)
+	@mkdir -p $(dir $@)
+	$(SIGCXX) -MMD -MP $(SIGINC) -c $< -o $@
+
+# ---------------------------------------------------------------------------
+# The 20 Designer forms -- PORTING.md Phase C, §7.
+#
+# Qt 2 shipped the .ui as <!DOCTYPE UI> with no version attribute; Qt 4.8's
+# uic3 -convert carries that to version="4.0", which Qt 6's uic reads. That
+# conversion happens ONCE, in tools/qtmig, and its result is committed -- the
+# forms in ui/ are Qt 6 forms now, so nothing here needs docker.
+#
+# Qt 6's uic emits only Ui::<Form>, a struct with setupUi(). The QWidget-derived
+# class the hand-written subclasses inherit from is a committed source file per
+# form, in the module's own include/ and src/ -- see SIG_GPParameterBase.h.
+#
+# FORMS is the converted ones, not all 20: C1 did one and C2 does the rest, so
+# an unconverted form must not silently be fed to Qt 6's uic.
+FORMS := SIGEL_MasterUI/SIG_GPParameterBase
+QRCS  := SIGEL_MasterUI/SIG_GPParameterBase
+
+UI_HDRS  := $(patsubst %,$(B)/ui/ui_%.h,$(notdir $(FORMS)))
+QRC_OBJS := $(patsubst %,$(OBJ)/qrc/%.o,$(notdir $(QRCS)))
+
+# The qrc objects are built here, not just generated, so that check.sh covers
+# rcc: a .qrc naming a file that is not there, or a malformed one, fails the
+# gate instead of waiting for C7 to link. C7 must name these on the link line
+# EXPLICITLY -- a resource object that ends up inside a static archive with
+# nothing referencing it is dropped, and the icons silently vanish again.
+.PHONY: forms
+forms: $(UI_HDRS) $(QRC_OBJS)
+
+# One pattern rule cannot see the module subdirectory, so generate the rule.
+define form_rule
+$(B)/ui/ui_$(notdir $(1)).h: $(SRC)/ui/$(1).ui
+	@mkdir -p $$(dir $$@)
+	$(UIC) $$< -o $$@
+endef
+$(foreach f,$(FORMS),$(eval $(call form_rule,$(f))))
+
+# The images Qt 2 embedded in the .ui. uic3 -extract pulled them out into a
+# .qrc next to the form; rcc puts them back INSIDE the binary, which is what
+# Qt 2 did and what a runtime file path would not do.
+define qrc_rule
+$(B)/qrc/qrc_$(notdir $(1)).cpp: $(SRC)/ui/$(1).qrc
+	@mkdir -p $$(dir $$@)
+	$(RCC) --name $(notdir $(1)) $$< -o $$@
+endef
+$(foreach q,$(QRCS),$(eval $(call qrc_rule,$(q))))
+
+$(OBJ)/qrc/%.o: $(B)/qrc/qrc_%.cpp
 	@mkdir -p $(dir $@)
 	$(SIGCXX) -MMD -MP $(SIGINC) -c $< -o $@
 
