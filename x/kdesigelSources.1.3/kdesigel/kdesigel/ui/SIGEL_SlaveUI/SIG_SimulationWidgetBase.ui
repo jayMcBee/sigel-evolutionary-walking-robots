@@ -372,9 +372,6 @@
                     </property>
                   </widget>
                   <widget class="QPushButton" name="downPushButton">
-                    <property name="icon">
-                      <iconset resource="SIG_SimulationWidgetBase.qrc">:/SIG_SimulationWidgetBase/images/image0.xpm</iconset>
-                    </property>
                     <property name="enabled">
                       <bool>false</bool>
                     </property>
@@ -394,9 +391,6 @@
                     </property>
                   </widget>
                   <widget class="QPushButton" name="upPushButton">
-                    <property name="icon">
-                      <iconset resource="SIG_SimulationWidgetBase.qrc">:/SIG_SimulationWidgetBase/images/image1.xpm</iconset>
-                    </property>
                     <property name="enabled">
                       <bool>false</bool>
                     </property>
@@ -416,9 +410,6 @@
                     </property>
                   </widget>
                   <widget class="QPushButton" name="backwardPushButton">
-                    <property name="icon">
-                      <iconset resource="SIG_SimulationWidgetBase.qrc">:/SIG_SimulationWidgetBase/images/image2.xpm</iconset>
-                    </property>
                     <property name="enabled">
                       <bool>false</bool>
                     </property>
@@ -438,9 +429,6 @@
                     </property>
                   </widget>
                   <widget class="QPushButton" name="rightPushButton">
-                    <property name="icon">
-                      <iconset resource="SIG_SimulationWidgetBase.qrc">:/SIG_SimulationWidgetBase/images/image3.xpm</iconset>
-                    </property>
                     <property name="enabled">
                       <bool>false</bool>
                     </property>
@@ -460,9 +448,6 @@
                     </property>
                   </widget>
                   <widget class="QPushButton" name="forwardPushButton">
-                    <property name="icon">
-                      <iconset resource="SIG_SimulationWidgetBase.qrc">:/SIG_SimulationWidgetBase/images/image4.xpm</iconset>
-                    </property>
                     <property name="enabled">
                       <bool>false</bool>
                     </property>
@@ -482,9 +467,6 @@
                     </property>
                   </widget>
                   <widget class="QPushButton" name="centerPushButton">
-                    <property name="icon">
-                      <iconset resource="SIG_SimulationWidgetBase.qrc">:/SIG_SimulationWidgetBase/images/image5.xpm</iconset>
-                    </property>
                     <property name="enabled">
                       <bool>false</bool>
                     </property>
@@ -504,9 +486,6 @@
                     </property>
                   </widget>
                   <widget class="QPushButton" name="leftPushButton">
-                    <property name="icon">
-                      <iconset resource="SIG_SimulationWidgetBase.qrc">:/SIG_SimulationWidgetBase/images/image6.xpm</iconset>
-                    </property>
                     <property name="enabled">
                       <bool>false</bool>
                     </property>

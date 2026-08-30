@@ -400,11 +400,11 @@ through `f0f2daa`.
 
 ## 7. Steps
 
-**Exit criterion per step:** `./check.sh` at the repo root — **198 pass, 4 fail,
+**Exit criterion per step:** `./check.sh` at the repo root — **203 pass, 4 fail,
 309 warnings** as of 2026-08-30, C2 (105/4/309 before Phase C; 322 warnings on
 2026-08-28 — the drops are recorded per step and each is explained, because a
 step that silently loses a warning has hidden something). The 4 failures are
-exactly the files the Makefile excludes. **The 93 new passes are the
+exactly the files the Makefile excludes. **The 98 new passes are the
 `forms (Phase C)` section**, six checks over each of the 20 forms — not new
 module coverage. A GUI module still joins `MODULES` only at C3–C7. It was 118/4/338 until the Dynamo backend was deleted
 (`physics_backends.md`); the pass count and "headers standalone" each fall by
@@ -681,7 +681,7 @@ succeeded.**
 **Gates any session must keep green**, all committed:
 
 ```
-./check.sh                                            198 pass, 4 fail
+./check.sh                                            203 pass, 4 fail
 ./dictorder-dump.sh | diff -u dictorder-baseline.txt -    empty
 ./fitness-check.sh  | diff -u fitness-baseline.txt -      empty
 ASAN_OPTIONS=detect_leaks=0 ./fitness-check.sh build      exit 0
@@ -1433,8 +1433,8 @@ review, the full residue is:
 | 27 custom **slot declarations**, silently dropped | in 6 forms. The 49 `<connection>` elements all survive; what goes is the `<slot>` declarations. Qt 6's `uic` then resolves the slot against the widget's Qt base class and emits `qOverload<>(&QDialog::slotFoo)` — **25 hard compile errors** |
 | 18 `qPixmapFromMimeSource` | Qt3Support, removed, not merely obsolete |
 | 9 embedded images in 2 forms | **the dangerous one.** Qt 6's `uic` omits `<images>` and emits `setIcon(QPixmap("image0"))`, which compiles clean and renders a blank button at runtime |
-| **`Line` `orientation`, silently dropped** | `uic3` emits `<widget class="Line" name="X"/>` with no properties, and `orientation` is the only thing Qt 6's `uic` reads to pick a frame shape — so the separator becomes a bare `QFrame`, i.e. `NoFrame`, and paints nothing. **6 `Line` widgets across 3 forms, all 6 affected**: `MT_StatisticsWidgetBase` ×4, `SIG_LanguageParametersBase` ×1, `SIG_GPParameterBase` ×1 (fixed at C1). `check.sh` now counts them |
-| 4 real size constraints, silently dropped | `QLayoutWidget` → `<layout>` discards them: `MT_IndividualWidgetBase` `Layout32`/`Layout33`/`Layout28` lose `maximumSize 130×32767`, `MT_PopulationWidgetBase` `Layout60` loses `minimumSize 200×0` |
+| **`Line` `orientation`, silently dropped** | `uic3` emits `<widget class="Line" name="X"/>` with no properties, and `orientation` is the only thing Qt 6's `uic` reads to pick a frame shape — so the separator becomes a bare `QFrame`, i.e. `NoFrame`, and paints nothing. **3 of the 6 `Line` widgets are affected** — those whose Qt 2 form set `orientation` **alone**: `MT_StatisticsWidgetBase/Line20`, `SIG_LanguageParametersBase/Line1`, `SIG_GPParameterBase/Line2`. `uic3` keeps an explicit `frameShape` and drops only the then-redundant `orientation`, so the other three are safe. *This row said "all 6"; measured at C2, corrected by review.* `check.sh` counts `Line`s against those carrying either property |
+| **6** real size constraints, silently dropped — *not 4* | `QLayoutWidget` → `<layout>` discards them: `MT_IndividualWidgetBase` `Layout32`/`Layout33`/`Layout28` lose `maximumSize 130×32767`, `MT_PopulationWidgetBase` `Layout60` loses `minimumSize 200×0`, **and `MT_StatisticsWidgetBase` `Layout22`/`Layout22_2` lose `sizePolicy` Expanding/Expanding** — re-measured at C2 over all 101 `QLayoutWidget`s. Their `minimumSize 0×0` / `maximumSize 32767×32767` are Qt defaults and inert, and `SIG_MovieSettingsDialogBase/Layout15`'s `geometry` is meaningless once laid out. **C2 did NOT restore any of these.** The faithful conversion is a real `QWidget` carrying the constraint around the flattened layout; it is C2's one unfinished item and C6/C7 own it with those forms' modules |
 | 11 widgets renamed by Qt 6's `uic` | duplicate names — `tab`→`tab1`… in **6** forms, not 5 (measured at C2). Breaks any hand-written subclass referring to them |
 
 Verified preserved: tab order 143/143, combo and list box items 47/47, list view
@@ -1743,7 +1743,8 @@ Comparing the committed Qt 6 form against `HEAD`'s Qt 2 form:
 | widget classes | identical after the two documented remaps, with 7 `QLayoutWidget` flattened to `<layout>` |
 
 **None of those 7 `QLayoutWidget`s carried a property besides its name**, so the
-"4 real size constraints, silently dropped" row of the residue table is entirely
+size-constraint row of the residue table (4 as recorded then, **6** as
+re-measured at C2) is entirely
 in other forms and stands. *The first version of the item comparison read 16
 against 82 and looked like a catastrophe; Qt 4's `<item>` is also a layout item,
 so it was counting two different things. §9's wrong-referent shape, caught by
@@ -1836,10 +1837,14 @@ have reached it is one extra `-I` on `SIGINC`.
 (plus `-extract` for the one form with images), restore `<slots>` re-spelled to
 the connections, remap the Qt3Support classes and enums, write `uic`'s duplicate
 renames in, then the committed base-class pair per form from `uic3`'s own
-declaration and implementation modes. **17 of the 19 generated headers came out
-byte-identical before and after the hand fixes** — the renames and the
-pixmap-function removal changed only warnings — and the two that moved are
-exactly the two intended: one signal and seven icons.
+declaration and implementation modes. **Writing `uic`'s duplicate renames into the forms and dropping the vestigial
+`<pixmapfunction>` changed no generated code at all** — 17 of 19 headers
+byte-identical across those two edits, and the two that moved are the signal and
+the icons. *That is a much narrower claim than "17 of 19 byte-identical before
+and after the hand fixes", which this section first made: restoring a `<slots>`
+block, remapping a class, adding `sortingEnabled` and removing a dead property
+all change the output by design, and at least 10 of the 19 moved for those
+reasons. Found by review.*
 
 **THE FINDING: `stdset="0"` decides whether a lost property is loud or silent,
 and 493 property sets were riding on it.** Qt 6's `uic` emits a real setter for
@@ -1852,8 +1857,13 @@ The same Qt 2 property proved it both ways in one commit:
 `SIG_IndividualListBase` and a silent no-op in `MT_PopulationWidgetBase`,
 differing only in that attribute.
 
-**So the attribute is gone: 616 `stdset="0"` removed across the 20 forms**, and
-with it all 493 unchecked `setProperty` calls — every property is now
+**So the attribute is gone: 616 `stdset="0"` removed across the 19 forms C2
+converted** — C1's carries none — and with it every unchecked `setProperty`
+call. *The count of those was given here as 493 and does not reproduce: review
+measures **492** against `uic3`'s raw output and **491** against the committed
+forms with the attribute re-inserted. 616 is the reproducible figure; the
+derived one depends on which tree you generate from, and should not have been
+stated without saying which.* Every property is now
 compile-checked. That is not a behaviour change for the ones that resolve
 (`setProperty("text", v)` reaches `setText` through the meta-object), and it
 turned the whole silent class loud in one edit. **It immediately found one more
@@ -1873,8 +1883,8 @@ forms with the reason recorded here:
 | property | on | resolution |
 |---|---|---|
 | `showSortIndicator` ×2 | `Q3ListView` → `QTreeWidget` | **redundant.** Measured: `setSortingEnabled(true)` takes `header()->isSortIndicatorShown()` from 0 to 1, and both views already get it from their clickable columns |
-| `frameShape`, `frameShadow` | `Q3ProgressBar` → `QProgressBar` | Q3ProgressBar was a `QFrame`; Qt 6's `QProgressBar` is not, so it has no frame at all |
-| `margin` | `Q3MultiLineEdit` → `QTextEdit` | no widget-level equivalent; Qt 6 puts it on the document |
+| `frameShape` | `Q3ProgressBar` → `QProgressBar` | Q3ProgressBar was a `QFrame`; Qt 6's `QProgressBar` is not, so it has no frame at all. *This row also listed `frameShadow`, which the widget never had — an invented entry in the table whose job is to enumerate real losses. Found by review* |
+| `margin` ×3 | `Q3MultiLineEdit` → `QTextEdit`, **and** a `Line` and a `QLCDNumber` | no widget-level equivalent; Qt 6 puts it on the document. *The two extra sites are the ones `uic3` warns about — `MT_StatisticsWidgetBase/Line1` (`margin 1`) and `SIG_ExperimentViewBase/lcdnumberGenerations` (`margin 0`). Both inert — a `Line` has no contents and 0 is the default — but this table said `Q3MultiLineEdit` only while the prose quoted the warnings, without joining them* |
 | `undoDepth` | `Q3MultiLineEdit` → `QTextEdit` | gone in Qt 6; the nearest survivor is `undoRedoEnabled`, which is not the same setting |
 
 **A dead signal, found by sweeping rather than by compiling.**
@@ -1885,11 +1895,15 @@ floor-selection UI would silently stop responding. Now `toggled(bool)`, which
 carries the same information to a no-argument slot. *Every signal and slot in
 all 49 connections was swept against Qt 6 for exactly this; it is the only one.*
 
-**The 7 button icons needed reattaching by hand, unlike C1's.** `uic3 -extract`
-pulled all 8 images out and wrote the `.qrc`, but Qt 4 renamed the widget
-property `pixmap` to `icon`, so `uic3` **dropped it outright** — where C1's was
-on a combo *item* and survived as `<pixmap>`. The mapping was recovered from the
-Qt 2 form. **The eighth image is not a form image at all**: `image7` is the
+**The 7 button icons did NOT need reattaching, and a first version of this step
+attached them twice.** `uic3 -extract` emits the property itself, as
+`<property name="icon"><pixmap resource="…">`. *This step reported it "dropped
+outright" on the strength of a grep for `name="pixmap"` returning 0 — but Qt 4
+renames the **property** to `icon` and keeps `<pixmap>` only as the child
+element, so that grep measured a name the tool had already changed. §9's
+wrong-referent shape.* The seven hand-added `<iconset>` duplicates are removed;
+`uic3`'s are what ship. **The eighth image is genuinely not a form image**:
+`image7` is the
 Designer palette icon of the custom widget `SIG_SimulationVisualisationWidget`,
 with no runtime effect; it is out of the `.qrc` and deleted, and `check.sh`'s
 reverse resource direction is what flagged it.
@@ -1923,14 +1937,36 @@ checks run; the compile and `moc` checks are skipped with the reason printed.
 without that, C2 would have had to either ship a fifth "known failure" or hide
 the dependency.
 
+**THE SORT DIRECTION WAS RE-CREATED IN FOUR MORE VIEWS AND CAUGHT BY REVIEW.**
+C1 measured that `sortingEnabled` is only half the conversion of Q3Header's
+clickable columns — Qt 2's `QListView` also sorted **column 0 ascending**
+(`qlistview.cpp:1836-1837`) where Qt 6 leaves the indicator **descending** — and
+pinned it with `sortByColumn( 0, Qt::AscendingOrder )`. C2 added
+`sortingEnabled` to four more views and pinned none of them. **C1's note that
+row order was unaffected did not carry**: it held because that view's column 0
+holds a pixmap and no text, and `MT_PopListViewItem.cpp:19` and
+`SIG_IndividualListItem.cpp:54` both `setText(0, …)`, so those two lists would
+have displayed **reversed**. All five sorted views now pin the direction, and
+**`check.sh` check 7 requires it**: any view the form calls
+`setSortingEnabled(true)` on must have a matching `sortByColumn` in its base
+class. *A bounded observation reported as a general one — §9's shape, and the
+reason the fix is now a check rather than a habit.*
+
+**A layout margin was deleted by hand and nothing recorded it, also caught by
+review.** Stripping `margin` from the `Q3MultiLineEdit` used a `count=1` regex
+that removed the **first** `margin` in the file — the top-level `QVBoxLayout`'s
+`11` — leaving `SIG_ExperimentViewBase` the only one of 20 forms whose top
+layout set no margin, and silently falsifying Phase T's verified
+"layout margins and spacing 196/196". Restored; the count is 196 again.
+
 **Corrections to Phase T's residue table**, both measured here: the 11 duplicate
 renames are across **6** forms, not 5 (C1's plus five more); and `uic3` reports
 **four** things that are not slot declarations — two `margin` properties it
 cannot map, the `stateChanged` signal, and a `WordBreak` label flag.
 
-**Gates: `./check.sh` 198 pass, 4 fail, 309 warnings.** The 4 failures are still
+**Gates: `./check.sh` 203 pass, 4 fail, 309 warnings.** The 4 failures are still
 exactly the Makefile-excluded files and the warning count has not moved; the
-forms section is **93 pass, 0 fail, 1 documented skip**. Both baselines
+forms section is **98 pass, 0 fail, 1 documented skip** — seven checks a form. Both baselines
 byte-identical, sanitized run clean. Teeth re-verified after the check changed:
 dropping a `Line`'s orientation gives 92/1, and a `.qrc` naming a missing file
 stops `make forms` and reports which checks did not run.

@@ -187,6 +187,19 @@ else
                 else ff=$((ff+1)); echo "  form FAIL: $form.qrc carries $have, ui_$base.h never uses it"; fi
             done
         fi
+        # 7. every view the form switches sorting on also pins the DIRECTION.
+        # Qt 2's QListView sorted column 0 ascending by default; Qt 6's
+        # setSortingEnabled(true) leaves the indicator descending, so the rows
+        # come out reversed wherever column 0 holds text. C1 found this and
+        # fixed one view; C2 re-created it in four more. This is why it is a
+        # check and not a habit.
+        if [ -f "$ROOT/build/ui/ui_$base.h" ]; then
+            for v in $(grep -oE '^        [A-Za-z0-9_]+->setSortingEnabled\(true\)' \
+                       "$ROOT/build/ui/ui_$base.h" | sed 's/->.*//;s/ *//' | sort -u); do
+                if [ -n "$blocked" ] || grep -q "$v->sortByColumn(" "$SRC/src/$mod/$base.cpp"; then fp=$((fp+1))
+                else ff=$((ff+1)); echo "  form FAIL: $base sorts $v but never pins the direction"; fi
+            done
+        fi
         # 6. every Designer separator still says which way it runs.
         # `uic3 -convert' DROPS a Line's `orientation', and that property is the
         # only thing Qt 6's uic reads to choose a frame shape: without it the

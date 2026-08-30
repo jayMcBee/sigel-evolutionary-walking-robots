@@ -14,6 +14,15 @@ SIG_LanguageParametersBase::SIG_LanguageParametersBase(QWidget* parent, const ch
     setObjectName( QString::fromUtf8( name ) );
 
   setupUi( this );
+
+  // Qt 2's QListView sorted by column 0 ASCENDING by default (qlistview.cpp:
+  // 1836-1837 sets sortcolumn=0, ascending=TRUE in init()). The .ui carries
+  // sortingEnabled, converted from Q3Header's clickable columns, but Qt 6's
+  // setSortingEnabled(true) leaves the indicator on column 0 DESCENDING --
+  // measured. Without this the rows come out reversed wherever column 0 holds
+  // text, which it does here. C1 found this for SIG_GPParameterBase and C2's
+  // review found it re-created in the four views C2 converted.
+  listviewCommands->sortByColumn( 0, Qt::AscendingOrder );
 }
 
 SIG_LanguageParametersBase::~SIG_LanguageParametersBase()
