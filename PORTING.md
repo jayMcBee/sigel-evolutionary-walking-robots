@@ -1770,6 +1770,20 @@ are more dangerous than arithmetic errors because the result looks clean.
 **The shape is always the same:** a bounded observation reported as a general
 one, or a proxy measured in place of the thing it stands for.
 
+**A second shape, found late: facts filed separately that are only wrong
+together.** The `±DBL_MAX` sentinel was correctly recorded. The `%g` precision-6
+writer was correctly recorded. The multiply-before-divide 1.3 regression was
+correctly recorded *and deliberately kept*. Each is right on its own; the
+undefined behaviour lives in all three composed, and nobody had crossed them.
+**Cross serialisation facts with parsing facts, and cross "known and accepted"
+facts with each other** — not just fresh findings. Both halves of this one were
+already in the file.
+
+*A third, smaller: test with a representative value, not an extreme.* Probing
+this with `q = DBL_MAX` collapses both the 1.0 and 1.3 orders to `NaN` and hides
+the difference between them; a realistic joint angle shows 1.0 giving a finite
+constant and 1.3 giving `NaN`.
+
 **Two rules, both learned the expensive way.**
 
 1. **Before asking for a measurement, ask which paths it can reach.** A run of
@@ -1923,6 +1937,14 @@ multiply-before-divide turns that same input into `NaN`. Measured both orders:
 So the regression this file already records as "kept because the reference is
 1.3" also converts a quiet failure into an undefined one, on an input no shipped
 file produces.
+
+**And this defect reproduces on every platform**, unlike the excess-precision
+differences above. The overflow is forced by the **type, not the FPU**: in the
+1.3 binary the multiply's result is stored with `fstpl` at `0x80b1f28` — a
+64-bit store, because `scaledState` is a `double` — and `1.79769e+308 × 57.3 ≈
+1.03e+310` is comfortably representable in an x87 register but not in a
+`double`. Verified here: the same product is finite in `long double` and `inf`
+in `double`. So x87-versus-SSE genuinely does not matter for this one.
 
 **This is 1.3's defect, reproduced exactly, not one the port introduces.** 1.3
 writes with the same `%g` at precision 6 (§ the fourth-family finding) and makes
