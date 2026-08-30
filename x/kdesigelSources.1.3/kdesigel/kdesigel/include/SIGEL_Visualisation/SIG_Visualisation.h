@@ -26,7 +26,7 @@
 #include "SIGEL_Visualisation/SIG_ViewSettings.h"
 #include "SIGEL_Visualisation/SIG_FloatingText.h"
 
-#include <qvector.h>
+#include <QList>
 
 #include <newmat.h>
 
@@ -102,7 +102,7 @@ namespace SIGEL_Visualisation
        */
       SIG_ViewSettings viewSettings;
 
-      QVector< SIG_FloatingText > floatingTexts;
+      QList< SIG_FloatingText * > floatingTexts;
 
     protected:
       NEWMAT::ColumnVector ambientSceneColor;

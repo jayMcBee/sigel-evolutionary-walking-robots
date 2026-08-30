@@ -52,7 +52,7 @@ namespace SIGEL_Visualisation
 
     GLfloat const diffuseLightIntensity = 1;
 
-    QArray< GLfloat > diffuseLightColor( 4 );
+    QList< GLfloat > diffuseLightColor( 4 );
     for (int i=0; i<3; i++)
       diffuseLightColor[i] = diffuseLightIntensity;
     diffuseLightColor[3] = 1;
@@ -67,7 +67,7 @@ namespace SIGEL_Visualisation
 
     glLightf( GL_LIGHT0, GL_LINEAR_ATTENUATION, 0.4 );
 
-    QArray< GLfloat > fogColor( 4 );
+    QList< GLfloat > fogColor( 4 );
     fogColor.fill( 1 );
 
     updateAspectRatio();
@@ -99,7 +99,7 @@ namespace SIGEL_Visualisation
 	       static_cast<GLdouble>(viewSettings.up.get(1)),
 	       static_cast<GLdouble>(viewSettings.up.get(2)) );
 
-    QArray< GLfloat > lightPos( 4 );
+    QList< GLfloat > lightPos( 4 );
 
     lightPos[0] = static_cast<GLfloat>(finalEyePoint.get(0));
     lightPos[1] = static_cast<GLfloat>(finalEyePoint.get(1));
@@ -141,7 +141,7 @@ namespace SIGEL_Visualisation
     ambientSceneColor( 2 ) = green;
     ambientSceneColor( 3 ) = blue;
 
-    QArray< GLfloat > lightModelAmbientColor( 4 );
+    QList< GLfloat > lightModelAmbientColor( 4 );
 
     lightModelAmbientColor[0] = red;
     lightModelAmbientColor[1] = green;

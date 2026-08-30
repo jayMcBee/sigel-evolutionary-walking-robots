@@ -20,6 +20,7 @@
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
+#include <QIODevice>
 #include "SIGEL_Visualisation/SIG_Renderer.h"
 #include "SIGEL_Tools/SIG_TypeConverter.h"
 
@@ -32,9 +33,6 @@ namespace SIGEL_Visualisation
     : sceneObjects(noOfObjects),
       floatingTexts(noOfFloatingTexts)
   {
-    sceneObjects.setAutoDelete(true);
-    floatingTexts.setAutoDelete(true);
-
     this->noOfObjects = static_cast<GLuint>(noOfObjects); // ToDo: throw bad number error
 
     glListBase(0);
@@ -43,6 +41,14 @@ namespace SIGEL_Visualisation
 
   SIG_Renderer::~SIG_Renderer()
   {
+    // setAutoDelete(true) on both vectors was their ONLY free -- ~QVector did
+    // it and nothing here did. Confirmed in the 1.3 binary: the constructor at
+    // 0x080cf640 makes exactly two setAutoDelete(true) calls. Written out.
+    qDeleteAll( sceneObjects );
+    sceneObjects.clear();
+    qDeleteAll( floatingTexts );
+    floatingTexts.clear();
+
     glDeleteLists( displayListsOffset, static_cast<GLsizei>(noOfObjects) );
   };
 
@@ -63,7 +69,7 @@ namespace SIGEL_Visualisation
   QString SIG_Renderer::exportSceneObjectsToPovray()
   {
     QString resultString;
-    QTextStream resultStream( &resultString, IO_WriteOnly );
+    QTextStream resultStream( &resultString, QIODevice::WriteOnly );
 
     for (int i=0; i < noOfObjects; i++)
       if (sceneObjects[ i ]->getVisible())
@@ -104,8 +110,8 @@ namespace SIGEL_Visualisation
   {
     QString resultString;
 
-    QTextStream resultStream( &resultString, IO_WriteOnly );
-    resultStream.precision( 5 );
+    QTextStream resultStream( &resultString, QIODevice::WriteOnly );
+    resultStream.setRealNumberPrecision( 5 );
 
     resultStream << "<" << input( 1 ) << ", " << input( 2 ) << ", " << input( 3 ) << ">";
 

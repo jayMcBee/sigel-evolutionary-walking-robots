@@ -815,7 +815,9 @@ and `iomanip.h` now includes `<iostream>`, which the pre-standard header did.
 **OpenGL is on the link line and is never called.** `dmLink::draw()` is pure
 virtual and every override lives in `gldraw.cpp`, so every `dm*` vtable
 references it and the linker pulls it in. `-lGL`, no `-lGLU` — nothing
-references GLU.
+references GLU. **That is true of core and FALSE of the interface**: C5 found
+`gluPerspective` and `gluLookAt` in `SIG_Visualisation.cpp`, so C9's link line
+needs `-lGLU` and the build host needs `libglu1-mesa-dev`.
 
 **Sanitizer split.** SIGEL's own code gets `-Wall -Wextra`, no `-fpermissive`
 and the full AddressSanitizer plus UndefinedBehaviorSanitizer. The vendored
@@ -1564,15 +1566,38 @@ modules include the headers `uic` generates from them.
 | C2 | **DONE 2026-08-30.** The remaining 19 forms. All 20 are Qt 6; 19 of 20 generated headers compile, the 20th blocked on C3 — see below | 19 forms |
 | C3 | `SIGEL_CommonGUI` — carries **all 6** `QGLWidget` sites, 2 in code and 4 in comments, all in `SIG_VisualisationWidget` | 665 LOC, 2 files |
 | C4 | `SIGEL_SlaveGUI` | 2,145 LOC, 5 files |
-| C5 | `SIGEL_Visualisation` — *this row said it carries all 6 `QGLWidget` sites. It carries **none**: measured per module 2026-08-30, all 6 are C3's `SIGEL_CommonGUI`* | 3,544 LOC, 12 files |
+| C5 | **IN PROGRESS 2026-08-30, done FIRST — it is the dependency root.** `SIGEL_Visualisation`, 23 Qt 2 sites; 11 of 12 sources compile, the 12th blocked on a missing `GL/glu.h`. *This row said it carries all 6 `QGLWidget` sites; it carries **none** — all 6 are C3's* | 3,564 LOC, 12 sources |
 | C6 | `MT_GUI` | 3,911 LOC, 14 files |
 | C7 | `SIGEL_MasterGUI` | 7,717 LOC, 20 files |
 | C8 | `sigel.cpp`, `sigel_slave.cpp` | 15 sites |
 | C9 | All five modules and both programs build, link and run | — |
 
 Each module step is the same shape: `qt3to4` in the container, hand-port off
-Qt3Support, extend `check.sh` to cover the module, commit. Smallest first, which
-also happens to respect the dependency order.
+Qt3Support, extend `check.sh` to cover the module, commit.
+
+**THE STEP ORDER DOES NOT RESPECT THE DEPENDENCY ORDER, AND THIS LINE USED TO
+CLAIM IT DID** — "smallest first, which also happens to respect the dependency
+order". Measured at C3 by walking every `#include "<Module>/…"` between the five
+GUI modules:
+
+| step | module | includes |
+|---|---|---|
+| C3 | `SIGEL_CommonGUI` | **C5** |
+| C4 | `SIGEL_SlaveGUI` | **C3, C5** |
+| C5 | `SIGEL_Visualisation` | none |
+| C6 | `MT_GUI` | none |
+| C7 | `SIGEL_MasterGUI` | none |
+
+`SIGEL_Visualisation` is a **root**; `SIGEL_CommonGUI` and `SIGEL_SlaveGUI` both
+need it. C3 reads `visualisation->floatingTexts`, a Qt 2 `QVector` living in
+C5's `SIG_Visualisation.h`, so C3 cannot compile before C5 without dragging
+containers across the boundary and leaving C5 half-converted.
+
+**Execution order is therefore C5, C3, C4, then C6 and C7 in either order.** The
+step IDs stay bound to their modules — "C5" always means `SIGEL_Visualisation` —
+because renumbering would strand every earlier reference. *"Smallest first" was
+also measuring the wrong thing: C5 is the largest by LOC (3,564) and among the
+smallest by work — **23 Qt 2 code sites** against C3's 9.*
 
 **C8 detail.** Both programs fail to compile on `qmotifplusstyle.h`. 15 sites:
 4 style includes, 6 `setStyle` constructions (`sigel.cpp:193,195`;
@@ -1970,6 +1995,117 @@ forms section is **98 pass, 0 fail, 1 documented skip** — seven checks a form.
 byte-identical, sanitized run clean. Teeth re-verified after the check changed:
 dropping a `Line`'s orientation gives 92/1, and a `.qrc` naming a missing file
 stops `make forms` and reports which checks did not run.
+
+
+#### C5 — `SIGEL_Visualisation` — IN PROGRESS, BLOCKED ON A MISSING PACKAGE
+
+**Done first, not third, because the step order was wrong** — see the dependency
+table above. 23 Qt 2 code sites converted, **11 of the 12 sources compile**;
+`SIG_Visualisation.cpp` is blocked on `GL/glu.h`.
+
+**`-lGLU` IS REQUIRED, AND §7 SAYS IT IS NOT.** Phase R records "`-lGL`, no
+`-lGLU` — nothing references GLU", which was measured on the **core** build and
+is false for the interface: `SIG_Visualisation.cpp` calls **`gluPerspective`**
+and **`gluLookAt`**. `libglu1-mesa-dev` is not installed here, so that one file
+cannot compile and C9's link line will need `-lGLU`. *A measurement of core
+quoted forward as a fact about the tree — §9's shape.*
+
+**Ownership settled from the 1.3 binary before writing anything**, which is what
+`xb/kdesigel/sigel_slave` is for:
+
+| container | 1.3 evidence | conversion |
+|---|---|---|
+| `SIG_Renderer::sceneObjects`, `::floatingTexts` | ctor at `0x080cf640` makes **2** `setAutoDelete(true)` calls | owning → `qDeleteAll` in `~SIG_Renderer`, which freed **nothing** before |
+| `SIG_Visualisation::floatingTexts` | ctor at `0x080ca020` makes **0** | **non-owning** — it aliases the renderer's pointers, filled from `robotRenderer.floatingTexts`. Making it owning would double-free |
+| `SIG_RenderRecorder::robotLinks` | `setAutoDelete(true)`, and the class has **no destructor at all** | owning → a destructor added, declared and defined |
+| `SIG_EnvironmentRenderer::robotPathPoints` | `setAutoDelete(true)`, empty destructor | owning → `qDeleteAll`. §9 flags this member by name as "the central pointer-versus-value trap, sitting unconverted" |
+
+The two `robotPathPoints` cursor walks became index walks; both were guarded by
+`count() >= 2`, which is what kept `first()` off an empty list — UB in Qt 6.
+
+**Seven `QDictIterator` walks became range-for** over D4's `getLinks()`,
+`getMaterials()` and D5's `getPoints()`. The dict **key** is the point's name,
+so `pointIter.currentKey()` is `NamedPoint::name` and `*pointIter.current()` is
+`*NamedPoint::value`. `robot.getLinkIter().count()` → `getLinks().size()`, 6
+sites.
+
+**`QArray<T>` → `QList<T>` by value**, 7 sites feeding GL through `.data()`.
+*Qt 2's `QArray(n)` left the elements **uninitialised**; `QList(n)`
+value-initialises. Every element here is written before use, so this only
+removes undefined reads.*
+
+**Four Qt 2 API classes the container sweep could not see**, all found by
+compiling: `IO_WriteOnly` → `QIODevice::WriteOnly` (9), `QString::utf8()` →
+`toUtf8()`, `QTextStream::precision()` → `setRealNumberPrecision()`, and **8
+dynamic exception specifications**, which C++17 removed.
+
+*§9's fourth-family note says "nothing in the tree sets `setRealNumberPrecision`
+… on a file stream — only `SIG_GPPVMData` does, at 50, for the wire". That is
+true as worded but narrower than it reads: `SIG_Renderer::vectorToPovray` sets
+precision **5** on a `QString` stream, and that is the POV-Ray export path — the
+one the x86 box confirms actually works and produced every published film.*
+
+**Four core getters gained `const`** — `SIG_Environment::getWithTexture`,
+`getDMEnvironment`, `getTexAlpha`, `getTextureFile` — because a `const
+SIG_Environment &` cannot call a non-const getter. Adding `const` to a getter
+cannot change behaviour; all three gates confirm it moved nothing.
+
+#### The build was choosing between the two `SIG_GPExperiment` variants by luck
+
+**Found while running C5's gates, and it is not a C5 defect.** §9 records that
+the class is defined twice on purpose — `SIG_GPExperiment.cpp` for `sigel`,
+`SIG_GPExperimentClean.cpp` for the slave, differing in whether the constructor
+builds an `MT_Controller` — and asserts that `sigel_eval` links Clean. **Nothing
+enforced that.** Both objects go into `libSIGEL_GP.a`, the linker takes the
+first member defining the symbol, and the Makefile's `$(wildcard)` does not sort:
+
+```
+clean build        ar t libSIGEL_GP.a -> SIG_GPExperimentClean.o, SIG_GPExperiment.o
+incremental build                     -> SIG_GPExperiment.o, SIG_GPExperimentClean.o  -> LINK FAILS
+```
+
+Touching any header `SIG_GPExperiment.h` includes is enough to flip it. **And
+sorting would be worse**: alphabetically the master wins. `SIG_GPExperimentClean.o`
+is now named explicitly ahead of the archives, as 2003 compiled it into the
+slave target, with an assertion after the link. Today the linker fails first on
+the master's undefined `MT_Controller`; **the assertion becomes the only guard
+once C6 makes `MT_Controller` link**, at which point the master would link
+silently and `sigel_eval` would start constructing one per experiment.
+
+#### What the 1.3 oracle could and could not answer for C3
+
+Asked because C3 converts `QGLWidget` → `QOpenGLWidget`, and the floating text
+labels are child `QLabel`s over the GL view — the case where the two differ
+most: `QGLWidget` is a native child window, `QOpenGLWidget` renders to an FBO
+inside the normal widget stack.
+
+**Answered.** The state is a checkbox, "Show anchor points", at the bottom of the
+Control tab below Show plane / Show grid / Show robot path, wired to
+`setShowAncorPoints(int)`. It behaves as a **two**-state box; the box could not
+establish a third state, so which of our 0/1/2 the middle value maps to is
+unknown. The label code is **live, not dead**: with gdb on the running slave,
+`SIG_SimulationVisualisationWidget::paintGL` 1783 hits,
+`SIG_VisualisationWidget::paintGL` 1785, `initFloatingTextWidgets` 1 — it fired
+on ticking the box. And `SIG_VisualisationWidget` is never constructed alone;
+its constructor has exactly one caller, the subclass.
+
+**NOT answered, and the reason is worth more than the answer.** The 3D view on
+that machine renders **nothing at all** — not the labels and not the robot —
+with no GL errors logged, while `paintGL` ran 1785 times. So the absence of
+labels is equally consistent with "they do not composite over a native GL
+window" and "nothing renders in that environment", and the robot's absence makes
+the second the likely reading. The box declined to report the first, which would
+have been measuring one thing and concluding about another.
+
+**Consequence, recorded rather than assumed: the labels are *unverified*, not
+unexercised.** The code demonstrably runs; whether a 2003 user ever saw them is
+not something that machine can currently show. **So "port faithfully" and "make
+it work" cannot be separated here**, and C3 should convert the code as written
+and record that Qt 6 may well make the labels *more* visible than Qt 2 did —
+that would be a behaviour change nobody can currently detect either way. *Also
+learned: that box's SIGEL visualisation has always meant the **POV-Ray export**,
+which computes geometry and writes files without the GL view displaying. The
+on-screen GL side of the 1.3 binary is effectively untested there.*
 
 
 ---

@@ -26,6 +26,7 @@
 #include "SIGEL_Visualisation/SIG_SceneObject.h"
 #include "SIGEL_Simulation/SIG_Recorder.h"
 #include "SIGEL_Simulation/SIG_SimulationCannotSolveException.h"
+#include <QList>
 #include <qdatetime.h>
 
 namespace SIGEL_Visualisation
@@ -52,6 +53,15 @@ namespace SIGEL_Visualisation
       SIG_RenderRecorder(int noOfObjects);
 
       /**
+       * The destructor.
+       *
+       * robotLinks had setAutoDelete(true), so ~QVector was its only free and
+       * this class had no destructor at all. Qt 6's QList frees nothing, so
+       * the free is written out -- PORTING.md Phase C, C5.
+       */
+      ~SIG_RenderRecorder();
+
+      /**
        * Initalizes the start positions and rotations of
        * the elements of robotLinks taken from the
        * appropriate SIGEL_Simulation::SIG_SimulationQueries.
@@ -59,9 +69,7 @@ namespace SIGEL_Visualisation
        * First it calls the method init of the superclass
        * SIGEL_Simulation::SIG_Recorder.
        */
-      void init()
-	throw (SIGEL_Simulation::SIG_RecorderNoQueriesSetException,
-	       SIGEL_Simulation::SIG_RecorderBadRecordingOrderException);
+      void init();
 
       /**
        * Updates the positions and rotations of the robotLinks
@@ -71,9 +79,7 @@ namespace SIGEL_Visualisation
        * First it calls the method record of the superclass
        * SIGEL_Simulation::SIG_Recorder.
        */
-      void record()
-	throw (SIGEL_Simulation::SIG_RecorderNoQueriesSetException,
-	       SIGEL_Simulation::SIG_RecorderBadRecordingOrderException);
+      void record();
 
       /**
        * This method does nothing at the moment.
@@ -85,9 +91,7 @@ namespace SIGEL_Visualisation
        * First it calls the method finish of the superclass
        * SIGEL_Simulation::SIG_Recorder.
        */
-      void finish()
-	throw (SIGEL_Simulation::SIG_RecorderNoQueriesSetException,
-	       SIGEL_Simulation::SIG_RecorderBadRecordingOrderException);
+      void finish();
 
     private:
 
@@ -95,7 +99,7 @@ namespace SIGEL_Visualisation
        * The data structure used to record the actual
        * positions and rotations of the simulated objects.
        */
-      QVector<SIG_SceneObject> robotLinks;
+      QList<SIG_SceneObject *> robotLinks;
 
       QTime simulationTime;
 

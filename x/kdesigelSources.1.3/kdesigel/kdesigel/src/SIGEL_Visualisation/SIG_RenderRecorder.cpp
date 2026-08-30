@@ -30,23 +30,24 @@ namespace SIGEL_Visualisation
 			robotLinks(noOfObjects),
 			simulationTime()
   {
-    robotLinks.setAutoDelete(true);
 
     for (int i=0; i<noOfObjects; i++)
-      robotLinks.insert(i, new SIG_SceneObject(i));
+      robotLinks[i] = new SIG_SceneObject(i);   // slot was value-initialised to null
+  };
+
+  SIG_RenderRecorder::~SIG_RenderRecorder()
+  {
+    qDeleteAll( robotLinks );
+    robotLinks.clear();
   };
 
   void SIG_RenderRecorder::init()
-    throw (SIGEL_Simulation::SIG_RecorderNoQueriesSetException,
-	   SIGEL_Simulation::SIG_RecorderBadRecordingOrderException)
   {
     SIG_Recorder::init();
     record();
   };
 
   void SIG_RenderRecorder::record()
-	throw (SIGEL_Simulation::SIG_RecorderNoQueriesSetException,
-	       SIGEL_Simulation::SIG_RecorderBadRecordingOrderException)
   {
     SIG_Recorder::record();
 
@@ -60,8 +61,6 @@ namespace SIGEL_Visualisation
   };
 
   void SIG_RenderRecorder::finish()
-    throw (SIGEL_Simulation::SIG_RecorderNoQueriesSetException,
-	   SIGEL_Simulation::SIG_RecorderBadRecordingOrderException)
   {
     SIG_Recorder::finish();
   };

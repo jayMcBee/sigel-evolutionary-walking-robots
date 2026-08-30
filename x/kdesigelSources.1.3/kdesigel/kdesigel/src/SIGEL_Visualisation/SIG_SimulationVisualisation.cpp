@@ -20,6 +20,8 @@
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
+#include <QIODevice>
+#include <QFile>
 #include "SIGEL_Visualisation/SIG_SimulationVisualisation.h"
 #include "SIGEL_Tools/SIG_TypeConverter.h"
 
@@ -47,7 +49,7 @@ namespace SIGEL_Visualisation
      if (robotPathPointAddingRate == 0)
        robotPathPointAddingRate = 1;
 
-     int noOfLinks = robot.getLinkIter().count();
+     int noOfLinks = robot.getLinks().size();
      renderRecorder = new SIG_RenderRecorder(noOfLinks);
 
      simulation = new SIGEL_Simulation::SIG_Simulation(robot,
@@ -112,7 +114,6 @@ namespace SIGEL_Visualisation
    };
 
    void SIG_SimulationVisualisation::makeTimeSteps(int noOfTimeSteps)
-     throw (SIGEL_Simulation::SIG_SimulationCannotSolveException)
    {
      for (int i=1; i <= noOfTimeSteps; i++)
        {
@@ -145,7 +146,7 @@ namespace SIGEL_Visualisation
 
   void SIG_SimulationVisualisation::updateRobotLinks()
   {
-    int noOfLinks = robot.getLinkIter().count();
+    int noOfLinks = robot.getLinks().size();
     for (int i=0; i<noOfLinks; i++)
       {
 	robotRenderer.sceneObjects[i]->setPosition( renderRecorder->robotLinks[i]->position );
@@ -155,9 +156,9 @@ namespace SIGEL_Visualisation
 
   void SIG_SimulationVisualisation::updateRobotPoints()
   {
-    int noOfPoints = robotRenderer.sceneObjects.size() - robot.getLinkIter().count();
+    int noOfPoints = robotRenderer.sceneObjects.size() - robot.getLinks().size();
 
-    for (int i=robot.getLinkIter().count(); i<robotRenderer.sceneObjects.size(); i++)
+    for (int i=robot.getLinks().size(); i<robotRenderer.sceneObjects.size(); i++)
       {
 	int linkNumber = robotRenderer.sceneObjects[i]->getNumber();
 
@@ -190,7 +191,7 @@ namespace SIGEL_Visualisation
   {
     QFile file( fileName );
 
-    if (!file.open( IO_WriteOnly ))
+    if (!file.open( QIODevice::WriteOnly ))
       return false;
 
     QTextStream stream( &file );
@@ -248,7 +249,7 @@ namespace SIGEL_Visualisation
   {
     QFile file( fileName );
 
-    if (!file.open( IO_WriteOnly ))
+    if (!file.open( QIODevice::WriteOnly ))
       return false;
 
     QTextStream stream( &file );

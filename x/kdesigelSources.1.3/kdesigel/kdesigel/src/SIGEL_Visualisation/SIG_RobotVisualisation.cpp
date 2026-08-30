@@ -28,11 +28,9 @@ namespace SIGEL_Visualisation
   SIG_RobotVisualisation::SIG_RobotVisualisation(SIGEL_Robot::SIG_Robot const &robot)
     : SIG_Visualisation(), robotRenderer(robot)
   {
-    QDictIterator<SIGEL_Robot::SIG_Link> iter = robot.getLinkIter();
-
-    while (iter.current())
+    for ( SIGEL_Robot::SIG_Link *linkPtr : robot.getLinks() )
       {
-	SIGEL_Robot::SIG_Link &actLink = *iter.current();
+	SIGEL_Robot::SIG_Link &actLink = *linkPtr;
 
 	int number = actLink.getNumber();
 
@@ -43,10 +41,9 @@ namespace SIGEL_Visualisation
 	robotRenderer.sceneObjects[number]->setPosition(position);
 	robotRenderer.sceneObjects[number]->setRotation(rotation);
 
-	++iter;
       };
 
-    for (int i = iter.count(); i < robotRenderer.sceneObjects.size(); i++)
+    for (int i = robot.getLinks().size(); i < robotRenderer.sceneObjects.size(); i++)
       {
 	int linkNumber = robotRenderer.sceneObjects[ i ]->getNumber();
 

@@ -107,8 +107,7 @@ namespace SIGEL_Visualisation
        *
        * @param noOfTimeSteps The number of timeSteps the simulation should progress about.
        */
-      void makeTimeSteps(int noOfTimeSteps)
-	throw (SIGEL_Simulation::SIG_SimulationCannotSolveException);
+      void makeTimeSteps(int noOfTimeSteps);
 
       QTime getSimulationTime() const;
 

@@ -23,6 +23,7 @@
 #ifndef SIGEL_VISUALISATION_SIG_VISUALSCENEOBJECT_H
 #define SIGEL_VISUALISATION_SIG_VISUALSCENEOBJECT_H
 
+#include <QList>
 #include <qstring.h>
 
 #include "SIGEL_Visualisation/SIG_SceneObject.h"
@@ -192,7 +193,7 @@ namespace SIGEL_Visualisation
        *            the attribute position. This is guaranted
        *            by the method updateTransformationInternal.
        */
-      QArray<GLdouble> transformationInternal;
+      QList<GLdouble> transformationInternal;
 
       /**
        * Internal representation the attribute color.
@@ -201,7 +202,7 @@ namespace SIGEL_Visualisation
        * The QArray contains the R, G and B components
        * of the object's color.
        */
-      QArray<GLdouble> colorInternal;
+      QList<GLdouble> colorInternal;
 
       /**
        * Controls if the object is rendered.

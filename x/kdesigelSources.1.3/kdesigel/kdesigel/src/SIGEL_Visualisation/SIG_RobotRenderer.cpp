@@ -20,6 +20,7 @@
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
+#include <QIODevice>
 #include "SIGEL_Visualisation/SIG_RobotRenderer.h"
 #include "SIGEL_Tools/SIG_TypeConverter.h"
 
@@ -29,16 +30,12 @@ namespace SIGEL_Visualisation
 {
 
   SIG_RobotRenderer::SIG_RobotRenderer(SIGEL_Robot::SIG_Robot const &robot)
-    : SIG_Renderer( robot.getLinkIter().count() + robot.getNrOfPoints(), robot.getNrOfPoints() ),
+    : SIG_Renderer( robot.getLinks().size() + robot.getNrOfPoints(), robot.getNrOfPoints() ),
       robot(robot)
   {
-    QDictIterator<SIGEL_Robot::SIG_Link> linkIter = robot.getLinkIter();
-
-    linkIter.toFirst();
-
-    while (linkIter.current())
+    for ( SIGEL_Robot::SIG_Link *linkPtr : robot.getLinks() )
       {
-	SIGEL_Robot::SIG_Link &actLink = *linkIter.current();
+	SIGEL_Robot::SIG_Link &actLink = *linkPtr;
 
 	int number = actLink.getNumber();
 	QString name = actLink.getName();
@@ -46,9 +43,9 @@ namespace SIGEL_Visualisation
 	SIG_VisualSceneObject *newSceneObject = new SIG_VisualSceneObject(number, name);
 	newSceneObject->setColor( actLink.getMaterial()->getColour() );
 
-	sceneObjects.insert( number, newSceneObject );
+	delete sceneObjects[ number ];
+	sceneObjects[ number ] = newSceneObject;
 
-	++linkIter;
       };
 
     buildDisplayLists();
@@ -61,14 +58,12 @@ namespace SIGEL_Visualisation
 
   void SIG_RobotRenderer::buildDisplayLists()
   {
-    QDictIterator<SIGEL_Robot::SIG_Link> linkIter = robot.getLinkIter();
-
-    int nextPointIndex = robot.getLinkIter().count();
+    int nextPointIndex = robot.getLinks().size();
     int nextFloatingIndex = 0;
 
-    while (linkIter.current())
+    for ( SIGEL_Robot::SIG_Link *linkPtr : robot.getLinks() )
       {
-	SIGEL_Robot::SIG_Link &actLink = *linkIter.current();
+	SIGEL_Robot::SIG_Link &actLink = *linkPtr;
 
 	int linkNumber = actLink.getNumber();
 	GLuint linkIndex = static_cast<GLuint>(linkNumber);
@@ -118,17 +113,13 @@ namespace SIGEL_Visualisation
 
 	glEndList();
 
-	QDictIterator<DL_vector> pointIter = actLink.getPointIter();
-
-	pointIter.toFirst();
-
-	while (pointIter.current())
+	for ( const SIGEL_Robot::SIG_Link::NamedPoint &pointEntry : actLink.getPoints() )
 	  {
 	    GLuint pointIndex = static_cast<GLuint>( nextPointIndex );
 
 	    GLuint actListIndex = pointIndex + displayListsOffset;
 
-	    DL_vector pointPosition = *pointIter.current();
+	    DL_vector pointPosition = *pointEntry.value;
 
 	    glNewList( actListIndex, GL_COMPILE );
 	    glPointSize( 5 );
@@ -140,9 +131,9 @@ namespace SIGEL_Visualisation
 	    glEndList();
 
 	    SIG_VisualSceneObject *newPointSceneObject = new SIG_VisualSceneObject( linkNumber,
-										    pointIter.currentKey() );
+										    pointEntry.name );
 
-	    SIG_FloatingText *newFloatingText = new SIG_FloatingText( 0, 0, pointIter.currentKey() );
+	    SIG_FloatingText *newFloatingText = new SIG_FloatingText( 0, 0, pointEntry.name );
 
 	    newPointSceneObject->setFloatingText( newFloatingText );
 
@@ -157,18 +148,16 @@ namespace SIGEL_Visualisation
 
 	    newPointSceneObject->setColor( linkColor );
 
-	    sceneObjects.insert( nextPointIndex, 
-				 newPointSceneObject );
+	    delete sceneObjects[ nextPointIndex ];
+	    sceneObjects[ nextPointIndex ] = newPointSceneObject;
 
-	    floatingTexts.insert( nextFloatingIndex,
-				  newFloatingText );
+	    delete floatingTexts[ nextFloatingIndex ];
+	    floatingTexts[ nextFloatingIndex ] = newFloatingText;
 
 	    nextPointIndex++;
 	    nextFloatingIndex++;
-	    ++pointIter;
 	  };
 
-	++linkIter;
       };
 
   };
@@ -177,9 +166,9 @@ namespace SIGEL_Visualisation
   {
     renderSceneObjects();
 
-    for (GLuint i=static_cast<GLuint>(robot.getLinkIter().count()); i<noOfObjects; i++)
+    for (GLuint i=static_cast<GLuint>(robot.getLinks().size()); i<noOfObjects; i++)
       {
-	QArray< GLfloat > buffer( 3 );
+	QList< GLfloat > buffer( 3 );
 	buffer.fill( 0 );
 
 	glFeedbackBuffer( 3, GL_2D, buffer.data() );
@@ -213,13 +202,11 @@ namespace SIGEL_Visualisation
   {
     QString declarationsString;
 
-    QTextStream stream( &declarationsString, IO_WriteOnly );
+    QTextStream stream( &declarationsString, QIODevice::WriteOnly );
 
-    QDictIterator<SIGEL_Robot::SIG_Material> materialIter = robot.getMaterialIter();
-
-    while (materialIter.current())
+    for ( SIGEL_Robot::SIG_Material *materialPtr : robot.getMaterials() )
       {
-	SIGEL_Robot::SIG_Material &actMaterial = *materialIter.current();
+	SIGEL_Robot::SIG_Material &actMaterial = *materialPtr;
 
 	stream << "#declare "
 	       << actMaterial.getName()
@@ -234,22 +221,19 @@ namespace SIGEL_Visualisation
 	       << "}\n"
 	       << "\n";
 
-	++materialIter;
       };
 
     QString pointDataString;
-    QTextStream pointDataStream( &pointDataString, IO_WriteOnly );
+    QTextStream pointDataStream( &pointDataString, QIODevice::WriteOnly );
 
-    QDictIterator<SIGEL_Robot::SIG_Link> linkIter = robot.getLinkIter();
-
-    while (linkIter.current())
+    for ( SIGEL_Robot::SIG_Link *linkPtr : robot.getLinks() )
       {
-	SIGEL_Robot::SIG_Link &actLink = *linkIter.current();
+	SIGEL_Robot::SIG_Link &actLink = *linkPtr;
 
 	int linkNumber = actLink.getNumber();
 
 	QString polygonDataString;
-	QTextStream polygonDataStream( &polygonDataString, IO_WriteOnly );
+	QTextStream polygonDataStream( &polygonDataString, QIODevice::WriteOnly );
 
 	stream << "#declare "
 	       << actLink.getName()
@@ -287,13 +271,9 @@ namespace SIGEL_Visualisation
 	    actGeoIter.next();
 	  };
 
-	QDictIterator<DL_vector> pointIter = actLink.getPointIter();
-
-	pointIter.toFirst();
-
-	while (pointIter.current())
+	for ( const SIGEL_Robot::SIG_Link::NamedPoint &pointEntry : actLink.getPoints() )
 	  {
-	    NEWMAT::ColumnVector pointPosition = SIG_TypeConverter::toColumnVector( *pointIter.current() );
+	    NEWMAT::ColumnVector pointPosition = SIG_TypeConverter::toColumnVector( *pointEntry.value );
 
 	    NEWMAT::ColumnVector linkColor = SIG_TypeConverter::toColumnVector( actLink.getMaterial()->getColour() );
 
@@ -305,7 +285,7 @@ namespace SIGEL_Visualisation
 	      };
 
 	    pointDataStream << "#declare "
-			    << pointIter.currentKey()
+			    << pointEntry.name
 			    << " = sphere {\n"
 			    << "  "
 			    << vectorToPovray( pointPosition )
@@ -321,7 +301,6 @@ namespace SIGEL_Visualisation
 			    << "}\n"
 			    << "\n";
 
-	    ++pointIter;
 	  };
 
 	stream << polygonDataString
@@ -331,7 +310,6 @@ namespace SIGEL_Visualisation
 	       << "  }\n"
 	       << "}\n"
 	       << "\n";
-	++linkIter;
       };
 
     stream << pointDataString;
@@ -341,7 +319,7 @@ namespace SIGEL_Visualisation
 
   void SIG_RobotRenderer::setPointsVisible( bool visible )
   {
-    for (int i = robot.getLinkIter().count(); i < noOfObjects; i++ )
+    for (int i = robot.getLinks().size(); i < noOfObjects; i++ )
       sceneObjects[i]->setVisible( visible );
   };
 

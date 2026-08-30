@@ -394,10 +394,34 @@ $(foreach m,$(CORE),$(eval $(call core_lib,$(m))))
 
 # One fitness evaluation. --start-group because the core modules have cycles:
 # SIGEL_GP calls SIGEL_Simulation, which reaches back through SIG_Robot.
-$(B)/sigel_eval: sigel_eval.cpp $(MOC_OBJS) $(CORE_LIBS) $(VENDOR_LIBS)
-	$(SIGCXX) $(SIGINC) $< $(MOC_OBJS) -o $@ \
+#
+# WHICH SIG_GPExperiment GETS LINKED WAS DECIDED BY ARCHIVE MEMBER ORDER, AND
+# NOTHING PINNED IT. §9 records that the class is defined twice on purpose --
+# SIG_GPExperiment.cpp for `sigel', SIG_GPExperimentClean.cpp for the slave,
+# differing in whether the constructor builds an MT_Controller -- and that
+# sigel_eval is the slave's role and must get Clean. But both land in
+# libSIGEL_GP.a, the linker takes the FIRST member that defines the symbol, and
+# $(wildcard) does not sort: a clean build happened to put Clean first, an
+# incremental one put the master first and the link then failed on
+# MT_Controller. Sorting would be worse, not better -- alphabetically the
+# master wins.
+#
+# So name Clean explicitly, ahead of the archives, exactly as 2003 compiled it
+# into the slave target. The assertion after the link is the P4 pattern.
+# TODAY the linker fails first, on the master's undefined MT_Controller, so the
+# assertion is belt-and-braces; it becomes the ONLY guard once C6 ports MT_GUI
+# and MT_Controller links, at which point the master would link silently and
+# sigel_eval would start constructing an MT_Controller per experiment.
+CLEAN_OBJ := $(OBJ)/sigel/SIGEL_GP/SIG_GPExperimentClean.o
+
+$(B)/sigel_eval: sigel_eval.cpp $(MOC_OBJS) $(CLEAN_OBJ) $(CORE_LIBS) $(VENDOR_LIBS)
+	$(SIGCXX) $(SIGINC) $< $(MOC_OBJS) $(CLEAN_OBJ) -o $@ \
 	  -Wl,--start-group $(CORE_LIBS) $(VENDOR_LIBS) -Wl,--end-group \
 	  -L$(QTLIB) -lQt6Widgets -lQt6Gui -lQt6Core -lGL -lm
+	@n=`nm -C $@ | grep -c 'MT_Controller' || true`; \
+	 test "$$n" -eq 0 || { \
+	   echo "sigel_eval linked the MASTER SIG_GPExperiment: $$n MT_Controller" \
+	        "symbols. It must link SIG_GPExperimentClean -- see §9." >&2; exit 1; }
 
 # ---------------------------------------------------------------------------
 # Does SIGEL's own PVM code link and run against real PVM? -- PORTING.md

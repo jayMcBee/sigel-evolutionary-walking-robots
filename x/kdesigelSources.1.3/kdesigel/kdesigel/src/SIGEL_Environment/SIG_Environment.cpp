@@ -389,7 +389,7 @@ namespace SIGEL_Environment {
  		return floorPictureFile;
  	};
  	
- 	QString SIG_Environment::getTextureFile() {
+ 	QString SIG_Environment::getTextureFile() const {
  		return textureFile;
  	};
 
@@ -418,11 +418,11 @@ namespace SIGEL_Environment {
   	dmEnvironment::setEnvironment( &dynaMechsEnvironment );
 	};
 	
-	dmEnvironment *SIG_Environment::getDMEnvironment() {
+	dmEnvironment *SIG_Environment::getDMEnvironment() const {
 		return dmEnvironment::getEnvironment();
 	}
 	
-	int SIG_Environment::getTexAlpha() {
+	int SIG_Environment::getTexAlpha() const {
 		return texAlpha;
 	};
 
@@ -430,7 +430,7 @@ namespace SIGEL_Environment {
 		texAlpha = _texAlpha;
   };
 
-  bool SIG_Environment::getWithTexture() {
+  bool SIG_Environment::getWithTexture() const {
 		return withTexture;
   };
 

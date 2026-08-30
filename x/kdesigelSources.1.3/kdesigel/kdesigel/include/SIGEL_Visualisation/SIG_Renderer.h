@@ -23,8 +23,7 @@
 #ifndef SIGEL_VISUALISATION_SIG_RENDERER_H
 #define SIGEL_VISUALISATION_SIG_RENDERER_H
 
-#include <qvector.h>
-#include <qarray.h>
+#include <QList>
 #include <qstring.h>
 #include <qtextstream.h>
 
@@ -108,9 +107,9 @@ namespace SIGEL_Visualisation
      * change the object properties with
      * the progress of a simulation for example.
      */
-    QVector<SIG_VisualSceneObject> sceneObjects;
+    QList<SIG_VisualSceneObject *> sceneObjects;
 
-    QVector<SIG_FloatingText> floatingTexts;
+    QList<SIG_FloatingText *> floatingTexts;
 
   protected:
 

@@ -27,7 +27,7 @@
 #include "SIGEL_Environment/SIG_Environment.h"
 #include "SIGEL_Visualisation/SIG_ViewSettings.h"
 
-#include <qlist.h>
+#include <QList>
 #include <pointvector.h>
 
 namespace SIGEL_Visualisation
@@ -203,7 +203,7 @@ namespace SIGEL_Visualisation
 
     bool withTexture;
 
-    QList< DL_vector > robotPathPoints;
+    QList< DL_vector * > robotPathPoints;
 
     /**
     	*	This variable holds a texture

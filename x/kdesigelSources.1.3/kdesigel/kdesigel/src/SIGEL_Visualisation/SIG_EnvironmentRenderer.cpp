@@ -20,6 +20,7 @@
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
+#include <QIODevice>
 #include "SIGEL_Visualisation/SIG_EnvironmentRenderer.h"
 
 #include "SIGEL_Tools/SIG_TypeConverter.h"
@@ -48,7 +49,6 @@ namespace SIGEL_Visualisation
       showPlane( true ),
       showGrid( false )
   {
-    robotPathPoints.setAutoDelete( true );
 
     DL_matrix idRotation;
     idRotation.makeone();
@@ -60,7 +60,8 @@ namespace SIGEL_Visualisation
     plane->setPosition( DL_vector(0, planeLevel, 0) );
     plane->setRotation( idRotation );
 
-    sceneObjects.insert( 0, plane );
+    delete sceneObjects[ 0 ];
+    sceneObjects[ 0 ] = plane;
 
     SIG_VisualSceneObject *grid = new SIG_VisualSceneObject( 1, "Grid" );
 
@@ -69,13 +70,18 @@ namespace SIGEL_Visualisation
     grid->setPosition( DL_vector(0, planeLevel, 0) );
     grid->setRotation( idRotation );
 
-    sceneObjects.insert( 1, grid );
+    delete sceneObjects[ 1 ];
+    sceneObjects[ 1 ] = grid;
 
     buildDisplayLists();
   };
 
   SIG_EnvironmentRenderer::~SIG_EnvironmentRenderer()
-  { };
+  {
+    // robotPathPoints had setAutoDelete(true) and nothing else freed it.
+    qDeleteAll( robotPathPoints );
+    robotPathPoints.clear();
+  };
 
   void SIG_EnvironmentRenderer::setPlaneColor( double red,
 					       double green,
@@ -184,14 +190,14 @@ namespace SIGEL_Visualisation
 	glColor3d( 1, 1, 0 );
 
 	glBegin( GL_LINE_STRIP );
-	DL_vector *actPoint = robotPathPoints.first();
-	while (actPoint)
+	// Qt 2 cursor walk. The count() >= 2 guard above is what kept first()
+	// off an empty list, which is UB in Qt 6 -- see §9.
+	for ( qsizetype i = 0; i < robotPathPoints.size(); i++ )
 	  {
+	    DL_vector *actPoint = robotPathPoints.at( i );
 	    glVertex3d( GLdouble( actPoint->x ),
 			GLdouble( actPoint->y ),
 			GLdouble( actPoint->z ) );
-
-	    actPoint = robotPathPoints.next();
 	  };
 	glEnd();
 
@@ -220,7 +226,7 @@ namespace SIGEL_Visualisation
   QString SIG_EnvironmentRenderer::exportToPovray()
   {
     QString resultString;
-    QTextStream stream( &resultString, IO_WriteOnly );
+    QTextStream stream( &resultString, QIODevice::WriteOnly );
 
 #ifdef _WINDOWS
     int xPos = static_cast< int >( ::floor( lookPoint.get( 0 ) / fieldEdgeLength ) * fieldEdgeLength );
@@ -243,11 +249,12 @@ namespace SIGEL_Visualisation
     if (showRobotPath)
       if (robotPathPoints.count() >= 2)
 	{
-	  DL_vector *prevPoint = robotPathPoints.first();
-	  DL_vector *actPoint = robotPathPoints.next();
-
-	  while (actPoint)
+	  // pairs walk: (0,1), (1,2), ... -- the Qt 2 cursor version stepped
+	  // prevPoint up behind actPoint
+	  for ( qsizetype i = 1; i < robotPathPoints.size(); i++ )
 	    {
+	      DL_vector *prevPoint = robotPathPoints.at( i - 1 );
+	      DL_vector *actPoint  = robotPathPoints.at( i );
 	      NEWMAT::ColumnVector base =   SIG_TypeConverter::sigelToPovray()
 		                          * SIG_TypeConverter::toColumnVector( *prevPoint );
 	      NEWMAT::ColumnVector cap =   SIG_TypeConverter::sigelToPovray()
@@ -265,8 +272,6 @@ namespace SIGEL_Visualisation
 		     << "           diffuse 1 }\n"
 		     << "}\n";
 
-	      prevPoint = actPoint;
-	      actPoint = robotPathPoints.next();
 	    };
 
 	  stream << "\n";
@@ -278,7 +283,7 @@ namespace SIGEL_Visualisation
   QString SIG_EnvironmentRenderer::createPovrayDeclarations()
   {
     QString declarationsString;
-    QTextStream stream( &declarationsString, IO_WriteOnly );
+    QTextStream stream( &declarationsString, QIODevice::WriteOnly );
 
     NEWMAT::ColumnVector planeColorVector = SIG_TypeConverter::toColumnVector( sceneObjects[ 0 ]->getColor() );
 
@@ -470,7 +475,7 @@ namespace SIGEL_Visualisation
     	return false;
     }
 
-    if ( !loadPNMTexture(texFile.utf8()) )
+    if ( !loadPNMTexture(texFile.toUtf8().data()) )
     	return false;
 
     // Set up texture environment.

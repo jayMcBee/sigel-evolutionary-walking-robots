@@ -229,7 +229,7 @@ class SIG_Environment {
   	*	@return
   	*		The path of the file.
   	*/
- 	QString getTextureFile();
+ 	QString getTextureFile() const;
 
 	/**	Sets the TextureFile.
  		*
@@ -243,7 +243,7 @@ class SIG_Environment {
   	*	@return
   	*		The alpha value for the texture.
   	*/
- 	int getTexAlpha();
+ 	int getTexAlpha() const;
 
 	/**	Sets the alpha value for the texture.
  		*
@@ -253,7 +253,7 @@ class SIG_Environment {
   void setTexAlpha(int _texAlpha);
 
 
- 	bool getWithTexture();
+ 	bool getWithTexture() const;
 
   void setWithTexture(bool _withTexture);
 
@@ -386,7 +386,7 @@ class SIG_Environment {
   /**
   	*  This function returns a reference to the dynaMechsEnvironment.
   	*/
-  dmEnvironment *getDMEnvironment();
+  dmEnvironment *getDMEnvironment() const;
 
  	/**
  		*	This function generates a terrain for the DynaMechsEnvironment with
