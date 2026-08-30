@@ -1797,6 +1797,37 @@ could undo that without noticing.
 *The sweep is a candidate list, not a proof of absence — its window is seven
 instructions, so it misses any site that stores the result and tests it later.*
 
+#### The third family: iterate and mutate the same container
+
+Found by converting `taskCanDoList` (D25a), then swept for systematically in
+the 1.3 binary: group container calls by **element type**, and flag any function
+that both iterates and mutates something with the same element signature.
+
+*The sweep's first version keyed on the container **type name** and missed
+`evolutionLoop` — the one case measured as real — because the iterator calls are
+on `QValueListIterator<int>` and the mutations on `QValueList<int>`, different
+strings that never join. Keying on element type finds it. **A sweep that cannot
+find a known positive is not evidence**, and this one was rebuilt until it
+could.*
+
+Seven functions, all now resolved:
+
+| function | verdict |
+|---|---|
+| `evolutionLoop()` and `evolutionLoop(MT_Classifier *)` | **the known positive** — 80 appends inside the live loop, measured. Converted in D25a |
+| `SIG_Link::transformToDynaMechs` | **safe** — walks `this->joints` (member at `+0x38`) and appends to a *local* list constructed at `0x80976f9`. Two container instances, one element type: an artefact of element-type keying |
+| `SIG_Material::setFrictionValue` | **safe** — the loop exits at `0x8094f64` and the `new`+`append` at `0x8094f7e`/`0x8094fa7` are past it. Never mutates while the iterator is live |
+| `SIG_Robot::clear` | **safe here, and not by luck** — Qt 2 built six `QDictIterator`s and deleted through them. Our conversion (`SIG_Robot.cpp:82-94`) is six `qDeleteAll` followed by six `clear()`, which deletes *items* and never mutates a container mid-walk. The shape is gone, not merely harmless |
+| `SIG_GPParameter::slotAddHost`, `::slotDeleteHost` | **Phase C.** `slotDeleteHost` is safe by design — the 2003 comment at `:467` says *"we don't delete the host directly as the iterator would get confused"*, and it defers into a list. But it is a knot of three separate §9 hazards: an unconverted Qt 2 `QList<SIG_GPPVMHost>` used as a pointer list, a Qt 2 cursor `QListIterator` with `.current()`/`++`, and `hostList2.remove(host)` at `:520` |
+
+**A refinement that does not work, recorded so nobody rebuilds it.** Comparing
+the *receiver operand* of the iterate calls against the mutate calls looks like
+an automatic discriminator. It is not: it declares `evolutionLoop` safe, because
+for iterator-style walks the iterator is always a different object from the
+container by construction. It would only work for cursor-style containers where
+`first`/`next` are called on the container itself. **Every candidate needs its
+loop body read.**
+
 ### `SIG_GPExperiment` is defined twice, on purpose — do not "fix" it
 
 **Two files define `SIGEL_GP::SIG_GPExperiment`**, with different bodies:
