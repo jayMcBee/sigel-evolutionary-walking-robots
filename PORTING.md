@@ -1797,6 +1797,51 @@ could undo that without noticing.
 *The sweep is a candidate list, not a proof of absence — its window is seven
 instructions, so it misses any site that stores the result and tests it later.*
 
+#### The fourth family: numeric text on serialisation — CHECKED, no divergence
+
+**Structurally invisible to every comparison run so far.** V1, V6, V7 and V8 all
+compared 1.3 against 1.3, so both sides came from the same writer. A difference
+in how a `double` is *rendered* could not appear in any of them — and it would
+make every saved `.exp` and `.pol` differ from 1.3 in the text of every real
+number while being numerically identical. That reads as file corruption in a
+diff, or passes a numeric-tolerance check and fails a byte check with no visible
+cause.
+
+**1.3's writer is C `%g` at default precision 6.** Characterised on the x86 box
+across all 126,871 numeric literals in the 12 shipped experiments: **0**
+violations of the `%g` notation rule, **0** literals whose text differs from
+`printf("%g", value)`, maximum 6 significant digits (115,896 sit at exactly 6,
+none above), scientific notation only for exponents −05 and −06, and not one
+trailing zero after the point anywhere.
+
+**Our writer matches, tested locally two ways.** Nothing in the tree sets
+`setRealNumberPrecision` or `setRealNumberNotation` on a file stream — only
+`SIG_GPPVMData.cpp:116,157` do, at 50, for the wire — so Qt 6's defaults
+(precision 6, `SmartNotation`) are what ships.
+
+| test | result |
+|---|---|
+| the seven boundary values, including the **exponent −4 case** that stays decimal under `%g` and would differ on 2,036 corpus values if a writer switched to scientific one exponent early | **7 of 7 identical** to 1.3 and to `%g` |
+| every distinct decimal literal in `data/Experiments/*.exp` and `data/Robots/*.rrb` — parse to `double`, write back through `QTextStream`, compare text | **4,330 literals, 0 differ** |
+
+Together with the existing 200,000-random-bit-pattern audit against Qt 2's
+`%.6lg` (§ replication table), which covers values the corpus does not contain,
+this family is closed for everything the port can write. *`-0` remains the one
+known exception and appears in no shipped stream.*
+
+**A consequence that sharpens V4.** The file format carries only 6 significant
+digits, so **any fitness comparison mediated by a file has 6-digit
+granularity** — architecture differences below the sixth significant figure
+cannot appear in a `.pol` at all. That gives V4 a natural form: *do the two
+builds agree to 6 significant figures on a fixed program?* If yes the files are
+byte-identical and there is nothing left to argue about tolerance. The gate
+falls out of the format instead of being chosen. **This does not touch the
+chaotic-amplification question**, which is about the simulation diverging over
+time, not about representation.
+
+*Scope: this characterises decimal literals in the shipped `.exp` and `.rrb`.
+Integers and any binary-format path are outside it.*
+
 #### The third family: iterate and mutate the same container
 
 Found by converting `taskCanDoList` (D25a), then swept for systematically in
