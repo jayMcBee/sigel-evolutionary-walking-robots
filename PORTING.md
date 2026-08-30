@@ -30,7 +30,7 @@ build and run, because nothing else can be verified without it — see §3.
 | B — ownership explicit | **subsumed by Phase D**, which deletes the containers rather than converting them. **3** `setAutoDelete` calls left in core, re-measured 2026-08-30 after D24 — all three in `SIGEL_GP`, and all three in one file: `SIG_GPManager.cpp:64` (`tours`), `:358` and `:1435` (the two local `fitTaskList`). **0 in `MT_Control`** (D24 deleted the last) and **0 in `SIGEL_Robot`**. *This row said 11 with 10 in `SIGEL_GP` and 1 in `MT_Control`. The two `setAutoDelete` in `SIG_GPFitnessTrainer.cpp` are comments, not calls, and 10 was never a core figure — `SIGEL_MasterGUI` has 11. Fourth correction of this row, fourth by review.*: D11 deleted `SIG_Body.cpp:54`, the last one, and left this row saying 12. *Before that it read 13 with 2 in `SIGEL_Robot`, where there was one. Three readings of the same row, three corrections, each by review.* **Not all of them are unreachable, and an earlier version of this row said they were.** `SIG_GPPopulation::pool` is owning, is constructed on every `sigel_eval` run and takes 100 `insert()`s inside both gates — see "What the gates actually reach" in §10. The **6** in `SIG_GPFitnessTrainer` and `SIG_GPManager` are the ones Phase C still blocks; the row said 7, which did not even add up against the 10 in the same sentence |
 | R — build and run | core builds and runs. **No longer checked only against itself** — Phase V has confirmed both the ordering and the arithmetic against the 1.3 binary, §7 |
 | T — old-Qt tool container | **done 2026-08-27.** `tools/qtmig`, §4 |
-| D — delete the shim, migrate the data | **D1–D24 done.** `Q2Dict`, `Q2DictIterator`, `Q2Array` and `Q2CString` gone from all code; the simulation path, `SIG_GPFitnessTrainer`, `SIG_GPFullDataRecorder` and `crossOver` all converted. Shim 806 → **536** lines, included by **23** files — *files that actually `#include` it: 22 in the source tree plus `sigel_eval.cpp`. A `git grep -l q2compat.h` returns 24 because it counts `PORTING.md`, which merely names the header.* Remaining, measured 2026-08-30 after D24: `Q2PtrList` **37**, `Q2PtrVector` 46, `Q2Queue` **9**, `Q2ValueList` 12, `Q2ListIterator` 8, `Q2CString` 15 — **lines containing the name, in the source tree only**: the shim's own header and self-check are included, `sigel_eval.cpp` and `verification-against-sigel-1.3/` are not. State the scope when you re-measure; the same six names give **44**/46/9/12/8/15 if `sigel_eval.cpp` and the captures are counted, and **46**/48/9/12/8/15 if you count occurrences instead of lines. *Both broad figures were left at their pre-D24 values when the narrow one was updated in the same sentence.* The `Q2PtrVector` bulk is `SIG_GPManager::tours`, which **cannot be linked** until Phase C. §10 |
+| D — delete the shim, migrate the data | **D1–D24 done, D25a done.** `Q2Dict`, `Q2DictIterator`, `Q2Array` and `Q2CString` gone from all code; the simulation path, `SIG_GPFitnessTrainer`, `SIG_GPFullDataRecorder` and `crossOver` all converted. Shim 806 → **536** lines, included by **23** files — *files that actually `#include` it: 22 in the source tree plus `sigel_eval.cpp`. A `git grep -l q2compat.h` returns 24 because it counts `PORTING.md`, which merely names the header.* Remaining, measured 2026-08-30 after D24: `Q2PtrList` **37**, `Q2PtrVector` 46, `Q2Queue` **9**, `Q2ValueList` **9**, `Q2ListIterator` 8, `Q2CString` 15 — **lines containing the name, in the source tree only**: the shim's own header and self-check are included, `sigel_eval.cpp` and `verification-against-sigel-1.3/` are not. State the scope when you re-measure; the same six names give **44**/46/9/12/8/15 if `sigel_eval.cpp` and the captures are counted, and **46**/48/9/12/8/15 if you count occurrences instead of lines. *Both broad figures were left at their pre-D24 values when the narrow one was updated in the same sentence.* The `Q2PtrVector` bulk is `SIG_GPManager::tours`, which **cannot be linked** until Phase C. §10 |
 | P — PVM | **DONE 2026-08-28.** Vendored 3.4.3 replaced by upstream 3.4.6; nine patches carry the four config lines and Debian's eight source fixes; `libpvm3.a` and `pvmd3` build; SIGEL's two PVM objects link against them and `SIG_GPPVMData` round-trips through real PVM. `sigel`/`sigel_slave` still need Phase C. §7 |
 | C — GUI | **not started, AUTHORIZED 2026-08-27 per D24.** ~450 Qt 2 sites + 20 forms |
 | V — check against the 1.3 binary | **V1, V5's MDH probe, V6, V7 and V8 all done, all PASS.** Ordering: 10 of 10 container orders match. Arithmetic: `twoBases` exact bit for bit, `octopus` 9/9 with three joints exact and 5 ulp worst. **V6, V7 and V8 done 2026-08-29** — friction and no-collide negotiation, their four remaining rules, and the GP parameter blocks captured *before* their conversion. `verification-against-sigel-1.3/v6`, `v7`, `v8`. V2–V4 not started; V5's sensor and force probes are **invalid as specified** — both target Dynamo-only functions, deleted 2026-08-28. §7 |
@@ -2623,6 +2623,9 @@ which is why the list exists.
 | **the whole `TmpBuffer` loop, D24** | `MT_Evaluator` is **not in either gate binary** — `nm -C build/sigel_eval \| grep -c 'MT_Evaluator::'` is **0**, same for `build-fast`. Modules link as static archives and nothing references `MT_Evaluator.o`, so its 14 symbols never leave `libMT_Control.a`. The three green baselines carry **no** evidence about this conversion; the only mechanical check that touches it is `check.sh`'s `-fsyntax-only` |
 | **`MT_Statistics`'s three converted functions, D24** | linked, never run. `gdb` breakpoints on `updateStatistics`, `getStatisticElement` and `writeToFileMT_Statistics` across **all 14** shipped experiments at individual 0: **zero hits** |
 | `MT_GUI/MT_StatisticsWidget.cpp`'s nine `.count()` calls on the converted member, D24 | `MT_GUI` is in neither `check.sh`'s `MODULES` nor the Makefile's `CORE`. They still compile — `QList::count()` exists — but no gate says so |
+| **the whole `taskCanDoList` index walk, D25a** | compiled and archived (21 `SIG_GPManager::` symbols in `libSIGEL_GP.a`) but **linked into nothing** — 0 in `sigel_eval`, `build-fast/sigel_eval` and `pvm_link`. The `removeAt` path, the append path and the `:122` reference never execute here. The 1.3 binary shows the path is live in a real run (80 appends in two generations); our gates cannot reach it |
+| **four of D25a's six `at(canDoIdx)` sites** | `:127`, `:151`, `:1310`, `:1336` sit inside `#ifdef SIG_DEBUG`, and **`SIG_DEBUG` is defined nowhere in this build** — its only occurrence in the repo is `x/sigelSourceDistribution.1.0/sigel/makefile:72`, the abandoned 1.0 tree. Neither `make` nor `check.sh` parses them. Compiled explicitly with `-DSIG_DEBUG` by review: exit 0, no errors — so no latent defect, but only two of the six were checked by the build |
+| the `maxTouchsPerLoop` break, D25a | **dead on every shipped configuration**: the value is persisted in none of the 28 `.exp`, and all five presets call `setMaxTouchsPerLoop(-1)` (`SIG_GPParameter.cpp:325,330,335,340,345`), so `(maxTouchsPerLoop != -1)` is always false |
 | all **seven** D23 sites | linked and never called — *in `sigel_eval`, which is a test harness, not the program*. 1.3's master links the whole MT subsystem (`MT_Evaluator` 16 symbols, `MT_Classifier` 25, `MT_Statistics` 83, `MT_Substitute` 20, `MT_TrainingCase` 46, `MT_Trainingset` 14; all 0 in `sigel_slave`), so "never linked" is a fact about our harness and Phase C will link these. Detail: `MT_Substitute`, `MT_Trainingset` and `MT_FitnessTrainer` **are** in `sigel_eval` and `pvm_link` — 59 symbols, pulled in by `moc/MT_GPSystem/MT_GPManager.o` on the link line — but `gdb` breakpoints on all three converted functions and on `MT_GPManager::checkForNewTCase` were not hit across a full evaluation. The classes that never link are **`MT_Classifier` and `MT_Evaluator`**, the queue's two fillers, both evolution-loop. *This row previously said the first three were the unlinked ones: inverted, and asserted without running the `nm` the D22 row had already established for exactly this* |
 | **all six D22 sites** | `nm -C build/sigel_eval` finds **0** `SIG_GPOperations::` and **0** `SIG_GPCrossOverTournament::`, and the same in `pvm_link`. The objects are archived in `libSIGEL_GP.a` and never pulled into a link. The evolution loop needs `sigel`, which Phase C blocks |
 | all six `Q2CString` sites in `SIG_GPFitnessTrainer`, D21 | zero trainer symbols in `sigel_eval`; `pvm_link` links the object but never constructs a trainer, so they are **link-checked and never run** |
@@ -3546,9 +3549,17 @@ table: lines, source tree only).
 
 ### D25a — `taskCanDoList`, and why the iterator had to go
 
-`SIG_GPManager::taskCanDoList` is `Q2ValueList<int>` → `QList<int>`. One header
-line, fourteen body lines, two identical loops (`evalNewIndis` around `:107`,
-`evalNeededIndis` around `:1289`).
+`SIG_GPManager::taskCanDoList` is `Q2ValueList<int>` → `QList<int>`. Header
++2/−1 (the declaration, plus an explicit `<QList>`), fourteen body lines, and
+two walks with an **identical 14-line skeleton** — in `evolutionLoop()`
+(`:80`, walk at `:107`) and `evolutionLoop(MT_Classifier *)` (`:1250`, walk at
+`:1289`). *An earlier draft named these `evalNewIndis` and `evalNeededIndis`.
+Those are at `:351` and `:1432`, they hold `fitTaskList`, and neither contains a
+`taskCanDoList` walk at all. The 1.3 binary settles it: the sweep's
+`usleep(300000)` appears at exactly two call sites, both inside
+`evolutionLoop`.* The **bodies** differ — `:156 actTour.run()` against
+`:1342 actTour.run(MetaClassifier)`, and the second carries an extra
+`successor != -1` guard the first does not; only the walk is common.
 
 **A direct iterator-for-iterator conversion here would have been a
 use-after-free.** Qt 2's `QValueList` is a **doubly-linked** list
@@ -3580,7 +3591,7 @@ contiguous and every append goes to the end:
 | was | now | why it matches |
 |---|---|---|
 | `Iterator canDoIter = begin()` | `qsizetype canDoIdx = 0` | |
-| `while (canDoIter != end())` | `while (canDoIdx < size())` | `end()` was re-read each pass, so growth extended the loop; `size()` does the same |
+| `while (canDoIter != end())` | `while (canDoIdx < size())` | growth extends the loop in both — but **not** because `end()` moves. Qt 2's `end()` is a **fixed sentinel**, `Iterator(sh->node)` (`qvaluelist.h:363`), allocated once. `insert(end(), x)` splices the new node in *front of* the sentinel (`:215-223`), i.e. behind the live iterator, so the walk reaches it. *An earlier draft said `end()` was re-read and moved; right conclusion, wrong mechanism.* `size()` genuinely is re-read |
 | `*canDoIter` | `taskCanDoList.at( canDoIdx )` | six sites |
 | `canDoIter = remove(canDoIter)` | `removeAt( canDoIdx )`, **no advance** | Qt 2's `remove` returned the *next* iterator; after `removeAt` the next element slides into the same index |
 | `++canDoIter` | `++canDoIdx` | |
@@ -3588,15 +3599,58 @@ contiguous and every append goes to the end:
 Appends stay correct: a forward iterator over a linked list eventually reaches
 an element appended behind it, and so does an index walk over a growing array.
 
-**No gate reaches this.** `nm -C build/sigel_eval | grep -c 'SIG_GPManager::'`
-is **0** — the object is not linked, exactly as with `MT_Evaluator` in D24. The
-three green baselines say nothing about this change; `check.sh`'s
-`-fsyntax-only` is again the only mechanical check. **Whether the append ever
-actually fires during a sweep is a question only a real run answers**, and that
-needs the x86 box.
+**Compiled and archived, never linked.** The file is fully compiled with
+codegen, `-Wall -Wextra` and the sanitizers, and archived —
+`nm -C build/lib/libSIGEL_GP.a | grep -c 'SIG_GPManager::'` is **21**. But
+nothing pulls the member out: `nm -C` gives **0** for `build/sigel_eval`,
+`build-fast/sigel_eval` **and** `build/pvm_link`. So the three green baselines
+say nothing about this change. *An earlier draft said `-fsyntax-only` was the
+only mechanical check, which undersold it — a full sanitized compile is not
+nothing, it just is not execution.* **The append does fire, and the trap was live rather than latent.** Measured on
+the 1.3 binary under gdb, two generations of `twoBasesSimpleFitness1`, 100
+individuals, `SLAVES=8`:
+
+| counter | count | what it establishes |
+|---|---|---|
+| `begin()` | 33 | the sweep genuinely ran, 33 times |
+| append at `0x80bf7a5` | 33 | first `taskCanDoList << actSuccessor` site |
+| append at `0x80bf9e4` | 47 | second site — **80 appends inside the live loop** |
+| `remove(iterator)` | 94 | 94 removals across 33 sweeps, so these are multi-iteration walks, not single passes |
+
+Both append addresses fall inside the loop body: the condition is at
+`0x80bf635`, the body runs `0x80bf648`–`0x80bfa58`, and the back-edge at
+`0x80bfa58` returns to `0x80bf614`. **So a direct iterator conversion would have
+been a use-after-free in the evolution loop on a path the shipped corpus takes
+80 times in two generations.** The index walk was load-bearing, not defensive.
+
+*A negative result here would have been corpus-dependent and would have had to
+be recorded as such. A positive is not: the path fired, so it can fire.* The run
+used the 5-second `TIMETOSIMULATE`, so the **rate** is this configuration's
+number, not a universal one; whether it happens at all is settled.
+
+This loop leans on **both** halves of the Qt 2 contract — stability under
+append, and a valid successor after removal — 174 times between them in those
+two generations.
+
+**The index walk was checked against the node semantics it replaces, not just
+argued.** A differential model — Qt 2 nodes (`std::list`, `erase` returns next,
+append at tail) against the committed index walk, both driven by the *same*
+randomised decisions, comparing the full visited sequence **and** the final
+container contents — ran **200,000 cases with 0 divergences** under ASan and
+UBSan: empty list, `maxTouchsPerLoop` 0 and −1, removal of the only element,
+removal of the last element, appends mid-iteration, and appends landing on the
+same iteration as a removal.
+
+**One pathology is preserved deliberately.** With `maxTouchsPerLoop == 0` the
+break fires on the first pass, nothing is ever removed, and the outer
+`while (!taskCanDoList.isEmpty())` spins forever. That hang is identical in both
+versions — preserved, not introduced, and unreachable on shipped data because
+the value is always −1.
 
 `Q2ValueList` now appears in **no user code at all** — only the shim and its
-self-check (12 → 9 lines, narrow scope). The `q2compat.h` include stays in
+self-check (12 → 9 lines, narrow scope). The shim comment that justified keeping
+it named the very code this step deleted; it now records the measurement
+instead. The `q2compat.h` include stays in
 `SIG_GPManager.h` because `tours` is still `Q2PtrVector`; `<QList>` is now
 included explicitly rather than arriving through the shim.
 

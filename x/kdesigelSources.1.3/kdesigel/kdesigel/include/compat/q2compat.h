@@ -446,10 +446,13 @@ private:
 // elsewhere. Qt 6's QList is contiguous and reallocates, which invalidates
 // every iterator into it.
 //
-// That difference is not academic here: SIG_GPManager.cpp:106-217 walks
-// taskCanDoList with an iterator while APPENDING to the same list inside the
-// loop, then passes the iterator to remove(). Backed by QList that is a
-// use-after-free. std::list reproduces Qt 2's node semantics exactly.
+// That difference was not academic: until D25a, SIG_GPManager.cpp:107-223 and
+// :1289-1425 walked taskCanDoList with an iterator while APPENDING to the same
+// list inside the loop, then passed the iterator to remove(). Backed by QList
+// that is a use-after-free, and the 1.3 binary shows it FIRING -- 80 appends
+// inside the live loop over two generations. Both walks are now index-based and
+// no user code uses this type; it is kept only so the self-check still pins the
+// semantics. std::list reproduces Qt 2's node semantics exactly.
 // ---------------------------------------------------------------------------
 template <class T>
 class Q2ValueList
