@@ -187,6 +187,15 @@ namespace SIGEL_GP
  public:
   ~SIG_GPManager();
 
+  // D25c gave the destructor a qDeleteAll( tours ). Q2PtrVector's copy
+  // constructor cleared autoDelete on the copy (q2compat.h:124, matching
+  // qcollection.h:64), so a copied manager freed nothing; a QList copy shares
+  // the raw pointers and BOTH destructors would free them. Same hazard D7 and
+  // D15 closed. Nothing copies a manager today -- SIG_GUIGPManager derives from
+  // this class, and Phase C is exactly the case that would find it.
+  SIG_GPManager( SIG_GPManager const & ) = delete;
+  SIG_GPManager &operator=( SIG_GPManager const & ) = delete;
+
    /**
     * The evolutionLoop is the heart of the genetic programming algorithm.
     * It determine how the evolution works.

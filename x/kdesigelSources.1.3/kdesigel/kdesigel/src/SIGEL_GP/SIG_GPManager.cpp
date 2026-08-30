@@ -358,6 +358,28 @@ void SIGEL_GP::SIG_GPManager::createTours(int quantity) {
 
 namespace {
 
+  /* Q2PtrVector::isEmpty() was count()==0 -- no NON-NULL slots -- while
+   * QList::isEmpty() is size()==0. They disagree between
+   * "tours.clear(); tours.resize(quantity);" and the loop that fills the slots,
+   * and after createTours' !totalProbCount early return, which leaves the
+   * vector resized and entirely null.
+   *
+   * Unreachable at the four call sites today: start() has exactly two callers
+   * in the 1.3 binary, main (straight-line, once) and
+   * SIG_Experiment::slotStartEvolution, which deletes the manager and builds a
+   * fresh one on every invocation, so tours is default-constructed at each
+   * entry to run(). Reproduced anyway, for the same reason D25c writes out the
+   * five provably-unnecessary deletes.
+   */
+  bool toursAreEmpty( QList< SIGEL_GP::SIG_GPTournament * > const &tours )
+  {
+    for (SIGEL_GP::SIG_GPTournament *t : tours)
+      if (t)
+        return false;
+    return true;
+  }
+
+
   /* fitTaskList held setAutoDelete(true): ~Q2PtrList was the ONLY free, and it
    * ran on every exit -- including the two early returns inside the function.
    * QList frees nothing, so the guard restores that. Same shape as
@@ -641,7 +663,8 @@ void SIGEL_GP::SIG_GPManager::start()
 void SIGEL_GP::SIG_GPManager::run() {
 
 	// start the MT_GP-System only if the SIGEL-GP-System would start
-	if(tours.isEmpty() && actExperiment.getPopulation().getSize() > 3)
+	// Qt 2's isEmpty() was count()==0 -- NO NON-NULL SLOTS -- not size()==0.
+	if(toursAreEmpty( tours ) && actExperiment.getPopulation().getSize() > 3)
 		actExperiment.mtController->startEvolution();
 
 #ifdef _WINDOWS
@@ -657,7 +680,7 @@ void SIGEL_GP::SIG_GPManager::run() {
    pthread_cond_init(&cond, NULL);
 #endif
 
-  if (!tours.isEmpty()) {
+  if (!toursAreEmpty( tours )) {
     SIGEL_Tools::SIG_IO::cerr << "SIG_GPManager::run() wurde mehr als einmal aufgerufen!\n";
     messageEvolutionStop();
   };
@@ -1065,7 +1088,7 @@ void SIGEL_GP::SIG_GPManager::run(MT_Classifier *MetaClassifier)
 	 ****/
 
 	// start the MT_GP-System only if the SIGEL-GP-System would start
-	if(tours.isEmpty() && actExperiment.getPopulation().getSize() > 3)
+	if(toursAreEmpty( tours ) && actExperiment.getPopulation().getSize() > 3)
 		actExperiment.mtController->startEvolution();
 
 	/***************************************
@@ -1086,7 +1109,7 @@ void SIGEL_GP::SIG_GPManager::run(MT_Classifier *MetaClassifier)
    pthread_cond_init(&cond, NULL);
 #endif
 
-    if (!tours.isEmpty())
+    if (!toursAreEmpty( tours ))
     {	SIGEL_Tools::SIG_IO::cerr << "SIG_GPManager::run() wurde mehr als einmal aufgerufen!\n";
 			messageEvolutionStop();
     };
