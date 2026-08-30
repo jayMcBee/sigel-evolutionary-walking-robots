@@ -24,7 +24,6 @@
 #define SIGEL_GP_SIG_GPMANAGER_H
 
 #include <QList>
-#include "compat/q2compat.h"
 #include "SIGEL_GP/SIG_GPFitnessTrainer.h"
 #include "SIGEL_GP/SIG_GPTournament.h"
 #include "SIGEL_Tools/SIG_Randomizer.h"
@@ -150,7 +149,7 @@ namespace SIGEL_GP
    * generation.
    */
  private:
-  Q2PtrVector<SIG_GPTournament> tours;
+  QList<SIG_GPTournament *> tours;
 
   /**
    * The randomizer object, used to create randomseeds for the evolution.

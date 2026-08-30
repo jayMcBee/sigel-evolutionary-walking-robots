@@ -445,7 +445,7 @@ MT_TranslatedIndividual * MT_Classifier::createDoubleTransIndi(SIGEL_Program::SI
 
 }
 
-bool MT_Classifier::preEvolution(Q2PtrVector<SIGEL_GP::SIG_GPTournament> *tours, int PosBest)
+bool MT_Classifier::preEvolution(QList<SIGEL_GP::SIG_GPTournament *> *tours, int PosBest)
 {
 	SIGEL_GP::SIG_GPTournament *Tourna;
 
@@ -479,7 +479,9 @@ bool MT_Classifier::preEvolution(Q2PtrVector<SIGEL_GP::SIG_GPTournament> *tours,
 #endif
 		for(int i=0; i<NumOfClassi; i++)
 		{	
-			Tourna = tours->take(i);
+			// take(i): return the occupant, empty the slot, never delete.
+			Tourna = tours->value(i);
+			if (i < tours->size()) (*tours)[i] = 0;
 			Tourna->classify(this);
 			delete Tourna;
 			NumOfMetaEstimation[GenerationNumber] += 1;
@@ -495,10 +497,16 @@ bool MT_Classifier::preEvolution(Q2PtrVector<SIGEL_GP::SIG_GPTournament> *tours,
 	
 		for( int i=0; i<TourSize-NumOfClassi; i++)
 		{
-			Tourna = tours->take(i+NumOfClassi); 
-			tours->insert(i,Tourna);
+			// take(i+NumOfClassi), then insert(i): slot i is already empty, so
+			// Qt 2's insert deleted nothing here -- the delete is kept anyway.
+			Tourna = tours->value(i+NumOfClassi);
+			if (i+NumOfClassi < tours->size()) (*tours)[i+NumOfClassi] = 0;
+			if (i < tours->size()) { delete (*tours)[i]; (*tours)[i] = Tourna; }
 		}
 
+		// resize(): Qt 2 deleted the truncated tail. Proven all-null here.
+		for (qsizetype k = TourSize-NumOfClassi; k < tours->size(); k++)
+			delete tours->at(k);
 		tours->resize(TourSize-NumOfClassi);
 		Change = true;
 	}
@@ -531,7 +539,9 @@ bool MT_Classifier::preEvolution(Q2PtrVector<SIGEL_GP::SIG_GPTournament> *tours,
 		{	
 			if(ToursWBestIndi[i] == 0)
 			{
-				Tourna = tours->take(i);
+				// take(i): occupant out, slot emptied, no delete.
+				Tourna = tours->value(i);
+				if (i < tours->size()) (*tours)[i] = 0;
 				Tourna->classify(this);
 				delete Tourna;
 				NumOfMetaEstimation[GenerationNumber] += 1;
@@ -555,15 +565,17 @@ bool MT_Classifier::preEvolution(Q2PtrVector<SIGEL_GP::SIG_GPTournament> *tours,
 		int NumOfTour = TourSize - NewNumOfClassi; // Number of tournaments to be run normally
 		for( int i=0; i<NumOfTour; i++)
 		{
-			Tourna = tours->at(i);
+			Tourna = tours->value(i);
 			if(Tourna == NULL)
 			{
 				for(int NextTourPos = i+1; NextTourPos<TourSize; NextTourPos++)
 				{
-					Tourna = tours->take(NextTourPos); 
+					Tourna = tours->value(NextTourPos);
+					if (NextTourPos < tours->size()) (*tours)[NextTourPos] = 0;
 					if(Tourna != NULL)
 					{
-						tours->insert(i,Tourna);
+						// insert(i): slot i is null on this branch, so no delete fires.
+						if (i < tours->size()) { delete (*tours)[i]; (*tours)[i] = Tourna; }
 						break;
 					}
 
@@ -572,12 +584,15 @@ bool MT_Classifier::preEvolution(Q2PtrVector<SIGEL_GP::SIG_GPTournament> *tours,
 		
 		}
 
+		// resize(): Qt 2 deleted the truncated tail. Proven all-null here.
+		for (qsizetype k = NumOfTour; k < tours->size(); k++)
+			delete tours->at(k);
 		tours->resize(NumOfTour);
 
 //**************DebugInfo *************************************
 for(int d=0; d < tours->size();d++)
 {
-	Tourna = tours->at(d); 
+	Tourna = tours->value(d);
 		if(Tourna == NULL)
 		{
 			int DeugInfo= tours->size();
@@ -602,7 +617,7 @@ for(int d=0; d < tours->size();d++)
 // NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU 
 // NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU 
 
-int MT_Classifier::evalNeededTours(Q2PtrVector<SIGEL_GP::SIG_GPTournament> *  tours, QList<int> * ToursWBestIndi, int PosBest)
+int MT_Classifier::evalNeededTours(QList<SIGEL_GP::SIG_GPTournament *> *  tours, QList<int> * ToursWBestIndi, int PosBest)
 {
 	SIGEL_GP::SIG_GPTournament *Tourna =NULL;
 	int NumClassi=0;
@@ -610,7 +625,7 @@ int MT_Classifier::evalNeededTours(Q2PtrVector<SIGEL_GP::SIG_GPTournament> *  to
 
 	for(int i=0; i<ToursSize; i++)
 	{
-		Tourna = tours->at(i);
+		Tourna = tours->value(i);
 		for (int k=0; k <Tourna->indis.size();k++)
 		{
 			if(PosBest == Tourna->indis.at(k)->indNumber){

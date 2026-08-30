@@ -61,7 +61,9 @@ SIGEL_GP::SIG_GPManager::SIG_GPManager(SIGEL_GP::SIG_GPExperiment &experiment)
 	} else {
 		trainer = new SIG_GPFitnessTrainer(actExperiment);
 	}
-	tours.setAutoDelete( true );
+	// tours.setAutoDelete(true) was the free for every tournament: it ran in
+	// ~Q2PtrVector, in clear(), in insert() on the old occupant and in a
+	// shrinking resize(). Each of those is now written out at its site.
 };
 
 
@@ -236,7 +238,10 @@ void SIGEL_GP::SIG_GPManager::createTours(int quantity) {
   SIG_GPPopulation &pop = actExperiment.population;
 
   //The tournament set size is fixed
+  // clear(): setAutoDelete made this delete every tournament. Real free.
+  qDeleteAll( tours );
   tours.clear();
+  // resize() grows with value-initialised (null) slots, as Qt 2 did.
   tours.resize(quantity);
 
   for(int i=0;i<quantity;i++) {
@@ -344,7 +349,10 @@ void SIGEL_GP::SIG_GPManager::createTours(int quantity) {
         poolPositions[3]);
     };
 
-    tours.insert( i, actTour );
+    // insert(): overwrite slot i, deleting any previous occupant. Qt 2's
+    // insert did NOT shift, unlike QList::insert. The slot is null here.
+    delete tours[ i ];
+    tours[ i ] = actTour;
   };
 };
 
@@ -1029,6 +1037,9 @@ SIGEL_GP::SIG_GPManager::~SIG_GPManager()
 	if(!actExperiment.mtController->IsEnabled() || actExperiment.mtController->UsedSystem() != EVALUATOR_SUBST){
 		delete trainer;
 	}
+
+	// ~Q2PtrVector freed whatever tournaments were still held. QList does not.
+	qDeleteAll( tours );
 };
 
 

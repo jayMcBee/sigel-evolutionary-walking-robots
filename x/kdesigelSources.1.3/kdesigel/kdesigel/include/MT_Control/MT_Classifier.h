@@ -5,7 +5,7 @@
 #if !defined(AFX_MT_CLASSIFIER_H__22632809_B47E_418D_8C86_EDE8B998506D__INCLUDED_)
 #define AFX_MT_CLASSIFIER_H__22632809_B47E_418D_8C86_EDE8B998506D__INCLUDED_
 
-#include "compat/q2compat.h"
+#include <QList>
 #include "MT_Substitute.h"
 
 #include "SIGEL_GP/SIG_GPTournament.h"
@@ -33,7 +33,7 @@ public:
 
 	/* execute the first Tournaments by the MT_Classifier 
 	*/
-	bool preEvolution(Q2PtrVector<SIGEL_GP::SIG_GPTournament> *  tours, int PosBest);
+	bool preEvolution(QList<SIGEL_GP::SIG_GPTournament *> *  tours, int PosBest);
 	
 	/* Method serves Tournament.run(Classifier)
 	* Runs the tournament normally, i.e. on exact fitness; 
@@ -63,7 +63,7 @@ private:
 	// ToursWBestIndi[tours.size-1] == 1 is set anyway, so that the last tournament is not run with the
 	// classifier but normally by exact fitness. This serves as calibration.
 	//
-	int evalNeededTours(Q2PtrVector<SIGEL_GP::SIG_GPTournament> *  tours, QList<int> * ToursWBestIndi, int PosBest);
+	int evalNeededTours(QList<SIGEL_GP::SIG_GPTournament *> *  tours, QList<int> * ToursWBestIndi, int PosBest);
 };
 
 #endif // !defined(AFX_MT_CLASSIFIER_H__22632809_B47E_418D_8C86_EDE8B998506D__INCLUDED_)

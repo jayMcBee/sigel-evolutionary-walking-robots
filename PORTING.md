@@ -27,10 +27,10 @@ build and run, because nothing else can be verified without it — see §3.
 |---|---|
 | 0 — comments to English | done for the 9 core modules; 9 GUI files still hold Latin-1 |
 | A — core onto Qt 6 | **done**, tags `step-A0`…`step-A9` |
-| B — ownership explicit | **subsumed by Phase D**, which deletes the containers rather than converting them. **1** `setAutoDelete` call left in core, re-measured 2026-08-30 after D25b — `SIG_GPManager.cpp:64`, `tours`, which is D25c. *D25b removed the two `fitTaskList` calls and replaced them with an RAII guard; before that it was 3.* **0 in `MT_Control`** (D24 deleted the last) and **0 in `SIGEL_Robot`**. *This row said 11 with 10 in `SIGEL_GP` and 1 in `MT_Control`. The two `setAutoDelete` in `SIG_GPFitnessTrainer.cpp` are comments, not calls, and 10 was never a core figure — `SIGEL_MasterGUI` has 11. Fourth correction of this row, fourth by review.*: D11 deleted `SIG_Body.cpp:54`, the last one, and left this row saying 12. *Before that it read 13 with 2 in `SIGEL_Robot`, where there was one. Three readings of the same row, three corrections, each by review.* **Not all of them are unreachable, and an earlier version of this row said they were.** `SIG_GPPopulation::pool` is owning, is constructed on every `sigel_eval` run and takes 100 `insert()`s inside both gates — see "What the gates actually reach" in §10. *The tail of this row used to say "the **6** in `SIG_GPFitnessTrainer` and `SIG_GPManager` are the ones Phase C still blocks". That is now arithmetically impossible against the core total of 1 above, and is struck: `SIG_GPFitnessTrainer` has no `setAutoDelete` call left at all, only two comments* |
+| B — ownership explicit | **subsumed by Phase D**, which deletes the containers rather than converting them. **0** `setAutoDelete` calls left in core, re-measured 2026-08-30 after D25c. *D25b replaced the two `fitTaskList` calls with an RAII guard; D25c wrote out `tours`' four frees at their sites. The remaining calls in the tree are all in `SIGEL_MasterGUI`, `SIGEL_Visualisation`, `SIGEL_CommonGUI` and `MT_GUI` — Phase C.* **0 in `MT_Control`** (D24 deleted the last) and **0 in `SIGEL_Robot`**. *This row said 11 with 10 in `SIGEL_GP` and 1 in `MT_Control`. The two `setAutoDelete` in `SIG_GPFitnessTrainer.cpp` are comments, not calls, and 10 was never a core figure — `SIGEL_MasterGUI` has 11. Fourth correction of this row, fourth by review.*: D11 deleted `SIG_Body.cpp:54`, the last one, and left this row saying 12. *Before that it read 13 with 2 in `SIGEL_Robot`, where there was one. Three readings of the same row, three corrections, each by review.* **Not all of them are unreachable, and an earlier version of this row said they were.** `SIG_GPPopulation::pool` is owning, is constructed on every `sigel_eval` run and takes 100 `insert()`s inside both gates — see "What the gates actually reach" in §10. *The tail of this row used to say "the **6** in `SIG_GPFitnessTrainer` and `SIG_GPManager` are the ones Phase C still blocks". That is now arithmetically impossible against the core total of 1 above, and is struck: `SIG_GPFitnessTrainer` has no `setAutoDelete` call left at all, only two comments* |
 | R — build and run | core builds and runs. **No longer checked only against itself** — Phase V has confirmed both the ordering and the arithmetic against the 1.3 binary, §7 |
 | T — old-Qt tool container | **done 2026-08-27.** `tools/qtmig`, §4 |
-| D — delete the shim, migrate the data | **D1–D24 done, D25a and D25b done.** `Q2Dict`, `Q2DictIterator`, `Q2Array` and `Q2CString` gone from all code; the simulation path, `SIG_GPFitnessTrainer`, `SIG_GPFullDataRecorder` and `crossOver` all converted. Shim 806 → **539** lines, included by **23** files — *files that actually `#include` it: 22 in the source tree plus `sigel_eval.cpp`. A `git grep -l q2compat.h` returns 24 because it counts `PORTING.md`, which merely names the header.* Remaining, measured 2026-08-30 after **D25b**: `Q2PtrList` **36**, `Q2PtrVector` 46, `Q2Queue` **9**, `Q2ValueList` **9**, `Q2ListIterator` 8, `Q2CString` 15 — **lines containing the name, in the source tree only**: the shim's own header and self-check are included, `sigel_eval.cpp` and `verification-against-sigel-1.3/` are not. State the scope when you re-measure; the same six names give **43**/46/9/**9**/8/15 if `sigel_eval.cpp` and the captures are counted, and **45**/48/9/**9**/8/15 if you count occurrences instead of lines. *Left stale twice now — at D24 and again at D25b — each time by updating the narrow figure in this sentence and not the broad ones beside it. If you change one, re-measure all three.* The `Q2PtrVector` bulk is `SIG_GPManager::tours`, which **cannot be linked** until Phase C. §10 |
+| D — delete the shim, migrate the data | **D1–D25 done** (D25a, D25b, D25c). `Q2Dict`, `Q2DictIterator`, `Q2Array` and `Q2CString` gone from all code; the simulation path, `SIG_GPFitnessTrainer`, `SIG_GPFullDataRecorder` and `crossOver` all converted. Shim 806 → **539** lines, included by **21** files — *files that actually `#include` it: 22 in the source tree plus `sigel_eval.cpp`. A `git grep -l q2compat.h` returns 24 because it counts `PORTING.md`, which merely names the header.* Remaining, measured 2026-08-30 after **D25c**: `Q2PtrList` **36**, `Q2PtrVector` **43**, `Q2Queue` **9**, `Q2ValueList` **9**, `Q2ListIterator` 8, `Q2CString` 15 — **lines containing the name, in the source tree only**: the shim's own header and self-check are included, `sigel_eval.cpp` and `verification-against-sigel-1.3/` are not. State the scope when you re-measure; the same six names give **43**/46/9/**9**/8/15 if `sigel_eval.cpp` and the captures are counted, and **45**/48/9/**9**/8/15 if you count occurrences instead of lines. *Left stale twice now — at D24 and again at D25b — each time by updating the narrow figure in this sentence and not the broad ones beside it. If you change one, re-measure all three.* The `Q2PtrVector` bulk is `SIG_GPManager::tours`, which **cannot be linked** until Phase C. §10 |
 | P — PVM | **DONE 2026-08-28.** Vendored 3.4.3 replaced by upstream 3.4.6; nine patches carry the four config lines and Debian's eight source fixes; `libpvm3.a` and `pvmd3` build; SIGEL's two PVM objects link against them and `SIG_GPPVMData` round-trips through real PVM. `sigel`/`sigel_slave` still need Phase C. §7 |
 | C — GUI | **not started, AUTHORIZED 2026-08-27 per D24.** ~450 Qt 2 sites + 20 forms |
 | V — check against the 1.3 binary | **V1, V5's MDH probe, V6, V7 and V8 all done, all PASS.** Ordering: 10 of 10 container orders match. Arithmetic: `twoBases` exact bit for bit, `octopus` 9/9 with three joints exact and 5 ulp worst. **V6, V7 and V8 done 2026-08-29** — friction and no-collide negotiation, their four remaining rules, and the GP parameter blocks captured *before* their conversion. `verification-against-sigel-1.3/v6`, `v7`, `v8`. V2–V4 not started; V5's sensor and force probes are **invalid as specified** — both target Dynamo-only functions, deleted 2026-08-28. §7 |
@@ -3754,6 +3754,85 @@ a future edit that mutates the list mid-loop turns a no-op into UB. And
 `FitTaskListGuard` is copyable while holding a raw owning pointer — inherited
 from `DynaMechsLinkGuard`, and worth fixing in both at once rather than
 diverging them.
+
+### D25c — `tours`, the sparse slot vector, and why its hidden frees are no-ops
+
+`SIG_GPManager::tours` is `Q2PtrVector<SIG_GPTournament>` → `QList<SIG_GPTournament *>`,
+with `MT_Classifier::preEvolution` and `::evalNeededTours` taking it by pointer.
+**This is the `Q2PtrVector` bulk §10 said could not be linked until Phase C, and
+the last `setAutoDelete` in core.**
+
+**`Q2PtrVector` is not a list. It is a fixed-size array of nullable slots**, and
+four of its operations mean something different from the `QList` method of the
+same name:
+
+| Qt 2 | what it does | `QList` equivalent |
+|---|---|---|
+| `size()` | **allocated slots** | `size()` — same only because the conversion keeps one element per slot, nulls included |
+| `count()` / `isEmpty()` | **non-null** slots | *not* `size()`/`isEmpty()` |
+| `insert(i, p)` | **overwrites slot `i`**, deleting the previous occupant; does **not** grow or shift; returns false if `i >= size` | `delete v[i]; v[i] = p;` — `QList::insert` *shifts*, which would be wrong |
+| `remove(i)` | deletes the occupant and leaves a **null hole**; the slot stays | `delete v[i]; v[i] = 0;` — `QList::removeAt` *shifts* |
+| `take(i)` | returns the occupant, empties the slot, **never deletes** | `p = v.value(i); v[i] = 0;` |
+| shrinking `resize(n)` | **deletes the truncated tail** | delete `[n, size)` then `resize(n)` |
+
+**All five hidden-free sites in `MT_Classifier` are provably no-ops.** This was
+worth proving rather than assuming, because it is the difference between a
+delete that must be reproduced and one that must not fire twice:
+
+- `insert` at `:499` — slot `i` is always already empty. For `i < NumOfClassi`
+  the first loop `take`s it; for `i >= NumOfClassi` this loop `take`s it at
+  iteration `i - NumOfClassi`, which has already run.
+- `insert` at `:566` — the branch is guarded by `if (Tourna == NULL)` where
+  `Tourna = tours->at(i)`, so slot `i` is null by construction.
+- shrinking `resize` at `:502` — the tail `[TourSize-NumOfClassi, TourSize)` is
+  entirely inside the union of what the two loops emptied, whether or not
+  `NumOfClassi` exceeds half of `TourSize`.
+- shrinking `resize` at `:575` — `evalNeededTours` returns **exactly** the final
+  count of `ToursWBestIndi[i] == 0` (it decrements `NumClassi` for each entry
+  the calibration flips), so there are exactly `NumOfTour` survivors and the
+  compaction packs all of them below `NumOfTour`.
+- `resize` at `:240` grows from an empty vector, so it truncates nothing.
+
+**The deletes are written out anyway.** Preserving the *semantics* rather than
+the current behaviour: if a later edit breaks one of those proofs, the code
+still frees what Qt 2 would have freed.
+
+**Three frees were real and are now explicit**, since `setAutoDelete(true)`
+(`:64`) is gone:
+
+| site | was | now |
+|---|---|---|
+| `:239` `tours.clear()` | deleted every tournament | `qDeleteAll( tours ); tours.clear();` |
+| `~SIG_GPManager` | `~Q2PtrVector` freed whatever was held; the destructor itself frees only `trainer` | `qDeleteAll( tours );` added |
+| `:347` `tours.insert(i, actTour)` | slot assignment, occupant deleted | `delete tours[i]; tours[i] = actTour;` |
+
+**`isEmpty()` is the subtle one and it is safe here.** Qt 2's is `count() == 0`
+— *no non-null slots* — while `QList::isEmpty()` is `size() == 0`. They differ
+exactly between `resize(quantity)` and the fill loop, where size is non-zero and
+every slot is null. All four call sites (`:636`, `:652`, `:1057`, `:1078`) are
+in `run()`, which executes once before `calcInitTourSet` has ever run, so
+`tours` is still default-constructed and both readings give true. *Recorded
+because a future call site between those two lines would not be safe.*
+
+`at()` becomes `value()` at three sites, for the §9 reason: Qt 2's returned null
+out of range, `QList::at` is UB. The four `take` sites keep an explicit
+`i < size()` guard so an out-of-range index yields null and touches nothing, as
+Qt 2 did — without it the failure mode changes from a null dereference to an
+out-of-range write.
+
+**Warnings fall 313 → 311, both accounted for and nothing new.** Each is the
+same `-Wsign-compare` between `int` and `uint` on a `tours.size()` loop bound —
+`SIG_GPManager.cpp:1479` and `MT_Classifier.cpp:578` — correct to disappear now
+that `size()` is signed. Verified by diffing the normalised warning multiset of
+both files before and after: one removal each, zero additions.
+
+`Q2PtrVector` 46 → 43. Shim reach 23 → **21**: both `SIG_GPManager.h` and
+`MT_Classifier.h` dropped the include entirely. **`setAutoDelete` in core is now
+0.** Only `SIG_GUIGPManager::individualItems` and `SIG_GPTournament::indis`
+still use the type — D26.
+
+**No gate reaches this either.** `MT_Classifier` and `SIG_GPManager` are both
+linked into nothing.
 
 ### A logging system
 
