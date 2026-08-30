@@ -413,7 +413,7 @@ through `f0f2daa`.
 ## 7. Steps
 
 **Exit criterion per step:** `./check.sh` at the repo root — **105 pass, 4 fail,
-313 warnings** as of 2026-08-30 (322 on 2026-08-28; the drops are recorded per
+309 warnings** as of 2026-08-30 (322 on 2026-08-28; the drops are recorded per
 step and each is explained — a step that silently loses a warning has hidden
 something). The 4 failures are exactly the files the
 Makefile excludes. It was 118/4/338 until the Dynamo backend was deleted
@@ -423,9 +423,10 @@ exactly 13, one per deleted file pair, and the failing files are unchanged.
 Two gates run alongside it, both committed and both required to stay empty: `./dictorder-dump.sh | diff -u dictorder-baseline.txt -` and
 `./fitness-check.sh | diff -u fitness-baseline.txt -`, the second of which runs
 `sigel_eval -selfcheck` first. It compiles every
-converted module, compiles every converted header standalone, and builds and
-runs the shim self-check under ASan and UBSan. Vendored headers are `-isystem`,
-so their ~12,979 warnings do not bury the ~373 in our own code.
+converted module and compiles every converted header standalone. **It runs no
+code** — D27 deleted the shim self-check, which was the only step that did.
+Vendored headers are `-isystem`, so their warnings do not bury the **309** in
+our own code.
 
 **Warnings count.** They were not read up to A8, and the `Qt::endl`-on-
 `std::cerr` regression in A3 was reported by this very command at the step that
