@@ -1902,14 +1902,36 @@ values are read from the model file (`SIG_Joint.cpp:64`). Measured:
     round-trips to == DBL_MAX ?   : NO
 
 At `%g` precision 6 the sentinel loses 11 significant digits, so **a joint saved
-as unbounded and reloaded is no longer recognised as unbounded**: `posRange`
-becomes `3.6e+308` instead of `1`, and `q` is clamped to a nonsense interval.
+as unbounded and reloaded is no longer recognised as unbounded**. What follows is
+worse than a wrong interval, and worse again than first recorded here:
+
+| step | value |
+|---|---|
+| `posRange = maxPos - minPos` | **`+inf`** — the true difference `3.595e+308` exceeds `DBL_MAX`. *An earlier draft said "3.6e+308", a figure no `double` can hold* |
+| `scaledState = (q - minPos)` then `*= 57.2957…` | **`+inf`** — the multiply comes first (`:136-137`) and `1.8e308 × 57.3` overflows |
+| `scaledState /= posRange` | **`NaN`** — `inf / inf` |
+| `static_cast<int>( scaledState * … )` (`:151`) | **undefined behaviour** |
+
+**And the 1.3 regression already noted at `:132-134` is what makes it
+undefined.** 1.0 computed `(q - minPos) / posRange` — divide first — which gives
+a finite **0**: an information-free constant sensor, but defined. 1.3's
+multiply-before-divide turns that same input into `NaN`. Measured both orders:
+
+    1.3  (q-minPos)*K then /posRange : nan
+    1.0  (q-minPos)/posRange         : 0
+
+So the regression this file already records as "kept because the reference is
+1.3" also converts a quiet failure into an undefined one, on an input no shipped
+file produces.
 
 **This is 1.3's defect, reproduced exactly, not one the port introduces.** 1.3
 writes with the same `%g` at precision 6 (§ the fourth-family finding) and makes
 the same `==` comparison against the same two constants at `0x81ec310` and
-`0x81ec318`. **Latent in both**: `grep` finds `1.79769e+308` in **no** shipped
-`.exp` or `.rrb`, so no distributed model has an unbounded joint to lose.
+`0x81ec318`. **Latent in both**, confirmed from two sides: `grep` finds `1.79769e+308` in
+**no** shipped `.exp` or `.rrb`, and all **61** `RotationalJoint` records in the
+shipped experiments carry finite limits — only four distinct pairs across the
+whole corpus, `0/35`, `-45/45`, `-85/85`, `-90/90`. No distributed model has an
+unbounded joint to lose.
 
 **Do not "fix" it.** The three tempting repairs all change behaviour against the
 reference: widening the write precision alters every number in every file;
