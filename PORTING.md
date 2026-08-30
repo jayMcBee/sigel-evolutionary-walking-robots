@@ -30,7 +30,7 @@ build and run, because nothing else can be verified without it — see §3.
 | B — ownership explicit | **subsumed by Phase D**, which deletes the containers rather than converting them. **0 `setAutoDelete` calls left in core**, re-measured 2026-08-30 after D25c: D11 removed the last in `SIGEL_Robot`, D24 the last in `MT_Control`, D25b replaced the two `fitTaskList` calls with an RAII guard, and D25c wrote out `tours`' two real frees at their sites. Every remaining call in the tree is in `SIGEL_MasterGUI`, `SIGEL_Visualisation`, `SIGEL_CommonGUI` or `MT_GUI` — Phase C. *This row has been corrected five times, each time by review: it has read 13, 12, 11, 3 and 1. The recurring errors were counting comments as calls and quoting a `SIGEL_MasterGUI` figure as a core one.* **Not all of these were unreachable, and an earlier version of this row said they were** — `SIG_GPPopulation::pool` is owning, is constructed on every `sigel_eval` run, and takes 100 `insert()`s inside both gates; see "What the gates actually reach" in §10 |
 | R — build and run | core builds and runs. **No longer checked only against itself** — Phase V has confirmed both the ordering and the arithmetic against the 1.3 binary, §7 |
 | T — old-Qt tool container | **done 2026-08-27.** `tools/qtmig`, §4 |
-| D — delete the shim, migrate the data | **D1–D26 done.** No shim type has a live use in `src/` or `include/` — every `Q2*` there is a comment. **The shim is not yet deletable**: `sigel_eval.cpp:363,401` still instantiate `Q2PtrList<int>` for the D18 differential check, two headers get `<QList>` only through the shim, and the shim installs the deterministic hash seed §9 depends on. *This row first said "no live use anywhere in the code", from a grep that never covered the repository root.* `Q2Dict`, `Q2DictIterator`, `Q2Array` and `Q2CString` gone from all code; the simulation path, `SIG_GPFitnessTrainer`, `SIG_GPFullDataRecorder` and `crossOver` all converted. Shim 806 → **539** lines, included by **21** files — *files that actually `#include` it: **20** in the source tree plus `sigel_eval.cpp`. A `git grep -l q2compat.h` returns **22** because it counts `PORTING.md`, which merely names the header.* Remaining, measured 2026-08-30 after **D26**: `Q2PtrList` **36**, `Q2PtrVector` **45**, `Q2Queue` **9**, `Q2ValueList` **9**, `Q2ListIterator` 8, `Q2CString` 15 — **lines containing the name, in the source tree only**: the shim's own header and self-check are included, `sigel_eval.cpp` and `verification-against-sigel-1.3/` are not. State the scope when you re-measure; the same six names give 43/**45**/9/9/8/15 if `sigel_eval.cpp` and the captures are counted, and 45/**47**/9/9/8/15 if you count occurrences instead of lines. *These counts now rise as containers are converted, because each conversion leaves a comment naming the Qt 2 type it replaced. A rising count is expected; what matters is that no line is a type use.* *Left stale three commits running — D24, D25b, D25c — every time by updating one figure in this sentence and not the others beside it. Re-measure all three scopes or change none.* *This row used to end "the `Q2PtrVector` bulk is `SIG_GPManager::tours`, which cannot be linked until Phase C". D25c converted it; what remains of the type is `SIG_GUIGPManager::individualItems` and `SIG_GPTournament::indis`, both D26.* §10 |
+| D — delete the shim, migrate the data | **D1–D26 done.** No shim type has a live use in `src/` or `include/` — every `Q2*` there is a comment. **The shim is not yet deletable**: `sigel_eval.cpp:363,401` still instantiate `Q2PtrList<int>` for the D18 differential check, and two headers get `<QList>` only through the shim. *The hash seed was listed here as a third blocker; it is vestigial — measured, see §7 — and moving it to `main()` is defence, not a prerequisite.* *This row first said "no live use anywhere in the code", from a grep that never covered the repository root.* `Q2Dict`, `Q2DictIterator`, `Q2Array` and `Q2CString` gone from all code; the simulation path, `SIG_GPFitnessTrainer`, `SIG_GPFullDataRecorder` and `crossOver` all converted. Shim 806 → **539** lines, included by **21** files — *files that actually `#include` it: **20** in the source tree plus `sigel_eval.cpp`. A `git grep -l q2compat.h` returns **23**: `PORTING.md` and `include/SIGEL_GP/SIG_GPManager.h`, both of which only name the header in prose or a comment.* Remaining, measured 2026-08-30 after **D26**: `Q2PtrList` **36**, `Q2PtrVector` **45**, `Q2Queue` **9**, `Q2ValueList` **9**, `Q2ListIterator` 8, `Q2CString` 15 — **lines containing the name, in the source tree only**: the shim's own header and self-check are included, `sigel_eval.cpp` and `verification-against-sigel-1.3/` are not. State the scope when you re-measure; the same six names give 43/**45**/9/9/8/15 if `sigel_eval.cpp` and the captures are counted, and 45/**47**/9/9/8/15 if you count occurrences instead of lines. *These counts now rise as containers are converted, because each conversion leaves a comment naming the Qt 2 type it replaced. A rising count is expected; what matters is that no line is a type use.* *Left stale three commits running — D24, D25b, D25c — every time by updating one figure in this sentence and not the others beside it. Re-measure all three scopes or change none.* *This row used to end "the `Q2PtrVector` bulk is `SIG_GPManager::tours`, which cannot be linked until Phase C". D25c converted it; what remains of the type is `SIG_GUIGPManager::individualItems` and `SIG_GPTournament::indis`, both D26.* §10 |
 | P — PVM | **DONE 2026-08-28.** Vendored 3.4.3 replaced by upstream 3.4.6; nine patches carry the four config lines and Debian's eight source fixes; `libpvm3.a` and `pvmd3` build; SIGEL's two PVM objects link against them and `SIG_GPPVMData` round-trips through real PVM. `sigel`/`sigel_slave` still need Phase C. §7 |
 | C — GUI | **not started, AUTHORIZED 2026-08-27 per D24.** ~450 Qt 2 sites + 20 forms |
 | V — check against the 1.3 binary | **V1, V5's MDH probe, V6, V7 and V8 all done, all PASS.** Ordering: 10 of 10 container orders match. Arithmetic: `twoBases` exact bit for bit, `octopus` 9/9 with three joints exact and 5 ulp worst. **V6, V7 and V8 done 2026-08-29** — friction and no-collide negotiation, their four remaining rules, and the GP parameter blocks captured *before* their conversion. `verification-against-sigel-1.3/v6`, `v7`, `v8`. V2–V4 not started; V5's sensor and force probes are **invalid as specified** — both target Dynamo-only functions, deleted 2026-08-28. §7 |
@@ -967,7 +967,7 @@ disassembly are local.
 | V1 | ~~Capture 1.3's load-and-save round trip for three shipped `.exp`~~ **DONE 2026-08-27** — `verification-against-sigel-1.3/v1-1.3-roundtrip.txt` | the `Q2Dict` hash, all order-carrying containers, the parser and the serialiser |
 | V2 | Our half: a save path in `sigel_eval`, the same round trip locally, diffed against V1. Becomes a gate. **Read V8 result 5 first** — a shipped `.exp` round-tripped through 1.3 differs from its input by ten keys, so an input-vs-pass-1 gate fails however correct the port is | equivalence instead of self-consistency |
 | V3 | Determinism on the x86 box — one experiment run twice, both `RANDOMSEED`s pinned | gates everything numeric; never tested there |
-| V4 | **REFERENCE CAPTURED 2026-08-30, before this build can run it.** Two whole-run digests — `twoBases` and `octopus` — each validated across two independent 1.3 runs. Supersedes the single-individual fitness harvest and its tolerance argument | the interpreter, physics, genetic operators, selection and RNG **in composition**, over 300 evaluations, as an exact yes/no. **A real gate, not judgement** |
+| V4 | **REFERENCE RECEIVED 2026-08-30**, captured before this build can run it. Two whole-run digests — `twoBases` and `octopus` — each validated across two independent 1.3 runs on the reference machine. **Not yet a runnable gate here**: no capture file, and the prepared inputs are uncommitted, so the digests cannot be checked locally. Supersedes the single-individual fitness harvest | the interpreter, physics, genetic operators, selection and RNG **in composition**, over 300 evaluations, as an exact yes/no — *once the inputs are committed* |
 | V5 | **MDH probe DONE 2026-08-27, PASS** — `verification-against-sigel-1.3/v5-1.3-mdh-compared.txt`. The sensor and force probes remain open | the port's **arithmetic**, which V1–V4 never touch |
 | V6 | **DONE 2026-08-29, PASS, 5 of 5** — `verification-against-sigel-1.3/v6-1.3-friction-nocollide.txt` | the two Phase D paths **no shipped data exercises**: friction pairs and no-collide pairs, and whether both setters negotiate |
 | V7 | **DONE 2026-08-29, 4 runs on `walker`** — `verification-against-sigel-1.3/v7-1.3-friction-nocollide-rules.txt` | the remaining rules for those two paths: multiple partners, unloaded partners, duplicates, and whether a dropped entry is resurrected |
@@ -979,6 +979,19 @@ disassembly are local.
 **Two reference captures, each validated across two independent 1.3 runs.** This
 replaces the single-individual fitness check V4 originally proposed, and the
 tolerance argument that came with it.
+
+**PROVENANCE — read before relying on any of this.** These digests were produced
+on the x86 reference machine and **cannot be verified in this repository**.
+Unlike V1 and V5–V8 there is **no capture file** here, and the modified `.exp`
+inputs are not committed — so the six hashes and the spot-check rows are
+currently *unfalsifiable locally*. The prose spec below is the only route back to
+the inputs, and it already needed one correction (the `PVMHOST` count differs
+between the two experiments), which means a future mismatch could be a
+reconstruction error rather than a port defect.
+
+**Before this is used as a gate, commit the two prepared `.exp` files** — or the
+diff that produces them — so a mismatch is interpretable. Until then treat V4 as
+*reference data received*, not as a gate that can be run.
 
 **Digest construction.** Per pool snapshot: one line per individual,
 `NAME|FITNESS|sha256(program)`, **in pool order**; then sha256 over the whole
@@ -1002,8 +1015,11 @@ block.
     spot check, first five of snapshot 1:
     5367|0.829977  5192|0.789198  5220|0.701824  5438|1.08944  5437|0.624343
 
-**Reproduction spec — identical for both.** Start from the shipped `.exp` and
-change exactly these; the population is unchanged:
+**Reproduction spec.** Start from the shipped `.exp` and change exactly these;
+the population is unchanged. *Identical for both **except** `PVMHOST`: the
+shipped host count is **8** for twoBases, **20** for octopus and 21 for walker.
+An earlier draft said "identical for both" with "8 dead hosts" in the shipped
+column, which is wrong for octopus.*
 
 | key | shipped | gate |
 |---|---|---|
@@ -1015,7 +1031,7 @@ change exactly these; the population is unchanged:
 | `TERMINATIONTIME` year | 2001 | 2030 |
 | `TERMINATIONDURATIONDAYS` | 0 | 30 — **must not be 0** |
 | `POOLIMAGEGENERATION` | 0 | 1 |
-| `PVMHOST` | 8 dead hosts | one host, **slot count 1** |
+| `PVMHOST` | 8 dead hosts (twoBases) / **20** (octopus) | one host, **slot count 1** |
 | `GRAVEYARDDIRECTORY`, `POOLIMAGEDIRECTORY` | dead paths | writable local |
 
 **The slot count of 1 is load-bearing.** At 8 the run is not reproducible and the
@@ -4389,8 +4405,11 @@ draft said 44; that was the whole-tree count, and 25 of those lines are inside
 differential check, which walks the shim's cursor beside the rewritten one. That
 file is built by `make` and **is the dictorder and fitness gate binary**.
 *The false claim came from grepping `src/` and `include/` and reporting the
-result as "all code"; the repository root was never in scope.* Ninth instance of
-the failure tabulated in §9 — and **the sharpest form of it**: the scope that
+result as "all code"; the repository root was never in scope.* Another instance of the failure tabulated in §9 — *earlier drafts numbered
+these and the numbering was wrong: the table has six rows, and the rows
+themselves describe more occurrences than they have entries, so no count is
+meaningful. They are a pattern, not a tally* — and this is **the sharpest form
+of it**: the scope that
 was too narrow happened to exclude *the file the gates run in*. Not merely
 missed coverage; the omitted file was the one being certified.
 
@@ -4401,9 +4420,11 @@ missed coverage; the omitted file was the one being certified.
    cannot outlive the shim; it has to be retired or re-expressed.
 2. **`MT_Randomizer.h` and `MT_StatisticsElement.h` need `#include <QList>`.**
    Both declare `QList` members and receive the header **only transitively
-   through the shim**. Dropping their include without adding it breaks **8**
-   headers standalone; adding it to exactly those two restores 111 pass / 1
-   fail. So the dead-include count is **19**, not 21 and not 20.
+   through the shim**. Dropping the shim include from all 19 dead-include sites
+   breaks **10** headers standalone (111/1 → 101/11); dropping it from only
+   these two breaks 3. *An earlier draft said 8, which counts neither of the
+   two headers themselves.* Adding `<QList>` to exactly those two restores
+   **111 pass / 1 fail**. So the dead-include count is **19**, not 21 and not 20.
 3. ~~**The shim installs deterministic hash seeding as a side effect**~~
    (`q2compat.h:88-91`, a per-TU `Q2DeterministicHashSeed`). **Measured, and it
    is vestigial** — see below. It should still move to `sigel.cpp` /
@@ -4423,7 +4444,8 @@ Two measurements settle it:
 | check | result |
 |---|---|
 | `QHash`/`QSet`/`QMultiHash` anywhere outside `compat/` | **none.** D3 replaced the six `Q2Dict`s with `QList<T *>`, which is insertion-ordered by construction |
-| the same binary under `QT_HASH_SEED` = 0, 1, 12345, 999999 | **dictorder digest identical across all four**; fitness identical across both tested |
+| ~~the same binary under `QT_HASH_SEED` = 0, 1, 12345, 999999~~ | **A NULL EXPERIMENT — it could not have failed.** Qt 6 honours `QT_HASH_SEED` **only when it is 0**; any other value prints `forced seed value is not 0; ignored` and is coerced to 0. Confirmed: `QHashSeed::globalSeed()` is 0 for all four. And the shim pins the seed per translation unit before `main`, while `sigel_eval.cpp:451` calls `setDeterministicGlobalSeed()` as its first statement — the environment variable is never consulted |
+| **the experiment that should have been run**: rebuild `sigel_eval` with `QHashSeed::resetRandomGlobalSeed()` after the deterministic call, so the seed is genuinely random per process | seeds `278889441371735583`, `12972567734183481017`, `2771707303525248410` — all three dictorder runs **byte-identical to `dictorder-baseline.txt`**. This is real support, and unlike the argument from "no `QHash` in our code" it also covers Qt's own internal hashes |
 
 So no hashed container's order reaches a file, and the seed cannot affect
 output. *The shim's own comment already anticipated the move to `main()`; what

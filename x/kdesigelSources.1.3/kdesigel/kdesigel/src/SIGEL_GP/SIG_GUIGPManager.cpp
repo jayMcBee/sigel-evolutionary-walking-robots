@@ -74,12 +74,17 @@ namespace SIGEL_GP
   {
     SIG_GPIndividual &actInd = actExperiment.population.getIndividual( poolPos );
 
-    // Q2PtrVector::operator[] went through at(), which warned and clamped to
-    // element 0; QList::operator[] out of range is UB. value() yields null
-    // instead, which the -> below turns into a clean crash rather than a
-    // silent read of the wrong item.
-    if (SIGEL_MasterGUI::SIG_IndividualListItem *item = individualItems.value( poolPos ))
+    // Q2PtrVector::operator[] went through at(), which WARNED and then clamped
+    // to element 0 -- so out of range, 1.3 updated the wrong item and said so.
+    // QList::operator[] is UB there instead. This skips, which is neither: no
+    // UB, and no wrong item. Keep the warning, or the failure becomes silent
+    // and this is strictly less diagnosable than what it replaces.
+    SIGEL_MasterGUI::SIG_IndividualListItem *item = individualItems.value( poolPos );
+    if (item)
       item->setTo( &actInd );
+    else
+      qWarning( "SIG_GUIGPManager: no list item for pool position %d (size %lld)",
+                poolPos, static_cast< long long >( individualItems.size() ) );
 
     // update generations display (this line looks cool, doesn't it ?!)
     //guiExperiment.experimentView->lcdnumberGenerations->display(actExperiment.population.getPoolGeneration());
