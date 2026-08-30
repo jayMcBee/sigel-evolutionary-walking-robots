@@ -348,14 +348,30 @@ void SIGEL_GP::SIG_GPManager::createTours(int quantity) {
   };
 };
 
+namespace {
+
+  /* fitTaskList held setAutoDelete(true): ~Q2PtrList was the ONLY free, and it
+   * ran on every exit -- including the two early returns inside the function.
+   * QList frees nothing, so the guard restores that. Same shape as
+   * DynaMechsLinkGuard in SIG_DynaMechsSimulationData.cpp.
+   */
+  struct FitTaskListGuard
+    {
+      QList< QList<int> * > *tasks;
+
+      ~FitTaskListGuard() { if (tasks) qDeleteAll( *tasks ); }
+    };
+
+};
+
 void SIGEL_GP::SIG_GPManager::evalNewIndis() {
 
 #ifdef SIG_DEBUG
   SIGEL_Tools::SIG_IO::cerr << "SIG_GPManager evaluates new Individuals.\n";
 #endif
 
-  Q2PtrList< QList<int> > fitTaskList;
-  fitTaskList.setAutoDelete( true );
+  QList< QList<int> * > fitTaskList;
+  FitTaskListGuard fitTaskListGuard{ &fitTaskList };
 
   //The experiment's population
   SIG_GPPopulation &pop=actExperiment.population;
@@ -412,7 +428,9 @@ void SIGEL_GP::SIG_GPManager::evalNewIndis() {
     haveABreak();
 
     trainer->sweepToSpawn();
-    QList<int> *actFitTask = fitTaskList.first();
+    // first(): Qt 2 returned null on empty, Qt 6's first() is UB there.
+    qsizetype fitCur = fitTaskList.isEmpty() ? -1 : 0;
+    QList<int> *actFitTask = (fitCur < 0) ? 0 : fitTaskList.at( fitCur );
     QList<int> *prevFitTask = 0;
 
     while (actFitTask) {
@@ -435,8 +453,12 @@ void SIGEL_GP::SIG_GPManager::evalNewIndis() {
         pop.getIndividual( (*actFitTask)[1] ).setFitness( actFitness );
         updateIndividualView( (*actFitTask)[1] );
 
-        fitTaskList.remove();
-        actFitTask = fitTaskList.current();
+        // remove(): setAutoDelete(true) made this the free.
+        delete fitTaskList.takeAt( fitCur );
+        // cursorAfterRemoval: land on whatever slid in, else step back.
+        if (fitCur >= fitTaskList.size())
+          fitCur = fitTaskList.isEmpty() ? -1 : fitTaskList.size() - 1;
+        actFitTask = (fitCur < 0) ? 0 : fitTaskList.at( fitCur );
         if (actFitTask == prevFitTask)
           break;
       }
@@ -447,7 +469,11 @@ void SIGEL_GP::SIG_GPManager::evalNewIndis() {
 #endif
 
         prevFitTask = actFitTask;
-        actFitTask = fitTaskList.next();
+        // next(): a dead cursor stays dead and does NOT advance.
+        if (fitCur < 0 || ++fitCur >= fitTaskList.size())
+          { fitCur = -1; actFitTask = 0; }
+        else
+          actFitTask = fitTaskList.at( fitCur );
       };
     };
   };
@@ -1431,8 +1457,8 @@ void SIGEL_GP::SIG_GPManager::evolutionLoop(MT_Classifier *MetaClassifier)
 
 void SIGEL_GP::SIG_GPManager::evalNeededIndis()
 {
-  Q2PtrList< QList<int> > fitTaskList;
-  fitTaskList.setAutoDelete( true );
+  QList< QList<int> * > fitTaskList;
+  FitTaskListGuard fitTaskListGuard{ &fitTaskList };
 
   //The experiment's population
   SIG_GPPopulation &pop=actExperiment.population;
@@ -1504,7 +1530,9 @@ int DebugInfo =0;
 	haveABreak();
 
 	trainer->sweepToSpawn();
-	QList<int> *actFitTask = fitTaskList.first();
+	// first(): Qt 2 returned null on empty, Qt 6's first() is UB there.
+	qsizetype fitCur = fitTaskList.isEmpty() ? -1 : 0;
+	QList<int> *actFitTask = (fitCur < 0) ? 0 : fitTaskList.at( fitCur );
 	QList<int> *prevFitTask = 0;
 
 	while (actFitTask)
@@ -1517,8 +1545,12 @@ int DebugInfo =0;
 			pop.getIndividual( (*actFitTask)[1] ).setFitness( actFitness );
 		updateIndividualView( (*actFitTask)[1] );
 
-		fitTaskList.remove();
-		actFitTask = fitTaskList.current();
+		// remove(): setAutoDelete(true) made this the free.
+		delete fitTaskList.takeAt( fitCur );
+		// cursorAfterRemoval: land on whatever slid in, else step back.
+		if (fitCur >= fitTaskList.size())
+		  fitCur = fitTaskList.isEmpty() ? -1 : fitTaskList.size() - 1;
+		actFitTask = (fitCur < 0) ? 0 : fitTaskList.at( fitCur );
 		if (actFitTask == prevFitTask)
 		  break;
 	      }
@@ -1527,7 +1559,11 @@ int DebugInfo =0;
 
 
 		prevFitTask = actFitTask;
-		actFitTask = fitTaskList.next();
+		// next(): a dead cursor stays dead and does NOT advance.
+		if (fitCur < 0 || ++fitCur >= fitTaskList.size())
+		  { fitCur = -1; actFitTask = 0; }
+		else
+		  actFitTask = fitTaskList.at( fitCur );
 	      };
 	  };
    };
