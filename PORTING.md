@@ -1752,6 +1752,38 @@ compiled at all. It went with the Dynamo backend, its only caller
   and will abort now. `MT_GUI` is in neither `check.sh`'s `MODULES` nor the
   Makefile's `CORE`, so nothing flags it.
 
+### The characteristic failure of this project: measuring the wrong thing
+
+**Not wrong numbers — wrong *referents*.** Every one of these produced a real,
+correct measurement that licensed nothing about the question being asked. They
+are more dangerous than arithmetic errors because the result looks clean.
+
+| what was measured | what was concluded | why it was empty |
+|---|---|---|
+| `RANDOMSEED` is 0 in all shipped `.exp` | "every shipped experiment is clock-seeded" | there are **two** keys; the one measured feeds a GUI spinbox and seeds nothing. The live one is 1 in 8 of 14 |
+| Phase V item 4 targeted `SIG_DynaDrive::applyForce` | it would have gated the register-to-force path | that function is **DynaMo-only** and every shipped experiment selects DynaMechs. A clean "no divergence" would have meant nothing |
+| an `-evolve` run would show whether `run()` is re-entered | it would settle the `isEmpty()` window | `-evolve` reaches `main`'s single straight-line call and **cannot reach the GUI slot**, which is the only re-entrant caller |
+| a 7-instruction window after each accessor call | a sweep for null-tested accessors | misses any site that stores the result and tests it later — a **candidate list**, not an absence proof |
+| a sweep keyed on **container type name** | iterate-and-mutate candidates | missed `evolutionLoop`, the one case measured as real, because the iterator and the container are different type strings |
+| `head -4` on a symbol grep; a 772-byte window on a 2072-byte function | op counts stated as totals | **an undercount stated as a count**, four times on one side and once on mine — including in the message correcting it |
+
+**The shape is always the same:** a bounded observation reported as a general
+one, or a proxy measured in place of the thing it stands for.
+
+**Two rules, both learned the expensive way.**
+
+1. **Before asking for a measurement, ask which paths it can reach.** A run of
+   `-evolve` samples one caller. A grep over `src/` samples one scope. State the
+   reachable set *first*, then decide whether the answer would settle anything.
+2. **Establish the boundary before counting.** Function extent from the next
+   symbol, not from an eyeballed byte range; corpus extent stated, not implied.
+   Every truncation in this project produced an undercount presented as a total.
+
+**And the discipline that catches it:** a sweep that cannot rediscover a known
+positive is not evidence. The iterate-and-mutate sweep was rebuilt until it
+found `evolutionLoop`; had it been trusted first time it would have returned a
+clean six-item list with the only real case silently absent.
+
 ### The real remaining risk: Qt 2 defined it, Qt 6 leaves it undefined
 
 **This is one hazard class, not a list of separate traps, and it is what is left
@@ -1819,7 +1851,7 @@ binary in this repository, alongside `xb/kdesigel/sigel`. `moveDrive` is at
 
 | claim | measured |
 |---|---|
-| extended-precision ops | **5 `fstpt` + 4 `fldt`** at `0x80b790f`–`0x80b7a50`. *Reported to me as "seven pairs"; it is nine ops, unpaired.* |
+| extended-precision ops | **14 `fstpt` + 22 `fldt` = 36**, over the function's true extent `0x080b787c`–`0x080b8094` (2072 bytes). *Reported to me as "seven pairs". I answered "nine ops" — also wrong, and wrong the same way: I had stopped at an arbitrary `0x080b7b80`, covering 772 of 2072 bytes. **I made the truncation error in the same message in which I corrected it.** The boundary is the next symbol, `__static_initialization_and_destruction_0`.* |
 | the exponent | **`getSize() - 1`**, from `lea -0x1(%eax),%edx` at `0x80b78d8`. *Reported as `pow(2.0, size)`, which is one instruction short.* Our source has `getSize() - 1` at `SIG_DynaMechsCommandInterface.cpp:66,69,103,107` — **it matches the binary** |
 | `pow` itself | called with **doubles** (`fstpl`, 64-bit, at `0x80b78f6`/`0x80b7902`), not extended. Only the surrounding intermediates are 80-bit |
 
@@ -1835,10 +1867,29 @@ whole tree, at `SIG_DynaMechsCommandInterface.cpp:49,65-69,102-111`.
 | a build on x86-64 Linux | x87 extended | **64 bits** |
 
 So the port does not lose precision here; it gains it, and therefore cannot be
-bit-identical. **But the third row is the practical point: an x86-64 build gets
-x87 `long double` back and closes this gap exactly.** That is worth knowing
-before anyone concludes the difference is inherent to the port rather than to
-the machine it was built on.
+bit-identical. An x86-64 build gets x87 `long double` back — **but that closes
+only half the gap, and the other half cannot be closed by choosing a host.**
+
+**1.3 uses x87 exclusively.** Measured over `sigel_slave`: **0** SSE scalar
+float ops, **53,652** x87 ops. That is what 2003 gcc targeting i386 does, and it
+has a consequence far beyond this one function: **on i386 every `double`
+expression is evaluated on the x87 stack at a 64-bit mantissa and rounded only
+when stored to memory.** The excess precision is not a property of variables
+declared `long double`; it is a property of all floating-point evaluation in the
+entire binary.
+
+On x86-64, `long double` is x87 extended but plain `double` arithmetic goes
+through SSE at true 64-bit. So an x86-64 build would match 1.3 wherever
+`long double` is explicit and **still differ everywhere 1.3 got 80-bit
+intermediates for ordinary `double` expressions** — which, at 53,652 x87 ops and
+zero SSE, is everywhere.
+
+Closing that would need `-mfpmath=387` on an x86-64 build, or accepting that
+plain-`double` paths differ in the last bits. **Not worth chasing.** It is
+recorded so that nobody concludes from "build on x86-64" that bit-identity
+becomes achievable and then treats the residual as a defect. Given the
+6-significant-figure format finding, none of it should matter for a
+file-mediated gate; it matters only to someone demanding bit equality.
 
 **How to compare it.** Treat `moveDrive` as a function of its inputs — feed a
 known register value and width, capture the drive value on both sides — rather
