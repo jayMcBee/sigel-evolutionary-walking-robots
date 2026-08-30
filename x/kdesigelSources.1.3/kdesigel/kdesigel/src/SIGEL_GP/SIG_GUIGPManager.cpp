@@ -47,7 +47,10 @@ namespace SIGEL_GP
 	  static_cast<SIGEL_MasterGUI::SIG_IndividualListItem*>( listIter.current() );
 	// insert(): a slot assignment. This container has no setAutoDelete, so
 	// Qt 2 deleted nothing here -- the items belong to the list view.
-	if (actItem->poolPosition < individualItems.size())
+	// Q2PtrVector::insert took a uint, so a negative index wrapped huge and was
+	// REJECTED. A signed test alone would let it through and index out of range.
+	if (actItem->poolPosition >= 0
+	    && actItem->poolPosition < individualItems.size())
 	  individualItems[ actItem->poolPosition ] = actItem;
 	++listIter;
       };
@@ -71,7 +74,12 @@ namespace SIGEL_GP
   {
     SIG_GPIndividual &actInd = actExperiment.population.getIndividual( poolPos );
 
-    individualItems[ poolPos ]->setTo( &actInd );
+    // Q2PtrVector::operator[] went through at(), which warned and clamped to
+    // element 0; QList::operator[] out of range is UB. value() yields null
+    // instead, which the -> below turns into a clean crash rather than a
+    // silent read of the wrong item.
+    if (SIGEL_MasterGUI::SIG_IndividualListItem *item = individualItems.value( poolPos ))
+      item->setTo( &actInd );
 
     // update generations display (this line looks cool, doesn't it ?!)
     //guiExperiment.experimentView->lcdnumberGenerations->display(actExperiment.population.getPoolGeneration());

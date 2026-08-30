@@ -41,8 +41,11 @@ languageP(languageP)
 SIGEL_GP::SIG_GPTournament::~SIG_GPTournament()
 {
   // This class owns the tournament individuals its subclasses build.
-  // deleteContents() was the free: no setAutoDelete on this container, so
-  // ~Q2PtrVector freed nothing and this call was the whole ownership.
+  // deleteContents() was the free in THIS tree. 1.3 also set
+  // indis.setAutoDelete(true) in the constructor (confirmed in the binary at
+  // 0x080cf9ee, pushw $0x1); Phase B removed the flag and moved the free here.
+  // The flag freed nothing at any converted site anyway -- the three resizes
+  // only grow and every insert lands on a null slot.
   qDeleteAll( indis );
   indis.clear();
 };
