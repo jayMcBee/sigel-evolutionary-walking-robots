@@ -1,1122 +1,824 @@
-<!DOCTYPE UI><UI>
-<class>SIG_SimulationParameterBase</class>
-<widget>
-    <class>QWidget</class>
-    <property stdset="1">
-        <name>name</name>
-        <cstring>SIG_SimulationParameterBase</cstring>
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0" stdsetdef="1">
+  <author></author>
+  <comment></comment>
+  <exportmacro></exportmacro>
+  <class>SIG_SimulationParameterBase</class>
+  <widget class="QWidget" name="SIG_SimulationParameterBase">
+    <property name="geometry">
+      <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>477</width>
+        <height>522</height>
+      </rect>
     </property>
-    <property stdset="1">
-        <name>geometry</name>
-        <rect>
-            <x>0</x>
-            <y>0</y>
-            <width>477</width>
-            <height>522</height>
-        </rect>
+    <property name="windowTitle">
+      <string>Simulation Parameter</string>
     </property>
-    <property stdset="1">
-        <name>caption</name>
-        <string>Simulation Parameter</string>
-    </property>
-    <vbox>
-        <property stdset="1">
-            <name>margin</name>
-            <number>11</number>
-        </property>
-        <property stdset="1">
-            <name>spacing</name>
-            <number>6</number>
-        </property>
-        <widget>
-            <class>QTabWidget</class>
-            <property stdset="1">
-                <name>name</name>
-                <cstring>TabWidget2</cstring>
-            </property>
-            <widget>
-                <class>QWidget</class>
-                <property stdset="1">
-                    <name>name</name>
-                    <cstring>tab</cstring>
-                </property>
-                <attribute>
-                    <name>title</name>
-                    <string>General settings</string>
-                </attribute>
-                <vbox>
-                    <property stdset="1">
-                        <name>margin</name>
-                        <number>11</number>
+    <layout class="QVBoxLayout">
+      <property name="margin">
+        <number>11</number>
+      </property>
+      <property name="spacing">
+        <number>6</number>
+      </property>
+      <item>
+        <widget class="QTabWidget" name="TabWidget2">
+          <widget class="QWidget" name="tab">
+            <attribute name="title">
+              <string>General settings</string>
+            </attribute>
+            <layout class="QVBoxLayout">
+              <property name="margin">
+                <number>11</number>
+              </property>
+              <property name="spacing">
+                <number>6</number>
+              </property>
+              <item>
+                <widget class="QGroupBox" name="groupboxGSIntegrator">
+                  <property name="title">
+                    <string>Integrator</string>
+                  </property>
+                  <layout class="QHBoxLayout">
+                    <property name="margin">
+                      <number>11</number>
                     </property>
-                    <property stdset="1">
-                        <name>spacing</name>
-                        <number>6</number>
+                    <property name="spacing">
+                      <number>6</number>
                     </property>
-                    <widget>
-                        <class>QGroupBox</class>
-                        <property stdset="1">
-                            <name>name</name>
-                            <cstring>groupboxGSIntegrator</cstring>
+                    <item>
+                      <widget class="QLabel" name="textlabelStepSize">
+                        <property name="text">
+                          <string>Step Size:</string>
                         </property>
-                        <property stdset="1">
-                            <name>title</name>
-                            <string>Integrator</string>
+                        <property name="wordWrap">
+                          <bool>false</bool>
                         </property>
-                        <hbox>
-                            <property stdset="1">
-                                <name>margin</name>
-                                <number>11</number>
-                            </property>
-                            <property stdset="1">
-                                <name>spacing</name>
-                                <number>6</number>
-                            </property>
-                            <widget>
-                                <class>QLabel</class>
-                                <property stdset="1">
-                                    <name>name</name>
-                                    <cstring>textlabelStepSize</cstring>
-                                </property>
-                                <property stdset="1">
-                                    <name>text</name>
-                                    <string>Step Size:</string>
-                                </property>
-                            </widget>
-                            <widget>
-                                <class>QLineEdit</class>
-                                <property stdset="1">
-                                    <name>name</name>
-                                    <cstring>lineeditStepSize</cstring>
-                                </property>
-                            </widget>
-                            <spacer>
-                                <property>
-                                    <name>name</name>
-                                    <cstring>Spacer13</cstring>
-                                </property>
-                                <property stdset="1">
-                                    <name>orientation</name>
-                                    <enum>Horizontal</enum>
-                                </property>
-                                <property stdset="1">
-                                    <name>sizeType</name>
-                                    <enum>Expanding</enum>
-                                </property>
-                                <property>
-                                    <name>sizeHint</name>
-                                    <size>
-                                        <width>20</width>
-                                        <height>20</height>
-                                    </size>
-                                </property>
-                            </spacer>
-                        </hbox>
-                    </widget>
-                    <widget>
-                        <class>QButtonGroup</class>
-                        <property stdset="1">
-                            <name>name</name>
-                            <cstring>buttongroupSimulationLibrary</cstring>
-                        </property>
-                        <property stdset="1">
-                            <name>title</name>
-                            <string>Used simulation library</string>
-                        </property>
-                        <vbox>
-                            <property stdset="1">
-                                <name>margin</name>
-                                <number>11</number>
-                            </property>
-                            <property stdset="1">
-                                <name>spacing</name>
-                                <number>6</number>
-                            </property>
-                            <widget>
-                                <class>QRadioButton</class>
-                                <property stdset="1">
-                                    <name>name</name>
-                                    <cstring>radiobuttonDynamo</cstring>
-                                </property>
-                                <property stdset="1">
-                                    <name>text</name>
-                                    <string>Dynamo  (not recommended)</string>
-                                </property>
-                            </widget>
-                            <widget>
-                                <class>QRadioButton</class>
-                                <property stdset="1">
-                                    <name>name</name>
-                                    <cstring>radiobuttonDynaMechs</cstring>
-                                </property>
-                                <property stdset="1">
-                                    <name>text</name>
-                                    <string>DynaMechs   (preferred)</string>
-                                </property>
-                            </widget>
-                        </vbox>
-                    </widget>
-                    <widget>
-                        <class>QGroupBox</class>
-                        <property stdset="1">
-                            <name>name</name>
-                            <cstring>groupboxSimulationConditions</cstring>
-                        </property>
-                        <property stdset="1">
-                            <name>title</name>
-                            <string>Simulation conditions</string>
-                        </property>
-                        <grid>
-                            <property stdset="1">
-                                <name>margin</name>
-                                <number>11</number>
-                            </property>
-                            <property stdset="1">
-                                <name>spacing</name>
-                                <number>6</number>
-                            </property>
-                            <widget row="0"  column="1"  rowspan="1"  colspan="2" >
-                                <class>QLayoutWidget</class>
-                                <property stdset="1">
-                                    <name>name</name>
-                                    <cstring>layoutHMS</cstring>
-                                </property>
-                                <hbox>
-                                    <property stdset="1">
-                                        <name>margin</name>
-                                        <number>0</number>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>spacing</name>
-                                        <number>6</number>
-                                    </property>
-                                    <widget>
-                                        <class>QLabel</class>
-                                        <property stdset="1">
-                                            <name>name</name>
-                                            <cstring>textlabelHours</cstring>
-                                        </property>
-                                        <property stdset="1">
-                                            <name>text</name>
-                                            <string>h:</string>
-                                        </property>
-                                    </widget>
-                                    <widget>
-                                        <class>QSpinBox</class>
-                                        <property stdset="1">
-                                            <name>name</name>
-                                            <cstring>spinboxHours</cstring>
-                                        </property>
-                                        <property stdset="1">
-                                            <name>maxValue</name>
-                                            <number>23</number>
-                                        </property>
-                                    </widget>
-                                    <widget>
-                                        <class>QLabel</class>
-                                        <property stdset="1">
-                                            <name>name</name>
-                                            <cstring>textlabelMins</cstring>
-                                        </property>
-                                        <property stdset="1">
-                                            <name>text</name>
-                                            <string>m:</string>
-                                        </property>
-                                    </widget>
-                                    <widget>
-                                        <class>QSpinBox</class>
-                                        <property stdset="1">
-                                            <name>name</name>
-                                            <cstring>spinboxMins</cstring>
-                                        </property>
-                                        <property stdset="1">
-                                            <name>maxValue</name>
-                                            <number>59</number>
-                                        </property>
-                                    </widget>
-                                    <widget>
-                                        <class>QLabel</class>
-                                        <property stdset="1">
-                                            <name>name</name>
-                                            <cstring>textlabelSecs</cstring>
-                                        </property>
-                                        <property stdset="1">
-                                            <name>text</name>
-                                            <string>s:</string>
-                                        </property>
-                                    </widget>
-                                    <widget>
-                                        <class>QSpinBox</class>
-                                        <property stdset="1">
-                                            <name>name</name>
-                                            <cstring>spinboxSecs</cstring>
-                                        </property>
-                                        <property stdset="1">
-                                            <name>maxValue</name>
-                                            <number>59</number>
-                                        </property>
-                                    </widget>
-                                </hbox>
-                            </widget>
-                            <widget row="0"  column="0" >
-                                <class>QLabel</class>
-                                <property stdset="1">
-                                    <name>name</name>
-                                    <cstring>textlabelTimeToSimulate</cstring>
-                                </property>
-                                <property stdset="1">
-                                    <name>text</name>
-                                    <string>Time To Simulate:</string>
-                                </property>
-                            </widget>
-                            <widget row="1"  column="0" >
-                                <class>QLabel</class>
-                                <property stdset="1">
-                                    <name>name</name>
-                                    <cstring>textlabelRandomSeed</cstring>
-                                </property>
-                                <property stdset="1">
-                                    <name>text</name>
-                                    <string>Random Seed:</string>
-                                </property>
-                            </widget>
-                            <widget row="1"  column="1" >
-                                <class>QSpinBox</class>
-                                <property stdset="1">
-                                    <name>name</name>
-                                    <cstring>spinboxRandomSeed</cstring>
-                                </property>
-                                <property stdset="1">
-                                    <name>suffix</name>
-                                    <string></string>
-                                </property>
-                                <property stdset="1">
-                                    <name>maxValue</name>
-                                    <number>32000</number>
-                                </property>
-                            </widget>
-                            <spacer row="0"  column="3" >
-                                <property>
-                                    <name>name</name>
-                                    <cstring>Spacer27</cstring>
-                                </property>
-                                <property stdset="1">
-                                    <name>orientation</name>
-                                    <enum>Horizontal</enum>
-                                </property>
-                                <property stdset="1">
-                                    <name>sizeType</name>
-                                    <enum>Expanding</enum>
-                                </property>
-                                <property>
-                                    <name>sizeHint</name>
-                                    <size>
-                                        <width>20</width>
-                                        <height>20</height>
-                                    </size>
-                                </property>
-                            </spacer>
-                            <spacer row="1"  column="2"  rowspan="1"  colspan="2" >
-                                <property>
-                                    <name>name</name>
-                                    <cstring>spacerRandomSeed</cstring>
-                                </property>
-                                <property stdset="1">
-                                    <name>orientation</name>
-                                    <enum>Horizontal</enum>
-                                </property>
-                                <property stdset="1">
-                                    <name>sizeType</name>
-                                    <enum>Expanding</enum>
-                                </property>
-                                <property>
-                                    <name>sizeHint</name>
-                                    <size>
-                                        <width>20</width>
-                                        <height>20</height>
-                                    </size>
-                                </property>
-                            </spacer>
-                        </grid>
-                    </widget>
-                    <spacer>
-                        <property>
-                            <name>name</name>
-                            <cstring>Spacer7</cstring>
-                        </property>
-                        <property stdset="1">
-                            <name>orientation</name>
-                            <enum>Vertical</enum>
-                        </property>
-                        <property stdset="1">
-                            <name>sizeType</name>
-                            <enum>Expanding</enum>
-                        </property>
-                        <property>
-                            <name>sizeHint</name>
-                            <size>
-                                <width>20</width>
-                                <height>20</height>
-                            </size>
-                        </property>
-                    </spacer>
-                </vbox>
-            </widget>
-            <widget>
-                <class>QWidget</class>
-                <property stdset="1">
-                    <name>name</name>
-                    <cstring>tab</cstring>
-                </property>
-                <attribute>
-                    <name>title</name>
-                    <string>DynaMechs</string>
-                </attribute>
-                <vbox>
-                    <property stdset="1">
-                        <name>margin</name>
-                        <number>11</number>
-                    </property>
-                    <property stdset="1">
-                        <name>spacing</name>
-                        <number>6</number>
-                    </property>
-                    <widget>
-                        <class>QGroupBox</class>
-                        <property stdset="1">
-                            <name>name</name>
-                            <cstring>groupboxDynaMechsIntegrator</cstring>
-                        </property>
-                        <property stdset="1">
-                            <name>title</name>
-                            <string>Integrator</string>
-                        </property>
-                        <hbox>
-                            <property stdset="1">
-                                <name>margin</name>
-                                <number>11</number>
-                            </property>
-                            <property stdset="1">
-                                <name>spacing</name>
-                                <number>6</number>
-                            </property>
-                            <widget>
-                                <class>QLabel</class>
-                                <property stdset="1">
-                                    <name>name</name>
-                                    <cstring>textlabelDynaMechsIntegrator</cstring>
-                                </property>
-                                <property stdset="1">
-                                    <name>text</name>
-                                    <string>Type:</string>
-                                </property>
-                            </widget>
-                            <widget>
-                                <class>QComboBox</class>
-                                <item>
-                                    <property>
-                                        <name>text</name>
-                                        <string>Euler</string>
-                                    </property>
-                                </item>
-                                <item>
-                                    <property>
-                                        <name>text</name>
-                                        <string>Runge Kutta 4</string>
-                                    </property>
-                                </item>
-                                <item>
-                                    <property>
-                                        <name>text</name>
-                                        <string>Runge Kutta 45</string>
-                                    </property>
-                                </item>
-                                <property stdset="1">
-                                    <name>name</name>
-                                    <cstring>comboboxDynaMechsIntegrator</cstring>
-                                </property>
-                            </widget>
-                            <spacer>
-                                <property>
-                                    <name>name</name>
-                                    <cstring>Spacer12</cstring>
-                                </property>
-                                <property stdset="1">
-                                    <name>orientation</name>
-                                    <enum>Horizontal</enum>
-                                </property>
-                                <property stdset="1">
-                                    <name>sizeType</name>
-                                    <enum>Expanding</enum>
-                                </property>
-                                <property>
-                                    <name>sizeHint</name>
-                                    <size>
-                                        <width>20</width>
-                                        <height>20</height>
-                                    </size>
-                                </property>
-                            </spacer>
-                        </hbox>
-                    </widget>
-                    <widget>
-                        <class>QGroupBox</class>
-                        <property stdset="1">
-                            <name>name</name>
-                            <cstring>groupboxJointConstants</cstring>
-                        </property>
-                        <property stdset="1">
-                            <name>title</name>
-                            <string>Joint constants</string>
-                        </property>
-                        <grid>
-                            <property stdset="1">
-                                <name>margin</name>
-                                <number>11</number>
-                            </property>
-                            <property stdset="1">
-                                <name>spacing</name>
-                                <number>6</number>
-                            </property>
-                            <widget row="0"  column="0" >
-                                <class>QLabel</class>
-                                <property stdset="1">
-                                    <name>name</name>
-                                    <cstring>textlabelJointlimitsSpringConstant</cstring>
-                                </property>
-                                <property stdset="1">
-                                    <name>text</name>
-                                    <string>Joint limits spring constant:</string>
-                                </property>
-                            </widget>
-                            <widget row="0"  column="1" >
-                                <class>QLineEdit</class>
-                                <property stdset="1">
-                                    <name>name</name>
-                                    <cstring>lineeditJointlimitsSpringConstant</cstring>
-                                </property>
-                            </widget>
-                            <widget row="2"  column="1" >
-                                <class>QLineEdit</class>
-                                <property stdset="1">
-                                    <name>name</name>
-                                    <cstring>lineeditJointfrictionConstant</cstring>
-                                </property>
-                            </widget>
-                            <widget row="2"  column="0" >
-                                <class>QLabel</class>
-                                <property stdset="1">
-                                    <name>name</name>
-                                    <cstring>textlabelJointfrictionConstant</cstring>
-                                </property>
-                                <property stdset="1">
-                                    <name>text</name>
-                                    <string>Joint friction constant:</string>
-                                </property>
-                            </widget>
-                            <widget row="1"  column="1" >
-                                <class>QLineEdit</class>
-                                <property stdset="1">
-                                    <name>name</name>
-                                    <cstring>lineeditJointlimitsDamperConstant</cstring>
-                                </property>
-                            </widget>
-                            <widget row="1"  column="0" >
-                                <class>QLabel</class>
-                                <property stdset="1">
-                                    <name>name</name>
-                                    <cstring>textlabelJointlimitsDamperConstant</cstring>
-                                </property>
-                                <property stdset="1">
-                                    <name>text</name>
-                                    <string>Joint limits damper constant:</string>
-                                </property>
-                            </widget>
-                        </grid>
-                    </widget>
-                    <spacer>
-                        <property>
-                            <name>name</name>
-                            <cstring>Spacer22</cstring>
-                        </property>
-                        <property stdset="1">
-                            <name>orientation</name>
-                            <enum>Vertical</enum>
-                        </property>
-                        <property stdset="1">
-                            <name>sizeType</name>
-                            <enum>Expanding</enum>
-                        </property>
-                        <property>
-                            <name>sizeHint</name>
-                            <size>
-                                <width>20</width>
-                                <height>20</height>
-                            </size>
-                        </property>
-                    </spacer>
-                </vbox>
-            </widget>
-            <widget>
-                <class>QWidget</class>
-                <property stdset="1">
-                    <name>name</name>
-                    <cstring>tab</cstring>
-                </property>
-                <attribute>
-                    <name>title</name>
-                    <string>DynaMo</string>
-                </attribute>
-                <vbox>
-                    <property stdset="1">
-                        <name>margin</name>
-                        <number>11</number>
-                    </property>
-                    <property stdset="1">
-                        <name>spacing</name>
-                        <number>6</number>
-                    </property>
-                    <widget>
-                        <class>QGroupBox</class>
-                        <property stdset="1">
-                            <name>name</name>
-                            <cstring>GroupBox5</cstring>
-                        </property>
-                        <property stdset="1">
-                            <name>title</name>
-                            <string>Integrator</string>
-                        </property>
-                        <grid>
-                            <property stdset="1">
-                                <name>margin</name>
-                                <number>11</number>
-                            </property>
-                            <property stdset="1">
-                                <name>spacing</name>
-                                <number>6</number>
-                            </property>
-                            <widget row="0"  column="0" >
-                                <class>QLabel</class>
-                                <property stdset="1">
-                                    <name>name</name>
-                                    <cstring>textlabelIntegrator</cstring>
-                                </property>
-                                <property stdset="1">
-                                    <name>text</name>
-                                    <string>Type:</string>
-                                </property>
-                            </widget>
-                            <widget row="1"  column="0" >
-                                <class>QLabel</class>
-                                <property stdset="1">
-                                    <name>name</name>
-                                    <cstring>textlabelSolveMode</cstring>
-                                </property>
-                                <property stdset="1">
-                                    <name>text</name>
-                                    <string>Solve Mode:</string>
-                                </property>
-                            </widget>
-                            <widget row="0"  column="1" >
-                                <class>QComboBox</class>
-                                <item>
-                                    <property>
-                                        <name>text</name>
-                                        <string>Runge Kutta 4</string>
-                                    </property>
-                                </item>
-                                <item>
-                                    <property>
-                                        <name>text</name>
-                                        <string>Runge Kutta 2</string>
-                                    </property>
-                                </item>
-                                <item>
-                                    <property>
-                                        <name>text</name>
-                                        <string>Double Euler</string>
-                                    </property>
-                                </item>
-                                <item>
-                                    <property>
-                                        <name>text</name>
-                                        <string>Euler</string>
-                                    </property>
-                                </item>
-                                <property stdset="1">
-                                    <name>name</name>
-                                    <cstring>comboboxIntegrator</cstring>
-                                </property>
-                            </widget>
-                            <widget row="1"  column="1" >
-                                <class>QComboBox</class>
-                                <item>
-                                    <property>
-                                        <name>text</name>
-                                        <string>Single Value Decomposition</string>
-                                    </property>
-                                </item>
-                                <item>
-                                    <property>
-                                        <name>text</name>
-                                        <string>Conjugate Gradient</string>
-                                    </property>
-                                </item>
-                                <item>
-                                    <property>
-                                        <name>text</name>
-                                        <string>LU Decomposition</string>
-                                    </property>
-                                </item>
-                                <property stdset="1">
-                                    <name>name</name>
-                                    <cstring>comboboxSolveMode</cstring>
-                                </property>
-                            </widget>
-                            <spacer row="0"  column="2" >
-                                <property>
-                                    <name>name</name>
-                                    <cstring>spacerType</cstring>
-                                </property>
-                                <property stdset="1">
-                                    <name>orientation</name>
-                                    <enum>Horizontal</enum>
-                                </property>
-                                <property stdset="1">
-                                    <name>sizeType</name>
-                                    <enum>Expanding</enum>
-                                </property>
-                                <property>
-                                    <name>sizeHint</name>
-                                    <size>
-                                        <width>20</width>
-                                        <height>20</height>
-                                    </size>
-                                </property>
-                            </spacer>
-                            <spacer row="1"  column="2" >
-                                <property>
-                                    <name>name</name>
-                                    <cstring>spacerSolveMode</cstring>
-                                </property>
-                                <property stdset="1">
-                                    <name>orientation</name>
-                                    <enum>Horizontal</enum>
-                                </property>
-                                <property stdset="1">
-                                    <name>sizeType</name>
-                                    <enum>Expanding</enum>
-                                </property>
-                                <property>
-                                    <name>sizeHint</name>
-                                    <size>
-                                        <width>20</width>
-                                        <height>20</height>
-                                    </size>
-                                </property>
-                            </spacer>
-                        </grid>
-                    </widget>
-                    <widget>
-                        <class>QButtonGroup</class>
-                        <property stdset="1">
-                            <name>name</name>
-                            <cstring>ButtonGroup3</cstring>
-                        </property>
-                        <property stdset="1">
-                            <name>title</name>
-                            <string>Constraint manager mode</string>
-                        </property>
-                        <hbox>
-                            <property stdset="1">
-                                <name>margin</name>
-                                <number>11</number>
-                            </property>
-                            <property stdset="1">
-                                <name>spacing</name>
-                                <number>6</number>
-                            </property>
-                            <widget>
-                                <class>QRadioButton</class>
-                                <property stdset="1">
-                                    <name>name</name>
-                                    <cstring>radiobuttonCMModeAnalytical</cstring>
-                                </property>
-                                <property stdset="1">
-                                    <name>text</name>
-                                    <string>Analytical</string>
-                                </property>
-                            </widget>
-                            <widget>
-                                <class>QRadioButton</class>
-                                <property stdset="1">
-                                    <name>name</name>
-                                    <cstring>radiobuttonCMModeEmpirical</cstring>
-                                </property>
-                                <property stdset="1">
-                                    <name>text</name>
-                                    <string>Empirical</string>
-                                </property>
-                            </widget>
-                        </hbox>
-                    </widget>
-                    <widget>
-                        <class>QGroupBox</class>
-                        <property stdset="1">
-                            <name>name</name>
-                            <cstring>groupboxPerformance</cstring>
-                        </property>
-                        <property stdset="1">
-                            <name>title</name>
-                            <string>Performance Settings</string>
-                        </property>
-                        <vbox>
-                            <property stdset="1">
-                                <name>margin</name>
-                                <number>11</number>
-                            </property>
-                            <property stdset="1">
-                                <name>spacing</name>
-                                <number>6</number>
-                            </property>
-                            <widget>
-                                <class>QLayoutWidget</class>
-                                <property stdset="1">
-                                    <name>name</name>
-                                    <cstring>Layout8</cstring>
-                                </property>
-                                <hbox>
-                                    <property stdset="1">
-                                        <name>margin</name>
-                                        <number>0</number>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>spacing</name>
-                                        <number>6</number>
-                                    </property>
-                                    <widget>
-                                        <class>QLabel</class>
-                                        <property stdset="1">
-                                            <name>name</name>
-                                            <cstring>textlabelMaximalError</cstring>
-                                        </property>
-                                        <property stdset="1">
-                                            <name>text</name>
-                                            <string>Maximal Error:</string>
-                                        </property>
-                                    </widget>
-                                    <widget>
-                                        <class>QLineEdit</class>
-                                        <property stdset="1">
-                                            <name>name</name>
-                                            <cstring>lineeditMaximalError</cstring>
-                                        </property>
-                                    </widget>
-                                </hbox>
-                            </widget>
-                            <widget>
-                                <class>QLayoutWidget</class>
-                                <property stdset="1">
-                                    <name>name</name>
-                                    <cstring>Layout4</cstring>
-                                </property>
-                                <grid>
-                                    <property stdset="1">
-                                        <name>margin</name>
-                                        <number>0</number>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>spacing</name>
-                                        <number>6</number>
-                                    </property>
-                                    <widget row="1"  column="0" >
-                                        <class>QLabel</class>
-                                        <property stdset="1">
-                                            <name>name</name>
-                                            <cstring>textlabelMaximalIterations</cstring>
-                                        </property>
-                                        <property stdset="1">
-                                            <name>text</name>
-                                            <string>Maximal Iterations:</string>
-                                        </property>
-                                    </widget>
-                                    <widget row="2"  column="0" >
-                                        <class>QLabel</class>
-                                        <property stdset="1">
-                                            <name>name</name>
-                                            <cstring>textlabelMaximalCollisionLoops</cstring>
-                                        </property>
-                                        <property stdset="1">
-                                            <name>text</name>
-                                            <string>Max. Collision Loops:</string>
-                                        </property>
-                                    </widget>
-                                    <spacer row="2"  column="2" >
-                                        <property>
-                                            <name>name</name>
-                                            <cstring>Spacer10</cstring>
-                                        </property>
-                                        <property stdset="1">
-                                            <name>orientation</name>
-                                            <enum>Horizontal</enum>
-                                        </property>
-                                        <property stdset="1">
-                                            <name>sizeType</name>
-                                            <enum>Expanding</enum>
-                                        </property>
-                                        <property>
-                                            <name>sizeHint</name>
-                                            <size>
-                                                <width>20</width>
-                                                <height>20</height>
-                                            </size>
-                                        </property>
-                                    </spacer>
-                                    <widget row="2"  column="1" >
-                                        <class>QSpinBox</class>
-                                        <property stdset="1">
-                                            <name>name</name>
-                                            <cstring>spinboxMaximalCollisionLoops</cstring>
-                                        </property>
-                                        <property stdset="1">
-                                            <name>maxValue</name>
-                                            <number>32000</number>
-                                        </property>
-                                    </widget>
-                                    <spacer row="0"  column="2" >
-                                        <property>
-                                            <name>name</name>
-                                            <cstring>Spacer8</cstring>
-                                        </property>
-                                        <property stdset="1">
-                                            <name>orientation</name>
-                                            <enum>Horizontal</enum>
-                                        </property>
-                                        <property stdset="1">
-                                            <name>sizeType</name>
-                                            <enum>Expanding</enum>
-                                        </property>
-                                        <property>
-                                            <name>sizeHint</name>
-                                            <size>
-                                                <width>20</width>
-                                                <height>20</height>
-                                            </size>
-                                        </property>
-                                    </spacer>
-                                    <widget row="0"  column="1" >
-                                        <class>QSpinBox</class>
-                                        <property stdset="1">
-                                            <name>name</name>
-                                            <cstring>spinboxSkippedFrames</cstring>
-                                        </property>
-                                        <property stdset="1">
-                                            <name>maxValue</name>
-                                            <number>32000</number>
-                                        </property>
-                                    </widget>
-                                    <widget row="0"  column="0" >
-                                        <class>QLabel</class>
-                                        <property stdset="1">
-                                            <name>name</name>
-                                            <cstring>textlabelSkippedFrames</cstring>
-                                        </property>
-                                        <property stdset="1">
-                                            <name>text</name>
-                                            <string>Skipped Frames:</string>
-                                        </property>
-                                    </widget>
-                                    <widget row="1"  column="1" >
-                                        <class>QSpinBox</class>
-                                        <property stdset="1">
-                                            <name>name</name>
-                                            <cstring>spinboxMaximalIterations</cstring>
-                                        </property>
-                                        <property stdset="1">
-                                            <name>maxValue</name>
-                                            <number>32000</number>
-                                        </property>
-                                    </widget>
-                                    <spacer row="1"  column="2" >
-                                        <property>
-                                            <name>name</name>
-                                            <cstring>Spacer9</cstring>
-                                        </property>
-                                        <property stdset="1">
-                                            <name>orientation</name>
-                                            <enum>Horizontal</enum>
-                                        </property>
-                                        <property stdset="1">
-                                            <name>sizeType</name>
-                                            <enum>Expanding</enum>
-                                        </property>
-                                        <property>
-                                            <name>sizeHint</name>
-                                            <size>
-                                                <width>20</width>
-                                                <height>20</height>
-                                            </size>
-                                        </property>
-                                    </spacer>
-                                </grid>
-                            </widget>
-                        </vbox>
-                    </widget>
-                    <widget>
-                        <class>QGroupBox</class>
-                        <property stdset="1">
-                            <name>name</name>
-                            <cstring>groupboxSOLID</cstring>
-                        </property>
-                        <property stdset="1">
-                            <name>title</name>
-                            <string>SOLID</string>
-                        </property>
-                        <hbox>
-                            <property stdset="1">
-                                <name>margin</name>
-                                <number>11</number>
-                            </property>
-                            <property stdset="1">
-                                <name>spacing</name>
-                                <number>6</number>
-                            </property>
-                            <widget>
-                                <class>QLabel</class>
-                                <property stdset="1">
-                                    <name>name</name>
-                                    <cstring>textlabelMaxSOLIDIterations</cstring>
-                                </property>
-                                <property stdset="1">
-                                    <name>text</name>
-                                    <string>Max. Iterations:</string>
-                                </property>
-                            </widget>
-                            <widget>
-                                <class>QSpinBox</class>
-                                <property stdset="1">
-                                    <name>name</name>
-                                    <cstring>spinboxMaxSOLIDIterations</cstring>
-                                </property>
-                                <property stdset="1">
-                                    <name>minValue</name>
-                                    <number>1</number>
-                                </property>
-                                <property stdset="1">
-                                    <name>value</name>
-                                    <number>1</number>
-                                </property>
-                            </widget>
-                            <spacer>
-                                <property>
-                                    <name>name</name>
-                                    <cstring>spacerMaxSOLIDIterations</cstring>
-                                </property>
-                                <property stdset="1">
-                                    <name>orientation</name>
-                                    <enum>Horizontal</enum>
-                                </property>
-                                <property stdset="1">
-                                    <name>sizeType</name>
-                                    <enum>Expanding</enum>
-                                </property>
-                                <property>
-                                    <name>sizeHint</name>
-                                    <size>
-                                        <width>20</width>
-                                        <height>20</height>
-                                    </size>
-                                </property>
-                            </spacer>
-                        </hbox>
-                    </widget>
-                    <spacer>
-                        <property>
-                            <name>name</name>
-                            <cstring>Spacer11</cstring>
-                        </property>
-                        <property stdset="1">
-                            <name>orientation</name>
-                            <enum>Vertical</enum>
-                        </property>
-                        <property stdset="1">
-                            <name>sizeType</name>
-                            <enum>Expanding</enum>
-                        </property>
-                        <property>
-                            <name>sizeHint</name>
-                            <size>
-                                <width>20</width>
-                                <height>20</height>
-                            </size>
-                        </property>
-                    </spacer>
-                </vbox>
-            </widget>
-        </widget>
-        <widget>
-            <class>QLayoutWidget</class>
-            <property stdset="1">
-                <name>name</name>
-                <cstring>Layout2</cstring>
-            </property>
-            <hbox>
-                <property stdset="1">
-                    <name>margin</name>
-                    <number>0</number>
-                </property>
-                <property stdset="1">
-                    <name>spacing</name>
-                    <number>6</number>
-                </property>
-                <spacer>
-                    <property>
-                        <name>name</name>
-                        <cstring>spacerImportExport</cstring>
-                    </property>
-                    <property stdset="1">
-                        <name>orientation</name>
-                        <enum>Horizontal</enum>
-                    </property>
-                    <property stdset="1">
-                        <name>sizeType</name>
-                        <enum>Expanding</enum>
-                    </property>
-                    <property>
-                        <name>sizeHint</name>
-                        <size>
+                      </widget>
+                    </item>
+                    <item>
+                      <widget class="QLineEdit" name="lineeditStepSize"/>
+                    </item>
+                    <item>
+                      <spacer name="Spacer13">
+                        <property name="sizeHint">
+                          <size>
                             <width>20</width>
                             <height>20</height>
-                        </size>
+                          </size>
+                        </property>
+                        <property name="sizeType">
+                          <enum>QSizePolicy::Expanding</enum>
+                        </property>
+                        <property name="orientation">
+                          <enum>Qt::Horizontal</enum>
+                        </property>
+                      </spacer>
+                    </item>
+                  </layout>
+                </widget>
+              </item>
+              <item>
+                <widget class="QGroupBox" name="buttongroupSimulationLibrary">
+                  <property name="title">
+                    <string>Used simulation library</string>
+                  </property>
+                  <layout class="QVBoxLayout">
+                    <property name="margin">
+                      <number>11</number>
                     </property>
+                    <property name="spacing">
+                      <number>6</number>
+                    </property>
+                    <item>
+                      <widget class="QRadioButton" name="radiobuttonDynamo">
+                        <property name="text">
+                          <string>Dynamo  (not recommended)</string>
+                        </property>
+                      </widget>
+                    </item>
+                    <item>
+                      <widget class="QRadioButton" name="radiobuttonDynaMechs">
+                        <property name="text">
+                          <string>DynaMechs   (preferred)</string>
+                        </property>
+                      </widget>
+                    </item>
+                  </layout>
+                </widget>
+              </item>
+              <item>
+                <widget class="QGroupBox" name="groupboxSimulationConditions">
+                  <property name="title">
+                    <string>Simulation conditions</string>
+                  </property>
+                  <layout class="QGridLayout">
+                    <property name="margin">
+                      <number>11</number>
+                    </property>
+                    <property name="spacing">
+                      <number>6</number>
+                    </property>
+                    <item row="0" column="1" rowspan="1" colspan="2">
+                      <layout class="QHBoxLayout">
+                        <property name="margin">
+                          <number>0</number>
+                        </property>
+                        <property name="spacing">
+                          <number>6</number>
+                        </property>
+                        <item>
+                          <widget class="QLabel" name="textlabelHours">
+                            <property name="text">
+                              <string>h:</string>
+                            </property>
+                            <property name="wordWrap">
+                              <bool>false</bool>
+                            </property>
+                          </widget>
+                        </item>
+                        <item>
+                          <widget class="QSpinBox" name="spinboxHours">
+                            <property name="maximum">
+                              <number>23</number>
+                            </property>
+                          </widget>
+                        </item>
+                        <item>
+                          <widget class="QLabel" name="textlabelMins">
+                            <property name="text">
+                              <string>m:</string>
+                            </property>
+                            <property name="wordWrap">
+                              <bool>false</bool>
+                            </property>
+                          </widget>
+                        </item>
+                        <item>
+                          <widget class="QSpinBox" name="spinboxMins">
+                            <property name="maximum">
+                              <number>59</number>
+                            </property>
+                          </widget>
+                        </item>
+                        <item>
+                          <widget class="QLabel" name="textlabelSecs">
+                            <property name="text">
+                              <string>s:</string>
+                            </property>
+                            <property name="wordWrap">
+                              <bool>false</bool>
+                            </property>
+                          </widget>
+                        </item>
+                        <item>
+                          <widget class="QSpinBox" name="spinboxSecs">
+                            <property name="maximum">
+                              <number>59</number>
+                            </property>
+                          </widget>
+                        </item>
+                      </layout>
+                    </item>
+                    <item row="0" column="0">
+                      <widget class="QLabel" name="textlabelTimeToSimulate">
+                        <property name="text">
+                          <string>Time To Simulate:</string>
+                        </property>
+                        <property name="wordWrap">
+                          <bool>false</bool>
+                        </property>
+                      </widget>
+                    </item>
+                    <item row="1" column="0">
+                      <widget class="QLabel" name="textlabelRandomSeed">
+                        <property name="text">
+                          <string>Random Seed:</string>
+                        </property>
+                        <property name="wordWrap">
+                          <bool>false</bool>
+                        </property>
+                      </widget>
+                    </item>
+                    <item row="1" column="1">
+                      <widget class="QSpinBox" name="spinboxRandomSeed">
+                        <property name="suffix">
+                          <string/>
+                        </property>
+                        <property name="maximum">
+                          <number>32000</number>
+                        </property>
+                      </widget>
+                    </item>
+                    <item row="0" column="3">
+                      <spacer name="Spacer27">
+                        <property name="sizeHint">
+                          <size>
+                            <width>20</width>
+                            <height>20</height>
+                          </size>
+                        </property>
+                        <property name="sizeType">
+                          <enum>QSizePolicy::Expanding</enum>
+                        </property>
+                        <property name="orientation">
+                          <enum>Qt::Horizontal</enum>
+                        </property>
+                      </spacer>
+                    </item>
+                    <item row="1" column="2" rowspan="1" colspan="2">
+                      <spacer name="spacerRandomSeed">
+                        <property name="sizeHint">
+                          <size>
+                            <width>20</width>
+                            <height>20</height>
+                          </size>
+                        </property>
+                        <property name="sizeType">
+                          <enum>QSizePolicy::Expanding</enum>
+                        </property>
+                        <property name="orientation">
+                          <enum>Qt::Horizontal</enum>
+                        </property>
+                      </spacer>
+                    </item>
+                  </layout>
+                </widget>
+              </item>
+              <item>
+                <spacer name="Spacer7">
+                  <property name="sizeHint">
+                    <size>
+                      <width>20</width>
+                      <height>20</height>
+                    </size>
+                  </property>
+                  <property name="sizeType">
+                    <enum>QSizePolicy::Expanding</enum>
+                  </property>
+                  <property name="orientation">
+                    <enum>Qt::Vertical</enum>
+                  </property>
                 </spacer>
-                <widget>
-                    <class>QPushButton</class>
-                    <property stdset="1">
-                        <name>name</name>
-                        <cstring>pushbuttonImport</cstring>
+              </item>
+            </layout>
+          </widget>
+          <widget class="QWidget" name="tab1">
+            <attribute name="title">
+              <string>DynaMechs</string>
+            </attribute>
+            <layout class="QVBoxLayout">
+              <property name="margin">
+                <number>11</number>
+              </property>
+              <property name="spacing">
+                <number>6</number>
+              </property>
+              <item>
+                <widget class="QGroupBox" name="groupboxDynaMechsIntegrator">
+                  <property name="title">
+                    <string>Integrator</string>
+                  </property>
+                  <layout class="QHBoxLayout">
+                    <property name="margin">
+                      <number>11</number>
                     </property>
-                    <property stdset="1">
-                        <name>text</name>
-                        <string>Import</string>
+                    <property name="spacing">
+                      <number>6</number>
                     </property>
+                    <item>
+                      <widget class="QLabel" name="textlabelDynaMechsIntegrator">
+                        <property name="text">
+                          <string>Type:</string>
+                        </property>
+                        <property name="wordWrap">
+                          <bool>false</bool>
+                        </property>
+                      </widget>
+                    </item>
+                    <item>
+                      <widget class="QComboBox" name="comboboxDynaMechsIntegrator">
+                        <item>
+                          <property name="text">
+                            <string>Euler</string>
+                          </property>
+                        </item>
+                        <item>
+                          <property name="text">
+                            <string>Runge Kutta 4</string>
+                          </property>
+                        </item>
+                        <item>
+                          <property name="text">
+                            <string>Runge Kutta 45</string>
+                          </property>
+                        </item>
+                      </widget>
+                    </item>
+                    <item>
+                      <spacer name="Spacer12">
+                        <property name="sizeHint">
+                          <size>
+                            <width>20</width>
+                            <height>20</height>
+                          </size>
+                        </property>
+                        <property name="sizeType">
+                          <enum>QSizePolicy::Expanding</enum>
+                        </property>
+                        <property name="orientation">
+                          <enum>Qt::Horizontal</enum>
+                        </property>
+                      </spacer>
+                    </item>
+                  </layout>
                 </widget>
-                <widget>
-                    <class>QPushButton</class>
-                    <property stdset="1">
-                        <name>name</name>
-                        <cstring>pushbuttonExport</cstring>
+              </item>
+              <item>
+                <widget class="QGroupBox" name="groupboxJointConstants">
+                  <property name="title">
+                    <string>Joint constants</string>
+                  </property>
+                  <layout class="QGridLayout">
+                    <property name="margin">
+                      <number>11</number>
                     </property>
-                    <property stdset="1">
-                        <name>text</name>
-                        <string>Export</string>
+                    <property name="spacing">
+                      <number>6</number>
                     </property>
+                    <item row="0" column="0">
+                      <widget class="QLabel" name="textlabelJointlimitsSpringConstant">
+                        <property name="text">
+                          <string>Joint limits spring constant:</string>
+                        </property>
+                        <property name="wordWrap">
+                          <bool>false</bool>
+                        </property>
+                      </widget>
+                    </item>
+                    <item row="0" column="1">
+                      <widget class="QLineEdit" name="lineeditJointlimitsSpringConstant"/>
+                    </item>
+                    <item row="2" column="1">
+                      <widget class="QLineEdit" name="lineeditJointfrictionConstant"/>
+                    </item>
+                    <item row="2" column="0">
+                      <widget class="QLabel" name="textlabelJointfrictionConstant">
+                        <property name="text">
+                          <string>Joint friction constant:</string>
+                        </property>
+                        <property name="wordWrap">
+                          <bool>false</bool>
+                        </property>
+                      </widget>
+                    </item>
+                    <item row="1" column="1">
+                      <widget class="QLineEdit" name="lineeditJointlimitsDamperConstant"/>
+                    </item>
+                    <item row="1" column="0">
+                      <widget class="QLabel" name="textlabelJointlimitsDamperConstant">
+                        <property name="text">
+                          <string>Joint limits damper constant:</string>
+                        </property>
+                        <property name="wordWrap">
+                          <bool>false</bool>
+                        </property>
+                      </widget>
+                    </item>
+                  </layout>
                 </widget>
-            </hbox>
+              </item>
+              <item>
+                <spacer name="Spacer22">
+                  <property name="sizeHint">
+                    <size>
+                      <width>20</width>
+                      <height>20</height>
+                    </size>
+                  </property>
+                  <property name="sizeType">
+                    <enum>QSizePolicy::Expanding</enum>
+                  </property>
+                  <property name="orientation">
+                    <enum>Qt::Vertical</enum>
+                  </property>
+                </spacer>
+              </item>
+            </layout>
+          </widget>
+          <widget class="QWidget" name="tab2">
+            <attribute name="title">
+              <string>DynaMo</string>
+            </attribute>
+            <layout class="QVBoxLayout">
+              <property name="margin">
+                <number>11</number>
+              </property>
+              <property name="spacing">
+                <number>6</number>
+              </property>
+              <item>
+                <widget class="QGroupBox" name="GroupBox5">
+                  <property name="title">
+                    <string>Integrator</string>
+                  </property>
+                  <layout class="QGridLayout">
+                    <property name="margin">
+                      <number>11</number>
+                    </property>
+                    <property name="spacing">
+                      <number>6</number>
+                    </property>
+                    <item row="0" column="0">
+                      <widget class="QLabel" name="textlabelIntegrator">
+                        <property name="text">
+                          <string>Type:</string>
+                        </property>
+                        <property name="wordWrap">
+                          <bool>false</bool>
+                        </property>
+                      </widget>
+                    </item>
+                    <item row="1" column="0">
+                      <widget class="QLabel" name="textlabelSolveMode">
+                        <property name="text">
+                          <string>Solve Mode:</string>
+                        </property>
+                        <property name="wordWrap">
+                          <bool>false</bool>
+                        </property>
+                      </widget>
+                    </item>
+                    <item row="0" column="1">
+                      <widget class="QComboBox" name="comboboxIntegrator">
+                        <item>
+                          <property name="text">
+                            <string>Runge Kutta 4</string>
+                          </property>
+                        </item>
+                        <item>
+                          <property name="text">
+                            <string>Runge Kutta 2</string>
+                          </property>
+                        </item>
+                        <item>
+                          <property name="text">
+                            <string>Double Euler</string>
+                          </property>
+                        </item>
+                        <item>
+                          <property name="text">
+                            <string>Euler</string>
+                          </property>
+                        </item>
+                      </widget>
+                    </item>
+                    <item row="1" column="1">
+                      <widget class="QComboBox" name="comboboxSolveMode">
+                        <item>
+                          <property name="text">
+                            <string>Single Value Decomposition</string>
+                          </property>
+                        </item>
+                        <item>
+                          <property name="text">
+                            <string>Conjugate Gradient</string>
+                          </property>
+                        </item>
+                        <item>
+                          <property name="text">
+                            <string>LU Decomposition</string>
+                          </property>
+                        </item>
+                      </widget>
+                    </item>
+                    <item row="0" column="2">
+                      <spacer name="spacerType">
+                        <property name="sizeHint">
+                          <size>
+                            <width>20</width>
+                            <height>20</height>
+                          </size>
+                        </property>
+                        <property name="sizeType">
+                          <enum>QSizePolicy::Expanding</enum>
+                        </property>
+                        <property name="orientation">
+                          <enum>Qt::Horizontal</enum>
+                        </property>
+                      </spacer>
+                    </item>
+                    <item row="1" column="2">
+                      <spacer name="spacerSolveMode">
+                        <property name="sizeHint">
+                          <size>
+                            <width>20</width>
+                            <height>20</height>
+                          </size>
+                        </property>
+                        <property name="sizeType">
+                          <enum>QSizePolicy::Expanding</enum>
+                        </property>
+                        <property name="orientation">
+                          <enum>Qt::Horizontal</enum>
+                        </property>
+                      </spacer>
+                    </item>
+                  </layout>
+                </widget>
+              </item>
+              <item>
+                <widget class="QGroupBox" name="ButtonGroup3">
+                  <property name="title">
+                    <string>Constraint manager mode</string>
+                  </property>
+                  <layout class="QHBoxLayout">
+                    <property name="margin">
+                      <number>11</number>
+                    </property>
+                    <property name="spacing">
+                      <number>6</number>
+                    </property>
+                    <item>
+                      <widget class="QRadioButton" name="radiobuttonCMModeAnalytical">
+                        <property name="text">
+                          <string>Analytical</string>
+                        </property>
+                      </widget>
+                    </item>
+                    <item>
+                      <widget class="QRadioButton" name="radiobuttonCMModeEmpirical">
+                        <property name="text">
+                          <string>Empirical</string>
+                        </property>
+                      </widget>
+                    </item>
+                  </layout>
+                </widget>
+              </item>
+              <item>
+                <widget class="QGroupBox" name="groupboxPerformance">
+                  <property name="title">
+                    <string>Performance Settings</string>
+                  </property>
+                  <layout class="QVBoxLayout">
+                    <property name="margin">
+                      <number>11</number>
+                    </property>
+                    <property name="spacing">
+                      <number>6</number>
+                    </property>
+                    <item>
+                      <layout class="QHBoxLayout">
+                        <property name="margin">
+                          <number>0</number>
+                        </property>
+                        <property name="spacing">
+                          <number>6</number>
+                        </property>
+                        <item>
+                          <widget class="QLabel" name="textlabelMaximalError">
+                            <property name="text">
+                              <string>Maximal Error:</string>
+                            </property>
+                            <property name="wordWrap">
+                              <bool>false</bool>
+                            </property>
+                          </widget>
+                        </item>
+                        <item>
+                          <widget class="QLineEdit" name="lineeditMaximalError"/>
+                        </item>
+                      </layout>
+                    </item>
+                    <item>
+                      <layout class="QGridLayout">
+                        <property name="margin">
+                          <number>0</number>
+                        </property>
+                        <property name="spacing">
+                          <number>6</number>
+                        </property>
+                        <item row="1" column="0">
+                          <widget class="QLabel" name="textlabelMaximalIterations">
+                            <property name="text">
+                              <string>Maximal Iterations:</string>
+                            </property>
+                            <property name="wordWrap">
+                              <bool>false</bool>
+                            </property>
+                          </widget>
+                        </item>
+                        <item row="2" column="0">
+                          <widget class="QLabel" name="textlabelMaximalCollisionLoops">
+                            <property name="text">
+                              <string>Max. Collision Loops:</string>
+                            </property>
+                            <property name="wordWrap">
+                              <bool>false</bool>
+                            </property>
+                          </widget>
+                        </item>
+                        <item row="2" column="2">
+                          <spacer name="Spacer10">
+                            <property name="sizeHint">
+                              <size>
+                                <width>20</width>
+                                <height>20</height>
+                              </size>
+                            </property>
+                            <property name="sizeType">
+                              <enum>QSizePolicy::Expanding</enum>
+                            </property>
+                            <property name="orientation">
+                              <enum>Qt::Horizontal</enum>
+                            </property>
+                          </spacer>
+                        </item>
+                        <item row="2" column="1">
+                          <widget class="QSpinBox" name="spinboxMaximalCollisionLoops">
+                            <property name="maximum">
+                              <number>32000</number>
+                            </property>
+                          </widget>
+                        </item>
+                        <item row="0" column="2">
+                          <spacer name="Spacer8">
+                            <property name="sizeHint">
+                              <size>
+                                <width>20</width>
+                                <height>20</height>
+                              </size>
+                            </property>
+                            <property name="sizeType">
+                              <enum>QSizePolicy::Expanding</enum>
+                            </property>
+                            <property name="orientation">
+                              <enum>Qt::Horizontal</enum>
+                            </property>
+                          </spacer>
+                        </item>
+                        <item row="0" column="1">
+                          <widget class="QSpinBox" name="spinboxSkippedFrames">
+                            <property name="maximum">
+                              <number>32000</number>
+                            </property>
+                          </widget>
+                        </item>
+                        <item row="0" column="0">
+                          <widget class="QLabel" name="textlabelSkippedFrames">
+                            <property name="text">
+                              <string>Skipped Frames:</string>
+                            </property>
+                            <property name="wordWrap">
+                              <bool>false</bool>
+                            </property>
+                          </widget>
+                        </item>
+                        <item row="1" column="1">
+                          <widget class="QSpinBox" name="spinboxMaximalIterations">
+                            <property name="maximum">
+                              <number>32000</number>
+                            </property>
+                          </widget>
+                        </item>
+                        <item row="1" column="2">
+                          <spacer name="Spacer9">
+                            <property name="sizeHint">
+                              <size>
+                                <width>20</width>
+                                <height>20</height>
+                              </size>
+                            </property>
+                            <property name="sizeType">
+                              <enum>QSizePolicy::Expanding</enum>
+                            </property>
+                            <property name="orientation">
+                              <enum>Qt::Horizontal</enum>
+                            </property>
+                          </spacer>
+                        </item>
+                      </layout>
+                    </item>
+                  </layout>
+                </widget>
+              </item>
+              <item>
+                <widget class="QGroupBox" name="groupboxSOLID">
+                  <property name="title">
+                    <string>SOLID</string>
+                  </property>
+                  <layout class="QHBoxLayout">
+                    <property name="margin">
+                      <number>11</number>
+                    </property>
+                    <property name="spacing">
+                      <number>6</number>
+                    </property>
+                    <item>
+                      <widget class="QLabel" name="textlabelMaxSOLIDIterations">
+                        <property name="text">
+                          <string>Max. Iterations:</string>
+                        </property>
+                        <property name="wordWrap">
+                          <bool>false</bool>
+                        </property>
+                      </widget>
+                    </item>
+                    <item>
+                      <widget class="QSpinBox" name="spinboxMaxSOLIDIterations">
+                        <property name="minimum">
+                          <number>1</number>
+                        </property>
+                        <property name="value">
+                          <number>1</number>
+                        </property>
+                      </widget>
+                    </item>
+                    <item>
+                      <spacer name="spacerMaxSOLIDIterations">
+                        <property name="sizeHint">
+                          <size>
+                            <width>20</width>
+                            <height>20</height>
+                          </size>
+                        </property>
+                        <property name="sizeType">
+                          <enum>QSizePolicy::Expanding</enum>
+                        </property>
+                        <property name="orientation">
+                          <enum>Qt::Horizontal</enum>
+                        </property>
+                      </spacer>
+                    </item>
+                  </layout>
+                </widget>
+              </item>
+              <item>
+                <spacer name="Spacer11">
+                  <property name="sizeHint">
+                    <size>
+                      <width>20</width>
+                      <height>20</height>
+                    </size>
+                  </property>
+                  <property name="sizeType">
+                    <enum>QSizePolicy::Expanding</enum>
+                  </property>
+                  <property name="orientation">
+                    <enum>Qt::Vertical</enum>
+                  </property>
+                </spacer>
+              </item>
+            </layout>
+          </widget>
         </widget>
-    </vbox>
-</widget>
-<tabstops>
+      </item>
+      <item>
+        <layout class="QHBoxLayout">
+          <property name="margin">
+            <number>0</number>
+          </property>
+          <property name="spacing">
+            <number>6</number>
+          </property>
+          <item>
+            <spacer name="spacerImportExport">
+              <property name="sizeHint">
+                <size>
+                  <width>20</width>
+                  <height>20</height>
+                </size>
+              </property>
+              <property name="sizeType">
+                <enum>QSizePolicy::Expanding</enum>
+              </property>
+              <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+              </property>
+            </spacer>
+          </item>
+          <item>
+            <widget class="QPushButton" name="pushbuttonImport">
+              <property name="text">
+                <string>Import</string>
+              </property>
+            </widget>
+          </item>
+          <item>
+            <widget class="QPushButton" name="pushbuttonExport">
+              <property name="text">
+                <string>Export</string>
+              </property>
+            </widget>
+          </item>
+        </layout>
+      </item>
+    </layout>
+  </widget>
+  <tabstops>
     <tabstop>TabWidget2</tabstop>
     <tabstop>lineeditStepSize</tabstop>
     <tabstop>radiobuttonDynamo</tabstop>
@@ -1137,5 +839,5 @@
     <tabstop>comboboxDynaMechsIntegrator</tabstop>
     <tabstop>pushbuttonImport</tabstop>
     <tabstop>pushbuttonExport</tabstop>
-</tabstops>
-</UI>
+  </tabstops>
+</ui>

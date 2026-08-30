@@ -88,7 +88,26 @@ printf '%-22s %2d pass  %2d fail\n' "headers standalone" "$hp" "$hf"
 # Generation is delegated to the Makefile rather than repeated here: check.sh
 # disagreeing with the Makefile about flags has already produced one phantom
 # failure (the QtGui/QtWidgets include path, found by review).
-FORM_LIST="SIGEL_MasterUI/SIG_GPParameterBase:SIGEL_MasterGUI"
+FORM_LIST="MT_UI/MT_AddConstantsWidgetBase:MT_GUI \
+            MT_UI/MT_AddIndividualsWidget:MT_GUI \
+            MT_UI/MT_EstimationWidgetBase:MT_GUI \
+            MT_UI/MT_ExperimentWidgetBase:MT_GUI \
+            MT_UI/MT_IndividualWidgetBase:MT_GUI \
+            MT_UI/MT_PopulationWidgetBase:MT_GUI \
+            MT_UI/MT_SearchWidgetBase:MT_GUI \
+            MT_UI/MT_SelectionWidgetBase:MT_GUI \
+            MT_UI/MT_StatisticsWidgetBase:MT_GUI \
+            SIGEL_MasterUI/SIG_EditHostDialogBase:SIGEL_MasterGUI \
+            SIGEL_MasterUI/SIG_EnvironmentBase:SIGEL_MasterGUI \
+            SIGEL_MasterUI/SIG_ExperimentViewBase:SIGEL_MasterGUI \
+            SIGEL_MasterUI/SIG_GPParameterBase:SIGEL_MasterGUI \
+            SIGEL_MasterUI/SIG_IndividualListBase:SIGEL_MasterGUI \
+            SIGEL_MasterUI/SIG_IndividualViewBase:SIGEL_MasterGUI \
+            SIGEL_MasterUI/SIG_LanguageParametersBase:SIGEL_MasterGUI \
+            SIGEL_MasterUI/SIG_RobotBase:SIGEL_MasterGUI \
+            SIGEL_MasterUI/SIG_SimulationParameterBase:SIGEL_MasterGUI \
+            SIGEL_SlaveUI/SIG_MovieSettingsDialogBase:SIGEL_SlaveGUI \
+            SIGEL_SlaveUI/SIG_SimulationWidgetBase:SIGEL_SlaveGUI:C3"
 
 MOCBIN=$(qmake6 -query QT_INSTALL_LIBEXECS)/moc
 fp=0; ff=0; fw=0
@@ -109,7 +128,16 @@ else
     if [ -s /tmp/uic2.$$ ]; then echo "  uic WARNED:"; cat /tmp/uic2.$$; ff=$((ff+1)); fi
     INCS="$INCS -I$ROOT/build/ui"
     for entry in $FORM_LIST; do
+        # <uidir>/<Form>:<Module>[:blocked]  -- "blocked" means the form itself
+        # is converted but a custom widget it embeds is not, so its generated
+        # header cannot compile yet. Checks 1, 5 and 6 still run; 2-4 cannot.
+        blocked=""
+        case $entry in *:*:*) blocked=${entry##*:}; entry=${entry%:*};; esac
         form=${entry%:*}; mod=${entry#*:}; base=$(basename "$form")
+        if [ -n "$blocked" ]; then
+            echo "  form SKIP: $base compile/moc -- blocked on $blocked:" \
+                 "it embeds a custom widget whose header is still Qt 2"
+        else
         # 2. the generated header, standalone
         printf '#include "ui_%s.h"\nint main(){return 0;}\n' "$base" > /tmp/hdr.$$.cpp
         if g++ $FLAGS $INCS /tmp/hdr.$$.cpp 2>/dev/null; then fp=$((fp+1))
@@ -123,6 +151,7 @@ else
                "$SRC/include/$mod/$base.h" -o /tmp/moc.$$.cpp 2>/tmp/chk.$$ \
            && g++ $FLAGS $INCS /tmp/moc.$$.cpp 2>>/tmp/chk.$$; then fp=$((fp+1))
         else ff=$((ff+1)); echo "  form FAIL: moc $mod/$base.h"; cat /tmp/chk.$$; fi
+        fi
         # 5. the form's images, checked in BOTH directions.
         #
         # Qt 2 embedded them in the .ui; uic3 -extract pulled them into a .qrc
@@ -162,14 +191,15 @@ else
         # `uic3 -convert' DROPS a Line's `orientation', and that property is the
         # only thing Qt 6's uic reads to choose a frame shape: without it the
         # widget is a bare QFrame, i.e. NoFrame, and the separator paints
-        # nothing. Invisible to every other check here -- it cost C1 one
-        # separator, and 5 more Lines are waiting in 2 of C2's forms.
-        # Found by the C1 review.
+        # nothing. Invisible to every other check here. C2 measured which:
+        # uic3 KEEPS an explicit frameShape and drops only the then-redundant
+        # orientation, so 3 of the 6 Lines were affected, not 6 -- the ones
+        # whose Qt 2 form set orientation ALONE. Either property satisfies it.
         nline=$(grep -c '<widget class="Line"' "$SRC/ui/$form.ui" || true)
-        norient=$(grep -A3 '<widget class="Line"' "$SRC/ui/$form.ui" \
-                  | grep -c '<property name="orientation">' || true)
-        if [ "$nline" -eq "$norient" ]; then fp=$((fp+1))
-        else ff=$((ff+1)); echo "  form FAIL: $form.ui has $nline Line widgets but $norient orientations"; fi
+        nshape=$(grep -A3 '<widget class="Line"' "$SRC/ui/$form.ui" \
+                 | grep -cE '<property name="(orientation|frameShape)"' || true)
+        if [ "$nline" -le "$nshape" ]; then fp=$((fp+1))
+        else ff=$((ff+1)); echo "  form FAIL: $form.ui has $nline Line widgets but $nshape with a shape"; fi
     done
 fi
 printf '%-22s %2d pass  %2d fail  %3d warnings\n' "forms (Phase C)" "$fp" "$ff" "$fw"

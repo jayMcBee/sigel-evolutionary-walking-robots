@@ -1,329 +1,249 @@
-<!DOCTYPE UI><UI>
-<class>SIG_IndividualViewBase</class>
-<widget>
-    <class>QWidget</class>
-    <property stdset="1">
-        <name>name</name>
-        <cstring>SIG_IndividualViewBase</cstring>
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0" stdsetdef="1">
+  <author></author>
+  <comment></comment>
+  <exportmacro></exportmacro>
+  <class>SIG_IndividualViewBase</class>
+  <widget class="QWidget" name="SIG_IndividualViewBase">
+    <property name="geometry">
+      <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>544</width>
+        <height>288</height>
+      </rect>
     </property>
-    <property stdset="1">
-        <name>geometry</name>
-        <rect>
-            <x>0</x>
-            <y>0</y>
-            <width>544</width>
-            <height>288</height>
-        </rect>
+    <property name="windowTitle">
+      <string>Individual View</string>
     </property>
-    <property stdset="1">
-        <name>caption</name>
-        <string>Individual View</string>
-    </property>
-    <hbox>
-        <property stdset="1">
-            <name>margin</name>
-            <number>11</number>
-        </property>
-        <property stdset="1">
-            <name>spacing</name>
+    <layout class="QHBoxLayout">
+      <property name="margin">
+        <number>11</number>
+      </property>
+      <property name="spacing">
+        <number>6</number>
+      </property>
+      <item>
+        <layout class="QVBoxLayout">
+          <property name="margin">
+            <number>0</number>
+          </property>
+          <property name="spacing">
             <number>6</number>
-        </property>
-        <widget>
-            <class>QLayoutWidget</class>
-            <property stdset="1">
-                <name>name</name>
-                <cstring>Layout4</cstring>
+          </property>
+          <item>
+            <layout class="QHBoxLayout">
+              <property name="margin">
+                <number>0</number>
+              </property>
+              <property name="spacing">
+                <number>6</number>
+              </property>
+              <item>
+                <widget class="QLabel" name="textlabelProgramCode">
+                  <property name="text">
+                    <string>Program Code:</string>
+                  </property>
+                  <property name="wordWrap">
+                    <bool>false</bool>
+                  </property>
+                </widget>
+              </item>
+              <item>
+                <spacer name="spacerProgramCode">
+                  <property name="sizeHint">
+                    <size>
+                      <width>20</width>
+                      <height>20</height>
+                    </size>
+                  </property>
+                  <property name="sizeType">
+                    <enum>QSizePolicy::Expanding</enum>
+                  </property>
+                  <property name="orientation">
+                    <enum>Qt::Horizontal</enum>
+                  </property>
+                </spacer>
+              </item>
+            </layout>
+          </item>
+          <item>
+            <widget class="QTextEdit" name="multilineeditProgramCode">
+              <property name="readOnly">
+                <bool>true</bool>
+              </property>
+            </widget>
+          </item>
+        </layout>
+      </item>
+      <item>
+        <widget class="QGroupBox" name="groupboxProperties">
+          <property name="title">
+            <string>Properties</string>
+          </property>
+          <layout class="QVBoxLayout">
+            <property name="margin">
+              <number>11</number>
             </property>
-            <vbox>
-                <property stdset="1">
-                    <name>margin</name>
-                    <number>0</number>
+            <property name="spacing">
+              <number>6</number>
+            </property>
+            <item>
+              <layout class="QGridLayout">
+                <property name="margin">
+                  <number>0</number>
                 </property>
-                <property stdset="1">
-                    <name>spacing</name>
-                    <number>6</number>
+                <property name="spacing">
+                  <number>6</number>
                 </property>
-                <widget>
-                    <class>QLayoutWidget</class>
-                    <property stdset="1">
-                        <name>name</name>
-                        <cstring>Layout3</cstring>
+                <item row="2" column="0">
+                  <widget class="QLabel" name="textlabelFitness">
+                    <property name="text">
+                      <string>Fitness:</string>
                     </property>
-                    <hbox>
-                        <property stdset="1">
-                            <name>margin</name>
-                            <number>0</number>
+                    <property name="sizePolicy">
+                      <sizepolicy>
+                        <hsizetype>0</hsizetype>
+                        <vsizetype>1</vsizetype>
+                      </sizepolicy>
+                    </property>
+                    <property name="wordWrap">
+                      <bool>false</bool>
+                    </property>
+                  </widget>
+                </item>
+                <item row="2" column="1">
+                  <widget class="QLabel" name="textlabelShowFitness">
+                    <property name="text">
+                      <string>None</string>
+                    </property>
+                    <property name="frameShape">
+                      <enum>QFrame::Panel</enum>
+                    </property>
+                    <property name="frameShadow">
+                      <enum>QFrame::Sunken</enum>
+                    </property>
+                    <property name="sizePolicy">
+                      <sizepolicy>
+                        <hsizetype>7</hsizetype>
+                        <vsizetype>1</vsizetype>
+                      </sizepolicy>
+                    </property>
+                    <property name="wordWrap">
+                      <bool>false</bool>
+                    </property>
+                  </widget>
+                </item>
+                <item row="1" column="1">
+                  <widget class="QLabel" name="textlabelShowAge">
+                    <property name="text">
+                      <string>1</string>
+                    </property>
+                    <property name="frameShape">
+                      <enum>QFrame::Panel</enum>
+                    </property>
+                    <property name="frameShadow">
+                      <enum>QFrame::Sunken</enum>
+                    </property>
+                    <property name="wordWrap">
+                      <bool>false</bool>
+                    </property>
+                  </widget>
+                </item>
+                <item row="0" column="0">
+                  <widget class="QLabel" name="textlabelName">
+                    <property name="text">
+                      <string>Name:</string>
+                    </property>
+                    <property name="wordWrap">
+                      <bool>false</bool>
+                    </property>
+                  </widget>
+                </item>
+                <item row="0" column="1">
+                  <widget class="QLabel" name="textlabelShowName">
+                    <property name="text">
+                      <string>None</string>
+                    </property>
+                    <property name="frameShape">
+                      <enum>QFrame::Panel</enum>
+                    </property>
+                    <property name="frameShadow">
+                      <enum>QFrame::Sunken</enum>
+                    </property>
+                    <property name="wordWrap">
+                      <bool>false</bool>
+                    </property>
+                  </widget>
+                </item>
+                <item row="1" column="0">
+                  <widget class="QLabel" name="textlabelAge">
+                    <property name="text">
+                      <string>Age:</string>
+                    </property>
+                    <property name="wordWrap">
+                      <bool>false</bool>
+                    </property>
+                  </widget>
+                </item>
+              </layout>
+            </item>
+            <item>
+              <layout class="QGridLayout">
+                <property name="margin">
+                  <number>0</number>
+                </property>
+                <property name="spacing">
+                  <number>6</number>
+                </property>
+                <item row="1" column="0">
+                  <widget class="QTextEdit" name="multilineeditHistory">
+                    <property name="readOnly">
+                      <bool>true</bool>
+                    </property>
+                  </widget>
+                </item>
+                <item row="0" column="0">
+                  <layout class="QHBoxLayout">
+                    <property name="margin">
+                      <number>0</number>
+                    </property>
+                    <property name="spacing">
+                      <number>6</number>
+                    </property>
+                    <item>
+                      <widget class="QLabel" name="textlabelHistory">
+                        <property name="text">
+                          <string>History:</string>
                         </property>
-                        <property stdset="1">
-                            <name>spacing</name>
-                            <number>6</number>
+                        <property name="wordWrap">
+                          <bool>false</bool>
                         </property>
-                        <widget>
-                            <class>QLabel</class>
-                            <property stdset="1">
-                                <name>name</name>
-                                <cstring>textlabelProgramCode</cstring>
-                            </property>
-                            <property stdset="1">
-                                <name>text</name>
-                                <string>Program Code:</string>
-                            </property>
-                        </widget>
-                        <spacer>
-                            <property>
-                                <name>name</name>
-                                <cstring>spacerProgramCode</cstring>
-                            </property>
-                            <property stdset="1">
-                                <name>orientation</name>
-                                <enum>Horizontal</enum>
-                            </property>
-                            <property stdset="1">
-                                <name>sizeType</name>
-                                <enum>Expanding</enum>
-                            </property>
-                            <property>
-                                <name>sizeHint</name>
-                                <size>
-                                    <width>20</width>
-                                    <height>20</height>
-                                </size>
-                            </property>
-                        </spacer>
-                    </hbox>
-                </widget>
-                <widget>
-                    <class>QMultiLineEdit</class>
-                    <property stdset="1">
-                        <name>name</name>
-                        <cstring>multilineeditProgramCode</cstring>
-                    </property>
-                    <property stdset="1">
-                        <name>readOnly</name>
-                        <bool>true</bool>
-                    </property>
-                </widget>
-            </vbox>
+                      </widget>
+                    </item>
+                    <item>
+                      <spacer name="spacerHistory">
+                        <property name="sizeHint">
+                          <size>
+                            <width>20</width>
+                            <height>20</height>
+                          </size>
+                        </property>
+                        <property name="sizeType">
+                          <enum>QSizePolicy::Expanding</enum>
+                        </property>
+                        <property name="orientation">
+                          <enum>Qt::Horizontal</enum>
+                        </property>
+                      </spacer>
+                    </item>
+                  </layout>
+                </item>
+              </layout>
+            </item>
+          </layout>
         </widget>
-        <widget>
-            <class>QGroupBox</class>
-            <property stdset="1">
-                <name>name</name>
-                <cstring>groupboxProperties</cstring>
-            </property>
-            <property stdset="1">
-                <name>title</name>
-                <string>Properties</string>
-            </property>
-            <vbox>
-                <property stdset="1">
-                    <name>margin</name>
-                    <number>11</number>
-                </property>
-                <property stdset="1">
-                    <name>spacing</name>
-                    <number>6</number>
-                </property>
-                <widget>
-                    <class>QLayoutWidget</class>
-                    <property stdset="1">
-                        <name>name</name>
-                        <cstring>Layout7</cstring>
-                    </property>
-                    <grid>
-                        <property stdset="1">
-                            <name>margin</name>
-                            <number>0</number>
-                        </property>
-                        <property stdset="1">
-                            <name>spacing</name>
-                            <number>6</number>
-                        </property>
-                        <widget row="2"  column="0" >
-                            <class>QLabel</class>
-                            <property stdset="1">
-                                <name>name</name>
-                                <cstring>textlabelFitness</cstring>
-                            </property>
-                            <property stdset="1">
-                                <name>text</name>
-                                <string>Fitness:</string>
-                            </property>
-                            <property stdset="1">
-                                <name>sizePolicy</name>
-                                <sizepolicy>
-                                    <hsizetype>0</hsizetype>
-                                    <vsizetype>1</vsizetype>
-                                </sizepolicy>
-                            </property>
-                        </widget>
-                        <widget row="2"  column="1" >
-                            <class>QLabel</class>
-                            <property stdset="1">
-                                <name>name</name>
-                                <cstring>textlabelShowFitness</cstring>
-                            </property>
-                            <property stdset="1">
-                                <name>text</name>
-                                <string>None</string>
-                            </property>
-                            <property stdset="1">
-                                <name>frameShape</name>
-                                <enum>Panel</enum>
-                            </property>
-                            <property stdset="1">
-                                <name>frameShadow</name>
-                                <enum>Sunken</enum>
-                            </property>
-                            <property stdset="1">
-                                <name>sizePolicy</name>
-                                <sizepolicy>
-                                    <hsizetype>7</hsizetype>
-                                    <vsizetype>1</vsizetype>
-                                </sizepolicy>
-                            </property>
-                        </widget>
-                        <widget row="1"  column="1" >
-                            <class>QLabel</class>
-                            <property stdset="1">
-                                <name>name</name>
-                                <cstring>textlabelShowAge</cstring>
-                            </property>
-                            <property stdset="1">
-                                <name>text</name>
-                                <string>1</string>
-                            </property>
-                            <property stdset="1">
-                                <name>frameShape</name>
-                                <enum>Panel</enum>
-                            </property>
-                            <property stdset="1">
-                                <name>frameShadow</name>
-                                <enum>Sunken</enum>
-                            </property>
-                        </widget>
-                        <widget row="0"  column="0" >
-                            <class>QLabel</class>
-                            <property stdset="1">
-                                <name>name</name>
-                                <cstring>textlabelName</cstring>
-                            </property>
-                            <property stdset="1">
-                                <name>text</name>
-                                <string>Name:</string>
-                            </property>
-                        </widget>
-                        <widget row="0"  column="1" >
-                            <class>QLabel</class>
-                            <property stdset="1">
-                                <name>name</name>
-                                <cstring>textlabelShowName</cstring>
-                            </property>
-                            <property stdset="1">
-                                <name>text</name>
-                                <string>None</string>
-                            </property>
-                            <property stdset="1">
-                                <name>frameShape</name>
-                                <enum>Panel</enum>
-                            </property>
-                            <property stdset="1">
-                                <name>frameShadow</name>
-                                <enum>Sunken</enum>
-                            </property>
-                        </widget>
-                        <widget row="1"  column="0" >
-                            <class>QLabel</class>
-                            <property stdset="1">
-                                <name>name</name>
-                                <cstring>textlabelAge</cstring>
-                            </property>
-                            <property stdset="1">
-                                <name>text</name>
-                                <string>Age:</string>
-                            </property>
-                        </widget>
-                    </grid>
-                </widget>
-                <widget>
-                    <class>QLayoutWidget</class>
-                    <property stdset="1">
-                        <name>name</name>
-                        <cstring>Layout2</cstring>
-                    </property>
-                    <grid>
-                        <property stdset="1">
-                            <name>margin</name>
-                            <number>0</number>
-                        </property>
-                        <property stdset="1">
-                            <name>spacing</name>
-                            <number>6</number>
-                        </property>
-                        <widget row="1"  column="0" >
-                            <class>QMultiLineEdit</class>
-                            <property stdset="1">
-                                <name>name</name>
-                                <cstring>multilineeditHistory</cstring>
-                            </property>
-                            <property stdset="1">
-                                <name>readOnly</name>
-                                <bool>true</bool>
-                            </property>
-                        </widget>
-                        <widget row="0"  column="0" >
-                            <class>QLayoutWidget</class>
-                            <property stdset="1">
-                                <name>name</name>
-                                <cstring>layoutHistory</cstring>
-                            </property>
-                            <hbox>
-                                <property stdset="1">
-                                    <name>margin</name>
-                                    <number>0</number>
-                                </property>
-                                <property stdset="1">
-                                    <name>spacing</name>
-                                    <number>6</number>
-                                </property>
-                                <widget>
-                                    <class>QLabel</class>
-                                    <property stdset="1">
-                                        <name>name</name>
-                                        <cstring>textlabelHistory</cstring>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>text</name>
-                                        <string>History:</string>
-                                    </property>
-                                </widget>
-                                <spacer>
-                                    <property>
-                                        <name>name</name>
-                                        <cstring>spacerHistory</cstring>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>orientation</name>
-                                        <enum>Horizontal</enum>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>sizeType</name>
-                                        <enum>Expanding</enum>
-                                    </property>
-                                    <property>
-                                        <name>sizeHint</name>
-                                        <size>
-                                            <width>20</width>
-                                            <height>20</height>
-                                        </size>
-                                    </property>
-                                </spacer>
-                            </hbox>
-                        </widget>
-                    </grid>
-                </widget>
-            </vbox>
-        </widget>
-    </hbox>
-</widget>
-</UI>
+      </item>
+    </layout>
+  </widget>
+</ui>

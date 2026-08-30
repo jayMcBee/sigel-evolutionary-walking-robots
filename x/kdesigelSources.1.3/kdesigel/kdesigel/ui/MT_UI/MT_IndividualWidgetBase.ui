@@ -1,1741 +1,1251 @@
-<!DOCTYPE UI><UI>
-<class>MT_IndividualsWidgetBase</class>
-<widget>
-    <class>QWidget</class>
-    <property stdset="1">
-        <name>name</name>
-        <cstring>MT_IndividualsWidgetBase</cstring>
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0" stdsetdef="1">
+  <author></author>
+  <comment></comment>
+  <exportmacro></exportmacro>
+  <class>MT_IndividualsWidgetBase</class>
+  <widget class="QWidget" name="MT_IndividualsWidgetBase">
+    <property name="geometry">
+      <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>440</width>
+        <height>405</height>
+      </rect>
     </property>
-    <property stdset="1">
-        <name>geometry</name>
-        <rect>
-            <x>0</x>
-            <y>0</y>
-            <width>440</width>
-            <height>405</height>
-        </rect>
+    <property name="minimumSize">
+      <size>
+        <width>440</width>
+        <height>362</height>
+      </size>
     </property>
-    <property stdset="1">
-        <name>minimumSize</name>
-        <size>
-            <width>440</width>
-            <height>362</height>
-        </size>
+    <property name="windowTitle">
+      <string>MTIndividuals</string>
     </property>
-    <property stdset="1">
-        <name>caption</name>
-        <string>MTIndividuals</string>
-    </property>
-    <vbox>
-        <property stdset="1">
-            <name>margin</name>
-            <number>11</number>
-        </property>
-        <property stdset="1">
-            <name>spacing</name>
+    <layout class="QVBoxLayout">
+      <property name="margin">
+        <number>11</number>
+      </property>
+      <property name="spacing">
+        <number>6</number>
+      </property>
+      <item>
+        <layout class="QHBoxLayout">
+          <property name="margin">
+            <number>0</number>
+          </property>
+          <property name="spacing">
             <number>6</number>
-        </property>
-        <widget>
-            <class>QLayoutWidget</class>
-            <property stdset="1">
-                <name>name</name>
-                <cstring>Layout62</cstring>
+          </property>
+          <item>
+            <widget class="QLabel" name="TextLabel6">
+              <property name="text">
+                <string>max. Program Length:</string>
+              </property>
+              <property name="wordWrap">
+                <bool>false</bool>
+              </property>
+            </widget>
+          </item>
+          <item>
+            <widget class="QSpinBox" name="programLengthSpinBox">
+              <property name="maximum">
+                <number>50000</number>
+              </property>
+              <property name="minimum">
+                <number>1</number>
+              </property>
+              <property name="value">
+                <number>1024</number>
+              </property>
+            </widget>
+          </item>
+          <item>
+            <spacer name="Spacer370">
+              <property name="sizeHint">
+                <size>
+                  <width>20</width>
+                  <height>20</height>
+                </size>
+              </property>
+              <property name="sizeType">
+                <enum>QSizePolicy::Expanding</enum>
+              </property>
+              <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+              </property>
+            </spacer>
+          </item>
+        </layout>
+      </item>
+      <item>
+        <widget class="QGroupBox" name="GroupBox1">
+          <property name="title">
+            <string>Terminalset:</string>
+          </property>
+          <layout class="QHBoxLayout">
+            <property name="margin">
+              <number>11</number>
             </property>
-            <hbox>
-                <property stdset="1">
-                    <name>margin</name>
-                    <number>0</number>
+            <property name="spacing">
+              <number>6</number>
+            </property>
+            <item>
+              <layout class="QHBoxLayout">
+                <property name="margin">
+                  <number>0</number>
                 </property>
-                <property stdset="1">
-                    <name>spacing</name>
-                    <number>6</number>
+                <property name="spacing">
+                  <number>6</number>
                 </property>
-                <widget>
-                    <class>QLabel</class>
-                    <property stdset="1">
-                        <name>name</name>
-                        <cstring>TextLabel6</cstring>
+                <item>
+                  <layout class="QVBoxLayout">
+                    <property name="margin">
+                      <number>0</number>
                     </property>
-                    <property stdset="1">
-                        <name>text</name>
-                        <string>max. Program Length:</string>
+                    <property name="spacing">
+                      <number>6</number>
                     </property>
-                </widget>
-                <widget>
-                    <class>QSpinBox</class>
-                    <property stdset="1">
-                        <name>name</name>
-                        <cstring>programLengthSpinBox</cstring>
-                    </property>
-                    <property stdset="1">
-                        <name>maxValue</name>
-                        <number>50000</number>
-                    </property>
-                    <property stdset="1">
-                        <name>minValue</name>
-                        <number>1</number>
-                    </property>
-                    <property stdset="1">
-                        <name>value</name>
-                        <number>1024</number>
-                    </property>
-                </widget>
-                <spacer>
-                    <property>
-                        <name>name</name>
-                        <cstring>Spacer370</cstring>
-                    </property>
-                    <property>
-                        <name>orientation</name>
-                        <enum>Horizontal</enum>
-                    </property>
-                    <property>
-                        <name>sizeType</name>
-                        <enum>Expanding</enum>
-                    </property>
-                    <property>
-                        <name>sizeHint</name>
-                        <size>
+                    <item>
+                      <layout class="QGridLayout">
+                        <property name="margin">
+                          <number>0</number>
+                        </property>
+                        <property name="spacing">
+                          <number>6</number>
+                        </property>
+                        <item row="0" column="0">
+                          <widget class="QLabel" name="TextLabel3">
+                            <property name="text">
+                              <string>Number of Variables:</string>
+                            </property>
+                            <property name="wordWrap">
+                              <bool>false</bool>
+                            </property>
+                          </widget>
+                        </item>
+                        <item row="1" column="0">
+                          <widget class="QLabel" name="TextLabel3_2">
+                            <property name="text">
+                              <string>Number of Constants:</string>
+                            </property>
+                            <property name="wordWrap">
+                              <bool>false</bool>
+                            </property>
+                          </widget>
+                        </item>
+                        <item row="0" column="1">
+                          <widget class="QSpinBox" name="numVariablesSpinBox">
+                            <property name="maximum">
+                              <number>9999</number>
+                            </property>
+                            <property name="value">
+                              <number>5</number>
+                            </property>
+                          </widget>
+                        </item>
+                        <item row="1" column="1">
+                          <widget class="QLCDNumber" name="numConstantsLCD">
+                            <property name="frameShape">
+                              <enum>QFrame::Panel</enum>
+                            </property>
+                            <property name="frameShadow">
+                              <enum>QFrame::Sunken</enum>
+                            </property>
+                            <property name="segmentStyle">
+                              <enum>QLCDNumber::Flat</enum>
+                            </property>
+                          </widget>
+                        </item>
+                      </layout>
+                    </item>
+                    <item>
+                      <spacer name="Spacer6">
+                        <property name="sizeHint">
+                          <size>
                             <width>20</width>
                             <height>20</height>
-                        </size>
+                          </size>
+                        </property>
+                        <property name="sizeType">
+                          <enum>QSizePolicy::Expanding</enum>
+                        </property>
+                        <property name="orientation">
+                          <enum>Qt::Vertical</enum>
+                        </property>
+                      </spacer>
+                    </item>
+                    <item>
+                      <layout class="QHBoxLayout">
+                        <property name="margin">
+                          <number>0</number>
+                        </property>
+                        <property name="spacing">
+                          <number>6</number>
+                        </property>
+                        <item>
+                          <widget class="QPushButton" name="importButton">
+                            <property name="sizePolicy">
+                              <sizepolicy>
+                                <hsizetype>0</hsizetype>
+                                <vsizetype>0</vsizetype>
+                              </sizepolicy>
+                            </property>
+                            <property name="maximumSize">
+                              <size>
+                                <width>60</width>
+                                <height>26</height>
+                              </size>
+                            </property>
+                            <property name="text">
+                              <string>Import</string>
+                            </property>
+                          </widget>
+                        </item>
+                        <item>
+                          <widget class="QPushButton" name="exportButton">
+                            <property name="sizePolicy">
+                              <sizepolicy>
+                                <hsizetype>0</hsizetype>
+                                <vsizetype>0</vsizetype>
+                              </sizepolicy>
+                            </property>
+                            <property name="maximumSize">
+                              <size>
+                                <width>60</width>
+                                <height>26</height>
+                              </size>
+                            </property>
+                            <property name="text">
+                              <string>Export</string>
+                            </property>
+                          </widget>
+                        </item>
+                        <item>
+                          <widget class="QPushButton" name="createButton">
+                            <property name="sizePolicy">
+                              <sizepolicy>
+                                <hsizetype>0</hsizetype>
+                                <vsizetype>0</vsizetype>
+                              </sizepolicy>
+                            </property>
+                            <property name="maximumSize">
+                              <size>
+                                <width>60</width>
+                                <height>26</height>
+                              </size>
+                            </property>
+                            <property name="text">
+                              <string>Create</string>
+                            </property>
+                          </widget>
+                        </item>
+                      </layout>
+                    </item>
+                  </layout>
+                </item>
+                <item>
+                  <widget class="QListWidget" name="constantsListBox">
+                    <property name="selectionMode">
+                      <enum>QAbstractItemView::ExtendedSelection</enum>
                     </property>
-                </spacer>
-            </hbox>
+                  </widget>
+                </item>
+              </layout>
+            </item>
+          </layout>
         </widget>
-        <widget>
-            <class>QGroupBox</class>
-            <property stdset="1">
-                <name>name</name>
-                <cstring>GroupBox1</cstring>
+      </item>
+      <item>
+        <widget class="QGroupBox" name="GroupBox2">
+          <property name="title">
+            <string>Functionset:</string>
+          </property>
+          <layout class="QHBoxLayout">
+            <property name="margin">
+              <number>11</number>
             </property>
-            <property stdset="1">
-                <name>title</name>
-                <string>Terminalset:</string>
+            <property name="spacing">
+              <number>6</number>
             </property>
-            <hbox>
-                <property stdset="1">
-                    <name>margin</name>
-                    <number>11</number>
+            <item>
+              <layout class="QVBoxLayout">
+                <property name="margin">
+                  <number>0</number>
                 </property>
-                <property stdset="1">
-                    <name>spacing</name>
-                    <number>6</number>
+                <property name="spacing">
+                  <number>6</number>
                 </property>
-                <widget>
-                    <class>QLayoutWidget</class>
-                    <property stdset="1">
-                        <name>name</name>
-                        <cstring>Layout37</cstring>
+                <item>
+                  <layout class="QHBoxLayout">
+                    <property name="margin">
+                      <number>0</number>
                     </property>
-                    <hbox>
-                        <property stdset="1">
-                            <name>margin</name>
-                            <number>0</number>
+                    <property name="spacing">
+                      <number>6</number>
+                    </property>
+                    <item>
+                      <widget class="QLabel" name="comLabel">
+                        <property name="sizePolicy">
+                          <sizepolicy>
+                            <hsizetype>0</hsizetype>
+                            <vsizetype>1</vsizetype>
+                          </sizepolicy>
                         </property>
-                        <property stdset="1">
-                            <name>spacing</name>
-                            <number>6</number>
+                        <property name="minimumSize">
+                          <size>
+                            <width>25</width>
+                            <height>0</height>
+                          </size>
                         </property>
-                        <widget>
-                            <class>QLayoutWidget</class>
-                            <property stdset="1">
-                                <name>name</name>
-                                <cstring>Layout35</cstring>
-                            </property>
-                            <vbox>
-                                <property stdset="1">
-                                    <name>margin</name>
-                                    <number>0</number>
-                                </property>
-                                <property stdset="1">
-                                    <name>spacing</name>
-                                    <number>6</number>
-                                </property>
-                                <widget>
-                                    <class>QLayoutWidget</class>
-                                    <property stdset="1">
-                                        <name>name</name>
-                                        <cstring>Layout34</cstring>
-                                    </property>
-                                    <grid>
-                                        <property stdset="1">
-                                            <name>margin</name>
-                                            <number>0</number>
-                                        </property>
-                                        <property stdset="1">
-                                            <name>spacing</name>
-                                            <number>6</number>
-                                        </property>
-                                        <widget row="0"  column="0" >
-                                            <class>QLabel</class>
-                                            <property stdset="1">
-                                                <name>name</name>
-                                                <cstring>TextLabel3</cstring>
-                                            </property>
-                                            <property stdset="1">
-                                                <name>text</name>
-                                                <string>Number of Variables:</string>
-                                            </property>
-                                        </widget>
-                                        <widget row="1"  column="0" >
-                                            <class>QLabel</class>
-                                            <property stdset="1">
-                                                <name>name</name>
-                                                <cstring>TextLabel3_2</cstring>
-                                            </property>
-                                            <property stdset="1">
-                                                <name>text</name>
-                                                <string>Number of Constants:</string>
-                                            </property>
-                                        </widget>
-                                        <widget row="0"  column="1" >
-                                            <class>QSpinBox</class>
-                                            <property stdset="1">
-                                                <name>name</name>
-                                                <cstring>numVariablesSpinBox</cstring>
-                                            </property>
-                                            <property stdset="1">
-                                                <name>maxValue</name>
-                                                <number>9999</number>
-                                            </property>
-                                            <property stdset="1">
-                                                <name>value</name>
-                                                <number>5</number>
-                                            </property>
-                                        </widget>
-                                        <widget row="1"  column="1" >
-                                            <class>QLCDNumber</class>
-                                            <property stdset="1">
-                                                <name>name</name>
-                                                <cstring>numConstantsLCD</cstring>
-                                            </property>
-                                            <property stdset="1">
-                                                <name>frameShape</name>
-                                                <enum>Panel</enum>
-                                            </property>
-                                            <property stdset="1">
-                                                <name>frameShadow</name>
-                                                <enum>Sunken</enum>
-                                            </property>
-                                            <property stdset="1">
-                                                <name>segmentStyle</name>
-                                                <enum>Flat</enum>
-                                            </property>
-                                        </widget>
-                                    </grid>
-                                </widget>
-                                <spacer>
-                                    <property>
-                                        <name>name</name>
-                                        <cstring>Spacer6</cstring>
-                                    </property>
-                                    <property>
-                                        <name>orientation</name>
-                                        <enum>Vertical</enum>
-                                    </property>
-                                    <property>
-                                        <name>sizeType</name>
-                                        <enum>Expanding</enum>
-                                    </property>
-                                    <property>
-                                        <name>sizeHint</name>
-                                        <size>
-                                            <width>20</width>
-                                            <height>20</height>
-                                        </size>
-                                    </property>
-                                </spacer>
-                                <widget>
-                                    <class>QLayoutWidget</class>
-                                    <property stdset="1">
-                                        <name>name</name>
-                                        <cstring>Layout69</cstring>
-                                    </property>
-                                    <hbox>
-                                        <property stdset="1">
-                                            <name>margin</name>
-                                            <number>0</number>
-                                        </property>
-                                        <property stdset="1">
-                                            <name>spacing</name>
-                                            <number>6</number>
-                                        </property>
-                                        <widget>
-                                            <class>QPushButton</class>
-                                            <property stdset="1">
-                                                <name>name</name>
-                                                <cstring>importButton</cstring>
-                                            </property>
-                                            <property stdset="1">
-                                                <name>sizePolicy</name>
-                                                <sizepolicy>
-                                                    <hsizetype>0</hsizetype>
-                                                    <vsizetype>0</vsizetype>
-                                                </sizepolicy>
-                                            </property>
-                                            <property stdset="1">
-                                                <name>maximumSize</name>
-                                                <size>
-                                                    <width>60</width>
-                                                    <height>26</height>
-                                                </size>
-                                            </property>
-                                            <property stdset="1">
-                                                <name>text</name>
-                                                <string>Import</string>
-                                            </property>
-                                        </widget>
-                                        <widget>
-                                            <class>QPushButton</class>
-                                            <property stdset="1">
-                                                <name>name</name>
-                                                <cstring>exportButton</cstring>
-                                            </property>
-                                            <property stdset="1">
-                                                <name>sizePolicy</name>
-                                                <sizepolicy>
-                                                    <hsizetype>0</hsizetype>
-                                                    <vsizetype>0</vsizetype>
-                                                </sizepolicy>
-                                            </property>
-                                            <property stdset="1">
-                                                <name>maximumSize</name>
-                                                <size>
-                                                    <width>60</width>
-                                                    <height>26</height>
-                                                </size>
-                                            </property>
-                                            <property stdset="1">
-                                                <name>text</name>
-                                                <string>Export</string>
-                                            </property>
-                                        </widget>
-                                        <widget>
-                                            <class>QPushButton</class>
-                                            <property stdset="1">
-                                                <name>name</name>
-                                                <cstring>createButton</cstring>
-                                            </property>
-                                            <property stdset="1">
-                                                <name>sizePolicy</name>
-                                                <sizepolicy>
-                                                    <hsizetype>0</hsizetype>
-                                                    <vsizetype>0</vsizetype>
-                                                </sizepolicy>
-                                            </property>
-                                            <property stdset="1">
-                                                <name>maximumSize</name>
-                                                <size>
-                                                    <width>60</width>
-                                                    <height>26</height>
-                                                </size>
-                                            </property>
-                                            <property stdset="1">
-                                                <name>text</name>
-                                                <string>Create</string>
-                                            </property>
-                                        </widget>
-                                    </hbox>
-                                </widget>
-                            </vbox>
-                        </widget>
-                        <widget>
-                            <class>QListBox</class>
-                            <property stdset="1">
-                                <name>name</name>
-                                <cstring>constantsListBox</cstring>
-                            </property>
-                            <property stdset="1">
-                                <name>selectionMode</name>
-                                <enum>Extended</enum>
-                            </property>
-                        </widget>
-                    </hbox>
-                </widget>
-            </hbox>
+                        <property name="text">
+                          <string>SWT</string>
+                        </property>
+                        <property name="wordWrap">
+                          <bool>false</bool>
+                        </property>
+                      </widget>
+                    </item>
+                    <item>
+                      <widget class="QSlider" name="slider01">
+                        <property name="maximum">
+                          <number>1000</number>
+                        </property>
+                        <property name="orientation">
+                          <enum>Qt::Horizontal</enum>
+                        </property>
+                      </widget>
+                    </item>
+                    <item>
+                      <widget class="QLineEdit" name="edit01">
+                        <property name="sizePolicy">
+                          <sizepolicy>
+                            <hsizetype>0</hsizetype>
+                            <vsizetype>0</vsizetype>
+                          </sizepolicy>
+                        </property>
+                        <property name="maximumSize">
+                          <size>
+                            <width>40</width>
+                            <height>22</height>
+                          </size>
+                        </property>
+                      </widget>
+                    </item>
+                  </layout>
+                </item>
+                <item>
+                  <layout class="QHBoxLayout">
+                    <property name="margin">
+                      <number>0</number>
+                    </property>
+                    <property name="spacing">
+                      <number>6</number>
+                    </property>
+                    <item>
+                      <widget class="QLabel" name="comLabel_2">
+                        <property name="minimumSize">
+                          <size>
+                            <width>25</width>
+                            <height>0</height>
+                          </size>
+                        </property>
+                        <property name="text">
+                          <string>CPY</string>
+                        </property>
+                        <property name="wordWrap">
+                          <bool>false</bool>
+                        </property>
+                      </widget>
+                    </item>
+                    <item>
+                      <widget class="QSlider" name="slider02">
+                        <property name="maximum">
+                          <number>1000</number>
+                        </property>
+                        <property name="orientation">
+                          <enum>Qt::Horizontal</enum>
+                        </property>
+                      </widget>
+                    </item>
+                    <item>
+                      <widget class="QLineEdit" name="edit02">
+                        <property name="sizePolicy">
+                          <sizepolicy>
+                            <hsizetype>0</hsizetype>
+                            <vsizetype>0</vsizetype>
+                          </sizepolicy>
+                        </property>
+                        <property name="maximumSize">
+                          <size>
+                            <width>40</width>
+                            <height>22</height>
+                          </size>
+                        </property>
+                      </widget>
+                    </item>
+                  </layout>
+                </item>
+                <item>
+                  <layout class="QHBoxLayout">
+                    <property name="margin">
+                      <number>0</number>
+                    </property>
+                    <property name="spacing">
+                      <number>6</number>
+                    </property>
+                    <item>
+                      <widget class="QLabel" name="comLabel_3">
+                        <property name="minimumSize">
+                          <size>
+                            <width>25</width>
+                            <height>0</height>
+                          </size>
+                        </property>
+                        <property name="text">
+                          <string>ADD</string>
+                        </property>
+                        <property name="wordWrap">
+                          <bool>false</bool>
+                        </property>
+                      </widget>
+                    </item>
+                    <item>
+                      <widget class="QSlider" name="slider03">
+                        <property name="maximum">
+                          <number>1000</number>
+                        </property>
+                        <property name="orientation">
+                          <enum>Qt::Horizontal</enum>
+                        </property>
+                      </widget>
+                    </item>
+                    <item>
+                      <widget class="QLineEdit" name="edit03">
+                        <property name="sizePolicy">
+                          <sizepolicy>
+                            <hsizetype>0</hsizetype>
+                            <vsizetype>0</vsizetype>
+                          </sizepolicy>
+                        </property>
+                        <property name="maximumSize">
+                          <size>
+                            <width>40</width>
+                            <height>22</height>
+                          </size>
+                        </property>
+                      </widget>
+                    </item>
+                  </layout>
+                </item>
+                <item>
+                  <layout class="QHBoxLayout">
+                    <property name="margin">
+                      <number>0</number>
+                    </property>
+                    <property name="spacing">
+                      <number>6</number>
+                    </property>
+                    <item>
+                      <widget class="QLabel" name="comLabel_7">
+                        <property name="minimumSize">
+                          <size>
+                            <width>25</width>
+                            <height>0</height>
+                          </size>
+                        </property>
+                        <property name="text">
+                          <string>SUB</string>
+                        </property>
+                        <property name="wordWrap">
+                          <bool>false</bool>
+                        </property>
+                      </widget>
+                    </item>
+                    <item>
+                      <widget class="QSlider" name="slider04">
+                        <property name="maximum">
+                          <number>1000</number>
+                        </property>
+                        <property name="orientation">
+                          <enum>Qt::Horizontal</enum>
+                        </property>
+                      </widget>
+                    </item>
+                    <item>
+                      <widget class="QLineEdit" name="edit04">
+                        <property name="sizePolicy">
+                          <sizepolicy>
+                            <hsizetype>0</hsizetype>
+                            <vsizetype>0</vsizetype>
+                          </sizepolicy>
+                        </property>
+                        <property name="maximumSize">
+                          <size>
+                            <width>40</width>
+                            <height>22</height>
+                          </size>
+                        </property>
+                      </widget>
+                    </item>
+                  </layout>
+                </item>
+                <item>
+                  <layout class="QHBoxLayout">
+                    <property name="margin">
+                      <number>0</number>
+                    </property>
+                    <property name="spacing">
+                      <number>6</number>
+                    </property>
+                    <item>
+                      <widget class="QLabel" name="comLabel_8">
+                        <property name="minimumSize">
+                          <size>
+                            <width>25</width>
+                            <height>0</height>
+                          </size>
+                        </property>
+                        <property name="text">
+                          <string>MUL</string>
+                        </property>
+                        <property name="wordWrap">
+                          <bool>false</bool>
+                        </property>
+                      </widget>
+                    </item>
+                    <item>
+                      <widget class="QSlider" name="slider05">
+                        <property name="maximum">
+                          <number>1000</number>
+                        </property>
+                        <property name="orientation">
+                          <enum>Qt::Horizontal</enum>
+                        </property>
+                      </widget>
+                    </item>
+                    <item>
+                      <widget class="QLineEdit" name="edit05">
+                        <property name="sizePolicy">
+                          <sizepolicy>
+                            <hsizetype>0</hsizetype>
+                            <vsizetype>0</vsizetype>
+                          </sizepolicy>
+                        </property>
+                        <property name="maximumSize">
+                          <size>
+                            <width>40</width>
+                            <height>22</height>
+                          </size>
+                        </property>
+                      </widget>
+                    </item>
+                  </layout>
+                </item>
+                <item>
+                  <layout class="QHBoxLayout">
+                    <property name="margin">
+                      <number>0</number>
+                    </property>
+                    <property name="spacing">
+                      <number>6</number>
+                    </property>
+                    <item>
+                      <widget class="QLabel" name="comLabel_4">
+                        <property name="minimumSize">
+                          <size>
+                            <width>25</width>
+                            <height>0</height>
+                          </size>
+                        </property>
+                        <property name="text">
+                          <string>DIV</string>
+                        </property>
+                        <property name="wordWrap">
+                          <bool>false</bool>
+                        </property>
+                      </widget>
+                    </item>
+                    <item>
+                      <widget class="QSlider" name="slider06">
+                        <property name="maximum">
+                          <number>1000</number>
+                        </property>
+                        <property name="orientation">
+                          <enum>Qt::Horizontal</enum>
+                        </property>
+                      </widget>
+                    </item>
+                    <item>
+                      <widget class="QLineEdit" name="edit06">
+                        <property name="sizePolicy">
+                          <sizepolicy>
+                            <hsizetype>0</hsizetype>
+                            <vsizetype>0</vsizetype>
+                          </sizepolicy>
+                        </property>
+                        <property name="maximumSize">
+                          <size>
+                            <width>40</width>
+                            <height>22</height>
+                          </size>
+                        </property>
+                      </widget>
+                    </item>
+                  </layout>
+                </item>
+              </layout>
+            </item>
+            <item>
+              <layout class="QVBoxLayout">
+                <property name="margin">
+                  <number>0</number>
+                </property>
+                <property name="spacing">
+                  <number>6</number>
+                </property>
+                <item>
+                  <layout class="QHBoxLayout">
+                    <property name="margin">
+                      <number>0</number>
+                    </property>
+                    <property name="spacing">
+                      <number>6</number>
+                    </property>
+                    <item>
+                      <widget class="QLabel" name="comLabel_5">
+                        <property name="minimumSize">
+                          <size>
+                            <width>25</width>
+                            <height>0</height>
+                          </size>
+                        </property>
+                        <property name="text">
+                          <string>MOD</string>
+                        </property>
+                        <property name="wordWrap">
+                          <bool>false</bool>
+                        </property>
+                      </widget>
+                    </item>
+                    <item>
+                      <widget class="QSlider" name="slider07">
+                        <property name="maximum">
+                          <number>1000</number>
+                        </property>
+                        <property name="orientation">
+                          <enum>Qt::Horizontal</enum>
+                        </property>
+                      </widget>
+                    </item>
+                    <item>
+                      <widget class="QLineEdit" name="edit07">
+                        <property name="sizePolicy">
+                          <sizepolicy>
+                            <hsizetype>0</hsizetype>
+                            <vsizetype>0</vsizetype>
+                          </sizepolicy>
+                        </property>
+                        <property name="maximumSize">
+                          <size>
+                            <width>40</width>
+                            <height>22</height>
+                          </size>
+                        </property>
+                      </widget>
+                    </item>
+                  </layout>
+                </item>
+                <item>
+                  <layout class="QHBoxLayout">
+                    <property name="margin">
+                      <number>0</number>
+                    </property>
+                    <property name="spacing">
+                      <number>6</number>
+                    </property>
+                    <item>
+                      <widget class="QLabel" name="comLabel_6">
+                        <property name="minimumSize">
+                          <size>
+                            <width>25</width>
+                            <height>0</height>
+                          </size>
+                        </property>
+                        <property name="text">
+                          <string>MIN</string>
+                        </property>
+                        <property name="wordWrap">
+                          <bool>false</bool>
+                        </property>
+                      </widget>
+                    </item>
+                    <item>
+                      <widget class="QSlider" name="slider08">
+                        <property name="maximum">
+                          <number>1000</number>
+                        </property>
+                        <property name="orientation">
+                          <enum>Qt::Horizontal</enum>
+                        </property>
+                      </widget>
+                    </item>
+                    <item>
+                      <widget class="QLineEdit" name="edit08">
+                        <property name="sizePolicy">
+                          <sizepolicy>
+                            <hsizetype>0</hsizetype>
+                            <vsizetype>0</vsizetype>
+                          </sizepolicy>
+                        </property>
+                        <property name="maximumSize">
+                          <size>
+                            <width>40</width>
+                            <height>22</height>
+                          </size>
+                        </property>
+                      </widget>
+                    </item>
+                  </layout>
+                </item>
+                <item>
+                  <layout class="QHBoxLayout">
+                    <property name="margin">
+                      <number>0</number>
+                    </property>
+                    <property name="spacing">
+                      <number>6</number>
+                    </property>
+                    <item>
+                      <widget class="QLabel" name="comLabel_81">
+                        <property name="minimumSize">
+                          <size>
+                            <width>25</width>
+                            <height>0</height>
+                          </size>
+                        </property>
+                        <property name="text">
+                          <string>MAX</string>
+                        </property>
+                        <property name="wordWrap">
+                          <bool>false</bool>
+                        </property>
+                      </widget>
+                    </item>
+                    <item>
+                      <widget class="QSlider" name="slider09">
+                        <property name="maximum">
+                          <number>1000</number>
+                        </property>
+                        <property name="orientation">
+                          <enum>Qt::Horizontal</enum>
+                        </property>
+                      </widget>
+                    </item>
+                    <item>
+                      <widget class="QLineEdit" name="edit09">
+                        <property name="sizePolicy">
+                          <sizepolicy>
+                            <hsizetype>0</hsizetype>
+                            <vsizetype>0</vsizetype>
+                          </sizepolicy>
+                        </property>
+                        <property name="maximumSize">
+                          <size>
+                            <width>40</width>
+                            <height>22</height>
+                          </size>
+                        </property>
+                      </widget>
+                    </item>
+                  </layout>
+                </item>
+                <item>
+                  <layout class="QHBoxLayout">
+                    <property name="margin">
+                      <number>0</number>
+                    </property>
+                    <property name="spacing">
+                      <number>6</number>
+                    </property>
+                    <item>
+                      <widget class="QLabel" name="comLabel_9">
+                        <property name="minimumSize">
+                          <size>
+                            <width>25</width>
+                            <height>0</height>
+                          </size>
+                        </property>
+                        <property name="text">
+                          <string>CMP</string>
+                        </property>
+                        <property name="wordWrap">
+                          <bool>false</bool>
+                        </property>
+                      </widget>
+                    </item>
+                    <item>
+                      <widget class="QSlider" name="slider10">
+                        <property name="maximum">
+                          <number>1000</number>
+                        </property>
+                        <property name="orientation">
+                          <enum>Qt::Horizontal</enum>
+                        </property>
+                      </widget>
+                    </item>
+                    <item>
+                      <widget class="QLineEdit" name="edit10">
+                        <property name="sizePolicy">
+                          <sizepolicy>
+                            <hsizetype>0</hsizetype>
+                            <vsizetype>0</vsizetype>
+                          </sizepolicy>
+                        </property>
+                        <property name="maximumSize">
+                          <size>
+                            <width>40</width>
+                            <height>22</height>
+                          </size>
+                        </property>
+                      </widget>
+                    </item>
+                  </layout>
+                </item>
+                <item>
+                  <layout class="QHBoxLayout">
+                    <property name="margin">
+                      <number>0</number>
+                    </property>
+                    <property name="spacing">
+                      <number>6</number>
+                    </property>
+                    <item>
+                      <widget class="QLabel" name="comLabel_4_2">
+                        <property name="minimumSize">
+                          <size>
+                            <width>25</width>
+                            <height>0</height>
+                          </size>
+                        </property>
+                        <property name="text">
+                          <string>JMP</string>
+                        </property>
+                        <property name="wordWrap">
+                          <bool>false</bool>
+                        </property>
+                      </widget>
+                    </item>
+                    <item>
+                      <widget class="QSlider" name="slider11">
+                        <property name="maximum">
+                          <number>1000</number>
+                        </property>
+                        <property name="orientation">
+                          <enum>Qt::Horizontal</enum>
+                        </property>
+                      </widget>
+                    </item>
+                    <item>
+                      <widget class="QLineEdit" name="edit11">
+                        <property name="sizePolicy">
+                          <sizepolicy>
+                            <hsizetype>0</hsizetype>
+                            <vsizetype>0</vsizetype>
+                          </sizepolicy>
+                        </property>
+                        <property name="maximumSize">
+                          <size>
+                            <width>40</width>
+                            <height>22</height>
+                          </size>
+                        </property>
+                      </widget>
+                    </item>
+                  </layout>
+                </item>
+                <item>
+                  <layout class="QHBoxLayout">
+                    <property name="margin">
+                      <number>0</number>
+                    </property>
+                    <property name="spacing">
+                      <number>6</number>
+                    </property>
+                    <item>
+                      <widget class="QLabel" name="comLabel_4_5">
+                        <property name="minimumSize">
+                          <size>
+                            <width>25</width>
+                            <height>0</height>
+                          </size>
+                        </property>
+                        <property name="text">
+                          <string>JLE</string>
+                        </property>
+                        <property name="wordWrap">
+                          <bool>false</bool>
+                        </property>
+                      </widget>
+                    </item>
+                    <item>
+                      <widget class="QSlider" name="slider12">
+                        <property name="maximum">
+                          <number>1000</number>
+                        </property>
+                        <property name="orientation">
+                          <enum>Qt::Horizontal</enum>
+                        </property>
+                      </widget>
+                    </item>
+                    <item>
+                      <widget class="QLineEdit" name="edit12">
+                        <property name="sizePolicy">
+                          <sizepolicy>
+                            <hsizetype>0</hsizetype>
+                            <vsizetype>0</vsizetype>
+                          </sizepolicy>
+                        </property>
+                        <property name="maximumSize">
+                          <size>
+                            <width>40</width>
+                            <height>22</height>
+                          </size>
+                        </property>
+                      </widget>
+                    </item>
+                  </layout>
+                </item>
+              </layout>
+            </item>
+            <item>
+              <layout class="QVBoxLayout">
+                <property name="margin">
+                  <number>0</number>
+                </property>
+                <property name="spacing">
+                  <number>6</number>
+                </property>
+                <item>
+                  <layout class="QHBoxLayout">
+                    <property name="margin">
+                      <number>0</number>
+                    </property>
+                    <property name="spacing">
+                      <number>6</number>
+                    </property>
+                    <item>
+                      <widget class="QLabel" name="comLabel_5_2">
+                        <property name="minimumSize">
+                          <size>
+                            <width>25</width>
+                            <height>0</height>
+                          </size>
+                        </property>
+                        <property name="text">
+                          <string>JEQ</string>
+                        </property>
+                        <property name="wordWrap">
+                          <bool>false</bool>
+                        </property>
+                      </widget>
+                    </item>
+                    <item>
+                      <widget class="QSlider" name="slider13">
+                        <property name="maximum">
+                          <number>1000</number>
+                        </property>
+                        <property name="orientation">
+                          <enum>Qt::Horizontal</enum>
+                        </property>
+                      </widget>
+                    </item>
+                    <item>
+                      <widget class="QLineEdit" name="edit13">
+                        <property name="sizePolicy">
+                          <sizepolicy>
+                            <hsizetype>0</hsizetype>
+                            <vsizetype>0</vsizetype>
+                          </sizepolicy>
+                        </property>
+                        <property name="maximumSize">
+                          <size>
+                            <width>40</width>
+                            <height>22</height>
+                          </size>
+                        </property>
+                      </widget>
+                    </item>
+                  </layout>
+                </item>
+                <item>
+                  <layout class="QHBoxLayout">
+                    <property name="margin">
+                      <number>0</number>
+                    </property>
+                    <property name="spacing">
+                      <number>6</number>
+                    </property>
+                    <item>
+                      <widget class="QLabel" name="comLabel_6_2">
+                        <property name="minimumSize">
+                          <size>
+                            <width>25</width>
+                            <height>0</height>
+                          </size>
+                        </property>
+                        <property name="text">
+                          <string>NOP</string>
+                        </property>
+                        <property name="wordWrap">
+                          <bool>false</bool>
+                        </property>
+                      </widget>
+                    </item>
+                    <item>
+                      <widget class="QSlider" name="slider14">
+                        <property name="maximum">
+                          <number>1000</number>
+                        </property>
+                        <property name="orientation">
+                          <enum>Qt::Horizontal</enum>
+                        </property>
+                      </widget>
+                    </item>
+                    <item>
+                      <widget class="QLineEdit" name="edit14">
+                        <property name="sizePolicy">
+                          <sizepolicy>
+                            <hsizetype>0</hsizetype>
+                            <vsizetype>0</vsizetype>
+                          </sizepolicy>
+                        </property>
+                        <property name="maximumSize">
+                          <size>
+                            <width>40</width>
+                            <height>22</height>
+                          </size>
+                        </property>
+                      </widget>
+                    </item>
+                  </layout>
+                </item>
+                <item>
+                  <layout class="QHBoxLayout">
+                    <property name="margin">
+                      <number>0</number>
+                    </property>
+                    <property name="spacing">
+                      <number>6</number>
+                    </property>
+                    <item>
+                      <widget class="QLabel" name="comLabel_8_2">
+                        <property name="minimumSize">
+                          <size>
+                            <width>25</width>
+                            <height>0</height>
+                          </size>
+                        </property>
+                        <property name="text">
+                          <string>LUI</string>
+                        </property>
+                        <property name="wordWrap">
+                          <bool>false</bool>
+                        </property>
+                      </widget>
+                    </item>
+                    <item>
+                      <widget class="QSlider" name="slider15">
+                        <property name="maximum">
+                          <number>1000</number>
+                        </property>
+                        <property name="orientation">
+                          <enum>Qt::Horizontal</enum>
+                        </property>
+                      </widget>
+                    </item>
+                    <item>
+                      <widget class="QLineEdit" name="edit15">
+                        <property name="sizePolicy">
+                          <sizepolicy>
+                            <hsizetype>0</hsizetype>
+                            <vsizetype>0</vsizetype>
+                          </sizepolicy>
+                        </property>
+                        <property name="maximumSize">
+                          <size>
+                            <width>40</width>
+                            <height>22</height>
+                          </size>
+                        </property>
+                      </widget>
+                    </item>
+                  </layout>
+                </item>
+                <item>
+                  <layout class="QHBoxLayout">
+                    <property name="margin">
+                      <number>0</number>
+                    </property>
+                    <property name="spacing">
+                      <number>6</number>
+                    </property>
+                    <item>
+                      <widget class="QLabel" name="comLabel_4_4">
+                        <property name="minimumSize">
+                          <size>
+                            <width>25</width>
+                            <height>0</height>
+                          </size>
+                        </property>
+                        <property name="text">
+                          <string>LUS</string>
+                        </property>
+                        <property name="wordWrap">
+                          <bool>false</bool>
+                        </property>
+                      </widget>
+                    </item>
+                    <item>
+                      <widget class="QSlider" name="slider16">
+                        <property name="maximum">
+                          <number>1000</number>
+                        </property>
+                        <property name="orientation">
+                          <enum>Qt::Horizontal</enum>
+                        </property>
+                      </widget>
+                    </item>
+                    <item>
+                      <widget class="QLineEdit" name="edit16">
+                        <property name="sizePolicy">
+                          <sizepolicy>
+                            <hsizetype>0</hsizetype>
+                            <vsizetype>0</vsizetype>
+                          </sizepolicy>
+                        </property>
+                        <property name="maximumSize">
+                          <size>
+                            <width>40</width>
+                            <height>22</height>
+                          </size>
+                        </property>
+                      </widget>
+                    </item>
+                  </layout>
+                </item>
+                <item>
+                  <layout class="QHBoxLayout">
+                    <property name="margin">
+                      <number>0</number>
+                    </property>
+                    <property name="spacing">
+                      <number>6</number>
+                    </property>
+                    <item>
+                      <widget class="QLabel" name="comLabel_4_3">
+                        <property name="minimumSize">
+                          <size>
+                            <width>25</width>
+                            <height>0</height>
+                          </size>
+                        </property>
+                        <property name="text">
+                          <string>LUD</string>
+                        </property>
+                        <property name="wordWrap">
+                          <bool>false</bool>
+                        </property>
+                      </widget>
+                    </item>
+                    <item>
+                      <widget class="QSlider" name="slider17">
+                        <property name="maximum">
+                          <number>1000</number>
+                        </property>
+                        <property name="orientation">
+                          <enum>Qt::Horizontal</enum>
+                        </property>
+                      </widget>
+                    </item>
+                    <item>
+                      <widget class="QLineEdit" name="edit17">
+                        <property name="sizePolicy">
+                          <sizepolicy>
+                            <hsizetype>0</hsizetype>
+                            <vsizetype>0</vsizetype>
+                          </sizepolicy>
+                        </property>
+                        <property name="maximumSize">
+                          <size>
+                            <width>40</width>
+                            <height>22</height>
+                          </size>
+                        </property>
+                      </widget>
+                    </item>
+                  </layout>
+                </item>
+                <item>
+                  <layout class="QHBoxLayout">
+                    <property name="margin">
+                      <number>0</number>
+                    </property>
+                    <property name="spacing">
+                      <number>6</number>
+                    </property>
+                    <item>
+                      <widget class="QLabel" name="comLabel_4_3_2">
+                        <property name="minimumSize">
+                          <size>
+                            <width>25</width>
+                            <height>0</height>
+                          </size>
+                        </property>
+                        <property name="text">
+                          <string>LUM</string>
+                        </property>
+                        <property name="wordWrap">
+                          <bool>false</bool>
+                        </property>
+                      </widget>
+                    </item>
+                    <item>
+                      <widget class="QSlider" name="slider18">
+                        <property name="maximum">
+                          <number>1000</number>
+                        </property>
+                        <property name="orientation">
+                          <enum>Qt::Horizontal</enum>
+                        </property>
+                      </widget>
+                    </item>
+                    <item>
+                      <widget class="QLineEdit" name="edit18">
+                        <property name="sizePolicy">
+                          <sizepolicy>
+                            <hsizetype>0</hsizetype>
+                            <vsizetype>0</vsizetype>
+                          </sizepolicy>
+                        </property>
+                        <property name="maximumSize">
+                          <size>
+                            <width>40</width>
+                            <height>22</height>
+                          </size>
+                        </property>
+                      </widget>
+                    </item>
+                  </layout>
+                </item>
+              </layout>
+            </item>
+          </layout>
         </widget>
-        <widget>
-            <class>QGroupBox</class>
-            <property stdset="1">
-                <name>name</name>
-                <cstring>GroupBox2</cstring>
-            </property>
-            <property stdset="1">
-                <name>title</name>
-                <string>Functionset:</string>
-            </property>
-            <hbox>
-                <property stdset="1">
-                    <name>margin</name>
-                    <number>11</number>
-                </property>
-                <property stdset="1">
-                    <name>spacing</name>
-                    <number>6</number>
-                </property>
-                <widget>
-                    <class>QLayoutWidget</class>
-                    <property stdset="1">
-                        <name>name</name>
-                        <cstring>Layout32</cstring>
-                    </property>
-                    <property stdset="1">
-                        <name>maximumSize</name>
-                        <size>
-                            <width>130</width>
-                            <height>32767</height>
-                        </size>
-                    </property>
-                    <vbox>
-                        <property stdset="1">
-                            <name>margin</name>
-                            <number>0</number>
-                        </property>
-                        <property stdset="1">
-                            <name>spacing</name>
-                            <number>6</number>
-                        </property>
-                        <widget>
-                            <class>QLayoutWidget</class>
-                            <property stdset="1">
-                                <name>name</name>
-                                <cstring>Layout31</cstring>
-                            </property>
-                            <hbox>
-                                <property stdset="1">
-                                    <name>margin</name>
-                                    <number>0</number>
-                                </property>
-                                <property stdset="1">
-                                    <name>spacing</name>
-                                    <number>6</number>
-                                </property>
-                                <widget>
-                                    <class>QLabel</class>
-                                    <property stdset="1">
-                                        <name>name</name>
-                                        <cstring>comLabel</cstring>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>sizePolicy</name>
-                                        <sizepolicy>
-                                            <hsizetype>0</hsizetype>
-                                            <vsizetype>1</vsizetype>
-                                        </sizepolicy>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>minimumSize</name>
-                                        <size>
-                                            <width>25</width>
-                                            <height>0</height>
-                                        </size>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>text</name>
-                                        <string>SWT</string>
-                                    </property>
-                                </widget>
-                                <widget>
-                                    <class>QSlider</class>
-                                    <property stdset="1">
-                                        <name>name</name>
-                                        <cstring>slider01</cstring>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>maxValue</name>
-                                        <number>1000</number>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>orientation</name>
-                                        <enum>Horizontal</enum>
-                                    </property>
-                                </widget>
-                                <widget>
-                                    <class>QLineEdit</class>
-                                    <property stdset="1">
-                                        <name>name</name>
-                                        <cstring>edit01</cstring>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>sizePolicy</name>
-                                        <sizepolicy>
-                                            <hsizetype>0</hsizetype>
-                                            <vsizetype>0</vsizetype>
-                                        </sizepolicy>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>maximumSize</name>
-                                        <size>
-                                            <width>40</width>
-                                            <height>22</height>
-                                        </size>
-                                    </property>
-                                </widget>
-                            </hbox>
-                        </widget>
-                        <widget>
-                            <class>QLayoutWidget</class>
-                            <property stdset="1">
-                                <name>name</name>
-                                <cstring>Layout74_2</cstring>
-                            </property>
-                            <hbox>
-                                <property stdset="1">
-                                    <name>margin</name>
-                                    <number>0</number>
-                                </property>
-                                <property stdset="1">
-                                    <name>spacing</name>
-                                    <number>6</number>
-                                </property>
-                                <widget>
-                                    <class>QLabel</class>
-                                    <property stdset="1">
-                                        <name>name</name>
-                                        <cstring>comLabel_2</cstring>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>minimumSize</name>
-                                        <size>
-                                            <width>25</width>
-                                            <height>0</height>
-                                        </size>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>text</name>
-                                        <string>CPY</string>
-                                    </property>
-                                </widget>
-                                <widget>
-                                    <class>QSlider</class>
-                                    <property stdset="1">
-                                        <name>name</name>
-                                        <cstring>slider02</cstring>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>maxValue</name>
-                                        <number>1000</number>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>orientation</name>
-                                        <enum>Horizontal</enum>
-                                    </property>
-                                </widget>
-                                <widget>
-                                    <class>QLineEdit</class>
-                                    <property stdset="1">
-                                        <name>name</name>
-                                        <cstring>edit02</cstring>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>sizePolicy</name>
-                                        <sizepolicy>
-                                            <hsizetype>0</hsizetype>
-                                            <vsizetype>0</vsizetype>
-                                        </sizepolicy>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>maximumSize</name>
-                                        <size>
-                                            <width>40</width>
-                                            <height>22</height>
-                                        </size>
-                                    </property>
-                                </widget>
-                            </hbox>
-                        </widget>
-                        <widget>
-                            <class>QLayoutWidget</class>
-                            <property stdset="1">
-                                <name>name</name>
-                                <cstring>Layout74_3</cstring>
-                            </property>
-                            <hbox>
-                                <property stdset="1">
-                                    <name>margin</name>
-                                    <number>0</number>
-                                </property>
-                                <property stdset="1">
-                                    <name>spacing</name>
-                                    <number>6</number>
-                                </property>
-                                <widget>
-                                    <class>QLabel</class>
-                                    <property stdset="1">
-                                        <name>name</name>
-                                        <cstring>comLabel_3</cstring>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>minimumSize</name>
-                                        <size>
-                                            <width>25</width>
-                                            <height>0</height>
-                                        </size>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>text</name>
-                                        <string>ADD</string>
-                                    </property>
-                                </widget>
-                                <widget>
-                                    <class>QSlider</class>
-                                    <property stdset="1">
-                                        <name>name</name>
-                                        <cstring>slider03</cstring>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>maxValue</name>
-                                        <number>1000</number>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>orientation</name>
-                                        <enum>Horizontal</enum>
-                                    </property>
-                                </widget>
-                                <widget>
-                                    <class>QLineEdit</class>
-                                    <property stdset="1">
-                                        <name>name</name>
-                                        <cstring>edit03</cstring>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>sizePolicy</name>
-                                        <sizepolicy>
-                                            <hsizetype>0</hsizetype>
-                                            <vsizetype>0</vsizetype>
-                                        </sizepolicy>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>maximumSize</name>
-                                        <size>
-                                            <width>40</width>
-                                            <height>22</height>
-                                        </size>
-                                    </property>
-                                </widget>
-                            </hbox>
-                        </widget>
-                        <widget>
-                            <class>QLayoutWidget</class>
-                            <property stdset="1">
-                                <name>name</name>
-                                <cstring>Layout74_6</cstring>
-                            </property>
-                            <hbox>
-                                <property stdset="1">
-                                    <name>margin</name>
-                                    <number>0</number>
-                                </property>
-                                <property stdset="1">
-                                    <name>spacing</name>
-                                    <number>6</number>
-                                </property>
-                                <widget>
-                                    <class>QLabel</class>
-                                    <property stdset="1">
-                                        <name>name</name>
-                                        <cstring>comLabel_7</cstring>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>minimumSize</name>
-                                        <size>
-                                            <width>25</width>
-                                            <height>0</height>
-                                        </size>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>text</name>
-                                        <string>SUB</string>
-                                    </property>
-                                </widget>
-                                <widget>
-                                    <class>QSlider</class>
-                                    <property stdset="1">
-                                        <name>name</name>
-                                        <cstring>slider04</cstring>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>maxValue</name>
-                                        <number>1000</number>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>orientation</name>
-                                        <enum>Horizontal</enum>
-                                    </property>
-                                </widget>
-                                <widget>
-                                    <class>QLineEdit</class>
-                                    <property stdset="1">
-                                        <name>name</name>
-                                        <cstring>edit04</cstring>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>sizePolicy</name>
-                                        <sizepolicy>
-                                            <hsizetype>0</hsizetype>
-                                            <vsizetype>0</vsizetype>
-                                        </sizepolicy>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>maximumSize</name>
-                                        <size>
-                                            <width>40</width>
-                                            <height>22</height>
-                                        </size>
-                                    </property>
-                                </widget>
-                            </hbox>
-                        </widget>
-                        <widget>
-                            <class>QLayoutWidget</class>
-                            <property stdset="1">
-                                <name>name</name>
-                                <cstring>Layout74_8</cstring>
-                            </property>
-                            <hbox>
-                                <property stdset="1">
-                                    <name>margin</name>
-                                    <number>0</number>
-                                </property>
-                                <property stdset="1">
-                                    <name>spacing</name>
-                                    <number>6</number>
-                                </property>
-                                <widget>
-                                    <class>QLabel</class>
-                                    <property stdset="1">
-                                        <name>name</name>
-                                        <cstring>comLabel_8</cstring>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>minimumSize</name>
-                                        <size>
-                                            <width>25</width>
-                                            <height>0</height>
-                                        </size>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>text</name>
-                                        <string>MUL</string>
-                                    </property>
-                                </widget>
-                                <widget>
-                                    <class>QSlider</class>
-                                    <property stdset="1">
-                                        <name>name</name>
-                                        <cstring>slider05</cstring>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>maxValue</name>
-                                        <number>1000</number>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>orientation</name>
-                                        <enum>Horizontal</enum>
-                                    </property>
-                                </widget>
-                                <widget>
-                                    <class>QLineEdit</class>
-                                    <property stdset="1">
-                                        <name>name</name>
-                                        <cstring>edit05</cstring>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>sizePolicy</name>
-                                        <sizepolicy>
-                                            <hsizetype>0</hsizetype>
-                                            <vsizetype>0</vsizetype>
-                                        </sizepolicy>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>maximumSize</name>
-                                        <size>
-                                            <width>40</width>
-                                            <height>22</height>
-                                        </size>
-                                    </property>
-                                </widget>
-                            </hbox>
-                        </widget>
-                        <widget>
-                            <class>QLayoutWidget</class>
-                            <property stdset="1">
-                                <name>name</name>
-                                <cstring>Layout74_3</cstring>
-                            </property>
-                            <hbox>
-                                <property stdset="1">
-                                    <name>margin</name>
-                                    <number>0</number>
-                                </property>
-                                <property stdset="1">
-                                    <name>spacing</name>
-                                    <number>6</number>
-                                </property>
-                                <widget>
-                                    <class>QLabel</class>
-                                    <property stdset="1">
-                                        <name>name</name>
-                                        <cstring>comLabel_4</cstring>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>minimumSize</name>
-                                        <size>
-                                            <width>25</width>
-                                            <height>0</height>
-                                        </size>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>text</name>
-                                        <string>DIV</string>
-                                    </property>
-                                </widget>
-                                <widget>
-                                    <class>QSlider</class>
-                                    <property stdset="1">
-                                        <name>name</name>
-                                        <cstring>slider06</cstring>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>maxValue</name>
-                                        <number>1000</number>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>orientation</name>
-                                        <enum>Horizontal</enum>
-                                    </property>
-                                </widget>
-                                <widget>
-                                    <class>QLineEdit</class>
-                                    <property stdset="1">
-                                        <name>name</name>
-                                        <cstring>edit06</cstring>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>sizePolicy</name>
-                                        <sizepolicy>
-                                            <hsizetype>0</hsizetype>
-                                            <vsizetype>0</vsizetype>
-                                        </sizepolicy>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>maximumSize</name>
-                                        <size>
-                                            <width>40</width>
-                                            <height>22</height>
-                                        </size>
-                                    </property>
-                                </widget>
-                            </hbox>
-                        </widget>
-                    </vbox>
-                </widget>
-                <widget>
-                    <class>QLayoutWidget</class>
-                    <property stdset="1">
-                        <name>name</name>
-                        <cstring>Layout33</cstring>
-                    </property>
-                    <property stdset="1">
-                        <name>maximumSize</name>
-                        <size>
-                            <width>130</width>
-                            <height>32767</height>
-                        </size>
-                    </property>
-                    <vbox>
-                        <property stdset="1">
-                            <name>margin</name>
-                            <number>0</number>
-                        </property>
-                        <property stdset="1">
-                            <name>spacing</name>
-                            <number>6</number>
-                        </property>
-                        <widget>
-                            <class>QLayoutWidget</class>
-                            <property stdset="1">
-                                <name>name</name>
-                                <cstring>Layout74_4</cstring>
-                            </property>
-                            <hbox>
-                                <property stdset="1">
-                                    <name>margin</name>
-                                    <number>0</number>
-                                </property>
-                                <property stdset="1">
-                                    <name>spacing</name>
-                                    <number>6</number>
-                                </property>
-                                <widget>
-                                    <class>QLabel</class>
-                                    <property stdset="1">
-                                        <name>name</name>
-                                        <cstring>comLabel_5</cstring>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>minimumSize</name>
-                                        <size>
-                                            <width>25</width>
-                                            <height>0</height>
-                                        </size>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>text</name>
-                                        <string>MOD</string>
-                                    </property>
-                                </widget>
-                                <widget>
-                                    <class>QSlider</class>
-                                    <property stdset="1">
-                                        <name>name</name>
-                                        <cstring>slider07</cstring>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>maxValue</name>
-                                        <number>1000</number>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>orientation</name>
-                                        <enum>Horizontal</enum>
-                                    </property>
-                                </widget>
-                                <widget>
-                                    <class>QLineEdit</class>
-                                    <property stdset="1">
-                                        <name>name</name>
-                                        <cstring>edit07</cstring>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>sizePolicy</name>
-                                        <sizepolicy>
-                                            <hsizetype>0</hsizetype>
-                                            <vsizetype>0</vsizetype>
-                                        </sizepolicy>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>maximumSize</name>
-                                        <size>
-                                            <width>40</width>
-                                            <height>22</height>
-                                        </size>
-                                    </property>
-                                </widget>
-                            </hbox>
-                        </widget>
-                        <widget>
-                            <class>QLayoutWidget</class>
-                            <property stdset="1">
-                                <name>name</name>
-                                <cstring>Layout30</cstring>
-                            </property>
-                            <hbox>
-                                <property stdset="1">
-                                    <name>margin</name>
-                                    <number>0</number>
-                                </property>
-                                <property stdset="1">
-                                    <name>spacing</name>
-                                    <number>6</number>
-                                </property>
-                                <widget>
-                                    <class>QLabel</class>
-                                    <property stdset="1">
-                                        <name>name</name>
-                                        <cstring>comLabel_6</cstring>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>minimumSize</name>
-                                        <size>
-                                            <width>25</width>
-                                            <height>0</height>
-                                        </size>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>text</name>
-                                        <string>MIN</string>
-                                    </property>
-                                </widget>
-                                <widget>
-                                    <class>QSlider</class>
-                                    <property stdset="1">
-                                        <name>name</name>
-                                        <cstring>slider08</cstring>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>maxValue</name>
-                                        <number>1000</number>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>orientation</name>
-                                        <enum>Horizontal</enum>
-                                    </property>
-                                </widget>
-                                <widget>
-                                    <class>QLineEdit</class>
-                                    <property stdset="1">
-                                        <name>name</name>
-                                        <cstring>edit08</cstring>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>sizePolicy</name>
-                                        <sizepolicy>
-                                            <hsizetype>0</hsizetype>
-                                            <vsizetype>0</vsizetype>
-                                        </sizepolicy>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>maximumSize</name>
-                                        <size>
-                                            <width>40</width>
-                                            <height>22</height>
-                                        </size>
-                                    </property>
-                                </widget>
-                            </hbox>
-                        </widget>
-                        <widget>
-                            <class>QLayoutWidget</class>
-                            <property stdset="1">
-                                <name>name</name>
-                                <cstring>Layout74_7</cstring>
-                            </property>
-                            <hbox>
-                                <property stdset="1">
-                                    <name>margin</name>
-                                    <number>0</number>
-                                </property>
-                                <property stdset="1">
-                                    <name>spacing</name>
-                                    <number>6</number>
-                                </property>
-                                <widget>
-                                    <class>QLabel</class>
-                                    <property stdset="1">
-                                        <name>name</name>
-                                        <cstring>comLabel_8</cstring>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>minimumSize</name>
-                                        <size>
-                                            <width>25</width>
-                                            <height>0</height>
-                                        </size>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>text</name>
-                                        <string>MAX</string>
-                                    </property>
-                                </widget>
-                                <widget>
-                                    <class>QSlider</class>
-                                    <property stdset="1">
-                                        <name>name</name>
-                                        <cstring>slider09</cstring>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>maxValue</name>
-                                        <number>1000</number>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>orientation</name>
-                                        <enum>Horizontal</enum>
-                                    </property>
-                                </widget>
-                                <widget>
-                                    <class>QLineEdit</class>
-                                    <property stdset="1">
-                                        <name>name</name>
-                                        <cstring>edit09</cstring>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>sizePolicy</name>
-                                        <sizepolicy>
-                                            <hsizetype>0</hsizetype>
-                                            <vsizetype>0</vsizetype>
-                                        </sizepolicy>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>maximumSize</name>
-                                        <size>
-                                            <width>40</width>
-                                            <height>22</height>
-                                        </size>
-                                    </property>
-                                </widget>
-                            </hbox>
-                        </widget>
-                        <widget>
-                            <class>QLayoutWidget</class>
-                            <property stdset="1">
-                                <name>name</name>
-                                <cstring>Layout74_9</cstring>
-                            </property>
-                            <hbox>
-                                <property stdset="1">
-                                    <name>margin</name>
-                                    <number>0</number>
-                                </property>
-                                <property stdset="1">
-                                    <name>spacing</name>
-                                    <number>6</number>
-                                </property>
-                                <widget>
-                                    <class>QLabel</class>
-                                    <property stdset="1">
-                                        <name>name</name>
-                                        <cstring>comLabel_9</cstring>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>minimumSize</name>
-                                        <size>
-                                            <width>25</width>
-                                            <height>0</height>
-                                        </size>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>text</name>
-                                        <string>CMP</string>
-                                    </property>
-                                </widget>
-                                <widget>
-                                    <class>QSlider</class>
-                                    <property stdset="1">
-                                        <name>name</name>
-                                        <cstring>slider10</cstring>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>maxValue</name>
-                                        <number>1000</number>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>orientation</name>
-                                        <enum>Horizontal</enum>
-                                    </property>
-                                </widget>
-                                <widget>
-                                    <class>QLineEdit</class>
-                                    <property stdset="1">
-                                        <name>name</name>
-                                        <cstring>edit10</cstring>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>sizePolicy</name>
-                                        <sizepolicy>
-                                            <hsizetype>0</hsizetype>
-                                            <vsizetype>0</vsizetype>
-                                        </sizepolicy>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>maximumSize</name>
-                                        <size>
-                                            <width>40</width>
-                                            <height>22</height>
-                                        </size>
-                                    </property>
-                                </widget>
-                            </hbox>
-                        </widget>
-                        <widget>
-                            <class>QLayoutWidget</class>
-                            <property stdset="1">
-                                <name>name</name>
-                                <cstring>Layout74_3_2</cstring>
-                            </property>
-                            <hbox>
-                                <property stdset="1">
-                                    <name>margin</name>
-                                    <number>0</number>
-                                </property>
-                                <property stdset="1">
-                                    <name>spacing</name>
-                                    <number>6</number>
-                                </property>
-                                <widget>
-                                    <class>QLabel</class>
-                                    <property stdset="1">
-                                        <name>name</name>
-                                        <cstring>comLabel_4_2</cstring>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>minimumSize</name>
-                                        <size>
-                                            <width>25</width>
-                                            <height>0</height>
-                                        </size>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>text</name>
-                                        <string>JMP</string>
-                                    </property>
-                                </widget>
-                                <widget>
-                                    <class>QSlider</class>
-                                    <property stdset="1">
-                                        <name>name</name>
-                                        <cstring>slider11</cstring>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>maxValue</name>
-                                        <number>1000</number>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>orientation</name>
-                                        <enum>Horizontal</enum>
-                                    </property>
-                                </widget>
-                                <widget>
-                                    <class>QLineEdit</class>
-                                    <property stdset="1">
-                                        <name>name</name>
-                                        <cstring>edit11</cstring>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>sizePolicy</name>
-                                        <sizepolicy>
-                                            <hsizetype>0</hsizetype>
-                                            <vsizetype>0</vsizetype>
-                                        </sizepolicy>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>maximumSize</name>
-                                        <size>
-                                            <width>40</width>
-                                            <height>22</height>
-                                        </size>
-                                    </property>
-                                </widget>
-                            </hbox>
-                        </widget>
-                        <widget>
-                            <class>QLayoutWidget</class>
-                            <property stdset="1">
-                                <name>name</name>
-                                <cstring>Layout74_3_5</cstring>
-                            </property>
-                            <hbox>
-                                <property stdset="1">
-                                    <name>margin</name>
-                                    <number>0</number>
-                                </property>
-                                <property stdset="1">
-                                    <name>spacing</name>
-                                    <number>6</number>
-                                </property>
-                                <widget>
-                                    <class>QLabel</class>
-                                    <property stdset="1">
-                                        <name>name</name>
-                                        <cstring>comLabel_4_5</cstring>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>minimumSize</name>
-                                        <size>
-                                            <width>25</width>
-                                            <height>0</height>
-                                        </size>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>text</name>
-                                        <string>JLE</string>
-                                    </property>
-                                </widget>
-                                <widget>
-                                    <class>QSlider</class>
-                                    <property stdset="1">
-                                        <name>name</name>
-                                        <cstring>slider12</cstring>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>maxValue</name>
-                                        <number>1000</number>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>orientation</name>
-                                        <enum>Horizontal</enum>
-                                    </property>
-                                </widget>
-                                <widget>
-                                    <class>QLineEdit</class>
-                                    <property stdset="1">
-                                        <name>name</name>
-                                        <cstring>edit12</cstring>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>sizePolicy</name>
-                                        <sizepolicy>
-                                            <hsizetype>0</hsizetype>
-                                            <vsizetype>0</vsizetype>
-                                        </sizepolicy>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>maximumSize</name>
-                                        <size>
-                                            <width>40</width>
-                                            <height>22</height>
-                                        </size>
-                                    </property>
-                                </widget>
-                            </hbox>
-                        </widget>
-                    </vbox>
-                </widget>
-                <widget>
-                    <class>QLayoutWidget</class>
-                    <property stdset="1">
-                        <name>name</name>
-                        <cstring>Layout28</cstring>
-                    </property>
-                    <property stdset="1">
-                        <name>maximumSize</name>
-                        <size>
-                            <width>130</width>
-                            <height>32767</height>
-                        </size>
-                    </property>
-                    <vbox>
-                        <property stdset="1">
-                            <name>margin</name>
-                            <number>0</number>
-                        </property>
-                        <property stdset="1">
-                            <name>spacing</name>
-                            <number>6</number>
-                        </property>
-                        <widget>
-                            <class>QLayoutWidget</class>
-                            <property stdset="1">
-                                <name>name</name>
-                                <cstring>Layout74_4_2</cstring>
-                            </property>
-                            <hbox>
-                                <property stdset="1">
-                                    <name>margin</name>
-                                    <number>0</number>
-                                </property>
-                                <property stdset="1">
-                                    <name>spacing</name>
-                                    <number>6</number>
-                                </property>
-                                <widget>
-                                    <class>QLabel</class>
-                                    <property stdset="1">
-                                        <name>name</name>
-                                        <cstring>comLabel_5_2</cstring>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>minimumSize</name>
-                                        <size>
-                                            <width>25</width>
-                                            <height>0</height>
-                                        </size>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>text</name>
-                                        <string>JEQ</string>
-                                    </property>
-                                </widget>
-                                <widget>
-                                    <class>QSlider</class>
-                                    <property stdset="1">
-                                        <name>name</name>
-                                        <cstring>slider13</cstring>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>maxValue</name>
-                                        <number>1000</number>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>orientation</name>
-                                        <enum>Horizontal</enum>
-                                    </property>
-                                </widget>
-                                <widget>
-                                    <class>QLineEdit</class>
-                                    <property stdset="1">
-                                        <name>name</name>
-                                        <cstring>edit13</cstring>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>sizePolicy</name>
-                                        <sizepolicy>
-                                            <hsizetype>0</hsizetype>
-                                            <vsizetype>0</vsizetype>
-                                        </sizepolicy>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>maximumSize</name>
-                                        <size>
-                                            <width>40</width>
-                                            <height>22</height>
-                                        </size>
-                                    </property>
-                                </widget>
-                            </hbox>
-                        </widget>
-                        <widget>
-                            <class>QLayoutWidget</class>
-                            <property stdset="1">
-                                <name>name</name>
-                                <cstring>Layout74_5_2</cstring>
-                            </property>
-                            <hbox>
-                                <property stdset="1">
-                                    <name>margin</name>
-                                    <number>0</number>
-                                </property>
-                                <property stdset="1">
-                                    <name>spacing</name>
-                                    <number>6</number>
-                                </property>
-                                <widget>
-                                    <class>QLabel</class>
-                                    <property stdset="1">
-                                        <name>name</name>
-                                        <cstring>comLabel_6_2</cstring>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>minimumSize</name>
-                                        <size>
-                                            <width>25</width>
-                                            <height>0</height>
-                                        </size>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>text</name>
-                                        <string>NOP</string>
-                                    </property>
-                                </widget>
-                                <widget>
-                                    <class>QSlider</class>
-                                    <property stdset="1">
-                                        <name>name</name>
-                                        <cstring>slider14</cstring>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>maxValue</name>
-                                        <number>1000</number>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>orientation</name>
-                                        <enum>Horizontal</enum>
-                                    </property>
-                                </widget>
-                                <widget>
-                                    <class>QLineEdit</class>
-                                    <property stdset="1">
-                                        <name>name</name>
-                                        <cstring>edit14</cstring>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>sizePolicy</name>
-                                        <sizepolicy>
-                                            <hsizetype>0</hsizetype>
-                                            <vsizetype>0</vsizetype>
-                                        </sizepolicy>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>maximumSize</name>
-                                        <size>
-                                            <width>40</width>
-                                            <height>22</height>
-                                        </size>
-                                    </property>
-                                </widget>
-                            </hbox>
-                        </widget>
-                        <widget>
-                            <class>QLayoutWidget</class>
-                            <property stdset="1">
-                                <name>name</name>
-                                <cstring>Layout74_7_2</cstring>
-                            </property>
-                            <hbox>
-                                <property stdset="1">
-                                    <name>margin</name>
-                                    <number>0</number>
-                                </property>
-                                <property stdset="1">
-                                    <name>spacing</name>
-                                    <number>6</number>
-                                </property>
-                                <widget>
-                                    <class>QLabel</class>
-                                    <property stdset="1">
-                                        <name>name</name>
-                                        <cstring>comLabel_8_2</cstring>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>minimumSize</name>
-                                        <size>
-                                            <width>25</width>
-                                            <height>0</height>
-                                        </size>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>text</name>
-                                        <string>LUI</string>
-                                    </property>
-                                </widget>
-                                <widget>
-                                    <class>QSlider</class>
-                                    <property stdset="1">
-                                        <name>name</name>
-                                        <cstring>slider15</cstring>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>maxValue</name>
-                                        <number>1000</number>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>orientation</name>
-                                        <enum>Horizontal</enum>
-                                    </property>
-                                </widget>
-                                <widget>
-                                    <class>QLineEdit</class>
-                                    <property stdset="1">
-                                        <name>name</name>
-                                        <cstring>edit15</cstring>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>sizePolicy</name>
-                                        <sizepolicy>
-                                            <hsizetype>0</hsizetype>
-                                            <vsizetype>0</vsizetype>
-                                        </sizepolicy>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>maximumSize</name>
-                                        <size>
-                                            <width>40</width>
-                                            <height>22</height>
-                                        </size>
-                                    </property>
-                                </widget>
-                            </hbox>
-                        </widget>
-                        <widget>
-                            <class>QLayoutWidget</class>
-                            <property stdset="1">
-                                <name>name</name>
-                                <cstring>Layout74_3_4</cstring>
-                            </property>
-                            <hbox>
-                                <property stdset="1">
-                                    <name>margin</name>
-                                    <number>0</number>
-                                </property>
-                                <property stdset="1">
-                                    <name>spacing</name>
-                                    <number>6</number>
-                                </property>
-                                <widget>
-                                    <class>QLabel</class>
-                                    <property stdset="1">
-                                        <name>name</name>
-                                        <cstring>comLabel_4_4</cstring>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>minimumSize</name>
-                                        <size>
-                                            <width>25</width>
-                                            <height>0</height>
-                                        </size>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>text</name>
-                                        <string>LUS</string>
-                                    </property>
-                                </widget>
-                                <widget>
-                                    <class>QSlider</class>
-                                    <property stdset="1">
-                                        <name>name</name>
-                                        <cstring>slider16</cstring>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>maxValue</name>
-                                        <number>1000</number>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>orientation</name>
-                                        <enum>Horizontal</enum>
-                                    </property>
-                                </widget>
-                                <widget>
-                                    <class>QLineEdit</class>
-                                    <property stdset="1">
-                                        <name>name</name>
-                                        <cstring>edit16</cstring>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>sizePolicy</name>
-                                        <sizepolicy>
-                                            <hsizetype>0</hsizetype>
-                                            <vsizetype>0</vsizetype>
-                                        </sizepolicy>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>maximumSize</name>
-                                        <size>
-                                            <width>40</width>
-                                            <height>22</height>
-                                        </size>
-                                    </property>
-                                </widget>
-                            </hbox>
-                        </widget>
-                        <widget>
-                            <class>QLayoutWidget</class>
-                            <property stdset="1">
-                                <name>name</name>
-                                <cstring>Layout74_3_3</cstring>
-                            </property>
-                            <hbox>
-                                <property stdset="1">
-                                    <name>margin</name>
-                                    <number>0</number>
-                                </property>
-                                <property stdset="1">
-                                    <name>spacing</name>
-                                    <number>6</number>
-                                </property>
-                                <widget>
-                                    <class>QLabel</class>
-                                    <property stdset="1">
-                                        <name>name</name>
-                                        <cstring>comLabel_4_3</cstring>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>minimumSize</name>
-                                        <size>
-                                            <width>25</width>
-                                            <height>0</height>
-                                        </size>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>text</name>
-                                        <string>LUD</string>
-                                    </property>
-                                </widget>
-                                <widget>
-                                    <class>QSlider</class>
-                                    <property stdset="1">
-                                        <name>name</name>
-                                        <cstring>slider17</cstring>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>maxValue</name>
-                                        <number>1000</number>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>orientation</name>
-                                        <enum>Horizontal</enum>
-                                    </property>
-                                </widget>
-                                <widget>
-                                    <class>QLineEdit</class>
-                                    <property stdset="1">
-                                        <name>name</name>
-                                        <cstring>edit17</cstring>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>sizePolicy</name>
-                                        <sizepolicy>
-                                            <hsizetype>0</hsizetype>
-                                            <vsizetype>0</vsizetype>
-                                        </sizepolicy>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>maximumSize</name>
-                                        <size>
-                                            <width>40</width>
-                                            <height>22</height>
-                                        </size>
-                                    </property>
-                                </widget>
-                            </hbox>
-                        </widget>
-                        <widget>
-                            <class>QLayoutWidget</class>
-                            <property stdset="1">
-                                <name>name</name>
-                                <cstring>Layout74_3_3_2</cstring>
-                            </property>
-                            <hbox>
-                                <property stdset="1">
-                                    <name>margin</name>
-                                    <number>0</number>
-                                </property>
-                                <property stdset="1">
-                                    <name>spacing</name>
-                                    <number>6</number>
-                                </property>
-                                <widget>
-                                    <class>QLabel</class>
-                                    <property stdset="1">
-                                        <name>name</name>
-                                        <cstring>comLabel_4_3_2</cstring>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>minimumSize</name>
-                                        <size>
-                                            <width>25</width>
-                                            <height>0</height>
-                                        </size>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>text</name>
-                                        <string>LUM</string>
-                                    </property>
-                                </widget>
-                                <widget>
-                                    <class>QSlider</class>
-                                    <property stdset="1">
-                                        <name>name</name>
-                                        <cstring>slider18</cstring>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>maxValue</name>
-                                        <number>1000</number>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>orientation</name>
-                                        <enum>Horizontal</enum>
-                                    </property>
-                                </widget>
-                                <widget>
-                                    <class>QLineEdit</class>
-                                    <property stdset="1">
-                                        <name>name</name>
-                                        <cstring>edit18</cstring>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>sizePolicy</name>
-                                        <sizepolicy>
-                                            <hsizetype>0</hsizetype>
-                                            <vsizetype>0</vsizetype>
-                                        </sizepolicy>
-                                    </property>
-                                    <property stdset="1">
-                                        <name>maximumSize</name>
-                                        <size>
-                                            <width>40</width>
-                                            <height>22</height>
-                                        </size>
-                                    </property>
-                                </widget>
-                            </hbox>
-                        </widget>
-                    </vbox>
-                </widget>
-            </hbox>
-        </widget>
-    </vbox>
-</widget>
-<tabstops>
+      </item>
+    </layout>
+  </widget>
+  <tabstops>
     <tabstop>programLengthSpinBox</tabstop>
     <tabstop>numVariablesSpinBox</tabstop>
     <tabstop>importButton</tabstop>
@@ -1776,5 +1286,5 @@
     <tabstop>slider15</tabstop>
     <tabstop>slider16</tabstop>
     <tabstop>slider17</tabstop>
-</tabstops>
-</UI>
+  </tabstops>
+</ui>

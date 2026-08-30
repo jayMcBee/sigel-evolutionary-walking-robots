@@ -32,7 +32,7 @@ build and run, because nothing else can be verified without it — see §3.
 | T — old-Qt tool container | **done 2026-08-27.** `tools/qtmig`, §4 |
 | D — delete the shim, migrate the data | **DONE 2026-08-30.** `q2compat.h` and `q2compat_check.cpp` deleted; `include/compat/` gone; **no `Q2*` shim type is used anywhere**. D1–D27. *This is not "no Qt 2 container exists" — the unported GUI modules still declare **71 lines** of `QArray`, `QDict`, `QList`-as-pointer-list and friends, all of which Phase C must convert. See D27.* The shim's self-check step is gone from `check.sh`, which now runs no code. §10 |
 | P — PVM | **DONE 2026-08-28.** Vendored 3.4.3 replaced by upstream 3.4.6; nine patches carry the four config lines and Debian's eight source fixes; `libpvm3.a` and `pvmd3` build; SIGEL's two PVM objects link against them and `SIG_GPPVMData` round-trips through real PVM. `sigel`/`sigel_slave` still need Phase C. §7 |
-| C — GUI | **C1 DONE 2026-08-30**, AUTHORIZED 2026-08-27 per D24. **534 Qt 2 code sites** in the 5 GUI modules, re-measured at C1 with the pattern stated and with every row derived from a sweep of what Qt 6 no longer declares — **up** from 466, because 8 classes this plan had never named account for 89 of them, `QIconSet` alone for 47. 20 forms, 1 converted. §7 |
+| C — GUI | **C1 DONE 2026-08-30**, AUTHORIZED 2026-08-27 per D24. **534 Qt 2 code sites** in the 5 GUI modules, re-measured at C1 with the pattern stated and with every row derived from a sweep of what Qt 6 no longer declares — **up** from 466, because 8 classes this plan had never named account for 89 of them, `QIconSet` alone for 47. **20 forms, all converted (C1, C2).** §7 |
 | V — check against the 1.3 binary | **V1, V5's MDH probe, V6, V7 and V8 all done, all PASS.** Ordering: 10 of 10 container orders match. Arithmetic: `twoBases` exact bit for bit, `octopus` 9/9 with three joints exact and 5 ulp worst. **V6, V7 and V8 done 2026-08-29** — friction and no-collide negotiation, their four remaining rules, and the GP parameter blocks captured *before* their conversion. `verification-against-sigel-1.3/v6`, `v7`, `v8`. V2–V4 not started; V5's sensor and force probes are **invalid as specified** — both target Dynamo-only functions, deleted 2026-08-28. §7 |
 
 **SCOPE — DECIDED 2026-08-23. Read this before changing anything.**
@@ -400,12 +400,13 @@ through `f0f2daa`.
 
 ## 7. Steps
 
-**Exit criterion per step:** `./check.sh` at the repo root — **111 pass, 4 fail,
-309 warnings** as of 2026-08-30, C1 (105/4/309 before it; 322 warnings on
+**Exit criterion per step:** `./check.sh` at the repo root — **198 pass, 4 fail,
+309 warnings** as of 2026-08-30, C2 (105/4/309 before Phase C; 322 warnings on
 2026-08-28 — the drops are recorded per step and each is explained, because a
 step that silently loses a warning has hidden something). The 4 failures are
-exactly the files the Makefile excludes. **The 6 new passes are C1's
-`forms (Phase C)` section**, not new module coverage. It was 118/4/338 until the Dynamo backend was deleted
+exactly the files the Makefile excludes. **The 93 new passes are the
+`forms (Phase C)` section**, six checks over each of the 20 forms — not new
+module coverage. A GUI module still joins `MODULES` only at C3–C7. It was 118/4/338 until the Dynamo backend was deleted
 (`physics_backends.md`); the pass count and "headers standalone" each fall by
 exactly 13, one per deleted file pair, and the failing files are unchanged.
 
@@ -680,7 +681,7 @@ succeeded.**
 **Gates any session must keep green**, all committed:
 
 ```
-./check.sh                                            111 pass, 4 fail
+./check.sh                                            198 pass, 4 fail
 ./dictorder-dump.sh | diff -u dictorder-baseline.txt -    empty
 ./fitness-check.sh  | diff -u fitness-baseline.txt -      empty
 ASAN_OPTIONS=detect_leaks=0 ./fitness-check.sh build      exit 0
@@ -1434,7 +1435,7 @@ review, the full residue is:
 | 9 embedded images in 2 forms | **the dangerous one.** Qt 6's `uic` omits `<images>` and emits `setIcon(QPixmap("image0"))`, which compiles clean and renders a blank button at runtime |
 | **`Line` `orientation`, silently dropped** | `uic3` emits `<widget class="Line" name="X"/>` with no properties, and `orientation` is the only thing Qt 6's `uic` reads to pick a frame shape — so the separator becomes a bare `QFrame`, i.e. `NoFrame`, and paints nothing. **6 `Line` widgets across 3 forms, all 6 affected**: `MT_StatisticsWidgetBase` ×4, `SIG_LanguageParametersBase` ×1, `SIG_GPParameterBase` ×1 (fixed at C1). `check.sh` now counts them |
 | 4 real size constraints, silently dropped | `QLayoutWidget` → `<layout>` discards them: `MT_IndividualWidgetBase` `Layout32`/`Layout33`/`Layout28` lose `maximumSize 130×32767`, `MT_PopulationWidgetBase` `Layout60` loses `minimumSize 200×0` |
-| 11 widgets renamed by Qt 6's `uic` | duplicate names — `tab`→`tab1`… in 5 forms. Breaks any hand-written subclass referring to them |
+| 11 widgets renamed by Qt 6's `uic` | duplicate names — `tab`→`tab1`… in **6** forms, not 5 (measured at C2). Breaks any hand-written subclass referring to them |
 
 Verified preserved: tab order 143/143, combo and list box items 47/47, list view
 columns 15/15, layout margins and spacing 196/196, and all seven property
@@ -1560,7 +1561,7 @@ modules include the headers `uic` generates from them.
 | # | Work | Size |
 |---|---|---|
 | C1 | **DONE 2026-08-30.** `SIG_GPParameterBase`, the only form with both an embedded image and dropped slots. Settles the residue table, the base-class question, and the build and check wiring — see below | 1 form |
-| C2 | The remaining 19 forms | 19 forms |
+| C2 | **DONE 2026-08-30.** The remaining 19 forms. All 20 are Qt 6; 19 of 20 generated headers compile, the 20th blocked on C3 — see below | 19 forms |
 | C3 | `SIGEL_CommonGUI` — carries **all 6** `QGLWidget` sites, 2 in code and 4 in comments, all in `SIG_VisualisationWidget` | 665 LOC, 2 files |
 | C4 | `SIGEL_SlaveGUI` | 2,145 LOC, 5 files |
 | C5 | `SIGEL_Visualisation` — *this row said it carries all 6 `QGLWidget` sites. It carries **none**: measured per module 2026-08-30, all 6 are C3's `SIGEL_CommonGUI`* | 3,544 LOC, 12 files |
@@ -1700,10 +1701,14 @@ all marked in the files:
   it compiles, it lays out, and it draws nothing. Restored here as
   `Qt::Horizontal`, which makes `uic` emit `setFrameShape(HLine)` and
   `setFrameShadow(Sunken)`. **This is a sixth silent-loss category** — Phase T's
-  residue table lists only the 4 dropped size constraints — and there are
-  **5 more `Line` widgets** to come, 4 in `MT_StatisticsWidgetBase` and 1 in
-  `SIG_LanguageParametersBase`. `check.sh` now counts `Line` widgets against
-  `orientation` properties per form, so C2 cannot repeat it.
+  residue table lists only the 4 dropped size constraints. *C2 measured the
+  scope and this paragraph first overstated it: **3 of the 6 `Line` widgets are
+  affected, not 6.** `uic3` keeps an explicit `frameShape` and drops only the
+  then-redundant `orientation`, so only a Line whose Qt 2 form set
+  `orientation` **alone** loses everything — C1's `Line2`,
+  `MT_StatisticsWidgetBase`'s `Line20` and `SIG_LanguageParametersBase`'s
+  `Line1`.* `check.sh` counts `Line` widgets against those carrying **either**
+  property.
 
 **A sorting divergence, measured on both sides.** `listviewHosts`'s four columns
 are all `clickable` in Q3Header, which has no per-column Qt 6 spelling; the
@@ -1824,6 +1829,112 @@ passes are the forms section. Both baselines byte-identical, and
 `ASAN_OPTIONS=detect_leaks=0 ./fitness-check.sh build` reproduces
 `fitness-baseline.txt`. C1 touches no core code; the Makefile change that could
 have reached it is one extra `-I` on `SIGINC`.
+
+#### C2 — the remaining 19 forms, and a property class no check could see
+
+**All 20 forms are Qt 6.** C1's recipe held with no change: `uic3 -convert`
+(plus `-extract` for the one form with images), restore `<slots>` re-spelled to
+the connections, remap the Qt3Support classes and enums, write `uic`'s duplicate
+renames in, then the committed base-class pair per form from `uic3`'s own
+declaration and implementation modes. **17 of the 19 generated headers came out
+byte-identical before and after the hand fixes** — the renames and the
+pixmap-function removal changed only warnings — and the two that moved are
+exactly the two intended: one signal and seven icons.
+
+**THE FINDING: `stdset="0"` decides whether a lost property is loud or silent,
+and 493 property sets were riding on it.** Qt 6's `uic` emits a real setter for
+a property spelled `<property name="x">` and
+`setProperty("x", …)` for one spelled `<property name="x" stdset="0">`. On a
+property Qt 6 does not have, the first is a **compile error** and the second
+**compiles clean, sets a dynamic property nothing reads, and does nothing**.
+The same Qt 2 property proved it both ways in one commit:
+`showSortIndicator` on a `QTreeWidget` is a hard error in
+`SIG_IndividualListBase` and a silent no-op in `MT_PopulationWidgetBase`,
+differing only in that attribute.
+
+**So the attribute is gone: 616 `stdset="0"` removed across the 20 forms**, and
+with it all 493 unchecked `setProperty` calls — every property is now
+compile-checked. That is not a behaviour change for the ones that resolve
+(`setProperty("text", v)` reaches `setText` through the meta-object), and it
+turned the whole silent class loud in one edit. **It immediately found one more
+loss no one had seen: `QLCDNumber::intValue`.**
+
+**One property has to keep `stdset="0"`, and it is the exception that explains
+the rule.** `intValue` **is** a Qt 6 property — `Q_PROPERTY(int intValue READ
+intValue WRITE display)` — but its setter is named `display`, not `setIntValue`,
+so `uic`'s set-plus-capital convention cannot reach it. Measured:
+`setProperty("intValue", 42)` returns **true** and sets it. The rule is
+therefore *"stdset only where the Qt 6 setter is not named `set<Property>`"*,
+not *"stdset is wrong"*.
+
+**Five properties genuinely have no Qt 6 equivalent**, all now removed from the
+forms with the reason recorded here:
+
+| property | on | resolution |
+|---|---|---|
+| `showSortIndicator` ×2 | `Q3ListView` → `QTreeWidget` | **redundant.** Measured: `setSortingEnabled(true)` takes `header()->isSortIndicatorShown()` from 0 to 1, and both views already get it from their clickable columns |
+| `frameShape`, `frameShadow` | `Q3ProgressBar` → `QProgressBar` | Q3ProgressBar was a `QFrame`; Qt 6's `QProgressBar` is not, so it has no frame at all |
+| `margin` | `Q3MultiLineEdit` → `QTextEdit` | no widget-level equivalent; Qt 6 puts it on the document |
+| `undoDepth` | `Q3MultiLineEdit` → `QTextEdit` | gone in Qt 6; the nearest survivor is `undoRedoEnabled`, which is not the same setting |
+
+**A dead signal, found by sweeping rather than by compiling.**
+`SIG_EnvironmentBase` connects `radiobuttonFunction`'s **`stateChanged(int)`** —
+Qt 2's `QButton` had it, Qt 6's `QAbstractButton` does not. String-based connect
+means this **compiles and fails at runtime** with "No such signal", and the
+floor-selection UI would silently stop responding. Now `toggled(bool)`, which
+carries the same information to a no-argument slot. *Every signal and slot in
+all 49 connections was swept against Qt 6 for exactly this; it is the only one.*
+
+**The 7 button icons needed reattaching by hand, unlike C1's.** `uic3 -extract`
+pulled all 8 images out and wrote the `.qrc`, but Qt 4 renamed the widget
+property `pixmap` to `icon`, so `uic3` **dropped it outright** — where C1's was
+on a combo *item* and survived as `<pixmap>`. The mapping was recovered from the
+Qt 2 form. **The eighth image is not a form image at all**: `image7` is the
+Designer palette icon of the custom widget `SIG_SimulationVisualisationWidget`,
+with no runtime effect; it is out of the `.qrc` and deleted, and `check.sh`'s
+reverse resource direction is what flagged it.
+
+**`QDialog` forms take a fourth constructor argument.** `uic3` emits
+`(QWidget*, const char*, bool modal, Qt::WindowFlags)` for the 4 dialog forms,
+and `MT_PopulationWidget.cpp:242` really does call
+`MT_AddIndividualsWidgetBase( this, 0, true )`. Qt 6's `QDialog` has neither
+`name` nor `modal` in its constructor, so the base does
+`QDialog( parent, fl )` then `setObjectName( name )` and `setModal( modal )`.
+
+**Two forms name a class that is not their filename**, which the build has to
+respect: `MT_IndividualWidgetBase.ui` declares `MT_Individual**s**WidgetBase`,
+and `MT_AddIndividualsWidget.ui` declares `MT_AddIndividualsWidget**Base**`. The
+header file is named after the **form**, the class after `<class>` — that is
+what the 2003 includes expect, and `include/MT_GUI/MT_AddIndividualsWidget.h`
+was a **committed 2003 uic output** that this step regenerates for Qt 6.
+
+**Two forms have no consumer, and that is recorded rather than acted on.**
+`MT_ExperimentWidgetBase` is included by nothing — `MT_ExperimentWidget` derives
+straight from `QListView`. It is converted anyway, per D21. *A grep that missed
+it initially used plain `grep`, which is `ugrep -I` and skips the Latin-1/CRLF
+files — §2's trap, hit again inside a script.*
+
+**One form is blocked on C3 and `check.sh` says so instead of failing.**
+`SIG_SimulationWidgetBase` embeds `SIG_SimulationVisualisationWidget`, whose
+header chain reaches `SIGEL_CommonGUI/SIG_VisualisationWidget.h` and its Qt 2
+`#include <qgl.h>`. The form is converted and its `uic`, resource and `Line`
+checks run; the compile and `moc` checks are skipped with the reason printed.
+**A `FORM_LIST` entry can now carry a third field naming the blocking step** —
+without that, C2 would have had to either ship a fifth "known failure" or hide
+the dependency.
+
+**Corrections to Phase T's residue table**, both measured here: the 11 duplicate
+renames are across **6** forms, not 5 (C1's plus five more); and `uic3` reports
+**four** things that are not slot declarations — two `margin` properties it
+cannot map, the `stateChanged` signal, and a `WordBreak` label flag.
+
+**Gates: `./check.sh` 198 pass, 4 fail, 309 warnings.** The 4 failures are still
+exactly the Makefile-excluded files and the warning count has not moved; the
+forms section is **93 pass, 0 fail, 1 documented skip**. Both baselines
+byte-identical, sanitized run clean. Teeth re-verified after the check changed:
+dropping a `Line`'s orientation gives 92/1, and a `.qrc` naming a missing file
+stops `make forms` and reports which checks did not run.
+
 
 ---
 

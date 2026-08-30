@@ -1,39 +1,35 @@
-/****************************************************************************
-** Form interface generated from reading ui file 'MT_AddIndividualsWidget.ui'
-**
-** Created: Tue Mar 25 16:05:10 2003
-**      by:  The User Interface Compiler (uic)
-**
-** WARNING! All changes made in this file will be lost!
-****************************************************************************/
-#ifndef MT_ADDINDIVIDUALSWIDGETBASE_H
-#define MT_ADDINDIVIDUALSWIDGETBASE_H
+/*
+  The form's base class -- PORTING.md Phase C, step C2. See C1 for why this
+  file exists and where its shape comes from: it is Qt 4.8 uic3's declaration
+  mode (`uic3 MT_AddIndividualsWidget.ui`, tools/qtmig), with the Qt 6 adjustments
+  C1 lists. Qt 6's uic emits only Ui::MT_AddIndividualsWidgetBase, a struct with setupUi().
 
-#include <qvariant.h>
-#include <qdialog.h>
-class QVBoxLayout; 
-class QHBoxLayout; 
-class QGridLayout; 
-class QLabel;
-class QPushButton;
-class QSpinBox;
+  Global namespace, as uic generated it in 2003.
+*/
+#ifndef MT_GUI_MT_ADDINDIVIDUALSWIDGET_H
+#define MT_GUI_MT_ADDINDIVIDUALSWIDGET_H
 
-class MT_AddIndividualsWidgetBase : public QDialog
-{ 
+#include "ui_MT_AddIndividualsWidget.h"
+
+#include <QEvent>
+#include <QDialog>
+
+class MT_AddIndividualsWidgetBase : public QDialog, public Ui::MT_AddIndividualsWidgetBase
+{
     Q_OBJECT
 
 public:
-    MT_AddIndividualsWidgetBase( QWidget* parent = 0, const char* name = 0, bool modal = FALSE, WFlags fl = 0 );
-    ~MT_AddIndividualsWidgetBase();
-
-    QLabel* TextLabel1;
-    QSpinBox* spinboxNumber;
-    QPushButton* buttonOk;
-    QPushButton* buttonCancel;
+    MT_AddIndividualsWidgetBase(QWidget* parent = 0, const char* name = 0, bool modal = false, Qt::WindowFlags fl = Qt::WindowFlags());
+    ~MT_AddIndividualsWidgetBase() override;
 
 protected:
-    QGridLayout* MT_AddIndividualsWidgetBaseLayout;
-    QHBoxLayout* Layout1;
+    // Qt 3 called languageChange() itself; Qt 6 has no such hook, so it is
+    // driven from changeEvent -- otherwise the slot below is dead code.
+    void changeEvent( QEvent *e ) override;
+
+protected slots:
+    virtual void languageChange();
+
 };
 
-#endif // MT_ADDINDIVIDUALSWIDGETBASE_H
+#endif // MT_GUI_MT_ADDINDIVIDUALSWIDGET_H

@@ -1,127 +1,100 @@
-<!DOCTYPE UI><UI>
-<class>MT_ExperimentWidgetBase</class>
-<widget>
-    <class>QWidget</class>
-    <property stdset="1">
-        <name>name</name>
-        <cstring>MT_ExperimentWidgetBase</cstring>
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0" stdsetdef="1">
+  <author></author>
+  <comment></comment>
+  <exportmacro></exportmacro>
+  <class>MT_ExperimentWidgetBase</class>
+  <widget class="QWidget" name="MT_ExperimentWidgetBase">
+    <property name="geometry">
+      <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>208</width>
+        <height>280</height>
+      </rect>
     </property>
-    <property>
-        <name>geometry</name>
-        <rect>
-            <x>0</x>
-            <y>0</y>
-            <width>208</width>
-            <height>280</height>
-        </rect>
+    <property name="windowTitle">
+      <string>MTExperiment</string>
     </property>
-    <property>
-        <name>caption</name>
-        <string>MTExperiment</string>
-    </property>
-    <property>
-        <name>layoutMargin</name>
-    </property>
-    <property>
-        <name>layoutSpacing</name>
-    </property>
-    <grid>
-        <property>
-            <name>margin</name>
-            <number>0</number>
-        </property>
-        <property>
-            <name>spacing</name>
-            <number>3</number>
-        </property>
-        <widget row="0"  column="0" >
-            <class>QListView</class>
-            <column>
-                <property>
-                    <name>text</name>
-                    <string>MetaExperiment</string>
-                </property>
-                <property>
-                    <name>clickable</name>
-                    <bool>false</bool>
-                </property>
-                <property>
-                    <name>resizeable</name>
-                    <bool>false</bool>
-                </property>
-            </column>
-        <item>
-            <property>
-                <name>text</name>
-                <string>Strategy</string>
+    <layout class="QGridLayout">
+      <property name="margin">
+        <number>0</number>
+      </property>
+      <property name="spacing">
+        <number>3</number>
+      </property>
+      <item row="0" column="0">
+        <widget class="QTreeWidget" name="MTExperimentListView">
+          <property name="sortingEnabled">
+            <bool>true</bool>
+          </property>
+          <property name="sizePolicy">
+            <sizepolicy>
+              <hsizetype>3</hsizetype>
+              <vsizetype>3</vsizetype>
+            </sizepolicy>
+          </property>
+          <column>
+            <property name="text">
+              <string>MetaExperiment</string>
             </property>
-            <property>
-                <name>pixmap</name>
-                <pixmap></pixmap>
+            <property name="clickable">
+              <bool>false</bool>
             </property>
-        </item>
-        <item>
-            <property>
-                <name>text</name>
-                <string>Individual</string>
+            <property name="resizable">
+              <bool>false</bool>
             </property>
-            <property>
-                <name>pixmap</name>
-                <pixmap></pixmap>
+          </column>
+          <item>
+            <property name="text">
+              <string>Strategy</string>
             </property>
-        </item>
-        <item>
-            <property>
-                <name>text</name>
-                <string>Population</string>
+            <property name="pixmap">
+              <pixmap/>
             </property>
-            <property>
-                <name>pixmap</name>
-                <pixmap></pixmap>
+          </item>
+          <item>
+            <property name="text">
+              <string>Individual</string>
             </property>
-        </item>
-        <item>
-            <property>
-                <name>text</name>
-                <string>GP Parameters</string>
+            <property name="pixmap">
+              <pixmap/>
             </property>
-            <property>
-                <name>pixmap</name>
-                <pixmap></pixmap>
+          </item>
+          <item>
+            <property name="text">
+              <string>Population</string>
             </property>
-        </item>
-        <item>
-            <property>
-                <name>text</name>
-                <string>Selection</string>
+            <property name="pixmap">
+              <pixmap/>
             </property>
-            <property>
-                <name>pixmap</name>
-                <pixmap></pixmap>
+          </item>
+          <item>
+            <property name="text">
+              <string>GP Parameters</string>
             </property>
-        </item>
-        <item>
-            <property>
-                <name>text</name>
-                <string>Statistics</string>
+            <property name="pixmap">
+              <pixmap/>
             </property>
-            <property>
-                <name>pixmap</name>
-                <pixmap></pixmap>
+          </item>
+          <item>
+            <property name="text">
+              <string>Selection</string>
             </property>
-        </item>
-            <property stdset="1">
-                <name>name</name>
-                <cstring>MTExperimentListView</cstring>
+            <property name="pixmap">
+              <pixmap/>
             </property>
-            <property>
-                <name>sizePolicy</name>
-                <sizepolicy>
-                    <hsizetype>3</hsizetype>
-                    <vsizetype>3</vsizetype>
-                </sizepolicy>
+          </item>
+          <item>
+            <property name="text">
+              <string>Statistics</string>
             </property>
+            <property name="pixmap">
+              <pixmap/>
+            </property>
+          </item>
         </widget>
-    </grid>
-</widget>
-</UI>
+      </item>
+    </layout>
+  </widget>
+</ui>

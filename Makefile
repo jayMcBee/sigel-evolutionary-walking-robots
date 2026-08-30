@@ -311,10 +311,27 @@ $(OBJ)/sigel/%.o: $(SRC)/src/%.cpp $(STAMP)
 # class the hand-written subclasses inherit from is a committed source file per
 # form, in the module's own include/ and src/ -- see SIG_GPParameterBase.h.
 #
-# FORMS is the converted ones, not all 20: C1 did one and C2 does the rest, so
-# an unconverted form must not silently be fed to Qt 6's uic.
-FORMS := SIGEL_MasterUI/SIG_GPParameterBase
-QRCS  := SIGEL_MasterUI/SIG_GPParameterBase
+# All 20 are converted as of C2. An unconverted form fed to Qt 6's uic fails
+# loudly (it cannot read the Qt 2 <!DOCTYPE UI> format at all), so this list
+# staying in step with ui/ is checked by the build rather than by inspection.
+FORMS :=  MT_UI/MT_AddConstantsWidgetBase MT_UI/MT_AddIndividualsWidget \
+            MT_UI/MT_EstimationWidgetBase MT_UI/MT_ExperimentWidgetBase \
+            MT_UI/MT_IndividualWidgetBase MT_UI/MT_PopulationWidgetBase \
+            MT_UI/MT_SearchWidgetBase MT_UI/MT_SelectionWidgetBase \
+            MT_UI/MT_StatisticsWidgetBase \
+            SIGEL_MasterUI/SIG_EditHostDialogBase \
+            SIGEL_MasterUI/SIG_EnvironmentBase \
+            SIGEL_MasterUI/SIG_ExperimentViewBase \
+            SIGEL_MasterUI/SIG_GPParameterBase \
+            SIGEL_MasterUI/SIG_IndividualListBase \
+            SIGEL_MasterUI/SIG_IndividualViewBase \
+            SIGEL_MasterUI/SIG_LanguageParametersBase \
+            SIGEL_MasterUI/SIG_RobotBase \
+            SIGEL_MasterUI/SIG_SimulationParameterBase \
+            SIGEL_SlaveUI/SIG_MovieSettingsDialogBase \
+            SIGEL_SlaveUI/SIG_SimulationWidgetBase
+QRCS  :=  SIGEL_MasterUI/SIG_GPParameterBase \
+            SIGEL_SlaveUI/SIG_SimulationWidgetBase
 
 UI_HDRS  := $(patsubst %,$(B)/ui/ui_%.h,$(notdir $(FORMS)))
 QRC_OBJS := $(patsubst %,$(OBJ)/qrc/%.o,$(notdir $(QRCS)))

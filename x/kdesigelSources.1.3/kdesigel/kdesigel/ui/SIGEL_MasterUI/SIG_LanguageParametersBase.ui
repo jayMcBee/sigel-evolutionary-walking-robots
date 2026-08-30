@@ -1,446 +1,315 @@
-<!DOCTYPE UI><UI>
-<class>SIG_LanguageParametersBase</class>
-<widget>
-    <class>QWidget</class>
-    <property stdset="1">
-        <name>name</name>
-        <cstring>SIG_LanguageParametersBase</cstring>
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0" stdsetdef="1">
+  <author></author>
+  <comment></comment>
+  <exportmacro></exportmacro>
+  <class>SIG_LanguageParametersBase</class>
+  <widget class="QWidget" name="SIG_LanguageParametersBase">
+    <property name="geometry">
+      <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>397</width>
+        <height>347</height>
+      </rect>
     </property>
-    <property stdset="1">
-        <name>geometry</name>
-        <rect>
-            <x>0</x>
-            <y>0</y>
-            <width>397</width>
-            <height>347</height>
-        </rect>
+    <property name="windowTitle">
+      <string>Language Parameters</string>
     </property>
-    <property stdset="1">
-        <name>caption</name>
-        <string>Language Parameters</string>
-    </property>
-    <vbox>
-        <property stdset="1">
-            <name>margin</name>
-            <number>11</number>
-        </property>
-        <property stdset="1">
-            <name>spacing</name>
+    <layout class="QVBoxLayout">
+      <property name="margin">
+        <number>11</number>
+      </property>
+      <property name="spacing">
+        <number>6</number>
+      </property>
+      <item>
+        <widget class="QGroupBox" name="groupboxCommand">
+          <property name="title">
+            <string>Commands</string>
+          </property>
+          <layout class="QHBoxLayout">
+            <property name="margin">
+              <number>11</number>
+            </property>
+            <property name="spacing">
+              <number>6</number>
+            </property>
+            <item>
+              <widget class="QTreeWidget" name="listviewCommands">
+          <property name="sortingEnabled">
+            <bool>true</bool>
+          </property>
+                <property name="selectionMode">
+                  <enum>QAbstractItemView::ExtendedSelection</enum>
+                </property>
+                <property name="allColumnsShowFocus">
+                  <bool>true</bool>
+                </property>
+                <column>
+                  <property name="text">
+                    <string>Allowed</string>
+                  </property>
+                </column>
+                <column>
+                  <property name="text">
+                    <string>Command</string>
+                  </property>
+                </column>
+                <column>
+                  <property name="text">
+                    <string>Duration</string>
+                  </property>
+                </column>
+              </widget>
+            </item>
+            <item>
+              <layout class="QVBoxLayout">
+                <property name="margin">
+                  <number>0</number>
+                </property>
+                <property name="spacing">
+                  <number>6</number>
+                </property>
+                <item>
+                  <widget class="QPushButton" name="pushbuttonEdit">
+                    <property name="text">
+                      <string>Edit</string>
+                    </property>
+                  </widget>
+                </item>
+                <item>
+                  <widget class="Line" name="Line1">
+          <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+          </property>
+        </widget>
+                </item>
+                <item>
+                  <widget class="QPushButton" name="pushbuttonAllowAll">
+                    <property name="text">
+                      <string>Allow All</string>
+                    </property>
+                  </widget>
+                </item>
+                <item>
+                  <widget class="QPushButton" name="pushbuttonDisallowAll">
+                    <property name="text">
+                      <string>Disallow All</string>
+                    </property>
+                  </widget>
+                </item>
+                <item>
+                  <spacer name="Spacer2">
+                    <property name="sizeHint">
+                      <size>
+                        <width>20</width>
+                        <height>20</height>
+                      </size>
+                    </property>
+                    <property name="sizeType">
+                      <enum>QSizePolicy::Expanding</enum>
+                    </property>
+                    <property name="orientation">
+                      <enum>Qt::Vertical</enum>
+                    </property>
+                  </spacer>
+                </item>
+              </layout>
+            </item>
+          </layout>
+        </widget>
+      </item>
+      <item>
+        <layout class="QHBoxLayout">
+          <property name="margin">
+            <number>0</number>
+          </property>
+          <property name="spacing">
             <number>6</number>
-        </property>
-        <widget>
-            <class>QGroupBox</class>
-            <property stdset="1">
-                <name>name</name>
-                <cstring>groupboxCommand</cstring>
-            </property>
-            <property stdset="1">
-                <name>title</name>
-                <string>Commands</string>
-            </property>
-            <hbox>
-                <property stdset="1">
-                    <name>margin</name>
-                    <number>11</number>
+          </property>
+          <item>
+            <widget class="QGroupBox" name="groupboxRegisters">
+              <property name="title">
+                <string>Registers</string>
+              </property>
+              <layout class="QGridLayout">
+                <property name="margin">
+                  <number>11</number>
                 </property>
-                <property stdset="1">
-                    <name>spacing</name>
-                    <number>6</number>
+                <property name="spacing">
+                  <number>6</number>
                 </property>
-                <widget>
-                    <class>QListView</class>
-                    <column>
-                        <property>
-                            <name>text</name>
-                            <string>Allowed</string>
-                        </property>
-                        <property>
-                            <name>clickable</name>
-                            <bool>true</bool>
-                        </property>
-                        <property>
-                            <name>resizeable</name>
-                            <bool>true</bool>
-                        </property>
-                    </column>
-                    <column>
-                        <property>
-                            <name>text</name>
-                            <string>Command</string>
-                        </property>
-                        <property>
-                            <name>clickable</name>
-                            <bool>true</bool>
-                        </property>
-                        <property>
-                            <name>resizeable</name>
-                            <bool>true</bool>
-                        </property>
-                    </column>
-                    <column>
-                        <property>
-                            <name>text</name>
-                            <string>Duration</string>
-                        </property>
-                        <property>
-                            <name>clickable</name>
-                            <bool>true</bool>
-                        </property>
-                        <property>
-                            <name>resizeable</name>
-                            <bool>true</bool>
-                        </property>
-                    </column>
-                    <property stdset="1">
-                        <name>name</name>
-                        <cstring>listviewCommands</cstring>
+                <item row="0" column="0">
+                  <widget class="QLabel" name="textlabelNumberOfRegisters">
+                    <property name="text">
+                      <string>Number of registers:</string>
                     </property>
-                    <property stdset="1">
-                        <name>selectionMode</name>
-                        <enum>Extended</enum>
+                    <property name="wordWrap">
+                      <bool>false</bool>
                     </property>
-                    <property stdset="1">
-                        <name>allColumnsShowFocus</name>
-                        <bool>true</bool>
+                  </widget>
+                </item>
+                <item row="1" column="0">
+                  <widget class="QLabel" name="textlabelRegisterWidth">
+                    <property name="text">
+                      <string>Register width:</string>
                     </property>
-                </widget>
-                <widget>
-                    <class>QLayoutWidget</class>
-                    <property stdset="1">
-                        <name>name</name>
-                        <cstring>Layout4</cstring>
+                    <property name="wordWrap">
+                      <bool>false</bool>
                     </property>
-                    <vbox>
-                        <property stdset="1">
-                            <name>margin</name>
-                            <number>0</number>
-                        </property>
-                        <property stdset="1">
-                            <name>spacing</name>
-                            <number>6</number>
-                        </property>
-                        <widget>
-                            <class>QPushButton</class>
-                            <property stdset="1">
-                                <name>name</name>
-                                <cstring>pushbuttonEdit</cstring>
-                            </property>
-                            <property stdset="1">
-                                <name>text</name>
-                                <string>Edit</string>
-                            </property>
-                        </widget>
-                        <widget>
-                            <class>Line</class>
-                            <property stdset="1">
-                                <name>name</name>
-                                <cstring>Line1</cstring>
-                            </property>
-                            <property stdset="1">
-                                <name>orientation</name>
-                                <enum>Horizontal</enum>
-                            </property>
-                        </widget>
-                        <widget>
-                            <class>QPushButton</class>
-                            <property stdset="1">
-                                <name>name</name>
-                                <cstring>pushbuttonAllowAll</cstring>
-                            </property>
-                            <property stdset="1">
-                                <name>text</name>
-                                <string>Allow All</string>
-                            </property>
-                        </widget>
-                        <widget>
-                            <class>QPushButton</class>
-                            <property stdset="1">
-                                <name>name</name>
-                                <cstring>pushbuttonDisallowAll</cstring>
-                            </property>
-                            <property stdset="1">
-                                <name>text</name>
-                                <string>Disallow All</string>
-                            </property>
-                        </widget>
-                        <spacer>
-                            <property>
-                                <name>name</name>
-                                <cstring>Spacer2</cstring>
-                            </property>
-                            <property stdset="1">
-                                <name>orientation</name>
-                                <enum>Vertical</enum>
-                            </property>
-                            <property stdset="1">
-                                <name>sizeType</name>
-                                <enum>Expanding</enum>
-                            </property>
-                            <property>
-                                <name>sizeHint</name>
-                                <size>
-                                    <width>20</width>
-                                    <height>20</height>
-                                </size>
-                            </property>
-                        </spacer>
-                    </vbox>
-                </widget>
-            </hbox>
-        </widget>
-        <widget>
-            <class>QLayoutWidget</class>
-            <property stdset="1">
-                <name>name</name>
-                <cstring>Layout5</cstring>
-            </property>
-            <hbox>
-                <property stdset="1">
-                    <name>margin</name>
-                    <number>0</number>
+                  </widget>
+                </item>
+                <item row="0" column="1">
+                  <widget class="QSpinBox" name="spinboxNumberOfRegisters">
+                    <property name="maximum">
+                      <number>32000</number>
+                    </property>
+                    <property name="minimum">
+                      <number>1</number>
+                    </property>
+                    <property name="value">
+                      <number>8</number>
+                    </property>
+                  </widget>
+                </item>
+                <item row="1" column="1">
+                  <widget class="QSpinBox" name="spinboxRegisterWidth">
+                    <property name="suffix">
+                      <string> bit</string>
+                    </property>
+                    <property name="minimum">
+                      <number>1</number>
+                    </property>
+                    <property name="value">
+                      <number>32</number>
+                    </property>
+                  </widget>
+                </item>
+              </layout>
+            </widget>
+          </item>
+          <item>
+            <widget class="QGroupBox" name="groupboxConstraints">
+              <property name="title">
+                <string>Constraints</string>
+              </property>
+              <layout class="QVBoxLayout">
+                <property name="margin">
+                  <number>11</number>
                 </property>
-                <property stdset="1">
-                    <name>spacing</name>
-                    <number>6</number>
+                <property name="spacing">
+                  <number>6</number>
                 </property>
-                <widget>
-                    <class>QGroupBox</class>
-                    <property stdset="1">
-                        <name>name</name>
-                        <cstring>groupboxRegisters</cstring>
+                <item>
+                  <widget class="QLabel" name="textlabelMaxDelayTime">
+                    <property name="text">
+                      <string>Max. delay:</string>
                     </property>
-                    <property stdset="1">
-                        <name>title</name>
-                        <string>Registers</string>
+                    <property name="wordWrap">
+                      <bool>false</bool>
                     </property>
-                    <grid>
-                        <property stdset="1">
-                            <name>margin</name>
-                            <number>11</number>
-                        </property>
-                        <property stdset="1">
-                            <name>spacing</name>
-                            <number>6</number>
-                        </property>
-                        <widget row="0"  column="0" >
-                            <class>QLabel</class>
-                            <property stdset="1">
-                                <name>name</name>
-                                <cstring>textlabelNumberOfRegisters</cstring>
-                            </property>
-                            <property stdset="1">
-                                <name>text</name>
-                                <string>Number of registers:</string>
-                            </property>
-                        </widget>
-                        <widget row="1"  column="0" >
-                            <class>QLabel</class>
-                            <property stdset="1">
-                                <name>name</name>
-                                <cstring>textlabelRegisterWidth</cstring>
-                            </property>
-                            <property stdset="1">
-                                <name>text</name>
-                                <string>Register width:</string>
-                            </property>
-                        </widget>
-                        <widget row="0"  column="1" >
-                            <class>QSpinBox</class>
-                            <property stdset="1">
-                                <name>name</name>
-                                <cstring>spinboxNumberOfRegisters</cstring>
-                            </property>
-                            <property stdset="1">
-                                <name>maxValue</name>
-                                <number>32000</number>
-                            </property>
-                            <property stdset="1">
-                                <name>minValue</name>
-                                <number>1</number>
-                            </property>
-                            <property stdset="1">
-                                <name>value</name>
-                                <number>8</number>
-                            </property>
-                        </widget>
-                        <widget row="1"  column="1" >
-                            <class>QSpinBox</class>
-                            <property stdset="1">
-                                <name>name</name>
-                                <cstring>spinboxRegisterWidth</cstring>
-                            </property>
-                            <property stdset="1">
-                                <name>suffix</name>
-                                <string> bit</string>
-                            </property>
-                            <property stdset="1">
-                                <name>minValue</name>
-                                <number>1</number>
-                            </property>
-                            <property stdset="1">
-                                <name>value</name>
-                                <number>32</number>
-                            </property>
-                        </widget>
-                    </grid>
-                </widget>
-                <widget>
-                    <class>QGroupBox</class>
-                    <property stdset="1">
-                        <name>name</name>
-                        <cstring>groupboxConstraints</cstring>
+                  </widget>
+                </item>
+                <item>
+                  <widget class="QSpinBox" name="spinboxMaximalDelayTime">
+                    <property name="suffix">
+                      <string> msec</string>
                     </property>
-                    <property stdset="1">
-                        <name>title</name>
-                        <string>Constraints</string>
+                    <property name="maximum">
+                      <number>64000</number>
                     </property>
-                    <vbox>
-                        <property stdset="1">
-                            <name>margin</name>
-                            <number>11</number>
-                        </property>
-                        <property stdset="1">
-                            <name>spacing</name>
-                            <number>6</number>
-                        </property>
-                        <widget>
-                            <class>QLabel</class>
-                            <property stdset="1">
-                                <name>name</name>
-                                <cstring>textlabelMaxDelayTime</cstring>
-                            </property>
-                            <property stdset="1">
-                                <name>text</name>
-                                <string>Max. delay:</string>
-                            </property>
-                        </widget>
-                        <widget>
-                            <class>QSpinBox</class>
-                            <property stdset="1">
-                                <name>name</name>
-                                <cstring>spinboxMaximalDelayTime</cstring>
-                            </property>
-                            <property stdset="1">
-                                <name>suffix</name>
-                                <string> msec</string>
-                            </property>
-                            <property stdset="1">
-                                <name>maxValue</name>
-                                <number>64000</number>
-                            </property>
-                            <property stdset="1">
-                                <name>value</name>
-                                <number>5000</number>
-                            </property>
-                        </widget>
-                    </vbox>
-                </widget>
-                <spacer>
-                    <property>
-                        <name>name</name>
-                        <cstring>Spacer3</cstring>
+                    <property name="value">
+                      <number>5000</number>
                     </property>
-                    <property stdset="1">
-                        <name>orientation</name>
-                        <enum>Horizontal</enum>
-                    </property>
-                    <property stdset="1">
-                        <name>sizeType</name>
-                        <enum>Expanding</enum>
-                    </property>
-                    <property>
-                        <name>sizeHint</name>
-                        <size>
-                            <width>20</width>
-                            <height>20</height>
-                        </size>
-                    </property>
-                </spacer>
-            </hbox>
-        </widget>
-        <widget>
-            <class>QLayoutWidget</class>
-            <property stdset="1">
-                <name>name</name>
-                <cstring>Layout2</cstring>
-            </property>
-            <hbox>
-                <property stdset="1">
-                    <name>margin</name>
-                    <number>0</number>
-                </property>
-                <property stdset="1">
-                    <name>spacing</name>
-                    <number>6</number>
-                </property>
-                <spacer>
-                    <property>
-                        <name>name</name>
-                        <cstring>Spacer1</cstring>
-                    </property>
-                    <property stdset="1">
-                        <name>orientation</name>
-                        <enum>Horizontal</enum>
-                    </property>
-                    <property stdset="1">
-                        <name>sizeType</name>
-                        <enum>Expanding</enum>
-                    </property>
-                    <property>
-                        <name>sizeHint</name>
-                        <size>
-                            <width>20</width>
-                            <height>20</height>
-                        </size>
-                    </property>
-                </spacer>
-                <widget>
-                    <class>QPushButton</class>
-                    <property stdset="1">
-                        <name>name</name>
-                        <cstring>pushbuttonImport</cstring>
-                    </property>
-                    <property stdset="1">
-                        <name>text</name>
-                        <string>Import</string>
-                    </property>
-                </widget>
-                <widget>
-                    <class>QPushButton</class>
-                    <property stdset="1">
-                        <name>name</name>
-                        <cstring>pushbuttonExport</cstring>
-                    </property>
-                    <property stdset="1">
-                        <name>text</name>
-                        <string>Export</string>
-                    </property>
-                </widget>
-            </hbox>
-        </widget>
-    </vbox>
-</widget>
-<connections>
+                  </widget>
+                </item>
+              </layout>
+            </widget>
+          </item>
+          <item>
+            <spacer name="Spacer3">
+              <property name="sizeHint">
+                <size>
+                  <width>20</width>
+                  <height>20</height>
+                </size>
+              </property>
+              <property name="sizeType">
+                <enum>QSizePolicy::Expanding</enum>
+              </property>
+              <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+              </property>
+            </spacer>
+          </item>
+        </layout>
+      </item>
+      <item>
+        <layout class="QHBoxLayout">
+          <property name="margin">
+            <number>0</number>
+          </property>
+          <property name="spacing">
+            <number>6</number>
+          </property>
+          <item>
+            <spacer name="Spacer1">
+              <property name="sizeHint">
+                <size>
+                  <width>20</width>
+                  <height>20</height>
+                </size>
+              </property>
+              <property name="sizeType">
+                <enum>QSizePolicy::Expanding</enum>
+              </property>
+              <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+              </property>
+            </spacer>
+          </item>
+          <item>
+            <widget class="QPushButton" name="pushbuttonImport">
+              <property name="text">
+                <string>Import</string>
+              </property>
+            </widget>
+          </item>
+          <item>
+            <widget class="QPushButton" name="pushbuttonExport">
+              <property name="text">
+                <string>Export</string>
+              </property>
+            </widget>
+          </item>
+        </layout>
+      </item>
+    </layout>
+  </widget>
+  <slots>
+    <slot>slotPushButtonDisallowAllClicked()</slot>
+    <slot>slotPushButtonAllowAllClicked()</slot>
+    <slot>slotPushButtonEditClicked()</slot>
+  </slots>
+  <connections>
     <connection>
-        <sender>pushbuttonEdit</sender>
-        <signal>clicked()</signal>
-        <receiver>SIG_LanguageParametersBase</receiver>
-        <slot>slotPushButtonEditClicked()</slot>
+      <sender>pushbuttonEdit</sender>
+      <signal>clicked()</signal>
+      <receiver>SIG_LanguageParametersBase</receiver>
+      <slot>slotPushButtonEditClicked()</slot>
     </connection>
     <connection>
-        <sender>pushbuttonAllowAll</sender>
-        <signal>clicked()</signal>
-        <receiver>SIG_LanguageParametersBase</receiver>
-        <slot>slotPushButtonAllowAllClicked()</slot>
+      <sender>pushbuttonAllowAll</sender>
+      <signal>clicked()</signal>
+      <receiver>SIG_LanguageParametersBase</receiver>
+      <slot>slotPushButtonAllowAllClicked()</slot>
     </connection>
     <connection>
-        <sender>pushbuttonDisallowAll</sender>
-        <signal>clicked()</signal>
-        <receiver>SIG_LanguageParametersBase</receiver>
-        <slot>slotPushButtonDisallowAllClicked()</slot>
+      <sender>pushbuttonDisallowAll</sender>
+      <signal>clicked()</signal>
+      <receiver>SIG_LanguageParametersBase</receiver>
+      <slot>slotPushButtonDisallowAllClicked()</slot>
     </connection>
-    <slot access="public">slotPushButtonDisallowAllClicked()</slot>
-    <slot access="public">slotPushButtonAllowAllClicked()</slot>
-    <slot access="public">slotPushButtonEditClicked()</slot>
-</connections>
-</UI>
+  </connections>
+</ui>
