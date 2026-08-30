@@ -1871,6 +1871,53 @@ clamp to ±90 (`:190-196`), and `(angle + 90) / 180` (`:197`). *The DynaMo
 function's `360 - angle` reflex wrap and its `pi = 4*atan(1)` idiom belong to
 the dead backend and are not ours to reproduce.*
 
+#### The `±DBL_MAX` sentinel cannot survive a save, in 1.3 or here
+
+The live `sense` references **eight** constants, not the five first recorded
+here: `2.0`, `-DBL_MAX`, `+DBL_MAX`, the truncated-π factor, `360.0`, `90.0`,
+`-90.0`, `180.0`. *The first list was truncated by a `head` and reported as
+complete — the same failure as the disassembly windows, in the same exchange
+that tabulated it.*
+
+**The pair is an unbounded-joint sentinel, not a min/max search seed**
+(`SIG_DynaMechsSimulationQueries.cpp:122`):
+
+```cpp
+if ( (minPos == (- DBL_MAX)) && (maxPos == DBL_MAX) )
+  posRange = 1;
+else
+  { posRange = maxPos - minPos;  /* and q is clamped to [minPos, maxPos] */ }
+```
+
+So the usual hazard of replacing a seed with `numeric_limits<double>::min()` —
+the smallest *positive* normal — does not arise. What does arise is worse:
+
+**The sentinel is compared with `==`, and it cannot round-trip through the file
+format.** `minPos`/`maxPos` come from `SIG_Joint::getMechsMinPos/MaxPos`, whose
+values are read from the model file (`SIG_Joint.cpp:64`). Measured:
+
+    DBL_MAX written by our stream : 1.79769e+308
+    read back                     : 1.7976900000000001e+308
+    DBL_MAX                       : 1.7976931348623157e+308
+    round-trips to == DBL_MAX ?   : NO
+
+At `%g` precision 6 the sentinel loses 11 significant digits, so **a joint saved
+as unbounded and reloaded is no longer recognised as unbounded**: `posRange`
+becomes `3.6e+308` instead of `1`, and `q` is clamped to a nonsense interval.
+
+**This is 1.3's defect, reproduced exactly, not one the port introduces.** 1.3
+writes with the same `%g` at precision 6 (§ the fourth-family finding) and makes
+the same `==` comparison against the same two constants at `0x81ec310` and
+`0x81ec318`. **Latent in both**: `grep` finds `1.79769e+308` in **no** shipped
+`.exp` or `.rrb`, so no distributed model has an unbounded joint to lose.
+
+**Do not "fix" it.** The three tempting repairs all change behaviour against the
+reference: widening the write precision alters every number in every file;
+replacing `==` with a threshold test changes which joints count as unbounded;
+and swapping the sentinel changes the file format. `numeric_limits<double>::lowest()`
+and `-numeric_limits<double>::max()` are both exactly `-DBL_MAX` and would be
+safe substitutions *if* one were ever wanted — `-INFINITY` and `min()` are not.
+
 #### The one gap that is structural: 80-bit intermediates in `moveDrive`
 
 **`SIG_DynaMechsCommandInterface::moveDrive` holds its intermediates in
