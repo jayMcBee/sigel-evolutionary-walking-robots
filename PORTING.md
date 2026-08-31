@@ -409,8 +409,8 @@ through `f0f2daa`.
 
 ## 7. Steps
 
-**Exit criterion per step:** `./check.sh` at the repo root — **217 pass, 4 fail,
-341 warnings** as of 2026-08-30, C3 (203/4/309 at C2; the rise is
+**Exit criterion per step:** `./check.sh` at the repo root — **227 pass, 4 fail,
+355 warnings** as of 2026-08-31, C4 (203/4/309 at C2; the rise is
 `SIGEL_Visualisation` 22 + `SIGEL_CommonGUI` 10, both newly covered) (105/4/309 before Phase C; 322 warnings on
 2026-08-28 — the drops are recorded per step and each is explained, because a
 step that silently loses a warning has hidden something). The 4 failures are
@@ -697,7 +697,7 @@ succeeded.**
 **Gates any session must keep green**, all committed:
 
 ```
-./check.sh                                            217 pass, 4 fail
+./check.sh                                            227 pass, 4 fail
 ./dictorder-dump.sh | diff -u dictorder-baseline.txt -    empty
 ./fitness-check.sh  | diff -u fitness-baseline.txt -      empty
 ASAN_OPTIONS=detect_leaks=0 ./fitness-check.sh build      exit 0
@@ -1581,7 +1581,7 @@ modules include the headers `uic` generates from them.
 | C1 | **DONE 2026-08-30.** `SIG_GPParameterBase`, the only form with both an embedded image and dropped slots. Settles the residue table, the base-class question, and the build and check wiring — see below | 1 form |
 | C2 | **DONE 2026-08-30.** The remaining 19 forms. All 20 are Qt 6; 19 of 20 generated headers compile, the 20th blocked on C3 — see below | 19 forms |
 | C3 | **DONE 2026-08-30.** `SIGEL_CommonGUI` — the `QGLWidget` → `QOpenGLWidget` step; all 6 sites are here, 2 in code. In `check.sh` | 665 LOC, 2 sources |
-| C4 | `SIGEL_SlaveGUI` | 2,145 LOC, 5 files |
+| C4 | **DONE 2026-08-31.** `SIGEL_SlaveGUI` — the toolbar, the movie path, and a `QActionGroup` that would have been silently empty. Unblocks the last form | 2,344 LOC, 7 sources |
 | C5 | **DONE 2026-08-30, done FIRST — it is the dependency root.** `SIGEL_Visualisation`, 23 Qt 2 sites, 12/12 sources and headers compile, in `check.sh` | 3,564 LOC, 12 sources |
 | C6 | `MT_GUI` | 3,911 LOC, 14 files |
 | C7 | `SIGEL_MasterGUI` | 7,717 LOC, 20 files |
@@ -2264,6 +2264,98 @@ same Makefile-excluded files. **Warnings rise 309 → 341, and the arithmetic is
 exact**: `SIGEL_Visualisation` 22 + `SIGEL_CommonGUI` 10, both newly covered;
 nothing in previously covered code moved. Both baselines byte-identical,
 sanitized run clean.
+
+
+#### C4 — `SIGEL_SlaveGUI`: the toolbar, the movie path, and a silently empty group
+
+16 files, 2,344 LOC, **30 Qt 2 code sites** plus 27 Qt 2 `<q*.h>` includes. It
+unblocks the last form: `SIG_SimulationWidgetBase` now compiles, so the
+`forms` section runs all seven checks on all 20.
+
+**THE FINDING: Qt 2's `QAction` added ITSELF to a `QActionGroup` parent, and
+Qt 6's does not.** `qaction.cpp`'s `QAction::init()` is
+
+```cpp
+if ( parent() && parent()->inherits("QActionGroup") )
+    ((QActionGroup*) parent())->insert( this );   // insert into action group
+```
+
+`SIG_SimulationControls` **is** a `QActionGroup` and builds its seven actions as
+`new QAction( this, "…" )`, never calling `insert`. In Qt 6 that only sets the
+parent, so `actions()` comes back **empty** and
+`QActionGroup::addTo(toolbar)` — which becomes
+`toolbar->addActions( group->actions() )` — adds nothing. **The window would
+render with an empty toolbar**: compiles, links, runs, no buttons. An explicit
+`addAction` per action restores it.
+
+*Exclusivity is not a second hazard here, checked rather than assumed: Qt 6's
+`QActionGroup` is exclusive by default and Qt 2's took the flag as a
+constructor argument, but **no action in this group is checkable**, and the
+policy only applies to checkable actions.*
+
+**The movie path: `QPixmap::grabWindow` is gone, and its replacement changes
+which frame is recorded.** Qt 6 removed it; for a `QOpenGLWidget` it was wrong
+anyway, since it read the window's on-screen pixels while the widget now
+renders into an FBO. The equivalent is `grabFramebuffer()`, so the pixmap
+becomes a `QImage` and `QWMatrix`/`xForm` become `QTransform`/`transformed`.
+
+**The behaviour change is forced, not chosen, and is recorded because nothing
+can see it.** Every caller runs `makeTimeSteps(n); update();` and the grab
+happens **inside** `makeTimeSteps` — so 1.3 captured the *last presented* frame
+while the simulation already stood one step further, i.e. frame N−1.
+`grabFramebuffer()` renders current content, so Qt 6 records frame N. It removes
+a one-frame lag that no like-for-like port could have kept. **This is the raster
+path only** — `fileFormat == "pov"` takes a different branch, and per the x86
+box the POV export is what produced every published film.
+
+*`updateGL()` → `update()` is safe here for the same reason: the grab precedes
+the repaint in every caller, so making the repaint deferred does not change
+which frame is grabbed.* 15 sites.
+
+| other Qt 2 API | Qt 6 |
+|---|---|
+| `QIconSet` ×18, `setPixmap(file, QIconSet::Large)` ×8, `setIconSet` ×13 | `QIcon`, `addFile(file)`, `setIcon` |
+| `QMainWindow::setUsesBigPixmaps(true)` | `setIconSize( QSize(25,25) )` — **measured from the XPMs**, seven at 25×25 and `quitApplicationSmall` at 24×24, not chosen |
+| `setUsesTextLabel(false)` | `setToolButtonStyle( Qt::ToolButtonIconOnly )` |
+| `setDockEnabled( Left/Right/Bottom, false )` | no per-window equivalent; it is per toolbar now — `setAllowedAreas( Qt::TopToolBarArea )`, since only Top was left enabled |
+| `QAction`/`QToolBar`/`QTimer`/`QMainWindow` `(parent, name)` ctors | `(parent)` + `setObjectName` |
+| `QFileDialog::getExistingDirectory( dir, parent, name, caption, dirOnly )` | `( parent, caption, dir, ShowDirsOnly )` — every argument survives but the widget `name` |
+| `QComboBox::setCurrentItem` ×6, `QString::lower`, `QTimer::changeInterval` | `setCurrentIndex`, `toLower`, `setInterval` |
+| `QButton::Off` / `NoChange` / `On`, `state()` | `Qt::Unchecked` / `PartiallyChecked` / `Checked`, `checkState()` |
+
+**That last row independently confirms C3's tristate reading.** The handler
+switches on the checkbox and maps the three states to 0/1/2 explicitly, so the
+enum's numeric values never mattered; and `showAncorPointsState == 2`, which is
+what shows the floating labels, is `QButton::On` — fully checked. C3 read that
+off the form's `tristate` property; this reads it off the handler.
+
+**A defect preserved, and it is why the module gains a warning.**
+`callRenderPixMap` assigns `res` from `save()` and then `return true`
+unconditionally, so a failed frame write is reported as success and the caller's
+`QMessageBox` and recording-stop are dead code. `-Wunused-but-set-variable` is
+the compiler saying exactly that. Not fixed: it changes behaviour against 1.3 on
+a path nothing here can exercise.
+
+**A mistake of mine worth recording, because it is the same shape as the ones
+review keeps finding.** The regex that rewrote `new QAction( this, "x" )` into
+three lines matched a **commented-out** line and expanded it into one commented
+line plus two live ones — dereferencing an uninitialised `recordAction`. Caught
+by reading the output rather than by the compiler, which would have accepted it.
+*A pattern applied to source that does not know what a comment is.*
+
+**`check.sh` had to be restructured, and the bug it fixes was real.** GUI module
+headers include the generated `ui_<Form>.h`, but `make forms` and the
+`-I build/ui` flag lived **inside** the forms section, which runs *after* the
+module and header passes. Five `SIGEL_SlaveGUI` headers failed the standalone
+pass for want of the flag. Generation and the include path are now hoisted above
+the module loop.
+
+**Gates: `./check.sh` 227 pass, 4 fail, 355 warnings.** The 4 failures are the
+same Makefile-excluded files. **Warnings 341 → 355, and the arithmetic is
+exact**: all 14 are `SIGEL_SlaveGUI`'s — 12 `-Wreorder` from the 2003
+initialiser lists, 1 unused-but-set `res`, 1 in `SIG_SimulationControls`.
+Headers 132/1, forms 101/0 now that the last form is unblocked. Both baselines
+byte-identical, sanitized run clean.
 
 
 ---

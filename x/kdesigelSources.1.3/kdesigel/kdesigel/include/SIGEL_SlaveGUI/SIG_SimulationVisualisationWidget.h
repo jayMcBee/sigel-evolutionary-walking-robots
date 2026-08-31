@@ -23,8 +23,8 @@
 #ifndef SIGEL_SLAVEGUI_SIG_SIMULATIONVISUALISATIONWIDGET_H
 #define SIGEL_SLAVEGUI_SIG_SIMULATIONVISUALISATIONWIDGET_H
 
-#include <qtimer.h>
-#include <qcolor.h>
+#include <QTimer>
+#include <QColor>
 
 #include "SIGEL_CommonGUI/SIG_VisualisationWidget.h"
 
@@ -60,7 +60,7 @@
        */
       SIG_SimulationVisualisationWidget( QWidget *parent=0,
 					 char const *name=0,
-					 WFlags f=0 );
+					 Qt::WindowFlags f = Qt::WindowFlags() );
 
       /**
        * The destructor of the SIG_SimulationVisualisationWidget.

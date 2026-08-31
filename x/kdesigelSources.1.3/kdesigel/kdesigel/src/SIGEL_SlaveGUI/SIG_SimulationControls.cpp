@@ -22,7 +22,7 @@
 */
 #include "SIGEL_SlaveGUI/SIG_SimulationControls.h"
 
-#include <qapplication.h>
+#include <QApplication>
 
 #include <cstdlib>
 
@@ -42,31 +42,45 @@ namespace SIGEL_SlaveGUI
 
     QString sigelRootString( sigelRootCString );
 
-    stopAction = new QAction( this, "stopAction" );
-    playAction = new QAction( this, "playAction" );
-    stepAction = new QAction( this, "stepAction" );
-    fForwardAction = new QAction( this, "fForwardAction" );
-    // recordAction = new QAction( this, "recordAction" );
-    alterMovieSettingsAction = new QAction( this, "alterMovieSettingsAction" );
-    quitAction = new QAction( this, "quitAction" );
+    stopAction = new QAction( this );
+    stopAction->setObjectName( "stopAction" );
+    addAction( stopAction );   // Qt 2's QAction::init() did this implicitly
+    playAction = new QAction( this );
+    playAction->setObjectName( "playAction" );
+    addAction( playAction );   // Qt 2's QAction::init() did this implicitly
+    stepAction = new QAction( this );
+    stepAction->setObjectName( "stepAction" );
+    addAction( stepAction );   // Qt 2's QAction::init() did this implicitly
+    fForwardAction = new QAction( this );
+    fForwardAction->setObjectName( "fForwardAction" );
+    addAction( fForwardAction );   // Qt 2's QAction::init() did this implicitly
+    // recordAction = new QAction( this );
+    // recordAction->setObjectName( "recordAction" );
+    // addAction( recordAction );
+    alterMovieSettingsAction = new QAction( this );
+    alterMovieSettingsAction->setObjectName( "alterMovieSettingsAction" );
+    addAction( alterMovieSettingsAction );   // Qt 2's QAction::init() did this implicitly
+    quitAction = new QAction( this );
+    quitAction->setObjectName( "quitAction" );
+    addAction( quitAction );   // Qt 2's QAction::init() did this implicitly
 
-    stopIcons.setPixmap( sigelRootString + "/pixmaps/stopButton.xpm", QIconSet::Large );
-    playIcons.setPixmap( sigelRootString + "/pixmaps/startButton.xpm", QIconSet::Large );
-    stepIcons.setPixmap( sigelRootString + "/pixmaps/stepButton.xpm", QIconSet::Large );
-    pauseIcons.setPixmap( sigelRootString + "/pixmaps/pauseButton.xpm", QIconSet::Large );
-    fForwardIcons.setPixmap( sigelRootString + "/pixmaps/ffButton.xpm", QIconSet::Large );
-    // recordIcons.setPixmap( sigelRootString + "/pixmaps/videoallow.xpm", QIconSet::Large );
-    recordingAllowedIcons.setPixmap( sigelRootString + "/pixmaps/videoallow.xpm", QIconSet::Large );
-    recordingDisallowedIcons.setPixmap( sigelRootString + "/pixmaps/videodisallow.xpm", QIconSet::Large ); 
-    quitIcons.setPixmap( sigelRootString + "/pixmaps/quitApplicationSmall.xpm", QIconSet::Large );
+    stopIcons.addFile( sigelRootString + "/pixmaps/stopButton.xpm" );
+    playIcons.addFile( sigelRootString + "/pixmaps/startButton.xpm" );
+    stepIcons.addFile( sigelRootString + "/pixmaps/stepButton.xpm" );
+    pauseIcons.addFile( sigelRootString + "/pixmaps/pauseButton.xpm" );
+    fForwardIcons.addFile( sigelRootString + "/pixmaps/ffButton.xpm" );
+    // recordIcons.addFile( sigelRootString + "/pixmaps/videoallow.xpm" );
+    recordingAllowedIcons.addFile( sigelRootString + "/pixmaps/videoallow.xpm" );
+    recordingDisallowedIcons.addFile( sigelRootString + "/pixmaps/videodisallow.xpm" ); 
+    quitIcons.addFile( sigelRootString + "/pixmaps/quitApplicationSmall.xpm" );
 
-    stopAction->setIconSet( stopIcons );
-    playAction->setIconSet( playIcons );
-    stepAction->setIconSet( stepIcons );
-    fForwardAction->setIconSet( fForwardIcons );
-    // recordAction->setIconSet( recordIcons );
-    alterMovieSettingsAction->setIconSet( recordingDisallowedIcons );
-    quitAction->setIconSet( quitIcons );
+    stopAction->setIcon( stopIcons );
+    playAction->setIcon( playIcons );
+    stepAction->setIcon( stepIcons );
+    fForwardAction->setIcon( fForwardIcons );
+    // recordAction->setIcon( recordIcons );
+    alterMovieSettingsAction->setIcon( recordingDisallowedIcons );
+    quitAction->setIcon( quitIcons );
 
     stopAction->setStatusTip( "Stops and restarts the simulation." );
     playAction->setStatusTip( "Starts/pauses the simulation." );
@@ -102,9 +116,9 @@ namespace SIGEL_SlaveGUI
     fForwardAction->setEnabled( !simulationRunning );
 
     if (simulationRunning)
-      playAction->setIconSet( pauseIcons );
+      playAction->setIcon( pauseIcons );
     else
-      playAction->setIconSet( playIcons );
+      playAction->setIcon( playIcons );
   };
 
   void SIG_SimulationControls::slotStopPressed()
@@ -114,14 +128,14 @@ namespace SIGEL_SlaveGUI
     stepAction->setEnabled( true );
     fForwardAction->setEnabled( true );
 
-    playAction->setIconSet( playIcons );
+    playAction->setIcon( playIcons );
   };
 
   void SIG_SimulationControls::slotRecordingAllowed( bool isAllowed )
   {
     if( isAllowed )
-      alterMovieSettingsAction->setIconSet( recordingAllowedIcons );
+      alterMovieSettingsAction->setIcon( recordingAllowedIcons );
     else
-      alterMovieSettingsAction->setIconSet( recordingDisallowedIcons );
+      alterMovieSettingsAction->setIcon( recordingDisallowedIcons );
   };
 }

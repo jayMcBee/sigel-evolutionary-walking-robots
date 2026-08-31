@@ -56,7 +56,7 @@ namespace SIGEL_SlaveGUI
      */
     SIG_SimulationWidget( QWidget *parent=0,
 			  char const *name=0,
-			  WFlags f=0 );
+			  Qt::WindowFlags f = Qt::WindowFlags() );
 
     /**
      * The destructor of the SIG_SimulationWidget.

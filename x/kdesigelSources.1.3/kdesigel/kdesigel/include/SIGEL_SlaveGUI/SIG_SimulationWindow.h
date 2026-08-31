@@ -23,8 +23,8 @@
 #ifndef SIGEL_SLAVEGUI_SIG_SIMULATIONWINDOW_H
 #define SIGEL_SLAVEGUI_SIG_SIMULATIONWINDOW_H
 
-#include <qmainwindow.h>
-#include <qtoolbar.h>
+#include <QMainWindow>
+#include <QToolBar>
 
 #include "SIGEL_Robot/SIG_Robot.h"
 #include "SIGEL_Environment/SIG_Environment.h"
@@ -69,7 +69,7 @@ namespace SIGEL_SlaveGUI
      */
     SIG_SimulationWindow( QWidget *parent,
 			  char const *name = 0,
-			  WFlags f = WType_TopLevel );
+			  Qt::WindowFlags f = Qt::Window );
 
     /**
      * The destructor of the SIG_SimulationWindow.

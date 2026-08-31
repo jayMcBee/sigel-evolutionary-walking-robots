@@ -32,7 +32,7 @@ class SIG_MovieSettingsDialog : public SIG_MovieSettingsDialogBase
     Q_OBJECT
 
 public:
-    SIG_MovieSettingsDialog( int imgWidth, int imgHeight, QWidget* parent = 0, const char* name = 0, bool modal = FALSE, WFlags fl = 0 );
+    SIG_MovieSettingsDialog( int imgWidth, int imgHeight, QWidget* parent = 0, const char* name = 0, bool modal = false, Qt::WindowFlags fl = Qt::WindowFlags() );
     ~SIG_MovieSettingsDialog();
 
 public slots:

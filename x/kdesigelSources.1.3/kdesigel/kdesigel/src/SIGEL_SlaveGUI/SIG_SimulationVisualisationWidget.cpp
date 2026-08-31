@@ -20,27 +20,28 @@
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
+#include <QDir>
 #include "SIGEL_SlaveGUI/SIG_SimulationVisualisationWidget.h"
 
 #include "SIGEL_Visualisation/SIG_SimulationVisualisation.h"
 #include "SIGEL_SlaveGUI/SIG_MovieSettingsDialog.h"
 #include "SIGEL_Tools/SIG_Exception.h"
 
-#include <qmessagebox.h>
-#include <qspinbox.h>
-#include <qlineedit.h>
-#include <qpixmap.h>
-#include <qcombobox.h>
-#include <qcheckbox.h>
-#include <qcolordialog.h>
-#include <qwmatrix.h>
+#include <QMessageBox>
+#include <QSpinBox>
+#include <QLineEdit>
+#include <QPixmap>
+#include <QComboBox>
+#include <QCheckBox>
+#include <QColorDialog>
+#include <QTransform>
 
 // namespace SIGEL_SlaveGUI
 // {
 
   SIG_SimulationVisualisationWidget::SIG_SimulationVisualisationWidget( QWidget *parent,
 									char const *name,
-									WFlags f )
+									Qt::WindowFlags f )
     : SIG_VisualisationWidget( parent, name, f ),
 		       frameDelay(0),
 		       noOfFFSteps(0),
@@ -62,7 +63,7 @@
 		       useLeadingZeros( true ),
 		       planeColor( 127, 127, 127 )
   {
-    simulationTimer = new QTimer(this, "simulationTimer");
+    simulationTimer = new QTimer( this );
 
     connect( simulationTimer,
 	     SIGNAL(timeout()),
@@ -113,7 +114,7 @@
 
 
 	    if (automaticRefresh)
-	      updateGL();
+	      update();
 	  };
       };
   };
@@ -136,7 +137,7 @@
 	  };
 
 	if (automaticRefresh)
-	  updateGL();
+	  update();
       };
   };
 
@@ -158,7 +159,7 @@
 	  };
 
 	if (automaticRefresh)
-	  updateGL();
+	  update();
       };
   };
 
@@ -180,7 +181,7 @@
 	  };
 
 	if (automaticRefresh)
-	  updateGL();
+	  update();
       };
   };
 
@@ -303,8 +304,8 @@
 	  int	pX=0, pY=0;
 	  int	pW=-1,pH=-1;
 	  double	scaleW=1.0, scaleH=1.0;
-	  QPixmap	pm, resPm;
-	  QWMatrix	m;
+	  QImage	pm, resPm;
+	  QTransform	m;
 
 	  if(cropImage){	// speichert den Ausschnitt gegebener Größe
 							// um den Mittelpunkt
@@ -352,10 +353,25 @@
 		  }
 	  }
 
-	  pm	= QPixmap::grabWindow(winId(), pX, pY, pW, pH);
+	  // QPixmap::grabWindow was REMOVED in Qt 6, and for a QOpenGLWidget it was
+	  // the wrong call anyway: it read the window's on-screen pixels through the
+	  // window system, whereas this widget now renders into an FBO. The
+	  // equivalent is grabFramebuffer(), which returns a QImage of this widget's
+	  // own content -- hence QImage/QTransform above rather than QPixmap/QWMatrix.
+	  //
+	  // BEHAVIOUR CHANGE, FORCED BY THE REMOVAL AND NOT CHOSEN. grabWindow read
+	  // the LAST PRESENTED frame; every caller runs `makeTimeSteps(n); update();'
+	  // and the grab happens inside makeTimeSteps, so 1.3 recorded frame N-1
+	  // while the simulation stood at N. grabFramebuffer() renders current
+	  // content, so this records frame N. It removes a one-frame lag that no
+	  // like-for-like port could have kept. Nothing gates it; C9 is the first
+	  // step that could see it. PORTING.md C4.
+	  pm	= grabFramebuffer().copy( pX, pY, pW, pH );
 	  m.scale(scaleW, scaleH);
-	  resPm = pm.xForm(m);
-	  res	= resPm.save( inFName, fileFormat.upper(), movieQuality );
+	  resPm = pm.transformed(m);
+	  res	= resPm.save( inFName,
+			      fileFormat.toUpper().toUtf8().constData(),
+			      movieQuality );
 
 	  return true;
   }
@@ -394,7 +410,7 @@
 
     slotSetTraceRobot( true );
     slotNavigateCenter();
-    updateGL();
+    update();
   };
 
 void SIG_SimulationVisualisationWidget::resetRecorder()
@@ -441,7 +457,7 @@ void SIG_SimulationVisualisationWidget::resetRecorder()
     if (!simulationRunning())
       {
 	makeTimeSteps(1);
-	updateGL();
+	update();
       };
   };
 
@@ -450,7 +466,7 @@ void SIG_SimulationVisualisationWidget::resetRecorder()
     if (!simulationRunning())
       {
 	makeTimeSteps( noOfFFSteps );
-	updateGL();
+	update();
       };
   };
 
@@ -459,13 +475,13 @@ void SIG_SimulationVisualisationWidget::resetRecorder()
     frameDelay = fframeDelay;
 
     if (simulationTimer->isActive())
-      simulationTimer->changeInterval( frameDelay );
+      simulationTimer->setInterval( frameDelay );
   };
 
   void SIG_SimulationVisualisationWidget::slotSimulationProgress()
   {
     makeTimeSteps(1);
-    updateGL();
+    update();
   };
 
   void SIG_SimulationVisualisationWidget::slotSetTraceRobot( bool newValue )
@@ -504,7 +520,7 @@ void SIG_SimulationVisualisationWidget::resetRecorder()
 	visualisation->viewSettings.lookPoint.set( 2 , newZPos );
 
 	if (automaticRefresh)
-	  updateGL();
+	  update();
       };
   };
 
@@ -531,7 +547,7 @@ void SIG_SimulationVisualisationWidget::resetRecorder()
 	visualisation->viewSettings.lookPoint.set( 2 , newZPos );
 
 	if (automaticRefresh)
-	  updateGL();
+	  update();
       };
   };
 
@@ -563,7 +579,7 @@ void SIG_SimulationVisualisationWidget::resetRecorder()
 	visualisation->viewSettings.lookPoint.set( 2 , newZPos );
 
 	if (automaticRefresh)
-	  updateGL();
+	  update();
       };
   };
 
@@ -594,7 +610,7 @@ void SIG_SimulationVisualisationWidget::resetRecorder()
 	visualisation->viewSettings.lookPoint.set( 2 , newZPos );
 
 	if (automaticRefresh)
-	  updateGL();
+	  update();
       };
   };
 
@@ -609,7 +625,7 @@ void SIG_SimulationVisualisationWidget::resetRecorder()
 	visualisation->viewSettings.lookPoint.set( 1, actHeight - distance );
 
 	if (automaticRefresh)
-	  updateGL();
+	  update();
       };
   };
 
@@ -624,7 +640,7 @@ void SIG_SimulationVisualisationWidget::resetRecorder()
 	visualisation->viewSettings.lookPoint.set( 1, actHeight + distance );
 
 	if (automaticRefresh)
-	  updateGL();
+	  update();
       };
   };
 
@@ -646,7 +662,7 @@ void SIG_SimulationVisualisationWidget::resetRecorder()
 	simulationVisualisation->viewSettings.lookPoint.plusis( &robotPosition );
 
 	if (automaticRefresh)
-	  updateGL();
+	  update();
       };
   };
 
@@ -665,17 +681,17 @@ void SIG_SimulationVisualisationWidget::resetRecorder()
     movieSettingsDialog.lineeditFilePrefix->setText( movieFilePrefix );
     movieSettingsDialog.spinboxMaxFrames->setValue( movieMaxFrames );
     if( fileFormat == "bmp" )
-      movieSettingsDialog.comboboxFormat->setCurrentItem(0);
+      movieSettingsDialog.comboboxFormat->setCurrentIndex(0);
     if( fileFormat == "png" )
-      movieSettingsDialog.comboboxFormat->setCurrentItem(1);
+      movieSettingsDialog.comboboxFormat->setCurrentIndex(1);
     if( fileFormat == "ppm" )
-      movieSettingsDialog.comboboxFormat->setCurrentItem(2);
+      movieSettingsDialog.comboboxFormat->setCurrentIndex(2);
     if( fileFormat == "xbm" )
-      movieSettingsDialog.comboboxFormat->setCurrentItem(3);
+      movieSettingsDialog.comboboxFormat->setCurrentIndex(3);
     if( fileFormat == "xpm" )
-      movieSettingsDialog.comboboxFormat->setCurrentItem(4);
+      movieSettingsDialog.comboboxFormat->setCurrentIndex(4);
     if( fileFormat == "pov" )
-      movieSettingsDialog.comboboxFormat->setCurrentItem(5);
+      movieSettingsDialog.comboboxFormat->setCurrentIndex(5);
     movieSettingsDialog.spinboxQuality->setValue( movieQuality );
     movieSettingsDialog.checkboxUseLeadingZeros->setChecked( useLeadingZeros );
     movieSettingsDialog.checkboxEnableMovie->setChecked( record );
@@ -692,7 +708,7 @@ void SIG_SimulationVisualisationWidget::resetRecorder()
 	if( movieDirectory.right(1) != "/" )
 	  movieDirectory.append( "/" );
 	movieFilePrefix = movieSettingsDialog.lineeditFilePrefix->text();
-	fileFormat = movieSettingsDialog.comboboxFormat->currentText().lower();
+	fileFormat = movieSettingsDialog.comboboxFormat->currentText().toLower();
 	movieMaxFrames = movieSettingsDialog.spinboxMaxFrames->value();
 	movieQuality = movieSettingsDialog.spinboxQuality->value();
 	useLeadingZeros = movieSettingsDialog.checkboxUseLeadingZeros->isChecked();

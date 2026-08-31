@@ -23,10 +23,11 @@
 #ifndef SIGEL_SLAVEGUI_SIG_SIMULATIONCONTROLS_H
 #define SIGEL_SLAVEGUI_SIG_SIMULATIONCONTROLS_H
 
-#include <qaction.h>
-#include <qiconset.h>
-#include <qmainwindow.h>
-#include <qstring.h>
+#include <QAction>
+#include <QActionGroup>
+#include <QIcon>
+#include <QMainWindow>
+#include <QString>
 
 namespace SIGEL_SlaveGUI
 {
@@ -125,41 +126,41 @@ namespace SIGEL_SlaveGUI
       /**
        * The iconset for the stop action.
        */
-      QIconSet stopIcons;
+      QIcon stopIcons;
 
       /**
        * The iconset for the play action.
        */
-      QIconSet playIcons;
+      QIcon playIcons;
 
       /**
        * The iconset for the step action.
        */
-      QIconSet stepIcons;
+      QIcon stepIcons;
 
       /**
        * The iconset for the pause action.
        */
-      QIconSet pauseIcons;
+      QIcon pauseIcons;
 
       /**
        * The iconset for the fast forward action.
        */
-      QIconSet fForwardIcons;
+      QIcon fForwardIcons;
 
       /**
        * The iconset for the record button.
        */
-      QIconSet recordIcons;
+      QIcon recordIcons;
       
       /**
        * The icon for the action with which the movie settings can be alter.
        */
-      QIconSet recordingAllowedIcons;
+      QIcon recordingAllowedIcons;
 
-      QIconSet recordingDisallowedIcons;
+      QIcon recordingDisallowedIcons;
 
-      QIconSet quitIcons;
+      QIcon quitIcons;
 
       bool simulationRunning;
 

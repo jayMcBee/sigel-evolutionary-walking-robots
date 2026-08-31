@@ -35,9 +35,20 @@ for d in newmat09 dynamechs/dm Dynamo/Src/Inc fparser cv97 SOLID-2.0/include pvm
     INCS="$INCS -isystem $SL/$d"
 done
 
-# SIGEL_Visualisation joined at C5 and SIGEL_CommonGUI at C3 -- a GUI module
-# joins this list only when EVERY file in it compiles.
-MODULES="${1:-SIGEL_Tools SIGEL_Environment MT_GPSystem SIGEL_Robot SIGEL_Program SIGEL_RobotIO SIGEL_Simulation MT_Control SIGEL_GP SIGEL_Visualisation SIGEL_CommonGUI}"
+# SIGEL_Visualisation joined at C5, SIGEL_CommonGUI at C3 and SIGEL_SlaveGUI at
+# C4 -- a GUI module joins this list only when EVERY file in it compiles.
+# The converted forms generate ui_<Form>.h into build/ui, and GUI module headers
+# include them -- so they must exist and be on the include path BEFORE the module
+# and header passes, not only inside the forms section. C4 found this: five
+# SIGEL_SlaveGUI headers failed the standalone pass for want of the flag.
+if make -s -C "$ROOT" forms >/tmp/mkforms.$$ 2>&1; then
+    INCS="$INCS -I$ROOT/build/ui"
+else
+    echo "  make forms FAILED -- every GUI module check below is unreliable:"
+    cat /tmp/mkforms.$$
+fi
+
+MODULES="${1:-SIGEL_Tools SIGEL_Environment MT_GPSystem SIGEL_Robot SIGEL_Program SIGEL_RobotIO SIGEL_Simulation MT_Control SIGEL_GP SIGEL_Visualisation SIGEL_CommonGUI SIGEL_SlaveGUI}"
 pass=0; fail=0; warn=0
 
 # The shim self-check was here: it built and RAN q2compat_check.cpp under
@@ -111,16 +122,15 @@ FORM_LIST="MT_UI/MT_AddConstantsWidgetBase:MT_GUI \
             SIGEL_MasterUI/SIG_RobotBase:SIGEL_MasterGUI \
             SIGEL_MasterUI/SIG_SimulationParameterBase:SIGEL_MasterGUI \
             SIGEL_SlaveUI/SIG_MovieSettingsDialogBase:SIGEL_SlaveGUI \
-            SIGEL_SlaveUI/SIG_SimulationWidgetBase:SIGEL_SlaveGUI:C4"
+            SIGEL_SlaveUI/SIG_SimulationWidgetBase:SIGEL_SlaveGUI"
 
 MOCBIN=$(qmake6 -query QT_INSTALL_LIBEXECS)/moc
 fp=0; ff=0; fw=0
-# `forms' runs uic AND rcc AND compiles the resource object, so a failure here
-# is not necessarily uic's -- calling it "uic FAIL" sent the reader after the
-# wrong tool. It also skips checks 2-6, so say that rather than let six passes
-# quietly disappear from the total. Found by the C1 review.
+# `forms' already ran above, before the module passes, because GUI headers need
+# its output. Its log is reused here: a failure means checks 2-7 cannot run.
+cp /tmp/mkforms.$$ /tmp/uic.$$ 2>/dev/null || : > /tmp/uic.$$
 if ! make -s -C "$ROOT" forms >/tmp/uic.$$ 2>&1; then
-    echo "  make forms FAILED -- checks 2-6 below did not run:"; cat /tmp/uic.$$; ff=$((ff+1))
+    echo "  make forms FAILED -- checks 2-7 below did not run:"; cat /tmp/uic.$$; ff=$((ff+1))
 else
     # uic writes warnings to stderr and still exits 0 -- a dropped <images>
     # block or a renamed duplicate widget is reported exactly this way, and
@@ -130,7 +140,6 @@ else
     grep -v '^Detected locale \|^Qt depends on a UTF-8 locale\|^If this causes problems\|^for more information' \
          /tmp/uic.$$ > /tmp/uic2.$$ || true
     if [ -s /tmp/uic2.$$ ]; then echo "  uic WARNED:"; cat /tmp/uic2.$$; ff=$((ff+1)); fi
-    INCS="$INCS -I$ROOT/build/ui"
     for entry in $FORM_LIST; do
         # <uidir>/<Form>:<Module>[:blocked]  -- "blocked" means the form itself
         # is converted but a custom widget it embeds is not, so its generated
@@ -222,6 +231,6 @@ fi
 printf '%-22s %2d pass  %2d fail  %3d warnings\n' "forms (Phase C)" "$fp" "$ff" "$fw"
 pass=$((pass+fp)); fail=$((fail+ff)); warn=$((warn+fw))
 
-rm -f /tmp/chk.$$ /tmp/hdr.$$.cpp /tmp/uic.$$ /tmp/uic2.$$ /tmp/moc.$$.cpp
+rm -f /tmp/chk.$$ /tmp/hdr.$$.cpp /tmp/uic.$$ /tmp/uic2.$$ /tmp/moc.$$.cpp /tmp/mkforms.$$
 echo "-----"
 echo "total: $pass pass, $fail fail, $warn warnings in SIGEL code"

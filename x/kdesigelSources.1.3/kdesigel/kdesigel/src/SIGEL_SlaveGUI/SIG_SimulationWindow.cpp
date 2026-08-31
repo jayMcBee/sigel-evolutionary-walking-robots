@@ -25,35 +25,46 @@
 #include "SIGEL_SlaveGUI/SIG_SimulationWidget.h"
 #include "SIGEL_SlaveGUI/SIG_SimulationVisualisationWidget.h"
 
-#include <qstatusbar.h>
+#include <QStatusBar>
 
 namespace SIGEL_SlaveGUI
 {
 
   SIG_SimulationWindow::SIG_SimulationWindow( QWidget *parent,
 					      char const *name,
-					      WFlags f )
-    : QMainWindow( parent,
-		   name,
-		   f )
+					      Qt::WindowFlags f )
+    : QMainWindow( parent, f )
   {
-    this->setUsesTextLabel( false );
-    this->setDockEnabled( Left, false );
-    this->setDockEnabled( Right, false );
-    this->setDockEnabled( Bottom, false );
+    if ( name )
+      setObjectName( QString::fromUtf8( name ) );
 
-    this->setUsesBigPixmaps( true );
+    // Qt 2's setUsesTextLabel(false) is Qt 6's ToolButtonIconOnly.
+    this->setToolButtonStyle( Qt::ToolButtonIconOnly );
+
+    // Qt 2's setUsesBigPixmaps(true) selected the QIconSet::Large pixmap, which
+    // is the size these actually are: 25x25 for seven of the eight toolbar
+    // XPMs, 24x24 for quitApplicationSmall. Qt 6 has no icon size classes, so
+    // the toolbar's iconSize is where that choice now lives -- measured from
+    // the files, not chosen.
+    this->setIconSize( QSize( 25, 25 ) );
 
     new QStatusBar( this );
 
     simulationWidget = new SIG_SimulationWidget(this, "simulationWidget");
     setCentralWidget( simulationWidget );
 
-    simulationControlBar = new QToolBar( this, "simulationControlBar" );
+    simulationControlBar = new QToolBar( this );
+    simulationControlBar->setObjectName( "simulationControlBar" );
+
+    // Qt 2's QMainWindow::setDockEnabled( Left/Right/Bottom, false ) restricted
+    // where a dock window could go. Qt 6 has no per-window equivalent; the
+    // restriction is per toolbar, and only Top was left enabled.
+    simulationControlBar->setAllowedAreas( Qt::TopToolBarArea );
 
     simulationControls = new SIG_SimulationControls(this, "simulationControls");
 
-    simulationControls->addTo( simulationControlBar );
+    // Qt 2's QActionGroup::addTo(w) added every member action to the widget.
+    simulationControlBar->addActions( simulationControls->actions() );
     this->addToolBar( simulationControlBar );
 
     QObject::connect( simulationControls->playAction,
@@ -114,7 +125,7 @@ namespace SIGEL_SlaveGUI
   void SIG_SimulationWindow::slotStopPressed()
   {
     // reset the button
-    simulationControls->alterMovieSettingsAction->setIconSet( simulationControls->recordingDisallowedIcons );
+    simulationControls->alterMovieSettingsAction->setIcon( simulationControls->recordingDisallowedIcons );
 
     // reset the data that has to be resetted in the simulationVisualisationWidget
     simulationWidget->visualisationWidget->resetRecorder();

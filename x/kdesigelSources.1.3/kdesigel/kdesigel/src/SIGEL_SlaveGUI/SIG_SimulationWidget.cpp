@@ -22,12 +22,12 @@
 */
 #include "SIGEL_SlaveGUI/SIG_SimulationWidget.h"
 
-#include <qslider.h>
-#include <qspinbox.h>
-#include <qcheckbox.h>
-#include <qcombobox.h>
-#include <qpushbutton.h>
-#include <qmultilineedit.h>
+#include <QSlider>
+#include <QSpinBox>
+#include <QCheckBox>
+#include <QComboBox>
+#include <QPushButton>
+#include <QTextEdit>
 
 #include <cmath>
 
@@ -38,7 +38,7 @@ namespace SIGEL_SlaveGUI
 
   SIG_SimulationWidget::SIG_SimulationWidget( QWidget *parent,
 					      char const *name,
-					      WFlags f )
+					      Qt::WindowFlags f )
     : SIG_SimulationWidgetBase( parent, name, f )
   {
     connect( yawSlider,
@@ -276,15 +276,15 @@ namespace SIGEL_SlaveGUI
 
     int showAnchorPointsState;
 
-    switch (showAncorPointsCheckBox->state())
+    switch (showAncorPointsCheckBox->checkState())
       {
-      case QButton::Off:
+      case Qt::Unchecked:
 	showAnchorPointsState = 0;
 	break;
-      case QButton::NoChange:
+      case Qt::PartiallyChecked:
 	showAnchorPointsState = 1;
 	break;
-      case QButton::On:
+      case Qt::Checked:
 	showAnchorPointsState = 2;
 	break;
       };

@@ -21,9 +21,9 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 #include "SIGEL_SlaveGUI/SIG_MovieSettingsDialog.h"
-#include <qfiledialog.h>
-#include <qlabel.h>
-#include <qspinbox.h>
+#include <QFileDialog>
+#include <QLabel>
+#include <QSpinBox>
 
 namespace SIGEL_SlaveGUI
 {
@@ -35,7 +35,7 @@ namespace SIGEL_SlaveGUI
  *  The dialog will by default be modeless, unless you set 'modal' to
  *  TRUE to construct a modal dialog.
  */
-SIG_MovieSettingsDialog::SIG_MovieSettingsDialog( int imgWidth, int imgHeight, QWidget* parent,  const char* name, bool modal, WFlags fl )
+SIG_MovieSettingsDialog::SIG_MovieSettingsDialog( int imgWidth, int imgHeight, QWidget* parent,  const char* name, bool modal, Qt::WindowFlags fl )
     : SIG_MovieSettingsDialogBase( parent, name, modal, fl )
 {
 	scrWidth  = imgWidth;
@@ -59,7 +59,15 @@ SIG_MovieSettingsDialog::~SIG_MovieSettingsDialog()
  */
 void SIG_MovieSettingsDialog::slotToolButtonClicked()
 {
-  QString newDirectory = QFileDialog::getExistingDirectory( lineeditDirectory->text(), this, "SIG_MOvieSettingsDialogslotToolButtonClicked", "Select movie directory...", true );
+  // Qt 2: getExistingDirectory( dir, parent, name, caption, dirOnly )
+  // Qt 6: getExistingDirectory( parent, caption, dir, options )
+  // Every argument survives but the widget `name', which Qt 6 has no place for;
+  // dirOnly=true becomes ShowDirsOnly.
+  QString newDirectory =
+    QFileDialog::getExistingDirectory( this,
+				       "Select movie directory...",
+				       lineeditDirectory->text(),
+				       QFileDialog::ShowDirsOnly );
   if( !newDirectory.isNull() )
     lineeditDirectory->setText( newDirectory );
 };
