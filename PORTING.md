@@ -222,8 +222,44 @@ times.
 `QTimer` 2.
 
 **Absent, and usually the worst part of a Qt port:** 0 `QPainter`, 0
-`paintEvent`. The 444 `SIGNAL()`/`SLOT()` macros in 174 `connect()` calls are
-all still valid — string-based connect was never removed.
+`paintEvent`.
+
+**But `SIGNAL()`/`SLOT()` is not a no-op row, and this file said it was.** It
+read: "The 444 `SIGNAL()`/`SLOT()` macros in 174 `connect()` calls are **all
+still valid** — string-based connect was never removed." The *mechanism*
+survived; **nine of the 41 distinct signal signatures did not**, and a
+string-based connect to a signal that is not there compiles, links, runs and
+never fires. Nothing in the compiler or in `check.sh` could see it. C4 shipped
+ten such connects and only review caught them.
+
+Each signature below was resolved with `QMetaObject::indexOfSignal` against the
+real Qt 6.10.2 meta-object — the same lookup `connect()` performs — not read off
+a porting guide:
+
+| Qt 2 signal | sites | Qt 6 |
+|---|---|---|
+| `activated()` on `QAction` | 74 | `triggered()` |
+| `rightButtonClicked(QListView/QListBoxItem*, …)` | 5 | **no equivalent** — `setContextMenuPolicy` + `customContextMenuRequested(QPoint)` |
+| `activated(const QString&)` on `QComboBox` | 6 | `textActivated(const QString&)` |
+| `doubleClicked(QListViewItem*)` | 4 | `itemDoubleClicked(QTreeWidgetItem*,int)` |
+| `selectionChanged()` on `QListView`/`QListBox` | 4 | `itemSelectionChanged()` |
+| `selected(QListBoxItem*)`, `selected(QAction*)` | 2 | `itemActivated(…)`, `QMenu::triggered(QAction*)` |
+| `lostFocus()` on `QLineEdit` | 2 | `editingFinished()` — **not equivalent**, it also fires on Return |
+| `currentChanged(QListView/QListBoxItem*)` | 2 | `currentItemChanged(item, previous)` |
+| `clicked(int)` on `QButtonGroup` | 1 | `idClicked(int)` |
+
+**The ones that look dead and are not, so nobody re-breaks them:** `clicked()`
+is live — moc emits a cloned method for the default argument of
+`clicked(bool)`; `activated(int)` on a `QComboBox` is live and only the
+`QString` overload went; `valueChanged(int)`, `textChanged(…)`,
+`stateChanged(int)`, `toggled(bool)`, `pressed()` and `timeout()` are all
+unchanged. The remaining 22 signatures are SIGEL's own.
+
+**100 in the pristine tree; C4 repaired 10; 90 remain — 43 in
+`SIGEL_MasterGUI` (C7), 32 in `MT_GUI` (C6), 15 in `MT_Control` (C8)**, and
+zero in the twelve modules `check.sh` compiles today.
+**`check.sh` now fails a module on any of them** — `$DEAD_SIGNALS` in the module
+loop, proved by injection.
 
 ### Structure
 
@@ -1581,11 +1617,11 @@ modules include the headers `uic` generates from them.
 | C1 | **DONE 2026-08-30.** `SIG_GPParameterBase`, the only form with both an embedded image and dropped slots. Settles the residue table, the base-class question, and the build and check wiring — see below | 1 form |
 | C2 | **DONE 2026-08-30.** The remaining 19 forms. All 20 are Qt 6; 19 of 20 generated headers compile, the 20th blocked on C3 — see below | 19 forms |
 | C3 | **DONE 2026-08-30.** `SIGEL_CommonGUI` — the `QGLWidget` → `QOpenGLWidget` step; all 6 sites are here, 2 in code. In `check.sh` | 665 LOC, 2 sources |
-| C4 | **DONE 2026-08-31.** `SIGEL_SlaveGUI` — the toolbar, the movie path, and a `QActionGroup` that would have been silently empty. Unblocks the last form | 2,344 LOC, 7 sources |
+| C4 | **DONE 2026-08-31.** `SIGEL_SlaveGUI` — the toolbar, the movie path, and ten connects to signals Qt 6 does not have. Unblocks the last form | 2,344 LOC, 7 sources |
 | C5 | **DONE 2026-08-30, done FIRST — it is the dependency root.** `SIGEL_Visualisation`, 23 Qt 2 sites, 12/12 sources and headers compile, in `check.sh` | 3,564 LOC, 12 sources |
-| C6 | `MT_GUI` | 3,911 LOC, 14 files |
-| C7 | `SIGEL_MasterGUI` | 7,717 LOC, 20 files |
-| C8 | `sigel.cpp`, `sigel_slave.cpp` | 15 sites |
+| C6 | `MT_GUI` — **32 dead connects** (§2) | 3,911 LOC, 14 files |
+| C7 | `SIGEL_MasterGUI` — **43 dead connects** (§2) and **24 prepending `QListViewItem` sites** (§9) | 7,717 LOC, 20 files |
+| C8 | `sigel.cpp`, `sigel_slave.cpp`; **`MT_Control`'s 15 dead connects** (§2) | 15 sites |
 | C9 | All five modules and both programs build, link and run | — |
 
 Each module step is the same shape: `qt3to4` in the container, hand-port off
@@ -2266,32 +2302,50 @@ nothing in previously covered code moved. Both baselines byte-identical,
 sanitized run clean.
 
 
-#### C4 — `SIGEL_SlaveGUI`: the toolbar, the movie path, and a silently empty group
+#### C4 — `SIGEL_SlaveGUI`: the toolbar, the movie path, and a toolbar that did nothing
 
 16 files, 2,344 LOC, **30 Qt 2 code sites** plus 27 Qt 2 `<q*.h>` includes. It
 unblocks the last form: `SIG_SimulationWidgetBase` now compiles, so the
 `forms` section runs all seven checks on all 20.
 
-**THE FINDING: Qt 2's `QAction` added ITSELF to a `QActionGroup` parent, and
-Qt 6's does not.** `qaction.cpp`'s `QAction::init()` is
+**THE FINDING THIS STEP WAS NAMED FOR DOES NOT EXIST.** It claimed that Qt 2's
+`QAction::init()` self-inserted into a `QActionGroup` parent, that **Qt 6 does
+not**, and that without added `addAction` calls the toolbar would render empty.
+The first half is true; **the second is false, and has been since Qt 4**. Qt 6's
+`QAction(QObject *parent)` does
 
 ```cpp
-if ( parent() && parent()->inherits("QActionGroup") )
-    ((QActionGroup*) parent())->insert( this );   // insert into action group
+d->group = qobject_cast<QActionGroup *>(parent);
+if (d->group) d->group->addAction(this);
 ```
 
-`SIG_SimulationControls` **is** a `QActionGroup` and builds its seven actions as
-`new QAction( this, "…" )`, never calling `insert`. In Qt 6 that only sets the
-parent, so `actions()` comes back **empty** and
-`QActionGroup::addTo(toolbar)` — which becomes
-`toolbar->addActions( group->actions() )` — adds nothing. **The window would
-render with an empty toolbar**: compiles, links, runs, no buttons. An explicit
-`addAction` per action restores it.
+Measured on 6.10.2 with 1.3's exact shape and no `addAction`: `actions()`
+returns the action and `actionGroup()` is the group. The six calls this step
+added were idempotent no-ops; they and their comments are removed. *Found by
+review. The error mattered beyond this step — C7 builds three more groups and
+would have inherited the wrong model — and the real hazard there is the
+opposite one: two of those three pass Qt 2's `exclusive = false` third
+argument, which Qt 6's constructor has no place for and which defaults to
+**true**.*
 
-*Exclusivity is not a second hazard here, checked rather than assumed: Qt 6's
-`QActionGroup` is exclusive by default and Qt 2's took the flag as a
-constructor argument, but **no action in this group is checkable**, and the
-policy only applies to checkable actions.*
+**THE REAL "COMPILES, LINKS, RUNS, DOES NOTHING" DEFECT WAS IN THIS MODULE ALL
+ALONG, AND THIS STEP WALKED PAST IT.** `QAction::activated()` does not exist in
+Qt 6 — the signal is `triggered()`. A string-based connect to a signal that is
+not there compiles, links, and silently never fires. C4's own two files carried
+**nine** of them, plus `QComboBox::activated(const QString &)`, which Qt 6
+renamed `textActivated`. So after C4 as first committed, the toolbar drew six
+buttons and **not one did anything** — play, stop, step, fast-forward,
+movie-settings, quit — and the render-mode combo was dead. All ten repaired.
+
+**AND §2 IS WHAT MISLED ME**, with "The 444 `SIGNAL()`/`SLOT()` macros … are
+**all still valid**". Rather than fix the two signals this step tripped over, I
+resolved **all 41 distinct signal signatures in the tree** through
+`QMetaObject::indexOfSignal` on the real Qt 6 meta-objects. **Nine are dead, not
+two**, and 90 connects to them remain in C6, C7 and C8. §2 now carries the
+table, the deliberate non-entries, and the per-module counts;
+**`check.sh` fails a module on any of them.** *The narrow fix would have left
+seven kinds of silent breakage for the later steps to walk into exactly as this
+one did.*
 
 **The movie path: `QPixmap::grabWindow` is gone, and its replacement changes
 which frame is recorded.** Qt 6 removed it; for a `QOpenGLWidget` it was wrong
@@ -2353,9 +2407,23 @@ the module loop.
 **Gates: `./check.sh` 227 pass, 4 fail, 355 warnings.** The 4 failures are the
 same Makefile-excluded files. **Warnings 341 → 355, and the arithmetic is
 exact**: all 14 are `SIGEL_SlaveGUI`'s — 12 `-Wreorder` from the 2003
-initialiser lists, 1 unused-but-set `res`, 1 in `SIG_SimulationControls`.
-Headers 132/1, forms 101/0 now that the last form is unblocked. Both baselines
-byte-identical, sanitized run clean.
+initialiser lists (8 in `SIG_SimulationVisualisationWidget.h`, 4 in its
+`.cpp`), 1 `-Wunused-but-set-variable` (the preserved `res` defect above) and 1
+`-Wunused-parameter` in `SIG_SimulationControls.cpp`. Headers 132/1, forms
+101/0 now that the last form is unblocked. Both baselines byte-identical,
+sanitized run clean.
+
+**`check.sh` gained two gates in this step, both proved by injection rather
+than asserted.** `$DEAD_SIGNALS` fails a module on any connect to a signal Qt 6
+does not have, against a per-module baseline that is **zero for every converted
+module** — so C6, C7 and C8 can only reduce it. And the uic-warning check was
+found *dead*: hoisting `make forms` above the module loop left a second,
+no-op `make forms` in the forms section whose empty output overwrote the real
+run's log, so the check C1 added to catch a dropped `<images>` block could not
+fire. It now reuses the first run's log via a `FORMS_FAILED` flag, and
+re-injecting an `<images>` block makes it fail again. *Two gates that reported
+green while seeing nothing.* `MODULES="${1:-…}"` also became `${*:-…}`: it had
+silently ignored every module argument after the first.
 
 
 ---
@@ -2402,6 +2470,53 @@ a count of hidden-free sites and a list of owning containers with no free path.
 Every entry is closed: the hidden frees in D15, D18, D19, D25b and D25c, the
 no-free-path class by D25c, and `SIG_Robot::clear()` by D4. The per-container
 record is in those D-steps and the pristine-tree counts are in §2.*
+
+### TRAP — `QListViewItem` construction PREPENDS, and C7 has 24 of them
+
+**Qt 2's `QListViewItem` constructor inserts the new item at the *head* of its
+parent's child list, not the tail.** `QListViewItem::insertItem` is
+
+```cpp
+newChild->siblingItem = childItem;
+childItem = newChild;
+```
+
+so a loop that constructs items in file order builds a list in **reverse** file
+order. Qt 6's `QTreeWidgetItem(parent)` and `QTreeWidget::addTopLevelItem`
+**append**. A like-for-like port therefore reverses every one of these lists,
+and nothing in the compiler, in `check.sh` or in either baseline can see it.
+
+**Confirmed on the running 1.3 binary, not only in `qlistview.cpp`.** The x86
+box loaded `twoBasesSimpleFitness1.exp`, whose `PVMHOST` entries are in file
+order `wickie, bube, birke, urobe, pappel, lithium, eiche, herz`, and
+GP-Parameters → PVM draws them **exactly reversed**, `herz` first and `wickie`
+last.
+
+**And it is visible there for a reason that generalises.** The view is sorted on
+column 0, which holds only a tick pixmap and no text — every sort key is
+identical, so the stable sort preserves insertion order and the prepend shows
+through. *This is why C1's sort-direction work was correct and this is still
+wrong: on this view the sort is not what orders the rows.*
+
+**24 construction sites, every one in `SIGEL_MasterGUI`** — 23 live plus one
+commented out. `SIG_LanguageParameters.cpp` 15, `SIG_ExperimentItem.cpp` 7,
+`SIG_GPParameter.cpp` 2. **`MT_GUI` has none**; its 22 `insertItem` calls are
+menus, combos and list boxes, which is a separate question. *A count of 27 with
+three in `MT_GUI` was recorded here first and was wrong — it came from a
+name-keyed sweep, not from the constructor.*
+
+**Two of the 24 populate `listviewHosts`, in the form C1 converted and review
+passed.** The form is correct; the defect is in the *population* code, which is
+C7's and still Qt 2. Nothing is owed at C1 — but the pairing is the point: a
+form can pass every gate this project has while the code that fills it is what
+holds the behaviour.
+
+**`SIG_ExperimentItem.cpp:64` is a second, independent trap in the same file.**
+`QListViewItem *childItem = new QListViewItem( newItem );` — `newItem` is the
+*Robot* item, so `Language-Parameters` is a **child of Robot**, not a sixth
+sibling. The five siblings above it use the same `newItem` variable and their
+`setText` calls all look alike, so reading the labels rather than the
+constructors gives a flat list of six. The 1.3 tree draws it indented.
 
 ### The register-to-index modulus, and the overflow under it
 

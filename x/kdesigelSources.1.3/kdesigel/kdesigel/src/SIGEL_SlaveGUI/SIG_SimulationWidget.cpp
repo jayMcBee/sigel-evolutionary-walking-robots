@@ -119,7 +119,7 @@ namespace SIGEL_SlaveGUI
 		      SLOT(setShowAncorPoints(int)) );
 
     QObject::connect( renderModeComboBox,
-		      SIGNAL(activated(const QString &)),
+		      SIGNAL(textActivated(const QString &)),
 		      visualisationWidget,
 		      SLOT(setRenderMode(const QString &)) );
 

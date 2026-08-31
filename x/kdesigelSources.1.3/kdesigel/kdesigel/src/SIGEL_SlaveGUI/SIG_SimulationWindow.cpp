@@ -48,7 +48,12 @@ namespace SIGEL_SlaveGUI
     // the files, not chosen.
     this->setIconSize( QSize( 25, 25 ) );
 
-    new QStatusBar( this );
+    // Qt 2's QMainWindow adopted a QStatusBar child through childEvent
+    // (qmainwindow.cpp: `if (e->child()->inherits("QStatusBar")) d->sb = ...').
+    // Qt 6 does not: without setStatusBar the bar is an unmanaged child painted
+    // over the central widget, and the seven setStatusTip strings this
+    // constructor sets could never be shown.
+    setStatusBar( new QStatusBar( this ) );
 
     simulationWidget = new SIG_SimulationWidget(this, "simulationWidget");
     setCentralWidget( simulationWidget );
@@ -68,22 +73,22 @@ namespace SIGEL_SlaveGUI
     this->addToolBar( simulationControlBar );
 
     QObject::connect( simulationControls->playAction,
-		      SIGNAL(activated()),
+		      SIGNAL(triggered()),
 		      simulationWidget->visualisationWidget,
 		      SLOT(slotStartSimulation()) );
 
     QObject::connect( simulationControls->stopAction,
-		      SIGNAL(activated()),
+		      SIGNAL(triggered()),
 		      simulationWidget,
 		      SLOT(slotStopSimulation()) );
 
     QObject::connect( simulationControls->stepAction,
-		      SIGNAL(activated()),
+		      SIGNAL(triggered()),
 		      simulationWidget->visualisationWidget,
 		      SLOT(slotStepSimulation()) );
 
     QObject::connect( simulationControls->fForwardAction,
-		      SIGNAL(activated()),
+		      SIGNAL(triggered()),
 		      simulationWidget->visualisationWidget,
 		      SLOT(slotFForwardSimulation()) );
 
@@ -98,12 +103,12 @@ namespace SIGEL_SlaveGUI
 		      SLOT( slotRecordingAllowed( bool ) ) );
 
     QObject::connect( simulationControls->alterMovieSettingsAction,
-		      SIGNAL( activated() ),
+		      SIGNAL(triggered()),
 		      simulationWidget->visualisationWidget,
 		      SLOT( slotAlterMovieSettingsClicked() ) );
 
     QObject::connect( simulationControls->stopAction,
-		      SIGNAL(activated()),
+		      SIGNAL(triggered()),
 		      this,
 		      SLOT( slotStopPressed()) );
 

@@ -41,14 +41,27 @@ done
 # include them -- so they must exist and be on the include path BEFORE the module
 # and header passes, not only inside the forms section. C4 found this: five
 # SIGEL_SlaveGUI headers failed the standalone pass for want of the flag.
+FORMS_FAILED=
 if make -s -C "$ROOT" forms >/tmp/mkforms.$$ 2>&1; then
     INCS="$INCS -I$ROOT/build/ui"
 else
+    FORMS_FAILED=1
     echo "  make forms FAILED -- every GUI module check below is unreliable:"
     cat /tmp/mkforms.$$
 fi
 
-MODULES="${1:-SIGEL_Tools SIGEL_Environment MT_GPSystem SIGEL_Robot SIGEL_Program SIGEL_RobotIO SIGEL_Simulation MT_Control SIGEL_GP SIGEL_Visualisation SIGEL_CommonGUI SIGEL_SlaveGUI}"
+# Signals that existed in Qt 2 and do NOT exist in Qt 6, in SIGNAL() spelling.
+# Verified one by one with QMetaObject::indexOfSignal against Qt 6.10.2, not
+# read off a porting guide. Deliberately NOT here because they are still live:
+# clicked() (moc clones the default argument of clicked(bool)), activated(int)
+# on a QComboBox, valueChanged(int), textChanged(...), stateChanged(int),
+# toggled(bool), pressed(), timeout().
+DEAD_SIGNALS='SIGNAL\( *(activated *\( *\)|activated *\( *const *QString'\
+'|clicked *\( *int|lostFocus *\(|selected *\(|selectionChanged *\( *\)'\
+'|currentChanged *\( *Q(ListView|ListBox)Item|rightButtonClicked'\
+'|doubleClicked *\( *QListViewItem)'
+
+MODULES="${*:-SIGEL_Tools SIGEL_Environment MT_GPSystem SIGEL_Robot SIGEL_Program SIGEL_RobotIO SIGEL_Simulation MT_Control SIGEL_GP SIGEL_Visualisation SIGEL_CommonGUI SIGEL_SlaveGUI}"
 pass=0; fail=0; warn=0
 
 # The shim self-check was here: it built and RAN q2compat_check.cpp under
@@ -57,6 +70,7 @@ pass=0; fail=0; warn=0
 # layer, so nothing is left for it to check. It was reported separately and
 # never counted in the module totals, so 105/4 is unchanged by its removal.
 
+dead=0; deadbase=0
 for m in $MODULES; do
     mp=0; mf=0; mw=0
     for f in "$SRC/src/$m"/*.cpp; do
@@ -64,6 +78,32 @@ for m in $MODULES; do
         if g++ $FLAGS $INCS "$f" 2>/tmp/chk.$$; then mp=$((mp+1)); else mf=$((mf+1)); fi
         mw=$((mw + $(grep -c "$SRC.*warning:" /tmp/chk.$$ || true)))
     done
+    # Dead string-based connects. A SIGNAL() naming a signal Qt 6 does not have
+    # compiles, links, runs and never fires -- there is no other check in this
+    # script, or in the compiler, that can see it. The list is not guessed: each
+    # signature was run through QMetaObject::indexOfSignal on the real Qt 6.10.2
+    # meta-object, which is exactly what connect() does at run time. C4 shipped
+    # ten of these and only review caught them.
+    # Counted against a per-module baseline, NOT folded into mf: an unconverted
+    # module's dead connects are known debt (§2 has the table), and folding them
+    # in would misreport them as compile failures and leave the script standing
+    # red until C8. Any count ABOVE the baseline fails -- which is zero for every
+    # converted module, so a new one cannot be introduced.
+    md=$(command grep -rcE "$DEAD_SIGNALS" "$SRC/src/$m" "$SRC/include/$m" 2>/dev/null \
+         | awk -F: '{s+=$2} END{print s+0}')
+    case "$m" in
+        SIGEL_MasterGUI) base=43 ;;
+        MT_GUI)          base=32 ;;
+        MT_Control)      base=15 ;;
+        *)               base=0  ;;
+    esac
+    dead=$((dead+md)); deadbase=$((deadbase+base))
+    if [ "$md" -gt "$base" ]; then
+        echo "  $m: $md connect(s) to a signal Qt 6 does not have, baseline $base:"
+        command grep -rnE "$DEAD_SIGNALS" "$SRC/src/$m" "$SRC/include/$m" 2>/dev/null \
+            | sed "s|$SRC/|    |" | cut -c1-140
+        mf=$((mf+md-base))
+    fi
     printf '%-22s %2d pass  %2d fail  %3d warnings\n' "$m" "$mp" "$mf" "$mw"
     pass=$((pass+mp)); fail=$((fail+mf)); warn=$((warn+mw))
 done
@@ -79,6 +119,8 @@ for m in $MODULES; do
  done
 done
 printf '%-22s %2d pass  %2d fail\n' "headers standalone" "$hp" "$hf"
+printf '%-22s %2d dead (baseline %d -- §2 has the per-signal table)\n' \
+       "Qt 6 signals" "$dead" "$deadbase"
 
 # ---------------------------------------------------------------------------
 # Phase C -- the converted Designer forms.
@@ -127,9 +169,14 @@ FORM_LIST="MT_UI/MT_AddConstantsWidgetBase:MT_GUI \
 MOCBIN=$(qmake6 -query QT_INSTALL_LIBEXECS)/moc
 fp=0; ff=0; fw=0
 # `forms' already ran above, before the module passes, because GUI headers need
-# its output. Its log is reused here: a failure means checks 2-7 cannot run.
+# its output. REUSE THAT LOG -- do not re-run make here. A second `make forms'
+# is a no-op that emits nothing, so its (empty) output would replace the first
+# run's warnings and the uic-warning check below would become unreachable. That
+# is exactly what happened when this section was hoisted: the gate C1 added to
+# catch a dropped <images> block stopped being able to fire. Found by the C4
+# review, which proved it by injecting one.
 cp /tmp/mkforms.$$ /tmp/uic.$$ 2>/dev/null || : > /tmp/uic.$$
-if ! make -s -C "$ROOT" forms >/tmp/uic.$$ 2>&1; then
+if [ -n "$FORMS_FAILED" ]; then
     echo "  make forms FAILED -- checks 2-7 below did not run:"; cat /tmp/uic.$$; ff=$((ff+1))
 else
     # uic writes warnings to stderr and still exits 0 -- a dropped <images>

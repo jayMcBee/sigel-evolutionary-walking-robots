@@ -44,25 +44,18 @@ namespace SIGEL_SlaveGUI
 
     stopAction = new QAction( this );
     stopAction->setObjectName( "stopAction" );
-    addAction( stopAction );   // Qt 2's QAction::init() did this implicitly
     playAction = new QAction( this );
     playAction->setObjectName( "playAction" );
-    addAction( playAction );   // Qt 2's QAction::init() did this implicitly
     stepAction = new QAction( this );
     stepAction->setObjectName( "stepAction" );
-    addAction( stepAction );   // Qt 2's QAction::init() did this implicitly
     fForwardAction = new QAction( this );
     fForwardAction->setObjectName( "fForwardAction" );
-    addAction( fForwardAction );   // Qt 2's QAction::init() did this implicitly
     // recordAction = new QAction( this );
     // recordAction->setObjectName( "recordAction" );
-    // addAction( recordAction );
     alterMovieSettingsAction = new QAction( this );
     alterMovieSettingsAction->setObjectName( "alterMovieSettingsAction" );
-    addAction( alterMovieSettingsAction );   // Qt 2's QAction::init() did this implicitly
     quitAction = new QAction( this );
     quitAction->setObjectName( "quitAction" );
-    addAction( quitAction );   // Qt 2's QAction::init() did this implicitly
 
     stopIcons.addFile( sigelRootString + "/pixmaps/stopButton.xpm" );
     playIcons.addFile( sigelRootString + "/pixmaps/startButton.xpm" );
@@ -91,15 +84,15 @@ namespace SIGEL_SlaveGUI
     quitAction->setStatusTip( "Closes the simulation visualization." );
 
     connect( playAction,
-	     SIGNAL(activated()),
+	     SIGNAL(triggered()),
 	     SLOT(slotPlayPressed()) );
 
     connect( stopAction,
-	     SIGNAL(activated()),
+	     SIGNAL(triggered()),
 	     SLOT(slotStopPressed()) );
 
     QObject::connect( quitAction,
-		      SIGNAL(activated()),
+		      SIGNAL(triggered()),
 		      qApp,
 		      SLOT(quit()) );
 

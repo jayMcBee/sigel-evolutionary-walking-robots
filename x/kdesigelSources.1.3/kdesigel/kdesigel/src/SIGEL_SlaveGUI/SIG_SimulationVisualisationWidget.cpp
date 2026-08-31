@@ -64,6 +64,7 @@
 		       planeColor( 127, 127, 127 )
   {
     simulationTimer = new QTimer( this );
+    simulationTimer->setObjectName( "simulationTimer" );
 
     connect( simulationTimer,
 	     SIGNAL(timeout()),
@@ -366,7 +367,28 @@
 	  // content, so this records frame N. It removes a one-frame lag that no
 	  // like-for-like port could have kept. Nothing gates it; C9 is the first
 	  // step that could see it. PORTING.md C4.
-	  pm	= grabFramebuffer().copy( pX, pY, pW, pH );
+	  // Qt 2's grabWindow read w<0 / h<0 as "to the window edge"
+	  // (qpixmap_x11.cpp: `if (w < 0) w = a.width - x;'). QImage::copy has no
+	  // such rule and returns a NULL image, which then saves nothing while
+	  // callRenderPixMap still returns true -- a recording that writes no
+	  // files and reports success. pW/pH really do reach here as -1: the
+	  // keepRatio branch sets neither, and the third branch sets exactly one.
+	  // grabFramebuffer() returns DEVICE pixels -- widget size x
+	  // devicePixelRatio -- while pX/pY/pW/pH are all logical, computed from
+	  // width()/height() and movieWidth/Height. On a scaled display the crop
+	  // would take a fraction of the frame. Normalise to logical pixels so the
+	  // arithmetic above means what it did in 1.3, where dpr was always 1.
+	  QImage grabbed = grabFramebuffer();
+	  if ( grabbed.devicePixelRatio() != 1.0 )
+	    {
+	      grabbed = grabbed.scaled( QSize( width(), height() ),
+					Qt::IgnoreAspectRatio,
+					Qt::SmoothTransformation );
+	      grabbed.setDevicePixelRatio( 1.0 );
+	    }
+	  if ( pW < 0 ) pW = grabbed.width()  - pX;
+	  if ( pH < 0 ) pH = grabbed.height() - pY;
+	  pm	= grabbed.copy( pX, pY, pW, pH );
 	  m.scale(scaleW, scaleH);
 	  resPm = pm.transformed(m);
 	  res	= resPm.save( inFName,
