@@ -51,7 +51,7 @@ public:
      * view will get its own window.
      * @param name The internal name used by Qt.
      */
-    SIG_IndividualView( QWidget* parent = 0, const char* name = 0, WFlags fl = 0 );
+    SIG_IndividualView( QWidget* parent = 0, const char* name = 0, Qt::WindowFlags fl = Qt::WindowFlags() );
 
     /**
      * The constructor with a supplied individual.
@@ -64,7 +64,7 @@ public:
      * @param name The internal name used by Qt.
      * @param theGPIndividual The individual that shall be displayed.
      */
-    SIG_IndividualView( QWidget* parent, const char* name, WFlags fl, SIGEL_GP::SIG_GPIndividual *theGPIndividual );
+    SIG_IndividualView( QWidget* parent, const char* name, Qt::WindowFlags fl, SIGEL_GP::SIG_GPIndividual *theGPIndividual );
 
     /**
      * The destructor.

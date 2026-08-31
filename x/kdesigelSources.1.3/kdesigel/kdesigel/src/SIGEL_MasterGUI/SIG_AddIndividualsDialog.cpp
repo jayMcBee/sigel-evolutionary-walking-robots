@@ -46,47 +46,53 @@ namespace SIGEL_MasterGUI
  *  name 'name' and widget flags set to 'f' 
  *
  *  The dialog will by default be modeless, unless you set 'modal' to
- *  TRUE to construct a modal dialog.
+ *  true to construct a modal dialog.
  */
-SIG_AddIndividualsDialog::SIG_AddIndividualsDialog( QWidget* parent,  const char* name, bool modal, WFlags fl )
-    : QDialog( parent, name, modal, fl )
+SIG_AddIndividualsDialog::SIG_AddIndividualsDialog( QWidget* parent,  const char* name, bool modal, Qt::WindowFlags fl )
+    : QDialog( parent, fl )
 {
+    setObjectName( QString::fromUtf8( name ) );
+    // Qt 2's QDialog folded modal into WType_Modal (qdialog.cpp:80), which set
+    // WState_Modal and called qt_enter_modal() -- real application modality,
+    // not merely a window type. setModal() sets WA_ShowModal, which is that.
+    setModal( modal );
+
     if ( !name )
-	setName( "SIG_AddIndividualsDialogBase" );
+	setObjectName( "SIG_AddIndividualsDialogBase" );
     resize( 222, 92 ); 
-    setSizePolicy( QSizePolicy( (QSizePolicy::SizeType)5, (QSizePolicy::SizeType)1, sizePolicy().hasHeightForWidth() ) );
-    setCaption( tr( "Add individuals..." ) );
+    setSizePolicy( QSizePolicy( (QSizePolicy::Policy)5, (QSizePolicy::Policy)1 ) );
+    setWindowTitle( tr( "Add individuals..." ) );
     SIG_AddIndividualsDialogBaseLayout = new QVBoxLayout( this ); 
     SIG_AddIndividualsDialogBaseLayout->setSpacing( 6 );
-    SIG_AddIndividualsDialogBaseLayout->setMargin( 11 );
+    SIG_AddIndividualsDialogBaseLayout->setContentsMargins( 11, 11, 11, 11 );
 
     Layout4 = new QHBoxLayout; 
     Layout4->setSpacing( 6 );
-    Layout4->setMargin( 0 );
+    Layout4->setContentsMargins( 0, 0, 0, 0 );
 
-    textlabelNumber = new QLabel( this, "textlabelNumber" );
+    textlabelNumber = new QLabel( this );
     textlabelNumber->setText( tr( "Number to add:" ) );
     Layout4->addWidget( textlabelNumber );
 
-    spinboxNumber = new QSpinBox( this, "spinboxNumber" );
-    spinboxNumber->setMaxValue( 999 );
-    spinboxNumber->setMinValue( 1 );
+    spinboxNumber = new QSpinBox( this );
+    spinboxNumber->setMaximum( 999 );
+    spinboxNumber->setMinimum( 1 );
     spinboxNumber->setValue( 1 );
     Layout4->addWidget( spinboxNumber );
     SIG_AddIndividualsDialogBaseLayout->addLayout( Layout4 );
 
     Layout1 = new QHBoxLayout; 
     Layout1->setSpacing( 6 );
-    Layout1->setMargin( 0 );
+    Layout1->setContentsMargins( 0, 0, 0, 0 );
     QSpacerItem* spacer = new QSpacerItem( 20, 20, QSizePolicy::Expanding, QSizePolicy::Minimum );
     Layout1->addItem( spacer );
 
-    pushbuttonOK = new QPushButton( this, "pushbuttonOK" );
+    pushbuttonOK = new QPushButton( this );
     pushbuttonOK->setText( tr( "&OK" ) );
-    pushbuttonOK->setDefault( TRUE );
+    pushbuttonOK->setDefault( true );
     Layout1->addWidget( pushbuttonOK );
 
-    pushbuttonCancel = new QPushButton( this, "pushbuttonCancel" );
+    pushbuttonCancel = new QPushButton( this );
     pushbuttonCancel->setText( tr( "&Cancel" ) );
     Layout1->addWidget( pushbuttonCancel );
     SIG_AddIndividualsDialogBaseLayout->addLayout( Layout1 );

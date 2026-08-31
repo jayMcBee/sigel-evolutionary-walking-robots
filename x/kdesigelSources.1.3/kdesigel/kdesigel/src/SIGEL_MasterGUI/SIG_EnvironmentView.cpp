@@ -21,6 +21,8 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 #include <qvalidator.h>
+#include <QLocale>
+#include <QValidator>
 #include <qlineedit.h>
 #include <qcombobox.h>
 #include <qradiobutton.h>
@@ -40,25 +42,25 @@ namespace SIGEL_MasterGUI
  *  Constructs a SIG_Environment which is a child of 'parent', with the 
  *  name 'name' and widget flags set to 'f' 
  */
-SIG_EnvironmentView::SIG_EnvironmentView( QWidget* parent,  const char* name, WFlags fl, SIGEL_GP::SIG_GPExperiment &theExperiment )
+SIG_EnvironmentView::SIG_EnvironmentView( QWidget* parent,  const char* name, Qt::WindowFlags fl, SIGEL_GP::SIG_GPExperiment &theExperiment )
   : SIG_EnvironmentBase( parent, name, fl ), theExperiment( theExperiment )
 {
   // gravity validators
-  lineeditGravityX->setValidator( new QDoubleValidator( lineeditGravityX , "ValidatorGravityX") );
-  lineeditGravityY->setValidator( new QDoubleValidator( lineeditGravityY , "ValidatorGravityY") );
-  lineeditGravityZ->setValidator( new QDoubleValidator( lineeditGravityZ , "ValidatorGravityZ") );
+  lineeditGravityX->setValidator( new QDoubleValidator( lineeditGravityX ) );
+  lineeditGravityY->setValidator( new QDoubleValidator( lineeditGravityY ) );
+  lineeditGravityZ->setValidator( new QDoubleValidator( lineeditGravityZ ) );
 
   // y plane level validators
-  lineeditYPlaneLevel->setValidator( new QDoubleValidator( lineeditYPlaneLevel, "ValidatorYPlaneLevel") );
+  lineeditYPlaneLevel->setValidator( new QDoubleValidator( lineeditYPlaneLevel ) );
 
   // start position validators
-  lineeditStartPositionX->setValidator( new QDoubleValidator( lineeditStartPositionX , "ValidatorStartPositionX") );
-  lineeditStartPositionY->setValidator( new QDoubleValidator( lineeditStartPositionY , "ValidatorStartPositionY") );
-  lineeditStartPositionZ->setValidator( new QDoubleValidator( lineeditStartPositionZ , "ValidatorStartPositionZ") );
+  lineeditStartPositionX->setValidator( new QDoubleValidator( lineeditStartPositionX ) );
+  lineeditStartPositionY->setValidator( new QDoubleValidator( lineeditStartPositionY ) );
+  lineeditStartPositionZ->setValidator( new QDoubleValidator( lineeditStartPositionZ ) );
 
   // floor properties validators
-	lineeditXDim->setValidator(new QIntValidator(lineeditXDim, "ValidatorXDimension") );
-	lineeditZDim->setValidator(new QIntValidator(lineeditZDim, "ValidatorZDimension") );
+	lineeditXDim->setValidator(new QIntValidator(lineeditXDim ) );
+	lineeditZDim->setValidator(new QIntValidator(lineeditZDim ) );
 	
   // validators for the dynaMechs lineedits
   lineeditPlanarSpringConstant->setValidator( new QDoubleValidator(lineeditPlanarSpringConstant) );
@@ -68,6 +70,14 @@ SIG_EnvironmentView::SIG_EnvironmentView( QWidget* parent,  const char* name, WF
   lineeditStaticFrictionCoefficient->setValidator( new QDoubleValidator(lineeditStaticFrictionCoefficient) );
   lineeditKineticFrictionCoefficient->setValidator( new QDoubleValidator(lineeditKineticFrictionCoefficient) );
 
+
+  // Qt 2 forced LC_NUMERIC="C" for the whole process (qapplication_x11.cpp:1389)
+  // and its QDoubleValidator hard-coded '.' (qvalidator.cpp:387). Qt 6 validators
+  // follow the system locale, but the read-back below is QString::toDouble(),
+  // which is locale-independent and always wants '.'. Left to disagree, a typed
+  // "9,81" validates under a comma-decimal locale and reads back as 0.
+  for ( QValidator *v : findChildren<QValidator *>() )
+    v->setLocale( QLocale::c() );
 }
 
 /*  
@@ -124,23 +134,23 @@ void SIG_EnvironmentView::getOutOfExperiment()
   // get the material name
   // first build the combobox
   comboboxMaterialName->clear();
-  QDictIterator<SIGEL_Robot::SIG_Material> materialIter = theExperiment.robot.getMaterialIter();
-  for(; materialIter.current(); ++materialIter )
+  const QList<SIGEL_Robot::SIG_Material *> &materialIterList = theExperiment.robot.getMaterials();
+  for ( auto *materialIter : materialIterList )
     {
-      comboboxMaterialName->insertItem( materialIter.current()->getName() );
+      comboboxMaterialName->addItem( materialIter->getName() );
     }
   bool wasAlreadyInserted = false;
   for( int i=0; i < comboboxMaterialName->count(); i++ )
     {
-      if( comboboxMaterialName->text(i) == theExperiment.environment.getFloorMaterialName() )
+      if( comboboxMaterialName->itemText(i) == theExperiment.environment.getFloorMaterialName() )
 	{
-	  comboboxMaterialName->setCurrentItem( i );
+	  comboboxMaterialName->setCurrentIndex( i );
 	  wasAlreadyInserted = true;
 	  break;
 	}
     }
   if( !wasAlreadyInserted)
-    comboboxMaterialName->insertItem( theExperiment.environment.getFloorMaterialName() );
+    comboboxMaterialName->addItem( theExperiment.environment.getFloorMaterialName() );
 
   //  lineeditMaterialName->setText( theExperiment.environment.getFloorMaterialName() );
   // get the y plane level
@@ -196,7 +206,7 @@ void SIG_EnvironmentView::getOutOfExperiment()
 	};
 	
 	void SIG_EnvironmentView::slotSelectFile() {
-		QString picFile = QFileDialog::getOpenFileName(theExperiment.environment.getFloorPictureFile(),"Portable Greymap (*.pnm *.pgm)",this);
+		QString picFile = QFileDialog::getOpenFileName( this, QString(), theExperiment.environment.getFloorPictureFile(), "Portable Greymap (*.pnm *.pgm)" );
 		if (!picFile.isEmpty()) {
 			lineeditPictureFile->setText(picFile);
 			this->putIntoExperiment();
@@ -204,7 +214,7 @@ void SIG_EnvironmentView::getOutOfExperiment()
 	};
 	
   void SIG_EnvironmentView::slotSelectTextureFile() {
-  QString texFile = QFileDialog::getOpenFileName(theExperiment.environment.getTextureFile(),"Portable Pixmap (*.pnm *.ppm)",this);
+  QString texFile = QFileDialog::getOpenFileName( this, QString(), theExperiment.environment.getTextureFile(), "Portable Pixmap (*.pnm *.ppm)" );
 		if (!texFile.isEmpty()) {
 			lineeditTextureFile->setText(texFile);
 			this->putIntoExperiment();

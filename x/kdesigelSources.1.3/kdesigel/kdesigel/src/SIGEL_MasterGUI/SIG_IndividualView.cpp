@@ -21,7 +21,6 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 #include <qlabel.h>
-#include <qmultilineedit.h>
 
 #include "SIGEL_MasterGUI/SIG_IndividualView.h"
 
@@ -34,12 +33,12 @@ namespace SIGEL_MasterGUI
  *  Constructs a SIG_IndividualView which is a child of 'parent', with the 
  *  name 'name' and widget flags set to 'f' 
  */
-SIG_IndividualView::SIG_IndividualView( QWidget* parent,  const char* name, WFlags fl )
+SIG_IndividualView::SIG_IndividualView( QWidget* parent,  const char* name, Qt::WindowFlags fl )
     : SIG_IndividualViewBase( parent, name, fl )
 {
 }
 
-SIG_IndividualView::SIG_IndividualView( QWidget* parent,  const char* name, WFlags fl, SIGEL_GP::SIG_GPIndividual *theGPIndividual )
+SIG_IndividualView::SIG_IndividualView( QWidget* parent,  const char* name, Qt::WindowFlags fl, SIGEL_GP::SIG_GPIndividual *theGPIndividual )
     : SIG_IndividualViewBase( parent, name, fl )
 {
   textlabelShowName->setText( theGPIndividual->getName() );
@@ -64,9 +63,9 @@ SIG_IndividualView::~SIG_IndividualView()
 
 void SIG_IndividualView::clear()
 {
-  textlabelShowName->setText( QString::null );
-  textlabelShowAge->setText( QString::null );
-  textlabelShowFitness->setText( QString::null );
+  textlabelShowName->setText( QString() );
+  textlabelShowAge->setText( QString() );
+  textlabelShowFitness->setText( QString() );
   multilineeditProgramCode->clear();
   multilineeditHistory->clear();
 };

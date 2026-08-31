@@ -90,13 +90,13 @@ namespace SIGEL_MasterGUI
        * This menu is shown when a user clicks on an
        * individual.
        */
-      QPopupMenu *individualMenu;
+      QMenu *individualMenu;
 
       /**
        * The menu that popups if one clicks in the listview and
        * not on an item.
        */
-      QPopupMenu *listviewMenu;
+      QMenu *listviewMenu;
       
     signals:
       void signalDataRefreshNeeded();
@@ -133,13 +133,13 @@ namespace SIGEL_MasterGUI
        * This slot is called whenever one clicks the right mouse button in
        * the individual list (the list displaying the pool).
        */
-      void slotRightButtonClicked( QListViewItem *theItem, const QPoint &thePoint, int inside );
+      void slotRightButtonClicked( const QPoint &pos );
       
       /**
        * This slot is called whenever one doubleclicks on an item in the
        * individual list.
        */
-      void slotDoubleClicked( QListViewItem * theItem );
+      void slotDoubleClicked( QTreeWidgetItem * theItem );
 
       /**
        * This slot is called whenever individuals shall

@@ -21,6 +21,8 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 #include <qvalidator.h>
+#include <QLocale>
+#include <QValidator>
 #include <qlineedit.h>
 #include <qspinbox.h>
 #include <qcombobox.h>
@@ -33,14 +35,22 @@
 namespace SIGEL_MasterGUI
 {
 
-SIG_SimulationParameter::SIG_SimulationParameter( QWidget* parent,  const char* name, WFlags fl, SIGEL_GP::SIG_GPExperiment &theExperiment )
+SIG_SimulationParameter::SIG_SimulationParameter( QWidget* parent,  const char* name, Qt::WindowFlags fl, SIGEL_GP::SIG_GPExperiment &theExperiment )
   : SIG_SimulationParameterBase( parent, name, fl ), theExperiment( theExperiment )
 {
-  lineeditStepSize->setValidator( new QDoubleValidator( lineeditStepSize , "ValidatorStepSize") );
-  lineeditMaximalError->setValidator( new QDoubleValidator( lineeditMaximalError , "ValidatorMaximalError") );
-  lineeditJointlimitsSpringConstant->setValidator( new QDoubleValidator( lineeditJointlimitsSpringConstant, "lineeditJointlimitsSpringConstant" ) );
-  lineeditJointlimitsDamperConstant->setValidator( new QDoubleValidator( lineeditJointlimitsDamperConstant, "lineeditJointlimitsDamperConstant" ) );
-  lineeditJointfrictionConstant->setValidator( new QDoubleValidator( lineeditJointfrictionConstant, "lineeditJointfrictionConstant" ) );
+  lineeditStepSize->setValidator( new QDoubleValidator( lineeditStepSize ) );
+  lineeditMaximalError->setValidator( new QDoubleValidator( lineeditMaximalError ) );
+  lineeditJointlimitsSpringConstant->setValidator( new QDoubleValidator( lineeditJointlimitsSpringConstant ) );
+  lineeditJointlimitsDamperConstant->setValidator( new QDoubleValidator( lineeditJointlimitsDamperConstant ) );
+  lineeditJointfrictionConstant->setValidator( new QDoubleValidator( lineeditJointfrictionConstant ) );
+
+  // Qt 2 forced LC_NUMERIC="C" for the whole process (qapplication_x11.cpp:1389)
+  // and its QDoubleValidator hard-coded '.' (qvalidator.cpp:387). Qt 6 validators
+  // follow the system locale, but the read-back below is QString::toDouble(),
+  // which is locale-independent and always wants '.'. Left to disagree, a typed
+  // "9,81" validates under a comma-decimal locale and reads back as 0.
+  for ( QValidator *v : findChildren<QValidator *>() )
+    v->setLocale( QLocale::c() );
 }
 
 SIG_SimulationParameter::~SIG_SimulationParameter()
@@ -78,7 +88,7 @@ void SIG_SimulationParameter::putIntoExperiment()
   theExperiment.simulationParameter.setMaximalCollisionLoops( spinboxMaximalCollisionLoops->value() );
 
   // get the integrator out of the widget (combobox)
-  switch( comboboxIntegrator->currentItem() )
+  switch( comboboxIntegrator->currentIndex() )
     {
     case 0:
       theExperiment.simulationParameter.setIntegrator( SIGEL_Simulation::SIG_SimulationParameters::itRungeKutta4);
@@ -95,7 +105,7 @@ void SIG_SimulationParameter::putIntoExperiment()
     }
 
   // get the solve mode out of the widget (combobox)
-  switch( comboboxSolveMode->currentItem() )
+  switch( comboboxSolveMode->currentIndex() )
     {
     case 0:
       theExperiment.simulationParameter.setSolveMode( SIGEL_Simulation::SIG_SimulationParameters::smtSingleValueDecomposition );
@@ -123,7 +133,7 @@ void SIG_SimulationParameter::putIntoExperiment()
     theExperiment.simulationParameter.setSimulationLibrary( SIGEL_Simulation::SIG_SimulationParameters::DynaMechs );
 
   // Get the dynaMechs integrator out of the widgets
-  switch( comboboxDynaMechsIntegrator->currentItem() )
+  switch( comboboxDynaMechsIntegrator->currentIndex() )
     {
       // euler
     case 0:
@@ -185,16 +195,16 @@ void SIG_SimulationParameter::getOutOfExperiment()
   switch( theExperiment.simulationParameter.getIntegrator() )
     {
     case SIGEL_Simulation::SIG_SimulationParameters::itEuler:
-      comboboxIntegrator->setCurrentItem( 3 );
+      comboboxIntegrator->setCurrentIndex( 3 );
       break;
     case SIGEL_Simulation::SIG_SimulationParameters::itDoubleEuler:
-      comboboxIntegrator->setCurrentItem( 2 );
+      comboboxIntegrator->setCurrentIndex( 2 );
       break;
     case SIGEL_Simulation::SIG_SimulationParameters::itRungeKutta2:
-      comboboxIntegrator->setCurrentItem( 1 );
+      comboboxIntegrator->setCurrentIndex( 1 );
       break;
     case SIGEL_Simulation::SIG_SimulationParameters::itRungeKutta4:
-      comboboxIntegrator->setCurrentItem( 0 );
+      comboboxIntegrator->setCurrentIndex( 0 );
       break;
     }
   
@@ -202,13 +212,13 @@ void SIG_SimulationParameter::getOutOfExperiment()
   switch( theExperiment.simulationParameter.getSolveMode() )
     {
     case SIGEL_Simulation::SIG_SimulationParameters::smtSingleValueDecomposition:
-      comboboxSolveMode->setCurrentItem( 0 );
+      comboboxSolveMode->setCurrentIndex( 0 );
       break;
     case SIGEL_Simulation::SIG_SimulationParameters::smtConjugateGradient:
-      comboboxSolveMode->setCurrentItem( 1 );
+      comboboxSolveMode->setCurrentIndex( 1 );
       break;
     case SIGEL_Simulation::SIG_SimulationParameters::smtLUDecomposition:
-      comboboxSolveMode->setCurrentItem( 2 );
+      comboboxSolveMode->setCurrentIndex( 2 );
       break;
     }
 
@@ -231,15 +241,15 @@ void SIG_SimulationParameter::getOutOfExperiment()
     {
       // euler
     case SIGEL_Simulation::SIG_SimulationParameters::Euler:
-      comboboxDynaMechsIntegrator->setCurrentItem( 0 );
+      comboboxDynaMechsIntegrator->setCurrentIndex( 0 );
       break;
       // runge kutta 4
     case SIGEL_Simulation::SIG_SimulationParameters::RungeKutta4:
-      comboboxDynaMechsIntegrator->setCurrentItem( 1 );
+      comboboxDynaMechsIntegrator->setCurrentIndex( 1 );
       break;
       // runga kutta 45
     case SIGEL_Simulation::SIG_SimulationParameters::RungeKutta45:
-      comboboxDynaMechsIntegrator->setCurrentItem( 2 );
+      comboboxDynaMechsIntegrator->setCurrentIndex( 2 );
       break;
     }
 

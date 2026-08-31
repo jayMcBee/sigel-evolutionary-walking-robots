@@ -307,10 +307,10 @@ recorded only in its no-argument form, and Qt 2's `QListView` declared a
 `selectionChanged(QListViewItem*)` overload too. *The two errors cancelled in
 the total, which is why the pristine count did not move.*
 
-**100 in the pristine tree; C4 repaired 10 and C6 repaired 31; 59 remain — 44
-in `SIGEL_MasterGUI` (C7) and 15 in `MT_Control` (C8)**, and
-zero in the **eleven other** modules `check.sh` compiles. *`MT_Control` is one
-of the twelve it compiles, so "zero everywhere it looks" was false; its 15 are
+**100 in the pristine tree; C4 repaired 10, C6 repaired 31 and C7 repaired 44;
+15 remain, all in `MT_Control` (C8)**, and
+zero in the **thirteen other** modules `check.sh` compiles. *`MT_Control` is one
+of the fourteen it compiles, so "zero everywhere it looks" was false; its 15 are
 carried as a baseline until C8.* Of the 100, **83 are `connect()` and 17 are
 `disconnect()`** — a dead `disconnect` is equally a no-op, so nothing is
 mis-prioritised, but the column counts sites, not connects. *That split was
@@ -1704,7 +1704,7 @@ modules include the headers `uic` generates from them.
 | C4 | **DONE 2026-08-31.** `SIGEL_SlaveGUI` — the toolbar, the movie path, and ten connects to signals Qt 6 does not have. Unblocks the last form | 2,344 LOC, 7 sources |
 | C5 | **DONE 2026-08-30, done FIRST — it is the dependency root.** `SIGEL_Visualisation`, 23 Qt 2 sites, 12/12 sources and headers compile, in `check.sh` | 3,564 LOC, 12 sources |
 | C6 | **DONE 2026-08-31.** `MT_GUI` — 31 dead connects, the prepending page list, and a right-click that cleared the selection | 4,513 LOC, 23 sources |
-| C7 | `SIGEL_MasterGUI` — **44 dead connects** (§2) and **28 prepending item sites** (§9) | 7,717 LOC, 20 files |
+| C7 | **DONE 2026-08-31.** `SIGEL_MasterGUI` — all **44 dead connects** repaired (§2), **23 prepending item sites**, the three owning `QDict`s, and 21 validators that would have read the decimal point by system locale. 29/29 sources and 29/29 headers compile; the module is in `MODULES` with a dead-signal baseline of 0 | 8,791 LOC measured (6,164 source + 2,627 header), 29 sources, 20 hand-written |
 | C8 | `sigel.cpp`, `sigel_slave.cpp`; **`MT_Control`'s 15 dead connects** (§2) | 15 sites |
 | C9 | All five modules and both programs build, link and run | — |
 
@@ -1722,7 +1722,7 @@ GUI modules:
 | C4 | `SIGEL_SlaveGUI` | **C3, C5** |
 | C5 | `SIGEL_Visualisation` | none |
 | C6 | `MT_GUI` | none |
-| C7 | `SIGEL_MasterGUI` | none |
+| C7 | `SIGEL_MasterGUI` | **DONE** |
 
 `SIGEL_Visualisation` is a **root**; `SIGEL_CommonGUI` and `SIGEL_SlaveGUI` both
 need it. C3 reads `visualisation->floatingTexts`, a Qt 2 `QVector` living in
@@ -2775,6 +2775,117 @@ the +380, **327 is the new encodings gate counting files** and 46 is `MT_GUI`'s
 headers. Headers 155/1, forms 101/0, parsers 1/0, regex
 self-test 39/0, dead signals 0 against a baseline that C6 lowered from 31 to 0.
 All three behaviour baselines byte-identical.
+
+---
+
+#### C7 — `SIGEL_MasterGUI`: three owning dictionaries, and 21 validators that read the decimal point by locale
+
+**8,791 lines measured at this commit** (6,164 source + 2,627 header) across 29
+sources, of which 9 were already the converted `uic3 -impl` form bases. The
+other 20 are the hand-written module. 29/29 sources and 29/29 headers compile;
+`SIGEL_MasterGUI` has joined `MODULES` with a dead-signal baseline of **0**,
+down from 44.
+
+**The `setAutoDelete` windows were `QDict::take()` all along.** Five sites
+toggle the flag off, `remove()` a value, re-`insert()` it under a new key and
+toggle back — the shape this plan had flagged as the module's real hazard.
+`qgdict.cpp` settles it: `remove_string` calls `deleteItem()` (a no-op while
+autoDelete is off) and `take_string` unlinks without it, so the whole dance
+*is* `take`, a method Qt 2 already had and the 2003 author did not use. Each
+window collapses to one line. That leaves exactly three places where the flag
+did real work: one `remove()` that ran with it **on** (`delete dict.take(k)`),
+and two destructors that leant on `~QDict` to free what they still held
+(`qDeleteAll`). A third dict, `menuDict`, never calls `setAutoDelete` at all —
+Qt 2's default is FALSE — so it owns nothing and needed neither.
+
+**`QDict::operator[]` is `const`; `QHash::operator[]` is not.** `qdict.h:67`
+declares a const find that returns 0 on a miss. Qt 6's non-const `operator[]`
+**default-inserts** a null and grows the hash. A straight rename would have
+quietly accumulated null entries at every lookup of a missing key — and
+`menuDict` has such a key by construction, since `setName()` rekeys
+`widgetDict` and not `menuDict`, so a renamed experiment can never find its own
+menu again. That is a 1.3 defect and it stays; what must not change is the
+container growing behind it. Every lookup is `.value()`.
+
+**21 validators, and the C6 locale bug at scale.** `SIG_EnvironmentView` alone
+builds 15 of them, on gravity, floor dimensions, spring and damper constants and
+friction coefficients, then reads every field back with `QString::toDouble()`.
+Qt 6's `QDoubleValidator` follows the system locale while `toDouble()` never
+does, so under a comma-decimal locale a typed `9,81` validates and reads back as
+**0** — silently zeroing gravity. Qt 2 could not have it: `QApplication` forced
+`setlocale(LC_NUMERIC, "C")` (`qapplication_x11.cpp:1389`) and its validator
+hard-coded `'.'` (`qvalidator.cpp:387`). One `findChildren<QValidator *>()` loop
+per constructor pins all of them to `QLocale::c()`, and covers any validator
+added later.
+
+**23 prepending item sites.** Every `QTreeWidgetItem` in the module was
+constructed with a bare parent, which Qt 2 **prepended**; `SIG_LanguageParameters`
+builds 15 command rows in sequence and 1.3 therefore shows them reversed. Each
+becomes a detached construction plus `insertTopLevelItem(0, …)` or
+`insertChild(0, …)`.
+
+**Two Qt 2 no-ops that Qt 6 turns into a crash or a warning.**
+`QListView::setSelected(0, true)` began `if ( !item ... ) return;`
+(`qlistview.cpp`), and the delete-experiment path calls
+`setSelected(firstChild(), true)` immediately after deleting the last
+experiment — `topLevelItem(0)` is null there, so the naive port segfaults.
+`QWidgetStack::raiseWidget(0)` began `if ( !w || !isMyChild(w) ) return;`, where
+Qt 6's `setCurrentWidget(nullptr)` warns instead. Both are guarded. Qt 2's
+`setSelected` was also *Single*-mode (`qlistview.cpp:1835`), deselecting the
+previous focus item, which is `setCurrentItem()` in Qt 6 — not
+`item->setSelected(true)`, which would leave both rows selected.
+
+**The 44 dead connects.** 33 are `QAction::activated()` → `triggered()`; 4
+`doubleClicked(QListViewItem*)` → `itemDoubleClicked(item, column)`; 3
+`rightButtonClicked` → `setContextMenuPolicy` + `customContextMenuRequested`; 2
+`selectionChanged()` → `itemSelectionChanged()`; 1
+`selectionChanged(QListViewItem*)` → `currentItemChanged`; and 1
+`QActionGroup::selected(QAction*)` → `triggered(QAction*)`. The right-click
+three carry the same two details C6 found and `qlistview.cpp:3388-3396` states
+outright: the position was **global**, and a click that hit no item called
+`clearSelection()` before emitting.
+
+**A Qt 2 hook with no Qt 6 counterpart at all.** `SIG_TextView` overrides
+`QScrollView::viewportMousePressEvent`/`ReleaseEvent`/`MoveEvent` to implement
+drag-scrolling. Qt 6 has no such virtuals: the three methods would have compiled,
+linked, and never been called, and the feature would have gone silently dead.
+They are now dispatched from `viewportEvent()`.
+
+**Toolbar appearance, measured not guessed.** `usesBigPixmaps()` /
+`setUsesTextLabel()` become `iconSize()` / `toolButtonStyle()`. Qt 2 chose
+between the two pixmaps of a `QIconSet` rather than any fixed size, so the
+numbers come from the files: the `*Small.xpm` are **22×22** and the `*Large.xpm`
+**32×32**. The constructor now sets 22×22, which Qt 2 defaulted to and Qt 6
+would otherwise take from the style.
+
+**Three toggle flags nearly lost.** Qt 2's `QAction` took a trailing `toggle`
+argument; `mtUseAction`, `mtChoiceEvaluatorAction` and `mtChoiceClassifierAction`
+passed `true`, and the first conversion dropped it. Restored as
+`setCheckable(true)` — without which `setChecked()` draws nothing in Qt 6.
+
+**Two of my own blanket substitutions overreached, and the compiler caught
+both.** `->currentItem()` → `currentIndex()` is right for `QComboBox` and wrong
+for `QTreeWidget`, which still has `currentItem()`; six sites were reverted.
+`(*it)` → `it` was right for the pointer-list iterators and wrong for the
+`QTreeWidgetItemIterator`s sharing the name. Both surfaced as compile errors, so
+neither could have shipped — unlike the dead connects, which is why those get a
+gate and these do not need one.
+
+**A check for the other half of `connect()`.** The `$DEAD_SIGNALS` gate reads
+`SIGNAL()` only, and this step changed five slot *signatures*. A `SLOT()` string
+that no longer matches its declaration fails at run time exactly as silently.
+Every `SLOT()` in the module was matched against the declarations in its
+headers: **0 mismatches**, the only apparent ones being inherited Qt slots
+(`setEnabled`, `accept`, `reject`) and parameter-name differences.
+
+**Gates: `./check.sh` 831 pass, 5 fail, 506 warnings.** The +58 over C6 is this
+module's 29 sources and 29 headers. The 5 failures are unchanged and all C8
+work: `MT_Control` 1, `SIGEL_GP` 3, and the `WIN_` ZORC header. Dead signals 15
+against baseline 15, all `MT_Control`'s. Warnings 436 → 506, the 70 being this
+module's 66 plus 4 elsewhere from now including converted headers. All three
+behaviour baselines byte-identical, and the encodings gate still reports the
+same 25 known D6 losses — the module's 4 CRLF files and 1 Latin-1 file came
+through unchanged.
 
 ---
 

@@ -23,7 +23,7 @@
 #ifndef SIGEL_MASTERGUI_SIG_INDIVIDUALLISTITEM_H
 #define SIGEL_MASTERGUI_SIG_INDIVIDUALLISTITEM_H
 
-#include <qlistview.h>
+#include <QTreeWidget>
 
 #include "SIGEL_GP/SIG_GPIndividual.h"
 
@@ -32,30 +32,30 @@ namespace SIGEL_MasterGUI
   /**
    * The class representing an individual in the GUI.
    *
-   * This class inherits from QListViewItem. Information
+   * This class inherits from QTreeWidgetItem. Information
    * about this class can be found in the Qt reference
    * library.
    */
-class SIG_IndividualListItem : public QListViewItem
+class SIG_IndividualListItem : public QTreeWidgetItem
 {
  public:
   
   /**
    * The constructor for creating an empty SIG_IndividualListItem.
    *
-   * @param parent The QListView in which this item shall be displayed.
+   * @param parent The QTreeWidget in which this item shall be displayed.
    */
-  SIG_IndividualListItem( QListView *parent );
+  SIG_IndividualListItem( QTreeWidget *parent );
 
   /**
    * The constructor for creating a SIG_IndividualListItem displaying
    * information about theIndividual.
    *
-   * @param parent The QListView in which this item shall be displayed.
+   * @param parent The QTreeWidget in which this item shall be displayed.
    * @param theIndividual The gp individual whose information shall be
    * displayed by this item.
    */
-  SIG_IndividualListItem( QListView *parent, int poolPosition, SIGEL_GP::SIG_GPIndividual *theIndividual );
+  SIG_IndividualListItem( QTreeWidget *parent, int poolPosition, SIGEL_GP::SIG_GPIndividual *theIndividual );
 
   /**
    * The destructor.

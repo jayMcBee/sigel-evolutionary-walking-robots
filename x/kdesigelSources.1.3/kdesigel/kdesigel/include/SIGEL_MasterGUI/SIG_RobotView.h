@@ -44,7 +44,7 @@ public:
     /**
      * The constructor.
      */
-    SIG_RobotView( QWidget* paren, const char* name, WFlags fl, SIGEL_GP::SIG_GPExperiment &theExperiment );
+    SIG_RobotView( QWidget* paren, const char* name, Qt::WindowFlags fl, SIGEL_GP::SIG_GPExperiment &theExperiment );
 
     /**
      * The destructor.

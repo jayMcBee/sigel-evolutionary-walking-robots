@@ -20,12 +20,14 @@
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
+#include <QScrollBar>
 #include "SIGEL_MasterGUI/SIG_TextView.h"
 #include <qtimer.h>
 
 SIG_TextView::SIG_TextView( QWidget *parent, const char *name )
-  : QTextView( parent, name ), oldY(0), scrollDown( true ), scroll( true )
+  : QTextBrowser( parent ), oldY(0), scrollDown( true ), scroll( true )
 {
+  setObjectName( QString::fromUtf8( name ) );
   QTimer *scrollTimer = new QTimer( this );
   connect( scrollTimer,
 	   SIGNAL( timeout() ),
@@ -54,7 +56,7 @@ void SIG_TextView::viewportMouseMoveEvent( QMouseEvent *e )
 {
   int newPos = e->y();
   int toMove = oldY - newPos;
-  scrollBy( 0, toMove );
+  verticalScrollBar()->setValue( verticalScrollBar()->value() + toMove );
   oldY = newPos;
 };
 
@@ -62,9 +64,12 @@ void SIG_TextView::updateScroll()
 {
   if( scroll )
     {
-      int cHeight = contentsHeight();
-      int cY = contentsY();
-      int vHeight = visibleHeight();
+      // Qt 2 QScrollView: contentsHeight() == maximum() + pageStep(),
+      // contentsY() == value(), visibleHeight() == pageStep().
+      QScrollBar *vBar = verticalScrollBar();
+      int cHeight = vBar->maximum() + vBar->pageStep();
+      int cY = vBar->value();
+      int vHeight = vBar->pageStep();
       if( scrollDown )
 	{
 	  if ( cY + vHeight >= cHeight )
@@ -80,8 +85,27 @@ void SIG_TextView::updateScroll()
 	    scrollDown = false;
 	}
       if( scrollDown )
-	scrollBy( 0, 1 );
+	vBar->setValue( vBar->value() + 1 );
       else
-	scrollBy( 0, -1 );
+	vBar->setValue( vBar->value() - 1 );
     }
+};
+
+bool SIG_TextView::viewportEvent( QEvent *e )
+{
+  switch ( e->type() )
+    {
+    case QEvent::MouseButtonPress:
+      viewportMousePressEvent( static_cast<QMouseEvent *>( e ) );
+      break;
+    case QEvent::MouseButtonRelease:
+      viewportMouseReleaseEvent( static_cast<QMouseEvent *>( e ) );
+      break;
+    case QEvent::MouseMove:
+      viewportMouseMoveEvent( static_cast<QMouseEvent *>( e ) );
+      break;
+    default:
+      break;
+    }
+  return QTextBrowser::viewportEvent( e );
 };

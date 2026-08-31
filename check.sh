@@ -90,7 +90,7 @@ DEAD_SIGNALS='SIGNAL\( *(activated *\( *\)|activated *\( *const *QString'\
 '|currentChanged *\( *Q(ListView|ListBox|TreeWidget|ListWidget)Item|rightButtonClicked'\
 '|doubleClicked *\( *Q(ListView|TreeWidget)Item)'
 
-MODULES="${*:-SIGEL_Tools SIGEL_Environment MT_GPSystem SIGEL_Robot SIGEL_Program SIGEL_RobotIO SIGEL_Simulation MT_Control SIGEL_GP SIGEL_Visualisation SIGEL_CommonGUI SIGEL_SlaveGUI MT_GUI}"
+MODULES="${*:-SIGEL_Tools SIGEL_Environment MT_GPSystem SIGEL_Robot SIGEL_Program SIGEL_RobotIO SIGEL_Simulation MT_Control SIGEL_GP SIGEL_Visualisation SIGEL_CommonGUI SIGEL_SlaveGUI MT_GUI SIGEL_MasterGUI}"
 pass=0; fail=0; warn=0
 
 # The shim self-check was here: it built and RAN q2compat_check.cpp under
@@ -175,17 +175,16 @@ for m in $MODULES; do
     # module's dead connects are known debt (§2 has the table), and folding them
     # in would misreport them as compile failures and leave the script standing
     # red until C8. Any count ABOVE the baseline fails. The baseline is zero for
-    # every CONVERTED module, so a new one cannot be introduced there; the three
-    # non-zero ones below are MT_Control, MT_GUI and SIGEL_MasterGUI, which is
-    # C8, C6 and C7 work. MT_Control IS compiled by this script today, so the
-    # gate is not "zero everywhere it looks".
+    # every CONVERTED module, so a new one cannot be introduced there; the only
+    # non-zero one left is MT_Control, which is C8 work. MT_Control IS compiled
+    # by this script today, so the gate is not "zero everywhere it looks".
     #
     # -o|wc -l, not -c: grep -c counts matching LINES. No line carries two
     # SIGNAL() macros today, so the two agree -- but the baselines are exact
     # numbers and should not quietly drift if that ever stops being true.
     md=$(command grep -rhoE "$DEAD_SIGNALS" "$SRC/src/$m" "$SRC/include/$m" 2>/dev/null | wc -l)
     case "$m" in
-        SIGEL_MasterGUI) base=44 ;;
+        SIGEL_MasterGUI) base=0  ;;   # C7 repaired all 44
         MT_GUI)          base=0  ;;   # C6 repaired all 31
         MT_Control)      base=15 ;;
         *)               base=0  ;;

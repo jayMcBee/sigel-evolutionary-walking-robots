@@ -25,6 +25,6 @@
 class SIG_InfoBox : public QDialog
 {
  public:
-  SIG_InfoBox( QWidget *parent = 0, const char *name = 0, bool modal = false, WFlags f = 0 );
+  SIG_InfoBox( QWidget *parent = 0, const char *name = 0, bool modal = false, Qt::WindowFlags f = Qt::WindowFlags() );
   ~SIG_InfoBox();
 };

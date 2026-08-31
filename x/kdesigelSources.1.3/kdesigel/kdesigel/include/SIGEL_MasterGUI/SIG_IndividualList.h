@@ -23,7 +23,7 @@
 #ifndef SIGEL_MASTERGUI_SIG_INDIVIDUALLIST
 #define SIGEL_MASTERGUI_SIG_INDIVIDUALLIST
 
-#include <qpopupmenu.h>
+#include <QMenu>
 
 #include "SIGEL_MasterGUI/SIG_IndividualListBase.h"
 
@@ -48,7 +48,7 @@ class SIG_IndividualList : public SIG_IndividualListBase
    * widget will get its own window.
    * @param name Internal name for Qt.
    */
-  SIG_IndividualList( QWidget* parent = 0, const char* name = 0, WFlags fl = 0 );
+  SIG_IndividualList( QWidget* parent = 0, const char* name = 0, Qt::WindowFlags fl = Qt::WindowFlags() );
 };
 
 }

@@ -21,7 +21,7 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 // #include <qpixmap.h>
-#include <qlistview.h>
+#include <QTreeWidget>
 #include <qspinbox.h>
 #include <qlabel.h>
 #include <qlineedit.h>
@@ -44,7 +44,7 @@ namespace SIGEL_MasterGUI
  *  Constructs a SIG_LanguageParameters which is a child of 'parent', with the 
  *  name 'name' and widget flags set to 'f' 
  */
-SIG_LanguageParameters::SIG_LanguageParameters( QWidget* parent,  const char* name, WFlags fl, SIGEL_GP::SIG_GPExperiment &theExperiment )
+SIG_LanguageParameters::SIG_LanguageParameters( QWidget* parent,  const char* name, Qt::WindowFlags fl, SIGEL_GP::SIG_GPExperiment &theExperiment )
 #ifdef _WINDOWS
   : SIG_LanguageParametersBase( parent, name, fl ), theExperiment( theExperiment ), sigelRoot( ::getenv( "SIGEL_ROOT" ) )//, allow( sigelRoot + "/pixmaps/allow.xpm" ), disallow( sigelRoot + "/pixmaps/disallow.xpm" )
 #else
@@ -58,12 +58,13 @@ SIG_LanguageParameters::SIG_LanguageParameters( QWidget* parent,  const char* na
   SIGEL_Robot::SIG_LanguageParameters *languageParameters = theExperiment.robot.getLangParam();
 
   // update the list
-  QListViewItem *newItem;
+  QTreeWidgetItem *newItem;
 
   if( languageParameters->hasCommand( "SUB" ) )
     {
-      newItem  = new QListViewItem( listviewCommands );
-      newItem->setPixmap( 0, allow );
+      newItem  = new QTreeWidgetItem();
+      listviewCommands->insertTopLevelItem( 0, newItem );
+      newItem->setIcon( 0, QIcon( allow ) );
       newItem->setText( 1, "SUB" );
       QString duration = QString::number( languageParameters->getCommand( "SUB" )->getDuration(), 'g', 10 );
       newItem->setText( 2, duration );
@@ -71,8 +72,9 @@ SIG_LanguageParameters::SIG_LanguageParameters( QWidget* parent,  const char* na
   
   if( languageParameters->hasCommand( "SENSE" ) )
     {
-      newItem  = new QListViewItem( listviewCommands );
-      newItem->setPixmap( 0, allow );
+      newItem  = new QTreeWidgetItem();
+      listviewCommands->insertTopLevelItem( 0, newItem );
+      newItem->setIcon( 0, QIcon( allow ) );
       newItem->setText( 1, "SENSE" );
       QString duration = QString::number( languageParameters->getCommand( "SENSE" )->getDuration(), 'g', 10 );
       newItem->setText( 2, duration );
@@ -80,8 +82,9 @@ SIG_LanguageParameters::SIG_LanguageParameters( QWidget* parent,  const char* na
   
   if( languageParameters->hasCommand( "NOP" ) )
     {
-      newItem  = new QListViewItem( listviewCommands );
-      newItem->setPixmap( 0, allow );
+      newItem  = new QTreeWidgetItem();
+      listviewCommands->insertTopLevelItem( 0, newItem );
+      newItem->setIcon( 0, QIcon( allow ) );
       newItem->setText( 1, "NOP" );
       QString duration = QString::number( languageParameters->getCommand( "NOP" )->getDuration(), 'g', 10 );
       newItem->setText( 2, duration );
@@ -89,8 +92,9 @@ SIG_LanguageParameters::SIG_LanguageParameters( QWidget* parent,  const char* na
   
   if( languageParameters->hasCommand( "MUL" ) )
     {
-      newItem  = new QListViewItem( listviewCommands );
-      newItem->setPixmap( 0, allow );
+      newItem  = new QTreeWidgetItem();
+      listviewCommands->insertTopLevelItem( 0, newItem );
+      newItem->setIcon( 0, QIcon( allow ) );
       newItem->setText( 1, "MUL" );
       QString duration = QString::number( languageParameters->getCommand( "MUL" )->getDuration(), 'g', 10 );
       newItem->setText( 2, duration );
@@ -98,8 +102,9 @@ SIG_LanguageParameters::SIG_LanguageParameters( QWidget* parent,  const char* na
   
   if( languageParameters->hasCommand( "MOVE" ) )
     {
-      newItem  = new QListViewItem( listviewCommands );
-      newItem->setPixmap( 0, allow );
+      newItem  = new QTreeWidgetItem();
+      listviewCommands->insertTopLevelItem( 0, newItem );
+      newItem->setIcon( 0, QIcon( allow ) );
       newItem->setText( 1, "MOVE" );
       QString duration = QString::number( languageParameters->getCommand( "MOVE" )->getDuration(), 'g', 10 );
       newItem->setText( 2, duration );
@@ -107,8 +112,9 @@ SIG_LanguageParameters::SIG_LanguageParameters( QWidget* parent,  const char* na
   
   if( languageParameters->hasCommand( "MOD" ) )
     {
-      newItem  = new QListViewItem( listviewCommands );
-      newItem->setPixmap( 0, allow );
+      newItem  = new QTreeWidgetItem();
+      listviewCommands->insertTopLevelItem( 0, newItem );
+      newItem->setIcon( 0, QIcon( allow ) );
       newItem->setText( 1, "MOD" );
       QString duration = QString::number( languageParameters->getCommand( "MOD" )->getDuration(), 'g', 10 );
       newItem->setText( 2, duration );
@@ -116,8 +122,9 @@ SIG_LanguageParameters::SIG_LanguageParameters( QWidget* parent,  const char* na
   
   if( languageParameters->hasCommand( "MIN" ) )
     {
-      newItem  = new QListViewItem( listviewCommands );
-      newItem->setPixmap( 0, allow );
+      newItem  = new QTreeWidgetItem();
+      listviewCommands->insertTopLevelItem( 0, newItem );
+      newItem->setIcon( 0, QIcon( allow ) );
       newItem->setText( 1, "MIN" );
       QString duration = QString::number( languageParameters->getCommand( "MIN" )->getDuration(), 'g', 10 );
       newItem->setText( 2, duration );
@@ -125,8 +132,9 @@ SIG_LanguageParameters::SIG_LanguageParameters( QWidget* parent,  const char* na
   
   if( languageParameters->hasCommand( "MAX" ) )
     {
-      newItem  = new QListViewItem( listviewCommands );
-      newItem->setPixmap( 0, allow );
+      newItem  = new QTreeWidgetItem();
+      listviewCommands->insertTopLevelItem( 0, newItem );
+      newItem->setIcon( 0, QIcon( allow ) );
       newItem->setText( 1, "MAX" );
       QString duration = QString::number( languageParameters->getCommand( "MAX" )->getDuration(), 'g', 10 );
       newItem->setText( 2, duration );
@@ -134,8 +142,9 @@ SIG_LanguageParameters::SIG_LanguageParameters( QWidget* parent,  const char* na
   
   if( languageParameters->hasCommand( "LOAD" ) )
     {
-      newItem  = new QListViewItem( listviewCommands );
-      newItem->setPixmap( 0, allow );
+      newItem  = new QTreeWidgetItem();
+      listviewCommands->insertTopLevelItem( 0, newItem );
+      newItem->setIcon( 0, QIcon( allow ) );
       newItem->setText( 1, "LOAD" );
       QString duration = QString::number( languageParameters->getCommand( "LOAD" )->getDuration(), 'g', 10 );
       newItem->setText( 2, duration );
@@ -143,8 +152,9 @@ SIG_LanguageParameters::SIG_LanguageParameters( QWidget* parent,  const char* na
 
   if( languageParameters->hasCommand( "JMP" ) )
     {
-      newItem  = new QListViewItem( listviewCommands );
-      newItem->setPixmap( 0, allow );
+      newItem  = new QTreeWidgetItem();
+      listviewCommands->insertTopLevelItem( 0, newItem );
+      newItem->setIcon( 0, QIcon( allow ) );
       newItem->setText( 1, "JMP" );
       QString duration = QString::number( languageParameters->getCommand( "JMP" )->getDuration(), 'g', 10 );
       newItem->setText( 2, duration );
@@ -152,8 +162,9 @@ SIG_LanguageParameters::SIG_LanguageParameters( QWidget* parent,  const char* na
 
   if( languageParameters->hasCommand( "DIV" ) )
     {
-      newItem  = new QListViewItem( listviewCommands );
-      newItem->setPixmap( 0, allow );
+      newItem  = new QTreeWidgetItem();
+      listviewCommands->insertTopLevelItem( 0, newItem );
+      newItem->setIcon( 0, QIcon( allow ) );
       newItem->setText( 1, "DIV" );
       QString duration = QString::number( languageParameters->getCommand( "DIV" )->getDuration(), 'g', 10 );
       newItem->setText( 2, duration );
@@ -161,8 +172,9 @@ SIG_LanguageParameters::SIG_LanguageParameters( QWidget* parent,  const char* na
 
   if( languageParameters->hasCommand( "DELAY" ) )
     {
-      newItem  = new QListViewItem( listviewCommands );
-      newItem->setPixmap( 0, allow );
+      newItem  = new QTreeWidgetItem();
+      listviewCommands->insertTopLevelItem( 0, newItem );
+      newItem->setIcon( 0, QIcon( allow ) );
       newItem->setText( 1, "DELAY" );
       QString duration = QString::number( languageParameters->getCommand( "DELAY" )->getDuration(), 'g', 10 );
       newItem->setText( 2, duration );
@@ -170,8 +182,9 @@ SIG_LanguageParameters::SIG_LanguageParameters( QWidget* parent,  const char* na
 
   if( languageParameters->hasCommand( "COPY" ) )
     {
-      newItem  = new QListViewItem( listviewCommands );
-      newItem->setPixmap( 0, allow );
+      newItem  = new QTreeWidgetItem();
+      listviewCommands->insertTopLevelItem( 0, newItem );
+      newItem->setIcon( 0, QIcon( allow ) );
       newItem->setText( 1, "COPY" );
       QString duration = QString::number( languageParameters->getCommand( "COPY" )->getDuration(), 'g', 10 );
       newItem->setText( 2, duration );
@@ -179,8 +192,9 @@ SIG_LanguageParameters::SIG_LanguageParameters( QWidget* parent,  const char* na
 
   if( languageParameters->hasCommand( "CMP" ) )
     {
-      newItem  = new QListViewItem( listviewCommands );
-      newItem->setPixmap( 0, allow );
+      newItem  = new QTreeWidgetItem();
+      listviewCommands->insertTopLevelItem( 0, newItem );
+      newItem->setIcon( 0, QIcon( allow ) );
       newItem->setText( 1, "CMP" );
       QString duration = QString::number( languageParameters->getCommand( "CMP" )->getDuration(), 'g', 10 );
       newItem->setText( 2, duration );
@@ -188,8 +202,9 @@ SIG_LanguageParameters::SIG_LanguageParameters( QWidget* parent,  const char* na
 
   if( languageParameters->hasCommand( "ADD" ) )
     {
-      newItem  = new QListViewItem( listviewCommands );
-      newItem->setPixmap( 0, allow );
+      newItem  = new QTreeWidgetItem();
+      listviewCommands->insertTopLevelItem( 0, newItem );
+      newItem->setIcon( 0, QIcon( allow ) );
       newItem->setText( 1, "ADD" );
       QString duration = QString::number( languageParameters->getCommand( "ADD" )->getDuration(), 'g', 10 );
       newItem->setText( 2, duration );
@@ -201,9 +216,9 @@ SIG_LanguageParameters::SIG_LanguageParameters( QWidget* parent,  const char* na
   // editCommandDialog = new SIG_EditCommandDialog( this, "EditCommandDialog", true );
 
   QObject::connect( listviewCommands,
-		    SIGNAL( doubleClicked( QListViewItem * ) ),
+		    SIGNAL( itemDoubleClicked( QTreeWidgetItem *, int ) ),
 		    this,
-		    SLOT( slotCommandDoubleClicked( QListViewItem *) ) );
+		    SLOT( slotCommandDoubleClicked( QTreeWidgetItem *) ) );
 };
 
 /*  
@@ -225,19 +240,19 @@ void SIG_LanguageParameters::putIntoExperiment()
 
 void SIG_LanguageParameters::getOutOfExperiment()
 {
-  QListViewItemIterator it( listviewCommands );
-  for( ; it.current(); ++it )
+  QTreeWidgetItemIterator it( listviewCommands );
+  for ( ; *it; ++it )
     {
-      QString command = it.current()->text( 1 );
+      QString command = (*it)->text( 1 );
       if( theExperiment.robot.getLangParam()->hasCommand( command ) )
 	{
-	  it.current()->setPixmap( 0, allow );
-	  it.current()->setText( 2, QString::number( theExperiment.robot.getLangParam()->getCommand( command )->getDuration() ) );
+	  (*it)->setIcon( 0, QIcon( allow ) );
+	  (*it)->setText( 2, QString::number( theExperiment.robot.getLangParam()->getCommand( command )->getDuration() ) );
 	}
       else
 	{
-	  it.current()->setPixmap( 0, disallow );
-	  it.current()->setText( 2, "0" );
+	  (*it)->setIcon( 0, QIcon( disallow ) );
+	  (*it)->setText( 2, "0" );
 	}
     }
 
@@ -253,47 +268,47 @@ void SIG_LanguageParameters::slotPushButtonEditClicked()
 
 void SIG_LanguageParameters::slotPushButtonAllowAllClicked()
 {
-  QListViewItemIterator it( listviewCommands );
-  for( ; it.current(); ++it )
+  QTreeWidgetItemIterator it( listviewCommands );
+  for ( ; *it; ++it )
     {
-      QString command = it.current()->text( 1 );
+      QString command = (*it)->text( 1 );
       if( !theExperiment.robot.getLangParam()->hasCommand( command ) )
 	theExperiment.robot.getLangParam()->addCommand( command, new SIGEL_Robot::SIG_CommandParameters() );
       SIGEL_Robot::SIG_CommandParameters *commandParameters = theExperiment.robot.getLangParam()->getCommand( command );
-      commandParameters->setDuration( it.current()->text( 2 ).toDouble() );
-      it.current()->setPixmap( 0, allow );
+      commandParameters->setDuration( (*it)->text( 2 ).toDouble() );
+      (*it)->setIcon( 0, QIcon( allow ) );
     }
 };
 
 void SIG_LanguageParameters::slotPushButtonDisallowAllClicked()
 {
-  QListViewItemIterator it( listviewCommands );
-  for( ; it.current(); ++it )
+  QTreeWidgetItemIterator it( listviewCommands );
+  for ( ; *it; ++it )
     {
-      QString command = it.current()->text( 1 );
+      QString command = (*it)->text( 1 );
       theExperiment.robot.getLangParam()->removeCommand( command );
-      it.current()->setPixmap( 0, disallow );
+      (*it)->setIcon( 0, QIcon( disallow ) );
     }
 };
 
-void SIG_LanguageParameters::slotCommandDoubleClicked( QListViewItem *theItem )
+void SIG_LanguageParameters::slotCommandDoubleClicked( QTreeWidgetItem *theItem )
 {
   if( theItem )
     {
       // lets collect all selected commands
       int numberOfSelectedCommands = 0;
-      QListViewItemIterator listIt( listviewCommands );
-      for( ; listIt.current(); ++listIt )
+      QTreeWidgetItemIterator listIt( listviewCommands );
+      for( ; *listIt; ++listIt )
 	{
-	  if( listIt.current()->isSelected() )
+	  if( (*listIt)->isSelected() )
 	    ++numberOfSelectedCommands;
 	}
       
-      QString command = theItem->text( 1 ); // HAS TO BE IN THE TRUE-BRANCH OF IF!!!
+      QString command = theItem->text( 1 ); // HAS TO BE IN THE true-BRANCH OF IF!!!
       SIG_EditCommandDialog editCommandDialog( this, "EditCommandDialog", true );
       if( numberOfSelectedCommands == 1 )
 	{
-	  editCommandDialog.setCaption( "Edit command " + command );
+	  editCommandDialog.setWindowTitle( "Edit command " + command );
 	  editCommandDialog.textlabelCommand->setText( "Command: " + command );
 	  if( theExperiment.robot.getLangParam()->hasCommand( command ) )
 	    editCommandDialog.radiobuttonAllow->setChecked( true );
@@ -304,7 +319,7 @@ void SIG_LanguageParameters::slotCommandDoubleClicked( QListViewItem *theItem )
 	}
       else
 	{
-	  editCommandDialog.setCaption( "Edit commands..." );
+	  editCommandDialog.setWindowTitle( "Edit commands..." );
 	  editCommandDialog.textlabelCommand->hide( );
 	  if( theExperiment.robot.getLangParam()->hasCommand( command ) )
 	    editCommandDialog.radiobuttonAllow->setChecked( true );
@@ -315,27 +330,27 @@ void SIG_LanguageParameters::slotCommandDoubleClicked( QListViewItem *theItem )
 	  editCommandDialog.resize( QSize() );
 	}
 
-      QListViewItemIterator listIt2( listviewCommands );
+      QTreeWidgetItemIterator listIt2( listviewCommands );
       
       switch( editCommandDialog.exec() )
 	{
 	  // the OK button was clicked
 	case QDialog::Accepted:
 	  // iterate over the listview
-	  for( ; listIt2.current(); listIt2++ )
+	  for( ; *listIt2; listIt2++ )
 	    {
 	      // check if the current is selected
-	      if( listIt2.current()->isSelected() )
+	      if( (*listIt2)->isSelected() )
 		{
 		  // which command are we in currently
-		  QString currentCommand = listIt2.current()->text( 1 );
+		  QString currentCommand = (*listIt2)->text( 1 );
 		  // check if the command is allowed
 		  if( editCommandDialog.radiobuttonDisallow->isChecked() )
 		    {
 		      // the command is not allowed...
 		      theExperiment.robot.getLangParam()->removeCommand( currentCommand );
-		      listIt2.current()->setPixmap( 0, disallow );
-		      listIt2.current()->setText( 2, editCommandDialog.lineeditDuration->text() );
+		      (*listIt2)->setIcon( 0, QIcon( disallow ) );
+		      (*listIt2)->setText( 2, editCommandDialog.lineeditDuration->text() );
 		    }
 		  else
 		    {
@@ -352,8 +367,8 @@ void SIG_LanguageParameters::slotCommandDoubleClicked( QListViewItem *theItem )
 		      commandParameters->setDuration( editCommandDialog.lineeditDuration->text().toDouble() );
 		      
 		      // lets enter the data into the GUI
-		      listIt2.current()->setPixmap( 0, allow );
-		      listIt2.current()->setText( 2, editCommandDialog.lineeditDuration->text() );
+		      (*listIt2)->setIcon( 0, QIcon( allow ) );
+		      (*listIt2)->setText( 2, editCommandDialog.lineeditDuration->text() );
 		    } // end of else
 		} // end of second if
 	    } // end for

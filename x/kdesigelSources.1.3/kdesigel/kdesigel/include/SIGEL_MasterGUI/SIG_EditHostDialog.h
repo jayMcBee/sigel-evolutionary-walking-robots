@@ -39,7 +39,7 @@ public:
     /**
      * Constructor.
      */
-    SIG_EditHostDialog( QWidget* parent = 0, const char* name = 0, bool modal = FALSE, WFlags fl = 0 );
+    SIG_EditHostDialog( QWidget* parent = 0, const char* name = 0, bool modal = false, Qt::WindowFlags fl = Qt::WindowFlags() );
 
     /**
      * Destructor.

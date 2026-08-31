@@ -23,7 +23,7 @@
 #ifndef SIGEL_MASTERGUI_SIG_EXPERIMENTITEM
 #define SIGEL_MASTERGUI_SIG_EXPERIMENTITEM
 
-#include <qlistview.h>
+#include <QTreeWidget>
 #include <qstring.h>
 
 namespace SIGEL_MasterGUI
@@ -34,7 +34,7 @@ namespace SIGEL_MasterGUI
    * A SIG_ExperimentItem knows how create all options, settings, which 
    * pixmaps to load etc.
    */
-  class SIG_ExperimentItem : public QListViewItem
+  class SIG_ExperimentItem : public QTreeWidgetItem
     {
     public:
       /**
@@ -45,7 +45,7 @@ namespace SIGEL_MasterGUI
        * @param name The name of the experiment. The first ListViewItem
        * will get this as its text.
        */
-      SIG_ExperimentItem( QListView * parent, QString name );
+      SIG_ExperimentItem( QTreeWidget * parent, QString name );
 
       /**
        * The destructor of the SIG_ExperimentItem.

@@ -36,24 +36,34 @@
 namespace SIGEL_MasterGUI
 {
 
-  SIG_ExperimentListView::SIG_ExperimentListView( QWidget * parent, const char * name, QWidgetStack *theWidgetStack ) : QListView( parent, name ), widgetStack( theWidgetStack ), numberOfExperiments(1)
+  SIG_ExperimentListView::SIG_ExperimentListView( QWidget * parent, const char * name, QStackedWidget *theWidgetStack ) : QTreeWidget( parent ), widgetStack( theWidgetStack ), numberOfExperiments(1)
 {
-  addColumn( "Experiments" );
+  setHeaderLabels( QStringList( "Experiments" ) );
+  // Qt 2's QListView::rightButtonClicked has no Qt 6 counterpart. It passed a
+  // GLOBAL position, column -1 when the click hit no item, and called
+  // clearSelection() first in that case (qlistview.cpp:3388-3396).
+  setContextMenuPolicy( Qt::CustomContextMenu );
   QObject::connect( this,
-		    SIGNAL( rightButtonClicked ( QListViewItem *, const QPoint &, int ) ),
-		    SLOT( slotRightButtonClicked( QListViewItem *, const QPoint &, int ) ) );
+		    SIGNAL( customContextMenuRequested( const QPoint & ) ),
+		    SLOT( slotRightButtonClicked( const QPoint & ) ) );
   QObject::connect( this,
-		    SIGNAL( selectionChanged( QListViewItem * ) ),
-		    SLOT( slotSelectionChanged( QListViewItem * ) ));
-  experimentListViewMenu = new QPopupMenu( this, "SIG_ExperimentListViewPopupMenu" );
+		    SIGNAL( currentItemChanged( QTreeWidgetItem *, QTreeWidgetItem * ) ),
+		    SLOT( slotSelectionChanged( QTreeWidgetItem * ) ));
+  experimentListViewMenu = new QMenu( this );
+  experimentListViewMenu->setObjectName( "SIG_ExperimentListViewPopupMenu" );
 
-  setRootIsDecorated( TRUE );
-  setSorting( -1 );
+  setRootIsDecorated( true );
+  // Qt 2: setSorting(-1) meant "do not sort at all".
+  setSortingEnabled( false );
   
-  experimentDict.setAutoDelete( true );
 };
 
-SIG_ExperimentListView::~SIG_ExperimentListView(){};
+SIG_ExperimentListView::~SIG_ExperimentListView()
+{
+  // experimentDict had setAutoDelete(true), so ~QDict deleted every
+  // experiment it still held. QHash owns nothing.
+  qDeleteAll( experimentDict );
+};
 
 void SIG_ExperimentListView::slotNewExperiment()
 {
@@ -71,7 +81,8 @@ void SIG_ExperimentListView::slotNewExperiment()
 		    SIGNAL( evolutionNotRunning( bool ) ) );
   experimentDict.insert( project , theNewExperiment );
   emit isNotEmpty( true );
-  this->setSelected( theNewItem, true );
+  if ( theNewItem )
+	    setCurrentItem( theNewItem );
 };
 
 void SIG_ExperimentListView::slotRenameExperiment()
@@ -81,7 +92,7 @@ void SIG_ExperimentListView::slotRenameExperiment()
     {
       SIG_RenameDialog renameDialog( this, 0, true );
       QString oldName = currentlySelectedExperimentName();
-      renameDialog.setCaption( "Rename " + oldName );
+      renameDialog.setWindowTitle( "Rename " + oldName );
       renameDialog.lineeditNewName->setText( oldName );
       renameDialog.lineeditNewName->selectAll();
       renameDialog.lineeditNewName->setFocus();
@@ -90,7 +101,7 @@ void SIG_ExperimentListView::slotRenameExperiment()
 	case QDialog::Accepted:
 	  QString newName = renameDialog.lineeditNewName->text();
 	  // we got a real new name so lets do it
-	  if( newName != QString::null && newName != oldName && !experimentExists( newName ) )
+	  if( newName != QString() && newName != oldName && !experimentExists( newName ) )
 	    {
 	      // the string is not empty, was really changed and there is no other experiment with that name, so lets go
 
@@ -99,15 +110,13 @@ void SIG_ExperimentListView::slotRenameExperiment()
 		newName.append( ".exp" );
 
 	      // disable autodelete to keep the SIG_Experiment object
-	      experimentDict.setAutoDelete( false );
-	      experimentDict.remove( oldName );
+	      experimentDict.take( oldName );
 
 	      theExperiment->setName( newName );
 	      // insert the experiment into the experiment dictionary
 	      experimentDict.insert( newName, theExperiment );
       
 	      // enable autodelete
-	      experimentDict.setAutoDelete( true );
 	    } // close if
 	  else
 	    QMessageBox::information( this, "Error...", "Either you have entered no name or there is\nalready an experiment under that name." );
@@ -119,7 +128,7 @@ void SIG_ExperimentListView::slotRenameExperiment()
 void SIG_ExperimentListView::slotDeleteExperiment()
 {
   // Find out which experiment is selected...
-  QListViewItem *current = currentItem();
+  QTreeWidgetItem *current = currentItem();
   if(current)
     {
       while(current->parent() != 0)
@@ -133,10 +142,12 @@ void SIG_ExperimentListView::slotDeleteExperiment()
 				    "the experiment " + name + "?", QMessageBox::Yes | QMessageBox::Default, QMessageBox::No) )
 	{
 	case QMessageBox::Yes:
-	  experimentDict.remove( name );
-	  takeItem(current);
+	  // Qt 2 ran this with autoDelete ON: the removed value was deleted
+	  delete experimentDict.take( name );
+	  takeTopLevelItem( indexOfTopLevelItem( current ) );
 	  delete current;
-	  setSelected( firstChild(), true );
+	  if ( QTreeWidgetItem *firstItem = topLevelItem( 0 ) )
+	    setCurrentItem( firstItem );
 	  break;
 	};
     }
@@ -144,7 +155,7 @@ void SIG_ExperimentListView::slotDeleteExperiment()
     {
       QMessageBox::information( this, "There is no experiment selected...", "Currently there is no experiment selected." );
     };
-  if( this->childCount() == 0 )
+  if( topLevelItemCount() == 0 )
     {
       emit isNotEmpty( false );
     }
@@ -156,21 +167,21 @@ void SIG_ExperimentListView::slotDeleteExperiment()
 
 void SIG_ExperimentListView::slotLoadExperiment()
 {
-  QStringList filesToOpen = QFileDialog::getOpenFileNames( "Experiment Files (*.exp);;All Files (*)", QString::null, 0, "filesToOpen", "Load Experiments..." );
+  QStringList filesToOpen = QFileDialog::getOpenFileNames( nullptr, "Load Experiments...", QString(), "Experiment Files (*.exp);;All Files (*)" );
   if( !filesToOpen.isEmpty() )
     {
       for( int i = 0; i < filesToOpen.count(); i++)
 	{
 	  QString absFileName = filesToOpen[i];
-	  int slashPosition = absFileName.findRev( "/" );
+	  int slashPosition = absFileName.lastIndexOf( "/" );
 	  QString fileName = absFileName.right( absFileName.length() - (slashPosition + 1) );
 	  if ( experimentExists( fileName ) )
 	    fileName = getAlternativeName( fileName );
 	  SIG_ExperimentItem *theNewItem = new SIG_ExperimentItem( this, fileName );
 
 	  // lets test something
-	  theNewItem->setOpen(false);
-	  theNewItem->setSelectable( false );
+	  theNewItem->setExpanded(false);
+	  theNewItem->setFlags( theNewItem->flags() & ~Qt::ItemIsSelectable );
 
 	  SIG_Experiment *theNewExperiment = new SIG_Experiment( fileName, widgetStack, theNewItem );
 	  QObject::connect( theNewExperiment,
@@ -179,7 +190,7 @@ void SIG_ExperimentListView::slotLoadExperiment()
 			    SIGNAL( evolutionNotRunning( bool ) ) );
 	  
 	  QFile file( absFileName );
-	  if( file.open(IO_ReadOnly) )
+	  if( file.open(QIODevice::ReadOnly) )
 	    {
 	      QTextStream theStream( &file );
 	      // this is for the autosave function
@@ -196,29 +207,30 @@ void SIG_ExperimentListView::slotLoadExperiment()
 	  emit isNotEmpty( true );
 
 	  // lets test something 2
-	  theNewItem->setSelectable( true );
-	  theNewItem->setOpen(true);
+	  theNewItem->setFlags( theNewItem->flags() | Qt::ItemIsSelectable );
+	  theNewItem->setExpanded(true);
 	  
 	} // for each filename end
-      setSelected( firstChild(), true );
+      if ( QTreeWidgetItem *firstItem = topLevelItem( 0 ) )
+	    setCurrentItem( firstItem );
     };
 };
 
 void SIG_ExperimentListView::slotSaveExperiment()
 {
   QString currentExperiment = currentlySelectedExperimentName();
-  if (currentExperiment != QString::null ) {
+  if (currentExperiment != QString() ) {
       SIG_Experiment *theExperiment = getByExperimentName( currentExperiment );
       theExperiment->putAllIntoExperiment();
-      QString fileName = QFileDialog::getSaveFileName( theExperiment->getName(), "Experiment Files (*.exp);;All Files (*)", 0, "ExperimentSaveDialog", "Save Experiment...");
+      QString fileName = QFileDialog::getSaveFileName( nullptr, "Save Experiment...", theExperiment->getName(), "Experiment Files (*.exp);;All Files (*)" );
       if( !fileName.isEmpty() ) {
 	  		if( fileName.right(4) != ".exp" ) fileName.append( ".exp" );
 	  		QFile file( fileName );
 	  		if( file.exists() )
-	    		switch( QMessageBox::warning( 0, "File exists...", "The file " + file.name() + " exists!\nDo you want to overwrite?", QMessageBox::Yes | QMessageBox::Default, QMessageBox::No | QMessageBox::Escape ) )
+	    		switch( QMessageBox::warning( 0, "File exists...", "The file " + file.fileName() + " exists!\nDo you want to overwrite?", QMessageBox::Yes | QMessageBox::Default, QMessageBox::No | QMessageBox::Escape ) )
 	      	{
 	      		case QMessageBox::Yes:
-							if( file.open(IO_WriteOnly) ) {
+							if( file.open(QIODevice::WriteOnly) ) {
 		    				QTextStream theStream( &file );
 		    				theExperiment->gpExperiment.saveExperiment( theStream );
 		  		    }
@@ -226,19 +238,17 @@ void SIG_ExperimentListView::slotSaveExperiment()
 
 				    QFileInfo fileInfo( fileName );
 
-						experimentDict.setAutoDelete( false );
-						experimentDict.remove( currentExperiment );
+						experimentDict.take( currentExperiment );
 
 						theExperiment->setName( fileInfo.fileName() );
 
 						experimentDict.insert( fileInfo.fileName(), theExperiment );
       
-						experimentDict.setAutoDelete( true );
 
 						break;
 	      	} // switch
 	  	else { // file does not exist
-	      if( file.open(IO_WriteOnly) ) {
+	      if( file.open(QIODevice::WriteOnly) ) {
 		  		QTextStream theStream( &file );
 		  		theExperiment->gpExperiment.saveExperiment( theStream );
 				}
@@ -246,14 +256,12 @@ void SIG_ExperimentListView::slotSaveExperiment()
 
 	      QFileInfo fileInfo( fileName );
 
-	      experimentDict.setAutoDelete( false );
-	      experimentDict.remove( currentExperiment );
+	      experimentDict.take( currentExperiment );
 
 	      theExperiment->setName( fileInfo.fileName() );
 
 	      experimentDict.insert( fileInfo.fileName(), theExperiment );
       
-	      experimentDict.setAutoDelete( true );
 	    } // else (file does not exist)
 	
 	  // this is for the autosave function
@@ -266,10 +274,15 @@ void SIG_ExperimentListView::slotSaveExperiment()
   }
 };
 
-void SIG_ExperimentListView::slotRightButtonClicked( QListViewItem * theItem, const QPoint & thePoint, int inside )
+void SIG_ExperimentListView::slotRightButtonClicked( const QPoint & pos )
 {
-  if (inside==-1)
-    experimentListViewMenu->popup( thePoint ); // the click was outside
+  QTreeWidgetItem *theItem = itemAt( pos );
+  const QPoint thePoint = viewport()->mapToGlobal( pos );
+  if ( !theItem )
+    {
+      clearSelection();                        // Qt 2 did this before emitting
+      experimentListViewMenu->popup( thePoint ); // the click was outside
+    }
   else
     {
       QString option = theItem->text(0);
@@ -279,12 +292,12 @@ void SIG_ExperimentListView::slotRightButtonClicked( QListViewItem * theItem, co
 	  theItem = theItem->parent();
 	}
       experimentName = theItem->text(0);
-      experimentDict[ experimentName ]->slotRightClick( option, thePoint );
+      experimentDict.value( experimentName )->slotRightClick( option, thePoint );
     }
 };
 
 
-void SIG_ExperimentListView::slotSelectionChanged( QListViewItem * theItem )
+void SIG_ExperimentListView::slotSelectionChanged( QTreeWidgetItem * theItem )
 {
   if(theItem)
     {
@@ -295,8 +308,8 @@ void SIG_ExperimentListView::slotSelectionChanged( QListViewItem * theItem )
 	  theItem = theItem->parent();
 	}
       experimentName = theItem->text(0);
-      experimentDict[ experimentName ]->slotSelectionChanged( option );
-      SIGEL_GP::SIG_GUIGPManager *manager = experimentDict[ experimentName ]->gpManager;
+      experimentDict.value( experimentName )->slotSelectionChanged( option );
+      SIGEL_GP::SIG_GUIGPManager *manager = experimentDict.value( experimentName )->gpManager;
       if( manager )
 	{
 	  if( manager->running() )
@@ -307,20 +320,20 @@ void SIG_ExperimentListView::slotSelectionChanged( QListViewItem * theItem )
       else
 	emit evolutionNotRunning( true );
  	  emit actExpChanged();
-      experimentDict[ experimentName ]->putAllIntoExperiment();
+      experimentDict.value( experimentName )->putAllIntoExperiment();
     }
 };
 
 SIG_Experiment* SIG_ExperimentListView::getByExperimentName( QString name )
 {
-  if( name != QString::null )
-    return experimentDict[ name ];
+  if( name != QString() )
+    return experimentDict.value( name );
   return NULL;
 };
 
 bool SIG_ExperimentListView::experimentExists( QString name )
 {
-  if( experimentDict[ name ] )
+  if( experimentDict.value( name ) )
     return true;
   else
     return false;
@@ -340,15 +353,15 @@ QString SIG_ExperimentListView::getAlternativeName( QString existingName )
 SIG_Experiment* SIG_ExperimentListView::currentlySelectedExperiment()
 {
   QString experimentName = currentlySelectedExperimentName();
-  if( experimentName != QString::null )
-    return experimentDict[ experimentName ];
+  if( experimentName != QString() )
+    return experimentDict.value( experimentName );
   else
     return 0;
 };
 
 QString SIG_ExperimentListView::currentlySelectedExperimentName()
 {
-  QListViewItem *theCurrentItem = currentItem();
+  QTreeWidgetItem *theCurrentItem = currentItem();
   if (theCurrentItem)
     {
       while( theCurrentItem->parent() != 0)
@@ -358,12 +371,12 @@ QString SIG_ExperimentListView::currentlySelectedExperimentName()
       return theCurrentItem->text( 0 );
     }
   else
-    return QString::null;
+    return QString();
 };
 
 void SIG_ExperimentListView::selectItem( QString label )
 {
-  QListViewItem *theItem = currentItem();
+  QTreeWidgetItem *theItem = currentItem();
   if( theItem )
     {
       while( theItem->parent() != 0)
@@ -371,21 +384,22 @@ void SIG_ExperimentListView::selectItem( QString label )
 	  theItem = theItem->parent();
 	}
 
-      for(; theItem; theItem = theItem->itemBelow() )
+      for(; theItem; theItem = itemBelow( theItem ) )
 	{
 	  if( theItem->text( 0 ) == label )
 	    {
-	      setSelected( theItem, true );
+	      if ( theItem )
+	    setCurrentItem( theItem );
 	      break;
 	    }
 	}
 
-      /* QListViewItemIterator it( theItem );
-       * for( ; it.current(); it++ )
+      /* QTreeWidgetItemIterator it( theItem );
+       * for ( ; *it; it++ )
        * 	{
-       *	  if( it.current()->text( 0 ) == label )
+       *	  if( (*it)->text( 0 ) == label )
        *    {
-       *	      setSelected( it.current(), true );
+       *	      setSelected( (*it), true );
        *	      break;
        *	    }
        *	} */

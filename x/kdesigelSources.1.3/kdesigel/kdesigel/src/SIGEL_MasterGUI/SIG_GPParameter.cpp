@@ -50,7 +50,7 @@ namespace SIGEL_MasterGUI
  *  Constructs a SIG_GPParameter which is a child of 'parent', with the 
  *  name 'name' and widget flags set to 'f' 
  */
-SIG_GPParameter::SIG_GPParameter( QWidget* parent,  const char* name, WFlags fl, SIGEL_GP::SIG_GPExperiment &theExperiment )
+SIG_GPParameter::SIG_GPParameter( QWidget* parent,  const char* name, Qt::WindowFlags fl, SIGEL_GP::SIG_GPExperiment &theExperiment )
 #ifdef _WINDOWS
   : SIG_GPParameterBase( parent, name, fl ), theExperiment( theExperiment ), sigelRoot( ::getenv( "SIGEL_ROOT" ) )
 #else
@@ -58,8 +58,8 @@ SIG_GPParameter::SIG_GPParameter( QWidget* parent,  const char* name, WFlags fl,
 #endif
 {
   QObject::connect( listviewHosts,
-		    SIGNAL( doubleClicked( QListViewItem * ) ),
-		    SLOT( slotItemDoubleClicked( QListViewItem * ) ) );
+		    SIGNAL( itemDoubleClicked( QTreeWidgetItem *, int ) ),
+		    SLOT( slotItemDoubleClicked( QTreeWidgetItem * ) ) );
 }
 
 /*  
@@ -72,12 +72,12 @@ SIG_GPParameter::~SIG_GPParameter()
 
 void SIG_GPParameter::slotChangeGraveyardDir()
 {
-  lineeditGraveyardDir->setText( QFileDialog::getExistingDirectory( "./", this, "getExistingDirDialogGraveyard", "Select Directory...", true ) );
+  lineeditGraveyardDir->setText( QFileDialog::getExistingDirectory( this, "Select Directory...", "./" ) );
 };
 
 void SIG_GPParameter::slotChangePoolImageDir()
 {
-  lineeditPoolImageDir->setText( QFileDialog::getExistingDirectory( "./", this, "getExistingDirDialogPoolImage", "Select Directory...", true ) );
+  lineeditPoolImageDir->setText( QFileDialog::getExistingDirectory( this, "Select Directory...", "./" ) );
 };
 
 void SIG_GPParameter::putIntoExperiment()
@@ -99,7 +99,7 @@ void SIG_GPParameter::putIntoExperiment()
 
   // put the fitness function name into the experiment
   // theExperiment.gpParameter.setFitnessName( lineeditFitnessFunctionName->text() );
-  switch( comboboxFitnessName->currentItem() )
+  switch( comboboxFitnessName->currentIndex() )
     {
     case 0: // simple fitnessFunction
       theExperiment.gpParameter.setFitnessName("SimpleFitnessFunction");
@@ -150,7 +150,7 @@ void SIG_GPParameter::putIntoExperiment()
   theExperiment.gpParameter.setProbability( SIGEL_Program::SENSE, sliderSENSE->value() );
   theExperiment.gpParameter.setProbability( SIGEL_Program::SUB, sliderSUB->value() );
   
-  switch( comboboxTerminationBy->currentItem() )
+  switch( comboboxTerminationBy->currentIndex() )
     {
     case 0:
       theExperiment.gpParameter.setTerminationModel( SIGEL_GP::SIG_GPParameter::byUser );
@@ -168,7 +168,7 @@ void SIG_GPParameter::putIntoExperiment()
 
   // put the date into the experiment
   QDate theDate;
-  theDate.setYMD( spinboxByTimeYear->value(), spinboxByTimeMonth->value(), spinboxByTimeDay->value());
+  theDate.setDate( spinboxByTimeYear->value(), spinboxByTimeMonth->value(), spinboxByTimeDay->value());
   QTime theTime;
   theTime.setHMS( spinboxByTimeHour->value(), spinboxByTimeMins->value(), spinboxByTimeSecs->value() );
   QDateTime theDateTime( theDate, theTime );
@@ -193,7 +193,7 @@ void SIG_GPParameter::putIntoExperiment()
   theExperiment.gpParameter.setTournamentsPerGeneration( tournamentsPerGeneration );
 
   // set the priority
-  switch( comboboxPriority->currentItem() )
+  switch( comboboxPriority->currentIndex() )
     {
     case 0:
       theExperiment.gpParameter.setPriority(SIGEL_GP::SIG_GPParameter::veryLow);
@@ -252,20 +252,20 @@ void SIG_GPParameter::getOutOfExperiment()
   // get the fitness function name
   QString fitnessName = theExperiment.gpParameter.getFitnessName();
   if ( fitnessName == "SimpleFitnessFunction" )
-    comboboxFitnessName->setCurrentItem(0);
+    comboboxFitnessName->setCurrentIndex(0);
   else if ( fitnessName == "RealSpeedFitnessFunction" )
-      comboboxFitnessName->setCurrentItem(1);
+      comboboxFitnessName->setCurrentIndex(1);
   else if ( fitnessName == "NiceWalkingFitnessFunction" )
-      comboboxFitnessName->setCurrentItem(2);
+      comboboxFitnessName->setCurrentIndex(2);
   else if ( fitnessName == "ZorcWalkingFitnessFunction" )
-      comboboxFitnessName->setCurrentItem(3);
+      comboboxFitnessName->setCurrentIndex(3);
   else if ( fitnessName == "StepperFitnessFunction" )
-      comboboxFitnessName->setCurrentItem(4);
+      comboboxFitnessName->setCurrentIndex(4);
   else if ( fitnessName == "RemoteZORCFitnessFunction" )
-      comboboxFitnessName->setCurrentItem(5);
+      comboboxFitnessName->setCurrentIndex(5);
   else if ( fitnessName == "ForceFitnessFunction" )
-  		comboboxFitnessName->setCurrentItem(6);
-  else comboboxFitnessName->setCurrentItem(0);
+  		comboboxFitnessName->setCurrentIndex(6);
+  else comboboxFitnessName->setCurrentIndex(0);
 
   // get the probabilities
   sliderADD->setValue( theExperiment.gpParameter.getProbability( SIGEL_Program::ADD ) );
@@ -288,16 +288,16 @@ void SIG_GPParameter::getOutOfExperiment()
   switch( theExperiment.gpParameter.getTerminationModel() )
     {
     case SIGEL_GP::SIG_GPParameter::byUser:
-      comboboxTerminationBy->setCurrentItem( 0 );
+      comboboxTerminationBy->setCurrentIndex( 0 );
       break;
     case SIGEL_GP::SIG_GPParameter::byTime:
-      comboboxTerminationBy->setCurrentItem( 1 );
+      comboboxTerminationBy->setCurrentIndex( 1 );
       break;
     case SIGEL_GP::SIG_GPParameter::byGeneration:
-      comboboxTerminationBy->setCurrentItem( 2 );
+      comboboxTerminationBy->setCurrentIndex( 2 );
       break;
     case SIGEL_GP::SIG_GPParameter::byTimeGeneration:
-      comboboxTerminationBy->setCurrentItem( 3 );
+      comboboxTerminationBy->setCurrentIndex( 3 );
       break;
     }
   
@@ -335,19 +335,19 @@ void SIG_GPParameter::getOutOfExperiment()
   switch( theExperiment.gpParameter.getPriority() )
     {
     case SIGEL_GP::SIG_GPParameter::veryLow:
-      comboboxPriority->setCurrentItem( 0 );
+      comboboxPriority->setCurrentIndex( 0 );
       break;
     case SIGEL_GP::SIG_GPParameter::low:
-      comboboxPriority->setCurrentItem( 1 );
+      comboboxPriority->setCurrentIndex( 1 );
       break;
     case SIGEL_GP::SIG_GPParameter::normal:
-      comboboxPriority->setCurrentItem( 2 );
+      comboboxPriority->setCurrentIndex( 2 );
       break;
     case SIGEL_GP::SIG_GPParameter::high:
-      comboboxPriority->setCurrentItem( 3 );
+      comboboxPriority->setCurrentIndex( 3 );
       break;
     case SIGEL_GP::SIG_GPParameter::veryHigh:
-      comboboxPriority->setCurrentItem( 4 );
+      comboboxPriority->setCurrentIndex( 4 );
       break;
     }
   
@@ -357,10 +357,10 @@ void SIG_GPParameter::getOutOfExperiment()
   else
     checkboxUseGraveyard->setChecked( false );
   QDir graveyardDir = theExperiment.gpParameter.getGraveYardDirectory();
-  lineeditGraveyardDir->setText( graveyardDir.absPath() );
+  lineeditGraveyardDir->setText( graveyardDir.absolutePath() );
 
   QDir poolImageDir = theExperiment.gpParameter.getPoolImageDirectory();
-  lineeditPoolImageDir->setText( poolImageDir.absPath() );
+  lineeditPoolImageDir->setText( poolImageDir.absolutePath() );
   int poolImageGeneration = theExperiment.gpParameter.getPoolImageGeneration();
   if (poolImageGeneration == 0)
     checkboxUsePoolImage->setChecked( false );
@@ -373,27 +373,28 @@ void SIG_GPParameter::getOutOfExperiment()
   // enter the PVM hosts into the list...
   // clear list
   listviewHosts->clear();
-  QList<SIGEL_GP::SIG_GPPVMHost> &hostList = theExperiment.gpParameter.getHostList();
+  QList<SIGEL_GP::SIG_GPPVMHost *> &hostList = theExperiment.gpParameter.getHostList();
 
-  QListIterator<SIGEL_GP::SIG_GPPVMHost> it( hostList );
+  
 
-  for ( ; it.current(); ++it )
+  for ( SIGEL_GP::SIG_GPPVMHost *it : hostList )
   {
       // create a new listview item for each found host
-      QListViewItem *newItem = new QListViewItem( listviewHosts );
+      QTreeWidgetItem *newItem = new QTreeWidgetItem();
+      listviewHosts->insertTopLevelItem( 0, newItem );
       // set the pixmap
-      if( it.current()->enabled )
-	newItem->setPixmap(0, QPixmap( sigelRoot + "/pixmaps/allow.xpm" ) );
+      if( it->enabled )
+	newItem->setIcon( 0, QIcon( QPixmap( sigelRoot + "/pixmaps/allow.xpm" ) ) );
       else
-	newItem->setPixmap(0, QPixmap( sigelRoot + "/pixmaps/disallow.xpm" ) );
+	newItem->setIcon( 0, QIcon( QPixmap( sigelRoot + "/pixmaps/disallow.xpm" ) ) );
       // set the hostname
-      newItem->setText( 1, it.current()->name );
+      newItem->setText( 1, it->name );
       // set maximal slaves
-      newItem->setText( 2, QString::number( it.current()->maxSlaves ) );
+      newItem->setText( 2, QString::number( it->maxSlaves ) );
 #ifdef _WINDOWS
-      newItem->setText( 3, it.current()->executableDir.path() );
+      newItem->setText( 3, it->executableDir.path() );
 #else
-      newItem->setText( 3, it.current()->executableDir.absPath() );
+      newItem->setText( 3, it->executableDir.absolutePath() );
 #endif
     }
 
@@ -404,22 +405,21 @@ void SIG_GPParameter::getOutOfExperiment()
 void SIG_GPParameter::slotAddHost()
 {
   // create an show the dialog
-  SIG_EditHostDialog editDialog( 0, "editDialogAddHosts", true, 0 );
+  SIG_EditHostDialog editDialog( 0, "editDialogAddHosts", true, Qt::WindowFlags() );
   editDialog.checkboxEnableHost->setChecked( true );
   editDialog.lineeditHostName->setFocus();
-  editDialog.lineeditSlaveDirectory->setText( QDir::currentDirPath() );
-  editDialog.setCaption( "Add host..." );
+  editDialog.lineeditSlaveDirectory->setText( QDir::currentPath() );
+  editDialog.setWindowTitle( "Add host..." );
   switch ( editDialog.exec() )
     {
       // the OK button was pressed
     case QDialog::Accepted:
       // lets first see if there is no host under that name...
-      QList<SIGEL_GP::SIG_GPPVMHost> &hostList = theExperiment.gpParameter.getHostList();
-      QListIterator<SIGEL_GP::SIG_GPPVMHost> it( hostList );
+      QList<SIGEL_GP::SIG_GPPVMHost *> &hostList = theExperiment.gpParameter.getHostList();
       bool isThere = false;
-      for ( ; it.current(); ++it )
+      for ( SIGEL_GP::SIG_GPPVMHost *it : hostList )
 	{
-	  if( it.current()->name == editDialog.lineeditHostName->text() )
+	  if( it->name == editDialog.lineeditHostName->text() )
 	    {
 	      isThere = true;
 	      break;
@@ -435,12 +435,14 @@ void SIG_GPParameter::slotAddHost()
 	  // has to changed!!! has to be changed!!! QDir has to be set right!!!
 	  SIGEL_GP::SIG_GPPVMHost *newHost = new SIGEL_GP::SIG_GPPVMHost( newName, newMaxSlaves, newEnabled, QDir( newSlaveDirectory ) );
 
-	  QListViewItem *newListViewItem = new QListViewItem( listviewHosts );
+	  QTreeWidgetItem *newListViewItem = new QTreeWidgetItem();
+
+	  listviewHosts->insertTopLevelItem( 0, newListViewItem );
 	  // set enabled
 	  if ( newEnabled )
-	    newListViewItem->setPixmap( 0, QPixmap( sigelRoot + "/pixmaps/allow.xpm" ) );
+	    newListViewItem->setIcon( 0, QIcon( QPixmap( sigelRoot + "/pixmaps/allow.xpm" ) ) );
 	  else
-	    newListViewItem->setPixmap( 0, QPixmap( sigelRoot + "/pixmaps/disallow.xpm" ) );
+	    newListViewItem->setIcon( 0, QIcon( QPixmap( sigelRoot + "/pixmaps/disallow.xpm" ) ) );
 	  // set Hostname
 	  newListViewItem->setText( 1, newName );
 	  //set maximal slaves
@@ -471,42 +473,42 @@ void SIG_GPParameter::slotDeleteHost()
    * list. It was (SIG_GPParameter.cpp, constructor), so remove() below was
    * the delete. The flag is gone and the delete is now written out.
    */
-  QList<SIGEL_GP::SIG_GPPVMHost> deleteListHosts;
-  QList<QListViewItem> deleteListViewItems;
+  QList<SIGEL_GP::SIG_GPPVMHost *> deleteListHosts;
+  QList<QTreeWidgetItem *> deleteListViewItems;
   
   // iterate over the list items
-  QListViewItemIterator listIt( listviewHosts );
-  for( ; listIt.current(); listIt++ )
+  QTreeWidgetItemIterator listIt( listviewHosts );
+  for( ; *listIt; listIt++ )
     // is the current one selected?
-    if( listIt.current()->isSelected() )
+    if( (*listIt)->isSelected() )
       {
 	// first enter the item into the list of items to delete
-	deleteListViewItems.append( listIt.current() );
+	deleteListViewItems.append( *listIt );
 
 	// get the name of the host to find it in the host list
-	QString currentName = listIt.current()->text( 1 );
+	QString currentName = (*listIt)->text( 1 );
 	// SIGEL_GP::SIG_GPPVMHost *theHost = 0; i think i don't need this anymore
-	QList<SIGEL_GP::SIG_GPPVMHost> &hostList = theExperiment.gpParameter.getHostList();
-	QListIterator<SIGEL_GP::SIG_GPPVMHost> it( hostList );
+	QList<SIGEL_GP::SIG_GPPVMHost *> &hostList = theExperiment.gpParameter.getHostList();
+	
 	// iterate over the host list to find the SIG_GPPVMHost object belonging to host currentName
-	for ( ; it.current(); ++it )
+	for ( SIGEL_GP::SIG_GPPVMHost *it : hostList )
 	  {
-	    if( it.current()->name == currentName )
+	    if( it->name == currentName )
 	      {
-		deleteListHosts.append( it.current() );
+		deleteListHosts.append( it );
 		break;
 	      }
 	  }
 	/* if( theHost )
 	 * hostList.remove( theHost );
-	 * listviewHosts->takeItem( listIt.current() );
+	 * listviewHosts->takeTopLevelItem( listviewHosts->indexOfTopLevelItem( listIt ) );
 	 */
       }
   
 // now lets break the shit up!
-  QList<SIGEL_GP::SIG_GPPVMHost> &hostList2 = theExperiment.gpParameter.getHostList();
-  QListIterator<SIGEL_GP::SIG_GPPVMHost> hostIt( deleteListHosts );
-  for( ; hostIt.current(); ++hostIt )
+  QList<SIGEL_GP::SIG_GPPVMHost *> &hostList2 = theExperiment.gpParameter.getHostList();
+  
+  for ( SIGEL_GP::SIG_GPPVMHost *hostIt : deleteListHosts )
     {
       // deleteListHosts can hold the same pointer twice: the search above
       // matches on name and breaks at the first hit, and nothing forbids two
@@ -516,97 +518,97 @@ void SIG_GPParameter::slotDeleteHost()
       // rows leave the list view, but only the first host leaves hostList, so
       // the trainer still spawns on it and writeToFile still persists it.
       // Left as it was -- fixing it means changing what the GUI does.
-      SIGEL_GP::SIG_GPPVMHost *host = hostIt.current();
-      if ( hostList2.remove( host ) )
+      SIGEL_GP::SIG_GPPVMHost *host = hostIt;
+      if ( hostList2.removeOne( host ) )
 	delete host;
     }
-  QListIterator<QListViewItem> itemIt( deleteListViewItems );
-  for( ; itemIt.current(); ++itemIt )
-    listviewHosts->takeItem( itemIt.current() );
+  
+  for ( QTreeWidgetItem *itemIt : deleteListViewItems )
+    listviewHosts->takeTopLevelItem( listviewHosts->indexOfTopLevelItem( itemIt ) );
   
 };
 
 void SIG_GPParameter::slotEnableAllHosts()
 {
-  QList<SIGEL_GP::SIG_GPPVMHost> &hostList = theExperiment.gpParameter.getHostList();
-  QListIterator<SIGEL_GP::SIG_GPPVMHost> it( hostList );
-  for ( ; it.current(); ++it )
+  QList<SIGEL_GP::SIG_GPPVMHost *> &hostList = theExperiment.gpParameter.getHostList();
+  
+  for ( SIGEL_GP::SIG_GPPVMHost *it : hostList )
     {
-      it.current()->enabled = true;
+      it->enabled = true;
     }
-  QListViewItemIterator listIt( listviewHosts );
-  for ( ; listIt.current(); ++listIt )
+  QTreeWidgetItemIterator listIt( listviewHosts );
+  for ( ; *listIt; ++listIt )
     {
-      listIt.current()->setPixmap( 0, QPixmap( sigelRoot + "/pixmaps/allow.xpm" ) );
+      (*listIt)->setIcon( 0, QIcon( QPixmap( sigelRoot + "/pixmaps/allow.xpm" ) ) );
     }
 };
 
 void SIG_GPParameter::slotDisableAllHosts()
 {
-  QList<SIGEL_GP::SIG_GPPVMHost> &hostList = theExperiment.gpParameter.getHostList();
-  QListIterator<SIGEL_GP::SIG_GPPVMHost> it( hostList );
-  for ( ; it.current(); ++it )
+  QList<SIGEL_GP::SIG_GPPVMHost *> &hostList = theExperiment.gpParameter.getHostList();
+  
+  for ( SIGEL_GP::SIG_GPPVMHost *it : hostList )
     {
-      it.current()->enabled = false;
+      it->enabled = false;
     }
-  QListViewItemIterator listIt( listviewHosts );
-  for ( ; listIt.current(); ++listIt )
+  QTreeWidgetItemIterator listIt( listviewHosts );
+  for ( ; *listIt; ++listIt )
     {
-      listIt.current()->setPixmap( 0, QPixmap( sigelRoot + "/pixmaps/disallow.xpm" ) );
+      (*listIt)->setIcon( 0, QIcon( QPixmap( sigelRoot + "/pixmaps/disallow.xpm" ) ) );
     }
 };
 
-void SIG_GPParameter::slotItemDoubleClicked( QListViewItem * theItem )
+void SIG_GPParameter::slotItemDoubleClicked( QTreeWidgetItem * theItem )
 {
   if( theItem )
     {
       // count how many host items are selected, so we can display the dialog the right way
       int numberOfSelectedHosts = 0;
-      QListViewItemIterator itemIt( listviewHosts );
-      for( ; itemIt.current(); ++itemIt )
+      QTreeWidgetItemIterator itemIt( listviewHosts );
+      for ( ; *itemIt; ++itemIt )
 	{
-	  if( itemIt.current()->isSelected() )
+	  if( (*itemIt)->isSelected() )
 	    ++numberOfSelectedHosts;
 	}
       
       QString currentName = theItem->text( 1 );
       SIGEL_GP::SIG_GPPVMHost *theHost = 0;
-      QList<SIGEL_GP::SIG_GPPVMHost> &hostList = theExperiment.gpParameter.getHostList();
-      QListIterator<SIGEL_GP::SIG_GPPVMHost> it( hostList );
-      for ( ; it.current(); ++it )
+      QList<SIGEL_GP::SIG_GPPVMHost *> &hostList = theExperiment.gpParameter.getHostList();
+      
+      for ( SIGEL_GP::SIG_GPPVMHost *it : hostList )
 	{
-	  if( it.current()->name == currentName )
+	  if( it->name == currentName )
 	    {
 	      // we found the host, so save it in the pointer and quit
-	      theHost = it.current();
+	      theHost = it;
 	      break;
 	    }
 	}
       
-      SIG_EditHostDialog editDialog( 0, "editDialogEditHosts", true, 0 );
+      SIG_EditHostDialog editDialog( 0, "editDialogEditHosts", true, Qt::WindowFlags() );
       if( numberOfSelectedHosts == 1 )
 	{
 	  editDialog.lineeditHostName->setText( theHost->name );
 	  editDialog.spinboxMaximalNumberOfProcesses->setValue( theHost->maxSlaves );
-	  editDialog.lineeditSlaveDirectory->setText( theHost->executableDir.absPath() );
+	  editDialog.lineeditSlaveDirectory->setText( theHost->executableDir.absolutePath() );
 	  if( theHost->enabled )
 	    editDialog.checkboxEnableHost->setChecked( true );
 	  else
 	    editDialog.checkboxEnableHost->setChecked( false );
 	  editDialog.lineeditHostName->setFocus();
-	  editDialog.setCaption( "Edit host " + theHost->name + "..." );
+	  editDialog.setWindowTitle( "Edit host " + theHost->name + "..." );
 	}
       else
 	{
 	  editDialog.lineeditHostName->hide();
-	  editDialog.lineeditSlaveDirectory->setText( theHost->executableDir.absPath() );
+	  editDialog.lineeditSlaveDirectory->setText( theHost->executableDir.absolutePath() );
 	  editDialog.spinboxMaximalNumberOfProcesses->setValue( theHost->maxSlaves );
 	  
 	  if( theHost->enabled )
 	    editDialog.checkboxEnableHost->setChecked( true );
 	  else
 	    editDialog.checkboxEnableHost->setChecked( false );
-	  editDialog.setCaption( "Edit hosts..." );
+	  editDialog.setWindowTitle( "Edit hosts..." );
 	  editDialog.resize( QSize() );
 	}
       switch( editDialog.exec() )
@@ -623,10 +625,10 @@ void SIG_GPParameter::slotItemDoubleClicked( QListViewItem * theItem )
 	      bool isThere = false;
 	      if( newName != currentName )
 		{
-		  QListIterator<SIGEL_GP::SIG_GPPVMHost> it2( hostList );
-		  for ( ; it2.current(); ++it2 )
+		  
+		  for ( SIGEL_GP::SIG_GPPVMHost *it2 : hostList )
 		    {
-		      if( it2.current()->name == newName )
+		      if( it2->name == newName )
 			{
 			  isThere = true;
 			  break;
@@ -643,9 +645,9 @@ void SIG_GPParameter::slotItemDoubleClicked( QListViewItem * theItem )
 		  theHost->enabled = newEnabled;
 		  theHost->executableDir = QDir( newSlaveDirectory );
 		  if ( newEnabled )
-		    theItem->setPixmap( 0, QPixmap( sigelRoot + "/pixmaps/allow.xpm" ) );
+		    theItem->setIcon( 0, QIcon( QPixmap( sigelRoot + "/pixmaps/allow.xpm" ) ) );
 		  else
-		    theItem->setPixmap( 0, QPixmap( sigelRoot + "/pixmaps/disallow.xpm" ) );
+		    theItem->setIcon( 0, QIcon( QPixmap( sigelRoot + "/pixmaps/disallow.xpm" ) ) );
 		  // set Hostname
 		  theItem->setText( 1, newName );
 		  //set maximal slaves
@@ -662,32 +664,31 @@ void SIG_GPParameter::slotItemDoubleClicked( QListViewItem * theItem )
 	      int newMaxSlaves = editDialog.spinboxMaximalNumberOfProcesses->value();
 	      bool newEnabled = editDialog.checkboxEnableHost->isChecked();
 	      QString newSlaveDirectory = editDialog.lineeditSlaveDirectory->text();
-	      QListViewItemIterator itemIt2( listviewHosts );
-	      for( ; itemIt2.current(); ++itemIt2 )
+	      QTreeWidgetItemIterator itemIt2( listviewHosts );
+	      for( ; *itemIt2; ++itemIt2 )
 		{
-		  if( itemIt2.current()->isSelected() )
+		  if( (*itemIt2)->isSelected() )
 		    {
-		      QString currentHostName = itemIt2.current()->text( 1 );
-		      QListIterator<SIGEL_GP::SIG_GPPVMHost> hostIt( hostList );
-		      for ( ; hostIt.current(); ++hostIt )
+		      QString currentHostName = (*itemIt2)->text( 1 );
+		      for ( SIGEL_GP::SIG_GPPVMHost *hostIt : hostList )
 			{
-			  if( hostIt.current()->name == currentHostName )
+			  if( hostIt->name == currentHostName )
 			    {
 			      // set all the stuff according to the dialog
-			      hostIt.current()->maxSlaves = newMaxSlaves;
-			      hostIt.current()->enabled = newEnabled;
-			      hostIt.current()->executableDir = QDir( newSlaveDirectory );
+			      hostIt->maxSlaves = newMaxSlaves;
+			      hostIt->enabled = newEnabled;
+			      hostIt->executableDir = QDir( newSlaveDirectory );
 			    }
 			} // for over all
 
 		      // set the listviewItems right...
 		      if( newEnabled)
-			itemIt2.current()->setPixmap(0, QPixmap( sigelRoot + "/pixmaps/allow.xpm" ) );
+			(*itemIt2)->setIcon( 0, QIcon( QPixmap( sigelRoot + "/pixmaps/allow.xpm" ) ) );
 		      else
-			itemIt2.current()->setPixmap(0, QPixmap( sigelRoot + "/pixmaps/disallow.xpm" ) );
-		      itemIt2.current()->setText(2, QString::number( newMaxSlaves ) );
-		      itemIt2.current()->setText(3, newSlaveDirectory );
-		    } // if( itemIt2.current()->isSelected )
+			(*itemIt2)->setIcon( 0, QIcon( QPixmap( sigelRoot + "/pixmaps/disallow.xpm" ) ) );
+		      (*itemIt2)->setText(2, QString::number( newMaxSlaves ) );
+		      (*itemIt2)->setText(3, newSlaveDirectory );
+		    } // if( (*itemIt2)->isSelected )
 		}
 	    }
 	  break;

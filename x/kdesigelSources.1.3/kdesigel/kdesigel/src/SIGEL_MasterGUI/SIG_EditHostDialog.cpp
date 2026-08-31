@@ -32,9 +32,9 @@ namespace SIGEL_MasterGUI
  *  name 'name' and widget flags set to 'f' 
  *
  *  The dialog will by default be modeless, unless you set 'modal' to
- *  TRUE to construct a modal dialog.
+ *  true to construct a modal dialog.
  */
-SIG_EditHostDialog::SIG_EditHostDialog( QWidget* parent,  const char* name, bool modal, WFlags fl )
+SIG_EditHostDialog::SIG_EditHostDialog( QWidget* parent,  const char* name, bool modal, Qt::WindowFlags fl )
     : SIG_EditHostDialogBase( parent, name, modal, fl )
 {
 }
@@ -49,7 +49,7 @@ SIG_EditHostDialog::~SIG_EditHostDialog()
 
 void SIG_EditHostDialog::slotToolbuttonSlaveDirectoryClicked()
 {
-  lineeditSlaveDirectory->setText( QFileDialog::getExistingDirectory( "./", this, "getExistingDirDialogSlaveDirectory", "Select Directory...", true ) );
+  lineeditSlaveDirectory->setText( QFileDialog::getExistingDirectory( this, "Select Directory...", "./" ) );
 };
 
 }

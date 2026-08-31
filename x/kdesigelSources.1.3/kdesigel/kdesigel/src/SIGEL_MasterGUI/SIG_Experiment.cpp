@@ -38,47 +38,47 @@
 namespace SIGEL_MasterGUI
 {
 
-  SIG_Experiment::SIG_Experiment( QString name, QWidgetStack *theWidgetStack, SIG_ExperimentItem *theExperimentItem ) : gpExperiment(), gpManager(0), experimentName(name), widgetStack( theWidgetStack ), experimentItem(theExperimentItem)
+  SIG_Experiment::SIG_Experiment( QString name, QStackedWidget *theWidgetStack, SIG_ExperimentItem *theExperimentItem ) : gpExperiment(), gpManager(0), experimentName(name), widgetStack( theWidgetStack ), experimentItem(theExperimentItem)
 {
   // build the gp parameter menu
-  menuGPParameter = new QPopupMenu( this );
-  menuGPParameter->insertItem( "GPParameter" );
+  menuGPParameter = new QMenu( this );
+  menuGPParameter->addAction( "GPParameter" );
 
   // build the simulation parameter menu
-  menuSimulationParameter = new QPopupMenu( this );
-  menuSimulationParameter->insertItem( "Import", this, SLOT( slotSimulationParameterImport() ) );
-  menuSimulationParameter->insertItem( "Export", this, SLOT( slotSimulationParameterExport() ) );
+  menuSimulationParameter = new QMenu( this );
+  menuSimulationParameter->addAction( "Import", this, SLOT( slotSimulationParameterImport() ) );
+  menuSimulationParameter->addAction( "Export", this, SLOT( slotSimulationParameterExport() ) );
 
   // build the environment view menu
-  menuEnvironmentView = new QPopupMenu( this );
-  menuEnvironmentView->insertItem( "Import", this, SLOT( slotEnvironmentImport() ) );
-  menuEnvironmentView->insertItem( "Export", this, SLOT( slotEnvironmentExport() ) );
+  menuEnvironmentView = new QMenu( this );
+  menuEnvironmentView->addAction( "Import", this, SLOT( slotEnvironmentImport() ) );
+  menuEnvironmentView->addAction( "Export", this, SLOT( slotEnvironmentExport() ) );
 
   // build the robot view menu
-  menuRobotView = new QPopupMenu( this );
-  menuRobotView->insertItem( "RobotView" );
+  menuRobotView = new QMenu( this );
+  menuRobotView->addAction( "RobotView" );
 
   // build experiment view menu
-  menuExperimentView = new QPopupMenu( this );
-  menuExperimentView->insertItem( "Start", this, SLOT( slotStartEvolution() ) );
-  menuExperimentView->insertItem( "Stop", this, SLOT( slotStopEvolution() ) );
+  menuExperimentView = new QMenu( this );
+  menuExperimentView->addAction( "Start", this, SLOT( slotStartEvolution() ) );
+  menuExperimentView->addAction( "Stop", this, SLOT( slotStopEvolution() ) );
 
-  gpParameter = new SIG_GPParameter( this , "GPParameter", 0, gpExperiment );
-  simulationParameter = new SIG_SimulationParameter( this, "SimulationParameter", 0, gpExperiment);
-  environmentView = new SIG_EnvironmentView( this, "EnvironmentView", 0, gpExperiment );
-  robotView = new SIG_RobotView( this, "RobotView",0 , gpExperiment );
-  experimentView = new SIG_ExperimentView( this, "ExperimentView", 0, gpExperiment );
+  gpParameter = new SIG_GPParameter( this , "GPParameter", Qt::WindowFlags(), gpExperiment );
+  simulationParameter = new SIG_SimulationParameter( this, "SimulationParameter", Qt::WindowFlags(), gpExperiment);
+  environmentView = new SIG_EnvironmentView( this, "EnvironmentView", Qt::WindowFlags(), gpExperiment );
+  robotView = new SIG_RobotView( this, "RobotView", Qt::WindowFlags(), gpExperiment );
+  experimentView = new SIG_ExperimentView( this, "ExperimentView", Qt::WindowFlags(), gpExperiment );
   allIndividualsView = new SIG_AllIndividualsView( this, "AllIndividualsView", gpExperiment );
-  languageParameters = new SIG_LanguageParameters( this, "LanguageParametersView", 0, gpExperiment );
+  languageParameters = new SIG_LanguageParameters( this, "LanguageParametersView", Qt::WindowFlags(), gpExperiment );
   
   // put all the widgets on the stack
-  widgetStack->addWidget( gpParameter, 0 );
-  widgetStack->addWidget( simulationParameter, 0 );
-  widgetStack->addWidget( environmentView, 0);
-  widgetStack->addWidget( robotView,0 );
-  widgetStack->addWidget( experimentView, 0 );
-  widgetStack->addWidget( allIndividualsView, 0 );
-  widgetStack->addWidget( languageParameters, 0 );
+  widgetStack->addWidget( gpParameter );
+  widgetStack->addWidget( simulationParameter );
+  widgetStack->addWidget( environmentView );
+  widgetStack->addWidget( robotView );
+  widgetStack->addWidget( experimentView );
+  widgetStack->addWidget( allIndividualsView );
+  widgetStack->addWidget( languageParameters );
 
   // insert the widgets into the widget dictionary
   widgetDict.insert( "GP-Parameters" , gpParameter );
@@ -175,20 +175,18 @@ namespace SIGEL_MasterGUI
 		    SIGNAL( signalEvolutionNotRunning( bool ) ),
 		    allIndividualsView,
 		    SLOT( slotEvolutionNotRunning( bool ) ) );
-  widgetDict.setAutoDelete( true );
-
   getAllOutOfExperiment();
 };
 
 SIG_Experiment::~SIG_Experiment()
 {
   // Before destroying the experiment take all widgets in the widgetDict from the widgetStack
-  QDictIterator<QWidget> it( widgetDict );
-  while ( it.current() )
-    {
-      widgetStack->removeWidget( it.current() );
-      ++it;
-    }
+  for ( QWidget *w : widgetDict )
+    widgetStack->removeWidget( w );
+  // Qt 2's widgetDict had setAutoDelete(true), so ~QDict deleted every widget
+  // it still held (qgdict.cpp deleteItem). QHash owns nothing, and the widgets
+  // were just orphaned by removeWidget(), so the delete has to be explicit.
+  qDeleteAll( widgetDict );
 
    if( gpManager )
       {
@@ -203,11 +201,7 @@ QString SIG_Experiment::getName() const
 
 void SIG_Experiment::setName( QString newName )
 {
-  widgetDict.setAutoDelete( false );
-  QWidget *theExperimentView = widgetDict[ experimentName ];
-  widgetDict.remove( experimentName );
-  widgetDict.insert( newName, theExperimentView );
-  widgetDict.setAutoDelete( true );
+  widgetDict.insert( newName, widgetDict.take( experimentName ) );
   
   experimentName = newName;
   experimentItem->setText( 0, newName );
@@ -244,23 +238,26 @@ QString SIG_Experiment::checkEnding( QString fileName, QString ending )
 
 void SIG_Experiment::slotRightClick( QString option, const QPoint & thePoint )
 {
-  QPopupMenu *showMenu = menuDict[option];
-  QWidget *showWidget = widgetDict[option];
+  QMenu *showMenu = menuDict.value( option );
+  QWidget *showWidget = widgetDict.value( option );
   if( showMenu && showWidget )
     {
       showMenu->popup( thePoint );
-      widgetStack->raiseWidget( showWidget );
+      widgetStack->setCurrentWidget( showWidget );
     }
 };
 
 void SIG_Experiment::slotSelectionChanged( QString option )
 {
-  widgetStack->raiseWidget( widgetDict[option] );
+  // Qt 2's raiseWidget() began "if ( !w || !isMyChild(w) ) return;", so a
+  // missing key was a silent no-op; Qt 6 warns and does nothing instead.
+  if ( QWidget *showWidget = widgetDict.value( option ) )
+    widgetStack->setCurrentWidget( showWidget );
 };
 
 void SIG_Experiment::slotStartEvolution()
 {
-  if( (gpExperiment.robot.getBodyIter().count() != 0) && (gpExperiment.population.getSize() >= 4) && (gpExperiment.gpParameter.getFitnessName() != QString::null) )
+  if( (gpExperiment.robot.getBodies().size() != 0) && (gpExperiment.population.getSize() >= 4) && (gpExperiment.gpParameter.getFitnessName() != QString()) )
     {
       delete gpManager;
       
@@ -314,11 +311,11 @@ void SIG_Experiment::slotStopEvolution()
 
 void SIG_Experiment::slotSimulationParameterImport()
 {
-  QString fileName = QFileDialog::getOpenFileName( QString::null, "Simulation Parameter Files (*.sip);;All Files (*)", 0, "FileOpenSimulationParameter", "Import Simulation Parameters...");
+  QString fileName = QFileDialog::getOpenFileName( nullptr, "Import Simulation Parameters...", QString(), "Simulation Parameter Files (*.sip);;All Files (*)" );
   if ( !fileName.isEmpty() )
     {
       QFile file( fileName );
-      if( file.open(IO_ReadOnly) )
+      if( file.open(QIODevice::ReadOnly) )
 	{
 	  QTextStream theStream( &file );
 	  gpExperiment.simulationParameter.readFromFile( theStream );
@@ -331,16 +328,16 @@ void SIG_Experiment::slotSimulationParameterImport()
 void SIG_Experiment::slotSimulationParameterExport()
 {
   simulationParameter->putIntoExperiment();
-  QString fileName = QFileDialog::getSaveFileName( QString::null, "Simulation Parameter Files (*.sip);;All Files (*)", 0, "FileOpenSimulationParameter", "Export Simulation Parameters...");
+  QString fileName = QFileDialog::getSaveFileName( nullptr, "Export Simulation Parameters...", QString(), "Simulation Parameter Files (*.sip);;All Files (*)" );
   if( !fileName.isEmpty() )
     {
       fileName = checkEnding( fileName, "sip" );
       QFile file( fileName );
       if( file.exists() )
-	switch( QMessageBox::warning( 0, "File exists...", "The file " + file.name() + " exists!\nDo you want to overwrite?", QMessageBox::Yes | QMessageBox::Default, QMessageBox::No | QMessageBox::Escape ) )
+	switch( QMessageBox::warning( 0, "File exists...", "The file " + file.fileName() + " exists!\nDo you want to overwrite?", QMessageBox::Yes | QMessageBox::Default, QMessageBox::No | QMessageBox::Escape ) )
 	  {
 	  case QMessageBox::Yes:
-	    if( file.open(IO_WriteOnly) )
+	    if( file.open(QIODevice::WriteOnly) )
 	      {
 		QTextStream theStream( &file );
 		gpExperiment.simulationParameter.writeToFile( theStream );
@@ -348,7 +345,7 @@ void SIG_Experiment::slotSimulationParameterExport()
 	    file.close();
 	    break;
 	  }
-      if( file.open(IO_WriteOnly) )
+      if( file.open(QIODevice::WriteOnly) )
 	{
 	  QTextStream theStream( &file );
 	  gpExperiment.simulationParameter.writeToFile( theStream );
@@ -359,11 +356,11 @@ void SIG_Experiment::slotSimulationParameterExport()
 
 void SIG_Experiment::slotEnvironmentImport()
 {
-  QString fileName = QFileDialog::getOpenFileName( QString::null, "Environment Files (*.env);;All Files (*)", 0, "FileImportEnvironment", "Import Environment...");
+  QString fileName = QFileDialog::getOpenFileName( nullptr, "Import Environment...", QString(), "Environment Files (*.env);;All Files (*)" );
   if ( !fileName.isEmpty() )
     {
       QFile file( fileName );
-      if( file.open(IO_ReadOnly) )
+      if( file.open(QIODevice::ReadOnly) )
 	{
 	  QTextStream theStream( &file );
 	  gpExperiment.environment.readFromFile( theStream );
@@ -376,16 +373,16 @@ void SIG_Experiment::slotEnvironmentImport()
 void SIG_Experiment::slotEnvironmentExport()
 {
   environmentView->putIntoExperiment();
-  QString fileName = QFileDialog::getSaveFileName( QString::null, "Environment Files (*.env);;All Files (*)", 0, "EnvironmentExportDialog", "Export Environment...");
+  QString fileName = QFileDialog::getSaveFileName( nullptr, "Export Environment...", QString(), "Environment Files (*.env);;All Files (*)" );
   if( !fileName.isEmpty() )
     {
       fileName = checkEnding( fileName, "env" );
       QFile file( fileName );
       if( file.exists() )
-	switch( QMessageBox::warning( 0, "File exists...", "The file " + file.name() + " exists!\nDo you want to overwrite?", QMessageBox::Yes | QMessageBox::Default, QMessageBox::No | QMessageBox::Escape ) )
+	switch( QMessageBox::warning( 0, "File exists...", "The file " + file.fileName() + " exists!\nDo you want to overwrite?", QMessageBox::Yes | QMessageBox::Default, QMessageBox::No | QMessageBox::Escape ) )
 	  {
 	  case QMessageBox::Yes:
-	    if( file.open(IO_WriteOnly) )
+	    if( file.open(QIODevice::WriteOnly) )
 	      {
 		QTextStream theStream( &file );
 		gpExperiment.environment.writeToFile( theStream );
@@ -393,7 +390,7 @@ void SIG_Experiment::slotEnvironmentExport()
 	    file.close();
 	    break;
 	  }
-      if( file.open(IO_WriteOnly) )
+      if( file.open(QIODevice::WriteOnly) )
 	{
 	  QTextStream theStream( &file );
 	  gpExperiment.environment.writeToFile( theStream );
@@ -404,11 +401,11 @@ void SIG_Experiment::slotEnvironmentExport()
 
 void SIG_Experiment::slotGPParameterImport()
 {
-  QString fileName = QFileDialog::getOpenFileName( QString::null, "GP Parameter Files (*.gpp);;All Files (*)", 0, "FileImportGPParameter", "Import GP Parameter...");
+  QString fileName = QFileDialog::getOpenFileName( nullptr, "Import GP Parameter...", QString(), "GP Parameter Files (*.gpp);;All Files (*)" );
   if ( !fileName.isEmpty() )
     {
       QFile file( fileName );
-      if( file.open(IO_ReadOnly) )
+      if( file.open(QIODevice::ReadOnly) )
 	{
 	  QTextStream theStream( &file );
 	  gpExperiment.gpParameter.readFromFile( theStream );
@@ -421,16 +418,16 @@ void SIG_Experiment::slotGPParameterImport()
 void SIG_Experiment::slotGPParameterExport()
 {
   gpParameter->putIntoExperiment();
-  QString fileName = QFileDialog::getSaveFileName( QString::null, "GP Parameter Files (*.gpp);;All Files (*)", 0, "GPParameterExportDialog", "Export GP Parameter...");
+  QString fileName = QFileDialog::getSaveFileName( nullptr, "Export GP Parameter...", QString(), "GP Parameter Files (*.gpp);;All Files (*)" );
   if( !fileName.isEmpty() )
     {
       fileName = checkEnding( fileName, "gpp" );
       QFile file( fileName );
       if( file.exists() )
-	switch( QMessageBox::warning( 0, "File exists...", "The file " + file.name() + " exists!\nDo you want to overwrite?", QMessageBox::Yes | QMessageBox::Default, QMessageBox::No | QMessageBox::Escape ) )
+	switch( QMessageBox::warning( 0, "File exists...", "The file " + file.fileName() + " exists!\nDo you want to overwrite?", QMessageBox::Yes | QMessageBox::Default, QMessageBox::No | QMessageBox::Escape ) )
 	  {
 	  case QMessageBox::Yes:
-	    if( file.open(IO_WriteOnly) )
+	    if( file.open(QIODevice::WriteOnly) )
 	      {
 		QTextStream theStream( &file );
 		gpExperiment.gpParameter.writeToFile( theStream );
@@ -438,7 +435,7 @@ void SIG_Experiment::slotGPParameterExport()
 	    file.close();
 	    break;
 	  }
-      if( file.open(IO_WriteOnly) )
+      if( file.open(QIODevice::WriteOnly) )
 	{
 	  QTextStream theStream( &file );
 	  gpExperiment.gpParameter.writeToFile( theStream );
@@ -449,11 +446,11 @@ void SIG_Experiment::slotGPParameterExport()
 
 void SIG_Experiment::slotLanguageParameterImport()
 {
-  QString fileName = QFileDialog::getOpenFileName( QString::null, "Language Parameter Files (*.lap);;All Files (*)", 0, "FileImportLanguageParameter", "Import Language Parameter...");
+  QString fileName = QFileDialog::getOpenFileName( nullptr, "Import Language Parameter...", QString(), "Language Parameter Files (*.lap);;All Files (*)" );
   if ( !fileName.isEmpty() )
     {
       QFile file( fileName );
-      if( file.open(IO_ReadOnly) )
+      if( file.open(QIODevice::ReadOnly) )
 	{
 	  QTextStream theStream( &file );
 	  SIGEL_Robot::SIG_LanguageParameters *newLanguageParameters = new SIGEL_Robot::SIG_LanguageParameters( theStream, true );
@@ -467,16 +464,16 @@ void SIG_Experiment::slotLanguageParameterImport()
 void SIG_Experiment::slotLanguageParameterExport()
 {
   languageParameters->putIntoExperiment();
-  QString fileName = QFileDialog::getSaveFileName( QString::null, "Language Parameter Files (*.lap);;All Files (*)", 0, "FileExportLanguageParameter", "Export Language Parameters...");
+  QString fileName = QFileDialog::getSaveFileName( nullptr, "Export Language Parameters...", QString(), "Language Parameter Files (*.lap);;All Files (*)" );
   if( !fileName.isEmpty() )
     {
       fileName = checkEnding( fileName, "lap" );
       QFile file( fileName );
       if( file.exists() )
-	switch( QMessageBox::warning( 0, "File exists...", "The file " + file.name() + " exists!\nDo you want to overwrite?", QMessageBox::Yes | QMessageBox::Default, QMessageBox::No | QMessageBox::Escape ) )
+	switch( QMessageBox::warning( 0, "File exists...", "The file " + file.fileName() + " exists!\nDo you want to overwrite?", QMessageBox::Yes | QMessageBox::Default, QMessageBox::No | QMessageBox::Escape ) )
 	  {
 	  case QMessageBox::Yes:
-	    if( file.open(IO_WriteOnly) )
+	    if( file.open(QIODevice::WriteOnly) )
 	      {
 		QTextStream theStream( &file );
 		gpExperiment.robot.getLangParam()->writeToFileTransfer( theStream );
@@ -484,7 +481,7 @@ void SIG_Experiment::slotLanguageParameterExport()
 	    file.close();
 	    break;
 	  }
-      if( file.open(IO_WriteOnly) )
+      if( file.open(QIODevice::WriteOnly) )
 	{
 	  QTextStream theStream( &file );
 	  gpExperiment.robot.getLangParam()->writeToFileTransfer( theStream );
@@ -495,11 +492,11 @@ void SIG_Experiment::slotLanguageParameterExport()
 
 void SIG_Experiment::slotPopulationImport()
 {
-  QString fileName = QFileDialog::getOpenFileName( QString::null, "Population Files (*.pop);;All Files (*)", 0, "FileImportPopulation", "Import Population...");
+  QString fileName = QFileDialog::getOpenFileName( nullptr, "Import Population...", QString(), "Population Files (*.pop);;All Files (*)" );
   if ( !fileName.isEmpty() )
     {
       QFile file( fileName );
-      if( file.open(IO_ReadOnly) )
+      if( file.open(QIODevice::ReadOnly) )
 	{
 	  QTextStream theStream( &file );
 	  gpExperiment.population.readFromFile( theStream );
@@ -511,16 +508,16 @@ void SIG_Experiment::slotPopulationImport()
 
 void SIG_Experiment::slotPopulationExport()
 {
-  QString fileName = QFileDialog::getSaveFileName( QString::null, "Population files (*.pop);;All Files (*)", 0, "FileExportPopulation", "Export Population...");
+  QString fileName = QFileDialog::getSaveFileName( nullptr, "Export Population...", QString(), "Population files (*.pop);;All Files (*)" );
   if( !fileName.isEmpty() )
     {
       fileName = checkEnding( fileName, "pop" );
       QFile file( fileName );
       if( file.exists() )
-	switch( QMessageBox::warning( 0, "File exists...", "The file " + file.name() + " exists!\nDo you want to overwrite?", QMessageBox::Yes | QMessageBox::Default, QMessageBox::No | QMessageBox::Escape ) )
+	switch( QMessageBox::warning( 0, "File exists...", "The file " + file.fileName() + " exists!\nDo you want to overwrite?", QMessageBox::Yes | QMessageBox::Default, QMessageBox::No | QMessageBox::Escape ) )
 	  {
 	  case QMessageBox::Yes:
-	    if( file.open(IO_WriteOnly) )
+	    if( file.open(QIODevice::WriteOnly) )
 	      {
 		QTextStream theStream( &file );
 		gpExperiment.population.writeToFile( theStream );
@@ -528,7 +525,7 @@ void SIG_Experiment::slotPopulationExport()
 	    file.close();
 	    break;
 	  }
-      if( file.open(IO_WriteOnly) )
+      if( file.open(QIODevice::WriteOnly) )
 	{
 	  QTextStream theStream( &file );
 	  gpExperiment.population.writeToFile( theStream );
@@ -539,7 +536,7 @@ void SIG_Experiment::slotPopulationExport()
 
 void SIG_Experiment::slotRobotImport()
 {
-  QString fileName = QFileDialog::getOpenFileName( QString::null, "Raw Robot Files (*.rrb);;All Files (*)", 0, "FileImportRobot", "Import Robot...");
+  QString fileName = QFileDialog::getOpenFileName( nullptr, "Import Robot...", QString(), "Raw Robot Files (*.rrb);;All Files (*)" );
   if( !fileName.isEmpty() )
     {
       try
@@ -560,7 +557,7 @@ void SIG_Experiment::slotRobotImport()
 
 void SIG_Experiment::slotGNUPlotExport()
 {
-  QString fileName = QFileDialog::getSaveFileName( QString::null, "GNU plot data file (*.dat);;All Files (*)", 0, "FileExportGNUPlot", "Export to GNU plot...");
+  QString fileName = QFileDialog::getSaveFileName( nullptr, "Export to GNU plot...", QString(), "GNU plot data file (*.dat);;All Files (*)" );
   if( !fileName.isEmpty() )
     {
       fileName = checkEnding( fileName, "dat" );
@@ -570,11 +567,11 @@ void SIG_Experiment::slotGNUPlotExport()
 
 void SIG_Experiment::slotRobotLoad()
 {
-  QString fileName = QFileDialog::getOpenFileName( QString::null, "Compiled Robot Files (*.crb);;All Files (*)", 0, "FileLoadRobot", "Load Robot...");
+  QString fileName = QFileDialog::getOpenFileName( nullptr, "Load Robot...", QString(), "Compiled Robot Files (*.crb);;All Files (*)" );
   if( !fileName.isEmpty() )
     {
       QFile file( fileName );
-      if( file.open(IO_ReadOnly) )
+      if( file.open(QIODevice::ReadOnly) )
 	{
 	  QTextStream theStream( &file );
 	  try
@@ -596,16 +593,16 @@ void SIG_Experiment::slotRobotLoad()
 
 void SIG_Experiment::slotRobotSave()
 {
-  QString fileName = QFileDialog::getSaveFileName( QString::null, "Cooked Robot Files (*.crb);;All Files (*)", 0, "FileSaveRobot", "Save Robot...");
+  QString fileName = QFileDialog::getSaveFileName( nullptr, "Save Robot...", QString(), "Cooked Robot Files (*.crb);;All Files (*)" );
   if( !fileName.isEmpty() )
     {
       fileName = checkEnding( fileName, "crb" );
       QFile file( fileName );
       if( file.exists() )
-	switch( QMessageBox::warning( 0, "File exists...", "The file " + file.name() + " exists!\nDo you want to overwrite?", QMessageBox::Yes | QMessageBox::Default, QMessageBox::No | QMessageBox::Escape ) )
+	switch( QMessageBox::warning( 0, "File exists...", "The file " + file.fileName() + " exists!\nDo you want to overwrite?", QMessageBox::Yes | QMessageBox::Default, QMessageBox::No | QMessageBox::Escape ) )
 	  {
 	  case QMessageBox::Yes:
-	    if( file.open(IO_WriteOnly) )
+	    if( file.open(QIODevice::WriteOnly) )
 	      {
 		QTextStream theStream( &file );
 		gpExperiment.robot.writeToFileTransfer( theStream );
@@ -613,7 +610,7 @@ void SIG_Experiment::slotRobotSave()
 	    file.close();
 	    break;
 	  }
-      if( file.open(IO_WriteOnly) )
+      if( file.open(QIODevice::WriteOnly) )
 	{
 	  QTextStream theStream( &file );
 	  gpExperiment.robot.writeToFileTransfer( theStream );
@@ -633,7 +630,7 @@ void SIG_Experiment::slotRobotInfo()
   }
 
   // get info and display
-  if( (gpExperiment.robot.getBodyIter().count() != 0))
+  if( (gpExperiment.robot.getBodies().size() != 0))
   { gpExperiment.robot.getRobotInformation(robInf, 4096);
     QMessageBox::information( 0, "Robot Information", robInf );
   }

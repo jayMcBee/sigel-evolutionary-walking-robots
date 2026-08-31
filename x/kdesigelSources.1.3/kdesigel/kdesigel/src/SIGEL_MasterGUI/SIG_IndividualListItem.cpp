@@ -29,19 +29,19 @@
 namespace SIGEL_MasterGUI
 {
 
-SIG_IndividualListItem::SIG_IndividualListItem( QListView *parent )
-  : QListViewItem( parent )
+SIG_IndividualListItem::SIG_IndividualListItem( QTreeWidget *parent )
+  : QTreeWidgetItem( parent )
 {
 #ifdef _WINDOWS
   QString sigelRoot( ::getenv( "SIGEL_ROOT" ) );
 #else
   QString sigelRoot( std::getenv( "SIGEL_ROOT" ) );
 #endif
-  setPixmap( 0, QPixmap( sigelRoot + "/pixmaps/individualSmall.xpm" ) );
+  setIcon( 0, QIcon( QPixmap( sigelRoot + "/pixmaps/individualSmall.xpm" ) ) );
 };
 
-SIG_IndividualListItem::SIG_IndividualListItem( QListView *parent, int poolPosition, SIGEL_GP::SIG_GPIndividual *theIndividual )
-  : QListViewItem( parent ), poolPosition( poolPosition), theIndividual( theIndividual ) 
+SIG_IndividualListItem::SIG_IndividualListItem( QTreeWidget *parent, int poolPosition, SIGEL_GP::SIG_GPIndividual *theIndividual )
+  : QTreeWidgetItem( parent ), poolPosition( poolPosition), theIndividual( theIndividual ) 
 {
 #ifdef _WINDOWS
   QString sigelRoot( ::getenv( "SIGEL_ROOT" ) );
@@ -56,7 +56,7 @@ SIG_IndividualListItem::SIG_IndividualListItem( QListView *parent, int poolPosit
       setText(1, fitness );
       QString age = QString::number( theIndividual->getAge() );
       setText(2, age );
-      setPixmap( 0, QPixmap( sigelRoot + "/pixmaps/individualSmall.xpm" ) );
+      setIcon( 0, QIcon( QPixmap( sigelRoot + "/pixmaps/individualSmall.xpm" ) ) );
       this->theIndividual = theIndividual;
       this->poolPosition = theIndividual->getPoolPos();
     }
@@ -82,8 +82,8 @@ QString SIG_IndividualListItem::key(int column, bool ascending) const {
       break;
     case 1: {
       QString result, orgString;
-      int positionOfPoint = this->text(1).find( "." );
-      int positionOfExponent = this->text(1).find("e");
+      int positionOfPoint = this->text(1).indexOf( "." );
+      int positionOfExponent = this->text(1).indexOf("e");
       orgString = this->text(1);
       if ( positionOfPoint != -1 ) {
         orgString.truncate(positionOfExponent);
@@ -112,7 +112,7 @@ QString SIG_IndividualListItem::key(int column, bool ascending) const {
       }
       break;
   }
-  return QString::null;
+  return QString();
 };
 
 void SIG_IndividualListItem::setTo( SIGEL_GP::SIG_GPIndividual *theIndividual )

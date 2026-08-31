@@ -33,6 +33,7 @@
 
 #include <qvariant.h>
 #include <qdialog.h>
+#include <QGroupBox>
 class QVBoxLayout; 
 class QHBoxLayout; 
 class QGridLayout; 
@@ -52,11 +53,11 @@ class SIG_EditCommandDialog : public QDialog
     Q_OBJECT
 
 public:
-    SIG_EditCommandDialog( QWidget* parent = 0, const char* name = 0, bool modal = FALSE, WFlags fl = 0 );
+    SIG_EditCommandDialog( QWidget* parent = 0, const char* name = 0, bool modal = false, Qt::WindowFlags fl = Qt::WindowFlags() );
     ~SIG_EditCommandDialog();
 
     QLabel* textlabelCommand;
-    QButtonGroup* buttongroupAllowDisallow;
+    QGroupBox* buttongroupAllowDisallow;
     QRadioButton* radiobuttonAllow;
     QRadioButton* radiobuttonDisallow;
     QLabel* textlabelDuration;

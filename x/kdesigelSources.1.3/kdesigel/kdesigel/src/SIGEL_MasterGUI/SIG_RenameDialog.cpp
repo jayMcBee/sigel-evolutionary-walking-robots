@@ -46,43 +46,49 @@ namespace SIGEL_MasterGUI
  *  name 'name' and widget flags set to 'f' 
  *
  *  The dialog will by default be modeless, unless you set 'modal' to
- *  TRUE to construct a modal dialog.
+ *  true to construct a modal dialog.
  */
-SIG_RenameDialog::SIG_RenameDialog( QWidget* parent,  const char* name, bool modal, WFlags fl )
-    : QDialog( parent, name, modal, fl )
+SIG_RenameDialog::SIG_RenameDialog( QWidget* parent,  const char* name, bool modal, Qt::WindowFlags fl )
+    : QDialog( parent, fl )
 {
+    setObjectName( QString::fromUtf8( name ) );
+    // Qt 2's QDialog folded modal into WType_Modal (qdialog.cpp:80), which set
+    // WState_Modal and called qt_enter_modal() -- real application modality,
+    // not merely a window type. setModal() sets WA_ShowModal, which is that.
+    setModal( modal );
+
     if ( !name )
-	setName( "SIG_RenameDialog" );
+	setObjectName( "SIG_RenameDialog" );
     resize( 226, 92 ); 
-    setCaption( tr( "Rename" ) );
+    setWindowTitle( tr( "Rename" ) );
     SIG_RenameDialogLayout = new QVBoxLayout( this ); 
     SIG_RenameDialogLayout->setSpacing( 6 );
-    SIG_RenameDialogLayout->setMargin( 11 );
+    SIG_RenameDialogLayout->setContentsMargins( 11, 11, 11, 11 );
 
     Layout2 = new QHBoxLayout; 
     Layout2->setSpacing( 6 );
-    Layout2->setMargin( 0 );
+    Layout2->setContentsMargins( 0, 0, 0, 0 );
 
-    textlabelNewName = new QLabel( this, "textlabelNewName" );
+    textlabelNewName = new QLabel( this );
     textlabelNewName->setText( tr( "New name:" ) );
     Layout2->addWidget( textlabelNewName );
 
-    lineeditNewName = new QLineEdit( this, "lineeditNewName" );
+    lineeditNewName = new QLineEdit( this );
     Layout2->addWidget( lineeditNewName );
     SIG_RenameDialogLayout->addLayout( Layout2 );
 
     Layout3 = new QHBoxLayout; 
     Layout3->setSpacing( 6 );
-    Layout3->setMargin( 0 );
+    Layout3->setContentsMargins( 0, 0, 0, 0 );
     QSpacerItem* spacer = new QSpacerItem( 20, 20, QSizePolicy::Expanding, QSizePolicy::Minimum );
     Layout3->addItem( spacer );
 
-    pushbuttonOK = new QPushButton( this, "pushbuttonOK" );
+    pushbuttonOK = new QPushButton( this );
     pushbuttonOK->setText( tr( "&OK" ) );
     pushbuttonOK->setDefault( true );
     Layout3->addWidget( pushbuttonOK );
 
-    pushbuttonCancel = new QPushButton( this, "pushbuttonCancel" );
+    pushbuttonCancel = new QPushButton( this );
     pushbuttonCancel->setText( tr( "&Cancel" ) );
     Layout3->addWidget( pushbuttonCancel );
     SIG_RenameDialogLayout->addLayout( Layout3 );

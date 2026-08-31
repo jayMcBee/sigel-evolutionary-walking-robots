@@ -21,7 +21,6 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 #include <qpushbutton.h>
-#include <qmultilineedit.h>
 #include <qtextstream.h>
 #include <qfiledialog.h>
 #include <qmessagebox.h>
@@ -44,7 +43,7 @@ namespace SIGEL_MasterGUI
  *  Constructs a SIG_ExperimentView which is a child of 'parent', with the 
  *  name 'name' and widget flags set to 'f' 
  */
-SIG_ExperimentView::SIG_ExperimentView( QWidget* parent,  const char* name, WFlags fl, SIGEL_GP::SIG_GPExperiment &theExperiment )
+SIG_ExperimentView::SIG_ExperimentView( QWidget* parent,  const char* name, Qt::WindowFlags fl, SIGEL_GP::SIG_GPExperiment &theExperiment )
   : SIG_ExperimentViewBase( parent, name, fl ), theExperiment( theExperiment )
 {
 }
@@ -59,7 +58,7 @@ SIG_ExperimentView::~SIG_ExperimentView() {
 
 void SIG_ExperimentView::putIntoExperiment() {
   // put comment into the box dedicated to the comment !
-  theExperiment.comment = multilineeditComment->text();
+  theExperiment.comment = multilineeditComment->toPlainText();
 
   // update the generations display + progress-bar
   lcdnumberGenerations->display(theExperiment.population.getPoolGeneration());
@@ -88,45 +87,33 @@ void SIG_ExperimentView::streamToGnuPlot( QTextStream &stream ) {
 
   stream << "plot '-' title 'Maximal fitness', '-' title 'Minimal fitness', '-' title 'Average fitness'\n";
 
-  SIGEL_GP::SIG_GPExperimentHistoryEntry *actEntry = theExperiment.experimentHistory.first();
-
-  while (actEntry)
+  for ( SIGEL_GP::SIG_GPExperimentHistoryEntry *actEntry : theExperiment.experimentHistory )
     {
       stream << actEntry->getGenerationNo()
 		 << " "
 		 << actEntry->getMaxFitness()
 		 << "\n";
-
-      actEntry = theExperiment.experimentHistory.next();
-    };
+    }
 
   stream << "e\n";
 
-  actEntry = theExperiment.experimentHistory.first();
-
-  while (actEntry)
+  for ( SIGEL_GP::SIG_GPExperimentHistoryEntry *actEntry : theExperiment.experimentHistory )
     {
       stream << actEntry->getGenerationNo()
 		 << " "
 		 << actEntry->getMinFitness()
 		 << "\n";
-
-      actEntry = theExperiment.experimentHistory.next();
-    };
+    }
 
   stream << "e\n";
 
-  actEntry = theExperiment.experimentHistory.first();
-
-  while (actEntry)
+  for ( SIGEL_GP::SIG_GPExperimentHistoryEntry *actEntry : theExperiment.experimentHistory )
     {
       stream << actEntry->getGenerationNo()
 		 << " "
 		 << actEntry->getAverageFitness()
 		 << "\n";
-
-      actEntry = theExperiment.experimentHistory.next();
-    };
+    }
 
   stream << "e\n";
 };
@@ -138,9 +125,7 @@ void SIG_ExperimentView::slotExportPostScript() {
       return;
     };
 
-  QString fileName = QFileDialog::getSaveFileName( QString::null,
-						   "Encapsulated postscript files (*.eps);;All files (*)",
-						   this );
+  QString fileName = QFileDialog::getSaveFileName( this, QString(), QString(), "Encapsulated postscript files (*.eps);;All files (*)" );
 
   if (fileName.isNull())
     return;
@@ -148,7 +133,7 @@ void SIG_ExperimentView::slotExportPostScript() {
 #ifdef _WINDOWS
 /* The windows pipe support doesn't work as expected, so we have to use a
    a temporary file as input to gnuplot. */
-   if(fileName.find(".eps", -5, false) == -1){
+   if(fileName.indexOf(".eps", -5, false) == -1){
    	fileName += ".eps";
    }
 
@@ -157,7 +142,7 @@ void SIG_ExperimentView::slotExportPostScript() {
    gnuCmdLine += "\\tmpFStat.plt";
 
    QFile pipeFile(gnuCmdLine);
-   pipeFile.open(IO_WriteOnly);
+   pipeFile.open(QIODevice::WriteOnly);
 
    QTextStream pipeStream( &pipeFile );
 
@@ -187,7 +172,7 @@ void SIG_ExperimentView::slotExportPostScript() {
     };
 
   QFile pipeFile;
-  pipeFile.open( IO_WriteOnly, gnuPlotStdInPipe );
+  pipeFile.open( gnuPlotStdInPipe, QIODevice::WriteOnly );
 
   QTextStream pipeStream( &pipeFile );
 
@@ -221,7 +206,7 @@ void SIG_ExperimentView::slotShowFitnesscurve() {
    gnuCmdLine += "\\tmpFStat.plt";
 
    QFile pipeFile(gnuCmdLine);
-   pipeFile.open(IO_WriteOnly);
+   pipeFile.open(QIODevice::WriteOnly);
 
    QTextStream pipeStream( &pipeFile );
 
@@ -248,7 +233,7 @@ void SIG_ExperimentView::slotShowFitnesscurve() {
   };
 
   QFile pipeFile;
- pipeFile.open( IO_WriteOnly, gnuPlotStdInPipe );
+ pipeFile.open( gnuPlotStdInPipe, QIODevice::WriteOnly );
 
   QTextStream pipeStream( &pipeFile );
 

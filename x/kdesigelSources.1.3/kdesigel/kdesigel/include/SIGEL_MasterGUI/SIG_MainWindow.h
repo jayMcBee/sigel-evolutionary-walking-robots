@@ -26,11 +26,12 @@
 #include <qmainwindow.h>
 #include <qsplitter.h>
 #include <qpushbutton.h>
-#include <qwidgetstack.h>
+#include <QStackedWidget>
 #include <qmenubar.h>
-#include <qpopupmenu.h>
+#include <QMenu>
 #include <qtoolbar.h>
 #include <qaction.h>
+#include <QActionGroup>
 #include <qlabel.h> // only for baseWidget which will be nicer someday...
 
 #include "SIGEL_MasterGUI/SIG_ExperimentListView.h"
@@ -57,13 +58,13 @@ namespace SIGEL_MasterGUI
        * The constructor of the main window.
        *
        * Here all menus are set up, as well as the splitter with the
-       * SIG_ExperimentListView on one side and the QWidgetStack on the
+       * SIG_ExperimentListView on one side and the QStackedWidget on the
        * other side.
        * @param parent The parent widget of SIG_MainWindow. If 0 (the normal case)
        * the widget will get its own window.
        * @param name Internal widget name for Qt.
        */
-      SIG_MainWindow( QWidget * parent = 0, const char * name = 0, WFlags f = WType_TopLevel );
+      SIG_MainWindow( QWidget * parent = 0, const char * name = 0, Qt::WindowFlags f = Qt::Window );
 
       /**
        * The destructor of SIG_MainWindow.
@@ -103,26 +104,26 @@ namespace SIGEL_MasterGUI
     * Experiment can be created, deleted, loaded and saved here
     * for example.
     */
-      QPopupMenu *fileMenu;
+      QMenu *fileMenu;
 
       /**
        * The help menu.
        */ 
-      QPopupMenu *helpMenu;
+      QMenu *helpMenu;
 
       /**
        * The view menu.
        */
-      QPopupMenu *viewMenu;
+      QMenu *viewMenu;
 
       /**
        * The optionsMenu;
        */
-      QPopupMenu *optionsMenu;
+      QMenu *optionsMenu;
       /**
        * The actions menu
        */
-      QPopupMenu *individualsMenu;
+      QMenu *individualsMenu;
 
       /**
        * The toolbar which contains the file actions.
@@ -145,7 +146,7 @@ namespace SIGEL_MasterGUI
        * The splitter which contains the two main widgets.
        *
        * The two main widgets are the SIG_ExperimentListView object
-       * on the left side and the QWidgetStack on the right side
+       * on the left side and the QStackedWidget on the right side
        * of the screen.
        */
       QSplitter *splitter;
@@ -158,7 +159,7 @@ namespace SIGEL_MasterGUI
        * a widget is needed to be shown, it is first looked up in the
        * widget dictionary, and the displayed on the widget stack.
        */
-      QWidgetStack *widgetStack;
+      QStackedWidget *widgetStack;
 
       /**
        * The widget that is displayed if there are no other widgets on
@@ -170,9 +171,9 @@ namespace SIGEL_MasterGUI
        * Saves the menu item item for the menu item with which one can switch to
        * using big pixmaps or not.
        */
-      int bigPixmapID;
+      QAction *bigPixmapAction;
 
-      int textLabelsID;
+      QAction *textLabelsAction;
       
       /**
        * The experiment list view. All experiments are shown in this widget.
@@ -183,7 +184,7 @@ namespace SIGEL_MasterGUI
 	   * The Meta-GP definitions
 	   */
 	  private:
-		  QPopupMenu *mtMenu;
+		  QMenu *mtMenu;
 		  QToolBar	 *mtToolBar;
 		  QAction	 *mtUseAction;
 		  QAction	 *mtConfigureAction;

@@ -25,7 +25,7 @@
 
 #include <cstdlib>
 
-SIGEL_MasterGUI::SIG_ExperimentItem::SIG_ExperimentItem( QListView * parent, QString name ) : QListViewItem(parent)
+SIGEL_MasterGUI::SIG_ExperimentItem::SIG_ExperimentItem( QTreeWidget * parent, QString name ) : QTreeWidgetItem(parent)
 {
 #ifdef _WINDOWS
   char *sigelRootCString = ::getenv( "SIGEL_ROOT" );
@@ -36,43 +36,52 @@ SIGEL_MasterGUI::SIG_ExperimentItem::SIG_ExperimentItem( QListView * parent, QSt
   QString sigelRootString( sigelRootCString );
 
   setText(0, name);
-  setPixmap(0, QPixmap( sigelRootString + "/pixmaps/experimentSmall.xpm" ) );
-  QListViewItem *newItem = new QListViewItem( this );
+  setIcon( 0, QIcon( QPixmap( sigelRootString + "/pixmaps/experimentSmall.xpm" ) ) );
+  QTreeWidgetItem *newItem = new QTreeWidgetItem();
+  insertChild( 0, newItem );
 
   // environment
   newItem->setText(0, "Environment");
-  newItem->setPixmap(0, QPixmap( sigelRootString + "/pixmaps/environSmall.xpm" ) );
+  newItem->setIcon( 0, QIcon( QPixmap( sigelRootString + "/pixmaps/environSmall.xpm" ) ) );
   
-  // newItem = new QListViewItem( this );
+  // newItem = new QTreeWidgetItem( this );
   // newItem->setText( 0, "Parameters");
 
   // language parameters
   
-  newItem = new QListViewItem( this );
+  newItem = new QTreeWidgetItem();
+  
+  insertChild( 0, newItem );
   newItem->setText(0, "Simulation-Parameters");
-  newItem->setPixmap(0, QPixmap( sigelRootString + "/pixmaps/simulationParameterSmall.xpm" ));
+  newItem->setIcon( 0, QIcon( QPixmap( sigelRootString + "/pixmaps/simulationParameterSmall.xpm" ) ) );
  
-  newItem = new QListViewItem( this );
+  newItem = new QTreeWidgetItem();
+ 
+  insertChild( 0, newItem );
   newItem->setText(0, "GP-Parameters");
-  newItem->setPixmap(0, QPixmap( sigelRootString + "/pixmaps/dnaSmall.xpm") );
+  newItem->setIcon( 0, QIcon( QPixmap( sigelRootString + "/pixmaps/dnaSmall.xpm") ) );
 
   // robot
-  newItem = new QListViewItem( this );
+  newItem = new QTreeWidgetItem();
+  insertChild( 0, newItem );
   newItem->setText(0, "Robot");
-  newItem->setPixmap(0, QPixmap( sigelRootString + "/pixmaps/robotSmall.xpm" ) );
+  newItem->setIcon( 0, QIcon( QPixmap( sigelRootString + "/pixmaps/robotSmall.xpm" ) ) );
   
-  QListViewItem *childItem = new QListViewItem( newItem );
+  QTreeWidgetItem *childItem = new QTreeWidgetItem();
+  
+  newItem->insertChild( 0, childItem );
   childItem->setText(0, "Language-Parameters");
-  childItem->setPixmap(0, QPixmap( sigelRootString + "/pixmaps/balloonSmall.xpm" ) );
+  childItem->setIcon( 0, QIcon( QPixmap( sigelRootString + "/pixmaps/balloonSmall.xpm" ) ) );
   
-  newItem->setOpen( true );
+  newItem->setExpanded( true );
 
   // Individuals
-  newItem = new QListViewItem( this );
+  newItem = new QTreeWidgetItem();
+  insertChild( 0, newItem );
   newItem->setText(0, "Individuals");
-  newItem->setPixmap(0, QPixmap( sigelRootString + "/pixmaps/individualSmall.xpm" ) );
+  newItem->setIcon( 0, QIcon( QPixmap( sigelRootString + "/pixmaps/individualSmall.xpm" ) ) );
 
-  this->setOpen( true );
+  this->setExpanded( true );
 };
 
 SIGEL_MasterGUI::SIG_ExperimentItem::~SIG_ExperimentItem(){};

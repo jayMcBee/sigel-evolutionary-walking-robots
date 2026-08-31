@@ -48,7 +48,7 @@ public:
      * @param name Internal name for Qt.
      * @param theExperiment A reference to the experiment this view belongs to.
      */
-    SIG_LanguageParameters( QWidget* parent, const char* name, WFlags fl, SIGEL_GP::SIG_GPExperiment &theExperiment );
+    SIG_LanguageParameters( QWidget* parent, const char* name, Qt::WindowFlags fl, SIGEL_GP::SIG_GPExperiment &theExperiment );
 
     /**
      * The destructor.
@@ -77,7 +77,7 @@ public:
 
     void slotPushButtonDisallowAllClicked();
 
-    void slotCommandDoubleClicked( QListViewItem *theItem );
+    void slotCommandDoubleClicked( QTreeWidgetItem *theItem );
 
  private:
 

@@ -20,14 +20,14 @@
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-// #include <qlistview.h>
+// #include <QTreeWidget>
 
 #include "SIGEL_MasterGUI/SIG_IndividualList.h"
 
 namespace SIGEL_MasterGUI
 {
 
-SIG_IndividualList::SIG_IndividualList( QWidget* parent, const char* name, WFlags fl ) : SIG_IndividualListBase( parent, name, fl )
+SIG_IndividualList::SIG_IndividualList( QWidget* parent, const char* name, Qt::WindowFlags fl ) : SIG_IndividualListBase( parent, name, fl )
 {
 
 };

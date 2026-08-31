@@ -23,12 +23,11 @@
 #ifndef SIGEL_MASTERGUI_SIG_EXPERIMENT_H
 #define SIGEL_MASTERGUI_SIG_EXPERIMENT_H
 
-#include <qwidgetstack.h>
+#include <QStackedWidget>
 #include <qstring.h>
-#include <qpopupmenu.h>
+#include <QMenu>
 #include <qpushbutton.h>
-#include <qdict.h>
-#include <qmultilineedit.h>
+#include <QHash>
 
 #include "SIGEL_MasterGUI/SIG_GPParameter.h"
 #include "SIGEL_MasterGUI/SIG_SimulationParameter.h"
@@ -65,7 +64,7 @@ namespace SIGEL_MasterGUI
        * @param name Internal name for Qt.
        * @param theExperiment A reference to the experiment this view belongs to.
        */
-      SIG_Experiment( QString name, QWidgetStack *theWidgetStack, SIG_ExperimentItem *theExperimentItem );
+      SIG_Experiment( QString name, QStackedWidget *theWidgetStack, SIG_ExperimentItem *theExperimentItem );
       
       /**
        * The destructor.
@@ -248,12 +247,12 @@ namespace SIGEL_MasterGUI
       /**
        * All widgets belonging to an experiment are stored in this dictionary.
        */
-      QDict<QWidget> widgetDict;
+      QHash<QString, QWidget *> widgetDict;
 
       /**
        * All menus belonging to an experiment are stored in this dictionary.
        */
-      QDict<QPopupMenu> menuDict;
+      QHash<QString, QMenu *> menuDict;
 
       /**
        * The experiment name.
@@ -263,7 +262,7 @@ namespace SIGEL_MasterGUI
       /**
        * A pointer to the widget stack in the main window.
        */
-      QWidgetStack *widgetStack;
+      QStackedWidget *widgetStack;
 
     public:
       
@@ -273,7 +272,7 @@ namespace SIGEL_MasterGUI
        * This menu is shown whenever the user rightclicks onto the GP-Parameter
        * item in the experiment list view.
        */
-      QPopupMenu *menuGPParameter;
+      QMenu *menuGPParameter;
 
       /**
        * The popup menu belonging to the simulation parameters.
@@ -281,7 +280,7 @@ namespace SIGEL_MasterGUI
        * This menu is shown whenever the user rightclicks onto the Simulation-Parameter 
        * item in the experiment list view.
        */
-      QPopupMenu *menuSimulationParameter;
+      QMenu *menuSimulationParameter;
 
       /**
        * The popup menu belonging to the robot view.
@@ -289,7 +288,7 @@ namespace SIGEL_MasterGUI
        * This menu is shown whenever the user rightclicks onto the robot view
        * item in the experiment list view.
        */
-      QPopupMenu *menuRobotView;
+      QMenu *menuRobotView;
 
       /**
        * The popup menu belonging to the environment view.
@@ -297,7 +296,7 @@ namespace SIGEL_MasterGUI
        * This menu is shown whenever the user rightclicks onto the environment view
        * item in the experiment list view.
        */
-      QPopupMenu *menuEnvironmentView;
+      QMenu *menuEnvironmentView;
 
       /**
        * The popup menu belonging to the experiment view.
@@ -305,7 +304,7 @@ namespace SIGEL_MasterGUI
        * This menu is shown whenever the user rightclicks onto the experiment view
        * item in the experiment list view.
        */
-      QPopupMenu *menuExperimentView;
+      QMenu *menuExperimentView;
       
       /**
        * The SIG_ExperimentItem belonging to the experiment.

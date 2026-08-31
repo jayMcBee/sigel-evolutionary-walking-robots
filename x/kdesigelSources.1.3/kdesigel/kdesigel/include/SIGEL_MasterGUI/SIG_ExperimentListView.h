@@ -23,10 +23,10 @@
 #ifndef SIGEL_MASTERGUI_SIG_EXPERIMENTLISTVIEW_H
 #define SIGEL_MASTERGUI_SIG_EXPERIMENTLISTVIEW_H
 
-#include <qlistview.h>
-#include <qwidgetstack.h>
-#include <qdict.h>
-#include <qpopupmenu.h>
+#include <QTreeWidget>
+#include <QStackedWidget>
+#include <QHash>
+#include <QMenu>
 
 #include "SIGEL_MasterGUI/SIG_Experiment.h"
 
@@ -37,7 +37,7 @@ namespace SIGEL_MasterGUI
    * The class that lets the user view the experiments.
    */
 
-class SIG_ExperimentListView : public QListView
+class SIG_ExperimentListView : public QTreeWidget
 {
   Q_OBJECT
  public:
@@ -50,7 +50,7 @@ class SIG_ExperimentListView : public QListView
    * @param name The internal name of the widget.
    * @param theWidgetStack The widget stack in the main window.
    */
-  SIG_ExperimentListView( QWidget * parent, const char * name, QWidgetStack *theWidgetStack );
+  SIG_ExperimentListView( QWidget * parent, const char * name, QStackedWidget *theWidgetStack );
 
   /**
    * The destructor of the SIG_ExperimentListView.
@@ -99,7 +99,7 @@ class SIG_ExperimentListView : public QListView
   /**
    * This function returns the experiment name of the currently selected experiment.
    *
-   * If there is no experiment selected a null-string ( QString::null) is returned.
+   * If there is no experiment selected a null-string ( QString()) is returned.
    * @return An alternative unique name for the experiment.
    */
   QString currentlySelectedExperimentName();
@@ -116,7 +116,7 @@ class SIG_ExperimentListView : public QListView
    * The popup-menu that is shown whenever the user right clicks into the list view
    * where all experiments are shown.
    */
-  QPopupMenu *experimentListViewMenu;
+  QMenu *experimentListViewMenu;
   
  public slots:
 
@@ -186,7 +186,7 @@ class SIG_ExperimentListView : public QListView
    * widget stack.
    * @param theItem The actual selected item.
    */
-  void slotSelectionChanged( QListViewItem * theItem );
+  void slotSelectionChanged( QTreeWidgetItem * theItem );
 
   void slotGPParametersImport();
   
@@ -239,7 +239,7 @@ class SIG_ExperimentListView : public QListView
      * the SIG_Experiment object belonging to this item is searched. If it is found
      * the method slotRightClick() is called in the experiment object.
      */
-  void slotRightButtonClicked( QListViewItem *theItem, const QPoint & thePoint, int inside);
+  void slotRightButtonClicked( const QPoint & pos );
 
  signals:
 
@@ -272,7 +272,7 @@ class SIG_ExperimentListView : public QListView
   * This pointer is stored, so that it can be passed to a newly created
   * SIG_Experiment.
   */
-  QWidgetStack *widgetStack;
+  QStackedWidget *widgetStack;
 
   /**
    * The dictionary in which all administered experiments are stored.
@@ -281,7 +281,7 @@ class SIG_ExperimentListView : public QListView
    * things under the same name in a QDict, for other reason the names are
    * needed to be unique.
    */
-  QDict<SIG_Experiment> experimentDict;
+  QHash<QString, SIG_Experiment *> experimentDict;
 
   /**
    * The number a new experiment gets.

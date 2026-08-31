@@ -30,7 +30,9 @@
 ****************************************************************************/
 #include "SIGEL_MasterGUI/SIG_EditCommandDialog.h"
 
-#include <qbuttongroup.h>
+#include <QGroupBox>
+#include <QLocale>
+#include <QValidator>
 #include <qlabel.h>
 #include <qlineedit.h>
 #include <qpushbutton.h>
@@ -49,68 +51,71 @@ namespace SIGEL_MasterGUI
  *  name 'name' and widget flags set to 'f' 
  *
  *  The dialog will by default be modeless, unless you set 'modal' to
- *  TRUE to construct a modal dialog.
+ *  true to construct a modal dialog.
  */
-SIG_EditCommandDialog::SIG_EditCommandDialog( QWidget* parent,  const char* name, bool modal, WFlags fl )
-    : QDialog( parent, name, modal, fl )
+SIG_EditCommandDialog::SIG_EditCommandDialog( QWidget* parent,  const char* name, bool modal, Qt::WindowFlags fl )
+    : QDialog( parent, fl )
 {
+    setObjectName( QString::fromUtf8( name ) );
+    // Qt 2's QDialog folded modal into WType_Modal (qdialog.cpp:80), which set
+    // WState_Modal and called qt_enter_modal() -- real application modality,
+    // not merely a window type. setModal() sets WA_ShowModal, which is that.
+    setModal( modal );
+
     if ( !name )
-	setName( "SIG_EditCommandDialog" );
+	setObjectName( "SIG_EditCommandDialog" );
     resize( 222, 201 ); 
-    setCaption( tr( "Edit Command" ) );
+    setWindowTitle( tr( "Edit Command" ) );
     SIG_EditCommandDialogLayout = new QVBoxLayout( this ); 
     SIG_EditCommandDialogLayout->setSpacing( 6 );
-    SIG_EditCommandDialogLayout->setMargin( 11 );
+    SIG_EditCommandDialogLayout->setContentsMargins( 11, 11, 11, 11 );
 
-    textlabelCommand = new QLabel( this, "textlabelCommand" );
+    textlabelCommand = new QLabel( this );
     textlabelCommand->setText( tr( "Command:" ) );
     SIG_EditCommandDialogLayout->addWidget( textlabelCommand );
 
-    buttongroupAllowDisallow = new QButtonGroup( this, "buttongroupAllowDisallow" );
+    buttongroupAllowDisallow = new QGroupBox( this );
     buttongroupAllowDisallow->setTitle( tr( "Allow/Disallow" ) );
-    buttongroupAllowDisallow->setColumnLayout(0, Qt::Vertical );
-    buttongroupAllowDisallow->layout()->setSpacing( 0 );
-    buttongroupAllowDisallow->layout()->setMargin( 0 );
-    buttongroupAllowDisallowLayout = new QVBoxLayout( buttongroupAllowDisallow->layout() );
+    buttongroupAllowDisallowLayout = new QVBoxLayout( buttongroupAllowDisallow );
     buttongroupAllowDisallowLayout->setAlignment( Qt::AlignTop );
     buttongroupAllowDisallowLayout->setSpacing( 6 );
-    buttongroupAllowDisallowLayout->setMargin( 11 );
+    buttongroupAllowDisallowLayout->setContentsMargins( 11, 11, 11, 11 );
 
-    radiobuttonAllow = new QRadioButton( buttongroupAllowDisallow, "radiobuttonAllow" );
+    radiobuttonAllow = new QRadioButton( buttongroupAllowDisallow );
     radiobuttonAllow->setText( tr( "Allow" ) );
-    radiobuttonAllow->setChecked( TRUE );
+    radiobuttonAllow->setChecked( true );
     buttongroupAllowDisallowLayout->addWidget( radiobuttonAllow );
 
-    radiobuttonDisallow = new QRadioButton( buttongroupAllowDisallow, "radiobuttonDisallow" );
+    radiobuttonDisallow = new QRadioButton( buttongroupAllowDisallow );
     radiobuttonDisallow->setText( tr( "Disallow" ) );
     buttongroupAllowDisallowLayout->addWidget( radiobuttonDisallow );
     SIG_EditCommandDialogLayout->addWidget( buttongroupAllowDisallow );
 
     Layout2 = new QHBoxLayout; 
     Layout2->setSpacing( 6 );
-    Layout2->setMargin( 0 );
+    Layout2->setContentsMargins( 0, 0, 0, 0 );
 
-    textlabelDuration = new QLabel( this, "textlabelDuration" );
+    textlabelDuration = new QLabel( this );
     textlabelDuration->setText( tr( "Duration:" ) );
     Layout2->addWidget( textlabelDuration );
 
-    lineeditDuration = new QLineEdit( this, "lineeditDuration" );
-    lineeditDuration->setValidator( new QDoubleValidator( this, "lineeditDurations DoubleValidator" ) );
+    lineeditDuration = new QLineEdit( this );
+    lineeditDuration->setValidator( new QDoubleValidator( this ) );
     Layout2->addWidget( lineeditDuration );
     SIG_EditCommandDialogLayout->addLayout( Layout2 );
 
     Layout1 = new QHBoxLayout; 
     Layout1->setSpacing( 6 );
-    Layout1->setMargin( 0 );
+    Layout1->setContentsMargins( 0, 0, 0, 0 );
     QSpacerItem* spacer = new QSpacerItem( 20, 20, QSizePolicy::Expanding, QSizePolicy::Minimum );
     Layout1->addItem( spacer );
 
-    pushbuttonOK = new QPushButton( this, "pushbuttonOK" );
+    pushbuttonOK = new QPushButton( this );
     pushbuttonOK->setText( tr( "&OK" ) );
     pushbuttonOK->setDefault( true );
     Layout1->addWidget( pushbuttonOK );
 
-    pushbuttonCancel = new QPushButton( this, "pushbuttonCancel" );
+    pushbuttonCancel = new QPushButton( this );
     pushbuttonCancel->setText( tr( "&Cancel" ) );
     Layout1->addWidget( pushbuttonCancel );
     SIG_EditCommandDialogLayout->addLayout( Layout1 );
@@ -118,6 +123,14 @@ SIG_EditCommandDialog::SIG_EditCommandDialog( QWidget* parent,  const char* name
     // signals and slots connections
     connect( pushbuttonOK, SIGNAL( clicked() ), this, SLOT( accept() ) );
     connect( pushbuttonCancel, SIGNAL( clicked() ), this, SLOT( reject() ) );
+
+  // Qt 2 forced LC_NUMERIC="C" for the whole process (qapplication_x11.cpp:1389)
+  // and its QDoubleValidator hard-coded '.' (qvalidator.cpp:387). Qt 6 validators
+  // follow the system locale, but the read-back below is QString::toDouble(),
+  // which is locale-independent and always wants '.'. Left to disagree, a typed
+  // "9,81" validates under a comma-decimal locale and reads back as 0.
+  for ( QValidator *v : findChildren<QValidator *>() )
+    v->setLocale( QLocale::c() );
 };
 
 /*  

@@ -29,26 +29,34 @@
 
 #include <cstdlib>
 
-SIG_InfoBox::SIG_InfoBox( QWidget *parent, const char *name, bool modal, WFlags f )
-  : QDialog( parent, name, modal, f )
+SIG_InfoBox::SIG_InfoBox( QWidget *parent, const char *name, bool modal, Qt::WindowFlags f )
+  : QDialog( parent, f )
 {
+    setObjectName( QString::fromUtf8( name ) );
+    // Qt 2's QDialog folded modal into WType_Modal (qdialog.cpp:80), which set
+    // WState_Modal and called qt_enter_modal() -- real application modality,
+    // not merely a window type. setModal() sets WA_ShowModal, which is that.
+    setModal( modal );
+
 #ifdef _WINDOWS
   QString sigelRoot( ::getenv( "SIGEL_ROOT" ) );
 #else
   QString sigelRoot( std::getenv( "SIGEL_ROOT" ) );
 #endif
-  this->setCaption( "Sigel InfoBox" );
-  QLabel *pixmapLabel = new QLabel( this, "gfxLabel" );
+  this->setWindowTitle( "Sigel InfoBox" );
+  QLabel *pixmapLabel = new QLabel( this );
   pixmapLabel->setPixmap( QPixmap( sigelRoot + "/pixmaps/altLogo.png" ) );
   pixmapLabel->setFrameStyle( QFrame::Box | QFrame::Sunken );
   // pixmapLabel->setScaledContents( true );
 
-  QHBoxLayout *hL = new QHBoxLayout( this, 6, -1 );
+  QHBoxLayout *hL = new QHBoxLayout( this );
+  hL->setContentsMargins( 6, 6, 6, 6 );
   hL->addWidget( pixmapLabel );
 
-  QVBoxLayout *vL = new QVBoxLayout( hL, -1, "vLayout" );
-  SIG_TextView *theView = new SIG_TextView( this, "SIG_TextView *theView" );
-  theView->setVScrollBarMode( QScrollView::AlwaysOff );
+  QVBoxLayout *vL = new QVBoxLayout();
+  hL->addLayout( vL );
+  SIG_TextView *theView = new SIG_TextView( this, nullptr );
+  theView->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
   theView->setText("<h3>Sigel v1.1</h3>"
 		   "<h3>Developed by PG 368:</h3>"
 		   "<ul>"
@@ -72,10 +80,11 @@ SIG_InfoBox::SIG_InfoBox( QWidget *parent, const char *name, bool modal, WFlags 
 
   QSpacerItem *okSpacerItem = new QSpacerItem( 20, 20, QSizePolicy::Expanding );
   
-  QHBoxLayout *okLayout = new QHBoxLayout( vL, -1, "okLayout" );
+  QHBoxLayout *okLayout = new QHBoxLayout();
+  vL->addLayout( okLayout );
   okLayout->addItem( okSpacerItem );
 
-  QPushButton *okPushButton = new QPushButton( "&OK", this, "okPushButton" );
+  QPushButton *okPushButton = new QPushButton( "&OK", this );
   connect( okPushButton,
 	   SIGNAL( clicked() ),
 	   this,

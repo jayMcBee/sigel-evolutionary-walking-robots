@@ -20,9 +20,10 @@
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-#include <qtextview.h>
+#include <QTextBrowser>
+#include <QMouseEvent>
 
-class SIG_TextView : public QTextView
+class SIG_TextView : public QTextBrowser
 {
   Q_OBJECT
 
@@ -31,6 +32,10 @@ class SIG_TextView : public QTextView
   ~SIG_TextView();
 
  protected:
+  // Qt 2 QScrollView called the three handlers below itself; Qt 6 delivers
+  // every viewport event through viewportEvent() instead.
+  bool viewportEvent( QEvent *e ) override;
+
   void viewportMousePressEvent( QMouseEvent * );
   void viewportMouseReleaseEvent( QMouseEvent * );
   void viewportMouseMoveEvent( QMouseEvent * );
