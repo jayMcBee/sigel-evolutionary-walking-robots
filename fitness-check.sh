@@ -23,8 +23,13 @@ DATA=${2:-data-reordered}
 # the binary from before the change. Gate results mean nothing unless the
 # build that produced them succeeded. pvm-check.sh has carried this guard
 # from the start; these two did not.
+# The hint has to match the build dir: SAN=/SIGSAN= empty is right for the
+# unsanitised build-fast, but passing it for the sanitised `build` links
+# sanitiser-compiled objects without the runtime and fails on
+# __ubsan_handle_type_mismatch_v1. Found by following this message's own advice.
 make -q B="$B" 2>/dev/null || {
-	echo ""$ROOT/$B/sigel_eval" is out of date -- run 'make B=$B SAN= SIGSAN='" >&2; exit 1; }
+	if [ "$B" = build ]; then hint="make B=$B"; else hint="make B=$B SAN= SIGSAN="; fi
+	echo ""$ROOT/$B/sigel_eval" is out of date -- run '$hint'" >&2; exit 1; }
 
 SIGEL_ROOT=$ROOT/x/kdesigelSources.1.3/kdesigel/kdesigel
 export SIGEL_ROOT

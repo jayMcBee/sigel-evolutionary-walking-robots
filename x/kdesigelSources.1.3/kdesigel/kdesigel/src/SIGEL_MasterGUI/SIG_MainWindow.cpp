@@ -21,6 +21,7 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 #include <qapplication.h>
+#include <QCloseEvent>
 #include <QList>
 #include <qmessagebox.h>
 #include <QIcon>
@@ -856,6 +857,14 @@ void SIG_MainWindow::slotEnableEvolutionRunningActions( bool enable )
 {
   for ( QAction *a : evolutionRunningActions )
     a->setEnabled( enable );
+};
+
+
+void SIG_MainWindow::closeEvent( QCloseEvent *event )
+{
+  QMainWindow::closeEvent( event );
+  if ( event->isAccepted() )
+    qApp->quit();
 };
 
 }

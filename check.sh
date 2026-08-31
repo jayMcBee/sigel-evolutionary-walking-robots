@@ -494,16 +494,21 @@ rm -f /tmp/pvm.$$ /tmp/pvm.$$.cpp /tmp/pvmb.$$
 # Rule: a class that still declares one of these must also declare the Qt 6
 # member that replaced it.
 kp=0; kf=0
-for h in "$SRC"/include/*/*.h; do
-    [ -e "$h" ] || continue
-    if command grep -qE '(^|[^:_[:alnum:]])QString[[:space:]]+key[[:space:]]*\([[:space:]]*int' "$h"; then
-        if command grep -q 'operator<[[:space:]]*(.*QTreeWidgetItem' "$h"; then
-            kp=$((kp+1))
-        else
-            kf=$((kf+1))
-            echo "  ${h#$SRC/}: declares Qt 2's key(int,bool) but no operator<(QTreeWidgetItem)"
-            echo "    Qt 6 sorts through operator<; key() is never called."
-        fi
+# Flattened to one line before matching: review demonstrated that a declaration
+# split as "QString\nkey(int, bool) const;" was invisible to a line-based grep,
+# and that a decoy "operator<( QTreeWidgetItem * )" -- a pointer parameter, which
+# overrides nothing -- was accepted. The signature below is the one that actually
+# overrides QTreeWidgetItem::operator<. find, not a fixed-depth glob.
+for h in $(find "$SRC/include" -name '*.h' | sort); do
+    flat=$(tr '\n' ' ' < "$h")
+    printf '%s' "$flat" | command grep -qE 'QString[[:space:]]+key[[:space:]]*\([[:space:]]*int' || continue
+    if printf '%s' "$flat" | command grep -qE 'operator<[[:space:]]*\([[:space:]]*const[[:space:]]+QTreeWidgetItem[[:space:]]*&'; then
+        kp=$((kp+1))
+    else
+        kf=$((kf+1))
+        echo "  ${h#$SRC/}: declares Qt 2's key(int,bool) but no"
+        echo "    operator<( const QTreeWidgetItem & ) -- Qt 6 sorts through operator<,"
+        echo "    so key() is never called and the column sorts as raw text."
     fi
 done
 printf '%-22s %2d pass  %2d fail\n' "dead item virtuals" "$kp" "$kf"

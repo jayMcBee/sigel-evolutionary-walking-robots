@@ -168,6 +168,18 @@ namespace SIGEL_MasterGUI
        */
       QAction *mtSelectedSystem;
 
+   protected:
+      /**
+       * Qt 2's QWidget::close() ended with "bool isMain = qApp->mainWidget() ==
+       * this; ... if ( isMain ) qApp->quit();", so closing THIS window quit the
+       * application even with other top-level windows still open. Qt 6 has no
+       * main widget; quitOnLastWindowClosed only fires once the LAST window
+       * goes, so with an individual view open this window would close and
+       * SIGEL would keep running. (1.3 showed no unsaved-experiment warning on
+       * this path either -- that warning is on the Quit action alone, in both.)
+       */
+      void closeEvent( QCloseEvent *event ) override;
+
       /**
        * The splitter which contains the two main widgets.
        *

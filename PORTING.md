@@ -3078,6 +3078,57 @@ virtuals`** check — a class declaring Qt 2's `key(int,bool)` must also declare
 new `operator<`, which takes it from 1 pass to 1 fail. It is the only `key()`
 in the tree, and there were no other `operator<` overrides to conflict with.
 
+**What the C8 review found.** Four things, of which one was a real defect, one
+was a real difference the review had backwards, one is unfixable, and two were
+holes in the new gate.
+
+*`readAll()` silently stopped normalising line endings.* Qt 2's
+`QTextStream::read()` ran an unconditional `s/\r\n/\n` over everything it read
+(`qtextstream.cpp:1531` — the loop is even commented "do a s/\r\n/\n"), with no
+dependence on the open mode. Qt 6's `readAll()` returns raw bytes unless the
+device is opened `QIODevice::Text`, and the call site opened plain `ReadOnly`,
+so a CRLF default-configuration file was being copied verbatim into saved
+`.mexp` files where 1.3 wrote LF. Opened with `| QIODevice::Text` now. *This is
+the same failure mode as the D6 CRLF losses, arriving through an API rename
+rather than an editor.*
+
+*The review's second "defect" was wrong, and the Qt 2 source says so plainly.*
+It argued that Qt 2 only quit when the main widget was **destroyed**
+(`qwidget.cpp:768-772`), so closing the window merely hid it, and that the port
+now exits without the unsaved-experiment warning. But `QWidget::close()` has its
+own path: `bool isMain = qApp->mainWidget() == this; … if ( isMain )
+qApp->quit();`. **1.3 did quit on closing the main window, and did skip the
+warning** — that warning is wired to the Quit action alone, in 1.3 and in the
+port. Nothing to fix there. *It does point at a real difference in the opposite
+direction:* Qt 2 quit when the **main widget** closed regardless of other open
+windows, while Qt 6's `quitOnLastWindowClosed` waits for the **last** one — so
+with an individual-view window open, closing the main window would leave SIGEL
+running. A `closeEvent` on `SIG_MainWindow` restores the Qt 2 rule exactly.
+
+*Descending sort ties: a difference that cannot be reproduced.* Qt 2 sorted
+ascending with `qsort` and then **reversed the whole sibling list** for
+descending (`qlistview.cpp:814-823`), so tied keys came out in reverse order.
+Qt 6 inverts the comparator inside a stable sort, so ties keep their ascending
+order. The catch is that `qsort` is **not stable**, so Qt 2's tie order was
+never defined in the first place — it was whatever that platform's `qsort`
+happened to produce. Reproducing it would mean reproducing a specific libc.
+Recorded as a known, unreproducible difference on tied Age/Fitness values.
+
+*Two holes in the `dead item virtuals` gate, both demonstrated and both closed.*
+A decoy `operator<( QTreeWidgetItem * )` — a pointer parameter, which overrides
+nothing — was accepted as a pass, and a `key()` declaration split across two
+lines was invisible to a line-based grep. The check now flattens each header to
+one line before matching and demands the signature that actually overrides,
+`operator<( const QTreeWidgetItem & )`. Both bypasses were teeth-tested: each
+takes the gate from 1 pass to 1 fail.
+
+*Left open for C9:* on the `-mtevolve` path `sigel.cpp` now constructs a
+`QCoreApplication`, while `MT_Controller.cpp` includes Widgets headers, so its
+`qApp` macro expands to a `static_cast<QApplication*>` of an object that is not
+one. The review probed the pattern under `-fsanitize=undefined,vptr` without a
+crash — `QCoreApplication` is at offset 0 and `exit()` is non-virtual — but the
+path has never actually run. C9 executes it.
+
 ---
 
 ## 8. Steps and status

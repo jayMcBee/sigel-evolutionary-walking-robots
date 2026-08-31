@@ -615,7 +615,12 @@ bool MT_Controller::saveSystem(QString sigExpName)
 				// system uses the default configuration
 				// therefore copy the default configuration file
 				QFile stdFile(defConfFileName);
-				if(stdFile.open(QIODevice::ReadOnly)){
+				// Qt 2's QTextStream::read() did an unconditional s/\r\n/\n on the way in
+				// (qtextstream.cpp:1531), with no dependence on the open mode. Qt 6's
+				// readAll() returns raw bytes unless the device is opened with Text, so
+				// without this a CRLF default-config file is copied verbatim into the
+				// saved .mexp where 1.3 wrote LF.
+				if(stdFile.open(QIODevice::ReadOnly | QIODevice::Text)){
 					QTextStream stdStr(&stdFile);
 					fileStr << stdStr.readAll();
 					stdFile.close();
