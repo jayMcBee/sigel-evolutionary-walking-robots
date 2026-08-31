@@ -133,7 +133,7 @@ void SIG_ExperimentView::slotExportPostScript() {
 #ifdef _WINDOWS
 /* The windows pipe support doesn't work as expected, so we have to use a
    a temporary file as input to gnuplot. */
-   if(fileName.indexOf(".eps", -5, false) == -1){
+   if(fileName.indexOf(".eps", -5, Qt::CaseInsensitive) == -1){
    	fileName += ".eps";
    }
 
@@ -155,8 +155,9 @@ void SIG_ExperimentView::slotExportPostScript() {
 
    gnuCmdLine += "\"";
    gnuCmdLine.prepend("gnuplot.exe \"");
-   if(WinExec(gnuCmdLine, SW_SHOW) < 32){
-   	QMessageBox::warning(this, "Error!", "Couldn't start gnuplot!", "Ok");
+   if(WinExec(gnuCmdLine.toLatin1().constData(), SW_SHOW) < 32){
+   	// Qt 2 took the button LABEL here (button0Text); Qt 6 takes StandardButtons.
+      QMessageBox::warning(this, "Error!", "Couldn't start gnuplot!", QMessageBox::Ok);
    	return;
    }
    pipeFile.remove();
@@ -216,8 +217,9 @@ void SIG_ExperimentView::slotShowFitnesscurve() {
 
    gnuCmdLine += "\" - ";
    gnuCmdLine.prepend("gnuplot.exe \"");
-   if(WinExec(gnuCmdLine, SW_SHOW) < 32){
-   	QMessageBox::warning(this, "Error!", "Couldn't start gnuplot!", "Ok");
+   if(WinExec(gnuCmdLine.toLatin1().constData(), SW_SHOW) < 32){
+   	// Qt 2 took the button LABEL here (button0Text); Qt 6 takes StandardButtons.
+      QMessageBox::warning(this, "Error!", "Couldn't start gnuplot!", QMessageBox::Ok);
    	return;
    }
    pipeFile.remove();

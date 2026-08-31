@@ -49,8 +49,15 @@ SIG_SimulationParameter::SIG_SimulationParameter( QWidget* parent,  const char* 
   // follow the system locale, but the read-back below is QString::toDouble(),
   // which is locale-independent and always wants '.'. Left to disagree, a typed
   // "9,81" validates under a comma-decimal locale and reads back as 0.
+  // The C locale's GROUP separator is ',', so QLocale::c() alone still accepts
+  // "0,375" -- as 375 grouped -- and QString::toDouble() then returns 0. Qt 2
+  // ran the whole string through strtod and demanded it be consumed to the NUL
+  // (qstring.cpp toDouble), so a comma made ok=false and validate() returned
+  // Invalid. RejectGroupSeparator is what reproduces that.
+  QLocale cLocale = QLocale::c();
+  cLocale.setNumberOptions( QLocale::RejectGroupSeparator );
   for ( QValidator *v : findChildren<QValidator *>() )
-    v->setLocale( QLocale::c() );
+    v->setLocale( cLocale );
 }
 
 SIG_SimulationParameter::~SIG_SimulationParameter()

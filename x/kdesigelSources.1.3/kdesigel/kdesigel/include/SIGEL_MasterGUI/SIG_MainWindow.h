@@ -73,6 +73,18 @@ namespace SIGEL_MasterGUI
       
    public slots:
 	/**
+	 * Enables or disables every action that requires an experiment.
+	 * Replaces Qt 2's QActionGroup::setEnabled over its own member list.
+	 */
+      void slotEnableNoExperimentActions( bool enable );
+
+	/**
+	 * Enables or disables every action that must be off while the
+	 * evolution is running. Same reason as above.
+	 */
+      void slotEnableEvolutionRunningActions( bool enable );
+
+	/**
 	 * This slot is called when the about box has to be shown.
 	 */
       void slotAbout();
@@ -134,13 +146,27 @@ namespace SIGEL_MasterGUI
        * The action group that is disabled when there is no
        * experiment present.
        */
-      QActionGroup *noExperimentActionGroup;
+      // Qt 2's QActionGroup kept its own member list (qaction.cpp:892-899), so
+      // one action could sit in several groups and each group's setEnabled()
+      // walked its own list. A Qt 6 QAction belongs to at most ONE QActionGroup
+      // -- adding it to a second EVICTS it from the first -- and 23 of these 30
+      // actions are also in evolutionRunningActions, which left only 7 of them
+      // being disabled. A plain list restores Qt 2's behaviour exactly.
+      QList<QAction *> noExperimentActions;
 
       /**
        * The action group that is disabled when there is no
        * experiment present.
        */
-      QActionGroup *evolutionRunningActionGroup;
+      QList<QAction *> evolutionRunningActions;
+
+      /**
+       * The MetaGP system currently selected. Qt 2's QActionGroup kept this as
+       * d->selected and emitted selected(s) only when it CHANGED
+       * (qaction.cpp childToggled); Qt 6's triggered(QAction*) fires on every
+       * click, so the comparison has to live here now.
+       */
+      QAction *mtSelectedSystem;
 
       /**
        * The splitter which contains the two main widgets.

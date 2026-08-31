@@ -334,10 +334,15 @@ cat > /tmp/dsp.$$.cpp <<'DSPEOF'
 #include <QApplication>
 #include <QLineEdit>
 #include <QLocale>
+#include <QLineEdit>
+#include <QValidator>
 #include <cstdio>
 struct P : DISpinBox {
     P(int d) : DISpinBox(d) {}
     void type(const char *s) { lineEdit()->setText(s); interpretText(); }
+    // lineEdit() and validate() are both non-public in the classes above; this
+    // is the one place that can reach the installed validator.
+    const QValidator *installedValidator() const { return lineEdit()->validator(); }
 };
 static int fails = 0;
 static void eq(const char *what, QString got, QString want)
@@ -346,6 +351,20 @@ static void eq(const char *what, QString got, QString want)
         ++fails;
         printf("  DISpinBox %s: got [%s] want [%s]\n",
                what, qPrintable(got), qPrintable(want));
+    }
+}
+static void vcomma(const char *where, QLocale system)
+{
+    QLocale::setDefault(system);
+    P k(3); k.setRange(3, 0.0, 100.0);
+    const QValidator *v = k.installedValidator();
+    if (!v) { ++fails; printf("  DISpinBox comma %s: no validator installed\n", where); return; }
+    QString comma = "0,375"; int pos = 0;
+    QValidator::State st = v->validate(comma, pos);
+    if (st != QValidator::Invalid) {
+        ++fails;
+        printf("  DISpinBox comma %s: \"0,375\" gave %s, Qt 2 gave Invalid\n",
+               where, st == QValidator::Acceptable ? "Acceptable" : "Intermediate");
     }
 }
 int main(int c, char **v)
@@ -363,6 +382,25 @@ int main(int c, char **v)
     P g(3); g.setRange(3, 0.0, 100.0); g.type("0.375");
     eq("3dp text de_DE",  g.text(),                  "0.375");
     eq("3dp value de_DE", QString::number(g.value()), "375");
+    // ...and pinning to QLocale::c() is NOT sufficient on its own, which is the
+    // trap these rows exist for. C's GROUP separator is ',', so a bare
+    // QLocale::c() validator accepts "0,375" as 375-with-a-group-separator, and
+    // QString::toDouble() -- which never takes group separators -- then returns
+    // 0. Qt 2 could not: its validator ran the whole string through strtod and
+    // demanded it be consumed to the NUL (qstring.cpp toDouble), so ok was false
+    // and validate() returned Invalid outright -- the keystroke was refused.
+    //
+    // Asserted through lineEdit()->validator(), which is the object the locale
+    // is pinned on and is reachable with public API: DISpinBox::validate() is
+    // private (DoubleSpinBox.h), and a probe calling it through a derived struct
+    // does not compile -- which silently took the whole widgets section, this
+    // block and the C6 rows above it, out of the build when first written.
+    //
+    // Invalid, not merely "not Acceptable": without RejectGroupSeparator the
+    // state is Intermediate, so only checking for Acceptable passes either way
+    // and the row cannot see the bug it exists for.
+    vcomma("de_DE", QLocale(QLocale::German, QLocale::Germany));
+    vcomma("C", QLocale::c());
     QLocale::setDefault(QLocale::c());
     P e(1); e.setRange(1, 0.0, 100.0); e.type("2.5");
     eq("1dp text",  e.text(),                  "2.5");

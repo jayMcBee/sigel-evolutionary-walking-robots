@@ -34,8 +34,14 @@ DISpinBox::DISpinBox(int decimals, QWidget *parent, const char *name) : QSpinBox
 	// reject "0.375" and accept "0,375", which toDouble then reads as 0. That
 	// is worse than the bug the validate() override exists to fix. Pinning the
 	// validators to the C locale restores 1.3 in every locale.
-	dValidator->setLocale(QLocale::c());
-	iValidator->setLocale(QLocale::c());
+	// QLocale::c() alone is not enough: C's GROUP separator is ',', so the
+	// validator accepts "0,375" as 375 grouped while QString::toDouble()
+	// rejects it and yields 0. Qt 2 fed the whole string to strtod and
+	// required it be consumed to the NUL, so a comma was Invalid.
+	QLocale cLocale = QLocale::c();
+	cLocale.setNumberOptions(QLocale::RejectGroupSeparator);
+	dValidator->setLocale(cLocale);
+	iValidator->setLocale(cLocale);
 
 	// Qt 2's textChanged only set an `edited' flag (qspinbox.cpp:780-783);
 	// valueChanged came solely from setValue. Qt 6 interprets every keystroke

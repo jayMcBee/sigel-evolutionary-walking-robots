@@ -2786,8 +2786,10 @@ other 20 are the hand-written module. 29/29 sources and 29/29 headers compile;
 `SIGEL_MasterGUI` has joined `MODULES` with a dead-signal baseline of **0**,
 down from 44.
 
-**The `setAutoDelete` windows were `QDict::take()` all along.** Five sites
-toggle the flag off, `remove()` a value, re-`insert()` it under a new key and
+**The `setAutoDelete` windows were `QDict::take()` all along.** Four sites
+(one in `SIG_Experiment`, three in `SIG_ExperimentListView` — this said *five*
+until review counted them; the fifth candidate was a `QList` `removeOne()`,
+not a `QDict`) toggle the flag off, `remove()` a value, re-`insert()` it under a new key and
 toggle back — the shape this plan had flagged as the module's real hazard.
 `qgdict.cpp` settles it: `remove_string` calls `deleteItem()` (a no-op while
 autoDelete is off) and `take_string` unlinks without it, so the whole dance
@@ -2818,11 +2820,20 @@ hard-coded `'.'` (`qvalidator.cpp:387`). One `findChildren<QValidator *>()` loop
 per constructor pins all of them to `QLocale::c()`, and covers any validator
 added later.
 
-**23 prepending item sites.** Every `QTreeWidgetItem` in the module was
-constructed with a bare parent, which Qt 2 **prepended**; `SIG_LanguageParameters`
+**26 prepending item sites — 23 found by sweep, 3 found by review.** Every
+`QTreeWidgetItem` in the module was constructed with a bare parent, which Qt 2
+**prepended**; `SIG_LanguageParameters`
 builds 15 command rows in sequence and 1.3 therefore shows them reversed. Each
 becomes a detached construction plus `insertTopLevelItem(0, …)` or
-`insertChild(0, …)`.
+`insertChild(0, …)`. *The sweep grepped `new QTreeWidgetItem(` and so could not
+see the three that sit in a **base-initializer list** — `SIG_ExperimentItem`'s
+constructor and both of `SIG_IndividualListItem`'s, each `: QTreeWidgetItem(
+parent )`. They append. The visible consequence is in the "Load Experiments"
+multi-select loop (`SIG_ExperimentListView`), which builds one item per chosen
+file with sorting disabled and then selects `topLevelItem(0)`: 1.3 prepended, so
+that was the LAST file loaded; appending makes it the first. A grep for a
+constructor call cannot find a constructor that is inherited — the shape to look
+for is the initializer list.*
 
 **Two Qt 2 no-ops that Qt 6 turns into a crash or a warning.**
 `QListView::setSelected(0, true)` began `if ( !item ... ) return;`
@@ -2851,12 +2862,21 @@ drag-scrolling. Qt 6 has no such virtuals: the three methods would have compiled
 linked, and never been called, and the feature would have gone silently dead.
 They are now dispatched from `viewportEvent()`.
 
-**Toolbar appearance, measured not guessed.** `usesBigPixmaps()` /
-`setUsesTextLabel()` become `iconSize()` / `toolButtonStyle()`. Qt 2 chose
-between the two pixmaps of a `QIconSet` rather than any fixed size, so the
-numbers come from the files: the `*Small.xpm` are **22×22** and the `*Large.xpm`
-**32×32**. The constructor now sets 22×22, which Qt 2 defaulted to and Qt 6
-would otherwise take from the style.
+**Toolbar appearance — and a figure recorded here as "measured" that was
+not.** `usesBigPixmaps()` / `setUsesTextLabel()` become `iconSize()` /
+`toolButtonStyle()`, and Qt 2 defaulted to small pixmaps with no text labels
+(`qmainwindow.cpp:177`, `ubp(FALSE), utl(FALSE)`). This entry first said the
+`*Small.xpm` are 22×22 and the `*Large.xpm` 32×32, "measured". **One pair was
+measured and the result generalised to all thirty.** Re-measured across every
+referenced file: Small is 25×25 ×7, 22×22 ×4, 24×24 ×3, 16×16 and 9×25; Large is
+32×32 ×7, 48×48 ×2, 40×40 ×2, 46×46 and 19×48. Five distinct sizes each. So
+`setIconSize(22,22)` was scaling the majority DOWN. It is now 25×25 small /
+48×48 big — the measured maxima, so nothing is enlarged past what 1.3 drew.
+*A residue remains and is not removable: Qt 2 named Small and Large explicitly
+and blitted each at its own size, while a Qt 6 toolbar has one `iconSize` and
+picks from the `QIcon` by pixel size, so icons whose two pixmaps straddle the
+chosen size are still resampled. Removing it would mean splitting every
+`QIcon`.*
 
 **Three toggle flags nearly lost.** Qt 2's `QAction` took a trailing `toggle`
 argument; `mtUseAction`, `mtChoiceEvaluatorAction` and `mtChoiceClassifierAction`
@@ -2877,6 +2897,85 @@ that no longer matches its declaration fails at run time exactly as silently.
 Every `SLOT()` in the module was matched against the declarations in its
 headers: **0 mismatches**, the only apparent ones being inherited Qt slots
 (`setEnabled`, `accept`, `reject`) and parameter-name differences.
+
+**What the C7 review found, and what it changed.** The first review agent died
+on a rate limit before its first tool call and returned nothing; the findings
+below come from a second one plus a self-check, and **six of them are real.**
+
+*The comma gate did not compile, and its teeth test was a false positive.*
+`DISpinBox::validate()` is `private` (`DoubleSpinBox.h`), so the probe's
+`struct P : DISpinBox` could not call it and the whole `widgets` binary failed to
+build. The "0 pass 1 fail" that was read as the new rows biting was the build
+breaking — it fails identically with and without the fix — and it also silently
+took C6's entire pre-existing spin-box check out of the run. The probe now
+reaches the validator through `lineEdit()->validator()` from inside a member of
+`P`, both being non-public. **And the assertion could not have discriminated
+anyway:** it tested `!= Acceptable`, but without `RejectGroupSeparator` the state
+is `Intermediate`, not `Acceptable`. It now asserts `Invalid`, which is what Qt 2
+returned, and the teeth test was re-run properly: it passes with the fix and
+prints a specific diagnostic without it. *This is the second time in this port a
+teeth test has been believed on a failure it did not cause.*
+
+*A Qt 6 `QAction` belongs to at most ONE `QActionGroup`.* Qt 2's
+`QActionGroup::insert` appended to the group's own list (`qaction.cpp:892-899`)
+and `setEnabled` walked that list, so an action could sit in several groups.
+Qt 6's `addAction` calls `setActionGroup`, which **evicts** it from the previous
+group — measured: after adding to a second group the first reports 0 members and
+`setEnabled(false)` leaves the action enabled. 30 actions go into
+`noExperimentActions` and 23 of those are later added to
+`evolutionRunningActions`, so "no experiment loaded" was disabling **7 of 30**
+instead of all 30 — leaving every import, export, save, rename and individuals
+action live with no experiment open. Both groups are used *only* as bulk
+enable/disable targets (no menu insertion, no signals out), so both are now a
+plain `QList<QAction *>` with a slot that loops, which is exactly what Qt 2's
+`setEnabled` did. The genuinely exclusive `mtChoiceTypeActionGroup` stays a
+`QActionGroup`.
+
+*The toolbar showed the long menu label.* Qt 2's `QAction` kept `text` and
+`menuText` distinct and put **`text`** on the toolbar button
+(`qaction.cpp:220`, `btn->setTextLabel( text, FALSE )`) while menus used
+`menuText()`. The port folded `menuText` into Qt 6's single `text()`, so with
+text labels enabled the buttons read "New Experiment" where 1.3 read "New".
+Qt 6's equivalent of the short button label is `iconText()` — verified by probe
+that a toolbar button shows `iconText` when set and falls back to `text`
+otherwise — so all 36 actions now carry `setIconText`.
+
+*A repeat click on the active MetaGP system re-entered `switchSystem()`.* Qt 2
+emitted `selected(s)` only on an actual change: `QActionGroup::childToggled`
+gates it on `s != d->selected`, and `QAction::setOn` returns early when the state
+already matches. Qt 6's `triggered(QAction*)` fires on every click. The slot now
+keeps the selected action and returns early, re-reading it at the end so a
+`switchSystem()` refusal that rolls the choice back stays consistent — which is
+what Qt 2's second `childToggled` did.
+
+*Drag-scrolling also selected text.* 1.3 overrode `QTextView`'s three viewport
+mouse handlers **without chaining to the base**, so Qt 2's own drag-selection
+(`qtextview.cpp:884`, `doSelection()`) never ran. The `viewportEvent()` routing
+dispatched to the handlers and then still called
+`QTextBrowser::viewportEvent()`, giving the drag a text selection 1.3 never had.
+It now returns `true` for the three mouse events.
+
+*Three Qt 2 APIs survive in `#ifdef _WINDOWS` blocks, which no gate can reach.*
+`QString::find(str, index, bool)` became `indexOf(…, false)` — Qt 6's third
+parameter is `Qt::CaseSensitivity` and `bool` does not convert, so it would not
+compile at all; Qt 2's `false` meant case-*in*sensitive and a negative index was
+`index += length()` then a forward search, which Qt 6 matches. Alongside it,
+`QMessageBox::warning(…, "Ok")` passed Qt 2's `button0Text` where Qt 6 wants
+`StandardButtons`, and `WinExec(gnuCmdLine, …)` relied on Qt 2's implicit
+`operator const char *()` (`qstring.h:511`, returning `latin1()`) — now
+`toLatin1().constData()`. **The whole branch cannot be compiled here** (`windows.h`
+is absent), so it was read by hand; that blind spot is real and unguarded.
+
+*Two validator inputs still differ from 1.3, measured and accepted.* Qt 2's
+validator ran `strtod` and required full consumption, so `" 9.81"` (leading
+whitespace, which strtod skips) and `"0x10"` (glibc hex float = 16) were both
+Acceptable; the pinned Qt 6 validator returns Invalid for both. `"+.5"`, `"1e5"`,
+`"1E5"`, a trailing space, and `"0,375"` all agree, and `"-"`, `"."` and empty
+agree as Intermediate via Qt 2's leading `^ *-?\.? *$` regex. The hex case cannot
+be reproduced regardless — Qt 6's own `QString::toDouble("0x10")` **fails**, so
+accepting it would store 0 where 1.3 stored 16, making rejection the safer half
+of an unreproducible pair. Recorded rather than fixed: matching `strtod` exactly
+would mean a hand-written validator on all 21 sites.
 
 **Gates: `./check.sh` 831 pass, 5 fail, 506 warnings.** The +58 over C6 is this
 module's 29 sources and 29 headers. The 5 failures are unchanged and all C8

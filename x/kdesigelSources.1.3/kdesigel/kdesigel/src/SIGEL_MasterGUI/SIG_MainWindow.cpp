@@ -39,9 +39,16 @@ namespace SIGEL_MasterGUI
 SIG_MainWindow::SIG_MainWindow( QWidget * parent, const char * name, Qt::WindowFlags f ) : QMainWindow( parent, f )
 {
   setObjectName( QString::fromUtf8( name ) );
-  // Qt 2 defaulted to the Small pixmap of each QIconSet (22x22 here);
-  // Qt 6 would otherwise use a style-dependent size and rescale them.
-  setIconSize( QSize( 22, 22 ) );
+  // Qt 2's QMainWindow defaulted to small pixmaps (qmainwindow.cpp:177, ubp
+  // FALSE) and drew each QIconSet member at its OWN size. These pixmaps are not
+  // a uniform size -- measured across the 30 referenced files, Small runs
+  // 9x25..25x25 and Large 19x48..48x48 -- and Qt 6 has exactly one iconSize per
+  // toolbar, choosing from the QIcon by pixel size rather than by the Small and
+  // Large roles Qt 2 named explicitly. 25 is the largest Small, so nothing is
+  // scaled UP past what 1.3 drew; icons whose two pixmaps straddle it are still
+  // resampled where Qt 2 blitted natively. That residue is not removable
+  // without splitting each QIcon, and is recorded in PORTING.md.
+  setIconSize( QSize( 25, 25 ) );
 #ifdef _WINDOWS
   QString sigelRoot( ::getenv( "SIGEL_ROOT" ) );
 #else
@@ -96,6 +103,7 @@ SIG_MainWindow::SIG_MainWindow( QWidget * parent, const char * name, Qt::WindowF
   icon_newExperimentAction.addPixmap( QPixmap( sigelRoot + "/pixmaps/newExperimentLarge.xpm" ) );
   QAction *newExperimentAction = new QAction( icon_newExperimentAction, "&New Experiment", this );
   newExperimentAction->setToolTip( "New" );
+  newExperimentAction->setIconText( "New" );
   newExperimentAction->setShortcut( Qt::CTRL | Qt::Key_N );
   fileMenu->addAction( newExperimentAction );
   fileToolBar->addAction( newExperimentAction );
@@ -108,6 +116,7 @@ SIG_MainWindow::SIG_MainWindow( QWidget * parent, const char * name, Qt::WindowF
 
   QAction *renameExperimentAction = new QAction( "&Rename Experiment", this );
   renameExperimentAction->setToolTip( "Rename" );
+  renameExperimentAction->setIconText( "Rename" );
   renameExperimentAction->setShortcut( Qt::CTRL | Qt::Key_R );
   fileMenu->addAction( renameExperimentAction );
   QObject::connect( renameExperimentAction,
@@ -120,6 +129,7 @@ SIG_MainWindow::SIG_MainWindow( QWidget * parent, const char * name, Qt::WindowF
   icon_deleteExperimentAction.addPixmap( QPixmap( sigelRoot + "/pixmaps/deleteExperimentLarge.xpm" ) );
   QAction *deleteExperimentAction = new QAction( icon_deleteExperimentAction, "&Delete Experiment", this );
   deleteExperimentAction->setToolTip( "Delete" );
+  deleteExperimentAction->setIconText( "Delete" );
   deleteExperimentAction->setShortcut( Qt::CTRL | Qt::Key_D );
   fileMenu->addAction( deleteExperimentAction );
   fileToolBar->addAction( deleteExperimentAction );
@@ -138,6 +148,7 @@ SIG_MainWindow::SIG_MainWindow( QWidget * parent, const char * name, Qt::WindowF
   icon_openExperimentAction.addPixmap( QPixmap( sigelRoot + "/pixmaps/openExperimentLarge.xpm" ) );
   QAction *openExperimentAction = new QAction( icon_openExperimentAction, "&Open Experiment", this );
   openExperimentAction->setToolTip( "Open" );
+  openExperimentAction->setIconText( "Open" );
   openExperimentAction->setShortcut( Qt::CTRL | Qt::Key_O );
   fileMenu->addAction( openExperimentAction );
   fileToolBar->addAction( openExperimentAction );
@@ -152,6 +163,7 @@ SIG_MainWindow::SIG_MainWindow( QWidget * parent, const char * name, Qt::WindowF
   icon_saveExperimentAction.addPixmap( QPixmap( sigelRoot + "/pixmaps/saveExperimentLarge.xpm" ) );
   QAction *saveExperimentAction = new QAction( icon_saveExperimentAction, "&Save Experiment", this );
   saveExperimentAction->setToolTip( "Save" );
+  saveExperimentAction->setIconText( "Save" );
   saveExperimentAction->setShortcut( Qt::CTRL | Qt::Key_S );
   fileMenu->addAction( saveExperimentAction );
   fileToolBar->addAction( saveExperimentAction );
@@ -171,6 +183,7 @@ SIG_MainWindow::SIG_MainWindow( QWidget * parent, const char * name, Qt::WindowF
   // create the actions and insert them into the menu
   QAction *importGPParametersAction = new QAction( "GP-Parameters", this );
   importGPParametersAction->setToolTip( "Import GP-Parameters" );
+  importGPParametersAction->setIconText( "Import GP-Parameters" );
   importGPParametersAction->setShortcut( Qt::CTRL | Qt::SHIFT | Qt::Key_G );
   importMenu->addAction( importGPParametersAction );
   QObject::connect( importGPParametersAction,
@@ -179,6 +192,7 @@ SIG_MainWindow::SIG_MainWindow( QWidget * parent, const char * name, Qt::WindowF
 		    SLOT( slotGPParametersImport() ) );
   QAction *importSimulationParametersAction = new QAction( "Simulation-Parameters", this );
   importSimulationParametersAction->setToolTip( "Import Simulation-Parameters" );
+  importSimulationParametersAction->setIconText( "Import Simulation-Parameters" );
   importSimulationParametersAction->setShortcut( Qt::CTRL | Qt::SHIFT | Qt::Key_S );
   importMenu->addAction( importSimulationParametersAction );
   QObject::connect( importSimulationParametersAction,
@@ -187,6 +201,7 @@ SIG_MainWindow::SIG_MainWindow( QWidget * parent, const char * name, Qt::WindowF
 		    SLOT( slotSimulationParametersImport() ) );
   QAction *importLanguageParametersAction = new QAction( "Language-Parameters", this );
   importLanguageParametersAction->setToolTip( "Import Language-Parameters" );
+  importLanguageParametersAction->setIconText( "Import Language-Parameters" );
   importLanguageParametersAction->setShortcut( Qt::CTRL | Qt::SHIFT | Qt::Key_L );
   importMenu->addAction( importLanguageParametersAction );
   QObject::connect( importLanguageParametersAction,
@@ -195,6 +210,7 @@ SIG_MainWindow::SIG_MainWindow( QWidget * parent, const char * name, Qt::WindowF
 		    SLOT( slotLanguageParametersImport() ) );
   QAction *importEnvironmentAction = new QAction( "Environment", this );
   importEnvironmentAction->setToolTip( "Import Environment" );
+  importEnvironmentAction->setIconText( "Import Environment" );
   importEnvironmentAction->setShortcut( Qt::CTRL | Qt::SHIFT | Qt::Key_E );
   importMenu->addAction( importEnvironmentAction );
   QObject::connect( importEnvironmentAction,
@@ -203,6 +219,7 @@ SIG_MainWindow::SIG_MainWindow( QWidget * parent, const char * name, Qt::WindowF
 		    SLOT( slotEnvironmentImport() ) );
   QAction *importPopulationAction = new QAction( "Population", this );
   importPopulationAction->setToolTip( "Import Population" );
+  importPopulationAction->setIconText( "Import Population" );
   importPopulationAction->setShortcut( Qt::CTRL | Qt::SHIFT | Qt::Key_P );
   importMenu->addAction( importPopulationAction );
   QObject::connect( importPopulationAction,
@@ -211,6 +228,7 @@ SIG_MainWindow::SIG_MainWindow( QWidget * parent, const char * name, Qt::WindowF
 		    SLOT( slotPopulationImport() ) );
   QAction *importRobotAction = new QAction( "Robot", this );
   importRobotAction->setToolTip( "Import Robot" );
+  importRobotAction->setIconText( "Import Robot" );
   importRobotAction->setShortcut( Qt::CTRL | Qt::SHIFT | Qt::Key_R );
   importMenu->addAction( importRobotAction );
   QObject::connect( importRobotAction,
@@ -222,6 +240,7 @@ SIG_MainWindow::SIG_MainWindow( QWidget * parent, const char * name, Qt::WindowF
 
   QAction *importProgramAction = new QAction( "Program", this );
   importProgramAction->setToolTip( "Import Program" );
+  importProgramAction->setIconText( "Import Program" );
   importProgramAction->setShortcut( Qt::CTRL | Qt::SHIFT | Qt::Key_K );
   importMenu->addAction( importProgramAction );
   QObject::connect( importProgramAction,
@@ -231,6 +250,7 @@ SIG_MainWindow::SIG_MainWindow( QWidget * parent, const char * name, Qt::WindowF
 
   QAction *importIndividualAction = new QAction( "Individual", this );
   importIndividualAction->setToolTip( "Import Individual" );
+  importIndividualAction->setIconText( "Import Individual" );
   importIndividualAction->setShortcut( Qt::CTRL | Qt::SHIFT | Qt::Key_L );
   importMenu->addAction( importIndividualAction );
   QObject::connect( importIndividualAction,
@@ -247,6 +267,7 @@ SIG_MainWindow::SIG_MainWindow( QWidget * parent, const char * name, Qt::WindowF
 
   QAction *exportGPParametersAction = new QAction( "GP-Parameters", this );
   exportGPParametersAction->setToolTip( "Export GP-Parameters" );
+  exportGPParametersAction->setIconText( "Export GP-Parameters" );
   exportGPParametersAction->setShortcut( Qt::CTRL | Qt::ALT | Qt::Key_G );
   exportMenu->addAction( exportGPParametersAction );
   QObject::connect( exportGPParametersAction,
@@ -255,6 +276,7 @@ SIG_MainWindow::SIG_MainWindow( QWidget * parent, const char * name, Qt::WindowF
 		    SLOT( slotGPParametersExport() ) );
   QAction *exportSimulationParametersAction = new QAction( "Simulation-Parameters", this );
   exportSimulationParametersAction->setToolTip( "Export Simulation-Parameters" );
+  exportSimulationParametersAction->setIconText( "Export Simulation-Parameters" );
   exportSimulationParametersAction->setShortcut( Qt::CTRL | Qt::ALT | Qt::Key_S );
   exportMenu->addAction( exportSimulationParametersAction );
   QObject::connect( exportSimulationParametersAction,
@@ -263,6 +285,7 @@ SIG_MainWindow::SIG_MainWindow( QWidget * parent, const char * name, Qt::WindowF
 		    SLOT( slotSimulationParametersExport() ) );
   QAction *exportLanguageParametersAction = new QAction( "Language-Parameters", this );
   exportLanguageParametersAction->setToolTip( "Export Language-Parameters" );
+  exportLanguageParametersAction->setIconText( "Export Language-Parameters" );
   exportLanguageParametersAction->setShortcut( Qt::CTRL | Qt::ALT | Qt::Key_L );
   exportMenu->addAction( exportLanguageParametersAction );
   QObject::connect( exportLanguageParametersAction,
@@ -271,6 +294,7 @@ SIG_MainWindow::SIG_MainWindow( QWidget * parent, const char * name, Qt::WindowF
 		    SLOT( slotLanguageParametersExport() ) );
   QAction *exportEnvironmentAction = new QAction( "Environment", this );
   exportEnvironmentAction->setToolTip( "Export Environment" );
+  exportEnvironmentAction->setIconText( "Export Environment" );
   exportEnvironmentAction->setShortcut( Qt::CTRL | Qt::ALT | Qt::Key_E );
   exportMenu->addAction( exportEnvironmentAction );
   QObject::connect( exportEnvironmentAction,
@@ -279,6 +303,7 @@ SIG_MainWindow::SIG_MainWindow( QWidget * parent, const char * name, Qt::WindowF
 		    SLOT( slotEnvironmentExport() ) );
   QAction *exportPopulationAction = new QAction( "Population", this );
   exportPopulationAction->setToolTip( "Export Population" );
+  exportPopulationAction->setIconText( "Export Population" );
   exportPopulationAction->setShortcut( Qt::CTRL | Qt::ALT | Qt::Key_P );
   exportMenu->addAction( exportPopulationAction );
   QObject::connect( exportPopulationAction,
@@ -290,6 +315,7 @@ SIG_MainWindow::SIG_MainWindow( QWidget * parent, const char * name, Qt::WindowF
 
   QAction *exportProgramAction = new QAction( "Program", this );
   exportProgramAction->setToolTip( "Export Program" );
+  exportProgramAction->setIconText( "Export Program" );
   exportProgramAction->setShortcut( Qt::CTRL | Qt::ALT | Qt::Key_K );
   exportMenu->addAction( exportProgramAction );
   QObject::connect( exportProgramAction,
@@ -299,6 +325,7 @@ SIG_MainWindow::SIG_MainWindow( QWidget * parent, const char * name, Qt::WindowF
 
   QAction *exportIndividualAction = new QAction( "Individual", this );
   exportIndividualAction->setToolTip( "Export Individual" );
+  exportIndividualAction->setIconText( "Export Individual" );
   exportIndividualAction->setShortcut( Qt::CTRL | Qt::ALT | Qt::Key_L );
   exportMenu->addAction( exportIndividualAction );
   QObject::connect( exportIndividualAction,
@@ -310,6 +337,7 @@ SIG_MainWindow::SIG_MainWindow( QWidget * parent, const char * name, Qt::WindowF
 
   QAction *exportToGNUPlotAction = new QAction( "...to GNU plot", this );
   exportToGNUPlotAction->setToolTip( "Export to GNU plot" );
+  exportToGNUPlotAction->setIconText( "Export to GNU plot" );
   exportToGNUPlotAction->setShortcut( Qt::ALT | Qt::Key_6 );
   exportMenu->addAction( exportToGNUPlotAction );
   QObject::connect( exportToGNUPlotAction,
@@ -328,6 +356,7 @@ SIG_MainWindow::SIG_MainWindow( QWidget * parent, const char * name, Qt::WindowF
   icon_quitProgramAction.addPixmap( QPixmap( sigelRoot + "/pixmaps/quitApplicationLarge.xpm" ) );
   QAction *quitProgramAction = new QAction( icon_quitProgramAction, "&Quit", this );
   quitProgramAction->setToolTip( "Quit" );
+  quitProgramAction->setIconText( "Quit" );
   quitProgramAction->setShortcut( Qt::CTRL | Qt::Key_Q );
   fileMenu->addAction( quitProgramAction );
   fileToolBar->addAction( quitProgramAction );
@@ -347,6 +376,7 @@ SIG_MainWindow::SIG_MainWindow( QWidget * parent, const char * name, Qt::WindowF
   icon_viewPopulationAction.addPixmap( QPixmap( sigelRoot + "/pixmaps/individualLarge.xpm" ) );
   QAction *viewPopulationAction = new QAction( icon_viewPopulationAction, "&Population", this );
   viewPopulationAction->setToolTip( "Population" );
+  viewPopulationAction->setIconText( "Population" );
   viewPopulationAction->setShortcut( Qt::ALT | Qt::Key_P );
   viewMenu->addAction( viewPopulationAction );
   viewToolBar->addAction( viewPopulationAction );
@@ -360,6 +390,7 @@ SIG_MainWindow::SIG_MainWindow( QWidget * parent, const char * name, Qt::WindowF
   icon_viewRobotAction.addPixmap( QPixmap( sigelRoot + "/pixmaps/robotLarge.xpm" ) );
   QAction *viewRobotAction = new QAction( icon_viewRobotAction, "&Robot", this );
   viewRobotAction->setToolTip( "Robot" );
+  viewRobotAction->setIconText( "Robot" );
   viewRobotAction->setShortcut( Qt::ALT | Qt::Key_R );
   viewMenu->addAction( viewRobotAction );
   viewToolBar->addAction( viewRobotAction );
@@ -373,6 +404,7 @@ SIG_MainWindow::SIG_MainWindow( QWidget * parent, const char * name, Qt::WindowF
   icon_viewLanguageParametersAction.addPixmap( QPixmap( sigelRoot + "/pixmaps/balloonLarge.xpm" ) );
   QAction *viewLanguageParametersAction = new QAction( icon_viewLanguageParametersAction, "&Language Parameters", this );
   viewLanguageParametersAction->setToolTip( "Language" );
+  viewLanguageParametersAction->setIconText( "Language" );
   viewLanguageParametersAction->setShortcut( Qt::ALT | Qt::Key_L );
   viewMenu->addAction( viewLanguageParametersAction );
   viewToolBar->addAction( viewLanguageParametersAction );
@@ -386,6 +418,7 @@ SIG_MainWindow::SIG_MainWindow( QWidget * parent, const char * name, Qt::WindowF
   icon_viewGPParametersAction.addPixmap( QPixmap( sigelRoot + "/pixmaps/dnaLarge.xpm" ) );
   QAction *viewGPParametersAction = new QAction( icon_viewGPParametersAction, "&GP Parameters", this );
   viewGPParametersAction->setToolTip( "Genetic" );
+  viewGPParametersAction->setIconText( "Genetic" );
   viewGPParametersAction->setShortcut( Qt::ALT | Qt::Key_G );
   viewMenu->addAction( viewGPParametersAction );
   viewToolBar->addAction( viewGPParametersAction );
@@ -399,6 +432,7 @@ SIG_MainWindow::SIG_MainWindow( QWidget * parent, const char * name, Qt::WindowF
   icon_viewSimulationParametersAction.addPixmap( QPixmap( sigelRoot + "/pixmaps/simulationParameterLarge.xpm" ) );
   QAction *viewSimulationParametersAction = new QAction( icon_viewSimulationParametersAction, "&Simulation Parameters", this );
   viewSimulationParametersAction->setToolTip( "Simulation" );
+  viewSimulationParametersAction->setIconText( "Simulation" );
   viewSimulationParametersAction->setShortcut( Qt::ALT | Qt::Key_S );
   viewMenu->addAction( viewSimulationParametersAction );
   viewToolBar->addAction( viewSimulationParametersAction );
@@ -412,6 +446,7 @@ SIG_MainWindow::SIG_MainWindow( QWidget * parent, const char * name, Qt::WindowF
   icon_viewEnvironmentAction.addPixmap( QPixmap( sigelRoot + "/pixmaps/environLarge.xpm" ) );
   QAction *viewEnvironmentAction = new QAction( icon_viewEnvironmentAction, "&Environment", this );
   viewEnvironmentAction->setToolTip( "Environment" );
+  viewEnvironmentAction->setIconText( "Environment" );
   viewEnvironmentAction->setShortcut( Qt::ALT | Qt::Key_E );
   viewMenu->addAction( viewEnvironmentAction );
   viewToolBar->addAction( viewEnvironmentAction );
@@ -433,35 +468,32 @@ SIG_MainWindow::SIG_MainWindow( QWidget * parent, const char * name, Qt::WindowF
   optionsMenu->addSeparator();
   optionsMenu->addAction( "Change font", this, SLOT( slotChangeFont() ) );
 
-  noExperimentActionGroup = new QActionGroup( this );
-  noExperimentActionGroup->setObjectName( "noExperimentActionGroup" );
-  noExperimentActionGroup->setExclusive( false );
-  noExperimentActionGroup->addAction( renameExperimentAction );
-  noExperimentActionGroup->addAction( deleteExperimentAction );
-  noExperimentActionGroup->addAction( saveExperimentAction );
-  noExperimentActionGroup->addAction( viewGPParametersAction );
-  noExperimentActionGroup->addAction( viewSimulationParametersAction );
-  noExperimentActionGroup->addAction( viewLanguageParametersAction );
-  noExperimentActionGroup->addAction( viewRobotAction );
-  noExperimentActionGroup->addAction( viewEnvironmentAction );
-  noExperimentActionGroup->addAction( viewPopulationAction );
+  noExperimentActions.append( renameExperimentAction );
+  noExperimentActions.append( deleteExperimentAction );
+  noExperimentActions.append( saveExperimentAction );
+  noExperimentActions.append( viewGPParametersAction );
+  noExperimentActions.append( viewSimulationParametersAction );
+  noExperimentActions.append( viewLanguageParametersAction );
+  noExperimentActions.append( viewRobotAction );
+  noExperimentActions.append( viewEnvironmentAction );
+  noExperimentActions.append( viewPopulationAction );
 
-  noExperimentActionGroup->addAction( importGPParametersAction );
-  noExperimentActionGroup->addAction( importSimulationParametersAction );
-  noExperimentActionGroup->addAction( importRobotAction );
-  noExperimentActionGroup->addAction( importLanguageParametersAction );
-  noExperimentActionGroup->addAction( importPopulationAction );
-  noExperimentActionGroup->addAction( importEnvironmentAction );
-  noExperimentActionGroup->addAction( importProgramAction );
-  noExperimentActionGroup->addAction( importIndividualAction );
-  noExperimentActionGroup->addAction( exportGPParametersAction );
-  noExperimentActionGroup->addAction( exportSimulationParametersAction );
-  noExperimentActionGroup->addAction( exportLanguageParametersAction );
-  noExperimentActionGroup->addAction( exportEnvironmentAction );
-  noExperimentActionGroup->addAction( exportPopulationAction );
-  noExperimentActionGroup->addAction( exportToGNUPlotAction );
-  noExperimentActionGroup->addAction( exportProgramAction );
-  noExperimentActionGroup->addAction( exportIndividualAction );
+  noExperimentActions.append( importGPParametersAction );
+  noExperimentActions.append( importSimulationParametersAction );
+  noExperimentActions.append( importRobotAction );
+  noExperimentActions.append( importLanguageParametersAction );
+  noExperimentActions.append( importPopulationAction );
+  noExperimentActions.append( importEnvironmentAction );
+  noExperimentActions.append( importProgramAction );
+  noExperimentActions.append( importIndividualAction );
+  noExperimentActions.append( exportGPParametersAction );
+  noExperimentActions.append( exportSimulationParametersAction );
+  noExperimentActions.append( exportLanguageParametersAction );
+  noExperimentActions.append( exportEnvironmentAction );
+  noExperimentActions.append( exportPopulationAction );
+  noExperimentActions.append( exportToGNUPlotAction );
+  noExperimentActions.append( exportProgramAction );
+  noExperimentActions.append( exportIndividualAction );
 
   // create the help menu
   helpMenu = new QMenu( this );
@@ -476,6 +508,7 @@ SIG_MainWindow::SIG_MainWindow( QWidget * parent, const char * name, Qt::WindowF
   icon_addIndividualsAction.addPixmap( QPixmap( sigelRoot + "/pixmaps/addIndividualsLarge.xpm" ) );
   QAction *addIndividualsAction = new QAction( icon_addIndividualsAction, "&Add", this );
   addIndividualsAction->setToolTip( "Add" );
+  addIndividualsAction->setIconText( "Add" );
   addIndividualsAction->setShortcut( Qt::ALT | Qt::Key_A );
   individualsMenu->addAction( addIndividualsAction );
   individualsToolBar->addAction( addIndividualsAction );
@@ -489,6 +522,7 @@ SIG_MainWindow::SIG_MainWindow( QWidget * parent, const char * name, Qt::WindowF
   icon_deleteIndividualsAction.addPixmap( QPixmap( sigelRoot + "/pixmaps/deleteIndividualsLarge.xpm" ) );
   QAction *deleteIndividualsAction = new QAction( icon_deleteIndividualsAction, "&Delete", this );
   deleteIndividualsAction->setToolTip( "Delete" );
+  deleteIndividualsAction->setIconText( "Delete" );
   deleteIndividualsAction->setShortcut( Qt::ALT | Qt::Key_D );
   individualsMenu->addAction( deleteIndividualsAction );
   individualsToolBar->addAction( deleteIndividualsAction );
@@ -500,6 +534,7 @@ SIG_MainWindow::SIG_MainWindow( QWidget * parent, const char * name, Qt::WindowF
 
   QAction *resetIndividualsAction = new QAction( "Reset", this );
   resetIndividualsAction->setToolTip( "Reset" );
+  resetIndividualsAction->setIconText( "Reset" );
   resetIndividualsAction->setShortcut( Qt::ALT | Qt::Key_O );
   individualsMenu->addAction( resetIndividualsAction );
   QObject::connect( resetIndividualsAction,
@@ -515,6 +550,7 @@ SIG_MainWindow::SIG_MainWindow( QWidget * parent, const char * name, Qt::WindowF
   icon_visualizeIndividualsAction.addPixmap( QPixmap( sigelRoot + "/pixmaps/visualizeLarge.xpm" ) );
   QAction *visualizeIndividualsAction = new QAction( icon_visualizeIndividualsAction, "&Visualize", this );
   visualizeIndividualsAction->setToolTip( "Visualize" );
+  visualizeIndividualsAction->setIconText( "Visualize" );
   visualizeIndividualsAction->setShortcut( Qt::ALT | Qt::Key_V );
   individualsMenu->addAction( visualizeIndividualsAction );
   individualsToolBar->addAction( visualizeIndividualsAction );
@@ -524,39 +560,36 @@ SIG_MainWindow::SIG_MainWindow( QWidget * parent, const char * name, Qt::WindowF
 		    SLOT( slotVisualizeIndividuals() ) );
   visualizeIndividualsAction->setStatusTip( "Visualize the selected individuals." );
 
-  noExperimentActionGroup->addAction( addIndividualsAction );
-  noExperimentActionGroup->addAction( deleteIndividualsAction );
-  noExperimentActionGroup->addAction( resetIndividualsAction );
-  noExperimentActionGroup->addAction( visualizeIndividualsAction );
+  noExperimentActions.append( addIndividualsAction );
+  noExperimentActions.append( deleteIndividualsAction );
+  noExperimentActions.append( resetIndividualsAction );
+  noExperimentActions.append( visualizeIndividualsAction );
 
-  noExperimentActionGroup->setEnabled( false );
+  slotEnableNoExperimentActions( false );
 
-  evolutionRunningActionGroup = new QActionGroup( this );
-  evolutionRunningActionGroup->setObjectName( "evolutionRunningActionGroup" );
-  evolutionRunningActionGroup->setExclusive( false );
-  evolutionRunningActionGroup->addAction( renameExperimentAction );
-  evolutionRunningActionGroup->addAction( deleteExperimentAction );
-  evolutionRunningActionGroup->addAction( saveExperimentAction );
-  evolutionRunningActionGroup->addAction( importGPParametersAction );
-  evolutionRunningActionGroup->addAction( importSimulationParametersAction );
-  evolutionRunningActionGroup->addAction( importRobotAction );
-  evolutionRunningActionGroup->addAction( importLanguageParametersAction );
-  evolutionRunningActionGroup->addAction( importPopulationAction );
-  evolutionRunningActionGroup->addAction( importEnvironmentAction );
-  evolutionRunningActionGroup->addAction( importProgramAction );
-  evolutionRunningActionGroup->addAction( importIndividualAction );
-  evolutionRunningActionGroup->addAction( exportGPParametersAction );
-  evolutionRunningActionGroup->addAction( exportSimulationParametersAction );
-  evolutionRunningActionGroup->addAction( exportLanguageParametersAction );
-  evolutionRunningActionGroup->addAction( exportEnvironmentAction );
-  evolutionRunningActionGroup->addAction( exportPopulationAction );
-  evolutionRunningActionGroup->addAction( exportToGNUPlotAction );
-  evolutionRunningActionGroup->addAction( exportProgramAction );
-  evolutionRunningActionGroup->addAction( exportIndividualAction );
-  evolutionRunningActionGroup->addAction( addIndividualsAction );
-  evolutionRunningActionGroup->addAction( deleteIndividualsAction );
-  evolutionRunningActionGroup->addAction( resetIndividualsAction );
-  evolutionRunningActionGroup->addAction( visualizeIndividualsAction );
+  evolutionRunningActions.append( renameExperimentAction );
+  evolutionRunningActions.append( deleteExperimentAction );
+  evolutionRunningActions.append( saveExperimentAction );
+  evolutionRunningActions.append( importGPParametersAction );
+  evolutionRunningActions.append( importSimulationParametersAction );
+  evolutionRunningActions.append( importRobotAction );
+  evolutionRunningActions.append( importLanguageParametersAction );
+  evolutionRunningActions.append( importPopulationAction );
+  evolutionRunningActions.append( importEnvironmentAction );
+  evolutionRunningActions.append( importProgramAction );
+  evolutionRunningActions.append( importIndividualAction );
+  evolutionRunningActions.append( exportGPParametersAction );
+  evolutionRunningActions.append( exportSimulationParametersAction );
+  evolutionRunningActions.append( exportLanguageParametersAction );
+  evolutionRunningActions.append( exportEnvironmentAction );
+  evolutionRunningActions.append( exportPopulationAction );
+  evolutionRunningActions.append( exportToGNUPlotAction );
+  evolutionRunningActions.append( exportProgramAction );
+  evolutionRunningActions.append( exportIndividualAction );
+  evolutionRunningActions.append( addIndividualsAction );
+  evolutionRunningActions.append( deleteIndividualsAction );
+  evolutionRunningActions.append( resetIndividualsAction );
+  evolutionRunningActions.append( visualizeIndividualsAction );
 
   /**
    * Meta-GP menu and toolbar definition
@@ -575,6 +608,7 @@ SIG_MainWindow::SIG_MainWindow( QWidget * parent, const char * name, Qt::WindowF
   icon_mtUseAction.addPixmap( QPixmap( sigelRoot + "/pixmaps/mt_UseSmall.xpm" ) );
   mtUseAction = new QAction( icon_mtUseAction, "&Use MetaGP", this );
   mtUseAction->setToolTip( "Meta" );
+  mtUseAction->setIconText( "Meta" );
   mtUseAction->setCheckable( true );
   mtUseAction->setStatusTip( "Activates the use of the Meta-System to speed up the evolution." );
   mtMenu->addAction( mtUseAction );
@@ -587,6 +621,7 @@ SIG_MainWindow::SIG_MainWindow( QWidget * parent, const char * name, Qt::WindowF
   icon_mtConfigureAction.addPixmap( QPixmap( sigelRoot + "/pixmaps/mt_ConfSmall.xpm" ) );
   mtConfigureAction = new QAction( icon_mtConfigureAction, "&Configure System", this );
   mtConfigureAction->setToolTip( "Configure Meta" );
+  mtConfigureAction->setIconText( "Configure Meta" );
   mtConfigureAction->setStatusTip( "Pops up the Meta Systems configuration dialog." );
   mtMenu->addAction( mtConfigureAction );
   mtToolBar->addAction( mtConfigureAction );
@@ -600,11 +635,14 @@ SIG_MainWindow::SIG_MainWindow( QWidget * parent, const char * name, Qt::WindowF
   mtChoiceTypeActionGroup->setExclusive( true );
   mtChoiceEvaluatorAction = new QAction( "&Evaluator System", mtChoiceTypeActionGroup );
   mtChoiceEvaluatorAction->setToolTip( "choose evaluator system" );
+  mtChoiceEvaluatorAction->setIconText( "choose evaluator system" );
   mtChoiceEvaluatorAction->setCheckable( true );
   mtChoiceEvaluatorAction->setChecked(true);
+  mtSelectedSystem = mtChoiceEvaluatorAction;   // Qt 2: d->selected
   mtChoiceEvaluatorAction->setStatusTip( "Chooses the Evaluator System. Replaces the simulation based fitness calculation by a MetaGP System which needs less simulation." );
   mtChoiceClassifierAction = new QAction( "Cl&assifier System", mtChoiceTypeActionGroup );
   mtChoiceClassifierAction->setToolTip( "choose classifier system" );
+  mtChoiceClassifierAction->setIconText( "choose classifier system" );
   mtChoiceClassifierAction->setCheckable( true );
   mtChoiceClassifierAction->setStatusTip( "Chooses the Classifer System. Replaces the fitness based tournament decision by a MetaGP System which needs less fitness calculation." );
   mtMenu->addActions( mtChoiceTypeActionGroup->actions() );
@@ -615,13 +653,13 @@ SIG_MainWindow::SIG_MainWindow( QWidget * parent, const char * name, Qt::WindowF
   mtMenu->addSeparator();
   mtMenu->addAction( "A&bout", this, SLOT( slotAbout() ) );
 
-  noExperimentActionGroup->addAction( mtUseAction );
+  noExperimentActions.append( mtUseAction );
   QObject::connect(experimentListView,
 	  SIGNAL( actExpChanged() ),
 	  this,
 	  SLOT( slotActExpChanged() ));
-//  noExperimentActionGroup->addAction( mtChoiceTypeActionGroup );
-//  noExperimentActionGroup->addAction( mtConfigureAction );
+//  noExperimentActions.append( mtChoiceTypeActionGroup );
+//  noExperimentActions.append( mtConfigureAction );
 
   /**
    * Meta-GP menu and toolbar definition
@@ -645,8 +683,8 @@ SIG_MainWindow::SIG_MainWindow( QWidget * parent, const char * name, Qt::WindowF
 
   QObject::connect( experimentListView,
 		    SIGNAL( isNotEmpty( bool ) ),
-		    noExperimentActionGroup,
-		    SLOT( setEnabled( bool ) ) );
+		    this,
+		    SLOT( slotEnableNoExperimentActions( bool ) ) );
 
   widgetBase = new QLabel( this );
   widgetBase->setObjectName( "baseWidget" ); // new QLabel( "I am the void", this );
@@ -662,8 +700,8 @@ SIG_MainWindow::SIG_MainWindow( QWidget * parent, const char * name, Qt::WindowF
 
   QObject::connect( experimentListView,
 		    SIGNAL( evolutionNotRunning( bool ) ),
-		    evolutionRunningActionGroup,
-		    SLOT( setEnabled( bool ) ) );
+		    this,
+		    SLOT( slotEnableEvolutionRunningActions( bool ) ) );
   statusBar()->showMessage( "Ready.", 5000 );
 };
 
@@ -699,9 +737,11 @@ void SIG_MainWindow::slotAboutToQuit()
 
 void SIG_MainWindow::slotUseBigPixmaps()
 {
-  bool usesBigPixmaps = iconSize().width() < 32;
+  // 25 is the largest Small pixmap, 48 the largest Large one -- both measured
+  // from the .xpm files, not assumed uniform.
+  bool usesBigPixmaps = iconSize().width() < 48;
   bigPixmapAction->setChecked( usesBigPixmaps );
-  setIconSize( usesBigPixmaps ? QSize( 32, 32 ) : QSize( 22, 22 ) );
+  setIconSize( usesBigPixmaps ? QSize( 48, 48 ) : QSize( 25, 25 ) );
 };
 
 void SIG_MainWindow::slotUseTextLabels()
@@ -750,6 +790,15 @@ void SIG_MainWindow::slotMTConfigureSystem()
 // switch the actual experiment to the other metaGP system
 void SIG_MainWindow::slotMTSwitchSystem(QAction *selSystem)
 {
+	// Qt 2 reached this slot only when the selection actually CHANGED:
+	// QActionGroup::childToggled gated "emit selected(s)" on "s != d->selected",
+	// and QAction::setOn returned early when the state was already correct.
+	// Qt 6's QActionGroup::triggered(QAction*) fires on every click, so
+	// re-clicking the already-active system would re-enter switchSystem()
+	// where 1.3 did nothing at all.
+	if (selSystem == mtSelectedSystem)
+		return;
+
 	SIG_Experiment *actExperiment = experimentListView->currentlySelectedExperiment();
 	if(actExperiment){
 		if(mtChoiceClassifierAction->isChecked()){
@@ -760,6 +809,11 @@ void SIG_MainWindow::slotMTSwitchSystem(QAction *selSystem)
 				mtChoiceClassifierAction->setChecked(true);
 		}
 	}
+	// switchSystem() may have refused and rolled the choice back above, so
+	// track what is actually checked -- Qt 2's d->selected was likewise
+	// re-updated by the second childToggled the rollback's setOn(TRUE) made.
+	mtSelectedSystem = mtChoiceClassifierAction->isChecked()
+	                   ? mtChoiceClassifierAction : mtChoiceEvaluatorAction;
 };
 
 void SIG_MainWindow::slotActExpChanged()
@@ -787,6 +841,21 @@ void SIG_MainWindow::slotActExpChanged()
 
 		}
 	}
+};
+
+
+void SIG_MainWindow::slotEnableNoExperimentActions( bool enable )
+{
+  // Qt 2's QActionGroup::setEnabled walked its own member list
+  // (qaction.cpp:902-908). This is that loop.
+  for ( QAction *a : noExperimentActions )
+    a->setEnabled( enable );
+};
+
+void SIG_MainWindow::slotEnableEvolutionRunningActions( bool enable )
+{
+  for ( QAction *a : evolutionRunningActions )
+    a->setEnabled( enable );
 };
 
 }
