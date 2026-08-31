@@ -226,7 +226,11 @@ times.
 
 **But `SIGNAL()`/`SLOT()` is not a no-op row, and this file said it was.** It
 read: "The 444 `SIGNAL()`/`SLOT()` macros in 174 `connect()` calls are **all
-still valid** — string-based connect was never removed." The *mechanism*
+still valid** — string-based connect was never removed." *Neither figure
+reproduces at any scope; 174 is `SIGEL_MasterGUI`'s macro count alone. Measured
+over the whole source tree with `command grep -rhoE 'SIGNAL *\('` and friends:
+**299 `SIGNAL()` + 312 `SLOT()` = 611 macros, in 248 `connect()` and 54
+`disconnect()` calls**, all of them in `.cpp` files.* The *mechanism*
 survived; **nine of the 41 distinct signal signatures did not**, and a
 string-based connect to a signal that is not there compiles, links, runs and
 never fires. Nothing in the compiler or in `check.sh` could see it. C4 shipped
@@ -243,23 +247,56 @@ a porting guide:
 | `activated(const QString&)` on `QComboBox` | 6 | `textActivated(const QString&)` |
 | `doubleClicked(QListViewItem*)` | 4 | `itemDoubleClicked(QTreeWidgetItem*,int)` |
 | `selectionChanged()` on `QListView`/`QListBox` | 4 | `itemSelectionChanged()` |
+| `selectionChanged(QListViewItem*)` | 2 | `currentItemChanged(item, previous)` |
 | `selected(QListBoxItem*)`, `selected(QAction*)` | 2 | `itemActivated(…)`, `QMenu::triggered(QAction*)` |
-| `lostFocus()` on `QLineEdit` | 2 | `editingFinished()` — **not equivalent**, it also fires on Return |
 | `currentChanged(QListView/QListBoxItem*)` | 2 | `currentItemChanged(item, previous)` |
 | `clicked(int)` on `QButtonGroup` | 1 | `idClicked(int)` |
 
 **The ones that look dead and are not, so nobody re-breaks them:** `clicked()`
 is live — moc emits a cloned method for the default argument of
-`clicked(bool)`; `activated(int)` on a `QComboBox` is live and only the
-`QString` overload went; `valueChanged(int)`, `textChanged(…)`,
-`stateChanged(int)`, `toggled(bool)`, `pressed()` and `timeout()` are all
-unchanged. The remaining 22 signatures are SIGEL's own.
+`clicked(bool)`, and a `dumpObjectInfo` shows `clicked(bool)` then
+`clicked() [CLONED]`; `activated(int)` on a `QComboBox` is live and only the
+`QString` overload went; `valueChanged(int)` (checked on `QSlider` **and**
+`QSpinBox`, since the 85 sites split across both), `textChanged(…)`,
+`stateChanged(int)`, `toggled(bool)` (including on `QAction`, which two senders
+are), `pressed()` and `timeout()` are all unchanged. **16 of the 41 are SIGEL's
+own signals.**
 
-**100 in the pristine tree; C4 repaired 10; 90 remain — 43 in
-`SIGEL_MasterGUI` (C7), 32 in `MT_GUI` (C6), 15 in `MT_Control` (C8)**, and
-zero in the twelve modules `check.sh` compiles today.
-**`check.sh` now fails a module on any of them** — `$DEAD_SIGNALS` in the module
-loop, proved by injection.
+**`lostFocus()` was in this table and was wrong in both halves.** It was listed
+as `QLineEdit`'s, 2 sites, to become `editingFinished()`. **Qt 2.3's `QLineEdit`
+had no `lostFocus()` at all** — its `signals:` block is `textChanged` and
+`returnPressed`; the signal arrived in Qt 3. Both sites connect on `editor`,
+an **`MT_Editor`**, which declares its own `void lostFocus();`
+(`include/MT_GUI/MT_Editor.h:32`) and emits it from `MT_Editor::hideEvent`. It
+is a user-defined signal and needs no conversion. `editingFinished()` would
+have been an outright regression: `MT_Editor` exists to distinguish Return
+(sets `acceptChange`, commits) from focus-out (does not), and
+`editingFinished()` fires on both. **Confirmed on the running 1.3**: typing
+`999` and pressing Return commits; typing `111` and clicking away leaves the
+old value.
+
+**The general rule this cost, and it points both ways.** A `SIGNAL()` name does
+not tell you the class. A user-defined signal sharing a framework name is a
+false positive whichever direction the sweep points — dead-signal hunts and
+live-signal hunts alike. **The counter-check is to parse every `signals:` block
+in the tree and intersect**; run over all nine names it returns exactly one
+collision, `lostFocus`, which is what makes the single hit trustworthy. The
+inverse error was in this table at the same time: `selectionChanged` was
+recorded only in its no-argument form, and Qt 2's `QListView` declared a
+`selectionChanged(QListViewItem*)` overload too. *The two errors cancelled in
+the total, which is why the pristine count did not move.*
+
+**100 in the pristine tree; C4 repaired 10; 90 remain — 44 in
+`SIGEL_MasterGUI` (C7), 31 in `MT_GUI` (C6), 15 in `MT_Control` (C8)**, and
+zero in the **eleven other** modules `check.sh` compiles. *`MT_Control` is one
+of the twelve it compiles, so "zero everywhere it looks" was false; its 15 are
+carried as a baseline until C8.* Of the 100, **82 are `connect()` and 18 are
+`disconnect()`** — a dead `disconnect` is equally a no-op, so nothing is
+mis-prioritised, but the column counts sites, not connects.
+**`check.sh` fails any module whose count exceeds its baseline**, which is zero
+for every converted module.
+The gate also scans `sigel.cpp`, `sigel_slave.cpp` and the forms, which sit in
+no module directory and so were under no baseline.
 
 ### Structure
 
@@ -1619,8 +1656,8 @@ modules include the headers `uic` generates from them.
 | C3 | **DONE 2026-08-30.** `SIGEL_CommonGUI` — the `QGLWidget` → `QOpenGLWidget` step; all 6 sites are here, 2 in code. In `check.sh` | 665 LOC, 2 sources |
 | C4 | **DONE 2026-08-31.** `SIGEL_SlaveGUI` — the toolbar, the movie path, and ten connects to signals Qt 6 does not have. Unblocks the last form | 2,344 LOC, 7 sources |
 | C5 | **DONE 2026-08-30, done FIRST — it is the dependency root.** `SIGEL_Visualisation`, 23 Qt 2 sites, 12/12 sources and headers compile, in `check.sh` | 3,564 LOC, 12 sources |
-| C6 | `MT_GUI` — **32 dead connects** (§2) | 3,911 LOC, 14 files |
-| C7 | `SIGEL_MasterGUI` — **43 dead connects** (§2) and **24 prepending `QListViewItem` sites** (§9) | 7,717 LOC, 20 files |
+| C6 | `MT_GUI` — **31 dead connects** (§2) and **9 prepending item sites** (§9), six of them ordering the MetaGP page list | 3,911 LOC, 14 files |
+| C7 | `SIGEL_MasterGUI` — **44 dead connects** (§2) and **28 prepending item sites** (§9) | 7,717 LOC, 20 files |
 | C8 | `sigel.cpp`, `sigel_slave.cpp`; **`MT_Control`'s 15 dead connects** (§2) | 15 sites |
 | C9 | All five modules and both programs build, link and run | — |
 
@@ -2341,11 +2378,18 @@ movie-settings, quit — and the render-mode combo was dead. All ten repaired.
 **all still valid**". Rather than fix the two signals this step tripped over, I
 resolved **all 41 distinct signal signatures in the tree** through
 `QMetaObject::indexOfSignal` on the real Qt 6 meta-objects. **Nine are dead, not
-two**, and 90 connects to them remain in C6, C7 and C8. §2 now carries the
-table, the deliberate non-entries, and the per-module counts;
-**`check.sh` fails a module on any of them.** *The narrow fix would have left
-seven kinds of silent breakage for the later steps to walk into exactly as this
-one did.*
+two**, and 90 connects to them remain in C6, C7 and C8. §2 carries the table,
+the deliberate non-entries and the per-module counts, and `check.sh` gates them.
+*The narrow fix would have left seven kinds of silent breakage for the later
+steps to walk into exactly as this one did.*
+
+**The sweep was right to run and still got two entries wrong, in opposite
+directions.** `lostFocus()` was listed as dead and is not — it is `MT_Editor`'s
+own signal — and `selectionChanged` was recorded only in its no-argument form
+when Qt 2's `QListView` declared an item-argument overload as well. Nine kinds
+is the corrected figure and 100 the corrected total; the two errors cancelled,
+which is exactly why a total that reproduces is not evidence that its parts do.
+§2 has both.
 
 **The movie path: `QPixmap::grabWindow` is gone, and its replacement changes
 which frame is recorded.** Qt 6 removed it; for a `QOpenGLWidget` it was wrong
@@ -2365,6 +2409,33 @@ box the POV export is what produced every published film.
 *`updateGL()` → `update()` is safe here for the same reason: the grab precedes
 the repaint in every caller, so making the repaint deferred does not change
 which frame is grabbed.* 15 sites.
+
+**Two further forced divergences on this path, which the step made and did not
+record.** *Found by review — they were in the diff and in the source comments,
+but in neither the commit message nor this file, and the rule is that every
+forced divergence is written down.*
+
+**A negative width or height reached `QImage::copy` and produced a null image.**
+Qt 2's `QPixmap::grabWindow` treated a negative `w`/`h` as "to the window edge"
+(`qpixmap_x11.cpp`: `if ( w < 0 ) w = a.width - x;`). Qt 6's `QImage::copy` does
+not — it returns a **null image**, `save()` fails, and `callRenderPixMap`'s
+unconditional `return true` reports the failure as success, so no file is
+written and nothing complains. Restored explicitly:
+`if ( pW < 0 ) pW = grabbed.width() - pX;` and the same for height. The three
+callers are exhaustive: `cropImage` sets both, `keepRatio` sets neither, and the
+third branch's two arms cover `a>=1||b>=1` and its negation, each setting one.
+
+**`grabFramebuffer()` returns device pixels, so on a HiDPI screen the movie
+frames come out at the wrong size.** Qt 2 had no device-pixel-ratio concept and
+1.3's frames are logical pixels. The grab is normalised back —
+`scaled(size(), IgnoreAspectRatio, SmoothTransformation)` then
+`setDevicePixelRatio(1.0)` — which introduces a resample that 1.3 never did, on
+HiDPI only; at ratio 1.0 the branch does not run and the bytes are unchanged.
+
+**And the status bar is adopted, not merely constructed.** 1.3 wrote
+`new QStatusBar( this )` and relied on `QMainWindow` adopting any `QStatusBar`
+child through `ChildInserted` (`qmainwindow.cpp:2335`). Qt 6 has no such
+adoption, so it is now `setStatusBar( new QStatusBar( this ) )`.
 
 | other Qt 2 API | Qt 6 |
 |---|---|
@@ -2413,7 +2484,7 @@ initialiser lists (8 in `SIG_SimulationVisualisationWidget.h`, 4 in its
 101/0 now that the last form is unblocked. Both baselines byte-identical,
 sanitized run clean.
 
-**`check.sh` gained two gates in this step, both proved by injection rather
+**`check.sh` gained three gates in this step, all proved by injection rather
 than asserted.** `$DEAD_SIGNALS` fails a module on any connect to a signal Qt 6
 does not have, against a per-module baseline that is **zero for every converted
 module** — so C6, C7 and C8 can only reduce it. And the uic-warning check was
@@ -2424,6 +2495,15 @@ fire. It now reuses the first run's log via a `FORMS_FAILED` flag, and
 re-injecting an `<images>` block makes it fail again. *Two gates that reported
 green while seeing nothing.* `MODULES="${1:-…}"` also became `${*:-…}`: it had
 silently ignored every module argument after the first.
+
+**The third gate reads a file format, which is a kind of check this project did
+not have.** Everything else here is a compile check, and the four behaviour
+gates only exercise what a fitness evaluation touches — so a format the program
+parses but no gate opens is covered by nothing. `check.sh` now builds and runs a
+`PVMHOST` round-trip against `SIG_GPPVMHost`, pinning 1.3's own line from
+`twoBasesSimpleFitness1.exp`. It fails on the naive conversion and passes on the
+faithful one. *Written because a defect of exactly that shape was found in
+`SIGEL_GP` — see §9 — in a module converted long ago and green throughout.*
 
 
 ---
@@ -2471,7 +2551,46 @@ Every entry is closed: the hidden frees in D15, D18, D19, D25b and D25c, the
 no-free-path class by D25c, and `SIG_Robot::clear()` by D4. The per-container
 record is in those D-steps and the pristine-tree counts are in §2.*
 
-### TRAP — `QListViewItem` construction PREPENDS, and C7 has 24 of them
+### TRAP — `QTextStream >> char` skipped whitespace in Qt 2 and does not in Qt 6
+
+**Qt 2's `QTextStream::operator>>(char &c)` was `c = eat_ws()`** — skip
+whitespace, return the first non-whitespace character (`qtextstream.cpp:1029`,
+and `eat_ws` at `:212`). The doc comment on the `QChar` overload immediately
+below it says "Note that whitespace is \e not skipped", drawing the contrast
+explicitly. **Qt 6's returns the very next character, whitespace included.**
+
+**Three sites, all in `SIG_GPPVMHost::SIG_GPPVMHost( QString input )`, and the
+effect is silent and total.** The parser primes with two char reads to step over
+the space and the opening quote, then walks to the closing quote:
+
+    inputStream >> name >> maxSlaves >> enabledInt >> buffer >> buffer;
+    while (buffer != '"') { dirString.append(buffer); inputStream >> buffer; }
+
+Measured on 6.10.2 with 1.3's own line `eiche 2 1 "/home/pg368b/ross/…"`: the
+first read returns `' '` where Qt 2 returned `'"'`, the second returns `'"'`
+where Qt 2 returned `'/'`, the loop therefore never executes, and **every PVM
+host parsed from an `.exp` file gets an empty slave directory.**
+
+**It also drops spaces inside the quoted path, and that is preserved.** Each
+read skips whitespace, so Qt 2 turns `/tmp/with space` into `/tmp/withspace`. A
+2003 defect; converted, not fixed.
+
+**`SIGEL_GP` was converted in Phase D and has been green on all four gates ever
+since.** Nothing could see this: it is not a compile error, and no gate reads a
+`PVMHOST` line. **That is the actual lesson** — the gates cover what the gates
+read, and a file format the program parses but no gate opens is covered by
+nothing at all. `check.sh` now has a `parsers` section that round-trips a
+`PVMHOST` line; it fails on the naive conversion.
+
+*Found while answering an unrelated question about a checkbox two files away.
+The x86 box reported that `Edit host`'s `Enable host` box was unchecked for a
+host the file marks enabled; chasing that led to the parser. **The finding was
+not in the thing being examined.***
+
+*Sweep: three `>> buffer` sites, all in this one constructor. No other file in
+the tree extracts a stream into a `char` or `QChar`.*
+
+### TRAP — `QListViewItem` construction PREPENDS: 28 sites in C7, 9 in C6
 
 **Qt 2's `QListViewItem` constructor inserts the new item at the *head* of its
 parent's child list, not the tail.** `QListViewItem::insertItem` is
@@ -2494,18 +2613,56 @@ last.
 
 **And it is visible there for a reason that generalises.** The view is sorted on
 column 0, which holds only a tick pixmap and no text — every sort key is
-identical, so the stable sort preserves insertion order and the prepend shows
-through. *This is why C1's sort-direction work was correct and this is still
+identical, and the comparator has no tiebreak (`qlistview.cpp:754`, a plain
+`key.compare`, handed to C `qsort` at `:809`, which the standard does not
+require to be stable), so insertion order survives in practice and the prepend
+shows through. *This is why C1's sort-direction work was correct and this is still
 wrong: on this view the sort is not what orders the rows.*
 
-**24 construction sites, every one in `SIGEL_MasterGUI`** — 23 live plus one
-commented out. `SIG_LanguageParameters.cpp` 15, `SIG_ExperimentItem.cpp` 7,
-`SIG_GPParameter.cpp` 2. **`MT_GUI` has none**; its 22 `insertItem` calls are
-menus, combos and list boxes, which is a separate question. *A count of 27 with
-three in `MT_GUI` was recorded here first and was wrong — it came from a
-name-keyed sweep, not from the constructor.*
+**37 construction sites — 28 in `SIGEL_MasterGUI` and 9 in `MT_GUI`**, because
+the trap is a property of the **constructor**, so every subclass inherits it.
+Counting only the literal type name misses four subclasses:
 
-**Two of the 24 populate `listviewHosts`, in the form C1 converted and review
+| | direct `new QListViewItem` | via a subclass | total |
+|---|---|---|---|
+| `SIGEL_MasterGUI` | 24 (23 live, 1 commented) | `SIG_ExperimentItem` 2, `SIG_IndividualListItem` 2 | **28** |
+| `MT_GUI` | 0 | `MT_ExperimentItem` 6, `MT_PopListViewItem` 3 | **9** |
+
+*This has now been wrong twice. First "27, three in `MT_GUI`" from a name-keyed
+sweep; then "24, `MT_GUI` has none" from a constructor-keyed sweep that keyed on
+the wrong constructor. The second correction was more confident than the first
+and no better. **Key on the hazard, not on a spelling.***
+
+**And `MT_GUI`'s six are the strongest case in the tree — stronger than the PVM
+one above, because nothing masks them.** `MT_ExperimentWidget`'s constructor:
+
+```cpp
+setSorting( -1 );                                    // sorting OFF
+new MT_ExperimentItem( this, 5, "Statistics",   … );
+new MT_ExperimentItem( this, 4, "Selection",    … );
+new MT_ExperimentItem( this, 3, "GP Parameter", … );
+new MT_ExperimentItem( this, 2, "Population",   … );
+new MT_ExperimentItem( this, 1, "Individual",   … );
+new MT_ExperimentItem( this, 0, "Strategy",     … );
+setCurrentItem( firstChild() );                      // and selects the first row
+```
+
+Constructed 5→0, prepended, so 1.3 draws **Strategy first** and selects
+Strategy. The `int pos` argument is the author encoding the intended order. A
+like-for-like `QTreeWidget` port draws Statistics first **and selects
+Statistics** — a different startup page. *Confirmed on the running 1.3: the
+`SIGEL MetaGP` window's left-hand list reads `Strategy, Individual, Population,
+GP Parameter, Selection, Statistics` — construction order exactly reversed, with
+sorting explicitly off. Source, Qt 2 semantics and the binary all agree.*
+
+**`SIG_ExperimentListView` calls `setSorting(-1)` too**, so a newly created
+experiment appears at the **top** of the list, not the bottom.
+
+*`MT_GUI`'s `insertItem` calls are mostly menus, combos and list boxes — but
+three of them are `individualListView->insertItem( new MT_PopListViewItem(…) )`,
+which are `QListView` items and are counted above.*
+
+**Two of the 37 populate `listviewHosts`, in the form C1 converted and review
 passed.** The form is correct; the defect is in the *population* code, which is
 C7's and still Qt 2. Nothing is owed at C1 — but the pairing is the point: a
 form can pass every gate this project has while the code that fills it is what
@@ -2514,7 +2671,7 @@ holds the behaviour.
 **`SIG_ExperimentItem.cpp:64` is a second, independent trap in the same file.**
 `QListViewItem *childItem = new QListViewItem( newItem );` — `newItem` is the
 *Robot* item, so `Language-Parameters` is a **child of Robot**, not a sixth
-sibling. The five siblings above it use the same `newItem` variable and their
+sibling. The four siblings above it use the same `newItem` variable and their
 `setText` calls all look alike, so reading the labels rather than the
 constructors gives a flat list of six. The 1.3 tree draws it indented.
 

@@ -42,6 +42,12 @@ done
 # and header passes, not only inside the forms section. C4 found this: five
 # SIGEL_SlaveGUI headers failed the standalone pass for want of the flag.
 FORMS_FAILED=
+# Regenerate unconditionally. make only re-runs uic when a .ui is newer than its
+# ui_*.h, so on a warm tree `make forms' prints nothing and the uic-warning check
+# below sees an empty log -- green with the defect still in the .ui. Review
+# proved it: injecting an <images> block failed the FIRST run and passed the
+# second. Deleting the output directory costs one uic pass over 20 forms.
+rm -rf "$ROOT/build/ui"
 if make -s -C "$ROOT" forms >/tmp/mkforms.$$ 2>&1; then
     INCS="$INCS -I$ROOT/build/ui"
 else
@@ -56,8 +62,19 @@ fi
 # clicked() (moc clones the default argument of clicked(bool)), activated(int)
 # on a QComboBox, valueChanged(int), textChanged(...), stateChanged(int),
 # toggled(bool), pressed(), timeout().
+#
+# lostFocus() was here and was WRONG: MT_Editor declares its own lostFocus()
+# signal (include/MT_GUI/MT_Editor.h:32) and Qt 2.3's QLineEdit never had one.
+# A name shared with a framework signal is a false positive in EITHER
+# direction, so the class has to be established per site. The counter-check is
+# to grep every `signals:' block in the tree for these names; lostFocus is the
+# only collision.
+#
+# selectionChanged was anchored to `( )' and so missed the QListViewItem*
+# overload, which Qt 2's QListView also declared and which is equally dead.
+# Both errors were found by review, and they cancelled in the total.
 DEAD_SIGNALS='SIGNAL\( *(activated *\( *\)|activated *\( *const *QString'\
-'|clicked *\( *int|lostFocus *\(|selected *\(|selectionChanged *\( *\)'\
+'|clicked *\( *int|selected *\(|selectionChanged *\('\
 '|currentChanged *\( *Q(ListView|ListBox)Item|rightButtonClicked'\
 '|doubleClicked *\( *QListViewItem)'
 
@@ -87,13 +104,19 @@ for m in $MODULES; do
     # Counted against a per-module baseline, NOT folded into mf: an unconverted
     # module's dead connects are known debt (§2 has the table), and folding them
     # in would misreport them as compile failures and leave the script standing
-    # red until C8. Any count ABOVE the baseline fails -- which is zero for every
-    # converted module, so a new one cannot be introduced.
-    md=$(command grep -rcE "$DEAD_SIGNALS" "$SRC/src/$m" "$SRC/include/$m" 2>/dev/null \
-         | awk -F: '{s+=$2} END{print s+0}')
+    # red until C8. Any count ABOVE the baseline fails. The baseline is zero for
+    # every CONVERTED module, so a new one cannot be introduced there; the three
+    # non-zero ones below are MT_Control, MT_GUI and SIGEL_MasterGUI, which is
+    # C8, C6 and C7 work. MT_Control IS compiled by this script today, so the
+    # gate is not "zero everywhere it looks".
+    #
+    # -o|wc -l, not -c: grep -c counts matching LINES. No line carries two
+    # SIGNAL() macros today, so the two agree -- but the baselines are exact
+    # numbers and should not quietly drift if that ever stops being true.
+    md=$(command grep -rhoE "$DEAD_SIGNALS" "$SRC/src/$m" "$SRC/include/$m" 2>/dev/null | wc -l)
     case "$m" in
-        SIGEL_MasterGUI) base=43 ;;
-        MT_GUI)          base=32 ;;
+        SIGEL_MasterGUI) base=44 ;;
+        MT_GUI)          base=31 ;;
         MT_Control)      base=15 ;;
         *)               base=0  ;;
     esac
@@ -119,8 +142,73 @@ for m in $MODULES; do
  done
 done
 printf '%-22s %2d pass  %2d fail\n' "headers standalone" "$hp" "$hf"
+# The module loop only reaches src/<Module>/ and include/<Module>/. sigel.cpp and
+# sigel_slave.cpp sit at the top of src/ and the forms carry <connection> blocks,
+# so both are outside every baseline above. Neither has a dead signal today and
+# this keeps it that way.
+stray=$(command grep -rhoE "$DEAD_SIGNALS" "$SRC"/src/*.cpp "$SRC"/ui 2>/dev/null | wc -l)
+if [ "$stray" -gt 0 ]; then
+    echo "  dead signal outside every module baseline:"
+    command grep -rnE "$DEAD_SIGNALS" "$SRC"/src/*.cpp "$SRC"/ui 2>/dev/null \
+        | sed "s|$SRC/|    |" | cut -c1-140
+    fail=$((fail+stray))
+fi
 printf '%-22s %2d dead (baseline %d -- §2 has the per-signal table)\n' \
-       "Qt 6 signals" "$dead" "$deadbase"
+       "Qt 6 signals" "$((dead+stray))" "$deadbase"
+
+# ---------------------------------------------------------------------------
+# Parsers that no gate reads.
+#
+# Every other check here is a COMPILE check, and the four behaviour gates only
+# exercise what a fitness evaluation touches. A file format the program parses
+# but the gates never open is therefore covered by nothing at all -- which is
+# exactly how Qt 2's QTextStream::operator>>(char&) skipping whitespace, and
+# Qt 6's not, survived the whole of SIGEL_GP's conversion while every gate
+# stayed green. It emptied the slave directory of every PVM host.
+#
+# Kept as a heredoc rather than a committed .cpp for the same reason the header
+# pass is: it needs no source file of its own, and the expectations belong next
+# to the reason they exist.
+cat > /tmp/pvm.$$.cpp <<'PVMEOF'
+#include "SIGEL_GP/SIG_GPPVMHost.h"
+#include <QString>
+#include <cstdio>
+static int fails = 0;
+static void eq( const char *what, QString got, QString want )
+{
+    if ( got != want ) {
+        ++fails;
+        printf( "  PVMHOST %s: got [%s] want [%s]\n",
+                what, qPrintable(got), qPrintable(want) );
+    }
+}
+int main()
+{
+    // 1.3's own data: data/Experiments/twoBasesSimpleFitness1.exp
+    SIGEL_GP::SIG_GPPVMHost h( "eiche 2 1 \"/home/pg368b/ross/projects/sigel\"" );
+    eq( "name",      h.name,                       "eiche" );
+    eq( "maxSlaves", QString::number(h.maxSlaves), "2" );
+    eq( "enabled",   QString::number(h.enabled),   "1" );
+    eq( "dir",       h.executableDir.path(),       "/home/pg368b/ross/projects/sigel" );
+    // Qt 2 skipped whitespace on EVERY char read, so it silently dropped spaces
+    // inside the quoted path too. That is a 2003 defect and it is preserved.
+    SIGEL_GP::SIG_GPPVMHost s( "herz 4 0 \"/tmp/with space/sigel\"" );
+    eq( "dir (2003 defect)", s.executableDir.path(), "/tmp/withspace/sigel" );
+    return fails ? 1 : 0;
+}
+PVMEOF
+pp=0; pf=0
+if g++ -std=c++17 -fPIC $(echo $INCS | sed 's/-fsyntax-only//') /tmp/pvm.$$.cpp \
+       "$SRC/src/SIGEL_GP/SIG_GPPVMHost.cpp" -o /tmp/pvm.$$ \
+       $(qmake6 -query QT_INSTALL_LIBS 2>/dev/null | sed 's|^|-L|') -lQt6Core 2>/tmp/pvmb.$$
+then
+    if /tmp/pvm.$$ 2>/dev/null; then pp=1; else pf=1; fi
+else
+    pf=1; echo "  PVMHOST check did not build:"; head -5 /tmp/pvmb.$$
+fi
+printf '%-22s %2d pass  %2d fail\n' "parsers" "$pp" "$pf"
+pass=$((pass+pp)); fail=$((fail+pf))
+rm -f /tmp/pvm.$$ /tmp/pvm.$$.cpp /tmp/pvmb.$$
 
 # ---------------------------------------------------------------------------
 # Phase C -- the converted Designer forms.
