@@ -289,21 +289,84 @@ ep=$(echo "$enc_out" | sed -n 's/^COUNTS \([0-9]*\) .*/\1/p')
 ef=$(echo "$enc_out" | sed -n 's/^COUNTS [0-9]* \([0-9]*\) .*/\1/p')
 es=$(echo "$enc_out" | sed -n 's/^COUNTS [0-9]* [0-9]* \([0-9]*\) .*/\1/p')
 et=$(echo "$enc_out" | sed -n 's/^COUNTS [0-9]* [0-9]* [0-9]* \([0-9]*\)/\1/p')
-# 25 files lost their CRLF during Phase 0's comment passes, before this check
-# existed. That is real but pre-existing damage; it is carried as a baseline so
-# the gate fails on a NEW one rather than standing permanently red. Lower it
+# 25 files lost their CRLF in ONE commit, 762c87f "D6: delete Q2Array, its 180
+# sites are plain QList" (2026-08-27) -- verified by walking each file's history
+# for its first CR-free revision, not inferred. An earlier version of this
+# comment blamed Phase 0's comment passes, which is where the German umlauts
+# went but not the carriage returns. Pre-existing damage, carried as a baseline
+# so the gate fails on a NEW one rather than standing permanently red. Lower it
 # when they are restored, never raise it.
 ENC_BASELINE=25
-if [ "$ef" -gt "$ENC_BASELINE" ]; then
+# Fail CLOSED. If the python above dies, $ep/$ef are empty, `[ "$ef" -gt 25 ]'
+# errors, and -- because it is an `if' condition -- set -e does not fire: the
+# gate printed blanks and scored 0/0 while claiming to have run. Found by review.
+if [ -z "$ep" ] || [ -z "$ef" ]; then
+    echo "  encodings check produced no COUNTS line -- treating as FAILED"
+    printf '%-22s %2d pass  %2d fail\n' "encodings" 0 1
+    fail=$((fail+1))
+elif [ "$ef" -gt "$ENC_BASELINE" ]; then
     echo "$enc_out" | command grep -v '^COUNTS ' || true
     printf '%-22s %2d pass  %2d fail  (baseline %d -- a NEW file lost its CRLF)\n' \
            "encodings" "$ep" "$((ef-ENC_BASELINE))" "$ENC_BASELINE"
     fail=$((fail+ef-ENC_BASELINE))
 else
-    printf '%-22s %2d pass  %2d known CRLF losses (Phase 0), %s translated, %s postdate root\n' \
+    printf '%-22s %2d pass  %2d known CRLF losses (D6), %s translated, %s postdate root\n' \
            "encodings" "$ep" "$ef" "$et" "$es"
 fi
 pass=$((pass+ep))
+
+# ---------------------------------------------------------------------------
+# Widgets whose behaviour no gate reads.
+#
+# Same blind spot as `parsers' below, one layer up: DISpinBox overrides Qt's
+# text/value mapping, and a conversion that compiles perfectly can still throw
+# away what the user typed. Qt 6's QSpinBox::validate()/fixup() are an INTEGER
+# parser and run BEFORE the virtual valueFromText, so "0.375" became 0 and the
+# override never saw the fraction. Nothing else here could see that.
+cat > /tmp/dsp.$$.cpp <<'DSPEOF'
+#include "MT_GUI/DoubleSpinBox.h"
+#include <QApplication>
+#include <QLineEdit>
+#include <cstdio>
+struct P : DISpinBox {
+    P(int d) : DISpinBox(d) {}
+    void type(const char *s) { lineEdit()->setText(s); interpretText(); }
+};
+static int fails = 0;
+static void eq(const char *what, QString got, QString want)
+{
+    if (got != want) {
+        ++fails;
+        printf("  DISpinBox %s: got [%s] want [%s]\n",
+               what, qPrintable(got), qPrintable(want));
+    }
+}
+int main(int c, char **v)
+{
+    QApplication a(c, v);
+    P d(3); d.setRange(3, 0.0, 100.0); d.type("0.375");
+    eq("3dp text",  d.text(),                  "0.375");
+    eq("3dp value", QString::number(d.value()), "375");
+    P e(1); e.setRange(1, 0.0, 100.0); e.type("2.5");
+    eq("1dp text",  e.text(),                  "2.5");
+    eq("1dp value", QString::number(e.value()), "25");
+    P i(0); i.setRange(0, 100); i.type("42");
+    eq("int text",  i.text(),                  "42");
+    return fails ? 1 : 0;
+}
+DSPEOF
+wp=0; wf=0
+if g++ -std=c++17 -fPIC $INCS /tmp/dsp.$$.cpp "$SRC/src/MT_GUI/DoubleSpinBox.cpp" \
+       -o /tmp/dsp.$$ $(qmake6 -query QT_INSTALL_LIBS 2>/dev/null | sed 's|^|-L|') \
+       -lQt6Widgets -lQt6Gui -lQt6Core 2>/tmp/dspb.$$
+then
+    if QT_QPA_PLATFORM=offscreen /tmp/dsp.$$ 2>/dev/null; then wp=1; else wf=1; fi
+else
+    wf=1; echo "  DISpinBox check did not build:"; head -5 /tmp/dspb.$$
+fi
+printf '%-22s %2d pass  %2d fail\n' "widgets" "$wp" "$wf"
+pass=$((pass+wp)); fail=$((fail+wf))
+rm -f /tmp/dsp.$$ /tmp/dsp.$$.cpp /tmp/dspb.$$
 
 # ---------------------------------------------------------------------------
 # Parsers that no gate reads.

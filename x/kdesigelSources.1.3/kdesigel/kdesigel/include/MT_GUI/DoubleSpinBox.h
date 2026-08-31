@@ -35,6 +35,16 @@ private:
 	QString textFromValue(int value) const override;
 	int valueFromText(const QString &t) const override;
 
+	// Qt 6's QSpinBox::validate()/fixup() are an INTEGER parser and run from
+	// QAbstractSpinBoxPrivate::interpret() BEFORE the virtual valueFromText, so
+	// a typed "0.375" is rejected and rewritten to "0" and the override never
+	// sees the fraction. Qt 2 had no such gate: interpretText() called
+	// mapTextToValue unconditionally (qspinbox.cpp:725-741) and the QLineEdit's
+	// validator was the only constraint on typing. Deferring to that same
+	// validator restores 1.3's behaviour.
+	QValidator::State validate(QString &input, int &pos) const override;
+	void fixup(QString &input) const override;
+
 	int typ;
 	int precision;
 	int iDecimals;

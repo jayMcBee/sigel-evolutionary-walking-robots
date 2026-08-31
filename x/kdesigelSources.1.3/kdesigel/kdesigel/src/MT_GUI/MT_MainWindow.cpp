@@ -6,6 +6,17 @@
 MT_MainWindow::MT_MainWindow(MT_Controller *controller, MT_GPManager *manager, subst_cache *substCache, QWidget * parent, const char * name, Qt::WindowFlags f )
  : QMainWindow( parent, f ), gpManager(manager), subst(substCache)
 {
+	if ( name )
+		setObjectName( QString::fromUtf8( name ) );
+
+	// Qt 2's WType_Modal did not merely name a window type -- it set
+	// WState_Modal (qwidget.cpp:725) and show() called qt_enter_modal()
+	// (qwidget.cpp:3365), so the MetaGP configuration window was APPLICATION
+	// MODAL. Qt 6's Qt::Dialog is a window type only; windowModality defaults
+	// to NonModal and nothing else sets it. The bit values happen to coincide
+	// at 0x3, which is a coincidence and not an equivalence.
+	if ( f & Qt::Dialog )
+		setWindowModality( Qt::ApplicationModal );
 	evolRunning = false;
 	boss = controller;
 	evolTimer = new QTimer(this);
@@ -28,10 +39,16 @@ MT_MainWindow::MT_MainWindow(MT_Controller *controller, MT_GPManager *manager, s
 	mainToolBar = new QToolBar(this);
 	mainToolBar->setObjectName("mtFileToolBar");
 	mainToolBar->setWindowTitle("MT File");
+	// Qt 2's QToolBar(QMainWindow*, name) docked ITSELF -- the constructor
+	// called parent->addToolBar(this, QString::null, QMainWindow::Top)
+	// (qtoolbar.cpp:279). Qt 6's does not, so an undocked toolbar floats at
+	// 0,0 over the central widget.
+	addToolBar(Qt::TopToolBarArea, mainToolBar);
 
 	// toolbar for evolution control
 	evolCtrlToolbar = new QToolBar(this);
 	evolCtrlToolbar->setObjectName("mtEvolutionToolBar");
+	addToolBar(Qt::TopToolBarArea, evolCtrlToolbar);
 	evolCtrlToolbar->setWindowTitle("MT Evolution Control");
 
 	QIcon icon_mtStartEvolutionAction(QPixmap(pixPath+"mt_StartSmall.xpm"));
@@ -55,6 +72,11 @@ MT_MainWindow::MT_MainWindow(MT_Controller *controller, MT_GPManager *manager, s
 	mtEvolutionStatus = new QLabel(evolCtrlToolbar);
 	mtEvolutionStatus->setObjectName("mtEvolStatus");
 	mtEvolutionStatus->setText(" stopped ");
+	// Qt 2's QToolBar::init() did boxLayout()->setAutoAdd(TRUE)
+	// (qtoolbar.cpp:300): any child widget joined the toolbar's layout on
+	// construction, in creation order. Qt 6 has no autoAdd, so a child parented
+	// to a toolbar is an unmanaged overlay at 0,0 unless addWidget() is called.
+	evolCtrlToolbar->addWidget(mtEvolutionStatus);
 
 	evolCtrlToolbar->addSeparator();
 	QIcon icon_mtAutoStopAction(QPixmap(pixPath+"mt_AutoStopSmall.xpm"));
@@ -76,6 +98,8 @@ MT_MainWindow::MT_MainWindow(MT_Controller *controller, MT_GPManager *manager, s
 	mtTime1 = new QLabel(evolCtrlToolbar);
 	mtTime1->setObjectName("mtTime1");
 	mtTime1->setText("h : ");
+	evolCtrlToolbar->addWidget(mtHour);
+	evolCtrlToolbar->addWidget(mtTime1);
 	mtMin = new QSpinBox(evolCtrlToolbar);
 	mtMin->setRange(0, 864000);
 	mtMin->setSingleStep(5);
@@ -83,6 +107,8 @@ MT_MainWindow::MT_MainWindow(MT_Controller *controller, MT_GPManager *manager, s
 	mtTime2 = new QLabel(evolCtrlToolbar);
 	mtTime2->setObjectName("mtTime2");
 	mtTime2->setText("m ");
+	evolCtrlToolbar->addWidget(mtMin);
+	evolCtrlToolbar->addWidget(mtTime2);
 	QObject::connect(mtAutoStopAction, SIGNAL(toggled(bool)), SLOT(slotAutoStop(bool)));
 	QObject::connect(mtMin, SIGNAL(valueChanged(int)), SLOT(slotMinChanged(int)));
 	
@@ -128,7 +154,7 @@ MT_MainWindow::MT_MainWindow(MT_Controller *controller, MT_GPManager *manager, s
 	icon_mtDefaultAction.addPixmap(QPixmap(pixPath+"newExperimentLarge.xpm"));
 	mtDefaultAction = new QAction(icon_mtDefaultAction, "&Default", this);
 	mtDefaultAction->setToolTip("Default");
-	mtDefaultAction->setShortcut(Qt::CTRL+Qt::Key_D);
+	mtDefaultAction->setShortcut(Qt::CTRL | Qt::Key_D);
 	mtDefaultAction->setStatusTip("Restores the default settings.");
 	fileMenu->addAction(mtDefaultAction);
 	mainToolBar->addAction(mtDefaultAction);
@@ -140,7 +166,7 @@ MT_MainWindow::MT_MainWindow(MT_Controller *controller, MT_GPManager *manager, s
 	icon_mtLoadAction.addPixmap(QPixmap(pixPath+"openExperimentLarge.xpm"));
 	mtLoadAction = new QAction(icon_mtLoadAction, "&Open", this);
 	mtLoadAction->setToolTip("Load");
-	mtLoadAction->setShortcut(Qt::CTRL+Qt::Key_O);
+	mtLoadAction->setShortcut(Qt::CTRL | Qt::Key_O);
 	mtLoadAction->setStatusTip("Load settings from a file.");
 	fileMenu->addAction(mtLoadAction);
 	mainToolBar->addAction(mtLoadAction);
@@ -150,7 +176,7 @@ MT_MainWindow::MT_MainWindow(MT_Controller *controller, MT_GPManager *manager, s
 	icon_mtSaveAction.addPixmap(QPixmap(pixPath+"saveExperimentLarge.xpm"));
 	mtSaveAction = new QAction(icon_mtSaveAction, "&Save", this);
 	mtSaveAction->setToolTip("Save");
-	mtSaveAction->setShortcut(Qt::CTRL+Qt::Key_S);
+	mtSaveAction->setShortcut(Qt::CTRL | Qt::Key_S);
 	mtSaveAction->setStatusTip("Saves the current settings to a file.");
 	fileMenu->addAction(mtSaveAction);
 	mainToolBar->addAction(mtSaveAction);
@@ -162,7 +188,7 @@ MT_MainWindow::MT_MainWindow(MT_Controller *controller, MT_GPManager *manager, s
 	icon_mtExitAction.addPixmap(QPixmap(pixPath+"quitApplicationLarge.xpm"));
 	mtExitAction = new QAction(icon_mtExitAction, "E&xit", this);
 	mtExitAction->setToolTip("Exit");
-	mtExitAction->setShortcut(Qt::ALT+Qt::Key_F4);
+	mtExitAction->setShortcut(Qt::ALT | Qt::Key_F4);
 	mtExitAction->setStatusTip("Applies changes and closes the configuration window.");
 	fileMenu->addAction(mtExitAction);
 	mainToolBar->addAction(mtExitAction);

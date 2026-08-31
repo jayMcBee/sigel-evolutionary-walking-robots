@@ -38,7 +38,9 @@ MT_PopulationWidget::MT_PopulationWidget(QMainWindow* parent, const char* name, 
 	pixPath += "/pixmaps/";
 
 	// create the toolbar
+	// Qt 2's QToolBar(QMainWindow*, name) docked itself (qtoolbar.cpp:279).
 	popToolBar = new QToolBar(parent);
+	parent->addToolBar(Qt::TopToolBarArea, popToolBar);
 	popToolBar->setObjectName("mtPopToolBar");
 	popToolBar->hide();
 	popToolBar->setWindowTitle("MT Population");
@@ -132,7 +134,15 @@ void MT_PopulationWidget::onShow(MT_GPManager *manager, subst_cache *subst)
 	gpManager = manager;
 
 	// clear the widget
-	individualListView->clear();
+	// Qt 2's QListView::clear() blocked signals for its whole body
+	// (qlistview.cpp:2303-2304, 2341), so currentChanged NEVER fired with a
+	// null item. Qt 6's clear() emits currentItemChanged(nullptr, prev), which
+	// slotCurrentChanged dereferences. Blocking reproduces 1.3 exactly.
+	{
+		const bool wasBlocked = individualListView->blockSignals(true);
+		individualListView->clear();
+		individualListView->blockSignals(wasBlocked);
+	}
 	individualProgramView->setText("");
 	individualCountLCD->display(0);
 
@@ -244,6 +254,11 @@ void MT_PopulationWidget::slotCurrentChanged(QTreeWidgetItem *item)
 {
 	// clean the display
 	individualProgramView->clear();
+
+	// Belt and braces: Qt 6 can deliver a null current in situations Qt 2 had
+	// no signal for at all (an item removed under the cursor, say). 1.3 never
+	// reached this slot with null, so returning is the faithful no-op.
+	if(!item) return;
 
 	// get the currently selected individual
 	int pos = ((MT_PopListViewItem *) item)->getPos();

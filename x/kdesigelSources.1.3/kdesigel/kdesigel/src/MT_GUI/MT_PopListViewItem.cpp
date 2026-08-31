@@ -8,7 +8,7 @@
 // Konstruktion/Destruktion
 //////////////////////////////////////////////////////////////////////
 
-// Prepends, like Qt 2's QTreeWidgetItem(QTreeWidget*). See MT_ExperimentItem.cpp
+// Prepends, like Qt 2's QListViewItem(QListView*). See MT_ExperimentItem.cpp
 // for why the parent is not handed to the base class.
 MT_PopListViewItem::MT_PopListViewItem(QTreeWidget *parent) : QTreeWidgetItem()
 { 

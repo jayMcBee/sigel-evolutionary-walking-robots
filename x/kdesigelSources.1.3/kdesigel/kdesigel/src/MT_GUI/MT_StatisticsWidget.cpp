@@ -14,7 +14,10 @@ MT_StatisticsWidget::MT_StatisticsWidget(QMainWindow* parent, const char* name, 
 
 	evolRunning = false;
 
+	// Qt 2's QToolBar(label, QMainWindow*, dock) docked itself
+	// (qtoolbar.cpp:240). Qt 6's does not.
 	statToolbar = new QToolBar("MT Statistics", parent);
+	parent->addToolBar(Qt::TopToolBarArea, statToolbar);
 	statToolbar->hide();
 
 #ifdef _WINDOWS
@@ -38,6 +41,13 @@ MT_StatisticsWidget::MT_StatisticsWidget(QMainWindow* parent, const char* name, 
 	intervalSpinBox->setRange(10, 6000);
 	intervalSpinBox->setSingleStep(10);
 	intervalLabel = new QLabel(" sec.", statToolbar);
+	// Qt 2's QToolBar::init() did boxLayout()->setAutoAdd(TRUE)
+	// (qtoolbar.cpp:300): any child widget joined the toolbar's layout on
+	// construction, in creation order. Qt 6 has no autoAdd, so a child parented
+	// to a toolbar is an unmanaged overlay at 0,0 unless addWidget() is called.
+	statToolbar->addWidget(autoUpdateCheckBox);
+	statToolbar->addWidget(intervalSpinBox);
+	statToolbar->addWidget(intervalLabel);
 	updateTimer = new QTimer(this);
 	QObject::connect(autoUpdateCheckBox, SIGNAL(toggled(bool)), SLOT(slotAutoUpdateChanged(bool)));
 	QObject::connect(updateTimer, SIGNAL(timeout()), SLOT(slotUpdateGUI()));
@@ -731,7 +741,8 @@ void MT_StatisticsWidget::plotSearchEffects(QString fileName)
 	int total=0;
 	// PRE-STANDARD for-SCOPING, PRESERVED. `l' outlived this loop in 2003 and
 	// the two loops further down print it instead of their own index, so
-	// gnuplot datasets 2 and 3 get a constant x of metaGens rather than the
+	// the 5th and 6th gnuplot datasets ('2pt destr.' and '3pt destr.') get a
+	// constant x of metaGens rather than the
 	// generation number. That is a defect and it is reproduced, not fixed.
 	int l;
 	for(l=0; l<metaGens; l++){

@@ -11,8 +11,8 @@
 // Konstruktion/Destruktion
 //////////////////////////////////////////////////////////////////////
 
-// Qt 2's QTreeWidgetItem(QTreeWidget*) PREPENDED -- it forwarded to
-// QTreeWidgetItem::insertItem, which is head insertion (qlistview.cpp:585).
+// Qt 2's QListViewItem(QListView*) PREPENDED -- it forwarded to
+// QListViewItem::insertItem, which is head insertion (qlistview.cpp:585).
 // Qt 6's QTreeWidgetItem(QTreeWidget*) appends, so the parent is NOT passed to
 // the base and the item is inserted at 0 by hand. MT_ExperimentWidget builds
 // its six pages 5..0 with sorting off and then selects firstChild(), so an

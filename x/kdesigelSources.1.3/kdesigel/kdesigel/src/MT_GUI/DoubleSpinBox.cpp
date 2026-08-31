@@ -51,6 +51,19 @@ DISpinBox::~DISpinBox()
 	delete iValidator;
 }
 
+QValidator::State DISpinBox::validate(QString &input, int &pos) const
+{
+	const QValidator *v = (typ == INTTYP) ? (const QValidator *) iValidator
+	                                      : (const QValidator *) dValidator;
+	return v ? v->validate(input, pos) : QValidator::Acceptable;
+}
+
+// Qt 2 had no fixup on this path; leaving the text alone is the no-op that
+// matches. Without the override, QSpinBox::fixup() rewrites "0.375" to "0".
+void DISpinBox::fixup(QString &) const
+{
+}
+
 int DISpinBox::valueFromText(const QString &t) const
 {
 	if(typ == INTTYP)

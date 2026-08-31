@@ -156,7 +156,13 @@ void MT_IndividualsWidget::onShow(MT_GPManager *manager, subst_cache *subst)
 		numVariablesSpinBox->setValue(*numVar);
 
 		// add the constants to the appropriate listbox
-		constantsListBox->clear();
+		// See MT_PopulationWidget: Qt 2's clear() blocked signals, Qt 6's
+		// does not, and slotSelectionChanged reads currentRow().
+		{
+			const bool wasBlocked = constantsListBox->blockSignals(true);
+			constantsListBox->clear();
+			constantsListBox->blockSignals(wasBlocked);
+		}
 		for(int i=0; i<constants->size(); i++){
 			constantsListBox->addItem(QString("%1").arg(constants->at(i)));
 		}
@@ -406,9 +412,9 @@ void MT_IndividualsWidget::slotRButtonClicked(const QPoint &pos)
 {
 	// Qt 2's rightButtonClicked is gone. Two things it did must be restored by
 	// hand. (1) It delivered a GLOBAL position (viewport()->mapToGlobal, see
-	// qlistview.cpp:3396); customContextMenuRequested delivers viewport
+	// qlistbox.cpp:1825); customContextMenuRequested delivers viewport
 	// coordinates. (2) When the click MISSED an item, Qt 2 called
-	// clearSelection() before emitting (qlistview.cpp:3390) -- which is why
+	// clearSelection() before emitting (qlistbox.cpp:1655) -- which is why
 	// 1.3 greys out Delete on blank space: clearing fires selectionChanged,
 	// and slotSelectionChanged disables the action. Qt 6 does neither.
 	// Confirmed on the running 1.3: on a row all four entries are enabled; on

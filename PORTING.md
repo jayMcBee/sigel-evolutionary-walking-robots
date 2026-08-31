@@ -519,8 +519,8 @@ through `f0f2daa`.
 
 ## 7. Steps
 
-**Exit criterion per step:** `./check.sh` at the repo root — **772 pass, 5 fail,
-441 warnings** as of 2026-08-31, C6.
+**Exit criterion per step:** `./check.sh` at the repo root — **773 pass, 5 fail,
+436 warnings** as of 2026-08-31, C6.
 
 **The pass/fail basis changed at C4 and earlier figures are not comparable.**
 The standalone header pass had always been reported and never added to the
@@ -817,7 +817,7 @@ succeeded.**
 **Gates any session must keep green**, all committed:
 
 ```
-./check.sh                                            772 pass, 5 fail
+./check.sh                                            773 pass, 5 fail
 ./dictorder-dump.sh | diff -u dictorder-baseline.txt -    empty
 ./fitness-check.sh  | diff -u fitness-baseline.txt -      empty
 ASAN_OPTIONS=detect_leaks=0 ./fitness-check.sh build      exit 0
@@ -2561,9 +2561,19 @@ faithful one. *Written because a defect of exactly that shape was found in
 
 #### C6 — `MT_GUI`: the MetaGP window, and a right-click that cleared the selection
 
-23 sources and 23 headers, 4,513 lines. *§7 said "3,911 LOC, 14 files", which
-counted neither the headers nor the eight form bases.* All 23 compile; 31 dead
-connects repaired; **71 warnings**, all pre-existing 2003 shapes.
+23 sources and 23 headers, 4,669 lines at HEAD. *§7's "3,911 LOC, 14 files" was
+right for the pristine tree — 14 `.cpp` at 3,289 plus 15 `.h` at 622 — and did
+count the headers; what it omits is the eight form bases C1/C2 added. A claim
+here that it counted neither was wrong, and the 4,513 figure was the module's
+size at the parent commit.* All 23 compile; 31 dead connects repaired.
+
+**66 warnings, and a claim here that all 71 were pre-existing 2003 shapes was
+wrong.** Six were not. Five are now gone: four `Qt::CTRL+Qt::Key_D` on
+`setShortcut` lines this step wrote — `operator+(Modifier, Key)` is deprecated
+in Qt 6 and `|` is the replacement — and one unused `name` parameter that
+existed only because the port had dropped it. The sixth stays: a sign-compare
+that exists only because Qt 6's `QListWidget::count()` returns `int` where
+Qt 2's returned `uint`. The other 65 are genuinely 2003 shapes.
 
 **The prepend trap is real here and the running 1.3 settles it.**
 `MT_ExperimentWidget` calls `setSorting(-1)`, builds its six pages **5 → 0**, and
@@ -2636,21 +2646,23 @@ breaks. Both names restored in the `.ui`.
 | `QPopupMenu` ×6, `QWidgetStack` ×2, `QMultiLineEdit` | `QMenu`, `QStackedWidget`, `QTextEdit` |
 | `QListBox::currentItem()` | `currentRow()` — Qt 2 returned an **index**, Qt 6 returns the item |
 | `QProgressDialog(label, cancel, totalSteps, creator, name, modal)` ×4 | `(label, cancel, minimum, maximum, parent)` + `setWindowModality`. **The third argument changed meaning**; `cancel` was `0` in 1.3, so there is no Cancel button |
-| `QSpinBox(min, max, step, parent)` ×4 | `(parent)` + `setRange` + `setSingleStep` |
-| `QFileDialog::getSaveFileName(initially, filter, parent)` ×7 | `(parent, caption, dir, filter)` — every argument survives but the widget `name` |
+| `QSpinBox(min, max, step, parent)` ×3 | `(parent)` + `setRange` + `setSingleStep` |
+| `QFileDialog::getSaveFileName(initially, filter, parent)` ×10 | `(parent, caption, dir, filter)` — every argument survives but the widget `name` |
 | `QFile::open(mode, FILE*)` ×3 | `open(FILE*, mode)` |
 | `QObject::child(name, "QLineEdit")` ×6 | `findChild<QLineEdit*>(name)` |
 | `QTimer::start(msec, singleShot)` ×2 | `setSingleShot` + `start(msec)` |
 | `QMenuBar::insertItem(text, popup)` | `popup->setTitle(text)` + `addMenu(popup)` |
-| `setMargin(n)` ×3 | `setContentsMargins(n, n, n, n)` |
-| `WType_TopLevel \| WType_Modal` | `Qt::Dialog` — the same 0x3 |
+| `setMargin(n)` ×2 | `setContentsMargins(n, n, n, n)` |
+| `WType_TopLevel \| WType_Modal` | `Qt::Dialog` **plus `setWindowModality(Qt::ApplicationModal)`** — the bits coincide at 0x3, which is not an equivalence: Qt 2's flag *made the window modal* (`WState_Modal`, `qwidget.cpp:725`; `qt_enter_modal` on show, `:3365`), while Qt 6's names a window type and `windowModality` defaults to `NonModal` |
 | `QSpinBox::mapValueToText`/`mapTextToValue` | `textFromValue`/`valueFromText`, **both `const`** |
 | `QSpinBox::setValidator` | no equivalent; Qt 2's forwarded to its internal `QLineEdit` (`qspinbox.cpp:680`), so `lineEdit()->setValidator` reaches the same object |
 
 **Three 2003 defects preserved, not fixed.**
 `MT_StatisticsWidget`'s gnuplot export declares `l` in one `for` and reads it in
-two later ones — pre-standard scoping, so datasets 2 and 3 get a constant x of
-`metaGens` instead of the generation number. `MT_PopulationWidget`'s
+two later ones — pre-standard scoping, so the **5th and 6th** of the six
+gnuplot datasets, `2pt destr.` and `3pt destr.`, get a constant x of `metaGens`
+instead of the generation number. *Recorded as "datasets 2 and 3" first, which
+would have sent a reader to `num 2pt`/`num 3pt`, both of which are correct.* `MT_PopulationWidget`'s
 save-individuals loop calls `list->current()` without ever advancing the
 `QPtrList` cursor, which `append()` left on the **last** selected item, so it
 writes that same individual into every one of the N files; `list->last()`
@@ -2668,9 +2680,53 @@ a divergence: the form sets no maximum and **both** Qt 2 and Qt 6 default
 — clicking either produced no pixel change under synthetic input, which the box
 correctly reported as an instrument limitation rather than a finding.
 
-**Gates: `./check.sh` 772 pass, 5 fail, 441 warnings.** Warnings 355 → 441: all
-86 are `MT_GUI`'s 71 plus 15 that `MT_Control` gains from now including
-converted `MT_GUI` headers. Headers 155/1, forms 101/0, parsers 1/0, regex
+**Four defects the review found after the step was committed, all now fixed.**
+
+**A reachable null dereference.** `currentChanged(QListViewItem*)` became
+`currentItemChanged(QTreeWidgetItem*,QTreeWidgetItem*)`, and Qt 6 emits that
+with `current == nullptr` when the view is cleared. **Qt 2's
+`QListView::clear()` blocked signals for its whole body**
+(`qlistview.cpp:2303-2304, 2341`), so the slot was never called with null and
+has no guard: `((MT_PopListViewItem *) item)->getPos()`. `onShow()` opens with
+`clear()` and runs on every page raise, so clicking an individual and switching
+away crashes. Both `clear()` calls now block signals as Qt 2 did, and the slot
+gained a guard for the cases Qt 6 has and Qt 2 had no signal for at all.
+
+**`DISpinBox` threw away everything after the decimal point.** Qt 6's
+`QSpinBox::validate()`/`fixup()` are an *integer* parser and run from
+`QAbstractSpinBoxPrivate::interpret()` **before** the virtual `valueFromText`,
+so a typed `0.375` was rejected and rewritten to `0` and the override never saw
+the fraction. Qt 2 had no such gate — `interpretText()` called
+`mapTextToValue()` unconditionally (`qspinbox.cpp:725-741`) and the
+`QLineEdit`'s validator was the only constraint on typing. Both are now
+overridden to defer to that same validator. Measured before: `0.375 → 0`;
+after: `0.375 → 375`, matching 1.3. **This affects `toleranceSpinBox`,
+`powerSpinBox` and `lineProbSpinBox` — GP configuration values.**
+`check.sh` gained a `widgets` section that types into a `DISpinBox` and
+compares; it is the only mechanical check that can see this class, and it
+fails on the unfixed code.
+
+**All four toolbars were floating, and eight widgets were unlaid-out overlays.**
+Qt 2's `QToolBar` constructors **docked themselves** —
+`parent->addToolBar(this, QString::null, QMainWindow::Top)`
+(`qtoolbar.cpp:279`, and `:240` for the label form) — and `init()` did
+`boxLayout()->setAutoAdd(TRUE)` (`:300`), so any child parented to a toolbar
+joined its layout on construction. Qt 6 does neither. `addToolBar` and eight
+`addWidget` calls restore both. *C4 got the docking right for
+`SIG_SimulationWindow`; C6 did not, which is what a per-step review is for.*
+
+**`MT_MainWindow` lost its modality and its object name.** `WType_Modal` did not
+merely name a window type in Qt 2 — see the table above. And the constructor
+dropped `setObjectName` where every other class in the module keeps it.
+
+**Gates: `./check.sh` 773 pass, 5 fail, 436 warnings — and 393 → 773 is again
+not a like-for-like step.** The total decomposes as modules 149 + headers 155 +
+regex self-test 39 + widgets 1 + parsers 1 + forms 101 + **encodings 327**; of
+the +380, **327 is the new encodings gate counting files** and 46 is `MT_GUI`'s
+23 sources and 23 headers, the rest being the self-test's new rows and the new
+`widgets` check. Warnings *are* comparable: 355 → 436, all 81 being `MT_GUI`'s
+66 plus 15 that `MT_Control` gains from now including converted `MT_GUI`
+headers. Headers 155/1, forms 101/0, parsers 1/0, regex
 self-test 39/0, dead signals 0 against a baseline that C6 lowered from 31 to 0.
 All three behaviour baselines byte-identical.
 
