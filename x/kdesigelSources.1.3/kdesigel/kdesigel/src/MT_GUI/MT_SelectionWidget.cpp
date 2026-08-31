@@ -1,17 +1,17 @@
 #include "MT_GUI/MT_SelectionWidget.h"
 
-#include <qcombobox.h>
-#include <qmessagebox.h>
-#include <qlabel.h>
-#include <qspinbox.h>
+#include <QComboBox>
+#include <QMessageBox>
+#include <QLabel>
+#include <QSpinBox>
 
-MT_SelectionWidget::MT_SelectionWidget(QWidget* parent, const char* name, WFlags fl)
+MT_SelectionWidget::MT_SelectionWidget(QWidget* parent, const char* name, Qt::WindowFlags fl)
 : MT_SelectionWidgetBase(parent, name, fl), MT_WidgetBase(parent)
 {
 	lastParentSize = -1;
 
 	QObject::connect((QObject*)overProductionSpinBox, SIGNAL(valueChanged(int)), SLOT(slotOverProdChanged(int)));
-	QObject::connect((QObject*)tourSizeComboBox, SIGNAL(activated(const QString&)), SLOT(slotTourSizeChanged(const QString&)));
+	QObject::connect((QObject*)tourSizeComboBox, SIGNAL(textActivated(const QString&)), SLOT(slotTourSizeChanged(const QString&)));
 }
 
 MT_SelectionWidget::~MT_SelectionWidget()
@@ -42,7 +42,7 @@ void MT_SelectionWidget::updateTSizeList(int pSize, int oSize)
 			if((tNum != 0)&&((pSize % tNum) == 0)){	//     "        "        "        "    1+2
 				
 				// candidate found so insert it into the list
-				tourSizeComboBox->insertItem(QString::number(tSize));
+				tourSizeComboBox->addItem(QString::number(tSize));
 				tourSizeMap.insert(tSize, index++);
 			}
 		}
@@ -67,15 +67,15 @@ int MT_SelectionWidget::calculateTournSize(int pSize, int oSize, int oTSize)
 	intMap::Iterator it = tourSizeMap.begin();
 	int lastSize, lastDiff, actDiff;
 
-	actDiff = abs( (it.data()) - oTSize);
+	actDiff = abs( (it.value()) - oTSize);
 	do {
 		lastDiff = actDiff;
-		lastSize = it.data();
+		lastSize = it.value();
 		it++;
 		if(it == tourSizeMap.end())
 			break;
 
-		actDiff = abs( (it.data()) - oTSize);
+		actDiff = abs( (it.value()) - oTSize);
 	} while( actDiff < lastDiff );
 
 	return lastSize;
@@ -91,7 +91,7 @@ void MT_SelectionWidget::onShow(MT_GPManager *manager, subst_cache *subst)
 	int tDuration;
 
 	QObject::disconnect((QObject*)overProductionSpinBox, SIGNAL(valueChanged(int)), this, SLOT(slotOverProdChanged(int)));
-	QObject::disconnect((QObject*)tourSizeComboBox, SIGNAL(activated(const QString&)), this, SLOT(slotTourSizeChanged(const QString&)));
+	QObject::disconnect((QObject*)tourSizeComboBox, SIGNAL(textActivated(const QString&)), this, SLOT(slotTourSizeChanged(const QString&)));
 
 	manager->getSelektionValue(&offspringSize, &tournSize, 
 		&selMethod, &fitFunc, 
@@ -109,12 +109,12 @@ void MT_SelectionWidget::onShow(MT_GPManager *manager, subst_cache *subst)
 
 	// set the tournament size
 	if(tourSizeMap.contains(tournSize)){
-		int index = tourSizeMap.find(tournSize).data();
-		tourSizeComboBox->setCurrentItem(index);
+		int index = tourSizeMap.find(tournSize).value();
+		tourSizeComboBox->setCurrentIndex(index);
 	} else {
 		QMessageBox::critical(this, "Configure system", "The tournament size is invalid.\n"
 			"A default value will be used.", "Ok");
-		tourSizeComboBox->setCurrentItem(0);
+		tourSizeComboBox->setCurrentIndex(0);
 	}
 
 	// update labels
@@ -123,21 +123,21 @@ void MT_SelectionWidget::onShow(MT_GPManager *manager, subst_cache *subst)
 	tourNumLabel->setText(QString::number(tourNum));
 	winNumLabel->setText(QString::number(parentSize / tourNum));
 
-	selectionMethodComboBox->setCurrentItem(selMethod - 1);	// set the selection method
+	selectionMethodComboBox->setCurrentIndex(selMethod - 1);	// set the selection method
 
 	// set the fitness function
 	fitnessFunctionComboBox->clear();
 	if(subst->strategy < 3){		// of type evaluator */
 	
-		fitnessFunctionComboBox->insertItem("simple error");
-		fitnessFunctionComboBox->insertItem("square error");
-		fitnessFunctionComboBox->setCurrentItem(fitFunc - 1);
+		fitnessFunctionComboBox->addItem("simple error");
+		fitnessFunctionComboBox->addItem("square error");
+		fitnessFunctionComboBox->setCurrentIndex(fitFunc - 1);
 
 	} else {						// of type classifier
 
-		fitnessFunctionComboBox->insertItem("simple");
-		fitnessFunctionComboBox->insertItem("weighted");
-		fitnessFunctionComboBox->setCurrentItem(fitFunc - 3);
+		fitnessFunctionComboBox->addItem("simple");
+		fitnessFunctionComboBox->addItem("weighted");
+		fitnessFunctionComboBox->setCurrentIndex(fitFunc - 3);
 
 	}
 
@@ -145,7 +145,7 @@ void MT_SelectionWidget::onShow(MT_GPManager *manager, subst_cache *subst)
 	TDurationSpinBox->setValue(tDuration);	// set max interpretation duration
 
 	QObject::connect((QObject*)overProductionSpinBox, SIGNAL(valueChanged(int)), SLOT(slotOverProdChanged(int)));
-	QObject::connect((QObject*)tourSizeComboBox, SIGNAL(activated(const QString&)), SLOT(slotTourSizeChanged(const QString&)));
+	QObject::connect((QObject*)tourSizeComboBox, SIGNAL(textActivated(const QString&)), SLOT(slotTourSizeChanged(const QString&)));
 }
 
 bool MT_SelectionWidget::onHide(MT_GPManager *manager, subst_cache *subst)
@@ -159,12 +159,12 @@ bool MT_SelectionWidget::onHide(MT_GPManager *manager, subst_cache *subst)
 
 	offspringSize = parentSize * overProductionSpinBox->value();
 	tournSize = tourSizeComboBox->currentText().toInt();
-	selMethod = selectionMethodComboBox->currentItem() + 1;
+	selMethod = selectionMethodComboBox->currentIndex() + 1;
 
 	if(subst->strategy < 3){		// of type evaluator */
-		fitFunc = fitnessFunctionComboBox->currentItem() + 1;
+		fitFunc = fitnessFunctionComboBox->currentIndex() + 1;
 	} else {						// of type classifier
-		fitFunc = fitnessFunctionComboBox->currentItem() + 3;
+		fitFunc = fitnessFunctionComboBox->currentIndex() + 3;
 	}
 
 	tsetSize = TSetSizeSpinBox->value();	// training set size
@@ -187,13 +187,13 @@ void MT_SelectionWidget::slotOverProdChanged(int nvalue)
 	updateTSizeList(parentSize, poolSize);
 	int tourn = calculateTournSize(parentSize, poolSize, otourn);
 
-	QObject::disconnect((QObject*)tourSizeComboBox, SIGNAL(activated(const QString&)), this, SLOT(slotTourSizeChanged(const QString&)));
+	QObject::disconnect((QObject*)tourSizeComboBox, SIGNAL(textActivated(const QString&)), this, SLOT(slotTourSizeChanged(const QString&)));
 
 	if(tourSizeMap.contains(tourn)){
-		int index = tourSizeMap.find(tourn).data();
-		tourSizeComboBox->setCurrentItem(index);
+		int index = tourSizeMap.find(tourn).value();
+		tourSizeComboBox->setCurrentIndex(index);
 	} else {
-		tourSizeComboBox->setCurrentItem(0);
+		tourSizeComboBox->setCurrentIndex(0);
 	}
 
 	tourn = tourSizeComboBox->currentText().toInt();
@@ -203,7 +203,7 @@ void MT_SelectionWidget::slotOverProdChanged(int nvalue)
 	tourNumLabel->setText(QString::number(tourNum));
 	winNumLabel->setText(QString::number(parentSize / tourNum));
 
-	QObject::connect((QObject*)tourSizeComboBox, SIGNAL(activated(const QString&)), SLOT(slotTourSizeChanged(const QString&)));
+	QObject::connect((QObject*)tourSizeComboBox, SIGNAL(textActivated(const QString&)), SLOT(slotTourSizeChanged(const QString&)));
 }
 
 void MT_SelectionWidget::slotTourSizeChanged(const QString &text)

@@ -5,14 +5,14 @@
 #if !defined(AFX_MT_POPLISTVIEWITEM_H__2BF5C50C_726A_4564_90DB_3E9CA925E011__INCLUDED_)
 #define AFX_MT_POPLISTVIEWITEM_H__2BF5C50C_726A_4564_90DB_3E9CA925E011__INCLUDED_
 
-#include <qlistview.h>
+#include <QTreeWidget>
 #include "MT_GPSystem/MT_Individual.h"
 
-class MT_PopListViewItem : public QListViewItem  
+class MT_PopListViewItem : public QTreeWidgetItem  
 {
 public:
-	MT_PopListViewItem(QListView *parent);
-	MT_PopListViewItem(QListView *parent, MT_Individual *ind);
+	MT_PopListViewItem(QTreeWidget *parent);
+	MT_PopListViewItem(QTreeWidget *parent, MT_Individual *ind);
 	virtual ~MT_PopListViewItem();
 	void setPos(int NewPos);
 	int getPos();

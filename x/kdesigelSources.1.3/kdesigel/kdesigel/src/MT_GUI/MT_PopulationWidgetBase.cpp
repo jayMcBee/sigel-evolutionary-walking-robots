@@ -15,7 +15,7 @@ MT_PopulationWidgetBase::MT_PopulationWidgetBase(QWidget* parent, const char* na
 
   setupUi( this );
 
-  // Qt 2's QListView sorted by column 0 ASCENDING by default (qlistview.cpp:
+  // Qt 2's QTreeWidget sorted by column 0 ASCENDING by default (qlistview.cpp:
   // 1836-1837 sets sortcolumn=0, ascending=TRUE in init()). The .ui carries
   // sortingEnabled, converted from Q3Header's clickable columns, but Qt 6's
   // setSortingEnabled(true) leaves the indicator on column 0 DESCENDING --

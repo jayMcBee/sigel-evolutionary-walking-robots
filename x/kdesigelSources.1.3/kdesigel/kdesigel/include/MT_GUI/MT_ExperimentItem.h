@@ -5,14 +5,14 @@
 #if !defined(AFX_MT_EXPERIMENTITEM_H__F6ADF263_E73B_40EA_B14B_7D9BEB6D2AAB__INCLUDED_)
 #define AFX_MT_EXPERIMENTITEM_H__F6ADF263_E73B_40EA_B14B_7D9BEB6D2AAB__INCLUDED_
 
-#include <qlistview.h>
-#include <qpixmap.h>
-#include <qstring.h>
+#include <QTreeWidget>
+#include <QPixmap>
+#include <QString>
 
-class MT_ExperimentItem : public QListViewItem  
+class MT_ExperimentItem : public QTreeWidgetItem  
 {
 public:
-	MT_ExperimentItem(QListView *parent, int pos, QString title, QPixmap &pix);
+	MT_ExperimentItem(QTreeWidget *parent, int pos, QString title, const QPixmap &pix);
 	virtual ~MT_ExperimentItem();
 
 	int getPos();

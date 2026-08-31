@@ -5,8 +5,8 @@
 #if !defined(AFX_DOUBLESPINBOX_H__B948F50E_5AB1_4AD5_8DC5_52FFC791595D__INCLUDED_)
 #define AFX_DOUBLESPINBOX_H__B948F50E_5AB1_4AD5_8DC5_52FFC791595D__INCLUDED_
 
-#include <qspinbox.h>
-#include <qvalidator.h>
+#include <QSpinBox>
+#include <QValidator>
 
 #define INTTYP 0
 #define DBLTYP 1
@@ -29,8 +29,11 @@ public:
 	void setRange(int minVal, int maxVal);
 
 private:
-	QString mapValueToText(int value);
-	int mapTextToValue(bool *ok);
+	// Qt 2's QSpinBox had virtual mapValueToText/mapTextToValue; Qt 6 calls
+	// them textFromValue/valueFromText and both are const. valueFromText is
+	// handed the text Qt 2 fetched itself with text().
+	QString textFromValue(int value) const override;
+	int valueFromText(const QString &t) const override;
 
 	int typ;
 	int precision;

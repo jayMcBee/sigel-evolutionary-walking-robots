@@ -1,16 +1,25 @@
 #include "MT_GUI/MT_ExperimentWidget.h"
 #include "MT_GUI/MT_ExperimentItem.h"
 
-#include <qlistview.h>
-#include <qpixmap.h>
+#include <QTreeWidget>
+#include <QPixmap>
 #include <stdlib.h>
 
-MT_ExperimentWidget::MT_ExperimentWidget(QWidget* parent, const char* name, WFlags fl ) 
-	: QListView( parent, name, fl)
+MT_ExperimentWidget::MT_ExperimentWidget(QWidget* parent, const char* name, Qt::WindowFlags fl ) 
+	: QTreeWidget( parent )
 {
-	setSorting(-1);
+	if ( name )
+		setObjectName( QString::fromUtf8( name ) );
+	if ( fl != Qt::WindowFlags() )
+		setWindowFlags( fl );
+
+	// setSorting(-1) is Qt 2 for "no sorting". Qt 6 defaults to false, but
+	// this is stated because it is load-bearing: with sorting off, the six
+	// pages below appear in insertion order, and Qt 2 inserted by PREPENDING.
+	setSortingEnabled(false);
 	clear();
-	addColumn("Meta Experiment");
+	setColumnCount(1);
+	setHeaderLabels(QStringList("Meta Experiment"));
 
 #ifdef _WINDOWS	
 	QString pixPath = ::getenv("SIGEL_ROOT");
@@ -28,19 +37,19 @@ MT_ExperimentWidget::MT_ExperimentWidget(QWidget* parent, const char* name, WFla
 
 	// before showing the window for the first time select the first item
 	// in the list
-	setCurrentItem(firstChild());
+	setCurrentItem(topLevelItem(0));
 };
 
 MT_ExperimentWidget::~MT_ExperimentWidget()
 {
 };
 
-void MT_ExperimentWidget::slotCurrentChanged(QListViewItem *newSelection)
+void MT_ExperimentWidget::slotCurrentChanged(QTreeWidgetItem *newSelection)
 {
 	// remember the previously selected item to allow reselection
 	prevSelectedItems.enqueue((MT_ExperimentItem*)newSelection);
 	if(prevSelectedItems.count() > 2)
-		prevSelectedItems.remove();
+		prevSelectedItems.dequeue();
 };
 
 void MT_ExperimentWidget::lastSelected()
@@ -48,5 +57,5 @@ void MT_ExperimentWidget::lastSelected()
 	MT_ExperimentItem *stickingItem = prevSelectedItems.head();
 	setCurrentItem(stickingItem);
 	prevSelectedItems.enqueue(stickingItem);
-	prevSelectedItems.remove();
+	prevSelectedItems.dequeue();
 }

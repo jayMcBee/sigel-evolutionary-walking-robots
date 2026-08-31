@@ -1,4 +1,14 @@
 #include "MT_GUI/MT_PopulationWidget.h"
+
+// Qt 2's QListViewItem::nextSibling() has no Qt 6 equivalent. Every item in
+// this view is top level, so the next sibling is the next top-level index.
+static MT_PopListViewItem *nextSiblingOf(QTreeWidget *tree, QTreeWidgetItem *item)
+{
+	if(!item) return 0;
+	int i = tree->indexOfTopLevelItem(item);
+	if(i < 0 || i + 1 >= tree->topLevelItemCount()) return 0;
+	return (MT_PopListViewItem *)tree->topLevelItem(i + 1);
+}
 #include "MT_GUI/MT_AddIndividualsWidget.h"
 #include "MT_GUI/MT_PopListViewItem.h"
 #include "MT_GUI/MT_MainWindow.h"
@@ -9,16 +19,16 @@
 #include "MT_GPSystem/MT_Programline.h"
 #include "MT_GPSystem/MT_Randomizer.h"
 
-#include <qspinbox.h>
-#include <qprogressdialog.h>
-#include <qfiledialog.h>
-#include <qstringlist.h>
-#include <qmultilineedit.h>
-#include <qlcdnumber.h>
-#include <qmessagebox.h>
+#include <QSpinBox>
+#include <QProgressDialog>
+#include <QFileDialog>
+#include <QStringList>
+#include <QTextEdit>
+#include <QLCDNumber>
+#include <QMessageBox>
 
 
-MT_PopulationWidget::MT_PopulationWidget(QMainWindow* parent, const char* name, WFlags fl)
+MT_PopulationWidget::MT_PopulationWidget(QMainWindow* parent, const char* name, Qt::WindowFlags fl)
 	: MT_PopulationWidgetBase(parent, name, fl), MT_WidgetBase(parent)
 {
 	oldPopSize = -1;
@@ -28,71 +38,74 @@ MT_PopulationWidget::MT_PopulationWidget(QMainWindow* parent, const char* name, 
 	pixPath += "/pixmaps/";
 
 	// create the toolbar
-	popToolBar = new QToolBar(parent, "mtPopToolBar");
+	popToolBar = new QToolBar(parent);
+	popToolBar->setObjectName("mtPopToolBar");
 	popToolBar->hide();
-	popToolBar->setLabel("MT Population");
+	popToolBar->setWindowTitle("MT Population");
 
 	// create context menu
-	popContextMenu = new QPopupMenu(this, "mtPopContextMenu");
+	popContextMenu = new QMenu(this);
+	popContextMenu->setObjectName("mtPopContextMenu");
 
 	// create the actions and insert them
-	addIndAction = new QAction("Add Individual",
-		QIconSet(QPixmap(pixPath+"addIndividualsSmall.xpm"),QPixmap(pixPath+"addIndividualsLarge.xpm")),
-		"&Add",
-		0, parentWindow);
+	QIcon icon_addIndAction(QPixmap(pixPath+"addIndividualsSmall.xpm"));
+	icon_addIndAction.addPixmap(QPixmap(pixPath+"addIndividualsLarge.xpm"));
+	addIndAction = new QAction(icon_addIndAction, "&Add", parentWindow);
+	addIndAction->setToolTip("Add Individual");
 	addIndAction->setStatusTip("Adds a randomly created individual to the population.");
-	addIndAction->addTo(popToolBar);
-	addIndAction->addTo(popContextMenu);
+	popToolBar->addAction(addIndAction);
+	popContextMenu->addAction(addIndAction);
 
-	delIndAction = new QAction("Delete Individual",
-		QIconSet(QPixmap(pixPath+"deleteIndividualsSmall.xpm"),QPixmap(pixPath+"deleteIndividualsLarge.xpm")),
-		"&Delete",
-		0, parentWindow);
+	QIcon icon_delIndAction(QPixmap(pixPath+"deleteIndividualsSmall.xpm"));
+	icon_delIndAction.addPixmap(QPixmap(pixPath+"deleteIndividualsLarge.xpm"));
+	delIndAction = new QAction(icon_delIndAction, "&Delete", parentWindow);
+	delIndAction->setToolTip("Delete Individual");
 	delIndAction->setEnabled(false);
 	delIndAction->setStatusTip("Deletes the selected individual from the population.");
-	delIndAction->addTo(popToolBar);
-	delIndAction->addTo(popContextMenu);
+	popToolBar->addAction(delIndAction);
+	popContextMenu->addAction(delIndAction);
 
-	impIndAction = new QAction("Import Individual",
-		QIconSet(QPixmap(pixPath+"mt_ImpIndSmall.xpm"),QPixmap(pixPath+"/mt_ImpIndSmall.xpm")),
-		"&Import",
-		0, parentWindow);
+	QIcon icon_impIndAction(QPixmap(pixPath+"mt_ImpIndSmall.xpm"));
+	icon_impIndAction.addPixmap(QPixmap(pixPath+"/mt_ImpIndSmall.xpm"));
+	impIndAction = new QAction(icon_impIndAction, "&Import", parentWindow);
+	impIndAction->setToolTip("Import Individual");
 	impIndAction->setStatusTip("Imports one or more individuals from a file.");
-	impIndAction->addTo(popToolBar);
-	impIndAction->addTo(popContextMenu);
+	popToolBar->addAction(impIndAction);
+	popContextMenu->addAction(impIndAction);
 
-	expIndAction = new QAction("Export Individual",
-		QIconSet(QPixmap(pixPath+"mt_ExpIndSmall.xpm"),QPixmap(pixPath+"mt_ExpIndSmall.xpm")),
-		"&Export",
-		0, parentWindow);
+	QIcon icon_expIndAction(QPixmap(pixPath+"mt_ExpIndSmall.xpm"));
+	icon_expIndAction.addPixmap(QPixmap(pixPath+"mt_ExpIndSmall.xpm"));
+	expIndAction = new QAction(icon_expIndAction, "&Export", parentWindow);
+	expIndAction->setToolTip("Export Individual");
 	expIndAction->setStatusTip("Writes the selected Individuals to a file.");
-	expIndAction->addTo(popToolBar);
-	expIndAction->addTo(popContextMenu);
+	popToolBar->addAction(expIndAction);
+	popContextMenu->addAction(expIndAction);
 
-	loadPopAction = new QAction("Load Population",
-		QIconSet(QPixmap(pixPath+"openExperimentSmall.xpm"),QPixmap(pixPath+"openExperimentLarge.xpm")),
-		"&Load Population",
-		0, parentWindow);
+	QIcon icon_loadPopAction(QPixmap(pixPath+"openExperimentSmall.xpm"));
+	icon_loadPopAction.addPixmap(QPixmap(pixPath+"openExperimentLarge.xpm"));
+	loadPopAction = new QAction(icon_loadPopAction, "&Load Population", parentWindow);
+	loadPopAction->setToolTip("Load Population");
 	loadPopAction->setStatusTip("Loads a population from a file and adds it to the current population.");
-	loadPopAction->addTo(popToolBar);
+	popToolBar->addAction(loadPopAction);
 
-	savePopAction = new QAction("Save Population",
-		QIconSet(QPixmap(pixPath+"saveExperimentSmall.xpm"),QPixmap(pixPath+"saveExperimentLarge.xpm")),
-		"&Save Population",
-		0, parentWindow);
+	QIcon icon_savePopAction(QPixmap(pixPath+"saveExperimentSmall.xpm"));
+	icon_savePopAction.addPixmap(QPixmap(pixPath+"saveExperimentLarge.xpm"));
+	savePopAction = new QAction(icon_savePopAction, "&Save Population", parentWindow);
+	savePopAction->setToolTip("Save Population");
 	savePopAction->setStatusTip("Save the complete population to a file.");
-	savePopAction->addTo(popToolBar);
+	popToolBar->addAction(savePopAction);
 
 	// establish connections
-	QObject::connect((const QObject*) individualListView, SIGNAL(rightButtonClicked(QListViewItem*, const QPoint&, int)), SLOT(slotRButtonClicked(QListViewItem*, const QPoint&) ));
-	QObject::connect((const QObject*) individualListView, SIGNAL(currentChanged(QListViewItem*)), SLOT(slotCurrentChanged(QListViewItem*)));
-	QObject::connect((const QObject*) individualListView, SIGNAL(selectionChanged()), SLOT(slotSelectionChanged()));
-	QObject::connect(addIndAction, SIGNAL(activated()), SLOT(slotAddInd()));
-	QObject::connect(delIndAction, SIGNAL(activated()), SLOT(slotDelInd()));
-	QObject::connect(impIndAction, SIGNAL(activated()), SLOT(slotImpInd()));
-	QObject::connect(expIndAction, SIGNAL(activated()), SLOT(slotExpInd()));
-	QObject::connect(loadPopAction, SIGNAL(activated()), SLOT(slotLoadPop()));
-	QObject::connect(savePopAction, SIGNAL(activated()), SLOT(slotSavePop()));
+	individualListView->setContextMenuPolicy(Qt::CustomContextMenu);
+	QObject::connect((const QObject*) individualListView, SIGNAL(customContextMenuRequested(const QPoint&)), SLOT(slotRButtonClicked(const QPoint&)));
+	QObject::connect((const QObject*) individualListView, SIGNAL(currentItemChanged(QTreeWidgetItem*,QTreeWidgetItem*)), SLOT(slotCurrentChanged(QTreeWidgetItem*)));
+	QObject::connect((const QObject*) individualListView, SIGNAL(itemSelectionChanged()), SLOT(slotSelectionChanged()));
+	QObject::connect(addIndAction, SIGNAL(triggered()), SLOT(slotAddInd()));
+	QObject::connect(delIndAction, SIGNAL(triggered()), SLOT(slotDelInd()));
+	QObject::connect(impIndAction, SIGNAL(triggered()), SLOT(slotImpInd()));
+	QObject::connect(expIndAction, SIGNAL(triggered()), SLOT(slotExpInd()));
+	QObject::connect(loadPopAction, SIGNAL(triggered()), SLOT(slotLoadPop()));
+	QObject::connect(savePopAction, SIGNAL(triggered()), SLOT(slotSavePop()));
 	QObject::connect(this, SIGNAL(numChanged()), SLOT(slotNumChanged()));
 };
 
@@ -135,7 +148,7 @@ void MT_PopulationWidget::onShow(MT_GPManager *manager, subst_cache *subst)
 	MT_Individual *actInd;
 	for(int i=0; i<population->getSize(); i++){
 		actInd = population->getIndividual(i);
-		individualListView->insertItem( new MT_PopListViewItem(individualListView, actInd) );
+		new MT_PopListViewItem(individualListView, actInd);
 		emit numChanged();
 	}
 
@@ -148,7 +161,7 @@ void MT_PopulationWidget::onShow(MT_GPManager *manager, subst_cache *subst)
  ***/
 bool MT_PopulationWidget::onHide(MT_GPManager *manager, subst_cache *subst)
 {
-	int popSize = individualListView->childCount();
+	int popSize = individualListView->topLevelItemCount();
 
 	if(oldPopSize != popSize){
 		int offspringSize;
@@ -186,15 +199,26 @@ bool MT_PopulationWidget::onHide(MT_GPManager *manager, subst_cache *subst)
  ***/
 void MT_PopulationWidget::slotNumChanged()
 {
-	individualCountLCD->display( individualListView->childCount());
+	individualCountLCD->display( individualListView->topLevelItemCount());
 }
 
 /***
  * displays the context menu if a right click on a individual occurs
  ***/ 
-void MT_PopulationWidget::slotRButtonClicked(QListViewItem *item, const QPoint &point)
+void MT_PopulationWidget::slotRButtonClicked(const QPoint &pos)
 {
-	popContextMenu->popup(point);
+	// Qt 2's rightButtonClicked is gone. Two things it did must be restored by
+	// hand. (1) It delivered a GLOBAL position (viewport()->mapToGlobal, see
+	// qlistview.cpp:3396); customContextMenuRequested delivers viewport
+	// coordinates. (2) When the click MISSED an item, Qt 2 called
+	// clearSelection() before emitting (qlistview.cpp:3390) -- which is why
+	// 1.3 greys out Delete on blank space: clearing fires selectionChanged,
+	// and slotSelectionChanged disables the action. Qt 6 does neither.
+	// Confirmed on the running 1.3: on a row all four entries are enabled; on
+	// blank space Delete is greyed and the other three are not.
+	if(!individualListView->itemAt(pos))
+		individualListView->clearSelection();
+	popContextMenu->popup(individualListView->viewport()->mapToGlobal(pos));
 }
 
 /***
@@ -203,8 +227,8 @@ void MT_PopulationWidget::slotRButtonClicked(QListViewItem *item, const QPoint &
  ***/
 void MT_PopulationWidget::slotSelectionChanged()
 {
-	QListViewItem *actItem = individualListView->currentItem();
-	if(individualListView->childCount() != 1 && actItem && actItem->isSelected())
+	QTreeWidgetItem *actItem = individualListView->currentItem();
+	if(individualListView->topLevelItemCount() != 1 && actItem && actItem->isSelected())
 	{
 		delIndAction->setEnabled(true);
 	} else {
@@ -216,7 +240,7 @@ void MT_PopulationWidget::slotSelectionChanged()
  * displays the program if the currently selected individual
  * (if there is an individual selected)
  ***/
-void MT_PopulationWidget::slotCurrentChanged(QListViewItem *item)
+void MT_PopulationWidget::slotCurrentChanged(QTreeWidgetItem *item)
 {
 	// clean the display
 	individualProgramView->clear();
@@ -227,7 +251,7 @@ void MT_PopulationWidget::slotCurrentChanged(QListViewItem *item)
 
 	// display the program
 	for(int i=0; i<actInd->getProgram()->getLength(); i++){
-		individualProgramView->insertLine(actInd->printProgramLine(i));
+		individualProgramView->append(actInd->printProgramLine(i));
 	}
 }
 
@@ -247,18 +271,22 @@ void MT_PopulationWidget::slotAddInd()
 		// ok button pressed
 		number = numDialog.spinboxNumber->value();
 
-		QProgressDialog progress("Generating individuals", 0, number, this, 0, true);
+		// Qt 2: (label, cancelText, totalSteps, creator, name, modal).
+		// Qt 6: (label, cancelText, minimum, maximum, parent); modality separate.
+		// cancelText was 0 in 1.3, i.e. NO Cancel button -- QString() keeps that.
+		QProgressDialog progress("Generating individuals", QString(), 0, number, this);
+		progress.setWindowModality(Qt::ApplicationModal);
 
 		MT_Individual *newInd;
 		MT_Randomizer *rand = gpManager->getRandomizer();
 		for(int i=0; i<number; i++){
-			progress.setProgress(i);
+			progress.setValue(i);
 			int pos = population->createNewIndi(rand);
 			newInd = population->getIndividual(pos);
-			individualListView->insertItem( new MT_PopListViewItem(individualListView, newInd) );
+			new MT_PopListViewItem(individualListView, newInd);
 			emit numChanged();
 		}
-		progress.setProgress(number);
+		progress.setValue(number);
 	}
 
 }
@@ -272,7 +300,7 @@ void MT_PopulationWidget::slotDelInd()
 	MT_PopListViewItem* actIndNew =0;
 	
 	MT_PopListViewItem *nextInd=0;
-	MT_PopListViewItem *actInd = (MT_PopListViewItem*) individualListView->firstChild();
+	MT_PopListViewItem *actInd = (MT_PopListViewItem*) individualListView->topLevelItem(0);
 
 	int DelPos =0;
 	int ActPos =0;
@@ -281,22 +309,22 @@ void MT_PopulationWidget::slotDelInd()
 	// and delete the selected ones
 	MT_Individual *actRInd =0;
 	while(actInd){
-		nextInd = (MT_PopListViewItem*)actInd->nextSibling();	// get next individual in list
-		if (( actInd->isSelected()) && (individualListView->childCount() != 1) )
+		nextInd = nextSiblingOf(individualListView, actInd);	// get next individual in list
+		if (( actInd->isSelected()) && (individualListView->topLevelItemCount() != 1) )
 		{
 			DelPos = actInd->getPos();
 			actRInd = population->delIndividual(DelPos);
 			delete actRInd;
 			emit numChanged();
 			
-			actIndNew = (MT_PopListViewItem*) individualListView->firstChild();
+			actIndNew = (MT_PopListViewItem*) individualListView->topLevelItem(0);
 			while(actIndNew !=0)		// laufe über alle IndisItem  // für alle Item mit Pos > DelPos --> setPos(Pos-1)
 			{
 				ActPos = actIndNew->getPos();
 				if (ActPos > DelPos)
 					actIndNew->setPos(ActPos-1);
 				
-				actIndNew = (MT_PopListViewItem*)actIndNew->nextSibling();	// get next individual in list
+				actIndNew = nextSiblingOf(individualListView, actIndNew);	// get next individual in list
 			}
 			
 			delete actInd;					// delete actual individual if selected
@@ -312,8 +340,7 @@ void MT_PopulationWidget::slotDelInd()
  ***/
 void MT_PopulationWidget::slotImpInd()
 {
-	QStringList files( QFileDialog::getOpenFileNames( "Individuals(*.mind);;All Files(*)",
-		0, this, "IndImpDialog", "Import Individuals"));
+	QStringList files( QFileDialog::getOpenFileNames( this, "Import Individuals", QString(), "Individuals(*.mind);;All Files(*)"));
 
 	if(!files.isEmpty()){
 	
@@ -321,23 +348,27 @@ void MT_PopulationWidget::slotImpInd()
 		QStringList::Iterator it = files.begin();
 		uint i = 0;
 		uint count = files.count();
-		QProgressDialog progress("Importing individuals", 0, count, this, 0, true);
+		// Qt 2: (label, cancelText, totalSteps, creator, name, modal).
+		// Qt 6: (label, cancelText, minimum, maximum, parent); modality separate.
+		// cancelText was 0 in 1.3, i.e. NO Cancel button -- QString() keeps that.
+		QProgressDialog progress("Importing individuals", QString(), 0, count, this);
+		progress.setWindowModality(Qt::ApplicationModal);
 		for( ; it != files.end(); ++it){
 			QFile file(*it);
-			progress.setProgress(i++);
-			if(file.open(IO_ReadOnly)){		// file successfully opened
+			progress.setValue(i++);
+			if(file.open(QIODevice::ReadOnly)){		// file successfully opened
 				QTextStream str(&file);
 
 				//population->importPop(str);
 				MT_Individual *newInd = new MT_Individual(str);
 				population->addIndividual(newInd);
-				individualListView->insertItem( new MT_PopListViewItem(individualListView, newInd) );
+				new MT_PopListViewItem(individualListView, newInd);
 				
 				 emit numChanged();
 				file.close();
 			}
 		}
-		progress.setProgress(count);
+		progress.setValue(count);
 	}
 }
 
@@ -347,7 +378,7 @@ void MT_PopulationWidget::slotImpInd()
  ***/
 void MT_PopulationWidget::slotExpInd()
 {
-	QList<MT_PopListViewItem> *list = getSelectedItems();
+	QList<MT_PopListViewItem *> *list = getSelectedItems();
 
 	bool saveAsPop = false;
 	QString fileName;
@@ -356,7 +387,7 @@ void MT_PopulationWidget::slotExpInd()
 			"Shall we save them as a population?", "Save as population", "Save separately");
 	}
 	if(saveAsPop){
-		fileName = QFileDialog::getSaveFileName(0, "Population Files (*.mpop);;All Files (*)", this);
+		fileName = QFileDialog::getSaveFileName(this, QString(), QString(), "Population Files (*.mpop);;All Files (*)");
 		if(!fileName.isEmpty()){
 			if(fileName.right(5) != ".mpop")
 				fileName += ".mpop";
@@ -368,15 +399,16 @@ void MT_PopulationWidget::slotExpInd()
 					return;
 			}
 
-			if(file.open(IO_WriteOnly)){
+			if(file.open(QIODevice::WriteOnly)){
 				QTextStream str(&file);
 				
 				MT_Population npop;
 				npop.changePopSize(0);//list->count());
-				MT_PopListViewItem *actItem = list->first();
+				// Qt 2's QPtrList carried an internal cursor: first() then
+				// next() walked it. Qt 6 has no cursor; the index does the job.
 				for(int i=0; i<list->count(); i++){
+					MT_PopListViewItem *actItem = list->at(i);
 					npop.addIndividual(population->getIndividual(actItem->getPos()));//, i);
-					actItem = list->next();
 				}
 
 				npop.exportPop(str);
@@ -389,7 +421,7 @@ void MT_PopulationWidget::slotExpInd()
 			}
 		}
 	} else {
-		fileName = QFileDialog::getSaveFileName(0, "Individual Files (*.mind);;All Files (*)", this);
+		fileName = QFileDialog::getSaveFileName(this, QString(), QString(), "Individual Files (*.mind);;All Files (*)");
 		if(!fileName.isEmpty()){
 
 			for(int i=0; i<list->count(); i++){
@@ -399,9 +431,13 @@ void MT_PopulationWidget::slotExpInd()
 						"the existing file. Do really want to continue?", "Ok", "Cancel", 0, 1))
 						return;
 				}
-				if(file.open(IO_WriteOnly)){
+				if(file.open(QIODevice::WriteOnly)){
 					QTextStream str(&file);
-					population->getIndividual(list->current()->getPos())->writeToFileIndi(str);
+					// PRESERVED DEFECT: current() is the QPtrList cursor, which
+					// this loop never advances -- append() left it on the LAST
+					// selected item, so 1.3 writes that same individual into
+					// every one of the N files. last() reproduces it exactly.
+					population->getIndividual(list->last()->getPos())->writeToFileIndi(str);
 					file.close();
 				} else {
 					QMessageBox::critical(this, "Save individual", "An error occured during saving the individual.\nAborting operation.", "Ok");
@@ -418,12 +454,12 @@ void MT_PopulationWidget::slotExpInd()
  ***/
 void MT_PopulationWidget::slotLoadPop()
 {
-	QString fileName( QFileDialog::getOpenFileName(0, "Population Files (*.mpop);;All Files (*)", this) );
+	QString fileName( QFileDialog::getOpenFileName(this, QString(), QString(), "Population Files (*.mpop);;All Files (*)") );
 
 	if(!fileName.isEmpty()){
 		QFile file( fileName );
 
-		if(file.open(IO_ReadOnly)){
+		if(file.open(QIODevice::ReadOnly)){
 			QTextStream str(&file);
 
 			if(1 == QMessageBox::warning(this, "Import population",
@@ -460,7 +496,7 @@ void MT_PopulationWidget::slotLoadPop()
  ***/
 void MT_PopulationWidget::slotSavePop()
 {
-	QString fileName( QFileDialog::getSaveFileName(0, "Population Files (*.mpop);;All Files (*)", this) );
+	QString fileName( QFileDialog::getSaveFileName(this, QString(), QString(), "Population Files (*.mpop);;All Files (*)") );
 
 	if(!fileName.isEmpty()){
 		if(fileName.right(5) != ".mpop")
@@ -473,7 +509,7 @@ void MT_PopulationWidget::slotSavePop()
 				return;
 		}
 
-		if(file.open(IO_WriteOnly)){
+		if(file.open(QIODevice::WriteOnly)){
 			QTextStream str(&file);
 			population->writeToFilePop(str);
 			file.close();
@@ -486,14 +522,16 @@ void MT_PopulationWidget::slotSavePop()
 /***
  * collects all selected items
  ***/
-QList<MT_PopListViewItem> * MT_PopulationWidget::getSelectedItems()
+QList<MT_PopListViewItem *> * MT_PopulationWidget::getSelectedItems()
 {
-	QList<MT_PopListViewItem> *lst = new QList<MT_PopListViewItem>;
-	lst->setAutoDelete(false);
-	QListViewItemIterator it(individualListView);
-	for(; it.current(); ++it){
-		if(it.current()->isSelected())
-			lst->append((MT_PopListViewItem*)it.current());
+	// Qt 2's QPtrList held pointers and this one explicitly did NOT own them
+	// (setAutoDelete(false)); a Qt 6 QList of pointers never owns, so the flag
+	// has no counterpart and is dropped rather than translated.
+	QList<MT_PopListViewItem *> *lst = new QList<MT_PopListViewItem *>;
+	QTreeWidgetItemIterator it(individualListView);
+	for(; (*it); ++it){
+		if((*it)->isSelected())
+			lst->append((MT_PopListViewItem*)(*it));
 	}
 	return lst;
 }

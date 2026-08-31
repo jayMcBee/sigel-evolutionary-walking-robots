@@ -7,10 +7,10 @@
 #include "MT_GPSystem/MT_Population.h"
 #include "MT_GPSystem/MT_GPManager.h"
 
-#include <qaction.h>
-#include <qtoolbar.h>
-#include <qlistview.h>
-#include <qpopupmenu.h>
+#include <QAction>
+#include <QToolBar>
+#include <QTreeWidget>
+#include <QMenu>
 
 class MT_MainWindow;
 
@@ -22,12 +22,12 @@ public:
 	virtual bool onHide(MT_GPManager *manager, subst_cache *subst);
 	virtual void onShow(MT_GPManager *manager, subst_cache *subst);
 	void evolutionRunning(bool running);
-	MT_PopulationWidget(QMainWindow* parent=0, const char* name=0, WFlags fl=0);
+	MT_PopulationWidget(QMainWindow* parent=0, const char* name=0, Qt::WindowFlags fl = Qt::WindowFlags());
 	~MT_PopulationWidget();
 
 private:
 	int oldPopSize;
-	QPopupMenu *popContextMenu;
+	QMenu *popContextMenu;
 	QToolBar *popToolBar;
 	QAction	*addIndAction;
 	QAction	*delIndAction;
@@ -38,11 +38,11 @@ private:
 	MT_Population *population;
 	MT_GPManager  *gpManager;
 	MT_MainWindow *boss;
-	QList<MT_PopListViewItem>* getSelectedItems();
+	QList<MT_PopListViewItem *>* getSelectedItems();
 
 private slots:
-	void slotRButtonClicked(QListViewItem *item, const QPoint &point);
-	void slotCurrentChanged(QListViewItem *item);
+	void slotRButtonClicked(const QPoint &pos);
+	void slotCurrentChanged(QTreeWidgetItem *item);
 	void slotSelectionChanged();
 	void slotAddInd();
 	void slotDelInd();

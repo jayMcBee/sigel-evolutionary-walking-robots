@@ -4,14 +4,18 @@
 
 #include "MT_GUI/DoubleSpinBox.h"
 
+#include <QLineEdit>
 #include <cmath>
 
 //////////////////////////////////////////////////////////////////////
 // Konstruktion/Destruktion
 //////////////////////////////////////////////////////////////////////
 
-DISpinBox::DISpinBox(int decimals, QWidget *parent, const char *name) : QSpinBox(parent, name)
+DISpinBox::DISpinBox(int decimals, QWidget *parent, const char *name) : QSpinBox(parent)
 {
+	if ( name )
+		setObjectName( QString::fromUtf8( name ) );
+
 	typ = -1;
 	precision = 0;
 	dValidator = 0;
@@ -25,16 +29,19 @@ DISpinBox::DISpinBox(int decimals, QWidget *parent, const char *name) : QSpinBox
 		typ = DBLTYP;
 		precision = pow(10, decimals);
 		dValidator->setRange(0.0, 100.0, decimals);
-		setValidator(dValidator);
+		// Qt 2's QSpinBox::setValidator forwarded to its internal QLineEdit
+		// (qspinbox.cpp:680). Qt 6 has no such method, so the line edit is
+		// addressed directly -- which is the same object Qt 2 reached.
+		lineEdit()->setValidator(dValidator);
 		setRange(0, dValidator->top() * precision);
-		setLineStep(10);
+		setSingleStep(10);
 	} else {				// create an IntSpinBox
 		typ = INTTYP;
 		precision = 1;
 		iValidator->setRange(0, 100);
-		setValidator(iValidator);
+		lineEdit()->setValidator(iValidator);
 		setRange(0, iValidator->top());
-		setLineStep(1);
+		setSingleStep(1);
 	}
 }
 
@@ -44,20 +51,20 @@ DISpinBox::~DISpinBox()
 	delete iValidator;
 }
 
-int DISpinBox::mapTextToValue(bool *ok)
+int DISpinBox::valueFromText(const QString &t) const
 {
 	if(typ == INTTYP)
-		return int(text().toInt());
+		return int(t.toInt());
 	else 
-		return int(text().toDouble()*precision);
+		return int(t.toDouble()*precision);
 }
 
-QString DISpinBox::mapValueToText(int value)
+QString DISpinBox::textFromValue(int value) const
 {
 	if(typ == INTTYP)
 		return QString("%1").arg(value);
 	else
-		return QString::number(value/precision).append(".").append(QString::number(value%precision).rightJustify(iDecimals, '0'));
+		return QString::number(value/precision).append(".").append(QString::number(value%precision).rightJustified(iDecimals, '0'));
 }
 
 
@@ -86,9 +93,9 @@ void DISpinBox::setRange(int minVal, int maxVal)
 	typ = INTTYP;
 	precision = 1;
 
-	setLineStep(1);
+	setSingleStep(1);
 	iValidator->setRange(minVal, maxVal);
-	setValidator(iValidator);
+	lineEdit()->setValidator(iValidator);
 	QSpinBox::setRange(minVal, maxVal);
 }
 
@@ -98,9 +105,9 @@ void DISpinBox::setRange(int decimals, double minVal, double maxVal)
 	iDecimals = decimals;
 	precision = pow(10, decimals);
 
-	setLineStep(10);
+	setSingleStep(10);
 	dValidator->setRange(minVal, maxVal, decimals);
-	setValidator(dValidator);
+	lineEdit()->setValidator(dValidator);
 	QSpinBox::setRange(minVal, (int)(maxVal * precision));
 }
 

@@ -2,11 +2,11 @@
 #include "MT_GPSystem/MT_Statistics.h"
 
 #include <math.h>
-#include <qslider.h>
-#include <qmessagebox.h>
-#include <qfiledialog.h>
+#include <QSlider>
+#include <QMessageBox>
+#include <QFileDialog>
 
-MT_StatisticsWidget::MT_StatisticsWidget(QMainWindow* parent, const char* name, WFlags fl)
+MT_StatisticsWidget::MT_StatisticsWidget(QMainWindow* parent, const char* name, Qt::WindowFlags fl)
 : MT_StatisticsWidgetBase(parent, name, fl), MT_WidgetBase(parent)
 {
 	soFarSigIdx = totalSim = totalEst = 0;
@@ -24,15 +24,19 @@ MT_StatisticsWidget::MT_StatisticsWidget(QMainWindow* parent, const char* name, 
 #endif
 	pixPath.append("/pixmaps/");
 
-	updateAction = new QAction("update statistics",
-							QIconSet( QPixmap(pixPath+"mt_UpdateSmall.xpm"), QPixmap(pixPath+"mt_UpdateSmall.xpm") ),
-							"update statistics",
-							0, this);
-	updateAction->addTo(statToolbar);
-	QObject::connect(updateAction, SIGNAL(activated()), SLOT(slotUpdateGUI()));
+	QIcon icon_updateAction(QPixmap(pixPath+"mt_UpdateSmall.xpm"));
+	icon_updateAction.addPixmap(QPixmap(pixPath+"mt_UpdateSmall.xpm"));
+	updateAction = new QAction(icon_updateAction, "update statistics", this);
+	updateAction->setToolTip("update statistics");
+	statToolbar->addAction(updateAction);
+	QObject::connect(updateAction, SIGNAL(triggered()), SLOT(slotUpdateGUI()));
 
 	autoUpdateCheckBox = new QCheckBox("auto update every ", statToolbar);
-	intervalSpinBox = new QSpinBox(10, 6000, 10, statToolbar);
+	// Qt 2: QSpinBox(minValue, maxValue, step, parent). Qt 6 takes the parent
+	// only; range and step are set afterwards.
+	intervalSpinBox = new QSpinBox(statToolbar);
+	intervalSpinBox->setRange(10, 6000);
+	intervalSpinBox->setSingleStep(10);
 	intervalLabel = new QLabel(" sec.", statToolbar);
 	updateTimer = new QTimer(this);
 	QObject::connect(autoUpdateCheckBox, SIGNAL(toggled(bool)), SLOT(slotAutoUpdateChanged(bool)));
@@ -306,7 +310,7 @@ void MT_StatisticsWidget::slotEstGButton()
 		QMessageBox::information(this, "View graph", "There's not enough data to plot a graph.", 1);
 		return;
 	}
-	plotEstimation(QString::null);
+	plotEstimation(QString());
 }
 
 void MT_StatisticsWidget::slotFitnessGButton()
@@ -320,7 +324,7 @@ void MT_StatisticsWidget::slotFitnessGButton()
 		QMessageBox::information(this, "View graph", "There's not enough data to plot a graph.", 1);
 		return;
 	}
-	plotFitness(QString::null);
+	plotFitness(QString());
 }
 
 void MT_StatisticsWidget::slotSearchEffectsGButton()
@@ -334,7 +338,7 @@ void MT_StatisticsWidget::slotSearchEffectsGButton()
 		QMessageBox::information(this, "View graph", "There's not enough data to plot a graph.", 1);
 		return;
 	}
-	plotSearchEffects(QString::null);
+	plotSearchEffects(QString());
 }
 
 /***
@@ -346,9 +350,8 @@ void MT_StatisticsWidget::slotEstDButton()
 		QMessageBox::information(this, "View graph", "There's not enough data to plot a graph.", 1);
 		return;
 	}
-	QString fileName = QFileDialog::getSaveFileName( QString::null,
-						   "gnuplot data files (*.dat);;All files (*)",
-						   this );
+	QString fileName = QFileDialog::getSaveFileName( this, QString(), QString(),
+						   "gnuplot data files (*.dat);;All files (*)" );
 	if(fileName.isNull())
 		return;
 	if(fileName.right(4) != ".dat")
@@ -361,7 +364,7 @@ void MT_StatisticsWidget::slotEstDButton()
 			return;
 	}
 
-	file.open(IO_WriteOnly);
+	file.open(QIODevice::WriteOnly);
 	QTextStream pipeStream(&file);
 
 	// write data
@@ -386,9 +389,8 @@ void MT_StatisticsWidget::slotFitnessDButton()
 		QMessageBox::information(this, "View graph", "There's not enough data to plot a graph.", 1);
 		return;
 	}
-	QString fileName = QFileDialog::getSaveFileName( QString::null,
-						   "gnuplot data files (*.dat);;All files (*)",
-						   this );
+	QString fileName = QFileDialog::getSaveFileName( this, QString(), QString(),
+						   "gnuplot data files (*.dat);;All files (*)" );
 	if(fileName.isNull())
 		return;
 	if(fileName.right(4) != ".dat")
@@ -401,7 +403,7 @@ void MT_StatisticsWidget::slotFitnessDButton()
 			return;
 	}
 
-	file.open(IO_WriteOnly);
+	file.open(QIODevice::WriteOnly);
 	QTextStream pipeStream(&file);
 
 	// write data
@@ -429,9 +431,8 @@ void MT_StatisticsWidget::slotSearchEffectsDButton()
 		QMessageBox::information(this, "View graph", "There's not enough data to plot a graph.", 1);
 		return;
 	}
-	QString fileName = QFileDialog::getSaveFileName( QString::null,
-						   "gnuplot data files (*.dat);;All files (*)",
-						   this );
+	QString fileName = QFileDialog::getSaveFileName( this, QString(), QString(),
+						   "gnuplot data files (*.dat);;All files (*)" );
 	if(fileName.isNull())
 		return;
 	if(fileName.right(4) != ".dat")
@@ -444,7 +445,7 @@ void MT_StatisticsWidget::slotSearchEffectsDButton()
 			return;
 	}
 
-	file.open(IO_WriteOnly);
+	file.open(QIODevice::WriteOnly);
 	QTextStream pipeStream(&file);
 
 	// write data
@@ -480,9 +481,8 @@ void MT_StatisticsWidget::slotEstPSExport()
 		QMessageBox::information(this, "View graph", "There's not enough data to plot a graph.", 1);
 		return;
 	}
-	QString fileName = QFileDialog::getSaveFileName( QString::null,
-						   "Encapsulated postscript files (*.eps);;All files (*)",
-						   this );
+	QString fileName = QFileDialog::getSaveFileName( this, QString(), QString(),
+						   "Encapsulated postscript files (*.eps);;All files (*)" );
 	if(fileName.isNull())
 		return;
 	if(fileName.right(4) != ".eps")
@@ -509,9 +509,8 @@ void MT_StatisticsWidget::slotFitnessPSExport()
 		QMessageBox::information(this, "View graph", "There's not enough data to plot a graph.", 1);
 		return;
 	}
-	QString fileName = QFileDialog::getSaveFileName( QString::null,
-						   "Encapsulated postscript files (*.eps);;All files (*)",
-						   this );
+	QString fileName = QFileDialog::getSaveFileName( this, QString(), QString(),
+						   "Encapsulated postscript files (*.eps);;All files (*)" );
 	if(fileName.isNull())
 		return;
 	if(fileName.right(4) != ".eps")
@@ -538,9 +537,8 @@ void MT_StatisticsWidget::slotSearchEffectsPSExport()
 		QMessageBox::information(this, "View graph", "There's not enough data to plot a graph.", 1);
 		return;
 	}
-	QString fileName = QFileDialog::getSaveFileName( QString::null,
-						   "Encapsulated postscript files (*.eps);;All files (*)",
-						   this );
+	QString fileName = QFileDialog::getSaveFileName( this, QString(), QString(),
+						   "Encapsulated postscript files (*.eps);;All files (*)" );
 	if(fileName.isNull())
 		return;
 	if(fileName.right(4) != ".eps")
@@ -566,7 +564,7 @@ void MT_StatisticsWidget::plotEstimation(QString fileName)
 	gnuCmdLine.append("\\tmpFStat.plt");
 
 	QFile pipeFile(gnuCmdLine);
-	pipeFile.open(IO_WriteOnly);
+	pipeFile.open(QIODevice::WriteOnly);
 #else
 	FILE *gnuPlotPipe = popen( "gnuplot -persist -", "w");
 	if(!gnuPlotPipe){
@@ -575,7 +573,7 @@ void MT_StatisticsWidget::plotEstimation(QString fileName)
 	}
 
 	QFile pipeFile;
-	pipeFile.open( IO_WriteOnly, gnuPlotPipe );
+	pipeFile.open(gnuPlotPipe, QIODevice::WriteOnly);
 #endif
 	QTextStream pipeStream(&pipeFile);
 
@@ -621,7 +619,7 @@ void MT_StatisticsWidget::plotFitness(QString fileName)
 	gnuCmdLine.append("\\tmpFStat.plt");
 
 	QFile pipeFile(gnuCmdLine);
-	pipeFile.open(IO_WriteOnly);
+	pipeFile.open(QIODevice::WriteOnly);
 #else
 	FILE *gnuPlotPipe = popen( "gnuplot -persist -", "w");
 	if(!gnuPlotPipe){
@@ -630,7 +628,7 @@ void MT_StatisticsWidget::plotFitness(QString fileName)
 	}
 
 	QFile pipeFile;
-	pipeFile.open( IO_WriteOnly, gnuPlotPipe );
+	pipeFile.open(gnuPlotPipe, QIODevice::WriteOnly);
 #endif
 	QTextStream pipeStream(&pipeFile);
 
@@ -684,7 +682,7 @@ void MT_StatisticsWidget::plotSearchEffects(QString fileName)
 	gnuCmdLine.append("\\tmpFStat.plt");
 
 	QFile pipeFile(gnuCmdLine);
-	pipeFile.open(IO_WriteOnly);
+	pipeFile.open(QIODevice::WriteOnly);
 #else
 	FILE *gnuPlotPipe = popen( "gnuplot -persist -", "w");
 	if(!gnuPlotPipe){
@@ -693,7 +691,7 @@ void MT_StatisticsWidget::plotSearchEffects(QString fileName)
 	}
 
 	QFile pipeFile;
-	pipeFile.open( IO_WriteOnly, gnuPlotPipe );
+	pipeFile.open(gnuPlotPipe, QIODevice::WriteOnly);
 #endif
 	QTextStream pipeStream(&pipeFile);
 
@@ -731,7 +729,12 @@ void MT_StatisticsWidget::plotSearchEffects(QString fileName)
 	pipeStream << "e\n";
 
 	int total=0;
-	for(int l=0; l<metaGens; l++){
+	// PRE-STANDARD for-SCOPING, PRESERVED. `l' outlived this loop in 2003 and
+	// the two loops further down print it instead of their own index, so
+	// gnuplot datasets 2 and 3 get a constant x of metaGens rather than the
+	// generation number. That is a defect and it is reproduced, not fixed.
+	int l;
+	for(l=0; l<metaGens; l++){
 		el = stat->getStatisticElement(l);
 		if(el){
 			total = el->CrossoverEventParent[0];

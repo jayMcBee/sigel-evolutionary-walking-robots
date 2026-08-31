@@ -4,15 +4,15 @@
 #include "MT_GUI/MT_SelectionWidgetBase.h"
 #include "MT_GUI/MT_WidgetBase.h"
 
-#include <qmap.h>
-#include <qstring.h>
+#include <QMap>
+#include <QString>
 
 class MT_SelectionWidget : public MT_SelectionWidgetBase, public MT_WidgetBase
 {
 	Q_OBJECT
 
 public:
-	MT_SelectionWidget(QWidget* parent=0, const char* name=0, WFlags fl=0);
+	MT_SelectionWidget(QWidget* parent=0, const char* name=0, Qt::WindowFlags fl = Qt::WindowFlags());
 	~MT_SelectionWidget();
 
 	void evolutionRunning(bool running);

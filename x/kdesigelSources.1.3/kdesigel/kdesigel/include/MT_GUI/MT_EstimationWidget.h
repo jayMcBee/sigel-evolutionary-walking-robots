@@ -10,7 +10,7 @@ class MT_EstimationWidget : public MT_EstimationWidgetBase, public MT_WidgetBase
 	Q_OBJECT
 
 public:
-	MT_EstimationWidget(QWidget* parent=0, const char* name=0, WFlags fl=0 );
+	MT_EstimationWidget(QWidget* parent=0, const char* name=0, Qt::WindowFlags fl = Qt::WindowFlags() );
 	~MT_EstimationWidget();
 
 	void evolutionRunning(bool running);

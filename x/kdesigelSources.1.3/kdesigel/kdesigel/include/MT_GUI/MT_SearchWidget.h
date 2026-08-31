@@ -5,14 +5,14 @@
 #include "MT_GUI/MT_WidgetBase.h"
 #include "MT_GUI/DoubleSpinBox.h"
 
-#include <qvalidator.h>
+#include <QValidator>
 
 class MT_SearchWidget : public MT_SearchWidgetBase, public MT_WidgetBase
 {
 	Q_OBJECT
 
 public:
-	MT_SearchWidget(QWidget* parent=0, const char* name=0, WFlags fl=0);
+	MT_SearchWidget(QWidget* parent=0, const char* name=0, Qt::WindowFlags fl = Qt::WindowFlags());
 	~MT_SearchWidget();
 
 	void onShow(MT_GPManager *manager, subst_cache *subst);

@@ -307,8 +307,8 @@ recorded only in its no-argument form, and Qt 2's `QListView` declared a
 `selectionChanged(QListViewItem*)` overload too. *The two errors cancelled in
 the total, which is why the pristine count did not move.*
 
-**100 in the pristine tree; C4 repaired 10; 90 remain — 44 in
-`SIGEL_MasterGUI` (C7), 31 in `MT_GUI` (C6), 15 in `MT_Control` (C8)**, and
+**100 in the pristine tree; C4 repaired 10 and C6 repaired 31; 59 remain — 44
+in `SIGEL_MasterGUI` (C7) and 15 in `MT_Control` (C8)**, and
 zero in the **eleven other** modules `check.sh` compiles. *`MT_Control` is one
 of the twelve it compiles, so "zero everywhere it looks" was false; its 15 are
 carried as a baseline until C8.* Of the 100, **83 are `connect()` and 17 are
@@ -519,8 +519,8 @@ through `f0f2daa`.
 
 ## 7. Steps
 
-**Exit criterion per step:** `./check.sh` at the repo root — **393 pass, 5 fail,
-355 warnings** as of 2026-08-31, C4.
+**Exit criterion per step:** `./check.sh` at the repo root — **772 pass, 5 fail,
+441 warnings** as of 2026-08-31, C6.
 
 **The pass/fail basis changed at C4 and earlier figures are not comparable.**
 The standalone header pass had always been reported and never added to the
@@ -817,7 +817,7 @@ succeeded.**
 **Gates any session must keep green**, all committed:
 
 ```
-./check.sh                                            393 pass, 5 fail
+./check.sh                                            772 pass, 5 fail
 ./dictorder-dump.sh | diff -u dictorder-baseline.txt -    empty
 ./fitness-check.sh  | diff -u fitness-baseline.txt -      empty
 ASAN_OPTIONS=detect_leaks=0 ./fitness-check.sh build      exit 0
@@ -1703,7 +1703,7 @@ modules include the headers `uic` generates from them.
 | C3 | **DONE 2026-08-30.** `SIGEL_CommonGUI` — the `QGLWidget` → `QOpenGLWidget` step; all 6 sites are here, 2 in code. In `check.sh` | 665 LOC, 2 sources |
 | C4 | **DONE 2026-08-31.** `SIGEL_SlaveGUI` — the toolbar, the movie path, and ten connects to signals Qt 6 does not have. Unblocks the last form | 2,344 LOC, 7 sources |
 | C5 | **DONE 2026-08-30, done FIRST — it is the dependency root.** `SIGEL_Visualisation`, 23 Qt 2 sites, 12/12 sources and headers compile, in `check.sh` | 3,564 LOC, 12 sources |
-| C6 | `MT_GUI` — **31 dead connects** (§2) and **9 prepending item sites** (§9), six of them ordering the MetaGP page list | 3,911 LOC, 14 files |
+| C6 | **DONE 2026-08-31.** `MT_GUI` — 31 dead connects, the prepending page list, and a right-click that cleared the selection | 4,513 LOC, 23 sources |
 | C7 | `SIGEL_MasterGUI` — **44 dead connects** (§2) and **28 prepending item sites** (§9) | 7,717 LOC, 20 files |
 | C8 | `sigel.cpp`, `sigel_slave.cpp`; **`MT_Control`'s 15 dead connects** (§2) | 15 sites |
 | C9 | All five modules and both programs build, link and run | — |
@@ -2557,6 +2557,122 @@ parses but no gate opens is covered by nothing. `check.sh` now builds and runs a
 faithful one. *Written because a defect of exactly that shape was found in
 `SIGEL_GP` — see §9 — in a module converted long ago and green throughout.*
 
+
+
+#### C6 — `MT_GUI`: the MetaGP window, and a right-click that cleared the selection
+
+23 sources and 23 headers, 4,513 lines. *§7 said "3,911 LOC, 14 files", which
+counted neither the headers nor the eight form bases.* All 23 compile; 31 dead
+connects repaired; **71 warnings**, all pre-existing 2003 shapes.
+
+**The prepend trap is real here and the running 1.3 settles it.**
+`MT_ExperimentWidget` calls `setSorting(-1)`, builds its six pages **5 → 0**, and
+then `setCurrentItem(firstChild())`. Qt 2's `QListViewItem(QListView*)`
+prepends, so 1.3 draws **Strategy** first and selects it; an appending
+`QTreeWidgetItem` port would draw *and select* **Statistics** — a different
+startup page. The x86 box confirms the MetaGP list reads
+`Strategy, Individual, Population, GP Parameter, Selection, Statistics`.
+Both item subclasses now insert at 0 explicitly rather than passing the parent
+to the base constructor.
+
+**`individualListView->insertItem( new MT_PopListViewItem(view, ind) )` is a
+double insertion that Qt 2 silently absorbed.** The constructor already
+inserted; `QListViewItem::insertItem` returns early when
+`newChild->parentItem == this` (`qlistview.cpp:579`). So it prepends once. Qt 6
+has no `QTreeWidget::insertItem` at all and the outer call is simply dropped.
+*The x86 box corroborates from the other end: the population list shows each
+individual exactly once.*
+
+**THE FINDING OF THIS STEP: `rightButtonClicked` did two things, and only one of
+them is obvious.** Qt 2 emitted it with a **global** position
+(`viewport()->mapToGlobal`, `qlistview.cpp:3396`) — Qt 6's
+`customContextMenuRequested` gives viewport coordinates. That much any porting
+guide covers. What it does not: **when the click missed an item, Qt 2 called
+`clearSelection()` first** (`qlistview.cpp:3390`). That is why 1.3 greys out
+`Delete` on blank space — clearing fires `selectionChanged`, which runs
+`slotSelectionChanged`, which disables the action. Qt 6 does neither, so a
+like-for-like port leaves `Delete` live on empty space.
+
+**I would not have looked for it.** The x86 box reported the menu contents
+unprompted: on a row all four of `Add · Delete · Import · Export` are enabled;
+on blank space `Delete` is greyed and the other three are not. My own prediction
+had been that `Export` would grey too, and that was wrong. Both sites now clear
+the selection explicitly when `itemAt()` misses.
+
+**`QButtonGroup` was a widget in Qt 2 and is not in Qt 6, and the form
+conversion silently dropped half of it.** Qt 2's `QButtonGroup` was a
+`QGroupBox` that *also* managed its buttons and their ids; `uic` emits only the
+`QGroupBox`, so `find(id)` and `clicked(int)` had nothing left to talk to. The
+logical half is rebuilt in `MT_AddConstantsWidget`. Exclusivity is preserved
+without a flag: Qt 2's `QButtonGroup::init` sets `radio_excl = TRUE`
+(`qbuttongroup.cpp:167`) and Qt 6's `QButtonGroup` defaults `exclusive` to true.
+*The box confirms `integer` is the button selected on open — read behaviourally,
+by generating and seeing no decimal points, because the two radio diamonds
+differ by a few pixels of shading.*
+
+**The last of the 31 was invisible to the gate because my own conversion had
+renamed it.** `$DEAD_SIGNALS` keys on Qt 2 type names, and the module-wide
+`QListViewItem` → `QTreeWidgetItem` rename ran first, so
+`selectionChanged(QListViewItem*)` became a spelling the pattern did not match
+and the count silently fell from 31 to 30. The regex now accepts both
+spellings, and the self-test grew rows for the renamed forms. *A gate that
+watches for Qt 2 names stops watching the moment a step succeeds at removing
+them.*
+
+**C1/C2 dropped two named layouts, and nothing could see it until now.** The
+pristine `.ui` files name `Layout44` and `Layout61`; the converted ones name no
+layout at all, so `uic` stopped emitting them as members and
+`MT_SearchWidget`/`MT_EstimationWidget` — which add widgets to them from code —
+would not compile. **The generated header compiles perfectly either way**, which
+is exactly why the forms section passed them: only a *user* of the member
+breaks. Both names restored in the `.ui`.
+
+| other Qt 2 API | Qt 6 |
+|---|---|
+| `QAction(text, iconset, menuText, accel, parent[, name, toggle])` ×16 | `QAction(icon, menuText, parent)` + `setToolTip(text)` + `setShortcut` + `setCheckable`. **`menuText` is what becomes `text()`** — the box's `Add · Delete · Import · Export` are the menu texts, not the `text` arguments |
+| `QIconSet(smallPix, largePix)` ×14 | `QIcon(small)` + `addPixmap(large)` |
+| `action->addTo(menu/toolbar)` ×24 | `menu->addAction(action)` |
+| `QListView`/`QListViewItem` ×31, `QListBox` ×10 | `QTreeWidget`/`QTreeWidgetItem`, `QListWidget` |
+| `QPopupMenu` ×6, `QWidgetStack` ×2, `QMultiLineEdit` | `QMenu`, `QStackedWidget`, `QTextEdit` |
+| `QListBox::currentItem()` | `currentRow()` — Qt 2 returned an **index**, Qt 6 returns the item |
+| `QProgressDialog(label, cancel, totalSteps, creator, name, modal)` ×4 | `(label, cancel, minimum, maximum, parent)` + `setWindowModality`. **The third argument changed meaning**; `cancel` was `0` in 1.3, so there is no Cancel button |
+| `QSpinBox(min, max, step, parent)` ×4 | `(parent)` + `setRange` + `setSingleStep` |
+| `QFileDialog::getSaveFileName(initially, filter, parent)` ×7 | `(parent, caption, dir, filter)` — every argument survives but the widget `name` |
+| `QFile::open(mode, FILE*)` ×3 | `open(FILE*, mode)` |
+| `QObject::child(name, "QLineEdit")` ×6 | `findChild<QLineEdit*>(name)` |
+| `QTimer::start(msec, singleShot)` ×2 | `setSingleShot` + `start(msec)` |
+| `QMenuBar::insertItem(text, popup)` | `popup->setTitle(text)` + `addMenu(popup)` |
+| `setMargin(n)` ×3 | `setContentsMargins(n, n, n, n)` |
+| `WType_TopLevel \| WType_Modal` | `Qt::Dialog` — the same 0x3 |
+| `QSpinBox::mapValueToText`/`mapTextToValue` | `textFromValue`/`valueFromText`, **both `const`** |
+| `QSpinBox::setValidator` | no equivalent; Qt 2's forwarded to its internal `QLineEdit` (`qspinbox.cpp:680`), so `lineEdit()->setValidator` reaches the same object |
+
+**Three 2003 defects preserved, not fixed.**
+`MT_StatisticsWidget`'s gnuplot export declares `l` in one `for` and reads it in
+two later ones — pre-standard scoping, so datasets 2 and 3 get a constant x of
+`metaGens` instead of the generation number. `MT_PopulationWidget`'s
+save-individuals loop calls `list->current()` without ever advancing the
+`QPtrList` cursor, which `append()` left on the **last** selected item, so it
+writes that same individual into every one of the N files; `list->last()`
+reproduces it exactly. And `MT_ExperimentItem` took a **non-const** `QPixmap&`
+bound to a temporary at all six call sites — a 2003 GCC extension that modern
+GCC rejects, so `const` is the minimum that compiles and it changes nothing.
+
+**Two things the box could not reach, recorded as open rather than guessed.**
+The progress dialogs never appear: constant generation is capped at 99 and
+completes faster than `QProgressDialog`'s minimum-duration, and the evolution
+toolbar is greyed without a running SIGEL. So the Cancel-button and modality
+claims above are read from the Qt 2 signature, not observed. *The 99 cap is not
+a divergence: the form sets no maximum and **both** Qt 2 and Qt 6 default
+`QSpinBox` maximum to 99.* And exclusivity of the two radios could not be tested
+— clicking either produced no pixel change under synthetic input, which the box
+correctly reported as an instrument limitation rather than a finding.
+
+**Gates: `./check.sh` 772 pass, 5 fail, 441 warnings.** Warnings 355 → 441: all
+86 are `MT_GUI`'s 71 plus 15 that `MT_Control` gains from now including
+converted `MT_GUI` headers. Headers 155/1, forms 101/0, parsers 1/0, regex
+self-test 39/0, dead signals 0 against a baseline that C6 lowered from 31 to 0.
+All three behaviour baselines byte-identical.
 
 ---
 

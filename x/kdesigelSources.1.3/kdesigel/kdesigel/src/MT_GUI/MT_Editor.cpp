@@ -4,10 +4,15 @@
 
 #include "MT_GUI/MT_Editor.h"
 
-#include <qapplication.h>
+#include <QApplication>
+#include <QKeyEvent>
+#include <QMouseEvent>
+#include <QHideEvent>
+#include <QFocusEvent>
 
-MT_Editor::MT_Editor(QWidget *parent) : QLineEdit(parent, "MT_Editor")
+MT_Editor::MT_Editor(QWidget *parent) : QLineEdit(parent)
 {
+	setObjectName( QString::fromUtf8( "MT_Editor" ) );
 	setFrame(false);
 	hide();
 }
@@ -51,11 +56,11 @@ void MT_Editor::mousePressEvent(QMouseEvent *event)
 void MT_Editor::keyPressEvent(QKeyEvent *event)
 {
 	switch(event->key()){
-	case Key_Escape: 
+	case Qt::Key_Escape: 
 		hide();
 		break;
-	case Key_Enter: 
-	case Key_Return: 
+	case Qt::Key_Enter: 
+	case Qt::Key_Return: 
 		acceptChange = true;
 		hide();
 		break;

@@ -1,11 +1,12 @@
-#include <qmainwindow.h>
-#include <qsplitter.h>
-#include <qwidgetstack.h>
-#include <qtoolbar.h>
-#include <qpopupmenu.h>
-#include <qaction.h>
-#include <qlabel.h>
-#include <qtimer.h>
+#include <QMainWindow>
+#include <QCloseEvent>
+#include <QSplitter>
+#include <QStackedWidget>
+#include <QToolBar>
+#include <QMenu>
+#include <QAction>
+#include <QLabel>
+#include <QTimer>
 
 #include "MT_GUI/MT_ExperimentWidget.h"
 #include "MT_GUI/MT_EstimationWidget.h"
@@ -29,7 +30,7 @@ class MT_MainWindow : public QMainWindow
 	friend class MT_Controller;
 
 public:
-	MT_MainWindow(MT_Controller *controller, MT_GPManager *manager, subst_cache *substCache, QWidget * parent = 0, const char * name = 0, WFlags f = WType_TopLevel | WType_Modal );
+	MT_MainWindow(MT_Controller *controller, MT_GPManager *manager, subst_cache *substCache, QWidget * parent = 0, const char * name = 0, Qt::WindowFlags f = Qt::Dialog );
 	~MT_MainWindow();
 
 	MT_GPManager* getManager();
@@ -37,7 +38,7 @@ public:
 	int calculateTournSize(int pSize, int oSize, int oTSize);
 
 public slots:
-	void slotRaiseWidget(QListViewItem *item);
+	void slotRaiseWidget(QTreeWidgetItem *item);
 	void slotEvolutionStatus(bool running);
 
 private slots:
@@ -50,7 +51,7 @@ private:
 	MT_WidgetBase* widgets[6];
 	int actWidgetID;
 	QSplitter	*splitter;
-	QWidgetStack	*widgetStack;
+	QStackedWidget	*widgetStack;
 	MT_SearchWidget		*searchWidget;
 	MT_SelectionWidget	*selectionWidget;
 	MT_ExperimentWidget	*experimentWidget;
@@ -61,7 +62,7 @@ private:
 	MT_Controller *boss;
 
 	QToolBar	*mainToolBar;
-	QPopupMenu	*fileMenu;
+	QMenu	*fileMenu;
 	QAction	*mtExitAction;
 	QAction *mtSaveAction;
 	QAction *mtLoadAction;

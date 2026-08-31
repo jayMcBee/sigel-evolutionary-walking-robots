@@ -1,13 +1,13 @@
 #include "MT_GUI/MT_SearchWidget.h"
 #include "MT_GPSystem/MT_Randomizer.h"
 
-#include <qslider.h>
-#include <qlineedit.h>
-#include <qspinbox.h>
-#include <qlcdnumber.h>
-#include <qlayout.h>
+#include <QSlider>
+#include <QLineEdit>
+#include <QSpinBox>
+#include <QLCDNumber>
+#include <QLayout>
 
-MT_SearchWidget::MT_SearchWidget(QWidget* parent, const char* name, WFlags fl)
+MT_SearchWidget::MT_SearchWidget(QWidget* parent, const char* name, Qt::WindowFlags fl)
 : MT_SearchWidgetBase(parent, name, fl), MT_WidgetBase(parent)
 {
     powerSpinBox = new DISpinBox( 1, (QWidget*)GroupBox12, "powerSpinBox" );
@@ -56,9 +56,9 @@ void MT_SearchWidget::evolutionRunning(bool running)
  ***/
 void MT_SearchWidget::onShow(MT_GPManager *manager, subst_cache *subst)
 {
-	QArray<double> *probMutPow   = 0;
-	QArray<double> *probSearchOp = 0;
-	QArray<double> *probXPoints  = 0;
+	QList<double> *probMutPow   = 0;
+	QList<double> *probSearchOp = 0;
+	QList<double> *probXPoints  = 0;
 
 	manager->getRandomizer()->returnSearchValue(&probMutPow, &probSearchOp, &probXPoints);
 
@@ -83,25 +83,25 @@ void MT_SearchWidget::onShow(MT_GPManager *manager, subst_cache *subst)
  ***/
 bool MT_SearchWidget::onHide(MT_GPManager *manager, subst_cache *subst)
 {
-	QArray<double> *probMutPow   = 0;
-	QArray<double> *probSearchOp = 0;
-	QArray<double> *probXPoints  = 0;
+	QList<double> *probMutPow   = 0;
+	QList<double> *probSearchOp = 0;
+	QList<double> *probXPoints  = 0;
 
 	manager->getRandomizer()->returnSearchValue(&probMutPow, &probSearchOp, &probXPoints);
 
 	// set the search operator probabilities
-	probSearchOp->at(0) = xOverProbSlider->value();
-	probSearchOp->at(1) = mutProbSlider->value()   + probSearchOp->at(0);
-	probSearchOp->at(2) = reproProbSlider->value() + probSearchOp->at(1);
+	(*probSearchOp)[0] = xOverProbSlider->value();
+	(*probSearchOp)[1] = mutProbSlider->value()   + probSearchOp->at(0);
+	(*probSearchOp)[2] = reproProbSlider->value() + probSearchOp->at(1);
 
 	// set the crossover probabilities
-	probMutPow->at(0) = lineProbSpinBox->value();
-	probMutPow->at(1) = powerSpinBox->value();
+	(*probMutPow)[0] = lineProbSpinBox->value();
+	(*probMutPow)[1] = powerSpinBox->value();
 
 	// set the crossover probabilities
-	probXPoints->at(0) = pt1XOverProbSlider->value();
-	probXPoints->at(1) = pt2XOverProbSlider->value() + probXPoints->at(0);
-	probXPoints->at(2) = pt3XOverProbSlider->value() + probXPoints->at(1);
+	(*probXPoints)[0] = pt1XOverProbSlider->value();
+	(*probXPoints)[1] = pt2XOverProbSlider->value() + probXPoints->at(0);
+	(*probXPoints)[2] = pt3XOverProbSlider->value() + probXPoints->at(1);
 
 	return true;
 }

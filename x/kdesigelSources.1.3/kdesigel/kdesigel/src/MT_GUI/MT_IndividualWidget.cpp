@@ -2,22 +2,22 @@
 #include "MT_GUI/MT_AddConstantsWidget.h"
 #include "MT_GPSystem/MT_Randomizer.h"
 
-#include <qslider.h>
-#include <qspinbox.h>
-#include <qlineedit.h>
-#include <qlistbox.h>
-#include <qprogressdialog.h>
-#include <qfiledialog.h>
-#include <qmessagebox.h>
-#include <qtextstream.h>
-#include <qlcdnumber.h>
-#include <qstringlist.h>
+#include <QSlider>
+#include <QSpinBox>
+#include <QLineEdit>
+#include <QListWidget>
+#include <QProgressDialog>
+#include <QFileDialog>
+#include <QMessageBox>
+#include <QTextStream>
+#include <QLCDNumber>
+#include <QStringList>
 
 /********************************
  *       general methods 
  ********************************/
 
-MT_IndividualsWidget::MT_IndividualsWidget(QWidget* parent, const char* name, WFlags fl)
+MT_IndividualsWidget::MT_IndividualsWidget(QWidget* parent, const char* name, Qt::WindowFlags fl)
 	: MT_IndividualsWidgetBase(parent, name, fl), MT_WidgetBase(parent)
 {
 	minValue = -10000.0;
@@ -26,7 +26,7 @@ MT_IndividualsWidget::MT_IndividualsWidget(QWidget* parent, const char* name, WF
 	numToCreate = 0;
 
 	// limit the lineEdit's allowed values to that of the sliders
-	validator = new QIntValidator(slider01->minValue(), slider01->maxValue(), this);
+	validator = new QIntValidator(slider01->minimum(), slider01->maximum(), this);
 	edit01->setValidator(validator);
 	edit02->setValidator(validator);
 	edit03->setValidator(validator);
@@ -87,25 +87,29 @@ MT_IndividualsWidget::MT_IndividualsWidget(QWidget* parent, const char* name, WF
 	connect(edit18, SIGNAL(textChanged(const QString&)), SLOT(slotChangeSlider(const QString&)));
 
 	// create context menu
-	constContextMenu = new QPopupMenu(this, "mtConstContextMenu");
-	delConstAction = new QAction("Delete Constant", "&Delete", 0, this);
+	constContextMenu = new QMenu(this);
+	constContextMenu->setObjectName("mtConstContextMenu");
+	delConstAction = new QAction("&Delete", this);
+	delConstAction->setToolTip("Delete Constant");
 	delConstAction->setStatusTip("Deletes the selected constants.");
 	delConstAction->setEnabled(false);
-	delConstAction->addTo(constContextMenu);
+	constContextMenu->addAction(delConstAction);
 
-	editConstAction = new QAction("Edit Constant", "&Edit", 0, this);
+	editConstAction = new QAction("&Edit", this);
+	editConstAction->setToolTip("Edit Constant");
 	editConstAction->setStatusTip("Edits the current constant.");
 	editConstAction->setEnabled(false);
-	editConstAction->addTo(constContextMenu);
+	constContextMenu->addAction(editConstAction);
 
-	connect(delConstAction, SIGNAL(activated()), SLOT(slotDelConst()));
-	connect(editConstAction, SIGNAL(activated()), SLOT(slotEditConst()));
+	connect(delConstAction, SIGNAL(triggered()), SLOT(slotDelConst()));
+	connect(editConstAction, SIGNAL(triggered()), SLOT(slotEditConst()));
 
 	// connection for the listbox
-	connect((const QObject*) constantsListBox, SIGNAL(rightButtonClicked(QListBoxItem*, const QPoint&)), SLOT(slotRButtonClicked(QListBoxItem*, const QPoint&)));
-	connect((const QObject*) constantsListBox, SIGNAL(currentChanged(QListBoxItem*)), SLOT(slotSelectionChanged()));
-	connect((const QObject*) constantsListBox, SIGNAL(selectionChanged()), SLOT(slotSelectionChanged()));
-	connect((const QObject*) constantsListBox, SIGNAL(selected(QListBoxItem*)), SLOT(slotEditConst(QListBoxItem*)));
+	constantsListBox->setContextMenuPolicy(Qt::CustomContextMenu);
+	connect((const QObject*) constantsListBox, SIGNAL(customContextMenuRequested(const QPoint&)), SLOT(slotRButtonClicked(const QPoint&)));
+	connect((const QObject*) constantsListBox, SIGNAL(currentItemChanged(QListWidgetItem*,QListWidgetItem*)), SLOT(slotSelectionChanged()));
+	connect((const QObject*) constantsListBox, SIGNAL(itemSelectionChanged()), SLOT(slotSelectionChanged()));
+	connect((const QObject*) constantsListBox, SIGNAL(itemActivated(QListWidgetItem*)), SLOT(slotEditConst(QListWidgetItem*)));
 
 	// connect the buttons
 	connect((const QObject*)createButton, SIGNAL(clicked()), SLOT(slotCreateConstants()));
@@ -140,8 +144,8 @@ void MT_IndividualsWidget::onShow(MT_GPManager *manager, subst_cache *subst)
 
 	int *length = 0;
 	int *numVar = 0;
-	QArray<double> *constants = 0;
-	QArray<double> *functions = 0;
+	QList<double> *constants = 0;
+	QList<double> *functions = 0;
 
 	if(randomizer){
 		
@@ -154,7 +158,7 @@ void MT_IndividualsWidget::onShow(MT_GPManager *manager, subst_cache *subst)
 		// add the constants to the appropriate listbox
 		constantsListBox->clear();
 		for(int i=0; i<constants->size(); i++){
-			constantsListBox->insertItem(QString("%1").arg(constants->at(i)));
+			constantsListBox->addItem(QString("%1").arg(constants->at(i)));
 		}
 		emit numConstChanged();
 		
@@ -166,24 +170,24 @@ void MT_IndividualsWidget::onShow(MT_GPManager *manager, subst_cache *subst)
 		QLineEdit *receiverObject;
 		double previous = 0.0;
 		double actual;
-		for(i=1; i<10; i++){
+		for(int i=1; i<10; i++){
 			receivername = com1 + QString("%1").arg(i);
 			actual = functions->at(i-1);
 			valText = QString("%1").arg((int)(actual - previous));
 			previous = actual;
 
-			receiverObject = (QLineEdit*) child(receivername, "QLineEdit");
+			receiverObject = findChild<QLineEdit*>(receivername);
 			if(receiverObject&& (receiverObject->text() != valText)){
 				receiverObject->setText(valText);
 			}
 		}
-		for(i=10; i<19; i++){
+		for(int i=10; i<19; i++){
 			receivername = com2 + QString("%1").arg(i);
 			actual = functions->at(i-1);
 			valText = QString("%1").arg((int)(actual - previous));
 			previous = actual;
 
-			receiverObject = (QLineEdit*) child(receivername, "QLineEdit");
+			receiverObject = findChild<QLineEdit*>(receivername);
 			if(receiverObject&& (receiverObject->text() != valText)){
 				receiverObject->setText(valText);
 			}
@@ -200,8 +204,8 @@ bool MT_IndividualsWidget::onHide(MT_GPManager *manager, subst_cache *subst)
 
 	manager->getParent()->setMaxProgLen( programLengthSpinBox->value() );
 
-	QArray<double> *constants = 0;
-	QArray<double> *functions = 0;
+	QList<double> *constants = 0;
+	QList<double> *functions = 0;
 	randomizer->returnIndividualsValue(&length, &numVar, &constants, &functions);
 
 	*length = programLengthSpinBox->value();
@@ -212,7 +216,7 @@ bool MT_IndividualsWidget::onHide(MT_GPManager *manager, subst_cache *subst)
 	if(constants->size() != numConst)
 		constants->resize(numConst);
 	for(int i=0; i<numConst; i++){
-		constants->at(i) = constantsListBox->text(i).toDouble();
+		(*constants)[i] = constantsListBox->item(i)->text().toDouble();
 	}
 
 	// set the command probabilities
@@ -222,21 +226,21 @@ bool MT_IndividualsWidget::onHide(MT_GPManager *manager, subst_cache *subst)
 	QString receivername;
 	QLineEdit *receiverObject;
 	double previous = 0.0;
-	for(i=1; i<10; i++){
+	for(int i=1; i<10; i++){
 		receivername = com1 + QString("%1").arg(i);
-		receiverObject = (QLineEdit*) child(receivername, "QLineEdit");
+		receiverObject = findChild<QLineEdit*>(receivername);
 		if(receiverObject){
 			previous += receiverObject->text().toDouble();
 		}
-		functions->at(i-1) = previous;
+		(*functions)[i-1] = previous;
 	}
-	for(i=10; i<19; i++){
+	for(int i=10; i<19; i++){
 		receivername = com2 + QString("%1").arg(i);
-		receiverObject = (QLineEdit*) child(receivername, "QLineEdit");
+		receiverObject = findChild<QLineEdit*>(receivername);
 		if(receiverObject){
 			previous += receiverObject->text().toDouble();
 		}
-		functions->at(i-1) = previous;
+		(*functions)[i-1] = previous;
 	}
 	
 	return true;
@@ -248,8 +252,7 @@ bool MT_IndividualsWidget::onHide(MT_GPManager *manager, subst_cache *subst)
 
 void MT_IndividualsWidget::slotImportConstants()
 {
-	QStringList files( QFileDialog::getOpenFileNames( "Constants(*.mcon);;All Files(*)",
-		0, this, "ConImpDialog", "Import Constants"));
+	QStringList files( QFileDialog::getOpenFileNames( this, "Import Constants", QString(), "Constants(*.mcon);;All Files(*)"));
 
 
 	if(files.isEmpty())
@@ -259,7 +262,7 @@ void MT_IndividualsWidget::slotImportConstants()
 	for(QStringList::Iterator it = files.begin(); it != files.end(); ++it){
 		QFile file(*it);
 
-		if(file.open(IO_ReadOnly)){
+		if(file.open(QIODevice::ReadOnly)){
 
 			// file was successfully opened
 			// so read it and fill the datastructures
@@ -267,7 +270,7 @@ void MT_IndividualsWidget::slotImportConstants()
 			QString s;
 			bool found = false;
 			int count=0;
-			while( !stream.eof() ){			// iterate the whole file
+			while( !stream.atEnd() ){			// iterate the whole file
 				s = stream.readLine();
 				if(!found && s=="[constants]"){
 					found = true;
@@ -276,15 +279,19 @@ void MT_IndividualsWidget::slotImportConstants()
 				if(found && s=="count"){
 					s = stream.readLine();
 					int tc = count = s.toInt();
-					QProgressDialog progress("Loading constants", 0, count, this, 0, true);
-					while(tc && !stream.eof()){
-						progress.setProgress(count - tc);
+					// Qt 2: (label, cancelText, totalSteps, creator, name, modal).
+		// Qt 6: (label, cancelText, minimum, maximum, parent); modality separate.
+		// cancelText was 0 in 1.3, i.e. NO Cancel button -- QString() keeps that.
+		QProgressDialog progress("Loading constants", QString(), 0, count, this);
+		progress.setWindowModality(Qt::ApplicationModal);
+					while(tc && !stream.atEnd()){
+						progress.setValue(count - tc);
 						s = stream.readLine();
-						constantsListBox->insertItem(QString(s));
+						constantsListBox->addItem(QString(s));
 						tc--;
 						emit numConstChanged();
 					}
-					progress.setProgress(count);
+					progress.setValue(count);
 				}
 			}
 			if(!found || !count){
@@ -304,7 +311,7 @@ void MT_IndividualsWidget::slotImportConstants()
 
 void MT_IndividualsWidget::slotExportConstants()
 {
-	QString fileName = QFileDialog::getSaveFileName(0, "Constants(*.mcon);;All Files(*)", this);
+	QString fileName = QFileDialog::getSaveFileName(this, QString(), QString(), "Constants(*.mcon);;All Files(*)");
 	if(fileName.isEmpty()) return;
 	if(fileName.right(5) != ".mcon")
 		fileName += ".mcon";
@@ -316,7 +323,7 @@ void MT_IndividualsWidget::slotExportConstants()
 			return;
 	}
 	
-	if(file.open( IO_WriteOnly )){
+	if(file.open( QIODevice::WriteOnly )){
 		QTextStream str( &file );
 		int count = constantsListBox->count();
 		if(!count){
@@ -326,11 +333,11 @@ void MT_IndividualsWidget::slotExportConstants()
 			return;
 		}
 		str << "[constants]\n";
-		str << "count\n" << count << endl;
+		str << "count\n" << count << Qt::endl;
 		for(int i=0; i<count; i++){
-			str << constantsListBox->text(i) << endl;
+			str << constantsListBox->item(i)->text() << Qt::endl;
 		}
-		str << endl;
+		str << Qt::endl;
 		file.close();
 	} else {
 		QMessageBox::critical(this, "Export Constants",
@@ -341,12 +348,12 @@ void MT_IndividualsWidget::slotExportConstants()
 
 void MT_IndividualsWidget::slotEditConst()
 {
-	slotEditConst(constantsListBox->item(constantsListBox->currentItem()));
+	slotEditConst(constantsListBox->item(constantsListBox->currentRow()));
 }
 
-void MT_IndividualsWidget::slotEditConst(QListBoxItem *item)
+void MT_IndividualsWidget::slotEditConst(QListWidgetItem *item)
 {
-	QRect dim(constantsListBox->itemRect(item));
+	QRect dim(constantsListBox->visualItemRect(item));
 	dim.setX(dim.x() + 2);
 	dim.setY(dim.y() + 2);
 	dim.setWidth(dim.width() + 2);
@@ -363,14 +370,14 @@ void MT_IndividualsWidget::slotResetFocus()
 
 void MT_IndividualsWidget::slotChangeConstant(const QString &ntext)
 {
-	constantsListBox->changeItem(ntext, constantsListBox->currentItem());
+	constantsListBox->item(constantsListBox->currentRow())->setText(ntext);
 }
 
 void MT_IndividualsWidget::slotSelectionChanged()
 {
-	int actItem = constantsListBox->currentItem();
+	int actItem = constantsListBox->currentRow();
 
-	if((actItem != -1) && constantsListBox->isSelected(actItem)){
+	if((actItem != -1) && constantsListBox->item(actItem)->isSelected()){
 		delConstAction->setEnabled(true);
 		editConstAction->setEnabled(true);
 	} else {
@@ -381,13 +388,13 @@ void MT_IndividualsWidget::slotSelectionChanged()
 
 void MT_IndividualsWidget::slotDelConst()
 {
-	QListBoxItem *nextInd=0;
+	QListWidgetItem *nextInd=0;
 
 	// iterate over all items, check if they are selected
 	// and delete the selected ones
 	for(uint actInd=0; actInd<constantsListBox->count(); actInd++){
-		if(constantsListBox->isSelected(actInd)){
-			constantsListBox->removeItem(actInd);	// delete actual constant if selected
+		if(constantsListBox->item(actInd)->isSelected()){
+			delete constantsListBox->takeItem(actInd);	// delete actual constant if selected
 			actInd--;		// the indices of the following items were decreased !!
 			emit numConstChanged();
 		}
@@ -395,9 +402,20 @@ void MT_IndividualsWidget::slotDelConst()
 	}
 }
 
-void MT_IndividualsWidget::slotRButtonClicked(QListBoxItem *item, const QPoint &point)
+void MT_IndividualsWidget::slotRButtonClicked(const QPoint &pos)
 {
-	constContextMenu->popup(point);
+	// Qt 2's rightButtonClicked is gone. Two things it did must be restored by
+	// hand. (1) It delivered a GLOBAL position (viewport()->mapToGlobal, see
+	// qlistview.cpp:3396); customContextMenuRequested delivers viewport
+	// coordinates. (2) When the click MISSED an item, Qt 2 called
+	// clearSelection() before emitting (qlistview.cpp:3390) -- which is why
+	// 1.3 greys out Delete on blank space: clearing fires selectionChanged,
+	// and slotSelectionChanged disables the action. Qt 6 does neither.
+	// Confirmed on the running 1.3: on a row all four entries are enabled; on
+	// blank space Delete is greyed and the other three are not.
+	if(!constantsListBox->itemAt(pos))
+		constantsListBox->clearSelection();
+	constContextMenu->popup(constantsListBox->viewport()->mapToGlobal(pos));
 }
 
 void MT_IndividualsWidget::slotCreateConstants()
@@ -408,22 +426,25 @@ void MT_IndividualsWidget::slotCreateConstants()
 
 		if(numToCreate > 0){
 		
-			QProgressDialog progress("Generating constants", 0, numToCreate+1, this, 0, true);
-			progress.setProgress(0);
+			// Qt 2: (label, cancelText, totalSteps, creator, name, modal).
+			// Qt 6: (label, cancelText, minimum, maximum, parent).
+			QProgressDialog progress("Generating constants", QString(), 0, numToCreate+1, this);
+			progress.setWindowModality(Qt::ApplicationModal);
+			progress.setValue(0);
 
 			int *length = 0;
 			int *numVar = 0;
-			QArray<double> *constants = 0;
-			QArray<double> *functions = 0;
+			QList<double> *constants = 0;
+			QList<double> *functions = 0;
 			randomizer->createConstant(numToCreate, integer, minValue, maxValue);
 			randomizer->returnIndividualsValue(&length, &numVar, &constants, &functions);
 
 			for(int i=0; i<constants->size(); i++){
-				progress.setProgress(i+1);
-				constantsListBox->insertItem(QString("%1").arg(constants->at(i)));
+				progress.setValue(i+1);
+				constantsListBox->addItem(QString("%1").arg(constants->at(i)));
 				emit numConstChanged();
 			}
-			progress.setProgress(numToCreate+1);
+			progress.setValue(numToCreate+1);
 		}
 	}
 }
@@ -442,13 +463,13 @@ void MT_IndividualsWidget::slotChangeEdit(int value)
 {
 	// find out who's sending this signal
 	const QObject *senderObject = sender();
-	QString senderName(senderObject->name());
+	QString senderName(senderObject->objectName());
 
 	// get the appropriate receiver
 	QString receiverName("edit");
 	receiverName += senderName.right(2);
 
-	QLineEdit *receiverObject = (QLineEdit*) child(receiverName, "QLineEdit");
+	QLineEdit *receiverObject = findChild<QLineEdit*>(receiverName);
 
 	// transfer value to text and update the widget if necessary
 	QString valText(tr("%1").arg(value));
@@ -461,13 +482,13 @@ void MT_IndividualsWidget::slotChangeSlider(const QString &text)
 {
 	// find out who's sending this signal
 	QLineEdit *senderObject = (QLineEdit*) sender();
-	QString senderName(senderObject->name());
+	QString senderName(senderObject->objectName());
 
 	// get the appropriate receiver
 	QString receiverName("slider");
 	receiverName += senderName.right(2);
 
-	QSlider *receiverObject = (QSlider*) child(receiverName, "QSlider");
+	QSlider *receiverObject = findChild<QSlider*>(receiverName);
 
 	// transfer text to value and update the widget if necessary
 	int value = text.toInt();

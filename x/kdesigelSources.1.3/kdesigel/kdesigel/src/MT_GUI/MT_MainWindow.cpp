@@ -1,10 +1,10 @@
-#include <qmenubar.h>
+#include <QMenuBar>
 #include <stdlib.h>
 
 #include "MT_GUI/MT_MainWindow.h"
 
-MT_MainWindow::MT_MainWindow(MT_Controller *controller, MT_GPManager *manager, subst_cache *substCache, QWidget * parent, const char * name, WFlags f )
- : QMainWindow( parent, name, f ), gpManager(manager), subst(substCache)
+MT_MainWindow::MT_MainWindow(MT_Controller *controller, MT_GPManager *manager, subst_cache *substCache, QWidget * parent, const char * name, Qt::WindowFlags f )
+ : QMainWindow( parent, f ), gpManager(manager), subst(substCache)
 {
 	evolRunning = false;
 	boss = controller;
@@ -17,69 +17,81 @@ MT_MainWindow::MT_MainWindow(MT_Controller *controller, MT_GPManager *manager, s
 	pixPath += "/pixmaps/";
 
 	resize(680, 595);
-	setCaption("SIGEL MetaGP");
+	setWindowTitle("SIGEL MetaGP");
 
 	// add a statusbar and a tooltip group
 	statusBar();
 
 	// create tool- and menubar
-	fileMenu = new QPopupMenu(this, "mtFileMenu");
-	mainToolBar = new QToolBar(this, "mtFileToolBar");
-	mainToolBar->setLabel("MT File");
+	fileMenu = new QMenu(this);
+	fileMenu->setObjectName("mtFileMenu");
+	mainToolBar = new QToolBar(this);
+	mainToolBar->setObjectName("mtFileToolBar");
+	mainToolBar->setWindowTitle("MT File");
 
 	// toolbar for evolution control
-	evolCtrlToolbar = new QToolBar(this, "mtEvolutionToolBar");
-	evolCtrlToolbar->setLabel("MT Evolution Control");
+	evolCtrlToolbar = new QToolBar(this);
+	evolCtrlToolbar->setObjectName("mtEvolutionToolBar");
+	evolCtrlToolbar->setWindowTitle("MT Evolution Control");
 
-	mtStartEvolutionAction = new QAction("start evolution",
-							QIconSet( QPixmap(pixPath+"mt_StartSmall.xpm"), QPixmap(pixPath+"mt_StartLarge.xpm") ),
-							"Start",
-							0, this);
+	QIcon icon_mtStartEvolutionAction(QPixmap(pixPath+"mt_StartSmall.xpm"));
+	icon_mtStartEvolutionAction.addPixmap(QPixmap(pixPath+"mt_StartLarge.xpm"));
+	mtStartEvolutionAction = new QAction(icon_mtStartEvolutionAction, "Start", this);
+	mtStartEvolutionAction->setToolTip("start evolution");
 	mtStartEvolutionAction->setStatusTip("Starts the evolution without running SIGEL.");
 	mtStartEvolutionAction->setEnabled(false);
-	mtStartEvolutionAction->addTo(evolCtrlToolbar);
-	QObject::connect(mtStartEvolutionAction, SIGNAL(activated()), SLOT(slotStartEvolution()));
+	evolCtrlToolbar->addAction(mtStartEvolutionAction);
+	QObject::connect(mtStartEvolutionAction, SIGNAL(triggered()), SLOT(slotStartEvolution()));
 
-	mtStopEvolutionAction = new QAction("stop evolution",
-							QIconSet( QPixmap(pixPath+"mt_StopSmall.xpm"), QPixmap(pixPath+"mt_StopLarge.xpm") ),
-							"Stop",
-							0, this);
+	QIcon icon_mtStopEvolutionAction(QPixmap(pixPath+"mt_StopSmall.xpm"));
+	icon_mtStopEvolutionAction.addPixmap(QPixmap(pixPath+"mt_StopLarge.xpm"));
+	mtStopEvolutionAction = new QAction(icon_mtStopEvolutionAction, "Stop", this);
+	mtStopEvolutionAction->setToolTip("stop evolution");
 	mtStopEvolutionAction->setStatusTip("Stops the evolution.");
 	mtStopEvolutionAction->setEnabled(false);
-	mtStopEvolutionAction->addTo(evolCtrlToolbar);
-	QObject::connect(mtStopEvolutionAction, SIGNAL(activated()), SLOT(slotStopEvolution()));
+	evolCtrlToolbar->addAction(mtStopEvolutionAction);
+	QObject::connect(mtStopEvolutionAction, SIGNAL(triggered()), SLOT(slotStopEvolution()));
 
-	mtEvolutionStatus = new QLabel(evolCtrlToolbar, "mtEvolStatus");
+	mtEvolutionStatus = new QLabel(evolCtrlToolbar);
+	mtEvolutionStatus->setObjectName("mtEvolStatus");
 	mtEvolutionStatus->setText(" stopped ");
 
 	evolCtrlToolbar->addSeparator();
-	mtAutoStopAction = new QAction("manual/timed stop",
-							QIconSet( QPixmap(pixPath+"mt_AutoStopSmall.xpm"), QPixmap(pixPath+"mt_AutoStopLarge.xpm") ),
-							"manual/timed stop",
-							0, this, 0, true);
+	QIcon icon_mtAutoStopAction(QPixmap(pixPath+"mt_AutoStopSmall.xpm"));
+	icon_mtAutoStopAction.addPixmap(QPixmap(pixPath+"mt_AutoStopLarge.xpm"));
+	mtAutoStopAction = new QAction(icon_mtAutoStopAction, "manual/timed stop", this);
+	mtAutoStopAction->setToolTip("manual/timed stop");
+	mtAutoStopAction->setCheckable(true);
 	mtAutoStopAction->setStatusTip("If on, evolution is stopped after the given time period is run down.");
-	mtAutoStopAction->setOn(false);
-	mtAutoStopAction->addTo(evolCtrlToolbar);
+	mtAutoStopAction->setChecked(false);
+	evolCtrlToolbar->addAction(mtAutoStopAction);
 
 	// max timed evolution duration is set to 24 days because the duration 
 	// is to be calculated in milli seconds and stored in an integer
 	// (assumed that an integer has 32bit)
-	mtHour = new QSpinBox(0, 576, 1, evolCtrlToolbar);
+	mtHour = new QSpinBox(evolCtrlToolbar);
+	mtHour->setRange(0, 576);
+	mtHour->setSingleStep(1);
 	mtHour->setValue(0);
-	mtTime1 = new QLabel(evolCtrlToolbar, "mtTime1");
+	mtTime1 = new QLabel(evolCtrlToolbar);
+	mtTime1->setObjectName("mtTime1");
 	mtTime1->setText("h : ");
-	mtMin = new QSpinBox(0, 864000, 5, evolCtrlToolbar);
+	mtMin = new QSpinBox(evolCtrlToolbar);
+	mtMin->setRange(0, 864000);
+	mtMin->setSingleStep(5);
 	mtMin->setValue(0);
-	mtTime2 = new QLabel(evolCtrlToolbar, "mtTime2");
+	mtTime2 = new QLabel(evolCtrlToolbar);
+	mtTime2->setObjectName("mtTime2");
 	mtTime2->setText("m ");
 	QObject::connect(mtAutoStopAction, SIGNAL(toggled(bool)), SLOT(slotAutoStop(bool)));
 	QObject::connect(mtMin, SIGNAL(valueChanged(int)), SLOT(slotMinChanged(int)));
 	
 	// divide the window horizontally in to resizable parts
-	splitter = new QSplitter( this, "Splitter" );
+	splitter = new QSplitter(this);
+	splitter->setObjectName("Splitter");
 	splitter->setFrameStyle( QFrame::Box | QFrame::Sunken );
 	splitter->setOpaqueResize();
-	splitter->setMargin( 6 );
+	splitter->setContentsMargins(6, 6, 6, 6);
 
 	setCentralWidget( splitter );		// make splitter the main widgets
 
@@ -87,73 +99,82 @@ MT_MainWindow::MT_MainWindow(MT_Controller *controller, MT_GPManager *manager, s
 	experimentWidget = new MT_ExperimentWidget(splitter);
 
 	// put a stack of widgets into the right part of the window
-	widgetStack = new QWidgetStack( splitter, "WidgetStack" );
-	widgetStack->setMargin( 6 );
+	widgetStack = new QStackedWidget(splitter);
+	widgetStack->setObjectName("WidgetStack");
+	widgetStack->setContentsMargins(6, 6, 6, 6);
 	widgetStack->setFrameStyle( QFrame::Box | QFrame::Sunken );
 
-	widgets[0] = estimationWidget = new MT_EstimationWidget(this, "MTEstimationWidget", 0);
-	widgetStack->addWidget(estimationWidget, 0);
+	widgets[0] = estimationWidget = new MT_EstimationWidget(this, "MTEstimationWidget", Qt::WindowFlags());
+	widgetStack->insertWidget(0, estimationWidget);
 
-	widgets[1] = individualsWidget = new MT_IndividualsWidget(this, "MTIndividualsWidget", 0);
-	widgetStack->addWidget(individualsWidget, 1);
+	widgets[1] = individualsWidget = new MT_IndividualsWidget(this, "MTIndividualsWidget", Qt::WindowFlags());
+	widgetStack->insertWidget(1, individualsWidget);
 
-	widgets[2] = populationWidget = new MT_PopulationWidget(this, "MTPopulationWidget", 0);
-	widgetStack->addWidget(populationWidget, 2);
+	widgets[2] = populationWidget = new MT_PopulationWidget(this, "MTPopulationWidget", Qt::WindowFlags());
+	widgetStack->insertWidget(2, populationWidget);
 
-	widgets[3] = searchWidget = new MT_SearchWidget(this, "MTSearchWidget", 0);
-	widgetStack->addWidget(searchWidget, 3);
+	widgets[3] = searchWidget = new MT_SearchWidget(this, "MTSearchWidget", Qt::WindowFlags());
+	widgetStack->insertWidget(3, searchWidget);
 
-	widgets[4] = selectionWidget = new MT_SelectionWidget(this, "MTSelectionWidget", 0);
-	widgetStack->addWidget(selectionWidget, 4);
+	widgets[4] = selectionWidget = new MT_SelectionWidget(this, "MTSelectionWidget", Qt::WindowFlags());
+	widgetStack->insertWidget(4, selectionWidget);
 
-	widgets[5] = statisticsWidget = new MT_StatisticsWidget(this, "MTStatisticsWidget", 0);
-	widgetStack->addWidget(statisticsWidget, 5);
+	widgets[5] = statisticsWidget = new MT_StatisticsWidget(this, "MTStatisticsWidget", Qt::WindowFlags());
+	widgetStack->insertWidget(5, statisticsWidget);
 
 	// create the actions for the menu and the toolbar
 	// - restore default settings
-	mtDefaultAction = new QAction("Default",
-							QIconSet( QPixmap(pixPath+"newExperimentSmall.xpm"), QPixmap(pixPath+"newExperimentLarge.xpm") ),
-							"&Default",
-							CTRL+Key_D, this);
+	QIcon icon_mtDefaultAction(QPixmap(pixPath+"newExperimentSmall.xpm"));
+	icon_mtDefaultAction.addPixmap(QPixmap(pixPath+"newExperimentLarge.xpm"));
+	mtDefaultAction = new QAction(icon_mtDefaultAction, "&Default", this);
+	mtDefaultAction->setToolTip("Default");
+	mtDefaultAction->setShortcut(Qt::CTRL+Qt::Key_D);
 	mtDefaultAction->setStatusTip("Restores the default settings.");
-	mtDefaultAction->addTo(fileMenu);
-	mtDefaultAction->addTo(mainToolBar);
-	fileMenu->insertSeparator();
+	fileMenu->addAction(mtDefaultAction);
+	mainToolBar->addAction(mtDefaultAction);
+	fileMenu->addSeparator();
 	mainToolBar->addSeparator();
 
 	// - load settings
-	mtLoadAction = new QAction("Load",
-							QIconSet( QPixmap(pixPath+"openExperimentSmall.xpm"), QPixmap(pixPath+"openExperimentLarge.xpm") ),
-							"&Open",
-							CTRL+Key_O, this);
+	QIcon icon_mtLoadAction(QPixmap(pixPath+"openExperimentSmall.xpm"));
+	icon_mtLoadAction.addPixmap(QPixmap(pixPath+"openExperimentLarge.xpm"));
+	mtLoadAction = new QAction(icon_mtLoadAction, "&Open", this);
+	mtLoadAction->setToolTip("Load");
+	mtLoadAction->setShortcut(Qt::CTRL+Qt::Key_O);
 	mtLoadAction->setStatusTip("Load settings from a file.");
-	mtLoadAction->addTo(fileMenu);
-	mtLoadAction->addTo(mainToolBar);
+	fileMenu->addAction(mtLoadAction);
+	mainToolBar->addAction(mtLoadAction);
 
 	// - save settings
-	mtSaveAction = new QAction("Save",
-							QIconSet( QPixmap(pixPath+"saveExperimentSmall.xpm"), QPixmap(pixPath+"saveExperimentLarge.xpm") ),
-							"&Save",
-							CTRL+Key_S, this);
+	QIcon icon_mtSaveAction(QPixmap(pixPath+"saveExperimentSmall.xpm"));
+	icon_mtSaveAction.addPixmap(QPixmap(pixPath+"saveExperimentLarge.xpm"));
+	mtSaveAction = new QAction(icon_mtSaveAction, "&Save", this);
+	mtSaveAction->setToolTip("Save");
+	mtSaveAction->setShortcut(Qt::CTRL+Qt::Key_S);
 	mtSaveAction->setStatusTip("Saves the current settings to a file.");
-	mtSaveAction->addTo(fileMenu);
-	mtSaveAction->addTo(mainToolBar);
-	fileMenu->insertSeparator();
+	fileMenu->addAction(mtSaveAction);
+	mainToolBar->addAction(mtSaveAction);
+	fileMenu->addSeparator();
 	mainToolBar->addSeparator();
 
 	// - close window
-	mtExitAction = new QAction("Exit",
-							QIconSet( QPixmap(pixPath+"quitApplicationSmall.xpm"), QPixmap(pixPath+"quitApplicationLarge.xpm") ),
-							"E&xit",
-							ALT+Key_F4, this);
+	QIcon icon_mtExitAction(QPixmap(pixPath+"quitApplicationSmall.xpm"));
+	icon_mtExitAction.addPixmap(QPixmap(pixPath+"quitApplicationLarge.xpm"));
+	mtExitAction = new QAction(icon_mtExitAction, "E&xit", this);
+	mtExitAction->setToolTip("Exit");
+	mtExitAction->setShortcut(Qt::ALT+Qt::Key_F4);
 	mtExitAction->setStatusTip("Applies changes and closes the configuration window.");
-	mtExitAction->addTo(fileMenu);
-	mtExitAction->addTo(mainToolBar);
-	QObject::connect(mtExitAction, SIGNAL( activated() ), SLOT( close() ));
+	fileMenu->addAction(mtExitAction);
+	mainToolBar->addAction(mtExitAction);
+	QObject::connect(mtExitAction, SIGNAL( triggered() ), SLOT( close() ));
 
-	menuBar()->insertItem("&File", fileMenu);
+	// Qt 2: QMenuBar::insertItem(text, popup). Qt 6 titles the menu itself.
+	fileMenu->setTitle("&File");
+	menuBar()->addMenu(fileMenu);
 
-	QObject::connect(experimentWidget, SIGNAL( selectionChanged(QListViewItem*) ),	SLOT( slotRaiseWidget(QListViewItem*) ));
+	QObject::connect(experimentWidget, // Qt 2 QListView::selectionChanged(item) carried the newly selected item;
+	// Qt 6 has no such overload, and currentItemChanged is the one that does.
+						 SIGNAL( currentItemChanged(QTreeWidgetItem*,QTreeWidgetItem*) ),	SLOT( slotRaiseWidget(QTreeWidgetItem*) ));
 
 	
 	raiseWidget(0);
@@ -171,7 +192,9 @@ void MT_MainWindow::slotAutoStop(bool on)
 		mtMin->setEnabled(false);
 		if(evolRunning){
 			int time = (mtHour->value() * 60 + mtMin->value()) * 60000;
-			evolTimer->start(time, true);
+			// Qt 2: QTimer::start(msec, singleShot). Qt 6 splits the two.
+			evolTimer->setSingleShot(true);
+			evolTimer->start(time);
 		}
 	} else {
 		mtHour->setEnabled(true);
@@ -203,11 +226,11 @@ void MT_MainWindow::closeEvent(QCloseEvent *e)
 	if(topWidget->onHide(gpManager, subst)){		// can we close the window savely ?
 		QObject::disconnect(gpManager, SIGNAL( metaEvolutionRunning(bool) ), this, SLOT( slotEvolutionStatus(bool) ));
 
-		QObject::disconnect(mtStartEvolutionAction, SIGNAL( activated() ), (QObject*)boss, SLOT( startSingleEvolution() ));
-		QObject::disconnect(mtStopEvolutionAction, SIGNAL( activated() ), (QObject*)boss, SLOT( stopEvolution() ));
-		QObject::disconnect(mtDefaultAction, SIGNAL( activated() ), (QObject*)boss, SLOT(slotLoadDefault() ) );
-		QObject::disconnect(mtLoadAction, SIGNAL( activated() ), (QObject*)boss, SLOT( slotLoadSetup() ) );
-		QObject::disconnect(mtSaveAction, SIGNAL( activated() ), (QObject*)boss, SLOT( slotSaveSetup() ));
+		QObject::disconnect(mtStartEvolutionAction, SIGNAL( triggered() ), (QObject*)boss, SLOT( startSingleEvolution() ));
+		QObject::disconnect(mtStopEvolutionAction, SIGNAL( triggered() ), (QObject*)boss, SLOT( stopEvolution() ));
+		QObject::disconnect(mtDefaultAction, SIGNAL( triggered() ), (QObject*)boss, SLOT(slotLoadDefault() ) );
+		QObject::disconnect(mtLoadAction, SIGNAL( triggered() ), (QObject*)boss, SLOT( slotLoadSetup() ) );
+		QObject::disconnect(mtSaveAction, SIGNAL( triggered() ), (QObject*)boss, SLOT( slotSaveSetup() ));
 		QObject::disconnect(evolTimer, SIGNAL( timeout() ), (QObject*)boss, SLOT( stopEvolution() ));
 
 		e->accept();	// yeah, close it
@@ -215,7 +238,7 @@ void MT_MainWindow::closeEvent(QCloseEvent *e)
 		e->ignore();	// sorry, keep it open
 }
 
-void MT_MainWindow::slotRaiseWidget(QListViewItem *item)
+void MT_MainWindow::slotRaiseWidget(QTreeWidgetItem *item)
 {
 	int pos = static_cast<MT_ExperimentItem*>(item)->getPos();
 	MT_WidgetBase *nextWidget = widgets[pos];
@@ -229,7 +252,7 @@ void MT_MainWindow::slotRaiseWidget(QListViewItem *item)
 			actWidget = widgets[actWidgetID];
 			if(actWidget->onHide(gpManager, subst)){
 				nextWidget->onShow(gpManager, subst);
-				widgetStack->raiseWidget(pos);
+				widgetStack->setCurrentIndex(pos);
 				experimentWidget->slotCurrentChanged(item);
 				actWidgetID = pos;
 			} else {
@@ -237,7 +260,7 @@ void MT_MainWindow::slotRaiseWidget(QListViewItem *item)
 			}
 		} else {
 			nextWidget->onShow(gpManager, subst);
-			widgetStack->raiseWidget(pos);
+			widgetStack->setCurrentIndex(pos);
 			actWidgetID = pos;
 		}
 	}
@@ -256,14 +279,14 @@ void MT_MainWindow::raiseWidget(int pos)
 			actWidget = widgets[actWidgetID];
 			if(actWidget->onHide(gpManager, subst)){
 				nextWidget->onShow(gpManager, subst);
-				widgetStack->raiseWidget(pos);
+				widgetStack->setCurrentIndex(pos);
 				actWidgetID = pos;
 			} else {
 				experimentWidget->lastSelected();
 			}
 		} else {
 			nextWidget->onShow(gpManager, subst);
-			widgetStack->raiseWidget(pos);
+			widgetStack->setCurrentIndex(pos);
 			actWidgetID = pos;
 		}
 	}
@@ -304,9 +327,10 @@ void MT_MainWindow::slotEvolutionStatus(bool running)
 		if(gpManager->separateEvolutionAllowed())
 			mtStopEvolutionAction->setEnabled(true);
 		mtEvolutionStatus->setText(" running ");
-		if(mtAutoStopAction->isOn()){
+		if(mtAutoStopAction->isChecked()){
 			int time = (mtHour->value() * 60 + mtMin->value()) * 60000;
-			evolTimer->start(time, true);
+			evolTimer->setSingleShot(true);
+		evolTimer->start(time);
 		}
 		mtSaveAction->setEnabled(false);
 		mtLoadAction->setEnabled(false);

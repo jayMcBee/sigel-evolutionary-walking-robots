@@ -1,12 +1,12 @@
 #include "MT_GUI/MT_AddConstantsWidget.h"
 
-#include <qlineedit.h>
-#include <qbuttongroup.h>
-#include <qspinbox.h>
-#include <qbutton.h>
-#include <qradiobutton.h>
+#include <QLineEdit>
+#include <QButtonGroup>
+#include <QSpinBox>
+#include <QAbstractButton>
+#include <QRadioButton>
 
-MT_AddConstantsWidget::MT_AddConstantsWidget(MT_IndividualsWidget *parent, const char *name, bool modal, WFlags fl)
+MT_AddConstantsWidget::MT_AddConstantsWidget(MT_IndividualsWidget *parent, const char *name, bool modal, Qt::WindowFlags fl)
 	: MT_AddConstantsWidgetBase(parent, name, true, fl)
 {
 	boss = parent;
@@ -29,7 +29,17 @@ MT_AddConstantsWidget::MT_AddConstantsWidget(MT_IndividualsWidget *parent, const
 	maxValueEdit->setText(tr("%1").arg(boss->maxValue));
 	numConstantsSpinBox->setValue(boss->numToCreate);
 	
-	connect((QObject*)typeGroup, SIGNAL(clicked(int)), SLOT(slotClicked(int)));
+	// Ids in .ui order, which is the order Qt 2's QButtonGroup auto-assigned.
+	// Only the objectName is ever compared, so the values matter merely for
+	// being distinct and stable.
+	typeButtons = new QButtonGroup(this);
+	typeButtons->addButton(intRadioButton, 0);
+	typeButtons->addButton(floatRadioButton, 1);
+
+	// QButtonGroup::clicked(int) is gone in Qt 6; the id-carrying signal is
+	// idClicked(int). clicked() without an id is still live, which is why only
+	// the int overload moves.
+	connect(typeButtons, SIGNAL(idClicked(int)), SLOT(slotClicked(int)));
 }
 
 MT_AddConstantsWidget::~MT_AddConstantsWidget()
@@ -49,7 +59,8 @@ void MT_AddConstantsWidget::accept()
 
 void MT_AddConstantsWidget::slotClicked(int id)
 {
-	if((QString)typeGroup->find(id)->name() == QString("intRadioButton")){
+	// Qt 2: QButtonGroup::find(int) -> QButton*, QObject::name() -> const char*.
+	if(typeButtons->button(id)->objectName() == QString("intRadioButton")){
 		if(selectedType != intType){
 			selectedType = intType;
 			delete minValidator;

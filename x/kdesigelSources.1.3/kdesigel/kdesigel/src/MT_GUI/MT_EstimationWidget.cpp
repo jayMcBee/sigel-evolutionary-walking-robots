@@ -1,13 +1,13 @@
 #include "MT_GUI/MT_EstimationWidget.h"
 
-#include <qmessagebox.h>
-#include <qspinbox.h>
-#include <qcombobox.h>
-#include <qlayout.h>
-#include <qgroupbox.h>
-#include <qcheckbox.h>
+#include <QMessageBox>
+#include <QSpinBox>
+#include <QComboBox>
+#include <QLayout>
+#include <QGroupBox>
+#include <QCheckBox>
 
-MT_EstimationWidget::MT_EstimationWidget(QWidget* parent, const char* name, WFlags fl )
+MT_EstimationWidget::MT_EstimationWidget(QWidget* parent, const char* name, Qt::WindowFlags fl )
 	 : MT_EstimationWidgetBase( parent, name, fl), MT_WidgetBase(parent)
 {
 	lastIndex = 0;
@@ -116,7 +116,7 @@ bool MT_EstimationWidget::onHide(MT_GPManager *manager, subst_cache *subst)
 	double tolerance;
 
 	if(usedSys == evaluator){
-		switch(strategyComboBox->currentItem()){
+		switch(strategyComboBox->currentIndex()){
 		case 0 : strategy = 1; break;
 		case 1 : strategy = 2; break;
 		case 2 : strategy = 9; break;
@@ -127,7 +127,7 @@ bool MT_EstimationWidget::onHide(MT_GPManager *manager, subst_cache *subst)
 	}
 	else
 	{
-		switch(strategyComboBox->currentItem()){
+		switch(strategyComboBox->currentIndex()){
 		case 0 : strategy = 3; break;
 		case 1 : strategy = 4; break;
 		case 2 : strategy = 5; break;
@@ -190,47 +190,47 @@ void MT_EstimationWidget::onShow(MT_GPManager *manager, subst_cache *subst)
 		// of type evaluator */
 		estimationGroupBox->setTitle("Evaluation");
 		usedSys = evaluator;
-		strategyComboBox->insertItem("mean error");
-		strategyComboBox->insertItem("cleaned mean error");
-		strategyComboBox->insertItem("adaptive error");
-		strategyComboBox->insertItem("adaptive cleaned error");
-		strategyComboBox->insertItem("don't use meta");
+		strategyComboBox->addItem("mean error");
+		strategyComboBox->addItem("cleaned mean error");
+		strategyComboBox->addItem("adaptive error");
+		strategyComboBox->addItem("adaptive cleaned error");
+		strategyComboBox->addItem("don't use meta");
 
 		switch(strategy){
-		case 1 : strategyComboBox->setCurrentItem(0);
+		case 1 : strategyComboBox->setCurrentIndex(0);
 			break;
-		case 2 : strategyComboBox->setCurrentItem(1);
+		case 2 : strategyComboBox->setCurrentIndex(1);
 			break;
-		case 9 : strategyComboBox->setCurrentItem(2);
+		case 9 : strategyComboBox->setCurrentIndex(2);
 			break;
-		case 10 : strategyComboBox->setCurrentItem(3);
+		case 10 : strategyComboBox->setCurrentIndex(3);
 			break;
 		case 13 :
 		default:
-			strategyComboBox->setCurrentItem(4);
+			strategyComboBox->setCurrentIndex(4);
 		}
 
 	} else {						
 		// of type classifier
 		estimationGroupBox->setTitle("Classification");
 		usedSys = classifier;
-		strategyComboBox->insertItem("error percentage");
-		strategyComboBox->insertItem("adaptive - Generation");
-		strategyComboBox->insertItem("adaptive - Fitness");
-		strategyComboBox->insertItem("save the best");
-		strategyComboBox->insertItem("don't use meta");
+		strategyComboBox->addItem("error percentage");
+		strategyComboBox->addItem("adaptive - Generation");
+		strategyComboBox->addItem("adaptive - Fitness");
+		strategyComboBox->addItem("save the best");
+		strategyComboBox->addItem("don't use meta");
 
 		switch(strategy){
-		case 3 : strategyComboBox->setCurrentItem(0); break;
-		case 4 : strategyComboBox->setCurrentItem(1); break;
-		case 5 : strategyComboBox->setCurrentItem(2); break;
-		case 6 : strategyComboBox->setCurrentItem(3); break;
+		case 3 : strategyComboBox->setCurrentIndex(0); break;
+		case 4 : strategyComboBox->setCurrentIndex(1); break;
+		case 5 : strategyComboBox->setCurrentIndex(2); break;
+		case 6 : strategyComboBox->setCurrentIndex(3); break;
 		case 8 :
-		default: strategyComboBox->setCurrentItem(4);
+		default: strategyComboBox->setCurrentIndex(4);
 		}
 	}
 	slotStrategyChanged(strategy);
-	lastIndex = strategyComboBox->currentItem();
+	lastIndex = strategyComboBox->currentIndex();
 
 	// remember the value been set
 	switch(lastIndex){

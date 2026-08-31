@@ -7,9 +7,9 @@
 #include "MT_GUI/MT_Editor.h"
 #include "MT_GPSystem/MT_Randomizer.h"
 
-#include <qvalidator.h>
-#include <qpopupmenu.h>
-#include <qaction.h>
+#include <QValidator>
+#include <QMenu>
+#include <QAction>
 
 class MT_IndividualsWidget : public MT_IndividualsWidgetBase, public MT_WidgetBase
 {
@@ -22,7 +22,7 @@ public:
 	virtual void onShow(MT_GPManager *manager, subst_cache *subst);
 	void evolutionRunning(bool running);
 
-	MT_IndividualsWidget(QWidget* parent=0, const char* name=0, WFlags fl=0);
+	MT_IndividualsWidget(QWidget* parent=0, const char* name=0, Qt::WindowFlags fl = Qt::WindowFlags());
 	~MT_IndividualsWidget();
 
 private slots:
@@ -32,9 +32,9 @@ private slots:
 	void slotChangeSlider(const QString &text);
 	void slotChangeEdit(int value);
 	void slotEditConst();
-	void slotEditConst(QListBoxItem *item);
+	void slotEditConst(QListWidgetItem *item);
 	void slotChangeConstant(const QString &ntext);
-	void slotRButtonClicked(QListBoxItem *item, const QPoint &point);
+	void slotRButtonClicked(const QPoint &pos);
 	void slotSelectionChanged();
 	void slotDelConst();
 	void slotResetFocus();
@@ -48,7 +48,7 @@ private:
 	MT_Randomizer *randomizer;
 
 	QIntValidator *validator;
-	QPopupMenu	*constContextMenu;
+	QMenu	*constContextMenu;
 	QAction	*delConstAction;
 	QAction	*editConstAction;
 	MT_Editor	*editor;

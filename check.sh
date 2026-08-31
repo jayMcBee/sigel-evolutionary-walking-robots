@@ -86,11 +86,11 @@ fi
 # The gate PRINTS every offending line precisely so a false positive is
 # visible rather than silently believed.
 DEAD_SIGNALS='SIGNAL\( *(activated *\( *\)|activated *\( *const *QString'\
-'|clicked *\( *int|selected *\(|selectionChanged *\( *(\)|QListViewItem)'\
-'|currentChanged *\( *Q(ListView|ListBox)Item|rightButtonClicked'\
-'|doubleClicked *\( *QListViewItem)'
+'|clicked *\( *int|selected *\(|selectionChanged *\( *(\)|Q(ListView|TreeWidget)Item)'\
+'|currentChanged *\( *Q(ListView|ListBox|TreeWidget|ListWidget)Item|rightButtonClicked'\
+'|doubleClicked *\( *Q(ListView|TreeWidget)Item)'
 
-MODULES="${*:-SIGEL_Tools SIGEL_Environment MT_GPSystem SIGEL_Robot SIGEL_Program SIGEL_RobotIO SIGEL_Simulation MT_Control SIGEL_GP SIGEL_Visualisation SIGEL_CommonGUI SIGEL_SlaveGUI}"
+MODULES="${*:-SIGEL_Tools SIGEL_Environment MT_GPSystem SIGEL_Robot SIGEL_Program SIGEL_RobotIO SIGEL_Simulation MT_Control SIGEL_GP SIGEL_Visualisation SIGEL_CommonGUI SIGEL_SlaveGUI MT_GUI}"
 pass=0; fail=0; warn=0
 
 # The shim self-check was here: it built and RAN q2compat_check.cpp under
@@ -125,6 +125,12 @@ done <<'RXEOF'
 1|		    SIGNAL( selectionChanged( QListViewItem * ) ),
 1|	connect(a, SIGNAL(currentChanged(QListViewItem*)), b);
 1|	connect(a, SIGNAL(currentChanged(QListBoxItem*)), b);
+1|	connect(a, SIGNAL(currentChanged(QTreeWidgetItem*)), b);
+1|	connect(a, SIGNAL(currentChanged(QListWidgetItem*)), b);
+1|	connect(a, SIGNAL(doubleClicked(QTreeWidgetItem*)), b);
+1|	connect(a, SIGNAL(selectionChanged(QTreeWidgetItem*)), b);
+0|	connect(a, SIGNAL(currentItemChanged(QTreeWidgetItem*,QTreeWidgetItem*)), b);
+0|	connect(a, SIGNAL(customContextMenuRequested(const QPoint&)), b);
 1|	connect(a, SIGNAL(doubleClicked( QListViewItem * )), b);
 1|	connect(a, SIGNAL(rightButtonClicked(QListBoxItem*, const QPoint&)), b);
 1|		    SIGNAL( rightButtonClicked ( QListViewItem *, const QPoint &, int ) ),
@@ -180,7 +186,7 @@ for m in $MODULES; do
     md=$(command grep -rhoE "$DEAD_SIGNALS" "$SRC/src/$m" "$SRC/include/$m" 2>/dev/null | wc -l)
     case "$m" in
         SIGEL_MasterGUI) base=44 ;;
-        MT_GUI)          base=31 ;;
+        MT_GUI)          base=0  ;;   # C6 repaired all 31
         MT_Control)      base=15 ;;
         *)               base=0  ;;
     esac
@@ -236,6 +242,68 @@ if [ "$stray" -gt 0 ]; then
 fi
 printf '%-22s %2d dead (baseline %d -- §2 has the per-signal table)\n' \
        "Qt 6 signals" "$((dead+stray))" "$deadbase"
+
+# ---------------------------------------------------------------------------
+# Encoding and line-ending fidelity.
+#
+# 46 files in this tree are Latin-1 and many are CRLF or MIXED CRLF/LF. Both
+# survive every other check here -- a file whose CRLF has been stripped compiles
+# identically and passes all four behaviour gates -- and both are destroyed by
+# the ordinary way of editing a file from a script: Python text mode reads with
+# universal newlines and writes back LF. That happened during C6 and silently
+# rewrote 26 files, turning a 436-line conversion into a 3,227-line diff.
+#
+# Written in Python rather than shell: this is byte counting against git, and
+# the first, shell version skipped files silently while reporting a clean pass.
+#
+# The invariant is deliberately weak so legitimately added lines do not trip it:
+# a file that HAD a CR must still have one, and a file that had non-ASCII bytes
+# must still have them. Wholesale conversion is what it catches.
+enc_out=$(cd "$ROOT" && python3 - <<'ENCPY'
+import subprocess
+base = subprocess.run(["git","rev-list","--max-parents=0","HEAD"],
+                      capture_output=True, text=True).stdout.split()[0]
+files = subprocess.run(["git","ls-files"], capture_output=True, text=True).stdout.split(chr(10))
+ok = bad = skip = translated = 0
+for rel in files:
+    if not rel.endswith((".cpp",".h",".ui",".exp",".mt")): continue
+    r = subprocess.run(["git","show","%s:%s" % (base, rel)], capture_output=True)
+    if r.returncode != 0: skip += 1; continue      # added after the root commit
+    try: cur = open(rel,"rb").read()
+    except OSError: skip += 1; continue
+    old = r.stdout
+    # Losing the non-ASCII bytes is EXPECTED and deliberate: Phase 0b translated
+    # the German comments to English, which is where the umlauts went. Counted
+    # and reported, never failed.
+    if any(x > 127 for x in old) and not any(x > 127 for x in cur):
+        translated += 1
+    if b"\r" in old and b"\r" not in cur:
+        bad += 1
+        print("  %s: CRLF stripped (%d CRs -> 0)" % (rel, old.count(b"\r")))
+    else:
+        ok += 1
+print("COUNTS %d %d %d %d" % (ok, bad, skip, translated))
+ENCPY
+)
+ep=$(echo "$enc_out" | sed -n 's/^COUNTS \([0-9]*\) .*/\1/p')
+ef=$(echo "$enc_out" | sed -n 's/^COUNTS [0-9]* \([0-9]*\) .*/\1/p')
+es=$(echo "$enc_out" | sed -n 's/^COUNTS [0-9]* [0-9]* \([0-9]*\) .*/\1/p')
+et=$(echo "$enc_out" | sed -n 's/^COUNTS [0-9]* [0-9]* [0-9]* \([0-9]*\)/\1/p')
+# 25 files lost their CRLF during Phase 0's comment passes, before this check
+# existed. That is real but pre-existing damage; it is carried as a baseline so
+# the gate fails on a NEW one rather than standing permanently red. Lower it
+# when they are restored, never raise it.
+ENC_BASELINE=25
+if [ "$ef" -gt "$ENC_BASELINE" ]; then
+    echo "$enc_out" | command grep -v '^COUNTS ' || true
+    printf '%-22s %2d pass  %2d fail  (baseline %d -- a NEW file lost its CRLF)\n' \
+           "encodings" "$ep" "$((ef-ENC_BASELINE))" "$ENC_BASELINE"
+    fail=$((fail+ef-ENC_BASELINE))
+else
+    printf '%-22s %2d pass  %2d known CRLF losses (Phase 0), %s translated, %s postdate root\n' \
+           "encodings" "$ep" "$ef" "$et" "$es"
+fi
+pass=$((pass+ep))
 
 # ---------------------------------------------------------------------------
 # Parsers that no gate reads.

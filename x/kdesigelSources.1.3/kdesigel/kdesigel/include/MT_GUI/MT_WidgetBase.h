@@ -5,7 +5,7 @@
 #ifndef MT_GUI_WIDGETBASE
 #define MT_GUI_WIDGETBASE
 
-#include <qwidget.h>
+#include <QWidget>
 
 #include "MT_GPSystem/MT_GPManager.h"
 #include "MT_Control/MT_Substitute.h"

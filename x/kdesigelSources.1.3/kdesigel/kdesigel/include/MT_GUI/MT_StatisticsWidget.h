@@ -1,22 +1,23 @@
 #ifndef MT_GUI_STATISTICSWIDGET
 #define MT_GUI_STATISTICSWIDGET
 
+#include <QMainWindow>
 #include "MT_GUI/MT_StatisticsWidgetBase.h"
 #include "MT_GUI/MT_WidgetBase.h"
 
-#include <qtoolbar.h>
-#include <qcheckbox.h>
-#include <qspinbox.h>
-#include <qlabel.h>
-#include <qaction.h>
-#include <qtimer.h>
+#include <QToolBar>
+#include <QCheckBox>
+#include <QSpinBox>
+#include <QLabel>
+#include <QAction>
+#include <QTimer>
 
 class MT_StatisticsWidget : public MT_StatisticsWidgetBase, public MT_WidgetBase
 {
 	Q_OBJECT
 
 public:
-	MT_StatisticsWidget(QMainWindow* parent=0, const char* name=0, WFlags fl=0);
+	MT_StatisticsWidget(QMainWindow* parent=0, const char* name=0, Qt::WindowFlags fl = Qt::WindowFlags());
 	~MT_StatisticsWidget();
 
 	void onShow(MT_GPManager *manager, subst_cache *subst);
