@@ -175,9 +175,9 @@ for m in $MODULES; do
     # module's dead connects are known debt (§2 has the table), and folding them
     # in would misreport them as compile failures and leave the script standing
     # red until C8. Any count ABOVE the baseline fails. The baseline is zero for
-    # every CONVERTED module, so a new one cannot be introduced there; the only
-    # non-zero one left is MT_Control, which is C8 work. MT_Control IS compiled
-    # by this script today, so the gate is not "zero everywhere it looks".
+    # every CONVERTED module. As of C8 there is no non-zero baseline left at all:
+    # the whole tree is at zero and any new dead connect fails the gate wherever
+    # it appears.
     #
     # -o|wc -l, not -c: grep -c counts matching LINES. No line carries two
     # SIGNAL() macros today, so the two agree -- but the baselines are exact
@@ -186,7 +186,7 @@ for m in $MODULES; do
     case "$m" in
         SIGEL_MasterGUI) base=0  ;;   # C7 repaired all 44
         MT_GUI)          base=0  ;;   # C6 repaired all 31
-        MT_Control)      base=15 ;;
+        MT_Control)      base=0  ;;   # C8 repaired all 15
         *)               base=0  ;;
     esac
     dead=$((dead+md)); deadbase=$((deadbase+base))
@@ -478,6 +478,53 @@ fi
 printf '%-22s %2d pass  %2d fail\n' "parsers" "$pp" "$pf"
 pass=$((pass+pp)); fail=$((fail+pf))
 rm -f /tmp/pvm.$$ /tmp/pvm.$$.cpp /tmp/pvmb.$$
+
+# ---------------------------------------------------------------------------
+# Qt 2 item virtuals that Qt 6 does not call any more.
+#
+# QListViewItem::key( int, bool ) drove QListView's sort (qlistview.cpp:802).
+# QTreeWidgetItem has no key() at all -- it sorts through operator< -- so the
+# moment C7 renamed the base class, SIG_IndividualListItem::key() became dead
+# code that still compiles, still looks right, and is never called. The
+# individuals list silently fell back to sorting column 0 as raw TEXT:
+# 0, 1, 10, 100, 11 where 1.3 shows 0, 1, 2, ... 10. The 1.3 binary confirmed
+# the numeric order. Nothing in a compiler or in the dead-signal gate can see
+# this: it is a virtual that stopped being virtual.
+#
+# Rule: a class that still declares one of these must also declare the Qt 6
+# member that replaced it.
+kp=0; kf=0
+for h in "$SRC"/include/*/*.h; do
+    [ -e "$h" ] || continue
+    if command grep -qE '(^|[^:_[:alnum:]])QString[[:space:]]+key[[:space:]]*\([[:space:]]*int' "$h"; then
+        if command grep -q 'operator<[[:space:]]*(.*QTreeWidgetItem' "$h"; then
+            kp=$((kp+1))
+        else
+            kf=$((kf+1))
+            echo "  ${h#$SRC/}: declares Qt 2's key(int,bool) but no operator<(QTreeWidgetItem)"
+            echo "    Qt 6 sorts through operator<; key() is never called."
+        fi
+    fi
+done
+printf '%-22s %2d pass  %2d fail\n' "dead item virtuals" "$kp" "$kf"
+pass=$((pass+kp)); fail=$((fail+kf))
+
+# ---------------------------------------------------------------------------
+# The two programs. They are src/*.cpp, so no entry in MODULES reaches them and
+# nothing compiled them until C8 -- which is how a QMotifPlusStyle that Qt 6
+# does not have, and a pthread_create cast C++17 rejects, both survived this
+# far. C9 needs them to build, link and run; this covers the first of the three.
+pp=0; pf=0
+for prog in sigel sigel_slave; do
+    if g++ $FLAGS $INCS "$SRC/src/$prog.cpp" 2>/tmp/prog.$$; then
+        pp=$((pp+1))
+    else
+        pf=$((pf+1)); echo "  $prog.cpp does not compile:"; head -5 /tmp/prog.$$
+    fi
+done
+printf '%-22s %2d pass  %2d fail\n' "programs" "$pp" "$pf"
+pass=$((pass+pp)); fail=$((fail+pf))
+rm -f /tmp/prog.$$
 
 # ---------------------------------------------------------------------------
 # Phase C -- the converted Designer forms.

@@ -70,6 +70,16 @@ class SIG_IndividualListItem : public QTreeWidgetItem
   QString key(int, bool) const;
 
   /**
+   * Qt 2 sorted a QListView by comparing QListViewItem::key( column, ascending )
+   * as strings (qlistview.cpp:802). Qt 6's QTreeWidgetItem has no key() at all
+   * and sorts through operator< instead, so key() above became dead code the
+   * moment the base class changed and column 0 fell back to raw text --
+   * 0, 1, 10, 100, 11 where 1.3 shows 0, 1, 2, ... 10. This routes the sort
+   * back through it.
+   */
+  bool operator<( const QTreeWidgetItem &other ) const override;
+
+  /**
    * The pool-position of the SIG_GPIndividual this list item represents.
    */
   int poolPosition;

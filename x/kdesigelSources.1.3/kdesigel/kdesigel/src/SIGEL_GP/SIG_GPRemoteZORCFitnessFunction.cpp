@@ -187,7 +187,7 @@ namespace SIGEL_GP
                      <OL><LI>Set ZORC down to start executing the current program</LI><LI>Enter the distance travelled by ZORC</LI></OL> \
                      <BR><BR><I>Execute the program as many times as you want by restarting the program manually on ZORC</I> <BR><BR><BR>\
                      Enter the distance travelled by the robot (centimeters, 1 decimal):";
-      distance = QInputDialog::getDouble(dlogTitle, expInstruct, 1.0, 0, 500.0, 1, &wasOk);
+      distance = QInputDialog::getDouble(nullptr, dlogTitle, expInstruct, 1.0, 0, 500.0, 1, &wasOk);
 
       // something went wrong, set fitness to -1 -> will be re-evaluated by SIGEL
       if (!wasOk)
@@ -265,10 +265,10 @@ namespace SIGEL_GP
       int   idx = 0;
 
       // send all data
-      while ((const char)txtToSend[idx] != 0)
+      while (txtToSend[idx].toLatin1() != 0)
       {
          // put next char to serial interface
-         c = (const char)txtToSend[idx];
+         c = txtToSend[idx].toLatin1();
          idx++;
 
          // prevent double newlines..

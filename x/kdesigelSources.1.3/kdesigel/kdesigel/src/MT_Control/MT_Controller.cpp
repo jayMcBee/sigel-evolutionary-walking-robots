@@ -42,7 +42,7 @@ MT_Controller::MT_Controller(SIGEL_GP::SIG_GPExperiment &exp)
 	startWOSigel = false;
 	withGUI = true;
 	cacheStrm = 0;
-	saveName = QString::null;
+	saveName = QString();
 	usedSystem = NOMETA_SUBST;
 	selectedSystem = EVALUATOR_SUBST;
 	metaOn = false;
@@ -85,7 +85,7 @@ void MT_Controller::startSingleEvolution()
 		meta_thread = CreateThread(NULL, 0, &StartMetaEvolution, this, 0, 0);
 //		SetThreadPriority(meta_thread, THREAD_PRIORITY_BELOW_NORMAL);
 #else
-		pthread_create(&meta_thread, NULL, (void*) &StartMetaEvolution, (void*) this);
+		pthread_create(&meta_thread, NULL, (void*(*)(void*)) &StartMetaEvolution, (void*) this);
 #endif
 
 }
@@ -105,14 +105,15 @@ void MT_Controller::startTimedEvolution(int minutes)
 
 	QObject::connect(evolTimer, SIGNAL(timeout()), SLOT(stopEvolution()));
 	createGPSystem();
-	evolTimer->start(minutes * 60000, true);
+	evolTimer->setSingleShot(true);
+	evolTimer->start(minutes * 60000);
 
 	QObject::connect(gpManager, SIGNAL(metaEvolutionRunning(bool)), this, SLOT(slotEvolutionRunning(bool)));
 #ifdef _WINDOWS
 		meta_thread = CreateThread(NULL, 0, &StartMetaEvolution, this, 0, 0);
 //		SetThreadPriority(meta_thread, THREAD_PRIORITY_BELOW_NORMAL);
 #else
-		pthread_create(&meta_thread, NULL, (void*) &StartMetaEvolution, (void*) this);
+		pthread_create(&meta_thread, NULL, (void*(*)(void*)) &StartMetaEvolution, (void*) this);
 #endif
 }
 
@@ -164,7 +165,7 @@ bool MT_Controller::startEvolution()
 //		SetThreadPriority(meta_thread, THREAD_PRIORITY_BELOW_NORMAL);
 //		SetThreadPriorityBoost(meta_thread, true);
 #else
-		pthread_create(&meta_thread, NULL, (void*) &StartMetaEvolution, (void*) this);
+		pthread_create(&meta_thread, NULL, (void*(*)(void*)) &StartMetaEvolution, (void*) this);
 #endif
 	}
 
@@ -211,11 +212,11 @@ bool MT_Controller::switchSystem(int wantedSystem)
 			"Yes", "No", 0, 1, 1) == 0){
 
 			if(mainWindow){
-				QObject::disconnect(mainWindow->mtStartEvolutionAction, SIGNAL( activated() ), this, SLOT( startSingleEvolution() ));
-				QObject::disconnect(mainWindow->mtStopEvolutionAction, SIGNAL( activated() ), this, SLOT( stopEvolution() ));
-				QObject::disconnect(mainWindow->mtDefaultAction, SIGNAL( activated() ), this, SLOT(slotLoadDefault() ) );
-				QObject::disconnect(mainWindow->mtLoadAction, SIGNAL( activated() ), this, SLOT( slotLoadSetup() ) );
-				QObject::disconnect(mainWindow->mtSaveAction, SIGNAL( activated() ), this, SLOT( slotSaveSetup() ));
+				QObject::disconnect(mainWindow->mtStartEvolutionAction, SIGNAL( triggered() ), this, SLOT( startSingleEvolution() ));
+				QObject::disconnect(mainWindow->mtStopEvolutionAction, SIGNAL( triggered() ), this, SLOT( stopEvolution() ));
+				QObject::disconnect(mainWindow->mtDefaultAction, SIGNAL( triggered() ), this, SLOT(slotLoadDefault() ) );
+				QObject::disconnect(mainWindow->mtLoadAction, SIGNAL( triggered() ), this, SLOT( slotLoadSetup() ) );
+				QObject::disconnect(mainWindow->mtSaveAction, SIGNAL( triggered() ), this, SLOT( slotSaveSetup() ));
 				QObject::disconnect(mainWindow->evolTimer, SIGNAL( timeout() ), this, SLOT( stopEvolution() ));
 			}
 
@@ -226,7 +227,7 @@ bool MT_Controller::switchSystem(int wantedSystem)
 			mainWindow = 0;
 			gpManager = 0;
 			substitution = 0;
-			confStrm.unsetDevice();
+			confStrm.setDevice(nullptr);
 			if(confFile.isOpen()) confFile.close();
 		} else
 			return false;
@@ -262,18 +263,18 @@ bool MT_Controller::useMeta(bool state)
 			{
 			case 2 :	// disables the system, saves it and finally delete it from memory
 					// save the gpSystem
-				saveName = QString::null;	// force the routine to show a filedialog
+				saveName = QString();	// force the routine to show a filedialog
 				if(!saveSystem(proposedName))
 					return false;
 
 			case 1 :	// disables the system and remove it from memory
 						// remove it from memory
 				if(mainWindow){
-					QObject::disconnect(mainWindow->mtStartEvolutionAction, SIGNAL( activated() ), this, SLOT( startSingleEvolution() ));
-					QObject::disconnect(mainWindow->mtStopEvolutionAction, SIGNAL( activated() ), this, SLOT( stopEvolution() ));
-					QObject::disconnect(mainWindow->mtDefaultAction, SIGNAL( activated() ), this, SLOT(slotLoadDefault() ) );
-					QObject::disconnect(mainWindow->mtLoadAction, SIGNAL( activated() ), this, SLOT( slotLoadSetup() ) );
-					QObject::disconnect(mainWindow->mtSaveAction, SIGNAL( activated() ), this, SLOT( slotSaveSetup() ));
+					QObject::disconnect(mainWindow->mtStartEvolutionAction, SIGNAL( triggered() ), this, SLOT( startSingleEvolution() ));
+					QObject::disconnect(mainWindow->mtStopEvolutionAction, SIGNAL( triggered() ), this, SLOT( stopEvolution() ));
+					QObject::disconnect(mainWindow->mtDefaultAction, SIGNAL( triggered() ), this, SLOT(slotLoadDefault() ) );
+					QObject::disconnect(mainWindow->mtLoadAction, SIGNAL( triggered() ), this, SLOT( slotLoadSetup() ) );
+					QObject::disconnect(mainWindow->mtSaveAction, SIGNAL( triggered() ), this, SLOT( slotSaveSetup() ));
 					QObject::disconnect(mainWindow->evolTimer, SIGNAL( timeout() ), this, SLOT( stopEvolution() ));
 				}
 
@@ -284,8 +285,8 @@ bool MT_Controller::useMeta(bool state)
 				gpManager = 0;
 				mainWindow = 0;
 				substitution = 0;
-				saveName = QString::null;
-				confStrm.unsetDevice();
+				saveName = QString();
+				confStrm.setDevice(nullptr);
 				if(confFile.isOpen()) confFile.close();
 			
 			case 0 :	// disables the system and keeps it in memory
@@ -317,13 +318,13 @@ bool MT_Controller::createGPSystem()
 {
 	// make sure we loaded a configuration
 	if(!confStrm.device()){
-		readFromFile(QString::null);	// load an experiment without a filename
+		readFromFile(QString());	// load an experiment without a filename
 										// this should result in loading the 
 										// default configuration file
 	}
 
 	if(!confFile.isOpen()){
-		confFile.open(IO_ReadOnly);
+		confFile.open(QIODevice::ReadOnly);
 	}
 
 	// fill the substituter cache
@@ -359,11 +360,11 @@ void MT_Controller::configureSystem()
 		QBuffer buffer;					// create a buffered stream
 		QTextStream inStrm(&buffer);
 
-		buffer.open(IO_WriteOnly);		// save the substituter to the stream
+		buffer.open(QIODevice::WriteOnly);		// save the substituter to the stream
 		substitution->writeToFile(inStrm);
 		buffer.close();
 
-		buffer.open(IO_ReadOnly);		// load the cache from the stream
+		buffer.open(QIODevice::ReadOnly);		// load the cache from the stream
 		loadCache(inStrm);
 		buffer.close();
 	}
@@ -381,11 +382,11 @@ void MT_Controller::configureSystem()
 		}
 	}
 
-	QObject::connect(mainWindow->mtStartEvolutionAction, SIGNAL( activated() ), this, SLOT( startSingleEvolution() ));
-	QObject::connect(mainWindow->mtStopEvolutionAction, SIGNAL( activated() ), this, SLOT( stopEvolution() ));
-	QObject::connect(mainWindow->mtDefaultAction, SIGNAL( activated() ), this, SLOT(slotLoadDefault() ) );
-	QObject::connect(mainWindow->mtLoadAction, SIGNAL( activated() ), this, SLOT( slotLoadSetup() ) );
-	QObject::connect(mainWindow->mtSaveAction, SIGNAL( activated() ), this, SLOT( slotSaveSetup() ));
+	QObject::connect(mainWindow->mtStartEvolutionAction, SIGNAL( triggered() ), this, SLOT( startSingleEvolution() ));
+	QObject::connect(mainWindow->mtStopEvolutionAction, SIGNAL( triggered() ), this, SLOT( stopEvolution() ));
+	QObject::connect(mainWindow->mtDefaultAction, SIGNAL( triggered() ), this, SLOT(slotLoadDefault() ) );
+	QObject::connect(mainWindow->mtLoadAction, SIGNAL( triggered() ), this, SLOT( slotLoadSetup() ) );
+	QObject::connect(mainWindow->mtSaveAction, SIGNAL( triggered() ), this, SLOT( slotSaveSetup() ));
 	QObject::connect(mainWindow->evolTimer, SIGNAL( timeout() ), this, SLOT( stopEvolution() ));
 
 	mainWindow->show();
@@ -404,7 +405,7 @@ bool MT_Controller::readFromFile(QString fileName)
 		confFile.close();
 	}
 	if(confStrm.device()){
-		confStrm.unsetDevice();
+		confStrm.setDevice(nullptr);
 	}
 
 	bool stdConf = false;
@@ -412,17 +413,17 @@ bool MT_Controller::readFromFile(QString fileName)
 		stdConf = true;
 		defConfFileName = ::getenv("SIGEL_ROOT");
 		defConfFileName.append("/stdConf.mt");
-		confFile.setName(defConfFileName);
+		confFile.setFileName(defConfFileName);
 	} else {
-		confFile.setName(fileName);
+		confFile.setFileName(fileName);
 	}
 
-	if(confFile.open(IO_ReadOnly)){
+	if(confFile.open(QIODevice::ReadOnly)){
 
 		if(!stdConf)
 			saveName = fileName;		// remember where to save the system
 		else
-			saveName = QString::null;
+			saveName = QString();
 
 
 	} else {
@@ -435,9 +436,9 @@ bool MT_Controller::readFromFile(QString fileName)
 								"Standard", "Deactivate", 0, 0))
 			{
 			case 0 :	// load default settings
-				saveName = QString::null;
-				confFile.setName(defConfFileName);
-				if(!confFile.open(IO_ReadOnly)){
+				saveName = QString();
+				confFile.setFileName(defConfFileName);
+				if(!confFile.open(QIODevice::ReadOnly)){
 
 					// oops, couldn't open default configuration file
 					SIGEL_Tools::SIG_IO::cerr << "Loading experiment: couldn't load default settings. "
@@ -446,7 +447,7 @@ bool MT_Controller::readFromFile(QString fileName)
 					break;
 				}
 			case 1 :	// disable meta system
-				saveName = QString::null;
+				saveName = QString();
 				useMeta(false);
 				return false;
 				break;
@@ -461,7 +462,7 @@ bool MT_Controller::readFromFile(QString fileName)
 	// the data determined for the controller
 	bool error = false;
 
-	int idx = saveName.findRev(".mexp");
+	int idx = saveName.lastIndexOf(".mexp");
  	if(idx == -1){
 		baseName = saveName;
 	} else {
@@ -474,7 +475,7 @@ bool MT_Controller::readFromFile(QString fileName)
 	if(stdConf == true){
 		usedSystem = selectedSystem;
 		useMeta(true);
-	} else if(int index = tmpStr.find("usedSystem=") != -1 ){
+	} else if(int index = tmpStr.indexOf("usedSystem=") != -1 ){
 		switch(tmpStr.mid(index+10).toInt()){
 		case EVALUATOR_SUBST :
 			usedSystem = EVALUATOR_SUBST;
@@ -574,7 +575,7 @@ bool MT_Controller::saveSystem(QString sigExpName)
 	if(saveName.isEmpty()){
 		stdConf = true;
 		if(guiEnabled)
-			saveName = QFileDialog::getSaveFileName(proposedName, "*.mexp;;*", 0);
+			saveName = QFileDialog::getSaveFileName(nullptr, QString(), proposedName, "*.mexp;;*");
 		else
 			saveName = "lastExperiment.mexp";
 
@@ -591,7 +592,7 @@ bool MT_Controller::saveSystem(QString sigExpName)
 		return true;				// --> no need to save anything
 
 	QFile file(saveName);
-	if(file.open(IO_WriteOnly)){
+	if(file.open(QIODevice::WriteOnly)){
 		QTextStream fileStr(&file);
 
 		fileStr << "usedSystem=" << usedSystem << "\n";		// remember the used type of system
@@ -614,9 +615,9 @@ bool MT_Controller::saveSystem(QString sigExpName)
 				// system uses the default configuration
 				// therefore copy the default configuration file
 				QFile stdFile(defConfFileName);
-				if(stdFile.open(IO_ReadOnly)){
+				if(stdFile.open(QIODevice::ReadOnly)){
 					QTextStream stdStr(&stdFile);
-					fileStr << stdStr.read();
+					fileStr << stdStr.readAll();
 					stdFile.close();
 				} else
 					return false;
@@ -625,7 +626,7 @@ bool MT_Controller::saveSystem(QString sigExpName)
 		}
 
 		file.close();		// finished - close everything
-		file.open(IO_ReadOnly);
+		file.open(QIODevice::ReadOnly);
 	} else {
 		// oops, something went wrong
 		if(guiEnabled)
@@ -721,7 +722,7 @@ void MT_Controller::loadCache(QTextStream &File)
 
 		QFile defFile(defConfFileName);
 		QTextStream defStrm(&defFile);
-		defFile.open(IO_ReadOnly);
+		defFile.open(QIODevice::ReadOnly);
 
 		switch(usedSystem){
 		case CLASSIFIER_SUBST :
@@ -795,7 +796,7 @@ void MT_Controller::createCacheStrm()
 	}
 	
 	delete cacheStrm;
-	cacheStrm = new QTextStream(&cacheString, IO_ReadOnly);
+	cacheStrm = new QTextStream(&cacheString, QIODevice::ReadOnly);
 }
 
 /***
@@ -804,7 +805,7 @@ void MT_Controller::createCacheStrm()
 void MT_Controller::slotLoadDefault()
 {
 	QFile file(defConfFileName);
-	if(file.open(IO_ReadOnly)){
+	if(file.open(QIODevice::ReadOnly)){
 
 		QTextStream strm(&file);
 		delete substitution;
@@ -812,7 +813,7 @@ void MT_Controller::slotLoadDefault()
 
 		// get to know what kind of system to use
 		QString tmpStr = strm.readLine();
-		if(int index = tmpStr.find("usedSystem=") != -1 ){
+		if(int index = tmpStr.indexOf("usedSystem=") != -1 ){
 			switch(tmpStr.mid(index+10).toInt()){
 			case EVALUATOR_SUBST :
 				usedSystem = EVALUATOR_SUBST;
@@ -844,13 +845,13 @@ void MT_Controller::slotLoadDefault()
 
 void MT_Controller::slotLoadSetup()
 {
-	QString fileName = QFileDialog::getOpenFileName(QString::null, "Setup(*.mcnf);;All Files(*)",	mainWindow);
+	QString fileName = QFileDialog::getOpenFileName(mainWindow, QString(), QString(), "Setup(*.mcnf);;All Files(*)");
 	
 	if(fileName.isEmpty())
 		return;
 
 	QFile file(fileName);
-	if(file.open(IO_ReadOnly)){
+	if(file.open(QIODevice::ReadOnly)){
 
 		QTextStream strm(&file);
 		delete substitution;
@@ -858,7 +859,7 @@ void MT_Controller::slotLoadSetup()
 
 		// get to know what kind of system to use
 		QString tmpStr = strm.readLine();
-		if(int index = tmpStr.find("usedSystem=") != -1 ){
+		if(int index = tmpStr.indexOf("usedSystem=") != -1 ){
 			switch(tmpStr.mid(index+10).toInt()){
 			case EVALUATOR_SUBST :
 				usedSystem = EVALUATOR_SUBST;
@@ -890,7 +891,7 @@ void MT_Controller::slotLoadSetup()
 
 void MT_Controller::slotSaveSetup()
 {
-	QString fileName = QFileDialog::getSaveFileName(QString::null, "Setup(*.mcnf);;All Files(*)",	mainWindow);
+	QString fileName = QFileDialog::getSaveFileName(mainWindow, QString(), QString(), "Setup(*.mcnf);;All Files(*)");
 
 	if(fileName.isEmpty())
 		return;
@@ -904,7 +905,7 @@ void MT_Controller::slotSaveSetup()
 			"the existing file. Do really want to continue?", "Ok", "Cancel", 0, 1))
 			return;
 	}
-	if(file.open(IO_WriteOnly)){
+	if(file.open(QIODevice::WriteOnly)){
 
 		QTextStream strm(&file);
 

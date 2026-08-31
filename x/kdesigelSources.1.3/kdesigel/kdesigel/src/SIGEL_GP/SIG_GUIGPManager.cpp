@@ -21,6 +21,7 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 #include "SIGEL_GP/SIG_GUIGPManager.h"
+#include <QTreeWidget>
 #include "SIGEL_MasterGUI/SIG_Experiment.h"
 #include "SIGEL_MasterGUI/SIG_IndividualListItem.h"
 
@@ -33,18 +34,18 @@ namespace SIGEL_GP
   SIG_GUIGPManager::SIG_GUIGPManager( SIGEL_MasterGUI::SIG_Experiment &guiExperiment )
     : SIG_GPManager( guiExperiment.gpExperiment ),
       guiExperiment( guiExperiment ),
-      individualItems( guiExperiment.allIndividualsView->individualList->listviewIndividuals->childCount() )
+      individualItems( guiExperiment.allIndividualsView->individualList->listviewIndividuals->topLevelItemCount() )
   {
-    QListView *listView = guiExperiment.allIndividualsView->individualList->listviewIndividuals;
-    QListViewItemIterator listIter( listView );
+    QTreeWidget *listView = guiExperiment.allIndividualsView->individualList->listviewIndividuals;
+    QTreeWidgetItemIterator listIter( listView );
 
     // update generations display (this line looks cool, doesn't it ?!)
    // guiExperiment.experimentView->lcdnumberGenerations->display(actExperiment.population.getPoolGeneration());
 
-    while ( listIter.current() )
+    while ( *listIter )
       {
 	SIGEL_MasterGUI::SIG_IndividualListItem *actItem =
-	  static_cast<SIGEL_MasterGUI::SIG_IndividualListItem*>( listIter.current() );
+	  static_cast<SIGEL_MasterGUI::SIG_IndividualListItem*>( (*listIter) );
 	// insert(): a slot assignment. This container has no setAutoDelete, so
 	// Qt 2 deleted nothing here -- the items belong to the list view.
 	// Q2PtrVector::insert took a uint, so a negative index wrapped huge and was
@@ -59,7 +60,8 @@ namespace SIGEL_GP
   void SIG_GUIGPManager::haveABreak()
   {
     //    qApp->wakeUpGuiThread();
-    qApp->processEvents( actExperiment.gpParameter.getPassiveTime() );
+    qApp->processEvents( QEventLoop::AllEvents,
+                         actExperiment.gpParameter.getPassiveTime() );
     //    msleep( actExperiment.gpParameter.getPassiveTime() );
   };
 

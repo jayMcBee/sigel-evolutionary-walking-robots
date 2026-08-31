@@ -21,12 +21,12 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 #include <qapplication.h>
-#ifdef _WINDOWS
-#include <qwindowsstyle.h>
+#include <QCoreApplication>
+// Qt 2 forced a style on both platforms. Qt 6 ships only "Windows" and
+// "Fusion" -- QMotifPlusStyle does not exist and cannot be reproduced, so the
+// X11 branch takes Fusion, the closest cross-platform equivalent. See PORTING.md.
+#include <QStyleFactory>
 #include <qdir.h>
-#else
-#include <qmotifplusstyle.h>
-#endif
 
 #include <pvm3.h>
 #include <csignal>
@@ -92,7 +92,7 @@ extern "C"
 
 }
 
-bool guiEnabled = TRUE;
+bool guiEnabled = true;
 
 
 int main( int argc, char *argv[] ) {
@@ -116,7 +116,7 @@ int main( int argc, char *argv[] ) {
   std::signal( SIGTERM, sigelStandardSignalHandler );
 #endif
 
-  bool mtEvolve=FALSE;
+  bool mtEvolve=false;
 
   // slaves have a priority of 19 when computing to make them behave nice when run in
   // the background using our batchsystem. Since SIGEL is most of the time waiting for
@@ -139,12 +139,12 @@ int main( int argc, char *argv[] ) {
   // this hostfile as argument.
   int info=-1;
   QDir dir(::getenv("SIGEL_ROOT"));
-  bool useHostFile = dir.exists("hostfile", false);
+  bool useHostFile = dir.exists("hostfile");
 
   if (useHostFile) { // hostfile found
-    QString fPath = dir.absFilePath("hostfile");
+    QString fPath = dir.absoluteFilePath("hostfile");
     char *cfPath  = new char[fPath.length()+1];
-    strcpy(cfPath, fPath);
+    strcpy(cfPath, fPath.toLatin1().constData());
     info = pvm_start_pvmd( 1, &cfPath, 0 );	// start PVM daemon with the hostfile as argument
     delete[] cfPath;
   }
@@ -158,8 +158,8 @@ int main( int argc, char *argv[] ) {
   // Register to PVM
   int myTaskId=pvm_mytid();
 
-//  bool guiEnabled = TRUE;
-  bool dynClients = FALSE;
+//  bool guiEnabled = true;
+  bool dynClients = false;
 
   // Parse the argument line
   if(argc >= 2) {
@@ -167,36 +167,40 @@ int main( int argc, char *argv[] ) {
 
     // start evolution w/o GUI
     if ( (option == "-evolve") || (option == "-e") ) {
-      guiEnabled = FALSE;
+      guiEnabled = false;
     }
     // start evolution w. dynamic number of clients
     else if( (option == "-devolve") || (option == "-de") ) {
-      guiEnabled = FALSE;
-      dynClients = TRUE;
+      guiEnabled = false;
+      dynClients = true;
     }
 	// just start the meta evolution wo SIGEL and wo GUI
 	else if( (option == "-mtevolve") || (option == "-me") ) {
-		guiEnabled = FALSE;
-		mtEvolve = TRUE;
+		guiEnabled = false;
+		mtEvolve = true;
 	}
     // start SIGEL with GUI
     else {
-      guiEnabled = TRUE;
+      guiEnabled = true;
       printf("Options:\n\n\t-devolve, -de\t.....\tEvolve with dynamic clients\n\t-evolve, -e\t.....\tEvolve without GUI\n");
     }
   }
 
   // Start SIGEL with GUI
   if ( guiEnabled ) {
-    QApplication app( argc, argv, true );
+    QApplication app( argc, argv );
 #ifdef _WINDOWS
-    app.setStyle( new QWindowsStyle() );
+    app.setStyle( QStyleFactory::create( "Windows" ) );
 #else		
-    app.setStyle( new QMotifPlusStyle() );
+    app.setStyle( QStyleFactory::create( "Fusion" ) );
 #endif
 
     SIGEL_MasterGUI::SIG_MainWindow *mainWindow = new SIGEL_MasterGUI::SIG_MainWindow( 0 , "MainWindow" );
-    app.setMainWidget( mainWindow );
+    // Qt 2's setMainWidget() marked the widget whose closing ends the app and
+    // applied the X11 -geometry / -title command-line options to it
+    // (qapplication_x11.cpp:1846). Qt 6 has no such call: quitOnLastWindowClosed
+    // defaults to true, which covers the first half; -geometry and -title are
+    // gone from Qt entirely and cannot be reproduced.
     mainWindow->show();
 
     int result = app.exec();
@@ -220,7 +224,7 @@ int main( int argc, char *argv[] ) {
 
     QString experimentName( argv[2] );
     QFile experimentFile( experimentName );
-    if (!experimentFile.open( IO_ReadOnly )) {
+    if (!experimentFile.open( QIODevice::ReadOnly )) {
       SIGEL_Tools::SIG_IO::cerr << "Error opening " << experimentName << "!\n";
       pvm_halt();
       return 1;
@@ -244,7 +248,11 @@ int main( int argc, char *argv[] ) {
       serv_thread = CreateThread( NULL, 0, &MeJustCallingRegisterDynPVMClients, &gpManager, 0, 0 );
 #else
       pthread_t serv_thread;
-      pthread_create(&serv_thread, NULL,(void *) &MeJustCallingRegisterDynPVMClients,(void *) &gpManager);
+      // 1.3 cast the thread function to (void *), which pthread_create takes as
+      // void *(*)(void *). Older compilers let that through; C++17 does not, so
+      // the cast is spelled out. The function still returns nothing and the
+      // return value is still never read, exactly as before.
+      pthread_create(&serv_thread, NULL,(void *(*)(void *)) &MeJustCallingRegisterDynPVMClients,(void *) &gpManager);
 
 
 #endif
@@ -252,7 +260,10 @@ int main( int argc, char *argv[] ) {
 
 	if(mtEvolve){
 	
-		QApplication app( argc, argv, false );
+		// Qt 2's third argument was GUIenabled: this branch ran with NO GUI
+		// connection at all. QCoreApplication is that in Qt 6, and it keeps the
+		// same restriction -- no QWidget may be created on this path.
+		QCoreApplication app( argc, argv );
 
 		// start just the meta evolution (w/o sigel)
 		if(argc < 4)
@@ -280,7 +291,7 @@ int main( int argc, char *argv[] ) {
 		gpManager.wait();
 	}
 
-    if (!experimentFile.open( IO_WriteOnly )) {
+    if (!experimentFile.open( QIODevice::WriteOnly )) {
       SIGEL_Tools::SIG_IO::cerr << "Error opening " << experimentName << "!\n";
       pvm_halt();
       return 1;

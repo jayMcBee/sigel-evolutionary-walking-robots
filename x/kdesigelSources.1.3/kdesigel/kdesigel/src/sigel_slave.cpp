@@ -21,11 +21,10 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 #include <qapplication.h>
-#ifdef _WINDOWS
-#include <qwindowsstyle.h>
-#else
-#include <qmotifplusstyle.h>
-#endif
+// Qt 2 forced a style on both platforms. Qt 6 ships only "Windows" and
+// "Fusion" -- QMotifPlusStyle does not exist and cannot be reproduced, so the
+// X11 branch takes Fusion, the closest cross-platform equivalent. See PORTING.md.
+#include <QStyleFactory>
 #include <qstring.h>
 #include <qtextstream.h>
 
@@ -106,7 +105,7 @@ extern "C"
   };
 };
 
-bool guiEnabled = FALSE;
+bool guiEnabled = false;
 
 int main( int argc, char *argv[] ) {
   // Install the sigel standard signal handler
@@ -160,7 +159,7 @@ int main( int argc, char *argv[] ) {
 
     QString experimentName( argv[2] );
     QFile experimentFile( experimentName );
-    if (!experimentFile.open( IO_ReadOnly )) {
+    if (!experimentFile.open( QIODevice::ReadOnly )) {
 	  	SIGEL_Tools::SIG_IO::cerr << "Error opening " << experimentName << "!\n";
 	  	pvm_halt();
 	  	return 1;
@@ -220,7 +219,7 @@ int main( int argc, char *argv[] ) {
 
     QString pvmDataString = pvmData.getQStringFromPVM( masterTaskId, 23 );
 
-    QTextStream pvmDataStream( &pvmDataString, IO_ReadWrite );
+    QTextStream pvmDataStream( &pvmDataString, QIODeviceBase::ReadWrite );
 
     try {
       pvmData.loadPVMDataTransfer( pvmDataStream, *program );
@@ -275,14 +274,13 @@ int main( int argc, char *argv[] ) {
     QApplication a(argc, argv);
 
 #ifdef _WINDOWS
-      QApplication::setStyle( new QWindowsStyle() );
+      QApplication::setStyle( QStyleFactory::create( "Windows" ) );
 #else
-      QApplication::setStyle( new QMotifPlusStyle() );
+      QApplication::setStyle( QStyleFactory::create( "Fusion" ) );
 #endif		
       SIG_SimulationWindow *simWindow = new SIG_SimulationWindow(0, "simWindow");
-      a.setMainWidget(simWindow);
 
-      simWindow->setCaption("Simulation Visualisation");
+      simWindow->setWindowTitle("Simulation Visualisation");
       simWindow->show();
 
       // if we use the RemoteZORC-Fitnessfunction: run evaluation to transmit the program !
@@ -343,9 +341,9 @@ int main( int argc, char *argv[] ) {
 		else if (fitnessFunctionName == "RemoteZORCFitnessFunction") {
    				QApplication *app = new QApplication(argc, argv);
 #ifdef _WINDOWS
-				app->setStyle( new QWindowsStyle() );
+				app->setStyle( QStyleFactory::create( "Windows" ) );
 #else					
-				app->setStyle( new QMotifPlusStyle() );
+				app->setStyle( QStyleFactory::create( "Fusion" ) );
 #endif			
 
 				fitnessFunction = new SIGEL_GP::SIG_GPRemoteZORCFitnessFunction( *program, *robot, *environment,	*simulationParameters );

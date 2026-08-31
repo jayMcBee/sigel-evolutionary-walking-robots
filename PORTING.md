@@ -1705,7 +1705,7 @@ modules include the headers `uic` generates from them.
 | C5 | **DONE 2026-08-30, done FIRST — it is the dependency root.** `SIGEL_Visualisation`, 23 Qt 2 sites, 12/12 sources and headers compile, in `check.sh` | 3,564 LOC, 12 sources |
 | C6 | **DONE 2026-08-31.** `MT_GUI` — 31 dead connects, the prepending page list, and a right-click that cleared the selection | 4,513 LOC, 23 sources |
 | C7 | **DONE 2026-08-31.** `SIGEL_MasterGUI` — all **44 dead connects** repaired (§2), **23 prepending item sites**, the three owning `QDict`s, and 21 validators that would have read the decimal point by system locale. 29/29 sources and 29/29 headers compile; the module is in `MODULES` with a dead-signal baseline of 0 | 8,791 LOC measured (6,164 source + 2,627 header), 29 sources, 20 hand-written |
-| C8 | `sigel.cpp`, `sigel_slave.cpp`; **`MT_Control`'s 15 dead connects** (§2) | 15 sites |
+| C8 | **DONE 2026-08-31.** `sigel.cpp`, `sigel_slave.cpp`, `MT_Control`'s 15 dead connects, and the four core files no module list reached. **The tree's dead-signal count is now 0 with no non-zero baseline anywhere.** `check.sh` gained a `programs` section and a `dead item virtuals` check | 15 sites + 4 files |
 | C9 | All five modules and both programs build, link and run | — |
 
 Each module step is the same shape: `qt3to4` in the container, hand-port off
@@ -2985,6 +2985,98 @@ module's 66 plus 4 elsewhere from now including converted headers. All three
 behaviour baselines byte-identical, and the encodings gate still reports the
 same 25 known D6 losses — the module's 4 CRLF files and 1 Latin-1 file came
 through unchanged.
+
+---
+
+#### C8 — the two programs, and a virtual that stopped being virtual
+
+**The programs were never compiled by anything.** `sigel.cpp` and
+`sigel_slave.cpp` are `src/*.cpp`, so no `MODULES` entry reached them and no
+gate had ever built them. That is how a `QMotifPlusStyle` Qt 6 does not have,
+and a `pthread_create` cast C++17 rejects, both survived to C8. `check.sh` now
+has a **`programs`** section; C9 still owns link-and-run.
+
+**`QMotifPlusStyle` cannot be reproduced.** Qt 6 ships exactly two styles here —
+measured, `QStyleFactory::keys()` returns `Windows, Fusion`. The `_WINDOWS`
+branch maps cleanly to `"Windows"`; the X11 branch took **Fusion**, and the
+Motif look is simply gone. Recorded as unreproducible rather than papered over.
+
+**`setMainWidget` splits in two.** Qt 2's did three things
+(`qapplication_x11.cpp:1846`): marked the widget whose closing ends the app, set
+the WM command property, and applied the X11 `-geometry` / `-title` options.
+Qt 6 has no such call. `quitOnLastWindowClosed` is true by default and covers
+the first; **`-geometry` and `-title` are gone from Qt entirely** and are not
+reproducible. The three-argument `QApplication( argc, argv, GUIenabled )`
+becomes `QCoreApplication` on the meta-evolution path, which keeps the same
+"no widget may be created here" restriction the `false` argument imposed.
+
+**`MT_Control`'s 15 dead connects** were all `QAction::activated()` →
+`triggered()`; ten of them are `disconnect`, which is equally a no-op when the
+signal does not exist. With those gone **no module carries a non-zero
+dead-signal baseline any more**, so a new one now fails the gate wherever it
+appears.
+
+**The four files no module list reached** — `SIG_GUIGPManager`,
+`MT_Controller`, and the two ZORC fitness functions — carried the same taxonomy
+one step late: the list-view family, `QString::null`, `QTextStream::read()` →
+`readAll()`, `unsetDevice()` → `setDevice(nullptr)` (which is literally what Qt 2's
+was), `QTimer::start(ms, singleShot)` split in two, `QFile::setName` →
+`setFileName`, `QInputDialog::getDouble`'s parent moving to the front, and a
+`QChar`→`char` cast that Qt 6 requires be spelled `toLatin1()`.
+`WIN_SIG_GPRemoteZORCFitnessFunction` needs `HANDLE` and `OVERLAPPED` from
+`windows.h`; it has **no Qt 2 API left in it** and cannot compile on Linux at
+all, so its header failure is correct and permanent rather than debt.
+
+**What the 1.3 oracle settled, and the bug it found.** Seven questions were put
+to the running 1.3 binary. Six confirmed the port — the greyed-action set with
+no experiment (and that the `Import >` / `Export >` submenu **parents** stay
+enabled, which the port respects), the short toolbar labels, the toolbar icons
+drawing at natural size with button height 31, the Language-Parameters list
+displaying `ADD…SUB` against a source order of `SUB…ADD`, the rename-loses-its-
+context-menu defect, and that deleting the last experiment is survivable.
+Clicking the already-active MetaGP system was measured as a **complete no-op**
+(0 differing status-bar pixels), which is the behaviour C7's review had already
+restored.
+
+*The seventh found a defect no reading had caught.* The individuals list
+displays in **creation order — 0, 1, 2, … 10, with "10" last**, which rules out
+both prepend and lexicographic sorting. It is neither: `SIG_IndividualListItem`
+overrides Qt 2's `QString key( int, bool )`, zero-padding each value to a fixed
+width so the sort is numeric (`qlistview.cpp:802` sorts by comparing those
+strings). **Qt 6's `QTreeWidgetItem` has no `key()` at all** — it sorts through
+`operator<` — so the moment C7 changed the base class that override became dead
+code which still compiles, still looks correct, and is never called. Measured:
+raw items sort `0 1 10 100 11 2` where 1.3 gives `0 1 2 10 11 100`. An
+`operator<` now routes the comparison back through `key()`.
+
+**The oracle's one contradicting answer was withdrawn, and the retraction is
+worth more than the answer.** It first reported that an empty-space right-click
+in the experiment tree produced no menu and left the selection intact — which
+contradicted `qlistview.cpp:3388-3396` and, more tellingly, contradicted its own
+result for the individuals list, the same widget class. Asked to re-test, it
+found the cause: the earlier run had an invisible application-modal dialog
+holding the X input grab behind the main window, swallowing every click. Re-run
+clean, the tree behaves exactly as the source says at five different x/y
+positions, selection clearing included. **The port was right and the measurement
+was wrong**; the source-faithful version stands unchanged.
+
+*Its corrected child-row map then confirmed the `menuDict` work end to end.* It
+found a context menu on exactly five rows — the experiment row, Robot,
+GP-Parameters, Simulation-Parameters and Environment — and **none at all** on
+Individuals and Language-Parameters. `menuDict` is inserted with exactly five
+keys and those two are not among them, so `menuDict.value()` returns null and
+the `if( showMenu && showWidget )` guard drops the popup. That is a live
+confirmation that `operator[]` → `.value()` was the right conversion (a
+`QHash::operator[]` would have inserted a null on every one of those clicks) and
+that the guard reproduces 1.3. It also confirms the menu labels `"RobotView"`
+and `"GPParameter"` are 1.3's own internal-looking strings, not a porting slip.
+
+*This is a class the compiler and every existing gate are blind to: a virtual
+that silently stopped overriding anything.* `check.sh` gained a **`dead item
+virtuals`** check — a class declaring Qt 2's `key(int,bool)` must also declare
+`operator<(const QTreeWidgetItem &)` — and it was teeth-tested by deleting the
+new `operator<`, which takes it from 1 pass to 1 fail. It is the only `key()`
+in the tree, and there were no other `operator<` overrides to conflict with.
 
 ---
 

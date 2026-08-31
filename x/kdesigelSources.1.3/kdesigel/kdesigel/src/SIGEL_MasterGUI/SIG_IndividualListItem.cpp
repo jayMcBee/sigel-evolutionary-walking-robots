@@ -122,6 +122,20 @@ QString SIG_IndividualListItem::key(int column, bool ascending) const {
   return QString();
 };
 
+bool SIG_IndividualListItem::operator<( const QTreeWidgetItem &other ) const
+{
+  // Direction is Qt 6's business -- it reverses the result for a descending
+  // sort, exactly as Qt 2 reversed the sibling list (qlistview.cpp:814-823) --
+  // so the key is always taken in its ascending form.
+  const QTreeWidget *tree = treeWidget();
+  const int column = tree ? tree->sortColumn() : 0;
+  const SIG_IndividualListItem *o =
+    dynamic_cast<const SIG_IndividualListItem *>( &other );
+  if( !o )
+    return QTreeWidgetItem::operator<( other );
+  return key( column, true ) < o->key( column, true );
+};
+
 void SIG_IndividualListItem::setTo( SIGEL_GP::SIG_GPIndividual *theIndividual )
 {
   if( theIndividual )
