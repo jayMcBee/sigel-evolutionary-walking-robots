@@ -15,7 +15,10 @@ MT_MainWindow::MT_MainWindow(MT_Controller *controller, MT_GPManager *manager, s
 	// MODAL. Qt 6's Qt::Dialog is a window type only; windowModality defaults
 	// to NonModal and nothing else sets it. The bit values happen to coincide
 	// at 0x3, which is a coincidence and not an equivalence.
-	if ( f & Qt::Dialog )
+	// Qt::Dialog is Window|0x2, so `f & Qt::Dialog' is also true for a plain
+	// Qt::Window, Qt::Tool, or anything else with bit 0 set. The window TYPE is
+	// the masked value.
+	if ( ( f & Qt::WindowType_Mask ) == Qt::Dialog )
 		setWindowModality( Qt::ApplicationModal );
 	evolRunning = false;
 	boss = controller;
@@ -266,6 +269,11 @@ void MT_MainWindow::closeEvent(QCloseEvent *e)
 
 void MT_MainWindow::slotRaiseWidget(QTreeWidgetItem *item)
 {
+	// Same shape as MT_PopulationWidget::slotCurrentChanged: Qt 6's
+	// currentItemChanged carries a null current where Qt 2's currentChanged
+	// did not, e.g. after setCurrentItem(nullptr).
+	if(!item) return;
+
 	int pos = static_cast<MT_ExperimentItem*>(item)->getPos();
 	MT_WidgetBase *nextWidget = widgets[pos];
 	MT_WidgetBase *actWidget  = 0;

@@ -40,7 +40,10 @@ MT_PopulationWidget::MT_PopulationWidget(QMainWindow* parent, const char* name, 
 	// create the toolbar
 	// Qt 2's QToolBar(QMainWindow*, name) docked itself (qtoolbar.cpp:279).
 	popToolBar = new QToolBar(parent);
-	parent->addToolBar(Qt::TopToolBarArea, popToolBar);
+	// Qt 2 guarded this: `if ( parent ) parent->addToolBar(...)'
+	// (qtoolbar.cpp:278-279), warning rather than crashing otherwise.
+	if(parent)
+		parent->addToolBar(Qt::TopToolBarArea, popToolBar);
 	popToolBar->setObjectName("mtPopToolBar");
 	popToolBar->hide();
 	popToolBar->setWindowTitle("MT Population");
@@ -255,9 +258,11 @@ void MT_PopulationWidget::slotCurrentChanged(QTreeWidgetItem *item)
 	// clean the display
 	individualProgramView->clear();
 
-	// Belt and braces: Qt 6 can deliver a null current in situations Qt 2 had
-	// no signal for at all (an item removed under the cursor, say). 1.3 never
-	// reached this slot with null, so returning is the faithful no-op.
+	// Belt and braces. Qt 2 DID signal a removal -- QListViewItem::takeItem
+	// emits currentChanged (qlistview.cpp:713-714), with 0 when the view
+	// empties (:688-689) -- so this is not a Qt 6 invention. It is unreachable
+	// either way, because slotDelInd refuses to delete the last item, and on
+	// the reachable case Qt 6 matches Qt 2. Returning is the faithful no-op.
 	if(!item) return;
 
 	// get the currently selected individual

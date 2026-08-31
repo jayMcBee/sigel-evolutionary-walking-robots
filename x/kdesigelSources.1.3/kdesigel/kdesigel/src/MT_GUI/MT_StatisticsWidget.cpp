@@ -17,7 +17,9 @@ MT_StatisticsWidget::MT_StatisticsWidget(QMainWindow* parent, const char* name, 
 	// Qt 2's QToolBar(label, QMainWindow*, dock) docked itself
 	// (qtoolbar.cpp:240). Qt 6's does not.
 	statToolbar = new QToolBar("MT Statistics", parent);
-	parent->addToolBar(Qt::TopToolBarArea, statToolbar);
+	// Qt 2 guarded this (qtoolbar.cpp:278-279).
+	if(parent)
+		parent->addToolBar(Qt::TopToolBarArea, statToolbar);
 	statToolbar->hide();
 
 #ifdef _WINDOWS

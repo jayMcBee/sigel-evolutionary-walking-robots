@@ -297,9 +297,16 @@ et=$(echo "$enc_out" | sed -n 's/^COUNTS [0-9]* [0-9]* [0-9]* \([0-9]*\)/\1/p')
 # so the gate fails on a NEW one rather than standing permanently red. Lower it
 # when they are restored, never raise it.
 ENC_BASELINE=25
-# Fail CLOSED. If the python above dies, $ep/$ef are empty, `[ "$ef" -gt 25 ]'
-# errors, and -- because it is an `if' condition -- set -e does not fire: the
-# gate printed blanks and scored 0/0 while claiming to have run. Found by review.
+# Fail CLOSED on an empty result. The failure this catches is "python exited 0
+# but printed no COUNTS line": $ep/$ef come back empty, `[ "$ef" -gt 25 ]' errors,
+# and because that is an `if' CONDITION set -e does not fire -- so the gate used
+# to print blanks and score 0/0 while claiming to have run.
+#
+# If python exits NON-zero instead, set -e trips on the enc_out assignment above
+# and the script stops there, printing no encodings row and no total: line. That
+# is loud rather than silent, so it is left alone -- but a reader should not
+# expect this branch to be what handles it. An earlier version of this comment
+# said set -e does not fire at all, which is wrong.
 if [ -z "$ep" ] || [ -z "$ef" ]; then
     echo "  encodings check produced no COUNTS line -- treating as FAILED"
     printf '%-22s %2d pass  %2d fail\n' "encodings" 0 1
@@ -327,6 +334,7 @@ cat > /tmp/dsp.$$.cpp <<'DSPEOF'
 #include "MT_GUI/DoubleSpinBox.h"
 #include <QApplication>
 #include <QLineEdit>
+#include <QLocale>
 #include <cstdio>
 struct P : DISpinBox {
     P(int d) : DISpinBox(d) {}
@@ -347,6 +355,16 @@ int main(int c, char **v)
     P d(3); d.setRange(3, 0.0, 100.0); d.type("0.375");
     eq("3dp text",  d.text(),                  "0.375");
     eq("3dp value", QString::number(d.value()), "375");
+    // 1.3 was locale-INDEPENDENT: QApplication forced LC_NUMERIC=C and Qt 2's
+    // QDoubleValidator hard-coded '.'. Qt 6's validators follow the system
+    // locale while QString::toDouble does not, so without QLocale::c() on the
+    // validator a comma-decimal locale reads 0.375 as 0. This row runs the same
+    // input under de_DE and is the only thing here that can see that.
+    QLocale::setDefault(QLocale(QLocale::German, QLocale::Germany));
+    P g(3); g.setRange(3, 0.0, 100.0); g.type("0.375");
+    eq("3dp text de_DE",  g.text(),                  "0.375");
+    eq("3dp value de_DE", QString::number(g.value()), "375");
+    QLocale::setDefault(QLocale::c());
     P e(1); e.setRange(1, 0.0, 100.0); e.type("2.5");
     eq("1dp text",  e.text(),                  "2.5");
     eq("1dp value", QString::number(e.value()), "25");

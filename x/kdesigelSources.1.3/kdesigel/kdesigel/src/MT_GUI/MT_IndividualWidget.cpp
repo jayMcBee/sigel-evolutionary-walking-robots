@@ -414,7 +414,7 @@ void MT_IndividualsWidget::slotRButtonClicked(const QPoint &pos)
 	// hand. (1) It delivered a GLOBAL position (viewport()->mapToGlobal, see
 	// qlistbox.cpp:1825); customContextMenuRequested delivers viewport
 	// coordinates. (2) When the click MISSED an item, Qt 2 called
-	// clearSelection() before emitting (qlistbox.cpp:1655) -- which is why
+	// clearSelection() before emitting (qlistbox.cpp:1656-1658) -- which is why
 	// 1.3 greys out Delete on blank space: clearing fires selectionChanged,
 	// and slotSelectionChanged disables the action. Qt 6 does neither.
 	// Confirmed on the running 1.3: on a row all four entries are enabled; on

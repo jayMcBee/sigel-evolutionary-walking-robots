@@ -7,6 +7,7 @@
 
 #include <QSpinBox>
 #include <QValidator>
+#include <QLocale>
 
 #define INTTYP 0
 #define DBLTYP 1

@@ -2561,11 +2561,16 @@ faithful one. *Written because a defect of exactly that shape was found in
 
 #### C6 — `MT_GUI`: the MetaGP window, and a right-click that cleared the selection
 
-23 sources and 23 headers, 4,669 lines at HEAD. *§7's "3,911 LOC, 14 files" was
-right for the pristine tree — 14 `.cpp` at 3,289 plus 15 `.h` at 622 — and did
-count the headers; what it omits is the eight form bases C1/C2 added. A claim
-here that it counted neither was wrong, and the 4,513 figure was the module's
-size at the parent commit.* All 23 compile; 31 dead connects repaired.
+**23 sources and 23 headers, 4,793 lines** — measured at HEAD, and the third
+figure this section has carried. *4,513 was `eace8c6`, the grandparent; 4,669
+was `f3287e8`, the parent, recorded as "at HEAD" in the very commit that added
+81 more lines. A step whose stated purpose was fixing a miscount landed two
+fresh ones. **Re-measure at the commit you are describing, not the one you
+started from.*** §7's pristine "3,911 LOC" is exact — 14 `.cpp` at 3,289 plus
+15 `.h` at 622 — but its "14 files" counts only the `.cpp`, so the LOC and the
+file count are on different bases. What the pristine tree lacks is the **nine**
+form bases C1/C2 added, not eight: `MT_AddIndividualsWidget.cpp` is a ninth
+`uic3 -impl` base and `check.sh`'s own form list names all nine. All 23 compile; 31 dead connects repaired.
 
 **66 warnings, and a claim here that all 71 were pre-existing 2003 shapes was
 wrong.** Six were not. Five are now gone: four `Qt::CTRL+Qt::Key_D` on
@@ -2680,7 +2685,10 @@ a divergence: the form sets no maximum and **both** Qt 2 and Qt 6 default
 — clicking either produced no pixel change under synthetic input, which the box
 correctly reported as an instrument limitation rather than a finding.
 
-**Four defects the review found after the step was committed, all now fixed.**
+**Nine defects two review rounds found after the step was committed, all now
+fixed. Two of them were introduced by the fixes for the other seven** — which is
+the argument for reviewing a review-action commit rather than treating it as
+bookkeeping.
 
 **A reachable null dereference.** `currentChanged(QListViewItem*)` became
 `currentItemChanged(QTreeWidgetItem*,QTreeWidgetItem*)`, and Qt 6 emits that
@@ -2699,12 +2707,28 @@ so a typed `0.375` was rejected and rewritten to `0` and the override never saw
 the fraction. Qt 2 had no such gate — `interpretText()` called
 `mapTextToValue()` unconditionally (`qspinbox.cpp:725-741`) and the
 `QLineEdit`'s validator was the only constraint on typing. Both are now
-overridden to defer to that same validator. Measured before: `0.375 → 0`;
-after: `0.375 → 375`, matching 1.3. **This affects `toleranceSpinBox`,
+overridden to defer to that same validator.
+
+**And that fix was itself locale-dependent, which 1.3 never was.** Qt 6's
+`QDoubleValidator` follows `QLocale::system()` while `QString::toDouble()` is
+locale-independent, so the two disagreed: under a comma-decimal locale the
+validator rejected `0.375` and accepted `0,375`, which `toDouble` then read as
+**0** — the same bug the override exists to remove, in a different locale, and
+strictly worse than before. 1.3 could not have that problem: `QApplication`
+forced `setlocale(LC_NUMERIC, "C")` at startup
+(`qapplication_x11.cpp:1389`) and Qt 2's `QDoubleValidator` hard-coded the
+separator, `input.find('.')` (`qvalidator.cpp:387`). Both validators are now
+pinned to `QLocale::c()`. Measured — `0.375 → 375` under both `C` and `de_DE`,
+where before the fix it was 375 under `C` only and 0 under `de_DE`.
+*`setKeyboardTracking(false)` goes with it: Qt 2's `textChanged` only set an
+`edited` flag (`qspinbox.cpp:780-783`) and `valueChanged` came solely from
+`setValue`, where Qt 6 interprets every keystroke.* **This affects `toleranceSpinBox`,
 `powerSpinBox` and `lineProbSpinBox` — GP configuration values.**
 `check.sh` gained a `widgets` section that types into a `DISpinBox` and
-compares; it is the only mechanical check that can see this class, and it
-fails on the unfixed code.
+compares; it is the only mechanical check that can see this class, and it fails
+on the unfixed code. **It now types the same value under `de_DE` as well** —
+without that row it ran only at the ambient C locale and was blind to the
+locale bug the first fix introduced.
 
 **All four toolbars were floating, and eight widgets were unlaid-out overlays.**
 Qt 2's `QToolBar` constructors **docked themselves** —
@@ -2717,7 +2741,29 @@ joined its layout on construction. Qt 6 does neither. `addToolBar` and eight
 
 **`MT_MainWindow` lost its modality and its object name.** `WType_Modal` did not
 merely name a window type in Qt 2 — see the table above. And the constructor
-dropped `setObjectName` where every other class in the module keeps it.
+dropped `setObjectName` where every other class in the module keeps it. *The
+modality test was then written `f & Qt::Dialog`, which is true for a plain
+`Qt::Window` as well, since `Qt::Dialog` is `Window|0x2`. The window type is the
+masked value: `( f & Qt::WindowType_Mask ) == Qt::Dialog`.*
+
+**A second crash, of the same family as the first and missed by the same
+sweep.** `MT_ExperimentWidget::lastSelected()` opens with
+`prevSelectedItems.head()`. Qt 2's `QQueue` was pointer-based over `QGList` and
+returned **0** on an empty queue (`qqueue.h:62`), and
+`QListView::setCurrentItem(0)` was an explicit no-op (`qlistview.cpp:4124`).
+Qt 6's `QQueue` is a `QList`, and `head()` on an empty one segfaults in a
+release build. **Reachable on the first refused page switch**, because
+`slotRaiseWidget` enqueues only in its success branch, and
+`MT_StatisticsWidget::onHide` refuses whenever the evolution is running. Guarded.
+`MT_MainWindow::slotRaiseWidget` had the identical unguarded dereference the
+first fix had just repaired one file over; guarded too. *The first sweep looked
+for slots that dereference a pointer parameter and stopped there; this one
+dereferences a container's front element, and the enqueue that feeds it accepts
+the null.*
+
+**Qt 2 guarded a null parent before docking a toolbar** — `if ( parent )
+parent->addToolBar(...)` (`qtoolbar.cpp:278-279`) — and the docking fix did not.
+Unreachable today, both sites being constructed with `this`, but restored.
 
 **Gates: `./check.sh` 773 pass, 5 fail, 436 warnings — and 393 → 773 is again
 not a like-for-like step.** The total decomposes as modules 149 + headers 155 +
