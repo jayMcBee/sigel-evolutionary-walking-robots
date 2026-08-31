@@ -227,11 +227,14 @@ times.
 **But `SIGNAL()`/`SLOT()` is not a no-op row, and this file said it was.** It
 read: "The 444 `SIGNAL()`/`SLOT()` macros in 174 `connect()` calls are **all
 still valid** — string-based connect was never removed." *Neither figure
-reproduces at any scope; 174 is `SIGEL_MasterGUI`'s macro count alone. Measured
-over the whole source tree with `command grep -rhoE 'SIGNAL *\('` and friends:
-**299 `SIGNAL()` + 312 `SLOT()` = 611 macros, in 248 `connect()` and 54
-`disconnect()` calls**, all of them in `.cpp` files.* The *mechanism*
-survived; **nine of the 41 distinct signal signatures did not**, and a
+reproduces at any scope; 174 is `SIGEL_MasterGUI`'s macro count alone (80 + 94).
+Measured over the whole source tree: **299 `SIGNAL()` + 312 `SLOT()` = 611
+macros, in 246 `connect()` and 54 `disconnect()` calls.* A tree-wide
+`\bconnect *\(` returns 248 — two of those are not Qt at all: the BSD socket
+`connect()` in `src/manage_dyn_slave.c:121` and one inside a doc comment in
+`include/SIGEL_Simulation/SIG_Simulation.h:126`. Every real one is in a `.cpp`.* The *mechanism*
+survived; **nine kinds of signal did not** — 12 of the tree's 37 distinct
+signatures, counting overloads — and a
 string-based connect to a signal that is not there compiles, links, runs and
 never fires. Nothing in the compiler or in `check.sh` could see it. C4 shipped
 ten such connects and only review caught them.
@@ -259,8 +262,17 @@ is live — moc emits a cloned method for the default argument of
 `QString` overload went; `valueChanged(int)` (checked on `QSlider` **and**
 `QSpinBox`, since the 85 sites split across both), `textChanged(…)`,
 `stateChanged(int)`, `toggled(bool)` (including on `QAction`, which two senders
-are), `pressed()` and `timeout()` are all unchanged. **16 of the 41 are SIGEL's
-own signals.**
+are), `pressed()` and `timeout()` are all unchanged. **The tree has 37 distinct signal signatures, not 41.** 41 is the count of
+*raw spellings*, which differ only by whitespace — `selectionChanged(
+QListViewItem * )` and `selectionChanged(QListViewItem*)` are one signature and
+two spellings, and `connect()` compares the normalised form. Normalised, the
+pristine tree has **37**, and they partition exactly:
+
+    17  SIGEL's own signals      (declared in the tree's own `signals:` blocks)
+    12  dead in Qt 6             (the nine kinds above, across their overloads)
+     8  still live, unchanged
+    --
+    37
 
 **`lostFocus()` was in this table and was wrong in both halves.** It was listed
 as `QLineEdit`'s, 2 sites, to become `editingFinished()`. **Qt 2.3's `QLineEdit`
@@ -279,8 +291,17 @@ old value.
 not tell you the class. A user-defined signal sharing a framework name is a
 false positive whichever direction the sweep points — dead-signal hunts and
 live-signal hunts alike. **The counter-check is to parse every `signals:` block
-in the tree and intersect**; run over all nine names it returns exactly one
-collision, `lostFocus`, which is what makes the single hit trustworthy. The
+in the tree and intersect.** Against the *corrected* nine that intersection is
+**empty** — `lostFocus` is precisely the name it removed. *Recorded as "exactly
+one collision" at first, which was true of the wrong list.*
+
+**And the live column is still recorded by signature, which is the same
+blindness one column over.** `textChanged(const QString&)` is listed unchanged,
+and it is — on `QLineEdit`, which all 27 senders are. But Qt 2's `QComboBox`
+declared `textChanged(const QString&)` too and **Qt 6's does not**
+(`currentTextChanged`), and `QSpinBox::valueChanged(const QString&)` is
+likewise gone. Zero such senders today; C6 and C7 must check the class, not the
+spelling. The
 inverse error was in this table at the same time: `selectionChanged` was
 recorded only in its no-argument form, and Qt 2's `QListView` declared a
 `selectionChanged(QListViewItem*)` overload too. *The two errors cancelled in
@@ -290,13 +311,29 @@ the total, which is why the pristine count did not move.*
 `SIGEL_MasterGUI` (C7), 31 in `MT_GUI` (C6), 15 in `MT_Control` (C8)**, and
 zero in the **eleven other** modules `check.sh` compiles. *`MT_Control` is one
 of the twelve it compiles, so "zero everywhere it looks" was false; its 15 are
-carried as a baseline until C8.* Of the 100, **82 are `connect()` and 18 are
+carried as a baseline until C8.* Of the 100, **83 are `connect()` and 17 are
 `disconnect()`** — a dead `disconnect` is equally a no-op, so nothing is
-mis-prioritised, but the column counts sites, not connects.
+mis-prioritised, but the column counts sites, not connects. *That split was
+first recorded as 82/18, computed before the table was corrected and not
+recomputed after: `lostFocus` contributed one of each and
+`selectionChanged(QListViewItem*)` contributes two connects. **A derived figure
+left standing after its source was corrected — the third time in three rounds.***
 **`check.sh` fails any module whose count exceeds its baseline**, which is zero
 for every converted module.
-The gate also scans `sigel.cpp`, `sigel_slave.cpp` and the forms, which sit in
-no module directory and so were under no baseline.
+The gate also scans `sigel.cpp`, `sigel_slave.cpp` and `SIGEL_RealInterface`,
+which sit in no module directory and so were under no baseline. **The forms need
+a separate pattern**: a `.ui` `<connection>` carries the bare signal name as XML,
+not a `SIGNAL()` macro, so the main regex structurally cannot match one. *It was
+pointed at the `.ui` directory anyway and claimed a coverage it could not have.*
+All 49 form connections are live today.
+
+**And the regex now self-tests.** It is the one check here that is a pattern
+rather than a compiler, so it is the only one that can quietly stop matching —
+which it did, for a whole commit, when `selectionChanged` was anchored to `( )`.
+33 rows of spellings that must match and near-misses that must not, including a
+converted `selectionModel()->selectionChanged(sel, desel)`, which must pass.
+Re-narrowing the pattern makes the self-test fail on exactly the two rows the
+bug hid.
 
 ### Structure
 
@@ -482,9 +519,19 @@ through `f0f2daa`.
 
 ## 7. Steps
 
-**Exit criterion per step:** `./check.sh` at the repo root — **227 pass, 4 fail,
-355 warnings** as of 2026-08-31, C4 (203/4/309 at C2; the rise is
-`SIGEL_Visualisation` 22 + `SIGEL_CommonGUI` 10, both newly covered) (105/4/309 before Phase C; 322 warnings on
+**Exit criterion per step:** `./check.sh` at the repo root — **393 pass, 5 fail,
+355 warnings** as of 2026-08-31, C4.
+
+**The pass/fail basis changed at C4 and earlier figures are not comparable.**
+The standalone header pass had always been reported and never added to the
+totals, so the headline "fail" excluded a real header failure; it is now folded
+in, along with the 33-row regex self-test and the parsers check.
+**228 + 132 + 33 = 393, and 4 + 1 = 5.** Warnings are on the unchanged basis and
+remain comparable throughout.
+
+Earlier figures, on the old basis: 227/4/355 at C4 as first recorded, 203/4/309
+at C2 (the rise being `SIGEL_Visualisation` 22 + `SIGEL_CommonGUI` 10, both
+newly covered), 105/4/309 before Phase C, 322 warnings on
 2026-08-28 — the drops are recorded per step and each is explained, because a
 step that silently loses a warning has hidden something). The 4 failures are
 exactly the files the Makefile excludes. Of the 112 passes added since Phase C began, **98 are the `forms (Phase C)`
@@ -770,7 +817,7 @@ succeeded.**
 **Gates any session must keep green**, all committed:
 
 ```
-./check.sh                                            227 pass, 4 fail
+./check.sh                                            393 pass, 5 fail
 ./dictorder-dump.sh | diff -u dictorder-baseline.txt -    empty
 ./fitness-check.sh  | diff -u fitness-baseline.txt -      empty
 ASAN_OPTIONS=detect_leaks=0 ./fitness-check.sh build      exit 0
@@ -2376,8 +2423,9 @@ movie-settings, quit — and the render-mode combo was dead. All ten repaired.
 
 **AND §2 IS WHAT MISLED ME**, with "The 444 `SIGNAL()`/`SLOT()` macros … are
 **all still valid**". Rather than fix the two signals this step tripped over, I
-resolved **all 41 distinct signal signatures in the tree** through
-`QMetaObject::indexOfSignal` on the real Qt 6 meta-objects. **Nine are dead, not
+resolved **every distinct signal signature in the tree** — 37 of them, once
+whitespace-only spelling variants are normalised the way `connect()` does —
+through `QMetaObject::indexOfSignal` on the real Qt 6 meta-objects. **Nine are dead, not
 two**, and 90 connects to them remain in C6, C7 and C8. §2 carries the table,
 the deliberate non-entries and the per-module counts, and `check.sh` gates them.
 *The narrow fix would have left seven kinds of silent breakage for the later
@@ -2475,8 +2523,12 @@ module and header passes. Five `SIGEL_SlaveGUI` headers failed the standalone
 pass for want of the flag. Generation and the include path are now hoisted above
 the module loop.
 
-**Gates: `./check.sh` 227 pass, 4 fail, 355 warnings.** The 4 failures are the
-same Makefile-excluded files. **Warnings 341 → 355, and the arithmetic is
+**Gates: `./check.sh` 393 pass, 5 fail, 355 warnings** — on a changed basis,
+so it is not comparable with the 227/4 recorded through C3. The standalone
+header pass (132/1) had never been folded into the totals, so the headline
+"fail" had been silently excluding a real header failure; folding it in, plus
+the 33-row regex self-test, accounts for the whole move: 228 + 132 + 33 = 393
+and 4 + 1 = 5. The 5 failures are the same Makefile-excluded files. **Warnings 341 → 355, and the arithmetic is
 exact**: all 14 are `SIGEL_SlaveGUI`'s — 12 `-Wreorder` from the 2003
 initialiser lists (8 in `SIG_SimulationVisualisationWidget.h`, 4 in its
 `.cpp`), 1 `-Wunused-but-set-variable` (the preserved `res` defect above) and 1

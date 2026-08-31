@@ -67,14 +67,26 @@ fi
 # signal (include/MT_GUI/MT_Editor.h:32) and Qt 2.3's QLineEdit never had one.
 # A name shared with a framework signal is a false positive in EITHER
 # direction, so the class has to be established per site. The counter-check is
-# to grep every `signals:' block in the tree for these names; lostFocus is the
-# only collision.
+# to parse every `signals:' block in the tree and intersect with the names
+# below; against the CORRECTED list that intersection is now EMPTY, because
+# lostFocus is exactly the name it removed.
 #
 # selectionChanged was anchored to `( )' and so missed the QListViewItem*
 # overload, which Qt 2's QListView also declared and which is equally dead.
 # Both errors were found by review, and they cancelled in the total.
+#
+# KNOWN FALSE-POSITIVE SURFACE, since a regex cannot know the sender's class:
+#   selectionChanged()  is LIVE on QLineEdit, QTextEdit and QPlainTextEdit.
+#     Zero such senders today (all 4 sites are QListView/QListBox), but the
+#     tree has 6 QMultiLineEdit -> QTextEdit, so C6/C7 could introduce one.
+#     The QItemSelection overload is deliberately NOT matched, so converting a
+#     view to selectionModel()->selectionChanged(sel, desel) passes cleanly.
+#   selected(), currentChanged(), clicked(int), activated() are unambiguous
+#     in this tree; each was checked sender-by-sender.
+# The gate PRINTS every offending line precisely so a false positive is
+# visible rather than silently believed.
 DEAD_SIGNALS='SIGNAL\( *(activated *\( *\)|activated *\( *const *QString'\
-'|clicked *\( *int|selected *\(|selectionChanged *\('\
+'|clicked *\( *int|selected *\(|selectionChanged *\( *(\)|QListViewItem)'\
 '|currentChanged *\( *Q(ListView|ListBox)Item|rightButtonClicked'\
 '|doubleClicked *\( *QListViewItem)'
 
@@ -86,6 +98,58 @@ pass=0; fail=0; warn=0
 # error. Deleted with the shim -- it only ever tested the compatibility
 # layer, so nothing is left for it to check. It was reported separately and
 # never counted in the module totals, so 105/4 is unchanged by its removal.
+
+# The gate's own self-test. $DEAD_SIGNALS is the only check here that is a
+# REGEX rather than a compiler, so it is the only one that can silently stop
+# matching -- which it did: anchoring selectionChanged to `( )' hid the
+# QListViewItem* overload for a whole commit. Every row below is a spelling
+# that appears in this tree or a near-miss that must NOT match.
+rt_p=0; rt_f=0
+while IFS='|' read -r want line; do
+    [ -z "$want" ] && continue
+    # grep -c exits 1 when the count is 0, which under `set -e' kills the whole
+    # script before it prints anything. Same trap C1 hit with a sed.
+    got=$(printf '%s\n' "$line" | command grep -cE "$DEAD_SIGNALS" || true)
+    if [ "$got" = "$want" ]; then rt_p=$((rt_p+1)); else
+        rt_f=$((rt_f+1)); echo "  regex self-test: want $want got $got for: $line"
+    fi
+done <<'RXEOF'
+1|	connect(a, SIGNAL(activated()), b);
+1|	connect(a, SIGNAL( activated() ), b);
+1|	connect(a, SIGNAL(activated(const QString &)), b);
+1|	connect(a, SIGNAL(clicked(int)), b);
+1|	connect(a, SIGNAL(selected(QListBoxItem*)), b);
+1|	connect(a, SIGNAL(selected(QAction *)), b);
+1|	connect(a, SIGNAL(selectionChanged()), b);
+1|	connect(a, SIGNAL(selectionChanged(QListViewItem*)), b);
+1|		    SIGNAL( selectionChanged( QListViewItem * ) ),
+1|	connect(a, SIGNAL(currentChanged(QListViewItem*)), b);
+1|	connect(a, SIGNAL(currentChanged(QListBoxItem*)), b);
+1|	connect(a, SIGNAL(doubleClicked( QListViewItem * )), b);
+1|	connect(a, SIGNAL(rightButtonClicked(QListBoxItem*, const QPoint&)), b);
+1|		    SIGNAL( rightButtonClicked ( QListViewItem *, const QPoint &, int ) ),
+0|	connect(a, SIGNAL(clicked()), b);
+0|	connect(a, SIGNAL(activated(int)), b);
+0|	connect(a, SIGNAL(valueChanged(int)), b);
+0|	connect(a, SIGNAL(textChanged(const QString&)), b);
+0|	connect(a, SIGNAL(stateChanged(int)), b);
+0|	connect(a, SIGNAL(toggled(bool)), b);
+0|	connect(a, SIGNAL(pressed()), b);
+0|	connect(a, SIGNAL(timeout()), b);
+0|	connect(editor, SIGNAL(lostFocus()), SLOT(slotResetFocus()));
+0|	connect(a, SIGNAL(newText(const QString &)), b);
+0|	connect(a, SIGNAL(triggered()), b);
+0|	connect(a, SIGNAL(textActivated(const QString &)), b);
+0|	connect(a, SIGNAL(idClicked(int)), b);
+0|	connect(a, SIGNAL(itemSelectionChanged()), b);
+0|	connect(a, SIGNAL(itemDoubleClicked(QTreeWidgetItem*,int)), b);
+0|	connect(a, SIGNAL(currentChanged(int)), b);
+0|	connect(a, SIGNAL(currentItemChanged(QListWidgetItem*,QListWidgetItem*)), b);
+0|	connect(sel, SIGNAL(selectionChanged(QItemSelection,QItemSelection)), b);
+0|	connect(sel, SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), b);
+RXEOF
+printf '%-22s %2d pass  %2d fail\n' "dead-signal regex" "$rt_p" "$rt_f"
+pass=$((pass+rt_p)); fail=$((fail+rt_f))
 
 dead=0; deadbase=0
 for m in $MODULES; do
@@ -141,16 +205,33 @@ for m in $MODULES; do
     if g++ $FLAGS $INCS /tmp/hdr.$$.cpp 2>/dev/null; then hp=$((hp+1)); else hf=$((hf+1)); echo "  header FAIL: $rel"; fi
  done
 done
+# hp/hf were reported but never folded into the totals, so the headline "N fail"
+# silently excluded the standalone-header failure. Found by review.
 printf '%-22s %2d pass  %2d fail\n' "headers standalone" "$hp" "$hf"
-# The module loop only reaches src/<Module>/ and include/<Module>/. sigel.cpp and
-# sigel_slave.cpp sit at the top of src/ and the forms carry <connection> blocks,
-# so both are outside every baseline above. Neither has a dead signal today and
-# this keeps it that way.
-stray=$(command grep -rhoE "$DEAD_SIGNALS" "$SRC"/src/*.cpp "$SRC"/ui 2>/dev/null | wc -l)
+pass=$((pass+hp)); fail=$((fail+hf))
+# The module loop only reaches src/<Module>/ and include/<Module>/ for the
+# modules in MODULES. Three things sit outside every baseline above:
+#   - sigel.cpp and sigel_slave.cpp, at the top of src/ (C8's files);
+#   - SIGEL_RealInterface, a module directory in no list (a stub today);
+#   - the forms, whose <connection> blocks are XML and carry the bare signal
+#     name, NOT a SIGNAL() macro -- so $DEAD_SIGNALS structurally cannot match
+#     them and a separate pattern is needed. All 49 are live today
+#     (clicked, valueChanged, toggled, sliderReleased).
+# An earlier version of this scan pointed $DEAD_SIGNALS at the .ui directory and
+# so claimed a coverage it could never have had.
+stray=$(command grep -rhoE "$DEAD_SIGNALS" \
+        "$SRC"/src/*.cpp "$SRC"/src/SIGEL_RealInterface "$SRC"/include/SIGEL_RealInterface \
+        2>/dev/null | wc -l)
+uistray=$(command grep -rhoE '<signal>(activated|selected|rightButtonClicked|doubleClicked|selectionChanged|currentChanged) *\(' \
+          "$SRC"/ui 2>/dev/null | wc -l)
+stray=$((stray+uistray))
 if [ "$stray" -gt 0 ]; then
     echo "  dead signal outside every module baseline:"
-    command grep -rnE "$DEAD_SIGNALS" "$SRC"/src/*.cpp "$SRC"/ui 2>/dev/null \
-        | sed "s|$SRC/|    |" | cut -c1-140
+    command grep -rnE "$DEAD_SIGNALS" \
+        "$SRC"/src/*.cpp "$SRC"/src/SIGEL_RealInterface "$SRC"/include/SIGEL_RealInterface \
+        2>/dev/null | sed "s|$SRC/|    |" | cut -c1-140
+    command grep -rnE '<signal>(activated|selected|rightButtonClicked|doubleClicked|selectionChanged|currentChanged) *\(' \
+        "$SRC"/ui 2>/dev/null | sed "s|$SRC/|    |" | cut -c1-140
     fail=$((fail+stray))
 fi
 printf '%-22s %2d dead (baseline %d -- §2 has the per-signal table)\n' \
@@ -198,7 +279,9 @@ int main()
 }
 PVMEOF
 pp=0; pf=0
-if g++ -std=c++17 -fPIC $(echo $INCS | sed 's/-fsyntax-only//') /tmp/pvm.$$.cpp \
+# $INCS is include flags only -- -fsyntax-only lives in $FLAGS and is not used
+# here, because this probe must LINK and RUN, not just parse.
+if g++ -std=c++17 -fPIC $INCS /tmp/pvm.$$.cpp \
        "$SRC/src/SIGEL_GP/SIG_GPPVMHost.cpp" -o /tmp/pvm.$$ \
        $(qmake6 -query QT_INSTALL_LIBS 2>/dev/null | sed 's|^|-L|') -lQt6Core 2>/tmp/pvmb.$$
 then
