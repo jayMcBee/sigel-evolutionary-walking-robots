@@ -684,6 +684,50 @@ printf '%-22s %2d pass  %2d fail\n' "gui vs 1.3" "$gp" "$gf"
 pass=$((pass+gp)); fail=$((fail+gf))
 
 # ---------------------------------------------------------------------------
+# Phase C, step C10 -- what the GUI DOES, not merely what it shows.
+#
+# `gui vs 1.3' above is static: menus, toolbars, and the values a freshly
+# loaded experiment displays. It cannot see a wrong answer to a click, because
+# nothing in it ever clicks. This section drives the real SIG_MainWindow with
+# real Qt input events -- QTest posts QMouseEvent, QKeyEvent and
+# QContextMenuEvent through QApplication::notify, so hit-testing, menu popups,
+# item-view selection and every slot behind them run as they do under a mouse.
+#
+# The baseline was diffed against the RUNNING 1.3 binary, so a failure here is
+# a regression against 1.3. guibehaviour-baseline.txt says which fact came from
+# where; the load-bearing one is the word SURVIVED, which is an assertion that
+# deleting most of the pool no longer kills the application.
+#
+# It needs an experiment to open, so it is skipped rather than failed when the
+# reference data is absent -- the data ships separately from the tarballs.
+bp=0; bf=0
+BEXP=$ROOT/data-reordered/Experiments/twoBasesSimpleFitness2.exp
+if [ ! -f "$BEXP" ]; then
+    echo "  no $BEXP -- behaviour section skipped (data ships separately)"
+elif make -s -C "$ROOT" B=build-fast SAN= SIGSAN= guidrive >/tmp/bdb.$$ 2>&1; then
+    # SIGEL_ROOT must be the SOURCE tree: the driver loads pixmaps and terrain
+    # from it. It needs no sigel_slave -- the gate scenario never spawns one.
+    if SIGEL_ROOT="$SRC" SIGEL_EXP="$BEXP" SIGEL_SCRATCH="${TMPDIR:-/tmp}"        QT_QPA_PLATFORM=offscreen timeout 300 "$ROOT/build-fast/guidrive" gate        > /tmp/bo.$$ 2>/dev/null; then
+        if command grep -v '^#' "$ROOT/guibehaviour-baseline.txt" | diff -u - /tmp/bo.$$ > /tmp/bd.$$; then
+            bp=1
+        else
+            bf=1; echo "  the GUI no longer BEHAVES the way SIGEL 1.3 does:"
+            head -16 /tmp/bd.$$ | sed 's/^/    /'
+        fi
+    else
+        bf=1
+        echo "  the driver did not finish -- it exits(1) on an out-of-range pool"
+        echo "  position, which is how the Qt 6 clear() regression showed up:"
+        tail -6 /tmp/bo.$$ | sed 's/^/    /'
+    fi
+else
+    bf=1; echo "  guidrive did not build:"; head -5 /tmp/bdb.$$ | sed 's/^/    /'
+fi
+rm -f /tmp/bo.$$ /tmp/bd.$$ /tmp/bdb.$$
+printf '%-22s %2d pass  %2d fail\n' "gui behaviour" "$bp" "$bf"
+pass=$((pass+bp)); fail=$((fail+bf))
+
+# ---------------------------------------------------------------------------
 # Phase C -- the converted Designer forms.
 #
 # MODULES above is the nine core modules. A GUI module can only join that list

@@ -1,0 +1,196 @@
+# Baseline for check.sh's `gui behaviour' section -- PORTING.md, step C10.
+#
+# NOT merely yesterday's output. Every fact below was compared against the
+# RUNNING SIGEL 1.3 binary through the sigel-x86 oracle, which drove the 2003
+# i386 build with XTest and read the same things off the screen:
+#   - the Fitness sort order, ascending on one click, INCLUDING the tie order
+#     of the two 4.19675e-05 rows and the three 1.14825 rows at the end
+#   - the Add dialog's shape and the five individuals it creates: names
+#     57533..57537 (57532 is skipped in 1.3 too), fitness -1, age 0, sorting to
+#     the TOP of a fitness-ascending list because -1 is below every real value
+#   - the deletion confirmation's title, body, and Yes-as-default
+#   - THAT THE APPLICATION SURVIVES deleting most of the pool. It did not:
+#     Qt 6's QTreeWidget::clear() emits itemSelectionChanged() where Qt 2's
+#     QListView::clear() blocked its own signals, and the stale item drove
+#     1.3's getIndividual() into exit(1).
+#
+# WHICH LINE ACTUALLY GUARDS THAT REGRESSION: it is `nameIsASurvivor=0', not
+# the word SURVIVED. Whether the stale index is out of range depends on which
+# row happens to be current, and after the fitness sort below it is not -- so
+# reverting the fix does NOT crash this scenario. What it does, every time, is
+# let slotSelectionChanged run during clear() and repoint the detail pane at a
+# SURVIVING individual; the flip of nameIsASurvivor from 0 to 1 is the signal
+# firing, and that is what the teeth test measured. The crash itself reproduces
+# under the `ctxempty' scenario, where the list is unsorted and the stale
+# position was 103 against a pool of 5. SURVIVED is a liveness check only.
+#   - that the detail pane keeps the DELETED individual's values afterwards
+#     rather than blanking: 1.3 only calls individualView->clear() when the
+#     list becomes empty, and the oracle read a non-survivor's name and a
+#     populated history off the running binary. nameIsASurvivor=0 is the point.
+#   - the TWO different context menus, and that the empty-space one clears the
+#     selection. A click near the bottom of a FULL list still lands on a row,
+#     so `itemAt(empty)=null' is part of the baseline: without it this section
+#     silently tests the row menu twice.
+#   - the MetaGP warning's three custom buttons. "Save && Remove" is the Qt 6
+#     escape that renders the literal ampersand 1.3 showed; unescaped, Qt 6
+#     eats it and underlines the space instead.
+#
+# A failure here is a regression against SIGEL 1.3, not against this file.
+== SCENARIO gate ==
+
+== STEP 1: fresh start, no experiment ==
+  [title] SIGEL
+  [tree] header=[Experiments] topLevel=0
+  [page] count=1 current=QLabel objectName=[baseWidget]
+  [action changes] none
+  [modal] class=QFileDialog title=[Load Experiments...]
+  [filedialog] title=[Load Experiments...] mode=3 nameFilters=[Experiment Files (*.exp) ;; All Files (*)] labelAccept=[&Open]
+
+== STEP 2: after File > Open Experiment ==
+  [title] SIGEL
+  [tree] header=[Experiments] topLevel=1
+      twoBasesSimpleFitness2.exp sel=1 exp=1 cur=1 selectable=1
+        Individuals              sel=0 exp=0 cur=0 selectable=1
+        Robot                    sel=0 exp=1 cur=0 selectable=1
+          Language-Parameters      sel=0 exp=0 cur=0 selectable=1
+        GP-Parameters            sel=0 exp=0 cur=0 selectable=1
+        Simulation-Parameters    sel=0 exp=0 cur=0 selectable=1
+        Environment              sel=0 exp=0 cur=0 selectable=1
+  [page] count=8 current=SIGEL_MasterGUI::SIG_ExperimentView objectName=[ExperimentView]
+  [widgets]
+    group    [Evolution controls] enabled=1
+    group    [Fitnesscurve] enabled=1
+    group    [Experiment properties] enabled=1
+    button   [&Start] enabled=1 checkable=0 checked=0
+    button   [S&top] enabled=0 checkable=0 checked=0
+    button   [Show in GNU-Plot] enabled=1 checkable=0 checked=0
+    button   [Export PostScript] enabled=1 checkable=0 checked=0
+    check    [Save the history] enabled=1 checkable=1 checked=1
+    lcd      [lcdnumberGenerations] value=532 digits=4
+    lcd      [lcdnumberAutosave] value=0 digits=4
+    slider   [sliderIntervall] value=0 min=0 max=100 enabled=1
+    progress [generationProgBar] value=-1 min=0 max=100
+  [action changes]
+    &File/&Delete Experiment                                   ENABLED
+    &File/&Rename Experiment                                   ENABLED
+    &File/&Save Experiment                                     ENABLED
+    &File>Export/...to GNU plot                                ENABLED
+    &File>Export/Environment                                   ENABLED
+    &File>Export/GP-Parameters                                 ENABLED
+    &File>Export/Individual                                    ENABLED
+    &File>Export/Language-Parameters                           ENABLED
+    &File>Export/Population                                    ENABLED
+    &File>Export/Program                                       ENABLED
+    &File>Export/Simulation-Parameters                         ENABLED
+    &File>Import/Environment                                   ENABLED
+    &File>Import/GP-Parameters                                 ENABLED
+    &File>Import/Individual                                    ENABLED
+    &File>Import/Language-Parameters                           ENABLED
+    &File>Import/Population                                    ENABLED
+    &File>Import/Program                                       ENABLED
+    &File>Import/Robot                                         ENABLED
+    &File>Import/Simulation-Parameters                         ENABLED
+    &Individuals/&Add                                          ENABLED
+    &Individuals/&Delete                                       ENABLED
+    &Individuals/&Visualize                                    ENABLED
+    &Individuals/Reset                                         ENABLED
+    &MetaGP/&Use MetaGP                                        ENABLED
+    &View/&Environment                                         ENABLED
+    &View/&GP Parameters                                       ENABLED
+    &View/&Language Parameters                                 ENABLED
+    &View/&Population                                          ENABLED
+    &View/&Robot                                               ENABLED
+    &View/&Simulation Parameters                               ENABLED
+    TB:fileToolbar/&Delete Experiment                          ENABLED
+    TB:fileToolbar/&Save Experiment                            ENABLED
+    TB:individualsToolBar/&Add                                 ENABLED
+    TB:individualsToolBar/&Delete                              ENABLED
+    TB:individualsToolBar/&Visualize                           ENABLED
+    TB:mtToolbar/&Use MetaGP                                   ENABLED
+    TB:viewToolBar/&Environment                                ENABLED
+    TB:viewToolBar/&GP Parameters                              ENABLED
+    TB:viewToolBar/&Language Parameters                        ENABLED
+    TB:viewToolBar/&Population                                 ENABLED
+    TB:viewToolBar/&Robot                                      ENABLED
+    TB:viewToolBar/&Simulation Parameters                      ENABLED
+
+== STEP 3: after View > Population ==
+  [title] SIGEL
+  [tree] header=[Experiments] topLevel=1
+      twoBasesSimpleFitness2.exp sel=0 exp=1 cur=0 selectable=1
+        Individuals              sel=1 exp=0 cur=1 selectable=1
+        Robot                    sel=0 exp=1 cur=0 selectable=1
+          Language-Parameters      sel=0 exp=0 cur=0 selectable=1
+        GP-Parameters            sel=0 exp=0 cur=0 selectable=1
+        Simulation-Parameters    sel=0 exp=0 cur=0 selectable=1
+        Environment              sel=0 exp=0 cur=0 selectable=1
+  [page] count=8 current=SIGEL_MasterGUI::SIG_AllIndividualsView objectName=[]
+  [individuals] rows=120 cols=3 headers=[Name               ][Fitness          ][Age               ] selected=0
+    row0  | 55658         | 1.14825       | 111           | sel=0
+    row1  | 56091         | 1.14825       | 109           | sel=0
+    row2  | 56248         | 1.14825       | 259           | sel=0
+    row3  | 56349         | 1.06261       | 97            | sel=0
+    row4  | 56432         | 1.14825       | 111           | sel=0
+    row5  | 56447         | 1.14825       | 107           | sel=0
+    ... 114 more
+  [action changes] none
+
+== SORT BY FITNESS (one click) ==
+order=Ascending
+  first0 57511 | 2.34536e-05 | 1
+  first1 57478 | 3.09259e-05 | 1
+  first2 57490 | 4.19675e-05 | 1
+  first3 57508 | 4.19675e-05 | 1
+  first4 57488 | 4.42652e-05 | 1
+  last   57363 | 1.14825 | 253
+  last   57364 | 1.14825 | 115
+  last   57482 | 1.14825 | 109
+
+== ADD 5 ==
+  [modal] class=SIGEL_MasterGUI::SIG_AddIndividualsDialog title=[Add individuals...]
+dialog [Add individuals...]
+  spin default=1 min=1 max=999
+  button [&OK] default=1
+  button [&Cancel] default=0
+rows=125
+  new 57537 | -1 | 0
+  new 57536 | -1 | 0
+  new 57535 | -1 | 0
+  new 57534 | -1 | 0
+  new 57533 | -1 | 0
+
+== DELETE A LARGE BLOCK ==
+selected=120
+  [modal] class=QMessageBox title=[Continue deletion?]
+dialog [Continue deletion?] text=[Do you really want to delete the 120 selected individuals?]
+  button [&Yes] default=1
+  button [&No] default=0
+  [answering] &Yes
+SURVIVED, rows=5 selected=0
+detail pane name=[56933] age=[111] fitness=[1.14825] historyEmpty=0 nameIsASurvivor=0
+
+== CONTEXT MENUS ==
+itemAt(empty)=null
+selected before=1
+  [ctxmenu empty space] entries=3
+    &Add                         enabled=1
+    ---
+    Import individual            enabled=1
+selected after=0
+  [ctxmenu a row] entries=7
+    &Visualize                   enabled=1
+    ---
+    &Delete                      enabled=1
+    ---
+    Import program               enabled=1
+    Export program               enabled=1
+    Export individual            enabled=1
+
+== METAGP DISABLE WARNING ==
+  [modal] class=QMessageBox title=[Disabling MetaGP]
+dialog [Disabling MetaGP]
+  text=[You are about to disable the Meta GP-System. What shall
+we do with the system?]
+  button [Disable] default=1
+  button [Remove] default=0
+  button [Save && Remove] default=0

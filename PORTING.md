@@ -32,7 +32,7 @@ build and run, because nothing else can be verified without it — see §3.
 | T — old-Qt tool container | **done 2026-08-27.** `tools/qtmig`, §4 |
 | D — delete the shim, migrate the data | **DONE 2026-08-30.** `q2compat.h` and `q2compat_check.cpp` deleted; `include/compat/` gone; **no `Q2*` shim type is used anywhere**. D1–D27. *This is not "no Qt 2 container exists" — the unported GUI modules still declare **71 lines** of `QArray`, `QDict`, `QList`-as-pointer-list and friends, all of which Phase C must convert. See D27.* The shim's self-check step is gone from `check.sh`, which now runs no code. §10 |
 | P — PVM | **DONE 2026-08-28.** Vendored 3.4.3 replaced by upstream 3.4.6; nine patches carry the four config lines and Debian's eight source fixes; `libpvm3.a` and `pvmd3` build; SIGEL's two PVM objects link against them and `SIG_GPPVMData` round-trips through real PVM. `sigel`/`sigel_slave` still need Phase C. §7 |
-| C — GUI | **DONE 2026-08-31. C1–C9 all complete.** All 20 Designer forms converted; all five GUI modules build as archives; **both programs link and run**; **100 dead `connect()`s repaired, tree-wide count now 0 with no baseline anywhere**. Verified against the running 1.3 binary: 42 menu entries, the toolbars and the loaded-experiment values all diff clean, and that comparison is now a committed gate (`gui vs 1.3`). §7 |
+| C — GUI | **DONE 2026-09-02. C1–C10 all complete.** All 20 Designer forms converted; all five GUI modules build as archives; **both programs link and run**; **100 dead `connect()`s repaired, tree-wide count now 0 with no baseline anywhere**. Verified against the running 1.3 binary: 42 menu entries, the toolbars and the loaded-experiment values all diff clean, and that comparison is now a committed gate (`gui vs 1.3`). **C10 then DROVE it** — real Qt input events into the real window, diffed against the same oracle driving 1.3 with XTest: the tree, the pages, sorting, add/delete/reset, rename, save, the five dialogs and all five context menus agree, and a GUI-exported individual is byte-identical across the two architectures. **Two defects found by using it that reading it did not show** — deleting most of the pool killed the application (Qt 6's `QTreeWidget::clear()` emits a signal Qt 2's blocked), and the MetaGP dialog ate an ampersand. Second committed gate, `gui behaviour`. §7 |
 | V — check against the 1.3 binary | **V1, V5's MDH probe, V6, V7 and V8 all done, all PASS.** Ordering: 10 of 10 container orders match. Arithmetic: `twoBases` exact bit for bit, `octopus` 9/9 with three joints exact and 5 ulp worst. **V6, V7 and V8 done 2026-08-29** — friction and no-collide negotiation, their four remaining rules, and the GP parameter blocks captured *before* their conversion. `verification-against-sigel-1.3/v6`, `v7`, `v8`. V2–V4 not started; V5's sensor and force probes are **invalid as specified** — both target Dynamo-only functions, deleted 2026-08-28. §7 |
 
 **SCOPE — DECIDED 2026-08-23. Read this before changing anything.**
@@ -1707,6 +1707,7 @@ modules include the headers `uic` generates from them.
 | C7 | **DONE 2026-08-31.** `SIGEL_MasterGUI` — all **44 dead connects** repaired (§2), **23 prepending item sites**, the three owning `QDict`s, and 21 validators that would have read the decimal point by system locale. 29/29 sources and 29/29 headers compile; the module is in `MODULES` with a dead-signal baseline of 0 | 8,791 LOC measured (6,164 source + 2,627 header), 29 sources, 20 hand-written |
 | C8 | **DONE 2026-08-31.** `sigel.cpp`, `sigel_slave.cpp`, `MT_Control`'s 15 dead connects, and the four core files no module list reached. **The tree's dead-signal count is now 0 with no non-zero baseline anywhere.** `check.sh` gained a `programs` section and a `dead item virtuals` check | 15 sites + 4 files |
 | C9 | **DONE 2026-08-31.** All five GUI modules build as archives, both programs link and run. Exclusions lifted, moc derived from source, resources named on the link line, `programs` gate upgraded from compile to link+run | 5 modules, 2 programs |
+| C10 | **DONE 2026-09-02.** Driving the interface rather than reading it. `guidrive.cpp` posts real Qt mouse, key and context-menu events into the real `SIG_MainWindow`; the 1.3 oracle drove the 2003 binary with XTest and the two were diffed. Found the `clear()` signal regression that killed the application on a large delete, and the eaten ampersand in the MetaGP dialog. New `gui behaviour` gate with `guibehaviour-baseline.txt`. **No X-level click was possible on this machine and the section says so** | 2 defects, 15 scenarios |
 
 Each module step is the same shape: `qt3to4` in the container, hand-port off
 Qt3Support, extend `check.sh` to cover the module, commit.
@@ -3315,6 +3316,264 @@ of which compile, link and run. Teeth-tested four ways: a removed shortcut, a
 reverted `setIconText`, a reverted `truncate` guard, and missing GUI libraries.
 Because the baseline was diffed against the running 1.3, a failure here is a
 regression against **1.3**, not merely against yesterday's output.
+
+
+#### C10 — driving the interface, which is where the GUI port was actually used
+
+C9 compared what the interface **shows**. Everything in it was static: 42 menu
+entries, the toolbars, and the values a freshly loaded experiment displays.
+Nothing in that comparison ever clicked anything, and a GUI that renders
+correctly and misbehaves on use would have passed every check in this project.
+C10 drives it and diffs the consequences.
+
+**What "the same" means here, because it is not "the same numbers".** Evolution
+is randomised and per-individual fitness is chaotic across architectures — §7
+measures a 1-ULP change in start height moving an individual by 45%, and
+`fitness-check.sh` says in terms that it is "NOT a cross-machine reference".
+The oracle runs a 2003 i386 x87 build; this is aarch64 with IEEE doubles. **So
+"evaluate the same individual and compare the fitness" cannot work between the
+two machines, and a match or a mismatch would both prove nothing.** The
+question was decomposed instead:
+
+| claim | how it was settled | machine-independent? |
+|---|---|---|
+| the GUI hands the evaluator the SAME INDIVIDUAL | `File > Export > Program` for individual 55658, diffed by checksum against 1.3 | **yes** |
+| the payload carries that individual unaltered | `Individuals > Visualize` captured with a stub `sigel_slave`, program section diffed against the `.exp` | yes |
+| the same individual evaluates the same way | already `fitness-baseline.txt`, unchanged | same machine only |
+
+**The export is byte-identical across the two architectures.** 1.3 on i386/Qt 2
+and the port on aarch64/Qt 6 produce the same 6616 bytes, 299 lines, LF only,
+trailing newline, seven leading spaces, `sha256
+f940751765c869f16f62333dafd34dbe0e66b6474577bf4209e9e8de70cc3214`. That is the
+deterministic anchor, and it is a stronger one than a fitness number because no
+floating-point arithmetic stands between the file and the answer.
+
+**The PVM payload agrees too.** A stub slave placed at `$SIGEL_ROOT/sigel_slave`
+captured what `slotVisualize` actually sends: 10,931 bytes, whose program
+section is byte-identical to individual 55658's `PROGRAM BEGIN{` block in the
+experiment file, and which is byte-identical between two runs. The simulation
+parameters travel at 50 significant digits, which is Qt 2's `file.precision(50)`
+correctly mapped to `setRealNumberPrecision(50)` — the file's `0.01` and the
+payload's `0.010000000000000000208166817117216851329430937767029` are the same
+double. The pvmd log incidentally corroborates the documented `+ 2` wire margin:
+*declared length 10933, received 10931 bytes*.
+
+##### What could drive the GUI, and what could not
+
+**No tool on this machine can deliver a real click to the shipped binary, and
+that is measured rather than assumed.** `xdotool`, `wmctrl`, `Xvfb`, `xte`,
+`ydotool` and `scrot` are all absent; `import`, `xwininfo`, `xprop` and `gdb`
+are present. Two routes were tried and both failed:
+
+- **XTEST.** The extension is present (2.2) and `XTestFakeMotionEvent` /
+  `XTestFakeKeyEvent` both return success — and neither has any effect. The
+  pointer does not move and keystrokes do not reach the window. This is a
+  VMware guest under GNOME/Wayland: `vmware-user` drives absolute pointer
+  integration and the compositor's pointer is authoritative, so XTEST from an
+  XWayland client is overridden. **A tool that returns success while doing
+  nothing is exactly the failure mode this project keeps hitting**, which is
+  why the pointer position was read back rather than trusted.
+- **Qt's VNC platform.** `QT_QPA_PLATFORM=vnc` does start a server on 5900 and a
+  hand-written RFB client connects (the server speaks RFB 003.003, not 3.8), but
+  `sigel` crashes under it — "Invalid storage access". Not pursued: that
+  platform has no GL context and SIGEL is not built for it, so the crash is an
+  artefact of an unsupported configuration, not a port defect.
+
+**So the driving is done with `QTest`, and the record must not overstate what
+that is.** `QTest::mouseClick`, `keyClicks` and a hand-posted
+`QContextMenuEvent` go through `QApplication::notify`, so the widgets' own event
+handlers, hit-testing, `QMenu` popup logic, item-view selection and every slot
+behind them run exactly as under a mouse — the instrument was teeth-tested by
+confirming a click on the menubar really opens the popup and
+`activePopupWidget()` becomes a `QMenu`. **What it does not cover is the
+platform plugin: nothing here goes through xcb.** Every finding below is
+"clicked" in the sense that the application's own code ran; none of it is
+"clicked" in the sense that X delivered the event. The oracle's side *was*
+driven by real XTEST input, so the comparison has a genuine click on one end.
+
+##### Three probe errors before any of it could be believed
+
+This step produced three false results, all of them mine, and each would have
+been reported as a port defect:
+
+1. **The harness linked the WRONG `SIG_GPExperiment`.** Left to the archives the
+   linker picks the Clean variant, whose constructor never builds an
+   `MT_Controller`; the first tree selection then called `IsEnabled()` through
+   `this=0x2020202020220a2c` — ASCII spaces read as a pointer. The Makefile has
+   asserted this for `sigel` since C9 and the harness did not. `guidrive` now
+   names `$(MASTER_OBJ)` and carries the same assertion.
+2. **A right-click that reached nothing.** `customContextMenuRequested` is
+   raised from a `QContextMenuEvent`, which `QTest::mouseClick` does not
+   synthesise, so all five context menus read as absent. Sending the
+   `QContextMenuEvent` is what a real right-click produces once the platform
+   plugin has done its part.
+3. **An "empty space" click that landed on a row.** With 120 individuals the
+   viewport is full, so a click near its bottom edge still hits an item and
+   returns the row menu. `itemAt()` being null is now printed into the baseline
+   so this cannot silently regress into testing the row menu twice.
+
+The oracle retracted two of its own readings in the same period — the "Save the
+history" checkbox and Reset — so the exchange corrected in both directions.
+
+##### What matched
+
+Driven here and read off the running 1.3 binary, all agreeing: the Open dialog
+(title `Load Experiments...`, `ExistingFiles` so multi-select, the `*.exp` and
+`All Files` filters — both are in the 2003 source, the oracle saw only the
+selected one); the tree after loading, its child order **Individuals, Robot >
+Language-Parameters, GP-Parameters, Simulation-Parameters, Environment**, both
+expansions and the top-level row selected; the experiment page with Start
+enabled, Stop greyed, the empty progress bar, the LCD reading 532 and **"Save
+the history" CHECKED**; the three File and four Individuals actions that become
+enabled, and all 16 Import/Export children while their parents were already
+enabled; 120 individuals under `Name | Fitness | Age` with the first three rows
+identical.
+
+Then the operations. **Sorting by Fitness ascends on one click**, and the first
+five and last three agree *including the tie order* of the two `4.19675e-05`
+rows and the three `1.14825` rows — the sort key that C9's `truncate` fix
+repaired. **Add** creates 57533–57537 at fitness -1 and age 0, skipping 57532 in
+both, and they sort to the *top* of a fitness-ascending list because -1 is below
+every real value. **Delete** confirms with `Continue deletion?` / "Do you really
+want to delete the N selected individuals?" and Yes as default — the Qt 3-style
+`Yes|Default, No|Escape` call still routes through Qt 6's compatibility path —
+answering No changes nothing and keeps the selection, Yes removes exactly the
+selected rows and leaves nothing selected. **Reset** shows an `Updating...`
+progress dialog and sets every fitness to -1 with ages and count untouched.
+**Rename** pre-fills and pre-selects the current name and appends `.exp`;
+**Delete Experiment** and **Quit** share the title `Do you really...` with
+Yes-as-default; the **MetaGP** warning is an *information* box titled
+`Disabling MetaGP` with three custom buttons and Disable as default. All five
+**context menus** agree, including the `Individuals` child row having none at
+all — there is no `menuDict` entry for it in either version.
+
+**Saving grows the file, and 1.3 does it too — measured, not argued.** Each
+save adds one `      ` line per individual: the reader takes everything between
+`HISTORY BEGIN{` and `}HISTORY END` as a SINGLE string (`history.clear()` is
+commented out in both versions) and the writer re-emits it before a fresh
+`\n      }HISTORY END;`, so the chunk's trailing indent gains a newline every
+cycle. The oracle ran the same two saves on the 1.3 binary:
+
+| file | bytes | lines | `}HISTORY END;` | lines that are exactly six spaces |
+|---|---|---|---|---|
+| shipped | 2,768,211 | 133,696 | 120 | 360 |
+| saved once | 2,769,205 | 133,837 | 120 | **480** |
+| saved twice | 2,770,045 | 133,957 | 120 | **600** |
+
+Steady state is **+840 bytes = 120 × 7**, exactly one `"      \n"` per
+individual per save, with the `}HISTORY END;` count never moving — nothing
+duplicates structurally, only the indent accumulates. The **first** save is a
+one-off +141 lines because the writer emits five keys the 2003 shipped file
+lacks: `WITHHISTORY`, `WITHTEXTURE`, `TEXTUREFILE`, `TEXALPHA`, `RESEVGEN`.
+*That last detail closes the checkbox question independently* — the shipped file
+genuinely has no `WITHHISTORY` line, which is why `history` kept its
+constructor value of `true` and "Save the history" is checked. **A 1.3 defect to
+preserve, not a port regression.** Two further 1.3 behaviours the oracle hit
+doing it. **Saving under a new name retitles the loaded experiment** — matched
+here, the tree row becomes `roundA.exp` after saving as that, and re-opening the
+same file a second time gets the alternative name `(1)roundA.exp`. **The Save
+dialog's pre-selection does NOT match, and it is a new instance of an already
+accepted difference rather than a defect.** 1.3 pre-fills the field with the
+current name and leaves it *unselected*, so typing appends — the oracle produced
+a file genuinely called `twoBasesSimpleFitness2.exsave1.expp.exp` that way.
+Qt 6's stock `QFileDialog` pre-fills *and* pre-selects, measured here as
+`prefill=[twoBasesSimpleFitness2.exp] preselected=[twoBasesSimpleFitness2.exp]`.
+Neither dialog is built by SIGEL — both are the framework's own
+`getSaveFileName` — and §7 already lists file-dialog behaviour among the
+accepted divergences, so this is **recorded, not fixed**. Note the port is the
+better-behaved of the two here; that is not a reason to change it, and not a
+reason to change 1.3's side either. *(Rename, which SIGEL does build itself,
+pre-selects in both.)*
+
+##### Two defects, both fixed, both found only by using the interface
+
+**1. Deleting most of the pool killed the application.**
+`slotDeleteIndividuals` → `slotCompleteRefreshList` → `listviewIndividuals->clear()`.
+**Qt 2's `QListView::clear()` blocked its own signals across its whole body**,
+`clearSelection()` included:
+
+```
+bool block = signalsBlocked();
+blockSignals( TRUE );
+d->clearing = TRUE;
+clearSelection();
+... d->focusItem = 0; ...
+blockSignals( block );
+```
+
+(vendored `qlistview.cpp`). Qt 6's `QTreeWidget::clear()` does not, so clearing
+emits `itemSelectionChanged()` while `currentItem()` still points into the *old*
+pool; `slotSelectionChanged()` asks the population for that item's
+`poolPosition`, and after a large delete the position is gone —
+`getIndividual()` prints "Wrong Position requested from Population!" and calls
+**`exit(1)`**, which is 1.3's own code. Confirmed against the oracle before
+changing anything: 1.3 deletes 113 of 118 and **survives, same PID, same start
+time, nothing on stderr**. The fix restores Qt 2's blocking at both `clear()`
+sites and nothing else. 1.3 also leaves the deleted individual's values in the
+detail pane until the next selection — it only calls `individualView->clear()`
+when the list empties — and the port now does the same, which the baseline
+asserts as `nameIsASurvivor=0`.
+
+**2. The MetaGP dialog ate an ampersand.** 1.3 shows a button reading
+**`Save & Remove`**; the port showed **`Save ‗Remove`**, the `&` consumed and the
+space underlined. Both frameworks explain it: Qt 2's text drawing treats `"&x"`
+as a prefix only when `x` passes its own `ISPRINT`, defined as
+`((x).row() || (x).cell()>' ')` (`qpainter.cpp:2317`) — **a space fails it**, so
+the ampersand was drawn as itself. Qt 6 has no such exclusion. Verified by
+pixel-comparing three rendered buttons rather than by reading code. Fixed by
+escaping the string as `"Save && Remove"`, Qt 6's literal-ampersand form.
+*(Qt 2 additionally registered Alt+Space from `QAccel::shortcutKey`, which uses
+the real `QChar::isPrint`; that accelerator is unreachable under any window
+manager and is not restored.)*
+
+##### What was NOT exercised, and why
+
+- **A real X-level click on the shipped binary.** No tool on this machine can
+  deliver one — measured above. Everything here is Qt-level event delivery.
+- **A running evolution over several generations.** Start and Stop *do* work:
+  `signalEvolutionNotRunning` emits `false` then `true`, slaves spawn, and the
+  loop calls `qApp->processEvents()` so the GUI stays live. But **every shipped
+  experiment terminates on a date in 2001** (`TERMINATIONUSESDATE 1`,
+  `TERMINATIONTIME 2001`, all 14 files), so a correct Start finishes in under
+  100 ms. Switching to duration-based termination through the GUI does start a
+  real run — slaves appear and the master waits on them — but one generation of
+  120 individuals against the local slaves did not complete inside the time
+  budget, so **the generation counter, the statistics and the fitness curve were
+  never observed advancing.** That is the largest gap this step leaves.
+- **The visualisation window.** `slotVisualize`'s payload was captured with a
+  stub; the real GL window was not opened here. The oracle did open it on 1.3.
+- **Native file dialogs.** Qt's own non-native dialog was used, as PORTING.md
+  already records as an accepted difference.
+- *(Save round-trip growth was on this list and has since been MEASURED on the
+  1.3 binary — it moved to the section above.)*
+
+##### The gate
+
+`guidrive.cpp` is the driver and `guibehaviour-baseline.txt` the committed
+baseline; `check.sh`'s **`gui behaviour`** section builds and diffs them, and
+`make guidrive` builds it with the same master-object assertion as `sigel`. The
+baseline's header says which fact came from the oracle.
+
+**The load-bearing line is `nameIsASurvivor=0`, and it is worth being exact
+about why, because the obvious answer is wrong.** Whether the stale index is out
+of range depends on which row is current when `clear()` runs, and after the
+gate's fitness sort it is not — so **reverting the fix does not crash the gate
+scenario**. What it does, every time, is let `slotSelectionChanged()` run during
+`clear()` and repoint the detail pane at a *surviving* individual. The teeth
+test measured exactly that: `nameIsASurvivor` flips 0 → 1. The crash itself
+reproduces under the `ctxempty` scenario, where the list is unsorted and the
+stale position was 103 against a pool of 5; `SURVIVED` in the baseline is a
+liveness check, not the assertion that catches the regression.
+
+Teeth-tested by breaking each guarded thing and reading the hunk it produced:
+reverting the `blockSignals` guard (fails on `nameIsASurvivor`, as above), and
+reverting the `&&` escape (fails on `button [Save && Remove]` and nothing else).
+A clean run before and after both confirms the gate is green when nothing is
+broken and recovers afterwards. *An earlier draft of this paragraph claimed four
+teeth tests and claimed the gate reproduced the crash. Two were run, and it does
+not.*
+
+C10 CLOSES PHASE C.
 
 ---
 

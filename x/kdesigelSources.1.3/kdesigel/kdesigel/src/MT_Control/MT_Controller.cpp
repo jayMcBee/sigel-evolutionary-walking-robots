@@ -258,7 +258,17 @@ bool MT_Controller::useMeta(bool state)
 											"we do with the system?",
 											"Disable",
 											"Remove",
-											"Save & Remove",
+											// 1.3 showed a LITERAL ampersand here. Qt 2's text drawing only
+											// treated "&x" as a prefix when x passed its own ISPRINT,
+											// "((x).row() || (x).cell()>' ')" (qpainter.cpp:2317), and a
+											// space FAILS that -- so the '&' was drawn as itself. Qt 6 has no
+											// such exclusion: it eats the '&' and underlines the space,
+											// rendering "Save _Remove". "&&" is Qt 6's escape for a literal
+											// ampersand and restores exactly what 1.3 displayed. (Qt 2 also
+											// registered Alt+Space from QAccel::shortcutKey, which uses the
+											// real QChar::isPrint; that accelerator is unreachable under any
+											// window manager and is not restored.)
+											"Save && Remove",
 											0, 0) )
 			{
 			case 2 :	// disables the system, saves it and finally delete it from memory

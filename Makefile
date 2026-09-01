@@ -582,4 +582,29 @@ $(B)/sigel_slave: $(SRC)/src/sigel_slave.cpp $(MOC_OBJS_SLAVE) $(QRC_SLAVE) $(CL
 	   echo "sigel_slave linked the WRONG SIG_GPExperiment: constructor is $$got," \
 	        "Clean's is $$want -- see PORTING.md section 9." >&2; exit 1; }
 
+# The GUI behaviour driver -- PORTING.md Phase C, step C10.
+#
+# Same link shape as $(B)/sigel, and for the same reason: it constructs the
+# real SIG_MainWindow, so it needs the MASTER SIG_GPExperiment. Left to the
+# archives the linker picks Clean, whose constructor never builds an
+# MT_Controller, and the first tree selection calls IsEnabled() through an
+# uninitialised pointer. That produced a convincing false defect before the
+# assertion below existed -- the crash is in the harness, not the port.
+#
+# -lQt6Test is the only addition: QTest is what posts the mouse, key and
+# context-menu events.
+.PHONY: guidrive
+guidrive: $(B)/guidrive
+
+$(B)/guidrive: guidrive.cpp $(MOC_OBJS) $(QRC_OBJS) $(GUI_LIBS) $(CORE_LIBS) \
+               $(VENDOR_LIBS) $(PVM_LIB)
+	$(SIGCXX) -DQT_CORE_LIB -DQT_GUI_LIB -DQT_WIDGETS_LIB -DQT_TESTLIB_LIB \
+	  $(SIGINC) -isystem $(QTINC)/QtTest $< $(MOC_OBJS) $(QRC_MASTER) $(MASTER_OBJ) -o $@ \
+	  -Wl,--start-group $(GUI_LIBS) $(CORE_LIBS) $(VENDOR_LIBS) -Wl,--end-group \
+	  -lQt6Test $(SIGLIBS)
+	@want=`$(call ctor_size,$(MASTER_OBJ))`; got=`$(call ctor_size,$@)`; \
+	 test -n "$$want" && test "$$got" = "$$want" || { \
+	   echo "guidrive linked the WRONG SIG_GPExperiment: constructor is $$got," \
+	        "the master's is $$want -- see PORTING.md section 9." >&2; exit 1; }
+
 -include $(shell find $(OBJ) -name '*.d' 2>/dev/null)

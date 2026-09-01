@@ -309,3 +309,44 @@ decision.
 
 **Do not** change `kdevprj_version`. It describes the file's own format and
 KDevelop reads it.
+
+## Two Qt 6 noises the port keeps on purpose — found by C10, 2026-09-02
+
+Both are 1.3 code preserved verbatim. Neither changes what the program does,
+and neither should be "cleaned up" while the port is still being trusted
+against the 1.3 binary.
+
+**The wildcard disconnect.** `SIG_AllIndividualsView::slotEvolutionNotRunning`
+begins each branch with `QObject::disconnect( individualList->
+listviewIndividuals, 0, 0, 0 )`, which is byte-identical to the 2003 source.
+Qt 6 prints `QObject::disconnect: wildcard call disconnects from destroyed
+signal of QTreeWidget::listviewIndividuals` on stderr each time an evolution
+starts. The disconnect still does what it is meant to; Qt 2 simply did not
+warn about the pattern.
+
+**Do:** name the three signals being disconnected, which is what the code
+below the call immediately reconnects anyway. **Do not** do it before the
+`gui behaviour` gate has a run under an actual evolution — that path is the
+one C10 could not exercise, so a change there is currently unguarded.
+
+**The history block grows by one line per individual per save.**
+`SIG_GPIndividual::readFromFile` takes everything between `HISTORY BEGIN{` and
+`}HISTORY END` as a SINGLE string — `history.clear()` is commented out in both
+versions — and `writeToFile` emits `history.join("\n")` followed by a fresh
+`"\n      }HISTORY END;"`. The chunk already ends with the previous save's
+indent, so each round trip adds one `      ` line to every individual: measured
+here as 1 line becoming 2 becoming 3, 120 extra lines per cycle on
+`twoBasesSimpleFitness2.exp`, and the code is identical in the 1.3 tarball.
+
+**CONFIRMED ON THE 1.3 BINARY, so preserve it.** The oracle ran the same two
+saves: the six-space line count goes 360 -> 480 -> 600 while `}HISTORY END;`
+stays at 120, i.e. +840 bytes = 120 x 7 per save, one `"      \n"` per
+individual. (The first save of a shipped file is +141 lines rather than +120,
+because the writer also emits five keys the 2003 file lacks — `WITHHISTORY`,
+`WITHTEXTURE`, `TEXTUREFILE`, `TEXALPHA`, `RESEVGEN`.)
+
+**Do:** nothing. This is 1.3 behaviour and the port reproduces it exactly, which
+is the correct outcome. It is recorded here only so that a future reader who
+notices experiment files growing does not "fix" it and silently diverge from
+1.3. If it is ever changed deliberately, that is a product decision and needs a
+note in PORTING.md saying the port stopped matching 1.3 on purpose.

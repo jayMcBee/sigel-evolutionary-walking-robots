@@ -156,7 +156,21 @@ void SIG_AllIndividualsView::slotCompleteRefreshList()
   progress.setWindowTitle( "Updating..." );
   progress.show();
   
-  individualList->listviewIndividuals->clear();
+  // Qt 2's QListView::clear() blocked its OWN signals for its whole body,
+  // clearSelection() included -- "bool block = signalsBlocked(); blockSignals(
+  // TRUE ); d->clearing = TRUE; clearSelection(); ... blockSignals( block );"
+  // (qlistview.cpp). Qt 6's QTreeWidget::clear() does not, so clearing the list
+  // emits itemSelectionChanged() while currentItem() still points at an item
+  // from the OLD pool. slotSelectionChanged() then asks the population for that
+  // item's poolPosition, and after a large delete that position no longer
+  // exists: getIndividual() prints "Wrong Position requested from Population!"
+  // and calls exit(1). Deleting most of the pool KILLED the application.
+  // Restoring Qt 2's blocking is the whole fix.
+  {
+    const bool wasBlocked = individualList->listviewIndividuals->blockSignals( true );
+    individualList->listviewIndividuals->clear();
+    individualList->listviewIndividuals->blockSignals( wasBlocked );
+  }
   for( int counter = 0; counter < poolSize; counter++ )
     {
       progress.setValue( counter );
@@ -178,7 +192,14 @@ void SIG_AllIndividualsView::slotAddIndividuals()
       theExperiment.population.addRandomIndividuals( addDialog.spinboxNumber->value(), theExperiment.gpParameter, *theExperiment.robot.getLangParam() );
       
       // lets do it inefficiently first. will be corrected later
-      individualList->listviewIndividuals->clear();
+      // Same Qt 2 blocking as slotCompleteRefreshList above. The pool only
+      // grows on this path, so a stale poolPosition still resolves and this
+      // one has never crashed -- but the emission itself is not Qt 2 behaviour.
+      {
+        const bool wasBlocked = individualList->listviewIndividuals->blockSignals( true );
+        individualList->listviewIndividuals->clear();
+        individualList->listviewIndividuals->blockSignals( wasBlocked );
+      }
       QProgressDialog progress( "Populating pool...", QString(), 0, theExperiment.population.getSize(), this );
   // Qt 2\'s trailing modal flag made it application modal.
   progress.setWindowModality( Qt::ApplicationModal );
