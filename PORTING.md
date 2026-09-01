@@ -3554,16 +3554,33 @@ manager and is not restored.)*
 
 - **A real X-level click on the shipped binary.** No tool on this machine can
   deliver one — measured above. Everything here is Qt-level event delivery.
-- **A running evolution over several generations.** Start and Stop *do* work:
-  `signalEvolutionNotRunning` emits `false` then `true`, slaves spawn, and the
-  loop calls `qApp->processEvents()` so the GUI stays live. But **every shipped
-  experiment terminates on a date in 2001** (`TERMINATIONUSESDATE 1`,
-  `TERMINATIONTIME 2001`, all 14 files), so a correct Start finishes in under
-  100 ms. Switching to duration-based termination through the GUI does start a
-  real run — slaves appear and the master waits on them — but one generation of
-  120 individuals against the local slaves did not complete inside the time
-  budget, so **the generation counter, the statistics and the fitness curve were
-  never observed advancing.** That is the largest gap this step leaves.
+- **A running evolution over several generations — the largest gap this step
+  leaves.** Being exact about what WAS established, because it is more than
+  nothing and less than the whole thing:
+  - Start's three guard conditions were read at the moment of the click and all
+    pass: `bodies=1`, `population=120`, `fitnessName=SimpleFitnessFunction`.
+  - The slot really runs. `QSignalSpy` on `signalEvolutionNotRunning` catches
+    **`false` then `true`** — the evolution starts and finishes — where a Start
+    that silently declined would emit nothing at all.
+  - Two real `sigel_slave` processes were observed alive under `ps` during a
+    run, so dispatch through `pvm_spawn` works end to end.
+  - Stop works, and the population is intact afterwards: 120 rows, unchanged
+    first rows.
+  - **Every shipped experiment terminates on a date in 2001**
+    (`TERMINATIONUSESDATE 1`, `TERMINATIONTIME 2001`, all 14 files), so a
+    *correct* Start finishes in under 100 ms. Sampling at 5 s and even at 100 ms
+    missed it entirely; only the signal spy could tell that apart from a Start
+    that did nothing, which is why the spy is in the driver.
+
+  What was NOT seen: **the generation counter advancing, the statistics
+  updating, or the fitness curve redrawing.** Switching to duration-based
+  termination through the GUI does start a real run, but the master then waits
+  on slave results and `SIG_GUIGPManager::haveABreak()` only services the GUI
+  between them, so a sampling timer armed before the click never fires; no
+  generation completed within the budget, with 120 individuals or with the pool
+  cut to 8. Nothing here suggests a defect — it is a throughput limit of one
+  machine — but it is untested behaviour and the `gui behaviour` gate does not
+  cover the evolution path at all.
 - **The visualisation window.** `slotVisualize`'s payload was captured with a
   stub; the real GL window was not opened here. The oracle did open it on 1.3.
 - **Native file dialogs.** Qt's own non-native dialog was used, as PORTING.md
