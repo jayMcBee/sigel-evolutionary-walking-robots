@@ -192,9 +192,14 @@ void SIG_AllIndividualsView::slotAddIndividuals()
       theExperiment.population.addRandomIndividuals( addDialog.spinboxNumber->value(), theExperiment.gpParameter, *theExperiment.robot.getLangParam() );
       
       // lets do it inefficiently first. will be corrected later
-      // Same Qt 2 blocking as slotCompleteRefreshList above. The pool only
-      // grows on this path, so a stale poolPosition still resolves and this
-      // one has never crashed -- but the emission itself is not Qt 2 behaviour.
+      // Same Qt 2 blocking as slotCompleteRefreshList above, and NOT COVERED BY
+      // ANY GATE -- said plainly because the C10 review found the claim that
+      // every added guard was teeth-tested to be false for this one. Adding
+      // only ever GROWS the pool, so a stale poolPosition still resolves to the
+      // same individual and reverting these three lines has no consequence any
+      // GUI observation can see. Kept because Qt 2 emitted nothing here and the
+      // divergence would bite the day this path stops being append-only; if it
+      // is ever removed, that is a defensible choice and not a regression.
       {
         const bool wasBlocked = individualList->listviewIndividuals->blockSignals( true );
         individualList->listviewIndividuals->clear();

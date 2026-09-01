@@ -3382,14 +3382,21 @@ are present. Two routes were tried and both failed:
 **So the driving is done with `QTest`, and the record must not overstate what
 that is.** `QTest::mouseClick`, `keyClicks` and a hand-posted
 `QContextMenuEvent` go through `QApplication::notify`, so the widgets' own event
-handlers, hit-testing, `QMenu` popup logic, item-view selection and every slot
-behind them run exactly as under a mouse — the instrument was teeth-tested by
-confirming a click on the menubar really opens the popup and
-`activePopupWidget()` becomes a `QMenu`. **What it does not cover is the
-platform plugin: nothing here goes through xcb.** Every finding below is
-"clicked" in the sense that the application's own code ran; none of it is
-"clicked" in the sense that X delivered the event. The oracle's side *was*
-driven by real XTEST input, so the comparison has a genuine click on one end.
+handlers, hit-testing, `QMenu` popup logic, item-view selection and the slots
+behind them all run — the instrument was teeth-tested by confirming a click on
+the menubar really opens the popup and `activePopupWidget()` becomes a `QMenu`.
+**It is not the same as a mouse, and "one missing hop" undersells the
+difference.** Bypassing `QWindowSystemInterface` changes window activation,
+mouse grabs, double-click synthesis and enter/leave delivery; menu navigation is
+the plain case, where a real mouse presses, drags under a popup grab and
+releases while this posts two independent clicks that happen to reach the same
+actions. **So this proves the application's own logic is right; it does not
+prove the platform layer is.** Every finding below is "clicked" in the sense
+that SIGEL's code ran, none of it in the sense that X delivered the event. The
+oracle's side *was* driven by real XTEST input, so the comparison has a genuine
+click on one end. *(An earlier draft of this paragraph said the events run
+"exactly as under a mouse". They do not, and the C10 review was right to say
+so.)*
 
 ##### Three probe errors before any of it could be believed
 
@@ -3452,13 +3459,20 @@ save adds one `      ` line per individual: the reader takes everything between
 `HISTORY BEGIN{` and `}HISTORY END` as a SINGLE string (`history.clear()` is
 commented out in both versions) and the writer re-emits it before a fresh
 `\n      }HISTORY END;`, so the chunk's trailing indent gains a newline every
-cycle. The oracle ran the same two saves on the 1.3 binary:
+cycle. The oracle ran the same two saves on the 1.3
+binary, and the same two were driven here through `File > Save Experiment`:
 
-| file | bytes | lines | `}HISTORY END;` | lines that are exactly six spaces |
+| file | bytes — 1.3 | bytes — port | `}HISTORY END;` | six-space lines, both |
 |---|---|---|---|---|
-| shipped | 2,768,211 | 133,696 | 120 | 360 |
-| saved once | 2,769,205 | 133,837 | 120 | **480** |
-| saved twice | 2,770,045 | 133,957 | 120 | **600** |
+| shipped | 2,768,211 | 2,768,211 | 120 | 360 |
+| saved once | 2,769,205 | **2,769,205** | 120 | **480** |
+| saved twice | 2,770,045 | **2,770,045** | 120 | **600** |
+
+**Every figure agrees, which is a second machine-independent anchor and a
+larger one than the program export.** A 2.7 MB experiment file written by
+i386/Qt 2 and by aarch64/Qt 6 comes out to the same byte count twice over — so
+the writer's formatting of every value in it agrees, not merely the structure.
+This was not planned; it fell out of comparing the growth figures.
 
 Steady state is **+840 bytes = 120 × 7**, exactly one `"      \n"` per
 individual per save, with the `}HISTORY END;` count never moving — nothing
@@ -3509,7 +3523,17 @@ pool; `slotSelectionChanged()` asks the population for that item's
 **`exit(1)`**, which is 1.3's own code. Confirmed against the oracle before
 changing anything: 1.3 deletes 113 of 118 and **survives, same PID, same start
 time, nothing on stderr**. The fix restores Qt 2's blocking at both `clear()`
-sites and nothing else. 1.3 also leaves the deleted individual's values in the
+sites and nothing else.
+
+**Only ONE of those two sites is covered by a gate, and the first draft of this
+section wrongly implied both were.** The second is in `slotAddIndividuals`,
+where adding only ever *grows* the pool — so a stale `poolPosition` still
+resolves to the same individual, and reverting those three lines has no
+consequence any GUI observation can distinguish. It is kept because Qt 2 emitted
+nothing there either and the divergence would bite the day that path stops being
+append-only, but it is **faithfulness without a test**, and the source comment
+now says so at the site. Removing it later would be a defensible choice rather
+than a regression. 1.3 also leaves the deleted individual's values in the
 detail pane until the next selection — it only calls `individualView->clear()`
 when the list empties — and the port now does the same, which the baseline
 asserts as `nameIsASurvivor=0`.

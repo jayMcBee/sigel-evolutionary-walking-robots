@@ -691,12 +691,17 @@ pass=$((pass+gp)); fail=$((fail+gf))
 # nothing in it ever clicks. This section drives the real SIG_MainWindow with
 # real Qt input events -- QTest posts QMouseEvent, QKeyEvent and
 # QContextMenuEvent through QApplication::notify, so hit-testing, menu popups,
-# item-view selection and every slot behind them run as they do under a mouse.
+# item-view selection and the slots behind them all run. It is NOT the same as
+# a mouse -- bypassing QWindowSystemInterface changes activation, grabs and
+# double-click synthesis -- so this proves the application's logic, not the
+# platform layer's. guidrive.cpp's header says so at more length.
 #
 # The baseline was diffed against the RUNNING 1.3 binary, so a failure here is
 # a regression against 1.3. guibehaviour-baseline.txt says which fact came from
-# where; the load-bearing one is the word SURVIVED, which is an assertion that
-# deleting most of the pool no longer kills the application.
+# where. The load-bearing line is `nameIsASurvivor=0', NOT the word SURVIVED:
+# after the fitness sort the stale index stays in range, so reverting the fix
+# does not crash this scenario -- it repoints the detail pane at a survivor,
+# and that flip is what the teeth test measured. SURVIVED is a liveness check.
 #
 # It needs an experiment to open, so it is skipped rather than failed when the
 # reference data is absent -- the data ships separately from the tarballs.

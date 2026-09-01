@@ -5,11 +5,15 @@
   WHAT THIS IS, precisely, because the distinction matters and the record
   should not overstate it: QTest posts QMouseEvent, QKeyEvent and
   QContextMenuEvent through QApplication::notify, so the widgets' own event
-  handlers, hit-testing, menu popup logic, item-view selection and every slot
-  behind them run exactly as they do under a mouse. It is NOT an X-level
-  click: nothing here goes through the platform plugin. That last hop is the
-  only part not covered, and on the machine this was written for it could not
-  be covered at all -- see C10 for why.
+  handlers, hit-testing, menu popup logic, item-view selection and the slots
+  behind them all run. It is NOT the same as a mouse, and the difference is
+  more than "one missing hop": bypassing QWindowSystemInterface changes window
+  activation, mouse grabs, double-click synthesis and enter/leave delivery.
+  Menu navigation is the plain example -- a real mouse presses, drags under a
+  popup grab and releases, where this posts two independent clicks that happen
+  to reach the same actions. So this proves the application's own logic is
+  right; it does not prove the platform layer is. On the machine this was
+  written for, no tool could drive that layer at all -- see C10.
 
   Scenarios (argv[1]):
     gate       the committed check.sh pass; deterministic, diffed against
@@ -79,8 +83,11 @@ extern "C" {
 #include "pvm3.h"
 }
 #include <QTimer>
+#include <QElapsedTimer>
 #include <QtTest/QtTest>
 #include <cstdio>
+#include <cstdlib>
+#include <unistd.h>
 #include <functional>
 #include <map>
 
@@ -260,25 +267,85 @@ static void step(const char *what, bool tree = true, bool page = true,
 }
 
 // ------------------------------------------------------- modal interception
+// PVM teardown. pvm_start_pvmd() returns 0 when THIS process started the
+// daemon and PvmDupHost when one was already up; only the former may halt it,
+// or a scenario would tear down someone else's running evolution. Without this
+// the visualize and evolution scenarios left a pvmd3 and its slaves behind.
+static bool g_pvmOurDaemon = false;
+static bool g_pvmEnrolled  = false;
+
+static void tearDownPvm()
+{
+    if (g_pvmOurDaemon) { g_pvmOurDaemon = false; pvm_halt(); }
+    if (g_pvmEnrolled)  { g_pvmEnrolled  = false; pvm_exit(); }
+}
+
+// A scenario that blocks in a modal exec() that never closes would otherwise
+// hang forever; check.sh's timeout would kill it and report the wrong reason.
+// A modal exec() still runs an event loop, so this timer fires inside exactly
+// the case it exists for.
+static void armWatchdog(int ms)
+{
+    QTimer *wd = new QTimer;
+    wd->setSingleShot(true);
+    QObject::connect(wd, &QTimer::timeout, [ms]() {
+        QWidget *m = QApplication::activeModalWidget();
+        printf("\n!! WATCHDOG: this scenario exceeded %d ms and is stuck.\n"
+               "!! active modal: %s\n"
+               "!! Aborting rather than hanging whatever is running this.\n",
+               ms, m ? m->metaObject()->className() : "(none)");
+        fflush(stdout);
+        tearDownPvm();
+        _exit(3);
+    });
+    wd->start(ms);
+}
+
+// Only ONE of these may be armed at a time. An earlier version left each
+// poller running until its own budget expired, so a handler armed for step N
+// could still be alive at step N+1 and latch onto that step's dialog -- the
+// MetaGP scenario demonstrably printed its "NONE appeared" line against the
+// wrong step, and roughly a second of drift would have had it consume the
+// disable warning before the intended handler saw it. That warning is what the
+// ampersand assertion reads, so this is not a cosmetic problem.
+static QTimer *g_modalPoller = nullptr;
+
+static void cancelModalHandler()
+{
+    if (g_modalPoller) {
+        g_modalPoller->stop();
+        g_modalPoller->deleteLater();
+        g_modalPoller = nullptr;
+    }
+}
+
 static void whenModal(std::function<void(QWidget *)> fn, int budgetMs = 8000)
 {
+    if (g_modalPoller) {                       // cancel the previous one
+        g_modalPoller->stop();
+        g_modalPoller->deleteLater();
+        g_modalPoller = nullptr;
+    }
     QTimer *t = new QTimer;
-    int *spent = new int(0);
-    QObject::connect(t, &QTimer::timeout, [t, fn, spent, budgetMs]() {
+    g_modalPoller = t;
+    QElapsedTimer *clock = new QElapsedTimer;  // real time, not tick counting
+    clock->start();
+    QObject::connect(t, &QTimer::timeout, [t, fn, clock, budgetMs]() {
         QWidget *m = QApplication::activeModalWidget();
-        *spent += 50;
         if (m) {
             t->stop(); t->deleteLater();
+            if (g_modalPoller == t) g_modalPoller = nullptr;
             printf("  [modal] class=%s title=[%s]\n",
                    m->metaObject()->className(), qPrintable(m->windowTitle()));
             fflush(stdout);
+            delete clock;
             fn(m);
-            delete spent;
-        } else if (*spent > budgetMs) {
+        } else if (clock->elapsed() > budgetMs) {
             t->stop(); t->deleteLater();
+            if (g_modalPoller == t) g_modalPoller = nullptr;
             printf("  [modal] NONE appeared within %d ms\n", budgetMs);
             fflush(stdout);
-            delete spent;
+            delete clock;
         }
     });
     t->start(50);
@@ -400,28 +467,40 @@ static bool clickMenu(const QString &top, const QString &item, const QString &su
 {
     QMenuBar *mb = W->menuBar();
     QAction *ta = topAction(top);
-    if (!ta || !ta->menu()) { printf("  !! no top menu [%s]\n", qPrintable(top)); return false; }
+    if (!ta || !ta->menu()) { printf("  !! no top menu [%s]\n", qPrintable(top));
+                              cancelModalHandler(); return false; }
     QTest::mouseClick(mb, Qt::LeftButton, Qt::NoModifier, mb->actionGeometry(ta).center());
     QTest::qWait(120);
     QMenu *m = ta->menu();
-    if (!m->isVisible()) { printf("  !! menu [%s] did not open\n", qPrintable(top)); return false; }
+    if (!m->isVisible()) { printf("  !! menu [%s] did not open\n", qPrintable(top));
+                           cancelModalHandler(); return false; }
     for (QAction *a : m->actions()) {
         if (a->text() != item) continue;
         if (!sub.isEmpty() && a->menu()) {
+            if (!a->isEnabled()) {
+                printf("  !! submenu parent [%s>%s] is GREYED\n",
+                       qPrintable(top), qPrintable(item));
+                m->close(); cancelModalHandler(); return false;
+            }
             QTest::mouseClick(m, Qt::LeftButton, Qt::NoModifier, m->actionGeometry(a).center());
             QTest::qWait(150);
             QMenu *s = a->menu();
             for (QAction *sa : s->actions())
                 if (sa->text() == sub) {
+                    if (!sa->isEnabled()) {
+                        printf("  !! item [%s>%s>%s] is GREYED\n", qPrintable(top),
+                               qPrintable(item), qPrintable(sub));
+                        s->close(); m->close(); cancelModalHandler(); return false;
+                    }
                     QTest::mouseClick(s, Qt::LeftButton, Qt::NoModifier, s->actionGeometry(sa).center());
                     QTest::qWait(150); return true;
                 }
-            s->close(); m->close(); return false;
+            s->close(); m->close(); cancelModalHandler(); return false;
         }
         if (!a->isEnabled()) {
             printf("  !! item [%s>%s] is GREYED -- click would do nothing\n",
                    qPrintable(top), qPrintable(item));
-            m->close(); return false;
+            m->close(); cancelModalHandler(); return false;
         }
         QTest::mouseClick(m, Qt::LeftButton, Qt::NoModifier, m->actionGeometry(a).center());
         QTest::qWait(200);
@@ -429,6 +508,7 @@ static bool clickMenu(const QString &top, const QString &item, const QString &su
     }
     printf("  !! no item [%s] in menu [%s]\n", qPrintable(item), qPrintable(top));
     m->close();
+    cancelModalHandler();
     return false;
 }
 
@@ -458,6 +538,9 @@ static void openExperiment(const QString &path)
 int main(int argc, char **argv)
 {
     QApplication app(argc, argv);
+    // Anything that returns from run() gets PVM torn down; the watchdog does it
+    // itself because _exit() runs no destructors.
+    struct PvmGuard { ~PvmGuard() { tearDownPvm(); } } pvmGuard;
     QString scenario = argc > 1 ? argv[1] : "open";
     QString expFile  = argc > 2 ? argv[2]
         : qEnvironmentVariable("SIGEL_EXP",
@@ -465,10 +548,22 @@ int main(int argc, char **argv)
 
     // sigel.cpp:154 brings PVM up before the window exists. Only the visualize
     // scenario needs it, and starting a daemon for the others would be noise.
+    // Evolution genuinely takes minutes; everything else that runs longer than
+    // this is stuck, not busy.
+    const bool slow = (scenario == "evolution" || scenario == "visualize");
+    armWatchdog(qEnvironmentVariableIntValue("SIGEL_WATCHDOG_MS") > 0
+                    ? qEnvironmentVariableIntValue("SIGEL_WATCHDOG_MS")
+                    : (slow ? 900000 : 240000));
+
     if (scenario == "visualize" || scenario == "evolution") {
         int info = pvm_start_pvmd(0, 0, 0);
         int mytid = pvm_mytid();
-        printf("  [pvm] start_pvmd=%d mytid=0x%x\n", info, mytid);
+        g_pvmOurDaemon = (info == 0);   // PvmDupHost means someone else's
+        g_pvmEnrolled  = (mytid >= 0);
+        // The tid is a per-run value, so it is deliberately NOT printed: these
+        // two scenarios could otherwise never be baselined.
+        printf("  [pvm] start_pvmd=%d ourDaemon=%d enrolled=%d\n", info,
+               g_pvmOurDaemon ? 1 : 0, g_pvmEnrolled ? 1 : 0);
         fflush(stdout);
     }
 
@@ -476,7 +571,7 @@ int main(int argc, char **argv)
     W = &w;
     w.resize(900, 750);
     w.show();
-    QTest::qWaitForWindowExposed(&w);
+    (void)QTest::qWaitForWindowExposed(&w);
 
     prevEnabled = collectEnabled();
     printf("== SCENARIO %s ==\n", qPrintable(scenario));
@@ -503,7 +598,9 @@ int main(int argc, char **argv)
         // 1. sort by Fitness -- pins SIG_IndividualListItem::key(), including
         //    the tie order of the two 4.19675e-05 rows.
         QHeaderView *h = t->header();
-        int x = h->sectionPosition(1) + h->sectionSize(1) / 2;
+        // viewport coordinates: sectionPosition() is in header space and only
+            // agrees while nothing scrolls horizontally.
+            int x = h->sectionViewportPosition(1) + h->sectionSize(1) / 2;
         QTest::mouseClick(h->viewport(), Qt::LeftButton, Qt::NoModifier,
                           QPoint(x, h->height() / 2));
         QTest::qWait(400);
@@ -541,9 +638,17 @@ int main(int argc, char **argv)
             printf("  new %s | %s | %s\n", qPrintable(t->topLevelItem(i)->text(0)),
                    qPrintable(t->topLevelItem(i)->text(1)), qPrintable(t->topLevelItem(i)->text(2)));
 
-        // 3. THE CRASH CASE. Deleting a block big enough that a selected row's
-        //    poolPosition exceeds the surviving pool used to reach 1.3's own
-        //    getIndividual() exit(1) through Qt 6's unblocked clear().
+        // 3. The large delete. NOTE WHAT THIS DOES AND DOES NOT CATCH: the
+        //    list is sorted by Fitness here, and the item that is current when
+        //    clear() runs turns out to be poolPosition 4 against a surviving
+        //    pool of 5 -- IN RANGE. So reverting the blockSignals guard does
+        //    NOT crash this scenario; getIndividual() is never called out of
+        //    range. What it does, every time, is let slotSelectionChanged()
+        //    run during clear() and repoint the detail pane at a SURVIVING
+        //    individual, which is why `nameIsASurvivor' below is the line that
+        //    actually guards the fix. The crash itself reproduces under the
+        //    `ctxempty' scenario, where the list is unsorted and the stale
+        //    position was 103 against a pool of 5.
         printf("\n== DELETE A LARGE BLOCK ==\n");
         clickRow(t, 5);
         clickRow(t, t->topLevelItemCount() - 1, Qt::ShiftModifier);
@@ -1131,7 +1236,9 @@ int main(int argc, char **argv)
             QHeaderView *h = t->header();
             printf("\n  [header] sortIndicatorShown=%d clickable=%d sortingEnabled=%d\n",
                    h->isSortIndicatorShown(), h->sectionsClickable(), t->isSortingEnabled());
-            int x = h->sectionPosition(1) + h->sectionSize(1) / 2;
+            // viewport coordinates: sectionPosition() is in header space and only
+            // agrees while nothing scrolls horizontally.
+            int x = h->sectionViewportPosition(1) + h->sectionSize(1) / 2;
             QTest::mouseClick(h->viewport(), Qt::LeftButton, Qt::NoModifier,
                               QPoint(x, h->height() / 2));
             QTest::qWait(400);
