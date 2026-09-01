@@ -3263,6 +3263,27 @@ all-zero key. Identical source, opposite behaviour, from a parameter changing
 signedness. Guarded to truncate only when an exponent exists; the order now
 matches 1.3 exactly.
 
+*The oracle then asked the right follow-up question: if the trigger is `uint`
+vs `qsizetype`, the same shape exists anywhere 1.3 feeds a possibly-`-1` search
+result into a Qt size parameter and relies on the unsigned wrap being
+harmless.* Swept: **30 such sites across 371 files**. They reduce to one, and
+the reason is measured rather than argued — Qt 6 clamps a negative argument
+harmlessly everywhere except `truncate`:
+
+| call | Qt 2 (`uint`, -1 wraps huge) | Qt 6 (`qsizetype`, -1 stays -1) | same? |
+|---|---|---|---|
+| `left(-1)` | whole string | whole string | yes |
+| `right(-1)` | whole string | whole string | yes |
+| `mid(p, negative)` | to end | to end | yes |
+| `chop(-1)` | no change | no change | yes |
+| **`truncate(-1)`** | **no-op** | **clears the string** | **NO** |
+
+Of the 30 sites, most pass `pos + N`, so a -1 becomes 0 — valid in both. Two are
+already guarded by an explicit `if (idx == -1)` in the 2003 source
+(`MT_Controller.cpp:466`, and the `remove` beside the truncate itself). The rest
+are `mid` with a length that can go negative, which both versions treat as "to
+the end". **`truncate` was the only one that could bite, and it did.**
+
 **And a defect the diff appeared to find but did not.** The language-command
 list first came out with 13 rows against 1.3's 15, JMP and NOP missing. The
 port was right and the probe was wrong: `SIG_LanguageParameters`' constructor
@@ -3273,6 +3294,17 @@ loading the file (`SIG_ExperimentListView` constructs, then calls
 invents the defect. Corrected, the port produces all 15 rows with JMP and NOP
 at duration 0 — 1.3's table exactly. *Checked before changing anything, which
 is the only reason working code was not "fixed".*
+
+**Two last unknowns closed by the oracle.** The `Classifier System`
+accelerator sits on the third character — `Cl&assifier System` — read off a 700%
+capture of the enabled menu, matching the port. And the unexplained LCD reading
+532 in the evolution controls is the generation count, proven from the file
+rather than inferred: `twoBasesSimpleFitness2.exp` holds exactly 532 generation
+records numbered 1..532 with no gaps. Its last record's three numbers,
+1.14825 / 2.34536e-05 / 0.382249, are the best, worst and average fitness — the
+first two being exactly the top and bottom of the individuals list — and its
+timestamp is three minutes past `TERMINATIONTIME`, consistent with the run
+ending on the date condition. Nothing on those pages is now unaccounted for.
 
 **All of it is now a gate.** `guidump-baseline.txt` holds the structural dump
 plus the fitness-sort order, and `check.sh`'s **`gui vs 1.3`** section rebuilds
