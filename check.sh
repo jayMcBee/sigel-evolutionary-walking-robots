@@ -527,9 +527,40 @@ for prog in sigel sigel_slave; do
         pf=$((pf+1)); echo "  $prog.cpp does not compile:"; head -5 /tmp/prog.$$
     fi
 done
+rm -f /tmp/prog.$$
+
+# ...but compiling was never the hard part. Every C9 defect -- a missing moc, an
+# unemitted vtable, a resource dropped from a static archive, the master
+# SIG_GPExperiment reaching the slave -- is invisible to -fsyntax-only and shows
+# up only at link. So the gate also requires the two binaries to be BUILT and
+# CURRENT, and runs the one of the two that can smoke-test itself headlessly.
+#
+# Fails rather than skips when they are absent: a gate that quietly passes when
+# the thing it checks is missing is the failure mode this port has already hit
+# twice (the C7 comma probe, the C6 spin-box rows).
+if make -q B=build-fast SAN= SIGSAN= programs 2>/dev/null; then
+    for prog in sigel sigel_slave; do
+        if [ -x "$ROOT/build-fast/$prog" ]; then pp=$((pp+1)); else
+            pf=$((pf+1)); echo "  build-fast/$prog missing"; fi
+    done
+    # sigel_slave with no PVM daemon must reach its own guard and exit cleanly.
+    # sigel needs a display and starts a pvmd, so its run is driven by hand and
+    # against the 1.3 oracle -- see PORTING.md C9.
+    out=$(SIGEL_ROOT="$SRC" QT_QPA_PLATFORM=offscreen \
+          timeout 60 "$ROOT/build-fast/sigel_slave" 2>&1 </dev/null || true)
+    case $out in
+        *"hasn't been started as a PVM slave"*) pp=$((pp+1)) ;;
+        *) pf=$((pf+1))
+           echo "  sigel_slave did not reach its no-PVM guard; it printed:"
+           printf '%s\n' "$out" | tail -3 | sed 's/^/    /' ;;
+    esac
+else
+    pf=$((pf+1))
+    echo "  the two programs are not built or are out of date --"
+    echo "    run 'make B=build-fast SAN= SIGSAN= programs'"
+fi
 printf '%-22s %2d pass  %2d fail\n' "programs" "$pp" "$pf"
 pass=$((pass+pp)); fail=$((fail+pf))
-rm -f /tmp/prog.$$
 
 # ---------------------------------------------------------------------------
 # Phase C -- the converted Designer forms.

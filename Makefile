@@ -289,18 +289,37 @@ SIGCXX := g++ -std=c++17 -O1 -g -Wall -Wextra \
 CORE := SIGEL_Tools SIGEL_Environment MT_GPSystem SIGEL_Robot SIGEL_Program \
         SIGEL_RobotIO SIGEL_Simulation MT_Control SIGEL_GP
 
-# MT_Controller.cpp constructs an MT_MainWindow and makes 23 mainWindow->
-# accesses, so it cannot build until MT_GUI is ported -- PORTING.md §9.
-# SIG_GUIGPManager.cpp is its counterpart in SIGEL_GP.
-EXCLUDE_MT_Control := $(SRC)/src/MT_Control/MT_Controller.cpp
-# The two ZORC files drive real hardware over a serial line and ask the user for
-# the distance walked through QInputDialog. Both still on the Qt 2 API.
-EXCLUDE_SIGEL_GP   := $(SRC)/src/SIGEL_GP/SIG_GUIGPManager.cpp \
-                      $(SRC)/src/SIGEL_GP/SIG_GPRemoteZORCFitnessFunction.cpp \
-                      $(SRC)/src/SIGEL_GP/WIN_SIG_GPRemoteZORCFitnessFunction.cpp
+# These three exclusions all existed for one reason -- the GUI was not ported --
+# and C6/C7/C8 removed it. MT_Controller.cpp constructs an MT_MainWindow and
+# makes 23 mainWindow-> accesses (MT_GUI, C6); SIG_GUIGPManager.cpp is its
+# counterpart in SIGEL_GP and reaches into SIG_Experiment (SIGEL_MasterGUI, C7);
+# the non-WIN ZORC fitness function was still on the Qt 2 API until C8. All
+# three now compile, and C9 needs all three: linking `sigel' without them fails
+# on 20 undefined MT_Controller symbols plus SIG_GUIGPManager's vtable.
+#
+# WIN_SIG_GPRemoteZORCFitnessFunction.cpp is the one real exclusion left. It
+# needs HANDLE and OVERLAPPED from windows.h and has no Qt 2 API left in it, so
+# it cannot be compiled on this platform at any point -- it is excluded because
+# of the platform, not because of the port.
+EXCLUDE_SIGEL_GP   := $(SRC)/src/SIGEL_GP/WIN_SIG_GPRemoteZORCFitnessFunction.cpp
 
 CORE_LIBS := $(patsubst %,$(LIB)/lib%.a,$(CORE))
 core: $(CORE_LIBS)
+
+# The five GUI modules, ported in C3-C7 and until C9 built by nothing at all --
+# check.sh only ever ran them through -fsyntax-only, so no GUI object file had
+# ever existed and no vtable had ever been emitted.
+GUI := SIGEL_CommonGUI SIGEL_Visualisation SIGEL_SlaveGUI MT_GUI SIGEL_MasterGUI
+GUI_LIBS := $(patsubst %,$(LIB)/lib%.a,$(GUI))
+gui: $(GUI_LIBS)
+
+# The slave is not a cut-down master: it links its OWN three GUI modules and
+# never the master's two. Handing it all five drags SIG_Experiment in through
+# the master's moc objects, which drags in MT_Controller, which is exactly the
+# master SIG_GPExperiment the slave must not have -- the assertion on the link
+# caught precisely that.
+GUI_SLAVE := SIGEL_CommonGUI SIGEL_Visualisation SIGEL_SlaveGUI
+GUI_SLAVE_LIBS := $(patsubst %,$(LIB)/lib%.a,$(GUI_SLAVE))
 
 $(OBJ)/sigel/%.o: $(SRC)/src/%.cpp $(STAMP)
 	@mkdir -p $(dir $@)
@@ -342,6 +361,8 @@ QRCS  :=  SIGEL_MasterUI/SIG_GPParameterBase \
 
 UI_HDRS  := $(patsubst %,$(B)/ui/ui_%.h,$(notdir $(FORMS)))
 QRC_OBJS := $(patsubst %,$(OBJ)/qrc/%.o,$(notdir $(QRCS)))
+QRC_MASTER := $(OBJ)/qrc/SIG_GPParameterBase.o
+QRC_SLAVE  := $(OBJ)/qrc/SIG_SimulationWidgetBase.o
 
 # The qrc objects are built here, not just generated, so that check.sh covers
 # rcc at all: a malformed .qrc fails the gate instead of waiting for C7 to link.
@@ -381,9 +402,28 @@ $(OBJ)/qrc/%.o: $(B)/qrc/qrc_%.cpp
 # The Q_OBJECT classes in core. Their vtable and typeinfo live in the generated
 # code, so without these the link fails on SIG_Simulation. SIG_DynaSystem.h was
 # the third entry until the Dynamo backend was deleted (physics_backends.md).
-MOC_HDRS := MT_GPSystem/MT_GPManager.h \
-            SIGEL_Simulation/SIG_Simulation.h
+# This was a hand-written list of the two core Q_OBJECT classes. The GUI adds
+# 54 more, and a hand-kept list of 56 is a list that goes stale silently: a
+# missing entry is not a compile error, it is an undefined vtable at link time
+# or -- worse, for a class whose vtable something else emits -- a signal that
+# never fires at run time. Derived from the source instead.
+MOC_HDRS := $(patsubst $(SRC)/include/%,%,$(shell grep -rl Q_OBJECT \
+              $(addprefix $(SRC)/include/,$(CORE) $(GUI)) 2>/dev/null | sort))
 MOC_OBJS := $(patsubst %.h,$(OBJ)/moc/%.o,$(MOC_HDRS))
+# MT_Control is a CORE module, but its only Q_OBJECT is MT_Controller, whose
+# meta-object references MT_MainWindow -- so putting it on the slave's line
+# drags the whole master GUI in behind it. The slave links the Clean
+# SIG_GPExperiment precisely so that it never has an MT_Controller at all.
+# sigel_eval and pvm_link are headless harnesses: they link no GUI archive at
+# all, so they get the core-only meta-objects they always had. Handing them the
+# derived full set drags GUI vtables onto a link line with no GUI library
+# behind it. MT_Control is out for the same reason as in the slave.
+MOC_OBJS_CORE  := $(patsubst %.h,$(OBJ)/moc/%.o,\
+                    $(filter $(addsuffix /%,$(filter-out MT_Control,$(CORE))),$(MOC_HDRS)))
+
+SLAVE_MODULES  := $(filter-out MT_Control,$(CORE)) $(GUI_SLAVE)
+MOC_OBJS_SLAVE := $(patsubst %.h,$(OBJ)/moc/%.o,\
+                    $(filter $(addsuffix /%,$(SLAVE_MODULES)),$(MOC_HDRS)))
 
 # make treats these as intermediate and DELETES them after linking, so the next
 # make regenerates the .cpp, recompiles the .o, and relinks -- which leaves the
@@ -404,6 +444,7 @@ $(LIB)/lib$(1).a: $$(patsubst $(SRC)/src/%.cpp,$(OBJ)/sigel/%.o,\
   $$(filter-out $$(EXCLUDE_$(1)),$$(wildcard $(SRC)/src/$(1)/*.cpp)))
 endef
 $(foreach m,$(CORE),$(eval $(call core_lib,$(m))))
+$(foreach m,$(GUI),$(eval $(call core_lib,$(m))))
 
 # One fitness evaluation. --start-group because the core modules have cycles:
 # SIGEL_GP calls SIGEL_Simulation, which reaches back through SIG_Robot.
@@ -427,8 +468,8 @@ $(foreach m,$(CORE),$(eval $(call core_lib,$(m))))
 # sigel_eval would start constructing an MT_Controller per experiment.
 CLEAN_OBJ := $(OBJ)/sigel/SIGEL_GP/SIG_GPExperimentClean.o
 
-$(B)/sigel_eval: sigel_eval.cpp $(MOC_OBJS) $(CLEAN_OBJ) $(CORE_LIBS) $(VENDOR_LIBS)
-	$(SIGCXX) $(SIGINC) $< $(MOC_OBJS) $(CLEAN_OBJ) -o $@ \
+$(B)/sigel_eval: sigel_eval.cpp $(MOC_OBJS_CORE) $(CLEAN_OBJ) $(CORE_LIBS) $(VENDOR_LIBS)
+	$(SIGCXX) $(SIGINC) $< $(MOC_OBJS_CORE) $(CLEAN_OBJ) -o $@ \
 	  -Wl,--start-group $(CORE_LIBS) $(VENDOR_LIBS) -Wl,--end-group \
 	  -L$(QTLIB) -lQt6OpenGLWidgets -lQt6OpenGL -lQt6Widgets -lQt6Gui -lQt6Core -lGL -lGLU -lm
 	@n=`nm -C $@ | grep -c 'MT_Controller' || true`; \
@@ -451,6 +492,13 @@ $(B)/sigel_eval: sigel_eval.cpp $(MOC_OBJS) $(CLEAN_OBJ) $(CORE_LIBS) $(VENDOR_L
 # other core object gains a pvm_* call it would sit unreferenced in its archive,
 # never be linked, and P4 would stay green while covering less.
 #
+# MT_Controller.o is exempted, and the assertion caught it the moment C9 lifted
+# its exclusion. Its ONLY pvm_* is a single pvm_halt() on a fatal error path
+# (MT_Controller.cpp:456, immediately followed by exit(1)) -- not a data round
+# trip, which is the thing P4 exists to prove. Linking it here would pull the
+# entire master GUI into a headless harness to cover one teardown call. The
+# exemption is the reason, not a silencing: any OTHER new pvm_* still fails.
+#
 # -ltirpc is NOT optional even though the link succeeds without it. libasan
 # exports weak xdr_double, xdr_int, xdrmem_create and friends as interceptors,
 # so under the sanitizers PVM's XDR references bind to those with nothing
@@ -460,18 +508,62 @@ $(B)/sigel_eval: sigel_eval.cpp $(MOC_OBJS) $(CLEAN_OBJ) $(CORE_LIBS) $(VENDOR_L
 PVM_OBJS := $(OBJ)/sigel/SIGEL_GP/SIG_GPFitnessTrainer.o \
             $(OBJ)/sigel/SIGEL_GP/SIG_GPPVMData.o
 
-$(B)/pvm_link: pvm_link.cpp $(PVM_OBJS) $(MOC_OBJS) $(CORE_LIBS) $(VENDOR_LIBS) \
+$(B)/pvm_link: pvm_link.cpp $(PVM_OBJS) $(MOC_OBJS_CORE) $(CORE_LIBS) $(VENDOR_LIBS) \
                $(PVM_LIB) $(PVM_D)
-	$(SIGCXX) $(SIGINC) $< $(PVM_OBJS) $(MOC_OBJS) -o $@ \
+	$(SIGCXX) $(SIGINC) $< $(PVM_OBJS) $(MOC_OBJS_CORE) -o $@ \
 	  -Wl,--start-group $(CORE_LIBS) $(VENDOR_LIBS) -Wl,--end-group \
 	  $(PVM_LIB) -ltirpc \
 	  -L$(QTLIB) -lQt6OpenGLWidgets -lQt6OpenGL -lQt6Widgets -lQt6Gui -lQt6Core -lGL -lGLU -lm
 	@bad=`nm --undefined-only --print-file-name $(CORE_LIBS) 2>/dev/null \
 	      | sed -n 's/.*:\(.*\.o\): *U pvm_.*/\1/p' | sort -u \
-	      | grep -v -e SIG_GPFitnessTrainer.o -e SIG_GPPVMData.o`; \
+	      | grep -v -e SIG_GPFitnessTrainer.o -e SIG_GPPVMData.o \
+	              -e MT_Controller.o`; \
 	  test -z "$$bad" || { \
 	    echo "PVM_OBJS is out of date: these also need pvm_* and are not" \
 	         "on the link line, so P4 no longer covers them:" >&2; \
 	    echo "$$bad" >&2; exit 1; }
+
+# ---------------------------------------------------------------------------
+# The two programs -- PORTING.md Phase C, step C9.
+#
+# Nothing built these before C9: they are src/*.cpp, outside every module list,
+# and check.sh only ever ran them through -fsyntax-only. Linking is what proves
+# the GUI port, because a missing moc, an unemitted vtable and a resource that
+# never made it into the binary are all invisible to a compile.
+#
+# The .qrc objects are named on the link line rather than left inside an
+# archive: nothing references their symbols, so the linker would drop them from
+# a static library and the form icons would silently vanish. The Makefile's own
+# forms section says so; this is the line it was talking about.
+#
+# sigel gets the MASTER SIG_GPExperiment -- the variant whose constructor builds
+# an MT_Controller -- straight out of libSIGEL_GP.a. sigel_slave must get the
+# Clean variant instead, so that object is named explicitly ahead of the
+# archives, exactly as sigel_eval does it. Both are asserted after the link.
+.PHONY: programs
+programs: $(B)/sigel $(B)/sigel_slave
+
+SIGLIBS = $(PVM_LIB) -ltirpc \
+          -L$(QTLIB) -lQt6OpenGLWidgets -lQt6OpenGL -lQt6Widgets -lQt6Gui -lQt6Core \
+          -lGL -lGLU -lm
+
+$(B)/sigel: $(SRC)/src/sigel.cpp $(MOC_OBJS) $(QRC_OBJS) $(GUI_LIBS) $(CORE_LIBS) \
+            $(VENDOR_LIBS) $(PVM_LIB)
+	$(SIGCXX) $(SIGINC) $< $(MOC_OBJS) $(QRC_MASTER) -o $@ \
+	  -Wl,--start-group $(GUI_LIBS) $(CORE_LIBS) $(VENDOR_LIBS) -Wl,--end-group $(SIGLIBS)
+	@n=`nm -C $@ | grep -c 'MT_Controller' || true`; \
+	 test "$$n" -gt 0 || { \
+	   echo "sigel linked WITHOUT MT_Controller: it must get the master" \
+	        "SIG_GPExperiment, not Clean -- see PORTING.md section 9." >&2; exit 1; }
+
+$(B)/sigel_slave: $(SRC)/src/sigel_slave.cpp $(MOC_OBJS_SLAVE) $(QRC_SLAVE) $(CLEAN_OBJ) \
+                  $(GUI_SLAVE_LIBS) $(CORE_LIBS) $(VENDOR_LIBS) $(PVM_LIB)
+	$(SIGCXX) $(SIGINC) $< $(MOC_OBJS_SLAVE) $(QRC_SLAVE) $(CLEAN_OBJ) -o $@ \
+	  -Wl,--start-group $(GUI_SLAVE_LIBS) $(CORE_LIBS) $(VENDOR_LIBS) -Wl,--end-group $(SIGLIBS)
+	@n=`nm -C $@ | grep -c 'MT_Controller' || true`; \
+	 test "$$n" -eq 0 || { \
+	   echo "sigel_slave linked the MASTER SIG_GPExperiment: $$n MT_Controller" \
+	        "symbols. It must link SIG_GPExperimentClean -- see PORTING.md section 9." >&2; \
+	   exit 1; }
 
 -include $(shell find $(OBJ) -name '*.d' 2>/dev/null)

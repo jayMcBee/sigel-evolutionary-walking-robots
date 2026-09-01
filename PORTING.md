@@ -1706,7 +1706,7 @@ modules include the headers `uic` generates from them.
 | C6 | **DONE 2026-08-31.** `MT_GUI` — 31 dead connects, the prepending page list, and a right-click that cleared the selection | 4,513 LOC, 23 sources |
 | C7 | **DONE 2026-08-31.** `SIGEL_MasterGUI` — all **44 dead connects** repaired (§2), **23 prepending item sites**, the three owning `QDict`s, and 21 validators that would have read the decimal point by system locale. 29/29 sources and 29/29 headers compile; the module is in `MODULES` with a dead-signal baseline of 0 | 8,791 LOC measured (6,164 source + 2,627 header), 29 sources, 20 hand-written |
 | C8 | **DONE 2026-08-31.** `sigel.cpp`, `sigel_slave.cpp`, `MT_Control`'s 15 dead connects, and the four core files no module list reached. **The tree's dead-signal count is now 0 with no non-zero baseline anywhere.** `check.sh` gained a `programs` section and a `dead item virtuals` check | 15 sites + 4 files |
-| C9 | All five modules and both programs build, link and run | — |
+| C9 | **DONE 2026-08-31.** All five GUI modules build as archives, both programs link and run. Exclusions lifted, moc derived from source, resources named on the link line, `programs` gate upgraded from compile to link+run | 5 modules, 2 programs |
 
 Each module step is the same shape: `qt3to4` in the container, hand-port off
 Qt3Support, extend `check.sh` to cover the module, commit.
@@ -3128,6 +3128,85 @@ takes the gate from 1 pass to 1 fail.
 one. The review probed the pattern under `-fsanitize=undefined,vptr` without a
 crash — `QCoreApplication` is at offset 0 and `exit()` is non-virtual — but the
 path has never actually run. C9 executes it.
+
+---
+
+#### C9 — linking, which is where the GUI port was actually tested
+
+**Nothing had ever been linked.** Every green gate up to here came from
+`g++ -fsyntax-only`. No GUI object file had ever existed, no vtable had ever
+been emitted, and neither program had a Makefile target at all — `sigel.cpp`
+and `sigel_slave.cpp` are `src/*.cpp`, outside every module list. C9 is the
+first step that produced a runnable SIGEL.
+
+**The five GUI modules now build as archives** alongside the nine core ones,
+61 object files, using the same rule. **`MOC_HDRS` stopped being hand-written.**
+It listed the two core `Q_OBJECT` classes; the GUI adds 54 more, and a
+hand-kept list of 56 goes stale silently — a missing entry is not a compile
+error but an undefined vtable at link, or a signal that never fires at run
+time. It is derived from the sources with a `Q_OBJECT` grep.
+
+**Three of the four build exclusions existed only because the GUI was
+unported, and C9 removed them.** `MT_Controller.cpp` (needs MT_GUI, C6),
+`SIG_GUIGPManager.cpp` (needs SIGEL_MasterGUI, C7) and the non-WIN ZORC fitness
+function (Qt 2 API until C8) all compile now, and linking `sigel` without them
+fails on 20 undefined `MT_Controller` symbols plus a vtable. The fourth,
+`WIN_SIG_GPRemoteZORCFitnessFunction.cpp`, stays out permanently: it needs
+`HANDLE` and `OVERLAPPED` from `windows.h` and has no Qt 2 API left in it, so
+it is excluded by platform, not by port state.
+
+**The slave is not a cut-down master, and an assertion proved it.** The first
+`sigel_slave` link put all 56 meta-objects on the line; the master GUI's moc
+objects reference `SIG_Experiment`, which drags in `MT_Controller`, which is
+exactly the master `SIG_GPExperiment` the slave must never have — and the
+existing §9 assertion caught it, reporting 45 `MT_Controller` symbols. The
+slave links its own three GUI modules and the core minus `MT_Control`, whose
+only `Q_OBJECT` is `MT_Controller` itself. *The two headless harnesses,
+`sigel_eval` and `pvm_link`, broke the same way and for the same reason: the
+derived meta-object set handed them GUI vtables with no GUI archive behind
+them. Both are pinned to the core-only set they always had, which is how the
+fitness baselines stayed byte-identical through all of this.*
+
+**Resource objects are named on the link line**, not left inside an archive.
+Nothing references their symbols, so a static library would drop them and the
+form icons would silently vanish — the Makefile's forms section had left that
+instruction for this step, and it is now honoured, one `.qrc` per program.
+
+**The P4 PVM assertion fired, correctly, and was answered rather than
+silenced.** With `MT_Controller.o` in the core archives it reported that a new
+object calls `pvm_*` and is not on the PVM link line. Its only PVM use is a
+single `pvm_halt()` on a fatal error path (`MT_Controller.cpp:456`, followed
+immediately by `exit(1)`) — not a data round trip, which is what P4 exists to
+prove, and linking it would pull the whole master GUI into a headless harness
+to cover one teardown call. Exempted **with that reason recorded**; any other
+new `pvm_*` still fails the check.
+
+**Both programs run.** `sigel_slave` with no PVM daemon reaches its own
+"hasn't been started as a PVM slave" guard and exits 0. `sigel` starts, builds
+the main window and sits in the Qt event loop — measured at 28 seconds and six
+threads under the offscreen platform, with one benign
+`propagateSizeHints()` notice and nothing else. *An earlier run appeared to
+abort; that was an artefact of `timeout` sending SIGTERM into SIGEL's own
+handler, which calls `pvm_halt()` and `exit()` from signal context while Qt
+threads are live. Killed with SIGKILL instead, the log is clean. The lesson is
+the same one as the C7 comma probe: a failure observed while the harness is
+what broke is not evidence about the thing under test.*
+
+**`check.sh`'s `programs` section was the gate that let all of this through.**
+It ran `-fsyntax-only`, which cannot see a missing moc, an unemitted vtable, a
+dropped resource, or the wrong `SIG_GPExperiment`. It now additionally requires
+both binaries to be built and current, and runs the slave's headless smoke
+test, failing — not skipping — when they are absent.
+
+*Teeth-tested three ways: binary missing, binary stale, and binary current but
+answering wrongly. The third attempt was itself a false positive on the first
+try* — the stale-binary test immediately before it had left the tree stale, so
+the staleness branch short-circuited and the substituted binary was never run,
+while the gate still printed a failure. Rebuilt first, then re-run, it fails
+with the specific diagnostic and echoes the wrong output. **That is three times
+now in this port that a teeth test has appeared to pass by failing for the
+wrong reason** (the C6 spin-box rows, the C7 comma probe, this). The check that
+a gate has teeth needs the same scepticism as the gate.
 
 ---
 
