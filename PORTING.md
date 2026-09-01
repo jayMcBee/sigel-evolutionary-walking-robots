@@ -32,7 +32,7 @@ build and run, because nothing else can be verified without it — see §3.
 | T — old-Qt tool container | **done 2026-08-27.** `tools/qtmig`, §4 |
 | D — delete the shim, migrate the data | **DONE 2026-08-30.** `q2compat.h` and `q2compat_check.cpp` deleted; `include/compat/` gone; **no `Q2*` shim type is used anywhere**. D1–D27. *This is not "no Qt 2 container exists" — the unported GUI modules still declare **71 lines** of `QArray`, `QDict`, `QList`-as-pointer-list and friends, all of which Phase C must convert. See D27.* The shim's self-check step is gone from `check.sh`, which now runs no code. §10 |
 | P — PVM | **DONE 2026-08-28.** Vendored 3.4.3 replaced by upstream 3.4.6; nine patches carry the four config lines and Debian's eight source fixes; `libpvm3.a` and `pvmd3` build; SIGEL's two PVM objects link against them and `SIG_GPPVMData` round-trips through real PVM. `sigel`/`sigel_slave` still need Phase C. §7 |
-| C — GUI | **C1 DONE 2026-08-30**, AUTHORIZED 2026-08-27 per D24. **534 Qt 2 code sites** in the 5 GUI modules, re-measured at C1 with the pattern stated and with every row derived from a sweep of what Qt 6 no longer declares — **up** from 466, because 8 classes this plan had never named account for 89 of them, `QIconSet` alone for 47. **20 forms, all converted (C1, C2).** §7 |
+| C — GUI | **DONE 2026-08-31. C1–C9 all complete.** All 20 Designer forms converted; all five GUI modules build as archives; **both programs link and run**; **100 dead `connect()`s repaired, tree-wide count now 0 with no baseline anywhere**. Verified against the running 1.3 binary: 42 menu entries, the toolbars and the loaded-experiment values all diff clean, and that comparison is now a committed gate (`gui vs 1.3`). §7 |
 | V — check against the 1.3 binary | **V1, V5's MDH probe, V6, V7 and V8 all done, all PASS.** Ordering: 10 of 10 container orders match. Arithmetic: `twoBases` exact bit for bit, `octopus` 9/9 with three joints exact and 5 ulp worst. **V6, V7 and V8 done 2026-08-29** — friction and no-collide negotiation, their four remaining rules, and the GP parameter blocks captured *before* their conversion. `verification-against-sigel-1.3/v6`, `v7`, `v8`. V2–V4 not started; V5's sensor and force probes are **invalid as specified** — both target Dynamo-only functions, deleted 2026-08-28. §7 |
 
 **SCOPE — DECIDED 2026-08-23. Read this before changing anything.**
@@ -3342,13 +3342,7 @@ windows, and nothing happens behind the Start button.
 
 ### Ownership hazards Phase C inherits (was: the Phase B audit)
 
-**11 `setAutoDelete` calls remain, all in GUI modules** — core is 0, and C5
-removed 4. *Counted as calls, not lines: a `command grep` for the word returns
-13, two of which are comments.* Two of them flip the flag at runtime; §9 "Toggling containers" names both.
-**21 pointer containers own with no flag at all**, measured on the pristine
-tree and **not re-measured for the GUI** — D7's blanket rule says nothing about
-that class, so each GUI container needs its ownership read rather than inferred
-from a flag.
+**No `setAutoDelete` call remains anywhere — this said 11, and C6/C7 removed the last of them.** The 19 occurrences of the name left in the tree are all COMMENTS recording what the Qt 2 code used to free, and the same is true of every remaining mention of `QDict`, `QArray`, `QListViewItem`, `QPtrList` and `QCString`. The compiler is the proof: none of those types or methods exists in Qt 6, so a live one could not build, and the whole tree builds.
 
 **A `getFoo()` returning a container by reference puts free sites in other
 modules**, including modules that do not compile yet. Grep the accessor, not
