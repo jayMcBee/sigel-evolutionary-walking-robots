@@ -467,15 +467,31 @@ $(foreach m,$(GUI),$(eval $(call core_lib,$(m))))
 # and MT_Controller links, at which point the master would link silently and
 # sigel_eval would start constructing an MT_Controller per experiment.
 CLEAN_OBJ := $(OBJ)/sigel/SIGEL_GP/SIG_GPExperimentClean.o
+# ...and its opposite. `sigel' needs the MASTER variant, and needs it named just
+# as explicitly: BOTH files define the identical set of symbols for the class,
+# so the linker takes whichever archive member it meets first, and $(wildcard)
+# happens to put Clean at member 5 and the master at 6. Leaving it to that
+# order gave `sigel' the Clean constructor -- which never assigns
+# mtController (a raw pointer with no initialiser, SIG_GPExperiment.h:221),
+# so every experiment in the GUI carried a garbage MT_Controller pointer and
+# -mtevolve dereferenced it. Found by the C9 review; see PORTING.md.
+MASTER_OBJ := $(OBJ)/sigel/SIGEL_GP/SIG_GPExperiment.o
+
+# The two variants differ only in the constructor, so the honest test of which
+# one linked is the constructor's SIZE against the object it should have come
+# from. The previous guard counted MT_Controller symbols in the binary, which
+# says nothing: `sigel' links MT_Control and MT_GUI whatever happens, so it
+# counted 45 and passed while linking exactly the wrong variant.
+ctor_size = nm -C -S $(1) | awk '/SIG_GPExperiment::SIG_GPExperiment\(\)$$/{print $$2; exit}'
 
 $(B)/sigel_eval: sigel_eval.cpp $(MOC_OBJS_CORE) $(CLEAN_OBJ) $(CORE_LIBS) $(VENDOR_LIBS)
 	$(SIGCXX) $(SIGINC) $< $(MOC_OBJS_CORE) $(CLEAN_OBJ) -o $@ \
 	  -Wl,--start-group $(CORE_LIBS) $(VENDOR_LIBS) -Wl,--end-group \
 	  -L$(QTLIB) -lQt6OpenGLWidgets -lQt6OpenGL -lQt6Widgets -lQt6Gui -lQt6Core -lGL -lGLU -lm
-	@n=`nm -C $@ | grep -c 'MT_Controller' || true`; \
-	 test "$$n" -eq 0 || { \
-	   echo "sigel_eval linked the MASTER SIG_GPExperiment: $$n MT_Controller" \
-	        "symbols. It must link SIG_GPExperimentClean -- see §9." >&2; exit 1; }
+	@want=`$(call ctor_size,$(CLEAN_OBJ))`; got=`$(call ctor_size,$@)`; \
+	 test -n "$$want" && test "$$got" = "$$want" || { \
+	   echo "sigel_eval linked the WRONG SIG_GPExperiment: constructor is $$got," \
+	        "Clean's is $$want -- see PORTING.md section 9." >&2; exit 1; }
 
 # ---------------------------------------------------------------------------
 # Does SIGEL's own PVM code link and run against real PVM? -- PORTING.md
@@ -516,8 +532,8 @@ $(B)/pvm_link: pvm_link.cpp $(PVM_OBJS) $(MOC_OBJS_CORE) $(CORE_LIBS) $(VENDOR_L
 	  -L$(QTLIB) -lQt6OpenGLWidgets -lQt6OpenGL -lQt6Widgets -lQt6Gui -lQt6Core -lGL -lGLU -lm
 	@bad=`nm --undefined-only --print-file-name $(CORE_LIBS) 2>/dev/null \
 	      | sed -n 's/.*:\(.*\.o\): *U pvm_.*/\1/p' | sort -u \
-	      | grep -v -e SIG_GPFitnessTrainer.o -e SIG_GPPVMData.o \
-	              -e MT_Controller.o`; \
+	      | grep -v -x -e SIG_GPFitnessTrainer.o -e SIG_GPPVMData.o \
+	                 -e MT_Controller.o`; \
 	  test -z "$$bad" || { \
 	    echo "PVM_OBJS is out of date: these also need pvm_* and are not" \
 	         "on the link line, so P4 no longer covers them:" >&2; \
@@ -549,21 +565,21 @@ SIGLIBS = $(PVM_LIB) -ltirpc \
 
 $(B)/sigel: $(SRC)/src/sigel.cpp $(MOC_OBJS) $(QRC_OBJS) $(GUI_LIBS) $(CORE_LIBS) \
             $(VENDOR_LIBS) $(PVM_LIB)
-	$(SIGCXX) $(SIGINC) $< $(MOC_OBJS) $(QRC_MASTER) -o $@ \
+	$(SIGCXX) $(SIGINC) $< $(MOC_OBJS) $(QRC_MASTER) $(MASTER_OBJ) -o $@ \
 	  -Wl,--start-group $(GUI_LIBS) $(CORE_LIBS) $(VENDOR_LIBS) -Wl,--end-group $(SIGLIBS)
-	@n=`nm -C $@ | grep -c 'MT_Controller' || true`; \
-	 test "$$n" -gt 0 || { \
-	   echo "sigel linked WITHOUT MT_Controller: it must get the master" \
-	        "SIG_GPExperiment, not Clean -- see PORTING.md section 9." >&2; exit 1; }
+	@want=`$(call ctor_size,$(MASTER_OBJ))`; got=`$(call ctor_size,$@)`; \
+	 test -n "$$want" && test "$$got" = "$$want" || { \
+	   echo "sigel linked the WRONG SIG_GPExperiment: constructor is $$got," \
+	        "the master's is $$want. Clean leaves mtController uninitialised" \
+	        "-- see PORTING.md section 9." >&2; exit 1; }
 
 $(B)/sigel_slave: $(SRC)/src/sigel_slave.cpp $(MOC_OBJS_SLAVE) $(QRC_SLAVE) $(CLEAN_OBJ) \
                   $(GUI_SLAVE_LIBS) $(CORE_LIBS) $(VENDOR_LIBS) $(PVM_LIB)
 	$(SIGCXX) $(SIGINC) $< $(MOC_OBJS_SLAVE) $(QRC_SLAVE) $(CLEAN_OBJ) -o $@ \
 	  -Wl,--start-group $(GUI_SLAVE_LIBS) $(CORE_LIBS) $(VENDOR_LIBS) -Wl,--end-group $(SIGLIBS)
-	@n=`nm -C $@ | grep -c 'MT_Controller' || true`; \
-	 test "$$n" -eq 0 || { \
-	   echo "sigel_slave linked the MASTER SIG_GPExperiment: $$n MT_Controller" \
-	        "symbols. It must link SIG_GPExperimentClean -- see PORTING.md section 9." >&2; \
-	   exit 1; }
+	@want=`$(call ctor_size,$(CLEAN_OBJ))`; got=`$(call ctor_size,$@)`; \
+	 test -n "$$want" && test "$$got" = "$$want" || { \
+	   echo "sigel_slave linked the WRONG SIG_GPExperiment: constructor is $$got," \
+	        "Clean's is $$want -- see PORTING.md section 9." >&2; exit 1; }
 
 -include $(shell find $(OBJ) -name '*.d' 2>/dev/null)

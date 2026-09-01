@@ -3140,9 +3140,14 @@ and `sigel_slave.cpp` are `src/*.cpp`, outside every module list. C9 is the
 first step that produced a runnable SIGEL.
 
 **The five GUI modules now build as archives** alongside the nine core ones,
-61 object files, using the same rule. **`MOC_HDRS` stopped being hand-written.**
-It listed the two core `Q_OBJECT` classes; the GUI adds 54 more, and a
-hand-kept list of 56 goes stale silently — a missing entry is not a compile
+**73** object files (2 + 12 + 7 + 23 + 29), using the same rule. *This entry
+first said 61: the count came from a `find` filtered on `*GUI*`, which silently
+omits `SIGEL_Visualisation` because its name does not contain "GUI". 73 - 12 =
+61 exactly. Found by the C9 review.* **`MOC_HDRS` stopped being hand-written.**
+It listed two core `Q_OBJECT` classes; there are in fact **3** in the built
+core (`MT_Controller` joined when C9 lifted its exclusion) and **53** in the
+GUI, so the derived list is **56**, and a hand-kept list of 56 goes stale
+silently — a missing entry is not a compile
 error but an undefined vtable at link, or a signal that never fires at run
 time. It is derived from the sources with a `Q_OBJECT` grep.
 
@@ -3207,6 +3212,77 @@ with the specific diagnostic and echoes the wrong output. **That is three times
 now in this port that a teeth test has appeared to pass by failing for the
 wrong reason** (the C6 spin-box rows, the C7 comma probe, this). The check that
 a gate has teeth needs the same scepticism as the gate.
+
+---
+
+#### C9 verification — the port and the running 1.3, side by side
+
+Once the port ran, the oracle stopped being a source of answers and became a
+source of **data to diff against**. A headless probe constructs the real
+`SIG_MainWindow` and prints every menu entry and toolbar button with its
+shortcut, enabled state and check state; the oracle read the same facts off the
+running 1.3 binary. The comparison is mechanical, not eyeballed.
+
+**42 menu entries, zero mismatches.** Text, shortcut and enabled state all
+agree, including every oddity: the duplicate `Ctrl+Shift+L` on both
+Language-Parameters and Individual (and `Ctrl+Alt+L` likewise), the
+Import/Export asymmetry (Import has Robot, Export has "...to GNU plot"), Reset
+carrying `Alt+O` with no matching letter in its name, `Evaluator System`
+showing its tick **while greyed**, and the Import and Export submenu PARENTS
+staying enabled while all sixteen children are greyed. That last one is the
+direct observable proof of the C7 review's action-group fix.
+
+**The toolbars agree too**, including the two things that look like mistakes
+and are not: the File toolbar omits Rename entirely and puts Delete **second**,
+where the menu order is New, Rename, Delete; and the button labels are their
+own short strings — "Language" not "Language Parameters", "Genetic" not "GP
+Parameters" — which is what `setIconText` restores. The Individuals toolbar has
+no Reset button though the menu does. The MetaGP toolbar has no title at all,
+because 1.3 never called `setLabel` on it.
+
+**With the same experiment file loaded — `twoBasesSimpleFitness2.exp`, md5 and
+line count confirmed identical on both machines — every value on the GP page
+matches**, including the three that are not simple echoes of the file:
+Mutation/Crossover/Reproduction show 5/67/28 where the file holds per-mille
+50/670/280; "Tournaments per generation" shows **60**, which is the file's 0.5
+multiplied by the 120-individual population, not a formatting of 0.5; and the
+pool-image frequency shows 1 where the file holds 0, clamped by the spin box
+minimum. The PVM host list comes out **exactly reversed from the file order** —
+a second prepend demonstration, and a better one than the command list because
+it is driven by file data rather than by hard-coded constructor calls.
+
+**A defect the diff found, in code the port never edited.** Sorting the
+individuals list by Fitness put `0.0029747` and `1.14825` *before* the `e-05`
+values; 1.3 puts the `e-05` group first. `SIG_IndividualListItem::key()` builds
+its sort key with `orgString.truncate( positionOfExponent )`, and
+`positionOfExponent` is **-1** for any value with no exponent. **Qt 2's
+`truncate` took a `uint`** (`qstring.h:375`), so -1 became 4294967295, past the
+end, a no-op. **Qt 6's takes a signed `qsizetype`** and -1 **clears the
+string** — measured. So every plain value lost its mantissa and got an
+all-zero key. Identical source, opposite behaviour, from a parameter changing
+signedness. Guarded to truncate only when an exponent exists; the order now
+matches 1.3 exactly.
+
+**And a defect the diff appeared to find but did not.** The language-command
+list first came out with 13 rows against 1.3's 15, JMP and NOP missing. The
+port was right and the probe was wrong: `SIG_LanguageParameters`' constructor
+creates a row only for a command the experiment has **at construction time**,
+and the application builds the page against a default experiment *before*
+loading the file (`SIG_ExperimentListView` constructs, then calls
+`loadExperiment`, then `getAllOutOfExperiment`). Probing in the opposite order
+invents the defect. Corrected, the port produces all 15 rows with JMP and NOP
+at duration 0 — 1.3's table exactly. *Checked before changing anything, which
+is the only reason working code was not "fixed".*
+
+**All of it is now a gate.** `guidump-baseline.txt` holds the structural dump
+plus the fitness-sort order, and `check.sh`'s **`gui vs 1.3`** section rebuilds
+the probe and diffs against it. It is the only check in the project that can
+see an accelerator that went missing, an action that stopped being greyed, a
+toolbar showing the long label, or a sort key that stopped being numeric — all
+of which compile, link and run. Teeth-tested four ways: a removed shortcut, a
+reverted `setIconText`, a reverted `truncate` guard, and missing GUI libraries.
+Because the baseline was diffed against the running 1.3, a failure here is a
+regression against **1.3**, not merely against yesterday's output.
 
 ---
 

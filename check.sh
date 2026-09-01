@@ -22,6 +22,7 @@ ROOT=$(cd "$(dirname "$0")" && pwd)
 SRC=$ROOT/x/kdesigelSources.1.3/kdesigel/kdesigel
 SL=$ROOT/x/supportingLibs/supportingLibs
 QTINC=$(qmake6 -query QT_INSTALL_HEADERS)
+QTLIBDIR=$(qmake6 -query QT_INSTALL_LIBS)
 
 FLAGS="-fsyntax-only -std=c++17 -Wall -Wextra -DMINMAX_H"
 # QtGui and QtWidgets are here because the Makefile has them: without them
@@ -561,6 +562,126 @@ else
 fi
 printf '%-22s %2d pass  %2d fail\n' "programs" "$pp" "$pf"
 pass=$((pass+pp)); fail=$((fail+pf))
+
+# ---------------------------------------------------------------------------
+# The master GUI's structure, against what the running SIGEL 1.3 actually shows.
+#
+# Every other check here proves code COMPILES or LINKS. This one checks what the
+# user sees: each menu entry and toolbar button with its shortcut, its enabled
+# state and its check state. guidump-baseline.txt is not a snapshot of whatever
+# the port emitted -- the 42 menu entries the 1.3 oracle read off the RUNNING
+# 1.3 binary were diffed against it mechanically, zero mismatches, so a
+# difference here is a regression against 1.3 itself.
+#
+# It is the only thing that can see an accelerator that went missing, an action
+# that stopped being greyed, a toolbar button showing the long menu label
+# instead of the short one, or a checkable action that quietly stopped being
+# checkable. All of those compile, link and run perfectly.
+gp=0; gf=0
+if [ -d "$ROOT/build-fast/lib" ] && [ -d "$ROOT/build-fast/obj/moc" ]; then
+    cat > /tmp/gui.$$.cpp <<'GUIEOF'
+// Headless structural dump of the ported GUI, in the same shape the 1.3 oracle
+// reports, so the two can be diffed mechanically.
+#include <QApplication>
+#include <QMenuBar>
+#include <QMenu>
+#include <QToolBar>
+#include <QAction>
+#include <cstdio>
+#include "SIGEL_MasterGUI/SIG_MainWindow.h"
+#include "SIGEL_MasterGUI/SIG_IndividualListItem.h"
+#include <QTreeWidget>
+
+// sigel.cpp defines this true, sigel_slave.cpp false; MT_Controller reads it.
+bool guiEnabled = true;
+
+static const char *en(const QAction *a) { return a->isEnabled() ? "enabled" : "greyed"; }
+static const char *tk(const QAction *a)
+{
+    if (!a->isCheckable()) return "n/a";
+    return a->isChecked() ? "tick" : "no-tick";
+}
+
+static void dumpMenu(const QString &path, QMenu *m)
+{
+    for (QAction *a : m->actions()) {
+        if (a->isSeparator()) { printf("%s | --- | - | - | -\n", qPrintable(path)); continue; }
+        QString sc = a->shortcut().isEmpty() ? QString("-") : a->shortcut().toString();
+        printf("%s | %s | %s | %s | %s\n", qPrintable(path), qPrintable(a->text()),
+               qPrintable(sc), en(a), tk(a));
+        if (a->menu()) dumpMenu(path + ">" + a->text(), a->menu());
+    }
+}
+
+int main(int argc, char **argv)
+{
+    QApplication app(argc, argv);
+    SIGEL_MasterGUI::SIG_MainWindow w(nullptr, "MainWindow");
+    printf("== WINDOW TITLE ==\n[%s]\n", qPrintable(w.windowTitle()));
+    printf("== ICON SIZE ==\n%dx%d\n", w.iconSize().width(), w.iconSize().height());
+    printf("== MENUS ==\n");
+    for (QAction *top : w.menuBar()->actions())
+        if (top->menu()) dumpMenu(top->text(), top->menu());
+    printf("== TOOLBARS ==\n");
+    for (QToolBar *tb : w.findChildren<QToolBar *>()) {
+        printf("-- %s (title [%s]) --\n", qPrintable(tb->objectName()), qPrintable(tb->windowTitle()));
+        for (QAction *a : tb->actions()) {
+            if (a->isSeparator()) { printf("  ---\n"); continue; }
+            printf("  %s | iconText[%s] | tip[%s] | %s | %s\n",
+                   qPrintable(a->text()), qPrintable(a->iconText()),
+                   qPrintable(a->toolTip()), en(a), tk(a));
+        }
+    }
+    // The individuals list sorts through SIG_IndividualListItem::key(), which
+    // zero-pads so the compare is NUMERIC. The 1.3 oracle read these exact
+    // Fitness values off the running binary and reported the e-05 values
+    // sorting first; as raw text 1.14825 would lead. This also pins the
+    // exponent branch of key(), where Qt 2's unsigned truncate() silently
+    // became a signed one that cleared the string.
+    printf("== FITNESS SORT ==\n");
+    {
+        QTreeWidget t; t.setColumnCount(3);
+        const char *fit[] = {"1.14825","2.34536e-05","3.09259e-05","4.19675e-05",
+                             "4.42652e-05","5.153e-05","5.6388e-05","0.0029747"};
+        int n = 0;
+        for (const char *f : fit) {
+            SIGEL_MasterGUI::SIG_IndividualListItem *it =
+                new SIGEL_MasterGUI::SIG_IndividualListItem(&t);
+            it->setText(0, QString::number(50000 + n++));
+            it->setText(1, f); it->setText(2, "1");
+        }
+        t.setSortingEnabled(true); t.sortByColumn(1, Qt::AscendingOrder);
+        for (int i = 0; i < t.topLevelItemCount(); ++i)
+            printf("%s\n", qPrintable(t.topLevelItem(i)->text(1)));
+    }
+    return 0;
+}
+GUIEOF
+    if g++ -std=c++17 -O1 -DMINMAX_H $INCS -I"$ROOT/build-fast/ui" /tmp/gui.$$.cpp \
+         $(find "$ROOT/build-fast/obj/moc" -name '*.o') \
+         "$ROOT/build-fast/obj/qrc/SIG_GPParameterBase.o" -o /tmp/gui.$$ \
+         -Wl,--start-group "$ROOT/build-fast"/lib/*.a -Wl,--end-group \
+         "$SL/pvm3/lib/LINUX64/libpvm3.a" -ltirpc \
+         -L"$QTLIBDIR" -lQt6OpenGLWidgets -lQt6OpenGL -lQt6Widgets -lQt6Gui \
+         -lQt6Core -lGL -lGLU -lm 2>/tmp/guib.$$; then
+        SIGEL_ROOT="$SRC" QT_QPA_PLATFORM=offscreen timeout 120 /tmp/gui.$$ \
+            > /tmp/guio.$$ 2>/dev/null || true
+        if command grep -v '^#' "$ROOT/guidump-baseline.txt" | diff -u - /tmp/guio.$$ > /tmp/guid.$$; then
+            gp=1
+        else
+            gf=1; echo "  the GUI no longer matches what SIGEL 1.3 shows:"
+            head -14 /tmp/guid.$$ | sed 's/^/    /'
+        fi
+    else
+        gf=1; echo "  GUI structure probe did not build:"; head -5 /tmp/guib.$$ | sed 's/^/    /'
+    fi
+    rm -f /tmp/gui.$$ /tmp/gui.$$.cpp /tmp/guib.$$ /tmp/guid.$$ /tmp/guio.$$
+else
+    gf=1
+    echo "  no built GUI libraries -- run 'make B=build-fast SAN= SIGSAN= gui'"
+fi
+printf '%-22s %2d pass  %2d fail\n' "gui vs 1.3" "$gp" "$gf"
+pass=$((pass+gp)); fail=$((fail+gf))
 
 # ---------------------------------------------------------------------------
 # Phase C -- the converted Designer forms.

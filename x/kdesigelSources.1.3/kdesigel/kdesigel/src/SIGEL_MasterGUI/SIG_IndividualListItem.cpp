@@ -93,7 +93,15 @@ QString SIG_IndividualListItem::key(int column, bool ascending) const {
       int positionOfExponent = this->text(1).indexOf("e");
       orgString = this->text(1);
       if ( positionOfPoint != -1 ) {
-        orgString.truncate(positionOfExponent);
+        // positionOfExponent is -1 when the value has no exponent at all.
+        // Qt 2's truncate took a UINT, so -1 became 4294967295, which is past
+        // the end and did nothing; Qt 6's takes a signed qsizetype and CLEARS
+        // the string. That wiped the mantissa for every plain value like
+        // "1.14825", leaving an all-zero sort key, so those sorted BEFORE the
+        // e-05 values instead of after them. Measured against 1.3, which puts
+        // the e-05 values first.
+        if (positionOfExponent != -1)
+          orgString.truncate(positionOfExponent);
         orgString.remove(positionOfPoint,1);
         positionOfExponent = (positionOfExponent != -1) ? (this->text(1).right(this->text(1).length()-(positionOfExponent+1))).toInt() : 0;
         for( int i=0; i < zeros - positionOfPoint - positionOfExponent; i++ )
