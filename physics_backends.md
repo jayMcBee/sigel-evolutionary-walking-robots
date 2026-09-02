@@ -188,7 +188,7 @@ dropping it is a one-line follow-up, to be measured the way `libdynalib.a` was.
 | `fitness-check.sh` vs baseline | **empty diff**, 42 of 42 |
 | `sigel_eval -selfcheck` | pass |
 | sanitized `fitness-check.sh build` | **empty diff**, no ASan or UBSan report |
-| `check.sh` **as of 2026-08-28** | **105 pass, 4 fail** — see PORTING.md for the current figure, 842/0 |
+| `check.sh` **as of 2026-08-28** | **105 pass, 4 fail** — see PORTING.md for the current figure, 844/0 |
 
 `check.sh` was 118 pass, 4 fail before this change. The pass count falls by
 exactly 13 because 13 fewer `.cpp` exist, and "headers standalone" by exactly 13
@@ -244,8 +244,29 @@ is what "dead code" was supposed to mean.
    the fix rather than carried forward: the only caller is `sigel_slave.cpp:293`,
    whose `catch` prints and returns 1 before `a.exec()`, so no guard is ever
    evaluated afterwards, and the widget's destructor is empty so nothing
-   double-frees. The line is kept because it costs one line and the shape is one
-   edit away from being live. `check.sh`'s `freed-pointer null` check
+   double-frees. **BOTH HALVES OF THAT WERE WRONG and are corrected here after a
+   fresh-eyes review.** `sigel_slave.cpp:293` is not the only caller —
+   `SIG_SimulationVisualisationWidget.cpp:478` calls `visualizeThis()` from
+   `slotStopSimulation()`, a live slot on the viewer's Stop action, running
+   inside `a.exec()` with no try/catch. And the destructor is empty only in the
+   DERIVED class: `visualisation` is a base-class member and
+   `SIG_VisualisationWidget::~SIG_VisualisationWidget()` does
+   `delete visualisation` (`SIGEL_CommonGUI/SIG_VisualisationWidget.cpp:60`), so
+   destruction after a throw IS a double free — it merely does not bite on the
+   slave path, where `simWindow` is leaked past the catch's `return 1`. The
+   correct reason it is unreachable today: every other caller is downstream of a
+   first `visualizeThis()` that must have succeeded, and nothing in the slave
+   calls `setSimulationLibrary`, so the same parameters cannot begin throwing
+   later. **The oracle then settled what 1.3 does with Dynamo selected: the
+   viewer opens normally and the slave SEGFAULTS on Play** — "Invalid storage
+   access", SIGEL's own name for SIGSEGV — with no dialog and the master
+   surviving. A DynaMechs control run on the same file and individual simulated
+   for 1 min 6 s. So 1.3's Dynamo path is non-functional at the first
+   integration step, and deleting it lost no working behaviour.
+   **`renderRecorder` still leaks on the throwing path** and is unfixed:
+   `SIG_SimulationVisualisation.cpp:53` allocates it, `:55` constructs the
+   throwing `SIG_Simulation`, and the destructor that would free it never runs.
+   Recorded in `future_refactorings.md`. `check.sh`'s `freed-pointer null` check
    holds it there, and was teeth-tested by removing the line again.
 2. **`SIG_SimulationQueries.cpp`: all seven non-self includes are dead.**
    Verified by compiling a translation unit

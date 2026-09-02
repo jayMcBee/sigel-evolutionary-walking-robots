@@ -33,12 +33,23 @@
     export     File > Export > Program for one named individual
     visualize  Individuals > Visualize, to capture the PVM payload
     evolution  Start and Stop  (needs PVM and a real sigel_slave)
+  ... and pages, pagesave, exportall, roundtrip, overwrite, dialogs, metagui.
+  The list above is not maintained in step with the code. The count that
+  cannot go stale is
+    command grep -o 'scenario == "[a-z]*"' guidrive.cpp | sed 's/.*"\(.*\)"/\1/' | sort -u | wc -l
+  which reads 23 today. A plain -c over the same pattern gives 26 and is
+  WRONG: two scenarios are tested twice in one condition.
 
   Environment:
     SIGEL_ROOT      as the application needs it; must hold sigel_slave for
                     the visualize and evolution scenarios
     SIGEL_EXP       experiment file to open (default the twoBases reference)
     SIGEL_SCRATCH   where save/export scenarios write (default /tmp)
+    SIGEL_GENERATIONS=N evolution only, and the PRIMARY lever: terminate by
+                    GENERATION after N, set through the Evolution control tab.
+                    Refuses a non-positive or unparseable value rather than
+                    silently falling through. Saves the evolved experiment to
+                    $SIGEL_SCRATCH/evolved.exp and asserts the run is in it.
     SIGEL_RUN_LONGER=1  evolution only: change the termination through the GUI
                     first, because every shipped experiment terminates on a
                     date in 2001 and would otherwise finish instantly
@@ -2926,7 +2937,23 @@ int main(int argc, char **argv)
         // is the lever that gives a run which measurably starts, progresses and
         // stops, and it is the same lever the oracle's fifteen reference runs
         // were produced with -- TERMINATIONGENERATIONNO, PORTING.md 9 item 2.
-        const int wantGens = qEnvironmentVariableIntValue("SIGEL_GENERATIONS");
+        // qEnvironmentVariableIntValue returns 0 for UNSET and for UNPARSEABLE
+        // alike, so SIGEL_GENERATIONS=abc silently fell through to the old
+        // date-terminated branch, saved nothing and still exited 0. Tell the
+        // two apart and refuse the bad one.
+        bool gensOk = true;
+        const int wantGens = qEnvironmentVariableIntValue("SIGEL_GENERATIONS", &gensOk);
+        if (!qEnvironmentVariableIsEmpty("SIGEL_GENERATIONS") && (!gensOk || wantGens <= 0)) {
+            printf("!! SIGEL_GENERATIONS=[%s] is not a positive integer\n",
+                   qPrintable(qEnvironmentVariable("SIGEL_GENERATIONS")));
+            fflush(stdout);
+            return 1;
+        }
+        // The pool generation BEFORE the run, so the assertion after it can say
+        // the run actually advanced rather than that a file merely exists.
+        int genBefore = -1;
+        if (SIG_Experiment *ex0 = lv->currentlySelectedExperiment())
+            genBefore = ex0->gpExperiment.population.getPoolGeneration();
         if (wantGens > 0) {
             clickMenu("&View", "&GP Parameters");
             QTest::qWait(400);
@@ -3116,6 +3143,25 @@ int main(int argc, char **argv)
             }
         }
         printf("  [clicked() emitted %d time(s)]\n", (int)spy.count());
+        // Everything below used to be PRINTED and never asserted, so a dead
+        // Start button produced a full, plausible-looking transcript and exit 0.
+        if (wantGens > 0) {
+            if (spy.count() != 1) {
+                printf("!! Start emitted clicked() %d times, expected 1 --"
+                       " the click path is broken\n", (int)spy.count());
+                fflush(stdout); return 1;
+            }
+            if (samples == 0) {
+                printf("!! the in-run sampler never fired -- Start did not block,"
+                       " so no evolution ran\n");
+                fflush(stdout); return 1;
+            }
+            if (runMs < 1000) {
+                printf("!! Start returned in %lld ms; a generation costs minutes."
+                       " Nothing was evaluated.\n", (long long)runMs);
+                fflush(stdout); return 1;
+            }
+        }
         if (evo) {
             printf("  [signalEvolutionNotRunning emitted %d time(s)]", (int)evo->count());
             for (int i = 0; i < evo->count(); ++i)
@@ -3189,6 +3235,44 @@ int main(int argc, char **argv)
                 printf("!! the evolved experiment was not written -- nothing to diff\n");
                 fflush(stdout);
                 return 1;
+            }
+            // Read the artefact back and prove the run is IN it. `exists and
+            // non-empty' passed for a file that was simply the unevolved
+            // experiment saved again.
+            QFile f(evolved);
+            int gotGen = -1, fitCount = 0, zeroFit = 0;
+            if (f.open(QIODevice::ReadOnly)) {
+                QTextStream in(&f);
+                QString line;
+                while (!(line = in.readLine()).isNull()) {
+                    if (line.contains("POOLGENERATION=")) {
+                        const QString v = line.section('=', 1).section(';', 0, 0).trimmed();
+                        if (gotGen < 0) gotGen = v.toInt();
+                    } else if (line.contains("FITNESS=")) {
+                        ++fitCount;
+                        if (line.section('=', 1).section(';', 0, 0).trimmed().toDouble() == 0.0)
+                            ++zeroFit;
+                    }
+                }
+            }
+            printf("  [artefact] POOLGENERATION=%d (was %d, +%d expected)"
+                   "  fitness values=%d of which zero=%d\n",
+                   gotGen, genBefore, wantGens, fitCount, zeroFit);
+            if (genBefore >= 0 && gotGen != genBefore + wantGens) {
+                printf("!! the saved pool generation did not advance by %d --"
+                       " the file does not contain the run\n", wantGens);
+                fflush(stdout); return 1;
+            }
+            // NOT a fitness comparison -- a liveness one. SIG_Simulation.cpp:66-70
+            // records that under PVM a throw is swallowed by sigel_slave and the
+            // individual "scores 0.0 as though it had been evaluated". A whole
+            // population of exact zeros is that failure, and it is WORSE than a
+            // crash: every `var1 >= var2' is then true, so the run is perfectly
+            // deterministic and its output looks like a clean comparison.
+            if (fitCount > 0 && zeroFit == fitCount) {
+                printf("!! every one of the %d fitness values is exactly 0.0 --"
+                       " no individual was really evaluated (swallowed throw?)\n", fitCount);
+                fflush(stdout); return 1;
             }
             fflush(stdout);
         }

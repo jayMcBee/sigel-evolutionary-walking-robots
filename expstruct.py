@@ -82,65 +82,122 @@ def sha(parts):
         h.update(b'\0')
     return h.hexdigest()[:16]
 
-def fingerprint(path):
-    """The WHOLE report as one string -- what --selfcheck asserts on.
-    Deliberately the whole thing, SHAPE included: an earlier version compared
-    only the counts and the two content hashes, and it therefore could not have
-    caught fitness leaking into SHAPE. A tool that must be blind to fitness has
-    to be blind to it in every line it prints, not merely in the ones that get
-    diffed most often."""
-    return "\n".join(report(path))
+def field(rep, name):
+    """One named field out of the report, so a probe asserts on the field it is
+    about rather than on the whole blob."""
+    for line in rep:
+        if line.startswith(name):
+            return line[len(name):].strip()
+    return None
 
 def selfcheck(path):
-    """Teeth for the one property everything here rests on: this must be blind
-    to fitness and sighted on structure. Both halves are asserted, because a
-    tool that saw NOTHING would pass the fitness half on its own."""
+    """Teeth for the properties everything here rests on.
+
+    An earlier version asserted only that the WHOLE report moved (or held). A
+    fresh-eyes review demonstrated NINE of eleven tool-breakages passing that:
+    SHAPE is a catch-all, so a matcher that silently STOPS matching still moves
+    the report, and the probe reads that as success. Two changes follow:
+
+      - sighted probes assert on the SPECIFIC field they are about (PROGRAMS,
+        ORDER), never on the concatenation;
+      - a structural floor compares the report against GROUND TRUTH recomputed
+        from the raw bytes -- individual count, total program lines, history
+        length against POOLGENERATION -- which is what catches a matcher that
+        died and dumped its content into SHAPE.
+
+    And the fitness probes are TWO. DROP does not match `Fitness Value:', which
+    is 1720 of the fitness values in a shipped experiment against 100 `FITNESS='
+    lines; FLOAT is their only net. A probe that changes a `FITNESS=' line alone
+    cannot see FLOAT die, because its own injected value trips FLOAT."""
     import re as _re, tempfile, os
     base = open(path, 'rb').read()
-    ref  = fingerprint(path)
+    ref  = report(path)
     fails = []
 
-    def variant(data, label, must_change):
+    def variant(data, label, must_change, fieldname=None):
         fd, tmp = tempfile.mkstemp(suffix='.exp'); os.close(fd)
         open(tmp, 'wb').write(data)
-        got = fingerprint(tmp)
+        got = report(tmp)
         os.unlink(tmp)
-        changed = (got != ref)
+        if fieldname:
+            changed = field(got, fieldname) != field(ref, fieldname)
+            what = fieldname
+        else:
+            changed = got != ref
+            what = "report"
         if changed != must_change:
-            fails.append("%s: fingerprint %s, expected it to %s" % (
-                label, "moved" if changed else "held",
+            fails.append("%s: %s %s, expected it to %s" % (
+                label, what, "moved" if changed else "held",
                 "move" if must_change else "hold"))
-        return changed
 
-    # 1. a changed FITNESS value must be INVISIBLE
+    # --- structural floor, recomputed from the raw bytes --------------------
+    truth_inds = len(_re.findall(rb'INDIVIDUAL\(\d+\) BEGIN', base))
+    truth_ops  = sum(1 for blk in _re.findall(rb'PROGRAM BEGIN\{(.*?)\}PROGRAM END;',
+                                              base, _re.S)
+                       for ln in blk.split(b'\n') if ln.strip())
+    got_inds = int(field(ref, 'INDIVIDUALS') or -1)
+    got_ops  = sum(int(m) for m in _re.findall(r'ops=(\d+)', "\n".join(ref)))
+    if got_inds != truth_inds:
+        fails.append("individuals: report says %d, the file has %d" % (got_inds, truth_inds))
+    if got_ops != truth_ops:
+        fails.append("program lines: report captured %d, the file has %d -- the "
+                     "rest fell through to SHAPE" % (got_ops, truth_ops))
+    # The three header fields must be PRESENT and numeric. Without this a dead
+    # KV matcher prints them as "(absent)", the POOLGENERATION cross-check below
+    # silently skips, and the whole breakage passes -- measured, not supposed.
+    for k in ('POPULATIONSIZE', 'NEXTIDENTIFIER', 'POOLGENERATION'):
+        v = field(ref, k)
+        if v is None or not v.lstrip('-').isdigit():
+            fails.append("header %s reads [%s], expected a number" % (k, v))
+    # Per-individual detail must be present too, for the same reason.
+    if _re.search(r'poolpos=-\s', "\n".join(ref)):
+        fails.append("poolpos is absent on at least one individual")
+
+    hist = (field(ref, 'HISTORY') or "0").split()[0]
+    poolgen = field(ref, 'POOLGENERATION') or ""
+    if not hist.isdigit() or int(hist) == 0:
+        fails.append("history: report says [%s], expected a non-zero count" % hist)
+    elif poolgen.isdigit() and int(hist) != int(poolgen):
+        fails.append("history: %s entries but POOLGENERATION is %s -- one entry "
+                     "per generation is the invariant" % (hist, poolgen))
+
+    # --- fitness must be INVISIBLE, in BOTH spellings -----------------------
     m = _re.search(rb'FITNESS=([0-9.eE+-]+);', base)
-    if m:
-        variant(base.replace(m.group(0), b'FITNESS=0.123456;', 1),
-                "fitness value changed", False)
-    else:
-        fails.append("no FITNESS= line found -- selfcheck cannot run")
+    if m: variant(base.replace(m.group(0), b'FITNESS=0.123456;', 1),
+                  "FITNESS= value changed", False)
+    else: fails.append("no FITNESS= line found -- selfcheck cannot run")
 
-    # 2. a changed program OPERAND must be VISIBLE
+    # An INTEGER-valued fitness, which FLOAT cannot see: it is the only probe
+    # that can catch DROP losing its FITNESS= clause. With a float value the
+    # belt-and-braces FLOAT net masks that breakage entirely.
+    m = _re.search(rb'FITNESS=([0-9.eE+-]+);', base)
+    if m: variant(base.replace(m.group(0), b'FITNESS=7;', 1),
+                  "FITNESS= set to an INTEGER", False)
+
+    m = _re.search(rb'Fitness Value: ([0-9.eE+-]+)', base)
+    if m: variant(base.replace(m.group(0), b'Fitness Value: 0.987654', 1),
+                  "Fitness Value: changed", False)
+    else: fails.append("no 'Fitness Value:' line found -- selfcheck cannot run")
+
+    # --- structure must be VISIBLE, in the field that owns it ---------------
     m = _re.search(rb'\n(\s+)(MOVE|ADD|SUB|CMP) (-?\d+)', base)
     if m:
         alt = b'\n' + m.group(1) + m.group(2) + b' ' + str(int(m.group(3)) + 1).encode()
-        variant(base.replace(m.group(0), alt, 1), "program operand changed", True)
-    else:
-        fails.append("no program line found -- selfcheck cannot run")
+        variant(base.replace(m.group(0), alt, 1), "program operand changed",
+                True, 'PROGRAMS')
+    else: fails.append("no program line found -- selfcheck cannot run")
 
-    # 3. a swapped pair of individuals must be VISIBLE (ordering is compared)
     blocks = _re.findall(rb'  INDIVIDUAL\(\d+\) BEGIN\{.*?\}INDIVIDUAL\(\d+\) END;',
                          base, _re.S)
     if len(blocks) >= 2:
         sw = base.replace(blocks[0], b'@@A@@', 1).replace(blocks[1], b'@@B@@', 1)
         sw = sw.replace(b'@@A@@', blocks[1], 1).replace(b'@@B@@', blocks[0], 1)
-        variant(sw, "two individuals swapped", True)
-    else:
-        fails.append("fewer than 2 individuals -- selfcheck cannot run")
+        variant(sw, "two individuals swapped", True, 'ORDER')
+    else: fails.append("fewer than 2 individuals -- selfcheck cannot run")
 
     for f in fails:
         print("  FAIL " + f)
-    print("expstruct selfcheck  %d pass  %d fail" % (3 - len(fails), len(fails)))
+    print("expstruct selfcheck  %d pass  %d fail" % (7 - len(fails), len(fails)))
     return 1 if fails else 0
 
 def report(path):

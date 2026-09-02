@@ -501,3 +501,42 @@ value that is ever written.
 **Until it is decided, the current behaviour is pinned.** Every spin box's
 `commits=` value is in `guibehaviour-baseline.txt`, so the port cannot drift
 further without the gate saying so.
+
+---
+
+## `tearDownPvm()`'s `pvm_halt()` never returns
+
+`guidrive.cpp:349`. Located with gdb, not guessed: `pvm_halt` → `msendrecv` →
+`mroute` → `mxfer` → `select()`, inside `PvmGuard::~PvmGuard` *after* `main`
+has returned. So every `evolution` (and `visualize`) run is killed by its
+timeout rather than exiting, its exit status is meaningless, and — because
+stdout is block-buffered to a file and the process never reaches exit — **any
+`printf` on an early-return path is lost unless it flushes itself**. An
+assertion added during §9 item 2 fired correctly and its message vanished; it
+was only visible under gdb.
+
+**Deliberately not changed during the port.** `pvm_halt()` is what stops the
+daemon this process started, and the comment above it records that dropping it
+left `pvmd3` and its slaves running. Measured: no stray `pvmd3` survives the
+kill, so today's behaviour is safe, only untidy. Connected: `PORTING.md`'s note
+that SIGEL's own SIGTERM handler calls `pvm_halt()` from signal context, which
+is why a SIGTERM cannot shut it down cleanly either.
+
+**When to do it:** before anything reads an evolution run's exit code, or
+before `check.sh` ever runs an evolution scenario. Both would silently mis-read
+a killed process as a failed one.
+
+## `renderRecorder` leaks whenever the visualisation constructor throws
+
+`SIG_SimulationVisualisation.cpp:53` allocates `renderRecorder`; `:55` then
+constructs `SIG_Simulation`, which throws for the removed Dynamo backend
+(`SIG_Simulation.cpp`, default case). The destructor at `:74-78` — the only
+thing that deletes it — never runs, so each attempt leaks one
+`SIG_RenderRecorder`.
+
+**Not fixed with §9 item 5.** That step nulled `visualisation` so the freed
+pointer could not be dereferenced or double-freed; this is the other half and
+needs the constructor to clean up after itself. Not reachable today for the
+same reason the null is not: 1.3's Dynamo path segfaults on Play (oracle,
+2026-09-02) and nothing in the slave can switch libraries mid-run. It becomes
+live the moment any caller catches that throw and continues.
