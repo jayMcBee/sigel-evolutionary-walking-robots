@@ -412,6 +412,13 @@
     makeCurrent();
 
     delete visualisation;
+    // NOT redundant with the assignment below: the constructor throws
+    // whenever SIMULATIONLIBRARY names the removed Dynamo backend
+    // (SIG_Simulation.cpp, default case), and the throw leaves this
+    // member holding the pointer just freed. Fourteen sites here test
+    // if (visualisation) and then dereference it, so the guard passes
+    // and every one is a use-after-free. physics_backends.md 1.
+    visualisation = nullptr;
 
     visualisation = new SIGEL_Visualisation::SIG_SimulationVisualisation( *robot,
 									  *environment,

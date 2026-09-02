@@ -526,6 +526,50 @@ printf '%-22s %2d pass  %2d fail\n' "dead item virtuals" "$kp" "$kf"
 pass=$((pass+kp)); fail=$((fail+kf))
 
 # ---------------------------------------------------------------------------
+# A freed pointer kept behind a guard that still passes.
+#
+# SIG_Simulation's constructor throws whenever SIMULATIONLIBRARY names the
+# Dynamo backend, which physics_backends.md deleted on 2026-08-28. That throw
+# unwinds out of visualizeThis() BETWEEN the `delete visualisation;' and the
+# assignment that was to replace it, so without an explicit null the member
+# keeps the pointer it just freed. Fourteen sites in that widget test
+# `if (visualisation)' and then dereference it -- the guard passes and every
+# one of them is a use-after-free -- IN SHAPE. At runtime they are not reached
+# today: the sole caller, sigel_slave.cpp:293, catches that throw and returns 1
+# before a.exec(), and the widget's destructor is empty so nothing double-frees.
+# The null is kept and gated anyway, because it is one line and one edit to a
+# catch is all that stands between the shape and the crash.
+#
+# This is guarded rather than trusted because the null LOOKS redundant sitting
+# three lines above `visualisation = new ...' and reads like tidying.
+vp=0; vf=0
+vsrc=$SRC/src/SIGEL_SlaveGUI/SIG_SimulationVisualisationWidget.cpp
+# Comments stripped and newlines flattened before matching, for the same reason
+# the item-virtuals check above flattens: the delete, the explanation and the
+# null are on separate lines and a line-based grep would see none of the pair.
+# LC_ALL=C because this file is Latin-1 and flattening puts its 376 non-ASCII
+# lines into ONE line: under a UTF-8 locale that line is invalid multibyte, and
+# a silent non-match is the exact failure the grep TRAP in PORTING.md describes.
+# Measured as matching under all five locales tried, C through de_DE.UTF-8 --
+# this pins that rather than relying on it.
+vflat=$(LC_ALL=C sed 's://.*::' "$vsrc" | tr '\n' ' ' | tr -s ' ')
+vdel=$(printf '%s' "$vflat" | LC_ALL=C command grep -oE 'delete +visualisation *;' | wc -l)
+vnul=$(printf '%s' "$vflat" | LC_ALL=C command grep -oE \
+       'delete +visualisation *; *visualisation *= *(nullptr|0|NULL) *;' | wc -l)
+if [ "$vdel" -gt 0 ] && [ "$vdel" -eq "$vnul" ]; then
+    vp=1
+else
+    vf=1
+    echo "  SIGEL_SlaveGUI/SIG_SimulationVisualisationWidget.cpp: $vdel"
+    echo "    'delete visualisation;' of which $vnul are followed by a null assignment."
+    echo "    SIG_Simulation's constructor throws for the removed Dynamo backend, so"
+    echo "    without the null the member keeps a freed pointer and the fourteen"
+    echo "    'if (visualisation)' guards each become a use-after-free."
+fi
+printf '%-22s %2d pass  %2d fail\n' "freed-pointer null" "$vp" "$vf"
+pass=$((pass+vp)); fail=$((fail+vf))
+
+# ---------------------------------------------------------------------------
 # The two programs. They are src/*.cpp, so no entry in MODULES reaches them and
 # nothing compiled them until C8 -- which is how a QMotifPlusStyle that Qt 6
 # does not have, and a pthread_create cast C++17 rejects, both survived this

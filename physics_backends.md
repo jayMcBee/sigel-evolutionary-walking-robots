@@ -235,10 +235,18 @@ is what "dead code" was supposed to mean.
    path pre-existed — Dynamo's own constructor could throw — but this change
    turns a conditional hazard into a certain one for every robot.
    **THIS SAID IT WAS "unreachable today only because `SIGEL_SlaveGUI` does
-   not compile". THAT EXPIRED.** `libSIGEL_SlaveGUI.a` builds and
-   `build-fast/sigel_slave` links it, and the bare `delete` is still there.
-   The fix is still `visualisation = nullptr;` between the delete and the new.
-   Tracked as open item 5 in PORTING.md section 9.
+   not compile". THAT EXPIRED** when `libSIGEL_SlaveGUI.a` began building and
+   `build-fast/sigel_slave` began linking it. **FIXED 2026-09-02:**
+   `visualisation = nullptr;` now sits between the delete and the new. The
+   site is at **line 414**, not the 376-381 above — line drift since this was
+   written, not a second occurrence. **The "fourteen use-after-frees" above is a
+   statement about SHAPE, not about a reachable crash**, and that was checked at
+   the fix rather than carried forward: the only caller is `sigel_slave.cpp:293`,
+   whose `catch` prints and returns 1 before `a.exec()`, so no guard is ever
+   evaluated afterwards, and the widget's destructor is empty so nothing
+   double-frees. The line is kept because it costs one line and the shape is one
+   edit away from being live. `check.sh`'s `freed-pointer null` check
+   holds it there, and was teeth-tested by removing the line again.
 2. **`SIG_SimulationQueries.cpp`: all seven non-self includes are dead.**
    Verified by compiling a translation unit
    holding only the class's own header and the empty constructor, under
