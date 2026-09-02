@@ -3546,7 +3546,10 @@ Anything else that stops matching 1.3 still needs justifying as a defect.
   fitness curve.** With duration-based termination a real run does start, but the
   master then waits on slaves and `haveABreak()` only services the GUI between
   them, so no generation completed in budget at 120 individuals or at 8. Nothing
-  suggests a defect — it is one machine's throughput — but the `gui behaviour`
+  suggests a defect — it is one machine's throughput, and **that was confirmed
+  2026-09-02**: the oracle measured **≈ 4 minutes per generation** on the 2003
+  i386 box from the timestamps of completed runs, so C10 was never going to see
+  one inside its budget — but the `gui behaviour`
   gate does not cover the evolution path at all.
 - **The visualisation window.** The payload was captured with a stub; the real
   GL window was not opened here. The oracle opened it on 1.3.
@@ -4483,8 +4486,9 @@ and C7 had already been bitten by**; ~~(2) the Import/Export round trips~~ —
 **done, and the guess was right again: byte-comparable files caught a defect
 that had corrupted a committed baseline**; ~~(3) the remaining dialogs~~ — **done, and the guess held a third
 time: the defect it found needed no invalid input at all**; ~~(4) `MT_GUI`~~ — **done, and it found the same defect class C7 had
-fixed everywhere else**; (5) the evolution path, last, because it needs a
-throughput answer before it can be observed at all.
+fixed everywhere else**; (5) the evolution path, last. *This said it "needs a
+throughput answer before it can be observed at all".* **THE ANSWER ARRIVED
+2026-09-02 and it is measured, not estimated** — see the open-items table.
 
 **Open after C11c — five items.** The `QSpinBox` divergence is closed: **D28**
 accepted it. The Import/Export item is closed by C11b.
@@ -4492,7 +4496,7 @@ accepted it. The Import/Export item is closed by C11b.
 | # | open item | blocked on |
 |---|---|---|
 | **1** | **`pagesave` and `roundtrip` have no gate.** `pagesave` proved nine parameter values byte-identical across the two architectures and `roundtrip` proved the five formats survive an export-import-export cycle; both are run by hand. A regression between the widget and the file, or in a reader, would not be caught by the gate — `pages` covers widget to widget and `exportall` covers widget to file in one direction only | a committed reference parameter block. Natural to do with the Import/Export item, which is byte-comparable files for the same reason |
-| **2** | **One C11 item left** — the evolution path. Also undriven: `SIGEL_SlaveGUI`, MT_GUI's toolbar actions and `MT_AddConstantsWidget` | the evolution path needs a throughput answer before it can be observed at all |
+| **2** | **One C11 item left — the evolution path, and it is NO LONGER BLOCKED.** The oracle supplied the throughput answer on 2026-09-02 from `master.log` timestamps of **completed runs on the 2003 i386 box**, not from an estimate: `twoTriDepth250` took 19 h 57 m for 299 generation intervals, **≈ 4.0 minutes per generation**; `octGateA` (octopus) took 9 m 00 s then 6 m 29 s. So a generation costs MINUTES on that hardware. **That retrospectively explains C10** — its failure to see a generation complete was the expected result, not an unexplained one. Fifteen completed runs with their `.exp`, `master.log` and pool snapshots are available as reference data | nothing. What it needs is a scenario shaped for minutes: set `Termination by:` to **Generation** and a small N through the Evolution control tab — 1.3 does not need the file edited — which gives a run that measurably starts, progresses and stops. **Precondition:** the `sigel_slave` wrapper on the oracle's side, in place since C9; without it a spawn dies in under a second and looks exactly like nothing happening. Note the 4 min/generation is *i386-2003* hardware; this machine's figure is still unmeasured |
 | **3** | **`QHashSeed::setDeterministicGlobalSeed()` was never added to `sigel.cpp`.** §10 says "PHASE C MUST ADD" it to `sigel.cpp` and `sigel_slave.cpp`; Phase C closed without doing so, and the sentence sits under a heading reading "Determinism — resolved". Measured: the call exists once in the tree, `sigel_eval.cpp:511`. **Also mis-scoped** — only `sigel` links the three `QHash`es, and `sigel_slave` links `GUI_SLAVE`, which has none | nothing. It is a bookkeeping gap rather than a live defect: the one iteration site is destruction, which is order-insensitive. But it is unowned, and that is why it is here |
 | **4** | **Six dropped size constraints from C2 were never restored.** §7 says "C6/C7 own it"; both closed without it. Measured: `MT_IndividualWidgetBase.ui` has three `130` values in `v1.3-pristine` and zero today, and `Layout32/33/28/60/22` appear in no converted form | nothing. Cosmetic — layout minimums, not behaviour — but it was an open item that vanished when its owning step closed |
 | **5** | **A use-after-free in `SIG_SimulationVisualisationWidget.cpp:414` is now reachable.** `physics_backends.md` records it as "unreachable today only because `SIGEL_SlaveGUI` does not compile", with the fix being `visualisation = nullptr;` between the delete and the new. **That module builds and `sigel_slave` links it**, and the bare `delete` is still there | nothing. This is the one of the four that could actually bite, and it is not tracked anywhere in this file |
