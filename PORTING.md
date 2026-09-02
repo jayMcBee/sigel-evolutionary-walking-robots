@@ -4515,6 +4515,38 @@ care: they are all-or-nothing and hid an 87%-identical population behind a
 single mismatched hash.** When they differ, get the per-individual names before
 concluding anything.
 
+**WHAT THE FINGERPRINT CANNOT SEE, and it is not a small surface.** The `FLOAT`
+net that keeps fitness out also drops **every live input that contains a float**:
+the 13 `<CMD> CommandParameters <f>` mutation step sizes, the `Link` /
+`Geometry` / `Material` morphology lines, and the environment constants. None of
+those reach `ORDER`, `PROGRAMS` or `SHAPE`. Twenty-two such lines in
+`twoBasesSimpleFitness1.exp`, forty-two in `octopusSimpleFitness.exp`. The
+concrete danger, found by the oracle rather than reasoned about: **`MOVE
+CommandParameters` is `0.01` for twoBases and `0.1` for octopus** — a tenfold
+difference in mutation magnitude on the one command with large integer operands.
+A reconstructed input that got that wrong would evolve differently and **every
+hash exchanged between the two machines would still agree**.
+
+*How that was closed for the runs recorded here, and how to close it again:* not
+by hashing the surface but by an exact diff of it, between the shipped experiment
+and the built input — identical for both models on both machines, so neither
+side's transformation touched any of it. **The cross-machine half needed no hash
+exchange at all**, only that both sides derive from the same ancestor:
+`twoBasesSimpleFitness1.exp` is md5 `35bcdb3a7a2bb6c2af7ccf964761e87e` and
+`octopusSimpleFitness.exp` md5 `d6a73c806137f492f285914e0e131c49` on both. Same
+ancestor plus surface-preserving on each side means the surfaces are identical —
+two `md5sum`s and a `diff`, instead of writing and cross-validating a
+normalisation. **The oracle's diff came back identical UNSORTED, which is the
+load-bearing part**: had its inputs been GUI load-and-save products the block
+order would have permuted and only a sorted comparison could have passed. That works only because these inputs are built by
+rewriting seed/PVMHOST/path lines TEXTUALLY. **Anything rebuilt through the GUI's
+load-and-save must be normalised first**: 1.3 permutes the `CommandParameters`
+block, the `Link`/`Geometry` order, and even the named attribute groups WITHIN a
+single `Link` line (`...Normal x y z ...Dir x y z` comes back `...Dir` first),
+all values preserved. A naive hash over that surface mismatches for pure
+`QDict`-bucket reasons, and Qt 6 permutes differently again — expected, and not
+a divergence.
+
 **Do it as C11 with the same method, not a rewrite.** `guidrive.cpp` already has
 the machinery — modal interception, context-menu posting, a watchdog, PVM
 teardown, the master-object assertion. New scenarios are additions to it, and
@@ -4850,7 +4882,13 @@ evaluations). Two limits as a baseline:
 
 **`twoTri` on that box is not reference material.** It is not in
 `robots.tar.gz`, which holds exactly the 7 models named above, and it appears
-nowhere in `data/`; verified 2026-08-27. That box's own experiments, modified
+nowhere in `data/`; verified 2026-08-27. **Nor are the four `twoTri*` runs one
+robot family among themselves** — `twoTriNano` carries 2 `Geometry` lines and
+`Material 1 2`, `twoTriDepth250` 4 and `Material 1 12`: different vertex sets,
+different bodies. They are also the seed-0 runs. So of the oracle's fifteen
+reference runs, **only the twoBases and octopus ones trace to a shipped
+experiment and only those are usable as cross-machine references** (oracle,
+2026-09-02). That box's own experiments, modified
 robots and render pipeline are likewise out of scope — its render path
 deliberately alters SIGEL's POV output.
 
