@@ -351,13 +351,14 @@ notices experiment files growing does not "fix" it and silently diverge from
 1.3. If it is ever changed deliberately, that is a product decision and needs a
 note in PORTING.md saying the port stopped matching 1.3 on purpose.
 
-## Restore Qt 2's spin-box editing — found by C11a, 2026-09-02, DECISION OPEN
+## Restore Qt 2's spin-box editing — C11a, 2026-09-02, NOT DOING IT (D28)
 
-**This one is not a cleanup. It is a behavioural regression with a data
-consequence, and it is here rather than fixed because the fix is wider than the
-step that found it.** PORTING.md's C11a section carries the full record; this is
-the change itself, so that whoever takes the decision does not have to
-re-derive it.
+**D28 accepted this divergence rather than fixing it**, because it is reachable
+only by typing a number outside a box's own range, the differing value is
+visible in the box before anything is saved, and the real cost is owning a
+custom widget forever rather than writing it. The current behaviour is pinned
+in `guibehaviour-baseline.txt`. This section is the worked-out change, kept so
+that revisiting the decision is a lookup and not a re-derivation.
 
 **What differs.** Qt 2's `QIntValidator::validate` returned **Intermediate**
 for an out-of-range number (`qvalidator.cpp:236`), so `QLineEdit` accepted

@@ -32,7 +32,7 @@ build and run, because nothing else can be verified without it — see §3.
 | T — old-Qt tool container | **done 2026-08-27.** `tools/qtmig`, §4 |
 | D — delete the shim, migrate the data | **DONE 2026-08-30.** `q2compat.h` and `q2compat_check.cpp` deleted; `include/compat/` gone; **no `Q2*` shim type is used anywhere**. D1–D27. *This is not "no Qt 2 container exists" — the unported GUI modules still declare **71 lines** of `QArray`, `QDict`, `QList`-as-pointer-list and friends, all of which Phase C must convert. See D27.* The shim's self-check step is gone from `check.sh`, which now runs no code. §10 |
 | P — PVM | **DONE 2026-08-28.** Vendored 3.4.3 replaced by upstream 3.4.6; nine patches carry the four config lines and Debian's eight source fixes; `libpvm3.a` and `pvmd3` build; SIGEL's two PVM objects link against them and `SIG_GPPVMData` round-trips through real PVM. `sigel`/`sigel_slave` still need Phase C. §7 |
-| C — GUI | **DONE 2026-09-02. C1–C10 all complete; C11a done.** All 20 Designer forms converted; all five GUI modules build as archives; **both programs link and run**; **100 dead `connect()`s repaired, tree-wide count now 0 with no baseline anywhere**. Verified against the running 1.3 binary: 42 menu entries, the toolbars and the loaded-experiment values all diff clean, and that comparison is now a committed gate (`gui vs 1.3`). **C10 then DROVE it** — real Qt input events into the real window, diffed against the same oracle driving 1.3 with XTest: the tree, the pages, sorting, add/delete/reset, rename, save, the five dialogs and all five context menus agree, and a GUI-exported individual is byte-identical across the two architectures. **Two defects found by using it that reading it did not show** — deleting most of the pool killed the application (Qt 6's `QTreeWidget::clear()` emits a signal Qt 2's blocked), and the MetaGP dialog ate an ampersand. Second committed gate, `gui behaviour`. **C11a then drove the five View pages C10 never opened** — every spin box, slider, combo, checkbox and 20 of C7's 21 locale validators, diffed against the same oracle. The 12-probe validator battery matches 1.3 character for character, on both sides under a comma-decimal locale; nine parameter values typed on the pages come out byte-identical in the saved `.exp` across the two architectures. **A third regression found by using it** — Qt 2's `QIntValidator` returned Intermediate out of range so 1.3 clamps a typed over-range number to the maximum, where Qt 6 refuses the keystroke and commits a truncated prefix; pinned in the gate, fix costed, decision open. §7 |
+| C — GUI | **DONE 2026-09-02. C1–C10 all complete; C11a done.** All 20 Designer forms converted; all five GUI modules build as archives; **both programs link and run**; **100 dead `connect()`s repaired, tree-wide count now 0 with no baseline anywhere**. Verified against the running 1.3 binary: 42 menu entries, the toolbars and the loaded-experiment values all diff clean, and that comparison is now a committed gate (`gui vs 1.3`). **C10 then DROVE it** — real Qt input events into the real window, diffed against the same oracle driving 1.3 with XTest: the tree, the pages, sorting, add/delete/reset, rename, save, the five dialogs and all five context menus agree, and a GUI-exported individual is byte-identical across the two architectures. **Two defects found by using it that reading it did not show** — deleting most of the pool killed the application (Qt 6's `QTreeWidget::clear()` emits a signal Qt 2's blocked), and the MetaGP dialog ate an ampersand. Second committed gate, `gui behaviour`. **C11a then drove the five View pages C10 never opened** — every spin box, slider, combo, checkbox and 20 of C7's 21 locale validators, diffed against the same oracle. The 12-probe validator battery matches 1.3 character for character, on both sides under a comma-decimal locale; nine parameter values typed on the pages come out byte-identical in the saved `.exp` across the two architectures. **A third regression found by using it** — Qt 2's `QIntValidator` returned Intermediate out of range so 1.3 clamps a typed over-range number to the maximum, where Qt 6 refuses the keystroke and commits a truncated prefix; accepted as a divergence (D28) and pinned in the gate. §7 |
 | V — check against the 1.3 binary | **V1, V5's MDH probe, V6, V7 and V8 all done, all PASS.** Ordering: 10 of 10 container orders match. Arithmetic: `twoBases` exact bit for bit, `octopus` 9/9 with three joints exact and 5 ulp worst. **V6, V7 and V8 done 2026-08-29** — friction and no-collide negotiation, their four remaining rules, and the GP parameter blocks captured *before* their conversion. `verification-against-sigel-1.3/v6`, `v7`, `v8`. V2–V4 not started; V5's sensor and force probes are **invalid as specified** — both target Dynamo-only functions, deleted 2026-08-28. §7 |
 
 **SCOPE — DECIDED 2026-08-23. Read this before changing anything.**
@@ -475,6 +475,15 @@ D20 supersedes D5, D24 supersedes D3.
 | **D24** | GUI scope | **Phase C is authorized.** Supersedes D3(b), which scoped the interface out. Named separately because D19–D23 did not carry it and the status table cited a struck-through row |
 | **D26** | What the 1.3 binary is asked for | **structure and arithmetic, not fitness equality.** Three tiers, in descending confidence: the container ordering and numbering, which compare exactly (V1, V2); per-individual fitness, which is chaotic across architectures and is therefore a judgement (V4); the non-integrating quantities, which compare exactly but need `gdb` (V5). Bit-exact agreement on an integrated trajectory is **not** a target and its absence proves nothing — §7. Recorded because this file repeatedly described the missing reference as "fitness numbers", which is the one thing that binary cannot usefully give |
 | **D25** | What "done" means | **Plain modern Qt 6, nothing left over.** `q2compat.h` deleted, no Qt3Support class anywhere, no compatibility flag on SIGEL's own code. This moves §10's "drop the Qt 2 emulation" from optional debt into a **required phase**, and with it the data migration that section describes — the shim exists because `Q2Dict`'s hash order numbers the links, so the 7 `.rrb` and 12 `.exp` files must be rewritten before it can go. **Ordered before Phase C**, so the GUI sites (466 as counted then, **534** re-measured at C1 — §7) are ported once, to the final target, instead of twice. Vendored third-party code is out of scope for this rule: qhull, cv97, Dynamo and PVM keep `-w -fpermissive` |
+
+## 5c. Decisions — signed off 2026-09-02, from driving the interface
+
+| # | Decision | Answer |
+|---|---|---|
+| **D27** | The duplicate MetaGP `A&bout` | **removed**, with its trailing separator. Present in 1.3 and verified there; wired to the same `slotAbout()` as `Help > About` and opening the identical `SIG_InfoBox`. The port's first intentional difference from 1.3. `Help > About` untouched |
+| **D28** | The `QSpinBox` over-range divergence (C11a) | **accepted, not fixed.** 1.3 accepts out-of-range digits and clamps on commit; the port refuses the keystroke and commits a truncated prefix. It is reachable **only by typing a number outside the box's own range**, and the differing value is **visible in the box** before anything is saved — 1.3 shows 99, the port shows 10. Contrast what the port did fix: `clear()` killed the application, the ampersand rendered wrong, a negative width silently wrote no file — all reachable with valid use. The fix is not the 25 lines, it is **owning a custom widget forever**: every future form edit and every new spin box must remember `SIG_SpinBox` or silently opt out. Pinned in `guibehaviour-baseline.txt` (`commits=`) so it cannot drift; prototype and the measured comparison in `future_refactorings.md`. **Revisit if** a dialog spin box turns out to feed something unvalidated, or if anyone actually hits it |
+
+---
 
 ## 5a. Decisions — signed off 2026-08-22, for Phase R
 
@@ -1708,7 +1717,7 @@ modules include the headers `uic` generates from them.
 | C8 | **DONE 2026-08-31.** `sigel.cpp`, `sigel_slave.cpp`, `MT_Control`'s 15 dead connects, and the four core files no module list reached. **The tree's dead-signal count is now 0 with no non-zero baseline anywhere.** `check.sh` gained a `programs` section and a `dead item virtuals` check | 15 sites + 4 files |
 | C9 | **DONE 2026-08-31.** All five GUI modules build as archives, both programs link and run. Exclusions lifted, moc derived from source, resources named on the link line, `programs` gate upgraded from compile to link+run | 5 modules, 2 programs |
 | C10 | **DONE 2026-09-02.** Driving the interface rather than reading it. `guidrive.cpp` posts real Qt mouse, key and context-menu events into the real `SIG_MainWindow`; the 1.3 oracle drove the 2003 binary with XTest and the two were diffed. Found the `clear()` signal regression that killed the application on a large delete, and the eaten ampersand in the MetaGP dialog. New `gui behaviour` gate with `guibehaviour-baseline.txt`. **No X-level click was possible on this machine and the section says so.** Also carries the port's FIRST deliberate divergence from 1.3 — the duplicate MetaGP About, removed by decision 2026-09-02 | 2 defects, 15 scenarios, 1 divergence |
-| C11a | **DONE 2026-09-02.** The five View pages C10 never opened. 29 spin boxes, 20 sliders, 7 combos, 4 checkboxes, 8 radios and 20 of C7's 21 validators driven and diffed against 1.3. The **12-probe validator battery matches character for character**, on both sides under a comma-decimal locale the oracle built with woody's own `localedef`. Nine parameter values typed on the pages come out **byte-identical** in the saved `.exp` across the two architectures. Found the `QIntValidator` Intermediate/Invalid trap: 1.3 clamps a typed over-range number to the maximum, the port commits a truncated prefix -- **pinned in the gate, fix costed, decision open**. `gui behaviour` now runs two scenarios and re-runs one under `de_DE` | 1 regression, 2 interlocks, 3 probe errors |
+| C11a | **DONE 2026-09-02.** The five View pages C10 never opened. 29 spin boxes, 20 sliders, 7 combos, 4 checkboxes, 8 radios and 20 of C7's 21 validators driven and diffed against 1.3. The **12-probe validator battery matches character for character**, on both sides under a comma-decimal locale the oracle built with woody's own `localedef`. Nine parameter values typed on the pages come out **byte-identical** in the saved `.exp` across the two architectures. Found the `QIntValidator` Intermediate/Invalid trap: 1.3 clamps a typed over-range number to the maximum, the port commits a truncated prefix -- **accepted as a divergence, D28**; pinned in the gate. `gui behaviour` now runs two scenarios and re-runs one under `de_DE` | 1 regression, 2 interlocks, 3 probe errors |
 
 Each module step is the same shape: `qt3to4` in the container, hand-port off
 Qt3Support, extend `check.sh` to cover the module, commit.
@@ -3646,15 +3655,16 @@ nothing to protect it, so select-all + Delete takes the suffix with everything
 else; Qt 6's `QAbstractSpinBox` actively keeps prefix and suffix in the editor.
 Transient — both show the suffix again after commit. Recorded, not chased.
 
-**NOT FIXED IN THIS STEP, AND THE DECISION IS OPEN.** A 25-line `QSpinBox`
+**ACCEPTED, NOT FIXED — D28, 2026-09-02.** Reachable only by typing a number
+outside the box's own range, and the differing value is visible in the box
+before anything is saved. The cost of restoring it is not the code but owning
+a custom widget forever. Pinned in the gate so it cannot drift. A 25-line `QSpinBox`
 subclass restoring Qt 2's rule reproduces all four readings exactly
 (`32001`→32000, `8001`→8000, `24`→23, `100`→99, in-range typing unchanged); it
 is written out in `future_refactorings.md`. Applying it means promoting **29
 spin boxes across four converted Designer forms**, and to be consistent it would
-also have to cover the dialogs, which are a separate step. That is wider than
-C11's remit, so the current behaviour is **pinned in the gate** — every spin
-box's `commits=` value is in `guibehaviour-baseline.txt` — and cannot drift
-unnoticed while the decision is open.
+also have to cover the dialogs, which are a separate step. The current behaviour is **pinned in the gate** — every spin
+box's `commits=` value is in `guibehaviour-baseline.txt`.
 
 *Two cheaper fixes were tried and rejected on measurement, not on taste.
 Swapping the validator on the spin box's internal `QLineEdit` lets the digits
@@ -3870,7 +3880,7 @@ roughly four fifths of the interface has still never been used.
 
 | never driven | what that leaves untested |
 |---|---|
-| ~~**5 of the 6 View pages**~~ **DONE in C11a** — all five driven: 29 spin boxes, 20 sliders, 7 combos, 4 checkboxes, 8 radios, 20 of the 21 validators. The 21st is on `SIG_EditCommandDialog`, so it belongs to the dialogs item | closed. The validator battery matches 1.3 character for character under two locales; a `QIntValidator` regression came out of it, pinned in the gate with the decision open |
+| ~~**5 of the 6 View pages**~~ **DONE in C11a** — all five driven: 29 spin boxes, 20 sliders, 7 combos, 4 checkboxes, 8 radios, 20 of the 21 validators. The 21st is on `SIG_EditCommandDialog`, so it belongs to the dialogs item | closed. The validator battery matches 1.3 character for character under two locales; a `QIntValidator` regression came out of it, accepted as a divergence by D28 and pinned in the gate |
 | **15 of 16 Import/Export children.** Only `Export > Program` was driven | every file-format round trip except one |
 | **6 dialogs** — EditCommand, EditHost, InfoBox, TextView, IndividualView (double-click), and AddIndividuals beyond its OK button | |
 | **The evolution path entirely** | the generation counter, statistics, fitness curve, and the enable/disable sweep during a run |
@@ -3890,13 +3900,13 @@ byte-comparable across architectures, which is the strongest kind of check this
 project has; (3) the remaining dialogs; (4) `MT_GUI`; (5) the evolution path,
 last, because it needs a throughput answer before it can be observed at all.
 
-**Open after C11a — three items.**
+**Open after C11a — two items.** The `QSpinBox` divergence is closed: **D28**
+accepted it.
 
 | # | open item | blocked on |
 |---|---|---|
-| **1** | **The `QSpinBox` over-range divergence.** 1.3 accepts the digits and clamps on commit; the port refuses the keystroke and commits a truncated prefix. Type `100` into a `[1..99]` box: 1.3 gives 99, the port gives 10, and that number is written to the `.exp`. Mechanism, both measurements and a working fix are in `future_refactorings.md` | **a decision: restore 1.3, or accept the divergence.** Restoring means one `SIG_SpinBox` in `SIGEL_CommonGUI` and 47 widgets promoted tree-wide. Current behaviour is pinned in `guibehaviour-baseline.txt` (`commits=`), so nothing drifts while it is open |
-| **2** | **`pagesave` has no gate.** The scenario that proved nine parameter values byte-identical across the two architectures is run by hand. A regression between the widget and the file would not be caught; the `pages` gate only covers widget to widget | a committed reference parameter block. Natural to do with the Import/Export item, which is byte-comparable files for the same reason |
-| **3** | **Four C11 items, in the order below** | nothing. C11b can start now |
+| **1** | **`pagesave` has no gate.** The scenario that proved nine parameter values byte-identical across the two architectures is run by hand. A regression between the widget and the file would not be caught; the `pages` gate only covers widget to widget | a committed reference parameter block. Natural to do with the Import/Export item, which is byte-comparable files for the same reason |
+| **2** | **Four C11 items, in the order below** | nothing. C11b can start now |
 
 **Hazards a follow-up must inherit, all of which cost time in C10:**
 
