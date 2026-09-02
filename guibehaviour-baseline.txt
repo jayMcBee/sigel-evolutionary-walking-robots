@@ -1404,3 +1404,401 @@ Do you want to overwrite?]
     spin                                        v=1         [1..999] step=1 pre=[] suf=[] up=2         dn2=1         typed(max+1)=[100]->100 commits=not-pressed(in a dialog) enabled=1
     [still open before Cancel] visible=1
   rows 120 -> 120 (Cancel must add nothing)
+#
+# ---------------------------------------------------------------------------
+# From here on: PORTING.md, MT_GUI -- the MetaGP window.
+#
+# Reached by MetaGP > Use MetaGP, then MetaGP > Configure System. Nothing had
+# ever opened it on either side. It is application-modal -- the oracle proved
+# that with a control rather than a null: with the window open, a click on the
+# main window's tree changed 0 pixels; with it closed, the identical click at
+# the same coordinates changed 4397.
+#
+# THE LOAD-BEARING LINES ARE THE `locale=[C] numberOptions=2' ONES AND THE
+# `group' PROBES. C7 pinned SIGEL_MasterGUI's 21 validators to QLocale::c()
+# with RejectGroupSeparator; MT_GUI has ten more and NONE of them had been.
+# It does not need a foreign locale to bite -- measured directly against Qt 6:
+#
+#     unpinned QIntValidator(0,1000), locale en_US, group separator ','
+#         validate("1,000") = ACCEPTABLE
+#         "1,000".toInt()   = 0, ok=false
+#
+# A user types one thousand, the field says it is fine, and ZERO reaches the
+# system. Under de_DE the same happens with "1.000". Before the fix, 138 lines
+# of this scenario changed under de_DE; now it is byte-identical, and the
+# `group' probes read [1000] with toInt=1000.
+#
+# 1.3 REJECTS BOTH SEPARATORS -- read off the running binary, typing into the
+# SWT field one character at a time: "1,000", "1.000" and "1000" all leave the
+# field reading 1000. So this is a RESTORATION of Qt 2 behaviour, not an
+# improvement on it. Qt 2 forced LC_NUMERIC="C" process-wide.
+#
+# The fix is applied at BOTH creation sites in MT_AddConstantsWidget: the type
+# radio deletes and rebuilds its validators, so pinning them only in the
+# constructor would be undone the first time a user switches between integer
+# and float constants.
+#
+# THE CONSTANTS LIST IS NOT PINNED, DELIBERATELY. MT_IndividualsWidget
+# generates its 30 constants with a randomizer at construction, so the values
+# differ every run -- two runs of this scenario differed by exactly those 60
+# lines and nothing else. What is invariant is the count and that every one
+# parses as an integer in range, and that is what is checked instead.
+#
+# TREE LABEL TO SOURCE CLASS, because they do not match and both sides needed
+# the mapping: Strategy = MT_EstimationWidget, Individual = MT_IndividualsWidget,
+# Population = MT_PopulationWidget, GP Parameter = MT_SearchWidget,
+# Selection = MT_SelectionWidget, Statistics = MT_StatisticsWidget.
+# MT_ExperimentWidget is not a page at all -- it is the tree on the left.
+#
+# QTest IS NOT A MOUSE -- see the C11a note above.
+# ---------------------------------------------------------------------------
+== SCENARIO metagui ==
+
+== STEP 1: fresh start, no experiment ==
+  [title] SIGEL
+  [tree] header=[Experiments] topLevel=0
+  [page] count=1 current=QLabel objectName=[baseWidget]
+  [action changes] none
+  [modal] class=QFileDialog title=[Load Experiments...]
+  [filedialog] title=[Load Experiments...] mode=3 nameFilters=[Experiment Files (*.exp) ;; All Files (*)] labelAccept=[&Open]
+
+== STEP 2: after File > Open Experiment ==
+  [title] SIGEL
+  [tree] header=[Experiments] topLevel=1
+      twoBasesSimpleFitness2.exp sel=1 exp=1 cur=1 selectable=1
+        Individuals              sel=0 exp=0 cur=0 selectable=1
+        Robot                    sel=0 exp=1 cur=0 selectable=1
+          Language-Parameters      sel=0 exp=0 cur=0 selectable=1
+        GP-Parameters            sel=0 exp=0 cur=0 selectable=1
+        Simulation-Parameters    sel=0 exp=0 cur=0 selectable=1
+        Environment              sel=0 exp=0 cur=0 selectable=1
+  [page] count=8 current=SIGEL_MasterGUI::SIG_ExperimentView objectName=[ExperimentView]
+  [widgets]
+    group    [Evolution controls] enabled=1
+    group    [Fitnesscurve] enabled=1
+    group    [Experiment properties] enabled=1
+    button   [&Start] enabled=1 checkable=0 checked=0
+    button   [S&top] enabled=0 checkable=0 checked=0
+    button   [Show in GNU-Plot] enabled=1 checkable=0 checked=0
+    button   [Export PostScript] enabled=1 checkable=0 checked=0
+    check    [Save the history] enabled=1 checkable=1 checked=1
+    lcd      [lcdnumberGenerations] value=532 digits=4
+    lcd      [lcdnumberAutosave] value=0 digits=4
+    slider   [sliderIntervall] value=0 min=0 max=100 enabled=1
+    progress [generationProgBar] value=-1 min=0 max=100
+  [action changes]
+    &File/&Delete Experiment                                   ENABLED
+    &File/&Rename Experiment                                   ENABLED
+    &File/&Save Experiment                                     ENABLED
+    &File>Export/...to GNU plot                                ENABLED
+    &File>Export/Environment                                   ENABLED
+    &File>Export/GP-Parameters                                 ENABLED
+    &File>Export/Individual                                    ENABLED
+    &File>Export/Language-Parameters                           ENABLED
+    &File>Export/Population                                    ENABLED
+    &File>Export/Program                                       ENABLED
+    &File>Export/Simulation-Parameters                         ENABLED
+    &File>Import/Environment                                   ENABLED
+    &File>Import/GP-Parameters                                 ENABLED
+    &File>Import/Individual                                    ENABLED
+    &File>Import/Language-Parameters                           ENABLED
+    &File>Import/Population                                    ENABLED
+    &File>Import/Program                                       ENABLED
+    &File>Import/Robot                                         ENABLED
+    &File>Import/Simulation-Parameters                         ENABLED
+    &Individuals/&Add                                          ENABLED
+    &Individuals/&Delete                                       ENABLED
+    &Individuals/&Visualize                                    ENABLED
+    &Individuals/Reset                                         ENABLED
+    &MetaGP/&Use MetaGP                                        ENABLED
+    &View/&Environment                                         ENABLED
+    &View/&GP Parameters                                       ENABLED
+    &View/&Language Parameters                                 ENABLED
+    &View/&Population                                          ENABLED
+    &View/&Robot                                               ENABLED
+    &View/&Simulation Parameters                               ENABLED
+    TB:fileToolbar/&Delete Experiment                          ENABLED
+    TB:fileToolbar/&Save Experiment                            ENABLED
+    TB:individualsToolBar/&Add                                 ENABLED
+    TB:individualsToolBar/&Delete                              ENABLED
+    TB:individualsToolBar/&Visualize                           ENABLED
+    TB:mtToolbar/&Use MetaGP                                   ENABLED
+    TB:viewToolBar/&Environment                                ENABLED
+    TB:viewToolBar/&GP Parameters                              ENABLED
+    TB:viewToolBar/&Language Parameters                        ENABLED
+    TB:viewToolBar/&Population                                 ENABLED
+    TB:viewToolBar/&Robot                                      ENABLED
+    TB:viewToolBar/&Simulation Parameters                      ENABLED
+
+== STEP 3: after View > Population ==
+  [title] SIGEL
+  [tree] header=[Experiments] topLevel=1
+      twoBasesSimpleFitness2.exp sel=0 exp=1 cur=0 selectable=1
+        Individuals              sel=1 exp=0 cur=1 selectable=1
+        Robot                    sel=0 exp=1 cur=0 selectable=1
+          Language-Parameters      sel=0 exp=0 cur=0 selectable=1
+        GP-Parameters            sel=0 exp=0 cur=0 selectable=1
+        Simulation-Parameters    sel=0 exp=0 cur=0 selectable=1
+        Environment              sel=0 exp=0 cur=0 selectable=1
+  [page] count=8 current=SIGEL_MasterGUI::SIG_AllIndividualsView objectName=[]
+  [individuals] rows=120 cols=3 headers=[Name               ][Fitness          ][Age               ] selected=0
+    row0  | 55658         | 1.14825       | 111           | sel=0
+    row1  | 56091         | 1.14825       | 109           | sel=0
+    row2  | 56248         | 1.14825       | 259           | sel=0
+    row3  | 56349         | 1.06261       | 97            | sel=0
+    row4  | 56432         | 1.14825       | 111           | sel=0
+    row5  | 56447         | 1.14825       | 107           | sel=0
+    ... 114 more
+    allrows sha256=ee0c3372fe5769ccf63f449dfcf2b301eb7d4acd4924cc5291e6f1e0c303e198
+  [action changes] none
+
+== METAGP: enabling ==
+  [menu] &Use MetaGP              enabled=1 checkable=1 checked=1
+  [menu] &Configure System        enabled=1 checkable=0 checked=0
+  [menu] &Evaluator System        enabled=1 checkable=1 checked=1
+  [menu] Cl&assifier System       enabled=1 checkable=1 checked=0
+
+== METAGP: Configure System ==
+  [modal] class=MT_MainWindow title=[SIGEL MetaGP]
+  [modal on configure] MT_MainWindow [SIGEL MetaGP]
+    (left open -- this is the window under test)
+  [window] class=MT_MainWindow title=[SIGEL MetaGP] 680x595 modal=1
+  [toolbar] mtFileToolBar          title=[MT File]
+    action &Default               enabled=1 checkable=0 checked=0 icon=1 sizes=2
+    ---
+    action &Open                  enabled=1 checkable=0 checked=0 icon=1 sizes=2
+    action &Save                  enabled=1 checkable=0 checked=0 icon=1 sizes=2
+    ---
+    action E&xit                  enabled=1 checkable=0 checked=0 icon=1 sizes=2
+  [toolbar] mtEvolutionToolBar     title=[MT Evolution Control]
+    action Start                  enabled=0 checkable=0 checked=0 icon=1 sizes=1
+    action Stop                   enabled=0 checkable=0 checked=0 icon=1 sizes=1
+    action                        enabled=1 checkable=0 checked=0 icon=0 sizes=0
+    ---
+    action manual/timed stop      enabled=1 checkable=1 checked=0 icon=1 sizes=1
+    action                        enabled=1 checkable=0 checked=0 icon=0 sizes=0
+    action                        enabled=1 checkable=0 checked=0 icon=0 sizes=0
+    action                        enabled=1 checkable=0 checked=0 icon=0 sizes=0
+    action                        enabled=1 checkable=0 checked=0 icon=0 sizes=0
+  [toolbar] mtPopToolBar           title=[MT Population]
+    action &Add                   enabled=1 checkable=0 checked=0 icon=1 sizes=2
+    action &Delete                enabled=0 checkable=0 checked=0 icon=1 sizes=2
+    action &Import                enabled=1 checkable=0 checked=0 icon=1 sizes=1
+    action &Export                enabled=1 checkable=0 checked=0 icon=1 sizes=1
+    action &Load Population       enabled=1 checkable=0 checked=0 icon=1 sizes=2
+    action &Save Population       enabled=1 checkable=0 checked=0 icon=1 sizes=2
+  [toolbar]                        title=[MT Statistics]
+    action update statistics      enabled=1 checkable=0 checked=0 icon=1 sizes=1
+    action                        enabled=1 checkable=0 checked=0 icon=0 sizes=0
+    action                        enabled=1 checkable=0 checked=0 icon=0 sizes=0
+    action                        enabled=1 checkable=0 checked=0 icon=0 sizes=0
+  [stack] count=6 current=0
+  [nav] not found by name; using the tree outside the stack: []
+  [nav] rows=6
+    row0  [Strategy]
+    row1  [Individual]
+    row2  [Population]
+    row3  [GP Parameter]
+    row4  [Selection]
+    row5  [Statistics]
+
+== METAGP PAGE 0: clicked [Strategy] ==
+  [page] index=0 class=MT_EstimationWidget objectName=[MTEstimationWidget]
+  [survey]
+    group  [Comment] enabled=1 checkable=0
+    group  [Evaluation] enabled=1 checkable=0
+  [drive]
+    spin   intervalSpinBox                      v=10        [1..100] step=1 pre=[] suf=[] up=11        dn2=9         typed(max+1)=[10]->10 commits=10 enabled=1
+    spin   toleranceSpinBox                     v=500       [0..100000] step=10 pre=[] suf=[] up=510       dn2=490       typed(max+1)=[100001]->500 commits=500 enabled=1
+    combo  strategyComboBox                     count=5 current=0 [mean error] editable=0 enabled=1
+      item0  [mean error]
+      item1  [cleaned mean error]
+      item2  [adaptive error]
+      item3  [adaptive cleaned error]
+      item4  [don't use meta]
+      5 Down clamps at current=4 [don't use meta]
+      5 Up   clamps at current=0 [mean error]
+    check  saveBestCheckBox                     text=[save the best] checkable=1 0->1 enabled=1
+
+== METAGP PAGE 1: clicked [Individual] ==
+  [page] index=1 class=MT_IndividualsWidget objectName=[MTIndividualsWidget]
+  [survey]
+    group  [Terminalset:] enabled=1 checkable=0
+    group  [Functionset:] enabled=1 checkable=0
+    edit   MT_Editor                            text=[] enabled=1 validator=none
+    edit   edit01                               text=[0] enabled=1 validator=QIntValidator bottom=0 top=1000 locale=[C] numberOptions=2
+    edit   edit02                               text=[1000] enabled=1 validator=QIntValidator bottom=0 top=1000 locale=[C] numberOptions=2
+    edit   edit03                               text=[1000] enabled=1 validator=QIntValidator bottom=0 top=1000 locale=[C] numberOptions=2
+    edit   edit04                               text=[1000] enabled=1 validator=QIntValidator bottom=0 top=1000 locale=[C] numberOptions=2
+    edit   edit05                               text=[1000] enabled=1 validator=QIntValidator bottom=0 top=1000 locale=[C] numberOptions=2
+    edit   edit06                               text=[1000] enabled=1 validator=QIntValidator bottom=0 top=1000 locale=[C] numberOptions=2
+    edit   edit07                               text=[1000] enabled=1 validator=QIntValidator bottom=0 top=1000 locale=[C] numberOptions=2
+    edit   edit08                               text=[1000] enabled=1 validator=QIntValidator bottom=0 top=1000 locale=[C] numberOptions=2
+    edit   edit09                               text=[1000] enabled=1 validator=QIntValidator bottom=0 top=1000 locale=[C] numberOptions=2
+    edit   edit10                               text=[1000] enabled=1 validator=QIntValidator bottom=0 top=1000 locale=[C] numberOptions=2
+    edit   edit11                               text=[1000] enabled=1 validator=QIntValidator bottom=0 top=1000 locale=[C] numberOptions=2
+    edit   edit12                               text=[1000] enabled=1 validator=QIntValidator bottom=0 top=1000 locale=[C] numberOptions=2
+    edit   edit13                               text=[1000] enabled=1 validator=QIntValidator bottom=0 top=1000 locale=[C] numberOptions=2
+    edit   edit14                               text=[1000] enabled=1 validator=QIntValidator bottom=0 top=1000 locale=[C] numberOptions=2
+    edit   edit15                               text=[1000] enabled=1 validator=QIntValidator bottom=0 top=1000 locale=[C] numberOptions=2
+    edit   edit16                               text=[1000] enabled=1 validator=QIntValidator bottom=0 top=1000 locale=[C] numberOptions=2
+    edit   edit17                               text=[1000] enabled=1 validator=QIntValidator bottom=0 top=1000 locale=[C] numberOptions=2
+    edit   edit18                               text=[1000] enabled=1 validator=QIntValidator bottom=0 top=1000 locale=[C] numberOptions=2
+    list   constantsListBox                     count=30 current=-1 enabled=1
+      (randomly generated at construction -- values differ every
+       run and are deliberately not pinned) parsedAsInt=30/30 inRange[0..1000]=30
+  [drive]
+    comma  edit01                               type[9,81] -> [981] acceptable=1
+    comma  edit02                               type[9,81] -> [981] acceptable=1
+    comma  edit03                               type[9,81] -> [981] acceptable=1
+    comma  edit04                               type[9,81] -> [981] acceptable=1
+    comma  edit05                               type[9,81] -> [981] acceptable=1
+    comma  edit06                               type[9,81] -> [981] acceptable=1
+    comma  edit07                               type[9,81] -> [981] acceptable=1
+    comma  edit08                               type[9,81] -> [981] acceptable=1
+    comma  edit09                               type[9,81] -> [981] acceptable=1
+    comma  edit10                               type[9,81] -> [981] acceptable=1
+    comma  edit11                               type[9,81] -> [981] acceptable=1
+    comma  edit12                               type[9,81] -> [981] acceptable=1
+    comma  edit13                               type[9,81] -> [981] acceptable=1
+    comma  edit14                               type[9,81] -> [981] acceptable=1
+    comma  edit15                               type[9,81] -> [981] acceptable=1
+    comma  edit16                               type[9,81] -> [981] acceptable=1
+    comma  edit17                               type[9,81] -> [981] acceptable=1
+    comma  edit18                               type[9,81] -> [981] acceptable=1
+    spin   programLengthSpinBox                 v=50        [1..50000] step=1 pre=[] suf=[] up=51        dn2=49        typed(max+1)=[5000]->5000 commits=5000 enabled=1
+    spin   numVariablesSpinBox                  v=10        [0..9999] step=1 pre=[] suf=[] up=11        dn2=9         typed(max+1)=[1000]->1000 commits=1000 enabled=1
+    slider slider01                             v=0      [0..1000] page=10 up=1      pgup=11     end=1000   lcd=(none) 0/0/0/0 enabled=1
+    click  slider01                             0 -> 10 (delta +10) focusPolicy=11 hasFocus=1
+    slider slider02                             v=1000   [0..1000] page=10 up=1000   pgup=1000   end=1000   lcd=(none) 0/0/0/0 enabled=1
+    click  slider02                             1000 -> 1000 (delta +0) focusPolicy=11 hasFocus=1
+    slider slider03                             v=1000   [0..1000] page=10 up=1000   pgup=1000   end=1000   lcd=(none) 0/0/0/0 enabled=1
+    click  slider03                             1000 -> 1000 (delta +0) focusPolicy=11 hasFocus=1
+    slider slider04                             v=1000   [0..1000] page=10 up=1000   pgup=1000   end=1000   lcd=(none) 0/0/0/0 enabled=1
+    click  slider04                             1000 -> 1000 (delta +0) focusPolicy=11 hasFocus=1
+    slider slider05                             v=1000   [0..1000] page=10 up=1000   pgup=1000   end=1000   lcd=(none) 0/0/0/0 enabled=1
+    click  slider05                             1000 -> 1000 (delta +0) focusPolicy=11 hasFocus=1
+    slider slider06                             v=1000   [0..1000] page=10 up=1000   pgup=1000   end=1000   lcd=(none) 0/0/0/0 enabled=1
+    click  slider06                             1000 -> 1000 (delta +0) focusPolicy=11 hasFocus=1
+    slider slider07                             v=1000   [0..1000] page=10 up=1000   pgup=1000   end=1000   lcd=(none) 0/0/0/0 enabled=1
+    click  slider07                             1000 -> 1000 (delta +0) focusPolicy=11 hasFocus=1
+    slider slider08                             v=1000   [0..1000] page=10 up=1000   pgup=1000   end=1000   lcd=(none) 0/0/0/0 enabled=1
+    click  slider08                             1000 -> 1000 (delta +0) focusPolicy=11 hasFocus=1
+    slider slider09                             v=1000   [0..1000] page=10 up=1000   pgup=1000   end=1000   lcd=(none) 0/0/0/0 enabled=1
+    click  slider09                             1000 -> 1000 (delta +0) focusPolicy=11 hasFocus=1
+    slider slider10                             v=1000   [0..1000] page=10 up=1000   pgup=1000   end=1000   lcd=(none) 0/0/0/0 enabled=1
+    click  slider10                             1000 -> 1000 (delta +0) focusPolicy=11 hasFocus=1
+    slider slider11                             v=1000   [0..1000] page=10 up=1000   pgup=1000   end=1000   lcd=(none) 0/0/0/0 enabled=1
+    click  slider11                             1000 -> 1000 (delta +0) focusPolicy=11 hasFocus=1
+    slider slider12                             v=1000   [0..1000] page=10 up=1000   pgup=1000   end=1000   lcd=(none) 0/0/0/0 enabled=1
+    click  slider12                             1000 -> 1000 (delta +0) focusPolicy=11 hasFocus=1
+    slider slider13                             v=1000   [0..1000] page=10 up=1000   pgup=1000   end=1000   lcd=(none) 0/0/0/0 enabled=1
+    click  slider13                             1000 -> 1000 (delta +0) focusPolicy=11 hasFocus=1
+    slider slider14                             v=1000   [0..1000] page=10 up=1000   pgup=1000   end=1000   lcd=(none) 0/0/0/0 enabled=1
+    click  slider14                             1000 -> 1000 (delta +0) focusPolicy=11 hasFocus=1
+    slider slider15                             v=1000   [0..1000] page=10 up=1000   pgup=1000   end=1000   lcd=(none) 0/0/0/0 enabled=1
+    click  slider15                             1000 -> 1000 (delta +0) focusPolicy=11 hasFocus=1
+    slider slider16                             v=1000   [0..1000] page=10 up=1000   pgup=1000   end=1000   lcd=(none) 0/0/0/0 enabled=1
+    click  slider16                             1000 -> 1000 (delta +0) focusPolicy=11 hasFocus=1
+    slider slider17                             v=1000   [0..1000] page=10 up=1000   pgup=1000   end=1000   lcd=(none) 0/0/0/0 enabled=1
+    click  slider17                             1000 -> 1000 (delta +0) focusPolicy=11 hasFocus=1
+    slider slider18                             v=1000   [0..1000] page=10 up=1000   pgup=1000   end=1000   lcd=(none) 0/0/0/0 enabled=1
+    click  slider18                             1000 -> 1000 (delta +0) focusPolicy=11 hasFocus=1
+    group  edit01                         type[1,000] -> [1000] acceptable=1 toInt=1000(ok=1)
+
+== METAGP PAGE 2: clicked [Population] ==
+  [page] index=2 class=MT_PopulationWidget objectName=[MTPopulationWidget]
+  [survey]
+    tree   individualListView                   cols=4 rows=10
+      row0  | 0                     | -1                    | 0                     | 33                    | col0icon=0 col0check=0
+      row1  | 1                     | -1                    | 0                     | 33                    | col0icon=0 col0check=0
+      row2  | 2                     | -1                    | 0                     | 33                    | col0icon=0 col0check=0
+      row3  | 3                     | -1                    | 0                     | 33                    | col0icon=0 col0check=0
+      row4  | 4                     | -1                    | 0                     | 33                    | col0icon=0 col0check=0
+      row5  | 5                     | -1                    | 0                     | 33                    | col0icon=0 col0check=0
+      row6  | 6                     | -1                    | 0                     | 33                    | col0icon=0 col0check=0
+      row7  | 7                     | -1                    | 0                     | 33                    | col0icon=0 col0check=0
+      row8  | 8                     | -1                    | 0                     | 33                    | col0icon=0 col0check=0
+      row9  | 9                     | -1                    | 0                     | 33                    | col0icon=0 col0check=0
+  [drive]
+    (nothing on this container is in C11's scope: no spin box, slider, combo, checkbox, radio or validated field)
+
+== METAGP PAGE 3: clicked [GP Parameter] ==
+  [page] index=3 class=MT_SearchWidget objectName=[MTSearchWidget]
+  [survey]
+    group  [Operator Probability] enabled=1 checkable=0
+    group  [Mutation] enabled=1 checkable=0
+    group  [Crossover] enabled=1 checkable=0
+    edit   xOverProbEdit                        text=[50] enabled=1 validator=QDoubleValidator bottom=0 top=100 decimals=1 notation=1 locale=[C] numberOptions=2
+    edit   mutProbEdit                          text=[25] enabled=1 validator=QDoubleValidator bottom=0 top=100 decimals=1 notation=1 locale=[C] numberOptions=2
+    edit   reproProbEdit                        text=[25] enabled=1 validator=QDoubleValidator bottom=0 top=100 decimals=1 notation=1 locale=[C] numberOptions=2
+  [drive]
+    comma  xOverProbEdit                        type[9,81] -> [100] acceptable=1
+    comma  mutProbEdit                          type[9,81] -> [100] acceptable=1
+    comma  reproProbEdit                        type[9,81] -> [100] acceptable=1
+    spin   powerSpinBox                         v=500       [0..1000] step=10 pre=[] suf=[] up=510       dn2=490       typed(max+1)=[1001]->500 commits=500 enabled=1
+    spin   lineProbSpinBox                      v=500       [0..1000] step=10 pre=[] suf=[] up=510       dn2=490       typed(max+1)=[1001]->500 commits=500 enabled=1
+    slider xOverProbSlider                      v=500    [0..1000] page=10 up=501    pgup=511    end=1000   lcd=(none) 0/0/0/0 enabled=1
+    click  xOverProbSlider                      500 -> 510 (delta +10) focusPolicy=11 hasFocus=1
+    slider mutProbSlider                        v=500    [0..1000] page=10 up=501    pgup=511    end=1000   lcd=(none) 0/0/0/0 enabled=1
+    click  mutProbSlider                        500 -> 510 (delta +10) focusPolicy=11 hasFocus=1
+    slider reproProbSlider                      v=500    [0..1000] page=10 up=501    pgup=511    end=1000   lcd=(none) 0/0/0/0 enabled=1
+    click  reproProbSlider                      500 -> 510 (delta +10) focusPolicy=11 hasFocus=1
+    slider pt2XOverProbSlider                   v=300    [0..1000] page=10 up=301    pgup=311    end=1000   lcd=(none) 0/0/0/0 enabled=1
+    click  pt2XOverProbSlider                   300 -> 310 (delta +10) focusPolicy=11 hasFocus=1
+    slider pt1XOverProbSlider                   v=0      [0..1000] page=10 up=1      pgup=11     end=1000   lcd=(none) 0/0/0/0 enabled=1
+    click  pt1XOverProbSlider                   0 -> 10 (delta +10) focusPolicy=11 hasFocus=1
+    slider pt3XOverProbSlider                   v=0      [0..1000] page=10 up=1      pgup=11     end=1000   lcd=(none) 0/0/0/0 enabled=1
+    click  pt3XOverProbSlider                   0 -> 10 (delta +10) focusPolicy=11 hasFocus=1
+    combo  breedSizeComboBox                    count=1 current=0 [No] editable=0 enabled=1
+      item0  [No]
+      1 Down clamps at current=0 [No]
+      1 Up   clamps at current=0 [No]
+    group  xOverProbEdit                  type[1,000] -> [1000] acceptable=0 toInt=1000(ok=1)
+
+== METAGP PAGE 4: clicked [Selection] ==
+  [page] index=4 class=MT_SelectionWidget objectName=[MTSelectionWidget]
+  [survey]
+    group  [Pressure] enabled=1 checkable=0
+    group  [Training] enabled=1 checkable=0
+  [drive]
+    spin   overProductionSpinBox                v=10        [1..100] step=1 pre=[] suf=[] up=11        dn2=9         typed(max+1)=[10]->10 commits=10 enabled=1
+    spin   TSetSizeSpinBox                      v=20        [0..2000] step=1 pre=[] suf=[] up=21        dn2=19        typed(max+1)=[200]->200 commits=200 enabled=1
+    spin   TDurationSpinBox                     v=250       [10..100000] step=10 pre=[] suf=[] up=260       dn2=240       typed(max+1)=[10000]->10000 commits=10000 enabled=1
+    combo  selectionMethodComboBox              count=2 current=0 [Ranking] editable=0 enabled=1
+      item0  [Ranking]
+      item1  [Fitness Proportional]
+      2 Down clamps at current=1 [Fitness Proportional]
+      2 Up   clamps at current=0 [Ranking]
+    combo  tourSizeComboBox                     count=4 current=0 [10] editable=0 enabled=1
+      item0  [10]
+      item1  [20]
+      item2  [50]
+      item3  [100]
+      4 Down clamps at current=3 [100]
+      4 Up   clamps at current=0 [10]
+    combo  fitnessFunctionComboBox              count=2 current=0 [simple error] editable=0 enabled=1
+      item0  [simple error]
+      item1  [square error]
+      2 Down clamps at current=1 [square error]
+      2 Up   clamps at current=0 [simple error]
+
+== METAGP PAGE 5: clicked [Statistics] ==
+  [page] index=5 class=MT_StatisticsWidget objectName=[MTStatisticsWidget]
+  [survey]
+    group  [Fitness] enabled=1 checkable=0
+    group  [Parentpool] enabled=1 checkable=0
+    group  [Search Operator Effects] enabled=1 checkable=0
+    group  [Simulation / Estimation] enabled=1 checkable=0
+    group  [Fitness] enabled=1 checkable=0
+    group  [Search Operator Effects] enabled=1 checkable=0
+  [drive]
+    spin   metaGenSpinBox                       v=1         [1..1] step=1 pre=[] suf=[] up=1         dn2=1         typed(max+1)=[1]->1 commits=1 enabled=1
+    spin   SIGGenSpinBox                        v=1         [1..1] step=1 pre=[] suf=[] up=1         dn2=1         typed(max+1)=[1]->1 commits=1 enabled=1
+    slider metaGenSlider                        v=1      [1..1] page=10 up=1      pgup=1      end=1      lcd=(none) 0/0/0/0 enabled=1
+    click  metaGenSlider                        1 -> 1 (delta +0) focusPolicy=11 hasFocus=1
+    slider SIGGenSlider                         v=1      [1..1] page=10 up=1      pgup=1      end=1      lcd=(none) 0/0/0/0 enabled=1
+    click  SIGGenSlider                         1 -> 1 (delta +0) focusPolicy=11 hasFocus=1
+
+== METAGP: closing ==
+  closed=1 (onHide() may refuse) mainWindowAlive=1

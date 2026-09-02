@@ -32,7 +32,7 @@ build and run, because nothing else can be verified without it — see §3.
 | T — old-Qt tool container | **done 2026-08-27.** `tools/qtmig`, §4 |
 | D — delete the shim, migrate the data | **DONE 2026-08-30.** `q2compat.h` and `q2compat_check.cpp` deleted; `include/compat/` gone; **no `Q2*` shim type is used anywhere**. D1–D27. *This is not "no Qt 2 container exists" — the unported GUI modules still declare **71 lines** of `QArray`, `QDict`, `QList`-as-pointer-list and friends, all of which Phase C must convert. See D27.* The shim's self-check step is gone from `check.sh`, which now runs no code. §10 |
 | P — PVM | **DONE 2026-08-28.** Vendored 3.4.3 replaced by upstream 3.4.6; nine patches carry the four config lines and Debian's eight source fixes; `libpvm3.a` and `pvmd3` build; SIGEL's two PVM objects link against them and `SIG_GPPVMData` round-trips through real PVM. `sigel`/`sigel_slave` still need Phase C. §7 |
-| C — GUI | **DONE 2026-09-02. C1–C10 complete; C11a, C11b and C11c done.** All 20 Designer forms converted; all five GUI modules build as archives; **both programs link and run**; **100 dead `connect()`s repaired, tree-wide count 0 with no baseline anywhere**. **C9** made it match what 1.3 SHOWS — 42 menu entries, the toolbars and the loaded values, now the `gui vs 1.3` gate. **C10** DROVE it, diffed against the oracle driving 1.3 with XTest, and found two defects reading it could not: `QTreeWidget::clear()` emitting a signal Qt 2 blocked, which killed the application on a large delete, and an eaten ampersand. Second gate, `gui behaviour`. **C11a** drove the five View pages C10 never opened — the 12-probe validator battery matches 1.3 character for character under two locales, nine typed values come out byte-identical in the saved `.exp` across the two architectures, and a `QIntValidator` over-range divergence was found and **accepted as D28**. **C11b** drove the Import/Export round trips — **seven of the eight exports are byte-identical to what the 2003 i386 binary writes** — and found default-constructed language parameters coming out alphabetical where 1.3 gives `QDict` hash order, which had also been wrong in `dictorder-baseline.txt` for all seven robots. **C11c** drove the six dialogs, closing C7's validator set at 21 of 21, and found Qt 6 selecting a pre-filled field where Qt 2 did not — a typed digit REPLACED the value instead of appending, so Add-individuals turned 1 into 2 where 1.3 makes it 12. Two reviews of the checking machinery then found five probes that could not fail and a **demonstrated false pass** (all 30 icons replaced with garbage, gate green). **842 pass, 0 fail.** §7 |
+| C — GUI | **DONE 2026-09-02. C1–C10 complete; C11a–C11d done.** All 20 Designer forms converted; all five GUI modules build as archives; **both programs link and run**; **100 dead `connect()`s repaired, tree-wide count 0 with no baseline anywhere**. **C9** made it match what 1.3 SHOWS — 42 menu entries, the toolbars and the loaded values, now the `gui vs 1.3` gate. **C10** DROVE it, diffed against the oracle driving 1.3 with XTest, and found two defects reading it could not: `QTreeWidget::clear()` emitting a signal Qt 2 blocked, which killed the application on a large delete, and an eaten ampersand. Second gate, `gui behaviour`. **C11a** drove the five View pages C10 never opened — the 12-probe validator battery matches 1.3 character for character under two locales, nine typed values come out byte-identical in the saved `.exp` across the two architectures, and a `QIntValidator` over-range divergence was found and **accepted as D28**. **C11b** drove the Import/Export round trips — **seven of the eight exports are byte-identical to what the 2003 i386 binary writes** — and found default-constructed language parameters coming out alphabetical where 1.3 gives `QDict` hash order, which had also been wrong in `dictorder-baseline.txt` for all seven robots. **C11c** drove the six dialogs, closing C7's validator set at 21 of 21, and found Qt 6 selecting a pre-filled field where Qt 2 did not — a typed digit REPLACED the value instead of appending, so Add-individuals turned 1 into 2 where 1.3 makes it 12. Two reviews of the checking machinery then found five probes that could not fail and a **demonstrated false pass** (all 30 icons replaced with garbage, gate green). **C11d** then opened the MetaGP window for the first time and found C7's locale fix had never reached MT_GUI's ten validators — `"1,000"` accepted, `toInt()` returning zero. **842 pass, 0 fail.** §7 |
 | V — check against the 1.3 binary | **V1, V5's MDH probe, V6, V7 and V8 all done, all PASS.** Ordering: 10 of 10 container orders match. Arithmetic: `twoBases` exact bit for bit, `octopus` 9/9 with three joints exact and 5 ulp worst. **V6, V7 and V8 done 2026-08-29** — friction and no-collide negotiation, their four remaining rules, and the GP parameter blocks captured *before* their conversion. `verification-against-sigel-1.3/v6`, `v7`, `v8`. **V9 done 2026-08-29, 3 of 3** — three function bodies disassembled, which symbol lookups cannot see. **V4's reference was RECEIVED 2026-08-30** — two whole-run digests validated across two independent 1.3 runs — but it is not yet a runnable gate here, because the prepared inputs are uncommitted. V2 and V3 not started. V5's sensor and force probes are **invalid as specified** — both target Dynamo-only functions, deleted 2026-08-28. §7 |
 
 **SCOPE — DECIDED 2026-08-23. Read this before changing anything.**
@@ -1730,6 +1730,7 @@ modules include the headers `uic` generates from them.
 | C11a | **DONE 2026-09-02.** The five View pages C10 never opened. 29 spin boxes, 20 sliders, 7 combos, 4 checkboxes, 8 radios and 20 of C7's 21 validators driven and diffed against 1.3. The **12-probe validator battery matches character for character**, on both sides under a comma-decimal locale the oracle built with woody's own `localedef`. Nine parameter values typed on the pages come out **byte-identical** in the saved `.exp` across the two architectures. Found the `QIntValidator` Intermediate/Invalid trap: 1.3 clamps a typed over-range number to the maximum, the port commits a truncated prefix -- **accepted as a divergence, D28**; pinned in the gate. `gui behaviour` grew from one scenario to two here, and to five by C11c | 1 regression, 2 interlocks, 3 probe errors |
 | C11b | **DONE 2026-09-02.** The Import/Export round trips — 15 of the 16 children C10 never drove. **Seven of the eight exports are BYTE-IDENTICAL to what the 2003 i386 binary writes**, including the 2.7 MB `.pop` and, unexpectedly, the `.dat` with its 532 lines of floating point. Found and fixed a real defect: default-constructed language parameters came out alphabetical where 1.3 gives `QDict` hash order — predicted from `qgdict.cpp`, confirmed on the running binary character for character, and it had been silently wrong in `dictorder-baseline.txt` for all 7 robots (**98 lines corrected**). Confirmed and preserved 1.3's ignored overwrite prompt. Also fixed a C10-era harness bug that had been handing SIGEL the wrong filename — 2 exports out of 32 in the runs that caught it | 1 defect fixed, 1 baseline corrected, 1 defect preserved |
 | C11c | **DONE 2026-09-02.** The six dialogs, plus two fresh-eyes reviews of the harness and of `check.sh` itself. **C7's 21st validator driven, closing that set at 21 of 21.** Found and fixed a defect with a data consequence and no need for invalid input: Qt 6 selects a pre-filled field when a dialog gives it focus and Qt 2 did not, so a user who types one digit into Add-individuals gets **12 on 1.3, which appends, and got 2 here, which replaced** — twelve individuals added where two were meant. Four sites, `end(false)` queued after show. A second divergence **kept on purpose**: allowing a command appends where 1.3 hash-inserts, predicted and confirmed character for character, but matching it would mean reimplementing what Phase D removed. Two reviews then went at the checking machinery: **five probes that could not fail**, including a Cancel test that never pressed Cancel and a round trip that was an identity test; and a **demonstrated false pass** — all 30 menu and toolbar icons replaced with garbage, whole gate green. `check.sh` also never exited non-zero, counted a skipped section as 0 fail, and ran its locale check under a locale that is not installed here. All fixed; **842 pass, 0 fail** for the first time, with `WIN_*` excluded explicitly as the permanent known failure it is. A `!!` failure marker had already reached the committed baseline; the gate now refuses those | 1 defect fixed, 1 kept, 5 probe defects, 7 gate defects |
+| C11d | **DONE 2026-09-02.** `MT_GUI` — the MetaGP window, 23 sources, which nothing had ever opened on either side. Its six pages driven. **C7 never reached MT_GUI's ten validators**: an unpinned `QIntValidator(0,1000)` calls `"1,000"` ACCEPTABLE under en_US while `toInt()` returns 0, so a user types one thousand and **zero** reaches the system. 1.3 rejects both separators — measured — so the fix RESTORES Qt 2. Applied at both creation sites in `MT_AddConstantsWidget`, whose type radio rebuilds them. The window is application-modal, proven with a control (0 pixels vs 4397). The `!!` guard added in C11c caught a probe defect before it could be baselined | 1 defect fixed, 2 probe defects |
 
 Each module step is the same shape: `qt3to4` in the container, hand-port off
 Qt3Support, extend `check.sh` to cover the module, commit.
@@ -4312,6 +4313,117 @@ this project checked that the capture had succeeded.*
   pressed once, on the JMP allow; every other dialog was cancelled.
 - **`MT_GUI`'s dialogs**, which are a separate item.
 
+#### C11d — MT_GUI, the MetaGP window nothing had ever opened
+
+23 sources and a window reached by `MetaGP > Use MetaGP`, then
+`MetaGP > Configure System`. Neither side had ever opened it.
+
+**It opens from the shipped experiment.** No MetaGP-specific file is needed and
+neither of `configureSystem()`'s two stderr-only failure paths fires — checked
+on 1.3 with stderr redirected to a file and diffed around the action, because
+"couldn't create the GP system" and "couldn't open the configuration window"
+both look like nothing happening.
+
+**Structure**: a `QMainWindow`, four toolbars, and a `QSplitter` holding an
+`MT_ExperimentWidget` tree on the left and a `QStackedWidget` of six on the
+right. The tree labels do not match the source class names, which cost both
+sides a round trip until it was written down:
+
+| tree label | source class |
+|---|---|
+| Strategy | `MT_EstimationWidget` |
+| Individual | `MT_IndividualsWidget` |
+| Population | `MT_PopulationWidget` |
+| GP Parameter | `MT_SearchWidget` |
+| Selection | `MT_SelectionWidget` |
+| Statistics | `MT_StatisticsWidget` |
+
+`MT_ExperimentWidget` is not a page at all — it *is* the tree.
+
+##### THE DEFECT: C7 never reached MT_GUI's validators
+
+C7 pinned `SIGEL_MasterGUI`'s 21 validators to `QLocale::c()` with
+`RejectGroupSeparator`. **MT_GUI has ten more and none of them had been.**
+
+It needs no foreign locale to bite. Measured directly against Qt 6:
+
+```
+unpinned QIntValidator(0,1000), locale en_US, group separator ','
+    validate("1,000") = ACCEPTABLE
+    "1,000".toInt()   = 0, ok=false
+```
+
+**A user types one thousand, the field says it is fine, and zero reaches the
+system.** Under `de_DE` the same happens with `"1.000"`. The whole window was
+locale-dependent: 138 lines of the dump moved under `de_DE`, where the master
+GUI's five pages are byte-identical across three locales.
+
+**1.3 rejects both separators** — read off the running binary, typing one
+character at a time into the `SWT` field: `"1,000"`, `"1.000"` and `"1000"` all
+leave it reading `1000`. Qt 2 forced `LC_NUMERIC="C"` process-wide, so this is
+a **restoration**, not an improvement.
+
+Fixed at all ten, including **both** creation sites in `MT_AddConstantsWidget`:
+the type radio deletes and rebuilds its validators, so pinning them only in the
+constructor would be undone the first time someone switches between integer and
+float constants. The window is now byte-identical under `de_DE`, and `"1,000"`
+reads back as 1000. Teeth-tested by reverting the pinning — the gate fires on
+the `locale=[C] numberOptions=2` lines and on the `group` probes.
+
+##### What matched, and one measurement worth copying
+
+Every toolbar and its actions, all icons loaded, `Start` and `Stop` both
+disabled on arrival, the six tree labels and their order, the Individual page's
+eighteen fields reading **0 and seventeen × 1000**, and the first-open
+`>>> im Randomizer <<<` on stderr — German diagnostic output that both versions
+print.
+
+**The window is application-modal, and the oracle proved it with a control
+rather than a null.** With it open, a click on the main window's tree changed
+**0 pixels**; with it closed, the identical click at the same coordinates
+changed **4397**. "The main window did not respond" is the shape of a click
+that missed, and a single null would not have distinguished the two.
+
+*It also measured the lazy-create-and-keep that `configureSystem()` reads: the
+first open creates X window `0x2005c3`, closing unmaps it without destroying
+it, and the second open re-maps the same id with no new stderr. **The window
+persists as an unmapped X window after closing, so its presence in the window
+list is not evidence that it is open** — the same class as reading an empty
+crop as a wrong answer.*
+
+##### Two probe defects, both caught by guards added earlier in C11
+
+1. **A modal handler closed the window under test.** `MT_MainWindow` comes back
+   from `activeModalWidget()`, so a handler that closes whatever it finds
+   closed it, and the run then reported "no MetaGP window appeared". Only a
+   `QMessageBox` is a failure there now.
+2. **`select-all` + `Delete` does not empty every field.** `xOverProbEdit` kept
+   its `0`, so the probe would have measured the concatenation rather than the
+   input. **The `!!` guard `check.sh` gained in C11c caught this before it could
+   reach a baseline** — which is the first time that guard has paid for itself.
+   The oracle hit the identical thing on 1.3, where its standard clear left a
+   `0` behind and the tell was a restore reading `00`. `clearEdit()` now falls
+   back to `End` plus backspaces and reports if it still cannot empty a field.
+
+**The 30 constants are deliberately not pinned.** `MT_IndividualsWidget`
+generates them with a randomizer at construction, so they differ every run —
+two runs differed by exactly those 60 lines and nothing else. The count and
+"every one parses as an integer in range" are checked instead, which is an
+invariant rather than noise.
+
+##### What C11d did NOT drive
+
+- **The toolbar actions that do something**: Start and Stop evolution, Default,
+  Load, Save, the population Add / Delete / Import / Export / Load / Save, and
+  `update statistics`. All were surveyed — labels, enabled state, icons — and
+  none was clicked. Start and Stop are disabled on arrival anyway.
+- **`MT_AddConstantsWidget`**, which is a dialog behind the Individual page's
+  Create button. Its four validators are fixed and its type-radio rebuild is
+  fixed, but nothing has opened it.
+- **`MT_Editor`**, the program editor on the Individual page.
+- **A MetaGP evolution actually running**, which belongs with the main
+  evolution path — the last open C11 item.
+
 ---
 
 ## 8. Steps and status
@@ -4336,7 +4448,7 @@ windows, and nothing happens behind the Start button.
 
 ## 9. Open
 
-### C11 — the coverage gap C10 leaves — C11a, C11b, C11c DONE; TWO ITEMS OPEN
+### C11 — the coverage gap C10 leaves — C11a–C11d DONE; the evolution path OPEN
 
 C10 found two defects in **fifteen** driven scenarios. That density is the
 argument for continuing: the defects were not in the parts anyone suspected,
@@ -4357,7 +4469,7 @@ no slicing of `guidump-baseline.txt` gives it. Corrected by review.*
 | ~~**15 of 16 Import/Export children**~~ **DONE in C11b** — all eight exports driven and diffed against 1.3, the five parameter formats round-tripped, and Robot / Program / Individual import driven | closed. Seven of eight exports byte-identical across the two architectures; the eighth differs for a documented Phase D reason. One defect found and fixed, one preserved |
 | ~~**6 dialogs**~~ **DONE in C11c** — EditCommand, EditHost, InfoBox, RobotInfo, IndividualView and AddIndividuals beyond its OK | closed. C7's 21st validator driven; a select-on-focus defect found and fixed at four sites; a command-insertion divergence measured and kept |
 | **The evolution path entirely** | the generation counter, statistics, fitness curve, and the enable/disable sweep during a run |
-| **`MT_GUI` and `SIGEL_SlaveGUI`** — 30 sources between them | the whole MetaGP window and the slave's simulation window |
+| ~~**`MT_GUI`**~~ **DONE in C11d** — the MetaGP window and its six pages driven; a C7-class locale defect found and fixed. **`SIGEL_SlaveGUI`** is still undriven | the slave's simulation window, and MT_GUI's toolbar actions, which were surveyed but not clicked |
 
 **Do it as C11 with the same method, not a rewrite.** `guidrive.cpp` already has
 the machinery — modal interception, context-menu posting, a watchdog, PVM
@@ -4370,9 +4482,9 @@ right: the regression it found is in exactly the spin-box/validator shape C6
 and C7 had already been bitten by**; ~~(2) the Import/Export round trips~~ —
 **done, and the guess was right again: byte-comparable files caught a defect
 that had corrupted a committed baseline**; ~~(3) the remaining dialogs~~ — **done, and the guess held a third
-time: the defect it found needed no invalid input at all**; (4) `MT_GUI`; (5)
-the evolution path, last, because it needs a throughput answer before it can be
-observed at all.
+time: the defect it found needed no invalid input at all**; ~~(4) `MT_GUI`~~ — **done, and it found the same defect class C7 had
+fixed everywhere else**; (5) the evolution path, last, because it needs a
+throughput answer before it can be observed at all.
 
 **Open after C11c — five items.** The `QSpinBox` divergence is closed: **D28**
 accepted it. The Import/Export item is closed by C11b.
@@ -4380,7 +4492,7 @@ accepted it. The Import/Export item is closed by C11b.
 | # | open item | blocked on |
 |---|---|---|
 | **1** | **`pagesave` and `roundtrip` have no gate.** `pagesave` proved nine parameter values byte-identical across the two architectures and `roundtrip` proved the five formats survive an export-import-export cycle; both are run by hand. A regression between the widget and the file, or in a reader, would not be caught by the gate — `pages` covers widget to widget and `exportall` covers widget to file in one direction only | a committed reference parameter block. Natural to do with the Import/Export item, which is byte-comparable files for the same reason |
-| **2** | **Two C11 items left** — `MT_GUI`, then the evolution path | nothing. `MT_GUI` can start now |
+| **2** | **One C11 item left** — the evolution path. Also undriven: `SIGEL_SlaveGUI`, MT_GUI's toolbar actions and `MT_AddConstantsWidget` | the evolution path needs a throughput answer before it can be observed at all |
 | **3** | **`QHashSeed::setDeterministicGlobalSeed()` was never added to `sigel.cpp`.** §10 says "PHASE C MUST ADD" it to `sigel.cpp` and `sigel_slave.cpp`; Phase C closed without doing so, and the sentence sits under a heading reading "Determinism — resolved". Measured: the call exists once in the tree, `sigel_eval.cpp:511`. **Also mis-scoped** — only `sigel` links the three `QHash`es, and `sigel_slave` links `GUI_SLAVE`, which has none | nothing. It is a bookkeeping gap rather than a live defect: the one iteration site is destruction, which is order-insensitive. But it is unowned, and that is why it is here |
 | **4** | **Six dropped size constraints from C2 were never restored.** §7 says "C6/C7 own it"; both closed without it. Measured: `MT_IndividualWidgetBase.ui` has three `130` values in `v1.3-pristine` and zero today, and `Layout32/33/28/60/22` appear in no converted form | nothing. Cosmetic — layout minimums, not behaviour — but it was an open item that vanished when its owning step closed |
 | **5** | **A use-after-free in `SIG_SimulationVisualisationWidget.cpp:414` is now reachable.** `physics_backends.md` records it as "unreachable today only because `SIGEL_SlaveGUI` does not compile", with the fix being `visualisation = nullptr;` between the delete and the new. **That module builds and `sigel_slave` links it**, and the bare `delete` is still there | nothing. This is the one of the four that could actually bite, and it is not tracked anywhere in this file |

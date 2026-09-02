@@ -730,7 +730,7 @@ elif make -s -C "$ROOT" B=build-fast SAN= SIGSAN= guidrive >/tmp/bdb.$$ 2>&1; th
     # SIGEL_ROOT must be the SOURCE tree: the driver loads pixmaps and terrain
     # from it. Neither scenario spawns a sigel_slave, so neither needs one.
     #
-    # FIVE scenarios make up the baseline, concatenated in this order:
+    # SIX scenarios make up the baseline, concatenated in this order:
     #   gate       C10 -- the tree, sorting, add/delete/reset, the dialogs,
     #              the context menus, the MetaGP warning
     #   pages      C11a -- the five View pages C10 never opened, every spin
@@ -746,6 +746,13 @@ elif make -s -C "$ROOT" B=build-fast SAN= SIGSAN= guidrive >/tmp/bdb.$$ 2>&1; th
     #              write is not inside the switch. Confirmed on the running
     #              binary. This pins the DEFECT: sentinelSurvived=1 would mean
     #              the port had started honouring the prompt.
+    #   metagui    MT_GUI -- the MetaGP window, which nothing had ever
+    #              opened. Its ten validators had never been given C7's C-locale
+    #              treatment, so an unpinned QIntValidator(0,1000) called
+    #              "1,000" ACCEPTABLE under en_US while text().toInt() returned
+    #              0: a user types one thousand and zero reaches the system.
+    #              1.3 rejects both separators -- measured on the binary -- so
+    #              the fix restores Qt 2 rather than improving on it.
     #   dialogs    C11c -- the six dialogs, C7's 21st validator, and the
     #              select-on-focus defect. The load-bearing lines are the two
     #              `typing "5" gives [0.015]' / `typing "2" gives [12]' ones:
@@ -775,8 +782,8 @@ elif make -s -C "$ROOT" B=build-fast SAN= SIGSAN= guidrive >/tmp/bdb.$$ 2>&1; th
     }
     if guidrive_run gate /tmp/bo.$$ && guidrive_run pages /tmp/bp.$$ \
        && guidrive_run exportall /tmp/bx.$$ && guidrive_run overwrite /tmp/bw.$$ \
-       && guidrive_run dialogs /tmp/bg.$$; then
-        cat /tmp/bo.$$ /tmp/bp.$$ /tmp/bx.$$ /tmp/bw.$$ /tmp/bg.$$ > /tmp/ball.$$
+       && guidrive_run dialogs /tmp/bg.$$ && guidrive_run metagui /tmp/bm.$$; then
+        cat /tmp/bo.$$ /tmp/bp.$$ /tmp/bx.$$ /tmp/bw.$$ /tmp/bg.$$ /tmp/bm.$$ > /tmp/ball.$$
         # The driver prints `!!' when it could not do what it was asked -- a
         # dialog that would not accept, a file that never appeared. Such a run
         # must not pass, and must not be diffed into a baseline either: one
@@ -803,7 +810,7 @@ elif make -s -C "$ROOT" B=build-fast SAN= SIGSAN= guidrive >/tmp/bdb.$$ 2>&1; th
         bf=1
         echo "  the driver did not finish -- it exits(1) on an out-of-range pool"
         echo "  position, which is how the Qt 6 clear() regression showed up:"
-        tail -6 /tmp/bo.$$ /tmp/bp.$$ /tmp/bx.$$ /tmp/bw.$$ /tmp/bg.$$ 2>/dev/null | sed 's/^/    /'
+        tail -6 /tmp/bo.$$ /tmp/bp.$$ /tmp/bx.$$ /tmp/bw.$$ /tmp/bg.$$ /tmp/bm.$$ 2>/dev/null | sed 's/^/    /'
     fi
 
     # C7 pinned 21 validators to QLocale::c() with RejectGroupSeparator because
@@ -848,7 +855,8 @@ elif make -s -C "$ROOT" B=build-fast SAN= SIGSAN= guidrive >/tmp/bdb.$$ 2>&1; th
 else
     bf=1; echo "  guidrive did not build:"; head -5 /tmp/bdb.$$ | sed 's/^/    /'
 fi
-rm -f /tmp/bo.$$ /tmp/bp.$$ /tmp/bx.$$ /tmp/bw.$$ /tmp/bg.$$ /tmp/bl.$$ /tmp/bl2.$$ /tmp/ball.$$ \
+rm -f /tmp/bo.$$ /tmp/bp.$$ /tmp/bx.$$ /tmp/bw.$$ /tmp/bg.$$ /tmp/bm.$$ \
+      /tmp/bl.$$ /tmp/bl2.$$ /tmp/ball.$$ \
       /tmp/bd.$$ /tmp/bdb.$$
 # exportall and overwrite WRITE FILES, 2.7 MB of them, the population export
 # being most of it. Fixed names, so they are overwritten rather than

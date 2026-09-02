@@ -624,6 +624,26 @@ static QString validatorDesc(const QValidator *v)
 // setText("9,81") on one of these fields stores "9,81" and reports
 // hasAcceptableInput()==false. So probe order cannot carry state from one
 // probe into the next.
+// Empty a line edit and PROVE it is empty. select-all + Delete is not enough
+// on every field -- the oracle found the same thing on 1.3, where its standard
+// clear left a "0" behind and silently contaminated a whole battery; the tell
+// was a restore reading "00" instead of "0". So: try the fast way, then fall
+// back to End plus BackSpaces, then report if it still is not empty.
+static bool clearEdit(QLineEdit *le)
+{
+    le->setFocus();
+    le->selectAll();
+    QTest::keyClick(le, Qt::Key_Delete);
+    if (le->text().isEmpty()) return true;
+    QTest::keyClick(le, Qt::Key_End);
+    for (int i = le->text().size() + 2; i > 0; --i)
+        QTest::keyClick(le, Qt::Key_Backspace);
+    if (le->text().isEmpty()) return true;
+    printf("    !! could not clear %s -- it still holds [%s]\n",
+           qPrintable(le->objectName()), qPrintable(le->text()));
+    return false;
+}
+
 static void probeEdit(QLineEdit *le, const char *probe)
 {
     const QString before = le->text();
@@ -2517,17 +2537,7 @@ int main(int argc, char **argv)
                 if (!le->validator()) continue;
                 if (qobject_cast<QAbstractSpinBox *>(le->parentWidget())) continue;
                 const QString before = le->text();
-                le->setFocus(); le->selectAll();
-                QTest::keyClick(le, Qt::Key_Delete);
-                // ASSERT THE CLEAR WORKED. The oracle's select-all-then-Delete
-                // did NOT empty these fields on 1.3 and its first battery was
-                // silently contaminated by the leftover; the tell was a restore
-                // reading "00" instead of "0". A probe that types into a field
-                // it failed to clear measures the concatenation, not the input.
-                if (!le->text().isEmpty())
-                    printf("    !! clear left [%s] in %s -- probe would be "
-                           "measuring the leftover\n", qPrintable(le->text()),
-                           qPrintable(le->objectName()));
+                clearEdit(le);
                 QTest::keyClicks(le, QStringLiteral("1,000"));
                 QTest::qWait(10);
                 bool ok = false;
