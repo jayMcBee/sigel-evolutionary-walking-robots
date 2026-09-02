@@ -714,10 +714,28 @@ elif make -s -C "$ROOT" B=build-fast SAN= SIGSAN= guidrive >/tmp/bdb.$$ 2>&1; th
     # from it. Neither scenario spawns a sigel_slave, so neither needs one.
     #
     # TWO scenarios make up the baseline, concatenated in this order:
-    #   gate   C10 -- the tree, sorting, add/delete/reset, the dialogs, the
-    #          context menus, the MetaGP warning
-    #   pages  C11 -- the five View pages C10 never opened, every spin box,
-    #          slider, combo, checkbox and validator on them
+    #   gate       C10 -- the tree, sorting, add/delete/reset, the dialogs,
+    #              the context menus, the MetaGP warning
+    #   pages      C11a -- the five View pages C10 never opened, every spin
+    #              box, slider, combo, checkbox and validator on them
+    #   exportall  C11b -- all eight File > Export children, each file's
+    #              sha256, size, line count and ends. SEVEN of the eight are
+    #              byte-identical to what the 2003 i386 binary writes, checked
+    #              by the oracle, so a move here is a regression against 1.3
+    #              and not merely against yesterday. The eighth, .lap, differs
+    #              for a reason the baseline records.
+    #   overwrite  C11b -- 1.3 asks "Do you want to overwrite?" and then
+    #              writes the file whichever way you answer, because the second
+    #              write is not inside the switch. Confirmed on the running
+    #              binary. This pins the DEFECT: sentinelSurvived=1 would mean
+    #              the port had started honouring the prompt.
+    #
+    # `roundtrip' is NOT run here. It exports, imports and re-exports each
+    # format, which takes 97 seconds against 30 for exportall, and what it
+    # uniquely covers -- writer/reader/writer symmetry -- is largely covered by
+    # exportall (a broken reader moves the export) and by dictorder. Run it by
+    # hand when touching a readFromFile or writeToFile:
+    #   SIGEL_ROOT=... SIGEL_EXP=... build-fast/guidrive roundtrip
     # $1 scenario, $2 outfile, $3.. extra NAME=VALUE for the child only.
     # The extras go through env rather than being written as a prefix on the
     # function call: a prefix would also apply to the SHELL, and bash then
@@ -730,8 +748,9 @@ elif make -s -C "$ROOT" B=build-fast SAN= SIGSAN= guidrive >/tmp/bdb.$$ 2>&1; th
             SIGEL_SCRATCH="${TMPDIR:-/tmp}" QT_QPA_PLATFORM=offscreen \
             timeout 300 "$ROOT/build-fast/guidrive" "$sc" > "$out" 2>/dev/null
     }
-    if guidrive_run gate /tmp/bo.$$ && guidrive_run pages /tmp/bp.$$; then
-        cat /tmp/bo.$$ /tmp/bp.$$ > /tmp/ball.$$
+    if guidrive_run gate /tmp/bo.$$ && guidrive_run pages /tmp/bp.$$ \
+       && guidrive_run exportall /tmp/bx.$$ && guidrive_run overwrite /tmp/bw.$$; then
+        cat /tmp/bo.$$ /tmp/bp.$$ /tmp/bx.$$ /tmp/bw.$$ > /tmp/ball.$$
         if command grep -v '^#' "$ROOT/guibehaviour-baseline.txt" | diff -u - /tmp/ball.$$ > /tmp/bd.$$; then
             bp=1
         else
@@ -742,7 +761,7 @@ elif make -s -C "$ROOT" B=build-fast SAN= SIGSAN= guidrive >/tmp/bdb.$$ 2>&1; th
         bf=1
         echo "  the driver did not finish -- it exits(1) on an out-of-range pool"
         echo "  position, which is how the Qt 6 clear() regression showed up:"
-        tail -6 /tmp/bo.$$ /tmp/bp.$$ | sed 's/^/    /'
+        tail -6 /tmp/bo.$$ /tmp/bp.$$ /tmp/bx.$$ /tmp/bw.$$ 2>/dev/null | sed 's/^/    /'
     fi
 
     # C7 pinned 21 validators to QLocale::c() with RejectGroupSeparator because
@@ -772,7 +791,16 @@ elif make -s -C "$ROOT" B=build-fast SAN= SIGSAN= guidrive >/tmp/bdb.$$ 2>&1; th
 else
     bf=1; echo "  guidrive did not build:"; head -5 /tmp/bdb.$$ | sed 's/^/    /'
 fi
-rm -f /tmp/bo.$$ /tmp/bp.$$ /tmp/bl.$$ /tmp/ball.$$ /tmp/bd.$$ /tmp/bdb.$$
+rm -f /tmp/bo.$$ /tmp/bp.$$ /tmp/bx.$$ /tmp/bw.$$ /tmp/bl.$$ /tmp/ball.$$ \
+      /tmp/bd.$$ /tmp/bdb.$$
+# exportall and overwrite WRITE FILES, 2.7 MB of them, the population export
+# being most of it. Fixed names, so they are overwritten rather than
+# accumulated, but leaving them in TMPDIR is untidy.
+rm -f "${TMPDIR:-/tmp}"/x11b-gpp.gpp "${TMPDIR:-/tmp}"/x11b-sip.sip \
+      "${TMPDIR:-/tmp}"/x11b-lap.lap "${TMPDIR:-/tmp}"/x11b-env.env \
+      "${TMPDIR:-/tmp}"/x11b-pop.pop "${TMPDIR:-/tmp}"/x11b-prg.prg \
+      "${TMPDIR:-/tmp}"/x11b-ind.ind "${TMPDIR:-/tmp}"/x11b-dat.dat \
+      "${TMPDIR:-/tmp}"/x11b-ow.sip
 printf '%-22s %2d pass  %2d fail\n' "gui behaviour" "$bp" "$bf"
 pass=$((pass+bp)); fail=$((fail+bf))
 

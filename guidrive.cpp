@@ -87,6 +87,7 @@
 #include <QContextMenuEvent>
 #include <QFile>
 #include <QFileInfo>
+#include <QCryptographicHash>
 extern "C" {
 #include "pvm3.h"
 }
@@ -1007,64 +1008,149 @@ static void probeAlphaSlider(QWidget *page)
     fflush(stdout);
 }
 
+// What an exported file IS, in a form that compares across architectures: the
+// size, a checksum, the line count and the ends. The 1.3 oracle can produce
+// the same four things on the 2003 box with sha256sum and sed.
+static void describeFile(const QString &out, const QString &stem)
+{
+    if (!QFile::exists(out)) {
+        // checkEnding() is supposed to append the extension. If the file
+        // landed WITHOUT it, say so rather than reporting a missing file.
+        // Basenames only: the scratch directory differs per machine and this
+        // output is diffed against a committed baseline.
+        if (QFile::exists(stem))
+            printf("  !! written WITHOUT the extension: [%s]\n",
+                   qPrintable(QFileInfo(stem).fileName()));
+        else
+            printf("  !! no file at [%s] and none at [%s]\n",
+                   qPrintable(QFileInfo(out).fileName()),
+                   qPrintable(QFileInfo(stem).fileName()));
+        fflush(stdout);
+        return;
+    }
+    QFile f(out);
+    if (!f.open(QIODevice::ReadOnly)) { printf("  !! cannot read it\n"); return; }
+    const QByteArray all = f.readAll();
+    f.close();
+    const QByteArray sum = QCryptographicHash::hash(all, QCryptographicHash::Sha256).toHex();
+    const QList<QByteArray> lines = all.split('\n');
+    // A trailing newline leaves an empty last element; report both so the
+    // oracle's `wc -l' and this agree on what is being counted.
+    printf("  bytes=%lld sha256=%s newlines=%d endsWithNewline=%d\n",
+           (long long)all.size(), sum.constData(), (int)all.count('\n'),
+           all.endsWith('\n') ? 1 : 0);
+    printf("  crCount=%d\n", (int)all.count('\r'));
+    for (int i = 0; i < 3 && i < lines.size(); ++i)
+        printf("  head%-2d [%s]\n", i, lines.at(i).constData());
+    int last = lines.size() - 1;
+    while (last > 0 && lines.at(last).isEmpty()) --last;
+    for (int i = qMax(0, last - 2); i <= last; ++i)
+        printf("  tail%-2d [%s]\n", i - last, lines.at(i).constData());
+    fflush(stdout);
+}
+
 // -------------------------------------------------------------------- steps
-// Type a path into a file dialog and accept it.
+// Hand a file dialog a path and accept it.
 //
-// THIS WAS THE INTERMITTENT HANG, and the cause is not what it looked like.
-// Seen four times while C11a was being written and then not reproducible in a
-// dozen runs; it is not new here either -- C10's openExperiment has the same
-// shape, so the C10 gate has been quietly flaky since it was written.
+// THIS WAS AN INTERMITTENT FAILURE FOR MOST OF C11a AND C11b, and three
+// diagnoses were wrong before the right one. Recording all three, because each
+// looked right and the last is not guessable from the first two:
 //
-// TWO WRONG DIAGNOSES, both recorded because each looked right:
-//  1. "The completer popup eats the Return." Plausible, and the popup is real,
-//     so the first fix escaped it and pressed Return again. That is WORSE than
-//     hanging: it reproduced during the fresh-eyes review and the dialog
-//     accepted with the completion's filename instead of the typed one, so the
-//     experiment silently did not load and the run carried on against an empty
-//     tree. A hang is loud; a wrong file is not.
-//  2. The actual cause, which only a printed diagnostic showed: QFileDialog
-//     NAVIGATES as a path with separators is typed, and strips the directory
-//     part out of the field as it goes. The field is then left holding just
-//     the basename, and Return resolves it against whichever directory the
-//     dialog has got to -- which is a race with the typing.
+//  1. "The completer popup eats the Return." The popup is real, so the first
+//     fix escaped it and pressed Return again. WORSE than the hang it fixed:
+//     it accepted with the completion's filename, so the experiment silently
+//     did not load and the run carried on against an empty tree.
+//  2. "The wait after Return is too short." It was not; polling until the
+//     dialog hid did not help.
+//  3. THE ACTUAL CAUSE. QFileDialog::accept() treats a filename that carries a
+//     DIRECTORY as a navigation request: it calls setDirectory() and RETURNS
+//     WITHOUT ACCEPTING, expecting a second accept once the listing is there.
+//     Whether one accept sufficed depended on whether the model had finished
+//     populating -- so it worked most of the time, which is the worst way for
+//     a race to behave: two of four recorded exportall runs lost one file
+//     each -- 2 exports out of 32 -- and which one moved between runs.
 //
-// So: type an ABSOLUTE path, which resolves the same wherever the dialog has
-// navigated to, and re-assert it before Return. Both the whole path and the
-// bare basename are the dialog behaving normally, so neither prints; anything
-// else does. The completer goes too -- one less thing to race with.
+// So the directory is set on the dialog FIRST and only the BASENAME is typed.
+// Then accept has nothing to navigate to and closes the dialog every time.
+// The typing is still real key events, which is the part under test; which
+// directory Qt's own dialog is looking at is not SIGEL behaviour, and section
+// 7 already accepts file-dialog differences.
 static void acceptFileDialog(QFileDialog *fd, const QString &path)
 {
     QLineEdit *le = fd->findChild<QLineEdit *>("fileNameEdit");
     if (!le) { printf("  !! no fileNameEdit\n"); fd->reject(); return; }
-    const QString abs  = QFileInfo(path).absoluteFilePath();
-    const QString base = QFileInfo(abs).fileName();
-    le->setCompleter(nullptr);
+    const QFileInfo fi(QFileInfo(path).absoluteFilePath());
+    fd->setDirectory(fi.absolutePath());
+    QTest::qWait(60);
+    le->setCompleter(nullptr);            // one less thing to race with
     le->setFocus();
     le->selectAll();
-    QTest::keyClicks(le, abs);           // real key events, one per character
-    QTest::qWait(120);
-    if (le->text() != abs && le->text() != base)
+    QTest::keyClick(le, Qt::Key_Delete);
+    QTest::keyClicks(le, fi.fileName());  // real key events, one per character
+    QTest::qWait(60);
+    if (le->text() != fi.fileName()) {
         printf("  [filedialog] typed [%s] but the field holds [%s]\n",
-               qPrintable(abs), qPrintable(le->text()));
-    le->setText(abs);                    // unconditional: kills the race
-    QTest::keyClick(le, Qt::Key_Return);
-    QTest::qWait(150);
-    if (!fd->isVisible()) return;
-
-    // If this ever prints, something changed in Qt's dialog and the run should
-    // be looked at rather than trusted.
-    printf("  [filedialog] still open after Return; clicking accept\n");
-    for (QPushButton *b : fd->findChildren<QPushButton *>())
-        if (b->isDefault() && b->isEnabled()) {
-            QTest::mouseClick(b, Qt::LeftButton, Qt::NoModifier, b->rect().center());
-            break;
-        }
-    QTest::qWait(150);
-    if (fd->isVisible()) {
-        printf("  [filedialog] STILL open -- rejecting it\n");
-        fd->reject();
+               qPrintable(fi.fileName()), qPrintable(le->text()));
+        le->setText(fi.fileName());
     }
+    QPushButton *accept = nullptr;
+    for (QPushButton *b : fd->findChildren<QPushButton *>())
+        if (b->isDefault() && b->isEnabled()) { accept = b; break; }
+    if (accept)
+        QTest::mouseClick(accept, Qt::LeftButton, Qt::NoModifier, accept->rect().center());
+    else
+        QTest::keyClick(le, Qt::Key_Return);
+    for (int i = 0; i < 40 && fd->isVisible(); ++i) QTest::qWait(50);
+    if (!fd->isVisible()) return;
+    // Still open because something MODAL is on top of it -- Qt's own overwrite
+    // confirmation is the case that happens -- is not the dialog failing to
+    // accept. Leave it to whoever armed the next handler.
+    if (QApplication::activeModalWidget() != fd) return;
+    printf("  [filedialog] STILL open after clicking accept -- rejecting it\n");
+    fd->reject();
     fflush(stdout);
+}
+
+// File > Export > <item>, answering the save dialog with `stem' -- no
+// extension, because checkEnding() appends one and whether it does is part of
+// what C11b measures. Returns the path that should have appeared.
+static QString exportTo(const char *item, const QString &stem, const char *ext)
+{
+    const QString out = stem + "." + QString::fromLatin1(ext);
+    QFile::remove(out);
+    QFile::remove(stem);
+    whenModal([stem](QWidget *m) {
+        QFileDialog *fd = qobject_cast<QFileDialog *>(m);
+        if (!fd) { printf("  !! export modal is not a QFileDialog: %s\n",
+                          m->metaObject()->className()); m->close(); return; }
+        acceptFileDialog(fd, stem);
+    });
+    if (!clickMenu("&File", "Export", QString::fromLatin1(item))) return QString();
+    QTest::qWait(2500);
+    return out;
+}
+
+static bool importFrom(const char *item, const QString &path)
+{
+    whenModal([path](QWidget *m) {
+        QFileDialog *fd = qobject_cast<QFileDialog *>(m);
+        if (!fd) { printf("  !! import modal is not a QFileDialog: %s [%s]\n",
+                          m->metaObject()->className(), qPrintable(m->windowTitle()));
+                   m->close(); return; }
+        acceptFileDialog(fd, path);
+    });
+    if (!clickMenu("&File", "Import", QString::fromLatin1(item))) return false;
+    QTest::qWait(2500);
+    return true;
+}
+
+static QString sha256Of(const QString &path)
+{
+    QFile f(path);
+    if (!f.open(QIODevice::ReadOnly)) return QStringLiteral("(unreadable)");
+    const QByteArray sum =
+        QCryptographicHash::hash(f.readAll(), QCryptographicHash::Sha256).toHex();
+    return QString::fromLatin1(sum);
 }
 
 static void openExperiment(const QString &path)
@@ -1445,6 +1531,279 @@ int main(int argc, char **argv)
         }
         printf("== %d lines ==\n", n);
         fflush(stdout);
+        return 0;
+    }
+
+    // --- every File > Export child --------------------------------------
+    // C11b. C10 drove ONE of the sixteen Import/Export children. These are
+    // FILE FORMATS, so the comparison is bytes rather than a rendered widget
+    // -- the one kind of check i386-x87 versus aarch64-IEEE cannot muddy, and
+    // the reason this item was ordered ahead of the dialogs.
+    if (scenario == "exportall") {
+        struct Item { const char *menu; const char *ext; bool needsIndividual; };
+        static const Item items[] = {
+            { "GP-Parameters",         "gpp", false },
+            { "Simulation-Parameters", "sip", false },
+            { "Language-Parameters",   "lap", false },
+            { "Environment",           "env", false },
+            { "Population",            "pop", false },
+            { "Program",               "prg", true  },
+            { "Individual",            "ind", true  },
+            { "...to GNU plot",        "dat", false },
+        };
+
+        // Program and Individual export whatever is SELECTED, so pick a named
+        // individual -- the same 55658 C10 used, so the two steps compare.
+        QTreeWidget *t = indList();
+        if (!t) { printf("!! no individuals list\n"); return 1; }
+        int want = -1;
+        for (int i = 0; i < t->topLevelItemCount(); ++i)
+            if (t->topLevelItem(i)->text(0) == "55658") { want = i; break; }
+        if (want < 0) { printf("!! individual 55658 not found\n"); return 1; }
+        clickRow(t, want);
+        printf("\n== EXPORT ALL ==\nselected=%s\n",
+               qPrintable(t->topLevelItem(want)->text(0)));
+
+        for (const Item &it : items) {
+            // Deliberately give a name with NO extension: checkEnding() is
+            // supposed to append one, and that is behaviour worth diffing.
+            const QString stem = scratch() + "/x11b-" + QString::fromLatin1(it.ext);
+            const QString out  = stem + "." + QString::fromLatin1(it.ext);
+            QFile::remove(out);
+            QFile::remove(stem);
+            printf("\n-- Export > %s\n", it.menu);
+            whenModal([stem](QWidget *m) {
+                QFileDialog *fd = qobject_cast<QFileDialog *>(m);
+                if (!fd) { printf("  !! modal is not a QFileDialog: %s\n",
+                                  m->metaObject()->className()); m->close(); return; }
+                printf("  [dialog] title=[%s] filters=[%s] accept=[%s]\n",
+                       qPrintable(fd->windowTitle()),
+                       qPrintable(fd->nameFilters().join(" ;; ")),
+                       qPrintable(fd->labelText(QFileDialog::Accept)));
+                acceptFileDialog(fd, stem);
+            });
+            if (!clickMenu("&File", "Export", QString::fromLatin1(it.menu))) continue;
+            QTest::qWait(2500);
+            describeFile(out, stem);
+        }
+        return 0;
+    }
+
+    // --- the round trip: export, import it back, export again -------------
+    // The strongest shape a check can take here. If writer and reader agree,
+    // the second export is byte-identical to the first; if they disagree the
+    // sha256 moves, and it moves whether the disagreement is a dropped field,
+    // a reordered container or a changed number. It needs no oracle to be
+    // useful -- though the oracle's copies of the first exports are what say
+    // the format itself matches 1.3 rather than merely being self-consistent.
+    if (scenario == "roundtrip") {
+        struct Item { const char *menu; const char *ext; };
+        static const Item items[] = {
+            { "GP-Parameters",         "gpp" },
+            { "Simulation-Parameters", "sip" },
+            { "Language-Parameters",   "lap" },
+            { "Environment",           "env" },
+            { "Population",            "pop" },
+        };
+        printf("\n== ROUND TRIP ==\n");
+        for (const Item &it : items) {
+            const QString a = scratch() + "/rt-a-" + QString::fromLatin1(it.ext);
+            const QString b = scratch() + "/rt-b-" + QString::fromLatin1(it.ext);
+            printf("\n-- %s\n", it.menu);
+            const QString fa = exportTo(it.menu, a, it.ext);
+            if (fa.isEmpty() || !QFile::exists(fa)) { printf("  !! first export failed\n"); continue; }
+            const QString sa = sha256Of(fa);
+            if (!importFrom(it.menu, fa)) { printf("  !! import failed\n"); continue; }
+            const QString fb = exportTo(it.menu, b, it.ext);
+            if (fb.isEmpty() || !QFile::exists(fb)) { printf("  !! second export failed\n"); continue; }
+            const QString sb = sha256Of(fb);
+            printf("  export1 %lld bytes  %s\n", QFileInfo(fa).size(), qPrintable(sa));
+            printf("  export2 %lld bytes  %s\n", QFileInfo(fb).size(), qPrintable(sb));
+            printf("  ROUND TRIP %s\n", sa == sb ? "STABLE" : "*** CHANGED ***");
+            fflush(stdout);
+        }
+
+        // Robot import is the odd one out: there is no Export > Robot, so it
+        // cannot round-trip through itself. Import the experiment's OWN robot
+        // and check nothing moves -- the robot the file already names.
+        printf("\n-- Robot (import only; there is no Export > Robot)\n");
+        const QString lapBefore = exportTo("Language-Parameters",
+                                           scratch() + "/rt-rob-before", "lap");
+        const QString before = lapBefore.isEmpty() ? QString() : sha256Of(lapBefore);
+        const QString rrb = QStringLiteral("data-reordered/twoBases/twoBases.rrb");
+        printf("  importing %s (exists=%d)\n", qPrintable(rrb), QFile::exists(rrb));
+        importFrom("Robot", QFileInfo(rrb).absoluteFilePath());
+        clickMenu("&View", "&Robot");
+        QTest::qWait(300);
+        if (QStackedWidget *st = W->findChild<QStackedWidget *>())
+            if (QWidget *pg = st->currentWidget())
+                for (QListWidget *lw : pg->findChildren<QListWidget *>())
+                    printf("  list %-22s count=%d\n", qPrintable(lw->objectName()), lw->count());
+        const QString lapAfter = exportTo("Language-Parameters",
+                                          scratch() + "/rt-rob-after", "lap");
+        const QString after = lapAfter.isEmpty() ? QString() : sha256Of(lapAfter);
+        printf("  language-parameters before %s\n  language-parameters after  %s\n",
+               qPrintable(before), qPrintable(after));
+        printf("  ROBOT IMPORT %s\n",
+               before == after ? "left the language parameters alone"
+                               : "*** CHANGED the language parameters ***");
+
+        // Program and Individual import differ, and the difference is the
+        // point: slotImportProgram REPLACES the selected individual's program
+        // (SIG_AllIndividualsView.cpp:486, importProgram on the selected item),
+        // while slotImportIndividual adds a new one. So +0 for Program is
+        // correct and a +1 there would be the defect. Program therefore gets
+        // the real round trip -- export, import into the same individual,
+        // export again -- and Individual gets the row count.
+        printf("\n-- Program import (replaces the selected individual's program)\n");
+        {
+            QTreeWidget *tl = indList();
+            int row = -1;
+            for (int i = 0; tl && i < tl->topLevelItemCount(); ++i)
+                if (tl->topLevelItem(i)->text(0) == "55658") { row = i; break; }
+            if (row < 0) printf("  !! 55658 not found\n");
+            else {
+                clickRow(tl, row);
+                const QString a1 = exportTo("Program", scratch() + "/rt-prg-a", "prg");
+                const int before = tl->topLevelItemCount();
+                if (!a1.isEmpty() && QFile::exists(a1)) {
+                    importFrom("Program", a1);
+                    clickMenu("&View", "&Population");
+                    QTest::qWait(300);
+                    tl = indList();
+                    for (int i = 0; tl && i < tl->topLevelItemCount(); ++i)
+                        if (tl->topLevelItem(i)->text(0) == "55658") { clickRow(tl, i); break; }
+                    const QString b1 = exportTo("Program", scratch() + "/rt-prg-b", "prg");
+                    printf("  rows %d -> %d (delta %+d, 0 is correct -- it replaces)\n",
+                           before, tl ? tl->topLevelItemCount() : -1,
+                           (tl ? tl->topLevelItemCount() : 0) - before);
+                    printf("  export1 %s\n  export2 %s\n", qPrintable(sha256Of(a1)),
+                           qPrintable(sha256Of(b1)));
+                    printf("  ROUND TRIP %s\n",
+                           sha256Of(a1) == sha256Of(b1) ? "STABLE" : "*** CHANGED ***");
+                }
+            }
+        }
+
+        printf("\n-- Individual import (adds one)\n");
+        {
+            QTreeWidget *tl = indList();
+            int row = -1;
+            for (int i = 0; tl && i < tl->topLevelItemCount(); ++i)
+                if (tl->topLevelItem(i)->text(0) == "55658") { row = i; break; }
+            if (row >= 0) clickRow(tl, row);
+            const QString a1 = exportTo("Individual", scratch() + "/rt-ind-a", "ind");
+            const int before = tl ? tl->topLevelItemCount() : -1;
+            if (!a1.isEmpty() && QFile::exists(a1)) {
+                importFrom("Individual", a1);
+                clickMenu("&View", "&Population");
+                QTest::qWait(300);
+                tl = indList();
+                const int after = tl ? tl->topLevelItemCount() : -1;
+                printf("  rows %d -> %d (delta %+d)\n", before, after, after - before);
+                // Where does the newcomer land, and is it a copy of 55658?
+                int copies = 0;
+                for (int i = 0; tl && i < tl->topLevelItemCount(); ++i)
+                    if (tl->topLevelItem(i)->text(0) == "55658") ++copies;
+                printf("  individuals now named 55658: %d\n", copies);
+                if (tl && after > 0) {
+                    QTreeWidgetItem *last = tl->topLevelItem(after - 1);
+                    printf("  last row: %s | %s | %s\n", qPrintable(last->text(0)),
+                           qPrintable(last->text(1)), qPrintable(last->text(2)));
+                }
+            }
+        }
+        fflush(stdout);
+        return 0;
+    }
+
+    // --- the overwrite prompt, which 1.3 asks and then ignores -------------
+    // Every one of the five parameter exports is shaped
+    //     if ( file.exists() ) switch ( warning(...) ) { case Yes: write; }
+    //     write;                                   <-- NOT in the switch
+    // so answering NO writes the file anyway, and answering YES writes it
+    // twice. Verified byte-for-byte against the pristine 1.3 source, so it is
+    // 1.3's defect and the port must keep it. Nothing has ever driven it on
+    // either side, because C10's only export went to a fresh path each time.
+    if (scenario == "overwrite") {
+        const QString stem = scratch() + "/x11b-ow";
+        const QString out  = stem + ".sip";
+        QFile::remove(out);
+        printf("\n== OVERWRITE ==\n");
+
+        // 1. first export -- the file does not exist, so no prompt is due.
+        whenModal([stem](QWidget *m) {
+            QFileDialog *fd = qobject_cast<QFileDialog *>(m);
+            if (fd) acceptFileDialog(fd, stem); else m->close();
+        });
+        clickMenu("&File", "Export", "Simulation-Parameters");
+        QTest::qWait(2500);
+        printf("  [first export] exists=%d size=%lld\n", QFile::exists(out),
+               QFileInfo(out).size());
+
+        // 2. make the file recognisably different, then export over it and
+        //    answer NO. If the file comes back to the exported content, the
+        //    answer was ignored -- which is what 1.3 does.
+        QFile f(out);
+        if (f.open(QIODevice::WriteOnly)) { f.write("SENTINEL\n"); f.close(); }
+        printf("  [overwritten with sentinel] size=%lld\n", QFileInfo(out).size());
+
+        int dialogs = 0;
+        // Two modals are possible now: Qt 6's own getSaveFileName overwrite
+        // confirmation, which Qt 2 did NOT have, and then SIGEL's. Count them.
+        std::function<void(QWidget *)> handler = [&](QWidget *m) {
+            ++dialogs;
+            QMessageBox *mb = qobject_cast<QMessageBox *>(m);
+            QFileDialog *fd = qobject_cast<QFileDialog *>(m);
+            printf("  [modal %d] class=%s title=[%s]%s\n", dialogs,
+                   m->metaObject()->className(), qPrintable(m->windowTitle()),
+                   mb ? "" : "");
+            if (fd) { acceptFileDialog(fd, stem); whenModal(handler, 4000); return; }
+            if (mb) {
+                // The box quotes the full path, which is machine-specific and
+                // cannot go in a committed baseline. Strip the scratch prefix.
+                QString t = mb->text();
+                t.replace(scratch(), QStringLiteral("<scratch>"));
+                printf("    text=[%s]\n", qPrintable(t));
+                for (QAbstractButton *b : mb->buttons())
+                    printf("    button [%s] default=%d\n", qPrintable(b->text()),
+                           b == mb->defaultButton());
+                printf("  [answering] No\n");
+                fflush(stdout);
+                clickMsgButton(m, QMessageBox::No);
+                whenModal(handler, 4000);
+                return;
+            }
+            m->close();
+        };
+        whenModal(handler);
+        clickMenu("&File", "Export", "Simulation-Parameters");
+        QTest::qWait(4000);
+        cancelModalHandler();
+
+        QFile g(out);
+        QString head;
+        if (g.open(QIODevice::ReadOnly)) { head = QString::fromLatin1(g.readLine()).trimmed(); g.close(); }
+        printf("  [modals seen] %d\n", dialogs);
+        printf("  [after answering NO] size=%lld firstLine=[%s] sentinelSurvived=%d\n",
+               QFileInfo(out).size(), qPrintable(head), head == "SENTINEL" ? 1 : 0);
+        printf("  (1.3 writes the file regardless of the answer -- the write after\n"
+               "   the switch is not inside it. sentinelSurvived=0 is 1.3's defect,\n"
+               "   preserved. A 1 would mean the port started honouring the prompt.)\n");
+        fflush(stdout);
+
+        // The extension case is NOT driven here, deliberately. Above, the
+        // name given to the dialog was `x11b-ow' while the file on disk is
+        // `x11b-ow.sip' -- checkEnding() appends the extension AFTER the
+        // dialog closes -- so Qt's own overwrite check had nothing to fire on
+        // and exactly two modals appeared. Typing the extension makes Qt 6's
+        // getSaveFileName raise its own confirmation INSIDE accept(), with an
+        // exec() that nests in the Return keystroke; driving that through the
+        // menu needs a handler armed inside a nested loop and an earlier
+        // attempt at it looped 27 times before the watchdog. The question it
+        // was asking -- does Qt 6 confirm where Qt 2 did not -- is answered
+        // directly by a five-line probe against QFileDialog, and the answer is
+        // in PORTING.md's C11b section. Not worth a nested-modal harness.
         return 0;
     }
 

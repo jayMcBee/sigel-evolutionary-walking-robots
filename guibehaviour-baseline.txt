@@ -715,3 +715,375 @@ we do with the system?]
     after 200 Up on Crossover    mut=250   cro=750   rep=0      lcd 25 / 75 / 0  sum=1000
     after 200 Down on Mutation   mut=50    cro=750   rep=200    lcd 5 / 75 / 20  sum=1000
     after dragging Mutation hard right mut=250   cro=750   rep=0      lcd 25 / 75 / 0  sum=1000
+#
+# ---------------------------------------------------------------------------
+# From here on: PORTING.md step C11b, the Import/Export round trips.
+#
+# C10 drove ONE of the sixteen Import/Export children. These are FILE FORMATS,
+# so the comparison is bytes -- the one kind of check i386-x87 against
+# aarch64-IEEE cannot muddy, which is why this item was ordered ahead of the
+# dialogs.
+#
+# SEVEN OF THE EIGHT EXPORTS ARE BYTE-IDENTICAL TO WHAT THE 2003 i386 BINARY
+# WRITES. The sigel-x86 oracle drove the same eight exports on 1.3 with XTest
+# against the same experiment with the same individual selected, and compared
+# sha256, byte count, LF count, CR count and the trailing byte. So a move in
+# any checksum below is a regression against 1.3, not against yesterday.
+#
+#   .gpp .sip .env .pop .prg .ind .dat   identical
+#   .lap                                 differs, and the reason is below
+#
+# The .dat is the one worth pausing on: 532 lines of floating-point output --
+# generation, best, worst, average -- byte-identical across the two
+# architectures. That was NOT expected and is a stronger result than the
+# parameter files, which are text.
+#
+# .pop and .ind do NOT end with a newline. Measured on both sides.
+#
+# WHY .lap DIFFERS, and why the port is not the one that is wrong. 1.3 held the
+# commands in a QDict and wrote them with a QDictIterator, so it emits them in
+# HASH order; Phase D replaced that with an ordered QList, so the port emits
+# the order the file supplied. Loading twoBasesSimpleFitness2.exp and exporting
+# straight back, 1.3 returns a DIFFERENT order from the one it read -- exactly
+# four pairwise swaps, MOVE/CMP, SUB/DIV, MIN/ADD and MOD/MAX, the four chains
+# that collide -- because Q2Dict::insert prepends and re-inserting in iteration
+# order reverses every colliding chain. The port preserves what it read. That
+# is Phase D's documented consequence, not a C11b defect: "once the shim goes,
+# load and save become order-preserving".
+#
+# THE OVERWRITE PROMPT IS A 1.3 DEFECT AND IS PRESERVED. All five parameter
+# exports are shaped
+#     if ( file.exists() ) switch ( warning(...) ) { case Yes: write; }
+#     write;                                    <-- NOT inside the switch
+# so answering NO writes the file anyway. Verified in the PRISTINE 1.3 source
+# and then on the RUNNING binary: the oracle wrote a sentinel over an exported
+# file, exported again, answered No, and the sentinel was gone. The line that
+# guards it here is `sentinelSurvived=0'. A 1 would mean the port had started
+# honouring the prompt -- an improvement, and a divergence.
+#
+# Two dialogs appear, not three. Qt 6's getSaveFileName raises its own
+# "already exists" confirmation where Qt 2's had none, but it cannot fire here:
+# the name typed carries no extension, checkEnding() appends it AFTER the
+# dialog has closed, so Qt's check sees a name that does not exist. Typing the
+# extension does produce Qt's extra box; that is a file-dialog difference and
+# section 7 already accepts those.
+#
+# QTest IS NOT A MOUSE -- see the C11a note above. The oracle's side was driven
+# by real XTest, so every comparison here has a genuine click on one end.
+# ---------------------------------------------------------------------------
+== SCENARIO exportall ==
+
+== STEP 1: fresh start, no experiment ==
+  [title] SIGEL
+  [tree] header=[Experiments] topLevel=0
+  [page] count=1 current=QLabel objectName=[baseWidget]
+  [action changes] none
+  [modal] class=QFileDialog title=[Load Experiments...]
+  [filedialog] title=[Load Experiments...] mode=3 nameFilters=[Experiment Files (*.exp) ;; All Files (*)] labelAccept=[&Open]
+
+== STEP 2: after File > Open Experiment ==
+  [title] SIGEL
+  [tree] header=[Experiments] topLevel=1
+      twoBasesSimpleFitness2.exp sel=1 exp=1 cur=1 selectable=1
+        Individuals              sel=0 exp=0 cur=0 selectable=1
+        Robot                    sel=0 exp=1 cur=0 selectable=1
+          Language-Parameters      sel=0 exp=0 cur=0 selectable=1
+        GP-Parameters            sel=0 exp=0 cur=0 selectable=1
+        Simulation-Parameters    sel=0 exp=0 cur=0 selectable=1
+        Environment              sel=0 exp=0 cur=0 selectable=1
+  [page] count=8 current=SIGEL_MasterGUI::SIG_ExperimentView objectName=[ExperimentView]
+  [widgets]
+    group    [Evolution controls] enabled=1
+    group    [Fitnesscurve] enabled=1
+    group    [Experiment properties] enabled=1
+    button   [&Start] enabled=1 checkable=0 checked=0
+    button   [S&top] enabled=0 checkable=0 checked=0
+    button   [Show in GNU-Plot] enabled=1 checkable=0 checked=0
+    button   [Export PostScript] enabled=1 checkable=0 checked=0
+    check    [Save the history] enabled=1 checkable=1 checked=1
+    lcd      [lcdnumberGenerations] value=532 digits=4
+    lcd      [lcdnumberAutosave] value=0 digits=4
+    slider   [sliderIntervall] value=0 min=0 max=100 enabled=1
+    progress [generationProgBar] value=-1 min=0 max=100
+  [action changes]
+    &File/&Delete Experiment                                   ENABLED
+    &File/&Rename Experiment                                   ENABLED
+    &File/&Save Experiment                                     ENABLED
+    &File>Export/...to GNU plot                                ENABLED
+    &File>Export/Environment                                   ENABLED
+    &File>Export/GP-Parameters                                 ENABLED
+    &File>Export/Individual                                    ENABLED
+    &File>Export/Language-Parameters                           ENABLED
+    &File>Export/Population                                    ENABLED
+    &File>Export/Program                                       ENABLED
+    &File>Export/Simulation-Parameters                         ENABLED
+    &File>Import/Environment                                   ENABLED
+    &File>Import/GP-Parameters                                 ENABLED
+    &File>Import/Individual                                    ENABLED
+    &File>Import/Language-Parameters                           ENABLED
+    &File>Import/Population                                    ENABLED
+    &File>Import/Program                                       ENABLED
+    &File>Import/Robot                                         ENABLED
+    &File>Import/Simulation-Parameters                         ENABLED
+    &Individuals/&Add                                          ENABLED
+    &Individuals/&Delete                                       ENABLED
+    &Individuals/&Visualize                                    ENABLED
+    &Individuals/Reset                                         ENABLED
+    &MetaGP/&Use MetaGP                                        ENABLED
+    &View/&Environment                                         ENABLED
+    &View/&GP Parameters                                       ENABLED
+    &View/&Language Parameters                                 ENABLED
+    &View/&Population                                          ENABLED
+    &View/&Robot                                               ENABLED
+    &View/&Simulation Parameters                               ENABLED
+    TB:fileToolbar/&Delete Experiment                          ENABLED
+    TB:fileToolbar/&Save Experiment                            ENABLED
+    TB:individualsToolBar/&Add                                 ENABLED
+    TB:individualsToolBar/&Delete                              ENABLED
+    TB:individualsToolBar/&Visualize                           ENABLED
+    TB:mtToolbar/&Use MetaGP                                   ENABLED
+    TB:viewToolBar/&Environment                                ENABLED
+    TB:viewToolBar/&GP Parameters                              ENABLED
+    TB:viewToolBar/&Language Parameters                        ENABLED
+    TB:viewToolBar/&Population                                 ENABLED
+    TB:viewToolBar/&Robot                                      ENABLED
+    TB:viewToolBar/&Simulation Parameters                      ENABLED
+
+== STEP 3: after View > Population ==
+  [title] SIGEL
+  [tree] header=[Experiments] topLevel=1
+      twoBasesSimpleFitness2.exp sel=0 exp=1 cur=0 selectable=1
+        Individuals              sel=1 exp=0 cur=1 selectable=1
+        Robot                    sel=0 exp=1 cur=0 selectable=1
+          Language-Parameters      sel=0 exp=0 cur=0 selectable=1
+        GP-Parameters            sel=0 exp=0 cur=0 selectable=1
+        Simulation-Parameters    sel=0 exp=0 cur=0 selectable=1
+        Environment              sel=0 exp=0 cur=0 selectable=1
+  [page] count=8 current=SIGEL_MasterGUI::SIG_AllIndividualsView objectName=[]
+  [individuals] rows=120 cols=3 headers=[Name               ][Fitness          ][Age               ] selected=0
+    row0  | 55658         | 1.14825       | 111           | sel=0
+    row1  | 56091         | 1.14825       | 109           | sel=0
+    row2  | 56248         | 1.14825       | 259           | sel=0
+    row3  | 56349         | 1.06261       | 97            | sel=0
+    row4  | 56432         | 1.14825       | 111           | sel=0
+    row5  | 56447         | 1.14825       | 107           | sel=0
+    ... 114 more
+  [action changes] none
+
+== EXPORT ALL ==
+selected=55658
+
+-- Export > GP-Parameters
+  [modal] class=QFileDialog title=[Export GP Parameter...]
+  [dialog] title=[Export GP Parameter...] filters=[GP Parameter Files (*.gpp) ;; All Files (*)] accept=[&Save]
+  bytes=1299 sha256=88e851e2b9d1b23185bf453c6c99cdc581be01d2547961c6fdb50fc3c6873234 newlines=101 endsWithNewline=1
+  crCount=0
+  head0  [RANDOMSEED]
+  head1  [0]
+  head2  [MININDLENGTH]
+  tail-2 [eiche 2 1 "/home/pg368b/ross/projects/sigel"]
+  tail-1 [PVMHOST]
+  tail0  [herz 2 1 "/home/pg368b/ross/projects/sigel"]
+
+-- Export > Simulation-Parameters
+  [modal] class=QFileDialog title=[Export Simulation Parameters...]
+  [dialog] title=[Export Simulation Parameters...] filters=[Simulation Parameter Files (*.sip) ;; All Files (*)] accept=[&Save]
+  bytes=305 sha256=c672eeabd54245663e8a308d68cdec2343a0b66840426cf4d7648606e1a1df10 newlines=35 endsWithNewline=1
+  crCount=0
+  head0  [TIMETOSIMULATE]
+  head1  [0]
+  head2  [3]
+  tail-2 [2500]
+  tail-1 [JOINTFRICTIONU_C]
+  tail0  [0.35]
+
+-- Export > Language-Parameters
+  [modal] class=QFileDialog title=[Export Language Parameters...]
+  [dialog] title=[Export Language Parameters...] filters=[Language Parameter Files (*.lap) ;; All Files (*)] accept=[&Save]
+  bytes=401 sha256=e40ca1caa26dd424faf1eca7d336b16e963a714a8c95b059dabed79a3ce72af0 newlines=14 endsWithNewline=1
+  crCount=0
+  head0  [LanguageParameters 3 8 5000 13]
+  head1  [MUL CommandParameters 0.001]
+  head2  [MOVE CommandParameters 0.01]
+  tail-2 [ADD CommandParameters 0.001]
+  tail-1 [MOD CommandParameters 0.001]
+  tail0  [MAX CommandParameters 0.001]
+
+-- Export > Environment
+  [modal] class=QFileDialog title=[Export Environment...]
+  [dialog] title=[Export Environment...] filters=[Environment Files (*.env) ;; All Files (*)] accept=[&Save]
+  bytes=299 sha256=383d1f4f142ff26bff698d9a62e73a441154d8d0329bc36b1ae560935b1f73b1 newlines=43 endsWithNewline=1
+  crCount=0
+  head0  [YPLANELEVEL]
+  head1  [0]
+  head2  [VELODAMPING]
+  tail-2 [1.5]
+  tail-1 [UKFcoeff]
+  tail0  [1]
+
+-- Export > Population
+  [modal] class=QFileDialog title=[Export Population...]
+  [dialog] title=[Export Population...] filters=[Population files (*.pop) ;; All Files (*)] accept=[&Save]
+  bytes=2738900 sha256=ccca841d6b6b4be23e9004c555c4a0a9b64f399c582f0a25a65aed0b1cdb5ad5 newlines=133076 endsWithNewline=0
+  crCount=0
+  head0  [WITHHISTORY]
+  head1  [1]
+  head2  []
+  tail-2 [  }INDIVIDUAL(119) END;]
+  tail-1 []
+  tail0  [}POPULATION END]
+
+-- Export > Program
+  [modal] class=QFileDialog title=[Export program...]
+  [dialog] title=[Export program...] filters=[Program files (*.prg) ;; All Files (*)] accept=[&Save]
+  bytes=6616 sha256=f940751765c869f16f62333dafd34dbe0e66b6474577bf4209e9e8de70cc3214 newlines=299 endsWithNewline=1
+  crCount=0
+  head0  [       MOD -19712,-1602]
+  head1  [       CMP -6459,30784]
+  head2  [       MOVE -7329]
+  tail-2 [       SENSE 29660]
+  tail-1 [       SENSE -22046]
+  tail0  [       MOD -22082,24751]
+
+-- Export > Individual
+  [modal] class=QFileDialog title=[Export individual...]
+  [dialog] title=[Export individual...] filters=[Individual files (*.ind) ;; All Files (*)] accept=[&Save]
+  bytes=22113 sha256=3e56bf03233a1603bf26671262cebbe7b4fa37dee4cff7a8d5fe1048916e2138 newlines=1076 endsWithNewline=0
+  crCount=0
+  head0  []
+  head1  [    INDIVIDUAL BEGIN{ ]
+  head2  [      NAME='55658';]
+  tail-2 [       MOD -22082,24751]
+  tail-1 [        }PROGRAM END;]
+  tail0  [    }INDIVIDUAL END]
+
+-- Export > ...to GNU plot
+  [modal] class=QFileDialog title=[Export to GNU plot...]
+  [dialog] title=[Export to GNU plot...] filters=[GNU plot data file (*.dat) ;; All Files (*)] accept=[&Save]
+  bytes=17420 sha256=7f5c3162ee74483fe925badf413bbba23e1f50bf3e6dc8a6a81d10fe96591a3f newlines=532 endsWithNewline=1
+  crCount=0
+  head0  [1 0.00112766 6.99488e-06 0.000109007]
+  head1  [2 0.0774405 6.99488e-06 0.00136046]
+  head2  [3 0.0774405 2.18826e-05 0.00146899]
+  tail-2 [530 1.14825 3.87891e-05 0.43338]
+  tail-1 [531 1.14825 4.19675e-05 0.413908]
+  tail0  [532 1.14825 2.34536e-05 0.382249]
+== SCENARIO overwrite ==
+
+== STEP 1: fresh start, no experiment ==
+  [title] SIGEL
+  [tree] header=[Experiments] topLevel=0
+  [page] count=1 current=QLabel objectName=[baseWidget]
+  [action changes] none
+  [modal] class=QFileDialog title=[Load Experiments...]
+  [filedialog] title=[Load Experiments...] mode=3 nameFilters=[Experiment Files (*.exp) ;; All Files (*)] labelAccept=[&Open]
+
+== STEP 2: after File > Open Experiment ==
+  [title] SIGEL
+  [tree] header=[Experiments] topLevel=1
+      twoBasesSimpleFitness2.exp sel=1 exp=1 cur=1 selectable=1
+        Individuals              sel=0 exp=0 cur=0 selectable=1
+        Robot                    sel=0 exp=1 cur=0 selectable=1
+          Language-Parameters      sel=0 exp=0 cur=0 selectable=1
+        GP-Parameters            sel=0 exp=0 cur=0 selectable=1
+        Simulation-Parameters    sel=0 exp=0 cur=0 selectable=1
+        Environment              sel=0 exp=0 cur=0 selectable=1
+  [page] count=8 current=SIGEL_MasterGUI::SIG_ExperimentView objectName=[ExperimentView]
+  [widgets]
+    group    [Evolution controls] enabled=1
+    group    [Fitnesscurve] enabled=1
+    group    [Experiment properties] enabled=1
+    button   [&Start] enabled=1 checkable=0 checked=0
+    button   [S&top] enabled=0 checkable=0 checked=0
+    button   [Show in GNU-Plot] enabled=1 checkable=0 checked=0
+    button   [Export PostScript] enabled=1 checkable=0 checked=0
+    check    [Save the history] enabled=1 checkable=1 checked=1
+    lcd      [lcdnumberGenerations] value=532 digits=4
+    lcd      [lcdnumberAutosave] value=0 digits=4
+    slider   [sliderIntervall] value=0 min=0 max=100 enabled=1
+    progress [generationProgBar] value=-1 min=0 max=100
+  [action changes]
+    &File/&Delete Experiment                                   ENABLED
+    &File/&Rename Experiment                                   ENABLED
+    &File/&Save Experiment                                     ENABLED
+    &File>Export/...to GNU plot                                ENABLED
+    &File>Export/Environment                                   ENABLED
+    &File>Export/GP-Parameters                                 ENABLED
+    &File>Export/Individual                                    ENABLED
+    &File>Export/Language-Parameters                           ENABLED
+    &File>Export/Population                                    ENABLED
+    &File>Export/Program                                       ENABLED
+    &File>Export/Simulation-Parameters                         ENABLED
+    &File>Import/Environment                                   ENABLED
+    &File>Import/GP-Parameters                                 ENABLED
+    &File>Import/Individual                                    ENABLED
+    &File>Import/Language-Parameters                           ENABLED
+    &File>Import/Population                                    ENABLED
+    &File>Import/Program                                       ENABLED
+    &File>Import/Robot                                         ENABLED
+    &File>Import/Simulation-Parameters                         ENABLED
+    &Individuals/&Add                                          ENABLED
+    &Individuals/&Delete                                       ENABLED
+    &Individuals/&Visualize                                    ENABLED
+    &Individuals/Reset                                         ENABLED
+    &MetaGP/&Use MetaGP                                        ENABLED
+    &View/&Environment                                         ENABLED
+    &View/&GP Parameters                                       ENABLED
+    &View/&Language Parameters                                 ENABLED
+    &View/&Population                                          ENABLED
+    &View/&Robot                                               ENABLED
+    &View/&Simulation Parameters                               ENABLED
+    TB:fileToolbar/&Delete Experiment                          ENABLED
+    TB:fileToolbar/&Save Experiment                            ENABLED
+    TB:individualsToolBar/&Add                                 ENABLED
+    TB:individualsToolBar/&Delete                              ENABLED
+    TB:individualsToolBar/&Visualize                           ENABLED
+    TB:mtToolbar/&Use MetaGP                                   ENABLED
+    TB:viewToolBar/&Environment                                ENABLED
+    TB:viewToolBar/&GP Parameters                              ENABLED
+    TB:viewToolBar/&Language Parameters                        ENABLED
+    TB:viewToolBar/&Population                                 ENABLED
+    TB:viewToolBar/&Robot                                      ENABLED
+    TB:viewToolBar/&Simulation Parameters                      ENABLED
+
+== STEP 3: after View > Population ==
+  [title] SIGEL
+  [tree] header=[Experiments] topLevel=1
+      twoBasesSimpleFitness2.exp sel=0 exp=1 cur=0 selectable=1
+        Individuals              sel=1 exp=0 cur=1 selectable=1
+        Robot                    sel=0 exp=1 cur=0 selectable=1
+          Language-Parameters      sel=0 exp=0 cur=0 selectable=1
+        GP-Parameters            sel=0 exp=0 cur=0 selectable=1
+        Simulation-Parameters    sel=0 exp=0 cur=0 selectable=1
+        Environment              sel=0 exp=0 cur=0 selectable=1
+  [page] count=8 current=SIGEL_MasterGUI::SIG_AllIndividualsView objectName=[]
+  [individuals] rows=120 cols=3 headers=[Name               ][Fitness          ][Age               ] selected=0
+    row0  | 55658         | 1.14825       | 111           | sel=0
+    row1  | 56091         | 1.14825       | 109           | sel=0
+    row2  | 56248         | 1.14825       | 259           | sel=0
+    row3  | 56349         | 1.06261       | 97            | sel=0
+    row4  | 56432         | 1.14825       | 111           | sel=0
+    row5  | 56447         | 1.14825       | 107           | sel=0
+    ... 114 more
+  [action changes] none
+
+== OVERWRITE ==
+  [modal] class=QFileDialog title=[Export Simulation Parameters...]
+  [first export] exists=1 size=305
+  [overwritten with sentinel] size=9
+  [modal] class=QFileDialog title=[Export Simulation Parameters...]
+  [modal 1] class=QFileDialog title=[Export Simulation Parameters...]
+  [modal] class=QMessageBox title=[File exists...]
+  [modal 2] class=QMessageBox title=[File exists...]
+    text=[The file <scratch>/x11b-ow.sip exists!
+Do you want to overwrite?]
+    button [&Yes] default=1
+    button [&No] default=0
+  [answering] No
+  [answering] &No
+  [modal] NONE appeared within 4000 ms
+  [modals seen] 2
+  [after answering NO] size=305 firstLine=[TIMETOSIMULATE] sentinelSurvived=0
+  (1.3 writes the file regardless of the answer -- the write after
+   the switch is not inside it. sentinelSurvived=0 is 1.3's defect,
+   preserved. A 1 would mean the port started honouring the prompt.)

@@ -31,9 +31,25 @@ namespace SIGEL_Robot {
 		  maximalDelayTime(5000),
                   allowedCommands ()
         {
+	  // ORDER MATTERS AND IS NOT ALPHABETICAL. Qt 2 held these in a QDict
+	  // and writeToFileTransfer walked it with a QDictIterator, so the
+	  // order a default-constructed object writes is that dict's HASH
+	  // order -- bucket 0 upward over 17 buckets, each chain in reverse
+	  // insertion order because look_string prepends (qgdict.cpp:356,
+	  // qdict.h:49). Phase D made the container an ordered QList, which
+	  // reproduces the file's order when there IS a file but has to be
+	  // given this order when there is not: a robot import and File >
+	  // New Experiment both default-construct, and both write it out.
+	  // Listed alphabetically before C11b, which is how the divergence
+	  // arose. Confirmed against the running 1.3 binary character for
+	  // character -- see PORTING.md, C11b.
 	  SIG_CommandParameters *commandParameters = new SIG_CommandParameters();
 	  commandParameters->setDuration( 0.001 );
-	  this->addCommand( "ADD", commandParameters );
+	  this->addCommand( "MUL", commandParameters );
+
+	  commandParameters = new SIG_CommandParameters();
+	  commandParameters->setDuration( 0.001 );
+	  this->addCommand( "MOVE", commandParameters );
 
 	  commandParameters = new SIG_CommandParameters();
 	  commandParameters->setDuration( 0.001 );
@@ -45,11 +61,7 @@ namespace SIGEL_Robot {
 
 	  commandParameters = new SIG_CommandParameters();
 	  commandParameters->setDuration( 0.001 );
-	  this->addCommand( "DELAY", commandParameters );
-
-	  commandParameters = new SIG_CommandParameters();
-	  commandParameters->setDuration( 0.001 );
-	  this->addCommand( "DIV", commandParameters );
+	  this->addCommand( "LOAD", commandParameters );
 
 	  commandParameters = new SIG_CommandParameters();
 	  commandParameters->setDuration( 0.001 );
@@ -57,27 +69,7 @@ namespace SIGEL_Robot {
 
 	  commandParameters = new SIG_CommandParameters();
 	  commandParameters->setDuration( 0.001 );
-	  this->addCommand( "LOAD", commandParameters );
-
-	  commandParameters = new SIG_CommandParameters();
-	  commandParameters->setDuration( 0.001 );
-	  this->addCommand( "MAX", commandParameters );
-
-	  commandParameters = new SIG_CommandParameters();
-	  commandParameters->setDuration( 0.001 );
-	  this->addCommand( "MIN", commandParameters );
-
-	  commandParameters = new SIG_CommandParameters();
-	  commandParameters->setDuration( 0.001 );
-	  this->addCommand( "MOD", commandParameters );
-
-	  commandParameters = new SIG_CommandParameters();
-	  commandParameters->setDuration( 0.001 );
-	  this->addCommand( "MOVE", commandParameters );
-
-	  commandParameters = new SIG_CommandParameters();
-	  commandParameters->setDuration( 0.001 );
-	  this->addCommand( "MUL", commandParameters );
+	  this->addCommand( "SENSE", commandParameters );
 
 	  commandParameters = new SIG_CommandParameters();
 	  commandParameters->setDuration( 0.001 );
@@ -85,11 +77,31 @@ namespace SIGEL_Robot {
 
 	  commandParameters = new SIG_CommandParameters();
 	  commandParameters->setDuration( 0.001 );
-	  this->addCommand( "SENSE", commandParameters );
+	  this->addCommand( "SUB", commandParameters );
 
 	  commandParameters = new SIG_CommandParameters();
 	  commandParameters->setDuration( 0.001 );
-	  this->addCommand( "SUB", commandParameters );
+	  this->addCommand( "DIV", commandParameters );
+
+	  commandParameters = new SIG_CommandParameters();
+	  commandParameters->setDuration( 0.001 );
+	  this->addCommand( "MIN", commandParameters );
+
+	  commandParameters = new SIG_CommandParameters();
+	  commandParameters->setDuration( 0.001 );
+	  this->addCommand( "DELAY", commandParameters );
+
+	  commandParameters = new SIG_CommandParameters();
+	  commandParameters->setDuration( 0.001 );
+	  this->addCommand( "ADD", commandParameters );
+
+	  commandParameters = new SIG_CommandParameters();
+	  commandParameters->setDuration( 0.001 );
+	  this->addCommand( "MOD", commandParameters );
+
+	  commandParameters = new SIG_CommandParameters();
+	  commandParameters->setDuration( 0.001 );
+	  this->addCommand( "MAX", commandParameters );
 
 	}
 

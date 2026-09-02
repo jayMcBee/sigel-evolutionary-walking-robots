@@ -2059,21 +2059,21 @@ rrb      drive      3 #3   hinge4Drive
 rrb      geom     10 v   11 p  -5.999867885e+00  base.wrl
 rrb      geom     18 v   21 p  +5.019037135e+01  effector.wrl
 rrb      geom      8 v   10 p  +0.000000000e+00  middle.wrl
-rrb      command    0      ADD
-rrb      command    1      CMP
-rrb      command    2      COPY
-rrb      command    3      DELAY
-rrb      command    4      DIV
+rrb      command    0      MUL
+rrb      command    1      MOVE
+rrb      command    2      CMP
+rrb      command    3      COPY
+rrb      command    4      LOAD
 rrb      command    5      JMP
-rrb      command    6      LOAD
-rrb      command    7      MAX
-rrb      command    8      MIN
-rrb      command    9      MOD
-rrb      command   10      MOVE
-rrb      command   11      MUL
-rrb      command   12      NOP
-rrb      command   13      SENSE
-rrb      command   14      SUB
+rrb      command    6      SENSE
+rrb      command    7      NOP
+rrb      command    8      SUB
+rrb      command    9      DIV
+rrb      command   10      MIN
+rrb      command   11      DELAY
+rrb      command   12      ADD
+rrb      command   13      MOD
+rrb      command   14      MAX
 rrb      point base  0  BaseAxisSuccNormal
 rrb      point base  1  BaseAxisSuccDir
 rrb      point base  2  BaseAxisSuccBase
@@ -2157,21 +2157,21 @@ rrb      sensor    11 #11  leg1Joint2Sensor
 rrb      geom     24 v   32 p  +3.054880857e+00  body.wrl
 rrb      geom     24 v   29 p  -5.188399195e-01  foot.wrl
 rrb      geom     12 v   12 p  -2.109004059e-02  leg.wrl
-rrb      command    0      ADD
-rrb      command    1      CMP
-rrb      command    2      COPY
-rrb      command    3      DELAY
-rrb      command    4      DIV
+rrb      command    0      MUL
+rrb      command    1      MOVE
+rrb      command    2      CMP
+rrb      command    3      COPY
+rrb      command    4      LOAD
 rrb      command    5      JMP
-rrb      command    6      LOAD
-rrb      command    7      MAX
-rrb      command    8      MIN
-rrb      command    9      MOD
-rrb      command   10      MOVE
-rrb      command   11      MUL
-rrb      command   12      NOP
-rrb      command   13      SENSE
-rrb      command   14      SUB
+rrb      command    6      SENSE
+rrb      command    7      NOP
+rrb      command    8      SUB
+rrb      command    9      DIV
+rrb      command   10      MIN
+rrb      command   11      DELAY
+rrb      command   12      ADD
+rrb      command   13      MOD
+rrb      command   14      MAX
 rrb      point body  0  bodyLeg4Normal
 rrb      point body  1  bodyLeg6Dir
 rrb      point body  2  bodyLeg5Base
@@ -2291,21 +2291,21 @@ rrb      sensor     8 #8   firstLegJoint2Sensor
 rrb      geom     18 v   21 p  +1.558927200e+01  footLink.wrl
 rrb      geom     12 v   14 p  +2.626249902e-01  tripleBase.wrl
 rrb      geom      8 v   10 p  +5.900859833e-06  legLink.wrl
-rrb      command    0      ADD
-rrb      command    1      CMP
-rrb      command    2      COPY
-rrb      command    3      DELAY
-rrb      command    4      DIV
+rrb      command    0      MUL
+rrb      command    1      MOVE
+rrb      command    2      CMP
+rrb      command    3      COPY
+rrb      command    4      LOAD
 rrb      command    5      JMP
-rrb      command    6      LOAD
-rrb      command    7      MAX
-rrb      command    8      MIN
-rrb      command    9      MOD
-rrb      command   10      MOVE
-rrb      command   11      MUL
-rrb      command   12      NOP
-rrb      command   13      SENSE
-rrb      command   14      SUB
+rrb      command    6      SENSE
+rrb      command    7      NOP
+rrb      command    8      SUB
+rrb      command    9      DIV
+rrb      command   10      MIN
+rrb      command   11      DELAY
+rrb      command   12      ADD
+rrb      command   13      MOD
+rrb      command   14      MAX
 rrb      point thirdFootLink  0  thirdFootLinkNormal
 rrb      point thirdFootLink  1  thirdFootLinkDir
 rrb      point thirdFootLink  2  thirdFootLinkBase
@@ -2395,21 +2395,21 @@ rrb      sensor     5 #5   firstLegJoint2Sensor
 rrb      geom     18 v   21 p  +1.558927200e+01  footLink.wrl
 rrb      geom     12 v   16 p  +2.464880198e-01  base.wrl
 rrb      geom      8 v   10 p  +5.900859833e-06  legLink.wrl
-rrb      command    0      ADD
-rrb      command    1      CMP
-rrb      command    2      COPY
-rrb      command    3      DELAY
-rrb      command    4      DIV
+rrb      command    0      MUL
+rrb      command    1      MOVE
+rrb      command    2      CMP
+rrb      command    3      COPY
+rrb      command    4      LOAD
 rrb      command    5      JMP
-rrb      command    6      LOAD
-rrb      command    7      MAX
-rrb      command    8      MIN
-rrb      command    9      MOD
-rrb      command   10      MOVE
-rrb      command   11      MUL
-rrb      command   12      NOP
-rrb      command   13      SENSE
-rrb      command   14      SUB
+rrb      command    6      SENSE
+rrb      command    7      NOP
+rrb      command    8      SUB
+rrb      command    9      DIV
+rrb      command   10      MIN
+rrb      command   11      DELAY
+rrb      command   12      ADD
+rrb      command   13      MOD
+rrb      command   14      MAX
 rrb      point firstFootLink  0  firstFootLinkNormal
 rrb      point firstFootLink  1  firstFootLinkDir
 rrb      point firstFootLink  2  firstFootLinkBase
@@ -2466,21 +2466,21 @@ rrb      drive      2 #2   hinge2Drive
 rrb      geom     10 v   11 p  -5.999867885e+00  base.wrl
 rrb      geom     18 v   21 p  +5.019037135e+01  effector.wrl
 rrb      geom      8 v   10 p  +0.000000000e+00  middle.wrl
-rrb      command    0      ADD
-rrb      command    1      CMP
-rrb      command    2      COPY
-rrb      command    3      DELAY
-rrb      command    4      DIV
+rrb      command    0      MUL
+rrb      command    1      MOVE
+rrb      command    2      CMP
+rrb      command    3      COPY
+rrb      command    4      LOAD
 rrb      command    5      JMP
-rrb      command    6      LOAD
-rrb      command    7      MAX
-rrb      command    8      MIN
-rrb      command    9      MOD
-rrb      command   10      MOVE
-rrb      command   11      MUL
-rrb      command   12      NOP
-rrb      command   13      SENSE
-rrb      command   14      SUB
+rrb      command    6      SENSE
+rrb      command    7      NOP
+rrb      command    8      SUB
+rrb      command    9      DIV
+rrb      command   10      MIN
+rrb      command   11      DELAY
+rrb      command   12      ADD
+rrb      command   13      MOD
+rrb      command   14      MAX
 rrb      point base  0  BaseAxisSuccNormal
 rrb      point base  1  BaseAxisSuccDir
 rrb      point base  2  BaseAxisSuccBase
@@ -2508,21 +2508,21 @@ rrb      joint      0 #0   hinge1
 rrb      drive      0 #0   hinge1Drive
 rrb      sensor     0 #0   hinge1Sensor
 rrb      geom     10 v   11 p  -5.999867885e+00  base.wrl
-rrb      command    0      ADD
-rrb      command    1      CMP
-rrb      command    2      COPY
-rrb      command    3      DELAY
-rrb      command    4      DIV
+rrb      command    0      MUL
+rrb      command    1      MOVE
+rrb      command    2      CMP
+rrb      command    3      COPY
+rrb      command    4      LOAD
 rrb      command    5      JMP
-rrb      command    6      LOAD
-rrb      command    7      MAX
-rrb      command    8      MIN
-rrb      command    9      MOD
-rrb      command   10      MOVE
-rrb      command   11      MUL
-rrb      command   12      NOP
-rrb      command   13      SENSE
-rrb      command   14      SUB
+rrb      command    6      SENSE
+rrb      command    7      NOP
+rrb      command    8      SUB
+rrb      command    9      DIV
+rrb      command   10      MIN
+rrb      command   11      DELAY
+rrb      command   12      ADD
+rrb      command   13      MOD
+rrb      command   14      MAX
 rrb      point base1  0  Base1AxisSuccNormal
 rrb      point base1  1  Base1AxisSuccBase
 rrb      point base1  2  Base1AxisSuccDir
@@ -2615,21 +2615,21 @@ rrb      geom      8 v    8 p  -8.821989701e-03  shoulder.wrl
 rrb      geom     36 v   32 p  -5.045691971e-03  body.wrl
 rrb      geom     24 v   29 p  -5.188399195e-01  foot.wrl
 rrb      geom     12 v   12 p  -2.109004059e-02  leg.wrl
-rrb      command    0      ADD
-rrb      command    1      CMP
-rrb      command    2      COPY
-rrb      command    3      DELAY
-rrb      command    4      DIV
+rrb      command    0      MUL
+rrb      command    1      MOVE
+rrb      command    2      CMP
+rrb      command    3      COPY
+rrb      command    4      LOAD
 rrb      command    5      JMP
-rrb      command    6      LOAD
-rrb      command    7      MAX
-rrb      command    8      MIN
-rrb      command    9      MOD
-rrb      command   10      MOVE
-rrb      command   11      MUL
-rrb      command   12      NOP
-rrb      command   13      SENSE
-rrb      command   14      SUB
+rrb      command    6      SENSE
+rrb      command    7      NOP
+rrb      command    8      SUB
+rrb      command    9      DIV
+rrb      command   10      MIN
+rrb      command   11      DELAY
+rrb      command   12      ADD
+rrb      command   13      MOD
+rrb      command   14      MAX
 rrb      point shoulder5  0  shoulder5SuccNormal
 rrb      point shoulder5  1  shoulder5PredDir
 rrb      point shoulder5  2  shoulder5PredBase
