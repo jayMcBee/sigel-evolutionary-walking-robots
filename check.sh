@@ -711,9 +711,28 @@ if [ ! -f "$BEXP" ]; then
     echo "  no $BEXP -- behaviour section skipped (data ships separately)"
 elif make -s -C "$ROOT" B=build-fast SAN= SIGSAN= guidrive >/tmp/bdb.$$ 2>&1; then
     # SIGEL_ROOT must be the SOURCE tree: the driver loads pixmaps and terrain
-    # from it. It needs no sigel_slave -- the gate scenario never spawns one.
-    if SIGEL_ROOT="$SRC" SIGEL_EXP="$BEXP" SIGEL_SCRATCH="${TMPDIR:-/tmp}"        QT_QPA_PLATFORM=offscreen timeout 300 "$ROOT/build-fast/guidrive" gate        > /tmp/bo.$$ 2>/dev/null; then
-        if command grep -v '^#' "$ROOT/guibehaviour-baseline.txt" | diff -u - /tmp/bo.$$ > /tmp/bd.$$; then
+    # from it. Neither scenario spawns a sigel_slave, so neither needs one.
+    #
+    # TWO scenarios make up the baseline, concatenated in this order:
+    #   gate   C10 -- the tree, sorting, add/delete/reset, the dialogs, the
+    #          context menus, the MetaGP warning
+    #   pages  C11 -- the five View pages C10 never opened, every spin box,
+    #          slider, combo, checkbox and validator on them
+    # $1 scenario, $2 outfile, $3.. extra NAME=VALUE for the child only.
+    # The extras go through env rather than being written as a prefix on the
+    # function call: a prefix would also apply to the SHELL, and bash then
+    # prints "warning: setlocale: LC_ALL: cannot change locale" on any box
+    # where the locale is not generated -- which is most of them, and is
+    # exactly the box this check is designed to run on.
+    guidrive_run() {
+        local sc="$1" out="$2"; shift 2
+        env "$@" SIGEL_ROOT="$SRC" SIGEL_EXP="$BEXP" \
+            SIGEL_SCRATCH="${TMPDIR:-/tmp}" QT_QPA_PLATFORM=offscreen \
+            timeout 300 "$ROOT/build-fast/guidrive" "$sc" > "$out" 2>/dev/null
+    }
+    if guidrive_run gate /tmp/bo.$$ && guidrive_run pages /tmp/bp.$$; then
+        cat /tmp/bo.$$ /tmp/bp.$$ > /tmp/ball.$$
+        if command grep -v '^#' "$ROOT/guibehaviour-baseline.txt" | diff -u - /tmp/ball.$$ > /tmp/bd.$$; then
             bp=1
         else
             bf=1; echo "  the GUI no longer BEHAVES the way SIGEL 1.3 does:"
@@ -723,12 +742,37 @@ elif make -s -C "$ROOT" B=build-fast SAN= SIGSAN= guidrive >/tmp/bdb.$$ 2>&1; th
         bf=1
         echo "  the driver did not finish -- it exits(1) on an out-of-range pool"
         echo "  position, which is how the Qt 6 clear() regression showed up:"
-        tail -6 /tmp/bo.$$ | sed 's/^/    /'
+        tail -6 /tmp/bo.$$ /tmp/bp.$$ | sed 's/^/    /'
+    fi
+
+    # C7 pinned 21 validators to QLocale::c() with RejectGroupSeparator because
+    # Qt 2 forced LC_NUMERIC="C" process-wide and its QDoubleValidator hard-coded
+    # '.', while Qt 6 validators follow the system locale and the read-back is
+    # QString::toDouble(), which does not. Left to disagree, a typed "9,81"
+    # validates under a comma locale and reads back as ZERO -- silent data loss
+    # into the saved experiment. The 1.3 oracle measured the 2003 binary under a
+    # de_DE built with woody's own localedef and found it locale-independent, so
+    # this is 1.3 behaviour to preserve and not a Qt 6 nicety.
+    #
+    # This needs no baseline of its own: the two runs must simply be IDENTICAL.
+    # de_DE is chosen because Qt reports it even when the locale is not
+    # generated -- measured -- so it works on a box with only English locales.
+    if [ "$bf" = 0 ]; then
+        if guidrive_run pages /tmp/bl.$$ LANG=de_DE.UTF-8 LC_ALL=de_DE.UTF-8 \
+           && diff -q /tmp/bp.$$ /tmp/bl.$$ >/dev/null; then
+            :
+        else
+            bf=1; bp=0
+            echo "  the pages BEHAVE DIFFERENTLY under a comma-decimal locale;"
+            echo "  C7's validator locale pinning is what stops that, and 1.3"
+            echo "  was measured locale-independent on the running binary:"
+            diff /tmp/bp.$$ /tmp/bl.$$ 2>/dev/null | head -12 | sed 's/^/    /'
+        fi
     fi
 else
     bf=1; echo "  guidrive did not build:"; head -5 /tmp/bdb.$$ | sed 's/^/    /'
 fi
-rm -f /tmp/bo.$$ /tmp/bd.$$ /tmp/bdb.$$
+rm -f /tmp/bo.$$ /tmp/bp.$$ /tmp/bl.$$ /tmp/ball.$$ /tmp/bd.$$ /tmp/bdb.$$
 printf '%-22s %2d pass  %2d fail\n' "gui behaviour" "$bp" "$bf"
 pass=$((pass+bp)); fail=$((fail+bf))
 

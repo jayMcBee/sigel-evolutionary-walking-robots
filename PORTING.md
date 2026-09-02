@@ -32,7 +32,7 @@ build and run, because nothing else can be verified without it — see §3.
 | T — old-Qt tool container | **done 2026-08-27.** `tools/qtmig`, §4 |
 | D — delete the shim, migrate the data | **DONE 2026-08-30.** `q2compat.h` and `q2compat_check.cpp` deleted; `include/compat/` gone; **no `Q2*` shim type is used anywhere**. D1–D27. *This is not "no Qt 2 container exists" — the unported GUI modules still declare **71 lines** of `QArray`, `QDict`, `QList`-as-pointer-list and friends, all of which Phase C must convert. See D27.* The shim's self-check step is gone from `check.sh`, which now runs no code. §10 |
 | P — PVM | **DONE 2026-08-28.** Vendored 3.4.3 replaced by upstream 3.4.6; nine patches carry the four config lines and Debian's eight source fixes; `libpvm3.a` and `pvmd3` build; SIGEL's two PVM objects link against them and `SIG_GPPVMData` round-trips through real PVM. `sigel`/`sigel_slave` still need Phase C. §7 |
-| C — GUI | **DONE 2026-09-02. C1–C10 all complete.** All 20 Designer forms converted; all five GUI modules build as archives; **both programs link and run**; **100 dead `connect()`s repaired, tree-wide count now 0 with no baseline anywhere**. Verified against the running 1.3 binary: 42 menu entries, the toolbars and the loaded-experiment values all diff clean, and that comparison is now a committed gate (`gui vs 1.3`). **C10 then DROVE it** — real Qt input events into the real window, diffed against the same oracle driving 1.3 with XTest: the tree, the pages, sorting, add/delete/reset, rename, save, the five dialogs and all five context menus agree, and a GUI-exported individual is byte-identical across the two architectures. **Two defects found by using it that reading it did not show** — deleting most of the pool killed the application (Qt 6's `QTreeWidget::clear()` emits a signal Qt 2's blocked), and the MetaGP dialog ate an ampersand. Second committed gate, `gui behaviour`. §7 |
+| C — GUI | **DONE 2026-09-02. C1–C10 all complete; C11a done.** All 20 Designer forms converted; all five GUI modules build as archives; **both programs link and run**; **100 dead `connect()`s repaired, tree-wide count now 0 with no baseline anywhere**. Verified against the running 1.3 binary: 42 menu entries, the toolbars and the loaded-experiment values all diff clean, and that comparison is now a committed gate (`gui vs 1.3`). **C10 then DROVE it** — real Qt input events into the real window, diffed against the same oracle driving 1.3 with XTest: the tree, the pages, sorting, add/delete/reset, rename, save, the five dialogs and all five context menus agree, and a GUI-exported individual is byte-identical across the two architectures. **Two defects found by using it that reading it did not show** — deleting most of the pool killed the application (Qt 6's `QTreeWidget::clear()` emits a signal Qt 2's blocked), and the MetaGP dialog ate an ampersand. Second committed gate, `gui behaviour`. **C11a then drove the five View pages C10 never opened** — every spin box, slider, combo, checkbox and 20 of C7's 21 locale validators, diffed against the same oracle. The 12-probe validator battery matches 1.3 character for character, on both sides under a comma-decimal locale; nine parameter values typed on the pages come out byte-identical in the saved `.exp` across the two architectures. **A third regression found by using it** — Qt 2's `QIntValidator` returned Intermediate out of range so 1.3 clamps a typed over-range number to the maximum, where Qt 6 refuses the keystroke and commits a truncated prefix; pinned in the gate, fix costed, decision open. §7 |
 | V — check against the 1.3 binary | **V1, V5's MDH probe, V6, V7 and V8 all done, all PASS.** Ordering: 10 of 10 container orders match. Arithmetic: `twoBases` exact bit for bit, `octopus` 9/9 with three joints exact and 5 ulp worst. **V6, V7 and V8 done 2026-08-29** — friction and no-collide negotiation, their four remaining rules, and the GP parameter blocks captured *before* their conversion. `verification-against-sigel-1.3/v6`, `v7`, `v8`. V2–V4 not started; V5's sensor and force probes are **invalid as specified** — both target Dynamo-only functions, deleted 2026-08-28. §7 |
 
 **SCOPE — DECIDED 2026-08-23. Read this before changing anything.**
@@ -1708,6 +1708,7 @@ modules include the headers `uic` generates from them.
 | C8 | **DONE 2026-08-31.** `sigel.cpp`, `sigel_slave.cpp`, `MT_Control`'s 15 dead connects, and the four core files no module list reached. **The tree's dead-signal count is now 0 with no non-zero baseline anywhere.** `check.sh` gained a `programs` section and a `dead item virtuals` check | 15 sites + 4 files |
 | C9 | **DONE 2026-08-31.** All five GUI modules build as archives, both programs link and run. Exclusions lifted, moc derived from source, resources named on the link line, `programs` gate upgraded from compile to link+run | 5 modules, 2 programs |
 | C10 | **DONE 2026-09-02.** Driving the interface rather than reading it. `guidrive.cpp` posts real Qt mouse, key and context-menu events into the real `SIG_MainWindow`; the 1.3 oracle drove the 2003 binary with XTest and the two were diffed. Found the `clear()` signal regression that killed the application on a large delete, and the eaten ampersand in the MetaGP dialog. New `gui behaviour` gate with `guibehaviour-baseline.txt`. **No X-level click was possible on this machine and the section says so.** Also carries the port's FIRST deliberate divergence from 1.3 — the duplicate MetaGP About, removed by decision 2026-09-02 | 2 defects, 15 scenarios, 1 divergence |
+| C11a | **DONE 2026-09-02.** The five View pages C10 never opened. 29 spin boxes, 20 sliders, 7 combos, 4 checkboxes, 8 radios and 20 of C7's 21 validators driven and diffed against 1.3. The **12-probe validator battery matches character for character**, on both sides under a comma-decimal locale the oracle built with woody's own `localedef`. Nine parameter values typed on the pages come out **byte-identical** in the saved `.exp` across the two architectures. Found the `QIntValidator` Intermediate/Invalid trap: 1.3 clamps a typed over-range number to the maximum, the port commits a truncated prefix -- **pinned in the gate, fix costed, decision open**. `gui behaviour` now runs two scenarios and re-runs one under `de_DE` | 1 regression, 2 interlocks, 3 probe errors |
 
 Each module step is the same shape: `qt3to4` in the container, hand-port off
 Qt3Support, extend `check.sh` to cover the module, commit.
@@ -3548,6 +3549,291 @@ and after confirming green-when-unbroken and recovery.
 
 C10 CLOSES PHASE C.
 
+#### C11a — the five parameter pages, which is where the numbers are typed
+
+C10 drove **one** of the six View pages. The other five carry every spin box,
+slider, combo, checkbox and validator in the application — and C7 had converted
+**21 validators that read the decimal point by system locale**, not one of
+which had ever been typed into on either side. This drives all five.
+
+**Counted, not estimated.** 29 spin boxes, 20 sliders, 7 combos, 4 checkboxes,
+8 radios, 20 validated line edits, 6 list boxes and 2 tables, across 11 tab
+pages. `guidrive.cpp` gained a `pages` scenario that surveys and then drives
+each one, and a `pagesave` scenario that types values in and saves.
+
+##### The validators: 12 probes, both architectures, three locales
+
+The battery is seven strings into a `QDoubleValidator` field and five into a
+`QIntValidator` field, typed **one character at a time** — a validator that
+answers `Invalid` makes `QLineEdit` drop that keystroke, so the surviving text
+carries a gap exactly where the rejection happened, and that gap is the
+measurement. It is also the only thing the oracle *can* read: Qt 2 has no
+accessibility API, so 1.3's side reports behaviour, never configuration.
+
+| typed | 1.3 | port | typed | 1.3 | port |
+|---|---|---|---|---|---|
+| `9.81` | `9.81` | `9.81` | `42` | `42` | `42` |
+| `9,81` | `981` | `981` | `-7` | `-7` | `-7` |
+| `0,375` | `0375` | `0375` | `4.2` | `42` | `42` |
+| `-2.5` | `-2.5` | `-2.5` | `4,2` | `42` | `42` |
+| `1e3` | `1e3` | `1e3` | `abc` | *empty* | *empty* |
+| `abc` | *empty* | *empty* | | | |
+| `1.2.3` | `1.23` | `1.23` | | | |
+
+**Twelve for twelve**, including the two that would have been got wrong by
+reasoning: the exponent passing, and the **integer** field taking a leading
+minus. The comma probe was then driven into all 20 validated fields on this
+side and spot-checked on four of them on 1.3 — Planar spring constant, Level,
+Step Size, Maximal Error — all `9,81` → `981`.
+
+**Locale independence is measured on both sides, which is the point of C7.**
+This side: the whole scenario re-run under `LANG=de_DE.UTF-8` and
+`fr_FR.UTF-8` (both comma decimal; fr_FR's group separator is U+202F, a narrow
+no-break space, where de_DE's is a full stop — two different failure shapes) is **byte-identical** to the en_US run, and Qt 6
+genuinely saw them — `QLocale::system()` reported `de_DE` with decimal `,`.
+The 1.3 side: **the oracle built a de_DE with woody's own `localedef` and
+verified it with woody's own `locale` binary**, because a locale a modern
+`localedef` produces may simply be rejected by glibc 2.2.5 — which would have
+given a silent fallback to C and a confident "no difference" that meant
+nothing. Under it, all seven probes are textually identical to its en_US run,
+and the Gravity Y box still renders `-9.81` with a **point**. So 1.3 is
+locale-independent as measured, not as assumed, and the port matches it.
+
+`check.sh` now re-runs the `pages` scenario under `de_DE.UTF-8` and requires it
+to be **identical** to the ambient run. That check needs no baseline of its own,
+which is why it is worth having.
+
+##### TRAP — `QIntValidator` returned Intermediate out of range in Qt 2 and returns Invalid in Qt 6
+
+**This is a real regression, found only by typing, and it changes the number
+that reaches the file.**
+
+Qt 2's `QIntValidator::validate` (`qvalidator.cpp:236`):
+
+```cpp
+else if ( tmp < b || tmp > t )
+    return QValidator::Intermediate;
+```
+
+Out of range is **Intermediate**, so `QLineEdit` accepts every digit.
+`qspinbox.cpp:186` gives every `QSpinBox` exactly that validator over its own
+`[min,max]`. `QSpinBox::interpretText()` then maps the whole text and calls
+`setValue()`, and `QRangeControl::directSetValue` "Forces the new value to be
+within the legal range" — the clamp. **Qt 6's returns `Invalid` once the typed
+prefix passes the top**, so the keystroke is refused and the box keeps the
+truncated prefix.
+
+Measured on both, four fields, typing then Return:
+
+| field | range | typed | 1.3 reads | 1.3 commits | port reads | port commits |
+|---|---|---|---|---|---|---|
+| Maximal program length | 2..32000 | `32001` | `32001` | **32000** | `3200` | **3200** |
+| Year | 1752..8000 | `8001` | `8001` | **8000** | `800` | **2001** |
+| Hour | 0..23 | `24` | `24` | **23** | `2` | **2** |
+| Register width | 1..99 | `100` | `100` | **99** | `10 bit` | **10** |
+
+Four out of four clamp to the maximum on 1.3; none of them does here. Both end
+on a *valid* value, they are **different valid values**, and
+`putAllIntoExperiment()` writes whichever the widget holds into the `.exp`.
+Only reachable by typing a number outside the range — but that is the case
+where the two disagree, not a case where either refuses.
+
+**A second, smaller difference in the same widget: 1.3 drops the suffix while
+editing.** The register-width box reads `3 bit` at rest, plain `100` during
+typing, `99 bit` after commit; the port shows `10 bit` throughout. Qt 2's
+`updateDisplay()` writes prefix + text + suffix into the line edit and does
+nothing to protect it, so select-all + Delete takes the suffix with everything
+else; Qt 6's `QAbstractSpinBox` actively keeps prefix and suffix in the editor.
+Transient — both show the suffix again after commit. Recorded, not chased.
+
+**NOT FIXED IN THIS STEP, AND THE DECISION IS OPEN.** A 25-line `QSpinBox`
+subclass restoring Qt 2's rule reproduces all four readings exactly
+(`32001`→32000, `8001`→8000, `24`→23, `100`→99, in-range typing unchanged); it
+is written out in `future_refactorings.md`. Applying it means promoting **29
+spin boxes across four converted Designer forms**, and to be consistent it would
+also have to cover the dialogs, which are a separate step. That is wider than
+C11's remit, so the current behaviour is **pinned in the gate** — every spin
+box's `commits=` value is in `guibehaviour-baseline.txt` — and cannot drift
+unnoticed while the decision is open.
+
+*Two cheaper fixes were tried and rejected on measurement, not on taste.
+Swapping the validator on the spin box's internal `QLineEdit` lets the digits
+through but leaves `QAbstractSpinBox`'s own interpret path unchanged, and
+`100` into a `[1..99]` box then commits to **1** — worse than the divergence.
+Widening the range would change what the pages display and write.*
+
+##### The two interlocks, neither visible without driving
+
+**The genetic-operator sliders are not independent.** `slotMutationChanged`
+clamps Mutation + Crossover at 1000 and recomputes Reproduction as the
+remainder, and Reproduction's own slider is disabled. Driven by **dragging the
+handle**, which is one operation and the one the oracle can perform:
+
+| | Mutation | Crossover | Reproduction | sum |
+|---|---|---|---|---|
+| 1.3, as loaded | 50 | 670 | 280 | 1000 |
+| 1.3, Mutation dragged hard right | **330** | 670 | **0** | **1000** |
+| port, same rule from Crossover 750 | **250** | 750 | **0** | **1000** |
+
+Mutation does **not** reach 1000 on either side: it clamps at `1000 -
+Crossover`, which is 330 there and 250 here because an earlier probe had left
+Crossover at 750. Same rule, different starting point, and the port lands on
+the arithmetic the rule predicts rather than on the oracle's number — which is
+a stronger agreement than matching the figure would have been.
+
+**The LCDs show percent where the sliders and the file are per-mille.** 330 /
+670 / 0 displays as 33 / 67 / 0. Comparing an LCD reading against a file value
+directly is out by a factor of ten. The oracle found this and it cost it time.
+
+**`sliderAlpha` starts disabled** — the texture checkbox owns it — so the
+generic probe measures a slider that cannot move, which is correct and says
+nothing. It is driven for real after the checkbox: `End` → 99, `Home` → 0,
+`PageUp` → +10.
+
+##### The page-to-file round trip: nine values, byte-identical across architectures
+
+`putAllIntoExperiment()` runs on save, so the parameter block of a written
+`.exp` is exactly what the five pages hold — and it is **bytes, not a number
+x87 and IEEE can round differently**. Eleven edits on each side — **nine of them
+typed identically**, see below — saved from a fresh load each time (so both
+are first saves and C10's 840-bytes-per-save history growth cancels), then
+the two files diffed:
+
+`STEPSIZE` 0.01→0.02, `MAXIMALERROR` 0.1→0.2, `DYNAMECHSINTEGRATOR` 1→2,
+`YPLANELEVEL` 0→2.5, `GRAVITY` x 0→1.25, floor dimension 50→77, `RANDOMSEED`
+0→123, maximal age 50→42, `LanguageParameters 3 8 5000 13` → `3 9 5000 13`.
+**Nine values, identical on i386/Qt 2 and aarch64/Qt 6, and nothing else moved.**
+
+The remaining three lines of the twelve are not divergences and the oracle
+showed why. Two are the mutation/reproduction pair, where its slider advanced
+one step and this one advanced 200 — same direction, same interlock, sum
+exactly 1000 on both. The third is the fitness-function name, where its own
+stray keystrokes moved the combo past the intended item before the save; it
+caught this itself, from a screen capture, and said so.
+
+##### What the oracle contributed that this side could not have found
+
+- **In 1.3, a groove click does not focus the slider**, so 200 arrow presses
+  went to the tree and changed the page underneath it. That matters here
+  because `QTest` posts key events **straight at the widget**, focus or no
+  focus — so the keyboard probe was never measuring focus, and a comparison
+  built only on it would have pitted a keyboard-driven Qt 6 slider against
+  something 1.3 will not do. The driver gained a groove-click probe, and on the
+  click path the two agree: **+1 per click, `hasFocus` 0 afterwards, both
+  sides**. (Tournaments-per-generation moves +5, because its page step is 5
+  where every other slider on the page is 1.)
+- **The page remembers its tab.** Reaching a control by clicking the View
+  toolbar does not reset the tab widget, and two of the oracle's captures came
+  back blank for that reason. It caught them because they were *empty* rather
+  than wrong.
+- **Each saved file shifts the load dialog's row positions for the next run.**
+  Its first attempt at the round trip silently loaded the file it had just
+  written; the tell was the line count and the six-space count, the signature
+  C10 established. It found and redid it before reporting.
+
+##### A latent flake in C10's harness, found by the fresh-eyes review
+
+**`openExperiment` has been intermittently loading nothing since C10, and the
+`gate` output would have been wrong rather than absent when it did.** It
+showed up four times while C11a was being written, then would not reproduce
+in a dozen runs. Two diagnoses, both wrong, both recorded because each looked
+right:
+
+1. **"The completer popup eats the Return."** The popup is real, so the first
+   fix escaped it and pressed Return again. **That is worse than hanging.**
+   It reproduced during the review and the dialog accepted with the
+   *completion's* filename instead of the typed one — the experiment did not
+   load, the tree was empty, and the run carried on regardless. A hang is
+   loud; a wrong file is not. The only reason it was caught is that the fix
+   printed when it took the fallback.
+2. **The actual cause**, which only that printed diagnostic exposed:
+   `QFileDialog` **navigates as a path with separators is typed** and strips
+   the directory out of the field as it goes, so the field is left holding the
+   bare basename and Return resolves it against whichever directory the dialog
+   has reached — a race with the typing.
+
+Fixed by typing an **absolute** path, which resolves the same wherever the
+dialog has navigated to, and re-asserting it before Return. Verified by
+stress rather than by argument: **10 consecutive `gate` runs and 5 `pages`
+runs byte-identical**, plus the `de_DE` run, and the C10 half of the baseline
+unchanged — the fix moved no output at all.
+
+*The general lesson, and it is not about file dialogs: a recovery path that
+does not say it fired turns an intermittent failure into an intermittent
+wrong answer. The printing is what made this findable.*
+
+##### Three probe errors, all mine, each of which read as a port defect
+
+1. **A greyed field ate five probes.** The integer battery ran *after* the page
+   drive, which had clicked `radiobuttonPictureFile`, whose side effect greys
+   `lineeditXDim` — and a disabled `QLineEdit` correctly ignores key events.
+   Five false negatives from one click. The battery now runs first, on a
+   pristine page, and the source says why.
+2. **A "clamp" that was a missed grab.** The interlock drag pressed at x=6,
+   which is groove, so it page-stepped *down* by one; Mutation went 50 → 49 and
+   read as a clamp. The press now lands on the handle, positioned from
+   `QStyle::sliderPositionFromValue` rather than guessed.
+3. **An LCD that "did not follow its slider".**
+   `lcdnumberTournamentsPerGeneration` stayed at 60 while its slider moved
+   500 → 501 → 506. It is correct: the slot displays
+   `(slider / 1000) * populationSize` truncated to int, and with 120
+   individuals every one of those is 60. Checked before anything was changed.
+
+##### The gate
+
+`check.sh`'s **`gui behaviour`** section now runs **two** scenarios and diffs
+the concatenation against `guibehaviour-baseline.txt`: C10's `gate` and C11's
+`pages`. The C10 half is **byte-identical** to what it was. It then re-runs
+`pages` under `de_DE.UTF-8` and requires the two runs to match.
+
+Teeth-tested by breaking each guarded thing and reading the hunk:
+
+- **reverting C7's validator locale pinning** fails on the battery lines and
+  nowhere else — `9,81` becomes accepted text that `QString::toDouble()` reads
+  back as **zero**, which is the silent data loss C7 exists to prevent;
+- **formatting one page value through `QLocale()` instead of
+  `QString::number`** leaves the ambient-locale baseline passing and is caught
+  *only* by the de_DE re-run — which is precisely the hole that check exists to
+  cover, and it would not have been proven by the first test alone.
+
+Both restored, with a clean run before and after.
+
+**`pagesave` IS NOT GATED, and that is a real gap rather than an oversight.**
+The nine byte-identical parameter values are the strongest single result in
+C11a and nothing guards them: the scenario needs two runs from a fresh load,
+writes two 2.7 MB files, and its answer is only meaningful against the 1.3
+file, which lives on another machine. What IS gated is the same typing
+reaching the same widgets — the `pages` scenario — so a regression in the
+widgets would be caught; a regression in `putAllIntoExperiment()` between the
+widget and the file would not. Gating it properly means committing a reference
+parameter block, which is the natural first move for whoever takes the
+Import/Export item, since that item is byte-comparable files for the same
+reason.
+
+**`QTest` is still not a mouse**, and the record keeps saying so. It posts
+`QMouseEvent`, `QKeyEvent` and `QContextMenuEvent` through
+`QApplication::notify`, so hit-testing, key handling, item-view selection and
+the slots behind them all run — but it bypasses `QWindowSystemInterface`, so
+activation, grabs and double-click synthesis are not what a real click
+produces. **The oracle's side was driven by real XTest**, so every comparison
+above has a genuine click on one end.
+
+##### What C11a did NOT exercise, and why
+
+- **The Robot page has nothing in scope.** Six list boxes, four buttons, no
+  spin box, slider, combo, checkbox or validated field. Its contents are
+  surveyed — 2 links, 1 material, 1 body, 1 sensor, 1 joint, 1 drive, with
+  icons on the last three — and the driver says so explicitly rather than
+  printing an empty block that reads as a harness failure.
+- **The four Robot-page buttons and the pages' Import/Export buttons.** They
+  open file dialogs and a `SIG_TextView`; both are separate C11 items.
+- **The 21st validator.** It is on `SIG_EditCommandDialog`, not on a page, and
+  dialogs are a separate item. 20 of the 21 are driven here.
+- **`listviewCommands` and `listviewHosts` beyond their contents.** Both are
+  double-click entry points to dialogs.
+- **A real X-level click.** Still impossible on this machine; C10 measured that
+  and nothing has changed.
+
 ---
 
 ## 8. Steps and status
@@ -3572,7 +3858,7 @@ windows, and nothing happens behind the Start button.
 
 ## 9. Open
 
-### C11 — the coverage gap C10 leaves, and how to close it — NOT STARTED
+### C11 — the coverage gap C10 leaves — C11a DONE, FOUR ITEMS OPEN
 
 C10 found two defects in **fifteen** driven scenarios. That density is the
 argument for continuing: the defects were not in the parts anyone suspected,
@@ -3584,7 +3870,7 @@ roughly four fifths of the interface has still never been used.
 
 | never driven | what that leaves untested |
 |---|---|
-| **5 of the 6 View pages** — GP-Parameters, Simulation-Parameters, Language-Parameters, Robot, Environment. Only Population was driven | every spin box, validator, slider, combo and checkbox on them. C7 converted **21 validators that read the decimal point by system locale**; none has been driven |
+| ~~**5 of the 6 View pages**~~ **DONE in C11a** — all five driven: 29 spin boxes, 20 sliders, 7 combos, 4 checkboxes, 8 radios, 20 of the 21 validators. The 21st is on `SIG_EditCommandDialog`, so it belongs to the dialogs item | closed. The validator battery matches 1.3 character for character under two locales; a `QIntValidator` regression came out of it, pinned in the gate with the decision open |
 | **15 of 16 Import/Export children.** Only `Export > Program` was driven | every file-format round trip except one |
 | **6 dialogs** — EditCommand, EditHost, InfoBox, TextView, IndividualView (double-click), and AddIndividuals beyond its OK button | |
 | **The evolution path entirely** | the generation counter, statistics, fitness curve, and the enable/disable sweep during a run |
@@ -3596,8 +3882,9 @@ teardown, the master-object assertion. New scenarios are additions to it, and
 each one that stabilises earns lines in `guibehaviour-baseline.txt`.
 
 **Order, most-likely-to-find-something first**, on the evidence of what C10
-actually caught: (1) the five parameter pages, because the locale validators and
-the spin boxes are the same shape as defects C6 and C7 already found; (2) the
+actually caught: ~~(1) the five parameter pages~~ — **done, and the guess was
+right: the regression it found is in exactly the spin-box/validator shape C6
+and C7 had already been bitten by**; (2) the
 Import/Export round trips, because they are file formats and therefore
 byte-comparable across architectures, which is the strongest kind of check this
 project has; (3) the remaining dialogs; (4) `MT_GUI`; (5) the evolution path,
@@ -3615,7 +3902,34 @@ last, because it needs a throughput answer before it can be observed at all.
   leaves `mtController` uninitialised and produces a convincing false crash.
 - **`QTest` is not a mouse.** Whatever is driven, the record must keep saying so.
 - **Verify every finding before acting.** Three of C10's apparent defects were
-  the probe, not the port; two of the oracle's readings were retracted.
+  the probe, not the port; two of the oracle's readings were retracted. C11a
+  repeated the pattern exactly: three more apparent defects, all three the
+  probe.
+- **`QTest` posts key events STRAIGHT AT THE WIDGET, focus or no focus.** So a
+  keyboard probe measures the widget's key handler and says nothing about
+  focus. On 1.3 a groove click does **not** focus a slider, and the oracle's
+  200 arrow presses went to the tree and changed the page underneath it. Drive
+  the path both sides share -- for a slider that is a groove click or a handle
+  drag -- or the comparison is between two different operations.
+- **A page remembers its tab.** Reaching a control through the View toolbar
+  does not reset the tab widget. Two of the oracle's captures came back blank
+  for this reason, and were caught only because they were empty rather than
+  wrong.
+- **Each file a scenario saves shifts the load dialog's row positions for the
+  next run.** The oracle's first round-trip attempt silently re-loaded the
+  file it had just written; the tell was the line count and the six-space
+  count, the signature C10 established.
+- **Order the probes so a toggle cannot grey a field before it is typed into.**
+  One click on a radio greyed an integer field and turned five subsequent
+  probes into false negatives.
+- **`QFileDialog` navigates as a path is typed and strips the directory out of
+  the field.** Type an ABSOLUTE path and re-assert it before Return, or the
+  dialog resolves a bare basename against wherever it has got to. This made
+  C10's `openExperiment` intermittently load nothing.
+- **A recovery path that does not print turns an intermittent failure into an
+  intermittent WRONG ANSWER.** The first fix for the above retried silently
+  and accepted the wrong filename; it was only findable because the retry
+  announced itself.
 
 **The oracle is the reason this works.** Both C10 defects were confirmed against
 the running 1.3 binary *before* anything was changed — in one case that

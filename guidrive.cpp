@@ -76,6 +76,14 @@
 #include <QProgressBar>
 #include <QComboBox>
 #include <QHeaderView>
+#include <QTabWidget>
+#include <QStyle>
+#include <QCompleter>
+#include <QStyleOptionSlider>
+#include <QTabBar>
+#include <QListWidget>
+#include <QValidator>
+#include <QAbstractSpinBox>
 #include <QContextMenuEvent>
 #include <QFile>
 #include <QFileInfo>
@@ -512,7 +520,553 @@ static bool clickMenu(const QString &top, const QString &item, const QString &su
     return false;
 }
 
+// ------------------------------------------------- the five parameter pages
+// C11. Only ONE of the six View pages -- Population -- was ever driven; the
+// other five hold every spin box, slider, combo, checkbox and validator in the
+// application, and C7 converted 21 validators that nothing has ever typed into.
+//
+// dumpWidgets() above is deliberately NOT extended. Its output sits in the
+// committed gate baseline, every line of which was diffed against the running
+// 1.3 binary in C10, so adding a field there would rewrite evidence rather
+// than add to it. Everything below is additional output in new scenarios.
+
+// A validator's CONFIGURATION. The oracle cannot read this off 1.3 at all --
+// Qt 2 has no accessibility API, so the 1.3 side reports only BEHAVIOUR, what
+// a typed character does. This half is therefore the port's own record: it is
+// what says whether C7's findChildren<QValidator*>() loop actually reached
+// every validator, or only the ones somebody happened to look at.
+static QString validatorDesc(const QValidator *v)
+{
+    if (!v) return QStringLiteral("none");
+    if (const QDoubleValidator *d = qobject_cast<const QDoubleValidator *>(v))
+        return QString("QDoubleValidator bottom=%1 top=%2 decimals=%3 notation=%4 "
+                       "locale=[%5] numberOptions=%6")
+            .arg(d->bottom()).arg(d->top()).arg(d->decimals())
+            .arg((int)d->notation()).arg(d->locale().name())
+            .arg((int)d->locale().numberOptions().toInt());
+    if (const QIntValidator *i = qobject_cast<const QIntValidator *>(v))
+        return QString("QIntValidator bottom=%1 top=%2 locale=[%3] numberOptions=%4")
+            .arg(i->bottom()).arg(i->top()).arg(i->locale().name())
+            .arg((int)i->locale().numberOptions().toInt());
+    return QString::fromLatin1(v->metaObject()->className());
+}
+
+// Type a string into a line edit ONE KEY AT A TIME and report what survived.
+// A validator that answers Invalid makes QLineEdit DROP that keystroke, so the
+// surviving text carries a gap exactly where the rejection happened: typing
+// "9,81" into a C-locale double field leaves "981", not "9,81" and not "9".
+// That gap is the whole measurement, and it is the one thing the 1.3 oracle
+// CAN read off the running binary, because it is displayed text rather than
+// validator state. The field is restored afterwards, through setText(), which
+// is programmatic and does not run the validator -- measured, not assumed:
+// setText("9,81") on one of these fields stores "9,81" and reports
+// hasAcceptableInput()==false. So probe order cannot carry state from one
+// probe into the next.
+static void probeEdit(QLineEdit *le, const char *probe)
+{
+    const QString before = le->text();
+    le->setFocus();
+    le->selectAll();
+    QTest::keyClick(le, Qt::Key_Delete);
+    QTest::keyClicks(le, QString::fromUtf8(probe));
+    QTest::qWait(10);
+    printf("      type [%-6s] -> text=[%s] acceptable=%d\n", probe,
+           qPrintable(le->text()), le->hasAcceptableInput() ? 1 : 0);
+    le->setText(before);
+}
+
+// The full battery, for the two fields the oracle types the same strings into.
+static void batteryDouble(QLineEdit *le)
+{
+    printf("    battery %s  (was [%s])\n", qPrintable(le->objectName()),
+           qPrintable(le->text()));
+    for (const char *p : {"9.81", "9,81", "0,375", "-2.5", "1e3", "abc", "1.2.3"})
+        probeEdit(le, p);
+}
+
+static void batteryInt(QLineEdit *le)
+{
+    printf("    battery %s  (was [%s])\n", qPrintable(le->objectName()),
+           qPrintable(le->text()));
+    for (const char *p : {"42", "-7", "4.2", "4,2", "abc"})
+        probeEdit(le, p);
+}
+
+// One line per spin box: resting state, one Up, two Downs, a typed value one
+// past the maximum, and THE VALUE THAT TYPING COMMITS TO.
+//
+// The commit is the load-bearing column and it took an oracle reading to know
+// it. Qt 2's QIntValidator returned INTERMEDIATE for an out-of-range number
+// (qvalidator.cpp:236, `else if ( tmp < b || tmp > t ) return Intermediate'),
+// so QLineEdit accepted every digit; QSpinBox::interpretText then mapped the
+// whole text and called setValue(), and QRangeControl::directSetValue CLAMPED
+// it into the range. Type 100 into a [1..99] box in 1.3 and you get 99.
+// Qt 6's QIntValidator returns INVALID once the prefix passes the top, so the
+// keystroke is refused and the box keeps the truncated prefix -- type 100 and
+// you get 10. Same range, same typing, a different number committed.
+static void probeSpin(QSpinBox *sp)
+{
+    const int start = sp->value();
+    sp->setFocus();
+    QTest::keyClick(sp, Qt::Key_Up);
+    const int up = sp->value();
+    QTest::keyClick(sp, Qt::Key_Down);
+    QTest::keyClick(sp, Qt::Key_Down);
+    const int down = sp->value();
+    sp->setValue(start);
+
+    sp->selectAll();
+    QTest::keyClick(sp, Qt::Key_Delete);
+    QTest::keyClicks(sp, QString::number((long long)sp->maximum() + 1));
+    QTest::qWait(10);
+    // QAbstractSpinBox::lineEdit() is protected; the editor is the spin
+    // box's only QLineEdit child, so ask for it that way.
+    QLineEdit *ed = sp->findChild<QLineEdit *>();
+    const QString typed = ed ? ed->text() : QString();
+    const int typedVal = sp->value();
+    // Return is what commits. 1.3 clamps here; the port has nothing left to
+    // clamp, having refused the digits that would have gone out of range.
+    QTest::keyClick(sp, Qt::Key_Return);
+    QTest::qWait(20);
+    const int committed = sp->value();
+    sp->setValue(start);
+
+    printf("    spin   %-36s v=%-9d [%d..%d] step=%d pre=[%s] suf=[%s] "
+           "up=%-9d dn2=%-9d typed(max+1)=[%s]->%d commits=%d enabled=%d\n",
+           qPrintable(sp->objectName()), start, sp->minimum(), sp->maximum(),
+           sp->singleStep(), qPrintable(sp->prefix()), qPrintable(sp->suffix()),
+           up, down, qPrintable(typed), typedVal, committed,
+           sp->isEnabled() ? 1 : 0);
+}
+
+// The form pairs sliderXXX with lcdnumberXXX by name, through connections uic
+// emitted. Reading the LCD back after a keyboard move is what proves the pair
+// is still connected -- a dead connect() compiles, links and shows nothing.
+static QLCDNumber *pairedLcd(QWidget *page, QSlider *sl)
+{
+    QString n = sl->objectName();
+    if (!n.startsWith("slider")) return nullptr;
+    return page->findChild<QLCDNumber *>("lcdnumber" + n.mid(6));
+}
+
+// A GROOVE CLICK, which is the operation the 1.3 oracle can actually perform.
+// It reported that in 1.3 clicking the groove moves the handle by exactly +1
+// and does NOT give the slider keyboard focus, so 200 arrow presses on its
+// side went to the tree and moved the page instead. That is worth having in
+// the record twice over: the keyboard probe below drives the slider's key
+// handler DIRECTLY (QTest posts to the widget, focus or no focus), so it does
+// not measure focus at all -- and a comparison built only on it would be
+// pitting a keyboard-driven Qt 6 slider against something 1.3 will not do.
+// The click path is the one both sides share.
+static void probeSliderClick(QSlider *sl)
+{
+    const int start = sl->value();
+    // Just inside the groove, past the handle, so the click is a page step
+    // rather than a grab. Vertical centre; these are all horizontal.
+    const QPoint p(sl->width() - 6, sl->height() / 2);
+    QTest::mouseClick(sl, Qt::LeftButton, Qt::NoModifier, p);
+    QTest::qWait(40);
+    const int after = sl->value();
+    printf("    click  %-36s %d -> %d (delta %+d) focusPolicy=%d hasFocus=%d\n",
+           qPrintable(sl->objectName()), start, after, after - start,
+           (int)sl->focusPolicy(), sl->hasFocus() ? 1 : 0);
+    sl->setValue(start);
+}
+
+static void probeSlider(QWidget *page, QSlider *sl)
+{
+    QLCDNumber *lcd = pairedLcd(page, sl);
+    const int start = sl->value();
+    const double lcdStart = lcd ? lcd->value() : 0.0;
+    sl->setFocus();
+    QTest::keyClick(sl, Qt::Key_Up);
+    const int up = sl->value();
+    const double lcdUp = lcd ? lcd->value() : 0.0;
+    QTest::keyClick(sl, Qt::Key_PageUp);
+    const int pg = sl->value();
+    const double lcdPg = lcd ? lcd->value() : 0.0;
+    sl->setValue(start);
+    printf("    slider %-36s v=%-6d [%d..%d] page=%d up=%-6d pgup=%-6d "
+           "lcd=%s %g/%g/%g enabled=%d\n",
+           qPrintable(sl->objectName()), start, sl->minimum(), sl->maximum(),
+           sl->pageStep(), up, pg, lcd ? qPrintable(lcd->objectName()) : "(none)",
+           lcdStart, lcdUp, lcdPg, sl->isEnabled() ? 1 : 0);
+}
+
+static void probeCombo(QComboBox *cb)
+{
+    printf("    combo  %-36s count=%d current=%d [%s] editable=%d enabled=%d\n",
+           qPrintable(cb->objectName()), cb->count(), cb->currentIndex(),
+           qPrintable(cb->currentText()), cb->isEditable() ? 1 : 0,
+           cb->isEnabled() ? 1 : 0);
+    for (int i = 0; i < cb->count(); ++i) printf("      item%-2d [%s]\n", i,
+                                                 qPrintable(cb->itemText(i)));
+    const int start = cb->currentIndex();
+    // Walk the list with the keyboard, which is what a user does with it
+    // closed. Selecting by index through the API would not exercise the
+    // widget's own key handling or the activated()/currentIndexChanged()
+    // signals the forms hang behaviour off. count Downs is one more than the
+    // list is long from ANY starting index, so it must end CLAMPED at the last
+    // item; count Ups must then clamp at the first. That pair is the
+    // measurement -- not a round trip back to where it started, which it is
+    // not and an earlier version of this wrongly implied.
+    cb->setFocus();
+    for (int i = 0; i < cb->count(); ++i) QTest::keyClick(cb, Qt::Key_Down);
+    printf("      %d Down clamps at current=%d [%s]\n", cb->count(),
+           cb->currentIndex(), qPrintable(cb->currentText()));
+    for (int i = 0; i < cb->count(); ++i) QTest::keyClick(cb, Qt::Key_Up);
+    printf("      %d Up   clamps at current=%d [%s]\n", cb->count(),
+           cb->currentIndex(), qPrintable(cb->currentText()));
+    cb->setCurrentIndex(start);
+}
+
+// Clicking a checkbox or radio, and reporting what ELSE moved. The forms wire
+// real behaviour off these -- checkboxIgnoreMaxIndLength disables a spin box,
+// the Environment radios switch which of two fields feeds the floor -- and a
+// click is the only way to see it.
+static void probeToggle(QWidget *page, QAbstractButton *b)
+{
+    const bool start = b->isChecked();
+    const char *kind = qobject_cast<QCheckBox *>(b) ? "check" : "radio";
+    // Record what is enabled AND what is checked before, so a side effect
+    // shows up as a delta. The checked half is what catches a radio group:
+    // clicking one member silently unchecks another, and the interlocks on
+    // these pages -- Function vs Picture, the two constraint-manager modes --
+    // are exactly that. Qt's own internal children (qt_*) are skipped: they
+    // are implementation detail, not the form's.
+    std::map<QString, bool> before, beforeChecked;
+    for (QWidget *w : page->findChildren<QWidget *>()) {
+        if (w->objectName().isEmpty() || w->objectName().startsWith("qt_")) continue;
+        before[w->objectName()] = w->isEnabled();
+        if (QAbstractButton *ab = qobject_cast<QAbstractButton *>(w))
+            beforeChecked[w->objectName()] = ab->isChecked();
+    }
+
+    QTest::mouseClick(b, Qt::LeftButton, Qt::NoModifier, QPoint(8, b->height() / 2));
+    QTest::qWait(30);
+    const bool after = b->isChecked();
+
+    printf("    %-6s %-36s text=[%s] checkable=%d %d->%d enabled=%d\n", kind,
+           qPrintable(b->objectName()), qPrintable(b->text()),
+           b->isCheckable() ? 1 : 0, start ? 1 : 0, after ? 1 : 0,
+           b->isEnabled() ? 1 : 0);
+    for (QWidget *w : page->findChildren<QWidget *>()) {
+        if (w->objectName().isEmpty() || w->objectName().startsWith("qt_")) continue;
+        auto it = before.find(w->objectName());
+        if (it != before.end() && it->second != w->isEnabled())
+            printf("      side effect: %s now %s\n", qPrintable(w->objectName()),
+                   w->isEnabled() ? "ENABLED" : "greyed");
+        QAbstractButton *ab = qobject_cast<QAbstractButton *>(w);
+        auto ic = beforeChecked.find(w->objectName());
+        if (ab && ab != b && ic != beforeChecked.end() && ic->second != ab->isChecked())
+            printf("      side effect: %s now %s\n", qPrintable(w->objectName()),
+                   ab->isChecked() ? "CHECKED" : "unchecked");
+    }
+    // Put it back, by clicking again -- a radio cannot be un-clicked, so only
+    // a checkbox returns, and saying which is part of the record.
+    if (qobject_cast<QCheckBox *>(b) && b->isChecked() != start) {
+        QTest::mouseClick(b, Qt::LeftButton, Qt::NoModifier, QPoint(8, b->height() / 2));
+        QTest::qWait(30);
+    }
+}
+
+// The read-only half: everything on a container that carries state but is not
+// driven here -- list boxes, trees, the line edits' text and validators.
+static void dumpContainer(QWidget *c)
+{
+    for (QGroupBox *g : c->findChildren<QGroupBox *>())
+        printf("    group  [%s] enabled=%d checkable=%d\n", qPrintable(g->title()),
+               g->isEnabled() ? 1 : 0, g->isCheckable() ? 1 : 0);
+    for (QLineEdit *le : c->findChildren<QLineEdit *>()) {
+        if (qobject_cast<QAbstractSpinBox *>(le->parentWidget())) continue;
+        printf("    edit   %-36s text=[%s] enabled=%d validator=%s\n",
+               qPrintable(le->objectName()), qPrintable(le->text()),
+               le->isEnabled() ? 1 : 0, qPrintable(validatorDesc(le->validator())));
+    }
+    for (QListWidget *lw : c->findChildren<QListWidget *>()) {
+        printf("    list   %-36s count=%d current=%d enabled=%d\n",
+               qPrintable(lw->objectName()), lw->count(), lw->currentRow(),
+               lw->isEnabled() ? 1 : 0);
+        for (int i = 0; i < lw->count(); ++i)
+            printf("      item%-2d [%s] hasIcon=%d\n", i,
+                   qPrintable(lw->item(i)->text()), lw->item(i)->icon().isNull() ? 0 : 1);
+    }
+    for (QTreeWidget *tw : c->findChildren<QTreeWidget *>()) {
+        printf("    tree   %-36s cols=%d rows=%d\n", qPrintable(tw->objectName()),
+               tw->columnCount(), tw->topLevelItemCount());
+        for (int i = 0; i < tw->topLevelItemCount(); ++i) {
+            QTreeWidgetItem *ti = tw->topLevelItem(i);
+            printf("      row%-2d ", i);
+            for (int c2 = 0; c2 < tw->columnCount(); ++c2)
+                printf("| %-22s", qPrintable(ti->text(c2)));
+            // Column 0 of these tables carries no text; saying WHAT it carries
+            // is the difference between "empty" and "the icon went missing".
+            printf("| col0icon=%d col0check=%d\n", ti->icon(0).isNull() ? 0 : 1,
+                   (int)ti->checkState(0));
+        }
+    }
+}
+
+// Drive everything in scope on one container: every spin box, slider, combo,
+// checkbox and radio it owns, plus a comma probe into every validated field.
+// The comma probe is the point of the whole exercise: C7 pinned 21 validators
+// to QLocale::c() with RejectGroupSeparator so that a typed comma behaves as
+// Qt 2's strtod-based one did, and nothing has ever typed a comma into any of
+// them. Driving all of them, not a sample, is what says the loop reached them.
+static void driveContainer(QWidget *page, QWidget *c)
+{
+    for (QLineEdit *le : c->findChildren<QLineEdit *>()) {
+        if (qobject_cast<QAbstractSpinBox *>(le->parentWidget())) continue;
+        if (!le->validator()) continue;
+        printf("    comma  %-36s", qPrintable(le->objectName()));
+        const QString before = le->text();
+        le->setFocus();
+        le->selectAll();
+        QTest::keyClick(le, Qt::Key_Delete);
+        QTest::keyClicks(le, QStringLiteral("9,81"));
+        QTest::qWait(10);
+        printf(" type[9,81] -> [%s] acceptable=%d\n", qPrintable(le->text()),
+               le->hasAcceptableInput() ? 1 : 0);
+        le->setText(before);
+    }
+    for (QSpinBox *sp : c->findChildren<QSpinBox *>())     probeSpin(sp);
+    for (QSlider *sl : c->findChildren<QSlider *>()) {
+        probeSlider(page, sl);
+        probeSliderClick(sl);
+    }
+    for (QComboBox *cb : c->findChildren<QComboBox *>())    probeCombo(cb);
+    for (QCheckBox *cb : c->findChildren<QCheckBox *>())    probeToggle(page, cb);
+    for (QRadioButton *rb : c->findChildren<QRadioButton *>()) probeToggle(page, rb);
+    // An empty [drive] block reads as a harness that failed to find anything.
+    // Say which it is: the Robot page genuinely carries none of these five
+    // widget kinds, only list boxes and four buttons that open dialogs.
+    if (c->findChildren<QSpinBox *>().isEmpty() && c->findChildren<QSlider *>().isEmpty()
+        && c->findChildren<QComboBox *>().isEmpty() && c->findChildren<QCheckBox *>().isEmpty()
+        && c->findChildren<QRadioButton *>().isEmpty()) {
+        int validated = 0;
+        for (QLineEdit *le : c->findChildren<QLineEdit *>())
+            if (le->validator() && !qobject_cast<QAbstractSpinBox *>(le->parentWidget()))
+                ++validated;
+        if (!validated) printf("    (nothing on this container is in C11's scope:"
+                               " no spin box, slider, combo, checkbox, radio or"
+                               " validated field)\n");
+    }
+}
+
+// Visit one View page, survey it, then drive it tab by tab. Switching tabs by
+// clicking the tab bar rather than setCurrentIndex() keeps every widget that
+// gets driven actually VISIBLE when it is driven, which is the state a user
+// would have it in and the state the oracle can photograph.
+static void visitPage(const QString &menuItem)
+{
+    clickMenu("&View", menuItem);
+    QTest::qWait(300);
+    QStackedWidget *st = W->findChild<QStackedWidget *>();
+    QWidget *pg = st ? st->currentWidget() : nullptr;
+    printf("\n== PAGE %s ==\n", qPrintable(menuItem));
+    if (!pg) { printf("  !! no current page\n"); fflush(stdout); return; }
+    printf("  [class] %s objectName=[%s] enabled=%d\n", pg->metaObject()->className(),
+           qPrintable(pg->objectName()), pg->isEnabled() ? 1 : 0);
+
+    QTabWidget *tabs = pg->findChild<QTabWidget *>();
+    if (!tabs) {
+        printf("  [tabs] none\n");
+        printf("  [survey]\n");   dumpContainer(pg);
+        printf("  [drive]\n");    driveContainer(pg, pg);
+        fflush(stdout);
+        return;
+    }
+    printf("  [tabs] %s count=%d current=%d\n", qPrintable(tabs->objectName()),
+           tabs->count(), tabs->currentIndex());
+    for (int i = 0; i < tabs->count(); ++i)
+        printf("    tab%-2d [%s] enabled=%d\n", i, qPrintable(tabs->tabText(i)),
+               tabs->isTabEnabled(i) ? 1 : 0);
+    for (int i = 0; i < tabs->count(); ++i) {
+        QTabBar *bar = tabs->tabBar();
+        QTest::mouseClick(bar, Qt::LeftButton, Qt::NoModifier, bar->tabRect(i).center());
+        QTest::qWait(150);
+        QWidget *t = tabs->widget(i);
+        printf("  -- tab %d [%s] shown=%d visible=%d\n", i, qPrintable(tabs->tabText(i)),
+               tabs->currentIndex() == i ? 1 : 0, t->isVisible() ? 1 : 0);
+        printf("  [survey]\n");   dumpContainer(t);
+        printf("  [drive]\n");    driveContainer(pg, t);
+        fflush(stdout);
+    }
+    // Anything the tab widget does not own -- the pages put buttons outside it.
+    printf("  -- outside the tab widget\n");
+    printf("  [survey]\n");
+    for (QAbstractButton *b : pg->findChildren<QAbstractButton *>()) {
+        if (tabs->isAncestorOf(b)) continue;
+        printf("    button %-36s text=[%s] enabled=%d default=%d\n",
+               qPrintable(b->objectName()), qPrintable(b->text()),
+               b->isEnabled() ? 1 : 0,
+               qobject_cast<QPushButton *>(b) ?
+                   (qobject_cast<QPushButton *>(b)->isDefault() ? 1 : 0) : 0);
+    }
+    fflush(stdout);
+}
+
+// The GP page's three genetic-operator sliders are not independent: Mutation
+// and Crossover are clamped so their sum cannot pass 1000, and Reproduction is
+// the disabled remainder, recomputed by the slot each time either moves. The
+// generic slider probe above cannot see any of this, because a one-step nudge
+// leaves the sum far from the ceiling. This drives it into the clamp.
+// Press the HANDLE and drag it past the right-hand end. QSlider has no public
+// way to ask where its handle is, so the geometry comes from the style: the
+// groove span is the width less the handle length, which is exactly what
+// QStyle::sliderPositionFromValue is defined against.
+static void dragSliderHardRight(QSlider *sl)
+{
+    const int handleLen = sl->style()->pixelMetric(QStyle::PM_SliderLength, nullptr, sl);
+    const int span = sl->width() - handleLen;
+    const int x = QStyle::sliderPositionFromValue(sl->minimum(), sl->maximum(),
+                                                  sl->value(), span) + handleLen / 2;
+    const QPoint from(x, sl->height() / 2);
+    const QPoint to(sl->width() + 400, sl->height() / 2);
+    QTest::mousePress(sl, Qt::LeftButton, Qt::NoModifier, from);
+    QTest::qWait(30);
+    QTest::mouseMove(sl, to);
+    QTest::qWait(60);
+    QTest::mouseRelease(sl, Qt::LeftButton, Qt::NoModifier, to);
+    QTest::qWait(60);
+}
+
+static void probeGeneticSliders(QWidget *page)
+{
+    QSlider *mut = page->findChild<QSlider *>("sliderMutation");
+    QSlider *cro = page->findChild<QSlider *>("sliderCrossover");
+    QSlider *rep = page->findChild<QSlider *>("sliderReproduction");
+    QLCDNumber *lm = page->findChild<QLCDNumber *>("lcdnumberMutation");
+    QLCDNumber *lc = page->findChild<QLCDNumber *>("lcdnumberCrossover");
+    QLCDNumber *lr = page->findChild<QLCDNumber *>("lcdnumberReproduction");
+    if (!mut || !cro || !rep || !lm || !lc || !lr) {
+        printf("  !! genetic sliders not all present\n"); return; }
+
+    auto line = [&](const char *what) {
+        printf("    %-28s mut=%-5d cro=%-5d rep=%-5d  lcd %g / %g / %g  sum=%d\n",
+               what, mut->value(), cro->value(), rep->value(),
+               lm->value(), lc->value(), lr->value(),
+               mut->value() + cro->value() + rep->value());
+    };
+    printf("\n  [genetic slider interlock]\n");
+    line("as loaded");
+
+    // Drive with the keyboard, one page step at a time, far enough for the
+    // clamp to engage. PageUp on these is 1, so this is deliberately a slow
+    // walk rather than setValue() -- setValue() would emit the same signal but
+    // would not prove the widget's own key handling reaches the slot.
+    mut->setFocus();
+    for (int i = 0; i < 200; ++i) QTest::keyClick(mut, Qt::Key_Up);
+    line("after 200 Up on Mutation");
+    cro->setFocus();
+    for (int i = 0; i < 200; ++i) QTest::keyClick(cro, Qt::Key_Up);
+    line("after 200 Up on Crossover");
+    mut->setFocus();
+    for (int i = 0; i < 200; ++i) QTest::keyClick(mut, Qt::Key_Down);
+    line("after 200 Down on Mutation");
+
+    // The same clamp reached by DRAGGING the handle -- ONE operation, and the
+    // one the oracle can perform on 1.3, where arrow keys demonstrably do not
+    // reach the slider and 280 groove clicks would not be worth anyone's time.
+    // The press must land ON THE HANDLE: an earlier version pressed at x=6,
+    // which is groove, so it page-stepped DOWN by one and the drag never
+    // started -- Mutation went 50 -> 49 and read as a clamp that was really a
+    // missed grab. The handle position comes from the style rather than a
+    // guess, for the same reason.
+    dragSliderHardRight(mut);
+    line("after dragging Mutation hard right");
+    fflush(stdout);
+}
+
+// sliderAlpha is the Environment page's only slider and it starts DISABLED --
+// the texture checkbox owns it. The generic probe therefore measures a slider
+// that cannot move, which is correct but says nothing. Turn the checkbox on
+// first and drive it for real.
+static void probeAlphaSlider(QWidget *page)
+{
+    QCheckBox *tex = page->findChild<QCheckBox *>("checkboxTextureFile");
+    QSlider *al = page->findChild<QSlider *>("sliderAlpha");
+    if (!tex || !al) { printf("  !! texture checkbox or alpha slider missing\n"); return; }
+    printf("\n  [alpha slider, once the texture checkbox enables it]\n");
+    printf("    before: checkbox=%d slider enabled=%d value=%d\n",
+           tex->isChecked() ? 1 : 0, al->isEnabled() ? 1 : 0, al->value());
+    if (!tex->isChecked())
+        QTest::mouseClick(tex, Qt::LeftButton, Qt::NoModifier, QPoint(8, tex->height() / 2));
+    QTest::qWait(50);
+    printf("    after checkbox click: checkbox=%d slider enabled=%d value=%d\n",
+           tex->isChecked() ? 1 : 0, al->isEnabled() ? 1 : 0, al->value());
+    al->setFocus();
+    for (int i = 0; i < 10; ++i) QTest::keyClick(al, Qt::Key_Down);
+    printf("    after 10 Down: value=%d\n", al->value());
+    QTest::keyClick(al, Qt::Key_PageUp);
+    printf("    after 1 PageUp (page=%d): value=%d\n", al->pageStep(), al->value());
+    QTest::keyClick(al, Qt::Key_End);
+    printf("    after End: value=%d  (max=%d)\n", al->value(), al->maximum());
+    QTest::keyClick(al, Qt::Key_Home);
+    printf("    after Home: value=%d  (min=%d)\n", al->value(), al->minimum());
+    fflush(stdout);
+}
+
 // -------------------------------------------------------------------- steps
+// Type a path into a file dialog and accept it.
+//
+// THIS WAS THE INTERMITTENT HANG, and the cause is not what it looked like.
+// Seen four times while C11a was being written and then not reproducible in a
+// dozen runs; it is not new here either -- C10's openExperiment has the same
+// shape, so the C10 gate has been quietly flaky since it was written.
+//
+// TWO WRONG DIAGNOSES, both recorded because each looked right:
+//  1. "The completer popup eats the Return." Plausible, and the popup is real,
+//     so the first fix escaped it and pressed Return again. That is WORSE than
+//     hanging: it reproduced during the fresh-eyes review and the dialog
+//     accepted with the completion's filename instead of the typed one, so the
+//     experiment silently did not load and the run carried on against an empty
+//     tree. A hang is loud; a wrong file is not.
+//  2. The actual cause, which only a printed diagnostic showed: QFileDialog
+//     NAVIGATES as a path with separators is typed, and strips the directory
+//     part out of the field as it goes. The field is then left holding just
+//     the basename, and Return resolves it against whichever directory the
+//     dialog has got to -- which is a race with the typing.
+//
+// So: type an ABSOLUTE path, which resolves the same wherever the dialog has
+// navigated to, and re-assert it before Return. Both the whole path and the
+// bare basename are the dialog behaving normally, so neither prints; anything
+// else does. The completer goes too -- one less thing to race with.
+static void acceptFileDialog(QFileDialog *fd, const QString &path)
+{
+    QLineEdit *le = fd->findChild<QLineEdit *>("fileNameEdit");
+    if (!le) { printf("  !! no fileNameEdit\n"); fd->reject(); return; }
+    const QString abs  = QFileInfo(path).absoluteFilePath();
+    const QString base = QFileInfo(abs).fileName();
+    le->setCompleter(nullptr);
+    le->setFocus();
+    le->selectAll();
+    QTest::keyClicks(le, abs);           // real key events, one per character
+    QTest::qWait(120);
+    if (le->text() != abs && le->text() != base)
+        printf("  [filedialog] typed [%s] but the field holds [%s]\n",
+               qPrintable(abs), qPrintable(le->text()));
+    le->setText(abs);                    // unconditional: kills the race
+    QTest::keyClick(le, Qt::Key_Return);
+    QTest::qWait(150);
+    if (!fd->isVisible()) return;
+
+    // If this ever prints, something changed in Qt's dialog and the run should
+    // be looked at rather than trusted.
+    printf("  [filedialog] still open after Return; clicking accept\n");
+    for (QPushButton *b : fd->findChildren<QPushButton *>())
+        if (b->isDefault() && b->isEnabled()) {
+            QTest::mouseClick(b, Qt::LeftButton, Qt::NoModifier, b->rect().center());
+            break;
+        }
+    QTest::qWait(150);
+    if (fd->isVisible()) {
+        printf("  [filedialog] STILL open -- rejecting it\n");
+        fd->reject();
+    }
+    fflush(stdout);
+}
+
 static void openExperiment(const QString &path)
 {
     whenModal([path](QWidget *m) {
@@ -522,12 +1076,7 @@ static void openExperiment(const QString &path)
                qPrintable(fd->windowTitle()), (int)fd->fileMode(),
                qPrintable(fd->nameFilters().join(" ;; ")),
                qPrintable(fd->labelText(QFileDialog::Accept)));
-        QLineEdit *le = fd->findChild<QLineEdit *>("fileNameEdit");
-        if (!le) { printf("  !! no fileNameEdit\n"); fd->reject(); return; }
-        le->setFocus();
-        QTest::keyClicks(le, path);          // real key events into the dialog
-        QTest::qWait(120);
-        QTest::keyClick(le, Qt::Key_Return); // real Return
+        acceptFileDialog(fd, path);          // real key events into the dialog
         fflush(stdout);
     });
     clickMenu("&File", "&Open Experiment");
@@ -720,6 +1269,182 @@ int main(int argc, char **argv)
         }, 5000);
         clickMenu("&MetaGP", "&Use MetaGP");
         QTest::qWait(2000);
+        return 0;
+    }
+
+    // --- the five View pages C10 never opened ------------------------------
+    // Population was the only one of the six that was ever driven. These five
+    // hold every spin box, slider, combo, checkbox and validator in the
+    // application. The population is untouched here (120 individuals), which
+    // matters: slotTourPerGenChanged reads the pool size to compute what its
+    // LCD shows, so this scenario must not follow a delete.
+    if (scenario == "pages") {
+        QStackedWidget *st2 = W->findChild<QStackedWidget *>();
+
+        // THE BATTERY RUNS FIRST, and the reason is a probe error worth
+        // recording: run after the page drive, it reported that lineeditXDim
+        // ignored every one of its five probes. The field had not stopped
+        // working -- the radio drive a moment earlier had clicked
+        // radiobuttonPictureFile, whose side effect GREYS lineeditXDim, and a
+        // disabled QLineEdit correctly ignores key events. Five false
+        // negatives from one click, in the probe rather than the port.
+        printf("\n== VALIDATOR BATTERY ==\n");
+        printf("  (on a pristine Environment page -- see the note in the source:\n"
+               "   running this after the page drive greys the integer field and\n"
+               "   silently turns all five of its probes into false negatives)\n");
+        clickMenu("&View", "&Environment");
+        QTest::qWait(300);
+        QWidget *env = st2 ? st2->currentWidget() : nullptr;
+        if (!env) { printf("  !! no Environment page\n"); return 1; }
+        if (QLineEdit *g = env->findChild<QLineEdit *>("lineeditGravityX"))
+            batteryDouble(g);
+        else printf("  !! no lineeditGravityX\n");
+        if (QLineEdit *x = env->findChild<QLineEdit *>("lineeditXDim")) {
+            printf("    (enabled=%d -- a greyed field would eat every probe)\n",
+                   x->isEnabled() ? 1 : 0);
+            batteryInt(x);
+        } else printf("  !! no lineeditXDim\n");
+        fflush(stdout);
+
+        // Then the survey and the drive, page by page. NOTE THE ORDER
+        // DEPENDENCE: the drive deliberately leaves what it clicked clicked --
+        // a radio cannot be un-clicked, and restoring state would hide exactly
+        // the interlocks this is here to find. So within a page the validated
+        // fields are probed BEFORE the toggles that can grey them, and the two
+        // interlock probes below run on the page they belong to, last.
+        for (const char *m : {"&GP Parameters", "&Simulation Parameters",
+                              "&Language Parameters", "&Robot", "&Environment"})
+            visitPage(QString::fromLatin1(m));
+
+        clickMenu("&View", "&Environment");
+        QTest::qWait(300);
+        if (st2 && st2->currentWidget()) probeAlphaSlider(st2->currentWidget());
+        clickMenu("&View", "&GP Parameters");
+        QTest::qWait(300);
+        if (st2 && st2->currentWidget()) probeGeneticSliders(st2->currentWidget());
+        return 0;
+    }
+
+    // --- does a value typed on a page reach the FILE? --------------------
+    // The strongest check this project has, because the answer is bytes and
+    // not a number a machine can round differently: putAllIntoExperiment()
+    // runs on save, so the parameter block of the written .exp is exactly what
+    // the five pages hold. i386/Qt 2 and aarch64/Qt 6 must write the same
+    // block from the same typing, and that comparison cannot be muddied by
+    // x87 vs IEEE the way a fitness value can.
+    //
+    // Run it TWICE, once with SIGEL_PAGEEDIT=1 and once without: both are the
+    // FIRST save of a freshly loaded experiment, so the history whitespace
+    // that C10 measured growing by 840 bytes a save is identical in the two,
+    // and diffing them shows the edits and nothing else.
+    if (scenario == "pagesave") {
+        const bool edit = qgetenv("SIGEL_PAGEEDIT") == "1";
+        QString out = scratch() + (edit ? "/pagesave-edited.exp"
+                                        : "/pagesave-base.exp");
+        QFile::remove(out);
+        QStackedWidget *st3 = W->findChild<QStackedWidget *>();
+        printf("\n== PAGE SAVE ROUND TRIP (edit=%d) ==\n", edit ? 1 : 0);
+
+        auto page = [&](const char *m) -> QWidget * {
+            clickMenu("&View", QString::fromLatin1(m));
+            QTest::qWait(300);
+            return st3 ? st3->currentWidget() : nullptr;
+        };
+        auto tab = [&](QWidget *pg, int i) {
+            QTabWidget *tw = pg ? pg->findChild<QTabWidget *>() : nullptr;
+            if (!tw) return;
+            QTabBar *bar = tw->tabBar();
+            QTest::mouseClick(bar, Qt::LeftButton, Qt::NoModifier, bar->tabRect(i).center());
+            QTest::qWait(120);
+        };
+        // Type into a line edit the way a person does: select all, delete,
+        // then the characters. NOT setText() -- setText bypasses the validator
+        // entirely, which is the one thing under test here.
+        auto typeInto = [&](QWidget *pg, const char *name, const char *val) {
+            QLineEdit *le = pg ? pg->findChild<QLineEdit *>(name) : nullptr;
+            if (!le) { printf("  !! no %s\n", name); return; }
+            le->setFocus(); le->selectAll();
+            QTest::keyClick(le, Qt::Key_Delete);
+            QTest::keyClicks(le, QString::fromLatin1(val));
+            QTest::qWait(20);
+            printf("  typed [%s] into %-34s -> [%s] acceptable=%d\n", val, name,
+                   qPrintable(le->text()), le->hasAcceptableInput() ? 1 : 0);
+        };
+        auto typeSpin = [&](QWidget *pg, const char *name, const char *val) {
+            QSpinBox *sp = pg ? pg->findChild<QSpinBox *>(name) : nullptr;
+            if (!sp) { printf("  !! no %s\n", name); return; }
+            sp->setFocus(); sp->selectAll();
+            QTest::keyClick(sp, Qt::Key_Delete);
+            QTest::keyClicks(sp, QString::fromLatin1(val));
+            QTest::qWait(20);
+            printf("  typed [%s] into %-34s -> value=%d\n", val, name, sp->value());
+        };
+
+        if (edit) {
+            QWidget *pg = page("&Environment");
+            tab(pg, 0);
+            typeInto(pg, "lineeditGravityX", "1.25");
+            typeInto(pg, "lineeditXDim", "77");
+            tab(pg, 2);
+            typeInto(pg, "lineeditYPlaneLevel", "2.5");
+
+            pg = page("&Simulation Parameters");
+            tab(pg, 0);
+            typeInto(pg, "lineeditStepSize", "0.02");
+            tab(pg, 1);
+            if (QComboBox *cb = pg->findChild<QComboBox *>("comboboxDynaMechsIntegrator")) {
+                cb->setFocus(); QTest::keyClick(cb, Qt::Key_Down);
+                printf("  combo comboboxDynaMechsIntegrator -> %d [%s]\n",
+                       cb->currentIndex(), qPrintable(cb->currentText()));
+            }
+            tab(pg, 2);
+            typeInto(pg, "lineeditMaximalError", "0.2");
+
+            pg = page("&GP Parameters");
+            tab(pg, 0);
+            typeSpin(pg, "spinboxRandomSeed", "123");
+            typeSpin(pg, "spinboxMaxAge", "42");
+            if (QComboBox *cb = pg->findChild<QComboBox *>("comboboxFitnessName")) {
+                cb->setFocus(); QTest::keyClick(cb, Qt::Key_Down);
+                printf("  combo comboboxFitnessName -> %d [%s]\n",
+                       cb->currentIndex(), qPrintable(cb->currentText()));
+            }
+            if (QSlider *sl = pg->findChild<QSlider *>("sliderMutation")) {
+                sl->setFocus();
+                for (int i = 0; i < 200; ++i) QTest::keyClick(sl, Qt::Key_Up);
+                printf("  slider sliderMutation -> %d\n", sl->value());
+            }
+
+            pg = page("&Language Parameters");
+            typeSpin(pg, "spinboxNumberOfRegisters", "9");
+            fflush(stdout);
+        }
+
+        whenModal([out](QWidget *m) {
+            QFileDialog *fd = qobject_cast<QFileDialog *>(m);
+            if (!fd) { printf("  !! save modal is not a QFileDialog\n"); m->close(); return; }
+            acceptFileDialog(fd, out);
+        });
+        clickMenu("&File", "&Save Experiment");
+        QTest::qWait(4000);
+        printf("  [saved] exists=%d size=%lld\n", QFile::exists(out),
+               QFileInfo(out).size());
+
+        // The parameter block is everything before POPULATION BEGIN{ -- about
+        // 170 lines, and it is what the five pages own. Printing it here makes
+        // it part of the diffable record rather than a file to go and look at.
+        QFile f(out);
+        if (!f.open(QIODevice::ReadOnly)) { printf("  !! cannot re-read it\n"); return 1; }
+        printf("\n== WRITTEN PARAMETER BLOCK ==\n");
+        int n = 0;
+        while (!f.atEnd()) {
+            QByteArray l = f.readLine();
+            if (l.startsWith("POPULATION BEGIN{")) break;
+            printf("%3d| %s", ++n, l.constData());
+            if (!l.endsWith("\n")) printf("\n");
+        }
+        printf("== %d lines ==\n", n);
+        fflush(stdout);
         return 0;
     }
 

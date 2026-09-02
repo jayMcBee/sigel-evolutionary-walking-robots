@@ -194,3 +194,524 @@ we do with the system?]
   button [Disable] default=1
   button [Remove] default=0
   button [Save && Remove] default=0
+#
+# ---------------------------------------------------------------------------
+# From here on: PORTING.md step C11, the five View pages C10 never opened.
+#
+# C10 drove ONE of the six View pages. The other five hold every spin box,
+# slider, combo, checkbox and validator in the application, and C7 had
+# converted 21 validators that nothing on either side had ever typed into.
+#
+# WHAT HAS AN ORACLE READING BEHIND IT, and what does not, stated per block
+# rather than in general, because the two are not the same strength:
+#
+#   VALIDATOR BATTERY -- confirmed against the running 1.3 binary, all twelve
+#     probes, character for character, by the sigel-x86 oracle driving the
+#     2003 i386 build with XTest. Both the double field and the integer field.
+#     1.3 accepts the exponent "1e3", takes a leading minus in the INTEGER
+#     field, turns "1.2.3" into "1.23" and "9,81" into "981" -- the comma
+#     rejected as a keystroke, leaving a gap. The port does all four the same.
+#
+#   comma probes on the other validated fields -- four of them spot-checked on
+#     1.3 (Planar spring constant, Level, Step Size, Maximal Error), all
+#     "9,81" -> "981". The rest are the port's own measurement.
+#
+#   LOCALE INDEPENDENCE -- check.sh re-runs this whole scenario under
+#     LANG=de_DE.UTF-8 and requires it to be IDENTICAL. That is not a Qt 6
+#     nicety: the oracle built a de_DE with WOODY'S OWN localedef, verified it
+#     with woody's own locale binary, ran the 2003 binary under it and got the
+#     same seven results. So 1.3 is locale-independent as measured, and the
+#     port matches. Reverting C7's locale pinning breaks it loudly -- "9.81"
+#     becomes UNACCEPTABLE and "9,81" becomes accepted text that
+#     QString::toDouble() reads back as ZERO, straight into the saved file.
+#
+#   spin boxes, sliders, combos, checkboxes, the two interlocks -- the port's
+#     own driven measurement. Deterministic across runs and across three
+#     locales, all measured. Where a 1.3 reading exists it is noted above.
+#
+# THE TWO INTERLOCKS ARE THE PART WORTH READING. Neither is visible without
+# driving. The genetic sliders are not independent: Mutation + Crossover is
+# clamped at 1000 and Reproduction is the recomputed remainder, so 200 Up on
+# Mutation takes it 50 -> 250 and drops Reproduction 280 -> 80 with the sum
+# staying exactly 1000; 200 Up on Crossover then stops at 750 rather than
+# reaching 870. And sliderAlpha starts DISABLED -- the texture checkbox owns
+# it -- so the generic probe measures a slider that cannot move, which is
+# correct and says nothing; it is driven for real after the checkbox.
+#
+# QTest IS NOT A MOUSE. It posts QMouseEvent, QKeyEvent and QContextMenuEvent
+# through QApplication::notify, so hit-testing, key handling, item-view
+# selection and the slots behind them all run -- but it bypasses
+# QWindowSystemInterface, so activation, grabs and double-click synthesis are
+# not what a real click produces. The oracle's side WAS driven by real XTest,
+# so every comparison above has a genuine click on one end.
+# ---------------------------------------------------------------------------
+== SCENARIO pages ==
+
+== STEP 1: fresh start, no experiment ==
+  [title] SIGEL
+  [tree] header=[Experiments] topLevel=0
+  [page] count=1 current=QLabel objectName=[baseWidget]
+  [action changes] none
+  [modal] class=QFileDialog title=[Load Experiments...]
+  [filedialog] title=[Load Experiments...] mode=3 nameFilters=[Experiment Files (*.exp) ;; All Files (*)] labelAccept=[&Open]
+
+== STEP 2: after File > Open Experiment ==
+  [title] SIGEL
+  [tree] header=[Experiments] topLevel=1
+      twoBasesSimpleFitness2.exp sel=1 exp=1 cur=1 selectable=1
+        Individuals              sel=0 exp=0 cur=0 selectable=1
+        Robot                    sel=0 exp=1 cur=0 selectable=1
+          Language-Parameters      sel=0 exp=0 cur=0 selectable=1
+        GP-Parameters            sel=0 exp=0 cur=0 selectable=1
+        Simulation-Parameters    sel=0 exp=0 cur=0 selectable=1
+        Environment              sel=0 exp=0 cur=0 selectable=1
+  [page] count=8 current=SIGEL_MasterGUI::SIG_ExperimentView objectName=[ExperimentView]
+  [widgets]
+    group    [Evolution controls] enabled=1
+    group    [Fitnesscurve] enabled=1
+    group    [Experiment properties] enabled=1
+    button   [&Start] enabled=1 checkable=0 checked=0
+    button   [S&top] enabled=0 checkable=0 checked=0
+    button   [Show in GNU-Plot] enabled=1 checkable=0 checked=0
+    button   [Export PostScript] enabled=1 checkable=0 checked=0
+    check    [Save the history] enabled=1 checkable=1 checked=1
+    lcd      [lcdnumberGenerations] value=532 digits=4
+    lcd      [lcdnumberAutosave] value=0 digits=4
+    slider   [sliderIntervall] value=0 min=0 max=100 enabled=1
+    progress [generationProgBar] value=-1 min=0 max=100
+  [action changes]
+    &File/&Delete Experiment                                   ENABLED
+    &File/&Rename Experiment                                   ENABLED
+    &File/&Save Experiment                                     ENABLED
+    &File>Export/...to GNU plot                                ENABLED
+    &File>Export/Environment                                   ENABLED
+    &File>Export/GP-Parameters                                 ENABLED
+    &File>Export/Individual                                    ENABLED
+    &File>Export/Language-Parameters                           ENABLED
+    &File>Export/Population                                    ENABLED
+    &File>Export/Program                                       ENABLED
+    &File>Export/Simulation-Parameters                         ENABLED
+    &File>Import/Environment                                   ENABLED
+    &File>Import/GP-Parameters                                 ENABLED
+    &File>Import/Individual                                    ENABLED
+    &File>Import/Language-Parameters                           ENABLED
+    &File>Import/Population                                    ENABLED
+    &File>Import/Program                                       ENABLED
+    &File>Import/Robot                                         ENABLED
+    &File>Import/Simulation-Parameters                         ENABLED
+    &Individuals/&Add                                          ENABLED
+    &Individuals/&Delete                                       ENABLED
+    &Individuals/&Visualize                                    ENABLED
+    &Individuals/Reset                                         ENABLED
+    &MetaGP/&Use MetaGP                                        ENABLED
+    &View/&Environment                                         ENABLED
+    &View/&GP Parameters                                       ENABLED
+    &View/&Language Parameters                                 ENABLED
+    &View/&Population                                          ENABLED
+    &View/&Robot                                               ENABLED
+    &View/&Simulation Parameters                               ENABLED
+    TB:fileToolbar/&Delete Experiment                          ENABLED
+    TB:fileToolbar/&Save Experiment                            ENABLED
+    TB:individualsToolBar/&Add                                 ENABLED
+    TB:individualsToolBar/&Delete                              ENABLED
+    TB:individualsToolBar/&Visualize                           ENABLED
+    TB:mtToolbar/&Use MetaGP                                   ENABLED
+    TB:viewToolBar/&Environment                                ENABLED
+    TB:viewToolBar/&GP Parameters                              ENABLED
+    TB:viewToolBar/&Language Parameters                        ENABLED
+    TB:viewToolBar/&Population                                 ENABLED
+    TB:viewToolBar/&Robot                                      ENABLED
+    TB:viewToolBar/&Simulation Parameters                      ENABLED
+
+== STEP 3: after View > Population ==
+  [title] SIGEL
+  [tree] header=[Experiments] topLevel=1
+      twoBasesSimpleFitness2.exp sel=0 exp=1 cur=0 selectable=1
+        Individuals              sel=1 exp=0 cur=1 selectable=1
+        Robot                    sel=0 exp=1 cur=0 selectable=1
+          Language-Parameters      sel=0 exp=0 cur=0 selectable=1
+        GP-Parameters            sel=0 exp=0 cur=0 selectable=1
+        Simulation-Parameters    sel=0 exp=0 cur=0 selectable=1
+        Environment              sel=0 exp=0 cur=0 selectable=1
+  [page] count=8 current=SIGEL_MasterGUI::SIG_AllIndividualsView objectName=[]
+  [individuals] rows=120 cols=3 headers=[Name               ][Fitness          ][Age               ] selected=0
+    row0  | 55658         | 1.14825       | 111           | sel=0
+    row1  | 56091         | 1.14825       | 109           | sel=0
+    row2  | 56248         | 1.14825       | 259           | sel=0
+    row3  | 56349         | 1.06261       | 97            | sel=0
+    row4  | 56432         | 1.14825       | 111           | sel=0
+    row5  | 56447         | 1.14825       | 107           | sel=0
+    ... 114 more
+  [action changes] none
+
+== VALIDATOR BATTERY ==
+  (on a pristine Environment page -- see the note in the source:
+   running this after the page drive greys the integer field and
+   silently turns all five of its probes into false negatives)
+    battery lineeditGravityX  (was [0])
+      type [9.81  ] -> text=[9.81] acceptable=1
+      type [9,81  ] -> text=[981] acceptable=1
+      type [0,375 ] -> text=[0375] acceptable=1
+      type [-2.5  ] -> text=[-2.5] acceptable=1
+      type [1e3   ] -> text=[1e3] acceptable=1
+      type [abc   ] -> text=[] acceptable=0
+      type [1.2.3 ] -> text=[1.23] acceptable=1
+    (enabled=1 -- a greyed field would eat every probe)
+    battery lineeditXDim  (was [50])
+      type [42    ] -> text=[42] acceptable=1
+      type [-7    ] -> text=[-7] acceptable=1
+      type [4.2   ] -> text=[42] acceptable=1
+      type [4,2   ] -> text=[42] acceptable=1
+      type [abc   ] -> text=[] acceptable=0
+
+== PAGE &GP Parameters ==
+  [class] SIGEL_MasterGUI::SIG_GPParameter objectName=[GPParameter] enabled=1
+  [tabs] tabwidgetGPParameter count=5 current=0
+    tab0  [Genetic programming] enabled=1
+    tab1  [Command probabilities] enabled=1
+    tab2  [Evolution control] enabled=1
+    tab3  [Technical] enabled=1
+    tab4  [PVM] enabled=1
+  -- tab 0 [Genetic programming] shown=1 visible=1
+  [survey]
+    group  [Settings] enabled=1 checkable=0
+    group  [Probabilities] enabled=1 checkable=0
+    group  [Fitness function] enabled=1 checkable=0
+  [drive]
+    spin   spinboxMaxIndLength                  v=1024      [2..32000] step=1 pre=[] suf=[] up=1025      dn2=1023      typed(max+1)=[3200]->3200 commits=3200 enabled=1
+    spin   spinboxMaxAge                        v=50        [1..32000] step=1 pre=[] suf=[] up=51        dn2=49        typed(max+1)=[3200]->3200 commits=3200 enabled=1
+    spin   spinboxRandomSeed                    v=0         [0..32000] step=1 pre=[] suf=[] up=1         dn2=0         typed(max+1)=[3200]->3200 commits=3200 enabled=1
+    spin   spinboxMinIndLength                  v=10        [2..32000] step=1 pre=[] suf=[] up=11        dn2=9         typed(max+1)=[3200]->3200 commits=3200 enabled=1
+    spin   spinboxResEvGen                      v=0         [0..99] step=1 pre=[] suf=[] up=1         dn2=0         typed(max+1)=[10]->10 commits=10 enabled=1
+    slider sliderReproduction                   v=280    [0..1000] page=1 up=280    pgup=280    lcd=lcdnumberReproduction 28/28/28 enabled=0
+    click  sliderReproduction                   280 -> 280 (delta +0) focusPolicy=11 hasFocus=0
+    slider sliderMutation                       v=50     [0..1000] page=1 up=51     pgup=52     lcd=lcdnumberMutation 5/5.1/5.2 enabled=1
+    click  sliderMutation                       50 -> 51 (delta +1) focusPolicy=11 hasFocus=0
+    slider sliderCrossover                      v=670    [0..1000] page=1 up=671    pgup=672    lcd=lcdnumberCrossover 67/67.1/67.2 enabled=1
+    click  sliderCrossover                      670 -> 671 (delta +1) focusPolicy=11 hasFocus=0
+    combo  comboboxFitnessName                  count=7 current=0 [Simple] editable=0 enabled=1
+      item0  [Simple]
+      item1  [Real Speed]
+      item2  [Nice Walking]
+      item3  [Adaptive Walking]
+      item4  [Stepper]
+      item5  [Remote ZORC]
+      item6  [Force]
+      7 Down clamps at current=6 [Force]
+      7 Up   clamps at current=0 [Simple]
+    check  checkboxIgnoreMaxIndLength           text=[Ignore maximal length] checkable=1 0->1 enabled=1
+      side effect: spinboxMaxIndLength now greyed
+  -- tab 1 [Command probabilities] shown=1 visible=1
+  [survey]
+  [drive]
+    slider sliderMAX                            v=500    [0..1000] page=1 up=501    pgup=502    lcd=lcdnumberMAX 500/501/502 enabled=1
+    click  sliderMAX                            500 -> 501 (delta +1) focusPolicy=11 hasFocus=0
+    slider sliderMIN                            v=500    [0..1000] page=1 up=501    pgup=502    lcd=lcdnumberMIN 500/501/502 enabled=1
+    click  sliderMIN                            500 -> 501 (delta +1) focusPolicy=11 hasFocus=0
+    slider sliderMOD                            v=500    [0..1000] page=1 up=501    pgup=502    lcd=lcdnumberMOD 500/501/502 enabled=1
+    click  sliderMOD                            500 -> 501 (delta +1) focusPolicy=11 hasFocus=0
+    slider sliderMOVE                           v=500    [0..1000] page=1 up=501    pgup=502    lcd=lcdnumberMOVE 500/501/502 enabled=1
+    click  sliderMOVE                           500 -> 501 (delta +1) focusPolicy=11 hasFocus=0
+    slider sliderMUL                            v=500    [0..1000] page=1 up=501    pgup=502    lcd=lcdnumberMUL 500/501/502 enabled=1
+    click  sliderMUL                            500 -> 501 (delta +1) focusPolicy=11 hasFocus=0
+    slider sliderNOP                            v=0      [0..1000] page=1 up=1      pgup=2      lcd=lcdnumberNOP 0/1/2 enabled=1
+    click  sliderNOP                            0 -> 1 (delta +1) focusPolicy=11 hasFocus=0
+    slider sliderSENSE                          v=500    [0..1000] page=1 up=501    pgup=502    lcd=lcdnumberSENSE 500/501/502 enabled=1
+    click  sliderSENSE                          500 -> 501 (delta +1) focusPolicy=11 hasFocus=0
+    slider sliderSUB                            v=500    [0..1000] page=1 up=501    pgup=502    lcd=lcdnumberSUB 500/501/502 enabled=1
+    click  sliderSUB                            500 -> 501 (delta +1) focusPolicy=11 hasFocus=0
+    slider sliderADD                            v=500    [0..1000] page=1 up=501    pgup=502    lcd=lcdnumberADD 500/501/502 enabled=1
+    click  sliderADD                            500 -> 501 (delta +1) focusPolicy=11 hasFocus=0
+    slider sliderCMP                            v=500    [0..1000] page=1 up=501    pgup=502    lcd=lcdnumberCMP 500/501/502 enabled=1
+    click  sliderCMP                            500 -> 501 (delta +1) focusPolicy=11 hasFocus=0
+    slider sliderCOPY                           v=500    [0..1000] page=1 up=501    pgup=502    lcd=lcdnumberCOPY 500/501/502 enabled=1
+    click  sliderCOPY                           500 -> 501 (delta +1) focusPolicy=11 hasFocus=0
+    slider sliderDIV                            v=500    [0..1000] page=1 up=501    pgup=502    lcd=lcdnumberDIV 500/501/502 enabled=1
+    click  sliderDIV                            500 -> 501 (delta +1) focusPolicy=11 hasFocus=0
+    slider sliderDELAY                          v=500    [0..1000] page=1 up=501    pgup=502    lcd=lcdnumberDELAY 500/501/502 enabled=1
+    click  sliderDELAY                          500 -> 501 (delta +1) focusPolicy=11 hasFocus=0
+    slider sliderJMP                            v=0      [0..1000] page=1 up=1      pgup=2      lcd=lcdnumberJMP 0/1/2 enabled=1
+    click  sliderJMP                            0 -> 1 (delta +1) focusPolicy=11 hasFocus=0
+    slider sliderLOAD                           v=500    [0..1000] page=1 up=501    pgup=502    lcd=lcdnumberLOAD 500/501/502 enabled=1
+    click  sliderLOAD                           500 -> 501 (delta +1) focusPolicy=11 hasFocus=0
+  -- tab 2 [Evolution control] shown=1 visible=1
+  [survey]
+    group  [By time] enabled=1 checkable=0
+    group  [By time - date settings] enabled=1 checkable=0
+    group  [By time - duration settings] enabled=1 checkable=0
+    group  [By generation] enabled=1 checkable=0
+    group  [Tournaments per generation] enabled=1 checkable=0
+  [drive]
+    spin   spinboxByTimeHour                    v=7         [0..23] step=1 pre=[] suf=[] up=8         dn2=6         typed(max+1)=[2]->2 commits=2 enabled=1
+    spin   spinboxByTimeYear                    v=2001      [1752..8000] step=1 pre=[] suf=[] up=2002      dn2=2000      typed(max+1)=[800]->2001 commits=2001 enabled=1
+    spin   spinboxByTimeSecs                    v=0         [0..59] step=1 pre=[] suf=[] up=1         dn2=0         typed(max+1)=[6]->6 commits=6 enabled=1
+    spin   spinboxByTimeDay                     v=12        [1..31] step=1 pre=[] suf=[] up=13        dn2=11        typed(max+1)=[3]->3 commits=3 enabled=1
+    spin   spinboxByTimeMins                    v=0         [0..59] step=1 pre=[] suf=[] up=1         dn2=0         typed(max+1)=[6]->6 commits=6 enabled=1
+    spin   spinboxByTimeMonth                   v=8         [1..12] step=1 pre=[] suf=[] up=9         dn2=7         typed(max+1)=[1]->1 commits=1 enabled=1
+    spin   spinboxByDurationDays                v=0         [0..365] step=1 pre=[] suf=[] up=1         dn2=0         typed(max+1)=[36]->36 commits=36 enabled=1
+    spin   spinboxByDurationHours               v=0         [0..23] step=1 pre=[] suf=[] up=1         dn2=0         typed(max+1)=[2]->2 commits=2 enabled=1
+    spin   spinboxByDurationMins                v=0         [0..59] step=1 pre=[] suf=[] up=1         dn2=0         typed(max+1)=[6]->6 commits=6 enabled=1
+    spin   spinboxByDurationSecs                v=0         [0..59] step=1 pre=[] suf=[] up=1         dn2=0         typed(max+1)=[6]->6 commits=6 enabled=1
+    spin   spinboxByGenerationNumber            v=0         [0..99999999] step=1 pre=[] suf=[] up=1         dn2=0         typed(max+1)=[10000000]->10000000 commits=10000000 enabled=1
+    slider sliderTournamentsPerGeneration       v=500    [1..1000] page=5 up=501    pgup=506    lcd=lcdnumberTournamentsPerGeneration 60/60/60 enabled=1
+    click  sliderTournamentsPerGeneration       500 -> 505 (delta +5) focusPolicy=11 hasFocus=0
+    combo  comboboxTerminationBy                count=4 current=1 [Time] editable=0 enabled=1
+      item0  [User]
+      item1  [Time]
+      item2  [Generation]
+      item3  [Time or generation]
+      4 Down clamps at current=3 [Time or generation]
+      4 Up   clamps at current=0 [User]
+    combo  comboboxPriority                     count=5 current=2 [Normal] editable=0 enabled=1
+      item0  [Very Low]
+      item1  [Low]
+      item2  [Normal]
+      item3  [High]
+      item4  [Very High]
+      5 Down clamps at current=4 [Very High]
+      5 Up   clamps at current=0 [Very Low]
+    radio  radiobuttonInterpreteAsDate          text=[Interprete as date] checkable=1 1->1 enabled=1
+    radio  radiobuttonInterpreteAsDuration      text=[Interprete as duration] checkable=1 0->1 enabled=1
+      side effect: radiobuttonInterpreteAsDate now unchecked
+  -- tab 3 [Technical] shown=1 visible=1
+  [survey]
+    group  [Graveyard] enabled=1 checkable=0
+    group  [Pool image options] enabled=1 checkable=0
+    edit   lineeditGraveyardDir                 text=[/home/pg368b/ross/projects/sigel] enabled=1 validator=none
+    edit   lineeditPoolImageDir                 text=[/home/pg368b/ross/projects/sigel] enabled=1 validator=none
+  [drive]
+    spin   spinboxPoolImageFrequency            v=1         [1..32000] step=1 pre=[] suf=[] up=2         dn2=1         typed(max+1)=[3200]->3200 commits=3200 enabled=1
+    check  checkboxUseGraveyard                 text=[Use graveyard] checkable=1 0->1 enabled=1
+    check  checkboxUsePoolImage                 text=[Use pool image] checkable=1 0->1 enabled=1
+  -- tab 4 [PVM] shown=1 visible=1
+  [survey]
+    group  [Hosts] enabled=1 checkable=0
+    tree   listviewHosts                        cols=4 rows=8
+      row0  |                       | herz                  | 2                     | /home/pg368b/ross/projects/sigel| col0icon=1 col0check=0
+      row1  |                       | eiche                 | 2                     | /home/pg368b/ross/projects/sigel| col0icon=1 col0check=0
+      row2  |                       | lithium               | 2                     | /home/pg368b/ross/projects/sigel| col0icon=1 col0check=0
+      row3  |                       | pappel                | 2                     | /home/pg368b/ross/projects/sigel| col0icon=1 col0check=0
+      row4  |                       | urobe                 | 2                     | /home/pg368b/ross/projects/sigel| col0icon=1 col0check=0
+      row5  |                       | birke                 | 2                     | /home/pg368b/ross/projects/sigel| col0icon=1 col0check=0
+      row6  |                       | bube                  | 2                     | /home/pg368b/ross/projects/sigel| col0icon=1 col0check=0
+      row7  |                       | wickie                | 2                     | /home/pg368b/ross/projects/sigel| col0icon=1 col0check=0
+  [drive]
+    spin   spinboxTimeout                       v=0         [0..32000] step=1 pre=[] suf=[ min] up=1         dn2=0         typed(max+1)=[3200 min]->3200 commits=3200 enabled=1
+  -- outside the tab widget
+  [survey]
+    button pushbuttonImport                     text=[Import] enabled=1 default=0
+    button pushbuttonExport                     text=[Export] enabled=1 default=0
+
+== PAGE &Simulation Parameters ==
+  [class] SIGEL_MasterGUI::SIG_SimulationParameter objectName=[SimulationParameter] enabled=1
+  [tabs] TabWidget2 count=3 current=0
+    tab0  [General settings] enabled=1
+    tab1  [DynaMechs] enabled=1
+    tab2  [DynaMo] enabled=1
+  -- tab 0 [General settings] shown=1 visible=1
+  [survey]
+    group  [Integrator] enabled=1 checkable=0
+    group  [Used simulation library] enabled=1 checkable=0
+    group  [Simulation conditions] enabled=1 checkable=0
+    edit   lineeditStepSize                     text=[0.01] enabled=1 validator=QDoubleValidator bottom=-inf top=inf decimals=-1 notation=1 locale=[C] numberOptions=2
+  [drive]
+    comma  lineeditStepSize                     type[9,81] -> [981] acceptable=1
+    spin   spinboxHours                         v=0         [0..23] step=1 pre=[] suf=[] up=1         dn2=0         typed(max+1)=[2]->2 commits=2 enabled=1
+    spin   spinboxMins                          v=3         [0..59] step=1 pre=[] suf=[] up=4         dn2=2         typed(max+1)=[6]->6 commits=6 enabled=1
+    spin   spinboxSecs                          v=0         [0..59] step=1 pre=[] suf=[] up=1         dn2=0         typed(max+1)=[6]->6 commits=6 enabled=1
+    spin   spinboxRandomSeed                    v=0         [0..32000] step=1 pre=[] suf=[] up=1         dn2=0         typed(max+1)=[3200]->3200 commits=3200 enabled=1
+    radio  radiobuttonDynamo                    text=[Dynamo  (not recommended)] checkable=1 0->1 enabled=1
+      side effect: radiobuttonDynaMechs now unchecked
+    radio  radiobuttonDynaMechs                 text=[DynaMechs   (preferred)] checkable=1 0->1 enabled=1
+      side effect: radiobuttonDynamo now unchecked
+  -- tab 1 [DynaMechs] shown=1 visible=1
+  [survey]
+    group  [Integrator] enabled=1 checkable=0
+    group  [Joint constants] enabled=1 checkable=0
+    edit   lineeditJointlimitsSpringConstant    text=[25000] enabled=1 validator=QDoubleValidator bottom=-inf top=inf decimals=-1 notation=1 locale=[C] numberOptions=2
+    edit   lineeditJointfrictionConstant        text=[0.35] enabled=1 validator=QDoubleValidator bottom=-inf top=inf decimals=-1 notation=1 locale=[C] numberOptions=2
+    edit   lineeditJointlimitsDamperConstant    text=[2500] enabled=1 validator=QDoubleValidator bottom=-inf top=inf decimals=-1 notation=1 locale=[C] numberOptions=2
+  [drive]
+    comma  lineeditJointlimitsSpringConstant    type[9,81] -> [981] acceptable=1
+    comma  lineeditJointfrictionConstant        type[9,81] -> [981] acceptable=1
+    comma  lineeditJointlimitsDamperConstant    type[9,81] -> [981] acceptable=1
+    combo  comboboxDynaMechsIntegrator          count=3 current=1 [Runge Kutta 4] editable=0 enabled=1
+      item0  [Euler]
+      item1  [Runge Kutta 4]
+      item2  [Runge Kutta 45]
+      3 Down clamps at current=2 [Runge Kutta 45]
+      3 Up   clamps at current=0 [Euler]
+  -- tab 2 [DynaMo] shown=1 visible=1
+  [survey]
+    group  [Integrator] enabled=1 checkable=0
+    group  [Constraint manager mode] enabled=1 checkable=0
+    group  [Performance Settings] enabled=1 checkable=0
+    group  [SOLID] enabled=1 checkable=0
+    edit   lineeditMaximalError                 text=[0.1] enabled=1 validator=QDoubleValidator bottom=-inf top=inf decimals=-1 notation=1 locale=[C] numberOptions=2
+  [drive]
+    comma  lineeditMaximalError                 type[9,81] -> [981] acceptable=1
+    spin   spinboxMaximalCollisionLoops         v=10        [0..32000] step=1 pre=[] suf=[] up=11        dn2=9         typed(max+1)=[3200]->3200 commits=3200 enabled=1
+    spin   spinboxSkippedFrames                 v=0         [0..32000] step=1 pre=[] suf=[] up=1         dn2=0         typed(max+1)=[3200]->3200 commits=3200 enabled=1
+    spin   spinboxMaximalIterations             v=100       [0..32000] step=1 pre=[] suf=[] up=101       dn2=99        typed(max+1)=[3200]->3200 commits=3200 enabled=1
+    spin   spinboxMaxSOLIDIterations            v=1         [1..99] step=1 pre=[] suf=[] up=2         dn2=1         typed(max+1)=[10]->10 commits=10 enabled=1
+    combo  comboboxIntegrator                   count=4 current=0 [Runge Kutta 4] editable=0 enabled=1
+      item0  [Runge Kutta 4]
+      item1  [Runge Kutta 2]
+      item2  [Double Euler]
+      item3  [Euler]
+      4 Down clamps at current=3 [Euler]
+      4 Up   clamps at current=0 [Runge Kutta 4]
+    combo  comboboxSolveMode                    count=3 current=1 [Conjugate Gradient] editable=0 enabled=1
+      item0  [Single Value Decomposition]
+      item1  [Conjugate Gradient]
+      item2  [LU Decomposition]
+      3 Down clamps at current=2 [LU Decomposition]
+      3 Up   clamps at current=0 [Single Value Decomposition]
+    radio  radiobuttonCMModeAnalytical          text=[Analytical] checkable=1 1->1 enabled=1
+    radio  radiobuttonCMModeEmpirical           text=[Empirical] checkable=1 0->1 enabled=1
+      side effect: radiobuttonCMModeAnalytical now unchecked
+  -- outside the tab widget
+  [survey]
+    button pushbuttonImport                     text=[Import] enabled=1 default=0
+    button pushbuttonExport                     text=[Export] enabled=1 default=0
+
+== PAGE &Language Parameters ==
+  [class] SIGEL_MasterGUI::SIG_LanguageParameters objectName=[LanguageParametersView] enabled=1
+  [tabs] none
+  [survey]
+    group  [Commands] enabled=1 checkable=0
+    group  [Registers] enabled=1 checkable=0
+    group  [Constraints] enabled=1 checkable=0
+    tree   listviewCommands                     cols=3 rows=15
+      row0  |                       | ADD                   | 0.001                 | col0icon=1 col0check=0
+      row1  |                       | CMP                   | 0.001                 | col0icon=1 col0check=0
+      row2  |                       | COPY                  | 0.001                 | col0icon=1 col0check=0
+      row3  |                       | DELAY                 | 0.001                 | col0icon=1 col0check=0
+      row4  |                       | DIV                   | 0.001                 | col0icon=1 col0check=0
+      row5  |                       | JMP                   | 0                     | col0icon=1 col0check=0
+      row6  |                       | LOAD                  | 0.001                 | col0icon=1 col0check=0
+      row7  |                       | MAX                   | 0.001                 | col0icon=1 col0check=0
+      row8  |                       | MIN                   | 0.001                 | col0icon=1 col0check=0
+      row9  |                       | MOD                   | 0.001                 | col0icon=1 col0check=0
+      row10 |                       | MOVE                  | 0.01                  | col0icon=1 col0check=0
+      row11 |                       | MUL                   | 0.001                 | col0icon=1 col0check=0
+      row12 |                       | NOP                   | 0                     | col0icon=1 col0check=0
+      row13 |                       | SENSE                 | 0.001                 | col0icon=1 col0check=0
+      row14 |                       | SUB                   | 0.001                 | col0icon=1 col0check=0
+  [drive]
+    spin   spinboxNumberOfRegisters             v=8         [1..32000] step=1 pre=[] suf=[] up=9         dn2=7         typed(max+1)=[3200]->3200 commits=3200 enabled=1
+    spin   spinboxRegisterWidth                 v=3         [1..99] step=1 pre=[] suf=[ bit] up=4         dn2=2         typed(max+1)=[10 bit]->10 commits=10 enabled=1
+    spin   spinboxMaximalDelayTime              v=5000      [0..64000] step=1 pre=[] suf=[ msec] up=5001      dn2=4999      typed(max+1)=[6400 msec]->6400 commits=6400 enabled=1
+
+== PAGE &Robot ==
+  [class] SIGEL_MasterGUI::SIG_RobotView objectName=[RobotView] enabled=1
+  [tabs] none
+  [survey]
+    group  [Robot Info] enabled=1 checkable=0
+    list   listboxLinks                         count=2 current=-1 enabled=1
+      item0  [base1] hasIcon=0
+      item1  [base2] hasIcon=0
+    list   listboxMaterials                     count=1 current=-1 enabled=1
+      item0  [metal] hasIcon=0
+    list   listboxBodies                        count=1 current=-1 enabled=1
+      item0  [base.wrl] hasIcon=0
+    list   listboxSensors                       count=1 current=-1 enabled=1
+      item0  [hinge1Sensor] hasIcon=1
+    list   listboxJoints                        count=1 current=-1 enabled=1
+      item0  [hinge1] hasIcon=1
+    list   listboxDrives                        count=1 current=-1 enabled=1
+      item0  [hinge1Drive] hasIcon=1
+  [drive]
+    (nothing on this container is in C11's scope: no spin box, slider, combo, checkbox, radio or validated field)
+
+== PAGE &Environment ==
+  [class] SIGEL_MasterGUI::SIG_EnvironmentView objectName=[EnvironmentView] enabled=1
+  [tabs] TabWidget2 count=3 current=0
+    tab0  [General] enabled=1
+    tab1  [DynaMechs] enabled=1
+    tab2  [DynaMo] enabled=1
+  -- tab 0 [General] shown=1 visible=1
+  [survey]
+    group  [World] enabled=1 checkable=0
+    group  [Robot] enabled=1 checkable=0
+    group  [Floor] enabled=1 checkable=0
+    group  [Floor Definition] enabled=1 checkable=0
+    edit   lineeditGravityX                     text=[0] enabled=1 validator=QDoubleValidator bottom=-inf top=inf decimals=-1 notation=1 locale=[C] numberOptions=2
+    edit   lineeditGravityY                     text=[-9.81] enabled=1 validator=QDoubleValidator bottom=-inf top=inf decimals=-1 notation=1 locale=[C] numberOptions=2
+    edit   lineeditGravityZ                     text=[0] enabled=1 validator=QDoubleValidator bottom=-inf top=inf decimals=-1 notation=1 locale=[C] numberOptions=2
+    edit   lineeditStartPositionZ               text=[0] enabled=1 validator=QDoubleValidator bottom=-inf top=inf decimals=-1 notation=1 locale=[C] numberOptions=2
+    edit   lineeditStartPositionX               text=[0] enabled=1 validator=QDoubleValidator bottom=-inf top=inf decimals=-1 notation=1 locale=[C] numberOptions=2
+    edit   lineeditStartPositionY               text=[1] enabled=1 validator=QDoubleValidator bottom=-inf top=inf decimals=-1 notation=1 locale=[C] numberOptions=2
+    edit   lineeditFunction                     text=[0] enabled=1 validator=none
+    edit   lineeditPictureFile                  text=[] enabled=0 validator=none
+    edit   lineeditXDim                         text=[50] enabled=1 validator=QIntValidator bottom=-2147483648 top=2147483647 locale=[C] numberOptions=2
+    edit   lineeditZDim                         text=[50] enabled=1 validator=QIntValidator bottom=-2147483648 top=2147483647 locale=[C] numberOptions=2
+    edit   lineeditTextureFile                  text=[] enabled=0 validator=none
+  [drive]
+    comma  lineeditGravityX                     type[9,81] -> [981] acceptable=1
+    comma  lineeditGravityY                     type[9,81] -> [981] acceptable=1
+    comma  lineeditGravityZ                     type[9,81] -> [981] acceptable=1
+    comma  lineeditStartPositionZ               type[9,81] -> [981] acceptable=1
+    comma  lineeditStartPositionX               type[9,81] -> [981] acceptable=1
+    comma  lineeditStartPositionY               type[9,81] -> [981] acceptable=1
+    comma  lineeditXDim                         type[9,81] -> [981] acceptable=1
+    comma  lineeditZDim                         type[9,81] -> [981] acceptable=1
+    slider sliderAlpha                          v=99     [0..99] page=10 up=99     pgup=99     lcd=(none) 0/0/0 enabled=0
+    click  sliderAlpha                          99 -> 99 (delta +0) focusPolicy=11 hasFocus=0
+    check  checkboxTextureFile                  text=[Texture:] checkable=1 0->1 enabled=1
+      side effect: lineeditTextureFile now ENABLED
+      side effect: pushbuttonSelectTextureFile now ENABLED
+      side effect: sliderAlpha now ENABLED
+    radio  radiobuttonFunction                  text=[Function:] checkable=1 1->1 enabled=1
+    radio  radiobuttonPictureFile               text=[Picture:] checkable=1 0->1 enabled=1
+      side effect: radiobuttonFunction now unchecked
+      side effect: lineeditFunction now greyed
+      side effect: lineeditPictureFile now ENABLED
+      side effect: pushbuttonSelectFile now ENABLED
+      side effect: lineeditXDim now greyed
+      side effect: lineeditZDim now greyed
+  -- tab 1 [DynaMechs] shown=1 visible=1
+  [survey]
+    group  [Ground Settings] enabled=1 checkable=0
+    edit   lineeditPlanarSpringConstant         text=[5500] enabled=1 validator=QDoubleValidator bottom=-inf top=inf decimals=-1 notation=1 locale=[C] numberOptions=2
+    edit   lineeditNormalSpringConstant         text=[7500] enabled=1 validator=QDoubleValidator bottom=-inf top=inf decimals=-1 notation=1 locale=[C] numberOptions=2
+    edit   lineeditPlanarDamperConstant         text=[50] enabled=1 validator=QDoubleValidator bottom=-inf top=inf decimals=-1 notation=1 locale=[C] numberOptions=2
+    edit   lineeditNormalDamperConstant         text=[50] enabled=1 validator=QDoubleValidator bottom=-inf top=inf decimals=-1 notation=1 locale=[C] numberOptions=2
+    edit   lineeditStaticFrictionCoefficient    text=[1.5] enabled=1 validator=QDoubleValidator bottom=-inf top=inf decimals=-1 notation=1 locale=[C] numberOptions=2
+    edit   lineeditKineticFrictionCoefficient   text=[1] enabled=1 validator=QDoubleValidator bottom=-inf top=inf decimals=-1 notation=1 locale=[C] numberOptions=2
+  [drive]
+    comma  lineeditPlanarSpringConstant         type[9,81] -> [981] acceptable=1
+    comma  lineeditNormalSpringConstant         type[9,81] -> [981] acceptable=1
+    comma  lineeditPlanarDamperConstant         type[9,81] -> [981] acceptable=1
+    comma  lineeditNormalDamperConstant         type[9,81] -> [981] acceptable=1
+    comma  lineeditStaticFrictionCoefficient    type[9,81] -> [981] acceptable=1
+    comma  lineeditKineticFrictionCoefficient   type[9,81] -> [981] acceptable=1
+  -- tab 2 [DynaMo] shown=1 visible=1
+  [survey]
+    group  [Floor] enabled=1 checkable=0
+    edit   lineeditYPlaneLevel                  text=[0] enabled=1 validator=QDoubleValidator bottom=-inf top=inf decimals=-1 notation=1 locale=[C] numberOptions=2
+  [drive]
+    comma  lineeditYPlaneLevel                  type[9,81] -> [981] acceptable=1
+    combo  comboboxMaterialName                 count=1 current=0 [metal] editable=0 enabled=1
+      item0  [metal]
+      1 Down clamps at current=0 [metal]
+      1 Up   clamps at current=0 [metal]
+  -- outside the tab widget
+  [survey]
+    button pushbuttonImport                     text=[Import] enabled=1 default=0
+    button pushbuttonExport                     text=[Export] enabled=1 default=0
+
+  [alpha slider, once the texture checkbox enables it]
+    before: checkbox=0 slider enabled=0 value=99
+    after checkbox click: checkbox=1 slider enabled=1 value=99
+    after 10 Down: value=89
+    after 1 PageUp (page=10): value=99
+    after End: value=99  (max=99)
+    after Home: value=0  (min=0)
+
+  [genetic slider interlock]
+    as loaded                    mut=50    cro=670   rep=280    lcd 5 / 67 / 28  sum=1000
+    after 200 Up on Mutation     mut=250   cro=670   rep=80     lcd 25 / 67 / 8  sum=1000
+    after 200 Up on Crossover    mut=250   cro=750   rep=0      lcd 25 / 75 / 0  sum=1000
+    after 200 Down on Mutation   mut=50    cro=750   rep=200    lcd 5 / 75 / 20  sum=1000
+    after dragging Mutation hard right mut=250   cro=750   rep=0      lcd 25 / 75 / 0  sum=1000

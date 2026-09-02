@@ -350,3 +350,104 @@ is the correct outcome. It is recorded here only so that a future reader who
 notices experiment files growing does not "fix" it and silently diverge from
 1.3. If it is ever changed deliberately, that is a product decision and needs a
 note in PORTING.md saying the port stopped matching 1.3 on purpose.
+
+## Restore Qt 2's spin-box editing — found by C11a, 2026-09-02, DECISION OPEN
+
+**This one is not a cleanup. It is a behavioural regression with a data
+consequence, and it is here rather than fixed because the fix is wider than the
+step that found it.** PORTING.md's C11a section carries the full record; this is
+the change itself, so that whoever takes the decision does not have to
+re-derive it.
+
+**What differs.** Qt 2's `QIntValidator::validate` returned **Intermediate**
+for an out-of-range number (`qvalidator.cpp:236`), so `QLineEdit` accepted
+every digit; `QSpinBox::interpretText()` then mapped the whole text and
+`QRangeControl::directSetValue` clamped it into range. Qt 6's returns
+**Invalid** once the typed prefix passes the top, so the keystroke is refused
+and the box keeps the truncated prefix. Measured on four fields on both
+architectures: type 32001 into a [2..32000] box and 1.3 commits **32000**, the
+port commits **3200**; type 100 into a [1..99] box and 1.3 commits **99**, the
+port commits **10**. Both valid, different, and `putAllIntoExperiment()` writes
+whichever the widget holds.
+
+**The fix, measured rather than sketched.** This subclass reproduces all four
+1.3 readings exactly — 32001→32000, 8001→8000, 24→23, 100→99 — with in-range
+typing unchanged:
+
+```cpp
+class SIG_SpinBox : public QSpinBox {           // Qt 2's editing semantics
+public:
+    using QSpinBox::QSpinBox;
+    QValidator::State validate( QString &input, int &pos ) const override {
+        QString t = stripFix( input );
+        if ( t.isEmpty() || t == "-" ) return QValidator::Intermediate;
+        bool ok = false;
+        const long long v = t.toLongLong( &ok );
+        if ( !ok ) return QSpinBox::validate( input, pos );
+        // Qt 2 said Intermediate here; Qt 6 says Invalid. This is the change.
+        if ( v < minimum() || v > maximum() ) return QValidator::Intermediate;
+        return QValidator::Acceptable;
+    }
+    void fixup( QString &input ) const override {   // QRangeControl's clamp
+        bool ok = false;
+        const long long v = stripFix( input ).toLongLong( &ok );
+        if ( !ok ) { QSpinBox::fixup( input ); return; }
+        input = prefix()
+              + QString::number( qBound<long long>( minimum(), v, maximum() ) )
+              + suffix();
+    }
+private:
+    QString stripFix( const QString &s ) const {
+        QString t = s;
+        if ( !prefix().isEmpty() && t.startsWith( prefix() ) ) t = t.mid( prefix().size() );
+        if ( !suffix().isEmpty() && t.endsWith( suffix() ) )   t.chop( suffix().size() );
+        return t.trimmed();
+    }
+};
+```
+
+Each instance also needs
+`setCorrectionMode( QAbstractSpinBox::CorrectToNearestValue )`, which is what
+routes an Intermediate commit through `fixup()`.
+
+**Do:** put it in `SIGEL_CommonGUI`, add a `<customwidget>` block to the three
+forms the five View pages are built from and promote **29 widgets** —
+`SIG_GPParameterBase.ui` (18), `SIG_SimulationParameterBase.ui` (8) and
+`SIG_LanguageParametersBase.ui` (3). Promotion is already an established
+pattern in this tree: `SIG_SimulationWidgetBase.ui` carries the one existing
+`<customwidget>`.
+
+**Then the other 18, counted:** `SIG_AddIndividualsDialog.cpp:77` builds its
+spin box in code rather than in a form, so that one is a one-line type change;
+`SIG_EditHostDialogBase.ui` (1), `SIG_MovieSettingsDialogBase.ui` (5) and
+`SIG_SimulationWidgetBase.ui` (1) are forms; and `MT_GUI` owns 10 across six
+forms. **47 spin boxes tree-wide** — 46 in the 20 forms plus the one built in
+code — of which the five View pages hold the 29 above.
+Regenerate `guibehaviour-baseline.txt`; every spin box's `commits=` column
+should move to the clamped value, and **nothing else in the baseline should
+move**. That diff is the check.
+
+**Do NOT** do it piecemeal. Fixing the five View pages and leaving the dialogs
+on stock `QSpinBox` would make the application inconsistent with itself, which
+is worse than being consistently different from 1.3.
+
+**Two cheaper fixes were tried and rejected on measurement.** Swapping the
+validator on the spin box's internal `QLineEdit` lets the digits through but
+leaves `QAbstractSpinBox`'s own interpret path alone, and 100 into a [1..99]
+box then commits to **1** — worse than the divergence it was meant to remove.
+Widening the range would change what the pages display and write. There is no
+runtime-only fix: `QSpinBox::validate()` is a protected virtual, so it cannot
+be overridden on an instance uic already created.
+
+**One part is NOT restored by this and is left alone deliberately.** 1.3 also
+drops the suffix while editing — `3 bit` at rest, plain `100` while typing,
+`99 bit` after commit — because Qt 2's `updateDisplay()` writes prefix + text +
+suffix into the line edit and does nothing to protect it, so select-all +
+Delete takes the suffix with everything else. Qt 6's `QAbstractSpinBox`
+actively keeps them in the editor. It is transient and cosmetic; chasing it
+means fighting `QAbstractSpinBox`'s editor management for no change to any
+value that is ever written.
+
+**Until it is decided, the current behaviour is pinned.** Every spin box's
+`commits=` value is in `guibehaviour-baseline.txt`, so the port cannot drift
+further without the gate saying so.
