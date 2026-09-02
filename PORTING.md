@@ -3991,6 +3991,42 @@ compiled at all. It went with the Dynamo backend, its only caller
   and will abort now. `MT_GUI` is in neither `check.sh`'s `MODULES` nor the
   Makefile's `CORE`, so nothing flags it.
 
+### TRAP — plain `grep` in this environment SILENTLY SKIPS 9 SOURCE FILES
+
+Found 2026-09-02, chasing a reported defect that turned out not to be one. In
+this shell `grep` is a **function**, not the binary: it execs `ugrep` with
+`-I`, which means *ignore binary files*. Nine files in the tree are ISO-8859
+(Latin-1) rather than UTF-8, ugrep classifies them as binary, and `-I` drops
+them **with no message and exit status 0** — indistinguishable from "no
+matches".
+
+    src/SIGEL_MasterGUI/SIG_MainWindow.cpp
+    src/SIGEL_SlaveGUI/SIG_SimulationVisualisationWidget.cpp
+    src/MT_GUI/MT_PopulationWidget.cpp
+    src/MT_GUI/MT_StatisticsWidget.cpp
+    include/MT_GUI/{MT_ExperimentItem,MT_PopListViewItem,MT_Editor,DoubleSpinBox,MT_WidgetBase}.h
+
+`SIG_MainWindow.cpp` is on that list, so **"grep found nothing in the main
+window" has meant nothing all along.** Use `command grep` (bypasses the
+function) or `grep -a`. Both were verified against a file with a known match.
+
+**`check.sh` is NOT affected, and that is not luck** — every load-bearing search
+in it already uses `command grep`. Checked explicitly: the dead-signal counters
+find an injected `rightButtonClicked` in a Latin-1 file (2 of 2 matches). The
+five plain `grep` uses left in it read generated `ui_*.h`, `.qrc` and `.ui`
+files, all ASCII; the one that reads a module source (`check.sh:869`,
+`sortByColumn`) would report a loud `form FAIL` rather than a silent pass, and
+no form base class is on the list anyway.
+
+**What this cost.** Nothing that shipped: the C10 fixes live in
+`SIG_AllIndividualsView.cpp` and `MT_Controller.cpp`, neither of which is
+Latin-1, and the sweep for other `->clear()` sites was re-run with `command
+grep` afterwards — it finds the same two, plus `listviewHosts->clear()` in
+`SIG_GPParameter.cpp`, which is safe because that view connects only
+`itemDoubleClicked` and `clear()` never emits it. But any NEGATIVE search result
+in this file's history that was produced with plain `grep` is worth redoing
+before it is relied on.
+
 ### The characteristic failure of this project: measuring the wrong thing
 
 **Not wrong numbers — wrong *referents*.** Every one of these produced a real,
