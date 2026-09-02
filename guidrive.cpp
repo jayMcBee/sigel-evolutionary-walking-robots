@@ -82,6 +82,7 @@
 #include <QStyleOptionSlider>
 #include <QTabBar>
 #include <QListWidget>
+#include <QTextBrowser>
 #include <QValidator>
 #include <QAbstractSpinBox>
 #include <QContextMenuEvent>
@@ -94,9 +95,11 @@ extern "C" {
 #include <QTimer>
 #include <QElapsedTimer>
 #include <QtTest/QtTest>
+#include <clocale>
 #include <cstdio>
 #include <cstdlib>
 #include <unistd.h>
+#include <algorithm>
 #include <functional>
 #include <map>
 
@@ -169,6 +172,50 @@ static void dumpEnabledDelta()
     prevEnabled = now;
 }
 
+// EVERY action's ICON, which nothing in this project looked at until a review
+// replaced all 30 menu and toolbar .xpm files with the text "NOT AN XPM AT ALL"
+// and watched the whole gate pass. `gui vs 1.3' prints iconText (a string) and
+// the toolbar's iconSize (a property); the forms section covers only .qrc-backed
+// Designer resources. A pixmap that fails to load compiles, runs, and renders
+// as nothing.
+//
+// isNull() on the QIcon is NOT enough: QIcon::addPixmap of a null pixmap leaves
+// a non-null QIcon that draws nothing. availableSizes() is what empties out, so
+// that is what is counted.
+static void dumpIcons()
+{
+    struct Row { QString key; int sizes; bool nullIcon; };
+    QList<Row> rows;
+    std::function<void(QMenu *, const QString &)> walk =
+        [&](QMenu *m, const QString &path) {
+        for (QAction *a : m->actions()) {
+            if (a->isSeparator()) continue;
+            rows.append({ path + "/" + a->text(),
+                          (int)a->icon().availableSizes().count(),
+                          a->icon().isNull() });
+            if (a->menu()) walk(a->menu(), path + ">" + a->text());
+        }
+    };
+    for (QAction *top : W->menuBar()->actions())
+        if (top->menu()) walk(top->menu(), top->text());
+    for (QToolBar *tb : W->findChildren<QToolBar *>())
+        for (QAction *a : tb->actions())
+            if (!a->isSeparator())
+                rows.append({ "TB:" + tb->objectName() + "/" + a->text(),
+                              (int)a->icon().availableSizes().count(),
+                              a->icon().isNull() });
+    std::sort(rows.begin(), rows.end(),
+              [](const Row &x, const Row &y) { return x.key < y.key; });
+    int withIcon = 0, empty = 0;
+    for (const Row &r : rows) { if (!r.nullIcon) ++withIcon; if (!r.nullIcon && !r.sizes) ++empty; }
+    printf("\n== ICONS ==\nactions=%d withIcon=%d loadedNothing=%d\n",
+           (int)rows.count(), withIcon, empty);
+    for (const Row &r : rows)
+        printf("  %-56s icon=%d sizes=%d\n", qPrintable(r.key),
+               r.nullIcon ? 0 : 1, r.sizes);
+    fflush(stdout);
+}
+
 static SIG_ExperimentListView *listView()
 {
     return W->findChild<SIG_ExperimentListView *>();
@@ -220,6 +267,19 @@ static void dumpIndividuals()
         printf("| sel=%d\n", it->isSelected() ? 1 : 0);
     }
     if (t->topLevelItemCount() > 6) printf("    ... %d more\n", t->topLevelItemCount() - 6);
+    // The six rows above leave 95% of the list outside the diff: a mis-sort or
+    // a corrupted fitness anywhere in rows 6..n-1 would change nothing here.
+    // One checksum over every cell closes that, and it is order-sensitive, so
+    // it catches a re-ordering as well as a changed value. Found by review.
+    {
+        QByteArray all;
+        for (int i = 0; i < t->topLevelItemCount(); ++i)
+            for (int c = 0; c < t->columnCount(); ++c)
+                all += t->topLevelItem(i)->text(c).toUtf8() + '\x1f';
+        printf("    allrows sha256=%s\n",
+               QCryptographicHash::hash(all, QCryptographicHash::Sha256)
+                   .toHex().constData());
+    }
 }
 
 // Everything on the current page that carries observable state. Generic on
@@ -605,7 +665,16 @@ static void batteryInt(QLineEdit *le)
 // Qt 6's QIntValidator returns INVALID once the prefix passes the top, so the
 // keystroke is refused and the box keeps the truncated prefix -- type 100 and
 // you get 10. Same range, same typing, a different number committed.
-static void probeSpin(QSpinBox *sp)
+// `commit' presses Return to make the spin box interpret what was typed. That
+// is safe on a page and NOT safe in a dialog: QAbstractSpinBox ignores Return,
+// QApplication::notify walks it up the parent chain, and QDialog clicks its
+// DEFAULT button -- which is OK on every dialog here. The `dialogs' scenario's
+// "Add individuals (Cancel)" step was accepting the dialog inside this probe
+// and only reaching Cancel afterwards, on a hidden widget; it printed the right
+// answer for the wrong reason and would have printed it just the same with a
+// dead Cancel connect. Found by review, and reproduced: the dialog reported
+// visible=0 on return from here.
+static void probeSpin(QSpinBox *sp, bool commit = true)
 {
     const int start = sp->value();
     sp->setFocus();
@@ -627,16 +696,21 @@ static void probeSpin(QSpinBox *sp)
     const int typedVal = sp->value();
     // Return is what commits. 1.3 clamps here; the port has nothing left to
     // clamp, having refused the digits that would have gone out of range.
-    QTest::keyClick(sp, Qt::Key_Return);
-    QTest::qWait(20);
-    const int committed = sp->value();
+    int committed = -1;
+    if (commit) {
+        QTest::keyClick(sp, Qt::Key_Return);
+        QTest::qWait(20);
+        committed = sp->value();
+    }
     sp->setValue(start);
 
     printf("    spin   %-36s v=%-9d [%d..%d] step=%d pre=[%s] suf=[%s] "
-           "up=%-9d dn2=%-9d typed(max+1)=[%s]->%d commits=%d enabled=%d\n",
+           "up=%-9d dn2=%-9d typed(max+1)=[%s]->%d commits=%s enabled=%d\n",
            qPrintable(sp->objectName()), start, sp->minimum(), sp->maximum(),
            sp->singleStep(), qPrintable(sp->prefix()), qPrintable(sp->suffix()),
-           up, down, qPrintable(typed), typedVal, committed,
+           up, down, qPrintable(typed), typedVal,
+           commit ? qPrintable(QString::number(committed))
+                  : "not-pressed(in a dialog)",
            sp->isEnabled() ? 1 : 0);
 }
 
@@ -686,12 +760,22 @@ static void probeSlider(QWidget *page, QSlider *sl)
     QTest::keyClick(sl, Qt::Key_PageUp);
     const int pg = sl->value();
     const double lcdPg = lcd ? lcd->value() : 0.0;
+    // A one-step nudge is too small to move some paired displays, and an LCD
+    // that does not move reads exactly like a dead connect. sliderTournaments-
+    // PerGeneration is the case: its slot shows int(slider/1000 * poolSize),
+    // which with 120 individuals only changes every ~8.34 units, so up/pgup
+    // both printed 60 and would have printed 60 with nothing connected at all.
+    // End is one keystroke and moves every slider to its maximum.
+    QTest::keyClick(sl, Qt::Key_End);
+    const int endV = sl->value();
+    const double lcdEnd = lcd ? lcd->value() : 0.0;
     sl->setValue(start);
-    printf("    slider %-36s v=%-6d [%d..%d] page=%d up=%-6d pgup=%-6d "
-           "lcd=%s %g/%g/%g enabled=%d\n",
+    printf("    slider %-36s v=%-6d [%d..%d] page=%d up=%-6d pgup=%-6d end=%-6d "
+           "lcd=%s %g/%g/%g/%g enabled=%d\n",
            qPrintable(sl->objectName()), start, sl->minimum(), sl->maximum(),
-           sl->pageStep(), up, pg, lcd ? qPrintable(lcd->objectName()) : "(none)",
-           lcdStart, lcdUp, lcdPg, sl->isEnabled() ? 1 : 0);
+           sl->pageStep(), up, pg, endV,
+           lcd ? qPrintable(lcd->objectName()) : "(none)",
+           lcdStart, lcdUp, lcdPg, lcdEnd, sl->isEnabled() ? 1 : 0);
 }
 
 static void probeCombo(QComboBox *cb)
@@ -1101,11 +1185,32 @@ static void acceptFileDialog(QFileDialog *fd, const QString &path)
     else
         QTest::keyClick(le, Qt::Key_Return);
     for (int i = 0; i < 40 && fd->isVisible(); ++i) QTest::qWait(50);
-    if (!fd->isVisible()) return;
+    if (!fd->isVisible()) {
+        // Say what was actually accepted. An earlier version returned here
+        // without looking, and a run in which setDirectory() had not taken
+        // would have written the right basename in the wrong place with no
+        // symptom but a missing file three lines later.
+        const QString got = fd->selectedFiles().isEmpty()
+                                ? QString() : fd->selectedFiles().first();
+        if (got != fi.absoluteFilePath())
+            printf("  !! filedialog accepted [%s], not [%s]\n",
+                   qPrintable(got), qPrintable(fi.absoluteFilePath()));
+        return;
+    }
     // Still open because something MODAL is on top of it -- Qt's own overwrite
     // confirmation is the case that happens -- is not the dialog failing to
-    // accept. Leave it to whoever armed the next handler.
-    if (QApplication::activeModalWidget() != fd) return;
+    // accept. Leave it to whoever armed the next handler. SAY SO: returning
+    // silently here is how a population export once produced no file at all,
+    // with nothing in the output between the dialog opening and the missing
+    // file, and that run was very nearly committed as a baseline.
+    if (QApplication::activeModalWidget() != fd) {
+        printf("  !! filedialog left open under a %s -- not accepted here\n",
+               QApplication::activeModalWidget()
+                   ? QApplication::activeModalWidget()->metaObject()->className()
+                   : "(none)");
+        fflush(stdout);
+        return;
+    }
     printf("  [filedialog] STILL open after clicking accept -- rejecting it\n");
     fd->reject();
     fflush(stdout);
@@ -1173,6 +1278,16 @@ static void openExperiment(const QString &path)
 int main(int argc, char **argv)
 {
     QApplication app(argc, argv);
+    // The C locale for THIS PROGRAM'S OWN output, and it has to come AFTER the
+    // QApplication constructor, which calls setlocale(LC_ALL, "") itself --
+    // setting it before is silently undone. Every %g and %f below would
+    // otherwise follow LC_NUMERIC, so the locale re-run printed `5,1' where the
+    // ambient run printed `5.1': eight lines of harness artefact with nothing
+    // to do with SIGEL, which is what made that check a tautology on a box
+    // where the chosen locale was not even installed.
+    // Qt's own locale handling is untouched: QLocale reads the environment,
+    // which is exactly what C7's validator pinning is tested against.
+    setlocale(LC_NUMERIC, "C");
     // Anything that returns from run() gets PVM torn down; the watchdog does it
     // itself because _exit() runs no destructors.
     struct PvmGuard { ~PvmGuard() { tearDownPvm(); } } pvmGuard;
@@ -1227,6 +1342,7 @@ int main(int argc, char **argv)
     // --- oracle reading behind it. Everything here was compared against the
     // --- running 1.3 binary; see PORTING.md's C10 section.
     if (scenario == "gate") {
+        dumpIcons();
         QTreeWidget *t = indList();
         if (!t) { printf("!! no individuals list\n"); return 1; }
 
@@ -1589,14 +1705,22 @@ int main(int argc, char **argv)
         return 0;
     }
 
-    // --- the round trip: export, import it back, export again -------------
-    // The strongest shape a check can take here. If writer and reader agree,
-    // the second export is byte-identical to the first; if they disagree the
-    // sha256 moves, and it moves whether the disagreement is a dropped field,
-    // a reordered container or a changed number. It needs no oracle to be
-    // useful -- though the oracle's copies of the first exports are what say
-    // the format itself matches 1.3 rather than merely being self-consistent.
+    // --- the round trip: export, MUTATE, import it back, export again -----
+    // The mutation is the whole point and an earlier version did not have it.
+    // Without it both exports serialise the SAME in-memory object and the file
+    // imported in between came from that object, so an importer that opens
+    // nothing, parses nothing or is never reached leaves the object untouched
+    // and the probe prints STABLE. It could see a LOSSY reader and was
+    // structurally blind to a NO-OP one -- which is the more likely failure,
+    // since a dead connect or a greyed menu item produces exactly that. Found
+    // by review.
+    //
+    // So: export A, change one field on the owning page, import A back, export
+    // B. A working importer overwrites the change and B == A. A no-op importer
+    // leaves the change in place and B != A. importFrom's return value is
+    // checked now too, so a greyed Import item fails rather than passing.
     if (scenario == "roundtrip") {
+        QStackedWidget *st4b = W->findChild<QStackedWidget *>();
         struct Item { const char *menu; const char *ext; };
         static const Item items[] = {
             { "GP-Parameters",         "gpp" },
@@ -1606,20 +1730,102 @@ int main(int argc, char **argv)
             { "Population",            "pop" },
         };
         printf("\n== ROUND TRIP ==\n");
-        for (const Item &it : items) {
+        // One field per format, on the page that owns it, changed between the
+        // two exports so that a no-op importer cannot pass.
+        struct Mut { const char *page; int tab; const char *widget; const char *value; };
+        auto mutate = [&](const Mut &mu) -> bool {
+            clickMenu("&View", QString::fromLatin1(mu.page));
+            QTest::qWait(300);
+            QWidget *pg = st4b ? st4b->currentWidget() : nullptr;
+            if (!pg) { printf("  !! no page %s\n", mu.page); return false; }
+            if (QTabWidget *tw = pg->findChild<QTabWidget *>()) {
+                QTabBar *bar = tw->tabBar();
+                QTest::mouseClick(bar, Qt::LeftButton, Qt::NoModifier,
+                                  bar->tabRect(mu.tab).center());
+                QTest::qWait(150);
+            }
+            if (QSpinBox *sp = pg->findChild<QSpinBox *>(mu.widget)) {
+                sp->setFocus(); sp->selectAll();
+                QTest::keyClick(sp, Qt::Key_Delete);
+                QTest::keyClicks(sp, QString::fromLatin1(mu.value));
+                QTest::qWait(30);
+                printf("  mutated %s -> %d\n", mu.widget, sp->value());
+                return true;
+            }
+            if (QLineEdit *le = pg->findChild<QLineEdit *>(mu.widget)) {
+                le->setFocus(); le->selectAll();
+                QTest::keyClick(le, Qt::Key_Delete);
+                QTest::keyClicks(le, QString::fromLatin1(mu.value));
+                QTest::qWait(30);
+                printf("  mutated %s -> [%s]\n", mu.widget, qPrintable(le->text()));
+                return true;
+            }
+            printf("  !! no widget %s on %s\n", mu.widget, mu.page);
+            return false;
+        };
+        static const Mut muts[] = {
+            { "&GP Parameters",         0, "spinboxRandomSeed",        "321"  },
+            { "&Simulation Parameters", 0, "lineeditStepSize",         "0.09" },
+            { "&Language Parameters",   0, "spinboxNumberOfRegisters", "7"    },
+            { "&Environment",           0, "lineeditGravityX",         "3.5"  },
+        };
+        for (int i = 0; i < (int)(sizeof(items) / sizeof(items[0])); ++i) {
+            const Item &it = items[i];
             const QString a = scratch() + "/rt-a-" + QString::fromLatin1(it.ext);
             const QString b = scratch() + "/rt-b-" + QString::fromLatin1(it.ext);
             printf("\n-- %s\n", it.menu);
             const QString fa = exportTo(it.menu, a, it.ext);
             if (fa.isEmpty() || !QFile::exists(fa)) { printf("  !! first export failed\n"); continue; }
             const QString sa = sha256Of(fa);
-            if (!importFrom(it.menu, fa)) { printf("  !! import failed\n"); continue; }
+
+            // Population has no single field to type into; shrink the pool
+            // instead, which is a change the .pop must undo.
+            bool mutated = false;
+            if (i < (int)(sizeof(muts) / sizeof(muts[0]))) mutated = mutate(muts[i]);
+            else {
+                clickMenu("&View", "&Population");
+                QTest::qWait(300);
+                QTreeWidget *tl = indList();
+                if (tl && tl->topLevelItemCount() > 3) {
+                    clickRow(tl, 0);
+                    clickRow(tl, 2, Qt::ShiftModifier);
+                    whenModal([](QWidget *m) { clickMsgButton(m, QMessageBox::Yes); });
+                    clickMenu("&Individuals", "&Delete");
+                    QTest::qWait(4000);
+                    printf("  mutated the pool -> %d rows\n", tl->topLevelItemCount());
+                    mutated = true;
+                }
+            }
+            if (!mutated) { printf("  !! could not mutate -- this run proves nothing\n"); continue; }
+
+            if (!importFrom(it.menu, fa)) { printf("  !! IMPORT FAILED\n"); continue; }
             const QString fb = exportTo(it.menu, b, it.ext);
             if (fb.isEmpty() || !QFile::exists(fb)) { printf("  !! second export failed\n"); continue; }
             const QString sb = sha256Of(fb);
             printf("  export1 %lld bytes  %s\n", QFileInfo(fa).size(), qPrintable(sa));
             printf("  export2 %lld bytes  %s\n", QFileInfo(fb).size(), qPrintable(sb));
-            printf("  ROUND TRIP %s\n", sa == sb ? "STABLE" : "*** CHANGED ***");
+            if (sa == sb) { printf("  ROUND TRIP STABLE (and the import undid the change)\n");
+                            fflush(stdout); continue; }
+            // Whitespace-only growth is C10's documented history defect, not a
+            // reader/writer disagreement -- say which before calling it either.
+            QFile x(fa), y(fb);
+            QByteArray xa, yb;
+            if (x.open(QIODevice::ReadOnly)) { xa = x.readAll(); x.close(); }
+            if (y.open(QIODevice::ReadOnly)) { yb = y.readAll(); y.close(); }
+            auto squeeze = [](const QByteArray &in) {
+                QByteArrayList keep;
+                for (const QByteArray &l : in.split('\n'))
+                    if (!l.trimmed().isEmpty()) keep << l.trimmed();
+                return keep.join('\n');
+            };
+            const bool onlyBlank = squeeze(xa) == squeeze(yb);
+            printf("  ROUND TRIP %s\n", onlyBlank
+                   ? "differs ONLY in blank lines -- C10's history growth, "
+                     "not a reader/writer disagreement"
+                   : "*** CHANGED IN CONTENT ***");
+            printf("  delta=%lld bytes  blankLineDelta=%d\n",
+                   (long long)(yb.size() - xa.size()),
+                   (int)(yb.count('\n') - xa.count('\n')));
             fflush(stdout);
         }
 
@@ -1729,6 +1935,12 @@ int main(int argc, char **argv)
         const QString stem = scratch() + "/x11b-ow";
         const QString out  = stem + ".sip";
         QFile::remove(out);
+        // The EXTENSIONLESS name too. checkEnding() appends .sip after the
+        // dialog closes, so nothing normally creates `x11b-ow' -- but if
+        // checkEnding ever regressed, the first export would write it, nothing
+        // would clean it up, and every later run would spend 240 seconds in the
+        // watchdog and blame the pool position. Found by review.
+        QFile::remove(stem);
         printf("\n== OVERWRITE ==\n");
 
         // 1. first export -- the file does not exist, so no prompt is due.
@@ -1804,6 +2016,349 @@ int main(int argc, char **argv)
         // was asking -- does Qt 6 confirm where Qt 2 did not -- is answered
         // directly by a five-line probe against QFileDialog, and the answer is
         // in PORTING.md's C11b section. Not worth a nested-modal harness.
+        return 0;
+    }
+
+    // --- the six dialogs C10 never opened ---------------------------------
+    // C11c. Five of the six are modal exec()s and one -- SIG_IndividualView --
+    // is a non-modal top-level window opened with show(), so it has to be
+    // found among topLevelWidgets() rather than caught by whenModal().
+    //
+    // Both tree-driven dialogs are reached here through their PUSH BUTTON:
+    // slotPushButtonEditClicked and slotEditHost both forward to the
+    // double-click slot with currentItem(), so the button exercises the same
+    // code by a route that needs no coordinates.
+    //
+    // NOT because double-click is unreliable. The oracle reported that in C11a
+    // and then RETRACTED it after testing properly -- 15 of 15 -- so the
+    // sequence sent to it uses double-click. Its C11a failures were a
+    // collapsed tree shifting every row by about 22px under a fixed y, which
+    // is a coordinate bug wearing a double-click costume. Recorded because the
+    // retraction is the useful part: "nothing happened" is a symptom that
+    // hides its own cause, where "the wrong thing happened" does not.
+    if (scenario == "dialogs") {
+        QStackedWidget *st4 = W->findChild<QStackedWidget *>();
+        auto page = [&](const char *m) -> QWidget * {
+            clickMenu("&View", QString::fromLatin1(m));
+            QTest::qWait(300);
+            return st4 ? st4->currentWidget() : nullptr;
+        };
+
+        // ---- 1. Edit Command, and C7's TWENTY-FIRST validator ------------
+        // C11a drove the other twenty. This one is on a dialog, so it was out
+        // of that step's scope; driving it here closes the set.
+        printf("\n== EDIT COMMAND ==\n");
+        QWidget *lang = page("&Language Parameters");
+        QTreeWidget *cmds = lang ? lang->findChild<QTreeWidget *>("listviewCommands") : nullptr;
+        QPushButton *editCmd = nullptr;
+        if (lang) for (QPushButton *b : lang->findChildren<QPushButton *>())
+            if (b->text().contains("Edit")) { editCmd = b; break; }
+        if (!cmds || !editCmd) { printf("  !! commands list or Edit button missing\n"); return 1; }
+        // MOVE is the one command the experiment gives a duration of its own.
+        int moveRow = -1;
+        for (int i = 0; i < cmds->topLevelItemCount(); ++i)
+            if (cmds->topLevelItem(i)->text(1) == "MOVE") { moveRow = i; break; }
+        printf("  rows=%d MOVE at row %d duration=[%s]\n", cmds->topLevelItemCount(),
+               moveRow, moveRow < 0 ? "?" : qPrintable(cmds->topLevelItem(moveRow)->text(2)));
+        if (moveRow >= 0) {
+            cmds->setCurrentItem(cmds->topLevelItem(moveRow));
+            cmds->topLevelItem(moveRow)->setSelected(true);
+        }
+        whenModal([](QWidget *m) {
+            describeDialog(m);
+            for (QRadioButton *rb : m->findChildren<QRadioButton *>())
+                printf("    radio  [%s] checked=%d\n", qPrintable(rb->text()),
+                       rb->isChecked() ? 1 : 0);
+            for (QGroupBox *g : m->findChildren<QGroupBox *>())
+                printf("    group  [%s]\n", qPrintable(g->title()));
+            QLineEdit *dur = m->findChild<QLineEdit *>();
+            if (dur) {
+                // THE CONSEQUENCE OF THE SELECTION, which is the thing that
+                // matters and not the highlight. 1.3 pre-fills without
+                // selecting, so a typed digit APPENDS: 0.01 becomes 0.015.
+                // Qt 6 selects on the dialog's initial focus, which would
+                // REPLACE and give 5. Type one character, changing nothing
+                // else, and read it back.
+                const QString pre = dur->text();
+                QTest::keyClicks(dur, QStringLiteral("5"));
+                QTest::qWait(20);
+                printf("    prefill=[%s] selected=[%s]; typing \"5\" gives [%s]"
+                       "  (1.3 appends -> 0.015)\n",
+                       qPrintable(pre), qPrintable(dur->selectedText()),
+                       qPrintable(dur->text()));
+                dur->setText(pre);
+                printf("    validator %s\n", qPrintable(validatorDesc(dur->validator())));
+                printf("    -- C7's 21st validator, the one C11a could not reach\n");
+                batteryDouble(dur);
+            }
+            // Radio exclusivity: Qt 2 grouped these with a QButtonGroup widget,
+            // Qt 6 with a QGroupBox parent. Clicking one must clear the other.
+            QRadioButton *allow = nullptr, *disallow = nullptr;
+            for (QRadioButton *rb : m->findChildren<QRadioButton *>()) {
+                if (rb->text() == "Allow") allow = rb;
+                if (rb->text() == "Disallow") disallow = rb;
+            }
+            if (allow && disallow) {
+                QTest::mouseClick(disallow, Qt::LeftButton, Qt::NoModifier,
+                                  QPoint(8, disallow->height() / 2));
+                QTest::qWait(40);
+                printf("    after clicking Disallow: Allow=%d Disallow=%d\n",
+                       allow->isChecked() ? 1 : 0, disallow->isChecked() ? 1 : 0);
+                QTest::mouseClick(allow, Qt::LeftButton, Qt::NoModifier,
+                                  QPoint(8, allow->height() / 2));
+                QTest::qWait(40);
+                printf("    after clicking Allow:    Allow=%d Disallow=%d\n",
+                       allow->isChecked() ? 1 : 0, disallow->isChecked() ? 1 : 0);
+            }
+            clickDlgButton(m, "Cancel");
+        });
+        QTest::mouseClick(editCmd, Qt::LeftButton, Qt::NoModifier, editCmd->rect().center());
+        QTest::qWait(1500);
+        printf("  after Cancel, MOVE duration=[%s]\n",
+               moveRow < 0 ? "?" : qPrintable(cmds->topLevelItem(moveRow)->text(2)));
+
+        // ---- 1b. ALLOWING A DISALLOWED COMMAND, and where it lands -------
+        // The experiment allows 13 of the 15; JMP and NOP are the two it does
+        // not. Allowing one through this dialog calls addCommand(), which
+        // APPENDS to the ordered QList Phase D put in. Qt 2 inserted into a
+        // QDict, so 1.3 puts it at its HASH position instead -- which for JMP
+        // is straight after LOAD, not at the end.
+        //
+        // Same family as C11b's constructor order, but NOT the same decision:
+        // there the port had a free choice of a static order and 1.3's was
+        // reproducible for nothing, so it was fixed. Here the insertion POINT
+        // depends on runtime hashing, so matching it would mean reimplementing
+        // Q2Dict -- which is what Phase D deliberately removed. Measured and
+        // recorded rather than fixed; see PORTING.md, C11c.
+        printf("\n== ALLOW A DISALLOWED COMMAND (JMP) ==\n");
+        int jmpRow = -1;
+        for (int i = 0; i < cmds->topLevelItemCount(); ++i)
+            if (cmds->topLevelItem(i)->text(1) == "JMP") { jmpRow = i; break; }
+        if (jmpRow < 0) printf("  !! JMP not in the list\n");
+        else {
+            printf("  JMP at row %d duration=[%s] (0 means disallowed)\n", jmpRow,
+                   qPrintable(cmds->topLevelItem(jmpRow)->text(2)));
+            for (int i = 0; i < cmds->topLevelItemCount(); ++i)
+                cmds->topLevelItem(i)->setSelected(i == jmpRow);
+            cmds->setCurrentItem(cmds->topLevelItem(jmpRow));
+            whenModal([](QWidget *m) {
+                for (QRadioButton *rb : m->findChildren<QRadioButton *>())
+                    printf("    as opened: [%s] checked=%d\n", qPrintable(rb->text()),
+                           rb->isChecked() ? 1 : 0);
+                QRadioButton *allow = nullptr;
+                for (QRadioButton *rb : m->findChildren<QRadioButton *>())
+                    if (rb->text() == "Allow") allow = rb;
+                if (allow) QTest::mouseClick(allow, Qt::LeftButton, Qt::NoModifier,
+                                             QPoint(8, allow->height() / 2));
+                QLineEdit *dur = m->findChild<QLineEdit *>();
+                if (dur) { dur->setFocus(); dur->selectAll();
+                           QTest::keyClick(dur, Qt::Key_Delete);
+                           QTest::keyClicks(dur, QStringLiteral("0.007")); }
+                QTest::qWait(60);
+                printf("    typed duration [%s]\n", dur ? qPrintable(dur->text()) : "?");
+                clickDlgButton(m, "OK");
+            });
+            QTest::mouseClick(editCmd, Qt::LeftButton, Qt::NoModifier, editCmd->rect().center());
+            QTest::qWait(1500);
+            printf("  JMP duration now [%s]\n",
+                   qPrintable(cmds->topLevelItem(jmpRow)->text(2)));
+            // The written order is the measurement, not the list widget, which
+            // is always alphabetical because the form builds it that way.
+            const QString out = exportTo("Language-Parameters",
+                                         scratch() + "/c11c-lap", "lap");
+            if (!out.isEmpty() && QFile::exists(out)) {
+                QFile f(out);
+                if (f.open(QIODevice::ReadOnly)) {
+                    QStringList names;
+                    QString header = QString::fromLatin1(f.readLine()).trimmed();
+                    while (!f.atEnd())
+                        names << QString::fromLatin1(f.readLine()).trimmed().section(' ', 0, 0);
+                    f.close();
+                    printf("  header  [%s]\n", qPrintable(header));
+                    printf("  written [%s]\n", qPrintable(names.join(' ')));
+                }
+            }
+        }
+
+        // ---- 2. Edit Host ------------------------------------------------
+        printf("\n== EDIT HOST ==\n");
+        QWidget *gp = page("&GP Parameters");
+        QTabWidget *gptabs = gp ? gp->findChild<QTabWidget *>() : nullptr;
+        if (gptabs) {   // the PVM tab, by name rather than by index
+            for (int i = 0; i < gptabs->count(); ++i)
+                if (gptabs->tabText(i) == "PVM") {
+                    QTabBar *bar = gptabs->tabBar();
+                    QTest::mouseClick(bar, Qt::LeftButton, Qt::NoModifier,
+                                      bar->tabRect(i).center());
+                    QTest::qWait(200);
+                    break;
+                }
+        }
+        QTreeWidget *hosts = gp ? gp->findChild<QTreeWidget *>("listviewHosts") : nullptr;
+        QPushButton *editHost = nullptr;
+        if (gp) for (QPushButton *b : gp->findChildren<QPushButton *>())
+            if (b->objectName() == "pushbuttonEdit") { editHost = b; break; }
+        if (!hosts || !editHost) printf("  !! host list or Edit button missing\n");
+        else {
+            printf("  rows=%d row0=[%s|%s|%s]\n", hosts->topLevelItemCount(),
+                   qPrintable(hosts->topLevelItem(0)->text(1)),
+                   qPrintable(hosts->topLevelItem(0)->text(2)),
+                   qPrintable(hosts->topLevelItem(0)->text(3)));
+            hosts->setCurrentItem(hosts->topLevelItem(0));
+            hosts->topLevelItem(0)->setSelected(true);
+            whenModal([](QWidget *m) {
+                describeDialog(m);
+                for (QCheckBox *cb : m->findChildren<QCheckBox *>())
+                    printf("    check  [%s] checked=%d\n", qPrintable(cb->text()),
+                           cb->isChecked() ? 1 : 0);
+                // The slave directory is the field the QTextStream >> char trap
+                // emptied: every PVMHOST parsed from an .exp got an empty dir
+                // until it was fixed. This is where a regression would show.
+                for (QLineEdit *le : m->findChildren<QLineEdit *>())
+                    printf("    edit   [%s] text=[%s] empty=%d\n",
+                           qPrintable(le->objectName()), qPrintable(le->text()),
+                           le->text().isEmpty() ? 1 : 0);
+                clickDlgButton(m, "Cancel");
+            });
+            QTest::mouseClick(editHost, Qt::LeftButton, Qt::NoModifier,
+                              editHost->rect().center());
+            QTest::qWait(1500);
+        }
+
+        // ---- 3. Help > About, the InfoBox --------------------------------
+        // SIG_TextView runs a 100 ms auto-scroll timer, so the scroll position
+        // is NOT dumped -- it would make this scenario unbaselineable. The
+        // text and the geometry are what is compared.
+        printf("\n== ABOUT / INFOBOX ==\n");
+        whenModal([](QWidget *m) {
+            printf("  [dialog] class=%s title=[%s] modal=%d\n",
+                   m->metaObject()->className(), qPrintable(m->windowTitle()),
+                   m->isModal() ? 1 : 0);
+            for (QLabel *l : m->findChildren<QLabel *>())
+                printf("    label pixmap=%d size=%dx%d\n", l->pixmap().isNull() ? 0 : 1,
+                       l->pixmap().width(), l->pixmap().height());
+            for (QTextBrowser *tb : m->findChildren<QTextBrowser *>()) {
+                const QStringList lines = tb->toPlainText().split('\n');
+                printf("    text lines=%d vScrollPolicy=%d\n", (int)lines.count(),
+                       (int)tb->verticalScrollBarPolicy());
+                for (const QString &l : lines) printf("    | %s\n", qPrintable(l));
+            }
+            for (QPushButton *b : m->findChildren<QPushButton *>())
+                printf("    button [%s] default=%d\n", qPrintable(b->text()), b->isDefault());
+            m->close();
+        }, 6000);
+        clickMenu("&Help", "About");   // no accelerator on this one
+        QTest::qWait(2000);
+
+        // ---- 4. Robot Info -----------------------------------------------
+        // Not a SIG_TextView: slotRobotInfo builds a text blob with
+        // getRobotInformation() and shows it in a QMessageBox. The blob is
+        // generated from the robot, so it is byte-comparable across machines.
+        printf("\n== ROBOT INFO ==\n");
+        QWidget *rob = page("&Robot");
+        QPushButton *info = nullptr;
+        if (rob) for (QPushButton *b : rob->findChildren<QPushButton *>())
+            if (b->objectName() == "pushbuttonRobInfo") { info = b; break; }
+        if (!info) printf("  !! Robot Info button missing\n");
+        else {
+            whenModal([](QWidget *m) {
+                QMessageBox *mb = qobject_cast<QMessageBox *>(m);
+                printf("  [dialog] class=%s title=[%s]\n", m->metaObject()->className(),
+                       qPrintable(m->windowTitle()));
+                if (mb) {
+                    const QStringList lines = mb->text().split('\n');
+                    printf("  text lines=%d\n", (int)lines.count());
+                    for (const QString &l : lines) printf("  | %s\n", qPrintable(l));
+                    for (QAbstractButton *b : mb->buttons())
+                        printf("  button [%s] default=%d\n", qPrintable(b->text()),
+                               b == mb->defaultButton());
+                }
+                m->close();
+            }, 6000);
+            QTest::mouseClick(info, Qt::LeftButton, Qt::NoModifier, info->rect().center());
+            QTest::qWait(2000);
+        }
+
+        // ---- 5. IndividualView, which is NOT modal ------------------------
+        printf("\n== INDIVIDUAL VIEW (double-click a population row) ==\n");
+        clickMenu("&View", "&Population");
+        QTest::qWait(300);
+        QTreeWidget *t5 = indList();
+        if (!t5) printf("  !! no individuals list\n");
+        else {
+            QTreeWidgetItem *row0 = t5->topLevelItem(0);
+            t5->scrollToItem(row0);
+            const QRect r = t5->visualItemRect(row0);
+            printf("  double-clicking row0 = %s at (%d,%d) itemAt=%s\n",
+                   qPrintable(row0->text(0)), r.center().x(), r.center().y(),
+                   t5->itemAt(r.center()) ? "the row" : "NOTHING -- probe is wrong");
+            // Distinguish "the double click never reached the view" from "it
+            // reached it and no window appeared". Without this the two look
+            // identical, and C10 lost time to exactly that with the context
+            // menus -- a right click that reached nothing read as five absent
+            // menus rather than as a broken probe.
+            QSignalSpy dbl(t5, SIGNAL(itemDoubleClicked(QTreeWidgetItem *, int)));
+            QTest::mouseClick(t5->viewport(), Qt::LeftButton, Qt::NoModifier, r.center());
+            QTest::qWait(60);
+            QTest::mouseDClick(t5->viewport(), Qt::LeftButton, Qt::NoModifier, r.center());
+            QTest::qWait(1200);
+            printf("  itemDoubleClicked emitted %d time(s)\n", (int)dbl.count());
+            // show(), not exec(), so it is a top-level window rather than a modal.
+            SIG_IndividualView *view = nullptr;
+            for (QWidget *w : QApplication::topLevelWidgets())
+                if (SIG_IndividualView *v = qobject_cast<SIG_IndividualView *>(w))
+                    if (w != W) { view = v; break; }
+            if (!view) printf("  !! no SIG_IndividualView appeared\n");
+            else {
+                printf("  [window] class=%s title=[%s] modal=%d visible=%d "
+                       "deleteOnClose=%d\n", view->metaObject()->className(),
+                       qPrintable(view->windowTitle()), view->isModal() ? 1 : 0,
+                       view->isVisible() ? 1 : 0,
+                       view->testAttribute(Qt::WA_DeleteOnClose) ? 1 : 0);
+                printf("  name=[%s] age=[%s] fitness=[%s] historyLines=%d\n",
+                       qPrintable(view->textlabelShowName->text()),
+                       qPrintable(view->textlabelShowAge->text()),
+                       qPrintable(view->textlabelShowFitness->text()),
+                       (int)view->multilineeditHistory->toPlainText().split('\n').count());
+                for (QPushButton *b : view->findChildren<QPushButton *>())
+                    printf("  button [%s] default=%d\n", qPrintable(b->text()), b->isDefault());
+                view->close();
+                QTest::qWait(300);
+                printf("  after close, main window still alive=%d\n", W->isVisible() ? 1 : 0);
+            }
+        }
+
+        // ---- 6. Add Individuals, the Cancel path C10 never took ----------
+        printf("\n== ADD INDIVIDUALS (Cancel) ==\n");
+        const int before6 = t5 ? t5->topLevelItemCount() : -1;
+        whenModal([](QWidget *m) {
+            describeDialog(m);
+            // NOT probeSpin(sp) -- its Return would click this dialog's
+            // default button and accept it, so the Cancel below would land on a
+            // hidden widget and test nothing.
+            QSpinBox *sp = m->findChild<QSpinBox *>();
+            // The same select-on-focus consequence as Edit Command, and the
+            // costly one: 1.3 leaves the "1" unselected, so a user who types 2
+            // adds TWELVE individuals. Measured on 1.3 as 12.
+            if (QLineEdit *ed = sp ? sp->findChild<QLineEdit *>() : nullptr) {
+                const QString pre = ed->text();
+                QTest::keyClicks(sp, QStringLiteral("2"));
+                QTest::qWait(20);
+                printf("    prefill=[%s] selected=[%s]; typing \"2\" gives [%s] "
+                       "value=%d  (1.3 appends -> 12)\n", qPrintable(pre),
+                       qPrintable(ed->selectedText()), qPrintable(ed->text()),
+                       sp->value());
+                sp->setValue(1);
+            }
+            if (sp) probeSpin(sp, false);
+            printf("    [still open before Cancel] visible=%d\n", m->isVisible());
+            clickDlgButton(m, "Cancel");
+        });
+        clickMenu("&Individuals", "&Add");
+        QTest::qWait(1500);
+        printf("  rows %d -> %d (Cancel must add nothing)\n", before6,
+               t5 ? t5->topLevelItemCount() : -1);
+        fflush(stdout);
         return 0;
     }
 
@@ -1895,16 +2450,12 @@ int main(int argc, char **argv)
             if (!le) { printf("  !! no fileNameEdit\n"); fd->reject(); return; }
             // 1.3 pre-fills this field but does NOT pre-select it, so typing
             // appends -- unlike the Rename dialog, which does pre-select.
-            // Printed before selectAll() so the default state is visible.
+            // Read BEFORE acceptFileDialog touches it, so the default state is
+            // what is printed.
             printf("  [savedialog] prefill=[%s] preselected=[%s]\n",
                    qPrintable(le->text()), qPrintable(le->selectedText()));
             fflush(stdout);
-            le->setFocus();
-            le->selectAll();
-            QTest::keyClicks(le, outA);
-            QTest::qWait(120);
-            QTest::keyClick(le, Qt::Key_Return);
-            fflush(stdout);
+            acceptFileDialog(fd, outA);
         });
         clickMenu("&File", "&Save Experiment");
         QTest::qWait(3000);
@@ -1920,12 +2471,7 @@ int main(int argc, char **argv)
         whenModal([outB](QWidget *m) {
             QFileDialog *fd = qobject_cast<QFileDialog *>(m);
             if (!fd) { m->close(); return; }
-            QLineEdit *le = fd->findChild<QLineEdit *>("fileNameEdit");
-            if (!le) { fd->reject(); return; }
-            le->setFocus(); le->selectAll();
-            QTest::keyClicks(le, outB);
-            QTest::qWait(120);
-            QTest::keyClick(le, Qt::Key_Return);
+            acceptFileDialog(fd, outB);
         });
         clickMenu("&File", "&Save Experiment");
         QTest::qWait(3000);
@@ -2106,12 +2652,7 @@ int main(int argc, char **argv)
                    qPrintable(fd->windowTitle()),
                    qPrintable(fd->nameFilters().join(" ;; ")),
                    qPrintable(fd->labelText(QFileDialog::Accept)));
-            QLineEdit *le = fd->findChild<QLineEdit *>("fileNameEdit");
-            if (!le) { fd->reject(); return; }
-            le->setFocus(); le->selectAll();
-            QTest::keyClicks(le, out);
-            QTest::qWait(120);
-            QTest::keyClick(le, Qt::Key_Return);
+            acceptFileDialog(fd, out);
             fflush(stdout);
         });
         clickMenu("&File", "Export", "Program");

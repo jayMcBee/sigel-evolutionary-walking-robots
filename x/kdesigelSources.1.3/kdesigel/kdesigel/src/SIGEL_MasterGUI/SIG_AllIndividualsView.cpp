@@ -20,6 +20,8 @@
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
+#include <QTimer>
+#include <QLineEdit>
 #include <qapplication.h>
 #include <qspinbox.h>
 #include <qlabel.h>
@@ -185,6 +187,18 @@ void SIG_AllIndividualsView::slotAddIndividuals()
 {
   SIG_AddIndividualsDialog addDialog( this, "Add Individual Dialog", true );
   addDialog.spinboxNumber->setFocus();
+  // Same Qt 6 select-on-dialog-focus difference as the Edit Command and
+  // Edit Host line edits (see SIG_LanguageParameters.cpp), and this is the
+  // site where it costs most: 1.3 leaves the "1" unselected with the cursor
+  // after it, so a user who types 2 gets 12 and adds TWELVE individuals.
+  // Unlike a wrong duration there is nothing wrong-looking left behind --
+  // the pool is simply twelve bigger. Measured on the running binary:
+  // 1 then "2" reads 12 there, and read 2 here before this line.
+  // The spin box's editor is its only QLineEdit child; lineEdit() is
+  // protected. Queued because the selection does not exist until exec()
+  // shows the dialog and focus travels the tab chain.
+  if ( QLineEdit *le = addDialog.spinboxNumber->findChild<QLineEdit *>() )
+    QTimer::singleShot( 0, le, [le]{ le->end( false ); } );
   switch( addDialog.exec() )
     {
     case QDialog::Accepted:

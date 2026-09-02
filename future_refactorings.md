@@ -371,8 +371,8 @@ port commits **3200**; type 100 into a [1..99] box and 1.3 commits **99**, the
 port commits **10**. Both valid, different, and `putAllIntoExperiment()` writes
 whichever the widget holds.
 
-**The fix, measured rather than sketched.** This subclass reproduces all four
-1.3 readings exactly — 32001→32000, 8001→8000, 24→23, 100→99 — with in-range
+**The fix, measured rather than sketched.** This subclass — 33 lines, 28
+without comments — reproduces all four 1.3 readings exactly — 32001→32000, 8001→8000, 24→23, 100→99 — with in-range
 typing unchanged:
 
 ```cpp
@@ -416,10 +416,11 @@ Each instance also needs
 routes an Intermediate commit through `fixup()`.
 
 **The promotion is smaller than "47 widgets" sounds.** Per form it is one
-11-line `<customwidgets>` block plus
-`sed 's/class="QSpinBox"/class="SIG_SpinBox"/g'` — 8 forms, plus one line in
-`SIG_AddIndividualsDialog.cpp` where the widget is built in code.
-`SIG_SimulationWidgetBase.ui` already carries a `<customwidget>` block to copy.
+`<customwidgets>` block — the existing one in `SIG_SimulationWidgetBase.ui` is
+12 lines, 8 without its `<sizehint>` — plus
+`sed 's/class="QSpinBox"/class="SIG_SpinBox"/g'`. **Twelve** forms hold a
+`QSpinBox`, not eight, plus one line in `SIG_AddIndividualsDialog.cpp` where
+the widget is built in code.
 
 **Do:** put it in `SIGEL_CommonGUI`, add a `<customwidget>` block to the three
 forms the five View pages are built from and promote **29 widgets** —

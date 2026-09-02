@@ -92,7 +92,7 @@ DEAD_SIGNALS='SIGNAL\( *(activated *\( *\)|activated *\( *const *QString'\
 '|doubleClicked *\( *Q(ListView|TreeWidget)Item)'
 
 MODULES="${*:-SIGEL_Tools SIGEL_Environment MT_GPSystem SIGEL_Robot SIGEL_Program SIGEL_RobotIO SIGEL_Simulation MT_Control SIGEL_GP SIGEL_Visualisation SIGEL_CommonGUI SIGEL_SlaveGUI MT_GUI SIGEL_MasterGUI}"
-pass=0; fail=0; warn=0
+pass=0; fail=0; warn=0; skipped=0; winskip=0
 
 # The shim self-check was here: it built and RAN q2compat_check.cpp under
 # ASan+UBSan, and was the only mechanical check that could see an ownership
@@ -163,6 +163,15 @@ for m in $MODULES; do
     mp=0; mf=0; mw=0
     for f in "$SRC/src/$m"/*.cpp; do
         [ -e "$f" ] || continue
+        # WIN_* is Windows-only and PERMANENTLY out of scope:
+        # WIN_SIG_GPRemoteZORCFitnessFunction needs HANDLE and OVERLAPPED
+        # from windows.h and has no Qt 2 API left in it, so it cannot
+        # compile on Linux at all -- section 7 records that its failure is
+        # correct rather than debt. Counted as a KNOWN EXCLUSION rather
+        # than a failure, so that "0 fail" means something and the exit
+        # status this script now returns is usable. Skipping it is the
+        # only honest alternative to a red run for ever.
+        case "${f##*/}" in WIN_*) winskip=$((winskip+1)); continue ;; esac
         if g++ $FLAGS $INCS "$f" 2>/tmp/chk.$$; then mp=$((mp+1)); else mf=$((mf+1)); fi
         mw=$((mw + $(grep -c "$SRC.*warning:" /tmp/chk.$$ || true)))
     done
@@ -207,6 +216,7 @@ for m in $MODULES; do
  for h in "$SRC/include/$m"/*.h; do
     [ -e "$h" ] || continue
     rel=${h#$SRC/include/}
+    case "${h##*/}" in WIN_*) winskip=$((winskip+1)); continue ;; esac
     printf '#include "%s"\nint main(){return 0;}\n' "$rel" > /tmp/hdr.$$.cpp
     if g++ $FLAGS $INCS /tmp/hdr.$$.cpp 2>/dev/null; then hp=$((hp+1)); else hf=$((hf+1)); echo "  header FAIL: $rel"; fi
  done
@@ -708,12 +718,19 @@ pass=$((pass+gp)); fail=$((fail+gf))
 bp=0; bf=0
 BEXP=$ROOT/data-reordered/Experiments/twoBasesSimpleFitness2.exp
 if [ ! -f "$BEXP" ]; then
-    echo "  no $BEXP -- behaviour section skipped (data ships separately)"
+    # data-reordered/ is gitignored, so a fresh clone lands here. Say SKIPPED
+    # loudly and count it: reporting `0 pass 0 fail' made the section vanish
+    # from the total and left the exit status clean, which is the same shape as
+    # the three silent-short-run holes this file has already been bitten by.
+    echo "  SKIPPED: no $BEXP -- the data ships separately from the tarballs;"
+    echo "  provision data/ as section 9 describes, then re-run. THIS SECTION"
+    echo "  TESTED NOTHING."
+    skipped=$((skipped+1))
 elif make -s -C "$ROOT" B=build-fast SAN= SIGSAN= guidrive >/tmp/bdb.$$ 2>&1; then
     # SIGEL_ROOT must be the SOURCE tree: the driver loads pixmaps and terrain
     # from it. Neither scenario spawns a sigel_slave, so neither needs one.
     #
-    # TWO scenarios make up the baseline, concatenated in this order:
+    # FIVE scenarios make up the baseline, concatenated in this order:
     #   gate       C10 -- the tree, sorting, add/delete/reset, the dialogs,
     #              the context menus, the MetaGP warning
     #   pages      C11a -- the five View pages C10 never opened, every spin
@@ -729,6 +746,14 @@ elif make -s -C "$ROOT" B=build-fast SAN= SIGSAN= guidrive >/tmp/bdb.$$ 2>&1; th
     #              write is not inside the switch. Confirmed on the running
     #              binary. This pins the DEFECT: sentinelSurvived=1 would mean
     #              the port had started honouring the prompt.
+    #   dialogs    C11c -- the six dialogs, C7's 21st validator, and the
+    #              select-on-focus defect. The load-bearing lines are the two
+    #              `typing "5" gives [0.015]' / `typing "2" gives [12]' ones:
+    #              Qt 6 selects a pre-filled field when a dialog hands it focus
+    #              and Qt 2 did not, so before the fix a typed digit REPLACED
+    #              the value instead of appending to it -- 2 individuals added
+    #              where 1.3 adds 12. Both figures are the oracle's, off the
+    #              running binary.
     #
     # `roundtrip' is NOT run here. It exports, imports and re-exports each
     # format, which takes 97 seconds against 30 for exportall, and what it
@@ -749,9 +774,26 @@ elif make -s -C "$ROOT" B=build-fast SAN= SIGSAN= guidrive >/tmp/bdb.$$ 2>&1; th
             timeout 300 "$ROOT/build-fast/guidrive" "$sc" > "$out" 2>/dev/null
     }
     if guidrive_run gate /tmp/bo.$$ && guidrive_run pages /tmp/bp.$$ \
-       && guidrive_run exportall /tmp/bx.$$ && guidrive_run overwrite /tmp/bw.$$; then
-        cat /tmp/bo.$$ /tmp/bp.$$ /tmp/bx.$$ /tmp/bw.$$ > /tmp/ball.$$
-        if command grep -v '^#' "$ROOT/guibehaviour-baseline.txt" | diff -u - /tmp/ball.$$ > /tmp/bd.$$; then
+       && guidrive_run exportall /tmp/bx.$$ && guidrive_run overwrite /tmp/bw.$$ \
+       && guidrive_run dialogs /tmp/bg.$$; then
+        cat /tmp/bo.$$ /tmp/bp.$$ /tmp/bx.$$ /tmp/bw.$$ /tmp/bg.$$ > /tmp/ball.$$
+        # The driver prints `!!' when it could not do what it was asked -- a
+        # dialog that would not accept, a file that never appeared. Such a run
+        # must not pass, and must not be diffed into a baseline either: one
+        # DID get committed that way, a population export that silently wrote
+        # nothing, and only a later diff caught it. Checked before the diff so
+        # the message is about the right thing.
+        if command grep -q '^ *!!' /tmp/ball.$$; then
+            bf=1
+            echo "  the driver could not carry out part of a scenario:"
+            command grep -n '^ *!!' /tmp/ball.$$ | head -6 | sed 's/^/    /'
+            echo "  (a run containing these must never be committed as a baseline)"
+        elif command grep -q '^ *!!' "$ROOT/guibehaviour-baseline.txt"; then
+            bf=1
+            echo "  the BASELINE itself contains a failure marker -- it was"
+            echo "  captured from a run that did not complete. Regenerate it:"
+            command grep -n '^ *!!' "$ROOT/guibehaviour-baseline.txt" | head -4 | sed 's/^/    /'
+        elif command grep -v '^#' "$ROOT/guibehaviour-baseline.txt" | diff -u - /tmp/ball.$$ > /tmp/bd.$$; then
             bp=1
         else
             bf=1; echo "  the GUI no longer BEHAVES the way SIGEL 1.3 does:"
@@ -761,7 +803,7 @@ elif make -s -C "$ROOT" B=build-fast SAN= SIGSAN= guidrive >/tmp/bdb.$$ 2>&1; th
         bf=1
         echo "  the driver did not finish -- it exits(1) on an out-of-range pool"
         echo "  position, which is how the Qt 6 clear() regression showed up:"
-        tail -6 /tmp/bo.$$ /tmp/bp.$$ /tmp/bx.$$ /tmp/bw.$$ 2>/dev/null | sed 's/^/    /'
+        tail -6 /tmp/bo.$$ /tmp/bp.$$ /tmp/bx.$$ /tmp/bw.$$ /tmp/bg.$$ 2>/dev/null | sed 's/^/    /'
     fi
 
     # C7 pinned 21 validators to QLocale::c() with RejectGroupSeparator because
@@ -773,25 +815,40 @@ elif make -s -C "$ROOT" B=build-fast SAN= SIGSAN= guidrive >/tmp/bdb.$$ 2>&1; th
     # de_DE built with woody's own localedef and found it locale-independent, so
     # this is 1.3 behaviour to preserve and not a Qt 6 nicety.
     #
-    # This needs no baseline of its own: the two runs must simply be IDENTICAL.
-    # de_DE is chosen because Qt reports it even when the locale is not
-    # generated -- measured -- so it works on a box with only English locales.
+    # This needs no baseline of its own: the runs must simply be IDENTICAL.
+    #
+    # TWO locales, and the reason is that one of them alone was a tautology.
+    # de_DE exercises QT's half: QLocale reads the environment directly, so it
+    # reports de_DE with a comma decimal even where no such locale is
+    # GENERATED -- measured -- which is what C7's validator pinning is tested
+    # against. But setlocale() then fails and LC_NUMERIC stays "C", so libc's
+    # half was never touched. en_DK is a comma-decimal locale that IS installed
+    # here (`locale -a`), so under it libc really does switch: a stray
+    # sprintf("%f") or strtod in a reader or writer shows up only in this one.
+    # Found by review, which measured the difference between them.
+    LOCTEST=en_DK.utf8
+    locale -a 2>/dev/null | command grep -qx "$LOCTEST" || LOCTEST=
     if [ "$bf" = 0 ]; then
         if guidrive_run pages /tmp/bl.$$ LANG=de_DE.UTF-8 LC_ALL=de_DE.UTF-8 \
-           && diff -q /tmp/bp.$$ /tmp/bl.$$ >/dev/null; then
-            :
+           && diff -q /tmp/bp.$$ /tmp/bl.$$ >/dev/null \
+           && { [ -z "$LOCTEST" ] || { guidrive_run pages /tmp/bl2.$$ \
+                  LANG="$LOCTEST" LC_ALL="$LOCTEST" \
+                  && diff -q /tmp/bp.$$ /tmp/bl2.$$ >/dev/null; }; }; then
+            [ -n "$LOCTEST" ] || echo "  note: no installed comma-decimal locale;" \
+                "only Qt's half of the locale check ran"
         else
             bf=1; bp=0
             echo "  the pages BEHAVE DIFFERENTLY under a comma-decimal locale;"
             echo "  C7's validator locale pinning is what stops that, and 1.3"
             echo "  was measured locale-independent on the running binary:"
-            diff /tmp/bp.$$ /tmp/bl.$$ 2>/dev/null | head -12 | sed 's/^/    /'
+            { diff /tmp/bp.$$ /tmp/bl.$$; diff /tmp/bp.$$ /tmp/bl2.$$; } 2>/dev/null \
+                | head -12 | sed 's/^/    /'
         fi
     fi
 else
     bf=1; echo "  guidrive did not build:"; head -5 /tmp/bdb.$$ | sed 's/^/    /'
 fi
-rm -f /tmp/bo.$$ /tmp/bp.$$ /tmp/bx.$$ /tmp/bw.$$ /tmp/bl.$$ /tmp/ball.$$ \
+rm -f /tmp/bo.$$ /tmp/bp.$$ /tmp/bx.$$ /tmp/bw.$$ /tmp/bg.$$ /tmp/bl.$$ /tmp/bl2.$$ /tmp/ball.$$ \
       /tmp/bd.$$ /tmp/bdb.$$
 # exportall and overwrite WRITE FILES, 2.7 MB of them, the population export
 # being most of it. Fixed names, so they are overwritten rather than
@@ -800,7 +857,8 @@ rm -f "${TMPDIR:-/tmp}"/x11b-gpp.gpp "${TMPDIR:-/tmp}"/x11b-sip.sip \
       "${TMPDIR:-/tmp}"/x11b-lap.lap "${TMPDIR:-/tmp}"/x11b-env.env \
       "${TMPDIR:-/tmp}"/x11b-pop.pop "${TMPDIR:-/tmp}"/x11b-prg.prg \
       "${TMPDIR:-/tmp}"/x11b-ind.ind "${TMPDIR:-/tmp}"/x11b-dat.dat \
-      "${TMPDIR:-/tmp}"/x11b-ow.sip
+      "${TMPDIR:-/tmp}"/x11b-ow.sip "${TMPDIR:-/tmp}"/x11b-ow \
+      "${TMPDIR:-/tmp}"/c11c-lap.lap
 printf '%-22s %2d pass  %2d fail\n' "gui behaviour" "$bp" "$bf"
 pass=$((pass+bp)); fail=$((fail+bf))
 
@@ -963,3 +1021,11 @@ pass=$((pass+fp)); fail=$((fail+ff)); warn=$((warn+fw))
 rm -f /tmp/chk.$$ /tmp/hdr.$$.cpp /tmp/uic.$$ /tmp/uic2.$$ /tmp/moc.$$.cpp /tmp/mkforms.$$
 echo "-----"
 echo "total: $pass pass, $fail fail, $warn warnings in SIGEL code"
+[ "$winskip" = 0 ] || echo "$winskip Windows-only WIN_* file(s) excluded -- permanent, §7"
+[ "$skipped" = 0 ] || echo "$skipped SECTION(S) SKIPPED -- see above; they tested nothing"
+# EXIT NON-ZERO WHEN ANYTHING FAILED. There was no exit here at all, so the
+# script always returned 0 and `./check.sh && ...' proceeded through a red run.
+# A skipped section counts as a failure for the exit status: it is the shape
+# this file has been bitten by three times -- a section that quietly tests
+# nothing and reports no failures. Found by review.
+[ "$fail" = 0 ] && [ "$skipped" = 0 ]

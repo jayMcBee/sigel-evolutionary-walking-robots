@@ -133,7 +133,69 @@
     row4  | 56432         | 1.14825       | 111           | sel=0
     row5  | 56447         | 1.14825       | 107           | sel=0
     ... 114 more
+    allrows sha256=ee0c3372fe5769ccf63f449dfcf2b301eb7d4acd4924cc5291e6f1e0c303e198
   [action changes] none
+
+== ICONS ==
+actions=58 withIcon=32 loadedNothing=0
+  &File/&Delete Experiment                                 icon=1 sizes=2
+  &File/&New Experiment                                    icon=1 sizes=2
+  &File/&Open Experiment                                   icon=1 sizes=2
+  &File/&Quit                                              icon=1 sizes=2
+  &File/&Rename Experiment                                 icon=0 sizes=0
+  &File/&Save Experiment                                   icon=1 sizes=2
+  &File/Export                                             icon=0 sizes=0
+  &File/Import                                             icon=0 sizes=0
+  &File>Export/...to GNU plot                              icon=0 sizes=0
+  &File>Export/Environment                                 icon=0 sizes=0
+  &File>Export/GP-Parameters                               icon=0 sizes=0
+  &File>Export/Individual                                  icon=0 sizes=0
+  &File>Export/Language-Parameters                         icon=0 sizes=0
+  &File>Export/Population                                  icon=0 sizes=0
+  &File>Export/Program                                     icon=0 sizes=0
+  &File>Export/Simulation-Parameters                       icon=0 sizes=0
+  &File>Import/Environment                                 icon=0 sizes=0
+  &File>Import/GP-Parameters                               icon=0 sizes=0
+  &File>Import/Individual                                  icon=0 sizes=0
+  &File>Import/Language-Parameters                         icon=0 sizes=0
+  &File>Import/Population                                  icon=0 sizes=0
+  &File>Import/Program                                     icon=0 sizes=0
+  &File>Import/Robot                                       icon=0 sizes=0
+  &File>Import/Simulation-Parameters                       icon=0 sizes=0
+  &Help/About                                              icon=0 sizes=0
+  &Individuals/&Add                                        icon=1 sizes=2
+  &Individuals/&Delete                                     icon=1 sizes=2
+  &Individuals/&Visualize                                  icon=1 sizes=2
+  &Individuals/Reset                                       icon=0 sizes=0
+  &MetaGP/&Configure System                                icon=1 sizes=1
+  &MetaGP/&Evaluator System                                icon=0 sizes=0
+  &MetaGP/&Use MetaGP                                      icon=1 sizes=1
+  &MetaGP/Cl&assifier System                               icon=0 sizes=0
+  &Options/Change font                                     icon=0 sizes=0
+  &Options/Use big pixmaps                                 icon=0 sizes=0
+  &Options/Use textlabels                                  icon=0 sizes=0
+  &View/&Environment                                       icon=1 sizes=2
+  &View/&GP Parameters                                     icon=1 sizes=2
+  &View/&Language Parameters                               icon=1 sizes=2
+  &View/&Population                                        icon=1 sizes=2
+  &View/&Robot                                             icon=1 sizes=2
+  &View/&Simulation Parameters                             icon=1 sizes=2
+  TB:fileToolbar/&Delete Experiment                        icon=1 sizes=2
+  TB:fileToolbar/&New Experiment                           icon=1 sizes=2
+  TB:fileToolbar/&Open Experiment                          icon=1 sizes=2
+  TB:fileToolbar/&Quit                                     icon=1 sizes=2
+  TB:fileToolbar/&Save Experiment                          icon=1 sizes=2
+  TB:individualsToolBar/&Add                               icon=1 sizes=2
+  TB:individualsToolBar/&Delete                            icon=1 sizes=2
+  TB:individualsToolBar/&Visualize                         icon=1 sizes=2
+  TB:mtToolbar/&Configure System                           icon=1 sizes=1
+  TB:mtToolbar/&Use MetaGP                                 icon=1 sizes=1
+  TB:viewToolBar/&Environment                              icon=1 sizes=2
+  TB:viewToolBar/&GP Parameters                            icon=1 sizes=2
+  TB:viewToolBar/&Language Parameters                      icon=1 sizes=2
+  TB:viewToolBar/&Population                               icon=1 sizes=2
+  TB:viewToolBar/&Robot                                    icon=1 sizes=2
+  TB:viewToolBar/&Simulation Parameters                    icon=1 sizes=2
 
 == SORT BY FITNESS (one click) ==
 order=Ascending
@@ -342,6 +404,7 @@ we do with the system?]
     row4  | 56432         | 1.14825       | 111           | sel=0
     row5  | 56447         | 1.14825       | 107           | sel=0
     ... 114 more
+    allrows sha256=ee0c3372fe5769ccf63f449dfcf2b301eb7d4acd4924cc5291e6f1e0c303e198
   [action changes] none
 
 == VALIDATOR BATTERY ==
@@ -383,11 +446,11 @@ we do with the system?]
     spin   spinboxRandomSeed                    v=0         [0..32000] step=1 pre=[] suf=[] up=1         dn2=0         typed(max+1)=[3200]->3200 commits=3200 enabled=1
     spin   spinboxMinIndLength                  v=10        [2..32000] step=1 pre=[] suf=[] up=11        dn2=9         typed(max+1)=[3200]->3200 commits=3200 enabled=1
     spin   spinboxResEvGen                      v=0         [0..99] step=1 pre=[] suf=[] up=1         dn2=0         typed(max+1)=[10]->10 commits=10 enabled=1
-    slider sliderReproduction                   v=280    [0..1000] page=1 up=280    pgup=280    lcd=lcdnumberReproduction 28/28/28 enabled=0
+    slider sliderReproduction                   v=280    [0..1000] page=1 up=280    pgup=280    end=280    lcd=lcdnumberReproduction 28/28/28/28 enabled=0
     click  sliderReproduction                   280 -> 280 (delta +0) focusPolicy=11 hasFocus=0
-    slider sliderMutation                       v=50     [0..1000] page=1 up=51     pgup=52     lcd=lcdnumberMutation 5/5.1/5.2 enabled=1
+    slider sliderMutation                       v=50     [0..1000] page=1 up=51     pgup=52     end=330    lcd=lcdnumberMutation 5/5.1/5.2/33 enabled=1
     click  sliderMutation                       50 -> 51 (delta +1) focusPolicy=11 hasFocus=0
-    slider sliderCrossover                      v=670    [0..1000] page=1 up=671    pgup=672    lcd=lcdnumberCrossover 67/67.1/67.2 enabled=1
+    slider sliderCrossover                      v=670    [0..1000] page=1 up=671    pgup=672    end=950    lcd=lcdnumberCrossover 67/67.1/67.2/95 enabled=1
     click  sliderCrossover                      670 -> 671 (delta +1) focusPolicy=11 hasFocus=0
     combo  comboboxFitnessName                  count=7 current=0 [Simple] editable=0 enabled=1
       item0  [Simple]
@@ -404,35 +467,35 @@ we do with the system?]
   -- tab 1 [Command probabilities] shown=1 visible=1
   [survey]
   [drive]
-    slider sliderMAX                            v=500    [0..1000] page=1 up=501    pgup=502    lcd=lcdnumberMAX 500/501/502 enabled=1
+    slider sliderMAX                            v=500    [0..1000] page=1 up=501    pgup=502    end=1000   lcd=lcdnumberMAX 500/501/502/1000 enabled=1
     click  sliderMAX                            500 -> 501 (delta +1) focusPolicy=11 hasFocus=0
-    slider sliderMIN                            v=500    [0..1000] page=1 up=501    pgup=502    lcd=lcdnumberMIN 500/501/502 enabled=1
+    slider sliderMIN                            v=500    [0..1000] page=1 up=501    pgup=502    end=1000   lcd=lcdnumberMIN 500/501/502/1000 enabled=1
     click  sliderMIN                            500 -> 501 (delta +1) focusPolicy=11 hasFocus=0
-    slider sliderMOD                            v=500    [0..1000] page=1 up=501    pgup=502    lcd=lcdnumberMOD 500/501/502 enabled=1
+    slider sliderMOD                            v=500    [0..1000] page=1 up=501    pgup=502    end=1000   lcd=lcdnumberMOD 500/501/502/1000 enabled=1
     click  sliderMOD                            500 -> 501 (delta +1) focusPolicy=11 hasFocus=0
-    slider sliderMOVE                           v=500    [0..1000] page=1 up=501    pgup=502    lcd=lcdnumberMOVE 500/501/502 enabled=1
+    slider sliderMOVE                           v=500    [0..1000] page=1 up=501    pgup=502    end=1000   lcd=lcdnumberMOVE 500/501/502/1000 enabled=1
     click  sliderMOVE                           500 -> 501 (delta +1) focusPolicy=11 hasFocus=0
-    slider sliderMUL                            v=500    [0..1000] page=1 up=501    pgup=502    lcd=lcdnumberMUL 500/501/502 enabled=1
+    slider sliderMUL                            v=500    [0..1000] page=1 up=501    pgup=502    end=1000   lcd=lcdnumberMUL 500/501/502/1000 enabled=1
     click  sliderMUL                            500 -> 501 (delta +1) focusPolicy=11 hasFocus=0
-    slider sliderNOP                            v=0      [0..1000] page=1 up=1      pgup=2      lcd=lcdnumberNOP 0/1/2 enabled=1
+    slider sliderNOP                            v=0      [0..1000] page=1 up=1      pgup=2      end=1000   lcd=lcdnumberNOP 0/1/2/1000 enabled=1
     click  sliderNOP                            0 -> 1 (delta +1) focusPolicy=11 hasFocus=0
-    slider sliderSENSE                          v=500    [0..1000] page=1 up=501    pgup=502    lcd=lcdnumberSENSE 500/501/502 enabled=1
+    slider sliderSENSE                          v=500    [0..1000] page=1 up=501    pgup=502    end=1000   lcd=lcdnumberSENSE 500/501/502/1000 enabled=1
     click  sliderSENSE                          500 -> 501 (delta +1) focusPolicy=11 hasFocus=0
-    slider sliderSUB                            v=500    [0..1000] page=1 up=501    pgup=502    lcd=lcdnumberSUB 500/501/502 enabled=1
+    slider sliderSUB                            v=500    [0..1000] page=1 up=501    pgup=502    end=1000   lcd=lcdnumberSUB 500/501/502/1000 enabled=1
     click  sliderSUB                            500 -> 501 (delta +1) focusPolicy=11 hasFocus=0
-    slider sliderADD                            v=500    [0..1000] page=1 up=501    pgup=502    lcd=lcdnumberADD 500/501/502 enabled=1
+    slider sliderADD                            v=500    [0..1000] page=1 up=501    pgup=502    end=1000   lcd=lcdnumberADD 500/501/502/1000 enabled=1
     click  sliderADD                            500 -> 501 (delta +1) focusPolicy=11 hasFocus=0
-    slider sliderCMP                            v=500    [0..1000] page=1 up=501    pgup=502    lcd=lcdnumberCMP 500/501/502 enabled=1
+    slider sliderCMP                            v=500    [0..1000] page=1 up=501    pgup=502    end=1000   lcd=lcdnumberCMP 500/501/502/1000 enabled=1
     click  sliderCMP                            500 -> 501 (delta +1) focusPolicy=11 hasFocus=0
-    slider sliderCOPY                           v=500    [0..1000] page=1 up=501    pgup=502    lcd=lcdnumberCOPY 500/501/502 enabled=1
+    slider sliderCOPY                           v=500    [0..1000] page=1 up=501    pgup=502    end=1000   lcd=lcdnumberCOPY 500/501/502/1000 enabled=1
     click  sliderCOPY                           500 -> 501 (delta +1) focusPolicy=11 hasFocus=0
-    slider sliderDIV                            v=500    [0..1000] page=1 up=501    pgup=502    lcd=lcdnumberDIV 500/501/502 enabled=1
+    slider sliderDIV                            v=500    [0..1000] page=1 up=501    pgup=502    end=1000   lcd=lcdnumberDIV 500/501/502/1000 enabled=1
     click  sliderDIV                            500 -> 501 (delta +1) focusPolicy=11 hasFocus=0
-    slider sliderDELAY                          v=500    [0..1000] page=1 up=501    pgup=502    lcd=lcdnumberDELAY 500/501/502 enabled=1
+    slider sliderDELAY                          v=500    [0..1000] page=1 up=501    pgup=502    end=1000   lcd=lcdnumberDELAY 500/501/502/1000 enabled=1
     click  sliderDELAY                          500 -> 501 (delta +1) focusPolicy=11 hasFocus=0
-    slider sliderJMP                            v=0      [0..1000] page=1 up=1      pgup=2      lcd=lcdnumberJMP 0/1/2 enabled=1
+    slider sliderJMP                            v=0      [0..1000] page=1 up=1      pgup=2      end=1000   lcd=lcdnumberJMP 0/1/2/1000 enabled=1
     click  sliderJMP                            0 -> 1 (delta +1) focusPolicy=11 hasFocus=0
-    slider sliderLOAD                           v=500    [0..1000] page=1 up=501    pgup=502    lcd=lcdnumberLOAD 500/501/502 enabled=1
+    slider sliderLOAD                           v=500    [0..1000] page=1 up=501    pgup=502    end=1000   lcd=lcdnumberLOAD 500/501/502/1000 enabled=1
     click  sliderLOAD                           500 -> 501 (delta +1) focusPolicy=11 hasFocus=0
   -- tab 2 [Evolution control] shown=1 visible=1
   [survey]
@@ -453,7 +516,7 @@ we do with the system?]
     spin   spinboxByDurationMins                v=0         [0..59] step=1 pre=[] suf=[] up=1         dn2=0         typed(max+1)=[6]->6 commits=6 enabled=1
     spin   spinboxByDurationSecs                v=0         [0..59] step=1 pre=[] suf=[] up=1         dn2=0         typed(max+1)=[6]->6 commits=6 enabled=1
     spin   spinboxByGenerationNumber            v=0         [0..99999999] step=1 pre=[] suf=[] up=1         dn2=0         typed(max+1)=[10000000]->10000000 commits=10000000 enabled=1
-    slider sliderTournamentsPerGeneration       v=500    [1..1000] page=5 up=501    pgup=506    lcd=lcdnumberTournamentsPerGeneration 60/60/60 enabled=1
+    slider sliderTournamentsPerGeneration       v=500    [1..1000] page=5 up=501    pgup=506    end=1000   lcd=lcdnumberTournamentsPerGeneration 60/60/60/120 enabled=1
     click  sliderTournamentsPerGeneration       500 -> 505 (delta +5) focusPolicy=11 hasFocus=0
     combo  comboboxTerminationBy                count=4 current=1 [Time] editable=0 enabled=1
       item0  [User]
@@ -656,7 +719,7 @@ we do with the system?]
     comma  lineeditStartPositionY               type[9,81] -> [981] acceptable=1
     comma  lineeditXDim                         type[9,81] -> [981] acceptable=1
     comma  lineeditZDim                         type[9,81] -> [981] acceptable=1
-    slider sliderAlpha                          v=99     [0..99] page=10 up=99     pgup=99     lcd=(none) 0/0/0 enabled=0
+    slider sliderAlpha                          v=99     [0..99] page=10 up=99     pgup=99     end=99     lcd=(none) 0/0/0/0 enabled=0
     click  sliderAlpha                          99 -> 99 (delta +0) focusPolicy=11 hasFocus=0
     check  checkboxTextureFile                  text=[Texture:] checkable=1 0->1 enabled=1
       side effect: lineeditTextureFile now ENABLED
@@ -868,6 +931,7 @@ we do with the system?]
     row4  | 56432         | 1.14825       | 111           | sel=0
     row5  | 56447         | 1.14825       | 107           | sel=0
     ... 114 more
+    allrows sha256=ee0c3372fe5769ccf63f449dfcf2b301eb7d4acd4924cc5291e6f1e0c303e198
   [action changes] none
 
 == EXPORT ALL ==
@@ -1065,6 +1129,7 @@ selected=55658
     row4  | 56432         | 1.14825       | 111           | sel=0
     row5  | 56447         | 1.14825       | 107           | sel=0
     ... 114 more
+    allrows sha256=ee0c3372fe5769ccf63f449dfcf2b301eb7d4acd4924cc5291e6f1e0c303e198
   [action changes] none
 
 == OVERWRITE ==
@@ -1087,3 +1152,255 @@ Do you want to overwrite?]
   (1.3 writes the file regardless of the answer -- the write after
    the switch is not inside it. sentinelSurvived=0 is 1.3's defect,
    preserved. A 1 would mean the port started honouring the prompt.)
+#
+# ---------------------------------------------------------------------------
+# From here on: PORTING.md step C11c, the six dialogs.
+#
+# THE LOAD-BEARING LINES ARE THE TWO `typing' ONES. Qt 6's QLineEdit selects
+# its text when a dialog hands it focus down the tab chain; Qt 2's did not, and
+# SIGEL only calls setText() then setFocus(). So before C11c a typed digit
+# REPLACED the pre-filled value where 1.3 appends to it:
+#
+#     Edit Command duration  0.01 + "5"  ->  1.3: 0.015   port was: 5
+#     Add individuals number 1    + "2"  ->  1.3: 12      port was: 2
+#
+# Both 1.3 figures are the oracle's, read off the running 2003 binary. The
+# second is the one that costs: adding TWELVE individuals where two were meant
+# leaves nothing wrong-looking behind, where a wrong duration at least shows.
+# Fixed at four sites with a QUEUED end(false) -- queued because the selection
+# does not exist until exec() shows the dialog, and end() rather than
+# deselect() because deselect leaves the cursor at position 0, which made
+# 1 + "2" read 21 rather than 12.
+#
+# Rename is deliberately NOT in that set: it calls selectAll() explicitly
+# (SIG_ExperimentListView.cpp:97) and the oracle measured it pre-selecting in
+# BOTH versions back in C10. Two of its readings eight steps apart, explained
+# by three lines of code.
+#
+# C7's TWENTY-FIRST VALIDATOR is here, on SIG_EditCommandDialog -- the one
+# C11a could not reach. Its seven probes match the other twenty and match 1.3.
+# That closes the set at 21 of 21.
+#
+# A DIVERGENCE KEPT ON PURPOSE, recorded here so it is not mistaken for a
+# regression: allowing a disallowed command calls addCommand(), which APPENDS
+# to Phase D's ordered list, where Qt 2's QDict inserted at a hash position.
+# Predicted before asking and confirmed on the binary character for character:
+# 1.3 puts JMP SIXTH, straight after LOAD. Matching it would mean
+# reimplementing Q2Dict, which is what Phase D removed -- see PORTING.md C11c.
+# The written order after allowing JMP is in this baseline; it ends in JMP.
+#
+# WHAT ELSE THE ORACLE CONFIRMED: every title and label, OK carrying the
+# default border on all four button dialogs, radio exclusivity, the Edit Host
+# slave directory populated, Enable host checked (calibrated twice), both spin
+# ranges, the Robot Information text and that its HTML is rendered rather than
+# shown as tags, and that IndividualView is non-modal, has no buttons and
+# ignores Escape -- which it is because SIG_IndividualViewBase derives from
+# QWidget, not QDialog.
+#
+# QTest IS NOT A MOUSE -- see the C11a note above.
+# ---------------------------------------------------------------------------
+== SCENARIO dialogs ==
+
+== STEP 1: fresh start, no experiment ==
+  [title] SIGEL
+  [tree] header=[Experiments] topLevel=0
+  [page] count=1 current=QLabel objectName=[baseWidget]
+  [action changes] none
+  [modal] class=QFileDialog title=[Load Experiments...]
+  [filedialog] title=[Load Experiments...] mode=3 nameFilters=[Experiment Files (*.exp) ;; All Files (*)] labelAccept=[&Open]
+
+== STEP 2: after File > Open Experiment ==
+  [title] SIGEL
+  [tree] header=[Experiments] topLevel=1
+      twoBasesSimpleFitness2.exp sel=1 exp=1 cur=1 selectable=1
+        Individuals              sel=0 exp=0 cur=0 selectable=1
+        Robot                    sel=0 exp=1 cur=0 selectable=1
+          Language-Parameters      sel=0 exp=0 cur=0 selectable=1
+        GP-Parameters            sel=0 exp=0 cur=0 selectable=1
+        Simulation-Parameters    sel=0 exp=0 cur=0 selectable=1
+        Environment              sel=0 exp=0 cur=0 selectable=1
+  [page] count=8 current=SIGEL_MasterGUI::SIG_ExperimentView objectName=[ExperimentView]
+  [widgets]
+    group    [Evolution controls] enabled=1
+    group    [Fitnesscurve] enabled=1
+    group    [Experiment properties] enabled=1
+    button   [&Start] enabled=1 checkable=0 checked=0
+    button   [S&top] enabled=0 checkable=0 checked=0
+    button   [Show in GNU-Plot] enabled=1 checkable=0 checked=0
+    button   [Export PostScript] enabled=1 checkable=0 checked=0
+    check    [Save the history] enabled=1 checkable=1 checked=1
+    lcd      [lcdnumberGenerations] value=532 digits=4
+    lcd      [lcdnumberAutosave] value=0 digits=4
+    slider   [sliderIntervall] value=0 min=0 max=100 enabled=1
+    progress [generationProgBar] value=-1 min=0 max=100
+  [action changes]
+    &File/&Delete Experiment                                   ENABLED
+    &File/&Rename Experiment                                   ENABLED
+    &File/&Save Experiment                                     ENABLED
+    &File>Export/...to GNU plot                                ENABLED
+    &File>Export/Environment                                   ENABLED
+    &File>Export/GP-Parameters                                 ENABLED
+    &File>Export/Individual                                    ENABLED
+    &File>Export/Language-Parameters                           ENABLED
+    &File>Export/Population                                    ENABLED
+    &File>Export/Program                                       ENABLED
+    &File>Export/Simulation-Parameters                         ENABLED
+    &File>Import/Environment                                   ENABLED
+    &File>Import/GP-Parameters                                 ENABLED
+    &File>Import/Individual                                    ENABLED
+    &File>Import/Language-Parameters                           ENABLED
+    &File>Import/Population                                    ENABLED
+    &File>Import/Program                                       ENABLED
+    &File>Import/Robot                                         ENABLED
+    &File>Import/Simulation-Parameters                         ENABLED
+    &Individuals/&Add                                          ENABLED
+    &Individuals/&Delete                                       ENABLED
+    &Individuals/&Visualize                                    ENABLED
+    &Individuals/Reset                                         ENABLED
+    &MetaGP/&Use MetaGP                                        ENABLED
+    &View/&Environment                                         ENABLED
+    &View/&GP Parameters                                       ENABLED
+    &View/&Language Parameters                                 ENABLED
+    &View/&Population                                          ENABLED
+    &View/&Robot                                               ENABLED
+    &View/&Simulation Parameters                               ENABLED
+    TB:fileToolbar/&Delete Experiment                          ENABLED
+    TB:fileToolbar/&Save Experiment                            ENABLED
+    TB:individualsToolBar/&Add                                 ENABLED
+    TB:individualsToolBar/&Delete                              ENABLED
+    TB:individualsToolBar/&Visualize                           ENABLED
+    TB:mtToolbar/&Use MetaGP                                   ENABLED
+    TB:viewToolBar/&Environment                                ENABLED
+    TB:viewToolBar/&GP Parameters                              ENABLED
+    TB:viewToolBar/&Language Parameters                        ENABLED
+    TB:viewToolBar/&Population                                 ENABLED
+    TB:viewToolBar/&Robot                                      ENABLED
+    TB:viewToolBar/&Simulation Parameters                      ENABLED
+
+== STEP 3: after View > Population ==
+  [title] SIGEL
+  [tree] header=[Experiments] topLevel=1
+      twoBasesSimpleFitness2.exp sel=0 exp=1 cur=0 selectable=1
+        Individuals              sel=1 exp=0 cur=1 selectable=1
+        Robot                    sel=0 exp=1 cur=0 selectable=1
+          Language-Parameters      sel=0 exp=0 cur=0 selectable=1
+        GP-Parameters            sel=0 exp=0 cur=0 selectable=1
+        Simulation-Parameters    sel=0 exp=0 cur=0 selectable=1
+        Environment              sel=0 exp=0 cur=0 selectable=1
+  [page] count=8 current=SIGEL_MasterGUI::SIG_AllIndividualsView objectName=[]
+  [individuals] rows=120 cols=3 headers=[Name               ][Fitness          ][Age               ] selected=0
+    row0  | 55658         | 1.14825       | 111           | sel=0
+    row1  | 56091         | 1.14825       | 109           | sel=0
+    row2  | 56248         | 1.14825       | 259           | sel=0
+    row3  | 56349         | 1.06261       | 97            | sel=0
+    row4  | 56432         | 1.14825       | 111           | sel=0
+    row5  | 56447         | 1.14825       | 107           | sel=0
+    ... 114 more
+    allrows sha256=ee0c3372fe5769ccf63f449dfcf2b301eb7d4acd4924cc5291e6f1e0c303e198
+  [action changes] none
+
+== EDIT COMMAND ==
+  rows=15 MOVE at row 10 duration=[0.01]
+  [modal] class=SIGEL_MasterGUI::SIG_EditCommandDialog title=[Edit command MOVE]
+  [dialog] class=SIGEL_MasterGUI::SIG_EditCommandDialog title=[Edit command MOVE] modal=1
+    label  [Command: MOVE]
+    label  [Duration:]
+    edit   [] text=[0.01] selected=[] focus=1
+    button [&OK         ] default=1 enabled=1 focus=0
+    button [&Cancel     ] default=0 enabled=1 focus=0
+    radio  [Allow] checked=1
+    radio  [Disallow] checked=0
+    group  [Allow/Disallow]
+    prefill=[0.01] selected=[]; typing "5" gives [0.015]  (1.3 appends -> 0.015)
+    validator QDoubleValidator bottom=-inf top=inf decimals=-1 notation=1 locale=[C] numberOptions=2
+    -- C7's 21st validator, the one C11a could not reach
+    battery   (was [0.01])
+      type [9.81  ] -> text=[9.81] acceptable=1
+      type [9,81  ] -> text=[981] acceptable=1
+      type [0,375 ] -> text=[0375] acceptable=1
+      type [-2.5  ] -> text=[-2.5] acceptable=1
+      type [1e3   ] -> text=[1e3] acceptable=1
+      type [abc   ] -> text=[] acceptable=0
+      type [1.2.3 ] -> text=[1.23] acceptable=1
+    after clicking Disallow: Allow=0 Disallow=1
+    after clicking Allow:    Allow=1 Disallow=0
+  after Cancel, MOVE duration=[0.01]
+
+== ALLOW A DISALLOWED COMMAND (JMP) ==
+  JMP at row 5 duration=[0] (0 means disallowed)
+  [modal] class=SIGEL_MasterGUI::SIG_EditCommandDialog title=[Edit command JMP]
+    as opened: [Allow] checked=0
+    as opened: [Disallow] checked=1
+    typed duration [0.007]
+  JMP duration now [0.007]
+  [modal] class=QFileDialog title=[Export Language Parameters...]
+  header  [LanguageParameters 3 8 5000 14]
+  written [MUL MOVE CMP COPY LOAD SENSE SUB DIV MIN DELAY ADD MOD MAX JMP]
+
+== EDIT HOST ==
+  rows=8 row0=[herz|2|/home/pg368b/ross/projects/sigel]
+  [modal] class=SIGEL_MasterGUI::SIG_EditHostDialog title=[Edit host herz...]
+  [dialog] class=SIGEL_MasterGUI::SIG_EditHostDialog title=[Edit host herz...] modal=1
+    label  [Max. number of processes:]
+    label  [Slave directory:]
+    label  [Host name:]
+    spin   [spinboxMaximalNumberOfProcesses] value=2 min=1 max=1000
+    edit   [qt_spinbox_lineedit] text=[2] selected=[] focus=0
+    edit   [lineeditSlaveDirectory] text=[/home/pg368b/ross/projects/sigel] selected=[] focus=0
+    edit   [lineeditHostName] text=[herz] selected=[] focus=1
+    button [&OK         ] default=1 enabled=1 focus=0
+    button [&Cancel     ] default=0 enabled=1 focus=0
+    check  [Enable host] checked=1
+    edit   [qt_spinbox_lineedit] text=[2] empty=0
+    edit   [lineeditSlaveDirectory] text=[/home/pg368b/ross/projects/sigel] empty=0
+    edit   [lineeditHostName] text=[herz] empty=0
+
+== ABOUT / INFOBOX ==
+  [modal] class=QDialog title=[Sigel InfoBox]
+  [dialog] class=QDialog title=[Sigel InfoBox] modal=1
+    label pixmap=1 size=256x256
+    text lines=16 vScrollPolicy=1
+    | Sigel v1.1
+    | Developed by PG 368:
+    | Christian "Krasstexta" Aue
+    | Abdeladim "Silent Ad" Benkacem
+    | Michael "CJ QT" Gregorius
+    | Andree "MC Overload" Ross
+    | Abdallah "The Raiyan" Salah Raiyan
+    | Daniel "Tabmaster Ispell" Sawitzki
+    | Volker "Alvi-Schnitte" Strunk
+    | Holger "DJ NOOP" Tuerk
+    | Chris "MC Royal" Varcol
+    | 
+    | 
+    | Additional programming for v1.x by:
+    | Patrick Matters (matters@ls11.cs.uni-dortmund.de)
+    | Jan Barnholt (jan.barnholt@epost.de)
+    button [&OK] default=1
+
+== ROBOT INFO ==
+  [modal] class=QMessageBox title=[Robot Information]
+  [dialog] class=QMessageBox title=[Robot Information]
+  text lines=1
+  | <B><U>Link Information</U></B><BR><UL><LI><B>"base1":</B> &nbsp; Mass: 20.00 kg, &nbsp; Volume: 10.00184 m^3, &nbsp; Density:   2.0 kg/m^3</LI><LI><B>"base2":</B> &nbsp; Mass: 20.00 kg, &nbsp; Volume: 10.00184 m^3, &nbsp; Density:   2.0 kg/m^3</LI></UL><BR><B><U>Robot Information</U></B><BR><UL><LI><B>Torso link:</B> &nbsp; 'base1'</LI><LI><B>Total mass:</B> &nbsp;   40.01 kg</LI></UL>
+  button [OK] default=1
+
+== INDIVIDUAL VIEW (double-click a population row) ==
+  double-clicking row0 = 55658 at (282,9) itemAt=the row
+  itemDoubleClicked emitted 1 time(s)
+  [window] class=SIGEL_MasterGUI::SIG_IndividualView title=[Individual View] modal=0 visible=1 deleteOnClose=1
+  name=[55658] age=[111] fitness=[1.14825] historyLines=768
+  after close, main window still alive=1
+
+== ADD INDIVIDUALS (Cancel) ==
+  [modal] class=SIGEL_MasterGUI::SIG_AddIndividualsDialog title=[Add individuals...]
+  [dialog] class=SIGEL_MasterGUI::SIG_AddIndividualsDialog title=[Add individuals...] modal=1
+    label  [Number to add:]
+    spin   [] value=1 min=1 max=999
+    edit   [qt_spinbox_lineedit] text=[1] selected=[] focus=1
+    button [&OK         ] default=1 enabled=1 focus=0
+    button [&Cancel     ] default=0 enabled=1 focus=0
+    prefill=[1] selected=[]; typing "2" gives [12] value=12  (1.3 appends -> 12)
+    spin                                        v=1         [1..999] step=1 pre=[] suf=[] up=2         dn2=1         typed(max+1)=[100]->100 commits=not-pressed(in a dialog) enabled=1
+    [still open before Cancel] visible=1
+  rows 120 -> 120 (Cancel must add nothing)

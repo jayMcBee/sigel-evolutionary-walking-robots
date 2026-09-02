@@ -20,7 +20,8 @@
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-// #include <qpixmap.h>
+// #include <QTimer>
+#include <qpixmap.h>
 #include <QTreeWidget>
 #include <qspinbox.h>
 #include <qlabel.h>
@@ -316,6 +317,21 @@ void SIG_LanguageParameters::slotCommandDoubleClicked( QTreeWidgetItem *theItem 
 	    editCommandDialog.radiobuttonDisallow->setChecked( true );
 	  editCommandDialog.lineeditDuration->setText( theItem->text( 2 ) );
 	  editCommandDialog.lineeditDuration->setFocus();
+	  // Qt 2's QLineEdit did not select its text when it took focus; Qt 6's
+	  // does, because a QDialog hands initial focus down the tab chain and
+	  // QLineEdit::focusInEvent selects all for that focus reason. The
+	  // consequence is not cosmetic: 1.3 leaves the pre-filled value intact
+	  // so a typed digit APPENDS to it, where a selection would replace it.
+	  // Confirmed on the running 1.3 binary for both this dialog and Edit
+	  // Host -- "pre-filled but NOT pre-selected... typing appends".
+	  // Rename does NOT get this treatment and must not: it calls
+	  // selectAll() explicitly (SIG_ExperimentListView.cpp:97), and the
+	  // oracle measured it pre-selecting in BOTH versions back in C10.
+	  // end(false) rather than deselect(): deselect leaves the cursor at
+	  // position 0, so a typed digit lands BEFORE the value -- 1 + "2" gave
+	  // 21 where 1.3 gives 12. end(false) clears the selection AND puts the
+	  // cursor after the text, which is where 1.3 leaves it.
+	  { QLineEdit *le = editCommandDialog.lineeditDuration; QTimer::singleShot( 0, le, [le]{ le->end( false ); } ); }
 	}
       else
 	{
@@ -327,6 +343,7 @@ void SIG_LanguageParameters::slotCommandDoubleClicked( QTreeWidgetItem *theItem 
 	    editCommandDialog.radiobuttonDisallow->setChecked( true );
 	  editCommandDialog.lineeditDuration->setText( theItem->text( 2 ) );
 	  editCommandDialog.lineeditDuration->setFocus();
+	  { QLineEdit *le = editCommandDialog.lineeditDuration; QTimer::singleShot( 0, le, [le]{ le->end( false ); } ); }
 	  editCommandDialog.resize( QSize() );
 	}
 

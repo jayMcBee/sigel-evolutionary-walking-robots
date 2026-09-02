@@ -20,6 +20,8 @@
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
+#include <QLineEdit>
+#include <QTimer>
 #include <qfiledialog.h>
 #include <qdatetime.h>
 #include <qspinbox.h>
@@ -596,6 +598,13 @@ void SIG_GPParameter::slotItemDoubleClicked( QTreeWidgetItem * theItem )
 	  else
 	    editDialog.checkboxEnableHost->setChecked( false );
 	  editDialog.lineeditHostName->setFocus();
+	  // Qt 6 selects a line edit's text when a dialog gives it focus and
+	  // Qt 2 did not, so a typed character REPLACES the pre-filled host
+	  // name here where 1.3 appends to it. Measured on the running binary.
+	  // See SIG_LanguageParameters.cpp for the full note; slotAddHost has
+	  // the same setFocus() and does NOT need this, because the field it
+	  // focuses is empty there.
+	  { QLineEdit *le = editDialog.lineeditHostName; QTimer::singleShot( 0, le, [le]{ le->end( false ); } ); }
 	  editDialog.setWindowTitle( "Edit host " + theHost->name + "..." );
 	}
       else
