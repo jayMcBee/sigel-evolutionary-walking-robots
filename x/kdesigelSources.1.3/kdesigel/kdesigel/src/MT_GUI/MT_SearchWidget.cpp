@@ -1,3 +1,5 @@
+#include <QLocale>
+#include <QValidator>
 #include "MT_GUI/MT_SearchWidget.h"
 #include "MT_GPSystem/MT_Randomizer.h"
 
@@ -18,6 +20,13 @@ MT_SearchWidget::MT_SearchWidget(QWidget* parent, const char* name, Qt::WindowFl
 	lineProbSpinBox->setRange(1, 0.0, 100.0);
 
 	validator = new QDoubleValidator(0, 100, 1, this);
+// The C locale for every validator here -- see MT_IndividualWidget.cpp.
+{
+	QLocale cLocale = QLocale::c();
+	cLocale.setNumberOptions(QLocale::RejectGroupSeparator);
+	for (QValidator *v : findChildren<QValidator *>())
+		v->setLocale(cLocale);
+}
 	xOverProbEdit->setValidator(validator);
 	mutProbEdit->setValidator(validator);
 	reproProbEdit->setValidator(validator);

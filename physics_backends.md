@@ -171,7 +171,10 @@ that is one of the 46 sources no longer compiled. The patch still applies
 cleanly against the untracked tree, so it was left alone rather than removed in
 this changeset.
 
-**SOLID is still built and still linked.** This document claimed SOLID would go
+~~**SOLID is still built and still linked.**~~ **NO LONGER TRUE, and this
+paragraph contradicted the section 70 lines above it.** SOLID and qhull went
+with the Dynamo backend on 2026-08-28; no `libsolid.a` exists in either build
+tree. Only the `-isystem .../SOLID-2.0/include` path survives. This document claimed SOLID would go
 with Dynamo. Its 15 API references were indeed all in deleted files, but
 removing `libsolid.a` was outside the brief for this change and was not
 attempted. It is now dead weight — ~4,800 lines and a vendored patch — and
@@ -185,7 +188,7 @@ dropping it is a one-line follow-up, to be measured the way `libdynalib.a` was.
 | `fitness-check.sh` vs baseline | **empty diff**, 42 of 42 |
 | `sigel_eval -selfcheck` | pass |
 | sanitized `fitness-check.sh build` | **empty diff**, no ASan or UBSan report |
-| `check.sh` | **105 pass, 4 fail** |
+| `check.sh` **as of 2026-08-28** | **105 pass, 4 fail** — see PORTING.md for the current figure, 842/0 |
 
 `check.sh` was 118 pass, 4 fail before this change. The pass count falls by
 exactly 13 because 13 fewer `.cpp` exist, and "headers standalone" by exactly 13
@@ -226,13 +229,16 @@ is what "dead code" was supposed to mean.
    **The throw has a second consequence.**
    `SIG_SimulationVisualisationWidget.cpp:376-381` does
    `delete visualisation;` and then assigns the result of a constructor that
-   now throws — so `visualisation` keeps a freed pointer. Ten sites in that
+   now throws — so `visualisation` keeps a freed pointer. Fourteen sites in that
    widget test `if (visualisation)` and then dereference it, so the guard
    passes and each is a use-after-free; `renderRecorder` leaks with it. The
    path pre-existed — Dynamo's own constructor could throw — but this change
-   turns a conditional hazard into a certain one for every robot. It is
-   unreachable today only because `SIGEL_SlaveGUI` does not compile. The Phase
-   C fix is `visualisation = nullptr;` between the delete and the new.
+   turns a conditional hazard into a certain one for every robot.
+   **THIS SAID IT WAS "unreachable today only because `SIGEL_SlaveGUI` does
+   not compile". THAT EXPIRED.** `libSIGEL_SlaveGUI.a` builds and
+   `build-fast/sigel_slave` links it, and the bare `delete` is still there.
+   The fix is still `visualisation = nullptr;` between the delete and the new.
+   Tracked as open item 5 in PORTING.md section 9.
 2. **`SIG_SimulationQueries.cpp`: all seven non-self includes are dead.**
    Verified by compiling a translation unit
    holding only the class's own header and the empty constructor, under
@@ -293,11 +299,11 @@ can say anything about this port.
 **Nothing vendored was deleted.** That tree is untracked and is left exactly as
 it extracts; 10,084 lines merely stopped being compiled. `diff -rq` against a
 fresh extract shows five differences across the whole vendored tree: the four
-recorded patches, plus the `.sigel-patched` stamp — **and three stale `.rej`
-files** left from 2026-08-22 (`cv97/JVector.h.rej`,
-`dynamechs/dm/svd_linpack.cpp.rej`, `SOLID-2.0/include/3D/Basic.h.rej`). Those
-pre-date this work but mean the `make unpatch` and re-extract cycle is not as
-clean as PORTING.md describes.
+recorded patches, plus the `.sigel-patched` stamp — ~~**and three stale `.rej` files**~~ *(this listed `cv97/JVector.h.rej`,
+`dynamechs/dm/svd_linpack.cpp.rej` and `SOLID-2.0/include/3D/Basic.h.rej`, and
+concluded the re-extract cycle was not as clean as PORTING.md describes)* —
+**none remains; `find . -name "*.rej"` is empty, so the cycle is clean after
+all.**
 
 **The DynaMechs adapters are 2,077 lines**, not the 2,013 measured on
 2026-08-20. They grew with Phase V5's MDH probe.

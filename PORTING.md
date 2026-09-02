@@ -21,7 +21,7 @@ Two rules follow from it:
 **Scope widened 2026-08-22.** Was Qt API only. Now also covers getting SIGEL to
 build and run, because nothing else can be verified without it — see §3.
 
-**Status — 2026-08-28**
+**Status — 2026-09-02**
 
 | phase | state |
 |---|---|
@@ -32,8 +32,8 @@ build and run, because nothing else can be verified without it — see §3.
 | T — old-Qt tool container | **done 2026-08-27.** `tools/qtmig`, §4 |
 | D — delete the shim, migrate the data | **DONE 2026-08-30.** `q2compat.h` and `q2compat_check.cpp` deleted; `include/compat/` gone; **no `Q2*` shim type is used anywhere**. D1–D27. *This is not "no Qt 2 container exists" — the unported GUI modules still declare **71 lines** of `QArray`, `QDict`, `QList`-as-pointer-list and friends, all of which Phase C must convert. See D27.* The shim's self-check step is gone from `check.sh`, which now runs no code. §10 |
 | P — PVM | **DONE 2026-08-28.** Vendored 3.4.3 replaced by upstream 3.4.6; nine patches carry the four config lines and Debian's eight source fixes; `libpvm3.a` and `pvmd3` build; SIGEL's two PVM objects link against them and `SIG_GPPVMData` round-trips through real PVM. `sigel`/`sigel_slave` still need Phase C. §7 |
-| C — GUI | **DONE 2026-09-02. C1–C10 all complete; C11a and C11b done.** All 20 Designer forms converted; all five GUI modules build as archives; **both programs link and run**; **100 dead `connect()`s repaired, tree-wide count now 0 with no baseline anywhere**. Verified against the running 1.3 binary: 42 menu entries, the toolbars and the loaded-experiment values all diff clean, and that comparison is now a committed gate (`gui vs 1.3`). **C10 then DROVE it** — real Qt input events into the real window, diffed against the same oracle driving 1.3 with XTest: the tree, the pages, sorting, add/delete/reset, rename, save, the five dialogs and all five context menus agree, and a GUI-exported individual is byte-identical across the two architectures. **Two defects found by using it that reading it did not show** — deleting most of the pool killed the application (Qt 6's `QTreeWidget::clear()` emits a signal Qt 2's blocked), and the MetaGP dialog ate an ampersand. Second committed gate, `gui behaviour`. **C11a then drove the five View pages C10 never opened** — every spin box, slider, combo, checkbox and 20 of C7's 21 locale validators, diffed against the same oracle. The 12-probe validator battery matches 1.3 character for character, on both sides under a comma-decimal locale; nine parameter values typed on the pages come out byte-identical in the saved `.exp` across the two architectures. **A third regression found by using it** — Qt 2's `QIntValidator` returned Intermediate out of range so 1.3 clamps a typed over-range number to the maximum, where Qt 6 refuses the keystroke and commits a truncated prefix; accepted as a divergence (D28) and pinned in the gate. **C11c then drove the six dialogs** — C7's 21st validator closes that set at 21 of 21, and a **fourth defect** came out of it: Qt 6 selects a pre-filled field when a dialog hands it focus where Qt 2 did not, so typing one digit into Add-individuals replaced the value instead of appending to it — 1.3 turns 1 into 12, the port made it 2. Fixed at four sites. A review of the harness itself then found five probes that would have reported success while the thing they named was broken. **C11b then drove the Import/Export round trips** — **seven of the eight exports are byte-identical to what the 2003 i386 binary writes**, the 2.7 MB population file and 532 lines of floating-point GNU-plot output included. **A fourth defect found by using it**: default-constructed language parameters came out alphabetical where 1.3 gives `QDict` hash order, predicted from `qgdict.cpp` and confirmed on the running binary character for character — and it had been silently wrong in `dictorder-baseline.txt` for all seven robots, 98 lines now corrected. Fixed. 1.3's ignored overwrite prompt was confirmed and preserved. §7 |
-| V — check against the 1.3 binary | **V1, V5's MDH probe, V6, V7 and V8 all done, all PASS.** Ordering: 10 of 10 container orders match. Arithmetic: `twoBases` exact bit for bit, `octopus` 9/9 with three joints exact and 5 ulp worst. **V6, V7 and V8 done 2026-08-29** — friction and no-collide negotiation, their four remaining rules, and the GP parameter blocks captured *before* their conversion. `verification-against-sigel-1.3/v6`, `v7`, `v8`. V2–V4 not started; V5's sensor and force probes are **invalid as specified** — both target Dynamo-only functions, deleted 2026-08-28. §7 |
+| C — GUI | **DONE 2026-09-02. C1–C10 complete; C11a, C11b and C11c done.** All 20 Designer forms converted; all five GUI modules build as archives; **both programs link and run**; **100 dead `connect()`s repaired, tree-wide count 0 with no baseline anywhere**. **C9** made it match what 1.3 SHOWS — 42 menu entries, the toolbars and the loaded values, now the `gui vs 1.3` gate. **C10** DROVE it, diffed against the oracle driving 1.3 with XTest, and found two defects reading it could not: `QTreeWidget::clear()` emitting a signal Qt 2 blocked, which killed the application on a large delete, and an eaten ampersand. Second gate, `gui behaviour`. **C11a** drove the five View pages C10 never opened — the 12-probe validator battery matches 1.3 character for character under two locales, nine typed values come out byte-identical in the saved `.exp` across the two architectures, and a `QIntValidator` over-range divergence was found and **accepted as D28**. **C11b** drove the Import/Export round trips — **seven of the eight exports are byte-identical to what the 2003 i386 binary writes** — and found default-constructed language parameters coming out alphabetical where 1.3 gives `QDict` hash order, which had also been wrong in `dictorder-baseline.txt` for all seven robots. **C11c** drove the six dialogs, closing C7's validator set at 21 of 21, and found Qt 6 selecting a pre-filled field where Qt 2 did not — a typed digit REPLACED the value instead of appending, so Add-individuals turned 1 into 2 where 1.3 makes it 12. Two reviews of the checking machinery then found five probes that could not fail and a **demonstrated false pass** (all 30 icons replaced with garbage, gate green). **842 pass, 0 fail.** §7 |
+| V — check against the 1.3 binary | **V1, V5's MDH probe, V6, V7 and V8 all done, all PASS.** Ordering: 10 of 10 container orders match. Arithmetic: `twoBases` exact bit for bit, `octopus` 9/9 with three joints exact and 5 ulp worst. **V6, V7 and V8 done 2026-08-29** — friction and no-collide negotiation, their four remaining rules, and the GP parameter blocks captured *before* their conversion. `verification-against-sigel-1.3/v6`, `v7`, `v8`. **V9 done 2026-08-29, 3 of 3** — three function bodies disassembled, which symbol lookups cannot see. **V4's reference was RECEIVED 2026-08-30** — two whole-run digests validated across two independent 1.3 runs — but it is not yet a runnable gate here, because the prepared inputs are uncommitted. V2 and V3 not started. V5's sensor and force probes are **invalid as specified** — both target Dynamo-only functions, deleted 2026-08-28. §7 |
 
 **SCOPE — DECIDED 2026-08-23. Read this before changing anything.**
 
@@ -115,9 +115,11 @@ found a real defect.** §0 has the rule; it is not optional.
   `make B=build-fast SAN= SIGSAN=` gives an unsanitised build about 15x faster,
   in its own directory.
 - Verify: `./check.sh` from the repo root compiles every module and header.
-  Takes several minutes. **It runs no code** — D27 removed the only step that
-  did. Execution happens in `./fitness-check.sh`, which runs
-  `sigel_eval -selfcheck`.
+  Takes several minutes, and **exits non-zero if anything fails or is skipped**.
+  *This said "it runs no code", which was true between D27 and Phase C.* It now
+  runs `sigel_slave`, a headless GUI structure probe, and `guidrive` through five
+  scenarios plus two locale re-runs. Further execution is in `./fitness-check.sh`,
+  which runs `sigel_eval -selfcheck`.
 - PVM: `make pvm && make pvm-link`, then `./pvm-check.sh` starts a daemon and
   runs both round trips. Not one of the three checks below — it has no baseline,
   it is PASS/FAIL.
@@ -187,7 +189,7 @@ dependency** — zero `k*.h` includes. Plain Qt 2.3.
 Counts from the extracted 1.3 tree.
 
 Measure with `command grep` or Python. Plain `grep` here wraps `ugrep -I`, which
-silently skips the 46 Latin-1/CRLF files — it has produced wrong counts several
+silently skips the 9 Latin-1 files — it has produced wrong counts several
 times.
 
 ### Qt API that must change
@@ -199,7 +201,7 @@ times.
 | `QVector<T>` | 48 | **array of pointers** in Qt 2 — not Qt 6's `QVector` |
 | `QList<T>` | 37 | **list of pointers** in Qt 2, with `autoDelete()` |
 | `QCString` / `QValueList` / `QQueue` / `QListIterator` | 16 | |
-| `setAutoDelete` / `autoDelete` | 47 | 38 `TRUE`, 9 `FALSE`. *Pristine-tree figures.* Today: **0 in core, 16 in the GUI modules** |
+| `setAutoDelete` / `autoDelete` | 47 | 38 `TRUE`, 9 `FALSE`. *Pristine-tree figures.* Today: **0 anywhere** — the 19 remaining textual hits are all comments recording what the Qt 2 code used to free |
 | `QString::null` | 42 | |
 | `sprintf` | 23 | |
 | `lower` 5, `findRev` 4, `latin1` 3, `simplifyWhiteSpace` 3, `upper` 2 | 17 | |
@@ -307,8 +309,8 @@ recorded only in its no-argument form, and Qt 2's `QListView` declared a
 `selectionChanged(QListViewItem*)` overload too. *The two errors cancelled in
 the total, which is why the pristine count did not move.*
 
-**100 in the pristine tree; C4 repaired 10, C6 repaired 31 and C7 repaired 44;
-15 remain, all in `MT_Control` (C8)**, and
+**100 in the pristine tree; C4 repaired 10, C6 repaired 31, C7 repaired 44 and
+C8 the last 15 in `MT_Control`. None remain**, and
 zero in the **thirteen other** modules `check.sh` compiles. *`MT_Control` is one
 of the fourteen it compiles, so "zero everywhere it looks" was false; its 15 are
 carried as a baseline until C8.* Of the 100, **83 are `connect()` and 17 are
@@ -480,7 +482,7 @@ D20 supersedes D5, D24 supersedes D3.
 
 | # | Decision | Answer |
 |---|---|---|
-| **D27** | The duplicate MetaGP `A&bout` | **removed**, with its trailing separator. Present in 1.3 and verified there; wired to the same `slotAbout()` as `Help > About` and opening the identical `SIG_InfoBox`. The port's first intentional difference from 1.3. `Help > About` untouched |
+| **D27** *(decision; §10 also has a **step** D27, the shim deletion — the two D-series overlap and this is the first collision)* | The duplicate MetaGP `A&bout` | **removed**, with its trailing separator. Present in 1.3 and verified there; wired to the same `slotAbout()` as `Help > About` and opening the identical `SIG_InfoBox`. The port's first intentional difference from 1.3. `Help > About` untouched |
 | **D28** | The `QSpinBox` over-range divergence (C11a) | **accepted, not fixed.** 1.3 accepts out-of-range digits and clamps on commit; the port refuses the keystroke and commits a truncated prefix. It is reachable **only by typing a number outside the box's own range**, and the differing value is **visible in the box** before anything is saved — 1.3 shows 99, the port shows 10. Contrast what the port did fix: `clear()` killed the application, the ampersand rendered wrong, a negative width silently wrote no file — all reachable with valid use. The fix is not the 33 lines of it, it is **owning a custom widget forever**: every future form edit and every new spin box must remember `SIG_SpinBox` or silently opt out. Pinned in `guibehaviour-baseline.txt` (`commits=`) so it cannot drift; prototype and the measured comparison in `future_refactorings.md`. **Revisit if** a dialog spin box turns out to feed something unvalidated, or if anyone actually hits it |
 
 ---
@@ -490,7 +492,7 @@ D20 supersedes D5, D24 supersedes D3.
 | # | Decision | Answer |
 |---|---|---|
 | **D15** | Where the robot models come from | downloaded from `sigel.sourceforge.net`, §9. Untracked, in `data/` |
-| **D16** | The Dynamo branch in `SIG_Simulation.cpp` | ~~build Dynamo, SOLID and qhull~~ **superseded 2026-08-28.** `physics_backends.md` was decided and executed: the branch and its 13 file pairs are deleted, `SIMULATIONLIBRARY 0` now fails loudly, and the Dynamo archive is cut to the maths objects. SOLID is still built and is now dead weight |
+| **D16** | The Dynamo branch in `SIG_Simulation.cpp` | ~~build Dynamo, SOLID and qhull~~ **superseded 2026-08-28.** `physics_backends.md` was decided and executed: the branch and its 13 file pairs are deleted, `SIMULATIONLIBRARY 0` now fails loudly, and the Dynamo archive is cut to the maths objects. SOLID and qhull went with it — no `libsolid.a` is built; only the include path survives |
 | **D17** | Build system | **plain `Makefile`** at the repo root. Phase C can bring its own for `moc` and `uic` |
 | **D18** | What "runs clean under ASan" means for R3 | ASan and UBSan errors are pass/fail; LeakSanitizer output is a recorded baseline, because §10's leaks are out of scope |
 
@@ -515,7 +517,7 @@ self-check and independent review are the substitute.
 - One branch per phase. One commit per step, prefixed with the step ID.
 - Tag each completed step: `step-A4`.
 - No squashing — the per-step history is what makes a bad step bisectable.
-- Commit messages: subject plus 3–5 lines. The code is the commit.
+- Commit messages: **one line, no body**. Detail goes in this file. The code is the commit.
 
 **Phase P departed from this, on instruction.** No `step-P*` tags exist — the
 session owner asked for none, so the last tags are `step-R1` and `step-A9`. P1's
@@ -528,8 +530,11 @@ through `f0f2daa`.
 
 ## 7. Steps
 
-**Exit criterion per step:** `./check.sh` at the repo root — **773 pass, 5 fail,
-436 warnings** as of 2026-08-31, C6.
+**Exit criterion per step:** `./check.sh` at the repo root — **842 pass, 0 fail,
+508 warnings** as of 2026-09-02, C11c, and it now **exits non-zero** when
+anything fails or is skipped. Zero is reachable because the two permanently
+Windows-only `WIN_*` files are an explicit exclusion rather than a standing
+red — see C11c.
 
 **The pass/fail basis changed at C4 and earlier figures are not comparable.**
 The standalone header pass had always been reported and never added to the
@@ -542,8 +547,8 @@ Earlier figures, on the old basis: 227/4/355 at C4 as first recorded, 203/4/309
 at C2 (the rise being `SIGEL_Visualisation` 22 + `SIGEL_CommonGUI` 10, both
 newly covered), 105/4/309 before Phase C, 322 warnings on
 2026-08-28 — the drops are recorded per step and each is explained, because a
-step that silently loses a warning has hidden something). The 4 failures are
-exactly the files the Makefile excludes. Of the 112 passes added since Phase C began, **98 are the `forms (Phase C)`
+step that silently loses a warning has hidden something). That block's "**228 + 132 + 33 = 393, and 4 + 1 = 5**" and the 4 failures it
+counts are the C6 basis; both are historical. Of the 112 passes added since Phase C began, **98 are the `forms (Phase C)`
 section** — six checks over each of the 20 forms — and **14 are genuine new
 module coverage**: `SIGEL_Visualisation` (12) joined `MODULES` at C5 and
 `SIGEL_CommonGUI` (2) at C3. A GUI module joins only when every file in it
@@ -568,9 +573,9 @@ introduced it, then shipped as "0 errors".
 
 **`check.sh` covers Phase C as of C1.** Its module list is the 9 core modules
 plus `SIGEL_Visualisation` (C5) and `SIGEL_CommonGUI` (C3) — a GUI module joins
-only when every file in it compiles. `sigel.cpp`, `sigel_slave.cpp` and the
-three remaining GUI modules are still checked by nothing — a GUI module can only join
-`MODULES` when every file in it compiles, which is C3–C7. What C1 added is a
+only when every file in it compiles. *When this was written, `sigel.cpp`, `sigel_slave.cpp` and three GUI modules
+were checked by nothing.* **All five GUI modules are in `MODULES` as of C7, and
+C8 added the `programs` section for the two `.cpp` files.** What C1 added is a
 `forms (Phase C)` section listing the forms converted so far and, per form,
 running `uic`, compiling the generated header standalone, compiling the
 committed base class, running `moc` over it, and checking the `.qrc` against
@@ -584,9 +589,10 @@ A break in them shows up as a build failure rather than a check failure.
 
 Upstream PVM 3.4.6 replaces the vendored 3.4.3. `libpvm3.a` and `pvmd3` build
 and run; SIGEL's PVM code links against them and `SIG_GPPVMData` round-trips
-through a live daemon. **`sigel` and `sigel_slave` still do not link** — they
-need the Qt 2 GUI modules Phase C has not ported, so the evolution loop stays
-unreachable. The blocker moved from PVM to Phase C; it did not lift.
+through a live daemon. *This said `sigel` and `sigel_slave` "still do not link", blocked on Phase C.*
+**C9 linked both and they run.** What is still unreachable is the evolution
+LOOP, and the blocker is throughput rather than the build — §9 has it as the
+last open C11 item.
 
 ```
 make pvm         libpvm3.a, pvmd3         28 objects, 0 errors, 6 warnings
@@ -826,7 +832,7 @@ succeeded.**
 **Gates any session must keep green**, all committed:
 
 ```
-./check.sh                                            773 pass, 5 fail
+./check.sh                                            842 pass, 0 fail, exit 0
 ./dictorder-dump.sh | diff -u dictorder-baseline.txt -    empty
 ./fitness-check.sh  | diff -u fitness-baseline.txt -      empty
 ASAN_OPTIONS=detect_leaks=0 ./fitness-check.sh build      exit 0
@@ -883,9 +889,12 @@ double-frees.
 
 Back-edges cost nothing: 2 were dead includes, 3 forward-declare.
 
-**4 files still fail**, and they are exactly the ones the Makefile excludes —
-`MT_Controller.cpp`, `SIG_GUIGPManager.cpp` and both ZORC fitness files. Blocked
-on Phase C; the site counts are in §7 C8. *This said 5 and listed
+*This said "4 files still fail… blocked on Phase C", listing `MT_Controller.cpp`,
+`SIG_GUIGPManager.cpp` and both ZORC files.* **C6, C7 and C8 fixed three of
+them and the Makefile now excludes exactly one**,
+`WIN_SIG_GPRemoteZORCFitnessFunction.cpp`, which needs `windows.h` and is
+permanently out of scope. `check.sh` reports **0 fail** and skips that one
+explicitly. *An earlier version of this said 5 and listed
 `SIG_GPPopulation.cpp`, which Phase R fixed.*
 
 ### Phase B — make ownership explicit — SUBSUMED BY PHASE D
@@ -907,7 +916,7 @@ value and the only match in the file today is a comment.*
 
 ### Phase R — build and run (§3, order item 1) — DONE
 
-`make` at the repo root builds 205 vendored objects, 105 of SIGEL's 109 core
+`make` at the repo root builds 205 vendored objects, 108 of SIGEL's 109 core
 sources, two moc outputs and `build/sigel_eval`. Was 251 / 118 of 122 / three
 until the Dynamo backend was deleted (`physics_backends.md`): 46 vendored
 Dynamo `.cpp`, 13 of SIGEL's own and the `SIG_DynaSystem` moc target went with
@@ -938,12 +947,13 @@ reads.
 `if (qApp)` guards mean none of it runs headless, but it has to compile:
 `SIG_GPExperiment` holds a `SIG_GPPopulation` by value.
 
-**Four core files still do not build.** `MT_Controller.cpp` constructs an
-`MT_MainWindow`; `SIG_GUIGPManager.cpp` is its counterpart; both ZORC fitness
-files ask the user for the distance walked through `QInputDialog` and are still
-on the Qt 2 API. None is on the evaluation path.
+*This said four core files do not build — `MT_Controller.cpp`,
+`SIG_GUIGPManager.cpp` and both ZORC fitness files.* **Three were fixed by C6,
+C7 and C8; one remains and always will**, the `WIN_` ZORC variant, which needs
+`HANDLE` and `OVERLAPPED` from `windows.h`. None was ever on the evaluation
+path.
 
-**Four vendored patches**, applied by `make` against a stamp inside the
+**Five vendored patches**, applied by `make` against a stamp inside the
 untracked tree:
 
 | patch | why |
@@ -1538,7 +1548,7 @@ the only independent source of numbers. All in `data/`, untracked.
 | T1 | `tools/Dockerfile.qtmig` + `tools/qtmig`: Qt 4.8's `uic3` and `qt3to4` over this repo | **done** |
 | T2 | Prove it on one form, then all 20 | **done** |
 
-**T2 EXERCISED ONE OF `uic3`'s FIVE MODES.** Everything below, and the residue
+**T2 EXERCISED ONE OF `uic3`'s SIX MODES.** *This said five; C1 corrects the count and the list.* Everything below, and the residue
 table, is about `-convert`. The tool also has declaration, implementation,
 subclass and image-extraction modes, and three of them answer residue rows this
 plan was treating as hand work — including the QWidget-derived base class, whose
@@ -1717,7 +1727,7 @@ modules include the headers `uic` generates from them.
 | C8 | **DONE 2026-08-31.** `sigel.cpp`, `sigel_slave.cpp`, `MT_Control`'s 15 dead connects, and the four core files no module list reached. **The tree's dead-signal count is now 0 with no non-zero baseline anywhere.** `check.sh` gained a `programs` section and a `dead item virtuals` check | 15 sites + 4 files |
 | C9 | **DONE 2026-08-31.** All five GUI modules build as archives, both programs link and run. Exclusions lifted, moc derived from source, resources named on the link line, `programs` gate upgraded from compile to link+run | 5 modules, 2 programs |
 | C10 | **DONE 2026-09-02.** Driving the interface rather than reading it. `guidrive.cpp` posts real Qt mouse, key and context-menu events into the real `SIG_MainWindow`; the 1.3 oracle drove the 2003 binary with XTest and the two were diffed. Found the `clear()` signal regression that killed the application on a large delete, and the eaten ampersand in the MetaGP dialog. New `gui behaviour` gate with `guibehaviour-baseline.txt`. **No X-level click was possible on this machine and the section says so.** Also carries the port's FIRST deliberate divergence from 1.3 — the duplicate MetaGP About, removed by decision 2026-09-02 | 2 defects, 15 scenarios, 1 divergence |
-| C11a | **DONE 2026-09-02.** The five View pages C10 never opened. 29 spin boxes, 20 sliders, 7 combos, 4 checkboxes, 8 radios and 20 of C7's 21 validators driven and diffed against 1.3. The **12-probe validator battery matches character for character**, on both sides under a comma-decimal locale the oracle built with woody's own `localedef`. Nine parameter values typed on the pages come out **byte-identical** in the saved `.exp` across the two architectures. Found the `QIntValidator` Intermediate/Invalid trap: 1.3 clamps a typed over-range number to the maximum, the port commits a truncated prefix -- **accepted as a divergence, D28**; pinned in the gate. `gui behaviour` now runs two scenarios and re-runs one under `de_DE` | 1 regression, 2 interlocks, 3 probe errors |
+| C11a | **DONE 2026-09-02.** The five View pages C10 never opened. 29 spin boxes, 20 sliders, 7 combos, 4 checkboxes, 8 radios and 20 of C7's 21 validators driven and diffed against 1.3. The **12-probe validator battery matches character for character**, on both sides under a comma-decimal locale the oracle built with woody's own `localedef`. Nine parameter values typed on the pages come out **byte-identical** in the saved `.exp` across the two architectures. Found the `QIntValidator` Intermediate/Invalid trap: 1.3 clamps a typed over-range number to the maximum, the port commits a truncated prefix -- **accepted as a divergence, D28**; pinned in the gate. `gui behaviour` grew from one scenario to two here, and to five by C11c | 1 regression, 2 interlocks, 3 probe errors |
 | C11b | **DONE 2026-09-02.** The Import/Export round trips — 15 of the 16 children C10 never drove. **Seven of the eight exports are BYTE-IDENTICAL to what the 2003 i386 binary writes**, including the 2.7 MB `.pop` and, unexpectedly, the `.dat` with its 532 lines of floating point. Found and fixed a real defect: default-constructed language parameters came out alphabetical where 1.3 gives `QDict` hash order — predicted from `qgdict.cpp`, confirmed on the running binary character for character, and it had been silently wrong in `dictorder-baseline.txt` for all 7 robots (**98 lines corrected**). Confirmed and preserved 1.3's ignored overwrite prompt. Also fixed a C10-era harness bug that had been handing SIGEL the wrong filename — 2 exports out of 32 in the runs that caught it | 1 defect fixed, 1 baseline corrected, 1 defect preserved |
 | C11c | **DONE 2026-09-02.** The six dialogs, plus two fresh-eyes reviews of the harness and of `check.sh` itself. **C7's 21st validator driven, closing that set at 21 of 21.** Found and fixed a defect with a data consequence and no need for invalid input: Qt 6 selects a pre-filled field when a dialog gives it focus and Qt 2 did not, so a user who types one digit into Add-individuals gets **12 on 1.3, which appends, and got 2 here, which replaced** — twelve individuals added where two were meant. Four sites, `end(false)` queued after show. A second divergence **kept on purpose**: allowing a command appends where 1.3 hash-inserts, predicted and confirmed character for character, but matching it would mean reimplementing what Phase D removed. Two reviews then went at the checking machinery: **five probes that could not fail**, including a Cancel test that never pressed Cancel and a round trip that was an identity test; and a **demonstrated false pass** — all 30 menu and toolbar icons replaced with garbage, whole gate green. `check.sh` also never exited non-zero, counted a skipped section as 0 fail, and ran its locale check under a locale that is not installed here. All fixed; **842 pass, 0 fail** for the first time, with `WIN_*` excluded explicitly as the permanent known failure it is. A `!!` failure marker had already reached the committed baseline; the gate now refuses those | 1 defect fixed, 1 kept, 5 probe defects, 7 gate defects |
 
@@ -1735,7 +1745,7 @@ GUI modules:
 | C4 | `SIGEL_SlaveGUI` | **C3, C5** |
 | C5 | `SIGEL_Visualisation` | none |
 | C6 | `MT_GUI` | none |
-| C7 | `SIGEL_MasterGUI` | **DONE** |
+| C7 | `SIGEL_MasterGUI` | none — measured; it includes no other GUI module |
 
 `SIGEL_Visualisation` is a **root**; `SIGEL_CommonGUI` and `SIGEL_SlaveGUI` both
 need it. C3 reads `visualisation->floatingTexts`, a Qt 2 `QVector` living in
@@ -1878,7 +1888,7 @@ all marked in the files:
   it compiles, it lays out, and it draws nothing. Restored here as
   `Qt::Horizontal`, which makes `uic` emit `setFrameShape(HLine)` and
   `setFrameShadow(Sunken)`. **This is a sixth silent-loss category** — Phase T's
-  residue table lists only the 4 dropped size constraints. *C2 measured the
+  residue table lists 6 dropped size constraints. *C2 measured the
   scope and this paragraph first overstated it: **3 of the 6 `Line` widgets are
   affected, not 6.** `uic3` keeps an explicit `frameShape` and drops only the
   then-redundant `orientation`, so only a Line whose Qt 2 form set
@@ -2105,7 +2115,7 @@ straight from `QListView`. It is converted anyway, per D21. *A grep that missed
 it initially used plain `grep`, which is `ugrep -I` and skips the Latin-1/CRLF
 files — §2's trap, hit again inside a script.*
 
-**One form is blocked on C3 and `check.sh` says so instead of failing.**
+~~**One form is blocked on C3 and `check.sh` says so instead of failing.**~~ **No longer: C3 and C4 closed and no `FORM_LIST` entry carries the `:blocked` field any more.** The machinery below still exists and is unused.
 `SIG_SimulationWidgetBase` embeds `SIG_SimulationVisualisationWidget`, whose
 header chain reaches `SIGEL_CommonGUI/SIG_VisualisationWidget.h` and its Qt 2
 `#include <qgl.h>`. The form is converted and its `uic`, resource and `Line`
@@ -2240,9 +2250,11 @@ SIG_Environment &` cannot call a non-const getter. Adding `const` to a getter
 cannot change behaviour, and the three gates stayed green.
 *But "all three gates confirm it moved nothing", as this said, is a wrong
 referent: **no gate calls any of the four.** Their only callers are
-`SIG_EnvironmentRenderer.cpp` and `SIG_EnvironmentView.cpp`, neither of which is
-built. What the gates confirm is that the header change broke nothing that IS
-built. The `const` is safe by inspection — header and definition agree at all
+`SIG_EnvironmentRenderer.cpp` and `SIG_EnvironmentView.cpp`. *When this was
+written neither was built, so the gates could only confirm that the header
+change broke nothing that WAS built.* **Both build now**, in
+`SIGEL_Visualisation` and `SIGEL_MasterGUI`, and the Environment page is
+driven by `pages`. The `const` is safe by inspection — header and definition agree at all
 four, `SIG_Environment` has no derived class and no const/non-const overload
 pair — not by test. Found by review.*
 
@@ -2274,9 +2286,10 @@ changed deliberately rather than the one I changed by accident. Found by
 review.* A future reader chasing a recurrence should look at the environment,
 not at build freshness. `SIG_GPExperimentClean.o`
 is now named explicitly ahead of the archives, as 2003 compiled it into the
-slave target, with an assertion after the link. Today the linker fails first on
-the master's undefined `MT_Controller`; **the assertion becomes the only guard
-once C6 makes `MT_Controller` link**, at which point the master would link
+slave target, with an assertion after the link. *This said the linker fails
+first on the master's undefined `MT_Controller`, and the assertion becomes the
+only guard once `MT_Controller` links.* **That arrived at C9**, so the
+assertion is now the only guard — at which point the master would link
 silently and `sigel_eval` would start constructing one per experiment.
 
 #### What the 1.3 oracle could and could not answer for C3
@@ -3236,7 +3249,7 @@ source of **data to diff against**. A headless probe constructs the real
 shortcut, enabled state and check state; the oracle read the same facts off the
 running 1.3 binary. The comparison is mechanical, not eyeballed.
 
-**42 menu entries, zero mismatches.** Text, shortcut and enabled state all
+**42 menu entries, zero mismatches — 1.3 has 43 and the port 42, the one difference being the duplicate MetaGP About removed by decision (D27, C10).** Text, shortcut and enabled state all
 agree, including every oddity: the duplicate `Ctrl+Shift+L` on both
 Language-Parameters and Individual (and `Ctrl+Alt+L` likewise), the
 Import/Export asymmetry (Import has Robot, Export has "...to GNU plot"), Reset
@@ -4305,7 +4318,7 @@ this project checked that the capture had succeeded.*
 
 **Phase status is the table at the top of this file.** A second one lived here
 and drifted: it had Phase B at "8 of 14", Phase C at 10 steps and Phase V at 5
-where §7 defines C1–C9 and V1–V9, and it omitted Phases D and R entirely.
+where §7 defines C1–C10 plus C11a, C11b and C11c, and V1–V9, and it omitted Phases D and R entirely.
 
 **No effort estimates in this file.** The column that held them carried six
 invented figures. Step counts are counted and stay. **Do not put estimates
@@ -4361,13 +4374,16 @@ time: the defect it found needed no invalid input at all**; (4) `MT_GUI`; (5)
 the evolution path, last, because it needs a throughput answer before it can be
 observed at all.
 
-**Open after C11b — two items.** The `QSpinBox` divergence is closed: **D28**
+**Open after C11c — five items.** The `QSpinBox` divergence is closed: **D28**
 accepted it. The Import/Export item is closed by C11b.
 
 | # | open item | blocked on |
 |---|---|---|
 | **1** | **`pagesave` and `roundtrip` have no gate.** `pagesave` proved nine parameter values byte-identical across the two architectures and `roundtrip` proved the five formats survive an export-import-export cycle; both are run by hand. A regression between the widget and the file, or in a reader, would not be caught by the gate — `pages` covers widget to widget and `exportall` covers widget to file in one direction only | a committed reference parameter block. Natural to do with the Import/Export item, which is byte-comparable files for the same reason |
 | **2** | **Two C11 items left** — `MT_GUI`, then the evolution path | nothing. `MT_GUI` can start now |
+| **3** | **`QHashSeed::setDeterministicGlobalSeed()` was never added to `sigel.cpp`.** §10 says "PHASE C MUST ADD" it to `sigel.cpp` and `sigel_slave.cpp`; Phase C closed without doing so, and the sentence sits under a heading reading "Determinism — resolved". Measured: the call exists once in the tree, `sigel_eval.cpp:511`. **Also mis-scoped** — only `sigel` links the three `QHash`es, and `sigel_slave` links `GUI_SLAVE`, which has none | nothing. It is a bookkeeping gap rather than a live defect: the one iteration site is destruction, which is order-insensitive. But it is unowned, and that is why it is here |
+| **4** | **Six dropped size constraints from C2 were never restored.** §7 says "C6/C7 own it"; both closed without it. Measured: `MT_IndividualWidgetBase.ui` has three `130` values in `v1.3-pristine` and zero today, and `Layout32/33/28/60/22` appear in no converted form | nothing. Cosmetic — layout minimums, not behaviour — but it was an open item that vanished when its owning step closed |
+| **5** | **A use-after-free in `SIG_SimulationVisualisationWidget.cpp:414` is now reachable.** `physics_backends.md` records it as "unreachable today only because `SIGEL_SlaveGUI` does not compile", with the fix being `visualisation = nullptr;` between the delete and the new. **That module builds and `sigel_slave` links it**, and the bare `delete` is still there | nothing. This is the one of the four that could actually bite, and it is not tracked anywhere in this file |
 
 **Hazards a follow-up must inherit, all of which cost time in C10:**
 
@@ -4581,11 +4597,14 @@ it changes simulation results against 1.3. It predates the port.
 no-op over this corpus — the 2003 binary's own `.exp`, `.rrb` and `.wrl` output
 is pure ASCII. Becomes live the moment a non-ASCII experiment file exists.
 
-### Toggling containers (Phase C)
+### ~~Toggling containers (Phase C)~~ — CLOSED BY C7
 
-Two containers flip `autoDelete` at runtime — Qt 2's "remove without deleting"
-idiom, which a single destructor free does not reproduce. Both GUI, both need
-per-site thought:
+**Both are now `QHash`es owning nothing** (`SIG_ExperimentListView.cpp:63-65`,
+`SIG_Experiment.cpp:183-189`), so there is no `autoDelete` to toggle and
+nothing here needs per-site thought. The table is kept because it records
+what the Qt 2 code did. *It said:* two containers flip `autoDelete` at
+runtime — Qt 2's "remove without deleting" idiom, which a single destructor
+free does not reproduce; both GUI, both needing per-site thought:
 
 | Container | File | Toggles |
 |---|---|---|
@@ -4694,7 +4713,7 @@ every D8 site for a stored `const char *`.
 |---|---|---|---|
 | `Q2Array::sort()` | `memcmp` byte order | numeric | Three sites need ascending numeric order and break once any element reaches 256: `SIG_GPManager.cpp:304,311`, `SIG_AllIndividualsView.cpp:240`. Qt 2's own source says *"Qt 3.0: Add a virtual compareItems()"* |
 | out-of-range array access | warn, clamp to 0 | same, in the shim | Not via `Q_ASSERT`, which compiles to nothing under `QT_NO_DEBUG` — a release build would corrupt memory silently where 2003 returned a wrong value |
-| `SIG_ProgramLine.cpp:215-224` | writes `element[no]` in the branch entered *because* `no >= size()` | to be fixed | Its own comment is `// ToDo: Exception!` |
+| ~~`SIG_ProgramLine.cpp:215-224`~~ | writes `element[no]` in the branch entered *because* `no >= size()` | **FIXED** — `:215-232` now guards `if( no >= 0 && no < int(element.size()) )` | Its own comment is `// ToDo: Exception!` |
 | ~~`SIG_DynaSystem.cpp:266-268`~~ | deletes `dynaJoints[k]` while looping to `dynaDrives.size()` | **moot 2026-08-28** — the file is deleted with the Dynamo backend, `physics_backends.md` | The two vectors grew independently |
 | `SIG_EarlyRunTermSimulation.cpp:97` | `QTime zeroHour;` | `QTime( 0, 0 )` | Same class as the other 11 `QTime()` sites but a declaration, so the first sweep's pattern missed it. `getMaxRecorderSteps` returned 2 instead of 182 — a factor of 91 on the denominator of three fitness functions. No shipped experiment selects them, so `replicate.sh` cannot see it |
 | `sigel_slave`, `getenv("SIGEL_ROOT")` | dereferenced unchecked | to be fixed | Segfaults if unset; the SIGSEGV handler masks it with no core. Bites under PVM specifically — spawned tasks inherit *pvmd's* environment, not the master's |
@@ -4752,7 +4771,7 @@ compiled at all. It went with the Dynamo backend, its only caller
   `MT_Trainingset::updateTSet`, the only drain today. **Live for Phase C**:
   `MT_GUI/MT_ExperimentWidget.cpp:48` calls `prevSelectedItems.head()` with no
   emptiness guard, so `lastSelected()` before any selection returned 0 in 2003
-  and will abort now. `MT_GUI` is in neither `check.sh`'s `MODULES` nor the
+  and will abort now. **STALE — Phase C closed this.** `MT_GUI` is in `check.sh`'s `MODULES` (`check.sh:94`) and the Makefile's `CORE` (`Makefile:312`), and C11c's `metagui` scenario drives the whole MetaGP window. *It said:* `MT_GUI` is in neither `check.sh`'s `MODULES` nor the
   Makefile's `CORE`, so nothing flags it.
 
 ### TRAP — plain `grep` in this environment SILENTLY SKIPS 9 SOURCE FILES
@@ -5089,8 +5108,12 @@ binary in this repository, alongside `xb/kdesigel/sigel`. `moveDrive` is at
 | the exponent | **`getSize() - 1`**, from `lea -0x1(%eax),%edx` at `0x80b78d8`. *Reported as `pow(2.0, size)`, which is one instruction short.* Our source has `getSize() - 1` at `SIG_DynaMechsCommandInterface.cpp:66,69,103,107` — **it matches the binary** |
 | `pow` itself | called with **doubles** (`fstpl`, 64-bit, at `0x80b78f6`/`0x80b7902`), not extended. Only the surrounding intermediates are 80-bit |
 
-**Our source really does use `long double`** — the only `long double` in the
-whole tree, at `SIG_DynaMechsCommandInterface.cpp:49,65-69,102-111`.
+**Our source really does use `long double`**, at
+`SIG_DynaMechsCommandInterface.cpp:49,65-69,102-111`. *This called it "the only
+`long double` in the whole tree", and that was wrong when it was written:*
+`SIG_DynaMechsSimulationQueries.cpp` has **17 more**, and the pristine tree has
+the same split — so the 80-bit-intermediate exposure argued below is NOT
+confined to `moveDrive`; the sensor path has it too.
 
 **And on this machine it is *more* precise, not less:**
 
@@ -6072,7 +6095,7 @@ which is why the list exists.
 | `SIG_Material::friction` — three walks and the owning free, D11 | **0 friction declarations in any `.rrb`, and `nfric` is 0 on all 31 `Material` lines**. The list is empty on every gate run |
 | `SIG_Body::usedByLinks`, D11 | appended on every `.rrb` load and **read nowhere in the tree** |
 | both `SIG_GPFitnessTrainer` host walks, D13 | that object is **not linked into `sigel_eval` at all** |
-| `SIG_GPParameter::writeToFile`'s `PVMHOST` loop, D13 | linked, never called — no gate saves an `.exp` |
+| `SIG_GPParameter::writeToFile`'s `PVMHOST` loop, D13 | ~~linked, never called~~ **COVERED as of C11b** — `exportall` writes it and `guibehaviour-baseline.txt` pins the bytes |
 | `readFromFile`'s `qDeleteAll` + `clear`, D13 | runs every load, always on an **empty** list |
 | **all four sites in `SIG_GPExperiment.cpp`**, D14 | the master variant is compiled into `libSIGEL_GP.a` and **never linked** — `SIG_GPExperimentClean.o` satisfies the symbols first. `readelf --debug-dump=info` on `sigel_eval` has a CU for Clean and none for the master |
 | `writeHistoryToFileTransfer`, D14 | linked, never called — no gate saves an `.exp` |
@@ -6083,7 +6106,7 @@ which is why the list exists.
 | `sort`, D15 | no caller anywhere |
 | **the whole `TmpBuffer` loop, D24** | `MT_Evaluator` is **not in either gate binary** — `nm -C build/sigel_eval \| grep -c 'MT_Evaluator::'` is **0**, same for `build-fast`. Modules link as static archives and nothing references `MT_Evaluator.o`, so its 14 symbols never leave `libMT_Control.a`. The three green baselines carry **no** evidence about this conversion; the only mechanical check that touches it is `check.sh`'s `-fsyntax-only` |
 | **`MT_Statistics`'s three converted functions, D24** | linked, never run. `gdb` breakpoints on `updateStatistics`, `getStatisticElement` and `writeToFileMT_Statistics` across **all 14** shipped experiments at individual 0: **zero hits** |
-| `MT_GUI/MT_StatisticsWidget.cpp`'s nine `.count()` calls on the converted member, D24 | `MT_GUI` is in neither `check.sh`'s `MODULES` nor the Makefile's `CORE`. They still compile — `QList::count()` exists — but no gate says so |
+| `MT_GUI/MT_StatisticsWidget.cpp`'s nine `.count()` calls on the converted member, D24 | ~~`MT_GUI` is in neither `check.sh`'s `MODULES` nor the Makefile's `CORE`~~ — **STALE, it is in both, and `metagui` drives the widget (C11c)** |
 | **the whole `taskCanDoList` index walk, D25a** | compiled and archived (21 `SIG_GPManager::` symbols in `libSIGEL_GP.a`) but **linked into nothing** — 0 in `sigel_eval`, `build-fast/sigel_eval` and `pvm_link`. The `removeAt` path, the append path and the `:122` reference never execute here. The 1.3 binary shows the path is live in a real run (80 appends in two generations); our gates cannot reach it |
 | **four of D25a's six `at(canDoIdx)` sites** | `:127`, `:151`, `:1310`, `:1336` sit inside `#ifdef SIG_DEBUG`, and **`SIG_DEBUG` is defined nowhere in this build** — its only occurrence in the repo is `x/sigelSourceDistribution.1.0/sigel/makefile:72`, the abandoned 1.0 tree. Neither `make` nor `check.sh` parses them. Compiled explicitly with `-DSIG_DEBUG` by review: exit 0, no errors — so no latent defect, but only two of the six were checked by the build |
 | the `maxTouchsPerLoop` break, D25a | **dead on every shipped configuration**: the value is persisted in none of the 28 `.exp`, and all five presets call `setMaxTouchsPerLoop(-1)` (`SIG_GPParameter.cpp:325,330,335,340,345`), so `(maxTouchsPerLoop != -1)` is always false |
@@ -6763,7 +6786,7 @@ residual count and `Case::live == 0` after teardown.
 (`qglist.h:188`), which returns 0 on an empty list. Qt 6's `QQueue::head()` is
 `QList::first()`, which asserts. `MT_ExperimentWidget::lastSelected()` calls
 `prevSelectedItems.head()` with no emptiness guard, so before any selection it
-returned 0 in 2003 and will abort under Qt 6. `MT_GUI` is in neither
+returned 0 in 2003 and will abort under Qt 6. **STALE — Phase C closed this.** `MT_GUI` is in `check.sh`'s `MODULES` (`check.sh:94`) and the Makefile's `CORE` (`Makefile:312`), and C11c's `metagui` scenario drives the whole MetaGP window. *It said:* `MT_GUI` is in neither
 `check.sh`'s `MODULES` nor the Makefile's `CORE`, which is why nothing flagged
 it. Recorded in §9's name-collision table.
 
@@ -7395,7 +7418,7 @@ fingerprints: the reference side validated each digest across two independent
 runs before shipping it.*
 
 **No gate reaches any of this** — the D25c section says so and D26's first draft
-omitted it. `SIG_GUIGPManager.cpp` is not even syntax-checked: `Makefile:288`
+omitted it. **STALE — C7/C9 closed this.** `SIG_GUIGPManager.cpp` compiles, links into `sigel` and into `guidrive`, and `SIG_Experiment.h:26` is now `#include <QStackedWidget>`. *It said:* `SIG_GUIGPManager.cpp` is not even syntax-checked: `Makefile:288`
 excludes it and it is one of `check.sh`'s four known failures, aborting at
 `SIG_Experiment.h:26` on `qwidgetstack.h` before the compiler sees the new
 guard. The tournament builders, the destructor and the `MT_Classifier` line are
@@ -7452,9 +7475,11 @@ the grand `fail` counter, never `pass`, so 105/4 is unchanged — verified by
 running the parent's `check.sh` on the parent's tree. An earlier version of the
 replacement comment claimed the count would drop by one.*
 
-**`check.sh` now executes no code at all** — it is `-fsyntax-only` plus the
-standalone-header pass. The deleted step was the only one that linked and ran
-anything. So **ownership of the evolution-loop containers (`fitTaskList`,
+*This said `check.sh` executes no code at all, which was true when D27 was
+written.* **Phase C put three running binaries back into it** — `sigel_slave`,
+a headless GUI probe, and `guidrive` over five scenarios. What is still true,
+and is the point of the paragraph, is that none of them reaches the evolution
+loop. So **ownership of the evolution-loop containers (`fitTaskList`,
 `toSpawnList`, `tours`), which no gate can reach, now has no mechanical coverage
 of any kind.** `sigel_eval -selfcheck` still runs, but from `fitness-check.sh`,
 not `check.sh`.

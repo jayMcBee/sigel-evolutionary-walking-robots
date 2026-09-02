@@ -1,3 +1,5 @@
+#include <QLocale>
+#include <QValidator>
 #include "MT_GUI/MT_IndividualWidget.h"
 #include "MT_GUI/MT_AddConstantsWidget.h"
 #include "MT_GPSystem/MT_Randomizer.h"
@@ -45,6 +47,21 @@ MT_IndividualsWidget::MT_IndividualsWidget(QWidget* parent, const char* name, Qt
 	edit16->setValidator(validator);
 	edit17->setValidator(validator);
 	edit18->setValidator(validator);
+// C7 pinned SIGEL_MasterGUI's 21 validators to the C locale and MT_GUI's were
+// never given the same treatment. Measured, and it needs no foreign locale to
+// bite: under en_US the GROUP separator is ',', so an unpinned
+// QIntValidator(0,1000) calls "1,000" ACCEPTABLE while the read-back --
+// text().toInt() -- returns 0 with ok=false. A user types one thousand, the
+// field says it is fine, and zero reaches the system. Under de_DE the same
+// happens with "1.000". Qt 2 forced LC_NUMERIC="C" process-wide, so 1.3 had
+// no such field. RejectGroupSeparator is what reproduces that, exactly as in
+// SIG_EnvironmentView.cpp.
+{
+	QLocale cLocale = QLocale::c();
+	cLocale.setNumberOptions(QLocale::RejectGroupSeparator);
+	for (QValidator *v : findChildren<QValidator *>())
+		v->setLocale(cLocale);
+}
 
 	// connect the sliders to the corresponding lineEdits
 	connect((const QObject*)slider01, SIGNAL(valueChanged(int)), SLOT(slotChangeEdit(int)));

@@ -32,7 +32,9 @@ Review is reading the diff.
   (was SIG_DynaMoSimulationQueries.h:34 -- file deleted 2026-08-28,
    physics_backends.md; re-measure this count)
   ```
-  Also retires `shim/`, which exists only to fake these.
+  *This said it "also retires `shim/`".* **It does not**: `Makefile:208` puts
+`-I$(SHIM)` on **cv97**'s include path, and 32 files across the vendored tree
+need `<iostream.h>` or `<fstream.h>`. Fixing SIGEL's own sites cannot retire it.
 
 - [ ] **2. `register` keyword** — 3 sites, all `src/SIGEL_Visualisation/SIG_EnvironmentRenderer.cpp`
   lines 119, 500, 602. Removed in C++17. Delete the keyword.
@@ -45,7 +47,10 @@ Review is reading the diff.
   `MT_TranslatedIndividual`, `MT_Trainingset`
   *Confined to one module — the VC6-era half of the tree.*
 
-- [ ] **4. Dynamic exception specifications** — 6 file pairs (.h + .cpp)
+- [x] **4. Dynamic exception specifications** — **DONE BY THE PORT, Phase A7.**
+  Zero remain: `) throw (` matches nothing tree-wide and all seven named headers
+  are clean. Three sites keep them only as `// NOTE: in 2003 this carried…`
+  comments. Listed below as it stood — 6 file pairs (.h + .cpp)
   ```
   SIGEL_Simulation   SIG_Simulation, SIG_Register, SIG_Recorder
                      (SIG_DynaSystem was here; deleted 2026-08-28)
@@ -117,7 +122,8 @@ Additive only — nothing changes at runtime. The value is that failures are
 
 ## 4 · Program display
 
-- [ ] **9. Syntax-highlight the program view** — needs Phase C, GUI not built yet
+- [ ] **9. Syntax-highlight the program view** — the GUI builds and runs as of
+  C9; the bar is now "after the port is validated", not "after it compiles"
 
   New function `programToHtml(const SIG_Program&, const SIG_LanguageParameters&)`
   returning a `QString`. `printToString()` stays as the ZORC serial format
@@ -137,7 +143,17 @@ Additive only — nothing changes at runtime. The value is that failures are
 
 ## What is measured vs. proposed
 
-- **Measured** (trust as fact): every site count, file path and line number above.
+- **Measured when written, and SOME HAVE DRIFTED.** A 2026-09-02 audit
+  re-derived them: item 1 is 6 sites not 7 (`MT_GPManager.cpp:10`, not `:6`);
+  item 2's `register` is at 125/505/607, not 119/500/602; item 5's "313
+  `virtual` sites" does not match its own table, which sums to 322, and the
+  per-module split has moved hard — `MT_GUI` 6 to 24 and `SIGEL_MasterGUI` 5 to
+  38 — because Phase C's uic3-derived base classes declare `virtual` slots, so
+  the one-commit-per-module plan needs re-measuring; item 6 is 63 `NULL` sites
+  not 75; item 9's `SIG_AllIndividualsView.cpp:394` is `:448` and
+  `SIG_SimulationWidget.cpp:234` is `:235`; the `tours` section cites two
+  doxygen comments where there are three, at `:225`, `:259` and `:262`. Item 3
+  still reproduces exactly. **Re-measure before acting on any of them.**
 - **Proposed** (yours to approve): the three-section ordering, the per-module
   split of item 5, and item 8's blocked status.
 
@@ -180,16 +196,20 @@ there are two.
 headers get matching distinct guards. Then the compiler enforces what the build
 files currently only imply.
 
-**Not before Phase C.** The master variant is the one that constructs
-`MT_Controller`, and `MT_Controller.cpp` does not compile yet, so the master
-half cannot be built or tested until the interface is ported. Renaming a class
-nothing can compile is how a rename goes wrong.
+**Not before the port is validated.** *This said `MT_Controller.cpp` "does not
+compile yet", which was true before C6–C9.* It compiles, links into `sigel` and
+into `guidrive`, and is driven by the `metagui` scenario — so the master half
+CAN now be built and tested, and the bar is validation rather than compilation.
 
 **Also fix while there:** our `Makefile` globs `src/<module>/*.cpp`, so it
 compiles both variants into `libSIGEL_GP.a` where 2003 compiled them into
-separate targets. The unused object is harmless today only because the linker
-cannot extract it — `SIG_GPExperiment.o` needs `MT_Controller`, which the build
-excludes. That is luck, not design.
+separate targets. *This said the unused object is harmless "only because the linker cannot
+extract it — `SIG_GPExperiment.o` needs `MT_Controller`, which the build
+excludes".* **The build no longer excludes it**: `MT_Controller` compiles and
+links, and the Makefile now excludes exactly one file,
+`WIN_SIG_GPRemoteZORCFitnessFunction.cpp`. Which variant the linker picks is
+now settled deliberately — `guidrive` names `$(MASTER_OBJ)` and asserts it,
+after linking the Clean variant produced a convincing false crash in C10.
 
 ## Rename `tours` to `tournaments` — after the Qt 6 port is complete and validated
 
@@ -203,11 +223,11 @@ two doxygen comments that call it "the QArray tours" (`SIG_GPManager.h:216`,
 `:250`) go with it — and they are wrong twice over, since it is not a `QArray`
 and has not been one for some time.
 
-**Not before the port is complete AND validated.** `SIG_GPManager` cannot be
-compiled today: its constructor reads `actExperiment.mtController`, a member of
-only the master variant of `SIG_GPExperiment`, which needs `MT_Controller`,
-which does not build. A rename inside a file nothing can compile is a rename
-nobody can check.
+**Not before the port is validated.** *This said `SIG_GPManager` "cannot be
+compiled today" because it reads `actExperiment.mtController`, a member of only
+the master variant, which needed `MT_Controller`, which did not build.* All of
+that builds now. The bar is validation, not compilation — but the reason to
+wait is unchanged: this rename crosses the two `SIG_GPExperiment` variants.
 
 Same reason as the `SIG_GPExperiment` rename above, and worth doing in the same
 pass.
@@ -277,9 +297,9 @@ them; do not hand-edit generated files.
 dictorder-baseline.txt -` empty, `fitness-check.sh` clean. Phase 10 cannot move
 any of them, which is why it goes first.
 
-**Not before Phase C and validation.** `MT_GPManager`, `MT_Classifier` and
-`SIG_GPManager` carry most of the German and none of them compiles today — the
-same bar as the two renames above.
+**Not before validation.** `MT_GPManager`, `MT_Classifier` and `SIG_GPManager`
+carry most of the German. *This said none of them compiles today*; all three do,
+and all three link into `sigel`. Same bar as the two renames above.
 
 ## Set the version to 2.0 — the LAST step of the port
 
@@ -295,7 +315,7 @@ look, and the tree disagrees with itself:**
 | `kdesigel/configure.in:2` | `AM_INIT_AUTOMAKE(kdesigel,1.0)` | **the only real version declaration in the whole tree.** The 1.3 release still calls itself 1.0 here |
 | `kdesigel/README:1` | `KDESIGEL v1.1 Readme File` | a third number, in the file a user reads first |
 | `kdesigel/kdesigel.kdevprj:36` | `kdevprj_version=1.3` | **not SIGEL's version.** This is KDevelop's own project-file format version, which happens to also be 1.3. **Do not touch it** |
-| the source | nothing | there is no version constant, and no binary prints one |
+| the source | `SIG_InfoBox.cpp:60` | **the About box prints `Sigel v1.1`**, and `pixmaps/altLogo.png` carries a `Sigel v1.0` caption — 1.3 already ships that mismatch. BOTH have to move or 2.0 ships it again with new numbers. Found by C11c |
 
 So "1.3" exists only in the tarball name and the directory name. Three files
 carry three different numbers and none of them is 1.3.
