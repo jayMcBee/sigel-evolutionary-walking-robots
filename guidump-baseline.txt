@@ -1,3 +1,10 @@
+# DELIBERATE DIVERGENCE, 2026-09-02: 1.3 has a SECOND About here, on the
+# MetaGP menu ('&MetaGP | A&bout'), preceded by a separator, wired to the
+# same slotAbout() as Help > About and opening the identical InfoBox. It was
+# verified present in the running 1.3 binary and then REMOVED BY DECISION,
+# separator included. Those two lines are absent below on purpose; this is
+# the one place this baseline intentionally does not match 1.3. See C10.
+#
 # Structural dump of the ported master GUI: every menu entry and toolbar
 # button, with shortcut, enabled state and check state.
 #
@@ -79,8 +86,6 @@
 &MetaGP | --- | - | - | -
 &MetaGP | &Evaluator System | - | greyed | tick
 &MetaGP | Cl&assifier System | - | greyed | no-tick
-&MetaGP | --- | - | - | -
-&MetaGP | A&bout | - | enabled | n/a
 &Help | About | - | enabled | n/a
 == TOOLBARS ==
 -- fileToolbar (title [File]) --

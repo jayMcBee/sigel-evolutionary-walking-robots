@@ -650,9 +650,14 @@ SIG_MainWindow::SIG_MainWindow( QWidget * parent, const char * name, Qt::WindowF
   mtChoiceTypeActionGroup->setEnabled(false);
   QObject::connect(mtChoiceTypeActionGroup, SIGNAL( triggered( QAction * ) ), SLOT( slotMTSwitchSystem(QAction*) ));
 
-  // about-box button
-  mtMenu->addSeparator();
-  mtMenu->addAction( "A&bout", this, SLOT( slotAbout() ) );
+  // DELIBERATE DIVERGENCE FROM 1.3, decided 2026-09-02. 1.3 put a second
+  // "A&bout" here, on the MetaGP menu, wired to the SAME slotAbout() as
+  // Help > About and therefore opening the identical SIG_InfoBox --
+  // "mtMenu->addSeparator(); mtMenu->addAction( \"A&bout\", this,
+  // SLOT( slotAbout() ) );". Preserved through C1-C10 and verified
+  // against the running 1.3 binary before being removed, so this is a
+  // CHOICE and not a porting error. Its trailing separator goes with it,
+  // or the menu would end on one. Help > About is untouched.
 
   noExperimentActions.append( mtUseAction );
   QObject::connect(experimentListView,
