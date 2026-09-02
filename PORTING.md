@@ -3890,6 +3890,14 @@ byte-comparable across architectures, which is the strongest kind of check this
 project has; (3) the remaining dialogs; (4) `MT_GUI`; (5) the evolution path,
 last, because it needs a throughput answer before it can be observed at all.
 
+**Open after C11a — three items.**
+
+| # | open item | blocked on |
+|---|---|---|
+| **1** | **The `QSpinBox` over-range divergence.** 1.3 accepts the digits and clamps on commit; the port refuses the keystroke and commits a truncated prefix. Type `100` into a `[1..99]` box: 1.3 gives 99, the port gives 10, and that number is written to the `.exp`. Mechanism, both measurements and a working fix are in `future_refactorings.md` | **a decision: restore 1.3, or accept the divergence.** Restoring means one `SIG_SpinBox` in `SIGEL_CommonGUI` and 47 widgets promoted tree-wide. Current behaviour is pinned in `guibehaviour-baseline.txt` (`commits=`), so nothing drifts while it is open |
+| **2** | **`pagesave` has no gate.** The scenario that proved nine parameter values byte-identical across the two architectures is run by hand. A regression between the widget and the file would not be caught; the `pages` gate only covers widget to widget | a committed reference parameter block. Natural to do with the Import/Export item, which is byte-comparable files for the same reason |
+| **3** | **Four C11 items, in the order below** | nothing. C11b can start now |
+
 **Hazards a follow-up must inherit, all of which cost time in C10:**
 
 - **Plain `grep` silently skips nine Latin-1 files** including
@@ -3901,35 +3909,23 @@ last, because it needs a throughput answer before it can be observed at all.
 - **Any harness must link `$(MASTER_OBJ)`**, or the Clean `SIG_GPExperiment`
   leaves `mtController` uninitialised and produces a convincing false crash.
 - **`QTest` is not a mouse.** Whatever is driven, the record must keep saying so.
-- **Verify every finding before acting.** Three of C10's apparent defects were
-  the probe, not the port; two of the oracle's readings were retracted. C11a
-  repeated the pattern exactly: three more apparent defects, all three the
-  probe.
-- **`QTest` posts key events STRAIGHT AT THE WIDGET, focus or no focus.** So a
-  keyboard probe measures the widget's key handler and says nothing about
-  focus. On 1.3 a groove click does **not** focus a slider, and the oracle's
-  200 arrow presses went to the tree and changed the page underneath it. Drive
-  the path both sides share -- for a slider that is a groove click or a handle
-  drag -- or the comparison is between two different operations.
-- **A page remembers its tab.** Reaching a control through the View toolbar
-  does not reset the tab widget. Two of the oracle's captures came back blank
-  for this reason, and were caught only because they were empty rather than
-  wrong.
+- **Verify every finding before acting.** C10: three apparent defects were the
+  probe, two oracle readings retracted. C11a: three more, all the probe.
+- **`QTest` posts key events STRAIGHT AT THE WIDGET, focus or no focus**, so a
+  keyboard probe says nothing about focus. On 1.3 a groove click does not
+  focus a slider, so arrow keys never reach it. Drive the path both sides
+  share — for a slider, a groove click or a handle drag.
+- **A page remembers its tab.** The View toolbar does not reset the tab widget.
+  Click the tab you want.
 - **Each file a scenario saves shifts the load dialog's row positions for the
-  next run.** The oracle's first round-trip attempt silently re-loaded the
-  file it had just written; the tell was the line count and the six-space
-  count, the signature C10 established.
+  next run**, so a multi-run sequence can silently re-load what it just
+  wrote. Check the line count and the six-space count.
 - **Order the probes so a toggle cannot grey a field before it is typed into.**
   One click on a radio greyed an integer field and turned five subsequent
   probes into false negatives.
 - **`QFileDialog` navigates as a path is typed and strips the directory out of
-  the field.** Type an ABSOLUTE path and re-assert it before Return, or the
-  dialog resolves a bare basename against wherever it has got to. This made
-  C10's `openExperiment` intermittently load nothing.
-- **A recovery path that does not print turns an intermittent failure into an
-  intermittent WRONG ANSWER.** The first fix for the above retried silently
-  and accepted the wrong filename; it was only findable because the retry
-  announced itself.
+  the field.** Use `acceptFileDialog()`; it types an absolute path and
+  re-asserts it. Do not hand-roll a second one.
 
 **The oracle is the reason this works.** Both C10 defects were confirmed against
 the running 1.3 binary *before* anything was changed — in one case that

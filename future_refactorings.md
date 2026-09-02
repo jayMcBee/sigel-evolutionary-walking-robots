@@ -391,7 +391,11 @@ public:
     void fixup( QString &input ) const override {   // QRangeControl's clamp
         bool ok = false;
         const long long v = stripFix( input ).toLongLong( &ok );
-        if ( !ok ) { QSpinBox::fixup( input ); return; }
+        // Qt 2 only called setValue() when mapTextToValue() succeeded, then
+        // updateDisplay() put the CURRENT value back -- so unparseable text
+        // keeps the old value. Falling through to QSpinBox::fixup() instead
+        // corrects to the MINIMUM, which 1.3 does not do. Measured.
+        if ( !ok ) { input = prefix() + textFromValue( value() ) + suffix(); return; }
         input = prefix()
               + QString::number( qBound<long long>( minimum(), v, maximum() ) )
               + suffix();
@@ -409,6 +413,12 @@ private:
 Each instance also needs
 `setCorrectionMode( QAbstractSpinBox::CorrectToNearestValue )`, which is what
 routes an Intermediate commit through `fixup()`.
+
+**The promotion is smaller than "47 widgets" sounds.** Per form it is one
+11-line `<customwidgets>` block plus
+`sed 's/class="QSpinBox"/class="SIG_SpinBox"/g'` — 8 forms, plus one line in
+`SIG_AddIndividualsDialog.cpp` where the widget is built in code.
+`SIG_SimulationWidgetBase.ui` already carries a `<customwidget>` block to copy.
 
 **Do:** put it in `SIGEL_CommonGUI`, add a `<customwidget>` block to the three
 forms the five View pages are built from and promote **29 widgets** —
@@ -431,13 +441,31 @@ move**. That diff is the check.
 on stock `QSpinBox` would make the application inconsistent with itself, which
 is worse than being consistently different from 1.3.
 
-**Two cheaper fixes were tried and rejected on measurement.** Swapping the
-validator on the spin box's internal `QLineEdit` lets the digits through but
-leaves `QAbstractSpinBox`'s own interpret path alone, and 100 into a [1..99]
-box then commits to **1** — worse than the divergence it was meant to remove.
-Widening the range would change what the pages display and write. There is no
-runtime-only fix: `QSpinBox::validate()` is a protected virtual, so it cannot
-be overridden on an instance uic already created.
+**Why a subclass, when C7 did its validator work in a runtime loop.** Three
+cheaper routes were tried and rejected on measurement, not on taste:
+
+1. **Swap the validator on the internal `QLineEdit`** (public API, no
+   subclass). The digits go through, but `QAbstractSpinBox`'s own interpret
+   path still calls the stock `validate()`, and 100 into a [1..99] box
+   commits to **1** — worse than the divergence it was meant to remove.
+2. **Widen the range.** Changes what the pages display and what is written.
+3. **Validator swap PLUS an event filter that pre-clamps on every commit
+   trigger.** This is the closest thing to a runtime-only fix and it very
+   nearly works: 100→99, 24→23, 8001→8000, 32001→32000 all correct on
+   Return. **It gets Hide wrong — 100 then hide gives 1, where 1.3 gives
+   99** — and Hide is the trigger that matters here, because switching View
+   pages hides the spin box and that is the ordinary way to leave a field in
+   SIGEL. Qt 2 commits on FocusOut, Leave, Hide, Return, Up and Down
+   (`qspinbox.cpp:575`); an event filter has to enumerate them and this one
+   silently missed one.
+
+**That is the argument for the subclass in one line: every Qt 6 commit path
+funnels through the virtual `validate()`/`fixup()`, so overriding them covers
+triggers you never thought to enumerate.** The subclass gets Hide and
+FocusOut right without either being mentioned in it. It is also the
+documented extension point — `validate()`, `fixup()`, `valueFromText()` and
+`textFromValue()` are the virtuals `QAbstractSpinBox` and `QSpinBox` expose
+for exactly this — so it is the idiomatic answer as well as the working one.
 
 **One part is NOT restored by this and is left alone deliberately.** 1.3 also
 drops the suffix while editing — `3 bit` at rest, plain `100` while typing,
