@@ -32,7 +32,7 @@ build and run, because nothing else can be verified without it — see §3.
 | T — old-Qt tool container | **done 2026-08-27.** `tools/qtmig`, §4 |
 | D — delete the shim, migrate the data | **DONE 2026-08-30.** `q2compat.h` and `q2compat_check.cpp` deleted; `include/compat/` gone; **no `Q2*` shim type is used anywhere**. D1–D27. *This is not "no Qt 2 container exists" — the unported GUI modules still declare **71 lines** of `QArray`, `QDict`, `QList`-as-pointer-list and friends, all of which Phase C must convert. See D27.* The shim's self-check step is gone from `check.sh`, which now runs no code. §10 |
 | P — PVM | **DONE 2026-08-28.** Vendored 3.4.3 replaced by upstream 3.4.6; nine patches carry the four config lines and Debian's eight source fixes; `libpvm3.a` and `pvmd3` build; SIGEL's two PVM objects link against them and `SIG_GPPVMData` round-trips through real PVM. `sigel`/`sigel_slave` still need Phase C. §7 |
-| C — GUI | **DONE 2026-09-02. C1–C10 complete; C11a–C11d done.** All 20 Designer forms converted; all five GUI modules build as archives; **both programs link and run**; **100 dead `connect()`s repaired, tree-wide count 0 with no baseline anywhere**. **C9** made it match what 1.3 SHOWS — 42 menu entries, the toolbars and the loaded values, now the `gui vs 1.3` gate. **C10** DROVE it, diffed against the oracle driving 1.3 with XTest, and found two defects reading it could not: `QTreeWidget::clear()` emitting a signal Qt 2 blocked, which killed the application on a large delete, and an eaten ampersand. Second gate, `gui behaviour`. **C11a** drove the five View pages C10 never opened — the 12-probe validator battery matches 1.3 character for character under two locales, nine typed values come out byte-identical in the saved `.exp` across the two architectures, and a `QIntValidator` over-range divergence was found and **accepted as D28**. **C11b** drove the Import/Export round trips — **seven of the eight exports are byte-identical to what the 2003 i386 binary writes** — and found default-constructed language parameters coming out alphabetical where 1.3 gives `QDict` hash order, which had also been wrong in `dictorder-baseline.txt` for all seven robots. **C11c** drove the six dialogs, closing C7's validator set at 21 of 21, and found Qt 6 selecting a pre-filled field where Qt 2 did not — a typed digit REPLACED the value instead of appending, so Add-individuals turned 1 into 2 where 1.3 makes it 12. Two reviews of the checking machinery then found five probes that could not fail and a **demonstrated false pass** (all 30 icons replaced with garbage, gate green). **C11d** then opened the MetaGP window for the first time and found C7's locale fix had never reached MT_GUI's ten validators — `"1,000"` accepted, `toInt()` returning zero. **843 pass, 0 fail.** §7 |
+| C — GUI | **DONE 2026-09-02. C1–C10 complete; C11a–C11d done.** All 20 Designer forms converted; all five GUI modules build as archives; **both programs link and run**; **100 dead `connect()`s repaired, tree-wide count 0 with no baseline anywhere**. **C9** made it match what 1.3 SHOWS — 42 menu entries, the toolbars and the loaded values, now the `gui vs 1.3` gate. **C10** DROVE it, diffed against the oracle driving 1.3 with XTest, and found two defects reading it could not: `QTreeWidget::clear()` emitting a signal Qt 2 blocked, which killed the application on a large delete, and an eaten ampersand. Second gate, `gui behaviour`. **C11a** drove the five View pages C10 never opened — the 12-probe validator battery matches 1.3 character for character under two locales, nine typed values come out byte-identical in the saved `.exp` across the two architectures, and a `QIntValidator` over-range divergence was found and **accepted as D28**. **C11b** drove the Import/Export round trips — **seven of the eight exports are byte-identical to what the 2003 i386 binary writes** — and found default-constructed language parameters coming out alphabetical where 1.3 gives `QDict` hash order, which had also been wrong in `dictorder-baseline.txt` for all seven robots. **C11c** drove the six dialogs, closing C7's validator set at 21 of 21, and found Qt 6 selecting a pre-filled field where Qt 2 did not — a typed digit REPLACED the value instead of appending, so Add-individuals turned 1 into 2 where 1.3 makes it 12. Two reviews of the checking machinery then found five probes that could not fail and a **demonstrated false pass** (all 30 icons replaced with garbage, gate green). **C11d** then opened the MetaGP window for the first time and found C7's locale fix had never reached MT_GUI's ten validators — `"1,000"` accepted, `toInt()` returning zero. **The evolution path then ran** — three generations on both machines, counts identical and 87 of 100 pool slots holding the same individual. **844 pass, 0 fail.** §7 |
 | V — check against the 1.3 binary | **V1, V5's MDH probe, V6, V7 and V8 all done, all PASS.** Ordering: 10 of 10 container orders match. Arithmetic: `twoBases` exact bit for bit, `octopus` 9/9 with three joints exact and 5 ulp worst. **V6, V7 and V8 done 2026-08-29** — friction and no-collide negotiation, their four remaining rules, and the GP parameter blocks captured *before* their conversion. `verification-against-sigel-1.3/v6`, `v7`, `v8`. **V9 done 2026-08-29, 3 of 3** — three function bodies disassembled, which symbol lookups cannot see. **V4's reference was RECEIVED 2026-08-30** — two whole-run digests validated across two independent 1.3 runs — but it is not yet a runnable gate here, because the prepared inputs are uncommitted. V2 and V3 not started. V5's sensor and force probes are **invalid as specified** — both target Dynamo-only functions, deleted 2026-08-28. §7 |
 
 **SCOPE — DECIDED 2026-08-23. Read this before changing anything.**
@@ -530,8 +530,8 @@ through `f0f2daa`.
 
 ## 7. Steps
 
-**Exit criterion per step:** `./check.sh` at the repo root — **843 pass, 0 fail,
-508 warnings** as of 2026-09-02, after §9 item 5, and it now **exits non-zero** when
+**Exit criterion per step:** `./check.sh` at the repo root — **844 pass, 0 fail,
+508 warnings** as of 2026-09-02, after §9 items 5 and 2, and it now **exits non-zero** when
 anything fails or is skipped. Zero is reachable because the two permanently
 Windows-only `WIN_*` files are an explicit exclusion rather than a standing
 red — see C11c.
@@ -832,7 +832,7 @@ succeeded.**
 **Gates any session must keep green**, all committed:
 
 ```
-./check.sh                                            843 pass, 0 fail, exit 0
+./check.sh                                            844 pass, 0 fail, exit 0
 ./dictorder-dump.sh | diff -u dictorder-baseline.txt -    empty
 ./fitness-check.sh  | diff -u fitness-baseline.txt -      empty
 ASAN_OPTIONS=detect_leaks=0 ./fitness-check.sh build      exit 0
@@ -4451,7 +4451,7 @@ windows, and nothing happens behind the Start button.
 
 ## 9. Open
 
-### C11 — the coverage gap C10 leaves — C11a–C11d DONE; the evolution path OPEN
+### C11 — the coverage gap C10 leaves — C11a–C11d DONE; the evolution path DONE 2026-09-02
 
 C10 found two defects in **fifteen** driven scenarios. That density is the
 argument for continuing: the defects were not in the parts anyone suspected,
@@ -4471,8 +4471,42 @@ no slicing of `guidump-baseline.txt` gives it. Corrected by review.*
 | ~~**5 of the 6 View pages**~~ **DONE in C11a** — all five driven: 29 spin boxes, 20 sliders, 7 combos, 4 checkboxes, 8 radios, 20 of the 21 validators. The 21st is on `SIG_EditCommandDialog`, so it belongs to the dialogs item | closed. The validator battery matches 1.3 character for character under two locales; a `QIntValidator` regression came out of it, accepted as a divergence by D28 and pinned in the gate |
 | ~~**15 of 16 Import/Export children**~~ **DONE in C11b** — all eight exports driven and diffed against 1.3, the five parameter formats round-tripped, and Robot / Program / Individual import driven | closed. Seven of eight exports byte-identical across the two architectures; the eighth differs for a documented Phase D reason. One defect found and fixed, one preserved |
 | ~~**6 dialogs**~~ **DONE in C11c** — EditCommand, EditHost, InfoBox, RobotInfo, IndividualView and AddIndividuals beyond its OK | closed. C7's 21st validator driven; a select-on-focus defect found and fixed at four sites; a command-insertion divergence measured and kept |
-| **The evolution path entirely** | the generation counter, statistics, fitness curve, and the enable/disable sweep during a run |
+| ~~**The evolution path entirely**~~ **DONE 2026-09-02** — three generations driven on both machines from the same input, single-slave, terminating by Generation set through the Evolution control tab | closed, and three of the four named unknowns answered rather than merely exercised. **The enable/disable sweep**: Start GREYED and Stop ENABLED for the whole run, then back. **The generation counter DOES NOT MOVE during a run, and that is 1.3 behaviour to preserve** — the only two statements that would update it, `SIG_GUIGPManager.cpp:40` and `:72`, are **commented out in the vendor commit**, the sources as released 2003-04-30, one of them under `// update generations display (this line looks cool, doesn't it ?!)`. The only live update is `SIG_ExperimentView.cpp:64` — and it is **inside `putIntoExperiment()`** (which begins at `:59`), not inside any refresh hook, so the counter moves when the experiment is selected, when a page is switched, and at the top of `slotStartEvolution` — **never when a run ends.** `slotEvolutionStopped()` (`SIG_Experiment.cpp:642`) only re-enables widgets. Confirmed from behaviour on BOTH binaries: 187 samples here across 554 s and 172 on the oracle across two generation boundaries, every one reading the starting value. **And the post-run behaviour matches too — checked because the oracle reported a possible divergence and it turned out to be MY error, not the port's.** 1.3 still reads the old value after the run and only updates after a page switch; this port reads **136 at every sample for 30 s after `Start` returned**, and through Stop, in the 3-generation run. An earlier reading of *“139 once Start returned”* came from the 1-generation run, where `guidrive`'s legacy direct-invoke probe ran `slotStartEvolution` a second time and its `putAllIntoExperiment()` refreshed the LCD. That probe is now suppressed whenever `SIGEL_GENERATIONS` is set — it would also start a second evolution over the population being compared. **The fitness curve** is `experimentHistory`, one entry per generation, and it grew by exactly 3 to 139 entries, gen 1..139 contiguous, on both machines. **Statistics** were not driven — `update statistics` is still an unclicked toolbar action, as it was after C11d |
 | ~~**`MT_GUI`**~~ **DONE in C11d** — the MetaGP window and its six pages driven; a C7-class locale defect found and fixed. **`SIGEL_SlaveGUI`** is still undriven | the slave's simulation window, and MT_GUI's toolbar actions, which were surveyed but not clicked |
+
+**Reproducing the evolution comparison.** `guidrive.cpp`'s `evolution` scenario
+takes **`SIGEL_GENERATIONS=N`**, which selects `Generation` in
+`comboboxTerminationBy` and types N into `spinboxByGenerationNumber` on the
+**Evolution control** tab, then reads the value back OUT of the experiment
+(`model=1`) rather than trusting the widget — `slotStartEvolution` calls
+`putAllIntoExperiment()` before it runs. It saves the evolved experiment through
+`File > Save Experiment` at the end, because a run that leaves no artefact
+cannot be diffed. The combo's items are User / Time / Generation / Time-or-
+generation, which is **not** the enum order (`byTime`, `byGeneration`,
+`byTimeGeneration`, `byUser`): index 2 maps to enum 1
+(`SIGEL_MasterGUI/SIG_GPParameter.cpp:155-169`). The old `SIGEL_RUN_LONGER`
+duration path is kept as the `else` branch.
+
+*The run input is BUILT, not shipped: `data/Experiments/twoBasesSimpleFitness1.exp`
+with the GP `RANDOMSEED` — the **second** of the two, the first being the
+simulation's (`SIG_GPParameter.cpp:387` against
+`SIG_SimulationParameters.cpp:102`) — set to 12345, the eight 2003 PVMHOST lines
+replaced by one local host at max-processes 1, and the paths rewritten. The
+oracle proved its own reference inputs derive from that same shipped file, and
+`expstruct.py` confirmed the reconstruction independently: identical
+`ORDER`/`PROGRAMS` and the same 21185 structural lines.*
+
+**`expstruct.py` is the comparison tool**, and it is in the repo because two
+machines had to run identical logic rather than two readings of a spec. It
+prints the counts, a per-individual line in file order, and `ORDER`/`PROGRAMS`/
+`SHAPE`/`HISTORY` hashes, and it **drops every float by construction** — `--audit`
+prints every line it refused to look at. `--selfcheck` asserts both halves of
+the property everything rests on (blind to fitness, sighted on structure) and is
+a `check.sh` section costing 0.34 s; teeth-tested by disabling both fitness
+filters and by blinding the program matcher. **Read `ORDER`/`PROGRAMS` with
+care: they are all-or-nothing and hid an 87%-identical population behind a
+single mismatched hash.** When they differ, get the per-individual names before
+concluding anything.
 
 **Do it as C11 with the same method, not a rewrite.** `guidrive.cpp` already has
 the machinery — modal interception, context-menu posting, a watchdog, PVM
@@ -4486,17 +4520,17 @@ and C7 had already been bitten by**; ~~(2) the Import/Export round trips~~ —
 **done, and the guess was right again: byte-comparable files caught a defect
 that had corrupted a committed baseline**; ~~(3) the remaining dialogs~~ — **done, and the guess held a third
 time: the defect it found needed no invalid input at all**; ~~(4) `MT_GUI`~~ — **done, and it found the same defect class C7 had
-fixed everywhere else**; (5) the evolution path, last. *This said it "needs a
+fixed everywhere else**; ~~(5) the evolution path, last~~ — **done, and it was the one place the guess did NOT hold: the defect-hunt found no port defect, and what it found instead was that this section's own comparison premise was wrong.** *This said it "needs a
 throughput answer before it can be observed at all".* **THE ANSWER ARRIVED
 2026-09-02 and it is measured, not estimated** — see the open-items table.
 
-**Open after C11c — five items, of which item 5 is now closed.** The `QSpinBox` divergence is closed: **D28**
+**Open after C11c — five items, of which items 2 and 5 are now closed.** The `QSpinBox` divergence is closed: **D28**
 accepted it. The Import/Export item is closed by C11b.
 
 | # | open item | blocked on |
 |---|---|---|
 | **1** | **`pagesave` and `roundtrip` have no gate.** `pagesave` proved nine parameter values byte-identical across the two architectures and `roundtrip` proved the five formats survive an export-import-export cycle; both are run by hand. A regression between the widget and the file, or in a reader, would not be caught by the gate — `pages` covers widget to widget and `exportall` covers widget to file in one direction only | a committed reference parameter block. Natural to do with the Import/Export item, which is byte-comparable files for the same reason |
-| **2** | **One C11 item left — the evolution path, and it is NO LONGER BLOCKED.** The oracle supplied the throughput answer on 2026-09-02 from `master.log` timestamps of **completed runs on the 2003 i386 box**, not from an estimate: `twoTriDepth250` took 19 h 57 m for 299 generation intervals, **≈ 4.0 minutes per generation**; `octGateA` (octopus) took 9 m 00 s then 6 m 29 s. So a generation costs MINUTES on that hardware. **That retrospectively explains C10** — its failure to see a generation complete was the expected result, not an unexplained one. **Fifteen completed runs are available as reference data, and each is a before/after PAIR** — `<name>.input.exp` as it went in and `<name>.exp` as it came out, plus `master.log`, `pvmd.log`, `slaveruns.log`, `RUNINFO.txt`, the `.wrl` bodies and a `pool/` with per-generation snapshots (31 for `twoTriDepth250` and `twoTriNanoF1200`, 18 for `twoTriNano`, 16 for `twoTriNice75`, 2–4 for the short gate runs). *Contents verified by the oracle rather than described from memory; not visible from this machine.* **The input half is what makes it strong**: the port can be driven from the identical input and its output diffed, instead of comparing against a pool whose provenance would have to be reconstructed — and the snapshots mean the comparison need not be all-or-nothing at the end of a run. **Structural only.** Per D26 and §7, a fitness number is not a cross-machine reference in either direction — a 1-ULP change in start height moves fitness 45%, and that box is i386/x87 against this one's aarch64/IEEE. What compares exactly is the same individuals present, the same names, the same program text, the same ordering and the same file shape | nothing. What it needs is a scenario shaped for minutes: set `Termination by:` to **Generation** and a small N through the Evolution control tab — 1.3 does not need the file edited — which gives a run that measurably starts, progresses and stops. **Precondition:** the `sigel_slave` wrapper on the oracle's side, in place since C9; without it a spawn dies in under a second and looks exactly like nothing happening. Note the 4 min/generation is *i386-2003* hardware; this machine's figure is still unmeasured |
+| **2** | ~~**One C11 item left — the evolution path**~~ **DONE 2026-09-02. The evolution path was driven end to end, and it corrected this item's own premise.** Three generations run through the GUI on both machines from the same input, single-slave, and diffed with `expstruct.py`. **What matched exactly: every COUNT.** `NEXTIDENTIFIER` **12552** — 245 identifiers consumed over three generations, predicted by the oracle before the run and hit on the nose — plus `POOLGENERATION` 139, `POPULATIONSIZE` 100, `INDIVIDUALS` 100 and `HISTORY` 139 entries, gen 1..139, contiguous. So the GP draws from the randomiser the same number of times in the same sequence on i386/x87 and on aarch64/IEEE. **What did not match: the contents — and that is NOT a port defect.** `SIG_GPSimpleTournament.cpp:77` picks the survivor with a bare `if (var1 >= var2)` between two doubles the physics produced. The randomiser decides which pairs fight and how many fights there are — identical, hence 12552; fitness decides who wins, and §7 measures a 1-ULP change in start height moving fitness 45%. **Measured distance: 87 of 100 pool slots hold the identical individual, 91 of 100 names are shared, 13 slots differ** — several of those the same individual in a different loser's slot, which is exactly what a flipped tournament looks like. **THE PREMISE THIS ITEM WAS WRITTEN ON IS WRONG AND IS CORRECTED HERE:** it said what compares exactly is *“the same individuals present, the same names, the same program text, the same ordering and the same file shape”*. Names, program text and ordering are all downstream of that float comparison and **cannot** match across these two architectures however faithful the port is. **Counts compare across machines; contents compare only within a machine.** Both halves are measured: `runA == runB` here and `serA == serB` on the oracle, byte-identical reports each side, so the divergence is specifically cross-architecture and not the GP being loose | closed. **Throughput, measured on THIS machine and no longer unmeasured:** 3 generations in 554.8 s = **185 s/generation** (100 individuals, one slave, twoBases/SimpleFitness), and 212 s for a single-generation run where the fixed start-up is not amortised; two runs agreed to 0.07%. The oracle's like-for-like 1-slave figure is 220 s. *Its earlier ≈4.0 min/generation was one run at an unrecorded slave count and it retracted that as predictive — slave count alone moves the figure 3.2x.* **SLAVES=1 IS A PRECONDITION, not a preference:** the oracle measured two same-seed 8-slave runs differing in 64 of 100 names on one machine, so above one slave there is no baseline to diff against at all |
 | **3** | **`QHashSeed::setDeterministicGlobalSeed()` was never added to `sigel.cpp`.** §10 says "PHASE C MUST ADD" it to `sigel.cpp` and `sigel_slave.cpp`; Phase C closed without doing so, and the sentence sits under a heading reading "Determinism — resolved". Measured: the call exists once in the tree, `sigel_eval.cpp:511`. **Also mis-scoped** — only `sigel` links the three `QHash`es, and `sigel_slave` links `GUI_SLAVE`, which has none | nothing. It is a bookkeeping gap rather than a live defect: the one iteration site is destruction, which is order-insensitive. But it is unowned, and that is why it is here |
 | **4** | **Six dropped size constraints from C2 were never restored.** §7 says "C6/C7 own it"; both closed without it. Measured: `MT_IndividualWidgetBase.ui` has three `130` values in `v1.3-pristine` and zero today, and `Layout32/33/28/60/22` appear in no converted form | nothing. Cosmetic — layout minimums, not behaviour — but it was an open item that vanished when its owning step closed |
 | **5** | ~~**A use-after-free in `SIG_SimulationVisualisationWidget.cpp:414` is now reachable.**~~ **FIXED 2026-09-02.** `visualisation = nullptr;` now sits between the `delete` and the `new`. The premise was re-verified rather than inherited: `SIG_Simulation.cpp`'s `default:` case throws for `SIMULATIONLIBRARY 0`, the widget has **21** `visualisation->` dereferences behind **14** `if (visualisation)` guards, and the throw unwinds out of `visualizeThis()` between the two statements. **But the 14 dereferences are NOT reached at runtime today, and the record said otherwise** — checked rather than inherited: the sole caller is `sigel_slave.cpp:293`, which wraps `visualizeThis()` in a `catch` that prints and `return 1`s, so the process exits before `a.exec()` and no event ever reaches a guard; the widget's destructor is **empty**, so there is no double free either; and `SIGEL_MasterGUI` never calls `visualizeThis` at all. **The line is kept regardless** — it is one line, it is what `physics_backends.md` prescribed, and it makes the member safe for any caller that catches and continues, which is one edit away. What is gated is the null, not a live crash. *`physics_backends.md` cited lines 376-381; the site is at 414 — line drift, not a second site.* | closed. Gated: `check.sh`'s **`freed-pointer null`** flattens comments and newlines and requires every `delete visualisation;` to be followed by a null assignment — teeth-tested by deleting the line (1 pass → 1 fail). **Deliberately NOT generalised:** 19 sites in the tree are delete-then-new with no intervening null, and the others (validators, program parts) are benign, so a blanket rule would be noise rather than a gate |
@@ -4512,6 +4546,46 @@ accepted it. The Import/Export item is closed by C11b.
 - **Any harness must link `$(MASTER_OBJ)`**, or the Clean `SIG_GPExperiment`
   leaves `mtController` uninitialised and produces a convincing false crash.
 - **`QTest` is not a mouse.** Whatever is driven, the record must keep saying so.
+- **`slotStartEvolution` BLOCKS, so a sampling loop written after the click sees
+  only the finished state.** `gpManager->start()` runs the whole evolution
+  inline (`SIG_Experiment.cpp:282`, with `slotEvolutionStopped()` on the very
+  next line), and the GUI survives only because
+  `SIG_GUIGPManager::haveABreak()` calls `qApp->processEvents()`. Anything that
+  must observe a RUNNING evolution has to be armed BEFORE the click — the
+  `evolution` scenario uses a `QTimer` for exactly this. The oracle hit the
+  same shape driving 1.3 with XTest and armed its capture first.
+- **`sigel_slave` builds `"$SIGEL_ROOT/Terrain.ter"` from an unchecked
+  `getenv()`, so an unset `SIGEL_ROOT` segfaults every slave on spawn** — and
+  PVM tasks inherit *pvmd's* environment, not the master's, so it can be set
+  for the master and still absent for the slave. Measured by the oracle, whose
+  wrapper must export it explicitly; it does not arise here only because this
+  tree's `sigel_slave` is a native binary that `pvmd` execs directly with the
+  launching environment. Set it for the daemon, not just for the GUI.
+- **`pvmd` resolves the slave executable relative to the directory in the
+  PVMHOST line**, not `SIGEL_ROOT`. A wrong directory gives
+  `pvm_spawn() failed ... (0/-7) - Executable ... is not found`, once per
+  individual. Here the PVMHOST directory IS the build directory, so the two
+  coincide; that is a property of this setup and not a general one.
+- **`tearDownPvm()`'s `pvm_halt()` BLOCKS FOR EVER at exit, so every evolution
+  run ends by being killed rather than by exiting**, and `timeout` reports 124
+  or the shell reports 143/15. The scenario itself has completed and its files
+  are written by then, so the artefacts are good — but the exit status of an
+  evolution run means nothing and must not be read as pass/fail. Located with
+  gdb rather than guessed: `guidrive.cpp:349` → `pvm_halt` → `msendrecv` →
+  `mroute` → `mxfer` → `select()`, in `PvmGuard::~PvmGuard` after `main`
+  returned. **Pre-existing, and deliberately not changed here** — `pvm_halt()`
+  is what stops the daemon this process started, and the comment above it
+  records that dropping it left `pvmd3` and its slaves running. Measured: no
+  stray `pvmd3` survives the kill, so the current behaviour is safe if untidy.
+- **A `printf` before an early `return` in `guidrive` is LOST unless flushed on
+  that path.** stdout is block-buffered when redirected to a file, and because
+  of the `pvm_halt` block above the process never reaches exit to flush it. An
+  assertion added during this step fired correctly and its message vanished;
+  it was only visible under gdb. Flush on the failing path, not after the block.
+- **Above one slave there is no baseline at all.** Two same-seed 8-slave runs
+  on the oracle's single machine differed in 64 of 100 individual names.
+  Whether that is GP evaluation order or the PVM layer is UNMEASURED. Any
+  evolution comparison must pin PVMHOST field 2 to 1.
 - **Verify every finding before acting.** C10: three apparent defects were the
   probe, two oracle readings retracted. C11a: three more, all the probe.
 - **`QTest` posts key events STRAIGHT AT THE WIDGET, focus or no focus**, so a

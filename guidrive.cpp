@@ -2918,7 +2918,95 @@ int main(int argc, char **argv)
         // termination has to be changed first -- through the GUI, by clicking
         // the "interprete as duration" radio and typing a duration, exactly as
         // a user would.
-        if (qgetenv("SIGEL_RUN_LONGER") == "1") {
+        // Terminate by GENERATION, not by duration. Every shipped experiment
+        // terminates on a DATE in 2001, so a correct Start runs and finishes at
+        // once -- MEASURED here rather than assumed: with the shipped
+        // termination this scenario saw signalEvolutionNotRunning emit false
+        // then true with the generation LCD unmoved at 136. A generation count
+        // is the lever that gives a run which measurably starts, progresses and
+        // stops, and it is the same lever the oracle's fifteen reference runs
+        // were produced with -- TERMINATIONGENERATIONNO, PORTING.md 9 item 2.
+        const int wantGens = qEnvironmentVariableIntValue("SIGEL_GENERATIONS");
+        if (wantGens > 0) {
+            clickMenu("&View", "&GP Parameters");
+            QTest::qWait(400);
+            QWidget *gp = st->currentWidget();
+            // The page REMEMBERS its tab and the View menu does not reset it,
+            // so the tab is chosen BY NAME. "Evolution control" is the tab that
+            // holds both the termination combo and the generation spin box
+            // (SIG_GPParameterBase.ui:1162).
+            QTabWidget *gptabs = gp ? gp->findChild<QTabWidget *>() : nullptr;
+            const char *tabbed = "NOT FOUND";
+            if (gptabs) for (int i = 0; i < gptabs->count(); ++i)
+                if (gptabs->tabText(i) == "Evolution control") {
+                    QTabBar *bar = gptabs->tabBar();
+                    QTest::mouseClick(bar, Qt::LeftButton, Qt::NoModifier,
+                                      bar->tabRect(i).center());
+                    QTest::qWait(200);
+                    tabbed = "Evolution control";
+                    break;
+                }
+            QComboBox *term = gp ? gp->findChild<QComboBox *>("comboboxTerminationBy") : nullptr;
+            QSpinBox  *gens = gp ? gp->findChild<QSpinBox  *>("spinboxByGenerationNumber") : nullptr;
+            printf("  [termination] tab=%s combo=%s spin=%s\n", tabbed,
+                   term ? "found" : "MISSING", gens ? "found" : "MISSING");
+            if (!term || !gens) { printf("!! cannot set termination by generation\n"); return 1; }
+
+            // The combo's items are User / Time / Generation / Time or
+            // generation, which is NOT the enum order (byTime, byGeneration,
+            // byTimeGeneration, byUser). Index 2 is the one that maps to
+            // byGeneration -- SIGEL_MasterGUI/SIG_GPParameter.cpp:155-169.
+            // setCurrentIndex rather than a popup click: QTest is not a mouse
+            // and a combo popup is where that difference bites hardest.
+            term->setCurrentIndex(2);
+            QTest::qWait(150);
+            gens->setFocus();
+            QTest::keyClick(gens, Qt::Key_A, Qt::ControlModifier);
+            QTest::keyClicks(gens, QString::number(wantGens));
+            QTest::qWait(150);
+            printf("  [termination] combo=[%s] index=%d  generations spin=%d\n",
+                   qPrintable(term->currentText()), term->currentIndex(), gens->value());
+            fflush(stdout);
+
+            lv->setCurrentItem(lv->topLevelItem(0));
+            QTest::qWait(400);
+            // Widget values only matter once they are IN the experiment.
+            // Selecting the experiment runs putAllIntoExperiment()
+            // (SIG_ExperimentListView.cpp:224) and slotStartEvolution() runs it
+            // again, so read the experiment back rather than trusting the
+            // widget: 1 is byGeneration.
+            if (SIG_Experiment *ex = lv->currentlySelectedExperiment()) {
+                const int gotModel = (int)ex->gpExperiment.gpParameter.getTerminationModel();
+                const int gotGens  = ex->gpExperiment.gpParameter.getTerminationGenerationNo();
+                printf("  [termination in experiment] model=%d (1=byGeneration) generationNo=%d\n",
+                       gotModel, gotGens);
+                // ASSERT rather than merely print. If the widget values did not
+                // reach the experiment the run terminates instantly, the counts
+                // come out wrong, and a scenario that only printed would have
+                // produced a plausible-looking artefact to diff. Fail here, where
+                // the reason is still visible.
+                if (gotModel != 1 || gotGens != wantGens) {
+                    printf("!! termination did not reach the experiment: wanted "
+                           "model=1 generationNo=%d\n", wantGens);
+                    // Flush BEFORE returning, not after the block. stdout is
+                    // block-buffered to a file and tearDownPvm()'s pvm_halt()
+                    // blocks in select() for ever, so the process never reaches
+                    // exit and never flushes on its own -- an assertion whose
+                    // message is lost is worse than no assertion. Measured: this
+                    // exact message vanished until the flush moved up here.
+                    fflush(stdout);
+                    return 1;
+                }
+            } else { printf("!! no experiment selected\n"); fflush(stdout); return 1; }
+            fflush(stdout);
+            st = W->findChild<QStackedWidget *>();
+            start = stop = nullptr;
+            for (QPushButton *b : st->currentWidget()->findChildren<QPushButton *>()) {
+                if (b->text() == "&Start") start = b;
+                if (b->text() == "S&top")  stop  = b;
+            }
+            if (!start || !stop) { printf("!! lost Start/Stop\n"); return 1; }
+        } else if (qgetenv("SIGEL_RUN_LONGER") == "1") {
             clickMenu("&View", "&GP Parameters");
             QTest::qWait(400);
             QWidget *gp = st->currentWidget();
@@ -2966,8 +3054,51 @@ int main(int argc, char **argv)
         SIG_Experiment *exp = lv->currentlySelectedExperiment();
         QSignalSpy *evo = exp ? new QSignalSpy(exp, SIGNAL(signalEvolutionNotRunning(bool)))
                               : nullptr;
+        // slotStartEvolution() BLOCKS. It calls gpManager->start(), which runs
+        // the whole evolution inline and returns only when it has stopped
+        // (SIG_Experiment.cpp:282, with slotEvolutionStopped() on the next
+        // line). The loop stays responsive only because
+        // SIG_GUIGPManager::haveABreak() calls qApp->processEvents(), so a
+        // timer armed BEFORE the click fires DURING the run. The sampling loop
+        // further down runs after start() has returned and can therefore only
+        // ever see the finished state -- which is why a generation counter that
+        // moves has to be caught from here.
+        QElapsedTimer runClock;
+        int lastGen = -1, samples = 0;
+        QTimer sampler;
+        QObject::connect(&sampler, &QTimer::timeout, [&]() {
+            QWidget *cw = st->currentWidget();
+            int gen = -1;
+            for (QLCDNumber *l : cw->findChildren<QLCDNumber *>())
+                if (l->objectName() == "lcdnumberGenerations") gen = (int)l->value();
+            ++samples;
+            // Print every sample for the first few, then only on a CHANGE, so a
+            // long run does not bury the transitions it exists to show.
+            if (samples <= 3 || gen != lastGen) {
+                printf("  [run t+%5llds] generations=%d Start=%s Stop=%s\n",
+                       (long long)(runClock.elapsed() / 1000), gen,
+                       start->isEnabled() ? "enabled" : "GREYED",
+                       stop->isEnabled()  ? "ENABLED" : "greyed");
+                fflush(stdout);
+            }
+            lastGen = gen;
+        });
+        sampler.start(2000);
+        runClock.start();
         printf("\n  >> clicking Start\n"); fflush(stdout);
         QTest::mouseClick(start, Qt::LeftButton, Qt::NoModifier, start->rect().center());
+        const qint64 runMs = runClock.elapsed();
+        sampler.stop();
+        // The cost of a generation ON THIS MACHINE. PORTING.md 9 records the
+        // oracle's ~4.0 min/generation as a measurement of ONE run on 2003
+        // i386 hardware at an unrecorded slave count -- the oracle then
+        // measured that figure moving 3.2x with slave count alone, so it
+        // predicts nothing here. This line is this machine's own number.
+        if (wantGens > 0)
+            printf("  [throughput] Start returned after %lld ms for %d generation(s)"
+                   " = %lld ms/generation, %d samples taken during the run\n",
+                   (long long)runMs, wantGens, (long long)(runMs / wantGens), samples);
+        fflush(stdout);
         // Sample FAST: this experiment terminates on a DATE that is long past,
         // so a correct Start can run to completion and re-enable itself well
         // inside a 5-second sampling gap. A slow poll cannot tell that apart
@@ -2997,7 +3128,13 @@ int main(int argc, char **argv)
         // slot directly on the same object the button is connected to. If THIS
         // greys Start, the click path is broken; if it does not, the slot is
         // running and choosing to do nothing.
-        if (SIG_Experiment *ex = lv->currentlySelectedExperiment()) {
+        // C10 added this to tell a dead connect from a guard that declines. A
+        // run that has just moved the generation counter has already answered
+        // that, and invoking the slot again starts a SECOND evolution over the
+        // population this scenario exists to compare -- so it is skipped
+        // whenever a generation count was asked for.
+        if (SIG_Experiment *ex = wantGens > 0 ? nullptr
+                                              : lv->currentlySelectedExperiment()) {
             bool ok = QMetaObject::invokeMethod(ex, "slotStartEvolution",
                                                 Qt::DirectConnection);
             QTest::qWait(600);
@@ -3026,6 +3163,35 @@ int main(int argc, char **argv)
         clickMenu("&View", "&Population");
         QTest::qWait(500);
         step("population after the evolution stopped", false, false, true);
+
+        // Write the evolved experiment out. Without this the run leaves nothing
+        // to compare: PORTING.md 9 item 2 wants the port driven from the same
+        // input as the oracle's reference runs and its OUTPUT diffed
+        // structurally -- individuals, names, program text, ordering, file
+        // shape, never fitness (D26: a 1-ULP change in start height moves
+        // fitness 45%, and that box is i386/x87 against this one's aarch64).
+        if (wantGens > 0) {
+            const QString evolved = scratch() + "/evolved.exp";
+            QFile::remove(evolved);
+            whenModal([evolved](QWidget *m) {
+                QFileDialog *fd = qobject_cast<QFileDialog *>(m);
+                if (!fd) { printf("  !! save modal is not a QFileDialog\n"); m->close(); return; }
+                acceptFileDialog(fd, evolved);   // never hand-roll a second one
+            });
+            clickMenu("&File", "&Save Experiment");
+            QTest::qWait(8000);
+            printf("  [evolved saved] exists=%d size=%lld path=%s\n",
+                   QFile::exists(evolved), QFileInfo(evolved).size(),
+                   qPrintable(evolved));
+            // A run costs minutes; a silently unwritten artefact would waste all
+            // of them and look like a comparison that simply had nothing to say.
+            if (!QFile::exists(evolved) || QFileInfo(evolved).size() == 0) {
+                printf("!! the evolved experiment was not written -- nothing to diff\n");
+                fflush(stdout);
+                return 1;
+            }
+            fflush(stdout);
+        }
         return 0;
     }
 

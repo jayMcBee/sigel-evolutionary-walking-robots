@@ -570,6 +570,38 @@ printf '%-22s %2d pass  %2d fail\n' "freed-pointer null" "$vp" "$vf"
 pass=$((pass+vp)); fail=$((fail+vf))
 
 # ---------------------------------------------------------------------------
+# The structural fingerprint tool's own teeth.
+#
+# expstruct.py is what compares an evolved .exp across the two architectures
+# (PORTING.md 9, the evolution path). Everything it concludes rests on ONE
+# property: it must be blind to fitness and sighted on structure. Fitness is
+# not a cross-machine reference in either direction -- D26 and section 7
+# measure a 1-ULP change in start height moving fitness 45%, and the reference
+# box is i386/x87 against this one's aarch64 -- while the tournament that picks
+# survivors is a bare `>=' between two of those doubles
+# (SIG_GPSimpleTournament.cpp:77). So a tool that let one fitness value reach
+# its output would report an unavoidable divergence as a regression.
+#
+# --selfcheck asserts BOTH halves, because a tool that saw nothing at all would
+# pass the fitness half on its own: a changed FITNESS value must not move the
+# report, a changed program operand must, and two swapped individuals must.
+# It compares the WHOLE report including SHAPE -- an earlier version compared
+# only the counts and the content hashes, and could not have caught fitness
+# leaking into SHAPE. Teeth-tested by disabling both fitness filters (caught)
+# and by blinding the program matcher (caught).
+ep=0; ef=0
+if python3 "$ROOT/expstruct.py" --selfcheck \
+       "$ROOT/data/Experiments/twoBasesSimpleFitness1.exp" >/tmp/eps.$$ 2>&1; then
+    ep=1
+else
+    ef=1
+    sed 's/^/  /' /tmp/eps.$$
+fi
+rm -f /tmp/eps.$$
+printf '%-22s %2d pass  %2d fail\n' "expstruct selfcheck" "$ep" "$ef"
+pass=$((pass+ep)); fail=$((fail+ef))
+
+# ---------------------------------------------------------------------------
 # The two programs. They are src/*.cpp, so no entry in MODULES reaches them and
 # nothing compiled them until C8 -- which is how a QMotifPlusStyle that Qt 6
 # does not have, and a pthread_create cast C++17 rejects, both survived this
