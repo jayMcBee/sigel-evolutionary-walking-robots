@@ -2956,11 +2956,19 @@ int main(int argc, char **argv)
                 printf(" [%s]", qPrintable(tw->tabText(i)));
             printf("\n");
         }
+        // GEOMETRY IS REPORTED because a control the user cannot see or hit is a
+        // usability defect, not a cosmetic one. 1.3 has seven 50x50 navigation
+        // buttons inside a 220x331 group (oracle, measured on screen).
+        for (QGroupBox *g : sw->findChildren<QGroupBox *>())
+            printf("    group   [%-24s] %dx%d at +%d+%d visible=%d\n",
+                   qPrintable(g->title()), g->width(), g->height(), g->x(), g->y(),
+                   g->isVisible());
         for (QAbstractButton *b : sw->findChildren<QAbstractButton *>()) {
             const char *kind = qobject_cast<QCheckBox *>(b) ? "check" : "button";
-            printf("    %-7s [%-24s] text=[%s] enabled=%d checkable=%d checked=%d\n",
-                   kind, qPrintable(b->objectName()), qPrintable(b->text()),
-                   b->isEnabled(), b->isCheckable(), b->isChecked());
+            printf("    %-7s [%-24s] %dx%d at +%d+%d icon=%d text=[%s] enabled=%d checked=%d\n",
+                   kind, qPrintable(b->objectName()), b->width(), b->height(),
+                   b->x(), b->y(), b->icon().isNull() ? 0 : 1,
+                   qPrintable(b->text()), b->isEnabled(), b->isChecked());
         }
         for (QSlider *sl : sw->findChildren<QSlider *>())
             printf("    slider  [%-24s] value=%d min=%d max=%d step=%d enabled=%d\n",

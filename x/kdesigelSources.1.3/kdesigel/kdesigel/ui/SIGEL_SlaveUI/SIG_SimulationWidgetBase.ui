@@ -251,6 +251,12 @@
                       <vsizetype>0</vsizetype>
                     </sizepolicy>
                   </property>
+                  <property name="minimumSize">
+                    <size>
+                      <width>220</width>
+                      <height>331</height>
+                    </size>
+                  </property>
                   <property name="title">
                     <string>Navigation</string>
                   </property>

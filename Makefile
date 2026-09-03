@@ -599,7 +599,7 @@ guidrive: $(B)/guidrive
 $(B)/guidrive: guidrive.cpp $(MOC_OBJS) $(QRC_OBJS) $(GUI_LIBS) $(CORE_LIBS) \
                $(VENDOR_LIBS) $(PVM_LIB)
 	$(SIGCXX) -DQT_CORE_LIB -DQT_GUI_LIB -DQT_WIDGETS_LIB -DQT_TESTLIB_LIB \
-	  $(SIGINC) -isystem $(QTINC)/QtTest $< $(MOC_OBJS) $(QRC_MASTER) $(MASTER_OBJ) -o $@ \
+	  $(SIGINC) -isystem $(QTINC)/QtTest $< $(MOC_OBJS) $(QRC_MASTER) $(QRC_SLAVE) $(MASTER_OBJ) -o $@ \
 	  -Wl,--start-group $(GUI_LIBS) $(CORE_LIBS) $(VENDOR_LIBS) -Wl,--end-group \
 	  -lQt6Test $(SIGLIBS)
 	@want=`$(call ctor_size,$(MASTER_OBJ))`; got=`$(call ctor_size,$@)`; \
