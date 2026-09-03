@@ -1376,6 +1376,32 @@ int main(int argc, char **argv)
     // Anything that returns from run() gets PVM torn down; the watchdog does it
     // itself because _exit() runs no destructors.
     struct PvmGuard { ~PvmGuard() { tearDownPvm(); } } pvmGuard;
+    // POSITIVE CONTROL for check.sh's `runtime connect' check, and it has to
+    // be a real dead connect rather than a plain qWarning. That check greps
+    // this process's stderr for Qt's "No such signal"/"No such slot", which is
+    // the only thing that catches a string-based connect naming something
+    // Qt 6 does not have -- $DEAD_SIGNALS is a closed regex over nine Qt 2
+    // spellings and cannot see a tenth.
+    //
+    // Qt emits that warning under the LOGGING CATEGORY qt.core.qobject.connect,
+    // and categories are filterable: QT_LOGGING_RULES='*=false' in the ambient
+    // environment, or a qtlogging.ini, silences it. An empty stderr then looks
+    // exactly like a clean run, so the check would pass while seeing nothing --
+    // demonstrated by review, which ran the full gate green with a genuinely
+    // dead connect injected.
+    //
+    // A control in the `default' category would not close it:
+    // qt.core.qobject.connect can be disabled on its own, leaving the control
+    // visible and the check blind. So the control is a deliberately bogus
+    // connect, which fires through the SAME category by the SAME mechanism.
+    // check.sh requires this line to be present and ignores it when grepping
+    // for real ones.
+    {
+        QObject control;
+        QObject::connect( &control, SIGNAL( guidriveStderrControl() ),
+                          &control, SLOT( deleteLater() ) );
+    }
+
     QString scenario = argc > 1 ? argv[1] : "open";
     QString expFile  = argc > 2 ? argv[2]
         : qEnvironmentVariable("SIGEL_EXP",

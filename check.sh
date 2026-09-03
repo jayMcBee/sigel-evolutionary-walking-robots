@@ -907,11 +907,67 @@ elif make -s -C "$ROOT" B=build-fast SAN= SIGSAN= guidrive >/tmp/bdb.$$ 2>&1; th
             SIGEL_SCRATCH="${TMPDIR:-/tmp}" QT_QPA_PLATFORM=offscreen \
             timeout 300 "$ROOT/build-fast/guidrive" "$sc" > "$out" 2>>/tmp/berr.$$
     }
-    : > /tmp/berr.$$
+    # `|| bf=1' because this runs under `set -e' with no trap: a bare `: > path'
+    # that fails (unwritable or full /tmp) would abort the WHOLE script here,
+    # with no summary line and no total -- the silent-short-run shape this file
+    # has already been bitten by three times, but applied to everything rather
+    # than one section.
+    : > /tmp/berr.$$ || bf=1
     if guidrive_run gate /tmp/bo.$$ && guidrive_run pages /tmp/bp.$$ \
        && guidrive_run exportall /tmp/bx.$$ && guidrive_run overwrite /tmp/bw.$$ \
        && guidrive_run dialogs /tmp/bg.$$ && guidrive_run metagui /tmp/bm.$$; then
         cat /tmp/bo.$$ /tmp/bp.$$ /tmp/bx.$$ /tmp/bw.$$ /tmp/bg.$$ /tmp/bm.$$ > /tmp/ball.$$
+        # The driver prints `!!' when it could not do what it was asked -- a
+        # dialog that would not accept, a file that never appeared. Such a run
+        # must not pass, and must not be diffed into a baseline either: one
+        # DID get committed that way, a population export that silently wrote
+        # nothing, and only a later diff caught it. Checked before the diff so
+        # the message is about the right thing.
+        # THE RUNTIME-CONNECT CHECK AND ITS POSITIVE CONTROL.
+        #
+        # Qt says "No such signal"/"No such slot" at RUNTIME when a
+        # string-based connect names something that does not exist. It
+        # compiles, it links, and the slot simply never fires -- the failure
+        # class C4 found. $DEAD_SIGNALS cannot replace this: it is a closed
+        # regex over the nine Qt 2 spellings in §2, matching SIGNAL( only, so a
+        # tenth kind and every bad SLOT() are invisible to it. Nor is it the
+        # other way round -- the regex is STATIC over all 14 modules while this
+        # is runtime over only what these six scenarios execute. Partly
+        # disjoint, so both are kept.
+        #
+        # But Qt emits it under the logging category qt.core.qobject.connect,
+        # and categories are filterable. QT_LOGGING_RULES='*=false' in the
+        # ambient environment (guidrive_run uses `env' without -i, so the whole
+        # environment passes through) or a qtlogging.ini silences it, and an
+        # empty stderr then looks exactly like a clean run. Review demonstrated
+        # the full gate passing green with a genuinely dead connect injected.
+        #
+        # So guidrive makes ONE deliberately bogus connect at startup and this
+        # requires its warning to be present. Same category, same mechanism --
+        # a control in `default' would not do, because qt.core.qobject.connect
+        # can be disabled on its own. An unfired control means this check could
+        # not have fired either, which is worth a failure on its own: check.sh
+        # already says of clipcheck that "0 clipped" from a check that cannot
+        # detect clipping is worth nothing.
+        CTL=guidriveStderrControl
+        if ! command grep -q "$CTL" /tmp/berr.$$; then
+            bf=1
+            echo "  Qt's connect logging is SUPPRESSED -- the runtime-connect check"
+            echo "  could not have fired, so this run proves nothing about connects."
+            echo "  Unset QT_LOGGING_RULES (or remove a qtlogging.ini) and re-run."
+        fi
+        # NOT an elif chain with the `!!' check below: a dead connect is the
+        # most likely CAUSE of a `!!' -- the driver clicks, the slot never
+        # fires, the driver reports it could not do the thing -- so reporting
+        # only the symptom hides the diagnosis exactly when it explains it.
+        if command grep -E 'No such (signal|slot)' /tmp/berr.$$ \
+               | command grep -qv "$CTL"; then
+            bf=1
+            echo "  a string-based connect names a signal or slot that does not exist:"
+            command grep -E 'No such (signal|slot)' /tmp/berr.$$ \
+                | command grep -v "$CTL" | sort -u | head -6 | sed 's/^/    /'
+            echo "  (it compiles and links; the slot never fires -- see §2's table)"
+        fi
         # The driver prints `!!' when it could not do what it was asked -- a
         # dialog that would not accept, a file that never appeared. Such a run
         # must not pass, and must not be diffed into a baseline either: one
@@ -923,22 +979,13 @@ elif make -s -C "$ROOT" B=build-fast SAN= SIGSAN= guidrive >/tmp/bdb.$$ 2>&1; th
             echo "  the driver could not carry out part of a scenario:"
             command grep -n '^ *!!' /tmp/ball.$$ | head -6 | sed 's/^/    /'
             echo "  (a run containing these must never be committed as a baseline)"
-        elif command grep -qE 'No such (signal|slot)' /tmp/berr.$$; then
-            # Qt says this at RUNTIME when a string-based connect names
-            # something that does not exist. It compiles, it links, and the
-            # slot simply never fires -- which is the whole failure class C4
-            # found and $DEAD_SIGNALS only partly covers. This check needs no
-            # list of Qt 2 spellings because Qt does the matching.
-            bf=1
-            echo "  a string-based connect names a signal or slot that does not exist:"
-            command grep -E 'No such (signal|slot)' /tmp/berr.$$ \
-                | sort -u | head -6 | sed 's/^/    /'
-            echo "  (it compiles and links; the slot never fires -- see §2's table)"
         elif command grep -q '^ *!!' "$ROOT/guibehaviour-baseline.txt"; then
             bf=1
             echo "  the BASELINE itself contains a failure marker -- it was"
             echo "  captured from a run that did not complete. Regenerate it:"
             command grep -n '^ *!!' "$ROOT/guibehaviour-baseline.txt" | head -4 | sed 's/^/    /'
+        elif [ "$bf" -ne 0 ]; then
+            :   # already failed above; the diff would only add noise
         elif command grep -v '^#' "$ROOT/guibehaviour-baseline.txt" | diff -u - /tmp/ball.$$ > /tmp/bd.$$; then
             bp=1
         else
@@ -950,6 +997,14 @@ elif make -s -C "$ROOT" B=build-fast SAN= SIGSAN= guidrive >/tmp/bdb.$$ 2>&1; th
         echo "  the driver did not finish -- it exits(1) on an out-of-range pool"
         echo "  position, which is how the Qt 6 clear() regression showed up:"
         tail -6 /tmp/bo.$$ /tmp/bp.$$ /tmp/bx.$$ /tmp/bw.$$ /tmp/bg.$$ /tmp/bm.$$ 2>/dev/null | sed 's/^/    /'
+        # stderr is captured now, and this is the path where it is most likely
+        # to say why. Printing it here is the whole reason for capturing it
+        # rather than discarding it: a crash, a Qt fatal, an ASan report or a
+        # timeout kill all land here.
+        if [ -s /tmp/berr.$$ ]; then
+            echo "  and the driver's stderr said:"
+            tail -8 /tmp/berr.$$ | sed 's/^/    /'
+        fi
     fi
 
     # C7 pinned 21 validators to QLocale::c() with RejectGroupSeparator because
@@ -1008,6 +1063,106 @@ rm -f "${TMPDIR:-/tmp}"/x11b-gpp.gpp "${TMPDIR:-/tmp}"/x11b-sip.sip \
       "${TMPDIR:-/tmp}"/c11c-lap.lap
 printf '%-22s %2d pass  %2d fail\n' "gui behaviour" "$bp" "$bf"
 pass=$((pass+bp)); fail=$((fail+bf))
+
+# ---------------------------------------------------------------------------
+# §9 item 1 -- the widget-to-file path, which nothing covered until now.
+#
+# `pages' proves typing reaches the widgets. `exportall' proves widgets reach a
+# file, in one direction, for the eight export formats. NEITHER of them runs
+# putAllIntoExperiment(), so a regression between what a parameter page holds
+# and what `File > Save Experiment' writes was caught by nothing at all. That
+# was §9 item 1, and it stood open because gating it needs a reference the port
+# did not produce itself -- §7's rule that every gate here compares the port
+# against itself.
+#
+# It now has one. pagesave-baseline.txt's BASE half is the 2003 i386 binary's
+# own output, and the port reproduces it byte for byte, so a failure in that
+# half is a regression against 1.3 rather than against yesterday. The EDITED
+# half is that same 1.3 block plus C11a's eleven page edits; the file's header
+# says which is captured and which is derived, and why the derivation holds.
+#
+# LanguageParameters is checked separately because it is NOT in the block --
+# it sits at line 133288 of the saved file, far below POPULATION BEGIN{ at 193,
+# so a check over the block alone would silently miss the registers edit.
+pp=0; pf=0
+PSD="${TMPDIR:-/tmp}"
+if [ ! -f "$ROOT/pagesave-baseline.txt" ]; then
+    pf=1; echo "  pagesave-baseline.txt is missing -- this gate tested NOTHING"
+elif [ -x "$ROOT/build-fast/guidrive" ]; then
+    # Same env as guidrive_run above, minus the locale extras. The two runs
+    # differ only in SIGEL_PAGEEDIT, which selects the eleven-edit set.
+    psrun() {
+        env ${2:+SIGEL_PAGEEDIT=1} SIGEL_ROOT="$SRC" SIGEL_EXP="$BEXP" \
+            SIGEL_SCRATCH="$PSD" QT_QPA_PLATFORM=offscreen \
+            timeout 300 "$ROOT/build-fast/guidrive" pagesave > "$1" 2>>/tmp/pserr.$$
+    }
+    rm -f "$PSD/pagesave-base.exp" "$PSD/pagesave-edited.exp"
+    : > /tmp/pserr.$$
+    if psrun /tmp/ps1.$$ && psrun /tmp/ps2.$$ 1; then
+        if [ ! -s "$PSD/pagesave-base.exp" ] || [ ! -s "$PSD/pagesave-edited.exp" ]; then
+            pf=1
+            echo "  a pagesave run wrote no experiment file -- nothing was compared:"
+            ls -l "$PSD/pagesave-base.exp" "$PSD/pagesave-edited.exp" 2>&1 | sed 's/^/    /'
+        elif command grep -q '^ *!!' /tmp/ps1.$$ /tmp/ps2.$$; then
+            pf=1
+            echo "  the driver could not carry out part of the save:"
+            command grep -h '^ *!!' /tmp/ps1.$$ /tmp/ps2.$$ | head -4 | sed 's/^/    /'
+        elif ! command grep -q guidriveStderrControl /tmp/pserr.$$; then
+            # Same positive control as the gui behaviour section: without it an
+            # empty stderr is indistinguishable from a clean run.
+            pf=1
+            echo "  Qt's connect logging is SUPPRESSED -- the save path's connects"
+            echo "  were not checked. Unset QT_LOGGING_RULES and re-run."
+        elif command grep -E 'No such (signal|slot)' /tmp/pserr.$$ \
+                 | command grep -qv guidriveStderrControl; then
+            # This is the only thing that catches a string-based connect naming
+            # something Qt 6 does not have, and File > Save Experiment is not
+            # exercised by any other scenario.
+            pf=1
+            echo "  a connect on the save path names a signal or slot that does not exist:"
+            command grep -E 'No such (signal|slot)' /tmp/pserr.$$ \
+                | command grep -v guidriveStderrControl | sort -u | head -4 | sed 's/^/    /'
+        else
+            # Everything before POPULATION BEGIN{ is the parameter block the
+            # five View pages own. Raw bytes, not key/value pairs: two keys in
+            # this data (FLOORPICTUREFILE, TEXTUREFILE) have an EMPTY value
+            # line after them, so anything that skips blanks reads the next key
+            # as a value and desynchronises silently from there on.
+            {
+                echo "== BASE BLOCK =="
+                awk '/^POPULATION BEGIN\{/{exit} {print}' "$PSD/pagesave-base.exp"
+                echo "== BASE LanguageParameters =="
+                command grep -h '^LanguageParameters' "$PSD/pagesave-base.exp"
+                echo "== EDITED BLOCK =="
+                awk '/^POPULATION BEGIN\{/{exit} {print}' "$PSD/pagesave-edited.exp"
+                echo "== EDITED LanguageParameters =="
+                command grep -h '^LanguageParameters' "$PSD/pagesave-edited.exp"
+            } > /tmp/psall.$$
+            # NOT `grep -v ^#': the DATA contains six `#####' separator
+            # lines, and stripping every #-leading line ate them -- caught by
+            # this gate failing on its own first run. Header comments are
+            # `# text' or bare `#', so this strips those and nothing else.
+            if sed '/^# /d; /^#$/d' "$ROOT/pagesave-baseline.txt" \
+                   | diff -u - /tmp/psall.$$ > /tmp/psd.$$; then
+                pp=1
+            else
+                pf=1
+                echo "  what the pages WRITE no longer matches SIGEL 1.3:"
+                head -14 /tmp/psd.$$ | sed 's/^/    /'
+            fi
+        fi
+    else
+        pf=1
+        echo "  a pagesave run did not finish:"
+        tail -4 /tmp/ps1.$$ /tmp/ps2.$$ 2>/dev/null | sed 's/^/    /'
+    fi
+    rm -f "$PSD/pagesave-base.exp" "$PSD/pagesave-edited.exp"
+else
+    pf=1; echo "  build-fast/guidrive is missing -- run 'make B=build-fast SAN= SIGSAN= guidrive'"
+fi
+rm -f /tmp/ps1.$$ /tmp/ps2.$$ /tmp/psall.$$ /tmp/psd.$$ /tmp/pserr.$$
+printf '%-22s %2d pass  %2d fail\n' "pagesave vs 1.3" "$pp" "$pf"
+pass=$((pass+pp)); fail=$((fail+pf))
 
 # ---------------------------------------------------------------------------
 # Phase C -- the converted Designer forms.

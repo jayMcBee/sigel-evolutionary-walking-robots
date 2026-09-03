@@ -1,0 +1,435 @@
+# pagesave-baseline.txt -- the widget-to-file path, PORTING.md §9 item 1.
+#
+# WHAT THIS PINS, and why it is not another port-against-itself baseline.
+# `pages' proves typing reaches the widgets. `exportall' proves widgets reach a
+# file, in one direction, for the export formats. NEITHER covers
+# putAllIntoExperiment(): a regression between what a page holds and what
+# `File > Save Experiment' writes would have been caught by nothing.
+#
+# The BASE block below is 1.3's OWN OUTPUT, captured from the 2003 i386 binary
+# on 2026-09-03 -- load twoBasesSimpleFitness2.exp (md5
+# a4fcba0f63a4aeaf3d6fe80b05c4bab2), visit no View page, change nothing, save
+# once. 192 lines, 2069 bytes, sha256
+# a327150ccf498d57cead7a5d745670999b499a26b398e07335c20e8ee94d7197. The port
+# writes it byte for byte, which is the third cross-machine anchor in this
+# project and the first that is parameter TEXT rather than a byte count.
+# A failure in the BASE half is therefore a regression against 1.3.
+#
+# The capture carried a positive control: a second save after changing one
+# visible parameter differed from the first in exactly one line. So the
+# reference tracks the experiment, and tracks it minimally.
+#
+# The EDITED block is 1.3's base plus C11a's eleven page edits. It is DERIVED,
+# not captured -- 1.3 was not driven through the edit set a second time -- and
+# it is admissible because C11a measured those nine typed values identical on
+# both architectures, and because the whole edited file differs from the 1.3
+# base in exactly twelve lines and no others: the nine typed values, the
+# mutation/reproduction interlock pair (250 + 670 + 80 = 1000), and the
+# fitness-name combo moving down one item.
+#
+# LanguageParameters IS NOT IN THE BLOCK. It lives at line 133288 of the saved
+# file, far below `POPULATION BEGIN{' at 193, so a check over the 192-line
+# block alone covers eleven of the twelve edits and silently misses the
+# registers one. It gets its own line here. That was found because the oracle
+# reported where POPULATION BEGIN{ had moved to, not by reading the code.
+#
+# Two parsing hazards, both real in this data and both reasons the comparison
+# is raw bytes rather than key/value pairs: FLOORPICTUREFILE and TEXTUREFILE
+# each have an EMPTY value line after them, so anything that skips blank lines
+# consumes the next key as a value; and the block ends with a blank line.
+# The 2003 paths and the eight PVMHOST lines are preserved verbatim on save.
+#
+# Regenerate with:
+#   SIGEL_ROOT=... SIGEL_EXP=... build-fast/guidrive pagesave
+#   SIGEL_PAGEEDIT=1 ... build-fast/guidrive pagesave
+# and take everything before POPULATION BEGIN{ from each written file.
+== BASE BLOCK ==
+TIMETOSIMULATE
+0
+3
+0
+0
+STEPSIZE
+0.01
+MAXIMALERROR
+0.1
+RANDOMSEED
+0
+MAXIMALITERATIONS
+100
+SKIPFRAMES
+0
+ANALYTICAL
+1
+MAXIMALCOLLISIONLOOPS
+10
+SOLVEMODE
+1
+INTEGRATOR
+3
+DYNAMECHSINTEGRATOR
+1
+SIMULATIONLIBRARY
+1
+MAXIMALSOLIDITERATIONS
+1
+JOINTLIMITSK_SPRING
+25000
+JOINTLIMITSB_DAMPER
+2500
+JOINTFRICTIONU_C
+0.35
+
+#####
+YPLANELEVEL
+0
+VELODAMPING
+0.995
+GRAVITY
+0
+-9.81
+0
+STARTPOSITION
+0
+1
+0
+FLOORDIMENSION
+50
+50
+FLOORFUNCTION
+0
+FLOORPICTUREFILE
+
+FLOORFUNCSELECTED
+1
+TEXTUREFILE
+
+TEXALPHA
+99
+WITHTEXTURE
+0
+FLOORMATERIALNAME
+metal
+AUTOSAVETIME
+0
+GPSconst
+5500
+GNSconst
+7500
+GPDconst
+50
+GNDconst
+50
+USFcoeff
+1.5
+UKFcoeff
+1
+
+#####
+RANDOMSEED
+0
+MININDLENGTH
+10
+MAXINDLENGTH
+1024
+RESEVGEN
+0
+REPRODUCTIONPROB
+280
+XOVERPROB
+670
+MUTATIONPROB
+50
+TOURNAMENTSPERGENERATION
+0.5
+MAXAGE
+50
+TERMINATIONTIME
+2001
+8
+12
+7
+0
+0
+TERMINATIONGENERATIONNO
+0
+TERMINATIONMODEL
+0
+SAVEEXIT
+1
+GRAVEYARDDIRECTORY
+/home/pg368b/ross/projects/sigel
+LIVEUNDEAD
+0
+POOLIMAGEDIRECTORY
+/home/pg368b/ross/projects/sigel
+POOLIMAGEGENERATION
+0
+PRIORITY
+2
+FITNESSNAME
+SimpleFitnessFunction
+TERMINATIONUSESDATE
+1
+PROBABILITY_ADD
+500
+PROBABILITY_SUB
+500
+PROBABILITY_MUL
+500
+PROBABILITY_DIV
+500
+PROBABILITY_LOAD
+500
+PROBABILITY_COPY
+500
+PROBABILITY_MIN
+500
+PROBABILITY_MAX
+500
+PROBABILITY_CMP
+500
+PROBABILITY_JMP
+0
+PROBABILITY_MOVE
+500
+PROBABILITY_SENSE
+500
+PROBABILITY_DELAY
+500
+PROBABILITY_NOP
+0
+PROBABILITY_MOD
+500
+TIMEOUTMINUTES
+0
+TERMINATIONDURATIONDAYS
+0
+TERMINATIONDURATIONHOURS
+0
+TERMINATIONDURATIONMINUTES
+0
+TERMINATIONDURATIONSECONDS
+0
+PVMHOST
+wickie 2 1 "/home/pg368b/ross/projects/sigel"
+PVMHOST
+bube 2 1 "/home/pg368b/ross/projects/sigel"
+PVMHOST
+birke 2 1 "/home/pg368b/ross/projects/sigel"
+PVMHOST
+urobe 2 1 "/home/pg368b/ross/projects/sigel"
+PVMHOST
+pappel 2 1 "/home/pg368b/ross/projects/sigel"
+PVMHOST
+lithium 2 1 "/home/pg368b/ross/projects/sigel"
+PVMHOST
+eiche 2 1 "/home/pg368b/ross/projects/sigel"
+PVMHOST
+herz 2 1 "/home/pg368b/ross/projects/sigel"
+
+#####
+WITHHISTORY
+1
+
+// ---------------------------------------
+// (C)2001, PG 368, UNIVERSITY OF DORTMUND
+// ---------------------------------------
+
+== BASE LanguageParameters ==
+LanguageParameters 3 8 5000 13
+== EDITED BLOCK ==
+TIMETOSIMULATE
+0
+3
+0
+0
+STEPSIZE
+0.02
+MAXIMALERROR
+0.2
+RANDOMSEED
+0
+MAXIMALITERATIONS
+100
+SKIPFRAMES
+0
+ANALYTICAL
+1
+MAXIMALCOLLISIONLOOPS
+10
+SOLVEMODE
+1
+INTEGRATOR
+3
+DYNAMECHSINTEGRATOR
+2
+SIMULATIONLIBRARY
+1
+MAXIMALSOLIDITERATIONS
+1
+JOINTLIMITSK_SPRING
+25000
+JOINTLIMITSB_DAMPER
+2500
+JOINTFRICTIONU_C
+0.35
+
+#####
+YPLANELEVEL
+2.5
+VELODAMPING
+0.995
+GRAVITY
+1.25
+-9.81
+0
+STARTPOSITION
+0
+1
+0
+FLOORDIMENSION
+77
+50
+FLOORFUNCTION
+0
+FLOORPICTUREFILE
+
+FLOORFUNCSELECTED
+1
+TEXTUREFILE
+
+TEXALPHA
+99
+WITHTEXTURE
+0
+FLOORMATERIALNAME
+metal
+AUTOSAVETIME
+0
+GPSconst
+5500
+GNSconst
+7500
+GPDconst
+50
+GNDconst
+50
+USFcoeff
+1.5
+UKFcoeff
+1
+
+#####
+RANDOMSEED
+123
+MININDLENGTH
+10
+MAXINDLENGTH
+1024
+RESEVGEN
+0
+REPRODUCTIONPROB
+80
+XOVERPROB
+670
+MUTATIONPROB
+250
+TOURNAMENTSPERGENERATION
+0.5
+MAXAGE
+42
+TERMINATIONTIME
+2001
+8
+12
+7
+0
+0
+TERMINATIONGENERATIONNO
+0
+TERMINATIONMODEL
+0
+SAVEEXIT
+1
+GRAVEYARDDIRECTORY
+/home/pg368b/ross/projects/sigel
+LIVEUNDEAD
+0
+POOLIMAGEDIRECTORY
+/home/pg368b/ross/projects/sigel
+POOLIMAGEGENERATION
+0
+PRIORITY
+2
+FITNESSNAME
+RealSpeedFitnessFunction
+TERMINATIONUSESDATE
+1
+PROBABILITY_ADD
+500
+PROBABILITY_SUB
+500
+PROBABILITY_MUL
+500
+PROBABILITY_DIV
+500
+PROBABILITY_LOAD
+500
+PROBABILITY_COPY
+500
+PROBABILITY_MIN
+500
+PROBABILITY_MAX
+500
+PROBABILITY_CMP
+500
+PROBABILITY_JMP
+0
+PROBABILITY_MOVE
+500
+PROBABILITY_SENSE
+500
+PROBABILITY_DELAY
+500
+PROBABILITY_NOP
+0
+PROBABILITY_MOD
+500
+TIMEOUTMINUTES
+0
+TERMINATIONDURATIONDAYS
+0
+TERMINATIONDURATIONHOURS
+0
+TERMINATIONDURATIONMINUTES
+0
+TERMINATIONDURATIONSECONDS
+0
+PVMHOST
+wickie 2 1 "/home/pg368b/ross/projects/sigel"
+PVMHOST
+bube 2 1 "/home/pg368b/ross/projects/sigel"
+PVMHOST
+birke 2 1 "/home/pg368b/ross/projects/sigel"
+PVMHOST
+urobe 2 1 "/home/pg368b/ross/projects/sigel"
+PVMHOST
+pappel 2 1 "/home/pg368b/ross/projects/sigel"
+PVMHOST
+lithium 2 1 "/home/pg368b/ross/projects/sigel"
+PVMHOST
+eiche 2 1 "/home/pg368b/ross/projects/sigel"
+PVMHOST
+herz 2 1 "/home/pg368b/ross/projects/sigel"
+
+#####
+WITHHISTORY
+1
+
+// ---------------------------------------
+// (C)2001, PG 368, UNIVERSITY OF DORTMUND
+// ---------------------------------------
+
+== EDITED LanguageParameters ==
+LanguageParameters 3 9 5000 13
