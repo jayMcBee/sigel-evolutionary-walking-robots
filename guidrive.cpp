@@ -3091,7 +3091,23 @@ int main(int argc, char **argv)
         for (QSlider *sl : sw->findChildren<QSlider *>()) {
             const bool vert = sl->orientation() == Qt::Vertical;
             const int len = vert ? sl->height() : sl->width();
-            const int cross = (vert ? sl->width() : sl->height()) / 2;
+            // The CROSS axis must come from the groove rect, not from the middle
+            // of the widget. A slider with tick marks on one side has its groove
+            // off-centre: yawSlider is 20 tall with a groove at y 6..12, and the
+            // widget middle, y=10, is outside the band that responds (3..9).
+            // Clicking the middle made yaw and pitch look dead, and that was
+            // written up as a port divergence before this was found. It was not.
+            QStyleOptionSlider go;
+            go.initFrom(sl);
+            go.minimum = sl->minimum(); go.maximum = sl->maximum();
+            go.sliderPosition = sl->value(); go.sliderValue = sl->value();
+            go.orientation = sl->orientation(); go.pageStep = sl->pageStep();
+            go.tickPosition = (QSlider::TickPosition)sl->tickPosition();
+            go.tickInterval = sl->tickInterval();
+            go.upsideDown = sl->invertedAppearance();
+            const QRect grv = sl->style()->subControlRect(QStyle::CC_Slider, &go,
+                                                          QStyle::SC_SliderGroove, sl);
+            const int cross = vert ? grv.center().x() : grv.center().y();
             const int span = sl->maximum() - sl->minimum();
             const double frac = span ? double(sl->value() - sl->minimum()) / span : 0.5;
             // Click at whichever end is FARTHER from the thumb, so the press can
@@ -3125,13 +3141,18 @@ int main(int argc, char **argv)
             opt.sliderPosition = sl->value(); opt.sliderValue = sl->value();
             opt.orientation = sl->orientation();
             opt.pageStep = sl->pageStep();
+            opt.tickPosition = (QSlider::TickPosition)sl->tickPosition();
+            opt.tickInterval = sl->tickInterval();
+            opt.upsideDown = sl->invertedAppearance();
             const QRect h = sl->style()->subControlRect(QStyle::CC_Slider, &opt,
                                                         QStyle::SC_SliderHandle, sl);
+            const QRect g = sl->style()->subControlRect(QStyle::CC_Slider, &opt,
+                                                        QStyle::SC_SliderGroove, sl);
             QString moved;
             for (double f : { 0.05, 0.20, 0.35, 0.65, 0.80, 0.95 }) {
                 const bool vert = sl->orientation() == Qt::Vertical;
                 const int len = vert ? sl->height() : sl->width();
-                const int cross = (vert ? sl->width() : sl->height()) / 2;
+                const int cross = vert ? g.center().x() : g.center().y();
                 const int along = int(len * f);
                 const QPoint pt = vert ? QPoint(cross, along) : QPoint(along, cross);
                 if (h.contains(pt)) { moved += QString("  %1:ONTHUMB").arg(f); continue; }
@@ -3153,10 +3174,10 @@ int main(int argc, char **argv)
             sl->setValue(start + sl->pageStep());
             const int bySet = sl->value() - start;
             sl->setValue(start);
-            printf("    sweep %-24s handle=(%d,%d %dx%d) vis=%d enab=%d%s"
-                   "  | PageUp %+d  setValue %+d\n",
+            printf("    sweep %-24s handle=(%d,%d %dx%d) groove=(%d,%d %dx%d)%s"
+                   "  | PageUp %+d\n",
                    qPrintable(sl->objectName()), h.x(), h.y(), h.width(), h.height(),
-                   sl->isVisible(), sl->isEnabled(), qPrintable(moved), byKey, bySet);
+                   g.x(), g.y(), g.width(), g.height(), qPrintable(moved), byKey);
         }
         fflush(stdout);
 
@@ -3247,6 +3268,93 @@ int main(int argc, char **argv)
         });
         if (QAction *a = act("alterMovieSettingsAction")) { a->trigger(); QTest::qWait(1200); }
         cancelModalHandler();
+        // --- DIAGNOSTIC: discriminate the two leads for the dead sliders ------
+        // The oracle measured on 1.3 that slotMouseRotation DOES write back to
+        // exactly yawSlider and pitchSlider, and that those same sliders still
+        // page-step on a groove click. So being a write-back target is not by
+        // itself incompatible with groove clicks, and the question becomes
+        // whether THIS port's wiring swallows the events. Two cheap tests:
+        //   1. cut every connection off yawSlider and click it again;
+        //   2. build a bare QSlider carrying yawSlider's exact properties and
+        //      click that -- if a fresh one works, the properties are cleared.
+        // Deliberately LAST, so nothing above is measured through a mutation.
+        printf("\n  -- diagnostic: why yaw/pitch ignore the mouse --\n");
+        auto grooveClick = [&](QSlider *sl, const char *what) {
+            const int start = sl->value();
+            const bool vert = sl->orientation() == Qt::Vertical;
+            const int len = vert ? sl->height() : sl->width();
+            const int cross = (vert ? sl->width() : sl->height()) / 2;
+            int moved = 0;
+            for (double f : { 0.20, 0.35, 0.65, 0.80 }) {
+                sl->setValue(start);
+                const int along = int(len * f);
+                QTest::mouseClick(sl, Qt::LeftButton, Qt::NoModifier,
+                                  vert ? QPoint(cross, along) : QPoint(along, cross));
+                QTest::qWait(60);
+                if (sl->value() != start) ++moved;
+            }
+            sl->setValue(start);
+            printf("    %-44s %d of 4 positions moved it\n", what, moved);
+        };
+        if (QSlider *yaw = sw->findChild<QSlider *>("yawSlider")) {
+            grooveClick(yaw, "yawSlider as wired");
+            QObject::disconnect(yaw, nullptr, nullptr, nullptr);
+            grooveClick(yaw, "yawSlider with ALL connections cut (lead 1)");
+
+            QSlider *fresh = new QSlider(yaw->orientation(), yaw->parentWidget());
+            fresh->setMinimum(yaw->minimum());   fresh->setMaximum(yaw->maximum());
+            fresh->setSingleStep(yaw->singleStep());
+            fresh->setPageStep(yaw->pageStep());
+            fresh->setValue(yaw->value());
+            fresh->setTickPosition(yaw->tickPosition());
+            fresh->setTickInterval(yaw->tickInterval());
+            fresh->setTracking(yaw->hasTracking());
+            fresh->setGeometry(yaw->geometry());
+            fresh->show();
+            QTest::qWait(150);
+            grooveClick(fresh, "a FRESH QSlider with yaw's properties (lead 2)");
+            delete fresh;
+            // Every click so far used the middle of the slider's SHORT side.
+            // That axis was never varied. A slider with tick marks puts its
+            // groove off-centre, so the middle may miss it. Vary it now.
+            QStyleOptionSlider o;
+            o.initFrom(yaw);
+            o.minimum = yaw->minimum(); o.maximum = yaw->maximum();
+            o.sliderPosition = yaw->value(); o.sliderValue = yaw->value();
+            o.orientation = yaw->orientation(); o.pageStep = yaw->pageStep();
+            const QRect gr = yaw->style()->subControlRect(QStyle::CC_Slider, &o,
+                                                          QStyle::SC_SliderGroove, yaw);
+            printf("    yaw groove rect = (%d,%d %dx%d), widget %dx%d\n",
+                   gr.x(), gr.y(), gr.width(), gr.height(), yaw->width(), yaw->height());
+            const int start = yaw->value();
+            QString row;
+            for (int y = 1; y < yaw->height(); y += 2) {
+                yaw->setValue(start);
+                QTest::mouseClick(yaw, Qt::LeftButton, Qt::NoModifier,
+                                  QPoint(int(yaw->width() * 0.80), y));
+                QTest::qWait(40);
+                if (yaw->value() != start) row += QString(" y=%1:%2").arg(y).arg(yaw->value() - start);
+            }
+            yaw->setValue(start);
+            printf("    yaw, click at 80%% along, every y:%s\n",
+                   row.isEmpty() ? "  NO y VALUE WORKED" : qPrintable(row));
+        }
+        if (QSlider *pit = sw->findChild<QSlider *>("pitchSlider")) {
+            const int start = pit->value();
+            QString row;
+            for (int x = 1; x < pit->width(); x += 2) {
+                pit->setValue(start);
+                QTest::mouseClick(pit, Qt::LeftButton, Qt::NoModifier,
+                                  QPoint(x, int(pit->height() * 0.80)));
+                QTest::qWait(40);
+                if (pit->value() != start) row += QString(" x=%1:%2").arg(x).arg(pit->value() - start);
+            }
+            pit->setValue(start);
+            printf("    pitch, click at 80%% along, every x:%s\n",
+                   row.isEmpty() ? "  NO x VALUE WORKED" : qPrintable(row));
+        }
+        fflush(stdout);
+
         printf("  -- slave window survived the whole battery --\n");
         fflush(stdout);
         return 0;
