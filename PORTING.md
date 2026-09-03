@@ -4563,6 +4563,24 @@ fixed everywhere else**; ~~(5) the evolution path, last~~ — **done, and it was
 throughput answer before it can be observed at all".* **THE ANSWER ARRIVED
 2026-09-02 and it is measured, not estimated** — see the open-items table.
 
+**THE PORT EVOLVES. Measured 2026-09-03, and it is the first measurement of OUTPUT this project has made.**
+Population 100, 30 generations, twoBases with `SimpleFitnessFunction` (fitness = distance / simulated seconds,
+i.e. speed). **Best fitness 0.063794 → 0.141625, never decreasing at any generation.** Mean 0.011711 → 0.046059.
+Every individual was evaluated on this machine — the pool's stored fitness was cleared first through
+`Individuals > Reset`, because survivors otherwise keep their 2003 i386 values and a curve drawn from a mix of
+two architectures means nothing. 4 slaves, 61.6 s/generation, 1,849,022 ms total; `POOLGENERATION` 136 → 166.
+
+**No conclusion is drawn from those numbers beyond the one question that is answerable:** does best fitness
+improve for a reasonably large population over a reasonable horizon. It does. GP is a randomised process with
+many parameters; anything further — whether 0.14 is a plausible value, whether the parameters are well chosen,
+what a flat stretch would imply — is not answerable from one run and must not be asserted here.
+*For future runs the starting pool should be RANDOMISED rather than a fitness-reset of the shipped programs.*
+
+**V4 and the cross-machine evolution comparison are DROPPED.** Both are exact replication across an x87/IEEE
+boundary that this section already says cannot be compared, and the attempt confirmed it: the matching counts
+are forced by `createTours` and the contents cannot agree. V3 stays and is SATISFIED — it is same-box
+determinism, not replication, and the oracle demonstrated it twice (serA≡serB, octGateA≡octGateB).
+
 **Open after C11c — five items, of which items 2 and 5 are now closed.** The `QSpinBox` divergence is closed: **D28**
 accepted it. The Import/Export item is closed by C11b.
 

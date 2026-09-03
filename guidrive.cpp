@@ -3517,6 +3517,33 @@ int main(int argc, char **argv)
             }
         }
 
+        // SIGEL_RESET_POOL=1 clears every stored fitness to -1 through the real
+        // GUI path (Individuals > Reset -> SIG_GPPopulation::resetPool), so the
+        // whole pool is re-evaluated ON THIS MACHINE. Without it the pool still
+        // carries the 2003 i386 numbers for whichever individuals survive, and
+        // any fitness curve drawn from it mixes two architectures and means
+        // nothing -- which is exactly how a first attempt at this went wrong.
+        if (qgetenv("SIGEL_RESET_POOL") == "1") {
+            clickMenu("&View", "&Population");
+            QTest::qWait(400);
+            whenModal([](QWidget *m) { clickMsgButton(m, QMessageBox::Yes); });
+            clickMenu("&Individuals", "Reset");
+            QTest::qWait(3000);
+            cancelModalHandler();
+            if (SIG_Experiment *ex = lv->currentlySelectedExperiment()) {
+                int neg = 0, n = ex->gpExperiment.population.getSize();
+                for (int i = 0; i < n; ++i)
+                    if (ex->gpExperiment.population.getIndividual(i).getFitness() < 0) ++neg;
+                printf("  [reset] %d of %d individuals now unevaluated\n", neg, n);
+                if (neg != n) {
+                    printf("!! reset did not clear the pool -- a curve from it would mix"
+                           " 2003 and local fitness values\n");
+                    fflush(stdout); return 1;
+                }
+            }
+            fflush(stdout);
+        }
+
         lv->setCurrentItem(lv->topLevelItem(0));
         QTest::qWait(400);
         step("experiment page, before Start", false, true, false, true);
