@@ -116,6 +116,7 @@ extern "C" {
 #include <map>
 
 #include "SIGEL_MasterGUI/SIG_MainWindow.h"
+#include "SIGEL_SlaveGUI/SIG_SimulationWindow.h"
 #include "SIGEL_MasterGUI/SIG_ExperimentListView.h"
 #include "SIGEL_MasterGUI/SIG_Experiment.h"
 #include "SIGEL_MasterGUI/SIG_AllIndividualsView.h"
@@ -2874,6 +2875,303 @@ int main(int argc, char **argv)
         clickMenu("&File", "Export", "Program");
         QTest::qWait(2500);
         printf("  [exported] exists=%d bytes=%lld\n", QFile::exists(out), QFileInfo(out).size());
+        return 0;
+    }
+
+    // --- SIGEL_SlaveGUI: the slave's simulation window ---------------------
+    // The last module C11 never drove. It is reachable WITHOUT PVM: the slave's
+    // own standalone mode is `sigel_slave -visualize <exp>'
+    // (sigel_slave.cpp:143-152), which loads an experiment, takes individual 0's
+    // program and opens this window. This scenario does the same thing in
+    // process, because guidrive already links SIGEL_SlaveGUI through GUI_LIBS
+    // and because a second program would be a harness rather than a scenario.
+    //
+    // It matters beyond coverage: this widget owns the `visualisation' pointer
+    // of PORTING.md 9 item 5, and showAncorPointsCheckBox is one of the
+    // fourteen sites that dereference it behind a guard.
+    if (scenario == "slavegui") {
+        SIG_ExperimentListView *lv = listView();
+        lv->setCurrentItem(lv->topLevelItem(0));
+        QTest::qWait(400);
+        SIG_Experiment *ex = lv->currentlySelectedExperiment();
+        if (!ex) { printf("!! no experiment selected\n"); fflush(stdout); return 1; }
+        if (ex->gpExperiment.population.getSize() < 1) {
+            printf("!! population is empty -- nothing to visualise\n");
+            fflush(stdout); return 1;
+        }
+
+        printf("\n== SLAVE SIMULATION WINDOW ==\n");
+        SIGEL_SlaveGUI::SIG_SimulationWindow *sw =
+            new SIGEL_SlaveGUI::SIG_SimulationWindow(nullptr, "simWindow");
+        sw->setWindowTitle("Simulation Visualisation");   // as sigel_slave.cpp:283
+        sw->resize(780, 810);                            // the oracle's 1.3 geometry
+        sw->show();
+        (void)QTest::qWaitForWindowExposed(sw);
+        QTest::qWait(300);
+
+        // THE ROBOT MUST BE PREPARED FIRST, and this is not optional decoration:
+        // SIG_RobotRenderer's constructor walks every link's geometry
+        // (SIG_RobotRenderer.cpp:79 -> SIG_GeometryIterator::valid ->
+        // SIG_Geometry::getNumPolygons), and a link's geometry is null until
+        // SIG_Robot::instantiateGeometries() has run. Passing the experiment's
+        // robot straight in SEGFAULTS on a null `this'. The standalone slave
+        // does not: sigel_slave.cpp:245-269 copies the robot and calls
+        // prepareDynaMechs() (or prepareDynaMo()), each of which begins with
+        // instantiateGeometries(). Mirrored exactly here, switch and all, so
+        // this scenario drives the same path the real slave drives.
+        SIGEL_Robot::SIG_Robot *modifiedRobot =
+            new SIGEL_Robot::SIG_Robot( ex->gpExperiment.robot );
+        try {
+            if (ex->gpExperiment.simulationParameter.getSimulationLibrary()
+                    == SIGEL_Simulation::SIG_SimulationParameters::DynaMo)
+                modifiedRobot->prepareDynaMo();
+            else
+                modifiedRobot->prepareDynaMechs();
+        } catch (SIGEL_Tools::SIG_Exception &e) {
+            printf("!! preparing the robot threw: %s\n", qPrintable(e.getMessage()));
+            fflush(stdout); return 1;
+        }
+        printf("  [robot] prepared, library=%d bodies=%d\n",
+               (int)ex->gpExperiment.simulationParameter.getSimulationLibrary(),
+               (int)ex->gpExperiment.robot.getBodies().size());
+        fflush(stdout);
+
+        // Individual 0, exactly as the standalone slave picks it.
+        sw->visualizeThis(*modifiedRobot,
+                          ex->gpExperiment.environment,
+                          ex->gpExperiment.simulationParameter,
+                          ex->gpExperiment.population.getIndividual(0).getProgramVar());
+        QTest::qWait(600);
+        printf("  [window] title=[%s] size=%dx%d visible=%d\n",
+               qPrintable(sw->windowTitle()), sw->width(), sw->height(),
+               sw->isVisible());
+
+        // Everything with observable state, by objectName so the oracle can be
+        // asked about the same control by the same name.
+        for (QTabWidget *tw : sw->findChildren<QTabWidget *>()) {
+            printf("  [tabs] count=%d current=%d", tw->count(), tw->currentIndex());
+            for (int i = 0; i < tw->count(); ++i)
+                printf(" [%s]", qPrintable(tw->tabText(i)));
+            printf("\n");
+        }
+        for (QAbstractButton *b : sw->findChildren<QAbstractButton *>()) {
+            const char *kind = qobject_cast<QCheckBox *>(b) ? "check" : "button";
+            printf("    %-7s [%-24s] text=[%s] enabled=%d checkable=%d checked=%d\n",
+                   kind, qPrintable(b->objectName()), qPrintable(b->text()),
+                   b->isEnabled(), b->isCheckable(), b->isChecked());
+        }
+        for (QSlider *sl : sw->findChildren<QSlider *>())
+            printf("    slider  [%-24s] value=%d min=%d max=%d step=%d enabled=%d\n",
+                   qPrintable(sl->objectName()), sl->value(), sl->minimum(),
+                   sl->maximum(), sl->pageStep(), sl->isEnabled());
+        for (QComboBox *cb : sw->findChildren<QComboBox *>()) {
+            printf("    combo   [%-24s] current=%d [", qPrintable(cb->objectName()),
+                   cb->currentIndex());
+            for (int i = 0; i < cb->count(); ++i)
+                printf("%s%s", i ? "|" : "", qPrintable(cb->itemText(i)));
+            printf("]\n");
+        }
+        for (QSpinBox *sp : sw->findChildren<QSpinBox *>())
+            printf("    spin    [%-24s] value=%d min=%d max=%d\n",
+                   qPrintable(sp->objectName()), sp->value(), sp->minimum(), sp->maximum());
+        for (QLabel *la : sw->findChildren<QLabel *>())
+            if (!la->objectName().isEmpty() && la->objectName().startsWith("TextLabel") == false)
+                printf("    label   [%-24s] text=[%s]\n",
+                       qPrintable(la->objectName()), qPrintable(la->text()));
+        for (QAction *a : sw->findChildren<QAction *>())
+            printf("    action  [%-24s] text=[%s] enabled=%d\n",
+                   qPrintable(a->objectName()), qPrintable(a->text()), a->isEnabled());
+        fflush(stdout);
+
+        // NOTE FOR THE RECORD: offscreen, Qt reports "QOpenGLWidget is not
+        // supported on this platform" and "No fbo, cannot render", so paintGL
+        // never draws. Everything below drives the WIDGET layer and the slots
+        // behind it; nothing here is evidence about what is on screen. The
+        // oracle reads the rendered view on 1.3; this does not.
+        auto named = [&](const char *n) -> QAbstractButton * {
+            for (QAbstractButton *b : sw->findChildren<QAbstractButton *>())
+                if (b->objectName() == QLatin1String(n)) return b;
+            return nullptr;
+        };
+        const char *navNames[] = { "forwardPushButton", "backwardPushButton",
+                                   "leftPushButton", "rightPushButton",
+                                   "upPushButton", "downPushButton",
+                                   "centerPushButton" };
+
+        // --- the trace-robot coupling -------------------------------------
+        // visualizeThis() ends with slotSetTraceRobot(true), and that slot
+        // disables all seven navigation buttons (SIG_SimulationWidget.cpp:238-249):
+        // tracing the robot owns the camera, so manual navigation is off. The
+        // coupling is the observable, and it is checkable without rendering.
+        printf("\n  -- trace-robot / manual-navigation coupling --\n");
+        QCheckBox *trace = qobject_cast<QCheckBox *>(named("traceRobotCheckBox"));
+        if (!trace) { printf("!! traceRobotCheckBox missing\n"); fflush(stdout); return 1; }
+        int enabledBefore = 0;
+        for (const char *n : navNames) if (QAbstractButton *b = named(n)) enabledBefore += b->isEnabled();
+        QTest::mouseClick(trace, Qt::LeftButton, Qt::NoModifier,
+                          QPoint(8, trace->height() / 2));
+        QTest::qWait(200);
+        int enabledAfter = 0;
+        for (const char *n : navNames) if (QAbstractButton *b = named(n)) enabledAfter += b->isEnabled();
+        printf("    traceRobot checked=%d -> %d ; nav buttons enabled %d/7 -> %d/7\n",
+               1, trace->isChecked(), enabledBefore, enabledAfter);
+        if (trace->isChecked() || enabledAfter != 7) {
+            printf("!! unchecking Trace Robot did not enable the seven navigation"
+                   " buttons (got %d/7)\n", enabledAfter);
+            fflush(stdout); return 1;
+        }
+
+        // --- every navigation button, which is also the use-after-free path --
+        // Each of these slots is one of the fourteen `if (visualisation)' sites
+        // of section 9 item 5. Clicking them all is the first time that code has
+        // ever been executed in this port.
+        printf("\n  -- navigation buttons (each dereferences `visualisation') --\n");
+        for (const char *n : navNames) {
+            QAbstractButton *b = named(n);
+            if (!b) { printf("    %-22s MISSING\n", n); continue; }
+            QTest::mouseClick(b, Qt::LeftButton, Qt::NoModifier, b->rect().center());
+            QTest::qWait(60);
+            printf("    %-22s clicked, survived; xyz=[%s|%s|%s]\n", n,
+                   qPrintable(sw->findChild<QLabel *>("xPosTextLabel")->text()),
+                   qPrintable(sw->findChild<QLabel *>("yPosTextLabel")->text()),
+                   qPrintable(sw->findChild<QLabel *>("zPosTextLabel")->text()));
+        }
+        fflush(stdout);
+
+        // --- the four remaining checkboxes, each a visualisation-> call ------
+        printf("\n  -- view checkboxes --\n");
+        for (const char *n : { "showAncorPointsCheckBox", "showRobotPathCheckBox",
+                               "showGridCheckBox", "showPlaneCheckBox" }) {
+            QCheckBox *cb = qobject_cast<QCheckBox *>(named(n));
+            if (!cb) { printf("    %-26s MISSING\n", n); continue; }
+            // THREE clicks with a generous wait, reporting checkState() rather
+            // than isChecked(): a two-click probe with an 80 ms wait reported
+            // showAncorPointsCheckBox stuck at checked, and that had to be told
+            // apart from a slow slot swallowing the second event. The slot shows
+            // one floating label per robot point, so it is not free.
+            const int s0 = (int)cb->checkState();
+            int seq[3];
+            for (int k = 0; k < 3; ++k) {
+                QTest::mouseClick(cb, Qt::LeftButton, Qt::NoModifier,
+                                  QPoint(8, cb->height() / 2));
+                QTest::qWait(400);
+                seq[k] = (int)cb->checkState();
+            }
+            // showAncorPointsCheckBox is TRISTATE and cycles 0 -> 1 -> 2 -> 0
+            // where the other three are plain 0 -> 2 -> 0. That is NOT a port
+            // defect: `tristate=true' is on this one checkbox in the PRISTINE
+            // 2003 form (vendor commit 0516d62) exactly as in the converted one.
+            // Preserved, so the expectation is per-widget rather than uniform.
+            // Its consequence is 1.3's too: the slot treats state>0 as points
+            // visible, but SIG_VisualisationWidget only shows the floating
+            // labels at state==2, so the middle state shows points without text.
+            const bool tri = cb->isTristate();
+            const bool ok = tri ? (seq[0] == 1 && seq[1] == 2 && seq[2] == 0)
+                                : (seq[0] != s0 && seq[1] == s0 && seq[2] != s0);
+            printf("    %-26s tristate=%d state %d -> %d -> %d -> %d%s\n", n,
+                   tri, s0, seq[0], seq[1], seq[2],
+                   ok ? "" : "   << UNEXPECTED CYCLE");
+        }
+        fflush(stdout);
+
+        // --- the four sliders, by groove click ------------------------------
+        // A groove click, not arrow keys: QTest posts keys straight at the
+        // widget whether or not it has focus, and on 1.3 a groove click does not
+        // focus a slider, so a key probe would measure something 1.3 never does.
+        printf("\n  -- sliders, groove click --\n");
+        for (QSlider *sl : sw->findChildren<QSlider *>())
+            probeSliderClick(sl);
+        fflush(stdout);
+
+        // --- render mode and frame delay ------------------------------------
+        printf("\n  -- render mode / frame delay --\n");
+        if (QComboBox *cb = sw->findChild<QComboBox *>("renderModeComboBox")) {
+            for (int i = 0; i < cb->count(); ++i) {
+                cb->setCurrentIndex(i);
+                QTest::qWait(80);
+                printf("    renderMode -> %d [%s] survived\n", i, qPrintable(cb->itemText(i)));
+            }
+            cb->setCurrentIndex(0);
+        }
+        if (QSpinBox *sp = sw->findChild<QSpinBox *>("frameDelaySpinBox")) {
+            sp->setFocus();
+            QTest::keyClick(sp, Qt::Key_A, Qt::ControlModifier);
+            QTest::keyClicks(sp, "250");
+            QTest::qWait(80);
+            printf("    frameDelay typed 250 -> value=%d\n", sp->value());
+            // PUT IT BACK. Leaving 250 ms between frames and then watching Play
+            // for four seconds gives ~16 steps, about 0.16 simulated seconds,
+            // which displays as "0 secs" -- indistinguishable from a Play that
+            // does nothing. That is exactly how this probe first read as a
+            // divergence against the oracle's minutes-long run.
+            sp->setFocus();
+            QTest::keyClick(sp, Qt::Key_A, Qt::ControlModifier);
+            QTest::keyClicks(sp, "0");
+            QTest::qWait(80);
+            printf("    frameDelay restored -> value=%d\n", sp->value());
+        }
+        fflush(stdout);
+
+        // --- the toolbar actions --------------------------------------------
+        // Play / Step / Stop actually advance the simulation, which is the one
+        // thing here that produces a number rather than a state.
+        printf("\n  -- toolbar actions --\n");
+        QLabel *simTime = sw->findChild<QLabel *>("simulationTimeTextLabel");
+        auto act = [&](const char *n) -> QAction * {
+            for (QAction *a : sw->findChildren<QAction *>())
+                if (a->objectName() == QLatin1String(n)) return a;
+            return nullptr;
+        };
+        printf("    simulationTime before      [%s]\n",
+               simTime ? qPrintable(simTime->text()) : "(no label)");
+        if (QAction *a = act("stepAction")) {
+            for (int i = 0; i < 3; ++i) { a->trigger(); QTest::qWait(400); }
+            printf("    after 3x stepAction        [%s]\n",
+                   simTime ? qPrintable(simTime->text()) : "(no label)");
+        }
+        if (QAction *a = act("playAction")) {
+            a->trigger();
+            // Sampled, not a single wait: the label is quantised to whole
+            // seconds, so a run that IS advancing looks identical to a dead one
+            // until the first second lands. Print the whole progression.
+            for (int i = 1; i <= 6; ++i) {
+                QTest::qWait(5000);
+                printf("    play +%2ds                  [%s]\n", i * 5,
+                       simTime ? qPrintable(simTime->text()) : "(no label)");
+                fflush(stdout);
+            }
+        }
+        if (QAction *a = act("stopAction")) {
+            a->trigger(); QTest::qWait(600);
+            printf("    after stopAction           [%s]\n",
+                   simTime ? qPrintable(simTime->text()) : "(no label)");
+        }
+        fflush(stdout);
+
+        // --- the movie settings dialog, never opened before ------------------
+        printf("\n  -- movie settings dialog --\n");
+        whenModal([](QWidget *m) {
+            describeDialog(m);
+            for (QSpinBox *sp : m->findChildren<QSpinBox *>())
+                printf("      spin  [%-22s] value=%d min=%d max=%d\n",
+                       qPrintable(sp->objectName()), sp->value(), sp->minimum(), sp->maximum());
+            for (QComboBox *cb : m->findChildren<QComboBox *>()) {
+                printf("      combo [%-22s] current=%d [", qPrintable(cb->objectName()),
+                       cb->currentIndex());
+                for (int i = 0; i < cb->count(); ++i)
+                    printf("%s%s", i ? "|" : "", qPrintable(cb->itemText(i)));
+                printf("]\n");
+            }
+            for (QLineEdit *le : m->findChildren<QLineEdit *>())
+                printf("      edit  [%-22s] text=[%s] validator=%s\n",
+                       qPrintable(le->objectName()), qPrintable(le->text()),
+                       qPrintable(validatorDesc(le->validator())));
+            clickDlgButton(m, "Cancel");
+        });
+        if (QAction *a = act("alterMovieSettingsAction")) { a->trigger(); QTest::qWait(1200); }
+        cancelModalHandler();
+        printf("  -- slave window survived the whole battery --\n");
+        fflush(stdout);
         return 0;
     }
 
