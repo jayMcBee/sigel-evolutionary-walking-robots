@@ -892,12 +892,22 @@ elif make -s -C "$ROOT" B=build-fast SAN= SIGSAN= guidrive >/tmp/bdb.$$ 2>&1; th
     # prints "warning: setlocale: LC_ALL: cannot change locale" on any box
     # where the locale is not generated -- which is most of them, and is
     # exactly the box this check is designed to run on.
+    # stderr is KEPT, appended to /tmp/berr.$$, and checked below. It used to
+    # go to /dev/null, which threw away the only thing that can catch a dead
+    # connect the $DEAD_SIGNALS regex has never heard of: Qt's own runtime
+    # "No such signal". That regex is a closed list of the nine Qt 2 spellings
+    # in §2 and matches SIGNAL( only, so a tenth kind -- or any SLOT() naming a
+    # slot that no longer exists -- was invisible to the whole gate. Injecting
+    # SIGNAL(highlighted(int)), which QTreeWidget does not have, passed every
+    # section green while Qt printed the warning into /dev/null. Found by
+    # review 2026-09-03.
     guidrive_run() {
         local sc="$1" out="$2"; shift 2
         env "$@" SIGEL_ROOT="$SRC" SIGEL_EXP="$BEXP" \
             SIGEL_SCRATCH="${TMPDIR:-/tmp}" QT_QPA_PLATFORM=offscreen \
-            timeout 300 "$ROOT/build-fast/guidrive" "$sc" > "$out" 2>/dev/null
+            timeout 300 "$ROOT/build-fast/guidrive" "$sc" > "$out" 2>>/tmp/berr.$$
     }
+    : > /tmp/berr.$$
     if guidrive_run gate /tmp/bo.$$ && guidrive_run pages /tmp/bp.$$ \
        && guidrive_run exportall /tmp/bx.$$ && guidrive_run overwrite /tmp/bw.$$ \
        && guidrive_run dialogs /tmp/bg.$$ && guidrive_run metagui /tmp/bm.$$; then
@@ -913,6 +923,17 @@ elif make -s -C "$ROOT" B=build-fast SAN= SIGSAN= guidrive >/tmp/bdb.$$ 2>&1; th
             echo "  the driver could not carry out part of a scenario:"
             command grep -n '^ *!!' /tmp/ball.$$ | head -6 | sed 's/^/    /'
             echo "  (a run containing these must never be committed as a baseline)"
+        elif command grep -qE 'No such (signal|slot)' /tmp/berr.$$; then
+            # Qt says this at RUNTIME when a string-based connect names
+            # something that does not exist. It compiles, it links, and the
+            # slot simply never fires -- which is the whole failure class C4
+            # found and $DEAD_SIGNALS only partly covers. This check needs no
+            # list of Qt 2 spellings because Qt does the matching.
+            bf=1
+            echo "  a string-based connect names a signal or slot that does not exist:"
+            command grep -E 'No such (signal|slot)' /tmp/berr.$$ \
+                | sort -u | head -6 | sed 's/^/    /'
+            echo "  (it compiles and links; the slot never fires -- see §2's table)"
         elif command grep -q '^ *!!' "$ROOT/guibehaviour-baseline.txt"; then
             bf=1
             echo "  the BASELINE itself contains a failure marker -- it was"
@@ -975,7 +996,7 @@ else
 fi
 rm -f /tmp/bo.$$ /tmp/bp.$$ /tmp/bx.$$ /tmp/bw.$$ /tmp/bg.$$ /tmp/bm.$$ \
       /tmp/bl.$$ /tmp/bl2.$$ /tmp/ball.$$ \
-      /tmp/bd.$$ /tmp/bdb.$$
+      /tmp/bd.$$ /tmp/bdb.$$ /tmp/berr.$$
 # exportall and overwrite WRITE FILES, 2.7 MB of them, the population export
 # being most of it. Fixed names, so they are overwritten rather than
 # accumulated, but leaving them in TMPDIR is untidy.
