@@ -23,9 +23,12 @@
 # not captured -- 1.3 was not driven through the edit set a second time -- and
 # it is admissible because C11a measured those nine typed values identical on
 # both architectures, and because the whole edited file differs from the 1.3
-# base in exactly twelve lines and no others: the nine typed values, the
-# mutation/reproduction interlock pair (250 + 670 + 80 = 1000), and the
-# fitness-name combo moving down one item.
+# base in exactly twelve lines and no others: eight typed values, the
+# DYNAMECHSINTEGRATOR and fitness-name combos each moving down one item, the
+# mutation/reproduction interlock pair (250 + 670 + 80 = 1000), and
+# LanguageParameters. 8 + 2 + 2 = 12. *An earlier version said "nine typed
+# values" and then listed the fitness-name combo separately, which counted the
+# integrator combo as typed and made the arithmetic work only by accident.*
 #
 # LanguageParameters IS NOT IN THE BLOCK. It lives at line 133288 of the saved
 # file, far below `POPULATION BEGIN{' at 193, so a check over the 192-line

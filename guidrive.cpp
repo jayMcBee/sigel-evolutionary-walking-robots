@@ -1896,16 +1896,34 @@ int main(int argc, char **argv)
         //   ROUND TRIP STABLE (and the import undid the change)
         // -- the exact words, on a gutted importer.
         //
-        // putAllIntoExperiment() is the aggregator the Save path uses, and it
-        // pushes all five pages, so one call covers every entry -- including
-        // Language-Parameters and Population, whose export slots do not call
-        // putIntoExperiment at all and which therefore could not be pushed by
-        // exporting again.
+        // putAllIntoExperiment() is the aggregator the Save path uses. It
+        // pushes experimentView, gpParameter, simulationParameter,
+        // languageParameters and environmentView -- NOT robotView and NOT the
+        // population, so it is not "all five View pages" and it does not cover
+        // the Population entry. That entry needs no push: `Individuals >
+        // Delete' changes the experiment directly, so it was falsifiable
+        // already. The four widget-typed entries are the ones that needed it,
+        // and they needed it for an ORDERING reason rather than a missing
+        // call -- three of their four export slots DO call putIntoExperiment,
+        // but importFrom's closing getOutOfExperiment() has already wiped the
+        // widget by then.
+        // THROUGH THE GUI, not by calling putAllIntoExperiment() directly.
+        // Selecting a row in the experiment tree runs it
+        // (SIG_ExperimentListView.cpp:323, slotSelectionChanged), and every
+        // View page switch calls selectItem() -> setCurrentItem(), so one
+        // click on a page the mutation did not touch pushes the typed value
+        // along the path a user actually takes. A direct call would work and
+        // would not contaminate the exports -- measured -- but this file has
+        // already recorded one reading that was wrong BECAUSE a direct invoke
+        // ran putAllIntoExperiment() at a moment no GUI action would (§9, the
+        // generation-counter LCD). Using the real path removes the question
+        // rather than answering it.
         auto pushToExperiment = [&]() -> bool {
-            SIG_ExperimentListView *lv2 = listView();
-            SIG_Experiment *ex = lv2 ? lv2->currentlySelectedExperiment() : nullptr;
-            if (!ex) { printf("  !! no selected experiment to push into\n"); return false; }
-            ex->putAllIntoExperiment();
+            if (!clickMenu("&View", "&Robot")) {
+                printf("  !! could not switch page to push the mutation\n");
+                return false;
+            }
+            QTest::qWait(300);
             return true;
         };
         static const Mut muts[] = {

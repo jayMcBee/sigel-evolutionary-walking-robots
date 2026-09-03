@@ -848,7 +848,8 @@ elif make -s -C "$ROOT" B=build-fast SAN= SIGSAN= guidrive >/tmp/bdb.$$ 2>&1; th
     # SIGEL_ROOT must be the SOURCE tree: the driver loads pixmaps and terrain
     # from it. Neither scenario spawns a sigel_slave, so neither needs one.
     #
-    # SIX scenarios make up the baseline, concatenated in this order:
+    # SEVEN scenarios make up the baseline, concatenated in this order
+    # (`roundtrip' joined 2026-09-03; this said SIX until then):
     #   gate       C10 -- the tree, sorting, add/delete/reset, the dialogs,
     #              the context menus, the MetaGP warning
     #   pages      C11a -- the five View pages C10 never opened, every spin
@@ -880,12 +881,13 @@ elif make -s -C "$ROOT" B=build-fast SAN= SIGSAN= guidrive >/tmp/bdb.$$ 2>&1; th
     #              where 1.3 adds 12. Both figures are the oracle's, off the
     #              running binary.
     #
-    # `roundtrip' is NOT run here. It exports, imports and re-exports each
-    # format, which takes 97 seconds against 30 for exportall, and what it
-    # uniquely covers -- writer/reader/writer symmetry -- is largely covered by
-    # exportall (a broken reader moves the export) and by dictorder. Run it by
-    # hand when touching a readFromFile or writeToFile:
-    #   SIGEL_ROOT=... SIGEL_EXP=... build-fast/guidrive roundtrip
+    # `roundtrip' IS run here as of 2026-09-03 -- §9 item 1. This comment used
+    # to say it was not, on the grounds that "what it uniquely covers is
+    # largely covered by exportall (a broken reader moves the export)". THAT
+    # ARGUMENT IS FALSE and gating it is what showed so: gutting each of the
+    # five readers in turn moves roundtrip and NOT exportall, because exportall
+    # never reads anything back. It costs 103 s measured, against 30 for
+    # exportall -- the most expensive scenario here by 3.4x, and worth it.
     # $1 scenario, $2 outfile, $3.. extra NAME=VALUE for the child only.
     # The extras go through env rather than being written as a prefix on the
     # function call: a prefix would also apply to the SHELL, and bash then
@@ -926,12 +928,6 @@ elif make -s -C "$ROOT" B=build-fast SAN= SIGSAN= guidrive >/tmp/bdb.$$ 2>&1; th
        && guidrive_run roundtrip /tmp/br.$$; then
         cat /tmp/bo.$$ /tmp/bp.$$ /tmp/bx.$$ /tmp/bw.$$ /tmp/bg.$$ /tmp/bm.$$ \
             /tmp/br.$$ > /tmp/ball.$$
-        # The driver prints `!!' when it could not do what it was asked -- a
-        # dialog that would not accept, a file that never appeared. Such a run
-        # must not pass, and must not be diffed into a baseline either: one
-        # DID get committed that way, a population export that silently wrote
-        # nothing, and only a later diff caught it. Checked before the diff so
-        # the message is about the right thing.
         # THE RUNTIME-CONNECT CHECK AND ITS POSITIVE CONTROL.
         #
         # Qt says "No such signal"/"No such slot" at RUNTIME when a
@@ -941,7 +937,7 @@ elif make -s -C "$ROOT" B=build-fast SAN= SIGSAN= guidrive >/tmp/bdb.$$ 2>&1; th
         # regex over the nine Qt 2 spellings in §2, matching SIGNAL( only, so a
         # tenth kind and every bad SLOT() are invisible to it. Nor is it the
         # other way round -- the regex is STATIC over all 14 modules while this
-        # is runtime over only what these six scenarios execute. Partly
+        # is runtime over only what these seven scenarios execute. Partly
         # disjoint, so both are kept.
         #
         # But Qt emits it under the logging category qt.core.qobject.connect,
@@ -1062,15 +1058,25 @@ fi
 rm -f /tmp/bo.$$ /tmp/bp.$$ /tmp/bx.$$ /tmp/bw.$$ /tmp/bg.$$ /tmp/bm.$$ /tmp/br.$$ \
       /tmp/bl.$$ /tmp/bl2.$$ /tmp/ball.$$ \
       /tmp/bd.$$ /tmp/bdb.$$ /tmp/berr.$$
-# exportall and overwrite WRITE FILES, 2.7 MB of them, the population export
-# being most of it. Fixed names, so they are overwritten rather than
-# accumulated, but leaving them in TMPDIR is untidy.
+# exportall, overwrite and roundtrip WRITE FILES -- 8.2 MB between them, the
+# two population exports being most of it. Fixed names, so they are overwritten
+# rather than accumulated, but leaving them in TMPDIR is untidy. roundtrip's
+# fifteen were missed when it joined the list and left 5.5 MB per run behind.
 rm -f "${TMPDIR:-/tmp}"/x11b-gpp.gpp "${TMPDIR:-/tmp}"/x11b-sip.sip \
       "${TMPDIR:-/tmp}"/x11b-lap.lap "${TMPDIR:-/tmp}"/x11b-env.env \
       "${TMPDIR:-/tmp}"/x11b-pop.pop "${TMPDIR:-/tmp}"/x11b-prg.prg \
       "${TMPDIR:-/tmp}"/x11b-ind.ind "${TMPDIR:-/tmp}"/x11b-dat.dat \
       "${TMPDIR:-/tmp}"/x11b-ow.sip "${TMPDIR:-/tmp}"/x11b-ow \
       "${TMPDIR:-/tmp}"/c11c-lap.lap
+for e in gpp sip lap env pop; do
+    rm -f "${TMPDIR:-/tmp}/rt-a-$e.$e" "${TMPDIR:-/tmp}/rt-b-$e.$e" \
+          "${TMPDIR:-/tmp}/rt-a-$e"    "${TMPDIR:-/tmp}/rt-b-$e"
+done
+rm -f "${TMPDIR:-/tmp}"/rt-prg-a.prg "${TMPDIR:-/tmp}"/rt-prg-b.prg \
+      "${TMPDIR:-/tmp}"/rt-prg-a     "${TMPDIR:-/tmp}"/rt-prg-b \
+      "${TMPDIR:-/tmp}"/rt-ind-a.ind "${TMPDIR:-/tmp}"/rt-ind-a \
+      "${TMPDIR:-/tmp}"/rt-rob-before.lap "${TMPDIR:-/tmp}"/rt-rob-after.lap \
+      "${TMPDIR:-/tmp}"/rt-rob-before     "${TMPDIR:-/tmp}"/rt-rob-after
 printf '%-22s %2d pass  %2d fail\n' "gui behaviour" "$bp" "$bf"
 pass=$((pass+bp)); fail=$((fail+bf))
 
@@ -1098,6 +1104,14 @@ pp=0; pf=0
 PSD="${TMPDIR:-/tmp}"
 if [ ! -f "$ROOT/pagesave-baseline.txt" ]; then
     pf=1; echo "  pagesave-baseline.txt is missing -- this gate tested NOTHING"
+elif [ ! -f "$BEXP" ]; then
+    # Same data dependency and therefore the same policy as `gui behaviour'
+    # above -- a fresh clone has no data-reordered/. Without this the two runs
+    # HANG in the modal Load dialog until the 300 s timeout, twice, and report
+    # "did not finish", which blames the driver for a missing file.
+    echo "  SKIPPED: no $BEXP -- the data ships separately. THIS SECTION"
+    echo "  TESTED NOTHING."
+    skipped=$((skipped+1))
 elif [ -x "$ROOT/build-fast/guidrive" ]; then
     # Same env as guidrive_run above, minus the locale extras. The two runs
     # differ only in SIGEL_PAGEEDIT, which selects the eleven-edit set.
@@ -1138,15 +1152,22 @@ elif [ -x "$ROOT/build-fast/guidrive" ]; then
             # this data (FLOORPICTUREFILE, TEXTUREFILE) have an EMPTY value
             # line after them, so anything that skips blanks reads the next key
             # as a value and desynchronises silently from there on.
+            # `|| true' on both greps is LOAD-BEARING, not tidiness. This runs
+            # under `set -e' with no trap, so a grep that matches NOTHING exits
+            # 1 and kills the WHOLE SCRIPT here -- no pagesave line, no forms
+            # section, no total, no summary. And a missing LanguageParameters
+            # line is EXACTLY the regression this check was added to catch, so
+            # without these the gate would abort silently on its own quarry.
+            # The empty output then fails the diff, which is the right outcome.
             {
                 echo "== BASE BLOCK =="
                 awk '/^POPULATION BEGIN\{/{exit} {print}' "$PSD/pagesave-base.exp"
                 echo "== BASE LanguageParameters =="
-                command grep -h '^LanguageParameters' "$PSD/pagesave-base.exp"
+                command grep -h '^LanguageParameters' "$PSD/pagesave-base.exp" || true
                 echo "== EDITED BLOCK =="
                 awk '/^POPULATION BEGIN\{/{exit} {print}' "$PSD/pagesave-edited.exp"
                 echo "== EDITED LanguageParameters =="
-                command grep -h '^LanguageParameters' "$PSD/pagesave-edited.exp"
+                command grep -h '^LanguageParameters' "$PSD/pagesave-edited.exp" || true
             } > /tmp/psall.$$
             # NOT `grep -v ^#': the DATA contains six `#####' separator
             # lines, and stripping every #-leading line ate them -- caught by
