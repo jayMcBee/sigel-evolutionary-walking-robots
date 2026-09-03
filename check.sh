@@ -582,6 +582,36 @@ printf '%-22s %2d pass  %2d fail\n' "freed-pointer null" "$vp" "$vf"
 pass=$((pass+vp)); fail=$((fail+vf))
 
 # ---------------------------------------------------------------------------
+# Controls the user cannot see or reach.
+#
+# The one real user-facing defect SIGEL_SlaveGUI turned up was a QGroupBox too
+# small to hold its own children: seven 50x50 navigation buttons and three
+# position readouts, all present, enabled and correctly sized, all clipped out
+# of existence by a container that had collapsed to 90x37. No widget-level probe
+# saw it -- every child reported healthy -- and it took a screenshot of the
+# running program to notice. This is that defect made mechanical: walk every
+# View page and every tab and report any widget whose rect leaves its parent.
+#
+# The scenario carries its own positive control and FAILS if the control does
+# not fire, because "0 clipped" from a check that cannot detect clipping is
+# worth nothing. Shrinking the window is NOT usable as that control here -- the
+# converted pages carry real layouts and reflow instead of clipping, where 1.3
+# is absolutely positioned and does clip. So it displaces a real widget instead
+# and requires the report.
+cp=0; cf=0
+if SIGEL_ROOT="$SRC" QT_QPA_PLATFORM=offscreen \
+       SIGEL_EXP="$ROOT/data-reordered/Experiments/twoBasesSimpleFitness2.exp" \
+       timeout 300 "$ROOT/build-fast/guidrive" clipcheck >/tmp/clip.$$ 2>/dev/null; then
+    cp=1
+else
+    cf=1
+    sed -n '/CLIPPED\|selftest/p' /tmp/clip.$$ | sed 's/^/  /'
+fi
+rm -f /tmp/clip.$$
+printf '%-22s %2d pass  %2d fail\n' "no clipped controls" "$cp" "$cf"
+pass=$((pass+cp)); fail=$((fail+cf))
+
+# ---------------------------------------------------------------------------
 # The structural fingerprint tool's own teeth.
 #
 # expstruct.py is what compares an evolved .exp across the two architectures

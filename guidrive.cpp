@@ -300,6 +300,35 @@ static void dumpIndividuals()
 // Everything on the current page that carries observable state. Generic on
 // purpose: the same dump has to serve the experiment page, the GP page and the
 // individuals page, and the oracle reads the same facts off 1.3 by eye.
+// Any widget whose rect leaves its parent is a control the user cannot fully
+// see or hit. This is the mechanical form of the defect that hid seven
+// navigation buttons behind a collapsed group box, and then a second one that
+// hid seven controls in the movie dialog.
+static int clippedWidgets(QWidget *root, const char *where)
+{
+    int checked = 0, bad = 0;
+    for (QWidget *w : root->findChildren<QWidget *>()) {
+        QWidget *par = w->parentWidget();
+        if (!par || !w->isVisible() || w->size().isEmpty()) continue;
+        ++checked;
+        const QRect r = w->geometry(), p = par->rect();
+        if (r.left() < p.left() || r.top() < p.top()
+            || r.right() > p.right() || r.bottom() > p.bottom()) {
+            ++bad;
+            printf("    !! CLIPPED %s [%s] %dx%d at +%d+%d inside [%s] %dx%d\n", where,
+                   qPrintable(w->objectName().isEmpty()
+                       ? QString(w->metaObject()->className()) : w->objectName()),
+                   r.width(), r.height(), r.x(), r.y(),
+                   qPrintable(par->objectName().isEmpty()
+                       ? QString(par->metaObject()->className()) : par->objectName()),
+                   p.width(), p.height());
+        }
+    }
+    printf("  %-26s %3d visible widgets, %d clipped\n", where, checked, bad);
+    fflush(stdout);
+    return bad;
+}
+
 static void dumpWidgets()
 {
     QStackedWidget *st = W->findChild<QStackedWidget *>();
@@ -2880,6 +2909,91 @@ int main(int argc, char **argv)
         return 0;
     }
 
+    // --- clipcheck: controls the user cannot see or reach -----------------
+    // The one real defect SIGEL_SlaveGUI turned up was a group box too small to
+    // contain its own children, which hid seven buttons and three readouts. No
+    // widget-level probe saw it: every child was present, enabled and correctly
+    // sized. Only the containing rect was wrong. This walks every page and tab
+    // and reports any widget whose rect leaves its parent's.
+    //
+    // The oracle ran the equivalent on 1.3 and found nothing clipped at the
+    // default 900x750, having first PROVED the check can fire by shrinking the
+    // window until Import/Export fell off their parent. Same idea here: the
+    // `--selftest' pass below deliberately shrinks a page and must report hits,
+    // or a clean result means nothing.
+    if (scenario == "clipcheck") {
+        auto walk = [&](QWidget *root, const char *where) {
+            return clippedWidgets(root, where);
+        };
+
+        printf("\n== CLIPCHECK: main window at %dx%d ==\n", W->width(), W->height());
+        QStackedWidget *st = W->findChild<QStackedWidget *>();
+        int total = 0;
+        for (const char *pg : { "&Population", "&Robot", "&Language Parameters",
+                                "&GP Parameters", "&Simulation Parameters",
+                                "&Environment" }) {
+            clickMenu("&View", QString::fromLatin1(pg));
+            QTest::qWait(300);
+            QWidget *page = st ? st->currentWidget() : nullptr;
+            if (!page) { printf("  %-26s NO PAGE\n", pg); continue; }
+            printf("  [%s] page %dx%d\n", pg, page->width(), page->height());
+            total += walk(page, pg);
+            if (QTabWidget *tw = page->findChild<QTabWidget *>()) {
+                for (int i = 0; i < tw->count(); ++i) {
+                    QTabBar *bar = tw->tabBar();
+                    QTest::mouseClick(bar, Qt::LeftButton, Qt::NoModifier,
+                                      bar->tabRect(i).center());
+                    QTest::qWait(200);
+                    total += walk(tw->currentWidget(),
+                                  qPrintable(QString("  tab %1").arg(tw->tabText(i))));
+                }
+            }
+        }
+        printf("  TOTAL CLIPPED: %d\n", total);
+
+        // DIALOGS TOO. The first version walked only the View pages and would
+        // NOT have caught the movie-settings dialog, whose "File conventions"
+        // group hid seven controls -- a static review found that, not this. A
+        // check that misses the second instance of the defect it was written
+        // for is not finished.
+        // The slave window and its movie dialog are checked by the `slavegui'
+        // scenario, which is where they exist. A dialog walk was attempted here
+        // first and was useless: the movie dialog belongs to the slave window,
+        // not to anything the master's menus can open.
+
+        // THE POSITIVE CONTROL. Without it "0 clipped" is not evidence.
+        // Shrinking the window does NOT work as a control here, and that is
+        // itself a finding: these pages carry real layouts, so a smaller window
+        // reflows them instead of clipping. On 1.3 the same shrink DOES clip,
+        // because its pages are absolutely positioned -- the oracle used exactly
+        // that to validate its own check, and it fired immediately there. So the
+        // port is better behaved than 1.3 on window resize, and this check needs
+        // a control that does not depend on clipping being reachable.
+        // Move one real widget outside its parent and require a report.
+        printf("\n  -- selftest: displace a widget and require the check to see it --\n");
+        clickMenu("&View", "&GP Parameters");
+        QTest::qWait(300);
+        int fired = 0;
+        if (QWidget *page = st ? st->currentWidget() : nullptr) {
+            QWidget *victim = nullptr;
+            for (QWidget *w : page->findChildren<QWidget *>())
+                if (w->isVisible() && !w->size().isEmpty() && w->parentWidget()) { victim = w; break; }
+            if (!victim) { printf("!! no widget to displace\n"); fflush(stdout); return 1; }
+            const QRect keep = victim->geometry();
+            victim->move(victim->parentWidget()->width() + 40, keep.y());
+            QTest::qWait(120);
+            fired = walk(page, "with one widget displaced");
+            victim->setGeometry(keep);
+            QTest::qWait(120);
+        }
+        printf("  selftest %s\n", fired > 0
+               ? "OK -- the check reports a widget that leaves its parent"
+               : "!! USELESS -- a displaced widget was not reported; a clean result proves nothing");
+        fflush(stdout);
+        // Fail on EITHER a real clipped control or a check that cannot detect one.
+        return (total == 0 && fired > 0) ? 0 : 1;
+    }
+
     // --- SIGEL_SlaveGUI: the slave's simulation window ---------------------
     // The last module C11 never drove. It is reachable WITHOUT PVM: the slave's
     // own standalone mode is `sigel_slave -visualize <exp>'
@@ -2947,6 +3061,7 @@ int main(int argc, char **argv)
         printf("  [window] title=[%s] size=%dx%d visible=%d\n",
                qPrintable(sw->windowTitle()), sw->width(), sw->height(),
                sw->isVisible());
+        int swClipped = clippedWidgets(sw, "slave window");
 
         // Everything with observable state, by objectName so the oracle can be
         // asked about the same control by the same name.
@@ -3256,7 +3371,8 @@ int main(int argc, char **argv)
 
         // --- the movie settings dialog, never opened before ------------------
         printf("\n  -- movie settings dialog --\n");
-        whenModal([](QWidget *m) {
+        int movieClipped = 0;
+        whenModal([&movieClipped](QWidget *m) {
             describeDialog(m);
             for (QSpinBox *sp : m->findChildren<QSpinBox *>())
                 printf("      spin  [%-22s] value=%d min=%d max=%d\n",
@@ -3272,6 +3388,11 @@ int main(int argc, char **argv)
                 printf("      edit  [%-22s] text=[%s] validator=%s\n",
                        qPrintable(le->objectName()), qPrintable(le->text()),
                        qPrintable(validatorDesc(le->validator())));
+            // This dialog shipped with seven controls hidden behind a group box
+            // that had collapsed. The widget dump above listed them all as
+            // healthy either way, which is exactly why the containing rect has
+            // to be checked as well.
+            movieClipped = clippedWidgets(m, "movie settings dialog");
             clickDlgButton(m, "Cancel");
         });
         if (QAction *a = act("alterMovieSettingsAction")) { a->trigger(); QTest::qWait(1200); }
@@ -3364,6 +3485,12 @@ int main(int argc, char **argv)
         fflush(stdout);
 
         printf("  -- slave window survived the whole battery --\n");
+        if (swClipped || movieClipped) {
+            printf("!! %d clipped control(s) in the slave window, %d in its dialog\n",
+                   swClipped, movieClipped);
+            fflush(stdout);
+            return 1;
+        }
         fflush(stdout);
         return 0;
     }

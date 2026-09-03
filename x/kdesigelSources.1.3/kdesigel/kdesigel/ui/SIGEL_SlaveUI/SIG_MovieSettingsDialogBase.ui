@@ -33,7 +33,13 @@
           </property>
           <item>
             <widget class="QGroupBox" name="groupboxDirectory">
-              <property name="title">
+              <property name="minimumSize">
+     <size>
+      <width>411</width>
+      <height>110</height>
+     </size>
+    </property>
+    <property name="title">
                 <string>File conventions</string>
               </property>
               <widget class="QWidget" name="Layout15">
