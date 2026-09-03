@@ -1802,3 +1802,183 @@ Do you want to overwrite?]
 
 == METAGP: closing ==
   closed=1 (onHide() may refuse) mainWindowAlive=1
+== SCENARIO roundtrip ==
+
+== STEP 1: fresh start, no experiment ==
+  [title] SIGEL
+  [tree] header=[Experiments] topLevel=0
+  [page] count=1 current=QLabel objectName=[baseWidget]
+  [action changes] none
+  [modal] class=QFileDialog title=[Load Experiments...]
+  [filedialog] title=[Load Experiments...] mode=3 nameFilters=[Experiment Files (*.exp) ;; All Files (*)] labelAccept=[&Open]
+
+== STEP 2: after File > Open Experiment ==
+  [title] SIGEL
+  [tree] header=[Experiments] topLevel=1
+      twoBasesSimpleFitness2.exp sel=1 exp=1 cur=1 selectable=1
+        Individuals              sel=0 exp=0 cur=0 selectable=1
+        Robot                    sel=0 exp=1 cur=0 selectable=1
+          Language-Parameters      sel=0 exp=0 cur=0 selectable=1
+        GP-Parameters            sel=0 exp=0 cur=0 selectable=1
+        Simulation-Parameters    sel=0 exp=0 cur=0 selectable=1
+        Environment              sel=0 exp=0 cur=0 selectable=1
+  [page] count=8 current=SIGEL_MasterGUI::SIG_ExperimentView objectName=[ExperimentView]
+  [widgets]
+    group    [Evolution controls] enabled=1
+    group    [Fitnesscurve] enabled=1
+    group    [Experiment properties] enabled=1
+    button   [&Start] enabled=1 checkable=0 checked=0
+    button   [S&top] enabled=0 checkable=0 checked=0
+    button   [Show in GNU-Plot] enabled=1 checkable=0 checked=0
+    button   [Export PostScript] enabled=1 checkable=0 checked=0
+    check    [Save the history] enabled=1 checkable=1 checked=1
+    lcd      [lcdnumberGenerations] value=532 digits=4
+    lcd      [lcdnumberAutosave] value=0 digits=4
+    slider   [sliderIntervall] value=0 min=0 max=100 enabled=1
+    progress [generationProgBar] value=-1 min=0 max=100
+  [action changes]
+    &File/&Delete Experiment                                   ENABLED
+    &File/&Rename Experiment                                   ENABLED
+    &File/&Save Experiment                                     ENABLED
+    &File>Export/...to GNU plot                                ENABLED
+    &File>Export/Environment                                   ENABLED
+    &File>Export/GP-Parameters                                 ENABLED
+    &File>Export/Individual                                    ENABLED
+    &File>Export/Language-Parameters                           ENABLED
+    &File>Export/Population                                    ENABLED
+    &File>Export/Program                                       ENABLED
+    &File>Export/Simulation-Parameters                         ENABLED
+    &File>Import/Environment                                   ENABLED
+    &File>Import/GP-Parameters                                 ENABLED
+    &File>Import/Individual                                    ENABLED
+    &File>Import/Language-Parameters                           ENABLED
+    &File>Import/Population                                    ENABLED
+    &File>Import/Program                                       ENABLED
+    &File>Import/Robot                                         ENABLED
+    &File>Import/Simulation-Parameters                         ENABLED
+    &Individuals/&Add                                          ENABLED
+    &Individuals/&Delete                                       ENABLED
+    &Individuals/&Visualize                                    ENABLED
+    &Individuals/Reset                                         ENABLED
+    &MetaGP/&Use MetaGP                                        ENABLED
+    &View/&Environment                                         ENABLED
+    &View/&GP Parameters                                       ENABLED
+    &View/&Language Parameters                                 ENABLED
+    &View/&Population                                          ENABLED
+    &View/&Robot                                               ENABLED
+    &View/&Simulation Parameters                               ENABLED
+    TB:fileToolbar/&Delete Experiment                          ENABLED
+    TB:fileToolbar/&Save Experiment                            ENABLED
+    TB:individualsToolBar/&Add                                 ENABLED
+    TB:individualsToolBar/&Delete                              ENABLED
+    TB:individualsToolBar/&Visualize                           ENABLED
+    TB:mtToolbar/&Use MetaGP                                   ENABLED
+    TB:viewToolBar/&Environment                                ENABLED
+    TB:viewToolBar/&GP Parameters                              ENABLED
+    TB:viewToolBar/&Language Parameters                        ENABLED
+    TB:viewToolBar/&Population                                 ENABLED
+    TB:viewToolBar/&Robot                                      ENABLED
+    TB:viewToolBar/&Simulation Parameters                      ENABLED
+
+== STEP 3: after View > Population ==
+  [title] SIGEL
+  [tree] header=[Experiments] topLevel=1
+      twoBasesSimpleFitness2.exp sel=0 exp=1 cur=0 selectable=1
+        Individuals              sel=1 exp=0 cur=1 selectable=1
+        Robot                    sel=0 exp=1 cur=0 selectable=1
+          Language-Parameters      sel=0 exp=0 cur=0 selectable=1
+        GP-Parameters            sel=0 exp=0 cur=0 selectable=1
+        Simulation-Parameters    sel=0 exp=0 cur=0 selectable=1
+        Environment              sel=0 exp=0 cur=0 selectable=1
+  [page] count=8 current=SIGEL_MasterGUI::SIG_AllIndividualsView objectName=[]
+  [individuals] rows=120 cols=3 headers=[Name               ][Fitness          ][Age               ] selected=0
+    row0  | 55658         | 1.14825       | 111           | sel=0
+    row1  | 56091         | 1.14825       | 109           | sel=0
+    row2  | 56248         | 1.14825       | 259           | sel=0
+    row3  | 56349         | 1.06261       | 97            | sel=0
+    row4  | 56432         | 1.14825       | 111           | sel=0
+    row5  | 56447         | 1.14825       | 107           | sel=0
+    ... 114 more
+    allrows sha256=ee0c3372fe5769ccf63f449dfcf2b301eb7d4acd4924cc5291e6f1e0c303e198
+  [action changes] none
+
+== ROUND TRIP ==
+
+-- GP-Parameters
+  [modal] class=QFileDialog title=[Export GP Parameter...]
+  mutated spinboxRandomSeed -> 321
+  [modal] class=QFileDialog title=[Import GP Parameter...]
+  [modal] class=QFileDialog title=[Export GP Parameter...]
+  export1 1299 bytes  88e851e2b9d1b23185bf453c6c99cdc581be01d2547961c6fdb50fc3c6873234
+  export2 1299 bytes  88e851e2b9d1b23185bf453c6c99cdc581be01d2547961c6fdb50fc3c6873234
+  ROUND TRIP STABLE (and the import undid the change)
+
+-- Simulation-Parameters
+  [modal] class=QFileDialog title=[Export Simulation Parameters...]
+  mutated lineeditStepSize -> [0.09]
+  [modal] class=QFileDialog title=[Import Simulation Parameters...]
+  [modal] class=QFileDialog title=[Export Simulation Parameters...]
+  export1 305 bytes  c672eeabd54245663e8a308d68cdec2343a0b66840426cf4d7648606e1a1df10
+  export2 305 bytes  c672eeabd54245663e8a308d68cdec2343a0b66840426cf4d7648606e1a1df10
+  ROUND TRIP STABLE (and the import undid the change)
+
+-- Language-Parameters
+  [modal] class=QFileDialog title=[Export Language Parameters...]
+  mutated spinboxNumberOfRegisters -> 7
+  [modal] class=QFileDialog title=[Import Language Parameter...]
+  [modal] class=QFileDialog title=[Export Language Parameters...]
+  export1 401 bytes  e40ca1caa26dd424faf1eca7d336b16e963a714a8c95b059dabed79a3ce72af0
+  export2 401 bytes  e40ca1caa26dd424faf1eca7d336b16e963a714a8c95b059dabed79a3ce72af0
+  ROUND TRIP STABLE (and the import undid the change)
+
+-- Environment
+  [modal] class=QFileDialog title=[Export Environment...]
+  mutated lineeditGravityX -> [3.5]
+  [modal] class=QFileDialog title=[Import Environment...]
+  [modal] class=QFileDialog title=[Export Environment...]
+  export1 299 bytes  383d1f4f142ff26bff698d9a62e73a441154d8d0329bc36b1ae560935b1f73b1
+  export2 299 bytes  383d1f4f142ff26bff698d9a62e73a441154d8d0329bc36b1ae560935b1f73b1
+  ROUND TRIP STABLE (and the import undid the change)
+
+-- Population
+  [modal] class=QFileDialog title=[Export Population...]
+  [modal] class=QMessageBox title=[Continue deletion?]
+  [answering] &Yes
+  mutated the pool -> 117 rows
+  [modal] class=QFileDialog title=[Import Population...]
+  [modal] class=QFileDialog title=[Export Population...]
+  export1 2738900 bytes  ccca841d6b6b4be23e9004c555c4a0a9b64f399c582f0a25a65aed0b1cdb5ad5
+  export2 2739740 bytes  fa8388322e1d070289ca96207cb4c05a24d44ce0122e46887b2e82b1c01b4804
+  ROUND TRIP differs ONLY in blank lines -- C10's history growth, not a reader/writer disagreement
+  delta=840 bytes  blankLineDelta=120
+
+-- Robot (import only; there is no Export > Robot)
+  [modal] class=QFileDialog title=[Export Language Parameters...]
+  importing data-reordered/twoBases/twoBases.rrb (exists=1)
+  [modal] class=QFileDialog title=[Import Robot...]
+  list listboxLinks           count=2
+  list listboxMaterials       count=1
+  list listboxBodies          count=1
+  list listboxSensors         count=1
+  list listboxJoints          count=1
+  list listboxDrives          count=1
+  [modal] class=QFileDialog title=[Export Language Parameters...]
+  language-parameters before e40ca1caa26dd424faf1eca7d336b16e963a714a8c95b059dabed79a3ce72af0
+  language-parameters after  dc48b8ea613ad127eb95812a1c5da85c86eaadc17d7c58686cefcd60781c335a
+  ROBOT IMPORT *** CHANGED the language parameters ***
+
+-- Program import (replaces the selected individual's program)
+  [modal] class=QFileDialog title=[Export program...]
+  [modal] class=QFileDialog title=[Import program...]
+  [modal] class=QFileDialog title=[Export program...]
+  rows 120 -> 120 (delta +0, 0 is correct -- it replaces)
+  export1 f940751765c869f16f62333dafd34dbe0e66b6474577bf4209e9e8de70cc3214
+  export2 f940751765c869f16f62333dafd34dbe0e66b6474577bf4209e9e8de70cc3214
+  ROUND TRIP STABLE
+
+-- Individual import (adds one)
+  [modal] class=QFileDialog title=[Export individual...]
+  [modal] class=QFileDialog title=[Import individual...]
+  rows 120 -> 121 (delta +1)
+  individuals now named 55658: 1
+  last row: 57533 | -1 | 111

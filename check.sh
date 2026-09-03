@@ -913,10 +913,19 @@ elif make -s -C "$ROOT" B=build-fast SAN= SIGSAN= guidrive >/tmp/bdb.$$ 2>&1; th
     # has already been bitten by three times, but applied to everything rather
     # than one section.
     : > /tmp/berr.$$ || bf=1
+    # roundtrip joined the list 2026-09-03, the other half of §9 item 1. It is
+    # export-import-export on ONE machine and needs no 1.3 reference: its point
+    # is that the READER undoes a mutation made between the two exports, so a
+    # no-op importer -- the likelier failure -- cannot pass it. C11c had to fix
+    # exactly that: the probe used to serialise the same in-memory object twice
+    # and printed STABLE regardless. It is deterministic across runs and costs
+    # 103 s, the most expensive scenario here by a wide margin.
     if guidrive_run gate /tmp/bo.$$ && guidrive_run pages /tmp/bp.$$ \
        && guidrive_run exportall /tmp/bx.$$ && guidrive_run overwrite /tmp/bw.$$ \
-       && guidrive_run dialogs /tmp/bg.$$ && guidrive_run metagui /tmp/bm.$$; then
-        cat /tmp/bo.$$ /tmp/bp.$$ /tmp/bx.$$ /tmp/bw.$$ /tmp/bg.$$ /tmp/bm.$$ > /tmp/ball.$$
+       && guidrive_run dialogs /tmp/bg.$$ && guidrive_run metagui /tmp/bm.$$ \
+       && guidrive_run roundtrip /tmp/br.$$; then
+        cat /tmp/bo.$$ /tmp/bp.$$ /tmp/bx.$$ /tmp/bw.$$ /tmp/bg.$$ /tmp/bm.$$ \
+            /tmp/br.$$ > /tmp/ball.$$
         # The driver prints `!!' when it could not do what it was asked -- a
         # dialog that would not accept, a file that never appeared. Such a run
         # must not pass, and must not be diffed into a baseline either: one
@@ -996,7 +1005,8 @@ elif make -s -C "$ROOT" B=build-fast SAN= SIGSAN= guidrive >/tmp/bdb.$$ 2>&1; th
         bf=1
         echo "  the driver did not finish -- it exits(1) on an out-of-range pool"
         echo "  position, which is how the Qt 6 clear() regression showed up:"
-        tail -6 /tmp/bo.$$ /tmp/bp.$$ /tmp/bx.$$ /tmp/bw.$$ /tmp/bg.$$ /tmp/bm.$$ 2>/dev/null | sed 's/^/    /'
+        tail -6 /tmp/bo.$$ /tmp/bp.$$ /tmp/bx.$$ /tmp/bw.$$ /tmp/bg.$$ /tmp/bm.$$ \
+             /tmp/br.$$ 2>/dev/null | sed 's/^/    /'
         # stderr is captured now, and this is the path where it is most likely
         # to say why. Printing it here is the whole reason for capturing it
         # rather than discarding it: a crash, a Qt fatal, an ASan report or a
@@ -1049,7 +1059,7 @@ elif make -s -C "$ROOT" B=build-fast SAN= SIGSAN= guidrive >/tmp/bdb.$$ 2>&1; th
 else
     bf=1; echo "  guidrive did not build:"; head -5 /tmp/bdb.$$ | sed 's/^/    /'
 fi
-rm -f /tmp/bo.$$ /tmp/bp.$$ /tmp/bx.$$ /tmp/bw.$$ /tmp/bg.$$ /tmp/bm.$$ \
+rm -f /tmp/bo.$$ /tmp/bp.$$ /tmp/bx.$$ /tmp/bw.$$ /tmp/bg.$$ /tmp/bm.$$ /tmp/br.$$ \
       /tmp/bl.$$ /tmp/bl2.$$ /tmp/ball.$$ \
       /tmp/bd.$$ /tmp/bdb.$$ /tmp/berr.$$
 # exportall and overwrite WRITE FILES, 2.7 MB of them, the population export

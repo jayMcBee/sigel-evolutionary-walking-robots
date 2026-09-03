@@ -1874,6 +1874,40 @@ int main(int argc, char **argv)
             printf("  !! no widget %s on %s\n", mu.widget, mu.page);
             return false;
         };
+
+        // TYPING INTO THE WIDGET IS NOT ENOUGH, AND WITHOUT THIS THE WHOLE
+        // SCENARIO CANNOT FAIL.
+        //
+        // The round trip is: export1, change something, import export1,
+        // export2, require export2 == export1 -- so that an importer which
+        // opens nothing, parses nothing or is never reached cannot pass. C11c
+        // fixed one version of that hole (both exports used to serialise the
+        // same in-memory object). This is a second version and it survived:
+        // `mutate' types into a WIDGET, but importFrom ends with
+        // getOutOfExperiment(), which refreshes every widget FROM the
+        // experiment -- and the experiment never saw the typed value, because
+        // only putIntoExperiment moves it there. So the change was undone
+        // before export2 whether the reader ran or not.
+        //
+        // Demonstrated: with `gpExperiment.gpParameter.readFromFile()' commented
+        // out entirely, the scenario still printed
+        //   export1 1299 bytes 88e851e2...
+        //   export2 1299 bytes 88e851e2...
+        //   ROUND TRIP STABLE (and the import undid the change)
+        // -- the exact words, on a gutted importer.
+        //
+        // putAllIntoExperiment() is the aggregator the Save path uses, and it
+        // pushes all five pages, so one call covers every entry -- including
+        // Language-Parameters and Population, whose export slots do not call
+        // putIntoExperiment at all and which therefore could not be pushed by
+        // exporting again.
+        auto pushToExperiment = [&]() -> bool {
+            SIG_ExperimentListView *lv2 = listView();
+            SIG_Experiment *ex = lv2 ? lv2->currentlySelectedExperiment() : nullptr;
+            if (!ex) { printf("  !! no selected experiment to push into\n"); return false; }
+            ex->putAllIntoExperiment();
+            return true;
+        };
         static const Mut muts[] = {
             { "&GP Parameters",         0, "spinboxRandomSeed",        "321"  },
             { "&Simulation Parameters", 0, "lineeditStepSize",         "0.09" },
@@ -1908,6 +1942,9 @@ int main(int argc, char **argv)
                 }
             }
             if (!mutated) { printf("  !! could not mutate -- this run proves nothing\n"); continue; }
+            // Without this the change never reaches the experiment and the
+            // comparison below is an identity test -- see pushToExperiment.
+            if (!pushToExperiment()) { printf("  !! could not push -- this run proves nothing\n"); continue; }
 
             if (!importFrom(it.menu, fa)) { printf("  !! IMPORT FAILED\n"); continue; }
             const QString fb = exportTo(it.menu, b, it.ext);
