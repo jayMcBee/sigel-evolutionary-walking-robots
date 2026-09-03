@@ -32,8 +32,8 @@ build and run, because nothing else can be verified without it — see §3.
 | T — old-Qt tool container | **done 2026-08-27.** `tools/qtmig`, §4 |
 | D — delete the shim, migrate the data | **DONE 2026-08-30.** `q2compat.h` and `q2compat_check.cpp` deleted; `include/compat/` gone; **no `Q2*` shim type is used anywhere**. D1–D27. *This is not "no Qt 2 container exists" — the unported GUI modules still declare **71 lines** of `QArray`, `QDict`, `QList`-as-pointer-list and friends, all of which Phase C must convert. See D27.* The shim's self-check step is gone from `check.sh`, which now runs no code. §10 |
 | P — PVM | **DONE 2026-08-28.** Vendored 3.4.3 replaced by upstream 3.4.6; nine patches carry the four config lines and Debian's eight source fixes; `libpvm3.a` and `pvmd3` build; SIGEL's two PVM objects link against them and `SIG_GPPVMData` round-trips through real PVM. `sigel`/`sigel_slave` still need Phase C. §7 |
-| C — GUI | **DONE 2026-09-02. C1–C10 complete; C11a–C11d done.** All 20 Designer forms converted; all five GUI modules build as archives; **both programs link and run**; **100 dead `connect()`s repaired, tree-wide count 0 with no baseline anywhere**. **C9** made it match what 1.3 SHOWS — 42 menu entries, the toolbars and the loaded values, now the `gui vs 1.3` gate. **C10** DROVE it, diffed against the oracle driving 1.3 with XTest, and found two defects reading it could not: `QTreeWidget::clear()` emitting a signal Qt 2 blocked, which killed the application on a large delete, and an eaten ampersand. Second gate, `gui behaviour`. **C11a** drove the five View pages C10 never opened — the 12-probe validator battery matches 1.3 character for character under two locales, nine typed values come out byte-identical in the saved `.exp` across the two architectures, and a `QIntValidator` over-range divergence was found and **accepted as D28**. **C11b** drove the Import/Export round trips — **seven of the eight exports are byte-identical to what the 2003 i386 binary writes** — and found default-constructed language parameters coming out alphabetical where 1.3 gives `QDict` hash order, which had also been wrong in `dictorder-baseline.txt` for all seven robots. **C11c** drove the six dialogs, closing C7's validator set at 21 of 21, and found Qt 6 selecting a pre-filled field where Qt 2 did not — a typed digit REPLACED the value instead of appending, so Add-individuals turned 1 into 2 where 1.3 makes it 12. Two reviews of the checking machinery then found five probes that could not fail and a **demonstrated false pass** (all 30 icons replaced with garbage, gate green). **C11d** then opened the MetaGP window for the first time and found C7's locale fix had never reached MT_GUI's ten validators — `"1,000"` accepted, `toInt()` returning zero. **The evolution path then ran** — three generations on both machines, counts identical and 87 of 100 pool slots holding the same individual. **845 pass, 0 fail.** §7 |
-| V — check against the 1.3 binary | **V1, V5's MDH probe, V6, V7 and V8 all done, all PASS.** Ordering: 10 of 10 container orders match. Arithmetic: `twoBases` exact bit for bit, `octopus` 9/9 with three joints exact and 5 ulp worst. **V6, V7 and V8 done 2026-08-29** — friction and no-collide negotiation, their four remaining rules, and the GP parameter blocks captured *before* their conversion. `verification-against-sigel-1.3/v6`, `v7`, `v8`. **V9 done 2026-08-29, 3 of 3** — three function bodies disassembled, which symbol lookups cannot see. **V4's reference was RECEIVED 2026-08-30** — two whole-run digests validated across two independent 1.3 runs — but it is not yet a runnable gate here, because the prepared inputs are uncommitted. V2 and V3 not started. V5's sensor and force probes are **invalid as specified** — both target Dynamo-only functions, deleted 2026-08-28. §7 |
+| C — GUI | **DONE 2026-09-02. C1–C10 complete; C11a–C11d done.** All 20 Designer forms converted; all five GUI modules build as archives; **both programs link and run**; **100 dead `connect()`s repaired, tree-wide count 0 with no baseline anywhere**. **C9** made it match what 1.3 SHOWS — 42 menu entries, the toolbars and the loaded values, now the `gui vs 1.3` gate. **C10** DROVE it, diffed against the oracle driving 1.3 with XTest, and found two defects reading it could not: `QTreeWidget::clear()` emitting a signal Qt 2 blocked, which killed the application on a large delete, and an eaten ampersand. Second gate, `gui behaviour`. **C11a** drove the five View pages C10 never opened — the 12-probe validator battery matches 1.3 character for character under two locales, nine typed values come out byte-identical in the saved `.exp` across the two architectures, and a `QIntValidator` over-range divergence was found and **accepted as D28**. **C11b** drove the Import/Export round trips — **seven of the eight exports are byte-identical to what the 2003 i386 binary writes** — and found default-constructed language parameters coming out alphabetical where 1.3 gives `QDict` hash order, which had also been wrong in `dictorder-baseline.txt` for all seven robots. **C11c** drove the six dialogs, closing C7's validator set at 21 of 21, and found Qt 6 selecting a pre-filled field where Qt 2 did not — a typed digit REPLACED the value instead of appending, so Add-individuals turned 1 into 2 where 1.3 makes it 12. Two reviews of the checking machinery then found five probes that could not fail and a **demonstrated false pass** (all 30 icons replaced with garbage, gate green). **C11d** then opened the MetaGP window for the first time and found C7's locale fix had never reached MT_GUI's ten validators — `"1,000"` accepted, `toInt()` returning zero. **The evolution path then ran end to end, and THE PORT EVOLVES** — population 100, 30 generations, best fitness 0.063794 → 0.141625. *A cross-machine claim once stood here and was WITHDRAWN: the counts it rested on are forced by the code. §9 item 2.* **845 pass, 0 fail.** §7 |
+| V — check against the 1.3 binary | **V1, V5's MDH probe, V6, V7 and V8 all done, all PASS.** Ordering: 10 of 10 container orders match. Arithmetic: `twoBases` exact bit for bit, `octopus` 9/9 with three joints exact and 5 ulp worst. **V6, V7 and V8 done 2026-08-29** — friction and no-collide negotiation, their four remaining rules, and the GP parameter blocks captured *before* their conversion. `verification-against-sigel-1.3/v6`, `v7`, `v8`. **V9 done 2026-08-29, 3 of 3** — three function bodies disassembled, which symbol lookups cannot see. **V3 SATISFIED 2026-09-02** — same-box determinism, demonstrated twice by the oracle (`serA`≡`serB`, `octGateA`≡`octGateB`). **V4 DROPPED 2026-09-03** — whole-run digests cannot cross an x87/IEEE boundary, and the counts that appear to agree are forced by the code. **Replaced by a measurement of OUTPUT needing no reference: the port EVOLVES** — population 100, 30 generations, best fitness 0.063794 → 0.141625, §9. V2 remains open |
 
 **SCOPE — DECIDED 2026-08-23. Read this before changing anything.**
 
@@ -85,10 +85,11 @@ ported interface has nothing to drive.
 6. Fix PVM — **superseded 2026-08-28.** That count measured the vendored 3.4.3,
    now replaced by upstream 3.4.6: four config lines, no source edits. Phase P.
 7. Full headless run, compared against the captured 2003 run.
-8. The evolution-loop containers, still untestable — PVM runs as of Phase P, but Phase C blocks the loop (§7).
+8. ~~The evolution-loop containers, still untestable~~ **The loop RUNS as of 2026-09-03** —
+   30 generations, best fitness 0.063794 → 0.141625. §9 item 2.
 
 **A caveat that governs the order of what is left.** Everything after Phase D's
-simulation-side work is in the **evolution loop**, which nothing can execute:
+simulation-side work is in the **evolution loop**, which now runs (§9 item 2):
 ~~the 13 remaining `setAutoDelete` sites, `Q2PtrList`'s `fitTaskList` and
 `toSpawnList`, and the rest of `Q2PtrVector`~~ — **all converted as of D25c;
 core `setAutoDelete` is 0, and D26 converted the last two GUI-side members.
@@ -477,7 +478,7 @@ D20 supersedes D5, D24 supersedes D3.
 | **D22** | The Qt 2 style classes | **`QStyleFactory::create("Fusion")` for the `#else` (Motif) branch.** `QMotifPlusStyle` has no successor in Qt 6; Fusion is the closest it offers. Chosen 2026-08-27 after comparing the two styles Qt 6.9 offers here. **The `#ifdef _WINDOWS` branch keeps Windows** — `QWindowsStyle` is no longer a public class but Qt 6 still creates that style by name, so under D21 its nearest equivalent is `QStyleFactory::create("Windows")`, not Fusion |
 | **D23** | Phase C granularity | **one module or one form at a time**, each its own commit, each independently reviewable. No API-wide sweeps across modules |
 | **D24** | GUI scope | **Phase C is authorized.** Supersedes D3(b), which scoped the interface out. Named separately because D19–D23 did not carry it and the status table cited a struck-through row |
-| **D26** | What the 1.3 binary is asked for | **structure and arithmetic, not fitness equality.** Three tiers, in descending confidence: the container ordering and numbering, which compare exactly (V1, V2); per-individual fitness, which is chaotic across architectures and is therefore a judgement (V4); the non-integrating quantities, which compare exactly but need `gdb` (V5). Bit-exact agreement on an integrated trajectory is **not** a target and its absence proves nothing — §7. Recorded because this file repeatedly described the missing reference as "fitness numbers", which is the one thing that binary cannot usefully give |
+| **D26** | What the 1.3 binary is asked for | **structure and arithmetic, not fitness equality.** Three tiers, in descending confidence: the container ordering and numbering, which compare exactly (V1, V2); per-individual fitness, which is chaotic across architectures and is therefore a judgement (no cross-machine gate; V4 dropped); the non-integrating quantities, which compare exactly but need `gdb` (V5). Bit-exact agreement on an integrated trajectory is **not** a target and its absence proves nothing — §7. Recorded because this file repeatedly described the missing reference as "fitness numbers", which is the one thing that binary cannot usefully give |
 | **D25** | What "done" means | **Plain modern Qt 6, nothing left over.** `q2compat.h` deleted, no Qt3Support class anywhere, no compatibility flag on SIGEL's own code. This moves §10's "drop the Qt 2 emulation" from optional debt into a **required phase**, and with it the data migration that section describes — the shim exists because `Q2Dict`'s hash order numbers the links, so the 7 `.rrb` and 12 `.exp` files must be rewritten before it can go. **Ordered before Phase C**, so the GUI sites (466 as counted then, **534** re-measured at C1 — §7) are ported once, to the final target, instead of twice. Vendored third-party code is out of scope for this rule: qhull, cv97, Dynamo and PVM keep `-w -fpermissive` |
 
 ## 5c. Decisions — signed off 2026-09-02, from driving the interface
@@ -538,28 +539,12 @@ anything fails or is skipped. Zero is reachable because the two permanently
 Windows-only `WIN_*` files are an explicit exclusion rather than a standing
 red — see C11c.
 
-**The pass/fail basis changed at C4 and earlier figures are not comparable.**
-The standalone header pass had always been reported and never added to the
-totals, so the headline "fail" excluded a real header failure; it is now folded
-in, along with the 33-row regex self-test and the parsers check.
-**228 + 132 + 33 = 393, and 4 + 1 = 5.** Warnings are on the unchanged basis and
-remain comparable throughout.
-
-Earlier figures, on the old basis: 227/4/355 at C4 as first recorded, 203/4/309
-at C2 (the rise being `SIGEL_Visualisation` 22 + `SIGEL_CommonGUI` 10, both
-newly covered), 105/4/309 before Phase C, 322 warnings on
-2026-08-28 — the drops are recorded per step and each is explained, because a
-step that silently loses a warning has hidden something). That block's "**228 + 132 + 33 = 393, and 4 + 1 = 5**" and the 4 failures it
-counts are the C6 basis; both are historical. Of the 112 passes added since Phase C began, **98 are the `forms (Phase C)`
-section** — six checks over each of the 20 forms — and **14 are genuine new
-module coverage**: `SIGEL_Visualisation` (12) joined `MODULES` at C5 and
-`SIGEL_CommonGUI` (2) at C3. A GUI module joins only when every file in it
-compiles. *This paragraph said "not new module coverage… a GUI module still
-joins only at C3–C7" while the paragraph fifteen lines below already said the
-opposite. It is the exit criterion, which is the first thing §0 sends a new
-session to.* It was 118/4/338 until the Dynamo backend was deleted
-(`physics_backends.md`); the pass count and "headers standalone" each fall by
-exactly 13, one per deleted file pair, and the failing files are unchanged.
+**Earlier pass/fail figures are not comparable and have been removed.** The basis
+changed at C4 (standalone headers folded into the totals, plus the regex self-test
+and the parsers check), and again when the Dynamo backend was deleted. The current
+figure is the one in "Handover" below; every historical arithmetic trail that used
+to sit here was superseded, and it sat at the top of the section §0 sends a new
+session to. Warnings are on an unchanged basis and remain comparable throughout.
 
 **There are four gates, not three, and the full list with its caveats is in
 "Handover" below — use that one.** `check.sh` compiles every converted module
@@ -997,7 +982,7 @@ as a fitness of 0, which made the headline number load-dependent.
 §10's pre-existing leak — `SIG_Simulation` is `new`ed and never deleted, and
 its destructor is empty. Gate on ASan and UBSan errors, not on this.
 
-### Replication — nothing to compare against yet
+### Replication — checked against the 1.3 binary since Phase V
 
 `./replicate.sh` runs every individual of every published experiment. It is
 **not currently a test of this port**, because the 14 published `.exp` files
@@ -1074,135 +1059,41 @@ disassembly are local.
 |---|---|---|
 | V1 | ~~Capture 1.3's load-and-save round trip for three shipped `.exp`~~ **DONE 2026-08-27** — `verification-against-sigel-1.3/v1-1.3-roundtrip.txt` | the `Q2Dict` hash, all order-carrying containers, the parser and the serialiser |
 | V2 | Our half: a save path in `sigel_eval`, the same round trip locally, diffed against V1. Becomes a gate. **Read V8 result 5 first** — a shipped `.exp` round-tripped through 1.3 differs from its input by ten keys, so an input-vs-pass-1 gate fails however correct the port is | equivalence instead of self-consistency |
-| V3 | Determinism on the x86 box — one experiment run twice, both `RANDOMSEED`s pinned | gates everything numeric; never tested there |
-| V4 | **REFERENCE RECEIVED 2026-08-30**, captured before this build can run it. Two whole-run digests — `twoBases` and `octopus` — each validated across two independent 1.3 runs on the reference machine. **Not yet a runnable gate here**: no capture file, and the prepared inputs are uncommitted, so the digests cannot be checked locally. Supersedes the single-individual fitness harvest | the interpreter, physics, genetic operators, selection and RNG **in composition**, over 300 evaluations, as an exact yes/no — *once the inputs are committed* |
+| V3 | ~~Determinism on the x86 box — one experiment run twice, both `RANDOMSEED`s pinned~~ **SATISFIED 2026-09-02.** The oracle ran it twice on each of two models: `serA`≡`serB` and `octGateA`≡`octGateB`, identical on every field but the run-directory paths | closed. It is SAME-BOX determinism, which is sound; it was never a cross-machine claim |
+| V4 | ~~Two whole-run digests validated against the reference machine~~ **DROPPED 2026-09-03.** A whole-run digest cannot cross an x87/IEEE boundary, which §7 and D26 already said and C11 then proved: the identifier counts that appear to agree are FORCED — consumed in the tournament constructors before any fitness is read, with `createTours` building a constant 50 per generation — while the contents are decided by a float comparison and cannot agree. Estimated ~98% chance the counts matched even under maximal divergence | dropped, not deferred. What replaced it is a measurement of OUTPUT on one machine: population 100, 30 generations, best fitness 0.063794 → 0.141625 — §9 |
 | V5 | **MDH probe DONE 2026-08-27, PASS** — `verification-against-sigel-1.3/v5-1.3-mdh-compared.txt`. The sensor and force probes remain open | the port's **arithmetic**, which V1–V4 never touch |
 | V6 | **DONE 2026-08-29, PASS, 5 of 5** — `verification-against-sigel-1.3/v6-1.3-friction-nocollide.txt` | the two Phase D paths **no shipped data exercises**: friction pairs and no-collide pairs, and whether both setters negotiate |
 | V7 | **DONE 2026-08-29, 4 runs on `walker`** — `verification-against-sigel-1.3/v7-1.3-friction-nocollide-rules.txt` | the remaining rules for those two paths: multiple partners, unloaded partners, duplicates, and whether a dropped entry is resurrected |
 | V8 | **DONE 2026-08-29, captured BEFORE the conversion** — `verification-against-sigel-1.3/v8-1.3-gp-blocks.txt` | `SIG_GPParameter::hostList` and `SIG_GPExperiment::experimentHistory`, the two `Q2PtrList` the gates run on every load and the next to convert |
 | V9 | **DONE 2026-08-29, 3 of 3** — three function *bodies* disassembled, recorded below rather than as a capture file | whether a reworked body hides under an unchanged name. Symbol lookups cannot see that |
 
-### V4 — the whole-run gate, captured 2026-08-30 before this build can run it
+### V4 — the whole-run gate — DROPPED 2026-09-03
 
-**Two reference captures, each validated across two independent 1.3 runs.** This
-replaces the single-individual fitness check V4 originally proposed, and the
-tolerance argument that came with it.
+**121 lines of digest specification, provenance caveats and interpretation
+rules were deleted here.** V4 proposed whole-run digests captured on the 1.3
+reference machine and compared against ours. It cannot work, and the argument
+it rested on — *"a match proves the interpreter, physics, genetic operators,
+selection and RNG all agree in composition"* — is false in the direction that
+matters.
 
-**PROVENANCE — read before relying on any of this.** These digests were produced
-on the x86 reference machine and **cannot be verified in this repository**.
-Unlike V1 and V5–V8 there is **no capture file** here, and the modified `.exp`
-inputs are not committed — so the six hashes and the spot-check rows are
-currently *unfalsifiable locally*. The prose spec below is the only route back to
-the inputs, and it already needed one correction (the `PVMHOST` count differs
-between the two experiments), which means a future mismatch could be a
-reconstruction error rather than a port defect.
+**Why, established by doing it (§9 item 2).** The digest lines were
+`NAME|FITNESS|sha256(program)`, and **fitness cannot cross an x87/IEEE
+boundary** — §7 measures a 1-ULP change in start height moving it 45%. Worse,
+the quantities that *do* agree agree for free: identifiers are consumed in the
+tournament constructors before any fitness is read, and `createTours` builds a
+constant 50 tournaments per generation, so the counts are forced by the code.
+Estimated ~98% chance they matched even under maximal divergence.
 
-**Before this is used as a gate, commit the two prepared `.exp` files** — or the
-diff that produces them — so a mismatch is interpretable. Until then treat V4 as
-*reference data received*, not as a gate that can be run.
+**Two lessons kept from it.** Reference data that cannot be verified in this
+repository is *unfalsifiable locally* — a later mismatch could be a
+reconstruction error rather than a port defect, so commit the inputs or do not
+rely on the digest. And a comparison surface that includes a float is not a
+comparison surface across machines.
 
-**Digest construction.** Per pool snapshot: one line per individual,
-`NAME|FITNESS|sha256(program)`, **in pool order**; then sha256 over the whole
-block.
+**What replaced it** is a measurement of OUTPUT on one machine, which needs no
+reference at all: population 100, 30 generations, best fitness 0.063794 →
+0.141625. See §9.
 
-**`twoBasesSimpleFitness1`** — 2 links, 1 joint, 100 individuals per snapshot:
-
-    snapshot 1  eec007b386aa97cd977ce61c9d18138493cace77b3e74520eee21c01e8c07856
-    snapshot 2  bc2ad371e65afac762f29e6d1bd5b5852994b74bee4bf70c24d3d55f1eccab51
-    snapshot 3  1771c69f7e15b98401c735da204fa24f554b17da8937afe433b966f329c4618b
-
-    spot check, first five of snapshot 1 (NAME|FITNESS):
-    12354|0.0106312  12040|0.842208  11958|0.560132  12291|0.246616  12326|0.704262
-
-**`octopusSimpleFitness`** — 10 links, 9 joints, 100 individuals per snapshot:
-
-    snapshot 1  db5b486ba5ebb0e071dd07611b6e7889e93488de5fb75ba669b3169882038551
-    snapshot 2  3895888944f94319ae5334beb4290dbe9342d7cdad89de013a647aaba9501378
-    snapshot 3  632ec0847c3e2fd44203dd1095f1b8ba6d0c6e5fee83e26d041cef5b94950e53
-
-    spot check, first five of snapshot 1:
-    5367|0.829977  5192|0.789198  5220|0.701824  5438|1.08944  5437|0.624343
-
-**Reproduction spec.** Start from the shipped `.exp` and change exactly these;
-the population is unchanged. *Identical for both **except** `PVMHOST`: the
-shipped host count is **8** for twoBases, **20** for octopus and 21 for walker.
-An earlier draft said "identical for both" with "8 dead hosts" in the shipped
-column, which is wrong for octopus.*
-
-| key | shipped | gate |
-|---|---|---|
-| `TIMETOSIMULATE` | `0 3 0 0` | `0 0 5 0` (3 min → 5 s) |
-| `RANDOMSEED`, **both keys** | `0`, `0` | `12345`, `12345` |
-| `TERMINATIONUSESDATE` | 1 | 0 |
-| `TERMINATIONMODEL` | 0 | 2 (generation) |
-| `TERMINATIONGENERATIONNO` | 0 | 3 |
-| `TERMINATIONTIME` year | 2001 | 2030 |
-| `TERMINATIONDURATIONDAYS` | 0 | 30 — **must not be 0** |
-| `POOLIMAGEGENERATION` | 0 | 1 |
-| `PVMHOST` | 8 dead hosts (twoBases) / **20** (octopus) | one host, **slot count 1** |
-| `GRAVEYARDDIRECTORY`, `POOLIMAGEDIRECTORY` | dead paths | writable local |
-
-**The slot count of 1 is load-bearing.** At 8 the run is not reproducible and the
-digests mean nothing.
-
-**Octopus has TWO dead 2003 roots, not one.** `/home/pg368/sawitzki/octopus/` on
-the `Body` lines and `/home/pg368/sawitzki/sigel` for the directories — where
-twoBases has only `/home/pg368b/ross/projects/sigel`. A repointing tool that
-knows one root silently fixes nothing. Both were normalised onto the twoBases
-root before capture.
-
-**Why two gates rather than one — they discriminate.** twoBases has one MDH
-call, one drive, one sensor, and no container-ordering effects at all: nothing
-can collide in its hash, which is why its robot block round-trips byte-identical
-(V1). Octopus is where V1 found Joint, Drive **and** Sensor orders permuting and
-where V5 found nine MDH triples including the one-ULP near-misses. Nine joints
-means nine MDH sets and nine sensor readings per step — and **the truncated-π
-constant feeds every one of them**, compounded over 500 steps and 300
-evaluations. So **twoBases green with octopus red points at geometry and
-container ordering, not at the interpreter, RNG or selection.** One gate cannot
-say that.
-
-**What a match proves:** the interpreter executed 300 programs identically, the
-physics integrated them identically, the genetic operators picked the same
-parents, crossover and mutation points, selection ranked identically, and the
-RNG produced the same stream — *in composition*. With the 6-significant-digit
-format result, a match means the `.pol` files are byte-identical bar timestamps.
-
-**What a mismatch gives:** the three snapshots localise in time, and the
-per-individual rows are held on the reference side, so a failure narrows to
-which individuals differ and whether it is the program, the fitness or the
-ordering. Ask for the diff at whatever granularity helps.
-
-**Limits, stated rather than implied.** Two experiments, two robots, three
-generations, a **5-second** window chosen for runtime — not the shipped 180.
-Neither exercises friction or no-collide (every shipped robot has `nfric 0`).
-`SLAVES=1` only: nothing here bears on the concurrent path, where two runs
-genuinely differ. **A strong gate on the machinery, not a certificate on the
-robot corpus.** `walker` (19 links, 0.002 step ⇒ 2,500 steps per individual) is
-deliberately uncaptured — it is the expensive one and is better taken once this
-build can be compared against something.
-
-**This also strengthens V3.** The determinism result no longer rests on one
-case: **two experiments, two robots (2 links and 10), two fitness functions**,
-all exactly reproducible at `SLAVES=1` with both seeds pinned.
-
-**SCOPE — the 1.3 source and the 1.3 binary are not the same revision.**
-Everything above treats `x/kdesigelSources.1.3/` and the frozen binary as one
-reference. **They are not.** `nm sigel | grep -c MT_FitnessTranier` returns
-**24**; `MT_FitnessTrainer` returns **0**. Our source has **38 lines** carrying the correct
-spelling (43 occurrences, over `src/` and `include/`) and **zero**
-misspellings, with the typo surviving only as a config
-token (`stdConf.mt:71`) and four string literals in `MT_FitnessTrainer.cpp`,
-where `:15` says it is kept deliberately. `SIG_GPFitnessTrainer` is spelled
-correctly in the same binary, so this is not a general mangling artifact.
-
-A 30-name survey found no other divergence: 28 present as expected, and the
-two that were not are both mine to own — `SIG_GPEnergyFitnessFunction` is
-absent from **both** trees, so the friend-line debris I called decisive
-supports neither direction, and `SIG_GPExperimentClean` was a category error,
-a file name that was never a class. **"The gap is confined to `MT_`" is an
-inference, not a measurement**, and a reworked body under an unchanged name is
-invisible to every symbol lookup. That is what V9 exists to probe.
 
 ### V9 — three function bodies from the 1.3 binary, 2026-08-29
 
@@ -4428,8 +4319,9 @@ invariant rather than noise.
   fixed, but nothing has opened it.
 - **`MT_Editor`**, the program editor on the Individual page.
 - **A MetaGP evolution actually running**, which belongs with the main
-  evolution path. *That path is now done (§9 item 2); the MetaGP variant of it
-  is not, and `SIGEL_SlaveGUI` is the last undriven item in the table above.*
+  evolution path. *That path is now done (§9 item 2) and `SIGEL_SlaveGUI` was DRIVEN 2026-09-03. What is still
+  undriven is the MetaGP variant of an evolution, `MT_Editor`, `MT_AddConstantsWidget` and
+  `update statistics`.*
 
 ---
 
@@ -4457,6 +4349,29 @@ absent.
 ---
 
 ## 9. Open
+
+**WHAT IS ACTUALLY OPEN, as of 2026-09-03.** The tables below are mostly struck
+through; read this first and use them for detail only.
+
+| still open | size |
+|---|---|
+| **item 1** — `pagesave` and `roundtrip` have no gate | real work |
+| **item 3** — `QHashSeed::setDeterministicGlobalSeed()` unowned in `sigel.cpp` | bookkeeping; not a live defect |
+| **item 4** — six dropped size constraints | measured, cosmetic |
+| **undriven**: a MetaGP evolution, `MT_Editor`, `MT_AddConstantsWidget`, `update statistics`, MT_GUI's toolbar actions | coverage |
+| six forms declare a minimum smaller than Qt 6's layout needs — inherited from 1.3, `MT_StatisticsWidgetBase` unreadable if dragged small | usability |
+| the evolution result is recorded as prose; no artefact is committed | reproducibility |
+
+**Closed and kept only for their lessons:** items 2 and 5, every row of the
+`never driven` table, V3 (satisfied) and V4 (dropped). **The most useful part of
+this section is the hazard list near its end** — measured traps, all
+forward-looking, and the thing most likely to save a future session time.
+
+**A warning this section has earned.** Four claims were withdrawn in two days —
+the item-5 reachability argument, the evolution headline, a slider divergence and
+a seed. Each was inherited from a document and repeated before being checked
+against source. **Verify before citing anything here.**
+
 
 ### C11 — the coverage gap C10 leaves — C11a–C11d DONE; the evolution path DONE 2026-09-02
 
@@ -4908,7 +4823,7 @@ evaluations). Two limits as a baseline:
 | the binaries | **not stripped.** 11,709 symbols in `sigel`, 10,936 in `sigel_slave`, 1,760 of them `SIG_*` with full g++ 2.95 mangling. This is what makes V5 possible without a rebuild |
 | `gdb` | **installed 2026-08-27**, so V5 is unblocked. `strace` and `ltrace` are still absent, and no probe needs them |
 | PVM | **works.** Four evolutions have completed, up to 300 generations at 8 concurrent slaves. `SIGEL_ROOT` must be in **pvmd's** environment, not the shell's, or every slave segfaults with the master idling |
-| the master's output | one line per generation, and nothing else. **No fitness value is ever printed.** Fitness lives only in the `.pol` pool images and the rewritten `.exp`, as `FITNESS=<value>`; `-1` means unevaluated, which is what V4 exploits |
+| the master's output | one line per generation, and nothing else. **No fitness value is ever printed.** Fitness lives only in the `.pol` pool images and the rewritten `.exp`, as `FITNESS=<value>`; `-1` means unevaluated, which is what `Individuals > Reset` exploits (V4 is dropped) |
 | per-step trajectories | POV-Ray export exists only in `sigel_slave`'s visualiser widget and is driven through its GUI. **Not reachable headlessly** |
 | how the binaries run | natively on x86-64 — woody's own loader invoked explicitly against unpacked woody `.deb`s. No chroot, no container, no root |
 
@@ -4948,7 +4863,10 @@ link line. Unobservable today: **0 `QHash`/`QSet`/`QMultiHash` in the converted
 core**, measured, and a build with a genuinely random seed reproduces
 `dictorder-baseline.txt` exactly (D26 review action).
 
-**PHASE C MUST ADD `QHashSeed::setDeterministicGlobalSeed()` TO `sigel.cpp` AND
+~~**PHASE C MUST ADD `QHashSeed::setDeterministicGlobalSeed()`**~~ **SUPERSEDED — see §9 item 3.**
+Phase C closed without it, and the `sigel_slave` half is MIS-SCOPED: `GUI_SLAVE` links no `QHash`.
+Do not act on the original sentence, kept below struck through:
+~~PHASE C MUST ADD it TO `sigel.cpp` AND
 `sigel_slave.cpp`**, as the first statement of each `main()`. Neither has it,
 and both will link containers this port has not yet seen.
 
@@ -5488,16 +5406,6 @@ see the failure — §9's "test with a representative value, not an extreme", in
 the other direction.* *`-0` remains the one
 known exception and appears in no shipped stream.*
 
-**A consequence that sharpens V4.** The file format carries only 6 significant
-digits, so **any fitness comparison mediated by a file has 6-digit
-granularity** — architecture differences below the sixth significant figure
-cannot appear in a `.pol` at all. That gives V4 a natural form: *do the two
-builds agree to 6 significant figures on a fixed program?* If yes the files are
-byte-identical and there is nothing left to argue about tolerance. The gate
-falls out of the format instead of being chosen. **This does not touch the
-chaotic-amplification question**, which is about the simulation diverging over
-time, not about representation.
-
 *Scope: this characterises decimal literals in the shipped `.exp` and `.rrb`.
 Integers and any binary-format path are outside it.*
 
@@ -5517,15 +5425,6 @@ writes to a `QString` stream — but it reads as "1.3 writes doubles at precisio
 6", and someone porting `vectorToPovray` against that would have written the
 wrong thing. C5 was porting exactly that function.* Precision 5 and 6 differ on
 most values: `0.842208` against `0.84221`.
-
-**And it sharpens V4 in a direction that was missed.** The
-"6-significant-digit granularity" argument is about **storage**. Fitness crosses
-the PVM wire at **precision 50**, so the master compares full-precision values
-and truncates only when writing: two builds can agree to six figures in the
-`.pol` and still make different selection decisions. V4's digests survive that —
-they cover names and programs, so a selection difference surfaces as a different
-population at the next snapshot — but "agree to six figures and the files are
-byte-identical" is not a statement about what the algorithm consumed.
 
 #### The third family: iterate and mutate the same container
 
@@ -7669,7 +7568,7 @@ Two measurements settle it:
 | check | result |
 |---|---|
 | `QHash`/`QSet`/`QMultiHash` anywhere outside `compat/` | **none.** D3 replaced the six `Q2Dict`s with `QList<T *>`, which is insertion-ordered by construction |
-| ~~the same binary under `QT_HASH_SEED` = 0, 1, 12345, 999999~~ | **A NULL EXPERIMENT — it could not have failed.** Qt 6 honours `QT_HASH_SEED` **only when it is 0**; any other value prints `forced seed value is not 0; ignored` and is coerced to 0. Confirmed: `QHashSeed::globalSeed()` is 0 for all four. And the shim pins the seed per translation unit before `main`, while `sigel_eval.cpp:451` calls `setDeterministicGlobalSeed()` as its first statement — the environment variable is never consulted |
+| ~~the same binary under `QT_HASH_SEED` = 0, 1, 12345, 999999~~ | **A NULL EXPERIMENT — it could not have failed.** Qt 6 honours `QT_HASH_SEED` **only when it is 0**; any other value prints `forced seed value is not 0; ignored` and is coerced to 0. Confirmed: `QHashSeed::globalSeed()` is 0 for all four. And the shim pins the seed per translation unit before `main`, while `sigel_eval.cpp:511` calls `setDeterministicGlobalSeed()` as its first statement — the environment variable is never consulted |
 | **the experiment that should have been run**: rebuild `sigel_eval` with `QHashSeed::resetRandomGlobalSeed()` after the deterministic call, so the seed is genuinely random per process | seeds `278889441371735583`, `12972567734183481017`, `2771707303525248410` — all three dictorder runs **byte-identical to `dictorder-baseline.txt`**. This is real support, and unlike the argument from "no `QHash` in our code" it also covers Qt's own internal hashes |
 
 So no hashed container's order reaches a file, and the seed cannot affect
@@ -7677,7 +7576,7 @@ output. *The shim's own comment already anticipated the move to `main()`; what
 it could not know is that D3 would remove every hash the seed protected.*
 
 **Self-consistency before fidelity — the order matters and it is cheap.** The
-V4 digests invite starting at the wrong end. The correct sequence:
+Self-consistency comes before fidelity. The correct sequence:
 
 1. **Run this build twice on the same input and compare it against itself.** No
    reference needed. Done: three consecutive `dictorder-dump.sh` runs and three

@@ -234,40 +234,22 @@ is what "dead code" was supposed to mean.
    passes and each is a use-after-free; `renderRecorder` leaks with it. The
    path pre-existed — Dynamo's own constructor could throw — but this change
    turns a conditional hazard into a certain one for every robot.
-   **THIS SAID IT WAS "unreachable today only because `SIGEL_SlaveGUI` does
-   not compile". THAT EXPIRED** when `libSIGEL_SlaveGUI.a` began building and
-   `build-fast/sigel_slave` began linking it. **FIXED 2026-09-02:**
-   `visualisation = nullptr;` now sits between the delete and the new. The
-   site is at **line 414**, not the 376-381 above — line drift since this was
-   written, not a second occurrence. **The "fourteen use-after-frees" above is a
-   statement about SHAPE, not about a reachable crash**, and that was checked at
-   the fix rather than carried forward: the only caller is `sigel_slave.cpp:293`,
-   whose `catch` prints and returns 1 before `a.exec()`, so no guard is ever
-   evaluated afterwards, and the widget's destructor is empty so nothing
-   double-frees. **BOTH HALVES OF THAT WERE WRONG and are corrected here after a
-   fresh-eyes review.** `sigel_slave.cpp:293` is not the only caller —
-   `SIG_SimulationVisualisationWidget.cpp:478` calls `visualizeThis()` from
-   `slotStopSimulation()`, a live slot on the viewer's Stop action, running
-   inside `a.exec()` with no try/catch. And the destructor is empty only in the
-   DERIVED class: `visualisation` is a base-class member and
-   `SIG_VisualisationWidget::~SIG_VisualisationWidget()` does
-   `delete visualisation` (`SIGEL_CommonGUI/SIG_VisualisationWidget.cpp:60`), so
-   destruction after a throw IS a double free — it merely does not bite on the
-   slave path, where `simWindow` is leaked past the catch's `return 1`. The
-   correct reason it is unreachable today: every other caller is downstream of a
-   first `visualizeThis()` that must have succeeded, and nothing in the slave
-   calls `setSimulationLibrary`, so the same parameters cannot begin throwing
-   later. **The oracle then settled what 1.3 does with Dynamo selected: the
-   viewer opens normally and the slave SEGFAULTS on Play** — "Invalid storage
-   access", SIGEL's own name for SIGSEGV — with no dialog and the master
-   surviving. A DynaMechs control run on the same file and individual simulated
-   for 1 min 6 s. So 1.3's Dynamo path is non-functional at the first
-   integration step, and deleting it lost no working behaviour.
-   **`renderRecorder` still leaks on the throwing path** and is unfixed:
-   `SIG_SimulationVisualisation.cpp:53` allocates it, `:55` constructs the
-   throwing `SIG_Simulation`, and the destructor that would free it never runs.
-   Recorded in `future_refactorings.md`. `check.sh`'s `freed-pointer null` check
-   holds it there, and was teeth-tested by removing the line again.
+   **FIXED 2026-09-02:** `visualisation = nullptr;` now sits between the delete
+   and the new, at **line 414** (the 376-381 above is line drift). `check.sh`'s
+   `freed-pointer null` holds it there.
+
+   **Not reachable today, on the argument that survives review.** Two earlier
+   arguments were wrong and are dropped rather than restated: `sigel_slave.cpp:293`
+   is not the only caller, and the destructor is empty only in the DERIVED class
+   (the base does `delete visualisation`, so a throw would be a double free).
+   What holds: every other caller is downstream of a first `visualizeThis()` that
+   must have succeeded, and nothing in the slave calls `setSimulationLibrary`, so
+   the same parameters cannot begin throwing later. **The oracle then settled
+   1.3's behaviour: with Dynamo selected the viewer opens and the slave SEGFAULTS
+   on Play**, no dialog, master surviving — so that path was non-functional in
+   1.3 and deleting it lost nothing. `renderRecorder` still leaks on the throwing
+   path; recorded in `future_refactorings.md`.
+
 2. **`SIG_SimulationQueries.cpp`: all seven non-self includes are dead.**
    Verified by compiling a translation unit
    holding only the class's own header and the empty constructor, under
