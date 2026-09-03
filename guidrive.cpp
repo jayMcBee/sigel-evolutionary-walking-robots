@@ -88,6 +88,8 @@
 #include <QComboBox>
 #include <QHeaderView>
 #include <QTabWidget>
+#include <QStyleOptionSlider>
+#include <QStyle>
 #include <QStyle>
 #include <QCompleter>
 #include <QStyleOptionSlider>
@@ -3079,8 +3081,83 @@ int main(int argc, char **argv)
         // widget whether or not it has focus, and on 1.3 a groove click does not
         // focus a slider, so a key probe would measure something 1.3 never does.
         printf("\n  -- sliders, groove click --\n");
-        for (QSlider *sl : sw->findChildren<QSlider *>())
-            probeSliderClick(sl);
+        // NOT probeSliderClick(): that one is written for the master's
+        // horizontal sliders and always clicks (width-6, height/2). Two of
+        // these four are VERTICAL, where that point is mid-groove -- and a
+        // groove click that lands ON THE THUMB does nothing. The oracle
+        // reproduced exactly the symptom seen here (a slider that looks dead)
+        // and it was that artifact, so the thumb is located and avoided before
+        // any conclusion is drawn.
+        for (QSlider *sl : sw->findChildren<QSlider *>()) {
+            const bool vert = sl->orientation() == Qt::Vertical;
+            const int len = vert ? sl->height() : sl->width();
+            const int cross = (vert ? sl->width() : sl->height()) / 2;
+            const int span = sl->maximum() - sl->minimum();
+            const double frac = span ? double(sl->value() - sl->minimum()) / span : 0.5;
+            // Click at whichever end is FARTHER from the thumb, so the press can
+            // never land on it. Qt draws vertical sliders with the maximum at
+            // the TOP, so the thumb's pixel fraction is inverted there.
+            const double thumbFrac = vert ? 1.0 - frac : frac;
+            const bool clickHigh = thumbFrac < 0.5;
+            const int along = clickHigh ? int(len * 0.90) : int(len * 0.10);
+            const QPoint pt = vert ? QPoint(cross, along) : QPoint(along, cross);
+            const int start = sl->value();
+            QTest::mouseClick(sl, Qt::LeftButton, Qt::NoModifier, pt);
+            QTest::qWait(120);
+            const int after = sl->value();
+            printf("    %-24s %-10s %dx%d thumb@%.0f%% click@%.0f%% : %d -> %d"
+                   " (delta %+d, pageStep %d)%s\n",
+                   qPrintable(sl->objectName()), vert ? "vertical" : "horizontal",
+                   sl->width(), sl->height(), thumbFrac * 100,
+                   (clickHigh ? 90.0 : 10.0), start, after, after - start,
+                   sl->pageStep(),
+                   (after == start) ? "   << DID NOT MOVE" : "");
+            sl->setValue(start);
+        }
+        // If a slider did not move, SWEEP it before concluding anything. The
+        // handle rect comes from the style rather than from arithmetic, so
+        // "the click missed the thumb" stops being an assumption.
+        for (QSlider *sl : sw->findChildren<QSlider *>()) {
+            const int start = sl->value();
+            QStyleOptionSlider opt;
+            opt.initFrom(sl);
+            opt.minimum = sl->minimum(); opt.maximum = sl->maximum();
+            opt.sliderPosition = sl->value(); opt.sliderValue = sl->value();
+            opt.orientation = sl->orientation();
+            opt.pageStep = sl->pageStep();
+            const QRect h = sl->style()->subControlRect(QStyle::CC_Slider, &opt,
+                                                        QStyle::SC_SliderHandle, sl);
+            QString moved;
+            for (double f : { 0.05, 0.20, 0.35, 0.65, 0.80, 0.95 }) {
+                const bool vert = sl->orientation() == Qt::Vertical;
+                const int len = vert ? sl->height() : sl->width();
+                const int cross = (vert ? sl->width() : sl->height()) / 2;
+                const int along = int(len * f);
+                const QPoint pt = vert ? QPoint(cross, along) : QPoint(along, cross);
+                if (h.contains(pt)) { moved += QString("  %1:ONTHUMB").arg(f); continue; }
+                sl->setValue(start);
+                QTest::mouseClick(sl, Qt::LeftButton, Qt::NoModifier, pt);
+                QTest::qWait(60);
+                moved += QString("  %1:%2").arg(f).arg(sl->value() - start);
+            }
+            sl->setValue(start);
+            // Keyboard and setValue as controls: if PageUp moves it but no
+            // click does, the widget is live and only its MOUSE handling is
+            // inert -- a different fault from a dead widget.
+            sl->setValue(start);
+            sl->setFocus();
+            QTest::keyClick(sl, Qt::Key_PageUp);
+            QTest::qWait(60);
+            const int byKey = sl->value() - start;
+            sl->setValue(start);
+            sl->setValue(start + sl->pageStep());
+            const int bySet = sl->value() - start;
+            sl->setValue(start);
+            printf("    sweep %-24s handle=(%d,%d %dx%d) vis=%d enab=%d%s"
+                   "  | PageUp %+d  setValue %+d\n",
+                   qPrintable(sl->objectName()), h.x(), h.y(), h.width(), h.height(),
+                   sl->isVisible(), sl->isEnabled(), qPrintable(moved), byKey, bySet);
+        }
         fflush(stdout);
 
         // --- render mode and frame delay ------------------------------------
