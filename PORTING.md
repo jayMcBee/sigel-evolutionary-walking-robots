@@ -2463,7 +2463,8 @@ through; read this first and use them for detail only.
 | **`SIGEL_SlaveGUI` has no runtime connect coverage** — 44 `SIGNAL(` and 44 `SLOT(` sites, and `check.sh` never runs the `slavegui` scenario | coverage; found 2026-09-03 |
 | **item 3** — `QHashSeed::setDeterministicGlobalSeed()` unowned in `sigel.cpp` | bookkeeping; not a live defect |
 | **item 4** — six dropped size constraints | measured, cosmetic |
-| **undriven**: a MetaGP evolution, `MT_Editor`, `MT_AddConstantsWidget`, `update statistics`, MT_GUI's toolbar actions | coverage |
+| ~~**undriven**: a MetaGP evolution, `MT_Editor`, `MT_AddConstantsWidget`, `update statistics`, MT_GUI's toolbar actions~~ **ALL BUT THE EVOLUTION DRIVEN 2026-09-04** — new `metadrive` scenario, in the gate. **A MetaGP evolution is what is left** | coverage |
+| ~~D28's divergence reaches `MT_AddConstantsWidget`~~ **FIXED 2026-09-04** — it reached the generated constants tenfold, so Qt 2's out-of-range rule is restored there rather than accepted | closed; D28 stands for the spin boxes it covers |
 | six forms declare a minimum smaller than Qt 6's layout needs — inherited from 1.3, `MT_StatisticsWidgetBase` unreadable if dragged small | usability |
 | the evolution result is recorded as prose; no artefact is committed | reproducibility |
 
@@ -2477,6 +2478,124 @@ the item-5 reachability argument, the evolution headline, a slider divergence an
 a seed. Each was inherited from a document and repeated before being checked
 against source. **Verify before citing anything here.**
 
+
+### C12 — the MetaGP window's last undriven corner, 2026-09-04
+
+`metagui` (C11d) surveyed the MetaGP window and printed what it found; nothing
+had ever **pressed** anything on it. §9 listed four such items — `MT_Editor`,
+`MT_AddConstantsWidget`, `update statistics` and MT_GUI's toolbar actions — and
+`metadrive` now drives all four on both versions. **The question throughout was
+core functionality, not appearance: can a user still do the thing, and does the
+thing still do what it did.**
+
+**Three results agree with 1.3, one diverges, and one prediction was falsified.**
+
+| what | 1.3, measured by the oracle | this port | |
+|---|---|---|---|
+| `MT_Editor`, **Return** | commits the typed value | commits | **agree** |
+| `MT_Editor`, **Escape** | discards, original kept | discards | **agree** |
+| `MT_Editor`, **focus away** | discards, original kept | **not driven** — see below | unanswered here |
+| AddConstants, letters | rejected in both modes, field left empty | same | **agree** |
+| AddConstants, `12.5` | stays `12.5` in float, becomes `125` in integer | same | **agree** |
+| AddConstants, `50000` / `-50000` in **float** | accepted, before and after the type switch | accepted | **agree** |
+| AddConstants, `-50000` in **integer** | keeps `-50000`, and **generates three constants of `-50000`** | kept `-5000` → **FIXED 2026-09-04**, keeps `-50000` | **was a data divergence; restored** |
+| AddConstants, OK with count 5 | constants 30 → 35, no progress dialog | 30 → 35 | **agree** |
+| `update statistics` | nothing visible; Fitness fields read `ERR` | nothing visible; **the same three fields read `ERR`** | **agree** |
+| arrival enabled map | Start, Stop and Delete disabled; all others enabled | identical | **agree** |
+
+**THE DIVERGENCE REACHED THE GENERATED DATA, AND IS THEREFORE RESTORED RATHER
+THAN ACCEPTED.** Qt 2's `QIntValidator` returned *Intermediate* out of range, so
+`QLineEdit` accepted every digit and the range bit only on commit; Qt 6 returns
+*Invalid* and drops the keystroke, leaving a truncated prefix. §9's D28 accepted
+exactly this for the **29 spin boxes on the five parameter pages**, explicitly
+not the dialogs — and the reason it could be accepted there is that the
+differing value is **visible in the box** before anything is saved.
+
+**Here it is not.** The oracle measured the commit side on the running 1.3, with
+min set equal to max so the result could not be a random draw: integer mode,
+min = max = `-50000`, count 3, OK — the field keeps `-50000`, the count goes
+30 → 33, and **the three new constants are `-50000`**. No clamping at any point.
+A port holding `-5000` generates constants of `-5000`: **a tenfold difference in
+data that reaches the MetaGP population and is invisible from then on.**
+
+So Qt 2's rule is restored, at all four creation sites, by a 20-line
+`QIntValidator` subclass that returns Intermediate for anything that parses as
+an integer and leaves letters Invalid. **That is preserving 1.3's behaviour, not
+improving on it** — the same argument as pinning these validators to
+`QLocale::c()`. *The control that it does not simply disable the validator: `abc`
+is still rejected and `12.5` still becomes `125` in integer mode, both matching
+1.3 exactly.* D28 stands unchanged for the spin boxes it covers; the two
+decisions differ because the consequences differ, and both are measured.
+
+**A PREDICTION MADE FROM THE SOURCE WAS FALSIFIED BY BOTH BINARIES.** The 2003
+code builds the float validators with the bounds **swapped** —
+`QDoubleValidator(100000.0, -100000.0, 4, …)`, bottom above top — and rebuilds
+them at ±10000 when the type radio is clicked, which reads like a tenfold
+narrowing. **There is no narrowing.** `50000` survives in float mode before and
+after the switch, on 1.3 and here. The swapped bounds do nothing observable.
+*Confirmed as 2003's own code against the pristine tarball first, so it was
+never a porting slip — but "this odd-looking constructor must have an effect"
+was an inference, and the binaries say it has none.*
+
+**What `metadrive` deliberately does NOT answer, and why.** `MT_Editor`'s third
+contract point — focus-out discards — **is not driven here.** The MetaGP window
+is never mapped under `QT_QPA_PLATFORM=offscreen`, and focus delivery is then
+racy: three consecutive runs of identical code gave "editor held focus, hid,
+discarded", "editor never held focus" and "editor still open". Both ways of
+forcing it flapped. A line that flaps cannot be baselined, and a `discarded=1`
+that is true because nothing happened is a probe that cannot fail — so the
+scenario prints `NOT DRIVEN` and the oracle owns that answer. *Return and Escape
+are driven here and pin the same `acceptChange` flag from both sides.*
+
+**A probe error of the usual shape, caught by a diagnostic rather than by a
+failure.** The first run reported the editor never opening. `isVisible()` was
+the wrong predicate: offscreen leaves the MetaGP window unmapped, so every
+widget inside it reports invisible whatever the code did — while the editor
+itself reported `isHidden()==0` and a real 84×17 geometry, i.e. `popup()` had
+run correctly. **`isVisible()` would have recorded "the editor never opens" on a
+port where it opens perfectly.** The predicate is `isHidden()`, which is exactly
+what `MT_Editor`'s own `show()`/`hide()` pair sets.
+
+**A claimed 1.3 behaviour that the Qt 2 source contradicted, and the source was
+right.** The oracle first reported that **double-click does not open the editor**
+on 1.3, only Return and the context menu. But 1.3 wires
+`QListBox::selected(QListBoxItem*)`, and vendored `qlistbox.cpp` emits it from
+**`mouseDoubleClickEvent`** (`:1840-1855`) *and* from Return/Enter
+(`:2146-2155`) — both paths, unambiguously. Challenged on that basis and
+re-measured: **the oracle's click helper sleeps 0.35 s after release and re-moves
+the pointer, so two calls landed ~750 ms apart, past Qt 2's 400 ms
+`doubleClickInterval`, and arrived as two single clicks.** With a real double
+click the editor opens exactly as the source says. **Double-click, Return/Enter
+and right-click → Edit all open it, and the port agrees.** *The control it
+adopted is worth reusing: in the load-experiment dialog a genuine double click
+accepts the dialog and loads the file with no Open click, which is
+double-click-only behaviour and so discriminates a real double click from two
+singles without depending on the widget under test.* The port reaches the same slot through
+`itemActivated`, which fires on double-click or Return **only while the style
+says activate-on-single-click is false** — so that style hint is pinned in the
+gate, because a style saying true would make a SINGLE click open the editor
+where 1.3 needs two.
+
+**Two things the survey had been hiding.** `metagui`'s toolbar dump keyed
+actions by text, which collapsed the evolution-control toolbar's eight
+`addWidget` children — the status label, the hour/minute boxes — into **one
+blank row**, and a later attempt keyed by text-plus-objectName still lost the
+unnamed `QSpinBox` pair. They are listed individually now. And the Population
+page's six actions are **not children of the page**: `MT_PopulationWidget` puts
+them on a toolbar owned by the MetaGP window, so a `findChildren` on the page
+returns almost nothing — which is why they appear in the window's toolbar map.
+
+**A harness trap from the oracle, recorded because it cost it an X server.**
+"Add Constants" is a separate top-level window **destroyed and recreated with
+new X window ids on every open**; its cached ids went stale and
+`import -window <stale id>` then hung *while holding an X server grab*, freezing
+every client on that display. This driver resolves the dialog fresh from its
+modal handler each time and caches nothing, so the trap has nothing to grab.
+
+**Teeth-tested**, per §0: making `MT_Editor::hideEvent` see `acceptChange =
+false` — the one-token change that stops Return committing — takes
+`gui behaviour` from 1 pass to 0 pass 1 fail, and the diff lands on the editor
+lines. Deterministic across four runs, no `!!` markers.
 
 ### C11 — the coverage gap C10 leaves — C11a–C11d DONE; the evolution path DONE 2026-09-02
 

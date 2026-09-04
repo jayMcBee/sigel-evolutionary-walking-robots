@@ -8,6 +8,53 @@
 #include <QAbstractButton>
 #include <QRadioButton>
 
+namespace
+{
+  // Qt 2's QIntValidator::validate returned INTERMEDIATE for a value outside
+  // [bottom,top] (qvalidator.cpp:236), so QLineEdit accepted every digit and
+  // the range bit only on commit. Qt 6's returns INVALID once the typed prefix
+  // passes the top, and QLineEdit drops the keystroke, leaving a truncated
+  // prefix.
+  //
+  // §9's D28 ACCEPTED that divergence for the five parameter pages' 29 spin
+  // boxes: there the differing value is visible in the box before anything is
+  // saved, and restoring it would mean owning a custom spin box forever.
+  // THIS SITE IS NOT THAT CASE, and the difference is measured rather than
+  // argued. On 1.3, integer mode with min = max = -50000 and a count of 3
+  // generates three constants of -50000 -- no clamping at any point, confirmed
+  // on the running binary, with min set equal to max so the value could not be
+  // a random draw. A port holding -5000 generates constants of -5000: a
+  // TENFOLD difference in data that reaches the MetaGP population and is
+  // invisible from then on.
+  //
+  // So Qt 2's rule is RESTORED here rather than accepted. That preserves 1.3's
+  // behaviour rather than improving on it -- the same argument as pinning
+  // these validators to QLocale::c(), which also restores what Qt 2 did.
+  class Qt2IntValidator : public QIntValidator
+  {
+  public:
+    Qt2IntValidator( int bottom, int top, QObject *parent )
+      : QIntValidator( bottom, top, parent ) {}
+
+    QValidator::State validate( QString &input, int &pos ) const override
+    {
+      const QValidator::State s = QIntValidator::validate( input, pos );
+      if ( s != QValidator::Invalid )
+        return s;
+      // Qt 6 answers Invalid both for "out of range" and for "not a number";
+      // only the first was Intermediate in Qt 2. So they are separated here:
+      // anything parsing as an integer is merely out of range and becomes
+      // Intermediate, while letters stay Invalid and are still dropped --
+      // which is the control that this does not just disable the validator.
+      if ( input.isEmpty() || input == QLatin1String( "-" ) )
+        return QValidator::Intermediate;
+      bool ok = false;
+      (void) input.toLongLong( &ok );
+      return ok ? QValidator::Intermediate : QValidator::Invalid;
+    }
+  };
+}
+
 MT_AddConstantsWidget::MT_AddConstantsWidget(MT_IndividualsWidget *parent, const char *name, bool modal, Qt::WindowFlags fl)
 	: MT_AddConstantsWidgetBase(parent, name, true, fl)
 {
@@ -16,8 +63,8 @@ MT_AddConstantsWidget::MT_AddConstantsWidget(MT_IndividualsWidget *parent, const
 		selectedType = intType;
 		intRadioButton->setDown(true);
 		floatRadioButton->setDown(false);
-		minValidator = new QIntValidator(-10000, 10000, this);
-		maxValidator = new QIntValidator(-10000, 10000, this);
+		minValidator = new Qt2IntValidator(-10000, 10000, this);
+		maxValidator = new Qt2IntValidator(-10000, 10000, this);
 	} else {
 		selectedType = floatType;
 		intRadioButton->setDown(false);
@@ -77,8 +124,8 @@ void MT_AddConstantsWidget::slotClicked(int id)
 			selectedType = intType;
 			delete minValidator;
 			delete maxValidator;
-			minValidator = new QIntValidator(-10000, 10000, this);
-			maxValidator = new QIntValidator(-10000, 10000, this);
+			minValidator = new Qt2IntValidator(-10000, 10000, this);
+			maxValidator = new Qt2IntValidator(-10000, 10000, this);
 			minValueEdit->setValidator(minValidator);
 			maxValueEdit->setValidator(maxValidator);
 			minValueEdit->setText(tr("%1").arg((int)minValueEdit->text().toDouble()));

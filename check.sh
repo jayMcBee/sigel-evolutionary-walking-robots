@@ -848,8 +848,9 @@ elif make -s -C "$ROOT" B=build-fast SAN= SIGSAN= guidrive >/tmp/bdb.$$ 2>&1; th
     # SIGEL_ROOT must be the SOURCE tree: the driver loads pixmaps and terrain
     # from it. Neither scenario spawns a sigel_slave, so neither needs one.
     #
-    # SEVEN scenarios make up the baseline, concatenated in this order
-    # (`roundtrip' joined 2026-09-03; this said SIX until then):
+    # EIGHT scenarios make up the baseline, concatenated in this order
+    # (`roundtrip' joined 2026-09-03 and `metadrive' 2026-09-04; this said SIX
+    # until the first of those):
     #   gate       C10 -- the tree, sorting, add/delete/reset, the dialogs,
     #              the context menus, the MetaGP warning
     #   pages      C11a -- the five View pages C10 never opened, every spin
@@ -925,9 +926,10 @@ elif make -s -C "$ROOT" B=build-fast SAN= SIGSAN= guidrive >/tmp/bdb.$$ 2>&1; th
     if guidrive_run gate /tmp/bo.$$ && guidrive_run pages /tmp/bp.$$ \
        && guidrive_run exportall /tmp/bx.$$ && guidrive_run overwrite /tmp/bw.$$ \
        && guidrive_run dialogs /tmp/bg.$$ && guidrive_run metagui /tmp/bm.$$ \
-       && guidrive_run roundtrip /tmp/br.$$; then
+       && guidrive_run roundtrip /tmp/br.$$ \
+       && guidrive_run metadrive /tmp/bv.$$; then
         cat /tmp/bo.$$ /tmp/bp.$$ /tmp/bx.$$ /tmp/bw.$$ /tmp/bg.$$ /tmp/bm.$$ \
-            /tmp/br.$$ > /tmp/ball.$$
+            /tmp/br.$$ /tmp/bv.$$ > /tmp/ball.$$
         # THE RUNTIME-CONNECT CHECK AND ITS POSITIVE CONTROL.
         #
         # Qt says "No such signal"/"No such slot" at RUNTIME when a
@@ -937,7 +939,7 @@ elif make -s -C "$ROOT" B=build-fast SAN= SIGSAN= guidrive >/tmp/bdb.$$ 2>&1; th
         # regex over the nine Qt 2 spellings in §2, matching SIGNAL( only, so a
         # tenth kind and every bad SLOT() are invisible to it. Nor is it the
         # other way round -- the regex is STATIC over all 14 modules while this
-        # is runtime over only what these seven scenarios execute. Partly
+        # is runtime over only what these eight scenarios execute. Partly
         # disjoint, so both are kept.
         #
         # But Qt emits it under the logging category qt.core.qobject.connect,
@@ -1002,7 +1004,7 @@ elif make -s -C "$ROOT" B=build-fast SAN= SIGSAN= guidrive >/tmp/bdb.$$ 2>&1; th
         echo "  the driver did not finish -- it exits(1) on an out-of-range pool"
         echo "  position, which is how the Qt 6 clear() regression showed up:"
         tail -6 /tmp/bo.$$ /tmp/bp.$$ /tmp/bx.$$ /tmp/bw.$$ /tmp/bg.$$ /tmp/bm.$$ \
-             /tmp/br.$$ 2>/dev/null | sed 's/^/    /'
+             /tmp/br.$$ /tmp/bv.$$ 2>/dev/null | sed 's/^/    /'
         # stderr is captured now, and this is the path where it is most likely
         # to say why. Printing it here is the whole reason for capturing it
         # rather than discarding it: a crash, a Qt fatal, an ASan report or a
@@ -1056,6 +1058,7 @@ else
     bf=1; echo "  guidrive did not build:"; head -5 /tmp/bdb.$$ | sed 's/^/    /'
 fi
 rm -f /tmp/bo.$$ /tmp/bp.$$ /tmp/bx.$$ /tmp/bw.$$ /tmp/bg.$$ /tmp/bm.$$ /tmp/br.$$ \
+      /tmp/bv.$$ \
       /tmp/bl.$$ /tmp/bl2.$$ /tmp/ball.$$ \
       /tmp/bd.$$ /tmp/bdb.$$ /tmp/berr.$$
 # exportall, overwrite and roundtrip WRITE FILES -- 8.2 MB between them, the
