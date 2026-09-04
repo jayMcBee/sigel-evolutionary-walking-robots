@@ -2711,9 +2711,22 @@ int main(int argc, char **argv)
         QTest::qWait(300);
 
         // Enabling MetaGP raises an information box with three custom buttons.
-        whenModal([](QWidget *m) { m->close(); }, 4000);
+        whenModal([](QWidget *m) { if (qobject_cast<QMessageBox *>(m)) m->close(); },
+                  4000);
         clickMenu("&MetaGP", "&Use MetaGP");
         QTest::qWait(1500);
+        // ONLY A QMessageBox IS A FAILURE HERE. MT_MainWindow is itself modal
+        // and comes back from activeModalWidget(), so a handler that closes
+        // whatever it finds CLOSES THE WINDOW UNDER TEST -- metagui documents
+        // this trap 150 lines above and the first version of this scenario
+        // walked straight into it anyway. It cost more than a wasted run:
+        // with the window closed, `closed=1' could not fail, the statistics
+        // section's "no modal appeared" was an artefact, and the focus-out
+        // probe's flakiness was blamed on the offscreen platform not mapping
+        // the window when the real cause was this handler closing it.
+        whenModal([](QWidget *m) {
+            if (qobject_cast<QMessageBox *>(m)) { describeMessageBox(m); m->close(); }
+        }, 4000);
         clickMenu("&MetaGP", "&Configure System");
         QTest::qWait(2500);
 
@@ -2721,6 +2734,10 @@ int main(int argc, char **argv)
         for (QWidget *w : QApplication::topLevelWidgets())
             if (w->windowTitle() == "SIGEL MetaGP") { mt = w; break; }
         if (!mt) { printf("\n!! no MetaGP window appeared\n"); return 1; }
+        // The control for the fix above: if this reads 0 the handler has
+        // closed the window again and everything below is measuring a corpse.
+        printf("  [window] visible=%d hidden=%d\n",
+               mt->isVisible() ? 1 : 0, mt->isHidden() ? 1 : 0);
 
         QStackedWidget *ws = mt->findChild<QStackedWidget *>("WidgetStack");
         QTreeWidget *nav = nullptr;
@@ -2816,42 +2833,33 @@ int main(int argc, char **argv)
                            ed->isHidden() ? 1 : 0);
                 } else printf("  !! editor did not reopen for the Escape probe\n");
 
-                // (c) focus-out is NOT DRIVEN HERE, and that is deliberate.
-                // MT_Editor::focusOutEvent hides without setting acceptChange,
-                // so a focus change should discard. But the MetaGP window is
-                // never mapped under QT_QPA_PLATFORM=offscreen and focus
-                // delivery is then RACY: consecutive runs of identical code
-                // gave "editor held focus, hid, discarded", "editor never held
-                // focus" and "editor still open" -- three answers, same
-                // binary. A line that flaps cannot be baselined, and a
-                // "discarded=1" that is true because nothing happened is a
-                // probe that cannot fail. Both ways of forcing it -- setFocus
-                // on a sibling and clearFocus on the editor -- flapped.
+                // (c) focus-out must DISCARD too -- MT_Editor::focusOutEvent
+                // hides without setting acceptChange.
                 //
-                // So the third of MT_Editor's three contract points is
-                // UNANSWERED ON THIS MACHINE and is asked of the 1.3 oracle
-                // instead, which has a real display. Return and Escape above
-                // are answered here and pin the same acceptChange flag from
-                // both sides.
-                // WHAT OPENS THE EDITOR, pinned because the two versions
-                // reach it through different signals. 1.3 connects Qt 2's
-                // QListBox::selected(QListBoxItem*), which qlistbox.cpp emits
-                // from BOTH mouseDoubleClickEvent (:1840-1855) and Return/Enter
-                // (:2146-2155). The port connects QListWidget::itemActivated,
-                // which fires on double-click or Return -- the same pair -- but
-                // only while the style says activate-on-single-click is false.
-                // If a style ever said true, a SINGLE click would open the
-                // editor where 1.3 needs two, so the style hint is pinned here
-                // rather than assumed.
-                printf("  [opener] activateOnSingleClick=%d (0 = double-click or\n"
-                       "           Return, which is what Qt 2's selected() did)\n",
-                       QApplication::style()->styleHint(
-                           QStyle::SH_ItemView_ActivateItemOnSingleClick) ? 1 : 0);
-                printf("  [focusOut] NOT DRIVEN -- offscreen never maps the MetaGP\n"
-                       "             window, so focus delivery is racy and any\n"
-                       "             result here would be a flake. The oracle owns\n"
-                       "             this one; Return and Escape above pin the same\n"
-                       "             acceptChange flag from both sides.\n");
+                // This WAS reported as undrivable, blamed on the offscreen
+                // platform not mapping the MetaGP window. That diagnosis was
+                // wrong: the window was mapped, and this scenario's own modal
+                // handler had CLOSED it. With the handler fixed the probe is
+                // stable. hadFocus is its control -- with no focus there is no
+                // focus-out to lose, and the probe says so rather than
+                // reporting a pass.
+                const QString before3 = consts->item(0)->text();
+                if (openEditor()) {
+                    ed->selectAll();
+                    QTest::keyClick(ed, Qt::Key_Delete);
+                    QTest::keyClicks(ed, QStringLiteral("7777"));
+                    const bool hadFocus = ed->hasFocus();
+                    consts->setFocus();
+                    QTest::qWait(300);
+                    if (!hadFocus)
+                        printf("  [focusOut] INCONCLUSIVE: the editor never held focus\n");
+                    else
+                        printf("  [focusOut] discarded=%d  editorHidden=%d\n",
+                               consts->item(0)->text() == before3 ? 1 : 0,
+                               ed->isHidden() ? 1 : 0);
+                    if (!ed->isHidden()) { QTest::keyClick(ed, Qt::Key_Escape);
+                                           QTest::qWait(150); }
+                } else printf("  !! editor did not reopen for the focus probe\n");
             }
             printf("  (row 0 started as a randomiser value; only the BOOLEANS above\n"
                    "   are pinned, because the value differs every run)\n");
@@ -2895,9 +2903,30 @@ int main(int argc, char **argv)
                 printf("  on open: intChecked=%d floatChecked=%d intDown=%d floatDown=%d\n",
                        ri && ri->isChecked() ? 1 : 0, rf && rf->isChecked() ? 1 : 0,
                        ri && ri->isDown() ? 1 : 0, rf && rf->isDown() ? 1 : 0);
-                printf("  as opened:\n");
+                // AS OPENED is the case that matters: the dialog opens in float
+                // mode, and 2003 built THIS validator with the bounds swapped,
+                // QDoubleValidator(100000.0, -100000.0, 4). A first version of
+                // this probe typed only "50000" here and typed "-50000" only
+                // after the radio had rebuilt the validator -- so it missed
+                // that Qt 6 drops a leading minus outright when bottom >= 0,
+                // turning -50000 into 50000. A SIGN FLIP, in the default mode,
+                // on the value that becomes the generated constants.
+                printf("  as opened (float, 2003's swapped bounds):\n");
                 probeField(m, "minValueEdit", "50000");
+                probeField(m, "minValueEdit", "-50000");
+                probeField(m, "minValueEdit", "1.23456");
+                probeField(m, "minValueEdit", "9.87654321");
+                probeField(m, "minValueEdit", "-0.0001");
+                // Qt 2 enforces WELL-FORMEDNESS ONLY here -- one leading minus,
+                // one decimal point -- and no constraint on magnitude or on the
+                // number of decimals. These three are the oracle's control that
+                // the validator is doing something in this state, measured on
+                // 1.3: abc -> empty, 1.2.3 -> 1.23, --5 -> -5.
+                probeField(m, "minValueEdit", "abc");
+                probeField(m, "minValueEdit", "1.2.3");
+                probeField(m, "minValueEdit", "--5");
                 probeField(m, "maxValueEdit", "50000");
+                probeField(m, "maxValueEdit", "-50000");
                 // Switch to integer and back to float; the second click is what
                 // deletes and rebuilds the validators at the tenfold-tighter
                 // range. Clicking the radio, not calling the slot.
@@ -2928,18 +2957,26 @@ int main(int argc, char **argv)
                 probeField(m, "minValueEdit", "abc");
                 probeField(m, "minValueEdit", "12.5");
                 if (rf) { QTest::mouseClick(rf, Qt::LeftButton); QTest::qWait(150); }
-                // Now set something sane and accept, so the generator runs.
-                if (QLineEdit *le = m->findChild<QLineEdit *>("minValueEdit")) {
-                    le->setFocus(); le->selectAll();
-                    QTest::keyClick(le, Qt::Key_Delete); QTest::keyClicks(le, "0");
-                }
-                if (QLineEdit *le = m->findChild<QLineEdit *>("maxValueEdit")) {
-                    le->setFocus(); le->selectAll();
-                    QTest::keyClick(le, Qt::Key_Delete); QTest::keyClicks(le, "500");
-                }
+                // MIN = MAX = -50000 IN INTEGER MODE, which is what the oracle
+                // ran on 1.3. Setting them equal makes the generator
+                // DEGENERATE: every constant it produces must be exactly that
+                // value, so the constants themselves become checkable instead
+                // of being randomiser noise. Without this the scenario pinned
+                // only the COUNT, and replacing boss->minValue/maxValue with 0
+                // in accept() -- the typed bounds never reaching the generator
+                // at all -- left the output byte-identical. The bounds are the
+                // whole point of this dialog and they were ungated.
+                if (ri) { QTest::mouseClick(ri, Qt::LeftButton); QTest::qWait(150); }
+                for (const char *n : { "minValueEdit", "maxValueEdit" })
+                    if (QLineEdit *le = m->findChild<QLineEdit *>(n)) {
+                        le->setFocus(); le->selectAll();
+                        QTest::keyClick(le, Qt::Key_Delete);
+                        QTest::keyClicks(le, QStringLiteral("-50000"));
+                        printf("  %s committed as [%s]\n", n, qPrintable(le->text()));
+                    }
                 if (QSpinBox *sp = m->findChild<QSpinBox *>("numConstantsSpinBox")) {
                     sp->setFocus(); sp->selectAll();
-                    QTest::keyClick(sp, Qt::Key_Delete); QTest::keyClicks(sp, "5");
+                    QTest::keyClick(sp, Qt::Key_Delete); QTest::keyClicks(sp, "3");
                     printf("  numConstants set to %d\n", sp->value());
                 }
                 if (QDialog *d = qobject_cast<QDialog *>(m)) d->accept();
@@ -2960,19 +2997,38 @@ int main(int argc, char **argv)
             }
             QTest::qWait(3000);
             const int after = consts ? consts->count() : -1;
-            printf("  constants %d -> %d  delta=%d (5 asked for)\n",
+            printf("  constants %d -> %d  delta=%d (3 asked for)\n",
                    before, after, after - before);
+            // The generated values, which the degenerate bounds make
+            // deterministic. 1.3, measured: three constants of -50000.
+            int matched = 0;
+            QStringList tail;
+            for (int i = before; i >= 0 && i < after; ++i) {
+                tail << consts->item(i)->text();
+                if (consts->item(i)->text() == QStringLiteral("-50000")) ++matched;
+            }
+            printf("  new constants=[%s]  allAreMinusFiftyThousand=%d\n",
+                   qPrintable(tail.join(",")), matched == after - before ? 1 : 0);
         }
         fflush(stdout);
 
         // ---- 3. `update statistics' --------------------------------------
         // One toolbar action on the Statistics page, unclicked on either
-        // version. No evolution has run, so the expectation is that nothing
-        // visible happens -- which is exactly why it needs a POSITIVE CONTROL:
-        // an action that is disabled, or a click that misses, prints the same
-        // "nothing happened". The control is the action's own enabled state
-        // plus the fact that triggering it must not change the page's widget
-        // count or raise a modal.
+        // version. With no evolution run, 1.3 does nothing visible either --
+        // measured by the oracle at 0 changed pixels, against a control (a real
+        // tab switch on that page moves 34,188) proving its diff could see a
+        // change if there were one.
+        //
+        // WHAT THIS SECTION CAN AND CANNOT SEE, stated because the difference
+        // is easy to miss. It pins that the action EXISTS, is ENABLED, can be
+        // TRIGGERED without raising a message box or changing the page, and
+        // that the three Fitness fields read ERR exactly as 1.3's do. It
+        // CANNOT tell whether the slot behind the action ran: gutting
+        // MT_StatisticsWidget::slotUpdateGUI() to `return;' leaves this output
+        // byte-identical. The ERR values are the .ui's own static text and the
+        // two fields that are not ERR are written by onShow() at page-raise,
+        // not by this action. So this is an agreement about STATE, matching
+        // 1.3's own "nothing happens", and not a test of the slot.
         printf("\n== UPDATE STATISTICS ==\n");
         if (QWidget *stat = raisePage("Statistics")) {
             QAction *upd = nullptr;
@@ -2982,7 +3038,11 @@ int main(int argc, char **argv)
                    upd && upd->isEnabled() ? 1 : 0);
             const int widgetsBefore = stat->findChildren<QWidget *>().count();
             bool modalAppeared = false;
+            // Only a QMessageBox counts. MT_MainWindow is modal and comes back
+            // from activeModalWidget(), so counting "a modal appeared" without
+            // this reported 1 on every run and measured nothing.
             whenModal([&](QWidget *m) {
+                if (!qobject_cast<QMessageBox *>(m)) return;
                 modalAppeared = true;
                 printf("  [modal] %s [%s]\n", m->metaObject()->className(),
                        qPrintable(m->windowTitle()));
@@ -3013,7 +3073,8 @@ int main(int argc, char **argv)
             }
             shown.sort();
             printf("  value labels=%d readingERR=%d"
-                   "  (1.3 shows ERR in the Fitness fields with no data)\n",
+                   "  (1.3 shows ERR here too; these are .ui defaults plus\n"
+                   "   two fields onShow() writes -- NOT evidence the action ran)\n",
                    (int)shown.count(), err);
             for (const QString &t : shown) printf("    %s\n", qPrintable(t));
         }
@@ -3072,7 +3133,11 @@ int main(int argc, char **argv)
 
             // `manual/timed stop' is a toggle and is the one action that is
             // safe to press twice and leave as it was.
-            if (QAction *a = acts.value("manual/timed stop")) {
+            // The keys are "text\tobjectName" and every objectName here is
+            // empty, so a lookup of the bare text found NOTHING and both press
+            // blocks below were dead code -- the baseline carried neither
+            // result line, which is how it went unnoticed.
+            if (QAction *a = acts.value(QStringLiteral("manual/timed stop\t"))) {
                 const bool was = a->isChecked();
                 a->trigger(); QTest::qWait(200);
                 const bool mid = a->isChecked();
@@ -3085,14 +3150,16 @@ int main(int argc, char **argv)
             // Default resets the MetaGP parameters. Its effect is read off the
             // Strategy page's own fields rather than asserted, because what it
             // resets them TO is 1.3's business and this side must not invent it.
-            if (QAction *a = acts.value("&Default")) {
+            if (QAction *a = acts.value(QStringLiteral("&Default\t"))) {
                 QWidget *strat = raisePage("Strategy");
                 QStringList before;
                 if (strat)
                     for (QSpinBox *sp : strat->findChildren<QSpinBox *>())
                         before << QString("%1=%2").arg(sp->objectName()).arg(sp->value());
                 bool modal = false;
-                whenModal([&](QWidget *m) { modal = true;
+                whenModal([&](QWidget *m) {
+                    if (!qobject_cast<QMessageBox *>(m)) return;
+                    modal = true;
                     printf("  [modal on Default] %s [%s]\n",
                            m->metaObject()->className(), qPrintable(m->windowTitle()));
                     m->close(); }, 3000);

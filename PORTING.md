@@ -2494,13 +2494,15 @@ thing still do what it did.**
 |---|---|---|---|
 | `MT_Editor`, **Return** | commits the typed value | commits | **agree** |
 | `MT_Editor`, **Escape** | discards, original kept | discards | **agree** |
-| `MT_Editor`, **focus away** | discards, original kept | **not driven** — see below | unanswered here |
+| `MT_Editor`, **focus away** | discards, original kept | discards, editor hides | **agree** |
 | AddConstants, letters | rejected in both modes, field left empty | same | **agree** |
 | AddConstants, `12.5` | stays `12.5` in float, becomes `125` in integer | same | **agree** |
-| AddConstants, `50000` / `-50000` in **float** | accepted, before and after the type switch | accepted | **agree** |
+| AddConstants, `-50000` in **float, as opened** | accepted | **dropped the minus — `50000`** → **FIXED**, accepted | **was a SIGN FLIP; restored** |
+| AddConstants, `1.23456` and `9.87654321` in float | kept in full — **`decimals` is not enforced during typing at all** | **truncated to `1.2345`** → **FIXED**, kept | **was precision loss; restored** |
+| AddConstants well-formedness, float | `abc` → empty, `1.2.3` → `1.23`, `--5` → `-5` | identical | **agree** — Qt 2 enforces **form only**: one leading minus, one point, no constraint on magnitude or decimal count |
 | AddConstants, `-50000` in **integer** | keeps `-50000`, and **generates three constants of `-50000`** | kept `-5000` → **FIXED 2026-09-04**, keeps `-50000` | **was a data divergence; restored** |
 | AddConstants, OK with count 5 | constants 30 → 35, no progress dialog | 30 → 35 | **agree** |
-| `update statistics` | nothing visible; Fitness fields read `ERR` | nothing visible; **the same three fields read `ERR`** | **agree** |
+| `update statistics` | nothing visible (0 changed pixels, against a control that a real tab switch moves 34,188); Fitness fields read `ERR` | nothing visible; **the same three fields read `ERR`** | **agree on STATE — but see the limit below** |
 | arrival enabled map | Start, Stop and Delete disabled; all others enabled | identical | **agree** |
 
 **THE DIVERGENCE REACHED THE GENERATED DATA, AND IS THEREFORE RESTORED RATHER
@@ -2518,13 +2520,50 @@ min = max = `-50000`, count 3, OK — the field keeps `-50000`, the count goes
 A port holding `-5000` generates constants of `-5000`: **a tenfold difference in
 data that reaches the MetaGP population and is invisible from then on.**
 
-So Qt 2's rule is restored, at all four creation sites, by a 20-line
-`QIntValidator` subclass that returns Intermediate for anything that parses as
-an integer and leaves letters Invalid. **That is preserving 1.3's behaviour, not
+**THE FIRST FIX WAS INCOMPLETE IN THE WORST POSSIBLE WAY, and a review caught
+it.** It restored the INTEGER validators of a dialog that **opens in float
+mode**, and the float half carried a worse instance of the same class. Qt 6's
+`QDoubleValidator` returns Invalid for any input beginning with `-` whenever
+`bottom >= 0` — and 2003 built this dialog's float min validator as
+`QDoubleValidator(100000.0, -100000.0, 4)`, bottom above top. Measured on
+Qt 6.10.2 through the same typing route: **`-50000` becomes `50000`, `-5`
+becomes `5`, `-1.5` becomes `1.5`. A sign flip, in the default mode, on the
+value that becomes the generated constants.** Qt 2 had no such rule
+(`qvalidator.cpp:362`) — out of range was always Intermediate. Qt 6 also
+enforces `decimals`, so `1.23456` became `1.2345` where Qt 2 returned
+Intermediate and kept typing.
+
+**Both validators are now TRANSCRIBED from vendored Qt 2 rather than patched on
+top of Qt 6's answers**, which is what let the first attempt miss two of the
+three divergences: Qt 6 says Invalid in three places Qt 2 said Intermediate, and
+post-processing one of them fixed one. `Qt2IntValidator` and
+`Qt2DoubleValidator` reproduce `qvalidator.cpp:236` and `:362` including the
+exponent handling, the `^ *-?\.? *$` empty form and the too-many-decimals rule.
+*`toInt`, not `toLongLong`: Qt 2's `QString::toLong` capped at `INT_MAX/base`
+whatever the platform's `long` width, so it failed past ±INT_MAX and the
+first version was over-permissive there.*
+
+**The transcription was then checked against the binary rather than trusted**,
+because reading the source is what produced the falsified narrowing prediction.
+The oracle typed into a fresh dialog with the type radio never touched:
+`-1.5` → `-1.5`, `1.23456` → `1.23456`, `9.87654321` → `9.87654321`,
+`-0.0001` → `-0.0001`, `-50000` → `-50000`. **`decimals` is not enforced during
+typing at all**, exactly as the transcription assumes. Its control, in the same
+state: `abc` → empty, `1.2.3` → `1.23`, `--5` → `-5`. **The port reproduces all
+eight.** *So Qt 2's rule here is well-formedness only — one leading minus, one
+decimal point — with no constraint on magnitude or decimal count, and that is
+the shape now transcribed.* **That is preserving 1.3's behaviour, not
 improving on it** — the same argument as pinning these validators to
-`QLocale::c()`. *The control that it does not simply disable the validator: `abc`
-is still rejected and `12.5` still becomes `125` in integer mode, both matching
-1.3 exactly.* D28 stands unchanged for the spin boxes it covers; the two
+`QLocale::c()`. *The control that this does not simply disable the validators: `abc` is still
+rejected in both modes and `12.5` still becomes `125` in integer mode, both
+matching 1.3 exactly.* **And the whole chain is now gated rather than just the
+validator**: the scenario sets min = max = `-50000` in integer mode, which makes
+the generator degenerate, and pins the produced values — `constants 30 → 33,
+new constants=[-50000,-50000,-50000]`, exactly what the oracle measured on 1.3.
+*Before that it pinned only the COUNT, and replacing `boss->minValue`/`maxValue`
+with `0` in `accept()` — the typed bounds never reaching the generator at all —
+left the output byte-identical.* Teeth-tested: reverting the validators gives
+`[-5000,-5000,-5000]`. D28 stands unchanged for the spin boxes it covers; the two
 decisions differ because the consequences differ, and both are measured.
 
 **A PREDICTION MADE FROM THE SOURCE WAS FALSIFIED BY BOTH BINARIES.** The 2003
@@ -2537,15 +2576,41 @@ after the switch, on 1.3 and here. The swapped bounds do nothing observable.
 never a porting slip — but "this odd-looking constructor must have an effect"
 was an inference, and the binaries say it has none.*
 
-**What `metadrive` deliberately does NOT answer, and why.** `MT_Editor`'s third
-contract point — focus-out discards — **is not driven here.** The MetaGP window
-is never mapped under `QT_QPA_PLATFORM=offscreen`, and focus delivery is then
-racy: three consecutive runs of identical code gave "editor held focus, hid,
-discarded", "editor never held focus" and "editor still open". Both ways of
-forcing it flapped. A line that flaps cannot be baselined, and a `discarded=1`
-that is true because nothing happened is a probe that cannot fail — so the
-scenario prints `NOT DRIVEN` and the oracle owns that answer. *Return and Escape
-are driven here and pin the same `acceptChange` flag from both sides.*
+**THE SCENARIO CLOSED THE WINDOW IT WAS TESTING, and that one defect explains
+three separate wrong conclusions.** `MT_MainWindow` is itself modal and comes
+back from `activeModalWidget()`, so the handler `whenModal([](QWidget *m) {
+m->close(); })` closed the MetaGP window immediately after opening it —
+**a trap `metagui` documents by name 150 lines earlier in the same file, having
+been bitten by it in C11d.** Everything below it was then measuring a closed
+window:
+
+- `closed=1 mainWindowAlive=1` **could not fail** — deleting the final
+  `mt->close()` outright still printed `closed=1`.
+- `modalAppeared=0` in the statistics section was an artefact; with the window
+  alive the handler sees `MT_MainWindow` itself and had to be narrowed to
+  `QMessageBox` there too.
+- **`MT_Editor`'s focus-out was declared undrivable and blamed on the platform.**
+  This file said "the MetaGP window is never mapped under
+  `QT_QPA_PLATFORM=offscreen`, and focus delivery is then racy". **That was
+  wrong.** The window *is* mapped; this scenario had closed it. With the handler
+  fixed the probe is stable across three runs — `discarded=1 editorHidden=1` —
+  and **all three of `MT_Editor`'s contract points now agree with 1.3.** *A
+  platform was blamed for a defect in the probe, and the retraction is recorded
+  because the false explanation was the more plausible-sounding one.*
+
+A `[window] visible=%d` line is printed right after the window is found, as the
+control: if it ever reads 0 the handler is closing it again and everything after
+is measuring a corpse.
+
+**What the `update statistics` section can and cannot see.** It pins that the
+action exists, is enabled, can be triggered without raising a box or changing
+the page, and that the three Fitness fields read `ERR` exactly as 1.3's do —
+which is a real agreement, because 1.3 does nothing visible there either. **It
+cannot tell whether the slot behind the action ran**: gutting
+`MT_StatisticsWidget::slotUpdateGUI()` to `return;` leaves the output
+byte-identical. The `ERR` values are the `.ui`'s own static text and the two
+fields that are not `ERR` are written by `onShow()` at page-raise. So this is an
+agreement about **state**, not a test of the slot, and the section says so.
 
 **A probe error of the usual shape, caught by a diagnostic rather than by a
 failure.** The first run reported the editor never opening. `isVisible()` was
@@ -2576,7 +2641,18 @@ says activate-on-single-click is false** — so that style hint is pinned in the
 gate, because a style saying true would make a SINGLE click open the editor
 where 1.3 needs two.
 
-**Two things the survey had been hiding.** `metagui`'s toolbar dump keyed
+**Two toolbar press blocks were DEAD CODE, and the baseline is how it hid.**
+The action map is keyed `text + "\t" + objectName`, and every objectName on
+these toolbars is empty — so `acts.value("&Default")` and
+`acts.value("manual/timed stop")`, without the tab, matched nothing and both
+blocks never ran. The baseline simply carried neither result line, so there was
+nothing to notice. **Until this was fixed, nothing on the MetaGP toolbar was
+ever pressed and "MT_GUI's toolbar actions DRIVEN" was false** — they were
+surveyed, which `metagui` already did. Fixed and deterministic:
+`manual/timed stop` toggles 0 → 1 → 0 and restores, `&Default` raises no box and
+leaves the Strategy page's two spin boxes unchanged.
+
+**Two more things the survey had been hiding.** `metagui`'s toolbar dump keyed
 actions by text, which collapsed the evolution-control toolbar's eight
 `addWidget` children — the status label, the hour/minute boxes — into **one
 blank row**, and a later attempt keyed by text-plus-objectName still lost the

@@ -7,50 +7,113 @@
 #include <QSpinBox>
 #include <QAbstractButton>
 #include <QRadioButton>
+#include <QRegularExpression>
 
 namespace
 {
-  // Qt 2's QIntValidator::validate returned INTERMEDIATE for a value outside
-  // [bottom,top] (qvalidator.cpp:236), so QLineEdit accepted every digit and
-  // the range bit only on commit. Qt 6's returns INVALID once the typed prefix
-  // passes the top, and QLineEdit drops the keystroke, leaving a truncated
-  // prefix.
+  // BOTH validator classes are TRANSCRIBED from vendored Qt 2's
+  // qvalidator.cpp rather than patched on top of Qt 6's answers, because Qt 6
+  // says Invalid in three places Qt 2 said Intermediate and post-processing
+  // one of them missed the other two. Qt 2 returns Invalid ONLY when the text
+  // is not a number at all; out of range, too many decimals and a bare "-"
+  // are all Intermediate, so QLineEdit keeps accepting keystrokes and the
+  // range bites on commit instead of on typing.
   //
-  // §9's D28 ACCEPTED that divergence for the five parameter pages' 29 spin
-  // boxes: there the differing value is visible in the box before anything is
-  // saved, and restoring it would mean owning a custom spin box forever.
-  // THIS SITE IS NOT THAT CASE, and the difference is measured rather than
-  // argued. On 1.3, integer mode with min = max = -50000 and a count of 3
-  // generates three constants of -50000 -- no clamping at any point, confirmed
-  // on the running binary, with min set equal to max so the value could not be
-  // a random draw. A port holding -5000 generates constants of -5000: a
-  // TENFOLD difference in data that reaches the MetaGP population and is
-  // invisible from then on.
+  // WHY THIS IS RESTORATION, NOT IMPROVEMENT. §9's D28 accepted Qt 6's
+  // stricter rule for the five parameter pages' 29 spin boxes, where the
+  // differing value is VISIBLE in the box before anything is saved. Here it is
+  // not: accept() copies these two fields into boss->minValue/maxValue, which
+  // go straight to randomizer->createConstant() and become the generated
+  // constants. Measured on the running 1.3 by the oracle, with min set equal
+  // to max so the result could not be a random draw: integer mode,
+  // min = max = -50000, count 3, generates three constants of -50000, no
+  // clamping anywhere. Qt 6's rule silently produced different DATA.
   //
-  // So Qt 2's rule is RESTORED here rather than accepted. That preserves 1.3's
-  // behaviour rather than improving on it -- the same argument as pinning
-  // these validators to QLocale::c(), which also restores what Qt 2 did.
+  // Three separate divergences, all measured on Qt 6.10.2, all fixed here:
+  //   QIntValidator(-10000,10000)        typed -50000  -> "-5000"  (tenfold)
+  //   QDoubleValidator(100000,-100000,4) typed -50000  -> "50000"  (SIGN FLIP)
+  //   QDoubleValidator(...,4)            typed 1.23456 -> "1.2345" (precision)
+  // The second is the worst and was the one this file's first fix MISSED: the
+  // dialog OPENS in float mode, and 2003 built that validator with bottom
+  // above top -- QDoubleValidator(100000.0, -100000.0, 4) -- which makes
+  // Qt 6 reject a leading minus outright, where Qt 2 had no such rule.
+
+  // Qt 2: qvalidator.cpp's QIntValidator::validate, verbatim in behaviour.
   class Qt2IntValidator : public QIntValidator
   {
   public:
     Qt2IntValidator( int bottom, int top, QObject *parent )
       : QIntValidator( bottom, top, parent ) {}
 
-    QValidator::State validate( QString &input, int &pos ) const override
+    QValidator::State validate( QString &input, int & ) const override
     {
-      const QValidator::State s = QIntValidator::validate( input, pos );
-      if ( s != QValidator::Invalid )
-        return s;
-      // Qt 6 answers Invalid both for "out of range" and for "not a number";
-      // only the first was Intermediate in Qt 2. So they are separated here:
-      // anything parsing as an integer is merely out of range and becomes
-      // Intermediate, while letters stay Invalid and are still dropped --
-      // which is the control that this does not just disable the validator.
-      if ( input.isEmpty() || input == QLatin1String( "-" ) )
+      // "^ *-? *$" -- empty, a lone minus, and either surrounded by spaces.
+      if ( QRegularExpression( QStringLiteral( "^ *-? *$" ) )
+               .match( input ).hasMatch() )
         return QValidator::Intermediate;
       bool ok = false;
-      (void) input.toLongLong( &ok );
-      return ok ? QValidator::Intermediate : QValidator::Invalid;
+      // toInt, not toLongLong: Qt 2 used QString::toLong, whose max_mult is
+      // INT_MAX/base (qstring.cpp), so it reported failure past +/-INT_MAX
+      // whatever the width of `long' was on the platform.
+      const int tmp = input.toInt( &ok );
+      if ( !ok )
+        return QValidator::Invalid;
+      return ( tmp < bottom() || tmp > top() ) ? QValidator::Intermediate
+                                               : QValidator::Acceptable;
+    }
+  };
+
+  // Qt 2: qvalidator.cpp's QDoubleValidator::validate, including its exponent
+  // handling and its "too many decimals is Intermediate" rule.
+  class Qt2DoubleValidator : public QDoubleValidator
+  {
+  public:
+    Qt2DoubleValidator( double bottom, double top, int decimals, QObject *parent )
+      : QDoubleValidator( bottom, top, decimals, parent ) {}
+
+    QValidator::State validate( QString &input, int & ) const override
+    {
+      // "^ *-?\.? *$"
+      if ( QRegularExpression( QStringLiteral( "^ *-?\\.? *$" ) )
+               .match( input ).hasMatch() )
+        return QValidator::Intermediate;
+
+      bool ok = false;
+      double tmp = input.toDouble( &ok );   // locale-independent, as Qt 2's was
+      if ( !ok )
+        {
+          // Qt 2 allowed a mantissa followed by a partial exponent, and a
+          // string that is nothing but an exponent tail, so that "1e" and
+          // "1e-" stay typeable.
+          const QRegularExpression tail( QStringLiteral( "e-?\\d*$" ),
+                                         QRegularExpression::CaseInsensitiveOption );
+          const QRegularExpressionMatch m = tail.match( input );
+          const int eeePos = m.hasMatch() ? m.capturedStart() : -1;
+          const int nume = input.count( QLatin1Char( 'e' ), Qt::CaseInsensitive );
+          if ( eeePos > 0 && nume < 2 )
+            {
+              tmp = input.left( eeePos ).toDouble( &ok );
+              if ( !ok )
+                return QValidator::Invalid;
+            }
+          else if ( eeePos == 0 )
+            return QValidator::Intermediate;
+          else
+            return QValidator::Invalid;
+        }
+
+      const int dot = input.indexOf( QLatin1Char( '.' ) );
+      if ( dot >= 0 )
+        {
+          int j = dot + 1;
+          while ( j < input.length() && input[ j ].isDigit() )
+            ++j;
+          if ( j - ( dot + 1 ) > decimals() )
+            return QValidator::Intermediate;   // Qt 6 says Invalid here
+        }
+
+      return ( tmp < bottom() || tmp > top() ) ? QValidator::Intermediate
+                                               : QValidator::Acceptable;
     }
   };
 }
@@ -69,8 +132,8 @@ MT_AddConstantsWidget::MT_AddConstantsWidget(MT_IndividualsWidget *parent, const
 		selectedType = floatType;
 		intRadioButton->setDown(false);
 		floatRadioButton->setDown(true);
-		minValidator = new QDoubleValidator(100000.0, -100000.0, 4, this);
-		maxValidator = new QDoubleValidator(-100000.0, 100000.0, 4, this);
+		minValidator = new Qt2DoubleValidator(100000.0, -100000.0, 4, this);
+		maxValidator = new Qt2DoubleValidator(-100000.0, 100000.0, 4, this);
 	}
 	minValueEdit->setValidator(minValidator);
 	minValueEdit->setText(tr("%1").arg(boss->minValue));
@@ -142,8 +205,8 @@ void MT_AddConstantsWidget::slotClicked(int id)
 			selectedType = floatType;
 			delete minValidator;
 			delete maxValidator;
-			minValidator = new QDoubleValidator(-10000.0, 10000.0, 4, this);
-			maxValidator = new QDoubleValidator(-10000.0, 10000.0, 4, this);
+			minValidator = new Qt2DoubleValidator(-10000.0, 10000.0, 4, this);
+			maxValidator = new Qt2DoubleValidator(-10000.0, 10000.0, 4, this);
 			minValueEdit->setValidator(minValidator);
 			maxValueEdit->setValidator(maxValidator);
 			minValueEdit->setText(tr("%1").arg((double)minValueEdit->text().toInt()));

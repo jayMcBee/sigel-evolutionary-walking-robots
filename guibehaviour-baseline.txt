@@ -2082,6 +2082,7 @@ Do you want to overwrite?]
     allrows sha256=ee0c3372fe5769ccf63f449dfcf2b301eb7d4acd4924cc5291e6f1e0c303e198
   [action changes] none
   [modal] class=MT_MainWindow title=[SIGEL MetaGP]
+  [window] visible=1 hidden=0
 
 == MT_EDITOR (inline constant editor) ==
   constants=30 (values are randomiser output and are NOT pinned)
@@ -2089,13 +2090,7 @@ Do you want to overwrite?]
   [open] editorVisible=1
   [Return]  committed=1  editorHidden=1
   [Escape]  discarded=1  editorHidden=1
-  [opener] activateOnSingleClick=0 (0 = double-click or
-           Return, which is what Qt 2's selected() did)
-  [focusOut] NOT DRIVEN -- offscreen never maps the MetaGP
-             window, so focus delivery is racy and any
-             result here would be a flake. The oracle owns
-             this one; Return and Escape above pin the same
-             acceptChange flag from both sides.
+  [focusOut] discarded=1  editorHidden=1
   (row 0 started as a randomiser value; only the BOOLEANS above
    are pinned, because the value differs every run)
 
@@ -2103,9 +2098,17 @@ Do you want to overwrite?]
   [modal] class=MT_AddConstantsWidget title=[Add Constants]
   [modal] MT_AddConstantsWidget [Add Constants]
   on open: intChecked=0 floatChecked=1 intDown=0 floatDown=1
-  as opened:
+  as opened (float, 2003's swapped bounds):
     minValueEdit   typed[50000  ] -> [50000] acceptable=0 validator=QDoubleValidator
+    minValueEdit   typed[-50000 ] -> [-50000] acceptable=0 validator=QDoubleValidator
+    minValueEdit   typed[1.23456] -> [1.23456] acceptable=0 validator=QDoubleValidator
+    minValueEdit   typed[9.87654321] -> [9.87654321] acceptable=0 validator=QDoubleValidator
+    minValueEdit   typed[-0.0001] -> [-0.0001] acceptable=0 validator=QDoubleValidator
+    minValueEdit   typed[abc    ] -> [] acceptable=0 validator=QDoubleValidator
+    minValueEdit   typed[1.2.3  ] -> [1.23] acceptable=0 validator=QDoubleValidator
+    minValueEdit   typed[--5    ] -> [-5] acceptable=0 validator=QDoubleValidator
     maxValueEdit   typed[50000  ] -> [50000] acceptable=1 validator=QDoubleValidator
+    maxValueEdit   typed[-50000 ] -> [-50000] acceptable=1 validator=QDoubleValidator
   after clicking integer:
     minValueEdit   typed[50000  ] -> [50000] acceptable=0 validator=QIntValidator
   after clicking float again:
@@ -2119,13 +2122,18 @@ Do you want to overwrite?]
     minValueEdit   typed[-50000 ] -> [-50000] acceptable=0 validator=QIntValidator
     minValueEdit   typed[abc    ] -> [] acceptable=0 validator=QIntValidator
     minValueEdit   typed[12.5   ] -> [125] acceptable=1 validator=QIntValidator
-  numConstants set to 5
-  constants 30 -> 35  delta=5 (5 asked for)
+  minValueEdit committed as [-50000]
+  maxValueEdit committed as [-50000]
+  numConstants set to 3
+  constants 30 -> 33  delta=3 (3 asked for)
+  new constants=[-50000,-50000,-50000]  allAreMinusFiftyThousand=1
 
 == UPDATE STATISTICS ==
   action found=1 enabled=1
+  [modal] class=MT_MainWindow title=[SIGEL MetaGP]
   triggered=1 modalAppeared=0 widgets 103 -> 103
-  value labels=36 readingERR=3  (1.3 shows ERR in the Fitness fields with no data)
+  value labels=36 readingERR=3  (1.3 shows ERR here too; these are .ui defaults plus
+   two fields onShow() writes -- NOT evidence the action ran)
     averageFitness=000
     averageFitnessTotal=ERR
     crossovers=000
@@ -2187,6 +2195,11 @@ Do you want to overwrite?]
   (widget) QSpinBox      obj=(none)               enabled=1
   (widget) QSpinBox      obj=(none)               enabled=1
   widgetsOnToolbars=8
+  [manual/timed stop] 0 -> 1 -> 0  toggles=1 restored=1
+  [modal] class=MT_MainWindow title=[SIGEL MetaGP]
+  [&Default] enabled=1 modal=0 strategySpinBoxes=2 changed=0
+    intervalSpinBox=10
+    toleranceSpinBox=500
 
 == METAGP POPULATION ACTIONS ==
   population rows=10 (list=0 tree=1)
