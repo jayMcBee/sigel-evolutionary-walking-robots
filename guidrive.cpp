@@ -1336,12 +1336,20 @@ static bool importFrom(const char *item, const QString &path)
     return true;
 }
 
-static QString sha256Of(const QString &path)
+// `bytes' is optional and, when given, is the length of the EXACT content this
+// hash was computed over -- not a separate stat of the file, which can disagree
+// with it. See the roundtrip scenario for the run that made that necessary.
+static QString sha256Of(const QString &path, qint64 *bytes = nullptr)
 {
     QFile f(path);
-    if (!f.open(QIODevice::ReadOnly)) return QStringLiteral("(unreadable)");
+    if (!f.open(QIODevice::ReadOnly)) {
+        if (bytes) *bytes = -1;
+        return QStringLiteral("(unreadable)");
+    }
+    const QByteArray data = f.readAll();
+    if (bytes) *bytes = data.size();
     const QByteArray sum =
-        QCryptographicHash::hash(f.readAll(), QCryptographicHash::Sha256).toHex();
+        QCryptographicHash::hash(data, QCryptographicHash::Sha256).toHex();
     return QString::fromLatin1(sum);
 }
 
@@ -1941,7 +1949,17 @@ int main(int argc, char **argv)
             printf("\n-- %s\n", it.menu);
             const QString fa = exportTo(it.menu, a, it.ext);
             if (fa.isEmpty() || !QFile::exists(fa)) { printf("  !! first export failed\n"); continue; }
-            const QString sa = sha256Of(fa);
+            // SIZE AND HASH MUST COME FROM THE SAME READ. They used to be
+            // taken at different moments -- the hash here, the size in the
+            // printf ~30 lines and one import later -- and a run printed
+            // `export1 0 bytes' beside the hash of a 299-byte file. Those two
+            // cannot both be true of one stable file (sha256 of empty is
+            // e3b0c442...), so the line was reporting two different instants
+            // as if they were one. sha256Of already reads the whole file;
+            // taking the length from the SAME QByteArray removes the race from
+            // the probe rather than papering over it with a retry.
+            qint64 na = -1;
+            const QString sa = sha256Of(fa, &na);
 
             // Population has no single field to type into; shrink the pool
             // instead, which is a change the .pop must undo.
@@ -1969,9 +1987,10 @@ int main(int argc, char **argv)
             if (!importFrom(it.menu, fa)) { printf("  !! IMPORT FAILED\n"); continue; }
             const QString fb = exportTo(it.menu, b, it.ext);
             if (fb.isEmpty() || !QFile::exists(fb)) { printf("  !! second export failed\n"); continue; }
-            const QString sb = sha256Of(fb);
-            printf("  export1 %lld bytes  %s\n", QFileInfo(fa).size(), qPrintable(sa));
-            printf("  export2 %lld bytes  %s\n", QFileInfo(fb).size(), qPrintable(sb));
+            qint64 nb = -1;
+            const QString sb = sha256Of(fb, &nb);
+            printf("  export1 %lld bytes  %s\n", (long long)na, qPrintable(sa));
+            printf("  export2 %lld bytes  %s\n", (long long)nb, qPrintable(sb));
             if (sa == sb) { printf("  ROUND TRIP STABLE (and the import undid the change)\n");
                             fflush(stdout); continue; }
             // Whitespace-only growth is C10's documented history defect, not a
@@ -2710,7 +2729,13 @@ int main(int argc, char **argv)
         lv->setCurrentItem(lv->topLevelItem(0));
         QTest::qWait(300);
 
-        // Enabling MetaGP raises an information box with three custom buttons.
+        // NOTE: enabling MetaGP raises NOTHING. The information box with three
+        // custom buttons is on DISABLING (MT_Controller.cpp:255-270, the
+        // state == false branch), which is why the baseline shows no
+        // QMessageBox here and this handler never fires. The "Save && Remove"
+        // ampersand fix documented at that site is therefore UNDRIVEN. The
+        // handler is kept because it costs nothing and a box appearing here
+        // would otherwise block the scenario.
         whenModal([](QWidget *m) { if (qobject_cast<QMessageBox *>(m)) m->close(); },
                   4000);
         clickMenu("&MetaGP", "&Use MetaGP");
@@ -2785,17 +2810,19 @@ int main(int argc, char **argv)
             // "the editor opened and something hid it again" and "the list is
             // not visible so nothing can be" all look identical from
             // isVisible() alone.
-            // THE PREDICATE IS isHidden(), NOT isVisible(), and the
-            // difference is the whole probe. Under QT_QPA_PLATFORM=offscreen
-            // the MetaGP window is never mapped, so isVisible() is false for
-            // every widget inside it whatever the code did -- measured:
-            // listVisible=0, listWindowVisible=0, while the editor itself
-            // reported hidden=0 and a real 84x17 geometry, i.e. popup() had
-            // run and show() had taken effect. isVisible() would have read
-            // "the editor never opened" on a port where it opens perfectly.
-            // isHidden() answers what this scenario actually asks -- did the
-            // code show it, and did Return/Escape hide it again -- and it is
-            // exactly what MT_Editor's own hide()/show() pair sets.
+            // THE PREDICATE IS isHidden(), NOT isVisible(). The reason first
+            // recorded here was WRONG and is corrected: it said the offscreen
+            // platform never maps the MetaGP window, so isVisible() is false
+            // for everything inside it. The window IS mapped -- instrumenting
+            // it now finds 43 of 377 descendants visible -- and the readings
+            // that produced that claim came from a run in which this
+            // scenario's own modal handler had CLOSED the window.
+            //
+            // isHidden() is still the right predicate, on its own merits: it
+            // is exactly what MT_Editor's show()/hide() pair sets, so it
+            // answers what this probe asks -- did the code show the editor,
+            // and did Return/Escape hide it again -- without depending on
+            // whether an ancestor happens to be mapped.
             auto editorOpen = [&]() { return ed && !ed->isHidden(); };
             auto openEditor = [&]() -> bool {
                 emit consts->itemActivated(consts->item(0));
@@ -2843,6 +2870,19 @@ int main(int argc, char **argv)
                 // stable. hadFocus is its control -- with no focus there is no
                 // focus-out to lose, and the probe says so rather than
                 // reporting a pass.
+                // The style hint that decides whether a SINGLE click opens the
+                // editor. 1.3 reaches slotEditConst through Qt 2's
+                // QListBox::selected, emitted from mouseDoubleClickEvent and
+                // from Return/Enter; the port reaches it through
+                // itemActivated, which is that same pair ONLY while this reads
+                // 0. It is pinned because a style saying 1 would silently make
+                // one click open the editor where 1.3 needs two. *This line
+                // was deleted by an earlier commit while PORTING.md went on
+                // claiming it was pinned -- a coverage removal, not a wording
+                // slip.*
+                printf("  [opener] activateOnSingleClick=%d\n",
+                       QApplication::style()->styleHint(
+                           QStyle::SH_ItemView_ActivateItemOnSingleClick) ? 1 : 0);
                 const QString before3 = consts->item(0)->text();
                 if (openEditor()) {
                     ed->selectAll();
@@ -3145,6 +3185,26 @@ int main(int argc, char **argv)
                 printf("  [manual/timed stop] %d -> %d -> %d  toggles=%d restored=%d\n",
                        was ? 1 : 0, mid ? 1 : 0, a->isChecked() ? 1 : 0,
                        mid != was ? 1 : 0, a->isChecked() == was ? 1 : 0);
+                // isChecked() alone proves NOTHING: Qt toggles a checkable
+                // action whether or not anything is connected to it, so
+                // deleting the connect left this line byte-identical. The
+                // slot's real effect is that slotAutoStop(true) disables the
+                // hour and minute boxes (MT_MainWindow.cpp:217-232), so their
+                // enabled state is read across the toggle and that is what
+                // gives the probe teeth.
+                QList<QSpinBox *> tb;
+                for (QToolBar *t2 : mt->findChildren<QToolBar *>())
+                    for (QSpinBox *sp : t2->findChildren<QSpinBox *>()) tb << sp;
+                QString st;
+                a->trigger(); QTest::qWait(200);
+                for (QSpinBox *sp : tb) st += sp->isEnabled() ? "1" : "0";
+                a->trigger(); QTest::qWait(200);
+                QString st2;
+                for (QSpinBox *sp : tb) st2 += sp->isEnabled() ? "1" : "0";
+                printf("    toolbar spin boxes=%d enabledWhileTimed=[%s] "
+                       "enabledAfterRestore=[%s] slotHadEffect=%d\n",
+                       (int)tb.count(), qPrintable(st), qPrintable(st2),
+                       st != st2 ? 1 : 0);
             }
 
             // Default resets the MetaGP parameters. Its effect is read off the
@@ -3152,10 +3212,20 @@ int main(int argc, char **argv)
             // resets them TO is 1.3's business and this side must not invent it.
             if (QAction *a = acts.value(QStringLiteral("&Default\t"))) {
                 QWidget *strat = raisePage("Strategy");
+                // PERTURB FIRST. Without this, "Default reset the values" and
+                // "Default did nothing" are the same observation -- gutting
+                // slotLoadDefault() to `return;' left the output
+                // byte-identical. Moving the boxes off their defaults means a
+                // working Default has to move them back.
                 QStringList before;
                 if (strat)
-                    for (QSpinBox *sp : strat->findChildren<QSpinBox *>())
+                    for (QSpinBox *sp : strat->findChildren<QSpinBox *>()) {
+                        sp->setValue(sp->value() == sp->maximum() ? sp->minimum()
+                                                                  : sp->maximum());
                         before << QString("%1=%2").arg(sp->objectName()).arg(sp->value());
+                    }
+                printf("  [&Default] perturbed to: %s\n",
+                       qPrintable(before.join(" ")));
                 bool modal = false;
                 whenModal([&](QWidget *m) {
                     if (!qobject_cast<QMessageBox *>(m)) return;

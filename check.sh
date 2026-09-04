@@ -1187,8 +1187,32 @@ elif [ -x "$ROOT/build-fast/guidrive" ]; then
         fi
     else
         pf=1
-        echo "  a pagesave run did not finish:"
+        # SAY WHY. The first time this fired it printed this header and NOTHING
+        # else -- both stdout files were empty and the captured stderr was
+        # deleted unread, so an intermittent failure produced no evidence at
+        # all. That is the shape this file keeps being bitten by, and the
+        # `gui behaviour' section above had already been fixed for it.
+        echo "  a pagesave run did not finish. Exit codes and sizes:"
+        for f in /tmp/ps1.$$ /tmp/ps2.$$; do
+            if [ -f "$f" ]; then
+                printf '    %s: %s bytes\n' "$f" "$(wc -c < "$f")"
+            else
+                printf '    %s: MISSING\n' "$f"
+            fi
+        done
         tail -4 /tmp/ps1.$$ /tmp/ps2.$$ 2>/dev/null | sed 's/^/    /'
+        if [ -s /tmp/pserr.$$ ]; then
+            echo "  the driver's stderr said:"
+            tail -12 /tmp/pserr.$$ | sed 's/^/    /'
+        else
+            echo "  and its stderr was EMPTY -- no flush, no watchdog line, nothing."
+            echo "  CHECK FREE MEMORY FIRST: this box has 7.2 GiB and a desktop on"
+            echo "  it, and a check.sh run has already been OOM-killed here. SIGKILL"
+            echo "  gives exactly these symptoms. Only if memory was fine is the"
+            echo "  other reading worth chasing -- the watchdog is a QTimer, so its"
+            echo "  silence would then mean the event loop was blocked and the 300 s"
+            echo "  timeout did the killing."
+        fi
     fi
     rm -f "$PSD/pagesave-base.exp" "$PSD/pagesave-edited.exp"
 else

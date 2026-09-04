@@ -2463,7 +2463,8 @@ through; read this first and use them for detail only.
 | **`SIGEL_SlaveGUI` has no runtime connect coverage** — 44 `SIGNAL(` and 44 `SLOT(` sites, and `check.sh` never runs the `slavegui` scenario | coverage; found 2026-09-03 |
 | **item 3** — `QHashSeed::setDeterministicGlobalSeed()` unowned in `sigel.cpp` | bookkeeping; not a live defect |
 | **item 4** — six dropped size constraints | measured, cosmetic |
-| ~~**undriven**: a MetaGP evolution, `MT_Editor`, `MT_AddConstantsWidget`, `update statistics`, MT_GUI's toolbar actions~~ **ALL BUT THE EVOLUTION DRIVEN 2026-09-04** — new `metadrive` scenario, in the gate. **A MetaGP evolution is what is left** | coverage |
+| ~~**undriven**: a MetaGP evolution, `MT_Editor`, `MT_AddConstantsWidget`, `update statistics`, MT_GUI's toolbar actions~~ **ALL BUT THE EVOLUTION DRIVEN 2026-09-04** — new `metadrive` scenario, in the gate | coverage |
+| **a MetaGP evolution — probably UNREACHABLE, on both versions, and for a reason worth stating** | `Start` is created disabled and is enabled only by `separateEvolutionAllowed()`, i.e. `getPresentTSize() >= getResultArray()->size()` — the training set having FILLED — and that predicate is re-evaluated **only on a MetaGP page switch** (`MT_MainWindow.cpp:282,309,361,380`), so it never lights up on its own. Filling the trainer needs a running SIGEL evolution feeding the classifier and evaluator. **There is no shortcut in the shipped data**: `&Open` filters for `Setup(*.mcnf)` and **no `.mcnf` exists in the repo or any tarball**. **And the MetaGP window is application-modal**, measured on 1.3 — with it open the main window accepts no input (0 pixels changed, against a control of 141,023 for a page switch inside the MetaGP window), so the feeding evolution cannot run while the window showing `Start` is open. The only route is enable → **close** → run → reopen → switch pages. *1.3 then crashed in generation 4 of that run; see the `pvmTasks` hazard in §10. Attribution pending a control.* **If both versions never enable Start, that is an equivalence result and closes this item rather than leaving it open** |
 | ~~D28's divergence reaches `MT_AddConstantsWidget`~~ **FIXED 2026-09-04** — it reached the generated constants tenfold, so Qt 2's out-of-range rule is restored there rather than accepted | closed; D28 stands for the spin boxes it covers |
 | six forms declare a minimum smaller than Qt 6's layout needs — inherited from 1.3, `MT_StatisticsWidgetBase` unreadable if dragged small | usability |
 | the evolution result is recorded as prose; no artefact is committed | reproducibility |
@@ -2484,7 +2485,10 @@ against source. **Verify before citing anything here.**
 `metagui` (C11d) surveyed the MetaGP window and printed what it found; nothing
 had ever **pressed** anything on it. §9 listed four such items — `MT_Editor`,
 `MT_AddConstantsWidget`, `update statistics` and MT_GUI's toolbar actions — and
-`metadrive` now drives all four on both versions. **The question throughout was
+`metadrive` now drives all four here, and the oracle measured the first three
+on 1.3. *The toolbar actions have NO 1.3-side measurement — neither pressed
+action has a row in the table below, so for that one item this is coverage on
+this side only, not an agreement.* **The question throughout was
 core functionality, not appearance: can a user still do the thing, and does the
 thing still do what it did.**
 
@@ -2543,14 +2547,30 @@ exponent handling, the `^ *-?\.? *$` empty form and the too-many-decimals rule.
 whatever the platform's `long` width, so it failed past ±INT_MAX and the
 first version was over-permissive there.*
 
+**AND THE TRANSCRIPTION'S FIRST VERSION HANDED THE PRECISION LOSS BACK, ONE
+FOCUS CHANGE LATER.** Neither class overrode `fixup()`, so Qt 6's was inherited
+and live. **Qt 2's `QIntValidator` and `QDoubleValidator` do not override
+`fixup` at all** — the only definition is `QValidator::fixup`, an empty body
+(`qvalidator.cpp:175`) — and Qt 2's `QLineEdit` called it **only on Return**,
+never from `focusOutEvent`. Qt 6 overrides it in both validators *and* calls it
+on Return **and** focus-out. Measured with the float validator at
+`(-10000, 10000, 4)`: typing `123.456789` and then clicking away rewrites the
+field to **`1.2346e+02`**, and `accept()` stores `123.46`. `9999.12345` becomes
+`9.9991e+03`. *So the commit that listed `1.23456 → 1.2345 (precision)` among
+the three divergences it fixed had repaired the keystroke-drop half and
+reproduced the loss through a different door, in the same data path.* Both
+classes now override `fixup` as a no-op, which is Qt 2's own behaviour;
+re-measured, all three values survive focus-out unchanged.
+
 **The transcription was then checked against the binary rather than trusted**,
 because reading the source is what produced the falsified narrowing prediction.
 The oracle typed into a fresh dialog with the type radio never touched:
 `-1.5` → `-1.5`, `1.23456` → `1.23456`, `9.87654321` → `9.87654321`,
 `-0.0001` → `-0.0001`, `-50000` → `-50000`. **`decimals` is not enforced during
 typing at all**, exactly as the transcription assumes. Its control, in the same
-state: `abc` → empty, `1.2.3` → `1.23`, `--5` → `-5`. **The port reproduces all
-eight.** *So Qt 2's rule here is well-formedness only — one leading minus, one
+state: `abc` → empty, `1.2.3` → `1.23`, `--5` → `-5`. **The port reproduces
+seven of the eight** — `-1.5` is the oracle's measurement only; the port side
+types `50000` in its place and has no `-1.5` line. *So Qt 2's rule here is well-formedness only — one leading minus, one
 decimal point — with no constraint on magnitude or decimal count, and that is
 the shape now transcribed.* **That is preserving 1.3's behaviour, not
 improving on it** — the same argument as pinning these validators to
@@ -4436,6 +4456,111 @@ error sink handed in at construction. Do not settle it per-site.
 7 core files touch dialogs. Done: `SIG_Environment.cpp`. Remaining:
 `MT_Controller.cpp`, `SIG_GPFitnessTrainer.cpp`,
 `SIG_GPRemoteZORCFitnessFunction.cpp` (+ WIN variant, + both headers).
+
+### FLAKE — `pagesave` failed once, in a way that left no evidence, 2026-09-04
+
+**Recorded rather than dismissed, because the interesting part is what the
+failure did NOT say.** One `check.sh` run gave `pagesave vs 1.3  0 pass 1 fail`
+with the message `a pagesave run did not finish:` **and nothing after it**. The
+scenario run directly, immediately afterwards, was clean — exit 0, 9.9 s, the
+expected 192 lines — and the next full `check.sh` was 846/0. It has not
+recurred.
+
+**What the absence of output narrows it to.** Both stdout files were empty and
+the captured stderr was deleted unread, so the first version of this diagnostic
+produced no evidence at all. guidrive's watchdog `fflush()`es stdout before
+`_exit(3)`, so an empty stdout with no `!! WATCHDOG` line means **the watchdog
+never fired**, and the process died without flushing its stdio buffer.
+
+**THE FIRST DIAGNOSIS WRITTEN HERE WAS "blocked outside the event loop until
+`timeout` killed it", AND THAT IS PROBABLY WRONG.** A later `check.sh` run on
+this machine was **killed by the system for low memory**, with no stray
+processes and 2.5 GiB free afterwards — the box has 7.2 GiB total and carries a
+desktop session, an editor and two agent processes. **An OOM kill is SIGKILL: no
+flush, no watchdog, no stderr, non-zero exit — every symptom, and a far simpler
+explanation than a blocking call.** *The blocking-call reading was a real
+deduction from real evidence and still fitted; it was just not the only thing
+that fitted, and it was written as though it were. Check free memory before
+chasing a blocking call.*
+
+**The diagnostic now says all of that**, and prints the two files' sizes and the
+captured stderr. *The `gui behaviour` section had already been fixed to print
+its stderr on the failure path, by an earlier review; this section was written
+afterwards and did not inherit it. A fix applied to one of two near-identical
+blocks is half a fix.*
+
+**This is the second flake this project has seen** — the first was a 844/1 run
+followed by 845/0 on an identical tree, cause unknown and never reproduced.
+That one left no evidence either. This one now would.
+
+**And a THIRD appeared immediately after, in `gui behaviour`, which was
+self-contradicting and IS fixed.** A `roundtrip` run printed
+
+```
+export1 0 bytes  383d1f4f...   <- the hash of a 299-byte file
+export2 299 bytes 383d1f4f...
+```
+
+**Those two cannot both be true of one stable file**: sha256 of an empty file is
+`e3b0c442…`, not `383d1f4f…`. The probe was taking the hash at one instant and
+the size at another — `sha256Of(fa)` immediately after the export, then
+`QFileInfo(fa).size()` some thirty lines and one whole import later — and
+printing them as if they were simultaneous. `sha256Of` now returns the length of
+**the exact bytes it hashed**, so the two cannot disagree. *This does not explain
+what made a separate stat report 0; it removes the probe's ability to report a
+contradiction, and leaves a real truncation to show up where it should — as a
+hash mismatch and a failed round trip, loudly.*
+
+### PRE-EXISTING — `pvmTasks` is READ without the growth check that WRITES it
+
+**Found 2026-09-04 from the oracle's crash, and it is 1.3's own defect,
+unchanged in the port.** `SIG_GPFitnessTrainer::spawnTask` grows the vector
+before writing — `oldMaxIndex < nextFreeNumber + 1` → `resize( oldSize +
+population )` — and that logic is **identical to the pristine 2003 source and
+correct on its own terms**: it always grows before the index it is about to use.
+But `checkTask( int taskId )` (`SIG_GPFitnessTrainer.cpp:368`) does
+
+```cpp
+SIG_GPPVMTask *pvmTask = pvmTasks[ taskId ];
+```
+
+with **no growth check and no bounds check at all**, so the read path can be
+handed an id the vector has not been grown to cover.
+
+**The evidence.** Driving a normal SIGEL evolution on the 2003 binary with
+MetaGP enabled, the oracle got, in generation 4:
+
+```
+QGVector::operator[]: Index 272 out of range
+Invalid storage access                       <- SIGEL's own SIGSEGV string
+```
+
+`QGVector` is the **pointer**-vector base, so `QArray` members are excluded
+(they print `QGArray::at:`) — which rules out `MT_ResultBuffer`,
+`instructionProb` and the `MT_TranslatedIndividual` arrays. Of the `QVector`
+members in the evolution loop at population 100 — `pool` 100, `tours` 50,
+`indis` and `pvmHosts` small, `individualItems` pool-sized — **only `pvmTasks`
+can be near 272**: it is built at 100 and grows a whole population at a time, so
+its sizes are 100, 200, 300, and **272 is out of range for exactly size 200**.
+
+**Why the MetaGP path is implicated but not convicted.**
+`MT_Evaluator::checkTask` **overrides** that function and calls the base, and
+`MT_Evaluator` is one of the two classes that are only in the loop when MetaGP
+is enabled. So MetaGP adds a layer in front of an unchecked index — a mechanism
+by which a crash could be MetaGP-specific **without the MetaGP code being
+wrong**. *Attribution is NOT settled: a control run with MetaGP never enabled
+was still running when this was written, and "long runs crash regardless" is an
+equally live explanation. Do not repeat this as a MetaGP defect until that
+control reports.*
+
+**THE PORT FAILS DIFFERENTLY HERE, AND MORE LOUDLY.** The unchecked read is
+unchanged, but neither the Makefile nor `check.sh` defines `QT_NO_DEBUG`, so
+`QList::operator[]`'s `Q_ASSERT_X` is live in both build trees. Where 1.3 warns
+to stderr and then reads out of bounds into a segfault, the port aborts at the
+index itself. That is the dropped-clamp consequence D6, D8, D9 and D25c each
+recorded in the abstract; **this is the first evidence of a path that actually
+reaches it.** No gate covers it — `SIG_GPFitnessTrainer` is linked into no gate
+binary — so it is recorded, not tested.
 
 ### PRE-EXISTING LEAK — the simulation backend is never freed
 

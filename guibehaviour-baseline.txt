@@ -2090,6 +2090,7 @@ Do you want to overwrite?]
   [open] editorVisible=1
   [Return]  committed=1  editorHidden=1
   [Escape]  discarded=1  editorHidden=1
+  [opener] activateOnSingleClick=0
   [focusOut] discarded=1  editorHidden=1
   (row 0 started as a randomiser value; only the BOOLEANS above
    are pinned, because the value differs every run)
@@ -2196,8 +2197,10 @@ Do you want to overwrite?]
   (widget) QSpinBox      obj=(none)               enabled=1
   widgetsOnToolbars=8
   [manual/timed stop] 0 -> 1 -> 0  toggles=1 restored=1
+    toolbar spin boxes=3 enabledWhileTimed=[001] enabledAfterRestore=[111] slotHadEffect=1
+  [&Default] perturbed to: intervalSpinBox=100 toleranceSpinBox=100000
   [modal] class=MT_MainWindow title=[SIGEL MetaGP]
-  [&Default] enabled=1 modal=0 strategySpinBoxes=2 changed=0
+  [&Default] enabled=1 modal=0 strategySpinBoxes=2 changed=1
     intervalSpinBox=10
     toleranceSpinBox=500
 

@@ -61,6 +61,20 @@ namespace
       return ( tmp < bottom() || tmp > top() ) ? QValidator::Intermediate
                                                : QValidator::Acceptable;
     }
+
+    // fixup() MUST BE A NO-OP, and leaving it inherited re-introduced the very
+    // defect this class removes. Qt 2's QIntValidator and QDoubleValidator do
+    // NOT override fixup at all -- the only definition is QValidator::fixup,
+    // an empty body (qvalidator.cpp:175) -- and Qt 2's QLineEdit called it
+    // only on Return, never from focusOutEvent. Qt 6 overrides it in both
+    // validators AND calls it on Return *and* focus-out. Measured: with the
+    // float validator at (-10000, 10000, 4), typing 123.456789 and then
+    // clicking away rewrites the field to "1.2346e+02", and accept() stores
+    // 123.46. The first version of this class fixed the keystroke-drop half
+    // of the precision divergence and handed the same loss back one focus
+    // change later, in the data path the class exists to protect.
+    void fixup( QString & ) const override {}
+
   };
 
   // Qt 2: qvalidator.cpp's QDoubleValidator::validate, including its exponent
@@ -115,6 +129,20 @@ namespace
       return ( tmp < bottom() || tmp > top() ) ? QValidator::Intermediate
                                                : QValidator::Acceptable;
     }
+
+    // fixup() MUST BE A NO-OP, and leaving it inherited re-introduced the very
+    // defect this class removes. Qt 2's QIntValidator and QDoubleValidator do
+    // NOT override fixup at all -- the only definition is QValidator::fixup,
+    // an empty body (qvalidator.cpp:175) -- and Qt 2's QLineEdit called it
+    // only on Return, never from focusOutEvent. Qt 6 overrides it in both
+    // validators AND calls it on Return *and* focus-out. Measured: with the
+    // float validator at (-10000, 10000, 4), typing 123.456789 and then
+    // clicking away rewrites the field to "1.2346e+02", and accept() stores
+    // 123.46. The first version of this class fixed the keystroke-drop half
+    // of the precision divergence and handed the same loss back one focus
+    // change later, in the data path the class exists to protect.
+    void fixup( QString & ) const override {}
+
   };
 }
 
