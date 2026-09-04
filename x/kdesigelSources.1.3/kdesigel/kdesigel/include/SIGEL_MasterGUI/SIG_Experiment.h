@@ -251,6 +251,13 @@ namespace SIGEL_MasterGUI
       bool evolutionIsRunning = false;
 
     public:
+      /**
+       * The real run state, for callers that must not ask
+       * SIG_GPManager::running() -- which is a 2003 stub returning false
+       * unconditionally and overridden nowhere.
+       */
+      bool isEvolutionRunning() const { return evolutionIsRunning; }
+
 
     protected:
 

@@ -309,16 +309,21 @@ void SIG_ExperimentListView::slotSelectionChanged( QTreeWidgetItem * theItem )
 	}
       experimentName = theItem->text(0);
       experimentDict.value( experimentName )->slotSelectionChanged( option );
-      SIGEL_GP::SIG_GUIGPManager *manager = experimentDict.value( experimentName )->gpManager;
-      if( manager )
-	{
-	  if( manager->running() )
-	    emit evolutionNotRunning( false );
-	  else
-	    emit evolutionNotRunning( true );
-	}
-      else
-	emit evolutionNotRunning( true );
+      // D29. This asked SIG_GPManager::running(), which is a 2003 STUB
+      // returning false unconditionally (SIG_GPManager.h:115) and overridden
+      // nowhere -- so this branch always emitted evolutionNotRunning( TRUE ),
+      // and SIG_MainWindow::slotEnableEvolutionRunningActions RE-ENABLED all
+      // 23 evolutionRunningActions on any tree click.
+      //
+      // The actions ARE correctly disabled when a run starts: SIG_Experiment
+      // emits signalEvolutionNotRunning( false ) and both construction sites
+      // relay it to this class's own signal. So the defect was not that they
+      // were never disabled -- it is that ONE CLICK ON THE TREE undid it,
+      // mid-run, handing back Import GP-Parameters, Add, Delete, Reset and
+      // the rest. That is precisely what D29 forbids, and on the oracle's
+      // evidence acting on the GUI mid-run also crashes 1.3.
+      SIG_Experiment *theExp = experimentDict.value( experimentName );
+      emit evolutionNotRunning( !( theExp && theExp->isEvolutionRunning() ) );
  	  emit actExpChanged();
       experimentDict.value( experimentName )->putAllIntoExperiment();
     }
