@@ -209,6 +209,28 @@ void SIG_Experiment::setName( QString newName )
 
 void SIG_Experiment::putAllIntoExperiment()
 {
+  // DELIBERATE DEVIATION FROM 1.3, decided 2026-09-04: parameters may not
+  // change once a run has started. That is how GP is normally implemented --
+  // the parameters define the run -- and 1.3's behaviour here is not the
+  // specification.
+  //
+  // The guard belongs HERE rather than on the widgets, because this function
+  // is reached by a path no widget guard covers:
+  // SIG_ExperimentListView::slotSelectionChanged ends with an UNCONDITIONAL
+  // putAllIntoExperiment() (:323), two lines after it has already asked
+  // manager->running() for a different purpose. So merely disabling the pages
+  // leaves a page switch able to push widget state into a live run.
+  //
+  // 1.3 does disable the five pages while running (slotStartEvolution below),
+  // so no user-typed value can currently reach here mid-run -- this makes the
+  // property structural instead of incidental, and covers any future caller.
+  //
+  // slotStartEvolution calls this BEFORE gpManager->start(), so the settings a
+  // user chose are still committed at start; only writes after that are
+  // refused.
+  if ( evolutionIsRunning )
+    return;
+
   experimentView->putIntoExperiment();
   gpParameter->putIntoExperiment();
   simulationParameter->putIntoExperiment();
@@ -279,8 +301,16 @@ void SIG_Experiment::slotStartEvolution()
       environmentView->setEnabled( false );
       // allIndividualsView->setEnabled( false );
       
+      // Set AFTER putAllIntoExperiment() above, so the user's chosen settings
+      // are committed, and before start(), so nothing can change them from
+      // here on. start() runs the evolution synchronously and services the GUI
+      // through haveABreak(), so a page switch during the run does reach
+      // putAllIntoExperiment -- with this true, it now declines.
+      evolutionIsRunning = true;
+
       gpManager->start();
-      
+
+      evolutionIsRunning = false;
       slotEvolutionStopped();
     }
   else

@@ -106,6 +106,12 @@ namespace SIGEL_MasterGUI
 	 *
 	 * The function calles the function putIntoExperiment() for each widget in this class.
 	 */
+	/**
+	 * Writes every parameter page into the experiment.
+	 *
+	 * DOES NOTHING WHILE AN EVOLUTION IS RUNNING -- a deliberate deviation from
+	 * SIGEL 1.3, decided 2026-09-04. See evolutionIsRunning below.
+	 */
 	void putAllIntoExperiment();
       
       /**
@@ -234,6 +240,17 @@ namespace SIGEL_MasterGUI
 
     signals:
       void signalEvolutionNotRunning( bool );
+
+    private:
+      /**
+       * True from the moment gpManager->start() is entered until the run
+       * stops. NOT SIG_GPManager::running(), which is a 2003 stub that always
+       * returns false (SIG_GPManager.h:115) and is overridden nowhere -- a
+       * guard written against it could never fire.
+       */
+      bool evolutionIsRunning = false;
+
+    public:
 
     protected:
 

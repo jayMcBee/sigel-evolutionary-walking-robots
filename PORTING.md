@@ -487,6 +487,7 @@ D20 supersedes D5, D24 supersedes D3.
 |---|---|---|
 | **D27** *(decision; §10 also has a **step** D27, the shim deletion — the two D-series overlap and this is the first collision)* | The duplicate MetaGP `A&bout` | **removed**, with its trailing separator. Present in 1.3 and verified there; wired to the same `slotAbout()` as `Help > About` and opening the identical `SIG_InfoBox`. The port's first intentional difference from 1.3. `Help > About` untouched |
 | **D28** | The `QSpinBox` over-range divergence (C11a) | **accepted, not fixed.** 1.3 accepts out-of-range digits and clamps on commit; the port refuses the keystroke and commits a truncated prefix. It is reachable **only by typing a number outside the box's own range**, and the differing value is **visible in the box** before anything is saved — 1.3 shows 99, the port shows 10. Contrast what the port did fix: `clear()` killed the application, the ampersand rendered wrong, a negative width silently wrote no file — all reachable with valid use. The fix is not the 33 lines of it, it is **owning a custom widget forever**: every future form edit and every new spin box must remember `SIG_SpinBox` or silently opt out. Pinned in `guibehaviour-baseline.txt` (`commits=`) so it cannot drift; prototype and the measured comparison in `future_refactorings.md`. **Revisit if** a dialog spin box turns out to feed something unvalidated, or if anyone actually hits it |
+| **D29** *(signed off 2026-09-04)* | Changing run parameters **while an evolution is running** | **FORBIDDEN in the port, whatever 1.3 permits.** The user's reason is the specification, not 1.3: *"that's not how GAs/GPs are commonly implemented"* — the parameters define the run. **The port's second intentional divergence**, after D27. Implemented as a guard inside `SIG_Experiment::putAllIntoExperiment()`, NOT on the widgets, because a widget guard does not cover the path that matters: `SIG_ExperimentListView::slotSelectionChanged` ends with an **unconditional** `putAllIntoExperiment()` (`:323`) — two lines after it has already asked `manager->running()` for a different purpose — so a **page switch** can push widget state into a live run. *1.3 does disable the five parameter pages during a run (`SIG_Experiment.cpp:275-279`), so no user-typed value can reach that path today; the guard makes the property structural rather than incidental and covers any future caller.* **The obvious predicate could not have worked:** `SIG_GPManager::running()` is a 2003 stub that returns `false` unconditionally (`SIG_GPManager.h:115`) and is overridden nowhere, so a guard written against it would never fire — the flag is explicit instead. Ordering is load-bearing: `slotStartEvolution` calls `putAllIntoExperiment()` **before** `gpManager->start()`, so the settings a user chose are still committed at start and only later writes are refused. **Out of scope, deliberately, and flagged rather than decided:** `allIndividualsView->setEnabled( false )` is **commented out in the 2003 source** (`:280`), so the Individuals view stays live during a run. Individuals are the population, not parameters, so this decision does not touch them — but it is the one place a user can still act mid-run. **COVERAGE, stated plainly: only half of this is gated.** The "does not over-block" half is — `pagesave vs 1.3` and `pages` both drive `putAllIntoExperiment()` on the normal path and would fail if the guard refused a legitimate commit, and they pass. The "**does** block during a run" half is **verified by inspection only**: exercising it needs a live evolution, and the evolution scenario is not in the gate (every shipped experiment terminates on a 2001 date, so a correct Start returns in under 100 ms, and a run long enough to switch pages during takes minutes). Add it to the `evolution` scenario when that is next touched |
 
 ---
 
@@ -4543,15 +4544,35 @@ members in the evolution loop at population 100 — `pool` 100, `tours` 50,
 can be near 272**: it is built at 100 and grows a whole population at a time, so
 its sizes are 100, 200, 300, and **272 is out of range for exactly size 200**.
 
-**Why the MetaGP path is implicated but not convicted.**
-`MT_Evaluator::checkTask` **overrides** that function and calls the base, and
-`MT_Evaluator` is one of the two classes that are only in the loop when MetaGP
-is enabled. So MetaGP adds a layer in front of an unchecked index — a mechanism
-by which a crash could be MetaGP-specific **without the MetaGP code being
-wrong**. *Attribution is NOT settled: a control run with MetaGP never enabled
-was still running when this was written, and "long runs crash regardless" is an
-equally live explanation. Do not repeat this as a MetaGP defect until that
-control reports.*
+**THE EXPERIMENT WAS CONFOUNDED AND NO ATTRIBUTION IS AVAILABLE. Do not repeat
+this as a MetaGP defect.** Two variables moved together: in both crashed runs
+MetaGP was enabled **and** the GUI was touched during the run (an attempt to
+open Configure System); in both controls MetaGP was off **and** nothing was
+touched. So "MetaGP enabled" and "the GUI was poked mid-run" are perfectly
+correlated in the data and the crash is attributable to either. *Caught by the
+oracle itself, after it had already sent a MetaGP-flavoured reading — the
+timing on the second run is documented to a 89-second window that contains the
+interaction.* Two crashes, indices **272** and **497**.
+
+| run | MetaGP | mid-run GUI interaction | outcome |
+|---|---|---|---|
+| 1 | on | yes | crash, generation 4, index 272 |
+| 2 | on | yes | crash, index 497 |
+| control 1 | off | none | generation 6, alive when killed |
+| control 2 | off | none | running at generation 2 |
+
+**The decisive run is MetaGP ON with no mid-run interaction**, and it had not
+been done when this was written. *If it survives, the two "MetaGP" crashes were
+self-inflicted and the real finding is much broader and more useful: **touching
+the GUI during a running evolution can kill 1.3**.* That reading also fits the
+mechanism above — an unchecked read racing the growth is exactly what a
+re-entrant `processEvents()` from a GUI interaction would expose, and
+`slotStartEvolution` only survives at all because `haveABreak()` pumps events.
+
+*A MetaGP-specific mechanism does exist and is why the first reading was
+plausible:* `MT_Evaluator::checkTask` **overrides** the unchecked function and
+calls the base, and `MT_Evaluator` is one of the two classes only in the loop
+when MetaGP is enabled. That remains a candidate, not a conclusion.
 
 **THE PORT FAILS DIFFERENTLY HERE, AND MORE LOUDLY.** The unchecked read is
 unchanged, but neither the Makefile nor `check.sh` defines `QT_NO_DEBUG`, so
