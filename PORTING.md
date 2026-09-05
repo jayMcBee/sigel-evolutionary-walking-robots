@@ -902,6 +902,51 @@ was in the list of ten, and `sigel.cpp`'s three were never in it, as the same
 paragraph then admitted. And "8 German lines have no umlaut" is **9**, of which
 **3** rather than 2 are in `SIG_SimulationVisualisationWidget.cpp`.*
 
+### Doc comments naming a member by its Qt 2 type — DONE 2026-09-05
+
+**26 lines in 14 files, not the 28 in 16 this section used to claim.** Every one
+was checked against the member's ACTUAL declared type in the same file before
+being touched, which is what the old figure was not:
+
+| file | lines | was | is |
+|---|---|---|---|
+| `SIG_GPManager.h` | 5 | `QArray` | `tours` is `QList<SIG_GPTournament *>`, `taskCanDoList` is `QList<int>` |
+| `SIG_GPParameter.h` | 4 | `QArray` | see below — `QStringList` |
+| `MT_Trainingset.h` | 4 | `QArray` | `TCases` is `QList<MT_TrainingCase *>` |
+| `MT_Statistics.h` | 2 | `QArray` | `TotalCrossoverEvent` is `QList<unsigned int>` |
+| `SIG_VisualSceneObject.h` | 2 | `QArray` | both are `QList<GLdouble>` |
+| `MT_Population.h`, `MT_StatisticsElement.h` | 1 each | `QArray` | `QList` |
+| `SIG_GPPopulation.h`, `SIG_GPTournament.h`, `SIG_Register.h`, `SIG_EnvironmentRenderer.h`, `SIG_RobotRenderer.h`, `SIG_SceneObject.h` | 1 each | `QVector` | `QList` |
+| `SIG_ExperimentListView.h` | 1 | `QDict` | `experimentDict` is `QHash<QString, SIG_Experiment *>` |
+
+**`SIG_GPParameter.h`'s four are the odd ones and did not become `QList`.** They
+sit inside a commented-out doc block for `setFunctionSet` / `getFunctionSet` /
+`setTerminalSet` / `getTerminalSet`, **none of which exists** — the class has no
+such member or method. Eleven lines up, in the same file, the same 2003 author's
+commented-out `private:` block declares `QStringList terminalSet;` and
+`QStringList functionSet;`. So the `QArray` there was the ORIGINAL author's own
+inconsistency, not something the port introduced, and `QStringList` is the only
+spelling the file itself supports. The surrounding prose says "given as a
+QString", which agrees with neither; that is left as found.
+
+**FIVE NEAR-MISSES WERE DELIBERATELY NOT TOUCHED**, and they are why the count
+came out lower. `MT_FitnessTrainer.h:99` and `MT_Trainingset.h:40` say `QQueue`
+of a parameter that really is `QQueue<MT_TrainingCase *> *`. `MT_Statistics.h`
+:13, :25 and :48 say `QList` and the members really are `QList`. Naming a type
+correctly is not a defect, and a sweep that matched Qt 2 spellings without
+reading the declaration would have "fixed" all five.
+
+**31 mentions of a dead Qt 2 container name remain in comments and all 31 are the
+port's own historical notes** — "at() was writable on Qt 2's const `QArray`;
+`QList`'s is not", "Qt 2's `QDict` returned the NEWEST binding", the
+`QGVector::operator[]` text quoted from a real crash. Those are correct and stay.
+`SIG_ProgramLine.cpp:686`'s `// QList<int> instr;` is commented-out code that
+already names the Qt 6 type.
+
+**No `QList`/`QHash`/`QQueue` mention was left pointing at the wrong container in
+the other direction** — the five near-misses above were re-read against their
+declarations, not assumed.
+
 ### Phase A — core onto Qt 6 — DONE
 
 | # | Work | LOC |

@@ -44,7 +44,7 @@ public:
 
 	/**************** only this parameter of the offspring population ****************/
 	
-		/* This QArray contain  Information about Crossover Event in this Generation/ Parent;
+		/* This QList contain  Information about Crossover Event in this Generation/ Parent;
 	* Array[0] indicate the Number of total Crossover with one X Point; 
 	* Array[1] indicate the Number of successful Crossover with one X Point; 
 	* Array[2] indicate the Number of total Crossover with two X Point; 

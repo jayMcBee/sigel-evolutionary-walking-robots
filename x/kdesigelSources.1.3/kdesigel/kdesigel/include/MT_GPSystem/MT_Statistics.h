@@ -11,7 +11,7 @@
 
 
 /* manage the accrued Information of the run. It's include a QList of MT_StatisicsElement 
-* and a QArray with the Information of crossover events so far.*/
+* and a QList with the Information of crossover events so far.*/
 class MT_Statistics  
 {
 public:
@@ -31,7 +31,7 @@ public:
 	virtual ~MT_Statistics();
 
 	// all Parameter are for the Offspring
-	/* This QArray contain  Information about Crossover Events so far;  
+	/* This QList contain  Information about Crossover Events so far;  
 	* Array[0] indicate the Number of total Crossover with one X Point; 
 	* Array[1] indicate the Number of successful Crossover with one X Point; 
 	* Array[2] indicate the Number of total Crossover with two X Point; 

@@ -34,7 +34,7 @@ namespace SIGEL_Simulation
 /**
  * This class represents one register.
  *
- * The interpreter holds an QVector of Registers. At the moment every
+ * The interpreter holds a QList of Registers. At the moment every
  * register is an integer value that holds the condition
  * @f$-2^{size-1} \le value \le 2^{size-1} - 1@f$.
  */

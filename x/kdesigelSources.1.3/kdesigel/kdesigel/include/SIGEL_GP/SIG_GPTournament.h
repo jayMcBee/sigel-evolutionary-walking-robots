@@ -44,7 +44,7 @@ namespace SIGEL_GP
 /**
 * This class is the parent class which all other GPTournament-classes will inherite from. It has a randomizer
 * reference, for creation of random number in the genetic operator. It has an fitnesstrainer reference for 
-* controlling the fitnesscomputation preformed by pvm. The GPTournament-class includes QVector for a datastructure
+* controlling the fitnesscomputation preformed by pvm. The GPTournament-class includes QList for a datastructure
 * of the envolved tournamentindividuals. The class has a reference of the actual individual pool, a flag for 
 * indicating if the tournament is ready to play and an integer value, which shows how many tournament are to 
 * play before this tournament can be played.

@@ -56,7 +56,7 @@ namespace SIGEL_Visualisation
        * The number of this SIG_SceneObject.
        *
        * Should be equal to the position of the respective
-       * SIG_VisualSceneObject in the QVector sceneObjects in
+       * SIG_VisualSceneObject in the QList sceneObjects in
        * the class SIG_Renderer.
        * It makes sense if this number also equals some enumeration
        * in the source datastructure (SIG_Link objects in the SIG_Robot

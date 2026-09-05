@@ -184,7 +184,7 @@ namespace SIGEL_Visualisation
        * homogenous transformation matrix.
        *
        * Used for OpenGL rendering.
-       * The QArray contains the matrix columnwise, so it
+       * The QList contains the matrix columnwise, so it
        * should contain 16 elements.
        *
        * @invariant transformationInternal has to perform the
@@ -199,7 +199,7 @@ namespace SIGEL_Visualisation
        * Internal representation the attribute color.
        *
        * Used for OpenGL rendering.
-       * The QArray contains the R, G and B components
+       * The QList contains the R, G and B components
        * of the object's color.
        */
       QList<GLdouble> colorInternal;

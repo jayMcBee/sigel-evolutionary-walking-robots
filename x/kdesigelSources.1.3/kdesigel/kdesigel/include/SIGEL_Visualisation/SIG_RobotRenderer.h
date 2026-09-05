@@ -39,7 +39,7 @@ namespace SIGEL_Visualisation
      * The constructor of the SIG_RobotRenderer.
      *
      * It reads the supplied SIG_Robot, fills the inherited
-     * QVector sceneObjects and calls the method buildDisplayLists.
+     * QList sceneObjects and calls the method buildDisplayLists.
      *
      * @param environment The environment that should be rendered.
      */

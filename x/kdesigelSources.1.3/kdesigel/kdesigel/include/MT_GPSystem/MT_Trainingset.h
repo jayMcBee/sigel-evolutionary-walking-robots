@@ -43,7 +43,7 @@ public:
 	void updateTSet (QQueue<MT_TrainingCase *> *NewTCases);
 	
 	/* changeTSize change the Size of T-set especially
-	* the Size of the QArray and the TSize.
+	* the Size of the QList and the TSize.
 	* This is necessary by a User variance of the T-set-size in the GUI.
 	*/
 	void changeTSize (int NewTSize);
@@ -72,7 +72,7 @@ public:
 private:
 	int FreePosition;
 
- /* this private function delete the first num TCase in the QArray 
+ /* this private function delete the first num TCase in the QList 
 	*	and move up the other TCase;
     * @pre: num<PresentTSize;
 	* @post: PresentTSize= PresentTSize-num
@@ -84,9 +84,9 @@ private:
 	int PresentTSize;
 	/* The name serve for identification of the T-Set by fitness estimation*/ 
 	int TSetName;
-	/* The TCases is a QArray which contain pointers  the current T-cases */
+	/* The TCases is a QList which contain pointers  the current T-cases */
 	QList<MT_TrainingCase *> TCases;
-	/* The TSize denote the max number of the T-Cases in the QArray */
+	/* The TSize denote the max number of the T-Cases in the QList */
 	int TSize;
 };
 

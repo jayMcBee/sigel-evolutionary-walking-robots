@@ -48,7 +48,7 @@ class SIG_GPPopulation
   {
 
     /**
-     * This is the main datastructure in the SIG_GPPopulation. This QVector
+     * This is the main datastructure in the SIG_GPPopulation. This QList
      * holds the individual objects, which contains the robot control program.
      */
   private:

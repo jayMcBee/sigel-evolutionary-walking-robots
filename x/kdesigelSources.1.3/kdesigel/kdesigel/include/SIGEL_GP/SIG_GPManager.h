@@ -145,7 +145,7 @@ namespace SIGEL_GP
   SIG_GPFitnessTrainer *trainer;
   
   /**
-   * This QArray is used to store the randomly created tournaments for one
+   * This QList is used to store the randomly created tournaments for one
    * generation.
    */
  private:
@@ -222,7 +222,7 @@ namespace SIGEL_GP
     * @pre
     * The evolutionloop is started and a set of tournaments is needed.
     * @post
-    * A set of tournaments is created and placed in the QArray tours of
+    * A set of tournaments is created and placed in the QList tours of
     * the GPManager.
     * @param quantity
     * This integer determines how many tournaments will be created.
@@ -256,10 +256,10 @@ namespace SIGEL_GP
     * played. It is a topological sorting algorithm, used to avoid trouble with
     * tournament dependencies, caused by the steady state paradigm.
     * @pre
-    * There is a set of tournaments created and placed in the QArray tours.
+    * There is a set of tournaments created and placed in the QList tours.
     * @return
-    * The returned QArray of integer contains the indices of the tournaments
-    * in the QArray tours. This tournaments can be played without blocking
+    * The returned QList of integer contains the indices of the tournaments
+    * in the QList tours. This tournaments can be played without blocking
     * dependicies to other tournaments.
     */
  private:

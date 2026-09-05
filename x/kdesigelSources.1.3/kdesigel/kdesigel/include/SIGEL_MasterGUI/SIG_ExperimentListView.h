@@ -278,7 +278,7 @@ class SIG_ExperimentListView : public QTreeWidget
    * The dictionary in which all administered experiments are stored.
    *
    * Names have to be unique. Although it is technically possible to store
-   * things under the same name in a QDict, for other reason the names are
+   * things under the same name in a QHash, for other reason the names are
    * needed to be unique.
    */
   QHash<QString, SIG_Experiment *> experimentDict;

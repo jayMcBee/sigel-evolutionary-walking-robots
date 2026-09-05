@@ -117,7 +117,7 @@ protected:
 	/* Indicate the max. Size of the Population*/
 	int PopSize;
 
-	/* Individuals is a QArray which include pointers of MT_Individuals, which represent the Metapopulation
+	/* Individuals is a QList which include pointers of MT_Individuals, which represent the Metapopulation
 	* Attention: the population dosen't completed filled !
 	* If a Population represent the parents it's should be !
 	*/

@@ -461,7 +461,7 @@ namespace SIGEL_GP
  * The set of functions, which can be used by the 
  *
  * public:
- *  void setFunctionSet(QArray fuset);
+ *  void setFunctionSet(QStringList fuset);
  *
  *
  * This function returns the set of functions, which are used for the 
@@ -470,7 +470,7 @@ namespace SIGEL_GP
  * The set of functions, given as a QString.
  *
  *  public:
- *  QArray getFunctionSet() const;
+ *  QStringList getFunctionSet() const;
  *
  *
  * This function will set the set of terminals, which is used for the random
@@ -479,7 +479,7 @@ namespace SIGEL_GP
  * The set of terminals, given as a QString.
  *
  * public:
- *  void setTerminalSet(QArray teset);
+ *  void setTerminalSet(QStringList teset);
  *
  *
  * This function returns the set of terminals, which are used for the 
@@ -488,7 +488,7 @@ namespace SIGEL_GP
  * The set of terminals, given as a QString.
  *
  *  public:
- *  QArray getTerminalSet() const;
+ *  QStringList getTerminalSet() const;
  */
 
  /**
