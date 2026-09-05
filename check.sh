@@ -647,20 +647,59 @@ pass=$((pass+cp)); fail=$((fail+cf))
 # clean result from a check that cannot fire. Measured the other way too --
 # putting MT_StatisticsWidgetBase back to 220x390 makes this section fail by
 # name. See PORTING.md.
+#
+# FOUR CAUSES, FOUR MESSAGES. The first version collapsed "a form is too small",
+# "guidrive is stale", "timeout killed it" and "it crashed" into one sentence
+# asserting the first -- and on the stale path /tmp/fmin.$$ was never created,
+# because the `&&' short-circuits before the redirect, so the operator got that
+# assertion with an empty body and no hint that the binary was the problem.
+# `programs' and `slave gui' both do better and this now follows them. Stderr is
+# KEPT for the same reason `gui behaviour' keeps it: a crash, a Qt fatal or a
+# timeout kill lands there and nowhere else. Found by review.
+#
+# `make -q' carries -C "$ROOT" because this script never cd's; without it the
+# section depended on the caller's working directory.
 mp=0; mf=0
-if make -q B=build-fast SAN= SIGSAN= guidrive 2>/dev/null \
-   && SIGEL_ROOT="$SRC" QT_QPA_PLATFORM=offscreen \
+: > /tmp/fmin.$$
+if ! make -q -C "$ROOT" B=build-fast SAN= SIGSAN= guidrive 2>/dev/null; then
+    mf=1
+    echo "  build-fast/guidrive is missing or out of date -- this section did NOT"
+    echo "  run. Build it with 'make B=build-fast SAN= SIGSAN= guidrive'."
+else
+    SIGEL_ROOT="$SRC" QT_QPA_PLATFORM=offscreen \
       SIGEL_EXP="$ROOT/data-reordered/Experiments/twoBasesSimpleFitness2.exp" \
       SIGEL_SCRATCH="${TMPDIR:-/tmp}" \
-      timeout 300 "$ROOT/build-fast/guidrive" formsize >/tmp/fmin.$$ 2>/dev/null; then
-    mp=1
-else
-    mf=1
-    echo "  a form declares a minimum below what Qt 6 needs to lay it out,"
-    echo "  or the check cannot detect one:"
-    sed -n '/TOO SMALL\|selftest\|!!/p' /tmp/fmin.$$ | sed 's/^/    /'
+      timeout 300 "$ROOT/build-fast/guidrive" formsize >/tmp/fmin.$$ 2>/tmp/fmerr.$$
+    mrc=$?
+    # The .ui files on disk are the independent source. The scenario's form
+    # table is a HAND list, so "20 forms" asserted against itself catches only
+    # shrinkage; against the directory it also catches a 21st form that nobody
+    # added to the table.
+    nui=$(find "$SRC/ui" -name '*.ui' | wc -l)
+    ngot=$(sed -n 's/.*of \([0-9]*\) forms.*/\1/p' /tmp/fmin.$$ | tail -1)
+    if [ "$mrc" = 124 ]; then
+        mf=1
+        echo "  formsize was killed at 300 s -- it did not finish, so its result"
+        echo "  means nothing:"
+        tail -4 /tmp/fmin.$$ | sed 's/^/    /'
+    elif [ "$mrc" != 0 ]; then
+        mf=1
+        echo "  a form declares a minimum below what Qt 6 needs to lay it out,"
+        echo "  or too few forms reached the comparison, or the check cannot"
+        echo "  detect either (exit $mrc):"
+        sed -n '/TOO SMALL:/p;/selftest/p;/^!!/p' /tmp/fmin.$$ | sed 's/^/    /'
+        [ -s /tmp/fmerr.$$ ] && { echo "  and its stderr said:";
+                                  tail -5 /tmp/fmerr.$$ | sed 's/^/    /'; }
+    elif [ -z "$ngot" ] || [ "$ngot" != "$nui" ]; then
+        mf=1
+        echo "  formsize measured [$ngot] forms but $nui .ui files exist --"
+        echo "  a form was added to ui/ and not to the scenario's table, or the"
+        echo "  scenario printed nothing this section could read."
+    else
+        mp=1
+    fi
 fi
-rm -f /tmp/fmin.$$
+rm -f /tmp/fmin.$$ /tmp/fmerr.$$
 printf '%-22s %2d pass  %2d fail\n' "form minimums" "$mp" "$mf"
 pass=$((pass+mp)); fail=$((fail+mf))
 

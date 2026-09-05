@@ -509,9 +509,14 @@ session to. Warnings are on an unchanged basis and remain comparable throughout.
 **There are four gates, not three, and the full list with its caveats is in
 "Handover" below — use that one.** `check.sh` compiles every converted module
 and every converted header standalone, and since C1 also runs `uic`, `moc` and
-`rcc` over the converted forms. **It also RUNS SIGEL**: **fourteen
-`guidrive` invocations over thirteen distinct scenarios** — the ten of
-`gui behaviour`, plus `clipcheck`, `formsize`, `slavegui`, and `pagesave` twice — the slave's
+`rcc` over the converted forms. **It also RUNS SIGEL**: **seventeen
+`guidrive` invocations over fourteen distinct scenarios**, sixteen where no
+comma-decimal locale is installed — the ten of
+`gui behaviour`, plus **two locale re-runs of `pages`**, `clipcheck`, `formsize`,
+`slavegui`, and `pagesave` twice. *Both numbers were wrong against this
+sentence's OWN list for three revisions running: the list gave 14 distinct and 15
+invocations while the prose said 12/13 then 13/14, and the two locale re-runs
+were never counted at all. Counted from `check.sh` this time, not incremented.*  — the slave's
 headless smoke test, the `widgets` and `parsers` probes and
 `expstruct --selfcheck`. *"Ten" counted only the `gui behaviour` list and stood
 while three more sections were added around it.* *This said "it
@@ -922,7 +927,8 @@ being touched, which is what the old figure was not:
 **`SIG_GPParameter.h`'s four are the odd ones and did not become `QList`.** They
 sit inside a commented-out doc block for `setFunctionSet` / `getFunctionSet` /
 `setTerminalSet` / `getTerminalSet`, **none of which exists** — the class has no
-such member or method. Eleven lines up, in the same file, the same 2003 author's
+such member or method. At `:160` and `:167` of the same file — some 300 lines ABOVE the four doc
+lines at `:464`-`:491`, not eleven, as this said — the same 2003 author's
 commented-out `private:` block declares `QStringList terminalSet;` and
 `QStringList functionSet;`. So the `QArray` there was the ORIGINAL author's own
 inconsistency, not something the port introduced, and `QStringList` is the only
@@ -985,6 +991,48 @@ read as a clean pass. And the section was measured the other way: putting
 `MT_StatisticsWidgetBase` back to 220x390 and rebuilding makes `check.sh` fail
 by name with `TOO SMALL: 1`, then restoring it passes again.
 
+**FOUR DEFECTS IN THIS GATE'S FIRST VERSION, all found by review, all fixed.**
+The gate as first written could not have caught the regression it exists for.
+
+- **It passed on ZERO comparisons.** 13 of the 20 forms declare no minimum and
+  take an early-out, so only **7** are ever compared. `tooSmall == 0` was
+  satisfied equally by "every form is big enough" and by "no form reached the
+  comparison" — so deleting the six `<minimumSize>` blocks, or breaking whatever
+  carries them out of the `.ui`, made every form `unset` and the gate returned 0
+  with all six fixes gone. **`compared >= 7` is now asserted**, and `noHint != 0`
+  now fails. *`check.sh:1502` learned this exact lesson for the forms corpus two
+  commits earlier and the new gate did not carry it over.* Teeth-tested: deleting
+  one `<minimumSize>` block gives `compared: 6` and exit 1.
+- **The "positive control" validated a COPY of the comparison.** The loop's test
+  and the selftest's were two hand-typed expressions, so flipping the loop's `<`
+  left the control passing. **Both now call one `classify()` lambda** — the shape
+  `clipcheck` next door already used, which this had regressed from. Teeth-tested:
+  flipping `<` to `>` now gives `NOT REPORTED` and exit 1.
+- **The control ran on a form the loop never compares.** `forms[0]` is
+  `MT_AddConstantsWidgetBase`, which declares no minimum and takes the `unset`
+  branch — so the control exercised a branch its chosen form never reaches in the
+  real loop. It now runs on the first form the loop actually **compared**.
+- **The `unset` test was per-FORM where Qt's rule is per-AXIS.** `setMinimumSize`
+  clears the explicit-minimum flag for whichever axis is 0, so a form declaring
+  `240x0` would have been called TOO SMALL for a height Qt takes from the layout.
+  No form is in that state today; closed before one is.
+
+**And `check.sh`'s section reported three different failures as a fourth.**
+Stale `guidrive`, a 300 s timeout kill and a crash all printed "a form declares a
+minimum below what Qt 6 needs" — and on the stale path `/tmp/fmin.$$` was never
+created, so that assertion arrived with an empty body. Four causes now have four
+messages, stderr is kept, and `make -q` carries `-C "$ROOT"` because this script
+never `cd`s. **The `.ui` files on disk are now the independent source for the
+corpus size**: a hand list asserted against itself catches only shrinkage, so the
+section compares the scenario's count against `find ui -name '*.ui' | wc -l`.
+Teeth-tested both ways.
+
+*Honest limit: `formsize` reads `minimumSize()` on the TOP-LEVEL widget only. The
+two defects that started this family — `GroupBox6` at 90x37 and
+`groupboxDirectory` at 465x37 — are on INNER group boxes and are invisible to it.
+`slave gui` covers those two, so the combined coverage is real, but "all twenty
+forms are measured" is true of the top-level widget and not of what is inside it.*
+
 **Raising these RESTORES 1.3 rather than diverging from it.** The declared values
 are 1.3's, readable under Qt 2's smaller default font; Qt 6's larger metrics are
 what make the layout need more. Confirmed that the hint does not move when the
@@ -1045,6 +1093,108 @@ greyed, zero new spawns for 4.5 minutes against a 62 s/generation baseline.
 **Know which of the two you are reproducing.** *`stdConf.mt` IS present in this
 repo's `SIGEL_ROOT`, so the port is set up to reproduce the crash rather than the
 wedge.*
+
+### The MetaGP window grew 59 px — SETTLED BY THE ORACLE 2026-09-05
+
+**`guibehaviour-baseline.txt` moves by one line, from 680x595 to 680x654, and
+the oracle's measurement is why that is right rather than tolerated.**
+
+**The cause here is measured by PREDICTION, not back-derivation.** The window's
+chrome is **99 px** and the six MT_* pages sit in a `QStackedWidget` whose
+minimum is the maximum over its pages. Four values, rebuilt each time:
+
+| statistics min height | predicted window | measured |
+|---|---|---|
+| 555 | 654 | **680x654** |
+| 500 | 599 | **680x599** |
+| 450 | 549 → floor of 595 | **680x595** |
+| 390 | 489 → floor of 595 | **680x595** |
+
+So at the declared 390 the Statistics page received **595 − 99 = 496 px where its
+Qt 6 layout needs 555**, at the DEFAULT size, not only when dragged.
+
+**WHAT THE ORACLE MEASURED ON 1.3, and it corrects this document twice.**
+
+- **1.3 does not open that window at 595 either. It opens at 680x605**, with a
+  `WM_NORMAL_HINTS` program minimum of **625x605**. **Qt 2 already overrode
+  `MT_MainWindow.cpp:33`'s `resize(680, 595)` by 10 px to satisfy its own
+  layout.** So 595 is a number the program asks for and has never got, and
+  reasoning from that line describes the source rather than the application.
+- **1.3's window cannot be made shorter at all** — 605 is both the opening
+  height and the minimum; a window manager honouring the hint refuses the drag.
+  Forced below it, **1.3's layout CLIPS rather than compresses**: the Search
+  Operator Effects table is cut mid-row.
+- **1.3's Statistics page is ALREADY CLIPPED at its own default.** Selecting
+  Statistics adds a second toolbar row that eats ~30 px, and at 605 the group-box
+  bottom border and the page frame bottom border are both cut. The oracle's
+  ladder: 605 borders cut, 620 group border appears, 640 both visible,
+  **654 fully laid out**.
+
+**SO 654 IS WHERE 1.3'S OWN STATISTICS PAGE FIRST RENDERS COMPLETE**, and a port
+that opens taller to honour its layout minimum is doing exactly what Qt 2 did —
+the same override, from a larger `minimumSizeHint`. Matching 595 would reproduce
+neither 1.3's size nor its behaviour. **The baseline was not moved on this
+session's reasoning: 1.3 moved it first, by 10 px, for the same reason.**
+
+**THIS FILE'S "the labels compress to 3-8 px tall" IS WITHDRAWN, on two counts.**
+1.3's window cannot be dragged shorter than it opens, so the drag it describes is
+not reachable; and the failure mode is **clipping, not compression**. The oracle
+measured text row heights at two window heights and they are **identical**: 9 px
+for plain labels, 12 px for ones with descenders, 25 px row pitch at both 605 and
+780. What an undersized window costs is frame borders and whole cut rows, not
+legibility. *The 3-8 px figure was never measured on either binary.*
+
+### `pvmcrash` — the harness exists, the slave never starts — OPEN 2026-09-05
+
+**§9's "the `pvmTasks` crash is untried on the port" is still untried; this is
+how far it got, and the diagnosis is much sharper than "it does not work".**
+
+`guidrive` has a **`pvmcrash`** scenario: the `evolution` scenario plus a
+single-shot `QTimer` armed immediately before the Start click, which fires from
+inside the blocking run through `SIG_GUIGPManager::haveABreak()`'s
+`processEvents()` and opens MetaGP > Configure System. `SIGEL_CRASH_AT_MS=0` is
+the **control** — the identical run with nothing injected. It reports whether the
+timer **fired**, not whether it was armed: deriving that from `crashAtMs > 0`
+called a run that finished early "SURVIVED WITH the event injected", which
+collapses the injected cell into the control cell and destroys the only thing the
+pair is for. *Found by review.*
+
+**`stdConf.mt` IS present in this repo's `SIGEL_ROOT`**, so the port is set up to
+reproduce the crash rather than the wedge — see the oracle's prerequisite above.
+
+**ESTABLISHED BY MEASUREMENT, in this order:**
+
+1. **`spawnTask` is reached and `pvm_spawn` IS sent.** `strace -e trace=write` on
+   the run shows the spawn message going to the daemon twice, carrying the
+   correct absolute path `.../build-fast/sigel_slave`. So the trainer, the host
+   list and `getNextHost()` are all working.
+2. **`pvm_spawn` does not report failure.** `SIG_GPFitnessTrainer.cpp:346` prints
+   on the failure path and nothing is printed, so it returned 1.
+3. **No `sigel_slave` process ever exists**, the daemon log records no task, and
+   the trainer then waits in `hrtimer_nanosleep` at ~15% CPU until killed.
+4. **The slave binary is healthy**: run by hand against a live daemon it enrolls
+   and correctly answers `Program hasn't been started as a PVM slave!`.
+
+**So the daemon accepts the spawn, answers success, and no task ever runs.** That
+is where the next session should start — not at SIGEL.
+
+**THE TRAP THAT HID ALL OF THIS, and it is in the committed harness.**
+`SIG_IO::cerr` and `::cout` are **`QTextStream`s** over `stderr`/`stdout`
+(`SIG_IO.cpp:27-29`), and the 2003 code ends every message with `"\n"`, never
+`endl` — so SIGEL's own diagnostics sit in the stream's buffer until it is
+destroyed at a normal exit. **Measured**: such a stream survives a clean return
+and is lost entirely on a kill, while a plain `fprintf` on the same descriptor
+survives both. `guidrive`'s watchdog ended with `_exit(3)`, which runs no
+destructors — **so every stuck scenario discarded SIGEL's own explanation at
+exactly the moment it mattered**, and the first two days of this investigation
+read an empty stderr as "nothing was printed". The watchdog and the `pvmcrash`
+sampler now flush both streams. **This matters beyond the diagnosis**: the whole
+of the 1.3 evidence for this crash is SIGEL's printed `Invalid storage access`,
+so without the flush the probe would have reported a crash with no reason.
+
+*Not diagnosed: why the daemon's exec produces no process. `ptrace_scope` is 1 on
+this machine, so `gdb -p` cannot attach to a running process — but strace of a
+process you START works, which is how (1) was measured.*
 
 ### The MetaGP window grew 59 px — SETTLED BY THE ORACLE 2026-09-05
 

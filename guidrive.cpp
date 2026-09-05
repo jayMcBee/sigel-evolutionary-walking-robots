@@ -38,8 +38,11 @@
   The list above is not maintained in step with the code. The count that
   cannot go stale is
     command grep -o 'scenario == "[a-z]*"' guidrive.cpp | sed 's/.*"\(.*\)"/\1/' | sort -u | wc -l
-  which reads 30 today. A plain -c over the same pattern gives 34 and is
-  WRONG: two scenarios are tested twice in one condition.
+  which reads 30 today. A plain -c over the same pattern gives 34, which is a
+  count of LINES rather than of matches (`grep -o | wc -l' gives 37): three
+  names -- evolution, visualize and pvmcrash -- are each tested in more than one
+  condition. The old wording said "two scenarios are tested twice", which stopped
+  describing the tree when pvmcrash was added.
 
   Environment:
     SIGEL_ROOT      as the application needs it; must hold sigel_slave for
@@ -127,6 +130,7 @@ extern "C" {
 #include "SIGEL_MasterGUI/SIG_AllIndividualsView.h"
 #include "SIGEL_MasterGUI/SIG_IndividualListItem.h"
 #include "SIGEL_MasterGUI/SIG_IndividualView.h"
+#include "SIGEL_Tools/SIG_IO.h"
 
 // The twenty committed form base classes, for the `formsize' scenario. Nothing
 // else here instantiates a form on its own -- every other scenario reaches them
@@ -424,6 +428,26 @@ static void tearDownPvm()
 // hang forever; check.sh's timeout would kill it and report the wrong reason.
 // A modal exec() still runs an event loop, so this timer fires inside exactly
 // the case it exists for.
+
+// SIGEL's own diagnostics do NOT reach the terminal on their own.
+// SIG_IO::cerr and ::cout are QTextStreams over stderr/stdout (SIG_IO.cpp:27-29)
+// and the 2003 code ends its messages with "\n", never endl -- so the text sits
+// in the QTextStream's buffer until the stream is destroyed at normal exit.
+// MEASURED: a QTextStream on stderr written this way survives a clean return and
+// is lost entirely on a kill, while a plain fprintf on the same descriptor
+// survives both. Everything SIGEL prints about a failure -- `pvm_spawn() failed
+// on "..."', the SIGSEGV handler's `Invalid storage access' that is the WHOLE of
+// the 1.3 evidence for the pvmTasks crash -- goes through those two streams.
+// So any exit that skips destructors discards exactly the diagnostics a stuck or
+// crashing scenario exists to capture.
+static void flushSigelStreams()
+{
+    SIGEL_Tools::SIG_IO::cerr.flush();
+    SIGEL_Tools::SIG_IO::cout.flush();
+    fflush(stdout);
+    fflush(stderr);
+}
+
 static void armWatchdog(int ms)
 {
     QTimer *wd = new QTimer;
@@ -434,8 +458,12 @@ static void armWatchdog(int ms)
                "!! active modal: %s\n"
                "!! Aborting rather than hanging whatever is running this.\n",
                ms, m ? m->metaObject()->className() : "(none)");
-        fflush(stdout);
+        // _exit() runs no destructors, so without this the QTextStream buffers
+        // go with the process -- and a watchdog fires precisely when SIGEL has
+        // something to say about why it is stuck.
+        flushSigelStreams();
         tearDownPvm();
+        flushSigelStreams();
         _exit(3);
     });
     wd->start(ms);
@@ -4022,65 +4050,112 @@ int main(int argc, char **argv)
         };
         const int nForms = (int)(sizeof(forms) / sizeof(forms[0]));
 
-        // ALL TWENTY, not the six. A gate listing only the known-bad forms
-        // passes the moment a twenty-first is added or a good one regresses.
+        // ONE comparison, used by the loop AND by the control below.
+        //
+        // It was two: the control re-typed the same expression, so breaking the
+        // loop's `<' left the control passing and the scenario returning 0.
+        // clipcheck next door does this right -- its control calls the same
+        // `walk' lambda that produced the real count -- and this regressed from
+        // that pattern in the same file. Found by review.
+        //
+        // PER AXIS, not per form. setMinimumSize clears the explicit-minimum
+        // flag for whichever axis is 0, and the layout then supplies that axis
+        // by itself -- so an axis declaring 0 cannot be too small, whatever the
+        // other axis declares. The first version tested `width==0 && height==0'
+        // and would have called a form declaring 240x0 TOO SMALL for a height
+        // Qt takes from the hint. No form is in that state today; it is closed
+        // before one is.
+        enum Verdict { V_NOHINT, V_UNSET, V_TOOSMALL, V_OK };
+        auto classify = [](const QSize &dec, const QSize &hint) -> Verdict {
+            if (!hint.isValid()) return V_NOHINT;
+            const bool wSet = dec.width() > 0, hSet = dec.height() > 0;
+            if (!wSet && !hSet) return V_UNSET;
+            if ((wSet && dec.width()  < hint.width()) ||
+                (hSet && dec.height() < hint.height())) return V_TOOSMALL;
+            return V_OK;
+        };
+
         printf("\n== FORM MINIMUMS: declared <minimumSize> against Qt 6's minimumSizeHint ==\n");
-        printf("   %d forms; the corpus size is asserted below so a shortened\n", nForms);
-        printf("   list cannot pass by testing nothing.\n\n");
-        int tooSmall = 0, unset = 0, noHint = 0;
-        for (const Row &r : forms) {
-            QWidget *w = r.make();
+        printf("   %d forms; the corpus size AND the number actually compared\n", nForms);
+        printf("   are both asserted below.\n\n");
+        int tooSmall = 0, unset = 0, noHint = 0, compared = 0, victim = -1;
+        for (int k = 0; k < nForms; ++k) {
+            QWidget *w = forms[k].make();
             w->ensurePolished();
             const QSize dec = w->minimumSize();
             const QSize hint = w->minimumSizeHint();
+            const Verdict v = classify(dec, hint);
             const char *verdict;
-            if (!hint.isValid()) { verdict = "no hint (no layout)"; ++noHint; }
-            else if (dec.width() == 0 && dec.height() == 0) {
-                verdict = "unset -- Qt uses the hint"; ++unset;
-            } else if (dec.width() < hint.width() || dec.height() < hint.height()) {
-                verdict = "TOO SMALL"; ++tooSmall;
-            } else verdict = "ok";
+            switch (v) {
+            case V_NOHINT:   verdict = "NO HINT (no layout)";       ++noHint;   break;
+            case V_UNSET:    verdict = "unset -- Qt uses the hint"; ++unset;    break;
+            case V_TOOSMALL: verdict = "TOO SMALL";                 ++tooSmall; ++compared; break;
+            default:         verdict = "ok";                                    ++compared;
+                             if (victim < 0) victim = k;            break;
+            }
             printf("  %-30s declared %4dx%-4d  hint %4dx%-4d  %s\n",
-                   r.name, dec.width(), dec.height(),
+                   forms[k].name, dec.width(), dec.height(),
                    hint.width(), hint.height(), verdict);
             delete w;
         }
-        printf("\n  TOO SMALL: %d   (unset: %d, no hint: %d, of %d forms)\n",
-               tooSmall, unset, noHint, nForms);
+        printf("\n  TOO SMALL: %d   (compared: %d, unset: %d, no hint: %d, of %d forms)\n",
+               tooSmall, compared, unset, noHint, nForms);
 
-        // THE POSITIVE CONTROL. "0 too small" is not evidence on its own -- if
-        // minimumSizeHint() came back invalid for every form, or the loop ran
-        // over nothing, the count would read 0 just the same. Take a form that
-        // passed, force its minimum below its own hint, and require the SAME
-        // comparison to report it.
-        printf("\n  -- selftest: lower one form's minimum below its hint --\n");
+        // THE CONTROL, and it runs through classify() on a form that the loop
+        // ACTUALLY COMPARED. The first version forced forms[0], which declares
+        // no minimum and therefore takes the `unset' early-out in the real loop
+        // -- so it exercised a branch the chosen form never reaches there.
+        printf("\n  -- selftest: lower a compared form's minimum below its hint --\n");
         int fired = 0;
-        {
-            QWidget *w = forms[0].make();
+        if (victim < 0) {
+            printf("    no form reached the comparison; there is nothing to control\n");
+        } else {
+            QWidget *w = forms[victim].make();
             w->ensurePolished();
             const QSize hint = w->minimumSizeHint();
             if (hint.isValid() && hint.width() > 1 && hint.height() > 1) {
                 w->setMinimumSize(1, 1);
                 const QSize dec = w->minimumSize();
                 const QSize h2 = w->minimumSizeHint();
-                if (dec.width() < h2.width() || dec.height() < h2.height()) fired = 1;
-                printf("    %s forced to %dx%d against hint %dx%d\n",
-                       forms[0].name, dec.width(), dec.height(),
-                       h2.width(), h2.height());
+                fired = (classify(dec, h2) == V_TOOSMALL);
+                printf("    %s forced to %dx%d against hint %dx%d -> %s\n",
+                       forms[victim].name, dec.width(), dec.height(),
+                       h2.width(), h2.height(), fired ? "TOO SMALL" : "NOT REPORTED");
             } else {
                 printf("    %s has no usable hint; the control could not run\n",
-                       forms[0].name);
+                       forms[victim].name);
             }
             delete w;
         }
         printf("  selftest %s\n", fired
-               ? "OK -- the check reports a minimum below the hint"
+               ? "OK -- the same comparison the loop uses reports it"
                : "!! USELESS -- a forced-small minimum was not reported;"
                  " a clean result proves nothing");
+
+        // WHY `compared' IS ASSERTED, and it is the whole reason this gate is
+        // not decorative. `tooSmall == 0' is satisfied equally by "every form
+        // is big enough" and by "no form reached the comparison at all" --
+        // and 13 of the 20 declare no minimum, so they take the unset
+        // early-out. Delete the six <minimumSize> blocks, or break whatever
+        // carries them out of the .ui, and every form becomes `unset':
+        // tooSmall stays 0, the corpus is still 20, and the control still
+        // fires because it sets its own minimum. Exit 0 with all six fixes
+        // gone and nothing measured. check.sh:1502 learned this two commits
+        // ago for the forms corpus; this is the same assertion.
+        // SEVEN forms declare a minimum today. Raise this when one more does;
+        // never lower it to make the gate quiet.
+        const int wantCompared = 7;
+        if (compared < wantCompared)
+            printf("!! only %d form(s) reached the comparison, expected at least %d --\n"
+                   "!! the declared minimums are not arriving from the .ui\n",
+                   compared, wantCompared);
+        // A form with no layout reports an invalid hint and is compared against
+        // nothing. One is a defect in itself, not a form to skip.
+        if (noHint != 0)
+            printf("!! %d form(s) reported no minimumSizeHint at all\n", noHint);
         fflush(stdout);
-        // Fail on a real undersized form, on a check that cannot detect one,
-        // and on a corpus that shrank.
-        return (tooSmall == 0 && fired > 0 && nForms == 20) ? 0 : 1;
+        return (tooSmall == 0 && fired > 0 && nForms == 20
+                && noHint == 0 && compared >= wantCompared) ? 0 : 1;
     }
 
     // --- SIGEL_SlaveGUI: the slave's simulation window ---------------------
@@ -4855,6 +4930,10 @@ int main(int argc, char **argv)
                 fflush(stdout);
             }
             lastGen = gen;
+            // SIGEL's own messages are buffered in a QTextStream; without this
+            // they appear only at a clean exit, out of order with everything
+            // above, and not at all if the run is killed or aborts.
+            if (crashProbe) flushSigelStreams();
         });
         sampler.start(2000);
 
@@ -4871,10 +4950,17 @@ int main(int argc, char **argv)
         // crashes 1.3", both generalised over a factor that moved with the
         // trigger.
         QTimer inject;
+        // Whether the timer FIRED, not whether it was armed. Deriving the
+        // verdict from crashAtMs > 0 reported "SURVIVED WITH the event
+        // injected" for a run that finished before the timer, or whose event
+        // loop never pumped -- which collapses the injected cell into the
+        // control cell and destroys the only thing the pair is for.
+        bool injected = false;
         const int crashAtMs = qEnvironmentVariableIntValue("SIGEL_CRASH_AT_MS");
         if (crashProbe && crashAtMs > 0) {
             inject.setSingleShot(true);
             QObject::connect(&inject, &QTimer::timeout, [&]() {
+                injected = true;
                 printf("\n  >> INJECTING MetaGP > Configure System, %d ms into the run\n",
                        crashAtMs);
                 // Leave the MetaGP window OPEN, exactly as the oracle's runs did.
@@ -4901,9 +4987,15 @@ int main(int argc, char **argv)
         QTest::mouseClick(start, Qt::LeftButton, Qt::NoModifier, start->rect().center());
         if (crashProbe) {
             inject.stop();
-            printf("\n  >> SURVIVED: Start returned normally%s\n",
-                   crashAtMs > 0 ? " WITH the event injected" : " (control run)");
-            fflush(stdout);
+            flushSigelStreams();
+            if (crashAtMs > 0 && !injected)
+                printf("\n  !! the injection timer never fired -- this run is NOT the"
+                       " injected cell, whatever else it shows\n");
+            printf("  >> SURVIVED: Start returned normally%s\n",
+                   crashAtMs <= 0 ? " (control run)"
+                                  : (injected ? " WITH the event injected"
+                                              : " with NOTHING injected"));
+            flushSigelStreams();
         }
         const qint64 runMs = runClock.elapsed();
         sampler.stop();
