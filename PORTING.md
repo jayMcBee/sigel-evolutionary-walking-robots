@@ -2980,6 +2980,29 @@ not in the thing being examined.***
 *Sweep: three `>> buffer` sites, all in this one constructor. No other file in
 the tree extracts a stream into a `char` or `QChar`.*
 
+### TRAP — Qt 2 INSERTS WHERE Qt 6 APPENDS: three defects, one root cause
+
+**Noted 2026-09-05, after the third instance.** The same difference has now
+produced three separate defects in three separate places, and they were each
+fixed as if they were unrelated:
+
+| where | what it did |
+|---|---|
+| `QListViewItem( QListView * )` | **prepends**; 26 sites in C7, 9 in C6. Wrong startup page, reversed command list, "Load Experiments" selecting the first file where 1.3 selected the last |
+| `Q2Dict::insert` | **prepends**; the `.lap` export order, and the default-constructed command order that had corrupted `dictorder-baseline.txt` for all seven robots |
+| `SIG_ExperimentItem` in the tree | **prepends**; a NEW experiment lands at index 0 and a previously loaded one moves to 1 |
+
+*The third is not a port defect — the port is correct, because C7 restored Qt 2's
+prepending deliberately. It is an AUTOMATION trap, and it bit this side's own
+driver: a scenario deleted `topLevelItem(0)` as "the loaded one" and removed the
+newly created experiment instead. **Select by name, not by index**, in anything
+that drives this GUI — including the 1.3 GUI, where it is equally true.*
+
+**The standing rule this earns:** wherever the port restores a Qt 2 insertion
+order, index-based access from OUTSIDE the port — probes, drivers, scripts — is
+wrong by default. The order is deliberate and it is not the one a Qt 6 reader
+expects.
+
 ### TRAP — `QListViewItem` construction PREPENDS: 28 sites in C7, 9 in C6
 
 **Qt 2's `QListViewItem` constructor inserts the new item at the *head* of its
@@ -4459,6 +4482,88 @@ error sink handed in at construction. Do not settle it per-site.
 7 core files touch dialogs. Done: `SIG_Environment.cpp`. Remaining:
 `MT_Controller.cpp`, `SIG_GPFitnessTrainer.cpp`,
 `SIG_GPRemoteZORCFitnessFunction.cpp` (+ WIN variant, + both headers).
+
+### THE RANDOMISER AGREES WITH 1.3, AND THE CHECK HAS NO PHYSICS IN IT — 2026-09-05
+
+**The first cross-machine agreement on GP OUTPUT this project has.** Every
+earlier one was a file the port wrote and 1.3 read, or a count that turned out
+to be forced by `createTours`.
+
+**The recipe, designed by the oracle, and the point is that BOTH SIDES CAN RUN
+IT.** A draw counter in `SIG_Randomizer` was the obvious idea and would have
+been half a measurement — the oracle has 2003 binaries and no source, so it can
+never instrument anything, and §9 says to design no check that assumes both
+halves can be instrumented. This needs only the GUI:
+
+    File > New Experiment          -- an EMPTY population, 0 individuals
+    GP-Parameters > Random seed    -- the GP seed
+    Individuals > Add, N           -- N programs straight from the randomiser
+    File > Save Experiment
+
+No PVM, no DynaMechs, no fitness, no machine-dependent arithmetic. **Every
+opcode, both operands and the program LENGTH are draws**, so one extra or
+missing draw shifts the whole remaining stream — strictly more sensitive than
+counting draws.
+
+**Result, seed 12345, N=5, twoBases:**
+
+| | 1.3 | this port |
+|---|---|---|
+| per-program lengths | 30, 152, 638, 45, 153 | **identical** |
+| individual 0, first six | `LOAD 9988,-22117 / MOVE 19741 / ADD -5659,-9758 / MAX -26233,15212 / NOP / JMP -23212` | **identical, token for token** |
+| two runs on one machine | 14 lines differ, all wall-clock | 12 lines differ, all wall-clock |
+
+**AND THE HASHES MATCH TOO, on both variants**, once the extraction rule was
+stated rather than assumed:
+
+    instructions only        1018 lines  6283c93317ee296b8d16e761ea31ccc7fa01e5b3be6d866569b3cac4075e366f
+    incl. BEGIN/END markers  1028 lines  3da84433537feb890e9b902450b30ce3345de2b4a36956eb669d4bae64763383
+
+**THE RULE, because the hash is meaningless without it.** Every line strictly
+between `PROGRAM BEGIN{` and `}PROGRAM END;`, trimmed of leading and trailing
+whitespace, in file order, joined with `\n`, **and no trailing newline** — add
+one and the first digest becomes `fb16518d0e8cb37db1e7a35cc4de3d0f997b41c9a5b9de59a8e21d683a39aae0`.
+
+*This is not a negotiated hash. The rule was specified from this side before
+seeing the oracle's data, and its two independently saved files satisfy it byte
+for byte.*
+
+**The oracle's first figure of 1,033 was wrong and is withdrawn**, along with
+the digest that went with it. Its extraction was `grep -E '^\s+[A-Z]+ '` over
+the population block, which sweeps in any indented line whose first token is
+uppercase — catching `PROGRAM BEGIN{`, `INDIVIDUAL BEGIN{` and
+`HISTORY BEGIN{INDIVIDUAL IS CREATED:`, exactly three per program, five programs,
+fifteen junk lines. **A regex loose enough to be convenient is loose enough to
+change what you are hashing, and the error is invisible in the digest: a hash
+mismatch looks exactly like a content mismatch.** What caught it in one exchange
+rather than a hunt through the randomiser was reporting the LINE COUNT beside
+the digest. *Send the count with the hash.*
+
+**Gated** as `rngseed`, the tenth `gui behaviour` scenario, so the stream is
+pinned against drift.
+
+**TRAP — a `.exp` has TWO `RANDOMSEED` keys.** The first is the SIMULATION seed,
+the second the GP seed. Both ship as 0, and setting the GP one leaves the first
+at 0. The scenario prints both every run — line 10 reads 0 and line 83 reads
+12345 — because reading the first and concluding the seed never took is the
+obvious mistake, and the oracle nearly made it.
+
+**TWO SHIPPED EXPERIMENTS ARE THE SAME BYTES.**
+`twoBasesSimpleFitness1.exp` and `twoBasesHighCrossOverRate.exp` are
+**byte-identical**, both md5 `35bcdb3a7a2bb6c2af7ccf964761e87e`. So that hash,
+which §9 cites as the ancestry anchor both machines derive from, does not name a
+unique file. *It has been visible in `fitness-baseline.txt` all along — the two
+experiments have identical fitness for all three individuals — and nobody had
+noticed.* The ancestry argument still holds, because both sides have the same
+bytes; the anchor is just less specific than it reads.
+
+**Two harness traps, found by running the recipe against a session that already
+had an experiment open.** The driver loads one at startup, so `New Experiment`
+leaves TWO in the tree: the first attempt added to and saved the **loaded** one,
+and the tell was `programs=125`, i.e. 120 + 5. The fix then deleted
+`topLevelItem(0)` as "the loaded one" and removed the new empty experiment
+instead — **because C7 restored Qt 2's PREPENDING item insertion, so the new
+experiment is at index 0 and the loaded one at 1.** Select by name.
 
 ### FLAKE — `pagesave` failed once, in a way that left no evidence, 2026-09-04
 

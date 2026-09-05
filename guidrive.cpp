@@ -3419,6 +3419,157 @@ int main(int argc, char **argv)
         return 0;
     }
 
+    // --- The randomiser stream, with no physics in it ----------------------
+    // A cross-machine lockstep check for SIG_Randomizer, designed by the 1.3
+    // oracle, and the point is that BOTH SIDES CAN PRODUCE IT. A draw counter
+    // in SIG_Randomizer would have been half a measurement -- the oracle has
+    // 2003 binaries and no source, so it can never instrument anything, and
+    // this project's own rule is to design no check that assumes both halves
+    // can be instrumented.
+    //
+    // The recipe needs nothing but the GUI:
+    //   File > New Experiment          -- an EMPTY population, 0 individuals
+    //   GP-Parameters > Random seed    -- the GP seed
+    //   Individuals > Add, N           -- N programs straight from the
+    //                                     randomiser: FITNESS -1, AGE 0
+    //   File > Save Experiment
+    // No PVM, no DynaMechs, no fitness, no machine-dependent arithmetic
+    // anywhere in it. Every opcode, both operands and the program LENGTH are
+    // draws, so one extra or missing draw shifts the whole remaining stream --
+    // strictly more sensitive than counting draws.
+    //
+    // TRAP the oracle hit and passed on: a .exp has TWO RANDOMSEED keys. The
+    // first is the SIMULATION seed, the second the GP seed. Both ship as 0 and
+    // setting the GP one leaves the first at 0, so reading the first and
+    // concluding the seed did not take is the obvious mistake.
+    if (scenario == "rngseed") {
+        const int seed = qEnvironmentVariableIntValue("SIGEL_RNGSEED") > 0
+                             ? qEnvironmentVariableIntValue("SIGEL_RNGSEED") : 12345;
+        const int want = qEnvironmentVariableIntValue("SIGEL_RNGCOUNT") > 0
+                             ? qEnvironmentVariableIntValue("SIGEL_RNGCOUNT") : 5;
+        printf("\n== RANDOMISER STREAM (seed=%d n=%d) ==\n", seed, want);
+
+        // The driver loads an experiment at startup, so New Experiment leaves
+        // TWO in the tree -- and a first version of this scenario then added
+        // to, and saved, the WRONG one: 125 programs and 40,346 instruction
+        // lines, which is the loaded 120-individual population plus the 5
+        // added. The count 120 + 5 is what gave it away. Delete the loaded one
+        // first so that exactly one experiment exists and nothing is ambiguous.
+        SIG_ExperimentListView *lv = listView();
+        clickMenu("&File", "&New Experiment");
+        QTest::qWait(1200);
+        printf("  experiments after New=%d\n", lv->topLevelItemCount());
+        for (int i = 0; i < lv->topLevelItemCount(); ++i)
+            printf("    row%d [%s]\n", i, qPrintable(lv->topLevelItem(i)->text(0)));
+        // BY NAME, NOT BY INDEX. slotNewExperiment names it Experiment-<n>.exp,
+        // and C7 restored Qt 2's PREPENDING item insertion -- so the new
+        // experiment lands at index 0 and the loaded one moves to 1. A first
+        // version deleted topLevelItem(0) as "the loaded one" and removed the
+        // new empty experiment instead, leaving the 120-individual population
+        // to be added to and saved.
+        QTreeWidgetItem *loaded = nullptr;
+        for (int i = 0; i < lv->topLevelItemCount(); ++i)
+            if (!lv->topLevelItem(i)->text(0).startsWith("Experiment-"))
+                loaded = lv->topLevelItem(i);
+        if (loaded) {
+            lv->setCurrentItem(loaded);
+            QTest::qWait(300);
+            whenModal([](QWidget *m) { clickMsgButton(m, QMessageBox::Yes); }, 4000);
+            clickMenu("&File", "&Delete Experiment");
+            QTest::qWait(1500);
+        }
+        printf("  experiments after deleting the loaded one=%d\n",
+               lv->topLevelItemCount());
+        if (lv->topLevelItemCount() != 1) {
+            printf("  !! expected exactly one experiment to remain\n");
+            return 1;
+        }
+        lv->setCurrentItem(lv->topLevelItem(0));
+        QTest::qWait(400);
+        printf("  remaining experiment=[%s]\n",
+               qPrintable(lv->topLevelItem(0)->text(0)));
+
+        QStackedWidget *st = W->findChild<QStackedWidget *>();
+        clickMenu("&View", "&GP Parameters");
+        QTest::qWait(400);
+        QWidget *pg = st ? st->currentWidget() : nullptr;
+        QSpinBox *sd = pg ? pg->findChild<QSpinBox *>("spinboxRandomSeed") : nullptr;
+        if (!sd) { printf("  !! no spinboxRandomSeed\n"); return 1; }
+        sd->setFocus(); sd->selectAll();
+        QTest::keyClick(sd, Qt::Key_Delete);
+        QTest::keyClicks(sd, QString::number(seed));
+        QTest::qWait(60);
+        printf("  GP random seed set to %d\n", sd->value());
+
+        // The pool must be EMPTY before Add, or the programs are not a clean
+        // stream from the seed. Reported, not assumed.
+        clickMenu("&View", "&Population");
+        QTest::qWait(400);
+        QTreeWidget *il = indList();
+        printf("  individuals before Add=%d (0 expected from a new experiment)\n",
+               il ? il->topLevelItemCount() : -1);
+
+        whenModal([want](QWidget *m) {
+            QSpinBox *sp = m->findChild<QSpinBox *>();
+            if (!sp) { printf("  !! add dialog has no spin box\n"); m->close(); return; }
+            // select-all then type: the dialog pre-fills 1, and C11c measured
+            // that Qt 6 leaves a pre-filled field selected where Qt 2 did not,
+            // so appending would give 15 rather than 5.
+            sp->setFocus(); sp->selectAll();
+            QTest::keyClick(sp, Qt::Key_Delete);
+            QTest::keyClicks(sp, QString::number(want));
+            QTest::qWait(40);
+            printf("  add dialog: n=%d\n", sp->value());
+            if (QDialog *d = qobject_cast<QDialog *>(m)) d->accept();
+        }, 6000);
+        clickMenu("&Individuals", "&Add");
+        QTest::qWait(3000);
+        printf("  individuals after Add=%d\n", il ? il->topLevelItemCount() : -1);
+
+        const QString out = scratch() + "/rngseed.exp";
+        QFile::remove(out);
+        whenModal([out](QWidget *m) {
+            if (QFileDialog *fd = qobject_cast<QFileDialog *>(m)) acceptFileDialog(fd, out);
+            else m->close();
+        });
+        clickMenu("&File", "&Save Experiment");
+        QTest::qWait(4000);
+        QFile f(out);
+        if (!f.open(QIODevice::ReadOnly)) { printf("  !! nothing saved\n"); return 1; }
+        const QStringList all = QString::fromLatin1(f.readAll()).split('\n');
+        f.close();
+
+        // EXTRACTION RULE, stated so the two sides can align: every line
+        // strictly between `PROGRAM BEGIN{' and `}PROGRAM END', trimmed of
+        // leading and trailing whitespace, in file order, joined with '\n'.
+        // Nothing else -- no dates, no fitness, no headers.
+        QStringList instr;
+        QList<int> lens;
+        bool in = false;
+        int thisLen = 0;
+        for (const QString &raw : all) {
+            const QString t = raw.trimmed();
+            if (t.startsWith("PROGRAM BEGIN{")) { in = true; thisLen = 0; continue; }
+            if (t.startsWith("}PROGRAM END"))   { if (in) lens << thisLen; in = false; continue; }
+            if (in && !t.isEmpty()) { instr << t; ++thisLen; }
+        }
+        const QByteArray joined = instr.join(QStringLiteral("\n")).toLatin1();
+        printf("  programs=%d  instructionLines=%d\n", (int)lens.count(), (int)instr.count());
+        QStringList lenTxt;
+        for (int n : lens) lenTxt << QString::number(n);
+        printf("  perProgramLengths=[%s]\n", qPrintable(lenTxt.join(",")));
+        printf("  sha256(instructions)=%s\n",
+               QCryptographicHash::hash(joined, QCryptographicHash::Sha256).toHex().constData());
+        printf("  first 6 of individual 0: %s\n",
+               qPrintable(QStringList(instr.mid(0, 6)).join(" / ")));
+        // Both RANDOMSEED keys, because reading the wrong one is the trap.
+        for (int i = 0; i + 1 < all.size(); ++i)
+            if (all.at(i).trimmed() == QStringLiteral("RANDOMSEED"))
+                printf("  RANDOMSEED at line %d = %s\n", i + 1, qPrintable(all.at(i + 1).trimmed()));
+        fflush(stdout);
+        return 0;
+    }
+
     // --- Individuals > Add ------------------------------------------------
     if (scenario == "add") {
         whenModal([](QWidget *m) {
