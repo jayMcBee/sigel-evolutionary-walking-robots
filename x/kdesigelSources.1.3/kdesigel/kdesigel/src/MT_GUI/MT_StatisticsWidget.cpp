@@ -589,7 +589,7 @@ void MT_StatisticsWidget::plotEstimation(QString fileName)
 #endif
 	QTextStream pipeStream(&pipeFile);
 
-	// stream mit gnuplot anweisungen und daten füllen
+	// fill the stream with gnuplot commands and data
 	if(!fileName.isNull()){
 		pipeStream << "set terminal postscript eps color\n"
 			<< "set output \"" << fileName << "\"\n";
@@ -644,7 +644,7 @@ void MT_StatisticsWidget::plotFitness(QString fileName)
 #endif
 	QTextStream pipeStream(&pipeFile);
 
-	// stream mit gnuplot anweisungen und daten füllen
+	// fill the stream with gnuplot commands and data
 	if(!fileName.isNull()){
 		pipeStream << "set terminal postscript eps color\n"
 			<< "set output \"" << fileName << "\"\n";
@@ -707,7 +707,7 @@ void MT_StatisticsWidget::plotSearchEffects(QString fileName)
 #endif
 	QTextStream pipeStream(&pipeFile);
 
-	// stream mit gnuplot anweisungen und daten füllen
+	// fill the stream with gnuplot commands and data
 	if(!fileName.isNull()){
 		pipeStream << "set terminal postscript eps color\n"
 			<< "set output \"" << fileName << "\"\n";

@@ -19,7 +19,7 @@ namespace
   // are all Intermediate, so QLineEdit keeps accepting keystrokes and the
   // range bites on commit instead of on typing.
   //
-  // WHY THIS IS RESTORATION, NOT IMPROVEMENT. §9's D28 accepted Qt 6's
+  // WHY THIS IS RESTORATION, NOT IMPROVEMENT. sec. 9's D28 accepted Qt 6's
   // stricter rule for the five parameter pages' 29 spin boxes, where the
   // differing value is VISIBLE in the box before anything is saved. Here it is
   // not: accept() copies these two fields into boss->minValue/maxValue, which

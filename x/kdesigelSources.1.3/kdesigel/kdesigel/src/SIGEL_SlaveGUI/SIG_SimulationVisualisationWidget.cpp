@@ -308,9 +308,9 @@
 	  QImage	pm, resPm;
 	  QTransform	m;
 
-	  if(cropImage){	// speichert den Ausschnitt gegebener Größe
-							// um den Mittelpunkt
-							// führt keine Größenanpassung aus
+	  if(cropImage){	// saves the crop of the given size
+							// around the centre point
+							// performs no resizing
 		  pW = movieWidth;
 		  if( (pX = (width()-movieWidth)/2) < 0){
 			pX = 0;
@@ -322,13 +322,13 @@
 			  pH = height();
 		  }
 
-	  } else if(keepRatio){	// speichere das gesamte Bild
-							// passe es an die gegebene Größe an (shrink to fit)
-							// behalte dabei das Seitenverhältnis bei
+	  } else if(keepRatio){	// save the whole image
+							// fit it to the given size (shrink to fit)
+							// keeping the aspect ratio
 		  scaleW = (double) movieWidth / (double) width();
 		  scaleH = (double) movieHeight/ (double) height();
 
-	  } else {				// zooms/shrinks das Bild und schneidet einen Teil ab
+	  } else {				// zooms/shrinks the image and crops a part of it
 		  scaleW = (double) movieWidth / (double) width();
 		  scaleH = (double) movieHeight/ (double) height();
 		  if( scaleW >= 1.0  ||  scaleH >= 1.0 ){			// we have to zoom in

@@ -1,4 +1,4 @@
-// MT_WidgetBase.cpp: Implementierung der Klasse MT_WidgetBase.
+// MT_WidgetBase.cpp: implementation of class MT_WidgetBase.
 //
 //////////////////////////////////////////////////////////////////////
 

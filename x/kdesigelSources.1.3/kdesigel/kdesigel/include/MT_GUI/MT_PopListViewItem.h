@@ -1,4 +1,4 @@
-// MT_PopListViewItem.h: Schnittstelle für die Klasse MT_PopListViewItem.
+// MT_PopListViewItem.h: interface for class MT_PopListViewItem.
 //
 //////////////////////////////////////////////////////////////////////
 

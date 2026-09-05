@@ -97,10 +97,10 @@ bool guiEnabled = true;
 
 
 int main( int argc, char *argv[] ) {
-  // §9 item 3, closed 2026-09-04. Qt 6 randomises QHash iteration order per
+  // sec. 9 item 3, closed 2026-09-04. Qt 6 randomises QHash iteration order per
   // process unless the seed is pinned, and `sigel' links THREE QHashes --
   // SIG_Experiment's widgetDict and menuDict, and SIG_ExperimentListView's
-  // experimentDict. This is NOT purely bookkeeping, which is how §9 had it:
+  // experimentDict. This is NOT purely bookkeeping, which is how sec. 9 had it:
   // ~SIG_Experiment iterates widgetDict and calls widgetStack->removeWidget()
   // on each, and that stack is SHARED -- SIG_ExperimentListView hands its own
   // widgetStack to every experiment it constructs. So with a second experiment
@@ -111,7 +111,7 @@ int main( int argc, char *argv[] ) {
   // hashed container's order reaches a FILE -- this is about the UI.
   //
   // Deliberately NOT added to sigel_slave.cpp: it links GUI_SLAVE, not
-  // SIGEL_MasterGUI, and has no QHash at all. §10's old "PHASE C MUST ADD it
+  // SIGEL_MasterGUI, and has no QHash at all. sec. 10's old "PHASE C MUST ADD it
   // to sigel.cpp AND sigel_slave.cpp" was mis-scoped on that half.
   QHashSeed::setDeterministicGlobalSeed();
 

@@ -117,7 +117,7 @@ private:
 
 
  //********************META changeen**************************************************
-  /*zwei neue Methoden: 
+  /*two new methods: 
 	bool runMetaClassifier(*Classifier) 
 		-> runs a tournament without exact fitness, using the MetaClassifier!
 		requires Classifier for double classifier (*SigProgOne, SigProgTwo)

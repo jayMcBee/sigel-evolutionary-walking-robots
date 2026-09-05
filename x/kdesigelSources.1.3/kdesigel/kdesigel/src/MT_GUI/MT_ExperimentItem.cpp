@@ -1,4 +1,4 @@
-// MT_ExperimentItem.cpp: Implementierung der Klasse MT_ExperimentItem.
+// MT_ExperimentItem.cpp: implementation of class MT_ExperimentItem.
 //
 //////////////////////////////////////////////////////////////////////
 

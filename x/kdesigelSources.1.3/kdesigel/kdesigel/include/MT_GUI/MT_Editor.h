@@ -1,4 +1,4 @@
-// MT_Editor.h: Schnittstelle für die Klasse MT_Editor.
+// MT_Editor.h: interface for class MT_Editor.
 //
 //////////////////////////////////////////////////////////////////////
 

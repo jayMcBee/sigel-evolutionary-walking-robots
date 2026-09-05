@@ -1,4 +1,4 @@
-// MT_WidgetBase.h: Schnittstelle für die Klasse MT_WidgetBase.
+// MT_WidgetBase.h: interface for class MT_WidgetBase.
 //
 //////////////////////////////////////////////////////////////////////
 

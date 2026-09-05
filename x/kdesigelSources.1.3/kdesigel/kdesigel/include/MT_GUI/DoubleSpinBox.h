@@ -1,4 +1,4 @@
-// DoubleSpinBox.h: Schnittstelle für die Klasse DoubleSpinBox.
+// DoubleSpinBox.h: interface for class DoubleSpinBox.
 //
 //////////////////////////////////////////////////////////////////////
 

@@ -338,7 +338,7 @@ void MT_PopulationWidget::slotDelInd()
 			emit numChanged();
 			
 			actIndNew = (MT_PopListViewItem*) individualListView->topLevelItem(0);
-			while(actIndNew !=0)		// laufe über alle IndisItem  // für alle Item mit Pos > DelPos --> setPos(Pos-1)
+			while(actIndNew !=0)		// walk over all IndisItem  // for every item with Pos > DelPos --> setPos(Pos-1)
 			{
 				ActPos = actIndNew->getPos();
 				if (ActPos > DelPos)

@@ -1,4 +1,4 @@
-// MT_ExperimentItem.h: Schnittstelle für die Klasse MT_ExperimentItem.
+// MT_ExperimentItem.h: interface for class MT_ExperimentItem.
 //
 //////////////////////////////////////////////////////////////////////
 

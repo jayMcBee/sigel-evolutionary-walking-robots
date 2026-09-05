@@ -1,4 +1,4 @@
-// MT_PopListViewItem.cpp: Implementierung der Klasse MT_PopListViewItem.
+// MT_PopListViewItem.cpp: implementation of class MT_PopListViewItem.
 //
 //////////////////////////////////////////////////////////////////////
 

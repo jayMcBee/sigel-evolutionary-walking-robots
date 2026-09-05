@@ -1,4 +1,4 @@
-// MT_Editor.cpp: Implementierung der Klasse MT_Editor.
+// MT_Editor.cpp: implementation of class MT_Editor.
 //
 //////////////////////////////////////////////////////////////////////
 

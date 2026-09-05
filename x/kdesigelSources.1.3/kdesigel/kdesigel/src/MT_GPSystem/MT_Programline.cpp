@@ -74,7 +74,7 @@ MT_Programline::MT_Programline (const QString & File)
 	PartOfLine = File.mid(4,5);
 	OperandA = new MT_Operand(1,-1,PartOfLine.toInt());
 	
-	// 2ter Operand ? Variable ==1 sonst Konstante !
+	// second operand ? variable ==1 otherwise constant !
 	PartOfLine = File.mid(9,2);
 	if (PartOfLine =="V ")
 	{
@@ -102,7 +102,7 @@ MT_Programline::MT_Programline(MT_Programline *Line)
 void MT_Programline::writeToFileProgramLine(QTextStream &File)
 {
 
-	// Aufbau Programmzeile Beispiel"
+	// program line layout, example"
 	//"swp 4    V 5"  or  "cop 1245 C 12.34565567"
 
 	if (Instruction == swi)

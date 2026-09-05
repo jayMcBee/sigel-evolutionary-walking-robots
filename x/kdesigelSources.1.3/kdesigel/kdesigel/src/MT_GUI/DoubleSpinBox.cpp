@@ -1,4 +1,4 @@
-// DoubleSpinBox.cpp: Implementierung der Klasse DoubleSpinBox.
+// DoubleSpinBox.cpp: implementation of class DoubleSpinBox.
 //
 //////////////////////////////////////////////////////////////////////
 

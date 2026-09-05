@@ -708,7 +708,7 @@ SIG_MainWindow::SIG_MainWindow( QWidget * parent, const char * name, Qt::WindowF
   menuBar()->addMenu( optionsMenu );
 
   mtMenu->setTitle( "&MetaGP" );
-  menuBar()->addMenu( mtMenu );	// MetaGP-Menü einfügen
+  menuBar()->addMenu( mtMenu );	// insert the MetaGP menu
 
   helpMenu->setTitle( "&Help" );
   menuBar()->addMenu( helpMenu );

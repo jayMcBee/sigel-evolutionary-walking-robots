@@ -25,7 +25,7 @@ build and run, because nothing else can be verified without it — see §3.
 
 | phase | state |
 |---|---|
-| 0 — comments to English | done for the 9 core modules; **15 lines across 10 GUI files remain**, nine of them CRLF. §9 |
+| 0 — **DONE 2026-09-05.** comments to English | 30 lines in 19 files, and the tree holds **no byte above 127 at all**. The last count was wrong in both directions — see §7 |
 | A — core onto Qt 6 | **done**, tags `step-A0`…`step-A9` |
 | B — ownership explicit | **subsumed by Phase D**, which deletes the containers rather than converting them. **0 `setAutoDelete` calls left in core**, re-measured 2026-08-30 after D25c: D11 removed the last in `SIGEL_Robot`, D24 the last in `MT_Control`, D25b replaced the two `fitTaskList` calls with an RAII guard, and D25c wrote out `tours`' two real frees at their sites. **0 tree-wide as of 2026-09-05** — every remaining `autoDelete` mention is a comment explaining what the Qt 2 original did |
 | R — build and run | core builds and runs. **No longer checked only against itself** — Phase V has confirmed both the ordering and the arithmetic against the 1.3 binary, §7 |
@@ -754,6 +754,21 @@ alongside it is refused for staleness that did not exist when it began. Run them
 in sequence. *Measured 2026-09-05; the refusal is the guard working, not a
 defect.*
 
+**AND DO NOT RUN ANYTHING ELSE HEAVY EITHER, which is a wider rule than the one
+above.** A `check.sh` run on 2026-09-05 came back `gui behaviour 0 pass 1 fail`
+with two markers from `roundtrip` — `!! menu [&File] did not open` then
+`!! second export failed` — while tree-wide Python walks and greps were running
+alongside it in the same session. **It did not reproduce**: `roundtrip`
+standalone, then all ten scenarios in sequence diffed clean against
+`guibehaviour-baseline.txt`, then a whole `check.sh` with nothing else running
+gave 849 pass, 0 fail. The scenarios call `QTest::qWait` with fixed delays, so
+they are wall-clock sensitive, and the driver reports a menu that did not open
+as a scenario failure rather than retrying — correctly, since a real one must
+not pass. **The cause is not established** and the correlation with load is one
+observation, not a measurement. What follows from it is only this: a `!!` marker
+is not automatically a regression, and the first thing to do with one is re-run
+that scenario alone on an idle machine.
+
 **The `sigel-x86` channel** reaches the machine holding the 1.3 reference binary
 and a working PVM. **That PVM is no longer the only one** — this machine has had
 one since Phase P — so the channel's value is now the 1.3 binary alone. It is currently owned by the Qt 6 session. If it transfers,
@@ -803,17 +818,46 @@ Criterion: strip comments from before and after, diff the remainder — must be
 byte-identical. Must not be interleaved with A1–A9, which are reviewable only
 because they are pure renames.
 
-Done for core. **TEN GUI files remain, and the work in them is 15 LINES** —
-re-measured 2026-09-05 by counting lines that actually contain a byte above 127,
-not files: `MT_StatisticsWidget.cpp` 3, `SIG_SimulationVisualisationWidget.cpp`
-4, and one line each in `MT_AddConstantsWidget.cpp`, `MT_PopulationWidget.cpp`,
-`SIG_MainWindow.cpp`, `DoubleSpinBox.h`, `MT_Editor.h`, `MT_ExperimentItem.h`,
-`MT_PopListViewItem.h` and `MT_WidgetBase.h`. *The old line said 9 files and
-omitted `MT_AddConstantsWidget.cpp`.*
+**DONE 2026-09-05: 30 comment lines in 19 files.** Every edit was a substring
+replacement in binary mode, so tabs, CRs and code are untouched; the criterion
+was run over all 19 and the stripped remainder is byte-identical in every one,
+CR counts unchanged. **The probe has its own controls** — a one-token code
+change, a change inside a string literal and a CR strip are all caught, a
+comment-only change is not.
 
-**NINE OF THE TEN ARE CRLF.** Edit them in binary mode. This is the smallest
-remaining conversion task in the project and the one most likely to produce a
-3,227-line diff by accident — see §2's encoding trap and the `encodings` gate.
+**THE "15 LINES ACROSS 10 GUI FILES" FIGURE WAS WRONG IN BOTH DIRECTIONS, and
+the cause was the measurement, not the count.** It counted lines containing a
+byte above 127, which is not the same set as German comments:
+
+- **4 of the 15 were not German.** `MT_AddConstantsWidget.cpp` and
+  `sigel.cpp`×3 are the port's OWN English notes, and the high byte is a
+  Latin-1 `§` in `§9` / `§10`. They are now `sec. 9` / `sec. 10`, which is what
+  makes the tree pure ASCII. `sigel.cpp` was not even in the list of ten,
+  though it met the stated criterion — so the list and the rule it claimed to
+  come from disagreed.
+- **8 German lines have no umlaut and were invisible to it**: five `//
+  X.cpp: Implementierung der Klasse X.` banners in `src/MT_GUI/` (the five
+  headers were counted, their sources were not), two more in
+  `SIG_SimulationVisualisationWidget.cpp` (7 lines there, not 4), and
+  `SIG_SimulationWidget.cpp:203` inside a commented-out block.
+- **3 German lines survive in CORE modules, which this phase called done since
+  A1**: `SIG_GPSimpleTournament.h:120` `/*zwei neue Methoden:` and
+  `MT_Programline.cpp:77` and `:105`. Core was declared clean on the same
+  high-byte test, and all three are pure ASCII.
+
+**Banner wording follows what the core pass used**, checked against
+`MT_Control` and `MT_GPSystem` rather than invented: `interface for class X.`
+in the header, `implementation of class X.` in the source.
+
+**NINE OF THE TEN CRLF FILES were edited in binary mode** and the `encodings`
+gate still reports the same 25 known CRLF losses — no new one. Translated count
+moved 43 → 44 there, which counts FILES that lost their high bytes, not lines.
+This was the task most likely to produce a 3,227-line diff by accident; the
+diff is 30 insertions and 30 deletions. See §2's encoding trap.
+
+**`SIGEL_GP/SIG_GPOperations.cpp:725` is deliberately left alone**: `"\n-->
+Programm-Laenge:"` is a string literal the program prints, not a comment, and
+changing it would change output.
 
 ### Phase A — core onto Qt 6 — DONE
 
@@ -2125,12 +2169,11 @@ questions the port could still be wrong about, then gaps in coverage.
 
 **THE PORT IS NOT FINISHED.** No Qt 2 API remains in live code — swept
 2026-09-05 over 33 spellings across `src/` and `include/`, code split from
-comment, zero in code — but two conversion tasks are open and both are in the
-first table below.
+comment, zero in code. **Phase 0 closed 2026-09-05** and its row is gone from
+the table below; what is left of the conversion work is there.
 
 | conversion still to do | size |
 |---|---|
-| **Phase 0 — German comments to English, the last 15 lines.** Ten files: `MT_StatisticsWidget.cpp` 3 lines, `SIG_SimulationVisualisationWidget.cpp` 4, and one each in `MT_AddConstantsWidget.cpp`, `MT_PopulationWidget.cpp`, `SIG_MainWindow.cpp`, `DoubleSpinBox.h`, `MT_Editor.h`, `MT_ExperimentItem.h`, `MT_PopListViewItem.h`, `MT_WidgetBase.h`. **Nine of the ten are CRLF — edit in binary mode.** Criterion is D14's: strip comments from before and after, the remainder must be byte-identical | 15 lines, 10 files |
 | **28 doc comments still name a member by its Qt 2 type.** `SIG_GPManager.h` says *"This QArray is used to store the randomly created tournaments"* of a `QList`; a reader of the header is told the wrong type. 16 files, led by `SIG_GPManager.h` 4, `SIG_GPParameter.h` 4, `MT_Trainingset.h` 4. **Do not touch the port's own historical notes** — "Qt 2's `QArray` was writable through `at()`" is correct and stays. Same encoding rules as Phase 0 | 28 lines, 16 files |
 | **Six forms can be dragged smaller than Qt 6 can lay them out.** Qt's mechanism is `minimumSize` in the `.ui`, and this is the SAME fix already applied to `GroupBox6` and `groupboxDirectory` and gated by `slave gui` — so it is a fix, not a permanent limitation. Declared against measured `minimumSizeHint` under Qt 6.10.2: `MT_StatisticsWidgetBase` **220x390 against 427x555** (the worst; it sits in the MetaTrainer's `QSplitter`, so a user can drag it until the labels compress to 3-8 px tall), `SIG_SimulationWidgetBase` 780x640 against 373x752, `MT_EstimationWidgetBase` 230x260 against 323x274, `MT_SelectionWidgetBase` 410x240 against 472x301, `MT_IndividualsWidgetBase` 440x362 against 338x404, `MT_SearchWidgetBase` 240x400 against 228x420. **Take the per-axis maximum** — `SIG_SimulationWidgetBase` is already wider than it needs and only too short. **Re-measure before editing**, and extend `clipcheck`'s walk or add a form-render assertion so the six are gated afterwards. *The declared values come from 1.3 and were readable under Qt 2's smaller default font; Qt 6's larger one is what breaks them, so raising the minimum RESTORES 1.3's readability rather than diverging from it* | 6 forms |
 
