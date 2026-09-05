@@ -411,7 +411,7 @@ void MT_GPManager::setSelektionValue(int _OffspringSize, int _TournamentSize, in
 			LastError = 3;
 		}
 
-		Selector->setTournamentSize(_TournamentSize); // macht mehr!!
+		Selector->setTournamentSize(_TournamentSize); // does more!!
 		Selector->setSelectionMethod(_SMethod);
 		FitnessTrainer->setSelektionValue(_FitnessFunction, _TrainingDuration, _TrainingSetSize);
 	}
@@ -539,7 +539,7 @@ void MT_GPManager::startEvolution(MT_Substitute *Substitute)
 		}
 	}
 	
-/*************************** Evolutionsschleife ***************************/
+/*************************** Evolution loop ***************************/
 
 	/* obtain the evolution lock to prevent concurrent saving during the evolution
 	   (multi threaded!!!)

@@ -32,7 +32,7 @@ MT_Interpreter::MT_Interpreter(int VarNum, int TDuration)
 }
 
 //////////////////////////////////////////////////////////////////////
-// weitere Methoden
+// further methods
 //////////////////////////////////////////////////////////////////////
 
 void MT_Interpreter::resetMachine()
@@ -56,7 +56,7 @@ int MT_Interpreter::getLastError()
 
 double MT_Interpreter::interpret(MT_TranslatedIndividual *RobProg)
 {
-	// Source and Var serve as index for Operanden catching   
+	// Source and Var serve as index for operand catching   
 	int Source;
 	int Var;
 	// Mod1 and Mod2 serve for casting double in integer for e.g. mod calculation   
@@ -96,7 +96,7 @@ double MT_Interpreter::interpret(MT_TranslatedIndividual *RobProg)
 
 // getSourceOperand and getTargetOperand are poorly named:
 // getSourceOperand := first operand -> possibly also the target, or always? 
-// getTargetOperand:= zweiter Operand  
+// getTargetOperand:= second operand  
 
 	for (int i=0; i<DurationToInterpret; i++)
 	{

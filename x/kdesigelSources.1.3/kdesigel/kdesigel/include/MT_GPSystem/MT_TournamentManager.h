@@ -37,7 +37,7 @@ public:
 	* ATTENTION: function always use !! after change of the population size.
 	* function change as well the TournamentNumber and the WinnerNumber;
 	* it's as well use the function createTournaments() to create adequate tournaments !
-	* it more than a simpel set function !!!
+	* it more than a simple set function !!!
 	*/
 	void setTournamentSize(int SizeOfT);
 

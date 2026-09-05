@@ -35,7 +35,7 @@ namespace SIGEL_GP
 {
 
 /**
-* This class realizes the spezial tournament, which ends with a mutation of the winner.
+* This class realizes the special tournament, which ends with a mutation of the winner.
 * It inherits its basic structure from SIG_GPTournament and uses the static function
 * mutation of SIG_GPOperations for the genetic operation. 
 */

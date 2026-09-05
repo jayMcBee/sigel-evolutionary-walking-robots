@@ -625,7 +625,7 @@ void SIG_GPParameter::slotItemDoubleClicked( QTreeWidgetItem * theItem )
 	case QDialog::Accepted:
 	  /*
 	   * warning! it is important that if one item was selected the hostname can be changed
-	   * but must NOT be changed into an existing name oder empty name!!!
+	   * but must NOT be changed into an existing name or empty name!!!
 	   */
 
 	  if( numberOfSelectedHosts == 1 )

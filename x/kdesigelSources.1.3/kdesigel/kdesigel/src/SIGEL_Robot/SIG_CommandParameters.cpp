@@ -34,7 +34,7 @@ namespace SIGEL_Robot {
 
                 tx >> tmpstr;
                 if (tmpstr != "CommandParameters"){
-                        // FEHLER
+                        // ERROR
         				}
 
                 tx >> duration;

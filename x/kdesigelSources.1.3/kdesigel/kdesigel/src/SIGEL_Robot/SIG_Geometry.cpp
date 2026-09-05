@@ -54,7 +54,7 @@ namespace SIGEL_Robot {
                 
                 tx >> tmpstr;
                 if (tmpstr != "Geometry")
-                        // FEHLER
+                        // ERROR
                         ;
 
                 tx >> zahl;

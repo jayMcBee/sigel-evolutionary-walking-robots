@@ -129,10 +129,10 @@ SIG_GPFitnessTrainer(SIG_GPExperiment& exp);
    * The experiment attribute have to be set, because if not, there is no structure data, which
    * is needed for the simulation run.
    * @post
-   * The PVM_task is spawned computing the fitnessvalue of the robot controll programm, contained
+   * The PVM_task is spawned computing the fitnessvalue of the robot controll program, contained
    * in the individual. 
    * @param ind
-   * The individual, which containes the robot controll programm.
+   * The individual, which containes the robot controll program.
    * @return
    * An integer, which represents the TID of the PVM-task. If an error occurred at the spawning
    * process, the returned integer has the value -1.
@@ -143,7 +143,7 @@ virtual int spawnTask(SIG_GPIndividual const& ind);
   /** This operation checks a PVM-task, if the computation continues or not. This happens by
    * checking out the message buffer, which the checked PVM-task have to use. If the computation
    * is completed, the operation will return the fitnessvalue of the evaluated robot controll
-   * programm. If it not, the negative value -1 is returned.
+   * program. If it not, the negative value -1 is returned.
    * @pre
    * There is an PVM-task to check.
    * @post
@@ -152,7 +152,7 @@ virtual int spawnTask(SIG_GPIndividual const& ind);
    * @param task
    * The TID of a PVM-task.
    * @return
-   * The fitnessvalue of the evaluated robot controll programm or -1 as a sign that an error 
+   * The fitnessvalue of the evaluated robot controll program or -1 as a sign that an error 
    * occurred.
    */
  public:

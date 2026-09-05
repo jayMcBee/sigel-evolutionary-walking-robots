@@ -35,7 +35,7 @@
 
 #include "SIGEL_GP/SIG_GPExperiment.h"
 
-// only needed for the zwischenziel!!!
+// only needed for the interim goal!!!
 #include "SIGEL_Tools/SIG_Randomizer.h"
 #include "SIGEL_GP/SIG_GPPopulation.h"
 

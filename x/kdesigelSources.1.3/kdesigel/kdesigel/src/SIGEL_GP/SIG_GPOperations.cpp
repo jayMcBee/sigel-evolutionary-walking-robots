@@ -722,7 +722,7 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::reproduction( SIGEL_GP::
 
   //SIGEL_Tools::SIG_IO::cerr << "\n<TEST>\n";
   //reproducedInd->print();
-  //SIGEL_Tools::SIG_IO::cerr << "\n--> Programm-Laenge:"
+  //SIGEL_Tools::SIG_IO::cerr << "\n--> Program-length:"
   //                          << reproducedInd->getProgramVar().getProgramLength()
   //                          << "\n\n";
 #endif  

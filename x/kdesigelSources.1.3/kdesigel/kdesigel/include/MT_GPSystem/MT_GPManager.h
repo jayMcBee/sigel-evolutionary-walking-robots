@@ -38,7 +38,7 @@ public:
 	
 	/******************** administrative method ********************/
 
-	MT_GPManager (QTextStream & File ); // the only correct Construktor 
+	MT_GPManager (QTextStream & File ); // the only correct constructor 
 
 	MT_GPManager(); // not used 
 	MT_GPManager (MT_Substitute * _Substitue); // not used
@@ -93,7 +93,7 @@ public:
 
 	/* set EvolStopped =true, so that the GP-Evolution will stop*/
 	void stopEvolution();
-	/* starte the evolution loop */ 
+	/* start the evolution loop */ 
 	void startEvolution(MT_Substitute * Substitute);	
 
 	/* returns true if the meta gp-system is able to run without sigel

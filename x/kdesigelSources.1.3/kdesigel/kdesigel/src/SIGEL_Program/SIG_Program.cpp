@@ -385,7 +385,7 @@ SIGEL_Program::SIG_Program::~SIG_Program()
 {
 #ifdef SIG_DEBUG
 
-  //  SIGEL_Tools::SIG_IO::cerr << "\nDestructor of PROGRAMM called!\n";
+  //  SIGEL_Tools::SIG_IO::cerr << "\nDestructor of PROGRAM called!\n";
 
 #endif
   

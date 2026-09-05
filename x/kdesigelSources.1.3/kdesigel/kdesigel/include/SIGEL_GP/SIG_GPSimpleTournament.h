@@ -116,7 +116,7 @@ private:
 #endif //  SIGEL_GP_SIG_GPSIMPLETOURNAMENT_H
 
 
- //********************META changeen**************************************************
+ //********************META changes**************************************************
   /*two new methods: 
 	bool runMetaClassifier(*Classifier) 
 		-> runs a tournament without exact fitness, using the MetaClassifier!

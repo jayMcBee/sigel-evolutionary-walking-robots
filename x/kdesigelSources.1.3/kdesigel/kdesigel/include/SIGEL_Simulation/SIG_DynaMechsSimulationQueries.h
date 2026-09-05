@@ -46,7 +46,7 @@ namespace SIGEL_Simulation
  * simulation data. Its functionality will be expanded as needed by
  * more sophisticated fitness-functions (respectively their recorders).
  * Especially it can be used to query the actual simulation time and the
- * position of each roboter link.
+ * position of each robot link.
  */
   class SIG_DynaMechsSimulationQueries : public SIG_SimulationQueries
   {

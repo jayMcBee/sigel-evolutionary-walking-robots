@@ -31,7 +31,7 @@ namespace SIGEL_GP
   /**
    * This class records the start and the end positions of the
    * torso element of the robot and calculates its fitness by
-   * calculating the absolut fitness.
+   * calculating the absolute fitness.
    */
   class SIG_GPSimpleRecorder : public SIGEL_Simulation::SIG_Recorder
     {

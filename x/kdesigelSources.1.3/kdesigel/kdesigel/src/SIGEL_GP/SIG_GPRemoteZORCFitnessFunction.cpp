@@ -211,7 +211,7 @@ namespace SIGEL_GP
       int baudcode;
       struct termios tio;
 
-      /* aktuelle Einstellungen lesen */
+      /* read the current settings */
       tcgetattr(fd, &tio);
 
       switch (baud)
@@ -231,7 +231,7 @@ namespace SIGEL_GP
       tio.c_cflag = baudcode | CS8 | CLOCAL | CREAD;
       if (handshake) tio.c_cflag |= CRTSCTS;
 
-		// Frame/Parity-Fehler ignorieren
+		// ignore frame/parity errors
       tio.c_iflag = IGNPAR;
 
       // Raw output
@@ -312,7 +312,7 @@ namespace SIGEL_GP
    }
 
 	/**
-    * This method goes one step into the ZORC menu hierarchie.
+    * This method goes one step into the ZORC menu hierarchy.
     */
 	void SIG_GPRemoteZORCFitnessFunction::goZORCMenu(int serIF, char inChoice)
 	{

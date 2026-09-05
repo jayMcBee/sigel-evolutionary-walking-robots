@@ -226,7 +226,7 @@ namespace SIGEL_GP
       int baudcode;
 	  DCB dcb = {0};
 
-      /* aktuelle Einstellungen lesen */
+      /* read the current settings */
 	  FillMemory(&dcb, sizeof(dcb), 0);
       if(!GetCommState(fd, &dcb)){
 		  fprintf(stderr, "SIG_GPRemoteZORCFitnessFunction::SetSerial() -- Couldn't get CommState\n");
@@ -257,7 +257,7 @@ namespace SIGEL_GP
 		dcb.fOutxCtsFlow= true;
 	  }
 
-	  // Frame/Parity-Fehler ignorieren
+	  // ignore frame/parity errors
 	  dcb.fParity = NOPARITY;
 
       // blocking read until 1 char arrives
@@ -333,7 +333,7 @@ namespace SIGEL_GP
    }
 
 	/**
-    * This method goes one step into the ZORC menu hierarchie.
+    * This method goes one step into the ZORC menu hierarchy.
     */
 	void SIG_GPRemoteZORCFitnessFunction::goZORCMenu(HANDLE serIF, char inChoice)
 	{

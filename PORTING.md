@@ -25,7 +25,7 @@ build and run, because nothing else can be verified without it — see §3.
 
 | phase | state |
 |---|---|
-| 0 — **DONE 2026-09-05.** comments to English | 30 lines in 19 files, and the tree holds **no byte above 127 at all**. The last count was wrong in both directions — see §7 |
+| 0 — **DONE 2026-09-05.** comments to English | Two passes on 2026-09-05: 30 lines in 19 files, then a further 101 comment lines in 46 files that the first pass's method could not see. **No `.c`/`.cpp`/`.h`/`.ui` file under the source root holds a byte above 127.** Every count this row used to carry was wrong — §7 says how |
 | A — core onto Qt 6 | **done**, tags `step-A0`…`step-A9` |
 | B — ownership explicit | **subsumed by Phase D**, which deletes the containers rather than converting them. **0 `setAutoDelete` calls left in core**, re-measured 2026-08-30 after D25c: D11 removed the last in `SIGEL_Robot`, D24 the last in `MT_Control`, D25b replaced the two `fitTaskList` calls with an RAII guard, and D25c wrote out `tours`' two real frees at their sites. **0 tree-wide as of 2026-09-05** — every remaining `autoDelete` mention is a comment explaining what the Qt 2 original did |
 | R — build and run | core builds and runs. **No longer checked only against itself** — Phase V has confirmed both the ordering and the arithmetic against the 1.3 binary, §7 |
@@ -818,46 +818,89 @@ Criterion: strip comments from before and after, diff the remainder — must be
 byte-identical. Must not be interleaved with A1–A9, which are reviewable only
 because they are pure renames.
 
-**DONE 2026-09-05: 30 comment lines in 19 files.** Every edit was a substring
-replacement in binary mode, so tabs, CRs and code are untouched; the criterion
-was run over all 19 and the stripped remainder is byte-identical in every one,
-CR counts unchanged. **The probe has its own controls** — a one-token code
-change, a change inside a string literal and a CR strip are all caught, a
-comment-only change is not.
+**DONE 2026-09-05, in TWO passes, and the second is the one that finished it.**
 
-**THE "15 LINES ACROSS 10 GUI FILES" FIGURE WAS WRONG IN BOTH DIRECTIONS, and
-the cause was the measurement, not the count.** It counted lines containing a
-byte above 127, which is not the same set as German comments:
+**Pass 1 — 30 comment lines in 19 files.** Every edit was a substring
+replacement in binary mode, so tabs, CRs and code are untouched.
 
-- **4 of the 15 were not German.** `MT_AddConstantsWidget.cpp` and
-  `sigel.cpp`×3 are the port's OWN English notes, and the high byte is a
-  Latin-1 `§` in `§9` / `§10`. They are now `sec. 9` / `sec. 10`, which is what
-  makes the tree pure ASCII. `sigel.cpp` was not even in the list of ten,
-  though it met the stated criterion — so the list and the rule it claimed to
-  come from disagreed.
-- **8 German lines have no umlaut and were invisible to it**: five `//
-  X.cpp: Implementierung der Klasse X.` banners in `src/MT_GUI/` (the five
-  headers were counted, their sources were not), two more in
-  `SIG_SimulationVisualisationWidget.cpp` (7 lines there, not 4), and
-  `SIG_SimulationWidget.cpp:203` inside a commented-out block.
-- **3 German lines survive in CORE modules, which this phase called done since
-  A1**: `SIG_GPSimpleTournament.h:120` `/*zwei neue Methoden:` and
-  `MT_Programline.cpp:77` and `:105`. Core was declared clean on the same
-  high-byte test, and all three are pure ASCII.
+**Pass 2 — a further 101 comment lines in 46 files, found by review.** Pass 1
+was scoped from this document's own "15 lines across 10 GUI files", and that
+figure came from counting lines with a byte above 127. **German without an
+umlaut has no such byte**, so the method could not see most of the work. The
+review that caught it swept every comment in the tree against an English
+dictionary instead, and the count was not close.
+
+**BOTH PASSES ARE VERIFIED BY D14'S CRITERION**, run over pass 1's 19 files and
+pass 2's 46: strip comments from before and after, and the remainder is
+byte-identical in every one, with CR and CRLF counts unchanged. **The criterion has its own
+controls** — a one-token code change, a change inside a string literal and a CR
+strip are all caught; a comment-only change is not.
+
+**HOW PASS 2 WAS DONE, because the method is the point.** A comment-aware
+rewriter: parse the file, apply the German→English word map ONLY inside comment
+bodies, leave every other byte alone. D14's criterion is what makes that safe —
+if the rewriter had reached into code, the stripped remainder would differ.
+Three words are deliberately NOT in the map: **`Typ`, `Instruktion` and
+`Selektion` are spellings of REAL member and method names**
+(`MT_Substitute::Typ`, `getRandomInstruktion`, `setSelektionValue`), so a comment
+naming one is correct and stays. That is the same rule that protects the port's
+own historical notes.
+
+**WHAT PASS 2 FOUND. 94 of the 101 lines are in CORE modules this phase had
+called done since A1** — `SIGEL_GP` 18 files/51 lines, `MT_GPSystem` 10/18,
+`MT_Control` 3/17, `SIGEL_Simulation` 4/4, `SIGEL_Robot` 3/3,
+`SIGEL_Program` 1/1. Only 7 lines are in the GUI modules Phase 0 had left:
+
+| where | what |
+|---|---|
+| `MT_Search.cpp` :100 :106 :113 | `// Mutiere Befehl!`, `// Mutiere Variable - 1.Operand`, `// Mutiere 2. Operand!` |
+| `MT_Classifier.cpp` ×4 | `//MetaProgError := prozentualer Fehler` |
+| `MT_FitnessTrainer.cpp`, `MT_Interpreter.cpp`, `MT_Trainingset.cpp` | `// weitere Methoden` |
+| `SIG_CommandParameters.cpp`, `SIG_Geometry.cpp`, `SIG_Polygon.cpp` | `// FEHLER` |
+| `SIG_GPRemoteZORCFitnessFunction.cpp` and its `WIN_` twin | `/* aktuelle Einstellungen lesen */`, `// Frame/Parity-Fehler ignorieren` |
+| `MT_Substitute.h:128`, `SIG_AllIndividualsView.cpp:120`, `SIG_GPParameter.cpp:628` | `sonst :=`, `Eventuell noch set AutoDelete enablen!!!`, `oder empty name` |
+| `MT_GPManager.cpp` :414 :542, `MT_Interpreter.cpp` :59 :99, `MT_Tournament.cpp:8`, four `MT_GUI` sources | `macht mehr!!`, `Evolutionsschleife`, `Operanden`, `zweiter Operand`, `Konstruktion/Destruktion` |
+| `SIG_DynaMechsCommandInterface.cpp:134` | `wat anderes kucken wa garnich an !` — Ruhr dialect, "we do not look at anything else at all" |
+| **15 banner lines** in `MT_Classifier.cpp`, `MT_Substitute.cpp`, `SIG_GPManager.cpp` | `// NEU NEU NEU …` → `NEW` |
+| **the rest: one German word inside an otherwise-English 2003 comment** | `programm`, `prozess`, `hierarchie`, `spezial`, `roboter`, `actuell`, `absolut`, `reproduktion`, `methode`, `Elter`, `Construktor`, `starte`, `simpel`, `zwischenziel`, `changeen`, `Laenge` |
+
+**THE `SIG_GPOperations.cpp:725` CARVE-OUT WAS WRONG ON ALL THREE OF ITS CLAIMS
+AND HAS BEEN WITHDRAWN.** It said the line "is a string literal the program
+prints, not a comment, and changing it would change output". The line is
+`//SIGEL_Tools::SIG_IO::cerr << "\n--> Programm-Laenge:"` — the whole statement
+is commented out, inside an `#ifdef SIG_DEBUG` that **nothing in this repo
+defines**. So it is a comment, it is never printed, and changing it changes
+nothing. It and the same shape at `SIG_Program.cpp:388` are both translated.
+
+**WHAT IS DELIBERATELY LEFT, and it is German:** `Sigel.dsw` and the three
+`.mak` files under the source root carry CP437 German — `GELÖSCHT`,
+`Ungültige Konfiguration`, `Sie können beim Ausführen`. They are **generated
+MSVC 6 project files**, not comments and not built by anything here. Left as
+found; recorded so the next reader does not have to rediscover them. The port's
+own repo-root harness files (`guidrive.cpp`, `sigel_eval.cpp`) keep a `§` in
+four places, but as **well-formed UTF-8** — the rule that came out of pass 1 is
+that files under the SIGEL source root are ASCII-only, and the port's own files
+may be UTF-8. What pass 1 removed from `sigel.cpp` and
+`MT_AddConstantsWidget.cpp` was a **bare Latin-1 `0xa7`**, which is not valid
+UTF-8 at all.
 
 **Banner wording follows what the core pass used**, checked against
 `MT_Control` and `MT_GPSystem` rather than invented: `interface for class X.`
 in the header, `implementation of class X.` in the source.
 
-**NINE OF THE TEN CRLF FILES were edited in binary mode** and the `encodings`
-gate still reports the same 25 known CRLF losses — no new one. Translated count
-moved 43 → 44 there, which counts FILES that lost their high bytes, not lines.
-This was the task most likely to produce a 3,227-line diff by accident; the
-diff is 30 insertions and 30 deletions. See §2's encoding trap.
+**THE CRLF FILES WERE EDITED IN BINARY MODE** and the `encodings` gate still
+reports the same 25 known CRLF losses — no new one. **Its `translated` count
+moved 35 → 44 over pass 1**, measured at both revisions, not the 43 → 44 this
+section first claimed; that 43 was back-derived from 44−1 rather than measured,
+and this file's own rule forbids exactly that. The count is of FILES that lost
+their high bytes, nine of them, not lines. This was the task most likely to
+produce a 3,227-line diff by accident; it produced none. See §2's encoding trap.
 
-**`SIGEL_GP/SIG_GPOperations.cpp:725` is deliberately left alone**: `"\n-->
-Programm-Laenge:"` is a string literal the program prints, not a comment, and
-changing it would change output.
+*Two smaller figures this section got wrong and the review corrected: "4 of the
+15 were not German" is **1 of the 15** — only `MT_AddConstantsWidget.cpp`'s line
+was in the list of ten, and `sigel.cpp`'s three were never in it, as the same
+paragraph then admitted. And "8 German lines have no umlaut" is **9**, of which
+**3** rather than 2 are in `SIG_SimulationVisualisationWidget.cpp`.*
 
 ### Phase A — core onto Qt 6 — DONE
 
@@ -2174,7 +2217,6 @@ the table below; what is left of the conversion work is there.
 
 | conversion still to do | size |
 |---|---|
-| **28 doc comments still name a member by its Qt 2 type.** `SIG_GPManager.h` says *"This QArray is used to store the randomly created tournaments"* of a `QList`; a reader of the header is told the wrong type. 16 files, led by `SIG_GPManager.h` 4, `SIG_GPParameter.h` 4, `MT_Trainingset.h` 4. **Do not touch the port's own historical notes** — "Qt 2's `QArray` was writable through `at()`" is correct and stays. Same encoding rules as Phase 0 | 28 lines, 16 files |
 | **Six forms can be dragged smaller than Qt 6 can lay them out.** Qt's mechanism is `minimumSize` in the `.ui`, and this is the SAME fix already applied to `GroupBox6` and `groupboxDirectory` and gated by `slave gui` — so it is a fix, not a permanent limitation. Declared against measured `minimumSizeHint` under Qt 6.10.2: `MT_StatisticsWidgetBase` **220x390 against 427x555** (the worst; it sits in the MetaTrainer's `QSplitter`, so a user can drag it until the labels compress to 3-8 px tall), `SIG_SimulationWidgetBase` 780x640 against 373x752, `MT_EstimationWidgetBase` 230x260 against 323x274, `MT_SelectionWidgetBase` 410x240 against 472x301, `MT_IndividualsWidgetBase` 440x362 against 338x404, `MT_SearchWidgetBase` 240x400 against 228x420. **Take the per-axis maximum** — `SIG_SimulationWidgetBase` is already wider than it needs and only too short. **Re-measure before editing**, and extend `clipcheck`'s walk or add a form-render assertion so the six are gated afterwards. *The declared values come from 1.3 and were readable under Qt 2's smaller default font; Qt 6's larger one is what breaks them, so raising the minimum RESTORES 1.3's readability rather than diverging from it* | 6 forms |
 
 | the port could still be wrong here | who can answer it |

@@ -41,7 +41,7 @@ namespace SIGEL_GP
 
 /**
  * This class realizes the GPIndividual object, which is needed as a container for the robot
- * controll programm. 
+ * controll program. 
  *
  *
  */
@@ -84,7 +84,7 @@ class SIG_GPIndividual{
 
 
 /**
- * This attribute holds the fitnessvalue of the robot controll programm. At the 
+ * This attribute holds the fitnessvalue of the robot controll program. At the 
  * initialization the value is -1 to show that the fitnessvalue is not actual.
  * The fitnessvalue has no max value.
  */
@@ -173,10 +173,10 @@ class SIG_GPIndividual{
  * The constructor of an individual, used for adding an individual to the pool, with a special 
  * robot control program from an external data store.
  * @pre
- * There is a pool object and the external robot control programm, which has to be inserted 
+ * There is a pool object and the external robot control program, which has to be inserted 
  * in the pool.
  * @post
- * The new individual is created with the external robot control programm and placed placed
+ * The new individual is created with the external robot control program and placed placed
  * in the right position of the pool.
  * @param prog
  * The external robot control program.
@@ -401,7 +401,7 @@ class SIG_GPIndividual{
  * @param time
  * The time when the crossover happened.
  * @param xoverpnt1
- * The crossover point of the first robot control programm
+ * The crossover point of the first robot control program
  * @param xoverpnt2
  * The crossoverpoint of the second robot control program.
  */
@@ -460,7 +460,7 @@ class SIG_GPIndividual{
    * This function adds information about the reproduction of the robot
    * control program of the considered individual object to the object.
    * @pre
-   * A reproduktion of the robot control program of the considered individual 
+   * A reproduction of the robot control program of the considered individual 
    * has occurred.
    * @post
    * The information is added to the history.

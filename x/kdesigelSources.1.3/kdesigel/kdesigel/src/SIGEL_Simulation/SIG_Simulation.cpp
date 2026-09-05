@@ -121,7 +121,7 @@ void SIGEL_Simulation::SIG_Simulation::start()
      makeTimeSteps(1);
      act=simulationQueries->getActualSimulationTime();
 
-     // premature means "fuehzeitig"
+     // premature means "early"
      if ( prematureTermination() ) {
         break;
      }

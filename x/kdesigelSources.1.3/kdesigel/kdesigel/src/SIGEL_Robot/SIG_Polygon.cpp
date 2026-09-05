@@ -49,7 +49,7 @@ namespace SIGEL_Robot {
 
                 tx >> tmpstr;
                 if (tmpstr != "Polygon")
-                        // FEHLER
+                        // ERROR
                         ;
                 
                 tx >> zahl;

@@ -38,20 +38,20 @@ namespace SIGEL_GP
 
 /**
  * This abstract class represents the structure of the different fitnessclasses
- * which computes the fitness of an robot controll programm.
+ * which computes the fitness of an robot controll program.
  *
  */
 class SIG_GPFitnessFunction{
 
   /**
-   * The individual, which conatins the robot control programm.
+   * The individual, which conatins the robot control program.
    *
    */
  protected:
 SIGEL_Program::SIG_Program & program;
 
   /**
-   * The robot artichecture on which the robot control programm shall be executed.
+   * The robot artichecture on which the robot control program shall be executed.
    *
    */
  protected:
@@ -84,14 +84,14 @@ QString const name;
  * for the simulationrun.
  * @pre
  * The parameters has to be set, the GPFitnesstrainer takes controll about the
- * PVM-Prozess. 
+ * PVM-process. 
  * @post
  * An object of the FitnessFunction is created and the parameters are set to the attributes.
  * @param ind
- * The individual, which contains the robot controll programm.
+ * The individual, which contains the robot controll program.
  * @param robot
  * The robot architecture of the robot, on which the robot controll
- * programm shall be executed
+ * program shall be executed
  * @param environment
  * The environment of the simulationrun.
  * @param simparameter
@@ -145,7 +145,7 @@ QString const name;
   */
  protected:
   /**
-    * this attribute specifies the actuell generation since this project was created.
+    * this attribute specifies the current generation since this project was created.
     */
   int actGeneration;
   /**

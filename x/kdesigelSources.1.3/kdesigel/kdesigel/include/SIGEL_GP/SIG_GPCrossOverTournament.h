@@ -34,7 +34,7 @@ namespace SIGEL_GP
 {
 
 /**
-* This class realizes the spezial tournament, which ends with a crossover of the winners.
+* This class realizes the special tournament, which ends with a crossover of the winners.
 * It inherits its basic structure from SIG_GPTournament and uses the static function
 * crossOver of SIG_GPOperations for the genetic operation. 
 */

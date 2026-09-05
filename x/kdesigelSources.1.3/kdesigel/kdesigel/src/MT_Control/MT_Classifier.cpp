@@ -180,7 +180,7 @@ int MT_Classifier::evaluationTactic(int ToursSize)
 					if( ((AssumedFitness[i]>=0.0)&&(CorrectFitness[i]<0.0)) || ((AssumedFitness[i]<0.0)&&(CorrectFitness[i]>=0.0)) )
 						MetaProgError++;
 
-				MetaProgError = (MetaProgError/ CorrectFitness.size())*100.0;  //MetaProgError := prozentualer Fehler 
+				MetaProgError = (MetaProgError/ CorrectFitness.size())*100.0;  //MetaProgError := percentage error 
 			}
 			
 			if(MetaProgError< Tolerance)
@@ -207,7 +207,7 @@ int MT_Classifier::evaluationTactic(int ToursSize)
 					if( ((AssumedFitness[i]>=0.0)&&(CorrectFitness[i]<0.0)) || ((AssumedFitness[i]<0.0)&&(CorrectFitness[i]>=0.0)) )
 						MetaProgError++;
 
-				MetaProgError = (MetaProgError/ CorrectFitness.size())*100.0;  //MetaProgError := prozentualer Fehler 
+				MetaProgError = (MetaProgError/ CorrectFitness.size())*100.0;  //MetaProgError := percentage error 
 			}
 
 			if (SigelGeneration >5.0)
@@ -249,7 +249,7 @@ int MT_Classifier::evaluationTactic(int ToursSize)
 					if( ((AssumedFitness[i]>=0.0)&&(CorrectFitness[i]<0.0)) || ((AssumedFitness[i]<0.0)&&(CorrectFitness[i]>=0.0)) )
 						MetaProgError++;
 
-				MetaProgError = (MetaProgError/ CorrectFitness.size())*100.0;  //MetaProgError := prozentualer Fehler 
+				MetaProgError = (MetaProgError/ CorrectFitness.size())*100.0;  //MetaProgError := percentage error 
 			}
 
 		// Tolerance weighting: AverageSigelFitness 
@@ -285,9 +285,9 @@ int MT_Classifier::evaluationTactic(int ToursSize)
 
 		}break;
 
-// NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU
-// NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU 
-// NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU 
+// NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW
+// NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW 
+// NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW 
 
 	case 6: 
 		{
@@ -298,7 +298,7 @@ int MT_Classifier::evaluationTactic(int ToursSize)
 					if( ((AssumedFitness[i]>=0.0)&&(CorrectFitness[i]<0.0)) || ((AssumedFitness[i]<0.0)&&(CorrectFitness[i]>=0.0)) )
 						MetaProgError++;
 
-				MetaProgError = (MetaProgError/ CorrectFitness.size())*100.0;  //MetaProgError := prozentualer Fehler 
+				MetaProgError = (MetaProgError/ CorrectFitness.size())*100.0;  //MetaProgError := percentage error 
 			}
 			
 			if(MetaProgError< Tolerance)
@@ -514,9 +514,9 @@ bool MT_Classifier::preEvolution(QList<SIGEL_GP::SIG_GPTournament *> *tours, int
 	}
 
 
-// NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU
-// NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU 
-// NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU 
+// NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW
+// NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW 
+// NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW 
 
 // only  tournament, which haven't the best Sig Individual inside 
 // will run by the Classifier
@@ -615,9 +615,9 @@ for(int d=0; d < tours->size();d++)
 
 }
 
-// NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU
-// NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU 
-// NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU 
+// NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW
+// NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW 
+// NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW 
 
 int MT_Classifier::evalNeededTours(QList<SIGEL_GP::SIG_GPTournament *> *  tours, QList<int> * ToursWBestIndi, int PosBest)
 {

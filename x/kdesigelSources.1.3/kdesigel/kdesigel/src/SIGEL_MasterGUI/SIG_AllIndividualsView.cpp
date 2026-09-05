@@ -117,7 +117,7 @@ SIG_AllIndividualsView::SIG_AllIndividualsView( QWidget * parent, const char * n
   
   /*
    * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-   * Eventuell noch set AutoDelete enablen!!!
+   * Perhaps also enable set AutoDelete!!!
    * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
    */
 

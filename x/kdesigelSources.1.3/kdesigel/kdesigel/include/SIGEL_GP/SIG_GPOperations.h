@@ -50,7 +50,7 @@ class SIG_GPOperations
 * @pre
 * A two tournaments has happened and the winners have to crossover.
 * @post
-*  The two individuals carrying a new combination of a robot control programm are created and
+*  The two individuals carrying a new combination of a robot control program are created and
 * the parent individuals are unmodified.
 * @param winner1
 * The involved individual number one.
@@ -104,7 +104,7 @@ class SIG_GPOperations
 					       SIGEL_GP::SIG_GPParameter& gpParameter,
 					       SIGEL_Robot::SIG_LanguageParameters &languageP);
 
-/** This operation gets the winner of an played tournament with reproduktion. 
+/** This operation gets the winner of an played tournament with reproduction. 
 * It returns the same Individual without any changes.
 * @pre
 * A tournament was played, with reproduction as the genetic operator.

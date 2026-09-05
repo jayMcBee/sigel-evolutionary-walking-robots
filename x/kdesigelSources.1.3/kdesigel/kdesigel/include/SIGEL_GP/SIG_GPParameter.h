@@ -37,10 +37,10 @@ namespace SIGEL_GP
 {
 /**
 * This class represents the data structure of the parameters for the
-* genetic programms evolution. The parameters for the designers are
+* genetic programs evolution. The parameters for the designers are
 * programmed in the code, the parameters for the users are selectable
-* from the gui. So every parameter the users has a set-methode and 
-* the parameters for the genetic programms have only a get-methode.
+* from the gui. So every parameter the users has a set-method and 
+* the parameters for the genetic programs have only a get-method.
 * More flexibility will be implemented in future.
 */
   class SIG_GPParameter{
@@ -133,13 +133,13 @@ namespace SIGEL_GP
   int randomSeed;
 
    /**
-   * The minimal length of a robot controll programm.
+   * The minimal length of a robot controll program.
    */
   private:
   int minIndLength;
 
    /**
-   * The maximal length of a robot controll programm.
+   * The maximal length of a robot controll program.
    */
   private:
   int maxIndLength;

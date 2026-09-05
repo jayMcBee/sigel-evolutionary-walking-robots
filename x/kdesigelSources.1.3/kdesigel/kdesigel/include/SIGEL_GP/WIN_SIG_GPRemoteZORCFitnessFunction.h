@@ -93,7 +93,7 @@ namespace SIGEL_GP
       bool     timedSerialWait(HANDLE serIF, int timeOutSecs);
 
 	 /**
-     * This method goes one step into the ZORC menu hierarchie.
+     * This method goes one step into the ZORC menu hierarchy.
      */
 		void 		goZORCMenu(HANDLE serIF, char inChoice);
 

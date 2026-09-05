@@ -60,7 +60,7 @@ bool SIGEL_GP::SIG_GPSimpleTournament::run()
 
 
 // META META META META META META META 
-// ATTENTION !!! Giga-wichtiger Code !!!
+// ATTENTION !!! Giga-important code !!!
 	if( var1 < -2.0 )
 		var1 = (var1 + 2.0) * -1.0;
 	

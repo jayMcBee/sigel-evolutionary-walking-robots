@@ -1075,7 +1075,7 @@ void SIGEL_GP::SIG_GPManager::run(MT_Classifier *MetaClassifier)
 		Meta ordering / changes
 		0) as for SIGEL ...
 		1) createTours
-		2) MT_Classifier.preEvolution  --->klassifiziert SigelTurnier; verkleinert evtl. tours(!)
+		2) MT_Classifier.preEvolution  --->classifies the SIGEL tournament; may shrink tours(!)
 		3) calcInitTourSet()
 		4) evalNeededIndis() --> new method: compute fitness only for those SIGEL individuals
 		which still appear in tours!
@@ -1135,9 +1135,9 @@ void SIGEL_GP::SIG_GPManager::run(MT_Classifier *MetaClassifier)
 	  return;
 
 	
-// NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU
-// NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU 
-// NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU // NEU NEU NEU NEU NEU 
+// NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW
+// NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW 
+// NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW 
 	// Find the population position of the best SIGEL individual  
 	int PosBestSigelIndi =0;
 	double BestFitness =-1.0;
@@ -1313,7 +1313,7 @@ void SIGEL_GP::SIG_GPManager::evolutionLoop(MT_Classifier *MetaClassifier)
 {
 	/**
 	*	Changes relative to the "normal" evolutionLoop():
-	*	1) actTour.run(MetaClassifier); anstatt actTour.run();
+	*	1) actTour.run(MetaClassifier); instead of actTour.run();
 	*	2) if a tournament participant takes part in no further tournament,
 	*		its fitness no longer needs computing. 
 	*/

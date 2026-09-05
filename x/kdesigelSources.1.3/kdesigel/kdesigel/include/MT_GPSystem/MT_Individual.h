@@ -79,7 +79,7 @@ private:
 
 	/* indicate how the program were created
 	* -1= not defined  ; 0= Random; 1= OneCrossoverPoint; 2=OneCrossoverPointMutation;
-	* 3 = OneCrossoverPoint; 4= Reproduktion; 5=Elter; 100+X = X Mutatuion have performed
+	* 3 = OneCrossoverPoint; 4= Reproduction; 5=Parent; 100+X = X Mutatuion have performed
 	* 6 = a loaded individual
 	*/
 	int TspOfGenesis;

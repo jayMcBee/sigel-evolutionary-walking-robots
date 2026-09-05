@@ -37,7 +37,7 @@ public:
  	int NumOfCrossoverEvent; // Parents by crossover  
 
 	int NumOfElementMutationParent; 
-	int NumOfMutateIndividuals;   // Eltern druch Mutation 
+	int NumOfMutateIndividuals;   // Parents by mutation 
 	
 	int NumOfSimpleCopyParent;  // Parents by simple copy
 

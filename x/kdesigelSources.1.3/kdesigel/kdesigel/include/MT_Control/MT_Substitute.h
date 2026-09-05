@@ -125,7 +125,7 @@ protected:
 	* (***) := the (number of fitness cases)/10 largest deviations 
 	* EstimationStrategy = 3 := percentage of wrong decisions: 0% < Tolerance < 100%
 	* EstimationStrategy = 4 :=
-	* EstimationStrategy sonst := 
+	* EstimationStrategy otherwise := 
 	*/
 	int EstimationStrategy;
 	// for EstimationStrategy: 

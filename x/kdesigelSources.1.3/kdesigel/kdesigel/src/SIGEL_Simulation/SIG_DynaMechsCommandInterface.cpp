@@ -131,7 +131,7 @@ void SIGEL_Simulation::SIG_DynaMechsCommandInterface::moveDrive(int driveNo,
 		int linkNumber = simulationData.jointIndices[ drive->getJoint()->getNumber() ];
 		SIG_DynaMechsLink *dynaMechsLink = simulationData.dynaMechsLinks[ linkNumber ];
 
-		// we work on rotational joints only, wat anderes kucken wa garnich an !
+		// we work on rotational joints only, we do not look at anything else at all!
 		SIGEL_Robot::SIG_Joint *myJoint = const_cast<SIGEL_Robot::SIG_Joint *>( drive->getJoint() );
 
 		if (myJoint->getJointType() != SIGEL_Robot::SIG_Joint::tRotationalJoint)

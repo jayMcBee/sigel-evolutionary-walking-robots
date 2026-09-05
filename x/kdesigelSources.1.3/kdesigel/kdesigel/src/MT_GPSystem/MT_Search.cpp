@@ -97,20 +97,20 @@ MT_Individual * MT_Search::mutate(MT_Individual * Progenitor)
 					{ 
 					case 0 :
 						{
-							// Mutiere Befehl!
+							// Mutate instruction!
 							(ChildProgram->getProgramLine(i))->setInstruction(Randi->getRandomInstruktion());
 						} break;
 
 					case 1:
 						{
-							// Mutiere Variable - 1.Operand
+							// Mutate Variable - 1.Operand
 							(ChildProgram->getProgramLine(i))->setOperandA(Randi->getRandomVariable());
 						
 						} break;
 
 					case 2:
 						{
-							// Mutiere 2. Operand!
+							// Mutate 2. Operand!
 							(ChildProgram->getProgramLine(i))->setOperandB(Randi->getRandomOperand());
 						
 						} break;
@@ -131,7 +131,7 @@ MT_Individual * MT_Search::mutate(MT_Individual * Progenitor)
 void MT_Search::crossover(MT_Individual * ParentOne, MT_Individual * ParentTwo)
 {
 
-/* ************************* Initialisationen  **************************/
+/* ************************* Initialisations  **************************/
 
 	MT_Program * POneProgram = ParentOne->getProgram();
 	MT_Program * PTwoProgram = ParentTwo->getProgram();
@@ -261,7 +261,7 @@ MT_Individual*  MT_Search::reproduce(MT_Individual * Progenitor)
 int MT_Search::startMatingProcess()
 {
 
-/* ************************* Initialisationen  **************************/
+/* ************************* Initialisations  **************************/
 	int ParentSize = SourcePop->getSize();
 	int OffspringSize = TargetPop->getSize();
 	int FreePos =0; 
