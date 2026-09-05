@@ -492,9 +492,9 @@ through `f0f2daa`.
 
 ## 7. Steps
 
-**Exit criterion per step:** `./check.sh` at the repo root — **849 pass, 0 fail,
-508 warnings** as of 2026-09-05, after the `slave gui` section and the two
-forms corpus assertions, and it **exits non-zero** when
+**Exit criterion per step:** `./check.sh` at the repo root — **850 pass, 0 fail,
+508 warnings** as of 2026-09-05, after the `slave gui` and `form minimums`
+sections and the two forms corpus assertions, and it **exits non-zero** when
 anything fails or is skipped. Zero is reachable because the two permanently
 Windows-only `WIN_*` files are an explicit exclusion rather than a standing
 red — see C11c.
@@ -509,9 +509,9 @@ session to. Warnings are on an unchanged basis and remain comparable throughout.
 **There are four gates, not three, and the full list with its caveats is in
 "Handover" below — use that one.** `check.sh` compiles every converted module
 and every converted header standalone, and since C1 also runs `uic`, `moc` and
-`rcc` over the converted forms. **It also RUNS SIGEL**: **thirteen
-`guidrive` invocations over twelve distinct scenarios** — the ten of
-`gui behaviour`, plus `clipcheck`, `slavegui`, and `pagesave` twice — the slave's
+`rcc` over the converted forms. **It also RUNS SIGEL**: **fourteen
+`guidrive` invocations over thirteen distinct scenarios** — the ten of
+`gui behaviour`, plus `clipcheck`, `formsize`, `slavegui`, and `pagesave` twice — the slave's
 headless smoke test, the `widgets` and `parsers` probes and
 `expstruct --selfcheck`. *"Ten" counted only the `gui behaviour` list and stood
 while three more sections were added around it.* *This said "it
@@ -787,7 +787,7 @@ succeeded.**
 **Gates any session must keep green**, all committed:
 
 ```
-./check.sh                                            849 pass, 0 fail, exit 0
+./check.sh                                            850 pass, 0 fail, exit 0
 ./dictorder-dump.sh | diff -u dictorder-baseline.txt -    empty
 ./fitness-check.sh  | diff -u fitness-baseline.txt -      empty
 ASAN_OPTIONS=detect_leaks=0 ./fitness-check.sh build      exit 0
@@ -946,6 +946,201 @@ already names the Qt 6 type.
 **No `QList`/`QHash`/`QQueue` mention was left pointing at the wrong container in
 the other direction** — the five near-misses above were re-read against their
 declarations, not assumed.
+
+### Form minimums — DONE 2026-09-05
+
+**Six forms declared a `minimumSize` below what Qt 6 needs to lay them out**, so
+a user could drag one down until its children compressed. Raised to the per-axis
+maximum of declared and measured, and **gated**, which is the half that was
+missing: `GroupBox6` and `groupboxDirectory` had the same fix in C11d and were
+gated by `slave gui`, but nothing measured a whole FORM.
+
+**RE-MEASURED FIRST, and one of the six figures in this file was wrong.**
+`MT_StatisticsWidgetBase`'s `minimumSizeHint` under Qt 6.10.2 is **402x555**,
+not the 427x555 recorded here — a 25 px difference in width, on the form this
+document called the worst case. The other five reproduced exactly.
+
+| form | declared | hint | raised to |
+|---|---|---|---|
+| `MT_StatisticsWidgetBase` | 220x390 | **402x555** | 402x555 |
+| `SIG_SimulationWidgetBase` | 780x640 | 373x752 | 780x752 — already wider than it needs |
+| `MT_SelectionWidgetBase` | 410x240 | 472x301 | 472x301 |
+| `MT_EstimationWidgetBase` | 230x260 | 323x274 | 323x274 |
+| `MT_SearchWidgetBase` | 240x400 | 228x420 | 240x420 |
+| `MT_IndividualsWidgetBase` | 440x362 | 338x404 | 440x404 |
+
+**The gate is a new `formsize` scenario in `guidrive` and a `form minimums`
+section in `check.sh`.** It measures **all twenty forms**, not the six that were
+wrong — a list of the known-bad ones passes the moment a twenty-first is added
+or a good one regresses — and the scenario **asserts the corpus is 20** so a
+shortened list cannot pass by testing nothing. Thirteen of the twenty declare no
+`minimumSize` at all; those are reported as `unset`, not failed, because Qt then
+uses the hint by itself and they are correct as they are. `MT_PopulationWidgetBase`
+declares 350x220 against a hint of 330x121 and was already fine.
+
+**Two independent teeth, because "TOO SMALL: 0" is not evidence on its own.**
+The scenario's own selftest forces one form's minimum to 1x1 and requires the
+same comparison to report it — without that, an invalid hint on every form would
+read as a clean pass. And the section was measured the other way: putting
+`MT_StatisticsWidgetBase` back to 220x390 and rebuilding makes `check.sh` fail
+by name with `TOO SMALL: 1`, then restoring it passes again.
+
+**Raising these RESTORES 1.3 rather than diverging from it.** The declared values
+are 1.3's, readable under Qt 2's smaller default font; Qt 6's larger metrics are
+what make the layout need more. Confirmed that the hint does not move when the
+minimum is raised — the hint comes from the layout's children, so there is no
+feedback loop and the new values are stable.
+
+### D29's guard placement — CONFIRMED CORRECT BY THE ORACLE 2026-09-05
+
+**The question was whether 1.3 refreshes the generations LCD on a page switch
+DURING a run.** The guard in `SIG_ExperimentView::putIntoExperiment()` sits
+below that read on the assumption that it does. **It does.** Measured on
+`twoBasesSimpleFitness2`, whose file base is 532:
+
+| when | LCD |
+|---|---|
+| pre-run | 532 |
+| **7 passive captures over 3 generations** | 532, byte-identical every time |
+| switch to Population and back, after gen 4 | **536** = 532 + 4 |
+| 2 more generations, no switch | 536, unchanged |
+| switch to Simulation-Parameters and back | **538** = 532 + 6 |
+
+**Two independent cycles, and the value moves only when a page is switched, to
+base + generations completed, exactly.** The seven passive captures are what rule
+out a spontaneous refresh as the explanation — without them a frozen LCD and a
+broken capture look the same. So C11 stays right that the counter does not move
+during a run, AND a mid-run page switch is one of `putIntoExperiment()`'s
+updates. **A guard below the read is therefore correct: the read still has to
+happen on a page switch.** No change needed.
+
+### The `pvmTasks` crash on 1.3 — CONFIRMED AND NARROWED BY THE ORACLE 2026-09-05
+
+**It dies, and the narrowing matters more than the confirmation.** The clean
+run: MetaGP enabled BEFORE Start so the only injected event in the whole run was
+one click, four generations at ~65 s each untouched, then Configure System:
+
+```
+Computing Generation 4  (Fri Sep 4 17:12:02 2026)
+QGVector::operator[]: Index 359 out of range
+Invalid storage access
+```
+
+Dead within ten seconds, and **no `MTMainWindow` is ever mapped — it dies on the
+way to opening the window**. `Invalid storage access` is SIGEL's own SIGSEGV
+handler string, so it is a segfault. Index N tracks the cumulative task counter.
+
+**IT IS NOT "GUI interaction during a run".** ~25 injected mid-run events across
+several runs — tree selections, spin-box and slider clicks, menu opens, Stop —
+plus four more page switches during the run that answered D29, and none of them
+crashed. Every crash shares the one trigger.
+
+**THE PREREQUISITE THAT WILL WASTE A SESSION'S TIME.** `Configure System` opens
+that window **only when a real `stdConf.mt` is present in `SIGEL_ROOT`** — it
+ships with the SOURCE tarball only. Without it, `Use MetaGP` raises "An error
+occurred in loading the meta experiment" and `Configure System` stays greyed;
+press **Standard** on that dialog mid-run and you get the OTHER failure instead —
+the evolution **silently wedges**, alive and repainting, Stop enabled, Start
+greyed, zero new spawns for 4.5 minutes against a 62 s/generation baseline.
+**Know which of the two you are reproducing.** *`stdConf.mt` IS present in this
+repo's `SIGEL_ROOT`, so the port is set up to reproduce the crash rather than the
+wedge.*
+
+### The MetaGP window grew 59 px — SETTLED BY THE ORACLE 2026-09-05
+
+**`guibehaviour-baseline.txt` moves by one line, from 680x595 to 680x654, and
+the oracle's measurement is why that is right rather than tolerated.**
+
+**The cause here is measured by PREDICTION, not back-derivation.** The window's
+chrome is **99 px** and the six MT_* pages sit in a `QStackedWidget` whose
+minimum is the maximum over its pages. Four values, rebuilt each time:
+
+| statistics min height | predicted window | measured |
+|---|---|---|
+| 555 | 654 | **680x654** |
+| 500 | 599 | **680x599** |
+| 450 | 549 → floor of 595 | **680x595** |
+| 390 | 489 → floor of 595 | **680x595** |
+
+So at the declared 390 the Statistics page received **595 − 99 = 496 px where its
+Qt 6 layout needs 555**, at the DEFAULT size, not only when dragged.
+
+**WHAT THE ORACLE MEASURED ON 1.3, and it corrects this document twice.**
+
+- **1.3 does not open that window at 595 either. It opens at 680x605**, with a
+  `WM_NORMAL_HINTS` program minimum of **625x605**. **Qt 2 already overrode
+  `MT_MainWindow.cpp:33`'s `resize(680, 595)` by 10 px to satisfy its own
+  layout.** So 595 is a number the program asks for and has never got, and
+  reasoning from that line describes the source rather than the application.
+- **1.3's window cannot be made shorter at all** — 605 is both the opening
+  height and the minimum; a window manager honouring the hint refuses the drag.
+  Forced below it, **1.3's layout CLIPS rather than compresses**: the Search
+  Operator Effects table is cut mid-row.
+- **1.3's Statistics page is ALREADY CLIPPED at its own default.** Selecting
+  Statistics adds a second toolbar row that eats ~30 px, and at 605 the group-box
+  bottom border and the page frame bottom border are both cut. The oracle's
+  ladder: 605 borders cut, 620 group border appears, 640 both visible,
+  **654 fully laid out**.
+
+**SO 654 IS WHERE 1.3'S OWN STATISTICS PAGE FIRST RENDERS COMPLETE**, and a port
+that opens taller to honour its layout minimum is doing exactly what Qt 2 did —
+the same override, from a larger `minimumSizeHint`. Matching 595 would reproduce
+neither 1.3's size nor its behaviour. **The baseline was not moved on this
+session's reasoning: 1.3 moved it first, by 10 px, for the same reason.**
+
+**THIS FILE'S "the labels compress to 3-8 px tall" IS WITHDRAWN, on two counts.**
+1.3's window cannot be dragged shorter than it opens, so the drag it describes is
+not reachable; and the failure mode is **clipping, not compression**. The oracle
+measured text row heights at two window heights and they are **identical**: 9 px
+for plain labels, 12 px for ones with descenders, 25 px row pitch at both 605 and
+780. What an undersized window costs is frame borders and whole cut rows, not
+legibility. *The 3-8 px figure was never measured on either binary.*
+
+### `pvmcrash` — the harness exists, the local run does not dispatch — OPEN 2026-09-05
+
+**§9's "the `pvmTasks` crash is untried on the port" is still untried, and this
+is how far it got.** `guidrive` has a new **`pvmcrash`** scenario: the
+`evolution` scenario plus a single-shot `QTimer` armed immediately before the
+Start click, which fires from inside the blocking run through
+`SIG_GUIGPManager::haveABreak()`'s `processEvents()` and opens
+MetaGP > Configure System. `SIGEL_CRASH_AT_MS=0` is the **control** — the
+identical run with nothing injected — because a crash with no negative cell is
+the exact mistake that made the oracle withdraw "MetaGP crashes 1.3" and then
+"mid-run GUI interaction crashes 1.3". stdout is unbuffered in this scenario
+only: the expected outcome is that the process dies, and a block-buffered
+transcript of a run that aborts is lost.
+
+**The input is built to C11's recipe** and is correct as far as it can be
+checked: `data/Experiments/twoBasesSimpleFitness1.exp`, GP `RANDOMSEED` (the
+second of the two) set to 12345, the eight 2003 `PVMHOST` lines replaced by one
+local host at max-processes 1, paths rewritten to `build-fast`.
+
+**WHAT BLOCKS IT.** The control run starts — Start greys, Stop enables, the
+in-run sampler fires — and then **no `pvm_spawn` ever reaches the daemon**. The
+`pvmd` log records only `guidrive`'s own task; no slave process ever exists;
+nothing is printed on the failure path, which `SIG_GPFitnessTrainer.cpp:346`
+would take. The process sits in `hrtimer_nanosleep` at ~15% CPU until killed.
+
+**Ruled out by measurement, so the next session does not repeat it:**
+
+- The host list loads. `guidrive pages` on the built input shows
+  `listviewHosts rows=1`, name `jan-UbuntuVM25`, maxSlaves 1, the right directory.
+- `col0check=0` on that row is **not** a disabled host — all eight hosts of the
+  shipped experiment read `col0check=0` too. It is an icon column.
+- `noOfSlaves` starts at 0 (`SIG_GPActivePVMHost.cpp:30`), so `getNextHost()`'s
+  `noOfSlaves < maxSlaves` is true at maxSlaves 1; a one-slave host is not
+  self-blocking.
+- `pvm_addhosts`' return is ignored (`SIG_GPFitnessTrainer.cpp:95`), so a
+  `PvmDupHost` for the local daemon cannot be what stops it.
+- PVM itself is up: `pvm_start_pvmd` succeeds, the daemon logs `ready`, and
+  `./pvm-check.sh` passes.
+- **`PVM_ROOT`, `PVM_ARCH` and `PVM_TMP` must be exported** — without them
+  `libpvm` prints `PVM_ROOT environment variable not set` and the run produces
+  no transcript at all. `pvm-check.sh:66-77` has the values.
+
+*Not diagnosed: whether `spawnTask` is reached at all. `ptrace_scope` on this
+machine refuses `gdb -p`, so no stack was taken; a print on the spawn path is the
+obvious next move.*
 
 ### Phase A — core onto Qt 6 — DONE
 
@@ -2260,15 +2455,15 @@ questions the port could still be wrong about, then gaps in coverage.
 comment, zero in code. **Phase 0 closed 2026-09-05** and its row is gone from
 the table below; what is left of the conversion work is there.
 
-| conversion still to do | size |
-|---|---|
-| **Six forms can be dragged smaller than Qt 6 can lay them out.** Qt's mechanism is `minimumSize` in the `.ui`, and this is the SAME fix already applied to `GroupBox6` and `groupboxDirectory` and gated by `slave gui` — so it is a fix, not a permanent limitation. Declared against measured `minimumSizeHint` under Qt 6.10.2: `MT_StatisticsWidgetBase` **220x390 against 427x555** (the worst; it sits in the MetaTrainer's `QSplitter`, so a user can drag it until the labels compress to 3-8 px tall), `SIG_SimulationWidgetBase` 780x640 against 373x752, `MT_EstimationWidgetBase` 230x260 against 323x274, `MT_SelectionWidgetBase` 410x240 against 472x301, `MT_IndividualsWidgetBase` 440x362 against 338x404, `MT_SearchWidgetBase` 240x400 against 228x420. **Take the per-axis maximum** — `SIG_SimulationWidgetBase` is already wider than it needs and only too short. **Re-measure before editing**, and extend `clipcheck`'s walk or add a form-render assertion so the six are gated afterwards. *The declared values come from 1.3 and were readable under Qt 2's smaller default font; Qt 6's larger one is what breaks them, so raising the minimum RESTORES 1.3's readability rather than diverging from it* | 6 forms |
+**THE CONVERSION WORK IS DONE.** This table held three items on 2026-09-05 —
+Phase 0's last comment lines, 28 doc comments naming a Qt 2 type, and six form
+minimums — and all three closed that day. Each is written up in §7, and each
+closed with a correction to the figure this table carried.
 
 | the port could still be wrong here | who can answer it |
 |---|---|
-| **The `pvmTasks` crash is untried on the port.** 1.3 dies when MetaGP `Configure System` opens its window during a run. The port has the same unchecked read and the same `processEvents` pump; it would assert rather than segfault. **Nobody has tried it** | drive it here, then on 1.3 |
+| **The `pvmTasks` crash is still untried on the port**, but **1.3's half is now confirmed and narrowed** — see §7. The port has the same unchecked read and the same `processEvents` pump. A `pvmcrash` scenario with its control exists and builds; what blocks it is that the local evolution does not dispatch a single `pvm_spawn`, diagnosed as far as §7 records | drive it here; 1.3's side is done |
 | **1.3's silent wedge — does the port do it too?** Toggling `Use MetaGP` mid-run stops the evolution on 1.3 while the GUI keeps repainting and Stop stays enabled. D29 locks that trigger; it does not answer whether another route wedges the port | drive it here |
-| **D29's guard placement in `putIntoExperiment` is source-derived, not measured.** Does 1.3 refresh the generations LCD on a page switch *during* a run? `poolGeneration` is incremented per generation and 1.3 has no guard, so the guard now sits below that read on the assumption that it does. One oracle run with a mid-run page switch settles it | the x86 box |
 
 | coverage gaps | what is missing |
 |---|---|

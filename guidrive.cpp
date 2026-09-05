@@ -34,11 +34,11 @@
     visualize  Individuals > Visualize, to capture the PVM payload
     evolution  Start and Stop  (needs PVM and a real sigel_slave)
   ... and pages, pagesave, exportall, roundtrip, overwrite, dialogs, metagui,
-  clipcheck, slavegui, metadrive, runlock, rngseed.
+  clipcheck, formsize, slavegui, metadrive, runlock, rngseed, pvmcrash.
   The list above is not maintained in step with the code. The count that
   cannot go stale is
     command grep -o 'scenario == "[a-z]*"' guidrive.cpp | sed 's/.*"\(.*\)"/\1/' | sort -u | wc -l
-  which reads 28 today. A plain -c over the same pattern gives 30 and is
+  which reads 30 today. A plain -c over the same pattern gives 34 and is
   WRONG: two scenarios are tested twice in one condition.
 
   Environment:
@@ -127,6 +127,30 @@ extern "C" {
 #include "SIGEL_MasterGUI/SIG_AllIndividualsView.h"
 #include "SIGEL_MasterGUI/SIG_IndividualListItem.h"
 #include "SIGEL_MasterGUI/SIG_IndividualView.h"
+
+// The twenty committed form base classes, for the `formsize' scenario. Nothing
+// else here instantiates a form on its own -- every other scenario reaches them
+// through the windows that own them.
+#include "MT_GUI/MT_AddConstantsWidgetBase.h"
+#include "MT_GUI/MT_AddIndividualsWidget.h"
+#include "MT_GUI/MT_EstimationWidgetBase.h"
+#include "MT_GUI/MT_ExperimentWidgetBase.h"
+#include "MT_GUI/MT_IndividualWidgetBase.h"
+#include "MT_GUI/MT_PopulationWidgetBase.h"
+#include "MT_GUI/MT_SearchWidgetBase.h"
+#include "MT_GUI/MT_SelectionWidgetBase.h"
+#include "MT_GUI/MT_StatisticsWidgetBase.h"
+#include "SIGEL_MasterGUI/SIG_EditHostDialogBase.h"
+#include "SIGEL_MasterGUI/SIG_EnvironmentBase.h"
+#include "SIGEL_MasterGUI/SIG_ExperimentViewBase.h"
+#include "SIGEL_MasterGUI/SIG_GPParameterBase.h"
+#include "SIGEL_MasterGUI/SIG_IndividualListBase.h"
+#include "SIGEL_MasterGUI/SIG_IndividualViewBase.h"
+#include "SIGEL_MasterGUI/SIG_LanguageParametersBase.h"
+#include "SIGEL_MasterGUI/SIG_RobotBase.h"
+#include "SIGEL_MasterGUI/SIG_SimulationParameterBase.h"
+#include "SIGEL_SlaveGUI/SIG_MovieSettingsDialogBase.h"
+#include "SIGEL_SlaveGUI/SIG_SimulationWidgetBase.h"
 
 // sigel.cpp:95 owns this global; anything that pulls MT_Controller needs it.
 bool guiEnabled = true;
@@ -1422,12 +1446,14 @@ int main(int argc, char **argv)
     // scenario needs it, and starting a daemon for the others would be noise.
     // Evolution genuinely takes minutes; everything else that runs longer than
     // this is stuck, not busy.
-    const bool slow = (scenario == "evolution" || scenario == "visualize");
+    const bool slow = (scenario == "evolution" || scenario == "visualize"
+                       || scenario == "pvmcrash");
     armWatchdog(qEnvironmentVariableIntValue("SIGEL_WATCHDOG_MS") > 0
                     ? qEnvironmentVariableIntValue("SIGEL_WATCHDOG_MS")
                     : (slow ? 900000 : 240000));
 
-    if (scenario == "visualize" || scenario == "evolution") {
+    if (scenario == "visualize" || scenario == "evolution"
+        || scenario == "pvmcrash") {
         int info = pvm_start_pvmd(0, 0, 0);
         int mytid = pvm_mytid();
         g_pvmOurDaemon = (info == 0);   // PvmDupHost means someone else's
@@ -3955,6 +3981,108 @@ int main(int argc, char **argv)
         return (total == 0 && fired > 0) ? 0 : 1;
     }
 
+    // --- formsize: a form the user can drag smaller than Qt 6 can lay out --
+    // The sibling of clipcheck, and it catches what clipcheck structurally
+    // cannot. clipcheck walks widgets at ONE size and asks whether any child
+    // leaves its parent. This asks a different question: what is the SMALLEST
+    // size the form permits, and can Qt lay the form out at that size?
+    //
+    // An explicit <minimumSize> in the .ui becomes setMinimumSize(), which
+    // OVERRIDES minimumSizeHint() -- so a form whose declared minimum is below
+    // what its layout needs can be dragged down until its children compress,
+    // and no walk at the default size sees it. The declared values are 1.3's,
+    // read under Qt 2's smaller default font; Qt 6's larger metrics are what
+    // make the layout need more. Raising them RESTORES 1.3's readability.
+    //
+    // A declared 0 means "unset", and Qt then uses the hint by itself -- those
+    // forms are correct as they are and are reported, not failed.
+    if (scenario == "formsize") {
+        struct Row { const char *name; std::function<QWidget *()> make; };
+        const Row forms[] = {
+            { "MT_AddConstantsWidgetBase",  [] { return (QWidget *) new MT_AddConstantsWidgetBase; } },
+            { "MT_AddIndividualsWidgetBase",[] { return (QWidget *) new MT_AddIndividualsWidgetBase; } },
+            { "MT_EstimationWidgetBase",    [] { return (QWidget *) new MT_EstimationWidgetBase; } },
+            { "MT_ExperimentWidgetBase",    [] { return (QWidget *) new MT_ExperimentWidgetBase; } },
+            { "MT_IndividualsWidgetBase",   [] { return (QWidget *) new MT_IndividualsWidgetBase; } },
+            { "MT_PopulationWidgetBase",    [] { return (QWidget *) new MT_PopulationWidgetBase; } },
+            { "MT_SearchWidgetBase",        [] { return (QWidget *) new MT_SearchWidgetBase; } },
+            { "MT_SelectionWidgetBase",     [] { return (QWidget *) new MT_SelectionWidgetBase; } },
+            { "MT_StatisticsWidgetBase",    [] { return (QWidget *) new MT_StatisticsWidgetBase; } },
+            { "SIG_EditHostDialogBase",     [] { return (QWidget *) new SIG_EditHostDialogBase; } },
+            { "SIG_EnvironmentBase",        [] { return (QWidget *) new SIG_EnvironmentBase; } },
+            { "SIG_ExperimentViewBase",     [] { return (QWidget *) new SIG_ExperimentViewBase; } },
+            { "SIG_GPParameterBase",        [] { return (QWidget *) new SIG_GPParameterBase; } },
+            { "SIG_IndividualListBase",     [] { return (QWidget *) new SIG_IndividualListBase; } },
+            { "SIG_IndividualViewBase",     [] { return (QWidget *) new SIG_IndividualViewBase; } },
+            { "SIG_LanguageParametersBase", [] { return (QWidget *) new SIG_LanguageParametersBase; } },
+            { "SIG_RobotBase",              [] { return (QWidget *) new SIG_RobotBase; } },
+            { "SIG_SimulationParameterBase",[] { return (QWidget *) new SIG_SimulationParameterBase; } },
+            { "SIG_MovieSettingsDialogBase",[] { return (QWidget *) new SIG_MovieSettingsDialogBase; } },
+            { "SIG_SimulationWidgetBase",   [] { return (QWidget *) new SIG_SimulationWidgetBase; } },
+        };
+        const int nForms = (int)(sizeof(forms) / sizeof(forms[0]));
+
+        // ALL TWENTY, not the six. A gate listing only the known-bad forms
+        // passes the moment a twenty-first is added or a good one regresses.
+        printf("\n== FORM MINIMUMS: declared <minimumSize> against Qt 6's minimumSizeHint ==\n");
+        printf("   %d forms; the corpus size is asserted below so a shortened\n", nForms);
+        printf("   list cannot pass by testing nothing.\n\n");
+        int tooSmall = 0, unset = 0, noHint = 0;
+        for (const Row &r : forms) {
+            QWidget *w = r.make();
+            w->ensurePolished();
+            const QSize dec = w->minimumSize();
+            const QSize hint = w->minimumSizeHint();
+            const char *verdict;
+            if (!hint.isValid()) { verdict = "no hint (no layout)"; ++noHint; }
+            else if (dec.width() == 0 && dec.height() == 0) {
+                verdict = "unset -- Qt uses the hint"; ++unset;
+            } else if (dec.width() < hint.width() || dec.height() < hint.height()) {
+                verdict = "TOO SMALL"; ++tooSmall;
+            } else verdict = "ok";
+            printf("  %-30s declared %4dx%-4d  hint %4dx%-4d  %s\n",
+                   r.name, dec.width(), dec.height(),
+                   hint.width(), hint.height(), verdict);
+            delete w;
+        }
+        printf("\n  TOO SMALL: %d   (unset: %d, no hint: %d, of %d forms)\n",
+               tooSmall, unset, noHint, nForms);
+
+        // THE POSITIVE CONTROL. "0 too small" is not evidence on its own -- if
+        // minimumSizeHint() came back invalid for every form, or the loop ran
+        // over nothing, the count would read 0 just the same. Take a form that
+        // passed, force its minimum below its own hint, and require the SAME
+        // comparison to report it.
+        printf("\n  -- selftest: lower one form's minimum below its hint --\n");
+        int fired = 0;
+        {
+            QWidget *w = forms[0].make();
+            w->ensurePolished();
+            const QSize hint = w->minimumSizeHint();
+            if (hint.isValid() && hint.width() > 1 && hint.height() > 1) {
+                w->setMinimumSize(1, 1);
+                const QSize dec = w->minimumSize();
+                const QSize h2 = w->minimumSizeHint();
+                if (dec.width() < h2.width() || dec.height() < h2.height()) fired = 1;
+                printf("    %s forced to %dx%d against hint %dx%d\n",
+                       forms[0].name, dec.width(), dec.height(),
+                       h2.width(), h2.height());
+            } else {
+                printf("    %s has no usable hint; the control could not run\n",
+                       forms[0].name);
+            }
+            delete w;
+        }
+        printf("  selftest %s\n", fired
+               ? "OK -- the check reports a minimum below the hint"
+               : "!! USELESS -- a forced-small minimum was not reported;"
+                 " a clean result proves nothing");
+        fflush(stdout);
+        // Fail on a real undersized form, on a check that cannot detect one,
+        // and on a corpus that shrank.
+        return (tooSmall == 0 && fired > 0 && nForms == 20) ? 0 : 1;
+    }
+
     // --- SIGEL_SlaveGUI: the slave's simulation window ---------------------
     // The last module C11 never drove. It is reachable WITHOUT PVM: the slave's
     // own standalone mode is `sigel_slave -visualize <exp>'
@@ -4457,7 +4585,19 @@ int main(int argc, char **argv)
     }
 
     // --- Start / Stop an evolution ----------------------------------------
-    if (scenario == "evolution") {
+    if (scenario == "evolution" || scenario == "pvmcrash") {
+        // --- pvmcrash: PORTING.md 9's "the pvmTasks crash is untried on the
+        // --- port". Everything below is the `evolution' scenario; the only
+        // --- difference is that a timer armed just before Start opens MetaGP >
+        // --- Configure System DURING the run, which is what kills 1.3.
+        //
+        // stdout is UNBUFFERED here and nowhere else. The expected outcome is
+        // that the process dies -- QList::operator[] asserts where Qt 2's
+        // QGVector printed a warning and segfaulted -- and a block-buffered
+        // transcript of a run that aborts is lost entirely. The same trap the
+        // termination assertion above hit, but here it is the whole point.
+        const bool crashProbe = (scenario == "pvmcrash");
+        if (crashProbe) setvbuf(stdout, nullptr, _IONBF, 0);
         SIG_ExperimentListView *lv = listView();
 
         // A generation is one evaluation per individual, each a full physics
@@ -4717,9 +4857,54 @@ int main(int argc, char **argv)
             lastGen = gen;
         });
         sampler.start(2000);
+
+        // THE INJECTED EVENT. slotStartEvolution() blocks for the whole run and
+        // the loop stays responsive only through SIG_GUIGPManager::haveABreak()'s
+        // processEvents(), so a single-shot timer armed HERE fires from inside
+        // the running evolution -- which is the only way to reach the unchecked
+        // pvmTasks[ taskId ] read in checkTask() the way a user's click does.
+        //
+        // SIGEL_CRASH_AT_MS=0 is the CONTROL: the identical run with no injected
+        // event. Without it a crash proves only that the run crashed, not that
+        // opening the window is what did it -- the mistake that made the oracle
+        // withdraw "MetaGP crashes 1.3" and then "mid-run GUI interaction
+        // crashes 1.3", both generalised over a factor that moved with the
+        // trigger.
+        QTimer inject;
+        const int crashAtMs = qEnvironmentVariableIntValue("SIGEL_CRASH_AT_MS");
+        if (crashProbe && crashAtMs > 0) {
+            inject.setSingleShot(true);
+            QObject::connect(&inject, &QTimer::timeout, [&]() {
+                printf("\n  >> INJECTING MetaGP > Configure System, %d ms into the run\n",
+                       crashAtMs);
+                // Leave the MetaGP window OPEN, exactly as the oracle's runs did.
+                // A handler that closes what it finds closes MT_MainWindow itself
+                // -- the mistake C12 records three wrong conclusions from.
+                whenModal([](QWidget *m) {
+                    printf("  [modal during run] %s [%s]\n",
+                           m->metaObject()->className(), qPrintable(m->windowTitle()));
+                    if (qobject_cast<QMessageBox *>(m)) { describeMessageBox(m); m->close(); }
+                    else printf("    (left open)\n");
+                }, 8000);
+                clickMenu("&MetaGP", "&Configure System");
+                printf("  >> the click returned; the process is still alive\n");
+            });
+            inject.start(crashAtMs);
+            printf("  [inject] armed for t+%d ms\n", crashAtMs);
+        } else if (crashProbe) {
+            printf("  [inject] CONTROL RUN -- no event will be injected\n");
+        }
+        fflush(stdout);
+
         runClock.start();
         printf("\n  >> clicking Start\n"); fflush(stdout);
         QTest::mouseClick(start, Qt::LeftButton, Qt::NoModifier, start->rect().center());
+        if (crashProbe) {
+            inject.stop();
+            printf("\n  >> SURVIVED: Start returned normally%s\n",
+                   crashAtMs > 0 ? " WITH the event injected" : " (control run)");
+            fflush(stdout);
+        }
         const qint64 runMs = runClock.elapsed();
         sampler.stop();
         // The cost of a generation ON THIS MACHINE. PORTING.md 9 records the

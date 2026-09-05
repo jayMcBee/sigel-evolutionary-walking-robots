@@ -36,6 +36,222 @@
 #     eats it and underlines the space instead.
 #
 # A failure here is a regression against SIGEL 1.3, not against this file.
+#
+# ---------------------------------------------------------------------------
+# From here on: PORTING.md step C11, the five View pages C10 never opened.
+#
+# C10 drove ONE of the six View pages. The other five hold every spin box,
+# slider, combo, checkbox and validator in the application, and C7 had
+# converted 21 validators that nothing on either side had ever typed into.
+#
+# WHAT HAS AN ORACLE READING BEHIND IT, and what does not, stated per block
+# rather than in general, because the two are not the same strength:
+#
+#   VALIDATOR BATTERY -- confirmed against the running 1.3 binary, all twelve
+#     probes, character for character, by the sigel-x86 oracle driving the
+#     2003 i386 build with XTest. Both the double field and the integer field.
+#     1.3 accepts the exponent "1e3", takes a leading minus in the INTEGER
+#     field, turns "1.2.3" into "1.23" and "9,81" into "981" -- the comma
+#     rejected as a keystroke, leaving a gap. The port does all four the same.
+#
+#   comma probes on the other validated fields -- four of them spot-checked on
+#     1.3 (Planar spring constant, Level, Step Size, Maximal Error), all
+#     "9,81" -> "981". The rest are the port's own measurement.
+#
+#   LOCALE INDEPENDENCE -- check.sh re-runs this whole scenario under
+#     LANG=de_DE.UTF-8 and requires it to be IDENTICAL. That is not a Qt 6
+#     nicety: the oracle built a de_DE with WOODY'S OWN localedef, verified it
+#     with woody's own locale binary, ran the 2003 binary under it and got the
+#     same seven results. So 1.3 is locale-independent as measured, and the
+#     port matches. Reverting C7's locale pinning breaks it loudly -- "9.81"
+#     becomes UNACCEPTABLE and "9,81" becomes accepted text that
+#     QString::toDouble() reads back as ZERO, straight into the saved file.
+#
+#   spin boxes, sliders, combos, checkboxes, the two interlocks -- the port's
+#     own driven measurement. Deterministic across runs and across three
+#     locales, all measured. Where a 1.3 reading exists it is noted above.
+#
+# THE TWO INTERLOCKS ARE THE PART WORTH READING. Neither is visible without
+# driving. The genetic sliders are not independent: Mutation + Crossover is
+# clamped at 1000 and Reproduction is the recomputed remainder, so 200 Up on
+# Mutation takes it 50 -> 250 and drops Reproduction 280 -> 80 with the sum
+# staying exactly 1000; 200 Up on Crossover then stops at 750 rather than
+# reaching 870. And sliderAlpha starts DISABLED -- the texture checkbox owns
+# it -- so the generic probe measures a slider that cannot move, which is
+# correct and says nothing; it is driven for real after the checkbox.
+#
+# QTest IS NOT A MOUSE. It posts QMouseEvent, QKeyEvent and QContextMenuEvent
+# through QApplication::notify, so hit-testing, key handling, item-view
+# selection and the slots behind them all run -- but it bypasses
+# QWindowSystemInterface, so activation, grabs and double-click synthesis are
+# not what a real click produces. The oracle's side WAS driven by real XTest,
+# so every comparison above has a genuine click on one end.
+# ---------------------------------------------------------------------------
+#
+# ---------------------------------------------------------------------------
+# From here on: PORTING.md step C11b, the Import/Export round trips.
+#
+# C10 drove ONE of the sixteen Import/Export children. These are FILE FORMATS,
+# so the comparison is bytes -- the one kind of check i386-x87 against
+# aarch64-IEEE cannot muddy, which is why this item was ordered ahead of the
+# dialogs.
+#
+# SEVEN OF THE EIGHT EXPORTS ARE BYTE-IDENTICAL TO WHAT THE 2003 i386 BINARY
+# WRITES. The sigel-x86 oracle drove the same eight exports on 1.3 with XTest
+# against the same experiment with the same individual selected, and compared
+# sha256, byte count, LF count, CR count and the trailing byte. So a move in
+# any checksum below is a regression against 1.3, not against yesterday.
+#
+#   .gpp .sip .env .pop .prg .ind .dat   identical
+#   .lap                                 differs, and the reason is below
+#
+# The .dat is the one worth pausing on: 532 lines of floating-point output --
+# generation, best, worst, average -- byte-identical across the two
+# architectures. That was NOT expected and is a stronger result than the
+# parameter files, which are text.
+#
+# .pop and .ind do NOT end with a newline. Measured on both sides.
+#
+# WHY .lap DIFFERS, and why the port is not the one that is wrong. 1.3 held the
+# commands in a QDict and wrote them with a QDictIterator, so it emits them in
+# HASH order; Phase D replaced that with an ordered QList, so the port emits
+# the order the file supplied. Loading twoBasesSimpleFitness2.exp and exporting
+# straight back, 1.3 returns a DIFFERENT order from the one it read -- exactly
+# four pairwise swaps, MOVE/CMP, SUB/DIV, MIN/ADD and MOD/MAX, the four chains
+# that collide -- because Q2Dict::insert prepends and re-inserting in iteration
+# order reverses every colliding chain. The port preserves what it read. That
+# is Phase D's documented consequence, not a C11b defect: "once the shim goes,
+# load and save become order-preserving".
+#
+# THE OVERWRITE PROMPT IS A 1.3 DEFECT AND IS PRESERVED. All five parameter
+# exports are shaped
+#     if ( file.exists() ) switch ( warning(...) ) { case Yes: write; }
+#     write;                                    <-- NOT inside the switch
+# so answering NO writes the file anyway. Verified in the PRISTINE 1.3 source
+# and then on the RUNNING binary: the oracle wrote a sentinel over an exported
+# file, exported again, answered No, and the sentinel was gone. The line that
+# guards it here is `sentinelSurvived=0'. A 1 would mean the port had started
+# honouring the prompt -- an improvement, and a divergence.
+#
+# Two dialogs appear, not three. Qt 6's getSaveFileName raises its own
+# "already exists" confirmation where Qt 2's had none, but it cannot fire here:
+# the name typed carries no extension, checkEnding() appends it AFTER the
+# dialog has closed, so Qt's check sees a name that does not exist. Typing the
+# extension does produce Qt's extra box; that is a file-dialog difference and
+# section 7 already accepts those.
+#
+# QTest IS NOT A MOUSE -- see the C11a note above. The oracle's side was driven
+# by real XTest, so every comparison here has a genuine click on one end.
+# ---------------------------------------------------------------------------
+#
+# ---------------------------------------------------------------------------
+# From here on: PORTING.md step C11c, the six dialogs.
+#
+# THE LOAD-BEARING LINES ARE THE TWO `typing' ONES. Qt 6's QLineEdit selects
+# its text when a dialog hands it focus down the tab chain; Qt 2's did not, and
+# SIGEL only calls setText() then setFocus(). So before C11c a typed digit
+# REPLACED the pre-filled value where 1.3 appends to it:
+#
+#     Edit Command duration  0.01 + "5"  ->  1.3: 0.015   port was: 5
+#     Add individuals number 1    + "2"  ->  1.3: 12      port was: 2
+#
+# Both 1.3 figures are the oracle's, read off the running 2003 binary. The
+# second is the one that costs: adding TWELVE individuals where two were meant
+# leaves nothing wrong-looking behind, where a wrong duration at least shows.
+# Fixed at four sites with a QUEUED end(false) -- queued because the selection
+# does not exist until exec() shows the dialog, and end() rather than
+# deselect() because deselect leaves the cursor at position 0, which made
+# 1 + "2" read 21 rather than 12.
+#
+# Rename is deliberately NOT in that set: it calls selectAll() explicitly
+# (SIG_ExperimentListView.cpp:97) and the oracle measured it pre-selecting in
+# BOTH versions back in C10. Two of its readings eight steps apart, explained
+# by three lines of code.
+#
+# C7's TWENTY-FIRST VALIDATOR is here, on SIG_EditCommandDialog -- the one
+# C11a could not reach. Its seven probes match the other twenty and match 1.3.
+# That closes the set at 21 of 21.
+#
+# A DIVERGENCE KEPT ON PURPOSE, recorded here so it is not mistaken for a
+# regression: allowing a disallowed command calls addCommand(), which APPENDS
+# to Phase D's ordered list, where Qt 2's QDict inserted at a hash position.
+# Predicted before asking and confirmed on the binary character for character:
+# 1.3 puts JMP SIXTH, straight after LOAD. Matching it would mean
+# reimplementing Q2Dict, which is what Phase D removed -- see PORTING.md C11c.
+# The written order after allowing JMP is in this baseline; it ends in JMP.
+#
+# WHAT ELSE THE ORACLE CONFIRMED: every title and label, OK carrying the
+# default border on all four button dialogs, radio exclusivity, the Edit Host
+# slave directory populated, Enable host checked (calibrated twice), both spin
+# ranges, the Robot Information text and that its HTML is rendered rather than
+# shown as tags, and that IndividualView is non-modal, has no buttons and
+# ignores Escape -- which it is because SIG_IndividualViewBase derives from
+# QWidget, not QDialog.
+#
+# QTest IS NOT A MOUSE -- see the C11a note above.
+# ---------------------------------------------------------------------------
+#
+# ---------------------------------------------------------------------------
+# From here on: PORTING.md, MT_GUI -- the MetaGP window.
+#
+# Reached by MetaGP > Use MetaGP, then MetaGP > Configure System. Nothing had
+# ever opened it on either side. It is application-modal -- the oracle proved
+# that with a control rather than a null: with the window open, a click on the
+# main window's tree changed 0 pixels; with it closed, the identical click at
+# the same coordinates changed 4397.
+#
+# THE LOAD-BEARING LINES ARE THE `locale=[C] numberOptions=2' ONES AND THE
+# `group' PROBES. C7 pinned SIGEL_MasterGUI's 21 validators to QLocale::c()
+# with RejectGroupSeparator; MT_GUI has ten more and NONE of them had been.
+# It does not need a foreign locale to bite -- measured directly against Qt 6:
+#
+#     unpinned QIntValidator(0,1000), locale en_US, group separator ','
+#         validate("1,000") = ACCEPTABLE
+#         "1,000".toInt()   = 0, ok=false
+#
+# A user types one thousand, the field says it is fine, and ZERO reaches the
+# system. Under de_DE the same happens with "1.000". Before the fix, 138 lines
+# of this scenario changed under de_DE; now it is byte-identical, and the
+# `group' probes read [1000] with toInt=1000.
+#
+# 1.3 REJECTS BOTH SEPARATORS -- read off the running binary, typing into the
+# SWT field one character at a time: "1,000", "1.000" and "1000" all leave the
+# field reading 1000. So this is a RESTORATION of Qt 2 behaviour, not an
+# improvement on it. Qt 2 forced LC_NUMERIC="C" process-wide.
+#
+# The fix is applied at BOTH creation sites in MT_AddConstantsWidget: the type
+# radio deletes and rebuilds its validators, so pinning them only in the
+# constructor would be undone the first time a user switches between integer
+# and float constants.
+#
+# THE CONSTANTS LIST IS NOT PINNED, DELIBERATELY. MT_IndividualsWidget
+# generates its 30 constants with a randomizer at construction, so the values
+# differ every run -- two runs of this scenario differed by exactly those 60
+# lines and nothing else. What is invariant is the count and that every one
+# parses as an integer in range, and that is what is checked instead.
+#
+# TREE LABEL TO SOURCE CLASS, because they do not match and both sides needed
+# the mapping: Strategy = MT_EstimationWidget, Individual = MT_IndividualsWidget,
+# Population = MT_PopulationWidget, GP Parameter = MT_SearchWidget,
+# Selection = MT_SelectionWidget, Statistics = MT_StatisticsWidget.
+# MT_ExperimentWidget is not a page at all -- it is the tree on the left.
+#
+# QTest IS NOT A MOUSE -- see the C11a note above.
+# ---------------------------------------------------------------------------
+#
+# 2026-09-05: THE ONE LINE THAT MOVED, and why it is not a regression.
+# `[window] class=MT_MainWindow ... 680x595' became 680x654 when the six form
+# minimums were raised to what Qt 6.10.2's minimumSizeHint actually reports.
+# MT_MainWindow.cpp:33 asks for resize(680, 595) and does NOT get it on EITHER
+# version: the oracle measured 1.3 opening that window at 680x605 with a
+# WM_NORMAL_HINTS minimum of 625x605, so Qt 2 already overrode the resize() by
+# 10 px to satisfy its own layout. 1.3's window cannot be dragged shorter than
+# it opens, and at its own 605 the Statistics page is ALREADY clipped -- group
+# border and frame border both cut -- becoming complete at 654, which is where
+# the port now opens. Raising the minimum reproduces 1.3's BEHAVIOUR (honour the
+# layout minimum over the resize call); matching 595 would reproduce neither its
+# size nor its behaviour. Recaptured from a run that carried no failure marker.
+# PORTING.md, "The MetaGP window grew 59 px".
 == SCENARIO gate ==
 
 == STEP 1: fresh start, no experiment ==
@@ -256,57 +472,6 @@ we do with the system?]
   button [Disable] default=1
   button [Remove] default=0
   button [Save && Remove] default=0
-#
-# ---------------------------------------------------------------------------
-# From here on: PORTING.md step C11, the five View pages C10 never opened.
-#
-# C10 drove ONE of the six View pages. The other five hold every spin box,
-# slider, combo, checkbox and validator in the application, and C7 had
-# converted 21 validators that nothing on either side had ever typed into.
-#
-# WHAT HAS AN ORACLE READING BEHIND IT, and what does not, stated per block
-# rather than in general, because the two are not the same strength:
-#
-#   VALIDATOR BATTERY -- confirmed against the running 1.3 binary, all twelve
-#     probes, character for character, by the sigel-x86 oracle driving the
-#     2003 i386 build with XTest. Both the double field and the integer field.
-#     1.3 accepts the exponent "1e3", takes a leading minus in the INTEGER
-#     field, turns "1.2.3" into "1.23" and "9,81" into "981" -- the comma
-#     rejected as a keystroke, leaving a gap. The port does all four the same.
-#
-#   comma probes on the other validated fields -- four of them spot-checked on
-#     1.3 (Planar spring constant, Level, Step Size, Maximal Error), all
-#     "9,81" -> "981". The rest are the port's own measurement.
-#
-#   LOCALE INDEPENDENCE -- check.sh re-runs this whole scenario under
-#     LANG=de_DE.UTF-8 and requires it to be IDENTICAL. That is not a Qt 6
-#     nicety: the oracle built a de_DE with WOODY'S OWN localedef, verified it
-#     with woody's own locale binary, ran the 2003 binary under it and got the
-#     same seven results. So 1.3 is locale-independent as measured, and the
-#     port matches. Reverting C7's locale pinning breaks it loudly -- "9.81"
-#     becomes UNACCEPTABLE and "9,81" becomes accepted text that
-#     QString::toDouble() reads back as ZERO, straight into the saved file.
-#
-#   spin boxes, sliders, combos, checkboxes, the two interlocks -- the port's
-#     own driven measurement. Deterministic across runs and across three
-#     locales, all measured. Where a 1.3 reading exists it is noted above.
-#
-# THE TWO INTERLOCKS ARE THE PART WORTH READING. Neither is visible without
-# driving. The genetic sliders are not independent: Mutation + Crossover is
-# clamped at 1000 and Reproduction is the recomputed remainder, so 200 Up on
-# Mutation takes it 50 -> 250 and drops Reproduction 280 -> 80 with the sum
-# staying exactly 1000; 200 Up on Crossover then stops at 750 rather than
-# reaching 870. And sliderAlpha starts DISABLED -- the texture checkbox owns
-# it -- so the generic probe measures a slider that cannot move, which is
-# correct and says nothing; it is driven for real after the checkbox.
-#
-# QTest IS NOT A MOUSE. It posts QMouseEvent, QKeyEvent and QContextMenuEvent
-# through QApplication::notify, so hit-testing, key handling, item-view
-# selection and the slots behind them all run -- but it bypasses
-# QWindowSystemInterface, so activation, grabs and double-click synthesis are
-# not what a real click produces. The oracle's side WAS driven by real XTest,
-# so every comparison above has a genuine click on one end.
-# ---------------------------------------------------------------------------
 == SCENARIO pages ==
 
 == STEP 1: fresh start, no experiment ==
@@ -778,62 +943,6 @@ we do with the system?]
     after 200 Up on Crossover    mut=250   cro=750   rep=0      lcd 25 / 75 / 0  sum=1000
     after 200 Down on Mutation   mut=50    cro=750   rep=200    lcd 5 / 75 / 20  sum=1000
     after dragging Mutation hard right mut=250   cro=750   rep=0      lcd 25 / 75 / 0  sum=1000
-#
-# ---------------------------------------------------------------------------
-# From here on: PORTING.md step C11b, the Import/Export round trips.
-#
-# C10 drove ONE of the sixteen Import/Export children. These are FILE FORMATS,
-# so the comparison is bytes -- the one kind of check i386-x87 against
-# aarch64-IEEE cannot muddy, which is why this item was ordered ahead of the
-# dialogs.
-#
-# SEVEN OF THE EIGHT EXPORTS ARE BYTE-IDENTICAL TO WHAT THE 2003 i386 BINARY
-# WRITES. The sigel-x86 oracle drove the same eight exports on 1.3 with XTest
-# against the same experiment with the same individual selected, and compared
-# sha256, byte count, LF count, CR count and the trailing byte. So a move in
-# any checksum below is a regression against 1.3, not against yesterday.
-#
-#   .gpp .sip .env .pop .prg .ind .dat   identical
-#   .lap                                 differs, and the reason is below
-#
-# The .dat is the one worth pausing on: 532 lines of floating-point output --
-# generation, best, worst, average -- byte-identical across the two
-# architectures. That was NOT expected and is a stronger result than the
-# parameter files, which are text.
-#
-# .pop and .ind do NOT end with a newline. Measured on both sides.
-#
-# WHY .lap DIFFERS, and why the port is not the one that is wrong. 1.3 held the
-# commands in a QDict and wrote them with a QDictIterator, so it emits them in
-# HASH order; Phase D replaced that with an ordered QList, so the port emits
-# the order the file supplied. Loading twoBasesSimpleFitness2.exp and exporting
-# straight back, 1.3 returns a DIFFERENT order from the one it read -- exactly
-# four pairwise swaps, MOVE/CMP, SUB/DIV, MIN/ADD and MOD/MAX, the four chains
-# that collide -- because Q2Dict::insert prepends and re-inserting in iteration
-# order reverses every colliding chain. The port preserves what it read. That
-# is Phase D's documented consequence, not a C11b defect: "once the shim goes,
-# load and save become order-preserving".
-#
-# THE OVERWRITE PROMPT IS A 1.3 DEFECT AND IS PRESERVED. All five parameter
-# exports are shaped
-#     if ( file.exists() ) switch ( warning(...) ) { case Yes: write; }
-#     write;                                    <-- NOT inside the switch
-# so answering NO writes the file anyway. Verified in the PRISTINE 1.3 source
-# and then on the RUNNING binary: the oracle wrote a sentinel over an exported
-# file, exported again, answered No, and the sentinel was gone. The line that
-# guards it here is `sentinelSurvived=0'. A 1 would mean the port had started
-# honouring the prompt -- an improvement, and a divergence.
-#
-# Two dialogs appear, not three. Qt 6's getSaveFileName raises its own
-# "already exists" confirmation where Qt 2's had none, but it cannot fire here:
-# the name typed carries no extension, checkEnding() appends it AFTER the
-# dialog has closed, so Qt's check sees a name that does not exist. Typing the
-# extension does produce Qt's extra box; that is a file-dialog difference and
-# section 7 already accepts those.
-#
-# QTest IS NOT A MOUSE -- see the C11a note above. The oracle's side was driven
-# by real XTest, so every comparison here has a genuine click on one end.
-# ---------------------------------------------------------------------------
 == SCENARIO exportall ==
 
 == STEP 1: fresh start, no experiment ==
@@ -1152,53 +1261,6 @@ Do you want to overwrite?]
   (1.3 writes the file regardless of the answer -- the write after
    the switch is not inside it. sentinelSurvived=0 is 1.3's defect,
    preserved. A 1 would mean the port started honouring the prompt.)
-#
-# ---------------------------------------------------------------------------
-# From here on: PORTING.md step C11c, the six dialogs.
-#
-# THE LOAD-BEARING LINES ARE THE TWO `typing' ONES. Qt 6's QLineEdit selects
-# its text when a dialog hands it focus down the tab chain; Qt 2's did not, and
-# SIGEL only calls setText() then setFocus(). So before C11c a typed digit
-# REPLACED the pre-filled value where 1.3 appends to it:
-#
-#     Edit Command duration  0.01 + "5"  ->  1.3: 0.015   port was: 5
-#     Add individuals number 1    + "2"  ->  1.3: 12      port was: 2
-#
-# Both 1.3 figures are the oracle's, read off the running 2003 binary. The
-# second is the one that costs: adding TWELVE individuals where two were meant
-# leaves nothing wrong-looking behind, where a wrong duration at least shows.
-# Fixed at four sites with a QUEUED end(false) -- queued because the selection
-# does not exist until exec() shows the dialog, and end() rather than
-# deselect() because deselect leaves the cursor at position 0, which made
-# 1 + "2" read 21 rather than 12.
-#
-# Rename is deliberately NOT in that set: it calls selectAll() explicitly
-# (SIG_ExperimentListView.cpp:97) and the oracle measured it pre-selecting in
-# BOTH versions back in C10. Two of its readings eight steps apart, explained
-# by three lines of code.
-#
-# C7's TWENTY-FIRST VALIDATOR is here, on SIG_EditCommandDialog -- the one
-# C11a could not reach. Its seven probes match the other twenty and match 1.3.
-# That closes the set at 21 of 21.
-#
-# A DIVERGENCE KEPT ON PURPOSE, recorded here so it is not mistaken for a
-# regression: allowing a disallowed command calls addCommand(), which APPENDS
-# to Phase D's ordered list, where Qt 2's QDict inserted at a hash position.
-# Predicted before asking and confirmed on the binary character for character:
-# 1.3 puts JMP SIXTH, straight after LOAD. Matching it would mean
-# reimplementing Q2Dict, which is what Phase D removed -- see PORTING.md C11c.
-# The written order after allowing JMP is in this baseline; it ends in JMP.
-#
-# WHAT ELSE THE ORACLE CONFIRMED: every title and label, OK carrying the
-# default border on all four button dialogs, radio exclusivity, the Edit Host
-# slave directory populated, Enable host checked (calibrated twice), both spin
-# ranges, the Robot Information text and that its HTML is rendered rather than
-# shown as tags, and that IndividualView is non-modal, has no buttons and
-# ignores Escape -- which it is because SIG_IndividualViewBase derives from
-# QWidget, not QDialog.
-#
-# QTest IS NOT A MOUSE -- see the C11a note above.
-# ---------------------------------------------------------------------------
 == SCENARIO dialogs ==
 
 == STEP 1: fresh start, no experiment ==
@@ -1404,54 +1466,6 @@ Do you want to overwrite?]
     spin                                        v=1         [1..999] step=1 pre=[] suf=[] up=2         dn2=1         typed(max+1)=[100]->100 commits=not-pressed(in a dialog) enabled=1
     [still open before Cancel] visible=1
   rows 120 -> 120 (Cancel must add nothing)
-#
-# ---------------------------------------------------------------------------
-# From here on: PORTING.md, MT_GUI -- the MetaGP window.
-#
-# Reached by MetaGP > Use MetaGP, then MetaGP > Configure System. Nothing had
-# ever opened it on either side. It is application-modal -- the oracle proved
-# that with a control rather than a null: with the window open, a click on the
-# main window's tree changed 0 pixels; with it closed, the identical click at
-# the same coordinates changed 4397.
-#
-# THE LOAD-BEARING LINES ARE THE `locale=[C] numberOptions=2' ONES AND THE
-# `group' PROBES. C7 pinned SIGEL_MasterGUI's 21 validators to QLocale::c()
-# with RejectGroupSeparator; MT_GUI has ten more and NONE of them had been.
-# It does not need a foreign locale to bite -- measured directly against Qt 6:
-#
-#     unpinned QIntValidator(0,1000), locale en_US, group separator ','
-#         validate("1,000") = ACCEPTABLE
-#         "1,000".toInt()   = 0, ok=false
-#
-# A user types one thousand, the field says it is fine, and ZERO reaches the
-# system. Under de_DE the same happens with "1.000". Before the fix, 138 lines
-# of this scenario changed under de_DE; now it is byte-identical, and the
-# `group' probes read [1000] with toInt=1000.
-#
-# 1.3 REJECTS BOTH SEPARATORS -- read off the running binary, typing into the
-# SWT field one character at a time: "1,000", "1.000" and "1000" all leave the
-# field reading 1000. So this is a RESTORATION of Qt 2 behaviour, not an
-# improvement on it. Qt 2 forced LC_NUMERIC="C" process-wide.
-#
-# The fix is applied at BOTH creation sites in MT_AddConstantsWidget: the type
-# radio deletes and rebuilds its validators, so pinning them only in the
-# constructor would be undone the first time a user switches between integer
-# and float constants.
-#
-# THE CONSTANTS LIST IS NOT PINNED, DELIBERATELY. MT_IndividualsWidget
-# generates its 30 constants with a randomizer at construction, so the values
-# differ every run -- two runs of this scenario differed by exactly those 60
-# lines and nothing else. What is invariant is the count and that every one
-# parses as an integer in range, and that is what is checked instead.
-#
-# TREE LABEL TO SOURCE CLASS, because they do not match and both sides needed
-# the mapping: Strategy = MT_EstimationWidget, Individual = MT_IndividualsWidget,
-# Population = MT_PopulationWidget, GP Parameter = MT_SearchWidget,
-# Selection = MT_SelectionWidget, Statistics = MT_StatisticsWidget.
-# MT_ExperimentWidget is not a page at all -- it is the tree on the left.
-#
-# QTest IS NOT A MOUSE -- see the C11a note above.
-# ---------------------------------------------------------------------------
 == SCENARIO metagui ==
 
 == STEP 1: fresh start, no experiment ==
@@ -1562,7 +1576,7 @@ Do you want to overwrite?]
   [modal] class=MT_MainWindow title=[SIGEL MetaGP]
   [modal on configure] MT_MainWindow [SIGEL MetaGP]
     (left open -- this is the window under test)
-  [window] class=MT_MainWindow title=[SIGEL MetaGP] 680x595 modal=1
+  [window] class=MT_MainWindow title=[SIGEL MetaGP] 680x654 modal=1
   [toolbar] mtFileToolBar          title=[MT File]
     action &Default               enabled=1 checkable=0 checked=0 icon=1 sizes=2
     ---

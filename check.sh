@@ -625,6 +625,45 @@ rm -f /tmp/clip.$$
 printf '%-22s %2d pass  %2d fail\n' "no clipped controls" "$cp" "$cf"
 pass=$((pass+cp)); fail=$((fail+cf))
 
+# ---------------------------------------------------------------------------
+# Forms that can be dragged smaller than Qt 6 can lay them out.
+#
+# The question clipcheck structurally CANNOT ask. clipcheck walks widgets at
+# one size and reports any child that leaves its parent; this asks what the
+# smallest permitted size IS. An explicit <minimumSize> in a .ui becomes
+# setMinimumSize(), which overrides minimumSizeHint() -- so a form whose
+# declared minimum is below what its layout needs can be dragged down until its
+# children compress, and a walk at the default size sees nothing wrong. Six
+# forms were in that state until 2026-09-05; MT_StatisticsWidgetBase was the
+# worst, 220x390 against a needed 402x555, and it sits in the MetaTrainer's
+# QSplitter where a user can really drag it there.
+#
+# All TWENTY forms are measured, not the six that were wrong -- the scenario
+# asserts the corpus is 20, so a shortened list cannot pass by testing nothing,
+# which is the shape this file has been bitten by three times.
+#
+# The teeth: guidrive's own selftest forces one form's minimum below its hint
+# and requires the same comparison to report it, so "TOO SMALL: 0" is not a
+# clean result from a check that cannot fire. Measured the other way too --
+# putting MT_StatisticsWidgetBase back to 220x390 makes this section fail by
+# name. See PORTING.md.
+mp=0; mf=0
+if make -q B=build-fast SAN= SIGSAN= guidrive 2>/dev/null \
+   && SIGEL_ROOT="$SRC" QT_QPA_PLATFORM=offscreen \
+      SIGEL_EXP="$ROOT/data-reordered/Experiments/twoBasesSimpleFitness2.exp" \
+      SIGEL_SCRATCH="${TMPDIR:-/tmp}" \
+      timeout 300 "$ROOT/build-fast/guidrive" formsize >/tmp/fmin.$$ 2>/dev/null; then
+    mp=1
+else
+    mf=1
+    echo "  a form declares a minimum below what Qt 6 needs to lay it out,"
+    echo "  or the check cannot detect one:"
+    sed -n '/TOO SMALL\|selftest\|!!/p' /tmp/fmin.$$ | sed 's/^/    /'
+fi
+rm -f /tmp/fmin.$$
+printf '%-22s %2d pass  %2d fail\n' "form minimums" "$mp" "$mf"
+pass=$((pass+mp)); fail=$((fail+mf))
+
 # The same defect, in the two containers where it was actually FOUND -- and
 # clipcheck cannot see either of them. Its own comment says so: the slave's
 # simulation window and its movie-settings dialog belong to the slave, not to
