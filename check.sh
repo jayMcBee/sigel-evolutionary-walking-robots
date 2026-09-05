@@ -173,7 +173,7 @@ for m in $MODULES; do
         # only honest alternative to a red run for ever.
         case "${f##*/}" in WIN_*) winskip=$((winskip+1)); continue ;; esac
         if g++ $FLAGS $INCS "$f" 2>/tmp/chk.$$; then mp=$((mp+1)); else mf=$((mf+1)); fi
-        mw=$((mw + $(grep -c "$SRC.*warning:" /tmp/chk.$$ || true)))
+        mw=$((mw + $(command grep -ac "$SRC.*warning:" /tmp/chk.$$ || true)))
     done
     # Dead string-based connects. A SIGNAL() naming a signal Qt 6 does not have
     # compiles, links, runs and never fires -- there is no other check in this
@@ -598,6 +598,20 @@ pass=$((pass+vp)); fail=$((fail+vf))
 # converted pages carry real layouts and reflow instead of clipping, where 1.3
 # is absolutely positioned and does clip. So it displaces a real widget instead
 # and requires the report.
+# BUILD IT FIRST. This section and the one below it run 240 lines BEFORE the
+# `gui behaviour' section that builds guidrive, so until 2026-09-05 the first
+# ./check.sh after editing guidrive.cpp -- or after editing anything guidrive
+# links -- scored a STALE binary here and a fresh one there. That is the exact
+# shape fitness-check.sh and pvm-check.sh already guard against, applied to the
+# wrong end of this script. Note also that `make -q B=build-fast SAN= SIGSAN='
+# with no target answers for `all', which does NOT depend on guidrive: it
+# reports up to date while build-fast/guidrive is stale. Name the target.
+if ! make -s -C "$ROOT" B=build-fast SAN= SIGSAN= guidrive >/tmp/gdb.$$ 2>&1; then
+    echo "  guidrive does not build; the two clip checks below prove nothing:"
+    tail -6 /tmp/gdb.$$ | sed 's/^/    /'
+fi
+rm -f /tmp/gdb.$$
+
 cp=0; cf=0
 if SIGEL_ROOT="$SRC" QT_QPA_PLATFORM=offscreen \
        SIGEL_EXP="$ROOT/data-reordered/Experiments/twoBasesSimpleFitness2.exp" \
@@ -610,6 +624,61 @@ fi
 rm -f /tmp/clip.$$
 printf '%-22s %2d pass  %2d fail\n' "no clipped controls" "$cp" "$cf"
 pass=$((pass+cp)); fail=$((fail+cf))
+
+# The same defect, in the two containers where it was actually FOUND -- and
+# clipcheck cannot see either of them. Its own comment says so: the slave's
+# simulation window and its movie-settings dialog belong to the slave, not to
+# anything the master's menus can open, so they are walked by the `slavegui'
+# scenario instead. Nothing here ran `slavegui', so until this section existed
+# BOTH fixes -- GroupBox6 "Navigation" 90x37 against a needed 220x331, and
+# groupboxDirectory "File conventions" 465x37 against 401x99 -- were ungated,
+# while PORTING.md said they were gated by the section above. Found by review.
+#
+# This greps the two totals rather than diffing the whole scenario, because the
+# rest of slavegui's output covers a GL view that does not render offscreen and
+# would baseline noise. The teeth are the fixes themselves: deleting either
+# <minimumSize> block from its .ui and rebuilding makes the matching line
+# non-zero and this section fail -- measured both ways, see PORTING.md.
+#
+# Its stderr is KEPT, not discarded, because this is also the only run of
+# SIGEL_SlaveGUI in the whole gate: 44 SIGNAL( and 44 SLOT( sites that had no
+# runtime coverage at all until now. Same positive control as the two sections
+# below -- guidrive makes one deliberately bogus connect at startup, so an empty
+# stderr means the logging was suppressed, not that the connects are sound.
+sp=0; sf=0
+if SIGEL_ROOT="$SRC" QT_QPA_PLATFORM=offscreen \
+       SIGEL_EXP="$ROOT/data-reordered/Experiments/twoBasesSimpleFitness2.exp" \
+       SIGEL_SCRATCH="${TMPDIR:-/tmp}" \
+       timeout 300 "$ROOT/build-fast/guidrive" slavegui >/tmp/sclip.$$ 2>/tmp/serr.$$; then
+    # Both lines must be PRESENT and read 0. A missing line is a walk that did
+    # not happen, which is the "0 clipped from a check that never ran" shape.
+    got=$(sed -n 's/.*\(slave window\|movie settings dialog\) *[0-9]* visible widgets, \([0-9]*\) clipped.*/\1=\2/p' /tmp/sclip.$$)
+    if [ "$(printf '%s\n' "$got" | wc -l)" -ne 2 ] || printf '%s\n' "$got" | command grep -qv '=0$'; then
+        sf=1
+        echo "  the slave window or the movie dialog clips a control, or the walk"
+        echo "  did not run -- both lines must be present and read 0:"
+        printf '%s\n' "$got" | sed 's/^/    /'
+    elif ! command grep -q guidriveStderrControl /tmp/serr.$$; then
+        sf=1
+        echo "  Qt's connect logging is SUPPRESSED -- SIGEL_SlaveGUI's connects"
+        echo "  were not checked. Unset QT_LOGGING_RULES and re-run."
+    elif command grep -E 'No such (signal|slot)' /tmp/serr.$$ \
+             | command grep -qv guidriveStderrControl; then
+        sf=1
+        echo "  a connect in SIGEL_SlaveGUI names a signal or slot that does not exist:"
+        command grep -E 'No such (signal|slot)' /tmp/serr.$$ \
+            | command grep -v guidriveStderrControl | sort -u | head -4 | sed 's/^/    /'
+    else
+        sp=1
+    fi
+else
+    sf=1
+    echo "  slavegui did not finish; its clip walk proves nothing:"
+    sed -n '/clipped\|!!/p' /tmp/sclip.$$ | sed 's/^/    /'
+fi
+rm -f /tmp/sclip.$$ /tmp/serr.$$
+printf '%-22s %2d pass  %2d fail\n' "slave gui" "$sp" "$sf"
+pass=$((pass+sp)); fail=$((fail+sf))
 
 # ---------------------------------------------------------------------------
 # The structural fingerprint tool's own teeth.
@@ -886,7 +955,7 @@ elif make -s -C "$ROOT" B=build-fast SAN= SIGSAN= guidrive >/tmp/bdb.$$ 2>&1; th
     #              where 1.3 adds 12. Both figures are the oracle's, off the
     #              running binary.
     #
-    # `roundtrip' IS run here as of 2026-09-03 -- §9 item 1. This comment used
+    # `roundtrip' IS run here as of 2026-09-03 -- PORTING.md's pagesave/roundtrip gap. This comment used
     # to say it was not, on the grounds that "what it uniquely covers is
     # largely covered by exportall (a broken reader moves the export)". THAT
     # ARGUMENT IS FALSE and gating it is what showed so: gutting each of the
@@ -920,7 +989,7 @@ elif make -s -C "$ROOT" B=build-fast SAN= SIGSAN= guidrive >/tmp/bdb.$$ 2>&1; th
     # has already been bitten by three times, but applied to everything rather
     # than one section.
     : > /tmp/berr.$$ || bf=1
-    # roundtrip joined the list 2026-09-03, the other half of §9 item 1. It is
+    # roundtrip joined the list 2026-09-03, the other half of PORTING.md's pagesave/roundtrip gap. It is
     # export-import-export on ONE machine and needs no 1.3 reference: its point
     # is that the READER undoes a mutation made between the two exports, so a
     # no-op importer -- the likelier failure -- cannot pass it. C11c had to fix
@@ -1090,13 +1159,13 @@ printf '%-22s %2d pass  %2d fail\n' "gui behaviour" "$bp" "$bf"
 pass=$((pass+bp)); fail=$((fail+bf))
 
 # ---------------------------------------------------------------------------
-# §9 item 1 -- the widget-to-file path, which nothing covered until now.
+# PORTING.md's pagesave/roundtrip gap -- the widget-to-file path, which nothing covered until now.
 #
 # `pages' proves typing reaches the widgets. `exportall' proves widgets reach a
 # file, in one direction, for the eight export formats. NEITHER of them runs
 # putAllIntoExperiment(), so a regression between what a parameter page holds
 # and what `File > Save Experiment' writes was caught by nothing at all. That
-# was §9 item 1, and it stood open because gating it needs a reference the port
+# was PORTING.md's pagesave/roundtrip gap, and it stood open because gating it needs a reference the port
 # did not produce itself -- §7's rule that every gate here compares the port
 # against itself.
 #
@@ -1273,7 +1342,7 @@ FORM_LIST="MT_UI/MT_AddConstantsWidgetBase:MT_GUI \
             SIGEL_SlaveUI/SIG_SimulationWidgetBase:SIGEL_SlaveGUI"
 
 MOCBIN=$(qmake6 -query QT_INSTALL_LIBEXECS)/moc
-fp=0; ff=0; fw=0
+fp=0; ff=0; fw=0; nlinetot=0; nsort=0
 # `forms' already ran above, before the module passes, because GUI headers need
 # its output. REUSE THAT LOG -- do not re-run make here. A second `make forms'
 # is a no-op that emits nothing, so its (empty) output would replace the first
@@ -1311,7 +1380,7 @@ else
         # 3. the committed base class
         if g++ $FLAGS $INCS "$SRC/src/$mod/$base.cpp" 2>/tmp/chk.$$; then fp=$((fp+1))
         else ff=$((ff+1)); echo "  form FAIL: $mod/$base.cpp"; fi
-        fw=$((fw + $(grep -c "$SRC.*warning:" /tmp/chk.$$ || true)))
+        fw=$((fw + $(command grep -ac "$SRC.*warning:" /tmp/chk.$$ || true)))
         # 4. moc, and its output
         if $MOCBIN $(echo "$INCS" | sed 's/-isystem /-I/g') \
                "$SRC/include/$mod/$base.h" -o /tmp/moc.$$.cpp 2>/tmp/chk.$$ \
@@ -1339,17 +1408,17 @@ else
         # Found by the C1 review.
         pfx=
         [ -f "$qrc" ] && pfx=$(sed -n 's/.*<qresource prefix="\([^"]*\)".*/\1/p' "$qrc")
-        for want in $(grep -o ':/[A-Za-z0-9_/.-]*' "$ROOT/build/ui/ui_$base.h" | sort -u); do
+        for want in $(command grep -ao ':/[A-Za-z0-9_/.-]*' "$ROOT/build/ui/ui_$base.h" | sort -u); do
             [ -f "$qrc" ] || { ff=$((ff+1)); echo "  form FAIL: $want but no $form.qrc"; continue; }
             rel=${want#:$pfx/}
-            if [ "$rel" != "$want" ] && grep -q "<file>$rel</file>" "$qrc" \
+            if [ "$rel" != "$want" ] && command grep -aq "<file>$rel</file>" "$qrc" \
                && [ -f "$SRC/ui/$(dirname "$form")/$rel" ]
             then fp=$((fp+1))
             else ff=$((ff+1)); echo "  form FAIL: $want not backed by $form.qrc"; fi
         done
         if [ -f "$qrc" ]; then
             for have in $(sed -n 's|.*<file>\(.*\)</file>.*|\1|p' "$qrc"); do
-                if grep -q ":$pfx/$have" "$ROOT/build/ui/ui_$base.h"; then fp=$((fp+1))
+                if command grep -aq ":$pfx/$have" "$ROOT/build/ui/ui_$base.h"; then fp=$((fp+1))
                 else ff=$((ff+1)); echo "  form FAIL: $form.qrc carries $have, ui_$base.h never uses it"; fi
             done
         fi
@@ -1360,9 +1429,10 @@ else
         # fixed one view; C2 re-created it in four more. This is why it is a
         # check and not a habit.
         if [ -f "$ROOT/build/ui/ui_$base.h" ]; then
-            for v in $(grep -oE '^        [A-Za-z0-9_]+->setSortingEnabled\(true\)' \
+            for v in $(command grep -aoE '^        [A-Za-z0-9_]+->setSortingEnabled\(true\)' \
                        "$ROOT/build/ui/ui_$base.h" | sed 's/->.*//;s/ *//' | sort -u); do
-                if [ -n "$blocked" ] || grep -q "$v->sortByColumn(" "$SRC/src/$mod/$base.cpp"; then fp=$((fp+1))
+                nsort=$((nsort+1))
+                if [ -n "$blocked" ] || command grep -aq "$v->sortByColumn(" "$SRC/src/$mod/$base.cpp"; then fp=$((fp+1))
                 else ff=$((ff+1)); echo "  form FAIL: $base sorts $v but never pins the direction"; fi
             done
         fi
@@ -1374,12 +1444,31 @@ else
         # uic3 KEEPS an explicit frameShape and drops only the then-redundant
         # orientation, so 3 of the 6 Lines were affected, not 6 -- the ones
         # whose Qt 2 form set orientation ALONE. Either property satisfies it.
-        nline=$(grep -c '<widget class="Line"' "$SRC/ui/$form.ui" || true)
-        nshape=$(grep -A3 '<widget class="Line"' "$SRC/ui/$form.ui" \
-                 | grep -cE '<property name="(orientation|frameShape)"' || true)
+        nline=$(command grep -ac '<widget class="Line"' "$SRC/ui/$form.ui" || true)
+        nlinetot=$((nlinetot+nline))
+        nshape=$(command grep -aA3 '<widget class="Line"' "$SRC/ui/$form.ui" \
+                 | command grep -acE '<property name="(orientation|frameShape)"' || true)
         if [ "$nline" -le "$nshape" ]; then fp=$((fp+1))
         else ff=$((ff+1)); echo "  form FAIL: $form.ui has $nline Line widgets but $nshape with a shape"; fi
     done
+    # Both checks above are `-le' or a for-loop over a grep, so ZERO matches is
+    # indistinguishable from a clean pass -- and a pattern that quietly stops
+    # matching (uic changes its indentation, Designer renames the class) would
+    # make every form pass with nothing checked. The corpus totals are known and
+    # asserted here for that reason: 6 Line widgets across the 20 forms and 5
+    # setSortingEnabled(true) in the generated headers. Raise them if a form
+    # gains one; never lower them to make this quiet. Added 2026-09-05 after a
+    # review pointed out that both checks pass on zero.
+    if [ "$nlinetot" -lt 6 ]; then
+        ff=$((ff+1))
+        echo "  form FAIL: found $nlinetot Line widgets across the forms, expected at least 6 --"
+        echo "             the separator check matched nothing and proves nothing"
+    else fp=$((fp+1)); fi
+    if [ "$nsort" -lt 5 ]; then
+        ff=$((ff+1))
+        echo "  form FAIL: found $nsort setSortingEnabled(true) sites, expected at least 5 --"
+        echo "             the sort-direction check matched nothing and proves nothing"
+    else fp=$((fp+1)); fi
 fi
 printf '%-22s %2d pass  %2d fail  %3d warnings\n' "forms (Phase C)" "$fp" "$ff" "$fw"
 pass=$((pass+fp)); fail=$((fail+ff)); warn=$((warn+fw))

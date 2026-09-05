@@ -30,8 +30,17 @@
 # and pvmtmpnam() builds "$PVM_TMP/pvmtmp<pid>.<n>" (pvmcruft.c:760).  A
 # sockaddr_un holds 107 characters plus the NUL, so PVM_TMP has 107 minus that
 # suffix.  Measured: 92 characters starts, 93 aborts with "*** buffer overflow
-# detected ***" before the daemon prints anything.  The limit below is 88, the
-# worst case with a 7-digit pid and a 4-digit sequence number.
+# detected ***" before the daemon prints anything -- that is the 6-digit-pid,
+# 1-digit-counter case, 107 - 7 - 6 - 1 - 1.
+#
+# The limit below is 87, and it was 88 until 2026-09-05.  Two things make the
+# worst case one character shorter than that.  pvmtmpnam's counter is
+# `n = 1 + (f++ % 10000)' assigned AFTER the sprintf that uses it, so n runs
+# 0,1,...,10000 and reaches FIVE digits, not four.  And %06d pads without
+# truncating, so a pid above 999999 -- /proc/sys/kernel/pid_max is 4194304 on
+# this machine -- contributes seven.  107 - 7 - 7 - 1 - 5 = 87.  The old guard
+# admitted exactly one length that could still abort the daemon.  Found by
+# review.  The same strcpy is at lpvm.c:1249 and :2465 on the task side.
 #
 # gcc warns about a DIFFERENT overflow in the same function -- pvmd.c:5178
 # sprintf's into a char buf[128] -- but nothing ever reaches it, because the
@@ -59,8 +68,8 @@ case $PVM_TMP in
 	/*) ;;
 	 *) echo "PVM_TMP must be an absolute path" >&2; exit 1 ;;
 esac
-[ ${#PVM_TMP} -le 88 ] || {
-	echo "PVM_TMP is ${#PVM_TMP} characters; pvmd.c:5067 allows 88" >&2
+[ ${#PVM_TMP} -le 87 ] || {
+	echo "PVM_TMP is ${#PVM_TMP} characters; pvmd.c:5067 allows 87" >&2
 	exit 1; }
 
 PVM_ROOT=$PVM

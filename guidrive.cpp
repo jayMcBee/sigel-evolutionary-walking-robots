@@ -33,11 +33,12 @@
     export     File > Export > Program for one named individual
     visualize  Individuals > Visualize, to capture the PVM payload
     evolution  Start and Stop  (needs PVM and a real sigel_slave)
-  ... and pages, pagesave, exportall, roundtrip, overwrite, dialogs, metagui.
+  ... and pages, pagesave, exportall, roundtrip, overwrite, dialogs, metagui,
+  clipcheck, slavegui, metadrive, runlock, rngseed.
   The list above is not maintained in step with the code. The count that
   cannot go stale is
     command grep -o 'scenario == "[a-z]*"' guidrive.cpp | sed 's/.*"\(.*\)"/\1/' | sort -u | wc -l
-  which reads 23 today. A plain -c over the same pattern gives 26 and is
+  which reads 28 today. A plain -c over the same pattern gives 30 and is
   WRONG: two scenarios are tested twice in one condition.
 
   Environment:
@@ -3963,7 +3964,7 @@ int main(int argc, char **argv)
     // and because a second program would be a harness rather than a scenario.
     //
     // It matters beyond coverage: this widget owns the `visualisation' pointer
-    // of PORTING.md 9 item 5, and showAncorPointsCheckBox is one of the
+    // of PORTING.md's C11 slave-GUI notes, and showAncorPointsCheckBox is one of the
     // fourteen sites that dereference it behind a guard.
     if (scenario == "slavegui") {
         SIG_ExperimentListView *lv = listView();
@@ -4108,7 +4109,7 @@ int main(int argc, char **argv)
 
         // --- every navigation button, which is also the use-after-free path --
         // Each of these slots is one of the fourteen `if (visualisation)' sites
-        // of section 9 item 5. Clicking them all is the first time that code has
+        // of PORTING.md's C11 slave-GUI notes. Clicking them all is the first time that code has
         // ever been executed in this port.
         printf("\n  -- navigation buttons (each dereferences `visualisation') --\n");
         for (const char *n : navNames) {
@@ -4541,7 +4542,7 @@ int main(int argc, char **argv)
         // then true with the generation LCD unmoved at 136. A generation count
         // is the lever that gives a run which measurably starts, progresses and
         // stops, and it is the same lever the oracle's fifteen reference runs
-        // were produced with -- TERMINATIONGENERATIONNO, PORTING.md 9 item 2.
+        // were produced with -- TERMINATIONGENERATIONNO, PORTING.md's C11 evolution notes.
         // qEnvironmentVariableIntValue returns 0 for UNSET and for UNPARSEABLE
         // alike, so SIGEL_GENERATIONS=abc silently fell through to the old
         // date-terminated branch, saved nothing and still exited 0. Tell the
@@ -4816,7 +4817,7 @@ int main(int argc, char **argv)
         step("population after the evolution stopped", false, false, true);
 
         // Write the evolved experiment out. Without this the run leaves nothing
-        // to compare: PORTING.md 9 item 2 wants the port driven from the same
+        // to compare: PORTING.md's C11 evolution notes wants the port driven from the same
         // input as the oracle's reference runs and its OUTPUT diffed
         // structurally -- individuals, names, program text, ordering, file
         // shape, never fitness (D26: a 1-ULP change in start height moves

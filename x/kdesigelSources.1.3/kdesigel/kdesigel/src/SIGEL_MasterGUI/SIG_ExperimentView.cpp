@@ -70,19 +70,24 @@ void SIG_ExperimentView::putIntoExperiment() {
   // getAutosave() every generation (SIG_GPManager.cpp:804-806) to decide
   // whether to save, and getHistory() decides what that save writes.
   //
-  // The LCD and progress bar below are display-only reads and are harmless,
-  // but they are on the far side of this return, so the generations display
-  // simply stops being refreshed by this route during a run -- which is what
-  // 1.3 does anyway, for its own reasons (§9's generation-counter section).
+  // The LCD read below is display-only and is deliberately AHEAD of the
+  // guard. poolGeneration IS incremented per generation inside the loop
+  // (SIG_GPManager.cpp:736), and 1.3 has no guard at all, so on 1.3 a page
+  // switch during a run refreshes this display to the advanced value.
+  // Returning before it would have made the port show a stale number where
+  // 1.3 shows a fresh one -- a divergence the run lock would have
+  // introduced, in a function whose point is to change nothing the user did
+  // not ask for. Reading is not writing; the guard belongs below it.
+
+  // update the generations display + progress-bar
+  lcdnumberGenerations->display(theExperiment.population.getPoolGeneration());
+  // generationProgBar
+
   if ( SIG_Experiment::anyEvolutionRunning() )
     return;
 
   // put comment into the box dedicated to the comment !
   theExperiment.comment = multilineeditComment->toPlainText();
-
-  // update the generations display + progress-bar
-  lcdnumberGenerations->display(theExperiment.population.getPoolGeneration());
-  // generationProgBar
 
   // autosave slider
   theExperiment.environment.setAutosave(lcdnumberAutosave->intValue());

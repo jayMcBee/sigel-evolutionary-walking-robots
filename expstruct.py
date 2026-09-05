@@ -21,7 +21,14 @@ import hashlib, re, sys
 # obvious one; the HISTORY block carries "Fitness (Elter 1): 3.9e-05" too, and
 # a date is wall-clock rather than structure, so a fresh run would differ on it
 # for a reason that says nothing about the port.
-DROP = re.compile(rb'FITNESS\s*=|Fitness\s*\(|Date of|^\s*$')
+#
+# `Fitness Value:' JOINED THIS LIST 2026-09-05 and it was a real hole, not a
+# theoretical one. It is 1720 of the fitness values in a shipped experiment
+# against 100 `FITNESS=' lines, and until now FLOAT was its ONLY net -- which
+# needs a decimal point. An integer-valued `Fitness Value: 0', which is exactly
+# what a swallowed-throw individual scores, reached SHAPE. The --selfcheck probe
+# for it failed on first run against the shipped file, so this is measured.
+DROP = re.compile(rb'FITNESS\s*=|Fitness\s*\(|Fitness Value\s*:|Date of|^\s*$')
 # A bare float anywhere is dropped as a belt-and-braces second net.
 FLOAT = re.compile(rb'\d+\.\d+([eE][-+]?\d+)?')
 
@@ -130,6 +137,10 @@ def selfcheck(path):
                 label, what, "moved" if changed else "held",
                 "move" if must_change else "hold"))
 
+    # Assertions below: 6 variant() probes plus the structural floor, which is
+    # one check for the purposes of this count.
+    PROBES = 9
+
     # --- structural floor, recomputed from the raw bytes --------------------
     truth_inds = len(_re.findall(rb'INDIVIDUAL\(\d+\) BEGIN', base))
     truth_ops  = sum(1 for blk in _re.findall(rb'PROGRAM BEGIN\{(.*?)\}PROGRAM END;',
@@ -179,6 +190,16 @@ def selfcheck(path):
                   "Fitness Value: changed", False)
     else: fails.append("no 'Fitness Value:' line found -- selfcheck cannot run")
 
+    # And the INTEGER spelling of the same line, which the float probe above
+    # cannot reach: DROP does not match `Fitness Value:' at all, so FLOAT is its
+    # only net, and FLOAT needs a decimal point. A swallowed-throw individual
+    # scores exactly `Fitness Value: 0' -- integer -- and would reach SHAPE.
+    # Latent today (all such lines in the shipped file are float-valued) and
+    # gated from here on. Added 2026-09-05 after review found the asymmetry:
+    # FITNESS= had both spellings probed and this one had only one.
+    if m: variant(base.replace(m.group(0), b'Fitness Value: 0', 1),
+                  "Fitness Value: set to an INTEGER", False)
+
     # --- structure must be VISIBLE, in the field that owns it ---------------
     m = _re.search(rb'\n(\s+)(MOVE|ADD|SUB|CMP) (-?\d+)', base)
     if m:
@@ -197,7 +218,12 @@ def selfcheck(path):
 
     for f in fails:
         print("  FAIL " + f)
-    print("expstruct selfcheck  %d pass  %d fail" % (7 - len(fails), len(fails)))
+    # PROBES is the number of assertions above, counted here rather than
+    # hardcoded: `7 - len(fails)' printed a NEGATIVE pass count as soon as more
+    # than seven things went wrong, because the structural floor can append
+    # several failures of its own. Found by review 2026-09-05.
+    print("expstruct selfcheck  %d pass  %d fail"
+          % (max(PROBES - len(fails), 0), len(fails)))
     return 1 if fails else 0
 
 def report(path):
