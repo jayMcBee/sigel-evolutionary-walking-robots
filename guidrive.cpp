@@ -3285,6 +3285,140 @@ int main(int argc, char **argv)
         return 0;
     }
 
+    // --- D29: the run lock, and it is gated by THIS and nothing else -------
+    // A review measured that neither mechanism of D29 was gated: deleting the
+    // line that arms the lock, and reverting the tree-click emit wholesale,
+    // both left all 846 checks green. Its positive control showed the emit
+    // line IS observable by the gate, so those passes were a real absence of
+    // teeth. Nothing in the repo had ever executed the guard's true branch --
+    // `evolution' is not one of the scenarios the gate runs, and inside it
+    // slotStartEvolution blocks, so every observation there is post-run.
+    //
+    // A real evolution is not needed to test the contract. SIG_Experiment
+    // exposes RunScope, which is exactly what slotStartEvolution enters around
+    // gpManager->start(); entering one here puts the application in the state
+    // the lock exists for, deterministically and in about a second.
+    //
+    // The observable is the page round trip: type into a page, switch away --
+    // which calls putAllIntoExperiment -- then switch back, which refreshes
+    // the widgets FROM the experiment. If the write happened the new value
+    // survives; if the lock held, the old one comes back. No getter, no test
+    // hook, only what a user can see.
+    if (scenario == "runlock") {
+        SIG_ExperimentListView *lv = listView();
+        lv->setCurrentItem(lv->topLevelItem(0));
+        QTest::qWait(300);
+        QStackedWidget *st = W->findChild<QStackedWidget *>();
+        printf("\n== D29 RUN LOCK ==\n");
+        printf("  atRest anyEvolutionRunning=%d\n",
+               SIG_Experiment::anyEvolutionRunning() ? 1 : 0);
+
+        auto page = [&](const char *m) -> QWidget * {
+            clickMenu("&View", QString::fromLatin1(m));
+            QTest::qWait(300);
+            return st ? st->currentWidget() : nullptr;
+        };
+        // spinboxMaxAge lives on the GP page and is a plain int, so the round
+        // trip is unambiguous.
+        auto readAge = [&]() -> int {
+            QWidget *pg = page("&GP Parameters");
+            QSpinBox *sp = pg ? pg->findChild<QSpinBox *>("spinboxMaxAge") : nullptr;
+            return sp ? sp->value() : -1;
+        };
+        auto typeAge = [&](int v) {
+            QWidget *pg = page("&GP Parameters");
+            QSpinBox *sp = pg ? pg->findChild<QSpinBox *>("spinboxMaxAge") : nullptr;
+            if (!sp) { printf("  !! no spinboxMaxAge\n"); return; }
+            sp->setFocus(); sp->selectAll();
+            QTest::keyClick(sp, Qt::Key_Delete);
+            QTest::keyClicks(sp, QString::number(v));
+            QTest::qWait(30);
+        };
+        // THE OBSERVABLE IS THE EXPERIMENT ITSELF. Two earlier attempts were
+        // wrong, and both failure modes are worth keeping:
+        //   - reading the spin box back after a page switch. A page switch
+        //     calls putAllIntoExperiment (widget -> experiment) and nothing
+        //     calls getOutOfExperiment on the way back, so the widget keeps
+        //     whatever was typed whether the write happened or not. It
+        //     reported `refused=0' against a guard that was working.
+        //   - saving the experiment and reading MAXAGE out of the file. File >
+        //     Save Experiment is itself one of the 23 actions the lock
+        //     disables, so under a RunScope there is no file to read.
+        // What the guard actually protects is the model, so the probe reads
+        // the model: gpParameter.getMaxAge(), which putIntoExperiment writes
+        // from spinboxMaxAge (SIG_GPParameter.cpp:95).
+        SIG_Experiment *theExp = lv->currentlySelectedExperiment();
+        if (!theExp) { printf("  !! no selected experiment\n"); return 1; }
+        auto modelAge = [&]() -> long { return theExp->gpExperiment.gpParameter.getMaxAge(); };
+        auto writtenAge = [&](int v) -> long {
+            typeAge(v);
+            page("&Environment");          // a page switch fires putAllIntoExperiment
+            return modelAge();
+        };
+
+        const int before = readAge();
+        printf("  maxAge as loaded=%d\n", before);
+
+        const long unlocked = writtenAge(before + 7);
+        printf("  [unlocked] typed=%d, model reads %ld  written=%d\n",
+               before + 7, unlocked, unlocked == before + 7 ? 1 : 0);
+
+        {
+            SIG_Experiment::RunScope lock;
+            printf("  [locked] anyEvolutionRunning=%d\n",
+                   SIG_Experiment::anyEvolutionRunning() ? 1 : 0);
+            const long locked = writtenAge(before + 21);
+            printf("  [locked] typed=%d, model reads %ld  refused=%d\n",
+                   before + 21, locked, locked == before + 7 ? 1 : 0);
+
+            // The tree-click emit, which drives the 23 locked actions. Under a
+            // RunScope a selection change must NOT re-enable them, and that is
+            // the half a review found revertible with the gate still green.
+            QAction *imp = nullptr, *add = nullptr;
+            for (QAction *a : W->findChildren<QAction *>()) {
+                if (a->text() == "GP-Parameters" && !imp) imp = a;
+                if (a->text() == "&Add") add = a;
+            }
+            lv->setCurrentItem(lv->topLevelItem(0));
+            QTest::qWait(300);
+            printf("  [locked] after a tree click: Add enabled=%d (0 = still locked)\n",
+                   add && add->isEnabled() ? 1 : 0);
+            (void)imp;
+        }
+
+        // RunScope's own contract, which is what makes the guard
+        // exception-safe and re-entrant -- the two ways the first per-experiment
+        // bool was wrong. Nesting must hold the lock until the OUTER scope
+        // exits, and an exception must still release it.
+        {
+            SIG_Experiment::RunScope outer;
+            const bool a = SIG_Experiment::anyEvolutionRunning();
+            bool b = false, c = false;
+            { SIG_Experiment::RunScope inner; b = SIG_Experiment::anyEvolutionRunning(); }
+            c = SIG_Experiment::anyEvolutionRunning();
+            printf("  [nesting] outer=%d inner=%d afterInner=%d  nestsCorrectly=%d\n",
+                   a ? 1 : 0, b ? 1 : 0, c ? 1 : 0, (a && b && c) ? 1 : 0);
+        }
+        printf("  [nesting] afterOuter=%d\n",
+               SIG_Experiment::anyEvolutionRunning() ? 1 : 0);
+        try {
+            SIG_Experiment::RunScope thrower;
+            throw 1;
+        } catch (int) {}
+        printf("  [unwind] afterThrow anyEvolutionRunning=%d (0 = released)\n",
+               SIG_Experiment::anyEvolutionRunning() ? 1 : 0);
+
+        printf("  [released] anyEvolutionRunning=%d\n",
+               SIG_Experiment::anyEvolutionRunning() ? 1 : 0);
+        lv->setCurrentItem(lv->topLevelItem(0));
+        QTest::qWait(300);
+        const long after = writtenAge(before + 33);
+        printf("  [released] typed=%d, model reads %ld  writtenAgain=%d\n",
+               before + 33, after, after == before + 33 ? 1 : 0);
+        fflush(stdout);
+        return 0;
+    }
+
     // --- Individuals > Add ------------------------------------------------
     if (scenario == "add") {
         whenModal([](QWidget *m) {

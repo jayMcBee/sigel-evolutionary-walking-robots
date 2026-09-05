@@ -322,8 +322,13 @@ void SIG_ExperimentListView::slotSelectionChanged( QTreeWidgetItem * theItem )
       // mid-run, handing back Import GP-Parameters, Add, Delete, Reset and
       // the rest. That is precisely what D29 forbids, and on the oracle's
       // evidence acting on the GUI mid-run also crashes 1.3.
-      SIG_Experiment *theExp = experimentDict.value( experimentName );
-      emit evolutionNotRunning( !( theExp && theExp->isEvolutionRunning() ) );
+      // ANY run, not this experiment's. Asking the clicked experiment's own
+      // state was still broken: File > New Experiment and File > Open
+      // Experiment are not among the 23 locked actions, and both end in
+      // setCurrentItem(), so selecting a NOT-running experiment mid-run
+      // re-enabled every locked action -- one click, no second experiment
+      // needed.
+      emit evolutionNotRunning( !SIG_Experiment::anyEvolutionRunning() );
  	  emit actExpChanged();
       experimentDict.value( experimentName )->putAllIntoExperiment();
     }

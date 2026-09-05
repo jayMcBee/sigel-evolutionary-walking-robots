@@ -242,21 +242,39 @@ namespace SIGEL_MasterGUI
       void signalEvolutionNotRunning( bool );
 
     private:
-      /**
-       * True from the moment gpManager->start() is entered until the run
-       * stops. NOT SIG_GPManager::running(), which is a 2003 stub that always
-       * returns false (SIG_GPManager.h:115) and is overridden nowhere -- a
-       * guard written against it could never fire.
-       */
-      bool evolutionIsRunning = false;
-
     public:
       /**
-       * The real run state, for callers that must not ask
-       * SIG_GPManager::running() -- which is a 2003 stub returning false
-       * unconditionally and overridden nowhere.
+       * D29's run state. A COUNT ACROSS ALL EXPERIMENTS, not a bool per
+       * experiment, and the difference is the whole correctness argument.
+       *
+       * Per-experiment was wrong three ways. (1) Selecting a DIFFERENT
+       * experiment mid-run asked that one's flag, found it false and
+       * re-enabled every locked action -- and File > New / Open Experiment are
+       * not locked, both end in setCurrentItem(), so one click did it with no
+       * second experiment needed. (2) A nested slotStartEvolution reached
+       * through haveABreak()'s processEvents cleared the flag on return,
+       * un-guarding the outer run. (3) An exception out of start() skipped the
+       * clear entirely and wedged the experiment for good.
+       *
+       * A count incremented by a scope guard fixes all three: any run anywhere
+       * locks, nesting is balanced, and unwinding decrements.
+       *
+       * NOT SIG_GPManager::running(), which is a 2003 stub returning false
+       * unconditionally (SIG_GPManager.h:115) with no override anywhere -- a
+       * guard written against it could never fire.
        */
-      bool isEvolutionRunning() const { return evolutionIsRunning; }
+      static bool anyEvolutionRunning();
+
+      /** Increments for its lifetime. Exception-safe and re-entrant. */
+      class RunScope
+      {
+        public:
+          RunScope();
+          ~RunScope();
+        private:
+          RunScope( const RunScope & ) = delete;
+          RunScope &operator=( const RunScope & ) = delete;
+      };
 
 
     protected:

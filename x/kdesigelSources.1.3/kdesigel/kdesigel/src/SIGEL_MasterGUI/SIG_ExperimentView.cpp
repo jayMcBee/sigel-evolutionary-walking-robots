@@ -20,6 +20,7 @@
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
+#include "SIGEL_MasterGUI/SIG_Experiment.h"   // D29: anyEvolutionRunning()
 #include <qpushbutton.h>
 #include <qtextstream.h>
 #include <qfiledialog.h>
@@ -57,6 +58,25 @@ SIG_ExperimentView::~SIG_ExperimentView() {
 }
 
 void SIG_ExperimentView::putIntoExperiment() {
+  // D29, and this is the path the first version of the guard MISSED.
+  // slotStartEvolution disables gpParameter, simulationParameter, robotView,
+  // languageParameters and environmentView -- but NOT experimentView, which is
+  // the page the user is looking at when they press Start and which stays
+  // fully live for the whole run. Its history checkbox and autosave slider are
+  // wired straight to this function, not to putAllIntoExperiment, so guarding
+  // only that one left the live path open.
+  //
+  // It is a live path in the strong sense: the running GP reads
+  // getAutosave() every generation (SIG_GPManager.cpp:804-806) to decide
+  // whether to save, and getHistory() decides what that save writes.
+  //
+  // The LCD and progress bar below are display-only reads and are harmless,
+  // but they are on the far side of this return, so the generations display
+  // simply stops being refreshed by this route during a run -- which is what
+  // 1.3 does anyway, for its own reasons (§9's generation-counter section).
+  if ( SIG_Experiment::anyEvolutionRunning() )
+    return;
+
   // put comment into the box dedicated to the comment !
   theExperiment.comment = multilineeditComment->toPlainText();
 

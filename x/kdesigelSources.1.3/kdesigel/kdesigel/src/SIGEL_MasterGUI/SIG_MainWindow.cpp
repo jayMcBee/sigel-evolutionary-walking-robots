@@ -660,6 +660,32 @@ SIG_MainWindow::SIG_MainWindow( QWidget * parent, const char * name, Qt::WindowF
   // or the menu would end on one. Help > About is untouched.
 
   noExperimentActions.append( mtUseAction );
+
+  // D29. None of the four MetaGP actions was in evolutionRunningActions, so
+  // all four stayed live throughout a run -- mtUseAction was in
+  // noExperimentActions only, i.e. disabled with no experiment and enabled
+  // the moment one is loaded, run or no run. They change MetaGP state, which
+  // is a run parameter, so D29 covers them.
+  //
+  // Two of the four are measured hazards on the 2003 binary, not theory:
+  //   Configure System, opening its MTMainWindow during a run, CRASHES 1.3.
+  //     Four observations; the cleanest had MetaGP set BEFORE Start, four
+  //     untouched generations, then one injected click -- dead in 10 s with
+  //     `QGVector::operator[]: Index 359 out of range'. Against it, ~25 other
+  //     injected mid-run events across two runs did nothing, so the trigger
+  //     is this path and not mid-run interaction in general.
+  //   Use MetaGP toggled mid-run WEDGES the run: an error dialog, then the
+  //     evolution never advances again while Stop stays enabled and the GUI
+  //     keeps repainting -- 4.5 minutes with zero slave spawns against a 62 s
+  //     per generation baseline. Worse than the crash, because it looks like
+  //     a healthy run.
+  // The other two are locked because they are the same class, not because
+  // anyone has crashed them -- fixing only the observed instance is how three
+  // earlier defects in this area each survived their first fix.
+  evolutionRunningActions.append( mtUseAction );
+  evolutionRunningActions.append( mtConfigureAction );
+  evolutionRunningActions.append( mtChoiceEvaluatorAction );
+  evolutionRunningActions.append( mtChoiceClassifierAction );
   QObject::connect(experimentListView,
 	  SIGNAL( actExpChanged() ),
 	  this,

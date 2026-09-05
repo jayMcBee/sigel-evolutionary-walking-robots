@@ -207,6 +207,18 @@ void SIG_Experiment::setName( QString newName )
   experimentItem->setText( 0, newName );
 };
 
+// D29's run counter. File-static rather than a class member so that no
+// experiment can be destroyed out from under it.
+static int g_runningEvolutions = 0;
+
+bool SIG_Experiment::anyEvolutionRunning()
+{
+  return g_runningEvolutions > 0;
+}
+
+SIG_Experiment::RunScope::RunScope()  { ++g_runningEvolutions; }
+SIG_Experiment::RunScope::~RunScope() { --g_runningEvolutions; }
+
 void SIG_Experiment::putAllIntoExperiment()
 {
   // DELIBERATE DEVIATION FROM 1.3, decided 2026-09-04: parameters may not
@@ -228,7 +240,7 @@ void SIG_Experiment::putAllIntoExperiment()
   // slotStartEvolution calls this BEFORE gpManager->start(), so the settings a
   // user chose are still committed at start; only writes after that are
   // refused.
-  if ( evolutionIsRunning )
+  if ( anyEvolutionRunning() )
     return;
 
   experimentView->putIntoExperiment();
@@ -301,16 +313,20 @@ void SIG_Experiment::slotStartEvolution()
       environmentView->setEnabled( false );
       // allIndividualsView->setEnabled( false );
       
-      // Set AFTER putAllIntoExperiment() above, so the user's chosen settings
-      // are committed, and before start(), so nothing can change them from
-      // here on. start() runs the evolution synchronously and services the GUI
-      // through haveABreak(), so a page switch during the run does reach
-      // putAllIntoExperiment -- with this true, it now declines.
-      evolutionIsRunning = true;
+      // Entered AFTER putAllIntoExperiment() above, so the settings the user
+      // chose are committed, and before start(), so nothing can change them
+      // from here on. start() runs the evolution synchronously and services
+      // the GUI through haveABreak()'s processEvents, so widgets and menus
+      // really are reachable during it.
+      //
+      // A SCOPE GUARD, not two assignments: it survives an exception out of
+      // start() (which would otherwise leave the experiment locked for good)
+      // and it nests correctly if start() is somehow re-entered.
+      {
+        RunScope runScope;
+        gpManager->start();
+      }
 
-      gpManager->start();
-
-      evolutionIsRunning = false;
       slotEvolutionStopped();
     }
   else
@@ -341,6 +357,15 @@ void SIG_Experiment::slotStopEvolution()
 
 void SIG_Experiment::slotSimulationParameterImport()
 {
+  // D29. These write gpExperiment.* DIRECTLY -- slotRobotLoad replaces the
+  // whole robot -- so none of them passes through putAllIntoExperiment and the
+  // guard there does not cover them. Their page buttons are disabled during a
+  // run, but menuSimulationParameter and menuEnvironmentView are parented on
+  // SIG_Experiment rather than on the pages, so a right-click on the tree item
+  // pops them regardless, and slotRightClick does not test enablement.
+  if ( anyEvolutionRunning() )
+    return;
+
   QString fileName = QFileDialog::getOpenFileName( nullptr, "Import Simulation Parameters...", QString(), "Simulation Parameter Files (*.sip);;All Files (*)" );
   if ( !fileName.isEmpty() )
     {
@@ -386,6 +411,15 @@ void SIG_Experiment::slotSimulationParameterExport()
 
 void SIG_Experiment::slotEnvironmentImport()
 {
+  // D29. These write gpExperiment.* DIRECTLY -- slotRobotLoad replaces the
+  // whole robot -- so none of them passes through putAllIntoExperiment and the
+  // guard there does not cover them. Their page buttons are disabled during a
+  // run, but menuSimulationParameter and menuEnvironmentView are parented on
+  // SIG_Experiment rather than on the pages, so a right-click on the tree item
+  // pops them regardless, and slotRightClick does not test enablement.
+  if ( anyEvolutionRunning() )
+    return;
+
   QString fileName = QFileDialog::getOpenFileName( nullptr, "Import Environment...", QString(), "Environment Files (*.env);;All Files (*)" );
   if ( !fileName.isEmpty() )
     {
@@ -431,6 +465,15 @@ void SIG_Experiment::slotEnvironmentExport()
 
 void SIG_Experiment::slotGPParameterImport()
 {
+  // D29. These write gpExperiment.* DIRECTLY -- slotRobotLoad replaces the
+  // whole robot -- so none of them passes through putAllIntoExperiment and the
+  // guard there does not cover them. Their page buttons are disabled during a
+  // run, but menuSimulationParameter and menuEnvironmentView are parented on
+  // SIG_Experiment rather than on the pages, so a right-click on the tree item
+  // pops them regardless, and slotRightClick does not test enablement.
+  if ( anyEvolutionRunning() )
+    return;
+
   QString fileName = QFileDialog::getOpenFileName( nullptr, "Import GP Parameter...", QString(), "GP Parameter Files (*.gpp);;All Files (*)" );
   if ( !fileName.isEmpty() )
     {
@@ -476,6 +519,15 @@ void SIG_Experiment::slotGPParameterExport()
 
 void SIG_Experiment::slotLanguageParameterImport()
 {
+  // D29. These write gpExperiment.* DIRECTLY -- slotRobotLoad replaces the
+  // whole robot -- so none of them passes through putAllIntoExperiment and the
+  // guard there does not cover them. Their page buttons are disabled during a
+  // run, but menuSimulationParameter and menuEnvironmentView are parented on
+  // SIG_Experiment rather than on the pages, so a right-click on the tree item
+  // pops them regardless, and slotRightClick does not test enablement.
+  if ( anyEvolutionRunning() )
+    return;
+
   QString fileName = QFileDialog::getOpenFileName( nullptr, "Import Language Parameter...", QString(), "Language Parameter Files (*.lap);;All Files (*)" );
   if ( !fileName.isEmpty() )
     {
@@ -522,6 +574,15 @@ void SIG_Experiment::slotLanguageParameterExport()
 
 void SIG_Experiment::slotPopulationImport()
 {
+  // D29. These write gpExperiment.* DIRECTLY -- slotRobotLoad replaces the
+  // whole robot -- so none of them passes through putAllIntoExperiment and the
+  // guard there does not cover them. Their page buttons are disabled during a
+  // run, but menuSimulationParameter and menuEnvironmentView are parented on
+  // SIG_Experiment rather than on the pages, so a right-click on the tree item
+  // pops them regardless, and slotRightClick does not test enablement.
+  if ( anyEvolutionRunning() )
+    return;
+
   QString fileName = QFileDialog::getOpenFileName( nullptr, "Import Population...", QString(), "Population Files (*.pop);;All Files (*)" );
   if ( !fileName.isEmpty() )
     {
@@ -566,6 +627,15 @@ void SIG_Experiment::slotPopulationExport()
 
 void SIG_Experiment::slotRobotImport()
 {
+  // D29. These write gpExperiment.* DIRECTLY -- slotRobotLoad replaces the
+  // whole robot -- so none of them passes through putAllIntoExperiment and the
+  // guard there does not cover them. Their page buttons are disabled during a
+  // run, but menuSimulationParameter and menuEnvironmentView are parented on
+  // SIG_Experiment rather than on the pages, so a right-click on the tree item
+  // pops them regardless, and slotRightClick does not test enablement.
+  if ( anyEvolutionRunning() )
+    return;
+
   QString fileName = QFileDialog::getOpenFileName( nullptr, "Import Robot...", QString(), "Raw Robot Files (*.rrb);;All Files (*)" );
   if( !fileName.isEmpty() )
     {
@@ -597,6 +667,15 @@ void SIG_Experiment::slotGNUPlotExport()
 
 void SIG_Experiment::slotRobotLoad()
 {
+  // D29. These write gpExperiment.* DIRECTLY -- slotRobotLoad replaces the
+  // whole robot -- so none of them passes through putAllIntoExperiment and the
+  // guard there does not cover them. Their page buttons are disabled during a
+  // run, but menuSimulationParameter and menuEnvironmentView are parented on
+  // SIG_Experiment rather than on the pages, so a right-click on the tree item
+  // pops them regardless, and slotRightClick does not test enablement.
+  if ( anyEvolutionRunning() )
+    return;
+
   QString fileName = QFileDialog::getOpenFileName( nullptr, "Load Robot...", QString(), "Compiled Robot Files (*.crb);;All Files (*)" );
   if( !fileName.isEmpty() )
     {
