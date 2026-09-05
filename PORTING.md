@@ -21,7 +21,7 @@ Two rules follow from it:
 **Scope widened 2026-08-22.** Was Qt API only. Now also covers getting SIGEL to
 build and run, because nothing else can be verified without it — see §3.
 
-**Status — 2026-09-02**
+**Status — 2026-09-05**
 
 | phase | state |
 |---|---|
@@ -32,7 +32,7 @@ build and run, because nothing else can be verified without it — see §3.
 | T — old-Qt tool container | **done 2026-08-27.** `tools/qtmig`, §4 |
 | D — delete the shim, migrate the data | **DONE 2026-08-30.** `q2compat.h` and `q2compat_check.cpp` deleted; `include/compat/` gone; **no `Q2*` shim type is used anywhere**. D1–D27. *This is not "no Qt 2 container exists" — the unported GUI modules still declare **71 lines** of `QArray`, `QDict`, `QList`-as-pointer-list and friends, all of which Phase C must convert. See D27.* The shim's self-check step is gone from `check.sh`, which now runs no code. §10 |
 | P — PVM | **DONE 2026-08-28.** Vendored 3.4.3 replaced by upstream 3.4.6; nine patches carry the four config lines and Debian's eight source fixes; `libpvm3.a` and `pvmd3` build; SIGEL's two PVM objects link against them and `SIG_GPPVMData` round-trips through real PVM. `sigel`/`sigel_slave` still need Phase C. §7 |
-| C — GUI | **DONE 2026-09-02. C1–C10 complete; C11a–C11d done.** All 20 Designer forms converted; all five GUI modules build as archives; **both programs link and run**; **100 dead `connect()`s repaired, tree-wide count 0 with no baseline anywhere**. **C9** made it match what 1.3 SHOWS — 42 menu entries, the toolbars and the loaded values, now the `gui vs 1.3` gate. **C10** DROVE it, diffed against the oracle driving 1.3 with XTest, and found two defects reading it could not: `QTreeWidget::clear()` emitting a signal Qt 2 blocked, which killed the application on a large delete, and an eaten ampersand. Second gate, `gui behaviour`. **C11a** drove the five View pages C10 never opened — the 12-probe validator battery matches 1.3 character for character under two locales, nine typed values come out byte-identical in the saved `.exp` across the two architectures, and a `QIntValidator` over-range divergence was found and **accepted as D28**. **C11b** drove the Import/Export round trips — **seven of the eight exports are byte-identical to what the 2003 i386 binary writes** — and found default-constructed language parameters coming out alphabetical where 1.3 gives `QDict` hash order, which had also been wrong in `dictorder-baseline.txt` for all seven robots. **C11c** drove the six dialogs, closing C7's validator set at 21 of 21, and found Qt 6 selecting a pre-filled field where Qt 2 did not — a typed digit REPLACED the value instead of appending, so Add-individuals turned 1 into 2 where 1.3 makes it 12. Two reviews of the checking machinery then found five probes that could not fail and a **demonstrated false pass** (all 30 icons replaced with garbage, gate green). **C11d** then opened the MetaGP window for the first time and found C7's locale fix had never reached MT_GUI's ten validators — `"1,000"` accepted, `toInt()` returning zero. **The evolution path then ran end to end, and THE PORT EVOLVES** — population 100, 30 generations, best fitness 0.063794 → 0.141625. *A cross-machine claim once stood here and was WITHDRAWN: the counts it rested on are forced by the code. §9 item 2.* **845 pass, 0 fail.** §7 |
+| C — GUI | **DONE.** C1–C10, C11a–C11d, C12. All 20 Designer forms converted; five GUI modules build as archives; both programs link and run; 100 dead `connect()`s repaired, tree-wide count 0. Nine port defects were found by DRIVING the interface that reading it could not see — `clear()` emitting a signal Qt 2 blocked and killing the app on a large delete, an eaten ampersand, a dead `key()` virtual, `truncate(-1)`, a pre-filled field Qt 6 selects and Qt 2 did not, ten unpinned validators in `MT_GUI`, and three in the Create-constants dialog that reached generated data. Detail in §9 |
 | V — check against the 1.3 binary | **V1, V5's MDH probe, V6, V7 and V8 all done, all PASS.** Ordering: 10 of 10 container orders match. Arithmetic: `twoBases` exact bit for bit, `octopus` 9/9 with three joints exact and 5 ulp worst. **V6, V7 and V8 done 2026-08-29** — friction and no-collide negotiation, their four remaining rules, and the GP parameter blocks captured *before* their conversion. `verification-against-sigel-1.3/v6`, `v7`, `v8`. **V9 done 2026-08-29, 3 of 3** — three function bodies disassembled, which symbol lookups cannot see. **V3 SATISFIED 2026-09-02** — same-box determinism, demonstrated twice by the oracle (`serA`≡`serB`, `octGateA`≡`octGateB`). **V4 DROPPED 2026-09-03** — whole-run digests cannot cross an x87/IEEE boundary, and the counts that appear to agree are forced by the code. **Replaced by a measurement of OUTPUT needing no reference: the port EVOLVES** — population 100, 30 generations, best fitness 0.063794 → 0.141625, §9. V2 remains open |
 
 **SCOPE — DECIDED 2026-08-23. Read this before changing anything.**
@@ -487,9 +487,9 @@ D20 supersedes D5, D24 supersedes D3.
 |---|---|---|
 | **D27** *(decision; §10 also has a **step** D27, the shim deletion — the two D-series overlap and this is the first collision)* | The duplicate MetaGP `A&bout` | **removed**, with its trailing separator. Present in 1.3 and verified there; wired to the same `slotAbout()` as `Help > About` and opening the identical `SIG_InfoBox`. The port's first intentional difference from 1.3. `Help > About` untouched |
 | **D28** | The `QSpinBox` over-range divergence (C11a) | **accepted, not fixed.** 1.3 accepts out-of-range digits and clamps on commit; the port refuses the keystroke and commits a truncated prefix. It is reachable **only by typing a number outside the box's own range**, and the differing value is **visible in the box** before anything is saved — 1.3 shows 99, the port shows 10. Contrast what the port did fix: `clear()` killed the application, the ampersand rendered wrong, a negative width silently wrote no file — all reachable with valid use. The fix is not the 33 lines of it, it is **owning a custom widget forever**: every future form edit and every new spin box must remember `SIG_SpinBox` or silently opt out. Pinned in `guibehaviour-baseline.txt` (`commits=`) so it cannot drift; prototype and the measured comparison in `future_refactorings.md`. **Revisit if** a dialog spin box turns out to feed something unvalidated, or if anyone actually hits it |
-| **D29** *(signed off 2026-09-04)* | Changing run parameters **while an evolution is running** | **FORBIDDEN in the port, whatever 1.3 permits.** The user's reason is the specification, not 1.3: *"that's not how GAs/GPs are commonly implemented"* — the parameters define the run. **And a harder justification arrived after the decision**: mid-run GUI interaction does not merely leave a run ill-defined, it **crashes 1.3 reliably** — isolated on a single process, ten generations untouched then dead within seconds of an injected click (§10's `pvmTasks` section). *That is evidence for the decision, not the reason for it; the decision was taken on the GP-semantics ground and stands on it.* **D29 does not fix that crash** — the crash arrives through `haveABreak()`'s `processEvents` and a menu path that never calls `putAllIntoExperiment()`, and the port has the same mechanism intact. **The port's second intentional divergence**, after D27. Implemented as a guard inside `SIG_Experiment::putAllIntoExperiment()`, NOT on the widgets, because a widget guard does not cover the path that matters: `SIG_ExperimentListView::slotSelectionChanged` ends with an **unconditional** `putAllIntoExperiment()` (in `slotSelectionChanged`) — two lines after it has already asked `manager->running()` for a different purpose — so a **page switch** can push widget state into a live run. **THAT WAS NOT ENOUGH, AND THE CLAIM THAT WENT WITH IT WAS WRONG.** This row said "1.3 disables the five parameter pages during a run, so no user-typed value can reach that path today". **The five pages `putAllIntoExperiment()` commits and the five `slotStartEvolution` disables are DIFFERENT SETS.** Committed: `experimentView`, `gpParameter`, `simulationParameter`, `languageParameters`, `environmentView`. Disabled: `gpParameter`, `simulationParameter`, **`robotView`**, `languageParameters`, `environmentView`. So **`experimentView` is committed and never disabled** — it is the page the user is looking at when they press Start, it stays live for the whole run, and its history checkbox and autosave slider are wired **straight to `SIG_ExperimentView::putIntoExperiment()`**, not to `putAllIntoExperiment()`. The running GP reads `getAutosave()` **every generation** (`SIG_GPManager.cpp:804-806`). Meanwhile `robotView` is disabled but `SIG_RobotView::putIntoExperiment()` has **no callers at all**. *The incidental property this row leaned on did not exist.* Found by review.
+| **D29** *(signed off 2026-09-04)* | Changing run parameters **while an evolution is running** | **FORBIDDEN in the port, whatever 1.3 permits.** The reason is the specification, not 1.3: *"that's not how GAs/GPs are commonly implemented"* — the parameters define the run. **The port's second intentional divergence**, after D27. *A harder justification arrived later and is narrower than it first looked: one mid-run action, MetaGP `Configure System` opening its window, crashes 1.3 reliably, while ~25 other injected mid-run events did nothing. That is evidence for the decision, not the reason for it — and **D29 does not fix that crash**, which arrives through a menu path that never writes a parameter.* **Implementation, and the three wrong versions it went through, are in §10 — read that before changing the guard** |
 
-**So D29 is now a run-scope COUNTER, not a per-experiment flag, and it guards five things rather than one:** `putAllIntoExperiment()`, `SIG_ExperimentView::putIntoExperiment()` (the live page), the **seven** import/load slots which write `gpExperiment.*` directly and are reachable mid-run through context menus parented on `SIG_Experiment` rather than on the pages, the tree-click emit, and — via `evolutionRunningActions` — the four MetaGP actions. *Per-experiment was wrong three ways beyond the missed page: selecting a **different** experiment mid-run asked that one's flag and re-enabled everything (and `File > New`/`Open Experiment` are not locked and both end in `setCurrentItem()`, so one click did it); a nested `slotStartEvolution` reached through `processEvents` cleared the flag on return; and an exception out of `start()` skipped the clear and wedged the experiment permanently. A count entered by a scope guard fixes all three.* **The obvious predicate could not have worked:** `SIG_GPManager::running()` is a 2003 stub that returns `false` unconditionally (`SIG_GPManager.h:115`) and is overridden nowhere, so a guard written against it would never fire — the flag is explicit instead. Ordering is load-bearing: `slotStartEvolution` calls `putAllIntoExperiment()` **before** `gpManager->start()`, so the settings a user chose are still committed at start and only later writes are refused. **Out of scope, deliberately, and flagged rather than decided:** `allIndividualsView->setEnabled( false )` is **commented out in the 2003 source** (`:280`), so the Individuals view stays live during a run. Individuals are the population, not parameters, so this decision does not touch them — but it is the one place a user can still act mid-run. **AND A SECOND, LARGER HOLE WAS FOUND WHILE CHECKING THAT, AND CLOSED.** `SIG_ExperimentListView::slotSelectionChanged` asked `manager->running()` — the same 2003 stub — and so **always** emitted `evolutionNotRunning( true )`, which drives `SIG_MainWindow::slotEnableEvolutionRunningActions` over the 23 `evolutionRunningActions`. *The actions ARE correctly disabled when a run starts* — `SIG_Experiment` emits `signalEvolutionNotRunning( false )` and **both** experiment construction sites relay it — **so the defect was never "they are not disabled". It is that ONE CLICK ON THE EXPERIMENT TREE re-enabled them, mid-run**, handing back Import GP-Parameters, Import Population, Add, Delete, Reset and eighteen more. *An earlier reading of this section concluded the actions were never disabled at all; that was wrong, and it was wrong because the relay lives in `SIG_ExperimentListView` while the emit lives in `SIG_Experiment` and only the latter was traced.* Now driven from `isEvolutionRunning()`. **COVERAGE. A review measured that NEITHER mechanism was gated** — deleting the line that armed the lock, and reverting the tree-click emit wholesale, both left all 846 checks green, with a positive control proving the emit line *is* observable. That is now fixed by the **`runlock`** scenario, the ninth in the `gui behaviour` set. It needs no live evolution: `SIG_Experiment::RunScope` is what `slotStartEvolution` enters around `gpManager->start()`, so entering one puts the application in exactly the state the lock exists for, deterministically and in about a second. The observable is the **model** — `gpParameter.getMaxAge()` — because two cheaper ones are wrong and both are recorded at the site: reading the spin box back after a page switch reports a false refusal (nothing calls `getOutOfExperiment` on the way back, so the widget keeps what was typed either way), and saving the experiment is impossible under the lock because `Save Experiment` is itself one of the 23 locked actions. It also pins that `RunScope` nests and releases on unwind. **Teeth: removing the guard body fails it, and reverting the emit fails it.** **NOT COVERED.** `runlock` makes its own `RunScope`. It therefore cannot check the line in `slotStartEvolution` that makes one. Delete `RunScope runScope;` there and the gate still passes. To check that line you must run a real evolution. Every shipped experiment stops on a date in 2001, so a correct Start returns in under 100 ms. That is too fast to observe |
+
 
 ---
 
@@ -536,7 +536,7 @@ through `f0f2daa`.
 
 ## 7. Steps
 
-**Exit criterion per step:** `./check.sh` at the repo root — **845 pass, 0 fail,
+**Exit criterion per step:** `./check.sh` at the repo root — **846 pass, 0 fail,
 508 warnings** as of 2026-09-03, after §9 items 5 and 2 and the clipped-control gate, and it now **exits non-zero** when
 anything fails or is skipped. Zero is reachable because the two permanently
 Windows-only `WIN_*` files are an explicit exclusion rather than a standing
@@ -823,7 +823,7 @@ succeeded.**
 **Gates any session must keep green**, all committed:
 
 ```
-./check.sh                                            845 pass, 0 fail, exit 0
+./check.sh                                            846 pass, 0 fail, exit 0
 ./dictorder-dump.sh | diff -u dictorder-baseline.txt -    empty
 ./fitness-check.sh  | diff -u fitness-baseline.txt -      empty
 ASAN_OPTIONS=detect_leaks=0 ./fitness-check.sh build      exit 0
@@ -2457,20 +2457,25 @@ absent.
 
 ## 9. Open
 
-**WHAT IS ACTUALLY OPEN, as of 2026-09-03.** The tables below are mostly struck
-through; read this first and use them for detail only.
+**WHAT IS ACTUALLY OPEN, as of 2026-09-05.** Closed rows have been removed from
+this box; the tables below keep them, struck through, for their lessons.
 
 | still open | size |
 |---|---|
-| ~~**item 1** — `pagesave` and `roundtrip` have no gate~~ **BOTH DONE 2026-09-03.** `pagesave` against a reference captured from the 2003 binary; `roundtrip` after fixing a probe that could not fail | closed |
-| **`SIGEL_SlaveGUI` has no runtime connect coverage** — 44 `SIGNAL(` and 44 `SLOT(` sites, and `check.sh` never runs the `slavegui` scenario | coverage; found 2026-09-03 |
-| ~~**item 3** — `QHashSeed::setDeterministicGlobalSeed()` unowned in `sigel.cpp`~~ **DONE 2026-09-04** — and it was UI non-determinism, not bookkeeping: `~SIG_Experiment` iterates `widgetDict` to remove widgets from a **shared** stack | closed |
+| **`SIGEL_SlaveGUI` has no runtime connect coverage.** 44 `SIGNAL(` and 44 `SLOT(` sites, and `check.sh` never runs the `slavegui` scenario | coverage |
+| **The port's exposure to the `pvmTasks` crash is untested.** 1.3 dies when MetaGP Configure System opens its window during a run. The port has the same unchecked read and the same `processEvents` pump. It would assert rather than segfault. Nobody has tried it | §10 |
+| **1.3's silent wedge — does the port do it too?** Toggling Use MetaGP mid-run stops the evolution while the GUI keeps repainting and Stop stays enabled. D29 locks the trigger; it does not answer whether another route wedges the port | §10 |
+| **D29's arming line is not gated.** `runlock` makes its own `RunScope`, so it cannot check the one in `slotStartEvolution`. That needs a live run | §5c |
 | **item 4** — six dropped size constraints | measured, cosmetic |
-| ~~**undriven**: a MetaGP evolution, `MT_Editor`, `MT_AddConstantsWidget`, `update statistics`, MT_GUI's toolbar actions~~ **ALL BUT THE EVOLUTION DRIVEN 2026-09-04** — new `metadrive` scenario, in the gate | coverage |
-| **a MetaGP evolution — probably UNREACHABLE, on both versions, and for a reason worth stating** | `Start` is created disabled and is enabled only by `separateEvolutionAllowed()`, i.e. `getPresentTSize() >= getResultArray()->size()` — the training set having FILLED — and that predicate is re-evaluated **only on a MetaGP page switch** (`MT_MainWindow.cpp:282,309,361,380`), so it never lights up on its own. Filling the trainer needs a running SIGEL evolution feeding the classifier and evaluator. **There is no shortcut in the shipped data**: `&Open` filters for `Setup(*.mcnf)` and **no `.mcnf` exists in the repo or any tarball**. **And the MetaGP window is application-modal**, measured on 1.3 — with it open the main window accepts no input (0 pixels changed, against a control of 141,023 for a page switch inside the MetaGP window), so the feeding evolution cannot run while the window showing `Start` is open. The only route is enable → **close** → run → reopen → switch pages. *1.3 then crashed in generation 4 of that run; see the `pvmTasks` hazard in §10. Attribution pending a control.* **If both versions never enable Start, that is an equivalence result and closes this item rather than leaving it open** |
-| ~~D28's divergence reaches `MT_AddConstantsWidget`~~ **FIXED 2026-09-04** — it reached the generated constants tenfold, so Qt 2's out-of-range rule is restored there rather than accepted | closed; D28 stands for the spin boxes it covers |
-| six forms declare a minimum smaller than Qt 6's layout needs — inherited from 1.3, `MT_StatisticsWidgetBase` unreadable if dragged small | usability |
-| the evolution result is recorded as prose; no artefact is committed | reproducibility |
+| **six forms declare a minimum smaller than Qt 6's layout needs**, inherited from 1.3. `MT_StatisticsWidgetBase` is unreadable if dragged small | usability |
+| **the evolution result is prose; no artefact is committed** | reproducibility |
+| **V2** — a save path in `sigel_eval` and the same round trip locally, as a gate. Read V8 result 5 first: a shipped `.exp` round-tripped through 1.3 differs from its input by ten keys, so an input-vs-pass-1 gate fails however correct the port is | equivalence instead of self-consistency |
+
+**A MetaGP evolution is NOT open — it is unreachable on both versions.** `Start`
+enables only once the training set fills; filling it needs a run; the MetaGP
+window is application-modal so the run cannot proceed while the window showing
+`Start` is open; and no `.mcnf` setup ships to shortcut it. Both versions refuse
+for the same reason, which is an equivalence result rather than a gap.
 
 **Closed and kept only for their lessons:** items 2 and 5, every row of the
 `never driven` table, V3 (satisfied) and V4 (dropped). **The most useful part of
@@ -4619,6 +4624,72 @@ what made a separate stat report 0; it removes the probe's ability to report a
 contradiction, and leaves a real truncation to show up where it should — as a
 hash mismatch and a failed round trip, loudly.*
 
+### D29 — how the run lock is built, and the three versions that were wrong
+
+**Read this before changing the guard.** The decision is in §5c; this is what it
+took to implement, and each wrong version passed its own gate.
+
+**Where the guard is.** A **count** of running evolutions, incremented by
+`SIG_Experiment::RunScope`, which `slotStartEvolution` enters around
+`gpManager->start()`. Five things ask it:
+
+| guarded | why it needs its own guard |
+|---|---|
+| `putAllIntoExperiment()` | the aggregator; a **page switch** reaches it — `slotSelectionChanged` ends with an unconditional call |
+| `SIG_ExperimentView::putIntoExperiment()` | **the page that stays live.** See below |
+| the seven import/load slots | they write `gpExperiment.*` directly and never go through the aggregator. `slotRobotLoad` replaces the whole robot. Reachable mid-run through context menus parented on `SIG_Experiment`, not on the pages |
+| the tree-click emit | drives the 23 `evolutionRunningActions` |
+| the four MetaGP actions | none was in `evolutionRunningActions` at all |
+
+**Version 1 was wrong: it guarded only the aggregator.**
+`slotStartEvolution` disables five pages — `gpParameter`,
+`simulationParameter`, **`robotView`**, `languageParameters`,
+`environmentView` — and the aggregator commits a *different* five:
+`experimentView`, `gpParameter`, `simulationParameter`, `languageParameters`,
+`environmentView`. **`experimentView` is committed and never disabled.** It is
+the page the user is looking at when they press Start, it stays live for the
+whole run, and its history checkbox and autosave slider are wired straight to
+`SIG_ExperimentView::putIntoExperiment()`. The running GP reads `getAutosave()`
+**every generation** (`SIG_GPManager.cpp:804-806`). Meanwhile `robotView` is
+disabled but `SIG_RobotView::putIntoExperiment()` has **no callers at all**.
+
+**Version 2 was wrong: a bool per experiment.** Three ways. Selecting a
+*different* experiment mid-run asked that one's flag and re-enabled everything —
+and `File > New`/`Open Experiment` are not locked and both end in
+`setCurrentItem()`, so one click did it with no second experiment needed. A
+nested `slotStartEvolution` reached through `processEvents` cleared the flag on
+return. An exception out of `start()` skipped the clear and locked the
+experiment for good. A count entered by a scope guard fixes all three.
+
+**Version 3 was wrong: it asked `SIG_GPManager::running()`.** That is a 2003
+stub returning `false` unconditionally (`SIG_GPManager.h:115`), overridden
+nowhere, so a guard against it can never fire. It is also why 1.3 has the same
+visible defect from a different cause: **one click on the experiment tree
+re-enabled all 23 locked actions mid-run.** The actions *are* correctly disabled
+at start — `SIG_Experiment` emits `signalEvolutionNotRunning( false )` and both
+construction sites relay it — so the defect was never "they are not disabled".
+
+**Ordering is load-bearing.** `slotStartEvolution` calls
+`putAllIntoExperiment()` **before** `gpManager->start()`, so the settings a user
+chose are committed at start and only later writes are refused.
+
+**Coverage.** The `runlock` scenario executes the guard in its locked state,
+which nothing did before — a review measured that both mechanisms could be
+reverted wholesale with all checks green. It needs no live evolution because
+`RunScope` is public. Its observable is the **model**, `gpParameter.getMaxAge()`,
+because two cheaper ones are wrong: reading the spin box back reports a false
+refusal (nothing calls `getOutOfExperiment` on the way back), and saving is
+impossible under the lock because `Save Experiment` is itself locked.
+**NOT COVERED:** `runlock` makes its own `RunScope`, so it cannot check the one
+in `slotStartEvolution`. Delete that line and the gate still passes. Checking it
+needs a real run, and every shipped experiment stops on a date in 2001, so a
+correct Start returns in under 100 ms.
+
+**Out of scope, deliberately.** `allIndividualsView->setEnabled( false )` is
+commented out in the 2003 source, so the Individuals view stays live during a
+run. Individuals are the population, not parameters. It is the one place a user
+can still act mid-run.
+
 ### PRE-EXISTING — `pvmTasks` is READ without the growth check that WRITES it
 
 **Found 2026-09-04 from the oracle's crash, and it is 1.3's own defect,
@@ -4651,38 +4722,53 @@ members in the evolution loop at population 100 — `pool` 100, `tours` 50,
 can be near 272**: it is built at 100 and grows a whole population at a time, so
 its sizes are 100, 200, 300, and **272 is out of range for exactly size 200**.
 
-**ISOLATED 2026-09-04, AND IT IS NOT MetaGP. INTERACTING WITH THE GUI DURING A
-RUNNING EVOLUTION CRASHES 1.3, RELIABLY.**
+**WHAT CRASHES 1.3, stated narrowly because two broader versions of this were
+wrong and both were withdrawn.**
 
-| MetaGP | mid-run interaction | outcome |
+> **MetaGP `Configure System`, opening its `MTMainWindow` during a running
+> evolution, crashes 1.3. Ordinary mid-run interaction does not.**
+
+Both halves are measured, not one inferred from absence. Four crashes on that
+path; against them, **~25 other injected mid-run events across two runs — tree
+selections, spin-box clicks, a slider, menu opens, Stop — did nothing at all**,
+with no lost generation.
+
+| MetaGP | mid-run action | outcome |
 |---|---|---|
-| on | MetaGP menu → Configure System | **crash**, generation 4, index 272 |
-| on | MetaGP menu → Configure System | **crash**, generation 7, index 497 |
-| **off** | none | generation 10, **alive** |
-| **on** | none | generation 10, **alive** |
-| **on** | **none for 10 generations, THEN inject** | **crash within seconds**, index 702 |
+| on | Configure System | crash, generation 4, index 272 |
+| on | Configure System | crash, generation 7, index 497 |
+| off | none | generation 10, alive |
+| on | none | generation 10, alive |
+| on | none for 10 generations, **then** Configure System | crash in seconds, index 702 |
+| on, set **before** Start | none for 4 generations, **then** Configure System | crash in 10 s, index 359 |
 
-**The last row settles it**: the *same process* ran ten generations untouched —
-past both earlier crash points — and died within seconds of an injected menu
-click. Before and after on one run, so no seed, no cross-run variation and no
-timing luck can explain it. **MetaGP enabled with no interaction is clean, so
-the feeding path and `MT_Evaluator::checkTask` are exonerated** — MetaGP was
-only ever how the oracle happened to reach the GUI.
+**The last row is the cleanest**: MetaGP was enabled before Start so no mid-run
+toggle could confound it, four generations ran untouched, and the Configure
+System click was the only injected event in the run.
 
-**The index is not special.** Always exactly one warning line then death, and N
-tracks the cumulative task count at roughly 70 per generation — 272 at
-generation 4, 497 at 7, 702 at 10. **N is simply wherever the counter has got
-to when the interaction lands**; any point in a run will do.
+**The index is not special.** One warning line then death, and N tracks the
+cumulative task count at roughly 70 per generation — 272 at 4, 359 at 4 with 369
+spawns logged, 497 at 7, 702 at 10. N is wherever the counter has reached when
+the click lands.
 
-*The first two reports of this were attribution-shaped and both were withdrawn.
-The confound — MetaGP and interaction varied together — was caught by writing
-the comparison out as a TABLE rather than as prose: the empty cell is obvious in
-columns and invisible in a sentence. Recorded as the practice, not the
-incident.*
+*Two withdrawn versions, kept because the errors are the instructive part.*
+**First: "MetaGP crashes 1.3."** The experiment was confounded — MetaGP enabled
+and the GUI touched moved together in every run. **Second: "mid-run GUI
+interaction crashes 1.3."** Too broad; the three crashes happened to share the
+specific trigger and it was generalised over the shared factor. Both times the
+fix was to build the missing cell of the table, and the negative side took one
+run.
+
+**A second failure mode on the same path, and it is worse than the crash.**
+Toggling `Use MetaGP` mid-run with no `stdConf.mt` present raises an error
+dialog; press Standard and **the evolution never advances again** while the
+process stays alive and repainting, Stop stays enabled and Start stays greyed.
+Measured 4.5 minutes with zero new slave spawns against a 62 s/generation
+baseline. *A crash is obvious. This looks exactly like a healthy run.* D29 locks
+the trigger; whether the port can wedge by another route is open.
 
 **Passive observation is safe.** A screenshot of the main window during a live
-run did not crash it; only injected events did. So monitoring a run by capture
-is fine and clicking is not — which matters for any harness on either side.
+run did not crash it. Only injected events did.
 
 **THE PORT HAS THE SAME MECHANISM, INTACT.**
 `SIG_GUIGPManager::haveABreak()` is `qApp->processEvents( QEventLoop::AllEvents,
