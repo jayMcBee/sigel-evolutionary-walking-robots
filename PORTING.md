@@ -25,14 +25,14 @@ build and run, because nothing else can be verified without it — see §3.
 
 | phase | state |
 |---|---|
-| 0 — comments to English | done for the 9 core modules; 9 GUI files still hold Latin-1 |
+| 0 — comments to English | done for the 9 core modules; **15 lines across 10 GUI files remain**, nine of them CRLF. §9 |
 | A — core onto Qt 6 | **done**, tags `step-A0`…`step-A9` |
 | B — ownership explicit | **subsumed by Phase D**, which deletes the containers rather than converting them. **0 `setAutoDelete` calls left in core**, re-measured 2026-08-30 after D25c: D11 removed the last in `SIGEL_Robot`, D24 the last in `MT_Control`, D25b replaced the two `fitTaskList` calls with an RAII guard, and D25c wrote out `tours`' two real frees at their sites. **0 tree-wide as of 2026-09-05** — every remaining `autoDelete` mention is a comment explaining what the Qt 2 original did |
 | R — build and run | core builds and runs. **No longer checked only against itself** — Phase V has confirmed both the ordering and the arithmetic against the 1.3 binary, §7 |
 | T — old-Qt tool container | **done 2026-08-27.** `tools/qtmig`, §4 |
 | D — delete the shim, migrate the data | **DONE 2026-08-30.** `q2compat.h` and `q2compat_check.cpp` deleted; `include/compat/` gone; **no `Q2*` shim type is used anywhere**. D1–D27. *D27 once said 71 lines of Qt 2 containers survived for Phase C to convert. **Phase C is done and none survive**: re-measured 2026-09-05, five textual mentions remain in the GUI modules and all five are comments.* The shim's self-check step is gone from `check.sh`. §10 |
 | P — PVM | **DONE 2026-08-28.** Vendored 3.4.3 replaced by upstream 3.4.6; nine patches carry the four config lines and Debian's eight source fixes; `libpvm3.a` and `pvmd3` build; SIGEL's two PVM objects link against them and `SIG_GPPVMData` round-trips through real PVM. `sigel`/`sigel_slave` still need Phase C. §7 |
-| C — GUI | **DONE.** C1–C10, C11a–C11d, C12. All 20 Designer forms converted; five GUI modules build as archives; both programs link and run; 100 dead `connect()`s repaired, tree-wide count 0. Nine port defects were found by DRIVING the interface that reading it could not see — `clear()` emitting a signal Qt 2 blocked and killing the app on a large delete, an eaten ampersand, a dead `key()` virtual, `truncate(-1)`, a pre-filled field Qt 6 selects and Qt 2 did not, ten unpinned validators in `MT_GUI`, and three in the Create-constants dialog that reached generated data. Detail in §9 |
+| C — GUI | **DONE.** C1–C10, C11a–C11d, C12. *The API conversion is complete — zero Qt 2 spellings in live code, swept 2026-09-05 — but §9 lists two conversion tasks still open: Phase 0's last 15 comment lines, and 28 doc comments that still name the old types.* All 20 Designer forms converted; five GUI modules build as archives; both programs link and run; 100 dead `connect()`s repaired, tree-wide count 0. Nine port defects were found by DRIVING the interface that reading it could not see — `clear()` emitting a signal Qt 2 blocked and killing the app on a large delete, an eaten ampersand, a dead `key()` virtual, `truncate(-1)`, a pre-filled field Qt 6 selects and Qt 2 did not, ten unpinned validators in `MT_GUI`, and three in the Create-constants dialog that reached generated data. Detail in §9 |
 | V — check against the 1.3 binary | **V1, V5's MDH probe, V6, V7 and V8 all done, all PASS.** Ordering: 10 of 10 container orders match. Arithmetic: `twoBases` exact bit for bit, `octopus` 9/9 with three joints exact and 5 ulp worst. **V6, V7 and V8 done 2026-08-29** — friction and no-collide negotiation, their four remaining rules, and the GP parameter blocks captured *before* their conversion. `verification-against-sigel-1.3/v6`, `v7`, `v8`. **V9 done 2026-08-29, 3 of 3** — three function bodies disassembled, which symbol lookups cannot see. **V3 SATISFIED 2026-09-02** — same-box determinism, demonstrated twice by the oracle (`serA`≡`serB`, `octGateA`≡`octGateB`). **V4 DROPPED 2026-09-03** — whole-run digests cannot cross an x87/IEEE boundary, and the counts that appear to agree are forced by the code. **Replaced by a measurement of OUTPUT needing no reference: the port EVOLVES** — C11 has the figures. V2 remains open |
 
 **SCOPE — DECIDED 2026-08-23. Read this before changing anything.**
@@ -726,8 +726,33 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 concurrent is not. On 2026-08-27 three concurrent sessions nearly corrupted a
 reference capture.
 
-This document is the handover. A new session should read §0, this section, and
-the phase it is taking on.
+This document is the handover. A new session should read §0, this section,
+**§9's open list — which is ordered so the conversion work still to do comes
+first** — and then the phase it is taking on.
+
+**REBUILD EVERYTHING BEFORE RUNNING THE GATES, and name the targets.** Touching
+one source file makes five things stale, and the gates refuse a stale binary
+rather than scoring it — correctly, but it costs a full run each time. This cost
+three runs on 2026-09-05:
+
+```
+make B=build-fast SAN= SIGSAN=            the fast tree
+make B=build-fast SAN= SIGSAN= programs   sigel and sigel_slave
+make B=build-fast SAN= SIGSAN= guidrive   the driver
+make B=build                              the sanitized tree
+make B=build pvm-link                     pvm-check's binary
+```
+
+**`make -q B=build-fast SAN= SIGSAN=` with no target answers for `all`, which
+does NOT depend on `guidrive` or on `programs`** — it reports up to date while
+both are stale. Always name the target.
+
+**AND DO NOT RUN THE GATES CONCURRENTLY.** `check.sh` regenerates `build/ui/*.h`
+with `uic`, which makes `build/sigel_eval` and `build/pvm_link` stale in the
+middle of its own run — so a `fitness-check.sh build` or `pvm-check.sh` started
+alongside it is refused for staleness that did not exist when it began. Run them
+in sequence. *Measured 2026-09-05; the refusal is the guard working, not a
+defect.*
 
 **The `sigel-x86` channel** reaches the machine holding the 1.3 reference binary
 and a working PVM. **That PVM is no longer the only one** — this machine has had
@@ -2095,17 +2120,33 @@ happens behind the Start button. **With the vendored PVM up it runs locally** �
 three generations driven end to end on 2026-09-02.
 
 **WHAT IS ACTUALLY OPEN, as of 2026-09-05.** Closed items are not listed; their
-lessons live in the step sections above.
+lessons live in the step sections above. Ordered: conversion work first, then
+questions the port could still be wrong about, then gaps in coverage.
 
-| still open | size |
+**THE PORT IS NOT FINISHED.** No Qt 2 API remains in live code — swept
+2026-09-05 over 33 spellings across `src/` and `include/`, code split from
+comment, zero in code — but two conversion tasks are open and both are in the
+first table below.
+
+| conversion still to do | size |
 |---|---|
-| **The port's exposure to the `pvmTasks` crash is untested.** 1.3 dies when MetaGP Configure System opens its window during a run. The port has the same unchecked read and the same `processEvents` pump. It would assert rather than segfault. Nobody has tried it | §10 |
-| **1.3's silent wedge — does the port do it too?** Toggling Use MetaGP mid-run stops the evolution while the GUI keeps repainting and Stop stays enabled. D29 locks the trigger; it does not answer whether another route wedges the port | §10 |
-| **D29's arming line is not gated.** `runlock` makes its own `RunScope`, so it cannot check the one in `slotStartEvolution`. That needs a live run | §5c |
-| **six forms declare a minimum smaller than Qt 6's layout needs**, inherited from 1.3. `MT_StatisticsWidgetBase` is unreadable if dragged small | usability |
-| **the evolution result is prose; no artefact is committed** | reproducibility |
-| **D29's guard placement in `putIntoExperiment` is source-derived, not measured.** Does 1.3 refresh the generations LCD on a page switch *during* a run? The guard now sits below that read on the assumption that it does. One oracle run with a mid-run page switch settles it | §5c |
-| **V2** — a save path in `sigel_eval` and the same round trip locally, as a gate. Read V8 result 5 first: a shipped `.exp` round-tripped through 1.3 differs from its input by ten keys, so an input-vs-pass-1 gate fails however correct the port is | equivalence instead of self-consistency |
+| **Phase 0 — German comments to English, the last 15 lines.** Ten files: `MT_StatisticsWidget.cpp` 3 lines, `SIG_SimulationVisualisationWidget.cpp` 4, and one each in `MT_AddConstantsWidget.cpp`, `MT_PopulationWidget.cpp`, `SIG_MainWindow.cpp`, `DoubleSpinBox.h`, `MT_Editor.h`, `MT_ExperimentItem.h`, `MT_PopListViewItem.h`, `MT_WidgetBase.h`. **Nine of the ten are CRLF — edit in binary mode.** Criterion is D14's: strip comments from before and after, the remainder must be byte-identical | 15 lines, 10 files |
+| **28 doc comments still name a member by its Qt 2 type.** `SIG_GPManager.h` says *"This QArray is used to store the randomly created tournaments"* of a `QList`; a reader of the header is told the wrong type. 16 files, led by `SIG_GPManager.h` 4, `SIG_GPParameter.h` 4, `MT_Trainingset.h` 4. **Do not touch the port's own historical notes** — "Qt 2's `QArray` was writable through `at()`" is correct and stays. Same encoding rules as Phase 0 | 28 lines, 16 files |
+| **Six forms can be dragged smaller than Qt 6 can lay them out.** Qt's mechanism is `minimumSize` in the `.ui`, and this is the SAME fix already applied to `GroupBox6` and `groupboxDirectory` and gated by `slave gui` — so it is a fix, not a permanent limitation. Declared against measured `minimumSizeHint` under Qt 6.10.2: `MT_StatisticsWidgetBase` **220x390 against 427x555** (the worst; it sits in the MetaTrainer's `QSplitter`, so a user can drag it until the labels compress to 3-8 px tall), `SIG_SimulationWidgetBase` 780x640 against 373x752, `MT_EstimationWidgetBase` 230x260 against 323x274, `MT_SelectionWidgetBase` 410x240 against 472x301, `MT_IndividualsWidgetBase` 440x362 against 338x404, `MT_SearchWidgetBase` 240x400 against 228x420. **Take the per-axis maximum** — `SIG_SimulationWidgetBase` is already wider than it needs and only too short. **Re-measure before editing**, and extend `clipcheck`'s walk or add a form-render assertion so the six are gated afterwards. *The declared values come from 1.3 and were readable under Qt 2's smaller default font; Qt 6's larger one is what breaks them, so raising the minimum RESTORES 1.3's readability rather than diverging from it* | 6 forms |
+
+| the port could still be wrong here | who can answer it |
+|---|---|
+| **The `pvmTasks` crash is untried on the port.** 1.3 dies when MetaGP `Configure System` opens its window during a run. The port has the same unchecked read and the same `processEvents` pump; it would assert rather than segfault. **Nobody has tried it** | drive it here, then on 1.3 |
+| **1.3's silent wedge — does the port do it too?** Toggling `Use MetaGP` mid-run stops the evolution on 1.3 while the GUI keeps repainting and Stop stays enabled. D29 locks that trigger; it does not answer whether another route wedges the port | drive it here |
+| **D29's guard placement in `putIntoExperiment` is source-derived, not measured.** Does 1.3 refresh the generations LCD on a page switch *during* a run? `poolGeneration` is incremented per generation and 1.3 has no guard, so the guard now sits below that read on the assumption that it does. One oracle run with a mid-run page switch settles it | the x86 box |
+
+| coverage gaps | what is missing |
+|---|---|
+| **D29's arming line is not gated.** `runlock` makes its own `RunScope`, so it cannot check the one in `slotStartEvolution` | a live run |
+| **The evolution path is in no gate.** `gui behaviour`'s ten scenarios do not include `evolution`, so nothing in `check.sh` runs a generation | a scenario, or an accepted cost |
+| **The evolution result is prose; no artefact is committed** | commit the 30-generation curve |
+| **V2** — a save path in `sigel_eval` and the same round trip locally, as a gate. `pagesave vs 1.3` covers the 192-line parameter block; the population and robot blocks are compared against nothing. Read V8 result 5 first: a shipped `.exp` round-tripped through 1.3 differs from its input by ten keys, so an input-vs-pass-1 gate fails however correct the port is | equivalence instead of self-consistency |
+
 
 **A MetaGP evolution is NOT open — it is unreachable on both versions.** `Start`
 enables only once the training set fills; filling it needs a run; the MetaGP
@@ -2372,10 +2413,9 @@ in `MT_IndividualWidgetBase.ui` (a dropped ceiling can only let a widget grow
 wider), a 200 px minimum in `MT_PopulationWidgetBase.ui` of which 190 is covered
 by `individualListView`'s own, and two in `MT_StatisticsWidgetBase.ui` carrying
 Qt's literal defaults. **Six forms declare a minimum smaller than Qt 6's layout
-needs**, inherited from 1.3 and not port regressions, the worst being
-`MT_StatisticsWidgetBase` at 220x390 against 427x555 — it sits in the
-MetaTrainer's `QSplitter`, so a user can drag it until the labels compress to
-3-8 px tall. Unreadable, but nothing hidden or unclickable. Otherwise the 20
+needs**, inherited from 1.3 and not port regressions, but **fixable with the same
+`minimumSize` mechanism the two group boxes above used** — the numbers and the
+instruction are in §9's open list. Otherwise the 20
 forms are clean, checked rather than assumed: 623 widgets, no negative
 coordinates, no zero-sized geometry, no `min > max`, no child outside its
 parent's declared size, no two grid items sharing a cell, every tab page laid
@@ -2447,7 +2487,11 @@ to be preserved.
 
 ### Ownership hazards Phase C inherits (was: the Phase B audit)
 
-**No `setAutoDelete` call remains anywhere — this said 11, and C6/C7 removed the last of them.** The 19 occurrences of the name left in the tree are all COMMENTS recording what the Qt 2 code used to free, and the same is true of every remaining mention of `QDict`, `QArray`, `QListViewItem`, `QPtrList` and `QCString`. The compiler is the proof: none of those types or methods exists in Qt 6, so a live one could not build, and the whole tree builds.
+**No `setAutoDelete` call remains anywhere — this said 11, and C6/C7 removed the last of them.** Every remaining occurrence of the name, and of `QDict`, `QArray`, `QListViewItem`, `QPtrList` and `QCString`, is in a comment. Re-measured 2026-09-05 by sweeping `src/` and `include/` for 33 Qt 2 spellings and splitting code from comment: **zero in code.** The only apparent exception, `QButtonGroup`, is Qt 6's class, not Qt 2's widget-flavoured one.
+
+**But 28 of those comments are now WRONG, and that is unfinished work.** They are 2003 doc comments that name the member by its Qt 2 type as though it were current — `SIG_GPManager.h` says *"This QArray is used to store the randomly created tournaments"* of what is now a `QList`. Across 16 files: `SIG_GPManager.h` 4, `SIG_GPParameter.h` 4, `MT_Trainingset.h` 4, `SIG_LanguageParameters.cpp` 2, `SIG_VisualSceneObject.h` 2, `MT_Statistics.h` 2, and one each in ten more. *This is separate from the port's own historical notes — "Qt 2's `QArray` was writable through `at()`; `QList`'s is not" — which are correct and stay. The sweep excludes those by looking for `Qt 2` / `used to` / `was` / a step number on the same line.* Listed as open.
+
+*Every step is DONE and enforced by a compiler that no longer accepts the Qt 2 alternative — the types themselves are gone from Qt 6, and the whole tree builds.*
 
 **A `getFoo()` returning a container by reference puts free sites in other
 modules**, including modules that do not compile yet. Grep the accessor, not
