@@ -5031,10 +5031,12 @@ static int guidriveMain(int argc, char **argv)
         // evolutionNotRunning( !SIG_Experiment::anyEvolutionRunning() ), and
         // anyEvolutionRunning() reads g_runningEvolutions, which ONLY
         // `RunScope runScope;' (SIG_Experiment.cpp:326) sets. Delete that line
-        // and a tree click mid-run emits TRUE and hands back all 23 locked
-        // actions. `&Save Experiment' is one of the 23 and, unlike the MetaGP
-        // four, nothing re-enables it afterwards -- so it reports the arming
-        // line and nothing else.
+        // and a tree click mid-run emits TRUE and hands back all 27 locked
+        // actions -- 23 appended at SIG_MainWindow.cpp:571-593 plus the four
+        // MetaGP ones at :685-688; `evolutionRunningActions.append' appears 27
+        // times. `&Save Experiment' is one of the 23 non-MetaGP ones and,
+        // unlike the MetaGP four, nothing re-enables it afterwards -- so it
+        // reports the arming line and nothing else.
         //
         // The FIRST greying is NOT the arming line: SIG_Experiment.cpp:304
         // emits signalEvolutionNotRunning(false) twenty-two lines BEFORE the
@@ -5059,13 +5061,13 @@ static int guidriveMain(int argc, char **argv)
                     if (qobject_cast<QMessageBox *>(m)) { describeMessageBox(m); m->close(); }
                     else printf("    (left open)\n");
                 }, 8000);
-                // D29's ARMING LINE, checked in a REAL run for the first
-                // time. SIG_MainWindow.cpp:685-688 puts all four MetaGP actions
-                // into evolutionRunningActions, so they are greyed for the
-                // duration of a run. PORTING.md 9 lists this as uncovered
-                // because `runlock' builds its own RunScope instead of running
-                // an evolution, and so can never exercise the arming line
-                // inside slotStartEvolution. This does.
+                // The BEFORE sample. It does NOT reach D29's arming line --
+                // SIG_MainWindow.cpp:685-688 puts the four MetaGP actions into
+                // evolutionRunningActions and SIG_Experiment.cpp:304 greys them
+                // at Start, 22 lines before the RunScope exists. Only the
+                // after-tree-click sample below reaches the arming line. An
+                // earlier version of this comment claimed otherwise, 25 lines
+                // from the paragraph withdrawing it. Found by review.
                 auto sampleCfg = [&]() {
                     int v = -1;
                     for (QAction *a : W->findChildren<QAction *>())
@@ -5114,7 +5116,17 @@ static int guidriveMain(int argc, char **argv)
                 // the repo's own failure marker. Found by review.
                 const int live = (cfgAfterTreeClick >= 0) ? cfgAfterTreeClick
                                                           : cfgEnabledDuringRun;
-                if (live == 1) {
+                // THE THIRD CELL. The injected run does TWO things -- a tree
+                // click and a Configure System click -- so on its own it cannot
+                // say which one killed the process. SIGEL_TREE_ONLY=1 does the
+                // tree click and stops, which is the missing cell. Without it
+                // this scenario commits the exact error its own control cell
+                // exists to prevent. Found by review.
+                if (qgetenv("SIGEL_TREE_ONLY") == "1") {
+                    printf("  >> TREE-CLICK-ONLY CELL: not clicking Configure System.\n"
+                           "  >> If this run survives, the tree click alone is not what"
+                           " kills it.\n");
+                } else if (live == 1) {
                     printf("  >> Configure System IS live -- clicking it, which is"
                            " what kills 1.3\n");
                     fflush(stdout);
@@ -5150,11 +5162,31 @@ static int guidriveMain(int argc, char **argv)
         const qint64 runMs = runClock.elapsed();
         sampler.stop();
         // THE ANSWER TO 9's "the pvmTasks crash is untried on the port".
+        //
+        // WHAT THE ABORT IS, and it is NOT a plain out-of-range index.
+        // MT_Controller::configureSystem does, three lines apart:
+        //     mainWindow->show();  delete substitution;  substitution = 0;
+        // (MT_Controller.cpp:402-404). `substitution' is the MT_Evaluator, and
+        // MT_Evaluator inherits SIG_GPFitnessTrainer -- so when the meta system
+        // is the Evaluator (stdConf.mt ships usedSystem=1 = EVALUATOR_SUBST),
+        // SIG_GPManager's `trainer' IS that object (SIG_GPManager.cpp:59-60,
+        // via MT_Controller::getFitnessTrainer which returns `substitution').
+        // Opening the window mid-run therefore DELETES THE TRAINER THE RUNNING
+        // LOOP IS HOLDING, and the next trainer->checkTask() reads a freed
+        // QList whose header is garbage. Bounds-checking the read would fix
+        // nothing. The same two lines are in the pristine 1.3 tarball, so this
+        // explains the oracle's crashes too. Found by review.
+        //
+        // WHICH container asserts is NOT identified. Qt 6 collapsed Qt 2's
+        // QArray and QGVector into QList, so MT_ResultBuffer,
+        // NumOfCorrectEstimation and NumOfMetaEstimation -- the three the 1.3
+        // analysis excluded BY TYPE -- now emit the identical message, and the
+        // port's assert carries no index. Do not cite a line number for it.
         // 1.3 dies opening MTMainWindow during a run -- `QGVector::operator[]:
         // Index 359 out of range' then its own SIGSEGV handler's `Invalid
         // storage access', four observations by the oracle, the cleanest with
-        // MetaGP set BEFORE Start and one injected click. The unchecked read is
-        // SIG_GPFitnessTrainer.cpp:368, reached from MT_Evaluator.cpp:473.
+        // MetaGP set BEFORE Start and one injected click. Which container
+        // asserts is NOT identified here -- see the note above.
         //
         // D29 greys the four MetaGP actions for the duration of a run, so the
         // click is refused -- UNTIL one click in the experiment tree, which
@@ -5190,14 +5222,27 @@ static int guidriveMain(int argc, char **argv)
                        " while an evolution was running.\n");
                 fflush(stdout); return 1;
             }
-            if (saveAfterTreeClick == 0)
-                printf("  >> D29's arming line HELD: a tree click mid-run left the"
-                       " other 22 locked actions greyed.\n");
+            // Only claim the arming line held when the click is PROVEN to have
+            // landed. Save Experiment was already greyed at Start, so 0 on its
+            // own is equally consistent with a click that reached nothing. The
+            // proof is cfgAfterTreeClick flipping 0 -> 1: actExpChanged() has
+            // exactly one emit site (SIG_ExperimentListView.cpp:332), one line
+            // after the emit that reaches the arming line, so the flip cannot
+            // happen without :331 having run. Found by review.
+            if (saveAfterTreeClick == 0 && cfgAfterTreeClick == 1)
+                printf("  >> D29's arming line HELD: the tree click provably landed"
+                       " (Configure System flipped 0->1, which only"
+                       " SIG_ExperimentListView.cpp:332 can do) and it left the 23"
+                       " non-MetaGP locked actions greyed.\n");
+            else if (saveAfterTreeClick == 0)
+                printf("  >> Save Experiment is greyed, but nothing here proves the"
+                       " tree click landed, so this says NOTHING about the arming"
+                       " line.\n");
             if (cfgAfterTreeClick == 0)
                 printf("\n  >> D29 HELD THROUGH A TREE CLICK: Configure System was"
                        " greyed during the run and stayed greyed after one tree"
                        " click, so the click that kills 1.3 is refused.\n"
-                       "  >> The unchecked read behind it is untouched.\n");
+                       "  >> The fault behind it is untouched.\n");
             else
                 printf("\n  >> D29 held before the tree click; the tree-click path was"
                        " NOT exercised in this run, so it is not answered here.\n");

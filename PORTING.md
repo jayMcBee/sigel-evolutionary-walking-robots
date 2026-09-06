@@ -1177,8 +1177,9 @@ legibility. *The 3-8 px figure was never measured on either binary.*
 ### `pvmcrash` — THE PORT HAS THE CRASH, and D29 does not close it — ANSWERED 2026-09-07
 
 **The §9 row that read "the `pvmTasks` crash is still untried on the port" —
-removed 2026-09-07 — is answered by driving it: the port aborts, from a sequence
-a user can perform.** Verbatim, one run:
+replaced in place 2026-09-07 by the crash row — is answered by driving it: the port aborts, from a sequence
+a user can perform.** One run, the lines that carry the result (two `[modal
+during run]` lines from the injection's own handler are omitted):
 
 ```
   [metagp] Use MetaGP clicked; Configure System found=1 enabled=1
@@ -1200,12 +1201,105 @@ a user can perform.** Verbatim, one run:
 
 **This is 1.3's crash.** The oracle's 1.3 run gives
 `QGVector::operator[]: Index 359 out of range` then its own SIGSEGV handler's
-`Invalid storage access`. The unchecked read is the same one,
-`SIG_GPFitnessTrainer.cpp:368` — `pvmTasks[ taskId ]`, no bounds test — reached
-from `MT_Evaluator.cpp:473`, which forwards a task id to the base class it
-inherits. **C11's prediction is now confirmed rather than expected**: it said the
-port would "abort on `QList::operator[]`'s live assertion rather than warn and
-segfault, which is louder but no more survivable". It does.
+`Invalid storage access`. **C11's prediction is confirmed rather than expected**:
+it said the port would "abort on `QList::operator[]`'s live assertion rather than
+warn and segfault, which is louder but no more survivable". It does.
+
+**THREE CELLS, because the injected run changes TWO things.** It performs a tree
+click *and* a Configure System click, so on its own it cannot say which one kills
+the process — and this document's own rule is that a crash with no negative cell
+proves only that the run crashed. `SIGEL_TREE_ONLY=1` supplies the missing cell.
+
+| cell | tree click | Configure System | result |
+|---|---|---|---|
+| control (`SIGEL_CRASH_AT_MS=0`) | no | no | six generations, clean |
+| **tree only** (`SIGEL_TREE_ONLY=1`) | **yes** | **no** | **two generations, survives, exit 1 for the D29 verdict** |
+| full injection | yes | yes | **abort, exit 134** |
+
+The tree-only cell landed its click — `Configure System` flipped 0 → 1 and
+`Save Experiment` stayed 0 — and the run then finished normally. **So the tree
+click alone is not what kills it; the Configure System click is.** *Found by
+review, which caught that the two-cell version could not support the attribution
+it was making.*
+
+#### It is a USE-AFTER-FREE, not an out-of-range index — and that changes the fix
+
+`MT_Controller::configureSystem` does this, three lines apart
+(`MT_Controller.cpp:402-404`):
+
+```
+	mainWindow->show();
+	delete substitution;
+	substitution = 0;
+```
+
+`substitution` is the `MT_Evaluator` (`MT_Controller.h:66`), and **`MT_Evaluator`
+inherits `SIG_GPFitnessTrainer`** (`MT_Evaluator.h:16`). When the meta system is
+the Evaluator — and the shipped `stdConf.mt` is `usedSystem=1`, which is
+`EVALUATOR_SUBST` (`MT_Controller.h:22`) — `SIG_GPManager`'s `trainer` **IS that
+object**: `SIG_GPManager.cpp:59-60` sets it from
+`mtController->getFitnessTrainer()`, which returns `substitution`
+(`MT_Controller.cpp:668-679`). `~SIG_GPManager` deliberately does not delete it,
+which confirms the ownership.
+
+**So opening the MetaGP window mid-run deletes the trainer the running loop is
+holding**, and the next `trainer->checkTask(...)` — `SIG_GPManager.cpp:202`,
+`:469`, `:1460`, `:1576` — reads a freed `QList` whose header is garbage. A
+garbage size gives "index out of range" for a perfectly legal `taskId`.
+**Bounds-checking `SIG_GPFitnessTrainer.cpp:368` would fix nothing.** The same
+two lines are in the pristine 1.3 tarball one line after `mainWindow->show()`, so
+this explains the oracle's four crashes as well as ours.
+
+**IT IS IN THE PUBLISHED 1.3 SOURCE, verbatim.** The pristine
+`kdesigelSources.1.3.tar.gz` has `mainWindow->show(); delete substitution;
+substitution = 0;` at its lines 387-389, so this is inherited and not port
+damage. *`SIG_GPManager.cpp:59` (the constructor) adopts the evaluator AS the
+trainer under `EVALUATOR_SUBST`; `:659` in `start()` tests `CLASSIFIER_SUBST` for
+a different path, and `:1062` tests `EVALUATOR_SUBST` again in the destructor —
+three call sites, not a contradiction.*
+
+**THE ORACLE'S BINARY IS A DIFFERENT REVISION IN `MT_`, so its MT_ observations
+are not evidence about this source and ours are not evidence about its binary.**
+It measured every member of that class in its binary carrying the misspelling
+`MT_FitnessTranier`, where the published source spells `MT_FitnessTrainer`
+correctly and keeps the misspelling only as a `stdConf.mt` format token — so its
+binary predates the published source. **This tree has the corrected spelling**,
+i.e. it matches the tarball. *Its control was that `SIG_GPFitnessTrainer` is
+spelled correctly in the same binary, so this is not a name-mangling artefact.*
+**THE CAVEAT IS BOUNDED TO `MT_`, and must not be widened without new
+evidence.** The only divergence either side has evidence for is that class
+naming. **The file-format, geometry and container comparisons this document
+rests on are untouched by it and still stand** — widening it would silently
+invalidate most of Phase V for no measured reason. *The oracle asked for this
+boundary to be written down, having raised the caveat itself.*
+
+Its classifier-mode test is recorded as **unvalidated on its own account**:
+`usedSystem` 0, 1 and 2 produced identical observable behaviour there across
+three checks, so it could not confirm the run had left evaluator mode.
+
+*A second explanation the evidence cannot exclude:* `MT_Controller::startEvolution`
+(`:168`) runs the meta GP on a `pthread`, so `substitution`'s `QList` members are
+touched from two threads with no lock.
+
+**WHICH CONTAINER ASSERTS IS NOT IDENTIFIED, and this section used to say it
+was.** It named `SIG_GPFitnessTrainer.cpp:368`, `pvmTasks[ taskId ]`, reached
+from `MT_Evaluator.cpp:473`. **Withdrawn.** That identification is inherited from
+the 1.3 analysis, which worked *by type*: `QGVector` is Qt 2's pointer-vector
+base, so the `QArray` members were excluded. **Qt 6 collapsed `QArray` and
+`QGVector` into `QList`**, and the three the 1.3 argument excluded are now
+`QList` in the port —
+
+| member | pristine 1.3 | port |
+|---|---|---|
+| `MT_ResultBuffer` | `QArray<double>` (`MT_Evaluator.h:35`) | `QList<double>` (`:36`) |
+| `NumOfCorrectEstimation` | `QArray<unsigned int>` (`MT_Substitute.h:138`) | `QList<unsigned int>` (`:137`) |
+| `NumOfMetaEstimation` | `QArray<unsigned int>` (`:139`) | `QList<unsigned int>` (`:138`) |
+
+— so all three now emit the identical message. `MT_Evaluator.cpp:476` is **three
+lines after** the `:473` this section cited. The port's assert also carries **no
+index**, so the "272 is out of range for exactly size 200" arithmetic that
+identified it on 1.3 is unavailable too. What the evidence supports is only:
+**the port aborts on a `QList` bounds assert on this path.** Found by review.
 
 **NO DIFFERENCE FROM 1.3 IN WHAT HAPPENS, once the oracle re-measured it.** Both
 versions map the window and then die out of the running evolution. Here:
@@ -1243,14 +1337,17 @@ picks it back up, and 1.3 never grey it in the first place.
 
 #### D29 greys the door and one tree click re-opens it
 
-**D29's arming line HELD.** `Save Experiment` — one of the 23 in
-`evolutionRunningActions` and, unlike the MetaGP four, re-enabled by nothing —
+**D29's arming line HELD.** `evolutionRunningActions` holds **27** entries —
+`evolutionRunningActions.append` appears 27 times, 23 at
+`SIG_MainWindow.cpp:571-593` and the four MetaGP ones at `:685-688`. *This
+section said 23; that is the non-MetaGP subset, not the list.* `Save Experiment`
+is one of those 23 and, unlike the MetaGP four, re-enabled by nothing —
 reads `enabled=0` after the tree click. That is the **only** thing that reaches
 the arming line: `SIG_ExperimentListView.cpp:331` emits
 `evolutionNotRunning( !SIG_Experiment::anyEvolutionRunning() )`, and
 `anyEvolutionRunning()` reads `g_runningEvolutions`, which only
 `RunScope runScope;` (`SIG_Experiment.cpp:326`) sets. Delete that line and a
-tree click mid-run hands all 23 back. **§9 listed this as uncovered and it is now
+tree click mid-run hands all 27 back. **§9 listed this as uncovered and it is now
 covered.**
 
 **The hole is elsewhere, and it is not the arming line.**
@@ -1272,6 +1369,19 @@ said that run checked **D29's arming line**; it did not —
 lines *before* the `RunScope` is constructed, so the greying at Start happens
 with or without the arming line. The tree-click sample is what reaches it, and
 that is why it was added.
+
+**A SECOND AND LARGER HOLE, not driven.** All 23 non-MetaGP
+`evolutionRunningActions` are **also** in `noExperimentActions` (32 entries), and
+`SIG_MainWindow::slotEnableNoExperimentActions` (`:879-885`) enables the lot with
+**no run check either**, driven by `isNotEmpty(bool)` which
+`SIG_ExperimentListView` emits at `:83`, `:164` and `:207`. `mtUseAction` is in
+that list too (`:662`). So loading or creating a second experiment mid-run hands
+back all 23 **plus `Use MetaGP`** — whose mid-run toggle is the trigger of the
+silent wedge this document elsewhere says D29 locks. `File > New Experiment` and
+`File > Open Experiment` are in neither lock list, which the D29 comment at
+`SIG_ExperimentListView.cpp:326-328` already says, and the `setCurrentItem` at
+`:214-215` only re-locks if the current item actually **changes**. *Found by
+review; nothing has driven it, so it is source-derived and not measured.*
 
 **THE FIX IS NOT APPLIED.** A run check in `slotActExpChanged` — the same
 `anyEvolutionRunning()` the line above it already calls — closes it, and that is
@@ -1391,9 +1501,15 @@ what shows the six-generation run completing untouched.
 
 **THE SAMPLER PROVES LESS THAN IT LOOKS.** `generations=136` never moving is
 **expected**: the two live-update calls are commented out at
-`SIG_GUIGPManager.cpp:43` and `:92`, and the only live write is a page refresh
-(`SIG_ExperimentView.cpp:83`) — which fires on a page switch during a run but
-never from the evolution loop. And the sampler counts **pumps of the event loop,
+`SIG_GUIGPManager.cpp:43` and `:92`. *This said the only live write is a page
+refresh at `SIG_ExperimentView.cpp:83`, "which fires on a page switch during a
+run but never from the evolution loop". **Wrong on the first half**: the
+page-switch route runs `putAllIntoExperiment`, which returns at
+`SIG_Experiment.cpp:243-244` under `anyEvolutionRunning()` **before** reaching
+`experimentView->putIntoExperiment()` at `:246` — so during a run a page switch
+never reaches `:83` either.* The live callers are `SIG_ExperimentView.cpp:278`
+(`slotHistory`) and `:284` (`slotIntervallChanged`), which is what the D29
+comment at `:61-67` says. And the sampler counts **pumps of the event loop,
 not seconds**: the run blocks the main thread, the only pump is `haveABreak()`'s
 `processEvents` once per outer pass, with `usleep(300000)` per tournament touch
 in between. One line in 100 seconds is what that predicts; the `samples == 0`
@@ -2808,8 +2924,10 @@ Phase 0's last comment lines, 28 doc comments naming a Qt 2 type, and six form
 minimums — and all three closed that day. Each is written up in §7, and each
 closed with a correction to the figure this table carried.
 
-**Two rows left these tables on 2026-09-07** — the `pvmTasks` crash, from the
-first table, and D29's arming line, from the coverage table below it. §7's
+**One row left these tables on 2026-09-07** — D29's arming line, from the
+coverage table. The `pvmTasks` row did not leave; it was **replaced in place** by
+the crash row below, because driving it produced a worse finding rather than
+closing the question. §7's
 `pvmcrash` section has both in full.
 
 **THE PORT HAS THE CRASH.** `ASSERT failure in QList::operator[]: "index out of
@@ -2833,7 +2951,7 @@ of the 23 locked actions that nothing re-enables, stayed greyed through it.
 
 | coverage gaps | what is missing |
 |---|---|
-| **The evolution path is in no gate.** `gui behaviour`'s ten scenarios do not include `evolution`, so nothing in `check.sh` runs a generation. **The cost is now measured rather than guessed**: 208 s per generation at one slave, 45 s at four, plus a leading pool evaluation of the same order — so the cheapest useful gate is minutes, not seconds. `pvmcrash` and `evolution` also cannot be gated on exit status until `pvm_halt()` stops blocking (`future_refactorings.md`); the SIGTERM handler makes the status readable, it does not make the process exit on its own | a scenario, or an accepted cost |
+| **The evolution path is in no gate.** `gui behaviour`'s ten scenarios do not include `evolution`, so nothing in `check.sh` runs a generation. **The cost is now measured rather than guessed**: 208 s per generation at one slave and a mean of 58 s at four (45-69 across five gaps), plus a leading pool evaluation of the same order — so the cheapest useful gate is minutes, not seconds. `pvmcrash` and `evolution` also cannot be gated on exit status until `pvm_halt()` stops blocking (`future_refactorings.md`); the SIGTERM handler makes the status readable, it does not make the process exit on its own | a scenario, or an accepted cost |
 | **The evolution result is prose; no artefact is committed** | commit the 30-generation curve |
 | **V2** — a save path in `sigel_eval` and the same round trip locally, as a gate. `pagesave vs 1.3` covers the 192-line parameter block; the population and robot blocks are compared against nothing. Read V8 result 5 first: a shipped `.exp` round-tripped through 1.3 differs from its input by ten keys, so an input-vs-pass-1 gate fails however correct the port is | equivalence instead of self-consistency |
 
