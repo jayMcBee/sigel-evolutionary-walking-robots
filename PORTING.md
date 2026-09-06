@@ -1074,9 +1074,18 @@ QGVector::operator[]: Index 359 out of range
 Invalid storage access
 ```
 
-Dead within ten seconds, and **no `MTMainWindow` is ever mapped — it dies on the
-way to opening the window**. `Invalid storage access` is SIGEL's own SIGSEGV
-handler string, so it is a segfault. Index N tracks the cumulative task counter.
+Dead within ten seconds. `Invalid storage access` is SIGEL's own SIGSEGV handler
+string, so it is a segfault. Index N tracks the cumulative task counter — the
+oracle has now paired it four times against the slave-invocation count at the
+moment of the click: 89 at 102, 107 at 111, 359 at 369, and 272 / 497 / 702 at
+roughly 70 per generation.
+
+*This said "no `MTMainWindow` is ever mapped — it dies on the way to opening the
+window". **Withdrawn by the oracle 2026-09-07.** The window maps: polled every
+30 ms, it goes `Unmapped` at t+2.157 s, `IsViewable` at t+2.197 s, and the
+process is gone at t+2.509 s. The original inspection was made after the crash,
+when a dead process has already taken its windows with it. The port behaves the
+same way — see the `pvmcrash` section.*
 
 **IT IS NOT "GUI interaction during a run".** ~25 injected mid-run events across
 several runs — tree selections, spin-box and slider clicks, menu opens, Stop —
@@ -1177,11 +1186,39 @@ inherits. **C11's prediction is now confirmed rather than expected**: it said th
 port would "abort on `QList::operator[]`'s live assertion rather than warn and
 segfault, which is louder but no more survivable". It does.
 
-**ONE DIFFERENCE FROM 1.3, and it favours neither.** On 1.3 **no `MTMainWindow`
-is ever mapped** — it dies on the way to opening the window. Here the window
-opens (`[modal] class=MT_MainWindow title=[SIGEL MetaGP]`), the click returns,
-the process is still alive, and the abort arrives afterwards from the running
-evolution. The port gets further before dying.
+**NO DIFFERENCE FROM 1.3 IN WHAT HAPPENS, once the oracle re-measured it.** Both
+versions map the window and then die out of the running evolution. Here:
+`[modal] class=MT_MainWindow title=[SIGEL MetaGP]`, the click returns, the
+process is still alive, and the abort arrives afterwards. On 1.3, polling the X
+root every 30 ms across the fatal click:
+
+```
+  t+2.157s  0x20056b 'SIGEL MetaGP' class=(MTMainWindow, sigel)  map=Unmapped
+  t+2.197s  0x20056b 'SIGEL MetaGP' class=(MTMainWindow, sigel)  map=IsViewable
+  t+2.509s  SIGEL PROCESS GONE
+```
+
+*This section said on 2026-09-07 that 1.3 dies on the way to the window and never
+maps it, citing the oracle. **The oracle has withdrawn that**: its original
+inspection was made AFTER the crash, when a dead process has already taken its
+windows with it, so "no window present" was equally consistent with "mapped, then
+destroyed". Its first re-probe agreed with the wrong answer because it
+deduplicated on the window rather than on (window, state), and so logged the
+window in its `Unmapped` instant and never saw the transition 40 ms later — a
+probe structurally incapable of seeing what it was built to find.* **The only
+real difference is Qt 6 asserting where Qt 2 warned and returned garbage.**
+
+**FOUR INDEPENDENT CONFIRMATIONS THAT THE INDEX IS THE CUMULATIVE TASK COUNTER**,
+all the oracle's, each pairing the reported index against its slave-invocation
+count at the moment of the click: **89 at 102**, **107 at 111**, **359 at 369**,
+and 272 / 497 / 702 at roughly 70 per generation. The index always lands a little
+below the cumulative count, which is what an unchecked read of a cumulative
+counter into a shorter array looks like.
+
+**AND 1.3 NEEDS NO TREE CLICK**, because it never greys `Configure System` at
+all — the oracle clicked it straight from the menu mid-run in both runs above and
+it fired. That is the same fact from the other side: the port greys it, one slot
+picks it back up, and 1.3 never grey it in the first place.
 
 #### D29 greys the door and one tree click re-opens it
 
