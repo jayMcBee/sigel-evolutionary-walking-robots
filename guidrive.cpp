@@ -115,6 +115,7 @@ extern "C" {
 #include <QtTest/QtTest>
 #include <climits>
 #include <clocale>
+#include <csignal>
 #include <cstdio>
 #include <cstdlib>
 #include <unistd.h>
@@ -424,6 +425,23 @@ static void tearDownPvm()
     if (g_pvmEnrolled)  { g_pvmEnrolled  = false; pvm_exit(); }
 }
 
+// PVM KILLS US DURING ITS OWN SHUTDOWN, so a scenario's exit status never
+// survives tearDownPvm() unaided. pvm_halt() sends TM_HALT and waits for a
+// reply the daemon never sends (tdpro.c:1507-1516); the daemon's pvmbailout()
+// SIGTERMs every local task on the way out (pvmd.c:1485-1517); this process is
+// one, having enrolled with pvm_mytid(). Measured: 143, not the scenario's
+// return value. That silently erased `return 1' from EVERY assertion in the
+// three scenarios that start PVM -- evolution, visualize, pvmcrash -- so a
+// failed assertion and a clean pass left the same status behind. Found by
+// review. The handler re-exits with the code we already decided on.
+static int g_exitCode = 0;
+extern "C" void guidriveExitOnTerm(int) { _exit(g_exitCode); }
+static void keepExitCodeThroughPvmShutdown(int rc)
+{
+    g_exitCode = rc;
+    std::signal(SIGTERM, guidriveExitOnTerm);
+}
+
 // A scenario that blocks in a modal exec() that never closes would otherwise
 // hang forever; check.sh's timeout would kill it and report the wrong reason.
 // A modal exec() still runs an event loop, so this timer fires inside exactly
@@ -462,6 +480,7 @@ static void armWatchdog(int ms)
         // go with the process -- and a watchdog fires precisely when SIGEL has
         // something to say about why it is stuck.
         flushSigelStreams();
+        keepExitCodeThroughPvmShutdown(3);
         tearDownPvm();
         flushSigelStreams();
         _exit(3);
@@ -1423,7 +1442,7 @@ static void openExperiment(const QString &path)
 }
 
 // ---------------------------------------------------------------------- main
-int main(int argc, char **argv)
+static int guidriveMain(int argc, char **argv)
 {
     QApplication app(argc, argv);
     // The C locale for THIS PROGRAM'S OWN output, and it has to come AFTER the
@@ -1436,9 +1455,10 @@ int main(int argc, char **argv)
     // Qt's own locale handling is untouched: QLocale reads the environment,
     // which is exactly what C7's validator pinning is tested against.
     setlocale(LC_NUMERIC, "C");
-    // Anything that returns from run() gets PVM torn down; the watchdog does it
-    // itself because _exit() runs no destructors.
-    struct PvmGuard { ~PvmGuard() { tearDownPvm(); } } pvmGuard;
+    // PVM teardown used to be a guard object HERE, which ran inside this
+    // function and took the process down with it before any return value
+    // reached the caller. It now happens in main() below, after the status is
+    // known and after the handler that preserves it is installed.
     // POSITIVE CONTROL for check.sh's `runtime connect' check, and it has to
     // be a real dead connect rather than a plain qWarning. That check greps
     // this process's stderr for Qt's "No such signal"/"No such slot", which is
@@ -4893,6 +4913,42 @@ int main(int argc, char **argv)
                start->width(), start->height(), start->x(), start->y(),
                start->isVisible(), start->isEnabled(),
                start->isDown());
+        // THE PREREQUISITE THIS SCENARIO WAS MISSING. Configure System is
+        // GREYED until Use MetaGP is on, so the injected click landed on a
+        // dead menu item and the run proved nothing. The control run said so
+        // in its own output -- "[action changes] &MetaGP/&Configure System
+        // greyed" -- and it was read as a clean pass. The oracle's 1.3 crash
+        // runs enable MetaGP BEFORE Start, so this also matches the sequence
+        // being reproduced rather than merely unblocking the click.
+        //
+        // Enabling raises no dialog. The information box with three custom
+        // buttons appears on DISABLE only -- the metagui scenario covers it.
+        if (crashProbe) {
+            clickMenu("&MetaGP", "&Use MetaGP");
+            QTest::qWait(400);
+            bool cfgFound = false, cfgEnabled = false;
+            for (QAction *a : W->findChildren<QAction *>())
+                if (a->text() == "&Configure System") {
+                    cfgFound = true;
+                    cfgEnabled = a->isEnabled();
+                }
+            printf("  [metagp] Use MetaGP clicked; Configure System found=%d enabled=%d\n",
+                   (int)cfgFound, (int)cfgEnabled);
+            // Fail HERE, not silently later. An injection into a greyed action
+            // produces a run that looks like a clean survival, which is the
+            // one outcome this scenario must never manufacture.
+            if (!cfgFound || !cfgEnabled) {
+                printf("!! Configure System is not enabled, so the injected click would\n"
+                       "!! hit a dead menu item and this run would prove NOTHING.\n"
+                       "!! A missing stdConf.mt in SIGEL_ROOT is the usual cause; the\n"
+                       "!! oracle reports that its absence gives a silent permanent\n"
+                       "!! stall rather than the crash, so check the file before\n"
+                       "!! concluding the crash does not reproduce.\n");
+                fflush(stdout);
+                return 1;
+            }
+            fflush(stdout);
+        }
         QSignalSpy spy(start, SIGNAL(clicked()));
         // The decisive question is not whether the button works but whether
         // slotStartEvolution ran and DECLINED. This signal is emitted false on
@@ -4956,6 +5012,37 @@ int main(int argc, char **argv)
         // loop never pumped -- which collapses the injected cell into the
         // control cell and destroys the only thing the pair is for.
         bool injected = false;
+        // -1 never sampled, 0 greyed, 1 live. The whole outcome of this
+        // scenario turns on this one value, so it is recorded at the moment of
+        // the click rather than inferred afterwards from a menu that has since
+        // been re-enabled by the run ending.
+        int cfgEnabledDuringRun = -1;
+        // Same three states, sampled again AFTER a tree click. D29 greys the
+        // MetaGP actions from SIG_Experiment's signalEvolutionNotRunning, but
+        // SIG_ExperimentListView::slotSelectionChanged emits actExpChanged() on
+        // the very next line (:331-332) and SIG_MainWindow::slotActExpChanged
+        // (:851-859) re-enables mtConfigureAction with NO run check at all. So
+        // one click in the tree is expected to hand the crash path straight
+        // back. Found by review; the scenario sampled only before the click and
+        // could not see it.
+        int cfgAfterTreeClick = -1;
+        // D29's ARMING LINE, and this is the only thing that reaches it.
+        // SIG_ExperimentListView.cpp:331 emits
+        // evolutionNotRunning( !SIG_Experiment::anyEvolutionRunning() ), and
+        // anyEvolutionRunning() reads g_runningEvolutions, which ONLY
+        // `RunScope runScope;' (SIG_Experiment.cpp:326) sets. Delete that line
+        // and a tree click mid-run emits TRUE and hands back all 23 locked
+        // actions. `&Save Experiment' is one of the 23 and, unlike the MetaGP
+        // four, nothing re-enables it afterwards -- so it reports the arming
+        // line and nothing else.
+        //
+        // The FIRST greying is NOT the arming line: SIG_Experiment.cpp:304
+        // emits signalEvolutionNotRunning(false) twenty-two lines BEFORE the
+        // RunScope is constructed, so a run with the arming line deleted still
+        // greys everything at Start. An earlier version of this scenario
+        // claimed the before-sample gated D29's arming line; it did not.
+        // Found by review.
+        int saveAfterTreeClick = -1;
         const int crashAtMs = qEnvironmentVariableIntValue("SIGEL_CRASH_AT_MS");
         if (crashProbe && crashAtMs > 0) {
             inject.setSingleShot(true);
@@ -4972,8 +5059,71 @@ int main(int argc, char **argv)
                     if (qobject_cast<QMessageBox *>(m)) { describeMessageBox(m); m->close(); }
                     else printf("    (left open)\n");
                 }, 8000);
-                clickMenu("&MetaGP", "&Configure System");
-                printf("  >> the click returned; the process is still alive\n");
+                // D29's ARMING LINE, checked in a REAL run for the first
+                // time. SIG_MainWindow.cpp:685-688 puts all four MetaGP actions
+                // into evolutionRunningActions, so they are greyed for the
+                // duration of a run. PORTING.md 9 lists this as uncovered
+                // because `runlock' builds its own RunScope instead of running
+                // an evolution, and so can never exercise the arming line
+                // inside slotStartEvolution. This does.
+                auto sampleCfg = [&]() {
+                    int v = -1;
+                    for (QAction *a : W->findChildren<QAction *>())
+                        if (a->text() == "&Configure System") { v = a->isEnabled() ? 1 : 0; break; }
+                    return v;
+                };
+                cfgEnabledDuringRun = sampleCfg();
+                printf("  [d29] Configure System during the run: enabled=%d"
+                       "  (0 means D29's guard is holding)\n", cfgEnabledDuringRun);
+
+                // NOW THE TREE CLICK. currentItemChanged is what reaches
+                // slotSelectionChanged, so the current item has to actually
+                // CHANGE -- setCurrentItem on the item that is already current
+                // emits nothing and would have silently proved the opposite of
+                // what this measures.
+                QTreeWidgetItem *cur = lv->currentItem();
+                QTreeWidgetItem *other = nullptr;
+                for (int i = 0; i < lv->topLevelItemCount() && !other; ++i) {
+                    QTreeWidgetItem *t = lv->topLevelItem(i);
+                    if (t != cur) other = t;
+                    for (int j = 0; j < t->childCount() && !other; ++j)
+                        if (t->child(j) != cur) other = t->child(j);
+                }
+                if (!other) {
+                    printf("  [d29] no second tree item to click -- cannot test the"
+                           " re-enable path in this run\n");
+                } else {
+                    lv->setCurrentItem(other);
+                    QTest::qWait(300);
+                    cfgAfterTreeClick = sampleCfg();
+                    for (QAction *a : W->findChildren<QAction *>())
+                        if (a->text() == "&Save Experiment") {
+                            saveAfterTreeClick = a->isEnabled() ? 1 : 0; break;
+                        }
+                    printf("  [d29] after ONE tree click ([%s]): Configure System"
+                           " enabled=%d (1 = the guard was undone mid-run),"
+                           " Save Experiment enabled=%d (0 = the arming line held)\n",
+                           qPrintable(other->text(0)), cfgAfterTreeClick,
+                           saveAfterTreeClick);
+                }
+                fflush(stdout);
+
+                // Only click when it is live. clickMenu prints `!!' on a greyed
+                // item, and check.sh treats `!!' as "this run must not pass" --
+                // so the DESIGNED-SUCCESS outcome used to be required to emit
+                // the repo's own failure marker. Found by review.
+                const int live = (cfgAfterTreeClick >= 0) ? cfgAfterTreeClick
+                                                          : cfgEnabledDuringRun;
+                if (live == 1) {
+                    printf("  >> Configure System IS live -- clicking it, which is"
+                           " what kills 1.3\n");
+                    fflush(stdout);
+                    clickMenu("&MetaGP", "&Configure System");
+                    printf("  >> the click returned; the process is still alive\n");
+                } else {
+                    printf("  >> Configure System is greyed, so it is NOT clicked:"
+                           " a click on a dead menu item would prove nothing\n");
+                }
             });
             inject.start(crashAtMs);
             printf("  [inject] armed for t+%d ms\n", crashAtMs);
@@ -4999,15 +5149,76 @@ int main(int argc, char **argv)
         }
         const qint64 runMs = runClock.elapsed();
         sampler.stop();
+        // THE ANSWER TO 9's "the pvmTasks crash is untried on the port".
+        // 1.3 dies opening MTMainWindow during a run -- `QGVector::operator[]:
+        // Index 359 out of range' then its own SIGSEGV handler's `Invalid
+        // storage access', four observations by the oracle, the cleanest with
+        // MetaGP set BEFORE Start and one injected click. The unchecked read is
+        // SIG_GPFitnessTrainer.cpp:368, reached from MT_Evaluator.cpp:473.
+        //
+        // D29 greys the four MetaGP actions for the duration of a run, so the
+        // click is refused -- UNTIL one click in the experiment tree, which
+        // emits actExpChanged() (SIG_ExperimentListView.cpp:332) into
+        // slotActExpChanged() (SIG_MainWindow.cpp:851-859), which re-enables
+        // mtConfigureAction with no run check. That is what the second sample
+        // is for. An earlier version of this scenario sampled only before the
+        // tree click and reported the door closed. Found by review.
+        if (crashProbe && crashAtMs > 0) {
+            if (cfgEnabledDuringRun == 1) {
+                printf("\n!! D29 DID NOT HOLD AT ALL: Configure System was live during"
+                       " the run before any tree click.\n");
+                fflush(stdout); return 1;
+            }
+            if (cfgEnabledDuringRun == -1) {
+                printf("\n!! the injection never sampled Configure System, so this run"
+                       " says nothing about D29 either way.\n");
+                fflush(stdout); return 1;
+            }
+            if (cfgAfterTreeClick == 1) {
+                printf("\n!! D29 IS INCOMPLETE: Configure System was greyed during the"
+                       " run and ONE TREE CLICK made it live again.\n"
+                       "!! The 1.3 crash path is OPEN on this port by that route.\n"
+                       "!! slotActExpChanged (SIG_MainWindow.cpp:851-859) has no run"
+                       " check; SIG_ExperimentListView.cpp:332 emits into it.\n");
+                fflush(stdout); return 1;
+            }
+            // The arming line, reported separately because it is a different
+            // guard from the one the MetaGP actions need.
+            if (saveAfterTreeClick == 1) {
+                printf("\n!! D29's ARMING LINE DID NOT HOLD: one tree click re-enabled"
+                       " Save Experiment mid-run, so anyEvolutionRunning() was false"
+                       " while an evolution was running.\n");
+                fflush(stdout); return 1;
+            }
+            if (saveAfterTreeClick == 0)
+                printf("  >> D29's arming line HELD: a tree click mid-run left the"
+                       " other 22 locked actions greyed.\n");
+            if (cfgAfterTreeClick == 0)
+                printf("\n  >> D29 HELD THROUGH A TREE CLICK: Configure System was"
+                       " greyed during the run and stayed greyed after one tree"
+                       " click, so the click that kills 1.3 is refused.\n"
+                       "  >> The unchecked read behind it is untouched.\n");
+            else
+                printf("\n  >> D29 held before the tree click; the tree-click path was"
+                       " NOT exercised in this run, so it is not answered here.\n");
+        }
+
         // The cost of a generation ON THIS MACHINE. PORTING.md 9 records the
         // oracle's ~4.0 min/generation as a measurement of ONE run on 2003
         // i386 hardware at an unrecorded slave count -- the oracle then
         // measured that figure moving 3.2x with slave count alone, so it
         // predicts nothing here. This line is this machine's own number.
+        // Only when the generations were actually COMPLETED. A run the
+        // watchdog killed mid-generation still divides cleanly and prints a
+        // per-generation cost for generations that never finished -- a made-up
+        // number in an artefact people read for timings. Found by review.
         if (wantGens > 0)
             printf("  [throughput] Start returned after %lld ms for %d generation(s)"
-                   " = %lld ms/generation, %d samples taken during the run\n",
-                   (long long)runMs, wantGens, (long long)(runMs / wantGens), samples);
+                   " = %lld ms/generation, %d samples taken during the run"
+                   " -- valid ONLY if the artefact check below reports"
+                   " POOLGENERATION advancing by %d\n",
+                   (long long)runMs, wantGens, (long long)(runMs / wantGens),
+                   samples, wantGens);
         fflush(stdout);
         // Sample FAST: this experiment terminates on a DATE that is long past,
         // so a correct Start can run to completion and re-enable itself well
@@ -5159,6 +5370,7 @@ int main(int argc, char **argv)
             }
             fflush(stdout);
         }
+        fflush(stdout);
         return 0;
     }
 
@@ -5229,4 +5441,31 @@ int main(int argc, char **argv)
     }
 
     return 0;
+}
+
+int main(int argc, char **argv)
+{
+    const int rc = guidriveMain(argc, argv);
+    // Decide the status FIRST, then tear PVM down. The order is the whole
+    // point: tearDownPvm() gets this process SIGTERMed whenever it started the
+    // daemon, and the handler installed here re-exits with rc instead of 143.
+    // Flush FIRST. tearDownPvm() gets this process SIGTERMed and the handler
+    // _exit()s, which runs no destructors and no stdio flush -- so a flush
+    // placed after the teardown never executes on the one path the teardown
+    // comment is about. The watchdog already had this order; main did not.
+    // Found by review.
+    flushSigelStreams();
+    // ONLY when PVM is actually up. The fourteen scenarios check.sh runs never
+    // start it, and their stdout is diffed against guibehaviour-baseline.txt --
+    // an unconditional line here would have failed all ten baseline scenarios
+    // on a cosmetic addition. It says the status is already decided, so a hang
+    // in the halt below is visibly cleanup and not the scenario.
+    if (g_pvmOurDaemon || g_pvmEnrolled) {
+        printf("  [teardown] scenario finished with status %d; halting PVM\n", rc);
+        fflush(stdout);
+    }
+    keepExitCodeThroughPvmShutdown(rc);
+    tearDownPvm();
+    flushSigelStreams();
+    return rc;
 }

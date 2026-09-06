@@ -506,25 +506,116 @@ further without the gate saying so.
 
 ## `tearDownPvm()`'s `pvm_halt()` never returns
 
-`guidrive.cpp:349`. Located with gdb, not guessed: `pvm_halt` → `msendrecv` →
-`mroute` → `mxfer` → `select()`, inside `PvmGuard::~PvmGuard` *after* `main`
-has returned. So every `evolution` (and `visualize`) run is killed by its
-timeout rather than exiting, its exit status is meaningless, and — because
-stdout is block-buffered to a file and the process never reaches exit — **any
-`printf` on an early-return path is lost unless it flushes itself**. An
-assertion added during §9 item 2 fired correctly and its message vanished; it
-was only visible under gdb.
+`guidrive.cpp:424`, inside `tearDownPvm()`. Located with gdb, not guessed:
+`pvm_halt` → `msendrecv` → `mroute` → `mxfer` → `select()`. Because stdout is
+block-buffered to a file and the process never reaches exit, **any `printf` on
+an early-return path is lost unless it flushes itself** — an assertion added
+during §9 item 2 fired correctly and its message vanished, visible only under
+gdb.
+
+*Two things this entry used to say are corrected. It cited `guidrive.cpp:349`
+and `PvmGuard::~PvmGuard` "after `main` has returned": the guard was a local of
+the function that is now `guidriveMain`, so it ran before `main` returned, and
+it has since been deleted outright. And it said such runs "are killed by their
+timeout" — they are killed by PVM, well before any timeout, as measured below.*
 
 **Deliberately not changed during the port.** `pvm_halt()` is what stops the
 daemon this process started, and the comment above it records that dropping it
-left `pvmd3` and its slaves running. Measured: no stray `pvmd3` survives the
-kill, so today's behaviour is safe, only untidy. Connected: `PORTING.md`'s note
+left `pvmd3` and its slaves running. Measured: no stray `pvmd3` survives PVM's
+own shutdown, so today's behaviour is safe, only untidy. *It does not run at
+all when `g_pvmOurDaemon` is false — with a daemon already up there is no halt,
+no SIGTERM, and the exit status was always readable.* Connected: `PORTING.md`'s note
 that SIGEL's own SIGTERM handler calls `pvm_halt()` from signal context, which
 is why a SIGTERM cannot shut it down cleanly either.
 
-**When to do it:** before anything reads an evolution run's exit code, or
-before `check.sh` ever runs an evolution scenario. Both would silently mis-read
-a killed process as a failed one.
+**The reading side is now fixed; the halt is not.** 2026-09-06 measured what
+actually kills the process, and it is not the timeout this entry assumed:
+`pvm_halt()` sends `TM_HALT` and waits for a reply the daemon never sends
+(`tdpro.c:1507-1516`), the daemon's `pvmbailout()` then `kill`s every local task
+with SIGTERM on its way out (`pvmd.c:1485-1517`), and this process is one of
+them because it enrolled with `pvm_mytid()`. Demonstrated: a `pvmcrash` run with
+a 25-second watchdog under a 90-second `timeout` exited **143**, far too early
+for the timeout to have fired. `guidrive` now installs a SIGTERM handler that
+re-exits with the status the scenario decided (`keepExitCodeThroughPvmShutdown`,
+called from `main` and from the watchdog), so `return 1` from an assertion
+survives. **Before that, an assertion in `evolution`, `visualize` or `pvmcrash`
+returned into a status nobody could read whenever this process had started the
+daemon itself** — a failed assertion and a clean pass both left 143. Confirmed
+from both sides afterwards: an `evolution` run that passed exited **0**, and a
+watchdog abort exited **3**. Found by review.
+
+**STILL OPEN, and it is the other half of the same knot.** Once the handler is
+installed with a status of 0, this process reports 0 for *any* SIGTERM for the
+rest of its life — including a person killing a `guidrive` wedged in the
+`pvm_halt()` above. The scenario really did pass by then, so the status is not a
+lie about the scenario; it is a lie about the cleanup. A "we are in teardown"
+flag, or preserving only a non-zero status, would close it. Nothing gates on it
+today because none of the three PVM scenarios is in `check.sh`. Found by
+review.
+
+**When to do it:** the remaining half is `pvm_halt()` itself, which still never
+returns. It matters before `check.sh` ever runs one of the three PVM scenarios,
+since the handler makes the status readable but does nothing about the process
+sitting in `select()` until PVM kills it.
+
+## `pvm_probe`'s error return is read as "a message is ready"
+
+`SIG_GPFitnessTrainer.cpp:372-382`. `pvm_probe` returns a buffer id above zero
+when a message is waiting, zero when none is, and a **negative error code**
+otherwise. The test is `if (info != 0)`, so an error takes the branch meant for
+a delivered result. Two shapes follow, and the second is worse than a hang:
+
+- `pvm_recv` blocks and the evolution stops dead. **No `TIMEOUTMINUTES` value
+  rescues it**: the timeout lives in the `else` branch (`:384-386`), so once
+  control enters the `if` and blocks at `:376` it never reaches the timeout at
+  all. Setting a timeout would change nothing.
+- `pvm_recv` fails immediately, `pvm_upkdouble` leaves `result` at `-1`, and the
+  code still decrements `noOfSlaves` and destroys the task record. The four callers
+  (`SIG_GPManager.cpp:202`, `:469`, `:1460`, `:1576`) read `-1` as "not ready
+  yet" and wait forever for a task that no longer exists. The individual is
+  lost.
+
+**Preserved, not introduced.** The same code in 1.0
+(`sigelSourceDistribution.1.0/.../SIG_GPFitnessTrainer.cpp:216-218`) and in the
+pristine `kdesigelSources.1.3.tar.gz` (line 345) — *identical statements, not
+identical bytes: 1.0 indents with six spaces where both the tarball and the port
+use tabs.* Found by review 2026-09-06.
+
+**When to do it:** before any claim rests on `noOfSlaves` accounting. A
+2026-09-06 argument that counted spawns to prove results had been harvested was
+sound only because this branch did not fire; the argument itself could not tell.
+
+## `SIG_GPPVMTask` holds a reference to a host that can be deleted under it
+
+`include/SIGEL_GP/SIG_GPPVMTask.h:43` declares `SIG_GPActivePVMHost &host`, and
+`SIG_GPFitnessTrainer::flushAllDynHosts` (from `:182`) calls
+`resizeOwningHosts`, which deletes host objects. Any task still outstanding then
+decrements a freed object at one of the two decrement sites, `:379` or `:397`.
+Latent today because `addDynHost` has exactly one call site,
+`SIG_GPManager.cpp:1004`, on the dynamic-client server thread that only
+`sigel.cpp:267-274` starts — and `guidrive` starts no such thread, so no host is
+ever flushed mid-run.
+
+**Preserved, not introduced** — the same reference member is at
+`sigelSourceDistribution.1.0/.../SIG_GPPVMTask.h:43`, the same line. Found by review
+2026-09-06.
+
+## `getNextHost`'s mutex is a function local and therefore locks nothing
+
+`SIG_GPFitnessTrainer.cpp:550` declares `pthread_mutex_t mutex;` as a local,
+`:558-559` `pthread_mutex_init`s and locks it, and `:588` unlocks it. *An
+earlier version of this entry cited 552-556 and 585-587, which are the `#ifdef
+_WINDOWS` halves of the same two blocks — tarball offsets applied to the port
+file, 45 lines out. Found by review.* Every call gets
+its own mutex, so the "now we make ourself running exclusively" comment above it
+is false — two threads in this function exclude each other from nothing. The
+section it guards is the one that moves entries out of `freshDynHosts`, which is
+written by the dynamic client server thread, so this is the one place in the
+trainer where a lock was actually wanted.
+
+**Preserved, not introduced.** Present in the pristine `kdesigelSources.1.3`
+tarball at its lines 505-514; **absent from 1.0**, which has no dynamic-host
+feature at all, so it arrived with 1.3. Found by review 2026-09-06.
 
 ## `renderRecorder` leaks whenever the visualisation constructor throws
 

@@ -816,8 +816,20 @@ rm -f /tmp/prog.$$
 # twice (the C7 comma probe, the C6 spin-box rows).
 if make -q B=build-fast SAN= SIGSAN= programs 2>/dev/null; then
     for prog in sigel sigel_slave; do
-        if [ -x "$ROOT/build-fast/$prog" ]; then pp=$((pp+1)); else
-            pf=$((pf+1)); echo "  build-fast/$prog missing"; fi
+        f=$ROOT/build-fast/$prog
+        if [ ! -x "$f" ]; then
+            pf=$((pf+1)); echo "  build-fast/$prog missing"
+        elif [ "$(head -c 4 "$f" | tail -c 3)" != ELF ]; then
+            # A SHELL WRAPPER LEFT IN PLACE OF THE BINARY PASSED EVERYTHING
+            # ELSE. It is -x, it execs the real binary so the smoke test below
+            # still prints the no-PVM guard, and `make -q' calls the target
+            # current because the wrapper's mtime is newer than every
+            # prerequisite -- so the link recipe never runs and neither does
+            # the ctor_size assertion inside it. Measured: check.sh went fully
+            # green against a 122-byte /bin/sh script standing in for
+            # sigel_slave during the pvmcrash work. Found by review.
+            pf=$((pf+1)); echo "  build-fast/$prog is not an ELF binary"
+        else pp=$((pp+1)); fi
     done
     # sigel_slave with no PVM daemon must reach its own guard and exit cleanly.
     # sigel needs a display and starts a pvmd, so its run is driven by hand and

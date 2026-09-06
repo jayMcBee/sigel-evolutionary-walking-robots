@@ -1144,153 +1144,293 @@ for plain labels, 12 px for ones with descenders, 25 px row pitch at both 605 an
 780. What an undersized window costs is frame borders and whole cut rows, not
 legibility. *The 3-8 px figure was never measured on either binary.*
 
-### `pvmcrash` — the harness exists, the slave never starts — OPEN 2026-09-05
+### `pvmcrash` — THE PORT HAS THE CRASH, and D29 does not close it — ANSWERED 2026-09-07
 
-**§9's "the `pvmTasks` crash is untried on the port" is still untried; this is
-how far it got, and the diagnosis is much sharper than "it does not work".**
+**The §9 row that read "the `pvmTasks` crash is still untried on the port" —
+removed 2026-09-07 — is answered by driving it: the port aborts, from a sequence
+a user can perform.** Verbatim, one run:
 
-`guidrive` has a **`pvmcrash`** scenario: the `evolution` scenario plus a
-single-shot `QTimer` armed immediately before the Start click, which fires from
-inside the blocking run through `SIG_GUIGPManager::haveABreak()`'s
-`processEvents()` and opens MetaGP > Configure System. `SIGEL_CRASH_AT_MS=0` is
-the **control** — the identical run with nothing injected. It reports whether the
-timer **fired**, not whether it was armed: deriving that from `crashAtMs > 0`
-called a run that finished early "SURVIVED WITH the event injected", which
-collapses the injected cell into the control cell and destroys the only thing the
-pair is for. *Found by review.*
+```
+  [metagp] Use MetaGP clicked; Configure System found=1 enabled=1
+  [inject] armed for t+30000 ms
+  >> clicking Start
+  >> INJECTING MetaGP > Configure System, 30000 ms into the run
+  [d29] Configure System during the run: enabled=0  (0 means D29's guard is holding)
+  [d29] after ONE tree click ([Individuals]): Configure System enabled=1 (1 = the
+        guard was undone mid-run), Save Experiment enabled=0 (0 = the arming line held)
+  >> Configure System IS live -- clicking it, which is what kills 1.3
+  [modal] class=MT_MainWindow title=[SIGEL MetaGP]
+  >> the click returned; the process is still alive
+```
+```
+  ASSERT failure in QList::operator[]: "index out of range",
+    file /usr/include/aarch64-linux-gnu/qt6/QtCore/qlist.h, line 517
+  Aborted (core dumped)                                    EXIT=134 (SIGABRT)
+```
 
-**`stdConf.mt` IS present in this repo's `SIGEL_ROOT`**, so the port is set up to
-reproduce the crash rather than the wedge — see the oracle's prerequisite above.
+**This is 1.3's crash.** The oracle's 1.3 run gives
+`QGVector::operator[]: Index 359 out of range` then its own SIGSEGV handler's
+`Invalid storage access`. The unchecked read is the same one,
+`SIG_GPFitnessTrainer.cpp:368` — `pvmTasks[ taskId ]`, no bounds test — reached
+from `MT_Evaluator.cpp:473`, which forwards a task id to the base class it
+inherits. **C11's prediction is now confirmed rather than expected**: it said the
+port would "abort on `QList::operator[]`'s live assertion rather than warn and
+segfault, which is louder but no more survivable". It does.
 
-**ESTABLISHED BY MEASUREMENT, in this order:**
+**ONE DIFFERENCE FROM 1.3, and it favours neither.** On 1.3 **no `MTMainWindow`
+is ever mapped** — it dies on the way to opening the window. Here the window
+opens (`[modal] class=MT_MainWindow title=[SIGEL MetaGP]`), the click returns,
+the process is still alive, and the abort arrives afterwards from the running
+evolution. The port gets further before dying.
 
-1. **`spawnTask` is reached and `pvm_spawn` IS sent.** `strace -e trace=write` on
-   the run shows the spawn message going to the daemon twice, carrying the
-   correct absolute path `.../build-fast/sigel_slave`. So the trainer, the host
-   list and `getNextHost()` are all working.
-2. **`pvm_spawn` does not report failure.** `SIG_GPFitnessTrainer.cpp:346` prints
-   on the failure path and nothing is printed, so it returned 1.
-3. **No `sigel_slave` process ever exists**, the daemon log records no task, and
-   the trainer then waits in `hrtimer_nanosleep` at ~15% CPU until killed.
-4. **The slave binary is healthy**: run by hand against a live daemon it enrolls
-   and correctly answers `Program hasn't been started as a PVM slave!`.
+#### D29 greys the door and one tree click re-opens it
 
-**So the daemon accepts the spawn, answers success, and no task ever runs.** That
-is where the next session should start — not at SIGEL.
+**D29's arming line HELD.** `Save Experiment` — one of the 23 in
+`evolutionRunningActions` and, unlike the MetaGP four, re-enabled by nothing —
+reads `enabled=0` after the tree click. That is the **only** thing that reaches
+the arming line: `SIG_ExperimentListView.cpp:331` emits
+`evolutionNotRunning( !SIG_Experiment::anyEvolutionRunning() )`, and
+`anyEvolutionRunning()` reads `g_runningEvolutions`, which only
+`RunScope runScope;` (`SIG_Experiment.cpp:326`) sets. Delete that line and a
+tree click mid-run hands all 23 back. **§9 listed this as uncovered and it is now
+covered.**
 
-**THE TRAP THAT HID ALL OF THIS, and it is in the committed harness.**
-`SIG_IO::cerr` and `::cout` are **`QTextStream`s** over `stderr`/`stdout`
-(`SIG_IO.cpp:27-29`), and the 2003 code ends every message with `"\n"`, never
-`endl` — so SIGEL's own diagnostics sit in the stream's buffer until it is
-destroyed at a normal exit. **Measured**: such a stream survives a clean return
-and is lost entirely on a kill, while a plain `fprintf` on the same descriptor
-survives both. `guidrive`'s watchdog ended with `_exit(3)`, which runs no
-destructors — **so every stuck scenario discarded SIGEL's own explanation at
-exactly the moment it mattered**, and the first two days of this investigation
-read an empty stderr as "nothing was printed". The watchdog and the `pvmcrash`
-sampler now flush both streams. **This matters beyond the diagnosis**: the whole
-of the 1.3 evidence for this crash is SIGEL's printed `Invalid storage access`,
-so without the flush the probe would have reported a crash with no reason.
+**The hole is elsewhere, and it is not the arming line.**
+`SIG_ExperimentListView.cpp:332` emits `actExpChanged()` on the very next line,
+and `SIG_MainWindow::slotActExpChanged` (`:851-859`) does
+`mtConfigureAction->setEnabled(true)` and
+`mtChoiceTypeActionGroup->setEnabled(true)` **with no run check at all**,
+whenever the selected experiment has MetaGP on. So the sequence greys the four
+MetaGP actions and immediately un-greys two of them. D29's own comment at
+`SIG_ExperimentListView.cpp:310-330` is about exactly this hazard — "ONE CLICK ON
+THE TREE undid it" — and it fixed the emit on `:331` while leaving `:332`
+untouched.
 
-*Not diagnosed: why the daemon's exec produces no process. `ptrace_scope` is 1 on
-this machine, so `gdb -p` cannot attach to a running process — but strace of a
-process you START works, which is how (1) was measured.*
+*Two claims made here on 2026-09-06 are withdrawn, both found by review.* The
+first said the crash path was **closed** by D29; it is not, and the run that
+"proved" it never clicked the tree, so it could not see the re-enable. The second
+said that run checked **D29's arming line**; it did not —
+`SIG_Experiment.cpp:304` emits `signalEvolutionNotRunning(false)` twenty-two
+lines *before* the `RunScope` is constructed, so the greying at Start happens
+with or without the arming line. The tree-click sample is what reaches it, and
+that is why it was added.
 
-### The MetaGP window grew 59 px — SETTLED BY THE ORACLE 2026-09-05
+**THE FIX IS NOT APPLIED.** A run check in `slotActExpChanged` — the same
+`anyEvolutionRunning()` the line above it already calls — closes it, and that is
+plainly what D29 intended. It is left for a decision rather than taken, because
+the port's rule is to preserve behaviour and **1.3 has this crash too**; closing
+it here is a deliberate divergence of the same kind D29 already is, and worth
+making on purpose rather than in passing. `future_refactorings.md` carries it.
 
-**`guibehaviour-baseline.txt` moves by one line, from 680x595 to 680x654, and
-the oracle's measurement is why that is right rather than tolerated.**
+**A SECOND ROUTE IS UNTESTED.** `mtChoiceTypeActionGroup` is re-enabled by the
+same line, so Evaluator/Classifier can also be switched mid-run. Nothing has
+driven that.
 
-**The cause here is measured by PREDICTION, not back-derivation.** The window's
-chrome is **99 px** and the six MT_* pages sit in a `QStackedWidget` whose
-minimum is the maximum over its pages. Four values, rebuilt each time:
+#### The wedge — 1.3's other MetaGP failure — is NOT reachable here
 
-| statistics min height | predicted window | measured |
-|---|---|---|
-| 555 | 654 | **680x654** |
-| 500 | 599 | **680x599** |
-| 450 | 549 → floor of 595 | **680x595** |
-| 390 | 489 → floor of 595 | **680x595** |
+Its precondition is the meta config failing to open, not the toggle.
+`MT_Controller::readFromFile` (`:412`) raises "An error occurred in loading the
+meta experiment" at `:440-447` only when `confFile.open()` fails; **Standard**
+retries the same default path and, when that fails too, falls through to
+`useMeta(false)` and returns false. The oracle's `stdConf.mt` was absent, so the
+fall-through was certain. Measured there: spawning stopped **dead** (slave
+wrapper frozen at 1139 invocations, zero new lines in 4.5 minutes), generations
+stopped with it, process state `S` at 5 s total CPU, GUI alive and Stop still
+enabled — *worse than a crash, because it looks like a healthy run.*
 
-So at the declared 390 the Statistics page received **595 − 99 = 496 px where its
-Qt 6 layout needs 555**, at the DEFAULT size, not only when dragged.
+`readFromFile` has exactly one caller, `createGPSystem` (`:331`), guarded by
+`if(!confStrm.device())`. `createGPSystem` has five callers, all MetaGP entry
+points: `startTimedEvolution` `:107`, `startEvolution` `:140`, `configureSystem`
+`:383`, `getFitnessTrainer` `:671`, `getClassifier` `:685`. The three that run
+during an evolution only execute once the meta system is already on, which
+requires the config to have loaded. **So the mid-run dialog cannot be raised
+while `stdConf.mt` exists — and it does exist here.** *Derived from source, not
+measured.* What IS measured: the port completed six generations with MetaGP
+enabled and did not wedge.
 
-**WHAT THE ORACLE MEASURED ON 1.3, and it corrects this document twice.**
+#### The evolution works, and three claims about it are withdrawn
 
-- **1.3 does not open that window at 595 either. It opens at 680x605**, with a
-  `WM_NORMAL_HINTS` program minimum of **625x605**. **Qt 2 already overrode
-  `MT_MainWindow.cpp:33`'s `resize(680, 595)` by 10 px to satisfy its own
-  layout.** So 595 is a number the program asks for and has never got, and
-  reasoning from that line describes the source rather than the application.
-- **1.3's window cannot be made shorter at all** — 605 is both the opening
-  height and the minimum; a window manager honouring the hint refuses the drag.
-  Forced below it, **1.3's layout CLIPS rather than compresses**: the Search
-  Operator Effects table is cut mid-row.
-- **1.3's Statistics page is ALREADY CLIPPED at its own default.** Selecting
-  Statistics adds a second toolbar row that eats ~30 px, and at 605 the group-box
-  bottom border and the page frame bottom border are both cut. The oracle's
-  ladder: 605 borders cut, 620 group border appears, 640 both visible,
-  **654 fully laid out**.
+| withdrawn | what is actually true |
+|---|---|
+| "no `pvm_spawn` ever reaches the daemon" | it reaches it constantly — **235 slave executions in one 7-minute run** |
+| "no `sigel_slave` process ever exists" | they exist for **~0.2 s each**, so a `pgrep` between spawns sees nothing. `sigel_eval` on the same individuals takes 0.20-0.37 s, and the oracle measures 1.3's slave lifetime at a 0.296 s median — 1.5x, not a mystery |
+| "the daemon log records no task" | **a working dispatch logs nothing at all.** The oracle's log from a run that spawned 165 slaves is the same two startup lines as mine. It was never evidence |
 
-**SO 654 IS WHERE 1.3'S OWN STATISTICS PAGE FIRST RENDERS COMPLETE**, and a port
-that opens taller to honour its layout minimum is doing exactly what Qt 2 did —
-the same override, from a larger `minimumSizeHint`. Matching 595 would reproduce
-neither 1.3's size nor its behaviour. **The baseline was not moved on this
-session's reasoning: 1.3 moved it first, by 10 px, for the same reason.**
+*The reasoning that produced them was: `SIG_GPFitnessTrainer.cpp:346` prints on
+the `pvm_spawn` failure path, nothing was printed, therefore it returned 1 —
+which was right. What was wrong was concluding from an empty `pgrep` and an empty
+daemon log that nothing ran.* `strace -e trace=write` had already shown the spawn
+message reaching the daemon twice with the correct absolute path, so the trainer,
+the host list and `getNextHost()` were never in doubt.
 
-**THIS FILE'S "the labels compress to 3-8 px tall" IS WITHDRAWN, on two counts.**
-1.3's window cannot be dragged shorter than it opens, so the drag it describes is
-not reachable; and the failure mode is **clipping, not compression**. The oracle
-measured text row heights at two window heights and they are **identical**: 9 px
-for plain labels, 12 px for ones with descenders, 25 px row pitch at both 605 and
-780. What an undersized window costs is frame borders and whole cut rows, not
-legibility. *The 3-8 px figure was never measured on either binary.*
+**HOW IT WAS MEASURED, and the method is the transferable part.** A shell script
+named `sigel_slave` in the PVMHOST directory, the real binary moved alongside as
+`sigel_slave.real`, logging one line per execution and `exec`ing the real one.
+Positive control: running the wrapper by hand writes a line, so an empty log
+would have meant no execution. **The oracle supplied the idea** by repointing a
+working experiment's host directory at an empty one and reproducing this exact
+symptom on demand — establishing that the PVMHOST line's **fourth field is the
+path SIGEL builds `<dir>/sigel_slave` from**, and `pvm_spawn`'s own search path
+never enters into it. *Field two is `maxSlaves` (`SIG_GPPVMHost.cpp:64-86`).*
 
-### `pvmcrash` — the harness exists, the local run does not dispatch — OPEN 2026-09-05
+A control run to completion, single slave:
 
-**§9's "the `pvmTasks` crash is untried on the port" is still untried, and this
-is how far it got.** `guidrive` has a new **`pvmcrash`** scenario: the
-`evolution` scenario plus a single-shot `QTimer` armed immediately before the
-Start click, which fires from inside the blocking run through
-`SIG_GUIGPManager::haveABreak()`'s `processEvents()` and opens
-MetaGP > Configure System. `SIGEL_CRASH_AT_MS=0` is the **control** — the
-identical run with nothing injected — because a crash with no negative cell is
-the exact mistake that made the oracle withdraw "MetaGP crashes 1.3" and then
-"mid-run GUI interaction crashes 1.3". stdout is unbuffered in this scenario
-only: the expected outcome is that the process dies, and a block-buffered
-transcript of a run that aborts is lost.
+```
+  [artefact] POOLGENERATION=138 (was 136, +2 expected)  fitness values=100 of which zero=0
+  [evolved saved] exists=1 size=1548652 path=/tmp/evolved.exp
+```
 
-**The input is built to C11's recipe** and is correct as far as it can be
-checked: `data/Experiments/twoBasesSimpleFitness1.exp`, GP `RANDOMSEED` (the
-second of the two) set to 12345, the eight 2003 `PVMHOST` lines replaced by one
-local host at max-processes 1, paths rewritten to `build-fast`.
+and SIGEL's own `Computing Generation` timestamps, visible only because of the
+flush fix below. **One slave: 208 s** for the single gap measured. **Four
+slaves: 45, 59, 69, 55 and 64 s, mean 58** — which agrees with the 61.6
+s/generation at four slaves already recorded in C11, and the single-slave figure
+sits near the 185 s recorded there. It was never broken; it was slow, and a
+90-second watchdog was killing it mid-generation and calling that a hang.
 
-**WHAT BLOCKS IT.** The control run starts — Start greys, Stop enables, the
-in-run sampler fires — and then **no `pvm_spawn` ever reaches the daemon**. The
-`pvmd` log records only `guidrive`'s own task; no slave process ever exists;
-nothing is printed on the failure path, which `SIG_GPFitnessTrainer.cpp:346`
-would take. The process sits in `hrtimer_nanosleep` at ~15% CPU until killed.
+**`sigel_eval` and the PVM path agree exactly**, to all printed digits, for the
+same individuals. Nothing is lost or corrupted in the spawn-transfer-harvest
+round trip.
 
-**Ruled out by measurement, so the next session does not repeat it:**
+#### The harness, and five defects review found in it
 
-- The host list loads. `guidrive pages` on the built input shows
-  `listviewHosts rows=1`, name `jan-UbuntuVM25`, maxSlaves 1, the right directory.
-- `col0check=0` on that row is **not** a disabled host — all eight hosts of the
-  shipped experiment read `col0check=0` too. It is an icon column.
-- `noOfSlaves` starts at 0 (`SIG_GPActivePVMHost.cpp:30`), so `getNextHost()`'s
-  `noOfSlaves < maxSlaves` is true at maxSlaves 1; a one-slave host is not
-  self-blocking.
-- `pvm_addhosts`' return is ignored (`SIG_GPFitnessTrainer.cpp:95`), so a
-  `PvmDupHost` for the local daemon cannot be what stops it.
-- PVM itself is up: `pvm_start_pvmd` succeeds, the daemon logs `ready`, and
-  `./pvm-check.sh` passes.
-- **`PVM_ROOT`, `PVM_ARCH` and `PVM_TMP` must be exported** — without them
-  `libpvm` prints `PVM_ROOT environment variable not set` and the run produces
-  no transcript at all. `pvm-check.sh:66-77` has the values.
+**THE TRAP THAT COST TWO DAYS.** `SIG_IO::cerr` and `::cout` are
+**`QTextStream`s** over `stderr`/`stdout` (`SIG_IO.cpp:27-29`), and the 2003 code
+ends every message with `"\n"`, never `endl` — so SIGEL's diagnostics sit in the
+stream's buffer until it is destroyed at a normal exit. **Measured**: such a
+stream survives a clean return and is lost entirely on a kill, while a plain
+`fprintf` on the same descriptor survives both. **Everything above depends on the
+flush**: the `Computing Generation` timestamps, and the `ASSERT failure` line
+that is the whole of the port's crash evidence, exactly as `Invalid storage
+access` is the whole of 1.3's.
 
-*Not diagnosed: whether `spawnTask` is reached at all. `ptrace_scope` on this
-machine refuses `gdb -p`, so no stack was taken; a print on the spawn path is the
-obvious next move.*
+1. **The scenario never clicked `Use MetaGP`**, so `Configure System` was greyed
+   before Start too and the injected click hit a dead menu item. The control run
+   printed `&MetaGP/&Configure System  greyed` and it was read as a clean pass.
+2. **It sampled only before the tree click**, and so reported the crash path
+   closed. The tree click is now part of the injection and both samples print.
+3. **PVM erased every exit status** whenever this process started the daemon
+   itself. `pvm_halt()` waits for a reply the daemon never sends
+   (`tdpro.c:1507-1516`) and the daemon SIGTERMs every local task on its way out
+   (`pvmd.c:1485-1517`). Demonstrated: a 25-second watchdog under a 90-second
+   `timeout` exited **143**, far too early to be the timeout. `main` now decides
+   the status first, **flushes before the teardown** — a flush after it never
+   runs, because the handler `_exit`s — and installs a handler that re-exits with
+   the status. Confirmed from both sides: a passing `evolution` run exits **0**,
+   a watchdog abort exits **3**, and the crash above exits **134**.
+4. **The designed-success path was required to print `!!`**, which is `check.sh`'s
+   own "this run must not pass" marker: `clickMenu` prints it on a greyed item.
+   The scenario now samples first and clicks only when the action is live.
+5. **The probe reported whether the timer was ARMED, not whether it FIRED**,
+   which called a run that finished early "SURVIVED WITH the event injected" and
+   collapsed the injected cell into the control cell.
+
+**`SIGEL_CRASH_AT_MS` is the knob**: milliseconds into the run at which the event
+is injected, and **`=0` is the CONTROL** — the identical run with nothing
+injected. A crash with no control cell is the exact mistake that made the oracle
+withdraw "MetaGP crashes 1.3" and then "mid-run GUI interaction crashes 1.3",
+each generalised over a factor that moved with the trigger. The control here is
+what shows the six-generation run completing untouched.
+
+**THE SAMPLER PROVES LESS THAN IT LOOKS.** `generations=136` never moving is
+**expected**: the two live-update calls are commented out at
+`SIG_GUIGPManager.cpp:43` and `:92`, and the only live write is a page refresh
+(`SIG_ExperimentView.cpp:83`) — which fires on a page switch during a run but
+never from the evolution loop. And the sampler counts **pumps of the event loop,
+not seconds**: the run blocks the main thread, the only pump is `haveABreak()`'s
+`processEvents` once per outer pass, with `usleep(300000)` per tournament touch
+in between. One line in 100 seconds is what that predicts; the `samples == 0`
+assertion it feeds is satisfied by a single pump.
+
+**`check.sh` could not tell a binary from a shell script.** The wrapper above
+passed the whole gate: it is `-x`, it execs the real binary so the no-PVM smoke
+test still prints its guard, and `make -q` calls the target current because the
+wrapper's mtime is newer than every prerequisite — so the link recipe, and the
+`ctor_size` assertion inside it, never ran. `check.sh` now requires ELF magic on
+both `build-fast` programs. *It closes the wrapper shape only: a copy of the real
+binary, a symlink, or a stale ELF still passes and still skips the link recipe.*
+
+**INHERITED, NOT A PORT DEFECT: with MetaGP enabled, `File > Save Experiment`
+does not complete — and 1.3 does exactly the same.** The oracle ran the pair on
+1.3, same experiment, same four slaves, same clicks, stopped at the same point,
+one click different: **MetaGP on — the file is truncated to 0 bytes and nothing
+further happens**, the descriptor still open write-only, the process idle at a
+CPU count frozen for four minutes; **MetaGP off — the save completes in under
+three seconds.** So the port reproduces 1.3 down to the zero-byte artefact. *The
+oracle's caveat, recorded because it is the honest boundary of the result: both
+its runs had history off, so MetaGP-on-plus-history-on is untested — but both
+cells shared that setting, and the MetaGP run never wrote a byte.*
+
+**A REAL DEFECT IN THE DRIVER CAME OUT OF IT.** There is a **second** modal after
+the file dialog — class `warning`, title `File exists...`, "Do you want to
+overwrite?", Yes/No — and it appears in **both** cells, because the target
+already exists. `guidrive` arms one handler and answers one dialog, so it would sit on that
+prompt for ever. **Latent here rather than the cause**: these runs deleted
+`/tmp/evolved.exp` first, so no overwrite prompt appeared. The silence has a
+simpler explanation that matches the oracle's process state exactly —
+`QFileDialog::getSaveFileName` is blocking, SIGEL stalls inside
+`saveExperiment` after it returns, so `slotSaveExperiment` never returns,
+`clickMenu` never returns, and nothing after it can print. *My hypothesis that
+`useMeta` blanking `saveName` armed the second dialog was half right and the
+wrong half mattered: the prompt is the overwrite one and has nothing to do with
+MetaGP.* **The driver defect is real, unfixed, and will bite the first save onto
+an existing file.**
+
+Isolated here to one variable — same input, same four slaves, same two
+generations, one click different:
+
+| MetaGP | save |
+|---|---|
+| not enabled | completes, 1,648,437 bytes, process **exits 0** |
+| enabled | dialog opens, save never completes, killed by the watchdog |
+| enabled, 6 generations | same, and a **zero-byte** file is left behind |
+
+*An earlier guess that a grown history was the cause is withdrawn.* **Not
+attributed.** The driver prints the modal's class and title and then produces no
+further output, which is odd on its own because every wait in `acceptFileDialog`
+is bounded — so the fault may be in the driver. One candidate that would make it
+neither: `MT_Controller::useMeta` blanks `saveName` with the comment "force the
+routine to show a filedialog", so enabling MetaGP may arm a **second** dialog and
+the driver answers exactly one. The oracle has been asked whether 1.3 saves with
+MetaGP on. It affects no committed gate.
+
+**THE PREREQUISITE, from the oracle.** `Configure System` opens `MTMainWindow`
+only when a real `stdConf.mt` is present in `SIGEL_ROOT`. **It IS present here**,
+which is why the crash reproduces rather than the wedge. If it goes missing the
+failure is neither — the run stays alive-looking and permanently stalled, no
+dialog, no message.
+
+**REBUILDING THE INPUT, because it is not committed and `/tmp` is cleaned
+between sessions.** A missing input is not diagnosed as missing: the load fails,
+a `QMessageBox` opens, and the scenario sits on it until the watchdog fires with
+`active modal: QMessageBox` — which reads exactly like a hang in the evolution.
+One session was spent on that. From `data/Experiments/twoBasesSimpleFitness1.exp`
+(C11's recipe): the GP `RANDOMSEED` (**the second of the two**) to 12345, the
+eight 2003 `PVMHOST` blocks replaced by ONE local block, and every
+`/home/pg368b/ross/projects/sigel` rewritten to the build directory. The host
+line is `<hostname> <maxSlaves> 1 "<dir holding sigel_slave>"`, and the shipped
+file repeats the bare keyword `PVMHOST` before *every* host line rather than once
+as a header. Correct result: 70,779 lines, 14 fewer than the source, differing
+only in the host block and that one seed.
+
+**Ruled out along the way, so nobody repeats it:** the host list loads
+(`listviewHosts rows=1`, name `jan-UbuntuVM25`, `maxSlaves 1`, right directory);
+`col0check=0` is an icon column, not a disabled flag — all eight shipped hosts
+read it too; `noOfSlaves` starts at 0 (`SIG_GPActivePVMHost.cpp:30`) so a
+one-slave host is not self-blocking; `pvm_addhosts`' return is ignored
+(`SIG_GPFitnessTrainer.cpp:95`) so `PvmDupHost` cannot stop it; the slave binary
+is healthy — run by hand against a live daemon it enrols and answers `Program
+hasn't been started as a PVM slave!`; PVM itself is up (`pvm_start_pvmd`
+succeeds, the daemon logs `ready`, `./pvm-check.sh` passes); a stalled trainer
+waits in `hrtimer_nanosleep` at ~15% CPU; and **`PVM_ROOT`, `PVM_ARCH` and
+`PVM_TMP` must be exported** or `libpvm` prints `PVM_ROOT environment variable
+not set` and the run produces no transcript at all (`pvm-check.sh:66-77`).
+
+*`ptrace_scope` is 1 on this machine, so `gdb -p` cannot attach to a running
+process — but `strace` of a process you START works, which is how the spawn
+message was seen.*
+
+*This section replaces two near-duplicate `pvmcrash` sections and one verbatim
+duplicate of the MetaGP window section, all committed on 2026-09-05.*
 
 ### Phase A — core onto Qt 6 — DONE
 
@@ -2596,7 +2736,7 @@ without PVM the ported interface builds and shows its windows, and nothing
 happens behind the Start button. **With the vendored PVM up it runs locally** —
 three generations driven end to end on 2026-09-02.
 
-**WHAT IS ACTUALLY OPEN, as of 2026-09-05.** Closed items are not listed; their
+**WHAT IS ACTUALLY OPEN, as of 2026-09-07.** Closed items are not listed; their
 lessons live in the step sections above. Ordered: conversion work first, then
 questions the port could still be wrong about, then gaps in coverage.
 
@@ -2610,15 +2750,32 @@ Phase 0's last comment lines, 28 doc comments naming a Qt 2 type, and six form
 minimums — and all three closed that day. Each is written up in §7, and each
 closed with a correction to the figure this table carried.
 
+**Two rows left these tables on 2026-09-07** — the `pvmTasks` crash, from the
+first table, and D29's arming line, from the coverage table below it. §7's
+`pvmcrash` section has both in full.
+
+**THE PORT HAS THE CRASH.** `ASSERT failure in QList::operator[]: "index out of
+range"`, exit 134, from a sequence a user can perform: MetaGP on, Start, **one
+click in the experiment tree**, then Configure System. D29 greys that menu item
+for the duration of a run and `SIG_MainWindow::slotActExpChanged` (`:851-859`)
+un-greys it again on any tree click, with no run check. *A claim made here on
+2026-09-06 that the path was closed is withdrawn — the run behind it never
+clicked the tree.* The unchecked read is unchanged:
+`SIG_GPFitnessTrainer.cpp:368`, reached from `MT_Evaluator.cpp:473`.
+
+**D29's arming line is now covered, and it held.** The tree click is the only
+thing that reaches it — `SIG_ExperimentListView.cpp:331` asks
+`anyEvolutionRunning()`, which only `RunScope` sets — and `Save Experiment`, one
+of the 23 locked actions that nothing re-enables, stayed greyed through it.
+
 | the port could still be wrong here | who can answer it |
 |---|---|
-| **The `pvmTasks` crash is still untried on the port**, but **1.3's half is now confirmed and narrowed** — see §7. The port has the same unchecked read and the same `processEvents` pump. A `pvmcrash` scenario with its control exists and builds; what blocks it is that the local evolution does not dispatch a single `pvm_spawn`, diagnosed as far as §7 records | drive it here; 1.3's side is done |
+| **THE PORT CRASHES ON A REACHABLE SEQUENCE, and the fix is not applied.** MetaGP on, Start, one click in the experiment tree, then MetaGP > Configure System: `ASSERT failure in QList::operator[]: "index out of range"`, exit 134. `SIG_MainWindow::slotActExpChanged` (`:851-859`) re-enables `mtConfigureAction` mid-run with no run check, undoing D29 one line after D29 applies it. A run check there — the same `anyEvolutionRunning()` the line above already calls — closes it, and that is plainly what D29 intended. **Left as a decision, not taken**, because 1.3 has this crash too and closing it is a deliberate divergence of the same kind D29 already is | a decision: complete D29, or preserve 1.3's crash |
 | **1.3's silent wedge — does the port do it too?** Toggling `Use MetaGP` mid-run stops the evolution on 1.3 while the GUI keeps repainting and Stop stays enabled. D29 locks that trigger; it does not answer whether another route wedges the port | drive it here |
 
 | coverage gaps | what is missing |
 |---|---|
-| **D29's arming line is not gated.** `runlock` makes its own `RunScope`, so it cannot check the one in `slotStartEvolution` | a live run |
-| **The evolution path is in no gate.** `gui behaviour`'s ten scenarios do not include `evolution`, so nothing in `check.sh` runs a generation | a scenario, or an accepted cost |
+| **The evolution path is in no gate.** `gui behaviour`'s ten scenarios do not include `evolution`, so nothing in `check.sh` runs a generation. **The cost is now measured rather than guessed**: 208 s per generation at one slave, 45 s at four, plus a leading pool evaluation of the same order — so the cheapest useful gate is minutes, not seconds. `pvmcrash` and `evolution` also cannot be gated on exit status until `pvm_halt()` stops blocking (`future_refactorings.md`); the SIGTERM handler makes the status readable, it does not make the process exit on its own | a scenario, or an accepted cost |
 | **The evolution result is prose; no artefact is committed** | commit the 30-generation curve |
 | **V2** — a save path in `sigel_eval` and the same round trip locally, as a gate. `pagesave vs 1.3` covers the 192-line parameter block; the population and robot blocks are compared against nothing. Read V8 result 5 first: a shipped `.exp` round-tripped through 1.3 differs from its input by ten keys, so an input-vs-pass-1 gate fails however correct the port is | equivalence instead of self-consistency |
 
@@ -2924,9 +3081,12 @@ out, and the nine `enabled=false` widgets all re-enabled in code.
   `pvm_spawn() failed ... (0/-7)`, once per individual. Here the two coincide,
   which is a property of this setup and not a general one.
 - **`tearDownPvm()`'s `pvm_halt()` BLOCKS FOR EVER at exit, so every evolution
-  run ends by being killed**, and `timeout` reports 124 or the shell 143/15. The
-  scenario has completed and its files are written by then, so the artefacts are
-  good — but **the exit status of an evolution run means nothing.** Pre-existing
+  run that started its own daemon ends by being killed** — by PVM itself, well
+  before any `timeout`. *This said "the exit status of an evolution run means
+  nothing", and that is no longer true:* `guidrive`'s `main` now flushes, records
+  the status and installs a SIGTERM handler that re-exits with it, so a passing
+  run gives **0**, a watchdog abort **3**, and the `pvmTasks` crash **134**. The
+  halt itself is unchanged and still never returns. Pre-existing
   and deliberately unchanged: `pvm_halt()` is what stops the daemon this process
   started, and dropping it left `pvmd3` and its slaves running. Consequence:
   **a `printf` before an early `return` is LOST unless flushed on that path**,
@@ -4822,14 +4982,21 @@ run did not crash it. Only injected events did.
 … )` (`SIG_GUIGPManager.cpp:63`), called from **six** places in the evolution loop (`SIG_GPManager.cpp:96, 420, 460, 1334, 1539, 1566`, three in each `run()` body),
 and `checkTask`'s unchecked `pvmTasks[ taskId ]` is unchanged. So a GUI
 interaction re-enters through that pump and can reach the unchecked read before
-the growth that would have covered the id. **There is no measurement of the port
-under mid-run interaction yet** — it is expected to abort on
-`QList::operator[]`'s live assertion rather than warn and segfault, which is
-louder but no more survivable.
+the growth that would have covered the id. **MEASURED 2026-09-07 and it does**:
+`ASSERT failure in QList::operator[]: "index out of range"`, exit 134. *This
+paragraph used to end "there is no measurement of the port under mid-run
+interaction yet — it is expected to abort on `QList::operator[]`'s live
+assertion rather than warn and segfault, which is louder but no more
+survivable". The expectation was right in every part.* §7's `pvmcrash` section
+has the sequence.
 
-**D29 DOES NOT FIX THIS, and must not be read as doing so.** D29 guards
-`putAllIntoExperiment()`, i.e. parameter *writes*. The crash arrives through the
-event pump and a menu path that never calls it. The two are related — both are
+**D29 DOES NOT FIX THIS, and must not be read as doing so — now confirmed by
+driving it.** D29 guards `putAllIntoExperiment()`, i.e. parameter *writes*. The
+crash arrives through the event pump and a menu path that never calls it. D29
+also greys the four MetaGP actions during a run, which looks like it closes the
+path and does not: `SIG_MainWindow::slotActExpChanged` (`:851-859`) re-enables
+`mtConfigureAction` on any tree click with no run check, and the crash follows
+from there. The two are related — both are
 about acting on the GUI mid-run — and D29's justification is stronger for this
 finding, but the crash is a separate and broader hazard. *What 1.3's
 `setEnabled(false)` on the five parameter pages really is, on this evidence, is
