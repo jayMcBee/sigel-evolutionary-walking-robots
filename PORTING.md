@@ -735,6 +735,27 @@ This document is the handover. A new session should read §0, this section,
 **§9's open list — which is ordered so the conversion work still to do comes
 first** — and then the phase it is taking on.
 
+**SAMPLE TWICE AND COMPARE; NEVER SAMPLE ONCE AND INTERPRET.** Three probes
+failed this way on 2026-09-06/07, two here and one on the oracle, and each was
+*structurally incapable* of seeing the transition it existed to find:
+
+- The `pvmcrash` scenario read `Configure System`'s enabled state **once, before
+  the tree click**, and so reported the crash path closed. The guard is applied
+  and undone one line apart; a second sample is the whole finding.
+- An empty `pgrep sigel_slave` and an empty daemon log were read as "nothing
+  ran". Slaves live **0.2 s** and a working PVM dispatch logs **nothing**, so
+  that is exactly what success looks like from one sample.
+- The oracle's window probe deduplicated on the window rather than on
+  *(window, state)*, so it logged `MTMainWindow` in its `Unmapped` instant and
+  never saw it become viewable 40 ms later — and read straight, it **confirmed
+  the wrong answer**.
+
+Every one of the three was repaired the same way: sample on both sides of the
+event and print both. **An absence is not a measurement.** This is the same rule
+as "every probe needs its own positive control", arrived at from the other
+direction: the control proves the probe can see a positive, and the second sample
+proves it can see a *change*.
+
 **REBUILD EVERYTHING BEFORE RUNNING THE GATES, and name the targets.** Touching
 one source file makes five things stale, and the gates refuse a stale binary
 rather than scoring it — correctly, but it costs a full run each time. This cost
