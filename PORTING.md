@@ -59,14 +59,96 @@ Three jobs, in order, no overlap:
    validating robot models at load. Recorded in `regression_1.0_to_1.3.md`.
    Not part of either job above.
 
-**Still needs a decision:** whether `QTextStream` no longer printing `-0`
-matters. *This was struck during the 2026-08-30 streamlining on the grounds that
-§9 says `-0` "appears in no shipped stream" — but that scope is the shipped
-`.exp` and `.rrb`. **POV-Ray output is a third stream**, generated per frame,
-never shipped, unmeasured, and per the x86 box it is the path that produced
-every published film. C5 converted its writer. Restored, correctly scoped.*
-And with it the larger question the fourth family reopens: whether to route
-every real number through `snprintf` to match 1.3's tie rounding.
+**THE `-0` HALF IS CLOSED — measured by the oracle on 1.3, 2026-09-07.** POV-Ray
+output was the last stream it could have reached, and it does not.
+
+Two samples parsed token by token rather than grepped — *a plain grep for `-0`
+matches `-0.0087262` and returns a dozen false positives*:
+
+| sample | numeric tokens | exact zeros | spelled | negative zeros |
+|---|---|---|---|---|
+| 120 frames + the `.inc` | 9,795 | 2,479 | all `0` | **0** |
+| 8 frames + the `.inc` | 2,851 | 229 | all `0` | **0** |
+
+**And there is a structural reason, not just an empty count.** Every zero in this
+stream is *structural* — identity-matrix elements and `translate <0, 0, 0>`.
+Computed quantities print in exponential form (1,442 of the 9,795 tokens), so
+they never underflow to a bare `0` where a sign could survive. **So `-0` cannot
+reach this stream**, and with the `.exp` and `.rrb` already cleared, it reaches
+none. *No `snprintf` change is needed for `-0`.*
+
+**THE TIE HALF IS CLOSED TOO, and MEASURED HERE — no `snprintf` change.**
+
+**1.3's `QTextStream` never formats a double at all.** The oracle disassembled
+`__ls__11QTextStreamd` in `libqt-mt.so.2.3.1`: it assembles a format string byte
+by byte — `%`, `.`, a precision clamped to 99, then one of `f e E g G` with `g`
+the default — and calls `sprintf@plt`. Qt 2 contributes the format string and
+nothing else; **every rounding decision is glibc's**. Confirmed against the real
+stream rather than left as a reading: **all 9,547 numeric tokens of the
+120-frame POV sample are reproduced exactly by `sprintf("%.6g", v)`, zero
+mismatches.**
+
+*That is what made this answerable without the oracle at all.* The comparison is
+not "Qt 2's `QTextStream` versus Qt 6's" but **"Qt 6 versus `%.6g`"**, which runs
+on this machine. Measured, 20.4 million values:
+
+| kind | checked | differ |
+|---|---|---|
+| the oracle's eight, read out of a live glibc 2.2.5 process under gdb | 8 | **0** |
+| random finite bit patterns | 400,000 | **0** |
+| exact dyadic halves needing rounding at the 6th digit | 20,400,000 | **450,004** |
+| negative zero | 1 | **1** |
+
+**The rule: Qt 6 rounds a tie AWAY FROM ZERO, glibc rounds it TO EVEN.**
+`0.5078125` → Qt 6 `0.507813`, `%.6g` `0.507812`. `131072.5` → `131073` against
+`131072`.
+
+**Why it cannot reach the stream, which is what decides it.** Only a **dyadic
+rational** can be an exact decimal tie — only those land on the midpoint with a
+terminating binary expansion. Everything else resolves strictly above or below
+it, where any correctly-rounded implementation must agree: `1.0000005` is really
+`1.00000050000000006988…` and `0.1234565` is really `0.12345649999999999679…`,
+so neither is a close call. **A physics simulation essentially never produces an
+exact dyadic half**, and the oracle's 9,547-token sample of real output contains
+not one — the same structural reason the zeros were all bare `0`. The 400,000
+random patterns agreeing is the other half of that: outside the dyadic halves
+there is nothing to disagree about.
+
+**`tiecheck.cpp` at the repo root is that measurement**, so a future session can
+re-derive the number instead of quoting this paragraph. Not built by the
+Makefile and not a gate — nothing depends on the answer. *Its header warns that
+the oracle's eight published values do NOT discriminate between the two
+rounding rules: both true ties among them round up either way, so a probe built
+only from that set reports "no difference" and is wrong.*
+
+**So: no `snprintf` change, and the divergence is real but unreachable.** *This
+was "still needs a decision" from 2026-08-27 to 2026-09-07.* The `-0` case above
+is the same shape — a genuine difference that no stream can carry.
+
+*The frame-by-frame diff the oracle first offered would NOT have settled this: its
+files are i386/x87 and ours aarch64, so the same matrix element is a different
+computation, and the arithmetic difference swamps any formatting difference. It
+withdrew the offer when that was pointed out.*
+
+**IT IS REACHABLE, AND IT IS NOT DEAD CODE.** Not from the master GUI at all —
+`sigel_slave -visualize <exp>`, the movie button on the visualisation toolbar,
+`Movie settings`, `Format` = POV, `Recording enabled`, then Play. A **per-frame
+dump** during playback, one `sigel_picN.pov` per step plus one shared
+`sigel_pic.inc`. Every film in the oracle's repo was rendered from files this
+code wrote. *Whether the 2001-03 Dortmund films came from this path is unknown
+and the oracle declined to guess.*
+
+**Two gotchas from its two failed attempts.** The visualiser needs **a live
+`pvmd` even in `-visualize` mode** — without one it writes `pvm_send(): Can't
+contact local daemon` to its log and produces **no frames, silently**. And the
+`.inc` it writes emits `#declare Plane = plane { less <0,1,0>, 0 … }` — a stray
+`less` where the normal vector belongs, a hard parse error on povray 3.7, so the
+output needs repairing before it renders.
+
+**The way to settle the tie half** is a byte-for-byte diff of frame 0: the
+geometry is deterministic from the same `.exp`, so the oracle's file and ours
+should match exactly or differ only where the rounding does. It has offered the
+frames.
 
 **Order of work, revised 2026-08-27.** Reordered around the goal above: the
 interface is the work, so it goes first, and PVM follows because without it the
