@@ -3971,19 +3971,20 @@ to the GUI**: 23 `mainWindow->` accesses, it constructs `new MT_MainWindow`
 itself, and it wires toolbar actions with `connect`/`disconnect`. It cannot
 compile against Qt6Core alone until `MT_GUI` is ported.
 
-This matters because `sigel.cpp:272` reaches `MT_Controller::startTimedEvolution`
+This matters because `sigel.cpp:302` reaches `MT_Controller::startTimedEvolution`
 on the headless `-me` path. Either the GUI wiring moves out into `MT_GUI`, or
 `MT_Control` is reclassified as a GUI module. **Not decided.**
 
-**AND ON THAT SAME PATH `qApp` IS A `static_cast` TO A TYPE THE OBJECT IS NOT.
-STILL OPEN — C8 left it for C9 and C9 never closed it.** Measured 2026-09-03 by
+**AND ON THAT SAME PATH `qApp` WAS A `static_cast` TO A TYPE THE OBJECT IS NOT.
+FIXED 2026-09-07** — C8 left it for C9, C9 never closed it, and it stood open until
+Jan asked for the one-line fix. Measured 2026-09-03 by
 preprocessing the real translation unit with the Makefile's own include set, not
 by grepping a header:
 
-- `sigel.cpp:178` handles `-mtevolve` / `-me`, and `:266` constructs a plain
+- `sigel.cpp:197` handles `-mtevolve` / `-me`, and `:285` constructs a plain
   **`QCoreApplication`** on that path — deliberately, because it is the Qt 6
   spelling of Qt 2's `QApplication(argc, argv, false)`.
-- `MT_Controller.cpp:125` calls `qApp->exit(0)`.
+- `MT_Controller.cpp:125` called `qApp->exit(0)` (`:130` after the fix).
 - That TU pulls **`qapplication.h`** — 22 references, transitively through
   `MT_GUI/MT_MainWindow.h`, whose chain reaches a generated `ui_<Form>.h` and
   its `<QtWidgets/QApplication>`. So `qApp` expands to
@@ -3998,13 +3999,44 @@ as an all-clear; the include arrives **three** headers deeper —
 `-fsanitize=undefined,vptr` without one — `QCoreApplication` is at offset 0 and
 `QCoreApplication::exit()` is **static** (`qcoreapplication.h:200`), not merely
 non-virtual — and **the path has never actually run**, which is the
-real reason nothing has bitten. It is UB either way. The fix is one line
-(`QCoreApplication::instance()->exit(0)`), and it is left open rather than done
-quietly because the `-me` path is undriven and this file's rule is that an
-untested change to unrun code is not an improvement.
+real reason nothing has bitten. It is UB either way.
 
-Same module: 4 of its 15 `QMessageBox` calls are **interactive** — the return
-value drives a branch. Those cannot become console output.
+**THE FIX, 2026-09-07: `QCoreApplication::exit(0)`, qualified.** It was left open
+for two days on this file's rule that an untested change to unrun code is not an
+improvement — and the rule does not bind here, which a review established rather
+than argued. `QApplication` and `QGuiApplication` declare no `exit` at all: taking
+the address of `&QApplication::exit`, `&QGuiApplication::exit` and
+`&QCoreApplication::exit` emits **one** symbol, `_ZN16QCoreApplication4exitEi`,
+and `decltype(&QApplication::exit)` is `void(*)(int)` — a plain function pointer,
+which independently proves it is static. Old code and new code call the identical
+function; the only thing deleted is a cast that emits no machine code. That is
+decidable by inspection, so the `-me` path did not need driving to close it.
+
+**Two corrections the same review made to the paragraph above.** *The UB is in the
+CAST, not the call* — C++17 [expr.static.cast]/11 makes the conversion undefined
+the moment it is evaluated, because the pointee is a complete `QCoreApplication`
+and not a base subobject of any `QApplication`. The offset-0 layout is true and
+**irrelevant**: `exit` being static means no `this` is formed, so the offset never
+enters it. *And therefore the clean UBSan run proves nothing* — with no member
+access and no vptr load, `-fsanitize=vptr` has nothing to instrument, so the
+absence of a report was expected rather than exculpatory.
+
+**Qualified rather than `QCoreApplication::instance()->exit(0)`**, which this
+section used to promise: with `exit` static, `instance()` would be evaluated and
+`*p` formed for nothing.
+
+**This does NOT mean the `-me` path works.** It is still undriven by every script
+here, and that is unchanged by this fix.
+
+Same module: **4 of 4** remaining `QMessageBox` calls are **interactive** — the
+return value drives an `if` or a `switch`, at `MT_Controller.cpp:214`, `:260`,
+`:446` and `:924`. Those cannot become console output. *This said "4 of its 15"
+until 2026-09-07: 15 is the count in the 1.3 ORIGINAL, and the other 11 have
+already become `SIGEL_Tools::SIG_IO::cerr`. The sentence read as open work that
+was in fact done. Two of the four, `:214` and `:924`, are not behind the
+`guiEnabled` guard that protects `:260` and `:446` — neither is on the
+`startTimedEvolution` route, so this is a separate open question, not part of
+the fix above.*
 
 ### TRAP — `toUtf8()` returns a temporary (all 74 D8 sites)
 

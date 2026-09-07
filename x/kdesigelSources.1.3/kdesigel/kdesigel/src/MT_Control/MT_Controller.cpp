@@ -1,4 +1,4 @@
-#include <QCoreApplication>   // qApp; was reached via SIG_Program.h before A7
+#include <QCoreApplication>   // QCoreApplication::exit; was reached via SIG_Program.h before A7
 #include "SIGEL_Tools/SIG_IO.h"
 #include "MT_GUI/MT_MainWindow.h"
 #include "MT_Control/MT_Controller.h"
@@ -122,7 +122,19 @@ void MT_Controller::slotEvolutionRunning(bool running)
 	if(!running){
 		if(startWOSigel && !withGUI){
 			QObject::disconnect(gpManager, SIGNAL(metaEvolutionRunning(bool)), this, SLOT(slotEvolutionRunning(bool)));
-			qApp->exit(0);
+			// NOT qApp. This TU pulls qapplication.h transitively (MT_MainWindow.h ->
+			// MT_EstimationWidget.h -> ...Base.h -> ui_...h -> <QtWidgets/QApplication>,
+			// the only inclusion of it in the whole TU), so qApp expands to
+			// static_cast<QApplication *>(QCoreApplication::instance()). On the
+			// -mtevolve / -me path sigel.cpp:285 builds a PLAIN QCoreApplication, so
+			// the CAST is undefined behaviour in itself -- C++17 [expr.static.cast]/11,
+			// the pointee is not a base subobject of any QApplication. Nothing has ever
+			// faulted because exit() is STATIC (qcoreapplication.h:200), so no this is
+			// formed and the pointer is never read -- which also means a clean UBSan
+			// run proves nothing here. Qualified, not instance()->: exit() being static,
+			// instance() would be evaluated for nothing. Same symbol either way,
+			// _ZN16QCoreApplication4exitEi.
+			QCoreApplication::exit(0);
 		}
 	}
 }

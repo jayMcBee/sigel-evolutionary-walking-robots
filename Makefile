@@ -264,7 +264,18 @@ $(LIB)/libfparser.a: $(OBJ)/fparser/fparser.o
 #
 # QtWidgets is on the include path and the link line. Nothing here opens a
 # window: SIG_GPPopulation is the one core file that names a widget, and it
-# guards every use with if (qApp), which is null without a QApplication.
+# guards every use with if (qApp).
+#
+# THAT GUARD DOES NOT MEAN WHAT THIS COMMENT USED TO SAY. It said qApp "is null
+# without a QApplication". SIG_GPPopulation.cpp:23 includes <QApplication>, so
+# its qApp is the QtWidgets macro -- a static_cast of QCoreApplication::instance()
+# -- and is non-null whenever ANY QCoreApplication exists, a plain one included.
+# It is harmless today by scope, not by the guard: the -me path's QCoreApplication
+# lives only inside the if(mtEvolve) block (sigel.cpp:285-306), loadExperiment
+# (:258) and saveExperiment (:320) both run outside it, and neither MT_GPSystem
+# nor MT_Control references SIG_GPPopulation. Those 14 sites are not UB either
+# way -- a static_cast of a NULL pointer is well defined. Found by review
+# 2026-09-07, alongside the same mistake in MT_Controller.cpp.
 #
 # These get -Wall -Wextra and no -fpermissive, unlike the vendored code, and
 # UndefinedBehaviorSanitizer as well as AddressSanitizer.
