@@ -3055,7 +3055,25 @@ assumed.** XTEST is present and `XTestFakeMotionEvent`/`XTestFakeKeyEvent`
 wins. *The pointer was read back rather than trusted, which is the only reason
 this was caught.* Qt's VNC platform serves but `sigel` crashes on it and has no
 GL context, so that crash is an unsupported configuration rather than a port
-defect. **So the driving is `QTest`, and it is not a mouse.** `mouseClick`,
+defect.
+
+**THAT MEASUREMENT IS ABOUT THE LIVE SESSION, AND THE CONCLUSION DRAWN FROM IT
+WAS TOO BROAD — 2026-09-07.** What was measured is that XTEST into the *running*
+Xwayland session has no effect, which is true and still true. What was never
+tried is a **nested plain X server** — no compositor, no `vmware-user`, no
+absolute pointer integration — which is the environment the oracle's side is
+already in, and where XTEST is ordinary. `Xvfb` and `xdotool` were installed
+2026-09-07 and are so far UNUSED. Qt has the `xcb` platform plugin here, so
+`sigel` can run as a real X11 client inside one.
+
+**What that would buy, stated so it is not oversold:** a real click on BOTH ends
+of every comparison instead of only the oracle's, and with it activation, mouse
+grabs, double-click synthesis and enter/leave delivery — the four things `QTest`
+structurally cannot reach. It would still be synthetic XTEST input rather than a
+physical mouse, but so is the oracle's side, which is the point. **Not yet
+attempted, so nothing here claims it works.**
+
+**So the driving is `QTest`, and it is not a mouse.** `mouseClick`,
 `keyClicks` and a hand-posted `QContextMenuEvent` go through
 `QApplication::notify`, so event handlers, hit-testing, `QMenu` popups, item-view
 selection and the slots behind them all run — but bypassing

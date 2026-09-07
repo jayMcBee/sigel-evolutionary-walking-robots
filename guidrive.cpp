@@ -13,7 +13,10 @@
   popup grab and releases, where this posts two independent clicks that happen
   to reach the same actions. So this proves the application's own logic is
   right; it does not prove the platform layer is. On the machine this was
-  written for, no tool could drive that layer at all -- see C10.
+  written for, nothing could drive that layer through the LIVE Wayland session --
+  XTEST returns success there and has no effect. A nested plain X server was
+  never tried and is not covered by that measurement; Xvfb and xdotool were
+  installed 2026-09-07 and are unused so far. See C10.
 
   Scenarios (argv[1]):
     gate       the committed check.sh pass; deterministic, diffed against
