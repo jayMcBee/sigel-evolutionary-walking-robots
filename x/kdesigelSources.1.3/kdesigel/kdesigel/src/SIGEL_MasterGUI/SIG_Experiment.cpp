@@ -322,9 +322,21 @@ void SIG_Experiment::slotStartEvolution()
       // A SCOPE GUARD, not two assignments: it survives an exception out of
       // start() (which would otherwise leave the experiment locked for good)
       // and it nests correctly if start() is somehow re-entered.
+      // D30a. slotEvolutionStopped() is the ONLY thing that re-enables the
+      // locked actions now that Stop no longer does it, so it must run even if
+      // start() throws -- otherwise the window stays locked for good, File >
+      // New Experiment and File > Open Experiment included, and the
+      // application looks bricked. The RunScope already survives a throw; this
+      // is the other half.
       {
         RunScope runScope;
-        gpManager->start();
+        try {
+          gpManager->start();
+        }
+        catch (...) {
+          slotEvolutionStopped();
+          throw;
+        }
       }
 
       slotEvolutionStopped();
@@ -337,7 +349,18 @@ void SIG_Experiment::slotStartEvolution()
 
 void SIG_Experiment::slotStopEvolution()
 {
-  emit signalEvolutionNotRunning( true );
+  // D30a. This used to emit signalEvolutionNotRunning( true ) HERE, as its
+  // first statement -- and it is a request to stop, not a stop. It only sets
+  // gpManager->userTerminated below; start() has not returned, the RunScope is
+  // still alive, and anyEvolutionRunning() is still true. So one click on Stop
+  // re-enabled all 29 locked actions WHILE THE RUN CONTINUED, for as long as
+  // the manager takes to notice the flag -- a whole generation, 58-208 s on
+  // this machine. Every D30 guard was bypassed, because none of them is
+  // consulted on this path: pressing Stop and then MetaGP > Configure System
+  // reached the crash D30 exists to block.
+  //
+  // The honest emit is in slotEvolutionStopped(), which runs after start()
+  // returns and already emits exactly this. Found by review.
 #ifdef SIG_DEBUG
   SIGEL_Tools::SIG_IO::cout << "Stopping Evolution (Haha)\n";
 #endif

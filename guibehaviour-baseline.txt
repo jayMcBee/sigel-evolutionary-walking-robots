@@ -2338,7 +2338,7 @@ Do you want to overwrite?]
 #                                               Use MetaGP all came back
 # The second is reached by File > New Experiment or File > Open Experiment
 # during a run -- neither was in any lock list, and the slot they end in
-# enables 32 actions of which 25 are run-locked.
+# enables 30 actions of which 24 are run-locked.
 #
 # The `[control]' line is a POSITIVE CONTROL, not decoration. Every check below
 # it asks whether a MetaGP action is OFF during a run, and all four are off at
@@ -2347,12 +2347,22 @@ Do you want to overwrite?]
 #
 # This is a DELIBERATE DIVERGENCE FROM 1.3, decided by Jan: changing parameters
 # while a run is going is nonsensical and is forbidden here whatever 1.3 allows.
-# 1.3 greys none of these during a run.
-  [control] MetaGP on at rest: Configure System enabled=1  (1 = the checks below can fail)
+# 1.3 greys 23 of them at run start and hands them back on the first tree click;
+# it greys neither the four MetaGP actions nor New/Open at all.
+# The control reads UseMetaGP's CHECKED state, not Configure System's enabled
+# state. Configure System is enabled by ANY tree click at rest, MetaGP or not,
+# so enabled=1 proved a click had happened and not that MetaGP was on. Found by
+# review.
+  [control] MetaGP on at rest: UseMetaGP checked=1  ConfigureSystem enabled=1  (both 1 = the checks below can fail)
   [locked] anyEvolutionRunning=1
   [locked] typed=71, model reads 57  refused=1
   [locked] after a tree click ([twoBasesSimpleFitness2.exp]): Add=0 ConfigureSystem=0  UseMetaGP=0  (0 = still locked)
   [locked] after slotEnableNoExperimentActions(true): Add=0 ConfigureSystem=0 UseMetaGP=0  (0 = still locked)
+# The two doors themselves. Putting New Experiment and Open Experiment into the
+# run lock is a third of D30 and NOTHING read them -- reverting that append left
+# every check green. Teeth-tested: with it reverted this line reads
+# NewExperiment=1 OpenExperiment=1 and the scenario fails. Found by review.
+  [locked] the two doors: NewExperiment=0 OpenExperiment=0  (0 = locked during a run)
   [nesting] outer=1 inner=1 afterInner=1  nestsCorrectly=1
   [nesting] afterOuter=0
   [unwind] afterThrow anyEvolutionRunning=0 (0 = released)

@@ -742,8 +742,12 @@ nonsensical… There is absolutely NO purpose in testing this — IT NEEDS TO BE
 FORBIDDEN."*
 
 - **Whether 1.3 allows it is irrelevant.** Do not preserve it, do not test it,
-  and do not compare it against 1.3. 1.3 greys none of these during a run; that
-  is a bug there, not a behaviour to carry over.
+  and do not compare it against 1.3. **What 1.3 actually does**, checked in the
+  tarball rather than assumed: it greys 23 of them at run start via
+  `evolutionRunningActionGroup` (`SIG_MainWindow.cpp:417-440`), greys neither
+  the four MetaGP actions nor New/Open at all, and hands the 23 back on the
+  first tree click because its `running()` was a stub returning false. So it
+  tries and fails, which is a bug there, not a behaviour to carry over.
 - It covers MetaGP settings, `New Experiment`, `Open Experiment`, and any other
   parameter route found later.
 - **Find another route? Block it, add it to `runlock`, move on.** D30 is the
@@ -1198,15 +1202,79 @@ legibility. *The 3-8 px figure was never measured on either binary.*
 **A DELIBERATE DIVERGENCE FROM 1.3, and it is a decision rather than a finding.**
 Jan's, in his words: changing parameters while a run is ongoing "is silly and
 makes no sense whatsoever and needs to be blocked… Whether 1.3 allows it or not
-is irrelevant, it's useless and a bug." **1.3 greys none of these during a run.**
+is irrelevant, it's useless and a bug." *An earlier version of this section said
+"1.3 greys none of these during a run", which is **false** and was asserted with
+no measurement behind it. 1.3 greys 23 of them at run start
+(`evolutionRunningActionGroup`, `SIG_MainWindow.cpp:417-440` in the tarball); what
+it does not do is KEEP them grey, because its `running()` stub always returned
+false and the first tree click handed them back. It greys neither the four MetaGP
+actions nor New/Open at all. Found by review.*
 D29 had already begun this divergence for the same reason; D30 finishes it.
 
-**TWO HOLES, both MEASURED by reverting the fix and re-running `runlock`:**
+**THREE HOLES, all MEASURED by reverting each fix and re-running `runlock`:**
 
-| after | `Add` | `Configure System` | `Use MetaGP` |
+| after, in one cumulative run | `Add` | `Configure System` | `Use MetaGP` |
 |---|---|---|---|
 | a tree click | 0 | **1** | 0 |
-| `slotEnableNoExperimentActions(true)` | **1** | **1** | **1** |
+| `slotEnableNoExperimentActions(true)` | **1** | 1 (already on, from the row above) | **1** |
+
+*The two rows are ONE run, not two independent measurements, and the second row's
+`Configure System` is left over from the first — `mtConfigureAction` is **not** in
+`noExperimentActions` (`:700` is commented out), so that slot cannot have turned
+it on. An earlier version of this table read as though it had. Found by review.*
+
+**The route into the second hole was open too**, and nothing tested it: `File >
+New Experiment` and `File > Open Experiment` were in no lock list at all. With
+their appends reverted, `runlock` now reports `NewExperiment=1 OpenExperiment=1`
+and fails. *Before 2026-09-07 that third of the change was gated by nothing —
+reverting it left every check green.*
+
+### D30a — the hole D30 missed: `Stop` unlocked everything mid-run
+
+**D30 did not block the crash, and this is why.** `SIG_Experiment::slotStopEvolution`
+opened with `emit signalEvolutionNotRunning( true )` as its **first statement**,
+and it is a request to stop rather than a stop: it only sets
+`gpManager->userTerminated` at the end, `start()` has not returned, the
+`RunScope` is still alive and `anyEvolutionRunning()` is still true. So one click
+on `Stop` re-enabled all 29 locked actions **while the run continued** — for as
+long as the manager takes to notice the flag, which is a whole generation, 58 to
+208 s on this machine. None of D30's guards is consulted on that path.
+**`Stop`, then MetaGP > Configure System, still reached the crash.** Neither
+button is an action, so `evolutionRunningActions` could never have covered them
+(`experimentView->pushbuttonStop`, and the context-menu entry at
+`SIG_Experiment.cpp:64`).
+
+**The fix is a deletion.** `slotEvolutionStopped()` already emits exactly that
+signal, and it runs after `start()` returns. The premature emit is gone.
+
+**Two more, found in the same review and fixed with it:**
+
+- **The unlock was not exception-safe.** `slotEvolutionStopped()` sits *after*
+  the `RunScope` block, so a throw out of `start()` skipped it. Before D30 that
+  left Import/Export dead; after D30 it also left `New Experiment` and `Open
+  Experiment` dead, i.e. the window looks bricked. Now called on the throw path
+  as well.
+- **D30 itself introduced a stuck state.** Its guard disabled
+  `mtChoiceTypeActionGroup`, which nothing ever re-enables —
+  `slotEnableEvolutionRunningActions( true )` walks actions, not groups — so
+  Evaluator/Classifier stayed grey after the run ended. That line is removed; the
+  group is not in `noExperimentActions` anyway (`:699` is commented out), so it
+  was never needed.
+
+**AND THE SECOND LAYER IS NOW IN, for three slots that had no check of their
+own.** `slotMTUseMT`, `slotMTConfigureSystem` and `slotMTSwitchSystem` each
+refuse when a run is going, on top of the greying. `slotMTUseMT` was the same
+shape as the hole D30 fixed — `mtConfigureAction->setEnabled(state)` with no run
+check — and was unreachable only because `useMeta()` returns false when the state
+is unchanged, which is luck rather than a guard. *This is the layering Jan asked
+for: keep the greying, add the refusal.* `MT_Controller`'s own refusal is still
+deferred — `future_refactorings.md`.
+
+**NOT GATED: the `Stop` fix.** `runlock` fakes a run with its own `RunScope` and
+never calls `slotStopEvolution`, which dereferences `gpManager` and would need a
+real run. The fix is verified against source and by the review that found it, not
+by a gate. Said plainly here because the rest of D30 *is* gated and the
+difference matters.
 
 The first is `SIG_MainWindow::slotActExpChanged` (`:851-859`), which has no run
 check and fires one line after the tree-click emit that *applies* the lock
@@ -1215,7 +1283,8 @@ check and fires one line after the tree-click emit that *applies* the lock
 deletes the trainer the running evolution is holding.
 
 The second is larger and had never been driven before today.
-`noExperimentActions` holds 32 actions, **25 of them also in
+`noExperimentActions` holds **30** active entries — 32 `append` lines, two of
+them commented out at `:699-700` — **24 of them also in
 `evolutionRunningActions`**, and `slotEnableNoExperimentActions` (`:879-885`)
 enabled the lot with no run check. `File > New Experiment` and
 `File > Open Experiment` reach it during a run — `SIG_ExperimentListView.cpp:83`

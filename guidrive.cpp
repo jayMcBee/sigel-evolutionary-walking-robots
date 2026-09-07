@@ -3453,11 +3453,18 @@ static int guidriveMain(int argc, char **argv)
         };
         clickMenu("&MetaGP", "&Use MetaGP");
         QTest::qWait(400);
-        printf("  [control] MetaGP on at rest: Configure System enabled=%d"
-               "  (1 = the checks below can fail)\n", en("&Configure System"));
-        if (en("&Configure System") != 1) {
-            printf("!! Configure System did not come on at rest, so the run-lock"
-                   " checks below would pass vacuously\n");
+        // Read isChecked(), not isEnabled(). Configure System is ENABLED by any
+        // tree click at rest whether MetaGP is on or not, so enabled=1 does not
+        // prove the control worked -- it proves a tree click happened. The
+        // checked state of Use MetaGP is the thing that says MetaGP is on.
+        // Found by review.
+        QAction *useMt = actionByText("&Use MetaGP");
+        printf("  [control] MetaGP on at rest: UseMetaGP checked=%d"
+               "  ConfigureSystem enabled=%d  (both 1 = the checks below can fail)\n",
+               useMt && useMt->isChecked() ? 1 : 0, en("&Configure System"));
+        if (!useMt || !useMt->isChecked() || en("&Configure System") != 1) {
+            printf("!! MetaGP did not come on at rest, so the run-lock checks below"
+                   " would pass vacuously\n");
             fflush(stdout); return 1;
         }
         fflush(stdout);
@@ -3500,10 +3507,19 @@ static int guidriveMain(int argc, char **argv)
                    "  UseMetaGP=%d  (0 = still locked)\n",
                    qPrintable(other->text(0)), add && add->isEnabled() ? 1 : 0,
                    en("&Configure System"), en("&Use MetaGP"));
+            // Assert HERE. The slot call below re-applies the lock, so a
+            // regression in the tree-click guard alone was silently repaired
+            // before the end-of-block check could see it -- the gate stayed
+            // green and only the baseline text moved. Found by review.
+            if ((add && add->isEnabled()) || en("&Configure System") == 1
+                || en("&Use MetaGP") == 1) {
+                printf("!! D30: a tree click during a run re-enabled a locked action\n");
+                fflush(stdout); return 1;
+            }
 
             // D30's SECOND ROUTE. File > New Experiment and File > Open
             // Experiment emit isNotEmpty(true) into slotEnableNoExperimentActions,
-            // which enables 32 actions -- 25 of them also run-locked. Invoke the
+            // which enables 30 actions -- 24 of them also run-locked. Invoke the
             // slot directly: the menu route needs a file dialog, and what is
             // under test is the slot, not the dialog.
             QMetaObject::invokeMethod(W, "slotEnableNoExperimentActions",
@@ -3513,6 +3529,17 @@ static int guidriveMain(int argc, char **argv)
                    " Add=%d ConfigureSystem=%d UseMetaGP=%d  (0 = still locked)\n",
                    add && add->isEnabled() ? 1 : 0,
                    en("&Configure System"), en("&Use MetaGP"));
+            // The two doors themselves. Adding them to evolutionRunningActions
+            // is a third of this change and NOTHING read them -- revert that
+            // append and every check stayed green. Found by review.
+            printf("  [locked] the two doors: NewExperiment=%d OpenExperiment=%d"
+                   "  (0 = locked during a run)\n",
+                   en("&New Experiment"), en("&Open Experiment"));
+            if (en("&New Experiment") != 0 || en("&Open Experiment") != 0) {
+                printf("!! D30: New or Open Experiment is live during a run --"
+                       " either is a route that re-enables everything else\n");
+                fflush(stdout); return 1;
+            }
             if ((add && add->isEnabled()) || en("&Configure System") == 1
                 || en("&Use MetaGP") == 1) {
                 printf("!! D30: a locked action came back during a run\n");

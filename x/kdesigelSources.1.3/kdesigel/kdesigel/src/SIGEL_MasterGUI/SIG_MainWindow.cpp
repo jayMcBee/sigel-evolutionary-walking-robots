@@ -806,6 +806,11 @@ void SIG_MainWindow::slotChangeFont()
 // make the experiment create the metaGP-System
 void SIG_MainWindow::slotMTUseMT(bool state)
 {
+	// D30 SECOND LAYER. The menu item is greyed during a run; this refuses
+	// anyway, because a greyed menu is one layer and a slot that checks for
+	// itself is another. Toggling MetaGP mid-run is what wedges 1.3.
+	if (SIG_Experiment::anyEvolutionRunning())
+		return;
 	SIG_Experiment *actExperiment = experimentListView->currentlySelectedExperiment();
 	if(actExperiment){
 		if(actExperiment->gpExperiment.mtController->useMeta(state)){
@@ -819,6 +824,12 @@ void SIG_MainWindow::slotMTUseMT(bool state)
 // used by the actual experiment
 void SIG_MainWindow::slotMTConfigureSystem()
 {
+	// D30 SECOND LAYER, and this is the one that crashes. configureSystem()
+	// deletes the trainer the running evolution is holding
+	// (MT_Controller.cpp:402-404), so reaching it mid-run by ANY route aborts
+	// the process. Refuse here as well as greying the menu.
+	if (SIG_Experiment::anyEvolutionRunning())
+		return;
 	SIG_Experiment *actExperiment = experimentListView->currentlySelectedExperiment();
 	if(actExperiment){
 		actExperiment->gpExperiment.mtController->configureSystem();
@@ -828,6 +839,10 @@ void SIG_MainWindow::slotMTConfigureSystem()
 // switch the actual experiment to the other metaGP system
 void SIG_MainWindow::slotMTSwitchSystem(QAction *selSystem)
 {
+	// D30 SECOND LAYER. Switching Evaluator/Classifier mid-run changes which
+	// substitute the run is using. Refuse, as well as greying the group.
+	if (SIG_Experiment::anyEvolutionRunning())
+		return;
 	// Qt 2 reached this slot only when the selection actually CHANGED:
 	// QActionGroup::childToggled gated "emit selected(s)" on "s != d->selected",
 	// and QAction::setOn returned early when the state was already correct.
@@ -901,16 +916,19 @@ void SIG_MainWindow::slotEnableNoExperimentActions( bool enable )
   for ( QAction *a : noExperimentActions )
     a->setEnabled( enable );
 
-  // D30. 25 of these 32 actions are ALSO in evolutionRunningActions, so this
-  // loop used to hand back everything a run had locked -- including Use MetaGP
-  // and Configure System. File > New Experiment and File > Open Experiment
+  // D30. 24 of these 30 actions are ALSO in evolutionRunningActions, so this
+  // loop used to hand back what a run had locked -- Use MetaGP among them.
+  // (30, not 32: two appends are commented out at :699-700, which is also why
+  // Configure System and the Evaluator/Classifier group are NOT in this list
+  // and why an earlier version of this comment naming them was wrong. An
+  // earlier version also disabled the group here, which nothing ever undid --
+  // it stayed grey after the run ended. Both found by review.)
+  // File > New Experiment and File > Open Experiment
   // reach it during a run (SIG_ExperimentListView.cpp:83 and :207 emit
   // isNotEmpty(true)), so one menu click undid the whole lock. Re-apply the
   // lock rather than filtering the list, so the two lists cannot drift apart.
-  if ( enable && SIG_Experiment::anyEvolutionRunning() ) {
+  if ( enable && SIG_Experiment::anyEvolutionRunning() )
     slotEnableEvolutionRunningActions( false );
-    mtChoiceTypeActionGroup->setEnabled( false );   // the one overlap that is a group
-  }
 };
 
 void SIG_MainWindow::slotEnableEvolutionRunningActions( bool enable )
