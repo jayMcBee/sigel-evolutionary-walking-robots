@@ -2329,9 +2329,30 @@ Do you want to overwrite?]
   atRest anyEvolutionRunning=0
   maxAge as loaded=50
   [unlocked] typed=57, model reads 57  written=1
+#
+# D30, 2026-09-07. Three lines change here and nothing else in this file moves.
+# The run lock had two holes, both MEASURED by reverting the fix and re-running
+# this scenario:
+#   after a tree click                          Configure System came back
+#   after slotEnableNoExperimentActions(true)   Add, Configure System AND
+#                                               Use MetaGP all came back
+# The second is reached by File > New Experiment or File > Open Experiment
+# during a run -- neither was in any lock list, and the slot they end in
+# enables 32 actions of which 25 are run-locked.
+#
+# The `[control]' line is a POSITIVE CONTROL, not decoration. Every check below
+# it asks whether a MetaGP action is OFF during a run, and all four are off at
+# rest too -- so without first switching MetaGP on and proving it CAN be on,
+# the whole block would pass on a window where MetaGP was never enabled.
+#
+# This is a DELIBERATE DIVERGENCE FROM 1.3, decided by Jan: changing parameters
+# while a run is going is nonsensical and is forbidden here whatever 1.3 allows.
+# 1.3 greys none of these during a run.
+  [control] MetaGP on at rest: Configure System enabled=1  (1 = the checks below can fail)
   [locked] anyEvolutionRunning=1
   [locked] typed=71, model reads 57  refused=1
-  [locked] after a tree click: Add enabled=0 (0 = still locked)
+  [locked] after a tree click ([twoBasesSimpleFitness2.exp]): Add=0 ConfigureSystem=0  UseMetaGP=0  (0 = still locked)
+  [locked] after slotEnableNoExperimentActions(true): Add=0 ConfigureSystem=0 UseMetaGP=0  (0 = still locked)
   [nesting] outer=1 inner=1 afterInner=1  nestsCorrectly=1
   [nesting] afterOuter=0
   [unwind] afterThrow anyEvolutionRunning=0 (0 = released)

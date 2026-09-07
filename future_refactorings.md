@@ -631,3 +631,41 @@ needs the constructor to clean up after itself. Not reachable today for the
 same reason the null is not: 1.3's Dynamo path segfaults on Play (oracle,
 2026-09-02) and nothing in the slave can switch libraries mid-run. It becomes
 live the moment any caller catches that throw and continues.
+
+## `MT_Controller` should refuse a mid-run `configureSystem` ITSELF — a SECOND layer
+
+**The menu greying is not to be removed.** D30 greys the MetaGP actions for the
+duration of a run and that stays. This entry adds a second check inside
+`MT_Controller`, so the guard also sits with the code that does the damage.
+Jan's instruction, verbatim: *"do not REMOVE the greyed out! In ADDITION
+MT_Controller should refuse, multiple layers of checks"*.
+
+**Why it is worth a second layer.** `MT_Controller::configureSystem`
+(`:402-404`) does `mainWindow->show(); delete substitution; substitution = 0;`,
+and `substitution` is the object `SIG_GPManager` is holding as its `trainer`
+whenever the meta system is the Evaluator. Deleting it mid-run is a
+use-after-free that aborts the process. D30 shuts every route the GUI currently
+offers; it cannot shut a route nobody has found yet. A refusal inside
+`configureSystem` is refused twice rather than not at all.
+
+**WHAT STANDS IN THE WAY — measured 2026-09-07, not assumed:**
+
+- **`MT_Control` has no dependency on `SIGEL_MasterGUI` today.** Zero includes,
+  either direction, across `src/MT_Control` and `include/MT_Control`.
+- `SIG_Experiment::anyEvolutionRunning()` is a static on `SIG_Experiment.h:266`,
+  which lives in `SIGEL_MasterGUI`. Calling it from `MT_Controller` adds a new
+  module edge — the kind Phase A spent effort cutting.
+- `MT_Controller` holds `SIGEL_GP::SIG_GPExperiment &sigExp`
+  (`MT_Controller.h:67`), **not** the GUI `SIG_Experiment`, so the flag is not
+  reachable through what it already has.
+- The counter itself, `g_runningEvolutions`, is a file-static in
+  `SIG_Experiment.cpp:212`.
+
+**The option that avoids the new edge:** move the run counter down into
+`SIGEL_GP`, beside `SIG_GPManager`, and have `SIG_Experiment::RunScope` and
+`anyEvolutionRunning()` become thin forwards to it. Both layers can then ask
+without `MT_Control` learning about the GUI at all. Not costed.
+
+**When to do it:** when the port reaches this area. It is a design decision about
+where the run flag belongs, not a defect to patch in passing, and Jan asked to
+discuss it at that point rather than have it decided here.

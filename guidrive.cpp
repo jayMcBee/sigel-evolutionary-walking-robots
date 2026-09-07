@@ -3438,6 +3438,30 @@ static int guidriveMain(int argc, char **argv)
         printf("  [unlocked] typed=%d, model reads %ld  written=%d\n",
                before + 7, unlocked, unlocked == before + 7 ? 1 : 0);
 
+        // D30's POSITIVE CONTROL. Every check below asks whether a MetaGP
+        // action is OFF during a run. All four are off at rest too, so without
+        // this the whole block passes on a window where MetaGP was never
+        // enabled and proves nothing. Turn it on first and prove it CAN be on.
+        auto actionByText = [&](const char *t) -> QAction * {
+            for (QAction *a : W->findChildren<QAction *>())
+                if (a->text() == QString::fromLatin1(t)) return a;
+            return nullptr;
+        };
+        auto en = [&](const char *t) -> int {
+            QAction *a = actionByText(t);
+            return a ? (a->isEnabled() ? 1 : 0) : -1;
+        };
+        clickMenu("&MetaGP", "&Use MetaGP");
+        QTest::qWait(400);
+        printf("  [control] MetaGP on at rest: Configure System enabled=%d"
+               "  (1 = the checks below can fail)\n", en("&Configure System"));
+        if (en("&Configure System") != 1) {
+            printf("!! Configure System did not come on at rest, so the run-lock"
+                   " checks below would pass vacuously\n");
+            fflush(stdout); return 1;
+        }
+        fflush(stdout);
+
         {
             SIG_Experiment::RunScope lock;
             printf("  [locked] anyEvolutionRunning=%d\n",
@@ -3454,10 +3478,46 @@ static int guidriveMain(int argc, char **argv)
                 if (a->text() == "GP-Parameters" && !imp) imp = a;
                 if (a->text() == "&Add") add = a;
             }
-            lv->setCurrentItem(lv->topLevelItem(0));
+            // A REAL selection change. setCurrentItem on the item that is
+            // already current emits nothing, and this check used to re-select
+            // topLevelItem(0) -- which the View page switches above may or may
+            // not have moved away from. Pick an item that is definitely not
+            // the current one, or say the check did not run.
+            QTreeWidgetItem *cur = lv->currentItem(), *other = nullptr;
+            for (int i = 0; i < lv->topLevelItemCount() && !other; ++i) {
+                QTreeWidgetItem *t = lv->topLevelItem(i);
+                if (t != cur) other = t;
+                for (int j = 0; j < t->childCount() && !other; ++j)
+                    if (t->child(j) != cur) other = t->child(j);
+            }
+            if (!other) {
+                printf("!! no second tree item -- the tree-click check did NOT run\n");
+                fflush(stdout); return 1;
+            }
+            lv->setCurrentItem(other);
             QTest::qWait(300);
-            printf("  [locked] after a tree click: Add enabled=%d (0 = still locked)\n",
-                   add && add->isEnabled() ? 1 : 0);
+            printf("  [locked] after a tree click ([%s]): Add=%d ConfigureSystem=%d"
+                   "  UseMetaGP=%d  (0 = still locked)\n",
+                   qPrintable(other->text(0)), add && add->isEnabled() ? 1 : 0,
+                   en("&Configure System"), en("&Use MetaGP"));
+
+            // D30's SECOND ROUTE. File > New Experiment and File > Open
+            // Experiment emit isNotEmpty(true) into slotEnableNoExperimentActions,
+            // which enables 32 actions -- 25 of them also run-locked. Invoke the
+            // slot directly: the menu route needs a file dialog, and what is
+            // under test is the slot, not the dialog.
+            QMetaObject::invokeMethod(W, "slotEnableNoExperimentActions",
+                                      Qt::DirectConnection, Q_ARG(bool, true));
+            QTest::qWait(200);
+            printf("  [locked] after slotEnableNoExperimentActions(true):"
+                   " Add=%d ConfigureSystem=%d UseMetaGP=%d  (0 = still locked)\n",
+                   add && add->isEnabled() ? 1 : 0,
+                   en("&Configure System"), en("&Use MetaGP"));
+            if ((add && add->isEnabled()) || en("&Configure System") == 1
+                || en("&Use MetaGP") == 1) {
+                printf("!! D30: a locked action came back during a run\n");
+                fflush(stdout); return 1;
+            }
             (void)imp;
         }
 

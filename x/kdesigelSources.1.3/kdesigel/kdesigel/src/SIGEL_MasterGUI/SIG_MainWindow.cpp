@@ -568,6 +568,12 @@ SIG_MainWindow::SIG_MainWindow( QWidget * parent, const char * name, Qt::WindowF
 
   slotEnableNoExperimentActions( false );
 
+  // D30. Neither of these was in ANY lock list, so both stayed live through a
+  // run -- and both end in a slot that emits isNotEmpty(true), which is what
+  // re-enabled everything else. Locking them shuts the route as well as the
+  // symptom.
+  evolutionRunningActions.append( newExperimentAction );
+  evolutionRunningActions.append( openExperimentAction );
   evolutionRunningActions.append( renameExperimentAction );
   evolutionRunningActions.append( deleteExperimentAction );
   evolutionRunningActions.append( saveExperimentAction );
@@ -855,8 +861,20 @@ void SIG_MainWindow::slotActExpChanged()
 		if(actExperiment->gpExperiment.mtController->IsEnabled()){
 
 			// currently selected experiment use meta gp-system
-			mtChoiceTypeActionGroup->setEnabled(true);
-			mtConfigureAction->setEnabled(true);
+			//
+			// D30. NOT while a run is going. This slot has no run check of
+			// its own and it fires one line after the tree-click emit that
+			// APPLIES the run lock (SIG_ExperimentListView.cpp:331-332), so
+			// it handed these two straight back mid-run. Measured: with
+			// MetaGP on, one click in the experiment tree during a run made
+			// Configure System live again, and clicking it aborted the
+			// process -- MT_Controller::configureSystem deletes the trainer
+			// the running evolution is holding. The greying is one layer;
+			// future_refactorings.md carries the second, inside MT_Controller.
+			if (!SIG_Experiment::anyEvolutionRunning()) {
+				mtChoiceTypeActionGroup->setEnabled(true);
+				mtConfigureAction->setEnabled(true);
+			}
 			mtUseAction->setChecked(true);
 			if(actExperiment->gpExperiment.mtController->UsedSystem() == EVALUATOR_SUBST){
 				mtChoiceEvaluatorAction->setChecked(true);
@@ -882,6 +900,17 @@ void SIG_MainWindow::slotEnableNoExperimentActions( bool enable )
   // (qaction.cpp:902-908). This is that loop.
   for ( QAction *a : noExperimentActions )
     a->setEnabled( enable );
+
+  // D30. 25 of these 32 actions are ALSO in evolutionRunningActions, so this
+  // loop used to hand back everything a run had locked -- including Use MetaGP
+  // and Configure System. File > New Experiment and File > Open Experiment
+  // reach it during a run (SIG_ExperimentListView.cpp:83 and :207 emit
+  // isNotEmpty(true)), so one menu click undid the whole lock. Re-apply the
+  // lock rather than filtering the list, so the two lists cannot drift apart.
+  if ( enable && SIG_Experiment::anyEvolutionRunning() ) {
+    slotEnableEvolutionRunningActions( false );
+    mtChoiceTypeActionGroup->setEnabled( false );   // the one overlap that is a group
+  }
 };
 
 void SIG_MainWindow::slotEnableEvolutionRunningActions( bool enable )

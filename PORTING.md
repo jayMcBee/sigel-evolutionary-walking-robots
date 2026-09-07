@@ -735,6 +735,25 @@ This document is the handover. A new session should read §0, this section,
 **§9's open list — which is ordered so the conversion work still to do comes
 first** — and then the phase it is taking on.
 
+**CHANGING ANY PARAMETER AFTER A RUN HAS STARTED IS USELESS AND IS FORBIDDEN.**
+Jan's instruction, 2026-09-07, and it settles a whole class of question before
+it is asked: *"changing parameters WHILE A RUN IS ONGOING is COMPLETELY
+nonsensical… There is absolutely NO purpose in testing this — IT NEEDS TO BE
+FORBIDDEN."*
+
+- **Whether 1.3 allows it is irrelevant.** Do not preserve it, do not test it,
+  and do not compare it against 1.3. 1.3 greys none of these during a run; that
+  is a bug there, not a behaviour to carry over.
+- It covers MetaGP settings, `New Experiment`, `Open Experiment`, and any other
+  parameter route found later.
+- **Find another route? Block it, add it to `runlock`, move on.** D30 is the
+  pattern: a run check where the action is re-enabled, plus the action in
+  `evolutionRunningActions`, plus a `runlock` case with a positive control.
+- **Do not propose driving such behaviour to "measure it first".** That was
+  proposed on 2026-09-07 — a run to see whether the port reproduced 1.3's
+  mid-run wedge — and it was wasted time on both sides of the question. There is
+  nothing to learn from a behaviour that is going to be forbidden either way.
+
 **SAMPLE TWICE AND COMPARE; NEVER SAMPLE ONCE AND INTERPRET.** Three probes
 failed this way on 2026-09-06/07, two here and one on the oracle, and each was
 *structurally incapable* of seeing the transition it existed to find:
@@ -1173,6 +1192,76 @@ measured text row heights at two window heights and they are **identical**: 9 px
 for plain labels, 12 px for ones with descenders, 25 px row pitch at both 605 and
 780. What an undersized window costs is frame borders and whole cut rows, not
 legibility. *The 3-8 px figure was never measured on either binary.*
+
+### D30 — parameter changes during a run are forbidden — 2026-09-07
+
+**A DELIBERATE DIVERGENCE FROM 1.3, and it is a decision rather than a finding.**
+Jan's, in his words: changing parameters while a run is ongoing "is silly and
+makes no sense whatsoever and needs to be blocked… Whether 1.3 allows it or not
+is irrelevant, it's useless and a bug." **1.3 greys none of these during a run.**
+D29 had already begun this divergence for the same reason; D30 finishes it.
+
+**TWO HOLES, both MEASURED by reverting the fix and re-running `runlock`:**
+
+| after | `Add` | `Configure System` | `Use MetaGP` |
+|---|---|---|---|
+| a tree click | 0 | **1** | 0 |
+| `slotEnableNoExperimentActions(true)` | **1** | **1** | **1** |
+
+The first is `SIG_MainWindow::slotActExpChanged` (`:851-859`), which has no run
+check and fires one line after the tree-click emit that *applies* the lock
+(`SIG_ExperimentListView.cpp:331-332`). **That one is what crashed the port** —
+`Configure System` back on, clicked, and `MT_Controller::configureSystem`
+deletes the trainer the running evolution is holding.
+
+The second is larger and had never been driven before today.
+`noExperimentActions` holds 32 actions, **25 of them also in
+`evolutionRunningActions`**, and `slotEnableNoExperimentActions` (`:879-885`)
+enabled the lot with no run check. `File > New Experiment` and
+`File > Open Experiment` reach it during a run — `SIG_ExperimentListView.cpp:83`
+and `:207` emit `isNotEmpty(true)` — and **neither action was in any lock list**.
+So one menu click handed back everything the run had locked, `Use MetaGP`
+included, which is the trigger of the failure the oracle measured on 1.3 where
+the evolution stops dead while the window keeps repainting.
+
+**THE FIX, three places in `SIG_MainWindow.cpp`:**
+
+1. `slotActExpChanged` enables the two MetaGP controls only when
+   `!SIG_Experiment::anyEvolutionRunning()`.
+2. `slotEnableNoExperimentActions` re-applies the run lock after its own loop,
+   rather than filtering its list — so the two lists cannot drift apart — and
+   also disables `mtChoiceTypeActionGroup`, the one overlap that is a group
+   rather than an action.
+3. `newExperimentAction` and `openExperimentAction` join
+   `evolutionRunningActions`, which shuts the route as well as the symptom.
+
+**THE TEST HAS TEETH, and it has a positive control.** `runlock` now switches
+MetaGP on *before* the run and **asserts `Configure System` is enabled** — every
+check after it asks whether a MetaGP action is OFF, and all four are off at rest
+too, so without that control the block would pass on a window where MetaGP was
+never enabled. It then checks all four MetaGP actions and `Add` after a real
+selection change and after the `New Experiment` route. *The tree-click check
+also had to be repaired: it re-selected `topLevelItem(0)`, which emits nothing
+when that item is already current, so it could have been inert.* Reverting the
+fix makes it print `!! D30: a locked action came back during a run` and fail.
+
+**WHAT IS NOT FIXED, and it wants a SECOND layer rather than a different one.**
+`MT_Controller::configureSystem` still deletes the trainer (`:402-404`, and
+verbatim in the pristine 1.3 tarball at `:387-389`). D30 makes it unreachable
+during a run; it does not repair it. Opening that window when no run is going is
+still the supported path and still deletes `substitution` — harmless there,
+because no loop is holding it.
+
+**The menu greying STAYS. `MT_Controller` should refuse IN ADDITION**, so the
+guard also sits with the code that does the damage and a future route that
+reaches `configureSystem` some other way is refused twice rather than not at
+all. Jan's instruction, in his words: "do not REMOVE the greyed out! In ADDITION
+MT_Controller should refuse, multiple layers of checks". **Deferred, to discuss
+when the port reaches it** — `future_refactorings.md` carries what stands in the
+way.
+
+`guibehaviour-baseline.txt` moves by three lines, all in `runlock`, and nothing
+else in the file changes.
 
 ### `pvmcrash` — THE PORT HAS THE CRASH, and D29 does not close it — ANSWERED 2026-09-07
 
@@ -2946,14 +3035,36 @@ of the 23 locked actions that nothing re-enables, stayed greyed through it.
 
 | the port could still be wrong here | who can answer it |
 |---|---|
-| **THE PORT CRASHES ON A REACHABLE SEQUENCE, and the fix is not applied.** MetaGP on, Start, one click in the experiment tree, then MetaGP > Configure System: `ASSERT failure in QList::operator[]: "index out of range"`, exit 134. `SIG_MainWindow::slotActExpChanged` (`:851-859`) re-enables `mtConfigureAction` mid-run with no run check, undoing D29 one line after D29 applies it. A run check there — the same `anyEvolutionRunning()` the line above already calls — closes it, and that is plainly what D29 intended. **Left as a decision, not taken**, because 1.3 has this crash too and closing it is a deliberate divergence of the same kind D29 already is | a decision: complete D29, or preserve 1.3's crash |
-| **1.3's silent wedge — does the port do it too?** Toggling `Use MetaGP` mid-run stops the evolution on 1.3 while the GUI keeps repainting and Stop stays enabled. D29 locks that trigger; it does not answer whether another route wedges the port | drive it here |
+| **The `pvmTasks` crash — BLOCKED by D30 2026-09-07, not repaired.** MetaGP on, Start, one click in the experiment tree, then MetaGP > Configure System used to abort the process. D30 forbids parameter changes during a run, so the sequence is refused. **The fault itself is untouched**: `MT_Controller::configureSystem` still deletes the trainer the running loop holds (`:402-404`, verbatim in the 1.3 tarball). Reachable again the moment anything re-opens that door | done; `runlock` gates it |
+| **1.3's silent wedge — CLOSED BY DECISION, not by measurement.** Toggling `Use MetaGP` mid-run stops the evolution on 1.3 while the GUI keeps repainting and Stop stays enabled. D30 makes that toggle unreachable during a run, so the port cannot do it — but nobody ever drove it here, and now nobody can. Recorded as forbidden by design rather than as tested | closed by D30; not measured |
+
+**THREE COVERAGE ITEMS WERE DROPPED 2026-09-07, by Jan, and they should not come
+back.** Each was one of this document's own proposals and each failed a plain
+question about what it would actually prove:
+
+- **"Commit the 30-generation curve."** A randomised search gives a different
+  curve every run. What matters is that the GP system works at all, not any one
+  result. *Jan: "concrete results will always vary in randomised search… not be
+  married to any specific experiment or run."*
+- **"Gate the evolution path."** Checked before dropping: the pieces are already
+  gated separately — the arithmetic by `fitness-check` (42 evaluations, also
+  sanitised), the PVM transfer by `pvm-check`'s `pvm_link`, the ordering by
+  `dictorder`, the run lock by `runlock`. What only a full run adds is the
+  trainer's spawn-and-collect bookkeeping and the generation loop, and **those
+  fail loudly** — nothing spawns, or nothing returns. The one quiet failure, a
+  whole population of exact 0.0 from a swallowed throw, is already asserted in
+  the scenario. Minutes on every `check.sh` run, forever, to catch a failure
+  that announces itself.
+- **"V2 — a save path in `sigel_eval`."** The wrong shape. `expstruct.py`
+  already fingerprints the population block — individuals, names, program text,
+  ordering, `POOLGENERATION` — and drops every float on purpose. The GUI already
+  writes a complete experiment; a 2026-09-07 run wrote 1.5 MB and the harness
+  read `POOLGENERATION` and 100 fitness values back out of it. **Nothing is
+  missing in code.** If equivalence is ever wanted it is `expstruct.py` on a file
+  from each side, which needs the oracle rather than a new save path.
 
 | coverage gaps | what is missing |
 |---|---|
-| **The evolution path is in no gate.** `gui behaviour`'s ten scenarios do not include `evolution`, so nothing in `check.sh` runs a generation. **The cost is now measured rather than guessed**: 208 s per generation at one slave and a mean of 58 s at four (45-69 across five gaps), plus a leading pool evaluation of the same order — so the cheapest useful gate is minutes, not seconds. `pvmcrash` and `evolution` also cannot be gated on exit status until `pvm_halt()` stops blocking (`future_refactorings.md`); the SIGTERM handler makes the status readable, it does not make the process exit on its own | a scenario, or an accepted cost |
-| **The evolution result is prose; no artefact is committed** | commit the 30-generation curve |
-| **V2** — a save path in `sigel_eval` and the same round trip locally, as a gate. `pagesave vs 1.3` covers the 192-line parameter block; the population and robot blocks are compared against nothing. Read V8 result 5 first: a shipped `.exp` round-tripped through 1.3 differs from its input by ten keys, so an input-vs-pass-1 gate fails however correct the port is | equivalence instead of self-consistency |
 
 
 **A MetaGP evolution is NOT open — it is unreachable on both versions.** `Start`
