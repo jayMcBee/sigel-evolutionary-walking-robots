@@ -666,9 +666,22 @@ offers; it cannot shut a route nobody has found yet. A refusal inside
 `anyEvolutionRunning()` become thin forwards to it. Both layers can then ask
 without `MT_Control` learning about the GUI at all. Not costed.
 
-**When to do it:** when the port reaches this area. It is a design decision about
-where the run flag belongs, not a defect to patch in passing, and Jan asked to
-discuss it at that point rather than have it decided here.
+**When to do it:** POSTPONED 2026-09-07. Jan wants to review the options in code
+himself, after everything else on the list is done, reviewed and tested. Not to
+be decided or started before then.
+
+**Two facts measured 2026-09-07 that change the options above:**
+
+- **`SIG_GPManager::running()` already exists and is a stub that always returns
+  `false`** (`SIG_GPManager.h:115`), next to empty `wait()` and `msleep()`
+  bodies — leftovers from Qt 2's `QThread` base. So "just ask the manager" is not
+  available, and worse, it compiles and reads correctly while answering "not
+  running" during a run. Whatever is decided, this stub should be removed or
+  implemented: it is the wrong answer sitting in the obvious place.
+- **`MT_Control` already depends on `SIGEL_GP`** — `MT_Evaluator.h:11` and
+  `MT_Classifier.h:11-14` include `SIGEL_GP/` headers today. The new-module-edge
+  objection above applies only to `SIGEL_MasterGUI`. Moving the counter into
+  `SIGEL_GP` therefore costs no new edge.
 
 ---
 

@@ -139,6 +139,10 @@ simulation produces neither". Four independent errors, all found by review:
 the PVM transfer at precision 50 — and quoted two different token counts, 9,795
 and 9,547, for the same sample.*
 
+**POSTPONED 2026-09-07.** Jan wants to review the options in code himself, after
+everything else on the list is done, reviewed and tested. No decision is to be
+recorded or acted on before then.
+
 **WHAT WOULD ACTUALLY CLOSE IT.** Not a byte diff of a POV frame against the
 oracle: its files are i386/x87 and ours aarch64, so the same matrix element is a
 different computation and the arithmetic difference swamps the formatting one.
