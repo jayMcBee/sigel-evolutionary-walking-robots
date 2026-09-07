@@ -661,16 +661,29 @@ pass=$((pass+cp)); fail=$((fail+cf))
 # section depended on the caller's working directory.
 mp=0; mf=0
 : > /tmp/fmin.$$
-if ! make -q -C "$ROOT" B=build-fast SAN= SIGSAN= guidrive 2>/dev/null; then
+if ! make -q --no-print-directory -C "$ROOT" B=build-fast SAN= SIGSAN= guidrive 2>/dev/null; then
     mf=1
     echo "  build-fast/guidrive is missing or out of date -- this section did NOT"
     echo "  run. Build it with 'make B=build-fast SAN= SIGSAN= guidrive'."
 else
+    # `|| mrc=$?', not a bare run followed by `mrc=$?'. This script sets -e and
+    # this call is a plain command in an `else' branch, so a non-zero formsize
+    # made the SHELL exit right here: no form-minimums line, no pagesave
+    # section, no forms section, no total. The silent-short-run shape this
+    # file guards against everywhere else, in the one place that could not
+    # report it.
+    #
+    # TWO of the branches below, not three: `mrc = 124' and `mrc != 0' were
+    # unreachable dead code, but the `ngot != nui' one sits on the mrc=0 path
+    # and has been live throughout -- guidrive returns 0 only when it measured
+    # 20 forms, so that branch fires on a 21st .ui nobody added to the
+    # scenario's table, which is what it is for. Corrected by review.
+    mrc=0
     SIGEL_ROOT="$SRC" QT_QPA_PLATFORM=offscreen \
       SIGEL_EXP="$ROOT/data-reordered/Experiments/twoBasesSimpleFitness2.exp" \
       SIGEL_SCRATCH="${TMPDIR:-/tmp}" \
-      timeout 300 "$ROOT/build-fast/guidrive" formsize >/tmp/fmin.$$ 2>/tmp/fmerr.$$
-    mrc=$?
+      timeout 300 "$ROOT/build-fast/guidrive" formsize >/tmp/fmin.$$ 2>/tmp/fmerr.$$ \
+      || mrc=$?
     # The .ui files on disk are the independent source. The scenario's form
     # table is a HAND list, so "20 forms" asserted against itself catches only
     # shrinkage; against the directory it also catches a 21st form that nobody
@@ -682,6 +695,20 @@ else
         echo "  formsize was killed at 300 s -- it did not finish, so its result"
         echo "  means nothing:"
         tail -4 /tmp/fmin.$$ | sed 's/^/    /'
+    elif [ "$mrc" -gt 128 ]; then
+        # A KILLED PROCESS IS NOT A FORM DEFECT. This branch used to lead with
+        # "a form declares a minimum below what Qt 6 needs" for EVERY non-124
+        # status, which includes 137 (SIGKILL, i.e. the OOM killer this file
+        # warns about at the pagesave section) and 139 (SIGSEGV). It had never
+        # run in production to show that, because until 2026-09-07 `set -e'
+        # killed the script before it -- so the message was never read against
+        # a real signal. Split out by review.
+        mf=1
+        echo "  formsize was KILLED by signal $((mrc-128)) -- it did not finish,"
+        echo "  so its result means nothing. 137 is SIGKILL: CHECK FREE MEMORY"
+        echo "  FIRST, a check.sh run has already been OOM-killed on this box."
+        [ -s /tmp/fmerr.$$ ] && { echo "  its stderr said:"
+                                  tail -5 /tmp/fmerr.$$ | sed 's/^/    /'; }
     elif [ "$mrc" != 0 ]; then
         mf=1
         echo "  a form declares a minimum below what Qt 6 needs to lay it out,"
@@ -814,7 +841,12 @@ rm -f /tmp/prog.$$
 # Fails rather than skips when they are absent: a gate that quietly passes when
 # the thing it checks is missing is the failure mode this port has already hit
 # twice (the C7 comma probe, the C6 spin-box rows).
-if make -q B=build-fast SAN= SIGSAN= programs 2>/dev/null; then
+# -C "$ROOT" for the reason the `form minimums' section states above: this
+# script never cd's, so without it this gate depended on the CALLER's working
+# directory and, run from anywhere else, failed into "the two programs are not
+# built or are out of date" -- blaming the build for the invocation. That
+# comment was written 165 lines up and this line was missed. Found by review.
+if make -q --no-print-directory -C "$ROOT" B=build-fast SAN= SIGSAN= programs 2>/dev/null; then
     for prog in sigel sigel_slave; do
         f=$ROOT/build-fast/$prog
         if [ ! -x "$f" ]; then

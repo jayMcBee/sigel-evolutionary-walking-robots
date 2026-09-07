@@ -669,3 +669,28 @@ without `MT_Control` learning about the GUI at all. Not costed.
 **When to do it:** when the port reaches this area. It is a design decision about
 where the run flag belongs, not a defect to patch in passing, and Jan asked to
 discuss it at that point rather than have it decided here.
+
+---
+
+## `pvm-check.sh` captures exit status the way `check.sh` did before it was fixed
+
+`pvm-check.sh:124` and `:128` are `"$PVM_TMP/pvm_smoke"; p3=$?` and
+`"$LINK"; p4=$?` — a bare command followed by `$?`, which is exactly the shape
+that made `check.sh`'s form-minimums gate unable to report a failure (PORTING.md,
+form minimums). It is **not** a defect today, and that is the whole point of
+recording it: `pvm-check.sh:49` is `set -u` alone, the only one of the four gate
+scripts without `-e`, so nothing aborts and `p3`/`p4` are read correctly.
+
+**The risk is that somebody adds `-e` to that line.** It is the obvious
+tightening, three of the four scripts already have it, and the moment it lands
+both captures become dead code and both halves of the PVM check start exiting
+the script instead of printing PASS/FAIL. The same line would also leave
+`pvm-check.sh:79-80` (`mkdir -p`, `rm -f`), `:98` (`cat > lsan.supp`) and `:105`
+(`pvmd3 &`) newly unguarded.
+
+**What to do:** if `-e` is ever added, convert both captures to `p3=0; cmd || p3=$?`
+in the same move, and check the four sites above. Doing it the other way round —
+adding `-e` first and fixing the fallout after — is how the form-minimums gate
+lost its teeth for two days without anyone noticing.
+
+*Found by review 2026-09-07, while auditing check.sh for the same defect class.*

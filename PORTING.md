@@ -881,6 +881,27 @@ alongside it is refused for staleness that did not exist when it began. Run them
 in sequence. *Measured 2026-09-05; the refusal is the guard working, not a
 defect.*
 
+**RUNNING THEM IN SEQUENCE IS NOT ENOUGH — THE STALENESS OUTLIVES `check.sh`.**
+`uic` rewrote those headers on disk; finishing the run does not put them back.
+So the fourth gate, straight after a clean `check.sh`, refuses with
+`/home/jan/Downloads/sigel/build/sigel_eval is out of date -- run 'make B=build'`
+and exits 1, which reads exactly like a failure and is not one. **Rebuild `B=build` and `B=build pvm-link`
+between gate 1 and gate 4**, then re-run. *Measured 2026-09-07.* The order that
+works:
+
+```
+make (all five targets, named)  →  ./check.sh  →  ./dictorder-dump.sh
+  →  ./fitness-check.sh  →  make B=build && make B=build pvm-link
+  →  ASAN_OPTIONS=detect_leaks=0 ./fitness-check.sh build  →  ./pvm-check.sh
+```
+
+**And pipe gate 3 without `2>&1`.** `fitness-check.sh` prints `selfcheck: ok` and
+the two-line "no sanitizer, leak test SKIPPED" note on **stderr**, deliberately,
+so that `| diff` sees only the fitness values. Folding stderr into the pipe puts
+those three lines at the top of the diff and the gate reads red with every
+number identical. *Done here 2026-09-07; it is a mistake in the invocation, not
+a regression.*
+
 **AND DO NOT RUN ANYTHING ELSE HEAVY EITHER, which is a wider rule than the one
 above.** A `check.sh` run on 2026-09-05 came back `gui behaviour 0 pass 1 fail`
 with two markers from `roundtrip` — `!! menu [&File] did not open` then
@@ -929,6 +950,33 @@ here.
 
 Never edit a baseline to make a diff go away. If a change moves one, that is the
 finding.
+
+**THE FOURTH LINE WAS ALSO THE BLINDEST, until 2026-09-07.** `fitness-check.sh`
+read each evaluation as
+
+```
+v=$("$ROOT/$B/sigel_eval" "$f" "$i" 2>/dev/null | tail -1 | awk '{print $3}')
+```
+
+which throws away both halves of the evidence: a pipeline's status is its
+**last** command's, so `awk`'s 0 hid a `sigel_eval` that segfaulted, aborted or
+was OOM-killed, and `2>/dev/null` discarded the stream a sanitizer reports on.
+`dictorder-dump.sh:62-77` had closed this exact hole and says so in its own
+comment; this script never did. The first three gate lines would still have
+caught a *changed number* through the baseline diff — **but the fourth line is
+checked by exit status alone**, so a UBSan `runtime error:` under
+`ASAN_OPTIONS=detect_leaks=0 ./fitness-check.sh build` went to `/dev/null` and
+the gate read green. `[ -n "$v" ]` was not a substitute: it only catches a crash
+that printed *nothing*.
+
+**Measured both ways, against a stub `sigel_eval` that exits 1 *and* prints
+`SIG_Robot.cpp:41:12: runtime error: signed integer overflow` on every one of
+the 42 runs:** the old script exits **0** and reports the word `individual` as
+the fitness of all 42; the new one exits **1** at the first evaluation with
+`hammerNiceWalkingFitness.exp 0: sigel_eval exited 1` and the sanitizer line
+beneath it. It now captures to files, tests the status, greps stderr for
+`AddressSanitizer|LeakSanitizer|runtime error:`, and only then reads the value —
+the shape `dictorder-dump.sh` already used. *Found by review 2026-09-07.*
 
 **`./pvm-check.sh` is a fifth check but not a fifth gate.** It has no baseline —
 it prints PASS/FAIL and exits non-zero if either half fails. Needs
@@ -1112,6 +1160,61 @@ same comparison to report it — without that, an invalid hint on every form wou
 read as a clean pass. And the section was measured the other way: putting
 `MT_StatisticsWidgetBase` back to 220x390 and rebuilding makes `check.sh` fail
 by name with `TOO SMALL: 1`, then restoring it passes again.
+
+**THAT SECOND MEASUREMENT STOPPED BEING TRUE 34 MINUTES AFTER IT WAS TAKEN, and
+this file went on asserting it for two days.** `5f6da9d` (2026-09-05 16:15:49)
+wrote the section as `if make -q ... && ... guidrive formsize ...; then`, with
+the run **inside the `if` condition**, where `set -e` is exempt — so a failing
+`formsize` set `mf=1`, printed, and the script carried on. That is the version
+the teeth test above was measured against. `640cfad` (2026-09-05 16:49:51),
+*"Close four holes in the form-minimums gate"*, restructured it into an `else`
+branch with a bare run followed by `mrc=$?`. A bare command in an `else` branch
+is **not** exempt: `check.sh` sets `-e`, so from that commit a real form-minimum
+regression **killed the shell at that line** — no `form minimums` row and
+nothing after it. A commit that closed four holes opened a fifth, in the one
+place that could not report it.
+
+Confirmed on the shell rather than reasoned:
+
+```
+$ dash -c 'set -e; f(){ return 3; }; if true; then f >/dev/null; rc=$?; echo REACHED; fi'
+$ echo $?
+3
+```
+
+`REACHED` is never printed. **Two** of the three branches went with it — `mrc =
+124` and `mrc != 0`. The third, the `ngot != nui` form-count check, sits on the
+`mrc=0` path and was live throughout: `guidrive` returns 0 only when it measured
+20 forms, so that branch fires on a 21st `.ui` nobody added to the scenario's
+table, which is what it is for. *This paragraph said "three"; corrected by
+review.*
+
+Fixed 2026-09-07 to `mrc=0` and `|| mrc=$?`, which puts the run back in a
+context `set -e` exempts. **The teeth test was then re-run in full**, and it is
+the original claim that is restored, not a new one — with `MT_StatisticsWidgetBase`
+at 220x390, `check.sh` prints, verbatim:
+
+```
+      TOO SMALL: 1   (compared: 7, unset: 13, no hint: 0, of 20 forms)
+      selftest OK -- the same comparison the loop uses reports it
+form minimums           0 pass   1 fail
+```
+
+… **and then runs `slave gui`, `expstruct selfcheck`, `programs`, `gui vs 1.3`,
+`gui behaviour` and `pagesave vs 1.3` after it.** The form was restored with
+`git checkout`, the five targets rebuilt, and the gate re-measured green.
+
+**Was the regression ungated for those two days? YES — within `./check.sh` it
+was.** `gui behaviour` moves under the same perturbation, to
+`[window] class=MT_MainWindow title=[SIGEL MetaGP] 680x595`, which is the same
+595 the oracle settled below (*"The MetaGP window grew 59 px"*) — so a second
+section *can* see this defect. **But it never got the chance.** `form minimums`
+prints at `check.sh:730` and `gui behaviour` at `check.sh:1280`: under the
+`640cfad` shape the shell died 550 lines before `gui behaviour` ran. The second
+gate only helps somebody running that scenario by hand. *An earlier version of
+this paragraph claimed the opposite — that `gui behaviour` "would have caught
+it" — which is exactly backwards for a failure that stops the script. Corrected
+by review, which read the two line numbers.*
 
 **FOUR DEFECTS IN THIS GATE'S FIRST VERSION, all found by review, all fixed.**
 The gate as first written could not have caught the regression it exists for.

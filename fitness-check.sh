@@ -64,10 +64,39 @@ fi
 
 n=$(find "$ROOT/$DATA/Experiments" -name '*.exp' | wc -l)
 [ "$n" -eq 14 ] || { echo "expected 14 .exp under $DATA/, found $n" >&2; exit 1; }
+# CAPTURE, TEST THE STATUS, THEN FILTER -- do NOT pipe sigel_eval straight into
+# tail. This line used to read
+#
+#   v=$("$ROOT/$B/sigel_eval" "$f" "$i" 2>/dev/null | tail -1 | awk '{print $3}')
+#
+# which loses BOTH halves of the evidence. A pipeline's status is its LAST
+# command's, so awk's 0 hid a segfaulting, aborting or OOM-killed sigel_eval;
+# and 2>/dev/null threw away the stderr a sanitizer reports on. That matters
+# most in the one invocation this gate exists for: under
+# `ASAN_OPTIONS=detect_leaks=0 ./fitness-check.sh build' a UBSan
+# `runtime error:' went to /dev/null and the gate read green with every number
+# identical to the baseline. `[ -n "$v" ]' below is not a substitute -- it only
+# catches a crash that printed NOTHING, and a crash after the last fitness line
+# still leaves one to read.
+#
+# dictorder-dump.sh:62-77 closed this exact hole and says so; this script did
+# not. Found by review 2026-09-07.
+out=$(mktemp); err=$(mktemp)
 for f in $(find "$ROOT/$DATA/Experiments" -name '*.exp' | sort); do
 	for i in 0 1 2; do
-		v=$("$ROOT/$B/sigel_eval" "$f" "$i" 2>/dev/null | tail -1 | awk '{print $3}')
-		[ -n "$v" ] || { echo "$(basename "$f") $i produced no fitness" >&2; exit 1; }
+		rc=0; "$ROOT/$B/sigel_eval" "$f" "$i" >"$out" 2>"$err" || rc=$?
+		if [ "$rc" -ne 0 ]; then
+			echo "$(basename "$f") $i: sigel_eval exited $rc" >&2
+			cat "$err" >&2; rm -f "$out" "$err"; exit 1
+		fi
+		if grep -qE 'AddressSanitizer|LeakSanitizer|runtime error:' "$err"; then
+			echo "$(basename "$f") $i: sanitizer report" >&2
+			cat "$err" >&2; rm -f "$out" "$err"; exit 1
+		fi
+		v=$(tail -1 "$out" | awk '{print $3}')
+		[ -n "$v" ] || { echo "$(basename "$f") $i produced no fitness" >&2
+		                 cat "$err" >&2; rm -f "$out" "$err"; exit 1; }
 		printf '%-34s %d  %s\n' "$(basename "$f" .exp)" "$i" "$v"
 	done
 done
+rm -f "$out" "$err"
