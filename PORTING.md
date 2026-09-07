@@ -59,96 +59,92 @@ Three jobs, in order, no overlap:
    validating robot models at load. Recorded in `regression_1.0_to_1.3.md`.
    Not part of either job above.
 
-**THE `-0` HALF IS CLOSED — measured by the oracle on 1.3, 2026-09-07.** POV-Ray
-output was the last stream it could have reached, and it does not.
+**STILL NEEDS A DECISION — and a 2026-09-07 attempt to close it was WRONG and is
+withdrawn.** Whether to route every real number through `snprintf` to match 1.3's
+tie rounding. **§7's C5 already measured this and left it open**; the withdrawn
+attempt did not reconcile with it, which is the whole of what went wrong.
 
-Two samples parsed token by token rather than grepped — *a plain grep for `-0`
-matches `-0.0087262` and returns a dozen false positives*:
+**WHAT 1.3 DOES.** Its `QTextStream` does not format doubles at all — it builds a
+format string and calls `sprintf` (`qtextstream.cpp:1776-1805`, vendored source;
+the oracle independently disassembled `__ls__11QTextStreamd` in
+`libqt-mt.so.2.3.1` and found the same). So every rounding decision is glibc's,
+and the comparison runs locally as **Qt 6 against `%.*g`** — no Qt 2 build needed.
+*That part of the 2026-09-07 work stands.*
 
-| sample | numeric tokens | exact zeros | spelled | negative zeros |
-|---|---|---|---|---|
-| 120 frames + the `.inc` | 9,795 | 2,479 | all `0` | **0** |
-| 8 frames + the `.inc` | 2,851 | 229 | all `0` | **0** |
+**AND SIGEL DOES NOT WRITE AT ONE PRECISION.** This is what the withdrawn attempt
+missed:
 
-**And there is a structural reason, not just an empty count.** Every zero in this
-stream is *structural* — identity-matrix elements and `translate <0, 0, 0>`.
-Computed quantities print in exponential form (1,442 of the 9,795 tokens), so
-they never underflow to a bare `0` where a sign could survive. **So `-0` cannot
-reach this stream**, and with the `.exp` and `.rrb` already cleared, it reaches
-none. *No `snprintf` change is needed for `-0`.*
-
-**THE TIE HALF IS CLOSED TOO, and MEASURED HERE — no `snprintf` change.**
-
-**1.3's `QTextStream` never formats a double at all.** The oracle disassembled
-`__ls__11QTextStreamd` in `libqt-mt.so.2.3.1`: it assembles a format string byte
-by byte — `%`, `.`, a precision clamped to 99, then one of `f e E g G` with `g`
-the default — and calls `sprintf@plt`. Qt 2 contributes the format string and
-nothing else; **every rounding decision is glibc's**. Confirmed against the real
-stream rather than left as a reading: **all 9,547 numeric tokens of the
-120-frame POV sample are reproduced exactly by `sprintf("%.6g", v)`, zero
-mismatches.**
-
-*That is what made this answerable without the oracle at all.* The comparison is
-not "Qt 2's `QTextStream` versus Qt 6's" but **"Qt 6 versus `%.6g`"**, which runs
-on this machine. Measured, 20.4 million values:
-
-| kind | checked | differ |
+| set to | where | what it writes |
 |---|---|---|
-| the oracle's eight, read out of a live glibc 2.2.5 process under gdb | 8 | **0** |
-| random finite bit patterns | 400,000 | **0** |
-| exact dyadic halves needing rounding at the 6th digit | 20,400,000 | **450,004** |
-| negative zero | 1 | **1** |
+| **5** | `SIG_Renderer.cpp:114` | **every POV `<x, y, z>`** — translate, rgb, every vertex |
+| **6** (default) | — | `.exp`, `.rrb`, and the POV rotation matrix |
+| **50** | `SIG_GPPVMData.cpp:116, :157` | the master↔slave transfer: parameters, environment, program, whole robot |
 
-**The rule: Qt 6 rounds a tie AWAY FROM ZERO, glibc rounds it TO EVEN.**
-`0.5078125` → Qt 6 `0.507813`, `%.6g` `0.507812`. `131072.5` → `131073` against
-`131072`.
+Both non-default calls are in the 1.3 original, so the port carried them
+faithfully. A single POV file therefore mixes precision 5 and 6.
 
-**Why it cannot reach the stream, which is what decides it.** Only a **dyadic
-rational** can be an exact decimal tie — only those land on the midpoint with a
-terminating binary expansion. Everything else resolves strictly above or below
-it, where any correctly-rounded implementation must agree: `1.0000005` is really
-`1.00000050000000006988…` and `0.1234565` is really `0.12345649999999999679…`,
-so neither is a close call. **A physics simulation essentially never produces an
-exact dyadic half**, and the oracle's 9,547-token sample of real output contains
-not one — the same structural reason the zeros were all bare `0`. The 400,000
-random patterns agreeing is the other half of that: outside the dyadic halves
-there is nothing to disagree about.
+**MEASURED, `tiecheck.cpp` at the repo root:**
 
-**`tiecheck.cpp` at the repo root is that measurement**, so a future session can
-re-derive the number instead of quoting this paragraph. Not built by the
-Makefile and not a gate — nothing depends on the answer. *Its header warns that
-the oracle's eight published values do NOT discriminate between the two
-rounding rules: both true ties among them round up either way, so a probe built
-only from that set reports "no difference" and is wrong.*
+| sample | prec 5 | prec 6 | prec 50 |
+|---|---|---|---|
+| multiples of 1/16 over [0,100] | **22.49%** | 0% | 0% |
+| multiples of 1/64 over [0,100] | 6.97% | **13.50%** | 0% |
+| multiples of 1/256 over [0,10] | 3.48% | 6.99% | 0% |
+| ordinary doubles in [-1000,1000] | 0% | 0% | **0.21%** |
+| uniform bit patterns | 0% | 0% | 0.04% |
 
-**So: no `snprintf` change, and the divergence is real but unreachable.** *This
-was "still needs a decision" from 2026-08-27 to 2026-09-07.* The `-0` case above
-is the same shape — a genuine difference that no stream can carry.
+**Qt 6 rounds a tie away from zero; glibc rounds to even.** `0.703125` →
+`0.70313` against `0.70312` at precision 5 — **and it is in a shipped file**,
+`twoBasesHighMutationRate.exp:112290`.
 
-*The frame-by-frame diff the oracle first offered would NOT have settled this: its
-files are i386/x87 and ours aarch64, so the same matrix element is a different
-computation, and the arithmetic difference swamps any formatting difference. It
-withdrew the offer when that was pointed out.*
+*Counted here rather than taken on trust.* The 14 shipped `data/Experiments/*.exp`
+hold **165,549** numeric tokens and **5** distinct exact dyadic fractions among
+them, 198 occurrences: `0.5` (103), `-0.5` (80), `1.5` (12), `-0.75` (2),
+`0.703125` (1). **Only the last is long enough to need rounding**, so it is the
+only one that differs — the others print verbatim at every precision. *The review
+that found this reported "530 dyadic fractions, three occurrences of 0.703125";
+both figures are wrong at this scope. The finding stands, the numbers are these.*
+So the class reaches shipped data, but by exactly one value.
 
-**IT IS REACHABLE, AND IT IS NOT DEAD CODE.** Not from the master GUI at all —
-`sigel_slave -visualize <exp>`, the movie button on the visualisation toolbar,
-`Movie settings`, `Format` = POV, `Recording enabled`, then Play. A **per-frame
-dump** during playback, one `sigel_picN.pov` per step plus one shared
-`sigel_pic.inc`. Every film in the oracle's repo was rendered from files this
-code wrote. *Whether the 2001-03 Dortmund films came from this path is unknown
-and the oracle declined to guess.*
+**`-0` differs at every precision** (Qt 6 `0`, glibc `-0`), so it is not closed
+either — see the correction below.
 
-**Two gotchas from its two failed attempts.** The visualiser needs **a live
-`pvmd` even in `-visualize` mode** — without one it writes `pvm_send(): Can't
-contact local daemon` to its log and produces **no frames, silently**. And the
-`.inc` it writes emits `#declare Plane = plane { less <0,1,0>, 0 … }` — a stray
-`less` where the normal vector belongs, a hard parse error on povray 3.7, so the
-output needs repairing before it renders.
+#### What the withdrawn attempt got wrong, in full
 
-**The way to settle the tie half** is a byte-for-byte diff of frame 0: the
-geometry is deterministic from the same `.exp`, so the oracle's file and ours
-should match exactly or differ only where the rounding does. It has offered the
-frames.
+It concluded "identical except exact dyadic halves and negative zero, and the
+simulation produces neither". Four independent errors, all found by review:
+
+1. **It measured only the default precision 6.** Two of the three writers use 5
+   and 50. At 5, nearly a quarter of sixteenths differ.
+2. **Its load-bearing step was vacuous.** "Only a dyadic rational can be an exact
+   decimal tie" — **every finite double is a dyadic rational**, so that excludes
+   nothing. The real condition is that the exact decimal expansion runs one digit
+   past the print precision and ends in 5. Rare at 6, common at 5, and at 50
+   ordinary doubles hit it because every double's expansion terminates.
+3. **Its confirming evidence was circular.** "All 9,547 tokens of a real POV
+   sample reproduced by `sprintf("%.6g", v)`" — a token written at `%.6g` has at
+   most 6 significant digits, so parsing and reformatting it is the **identity**.
+   Qt 6's own output passes the same test. It could not have failed. *This is the
+   blindness C5 already named, repeated.*
+4. **The `-0` structural argument named the wrong mechanism.** It said computed
+   values print in exponential form and so never underflow to a bare `0`. `-0.0`
+   is not an underflow; `%g` prints it `-0` at any precision. The actual reason no
+   `-0` appears in the POV sample is that `sigelToPovray()`
+   (`SIG_TypeConverter.cpp:160-169`) goes through a matrix **product**, and
+   `(-0) + (+0) = +0` wipes the sign — plus the grid coordinates at
+   `SIG_EnvironmentRenderer.cpp:231-235, :305-340` are `int`. Right conclusion for
+   that stream, wrong reason, and it says nothing about the other three.
+
+*It also counted a fourth stream as covered when it had never been examined —
+the PVM transfer at precision 50 — and quoted two different token counts, 9,795
+and 9,547, for the same sample.*
+
+**WHAT WOULD ACTUALLY CLOSE IT.** Not a byte diff of a POV frame against the
+oracle: its files are i386/x87 and ours aarch64, so the same matrix element is a
+different computation and the arithmetic difference swamps the formatting one.
+What is needed is a decision, not a measurement — the measurement is above.
+**The PVM stream does not need to match 1.3** (it is ours at both ends, within one
+run), which leaves the `.exp`, `.rrb` and POV writers, and C5's list of the same.
 
 **Order of work, revised 2026-08-27.** Reordered around the goal above: the
 interface is the work, so it goes first, and PVM follows because without it the
@@ -4418,6 +4414,19 @@ are exact binary fractions. That covers the V2 save path, `.pol` pool images and
 the POV-Ray export. Not fixed here — `QTextStream` has no tie-breaking control,
 so matching 1.3 would mean routing every real number through `snprintf("%.*lg")`,
 which is a change to every writer and needs deciding, not assuming.
+
+**EXTENDED 2026-09-07, and this section was right all along.** An attempt to
+close the question in §0 was withdrawn for not reconciling with this table. Two
+things are now known that sharpen it. **The writers do not all use precision 6**:
+`SIG_Renderer.cpp:114` sets **5** for every POV `<x, y, z>` and
+`SIG_GPPVMData.cpp:116, :157` set **50** for the master↔slave transfer — so this
+table's precision-6 column is the *least* affected case. At 5, **22.49%** of
+multiples of 1/16 differ against 0% at 6. And **`0.703125` is in a shipped
+file** — once, `twoBasesHighMutationRate.exp:112290` — differing at precision 5,
+so the class reaches real data and not only synthetic grids. It is the only one
+of the 5 distinct exact dyadic fractions in that corpus long enough to be
+rounded at all. `tiecheck.cpp` at the
+repo root is the measurement.
 *Found by the C5 review. The audit was correct and its sampling method could not
 see the failure — §9's "test with a representative value, not an extreme", in
 the other direction.* *`-0` remains the one
