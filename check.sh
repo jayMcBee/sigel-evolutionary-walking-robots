@@ -1582,6 +1582,381 @@ rm -f /tmp/ps1.$$ /tmp/ps2.$$ /tmp/psall.$$ /tmp/psd.$$ /tmp/pserr.$$
 printf '%-22s %2d pass  %2d fail\n' "pagesave vs 1.3" "$pp" "$pf"
 pass=$((pass+pp)); fail=$((fail+pf))
 
+
+# ---------------------------------------------------------------------------
+# V2 -- whole experiments through File > Save Experiment, against 1.3's own.
+#
+# Every other section here compares the port against itself. This one does not.
+# The expected report is copied from two captures of the running 2003 binary,
+# both taken before this conversion existed:
+#
+#   verification-against-sigel-1.3/v8-1.3-gp-blocks.txt   hammer, 2026-08-29
+#   verification-against-sigel-1.3/v1-1.3-roundtrip.txt   octopus, 2026-08-27
+#
+# So a failure here is a regression against 1.3, not against yesterday.
+#
+# TWO EXPERIMENTS, BECAUSE ONE OF THEM PROVES LESS THAN IT LOOKS.
+# hammer has 5 links, 4 joints, 4 drives and no sensors at all -- few enough
+# that no hash bucket need collide. 1.3 does not permute its link, joint or
+# drive containers either, so agreement there is not evidence. What hammer
+# really tests is material order, `Body' emission order and `middle3''s axis
+# points, plus everything outside the robot: the section line counts, PVMHOST
+# order, the experiment history, the HISTORY growth defect and the ten
+# first-save keys.
+#   octopusSimpleFitness supplies the rest. Its joint, drive and sensor
+# containers DO collide -- V1 measured 1.3 permuting all three, plus the body
+# order and the command list. That is where "we reproduced the order" and "we
+# never permute" come apart.
+#
+# TWO SAVES EACH, NOT V8'S THREE. Pass 0 to 1 shows the ten keys arrive; pass 1
+# to 2 shows them hold and gives the steady-state growth. A third save only
+# repeats the second.
+#
+# THE PRISTINE data/ COPIES, not data-reordered/: dictorder-reorder.py rewrites
+# the other tree. (They are byte-identical for both files today. The point is
+# which one the reference was taken from.)
+#
+# INPUT AGAINST PASS 1 CANNOT BE THE TEST -- V8 result 5. The shipped .exp are
+# a 2001 format revision and the 2003 binary adds ten keys with defaults on the
+# first save. A gate comparing a shipped file against its own round trip fails
+# however correct the port is. So the test is pass 1 against pass 2, and the
+# ten keys are asserted by name and value instead.
+#
+# THE TWO DIVERGENCES ARE IN THE EXPECTED TEXT ON PURPOSE, not filtered out:
+#
+#   robot block   Ours is a FIXED POINT -- byte-identical in all three passes,
+#                 on both robots. 1.3's is an involution: state0 == state2 and
+#                 state1 == state3. That is D3's flip to insertion order,
+#                 decided deliberately, and PORTING.md's V2, V6 and D3 carry
+#                 it. Measured on 1.3 for hammer through the sigel-x86 session
+#                 2026-09-08, and for octopus by V1 in 2026-08.
+#                 A SINGLE SAVE CANNOT SEE THIS. It only shows the order we
+#                 wrote, not whether a second save would move it. That is why
+#                 there are two saves and why octopus is here.
+#
+#   TEXALPHA      99 here, 255 in the V8 capture. IT IS NOT A PORT DEFECT.
+#                 1.3 writes BOTH values, from its two save paths. Measured on
+#                 1.3 for hammer 2026-09-08: its GUI save and its headless save
+#                 differ in EXACTLY ONE LINE and nothing else -- 255 against
+#                 99, with the rest byte-identical including markers, PVMHOST,
+#                 the experiment history and the HISTORY growth. The same
+#                 split shows on a second robot: pagesave-baseline.txt is 1.3's
+#                 own GUI save of twoBases and reads 99.
+#                 The mechanism, in 1.3's source and Qt 2's:
+#                 SIG_Environment.cpp:47 defaults texAlpha to 0xFF;
+#                 SIG_EnvironmentView.cpp:180 pushes it into sliderAlpha and
+#                 :112 reads it back out. The pristine form gives that slider
+#                 no maximum -- `git show 0516d62:…/SIG_EnvironmentBase.ui',
+#                 not the converted file at that path today -- and Qt 2 then
+#                 caps it at QRangeControl's default of 99
+#                 (qrangecontrol.cpp:111-119, reached from qslider.cpp:124).
+#                 Qt 6 has no QRangeControl; its 0-99 default comes from
+#                 QAbstractSlider. Different class, same number, same result.
+#                 The headless path has no slider and keeps 255.
+#                 Ours is a GUI save, so 99 is 1.3's own GUI value.
+#
+# NOT EVERY LINE BELOW IS 1.3's, and the diff labels say so. Three kinds:
+#
+#   1.3's own numbers, from the two captures -- the markers, PVMHOST, the
+#   experiment-history line count and its first and last entry, the first
+#   block's character counts, the HISTORY growth, the ten first-save keys,
+#   and octopus's material and link order.
+#
+#   1.3's DATA, read back out. The individual names, the robot-block hash and
+#   the octopus container rows are the shipped file's own bytes, so pinning
+#   them pins this build against 1.3's artefact even though no capture quotes
+#   them.
+#
+#   OURS, and only ours: the `expstruct' hash. V8 never ran that tool. It is
+#   kept because it covers the population, which nothing else here reaches.
+#
+# WHY ONE DIFF RATHER THAN A DOZEN ifs: so that a generator which produces the
+# wrong text, or stops early, fails on the whole report instead of on the one
+# predicate someone remembered to write. The generator runs inside `|| v2f=1',
+# which suspends `set -e' for it -- without that a single failing command in
+# there would kill the WHOLE script, with no v2 line, no forms section and no
+# total. That is the shape this file has been bitten by three times.
+#
+# TEETH-TESTED 2026-09-08, IN TWO ROUNDS, AND IT FOUND TWO HOLES IN THIS
+# SECTION. Both are closed above and both are the same mistake in two
+# directions -- a line that compares this run against itself and nothing else.
+#
+#   Round one mutated an intermediate pass file. It found that three lines
+#   hashed an extract and compared three hashes, which says "identical" when
+#   the EXTRACTOR dies, since three empty strings are equal. Replacing
+#   expstruct.py with /bin/false passed the gate 1 pass 0 fail. Those lines
+#   now print the size of what they hashed.
+#
+#   Round two mutated the INPUT experiment instead. It found that every
+#   "identical in all three" line passes when the input changes, because all
+#   three passes change with it. Renaming an individual, permuting hammer's
+#   materials and editing an experiment-history entry all went unnoticed.
+#   Those lines now print content too -- a hash, or a first and last entry.
+#
+# What the mutations show is one-way: each predicate CAN fail on a change of
+# the kind it exists to catch. It is not that each mutation moves exactly one
+# line, and an earlier version of this comment claimed that wrongly. A deleted
+# key shifts every marker below it, and any edit to pass 1 or 2 also moves
+# `expstruct'.
+#
+# The wrapper was tested too: missing data SKIPS and counts, a missing or
+# stale binary FAILS, suppressed Qt connect logging FAILS, and the section was
+# run from OUTSIDE the repo root to check the `make -q -C "$ROOT"' fix.
+v2p=0; v2f=0
+V2HAM=$ROOT/data/Experiments/hammerNiceWalkingFitness.exp
+V2OCT=$ROOT/data/Experiments/octopusSimpleFitness.exp
+V2D=${TMPDIR:-/tmp}/v2.$$
+if [ ! -f "$V2HAM" ] || [ ! -f "$V2OCT" ]; then
+    # Same data dependency and the same policy as the sections above: say
+    # SKIPPED loudly and count it, never report 0 pass 0 fail.
+    echo "  SKIPPED: no $V2HAM or $V2OCT -- the data ships separately from the"
+    echo "  tarballs; provision data/ as section 9 describes, then re-run."
+    echo "  THIS SECTION TESTED NOTHING."
+    skipped=$((skipped+1))
+elif [ ! -x "$ROOT/build-fast/guidrive" ]; then
+    v2f=1; echo "  build-fast/guidrive is missing -- run 'make B=build-fast SAN= SIGSAN= guidrive'"
+elif ! make -q -C "$ROOT" --no-print-directory B=build-fast SAN= SIGSAN= guidrive 2>/dev/null; then
+    # A failed make leaves the previous binary in place, so a test for
+    # existence passes on a stale one. D13 was scored green that way.
+    # -C "$ROOT" because this script never cd's -- without it the check
+    # depends on the caller's working directory and reports a false failure
+    # from anywhere but the repo root. The rule is stated at the top of the
+    # `form minimums' section and two other sites already obey it.
+    v2f=1; echo "  build-fast/guidrive is out of date -- run 'make B=build-fast SAN= SIGSAN= guidrive'"
+elif ! mkdir -p "$V2D"; then
+    v2f=1; echo "  cannot create $V2D"
+else
+    # Guarded: a bare `cp && chmod' under `set -e' would abort the whole
+    # script rather than fail this section.
+    cpok=1
+    { cp "$V2HAM" "$V2D/ham0.exp" && chmod u+w "$V2D/ham0.exp" \
+      && cp "$V2OCT" "$V2D/oct0.exp" && chmod u+w "$V2D/oct0.exp"; } || cpok=0
+    : > "$V2D/err" || cpok=0
+    # pagesave with SIGEL_PAGEEDIT unset is exactly File > Open then File >
+    # Save Experiment. No new scenario was added.
+    # $1 = stem, $2 = input pass number.
+    v2run() {
+        rm -f "$V2D/pagesave-base.exp"
+        env SIGEL_ROOT="$SRC" SIGEL_EXP="$V2D/$1$2.exp" SIGEL_SCRATCH="$V2D" \
+            QT_QPA_PLATFORM=offscreen timeout 300 "$ROOT/build-fast/guidrive" \
+            pagesave > "$V2D/$1$2.out" 2>>"$V2D/err" \
+        && mv "$V2D/pagesave-base.exp" "$V2D/$1$(($2 + 1)).exp"
+    }
+    v2marks() { command grep -n '^#####' "$1" | cut -d: -f1 | tr '\n' ' ' | sed 's/ $//'; }
+    v2hosts() { command grep -A1 '^PVMHOST$' "$1" | command grep -v '^PVMHOST$' \
+                | command grep -v '^--$' | awk '{h=h" "$1} END{printf "%d%s", NR, h}'; }
+    v2s6()    { awk '/^#####/{n++; next} n==5' "$1" | md5sum | cut -c1-16; }
+    v2s6n()   { awk '/^#####/{n++; next} n==5' "$1" | wc -l | tr -d ' '; }
+    # $2 = 1 for the first entry, $ for the last.
+    v2s6e()   { awk '/^#####/{n++; next} n==5' "$1" | command grep -v '^$' | sed -n "$2p"; }
+    v2s5()    { awk '/^#####/{n++; next} n==4' "$1" | md5sum | cut -c1-16; }
+    v2s5n()   { awk '/^#####/{n++; next} n==4' "$1" | wc -l | tr -d ' '; }
+    v2blocks(){ awk '/HISTORY BEGIN\{/{c=0} c!=""{c++} /}HISTORY END;/{if(c!=""){print c; c=""}}' "$1"; }
+    # Byte offsets rather than awk's RS="\0": mawk reads a NUL record separator
+    # as one whole-file record, busybox awk reads it as RS="" and returns one
+    # number per paragraph. grep -b is the same answer without the dialect.
+    # Prefixed names because dash has no function scope and this script is one
+    # namespace: a bare s= and e= here would be visible to every later section.
+    v2first() { v2fs=$(command grep -abo 'HISTORY BEGIN{' "$1" | head -1 | cut -d: -f1)
+                v2fe=$(command grep -abo '}HISTORY END'  "$1" | head -1 | cut -d: -f1)
+                echo $((v2fe - v2fs - 14)); }
+    v2names() { command grep -o "NAME='[^']*'" "$1" | md5sum | cut -c1-16; }
+    v2namee() { command grep -o "NAME='[^']*'" "$1" | sed -n "$2p"; }
+    v2robot() { awk '/^StreamedRobot/{p=1} p{print} /^RobotComplete/{exit}' "$1" | md5sum | cut -c1-16; }
+    v2robotn(){ awk '/^StreamedRobot/{p=1} p{print} /^RobotComplete/{exit}' "$1" | wc -l | tr -d ' '; }
+    # $2 = the line prefix, $3 = which field on it carries the name.
+    v2list()  { command grep "$2" "$1" | awk -v k="$3" '{printf "%s ", $k}' | sed 's/ $//'; }
+    v2body()  { command grep -o 'Body [^ ]*' "$1" | awk '{printf "%s ", $2}' | sed 's/ $//'; }
+    v2cmds()  { command grep -o '^[A-Z]* CommandParameters' "$1" | awk '{printf "%s ", $1}' | sed 's/ $//'; }
+    # A key's value line COUNT is part of the shape and is declared, not
+    # discovered: FLOORDIMENSION has two (X and Z), the other nine have one.
+    # Without the cap a key swallows every line down to the next ALL-CAPS one,
+    # and AUTOSAVETIME then reports GPSconst, GNSconst and four more as its
+    # own value -- measured while writing this, not supposed.
+    v2keys()  { awk '/^POPULATION BEGIN\{/{exit}
+                     BEGIN{split("FLOORDIMENSION FLOORFUNCTION FLOORPICTUREFILE FLOORFUNCSELECTED TEXTUREFILE TEXALPHA WITHTEXTURE AUTOSAVETIME RESEVGEN WITHHISTORY",K," ");
+                           for(i=1;i<=10;i++){want[K[i]]=1}; want["FLOORDIMENSION"]=2}
+                     $0 in want {k=$0; c[k]++; got=0; next}
+                     k!="" && got<want[k] {v[k]=v[k]" "($0==""?"<blank>":$0); got++; next}
+                     {k=""}
+                     END{for(i=1;i<=10;i++){printf "%-18s x%d%s\n", K[i], c[K[i]]+0, v[K[i]]}}' "$1"; }
+    v2eq3()   { [ "$2" = "$3" ] && [ "$3" = "$4" ] && echo "$1" || echo "NO"; }
+    if [ "$cpok" = 0 ]; then
+        v2f=1; echo "  could not stage the two experiments into $V2D"
+    elif ! v2run ham 0 || ! v2run ham 1 || ! v2run oct 0 || ! v2run oct 1; then
+        v2f=1
+        echo "  a save did not finish. Sizes of what it did write:"
+        ls -l "$V2D" 2>&1 | sed 's/^/    /'
+        if [ -s "$V2D/err" ]; then
+            echo "  the driver's stderr said:"
+            tail -12 "$V2D/err" | sed 's/^/    /'
+        else
+            echo "  and its stderr was EMPTY. CHECK FREE MEMORY FIRST -- a"
+            echo "  check.sh run has already been OOM-killed on this box, and"
+            echo "  SIGKILL gives exactly these symptoms."
+        fi
+    elif command grep -q '^ *!!' "$V2D"/ham0.out "$V2D"/ham1.out \
+                                "$V2D"/oct0.out "$V2D"/oct1.out; then
+        v2f=1
+        echo "  the driver could not carry out part of a save:"
+        command grep -h '^ *!!' "$V2D"/ham*.out "$V2D"/oct*.out | head -4 | sed 's/^/    /'
+    elif ! command grep -q guidriveStderrControl "$V2D/err"; then
+        # Its own positive control, on its own stderr. The `pagesave' section
+        # above checks the same scenario, but on a DIFFERENT stream from a
+        # different run -- `slave gui' carries a duplicate of this check for
+        # exactly that reason. Without it an empty stderr cannot be told from
+        # a suppressed one.
+        v2f=1
+        echo "  Qt's connect logging is SUPPRESSED -- the save path's connects"
+        echo "  were not checked. Unset QT_LOGGING_RULES and re-run."
+    elif command grep -E 'No such (signal|slot)' "$V2D/err" \
+             | command grep -qv guidriveStderrControl; then
+        v2f=1
+        echo "  a connect on the save path names a signal or slot that does not exist:"
+        command grep -E 'No such (signal|slot)' "$V2D/err" \
+            | command grep -v guidriveStderrControl | sort -u | head -4 | sed 's/^/    /'
+    else
+        genok=1
+        {
+        echo "== V2 round trip, against v8-1.3-gp-blocks.txt (hammer) and v1-1.3-roundtrip.txt (octopus)"
+        for p in 0 1 2; do echo "markers ham$p        $(v2marks "$V2D/ham$p.exp")"; done
+        for p in 0 1 2; do echo "pvmhost ham$p        $(v2hosts "$V2D/ham$p.exp")"; done
+        echo "exp history lines    $(v2s6n "$V2D/ham0.exp") $(v2s6n "$V2D/ham1.exp") $(v2s6n "$V2D/ham2.exp")"
+        echo "exp history stable   $(v2eq3 yes "$(v2s6 "$V2D/ham0.exp")" "$(v2s6 "$V2D/ham1.exp")" "$(v2s6 "$V2D/ham2.exp")")"
+        # CONTENT, not only stability. Without these two the section compares
+        # section 6 against ITSELF across the three passes and never against
+        # 1.3 -- a mutated input passes, measured 2026-09-08. V8 result 4
+        # quotes both lines from the 1.3 run, so they are 1.3's bytes.
+        # The floats here are read and written as text, never recomputed, so
+        # comparing them byte for byte is legitimate where a fitness value
+        # would not be.
+        echo "exp history first    $(v2s6e "$V2D/ham2.exp" 1)"
+        echo "exp history last     $(v2s6e "$V2D/ham2.exp" '$')"
+        echo "first block chars    $(v2first "$V2D/ham0.exp") $(v2first "$V2D/ham1.exp") $(v2first "$V2D/ham2.exp")"
+        for p in 0 1; do
+            q=$((p + 1))
+            v2blocks "$V2D/ham$p.exp" > "$V2D/b$p.txt"
+            v2blocks "$V2D/ham$q.exp" > "$V2D/b$q.txt"
+            echo "history growth $p->$q  $(paste "$V2D/b$p.txt" "$V2D/b$q.txt" \
+                | awk '{d[$2-$1]++} END{n=0; for(k in d){printf "%s%d blocks %+d", (n++?" ":""), d[k], k} if(n==0) printf "NO BLOCKS"}')"
+        done
+        # STABILITY IS NOT ENOUGH ON ITS OWN. Every "identical in all three"
+        # line here passes when the INPUT changes, because all three passes
+        # change together -- measured 2026-09-08 by renaming an individual in
+        # the input, which the gate did not notice. So each such line also
+        # carries content: a hash, or the first and last entry. The names,
+        # the robot block and the population come from the shipped 1.3 data,
+        # so pinning their bytes pins them against 1.3.
+        echo "names stable         $(v2eq3 yes "$(v2names "$V2D/ham0.exp")" "$(v2names "$V2D/ham1.exp")" "$(v2names "$V2D/ham2.exp")") $(command grep -c "NAME='" "$V2D/ham0.exp" || true) $(v2namee "$V2D/ham2.exp" 1) $(v2namee "$V2D/ham2.exp" '$')"
+        # THE SIZE IS PART OF THE ASSERTION, not decoration. Every line here
+        # that hashes an extract and compares three hashes says "identical"
+        # when the extractor DIES, because three empty strings are equal.
+        # Measured: replacing expstruct.py with /bin/false left both reports
+        # empty, cmp called them identical, and the gate passed 1/0 with the
+        # tool gone. The line count fails on the same input.
+        echo "hammer robot block   $(v2eq3 'identical in all three' "$(v2robot "$V2D/ham0.exp")" "$(v2robot "$V2D/ham1.exp")" "$(v2robot "$V2D/ham2.exp")") $(v2robotn "$V2D/ham2.exp") lines $(v2robot "$V2D/ham2.exp")"
+        "$ROOT/expstruct.py" "$V2D/ham1.exp" > "$V2D/e1.txt"
+        "$ROOT/expstruct.py" "$V2D/ham2.exp" > "$V2D/e2.txt"
+        echo "expstruct ham1==ham2 $(cmp -s "$V2D/e1.txt" "$V2D/e2.txt" && echo yes || echo NO) $(wc -l < "$V2D/e2.txt" | tr -d ' ') lines $(md5sum < "$V2D/e2.txt" | cut -c1-16)"
+        for p in 0 1 2; do echo "-- first-save keys, ham$p"; v2keys "$V2D/ham$p.exp"; done
+        # octopus: the containers that actually collide. Printed from the LAST
+        # save, so a writer that only got the first one right cannot pass.
+        echo "octopus section 5    $(v2eq3 'identical in all three' "$(v2s5 "$V2D/oct0.exp")" "$(v2s5 "$V2D/oct1.exp")" "$(v2s5 "$V2D/oct2.exp")") $(v2s5n "$V2D/oct2.exp") lines $(v2s5 "$V2D/oct2.exp")"
+        echo "octopus material     $(v2list "$V2D/oct2.exp" '^Material ' 2)"
+        echo "octopus link         $(v2list "$V2D/oct2.exp" '^Link ' 2)"
+        echo "octopus joint        $(v2list "$V2D/oct2.exp" '^RotationalJoint ' 3)"
+        echo "octopus drive        $(v2list "$V2D/oct2.exp" '^Drive ' 3)"
+        echo "octopus sensor       $(v2list "$V2D/oct2.exp" '^JointSensor ' 3)"
+        echo "octopus body         $(v2body "$V2D/oct2.exp")"
+        echo "octopus commands     $(v2cmds "$V2D/oct2.exp")"
+        } > "$V2D/report.txt" || genok=0
+        # The octopus rows are OUR order. 1.3's is in v1-1.3-roundtrip.txt:
+        # material and link come back unchanged there too, but joint, drive,
+        # sensor, body and the command list are all PERMUTED on 1.3 and are not
+        # here. That is the divergence, recorded, not filtered.
+        cat > "$V2D/expect.txt" <<'V2EXPECT'
+== V2 round trip, against v8-1.3-gp-blocks.txt (hammer) and v1-1.3-roundtrip.txt (octopus)
+markers ham0        37 65 190 75242 75329 75491
+markers ham1        37 82 209 75363 75450 75612
+markers ham2        37 82 209 75463 75550 75712
+pvmhost ham0        20 herz pappel platane birke eiche wickie urobe sven hamlet honi kunibert moritz zehn koenig pik bube kreuz bolte laempel esche
+pvmhost ham1        20 herz pappel platane birke eiche wickie urobe sven hamlet honi kunibert moritz zehn koenig pik bube kreuz bolte laempel esche
+pvmhost ham2        20 herz pappel platane birke eiche wickie urobe sven hamlet honi kunibert moritz zehn koenig pik bube kreuz bolte laempel esche
+exp history lines    161 161 161
+exp history stable   yes
+exp history first    1 2001 8 8 21 13 32 0.0821164 0 0.00939138
+exp history last     160 2001 8 9 7 30 45 0.45972 0 0.3833
+first block chars    10574 10581 10588
+history growth 0->1  100 blocks +1
+history growth 1->2  100 blocks +1
+names stable         yes 100 NAME='10443' NAME='10194'
+hammer robot block   identical in all three 70 lines 666f06787942ddb6
+expstruct ham1==ham2 yes 108 lines 1ca79cc55948de76
+-- first-save keys, ham0
+FLOORDIMENSION     x0
+FLOORFUNCTION      x0
+FLOORPICTUREFILE   x0
+FLOORFUNCSELECTED  x0
+TEXTUREFILE        x0
+TEXALPHA           x0
+WITHTEXTURE        x0
+AUTOSAVETIME       x0
+RESEVGEN           x0
+WITHHISTORY        x0
+-- first-save keys, ham1
+FLOORDIMENSION     x1 50 50
+FLOORFUNCTION      x1 0
+FLOORPICTUREFILE   x1 <blank>
+FLOORFUNCSELECTED  x1 1
+TEXTUREFILE        x1 <blank>
+TEXALPHA           x1 99
+WITHTEXTURE        x1 0
+AUTOSAVETIME       x1 0
+RESEVGEN           x1 0
+WITHHISTORY        x1 1
+-- first-save keys, ham2
+FLOORDIMENSION     x1 50 50
+FLOORFUNCTION      x1 0
+FLOORPICTUREFILE   x1 <blank>
+FLOORFUNCSELECTED  x1 1
+TEXTUREFILE        x1 <blank>
+TEXALPHA           x1 99
+WITHTEXTURE        x1 0
+AUTOSAVETIME       x1 0
+RESEVGEN           x1 0
+WITHHISTORY        x1 1
+octopus section 5    identical in all three 127 lines 82215b5620a0f271
+octopus material     greenPlastic bluePlastic redPlastic
+octopus link         thirdFootLink firstFootLink base firstLegLink1 firstLegLink2 secondFootLink secondLegLink1 secondLegLink2 thirdLegLink1 thirdLegLink2
+octopus joint        secondLegJoint1 thirdLegJoint1 secondLegJoint2 thirdLegJoint2 secondLegJoint3 thirdLegJoint3 firstLegJoint1 firstLegJoint2 firstLegJoint3
+octopus drive        firstLegJoint2Drive firstLegJoint1Drive secondLegJoint1Drive thirdLegJoint2Drive secondLegJoint3Drive thirdLegJoint3Drive secondLegJoint2Drive thirdLegJoint1Drive firstLegJoint3Drive
+octopus sensor       thirdLegJoint3Sensor secondLegJoint1Sensor secondLegJoint2Sensor firstLegJoint3Sensor thirdLegJoint2Sensor secondLegJoint3Sensor thirdLegJoint1Sensor firstLegJoint1Sensor firstLegJoint2Sensor
+octopus body         footLink.wrl legLink.wrl tripleBase.wrl
+octopus commands     MUL CMP MOVE COPY LOAD SENSE DIV SUB ADD DELAY MIN MAX MOD
+V2EXPECT
+        if [ "$genok" = 0 ]; then
+            v2f=1
+            echo "  the report generator could not write its report at all:"
+            ls -l "$V2D/report.txt" 2>&1 | sed 's/^/    /'
+        elif diff -u --label "1.3's numbers, plus our two known divergences" \
+                     --label "what this build wrote" \
+                     "$V2D/expect.txt" "$V2D/report.txt" > "$V2D/diff.txt"; then
+            v2p=1
+        else
+            v2f=1
+            echo "  our round trip no longer matches what SIGEL 1.3 wrote:"
+            # The CHANGED lines, not the first 20 lines of the diff. The
+            # report is 58 lines, so a plain head shows context and can stop
+            # before reaching the difference -- measured 2026-09-08, when a
+            # changed TEXALPHA failed the gate and printed no TEXALPHA line.
+            command grep -E '^([-+]|@@)' "$V2D/diff.txt" | head -20 | sed 's/^/    /'
+        fi
+    fi
+    rm -rf "$V2D" || true
+fi
+printf '%-22s %2d pass  %2d fail\n' "v2 round trip vs 1.3" "$v2p" "$v2f"
+pass=$((pass+v2p)); fail=$((fail+v2f))
+
 # ---------------------------------------------------------------------------
 # Phase C -- the converted Designer forms.
 #

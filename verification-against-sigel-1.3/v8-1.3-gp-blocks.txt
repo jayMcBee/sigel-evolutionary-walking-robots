@@ -195,3 +195,126 @@ must still normalise trailing whitespace inside HISTORY blocks (result 2).
 
 The only parts stable from the input onward are the ones measured above:
 PVMHOST order, experiment-history contents, and section 6 as a whole.
+
+RESULT 6 -- HAMMER'S CONTAINER ORDER, AND WHAT ELSE MOVES
+---------------------------------------------------------
+Captured 2026-09-08 through the sigel-x86 session, for V2. Same file and same
+method as the four results above: hammerNiceWalkingFitness.exp, sha256
+80a5efc7cf2079c81f5da00339c27b9f7cf889103c6439f991196cb56b1064d6, scratch copy,
+only the two dead 2003 roots repointed. Load and save three times.
+
+V1 covered twoBases, octopusSimple, octopusNice and walker. It never covered
+hammer. Result 3 above covered hammer's materials alone.
+
+    === IN (shipped) ===
+      material  plastic metal rubber
+      link      base hammer middle1 middle2 middle3
+      joint     hinge1 hinge2 hinge3 hinge4
+      drive     hinge1Drive hinge3Drive hinge2Drive hinge4Drive
+      sensor    none: hammer has no Sensor records at all
+      body      base.wrl middle.wrl effector.wrl
+
+    === OUT pass 1 ===
+      material  plastic rubber metal
+      body      base.wrl effector.wrl middle.wrl
+      link, joint, drive: unchanged from IN
+
+    pass 2 == IN.  pass 3 == pass 1.
+
+TWO THINGS MOVE THAT A CONTAINER-NAME LIST DOES NOT SHOW. Body emission order
+toggles. So do the named axis points INSIDE the middle3 Link line, positions 3
+and 4:
+
+    IN       ... Middle3SuccAxisBase Middle3SuccAxisDir Middle3SuccAxisNormal ...
+    pass 1   ... Middle3SuccAxisBase Middle3SuccAxisNormal Middle3SuccAxisDir ...
+
+base, hammer, middle1 and middle2 are byte-identical in all four states. Each
+Geometry travels with its own Body; no mesh is reassigned when Body order flips.
+
+INVOLUTION CONFIRMED ON A FIFTH ROBOT. sha256 of the whole robot block:
+
+    state0  c8a13fa4773fb0e40494466871131edee499704915d373579cb4f56e52fc143a
+    state1  e8921b5d8df12e197c30928c7b994ffae49a21ece8df4aeb49092d6ab44bb3ba
+    state2  = state0        state3  = state1
+
+DO NOT READ "link, joint and drive are stable" AS "they cannot move on hammer".
+Hammer has 5 links, 4 joints and 4 drives -- few enough that no bucket need
+collide. V1 saw all three permute on octopus. Hammer does not discriminate on
+them. And its sensor line carries no evidence at all, because the robot has no
+Sensor records.
+
+OUR SIDE, measured the same day: the robot block is a FIXED POINT. Identical
+md5 in all four states, so material, Body and axis-point order all stay at the
+IN order. That is D3's flip to insertion order and it is deliberate. 1.3
+permutes, we do not.
+
+RESULT 7 -- 1.3 HAS TWO SAVE PATHS AND THEY WRITE DIFFERENT FILES
+------------------------------------------------------------------
+Captured 2026-09-08 through the sigel-x86 session, on hammer, both paths in
+one sitting. One key, one byte, and nothing else.
+
+    diff  -evolve pass 1  against  GUI File > Save Experiment
+    NO normalisation of any kind:
+
+        62c62
+        < 255
+        ---
+        > 99
+
+    That line is TEXALPHA's value. The same diff with HISTORY trailing
+    whitespace normalised is identical, so both writers append the same seven
+    characters to all 100 blocks.
+
+    sha256 with only the TEXALPHA VALUE line masked:
+        f5d9d736eee7bfb77f9e6b81743463d4727daa734e739cdbbe39e42405b20677  -evolve
+        f5d9d736eee7bfb77f9e6b81743463d4727daa734e739cdbbe39e42405b20677  GUI
+
+    -evolve  1554808 bytes   75612 lines   #####: 37 82 209 75363 75450 75612
+    GUI      1554807 bytes   75612 lines   #####: 37 82 209 75363 75450 75612
+
+The masked sha256 is what makes this a closed statement rather than a list of
+things that happened to agree. It covers every line neither side inspected.
+
+The GUI writer also produces the SAME permutation as -evolve: robot-block
+sha256 e8921b5d8df12e197c30928c7b994ffae49a21ece8df4aeb49092d6ab44bb3ba, equal
+to -evolve pass 1. So the involution belongs to the writer, not to the path.
+
+A SECOND ROBOT SHOWS THE SAME SPLIT. pagesave-baseline.txt is 1.3's own GUI
+save of twoBasesSimpleFitness2, captured 2026-09-03, and reads TEXALPHA 99.
+
+WHICH PATH RESULTS 1 TO 5 CAME FROM IS NOT RECORDED. This file's METHOD says
+only "loaded and saved three times in succession". Result 5's 255 therefore
+identifies that capture as the headless path by its VALUE, now that both
+values are known -- it is not a claim about how it was run.
+
+CAUSE, in 1.3's own source and Qt 2's. SIG_Environment.cpp:47 defaults texAlpha
+to 0xFF. SIG_EnvironmentView.cpp:180 pushes it into sliderAlpha on load, and
+:112 reads it back on save. The pristine form gives that slider a name and an
+orientation and nothing else, no maximum -- read it with
+
+    git show 0516d62:x/kdesigelSources.1.3/kdesigel/kdesigel/ui/SIGEL_MasterUI/SIG_EnvironmentBase.ui
+
+because the file at that path today is the CONVERTED Qt 4 form. Qt 2's
+QRangeControl() sets maxVal to 99 (qrangecontrol.cpp:111-119) and
+QSlider(Orientation,...) uses that default constructor (qslider.cpp:124). Qt 6
+has no QRangeControl at all; its 0-99 default comes from QAbstractSlider.
+The headless path has no slider and keeps 255.
+
+SAME NUMBER, DIFFERENT MECHANISM -- AND THAT IS WEAKER THAN IT LOOKS. The two
+99s do not share a code path. 1.3's comes from Qt 2's QRangeControl default;
+ours comes from Qt 6's QAbstractSlider default. They agree on the value today,
+and nothing enforces that they keep agreeing. A Qt release that changed the
+default would move our side alone, silently, and the gate would then be the
+only thing that noticed. Do not read "the port is faithful here" as "the port
+cannot drift here". If it ever moves, the fix is to set the maximum on the
+form explicitly rather than to chase the toolkit.
+
+NOT MEASURED: that 1.3's Alpha slider really reports a maximum of 99. The
+oracle attempted it, the nested X server went down mid-probe, and the reading
+was not retaken. What is established is the two file values above and the Qt 2
+source. The clamp is the explanation for them, not an observation of its own.
+
+CONSEQUENCE: pick the reference by PATH. A GUI save must be compared against a
+GUI capture. Every other line agrees between the two paths, which is why the
+V2 gate can compare our GUI save against this headless capture -- but that is
+a measured licence, not an assumption.
