@@ -2153,7 +2153,7 @@ disassembly are local.
 | # | Step | What it checks |
 |---|---|---|
 | V1 | ~~Capture 1.3's load-and-save round trip for three shipped `.exp`~~ **DONE 2026-08-27** — `verification-against-sigel-1.3/v1-1.3-roundtrip.txt` | the `Q2Dict` hash, all order-carrying containers, the parser and the serialiser |
-| V2 | Our half: a save path in `sigel_eval`, the same round trip locally, diffed against V1. Becomes a gate. **Read V8 result 5 first** — a shipped `.exp` round-tripped through 1.3 differs from its input by ten keys, so an input-vs-pass-1 gate fails however correct the port is | equivalence instead of self-consistency |
+| V2 | ~~Our half: a save path in `sigel_eval`~~ **RESHAPED 2026-09-08, and the `sigel_eval` half is dropped for good.** What V2 has to answer is whether our saved file matches the one 1.3 saved. A save path in `sigel_eval` cannot answer it: `sigel_eval` links `SIG_GPExperimentClean.o` (`Makefile:498`), which is the SLAVE variant of the writer, and `sigel_slave.cpp` never calls `saveExperiment` at all. So that variant is dead code in the only binary that ships it, and a test there would test something no user reaches. It is also the wrong side of the one difference between the two writers: the master writes the MetaGP block when `mtController->IsEnabled()` (`SIG_GPExperiment.cpp:107`) and the slave has no `mtController` (`SIG_GPExperimentClean.cpp:87`). Everything else is the same source compiled twice. Against a V1 reference written by 1.3's master, the slave writer gives identical bytes with MetaGP off and cannot produce the right bytes with it on. **What V2 is now:** round trip a shipped `.exp` through the save path that already exists, fingerprint it with `expstruct.py`, and diff against V1. **Read V8 result 5 first** — a shipped `.exp` round-tripped through 1.3 differs from its input by ten keys, so an input-against-pass-1 gate fails however correct the port is. Compare pass 1 against pass 2 | the same file, not self-consistency |
 | V3 | ~~Determinism on the x86 box — one experiment run twice, both `RANDOMSEED`s pinned~~ **SATISFIED 2026-09-02.** The oracle ran it twice on each of two models: `serA`≡`serB` and `octGateA`≡`octGateB`, identical on every field but the run-directory paths | closed. It is SAME-BOX determinism, which is sound; it was never a cross-machine claim |
 | V4 | ~~Two whole-run digests validated against the reference machine~~ **DROPPED 2026-09-03.** A whole-run digest cannot cross an x87/IEEE boundary, which §7 and D26 already said and C11 then proved: the identifier counts that appear to agree are FORCED — consumed in the tournament constructors before any fitness is read, with `createTours` building a constant 50 per generation — while the contents are decided by a float comparison and cannot agree. Estimated ~98% chance the counts matched even under maximal divergence | dropped, not deferred. What replaced it is a measurement of OUTPUT on one machine — see C11 |
 | V5 | **MDH probe DONE 2026-08-27, PASS** — `verification-against-sigel-1.3/v5-1.3-mdh-compared.txt`. The sensor and force probes remain open | the port's **arithmetic**, which V1–V4 never touch |
@@ -3387,8 +3387,15 @@ question about what it would prove:
   ordering, `POOLGENERATION` — and drops every float on purpose. The GUI already
   writes a complete experiment; a 2026-09-07 run wrote 1.5 MB and the harness
   read `POOLGENERATION` and 100 fitness values back out of it. **Nothing is
-  missing in code.** If equivalence is ever wanted it is `expstruct.py` on a file
-  from each side, which needs the oracle rather than a new save path.
+  missing in code.** If a comparison against 1.3 is ever wanted it is
+  `expstruct.py` on a file from each side, which needs the oracle rather than a
+  new save path.
+  *Re-opened 2026-09-08, because this bullet carried Jan's name and the argument
+  is not his. The conclusion holds, and the reason is now much stronger than
+  "the wrong shape": `sigel_eval` links the SLAVE variant of the writer, and
+  `sigel_slave` never calls it, so a save path there would test dead code. Jan,
+  2026-09-08: "no need to test dead code". The V2 row in the Phase V table has
+  the full argument and the reshaped step.*
 
 | coverage gaps | what is missing |
 |---|---|
