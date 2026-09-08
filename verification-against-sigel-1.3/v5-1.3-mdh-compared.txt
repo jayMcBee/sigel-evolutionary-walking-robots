@@ -156,3 +156,131 @@ THE LIVE FORCE PATH  *** RECEIVED, NOT RE-DERIVED ***
     Computes the drive value inline from SIG_Register getValue() and getSize(),
     calling pow(2.0, size) twice with exponent getSize()-1, giving the signed
     range -2^(n-1) .. 2^(n-1)-1.
+
+================================================================================
+OUR SIDE OF THE SENSOR PATH -- MEASURED HERE 2026-09-08
+================================================================================
+Checked on this machine, from our own source and our own binaries. No gdb and
+no running simulation.
+
+THE EIGHT CONSTANTS AGREE AS VALUES. READ THE NEXT PARAGRAPH BEFORE QUOTING
+THIS AS A BYTE COMPARISON, BECAUSE FOR SIX OF THEM IT IS NOT ONE.
+
+    1.3 addr    1.3 raw (BE)        ours, computed   where ours comes from
+    0x081ec308  4000000000000000    4000000000000000  pow(2, size-1)
+    0x081ec310  ffefffffffffffff    ffefffffffffffff  -DBL_MAX, Queries.cpp:122
+    0x081ec318  7fefffffffffffff    7fefffffffffffff  +DBL_MAX, Queries.cpp:122
+    0x081ec320  404ca5dc1af05a77    404ca5dc1af05a77  360.0/(2.0*3.14159265)
+    0x081ec328  4076800000000000    4076800000000000  360.0
+    0x081ec330  4056800000000000    4056800000000000  90.0
+    0x081ec338  c056800000000000    c056800000000000  -90.0
+    0x081ec340  4066800000000000    4066800000000000  180.0
+
+The "ours" column is each value COMPUTED from our source expression, not read
+out of our binary. That distinction was wrong in the first version of this
+file, which printed "same" and read as a byte comparison that had not been
+made. Found by review.
+
+ONLY ONE OF THE EIGHT EXISTS AS BYTES IN OUR IMAGE. Searched for as 8-byte
+little-endian doubles in build-fast/sigel_eval:
+
+    180/3.14159265   3 hits: ONE in .rodata at 0x141658, two in .debug_loclists
+    -DBL_MAX         0 hits
+    +DBL_MAX         0 hits
+    360.0            0 hits
+    -90.0            0 hits
+    90.0             2 hits, both in .debug_loclists
+    180.0            5 hits, all in debug sections
+    2.0              442 hits, noise
+
+aarch64 folds the others into immediates or into larger expressions instead of
+emitting them. So the radian factor is the only one of the eight with a
+.rodata entry to compare, which is why it is the only one gated.
+
+THE THREE HITS ARE NOT THREE COPIES OF A POOLED CONSTANT. One is the program's
+constant and two are debug data, because the Makefile compiles with -g. The
+earlier reading of this as constant pooling was wrong, and it mattered: the
+gate's "the constant is missing" arm searched the whole file, so patching the
+real constant out still left two debug copies and the arm could never fire.
+The search is bounded to .rodata now.
+
+A DIFFERENT SPELLING REACHING THE SAME BITS. 1.3's image holds the folded
+180/3.14159265. Our source writes 360.0/(2.0*3.14159265). Computed, not
+assumed: both are 404ca5dc1af05a77. Doubling is exact and 360/(2x) is the same
+correctly-rounded quotient as 180/x, so the rewording is safe.
+
+THE ABSENCE REPRODUCES ON OUR SIDE TOO, which is the mirror of the 1.3
+measurement above. The true 180/pi occurs ZERO times in build-fast/sigel,
+build-fast/sigel_slave, build-fast/sigel_eval and build/sigel_eval -- anywhere
+in the file, debug sections included.
+
+Do not compare our hit COUNTS against 1.3's. The 2003 images are about 3 MB and
+carry NO .debug_* sections at all; ours are 33 to 87 MB and carry DWARF. That,
+not stripping, is the difference -- the 1.3 images are not stripped and hold a
+.symtab, which is where the mangled `sense__CQ216SIGEL_Simulation30...' symbol
+above came from. A symbol table holds no 8-byte doubles, so their 1-hit and
+0-hit counts stand. Why 1.3's master has none and ours does is not established,
+and this file previously guessed at it.
+
+1.3 IS INCONSISTENT WITH ITSELF, AND THE PORT PRESERVES THAT. SIGEL_Robot/
+IFunctions.cpp:384 uses the true M_PI. It is untouched since the vendor drop
+apart from comment translation, so the inconsistency is 1.3's. A reader who
+meets that line first will read the 3.14159265 as an oversight. Gated as
+`truncated pi (V5)' for exactly that reason.
+
+MULTIPLY BEFORE DIVIDE IS OUR ORDER TOO
+    Queries.cpp:136-139
+        scaledState  = (q - minPos);
+        scaledState *= 360.0 / (2.0*3.14159265);
+        scaledState /= posRange;
+    matching the disassembled fmulp / fstpl / fdivl above, store included.
+    scaledState and posRange are plain `double' here (Queries.cpp:68-69), so
+    the 64-bit store the 1.3 disassembly overflows through is our width too.
+    Already recorded as a 1.0->1.3 regression kept on purpose; the source
+    carries the note and regression_1.0_to_1.3.md has the analysis.
+
+THE DBL_MAX SENTINEL IS PRESENT, Queries.cpp:122, same == comparison:
+    if ( (minPos == (- DBL_MAX)) && (maxPos == DBL_MAX) ) posRange = 1;
+
+THE DEAD DYNAMO PATHS DO NOT EXIST HERE AT ALL. senseJoint1, senseJoint2,
+applyForce and SIG_DynaMoSimulationQueries were deleted with the Dynamo
+backend (D16, physics_backends.md). So the oracle's unverified "no other
+caller exists" claim gates nothing on our side: there is no counterpart to
+probe either way. What justifies the deletion is the half that IS checked --
+every shipped experiment sets SIMULATIONLIBRARY 1.
+
+WHAT BOUNDS A VALUE-LEVEL PROBE, AND WHY THE FORCE HALF CANNOT BE BIT-COMPARED
+    This machine is aarch64 and its `long double' is IEEE binary128. 1.3's i386
+    `long double' is the x87 80-bit format. Measured here: LDBL_MANT_DIG == 113
+    against 64 for x87.
+
+    DO NOT USE sizeof, AND DO NOT USE THE ROUNDING TEST. An earlier version of
+    this file cited sizeof(long double) == 16 and
+    (double)(3.14159265L/180.0L) != 3.14159265/180.0. Neither discriminates,
+    and the oracle demonstrated it by running both on x86-64: sizeof is 16
+    there too, because the 80-bit x87 value is padded to 16 bytes, and the
+    inequality holds there too, because it only says "compute in any extended
+    precision, then round, and you differ from computing in double". Both
+    results appear on a machine whose long double format is IDENTICAL to 1.3's.
+    LDBL_MANT_DIG is the quantity that tells the formats apart: 64 for i386 and
+    x86-64 x87, 113 for aarch64 binary128.
+
+    AND THIS IS A PROPERTY OF THE BUILD HOST, NOT OF THE PORT. Do not read it
+    as "the force path can never be verified". A build on x86-64 would give a
+    long double bit-identical in FORMAT to 1.3's, and moveDrive would become
+    comparable. That would still not close the plain-`double' gap: x86-64
+    computes double in SSE at a true 64 bits, where i386 used x87 with 80-bit
+    intermediates, so full closure would additionally need -mfpmath=387.
+    An x86-64 build buys the long double half only.
+    moveDrive carries its VALUE CHAIN in long double -- minRegisterValue,
+    registerValueRange, absoluteRegisterValue, sigelDestAngle, destAngle,
+    dmDestAngle and force. Not everything in it is long double: q, qd, intMin,
+    intMax and jointInput are plain double, and intMin is added back at
+    CommandInterface.cpp:174. But the quantities the command computes cross the
+    precision boundary, so they CANNOT be compared bit for bit between the two
+    machines. That is D26 and section 7's x87/IEEE boundary, not a port defect.
+    sense is comparable further: scaledState and posRange are plain double all
+    the way to the divide. Its register-value steps then mix double with long
+    double -- Queries.cpp:151 in the joint branch, :209 in pitch/roll and :261
+    in the third -- and cross the same boundary.
+    So a future value probe should stop at scaledState, not at registerValue.

@@ -1584,6 +1584,163 @@ pass=$((pass+pp)); fail=$((fail+pf))
 
 
 # ---------------------------------------------------------------------------
+# V5 -- the truncated pi, and the constants the sensor path is built on.
+#
+# SIGEL 1.3 converts radians to degrees with pi TRUNCATED TO EIGHT DECIMALS.
+# Not 180/pi but 180/3.14159265, which is 57.29577957855229 against the true
+# 57.295779513082323 -- a relative error of 1.14e-09.
+#
+# THAT IS NOT A DEFECT TO FIX. IT IS THE BEHAVIOUR BEING PRESERVED. Every
+# evolved program in the shipped experiments was selected against sensor
+# values carrying that error, and the values feed a chaotic simulation, so
+# "correcting" it changes what the robots do. The port's rule is convert, do
+# not improve; PORTING.md lists this with the 1.3 behaviour preserved on
+# purpose. This section exists because the change is a ONE-WORD EDIT that
+# looks like tidying -- write M_PI and the gate is the only thing that
+# notices.
+#
+# AND 1.3 INVITES THE EDIT, because it is inconsistent with itself. It
+# uses the true M_PI in SIGEL_Robot/IFunctions.cpp:384 and the truncated
+# literal in the two simulation files. That is 1.3's own inconsistency,
+# preserved verbatim -- IFunctions.cpp is untouched since the vendor drop
+# apart from comment translation. A reader who finds the M_PI first will read
+# the 3.14159265 as an oversight.
+#
+# MEASURED ON THE 1.3 BINARY, through the sigel-x86 session 2026-09-08, and
+# the decisive part is an ABSENCE:
+#     sigel_slave   404ca5dc1af05a77 (truncated)   1 occurrence
+#                   404ca5dc1a63c1f8 (true 180/pi) 0 occurrences
+#     sigel         both                           0 occurrences
+# The correct constant is in NEITHER shipped 1.3 binary. So this is not "1.3
+# happens to use a truncated pi somewhere"; the true value is absent from the
+# image. Full capture, with the .rodata table and the disassembly, in
+# verification-against-sigel-1.3/v5-1.3-mdh-compared.txt.
+#
+# TWO CHECKS, because neither covers the other.
+#   SOURCE  catches an edit at one of the four sites even when another site
+#           still supplies the same constant, which a binary search cannot
+#           see. It is also independent of the compiler.
+#   BINARY  catches any SPELLING that produces the true value -- M_PI,
+#           4*atan(1), a longer literal, a header constant -- which a grep for
+#           `M_PI' would miss.
+#
+# WHY ONLY THE RADIAN FACTOR IS GATED. The sensor path references eight
+# constants and all eight agree with 1.3 AS VALUES, checked from the source.
+# Only the radian factor can be gated in the binary, and the reason is
+# measured, not assumed: on this machine -DBL_MAX, +DBL_MAX, 360.0 and -90.0
+# appear ZERO times as 8-byte doubles in our image, and 90.0 and 180.0 appear
+# only inside debug sections. aarch64 folds them into immediates or into
+# larger expressions instead of emitting them. 2.0 does appear, 442 times,
+# which is noise. So the radian factor is the only one of the eight with a
+# .rodata entry to compare, and it is also the only one anybody would edit.
+#
+# NOTE ON SPELLING: our sense writes `360.0 / (2.0*3.14159265)' where 1.3's
+# image holds the folded 180/3.14159265. Different expression, IDENTICAL
+# bits -- 2.0*x is exact and 360/2x is the same correctly-rounded quotient as
+# 180/x. Verified, not assumed.
+v5p=0; v5f=0
+V5SRC=$SRC/src/SIGEL_Simulation
+V5Q=$V5SRC/SIG_DynaMechsSimulationQueries.cpp
+V5C=$V5SRC/SIG_DynaMechsCommandInterface.cpp
+V5BIN=$ROOT/build-fast/sigel_eval
+if [ ! -f "$V5Q" ] || [ ! -f "$V5C" ]; then
+    v5f=1; echo "  the two simulation sources are missing -- nothing was checked"
+else
+    # 4 sites: three in sense (rad->deg) and one in moveDrive (deg->rad).
+    # ANCHORED. A bare `3\.14159265' is a PREFIX match, so lengthening one site
+    # to 3.14159265358979 keeps the count at 4 while changing the factor to
+    # 404ca5dc1a63c200 -- which is neither the kept constant nor either
+    # forbidden one, so the binary half misses it too. Measured: the whole
+    # section passed on that edit. The trailing class closes it.
+    # COMMENTS STRIPPED BEFORE BOTH COUNTS. A note saying "do not change this
+    # to M_PI" is documentation, not a defect, and a comment quoting the
+    # literal is not a fifth site. Measured: without this, adding either kind
+    # of comment failed the gate.
+    v5t=$(sed 's://.*::' "$V5Q" "$V5C")
+    v5n=$(printf '%s\n' "$v5t" | command grep -Ec '3\.14159265([^0-9]|$)' || true)
+    v5m=$(printf '%s\n' "$v5t" | command grep -c 'M_PI' || true)
+    # M_PI FIRST. Tidying a site to M_PI also drops the count, so both tests
+    # fire; the substitution is the specific diagnosis and must be the one
+    # printed. Measured -- with the count tested first, an M_PI edit reported
+    # only "expected 4", which points at the wrong thing.
+    if [ "$v5m" != 0 ]; then
+        v5f=1
+        echo "  M_PI has appeared in the simulation sources, where 1.3 uses 3.14159265:"
+        command grep -n 'M_PI' "$V5Q" "$V5C" | sed 's/^/    /'
+        echo "  This is the one-word edit this section exists to catch. See above."
+    elif [ "$v5n" != 4 ]; then
+        v5f=1
+        echo "  the truncated pi is at $v5n sites in the simulation sources, expected 4:"
+        command grep -n '3\.14159265' "$V5Q" "$V5C" | sed 's/^/    /'
+        echo "  If a site was legitimately added or removed, move the count"
+        echo "  deliberately and say why."
+    elif [ ! -x "$V5BIN" ]; then
+        v5f=1; echo "  no $V5BIN -- run 'make B=build-fast SAN= SIGSAN= all'"
+    elif ! make -q -C "$ROOT" --no-print-directory B=build-fast SAN= SIGSAN= all 2>/dev/null; then
+        v5f=1; echo "  $V5BIN is out of date -- run 'make B=build-fast SAN= SIGSAN= all'"
+    else
+        # .rodata ONLY, and that bound is load-bearing rather than tidiness.
+        # The Makefile compiles with -g, so the constant also appears twice in
+        # .debug_loclists. Searching the whole file made the "it is missing"
+        # arm UNREACHABLE: patching the real constant out of .rodata still
+        # left two debug copies, so the count never fell below one. Measured
+        # on this binary -- 1 in .rodata at 0x141658, 2 in .debug_loclists.
+        # Debug sections are not what the program computes with.
+        v5out=$(python3 - "$V5BIN" <<'V5PY'
+import struct, sys, math
+d = open(sys.argv[1], 'rb').read()
+if d[:4] != b'\x7fELF':
+    sys.exit("not an ELF file")
+shoff = struct.unpack_from('<Q', d, 0x28)[0]
+shent = struct.unpack_from('<H', d, 0x3a)[0]
+shnum = struct.unpack_from('<H', d, 0x3c)[0]
+shstr = struct.unpack_from('<H', d, 0x3e)[0]
+hdr = [struct.unpack_from('<IIQQQQIIQQ', d, shoff + i * shent) for i in range(shnum)]
+stro = hdr[shstr][4]
+def name(off):
+    end = d.index(b'\0', stro + off)
+    return d[stro + off:end].decode()
+ro = [h for h in hdr if name(h[0]) == '.rodata']
+if not ro:
+    sys.exit("no .rodata section")
+off, size = ro[0][4], ro[0][5]
+blob = d[off:off + size]
+n = lambda v: blob.count(struct.pack('<d', v))
+print("%d %d %d" % (n(180.0/3.14159265), n(180.0/math.pi), n(math.pi/180.0)))
+V5PY
+) || v5out=""
+        if [ -z "$v5out" ]; then
+            v5f=1; echo "  the constant search did not run -- nothing was checked"
+        else
+            v5keep=$(echo "$v5out" | awk '{print $1}')
+            v5bad=$(echo "$v5out" | awk '{print $2 + $3}')
+            # FORBIDDEN FIRST, for the same reason M_PI is tested before the
+            # site count: replacing the kept constant with the true one does
+            # BOTH -- it removes the kept value and introduces the forbidden
+            # one. Measured with the .rodata word patched: tested the other
+            # way round, the run reported only "is NOT in", which describes
+            # the symptom and not the change.
+            if [ "$v5bad" != 0 ]; then
+                v5f=1
+                echo "  the TRUE pi has reached the binary: 180/M_PI or M_PI/180 is"
+                echo "  present $v5bad time(s) in $V5BIN, and 1.3's own binaries"
+                echo "  contain neither. Every joint-sensor reading would shift by"
+                echo "  1.14e-09 -- invisible in print, and fed into a chaotic"
+                echo "  simulation the shipped programs were evolved against."
+            elif [ "$v5keep" -lt 1 ]; then
+                v5f=1
+                echo "  180/3.14159265 (404ca5dc1af05a77) is NOT in $V5BIN's"
+                echo "  .rodata. 1.3's sensor path is built on it."
+            else
+                v5p=1
+            fi
+        fi
+    fi
+fi
+printf '%-22s %2d pass  %2d fail\n' "truncated pi (V5)" "$v5p" "$v5f"
+pass=$((pass+v5p)); fail=$((fail+v5f))
+
+# ---------------------------------------------------------------------------
 # V2 -- whole experiments through File > Save Experiment, against 1.3's own.
 #
 # Every other section here compares the port against itself. This one does not.
