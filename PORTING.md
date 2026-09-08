@@ -232,7 +232,7 @@ found a real defect.** §0 has the rule; it is not optional.
 ├── check.sh                                per-file compile check, §7
 ├── dictorder-dump.sh                       dictionary-order check, §7
 ├── expstruct.py                            structural fingerprint of an .exp, C11
-├── guidrive.cpp                            the GUI behaviour harness, 28 scenarios
+├── guidrive.cpp                            the GUI behaviour harness, 31 scenarios
 ├── fitness-check.sh                        fitness check, §7
 ├── pvm-check.sh                            does PVM run? Phase P, P3 and P4
 ├── pvm_link.cpp                            SIGEL's PVM objects vs real PVM
@@ -574,9 +574,10 @@ through `f0f2daa`.
 
 ## 7. Steps
 
-**Exit criterion per step:** `./check.sh` at the repo root — **850 pass, 0 fail,
-508 warnings** as of 2026-09-05, after the `slave gui` and `form minimums`
-sections and the two forms corpus assertions, and it **exits non-zero** when
+**Exit criterion per step:** `./check.sh` at the repo root — **851 pass, 0 fail,
+508 warnings** as of 2026-09-08, after the `real clicks` section. It was 850 on
+2026-09-05, after the `slave gui` and `form minimums`
+sections and the two forms corpus assertions. It **exits non-zero** when
 anything fails or is skipped. Zero is reachable because the two permanently
 Windows-only `WIN_*` files are an explicit exclusion rather than a standing
 red — see C11c.
@@ -939,7 +940,7 @@ succeeded.**
 **Gates any session must keep green**, all committed:
 
 ```
-./check.sh                                            850 pass, 0 fail, exit 0
+./check.sh                                            851 pass, 0 fail, exit 0
 ./dictorder-dump.sh | diff -u dictorder-baseline.txt -    empty
 ./fitness-check.sh  | diff -u fitness-baseline.txt -      empty
 ASAN_OPTIONS=detect_leaks=0 ./fitness-check.sh build      exit 0
@@ -2578,11 +2579,12 @@ modules include the headers `uic` generates from them.
 | C7 | **DONE 2026-08-31.** `SIGEL_MasterGUI` — all **44 dead connects** repaired (§2), **23 prepending item sites**, the three owning `QDict`s, and 21 validators that would have read the decimal point by system locale. 29/29 sources and 29/29 headers compile; the module is in `MODULES` with a dead-signal baseline of 0 | 8,791 LOC measured (6,164 source + 2,627 header), 29 sources, 20 hand-written |
 | C8 | **DONE 2026-08-31.** `sigel.cpp`, `sigel_slave.cpp`, `MT_Control`'s 15 dead connects, and the four core files no module list reached. **The tree's dead-signal count is now 0 with no non-zero baseline anywhere.** `check.sh` gained a `programs` section and a `dead item virtuals` check | 15 sites + 4 files |
 | C9 | **DONE 2026-08-31.** All five GUI modules build as archives, both programs link and run. Exclusions lifted, moc derived from source, resources named on the link line, `programs` gate upgraded from compile to link+run | 5 modules, 2 programs |
-| C10 | **DONE 2026-09-02.** Driving the interface rather than reading it. `guidrive.cpp` posts real Qt mouse, key and context-menu events into the real `SIG_MainWindow`; the 1.3 oracle drove the 2003 binary with XTest and the two were diffed. Found the `clear()` signal regression that killed the application on a large delete, and the eaten ampersand in the MetaGP dialog. New `gui behaviour` gate with `guibehaviour-baseline.txt`. **No X-level click was possible on this machine and the section says so.** Also carries the port's FIRST deliberate divergence from 1.3 — the duplicate MetaGP About, removed by decision 2026-09-02 | 2 defects, 15 scenarios, 1 divergence |
+| C10 | **DONE 2026-09-02.** Driving the interface rather than reading it. `guidrive.cpp` posts real Qt mouse, key and context-menu events into the real `SIG_MainWindow`; the 1.3 oracle drove the 2003 binary with XTest and the two were diffed. Found the `clear()` signal regression that killed the application on a large delete, and the eaten ampersand in the MetaGP dialog. New `gui behaviour` gate with `guibehaviour-baseline.txt`. **That section said no X-level click was possible on this machine; C13 withdrew that in 2026-09-07 and gated real XTEST input.** Also carries the port's FIRST deliberate divergence from 1.3 — the duplicate MetaGP About, removed by decision 2026-09-02 | 2 defects, 15 scenarios, 1 divergence |
 | C11a | **DONE 2026-09-02.** The five View pages C10 never opened. 29 spin boxes, 20 sliders, 7 combos, 4 checkboxes, 8 radios and 20 of C7's 21 validators driven and diffed against 1.3. The **12-probe validator battery matches character for character**, on both sides under a comma-decimal locale the oracle built with woody's own `localedef`. Nine parameter values typed on the pages come out **byte-identical** in the saved `.exp` across the two architectures. Found the `QIntValidator` Intermediate/Invalid trap: 1.3 clamps a typed over-range number to the maximum, the port commits a truncated prefix -- **accepted as a divergence, D28**; pinned in the gate. `gui behaviour` grew from one scenario to two here, and to five by C11c | 1 regression, 2 interlocks, 3 probe errors |
 | C11b | **DONE 2026-09-02.** The Import/Export round trips — 15 of the 16 children C10 never drove. **Seven of the eight exports are BYTE-IDENTICAL to what the 2003 i386 binary writes**, including the 2.7 MB `.pop` and, unexpectedly, the `.dat` with its 532 lines of floating point. Found and fixed a real defect: default-constructed language parameters came out alphabetical where 1.3 gives `QDict` hash order — predicted from `qgdict.cpp`, confirmed on the running binary character for character, and it had been silently wrong in `dictorder-baseline.txt` for all 7 robots (**98 lines corrected**). Confirmed and preserved 1.3's ignored overwrite prompt. Also fixed a C10-era harness bug that had been handing SIGEL the wrong filename — 2 exports out of 32 in the runs that caught it | 1 defect fixed, 1 baseline corrected, 1 defect preserved |
 | C11c | **DONE 2026-09-02.** The six dialogs, plus two fresh-eyes reviews of the harness and of `check.sh` itself. **C7's 21st validator driven, closing that set at 21 of 21.** Found and fixed a defect with a data consequence and no need for invalid input: Qt 6 selects a pre-filled field when a dialog gives it focus and Qt 2 did not, so a user who types one digit into Add-individuals gets **12 on 1.3, which appends, and got 2 here, which replaced** — twelve individuals added where two were meant. Four sites, `end(false)` queued after show. A second divergence **kept on purpose**: allowing a command appends where 1.3 hash-inserts, predicted and confirmed character for character, but matching it would mean reimplementing what Phase D removed. Two reviews then went at the checking machinery: **five probes that could not fail**, including a Cancel test that never pressed Cancel and a round trip that was an identity test; and a **demonstrated false pass** — all 30 menu and toolbar icons replaced with garbage, whole gate green. `check.sh` also never exited non-zero, counted a skipped section as 0 fail, and ran its locale check under a locale that is not installed here. All fixed; **842 pass, 0 fail** for the first time, with `WIN_*` excluded explicitly as the permanent known failure it is. A `!!` failure marker had already reached the committed baseline; the gate now refuses those | 1 defect fixed, 1 kept, 5 probe defects, 7 gate defects |
 | C11d | **DONE 2026-09-02.** `MT_GUI` — the MetaGP window, 23 sources, which nothing had ever opened on either side. Its six pages driven. **C7 never reached MT_GUI's ten validators**: an unpinned `QIntValidator(0,1000)` calls `"1,000"` ACCEPTABLE under en_US while `toInt()` returns 0, so a user types one thousand and **zero** reaches the system. 1.3 rejects both separators — measured — so the fix RESTORES Qt 2. Applied at both creation sites in `MT_AddConstantsWidget`, whose type radio rebuilds them. The window is application-modal, proven with a control (0 pixels vs 4397). The `!!` guard added in C11c caught a probe defect before it could be baselined | 1 defect fixed, 2 probe defects |
+| C13 | **DONE 2026-09-07.** A real click on both ends. `guidrive` runs as a normal X11 client in a nested `Xvfb` under `QT_QPA_PLATFORM=xcb`, driven by XTEST through `xdotool`. The oracle measured the same three questions on the 2003 binary the same day, on its own `Xephyr` with no window manager. Withdrew this file’s claim that no tool here can deliver a real X-level click. That was measured on the live Wayland session only. Its pointer readback used `xdotool getmouselocation`, which reports the screen centre whatever the pointer does. **Found a difference that `QTest` could not have found**: the click that closes an open menu is swallowed here and forwarded by 1.3. Double click synthesis agrees, at 400 ms on both sides, with a slow-click control that opens nothing on either. Corrected one claim this file made about `QTest`: enter and leave was an offscreen platform limit, not a `QTest` limit. `QEvent::spontaneous()` is recorded as a trap, not withdrawn — this file never claimed it. New `real clicks` gate with `xtest-baseline.txt` | 2 differences, 4 probe errors, 2 claims withdrawn |
 
 Each module step is the same shape: `qt3to4` in the container, hand-port off
 Qt3Support, extend `check.sh` to cover the module, commit.
@@ -2695,6 +2697,8 @@ else that stops matching 1.3 still needs justifying as a defect.
 | **Icons whose two pixmaps straddle the chosen size are resampled.** Qt 2 named Small and Large explicitly and blitted each at its own size; a Qt 6 toolbar has one `iconSize` and picks from the `QIcon` by pixel size | removing it means splitting every `QIcon`. Sizes were re-measured across every referenced XPM — **five distinct sizes each** — and set to 25×25 / 48×48, the measured maxima, so nothing is enlarged past what 1.3 drew | — |
 | **1.3 drops a spin box's suffix while editing; this port keeps it.** The register-width box reads `3 bit` at rest, plain `100` during typing and `99 bit` after commit on 1.3; here it reads `10 bit` throughout | Qt 2's `updateDisplay()` wrote prefix + text + suffix into the line edit unprotected, where Qt 6's `QAbstractSpinBox` keeps them out of the editable text | **Recorded, not chased.** No value differs; only what is on screen mid-edit |
 | **Clicking the outer edge of a ticked slider pages on 1.3 and does nothing here.** Qt 2's Motif slider treats the WHOLE widget as clickable — the oracle got a clean page step at all twenty of `yawSlider`'s cross-axis offsets — where Qt 6 honours the groove sub-rect only: on `yawSlider`, y=3,5,7,9 page it and y=1,11,13,15,17,19 do not | a Qt framework behaviour rather than anything the conversion did. Nobody is likely to notice, but it is a fidelity difference | §7's probe-craft list: **take the cross-axis from `SC_SliderGroove`, never from the widget's middle**, and populate the `QStyleOptionSlider` fully — `tickPosition` unset makes `subControlRect` return a tickless groove. *Added here 2026-09-03: the divergences table was billed as complete and omitted this one* |
+| **A click that closes an open menu is swallowed here. 1.3 passes it on.** On 1.3 one real click closes the File menu and selects the list row under it. Here the menu closes and the row does not move, so the user must click again | Qt’s own popup handling, not SIGEL code. The Qt 2 side is in the vendored source: `qapplication_x11.cpp:3402-3416`, in `QApplication::closePopup`, calls **`XAllowEvents(…, ReplayPointer, CurrentTime)`** when the last popup closes on a press outside it. The X server then delivers that press again to the window below. The same code subtracts 10 s from `mouseButtonPressTime`, so the repeated press cannot count as a double click. Qt 6 does not do this. That half is measured, not read, because Qt 6’s sources are not on this machine. Matching 1.3 means overriding popup dismissal for the whole application, which is D28’s "owning a custom widget forever" applied to every popup. The swallowing behaviour is also what every modern toolkit does | `xtest-baseline.txt` section 4, with the control click printed below it |
+| **A second click on the same menubar item closes the menu here. On 1.3 it stays open** | Same cause and same answer as the row above. Qt 6’s menubar toggles on a second click and Qt 2’s did not. Nothing in SIGEL decides it | `xtest-baseline.txt` section 4 |
 
 **Three 1.3 defects preserved on purpose**, plus the two below them. `MT_GUI`'s
 gnuplot export puts a constant x on datasets `2pt destr.` and `3pt destr.`
@@ -2726,6 +2730,7 @@ file and answering Yes writes it twice. The guarding line is
 | **`freed-pointer null`** | that `visualisation` is nulled between its `delete` and its `new`. `SIG_Simulation`'s `default:` case throws for `SIMULATIONLIBRARY 0` and unwinds out of `visualizeThis()` between the two statements. **The defect is real but not reachable today, and the argument matters because the first version of it was wrong in three ways.** The widget has 21 `visualisation->` dereferences behind 14 `if (visualisation)` guards, all reached constantly (`paintGL` runs every frame). `sigel_slave` is **not** the sole caller — `SIG_SimulationVisualisationWidget::slotStopSimulation()` calls `visualizeThis()` from a live Stop action, **inside `a.exec()` with no try/catch**. And `visualisation` is a **base-class** member that `~SIG_VisualisationWidget` deletes, so destruction after a throw **is** a double free; it does not bite on the slave path only because `simWindow` is leaked past the catch's `return 1`. **Why it is still unreachable:** every other caller is downstream of a first `visualizeThis()` that must have SUCCEEDED, and nothing in the slave calls `setSimulationLibrary`. **Deliberately NOT generalised** — the tree's other `delete x; ... x = new` pairs are benign, so a blanket rule would be noise. Teeth-tested by deleting the line |
 | **`no clipped controls`** (`clipcheck`) | any widget whose rect leaves its parent's, over the master's **six View pages and their tabs only** — and it carries a positive control that FAILS the gate if it does not fire, because "0 clipped" from a check that cannot detect clipping is worth nothing. Shrinking the window is not usable as that control: the converted pages carry real layouts and reflow where 1.3, absolutely positioned, clips — so **the port is better behaved than 1.3 on resize** — and it displaces a real widget instead |
 | **`slave gui`** (`slavegui`) — NEW 2026-09-05 | **two things `check.sh` had never reached, because it never ran this scenario.** (a) The clipping defect **in the two containers where it was actually found**, which `clipcheck` structurally cannot see: they belong to the slave window and its movie dialog, not to anything the master's menus open. *Both fixes were UNGATED while this table said the section above covered them — found by review.* It greps the two clip totals rather than diffing the whole scenario, whose GL view does not render offscreen. **Teeth-tested by deleting each `<minimumSize>` block and rebuilding**: without `GroupBox6`'s, 14 controls clip; without `groupboxDirectory`'s, 1. (b) **`SIGEL_SlaveGUI`'s 44 `SIGNAL(` and 44 `SLOT(` sites, which had no runtime coverage at all** — its stderr is kept and checked for Qt's `No such signal`/`No such slot`, behind the same `guidriveStderrControl` positive control. **Teeth-tested both ways**: `QT_LOGGING_RULES='*=false'` fails it as suppressed, and renaming one live signal in `SIG_SimulationWindow.cpp` fails it by name |
+| **`real clicks`** (`xtest`, `xtest-baseline.txt`) — NEW 2026-09-07 | **the platform layer, which nothing else here touches.** Every other section drives Qt through `QApplication::notify`. This one runs `guidrive` as a real X11 client in a nested `Xvfb` under `xcb`, and sends XTEST input with `xdotool`. It is the only section that exercises activation, the popup's pointer grab and Qt's double-click synthesis. It found C13's swallowed dismissing click on its first run. **Its control is inside the scenario, and the section fails without it.** The scenario compares one real click and one `QTest::mouseClick` at the same point, through a native event filter. It prints `DISCRIMINATES` only when the real click produced native `ButtonPress` events and `QTest` produced none. *Teeth-tested. `xdotool` was replaced by a stub that exits 0 and does nothing. The scenario stops at the coordinate check with a line-initial `!!` and exit 1, so the section fails on three predicates. **An earlier version of this row claimed it failed "on the control and on the `!!` marker", and review showed that was false**: all three of the scenario's mis-target messages put their `!!` in the MIDDLE of a line, and `check.sh` greps `^ *!!`, so not one of them was visible. A run whose own output said the finding was undecidable passed every guard the section had. The markers start their lines now, and the scenario returns 1 rather than carrying on.* `QEvent::spontaneous()` would not work as that control, because `qtestmouse.h` marks QTest's own events spontaneous. A missing `Xvfb` or `xdotool` **fails** rather than skips. The display is refused if something is already on it. The server is killed by pid, so a real session's own `Xvfb` survives |
 | `encodings` | a CRLF or Latin-1 file silently rewritten by an editor: 327 files, against 25 known D6 losses, 35 translated and 51 that postdate the root |
 | `dead item virtuals` | a class declaring Qt 2's `key(int,bool)` without the `operator<` that replaces it. Matched against a **flattened** header and demanding the signature that actually overrides — a decoy `operator<( QTreeWidgetItem * )` and a two-line declaration both bypassed the first version |
 | `widgets` | `DISpinBox` losing the fraction, under **`C` and `de_DE`** — without the second row it was blind to the locale bug the first fix introduced |
@@ -3048,37 +3053,84 @@ and **the saved 2.7 MB experiment file**, whose byte counts agree across two
 saves on both machines, so the writer's formatting of every value agrees and not
 merely the structure.
 
-**No tool on this machine can deliver a real X-level click, measured rather than
-assumed.** XTEST is present and `XTestFakeMotionEvent`/`XTestFakeKeyEvent`
-**return success and have no effect** — a VMware guest under GNOME/Wayland, where
-`vmware-user` owns absolute pointer integration and the compositor's pointer
-wins. *The pointer was read back rather than trusted, which is the only reason
-this was caught.* Qt's VNC platform serves but `sigel` crashes on it and has no
-GL context, so that crash is an unsupported configuration rather than a port
-defect.
+**~~No tool on this machine can deliver a real X-level click~~ — WITHDRAWN
+2026-09-07.** As written this was too broad, and it is now false. A nested
+`Xvfb` delivers real clicks. The port is gated on them. See C13.
 
-**THAT MEASUREMENT IS ABOUT THE LIVE SESSION, AND THE CONCLUSION DRAWN FROM IT
-WAS TOO BROAD — 2026-09-07.** What was measured is that XTEST into the *running*
-Xwayland session has no effect, which is true and still true. What was never
-tried is a **nested plain X server** — no compositor, no `vmware-user`, no
-absolute pointer integration — which is the environment the oracle's side is
-already in, and where XTEST is ordinary. `Xvfb` and `xdotool` were installed
-2026-09-07 and are so far UNUSED. Qt has the `xcb` platform plugin here, so
-`sigel` can run as a real X11 client inside one.
+What was measured, and still holds, is about the live session only. XTEST into
+the running Xwayland session returns success and has no effect. This is a VMware
+guest under GNOME/Wayland. `vmware-user` owns absolute pointer integration and
+the compositor's pointer wins. Qt's VNC platform serves, but `sigel` crashes on
+it and has no GL context, so that crash is an unsupported configuration and not
+a port defect.
 
-**What that would buy, stated so it is not oversold:** a real click on BOTH ends
-of every comparison instead of only the oracle's, and with it activation, mouse
-grabs, double-click synthesis and enter/leave delivery — the four things `QTest`
-structurally cannot reach. It would still be synthetic XTEST input rather than a
-physical mouse, but so is the oracle's side, which is the point. **Not yet
-attempted, so nothing here claims it works.**
+**A nested plain X server was never tried, and that was the gap.** It has no
+compositor, no `vmware-user` and no absolute pointer integration. It is the same
+kind of display the oracle already uses, and XTEST is ordinary there. It was
+tried on 2026-09-07 with `Xvfb :N`, `QT_QPA_PLATFORM=xcb` and `xdotool`. The
+port runs in it as an ordinary X11 client and a real click arrives. The scenario
+is `guidrive xtest`. The output is `xtest-baseline.txt`. The gate is `real
+clicks` in `check.sh`.
 
-**So the driving is `QTest`, and it is not a mouse.** `mouseClick`,
-`keyClicks` and a hand-posted `QContextMenuEvent` go through
-`QApplication::notify`, so event handlers, hit-testing, `QMenu` popups, item-view
-selection and the slots behind them all run — but bypassing
-`QWindowSystemInterface` changes activation, grabs, double-click synthesis and
-enter/leave. It proves SIGEL's logic, not the platform layer's. **The oracle's
+**The pointer readback behind the original verdict cannot be trusted.** On the
+nested server, `xdotool getmouselocation` reports the screen centre whatever the
+pointer is doing. XTEST moved the pointer to (42,43). An independent client
+watching the server, `xev -root`, saw it arrive there, marked `synthetic NO`.
+`getmouselocation` still said (700,500), every time. This was measured on `:N`
+only. Whether it behaves the same way on the live `:0` was not retested, and
+claiming that would repeat the error being corrected here. So the original
+verdict loses that piece of evidence, but not necessarily its conclusion: the
+negative on the live session was also seen in behaviour. A readback that returns
+a plausible constant is the worst kind, because it fails every test by passing.
+
+**What this bought.** A real click on both ends of every comparison, instead of
+only the oracle's. It is still XTEST input and not a physical mouse, but so is
+the oracle's side. The first run found a difference: C13's swallowed dismissing
+click. Nothing driven through `QTest` could have found it.
+
+**One of the four items in the list below was wrong.** Enter and leave delivery
+is not something `QTest` cannot reach.
+`/usr/include/aarch64-linux-gnu/qt6/QtTest/qtestmouse.h` shows
+`QTest::mouseMove(QWidget *)` with no button held. It calls `QCursor::setPos()`
+and then `processEvents()`. That moves the real pointer through the platform. On
+a real X server it produces real crossing events, as section 6 of the baseline
+shows. The offscreen platform could not deliver them, because there is no
+pointer to move. That is a platform limit, not a `QTest` limit. The other three
+items hold: activation, the popup's pointer grab, and double click synthesis.
+C13 measures those.
+
+**`QEvent::spontaneous()` does not tell a real click from a `QTest` one.** This
+is worth writing down, because it is the obvious first idea and it gives a false
+pass. The same header calls `QSpontaneKeyEvent::setSpontaneous()` on the event
+it posts, and only then calls `qApp->notify()`. A `QTest` click therefore
+reports `spontaneous() == true`, exactly like a real one. A probe built on it
+would pass with no real click in it. What does work is a native event filter. A
+real click arrives from the server as an XInput 2 `GenericEvent`, and reaches
+`QWidgetWindow` before the `QWidget`. `QTest` produces no native event and never
+touches `QWidgetWindow`. Both halves are printed in section 2 of the baseline,
+and the gate fails if they stop differing.
+
+**Trap for anyone running the harness under `xcb`: the file dialog goes
+native.** Under `offscreen` no platform theme offers one, so all ten baselines
+were captured against Qt's own widget dialog. Under `xcb` on `:N`, the same
+`guidrive open` run reports `labelAccept=[]` and has no `fileNameEdit` child.
+That is `QFileDialogPrivate::usingWidgets()` returning false: the dialog belongs
+to another process, and `acceptFileDialog()` cannot type into it. None of these
+changed it: `QT_NO_XDG_DESKTOP_PORTAL=1`, clearing `DBUS_SESSION_BUS_ADDRESS`
+and `XDG_RUNTIME_DIR`, `XDG_CURRENT_DESKTOP=`, or
+`QT_QPA_PLATFORMTHEME=minimal|gtk3`. `guidrive` now sets
+`Qt::AA_DontUseNativeDialogs`. That also matches 1.3: Qt 2.3 had no native
+dialog path, so 1.3 always drew its own widgets. It does nothing under
+`offscreen`. With it, a `guidrive open` run under `xcb` is byte-identical to the
+same run offscreen.
+
+**The ten `gui behaviour` scenarios are driven by `QTest`, and `QTest` is not a
+mouse.** `mouseClick`, `keyClicks` and a hand-posted `QContextMenuEvent` go
+through `QApplication::notify`. Event handlers, hit-testing, `QMenu` popups,
+item-view selection and the slots behind them all run. But they bypass
+`QWindowSystemInterface`, so activation, grabs and double-click synthesis are
+not what a real click produces. *Enter and leave were listed here too, and that
+was wrong; see above. The `xtest` scenario now covers the other three.* It proves SIGEL's logic, not the platform layer's. **The oracle's
 side was driven by real XTest, so every comparison has a genuine click on one
 end.**
 
@@ -3310,9 +3362,12 @@ of the 23 locked actions that nothing re-enables, stayed greyed through it.
 | **The `pvmTasks` crash — BLOCKED by D30 2026-09-07, not repaired.** MetaGP on, Start, one click in the experiment tree, then MetaGP > Configure System used to abort the process. D30 forbids parameter changes during a run, so the sequence is refused. **The fault itself is untouched**: `MT_Controller::configureSystem` still deletes the trainer the running loop holds (`:402-404`, verbatim in the 1.3 tarball). Reachable again the moment anything re-opens that door | done; `runlock` gates it |
 | **1.3's silent wedge — CLOSED BY DECISION, not by measurement.** Toggling `Use MetaGP` mid-run stops the evolution on 1.3 while the GUI keeps repainting and Stop stays enabled. D30 makes that toggle unreachable during a run, so the port cannot do it — but nobody ever drove it here, and now nobody can. Recorded as forbidden by design rather than as tested | closed by D30; not measured |
 
-**THREE COVERAGE ITEMS WERE DROPPED 2026-09-07, by Jan, and they should not come
-back.** Each was one of this document's own proposals and each failed a plain
-question about what it would actually prove:
+**THREE COVERAGE ITEMS WERE DROPPED 2026-09-07. The attribution on this line
+was corrected 2026-09-08: only the first one is Jan's.** It is the one that
+quotes him. The other two are this document's own arguments, written under his
+name. A note filed that way cannot be argued with, and nobody decided it should
+be. Each of the three was this document's own proposal, and each failed a plain
+question about what it would prove:
 
 - **"Commit the 30-generation curve."** A randomised search gives a different
   curve every run. What matters is that the GP system works at all, not any one
@@ -3353,6 +3408,145 @@ the item-5 reachability argument, the evolution headline, a slider divergence an
 a seed. Each was inherited from a document and repeated before being checked
 against source. **Verify before citing anything here.**
 
+
+### C13 — a real click on both ends, 2026-09-07
+
+`guidrive` now runs as a normal X11 client. It runs inside a nested `Xvfb` with
+`QT_QPA_PLATFORM=xcb`. `xdotool` sends the input. The scenario is `xtest`. The
+baseline is `xtest-baseline.txt`. The gate is `real clicks` in `check.sh`.
+
+The oracle measured the same three questions on the 2003 binary on the same day.
+It used its own `Xephyr` with no window manager, and `python-xlib` `fake_input`.
+Both sides send XTEST input to a nested server with no window manager. That is
+why the two sides compare.
+
+Neither display has a window manager. That much is the same, and it had to be
+checked first: a different focus mode sends key events elsewhere, and any
+difference would then come from the display and not from the port.
+
+**The focus states are NOT the same, and an earlier version of this section said
+they were.** Review measured it. An idle nested `Xvfb` reports `focus:
+PointerRoot`, which is a focus mode and not the root window. The oracle's
+`Xephyr` reports focus on the root window itself. The port then takes focus for
+itself. Polling `xdpyinfo` from outside during a run shows X input focus change
+five times before the first real click, ending on the main window and staying
+there. 1.3 never calls `XSetInputFocus`, and with no window manager nothing else
+does, so 1.3 stays on the root. The focus rows below therefore compare a port
+that claims focus against a version that never does.
+
+| question | 1.3, real XTest | this port, real XTEST | |
+|---|---|---|---|
+| Double click opens the Individual View | yes, and only a real double click does it | yes: `itemDoubleClicked` once, one window | **agree** |
+| Two single clicks 1.2–2.0 s apart | no window. The probe still worked: the same clicks moved the selection and filled the properties pane | no window, `itemDoubleClicked` 0 | **agree**. This control is what makes the row above mean anything |
+| The interval | 400 ms. The oracle bracketed it between 0.3807 s (opens) and 0.4012 s (does not), over twelve trials | `QApplication::doubleClickInterval()` reports 400 | **agree**. The two halves are independent. The oracle measured the behaviour and read no source. This side read the number and did not run 1.3. The vendored Qt 2.3 gives the same number: `qapplication.cpp:280`, `int QApplication::mouse_double_click_time = 400` |
+| Is there a real pointer grab while a menu is open? | yes. `XGrabPointer` from a second X client answers `AlreadyGrabbed` while the File menu is open, and `GrabSuccess` when it is closed | the popup is a `QMenu`. `QWidget::mouseGrabber()` is null, which is Qt's own record and not the X grab | not compared directly. See below |
+| Does the dismissing click reach the widget below? | yes. One click closes the menu and selects the row under it. The list moved from row 1 to row 3. On the tree it also changed the right-hand page | no. The press goes to the `QMenu` only. The list selection does not move | **DIFFERS** |
+| Second click on the same menubar item | the menu stays open. The oracle checked the map state, not the focus | the menu closes | **DIFFERS** |
+| Does a real click move X input focus? | no. Focus stays on the root window. 1.3 never calls `XSetInputFocus`, and with no window manager nothing else does | no, but only because the port already holds focus. It takes the main window during startup, after five focus changes that all happen before the first click | the click changes nothing on either side, but the states it starts from differ |
+| Where focus sits while a menu is open | on the popup. After an outside click it is `None(0)`, so keys go nowhere until something sets focus again | on the main window the whole time | differs. This is Qt, not SIGEL |
+
+**The swallowed click is the difference that matters.** It is in the divergences
+table. 1.3's side is not a guess, because the Qt 2 source is vendored here.
+`qapplication_x11.cpp:3402-3416` runs when the last popup closes. If the press
+was outside the popup, it calls `XAllowEvents(…, ReplayPointer, CurrentTime)`.
+The X server then delivers that press again, to the window below. The same code
+subtracts 10 s from `mouseButtonPressTime`, so the repeated press cannot count
+as a double click. The oracle measured this without reading any code. The first
+run with real input found the difference. `QTest` could not have found it,
+because `QTest` never creates the pointer grab.
+
+**Four probe errors, all mine.** Three were caught by a control. The fourth was
+caught by the gate.
+
+- The first outside point was inside the menu. The File popup covers the
+  experiment tree. The probe clicked the menu and reported that the popup
+  survived an outside click. That is a false difference, and it points the
+  opposite way to the real one.
+- The second point was the row that was already selected. Probe 2 had just
+  clicked it. The selection could not change, whatever the port did. The oracle
+  avoided this by clicking row 3 while row 1 was selected.
+- The third point was a `QLabel`. Nothing there can change. "Nothing happened"
+  then looks the same as a swallowed click.
+- The fourth was in the gate, not in the scenario. `xdotool` has no `--display`
+  option. It answers `getdisplaygeometry: unrecognized option '--display'` and
+  exits 1, whatever the server is doing. So the "display already in use" guard
+  could never fire. The readiness loop could never succeed either. The loop was
+  written as `... && break` inside a `for`, so it became a fixed 15 s wait. Runs
+  by hand still worked, because nothing there checked the loop result.
+  `check.sh` did check it, and failed with `Xvfb never came up on :97`. Both
+  places now use `DISPLAY=:N xdotool …`. Both directions were then tested: the
+  check succeeds on a live display and fails on a dead one. This is §7's "check
+  a lookup found something", made inside the gate that exists to enforce it.
+
+**A fifth round of review found four more, and three of them let a bad run
+pass.** All are fixed and all are demonstrated:
+
+- **The `!!` markers were in the middle of their lines.** `check.sh` greps
+  `^ *!!`. So the three messages that say the probe mis-targeted were invisible
+  to the guard whose whole job is to stop a bad run being baselined. Review
+  produced a run, under `QT_FONT_DPI=120`, whose own output said
+  `UNDECIDABLE, the control did not fire` and which passed every predicate the
+  section had. The markers now start their lines, and the scenario returns 1
+  instead of carrying on.
+- **A scaling variable in the caller's environment mis-aimed every click.**
+  `mapToGlobal()` gives logical pixels and `xdotool` takes device pixels. At
+  `QT_SCALE_FACTOR=1.25` the clicks were real, so the provenance control still
+  said `DISCRIMINATES`, but they landed 20 per cent away and the run reported a
+  false difference from 1.3. `check.sh` uses `env` without `-i`, so the whole
+  environment passed through. This is the only section here that is exposed:
+  offscreen pins the ratio, and review confirmed `QT_SCALE_FACTOR=1.25` leaves
+  the offscreen `gate` scenario byte-identical. `check.sh` now clears the
+  scaling variables, and the scenario refuses any `devicePixelRatio` other
+  than 1.
+- **Section 5 could report a false difference with no marker at all.** A
+  mis-aimed run printed "a fast double click opens nothing", which reads as a
+  divergence from 1.3. It now prints a line-initial `!!` when two clicks inside
+  the interval produce no `itemDoubleClicked`.
+- **Pixel geometry from the local font and style was in the baseline.** The
+  popup rectangle and the chosen click point were printed. Under
+  `QT_STYLE_OVERRIDE=Windows` the File popup is 228x235 rather than 261x214,
+  which moves both. Neither is printed now. The outside point is list **row 3**
+  by index, the same row the oracle used, and the probe checks that the popup
+  does not cover it rather than searching for a row that it does not.
+
+**The control makes the finding readable.** The baseline prints it directly
+below the result. The same click, at the same point, with no menu open, does
+select the row: 55658 → 56091. Without that line the result means nothing. If
+the control ever stops working, the gate prints `UNDECIDABLE` instead of a
+verdict.
+
+**Double click synthesis agrees, and it is the deepest agreement here.** Two
+real presses go in. Qt decides for itself whether they are one double click. The
+threshold is 400 ms on both sides. Slow clicks open nothing on either side.
+`QTest::mouseDClick` supplies the `DblClick` event ready-made, so it never tests
+that decision.
+
+**Two counts in the baseline are not one per click.** A real click gives
+`native press=2`, because Qt's xcb plugin uses XInput 2 and both the master and
+the slave device report. The same click gives `qt press=2`, because
+`QWidgetWindow` gets it first and the `QWidget` second. The `pressOn=[...]` line
+names the receivers. It answers the swallowing question:
+`[QWidgetWindow, QMenu]` with a menu open, `[QWidgetWindow, QWidget]` without
+one.
+
+**`nativeEnter` and `nativeLeave` are 0 in section 6, and that is correct.** X
+sends crossing events per X window. A Qt 6 top level is one X window. Moving
+between two widgets inside it crosses no X boundary. Qt works out those `Enter`
+and `Leave` events itself, and the `qt` columns show them.
+
+**What this does not show.** Section 3 samples activation before and after a
+click. Both samples read `isActiveWindow=1`. That is a settled state, not a
+change, because the port had already activated the window during startup.
+
+*An earlier version of this paragraph explained the `1` as "there is no window
+manager, so nothing deactivates it". That is backwards, and review showed it. A
+run in which no click ever lands reports `isActiveWindow=0` throughout, and
+section 2 of the baseline shows `act=1` on the first real click. Activation does
+happen here. Section 3 simply samples too late to catch it.* If a later session
+adds a window manager, section 3 will move. That is not a regression.
+The grab itself is only proved on 1.3's side, by the oracle, with `XGrabPointer`
+from a second client. Nothing here repeats that test. This side measures the
+result of the grab, which is what a user sees.
 
 ### C12 — the MetaGP window's last undriven corner, 2026-09-04
 

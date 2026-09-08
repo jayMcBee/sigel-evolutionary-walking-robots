@@ -1281,6 +1281,169 @@ printf '%-22s %2d pass  %2d fail\n' "gui behaviour" "$bp" "$bf"
 pass=$((pass+bp)); fail=$((fail+bf))
 
 # ---------------------------------------------------------------------------
+# REAL X INPUT -- the only section here that does not drive Qt through QTest.
+#
+# Everything above posts QMouseEvent through QApplication::notify. That reaches
+# every slot SIGEL has, which is why those sections are worth something, but it
+# never goes through QWindowSystemInterface. PORTING.md's C10 section named the
+# four things that leaves untested: activation, the pointer grab a popup takes,
+# Qt's synthesis of a double click out of two presses. Enter and leave was
+# listed here too and that was wrong: QTest::mouseMove on a widget calls
+# QCursor::setPos(), a real pointer warp. Offscreen could not deliver them,
+# QTest can. See PORTING.md C13.
+#
+# This section runs guidrive as a REAL X11 CLIENT inside a nested Xvfb with
+# QT_QPA_PLATFORM=xcb and drives it with XTEST through xdotool, so the port
+# gets a genuine click where until now only the 1.3 oracle's side did.
+#
+# ITS POSITIVE CONTROL IS INSIDE THE SCENARIO AND IS CHECKED HERE. The whole
+# section is worthless if the clicks are not real -- a broken xdotool, a display
+# that never came up, or a fallback to a synthetic path would leave every count
+# at zero, which looks exactly like "the port ignores real clicks". So the
+# scenario compares one real click against one QTest::mouseClick at the same
+# point through a native event filter and prints DISCRIMINATES only when the
+# real one produced native ButtonPress events and QTest produced none. Its
+# absence fails this section on its own.
+#
+# NOT skipped when Xvfb or xdotool is missing. A skip here is a section that
+# tested nothing while reporting no failure, which is the shape check.sh has
+# been bitten by before.
+xtp=0; xtf=0
+XTDISP=:97
+if [ ! -f "$ROOT/xtest-baseline.txt" ]; then
+    xtf=1; echo "  xtest-baseline.txt is missing -- this gate tested NOTHING"
+elif [ ! -f "$BEXP" ]; then
+    # Same data dependency as the two sections above: a fresh clone has no
+    # data-reordered/, and without the file the run hangs in the modal Load
+    # dialog until the timeout and blames the driver for a missing file.
+    echo "  SKIPPED: no $BEXP -- the data ships separately. THIS SECTION"
+    echo "  TESTED NOTHING."
+    skipped=$((skipped+1))
+elif ! command -v Xvfb >/dev/null 2>&1 || ! command -v xdotool >/dev/null 2>&1 \
+     || ! command -v xdpyinfo >/dev/null 2>&1; then
+    xtf=1
+    echo "  Xvfb, xdotool or xdpyinfo is not installed, so no real click could be"
+    echo "  delivered and the only section that tests the platform layer did"
+    echo "  not run. Install x11-utils/xvfb and xdotool, or delete this section"
+    echo "  deliberately -- do not leave it passing silently."
+elif [ ! -x "$ROOT/build-fast/guidrive" ]; then
+    xtf=1; echo "  guidrive is not built -- the real-input section tested NOTHING"
+elif ! (cd "$ROOT" && make -q B=build-fast SAN= SIGSAN= guidrive) 2>/dev/null; then
+    # NAME THE TARGET. `make -q' with no target answers for `all', which does
+    # not depend on guidrive. The section above builds it and only sets bf=1 if
+    # that build fails, so without this check a compile failure leaves the
+    # PREVIOUS binary in place and this section scores it -- printing
+    # "1 pass 0 fail" for source it never compiled. Found by review. Section 7
+    # of PORTING.md already states this rule for the three gate scripts; it was
+    # missing here.
+    xtf=1
+    echo "  build-fast/guidrive is out of date, so this section would have"
+    echo "  measured a binary that is not the source in the tree."
+elif true; then
+    # A display already in use would make every click land in someone else's
+    # session, so refuse rather than share one.
+    #
+    # DISPLAY=, NOT --display. xdotool has no --display option: it answers
+    # "getdisplaygeometry: unrecognized option" and exits 1 whatever the state
+    # of the server. The first version of this section used --display in both
+    # places, so this guard could never fire and the readiness poll below could
+    # never succeed -- and the poll, written as `... && break', silently
+    # degraded into a fixed 15 s sleep that happened to be long enough. The
+    # gate caught it by failing on its first real run; a run by hand had not,
+    # because nothing there checked the loop's outcome.
+    if DISPLAY="$XTDISP" xdotool getdisplaygeometry >/dev/null 2>&1; then
+        xtf=1
+        echo "  display $XTDISP is already in use -- refusing to drive it."
+    else
+        Xvfb "$XTDISP" -screen 0 1400x1000x24 -nolisten tcp >/tmp/xtv.$$ 2>&1 &
+        xtpid=$!
+        # Poll rather than sleep a fixed time: too short is a flake and too
+        # long is dead time on every run. xdotool is already required above,
+        # so this adds no new dependency.
+        xtup=0; xti=0
+        while [ "$xti" -lt 60 ]; do
+            if DISPLAY="$XTDISP" xdotool getdisplaygeometry >/dev/null 2>&1; then
+                xtup=1; break
+            fi
+            xti=$((xti+1)); command sleep 0.25
+        done
+        if [ "$xtup" -eq 0 ]; then
+            xtf=1
+            echo "  Xvfb never came up on $XTDISP:"
+            head -5 /tmp/xtv.$$ 2>/dev/null | sed 's/^/    /'
+        else
+            # `|| xtf=1', not bare. This file runs under `set -e' with no
+            # trap, so a bare `: > path' that fails on a full or unwritable
+            # /tmp would abort the WHOLE script here. It would do that AFTER the
+            # Xvfb above was started and BEFORE the kill below, leaving a server
+            # on $XTDISP that makes every later run refuse the display. The
+            # neighbouring section already writes `: > /tmp/berr.$$ || bf=1' for
+            # the same reason. Found by review.
+            : > /tmp/xterr.$$ || xtf=1
+            # SCRUB THE SCALING VARIABLES. This is the only section here whose
+            # result depends on Qt's coordinate scaling. mapToGlobal() returns
+            # logical pixels and xdotool takes device pixels, so at a ratio of
+            # 1.25 every click is real but lands 20 per cent away, and the run
+            # reports a false difference from 1.3. `env' is used without `-i',
+            # so the caller's whole environment passes through. Review
+            # demonstrated it with QT_SCALE_FACTOR=1.25. Offscreen is immune,
+            # because it pins the ratio, which is why no other section needs
+            # this. guidrive also refuses a devicePixelRatio other than 1 on its
+            # own, so a caller who runs it directly is covered too.
+            if env DISPLAY="$XTDISP" SIGEL_ROOT="$SRC" SIGEL_EXP="$BEXP" \
+                   SIGEL_SCRATCH="${TMPDIR:-/tmp}" QT_QPA_PLATFORM=xcb \
+                   QT_SCALE_FACTOR=1 QT_SCREEN_SCALE_FACTORS= \
+                   QT_ENABLE_HIGHDPI_SCALING=0 QT_AUTO_SCREEN_SCALE_FACTOR=0 \
+                   QT_FONT_DPI= QT_SCALE_FACTOR_ROUNDING_POLICY=Round \
+                   timeout 300 "$ROOT/build-fast/guidrive" xtest \
+                   > /tmp/xt.$$ 2>/tmp/xterr.$$; then
+                # The control, before the diff: if the run could not tell a real
+                # click from a QTest one, the numbers below mean nothing and the
+                # baseline would happily match a run in which nothing was
+                # clicked at all.
+                if ! command grep -q 'DISCRIMINATES' /tmp/xt.$$; then
+                    xtf=1
+                    echo "  the real/QTest control did NOT fire, so this run proves"
+                    echo "  nothing about real input -- no click here was real:"
+                    command grep -E 'native ButtonPress|platform' /tmp/xt.$$ \
+                        | head -3 | sed 's/^/    /'
+                elif command grep -q '^ *!!' /tmp/xt.$$; then
+                    xtf=1
+                    echo "  the driver could not carry out part of the scenario:"
+                    command grep -n '^ *!!' /tmp/xt.$$ | head -6 | sed 's/^/    /'
+                elif command grep -q '^ *!!' "$ROOT/xtest-baseline.txt"; then
+                    xtf=1
+                    echo "  the BASELINE itself contains a failure marker:"
+                    command grep -n '^ *!!' "$ROOT/xtest-baseline.txt" | head -4 | sed 's/^/    /'
+                elif command grep -v '^#' "$ROOT/xtest-baseline.txt" \
+                        | diff -u - /tmp/xt.$$ > /tmp/xtd.$$; then
+                    xtp=1
+                else
+                    xtf=1
+                    echo "  the port no longer responds to REAL input the way it did:"
+                    head -16 /tmp/xtd.$$ | sed 's/^/    /'
+                fi
+            else
+                xtf=1
+                echo "  the xtest run did not finish:"
+                tail -6 /tmp/xt.$$ 2>/dev/null | sed 's/^/    /'
+                if [ -s /tmp/xterr.$$ ]; then
+                    echo "  and its stderr said:"
+                    tail -6 /tmp/xterr.$$ | sed 's/^/    /'
+                fi
+            fi
+        fi
+        # By pid, never `pkill Xvfb': a real session on this machine may have
+        # one of its own, and the gates are not allowed to take it down.
+        kill "$xtpid" 2>/dev/null || true
+        wait "$xtpid" 2>/dev/null || true
+        rm -f /tmp/xtv.$$ /tmp/xt.$$ /tmp/xtd.$$ /tmp/xterr.$$
+    fi
+fi
+printf '%-22s %2d pass  %2d fail\n' "real clicks" "$xtp" "$xtf"
+pass=$((pass+xtp)); fail=$((fail+xtf))
+
+# ---------------------------------------------------------------------------
 # PORTING.md's pagesave/roundtrip gap -- the widget-to-file path, which nothing covered until now.
 #
 # `pages' proves typing reaches the widgets. `exportall' proves widgets reach a

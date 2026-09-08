@@ -1,0 +1,231 @@
+# xtest-baseline.txt -- what the port does with REAL X INPUT.
+#
+# Captured 2026-09-07. build-fast/guidrive runs as a normal X11 client inside a
+# nested Xvfb, 1400x1000x24, with no window manager, under
+# QT_QPA_PLATFORM=xcb. xdotool sends XTEST input. check.sh's `real clicks'
+# section reproduces this file. Lines starting with # are stripped before the
+# diff.
+#
+# WHY THIS FILE EXISTS
+# Every other behavioural baseline here was captured with QTest. QTest builds a
+# QMouseEvent and gives it to QApplication::notify. That runs every slot SIGEL
+# has, but it never goes through QWindowSystemInterface. So it cannot test
+# window activation, the pointer grab a popup takes, or Qt's synthesis of a
+# double click from two presses. PORTING.md's C10 section named those and said
+# no tool on this machine could deliver a real click. That was measured on the
+# live Wayland session only, and it was too broad. In a nested plain X server
+# there is no compositor and no vmware-user owning the pointer, and XTEST is
+# ordinary. This file is the result.
+#
+# THE CONTROL IS IN THE OUTPUT
+# It is in the `-- 2. provenance --' block. check.sh fails the section if the
+# word DISCRIMINATES is missing. The scenario compares one real XTEST click
+# against one QTest::mouseClick at the same point, through a native event
+# filter. The real click produces native ButtonPress events and reaches
+# QWidgetWindow before the QWidget. The QTest click produces no native event and
+# never touches QWidgetWindow. Without that line, every count in this file is
+# also consistent with nothing having been clicked.
+#
+# QEvent::spontaneous() CANNOT BE THAT CONTROL
+# Qt's own qtestmouse.h calls QSpontaneKeyEvent::setSpontaneous() on the event
+# it posts, and only then calls qApp->notify(). A QTest click therefore reports
+# spontaneous()==true, exactly like a real one. A probe built on it would pass
+# with no real click in it.
+#
+# NUMBERS IN HERE THAT ARE NOT ONE PER CLICK. All measured, none assumed:
+#   native press=2 for ONE click   Qt's xcb plugin uses XInput 2. The master and
+#                                  the slave device both report.
+#   qt press=2 for ONE click       QWidgetWindow first, then the QWidget.
+#   qt enter=8 for one crossing    One Enter per widget in the nested stack
+#                                  under the pointer.
+#   Section 4 prints NO pixel coordinates and no popup rectangle. Those come
+#   from the local font and style: under QT_STYLE_OVERRIDE=Windows the File
+#   popup is 228x235 instead of 261x214, which moves both the rectangle and the
+#   point a geometry search would pick. The outside point is list ROW 3, by
+#   index, the same row the oracle used on 1.3.
+#   nativeEnter/nativeLeave = 0 in section 6. This is correct. X sends crossing
+#                                  events per X window. A Qt 6 top level is one
+#                                  X window. Moving between widgets inside it
+#                                  crosses no X boundary. Qt works out those
+#                                  Enter and Leave events itself.
+#
+# TWO DIFFERENCES FROM 1.3 ARE PINNED HERE. Both are in Qt's popup handling.
+# Neither is in SIGEL's code. The oracle measured 1.3 on the 2003 binary with
+# real XTest on 2026-09-07. PORTING.md's C13 section has both in full.
+#   1. A click that closes an open menu is swallowed here and passed on by 1.3.
+#      On 1.3 one click closes the File menu and selects the row under it. Here
+#      the row does not move and a second click is needed. THE CONTROL LINE
+#      BELOW IT IS WHAT MAKES THAT A FINDING: the same click, at the same point,
+#      with no menu open, does select the row. So the target is right and the
+#      click really is being eaten.
+#   2. A second click on the same menubar item closes the menu here. On 1.3 it
+#      stays open.
+# If either line changes, the port's popup behaviour has moved. Do not edit this
+# file to make the diff go away. That is the finding.
+#
+# X INPUT FOCUS IS NAMED, NEVER PRINTED AS AN ID. Window ids are assigned per
+# run, so the number would differ from itself every time. The name comes from
+# xdpyinfo, not from `xdotool getwindowfocus': on an idle nested server xdotool
+# exits 1 and prints nothing, and reading that as "None" would report
+# PointerRoot(1), a real None(0) and any xdotool failure with the same word.
+# 1.3 keeps focus on the root window at rest, moves it to the popup while a menu
+# is open, and leaves it at None after an outside click. Qt 6 here holds the
+# main window throughout, because the port claims focus during startup. That is
+# the toolkit, not the port logic. It is recorded, not judged.
+#
+# SECTION 3 SAMPLES TOO LATE TO SEE ACTIVATION. Both of its samples read
+# isActiveWindow=1, because the port activated the window during startup. It
+# records a settled state, not a change. Activation does happen: section 2 shows
+# act=1 on the first real click, and a run in which no click lands reports
+# isActiveWindow=0 throughout. A session that adds a window manager to the
+# nested display should expect section 3 to move.
+#
+# THE SCENARIO REFUSES A SCALED DISPLAY. Widget coordinates are logical pixels
+# and xdotool takes device pixels. At devicePixelRatio 1.25 the clicks are real
+# but land 20 per cent away, and the run reports a false difference from 1.3.
+# check.sh clears the scaling variables and the scenario refuses any ratio other
+# than 1.
+== SCENARIO xtest ==
+
+== STEP 1: fresh start, no experiment ==
+  [title] SIGEL
+  [tree] header=[Experiments] topLevel=0
+  [page] count=1 current=QLabel objectName=[baseWidget]
+  [action changes] none
+  [modal] class=QFileDialog title=[Load Experiments...]
+  [filedialog] title=[Load Experiments...] mode=3 nameFilters=[Experiment Files (*.exp) ;; All Files (*)] labelAccept=[&Open]
+
+== STEP 2: after File > Open Experiment ==
+  [title] SIGEL
+  [tree] header=[Experiments] topLevel=1
+      twoBasesSimpleFitness2.exp sel=1 exp=1 cur=1 selectable=1
+        Individuals              sel=0 exp=0 cur=0 selectable=1
+        Robot                    sel=0 exp=1 cur=0 selectable=1
+          Language-Parameters      sel=0 exp=0 cur=0 selectable=1
+        GP-Parameters            sel=0 exp=0 cur=0 selectable=1
+        Simulation-Parameters    sel=0 exp=0 cur=0 selectable=1
+        Environment              sel=0 exp=0 cur=0 selectable=1
+  [page] count=8 current=SIGEL_MasterGUI::SIG_ExperimentView objectName=[ExperimentView]
+  [widgets]
+    group    [Evolution controls] enabled=1
+    group    [Fitnesscurve] enabled=1
+    group    [Experiment properties] enabled=1
+    button   [&Start] enabled=1 checkable=0 checked=0
+    button   [S&top] enabled=0 checkable=0 checked=0
+    button   [Show in GNU-Plot] enabled=1 checkable=0 checked=0
+    button   [Export PostScript] enabled=1 checkable=0 checked=0
+    check    [Save the history] enabled=1 checkable=1 checked=1
+    lcd      [lcdnumberGenerations] value=532 digits=4
+    lcd      [lcdnumberAutosave] value=0 digits=4
+    slider   [sliderIntervall] value=0 min=0 max=100 enabled=1
+    progress [generationProgBar] value=-1 min=0 max=100
+  [action changes]
+    &File/&Delete Experiment                                   ENABLED
+    &File/&Rename Experiment                                   ENABLED
+    &File/&Save Experiment                                     ENABLED
+    &File>Export/...to GNU plot                                ENABLED
+    &File>Export/Environment                                   ENABLED
+    &File>Export/GP-Parameters                                 ENABLED
+    &File>Export/Individual                                    ENABLED
+    &File>Export/Language-Parameters                           ENABLED
+    &File>Export/Population                                    ENABLED
+    &File>Export/Program                                       ENABLED
+    &File>Export/Simulation-Parameters                         ENABLED
+    &File>Import/Environment                                   ENABLED
+    &File>Import/GP-Parameters                                 ENABLED
+    &File>Import/Individual                                    ENABLED
+    &File>Import/Language-Parameters                           ENABLED
+    &File>Import/Population                                    ENABLED
+    &File>Import/Program                                       ENABLED
+    &File>Import/Robot                                         ENABLED
+    &File>Import/Simulation-Parameters                         ENABLED
+    &Individuals/&Add                                          ENABLED
+    &Individuals/&Delete                                       ENABLED
+    &Individuals/&Visualize                                    ENABLED
+    &Individuals/Reset                                         ENABLED
+    &MetaGP/&Use MetaGP                                        ENABLED
+    &View/&Environment                                         ENABLED
+    &View/&GP Parameters                                       ENABLED
+    &View/&Language Parameters                                 ENABLED
+    &View/&Population                                          ENABLED
+    &View/&Robot                                               ENABLED
+    &View/&Simulation Parameters                               ENABLED
+    TB:fileToolbar/&Delete Experiment                          ENABLED
+    TB:fileToolbar/&Save Experiment                            ENABLED
+    TB:individualsToolBar/&Add                                 ENABLED
+    TB:individualsToolBar/&Delete                              ENABLED
+    TB:individualsToolBar/&Visualize                           ENABLED
+    TB:mtToolbar/&Use MetaGP                                   ENABLED
+    TB:viewToolBar/&Environment                                ENABLED
+    TB:viewToolBar/&GP Parameters                              ENABLED
+    TB:viewToolBar/&Language Parameters                        ENABLED
+    TB:viewToolBar/&Population                                 ENABLED
+    TB:viewToolBar/&Robot                                      ENABLED
+    TB:viewToolBar/&Simulation Parameters                      ENABLED
+
+== STEP 3: after View > Population ==
+  [title] SIGEL
+  [tree] header=[Experiments] topLevel=1
+      twoBasesSimpleFitness2.exp sel=0 exp=1 cur=0 selectable=1
+        Individuals              sel=1 exp=0 cur=1 selectable=1
+        Robot                    sel=0 exp=1 cur=0 selectable=1
+          Language-Parameters      sel=0 exp=0 cur=0 selectable=1
+        GP-Parameters            sel=0 exp=0 cur=0 selectable=1
+        Simulation-Parameters    sel=0 exp=0 cur=0 selectable=1
+        Environment              sel=0 exp=0 cur=0 selectable=1
+  [page] count=8 current=SIGEL_MasterGUI::SIG_AllIndividualsView objectName=[]
+  [individuals] rows=120 cols=3 headers=[Name               ][Fitness          ][Age               ] selected=0
+    row0  | 55658         | 1.14825       | 111           | sel=0
+    row1  | 56091         | 1.14825       | 109           | sel=0
+    row2  | 56248         | 1.14825       | 259           | sel=0
+    row3  | 56349         | 1.06261       | 97            | sel=0
+    row4  | 56432         | 1.14825       | 111           | sel=0
+    row5  | 56447         | 1.14825       | 107           | sel=0
+    ... 114 more
+    allrows sha256=ee0c3372fe5769ccf63f449dfcf2b301eb7d4acd4924cc5291e6f1e0c303e198
+  [action changes] none
+
+== REAL X INPUT ==
+  [platform] xcb
+
+  -- 1. coordinates --
+    asked for (40,40), server reports (40,40) -- AGREE
+
+  -- 2. provenance --
+    real XTEST click           native[press=2 rel=2 motion=1 enter=2 leave=1 focusIn=1 xi2=6 core=3] qt[press=2 dbl=0 enter=8 leave=0 act=1 deact=0]
+                               pressOn=[QWidgetWindow, QWidget]
+    QTest::mouseClick          native[press=0 rel=0 motion=0 enter=0 leave=0 focusIn=0 xi2=0 core=0] qt[press=1 dbl=0 enter=0 leave=0 act=0 deact=0]
+                               pressOn=[QWidget]
+    native ButtonPress: real=2 QTest=0 -- DISCRIMINATES (this is the whole point)
+
+  -- 3. activation --
+    before: isActiveWindow=1 activeWindow=SIGEL_MasterGUI::SIG_MainWindow xfocus=main window
+    after : isActiveWindow=1 activeWindow=SIGEL_MasterGUI::SIG_MainWindow xfocus=main window
+    after real click           native[press=2 rel=2 motion=1 enter=2 leave=1 focusIn=0 xi2=6 core=2] qt[press=2 dbl=0 enter=8 leave=0 act=0 deact=0]
+                               pressOn=[QWidgetWindow, QWidget]
+
+  -- 4. pointer grab --
+    xfocus with no menu up: main window
+    real click on [&File]: popup=QMenu mouseGrabber=(none) keyboardGrabber=(none) xfocus=main window
+    second click on [&File]: popup still up=0
+    outside point is list row 3, outside the popup=1, widgetThere=QWidget
+    then a real click on list row 3: popup before=1 after=0, list current before=[55658] after=[55658] xfocus=main window
+    outside click              native[press=2 rel=2 motion=1 enter=2 leave=2 focusIn=1 xi2=7 core=3] qt[press=2 dbl=0 enter=8 leave=0 act=0 deact=0]
+                               pressOn=[QWidgetWindow, QMenu]
+    CONTROL, same point with no menu up: list current before=[55658] after=[56349] -- row selectable, so the probe can see a change
+    control click              native[press=2 rel=2 motion=1 enter=0 leave=0 focusIn=0 xi2=5 core=0] qt[press=2 dbl=0 enter=0 leave=0 act=0 deact=0]
+                               pressOn=[QWidgetWindow, QWidget]
+    vs 1.3: menu closes AND the row under the click is selected -- DIFFERS -- the port SWALLOWS the dismissing click
+
+  -- 5. double-click synthesis --
+    doubleClickInterval=400 ms
+    two SLOW clicks (1200 ms apart): qtDblClick=0 itemDoubleClicked=0 views 0 -> 0
+    two FAST clicks (80 ms apart) : qtDblClick=2 itemDoubleClicked=1 views 0 -> 1
+    fast pair                  native[press=4 rel=4 motion=1 enter=0 leave=0 focusIn=0 xi2=9 core=0] qt[press=3 dbl=2 enter=0 leave=0 act=0 deact=0]
+                               pressOn=[QWidgetWindow, QWidget, QWidgetWindow]
+
+  -- 6. enter / leave --
+    move within one widget : qtEnter=0 qtLeave=0 nativeMotion=1 nativeEnter=0 nativeLeave=0
+    move across a boundary : qtEnter=5 qtLeave=2 nativeMotion=1 nativeEnter=0 nativeLeave=0
+    same motion via QTest  : qtEnter=2 qtLeave=5 nativeMotion=1 nativeEnter=0 nativeLeave=0
+
