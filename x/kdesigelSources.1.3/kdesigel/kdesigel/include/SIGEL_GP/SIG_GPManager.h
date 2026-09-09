@@ -33,8 +33,6 @@
 
 #include <qdatetime.h>
 
-#include <qthread.h>
-
 #include <sys/types.h>
 #ifndef _WINDOWS
 #include <sys/select.h>
@@ -61,7 +59,7 @@ namespace SIGEL_GP
  * evolution run. The SIG_Randomizer supplies the system with random seeds.
  */
 
-  class SIG_GPManager // : public QThread
+  class SIG_GPManager
     {
 
   /**
@@ -105,12 +103,6 @@ namespace SIGEL_GP
 #endif
 
   void start();
-
-  void wait() {
-  };
-
-  void msleep( int ) {
-  };
 
   bool running()  {
     return false;
@@ -295,8 +287,8 @@ namespace SIGEL_GP
   bool checkTerminationConditions(bool generationBreak);
 
    /**
-    * This method starts the GPManager. That is why the GPManager inherits 
-    * from QThread.
+    * Runs the evolution on the calling thread and returns when it is
+    * finished. Not a thread entry point, despite the name.
     * @pre
     * The GPManager object is created.
     */

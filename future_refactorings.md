@@ -218,9 +218,8 @@ name reads as travel, or as a shortening of nothing in particular. The type it
 holds already says the word.
 
 **Do:** rename the member to `tournaments`. It is private
-(`SIG_GPManager.h:152`) and used in one file, so the change is contained. The
-two doxygen comments that call it "the QArray tours" (`SIG_GPManager.h:216`,
-`:250`) go with it — and they are wrong twice over, since it is not a `QArray`
+(`SIG_GPManager.h:144`) and used in one file, so the change is contained. The
+two doxygen comments that name it (`SIG_GPManager.h:217`, `:251`) go with it — and they are wrong twice over, since it is not a `QArray`
 and has not been one for some time.
 
 **Not before the port is validated.** *This said `SIG_GPManager` "cannot be
@@ -268,7 +267,7 @@ created. Counts measured 2026-08-30 by grep over the extracted 1.3 tree.
 
   | symbol | where |
   |---|---|
-  | `schlussJetzt` | `SIG_GPManager.h:136` + 5 uses |
+  | `schlussJetzt` | `SIG_GPManager.h:127` + 5 uses |
   | `liesdas` (ctor param) | `SIG_Scanner.h:43`, `SIG_RobotScanner.h:48`, `SIG_UnstreamerScanner.h:34` + 3 `.cpp` |
   | `getRandomInstruktion`, `ProbInstruktion` | `MT_Randomizer.h:54,165` |
   | `T_Instruktion`, `T_Instruk` | `MT_TranslatedIndividual.h:38,74` |
@@ -571,7 +570,7 @@ a delivered result. Two shapes follow, and the second is worse than a hang:
   all. Setting a timeout would change nothing.
 - `pvm_recv` fails immediately, `pvm_upkdouble` leaves `result` at `-1`, and the
   code still decrements `noOfSlaves` and destroys the task record. The four callers
-  (`SIG_GPManager.cpp:202`, `:469`, `:1460`, `:1576`) read `-1` as "not ready
+  (`SIG_GPManager.cpp:202`, `:469`, `:1461`, `:1577`) read `-1` as "not ready
   yet" and wait forever for a task that no longer exists. The individual is
   lost.
 
@@ -592,7 +591,7 @@ sound only because this branch did not fire; the argument itself could not tell.
 `resizeOwningHosts`, which deletes host objects. Any task still outstanding then
 decrements a freed object at one of the two decrement sites, `:379` or `:397`.
 Latent today because `addDynHost` has exactly one call site,
-`SIG_GPManager.cpp:1004`, on the dynamic-client server thread that only
+`SIG_GPManager.cpp:1005`, on the dynamic-client server thread that only
 `sigel.cpp:267-274` starts — and `guidrive` starts no such thread, so no host is
 ever flushed mid-run.
 
@@ -661,27 +660,32 @@ offers; it cannot shut a route nobody has found yet. A refusal inside
 - The counter itself, `g_runningEvolutions`, is a file-static in
   `SIG_Experiment.cpp:212`.
 
-**The option that avoids the new edge:** move the run counter down into
-`SIGEL_GP`, beside `SIG_GPManager`, and have `SIG_Experiment::RunScope` and
-`anyEvolutionRunning()` become thin forwards to it. Both layers can then ask
-without `MT_Control` learning about the GUI at all. Not costed.
+**THAT ROUTE IS DEAD — REJECTED BY JAN 2026-09-09.** It proposed moving the run
+counter down into `SIGEL_GP`. His objection: the counter is ours — added by D29
+in `e998b76`, 2026-09-05, 28 commits before this was written — and pushing it
+into the core model to serve a menu guard is the wrong direction. His words: *"I strongly reject changes to the core model
+just to hot-fix a UI enablement issue."* **The counter is to be removed, not
+relocated.** What replaces it is undecided.
 
-**When to do it:** POSTPONED 2026-09-07. Jan wants to review the options in code
-himself, after everything else on the list is done, reviewed and tested. Not to
-be decided or started before then.
+**When to do it:** the *layer* is still wanted; only the route above is dead.
+Superseded 2026-09-09 — the earlier "POSTPONED, Jan wants to review the options
+in code himself" is overtaken by his decision that the counter goes.
 
 **Two facts measured 2026-09-07 that change the options above:**
 
 - **`SIG_GPManager::running()` already exists and is a stub that always returns
-  `false`** (`SIG_GPManager.h:115`), next to empty `wait()` and `msleep()`
-  bodies — leftovers from Qt 2's `QThread` base. So "just ask the manager" is not
-  available, and worse, it compiles and reads correctly while answering "not
-  running" during a run. Whatever is decided, this stub should be removed or
-  implemented: it is the wrong answer sitting in the obvious place.
+  `false`** (`SIG_GPManager.h:107`). So "just ask the manager" is not available,
+  and worse, it compiles and reads correctly while answering "not running"
+  during a run. *The empty `wait()` and `msleep()` that used to sit beside it
+  are gone — step A, 2026-09-09. `running()` was deliberately left, because
+  removing it and giving it a real answer are different decisions. It is not an
+  unfinished feature: PORTING.md's D29 passage has the evidence.*
 - **`MT_Control` already depends on `SIGEL_GP`** — `MT_Evaluator.h:11` and
-  `MT_Classifier.h:11-14` include `SIGEL_GP/` headers today. The new-module-edge
-  objection above applies only to `SIGEL_MasterGUI`. Moving the counter into
-  `SIGEL_GP` therefore costs no new edge.
+  `MT_Classifier.h:11-14` include `SIGEL_GP/` headers today, so the dependency
+  objection above applies only to `SIGEL_MasterGUI`. *This was the argument that
+  moving the counter into `SIGEL_GP` costs nothing. It is kept only as a fact
+  about the dependencies — **it no longer supports anything**, because that move
+  is rejected.*
 
 ---
 

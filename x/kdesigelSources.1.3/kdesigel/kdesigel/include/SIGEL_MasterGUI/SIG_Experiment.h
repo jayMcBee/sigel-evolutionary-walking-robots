@@ -260,7 +260,7 @@ namespace SIGEL_MasterGUI
        * locks, nesting is balanced, and unwinding decrements.
        *
        * NOT SIG_GPManager::running(), which is a 2003 stub returning false
-       * unconditionally (SIG_GPManager.h:115) with no override anywhere -- a
+       * unconditionally (SIG_GPManager.h:107) with no override anywhere -- a
        * guard written against it could never fire.
        */
       static bool anyEvolutionRunning();

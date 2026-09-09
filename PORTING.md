@@ -299,7 +299,7 @@ times.
 ### Qt API that does not change
 
 `QString` 958, `QTextStream` 232, `QDateTime`/`QTime`/`QDate` 91, `QObject` 28,
-`QFile` 15, `QDir` 14, `QStringList` 12, `QDataStream` 12, `QThread` 3,
+`QFile` 15, `QDir` 14, `QStringList` 12, `QDataStream` 12, `QThread` 3 *(pristine-tree figure; today 0 — step A removed the last of them, 2026-09-09)*,
 `QTimer` 2.
 
 **Absent, and usually the worst part of a Qt port:** 0 `QPainter`, 0
@@ -1863,7 +1863,7 @@ what shows the six-generation run completing untouched.
 
 **THE SAMPLER PROVES LESS THAN IT LOOKS.** `generations=136` never moving is
 **expected**: the two live-update calls are commented out at
-`SIG_GUIGPManager.cpp:43` and `:92`. *This said the only live write is a page
+`SIG_GUIGPManager.cpp:43` and `:95`. *This said the only live write is a page
 refresh at `SIG_ExperimentView.cpp:83`, "which fires on a page switch during a
 run but never from the evolution loop". **Wrong on the first half**: the
 page-switch route runs `putAllIntoExperiment`, which returns at
@@ -4542,7 +4542,7 @@ tracked anywhere:
 
 | site | state | why it matters |
 |---|---|---|
-| ~~`SIG_GPManager.cpp:415` and `:1507`~~ **CLOSED by D25b** | `fitTaskList` is now `QList< QList<int> * >` (`:373`, `:1460`) and the walk is index-based | The hazard was real: `fitTaskList.first()` then `while (actFitTask)` — **the loop terminated on the null**, and Qt 6's `first()` is UB on empty. It became a cursor index (`isEmpty() ? -1 : 0`, then `at()`), not `value(0)` or a range-for, because the walk also needs `remove`/`current`/`next` semantics. This row is why the step was written the way it was |
+| ~~`SIG_GPManager.cpp:415` and `:1507`~~ **CLOSED by D25b** | `fitTaskList` is now `QList< QList<int> * >` (`:405`, `:1461`) and the walk is index-based | The hazard was real: `fitTaskList.first()` then `while (actFitTask)` — **the loop terminated on the null**, and Qt 6's `first()` is UB on empty. It became a cursor index (`isEmpty() ? -1 : 0`, then `at()`), not `value(0)` or a range-for, because the walk also needs `remove`/`current`/`next` semantics. This row is why the step was written the way it was |
 | `SIG_ExperimentView.cpp:91`, `:105`, `:119` | `experimentHistory` is **already** `QList<T *>`; `.first()` unguarded | converted-code UB, latent only because `SIGEL_MasterGUI` is not in the build. Phase C |
 | ~~`SIG_EnvironmentRenderer` `robotPathPoints`~~ **CLOSED by C5** | was **unconverted Qt 2** `QList<DL_vector>` under `#include <qlist.h>`, walked with `.first()`/`.next()` into a `DL_vector *` | the central pointer-versus-value trap. Now `QList<DL_vector *>` with index walks and an explicit `qDeleteAll`; both walks were guarded by `count() >= 2`, which is what kept `first()` off an empty list |
 
@@ -5689,7 +5689,7 @@ trip.*
 **THE GUARD IN `SIG_ExperimentView::putIntoExperiment()` SITS BELOW THE LCD READ,
 DELIBERATELY — moved there 2026-09-05.** It was above it, and that would have
 been a divergence **the run lock itself introduced**. `poolGeneration` IS
-incremented per generation inside the loop (`SIG_GPManager.cpp:736`), 1.3 has no
+incremented per generation inside the loop (`SIG_GPManager.cpp:737`), 1.3 has no
 guard anywhere in this function, and this document's own reading of 1.3 says the
 counter "moves when the experiment is selected, when a page is switched, and at
 the top of `slotStartEvolution`" — so on 1.3 a page switch **during** a run
@@ -5725,7 +5725,7 @@ took to implement, and each wrong version passed its own gate.
 the page the user is looking at when they press Start, it stays live for the
 whole run, and its history checkbox and autosave slider are wired straight to
 `SIG_ExperimentView::putIntoExperiment()`. The running GP reads `getAutosave()`
-**every generation** (`SIG_GPManager.cpp:804-806`). Meanwhile `robotView` is
+**every generation** (`SIG_GPManager.cpp:805-807`). Meanwhile `robotView` is
 disabled but `SIG_RobotView::putIntoExperiment()` has **no callers at all**.
 
 **Version 2 was wrong: a bool per experiment.** Three ways. Selecting a
@@ -5737,9 +5737,31 @@ return. An exception out of `start()` skipped the clear and locked the
 experiment for good. A count entered by a scope guard fixes all three.
 
 **Version 3 was wrong: it asked `SIG_GPManager::running()`.** That is a 2003
-stub returning `false` unconditionally (`SIG_GPManager.h:115`), overridden
-nowhere, so a guard against it can never fire. It is also why 1.3 has the same
-visible defect from a different cause: **one click on the experiment tree
+stub returning `false` unconditionally (`SIG_GPManager.h:107`), overridden
+nowhere, so a guard against it can never fire. **It is a leftover, not an
+unfinished feature, and that matters before anyone implements it.**
+`SIG_GPManager` was to derive from Qt 2's `QThread`; the base class is already
+commented out in release 1.0 (**September 2001** — `sigelSourceDistribution.1.0.tar.gz`
+is stamped 2001-09-06, and the file itself 2001-09-05; August 2001 is the date of
+the shipped experiment DATA, not of the release) and in 1.3, so `running()`,
+`wait()` and `msleep()` are its orphaned methods. The team's own final report
+(`sigelEndbericht.pdf`, PG 368 Dortmund) never uses the word *thread* in 11,579
+lines — their parallelism is PVM, separate processes. **So making `running()`
+answer honestly is new design by us, not restoration**, and there is no earlier
+revision to consult. **Where that comes from, since none of it is in this repo's
+git:** SourceForge's CVS is shut down (rsync refused, ViewVC redirects to the
+download page); the CVS metadata in the UNTRACKED `xb/` tree — a 2003 working
+copy, `xb/kdesigel/pixmaps/CVS/Root` and `Entries` — names
+`:ext:…@cvs.sigel.sourceforge.net:/cvsroot/sigel` and dates its oldest revision
+`1.1.1.1` to 18 December 2001, a vendor import and therefore *after* the change;
+and the project's own file listing offers source tarballs for **1.0 and 1.3
+only**, with 1.1 and 1.2 as Debian binaries. (The 1.3 tarball's `README` still
+says "v1.1" — a stale README, not a source release.) Step A (2026-09-09) removed the commented base class, the sole
+`qthread.h` include, `wait()`, `msleep()` and the one `wait()` call;
+`running()` is deliberately left for a separate decision.
+
+**That always-false stub is also why 1.3 has the same visible defect from a
+different cause: one click on the experiment tree
 re-enabled all 23 locked actions mid-run.** The actions *are* correctly disabled
 at start — `SIG_Experiment` emits `signalEvolutionNotRunning( false )` and both
 construction sites relay it — so the defect was never "they are not disabled".
@@ -5847,7 +5869,7 @@ run did not crash it. Only injected events did.
 
 **THE PORT HAS THE SAME MECHANISM, INTACT.**
 `SIG_GUIGPManager::haveABreak()` is `qApp->processEvents( QEventLoop::AllEvents,
-… )` (`SIG_GUIGPManager.cpp:63`), called from **six** places in the evolution loop (`SIG_GPManager.cpp:96, 420, 460, 1334, 1539, 1566`, three in each `run()` body),
+… )` (`SIG_GUIGPManager.cpp:65`), called from **six** places in the evolution loop (`SIG_GPManager.cpp:96, 420, 460, 1335, 1540, 1567`, three in each `run()` body),
 and `checkTask`'s unchecked `pvmTasks[ taskId ]` is unchanged. So a GUI
 interaction re-enters through that pump and can reach the unchecked read before
 the growth that would have covered the id. **MEASURED 2026-09-07 and it does**:

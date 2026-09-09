@@ -310,7 +310,7 @@ void SIG_ExperimentListView::slotSelectionChanged( QTreeWidgetItem * theItem )
       experimentName = theItem->text(0);
       experimentDict.value( experimentName )->slotSelectionChanged( option );
       // D29. This asked SIG_GPManager::running(), which is a 2003 STUB
-      // returning false unconditionally (SIG_GPManager.h:115) and overridden
+      // returning false unconditionally (SIG_GPManager.h:107) and overridden
       // nowhere -- so this branch always emitted evolutionNotRunning( TRUE ),
       // and SIG_MainWindow::slotEnableEvolutionRunningActions RE-ENABLED all
       // 23 evolutionRunningActions on any tree click.

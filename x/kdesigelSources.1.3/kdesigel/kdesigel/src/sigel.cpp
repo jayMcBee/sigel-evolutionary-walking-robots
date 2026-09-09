@@ -305,9 +305,8 @@ int main( int argc, char *argv[] ) {
 
 	} else {
 
-		// start sigel evolution
+		// start() runs the evolution on this thread and returns when it is done
 		gpManager.start();
-		gpManager.wait();
 	}
 
     if (!experimentFile.open( QIODevice::WriteOnly )) {

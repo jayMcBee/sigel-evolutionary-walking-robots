@@ -579,11 +579,12 @@ void SIGEL_GP::SIG_GPManager::calcInitTourSet() {
 
 void SIGEL_GP::SIG_GPManager::haveABreak()
 {
-  //  msleep( actExperiment.gpParameter.getPassiveTime() );
+  // Empty in the base. SIG_GUIGPManager overrides it to pump the event loop.
 };
 
 void SIGEL_GP::SIG_GPManager::messageEvolutionStop() {
-  //  QThread::exit();
+  // Sets the flag the evolution loop reads. Stops nothing itself; the loop
+  // notices at its next check.
   schlussJetzt = true;
 };
 

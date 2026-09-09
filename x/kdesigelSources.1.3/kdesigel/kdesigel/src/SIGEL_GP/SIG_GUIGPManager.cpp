@@ -59,17 +59,20 @@ namespace SIGEL_GP
 
   void SIG_GUIGPManager::haveABreak()
   {
-    //    qApp->wakeUpGuiThread();
+    // The ONLY read of the `passive time' GP parameter in the tree, and it is
+    // not what the name says: a millisecond budget for the event pump, not a
+    // pause between generations. No pause is implemented anywhere.
     qApp->processEvents( QEventLoop::AllEvents,
                          actExperiment.gpParameter.getPassiveTime() );
-    //    msleep( actExperiment.gpParameter.getPassiveTime() );
   };
 
   void SIG_GUIGPManager::messageEvolutionStop()
   {
+    // Sets the flag, stops nothing itself. slotEvolutionStopped() stays
+    // commented out: SIG_Experiment calls it after start() returns, and
+    // calling it here too would announce the run finished while it still runs.
     schlussJetzt = true;
     //    guiExperiment.slotEvolutionStopped();
-    //    QThread::exit();
   };
 
   void SIG_GUIGPManager::updateIndividualView( int poolPos )

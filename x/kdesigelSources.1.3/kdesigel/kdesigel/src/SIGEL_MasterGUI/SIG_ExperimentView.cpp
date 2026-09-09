@@ -67,12 +67,12 @@ void SIG_ExperimentView::putIntoExperiment() {
   // only that one left the live path open.
   //
   // It is a live path in the strong sense: the running GP reads
-  // getAutosave() every generation (SIG_GPManager.cpp:804-806) to decide
+  // getAutosave() every generation (SIG_GPManager.cpp:805-807) to decide
   // whether to save, and getHistory() decides what that save writes.
   //
   // The LCD read below is display-only and is deliberately AHEAD of the
   // guard. poolGeneration IS incremented per generation inside the loop
-  // (SIG_GPManager.cpp:736), and 1.3 has no guard at all, so on 1.3 a page
+  // (SIG_GPManager.cpp:737), and 1.3 has no guard at all, so on 1.3 a page
   // switch during a run refreshes this display to the advanced value.
   // Returning before it would have made the port show a stale number where
   // 1.3 shows a fresh one -- a divergence the run lock would have
