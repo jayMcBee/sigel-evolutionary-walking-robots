@@ -38,7 +38,7 @@
 namespace SIGEL_MasterGUI
 {
 
-  SIG_Experiment::SIG_Experiment( QString name, QStackedWidget *theWidgetStack, SIG_ExperimentItem *theExperimentItem ) : gpExperiment(), gpManager(0), experimentName(name), widgetStack( theWidgetStack ), experimentItem(theExperimentItem)
+  SIG_Experiment::SIG_Experiment( QString name, QStackedWidget *theWidgetStack, SIG_ExperimentItem *theExperimentItem ) : gpExperiment(), guiGPManager(0), experimentName(name), widgetStack( theWidgetStack ), experimentItem(theExperimentItem)
 {
   // build the gp parameter menu
   menuGPParameter = new QMenu( this );
@@ -188,9 +188,9 @@ SIG_Experiment::~SIG_Experiment()
   // were just orphaned by removeWidget(), so the delete has to be explicit.
   qDeleteAll( widgetDict );
 
-   if( gpManager )
+   if( guiGPManager )
       {
-        delete gpManager;
+        delete guiGPManager;
       }
 };
 
@@ -237,7 +237,7 @@ void SIG_Experiment::putAllIntoExperiment()
   // so no user-typed value can currently reach here mid-run -- this makes the
   // property structural instead of incidental, and covers any future caller.
   //
-  // slotStartEvolution calls this BEFORE gpManager->start(), so the settings a
+  // slotStartEvolution calls this BEFORE guiGPManager->start(), so the settings a
   // user chose are still committed at start; only writes after that are
   // refused.
   if ( anyEvolutionRunning() )
@@ -293,9 +293,9 @@ void SIG_Experiment::slotStartEvolution()
 {
   if( (gpExperiment.robot.getBodies().size() != 0) && (gpExperiment.population.getSize() >= 4) && (gpExperiment.gpParameter.getFitnessName() != QString()) )
     {
-      delete gpManager;
+      delete guiGPManager;
       
-      gpManager = new SIGEL_GP::SIG_GUIGPManager( *this );
+      guiGPManager = new SIGEL_GP::SIG_GUIGPManager( *this );
 #ifdef SIG_DEBUG
       SIGEL_Tools::SIG_IO::cout << "Starting Evolution (Haha)\n";
 #endif
@@ -331,7 +331,7 @@ void SIG_Experiment::slotStartEvolution()
       {
         RunScope runScope;
         try {
-          gpManager->start();
+          guiGPManager->start();
         }
         catch (...) {
           slotEvolutionStopped();
@@ -351,7 +351,7 @@ void SIG_Experiment::slotStopEvolution()
 {
   // D30a. This used to emit signalEvolutionNotRunning( true ) HERE, as its
   // first statement -- and it is a request to stop, not a stop. It only sets
-  // gpManager->userTerminated below; start() has not returned, the RunScope is
+  // guiGPManager->userTerminated below; start() has not returned, the RunScope is
   // still alive, and anyEvolutionRunning() is still true. So one click on Stop
   // re-enabled all 29 locked actions WHILE THE RUN CONTINUED, for as long as
   // the manager takes to notice the flag -- a whole generation, 58-208 s on
@@ -375,7 +375,7 @@ void SIG_Experiment::slotStopEvolution()
   // environmentView->setEnabled( true );
   // allIndividualsView->setEnabled( true );
 
-  gpManager->userTerminated = true;
+  guiGPManager->userTerminated = true;
 };
 
 void SIG_Experiment::slotSimulationParameterImport()
@@ -786,10 +786,10 @@ void SIG_Experiment::slotEvolutionStopped()
   // allIndividualsView->setEnabled( true );
 
   /*
-  if( gpManager )
+  if( guiGPManager )
     {
-      delete gpManager;
-      gpManager = 0;
+      delete guiGPManager;
+      guiGPManager = 0;
     }
   */
 };

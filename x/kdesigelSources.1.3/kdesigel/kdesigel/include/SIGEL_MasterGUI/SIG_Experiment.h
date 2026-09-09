@@ -96,7 +96,7 @@ namespace SIGEL_MasterGUI
       /**
        * The SIG_GPManager belonging to this experiment.
        */
-      SIGEL_GP::SIG_GUIGPManager *gpManager;
+      SIGEL_GP::SIG_GUIGPManager *guiGPManager;
       
       public slots:
 

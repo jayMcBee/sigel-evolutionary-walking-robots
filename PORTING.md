@@ -521,7 +521,8 @@ D20 supersedes D5, D24 supersedes D3.
 | **D28** | The `QSpinBox` over-range divergence (C11a) | **accepted, not fixed.** 1.3 accepts out-of-range digits and clamps on commit; the port refuses the keystroke and commits a truncated prefix. It is reachable **only by typing a number outside the box's own range**, and the differing value is **visible in the box** before anything is saved — 1.3 shows 99, the port shows 10. Contrast what the port did fix: `clear()` killed the application, the ampersand rendered wrong, a negative width silently wrote no file — all reachable with valid use. The fix is not the 33 lines of it, it is **owning a custom widget forever**: every future form edit and every new spin box must remember `SIG_SpinBox` or silently opt out. Pinned in `guibehaviour-baseline.txt` (`commits=`) so it cannot drift; prototype and the measured comparison in `future_refactorings.md`. **Revisit if** a dialog spin box turns out to feed something unvalidated, or if anyone actually hits it |
 | **D29** *(signed off 2026-09-04)* | Changing run parameters **while an evolution is running** | **FORBIDDEN in the port, whatever 1.3 permits.** The reason is the specification, not 1.3: *"that's not how GAs/GPs are commonly implemented"* — the parameters define the run. **The port's second intentional divergence**, after D27. *A harder justification arrived later and is narrower than it first looked: one mid-run action, MetaGP `Configure System` opening its window, crashes 1.3 reliably, while ~25 other injected mid-run events did nothing. That is evidence for the decision, not the reason for it — and **D29 does not fix that crash**, which arrives through a menu path that never writes a parameter.* **Implementation, and the three wrong versions it went through, are in §10 — read that before changing the guard** |
 
-| **D31** *(signed off 2026-09-09)* | Line endings | **LF ONLY, tree-wide. No more DOS.** Jan's decision, and it overrides the guard that existed to prevent it. **100 files under `x/kdesigelSources.1.3` converted, 17,750 CRLF pairs.** **The conversion is line endings only except for two bytes, and `git diff --ignore-cr-at-eol` is NOT what proves it** — that flag strips a trailing CR from *both* sides, so it would equally hide a CRLF being *introduced*. The proof is a direct comparison of every one of the 100 files: `re.sub(rb"\r+\n", b"\n", git show HEAD:f) == working file`, exact, with no `\r` surviving anywhere. Zero anomalies. Zero anomalies. **Two lines of `sigel_slave.mak` are the one real content change**, and calling them line endings flatters them: `:598` and `:647` ended `\r\r\n`, so the byte removed is an INTERIOR one — under NMAKE that trailing CR is part of the variable's value. The `\r+` in the proof above is what swallows the case, so the proof cannot tell it from a line ending; it is called out here instead. Nothing else in the tree has a run of two. **Binaries are excluded and this is not cosmetic** — three tracked binaries hold 12 incidental `\r\n` byte pairs (`pvm3.4.6.tgz` 9, `altLogo.png` 2, `noExperiment.png` 1), and a blind repo-wide replace would corrupt all three. Extensions touched: 36 `.cpp`, 35 `.h`, 19 `.xpm`, 5 `.dsp`, 3 `.mak`, 1 `.mt`, 1 `.dsw`. **No `.exp` and no `.ui`**, so no reference artefact was touched. **Lone CRs are left alone, and NOT because they are Mac-classic line endings** — the first version of this row said that and it was wrong. Six tracked files hold lone CRs and git calls **all six** binary, so this gate never even reads them: `pvm3.4.6.tgz` 3859, `noExperiment.png` 691, `JustGreen.pnm` 2848, `altLogo.png` 208, `Hippie.pnm` 208, `Stone.pnm` 68. All five `.pnm` are **P6 raw raster**: those bytes are pixel values that happen to equal `0x0d`. They were never line endings. **The `encodings` gate was turned round in the same commit**, so that commit is not line endings alone — `check.sh`, `PORTING.md` and `future_refactorings.md` change with it. The gate used to say *a file that HAD a CR must still have one*, with `ENC_BASELINE=25`; it now says **no tracked text file may carry CRLF**, expected zero, reads every tracked file rather than five extensions present in the root commit, lists them with `-z` so a C-quoted path cannot break `open()`, and reconciles — every file lands in exactly one of ok / CRLF / binary / unreadable, or it aborts. **It asks `git ls-files --eol` what is binary rather than testing for a NUL byte**, because the NUL test got two files wrong: `Hippie.pnm` has no NUL in its 196,668 bytes and `UniDo_LSXI.pnm`'s first NUL is at offset 15,456, so both were judged as text and passed only by luck. **Read the `w/` column, not `i/`**: while this change was being made, `sigel_slave.mak`'s index blob read `i/-text` — HEAD still held its two `\r\r\n`, which git's own heuristic calls binary — against a working file of `w/lf`, and testing both columns dropped a real text file out of the check. **Both columns read `lf` once this is committed, so the demonstration is gone and only the rule survives.** Reads 611 text files and 8 binaries. **A floor of 500 was added**, because zero failures is also what a check that read nothing reports: a dead `git ls-files` gave `COUNTS 0 0 0 0 0 0`, two non-empty numbers, which the fail-closed branch did not catch. Teeth-tested: CRLF into a `.cpp` and into `sigel_slave.mak` both caught and named, CRLF into a texture correctly ignored, and all seven branch states driven by hand — including a **tree-wide** CRLF regression, which the first version of the floor misreported as *"it did not run"* with one failure instead of 611, and a below-floor count, which the first version printed as `0 pass` while adding up to 499 passes to the total. Both found by review 2026-09-09. The bucket reconciliation is a tautology as the loop is now written and is **not** counted as coverage; it is kept only so the earlier bare-`continue` shape cannot come back. **`SIGEL_ROOT` is the source tree**, so `stdConf.mt` and the 19 `.xpm` pixmaps the conversion touched are the very files the GUI gates load at runtime; the `gui behaviour` gate covers them. The `.xpm` are loaded by path and `#include`d nowhere, and a C string literal cannot span a raw newline, so no removed CR was ever inside a quoted pixel row. **No `.gitattributes` exists and none was added.** `* text=auto eol=lf` would make git enforce this rather than only detect it; not done, because it changes what every future checkout writes and that is a separate decision. On a clone with `core.autocrlf=true` the working tree comes back CRLF and this gate goes red tree-wide — which is the gate working |
+| **D32** *(signed off 2026-09-09)* | `SIG_Experiment::gpManager` renamed to `guiGPManager` | **A deliberate divergence from the 1.3 name, and the only one of its kind so far.** Four members across the tracked tree were called `gpManager`; three hold an `MT_GPManager *` inside the meta modules, where the name is right. The fourth, `SIG_Experiment.h:99`, holds a `SIG_GUIGPManager *` — and it was the **only** `SIG_`-typed member in that class not named after its own type with the `SIG_` prefix stripped. The other nine follow the rule exactly (`gpExperiment`, `gpParameter`, `simulationParameter`, `environmentView`, `robotView`, `experimentView`, `allIndividualsView`, `languageParameters`, `experimentItem`); the class's remaining members are named by role (`widgetDict`, `menuGPParameter`, …) and were never in scope. So this is the class's own rule applied to the one member that broke it, not a new scheme. **20 sites**: 13 in `SIG_Experiment.{h,cpp}`, 5 in this file, 2 in `guidrive.cpp`, both comments. The three `MT_GPManager` members and the `SIG_GPManager gpManager` local at `sigel.cpp:261` are correctly named and were left alone; the 1.0 tree holds the same member and is untracked, so a future sweep will re-find it there and should leave it. **VERIFIED AS `.text`-IDENTICAL, NOT AS BYTE-IDENTICAL OBJECTS** — a data member's name never reaches a mangled symbol, but `-g` is on and DWARF records member names, so the objects legitimately differ. `sigel.cpp` is the interesting one and was checked: it is the single translation unit where both names coexist, and its `.text` is unchanged |
+| **D31** *(signed off 2026-09-09)* | Line endings | **LF ONLY, tree-wide. No more DOS.** Jan's decision, and it overrides the guard that existed to prevent it. **100 files under `x/kdesigelSources.1.3` converted, 17,750 CRLF pairs.** **The conversion is line endings only except for two bytes, and `git diff --ignore-cr-at-eol` is NOT what proves it** — that flag strips a trailing CR from *both* sides, so it would equally hide a CRLF being *introduced*. The proof is a direct comparison of every one of the 100 files: `re.sub(rb"\r+\n", b"\n", git show HEAD:f) == working file`, exact, with no `\r` surviving anywhere. Zero anomalies. Zero anomalies. **Two lines of `sigel_slave.mak` are the one real content change**, and calling them line endings flatters them: `:598` and `:647` ended `\r\r\n`, so the byte removed is an INTERIOR one — under NMAKE that trailing CR is part of the variable's value. The `\r+` in the proof above is what swallows the case, so the proof cannot tell it from a line ending; it is called out here instead. Nothing else in the tree has a run of two. **Binaries are excluded and this is not cosmetic** — three tracked binaries hold 12 incidental `\r\n` byte pairs (`pvm3.4.6.tgz` 9, `altLogo.png` 2, `noExperiment.png` 1), and a blind repo-wide replace would corrupt all three. Extensions touched: 36 `.cpp`, 35 `.h`, 19 `.xpm`, 5 `.dsp`, 3 `.mak`, 1 `.mt`, 1 `.dsw`. **No `.exp` and no `.ui`**, so no reference artefact was touched. **Lone CRs are left alone, and NOT because they are Mac-classic line endings** — the first version of this row said that and it was wrong. Six tracked files hold lone CRs and git calls **all six** binary, so this gate never even reads them: `pvm3.4.6.tgz` 3859, `noExperiment.png` 691, `JustGreen.pnm` 2848, `altLogo.png` 208, `Hippie.pnm` 208, `Stone.pnm` 68. All five `.pnm` are **P6 raw raster**: those bytes are pixel values that happen to equal `0x0d`. They were never line endings. **The `encodings` gate was turned round in the same commit**, so that commit is not line endings alone — `check.sh`, `PORTING.md` and `future_refactorings.md` change with it. The gate used to say *a file that HAD a CR must still have one*, with `ENC_BASELINE=25`; it now says **no tracked text file may carry CRLF**, expected zero, reads every tracked file rather than five extensions present in the root commit, lists them with `-z` so a C-quoted path cannot break `open()`, and reconciles — every file lands in exactly one of ok / CRLF / binary / unreadable, or it aborts. **It asks `git ls-files --eol` what is binary rather than testing for a NUL byte**, because the NUL test got two files wrong: `Hippie.pnm` has no NUL in its 196,668 bytes and `UniDo_LSXI.pnm`'s first NUL is at offset 15,456, so both were judged as text and passed only by luck. **Read the `w/` column, not `i/`**: while this change was being made, `sigel_slave.mak`'s index blob read `i/-text` — HEAD still held its two `\r\r\n`, which git's own heuristic calls binary — against a working file of `w/lf`, and testing both columns dropped a real text file out of the check. **Both columns read `lf` once this is committed, so the demonstration is gone and only the rule survives.** Reads 610 text files and 8 binaries. **A floor of 500 was added**, because zero failures is also what a check that read nothing reports: a dead `git ls-files` gave `COUNTS 0 0 0 0 0 0`, two non-empty numbers, which the fail-closed branch did not catch. Teeth-tested: CRLF into a `.cpp` and into `sigel_slave.mak` both caught and named, CRLF into a texture correctly ignored, and all seven branch states driven by hand — including a **tree-wide** CRLF regression, which the first version of the floor misreported as *"it did not run"* with one failure instead of 611, and a below-floor count, which the first version printed as `0 pass` while adding up to 499 passes to the total. Both found by review 2026-09-09. The bucket reconciliation is a tautology as the loop is now written and is **not** counted as coverage; it is kept only so the earlier bare-`continue` shape cannot come back. **`SIGEL_ROOT` is the source tree**, so `stdConf.mt` and the 19 `.xpm` pixmaps the conversion touched are the very files the GUI gates load at runtime; the `gui behaviour` gate covers them. The `.xpm` are loaded by path and `#include`d nowhere, and a C string literal cannot span a raw newline, so no removed CR was ever inside a quoted pixel row. **No `.gitattributes` exists and none was added.** `* text=auto eol=lf` would make git enforce this rather than only detect it; not done, because it changes what every future checkout writes and that is a separate decision. On a clone with `core.autocrlf=true` the working tree comes back CRLF and this gate goes red tree-wide — which is the gate working |
 
 
 ---
@@ -569,12 +570,13 @@ through `f0f2daa`.
 
 ## 7. Steps
 
-**Exit criterion per step:** `./check.sh` at the repo root — **1137 pass, 0 fail,
-508 warnings** as of 2026-09-09, after D31.
+**Exit criterion per step:** `./check.sh` at the repo root — **1136 pass, 0 fail,
+508 warnings** as of 2026-09-09, after D31 and D32.
 **It was 853 until D31 and the jump is not new coverage of SIGEL's code.** The
 `encodings` gate used to read 404 files of five extensions and now reads all 619
-tracked files, 8 of which git calls binary: its pass count went 327 → 611, and
-853 + 284 = 1137 exactly. The warning count did not move, which is the half that
+tracked files, 8 of which git calls binary: its pass count went 327 → 610, and
+853 + 283 = 1136 exactly. *611 until portinglog.txt was deleted 2026-09-09; the
+gate reads every tracked file, so removing one moves the total by one.* The warning count did not move, which is the half that
 says the conversion changed no code.
 **It now needs `sigel_eval` built**, which `check.sh` does not build for you:
 the V5 section reads constants out of `build-fast/sigel_eval`, so run
@@ -956,7 +958,7 @@ succeeded.**
 **Gates any session must keep green**, all committed:
 
 ```
-./check.sh                                           1137 pass, 0 fail, exit 0
+./check.sh                                           1136 pass, 0 fail, exit 0
 ./dictorder-dump.sh | diff -u dictorder-baseline.txt -    empty
 ./fitness-check.sh  | diff -u fitness-baseline.txt -      empty
 ASAN_OPTIONS=detect_leaks=0 ./fitness-check.sh build      exit 0
@@ -971,6 +973,75 @@ here.
 
 Never edit a baseline to make a diff go away. If a change moves one, that is the
 finding.
+
+**THE TEN ROOT FILES NOTHING OBVIOUSLY NEEDS, AND WHY THEY STAY.** The root holds 25 tracked files; the other 15 explain themselves by name or are named in the build. Asked 2026-09-09,
+answered by measurement, and written down so it is not asked again. Line counts
+are `wc -l`; the consumer column is `grep` over `check.sh`, the `.sh` scripts and
+the `Makefile`.
+
+*Gate inputs. Deleting one fails loudly in every case, but only two say why:
+`check.sh:1562` and `:1407` name the missing file. The other four fail as a
+maximal diff — every line of the dump reported as an addition — which is loud and
+uninformative.*
+
+| file | lines | what it holds |
+|---|---|---|
+| `dictorder-baseline.txt` | 2740 | every container order that reaches the simulation, as `dictorder-dump.sh` prints it. Gate 2 is a diff against this |
+| `fitness-baseline.txt` | 42 | the 42 fitness values. Gate 3 is a diff against this |
+| `guibehaviour-baseline.txt` | 2490 | the `guidrive` scenarios under QTest |
+| `guidump-baseline.txt` | 122 | the widget dump |
+| `pagesave-baseline.txt` | 438 | **holds 1.3's OWN OUTPUT** — see below |
+| `xtest-baseline.txt` | 231 | what the port does under real X11 input — see below |
+
+**`pagesave-baseline.txt` is the one that cannot be made again here.** Its BASE
+block was captured from the 2003 i386 binary on 2026-09-03: load
+`twoBasesSimpleFitness2.exp`, visit no page, change nothing, save once — 192
+lines, sha256 `a327150c…`. Our writer reproduces it byte for byte, so a failure
+in that half is a regression against 1.3. **Regenerating it from our own build
+would turn the only cross-machine anchor for the widget-to-file path into a
+port-against-itself baseline**, which is precisely what it exists not to be.
+Only the oracle machine can produce it. `check.sh:1561` guards it and `:1562` prints *"this gate tested
+NOTHING"* if it is absent.
+
+**`xtest-baseline.txt` covers what QTest structurally cannot.** QTest's **widget** overload — the only one `guidrive` uses — builds a
+`QMouseEvent` and hands it to `QApplication::notify`, so it never passes through
+`QWindowSystemInterface` — window activation, a popup's pointer grab and Qt's
+synthesis of a double click from two presses are all invisible to it. This file
+is `guidrive` driven by `xdotool` XTEST inside a nested Xvfb. Reproducible here,
+unlike the one above, but it is the only reference for that class of behaviour.
+`check.sh:1406` guards it and `:1407` prints the same *"tested NOTHING"* warning.
+
+*Referenced by no script. These are evidence, not inputs, and each one is at risk
+of being deleted as a stale file precisely because no script points at it.*
+
+| file | lines | why it stays |
+|---|---|---|
+| `tiecheck.cpp` | 132 | re-derives the double-printing tie rates quoted in §0 and C5, so they can be checked rather than trusted. Deliberately not a gate, and exits 0 on purpose — differences are the expected result |
+| `regression_1.0_to_1.3.md` | 194 | the deferred 1.0 → 1.3 regression, and the oracle's diagnostics wishlist |
+| `future_refactorings.md` | — | the to-do list this file defers work into. No count: it moves every session |
+
+**`portinglog.txt` WAS DELETED 2026-09-09, and this paragraph is what it held.**
+It was the raw output of Qt 4.8's `qt3to4` from one run in the `tools/qtmig`
+container, over one file, `SIG_GPParameter.cpp`, captured 2026-08-27 — container
+paths, `/w/.q34tmp/…`. No script ever read it. It is recoverable from git at any commit up to and including `67caf61` if the raw text is ever wanted; the two things it evidenced are here so
+that it does not need to be:
+
+- **17 of its 19 entries pull in Qt3Support.** `QListViewItem` →
+  `Q3ListViewItem` nine times, `QListViewItemIterator` → `Q3ListViewItemIterator`
+  five, `QFileDialog` → `Q3FileDialog` twice, and one include-path rewrite,
+  `qfiledialog.h` → `q3filedialog.h`. The remaining two are not Qt3Support at all:
+  `WFlags` → `Qt::WFlags` is a namespace qualification, and one added
+  `#include <QPixmap>`. That is the measurement behind D25's rule that the tool's
+  output cannot be kept as it stands.
+- **It recorded no container substitution at all**, which is the evidence for
+  D19a. The file was **`SIGEL_MasterGUI/SIG_GPParameter.cpp`** — say the module,
+  because a second tracked file shares that basename and it is the wrong one — and
+  the copy fed to the tool was the pristine 1.3 source, not this repo's. It held
+  Qt 2 containers and the tool left every one alone. D19a carries the count.
+
+**What it was not:** one file, one run — a sample of the tool's behaviour, not a
+record of the conversion. It was never evidence about the tree, and the deletion
+costs no gate.
 
 **THE FOURTH LINE WAS ALSO THE BLINDEST, until 2026-09-07.** `fitness-check.sh`
 read each evaluation as
@@ -1438,7 +1509,7 @@ reverting it left every check green.*
 **D30 did not block the crash, and this is why.** `SIG_Experiment::slotStopEvolution`
 opened with `emit signalEvolutionNotRunning( true )` as its **first statement**,
 and it is a request to stop rather than a stop: it only sets
-`gpManager->userTerminated` at the end, `start()` has not returned, the
+`guiGPManager->userTerminated` at the end, `start()` has not returned, the
 `RunScope` is still alive and `anyEvolutionRunning()` is still true. So one click
 on `Stop` re-enabled all 29 locked actions **while the run continued** — for as
 long as the manager takes to notice the flag, which is a whole generation, 58 to
@@ -1475,7 +1546,7 @@ for: keep the greying, add the refusal.* `MT_Controller`'s own refusal is still
 deferred — `future_refactorings.md`.
 
 **NOT GATED: the `Stop` fix.** `runlock` fakes a run with its own `RunScope` and
-never calls `slotStopEvolution`, which dereferences `gpManager` and would need a
+never calls `slotStopEvolution`, which dereferences `guiGPManager` and would need a
 real run. The fix is verified against source and by the review that found it, not
 by a gate. Said plainly here because the rest of D30 *is* gated and the
 difference matters.
@@ -3879,7 +3950,7 @@ out, and the nine `enabled=false` widgets all re-enabled in code.
 - **Any harness must link `$(MASTER_OBJ)`**, or the Clean `SIG_GPExperiment`
   leaves `mtController` uninitialised and produces a convincing false crash.
 - **`slotStartEvolution` BLOCKS, so a sampling loop written after the click sees
-  only the finished state.** `gpManager->start()` runs the whole evolution
+  only the finished state.** `guiGPManager->start()` runs the whole evolution
   inline, and the GUI survives only because `SIG_GUIGPManager::haveABreak()`
   calls `qApp->processEvents()`. Anything that must observe a RUNNING evolution
   has to be armed BEFORE the click — the `evolution` scenario uses a `QTimer`,
@@ -5706,7 +5777,7 @@ took to implement, and each wrong version passed its own gate.
 
 **Where the guard is.** A **count** of running evolutions, incremented by
 `SIG_Experiment::RunScope`, which `slotStartEvolution` enters around
-`gpManager->start()`. Five things ask it:
+`guiGPManager->start()`. Five things ask it:
 
 | guarded | why it needs its own guard |
 |---|---|
@@ -5767,7 +5838,7 @@ at start — `SIG_Experiment` emits `signalEvolutionNotRunning( false )` and bot
 construction sites relay it — so the defect was never "they are not disabled".
 
 **Ordering is load-bearing.** `slotStartEvolution` calls
-`putAllIntoExperiment()` **before** `gpManager->start()`, so the settings a user
+`putAllIntoExperiment()` **before** `guiGPManager->start()`, so the settings a user
 chose are committed at start and only later writes are refused.
 
 **Coverage.** The `runlock` scenario executes the guard in its locked state,

@@ -248,9 +248,27 @@ created. Counts measured 2026-08-30 by grep over the extracted 1.3 tree.
   `Konstruktion/Destruktion`, all five `MT_GUI` pairs plus `MT_Tournament.cpp`).
   Nothing to verify — nothing executes.
 
-- [ ] **11. Strings** — 11 lines in 4 files
-  `MT_GPManager.cpp:277,332,333,341`, `SIG_GPIndividual.cpp:384,385`,
-  `SIG_GPManager.cpp:627,1053`, `SIG_GPOperations.cpp:697`.
+- [ ] **11. Strings** — **9** lines in 4 files
+  `MT_GPSystem/MT_GPManager.cpp:277,332,333,341` ("beste Fitness vor
+  Berechnung", "Sigel Fitness/Sieger", "Meta Vorhersage", "durch.Fitness"),
+  `SIG_GPIndividual.cpp:384,385` ("Fitness (Elter 1)" / "(Elter 2)"),
+  `SIGEL_GP/SIG_GPManager.cpp:687,1116` ("SIG_GPManager::run() wurde mehr als
+  einmal aufgerufen!", the same string twice),
+  `SIG_GPOperations.cpp:697` ("reproduction: Konnte kein neues Individuum
+  erzeugen").
+
+  *Corrected 2026-09-09. This said **11** lines and cited
+  `SIG_GPManager.cpp:627,1053`. Both were wrong: the count is 9 in the working
+  tree **and 9 in the pristine 1.3 tarball**, so 11 never matched anything; and
+  those two line numbers point at unrelated code, while the strings they mean
+  are at `:687` and `:1116`. Jan read `SIG_GPManager` on 2026-09-09, found the
+  German, and reasonably concluded it was untracked — the entry covered it, but
+  its citations pointed away from it.*
+
+  **Why Phase 0 could not have caught these.** Phase 0 swept for bytes above
+  127. Every string here is pure ASCII — German without umlauts is invisible to
+  an encoding sweep. Any future check for German has to look for words, not
+  bytes.
 
   **No compiler and no gate checks this phase.** All three persisted paths were
   checked and all three are safe:
@@ -714,6 +732,49 @@ lost its teeth for two days without anyone noticing.
 
 ---
 
+## SIGEL needs a real logging system
+
+**RESTORED 2026-09-09, and the restoration is the point.** This item was opened
+on 2026-08-20 at the review of A1–A6, written into PORTING.md by `1734ab3`
+("note the logging debt"), and **removed the same day** by `2e23cc3` ("fix the
+regressions and shim defects found by review") — a doc restructure, not a
+decision. It was gone for twenty days before Jan noticed it missing. Nothing else
+in either document mentions logging.
+
+**The defect it records.** Qt 2's `QTextStream` wrote straight through to
+unbuffered `stderr` on every `<<`. Qt 6 buffers and flushes only on `flush()`,
+`Qt::endl`, overflow, or destruction. **A trailing `"\n"` does not flush.**
+`SIGEL_Tools::SIG_IO` still declares `cin`, `cout` and `cerr` as plain
+`QTextStream` (`SIG_IO.h:49-59`), so every diagnostic in the program inherits
+that behaviour.
+
+**Re-counted 2026-09-09, over `.cpp` and `.h` under the source root:**
+
+| | 2026-08-20 | 2026-09-09 |
+|---|---|---|
+| `SIG_IO::cerr` / `cout` mentions | 509 | **475** |
+| lines that flush (`Qt::endl` or `flush`) | 9 | **35** |
+| lines ending in a bare `"\n"` | not counted then | **232** |
+
+So the port has flushed 26 more sites than it had, and **232 statements still end
+in a newline that does not flush**. Those sit in a buffer and are lost if the
+process dies — including on the SIGSEGV path, which is exactly when they are
+wanted.
+
+**What is required, after the Qt migration.** A proper logging system: levels,
+one place that decides where output goes and when it is flushed, and something
+the GUI can display. It replaces both `SIG_IO` and the console-warning stopgap.
+
+**Do NOT fix this by adding `Qt::endl` to 232 call sites.** That was the original
+entry's closing instruction and it still holds. It would bury the real change
+under a mechanical diff and leave the design untouched.
+
+**WHERE TO START — Jan, 2026-09-09.** The code base uses
+`SIGEL_Tools::SIG_IO::cerr` extensively. That is the hook: start there, and
+assess the pattern from it when the time comes.
+
+---
+
 ## Remove the Windows and Visual Studio support
 
 **Decided 2026-09-09 by Jan.** The Windows half of this tree is dead. It does
@@ -757,7 +818,7 @@ it cannot be trusted, but it is read by anybody working on the file.
 thread entry point is declared twice as well at `:34` and `:36`.
 
 **THIS ITEM SUPERSEDES D22, WHICH IS A SIGNED DECISION — say so when doing it.**
-D22 (`PORTING.md:510`) chose what the two style branches do: Fusion for the
+D22 in PORTING.md's decision table chose what the two style branches do: Fusion for the
 `#else`, and **the `#ifdef _WINDOWS` branch keeps Windows**, by name, because
 Qt 6 still creates that style. There are three such call sites —
 `sigel.cpp:212`, `sigel_slave.cpp:277` and `:344` — and they are live, ported
@@ -766,8 +827,8 @@ the right outcome once Windows is gone, but it is a decision being overturned
 and not a mechanical edit.
 
 **IT ALSO OVERTURNS THREE "PERMANENT" STATEMENTS about the `WIN_*` files.**
-`PORTING.md:588` calls them *"an explicit exclusion rather than a standing"*
-gap; `PORTING.md:2053` says *"one remains and always will"*; `check.sh:2389`
+PORTING.md's Phase C exclusions call them *"an explicit exclusion rather than a standing"*
+gap; PORTING.md's C7/C8 row says *"one remains and always will"*; `check.sh:2389`
 prints *"Windows-only WIN_* file(s) excluded -- permanent, §7"*. All three must
 be edited in the same move. **And the counter behind that line goes with them:**
 `check.sh:95` initialises `winskip`, `:174` and `:219` increment it on a `WIN_*`
@@ -799,8 +860,8 @@ SIGEL_Visualisation/SIG_Renderer.h
 
 **IT ALSO MOVES A PINNED GATE TOTAL.** The 9 project files and the 2 `WIN_`
 sources are 11 of the 611 files the `encodings` gate counts, so deleting them
-takes `./check.sh` from 1137 pass to 1126. `PORTING.md:572` and `:959` both pin
-1137. Move them in the same commit, or the next session reads a green tree as a
+takes `./check.sh` from 1136 pass to 1125. PORTING.md pins that number twice — the per-step exit criterion in §7, and the
+gate list — both say. Move them in the same commit, or the next session reads a green tree as a
 regression. This is the same class of coupling the rest of this entry lists.
 
 **When to do it:** after the MetaGP guard step and its review. Not before.

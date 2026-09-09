@@ -3630,7 +3630,7 @@ static int guidriveMain(int argc, char **argv)
     //
     // A real evolution is not needed to test the contract. SIG_Experiment
     // exposes RunScope, which is exactly what slotStartEvolution enters around
-    // gpManager->start(); entering one here puts the application in the state
+    // guiGPManager->start(); entering one here puts the application in the state
     // the lock exists for, deterministically and in about a second.
     //
     // The observable is the page round trip: type into a page, switch away --
@@ -5304,7 +5304,7 @@ static int guidriveMain(int argc, char **argv)
         SIG_Experiment *exp = lv->currentlySelectedExperiment();
         QSignalSpy *evo = exp ? new QSignalSpy(exp, SIGNAL(signalEvolutionNotRunning(bool)))
                               : nullptr;
-        // slotStartEvolution() BLOCKS. It calls gpManager->start(), which runs
+        // slotStartEvolution() BLOCKS. It calls guiGPManager->start(), which runs
         // the whole evolution inline and returns only when it has stopped
         // (SIG_Experiment.cpp:282, with slotEvolutionStopped() on the next
         // line). The loop stays responsive only because
