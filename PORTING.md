@@ -59,96 +59,90 @@ Three jobs, in order, no overlap:
    validating robot models at load. Recorded in `regression_1.0_to_1.3.md`.
    Not part of either job above.
 
-**STILL NEEDS A DECISION — and a 2026-09-07 attempt to close it was WRONG and is
-withdrawn.** Whether to route every real number through `snprintf` to match 1.3's
-tie rounding. **§7's C5 already measured this and left it open**; the withdrawn
-attempt did not reconcile with it, which is the whole of what went wrong.
+**THE ROUNDING QUESTION — IMPACT MEASURED AT ZERO 2026-09-09. The decision is
+still Jan's**, per the 2026-09-07 parking note; he reviews the options in code.
+Nothing is recorded here as decided. What follows is measurement.
 
-**WHAT 1.3 DOES.** Its `QTextStream` does not format doubles at all — it builds a
-format string and calls `sprintf` (`qtextstream.cpp:1776-1805`, vendored source;
-the oracle independently disassembled `__ls__11QTextStreamd` in
-`libqt-mt.so.2.3.1` and found the same). So every rounding decision is glibc's,
-and the comparison runs locally as **Qt 6 against `%.*g`** — no Qt 2 build needed.
-*That part of the 2026-09-07 work stands.*
+The question: whether to route every real number through a C-style formatter to
+match 1.3's tie rounding.
 
-**AND SIGEL DOES NOT WRITE AT ONE PRECISION.** This is what the withdrawn attempt
-missed:
+**WHAT 1.3 DOES.** Its `QTextStream` does not format doubles — it builds a format
+string and calls `sprintf` (`qtextstream.cpp:1776-1805`, vendored; the oracle
+disassembled `__ls__11QTextStreamd` in `libqt-mt.so.2.3.1` and found the same).
+So every rounding decision is glibc's. Qt 6 formats doubles itself, through
+`libdouble-conversion`, and rounds a tie **away from zero** where glibc rounds
+**to even**.
+
+**SIGEL WRITES AT THREE PRECISIONS, and that is what decides the impact.**
 
 | set to | where | what it writes |
 |---|---|---|
-| **5** | `SIG_Renderer.cpp:114` | **every POV `<x, y, z>`** — translate, rgb, every vertex |
+| **5** | `SIG_Renderer.cpp:114` | every POV `<x, y, z>` |
 | **6** (default) | — | `.exp`, `.rrb`, and the POV rotation matrix |
-| **50** | `SIG_GPPVMData.cpp:116, :157` | the master↔slave transfer: parameters, environment, program, whole robot |
+| **50** | `SIG_GPPVMData.cpp:116, :157` | the master↔slave PVM transfer |
 
-Both non-default calls are in the 1.3 original, so the port carried them
-faithfully. A single POV file therefore mixes precision 5 and 6.
+Both non-default calls are 1.3's own, so the port carried them faithfully.
 
-**MEASURED, `tiecheck.cpp` at the repo root:**
+**Tie rates, `tiecheck.cpp` at the repo root.** Ties live at precision 5:
 
 | sample | prec 5 | prec 6 | prec 50 |
 |---|---|---|---|
 | multiples of 1/16 over [0,100] | **22.49%** | 0% | 0% |
 | multiples of 1/64 over [0,100] | 6.97% | **13.50%** | 0% |
-| multiples of 1/256 over [0,10] | 3.48% | 6.99% | 0% |
 | ordinary doubles in [-1000,1000] | 0% | 0% | **0.21%** |
-| uniform bit patterns | 0% | 0% | 0.04% |
 
-**Qt 6 rounds a tie away from zero; glibc rounds to even.** `0.703125` →
-`0.70313` against `0.70312` at precision 5 — **and it is in a shipped file**,
-`twoBasesHighMutationRate.exp:112290`.
+**IMPACT PER WRITER. NOTHING OBSERVABLE DIFFERS.**
 
-*Counted here rather than taken on trust.* The 14 shipped `data/Experiments/*.exp`
-hold **165,549** numeric tokens and **5** distinct exact dyadic fractions among
-them, 198 occurrences: `0.5` (103), `-0.5` (80), `1.5` (12), `-0.75` (2),
-`0.703125` (1). **Only the last is long enough to need rounding**, so it is the
-only one that differs — the others print verbatim at every precision. *The review
-that found this reported "530 dyadic fractions, three occurrences of 0.703125";
-both figures are wrong at this scope. The finding stands, the numbers are these.*
-So the class reaches shipped data, but by exactly one value.
+| output | impact |
+|---|---|
+| shipped `.exp` and `.rrb` | **none** — precision 6, see below |
+| POV | a sub-pixel shift in a rendered image. **Nothing reads a `.pov` back**, zero readers in the tree; it is input to an external renderer |
+| PVM transfer | ours at both ends within one run. Only matters against a 1.3 slave, which nobody runs |
+| the graveyard `.ind` file name, `SIG_GPTournament.cpp:74` | **never written.** `LIVEUNDEAD` is 0 in all 14 shipped experiments, and nothing lists or parses the graveyard — it has a writer and no reader |
+| `-0` (Qt 6 `0`, glibc `-0`, differs at every precision) | absent from all shipped data, and the port writes none |
 
-**`-0` differs at every precision** (Qt 6 `0`, glibc `-0`), so it is not closed
-either — see the correction below.
+**THE SHIPPED-DATA CLAIM WAS WRONG AND IS WITHDRAWN.** This section used to say
+the difference "is in a shipped file, `twoBasesHighMutationRate.exp:112290`". The
+**value** is there; the **difference** is not. `0.703125` has exactly six
+significant digits, so at precision 6 it prints verbatim. The `0.70312` /
+`0.70313` split exists **only at precision 5**, and no `.exp` is written at
+precision 5. Measured by round-tripping that file through the port: generation
+114 comes back unchanged and the whole experiment-history section is
+byte-identical. All five shipped dyadic values print verbatim at precision 6 —
+`0.5` (103 occurrences), `-0.5` (80), `1.5` (12), `-0.75` (2), `0.703125` (1),
+out of 165,549 numeric tokens.
 
-#### What the withdrawn attempt got wrong, in full
+**THERE IS NO Qt 6 CONFIGURATION OPTION.** Measured on Qt 6.10.2 across ten
+formatting paths: `QTextStream <<`, the same under `setLocale` at `c()`, `C`,
+`en_US`, `de_DE` and `OmitGroupSeparator`, plus `QLocale::toString`,
+`QString::number`, `QString::asprintf` and `QString::arg`. All ten agree with
+each other and disagree with glibc. **`QString::asprintf` runs Qt's own engine,
+not the C library**, so swapping to it changes nothing. `setLocale` is worse than
+useless: `en_US` inserts a group separator that plain `QTextStream` never writes.
+No `QT_*` environment variable and no exposed feature flag reaches it.
 
-It concluded "identical except exact dyadic halves and negative zero, and the
-simulation produces neither". Four independent errors, all found by review:
+**WHAT A FIX WOULD COST, if it is ever wanted.** **99 lines in 30 files** stream
+a double — counted by injecting a deleted `operator<<(QTextStream&, double)` and
+compiling all 185 sources, not by grep. Four more sites write a double outside a
+stream. **Do not subclass `QTextStream`:** it is `final` since Qt 6.9 under
+`QT_DISABLE_DEPRECATED_UP_TO`, inheritance goes in Qt 7, and the obvious form is
+silently broken — every base `operator<<` returns `QTextStream&`, so
+`file << "TAG " << value` takes the base overload. That route needs 357
+declaration changes across 118 files against 99 line changes. **Use
+`std::to_chars`, not `snprintf`:** measured byte-identical to glibc over ~8.6
+million values at precisions 5, 6, 15, 17 and 50 in all three notations, and
+locale-independent by design. `snprintf` follows `LC_NUMERIC` (`0,5` under
+`en_DK.utf8`), `snprintf_l` does not exist on glibc, and `strfromd` is **not**
+locale-safe there despite its reputation.
 
-1. **It measured only the default precision 6.** Two of the three writers use 5
-   and 50. At 5, nearly a quarter of sixteenths differ.
-2. **Its load-bearing step was vacuous.** "Only a dyadic rational can be an exact
-   decimal tie" — **every finite double is a dyadic rational**, so that excludes
-   nothing. The real condition is that the exact decimal expansion runs one digit
-   past the print precision and ends in 5. Rare at 6, common at 5, and at 50
-   ordinary doubles hit it because every double's expansion terminates.
-3. **Its confirming evidence was circular.** "All 9,547 tokens of a real POV
-   sample reproduced by `sprintf("%.6g", v)`" — a token written at `%.6g` has at
-   most 6 significant digits, so parsing and reformatting it is the **identity**.
-   Qt 6's own output passes the same test. It could not have failed. *This is the
-   blindness C5 already named, repeated.*
-4. **The `-0` structural argument named the wrong mechanism.** It said computed
-   values print in exponential form and so never underflow to a bare `0`. `-0.0`
-   is not an underflow; `%g` prints it `-0` at any precision. The actual reason no
-   `-0` appears in the POV sample is that `sigelToPovray()`
-   (`SIG_TypeConverter.cpp:160-169`) goes through a matrix **product**, and
-   `(-0) + (+0) = +0` wipes the sign — plus the grid coordinates at
-   `SIG_EnvironmentRenderer.cpp:231-235, :305-340` are `int`. Right conclusion for
-   that stream, wrong reason, and it says nothing about the other three.
-
-*It also counted a fourth stream as covered when it had never been examined —
-the PVM transfer at precision 50 — and quoted two different token counts, 9,795
-and 9,547, for the same sample.*
-
-**POSTPONED 2026-09-07.** Jan wants to review the options in code himself, after
-everything else on the list is done, reviewed and tested. No decision is to be
-recorded or acted on before then.
-
-**WHAT WOULD ACTUALLY CLOSE IT.** Not a byte diff of a POV frame against the
-oracle: its files are i386/x87 and ours aarch64, so the same matrix element is a
-different computation and the arithmetic difference swamps the formatting one.
-What is needed is a decision, not a measurement — the measurement is above.
-**The PVM stream does not need to match 1.3** (it is ours at both ends, within one
-run), which leaves the `.exp`, `.rrb` and POV writers, and C5's list of the same.
+**TWO ATTEMPTS ON THIS WERE WITHDRAWN, and both failed the same way — a test that
+could not fail.** The 2026-09-07 attempt argued from "only a dyadic rational can
+be an exact decimal tie", which excludes nothing because every finite double is
+one, and confirmed itself by reformatting `%.6g` output with `%.6g`, which is the
+identity. The 2026-09-09 assessment then priced a 99-line rewrite before tracing
+one difference to an observable consequence, and repeated this section's own
+shipped-file error back as evidence. **Ask what breaks if nothing changes,
+before costing a fix.**
 
 **Order of work, revised 2026-08-27.** Reordered around the goal above: the
 interface is the work, so it goes first, and PVM follows because without it the
@@ -4819,10 +4813,12 @@ are exactly what geometry is made of.
 
 **What is still established:** 0 differences over the shipped corpus, so nothing
 we *read back* moves. **What is not:** any file this port *writes* whose values
-are exact binary fractions. That covers the V2 save path, `.pol` pool images and
-the POV-Ray export. Not fixed here — `QTextStream` has no tie-breaking control,
-so matching 1.3 would mean routing every real number through `snprintf("%.*lg")`,
-which is a change to every writer and needs deciding, not assuming.
+are exact binary fractions AND are written at a precision that cuts them. Only
+the POV-Ray export does that, at precision 5. The `.exp`, `.rrb` and `.pol`
+writers use precision 6, where no shipped value is long enough to round.
+`QTextStream` has no tie-breaking control, so matching 1.3 would mean routing
+every real number through a C-style formatter. **§0 now measures what that would
+buy: nothing observable.** Read that before re-opening this.
 
 **EXTENDED 2026-09-07, and this section was right all along.** An attempt to
 close the question in §0 was withdrawn for not reconciling with this table. Two
@@ -4830,12 +4826,17 @@ things are now known that sharpen it. **The writers do not all use precision 6**
 `SIG_Renderer.cpp:114` sets **5** for every POV `<x, y, z>` and
 `SIG_GPPVMData.cpp:116, :157` set **50** for the master↔slave transfer — so this
 table's precision-6 column is the *least* affected case. At 5, **22.49%** of
-multiples of 1/16 differ against 0% at 6. And **`0.703125` is in a shipped
-file** — once, `twoBasesHighMutationRate.exp:112290` — differing at precision 5,
-so the class reaches real data and not only synthetic grids. It is the only one
-of the 5 distinct exact dyadic fractions in that corpus long enough to be
-rounded at all. `tiecheck.cpp` at the
-repo root is the measurement.
+multiples of 1/16 differ against 0% at 6. `tiecheck.cpp` at the repo root is the
+measurement.
+
+**CORRECTED 2026-09-09.** This paragraph used to add that `0.703125` "is in a
+shipped file — once, `twoBasesHighMutationRate.exp:112290` — differing at
+precision 5, so the class reaches real data". **The value is in that file; the
+difference is not.** Nothing writes an `.exp` at precision 5, and at precision 6
+that value has exactly six significant digits and prints verbatim. Measured by
+round-tripping the file: the experiment-history section comes back
+byte-identical. The class reaches synthetic grids and the POV export, and no
+shipped data.
 *Found by the C5 review. The audit was correct and its sampling method could not
 see the failure — §9's "test with a representative value, not an extreme", in
 the other direction.* *`-0` remains the one
