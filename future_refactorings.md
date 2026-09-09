@@ -707,3 +707,96 @@ adding `-e` first and fixing the fallout after — is how the form-minimums gate
 lost its teeth for two days without anyone noticing.
 
 *Found by review 2026-09-07, while auditing check.sh for the same defect class.*
+
+---
+
+## Remove the Windows and Visual Studio support
+
+**Decided 2026-09-09 by Jan.** The Windows half of this tree is dead. It does
+not build here, nothing tests it, and it has not been built by anybody since
+2003. It is to go. Recorded as a work item, not started.
+
+**WHAT IS THERE — counted 2026-09-09, over every `.c`, `.cpp` and `.h` under
+`x/kdesigelSources.1.3`:**
+
+- **9 Visual Studio project files**, all at the source root: 5 `.dsp`
+  (`Sigel`, `SIGELCommon`, `MetaSIGEL`, `sigel_slave`, `manage_dyn_slave`),
+  1 `.dsw` (`Sigel.dsw`) and 3 `.mak` (`Sigel.mak`, `sigel_slave.mak`,
+  `manage_dyn_slave.mak`). Together 7,962 lines. They name Qt 2 paths, MSVC 6
+  switches and a `uic` that is not the one this port runs. **Four of them are
+  already named at `future_refactorings.md:292`, under *Translate the German*:** *"Do not
+  translate ... MSVC-generated German, not built by this port. Delete them or
+  leave them."* This item decides it — they go.
+- **2 `WIN_`-prefixed sources** — `WIN_SIG_GPRemoteZORCFitnessFunction.h` and
+  `.cpp`, 451 lines. The `.cpp` is already excluded from the build by name
+  (`Makefile:315`, `EXCLUDE_SIGEL_GP`), so it compiles nowhere.
+- **206 `_WINDOWS` occurrences across 57 source files**: 195 `#ifdef _WINDOWS`,
+  9 `#ifndef _WINDOWS`, and 2 inside commented-out code
+  (`MT_GPManager.cpp:469` and `:594`).
+- **4 `#include <windows.h>`** — `MT_Controller.h:16`, `MT_Substitute.h:21`,
+  `MT_GPSystem/MT_GPManager.h:22`, `MT_GPSystem/MT_GPManager.cpp:12`.
+- The Windows branches carry their own thread and mutex types — `HANDLE`,
+  `DWORD WINAPI`, `LPVOID` — against `pthread_t` and `pthread_mutex_t` on the
+  side that is built.
+
+**`src/manage_dyn_slave.c` IS IN THIS LIST and is easy to miss.** It is the only
+`.c` file in the tree, it holds 9 of the 206 occurrences, and a sweep written as
+`--include=*.cpp --include=*.h` does not see it. The first version of this entry
+made exactly that mistake and reported 197 across 56 files; found by review
+2026-09-09. It has a `.dsp` and a `.mak` of its own in the list above.
+
+**WHY IT IS WORTH DOING, beyond tidiness.** Every `#ifdef _WINDOWS` is a second
+version of a function that no compiler here ever reads. It cannot be tested and
+it cannot be trusted, but it is read by anybody working on the file.
+`MT_Controller.h` is the clearest case: the meta thread is declared twice, at
+`:73` as `HANDLE meta_thread` and at `:75` as `pthread_t meta_thread`, and the
+thread entry point is declared twice as well at `:34` and `:36`.
+
+**THIS ITEM SUPERSEDES D22, WHICH IS A SIGNED DECISION — say so when doing it.**
+D22 (`PORTING.md:510`) chose what the two style branches do: Fusion for the
+`#else`, and **the `#ifdef _WINDOWS` branch keeps Windows**, by name, because
+Qt 6 still creates that style. There are three such call sites —
+`sigel.cpp:212`, `sigel_slave.cpp:277` and `:344` — and they are live, ported
+Qt 6 code, not 2003 leftovers. Keeping the `#else` half deletes them, which is
+the right outcome once Windows is gone, but it is a decision being overturned
+and not a mechanical edit.
+
+**IT ALSO OVERTURNS THREE "PERMANENT" STATEMENTS about the `WIN_*` files.**
+`PORTING.md:588` calls them *"an explicit exclusion rather than a standing"*
+gap; `PORTING.md:2053` says *"one remains and always will"*; `check.sh:2389`
+prints *"Windows-only WIN_* file(s) excluded -- permanent, §7"*. All three must
+be edited in the same move. **And the counter behind that line goes with them:**
+`check.sh:95` initialises `winskip`, `:174` and `:219` increment it on a `WIN_*`
+basename, and `:2364` only prints when it is non-zero — delete the files and the
+line disappears, which will look like a lost check unless it is done knowingly.
+
+**HOW TO DO IT — the shape, not a plan.** Delete the 9 project files and the 2
+`WIN_` sources first; nothing includes them, and `Makefile:315` and the four
+`winskip` sites go with them. Then take the `#ifdef _WINDOWS` blocks one module
+at a time, keeping the `#else` half and deleting the conditional. That half is
+the one the build already uses, so each edit is checkable: the object file must
+not change. Do not mix it with any other change.
+
+**WHAT TO WATCH.** The 9 `#ifndef _WINDOWS` blocks are the reverse polarity —
+their body is KEPT and only the guard goes. Reading them as `#ifdef` and
+deleting the body would remove live code. **And 12 headers carry `_WINDOWS`, not
+the three an earlier version of this entry listed** — a mistake there changes
+what every including translation unit sees:
+
+```
+MT_Control/MT_Controller.h              SIGEL_Simulation/SIG_Recorder.h
+MT_Control/MT_Substitute.h              SIGEL_Simulation/SIG_Register.h
+MT_GPSystem/MT_GPManager.h              SIGEL_Simulation/SIG_SimulationQueries.h
+SIGEL_GP/SIG_GPManager.h                SIGEL_Visualisation/SIG_EnvironmentRenderer.h
+SIGEL_Program/SIG_Program.h             SIGEL_Visualisation/SIG_EnvironmentVisualisation.h
+SIGEL_Simulation/SIG_DynaMechsSimulationQueries.h
+SIGEL_Visualisation/SIG_Renderer.h
+```
+
+**IT ALSO MOVES A PINNED GATE TOTAL.** The 9 project files and the 2 `WIN_`
+sources are 11 of the 611 files the `encodings` gate counts, so deleting them
+takes `./check.sh` from 1137 pass to 1126. `PORTING.md:572` and `:959` both pin
+1137. Move them in the same commit, or the next session reads a green tree as a
+regression. This is the same class of coupling the rest of this entry lists.
+
+**When to do it:** after the MetaGP guard step and its review. Not before.

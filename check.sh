@@ -256,59 +256,142 @@ printf '%-22s %2d dead (baseline %d -- §2 has the per-signal table)\n' \
 # ---------------------------------------------------------------------------
 # Encoding and line-ending fidelity.
 #
-# 46 files in this tree are Latin-1 and many are CRLF or MIXED CRLF/LF. Both
-# survive every other check here -- a file whose CRLF has been stripped compiles
-# identically and passes all four behaviour gates -- and both are destroyed by
-# the ordinary way of editing a file from a script: Python text mode reads with
-# universal newlines and writes back LF. That happened during C6 and silently
-# rewrote 26 files, turning a 436-line conversion into a 3,227-line diff.
+# THE LINE-ENDING RULE CHANGED ON 2026-09-09, BY DECISION: the tree is LF only.
+# Every file under x/kdesigelSources.1.3 was converted -- 100 files, 17,750
+# CRLF pairs -- and this half of the check was turned round to match. It used to
+# say "a file that HAD a CR must still have one", with a baseline of 25 for the
+# files 762c87f had already stripped. It now says NO TRACKED TEXT FILE MAY
+# CARRY CRLF, expected count zero, and it fails the moment one comes back
+# through a Windows editor, an unpacked archive or a patch.
+#
+# Turning it round widened it as well. The old form could only judge files that
+# existed in the root commit and had one of five extensions, so a NEW file
+# arriving with CRLF was invisible to it. The rule below reads every tracked
+# file instead.
+#
+# WHAT IS BINARY IS GIT'S ANSWER, NOT A HOME-MADE ONE. \r\n inside a PNG or a
+# tarball is pixel data, not a line ending -- three tracked binaries hold 12
+# such pairs between them -- so binaries must be skipped. The first version of
+# this check tested for a NUL byte in the first 8 KB and GOT TWO FILES WRONG:
+# textures/Hippie.pnm has no NUL anywhere in its 196,668 bytes, and
+# textures/UniDo_LSXI.pnm has its first NUL at offset 15,456. Both are P6 raw
+# raster and both were judged as text. They passed only because neither happens
+# to contain a 0d 0a pair; a re-rendered texture that did would have failed this
+# gate, and the obvious way to make it green again corrupts the image.
+# `git ls-files --eol' gets all five .pnm right, because git falls back to a
+# printable-byte ratio when there is no NUL. Ask git. Found by review 2026-09-09.
+#
+# Lone CRs are left alone, and NOT because they are Mac-classic line endings --
+# an earlier version of this comment said that and it was wrong. Six tracked
+# files hold lone CRs and git calls ALL SIX binary: pvm3.4.6.tgz 3859,
+# noExperiment.png 691, JustGreen.pnm 2848, altLogo.png 208, Hippie.pnm 208,
+# Stone.pnm 68. Those bytes are pixel values and archive data that happen to
+# equal 0x0d. They were never line endings, and nothing here treats them as any
+# -- the binary skip below means this gate never even reads them.
+#
+# THE NON-ASCII HALF IS UNCHANGED, in value AND in scope: it still runs over the
+# five extensions that carried the German comments, judged against the root
+# commit, and the binary skip above is deliberately NOT upstream of it. A file
+# that had bytes above 127 and now has none is COUNTED and reported, never
+# failed. That is Phase 0 turning the German comments into English.
 #
 # Written in Python rather than shell: this is byte counting against git, and
 # the first, shell version skipped files silently while reporting a clean pass.
-#
-# The invariant is deliberately weak so legitimately added lines do not trip it:
-# a file that HAD a CR must still have one, and a file that had non-ASCII bytes
-# must still have them. Wholesale conversion is what it catches.
 enc_out=$(cd "$ROOT" && python3 - <<'ENCPY'
 import subprocess
-base = subprocess.run(["git","rev-list","--max-parents=0","HEAD"],
-                      capture_output=True, text=True).stdout.split()[0]
-files = subprocess.run(["git","ls-files"], capture_output=True, text=True).stdout.split(chr(10))
-ok = bad = skip = translated = 0
+def git(*a):
+    r = subprocess.run(["git"] + list(a), capture_output=True)
+    if r.returncode != 0:
+        raise SystemExit("git %s failed" % " ".join(a))
+    return r.stdout
+base = git("rev-list","--max-parents=0","HEAD").decode().split()[0]
+# -z, NOT the default. Without it git C-quotes any path holding a space, a
+# tab, a quote or a byte above 127 -- "l\303\244tin.txt" -- and open() then
+# fails on the literal quoted string, so four readable files were reported as
+# unreadable and the whole gate went red. No such path exists in this tree
+# today; -z means one never can. Found by review 2026-09-09.
+files = [f for f in git("ls-files","-z").decode("utf-8","surrogateescape").split(chr(0)) if f]
+# THE w/ COLUMN, NOT THE i/ COLUMN. `ls-files --eol' prints both: i/ is the
+# blob in the index, w/ is the file on disk, and this check reads the file on
+# disk. Testing both together got sigel_slave.mak wrong: while D31 was being
+# made, its index blob read i/-text -- the version still in HEAD held two
+# \r\r\n, which git's own heuristic calls binary -- against a working file of
+# plain w/lf. That would have dropped a tracked text file out of the check
+# entirely. BOTH COLUMNS READ lf ONCE D31 IS COMMITTED, so the demonstration is
+# gone and only the rule survives; do not "simplify" this back to cols[0].
+# Found by testing, 2026-09-09.
+binary = set()
+for line in git("ls-files","--eol","-z").decode("utf-8","surrogateescape").split(chr(0)):
+    if not line: continue
+    cols = line.split(chr(9))
+    w = [t for t in cols[0].split() if t.startswith("w/")]
+    if w and w[0] == "w/-text":
+        binary.add(cols[-1])
+ok = bad = skip = translated = binfiles = unreadable = 0
 for rel in files:
+    try: cur = open(rel,"rb").read()
+    except OSError: cur = None
+    # --- line endings ---
+    if cur is None:
+        unreadable += 1
+        print("  %s: tracked but unreadable" % rel)
+    elif rel in binary:
+        binfiles += 1
+    elif b"\r\n" in cur:
+        bad += 1
+        print("  %s: CRLF is back (%d pairs)" % (rel, cur.count(b"\r\n")))
+    else:
+        ok += 1
+    # --- the non-ASCII half, same files and same order as before the inversion ---
     if not rel.endswith((".cpp",".h",".ui",".exp",".mt")): continue
     r = subprocess.run(["git","show","%s:%s" % (base, rel)], capture_output=True)
     if r.returncode != 0: skip += 1; continue      # added after the root commit
-    try: cur = open(rel,"rb").read()
-    except OSError: skip += 1; continue
+    if cur is None: skip += 1; continue
     old = r.stdout
-    # Losing the non-ASCII bytes is EXPECTED and deliberate: Phase 0b translated
-    # the German comments to English, which is where the umlauts went. Counted
-    # and reported, never failed.
     if any(x > 127 for x in old) and not any(x > 127 for x in cur):
         translated += 1
-    if b"\r" in old and b"\r" not in cur:
-        bad += 1
-        print("  %s: CRLF stripped (%d CRs -> 0)" % (rel, old.count(b"\r")))
-    else:
-        ok += 1
-print("COUNTS %d %d %d %d" % (ok, bad, skip, translated))
+# EVERY TRACKED FILE MUST LAND IN EXACTLY ONE BUCKET. AS THE LOOP IS WRITTEN
+# ABOVE THIS CANNOT FAIL -- the four branches are one if/elif chain over `files',
+# so the identity holds by construction. It is kept anyway, and the honest
+# reason is not that it catches something today: the FIRST version of this gate
+# had a bare `continue' for binaries that landed in no bucket at all, and a file
+# acquiring a NUL then dropped out of the check and out of the totals with no
+# number saying so. This line makes that shape fail loudly if anyone writes it
+# again. Do not quote it as coverage. Found by review 2026-09-09.
+if ok + bad + binfiles + unreadable != len(files):
+    raise SystemExit("encodings: %d files but %d + %d + %d + %d accounted" %
+                     (len(files), ok, bad, binfiles, unreadable))
+print("COUNTS %d %d %d %d %d %d" % (ok, bad, skip, translated, binfiles, unreadable))
 ENCPY
 )
-ep=$(echo "$enc_out" | sed -n 's/^COUNTS \([0-9]*\) .*/\1/p')
-ef=$(echo "$enc_out" | sed -n 's/^COUNTS [0-9]* \([0-9]*\) .*/\1/p')
-es=$(echo "$enc_out" | sed -n 's/^COUNTS [0-9]* [0-9]* \([0-9]*\) .*/\1/p')
-et=$(echo "$enc_out" | sed -n 's/^COUNTS [0-9]* [0-9]* [0-9]* \([0-9]*\)/\1/p')
-# 25 files lost their CRLF in ONE commit, 762c87f "D6: delete Q2Array, its 180
-# sites are plain QList" (2026-08-27) -- verified by walking each file's history
-# for its first CR-free revision, not inferred. An earlier version of this
-# comment blamed Phase 0's comment passes, which is where the German umlauts
-# went but not the carriage returns. Pre-existing damage, carried as a baseline
-# so the gate fails on a NEW one rather than standing permanently red. Lower it
-# when they are restored, never raise it.
-ENC_BASELINE=25
+enc_field() { echo "$enc_out" | sed -n "s/^COUNTS $1.*/\\1/p"; }
+ep=$(enc_field '\([0-9]*\) ')
+ef=$(enc_field '[0-9]* \([0-9]*\) ')
+es=$(enc_field '[0-9]* [0-9]* \([0-9]*\) ')
+et=$(enc_field '[0-9]* [0-9]* [0-9]* \([0-9]*\) ')
+eb=$(enc_field '[0-9]* [0-9]* [0-9]* [0-9]* \([0-9]*\) ')
+eu=$(enc_field '[0-9]* [0-9]* [0-9]* [0-9]* [0-9]* \([0-9]*\)')
+# ZERO, and it stays zero. The tree is LF only since 2026-09-09, so there is no
+# pre-existing damage left to carry: the 25 files 762c87f stripped are no longer
+# a special case, they are simply what every file looks like now. Never raise
+# this to make a diff go away -- a non-zero count means CRLF has come back.
+ENC_BASELINE=0
+# A FLOOR, because zero failures is also what a check that ran over nothing
+# reports. `git ls-files' returning empty gives COUNTS 0 0 0 0 0 0, whose six
+# numbers are all NON-EMPTY, so the empty-result branch below does not catch it:
+# the gate printed a green row having read no files at all. The helper above now
+# aborts on a non-zero git status, and this floor is the second half -- the tree
+# holds 619 tracked files, so anything under 500 means the check did not run.
+#
+# IT COUNTS FILES SEEN, NOT FILES THAT PASSED, AND IT IS TESTED LAST. Both
+# matter, and the first version got both wrong. `ep' alone is the LF-only count,
+# which a tree-wide CRLF regression drives to ZERO -- exactly the case D31 says
+# this gate exists for, a clone with core.autocrlf=true -- so the floor fired
+# first and reported "it did not run", blaming the harness, and recorded ONE
+# failure for 611 broken files. Found by review 2026-09-09.
+ENC_FLOOR=500
 # Fail CLOSED on an empty result. The failure this catches is "python exited 0
-# but printed no COUNTS line": $ep/$ef come back empty, `[ "$ef" -gt 25 ]' errors,
+# but printed no COUNTS line": $ep/$ef come back empty, the numeric test errors,
 # and because that is an `if' CONDITION set -e does not fire -- so the gate used
 # to print blanks and score 0/0 while claiming to have run.
 #
@@ -317,18 +400,28 @@ ENC_BASELINE=25
 # is loud rather than silent, so it is left alone -- but a reader should not
 # expect this branch to be what handles it. An earlier version of this comment
 # said set -e does not fire at all, which is wrong.
-if [ -z "$ep" ] || [ -z "$ef" ]; then
+if [ -z "$ep" ] || [ -z "$ef" ] || [ -z "$eb" ] || [ -z "$eu" ]; then
     echo "  encodings check produced no COUNTS line -- treating as FAILED"
     printf '%-22s %2d pass  %2d fail\n' "encodings" 0 1
     fail=$((fail+1))
-elif [ "$ef" -gt "$ENC_BASELINE" ]; then
+    ep=0
+elif [ "$ef" -gt "$ENC_BASELINE" ] || [ "$eu" -gt 0 ]; then
     echo "$enc_out" | command grep -v '^COUNTS ' || true
-    printf '%-22s %2d pass  %2d fail  (baseline %d -- a NEW file lost its CRLF)\n' \
-           "encodings" "$ep" "$((ef-ENC_BASELINE))" "$ENC_BASELINE"
-    fail=$((fail+ef-ENC_BASELINE))
+    printf '%-22s %2d pass  %2d fail  (%s with CRLF, %s unreadable -- the tree is LF only)\n' \
+           "encodings" "$ep" "$((ef-ENC_BASELINE+eu))" "$ef" "$eu"
+    fail=$((fail+ef-ENC_BASELINE+eu))
+elif [ "$((ep+ef+eb+eu))" -lt "$ENC_FLOOR" ]; then
+    # LAST, and on files SEEN. See ENC_FLOOR above for why both.
+    echo "$enc_out" | command grep -v '^COUNTS ' || true
+    printf '%-22s %2d pass  %2d fail  (saw only %d tracked files, floor is %d -- it did not run)\n' \
+           "encodings" 0 1 "$((ep+ef+eb+eu))" "$ENC_FLOOR"
+    fail=$((fail+1))
+    # NOT $ep. The row says 0 pass, so 0 pass is what the total must get: the
+    # first version printed 0 and added up to 499 phantom passes to `total:'.
+    ep=0
 else
-    printf '%-22s %2d pass  %2d known CRLF losses (D6), %s translated, %s postdate root\n' \
-           "encodings" "$ep" "$ef" "$et" "$es"
+    printf '%-22s %2d LF-only  %2d CRLF, %s binary (git), %s translated, %s postdate root\n' \
+           "encodings" "$ep" "$ef" "$eb" "$et" "$es"
 fi
 pass=$((pass+ep))
 

@@ -595,7 +595,7 @@ ProjDir=.
 InputPath=.\ui\SIGEL_SlaveUI\SIG_MovieSettingsDialogBase.ui
 InputName=SIG_MovieSettingsDialogBase
 
-".\include\SIGEL_SlaveGUI\SIG_MovieSettingsDialogBase.h"	".\ui\SIGEL_SlaveUI\SIG_MovieSettingsDialogBase.cpp"	".\ui\SIGEL_SlaveUI\moc_SIG_MovieSettingsDialogBase.cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+".\include\SIGEL_SlaveGUI\SIG_MovieSettingsDialogBase.h"	".\ui\SIGEL_SlaveUI\SIG_MovieSettingsDialogBase.cpp"	".\ui\SIGEL_SlaveUI\moc_SIG_MovieSettingsDialogBase.cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	<<tempfile.bat 
 	@echo off 
 	%qtdir%\bin\uic.exe $(InputPath) -o $(ProjDir)\include\SIGEL_SlaveGUI\$(InputName).h 
@@ -644,7 +644,7 @@ InputName=SIG_SimulationWidgetBase
 
 InputDir=.\ui\SIGEL_SlaveUI
 ProjDir=.
-InputPath=.\ui\SIGEL_SlaveUI\SIG_SimulationWidgetBase.ui
+InputPath=.\ui\SIGEL_SlaveUI\SIG_SimulationWidgetBase.ui
 InputName=SIG_SimulationWidgetBase
 
 ".\include\SIGEL_SlaveGUI\SIG_SimulationWidgetBase.h"	".\ui\SIGEL_SlaveUI\SIG_SimulationWidgetBase.cpp"	".\ui\SIGEL_SlaveUI\moc_SIG_SimulationWidgetBase.cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
