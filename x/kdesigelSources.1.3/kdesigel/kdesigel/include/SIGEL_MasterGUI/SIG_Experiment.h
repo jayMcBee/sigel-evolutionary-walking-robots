@@ -259,9 +259,10 @@ namespace SIGEL_MasterGUI
        * A count incremented by a scope guard fixes all three: any run anywhere
        * locks, nesting is balanced, and unwinding decrements.
        *
-       * NOT SIG_GPManager::running(), which is a 2003 stub returning false
-       * unconditionally (SIG_GPManager.h:107) with no override anywhere -- a
-       * guard written against it could never fire.
+       * NOT SIG_GPManager::running(). That was a 2003 stub returning false
+       * unconditionally, with no override anywhere, so a guard written against
+       * it could never fire. Deleted 2026-09-09 -- see PORTING.md's D29
+       * passage for why it was a leftover rather than an unfinished feature.
        */
       static bool anyEvolutionRunning();
 

@@ -229,8 +229,8 @@ void SIG_Experiment::putAllIntoExperiment()
   // The guard belongs HERE rather than on the widgets, because this function
   // is reached by a path no widget guard covers:
   // SIG_ExperimentListView::slotSelectionChanged ends with an UNCONDITIONAL
-  // putAllIntoExperiment() (:323), two lines after it has already asked
-  // manager->running() for a different purpose. So merely disabling the pages
+  // putAllIntoExperiment(), two lines after it has already asked
+  // anyEvolutionRunning() for a different purpose. So disabling the pages
   // leaves a page switch able to push widget state into a live run.
   //
   // 1.3 does disable the five pages while running (slotStartEvolution below),

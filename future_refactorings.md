@@ -218,8 +218,8 @@ name reads as travel, or as a shortening of nothing in particular. The type it
 holds already says the word.
 
 **Do:** rename the member to `tournaments`. It is private
-(`SIG_GPManager.h:144`) and used in one file, so the change is contained. The
-two doxygen comments that name it (`SIG_GPManager.h:217`, `:251`) go with it — and they are wrong twice over, since it is not a `QArray`
+(`SIG_GPManager.h:140`) and used in one file, so the change is contained. The
+two doxygen comments that name it (`SIG_GPManager.h:213`, `:247`) go with it — and they are wrong twice over, since it is not a `QArray`
 and has not been one for some time.
 
 **Not before the port is validated.** *This said `SIG_GPManager` "cannot be
@@ -285,7 +285,7 @@ created. Counts measured 2026-08-30 by grep over the extracted 1.3 tree.
 
   | symbol | where |
   |---|---|
-  | `schlussJetzt` | `SIG_GPManager.h:127` + 5 uses |
+  | `schlussJetzt` | `SIG_GPManager.h:123` + 5 uses |
   | `liesdas` (ctor param) | `SIG_Scanner.h:43`, `SIG_RobotScanner.h:48`, `SIG_UnstreamerScanner.h:34` + 3 `.cpp` |
   | `getRandomInstruktion`, `ProbInstruktion` | `MT_Randomizer.h:54,165` |
   | `T_Instruktion`, `T_Instruk` | `MT_TranslatedIndividual.h:38,74` |
@@ -649,13 +649,20 @@ same reason the null is not: 1.3's Dynamo path segfaults on Play (oracle,
 2026-09-02) and nothing in the slave can switch libraries mid-run. It becomes
 live the moment any caller catches that throw and continues.
 
-## `MT_Controller` should refuse a mid-run `configureSystem` ITSELF — a SECOND layer
+## ~~`MT_Controller` should refuse a mid-run `configureSystem` ITSELF~~ — SUPERSEDED
+
+**Dead as of D33, 2026-09-09.** The protection goes in the UI and the model is not
+to be touched. `MT_Control` is a core module, so a refusal inside `MT_Controller`
+is not available. The entry is kept because the DEFECT it describes is real and
+still needs covering — from the UI side.
 
 **The menu greying is not to be removed.** D30 greys the MetaGP actions for the
-duration of a run and that stays. This entry adds a second check inside
-`MT_Controller`, so the guard also sits with the code that does the damage.
-Jan's instruction, verbatim: *"do not REMOVE the greyed out! In ADDITION
-MT_Controller should refuse, multiple layers of checks"*.
+duration of a run and that stays. This entry PROPOSED a second check inside
+`MT_Controller`, so the guard would also sit with the code that does the damage.
+D33 rules that out — see the strike above.
+Jan's instruction at the time, verbatim: *"do not REMOVE the greyed out! In
+ADDITION MT_Controller should refuse, multiple layers of checks"*. The first half
+stands; the second is what D33 overturned.
 
 **Why it is worth a second layer.** `MT_Controller::configureSystem`
 (`:402-404`) does `mainWindow->show(); delete substitution; substitution = 0;`,
@@ -669,7 +676,7 @@ offers; it cannot shut a route nobody has found yet. A refusal inside
 
 - **`MT_Control` has no dependency on `SIGEL_MasterGUI` today.** Zero includes,
   either direction, across `src/MT_Control` and `include/MT_Control`.
-- `SIG_Experiment::anyEvolutionRunning()` is a static on `SIG_Experiment.h:266`,
+- `SIG_Experiment::anyEvolutionRunning()` is a static on `SIG_Experiment.h:267`,
   which lives in `SIGEL_MasterGUI`. Calling it from `MT_Controller` adds a new
   module edge — the kind Phase A spent effort cutting.
 - `MT_Controller` holds `SIGEL_GP::SIG_GPExperiment &sigExp`
@@ -685,19 +692,19 @@ into the core model to serve a menu guard is the wrong direction. His words: *"I
 just to hot-fix a UI enablement issue."* **The counter is to be removed, not
 relocated.** What replaces it is undecided.
 
-**When to do it:** the *layer* is still wanted; only the route above is dead.
-Superseded 2026-09-09 — the earlier "POSTPONED, Jan wants to review the options
-in code himself" is overtaken by his decision that the counter goes.
+**When to do it:** the LAYER is dead too, not only the route — D33 puts the
+protection in the UI and `MT_Control` is a core module. What survives is the
+defect, and it has to be covered from the UI side.
 
 **Two facts measured 2026-09-07 that change the options above:**
 
-- **`SIG_GPManager::running()` already exists and is a stub that always returns
-  `false`** (`SIG_GPManager.h:107`). So "just ask the manager" is not available,
-  and worse, it compiles and reads correctly while answering "not running"
-  during a run. *The empty `wait()` and `msleep()` that used to sit beside it
-  are gone — step A, 2026-09-09. `running()` was deliberately left, because
-  removing it and giving it a real answer are different decisions. It is not an
-  unfinished feature: PORTING.md's D29 passage has the evidence.*
+- **`SIG_GPManager::running()` IS GONE — deleted 2026-09-09, with the empty
+  `wait()` and `msleep()` that sat beside it.** It was a 2003 stub returning
+  `false` unconditionally, overridden nowhere, so a guard written against it
+  could never fire. It was a leftover from a `QThread` base dropped before
+  release 1.0, not an unfinished feature — PORTING.md's D29 passage has the
+  evidence. **So "just ask the manager" is not available and is not coming
+  back**: D33 puts this problem in the UI, and the model is not to be touched.
 - **`MT_Control` already depends on `SIGEL_GP`** — `MT_Evaluator.h:11` and
   `MT_Classifier.h:11-14` include `SIGEL_GP/` headers today, so the dependency
   objection above applies only to `SIGEL_MasterGUI`. *This was the argument that

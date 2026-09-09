@@ -104,10 +104,6 @@ namespace SIGEL_GP
 
   void start();
 
-  bool running()  {
-    return false;
-  };
-
  private:
   /**
    * This list contains the indices of all tournaments in tours

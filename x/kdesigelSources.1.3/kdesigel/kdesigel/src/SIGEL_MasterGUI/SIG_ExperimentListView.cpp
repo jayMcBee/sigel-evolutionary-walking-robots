@@ -309,11 +309,12 @@ void SIG_ExperimentListView::slotSelectionChanged( QTreeWidgetItem * theItem )
 	}
       experimentName = theItem->text(0);
       experimentDict.value( experimentName )->slotSelectionChanged( option );
-      // D29. This asked SIG_GPManager::running(), which is a 2003 STUB
-      // returning false unconditionally (SIG_GPManager.h:107) and overridden
-      // nowhere -- so this branch always emitted evolutionNotRunning( TRUE ),
+      // D29. This asked SIG_GPManager::running(), a 2003 STUB that returned
+      // false unconditionally and was overridden nowhere -- deleted 2026-09-09 --
+      // so this branch always emitted evolutionNotRunning( TRUE ),
       // and SIG_MainWindow::slotEnableEvolutionRunningActions RE-ENABLED all
-      // 23 evolutionRunningActions on any tree click.
+      // 29 evolutionRunningActions on any tree click. (23 is 1.3's number; the
+      // port appends 29 -- counted in SIG_MainWindow.cpp.)
       //
       // The actions ARE correctly disabled when a run starts: SIG_Experiment
       // emits signalEvolutionNotRunning( false ) and both construction sites
@@ -323,8 +324,9 @@ void SIG_ExperimentListView::slotSelectionChanged( QTreeWidgetItem * theItem )
       // the rest. That is precisely what D29 forbids, and on the oracle's
       // evidence acting on the GUI mid-run also crashes 1.3.
       // ANY run, not this experiment's. Asking the clicked experiment's own
-      // state was still broken: File > New Experiment and File > Open
-      // Experiment are not among the 23 locked actions, and both end in
+      // state was still broken: in 1.3, File > New Experiment and File > Open
+      // Experiment were not among the locked actions -- the port appends both
+      // (SIG_MainWindow.cpp, evolutionRunningActions) -- and both end in
       // setCurrentItem(), so selecting a NOT-running experiment mid-run
       // re-enabled every locked action -- one click, no second experiment
       // needed.
