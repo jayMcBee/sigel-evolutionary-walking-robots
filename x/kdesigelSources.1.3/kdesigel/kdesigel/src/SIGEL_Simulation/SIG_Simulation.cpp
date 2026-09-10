@@ -68,7 +68,7 @@ SIGEL_Simulation::SIG_Simulation::SIG_Simulation(SIGEL_Robot::SIG_Robot const & 
     // wraps evalFitness() in catch (SIG_Exception &) { fitnessValue = 0; }.
     // So under PVM the throw is swallowed and the individual scores 0.0 as
     // though it had been evaluated, which is exactly the failure
-    // SIG_GPSimpleRecorder.cpp:42 describes. The message is then the only
+    // SIG_GPSimpleRecorder.cpp, init describes. The message is then the only
     // evidence that reaches anyone. It goes to std::cerr rather than
     // SIG_IO::cerr because SIG_IO buffers and flushes on destruction
     // (PORTING.md 10). Under sigel_eval, which has no such catch, the throw

@@ -924,7 +924,7 @@ void SIG_MainWindow::slotEnableNoExperimentActions( bool enable )
   // earlier version also disabled the group here, which nothing ever undid --
   // it stayed grey after the run ended. Both found by review.)
   // File > New Experiment and File > Open Experiment
-  // reach it during a run (SIG_ExperimentListView.cpp:83 and :207 emit
+  // reach it during a run (SIG_ExperimentListView.cpp, slotNewExperiment and :207 emit
   // isNotEmpty(true)), so one menu click undid the whole lock. Re-apply the
   // lock rather than filtering the list, so the two lists cannot drift apart.
   if ( enable && SIG_Experiment::anyEvolutionRunning() )

@@ -52,7 +52,7 @@ namespace SIGEL_Robot {
     // Phase D. Were Q2PtrVector, used as grow-by-doubling append buffers
     // where size() was capacity and count() was fill. QList appends natively,
     // so the two are now always equal -- which also removes a latent null
-    // dereference: SIG_DynaMechsLink.cpp:108 iterates to size() and
+    // dereference: SIG_DynaMechsLink.cpp, SIG_DynaMechsLink iterates to size() and
     // dereferences every slot, so any unfilled capacity would have crashed it.
     QList<SIG_Polygon *> polygons;
     QList<DL_vector *> vertices;

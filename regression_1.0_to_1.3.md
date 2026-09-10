@@ -39,11 +39,11 @@ scaledState /= posRange;                   // denominator still radians
 ```
 
 `q`, `minPos` and `posRange` are all radians. `getMechsMinPos`/`getMechsMaxPos`
-are built in radians at `SIG_Joint.cpp:661` as `2*pi - (deg/360)*2*pi`, because
+are built in radians at `SIG_Joint.cpp, calculateMDH` as `2*pi - (deg/360)*2*pi`, because
 `dmRevoluteLink` wants radians. So `scaledState`, which must be a 0..1 fraction
 of the joint's travel, comes out **57.3 times too large**.
 
-SIGEL 1.0, `sigel/src/SIGEL_Simulation/SIG_DynaMechsSimulationQueries.cpp:95`:
+SIGEL 1.0, `sigel/src/SIGEL_Simulation/SIG_DynaMechsSimulationQueries.cpp, sense`:
 
 ```cpp
 double scaledState = (q - minPos) / posRange;

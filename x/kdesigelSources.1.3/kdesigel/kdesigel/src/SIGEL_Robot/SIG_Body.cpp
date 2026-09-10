@@ -242,7 +242,7 @@ namespace SIGEL_Robot
         {
                 // Qt 2's QString::at(uint) was bounds-safe -- it returned QChar::null past
 		// the end (qstring.h:483). Qt 6's asserts, and on a null string it
-		// dereferences a null pointer. SIG_Robot.cpp:365 produces a null
+		// dereferences a null pointer. SIG_Robot.cpp, readFromFileTransfer produces a null
 		// geometryFile from a truncated stream. (D13)
 		if (!geometryFile.isEmpty() && geometryFile.at (0) == '/')
                         return geometryFile;

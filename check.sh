@@ -65,7 +65,7 @@ fi
 # toggled(bool), pressed(), timeout().
 #
 # lostFocus() was here and was WRONG: MT_Editor declares its own lostFocus()
-# signal (include/MT_GUI/MT_Editor.h:32) and Qt 2.3's QLineEdit never had one.
+# signal (include/MT_GUI/MT_Editor.h, MT_Editor) and Qt 2.3's QLineEdit never had one.
 # A name shared with a framework signal is a false positive in EITHER
 # direction, so the class has to be established per site. The counter-check is
 # to parse every `signals:' block in the tree and intersect with the names
@@ -628,7 +628,7 @@ pass=$((pass+kp)); fail=$((fail+kf))
 # the pointer it just freed. Twenty-one sites dereference it behind fourteen
 # `if (visualisation)' guards -- the guard passes -- and, because `visualisation'
 # is a BASE-class member whose base destructor does `delete visualisation'
-# (SIGEL_CommonGUI/SIG_VisualisationWidget.cpp:60), destroying the widget after
+# (SIGEL_CommonGUI/SIG_VisualisationWidget.cpp, ~SIG_VisualisationWidget), destroying the widget after
 # such a throw is a double free as well.
 #
 # Guarded rather than trusted because the null LOOKS redundant three lines above
@@ -888,7 +888,7 @@ pass=$((pass+sp)); fail=$((fail+sf))
 # measure a 1-ULP change in start height moving fitness 45%, and the reference
 # box is i386/x87 against this one's aarch64 -- while the tournament that picks
 # survivors is a bare `>=' between two of those doubles
-# (SIG_GPSimpleTournament.cpp:77). So a tool that let one fitness value reach
+# (SIG_GPSimpleTournament.cpp, run). So a tool that let one fitness value reach
 # its output would report an unavoidable divergence as a regression.
 #
 # --selfcheck asserts BOTH halves, because a tool that saw nothing at all would
@@ -1693,7 +1693,7 @@ pass=$((pass+pp)); fail=$((fail+pf))
 # notices.
 #
 # AND 1.3 INVITES THE EDIT, because it is inconsistent with itself. It
-# uses the true M_PI in SIGEL_Robot/IFunctions.cpp:384 and the truncated
+# uses the true M_PI in SIGEL_Robot/IFunctions.cpp, calculateAnyJoint and the truncated
 # literal in the two simulation files. That is 1.3's own inconsistency,
 # preserved verbatim -- IFunctions.cpp is untouched since the vendor drop
 # apart from comment translation. A reader who finds the M_PI first will read
@@ -1894,7 +1894,7 @@ pass=$((pass+v5p)); fail=$((fail+v5f))
 #                 own GUI save of twoBases and reads 99.
 #                 The mechanism, in 1.3's source and Qt 2's:
 #                 SIG_Environment.cpp:47 defaults texAlpha to 0xFF;
-#                 SIG_EnvironmentView.cpp:180 pushes it into sliderAlpha and
+#                 SIG_EnvironmentView.cpp, getOutOfExperiment pushes it into sliderAlpha and
 #                 :112 reads it back out. The pristine form gives that slider
 #                 no maximum -- `git show 0516d62:…/SIG_EnvironmentBase.ui',
 #                 not the converted file at that path today -- and Qt 2 then

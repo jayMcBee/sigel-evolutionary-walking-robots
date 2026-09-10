@@ -77,7 +77,7 @@ So every rounding decision is glibc's. Qt 6 formats doubles itself, through
 
 | set to | where | what it writes |
 |---|---|---|
-| **5** | `SIG_Renderer.cpp:114` | every POV `<x, y, z>` |
+| **5** | `SIG_Renderer.cpp, vectorToPovray` | every POV `<x, y, z>` |
 | **6** (default) | — | `.exp`, `.rrb`, and the POV rotation matrix |
 | **50** | `SIG_GPPVMData.cpp:116, :157` | the master↔slave PVM transfer |
 
@@ -98,7 +98,7 @@ Both non-default calls are 1.3's own, so the port carried them faithfully.
 | shipped `.exp` and `.rrb` | **none** — precision 6, see below |
 | POV | a sub-pixel shift in a rendered image. **Nothing reads a `.pov` back**, zero readers in the tree; it is input to an external renderer |
 | PVM transfer | ours at both ends within one run. Only matters against a 1.3 slave, which nobody runs |
-| the graveyard `.ind` file name, `SIG_GPTournament.cpp:74` | **never written.** `LIVEUNDEAD` is 0 in all 14 shipped experiments, and nothing lists or parses the graveyard — it has a writer and no reader |
+| the graveyard `.ind` file name, `SIG_GPTournament.cpp, inhume` | **never written.** `LIVEUNDEAD` is 0 in all 14 shipped experiments, and nothing lists or parses the graveyard — it has a writer and no reader |
 | `-0` (Qt 6 `0`, glibc `-0`, differs at every precision) | absent from all shipped data, and the port writes none |
 
 **THE SHIPPED-DATA CLAIM WAS WRONG AND IS WITHDRAWN.** This section used to say
@@ -521,8 +521,8 @@ D20 supersedes D5, D24 supersedes D3.
 | **D28** | The `QSpinBox` over-range divergence (C11a) | **accepted, not fixed.** 1.3 accepts out-of-range digits and clamps on commit; the port refuses the keystroke and commits a truncated prefix. It is reachable **only by typing a number outside the box's own range**, and the differing value is **visible in the box** before anything is saved — 1.3 shows 99, the port shows 10. Contrast what the port did fix: `clear()` killed the application, the ampersand rendered wrong, a negative width silently wrote no file — all reachable with valid use. The fix is not the 33 lines of it, it is **owning a custom widget forever**: every future form edit and every new spin box must remember `SIG_SpinBox` or silently opt out. Pinned in `guibehaviour-baseline.txt` (`commits=`) so it cannot drift; prototype and the measured comparison in `future_refactorings.md`. **Revisit if** a dialog spin box turns out to feed something unvalidated, or if anyone actually hits it |
 | **D29** *(signed off 2026-09-04)* | Changing run parameters **while an evolution is running** | **FORBIDDEN in the port, whatever 1.3 permits.** The reason is the specification, not 1.3: *"that's not how GAs/GPs are commonly implemented"* — the parameters define the run. **The port's second intentional divergence**, after D27. *A harder justification arrived later and is narrower than it first looked: one mid-run action, MetaGP `Configure System` opening its window, crashes 1.3 reliably, while ~25 other injected mid-run events did nothing. That is evidence for the decision, not the reason for it — and **D29 does not fix that crash**, which arrives through a menu path that never writes a parameter.* **Implementation, and the three wrong versions it went through, are in §10 — read that before changing the guard** |
 | **D31** *(signed off 2026-09-09)* | Line endings | **LF ONLY, tree-wide. No more DOS.** Jan's decision, and it overrides the guard that existed to prevent it. **100 files under `x/kdesigelSources.1.3` converted, 17,750 CRLF pairs.** **The conversion is line endings only except for two bytes, and `git diff --ignore-cr-at-eol` is NOT what proves it** — that flag strips a trailing CR from *both* sides, so it would equally hide a CRLF being *introduced*. The proof is a direct comparison of every one of the 100 files: `re.sub(rb"\r+\n", b"\n", git show HEAD:f) == working file`, exact, with no `\r` surviving anywhere. Zero anomalies. Zero anomalies. **Two lines of `sigel_slave.mak` are the one real content change**, and calling them line endings flatters them: `:598` and `:647` ended `\r\r\n`, so the byte removed is an INTERIOR one — under NMAKE that trailing CR is part of the variable's value. The `\r+` in the proof above is what swallows the case, so the proof cannot tell it from a line ending; it is called out here instead. Nothing else in the tree has a run of two. **Binaries are excluded and this is not cosmetic** — three tracked binaries hold 12 incidental `\r\n` byte pairs (`pvm3.4.6.tgz` 9, `altLogo.png` 2, `noExperiment.png` 1), and a blind repo-wide replace would corrupt all three. Extensions touched: 36 `.cpp`, 35 `.h`, 19 `.xpm`, 5 `.dsp`, 3 `.mak`, 1 `.mt`, 1 `.dsw`. **No `.exp` and no `.ui`**, so no reference artefact was touched. **Lone CRs are left alone, and NOT because they are Mac-classic line endings** — the first version of this row said that and it was wrong. Six tracked files hold lone CRs and git calls **all six** binary, so this gate never even reads them: `pvm3.4.6.tgz` 3859, `noExperiment.png` 691, `JustGreen.pnm` 2848, `altLogo.png` 208, `Hippie.pnm` 208, `Stone.pnm` 68. All five `.pnm` are **P6 raw raster**: those bytes are pixel values that happen to equal `0x0d`. They were never line endings. **The `encodings` gate was turned round in the same commit**, so that commit is not line endings alone — `check.sh`, `PORTING.md` and `future_refactorings.md` change with it. The gate used to say *a file that HAD a CR must still have one*, with `ENC_BASELINE=25`; it now says **no tracked text file may carry CRLF**, expected zero, reads every tracked file rather than five extensions present in the root commit, lists them with `-z` so a C-quoted path cannot break `open()`, and reconciles — every file lands in exactly one of ok / CRLF / binary / unreadable, or it aborts. **It asks `git ls-files --eol` what is binary rather than testing for a NUL byte**, because the NUL test got two files wrong: `Hippie.pnm` has no NUL in its 196,668 bytes and `UniDo_LSXI.pnm`'s first NUL is at offset 15,456, so both were judged as text and passed only by luck. **Read the `w/` column, not `i/`**: while this change was being made, `sigel_slave.mak`'s index blob read `i/-text` — HEAD still held its two `\r\r\n`, which git's own heuristic calls binary — against a working file of `w/lf`, and testing both columns dropped a real text file out of the check. **Both columns read `lf` once this is committed, so the demonstration is gone and only the rule survives.** Reads 610 text files and 8 binaries. **A floor of 500 was added**, because zero failures is also what a check that read nothing reports: a dead `git ls-files` gave `COUNTS 0 0 0 0 0 0`, two non-empty numbers, which the fail-closed branch did not catch. Teeth-tested: CRLF into a `.cpp` and into `sigel_slave.mak` both caught and named, CRLF into a texture correctly ignored, and all seven branch states driven by hand — including a **tree-wide** CRLF regression, which the first version of the floor misreported as *"it did not run"* with one failure instead of 611, and a below-floor count, which the first version printed as `0 pass` while adding up to 499 passes to the total. Both found by review 2026-09-09. The bucket reconciliation is a tautology as the loop is now written and is **not** counted as coverage; it is kept only so the earlier bare-`continue` shape cannot come back. **`SIGEL_ROOT` is the source tree**, so `stdConf.mt` and the 19 `.xpm` pixmaps the conversion touched are the very files the GUI gates load at runtime; the `gui behaviour` gate covers them. The `.xpm` are loaded by path and `#include`d nowhere, and a C string literal cannot span a raw newline, so no removed CR was ever inside a quoted pixel row. **No `.gitattributes` exists and none was added.** `* text=auto eol=lf` would make git enforce this rather than only detect it; not done, because it changes what every future checkout writes and that is a separate decision. On a clone with `core.autocrlf=true` the working tree comes back CRLF and this gate goes red tree-wide — which is the gate working |
-| **D32** *(signed off 2026-09-09)* | `SIG_Experiment::gpManager` renamed to `guiGPManager` | **A deliberate divergence from the 1.3 name, and the only one of its kind so far.** Four members across the tracked tree were called `gpManager`; three hold an `MT_GPManager *` inside the meta modules, where the name is right. The fourth, `SIG_Experiment.h:99`, holds a `SIG_GUIGPManager *` — and it was the **only** `SIG_`-typed member in that class not named after its own type with the `SIG_` prefix stripped. The other nine follow the rule exactly (`gpExperiment`, `gpParameter`, `simulationParameter`, `environmentView`, `robotView`, `experimentView`, `allIndividualsView`, `languageParameters`, `experimentItem`); the class's remaining members are named by role (`widgetDict`, `menuGPParameter`, …) and were never in scope. So this is the class's own rule applied to the one member that broke it, not a new scheme. **20 sites**: 13 in `SIG_Experiment.{h,cpp}`, 5 in this file, 2 in `guidrive.cpp`, both comments. The three `MT_GPManager` members and the `SIG_GPManager gpManager` local at `sigel.cpp:261` are correctly named and were left alone; the 1.0 tree holds the same member and is untracked, so a future sweep will re-find it there and should leave it. **VERIFIED AS `.text`-IDENTICAL, NOT AS BYTE-IDENTICAL OBJECTS** — a data member's name never reaches a mangled symbol, but `-g` is on and DWARF records member names, so the objects legitimately differ. `sigel.cpp` is the interesting one and was checked: it is the single translation unit where both names coexist, and its `.text` is unchanged |
-| **D33** *(signed off 2026-09-09)* | Where the mid-run protection lives | **IN THE UI. The model is not to be touched.** Jan: *"we'll focus on the UI side from now on, NO TOUCHING the gp manager or other model classes."* **The problem, stated plainly:** two GUI actions free objects a running evolution is still using. `MetaGP > Configure System` frees `substitution`, which `SIG_GPManager` holds as its `trainer` (`SIG_GPManager.cpp:60`) **whenever the meta system is enabled and set to Evaluator** — the condition is on `:59`, and `stdConf.mt` ships that as the default; the experiment tree's context-menu `Start` frees the manager whose `run()` is on the stack. Both are 1.3's code, both are use-after-free, and both are reachable only because `haveABreak()` pumps the event loop from inside the run. **Measured 2026-09-09: every route starts at a GUI slot, but the reason is not the caller.** All five sites that free `substitution` outside the destructor sit in `configureSystem`, `useMeta`, `switchSystem`, `slotLoadDefault` and `slotLoadSetup`. Four are reached only from a menu action. **`useMeta` is not** — `MT_Controller::readFromFile` calls it at `:473`, `:499`, `:505`, `:511` and `:530`, and `SIG_GPExperiment::loadExperiment:76` calls `readFromFile` on the headless load path. What keeps the free out of reach there is a flag, not a caller: it sits inside `if(guiEnabled)` at `MT_Controller.cpp:266`. So `sigel -mtevolve` reaches the function and not the free. *An earlier version of this row said no headless path reached any of them and spelled the switch `-mtEvolve`; the parser at `sigel.cpp:197` is case-sensitive, so that spelling starts the GUI instead. Both found by review.* **The caveat, recorded so it is not forgotten:** the trigger is UI, but the arrangement that makes it fatal is not — two core classes share an object with no ownership contract. Fixing that would stop the crash being possible at all, and is exactly the model change this decision rules out. **Consequences.** No NEW behaviour goes into the model; removing a dead 2003 stub is not new behaviour, so `SIG_GPManager::running()` was deleted — see D29's passage. Nothing is added to `SIG_GPManager` or `MT_Controller`. `future_refactorings.md`'s *"MT_Controller should refuse a mid-run configureSystem ITSELF"* is superseded: `MT_Control` is a core module, so that layer is not available. Whatever replaces the D29 counter is UI-side |
+| **D32** *(signed off 2026-09-09)* | `SIG_Experiment::gpManager` renamed to `guiGPManager` | **A deliberate divergence from the 1.3 name, and the only one of its kind so far.** Four members across the tracked tree were called `gpManager`; three hold an `MT_GPManager *` inside the meta modules, where the name is right. The fourth, `SIG_Experiment.h, SIG_Experiment`, holds a `SIG_GUIGPManager *` — and it was the **only** `SIG_`-typed member in that class not named after its own type with the `SIG_` prefix stripped. The other nine follow the rule exactly (`gpExperiment`, `gpParameter`, `simulationParameter`, `environmentView`, `robotView`, `experimentView`, `allIndividualsView`, `languageParameters`, `experimentItem`); the class's remaining members are named by role (`widgetDict`, `menuGPParameter`, …) and were never in scope. So this is the class's own rule applied to the one member that broke it, not a new scheme. **20 sites**: 13 in `SIG_Experiment.{h,cpp}`, 5 in this file, 2 in `guidrive.cpp`, both comments. The three `MT_GPManager` members and the `SIG_GPManager gpManager` local at `sigel.cpp:261` are correctly named and were left alone; the 1.0 tree holds the same member and is untracked, so a future sweep will re-find it there and should leave it. **VERIFIED AS `.text`-IDENTICAL, NOT AS BYTE-IDENTICAL OBJECTS** — a data member's name never reaches a mangled symbol, but `-g` is on and DWARF records member names, so the objects legitimately differ. `sigel.cpp` is the interesting one and was checked: it is the single translation unit where both names coexist, and its `.text` is unchanged |
+| **D33** *(signed off 2026-09-09)* | Where the mid-run protection lives | **IN THE UI. The model is not to be touched.** Jan: *"we'll focus on the UI side from now on, NO TOUCHING the gp manager or other model classes."* **The problem, stated plainly:** two GUI actions free objects a running evolution is still using. `MetaGP > Configure System` frees `substitution`, which `SIG_GPManager` holds as its `trainer` (`SIG_GPManager.cpp:60`) **whenever the meta system is enabled and set to Evaluator** — the condition is on `:59`, and `stdConf.mt` ships that as the default; the experiment tree's context-menu `Start` frees the manager whose `run()` is on the stack. Both are 1.3's code, both are use-after-free, and both are reachable only because `haveABreak()` pumps the event loop from inside the run. **Measured 2026-09-09: every route starts at a GUI slot, but the reason is not the caller.** All five sites that free `substitution` outside the destructor sit in `configureSystem`, `useMeta`, `switchSystem`, `slotLoadDefault` and `slotLoadSetup`. Four are reached only from a menu action. **`useMeta` is not** — `MT_Controller::readFromFile` calls it at `:473`, `:499`, `:505`, `:511` and `:530`, and `SIG_GPExperiment::loadExperiment:76` calls `readFromFile` on the headless load path. What keeps the free out of reach there is a flag, not a caller: it sits inside `if(guiEnabled)` at `MT_Controller.cpp, useMeta`. So `sigel -mtevolve` reaches the function and not the free. *An earlier version of this row said no headless path reached any of them and spelled the switch `-mtEvolve`; the parser at `sigel.cpp:197` is case-sensitive, so that spelling starts the GUI instead. Both found by review.* **The caveat, recorded so it is not forgotten:** the trigger is UI, but the arrangement that makes it fatal is not — two core classes share an object with no ownership contract. Fixing that would stop the crash being possible at all, and is exactly the model change this decision rules out. **Consequences.** No NEW behaviour goes into the model; removing a dead 2003 stub is not new behaviour, so `SIG_GPManager::running()` was deleted — see D29's passage. Nothing is added to `SIG_GPManager` or `MT_Controller`. `future_refactorings.md`'s *"MT_Controller should refuse a mid-run configureSystem ITSELF"* is superseded: `MT_Control` is a core module, so that layer is not available. Whatever replaces the D29 counter is UI-side |
 
 
 ---
@@ -1125,19 +1125,19 @@ called done since A1** — `SIGEL_GP` 18 files/51 lines, `MT_GPSystem` 10/18,
 | `MT_FitnessTrainer.cpp`, `MT_Interpreter.cpp`, `MT_Trainingset.cpp` | `// weitere Methoden` |
 | `SIG_CommandParameters.cpp`, `SIG_Geometry.cpp`, `SIG_Polygon.cpp` | `// FEHLER` |
 | `SIG_GPRemoteZORCFitnessFunction.cpp` and its `WIN_` twin | `/* aktuelle Einstellungen lesen */`, `// Frame/Parity-Fehler ignorieren` |
-| `MT_Substitute.h:128`, `SIG_AllIndividualsView.cpp:120`, `SIG_GPParameter.cpp:628` | `sonst :=`, `Eventuell noch set AutoDelete enablen!!!`, `oder empty name` |
+| `MT_Substitute.h:128`, `SIG_AllIndividualsView.cpp, SIG_AllIndividualsView`, `SIG_GPParameter.cpp:628` | `sonst :=`, `Eventuell noch set AutoDelete enablen!!!`, `oder empty name` |
 | `MT_GPManager.cpp` :414 :542, `MT_Interpreter.cpp` :59 :99, `MT_Tournament.cpp:8`, four `MT_GUI` sources | `macht mehr!!`, `Evolutionsschleife`, `Operanden`, `zweiter Operand`, `Konstruktion/Destruktion` |
 | `SIG_DynaMechsCommandInterface.cpp:134` | `wat anderes kucken wa garnich an !` — Ruhr dialect, "we do not look at anything else at all" |
 | **15 banner lines** in `MT_Classifier.cpp`, `MT_Substitute.cpp`, `SIG_GPManager.cpp` | `// NEU NEU NEU …` → `NEW` |
 | **the rest: one German word inside an otherwise-English 2003 comment** | `programm`, `prozess`, `hierarchie`, `spezial`, `roboter`, `actuell`, `absolut`, `reproduktion`, `methode`, `Elter`, `Construktor`, `starte`, `simpel`, `zwischenziel`, `changeen`, `Laenge` |
 
-**THE `SIG_GPOperations.cpp:725` CARVE-OUT WAS WRONG ON ALL THREE OF ITS CLAIMS
+**THE `SIG_GPOperations.cpp, reproduction` CARVE-OUT WAS WRONG ON ALL THREE OF ITS CLAIMS
 AND HAS BEEN WITHDRAWN.** It said the line "is a string literal the program
 prints, not a comment, and changing it would change output". The line is
 `//SIGEL_Tools::SIG_IO::cerr << "\n--> Programm-Laenge:"` — the whole statement
 is commented out, inside an `#ifdef SIG_DEBUG` that **nothing in this repo
 defines**. So it is a comment, it is never printed, and changing it changes
-nothing. It and the same shape at `SIG_Program.cpp:388` are both translated.
+nothing. It and the same shape at `SIG_Program.cpp, ~SIG_Program` are both translated.
 
 **WHAT IS DELIBERATELY LEFT, and it is German:** `Sigel.dsw` and the three
 `.mak` files under the source root carry CP437 German — `GELÖSCHT`,
@@ -1200,7 +1200,7 @@ spelling the file itself supports. The surrounding prose says "given as a
 QString", which agrees with neither; that is left as found.
 
 **FIVE NEAR-MISSES WERE DELIBERATELY NOT TOUCHED**, and they are why the count
-came out lower. `MT_FitnessTrainer.h:99` and `MT_Trainingset.h:40` say `QQueue`
+came out lower. `MT_FitnessTrainer.h, MT_FitnessTrainer` and `MT_Trainingset.h, MT_Trainingset` say `QQueue`
 of a parameter that really is `QQueue<MT_TrainingCase *> *`. `MT_Statistics.h`
 :13, :25 and :48 say `QList` and the members really are `QList`. Naming a type
 correctly is not a defect, and a sweep that matched Qt 2 spellings without
@@ -1210,7 +1210,7 @@ reading the declaration would have "fixed" all five.
 port's own historical notes** — "at() was writable on Qt 2's const `QArray`;
 `QList`'s is not", "Qt 2's `QDict` returned the NEWEST binding", the
 `QGVector::operator[]` text quoted from a real crash. Those are correct and stay.
-`SIG_ProgramLine.cpp:686`'s `// QList<int> instr;` is commented-out code that
+`SIG_ProgramLine.cpp, randomRobotinstruction`'s `// QList<int> instr;` is commented-out code that
 already names the Qt 6 type.
 
 **No `QList`/`QHash`/`QQueue` mention was left pointing at the wrong container in
@@ -1445,7 +1445,7 @@ Qt 6 layout needs 555**, at the DEFAULT size, not only when dragged.
 
 - **1.3 does not open that window at 595 either. It opens at 680x605**, with a
   `WM_NORMAL_HINTS` program minimum of **625x605**. **Qt 2 already overrode
-  `MT_MainWindow.cpp:33`'s `resize(680, 595)` by 10 px to satisfy its own
+  `MT_MainWindow.cpp, MT_MainWindow`'s `resize(680, 595)` by 10 px to satisfy its own
   layout.** So 595 is a number the program asks for and has never got, and
   reasoning from that line describes the source rather than the application.
 - **1.3's window cannot be made shorter at all** — 605 is both the opening
@@ -1517,7 +1517,7 @@ long as the manager takes to notice the flag, which is a whole generation, 58 to
 **`Stop`, then MetaGP > Configure System, still reached the crash.** Neither
 button is an action, so `evolutionRunningActions` could never have covered them
 (`experimentView->pushbuttonStop`, and the context-menu entry at
-`SIG_Experiment.cpp:64`).
+`SIG_Experiment.cpp, SIG_Experiment`).
 
 **The fix is a deletion.** `slotEvolutionStopped()` already emits exactly that
 signal, and it runs after `start()` returns. The premature emit is gone.
@@ -1562,7 +1562,7 @@ The second is larger and had never been driven before today.
 them commented out at `:699-700` — **24 of them also in
 `evolutionRunningActions`**, and `slotEnableNoExperimentActions` (`:879-885`)
 enabled the lot with no run check. `File > New Experiment` and
-`File > Open Experiment` reach it during a run — `SIG_ExperimentListView.cpp:83`
+`File > Open Experiment` reach it during a run — `SIG_ExperimentListView.cpp, slotNewExperiment`
 and `:207` emit `isNotEmpty(true)` — and **neither action was in any lock list**.
 So one menu click handed back everything the run had locked, `Use MetaGP`
 included, which is the trigger of the failure the oracle measured on 1.3 where
@@ -1666,10 +1666,10 @@ it was making.*
 	substitution = 0;
 ```
 
-`substitution` is the `MT_Evaluator` (`MT_Controller.h:66`), and **`MT_Evaluator`
+`substitution` is the `MT_Evaluator` (`MT_Controller.h, MT_Controller`), and **`MT_Evaluator`
 inherits `SIG_GPFitnessTrainer`** (`MT_Evaluator.h:16`). When the meta system is
 the Evaluator — and the shipped `stdConf.mt` is `usedSystem=1`, which is
-`EVALUATOR_SUBST` (`MT_Controller.h:22`) — `SIG_GPManager`'s `trainer` **IS that
+`EVALUATOR_SUBST` (`MT_Controller.h, EVALUATOR_SUBST`) — `SIG_GPManager`'s `trainer` **IS that
 object**: `SIG_GPManager.cpp:59-60` sets it from
 `mtController->getFitnessTrainer()`, which returns `substitution`
 (`MT_Controller.cpp:668-679`). `~SIG_GPManager` deliberately does not delete it,
@@ -1679,7 +1679,7 @@ which confirms the ownership.
 holding**, and the next `trainer->checkTask(...)` — `SIG_GPManager.cpp:202`,
 `:469`, `:1460`, `:1576` — reads a freed `QList` whose header is garbage. A
 garbage size gives "index out of range" for a perfectly legal `taskId`.
-**Bounds-checking `SIG_GPFitnessTrainer.cpp:368` would fix nothing.** The same
+**Bounds-checking `SIG_GPFitnessTrainer.cpp, checkTask` would fix nothing.** The same
 two lines are in the pristine 1.3 tarball one line after `mainWindow->show()`, so
 this explains the oracle's four crashes as well as ours.
 
@@ -1715,7 +1715,7 @@ three checks, so it could not confirm the run had left evaluator mode.
 touched from two threads with no lock.
 
 **WHICH CONTAINER ASSERTS IS NOT IDENTIFIED, and this section used to say it
-was.** It named `SIG_GPFitnessTrainer.cpp:368`, `pvmTasks[ taskId ]`, reached
+was.** It named `SIG_GPFitnessTrainer.cpp, checkTask`, `pvmTasks[ taskId ]`, reached
 from `MT_Evaluator.cpp:473`. **Withdrawn.** That identification is inherited from
 the 1.3 analysis, which worked *by type*: `QGVector` is Qt 2's pointer-vector
 base, so the `QArray` members were excluded. **Qt 6 collapsed `QArray` and
@@ -1724,7 +1724,7 @@ base, so the `QArray` members were excluded. **Qt 6 collapsed `QArray` and
 
 | member | pristine 1.3 | port |
 |---|---|---|
-| `MT_ResultBuffer` | `QArray<double>` (`MT_Evaluator.h:35`) | `QList<double>` (`:36`) |
+| `MT_ResultBuffer` | `QArray<double>` (`MT_Evaluator.h, MT_Evaluator`) | `QList<double>` (`:36`) |
 | `NumOfCorrectEstimation` | `QArray<unsigned int>` (`MT_Substitute.h:138`) | `QList<unsigned int>` (`:137`) |
 | `NumOfMetaEstimation` | `QArray<unsigned int>` (`:139`) | `QList<unsigned int>` (`:138`) |
 
@@ -1857,7 +1857,7 @@ enabled and did not wedge.
 | "no `sigel_slave` process ever exists" | they exist for **~0.2 s each**, so a `pgrep` between spawns sees nothing. `sigel_eval` on the same individuals takes 0.20-0.37 s, and the oracle measures 1.3's slave lifetime at a 0.296 s median — 1.5x, not a mystery |
 | "the daemon log records no task" | **a working dispatch logs nothing at all.** The oracle's log from a run that spawned 165 slaves is the same two startup lines as mine. It was never evidence |
 
-*The reasoning that produced them was: `SIG_GPFitnessTrainer.cpp:346` prints on
+*The reasoning that produced them was: `SIG_GPFitnessTrainer.cpp, spawnTask` prints on
 the `pvm_spawn` failure path, nothing was printed, therefore it returned 1 —
 which was right. What was wrong was concluding from an empty `pgrep` and an empty
 daemon log that nothing ran.* `strace -e trace=write` had already shown the spawn
@@ -1934,13 +1934,13 @@ what shows the six-generation run completing untouched.
 
 **THE SAMPLER PROVES LESS THAN IT LOOKS.** `generations=136` never moving is
 **expected**: the two live-update calls are commented out at
-`SIG_GUIGPManager.cpp:43` and `:95`. *This said the only live write is a page
-refresh at `SIG_ExperimentView.cpp:83`, "which fires on a page switch during a
+`SIG_GUIGPManager.cpp, SIG_GUIGPManager` and `:95`. *This said the only live write is a page
+refresh at `SIG_ExperimentView.cpp, putIntoExperiment`, "which fires on a page switch during a
 run but never from the evolution loop". **Wrong on the first half**: the
 page-switch route runs `putAllIntoExperiment`, which returns at
 `SIG_Experiment.cpp:243-244` under `anyEvolutionRunning()` **before** reaching
 `experimentView->putIntoExperiment()` at `:246` — so during a run a page switch
-never reaches `:83` either.* The live callers are `SIG_ExperimentView.cpp:278`
+never reaches `:83` either.* The live callers are `SIG_ExperimentView.cpp, slotHistory`
 (`slotHistory`) and `:284` (`slotIntervallChanged`), which is what the D29
 comment at `:61-67` says. And the sampler counts **pumps of the event loop,
 not seconds**: the run blocks the main thread, the only pump is `haveABreak()`'s
@@ -2024,7 +2024,7 @@ only in the host block and that one seed.
 `col0check=0` is an icon column, not a disabled flag — all eight shipped hosts
 read it too; `noOfSlaves` starts at 0 (`SIG_GPActivePVMHost.cpp:30`) so a
 one-slave host is not self-blocking; `pvm_addhosts`' return is ignored
-(`SIG_GPFitnessTrainer.cpp:95`) so `PvmDupHost` cannot stop it; the slave binary
+(`SIG_GPFitnessTrainer.cpp, SIG_GPFitnessTrainer`) so `PvmDupHost` cannot stop it; the slave binary
 is healthy — run by hand against a live daemon it enrols and answers `Program
 hasn't been started as a PVM slave!`; PVM itself is up (`pvm_start_pvmd`
 succeeds, the daemon logs `ready`, `./pvm-check.sh` passes); a stalled trainer
@@ -2208,7 +2208,7 @@ than inspection:
   `ReadCorruptData` and refuses every later read. Qt 2 returned 0 and un-got the
   character, so a following `>> QString` resynchronised. All robot, experiment
   and language parsing goes through `>>`. Does not fire on the shipped data.
-- `SIG_EarlyRunTermSimulation.cpp:97` was a twelfth `QTime()` site, missed by
+- `SIG_EarlyRunTermSimulation.cpp, getMaxRecorderSteps` was a twelfth `QTime()` site, missed by
   the first sweep because it is a declaration rather than a call. Fixed. It made
   `getMaxRecorderSteps` return 2 instead of 182 for three fitness functions no
   shipped experiment selects.
@@ -2242,10 +2242,10 @@ disassembly are local.
 | # | Step | What it checks |
 |---|---|---|
 | V1 | ~~Capture 1.3's load-and-save round trip for three shipped `.exp`~~ **DONE 2026-08-27** — `verification-against-sigel-1.3/v1-1.3-roundtrip.txt` | the `Q2Dict` hash, all order-carrying containers, the parser and the serialiser |
-| V2 | ~~Our half: a save path in `sigel_eval`~~ **RESHAPED 2026-09-08, and the `sigel_eval` half is dropped for good.** What V2 has to answer is whether our saved file matches the one 1.3 saved. A save path in `sigel_eval` cannot answer it: `sigel_eval` links `SIG_GPExperimentClean.o` (`Makefile:498`), which is the SLAVE variant of the writer, and `sigel_slave.cpp` never calls `saveExperiment` at all. So that variant is dead code in the only binary that ships it, and a test there would test something no user reaches. It is also the wrong side of the one difference between the two writers: the master writes the MetaGP block when `mtController->IsEnabled()` (`SIG_GPExperiment.cpp:107`) and the slave has no `mtController` (`SIG_GPExperimentClean.cpp:87`). Everything else is the same source compiled twice. Against a V1 reference written by 1.3's master, the slave writer gives identical bytes with MetaGP off and cannot produce the right bytes with it on. **V2 DONE 2026-09-08, and it is a gate.** Two shipped experiments go through `File > Open Experiment` and `File > Save Experiment` twice each, and the run is compared against two captures of the running 2003 binary — `v8-1.3-gp-blocks.txt` for `hammer`, `v1-1.3-roundtrip.txt` for `octopusSimpleFitness`. Both predate this conversion, so a failure is a regression against 1.3. **Two experiments, because hammer alone proves less than it looks.** Hammer has 5 links, 4 joints, 4 drives and no sensors, few enough that no hash bucket need collide, and 1.3 does not permute those containers either — so agreement there is not evidence. Hammer really tests material order, `Body` emission order, `middle3`'s axis points, and everything outside the robot. **Octopus supplies the rest:** V1 measured 1.3 permuting its joint, drive and sensor containers, its body order and its command list, and our writer moves none of them. That is where *we reproduced the order* and *we never permute* come apart. The oracle made this point against the first version of this row, which claimed more for hammer than hammer can carry. **What agrees with 1.3:** all six `#####` marker line numbers in all three hammer passes; `PVMHOST` 20 of 20 in 1.3's order; the experiment history byte-stable at 161 lines; the first HISTORY block at 10574, 10581 and 10588 characters; one added line in all 100 blocks per save; the individual name sequence; nine of the ten first-save keys with 1.3's values; and octopus's material and link order, which 1.3 returns unchanged too. **Input against pass 1 is not the test**, per V8 result 5. **Two things differ and both are explained.** (a) Our robot block is a FIXED POINT where 1.3's is an involution — D3's flip to insertion order. A single save cannot tell those apart, which is why there are two saves. Measured on 1.3 for hammer 2026-09-08 (result 6) and for octopus by V1. (b) `TEXALPHA` reads 99 here against the hammer capture's 255, because **1.3 has two save paths and they write different files.** Measured on 1.3, hammer, both paths in one sitting: the GUI save and the headless save differ in **exactly one line and nothing else**, confirmed by a sha256 over both files with only that value masked. 1.3's GUI writes 99, its headless path writes 255, and `pagesave-baseline.txt` shows the same on a second robot. `SIG_EnvironmentView.cpp:180` pushes the 255 default into `sliderAlpha`; the pristine form gives that slider no maximum — read it at `git show 0516d62:…/SIG_EnvironmentBase.ui`, since the file at that path today is the converted one — and Qt 2 caps it at `QRangeControl`'s default of 99 (`qrangecontrol.cpp:111-119`, from `qslider.cpp:124`). Qt 6 has no `QRangeControl`; its 0–99 default comes from `QAbstractSlider`. **Same number, different mechanism, which is weaker than it looks:** nothing enforces that the two toolkits keep the same default, so a Qt release could move our side alone and the gate would be the only thing that noticed. If it ever moves, set the maximum on the form rather than chase the toolkit. **Not measured:** that 1.3's slider really reports 99 — the oracle's X server went down mid-probe and the reading was not retaken. Result 7. **The gate is one diff of a 58-line report, not a dozen ifs**, so a generator that produces the wrong text fails on the whole report rather than on the one predicate someone remembered to write. Its own teeth test found a hole in it: three lines hashed an extract and compared three hashes, which reads *identical* when the extractor dies — replacing `expstruct.py` with `/bin/false` passed the gate 1/0. Each of those lines now carries the size of what it hashed. A second teeth round found the mirror of it: every *stable across all three passes* line passes when the INPUT changes, because all three passes change together — renaming an individual in the input went unnoticed. Those lines now carry content as well, and section 6's first and last entries are compared against 1.3's, which V8 result 4 quotes | gated as `v2 round trip vs 1.3` |
+| V2 | ~~Our half: a save path in `sigel_eval`~~ **RESHAPED 2026-09-08, and the `sigel_eval` half is dropped for good.** What V2 has to answer is whether our saved file matches the one 1.3 saved. A save path in `sigel_eval` cannot answer it: `sigel_eval` links `SIG_GPExperimentClean.o` (`Makefile:498`), which is the SLAVE variant of the writer, and `sigel_slave.cpp` never calls `saveExperiment` at all. So that variant is dead code in the only binary that ships it, and a test there would test something no user reaches. It is also the wrong side of the one difference between the two writers: the master writes the MetaGP block when `mtController->IsEnabled()` (`SIG_GPExperiment.cpp:107`) and the slave has no `mtController` (`SIG_GPExperimentClean.cpp:87`). Everything else is the same source compiled twice. Against a V1 reference written by 1.3's master, the slave writer gives identical bytes with MetaGP off and cannot produce the right bytes with it on. **V2 DONE 2026-09-08, and it is a gate.** Two shipped experiments go through `File > Open Experiment` and `File > Save Experiment` twice each, and the run is compared against two captures of the running 2003 binary — `v8-1.3-gp-blocks.txt` for `hammer`, `v1-1.3-roundtrip.txt` for `octopusSimpleFitness`. Both predate this conversion, so a failure is a regression against 1.3. **Two experiments, because hammer alone proves less than it looks.** Hammer has 5 links, 4 joints, 4 drives and no sensors, few enough that no hash bucket need collide, and 1.3 does not permute those containers either — so agreement there is not evidence. Hammer really tests material order, `Body` emission order, `middle3`'s axis points, and everything outside the robot. **Octopus supplies the rest:** V1 measured 1.3 permuting its joint, drive and sensor containers, its body order and its command list, and our writer moves none of them. That is where *we reproduced the order* and *we never permute* come apart. The oracle made this point against the first version of this row, which claimed more for hammer than hammer can carry. **What agrees with 1.3:** all six `#####` marker line numbers in all three hammer passes; `PVMHOST` 20 of 20 in 1.3's order; the experiment history byte-stable at 161 lines; the first HISTORY block at 10574, 10581 and 10588 characters; one added line in all 100 blocks per save; the individual name sequence; nine of the ten first-save keys with 1.3's values; and octopus's material and link order, which 1.3 returns unchanged too. **Input against pass 1 is not the test**, per V8 result 5. **Two things differ and both are explained.** (a) Our robot block is a FIXED POINT where 1.3's is an involution — D3's flip to insertion order. A single save cannot tell those apart, which is why there are two saves. Measured on 1.3 for hammer 2026-09-08 (result 6) and for octopus by V1. (b) `TEXALPHA` reads 99 here against the hammer capture's 255, because **1.3 has two save paths and they write different files.** Measured on 1.3, hammer, both paths in one sitting: the GUI save and the headless save differ in **exactly one line and nothing else**, confirmed by a sha256 over both files with only that value masked. 1.3's GUI writes 99, its headless path writes 255, and `pagesave-baseline.txt` shows the same on a second robot. `SIG_EnvironmentView.cpp, getOutOfExperiment` pushes the 255 default into `sliderAlpha`; the pristine form gives that slider no maximum — read it at `git show 0516d62:…/SIG_EnvironmentBase.ui`, since the file at that path today is the converted one — and Qt 2 caps it at `QRangeControl`'s default of 99 (`qrangecontrol.cpp:111-119`, from `qslider.cpp:124`). Qt 6 has no `QRangeControl`; its 0–99 default comes from `QAbstractSlider`. **Same number, different mechanism, which is weaker than it looks:** nothing enforces that the two toolkits keep the same default, so a Qt release could move our side alone and the gate would be the only thing that noticed. If it ever moves, set the maximum on the form rather than chase the toolkit. **Not measured:** that 1.3's slider really reports 99 — the oracle's X server went down mid-probe and the reading was not retaken. Result 7. **The gate is one diff of a 58-line report, not a dozen ifs**, so a generator that produces the wrong text fails on the whole report rather than on the one predicate someone remembered to write. Its own teeth test found a hole in it: three lines hashed an extract and compared three hashes, which reads *identical* when the extractor dies — replacing `expstruct.py` with `/bin/false` passed the gate 1/0. Each of those lines now carries the size of what it hashed. A second teeth round found the mirror of it: every *stable across all three passes* line passes when the INPUT changes, because all three passes change together — renaming an individual in the input went unnoticed. Those lines now carry content as well, and section 6's first and last entries are compared against 1.3's, which V8 result 4 quotes | gated as `v2 round trip vs 1.3` |
 | V3 | ~~Determinism on the x86 box — one experiment run twice, both `RANDOMSEED`s pinned~~ **SATISFIED 2026-09-02.** The oracle ran it twice on each of two models: `serA`≡`serB` and `octGateA`≡`octGateB`, identical on every field but the run-directory paths | closed. It is SAME-BOX determinism, which is sound; it was never a cross-machine claim |
 | V4 | ~~Two whole-run digests validated against the reference machine~~ **DROPPED 2026-09-03.** A whole-run digest cannot cross an x87/IEEE boundary, which §7 and D26 already said and C11 then proved: the identifier counts that appear to agree are FORCED — consumed in the tournament constructors before any fitness is read, with `createTours` building a constant 50 per generation — while the contents are decided by a float comparison and cannot agree. Estimated ~98% chance the counts matched even under maximal divergence | dropped, not deferred. What replaced it is a measurement of OUTPUT on one machine — see C11 |
-| V5 | **MDH probe DONE 2026-08-27, PASS** — `verification-against-sigel-1.3/v5-1.3-mdh-compared.txt`. **SENSOR PROBE DONE 2026-09-08, PASS, and it needed no gdb** — the constants are readable from both images, so the comparison is source-against-binary rather than breakpoint-against-breakpoint. **All eight constants the live `sense` references agree with 1.3 as values** — computed from our source expressions, not read out of our binary, and the difference matters: on aarch64 only ONE of the eight (the radian factor) is emitted into `.rodata` at all, four appear nowhere as 8-byte doubles, and two appear only in debug sections. The one that matters is the radian factor: 1.3 converts with pi TRUNCATED TO EIGHT DECIMALS, `180/3.14159265` = `404ca5dc1af05a77`, against the true `404ca5dc1a63c1f8`, a relative error of 1.14e-09. **The decisive measurement is an absence, and it reproduces on both sides:** the true constant appears in NEITHER 1.3 binary and in none of ours. Our source spells it `360.0/(2.0*3.14159265)` where 1.3's image holds the folded quotient — computed, not assumed, to be the same bits. The multiply-before-divide order, the ±`DBL_MAX` sentinel and the plain-`double` widths all match too. **Gated as `truncated pi (V5)`**, because the way to break it is a one-word edit that looks like tidying — and 1.3 itself uses the true `M_PI` in `IFunctions.cpp:384`, so the truncated literal reads as an oversight. **FORCE PROBE SCOPED AND NOT ATTEMPTED AS A BIT COMPARISON.** `moveDrive` carries its value chain in `long double`, and this machine's `long double` is IEEE binary128 against 1.3's x87 80-bit — `LDBL_MANT_DIG` 113 against 64. **Use that, not `sizeof`:** `sizeof` is 16 on x86-64 as well, where the format matches 1.3's exactly, so it cannot tell the platforms apart. An earlier version of this row cited `sizeof` and a rounding inequality, and the oracle showed both hold on x86-64 too. **This is a property of the BUILD HOST, not of the port:** an x86-64 build would make `moveDrive` comparable, though closing the plain-`double` gap as well would need `-mfpmath=387`, because x86-64 computes `double` in SSE where i386 used x87 intermediates. D26 and §7. `sense` is comparable further, because `scaledState` and `posRange` are plain `double` up to the divide, so a future value probe should stop at `scaledState` rather than at `registerValue` | the port's **arithmetic**, which V1–V4 never touch |
+| V5 | **MDH probe DONE 2026-08-27, PASS** — `verification-against-sigel-1.3/v5-1.3-mdh-compared.txt`. **SENSOR PROBE DONE 2026-09-08, PASS, and it needed no gdb** — the constants are readable from both images, so the comparison is source-against-binary rather than breakpoint-against-breakpoint. **All eight constants the live `sense` references agree with 1.3 as values** — computed from our source expressions, not read out of our binary, and the difference matters: on aarch64 only ONE of the eight (the radian factor) is emitted into `.rodata` at all, four appear nowhere as 8-byte doubles, and two appear only in debug sections. The one that matters is the radian factor: 1.3 converts with pi TRUNCATED TO EIGHT DECIMALS, `180/3.14159265` = `404ca5dc1af05a77`, against the true `404ca5dc1a63c1f8`, a relative error of 1.14e-09. **The decisive measurement is an absence, and it reproduces on both sides:** the true constant appears in NEITHER 1.3 binary and in none of ours. Our source spells it `360.0/(2.0*3.14159265)` where 1.3's image holds the folded quotient — computed, not assumed, to be the same bits. The multiply-before-divide order, the ±`DBL_MAX` sentinel and the plain-`double` widths all match too. **Gated as `truncated pi (V5)`**, because the way to break it is a one-word edit that looks like tidying — and 1.3 itself uses the true `M_PI` in `IFunctions.cpp, calculateAnyJoint`, so the truncated literal reads as an oversight. **FORCE PROBE SCOPED AND NOT ATTEMPTED AS A BIT COMPARISON.** `moveDrive` carries its value chain in `long double`, and this machine's `long double` is IEEE binary128 against 1.3's x87 80-bit — `LDBL_MANT_DIG` 113 against 64. **Use that, not `sizeof`:** `sizeof` is 16 on x86-64 as well, where the format matches 1.3's exactly, so it cannot tell the platforms apart. An earlier version of this row cited `sizeof` and a rounding inequality, and the oracle showed both hold on x86-64 too. **This is a property of the BUILD HOST, not of the port:** an x86-64 build would make `moveDrive` comparable, though closing the plain-`double` gap as well would need `-mfpmath=387`, because x86-64 computes `double` in SSE where i386 used x87 intermediates. D26 and §7. `sense` is comparable further, because `scaledState` and `posRange` are plain `double` up to the divide, so a future value probe should stop at `scaledState` rather than at `registerValue` | the port's **arithmetic**, which V1–V4 never touch |
 | V6 | **DONE 2026-08-29, PASS, 5 of 5** — `verification-against-sigel-1.3/v6-1.3-friction-nocollide.txt` | the two Phase D paths **no shipped data exercises**: friction pairs and no-collide pairs, and whether both setters negotiate |
 | V7 | **DONE 2026-08-29, 4 runs on `walker`** — `verification-against-sigel-1.3/v7-1.3-friction-nocollide-rules.txt` | the remaining rules for those two paths: multiple partners, unloaded partners, duplicates, and whether a dropped entry is resurrected |
 | V8 | **DONE 2026-08-29, captured BEFORE the conversion** — `verification-against-sigel-1.3/v8-1.3-gp-blocks.txt` | `SIG_GPParameter::hostList` and `SIG_GPExperiment::experimentHistory`, the two `Q2PtrList` the gates run on every load and the next to convert |
@@ -2831,7 +2831,7 @@ experiments hold programs that were evolved against readings carrying that
 error, in a chaotic simulation. **The correct constant is absent from both 1.3
 binaries and from all of ours**, which is the measurement rather than an
 inference. The edit is one word, and 1.3 itself uses the true
-`M_PI` in `IFunctions.cpp:384`, so the truncated literal reads as an
+`M_PI` in `IFunctions.cpp, calculateAnyJoint`, so the truncated literal reads as an
 oversight. Gated as `truncated pi (V5)`, in
 the source and in the built binary. Evidence in
 `verification-against-sigel-1.3/v5-1.3-mdh-compared.txt`; the same file records
@@ -2853,7 +2853,7 @@ is 80-bit.
 | **`no clipped controls`** (`clipcheck`) | any widget whose rect leaves its parent's, over the master's **six View pages and their tabs only** — and it carries a positive control that FAILS the gate if it does not fire, because "0 clipped" from a check that cannot detect clipping is worth nothing. Shrinking the window is not usable as that control: the converted pages carry real layouts and reflow where 1.3, absolutely positioned, clips — so **the port is better behaved than 1.3 on resize** — and it displaces a real widget instead |
 | **`slave gui`** (`slavegui`) — NEW 2026-09-05 | **two things `check.sh` had never reached, because it never ran this scenario.** (a) The clipping defect **in the two containers where it was actually found**, which `clipcheck` structurally cannot see: they belong to the slave window and its movie dialog, not to anything the master's menus open. *Both fixes were UNGATED while this table said the section above covered them — found by review.* It greps the two clip totals rather than diffing the whole scenario, whose GL view does not render offscreen. **Teeth-tested by deleting each `<minimumSize>` block and rebuilding**: without `GroupBox6`'s, 14 controls clip; without `groupboxDirectory`'s, 1. (b) **`SIGEL_SlaveGUI`'s 44 `SIGNAL(` and 44 `SLOT(` sites, which had no runtime coverage at all** — its stderr is kept and checked for Qt's `No such signal`/`No such slot`, behind the same `guidriveStderrControl` positive control. **Teeth-tested both ways**: `QT_LOGGING_RULES='*=false'` fails it as suppressed, and renaming one live signal in `SIG_SimulationWindow.cpp` fails it by name |
 | **`real clicks`** (`xtest`, `xtest-baseline.txt`) — NEW 2026-09-07 | **the platform layer, which nothing else here touches.** Every other section drives Qt through `QApplication::notify`. This one runs `guidrive` as a real X11 client in a nested `Xvfb` under `xcb`, and sends XTEST input with `xdotool`. It is the only section that exercises activation, the popup's pointer grab and Qt's double-click synthesis. It found C13's swallowed dismissing click on its first run. **Its control is inside the scenario, and the section fails without it.** The scenario compares one real click and one `QTest::mouseClick` at the same point, through a native event filter. It prints `DISCRIMINATES` only when the real click produced native `ButtonPress` events and `QTest` produced none. *Teeth-tested. `xdotool` was replaced by a stub that exits 0 and does nothing. The scenario stops at the coordinate check with a line-initial `!!` and exit 1, so the section fails on three predicates. **An earlier version of this row claimed it failed "on the control and on the `!!` marker", and review showed that was false**: all three of the scenario's mis-target messages put their `!!` in the MIDDLE of a line, and `check.sh` greps `^ *!!`, so not one of them was visible. A run whose own output said the finding was undecidable passed every guard the section had. The markers start their lines now, and the scenario returns 1 rather than carrying on.* `QEvent::spontaneous()` would not work as that control, because `qtestmouse.h` marks QTest's own events spontaneous. A missing `Xvfb` or `xdotool` **fails** rather than skips. The display is refused if something is already on it. The server is killed by pid, so a real session's own `Xvfb` survives |
-| **`truncated pi (V5)`** — NEW 2026-09-08 | **that nobody "fixes" 1.3's truncated pi.** The sensor path converts radians to degrees with `3.14159265`, not `M_PI`. Every evolved program in the shipped experiments was selected against sensor readings carrying that 1.14e-09 error, and they feed a chaotic simulation, so correcting it changes what the robots do. **The edit that breaks it is one word and looks like tidying**, and 1.3 uses the true `M_PI` in `IFunctions.cpp:384`, so the truncated literal reads as an oversight to anyone who meets that line first. **Two checks, because neither covers the other:** the SOURCE check catches an edit at one of the four sites even while another site still supplies the constant, which no binary search can see, and it is compiler-independent; the BINARY check catches any spelling that yields the true value — `M_PI`, `4*atan(1)`, a longer literal, a header constant — which a grep for `M_PI` would miss. Only the radian factor is gated, and the reason is measured rather than assumed: on aarch64 four of the other seven appear ZERO times as 8-byte doubles in our image and two appear only in debug sections, so there is nothing of theirs in `.rodata` to compare. Costs 0.18 s. *Teeth-tested six ways, and the testing found three defects in the gate itself. **The binary search covered the whole file, so its "the constant is missing" arm could never fire** — the Makefile compiles with `-g`, so two debug copies survive any patch of the real one; the search is bounded to `.rodata` now. **The source pattern was a prefix match**, so lengthening a site to `3.14159265358979` changed the factor while the count stayed at 4 and neither forbidden double appeared — the whole section passed on that edit. **And a comment mentioning `M_PI` or the literal failed the gate**, which is documentation, not a defect; comments are stripped now. The six probes: a site tidied to `M_PI`, a site deleted, a site lengthened, the true `180/pi` patched into `.rodata`, the kept constant patched out of `.rodata`, and a comment naming both. Five fail with the message aimed at them, one passes. Two orderings had to be fixed for that: `M_PI` is tested before the site count, and the forbidden constant before the missing one, because each of those edits trips both tests and the specific diagnosis has to win.* |
+| **`truncated pi (V5)`** — NEW 2026-09-08 | **that nobody "fixes" 1.3's truncated pi.** The sensor path converts radians to degrees with `3.14159265`, not `M_PI`. Every evolved program in the shipped experiments was selected against sensor readings carrying that 1.14e-09 error, and they feed a chaotic simulation, so correcting it changes what the robots do. **The edit that breaks it is one word and looks like tidying**, and 1.3 uses the true `M_PI` in `IFunctions.cpp, calculateAnyJoint`, so the truncated literal reads as an oversight to anyone who meets that line first. **Two checks, because neither covers the other:** the SOURCE check catches an edit at one of the four sites even while another site still supplies the constant, which no binary search can see, and it is compiler-independent; the BINARY check catches any spelling that yields the true value — `M_PI`, `4*atan(1)`, a longer literal, a header constant — which a grep for `M_PI` would miss. Only the radian factor is gated, and the reason is measured rather than assumed: on aarch64 four of the other seven appear ZERO times as 8-byte doubles in our image and two appear only in debug sections, so there is nothing of theirs in `.rodata` to compare. Costs 0.18 s. *Teeth-tested six ways, and the testing found three defects in the gate itself. **The binary search covered the whole file, so its "the constant is missing" arm could never fire** — the Makefile compiles with `-g`, so two debug copies survive any patch of the real one; the search is bounded to `.rodata` now. **The source pattern was a prefix match**, so lengthening a site to `3.14159265358979` changed the factor while the count stayed at 4 and neither forbidden double appeared — the whole section passed on that edit. **And a comment mentioning `M_PI` or the literal failed the gate**, which is documentation, not a defect; comments are stripped now. The six probes: a site tidied to `M_PI`, a site deleted, a site lengthened, the true `180/pi` patched into `.rodata`, the kept constant patched out of `.rodata`, and a comment naming both. Five fail with the message aimed at them, one passes. Two orderings had to be fixed for that: `M_PI` is tested before the site count, and the forbidden constant before the missing one, because each of those edits trips both tests and the specific diagnosis has to win.* |
 | **`v2 round trip vs 1.3`** — NEW 2026-09-08 | **a whole experiment through `File > Save Experiment`, twice, against what the 2003 binary wrote.** `pagesave vs 1.3` compares a 192-line parameter block, over two saves that differ only in whether the pages were edited; this compares the WHOLE file across two CHAINED saves, where each save's output is the next one's input — marker line numbers, `PVMHOST` order, the experiment history, the per-individual HISTORY growth, the individual names, the robot block, the ten first-save keys, and `expstruct.py` over pass 1 against pass 2. The expected text is copied from `verification-against-sigel-1.3/v8-1.3-gp-blocks.txt`, captured before this conversion existed, so a failure is a regression against 1.3 rather than against yesterday. **Input against pass 1 is not the test** — the first save adds ten keys and would fail however correct the port is (V8 result 5). It is ONE diff of a 58-line report. Costs 35 s measured, four `pagesave` runs over two experiments; no new scenario was added. *Teeth-tested 2026-09-08, and the testing found two holes in the gate itself, both since closed — see the V2 row above. Every predicate has been shown to fail on a change of the kind it exists to catch. The claim is one-way: a mutation moves the line it is aimed at, and usually others too, because a deleted key shifts every marker below it. It is NOT that each mutation moves exactly one line, which an earlier version of this row claimed and which the measurements never showed. The wrapper was tested too: missing data SKIPS and counts, a missing or stale binary FAILS, suppressed Qt connect logging FAILS, and the section was run from outside the repo root to check the `make -q -C` fix.* |
 | `encodings` | **INVERTED BY D31 2026-09-09 — this row used to say the opposite.** It no longer catches *a file whose CRLF was stripped*; it catches **CRLF present at all**, in any tracked text file, expected zero. 611 LF-only files and 8 that git calls binary, with 44 translated and 52 that postdate the root. Baseline 0, floor 500 |
 | `dead item virtuals` | a class declaring Qt 2's `key(int,bool)` without the `operator<` that replaces it. Matched against a **flattened** header and demanding the signature that actually overrides — a decoy `operator<( QTreeWidgetItem * )` and a two-line declaration both bypassed the first version |
@@ -3054,7 +3054,7 @@ non-owning**: `SIG_Visualisation::floatingTexts` aliases the renderer's
 pointers, and its constructor makes **0** `setAutoDelete` calls against
 `SIG_Renderer`'s 2. Making it owning is a double free.
 
-**A range check was lost at a FILE-DRIVEN index.** `SIG_RobotRenderer.cpp:46`
+**A range check was lost at a FILE-DRIVEN index.** `SIG_RobotRenderer.cpp, SIG_RobotRenderer`
 does `delete sceneObjects[ number ]; sceneObjects[ number ] = …` where `number`
 is **read from the model file**. Qt 2's `QGVector::insert` was range-checked;
 `QList::operator[]` asserts here and is an out-of-bounds **write** under
@@ -3474,7 +3474,7 @@ for the duration of a run and `SIG_MainWindow::slotActExpChanged` (`:851-859`)
 un-greys it again on any tree click, with no run check. *A claim made here on
 2026-09-06 that the path was closed is withdrawn — the run behind it never
 clicked the tree.* The unchecked read is unchanged:
-`SIG_GPFitnessTrainer.cpp:368`, reached from `MT_Evaluator.cpp:473`.
+`SIG_GPFitnessTrainer.cpp, checkTask`, reached from `MT_Evaluator.cpp:473`.
 
 **D29's arming line is now covered, and it held.** The tree click is the only
 thing that reaches it — `SIG_ExperimentListView.cpp:331` asks
@@ -4166,7 +4166,7 @@ C7's and still Qt 2. Nothing is owed at C1 — but the pairing is the point: a
 form can pass every gate this project has while the code that fills it is what
 holds the behaviour.
 
-**`SIG_ExperimentItem.cpp:64` is a second, independent trap in the same file.**
+**`SIG_ExperimentItem.cpp, SIG_ExperimentItem` is a second, independent trap in the same file.**
 `QListViewItem *childItem = new QListViewItem( newItem );` — `newItem` is the
 *Robot* item, so `Language-Parameters` is a **child of Robot**, not a sixth
 sibling. The four siblings above it use the same `newItem` variable and their
@@ -4330,7 +4330,7 @@ by grepping a header:
 - `sigel.cpp:197` handles `-mtevolve` / `-me`, and `:285` constructs a plain
   **`QCoreApplication`** on that path — deliberately, because it is the Qt 6
   spelling of Qt 2's `QApplication(argc, argv, false)`.
-- `MT_Controller.cpp:125` called `qApp->exit(0)` (`:130` after the fix).
+- `MT_Controller.cpp, slotEvolutionRunning` called `qApp->exit(0)` (`:130` after the fix).
 - That TU pulls **`qapplication.h`** — 22 references, transitively through
   `MT_GUI/MT_MainWindow.h`, whose chain reaches a generated `ui_<Form>.h` and
   its `<QtWidgets/QApplication>`. So `qApp` expands to
@@ -4403,19 +4403,19 @@ every D8 site for a stored `const char *`.
 
 | Where | 2003 | Now | Why |
 |---|---|---|---|
-| `Q2Array::sort()` | `memcmp` byte order | numeric | Three sites need ascending numeric order and break once any element reaches 256: `SIG_GPManager.cpp:304,311`, `SIG_AllIndividualsView.cpp:240`. Qt 2's own source says *"Qt 3.0: Add a virtual compareItems()"* |
+| `Q2Array::sort()` | `memcmp` byte order | numeric | Three sites need ascending numeric order and break once any element reaches 256: `SIG_GPManager.cpp:304,311`, `SIG_AllIndividualsView.cpp, slotDeleteIndividuals`. Qt 2's own source says *"Qt 3.0: Add a virtual compareItems()"* |
 | out-of-range array access | ~~warn, clamp to 0~~ **BOTH HALVES OF THIS ROW ARE WRONG, corrected 2026-09-03.** "2003 warned and clamped" is true of **`QGArray::at`** (`qgarray.h:108-117`, `msg_index(index); index = 0;`) and **false of `QGVector::at`** (`qgvector.h:85-92`, which warns and then *reads out of range*) and of **`QGList::at`** (`qglist.h:172-176`, which returns **null**). Three behaviours, and this row is the **fourth** recorded instance of fusing them — in the very table §10's corrected semantics row points at | ~~same, in the shim~~ **nothing clamps today**: `q2compat.h` went with D27, and `shim/` now holds only `fstream.h`, `iomanip.h`, `iostream.h`, `minmax.h`, `new.h`, `strstream.h`, `vector.h`. The port uses `value()`, which yields null — **safer than Qt 2, not equal to it** | The original reason still stands for why a clamp was not replaced by `Q_ASSERT`: it compiles to nothing under `QT_NO_DEBUG`, so a release build would corrupt memory silently where 2003 returned a wrong value. *Neither `QT_NO_DEBUG` nor `NDEBUG` is defined by the Makefile or `check.sh`, so `QList`'s assert is live in both build trees today* |
 | ~~`SIG_ProgramLine.cpp:215-224`~~ | writes `element[no]` in the branch entered *because* `no >= size()` | **FIXED** — `:215-232` now guards `if( no >= 0 && no < int(element.size()) )` | Its own comment is `// ToDo: Exception!` |
 | ~~`SIG_DynaSystem.cpp:266-268`~~ | deletes `dynaJoints[k]` while looping to `dynaDrives.size()` | **moot 2026-08-28** — the file is deleted with the Dynamo backend, `physics_backends.md` | The two vectors grew independently |
-| `SIG_EarlyRunTermSimulation.cpp:97` | `QTime zeroHour;` | `QTime( 0, 0 )` | Same class as the other 11 `QTime()` sites but a declaration, so the first sweep's pattern missed it. `getMaxRecorderSteps` returned 2 instead of 182 — a factor of 91 on the denominator of three fitness functions. No shipped experiment selects them, so `replicate.sh` cannot see it |
+| `SIG_EarlyRunTermSimulation.cpp, getMaxRecorderSteps` | `QTime zeroHour;` | `QTime( 0, 0 )` | Same class as the other 11 `QTime()` sites but a declaration, so the first sweep's pattern missed it. `getMaxRecorderSteps` returned 2 instead of 182 — a factor of 91 on the denominator of three fitness functions. No shipped experiment selects them, so `replicate.sh` cannot see it |
 | `sigel_slave`, `getenv("SIGEL_ROOT")` | dereferenced unchecked | to be fixed | Segfaults if unset; the SIGSEGV handler masks it with no core. Bites under PVM specifically — spawned tasks inherit *pvmd's* environment, not the master's |
-| `SIG_GPPVMData.cpp:51` `sendQStringToPVM` | sends `str.length() + 1`, a **character** count, then sends `str.toUtf8()`, up to 4x longer in bytes | `qCStringBuffer.size() + 2` (D21; was `+ 1` on a `Q2CString`) | `getQStringFromPVM` sizes its receive buffer from that count and lets `pvm_upkstr` write the bytes in. 20 `ü` gives `heap-buffer-overflow ... in byteupk` under ASan; short strings survive only because `QList` over-allocates. Qt 2's `length()` was the Latin-1 byte count, so 2003 was right for its own data. **Changes the wire format for non-ASCII** — safe only because both ends are this file and no distributed run exists. Found by Phase P's P4, regression-tested by `pvm_link.cpp` |
+| `SIG_GPPVMData.cpp, sendQStringToPVM` `sendQStringToPVM` | sends `str.length() + 1`, a **character** count, then sends `str.toUtf8()`, up to 4x longer in bytes | `qCStringBuffer.size() + 2` (D21; was `+ 1` on a `Q2CString`) | `getQStringFromPVM` sizes its receive buffer from that count and lets `pvm_upkstr` write the bytes in. 20 `ü` gives `heap-buffer-overflow ... in byteupk` under ASan; short strings survive only because `QList` over-allocates. Qt 2's `length()` was the Latin-1 byte count, so 2003 was right for its own data. **Changes the wire format for non-ASCII** — safe only because both ends are this file and no distributed run exists. Found by Phase P's P4, regression-tested by `pvm_link.cpp` |
 | `SIG_GPIndividual.cpp:557-559` / `:647` | the writer emits `"\n      "` before `}HISTORY END;`; the reader takes everything up to that marker as content, so the separator becomes data | **preserved, not fixed** | Every save grows every `HISTORY` block by 7 bytes, linearly and without limit — 100 blocks is ~700 bytes per round trip. Measured on the 1.3 binary over three consecutive round trips (V8) and confirmed to be the same code here. Fixing it would change file bytes against 1.3. Any gate that diffs a round-tripped `.exp` must normalise trailing whitespace inside these blocks |
 | `SIG_GPPVMData::sendQStringToPVM`, a **null** `QString` | `Q2CString`'s `const char *` conversion gave `nullptr`, and `pvm_pkstr` does `strlen(cp)` unguarded — a segfault | `constData()` gives `""`; an empty string is sent | Found by the D21 review, which showed the `+ 2` does not reproduce the old length for a null string. It never could: the old path died before the length was used. Unreachable today — the two live callers pass a string built by `savePVMDataTransfer` — but it is a crash removed, not a value preserved, and D21 first claimed otherwise |
 | `SIG_GPForceFitnessFunction`'s cleanup loop | a `do`/`while` dereferencing `listForces.first()` **before** testing it | a range-for | `Q2PtrList::first()` returned null on an empty list, so an evaluation that recorded no frames took a null dereference **while freeing memory**. Identical with frames, a no-op without. Contrast D10, where the same shape's once-through was load-bearing and had to be kept — which side of the null the body is written for must be read each time, not pattern-matched |
 | `SIG_Environment` terrain load | `getenv("SIGEL_ROOT")` unchecked | already checked, message on stderr | `sigel_eval` says "SIGEL_ROOT is not set, cannot locate Terrain.ter" instead of reading `/Terrain.ter` |
-| `MT_GPSystem/MT_FitnessTrainer.cpp:88` | `loadSetup` sized `Result`/`ResultIst` from the **stale member** `TSetSize` while handing the training set the file's `NewTSetSize` | `TSetSize = NewTSetSize;` | Any setup file with a larger set made `calculateFitness` **write past both arrays**. `setSelektionValue` in the same file always did it correctly. Found by the D4–D6 review; **off the 42-evaluation path, so no gate saw it**. *Added to this table 2026-09-03 — it had been recorded only in a D-step paragraph, which the compression then removed* |
-| `MT_Control/MT_Substitute.cpp:64` | `changeErrorInfo` looped to `CorrectFitness.size()`, a **high-water mark that only grows**, while indexing the caller's arrays | bounded by the smallest of the three | Those arrays shrink whenever the selection size is lowered. Same review, same table omission, same date |
+| `MT_GPSystem/MT_FitnessTrainer.cpp, loadSetup` | `loadSetup` sized `Result`/`ResultIst` from the **stale member** `TSetSize` while handing the training set the file's `NewTSetSize` | `TSetSize = NewTSetSize;` | Any setup file with a larger set made `calculateFitness` **write past both arrays**. `setSelektionValue` in the same file always did it correctly. Found by the D4–D6 review; **off the 42-evaluation path, so no gate saw it**. *Added to this table 2026-09-03 — it had been recorded only in a D-step paragraph, which the compression then removed* |
+| `MT_Control/MT_Substitute.cpp, changeErrorInfo` | `changeErrorInfo` looped to `CorrectFitness.size()`, a **high-water mark that only grows**, while indexing the caller's arrays | bounded by the smallest of the three | Those arrays shrink whenever the selection size is lowered. Same review, same table omission, same date |
 
 ~~**Open, from the R1 review:** SOLID is built without the `-DNDEBUG` its own
 `Make-config` sets, so eight `assert(!eqz(x))` guards ahead of a division are
@@ -4450,7 +4450,7 @@ compiled at all. It went with the Dynamo backend, its only caller
   either way, so a `first()`/`next()` walk converts silently while only the
   `.next()` fails to build. Live at the next step:
   `writeHistoryToFileTransfer` opens with `experimentHistory.first()`
-  (`SIG_GPExperiment.cpp:133`, `SIG_GPExperimentClean.cpp:109,162`). All 14
+  (`SIG_GPExperiment.cpp, writeHistoryToFileTransfer`, `SIG_GPExperimentClean.cpp:109,162`). All 14
   shipped `.exp` have a non-empty history, but an experiment saved before any
   generation runs does not. Use `value(0)` or a range-for.
 - **`QQueue` on an empty queue** — the same trap one level up, and it caught
@@ -4463,7 +4463,7 @@ compiled at all. It went with the Dynamo backend, its only caller
   `QList::takeFirst()`, `head()` is `QList::first()`. Measured: abort at
   `-O1 -g`, segfault under `-DQT_NO_DEBUG`. Not reachable through
   `MT_Trainingset::updateTSet`, the only drain today. **Live for Phase C**:
-  `MT_GUI/MT_ExperimentWidget.cpp:48` calls `prevSelectedItems.head()` with no
+  `MT_GUI/MT_ExperimentWidget.cpp, slotCurrentChanged` calls `prevSelectedItems.head()` with no
   emptiness guard, so `lastSelected()` before any selection returned 0 in 2003
   and will abort now. **STALE — Phase C closed this.** `MT_GUI` is in `check.sh`'s `MODULES` (`check.sh:94`) and the Makefile's `CORE` (`Makefile:312`), and C11c's `metagui` scenario drives the whole MetaGP window. *It said:* `MT_GUI` is in neither `check.sh`'s `MODULES` nor the
   Makefile's `CORE`, so nothing flags it.
@@ -4613,7 +4613,7 @@ tracked anywhere:
 
 | site | state | why it matters |
 |---|---|---|
-| ~~`SIG_GPManager.cpp:415` and `:1507`~~ **CLOSED by D25b** | `fitTaskList` is now `QList< QList<int> * >` (`:405`, `:1461`) and the walk is index-based | The hazard was real: `fitTaskList.first()` then `while (actFitTask)` — **the loop terminated on the null**, and Qt 6's `first()` is UB on empty. It became a cursor index (`isEmpty() ? -1 : 0`, then `at()`), not `value(0)` or a range-for, because the walk also needs `remove`/`current`/`next` semantics. This row is why the step was written the way it was |
+| ~~`SIG_GPManager.cpp, evalNewIndis` and `:1507`~~ **CLOSED by D25b** | `fitTaskList` is now `QList< QList<int> * >` (`:405`, `:1461`) and the walk is index-based | The hazard was real: `fitTaskList.first()` then `while (actFitTask)` — **the loop terminated on the null**, and Qt 6's `first()` is UB on empty. It became a cursor index (`isEmpty() ? -1 : 0`, then `at()`), not `value(0)` or a range-for, because the walk also needs `remove`/`current`/`next` semantics. This row is why the step was written the way it was |
 | `SIG_ExperimentView.cpp:91`, `:105`, `:119` | `experimentHistory` is **already** `QList<T *>`; `.first()` unguarded | converted-code UB, latent only because `SIGEL_MasterGUI` is not in the build. Phase C |
 | ~~`SIG_EnvironmentRenderer` `robotPathPoints`~~ **CLOSED by C5** | was **unconverted Qt 2** `QList<DL_vector>` under `#include <qlist.h>`, walked with `.first()`/`.next()` into a `DL_vector *` | the central pointer-versus-value trap. Now `QList<DL_vector *>` with index walks and an explicit `qDeleteAll`; both walks were guarded by `count() >= 2`, which is what kept `first()` off an empty list |
 
@@ -4689,7 +4689,7 @@ the smallest *positive* normal — does not arise. What does arise is worse:
 
 **The sentinel is compared with `==`, and it cannot round-trip through the file
 format.** `minPos`/`maxPos` come from `SIG_Joint::getMechsMinPos/MaxPos`, whose
-values are read from the model file (`SIG_Joint.cpp:64`). Measured:
+values are read from the model file (`SIG_Joint.cpp, SIG_Joint`). Measured:
 
     DBL_MAX written by our stream : 1.79769e+308
     read back                     : 1.7976900000000001e+308
@@ -4905,7 +4905,7 @@ buy: nothing observable.** Read that before re-opening this.
 **EXTENDED 2026-09-07, and this section was right all along.** An attempt to
 close the question in §0 was withdrawn for not reconciling with this table. Two
 things are now known that sharpen it. **The writers do not all use precision 6**:
-`SIG_Renderer.cpp:114` sets **5** for every POV `<x, y, z>` and
+`SIG_Renderer.cpp, vectorToPovray` sets **5** for every POV `<x, y, z>` and
 `SIG_GPPVMData.cpp:116, :157` set **50** for the master↔slave transfer — so this
 table's precision-6 column is the *least* affected case. At 5, **22.49%** of
 multiples of 1/16 differ against 0% at 6. `tiecheck.cpp` at the repo root is the
@@ -5115,10 +5115,10 @@ Bodies and materials are free of *numbering* — but an earlier draft said they
 were "touched only by `loadGeometries`" and "only through `lookupMaterial`",
 **and that was wrong**: both are also iterated by
 `SIG_Robot::writeToFileTransfer`, so their order reaches `.exp` bytes, the PVM
-stream (`SIG_GPPVMData.cpp:144`) and the POV-Ray export
-(`SIG_RobotRenderer.cpp:218`). No index, number or DynaMechs registration comes
+stream (`SIG_GPPVMData.cpp, loadPVMDataTransfer`) and the POV-Ray export
+(`SIG_RobotRenderer.cpp, createPovrayDeclarations`). No index, number or DynaMechs registration comes
 from either, so the conclusion holds and no fitness moves — but for a different
-reason than the one given. One latent path: `SIG_Material.cpp:57` records a
+reason than the one given. One latent path: `SIG_Material.cpp, SIG_Material` records a
 friction pair only if the partner is already loaded, so an **asymmetric**
 friction graph would lose pairs as a function of write order. Every material in
 all 14 `.exp` has `nfric == 0` and no `.rrb` declares `friction`, so it is
@@ -5163,7 +5163,7 @@ is `body, shoulder5, foot1, …`. So once the containers are insertion-ordered,
 loading an `.exp` gives the order the simulation already ran on, and **not one
 byte of the shipped experiments changes**.
 
-The 7 `.rrb` do need it: `SIG_RobotCompilerObjects.cpp:89` inserts in
+The 7 `.rrb` do need it: `SIG_RobotCompilerObjects.cpp, linkFind` inserts in
 declaration order, which the same prepend then reverses, so the file has to be
 written in today's `rrb` order for the flip to preserve it.
 
@@ -5175,7 +5175,7 @@ the risk was already stated two paragraphs up.
 `SIG_DynaSystem::getJoint(int)` really is a linear search rather than a
 subscript, but the search *key is the number*, so that fact settles nothing.
 Four containers are subscripted by it directly —
-`SIG_DynaMechsSimulationData.cpp:148` `drives.insert(getNumber(), …)`, `:170`,
+`SIG_DynaMechsSimulationData.cpp, SIG_DynaMechsSimulationData` `drives.insert(getNumber(), …)`, `:170`,
 `:183`, `:197` for sensors, and `:486-489` `jointIndices[joint->getNumber()]` —
 and an evolved program's operand resolves straight through them:
 `SIG_DynaMechsSimulationQueries.cpp:93-95` does
@@ -5188,7 +5188,7 @@ sensor `#0` was `leg1Joint1Sensor`, now `leg6Joint2Sensor`. So `MOVE 0` on a
 `.rrb`-loaded walker drives a different actuator than it did in 2003.
 
 **Iteration order and numbering cannot both be preserved for a `.rrb`**, because
-the number *is* the declaration position (`SIG_RobotCompilerObjects.cpp:89`,
+the number *is* the declaration position (`SIG_RobotCompilerObjects.cpp, linkFind`,
 `linknumber++`) and the file has nowhere to record a number independently. The
 migration chose **iteration order**, which is what §10 asks for and what feeds
 the DynaMechs body index. That choice was made silently and should not have
@@ -5199,7 +5199,7 @@ iteration order, fully self-consistent, at the cost of changing the order the
 
 **Nothing shipped is affected either way.** The 14 `.exp` embed their own robot
 with its own stored numbers, are never reconciled against a `.rrb`
-(`SIG_GPExperiment.cpp:86-101`), and `SIG_Link.cpp:65` reads
+(`SIG_GPExperiment.cpp:86-101`), and `SIG_Link.cpp, SIG_Link` reads
 `tx >> name >> number` straight back — every number stays as 2001 wrote it.
 `dictorder-dump.sh` now prints the stored number next to the position (`#N`) so
 this is visible to the gate instead of invisible to it.
@@ -5232,7 +5232,7 @@ D25c each shipped or nearly shipped a defect.
 | `Q2PtrVector::remove(i)` | deleted the occupant and left a **null hole**; the slot stays | `delete v[i]; v[i] = 0;` — `QList::removeAt` *shifts* |
 | `Q2PtrVector::take(i)` | returned the occupant, emptied the slot, **never deleted** | `p = v.value(i); v[i] = 0;` |
 | shrinking `resize(n)` | **deleted the truncated tail** | delete `[n, size)` then `resize(n)`. Written once as a helper (`resizeOwning`, `resizeOwningHosts`) so no shrink is a special case a later reader has to re-derive |
-| `Q2PtrList::at(i)` | returned **nullptr** out of range, and 2003 code relies on it defensively (`MT_Statistics.cpp:79`) | **`value(i)`**, not `at()`. `QList::at()` out of range is UB and compiles silently |
+| `Q2PtrList::at(i)` | returned **nullptr** out of range, and 2003 code relies on it defensively (`MT_Statistics.cpp, writeToFileMT_Statistics`) | **`value(i)`**, not `at()`. `QList::at()` out of range is UB and compiles silently |
 | `Q2PtrVector::at(i)` / `operator[]` | **Qt 2 warned and then READ OUT OF RANGE** — `QGVector::at` is `if ( index >= len ) warningIndexRange( index ); return vec[index];` (`qgvector.h:85-92`), no clamp. **The clamp was the SHIM's own deliberate divergence**, and `q2compat.h`'s header comment said so | `value(i)`, which yields null. *Three distinct behaviours, and conflating them has now been done three times: `Q2PtrList::at` **returned null**, `Q2Array::at` **clamped** (`QGArray::at` does `msg_index(index); index = 0;`), and `Q2PtrVector::at` **read out of bounds**. §9's null-out-of-range row is the FIRST of the three. So where a D-step below says "the clamp went", what went was the **shim's safety net**, not 1.3 behaviour — and `value()` is safer than Qt 2 rather than equal to it.* Corrected 2026-09-03 by review; the compression had fused the distinction away |
 | `Q2PtrList::insert(uint, const T*)` | returned false and did nothing when `i > size` | `QList::insert` is `Q_ASSERT_X(i <= size)` — abort in debug, UB in release |
 | `Q2PtrList::take(i)` | returned nullptr out of range | `takeAt(i)` is out-of-range `operator[]` — abort or a heap read |
@@ -5285,7 +5285,7 @@ first compression cut them; a review reproduced the first one on the spot.
 **heap-buffer-overflow inside vendored cv97** — `JString::regionMatches`
 (`cv97/JString.cpp:150`) via `JString::endsWith` (`:189`) from
 `SceneGraph::SceneGraph()` (`cv97/SceneGraph.cpp:31`) under
-`SIG_Body::load()` (`src/SIGEL_Robot/SIG_Body.cpp:217`). It **aborts** under
+`SIG_Body::load()` (`src/SIGEL_Robot/SIG_Body.cpp, load`). It **aborts** under
 AddressSanitizer, so `dictorder-dump.sh` cannot be run against `build/` at all
 and the 7 `.rrb` — and everything the VRML/SceneGraph reader does — are
 unreachable by ASan and UBSan. Vendored code, out of scope for the Qt port, but
@@ -5310,7 +5310,7 @@ present tense, two paragraphs after a correction whose own moral was that a
 figure "stood for a day in two places at once". Found by review the same day.*
 
 **The trainer's host-rotation modulus is cast, and it is D9's defect a third and
-fourth time.** `SIG_GPFitnessTrainer.cpp:593` and `:602` are
+fourth time.** `SIG_GPFitnessTrainer.cpp, getNextHost` and `:602` are
 `nextHostNumber % static_cast< uint >(pvmHosts.size())` over an `int`
 `nextHostNumber` (header `:75`); the cast preserves Qt 2's unsigned wrap and is
 what keeps `pvmHosts[ nextHostNumber ]` at `:598` non-negative. §9's
@@ -5341,9 +5341,9 @@ are unrun.
 **Two pre-existing leaks D24 wrote down.** `TmpBuffer`'s **never-matched
 remainder** leaks — a *matched* case is freed, because it is enqueued on
 `TCaseBuffer` and `MT_Trainingset::updateTSet` deletes it at
-`MT_Trainingset.cpp:120` and `:145`. And `StatisticsOfGeneration` leaks
-**entirely**: its elements are `new`'d at `MT_Statistics.cpp:56` and
-`MT_GPManager.cpp:557`, `~MT_Statistics` is empty, and **no `delete` of an
+`MT_Trainingset.cpp, updateTSet` and `:145`. And `StatisticsOfGeneration` leaks
+**entirely**: its elements are `new`'d at `MT_Statistics.cpp, MT_Statistics` and
+`MT_GPManager.cpp, startEvolution`, `~MT_Statistics` is empty, and **no `delete` of an
 `MT_StatisticsElement` exists anywhere in the tree**.
 
 **D25b's forward-looking note.** `delete fitTaskList.takeAt( fitCur )` is
@@ -5354,7 +5354,7 @@ a future edit that mutates the list mid-loop turns a no-op into UB.
 
 **`sigel_eval.cpp` is in the repository root, and `src/` + `include/` is not "all
 code".** D26 declared the shim deletable on a grep over those two directories.
-`sigel_eval.cpp:363` and `:401` instantiate `Q2PtrList<int>` — the D18
+`sigel_eval.cpp, selfcheck` and `:401` instantiate `Q2PtrList<int>` — the D18
 differential check — and **that file is the dictorder and fitness gate binary**.
 Another instance of §9's characteristic failure and **the sharpest form of it:
 the scope that was too narrow happened to exclude the file being certified.**
@@ -5436,7 +5436,7 @@ member — plus one per material and body, so it tracks robot size.
 
 **`Q2CString`'s row was zeroed by D12 and is struck through above.** Its 3 and 4
 were `SIG_Environment.cpp:416` — the constructor *and* `readFromFile` — and
-`SIG_DynaMechsSimulationData.cpp:303`, which were the only `Q2CString` the gates
+`SIG_DynaMechsSimulationData.cpp, initializeEnvironment`, which were the only `Q2CString` the gates
 ever constructed. The 7 that survive are PVM code `sigel_eval` never runs. D12
 took the row to zero and left it standing while citing the table as current;
 corrected by review.
@@ -5476,7 +5476,7 @@ which is why the list exists.
 | `readFromFile`'s `qDeleteAll` + `clear`, D13 | runs every load, always on an **empty** list |
 | **all four sites in `SIG_GPExperiment.cpp`**, D14 | the master variant is compiled into `libSIGEL_GP.a` and **never linked** — `SIG_GPExperimentClean.o` satisfies the symbols first. `readelf --debug-dump=info` on `sigel_eval` has a CU for Clean and none for the master |
 | `writeHistoryToFileTransfer`, D14 | linked, never called — no gate saves an `.exp` |
-| `exportExperimentHistoryToGNUPlot`, D14 | linked; its only caller is `SIG_Experiment.cpp:567`, Phase C |
+| `exportExperimentHistoryToGNUPlot`, D14 | linked; its only caller is `SIG_Experiment.cpp, slotLanguageParameterImport`, Phase C |
 | **five of D15's eight `delete pool[…]`** | the three sized constructors, `importNewIndividual`, and `addRandomIndividuals`' — which is `delete nullptr` on every possible call, since `resize()` just made those slots. *D16 said six of nine; nine was a `grep` hit that counted a comment, and three of the eight are entered by the self-check as of D16* |
 | both `wasCanceled()` shrinks, D15 | need a `QApplication`; `sigel_eval` has none, so `if (qApp)` is false |
 | `readFromFile`'s shrink loop, D15 | the function runs on every load, but always on an **empty** pool, so the loop body never executes |
@@ -5760,7 +5760,7 @@ trip.*
 **THE GUARD IN `SIG_ExperimentView::putIntoExperiment()` SITS BELOW THE LCD READ,
 DELIBERATELY — moved there 2026-09-05.** It was above it, and that would have
 been a divergence **the run lock itself introduced**. `poolGeneration` IS
-incremented per generation inside the loop (`SIG_GPManager.cpp:737`), 1.3 has no
+incremented per generation inside the loop (`SIG_GPManager.cpp, run`), 1.3 has no
 guard anywhere in this function, and this document's own reading of 1.3 says the
 counter "moves when the experiment is selected, when a page is switched, and at
 the top of `slotStartEvolution`" — so on 1.3 a page switch **during** a run
@@ -5867,7 +5867,7 @@ unchanged in the port.** `SIG_GPFitnessTrainer::spawnTask` grows the vector
 before writing — `oldMaxIndex < nextFreeNumber + 1` → `resize( oldSize +
 population )` — and that logic is **identical to the pristine 2003 source and
 correct on its own terms**: it always grows before the index it is about to use.
-But `checkTask( int taskId )` (`SIG_GPFitnessTrainer.cpp:368`) does
+But `checkTask( int taskId )` (`SIG_GPFitnessTrainer.cpp, checkTask`) does
 
 ```cpp
 SIG_GPPVMTask *pvmTask = pvmTasks[ taskId ];
@@ -5942,7 +5942,7 @@ run did not crash it. Only injected events did.
 
 **THE PORT HAS THE SAME MECHANISM, INTACT.**
 `SIG_GUIGPManager::haveABreak()` is `qApp->processEvents( QEventLoop::AllEvents,
-… )` (`SIG_GUIGPManager.cpp:65`), called from **six** places in the evolution loop (`SIG_GPManager.cpp:96, 420, 460, 1335, 1540, 1567`, three in each `run()` body),
+… )` (`SIG_GUIGPManager.cpp, haveABreak`), called from **six** places in the evolution loop (`SIG_GPManager.cpp:96, 420, 460, 1335, 1540, 1567`, three in each `run()` body),
 and `checkTask`'s unchecked `pvmTasks[ taskId ]` is unchanged. So a GUI
 interaction re-enters through that pump and can reach the unchecked read before
 the growth that would have covered the id. **MEASURED 2026-09-07 and it does**:
@@ -5978,7 +5978,7 @@ binary — so it is recorded, not tested.
 
 ### PRE-EXISTING LEAK — the simulation backend is never freed
 
-`SIG_Simulation.cpp:65` allocates a `SIG_DynaMechsSimulationData` with `new`.
+`SIG_Simulation.cpp, SIG_Simulation` allocates a `SIG_DynaMechsSimulationData` with `new`.
 `~SIG_Simulation()` at `:86` is empty. Nothing deletes it — verified across
 `src/`. Same for `simulationQueries` and the command interface. One simulation
 object per fitness evaluation, so a GP run leaks the physics backend thousands

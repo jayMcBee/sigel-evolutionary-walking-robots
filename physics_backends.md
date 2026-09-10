@@ -67,7 +67,7 @@ gains a `default:` that prints to `std::cerr` and throws. It does not fall
 through — the previous switch had no `default` at all, so an unknown library
 would have left `simulationData`, `simulationQueries` and `commandInterface`
 uninitialised. Verified by building a copy of `sigel_eval` without its own
-`SIMULATIONLIBRARY` guard (`sigel_eval.cpp:242`) and running an `.exp` edited to
+`SIMULATIONLIBRARY` guard (`sigel_eval.cpp, selfcheck`) and running an `.exp` edited to
 `SIMULATIONLIBRARY 0`: one line of diagnostic, then abort, exit 134. It never
 falls through and never runs DynaMechs.
 
@@ -76,7 +76,7 @@ functions, which construct `SIG_Simulation` outside their own `try` — but one
 frame further out, `sigel_slave.cpp:361-367` wraps `evalFitness()` in
 `catch (SIG_Exception &) { fitnessValue = 0; }`. So under PVM the exception is
 swallowed and the individual is scored 0.0 as though evaluated, the failure
-`SIG_GPSimpleRecorder.cpp:42` documents. The printed line is therefore the only
+`SIG_GPSimpleRecorder.cpp, init` documents. The printed line is therefore the only
 evidence anyone gets, which is why it goes to `std::cerr` and not the buffered
 `SIG_IO::cerr`. Hardening that `catch` is pre-existing and out of scope.
 
@@ -202,9 +202,9 @@ is what "dead code" was supposed to mean.
 
 | predicted | measured 2026-08-28 |
 |---|---|
-| `SIG_GlueJoint`, `SIG_CylindricalJoint` | **holds.** Both still parsed (`SIG_Robot.cpp:367,369`), still compiled by `SIGEL_RobotIO`, still listed by `SIG_RobotView.cpp:110`. No simulator reads either |
+| `SIG_GlueJoint`, `SIG_CylindricalJoint` | **holds.** Both still parsed (`SIG_Robot.cpp:367,369`), still compiled by `SIGEL_RobotIO`, still listed by `SIG_RobotView.cpp, getOutOfExperiment`. No simulator reads either |
 | `getFrictionValue`, `getElasticity`, `getVeloDamping` | **holds, exactly.** Zero call sites anywhere in the tree; only the definition and the declaration remain |
-| `getYPlaneLevel` | survives, as predicted — `SIG_EnvironmentRenderer.cpp:58` and `SIG_EnvironmentView.cpp:148` |
+| `getYPlaneLevel` | survives, as predicted — `SIG_EnvironmentRenderer.cpp, SIG_EnvironmentRenderer` and `SIG_EnvironmentView.cpp, getOutOfExperiment` |
 | the six simulation parameters | **holds, with a correction.** `getAnalytical`, `getIntegrator`, `getMaximalIterations`, `getMaximalCollisionLoops`, `getSkipFrames` and `getSolveMode` lose their only *simulation* reader, but each is still read by `SIG_SimulationParameter.cpp` to fill its dialog. They are now exactly as dead as `getMaximalError` and `getMaximalSOLIDIterations` already were: parsed, displayed, editable, simulated by nothing |
 
 **Three things the prediction missed, found by review of the change:**
@@ -212,13 +212,13 @@ is what "dead code" was supposed to mean.
 | now dead | where |
 |---|---|
 | `SIG_Robot::prepareDynaMo` and `SIG_Link::transformToDynaMo` | `SIG_Robot.cpp:274-282` and `SIG_Link.cpp:200-206` — **16 lines of definition, 23 with the declarations and their doxygen blocks.** An earlier draft said "~45", which was a guess; this project's rule is that only measured figures go in a planning document. Their only callers are the three surviving `case DynaMo:` arms below |
-| three `case DynaMo:` arms | `SIG_GPFitnessTrainer.cpp:52`, `sigel_slave.cpp:252`, `SIG_AllIndividualsView.cpp:311`. Each transforms the robot for a simulation that now always throws. Left because the `SimulationLibrary` enum has to survive — the parser, the GUI and four other switches name it |
+| three `case DynaMo:` arms | `SIG_GPFitnessTrainer.cpp, SIG_GPFitnessTrainer`, `sigel_slave.cpp:252`, `SIG_AllIndividualsView.cpp, slotStatsClicked`. Each transforms the robot for a simulation that now always throws. Left because the `SimulationLibrary` enum has to survive — the parser, the GUI and four other switches name it |
 | `SIG_Simulation::slotDynamoMessage`, `stopSimulation`, and the only throw of `SIG_SimulationCannotSolveException` | see "One `moc` target" above |
 
 ### Follow-up this change deliberately did not take
 
 1. **The GUI can still author an experiment that now aborts.**
-   **Four surviving surfaces**: `SIG_SimulationParameter.cpp:121` calls
+   **Four surviving surfaces**: `SIG_SimulationParameter.cpp, putIntoExperiment` calls
    `setSimulationLibrary(DynaMo)`; `:224-225` reads the value back to re-check
    that button; `SIG_SimulationParameterBase.ui:143` offers "Dynamo  (not
    recommended)" and `:566-568` is a whole tab titled `DynaMo`; and
@@ -322,7 +322,7 @@ all.**
 ### Still not fixed, deliberately
 
 The `exit(1)` a glue joint would reach under DynaMechs is at
-**`SIG_DynaMechsSimulationData.cpp:424`**, not `:394` as recorded above — the
+**`SIG_DynaMechsSimulationData.cpp, initializeJoint`**, not `:394` as recorded above — the
 line moved with Phase V5's probe. It is still an `exit(1)` and should still
 become a thrown exception. Left alone to keep this changeset single-purpose.
 
@@ -375,5 +375,5 @@ diagnostic, including plain `"Warning:"` lines.
 
 **The authors agreed.** `SIG_SimulationParameterBase.ui:143,154` labels the two
 choices `"Dynamo  (not recommended)"` and `"DynaMechs   (preferred)"`, and
-`SIG_Experiment.cpp:630` refuses to open the Robot Information dialog unless
+`SIG_Experiment.cpp, slotPopulationExport` refuses to open the Robot Information dialog unless
 DynaMechs is selected. All 14 shipped experiments carry `SIMULATIONLIBRARY 1`.

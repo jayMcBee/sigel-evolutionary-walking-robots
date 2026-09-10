@@ -1749,7 +1749,7 @@ static int guidriveMain(int argc, char **argv)
         : qEnvironmentVariable("SIGEL_EXP",
               "data-reordered/Experiments/twoBasesSimpleFitness2.exp");
 
-    // sigel.cpp:154 brings PVM up before the window exists. Only the visualize
+    // sigel.cpp, main brings PVM up before the window exists. Only the visualize
     // scenario needs it, and starting a daemon for the others would be noise.
     // Evolution genuinely takes minutes; everything else that runs longer than
     // this is stuck, not busy.
@@ -2377,7 +2377,7 @@ static int guidriveMain(int argc, char **argv)
 
         // Program and Individual import differ, and the difference is the
         // point: slotImportProgram REPLACES the selected individual's program
-        // (SIG_AllIndividualsView.cpp:486, importProgram on the selected item),
+        // (SIG_AllIndividualsView.cpp, slotEvolutionNotRunning, importProgram on the selected item),
         // while slotImportIndividual adds a new one. So +0 for Program is
         // correct and a +1 there would be the defect. Program therefore gets
         // the real round trip -- export, import into the same individual,
@@ -4549,7 +4549,7 @@ static int guidriveMain(int argc, char **argv)
         printf("\n== SLAVE SIMULATION WINDOW ==\n");
         SIGEL_SlaveGUI::SIG_SimulationWindow *sw =
             new SIGEL_SlaveGUI::SIG_SimulationWindow(nullptr, "simWindow");
-        sw->setWindowTitle("Simulation Visualisation");   // as sigel_slave.cpp:283
+        sw->setWindowTitle("Simulation Visualisation");   // as sigel_slave.cpp, main
         sw->resize(780, 810);                            // the oracle's 1.3 geometry
         sw->show();
         (void)QTest::qWaitForWindowExposed(sw);
@@ -4557,7 +4557,7 @@ static int guidriveMain(int argc, char **argv)
 
         // THE ROBOT MUST BE PREPARED FIRST, and this is not optional decoration:
         // SIG_RobotRenderer's constructor walks every link's geometry
-        // (SIG_RobotRenderer.cpp:79 -> SIG_GeometryIterator::valid ->
+        // (SIG_RobotRenderer.cpp, buildDisplayLists -> SIG_GeometryIterator::valid ->
         // SIG_Geometry::getNumPolygons), and a link's geometry is null until
         // SIG_Robot::instantiateGeometries() has run. Passing the experiment's
         // robot straight in SEGFAULTS on a null `this'. The standalone slave
@@ -5186,7 +5186,7 @@ static int guidriveMain(int argc, char **argv)
             QTest::qWait(400);
             // Widget values only matter once they are IN the experiment.
             // Selecting the experiment runs putAllIntoExperiment()
-            // (SIG_ExperimentListView.cpp:224) and slotStartEvolution() runs it
+            // (SIG_ExperimentListView.cpp, slotSaveExperiment) and slotStartEvolution() runs it
             // again, so read the experiment back rather than trusting the
             // widget: 1 is byGeneration.
             if (SIG_Experiment *ex = lv->currentlySelectedExperiment()) {
@@ -5306,7 +5306,7 @@ static int guidriveMain(int argc, char **argv)
                               : nullptr;
         // slotStartEvolution() BLOCKS. It calls guiGPManager->start(), which runs
         // the whole evolution inline and returns only when it has stopped
-        // (SIG_Experiment.cpp:282, with slotEvolutionStopped() on the next
+        // (SIG_Experiment.cpp, slotRightClick, with slotEvolutionStopped() on the next
         // line). The loop stays responsive only because
         // SIG_GUIGPManager::haveABreak() calls qApp->processEvents(), so a
         // timer armed BEFORE the click fires DURING the run. The sampling loop

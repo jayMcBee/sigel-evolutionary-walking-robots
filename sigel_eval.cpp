@@ -70,7 +70,7 @@ static void dumpOrder(const SIGEL_Robot::SIG_Robot &r, const char *which)
 // Position AND stored number. The two are independent: position becomes the
 // DynaMechs body index, while the stored number is what an evolved program's
 // SENSE and MOVE operands resolve through (SIG_DynaMechsSimulationQueries.cpp:
-// 93-95, SIG_DynaMechsCommandInterface.cpp:74). Reordering a .rrb changes the
+// 93-95, SIG_DynaMechsCommandInterface.cpp, moveDrive). Reordering a .rrb changes the
 // number; reordering an .exp would change the position. A gate that watched
 // only position could not see the first.
 #define SIG_DUMP(label, Type, accessor)                                    \

@@ -92,7 +92,7 @@ cc -I"$PVM/include" "$ROOT/pvm_smoke.c" "$BIN/libpvm3.a" -ltirpc \
 
 # pvm_link constructs a SIG_Environment, whose default constructor loads
 # terrain through vendored DynaMechs and leaks 20,400 bytes in 51 allocations
-# (dmEnvironment.cpp:110, via SIG_Environment.cpp:416). Suppress that one
+# (dmEnvironment.cpp:110, via SIG_Environment.cpp, loadDynaMechsEnvironment). Suppress that one
 # function rather than turning leak detection off: a leak on the PVM path is
 # exactly what this check should still catch.
 cat > "$PVM_TMP/lsan.supp" <<'SUPP'

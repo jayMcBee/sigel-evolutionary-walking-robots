@@ -127,7 +127,7 @@ Additive only — nothing changes at runtime. The value is that failures are
 
   New function `programToHtml(const SIG_Program&, const SIG_LanguageParameters&)`
   returning a `QString`. `printToString()` stays as the ZORC serial format
-  (`SIG_GPRemoteZORCFitnessFunction.cpp:69`).
+  (`SIG_GPRemoteZORCFitnessFunction.cpp, evalFitness`).
 
   - `<pre>` wrapper, one `<span>` per token.
   - Colour opcodes by group: arithmetic `ADD SUB MUL DIV MOD MIN MAX`,
@@ -136,8 +136,8 @@ Additive only — nothing changes at runtime. The value is that failures are
     `LOAD` operand 2 and `JMP` operand 1 print as literals.
   - Line number in a leading `<span>` per line.
 
-  Feed it to `QTextBrowser::setHtml()` at `SIG_SimulationWidget.cpp:234`,
-  `SIG_IndividualView.cpp:51`, `SIG_AllIndividualsView.cpp:394`.
+  Feed it to `QTextBrowser::setHtml()` at `SIG_SimulationWidget.cpp, visualizeThis`,
+  `SIG_IndividualView.cpp, SIG_IndividualView`, `SIG_AllIndividualsView.cpp, slotVisualize`.
 
 ---
 
@@ -150,8 +150,8 @@ Additive only — nothing changes at runtime. The value is that failures are
   per-module split has moved hard — `MT_GUI` 6 to 24 and `SIGEL_MasterGUI` 5 to
   38 — because Phase C's uic3-derived base classes declare `virtual` slots, so
   the one-commit-per-module plan needs re-measuring; item 6 is 63 `NULL` sites
-  not 75; item 9's `SIG_AllIndividualsView.cpp:394` is `:448` and
-  `SIG_SimulationWidget.cpp:234` is `:235`; the `tours` section cites two
+  not 75; item 9's `SIG_AllIndividualsView.cpp, slotVisualize` is `:448` and
+  `SIG_SimulationWidget.cpp, visualizeThis` is `:235`; the `tours` section cites two
   doxygen comments where there are three, at `:225`, `:259` and `:262`. Item 3
   still reproduces exactly. **Re-measure before acting on any of them.**
 - **Proposed** (yours to approve): the three-section ordering, the per-module
@@ -173,7 +173,7 @@ is appended on every one of the 7 `.rrb` loads and read nowhere in the tree.
   real leak; here the destructor already frees, so there is nothing to fix and
   the change would only be tidier.
 - **`SIG_Body::usedByLinks` is dead.** `addUsingLink` appends to it from
-  `SIG_RobotCompilerObjects.cpp:112` on every model load, and nothing in the
+  `SIG_RobotCompilerObjects.cpp, linkGeometryFile` on every model load, and nothing in the
   tree — GUI included — ever reads it back. The member, the method and the one
   call could all go. Asked directly during D11, the answer was convert, not
   delete.
@@ -254,7 +254,7 @@ created. Counts measured 2026-08-30 by grep over the extracted 1.3 tree.
   `SIG_GPIndividual.cpp:384,385` ("Fitness (Elter 1)" / "(Elter 2)"),
   `SIGEL_GP/SIG_GPManager.cpp:687,1116` ("SIG_GPManager::run() wurde mehr als
   einmal aufgerufen!", the same string twice),
-  `SIG_GPOperations.cpp:697` ("reproduction: Konnte kein neues Individuum
+  `SIG_GPOperations.cpp, reproduction` ("reproduction: Konnte kein neues Individuum
   erzeugen").
 
   *Corrected 2026-09-09. This said **11** lines and cited
@@ -286,19 +286,19 @@ created. Counts measured 2026-08-30 by grep over the extracted 1.3 tree.
   | symbol | where |
   |---|---|
   | `schlussJetzt` | `SIG_GPManager.h:123` + 5 uses |
-  | `liesdas` (ctor param) | `SIG_Scanner.h:43`, `SIG_RobotScanner.h:48`, `SIG_UnstreamerScanner.h:34` + 3 `.cpp` |
+  | `liesdas` (ctor param) | `SIG_Scanner.h, SIG_Scanner`, `SIG_RobotScanner.h, SIG_RobotScanner`, `SIG_UnstreamerScanner.h, SIG_UnstreamerScanner` + 3 `.cpp` |
   | `getRandomInstruktion`, `ProbInstruktion` | `MT_Randomizer.h:54,165` |
   | `T_Instruktion`, `T_Instruk` | `MT_TranslatedIndividual.h:38,74` |
-  | `Instruktion` | `MT_Classifier.cpp:319` |
-  | `set`/`getSelektionValue` | `MT_FitnessTrainer.h:109,115`, `MT_GPManager.h:68` |
-  | `Varianz` | `MT_StatisticsElement.h:31` |
+  | `Instruktion` | `MT_Classifier.cpp, createDoubleTransIndi` |
+  | `set`/`getSelektionValue` | `MT_FitnessTrainer.h:109,115`, `MT_GPManager.h, MT_GPManager` |
+  | `Varianz` | `MT_StatisticsElement.h, MT_StatisticsElement` |
   | `winkel`, `verschiebung`, `schiebung`, `drehmatrix`, `hilf`, `stflorianhilf` | `IFunctions.h:38`, `IFunctions.cpp:321,380–397` |
-  | `masse` | `SIG_Mirtich.h:80`, `.cpp:265,330` |
+  | `masse` | `SIG_Mirtich.h, SIG_Mirtich`, `.cpp:265,330` |
   | `dichte`, `konstante`, `anderes_material`, `rot`/`gruen`/`blau` | `SIG_RobotCompiler.cpp:167–236` |
   | `betrag`, `betraege`, `varianz`, `durchschnittProGelenk` | `SIG_GPForceFitnessFunction.cpp:105–122` |
   | `ausgabeTerrain` | `SIG_Environment.cpp:460–536` |
   | `zeiger` | `SIG_EnvironmentRenderer.cpp:447–455` |
-  | `zahl` | `SIG_Geometry.cpp:53` |
+  | `zahl` | `SIG_Geometry.cpp, SIG_Geometry` |
 
   **The robot description grammar is entirely English** — `density`, `red`,
   `green`, `blue`, `friction`, `minimal_rot`. So the German names in
@@ -332,7 +332,7 @@ look, and the tree disagrees with itself:**
 | `kdesigel/configure.in:2` | `AM_INIT_AUTOMAKE(kdesigel,1.0)` | **the only real version declaration in the whole tree.** The 1.3 release still calls itself 1.0 here |
 | `kdesigel/README:1` | `KDESIGEL v1.1 Readme File` | a third number, in the file a user reads first |
 | `kdesigel/kdesigel.kdevprj:36` | `kdevprj_version=1.3` | **not SIGEL's version.** This is KDevelop's own project-file format version, which happens to also be 1.3. **Do not touch it** |
-| the source | `SIG_InfoBox.cpp:60` | **the About box prints `Sigel v1.1`**, and `pixmaps/altLogo.png` carries a `Sigel v1.0` caption — 1.3 already ships that mismatch. BOTH have to move or 2.0 ships it again with new numbers. Found by C11c |
+| the source | `SIG_InfoBox.cpp, SIG_InfoBox` | **the About box prints `Sigel v1.1`**, and `pixmaps/altLogo.png` carries a `Sigel v1.0` caption — 1.3 already ships that mismatch. BOTH have to move or 2.0 ships it again with new numbers. Found by C11c |
 
 So "1.3" exists only in the tarball name and the directory name. Three files
 carry three different numbers and none of them is 1.3.
@@ -466,7 +466,7 @@ forms the five View pages are built from and promote **29 widgets** —
 pattern in this tree: `SIG_SimulationWidgetBase.ui` carries the one existing
 `<customwidget>`.
 
-**Then the other 18, counted:** `SIG_AddIndividualsDialog.cpp:77` builds its
+**Then the other 18, counted:** `SIG_AddIndividualsDialog.cpp, SIG_AddIndividualsDialog` builds its
 spin box in code rather than in a form, so that one is a one-line type change;
 `SIG_EditHostDialogBase.ui` (1), `SIG_MovieSettingsDialogBase.ui` (5) and
 `SIG_SimulationWidgetBase.ui` (1) are forms; and `MT_GUI` owns 10 across six
@@ -530,7 +530,7 @@ an early-return path is lost unless it flushes itself** — an assertion added
 during §9 item 2 fired correctly and its message vanished, visible only under
 gdb.
 
-*Two things this entry used to say are corrected. It cited `guidrive.cpp:349`
+*Two things this entry used to say are corrected. It cited `guidrive.cpp, clippedWidgets`
 and `PvmGuard::~PvmGuard` "after `main` has returned": the guard was a local of
 the function that is now `guidriveMain`, so it ran before `main` returned, and
 it has since been deleted outright. And it said such runs "are killed by their
@@ -604,22 +604,22 @@ sound only because this branch did not fire; the argument itself could not tell.
 
 ## `SIG_GPPVMTask` holds a reference to a host that can be deleted under it
 
-`include/SIGEL_GP/SIG_GPPVMTask.h:43` declares `SIG_GPActivePVMHost &host`, and
+`include/SIGEL_GP/SIG_GPPVMTask.h, SIG_GPPVMTask` declares `SIG_GPActivePVMHost &host`, and
 `SIG_GPFitnessTrainer::flushAllDynHosts` (from `:182`) calls
 `resizeOwningHosts`, which deletes host objects. Any task still outstanding then
 decrements a freed object at one of the two decrement sites, `:379` or `:397`.
 Latent today because `addDynHost` has exactly one call site,
-`SIG_GPManager.cpp:1005`, on the dynamic-client server thread that only
+`SIG_GPManager.cpp, RegisterDynPVMClients`, on the dynamic-client server thread that only
 `sigel.cpp:267-274` starts — and `guidrive` starts no such thread, so no host is
 ever flushed mid-run.
 
 **Preserved, not introduced** — the same reference member is at
-`sigelSourceDistribution.1.0/.../SIG_GPPVMTask.h:43`, the same line. Found by review
+`sigelSourceDistribution.1.0/.../SIG_GPPVMTask.h, SIG_GPPVMTask`, the same line. Found by review
 2026-09-06.
 
 ## `getNextHost`'s mutex is a function local and therefore locks nothing
 
-`SIG_GPFitnessTrainer.cpp:550` declares `pthread_mutex_t mutex;` as a local,
+`SIG_GPFitnessTrainer.cpp, getNextHost` declares `pthread_mutex_t mutex;` as a local,
 `:558-559` `pthread_mutex_init`s and locks it, and `:588` unlocks it. *An
 earlier version of this entry cited 552-556 and 585-587, which are the `#ifdef
 _WINDOWS` halves of the same two blocks — tarball offsets applied to the port
@@ -636,7 +636,7 @@ feature at all, so it arrived with 1.3. Found by review 2026-09-06.
 
 ## `renderRecorder` leaks whenever the visualisation constructor throws
 
-`SIG_SimulationVisualisation.cpp:53` allocates `renderRecorder`; `:55` then
+`SIG_SimulationVisualisation.cpp, SIG_SimulationVisualisation` allocates `renderRecorder`; `:55` then
 constructs `SIG_Simulation`, which throws for the removed Dynamo backend
 (`SIG_Simulation.cpp`, default case). The destructor at `:74-78` — the only
 thing that deletes it — never runs, so each attempt leaks one
@@ -676,11 +676,11 @@ offers; it cannot shut a route nobody has found yet. A refusal inside
 
 - **`MT_Control` has no dependency on `SIGEL_MasterGUI` today.** Zero includes,
   either direction, across `src/MT_Control` and `include/MT_Control`.
-- `SIG_Experiment::anyEvolutionRunning()` is a static on `SIG_Experiment.h:267`,
+- `SIG_Experiment::anyEvolutionRunning()` is a static on `SIG_Experiment.h, SIG_Experiment`,
   which lives in `SIGEL_MasterGUI`. Calling it from `MT_Controller` adds a new
   module edge — the kind Phase A spent effort cutting.
 - `MT_Controller` holds `SIGEL_GP::SIG_GPExperiment &sigExp`
-  (`MT_Controller.h:67`), **not** the GUI `SIG_Experiment`, so the flag is not
+  (`MT_Controller.h, MT_Controller`), **not** the GUI `SIG_Experiment`, so the flag is not
   reachable through what it already has.
 - The counter itself, `g_runningEvolutions`, is a file-static in
   `SIG_Experiment.cpp:212`.
@@ -804,7 +804,7 @@ not build here, nothing tests it, and it has not been built by anybody since
   (`Makefile:315`, `EXCLUDE_SIGEL_GP`), so it compiles nowhere.
 - **206 `_WINDOWS` occurrences across 57 source files**: 195 `#ifdef _WINDOWS`,
   9 `#ifndef _WINDOWS`, and 2 inside commented-out code
-  (`MT_GPManager.cpp:469` and `:594`).
+  (`MT_GPManager.cpp, startEvolution` and `:594`).
 - **4 `#include <windows.h>`** — `MT_Controller.h:16`, `MT_Substitute.h:21`,
   `MT_GPSystem/MT_GPManager.h:22`, `MT_GPSystem/MT_GPManager.cpp:12`.
 - The Windows branches carry their own thread and mutex types — `HANDLE`,
@@ -828,7 +828,7 @@ thread entry point is declared twice as well at `:34` and `:36`.
 D22 in PORTING.md's decision table chose what the two style branches do: Fusion for the
 `#else`, and **the `#ifdef _WINDOWS` branch keeps Windows**, by name, because
 Qt 6 still creates that style. There are three such call sites —
-`sigel.cpp:212`, `sigel_slave.cpp:277` and `:344` — and they are live, ported
+`sigel.cpp, main`, `sigel_slave.cpp, main` and `:344` — and they are live, ported
 Qt 6 code, not 2003 leftovers. Keeping the `#else` half deletes them, which is
 the right outcome once Windows is gone, but it is a decision being overturned
 and not a mechanical edit.

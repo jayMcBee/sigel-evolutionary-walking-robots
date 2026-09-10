@@ -126,7 +126,7 @@ void MT_Controller::slotEvolutionRunning(bool running)
 			// MT_EstimationWidget.h -> ...Base.h -> ui_...h -> <QtWidgets/QApplication>,
 			// the only inclusion of it in the whole TU), so qApp expands to
 			// static_cast<QApplication *>(QCoreApplication::instance()). On the
-			// -mtevolve / -me path sigel.cpp:285 builds a PLAIN QCoreApplication, so
+			// -mtevolve / -me path sigel.cpp, main builds a PLAIN QCoreApplication, so
 			// the CAST is undefined behaviour in itself -- C++17 [expr.static.cast]/11,
 			// the pointee is not a base subobject of any QApplication. Nothing has ever
 			// faulted because exit() is STATIC (qcoreapplication.h:200), so no this is

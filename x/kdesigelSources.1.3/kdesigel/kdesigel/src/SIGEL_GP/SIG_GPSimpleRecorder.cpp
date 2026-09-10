@@ -40,7 +40,7 @@ void SIGEL_GP::SIG_GPSimpleRecorder::init()
   // finish(), init() is called from SIG_Simulation's CONSTRUCTOR, which
   // every fitness function builds OUTSIDE its own try block. Without this
   // boundary a SIG_Exception from simulationQueries->getLinkPosition()
-  // escapes to sigel_slave.cpp:361, which reports fitness 0.0 and the master
+  // escapes to sigel_slave.cpp, main, which reports fitness 0.0 and the master
   // accepts it as a real result. (The example used to be named here as
   // SIG_DynaSystemWrongNumberException; that class went with the Dynamo
   // backend on 2026-08-28 -- physics_backends.md -- but the escape path is

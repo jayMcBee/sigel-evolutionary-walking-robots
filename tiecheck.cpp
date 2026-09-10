@@ -16,7 +16,7 @@
 
   THE PRECISIONS ARE THE POINT. SIGEL does not write at one precision:
 
-    SIG_Renderer.cpp:114     setRealNumberPrecision( 5 )   every POV <x,y,z>
+    SIG_Renderer.cpp, vectorToPovray     setRealNumberPrecision( 5 )   every POV <x,y,z>
     default                                        ( 6 )   .exp, .rrb, POV matrix
     SIG_GPPVMData.cpp:116,157                      ( 50 )  master<->slave transfer
 
