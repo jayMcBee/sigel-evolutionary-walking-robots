@@ -245,17 +245,9 @@ namespace SIGEL_MasterGUI
     public:
       /**
        * D29's run state. A COUNT ACROSS ALL EXPERIMENTS, not a bool per
-       * experiment, and the difference is the whole correctness argument.
-       *
-       * Per-experiment was wrong three ways. (1) Selecting a DIFFERENT
-       * experiment mid-run asked that one's flag, found it false and
-       * re-enabled every locked action. (2) A nested slotStartEvolution reached
-       * through haveABreak()'s processEvents cleared the flag on return,
-       * un-guarding the outer run. (3) An exception out of start() skipped the
-       * clear entirely and wedged the experiment for good.
-       *
-       * A count incremented by a scope guard fixes all three: any run anywhere
-       * locks, nesting is balanced, and unwinding decrements.
+       * experiment, incremented by RunScope. Keep it that way: any run
+       * anywhere locks, even when the tree shows a different experiment, and
+       * an exception out of start() still decrements.
        */
       static bool anyEvolutionRunning();
 

@@ -463,8 +463,8 @@ static void keepExitCodeThroughPvmShutdown(int rc)
 // MEASURED: a QTextStream on stderr written this way survives a clean return and
 // is lost entirely on a kill, while a plain fprintf on the same descriptor
 // survives both. Everything SIGEL prints about a failure -- `pvm_spawn() failed
-// on "..."', the SIGSEGV handler's `Invalid storage access' that is the WHOLE of
-// the 1.3 evidence for the pvmTasks crash -- goes through those two streams.
+// on "..."' and the SIGSEGV handler's `Invalid storage access' -- goes through
+// those two streams.
 // So any exit that skips destructors discards exactly the diagnostics a stuck or
 // crashing scenario exists to capture.
 static void flushSigelStreams()

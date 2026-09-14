@@ -568,10 +568,7 @@ SIG_MainWindow::SIG_MainWindow( QWidget * parent, const char * name, Qt::WindowF
 
   slotEnableNoExperimentActions( false );
 
-  // D30. Neither of these was in ANY lock list, so both stayed live through a
-  // run -- and both end in a slot that emits isNotEmpty(true), which is what
-  // re-enabled everything else. Locking them shuts the route as well as the
-  // symptom.
+  // D30. New and Open are locked during a run; runlock checks both.
   evolutionRunningActions.append( newExperimentAction );
   evolutionRunningActions.append( openExperimentAction );
   evolutionRunningActions.append( renameExperimentAction );
@@ -667,27 +664,8 @@ SIG_MainWindow::SIG_MainWindow( QWidget * parent, const char * name, Qt::WindowF
 
   noExperimentActions.append( mtUseAction );
 
-  // D29. None of the four MetaGP actions was in evolutionRunningActions, so
-  // all four stayed live throughout a run -- mtUseAction was in
-  // noExperimentActions only, i.e. disabled with no experiment and enabled
-  // the moment one is loaded, run or no run. They change MetaGP state, which
-  // is a run parameter, so D29 covers them.
-  //
-  // Two of the four are measured hazards on the 2003 binary, not theory:
-  //   Configure System, opening its MTMainWindow during a run, CRASHES 1.3.
-  //     Four observations; the cleanest had MetaGP set BEFORE Start, four
-  //     untouched generations, then one injected click -- dead in 10 s with
-  //     `QGVector::operator[]: Index 359 out of range'. Against it, ~25 other
-  //     injected mid-run events across two runs did nothing, so the trigger
-  //     is this path and not mid-run interaction in general.
-  //   Use MetaGP toggled mid-run WEDGES the run: an error dialog, then the
-  //     evolution never advances again while Stop stays enabled and the GUI
-  //     keeps repainting -- 4.5 minutes with zero slave spawns against a 62 s
-  //     per generation baseline. Worse than the crash, because it looks like
-  //     a healthy run.
-  // The other two are locked because they are the same class, not because
-  // anyone has crashed them -- fixing only the observed instance is how three
-  // earlier defects in this area each survived their first fix.
+  // D29. The four MetaGP actions change MetaGP state, which is a run
+  // parameter, so all four are locked during a run.
   evolutionRunningActions.append( mtUseAction );
   evolutionRunningActions.append( mtConfigureAction );
   evolutionRunningActions.append( mtChoiceEvaluatorAction );
@@ -808,7 +786,7 @@ void SIG_MainWindow::slotMTUseMT(bool state)
 {
 	// D30 SECOND LAYER. The menu item is greyed during a run; this refuses
 	// anyway, because a greyed menu is one layer and a slot that checks for
-	// itself is another. Toggling MetaGP mid-run is what wedges 1.3.
+	// itself is another.
 	if (SIG_Experiment::anyEvolutionRunning())
 		return;
 	SIG_Experiment *actExperiment = experimentListView->currentlySelectedExperiment();
@@ -824,10 +802,7 @@ void SIG_MainWindow::slotMTUseMT(bool state)
 // used by the actual experiment
 void SIG_MainWindow::slotMTConfigureSystem()
 {
-	// D30 SECOND LAYER, and this is the one that crashes. configureSystem()
-	// deletes the trainer the running evolution is holding
-	// (MT_Controller.cpp:402-404), so reaching it mid-run by ANY route aborts
-	// the process. Refuse here as well as greying the menu.
+	// D30 SECOND LAYER. Refuse during a run, as well as greying the menu.
 	if (SIG_Experiment::anyEvolutionRunning())
 		return;
 	SIG_Experiment *actExperiment = experimentListView->currentlySelectedExperiment();
@@ -839,8 +814,7 @@ void SIG_MainWindow::slotMTConfigureSystem()
 // switch the actual experiment to the other metaGP system
 void SIG_MainWindow::slotMTSwitchSystem(QAction *selSystem)
 {
-	// D30 SECOND LAYER. Switching Evaluator/Classifier mid-run changes which
-	// substitute the run is using. Refuse, as well as greying the group.
+	// D30 SECOND LAYER. Refuse during a run, as well as greying the group.
 	if (SIG_Experiment::anyEvolutionRunning())
 		return;
 	// Qt 2 reached this slot only when the selection actually CHANGED:
@@ -877,15 +851,10 @@ void SIG_MainWindow::slotActExpChanged()
 
 			// currently selected experiment use meta gp-system
 			//
-			// D30. NOT while a run is going. This slot has no run check of
-			// its own and it fires one line after the tree-click emit that
-			// APPLIES the run lock (SIG_ExperimentListView::slotSelectionChanged), so
-			// it handed these two straight back mid-run. Measured: with
-			// MetaGP on, one click in the experiment tree during a run made
-			// Configure System live again, and clicking it aborted the
-			// process -- MT_Controller::configureSystem deletes the trainer
-			// the running evolution is holding. The greying is one layer;
-			// future_refactorings.md carries the second, inside MT_Controller.
+			// D30. NOT while a run is going. This slot fires one line after the
+			// tree-click emit that APPLIES the run lock
+			// (SIG_ExperimentListView::slotSelectionChanged), so without this
+			// check it would hand these two straight back.
 			if (!SIG_Experiment::anyEvolutionRunning()) {
 				mtChoiceTypeActionGroup->setEnabled(true);
 				mtConfigureAction->setEnabled(true);
@@ -916,17 +885,10 @@ void SIG_MainWindow::slotEnableNoExperimentActions( bool enable )
   for ( QAction *a : noExperimentActions )
     a->setEnabled( enable );
 
-  // D30. 24 of these 30 actions are ALSO in evolutionRunningActions, so this
-  // loop used to hand back what a run had locked -- Use MetaGP among them.
-  // (30, not 32: two appends are commented out at :699-700, which is also why
-  // Configure System and the Evaluator/Classifier group are NOT in this list
-  // and why an earlier version of this comment naming them was wrong. An
-  // earlier version also disabled the group here, which nothing ever undid --
-  // it stayed grey after the run ended. Both found by review.)
-  // File > New Experiment and File > Open Experiment
-  // reach it during a run (SIG_ExperimentListView.cpp, slotNewExperiment and :207 emit
-  // isNotEmpty(true)), so one menu click undid the whole lock. Re-apply the
-  // lock rather than filtering the list, so the two lists cannot drift apart.
+  // D30. 24 of these 30 actions are ALSO in evolutionRunningActions (30, not
+  // 32: the appends of mtChoiceTypeActionGroup and mtConfigureAction are
+  // commented out). During a run, re-apply the lock after this loop rather
+  // than filtering the list, so the two lists cannot drift apart.
   if ( enable && SIG_Experiment::anyEvolutionRunning() )
     slotEnableEvolutionRunningActions( false );
 };

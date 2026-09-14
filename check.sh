@@ -952,7 +952,7 @@ if make -q --no-print-directory -C "$ROOT" B=build-fast SAN= SIGSAN= programs 2>
             # prerequisite -- so the link recipe never runs and neither does
             # the ctor_size assertion inside it. Measured: check.sh went fully
             # green against a 122-byte /bin/sh script standing in for
-            # sigel_slave during the pvmcrash work. Found by review.
+            # sigel_slave. Found by review.
             pf=$((pf+1)); echo "  build-fast/$prog is not an ELF binary"
         else pp=$((pp+1)); fi
     done

@@ -58,16 +58,16 @@ SIG_ExperimentView::~SIG_ExperimentView() {
 }
 
 void SIG_ExperimentView::putIntoExperiment() {
-  // D29, and this is the path the first version of the guard MISSED.
+  // D29.
   // slotStartEvolution disables gpParameter, simulationParameter, robotView,
   // languageParameters and environmentView -- but NOT experimentView, which is
   // the page the user is looking at when they press Start and which stays
-  // fully live for the whole run. Its history checkbox and autosave slider are
-  // wired straight to this function, not to putAllIntoExperiment, so guarding
-  // only that one left the live path open.
+  // fully live for the whole run. Its history checkbox and autosave slider
+  // reach this function through slotHistory and slotIntervallChanged, not
+  // through putAllIntoExperiment, so this function needs its own guard.
   //
   // It is a live path in the strong sense: the running GP reads
-  // getAutosave() every generation (SIG_GPManager.cpp:805-807) to decide
+  // getAutosave() every generation (both SIG_GPManager::run bodies) to decide
   // whether to save, and getHistory() decides what that save writes.
   //
   // The LCD read below is display-only and is deliberately AHEAD of the

@@ -32,7 +32,7 @@ build and run, because nothing else can be verified without it — see §3.
 | T — old-Qt tool container | **done 2026-08-27.** `tools/qtmig`, §4 |
 | D — delete the shim, migrate the data | **DONE 2026-08-30.** `q2compat.h` and `q2compat_check.cpp` deleted; `include/compat/` gone; **no `Q2*` shim type is used anywhere**. D1–D27. *D27 once said 71 lines of Qt 2 containers survived for Phase C to convert. **Phase C is done and none survive**: re-measured 2026-09-05, five textual mentions remain in the GUI modules and all five are comments.* The shim's self-check step is gone from `check.sh`. §10 |
 | P — PVM | **DONE 2026-08-28.** Vendored 3.4.3 replaced by upstream 3.4.6; nine patches carry the four config lines and Debian's eight source fixes; `libpvm3.a` and `pvmd3` build; SIGEL's two PVM objects link against them and `SIG_GPPVMData` round-trips through real PVM. `sigel`/`sigel_slave` still need Phase C. §7 |
-| C — GUI | **DONE.** C1–C10, C11a–C11d, C12. *The API conversion is complete — zero Qt 2 spellings in live code, swept 2026-09-05 — but §9 lists two conversion tasks still open: Phase 0's last 15 comment lines, and 28 doc comments that still name the old types.* All 20 Designer forms converted; five GUI modules build as archives; both programs link and run; 100 dead `connect()`s repaired, tree-wide count 0. Nine port defects were found by DRIVING the interface that reading it could not see — `clear()` emitting a signal Qt 2 blocked and killing the app on a large delete, an eaten ampersand, a dead `key()` virtual, `truncate(-1)`, a pre-filled field Qt 6 selects and Qt 2 did not, ten unpinned validators in `MT_GUI`, and three in the Create-constants dialog that reached generated data. Detail in §9 |
+| C — GUI | **DONE.** C1–C10, C11a–C11d, C12. *The API conversion is complete — zero Qt 2 spellings in live code, swept 2026-09-05.* All 20 Designer forms converted; five GUI modules build as archives; both programs link and run; 100 dead `connect()`s repaired, tree-wide count 0. Nine port defects were found by DRIVING the interface that reading it could not see — `clear()` emitting a signal Qt 2 blocked and killing the app on a large delete, an eaten ampersand, a dead `key()` virtual, `truncate(-1)`, a pre-filled field Qt 6 selects and Qt 2 did not, ten unpinned validators in `MT_GUI`, and three in the Create-constants dialog that reached generated data. Detail in §9 |
 | V — check against the 1.3 binary | **V1, V5's MDH probe, V6, V7 and V8 all done, all PASS.** Ordering: 10 of 10 container orders match. Arithmetic: `twoBases` exact bit for bit, `octopus` 9/9 with three joints exact and 5 ulp worst. **V6, V7 and V8 done 2026-08-29** — friction and no-collide negotiation, their four remaining rules, and the GP parameter blocks captured *before* their conversion. `verification-against-sigel-1.3/v6`, `v7`, `v8`. **V9 done 2026-08-29, 3 of 3** — three function bodies disassembled, which symbol lookups cannot see. **V3 SATISFIED 2026-09-02** — same-box determinism, demonstrated twice by the oracle (`serA`≡`serB`, `octGateA`≡`octGateB`). **V4 DROPPED 2026-09-03** — whole-run digests cannot cross an x87/IEEE boundary, and the counts that appear to agree are forced by the code. **Replaced by a measurement of OUTPUT needing no reference: the port EVOLVES** — C11 has the figures. **V2 DONE 2026-09-08** — a whole experiment through the GUI save path, twice, against the 1.3 capture; gated as `v2 round trip vs 1.3`. **Every V step is now done or dropped.** |
 
 **SCOPE — DECIDED 2026-08-23. Read this before changing anything.**
@@ -519,10 +519,10 @@ D20 supersedes D5, D24 supersedes D3.
 |---|---|---|
 | **D27** *(decision; §10 also has a **step** D27, the shim deletion — the two D-series overlap and this is the first collision)* | The duplicate MetaGP `A&bout` | **removed**, with its trailing separator. Present in 1.3 and verified there; wired to the same `slotAbout()` as `Help > About` and opening the identical `SIG_InfoBox`. The port's first intentional difference from 1.3. `Help > About` untouched |
 | **D28** | The `QSpinBox` over-range divergence (C11a) | **accepted, not fixed.** 1.3 accepts out-of-range digits and clamps on commit; the port refuses the keystroke and commits a truncated prefix. It is reachable **only by typing a number outside the box's own range**, and the differing value is **visible in the box** before anything is saved — 1.3 shows 99, the port shows 10. Contrast what the port did fix: `clear()` killed the application, the ampersand rendered wrong, a negative width silently wrote no file — all reachable with valid use. The fix is not the 33 lines of it, it is **owning a custom widget forever**: every future form edit and every new spin box must remember `SIG_SpinBox` or silently opt out. Pinned in `guibehaviour-baseline.txt` (`commits=`) so it cannot drift; prototype and the measured comparison in `future_refactorings.md`. **Revisit if** a dialog spin box turns out to feed something unvalidated, or if anyone actually hits it |
-| **D29** *(signed off 2026-09-04)* | Changing run parameters **while an evolution is running** | **FORBIDDEN in the port, whatever 1.3 permits.** The reason is the specification, not 1.3: *"that's not how GAs/GPs are commonly implemented"* — the parameters define the run. **The port's second intentional divergence**, after D27. *A harder justification arrived later and is narrower than it first looked: one mid-run action, MetaGP `Configure System` opening its window, crashes 1.3 reliably, while ~25 other injected mid-run events did nothing. That is evidence for the decision, not the reason for it — and **D29 does not fix that crash**, which arrives through a menu path that never writes a parameter.* **Implementation, and the three wrong versions it went through, are in §10 — read that before changing the guard** |
+| **D29** *(signed off 2026-09-04)* | Changing run parameters **while an evolution is running** | **FORBIDDEN in the port, whatever 1.3 permits.** The reason is the specification, not 1.3: *"that's not how GAs/GPs are commonly implemented"* — the parameters define the run. **The port's second intentional divergence**, after D27. **Implementation, and the three wrong versions it went through, are in §10 — read that before changing the guard** |
 | **D31** *(signed off 2026-09-09)* | Line endings | **LF ONLY, tree-wide. No more DOS.** Jan's decision, and it overrides the guard that existed to prevent it. **100 files under `x/kdesigelSources.1.3` converted, 17,750 CRLF pairs.** **The conversion is line endings only except for two bytes, and `git diff --ignore-cr-at-eol` is NOT what proves it** — that flag strips a trailing CR from *both* sides, so it would equally hide a CRLF being *introduced*. The proof is a direct comparison of every one of the 100 files: `re.sub(rb"\r+\n", b"\n", git show HEAD:f) == working file`, exact, with no `\r` surviving anywhere. Zero anomalies. Zero anomalies. **Two lines of `sigel_slave.mak` are the one real content change**, and calling them line endings flatters them: `:598` and `:647` ended `\r\r\n`, so the byte removed is an INTERIOR one — under NMAKE that trailing CR is part of the variable's value. The `\r+` in the proof above is what swallows the case, so the proof cannot tell it from a line ending; it is called out here instead. Nothing else in the tree has a run of two. **Binaries are excluded and this is not cosmetic** — three tracked binaries hold 12 incidental `\r\n` byte pairs (`pvm3.4.6.tgz` 9, `altLogo.png` 2, `noExperiment.png` 1), and a blind repo-wide replace would corrupt all three. Extensions touched: 36 `.cpp`, 35 `.h`, 19 `.xpm`, 5 `.dsp`, 3 `.mak`, 1 `.mt`, 1 `.dsw`. **No `.exp` and no `.ui`**, so no reference artefact was touched. **Lone CRs are left alone, and NOT because they are Mac-classic line endings** — the first version of this row said that and it was wrong. Six tracked files hold lone CRs and git calls **all six** binary, so this gate never even reads them: `pvm3.4.6.tgz` 3859, `noExperiment.png` 691, `JustGreen.pnm` 2848, `altLogo.png` 208, `Hippie.pnm` 208, `Stone.pnm` 68. All five `.pnm` are **P6 raw raster**: those bytes are pixel values that happen to equal `0x0d`. They were never line endings. **The `encodings` gate was turned round in the same commit**, so that commit is not line endings alone — `check.sh`, `PORTING.md` and `future_refactorings.md` change with it. The gate used to say *a file that HAD a CR must still have one*, with `ENC_BASELINE=25`; it now says **no tracked text file may carry CRLF**, expected zero, reads every tracked file rather than five extensions present in the root commit, lists them with `-z` so a C-quoted path cannot break `open()`, and reconciles — every file lands in exactly one of ok / CRLF / binary / unreadable, or it aborts. **It asks `git ls-files --eol` what is binary rather than testing for a NUL byte**, because the NUL test got two files wrong: `Hippie.pnm` has no NUL in its 196,668 bytes and `UniDo_LSXI.pnm`'s first NUL is at offset 15,456, so both were judged as text and passed only by luck. **Read the `w/` column, not `i/`**: while this change was being made, `sigel_slave.mak`'s index blob read `i/-text` — HEAD still held its two `\r\r\n`, which git's own heuristic calls binary — against a working file of `w/lf`, and testing both columns dropped a real text file out of the check. **Both columns read `lf` once this is committed, so the demonstration is gone and only the rule survives.** Reads 610 text files and 8 binaries. **A floor of 500 was added**, because zero failures is also what a check that read nothing reports: a dead `git ls-files` gave `COUNTS 0 0 0 0 0 0`, two non-empty numbers, which the fail-closed branch did not catch. Teeth-tested: CRLF into a `.cpp` and into `sigel_slave.mak` both caught and named, CRLF into a texture correctly ignored, and all seven branch states driven by hand — including a **tree-wide** CRLF regression, which the first version of the floor misreported as *"it did not run"* with one failure instead of 611, and a below-floor count, which the first version printed as `0 pass` while adding up to 499 passes to the total. Both found by review 2026-09-09. The bucket reconciliation is a tautology as the loop is now written and is **not** counted as coverage; it is kept only so the earlier bare-`continue` shape cannot come back. **`SIGEL_ROOT` is the source tree**, so `stdConf.mt` and the 19 `.xpm` pixmaps the conversion touched are the very files the GUI gates load at runtime; the `gui behaviour` gate covers them. The `.xpm` are loaded by path and `#include`d nowhere, and a C string literal cannot span a raw newline, so no removed CR was ever inside a quoted pixel row. **No `.gitattributes` exists and none was added.** `* text=auto eol=lf` would make git enforce this rather than only detect it; not done, because it changes what every future checkout writes and that is a separate decision. On a clone with `core.autocrlf=true` the working tree comes back CRLF and this gate goes red tree-wide — which is the gate working |
 | **D32** *(signed off 2026-09-09)* | `SIG_Experiment::gpManager` renamed to `guiGPManager` | **A deliberate divergence from the 1.3 name, and the only one of its kind so far.** Four members across the tracked tree were called `gpManager`; three hold an `MT_GPManager *` inside the meta modules, where the name is right. The fourth, `SIG_Experiment.h, SIG_Experiment`, holds a `SIG_GUIGPManager *` — and it was the **only** `SIG_`-typed member in that class not named after its own type with the `SIG_` prefix stripped. The other nine follow the rule exactly (`gpExperiment`, `gpParameter`, `simulationParameter`, `environmentView`, `robotView`, `experimentView`, `allIndividualsView`, `languageParameters`, `experimentItem`); the class's remaining members are named by role (`widgetDict`, `menuGPParameter`, …) and were never in scope. So this is the class's own rule applied to the one member that broke it, not a new scheme. **20 sites**: 13 in `SIG_Experiment.{h,cpp}`, 5 in this file, 2 in `guidrive.cpp`, both comments. The three `MT_GPManager` members and the `SIG_GPManager gpManager` local at `sigel.cpp:261` are correctly named and were left alone; the 1.0 tree holds the same member and is untracked, so a future sweep will re-find it there and should leave it. **VERIFIED AS `.text`-IDENTICAL, NOT AS BYTE-IDENTICAL OBJECTS** — a data member's name never reaches a mangled symbol, but `-g` is on and DWARF records member names, so the objects legitimately differ. `sigel.cpp` is the interesting one and was checked: it is the single translation unit where both names coexist, and its `.text` is unchanged |
-| **D33** *(signed off 2026-09-09)* | Where the mid-run protection lives | **IN THE UI. The model is not to be touched.** Jan: *"we'll focus on the UI side from now on, NO TOUCHING the gp manager or other model classes."* **The problem, stated plainly:** two GUI actions free objects a running evolution is still using. `MetaGP > Configure System` frees `substitution`, which `SIG_GPManager` holds as its `trainer` (`SIG_GPManager.cpp:60`) **whenever the meta system is enabled and set to Evaluator** — the condition is on `:59`, and `stdConf.mt` ships that as the default; the experiment tree's context-menu `Start` frees the manager whose `run()` is on the stack. Both are 1.3's code, both are use-after-free, and both are reachable only because `haveABreak()` pumps the event loop from inside the run. **Measured 2026-09-09: every route starts at a GUI slot, but the reason is not the caller.** All five sites that free `substitution` outside the destructor sit in `configureSystem`, `useMeta`, `switchSystem`, `slotLoadDefault` and `slotLoadSetup`. Four are reached only from a menu action. **`useMeta` is not** — `MT_Controller::readFromFile` calls it at `:473`, `:499`, `:505`, `:511` and `:530`, and `SIG_GPExperiment::loadExperiment:76` calls `readFromFile` on the headless load path. What keeps the free out of reach there is a flag, not a caller: it sits inside `if(guiEnabled)` at `MT_Controller.cpp, useMeta`. So `sigel -mtevolve` reaches the function and not the free. *An earlier version of this row said no headless path reached any of them and spelled the switch `-mtEvolve`; the parser at `sigel.cpp:197` is case-sensitive, so that spelling starts the GUI instead. Both found by review.* **The caveat, recorded so it is not forgotten:** the trigger is UI, but the arrangement that makes it fatal is not — two core classes share an object with no ownership contract. Fixing that would stop the crash being possible at all, and is exactly the model change this decision rules out. **Consequences.** No NEW behaviour goes into the model; removing a dead 2003 stub is not new behaviour, so `SIG_GPManager::running()` was deleted — see D29's passage. Nothing is added to `SIG_GPManager` or `MT_Controller`. `future_refactorings.md`'s *"MT_Controller should refuse a mid-run configureSystem ITSELF"* is superseded: `MT_Control` is a core module, so that layer is not available. Whatever replaces the D29 counter is UI-side |
+| **D33** *(signed off 2026-09-09)* | Where the mid-run protection lives | **IN THE UI. The model is not to be touched.** Jan: *"we'll focus on the UI side from now on, NO TOUCHING the gp manager or other model classes."* No new behaviour goes into the model. Removing a dead 2003 stub is not new behaviour, so `SIG_GPManager::running()` was deleted — see D29's passage in §10. Nothing is added to `SIG_GPManager` or `MT_Controller`. **The D29 counter, `g_runningEvolutions`, is to be removed, not moved into the model.** Jan, rejecting a move into `SIGEL_GP`: *"I strongly reject changes to the core model just to hot-fix a UI enablement issue."* What replaces it is undecided, and it is UI-side |
 
 
 ---
@@ -854,27 +854,21 @@ FORBIDDEN."*
 - **Find another route? Block it, add it to `runlock`, move on.** D30 is the
   pattern: a run check where the action is re-enabled, plus the action in
   `evolutionRunningActions`, plus a `runlock` case with a positive control.
-- **Do not propose driving such behaviour to "measure it first".** That was
-  proposed on 2026-09-07 — a run to see whether the port reproduced 1.3's
-  mid-run wedge — and it was wasted time on both sides of the question. There is
+- **Do not propose driving such behaviour to "measure it first".** There is
   nothing to learn from a behaviour that is going to be forbidden either way.
 
-**SAMPLE TWICE AND COMPARE; NEVER SAMPLE ONCE AND INTERPRET.** Three probes
-failed this way on 2026-09-06/07, two here and one on the oracle, and each was
+**SAMPLE TWICE AND COMPARE; NEVER SAMPLE ONCE AND INTERPRET.** Two probes
+failed this way on 2026-09-06/07, and each was
 *structurally incapable* of seeing the transition it existed to find:
 
-- The `pvmcrash` scenario read `Configure System`'s enabled state **once, before
-  the tree click**, and so reported the crash path closed. The guard is applied
+- A `guidrive` scenario read `Configure System`'s enabled state **once, before
+  a tree click**, and so reported the lock holding. The lock was applied
   and undone one line apart; a second sample is the whole finding.
 - An empty `pgrep sigel_slave` and an empty daemon log were read as "nothing
   ran". Slaves live **0.2 s** and a working PVM dispatch logs **nothing**, so
   that is exactly what success looks like from one sample.
-- The oracle's window probe deduplicated on the window rather than on
-  *(window, state)*, so it logged `MTMainWindow` in its `Unmapped` instant and
-  never saw it become viewable 40 ms later — and read straight, it **confirmed
-  the wrong answer**.
 
-Every one of the three was repaired the same way: sample on both sides of the
+Both were repaired the same way: sample on both sides of the
 event and print both. **An absence is not a measurement.** This is the same rule
 as "every probe needs its own positive control", arrived at from the other
 direction: the control proves the probe can see a positive, and the second sample
@@ -1206,10 +1200,9 @@ of a parameter that really is `QQueue<MT_TrainingCase *> *`. `MT_Statistics.h`
 correctly is not a defect, and a sweep that matched Qt 2 spellings without
 reading the declaration would have "fixed" all five.
 
-**31 mentions of a dead Qt 2 container name remain in comments and all 31 are the
+**31 mentions of a dead Qt 2 container name remained in comments on 2026-09-05, all 31 the
 port's own historical notes** — "at() was writable on Qt 2's const `QArray`;
-`QList`'s is not", "Qt 2's `QDict` returned the NEWEST binding", the
-`QGVector::operator[]` text quoted from a real crash. Those are correct and stay.
+`QList`'s is not", "Qt 2's `QDict` returned the NEWEST binding". The two quoted above stay.
 `SIG_ProgramLine.cpp, randomRobotinstruction`'s `// QList<int> instr;` is commented-out code that
 already names the Qt 6 type.
 
@@ -1381,46 +1374,13 @@ during a run, AND a mid-run page switch is one of `putIntoExperiment()`'s
 updates. **A guard below the read is therefore correct: the read still has to
 happen on a page switch.** No change needed.
 
-### The `pvmTasks` crash on 1.3 — CONFIRMED AND NARROWED BY THE ORACLE 2026-09-05
+### MetaGP needs `stdConf.mt`
 
-**It dies, and the narrowing matters more than the confirmation.** The clean
-run: MetaGP enabled BEFORE Start so the only injected event in the whole run was
-one click, four generations at ~65 s each untouched, then Configure System:
-
-```
-Computing Generation 4  (Fri Sep 4 17:12:02 2026)
-QGVector::operator[]: Index 359 out of range
-Invalid storage access
-```
-
-Dead within ten seconds. `Invalid storage access` is SIGEL's own SIGSEGV handler
-string, so it is a segfault. Index N tracks the cumulative task counter — the
-oracle has now paired it four times against the slave-invocation count at the
-moment of the click: 89 at 102, 107 at 111, 359 at 369, and 272 / 497 / 702 at
-roughly 70 per generation.
-
-*This said "no `MTMainWindow` is ever mapped — it dies on the way to opening the
-window". **Withdrawn by the oracle 2026-09-07.** The window maps: polled every
-30 ms, it goes `Unmapped` at t+2.157 s, `IsViewable` at t+2.197 s, and the
-process is gone at t+2.509 s. The original inspection was made after the crash,
-when a dead process has already taken its windows with it. The port behaves the
-same way — see the `pvmcrash` section.*
-
-**IT IS NOT "GUI interaction during a run".** ~25 injected mid-run events across
-several runs — tree selections, spin-box and slider clicks, menu opens, Stop —
-plus four more page switches during the run that answered D29, and none of them
-crashed. Every crash shares the one trigger.
-
-**THE PREREQUISITE THAT WILL WASTE A SESSION'S TIME.** `Configure System` opens
-that window **only when a real `stdConf.mt` is present in `SIGEL_ROOT`** — it
-ships with the SOURCE tarball only. Without it, `Use MetaGP` raises "An error
-occurred in loading the meta experiment" and `Configure System` stays greyed;
-press **Standard** on that dialog mid-run and you get the OTHER failure instead —
-the evolution **silently wedges**, alive and repainting, Stop enabled, Start
-greyed, zero new spawns for 4.5 minutes against a 62 s/generation baseline.
-**Know which of the two you are reproducing.** *`stdConf.mt` IS present in this
-repo's `SIGEL_ROOT`, so the port is set up to reproduce the crash rather than the
-wedge.*
+`Configure System` needs a real `stdConf.mt` in `SIGEL_ROOT`. Of the tarballs
+on disk, only `kdesigelSources.1.3.tar.gz` holds it. This repo has it in the
+source root, which is the `SIGEL_ROOT` the gates use. In the GUI, without it,
+`MT_Controller::readFromFile` shows "An error occurred in loading the meta
+experiment".
 
 ### The MetaGP window grew 59 px — SETTLED BY THE ORACLE 2026-09-05
 
@@ -1495,7 +1455,7 @@ D29 had already begun this divergence for the same reason; D30 finishes it.
 
 *The two rows are ONE run, not two independent measurements, and the second row's
 `Configure System` is left over from the first — `mtConfigureAction` is **not** in
-`noExperimentActions` (`:700` is commented out), so that slot cannot have turned
+`noExperimentActions` (its append is commented out), so that slot cannot have turned
 it on. An earlier version of this table read as though it had. Found by review.*
 
 **The route into the second hole was open too**, and nothing tested it: `File >
@@ -1506,7 +1466,7 @@ reverting it left every check green.*
 
 ### D30a — the hole D30 missed: `Stop` unlocked everything mid-run
 
-**D30 did not block the crash, and this is why.** `SIG_Experiment::slotStopEvolution`
+**D30 did not keep the lock, and this is why.** `SIG_Experiment::slotStopEvolution`
 opened with `emit signalEvolutionNotRunning( true )` as its **first statement**,
 and it is a request to stop rather than a stop: it only sets
 `guiGPManager->userTerminated` at the end, `start()` has not returned, the
@@ -1514,10 +1474,6 @@ and it is a request to stop rather than a stop: it only sets
 on `Stop` re-enabled all 29 locked actions **while the run continued** — for as
 long as the manager takes to notice the flag, which is a whole generation, 58 to
 208 s on this machine. None of D30's guards is consulted on that path.
-**`Stop`, then MetaGP > Configure System, still reached the crash.** Neither
-button is an action, so `evolutionRunningActions` could never have covered them
-(`experimentView->pushbuttonStop`, and the context-menu entry at
-`SIG_Experiment.cpp, SIG_Experiment`).
 
 **The fix is a deletion.** `slotEvolutionStopped()` already emits exactly that
 signal, and it runs after `start()` returns. The premature emit is gone.
@@ -1525,15 +1481,13 @@ signal, and it runs after `start()` returns. The premature emit is gone.
 **Two more, found in the same review and fixed with it:**
 
 - **The unlock was not exception-safe.** `slotEvolutionStopped()` sits *after*
-  the `RunScope` block, so a throw out of `start()` skipped it. Before D30 that
-  left Import/Export dead; after D30 it also left `New Experiment` and `Open
-  Experiment` dead, i.e. the window looks bricked. Now called on the throw path
-  as well.
+  the `RunScope` block, so a throw out of `start()` skipped it and left `Start`
+  and the five pages disabled. Now called on the throw path as well.
 - **D30 itself introduced a stuck state.** Its guard disabled
   `mtChoiceTypeActionGroup`, which nothing ever re-enables —
   `slotEnableEvolutionRunningActions( true )` walks actions, not groups — so
   Evaluator/Classifier stayed grey after the run ended. That line is removed; the
-  group is not in `noExperimentActions` anyway (`:699` is commented out), so it
+  group is not in `noExperimentActions` anyway (its append is commented out), so it
   was never needed.
 
 **AND THE SECOND LAYER IS NOW IN, for three slots that had no check of their
@@ -1542,40 +1496,29 @@ refuse when a run is going, on top of the greying. `slotMTUseMT` was the same
 shape as the hole D30 fixed — `mtConfigureAction->setEnabled(state)` with no run
 check — and was unreachable only because `useMeta()` returns false when the state
 is unchanged, which is luck rather than a guard. *This is the layering Jan asked
-for: keep the greying, add the refusal.* `MT_Controller`'s own refusal is still
-deferred — `future_refactorings.md`.
+for: keep the greying, add the refusal.*
 
 **NOT GATED: the `Stop` fix.** `runlock` fakes a run with its own `RunScope` and
 never calls `slotStopEvolution`, which dereferences `guiGPManager` and would need a
 real run. The fix is verified against source and by the review that found it, not
-by a gate. Said plainly here because the rest of D30 *is* gated and the
-difference matters.
+by a gate. **Nor are the three slot refusals above**: `guidrive` never reaches
+`slotMTUseMT`, `slotMTConfigureSystem` or `slotMTSwitchSystem` during a run, and
+`runlock` checks only that `Use MetaGP` and `Configure System` are grey.
 
-The first is `SIG_MainWindow::slotActExpChanged` (`:851-859`), which has no run
-check and fires one line after the tree-click emit that *applies* the lock
-(`SIG_ExperimentListView::slotSelectionChanged`). **That one is what crashed the port** —
-`Configure System` back on, clicked, and `MT_Controller::configureSystem`
-deletes the trainer the running evolution is holding.
-
-The second is larger and had never been driven before today.
-`noExperimentActions` holds **30** active entries — 32 `append` lines, two of
-them commented out at `:699-700` — **24 of them also in
-`evolutionRunningActions`**, and `slotEnableNoExperimentActions` (`:879-885`)
-enabled the lot with no run check. `File > New Experiment` and
-`File > Open Experiment` reach it during a run — `SIG_ExperimentListView.cpp, slotNewExperiment`
-and `:207` emit `isNotEmpty(true)` — and **neither action was in any lock list**.
-So one menu click handed back everything the run had locked, `Use MetaGP`
-included, which is the trigger of the failure the oracle measured on 1.3 where
-the evolution stops dead while the window keeps repainting.
+**Two slots re-enabled locked actions, neither with a run check.**
+`SIG_MainWindow::slotActExpChanged` runs on every change of the current tree
+item, one line after the emit that applies the lock
+(`SIG_ExperimentListView::slotSelectionChanged`), and, when MetaGP was on, turned
+`Configure System` and the Evaluator/Classifier group back on.
+`SIG_MainWindow::slotEnableNoExperimentActions` enables `noExperimentActions`:
+30 active entries, 24 of them also in `evolutionRunningActions`.
 
 **THE FIX, three places in `SIG_MainWindow.cpp`:**
 
 1. `slotActExpChanged` enables the two MetaGP controls only when
    `!SIG_Experiment::anyEvolutionRunning()`.
 2. `slotEnableNoExperimentActions` re-applies the run lock after its own loop,
-   rather than filtering its list — so the two lists cannot drift apart — and
-   also disables `mtChoiceTypeActionGroup`, the one overlap that is a group
-   rather than an action.
+   rather than filtering its list — so the two lists cannot drift apart.
 3. `newExperimentAction` and `openExperimentAction` join
    `evolutionRunningActions`, which shuts the route as well as the symptom.
 
@@ -1583,271 +1526,16 @@ the evolution stops dead while the window keeps repainting.
 MetaGP on *before* the run and **asserts `Configure System` is enabled** — every
 check after it asks whether a MetaGP action is OFF, and all four are off at rest
 too, so without that control the block would pass on a window where MetaGP was
-never enabled. It then checks all four MetaGP actions and `Add` after a real
+never enabled. It then checks `Use MetaGP`, `Configure System` and `Add` after a real
 selection change and after the `New Experiment` route. *The tree-click check
 also had to be repaired: it re-selected `topLevelItem(0)`, which emits nothing
 when that item is already current, so it could have been inert.* Reverting the
 fix makes it print `!! D30: a locked action came back during a run` and fail.
 
-**WHAT IS NOT FIXED, and it wants a SECOND layer rather than a different one.**
-`MT_Controller::configureSystem` still deletes the trainer (`:402-404`, and
-verbatim in the pristine 1.3 tarball at `:387-389`). D30 makes it unreachable
-during a run; it does not repair it. Opening that window when no run is going is
-still the supported path and still deletes `substitution` — harmless there,
-because no loop is holding it.
-
-**The menu greying STAYS. `MT_Controller` should refuse IN ADDITION**, so the
-guard also sits with the code that does the damage and a future route that
-reaches `configureSystem` some other way is refused twice rather than not at
-all. Jan's instruction, in his words: "do not REMOVE the greyed out! In ADDITION
-MT_Controller should refuse, multiple layers of checks". **Deferred, to discuss
-when the port reaches it** — `future_refactorings.md` carries what stands in the
-way.
-
 `guibehaviour-baseline.txt` moves by three lines, all in `runlock`, and nothing
 else in the file changes.
 
-### `pvmcrash` — THE PORT HAS THE CRASH, and D29 does not close it — ANSWERED 2026-09-07
-
-**The §9 row that read "the `pvmTasks` crash is still untried on the port" —
-replaced in place 2026-09-07 by the crash row — is answered by driving it: the port aborts, from a sequence
-a user can perform.** One run, the lines that carry the result (two `[modal
-during run]` lines from the injection's own handler are omitted):
-
-```
-  [metagp] Use MetaGP clicked; Configure System found=1 enabled=1
-  [inject] armed for t+30000 ms
-  >> clicking Start
-  >> INJECTING MetaGP > Configure System, 30000 ms into the run
-  [d29] Configure System during the run: enabled=0  (0 means D29's guard is holding)
-  [d29] after ONE tree click ([Individuals]): Configure System enabled=1 (1 = the
-        guard was undone mid-run), Save Experiment enabled=0 (0 = the arming line held)
-  >> Configure System IS live -- clicking it, which is what kills 1.3
-  [modal] class=MT_MainWindow title=[SIGEL MetaGP]
-  >> the click returned; the process is still alive
-```
-```
-  ASSERT failure in QList::operator[]: "index out of range",
-    file /usr/include/aarch64-linux-gnu/qt6/QtCore/qlist.h, line 517
-  Aborted (core dumped)                                    EXIT=134 (SIGABRT)
-```
-
-**This is 1.3's crash.** The oracle's 1.3 run gives
-`QGVector::operator[]: Index 359 out of range` then its own SIGSEGV handler's
-`Invalid storage access`. **C11's prediction is confirmed rather than expected**:
-it said the port would "abort on `QList::operator[]`'s live assertion rather than
-warn and segfault, which is louder but no more survivable". It does.
-
-**THREE CELLS, because the injected run changes TWO things.** It performs a tree
-click *and* a Configure System click, so on its own it cannot say which one kills
-the process — and this document's own rule is that a crash with no negative cell
-proves only that the run crashed. `SIGEL_TREE_ONLY=1` supplies the missing cell.
-
-| cell | tree click | Configure System | result |
-|---|---|---|---|
-| control (`SIGEL_CRASH_AT_MS=0`) | no | no | six generations, clean |
-| **tree only** (`SIGEL_TREE_ONLY=1`) | **yes** | **no** | **two generations, survives, exit 1 for the D29 verdict** |
-| full injection | yes | yes | **abort, exit 134** |
-
-The tree-only cell landed its click — `Configure System` flipped 0 → 1 and
-`Save Experiment` stayed 0 — and the run then finished normally. **So the tree
-click alone is not what kills it; the Configure System click is.** *Found by
-review, which caught that the two-cell version could not support the attribution
-it was making.*
-
-#### It is a USE-AFTER-FREE, not an out-of-range index — and that changes the fix
-
-`MT_Controller::configureSystem` does this, three lines apart
-(`MT_Controller.cpp:402-404`):
-
-```
-	mainWindow->show();
-	delete substitution;
-	substitution = 0;
-```
-
-`substitution` is the `MT_Evaluator` (`MT_Controller.h, MT_Controller`), and **`MT_Evaluator`
-inherits `SIG_GPFitnessTrainer`** (`MT_Evaluator.h:16`). When the meta system is
-the Evaluator — and the shipped `stdConf.mt` is `usedSystem=1`, which is
-`EVALUATOR_SUBST` (`MT_Controller.h, EVALUATOR_SUBST`) — `SIG_GPManager`'s `trainer` **IS that
-object**: `SIG_GPManager.cpp:59-60` sets it from
-`mtController->getFitnessTrainer()`, which returns `substitution`
-(`MT_Controller.cpp:668-679`). `~SIG_GPManager` deliberately does not delete it,
-which confirms the ownership.
-
-**So opening the MetaGP window mid-run deletes the trainer the running loop is
-holding**, and the next `trainer->checkTask(...)` — `SIG_GPManager.cpp:202`,
-`:469`, `:1460`, `:1576` — reads a freed `QList` whose header is garbage. A
-garbage size gives "index out of range" for a perfectly legal `taskId`.
-**Bounds-checking `SIG_GPFitnessTrainer.cpp, checkTask` would fix nothing.** The same
-two lines are in the pristine 1.3 tarball one line after `mainWindow->show()`, so
-this explains the oracle's four crashes as well as ours.
-
-**IT IS IN THE PUBLISHED 1.3 SOURCE, verbatim.** The pristine
-`kdesigelSources.1.3.tar.gz` has `mainWindow->show(); delete substitution;
-substitution = 0;` at its lines 387-389, so this is inherited and not port
-damage. *`SIG_GPManager.cpp:59` (the constructor) adopts the evaluator AS the
-trainer under `EVALUATOR_SUBST`; `:659` in `start()` tests `CLASSIFIER_SUBST` for
-a different path, and `:1062` tests `EVALUATOR_SUBST` again in the destructor —
-three call sites, not a contradiction.*
-
-**THE ORACLE'S BINARY IS A DIFFERENT REVISION IN `MT_`, so its MT_ observations
-are not evidence about this source and ours are not evidence about its binary.**
-It measured every member of that class in its binary carrying the misspelling
-`MT_FitnessTranier`, where the published source spells `MT_FitnessTrainer`
-correctly and keeps the misspelling only as a `stdConf.mt` format token — so its
-binary predates the published source. **This tree has the corrected spelling**,
-i.e. it matches the tarball. *Its control was that `SIG_GPFitnessTrainer` is
-spelled correctly in the same binary, so this is not a name-mangling artefact.*
-**THE CAVEAT IS BOUNDED TO `MT_`, and must not be widened without new
-evidence.** The only divergence either side has evidence for is that class
-naming. **The file-format, geometry and container comparisons this document
-rests on are untouched by it and still stand** — widening it would silently
-invalidate most of Phase V for no measured reason. *The oracle asked for this
-boundary to be written down, having raised the caveat itself.*
-
-Its classifier-mode test is recorded as **unvalidated on its own account**:
-`usedSystem` 0, 1 and 2 produced identical observable behaviour there across
-three checks, so it could not confirm the run had left evaluator mode.
-
-*A second explanation the evidence cannot exclude:* `MT_Controller::startEvolution`
-(`:168`) runs the meta GP on a `pthread`, so `substitution`'s `QList` members are
-touched from two threads with no lock.
-
-**WHICH CONTAINER ASSERTS IS NOT IDENTIFIED, and this section used to say it
-was.** It named `SIG_GPFitnessTrainer.cpp, checkTask`, `pvmTasks[ taskId ]`, reached
-from `MT_Evaluator.cpp:473`. **Withdrawn.** That identification is inherited from
-the 1.3 analysis, which worked *by type*: `QGVector` is Qt 2's pointer-vector
-base, so the `QArray` members were excluded. **Qt 6 collapsed `QArray` and
-`QGVector` into `QList`**, and the three the 1.3 argument excluded are now
-`QList` in the port —
-
-| member | pristine 1.3 | port |
-|---|---|---|
-| `MT_ResultBuffer` | `QArray<double>` (`MT_Evaluator.h, MT_Evaluator`) | `QList<double>` (`:36`) |
-| `NumOfCorrectEstimation` | `QArray<unsigned int>` (`MT_Substitute.h:138`) | `QList<unsigned int>` (`:137`) |
-| `NumOfMetaEstimation` | `QArray<unsigned int>` (`:139`) | `QList<unsigned int>` (`:138`) |
-
-— so all three now emit the identical message. `MT_Evaluator.cpp:476` is **three
-lines after** the `:473` this section cited. The port's assert also carries **no
-index**, so the "272 is out of range for exactly size 200" arithmetic that
-identified it on 1.3 is unavailable too. What the evidence supports is only:
-**the port aborts on a `QList` bounds assert on this path.** Found by review.
-
-**NO DIFFERENCE FROM 1.3 IN WHAT HAPPENS, once the oracle re-measured it.** Both
-versions map the window and then die out of the running evolution. Here:
-`[modal] class=MT_MainWindow title=[SIGEL MetaGP]`, the click returns, the
-process is still alive, and the abort arrives afterwards. On 1.3, polling the X
-root every 30 ms across the fatal click:
-
-```
-  t+2.157s  0x20056b 'SIGEL MetaGP' class=(MTMainWindow, sigel)  map=Unmapped
-  t+2.197s  0x20056b 'SIGEL MetaGP' class=(MTMainWindow, sigel)  map=IsViewable
-  t+2.509s  SIGEL PROCESS GONE
-```
-
-*This section said on 2026-09-07 that 1.3 dies on the way to the window and never
-maps it, citing the oracle. **The oracle has withdrawn that**: its original
-inspection was made AFTER the crash, when a dead process has already taken its
-windows with it, so "no window present" was equally consistent with "mapped, then
-destroyed". Its first re-probe agreed with the wrong answer because it
-deduplicated on the window rather than on (window, state), and so logged the
-window in its `Unmapped` instant and never saw the transition 40 ms later — a
-probe structurally incapable of seeing what it was built to find.* **The only
-real difference is Qt 6 asserting where Qt 2 warned and returned garbage.**
-
-**FOUR INDEPENDENT CONFIRMATIONS THAT THE INDEX IS THE CUMULATIVE TASK COUNTER**,
-all the oracle's, each pairing the reported index against its slave-invocation
-count at the moment of the click: **89 at 102**, **107 at 111**, **359 at 369**,
-and 272 / 497 / 702 at roughly 70 per generation. The index always lands a little
-below the cumulative count, which is what an unchecked read of a cumulative
-counter into a shorter array looks like.
-
-**AND 1.3 NEEDS NO TREE CLICK**, because it never greys `Configure System` at
-all — the oracle clicked it straight from the menu mid-run in both runs above and
-it fired. That is the same fact from the other side: the port greys it, one slot
-picks it back up, and 1.3 never grey it in the first place.
-
-#### D29 greys the door and one tree click re-opens it
-
-**D29's arming line HELD.** `evolutionRunningActions` holds **27** entries —
-`evolutionRunningActions.append` appears 27 times, 23 at
-`SIG_MainWindow.cpp:571-593` and the four MetaGP ones at `:685-688`. *This
-section said 23; that is the non-MetaGP subset, not the list.* `Save Experiment`
-is one of those 23 and, unlike the MetaGP four, re-enabled by nothing —
-reads `enabled=0` after the tree click. That is the **only** thing that reaches
-the arming line: `SIG_ExperimentListView::slotSelectionChanged` emits
-`evolutionNotRunning( !SIG_Experiment::anyEvolutionRunning() )`, and
-`anyEvolutionRunning()` reads `g_runningEvolutions`, which only
-`RunScope runScope;` (`SIG_Experiment.cpp:326`) sets. Delete that line and a
-tree click mid-run hands all 27 back. **§9 listed this as uncovered and it is now
-covered.**
-
-**The hole is elsewhere, and it is not the arming line.**
-The same slot emits `actExpChanged()` on the very next line,
-and `SIG_MainWindow::slotActExpChanged` does
-`mtConfigureAction->setEnabled(true)` and
-`mtChoiceTypeActionGroup->setEnabled(true)` **with no run check at all**,
-whenever the selected experiment has MetaGP on. So the sequence greys the four
-MetaGP actions and immediately un-greys two of them. D29's own comment in
-`SIG_ExperimentListView::slotSelectionChanged` is about exactly this hazard, and it
-fixed the `evolutionNotRunning` emit while leaving the `actExpChanged` emit on the
-next line untouched.
-
-*Two claims made here on 2026-09-06 are withdrawn, both found by review.* The
-first said the crash path was **closed** by D29; it is not, and the run that
-"proved" it never clicked the tree, so it could not see the re-enable. The second
-said that run checked **D29's arming line**; it did not —
-`SIG_Experiment.cpp:304` emits `signalEvolutionNotRunning(false)` twenty-two
-lines *before* the `RunScope` is constructed, so the greying at Start happens
-with or without the arming line. The tree-click sample is what reaches it, and
-that is why it was added.
-
-**A SECOND AND LARGER HOLE, not driven.** All 23 non-MetaGP
-`evolutionRunningActions` are **also** in `noExperimentActions` (32 entries), and
-`SIG_MainWindow::slotEnableNoExperimentActions` (`:879-885`) enables the lot with
-**no run check either**, driven by `isNotEmpty(bool)` which
-`SIG_ExperimentListView` emits at `:83`, `:164` and `:207`. `mtUseAction` is in
-that list too (`:662`). So loading or creating a second experiment mid-run hands
-back all 23 **plus `Use MetaGP`** — whose mid-run toggle is the trigger of the
-silent wedge this document elsewhere says D29 locks. `File > New Experiment` and
-`File > Open Experiment` are in neither lock list, which the D29 comment at
-`SIG_ExperimentListView.cpp:326-328` already says, and the `setCurrentItem` at
-`:214-215` only re-locks if the current item actually **changes**. *Found by
-review; nothing has driven it, so it is source-derived and not measured.*
-
-**THE FIX IS NOT APPLIED.** A run check in `slotActExpChanged` — the same
-`anyEvolutionRunning()` the line above it already calls — closes it, and that is
-plainly what D29 intended. It is left for a decision rather than taken, because
-the port's rule is to preserve behaviour and **1.3 has this crash too**; closing
-it here is a deliberate divergence of the same kind D29 already is, and worth
-making on purpose rather than in passing. `future_refactorings.md` carries it.
-
-**A SECOND ROUTE IS UNTESTED.** `mtChoiceTypeActionGroup` is re-enabled by the
-same line, so Evaluator/Classifier can also be switched mid-run. Nothing has
-driven that.
-
-#### The wedge — 1.3's other MetaGP failure — is NOT reachable here
-
-Its precondition is the meta config failing to open, not the toggle.
-`MT_Controller::readFromFile` (`:412`) raises "An error occurred in loading the
-meta experiment" at `:440-447` only when `confFile.open()` fails; **Standard**
-retries the same default path and, when that fails too, falls through to
-`useMeta(false)` and returns false. The oracle's `stdConf.mt` was absent, so the
-fall-through was certain. Measured there: spawning stopped **dead** (slave
-wrapper frozen at 1139 invocations, zero new lines in 4.5 minutes), generations
-stopped with it, process state `S` at 5 s total CPU, GUI alive and Stop still
-enabled — *worse than a crash, because it looks like a healthy run.*
-
-`readFromFile` has exactly one caller, `createGPSystem` (`:331`), guarded by
-`if(!confStrm.device())`. `createGPSystem` has five callers, all MetaGP entry
-points: `startTimedEvolution` `:107`, `startEvolution` `:140`, `configureSystem`
-`:383`, `getFitnessTrainer` `:671`, `getClassifier` `:685`. The three that run
-during an evolution only execute once the meta system is already on, which
-requires the config to have loaded. **So the mid-run dialog cannot be raised
-while `stdConf.mt` exists — and it does exist here.** *Derived from source, not
-measured.* What IS measured: the port completed six generations with MetaGP
-enabled and did not wedge.
+### A real evolution under `guidrive`
 
 #### The evolution works, and three claims about it are withdrawn
 
@@ -1892,45 +1580,25 @@ sits near the 185 s recorded there. It was never broken; it was slow, and a
 same individuals. Nothing is lost or corrupted in the spawn-transfer-harvest
 round trip.
 
-#### The harness, and five defects review found in it
+#### The harness
 
 **THE TRAP THAT COST TWO DAYS.** `SIG_IO::cerr` and `::cout` are
 **`QTextStream`s** over `stderr`/`stdout` (`SIG_IO.cpp:27-29`), and the 2003 code
 ends every message with `"\n"`, never `endl` — so SIGEL's diagnostics sit in the
 stream's buffer until it is destroyed at a normal exit. **Measured**: such a
 stream survives a clean return and is lost entirely on a kill, while a plain
-`fprintf` on the same descriptor survives both. **Everything above depends on the
-flush**: the `Computing Generation` timestamps, and the `ASSERT failure` line
-that is the whole of the port's crash evidence, exactly as `Invalid storage
-access` is the whole of 1.3's.
+`fprintf` on the same descriptor survives both. **The `Computing Generation`
+timestamps above depend on the flush.**
 
-1. **The scenario never clicked `Use MetaGP`**, so `Configure System` was greyed
-   before Start too and the injected click hit a dead menu item. The control run
-   printed `&MetaGP/&Configure System  greyed` and it was read as a clean pass.
-2. **It sampled only before the tree click**, and so reported the crash path
-   closed. The tree click is now part of the injection and both samples print.
-3. **PVM erased every exit status** whenever this process started the daemon
-   itself. `pvm_halt()` waits for a reply the daemon never sends
-   (`tdpro.c:1507-1516`) and the daemon SIGTERMs every local task on its way out
-   (`pvmd.c:1485-1517`). Demonstrated: a 25-second watchdog under a 90-second
-   `timeout` exited **143**, far too early to be the timeout. `main` now decides
-   the status first, **flushes before the teardown** — a flush after it never
-   runs, because the handler `_exit`s — and installs a handler that re-exits with
-   the status. Confirmed from both sides: a passing `evolution` run exits **0**,
-   a watchdog abort exits **3**, and the crash above exits **134**.
-4. **The designed-success path was required to print `!!`**, which is `check.sh`'s
-   own "this run must not pass" marker: `clickMenu` prints it on a greyed item.
-   The scenario now samples first and clicks only when the action is live.
-5. **The probe reported whether the timer was ARMED, not whether it FIRED**,
-   which called a run that finished early "SURVIVED WITH the event injected" and
-   collapsed the injected cell into the control cell.
-
-**`SIGEL_CRASH_AT_MS` is the knob**: milliseconds into the run at which the event
-is injected, and **`=0` is the CONTROL** — the identical run with nothing
-injected. A crash with no control cell is the exact mistake that made the oracle
-withdraw "MetaGP crashes 1.3" and then "mid-run GUI interaction crashes 1.3",
-each generalised over a factor that moved with the trigger. The control here is
-what shows the six-generation run completing untouched.
+**PVM erased every exit status** whenever this process started the daemon
+itself. `pvm_halt()` waits for a reply the daemon never sends, and the
+daemon's `pvmbailout()` SIGTERMs every local task on its way out.
+Demonstrated: a 25-second watchdog under a 90-second
+`timeout` exited **143**, far too early to be the timeout. `main` now decides
+the status first, **flushes before the teardown** — a flush after it never
+runs, because the handler `_exit`s — and installs a handler that re-exits with
+the status. Confirmed from both sides: a passing `evolution` run exits **0**
+and a watchdog abort exits **3**.
 
 **THE SAMPLER PROVES LESS THAN IT LOOKS.** `generations=136` never moving is
 **expected**: the two live-update calls are commented out at
@@ -2000,12 +1668,6 @@ routine to show a filedialog", so enabling MetaGP may arm a **second** dialog an
 the driver answers exactly one. The oracle has been asked whether 1.3 saves with
 MetaGP on. It affects no committed gate.
 
-**THE PREREQUISITE, from the oracle.** `Configure System` opens `MTMainWindow`
-only when a real `stdConf.mt` is present in `SIGEL_ROOT`. **It IS present here**,
-which is why the crash reproduces rather than the wedge. If it goes missing the
-failure is neither — the run stays alive-looking and permanently stalled, no
-dialog, no message.
-
 **REBUILDING THE INPUT, because it is not committed and `/tmp` is cleaned
 between sessions.** A missing input is not diagnosed as missing: the load fails,
 a `QMessageBox` opens, and the scenario sits on it until the watchdog fires with
@@ -2035,9 +1697,6 @@ not set` and the run produces no transcript at all (`pvm-check.sh:66-77`).
 *`ptrace_scope` is 1 on this machine, so `gdb -p` cannot attach to a running
 process — but `strace` of a process you START works, which is how the spawn
 message was seen.*
-
-*This section replaces two near-duplicate `pvmcrash` sections and one verbatim
-duplicate of the MetaGP window section, all committed on 2026-09-05.*
 
 ### Phase A — core onto Qt 6 — DONE
 
@@ -2338,6 +1997,9 @@ counted. External behaviour and internal shape agree.
 **What V9 does not establish.** Three matching bodies raise confidence that the
 `SIGEL_*` code is common between our source and this binary. They do not prove
 all of it is. `MT_FitnessTranier` remains the only confirmed divergence.
+It shows that the oracle's binary predates the published source in `MT_`, so
+the oracle's `MT_` observations are not evidence about this source. The caveat
+stops at `MT_`: nothing measured widens it to other code.
 
 ### V5 RESULT — the arithmetic agrees with 1.3
 
@@ -3448,43 +3110,20 @@ happens behind the Start button. **With the vendored PVM up it runs locally** �
 three generations driven end to end on 2026-09-02.
 
 **WHAT IS ACTUALLY OPEN, as of 2026-09-07.** Closed items are not listed; their
-lessons live in the step sections above. Ordered: conversion work first, then
-questions the port could still be wrong about, then gaps in coverage.
+lessons live in the step sections above.
 
 **THE PORT IS NOT FINISHED.** No Qt 2 API remains in live code — swept
 2026-09-05 over 33 spellings across `src/` and `include/`, code split from
-comment, zero in code. **Phase 0 closed 2026-09-05** and its row is gone from
-the table below; what is left of the conversion work is there.
+comment, zero in code. **Phase 0 closed 2026-09-05.**
 
-**THE CONVERSION WORK IS DONE.** This table held three items on 2026-09-05 —
-Phase 0's last comment lines, 28 doc comments naming a Qt 2 type, and six form
-minimums — and all three closed that day. Each is written up in §7, and each
-closed with a correction to the figure this table carried.
-
-**One row left these tables on 2026-09-07** — D29's arming line, from the
-coverage table. The `pvmTasks` row did not leave; it was **replaced in place** by
-the crash row below, because driving it produced a worse finding rather than
-closing the question. §7's
-`pvmcrash` section has both in full.
-
-**THE PORT HAS THE CRASH.** `ASSERT failure in QList::operator[]: "index out of
-range"`, exit 134, from a sequence a user can perform: MetaGP on, Start, **one
-click in the experiment tree**, then Configure System. D29 greys that menu item
-for the duration of a run and `SIG_MainWindow::slotActExpChanged` (`:851-859`)
-un-greys it again on any tree click, with no run check. *A claim made here on
-2026-09-06 that the path was closed is withdrawn — the run behind it never
-clicked the tree.* The unchecked read is unchanged:
-`SIG_GPFitnessTrainer.cpp, checkTask`, reached from `MT_Evaluator.cpp:473`.
+**THE CONVERSION WORK IS DONE.** Its last three items — Phase 0's last comment
+lines, 28 doc comments naming a Qt 2 type, and six form minimums — closed on
+2026-09-05. Each is written up in §7.
 
 **D29's arming line is now covered, and it held.** The tree click is the only
 thing that reaches it — `SIG_ExperimentListView::slotSelectionChanged` asks
 `anyEvolutionRunning()`, which only `RunScope` sets — and `Save Experiment`, one
 of the 23 locked actions that nothing re-enables, stayed greyed through it.
-
-| the port could still be wrong here | who can answer it |
-|---|---|
-| **The `pvmTasks` crash — BLOCKED by D30 2026-09-07, not repaired.** MetaGP on, Start, one click in the experiment tree, then MetaGP > Configure System used to abort the process. D30 forbids parameter changes during a run, so the sequence is refused. **The fault itself is untouched**: `MT_Controller::configureSystem` still deletes the trainer the running loop holds (`:402-404`, verbatim in the 1.3 tarball). Reachable again the moment anything re-opens that door | done; `runlock` gates it |
-| **1.3's silent wedge — CLOSED BY DECISION, not by measurement.** Toggling `Use MetaGP` mid-run stops the evolution on 1.3 while the GUI keeps repainting and Stop stays enabled. D30 makes that toggle unreachable during a run, so the port cannot do it — but nobody ever drove it here, and now nobody can. Recorded as forbidden by design rather than as tested | closed by D30; not measured |
 
 **THREE COVERAGE ITEMS WERE DROPPED 2026-09-07. The attribution on this line
 was corrected 2026-09-08: only the first one is Jan's.** It is the one that
@@ -3520,10 +3159,6 @@ question about what it would prove:
   `sigel_slave` never calls it, so a save path there would test dead code. Jan,
   2026-09-08: "no need to test dead code". The V2 row in the Phase V table has
   the full argument and the reshaped step.*
-
-| coverage gaps | what is missing |
-|---|---|
-
 
 **A MetaGP evolution is NOT open — it is unreachable on both versions.** `Start`
 enables only once the training set fills; filling it needs a run; the MetaGP
@@ -3972,7 +3607,7 @@ out, and the nine `enabled=false` widgets all re-enabled in code.
   before any `timeout`. *This said "the exit status of an evolution run means
   nothing", and that is no longer true:* `guidrive`'s `main` now flushes, records
   the status and installs a SIGTERM handler that re-exits with it, so a passing
-  run gives **0**, a watchdog abort **3**, and the `pvmTasks` crash **134**. The
+  run gives **0** and a watchdog abort **3**. The
   halt itself is unchanged and still never returns. Pre-existing
   and deliberately unchanged: `pvm_halt()` is what stops the daemon this process
   started, and dropping it left `pvmd3` and its slaves running. Consequence:
@@ -5800,9 +5435,7 @@ whole run, and its history checkbox and autosave slider are wired straight to
 disabled but `SIG_RobotView::putIntoExperiment()` has **no callers at all**.
 
 **Version 2 was wrong: a bool per experiment.** Three ways. Selecting a
-*different* experiment mid-run asked that one's flag and re-enabled everything —
-and `File > New`/`Open Experiment` were not locked then and both end in
-`setCurrentItem()`, so one click did it with no second experiment needed. A
+*different* experiment mid-run asked that one's flag and re-enabled everything. A
 nested `slotStartEvolution` reached through `processEvents` cleared the flag on
 return. An exception out of `start()` skipped the clear and locked the
 experiment for good. A count entered by a scope guard fixes all three.
@@ -5855,126 +5488,11 @@ in `slotStartEvolution`. Delete that line and the gate still passes. Checking it
 needs a real run, and every shipped experiment stops on a date in 2001, so a
 correct Start returns in under 100 ms.
 
-**Out of scope, deliberately.** `allIndividualsView->setEnabled( false )` is
-commented out in the 2003 source, so the Individuals view stays live during a
-run. Individuals are the population, not parameters. It is the one place a user
-can still act mid-run.
-
-### PRE-EXISTING — `pvmTasks` is READ without the growth check that WRITES it
-
-**Found 2026-09-04 from the oracle's crash, and it is 1.3's own defect,
-unchanged in the port.** `SIG_GPFitnessTrainer::spawnTask` grows the vector
-before writing — `oldMaxIndex < nextFreeNumber + 1` → `resize( oldSize +
-population )` — and that logic is **identical to the pristine 2003 source and
-correct on its own terms**: it always grows before the index it is about to use.
-But `checkTask( int taskId )` (`SIG_GPFitnessTrainer.cpp, checkTask`) does
-
-```cpp
-SIG_GPPVMTask *pvmTask = pvmTasks[ taskId ];
-```
-
-with **no growth check and no bounds check at all**, so the read path can be
-handed an id the vector has not been grown to cover.
-
-**The evidence.** Driving a normal SIGEL evolution on the 2003 binary with
-MetaGP enabled, the oracle got, in generation 4:
-
-```
-QGVector::operator[]: Index 272 out of range
-Invalid storage access                       <- SIGEL's own SIGSEGV string
-```
-
-`QGVector` is the **pointer**-vector base, so `QArray` members are excluded
-(they print `QGArray::at:`) — which rules out `MT_ResultBuffer`,
-`instructionProb` and the `MT_TranslatedIndividual` arrays. Of the `QVector`
-members in the evolution loop at population 100 — `pool` 100, `tours` 50,
-`indis` and `pvmHosts` small, `individualItems` pool-sized — **only `pvmTasks`
-can be near 272**: it is built at 100 and grows a whole population at a time, so
-its sizes are 100, 200, 300, and **272 is out of range for exactly size 200**.
-
-**WHAT CRASHES 1.3, stated narrowly because two broader versions of this were
-wrong and both were withdrawn.**
-
-> **MetaGP `Configure System`, opening its `MTMainWindow` during a running
-> evolution, crashes 1.3. Ordinary mid-run interaction does not.**
-
-Both halves are measured, not one inferred from absence. Four crashes on that
-path; against them, **~25 other injected mid-run events across two runs — tree
-selections, spin-box clicks, a slider, menu opens, Stop — did nothing at all**,
-with no lost generation.
-
-| MetaGP | mid-run action | outcome |
-|---|---|---|
-| on | Configure System | crash, generation 4, index 272 |
-| on | Configure System | crash, generation 7, index 497 |
-| off | none | generation 10, alive |
-| on | none | generation 10, alive |
-| on | none for 10 generations, **then** Configure System | crash in seconds, index 702 |
-| on, set **before** Start | none for 4 generations, **then** Configure System | crash in 10 s, index 359 |
-
-**The last row is the cleanest**: MetaGP was enabled before Start so no mid-run
-toggle could confound it, four generations ran untouched, and the Configure
-System click was the only injected event in the run.
-
-**The index is not special.** One warning line then death, and N tracks the
-cumulative task count at roughly 70 per generation — 272 at 4, 359 at 4 with 369
-spawns logged, 497 at 7, 702 at 10. N is wherever the counter has reached when
-the click lands.
-
-*Two withdrawn versions, kept because the errors are the instructive part.*
-**First: "MetaGP crashes 1.3."** The experiment was confounded — MetaGP enabled
-and the GUI touched moved together in every run. **Second: "mid-run GUI
-interaction crashes 1.3."** Too broad; the three crashes happened to share the
-specific trigger and it was generalised over the shared factor. Both times the
-fix was to build the missing cell of the table, and the negative side took one
-run.
-
-**A second failure mode on the same path, and it is worse than the crash.**
-Toggling `Use MetaGP` mid-run with no `stdConf.mt` present raises an error
-dialog; press Standard and **the evolution never advances again** while the
-process stays alive and repainting, Stop stays enabled and Start stays greyed.
-Measured 4.5 minutes with zero new slave spawns against a 62 s/generation
-baseline. *A crash is obvious. This looks exactly like a healthy run.* D29 locks
-the trigger; whether the port can wedge by another route is open.
-
-**Passive observation is safe.** A screenshot of the main window during a live
-run did not crash it. Only injected events did.
-
-**THE PORT HAS THE SAME MECHANISM, INTACT.**
-`SIG_GUIGPManager::haveABreak()` is `qApp->processEvents( QEventLoop::AllEvents,
-… )` (`SIG_GUIGPManager.cpp, haveABreak`), called from **six** places in the evolution loop (`SIG_GPManager.cpp:96, 420, 460, 1335, 1540, 1567`, three in each `run()` body),
-and `checkTask`'s unchecked `pvmTasks[ taskId ]` is unchanged. So a GUI
-interaction re-enters through that pump and can reach the unchecked read before
-the growth that would have covered the id. **MEASURED 2026-09-07 and it does**:
-`ASSERT failure in QList::operator[]: "index out of range"`, exit 134. *This
-paragraph used to end "there is no measurement of the port under mid-run
-interaction yet — it is expected to abort on `QList::operator[]`'s live
-assertion rather than warn and segfault, which is louder but no more
-survivable". The expectation was right in every part.* §7's `pvmcrash` section
-has the sequence.
-
-**D29 DOES NOT FIX THIS, and must not be read as doing so — now confirmed by
-driving it.** D29 guards `putAllIntoExperiment()`, i.e. parameter *writes*. The
-crash arrives through the event pump and a menu path that never calls it. D29
-also greys the four MetaGP actions during a run, which looks like it closes the
-path and does not: `SIG_MainWindow::slotActExpChanged` (`:851-859`) re-enables
-`mtConfigureAction` on any tree click with no run check, and the crash follows
-from there. The two are related — both are
-about acting on the GUI mid-run — and D29's justification is stronger for this
-finding, but the crash is a separate and broader hazard. *What 1.3's
-`setEnabled(false)` on the five parameter pages really is, on this evidence, is
-not tidiness but the thing standing between a user and this crash — and the one
-page it does not cover is the Individuals view, which is exactly where a user
-can still act.*
-
-**THE PORT FAILS DIFFERENTLY HERE, AND MORE LOUDLY.** The unchecked read is
-unchanged, but neither the Makefile nor `check.sh` defines `QT_NO_DEBUG`, so
-`QList::operator[]`'s `Q_ASSERT_X` is live in both build trees. Where 1.3 warns
-to stderr and then reads out of bounds into a segfault, the port aborts at the
-index itself. That is the dropped-clamp consequence D6, D8, D9 and D25c each
-recorded in the abstract; **this is the first evidence of a path that actually
-reaches it.** No gate covers it — `SIG_GPFitnessTrainer` is linked into no gate
-binary — so it is recorded, not tested.
+**The Individuals view is locked, not disabled.** `allIndividualsView->setEnabled(
+false )` is commented out in the 2003 source. During a run,
+`SIG_AllIndividualsView::slotEvolutionNotRunning` disconnects the list's context
+menu, double-click and selection, and the Individuals actions are in
+`evolutionRunningActions`.
 
 ### PRE-EXISTING LEAK — the simulation backend is never freed
 
