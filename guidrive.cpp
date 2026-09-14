@@ -2253,7 +2253,7 @@ static int guidriveMain(int argc, char **argv)
         // widget by then.
         // THROUGH THE GUI, not by calling putAllIntoExperiment() directly.
         // Selecting a row in the experiment tree runs it
-        // (SIG_ExperimentListView.cpp:323, slotSelectionChanged), and every
+        // (SIG_ExperimentListView::slotSelectionChanged), and every
         // View page switch calls selectItem() -> setCurrentItem(), so one
         // click on a page the mutation did not touch pushes the typed value
         // along the path a user actually takes. A direct call would work and
@@ -5366,14 +5366,14 @@ static int guidriveMain(int argc, char **argv)
         // Same three states, sampled again AFTER a tree click. D29 greys the
         // MetaGP actions from SIG_Experiment's signalEvolutionNotRunning, but
         // SIG_ExperimentListView::slotSelectionChanged emits actExpChanged() on
-        // the very next line (:331-332) and SIG_MainWindow::slotActExpChanged
-        // (:851-859) re-enables mtConfigureAction with NO run check at all. So
+        // the very next line and SIG_MainWindow::slotActExpChanged
+        // re-enables mtConfigureAction with NO run check at all. So
         // one click in the tree is expected to hand the crash path straight
         // back. Found by review; the scenario sampled only before the click and
         // could not see it.
         int cfgAfterTreeClick = -1;
         // D29's ARMING LINE, and this is the only thing that reaches it.
-        // SIG_ExperimentListView.cpp:331 emits
+        // SIG_ExperimentListView::slotSelectionChanged emits
         // evolutionNotRunning( !SIG_Experiment::anyEvolutionRunning() ), and
         // anyEvolutionRunning() reads g_runningEvolutions, which ONLY
         // `RunScope runScope;' (SIG_Experiment.cpp:326) sets. Delete that line
@@ -5536,8 +5536,8 @@ static int guidriveMain(int argc, char **argv)
         //
         // D29 greys the four MetaGP actions for the duration of a run, so the
         // click is refused -- UNTIL one click in the experiment tree, which
-        // emits actExpChanged() (SIG_ExperimentListView.cpp:332) into
-        // slotActExpChanged() (SIG_MainWindow.cpp:851-859), which re-enables
+        // emits actExpChanged() (SIG_ExperimentListView::slotSelectionChanged) into
+        // SIG_MainWindow::slotActExpChanged(), which re-enables
         // mtConfigureAction with no run check. That is what the second sample
         // is for. An earlier version of this scenario sampled only before the
         // tree click and reported the door closed. Found by review.
@@ -5556,8 +5556,8 @@ static int guidriveMain(int argc, char **argv)
                 printf("\n!! D29 IS INCOMPLETE: Configure System was greyed during the"
                        " run and ONE TREE CLICK made it live again.\n"
                        "!! The 1.3 crash path is OPEN on this port by that route.\n"
-                       "!! slotActExpChanged (SIG_MainWindow.cpp:851-859) has no run"
-                       " check; SIG_ExperimentListView.cpp:332 emits into it.\n");
+                       "!! SIG_MainWindow::slotActExpChanged has no run"
+                       " check; SIG_ExperimentListView::slotSelectionChanged emits into it.\n");
                 fflush(stdout); return 1;
             }
             // The arming line, reported separately because it is a different
@@ -5572,13 +5572,13 @@ static int guidriveMain(int argc, char **argv)
             // landed. Save Experiment was already greyed at Start, so 0 on its
             // own is equally consistent with a click that reached nothing. The
             // proof is cfgAfterTreeClick flipping 0 -> 1: actExpChanged() has
-            // exactly one emit site (SIG_ExperimentListView.cpp:332), one line
+            // exactly one emit site (SIG_ExperimentListView::slotSelectionChanged), one line
             // after the emit that reaches the arming line, so the flip cannot
-            // happen without :331 having run. Found by review.
+            // happen without the evolutionNotRunning emit having run. Found by review.
             if (saveAfterTreeClick == 0 && cfgAfterTreeClick == 1)
                 printf("  >> D29's arming line HELD: the tree click provably landed"
                        " (Configure System flipped 0->1, which only"
-                       " SIG_ExperimentListView.cpp:332 can do) and it left the 23"
+                       " SIG_ExperimentListView::slotSelectionChanged can do) and it left the 23"
                        " non-MetaGP locked actions greyed.\n");
             else if (saveAfterTreeClick == 0)
                 printf("  >> Save Experiment is greyed, but nothing here proves the"

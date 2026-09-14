@@ -249,20 +249,13 @@ namespace SIGEL_MasterGUI
        *
        * Per-experiment was wrong three ways. (1) Selecting a DIFFERENT
        * experiment mid-run asked that one's flag, found it false and
-       * re-enabled every locked action -- and File > New / Open Experiment are
-       * not locked, both end in setCurrentItem(), so one click did it with no
-       * second experiment needed. (2) A nested slotStartEvolution reached
+       * re-enabled every locked action. (2) A nested slotStartEvolution reached
        * through haveABreak()'s processEvents cleared the flag on return,
        * un-guarding the outer run. (3) An exception out of start() skipped the
        * clear entirely and wedged the experiment for good.
        *
        * A count incremented by a scope guard fixes all three: any run anywhere
        * locks, nesting is balanced, and unwinding decrements.
-       *
-       * NOT SIG_GPManager::running(). That was a 2003 stub returning false
-       * unconditionally, with no override anywhere, so a guard written against
-       * it could never fire. Deleted 2026-09-09 -- see PORTING.md's D29
-       * passage for why it was a leftover rather than an unfinished feature.
        */
       static bool anyEvolutionRunning();
 

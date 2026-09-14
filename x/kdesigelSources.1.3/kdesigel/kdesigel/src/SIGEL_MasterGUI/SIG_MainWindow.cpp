@@ -879,7 +879,7 @@ void SIG_MainWindow::slotActExpChanged()
 			//
 			// D30. NOT while a run is going. This slot has no run check of
 			// its own and it fires one line after the tree-click emit that
-			// APPLIES the run lock (SIG_ExperimentListView.cpp:331-332), so
+			// APPLIES the run lock (SIG_ExperimentListView::slotSelectionChanged), so
 			// it handed these two straight back mid-run. Measured: with
 			// MetaGP on, one click in the experiment tree during a run made
 			// Configure System live again, and clicking it aborted the

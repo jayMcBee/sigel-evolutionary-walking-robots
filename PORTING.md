@@ -1553,7 +1553,7 @@ difference matters.
 
 The first is `SIG_MainWindow::slotActExpChanged` (`:851-859`), which has no run
 check and fires one line after the tree-click emit that *applies* the lock
-(`SIG_ExperimentListView.cpp:331-332`). **That one is what crashed the port** —
+(`SIG_ExperimentListView::slotSelectionChanged`). **That one is what crashed the port** —
 `Configure System` back on, clicked, and `MT_Controller::configureSystem`
 deletes the trainer the running evolution is holding.
 
@@ -1776,7 +1776,7 @@ picks it back up, and 1.3 never grey it in the first place.
 section said 23; that is the non-MetaGP subset, not the list.* `Save Experiment`
 is one of those 23 and, unlike the MetaGP four, re-enabled by nothing —
 reads `enabled=0` after the tree click. That is the **only** thing that reaches
-the arming line: `SIG_ExperimentListView.cpp:331` emits
+the arming line: `SIG_ExperimentListView::slotSelectionChanged` emits
 `evolutionNotRunning( !SIG_Experiment::anyEvolutionRunning() )`, and
 `anyEvolutionRunning()` reads `g_runningEvolutions`, which only
 `RunScope runScope;` (`SIG_Experiment.cpp:326`) sets. Delete that line and a
@@ -1784,15 +1784,15 @@ tree click mid-run hands all 27 back. **§9 listed this as uncovered and it is n
 covered.**
 
 **The hole is elsewhere, and it is not the arming line.**
-`SIG_ExperimentListView.cpp:332` emits `actExpChanged()` on the very next line,
-and `SIG_MainWindow::slotActExpChanged` (`:851-859`) does
+The same slot emits `actExpChanged()` on the very next line,
+and `SIG_MainWindow::slotActExpChanged` does
 `mtConfigureAction->setEnabled(true)` and
 `mtChoiceTypeActionGroup->setEnabled(true)` **with no run check at all**,
 whenever the selected experiment has MetaGP on. So the sequence greys the four
-MetaGP actions and immediately un-greys two of them. D29's own comment at
-`SIG_ExperimentListView.cpp:310-330` is about exactly this hazard — "ONE CLICK ON
-THE TREE undid it" — and it fixed the emit on `:331` while leaving `:332`
-untouched.
+MetaGP actions and immediately un-greys two of them. D29's own comment in
+`SIG_ExperimentListView::slotSelectionChanged` is about exactly this hazard, and it
+fixed the `evolutionNotRunning` emit while leaving the `actExpChanged` emit on the
+next line untouched.
 
 *Two claims made here on 2026-09-06 are withdrawn, both found by review.* The
 first said the crash path was **closed** by D29; it is not, and the run that
@@ -3477,7 +3477,7 @@ clicked the tree.* The unchecked read is unchanged:
 `SIG_GPFitnessTrainer.cpp, checkTask`, reached from `MT_Evaluator.cpp:473`.
 
 **D29's arming line is now covered, and it held.** The tree click is the only
-thing that reaches it — `SIG_ExperimentListView.cpp:331` asks
+thing that reaches it — `SIG_ExperimentListView::slotSelectionChanged` asks
 `anyEvolutionRunning()`, which only `RunScope` sets — and `Save Experiment`, one
 of the 23 locked actions that nothing re-enables, stayed greyed through it.
 
@@ -5801,7 +5801,7 @@ disabled but `SIG_RobotView::putIntoExperiment()` has **no callers at all**.
 
 **Version 2 was wrong: a bool per experiment.** Three ways. Selecting a
 *different* experiment mid-run asked that one's flag and re-enabled everything —
-and `File > New`/`Open Experiment` are not locked and both end in
+and `File > New`/`Open Experiment` were not locked then and both end in
 `setCurrentItem()`, so one click did it with no second experiment needed. A
 nested `slotStartEvolution` reached through `processEvents` cleared the flag on
 return. An exception out of `start()` skipped the clear and locked the
