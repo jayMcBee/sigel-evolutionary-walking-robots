@@ -206,7 +206,7 @@ SOURCE=.\src\SIGEL_MasterGUI\SIG_EnvironmentView.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\SIGEL_MasterGUI\SIG_Experiment.cpp
+SOURCE=.\src\SIGEL_MasterGUI\SIG_GUIGPExperiment.cpp
 
 !IF  "$(CFG)" == "Sigel - Win32 Release"
 
@@ -601,14 +601,14 @@ InputName=SIG_EnvironmentView
 # End Source File
 # Begin Source File
 
-SOURCE=.\include\SIGEL_MasterGUI\SIG_Experiment.h
+SOURCE=.\include\SIGEL_MasterGUI\SIG_GUIGPExperiment.h
 
 !IF  "$(CFG)" == "Sigel - Win32 Release"
 
 # Begin Custom Build - Moc'ing $(InputName).h ...
 ProjDir=.
-InputPath=.\include\SIGEL_MasterGUI\SIG_Experiment.h
-InputName=SIG_Experiment
+InputPath=.\include\SIGEL_MasterGUI\SIG_GUIGPExperiment.h
+InputName=SIG_GUIGPExperiment
 
 "$(ProjDir)\src\SIGEL_MasterGUI\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	$(QTDIR)\bin\moc $(InputPath) -o $(ProjDir)\src\SIGEL_MasterGUI\moc_$(InputName).cpp
@@ -620,8 +620,8 @@ InputName=SIG_Experiment
 # PROP Intermediate_Dir "Debug2"
 # Begin Custom Build - Moc'ing $(InputName).h ...
 ProjDir=.
-InputPath=.\include\SIGEL_MasterGUI\SIG_Experiment.h
-InputName=SIG_Experiment
+InputPath=.\include\SIGEL_MasterGUI\SIG_GUIGPExperiment.h
+InputName=SIG_GUIGPExperiment
 
 "$(ProjDir)\src\SIGEL_MasterGUI\moc_$(InputName).cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	$(QTDIR)\bin\moc $(InputPath) -o $(ProjDir)\src\SIGEL_MasterGUI\moc_$(InputName).cpp
@@ -1048,7 +1048,7 @@ SOURCE=.\src\SIGEL_MasterGUI\moc_SIG_EnvironmentView.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\SIGEL_MasterGUI\moc_SIG_Experiment.cpp
+SOURCE=.\src\SIGEL_MasterGUI\moc_SIG_GUIGPExperiment.cpp
 # End Source File
 # Begin Source File
 

@@ -28,7 +28,7 @@
 #include <QHash>
 #include <QMenu>
 
-#include "SIGEL_MasterGUI/SIG_Experiment.h"
+#include "SIGEL_MasterGUI/SIG_GUIGPExperiment.h"
 
 namespace SIGEL_MasterGUI
 {

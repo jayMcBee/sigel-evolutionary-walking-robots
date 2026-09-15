@@ -22,7 +22,7 @@
 */
 #include "SIGEL_GP/SIG_GUIGPManager.h"
 #include <QTreeWidget>
-#include "SIGEL_MasterGUI/SIG_Experiment.h"
+#include "SIGEL_MasterGUI/SIG_GUIGPExperiment.h"
 #include "SIGEL_MasterGUI/SIG_IndividualListItem.h"
 
 #include <qapplication.h>

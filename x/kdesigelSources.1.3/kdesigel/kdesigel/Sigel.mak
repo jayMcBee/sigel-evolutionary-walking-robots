@@ -57,7 +57,7 @@ CLEAN :
 	-@erase "$(INTDIR)\moc_SIG_EditHostDialogBase.obj"
 	-@erase "$(INTDIR)\moc_SIG_EnvironmentBase.obj"
 	-@erase "$(INTDIR)\moc_SIG_EnvironmentView.obj"
-	-@erase "$(INTDIR)\moc_SIG_Experiment.obj"
+	-@erase "$(INTDIR)\moc_SIG_GUIGPExperiment.obj"
 	-@erase "$(INTDIR)\moc_SIG_ExperimentListView.obj"
 	-@erase "$(INTDIR)\moc_SIG_ExperimentView.obj"
 	-@erase "$(INTDIR)\moc_SIG_ExperimentViewBase.obj"
@@ -83,7 +83,7 @@ CLEAN :
 	-@erase "$(INTDIR)\SIG_EditHostDialogBase.obj"
 	-@erase "$(INTDIR)\SIG_EnvironmentBase.obj"
 	-@erase "$(INTDIR)\SIG_EnvironmentView.obj"
-	-@erase "$(INTDIR)\SIG_Experiment.obj"
+	-@erase "$(INTDIR)\SIG_GUIGPExperiment.obj"
 	-@erase "$(INTDIR)\SIG_ExperimentItem.obj"
 	-@erase "$(INTDIR)\SIG_ExperimentListView.obj"
 	-@erase "$(INTDIR)\SIG_ExperimentView.obj"
@@ -199,7 +199,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\SIG_EditHostDialogBase.obj" \
 	"$(INTDIR)\SIG_EnvironmentBase.obj" \
 	"$(INTDIR)\SIG_EnvironmentView.obj" \
-	"$(INTDIR)\SIG_Experiment.obj" \
+	"$(INTDIR)\SIG_GUIGPExperiment.obj" \
 	"$(INTDIR)\SIG_ExperimentItem.obj" \
 	"$(INTDIR)\SIG_ExperimentListView.obj" \
 	"$(INTDIR)\SIG_ExperimentView.obj" \
@@ -227,7 +227,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\moc_SIG_EditCommandDialog.obj" \
 	"$(INTDIR)\moc_SIG_EditHostDialog.obj" \
 	"$(INTDIR)\moc_SIG_EnvironmentView.obj" \
-	"$(INTDIR)\moc_SIG_Experiment.obj" \
+	"$(INTDIR)\moc_SIG_GUIGPExperiment.obj" \
 	"$(INTDIR)\moc_SIG_ExperimentListView.obj" \
 	"$(INTDIR)\moc_SIG_ExperimentView.obj" \
 	"$(INTDIR)\moc_SIG_GPParameter.obj" \
@@ -299,7 +299,7 @@ CLEAN :
 	-@erase "$(INTDIR)\moc_SIG_EditHostDialogBase.obj"
 	-@erase "$(INTDIR)\moc_SIG_EnvironmentBase.obj"
 	-@erase "$(INTDIR)\moc_SIG_EnvironmentView.obj"
-	-@erase "$(INTDIR)\moc_SIG_Experiment.obj"
+	-@erase "$(INTDIR)\moc_SIG_GUIGPExperiment.obj"
 	-@erase "$(INTDIR)\moc_SIG_ExperimentListView.obj"
 	-@erase "$(INTDIR)\moc_SIG_ExperimentView.obj"
 	-@erase "$(INTDIR)\moc_SIG_ExperimentViewBase.obj"
@@ -338,7 +338,7 @@ CLEAN :
 	-@erase ".\Debug2\SIG_EditCommandDialog.obj"
 	-@erase ".\Debug2\SIG_EditHostDialog.obj"
 	-@erase ".\Debug2\SIG_EnvironmentView.obj"
-	-@erase ".\Debug2\SIG_Experiment.obj"
+	-@erase ".\Debug2\SIG_GUIGPExperiment.obj"
 	-@erase ".\Debug2\SIG_ExperimentItem.obj"
 	-@erase ".\Debug2\SIG_ExperimentListView.obj"
 	-@erase ".\Debug2\SIG_ExperimentView.obj"
@@ -418,7 +418,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\SIG_EditHostDialogBase.obj" \
 	"$(INTDIR)\SIG_EnvironmentBase.obj" \
 	".\Debug2\SIG_EnvironmentView.obj" \
-	".\Debug2\SIG_Experiment.obj" \
+	".\Debug2\SIG_GUIGPExperiment.obj" \
 	".\Debug2\SIG_ExperimentItem.obj" \
 	".\Debug2\SIG_ExperimentListView.obj" \
 	".\Debug2\SIG_ExperimentView.obj" \
@@ -446,7 +446,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\moc_SIG_EditCommandDialog.obj" \
 	"$(INTDIR)\moc_SIG_EditHostDialog.obj" \
 	"$(INTDIR)\moc_SIG_EnvironmentView.obj" \
-	"$(INTDIR)\moc_SIG_Experiment.obj" \
+	"$(INTDIR)\moc_SIG_GUIGPExperiment.obj" \
 	"$(INTDIR)\moc_SIG_ExperimentListView.obj" \
 	"$(INTDIR)\moc_SIG_ExperimentView.obj" \
 	"$(INTDIR)\moc_SIG_GPParameter.obj" \
@@ -657,19 +657,19 @@ SOURCE=.\src\SIGEL_MasterGUI\SIG_EnvironmentView.cpp
 
 !ENDIF 
 
-SOURCE=.\src\SIGEL_MasterGUI\SIG_Experiment.cpp
+SOURCE=.\src\SIGEL_MasterGUI\SIG_GUIGPExperiment.cpp
 
 !IF  "$(CFG)" == "Sigel - Win32 Release"
 
 
-"$(INTDIR)\SIG_Experiment.obj" : $(SOURCE) "$(INTDIR)"
+"$(INTDIR)\SIG_GUIGPExperiment.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "Sigel - Win32 Debug"
 
 
-".\Debug2\SIG_Experiment.obj" : $(SOURCE) ".\include\SIGEL_MasterGUI\SIG_Experiment.h" ".\include\SIGEL_MasterGUI\SIG_GPParameter.h" ".\include\SIGEL_MasterGUI\SIG_SimulationParameter.h" ".\include\SIGEL_MasterGUI\SIG_EnvironmentView.h" ".\include\SIGEL_MasterGUI\SIG_RobotView.h" ".\include\SIGEL_MasterGUI\SIG_ExperimentView.h" ".\include\SIGEL_MasterGUI\SIG_AllIndividualsView.h" ".\include\SIGEL_MasterGUI\SIG_LanguageParameters.h" ".\include\SIGEL_MasterGUI\SIG_GPParameterBase.h" ".\include\SIGEL_MasterGUI\SIG_SimulationParameterBase.h" ".\include\SIGEL_MasterGUI\SIG_EnvironmentBase.h" ".\include\SIGEL_MasterGUI\SIG_ExperimentViewBase.h" ".\include\SIGEL_MasterGUI\SIG_IndividualList.h" ".\include\SIGEL_MasterGUI\SIG_IndividualView.h" ".\include\SIGEL_MasterGUI\SIG_AddIndividualsDialog.h" ".\include\SIGEL_MasterGUI\SIG_LanguageParametersBase.h" ".\include\SIGEL_MasterGUI\SIG_IndividualListBase.h" ".\include\SIGEL_MasterGUI\SIG_IndividualViewBase.h"
+".\Debug2\SIG_GUIGPExperiment.obj" : $(SOURCE) ".\include\SIGEL_MasterGUI\SIG_GUIGPExperiment.h" ".\include\SIGEL_MasterGUI\SIG_GPParameter.h" ".\include\SIGEL_MasterGUI\SIG_SimulationParameter.h" ".\include\SIGEL_MasterGUI\SIG_EnvironmentView.h" ".\include\SIGEL_MasterGUI\SIG_RobotView.h" ".\include\SIGEL_MasterGUI\SIG_ExperimentView.h" ".\include\SIGEL_MasterGUI\SIG_AllIndividualsView.h" ".\include\SIGEL_MasterGUI\SIG_LanguageParameters.h" ".\include\SIGEL_MasterGUI\SIG_GPParameterBase.h" ".\include\SIGEL_MasterGUI\SIG_SimulationParameterBase.h" ".\include\SIGEL_MasterGUI\SIG_EnvironmentBase.h" ".\include\SIGEL_MasterGUI\SIG_ExperimentViewBase.h" ".\include\SIGEL_MasterGUI\SIG_IndividualList.h" ".\include\SIGEL_MasterGUI\SIG_IndividualView.h" ".\include\SIGEL_MasterGUI\SIG_AddIndividualsDialog.h" ".\include\SIGEL_MasterGUI\SIG_LanguageParametersBase.h" ".\include\SIGEL_MasterGUI\SIG_IndividualListBase.h" ".\include\SIGEL_MasterGUI\SIG_IndividualViewBase.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -705,7 +705,7 @@ SOURCE=.\src\SIGEL_MasterGUI\SIG_ExperimentListView.cpp
 !ELSEIF  "$(CFG)" == "Sigel - Win32 Debug"
 
 
-".\Debug2\SIG_ExperimentListView.obj" : $(SOURCE) ".\include\SIGEL_MasterGUI\SIG_RenameDialog.h" ".\include\SIGEL_MasterGUI\SIG_ExperimentListView.h" ".\include\SIGEL_MasterGUI\SIG_Experiment.h" ".\include\SIGEL_MasterGUI\SIG_GPParameter.h" ".\include\SIGEL_MasterGUI\SIG_SimulationParameter.h" ".\include\SIGEL_MasterGUI\SIG_EnvironmentView.h" ".\include\SIGEL_MasterGUI\SIG_RobotView.h" ".\include\SIGEL_MasterGUI\SIG_ExperimentView.h" ".\include\SIGEL_MasterGUI\SIG_AllIndividualsView.h" ".\include\SIGEL_MasterGUI\SIG_LanguageParameters.h" ".\include\SIGEL_MasterGUI\SIG_GPParameterBase.h" ".\include\SIGEL_MasterGUI\SIG_SimulationParameterBase.h" ".\include\SIGEL_MasterGUI\SIG_EnvironmentBase.h" ".\include\SIGEL_MasterGUI\SIG_ExperimentViewBase.h" ".\include\SIGEL_MasterGUI\SIG_IndividualList.h" ".\include\SIGEL_MasterGUI\SIG_IndividualView.h" ".\include\SIGEL_MasterGUI\SIG_AddIndividualsDialog.h" ".\include\SIGEL_MasterGUI\SIG_LanguageParametersBase.h" ".\include\SIGEL_MasterGUI\SIG_IndividualListBase.h" ".\include\SIGEL_MasterGUI\SIG_IndividualViewBase.h"
+".\Debug2\SIG_ExperimentListView.obj" : $(SOURCE) ".\include\SIGEL_MasterGUI\SIG_RenameDialog.h" ".\include\SIGEL_MasterGUI\SIG_ExperimentListView.h" ".\include\SIGEL_MasterGUI\SIG_GUIGPExperiment.h" ".\include\SIGEL_MasterGUI\SIG_GPParameter.h" ".\include\SIGEL_MasterGUI\SIG_SimulationParameter.h" ".\include\SIGEL_MasterGUI\SIG_EnvironmentView.h" ".\include\SIGEL_MasterGUI\SIG_RobotView.h" ".\include\SIGEL_MasterGUI\SIG_ExperimentView.h" ".\include\SIGEL_MasterGUI\SIG_AllIndividualsView.h" ".\include\SIGEL_MasterGUI\SIG_LanguageParameters.h" ".\include\SIGEL_MasterGUI\SIG_GPParameterBase.h" ".\include\SIGEL_MasterGUI\SIG_SimulationParameterBase.h" ".\include\SIGEL_MasterGUI\SIG_EnvironmentBase.h" ".\include\SIGEL_MasterGUI\SIG_ExperimentViewBase.h" ".\include\SIGEL_MasterGUI\SIG_IndividualList.h" ".\include\SIGEL_MasterGUI\SIG_IndividualView.h" ".\include\SIGEL_MasterGUI\SIG_AddIndividualsDialog.h" ".\include\SIGEL_MasterGUI\SIG_LanguageParametersBase.h" ".\include\SIGEL_MasterGUI\SIG_IndividualListBase.h" ".\include\SIGEL_MasterGUI\SIG_IndividualViewBase.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -891,7 +891,7 @@ SOURCE=.\src\SIGEL_MasterGUI\SIG_MainWindow.cpp
 !ELSEIF  "$(CFG)" == "Sigel - Win32 Debug"
 
 
-".\Debug2\SIG_MainWindow.obj" : $(SOURCE) ".\include\SIGEL_MasterGUI\SIG_MainWindow.h" ".\include\SIGEL_MasterGUI\SIG_ExperimentListView.h" ".\include\SIGEL_MasterGUI\SIG_Experiment.h" ".\include\SIGEL_MasterGUI\SIG_GPParameter.h" ".\include\SIGEL_MasterGUI\SIG_SimulationParameter.h" ".\include\SIGEL_MasterGUI\SIG_EnvironmentView.h" ".\include\SIGEL_MasterGUI\SIG_RobotView.h" ".\include\SIGEL_MasterGUI\SIG_ExperimentView.h" ".\include\SIGEL_MasterGUI\SIG_AllIndividualsView.h" ".\include\SIGEL_MasterGUI\SIG_LanguageParameters.h" ".\include\SIGEL_MasterGUI\SIG_GPParameterBase.h" ".\include\SIGEL_MasterGUI\SIG_SimulationParameterBase.h" ".\include\SIGEL_MasterGUI\SIG_EnvironmentBase.h" ".\include\SIGEL_MasterGUI\SIG_ExperimentViewBase.h" ".\include\SIGEL_MasterGUI\SIG_IndividualList.h" ".\include\SIGEL_MasterGUI\SIG_IndividualView.h" ".\include\SIGEL_MasterGUI\SIG_AddIndividualsDialog.h" ".\include\SIGEL_MasterGUI\SIG_LanguageParametersBase.h" ".\include\SIGEL_MasterGUI\SIG_IndividualListBase.h" ".\include\SIGEL_MasterGUI\SIG_IndividualViewBase.h"
+".\Debug2\SIG_MainWindow.obj" : $(SOURCE) ".\include\SIGEL_MasterGUI\SIG_MainWindow.h" ".\include\SIGEL_MasterGUI\SIG_ExperimentListView.h" ".\include\SIGEL_MasterGUI\SIG_GUIGPExperiment.h" ".\include\SIGEL_MasterGUI\SIG_GPParameter.h" ".\include\SIGEL_MasterGUI\SIG_SimulationParameter.h" ".\include\SIGEL_MasterGUI\SIG_EnvironmentView.h" ".\include\SIGEL_MasterGUI\SIG_RobotView.h" ".\include\SIGEL_MasterGUI\SIG_ExperimentView.h" ".\include\SIGEL_MasterGUI\SIG_AllIndividualsView.h" ".\include\SIGEL_MasterGUI\SIG_LanguageParameters.h" ".\include\SIGEL_MasterGUI\SIG_GPParameterBase.h" ".\include\SIGEL_MasterGUI\SIG_SimulationParameterBase.h" ".\include\SIGEL_MasterGUI\SIG_EnvironmentBase.h" ".\include\SIGEL_MasterGUI\SIG_ExperimentViewBase.h" ".\include\SIGEL_MasterGUI\SIG_IndividualList.h" ".\include\SIGEL_MasterGUI\SIG_IndividualView.h" ".\include\SIGEL_MasterGUI\SIG_AddIndividualsDialog.h" ".\include\SIGEL_MasterGUI\SIG_LanguageParametersBase.h" ".\include\SIGEL_MasterGUI\SIG_IndividualListBase.h" ".\include\SIGEL_MasterGUI\SIG_IndividualViewBase.h"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -1137,15 +1137,15 @@ InputName=SIG_EnvironmentView
 
 !ENDIF 
 
-SOURCE=.\include\SIGEL_MasterGUI\SIG_Experiment.h
+SOURCE=.\include\SIGEL_MasterGUI\SIG_GUIGPExperiment.h
 
 !IF  "$(CFG)" == "Sigel - Win32 Release"
 
 ProjDir=.
-InputPath=.\include\SIGEL_MasterGUI\SIG_Experiment.h
-InputName=SIG_Experiment
+InputPath=.\include\SIGEL_MasterGUI\SIG_GUIGPExperiment.h
+InputName=SIG_GUIGPExperiment
 
-".\src\SIGEL_MasterGUI\moc_SIG_Experiment.cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+".\src\SIGEL_MasterGUI\moc_SIG_GUIGPExperiment.cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	<<tempfile.bat 
 	@echo off 
 	$(QTDIR)\bin\moc $(InputPath) -o $(ProjDir)\src\SIGEL_MasterGUI\moc_$(InputName).cpp
@@ -1155,10 +1155,10 @@ InputName=SIG_Experiment
 !ELSEIF  "$(CFG)" == "Sigel - Win32 Debug"
 
 ProjDir=.
-InputPath=.\include\SIGEL_MasterGUI\SIG_Experiment.h
-InputName=SIG_Experiment
+InputPath=.\include\SIGEL_MasterGUI\SIG_GUIGPExperiment.h
+InputName=SIG_GUIGPExperiment
 
-".\src\SIGEL_MasterGUI\moc_SIG_Experiment.cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+".\src\SIGEL_MasterGUI\moc_SIG_GUIGPExperiment.cpp" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	<<tempfile.bat 
 	@echo off 
 	$(QTDIR)\bin\moc $(InputPath) -o $(ProjDir)\src\SIGEL_MasterGUI\moc_$(InputName).cpp
@@ -1516,9 +1516,9 @@ SOURCE=.\src\SIGEL_MasterGUI\moc_SIG_EnvironmentView.cpp
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
-SOURCE=.\src\SIGEL_MasterGUI\moc_SIG_Experiment.cpp
+SOURCE=.\src\SIGEL_MasterGUI\moc_SIG_GUIGPExperiment.cpp
 
-"$(INTDIR)\moc_SIG_Experiment.obj" : $(SOURCE) "$(INTDIR)"
+"$(INTDIR)\moc_SIG_GUIGPExperiment.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 

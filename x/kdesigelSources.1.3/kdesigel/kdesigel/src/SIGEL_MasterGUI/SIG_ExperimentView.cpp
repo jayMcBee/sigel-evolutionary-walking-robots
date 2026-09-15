@@ -20,7 +20,7 @@
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-#include "SIGEL_MasterGUI/SIG_Experiment.h"   // anyEvolutionRunning()
+#include "SIGEL_MasterGUI/SIG_GUIGPExperiment.h"   // anyEvolutionRunning()
 #include <qpushbutton.h>
 #include <qtextstream.h>
 #include <qfiledialog.h>

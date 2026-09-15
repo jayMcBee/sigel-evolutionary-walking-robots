@@ -375,5 +375,5 @@ diagnostic, including plain `"Warning:"` lines.
 
 **The authors agreed.** `SIG_SimulationParameterBase.ui:143,154` labels the two
 choices `"Dynamo  (not recommended)"` and `"DynaMechs   (preferred)"`, and
-`SIG_Experiment.cpp, slotPopulationExport` refuses to open the Robot Information dialog unless
+`SIG_GUIGPExperiment.cpp, slotRobotInfo` refuses to open the Robot Information dialog unless
 DynaMechs is selected. All 14 shipped experiments carry `SIMULATIONLIBRARY 1`.

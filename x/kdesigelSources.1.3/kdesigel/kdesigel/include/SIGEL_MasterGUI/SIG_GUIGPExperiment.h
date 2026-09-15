@@ -20,8 +20,8 @@
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-#ifndef SIGEL_MASTERGUI_SIG_EXPERIMENT_H
-#define SIGEL_MASTERGUI_SIG_EXPERIMENT_H
+#ifndef SIGEL_MASTERGUI_SIG_GUIGPEXPERIMENT_H
+#define SIGEL_MASTERGUI_SIG_GUIGPEXPERIMENT_H
 
 #include <QStackedWidget>
 #include <qstring.h>
@@ -110,7 +110,7 @@ namespace SIGEL_MasterGUI
 	 * Writes every parameter page into the experiment.
 	 *
 	 * DOES NOTHING WHILE AN EVOLUTION IS RUNNING -- a deliberate deviation from
-	 * SIGEL 1.3. See SIG_Experiment.cpp, putAllIntoExperiment.
+	 * SIGEL 1.3. See SIG_GUIGPExperiment.cpp, putAllIntoExperiment.
 	 */
 	void putAllIntoExperiment();
       
@@ -376,5 +376,5 @@ namespace SIGEL_MasterGUI
     };
   
 }
-#endif // SIGEL_MASTERGUI_SIG_EXPERIMENT_H
+#endif // SIGEL_MASTERGUI_SIG_GUIGPEXPERIMENT_H
 

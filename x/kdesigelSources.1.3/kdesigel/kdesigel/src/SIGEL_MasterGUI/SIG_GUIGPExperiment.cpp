@@ -25,7 +25,7 @@
 #include <qlabel.h>
 #include <qmessagebox.h>
 
-#include "SIGEL_MasterGUI/SIG_Experiment.h"
+#include "SIGEL_MasterGUI/SIG_GUIGPExperiment.h"
 
 #include "SIGEL_GP/SIG_GUIGPManager.h"
 

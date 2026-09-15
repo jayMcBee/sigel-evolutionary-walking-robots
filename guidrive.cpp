@@ -135,7 +135,7 @@ extern "C" {
 #include "SIGEL_MasterGUI/SIG_MainWindow.h"
 #include "SIGEL_SlaveGUI/SIG_SimulationWindow.h"
 #include "SIGEL_MasterGUI/SIG_ExperimentListView.h"
-#include "SIGEL_MasterGUI/SIG_Experiment.h"
+#include "SIGEL_MasterGUI/SIG_GUIGPExperiment.h"
 #include "MT_GUI/MT_Editor.h"
 #include "SIGEL_MasterGUI/SIG_AllIndividualsView.h"
 #include "SIGEL_MasterGUI/SIG_IndividualListItem.h"
@@ -5306,7 +5306,7 @@ static int guidriveMain(int argc, char **argv)
                               : nullptr;
         // slotStartEvolution() BLOCKS. It calls guiGPManager->start(), which runs
         // the whole evolution inline and returns only when it has stopped
-        // (SIG_Experiment.cpp, slotRightClick, with slotEvolutionStopped() on the next
+        // (SIG_GUIGPExperiment.cpp, slotRightClick, with slotEvolutionStopped() on the next
         // line). The loop stays responsive only because
         // SIG_GUIGPManager::haveABreak() calls qApp->processEvents(), so a
         // timer armed BEFORE the click fires DURING the run. The sampling loop
@@ -5376,7 +5376,7 @@ static int guidriveMain(int argc, char **argv)
         // SIG_ExperimentListView::slotSelectionChanged emits
         // evolutionNotRunning( !SIG_GUIGPExperiment::anyEvolutionRunning() ), and
         // anyEvolutionRunning() reads g_runningEvolutions, which ONLY
-        // `RunScope runScope;' (SIG_Experiment.cpp:326) sets. Delete that line
+        // `RunScope runScope;' (SIG_GUIGPExperiment.cpp:326) sets. Delete that line
         // and a tree click mid-run emits TRUE and hands back all 27 locked
         // actions -- 23 appended at SIG_MainWindow.cpp:571-593 plus the four
         // MetaGP ones at :685-688; `evolutionRunningActions.append' appears 27
@@ -5384,7 +5384,7 @@ static int guidriveMain(int argc, char **argv)
         // unlike the MetaGP four, nothing re-enables it afterwards -- so it
         // reports the arming line and nothing else.
         //
-        // The FIRST greying is NOT the arming line: SIG_Experiment.cpp:304
+        // The FIRST greying is NOT the arming line: SIG_GUIGPExperiment.cpp:304
         // emits signalEvolutionNotRunning(false) twenty-two lines BEFORE the
         // RunScope is constructed, so a run with the arming line deleted still
         // greys everything at Start. An earlier version of this scenario
@@ -5409,7 +5409,7 @@ static int guidriveMain(int argc, char **argv)
                 }, 8000);
                 // The BEFORE sample. It does NOT reach D29's arming line --
                 // SIG_MainWindow.cpp:685-688 puts the four MetaGP actions into
-                // evolutionRunningActions and SIG_Experiment.cpp:304 greys them
+                // evolutionRunningActions and SIG_GUIGPExperiment.cpp:304 greys them
                 // at Start, 22 lines before the RunScope exists. Only the
                 // after-tree-click sample below reaches the arming line. An
                 // earlier version of this comment claimed otherwise, 25 lines

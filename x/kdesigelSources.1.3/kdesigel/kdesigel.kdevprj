@@ -605,7 +605,7 @@ install_location=
 type=HEADER
 
 [kdesigel/include/SIGEL_MasterGUI/Makefile.am]
-files=kdesigel/include/SIGEL_MasterGUI/SIG_AddIndividualsDialog.h,kdesigel/include/SIGEL_MasterGUI/SIG_AllIndividualsView.h,kdesigel/include/SIGEL_MasterGUI/SIG_EditCommandDialog.h,kdesigel/include/SIGEL_MasterGUI/SIG_EditHostDialog.h,kdesigel/include/SIGEL_MasterGUI/SIG_EnvironmentView.h,kdesigel/include/SIGEL_MasterGUI/SIG_Experiment.h,kdesigel/include/SIGEL_MasterGUI/SIG_ExperimentItem.h,kdesigel/include/SIGEL_MasterGUI/SIG_ExperimentListView.h,kdesigel/include/SIGEL_MasterGUI/SIG_ExperimentView.h,kdesigel/include/SIGEL_MasterGUI/SIG_GPParameter.h,kdesigel/include/SIGEL_MasterGUI/SIG_IndividualList.h,kdesigel/include/SIGEL_MasterGUI/SIG_IndividualListItem.h,kdesigel/include/SIGEL_MasterGUI/SIG_IndividualView.h,kdesigel/include/SIGEL_MasterGUI/SIG_InfoBox.h,kdesigel/include/SIGEL_MasterGUI/SIG_LanguageParameters.h,kdesigel/include/SIGEL_MasterGUI/SIG_MainWindow.h,kdesigel/include/SIGEL_MasterGUI/SIG_RenameDialog.h,kdesigel/include/SIGEL_MasterGUI/SIG_RobotView.h,kdesigel/include/SIGEL_MasterGUI/SIG_SimulationParameter.h,kdesigel/include/SIGEL_MasterGUI/SIG_TextView.h
+files=kdesigel/include/SIGEL_MasterGUI/SIG_AddIndividualsDialog.h,kdesigel/include/SIGEL_MasterGUI/SIG_AllIndividualsView.h,kdesigel/include/SIGEL_MasterGUI/SIG_EditCommandDialog.h,kdesigel/include/SIGEL_MasterGUI/SIG_EditHostDialog.h,kdesigel/include/SIGEL_MasterGUI/SIG_EnvironmentView.h,kdesigel/include/SIGEL_MasterGUI/SIG_GUIGPExperiment.h,kdesigel/include/SIGEL_MasterGUI/SIG_ExperimentItem.h,kdesigel/include/SIGEL_MasterGUI/SIG_ExperimentListView.h,kdesigel/include/SIGEL_MasterGUI/SIG_ExperimentView.h,kdesigel/include/SIGEL_MasterGUI/SIG_GPParameter.h,kdesigel/include/SIGEL_MasterGUI/SIG_IndividualList.h,kdesigel/include/SIGEL_MasterGUI/SIG_IndividualListItem.h,kdesigel/include/SIGEL_MasterGUI/SIG_IndividualView.h,kdesigel/include/SIGEL_MasterGUI/SIG_InfoBox.h,kdesigel/include/SIGEL_MasterGUI/SIG_LanguageParameters.h,kdesigel/include/SIGEL_MasterGUI/SIG_MainWindow.h,kdesigel/include/SIGEL_MasterGUI/SIG_RenameDialog.h,kdesigel/include/SIGEL_MasterGUI/SIG_RobotView.h,kdesigel/include/SIGEL_MasterGUI/SIG_SimulationParameter.h,kdesigel/include/SIGEL_MasterGUI/SIG_TextView.h
 sub_dirs=
 type=normal
 
@@ -639,7 +639,7 @@ install=false
 install_location=
 type=HEADER
 
-[kdesigel/include/SIGEL_MasterGUI/SIG_Experiment.h]
+[kdesigel/include/SIGEL_MasterGUI/SIG_GUIGPExperiment.h]
 dist=true
 install=false
 install_location=
@@ -1932,7 +1932,7 @@ install_location=
 type=SOURCE
 
 [kdesigel/src/SIGEL_MasterGUI/Makefile.am]
-files=kdesigel/src/SIGEL_MasterGUI/SIG_AddIndividualsDialog.cpp,kdesigel/src/SIGEL_MasterGUI/SIG_AllIndividualsView.cpp,kdesigel/src/SIGEL_MasterGUI/SIG_EditCommandDialog.cpp,kdesigel/src/SIGEL_MasterGUI/SIG_EditHostDialog.cpp,kdesigel/src/SIGEL_MasterGUI/SIG_EnvironmentView.cpp,kdesigel/src/SIGEL_MasterGUI/SIG_Experiment.cpp,kdesigel/src/SIGEL_MasterGUI/SIG_ExperimentItem.cpp,kdesigel/src/SIGEL_MasterGUI/SIG_ExperimentListView.cpp,kdesigel/src/SIGEL_MasterGUI/SIG_ExperimentView.cpp,kdesigel/src/SIGEL_MasterGUI/SIG_GPParameter.cpp,kdesigel/src/SIGEL_MasterGUI/SIG_IndividualList.cpp,kdesigel/src/SIGEL_MasterGUI/SIG_IndividualListItem.cpp,kdesigel/src/SIGEL_MasterGUI/SIG_IndividualView.cpp,kdesigel/src/SIGEL_MasterGUI/SIG_InfoBox.cpp,kdesigel/src/SIGEL_MasterGUI/SIG_LanguageParameters.cpp,kdesigel/src/SIGEL_MasterGUI/SIG_MainWindow.cpp,kdesigel/src/SIGEL_MasterGUI/SIG_RenameDialog.cpp,kdesigel/src/SIGEL_MasterGUI/SIG_RobotView.cpp,kdesigel/src/SIGEL_MasterGUI/SIG_SimulationParameter.cpp,kdesigel/src/SIGEL_MasterGUI/SIG_TextView.cpp
+files=kdesigel/src/SIGEL_MasterGUI/SIG_AddIndividualsDialog.cpp,kdesigel/src/SIGEL_MasterGUI/SIG_AllIndividualsView.cpp,kdesigel/src/SIGEL_MasterGUI/SIG_EditCommandDialog.cpp,kdesigel/src/SIGEL_MasterGUI/SIG_EditHostDialog.cpp,kdesigel/src/SIGEL_MasterGUI/SIG_EnvironmentView.cpp,kdesigel/src/SIGEL_MasterGUI/SIG_GUIGPExperiment.cpp,kdesigel/src/SIGEL_MasterGUI/SIG_ExperimentItem.cpp,kdesigel/src/SIGEL_MasterGUI/SIG_ExperimentListView.cpp,kdesigel/src/SIGEL_MasterGUI/SIG_ExperimentView.cpp,kdesigel/src/SIGEL_MasterGUI/SIG_GPParameter.cpp,kdesigel/src/SIGEL_MasterGUI/SIG_IndividualList.cpp,kdesigel/src/SIGEL_MasterGUI/SIG_IndividualListItem.cpp,kdesigel/src/SIGEL_MasterGUI/SIG_IndividualView.cpp,kdesigel/src/SIGEL_MasterGUI/SIG_InfoBox.cpp,kdesigel/src/SIGEL_MasterGUI/SIG_LanguageParameters.cpp,kdesigel/src/SIGEL_MasterGUI/SIG_MainWindow.cpp,kdesigel/src/SIGEL_MasterGUI/SIG_RenameDialog.cpp,kdesigel/src/SIGEL_MasterGUI/SIG_RobotView.cpp,kdesigel/src/SIGEL_MasterGUI/SIG_SimulationParameter.cpp,kdesigel/src/SIGEL_MasterGUI/SIG_TextView.cpp
 sub_dirs=
 type=static_library
 
@@ -1966,7 +1966,7 @@ install=false
 install_location=
 type=SOURCE
 
-[kdesigel/src/SIGEL_MasterGUI/SIG_Experiment.cpp]
+[kdesigel/src/SIGEL_MasterGUI/SIG_GUIGPExperiment.cpp]
 dist=true
 install=false
 install_location=

@@ -5,10 +5,10 @@ noinst_LIBRARIES = libSIGEL_MasterGUI.a
 
 INCLUDES = $(all_includes)
 
-libSIGEL_MasterGUI_a_SOURCES = SIG_TextView.cpp SIG_SimulationParameter.cpp SIG_RobotView.cpp SIG_RenameDialog.cpp SIG_MainWindow.cpp SIG_LanguageParameters.cpp SIG_InfoBox.cpp SIG_IndividualView.cpp SIG_IndividualListItem.cpp SIG_IndividualList.cpp SIG_GPParameter.cpp SIG_ExperimentView.cpp SIG_ExperimentListView.cpp SIG_ExperimentItem.cpp SIG_Experiment.cpp SIG_EnvironmentView.cpp SIG_EditHostDialog.cpp SIG_EditCommandDialog.cpp SIG_AllIndividualsView.cpp SIG_AddIndividualsDialog.cpp 
+libSIGEL_MasterGUI_a_SOURCES = SIG_TextView.cpp SIG_SimulationParameter.cpp SIG_RobotView.cpp SIG_RenameDialog.cpp SIG_MainWindow.cpp SIG_LanguageParameters.cpp SIG_InfoBox.cpp SIG_IndividualView.cpp SIG_IndividualListItem.cpp SIG_IndividualList.cpp SIG_GPParameter.cpp SIG_ExperimentView.cpp SIG_ExperimentListView.cpp SIG_ExperimentItem.cpp SIG_GUIGPExperiment.cpp SIG_EnvironmentView.cpp SIG_EditHostDialog.cpp SIG_EditCommandDialog.cpp SIG_AllIndividualsView.cpp SIG_AddIndividualsDialog.cpp 
 
 
-EXTRA_DIST = SIG_AddIndividualsDialog.cpp SIG_AllIndividualsView.cpp SIG_EditCommandDialog.cpp SIG_EditHostDialog.cpp SIG_EnvironmentView.cpp SIG_Experiment.cpp SIG_ExperimentItem.cpp SIG_ExperimentListView.cpp SIG_ExperimentView.cpp SIG_GPParameter.cpp SIG_IndividualList.cpp SIG_IndividualListItem.cpp SIG_IndividualView.cpp SIG_InfoBox.cpp SIG_LanguageParameters.cpp SIG_MainWindow.cpp SIG_RenameDialog.cpp SIG_RobotView.cpp SIG_SimulationParameter.cpp SIG_TextView.cpp 
+EXTRA_DIST = SIG_AddIndividualsDialog.cpp SIG_AllIndividualsView.cpp SIG_EditCommandDialog.cpp SIG_EditHostDialog.cpp SIG_EnvironmentView.cpp SIG_GUIGPExperiment.cpp SIG_ExperimentItem.cpp SIG_ExperimentListView.cpp SIG_ExperimentView.cpp SIG_GPParameter.cpp SIG_IndividualList.cpp SIG_IndividualListItem.cpp SIG_IndividualView.cpp SIG_InfoBox.cpp SIG_LanguageParameters.cpp SIG_MainWindow.cpp SIG_RenameDialog.cpp SIG_RobotView.cpp SIG_SimulationParameter.cpp SIG_TextView.cpp 
 
 ####### kdevelop will overwrite this part!!! (end)############
 
@@ -19,7 +19,7 @@ SIG_AllIndividualsView_moc.cpp \
 SIG_EditCommandDialog_moc.cpp \
 SIG_EditHostDialog_moc.cpp \
 SIG_EnvironmentView_moc.cpp \
-SIG_Experiment_moc.cpp \
+SIG_GUIGPExperiment_moc.cpp \
 SIG_ExperimentListView_moc.cpp \
 SIG_ExperimentView_moc.cpp \
 SIG_GPParameter_moc.cpp \
