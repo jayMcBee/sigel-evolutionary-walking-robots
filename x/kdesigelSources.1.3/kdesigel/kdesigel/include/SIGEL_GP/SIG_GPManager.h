@@ -175,12 +175,9 @@ namespace SIGEL_GP
  public:
   ~SIG_GPManager();
 
-  // D25c gave the destructor a qDeleteAll( tours ). Q2PtrVector's copy
-  // constructor cleared autoDelete on the copy (the deleted shim, matching
-  // qcollection.h:64), so a copied manager freed nothing; a QList copy shares
-  // the raw pointers and BOTH destructors would free them. Same hazard D7 and
-  // D15 closed. Nothing copies a manager today -- SIG_GUIGPManager derives from
-  // this class, and Phase C is exactly the case that would find it.
+  // The destructor qDeleteAll's tours, so a copy would free them twice. Qt 2's
+  // QVector copy cleared autoDelete on the copy and freed nothing; a QList copy
+  // shares the raw pointers. Nothing copies a manager.
   SIG_GPManager( SIG_GPManager const & ) = delete;
   SIG_GPManager &operator=( SIG_GPManager const & ) = delete;
 

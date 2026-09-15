@@ -102,7 +102,7 @@ SIGEL_GP::SIG_GPFitnessTrainer::SIG_GPFitnessTrainer(SIGEL_GP::SIG_GPExperiment&
 
 namespace {
 
-// Q2PtrVector::resize() deleted every truncated item when autoDelete was set.
+// Qt 2's QVector::resize() deleted every truncated item when autoDelete was set.
 // QList::resize() frees nothing. One site here shrinks: flushAllDynHosts.
 void resizeOwningHosts( QList< SIGEL_GP::SIG_GPActivePVMHost * > &v, qsizetype want )
 {
@@ -118,7 +118,7 @@ void resizeOwningHosts( QList< SIGEL_GP::SIG_GPActivePVMHost * > &v, qsizetype w
 SIGEL_GP::SIG_GPFitnessTrainer::~SIG_GPFitnessTrainer() {
   // This class owns its dynamic host lists and its pending-spawn jobs.
   // toSpawnList had no deleteContents anywhere: setAutoDelete(true) was its
-  // only ownership, so ~Q2PtrList was the free. Section 9 item 2.
+  // only ownership, so Qt 2's ~QList was the free.
   qDeleteAll( toSpawnList );
   toSpawnList.clear();
 
@@ -127,7 +127,7 @@ SIGEL_GP::SIG_GPFitnessTrainer::~SIG_GPFitnessTrainer() {
   qDeleteAll( freshDynHosts );
   freshDynHosts.clear();
 
-  // setAutoDelete was the only free for both of these -- section 9 item 2.
+  // setAutoDelete was the only free for both of these.
   qDeleteAll( pvmTasks );
   pvmTasks.clear();
 
@@ -147,11 +147,8 @@ SIGEL_GP::SIG_GPFitnessTrainer::~SIG_GPFitnessTrainer() {
 #endif
     };
 
-  // ~Q2PtrVector with autoDelete freed these. D19 removed the flag and gave
-  // pvmTasks an explicit qDeleteAll but not pvmHosts, so every active host
-  // leaked. The loop above only tells PVM to drop the host; it never owned
-  // the object. Found by review, over a 19,500-scenario sweep against the
-  // shim -- it was the ONLY behavioural difference in the whole conversion.
+  // Qt 2's autoDelete QVector freed these; QList does not. The loop above only
+  // tells PVM to drop the host; it never owned the object.
   qDeleteAll( pvmHosts );
   pvmHosts.clear();
 };
@@ -436,12 +433,11 @@ void SIGEL_GP::SIG_GPFitnessTrainer::stopTrainersSlaves()
 
 void SIGEL_GP::SIG_GPFitnessTrainer::sweepToSpawn()
 {
-  // Q2PtrList's internal cursor, written out. remove() took the CURRENT
+  // Qt 2's QList internal cursor, written out. remove() took the CURRENT
   // element and freed it, then left the cursor on whatever slid into that
   // slot -- or on the new last element if the removed one was last, or dead
-  // if the list emptied. current() and next() read that cursor. It is the one
-  // shim behaviour with no QList equivalent, so it is spelled out here rather
-  // than approximated.
+  // if the list emptied. current() and next() read that cursor. Qt 6's QList has no
+  // cursor, so it is spelled out here rather than approximated.
   qsizetype cur = toSpawnList.isEmpty() ? -1 : 0;
   QList< int > *actJob = (cur < 0) ? 0 : toSpawnList.at( cur );
   QList< int > *prevJob = 0;
@@ -522,7 +518,7 @@ void SIGEL_GP::SIG_GPFitnessTrainer::sweepToSpawn()
       if (success)
 	{
 	  delete toSpawnList.takeAt( cur );      // remove() freed it
-	  if (cur >= toSpawnList.size())         // Q2PtrList::cursorAfterRemoval
+	  if (cur >= toSpawnList.size())         // Qt 2's QList cursor after remove()
 	    cur = toSpawnList.isEmpty() ? -1 : toSpawnList.size() - 1;
 	  actJob = (cur < 0) ? 0 : toSpawnList.at( cur );
 	  if (actJob == prevJob)

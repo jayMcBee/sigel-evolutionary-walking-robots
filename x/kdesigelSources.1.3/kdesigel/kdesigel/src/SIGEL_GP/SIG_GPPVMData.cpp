@@ -49,29 +49,16 @@ SIGEL_GP::SIG_GPPVMData::~SIG_GPPVMData() {};
 
 void SIGEL_GP::SIG_GPPVMData::sendQStringToPVM(QString str, int taskId, int messageId)
 {
-  // finalLength sizes the receiver's buffer, so it must count the BYTES that
-  // go on the wire, not the characters. It was str.length() + 1 here and in
-  // the 2003 original, which is the same number only for ASCII: 20 'u'-umlauts
-  // are 20 characters and 40 UTF-8 bytes, and getQStringFromPVM() below then
-  // let pvm_upkstr write 41 bytes into a 21-byte buffer. Confirmed as a
-  // heap-buffer-overflow under AddressSanitizer -- PORTING.md Phase P.
-  // NOTE THE + 2, which is not a typo. Q2CString::size() reported
-  // QByteArray::size() + 1, because Qt 2's QCString counted the terminating
-  // NUL in its length. So "size() + 1" here was byte length + TWO: one byte
-  // for the NUL that pvm_upkstr writes, and one spare. QByteArray::size() is
-  // the plain byte count, so the same wire value needs + 2.
+  // finalLength sizes the receiver's buffer, so it counts the BYTES that go on
+  // the wire, not the characters: 1.3's str.length() + 1 is the same number only
+  // for ASCII, and for 20 'u'-umlauts (40 UTF-8 bytes) getQStringFromPVM() below
+  // let pvm_upkstr write 41 bytes into a 21-byte buffer.
   //
-  // Preserved rather than tightened. The receiver below sizes its buffer from
-  // this number and pvm_upkstr writes byte length + 1, so + 1 would fit
-  // exactly and + 2 leaves one byte of margin. Dropping that margin is a
-  // behaviour change on the wire, and not this step's to make.
+  // NOTE THE + 2, which is not a typo: one byte for the NUL that pvm_upkstr
+  // writes, and one spare. For ASCII, 1.3 sent one less.
   //
-  // ONE INPUT DIFFERS, and it is a crash removed rather than a value changed.
-  // Q2CString::size() special-cased a NULL string to 0, not to size()+1, so
-  // the old finalLength was 1 there and this is 2. It never reached the wire:
-  // Q2CString's const char* conversion returned nullptr for a null string and
-  // pvm_pkstr does strlen(cp) unguarded, so the old code segfaulted. This
-  // sends an empty string instead. Section 9, D13.
+  // A null string sends an empty string: pvm_pkstr does strlen(cp) unguarded,
+  // so it must never get a null pointer.
   const QByteArray qCStringBuffer = str.toUtf8();
   int finalLength = qCStringBuffer.size() + 2;
 

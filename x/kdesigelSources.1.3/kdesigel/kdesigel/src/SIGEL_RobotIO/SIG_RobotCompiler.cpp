@@ -41,7 +41,7 @@ namespace SIGEL_RobotIO {
                 if (filename.length () == 0)
                         throw SIG_SemanticError (__FILE__, __LINE__,
                                                  "Empty filename");
-                // Qt 2's QString::at was bounds-safe; Qt 6's is not. (D13)
+                // Qt 2's QString::at was bounds-safe; Qt 6's is not.
 		if (filename.isEmpty() || filename.at (0) != '/')
                         return dirprefix + filename;
                 else

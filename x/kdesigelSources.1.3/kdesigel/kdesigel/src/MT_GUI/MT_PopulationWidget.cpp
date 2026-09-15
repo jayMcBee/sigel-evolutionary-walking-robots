@@ -227,7 +227,7 @@ void MT_PopulationWidget::slotRButtonClicked(const QPoint &pos)
 	// clearSelection() before emitting (qlistview.cpp:3390) -- which is why
 	// 1.3 greys out Delete on blank space: clearing fires selectionChanged,
 	// and slotSelectionChanged disables the action. Qt 6 does neither.
-	// Confirmed on the running 1.3: on a row all four entries are enabled; on
+	// In 1.3, on a row all four entries are enabled; on
 	// blank space Delete is greyed and the other three are not.
 	if(!individualListView->itemAt(pos))
 		individualListView->clearSelection();

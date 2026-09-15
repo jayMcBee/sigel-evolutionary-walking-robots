@@ -75,8 +75,7 @@ namespace SIGEL_Visualisation
     ~SIG_Renderer();
     // This class owns raw pointers in a QList and frees them in its
     // destructor, so a copy would free them twice. Qt 2's QGVector copy
-    // cleared del_item and freed nothing -- the hazard is new with the
-    // conversion, not inherited. D7, D15 and D25c did the same.
+    // cleared del_item and freed nothing.
     SIG_Renderer( const SIG_Renderer & ) = delete;
     SIG_Renderer &operator=( const SIG_Renderer & ) = delete;
 

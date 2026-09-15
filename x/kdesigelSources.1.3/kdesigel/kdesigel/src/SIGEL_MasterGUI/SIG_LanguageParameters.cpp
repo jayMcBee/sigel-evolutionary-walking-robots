@@ -322,13 +322,11 @@ void SIG_LanguageParameters::slotCommandDoubleClicked( QTreeWidgetItem *theItem 
 	  // QLineEdit::focusInEvent selects all for that focus reason. The
 	  // consequence is not cosmetic: 1.3 leaves the pre-filled value intact
 	  // so a typed digit APPENDS to it, where a selection would replace it.
-	  // Confirmed on the running 1.3 binary for both this dialog and Edit
-	  // Host -- "pre-filled but NOT pre-selected... typing appends".
-	  // Rename does NOT get this treatment and must not: it calls
-	  // selectAll() explicitly (SIG_ExperimentListView.cpp, slotRenameExperiment), and the
-	  // oracle measured it pre-selecting in BOTH versions back in C10.
+	  // 1.3 does the same in the Edit Host dialog. Rename does NOT get this
+	  // treatment and must not: it calls selectAll() explicitly
+	  // (SIG_ExperimentListView.cpp, slotRenameExperiment) and pre-selects in 1.3 too.
 	  // end(false) rather than deselect(): deselect leaves the cursor at
-	  // position 0, so a typed digit lands BEFORE the value -- 1 + "2" gave
+	  // position 0, so a typed digit lands BEFORE the value -- 1 + "2" gives
 	  // 21 where 1.3 gives 12. end(false) clears the selection AND puts the
 	  // cursor after the text, which is where 1.3 leaves it.
 	  { QLineEdit *le = editCommandDialog.lineeditDuration; QTimer::singleShot( 0, le, [le]{ le->end( false ); } ); }

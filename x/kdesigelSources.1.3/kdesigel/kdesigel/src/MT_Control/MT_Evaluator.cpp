@@ -196,7 +196,7 @@ bool MT_Evaluator::evaluationTactic()
 				WorseError.resize(NumOfWorseError);
 				// 2003 zero-filled to CorrectFitness.size() into an array that holds
 				// only NumOfWorseError entries -- every iteration past the tenth
-				// wrote out of range. (D13)
+				// wrote out of range.
 				for (int i=0; i<NumOfWorseError; i++)
 					WorseError[i] = 0.0;
 				
@@ -209,7 +209,7 @@ bool MT_Evaluator::evaluationTactic()
 					for(int k=0; k<NumOfWorseError; k++)
 					{
 						// 2003 used i, the OUTER loop variable, to index WorseError.
-						// k is the index this loop scans. (D13)
+						// k is the index this loop scans.
 						if (WorseError[PosOfSmallestError]>WorseError[k])
 							PosOfSmallestError = k;
 					}
@@ -223,7 +223,7 @@ bool MT_Evaluator::evaluationTactic()
 					// 2003 wrote WorseError[i]. Pre-standard for-scope left i at
 					// CorrectFitness.size() from the loop above, and WorseError holds
 					// only size()/10 entries, so this read past the end every time.
-					// k is plainly what the loop means. (D13)
+					// k is plainly what the loop means.
 					PresentError = PresentError + WorseError[k];
 			
 				MetaProgError = (MetaProgError-PresentError)/ (CorrectFitness.size()-NumOfWorseError);

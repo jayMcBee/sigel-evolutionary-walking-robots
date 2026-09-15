@@ -61,8 +61,7 @@ namespace SIGEL_Visualisation
      // Qt 2's QVector::insert OVERWRITES slot i; Qt 6's QList::insert SHIFTS,
      // which would leave this list twice its size with a null tail. Non-owning
      // -- these pointers belong to robotRenderer.floatingTexts -- so a plain
-     // assignment over the null-filled slots is exact. (Found by review: the
-     // member's type was converted and this, its only fill site, was not.)
+     // assignment over the null-filled slots is exact.
      floatingTexts.resize( robot.getNrOfPoints() );
      for (int i=0; i<robot.getNrOfPoints(); i++)
        floatingTexts[ i ] = robotRenderer.floatingTexts[ i ];

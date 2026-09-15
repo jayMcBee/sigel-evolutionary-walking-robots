@@ -176,10 +176,9 @@ double SIGEL_GP::SIG_GPForceFitnessFunction::evalFitness() {
 
   // now we have to clean up the memory
   // the forces-Array are created with "new" in dmArticulation::getForces()
-  // A do-while that dereferenced before testing. Q2PtrList::first() returned
-  // null on an empty list, so an evaluation that recorded no frames took a
-  // null dereference here. Fixed per D13 rather than reproduced: with frames
-  // present the behaviour is identical, and with none it is now a no-op.
+  // 1.3 used a do-while that dereferenced before testing, so an evaluation that
+  // recorded no frames dereferenced null here. With frames present the behaviour
+  // is identical; with none this is a no-op.
   for (vector<double*> *usedForceLoes : recorder.listForces) {
     for (unsigned int i=0; i<usedForceLoes->size(); ++i)
       delete[] (*usedForceLoes)[i];

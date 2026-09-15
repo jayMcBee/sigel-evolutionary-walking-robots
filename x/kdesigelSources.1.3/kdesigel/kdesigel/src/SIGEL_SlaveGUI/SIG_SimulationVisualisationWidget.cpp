@@ -364,9 +364,7 @@
 	  // the LAST PRESENTED frame; every caller runs `makeTimeSteps(n); update();'
 	  // and the grab happens inside makeTimeSteps, so 1.3 recorded frame N-1
 	  // while the simulation stood at N. grabFramebuffer() renders current
-	  // content, so this records frame N. It removes a one-frame lag that no
-	  // like-for-like port could have kept. Nothing gates it; C9 is the first
-	  // step that could see it. PORTING.md C4.
+	  // content, so this records frame N, not 1.3's N-1.
 	  // Qt 2's grabWindow read w<0 / h<0 as "to the window edge"
 	  // (qpixmap_x11.cpp: `if (w < 0) w = a.width - x;'). QImage::copy has no
 	  // such rule and returns a NULL image, which then saves nothing while
@@ -417,7 +415,7 @@
     // (SIG_Simulation.cpp, default case), and the throw leaves this
     // member holding the pointer just freed. Fourteen sites here test
     // if (visualisation) and then dereference it, so the guard passes
-    // and every one is a use-after-free. physics_backends.md 1.
+    // and every one is a use-after-free.
     visualisation = nullptr;
 
     visualisation = new SIGEL_Visualisation::SIG_SimulationVisualisation( *robot,

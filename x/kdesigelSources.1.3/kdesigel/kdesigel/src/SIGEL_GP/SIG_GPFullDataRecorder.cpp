@@ -40,9 +40,7 @@ namespace SIGEL_GP
     }
   };
 
-  // B2: 2003 armed autoDelete in the constructor and let the member
-  // destructors free. This class had no destructor at all, so the
-  // ownership was stated nowhere.
+  // This class owns positions, rotations and touchdowns.
   SIG_GPFullDataRecorder::~SIG_GPFullDataRecorder()
   {
     qDeleteAll( positions );   positions.clear();
@@ -50,7 +48,7 @@ namespace SIGEL_GP
     qDeleteAll( touchdowns );  touchdowns.clear();
     // listForces is NOT freed here and never was, even in 1.3: the force
     // vectors belong to SIG_GPForceFitnessFunction, which frees them at the
-    // end of its evaluation. Recorded rather than "fixed".
+    // end of its evaluation.
     listForces.clear();
   };
 

@@ -72,7 +72,7 @@ namespace SIGEL_Simulation
        *
        * NOTE: nothing deletes the SIG_SimulationData object that
        * SIG_Simulation::SIG_Simulation() allocates, so this destructor does
-       * not run today. That leak predates the Qt 6 port.
+       * not run. That leak is 1.3's.
        */
       ~SIG_DynaMechsSimulationData();
 

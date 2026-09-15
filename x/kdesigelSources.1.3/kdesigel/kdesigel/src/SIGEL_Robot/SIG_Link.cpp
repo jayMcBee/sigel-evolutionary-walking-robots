@@ -102,9 +102,7 @@ namespace SIGEL_Robot {
 
         SIG_Link::~SIG_Link()
         {
-                // B1: SIG_Link owns its points and nothing else. 2003 armed
-                // autoDelete here in the destructor and let ~QDict do the work;
-                // the free is now stated where the ownership is.
+                // Of its lists, SIG_Link owns only points.
                 for (const NamedPoint &p : points) delete p.value;
                 points.clear ();
 
@@ -158,9 +156,8 @@ namespace SIGEL_Robot {
         {
                 DL_vector tmp;
                 DL_vector *t;
-                // Backwards, for the newest binding -- see SIG_Robot::lookupLink.
-                // This used to rely on a forward loop with no break, which is
-                // the same answer but one "optimisation" away from flipping.
+                // Backwards, for the newest binding -- see SIG_Robot::lookupLink. A
+                // forward loop with a break would find the oldest.
                 t = 0;
                 for (qsizetype i = points.size () - 1; i >= 0; --i)
                         if (points.at (i).name == id) { t = points.at (i).value; break; }
@@ -363,7 +360,7 @@ namespace SIGEL_Robot {
 	    if (actAdjacentJoint->continuable( this ))
 	      successors.append( actAdjacentJoint );
 
-	  // value() yields null past the end, which is what Q2PtrList::first()
+	  // value() yields null past the end, which is what Qt 2's QList::first()
 	  // and next() did.  The do-while below MUST still run its body once
 	  // when successors is empty -- actSuccessor is null there, the body
 	  // has an explicit "without successor" path, and transformX is false.

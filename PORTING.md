@@ -206,6 +206,10 @@ found a real defect.** §0 has the rule; it is not optional.
 - **After every step, an independent agent reviews the diff with fresh eyes.**
   Not optional — every round so far has found a real defect, and a compile check
   proves nothing about ownership.
+- **SIGEL source comments explain SIGEL code and nothing else.** They never cite
+  this document or its siblings, a decision number, a step, a test program or
+  script, a review, the oracle, a date, or the deleted shim. This document cites
+  SIGEL code by file and function name; SIGEL code never cites this document.
 - When adding an assertion to `sigel_eval -selfcheck`, break the code it covers
   and confirm the check aborts. Nine assertions have passed on broken code.
   *This rule was written for the shim self-check, deleted in D27; it applies

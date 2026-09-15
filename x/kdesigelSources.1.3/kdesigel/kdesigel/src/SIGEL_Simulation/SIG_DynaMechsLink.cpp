@@ -103,8 +103,7 @@ namespace SIGEL_Simulation
 
     dmContactModel *contactModel = new dmContactModel();
 
-    // A const reference, not a copy: this took a whole Q2PtrVector by value
-    // on every link construction for no reason.
+    // A const reference, not a copy.
     const QList< DL_vector * > &vertices = geometry->getVertices();
 
     int noOfContactPoints = vertices.size();

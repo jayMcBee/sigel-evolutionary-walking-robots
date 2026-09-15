@@ -41,9 +41,8 @@ namespace SIGEL_Visualisation
 
   SIG_Renderer::~SIG_Renderer()
   {
-    // setAutoDelete(true) on both vectors was their ONLY free -- ~QVector did
-    // it and nothing here did. Confirmed in the 1.3 binary: the constructor at
-    // 0x080cf640 makes exactly two setAutoDelete(true) calls. Written out.
+    // In 1.3, setAutoDelete(true) on both vectors was their ONLY free --
+    // ~QVector did it. Written out here.
     qDeleteAll( sceneObjects );
     sceneObjects.clear();
     qDeleteAll( floatingTexts );

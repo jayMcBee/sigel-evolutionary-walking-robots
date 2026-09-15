@@ -48,9 +48,8 @@ namespace SIGEL_Robot {
                  * A dictionary of the commands allowed in the
                  * control language of the particular robot.
                  */
-                // Phase D. Was Q2Dict. Its order rides inside every .exp and
-                // every PVM transfer via writeToFileTransfer, so it is ordered,
-                // and SIG_CommandParameters carries no name of its own.
+                // Ordered: this order rides inside every .exp and every PVM transfer via
+                // writeToFileTransfer. SIG_CommandParameters carries no name of its own.
                 QList<NamedCommand> allowedCommands;
                 /**
                  * The width of the registers of the robot's

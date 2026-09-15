@@ -83,7 +83,7 @@ private:
 	int LastError;
 	int MaxLength;
 	int Length;
-//	Q2PtrVector<MT_Programline> Program;
+//	QVector<MT_Programline> Program;
 	MT_Programline **Program;
 
 	void resize(int nSize);

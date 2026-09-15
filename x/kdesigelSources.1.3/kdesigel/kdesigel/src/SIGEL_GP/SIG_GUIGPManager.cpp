@@ -48,7 +48,7 @@ namespace SIGEL_GP
 	  static_cast<SIGEL_MasterGUI::SIG_IndividualListItem*>( (*listIter) );
 	// insert(): a slot assignment. This container has no setAutoDelete, so
 	// Qt 2 deleted nothing here -- the items belong to the list view.
-	// Q2PtrVector::insert took a uint, so a negative index wrapped huge and was
+	// Qt 2's QVector::insert took a uint, so a negative index wrapped huge and was
 	// REJECTED. A signed test alone would let it through and index out of range.
 	if (actItem->poolPosition >= 0
 	    && actItem->poolPosition < individualItems.size())
@@ -79,7 +79,7 @@ namespace SIGEL_GP
   {
     SIG_GPIndividual &actInd = actExperiment.population.getIndividual( poolPos );
 
-    // Q2PtrVector::operator[] went through at(), which WARNED and then clamped
+    // Qt 2's QVector::operator[] went through at(), which WARNED and then clamped
     // to element 0 -- so out of range, 1.3 updated the wrong item and said so.
     // QList::operator[] is UB there instead. This skips, which is neither: no
     // UB, and no wrong item. Keep the warning, or the failure becomes silent

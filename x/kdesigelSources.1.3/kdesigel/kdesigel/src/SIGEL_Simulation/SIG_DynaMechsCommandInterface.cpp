@@ -71,7 +71,7 @@ void SIGEL_Simulation::SIG_DynaMechsCommandInterface::moveDrive(int driveNo,
 
       int absoluteDriveNo = driveNo - static_cast< int >(minRegisterValue);
 
-      // The modulus is UNSIGNED on purpose. Q2PtrVector::size() returned uint,
+      // The modulus is UNSIGNED on purpose. Qt 2's QVector::size() returned uint,
       // so this promoted absoluteDriveNo and the result was always in
       // [0, size). QList::size() is signed, which would hand a negative
       // absoluteDriveNo straight through as a negative index -- into
@@ -79,7 +79,7 @@ void SIGEL_Simulation::SIG_DynaMechsCommandInterface::moveDrive(int driveNo,
       // write. absoluteDriveNo goes negative whenever bitsPerRegister is 32,
       // the SIG_LanguageParameters default: driveNo - (int)(-2^31) overflows.
       // The wrap decides which actuator MOVE drives, so reproducing it is the
-      // point -- see PORTING.md section 9.
+      // point.
       driveIndex = absoluteDriveNo % static_cast< uint >(simulationData.drives.size());
 
 

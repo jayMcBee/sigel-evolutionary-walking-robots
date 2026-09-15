@@ -131,8 +131,8 @@ void SIGEL_Simulation::SIG_DynaMechsSimulationQueries::sense(int sensorNo,
 														};
 
 														// NOTE: this multiply is a 1.3 regression against 1.0, which had a
-														// plain (q - minPos) / posRange. Kept because the reference for
-														// this port is 1.3 -- see regression_1.0_to_1.3.md.
+														// plain (q - minPos) / posRange. Kept, because
+														// SIGEL 1.3 behaves this way.
 														scaledState  = (q - minPos);
 														scaledState *= 360.0 / (2.0*3.14159265);
 

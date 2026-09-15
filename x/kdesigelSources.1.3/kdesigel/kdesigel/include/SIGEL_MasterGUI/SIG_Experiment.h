@@ -110,7 +110,7 @@ namespace SIGEL_MasterGUI
 	 * Writes every parameter page into the experiment.
 	 *
 	 * DOES NOTHING WHILE AN EVOLUTION IS RUNNING -- a deliberate deviation from
-	 * SIGEL 1.3, decided 2026-09-04. See evolutionIsRunning below.
+	 * SIGEL 1.3. See SIG_Experiment.cpp, putAllIntoExperiment.
 	 */
 	void putAllIntoExperiment();
       
@@ -244,7 +244,7 @@ namespace SIGEL_MasterGUI
     private:
     public:
       /**
-       * D29's run state. A COUNT ACROSS ALL EXPERIMENTS, not a bool per
+       * The run state. A COUNT ACROSS ALL EXPERIMENTS, not a bool per
        * experiment, incremented by RunScope. Keep it that way: any run
        * anywhere locks, even when the tree shows a different experiment, and
        * an exception out of start() still decrements.

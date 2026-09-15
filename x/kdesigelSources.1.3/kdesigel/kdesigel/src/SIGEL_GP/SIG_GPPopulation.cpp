@@ -128,11 +128,11 @@ SIGEL_GP::SIG_GPPopulation::SIG_GPPopulation(int size,
     
 namespace {
 
-// Q2PtrVector::resize() DELETED every truncated item when autoDelete was set,
-// and that was the only free at three sites in this file (PORTING.md section
-// 9). QList::resize() frees nothing. Written out once rather than three times.
+// Qt 2's QVector::resize() DELETED every truncated item when autoDelete was
+// set, and that was the only free at three sites in this file. QList::resize()
+// frees nothing. Written out once rather than three times.
 //
-// Negative sizes are clamped. Q2PtrVector took a uint, so a negative reached
+// Negative sizes are clamped. Qt 2's QVector took a uint, so a negative reached
 // it as a huge value and the allocation simply failed; QList takes a signed
 // qsizetype, where a negative index would reach delete pool[-3].
 void resizeOwning( QList< SIGEL_GP::SIG_GPIndividual * > &v, qsizetype want )
@@ -297,7 +297,7 @@ void SIGEL_GP::SIG_GPPopulation::deleteIndividual(int poolpos)
 
    SIGEL_GP::SIG_GPIndividual *tmpInd;
 
-   // The victim. Q2PtrVector::insert() freed it on the first iteration below;
+   // The victim. Qt 2's QVector::insert() freed it on the first iteration below;
    // take() then nulled each source slot, so the resize at the end truncated
    // a null and freed nothing. Exactly one delete, and this is it.
    delete pool[ poolpos ];
@@ -452,7 +452,7 @@ void SIGEL_GP::SIG_GPPopulation::readFromFile(QTextStream &file)
 
 		    // Slots above x still hold the individuals from before this
 		    // load -- the replace loop only reached x -- so this shrink
-		    // frees them. It is the section 9 site D15 missed.
+		    // frees them.
 		    resizeOwning( pool, x + 1 );
                     
 		    break;

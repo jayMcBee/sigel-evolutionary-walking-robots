@@ -1,10 +1,8 @@
 /*
-  The form's base class -- PORTING.md Phase C, step C1. See the header.
-
-  This is Qt 4.8 uic3's implementation-mode output (`uic3 -impl`), with the two
-  Qt 6 adjustments marked below. The qWarning stubs are uic3's own: a connection
-  whose slot the subclass forgot to override warns at runtime instead of failing
-  silently, which is what the 2003 build did.
+  The class the 2003 uic generated, in uic3 implementation-mode shape,
+  with the two Qt 6 adjustments marked below. The qWarning stubs warn at
+  runtime when the subclass forgot to override a connected slot, as the
+  2003 uic stubs did.
 */
 #include "SIGEL_MasterGUI/SIG_GPParameterBase.h"
 
@@ -26,8 +24,7 @@ SIG_GPParameterBase::SIG_GPParameterBase( QWidget *parent, const char *name,
 
   setupUi( this );
 
-  // The .ui carries sortingEnabled, converted from Q3Header's clickable=true on
-  // all four columns. Qt 2's QListView additionally sorted by column 0 ASCENDING
+  // The .ui carries sortingEnabled on all four columns. Qt 2's QListView additionally sorted by column 0 ASCENDING
   // by default (qlistview.cpp:1836-1837); Qt 6 leaves the indicator on column 0
   // DESCENDING -- measured, not assumed. Restored here because nothing in the
   // .ui can express it and nothing in SIGEL calls setSorting on this view.

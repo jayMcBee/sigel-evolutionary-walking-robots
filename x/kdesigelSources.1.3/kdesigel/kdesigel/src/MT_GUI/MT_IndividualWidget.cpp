@@ -47,9 +47,8 @@ MT_IndividualsWidget::MT_IndividualsWidget(QWidget* parent, const char* name, Qt
 	edit16->setValidator(validator);
 	edit17->setValidator(validator);
 	edit18->setValidator(validator);
-// C7 pinned SIGEL_MasterGUI's 21 validators to the C locale and MT_GUI's were
-// never given the same treatment. Measured, and it needs no foreign locale to
-// bite: under en_US the GROUP separator is ',', so an unpinned
+// These validators are pinned to the C locale. An unpinned one needs no
+// foreign locale to bite: under en_US the GROUP separator is ',', so an unpinned
 // QIntValidator(0,1000) calls "1,000" ACCEPTABLE while the read-back --
 // text().toInt() -- returns 0 with ok=false. A user types one thousand, the
 // field says it is fine, and zero reaches the system. Under de_DE the same
@@ -434,7 +433,7 @@ void MT_IndividualsWidget::slotRButtonClicked(const QPoint &pos)
 	// clearSelection() before emitting (qlistbox.cpp:1656-1658) -- which is why
 	// 1.3 greys out Delete on blank space: clearing fires selectionChanged,
 	// and slotSelectionChanged disables the action. Qt 6 does neither.
-	// Confirmed on the running 1.3: on a row all four entries are enabled; on
+	// In 1.3, on a row all four entries are enabled; on
 	// blank space Delete is greyed and the other three are not.
 	if(!constantsListBox->itemAt(pos))
 		constantsListBox->clearSelection();

@@ -48,7 +48,7 @@ SIG_MainWindow::SIG_MainWindow( QWidget * parent, const char * name, Qt::WindowF
   // Large roles Qt 2 named explicitly. 25 is the largest Small, so nothing is
   // scaled UP past what 1.3 drew; icons whose two pixmaps straddle it are still
   // resampled where Qt 2 blitted natively. That residue is not removable
-  // without splitting each QIcon, and is recorded in PORTING.md.
+  // without splitting each QIcon.
   setIconSize( QSize( 25, 25 ) );
 #ifdef _WINDOWS
   QString sigelRoot( ::getenv( "SIGEL_ROOT" ) );
@@ -568,7 +568,7 @@ SIG_MainWindow::SIG_MainWindow( QWidget * parent, const char * name, Qt::WindowF
 
   slotEnableNoExperimentActions( false );
 
-  // D30. New and Open are locked during a run; runlock checks both.
+  // New and Open are locked during a run.
   evolutionRunningActions.append( newExperimentAction );
   evolutionRunningActions.append( openExperimentAction );
   evolutionRunningActions.append( renameExperimentAction );
@@ -653,18 +653,14 @@ SIG_MainWindow::SIG_MainWindow( QWidget * parent, const char * name, Qt::WindowF
   mtChoiceTypeActionGroup->setEnabled(false);
   QObject::connect(mtChoiceTypeActionGroup, SIGNAL( triggered( QAction * ) ), SLOT( slotMTSwitchSystem(QAction*) ));
 
-  // DELIBERATE DIVERGENCE FROM 1.3, decided 2026-09-02. 1.3 put a second
-  // "A&bout" here, on the MetaGP menu, wired to the SAME slotAbout() as
-  // Help > About and therefore opening the identical SIG_InfoBox --
-  // "mtMenu->addSeparator(); mtMenu->addAction( \"A&bout\", this,
-  // SLOT( slotAbout() ) );". Preserved through C1-C10 and verified
-  // against the running 1.3 binary before being removed, so this is a
-  // CHOICE and not a porting error. Its trailing separator goes with it,
-  // or the menu would end on one. Help > About is untouched.
+  // DELIBERATE DIVERGENCE FROM 1.3. 1.3 put a second "A&bout" here, on the
+  // MetaGP menu, wired to the SAME slotAbout() as Help > About and opening the
+  // identical SIG_InfoBox. It is left out on purpose. The separator before
+  // it is left out too, or the menu would end on one.
 
   noExperimentActions.append( mtUseAction );
 
-  // D29. The four MetaGP actions change MetaGP state, which is a run
+  // The four MetaGP actions change MetaGP state, which is a run
   // parameter, so all four are locked during a run.
   evolutionRunningActions.append( mtUseAction );
   evolutionRunningActions.append( mtConfigureAction );
@@ -784,7 +780,7 @@ void SIG_MainWindow::slotChangeFont()
 // make the experiment create the metaGP-System
 void SIG_MainWindow::slotMTUseMT(bool state)
 {
-	// D30 SECOND LAYER. The menu item is greyed during a run; this refuses
+	// The menu item is greyed during a run; this refuses
 	// anyway, because a greyed menu is one layer and a slot that checks for
 	// itself is another.
 	if (SIG_Experiment::anyEvolutionRunning())
@@ -802,7 +798,7 @@ void SIG_MainWindow::slotMTUseMT(bool state)
 // used by the actual experiment
 void SIG_MainWindow::slotMTConfigureSystem()
 {
-	// D30 SECOND LAYER. Refuse during a run, as well as greying the menu.
+	// Refuse during a run, as well as greying the menu.
 	if (SIG_Experiment::anyEvolutionRunning())
 		return;
 	SIG_Experiment *actExperiment = experimentListView->currentlySelectedExperiment();
@@ -814,7 +810,7 @@ void SIG_MainWindow::slotMTConfigureSystem()
 // switch the actual experiment to the other metaGP system
 void SIG_MainWindow::slotMTSwitchSystem(QAction *selSystem)
 {
-	// D30 SECOND LAYER. Refuse during a run, as well as greying the group.
+	// Refuse during a run, as well as greying the group.
 	if (SIG_Experiment::anyEvolutionRunning())
 		return;
 	// Qt 2 reached this slot only when the selection actually CHANGED:
@@ -851,7 +847,7 @@ void SIG_MainWindow::slotActExpChanged()
 
 			// currently selected experiment use meta gp-system
 			//
-			// D30. NOT while a run is going. This slot fires one line after the
+			// NOT while a run is going. This slot fires one line after the
 			// tree-click emit that APPLIES the run lock
 			// (SIG_ExperimentListView::slotSelectionChanged), so without this
 			// check it would hand these two straight back.
@@ -885,7 +881,7 @@ void SIG_MainWindow::slotEnableNoExperimentActions( bool enable )
   for ( QAction *a : noExperimentActions )
     a->setEnabled( enable );
 
-  // D30. 24 of these 30 actions are ALSO in evolutionRunningActions (30, not
+  // 24 of these 30 actions are ALSO in evolutionRunningActions (30, not
   // 32: the appends of mtChoiceTypeActionGroup and mtConfigureAction are
   // commented out). During a run, re-apply the lock after this loop rather
   // than filtering the list, so the two lists cannot drift apart.

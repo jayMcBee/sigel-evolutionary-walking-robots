@@ -207,7 +207,7 @@ void SIG_Experiment::setName( QString newName )
   experimentItem->setText( 0, newName );
 };
 
-// D29's run counter. File-static rather than a class member so that no
+// The run counter. File-static rather than a class member so that no
 // experiment can be destroyed out from under it.
 static int g_runningEvolutions = 0;
 
@@ -221,7 +221,7 @@ SIG_Experiment::RunScope::~RunScope() { --g_runningEvolutions; }
 
 void SIG_Experiment::putAllIntoExperiment()
 {
-  // DELIBERATE DEVIATION FROM 1.3, decided 2026-09-04: parameters may not
+  // DELIBERATE DEVIATION FROM 1.3: parameters may not
   // change once a run has started. That is how GP is normally implemented --
   // the parameters define the run -- and 1.3's behaviour here is not the
   // specification.
@@ -321,7 +321,7 @@ void SIG_Experiment::slotStartEvolution()
       //
       // A SCOPE GUARD, not two assignments: it survives an exception out of
       // start(), which would otherwise leave the experiment locked for good.
-      // D30a. slotEvolutionStopped() is the only thing that re-enables Start
+      // slotEvolutionStopped() is the only thing that re-enables Start
       // and the five pages disabled above, so it must run even if start()
       // throws. The RunScope already survives a throw; this is the other half.
       {
@@ -345,7 +345,7 @@ void SIG_Experiment::slotStartEvolution()
 
 void SIG_Experiment::slotStopEvolution()
 {
-  // D30a. Do NOT emit signalEvolutionNotRunning( true ) here. This is a
+  // Do NOT emit signalEvolutionNotRunning( true ) here. This is a
   // request to stop, not a stop: it only sets guiGPManager->userTerminated
   // below, start() has not returned, and anyEvolutionRunning() is still true,
   // so the locked actions must stay locked. slotEvolutionStopped() emits it
@@ -369,7 +369,7 @@ void SIG_Experiment::slotStopEvolution()
 
 void SIG_Experiment::slotSimulationParameterImport()
 {
-  // D29. These write gpExperiment.* DIRECTLY -- slotRobotLoad replaces the
+  // These write gpExperiment.* DIRECTLY -- slotRobotLoad replaces the
   // whole robot -- so none of them passes through putAllIntoExperiment and the
   // guard there does not cover them. Their page buttons are disabled during a
   // run, but menuSimulationParameter and menuEnvironmentView are parented on
@@ -423,7 +423,7 @@ void SIG_Experiment::slotSimulationParameterExport()
 
 void SIG_Experiment::slotEnvironmentImport()
 {
-  // D29. These write gpExperiment.* DIRECTLY -- slotRobotLoad replaces the
+  // These write gpExperiment.* DIRECTLY -- slotRobotLoad replaces the
   // whole robot -- so none of them passes through putAllIntoExperiment and the
   // guard there does not cover them. Their page buttons are disabled during a
   // run, but menuSimulationParameter and menuEnvironmentView are parented on
@@ -477,7 +477,7 @@ void SIG_Experiment::slotEnvironmentExport()
 
 void SIG_Experiment::slotGPParameterImport()
 {
-  // D29. These write gpExperiment.* DIRECTLY -- slotRobotLoad replaces the
+  // These write gpExperiment.* DIRECTLY -- slotRobotLoad replaces the
   // whole robot -- so none of them passes through putAllIntoExperiment and the
   // guard there does not cover them. Their page buttons are disabled during a
   // run, but menuSimulationParameter and menuEnvironmentView are parented on
@@ -531,7 +531,7 @@ void SIG_Experiment::slotGPParameterExport()
 
 void SIG_Experiment::slotLanguageParameterImport()
 {
-  // D29. These write gpExperiment.* DIRECTLY -- slotRobotLoad replaces the
+  // These write gpExperiment.* DIRECTLY -- slotRobotLoad replaces the
   // whole robot -- so none of them passes through putAllIntoExperiment and the
   // guard there does not cover them. Their page buttons are disabled during a
   // run, but menuSimulationParameter and menuEnvironmentView are parented on
@@ -586,7 +586,7 @@ void SIG_Experiment::slotLanguageParameterExport()
 
 void SIG_Experiment::slotPopulationImport()
 {
-  // D29. These write gpExperiment.* DIRECTLY -- slotRobotLoad replaces the
+  // These write gpExperiment.* DIRECTLY -- slotRobotLoad replaces the
   // whole robot -- so none of them passes through putAllIntoExperiment and the
   // guard there does not cover them. Their page buttons are disabled during a
   // run, but menuSimulationParameter and menuEnvironmentView are parented on
@@ -639,7 +639,7 @@ void SIG_Experiment::slotPopulationExport()
 
 void SIG_Experiment::slotRobotImport()
 {
-  // D29. These write gpExperiment.* DIRECTLY -- slotRobotLoad replaces the
+  // These write gpExperiment.* DIRECTLY -- slotRobotLoad replaces the
   // whole robot -- so none of them passes through putAllIntoExperiment and the
   // guard there does not cover them. Their page buttons are disabled during a
   // run, but menuSimulationParameter and menuEnvironmentView are parented on
@@ -679,7 +679,7 @@ void SIG_Experiment::slotGNUPlotExport()
 
 void SIG_Experiment::slotRobotLoad()
 {
-  // D29. These write gpExperiment.* DIRECTLY -- slotRobotLoad replaces the
+  // These write gpExperiment.* DIRECTLY -- slotRobotLoad replaces the
   // whole robot -- so none of them passes through putAllIntoExperiment and the
   // guard there does not cover them. Their page buttons are disabled during a
   // run, but menuSimulationParameter and menuEnvironmentView are parented on

@@ -57,13 +57,12 @@ namespace SIGEL_Visualisation
        *
        * robotLinks had setAutoDelete(true), so ~QVector was its only free and
        * this class had no destructor at all. Qt 6's QList frees nothing, so
-       * the free is written out -- PORTING.md Phase C, C5.
+       * the free is written out.
        */
       ~SIG_RenderRecorder();
       // This class owns raw pointers in a QList and frees them in its
       // destructor, so a copy would free them twice. Qt 2's QGVector copy
-      // cleared del_item and freed nothing -- the hazard is new with the
-      // conversion, not inherited. D7, D15 and D25c did the same.
+      // cleared del_item and freed nothing.
       SIG_RenderRecorder( const SIG_RenderRecorder & ) = delete;
       SIG_RenderRecorder &operator=( const SIG_RenderRecorder & ) = delete;
 

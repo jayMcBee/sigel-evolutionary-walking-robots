@@ -192,8 +192,7 @@ void SIG_AllIndividualsView::slotAddIndividuals()
   // site where it costs most: 1.3 leaves the "1" unselected with the cursor
   // after it, so a user who types 2 gets 12 and adds TWELVE individuals.
   // Unlike a wrong duration there is nothing wrong-looking left behind --
-  // the pool is simply twelve bigger. Measured on the running binary:
-  // 1 then "2" reads 12 there, and read 2 here before this line.
+  // the pool is simply twelve bigger.
   // The spin box's editor is its only QLineEdit child; lineEdit() is
   // protected. Queued because the selection does not exist until exec()
   // shows the dialog and focus travels the tab chain.
@@ -206,14 +205,10 @@ void SIG_AllIndividualsView::slotAddIndividuals()
       theExperiment.population.addRandomIndividuals( addDialog.spinboxNumber->value(), theExperiment.gpParameter, *theExperiment.robot.getLangParam() );
       
       // lets do it inefficiently first. will be corrected later
-      // Same Qt 2 blocking as slotCompleteRefreshList above, and NOT COVERED BY
-      // ANY GATE -- said plainly because the C10 review found the claim that
-      // every added guard was teeth-tested to be false for this one. Adding
-      // only ever GROWS the pool, so a stale poolPosition still resolves to the
-      // same individual and reverting these three lines has no consequence any
-      // GUI observation can see. Kept because Qt 2 emitted nothing here and the
-      // divergence would bite the day this path stops being append-only; if it
-      // is ever removed, that is a defensible choice and not a regression.
+      // Same Qt 2 signal blocking as slotCompleteRefreshList above. Adding only
+      // GROWS the pool, so a stale poolPosition still resolves to the same
+      // individual today; the blocking matters the day this path stops being
+      // append-only.
       {
         const bool wasBlocked = individualList->listviewIndividuals->blockSignals( true );
         individualList->listviewIndividuals->clear();

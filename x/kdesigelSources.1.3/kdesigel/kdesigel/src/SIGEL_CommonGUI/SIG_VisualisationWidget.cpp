@@ -62,10 +62,8 @@
     // The labels are Qt CHILDREN of this widget and were ALSO owned by the
     // Qt 2 vector's autoDelete. That was not a double free: the member is
     // destroyed before the QWidget base, so each label unparented itself and
-    // ~QWidget then found no children left. Disassembly of the 1.3 slave shows
-    // exactly that order: ~QVector at 0x0806edec, then ~QGLWidget at
-    // 0x0806edfc. This body runs before the base destructor, so the order
-    // is preserved.
+    // ~QWidget then found no children left. This body runs before the base
+    // destructor, so the order is preserved.
     qDeleteAll( floatingTextWidgets );
     floatingTextWidgets.clear();
   };

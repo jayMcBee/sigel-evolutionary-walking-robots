@@ -1,8 +1,7 @@
 /*
-  The form's base class -- PORTING.md Phase C, step C2. See C1 for why this
-  file exists and where its shape comes from: it is Qt 4.8 uic3's declaration
-  mode (`uic3 MT_SearchWidgetBase.ui`, tools/qtmig), with the Qt 6 adjustments
-  C1 lists. Qt 6's uic emits only Ui::MT_SearchWidgetBase, a struct with setupUi().
+  The class the 2003 uic generated, in uic3 declaration-mode shape,
+  adapted to Qt 6. Qt 6's uic emits only Ui::MT_SearchWidgetBase,
+  a struct with setupUi().
 
   Global namespace, as uic generated it in 2003.
 */

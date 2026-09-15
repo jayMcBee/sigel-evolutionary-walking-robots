@@ -19,21 +19,18 @@ namespace
   // are all Intermediate, so QLineEdit keeps accepting keystrokes and the
   // range bites on commit instead of on typing.
   //
-  // WHY THIS IS RESTORATION, NOT IMPROVEMENT. sec. 9's D28 accepted Qt 6's
-  // stricter rule for the five parameter pages' 29 spin boxes, where the
-  // differing value is VISIBLE in the box before anything is saved. Here it is
-  // not: accept() copies these two fields into boss->minValue/maxValue, which
+  // WHY: the parameter pages' spin boxes keep Qt 6's stricter rule, because
+  // the changed value shows before saving. Here it does not: accept() copies
+  // these two fields into boss->minValue/maxValue, which
   // go straight to randomizer->createConstant() and become the generated
-  // constants. Measured on the running 1.3 by the oracle, with min set equal
-  // to max so the result could not be a random draw: integer mode,
-  // min = max = -50000, count 3, generates three constants of -50000, no
-  // clamping anywhere. Qt 6's rule silently produced different DATA.
+  // constants. 1.3 generates -50000 when min = max = -50000 in integer mode,
+  // with no clamping; Qt 6's rule would silently produce different data.
   //
   // Three separate divergences, all measured on Qt 6.10.2, all fixed here:
   //   QIntValidator(-10000,10000)        typed -50000  -> "-5000"  (tenfold)
   //   QDoubleValidator(100000,-100000,4) typed -50000  -> "50000"  (SIGN FLIP)
   //   QDoubleValidator(...,4)            typed 1.23456 -> "1.2345" (precision)
-  // The second is the worst and was the one this file's first fix MISSED: the
+  // The second is the worst: the
   // dialog OPENS in float mode, and 2003 built that validator with bottom
   // above top -- QDoubleValidator(100000.0, -100000.0, 4) -- which makes
   // Qt 6 reject a leading minus outright, where Qt 2 had no such rule.
@@ -62,7 +59,7 @@ namespace
                                                : QValidator::Acceptable;
     }
 
-    // fixup() MUST BE A NO-OP, and leaving it inherited re-introduced the very
+    // fixup() MUST BE A NO-OP, and leaving it inherited re-introduces the
     // defect this class removes. Qt 2's QIntValidator and QDoubleValidator do
     // NOT override fixup at all -- the only definition is QValidator::fixup,
     // an empty body (qvalidator.cpp:175) -- and Qt 2's QLineEdit called it
@@ -70,9 +67,8 @@ namespace
     // validators AND calls it on Return *and* focus-out. Measured: with the
     // float validator at (-10000, 10000, 4), typing 123.456789 and then
     // clicking away rewrites the field to "1.2346e+02", and accept() stores
-    // 123.46. The first version of this class fixed the keystroke-drop half
-    // of the precision divergence and handed the same loss back one focus
-    // change later, in the data path the class exists to protect.
+    // 123.46. So fixup stays empty: without that the precision is lost one focus
+    // change later, in the data path this class exists to protect.
     void fixup( QString & ) const override {}
 
   };
@@ -130,7 +126,7 @@ namespace
                                                : QValidator::Acceptable;
     }
 
-    // fixup() MUST BE A NO-OP, and leaving it inherited re-introduced the very
+    // fixup() MUST BE A NO-OP, and leaving it inherited re-introduces the
     // defect this class removes. Qt 2's QIntValidator and QDoubleValidator do
     // NOT override fixup at all -- the only definition is QValidator::fixup,
     // an empty body (qvalidator.cpp:175) -- and Qt 2's QLineEdit called it
@@ -138,9 +134,8 @@ namespace
     // validators AND calls it on Return *and* focus-out. Measured: with the
     // float validator at (-10000, 10000, 4), typing 123.456789 and then
     // clicking away rewrites the field to "1.2346e+02", and accept() stores
-    // 123.46. The first version of this class fixed the keystroke-drop half
-    // of the precision divergence and handed the same loss back one focus
-    // change later, in the data path the class exists to protect.
+    // 123.46. So fixup stays empty: without that the precision is lost one focus
+    // change later, in the data path this class exists to protect.
     void fixup( QString & ) const override {}
 
   };

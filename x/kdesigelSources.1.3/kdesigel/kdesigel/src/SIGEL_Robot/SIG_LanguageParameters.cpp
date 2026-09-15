@@ -36,13 +36,11 @@ namespace SIGEL_Robot {
 	  // order a default-constructed object writes is that dict's HASH
 	  // order -- bucket 0 upward over 17 buckets, each chain in reverse
 	  // insertion order because look_string prepends (qgdict.cpp:356,
-	  // qdict.h:49). Phase D made the container an ordered QList, which
+	  // qdict.h:49). The container is an ordered QList, which
 	  // reproduces the file's order when there IS a file but has to be
 	  // given this order when there is not: a robot import and File >
 	  // New Experiment both default-construct, and both write it out.
-	  // Listed alphabetically before C11b, which is how the divergence
-	  // arose. Confirmed against the running 1.3 binary character for
-	  // character -- see PORTING.md, C11b.
+	  // This order matches 1.3's output character for character.
 	  SIG_CommandParameters *commandParameters = new SIG_CommandParameters();
 	  commandParameters->setDuration( 0.001 );
 	  this->addCommand( "MUL", commandParameters );
@@ -132,7 +130,7 @@ namespace SIGEL_Robot {
 
         SIG_LanguageParameters::~SIG_LanguageParameters (void)
         {
-		// B1: this class owns the SIG_CommandParameters it inserted.
+		// This class owns the SIG_CommandParameters it inserted.
 		for (const NamedCommand &c : allowedCommands) delete c.value;
 		allowedCommands.clear ();
 

@@ -53,26 +53,19 @@ SIGEL_Simulation::SIG_Simulation::SIG_Simulation(SIGEL_Robot::SIG_Robot const & 
       };
       break;
 
-    // The Dynamo backend was deleted on 2026-08-28 -- physics_backends.md.
-    // SIMULATIONLIBRARY 0 therefore names a simulator that no longer exists,
-    // and this case must not be allowed to fall through: the three interface
-    // pointers below would stay uninitialised, and silently constructing a
-    // DynaMechs simulation instead would answer with a fitness from a
-    // different physics engine than the file asked for. All 14 shipped
-    // experiments carry SIMULATIONLIBRARY 1.
+    // SIMULATIONLIBRARY 0 names the Dynamo backend, which this tree does not
+    // have. This case must not fall through: the three interface pointers below
+    // would stay uninitialised, and silently constructing a DynaMechs simulation
+    // instead would answer with a fitness from a different physics engine than
+    // the file asked for. All 14 shipped experiments carry SIMULATIONLIBRARY 1.
     //
-    // The printed line is load-bearing, not decoration, and an earlier
-    // version of this comment had the reason backwards. The throw does clear
-    // all six fitness functions, which construct SIG_Simulation OUTSIDE their
-    // own try block -- but one frame further out sigel_slave.cpp:361-367
-    // wraps evalFitness() in catch (SIG_Exception &) { fitnessValue = 0; }.
-    // So under PVM the throw is swallowed and the individual scores 0.0 as
-    // though it had been evaluated, which is exactly the failure
-    // SIG_GPSimpleRecorder.cpp, init describes. The message is then the only
-    // evidence that reaches anyone. It goes to std::cerr rather than
-    // SIG_IO::cerr because SIG_IO buffers and flushes on destruction
-    // (PORTING.md 10). Under sigel_eval, which has no such catch, the throw
-    // reaches terminate() and aborts.
+    // The printed line is load-bearing. The fitness functions construct
+    // SIG_Simulation OUTSIDE their own try block, and sigel_slave.cpp, main wraps
+    // evalFitness() in catch (SIG_Exception &) { fitnessValue = 0; }, so under PVM
+    // the throw is swallowed and the individual scores 0.0 as though it had been
+    // evaluated. The message is then the only evidence that reaches anyone. It
+    // goes to std::cerr rather than SIG_IO::cerr because SIG_IO buffers until
+    // it is flushed.
     default:
       std::cerr << "SIG_Simulation: SIMULATIONLIBRARY "
 		<< static_cast<int>( simulationParameter.getSimulationLibrary() )
@@ -162,12 +155,9 @@ void SIGEL_Simulation::SIG_Simulation::makeTimeSteps(int numTimeSteps)
 
       simulationQueries->checkDynas();
 
-      // UNREACHABLE since 2026-08-28. slotDynamoMessage was the only writer
-      // of stopSimulation and the Dynamo signal that invoked it is deleted,
-      // so this is the sole throw site of SIG_SimulationCannotSolveException
-      // in the tree and it can no longer fire. Left in place: removing it
-      // would change the exception surface of a class Phase C still has to
-      // port. See physics_backends.md, "Dead but not deleted".
+      // UNREACHABLE. slotDynamoMessage is the only writer of stopSimulation and
+      // nothing connects to it, so this sole throw site of
+      // SIG_SimulationCannotSolveException cannot fire.
       if (stopSimulation)
         throw SIG_SimulationCannotSolveException( __FILE__, __LINE__,
                                                                                                   "Dynamo produced an Cannot Solve Constraints Error" );

@@ -42,12 +42,8 @@ namespace SIGEL_Simulation
   {
     int numberOfRegisters = langParams.getMemorySize();
     int registerWidth = langParams.getRegisterWidth();
-    // Phase D. Was a Q2PtrVector of new'ed SIG_Register with no autoDelete,
-    // no destructor and no deleteContents anywhere -- so every interpreter
-    // leaked its whole register file. SIG_Register is two ints with no
-    // destructor and no pointers, so values remove the ownership question and
-    // the leak together. It has no default constructor, hence append rather
-    // than resize.
+    // Held by value: SIG_Register is two ints with no destructor and no pointers.
+    // It has no default constructor, hence append rather than resize.
     registers.reserve( numberOfRegisters );
     for( int count = 0; count < numberOfRegisters; count++ )
       {

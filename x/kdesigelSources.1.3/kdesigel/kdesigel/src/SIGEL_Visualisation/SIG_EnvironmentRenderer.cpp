@@ -191,7 +191,7 @@ namespace SIGEL_Visualisation
 
 	glBegin( GL_LINE_STRIP );
 	// Qt 2 cursor walk. The count() >= 2 guard above is what kept first()
-	// off an empty list, which is UB in Qt 6 -- see section 9.
+	// off an empty list, which is UB in Qt 6.
 	for ( qsizetype i = 0; i < robotPathPoints.size(); i++ )
 	  {
 	    DL_vector *actPoint = robotPathPoints.at( i );

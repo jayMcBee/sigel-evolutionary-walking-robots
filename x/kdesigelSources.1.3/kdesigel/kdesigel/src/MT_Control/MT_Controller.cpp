@@ -1,4 +1,4 @@
-#include <QCoreApplication>   // QCoreApplication::exit; was reached via SIG_Program.h before A7
+#include <QCoreApplication>   // QCoreApplication::exit
 #include "SIGEL_Tools/SIG_IO.h"
 #include "MT_GUI/MT_MainWindow.h"
 #include "MT_Control/MT_Controller.h"

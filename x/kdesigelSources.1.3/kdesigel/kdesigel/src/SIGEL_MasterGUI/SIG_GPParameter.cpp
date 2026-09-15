@@ -473,7 +473,7 @@ void SIG_GPParameter::slotDeleteHost()
    *
    * NOTE: the 2003 comment here said setAutoDelete was not true on the host
    * list. It was (SIG_GPParameter.cpp, constructor), so remove() below was
-   * the delete. The flag is gone and the delete is now written out.
+   * the delete. The delete is written out below.
    */
   QList<SIGEL_GP::SIG_GPPVMHost *> deleteListHosts;
   QList<QTreeWidgetItem *> deleteListViewItems;
@@ -600,7 +600,7 @@ void SIG_GPParameter::slotItemDoubleClicked( QTreeWidgetItem * theItem )
 	  editDialog.lineeditHostName->setFocus();
 	  // Qt 6 selects a line edit's text when a dialog gives it focus and
 	  // Qt 2 did not, so a typed character REPLACES the pre-filled host
-	  // name here where 1.3 appends to it. Measured on the running binary.
+	  // name here where 1.3 appends to it.
 	  // See SIG_LanguageParameters.cpp for the full note; slotAddHost has
 	  // the same setFocus() and does NOT need this, because the field it
 	  // focuses is empty there.

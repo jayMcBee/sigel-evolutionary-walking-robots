@@ -20,7 +20,7 @@
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-#include "SIGEL_MasterGUI/SIG_Experiment.h"   // D29: anyEvolutionRunning()
+#include "SIGEL_MasterGUI/SIG_Experiment.h"   // anyEvolutionRunning()
 #include <qpushbutton.h>
 #include <qtextstream.h>
 #include <qfiledialog.h>
@@ -58,7 +58,6 @@ SIG_ExperimentView::~SIG_ExperimentView() {
 }
 
 void SIG_ExperimentView::putIntoExperiment() {
-  // D29.
   // slotStartEvolution disables gpParameter, simulationParameter, robotView,
   // languageParameters and environmentView -- but NOT experimentView, which is
   // the page the user is looking at when they press Start and which stays
@@ -70,14 +69,10 @@ void SIG_ExperimentView::putIntoExperiment() {
   // getAutosave() every generation (both SIG_GPManager::run bodies) to decide
   // whether to save, and getHistory() decides what that save writes.
   //
-  // The LCD read below is display-only and is deliberately AHEAD of the
-  // guard. poolGeneration IS incremented per generation inside the loop
-  // (SIG_GPManager.cpp, run), and 1.3 has no guard at all, so on 1.3 a page
-  // switch during a run refreshes this display to the advanced value.
-  // Returning before it would have made the port show a stale number where
-  // 1.3 shows a fresh one -- a divergence the run lock would have
-  // introduced, in a function whose point is to change nothing the user did
-  // not ask for. Reading is not writing; the guard belongs below it.
+  // The LCD read below is display-only and sits AHEAD of the guard, so
+  // slotHistory and slotIntervallChanged still refresh it during a run;
+  // poolGeneration IS incremented per generation inside the loop
+  // (SIG_GPManager.cpp, run).
 
   // update the generations display + progress-bar
   lcdnumberGenerations->display(theExperiment.population.getPoolGeneration());

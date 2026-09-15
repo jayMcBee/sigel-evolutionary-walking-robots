@@ -157,11 +157,9 @@ namespace SIGEL_Robot
                                         if (coordinateNode) {
                                                 int noOfVertices = coordinateNode->getNPoints();
                                                 int noOfIndices = indexedFaceSetNode->getNCoordIndexes();
-                                                // Phase D. Was an owning Q2PtrVector of DL_vector*, kept on
-                                                // setAutoDelete because the NEWMAT multiply and the SIG_Polygon
-                                                // allocations below can throw and a hand-written free would drop
-                                                // the unwinding path. There is no polymorphism here, so values
-                                                // remove the question entirely -- nothing to own, nothing to free.
+                                                // Held by value, not as owned DL_vector pointers: the NEWMAT multiply and
+                                                // the SIG_Polygon allocations below can throw, and values need no free on the
+                                                // unwinding path.
                                                 QList< DL_vector > vertices( noOfVertices );
 
                                                 for (int i=0; i < noOfVertices; i++) {
@@ -186,7 +184,7 @@ namespace SIGEL_Robot
                                                         int actIndex = indexedFaceSetNode->getCoordIndex(j);
                                                         
                                                         // actIndex comes straight out of the VRML file, and a
-                                                        // negative one ends the face. Q2PtrVector::at used to
+                                                        // negative one ends the face. Qt 2's QVector::at used to
                                                         // clamp an out-of-range index to 0; QList does not.
                                                         // The check has to come BEFORE the polygon is created:
                                                         // SIG_Polygon self-registers with the geometry in its
@@ -243,7 +241,7 @@ namespace SIGEL_Robot
                 // Qt 2's QString::at(uint) was bounds-safe -- it returned QChar::null past
 		// the end (qstring.h:483). Qt 6's asserts, and on a null string it
 		// dereferences a null pointer. SIG_Robot.cpp, readFromFileTransfer produces a null
-		// geometryFile from a truncated stream. (D13)
+		// geometryFile from a truncated stream.
 		if (!geometryFile.isEmpty() && geometryFile.at (0) == '/')
                         return geometryFile;
                 else {

@@ -143,7 +143,7 @@ namespace SIGEL_Robot {
         SIG_Body *SIG_Robot::lookupBody (QString n) const
         {
                 // Backwards: Qt 2's QDict returned the NEWEST binding for a
-                // duplicate key, and the Q2Dict this replaced did the same.
+                // duplicate key.
                 for (qsizetype i = bodies.size () - 1; i >= 0; --i)
                         if (bodies.at (i)->getName () == n)
                                 return bodies.at (i);
@@ -153,7 +153,7 @@ namespace SIGEL_Robot {
         SIG_Material *SIG_Robot::lookupMaterial (QString n) const
         {
                 // Backwards: Qt 2's QDict returned the NEWEST binding for a
-                // duplicate key, and the Q2Dict this replaced did the same.
+                // duplicate key.
                 for (qsizetype i = materials.size () - 1; i >= 0; --i)
                         if (materials.at (i)->getName () == n)
                                 return materials.at (i);
@@ -163,7 +163,7 @@ namespace SIGEL_Robot {
         SIG_Link *SIG_Robot::lookupLink (QString n) const
         {
                 // Backwards: Qt 2's QDict returned the NEWEST binding for a
-                // duplicate key, and the Q2Dict this replaced did the same.
+                // duplicate key.
                 for (qsizetype i = links.size () - 1; i >= 0; --i)
                         if (links.at (i)->getName () == n)
                                 return links.at (i);
@@ -173,7 +173,7 @@ namespace SIGEL_Robot {
         SIG_Joint *SIG_Robot::lookupJoint (QString n) const
         {
                 // Backwards: Qt 2's QDict returned the NEWEST binding for a
-                // duplicate key, and the Q2Dict this replaced did the same.
+                // duplicate key.
                 for (qsizetype i = joints.size () - 1; i >= 0; --i)
                         if (joints.at (i)->getName () == n)
                                 return joints.at (i);
@@ -183,7 +183,7 @@ namespace SIGEL_Robot {
         SIG_Drive *SIG_Robot::lookupDrive (QString n) const
         {
                 // Backwards: Qt 2's QDict returned the NEWEST binding for a
-                // duplicate key, and the Q2Dict this replaced did the same.
+                // duplicate key.
                 for (qsizetype i = drives.size () - 1; i >= 0; --i)
                         if (drives.at (i)->getName () == n)
                                 return drives.at (i);
@@ -193,7 +193,7 @@ namespace SIGEL_Robot {
         SIG_Sensor *SIG_Robot::lookupSensor (QString n) const
         {
                 // Backwards: Qt 2's QDict returned the NEWEST binding for a
-                // duplicate key, and the Q2Dict this replaced did the same.
+                // duplicate key.
                 for (qsizetype i = sensors.size () - 1; i >= 0; --i)
                         if (sensors.at (i)->getName () == n)
                                 return sensors.at (i);

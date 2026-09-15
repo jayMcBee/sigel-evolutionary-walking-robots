@@ -120,8 +120,8 @@ namespace SIGEL_Robot
       SIG_Geometry *geometry;
       SIG_Mirtich *mirtich;
       SIG_Material *material;
-      // Phase D. Was Q2Dict<DL_vector>. A DL_vector has no name of its own,
-      // so unlike SIG_Robot's six lists this one needs to carry the key.
+      // A DL_vector has no name of its own, so unlike SIG_Robot's six lists this
+      // one needs to carry the key.
       QList<NamedPoint> points;
       QList<SIG_Joint *> adjacentJoints;
       QList<SIG_Link *> noCollide;

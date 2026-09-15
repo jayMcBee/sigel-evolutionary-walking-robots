@@ -98,7 +98,7 @@ QString SIG_IndividualListItem::key(int column, bool ascending) const {
         // the end and did nothing; Qt 6's takes a signed qsizetype and CLEARS
         // the string. That wiped the mantissa for every plain value like
         // "1.14825", leaving an all-zero sort key, so those sorted BEFORE the
-        // e-05 values instead of after them. Measured against 1.3, which puts
+        // e-05 values instead of after them. 1.3 puts
         // the e-05 values first.
         if (positionOfExponent != -1)
           orgString.truncate(positionOfExponent);

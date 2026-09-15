@@ -49,8 +49,7 @@ namespace SIGEL_GP
   // Qt 6's returns the very next character, whitespace included. Reading a
   // PVMHOST line with Qt 6's semantics makes the two priming reads consume the
   // space and then the opening quote, so the loop below sees '"' immediately and
-  // EVERY host parsed from an .exp file gets an empty slave directory. No gate
-  // reads a PVMHOST line, so nothing here could see it.
+  // EVERY host parsed from an .exp file gets an empty slave directory.
   //
   // Note this reproduces the Qt 2 behaviour exactly, INCLUDING inside the quoted
   // path: each read skips whitespace, so 1.3 silently drops spaces in a

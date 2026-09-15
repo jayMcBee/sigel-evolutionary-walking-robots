@@ -23,7 +23,7 @@
 #include <QList>
 #include <QString>
 #include <QTextStream>
-#include <algorithm>   // std::sort -- Q2Array::sort was numeric (D13)
+#include <algorithm>   // std::sort, numeric; Qt 2's QArray::sort compared raw bytes (memcmp)
 #include "SIGEL_GP/SIG_GPManager.h"
 
 #ifndef _WINDOWS
@@ -64,8 +64,8 @@ SIGEL_GP::SIG_GPManager::SIG_GPManager(SIGEL_GP::SIG_GPExperiment &experiment)
 		trainer = new SIG_GPFitnessTrainer(actExperiment);
 	}
 	// tours.setAutoDelete(true) was the free for every tournament: it ran in
-	// ~Q2PtrVector, in clear(), in insert() on the old occupant and in a
-	// shrinking resize(). Each of those is now written out at its site.
+	// Qt 2's ~QVector, in clear(), in insert() on the old occupant and in a
+	// shrinking resize(). Each of those is written out at its site.
 };
 
 
@@ -360,18 +360,16 @@ void SIGEL_GP::SIG_GPManager::createTours(int quantity) {
 
 namespace {
 
-  /* Q2PtrVector::isEmpty() was count()==0 -- no NON-NULL slots -- while
+  /* Qt 2's QVector::isEmpty() was count()==0 -- no NON-NULL slots -- while
    * QList::isEmpty() is size()==0. They disagree between
    * "tours.clear(); tours.resize(quantity);" and the loop that fills the slots,
    * and after createTours' !totalProbCount early return, which leaves the
    * vector resized and entirely null.
    *
-   * Unreachable at the four call sites today: start() has exactly two callers
-   * in the 1.3 binary, main (straight-line, once) and
-   * SIG_Experiment::slotStartEvolution, which deletes the manager and builds a
-   * fresh one on every invocation, so tours is default-constructed at each
-   * entry to run(). Reproduced anyway, for the same reason D25c writes out the
-   * five provably-unnecessary deletes.
+   * Unreachable at the four call sites today: start()'s two callers, main and
+   * SIG_Experiment::slotStartEvolution, each use a freshly built manager, so
+   * tours is default-constructed at each entry to run(). Reproduced anyway,
+   * so a caller that reuses a manager keeps 1.3's behaviour.
    */
   bool toursAreEmpty( QList< SIGEL_GP::SIG_GPTournament * > const &tours )
   {
@@ -382,7 +380,7 @@ namespace {
   }
 
 
-  /* fitTaskList held setAutoDelete(true): ~Q2PtrList was the ONLY free, and it
+  /* fitTaskList held setAutoDelete(true): Qt 2's ~QList was the ONLY free, and it
    * ran on every exit -- including the two early returns inside the function.
    * QList frees nothing, so the guard restores that. Same shape as
    * DynaMechsLinkGuard in SIG_DynaMechsSimulationData.cpp.
@@ -487,7 +485,7 @@ void SIGEL_GP::SIG_GPManager::evalNewIndis() {
 
         // remove(): setAutoDelete(true) made this the free.
         delete fitTaskList.takeAt( fitCur );
-        // cursorAfterRemoval: land on whatever slid in, else step back.
+        // Qt 2's QList cursor after remove(): land on whatever slid in, else step back.
         if (fitCur >= fitTaskList.size())
           fitCur = fitTaskList.isEmpty() ? -1 : fitTaskList.size() - 1;
         actFitTask = (fitCur < 0) ? 0 : fitTaskList.at( fitCur );
@@ -1064,7 +1062,7 @@ SIGEL_GP::SIG_GPManager::~SIG_GPManager()
 		delete trainer;
 	}
 
-	// ~Q2PtrVector freed whatever tournaments were still held. QList does not.
+	// Qt 2's ~QVector freed whatever tournaments were still held. QList does not.
 	qDeleteAll( tours );
 };
 
@@ -1584,7 +1582,7 @@ int DebugInfo =0;
 
 		// remove(): setAutoDelete(true) made this the free.
 		delete fitTaskList.takeAt( fitCur );
-		// cursorAfterRemoval: land on whatever slid in, else step back.
+		// Qt 2's QList cursor after remove(): land on whatever slid in, else step back.
 		if (fitCur >= fitTaskList.size())
 		  fitCur = fitTaskList.isEmpty() ? -1 : fitTaskList.size() - 1;
 		actFitTask = (fitCur < 0) ? 0 : fitTaskList.at( fitCur );
