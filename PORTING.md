@@ -523,10 +523,10 @@ D20 supersedes D5, D24 supersedes D3.
 |---|---|---|
 | **D27** *(decision; §10 also has a **step** D27, the shim deletion — the two D-series overlap and this is the first collision)* | The duplicate MetaGP `A&bout` | **removed**, with its trailing separator. Present in 1.3 and verified there; wired to the same `slotAbout()` as `Help > About` and opening the identical `SIG_InfoBox`. The port's first intentional difference from 1.3. `Help > About` untouched |
 | **D28** | The `QSpinBox` over-range divergence (C11a) | **accepted, not fixed.** 1.3 accepts out-of-range digits and clamps on commit; the port refuses the keystroke and commits a truncated prefix. It is reachable **only by typing a number outside the box's own range**, and the differing value is **visible in the box** before anything is saved — 1.3 shows 99, the port shows 10. Contrast what the port did fix: `clear()` killed the application, the ampersand rendered wrong, a negative width silently wrote no file — all reachable with valid use. The fix is not the 33 lines of it, it is **owning a custom widget forever**: every future form edit and every new spin box must remember `SIG_SpinBox` or silently opt out. Pinned in `guibehaviour-baseline.txt` (`commits=`) so it cannot drift; prototype and the measured comparison in `future_refactorings.md`. **Revisit if** a dialog spin box turns out to feed something unvalidated, or if anyone actually hits it |
-| **D29** *(signed off 2026-09-04)* | Changing run parameters **while an evolution is running** | **FORBIDDEN in the port, whatever 1.3 permits.** The reason is the specification, not 1.3: *"that's not how GAs/GPs are commonly implemented"* — the parameters define the run. **The port's second intentional divergence**, after D27. **Implementation, and the three wrong versions it went through, are in §10 — read that before changing the guard** |
+| **D29** *(signed off 2026-09-04)* | Changing run parameters **while an evolution is running** | **FORBIDDEN in the port, whatever 1.3 permits.** The reason is the specification, not 1.3: *"that's not how GAs/GPs are commonly implemented"* — the parameters define the run. **The port's second intentional divergence**, after D27. **Implementation, and the wrong versions it went through, are in §10 — read that before changing the guard** |
 | **D31** *(signed off 2026-09-09)* | Line endings | **LF ONLY, tree-wide. No more DOS.** Jan's decision, and it overrides the guard that existed to prevent it. **100 files under `x/kdesigelSources.1.3` converted, 17,750 CRLF pairs.** **The conversion is line endings only except for two bytes, and `git diff --ignore-cr-at-eol` is NOT what proves it** — that flag strips a trailing CR from *both* sides, so it would equally hide a CRLF being *introduced*. The proof is a direct comparison of every one of the 100 files: `re.sub(rb"\r+\n", b"\n", git show HEAD:f) == working file`, exact, with no `\r` surviving anywhere. Zero anomalies. Zero anomalies. **Two lines of `sigel_slave.mak` are the one real content change**, and calling them line endings flatters them: `:598` and `:647` ended `\r\r\n`, so the byte removed is an INTERIOR one — under NMAKE that trailing CR is part of the variable's value. The `\r+` in the proof above is what swallows the case, so the proof cannot tell it from a line ending; it is called out here instead. Nothing else in the tree has a run of two. **Binaries are excluded and this is not cosmetic** — three tracked binaries hold 12 incidental `\r\n` byte pairs (`pvm3.4.6.tgz` 9, `altLogo.png` 2, `noExperiment.png` 1), and a blind repo-wide replace would corrupt all three. Extensions touched: 36 `.cpp`, 35 `.h`, 19 `.xpm`, 5 `.dsp`, 3 `.mak`, 1 `.mt`, 1 `.dsw`. **No `.exp` and no `.ui`**, so no reference artefact was touched. **Lone CRs are left alone, and NOT because they are Mac-classic line endings** — the first version of this row said that and it was wrong. Six tracked files hold lone CRs and git calls **all six** binary, so this gate never even reads them: `pvm3.4.6.tgz` 3859, `noExperiment.png` 691, `JustGreen.pnm` 2848, `altLogo.png` 208, `Hippie.pnm` 208, `Stone.pnm` 68. All five `.pnm` are **P6 raw raster**: those bytes are pixel values that happen to equal `0x0d`. They were never line endings. **The `encodings` gate was turned round in the same commit**, so that commit is not line endings alone — `check.sh`, `PORTING.md` and `future_refactorings.md` change with it. The gate used to say *a file that HAD a CR must still have one*, with `ENC_BASELINE=25`; it now says **no tracked text file may carry CRLF**, expected zero, reads every tracked file rather than five extensions present in the root commit, lists them with `-z` so a C-quoted path cannot break `open()`, and reconciles — every file lands in exactly one of ok / CRLF / binary / unreadable, or it aborts. **It asks `git ls-files --eol` what is binary rather than testing for a NUL byte**, because the NUL test got two files wrong: `Hippie.pnm` has no NUL in its 196,668 bytes and `UniDo_LSXI.pnm`'s first NUL is at offset 15,456, so both were judged as text and passed only by luck. **Read the `w/` column, not `i/`**: while this change was being made, `sigel_slave.mak`'s index blob read `i/-text` — HEAD still held its two `\r\r\n`, which git's own heuristic calls binary — against a working file of `w/lf`, and testing both columns dropped a real text file out of the check. **Both columns read `lf` once this is committed, so the demonstration is gone and only the rule survives.** Reads 610 text files and 8 binaries. **A floor of 500 was added**, because zero failures is also what a check that read nothing reports: a dead `git ls-files` gave `COUNTS 0 0 0 0 0 0`, two non-empty numbers, which the fail-closed branch did not catch. Teeth-tested: CRLF into a `.cpp` and into `sigel_slave.mak` both caught and named, CRLF into a texture correctly ignored, and all seven branch states driven by hand — including a **tree-wide** CRLF regression, which the first version of the floor misreported as *"it did not run"* with one failure instead of 611, and a below-floor count, which the first version printed as `0 pass` while adding up to 499 passes to the total. Both found by review 2026-09-09. The bucket reconciliation is a tautology as the loop is now written and is **not** counted as coverage; it is kept only so the earlier bare-`continue` shape cannot come back. **`SIGEL_ROOT` is the source tree**, so `stdConf.mt` and the 19 `.xpm` pixmaps the conversion touched are the very files the GUI gates load at runtime; the `gui behaviour` gate covers them. The `.xpm` are loaded by path and `#include`d nowhere, and a C string literal cannot span a raw newline, so no removed CR was ever inside a quoted pixel row. **No `.gitattributes` exists and none was added.** `* text=auto eol=lf` would make git enforce this rather than only detect it; not done, because it changes what every future checkout writes and that is a separate decision. On a clone with `core.autocrlf=true` the working tree comes back CRLF and this gate goes red tree-wide — which is the gate working |
 | **D32** *(signed off 2026-09-09)* | `SIG_Experiment::gpManager` renamed to `guiGPManager` | **A deliberate divergence from the 1.3 name, and the only one of its kind so far.** Four members across the tracked tree were called `gpManager`; three hold an `MT_GPManager *` inside the meta modules, where the name is right. The fourth, `SIG_Experiment.h, SIG_Experiment`, holds a `SIG_GUIGPManager *` — and it was the **only** `SIG_`-typed member in that class not named after its own type with the `SIG_` prefix stripped. The other nine follow the rule exactly (`gpExperiment`, `gpParameter`, `simulationParameter`, `environmentView`, `robotView`, `experimentView`, `allIndividualsView`, `languageParameters`, `experimentItem`); the class's remaining members are named by role (`widgetDict`, `menuGPParameter`, …) and were never in scope. So this is the class's own rule applied to the one member that broke it, not a new scheme. **20 sites**: 13 in `SIG_Experiment.{h,cpp}`, 5 in this file, 2 in `guidrive.cpp`, both comments. The three `MT_GPManager` members and the `SIG_GPManager gpManager` local at `sigel.cpp:261` are correctly named and were left alone; the 1.0 tree holds the same member and is untracked, so a future sweep will re-find it there and should leave it. **VERIFIED AS `.text`-IDENTICAL, NOT AS BYTE-IDENTICAL OBJECTS** — a data member's name never reaches a mangled symbol, but `-g` is on and DWARF records member names, so the objects legitimately differ. `sigel.cpp` is the interesting one and was checked: it is the single translation unit where both names coexist, and its `.text` is unchanged |
-| **D33** *(signed off 2026-09-09)* | Where the mid-run protection lives | **IN THE UI. The model is not to be touched.** Jan: *"we'll focus on the UI side from now on, NO TOUCHING the gp manager or other model classes."* No new behaviour goes into the model. Removing a dead 2003 stub is not new behaviour, so `SIG_GPManager::running()` was deleted — see D29's passage in §10. Nothing is added to `SIG_GPManager` or `MT_Controller`. **The D29 counter, `g_runningEvolutions`, is to be removed, not moved into the model.** Jan, rejecting a move into `SIGEL_GP`: *"I strongly reject changes to the core model just to hot-fix a UI enablement issue."* What replaces it is undecided, and it is UI-side |
+| **D33** *(signed off 2026-09-09)* | Where the mid-run protection lives | **IN THE UI. The model is not to be touched.** Jan: *"we'll focus on the UI side from now on, NO TOUCHING the gp manager or other model classes."* No new behaviour goes into the model. Removing a dead 2003 stub is not new behaviour, so `SIG_GPManager::running()` was deleted — see D29's passage in §10. Nothing is added to `SIG_GPManager` or `MT_Controller`. **The D29 counter, `g_runningEvolutions`, is to be removed, not moved into the model.** Jan, rejecting a move into `SIGEL_GP`: *"I strongly reject changes to the core model just to hot-fix a UI enablement issue."* **Replaced 2026-09-15 by a UI-side run state.** Each experiment has `evolutionRunning`, which `SIG_GUIGPExperiment::isRunning()` returns. Every run check asks `SIG_ExperimentListView::isRunning()`, which is true while any experiment runs. The decision is to lock the whole application during a run; §9 lists what is not locked yet. Jan: *"multiple simul. experiments running makes no sense, we need all resources we can get"* |
 | **D34** *(signed off 2026-09-15)* | `SIG_Experiment` renamed to `SIG_GUIGPExperiment` | **By Jan's decision, and the second deliberate divergence from a 1.3 name, after D32.** The interface experiment class now follows the rule the manager pair already uses: model `SIG_GPManager`, interface `SIG_GUIGPManager`; model `SIG_GPExperiment`, interface `SIG_GUIGPExperiment`. Its files follow it: `SIG_Experiment.h` and `SIG_Experiment.cpp` became `SIG_GUIGPExperiment.h` and `SIG_GUIGPExperiment.cpp`, with the include guard, every include and the 2003 build files. D32's row keeps the old class name, because it records a rename made under it |
 
 
@@ -1474,8 +1474,8 @@ reverting it left every check green.*
 **D30 did not keep the lock, and this is why.** `SIG_GUIGPExperiment::slotStopEvolution`
 opened with `emit signalEvolutionNotRunning( true )` as its **first statement**,
 and it is a request to stop rather than a stop: it only sets
-`guiGPManager->userTerminated` at the end, `start()` has not returned, the
-`RunScope` is still alive and `anyEvolutionRunning()` is still true. So one click
+`guiGPManager->userTerminated` at the end, `start()` has not returned, and
+`isRunning()` is still true. So one click
 on `Stop` re-enabled all 29 locked actions **while the run continued** — for as
 long as the manager takes to notice the flag, which is a whole generation, 58 to
 208 s on this machine. None of D30's guards is consulted on that path.
@@ -1486,7 +1486,7 @@ signal, and it runs after `start()` returns. The premature emit is gone.
 **Two more, found in the same review and fixed with it:**
 
 - **The unlock was not exception-safe.** `slotEvolutionStopped()` sits *after*
-  the `RunScope` block, so a throw out of `start()` skipped it and left `Start`
+  the call to `start()`, so a throw out of `start()` skipped it and left `Start`
   and the five pages disabled. Now called on the throw path as well.
 - **D30 itself introduced a stuck state.** Its guard disabled
   `mtChoiceTypeActionGroup`, which nothing ever re-enables —
@@ -1503,8 +1503,8 @@ check — and was unreachable only because `useMeta()` returns false when the st
 is unchanged, which is luck rather than a guard. *This is the layering Jan asked
 for: keep the greying, add the refusal.*
 
-**NOT GATED: the `Stop` fix.** `runlock` fakes a run with its own `RunScope` and
-never calls `slotStopEvolution`, which dereferences `guiGPManager` and would need a
+**NOT GATED: the `Stop` fix.** `runlock` fakes a run by setting `evolutionRunning`
+itself and never calls `slotStopEvolution`, which dereferences `guiGPManager` and would need a
 real run. The fix is verified against source and by the review that found it, not
 by a gate. **Nor are the three slot refusals above**: `guidrive` never reaches
 `slotMTUseMT`, `slotMTConfigureSystem` or `slotMTSwitchSystem` during a run, and
@@ -1521,7 +1521,7 @@ item, one line after the emit that applies the lock
 **THE FIX, three places in `SIG_MainWindow.cpp`:**
 
 1. `slotActExpChanged` enables the two MetaGP controls only when
-   `!SIG_GUIGPExperiment::anyEvolutionRunning()`.
+   `!experimentListView->isRunning()`.
 2. `slotEnableNoExperimentActions` re-applies the run lock after its own loop,
    rather than filtering its list — so the two lists cannot drift apart.
 3. `newExperimentAction` and `openExperimentAction` join
@@ -1610,12 +1610,13 @@ and a watchdog abort exits **3**.
 `SIG_GUIGPManager.cpp, SIG_GUIGPManager` and `:95`. *This said the only live write is a page
 refresh at `SIG_ExperimentView.cpp, putIntoExperiment`, "which fires on a page switch during a
 run but never from the evolution loop". **Wrong on the first half**: the
-page-switch route runs `putAllIntoExperiment`, which returns at
-`SIG_GUIGPExperiment.cpp:243-244` under `anyEvolutionRunning()` **before** reaching
-`experimentView->putIntoExperiment()` at `:246` — so during a run a page switch
-never reaches `:83` either.* The live callers are `SIG_ExperimentView.cpp, slotHistory`
-(`slotHistory`) and `:284` (`slotIntervallChanged`), which is what the D29
-comment at `:61-67` says. And the sampler counts **pumps of the event loop,
+page-switch route runs `putAllIntoExperiment`, which returns under
+`SIG_ExperimentListView::isRunning()` **before** reaching
+`experimentView->putIntoExperiment()` — so during a run a page switch
+never reaches the writes in `SIG_ExperimentView::putIntoExperiment` either.* The
+live callers are `SIG_ExperimentView::slotHistory` and
+`SIG_ExperimentView::slotIntervallChanged`, which is what the comment in
+`SIG_ExperimentView::putIntoExperiment` says. And the sampler counts **pumps of the event loop,
 not seconds**: the run blocks the main thread, the only pump is `haveABreak()`'s
 `processEvents` once per outer pass, with `usleep(300000)` per tournament touch
 in between. One line in 100 seconds is what that predicts; the `samples == 0`
@@ -3125,10 +3126,23 @@ comment, zero in code. **Phase 0 closed 2026-09-05.**
 lines, 28 doc comments naming a Qt 2 type, and six form minimums — closed on
 2026-09-05. Each is written up in §7.
 
-**D29's arming line is now covered, and it held.** The tree click is the only
-thing that reaches it — `SIG_ExperimentListView::slotSelectionChanged` asks
-`anyEvolutionRunning()`, which only `RunScope` sets — and `Save Experiment`, one
-of the 23 locked actions that nothing re-enables, stayed greyed through it.
+**Right-click `Stop` on an experiment that never ran crashes.**
+`SIG_GUIGPExperiment::slotStopEvolution` sets `guiGPManager->userTerminated`,
+and `guiGPManager` is 0 until a Start passes the three checks in
+`slotStartEvolution`. 1.3 has the same code. Jan, 2026-09-15: investigate later.
+
+**Start is not locked during a run yet, nor are the pages of the other
+experiments.** `slotStartEvolution` has no run check. It greys only its own
+experiment's `pushbuttonStart` and its own five pages. The right-click `Start` in
+`menuExperimentView` is never greyed. No check proves a lock on any of them. The
+next step locks them.
+
+**D29's arming line was checked by the `evolution` scenario, and it held.** The
+tree click is the only thing that reaches it —
+`SIG_ExperimentListView::slotSelectionChanged` asks `isRunning()`, which only
+`slotStartEvolution` sets — and `Save Experiment`, one of the 23 locked actions
+that nothing re-enables, stayed greyed through it. *That run used the counter
+that the run state replaced on 2026-09-15. Re-running it is open.*
 
 **THREE COVERAGE ITEMS WERE DROPPED 2026-09-07. The attribution on this line
 was corrected 2026-09-08: only the first one is Jan's.** It is the one that
@@ -5395,7 +5409,7 @@ truncation to show up where it should — as a hash mismatch and a failed round
 trip.*
 
 
-### D29 — how the run lock is built, and the three versions that were wrong
+### D29 — how the run lock is built, and the versions that were wrong
 
 **THE GUARD IN `SIG_ExperimentView::putIntoExperiment()` SITS BELOW THE LCD READ,
 DELIBERATELY — moved there 2026-09-05.** It was above it, and that would have
@@ -5415,9 +5429,13 @@ distinguish the two placements. Listed as open.*
 **Read this before changing the guard.** The decision is in §5c; this is what it
 took to implement, and each wrong version passed its own gate.
 
-**Where the guard is.** A **count** of running evolutions, incremented by
-`SIG_GUIGPExperiment::RunScope`, which `slotStartEvolution` enters around
-`guiGPManager->start()`. Five things ask it:
+**Where the guard is.** Each experiment has a bool, `evolutionRunning`, which
+`SIG_GUIGPExperiment::isRunning()` returns. `slotStartEvolution` sets it just
+before `guiGPManager->start()`. `slotEvolutionStopped` clears it, and
+`slotStartEvolution` calls that slot also when `start()` throws.
+`SIG_ExperimentListView::isRunning()` is true while any experiment runs. Every
+check asks the list view, so each check refuses while any experiment runs. The
+checks, by group:
 
 | guarded | why it needs its own guard |
 |---|---|
@@ -5439,13 +5457,7 @@ whole run, and its history checkbox and autosave slider are wired straight to
 **every generation** (`SIG_GPManager.cpp:805-807`). Meanwhile `robotView` is
 disabled but `SIG_RobotView::putIntoExperiment()` has **no callers at all**.
 
-**Version 2 was wrong: a bool per experiment.** Three ways. Selecting a
-*different* experiment mid-run asked that one's flag and re-enabled everything. A
-nested `slotStartEvolution` reached through `processEvents` cleared the flag on
-return. An exception out of `start()` skipped the clear and locked the
-experiment for good. A count entered by a scope guard fixes all three.
-
-**Version 3 was wrong: it asked `SIG_GPManager::running()`.** That was a 2003
+**Version 2 was wrong: it asked `SIG_GPManager::running()`.** That was a 2003
 stub returning `false` unconditionally, overridden nowhere, so a guard against
 it could never fire. **Deleted 2026-09-09** — the line number this used to cite
 is gone with it. **It is a leftover, not an
@@ -5483,13 +5495,17 @@ chose are committed at start and only later writes are refused.
 
 **Coverage.** The `runlock` scenario executes the guard in its locked state,
 which nothing did before — a review measured that both mechanisms could be
-reverted wholesale with all checks green. It needs no live evolution because
-`RunScope` is public. Its observable is the **model**, `gpParameter.getMaxAge()`,
+reverted wholesale with all checks green. It needs no live evolution: it sets
+the protected `evolutionRunning` itself and clears it through
+`slotEvolutionStopped`. Its observable is the **model**, `gpParameter.getMaxAge()`,
 because two cheaper ones are wrong: reading the spin box back reports a false
 refusal (nothing calls `getOutOfExperiment` on the way back), and saving is
 impossible under the lock because `Save Experiment` is itself locked.
-**NOT COVERED:** `runlock` makes its own `RunScope`, so it cannot check the one
-in `slotStartEvolution`. Delete that line and the gate still passes. Checking it
+**NOT COVERED:** `runlock` sets `evolutionRunning` itself, so it cannot check
+the line in `slotStartEvolution` that sets it. Delete that line and the gate
+still passes. Nor does it run the call to `slotEvolutionStopped` in the `catch`
+of `slotStartEvolution`: it calls that slot directly, so it checks only that the
+slot clears the flag. Checking it
 needs a real run, and every shipped experiment stops on a date in 2001, so a
 correct Start returns in under 100 ms.
 

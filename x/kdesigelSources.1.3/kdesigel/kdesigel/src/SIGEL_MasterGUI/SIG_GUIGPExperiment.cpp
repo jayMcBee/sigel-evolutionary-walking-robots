@@ -26,6 +26,7 @@
 #include <qmessagebox.h>
 
 #include "SIGEL_MasterGUI/SIG_GUIGPExperiment.h"
+#include "SIGEL_MasterGUI/SIG_ExperimentListView.h"
 
 #include "SIGEL_GP/SIG_GUIGPManager.h"
 
@@ -38,7 +39,7 @@
 namespace SIGEL_MasterGUI
 {
 
-  SIG_GUIGPExperiment::SIG_GUIGPExperiment( QString name, QStackedWidget *theWidgetStack, SIG_ExperimentItem *theExperimentItem ) : gpExperiment(), guiGPManager(0), experimentName(name), widgetStack( theWidgetStack ), experimentItem(theExperimentItem)
+  SIG_GUIGPExperiment::SIG_GUIGPExperiment( QString name, QStackedWidget *theWidgetStack, SIG_ExperimentItem *theExperimentItem ) : gpExperiment(), guiGPManager(0), experimentName(name), widgetStack( theWidgetStack ), evolutionRunning(false), experimentItem(theExperimentItem), experimentListView( static_cast<SIG_ExperimentListView *>( theExperimentItem->treeWidget() ) )
 {
   // build the gp parameter menu
   menuGPParameter = new QMenu( this );
@@ -67,7 +68,7 @@ namespace SIGEL_MasterGUI
   simulationParameter = new SIG_SimulationParameter( this, "SimulationParameter", Qt::WindowFlags(), gpExperiment);
   environmentView = new SIG_EnvironmentView( this, "EnvironmentView", Qt::WindowFlags(), gpExperiment );
   robotView = new SIG_RobotView( this, "RobotView", Qt::WindowFlags(), gpExperiment );
-  experimentView = new SIG_ExperimentView( this, "ExperimentView", Qt::WindowFlags(), gpExperiment );
+  experimentView = new SIG_ExperimentView( this, "ExperimentView", Qt::WindowFlags(), gpExperiment, *this );
   allIndividualsView = new SIG_AllIndividualsView( this, "AllIndividualsView", gpExperiment );
   languageParameters = new SIG_LanguageParameters( this, "LanguageParametersView", Qt::WindowFlags(), gpExperiment );
   
@@ -207,17 +208,10 @@ void SIG_GUIGPExperiment::setName( QString newName )
   experimentItem->setText( 0, newName );
 };
 
-// The run counter. File-static rather than a class member so that no
-// experiment can be destroyed out from under it.
-static int g_runningEvolutions = 0;
-
-bool SIG_GUIGPExperiment::anyEvolutionRunning()
+bool SIG_GUIGPExperiment::isRunning()
 {
-  return g_runningEvolutions > 0;
-}
-
-SIG_GUIGPExperiment::RunScope::RunScope()  { ++g_runningEvolutions; }
-SIG_GUIGPExperiment::RunScope::~RunScope() { --g_runningEvolutions; }
+  return evolutionRunning;
+};
 
 void SIG_GUIGPExperiment::putAllIntoExperiment()
 {
@@ -230,7 +224,7 @@ void SIG_GUIGPExperiment::putAllIntoExperiment()
   // is reached by a path no widget guard covers:
   // SIG_ExperimentListView::slotSelectionChanged ends with an UNCONDITIONAL
   // putAllIntoExperiment(), two lines after it has already asked
-  // anyEvolutionRunning() for a different purpose. So disabling the pages
+  // SIG_ExperimentListView::isRunning() for a different purpose. So disabling the pages
   // leaves a page switch able to push widget state into a live run.
   //
   // 1.3 does disable the five pages while running (slotStartEvolution below),
@@ -240,7 +234,7 @@ void SIG_GUIGPExperiment::putAllIntoExperiment()
   // slotStartEvolution calls this BEFORE guiGPManager->start(), so the settings a
   // user chose are still committed at start; only writes after that are
   // refused.
-  if ( anyEvolutionRunning() )
+  if ( experimentListView->isRunning() )
     return;
 
   experimentView->putIntoExperiment();
@@ -313,26 +307,22 @@ void SIG_GUIGPExperiment::slotStartEvolution()
       environmentView->setEnabled( false );
       // allIndividualsView->setEnabled( false );
       
-      // Entered AFTER putAllIntoExperiment() above, so the settings the user
+      // Set AFTER putAllIntoExperiment() above, so the settings the user
       // chose are committed, and before start(), so nothing can change them
       // from here on. start() runs the evolution synchronously and services
       // the GUI through haveABreak()'s processEvents, so widgets and menus
       // really are reachable during it.
       //
-      // A SCOPE GUARD, not two assignments: it survives an exception out of
-      // start(), which would otherwise leave the experiment locked for good.
-      // slotEvolutionStopped() is the only thing that re-enables Start
+      // slotEvolutionStopped() clears evolutionRunning and re-enables Start
       // and the five pages disabled above, so it must run even if start()
-      // throws. The RunScope already survives a throw; this is the other half.
-      {
-        RunScope runScope;
-        try {
-          guiGPManager->start();
-        }
-        catch (...) {
-          slotEvolutionStopped();
-          throw;
-        }
+      // throws.
+      evolutionRunning = true;
+      try {
+        guiGPManager->start();
+      }
+      catch (...) {
+        slotEvolutionStopped();
+        throw;
       }
 
       slotEvolutionStopped();
@@ -347,7 +337,7 @@ void SIG_GUIGPExperiment::slotStopEvolution()
 {
   // Do NOT emit signalEvolutionNotRunning( true ) here. This is a
   // request to stop, not a stop: it only sets guiGPManager->userTerminated
-  // below, start() has not returned, and anyEvolutionRunning() is still true,
+  // below, start() has not returned, and isRunning() is still true,
   // so the locked actions must stay locked. slotEvolutionStopped() emits it
   // after start() returns.
 #ifdef SIG_DEBUG
@@ -375,7 +365,7 @@ void SIG_GUIGPExperiment::slotSimulationParameterImport()
   // run, but menuSimulationParameter and menuEnvironmentView are parented on
   // SIG_GUIGPExperiment rather than on the pages, so a right-click on the tree item
   // pops them regardless, and slotRightClick does not test enablement.
-  if ( anyEvolutionRunning() )
+  if ( experimentListView->isRunning() )
     return;
 
   QString fileName = QFileDialog::getOpenFileName( nullptr, "Import Simulation Parameters...", QString(), "Simulation Parameter Files (*.sip);;All Files (*)" );
@@ -429,7 +419,7 @@ void SIG_GUIGPExperiment::slotEnvironmentImport()
   // run, but menuSimulationParameter and menuEnvironmentView are parented on
   // SIG_GUIGPExperiment rather than on the pages, so a right-click on the tree item
   // pops them regardless, and slotRightClick does not test enablement.
-  if ( anyEvolutionRunning() )
+  if ( experimentListView->isRunning() )
     return;
 
   QString fileName = QFileDialog::getOpenFileName( nullptr, "Import Environment...", QString(), "Environment Files (*.env);;All Files (*)" );
@@ -483,7 +473,7 @@ void SIG_GUIGPExperiment::slotGPParameterImport()
   // run, but menuSimulationParameter and menuEnvironmentView are parented on
   // SIG_GUIGPExperiment rather than on the pages, so a right-click on the tree item
   // pops them regardless, and slotRightClick does not test enablement.
-  if ( anyEvolutionRunning() )
+  if ( experimentListView->isRunning() )
     return;
 
   QString fileName = QFileDialog::getOpenFileName( nullptr, "Import GP Parameter...", QString(), "GP Parameter Files (*.gpp);;All Files (*)" );
@@ -537,7 +527,7 @@ void SIG_GUIGPExperiment::slotLanguageParameterImport()
   // run, but menuSimulationParameter and menuEnvironmentView are parented on
   // SIG_GUIGPExperiment rather than on the pages, so a right-click on the tree item
   // pops them regardless, and slotRightClick does not test enablement.
-  if ( anyEvolutionRunning() )
+  if ( experimentListView->isRunning() )
     return;
 
   QString fileName = QFileDialog::getOpenFileName( nullptr, "Import Language Parameter...", QString(), "Language Parameter Files (*.lap);;All Files (*)" );
@@ -592,7 +582,7 @@ void SIG_GUIGPExperiment::slotPopulationImport()
   // run, but menuSimulationParameter and menuEnvironmentView are parented on
   // SIG_GUIGPExperiment rather than on the pages, so a right-click on the tree item
   // pops them regardless, and slotRightClick does not test enablement.
-  if ( anyEvolutionRunning() )
+  if ( experimentListView->isRunning() )
     return;
 
   QString fileName = QFileDialog::getOpenFileName( nullptr, "Import Population...", QString(), "Population Files (*.pop);;All Files (*)" );
@@ -645,7 +635,7 @@ void SIG_GUIGPExperiment::slotRobotImport()
   // run, but menuSimulationParameter and menuEnvironmentView are parented on
   // SIG_GUIGPExperiment rather than on the pages, so a right-click on the tree item
   // pops them regardless, and slotRightClick does not test enablement.
-  if ( anyEvolutionRunning() )
+  if ( experimentListView->isRunning() )
     return;
 
   QString fileName = QFileDialog::getOpenFileName( nullptr, "Import Robot...", QString(), "Raw Robot Files (*.rrb);;All Files (*)" );
@@ -685,7 +675,7 @@ void SIG_GUIGPExperiment::slotRobotLoad()
   // run, but menuSimulationParameter and menuEnvironmentView are parented on
   // SIG_GUIGPExperiment rather than on the pages, so a right-click on the tree item
   // pops them regardless, and slotRightClick does not test enablement.
-  if ( anyEvolutionRunning() )
+  if ( experimentListView->isRunning() )
     return;
 
   QString fileName = QFileDialog::getOpenFileName( nullptr, "Load Robot...", QString(), "Compiled Robot Files (*.crb);;All Files (*)" );
@@ -762,6 +752,7 @@ void SIG_GUIGPExperiment::slotRobotInfo()
 
 void SIG_GUIGPExperiment::slotEvolutionStopped()
 {
+  evolutionRunning = false;
   emit signalEvolutionNotRunning( true );
   experimentView->pushbuttonStart->setEnabled( true );
   experimentView->pushbuttonStop->setEnabled( false );

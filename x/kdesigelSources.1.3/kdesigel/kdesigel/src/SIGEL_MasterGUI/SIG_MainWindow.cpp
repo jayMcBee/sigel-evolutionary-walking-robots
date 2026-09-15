@@ -783,7 +783,7 @@ void SIG_MainWindow::slotMTUseMT(bool state)
 	// The menu item is greyed during a run; this refuses
 	// anyway, because a greyed menu is one layer and a slot that checks for
 	// itself is another.
-	if (SIG_GUIGPExperiment::anyEvolutionRunning())
+	if (experimentListView->isRunning())
 		return;
 	SIG_GUIGPExperiment *actExperiment = experimentListView->currentlySelectedExperiment();
 	if(actExperiment){
@@ -799,7 +799,7 @@ void SIG_MainWindow::slotMTUseMT(bool state)
 void SIG_MainWindow::slotMTConfigureSystem()
 {
 	// Refuse during a run, as well as greying the menu.
-	if (SIG_GUIGPExperiment::anyEvolutionRunning())
+	if (experimentListView->isRunning())
 		return;
 	SIG_GUIGPExperiment *actExperiment = experimentListView->currentlySelectedExperiment();
 	if(actExperiment){
@@ -811,7 +811,7 @@ void SIG_MainWindow::slotMTConfigureSystem()
 void SIG_MainWindow::slotMTSwitchSystem(QAction *selSystem)
 {
 	// Refuse during a run, as well as greying the group.
-	if (SIG_GUIGPExperiment::anyEvolutionRunning())
+	if (experimentListView->isRunning())
 		return;
 	// Qt 2 reached this slot only when the selection actually CHANGED:
 	// QActionGroup::childToggled gated "emit selected(s)" on "s != d->selected",
@@ -851,7 +851,7 @@ void SIG_MainWindow::slotActExpChanged()
 			// tree-click emit that APPLIES the run lock
 			// (SIG_ExperimentListView::slotSelectionChanged), so without this
 			// check it would hand these two straight back.
-			if (!SIG_GUIGPExperiment::anyEvolutionRunning()) {
+			if (!experimentListView->isRunning()) {
 				mtChoiceTypeActionGroup->setEnabled(true);
 				mtConfigureAction->setEnabled(true);
 			}
@@ -885,7 +885,7 @@ void SIG_MainWindow::slotEnableNoExperimentActions( bool enable )
   // 32: the appends of mtChoiceTypeActionGroup and mtConfigureAction are
   // commented out). During a run, re-apply the lock after this loop rather
   // than filtering the list, so the two lists cannot drift apart.
-  if ( enable && SIG_GUIGPExperiment::anyEvolutionRunning() )
+  if ( enable && experimentListView->isRunning() )
     slotEnableEvolutionRunningActions( false );
 };
 

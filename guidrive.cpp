@@ -3628,10 +3628,11 @@ static int guidriveMain(int argc, char **argv)
     // `evolution' is not one of the scenarios the gate runs, and inside it
     // slotStartEvolution blocks, so every observation there is post-run.
     //
-    // A real evolution is not needed to test the contract. SIG_GUIGPExperiment
-    // exposes RunScope, which is exactly what slotStartEvolution enters around
-    // guiGPManager->start(); entering one here puts the application in the state
-    // the lock exists for, deterministically and in about a second.
+    // A real evolution is not needed to test the contract. slotStartEvolution
+    // sets the protected SIG_GUIGPExperiment::evolutionRunning just before
+    // guiGPManager->start(); setting it here through RunState puts the
+    // application in the state the lock exists for, deterministically and in
+    // about a second.
     //
     // The observable is the page round trip: type into a page, switch away --
     // which calls putAllIntoExperiment -- then switch back, which refreshes
@@ -3644,8 +3645,7 @@ static int guidriveMain(int argc, char **argv)
         QTest::qWait(300);
         QStackedWidget *st = W->findChild<QStackedWidget *>();
         printf("\n== D29 RUN LOCK ==\n");
-        printf("  atRest anyEvolutionRunning=%d\n",
-               SIG_GUIGPExperiment::anyEvolutionRunning() ? 1 : 0);
+        printf("  atRest isRunning=%d\n", lv->isRunning() ? 1 : 0);
 
         auto page = [&](const char *m) -> QWidget * {
             clickMenu("&View", QString::fromLatin1(m));
@@ -3677,7 +3677,7 @@ static int guidriveMain(int argc, char **argv)
         //     reported `refused=0' against a guard that was working.
         //   - saving the experiment and reading MAXAGE out of the file. File >
         //     Save Experiment is itself one of the 23 actions the lock
-        //     disables, so under a RunScope there is no file to read.
+        //     disables, so under the lock there is no file to read.
         // What the guard actually protects is the model, so the probe reads
         // the model: gpParameter.getMaxAge(), which putIntoExperiment writes
         // from spinboxMaxAge (SIG_GPParameter.cpp:95).
@@ -3728,16 +3728,20 @@ static int guidriveMain(int argc, char **argv)
         }
         fflush(stdout);
 
+        // evolutionRunning is protected. A pointer to it, formed inside a
+        // derived class, sets it on the real experiment.
+        struct RunState : SIG_GUIGPExperiment {
+            static bool SIG_GUIGPExperiment::*flag() { return &RunState::evolutionRunning; }
+        };
         {
-            SIG_GUIGPExperiment::RunScope lock;
-            printf("  [locked] anyEvolutionRunning=%d\n",
-                   SIG_GUIGPExperiment::anyEvolutionRunning() ? 1 : 0);
+            theExp->*RunState::flag() = true;
+            printf("  [locked] isRunning=%d\n", lv->isRunning() ? 1 : 0);
             const long locked = writtenAge(before + 21);
             printf("  [locked] typed=%d, model reads %ld  refused=%d\n",
                    before + 21, locked, locked == before + 7 ? 1 : 0);
 
-            // The tree-click emit, which drives the 23 locked actions. Under a
-            // RunScope a selection change must NOT re-enable them, and that is
+            // The tree-click emit, which drives the 23 locked actions. While
+            // the flag is set a selection change must NOT re-enable them, and that is
             // the half a review found revertible with the gate still green.
             QAction *imp = nullptr, *add = nullptr;
             for (QAction *a : W->findChildren<QAction *>()) {
@@ -3807,30 +3811,12 @@ static int guidriveMain(int argc, char **argv)
             (void)imp;
         }
 
-        // RunScope's own contract, which is what makes the guard
-        // exception-safe and re-entrant -- the two ways the first per-experiment
-        // bool was wrong. Nesting must hold the lock until the OUTER scope
-        // exits, and an exception must still release it.
-        {
-            SIG_GUIGPExperiment::RunScope outer;
-            const bool a = SIG_GUIGPExperiment::anyEvolutionRunning();
-            bool b = false, c = false;
-            { SIG_GUIGPExperiment::RunScope inner; b = SIG_GUIGPExperiment::anyEvolutionRunning(); }
-            c = SIG_GUIGPExperiment::anyEvolutionRunning();
-            printf("  [nesting] outer=%d inner=%d afterInner=%d  nestsCorrectly=%d\n",
-                   a ? 1 : 0, b ? 1 : 0, c ? 1 : 0, (a && b && c) ? 1 : 0);
-        }
-        printf("  [nesting] afterOuter=%d\n",
-               SIG_GUIGPExperiment::anyEvolutionRunning() ? 1 : 0);
-        try {
-            SIG_GUIGPExperiment::RunScope thrower;
-            throw 1;
-        } catch (int) {}
-        printf("  [unwind] afterThrow anyEvolutionRunning=%d (0 = released)\n",
-               SIG_GUIGPExperiment::anyEvolutionRunning() ? 1 : 0);
-
-        printf("  [released] anyEvolutionRunning=%d\n",
-               SIG_GUIGPExperiment::anyEvolutionRunning() ? 1 : 0);
+        // This checks only that slotEvolutionStopped clears the flag. Neither
+        // call to it in slotStartEvolution runs here. The `[locked]
+        // isRunning=1' line above is its positive control.
+        theExp->slotEvolutionStopped();
+        printf("  [released] after slotEvolutionStopped: isRunning=%d (0 = released)\n",
+               lv->isRunning() ? 1 : 0);
         lv->setCurrentItem(lv->topLevelItem(0));
         QTest::qWait(300);
         const long after = writtenAge(before + 33);
@@ -5374,9 +5360,8 @@ static int guidriveMain(int argc, char **argv)
         int cfgAfterTreeClick = -1;
         // D29's ARMING LINE, and this is the only thing that reaches it.
         // SIG_ExperimentListView::slotSelectionChanged emits
-        // evolutionNotRunning( !SIG_GUIGPExperiment::anyEvolutionRunning() ), and
-        // anyEvolutionRunning() reads g_runningEvolutions, which ONLY
-        // `RunScope runScope;' (SIG_GUIGPExperiment.cpp:326) sets. Delete that line
+        // evolutionNotRunning( !isRunning() ), and isRunning() is true only
+        // after `evolutionRunning = true;' in slotStartEvolution. Delete that line
         // and a tree click mid-run emits TRUE and hands back all 27 locked
         // actions -- 23 appended at SIG_MainWindow.cpp:571-593 plus the four
         // MetaGP ones at :685-688; `evolutionRunningActions.append' appears 27
@@ -5384,9 +5369,9 @@ static int guidriveMain(int argc, char **argv)
         // unlike the MetaGP four, nothing re-enables it afterwards -- so it
         // reports the arming line and nothing else.
         //
-        // The FIRST greying is NOT the arming line: SIG_GUIGPExperiment.cpp:304
-        // emits signalEvolutionNotRunning(false) twenty-two lines BEFORE the
-        // RunScope is constructed, so a run with the arming line deleted still
+        // The FIRST greying is NOT the arming line: slotStartEvolution
+        // emits signalEvolutionNotRunning(false) BEFORE it sets
+        // evolutionRunning, so a run with the arming line deleted still
         // greys everything at Start. An earlier version of this scenario
         // claimed the before-sample gated D29's arming line; it did not.
         // Found by review.
@@ -5409,8 +5394,8 @@ static int guidriveMain(int argc, char **argv)
                 }, 8000);
                 // The BEFORE sample. It does NOT reach D29's arming line --
                 // SIG_MainWindow.cpp:685-688 puts the four MetaGP actions into
-                // evolutionRunningActions and SIG_GUIGPExperiment.cpp:304 greys them
-                // at Start, 22 lines before the RunScope exists. Only the
+                // evolutionRunningActions and slotStartEvolution greys them
+                // at Start, before evolutionRunning is set. Only the
                 // after-tree-click sample below reaches the arming line. An
                 // earlier version of this comment claimed otherwise, 25 lines
                 // from the paragraph withdrawing it. Found by review.
@@ -5564,7 +5549,7 @@ static int guidriveMain(int argc, char **argv)
             // guard from the one the MetaGP actions need.
             if (saveAfterTreeClick == 1) {
                 printf("\n!! D29's ARMING LINE DID NOT HOLD: one tree click re-enabled"
-                       " Save Experiment mid-run, so anyEvolutionRunning() was false"
+                       " Save Experiment mid-run, so isRunning() was false"
                        " while an evolution was running.\n");
                 fflush(stdout); return 1;
             }

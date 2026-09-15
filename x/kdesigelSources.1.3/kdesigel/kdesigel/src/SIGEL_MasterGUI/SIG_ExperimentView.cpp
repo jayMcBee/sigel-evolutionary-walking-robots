@@ -20,7 +20,7 @@
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-#include "SIGEL_MasterGUI/SIG_GUIGPExperiment.h"   // anyEvolutionRunning()
+#include "SIGEL_MasterGUI/SIG_ExperimentListView.h"
 #include <qpushbutton.h>
 #include <qtextstream.h>
 #include <qfiledialog.h>
@@ -44,8 +44,8 @@ namespace SIGEL_MasterGUI
  *  Constructs a SIG_ExperimentView which is a child of 'parent', with the 
  *  name 'name' and widget flags set to 'f' 
  */
-SIG_ExperimentView::SIG_ExperimentView( QWidget* parent,  const char* name, Qt::WindowFlags fl, SIGEL_GP::SIG_GPExperiment &theExperiment )
-  : SIG_ExperimentViewBase( parent, name, fl ), theExperiment( theExperiment )
+SIG_ExperimentView::SIG_ExperimentView( QWidget* parent,  const char* name, Qt::WindowFlags fl, SIGEL_GP::SIG_GPExperiment &theExperiment, SIG_GUIGPExperiment &guiExperiment )
+  : SIG_ExperimentViewBase( parent, name, fl ), theExperiment( theExperiment ), guiExperiment( guiExperiment )
 {
 }
 
@@ -78,7 +78,7 @@ void SIG_ExperimentView::putIntoExperiment() {
   lcdnumberGenerations->display(theExperiment.population.getPoolGeneration());
   // generationProgBar
 
-  if ( SIG_GUIGPExperiment::anyEvolutionRunning() )
+  if ( guiExperiment.experimentListView->isRunning() )
     return;
 
   // put comment into the box dedicated to the comment !

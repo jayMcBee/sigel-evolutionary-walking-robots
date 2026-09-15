@@ -2326,7 +2326,7 @@ Do you want to overwrite?]
   [action changes] none
 
 == D29 RUN LOCK ==
-  atRest anyEvolutionRunning=0
+  atRest isRunning=0
   maxAge as loaded=50
   [unlocked] typed=57, model reads 57  written=1
 #
@@ -2354,7 +2354,7 @@ Do you want to overwrite?]
 # so enabled=1 proved a click had happened and not that MetaGP was on. Found by
 # review.
   [control] MetaGP on at rest: UseMetaGP checked=1  ConfigureSystem enabled=1  (both 1 = the checks below can fail)
-  [locked] anyEvolutionRunning=1
+  [locked] isRunning=1
   [locked] typed=71, model reads 57  refused=1
   [locked] after a tree click ([twoBasesSimpleFitness2.exp]): Add=0 ConfigureSystem=0  UseMetaGP=0  (0 = still locked)
   [locked] after slotEnableNoExperimentActions(true): Add=0 ConfigureSystem=0 UseMetaGP=0  (0 = still locked)
@@ -2363,10 +2363,7 @@ Do you want to overwrite?]
 # every check green. Teeth-tested: with it reverted this line reads
 # NewExperiment=1 OpenExperiment=1 and the scenario fails. Found by review.
   [locked] the two doors: NewExperiment=0 OpenExperiment=0  (0 = locked during a run)
-  [nesting] outer=1 inner=1 afterInner=1  nestsCorrectly=1
-  [nesting] afterOuter=0
-  [unwind] afterThrow anyEvolutionRunning=0 (0 = released)
-  [released] anyEvolutionRunning=0
+  [released] after slotEvolutionStopped: isRunning=0 (0 = released)
   [released] typed=83, model reads 83  writtenAgain=1
 == SCENARIO rngseed ==
 

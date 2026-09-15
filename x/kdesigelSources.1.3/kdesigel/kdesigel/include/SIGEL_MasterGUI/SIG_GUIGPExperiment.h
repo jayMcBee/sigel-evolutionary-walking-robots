@@ -45,6 +45,8 @@ namespace SIGEL_GP
 
 namespace SIGEL_MasterGUI
 {
+  class SIG_ExperimentListView;
+
   /**
    * This class encapsules an experiment on GUI-side.
    *
@@ -244,23 +246,12 @@ namespace SIGEL_MasterGUI
     private:
     public:
       /**
-       * The run state. A COUNT ACROSS ALL EXPERIMENTS, not a bool per
-       * experiment, incremented by RunScope. Keep it that way: any run
-       * anywhere locks, even when the tree shows a different experiment, and
-       * an exception out of start() still decrements.
+       * Returns true while the evolution of this experiment runs.
+       *
+       * A run check asks SIG_ExperimentListView::isRunning() instead, which
+       * covers every experiment.
        */
-      static bool anyEvolutionRunning();
-
-      /** Increments for its lifetime. Exception-safe and re-entrant. */
-      class RunScope
-      {
-        public:
-          RunScope();
-          ~RunScope();
-        private:
-          RunScope( const RunScope & ) = delete;
-          RunScope &operator=( const RunScope & ) = delete;
-      };
+      bool isRunning();
 
 
     protected:
@@ -291,6 +282,14 @@ namespace SIGEL_MasterGUI
        * A pointer to the widget stack in the main window.
        */
       QStackedWidget *widgetStack;
+
+      /**
+       * True while the evolution of this experiment runs.
+       *
+       * slotStartEvolution sets it just before guiGPManager->start().
+       * slotEvolutionStopped clears it, also when start() throws.
+       */
+      bool evolutionRunning;
 
     public:
       
@@ -338,6 +337,11 @@ namespace SIGEL_MasterGUI
        * The SIG_ExperimentItem belonging to the experiment.
        */
       SIG_ExperimentItem *experimentItem;
+
+      /**
+       * The SIG_ExperimentListView that holds experimentItem.
+       */
+      SIG_ExperimentListView *experimentListView;
 
       /**
        * The SIG_GPParameter belonging to the experiment.

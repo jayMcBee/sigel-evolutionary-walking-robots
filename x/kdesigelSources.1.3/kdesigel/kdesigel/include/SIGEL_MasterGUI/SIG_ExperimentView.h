@@ -30,6 +30,8 @@
 
 namespace SIGEL_MasterGUI
 {
+class SIG_GUIGPExperiment;
+
 /**
  * The widget belonging to an experiment. Experiments can be started, paused or stopped here.
  *
@@ -49,8 +51,9 @@ public:
      * @param parent The parent widget of SIG_AllIndividualsView
      * @param name Internal name for Qt.
      * @param theExperiment A reference to the experiment this view belongs to.
+     * @param guiExperiment The SIG_GUIGPExperiment this view belongs to.
      */
-    SIG_ExperimentView( QWidget* parent, const char* name, Qt::WindowFlags fl, SIGEL_GP::SIG_GPExperiment &theExperiment );
+    SIG_ExperimentView( QWidget* parent, const char* name, Qt::WindowFlags fl, SIGEL_GP::SIG_GPExperiment &theExperiment, SIG_GUIGPExperiment &guiExperiment );
 
     /**
      * The destructor.
@@ -85,6 +88,11 @@ public:
      * The SIG_GPExperiment belonging to this experiment.
      */
     SIGEL_GP::SIG_GPExperiment &theExperiment;
+
+    /**
+     * The SIG_GUIGPExperiment this view belongs to.
+     */
+    SIG_GUIGPExperiment &guiExperiment;
 
     void streamToGnuPlot( QTextStream &stream );
 

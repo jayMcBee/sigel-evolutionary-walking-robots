@@ -312,7 +312,7 @@ void SIG_ExperimentListView::slotSelectionChanged( QTreeWidgetItem * theItem )
       // ANY run, not the clicked experiment's. The tree itself is never
       // locked, so a mid-run click can select a not-running experiment; asking
       // that one would hand back every locked action.
-      emit evolutionNotRunning( !SIG_GUIGPExperiment::anyEvolutionRunning() );
+      emit evolutionNotRunning( !isRunning() );
  	  emit actExpChanged();
       experimentDict.value( experimentName )->putAllIntoExperiment();
     }
@@ -351,6 +351,14 @@ SIG_GUIGPExperiment* SIG_ExperimentListView::currentlySelectedExperiment()
     return experimentDict.value( experimentName );
   else
     return 0;
+};
+
+bool SIG_ExperimentListView::isRunning()
+{
+  for ( SIG_GUIGPExperiment *theExperiment : experimentDict )
+    if ( theExperiment->isRunning() )
+      return true;
+  return false;
 };
 
 QString SIG_ExperimentListView::currentlySelectedExperimentName()

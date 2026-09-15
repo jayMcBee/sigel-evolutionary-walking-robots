@@ -97,6 +97,13 @@ class SIG_ExperimentListView : public QTreeWidget
   SIG_GUIGPExperiment* currentlySelectedExperiment();
 
   /**
+   * Returns true while the evolution of any experiment in this list runs.
+   *
+   * The run checks ask this, not a single experiment.
+   */
+  bool isRunning();
+
+  /**
    * This function returns the experiment name of the currently selected experiment.
    *
    * If there is no experiment selected a null-string ( QString()) is returned.
