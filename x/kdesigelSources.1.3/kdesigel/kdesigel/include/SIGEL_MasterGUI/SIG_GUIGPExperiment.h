@@ -253,15 +253,21 @@ namespace SIGEL_MasterGUI
        */
       bool isRunning();
 
-
-    protected:
-
       /**
-       * This function checks if a filename has a given ending.
+       * Returns fileName with the given ending.
+       *
+       * A name that already has the ending comes back unchanged: the file
+       * dialog asks before it lets the user pick an existing file. Otherwise
+       * the ending is added. If a file with that name exists, the date stamp
+       * -yyyy-MM-dd-hh-mm-ss goes between name and ending, so no existing file
+       * is overwritten and nothing has to ask.
        * @param fileName The file name to check.
-       * @param ending The ending to be checked for.
+       * @param ending The ending, without the point.
        */
       QString checkEnding( QString fileName, QString ending );
+
+
+    protected:
 
       /**
        * All widgets belonging to an experiment are stored in this dictionary.

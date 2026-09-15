@@ -1149,11 +1149,11 @@ elif make -s -C "$ROOT" B=build-fast SAN= SIGSAN= guidrive >/tmp/bdb.$$ 2>&1; th
     #              by the oracle, so a move here is a regression against 1.3
     #              and not merely against yesterday. The eighth, .lap, differs
     #              for a reason the baseline records.
-    #   overwrite  C11b -- 1.3 asks "Do you want to overwrite?" and then
-    #              writes the file whichever way you answer, because the second
-    #              write is not inside the switch. Confirmed on the running
-    #              binary. This pins the DEFECT: sentinelSurvived=1 would mean
-    #              the port had started honouring the prompt.
+    #   overwrite  D35 -- an export over an existing file. A name without
+    #              the extension must give a date-stamped file and no prompt.
+    #              The name with it must raise the file dialog's own
+    #              confirmation, as a child of the dialog, and No must leave
+    #              the file alone.
     #   metagui    MT_GUI -- the MetaGP window, which nothing had ever
     #              opened. Its ten validators had never been given C7's C-locale
     #              treatment, so an unpinned QIntValidator(0,1000) called
@@ -1359,7 +1359,7 @@ rm -f "${TMPDIR:-/tmp}"/x11b-gpp.gpp "${TMPDIR:-/tmp}"/x11b-sip.sip \
       "${TMPDIR:-/tmp}"/x11b-lap.lap "${TMPDIR:-/tmp}"/x11b-env.env \
       "${TMPDIR:-/tmp}"/x11b-pop.pop "${TMPDIR:-/tmp}"/x11b-prg.prg \
       "${TMPDIR:-/tmp}"/x11b-ind.ind "${TMPDIR:-/tmp}"/x11b-dat.dat \
-      "${TMPDIR:-/tmp}"/x11b-ow.sip "${TMPDIR:-/tmp}"/x11b-ow \
+      "${TMPDIR:-/tmp}"/x11b-ow.sip "${TMPDIR:-/tmp}"/x11b-ow "${TMPDIR:-/tmp}"/x11b-ow-*.sip \
       "${TMPDIR:-/tmp}"/c11c-lap.lap
 for e in gpp sip lap env pop; do
     rm -f "${TMPDIR:-/tmp}/rt-a-$e.$e" "${TMPDIR:-/tmp}/rt-b-$e.$e" \

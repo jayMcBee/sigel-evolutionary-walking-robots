@@ -24,6 +24,7 @@
 #include <qapplication.h>
 #include <qlabel.h>
 #include <qmessagebox.h>
+#include <QDateTime>
 
 #include "SIGEL_MasterGUI/SIG_GUIGPExperiment.h"
 #include "SIGEL_MasterGUI/SIG_ExperimentListView.h"
@@ -260,8 +261,23 @@ QString SIG_GUIGPExperiment::checkEnding( QString fileName, QString ending )
   QString endWithPoint = "." + ending;
   if( fileName.right( endWithPoint.length() ) == endWithPoint )
     return fileName;
-  else
-    return fileName.append( "." + ending);
+
+  // The file dialog asked only about the name it returned. An existing file
+  // under the name with the ending added is never overwritten: a date stamp
+  // goes between name and ending, one second later while that name is taken
+  // as well.
+  if( !QFile::exists( fileName + endWithPoint ) )
+    return fileName + endWithPoint;
+
+  QDateTime stampTime = QDateTime::currentDateTime();
+  QString stampedName;
+  do
+    {
+      stampedName = fileName + "-" + stampTime.toString( "yyyy-MM-dd-hh-mm-ss" ) + endWithPoint;
+      stampTime = stampTime.addSecs( 1 );
+    }
+  while( QFile::exists( stampedName ) );
+  return stampedName;
 };
 
 void SIG_GUIGPExperiment::slotRightClick( QString option, const QPoint & thePoint )
@@ -385,23 +401,11 @@ void SIG_GUIGPExperiment::slotSimulationParameterImport()
 void SIG_GUIGPExperiment::slotSimulationParameterExport()
 {
   simulationParameter->putIntoExperiment();
-  QString fileName = QFileDialog::getSaveFileName( nullptr, "Export Simulation Parameters...", QString(), "Simulation Parameter Files (*.sip);;All Files (*)" );
+  QString fileName = QFileDialog::getSaveFileName( experimentListView, "Export Simulation Parameters...", QString(), "Simulation Parameter Files (*.sip);;All Files (*)" );
   if( !fileName.isEmpty() )
     {
       fileName = checkEnding( fileName, "sip" );
       QFile file( fileName );
-      if( file.exists() )
-	switch( QMessageBox::warning( 0, "File exists...", "The file " + file.fileName() + " exists!\nDo you want to overwrite?", QMessageBox::Yes | QMessageBox::Default, QMessageBox::No | QMessageBox::Escape ) )
-	  {
-	  case QMessageBox::Yes:
-	    if( file.open(QIODevice::WriteOnly) )
-	      {
-		QTextStream theStream( &file );
-		gpExperiment.simulationParameter.writeToFile( theStream );
-	      }
-	    file.close();
-	    break;
-	  }
       if( file.open(QIODevice::WriteOnly) )
 	{
 	  QTextStream theStream( &file );
@@ -439,23 +443,11 @@ void SIG_GUIGPExperiment::slotEnvironmentImport()
 void SIG_GUIGPExperiment::slotEnvironmentExport()
 {
   environmentView->putIntoExperiment();
-  QString fileName = QFileDialog::getSaveFileName( nullptr, "Export Environment...", QString(), "Environment Files (*.env);;All Files (*)" );
+  QString fileName = QFileDialog::getSaveFileName( experimentListView, "Export Environment...", QString(), "Environment Files (*.env);;All Files (*)" );
   if( !fileName.isEmpty() )
     {
       fileName = checkEnding( fileName, "env" );
       QFile file( fileName );
-      if( file.exists() )
-	switch( QMessageBox::warning( 0, "File exists...", "The file " + file.fileName() + " exists!\nDo you want to overwrite?", QMessageBox::Yes | QMessageBox::Default, QMessageBox::No | QMessageBox::Escape ) )
-	  {
-	  case QMessageBox::Yes:
-	    if( file.open(QIODevice::WriteOnly) )
-	      {
-		QTextStream theStream( &file );
-		gpExperiment.environment.writeToFile( theStream );
-	      }
-	    file.close();
-	    break;
-	  }
       if( file.open(QIODevice::WriteOnly) )
 	{
 	  QTextStream theStream( &file );
@@ -493,23 +485,11 @@ void SIG_GUIGPExperiment::slotGPParameterImport()
 void SIG_GUIGPExperiment::slotGPParameterExport()
 {
   gpParameter->putIntoExperiment();
-  QString fileName = QFileDialog::getSaveFileName( nullptr, "Export GP Parameter...", QString(), "GP Parameter Files (*.gpp);;All Files (*)" );
+  QString fileName = QFileDialog::getSaveFileName( experimentListView, "Export GP Parameter...", QString(), "GP Parameter Files (*.gpp);;All Files (*)" );
   if( !fileName.isEmpty() )
     {
       fileName = checkEnding( fileName, "gpp" );
       QFile file( fileName );
-      if( file.exists() )
-	switch( QMessageBox::warning( 0, "File exists...", "The file " + file.fileName() + " exists!\nDo you want to overwrite?", QMessageBox::Yes | QMessageBox::Default, QMessageBox::No | QMessageBox::Escape ) )
-	  {
-	  case QMessageBox::Yes:
-	    if( file.open(QIODevice::WriteOnly) )
-	      {
-		QTextStream theStream( &file );
-		gpExperiment.gpParameter.writeToFile( theStream );
-	      }
-	    file.close();
-	    break;
-	  }
       if( file.open(QIODevice::WriteOnly) )
 	{
 	  QTextStream theStream( &file );
@@ -548,23 +528,11 @@ void SIG_GUIGPExperiment::slotLanguageParameterImport()
 void SIG_GUIGPExperiment::slotLanguageParameterExport()
 {
   languageParameters->putIntoExperiment();
-  QString fileName = QFileDialog::getSaveFileName( nullptr, "Export Language Parameters...", QString(), "Language Parameter Files (*.lap);;All Files (*)" );
+  QString fileName = QFileDialog::getSaveFileName( experimentListView, "Export Language Parameters...", QString(), "Language Parameter Files (*.lap);;All Files (*)" );
   if( !fileName.isEmpty() )
     {
       fileName = checkEnding( fileName, "lap" );
       QFile file( fileName );
-      if( file.exists() )
-	switch( QMessageBox::warning( 0, "File exists...", "The file " + file.fileName() + " exists!\nDo you want to overwrite?", QMessageBox::Yes | QMessageBox::Default, QMessageBox::No | QMessageBox::Escape ) )
-	  {
-	  case QMessageBox::Yes:
-	    if( file.open(QIODevice::WriteOnly) )
-	      {
-		QTextStream theStream( &file );
-		gpExperiment.robot.getLangParam()->writeToFileTransfer( theStream );
-	      }
-	    file.close();
-	    break;
-	  }
       if( file.open(QIODevice::WriteOnly) )
 	{
 	  QTextStream theStream( &file );
@@ -601,23 +569,11 @@ void SIG_GUIGPExperiment::slotPopulationImport()
 
 void SIG_GUIGPExperiment::slotPopulationExport()
 {
-  QString fileName = QFileDialog::getSaveFileName( nullptr, "Export Population...", QString(), "Population files (*.pop);;All Files (*)" );
+  QString fileName = QFileDialog::getSaveFileName( experimentListView, "Export Population...", QString(), "Population files (*.pop);;All Files (*)" );
   if( !fileName.isEmpty() )
     {
       fileName = checkEnding( fileName, "pop" );
       QFile file( fileName );
-      if( file.exists() )
-	switch( QMessageBox::warning( 0, "File exists...", "The file " + file.fileName() + " exists!\nDo you want to overwrite?", QMessageBox::Yes | QMessageBox::Default, QMessageBox::No | QMessageBox::Escape ) )
-	  {
-	  case QMessageBox::Yes:
-	    if( file.open(QIODevice::WriteOnly) )
-	      {
-		QTextStream theStream( &file );
-		gpExperiment.population.writeToFile( theStream );
-	      }
-	    file.close();
-	    break;
-	  }
       if( file.open(QIODevice::WriteOnly) )
 	{
 	  QTextStream theStream( &file );
@@ -659,7 +615,7 @@ void SIG_GUIGPExperiment::slotRobotImport()
 
 void SIG_GUIGPExperiment::slotGNUPlotExport()
 {
-  QString fileName = QFileDialog::getSaveFileName( nullptr, "Export to GNU plot...", QString(), "GNU plot data file (*.dat);;All Files (*)" );
+  QString fileName = QFileDialog::getSaveFileName( experimentListView, "Export to GNU plot...", QString(), "GNU plot data file (*.dat);;All Files (*)" );
   if( !fileName.isEmpty() )
     {
       fileName = checkEnding( fileName, "dat" );
@@ -704,23 +660,11 @@ void SIG_GUIGPExperiment::slotRobotLoad()
 
 void SIG_GUIGPExperiment::slotRobotSave()
 {
-  QString fileName = QFileDialog::getSaveFileName( nullptr, "Save Robot...", QString(), "Cooked Robot Files (*.crb);;All Files (*)" );
+  QString fileName = QFileDialog::getSaveFileName( experimentListView, "Save Robot...", QString(), "Cooked Robot Files (*.crb);;All Files (*)" );
   if( !fileName.isEmpty() )
     {
       fileName = checkEnding( fileName, "crb" );
       QFile file( fileName );
-      if( file.exists() )
-	switch( QMessageBox::warning( 0, "File exists...", "The file " + file.fileName() + " exists!\nDo you want to overwrite?", QMessageBox::Yes | QMessageBox::Default, QMessageBox::No | QMessageBox::Escape ) )
-	  {
-	  case QMessageBox::Yes:
-	    if( file.open(QIODevice::WriteOnly) )
-	      {
-		QTextStream theStream( &file );
-		gpExperiment.robot.writeToFileTransfer( theStream );
-	      }
-	    file.close();
-	    break;
-	  }
       if( file.open(QIODevice::WriteOnly) )
 	{
 	  QTextStream theStream( &file );

@@ -819,13 +819,22 @@ The file dialog "Load Experiments..." is not evidence either way. In `sigel` it
 is a GTK dialog on its own Wayland connection, not a Qt dialog. It sent
 `set_parent(nil)`.
 
-**Not measured yet:** what a Qt dialog with no parent sends, the overwrite prompt
-included. The test for it stopped at File > Open Experiment, which crashed
-(PORTING.md §9).
+**Measured 2026-09-15, 22:29.** The overwrite prompt in `slotSaveExperiment`,
+`QMessageBox::warning` with parent (nil), sent `get_xdg_dialog` and `set_modal`,
+and no `set_parent` at all. So it is modal, but not tied to the SIGEL window.
+That time it showed on top, right after GTK's save dialog and GTK's own replace
+prompt closed.
 
-**How many.** In the port, 31 of 107 `QMessageBox` calls pass parent `0`, and 21
-of 43 `QFileDialog` calls pass `nullptr`. In 1.3, 56 of 135 `QMessageBox` calls
+**How many.** In the port after D35, 24 of 100 `QMessageBox` calls pass parent
+`0`, and 13 of 43 `QFileDialog` calls pass `nullptr`. In 1.3, 56 of 135 `QMessageBox` calls
 pass no parent: 39 with `0`, 17 with `NULL`.
+
+**Decided as D36.** Jan, 2026-09-15: *"we need to make sure NO SIGEL dialog ever
+can end up out of sight and block the window"*. D35 gave the eight save and
+export file dialogs a parent in the main window. The rest is open. Not measured
+yet: whether a parent attaches GTK's own file dialog on Wayland. Part of it is
+in model classes that D33 keeps untouched: `MT_Controller`, `SIG_GPPopulation`
+and `SIG_GPRemoteZORCFitnessFunction`.
 
 ---
 

@@ -528,6 +528,8 @@ D20 supersedes D5, D24 supersedes D3.
 | **D32** *(signed off 2026-09-09)* | `SIG_Experiment::gpManager` renamed to `guiGPManager` | **A deliberate divergence from the 1.3 name, and the only one of its kind so far.** Four members across the tracked tree were called `gpManager`; three hold an `MT_GPManager *` inside the meta modules, where the name is right. The fourth, `SIG_Experiment.h, SIG_Experiment`, holds a `SIG_GUIGPManager *` — and it was the **only** `SIG_`-typed member in that class not named after its own type with the `SIG_` prefix stripped. The other nine follow the rule exactly (`gpExperiment`, `gpParameter`, `simulationParameter`, `environmentView`, `robotView`, `experimentView`, `allIndividualsView`, `languageParameters`, `experimentItem`); the class's remaining members are named by role (`widgetDict`, `menuGPParameter`, …) and were never in scope. So this is the class's own rule applied to the one member that broke it, not a new scheme. **20 sites**: 13 in `SIG_Experiment.{h,cpp}`, 5 in this file, 2 in `guidrive.cpp`, both comments. The three `MT_GPManager` members and the `SIG_GPManager gpManager` local at `sigel.cpp:261` are correctly named and were left alone; the 1.0 tree holds the same member and is untracked, so a future sweep will re-find it there and should leave it. **VERIFIED AS `.text`-IDENTICAL, NOT AS BYTE-IDENTICAL OBJECTS** — a data member's name never reaches a mangled symbol, but `-g` is on and DWARF records member names, so the objects legitimately differ. `sigel.cpp` is the interesting one and was checked: it is the single translation unit where both names coexist, and its `.text` is unchanged |
 | **D33** *(signed off 2026-09-09)* | Where the mid-run protection lives | **IN THE UI. The model is not to be touched.** Jan: *"we'll focus on the UI side from now on, NO TOUCHING the gp manager or other model classes."* No new behaviour goes into the model. Removing a dead 2003 stub is not new behaviour, so `SIG_GPManager::running()` was deleted — see D29's passage in §10. Nothing is added to `SIG_GPManager` or `MT_Controller`. **The D29 counter, `g_runningEvolutions`, is to be removed, not moved into the model.** Jan, rejecting a move into `SIGEL_GP`: *"I strongly reject changes to the core model just to hot-fix a UI enablement issue."* **Replaced 2026-09-15 by a UI-side run state.** Each experiment has `evolutionRunning`, which `SIG_GUIGPExperiment::isRunning()` returns. Every run check asks `SIG_ExperimentListView::isRunning()`, which is true while any experiment runs. The decision is to lock the whole application during a run; §9 lists what is not locked yet. Jan: *"multiple simul. experiments running makes no sense, we need all resources we can get"* |
 | **D34** *(signed off 2026-09-15)* | `SIG_Experiment` renamed to `SIG_GUIGPExperiment` | **By Jan's decision, and the second deliberate divergence from a 1.3 name, after D32.** The interface experiment class now follows the rule the manager pair already uses: model `SIG_GPManager`, interface `SIG_GUIGPManager`; model `SIG_GPExperiment`, interface `SIG_GUIGPExperiment`. Its files follow it: `SIG_Experiment.h` and `SIG_Experiment.cpp` became `SIG_GUIGPExperiment.h` and `SIG_GUIGPExperiment.cpp`, with the include guard, every include and the 2003 build files. D32's row keeps the old class name, because it records a rename made under it |
+| **D35** *(signed off 2026-09-15)* | Overwrite prompts on save and export | **In these slots the file dialog's own prompt is the only one.** SIGEL's "File exists..." prompt is gone from `SIG_ExperimentListView::slotSaveExperiment`, the five parameter and population exports and `SIG_GUIGPExperiment::slotRobotSave`; the file is written once. When SIGEL adds the extension itself and that file exists, `SIG_GUIGPExperiment::checkEnding` puts the date stamp `-yyyy-MM-dd-hh-mm-ss` between name and ending, one second later while that name is taken too. So nothing is overwritten and nothing asks; `slotGNUPlotExport` gets the same rule. Jan: *"we will refactor to use the file dialog's own prompt now. IF we enter no extension and IF SIGEL adds one and IF the file exists we simply append the datestamp (YYYY-MM-DD-HH-MM-SS) to the provided filename so nothing is ever overwroitten and no prompt is required in that rare edge case"*. **Not covered yet:** save paths that add an extension without `checkEnding` — `SIG_AllIndividualsView` (`.prg`, `.ind`), MT_GUI, and `MT_Controller`. Several of them still show their own "There is another file with this name" prompt: `MT_PopulationWidget::slotExpInd` and `slotSavePop`, six `MT_StatisticsWidget` exports, `MT_IndividualsWidget::slotExportConstants` and `MT_Controller::slotSaveSetup` |
+| **D36** *(signed off 2026-09-15)* | Dialogs out of sight | **No SIGEL dialog may end up out of sight and block the window.** Jan: *"we need to make sure NO SIGEL dialog ever can end up out of sight and block the window, regardless of how we decide to handle save"*. **Not done yet.** D35 gave the eight save and export file dialogs a parent in the main window. The other dialogs without a parent are counted in `future_refactorings.md`, "Dialogs with no parent can end up out of sight"; some of them are in model classes that D33 keeps untouched |
 
 
 ---
@@ -1645,7 +1647,9 @@ cells shared that setting, and the MetaGP run never wrote a byte.*
 the file dialog — class `warning`, title `File exists...`, "Do you want to
 overwrite?", Yes/No — and it appears in **both** cells, because the target
 already exists. `guidrive` arms one handler and answers one dialog, so it would sit on that
-prompt for ever. **Latent here rather than the cause**: these runs deleted
+prompt for ever. *Since D35 the port has no such modal. A save onto an existing
+`.exp` now raises the file dialog's own confirmation inside the click on Save,
+and `acceptFileDialog` does not answer that either.* **Latent here rather than the cause**: these runs deleted
 `/tmp/evolved.exp` first, so no overwrite prompt appeared. The silence has a
 simpler explanation that matches the oracle's process state exactly —
 `QFileDialog::getSaveFileName` is blocking, SIGEL stalls inside
@@ -2472,24 +2476,22 @@ else that stops matching 1.3 still needs justifying as a defect.
 | **1.3 drops a spin box's suffix while editing; this port keeps it.** The register-width box reads `3 bit` at rest, plain `100` during typing and `99 bit` after commit on 1.3; here it reads `10 bit` throughout | Qt 2's `updateDisplay()` wrote prefix + text + suffix into the line edit unprotected, where Qt 6's `QAbstractSpinBox` keeps them out of the editable text | **Recorded, not chased.** No value differs; only what is on screen mid-edit |
 | **Clicking the outer edge of a ticked slider pages on 1.3 and does nothing here.** Qt 2's Motif slider treats the WHOLE widget as clickable — the oracle got a clean page step at all twenty of `yawSlider`'s cross-axis offsets — where Qt 6 honours the groove sub-rect only: on `yawSlider`, y=3,5,7,9 page it and y=1,11,13,15,17,19 do not | a Qt framework behaviour rather than anything the conversion did. Nobody is likely to notice, but it is a fidelity difference | §7's probe-craft list: **take the cross-axis from `SC_SliderGroove`, never from the widget's middle**, and populate the `QStyleOptionSlider` fully — `tickPosition` unset makes `subControlRect` return a tickless groove. *Added here 2026-09-03: the divergences table was billed as complete and omitted this one* |
 | **A click that closes an open menu is swallowed here. 1.3 passes it on.** On 1.3 one real click closes the File menu and selects the list row under it. Here the menu closes and the row does not move, so the user must click again | Qt’s own popup handling, not SIGEL code. The Qt 2 side is in the vendored source: `qapplication_x11.cpp:3402-3416`, in `QApplication::closePopup`, calls **`XAllowEvents(…, ReplayPointer, CurrentTime)`** when the last popup closes on a press outside it. The X server then delivers that press again to the window below. The same code subtracts 10 s from `mouseButtonPressTime`, so the repeated press cannot count as a double click. Qt 6 does not do this. That half is measured, not read, because Qt 6’s sources are not on this machine. Matching 1.3 means overriding popup dismissal for the whole application, which is D28’s "owning a custom widget forever" applied to every popup. The swallowing behaviour is also what every modern toolkit does | `xtest-baseline.txt` section 4, with the control click printed below it |
+| **Overwrite on save and export — D35.** 1.3 asks "File exists... Do you want to overwrite?" after the file dialog, and in five exports and `slotRobotSave` writes the file whatever the answer. The port does not ask: the file dialog's own confirmation asks when the chosen name exists, and a name to which `checkEnding` adds the extension gets a date stamp when that file exists | a decision, 2026-09-15 | `overwrite` in `gui behaviour`: a date-stamped file and `sentinelSurvived=1` without the extension, `childOfTheFileDialog=1` and `sentinelSurvived=1` after No |
 | **A second click on the same menubar item closes the menu here. On 1.3 it stays open** | Same cause and same answer as the row above. Qt 6’s menubar toggles on a second click and Qt 2’s did not. Nothing in SIGEL decides it | `xtest-baseline.txt` section 4 |
 
-**Three 1.3 defects preserved on purpose**, plus the two below them. `MT_GUI`'s
+**Three 1.3 defects preserved on purpose**, plus the one below them. `MT_GUI`'s
 gnuplot export puts a constant x on datasets `2pt destr.` and `3pt destr.`
 (pre-standard `for` scoping); `MT_PopulationWidget`'s save-individuals loop never
 advances the cursor and writes the same individual into every file;
 `callRenderPixMap` assigns `res` from `save()` and then `return true`
 unconditionally, so a failed frame write is reported as success and the caller's
 message box is dead code — **which is why that module carries a
-`-Wunused-but-set-variable`**. And two that are gated: **saving grows the file**
+`-Wunused-but-set-variable`**. And one that is gated: **saving grows the file**
 by exactly **840 bytes = 120 × 7**, one `"      \n"` per individual per save,
 because the reader takes everything between `HISTORY BEGIN{` and `}HISTORY END`
-as ONE string and the writer re-emits it before a fresh terminator; and **the
-overwrite prompt asks and then writes anyway**, because the second
-`file.open(WriteOnly)` sits *outside* the `switch` — so answering No writes the
-file and answering Yes writes it twice. The guarding line is
-`sentinelSurvived=0`; a `1` would mean the port had started honouring the prompt,
-**which would be an improvement and a divergence**.
+as ONE string and the writer re-emits it before a fresh terminator. The
+overwrite prompt that asked and then wrote anyway is gone; see the D35 row in
+the table above.
 
 **And one that is not a defect at all, but is the easiest thing here to break
 by accident: 1.3's TRUNCATED PI.** The sensor path converts radians to degrees
@@ -3674,10 +3676,11 @@ out, and the nine `enabled=false` widgets all re-enabled in code.
   turned five subsequent probes into false negatives. **`QFileDialog` navigates
   as a path is typed and strips the directory out of the field**: use
   `acceptFileDialog()`, do not hand-roll a second one.
-- **Qt 6's `getSaveFileName` raises its own "already exists" box where Qt 2's had
-  none.** It cannot fire on the tested paths *only because the typed name carries
-  no extension* and `checkEnding()` appends it after the dialog closes — a trap
-  for the next probe that decides to type the extension.
+- **Qt 6's `getSaveFileName` raises its own "already exists" box when the typed
+  name exists.** It is modal inside `accept()`, nested under the click on Save,
+  so a handler armed after the click never runs. The `overwrite` scenario types
+  the extension on purpose and answers the box with a poller started before the
+  click. A probe that types an existing name needs the same.
 - **Two clicks are not a double click.** A helper that sleeps 0.35 s and re-moves
   the pointer between them puts them ~750 ms apart, past Qt 2's 400 ms
   `doubleClickInterval`, and they arrive as two singles. The reusable control is a

@@ -222,47 +222,23 @@ void SIG_ExperimentListView::slotSaveExperiment()
   if (currentExperiment != QString() ) {
       SIG_GUIGPExperiment *theExperiment = getByExperimentName( currentExperiment );
       theExperiment->putAllIntoExperiment();
-      QString fileName = QFileDialog::getSaveFileName( nullptr, "Save Experiment...", theExperiment->getName(), "Experiment Files (*.exp);;All Files (*)" );
+      QString fileName = QFileDialog::getSaveFileName( this, "Save Experiment...", theExperiment->getName(), "Experiment Files (*.exp);;All Files (*)" );
       if( !fileName.isEmpty() ) {
-	  		if( fileName.right(4) != ".exp" ) fileName.append( ".exp" );
-	  		QFile file( fileName );
-	  		if( file.exists() )
-	    		switch( QMessageBox::warning( 0, "File exists...", "The file " + file.fileName() + " exists!\nDo you want to overwrite?", QMessageBox::Yes | QMessageBox::Default, QMessageBox::No | QMessageBox::Escape ) )
-	      	{
-	      		case QMessageBox::Yes:
-							if( file.open(QIODevice::WriteOnly) ) {
-		    				QTextStream theStream( &file );
-		    				theExperiment->gpExperiment.saveExperiment( theStream );
-		  		    }
-				    file.close();
+	  fileName = theExperiment->checkEnding( fileName, "exp" );
+	  QFile file( fileName );
+	  if( file.open(QIODevice::WriteOnly) ) {
+	      QTextStream theStream( &file );
+	      theExperiment->gpExperiment.saveExperiment( theStream );
+	  }
+	  file.close();
 
-				    QFileInfo fileInfo( fileName );
+	  QFileInfo fileInfo( fileName );
 
-						experimentDict.take( currentExperiment );
+	  experimentDict.take( currentExperiment );
 
-						theExperiment->setName( fileInfo.fileName() );
+	  theExperiment->setName( fileInfo.fileName() );
 
-						experimentDict.insert( fileInfo.fileName(), theExperiment );
-      
-
-						break;
-	      	} // switch
-	  	else { // file does not exist
-	      if( file.open(QIODevice::WriteOnly) ) {
-		  		QTextStream theStream( &file );
-		  		theExperiment->gpExperiment.saveExperiment( theStream );
-				}
-	      file.close();
-
-	      QFileInfo fileInfo( fileName );
-
-	      experimentDict.take( currentExperiment );
-
-	      theExperiment->setName( fileInfo.fileName() );
-
-	      experimentDict.insert( fileInfo.fileName(), theExperiment );
-      
-	    } // else (file does not exist)
+	  experimentDict.insert( fileInfo.fileName(), theExperiment );
 	
 	  // this is for the autosave function
 	  // so the gpExperiment knows where to save the experiment

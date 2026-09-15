@@ -112,6 +112,8 @@
 #include <QContextMenuEvent>
 #include <QFile>
 #include <QFileInfo>
+#include <QDir>
+#include <QRegularExpression>
 #include <QCryptographicHash>
 #include <QProcess>
 #include <QCursor>
@@ -2158,6 +2160,7 @@ static int guidriveMain(int argc, char **argv)
                        qPrintable(fd->windowTitle()),
                        qPrintable(fd->nameFilters().join(" ;; ")),
                        qPrintable(fd->labelText(QFileDialog::Accept)));
+                printf("  [dialog] parentIsTheMainWindow=%d\n", (fd->parentWidget() && fd->parentWidget()->window() == W) ? 1 : 0);
                 acceptFileDialog(fd, stem);
             });
             if (!clickMenu("&File", "Export", QString::fromLatin1(it.menu))) continue;
@@ -2451,14 +2454,12 @@ static int guidriveMain(int argc, char **argv)
         return 0;
     }
 
-    // --- the overwrite prompt, which 1.3 asks and then ignores -------------
-    // Every one of the five parameter exports is shaped
-    //     if ( file.exists() ) switch ( warning(...) ) { case Yes: write; }
-    //     write;                                   <-- NOT in the switch
-    // so answering NO writes the file anyway, and answering YES writes it
-    // twice. Verified byte-for-byte against the pristine 1.3 source, so it is
-    // 1.3's defect and the port must keep it. Nothing has ever driven it on
-    // either side, because C10's only export went to a fresh path each time.
+    // --- overwrite: an export over an existing file (D35) ------------------
+    // SIGEL itself never asks. A name without the extension, over a taken
+    // name, must give a date-stamped file and no prompt. The name with the
+    // extension must raise the file dialog's own confirmation, as a child of
+    // the dialog, and No must leave the file alone. The export's file dialog
+    // must have the main window as its window.
     if (scenario == "overwrite") {
         const QString stem = scratch() + "/x11b-ow";
         const QString out  = stem + ".sip";
@@ -2469,81 +2470,108 @@ static int guidriveMain(int argc, char **argv)
         // would clean it up, and every later run would spend 240 seconds in the
         // watchdog and blame the pool position. Found by review.
         QFile::remove(stem);
+        // Date-stamped names from earlier runs, so the count below is this run's.
+        const QRegularExpression stampedName(QStringLiteral(
+            "^x11b-ow-\\d{4}-\\d{2}-\\d{2}-\\d{2}-\\d{2}-\\d{2}\\.sip$"));
+        auto stampedFiles = [&]() {
+            QStringList names;
+            for (const QString &n : QDir(scratch()).entryList(
+                     QStringList() << QStringLiteral("x11b-ow-*.sip"), QDir::Files))
+                if (stampedName.match(n).hasMatch()) names << n;
+            return names;
+        };
+        for (const QString &n : stampedFiles()) QFile::remove(scratch() + "/" + n);
+        auto firstLine = [&]() -> QString {
+            QFile g(out);
+            if (!g.open(QIODevice::ReadOnly)) return QString();
+            return QString::fromLatin1(g.readLine()).trimmed();
+        };
         printf("\n== OVERWRITE ==\n");
 
-        // 1. first export -- the file does not exist, so no prompt is due.
+        // 1. First export: the file does not exist, so nothing asks.
         whenModal([stem](QWidget *m) {
             QFileDialog *fd = qobject_cast<QFileDialog *>(m);
-            if (fd) acceptFileDialog(fd, stem); else m->close();
+            if (!fd) { m->close(); return; }
+            printf("  [export dialog] parentIsTheMainWindow=%d\n", (fd->parentWidget() && fd->parentWidget()->window() == W) ? 1 : 0);
+            acceptFileDialog(fd, stem);
         });
         clickMenu("&File", "Export", "Simulation-Parameters");
         QTest::qWait(2500);
         printf("  [first export] exists=%d size=%lld\n", QFile::exists(out),
                QFileInfo(out).size());
 
-        // 2. make the file recognisably different, then export over it and
-        //    answer NO. If the file comes back to the exported content, the
-        //    answer was ignored -- which is what 1.3 does.
         QFile f(out);
         if (f.open(QIODevice::WriteOnly)) { f.write("SENTINEL\n"); f.close(); }
         printf("  [overwritten with sentinel] size=%lld\n", QFileInfo(out).size());
 
-        int dialogs = 0;
-        // Two modals are possible now: Qt 6's own getSaveFileName overwrite
-        // confirmation, which Qt 2 did NOT have, and then SIGEL's. Count them.
+        // 2. The name WITHOUT the extension while x11b-ow.sip exists. The file
+        //    dialog never sees x11b-ow.sip, so it cannot ask. checkEnding()
+        //    must write a date-stamped name instead, and nothing may ask.
+        int modals = 0;
         std::function<void(QWidget *)> handler = [&](QWidget *m) {
-            ++dialogs;
-            QMessageBox *mb = qobject_cast<QMessageBox *>(m);
-            QFileDialog *fd = qobject_cast<QFileDialog *>(m);
-            printf("  [modal %d] class=%s title=[%s]%s\n", dialogs,
-                   m->metaObject()->className(), qPrintable(m->windowTitle()),
-                   mb ? "" : "");
-            if (fd) { acceptFileDialog(fd, stem); whenModal(handler, 4000); return; }
-            if (mb) {
-                // The box quotes the full path, which is machine-specific and
-                // cannot go in a committed baseline. Strip the scratch prefix.
-                QString t = mb->text();
-                t.replace(scratch(), QStringLiteral("<scratch>"));
-                printf("    text=[%s]\n", qPrintable(t));
-                for (QAbstractButton *b : mb->buttons())
-                    printf("    button [%s] default=%d\n", qPrintable(b->text()),
-                           b == mb->defaultButton());
-                printf("  [answering] No\n");
-                fflush(stdout);
-                clickMsgButton(m, QMessageBox::No);
+            ++modals;
+            if (QFileDialog *fd = qobject_cast<QFileDialog *>(m)) {
+                acceptFileDialog(fd, stem);
                 whenModal(handler, 4000);
                 return;
             }
+            printf("  !! a %s [%s] asked, and nothing should\n",
+                   m->metaObject()->className(), qPrintable(m->windowTitle()));
             m->close();
         };
         whenModal(handler);
         clickMenu("&File", "Export", "Simulation-Parameters");
-        QTest::qWait(4000);
+        QTest::qWait(4500);
         cancelModalHandler();
-
-        QFile g(out);
-        QString head;
-        if (g.open(QIODevice::ReadOnly)) { head = QString::fromLatin1(g.readLine()).trimmed(); g.close(); }
-        printf("  [modals seen] %d\n", dialogs);
-        printf("  [after answering NO] size=%lld firstLine=[%s] sentinelSurvived=%d\n",
-               QFileInfo(out).size(), qPrintable(head), head == "SENTINEL" ? 1 : 0);
-        printf("  (1.3 writes the file regardless of the answer -- the write after\n"
-               "   the switch is not inside it. sentinelSurvived=0 is 1.3's defect,\n"
-               "   preserved. A 1 would mean the port started honouring the prompt.)\n");
+        const QStringList stamped = stampedFiles();
+        printf("  [no extension] modals=%d stampedFiles=%d stampedSize=%lld"
+               " firstLine=[%s] sentinelSurvived=%d\n",
+               modals, int(stamped.size()),
+               stamped.isEmpty() ? -1LL
+                                 : (long long)QFileInfo(scratch() + "/" + stamped.first()).size(),
+               qPrintable(firstLine()), firstLine() == "SENTINEL" ? 1 : 0);
         fflush(stdout);
 
-        // The extension case is NOT driven here, deliberately. Above, the
-        // name given to the dialog was `x11b-ow' while the file on disk is
-        // `x11b-ow.sip' -- checkEnding() appends the extension AFTER the
-        // dialog closes -- so Qt's own overwrite check had nothing to fire on
-        // and exactly two modals appeared. Typing the extension makes Qt 6's
-        // getSaveFileName raise its own confirmation INSIDE accept(), with an
-        // exec() that nests in the Return keystroke; driving that through the
-        // menu needs a handler armed inside a nested loop and an earlier
-        // attempt at it looped 27 times before the watchdog. The question it
-        // was asking -- does Qt 6 confirm where Qt 2 did not -- is answered
-        // directly by a five-line probe against QFileDialog, and the answer is
-        // in PORTING.md's C11b section. Not worth a nested-modal harness.
+        // 3. The name WITH the extension while it exists. Now the file dialog's
+        //    own confirmation asks, as a child of the dialog. Qt raises it
+        //    inside accept(), in an exec() nested under the click on Save, so
+        //    its poller runs BEFORE acceptFileDialog clicks. After No the
+        //    dialog is still open, and acceptFileDialog rejects it.
+        auto withExtension = [&](const char *label, QMessageBox::StandardButton answer) {
+            int confirmations = 0, childOfDialog = -1;
+            QString text;
+            QFileDialog *dialog = nullptr;
+            QTimer poll;
+            QObject::connect(&poll, &QTimer::timeout, [&]() {
+                QMessageBox *mb = qobject_cast<QMessageBox *>(QApplication::activeModalWidget());
+                if (!mb) return;
+                poll.stop();
+                ++confirmations;
+                childOfDialog = (dialog && mb->parentWidget() == dialog) ? 1 : 0;
+                text = mb->text();
+                text.replace(scratch(), QStringLiteral("<scratch>"));
+                clickMsgButton(mb, answer);
+            });
+            whenModal([&](QWidget *m) {
+                dialog = qobject_cast<QFileDialog *>(m);
+                if (!dialog) { m->close(); return; }
+                poll.start(50);
+                acceptFileDialog(dialog, out);
+                poll.stop();
+            });
+            clickMenu("&File", "Export", "Simulation-Parameters");
+            QTest::qWait(4500);
+            cancelModalHandler();
+            printf("  [%s] confirmations=%d childOfTheFileDialog=%d\n",
+                   label, confirmations, childOfDialog);
+            printf("    text=[%s]\n", qPrintable(text));
+            printf("  [%s] size=%lld firstLine=[%s] sentinelSurvived=%d stampedFiles=%d\n",
+                   label, (long long)QFileInfo(out).size(), qPrintable(firstLine()),
+                   firstLine() == "SENTINEL" ? 1 : 0, int(stampedFiles().size()));
+            fflush(stdout);
+        };
+        withExtension("answered No", QMessageBox::No);
+        withExtension("answered Yes", QMessageBox::Yes);
         return 0;
     }
 
@@ -3943,7 +3971,11 @@ static int guidriveMain(int argc, char **argv)
         const QString out = scratch() + "/rngseed.exp";
         QFile::remove(out);
         whenModal([out](QWidget *m) {
-            if (QFileDialog *fd = qobject_cast<QFileDialog *>(m)) acceptFileDialog(fd, out);
+            if (QFileDialog *fd = qobject_cast<QFileDialog *>(m)) {
+                printf("  [savedialog] parentIsTheMainWindow=%d\n",
+                       (fd->parentWidget() && fd->parentWidget()->window() == W) ? 1 : 0);
+                acceptFileDialog(fd, out);
+            }
             else m->close();
         });
         clickMenu("&File", "&Save Experiment");
@@ -4068,6 +4100,7 @@ static int guidriveMain(int argc, char **argv)
                    qPrintable(fd->windowTitle()), (int)fd->fileMode(),
                    qPrintable(fd->labelText(QFileDialog::Accept)),
                    fd->selectedFiles().isEmpty() ? "" : qPrintable(fd->selectedFiles().first()));
+            printf("  [savedialog] parentIsTheMainWindow=%d\n", (fd->parentWidget() && fd->parentWidget()->window() == W) ? 1 : 0);
             QLineEdit *le = fd->findChild<QLineEdit *>("fileNameEdit");
             if (!le) { printf("  !! no fileNameEdit\n"); fd->reject(); return; }
             // 1.3 pre-fills this field but does NOT pre-select it, so typing

@@ -123,22 +123,16 @@
 # is Phase D's documented consequence, not a C11b defect: "once the shim goes,
 # load and save become order-preserving".
 #
-# THE OVERWRITE PROMPT IS A 1.3 DEFECT AND IS PRESERVED. All five parameter
-# exports are shaped
-#     if ( file.exists() ) switch ( warning(...) ) { case Yes: write; }
-#     write;                                    <-- NOT inside the switch
-# so answering NO writes the file anyway. Verified in the PRISTINE 1.3 source
-# and then on the RUNNING binary: the oracle wrote a sentinel over an exported
-# file, exported again, answered No, and the sentinel was gone. The line that
-# guards it here is `sentinelSurvived=0'. A 1 would mean the port had started
-# honouring the prompt -- an improvement, and a divergence.
-#
-# Two dialogs appear, not three. Qt 6's getSaveFileName raises its own
-# "already exists" confirmation where Qt 2's had none, but it cannot fire here:
-# the name typed carries no extension, checkEnding() appends it AFTER the
-# dialog has closed, so Qt's check sees a name that does not exist. Typing the
-# extension does produce Qt's extra box; that is a file-dialog difference and
-# section 7 already accepts those.
+# OVERWRITE, D35. SIGEL's own "File exists..." prompt is gone, and the file
+# dialog's confirmation is the only one. Three cases, each over a sentinel file:
+#   no extension typed   checkEnding() adds .sip, finds that file taken and
+#                        writes x11b-ow-<date stamp>.sip. Nothing asks, and the
+#                        sentinel survives.
+#   extension, No        the dialog's own confirmation asks, as a child of the
+#                        dialog. The dialog stays open and is rejected, and the
+#                        sentinel survives.
+#   extension, Yes       the same confirmation; the file is written.
+# 1.3 asked, and then wrote the file whatever the answer.
 #
 # QTest IS NOT A MOUSE -- see the C11a note above. The oracle's side was driven
 # by real XTest, so every comparison here has a genuine click on one end.
@@ -1049,6 +1043,7 @@ selected=55658
 -- Export > GP-Parameters
   [modal] class=QFileDialog title=[Export GP Parameter...]
   [dialog] title=[Export GP Parameter...] filters=[GP Parameter Files (*.gpp) ;; All Files (*)] accept=[&Save]
+  [dialog] parentIsTheMainWindow=1
   bytes=1299 sha256=88e851e2b9d1b23185bf453c6c99cdc581be01d2547961c6fdb50fc3c6873234 newlines=101 endsWithNewline=1
   crCount=0
   head0  [RANDOMSEED]
@@ -1061,6 +1056,7 @@ selected=55658
 -- Export > Simulation-Parameters
   [modal] class=QFileDialog title=[Export Simulation Parameters...]
   [dialog] title=[Export Simulation Parameters...] filters=[Simulation Parameter Files (*.sip) ;; All Files (*)] accept=[&Save]
+  [dialog] parentIsTheMainWindow=1
   bytes=305 sha256=c672eeabd54245663e8a308d68cdec2343a0b66840426cf4d7648606e1a1df10 newlines=35 endsWithNewline=1
   crCount=0
   head0  [TIMETOSIMULATE]
@@ -1073,6 +1069,7 @@ selected=55658
 -- Export > Language-Parameters
   [modal] class=QFileDialog title=[Export Language Parameters...]
   [dialog] title=[Export Language Parameters...] filters=[Language Parameter Files (*.lap) ;; All Files (*)] accept=[&Save]
+  [dialog] parentIsTheMainWindow=1
   bytes=401 sha256=e40ca1caa26dd424faf1eca7d336b16e963a714a8c95b059dabed79a3ce72af0 newlines=14 endsWithNewline=1
   crCount=0
   head0  [LanguageParameters 3 8 5000 13]
@@ -1085,6 +1082,7 @@ selected=55658
 -- Export > Environment
   [modal] class=QFileDialog title=[Export Environment...]
   [dialog] title=[Export Environment...] filters=[Environment Files (*.env) ;; All Files (*)] accept=[&Save]
+  [dialog] parentIsTheMainWindow=1
   bytes=299 sha256=383d1f4f142ff26bff698d9a62e73a441154d8d0329bc36b1ae560935b1f73b1 newlines=43 endsWithNewline=1
   crCount=0
   head0  [YPLANELEVEL]
@@ -1097,6 +1095,7 @@ selected=55658
 -- Export > Population
   [modal] class=QFileDialog title=[Export Population...]
   [dialog] title=[Export Population...] filters=[Population files (*.pop) ;; All Files (*)] accept=[&Save]
+  [dialog] parentIsTheMainWindow=1
   bytes=2738900 sha256=ccca841d6b6b4be23e9004c555c4a0a9b64f399c582f0a25a65aed0b1cdb5ad5 newlines=133076 endsWithNewline=0
   crCount=0
   head0  [WITHHISTORY]
@@ -1109,6 +1108,7 @@ selected=55658
 -- Export > Program
   [modal] class=QFileDialog title=[Export program...]
   [dialog] title=[Export program...] filters=[Program files (*.prg) ;; All Files (*)] accept=[&Save]
+  [dialog] parentIsTheMainWindow=0
   bytes=6616 sha256=f940751765c869f16f62333dafd34dbe0e66b6474577bf4209e9e8de70cc3214 newlines=299 endsWithNewline=1
   crCount=0
   head0  [       MOD -19712,-1602]
@@ -1121,6 +1121,7 @@ selected=55658
 -- Export > Individual
   [modal] class=QFileDialog title=[Export individual...]
   [dialog] title=[Export individual...] filters=[Individual files (*.ind) ;; All Files (*)] accept=[&Save]
+  [dialog] parentIsTheMainWindow=0
   bytes=22113 sha256=3e56bf03233a1603bf26671262cebbe7b4fa37dee4cff7a8d5fe1048916e2138 newlines=1076 endsWithNewline=0
   crCount=0
   head0  []
@@ -1133,6 +1134,7 @@ selected=55658
 -- Export > ...to GNU plot
   [modal] class=QFileDialog title=[Export to GNU plot...]
   [dialog] title=[Export to GNU plot...] filters=[GNU plot data file (*.dat) ;; All Files (*)] accept=[&Save]
+  [dialog] parentIsTheMainWindow=1
   bytes=17420 sha256=7f5c3162ee74483fe925badf413bbba23e1f50bf3e6dc8a6a81d10fe96591a3f newlines=532 endsWithNewline=1
   crCount=0
   head0  [1 0.00112766 6.99488e-06 0.000109007]
@@ -1243,24 +1245,25 @@ selected=55658
 
 == OVERWRITE ==
   [modal] class=QFileDialog title=[Export Simulation Parameters...]
+  [export dialog] parentIsTheMainWindow=1
   [first export] exists=1 size=305
   [overwritten with sentinel] size=9
   [modal] class=QFileDialog title=[Export Simulation Parameters...]
-  [modal 1] class=QFileDialog title=[Export Simulation Parameters...]
-  [modal] class=QMessageBox title=[File exists...]
-  [modal 2] class=QMessageBox title=[File exists...]
-    text=[The file <scratch>/x11b-ow.sip exists!
-Do you want to overwrite?]
-    button [&Yes] default=1
-    button [&No] default=0
-  [answering] No
-  [answering] &No
   [modal] NONE appeared within 4000 ms
-  [modals seen] 2
-  [after answering NO] size=305 firstLine=[TIMETOSIMULATE] sentinelSurvived=0
-  (1.3 writes the file regardless of the answer -- the write after
-   the switch is not inside it. sentinelSurvived=0 is 1.3's defect,
-   preserved. A 1 would mean the port started honouring the prompt.)
+  [no extension] modals=1 stampedFiles=1 stampedSize=305 firstLine=[SENTINEL] sentinelSurvived=1
+  [modal] class=QFileDialog title=[Export Simulation Parameters...]
+  [answering] &No
+  [filedialog] STILL open after clicking accept -- rejecting it
+  [answered No] confirmations=1 childOfTheFileDialog=1
+    text=[x11b-ow.sip already exists.
+Do you want to replace it?]
+  [answered No] size=9 firstLine=[SENTINEL] sentinelSurvived=1 stampedFiles=1
+  [modal] class=QFileDialog title=[Export Simulation Parameters...]
+  [answering] &Yes
+  [answered Yes] confirmations=1 childOfTheFileDialog=1
+    text=[x11b-ow.sip already exists.
+Do you want to replace it?]
+  [answered Yes] size=305 firstLine=[TIMETOSIMULATE] sentinelSurvived=0 stampedFiles=1
 == SCENARIO dialogs ==
 
 == STEP 1: fresh start, no experiment ==
@@ -2479,6 +2482,7 @@ Do you want to overwrite?]
   add dialog: n=5
   individuals after Add=5
   [modal] class=QFileDialog title=[Save Experiment...]
+  [savedialog] parentIsTheMainWindow=1
   programs=5  instructionLines=1018
   perProgramLengths=[30,152,638,45,153]
   sha256(instructions)=6283c93317ee296b8d16e761ea31ccc7fa01e5b3be6d866569b3cac4075e366f
