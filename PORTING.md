@@ -3155,7 +3155,11 @@ on `Xvfb` with no window manager. The real `sigel`, as a native Wayland window,
 loaded the same file once without a crash, and crashed the same way at 20:21,
 under gdb. In the Wayland log of that run, the "Updating..." progress window of
 `SIG_AllIndividualsView::slotCompleteRefreshList` closed just before the crash.
-The fix is not decided.
+On 2026-09-16 at 00:14 the real `sigel` crashed the same way on a second route:
+`slotLoadExperiment` calls `SIG_GUIGPExperiment::getAllOutOfExperiment`, which
+reaches `SIG_AllIndividualsView::slotCompleteRefreshList`. Its progress loop runs
+`processEvents`, and a window-focus event reaches the tree from there. So far the
+real `sigel` has crashed on 2 of 4 opens. The fix is not decided.
 
 **Slaves crash during a GUI run.** Seen 2026-09-15 in a run of
 `twoBasesLocal.exp`, saved in the repo root at 18:33: termination by time, with a
