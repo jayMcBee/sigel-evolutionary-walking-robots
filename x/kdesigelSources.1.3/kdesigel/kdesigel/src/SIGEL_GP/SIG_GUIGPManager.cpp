@@ -92,7 +92,7 @@ namespace SIGEL_GP
                 poolPos, static_cast< long long >( individualItems.size() ) );
 
     // update generations display (this line looks cool, doesn't it ?!)
-    //guiExperiment.experimentView->lcdnumberGenerations->display(actExperiment.population.getPoolGeneration());
+    guiExperiment.experimentView->lcdnumberGenerations->display(actExperiment.population.getPoolGeneration());
   };
 
 }

@@ -779,26 +779,29 @@ happening??"*
 `SIG_GUIGPManager::updateIndividualView` calls `SIG_IndividualListItem::setTo`
 as results come in, and that rewrites the name, fitness and age of the row.
 
-**What does not.** The generation counter on the Experiment page,
-`lcdnumberGenerations`. During a run, only `SIG_ExperimentView::putIntoExperiment`
-writes it.
-The manager's two calls that would update it are commented out in
-`SIG_GUIGPManager.cpp`, in the constructor and in `updateIndividualView`. 1.3 has
-them commented out too. But in 1.3, `putAllIntoExperiment` always called
-`experimentView->putIntoExperiment()`, so every tree click refreshed the counter.
-In the port, `SIG_GUIGPExperiment::putAllIntoExperiment` returns first while a run
-is on, so a tree click does not refresh the counter during a run.
+**The generation counter during a run, since 2026-09-15 (D37).**
+`SIG_GUIGPManager::updateIndividualView` writes the model's pool generation into
+`lcdnumberGenerations`. `SIG_GPManager::run` calls it for every individual right
+after it raises `poolGeneration`, so the counter changes when a generation
+completes. The next pass of the event loop, in `haveABreak`, repaints it. The
+matching call in the `SIG_GUIGPManager` constructor stays commented out:
+`slotStartEvolution` already refreshes the counter through
+`putAllIntoExperiment` before the run. 1.3 has both calls commented out. No gate
+covers it, because no gate starts a run. The ungated `evolution` scenario samples
+the counter during a run. A gate without PVM may be possible with a run that has
+no tournaments; it is not tried.
 
 **After it, since 2026-09-15.** `SIG_GUIGPExperiment::slotEvolutionStopped` writes
 the model's generation into the counter when a run ends. The `runlock` scenario
-checks it. Before that change the counter moved only when something called
+checks it. In a normal run `updateIndividualView` has already shown that value,
+so this write changes nothing visible there; it is kept. Before that change the counter moved only when something called
 `SIG_ExperimentView::putIntoExperiment`, such as the next Start. Jan,
 2026-09-15: *"Major annoyance: generations counter does NOT update, not even when
 stopped - only when RESTARTING!"*
 
-**Where a fix can go.** The commented calls are in `SIGEL_GP`, which D33 keeps
-untouched. The tree-click refresh is in `SIGEL_MasterGUI`. See also "The window
-stops answering during a run".
+**Where the rest stands.** D37 covers the counter during a run. The constructor
+call in `SIG_GUIGPManager` stays commented out. See also "The window stops
+answering during a run".
 
 ---
 

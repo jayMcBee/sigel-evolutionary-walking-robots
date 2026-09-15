@@ -3850,10 +3850,10 @@ static int guidriveMain(int argc, char **argv)
         // pool generation. Neither call to it in slotStartEvolution runs here.
         // The `[locked] isRunning=1' line above is the flag's positive control.
         //
-        // slotEvolutionStopped also shows the generation the run reached. A
-        // run raises poolGeneration and leaves the display alone, so this does
-        // the same: the `before' value must differ from the model, which is
-        // the positive control for the `after' value.
+        // slotEvolutionStopped also shows the generation the run reached. This
+        // raises poolGeneration without touching the display, so the `before'
+        // value differs from the model. That is the positive control for the
+        // `after' value.
         QLCDNumber *gens = theExp->experimentView->lcdnumberGenerations;
         const int genAtRest = theExp->gpExperiment.population.getPoolGeneration();
         theExp->gpExperiment.population.poolGeneration = genAtRest + 3;
