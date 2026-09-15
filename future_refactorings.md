@@ -719,6 +719,116 @@ assess the pattern from it when the time comes.
 
 ---
 
+## Say why a run ended at once
+
+**Asked for by Jan, 2026-09-15:** *"we need some kind of feedback in the UI for
+that case"*.
+
+**The case.** Start runs the evolution, and the run ends at once when its
+termination condition already holds. Every shipped experiment terminates by time,
+on a date in 2001: `TERMINATIONUSESDATE 1`, and `TERMINATIONMODEL 0`, which is
+`byTime`. `SIG_GPManager::run` first evaluates every individual that has no
+fitness yet, through `evalNewIndis`. After that,
+`SIG_GPManager::checkTerminationConditions` returns true. The shipped populations
+are already evaluated, so the run ends at once. The Start button greys and comes
+back, and the window shows nothing else. It looks as if Start did nothing.
+
+**What is required.** The GUI tells the user that the run ended because its
+termination condition was already met, and which condition it was. How and where
+is not decided.
+
+**Where to look.** `SIG_GUIGPExperiment::slotStartEvolution`, which calls
+`guiGPManager->start()` and then `slotEvolutionStopped()`, and
+`SIG_GPManager::checkTerminationConditions`. The setting is on the GP Parameters
+page, tab Evolution control, "Termination by".
+
+---
+
+## The window stops answering during a run
+
+**Reported by Jan, 2026-09-15,** during a run of `twoBasesLocal.exp`: now and then
+the desktop says SIGEL is not responding. *"we should look into that as well"*.
+
+**What the source shows.** `SIG_GUIGPExperiment::slotStartEvolution` runs the
+whole evolution inside `guiGPManager->start()`, on the GUI thread. During the
+run, the window handles input mainly in `SIG_GUIGPManager::haveABreak()`, which
+calls `processEvents` for at most `getPassiveTime()` milliseconds.
+`SIG_GPPopulation::writeToFile` also calls `processEvents`.
+`SIG_GPManager::evolutionLoop` calls `haveABreak()` once per pass of its outer
+loop. Inside one pass, the inner loop over `taskCanDoList` calls
+`usleep(300000)` for each entry it visits. `evalNewIndis` and `evalNeededIndis`
+call `haveABreak()` too. So the time between two calls to `haveABreak()` grows
+with the number of entries one pass visits, and the window does not answer in
+that time. PORTING.md §7, "A real evolution under `guidrive`", describes the
+same loop.
+
+**Not measured:** how long that time is, and how many entries one pass visits.
+
+**The constraint.** The event pump and the sleep are in `SIGEL_GP`
+(`SIG_GPManager`, `SIG_GUIGPManager`). D33 keeps the model untouched, so a fix
+needs a decision first.
+
+---
+
+## Show progress during a run
+
+**Asked by Jan, 2026-09-15,** during a run: *"no feedback in UI - is anything
+happening??"*
+
+**What changes during a run.** The Individuals list.
+`SIG_GUIGPManager::updateIndividualView` calls `SIG_IndividualListItem::setTo`
+as results come in, and that rewrites the name, fitness and age of the row.
+
+**What does not.** The generation counter on the Experiment page,
+`lcdnumberGenerations`. Only `SIG_ExperimentView::putIntoExperiment` writes it.
+The manager's two calls that would update it are commented out in
+`SIG_GUIGPManager.cpp`, in the constructor and in `updateIndividualView`. 1.3 has
+them commented out too. But in 1.3, `putAllIntoExperiment` always called
+`experimentView->putIntoExperiment()`, so every tree click refreshed the counter.
+In the port, `SIG_GUIGPExperiment::putAllIntoExperiment` returns first while a run
+is on, so the counter does not refresh during a run.
+
+**Nor after it.** `SIG_GUIGPExperiment::slotEvolutionStopped` enables Start,
+disables Stop, enables the five pages again, and does not refresh the counter. It
+moves again when something calls `SIG_ExperimentView::putIntoExperiment`, for
+example the next Start, through `putAllIntoExperiment`, or a click on a different
+tree item. Jan,
+2026-09-15: *"Major annoyance: generations counter does NOT update, not even when
+stopped - only when RESTARTING!"*
+
+**Where a fix can go.** The commented calls are in `SIGEL_GP`, which D33 keeps
+untouched. The tree-click refresh is in `SIGEL_MasterGUI`. See also "The window
+stops answering during a run".
+
+---
+
+## Dialogs with no parent can end up out of sight
+
+**Seen by Jan, 2026-09-15:** SIGEL would not quit. A gdb backtrace showed the
+main thread waiting in `QMessageBox::warning`, called from
+`SIG_ExperimentListView::slotSaveExperiment`: the prompt "File exists... Do you
+want to overwrite?", created with parent 0. While a modal prompt waits, the other
+windows take no input, Quit included.
+
+**What the Wayland log shows** (`WAYLAND_DEBUG=1`, SIGEL as a native Wayland
+window, the same day). "Updating...", the `QProgressDialog` in
+`SIG_AllIndividualsView::slotCompleteRefreshList`, has the view as its parent.
+The log shows `set_parent` to the main window, and `set_modal`.
+
+The file dialog "Load Experiments..." is not evidence either way. In `sigel` it
+is a GTK dialog on its own Wayland connection, not a Qt dialog. It sent
+`set_parent(nil)`.
+
+**Not measured yet:** what a Qt dialog with no parent sends, the overwrite prompt
+included. The test for it stopped at File > Open Experiment, which crashed
+(PORTING.md §9).
+
+**How many.** In the port, 31 of 107 `QMessageBox` calls pass parent `0`, and 21
+of 43 `QFileDialog` calls pass `nullptr`. In 1.3, 56 of 135 `QMessageBox` calls
+pass no parent: 39 with `0`, 17 with `NULL`.
+
+---
+
 ## Remove the Windows and Visual Studio support
 
 **Decided 2026-09-09 by Jan.** The Windows half of this tree is dead. It does

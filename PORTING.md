@@ -230,7 +230,7 @@ found a real defect.** §0 has the rule; it is not optional.
 ├── check.sh                                per-file compile check, §7
 ├── dictorder-dump.sh                       dictionary-order check, §7
 ├── expstruct.py                            structural fingerprint of an .exp, C11
-├── guidrive.cpp                            the GUI behaviour harness, 31 scenarios
+├── guidrive.cpp                            the GUI behaviour harness, 32 scenarios
 ├── fitness-check.sh                        fitness check, §7
 ├── pvm-check.sh                            does PVM run? Phase P, P3 and P4
 ├── pvm_link.cpp                            SIGEL's PVM objects vs real PVM
@@ -3130,6 +3130,36 @@ lines, 28 doc comments naming a Qt 2 type, and six form minimums — closed on
 `SIG_GUIGPExperiment::slotStopEvolution` sets `guiGPManager->userTerminated`,
 and `guiGPManager` is 0 until a Start passes the three checks in
 `slotStartEvolution`. 1.3 has the same code. Jan, 2026-09-15: investigate later.
+
+**File > Open Experiment can crash when the tree gets focus during the load.**
+`SIG_ExperimentListView::slotLoadExperiment` adds the tree item, then calls
+`SIG_GPExperiment::loadExperiment`, then inserts the experiment into
+`experimentDict`. The load reaches `SIG_GPPopulation::readFromFile`, which calls
+`processEvents`. A focus event from the window manager arrives there.
+`QAbstractItemView::focusInEvent` sets the current item, `currentItemChanged`
+calls `SIG_ExperimentListView::slotSelectionChanged`, and that calls
+`SIG_GUIGPExperiment::slotSelectionChanged` on a null pointer. 1.3 connected
+`selectionChanged` and made the item non-selectable during the load. The port
+connects `currentItemChanged`, and Qt 6 sets the current item even when the item
+is not selectable. Seen 2026-09-15 under xcb on the real desktop:
+`guidrive hold` exited 139, and `guidrive open` under gdb gave the backtrace.
+Not seen offscreen, nor
+on `Xvfb` with no window manager. The real `sigel`, as a native Wayland window,
+loaded the same file once without a crash, and crashed the same way at 20:21,
+under gdb. In the Wayland log of that run, the "Updating..." progress window of
+`SIG_AllIndividualsView::slotCompleteRefreshList` closed just before the crash.
+The fix is not decided.
+
+**Slaves crash during a GUI run.** Seen 2026-09-15 in a run of
+`twoBasesLocal.exp`, saved in the repo root at 18:33: termination by time, with a
+date in 2030, and 4 slaves on this machine. The PVM daemon log has 123 lines
+`Invalid storage access`, from 18:34:11 to 19:53:02.
+`sigel_slave.cpp, sigelStandardSignalHandler` prints that text on SIGSEGV, sends
+fitness 0 to the master and exits. 1.3 has the same handler. Each line is one
+individual: its slave crashed, so it got fitness 0. Slaves kept starting at about
+one per second: the PVM task ids rose by 3937 from 18:34:11 to 19:33:18, and a
+10-second sample saw 10 slaves. The cause is not known. The two-generation run in
+§7, "A real evolution under `guidrive`", had no fitness value of 0.
 
 **Start is not locked during a run yet, nor are the pages of the other
 experiments.** `slotStartEvolution` has no run check. It greys only its own

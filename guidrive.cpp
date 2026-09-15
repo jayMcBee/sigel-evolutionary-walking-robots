@@ -37,15 +37,16 @@
     export     File > Export > Program for one named individual
     visualize  Individuals > Visualize, to capture the PVM payload
     evolution  Start and Stop  (needs PVM and a real sigel_slave)
+    hold       open, start PVM, then leave the window to a person; no watchdog
   ... and pages, pagesave, exportall, roundtrip, overwrite, dialogs, metagui,
   clipcheck, formsize, slavegui, metadrive, runlock, rngseed, pvmcrash.
   The list above is not maintained in step with the code. The count that
   cannot go stale is
     command grep -o 'scenario == "[a-z]*"' guidrive.cpp | sed 's/.*"\(.*\)"/\1/' | sort -u | wc -l
-  which reads 30 today. A plain -c over the same pattern gives 34, which is a
-  count of LINES rather than of matches (`grep -o | wc -l' gives 37): three
-  names -- evolution, visualize and pvmcrash -- are each tested in more than one
-  condition. The old wording said "two scenarios are tested twice", which stopped
+  which reads 32 today. A plain -c over the same pattern gives 36, which is a
+  count of LINES rather than of matches (`grep -o | wc -l' gives 40): four
+  names -- evolution, visualize, pvmcrash and hold -- are each tested in more
+  than one condition. The old wording said "two scenarios are tested twice", which stopped
   describing the tree when pvmcrash was added.
 
   Environment:
@@ -440,7 +441,7 @@ static void tearDownPvm()
 // SIGTERMs every local task on the way out (pvmd.c:1485-1517); this process is
 // one, having enrolled with pvm_mytid(). Measured: 143, not the scenario's
 // return value. That silently erased `return 1' from EVERY assertion in the
-// three scenarios that start PVM -- evolution, visualize, pvmcrash -- so a
+// scenarios that start PVM -- evolution, visualize, pvmcrash, hold -- so a
 // failed assertion and a clean pass left the same status behind. Found by
 // review. The handler re-exits with the code we already decided on.
 static int g_exitCode = 0;
@@ -1755,12 +1756,14 @@ static int guidriveMain(int argc, char **argv)
     // this is stuck, not busy.
     const bool slow = (scenario == "evolution" || scenario == "visualize"
                        || scenario == "pvmcrash");
-    armWatchdog(qEnvironmentVariableIntValue("SIGEL_WATCHDOG_MS") > 0
-                    ? qEnvironmentVariableIntValue("SIGEL_WATCHDOG_MS")
-                    : (slow ? 900000 : 240000));
+    // `hold' hands the window to a person, so it has no time limit.
+    if (scenario != "hold")
+        armWatchdog(qEnvironmentVariableIntValue("SIGEL_WATCHDOG_MS") > 0
+                        ? qEnvironmentVariableIntValue("SIGEL_WATCHDOG_MS")
+                        : (slow ? 900000 : 240000));
 
     if (scenario == "visualize" || scenario == "evolution"
-        || scenario == "pvmcrash") {
+        || scenario == "pvmcrash" || scenario == "hold") {
         int info = pvm_start_pvmd(0, 0, 0);
         int mytid = pvm_mytid();
         g_pvmOurDaemon = (info == 0);   // PvmDupHost means someone else's
@@ -1792,6 +1795,10 @@ static int guidriveMain(int argc, char **argv)
     step("after View > Population", true, true, true);
 
     if (scenario == "open") return 0;
+
+    // `hold': the experiment is open and PVM is up. Hand the window to a
+    // person until they close it.
+    if (scenario == "hold") return app.exec();
 
     // --- the gate: one deterministic pass over the behaviour that has an
     // --- oracle reading behind it. Everything here was compared against the
