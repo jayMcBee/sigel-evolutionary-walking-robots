@@ -98,8 +98,8 @@ bool guiEnabled = true;
 
 int main( int argc, char *argv[] ) {
   // Qt 6 randomises QHash iteration order per process unless the seed is
-  // pinned, and `sigel' links THREE QHashes -- SIG_Experiment's widgetDict and
-  // menuDict, and SIG_ExperimentListView's experimentDict. ~SIG_Experiment
+  // pinned, and `sigel' links THREE QHashes -- SIG_GUIGPExperiment's widgetDict and
+  // menuDict, and SIG_ExperimentListView's experimentDict. ~SIG_GUIGPExperiment
   // iterates widgetDict and calls widgetStack->removeWidget() on each, and that
   // stack is SHARED -- SIG_ExperimentListView hands its own widgetStack to every
   // experiment it constructs. So with a second experiment still loaded, the

@@ -303,7 +303,7 @@ CORE := SIGEL_Tools SIGEL_Environment MT_GPSystem SIGEL_Robot SIGEL_Program \
 # These three exclusions all existed for one reason -- the GUI was not ported --
 # and C6/C7/C8 removed it. MT_Controller.cpp constructs an MT_MainWindow and
 # makes 23 mainWindow-> accesses (MT_GUI, C6); SIG_GUIGPManager.cpp is its
-# counterpart in SIGEL_GP and reaches into SIG_Experiment (SIGEL_MasterGUI, C7);
+# counterpart in SIGEL_GP and reaches into SIG_GUIGPExperiment (SIGEL_MasterGUI, C7);
 # the non-WIN ZORC fitness function was still on the Qt 2 API until C8. All
 # three now compile, and C9 needs all three: linking `sigel' without them fails
 # on 20 undefined MT_Controller symbols plus SIG_GUIGPManager's vtable.
@@ -325,7 +325,7 @@ GUI_LIBS := $(patsubst %,$(LIB)/lib%.a,$(GUI))
 gui: $(GUI_LIBS)
 
 # The slave is not a cut-down master: it links its OWN three GUI modules and
-# never the master's two. Handing it all five drags SIG_Experiment in through
+# never the master's two. Handing it all five drags SIG_GUIGPExperiment in through
 # the master's moc objects, which drags in MT_Controller, which is exactly the
 # master SIG_GPExperiment the slave must not have -- the assertion on the link
 # caught precisely that.

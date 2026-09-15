@@ -31,7 +31,7 @@
 namespace SIGEL_GP
 {
 
-  SIG_GUIGPManager::SIG_GUIGPManager( SIGEL_MasterGUI::SIG_Experiment &guiExperiment )
+  SIG_GUIGPManager::SIG_GUIGPManager( SIGEL_MasterGUI::SIG_GUIGPExperiment &guiExperiment )
     : SIG_GPManager( guiExperiment.gpExperiment ),
       guiExperiment( guiExperiment ),
       individualItems( guiExperiment.allIndividualsView->individualList->listviewIndividuals->topLevelItemCount() )
@@ -69,7 +69,7 @@ namespace SIGEL_GP
   void SIG_GUIGPManager::messageEvolutionStop()
   {
     // Sets the flag, stops nothing itself. slotEvolutionStopped() stays
-    // commented out: SIG_Experiment calls it after start() returns, and
+    // commented out: SIG_GUIGPExperiment calls it after start() returns, and
     // calling it here too would announce the run finished while it still runs.
     schlussJetzt = true;
     //    guiExperiment.slotEvolutionStopped();

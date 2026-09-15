@@ -74,7 +74,7 @@ void SIG_ExperimentListView::slotNewExperiment()
   if( experimentExists( project ) )
     project = getAlternativeName( project );
   SIG_ExperimentItem *theNewItem = new SIG_ExperimentItem( this, project );
-  SIG_Experiment *theNewExperiment = new SIG_Experiment( project, widgetStack, theNewItem );
+  SIG_GUIGPExperiment *theNewExperiment = new SIG_GUIGPExperiment( project, widgetStack, theNewItem );
   QObject::connect( theNewExperiment,
 		    SIGNAL( signalEvolutionNotRunning( bool ) ),
 		    this,
@@ -87,7 +87,7 @@ void SIG_ExperimentListView::slotNewExperiment()
 
 void SIG_ExperimentListView::slotRenameExperiment()
 {
-  SIG_Experiment *theExperiment = currentlySelectedExperiment();
+  SIG_GUIGPExperiment *theExperiment = currentlySelectedExperiment();
   if( theExperiment )
     {
       SIG_RenameDialog renameDialog( this, 0, true );
@@ -109,7 +109,7 @@ void SIG_ExperimentListView::slotRenameExperiment()
 	      if( newName.right( 4 ) != ".exp")
 		newName.append( ".exp" );
 
-	      // disable autodelete to keep the SIG_Experiment object
+	      // disable autodelete to keep the SIG_GUIGPExperiment object
 	      experimentDict.take( oldName );
 
 	      theExperiment->setName( newName );
@@ -183,7 +183,7 @@ void SIG_ExperimentListView::slotLoadExperiment()
 	  theNewItem->setExpanded(false);
 	  theNewItem->setFlags( theNewItem->flags() & ~Qt::ItemIsSelectable );
 
-	  SIG_Experiment *theNewExperiment = new SIG_Experiment( fileName, widgetStack, theNewItem );
+	  SIG_GUIGPExperiment *theNewExperiment = new SIG_GUIGPExperiment( fileName, widgetStack, theNewItem );
 	  QObject::connect( theNewExperiment,
 			    SIGNAL( signalEvolutionNotRunning( bool ) ),
 			    this,
@@ -220,7 +220,7 @@ void SIG_ExperimentListView::slotSaveExperiment()
 {
   QString currentExperiment = currentlySelectedExperimentName();
   if (currentExperiment != QString() ) {
-      SIG_Experiment *theExperiment = getByExperimentName( currentExperiment );
+      SIG_GUIGPExperiment *theExperiment = getByExperimentName( currentExperiment );
       theExperiment->putAllIntoExperiment();
       QString fileName = QFileDialog::getSaveFileName( nullptr, "Save Experiment...", theExperiment->getName(), "Experiment Files (*.exp);;All Files (*)" );
       if( !fileName.isEmpty() ) {
@@ -312,13 +312,13 @@ void SIG_ExperimentListView::slotSelectionChanged( QTreeWidgetItem * theItem )
       // ANY run, not the clicked experiment's. The tree itself is never
       // locked, so a mid-run click can select a not-running experiment; asking
       // that one would hand back every locked action.
-      emit evolutionNotRunning( !SIG_Experiment::anyEvolutionRunning() );
+      emit evolutionNotRunning( !SIG_GUIGPExperiment::anyEvolutionRunning() );
  	  emit actExpChanged();
       experimentDict.value( experimentName )->putAllIntoExperiment();
     }
 };
 
-SIG_Experiment* SIG_ExperimentListView::getByExperimentName( QString name )
+SIG_GUIGPExperiment* SIG_ExperimentListView::getByExperimentName( QString name )
 {
   if( name != QString() )
     return experimentDict.value( name );
@@ -344,7 +344,7 @@ QString SIG_ExperimentListView::getAlternativeName( QString existingName )
   return alternativeName; // has to be implemented right!
 };
 
-SIG_Experiment* SIG_ExperimentListView::currentlySelectedExperiment()
+SIG_GUIGPExperiment* SIG_ExperimentListView::currentlySelectedExperiment()
 {
   QString experimentName = currentlySelectedExperimentName();
   if( experimentName != QString() )
@@ -436,7 +436,7 @@ void SIG_ExperimentListView::slotShowIndividuals()
 
 void SIG_ExperimentListView::slotGPParametersImport()
 {
-  SIG_Experiment *theExperiment = currentlySelectedExperiment();
+  SIG_GUIGPExperiment *theExperiment = currentlySelectedExperiment();
   if( theExperiment )
     {
       slotShowGPParameters();
@@ -448,7 +448,7 @@ void SIG_ExperimentListView::slotGPParametersImport()
   
 void SIG_ExperimentListView::slotSimulationParametersImport()
 {
-  SIG_Experiment *theExperiment = currentlySelectedExperiment();
+  SIG_GUIGPExperiment *theExperiment = currentlySelectedExperiment();
   if( theExperiment )
     {
       slotShowSimulationParameters();
@@ -460,7 +460,7 @@ void SIG_ExperimentListView::slotSimulationParametersImport()
 
 void SIG_ExperimentListView::slotRobotImport()
 {
-  SIG_Experiment *theExperiment = currentlySelectedExperiment();
+  SIG_GUIGPExperiment *theExperiment = currentlySelectedExperiment();
   if( theExperiment )
     {
       slotShowRobot();
@@ -472,7 +472,7 @@ void SIG_ExperimentListView::slotRobotImport()
 
 void SIG_ExperimentListView::slotLanguageParametersImport()
 {
-  SIG_Experiment *theExperiment = currentlySelectedExperiment();
+  SIG_GUIGPExperiment *theExperiment = currentlySelectedExperiment();
   if( theExperiment )
     {
       slotShowLanguageParameters();
@@ -484,7 +484,7 @@ void SIG_ExperimentListView::slotLanguageParametersImport()
 
 void SIG_ExperimentListView::slotPopulationImport()
 {
-  SIG_Experiment *theExperiment = currentlySelectedExperiment();
+  SIG_GUIGPExperiment *theExperiment = currentlySelectedExperiment();
   if( theExperiment )
     {
       slotShowIndividuals();
@@ -496,7 +496,7 @@ void SIG_ExperimentListView::slotPopulationImport()
 
 void SIG_ExperimentListView::slotEnvironmentImport()
 {
-  SIG_Experiment *theExperiment = currentlySelectedExperiment();
+  SIG_GUIGPExperiment *theExperiment = currentlySelectedExperiment();
   if( theExperiment )
     {
       slotShowEnvironment();
@@ -508,7 +508,7 @@ void SIG_ExperimentListView::slotEnvironmentImport()
 
 void SIG_ExperimentListView::slotGPParametersExport()
 {
-  SIG_Experiment *theExperiment = currentlySelectedExperiment();
+  SIG_GUIGPExperiment *theExperiment = currentlySelectedExperiment();
   if( theExperiment )
     {
       slotShowGPParameters();
@@ -520,7 +520,7 @@ void SIG_ExperimentListView::slotGPParametersExport()
 
 void SIG_ExperimentListView::slotSimulationParametersExport()
 {
-  SIG_Experiment *theExperiment = currentlySelectedExperiment();
+  SIG_GUIGPExperiment *theExperiment = currentlySelectedExperiment();
   if( theExperiment )
     {
       slotShowSimulationParameters();
@@ -532,7 +532,7 @@ void SIG_ExperimentListView::slotSimulationParametersExport()
 
 void SIG_ExperimentListView::slotLanguageParametersExport()
 {
-  SIG_Experiment *theExperiment = currentlySelectedExperiment();
+  SIG_GUIGPExperiment *theExperiment = currentlySelectedExperiment();
   if( theExperiment )
     {
       slotShowLanguageParameters();
@@ -544,7 +544,7 @@ void SIG_ExperimentListView::slotLanguageParametersExport()
 
 void SIG_ExperimentListView::slotPopulationExport()
 {
-  SIG_Experiment *theExperiment = currentlySelectedExperiment();
+  SIG_GUIGPExperiment *theExperiment = currentlySelectedExperiment();
   if( theExperiment )
     {
       slotShowIndividuals();
@@ -556,7 +556,7 @@ void SIG_ExperimentListView::slotPopulationExport()
 
 void SIG_ExperimentListView::slotEnvironmentExport()
 {
-  SIG_Experiment *theExperiment = currentlySelectedExperiment();
+  SIG_GUIGPExperiment *theExperiment = currentlySelectedExperiment();
   if( theExperiment )
     {
       slotShowEnvironment();
@@ -568,7 +568,7 @@ void SIG_ExperimentListView::slotEnvironmentExport()
 
 void SIG_ExperimentListView::slotGNUPlotExport()
 {
-  SIG_Experiment *theExperiment = currentlySelectedExperiment();
+  SIG_GUIGPExperiment *theExperiment = currentlySelectedExperiment();
   if( theExperiment )
     {
       theExperiment->slotGNUPlotExport();
@@ -579,7 +579,7 @@ void SIG_ExperimentListView::slotGNUPlotExport()
 
 void SIG_ExperimentListView::slotAddIndividuals()
 {
-  SIG_Experiment *theExperiment = currentlySelectedExperiment();
+  SIG_GUIGPExperiment *theExperiment = currentlySelectedExperiment();
   if( theExperiment )
     {
       slotShowIndividuals();
@@ -591,7 +591,7 @@ void SIG_ExperimentListView::slotAddIndividuals()
 
 void SIG_ExperimentListView::slotDeleteIndividuals()
 {
-  SIG_Experiment *theExperiment = currentlySelectedExperiment();
+  SIG_GUIGPExperiment *theExperiment = currentlySelectedExperiment();
   if( theExperiment )
     {
       slotShowIndividuals();
@@ -603,7 +603,7 @@ void SIG_ExperimentListView::slotDeleteIndividuals()
 
 void SIG_ExperimentListView::slotResetIndividuals()
 {
-  SIG_Experiment *theExperiment = currentlySelectedExperiment();
+  SIG_GUIGPExperiment *theExperiment = currentlySelectedExperiment();
   if( theExperiment )
     {
       slotShowIndividuals();
@@ -615,7 +615,7 @@ void SIG_ExperimentListView::slotResetIndividuals()
 
 void SIG_ExperimentListView::slotVisualizeIndividuals()
 {
-  SIG_Experiment *theExperiment = currentlySelectedExperiment();
+  SIG_GUIGPExperiment *theExperiment = currentlySelectedExperiment();
   // write all changes back to generate a new dynamechs terrain
   theExperiment->putAllIntoExperiment();
 
@@ -630,7 +630,7 @@ void SIG_ExperimentListView::slotVisualizeIndividuals()
 
 void SIG_ExperimentListView::slotProgramExport()
 {
-  SIG_Experiment *theExperiment = currentlySelectedExperiment();
+  SIG_GUIGPExperiment *theExperiment = currentlySelectedExperiment();
   if( theExperiment )
     {
       slotShowIndividuals();
@@ -642,7 +642,7 @@ void SIG_ExperimentListView::slotProgramExport()
 
 void SIG_ExperimentListView::slotIndividualExport()
 {
-  SIG_Experiment *theExperiment = currentlySelectedExperiment();
+  SIG_GUIGPExperiment *theExperiment = currentlySelectedExperiment();
   if( theExperiment )
     {
       slotShowIndividuals();
@@ -654,7 +654,7 @@ void SIG_ExperimentListView::slotIndividualExport()
 
 void SIG_ExperimentListView::slotProgramImport()
 {
-  SIG_Experiment *theExperiment = currentlySelectedExperiment();
+  SIG_GUIGPExperiment *theExperiment = currentlySelectedExperiment();
   if( theExperiment )
     {
       slotShowIndividuals();
@@ -666,7 +666,7 @@ void SIG_ExperimentListView::slotProgramImport()
 
 void SIG_ExperimentListView::slotIndividualImport()
 {
-  SIG_Experiment *theExperiment = currentlySelectedExperiment();
+  SIG_GUIGPExperiment *theExperiment = currentlySelectedExperiment();
   if( theExperiment )
     {
       slotShowIndividuals();

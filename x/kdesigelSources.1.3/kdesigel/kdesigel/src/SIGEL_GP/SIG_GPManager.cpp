@@ -367,7 +367,7 @@ namespace {
    * vector resized and entirely null.
    *
    * Unreachable at the four call sites today: start()'s two callers, main and
-   * SIG_Experiment::slotStartEvolution, each use a freshly built manager, so
+   * SIG_GUIGPExperiment::slotStartEvolution, each use a freshly built manager, so
    * tours is default-constructed at each entry to run(). Reproduced anyway,
    * so a caller that reuses a manager keeps 1.3's behaviour.
    */

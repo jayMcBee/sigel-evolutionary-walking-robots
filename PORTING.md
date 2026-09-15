@@ -527,6 +527,7 @@ D20 supersedes D5, D24 supersedes D3.
 | **D31** *(signed off 2026-09-09)* | Line endings | **LF ONLY, tree-wide. No more DOS.** Jan's decision, and it overrides the guard that existed to prevent it. **100 files under `x/kdesigelSources.1.3` converted, 17,750 CRLF pairs.** **The conversion is line endings only except for two bytes, and `git diff --ignore-cr-at-eol` is NOT what proves it** — that flag strips a trailing CR from *both* sides, so it would equally hide a CRLF being *introduced*. The proof is a direct comparison of every one of the 100 files: `re.sub(rb"\r+\n", b"\n", git show HEAD:f) == working file`, exact, with no `\r` surviving anywhere. Zero anomalies. Zero anomalies. **Two lines of `sigel_slave.mak` are the one real content change**, and calling them line endings flatters them: `:598` and `:647` ended `\r\r\n`, so the byte removed is an INTERIOR one — under NMAKE that trailing CR is part of the variable's value. The `\r+` in the proof above is what swallows the case, so the proof cannot tell it from a line ending; it is called out here instead. Nothing else in the tree has a run of two. **Binaries are excluded and this is not cosmetic** — three tracked binaries hold 12 incidental `\r\n` byte pairs (`pvm3.4.6.tgz` 9, `altLogo.png` 2, `noExperiment.png` 1), and a blind repo-wide replace would corrupt all three. Extensions touched: 36 `.cpp`, 35 `.h`, 19 `.xpm`, 5 `.dsp`, 3 `.mak`, 1 `.mt`, 1 `.dsw`. **No `.exp` and no `.ui`**, so no reference artefact was touched. **Lone CRs are left alone, and NOT because they are Mac-classic line endings** — the first version of this row said that and it was wrong. Six tracked files hold lone CRs and git calls **all six** binary, so this gate never even reads them: `pvm3.4.6.tgz` 3859, `noExperiment.png` 691, `JustGreen.pnm` 2848, `altLogo.png` 208, `Hippie.pnm` 208, `Stone.pnm` 68. All five `.pnm` are **P6 raw raster**: those bytes are pixel values that happen to equal `0x0d`. They were never line endings. **The `encodings` gate was turned round in the same commit**, so that commit is not line endings alone — `check.sh`, `PORTING.md` and `future_refactorings.md` change with it. The gate used to say *a file that HAD a CR must still have one*, with `ENC_BASELINE=25`; it now says **no tracked text file may carry CRLF**, expected zero, reads every tracked file rather than five extensions present in the root commit, lists them with `-z` so a C-quoted path cannot break `open()`, and reconciles — every file lands in exactly one of ok / CRLF / binary / unreadable, or it aborts. **It asks `git ls-files --eol` what is binary rather than testing for a NUL byte**, because the NUL test got two files wrong: `Hippie.pnm` has no NUL in its 196,668 bytes and `UniDo_LSXI.pnm`'s first NUL is at offset 15,456, so both were judged as text and passed only by luck. **Read the `w/` column, not `i/`**: while this change was being made, `sigel_slave.mak`'s index blob read `i/-text` — HEAD still held its two `\r\r\n`, which git's own heuristic calls binary — against a working file of `w/lf`, and testing both columns dropped a real text file out of the check. **Both columns read `lf` once this is committed, so the demonstration is gone and only the rule survives.** Reads 610 text files and 8 binaries. **A floor of 500 was added**, because zero failures is also what a check that read nothing reports: a dead `git ls-files` gave `COUNTS 0 0 0 0 0 0`, two non-empty numbers, which the fail-closed branch did not catch. Teeth-tested: CRLF into a `.cpp` and into `sigel_slave.mak` both caught and named, CRLF into a texture correctly ignored, and all seven branch states driven by hand — including a **tree-wide** CRLF regression, which the first version of the floor misreported as *"it did not run"* with one failure instead of 611, and a below-floor count, which the first version printed as `0 pass` while adding up to 499 passes to the total. Both found by review 2026-09-09. The bucket reconciliation is a tautology as the loop is now written and is **not** counted as coverage; it is kept only so the earlier bare-`continue` shape cannot come back. **`SIGEL_ROOT` is the source tree**, so `stdConf.mt` and the 19 `.xpm` pixmaps the conversion touched are the very files the GUI gates load at runtime; the `gui behaviour` gate covers them. The `.xpm` are loaded by path and `#include`d nowhere, and a C string literal cannot span a raw newline, so no removed CR was ever inside a quoted pixel row. **No `.gitattributes` exists and none was added.** `* text=auto eol=lf` would make git enforce this rather than only detect it; not done, because it changes what every future checkout writes and that is a separate decision. On a clone with `core.autocrlf=true` the working tree comes back CRLF and this gate goes red tree-wide — which is the gate working |
 | **D32** *(signed off 2026-09-09)* | `SIG_Experiment::gpManager` renamed to `guiGPManager` | **A deliberate divergence from the 1.3 name, and the only one of its kind so far.** Four members across the tracked tree were called `gpManager`; three hold an `MT_GPManager *` inside the meta modules, where the name is right. The fourth, `SIG_Experiment.h, SIG_Experiment`, holds a `SIG_GUIGPManager *` — and it was the **only** `SIG_`-typed member in that class not named after its own type with the `SIG_` prefix stripped. The other nine follow the rule exactly (`gpExperiment`, `gpParameter`, `simulationParameter`, `environmentView`, `robotView`, `experimentView`, `allIndividualsView`, `languageParameters`, `experimentItem`); the class's remaining members are named by role (`widgetDict`, `menuGPParameter`, …) and were never in scope. So this is the class's own rule applied to the one member that broke it, not a new scheme. **20 sites**: 13 in `SIG_Experiment.{h,cpp}`, 5 in this file, 2 in `guidrive.cpp`, both comments. The three `MT_GPManager` members and the `SIG_GPManager gpManager` local at `sigel.cpp:261` are correctly named and were left alone; the 1.0 tree holds the same member and is untracked, so a future sweep will re-find it there and should leave it. **VERIFIED AS `.text`-IDENTICAL, NOT AS BYTE-IDENTICAL OBJECTS** — a data member's name never reaches a mangled symbol, but `-g` is on and DWARF records member names, so the objects legitimately differ. `sigel.cpp` is the interesting one and was checked: it is the single translation unit where both names coexist, and its `.text` is unchanged |
 | **D33** *(signed off 2026-09-09)* | Where the mid-run protection lives | **IN THE UI. The model is not to be touched.** Jan: *"we'll focus on the UI side from now on, NO TOUCHING the gp manager or other model classes."* No new behaviour goes into the model. Removing a dead 2003 stub is not new behaviour, so `SIG_GPManager::running()` was deleted — see D29's passage in §10. Nothing is added to `SIG_GPManager` or `MT_Controller`. **The D29 counter, `g_runningEvolutions`, is to be removed, not moved into the model.** Jan, rejecting a move into `SIGEL_GP`: *"I strongly reject changes to the core model just to hot-fix a UI enablement issue."* What replaces it is undecided, and it is UI-side |
+| **D34** *(signed off 2026-09-15)* | `SIG_Experiment` renamed to `SIG_GUIGPExperiment` | **The class only, by Jan's decision, and the second deliberate divergence from a 1.3 name, after D32.** The interface experiment class now follows the rule the manager pair already uses: model `SIG_GPManager`, interface `SIG_GUIGPManager`; model `SIG_GPExperiment`, interface `SIG_GUIGPExperiment`. The files keep their names, `SIG_Experiment.h` and `SIG_Experiment.cpp`, and so does the include guard. `Sigel.dsp` and `Sigel.mak` name only those files and are unchanged. D32's row keeps the old class name, because it records a rename made under it |
 
 
 ---
@@ -1184,7 +1185,7 @@ being touched, which is what the old figure was not:
 | `SIG_VisualSceneObject.h` | 2 | `QArray` | both are `QList<GLdouble>` |
 | `MT_Population.h`, `MT_StatisticsElement.h` | 1 each | `QArray` | `QList` |
 | `SIG_GPPopulation.h`, `SIG_GPTournament.h`, `SIG_Register.h`, `SIG_EnvironmentRenderer.h`, `SIG_RobotRenderer.h`, `SIG_SceneObject.h` | 1 each | `QVector` | `QList` |
-| `SIG_ExperimentListView.h` | 1 | `QDict` | `experimentDict` is `QHash<QString, SIG_Experiment *>` |
+| `SIG_ExperimentListView.h` | 1 | `QDict` | `experimentDict` is `QHash<QString, SIG_GUIGPExperiment *>` |
 
 **`SIG_GPParameter.h`'s four are the odd ones and did not become `QList`.** They
 sit inside a commented-out doc block for `setFunctionSet` / `getFunctionSet` /
@@ -1470,7 +1471,7 @@ reverting it left every check green.*
 
 ### D30a — the hole D30 missed: `Stop` unlocked everything mid-run
 
-**D30 did not keep the lock, and this is why.** `SIG_Experiment::slotStopEvolution`
+**D30 did not keep the lock, and this is why.** `SIG_GUIGPExperiment::slotStopEvolution`
 opened with `emit signalEvolutionNotRunning( true )` as its **first statement**,
 and it is a request to stop rather than a stop: it only sets
 `guiGPManager->userTerminated` at the end, `start()` has not returned, the
@@ -1520,7 +1521,7 @@ item, one line after the emit that applies the lock
 **THE FIX, three places in `SIG_MainWindow.cpp`:**
 
 1. `slotActExpChanged` enables the two MetaGP controls only when
-   `!SIG_Experiment::anyEvolutionRunning()`.
+   `!SIG_GUIGPExperiment::anyEvolutionRunning()`.
 2. `slotEnableNoExperimentActions` re-applies the run lock after its own loop,
    rather than filtering its list — so the two lists cannot drift apart.
 3. `newExperimentAction` and `openExperimentAction` join
@@ -2747,7 +2748,7 @@ from a `Q_OBJECT` grep**, never hand-written — a missing entry is an undefined
 vtable at link, or a signal that never fires. **Resource objects are named on
 the link line**, not left inside an archive, or the form icons vanish. And **the
 slave must not link the master's meta-objects** — doing so drags in
-`SIG_Experiment` → `MT_Controller` → the master `SIG_GPExperiment`; §9's
+`SIG_GUIGPExperiment` → `MT_Controller` → the master `SIG_GPExperiment`; §9's
 assertion catches it.
 
 **The build picks between the two `SIG_GPExperiment` variants BY LOCALE.**
@@ -3935,12 +3936,12 @@ core**, measured, and a build with a genuinely random seed reproduces
 
 **`QHashSeed::setDeterministicGlobalSeed()` — DONE 2026-09-04, in `sigel.cpp`
 only, and it was NOT purely bookkeeping.** Only `sigel` links the three `QHash`es
-(`SIG_Experiment`'s `widgetDict` and `menuDict`, `SIG_ExperimentListView`'s
+(`SIG_GUIGPExperiment`'s `widgetDict` and `menuDict`, `SIG_ExperimentListView`'s
 `experimentDict`); `sigel_slave` links `GUI_SLAVE`, which has none. *An earlier
 version demanded the call in `sigel_slave.cpp` too; that half was mis-scoped and
 is withdrawn.* **The "the only iteration site is destruction, which is
 order-insensitive" half was wrong on both counts.** There are **two** iteration
-sites, both in `~SIG_Experiment`, and the first is
+sites, both in `~SIG_GUIGPExperiment`, and the first is
 `for ( QWidget *w : widgetDict ) widgetStack->removeWidget( w )` — **and that
 stack is SHARED**: `SIG_ExperimentListView` hands its own `widgetStack` to every
 experiment it constructs. So with a second experiment still loaded, the order in
@@ -5415,14 +5416,14 @@ distinguish the two placements. Listed as open.*
 took to implement, and each wrong version passed its own gate.
 
 **Where the guard is.** A **count** of running evolutions, incremented by
-`SIG_Experiment::RunScope`, which `slotStartEvolution` enters around
+`SIG_GUIGPExperiment::RunScope`, which `slotStartEvolution` enters around
 `guiGPManager->start()`. Five things ask it:
 
 | guarded | why it needs its own guard |
 |---|---|
 | `putAllIntoExperiment()` | the aggregator; a **page switch** reaches it — `slotSelectionChanged` ends with an unconditional call |
 | `SIG_ExperimentView::putIntoExperiment()` | **the page that stays live.** See below |
-| the seven import/load slots | they write `gpExperiment.*` directly and never go through the aggregator. `slotRobotLoad` replaces the whole robot. Reachable mid-run through context menus parented on `SIG_Experiment`, not on the pages |
+| the seven import/load slots | they write `gpExperiment.*` directly and never go through the aggregator. `slotRobotLoad` replaces the whole robot. Reachable mid-run through context menus parented on `SIG_GUIGPExperiment`, not on the pages |
 | the tree-click emit | drives the 23 `evolutionRunningActions` |
 | the four MetaGP actions | none was in `evolutionRunningActions` at all |
 
@@ -5473,7 +5474,7 @@ taken 2026-09-09, and it is gone too.
 **That always-false stub is also why 1.3 has the same visible defect from a
 different cause: one click on the experiment tree
 re-enabled all 23 locked actions mid-run.** The actions *are* correctly disabled
-at start — `SIG_Experiment` emits `signalEvolutionNotRunning( false )` and both
+at start — `SIG_GUIGPExperiment` emits `signalEvolutionNotRunning( false )` and both
 construction sites relay it — so the defect was never "they are not disabled".
 
 **Ordering is load-bearing.** `slotStartEvolution` calls

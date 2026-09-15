@@ -65,7 +65,7 @@ class SIG_ExperimentListView : public QTreeWidget
    * @param name The name of the experiment.
    * @return The experiment called name.
    */
-  SIG_Experiment* getByExperimentName( QString name );
+  SIG_GUIGPExperiment* getByExperimentName( QString name );
 
   /**
    * Checks whether an experiment exists under name.
@@ -90,11 +90,11 @@ class SIG_ExperimentListView : public QTreeWidget
   QString getAlternativeName( QString existingName );
 
   /**
-   * This method return a pointer to the currently seleted SIGEL_MasterGUI::SIG_Experiment.
+   * This method return a pointer to the currently seleted SIGEL_MasterGUI::SIG_GUIGPExperiment.
    *
    * If there is no experiment selected 0 is returned.
    */
-  SIG_Experiment* currentlySelectedExperiment();
+  SIG_GUIGPExperiment* currentlySelectedExperiment();
 
   /**
    * This function returns the experiment name of the currently selected experiment.
@@ -180,7 +180,7 @@ class SIG_ExperimentListView : public QTreeWidget
    *
    * The method looks up the experiment name and searches for the experiment
    * in the list. Then it looks up the text at position 0 in the passed item
-   * and calles slotSelectionChanged( QString ) in the SIG_Experiment object.
+   * and calles slotSelectionChanged( QString ) in the SIG_GUIGPExperiment object.
    * @pre The item is not null.
    * @post The widget belonging to the list view item is shown in the
    * widget stack.
@@ -236,7 +236,7 @@ class SIG_ExperimentListView : public QTreeWidget
      *
      * First the method checks inside to see whether the click was onto a list view
      * item or outside. If it is outside the experimentListViewMenu is show. Else
-     * the SIG_Experiment object belonging to this item is searched. If it is found
+     * the SIG_GUIGPExperiment object belonging to this item is searched. If it is found
      * the method slotRightClick() is called in the experiment object.
      */
   void slotRightButtonClicked( const QPoint & pos );
@@ -270,7 +270,7 @@ class SIG_ExperimentListView : public QTreeWidget
   * The pointer to the widget stack in the main window.
   *
   * This pointer is stored, so that it can be passed to a newly created
-  * SIG_Experiment.
+  * SIG_GUIGPExperiment.
   */
   QStackedWidget *widgetStack;
 
@@ -281,7 +281,7 @@ class SIG_ExperimentListView : public QTreeWidget
    * things under the same name in a QHash, for other reason the names are
    * needed to be unique.
    */
-  QHash<QString, SIG_Experiment *> experimentDict;
+  QHash<QString, SIG_GUIGPExperiment *> experimentDict;
 
   /**
    * The number a new experiment gets.

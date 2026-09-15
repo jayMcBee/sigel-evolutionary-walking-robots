@@ -50,7 +50,7 @@ namespace SIGEL_GP
 /**
  * This class manages the genetic-programming algorithm.
  *
- * It uses the class SIG_Experiment to organize the data of the
+ * It uses the class SIG_GPExperiment to organize the data of the
  * different experiments, like the GPParameter, which are used to 
  * store the current genetic-programming-parameters. A nessecary part 
  * of the evolution, the fitnesstrainer, are included, which manages 

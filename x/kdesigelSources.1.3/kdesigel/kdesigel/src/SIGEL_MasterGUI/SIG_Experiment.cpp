@@ -38,7 +38,7 @@
 namespace SIGEL_MasterGUI
 {
 
-  SIG_Experiment::SIG_Experiment( QString name, QStackedWidget *theWidgetStack, SIG_ExperimentItem *theExperimentItem ) : gpExperiment(), guiGPManager(0), experimentName(name), widgetStack( theWidgetStack ), experimentItem(theExperimentItem)
+  SIG_GUIGPExperiment::SIG_GUIGPExperiment( QString name, QStackedWidget *theWidgetStack, SIG_ExperimentItem *theExperimentItem ) : gpExperiment(), guiGPManager(0), experimentName(name), widgetStack( theWidgetStack ), experimentItem(theExperimentItem)
 {
   // build the gp parameter menu
   menuGPParameter = new QMenu( this );
@@ -178,7 +178,7 @@ namespace SIGEL_MasterGUI
   getAllOutOfExperiment();
 };
 
-SIG_Experiment::~SIG_Experiment()
+SIG_GUIGPExperiment::~SIG_GUIGPExperiment()
 {
   // Before destroying the experiment take all widgets in the widgetDict from the widgetStack
   for ( QWidget *w : widgetDict )
@@ -194,12 +194,12 @@ SIG_Experiment::~SIG_Experiment()
       }
 };
 
-QString SIG_Experiment::getName() const
+QString SIG_GUIGPExperiment::getName() const
 {
   return experimentName;
 };
 
-void SIG_Experiment::setName( QString newName )
+void SIG_GUIGPExperiment::setName( QString newName )
 {
   widgetDict.insert( newName, widgetDict.take( experimentName ) );
   
@@ -211,15 +211,15 @@ void SIG_Experiment::setName( QString newName )
 // experiment can be destroyed out from under it.
 static int g_runningEvolutions = 0;
 
-bool SIG_Experiment::anyEvolutionRunning()
+bool SIG_GUIGPExperiment::anyEvolutionRunning()
 {
   return g_runningEvolutions > 0;
 }
 
-SIG_Experiment::RunScope::RunScope()  { ++g_runningEvolutions; }
-SIG_Experiment::RunScope::~RunScope() { --g_runningEvolutions; }
+SIG_GUIGPExperiment::RunScope::RunScope()  { ++g_runningEvolutions; }
+SIG_GUIGPExperiment::RunScope::~RunScope() { --g_runningEvolutions; }
 
-void SIG_Experiment::putAllIntoExperiment()
+void SIG_GUIGPExperiment::putAllIntoExperiment()
 {
   // DELIBERATE DEVIATION FROM 1.3: parameters may not
   // change once a run has started. That is how GP is normally implemented --
@@ -250,7 +250,7 @@ void SIG_Experiment::putAllIntoExperiment()
   environmentView->putIntoExperiment();
 };
 
-void SIG_Experiment::getAllOutOfExperiment()
+void SIG_GUIGPExperiment::getAllOutOfExperiment()
 {
   experimentView->getOutOfExperiment();
   gpParameter->getOutOfExperiment();
@@ -261,7 +261,7 @@ void SIG_Experiment::getAllOutOfExperiment()
   allIndividualsView->slotCompleteRefreshList();
 };
 
-QString SIG_Experiment::checkEnding( QString fileName, QString ending )
+QString SIG_GUIGPExperiment::checkEnding( QString fileName, QString ending )
 {
   QString endWithPoint = "." + ending;
   if( fileName.right( endWithPoint.length() ) == endWithPoint )
@@ -270,7 +270,7 @@ QString SIG_Experiment::checkEnding( QString fileName, QString ending )
     return fileName.append( "." + ending);
 };
 
-void SIG_Experiment::slotRightClick( QString option, const QPoint & thePoint )
+void SIG_GUIGPExperiment::slotRightClick( QString option, const QPoint & thePoint )
 {
   QMenu *showMenu = menuDict.value( option );
   QWidget *showWidget = widgetDict.value( option );
@@ -281,7 +281,7 @@ void SIG_Experiment::slotRightClick( QString option, const QPoint & thePoint )
     }
 };
 
-void SIG_Experiment::slotSelectionChanged( QString option )
+void SIG_GUIGPExperiment::slotSelectionChanged( QString option )
 {
   // Qt 2's raiseWidget() began "if ( !w || !isMyChild(w) ) return;", so a
   // missing key was a silent no-op; Qt 6 warns and does nothing instead.
@@ -289,7 +289,7 @@ void SIG_Experiment::slotSelectionChanged( QString option )
     widgetStack->setCurrentWidget( showWidget );
 };
 
-void SIG_Experiment::slotStartEvolution()
+void SIG_GUIGPExperiment::slotStartEvolution()
 {
   if( (gpExperiment.robot.getBodies().size() != 0) && (gpExperiment.population.getSize() >= 4) && (gpExperiment.gpParameter.getFitnessName() != QString()) )
     {
@@ -343,7 +343,7 @@ void SIG_Experiment::slotStartEvolution()
     }
 };
 
-void SIG_Experiment::slotStopEvolution()
+void SIG_GUIGPExperiment::slotStopEvolution()
 {
   // Do NOT emit signalEvolutionNotRunning( true ) here. This is a
   // request to stop, not a stop: it only sets guiGPManager->userTerminated
@@ -367,13 +367,13 @@ void SIG_Experiment::slotStopEvolution()
   guiGPManager->userTerminated = true;
 };
 
-void SIG_Experiment::slotSimulationParameterImport()
+void SIG_GUIGPExperiment::slotSimulationParameterImport()
 {
   // These write gpExperiment.* DIRECTLY -- slotRobotLoad replaces the
   // whole robot -- so none of them passes through putAllIntoExperiment and the
   // guard there does not cover them. Their page buttons are disabled during a
   // run, but menuSimulationParameter and menuEnvironmentView are parented on
-  // SIG_Experiment rather than on the pages, so a right-click on the tree item
+  // SIG_GUIGPExperiment rather than on the pages, so a right-click on the tree item
   // pops them regardless, and slotRightClick does not test enablement.
   if ( anyEvolutionRunning() )
     return;
@@ -392,7 +392,7 @@ void SIG_Experiment::slotSimulationParameterImport()
     }
 };
 
-void SIG_Experiment::slotSimulationParameterExport()
+void SIG_GUIGPExperiment::slotSimulationParameterExport()
 {
   simulationParameter->putIntoExperiment();
   QString fileName = QFileDialog::getSaveFileName( nullptr, "Export Simulation Parameters...", QString(), "Simulation Parameter Files (*.sip);;All Files (*)" );
@@ -421,13 +421,13 @@ void SIG_Experiment::slotSimulationParameterExport()
     }
 };
 
-void SIG_Experiment::slotEnvironmentImport()
+void SIG_GUIGPExperiment::slotEnvironmentImport()
 {
   // These write gpExperiment.* DIRECTLY -- slotRobotLoad replaces the
   // whole robot -- so none of them passes through putAllIntoExperiment and the
   // guard there does not cover them. Their page buttons are disabled during a
   // run, but menuSimulationParameter and menuEnvironmentView are parented on
-  // SIG_Experiment rather than on the pages, so a right-click on the tree item
+  // SIG_GUIGPExperiment rather than on the pages, so a right-click on the tree item
   // pops them regardless, and slotRightClick does not test enablement.
   if ( anyEvolutionRunning() )
     return;
@@ -446,7 +446,7 @@ void SIG_Experiment::slotEnvironmentImport()
     }
 };
 
-void SIG_Experiment::slotEnvironmentExport()
+void SIG_GUIGPExperiment::slotEnvironmentExport()
 {
   environmentView->putIntoExperiment();
   QString fileName = QFileDialog::getSaveFileName( nullptr, "Export Environment...", QString(), "Environment Files (*.env);;All Files (*)" );
@@ -475,13 +475,13 @@ void SIG_Experiment::slotEnvironmentExport()
     }
 };
 
-void SIG_Experiment::slotGPParameterImport()
+void SIG_GUIGPExperiment::slotGPParameterImport()
 {
   // These write gpExperiment.* DIRECTLY -- slotRobotLoad replaces the
   // whole robot -- so none of them passes through putAllIntoExperiment and the
   // guard there does not cover them. Their page buttons are disabled during a
   // run, but menuSimulationParameter and menuEnvironmentView are parented on
-  // SIG_Experiment rather than on the pages, so a right-click on the tree item
+  // SIG_GUIGPExperiment rather than on the pages, so a right-click on the tree item
   // pops them regardless, and slotRightClick does not test enablement.
   if ( anyEvolutionRunning() )
     return;
@@ -500,7 +500,7 @@ void SIG_Experiment::slotGPParameterImport()
     }
 };
 
-void SIG_Experiment::slotGPParameterExport()
+void SIG_GUIGPExperiment::slotGPParameterExport()
 {
   gpParameter->putIntoExperiment();
   QString fileName = QFileDialog::getSaveFileName( nullptr, "Export GP Parameter...", QString(), "GP Parameter Files (*.gpp);;All Files (*)" );
@@ -529,13 +529,13 @@ void SIG_Experiment::slotGPParameterExport()
     }
 };
 
-void SIG_Experiment::slotLanguageParameterImport()
+void SIG_GUIGPExperiment::slotLanguageParameterImport()
 {
   // These write gpExperiment.* DIRECTLY -- slotRobotLoad replaces the
   // whole robot -- so none of them passes through putAllIntoExperiment and the
   // guard there does not cover them. Their page buttons are disabled during a
   // run, but menuSimulationParameter and menuEnvironmentView are parented on
-  // SIG_Experiment rather than on the pages, so a right-click on the tree item
+  // SIG_GUIGPExperiment rather than on the pages, so a right-click on the tree item
   // pops them regardless, and slotRightClick does not test enablement.
   if ( anyEvolutionRunning() )
     return;
@@ -555,7 +555,7 @@ void SIG_Experiment::slotLanguageParameterImport()
     }
 };
 
-void SIG_Experiment::slotLanguageParameterExport()
+void SIG_GUIGPExperiment::slotLanguageParameterExport()
 {
   languageParameters->putIntoExperiment();
   QString fileName = QFileDialog::getSaveFileName( nullptr, "Export Language Parameters...", QString(), "Language Parameter Files (*.lap);;All Files (*)" );
@@ -584,13 +584,13 @@ void SIG_Experiment::slotLanguageParameterExport()
     }
 };
 
-void SIG_Experiment::slotPopulationImport()
+void SIG_GUIGPExperiment::slotPopulationImport()
 {
   // These write gpExperiment.* DIRECTLY -- slotRobotLoad replaces the
   // whole robot -- so none of them passes through putAllIntoExperiment and the
   // guard there does not cover them. Their page buttons are disabled during a
   // run, but menuSimulationParameter and menuEnvironmentView are parented on
-  // SIG_Experiment rather than on the pages, so a right-click on the tree item
+  // SIG_GUIGPExperiment rather than on the pages, so a right-click on the tree item
   // pops them regardless, and slotRightClick does not test enablement.
   if ( anyEvolutionRunning() )
     return;
@@ -609,7 +609,7 @@ void SIG_Experiment::slotPopulationImport()
     }
 };
 
-void SIG_Experiment::slotPopulationExport()
+void SIG_GUIGPExperiment::slotPopulationExport()
 {
   QString fileName = QFileDialog::getSaveFileName( nullptr, "Export Population...", QString(), "Population files (*.pop);;All Files (*)" );
   if( !fileName.isEmpty() )
@@ -637,13 +637,13 @@ void SIG_Experiment::slotPopulationExport()
     }
 };
 
-void SIG_Experiment::slotRobotImport()
+void SIG_GUIGPExperiment::slotRobotImport()
 {
   // These write gpExperiment.* DIRECTLY -- slotRobotLoad replaces the
   // whole robot -- so none of them passes through putAllIntoExperiment and the
   // guard there does not cover them. Their page buttons are disabled during a
   // run, but menuSimulationParameter and menuEnvironmentView are parented on
-  // SIG_Experiment rather than on the pages, so a right-click on the tree item
+  // SIG_GUIGPExperiment rather than on the pages, so a right-click on the tree item
   // pops them regardless, and slotRightClick does not test enablement.
   if ( anyEvolutionRunning() )
     return;
@@ -667,7 +667,7 @@ void SIG_Experiment::slotRobotImport()
     }
 };
 
-void SIG_Experiment::slotGNUPlotExport()
+void SIG_GUIGPExperiment::slotGNUPlotExport()
 {
   QString fileName = QFileDialog::getSaveFileName( nullptr, "Export to GNU plot...", QString(), "GNU plot data file (*.dat);;All Files (*)" );
   if( !fileName.isEmpty() )
@@ -677,13 +677,13 @@ void SIG_Experiment::slotGNUPlotExport()
     }
 };
 
-void SIG_Experiment::slotRobotLoad()
+void SIG_GUIGPExperiment::slotRobotLoad()
 {
   // These write gpExperiment.* DIRECTLY -- slotRobotLoad replaces the
   // whole robot -- so none of them passes through putAllIntoExperiment and the
   // guard there does not cover them. Their page buttons are disabled during a
   // run, but menuSimulationParameter and menuEnvironmentView are parented on
-  // SIG_Experiment rather than on the pages, so a right-click on the tree item
+  // SIG_GUIGPExperiment rather than on the pages, so a right-click on the tree item
   // pops them regardless, and slotRightClick does not test enablement.
   if ( anyEvolutionRunning() )
     return;
@@ -712,7 +712,7 @@ void SIG_Experiment::slotRobotLoad()
     }
 };
 
-void SIG_Experiment::slotRobotSave()
+void SIG_GUIGPExperiment::slotRobotSave()
 {
   QString fileName = QFileDialog::getSaveFileName( nullptr, "Save Robot...", QString(), "Cooked Robot Files (*.crb);;All Files (*)" );
   if( !fileName.isEmpty() )
@@ -740,7 +740,7 @@ void SIG_Experiment::slotRobotSave()
     }
 };
 
-void SIG_Experiment::slotRobotInfo()
+void SIG_GUIGPExperiment::slotRobotInfo()
 { char robInf[4096];
 
 
@@ -760,7 +760,7 @@ void SIG_Experiment::slotRobotInfo()
   }
 }
 
-void SIG_Experiment::slotEvolutionStopped()
+void SIG_GUIGPExperiment::slotEvolutionStopped()
 {
   emit signalEvolutionNotRunning( true );
   experimentView->pushbuttonStart->setEnabled( true );

@@ -50,28 +50,28 @@ namespace SIGEL_MasterGUI
    *
    * It holds one SIG_GPExperiment as well as one SIG_GPManager.
    */
-  class SIG_Experiment : public QWidget
+  class SIG_GUIGPExperiment : public QWidget
     {
       Q_OBJECT
 	
 	public:
 
       /**
-       * The constructor of SIG_Experiment.
+       * The constructor of SIG_GUIGPExperiment.
        *
        * Receives the SIG_GPExperiment it belongs to.
        * @param parent The parent widget of SIG_AllIndividualsView
        * @param name Internal name for Qt.
        * @param theExperiment A reference to the experiment this view belongs to.
        */
-      SIG_Experiment( QString name, QStackedWidget *theWidgetStack, SIG_ExperimentItem *theExperimentItem );
+      SIG_GUIGPExperiment( QString name, QStackedWidget *theWidgetStack, SIG_ExperimentItem *theExperimentItem );
       
       /**
        * The destructor.
        *
        * Will be erased if not needed.
        */
-      ~SIG_Experiment();
+      ~SIG_GUIGPExperiment();
   
       /**
        * This function return the name of the experiment.

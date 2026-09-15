@@ -3628,7 +3628,7 @@ static int guidriveMain(int argc, char **argv)
     // `evolution' is not one of the scenarios the gate runs, and inside it
     // slotStartEvolution blocks, so every observation there is post-run.
     //
-    // A real evolution is not needed to test the contract. SIG_Experiment
+    // A real evolution is not needed to test the contract. SIG_GUIGPExperiment
     // exposes RunScope, which is exactly what slotStartEvolution enters around
     // guiGPManager->start(); entering one here puts the application in the state
     // the lock exists for, deterministically and in about a second.
@@ -3645,7 +3645,7 @@ static int guidriveMain(int argc, char **argv)
         QStackedWidget *st = W->findChild<QStackedWidget *>();
         printf("\n== D29 RUN LOCK ==\n");
         printf("  atRest anyEvolutionRunning=%d\n",
-               SIG_Experiment::anyEvolutionRunning() ? 1 : 0);
+               SIG_GUIGPExperiment::anyEvolutionRunning() ? 1 : 0);
 
         auto page = [&](const char *m) -> QWidget * {
             clickMenu("&View", QString::fromLatin1(m));
@@ -3681,7 +3681,7 @@ static int guidriveMain(int argc, char **argv)
         // What the guard actually protects is the model, so the probe reads
         // the model: gpParameter.getMaxAge(), which putIntoExperiment writes
         // from spinboxMaxAge (SIG_GPParameter.cpp:95).
-        SIG_Experiment *theExp = lv->currentlySelectedExperiment();
+        SIG_GUIGPExperiment *theExp = lv->currentlySelectedExperiment();
         if (!theExp) { printf("  !! no selected experiment\n"); return 1; }
         auto modelAge = [&]() -> long { return theExp->gpExperiment.gpParameter.getMaxAge(); };
         auto writtenAge = [&](int v) -> long {
@@ -3729,9 +3729,9 @@ static int guidriveMain(int argc, char **argv)
         fflush(stdout);
 
         {
-            SIG_Experiment::RunScope lock;
+            SIG_GUIGPExperiment::RunScope lock;
             printf("  [locked] anyEvolutionRunning=%d\n",
-                   SIG_Experiment::anyEvolutionRunning() ? 1 : 0);
+                   SIG_GUIGPExperiment::anyEvolutionRunning() ? 1 : 0);
             const long locked = writtenAge(before + 21);
             printf("  [locked] typed=%d, model reads %ld  refused=%d\n",
                    before + 21, locked, locked == before + 7 ? 1 : 0);
@@ -3812,25 +3812,25 @@ static int guidriveMain(int argc, char **argv)
         // bool was wrong. Nesting must hold the lock until the OUTER scope
         // exits, and an exception must still release it.
         {
-            SIG_Experiment::RunScope outer;
-            const bool a = SIG_Experiment::anyEvolutionRunning();
+            SIG_GUIGPExperiment::RunScope outer;
+            const bool a = SIG_GUIGPExperiment::anyEvolutionRunning();
             bool b = false, c = false;
-            { SIG_Experiment::RunScope inner; b = SIG_Experiment::anyEvolutionRunning(); }
-            c = SIG_Experiment::anyEvolutionRunning();
+            { SIG_GUIGPExperiment::RunScope inner; b = SIG_GUIGPExperiment::anyEvolutionRunning(); }
+            c = SIG_GUIGPExperiment::anyEvolutionRunning();
             printf("  [nesting] outer=%d inner=%d afterInner=%d  nestsCorrectly=%d\n",
                    a ? 1 : 0, b ? 1 : 0, c ? 1 : 0, (a && b && c) ? 1 : 0);
         }
         printf("  [nesting] afterOuter=%d\n",
-               SIG_Experiment::anyEvolutionRunning() ? 1 : 0);
+               SIG_GUIGPExperiment::anyEvolutionRunning() ? 1 : 0);
         try {
-            SIG_Experiment::RunScope thrower;
+            SIG_GUIGPExperiment::RunScope thrower;
             throw 1;
         } catch (int) {}
         printf("  [unwind] afterThrow anyEvolutionRunning=%d (0 = released)\n",
-               SIG_Experiment::anyEvolutionRunning() ? 1 : 0);
+               SIG_GUIGPExperiment::anyEvolutionRunning() ? 1 : 0);
 
         printf("  [released] anyEvolutionRunning=%d\n",
-               SIG_Experiment::anyEvolutionRunning() ? 1 : 0);
+               SIG_GUIGPExperiment::anyEvolutionRunning() ? 1 : 0);
         lv->setCurrentItem(lv->topLevelItem(0));
         QTest::qWait(300);
         const long after = writtenAge(before + 33);
@@ -4539,7 +4539,7 @@ static int guidriveMain(int argc, char **argv)
         SIG_ExperimentListView *lv = listView();
         lv->setCurrentItem(lv->topLevelItem(0));
         QTest::qWait(400);
-        SIG_Experiment *ex = lv->currentlySelectedExperiment();
+        SIG_GUIGPExperiment *ex = lv->currentlySelectedExperiment();
         if (!ex) { printf("!! no experiment selected\n"); fflush(stdout); return 1; }
         if (ex->gpExperiment.population.getSize() < 1) {
             printf("!! population is empty -- nothing to visualise\n");
@@ -5072,7 +5072,7 @@ static int guidriveMain(int argc, char **argv)
             clickMenu("&Individuals", "Reset");
             QTest::qWait(3000);
             cancelModalHandler();
-            if (SIG_Experiment *ex = lv->currentlySelectedExperiment()) {
+            if (SIG_GUIGPExperiment *ex = lv->currentlySelectedExperiment()) {
                 int neg = 0, n = ex->gpExperiment.population.getSize();
                 for (int i = 0; i < n; ++i)
                     if (ex->gpExperiment.population.getIndividual(i).getFitness() < 0) ++neg;
@@ -5102,7 +5102,7 @@ static int guidriveMain(int argc, char **argv)
         // at all if any fails -- silently, with no dialog. Print them, so a
         // Start that appears to do nothing can be told apart from one that is
         // correctly declining.
-        if (SIG_Experiment *ex = lv->currentlySelectedExperiment()) {
+        if (SIG_GUIGPExperiment *ex = lv->currentlySelectedExperiment()) {
             printf("  [start guard] bodies=%d (needs !=0)  population=%d (needs >=4)  "
                    "fitnessName=[%s] (needs non-empty)\n",
                    (int)ex->gpExperiment.robot.getBodies().size(),
@@ -5139,7 +5139,7 @@ static int guidriveMain(int argc, char **argv)
         // The pool generation BEFORE the run, so the assertion after it can say
         // the run actually advanced rather than that a file merely exists.
         int genBefore = -1;
-        if (SIG_Experiment *ex0 = lv->currentlySelectedExperiment())
+        if (SIG_GUIGPExperiment *ex0 = lv->currentlySelectedExperiment())
             genBefore = ex0->gpExperiment.population.getPoolGeneration();
         if (wantGens > 0) {
             clickMenu("&View", "&GP Parameters");
@@ -5189,7 +5189,7 @@ static int guidriveMain(int argc, char **argv)
             // (SIG_ExperimentListView.cpp, slotSaveExperiment) and slotStartEvolution() runs it
             // again, so read the experiment back rather than trusting the
             // widget: 1 is byGeneration.
-            if (SIG_Experiment *ex = lv->currentlySelectedExperiment()) {
+            if (SIG_GUIGPExperiment *ex = lv->currentlySelectedExperiment()) {
                 const int gotModel = (int)ex->gpExperiment.gpParameter.getTerminationModel();
                 const int gotGens  = ex->gpExperiment.gpParameter.getTerminationGenerationNo();
                 printf("  [termination in experiment] model=%d (1=byGeneration) generationNo=%d\n",
@@ -5301,7 +5301,7 @@ static int guidriveMain(int argc, char **argv)
         // start and true when the run ends, so a start-then-immediately-finish
         // is visible even if the buttons are back to their resting state by the
         // time anything samples them.
-        SIG_Experiment *exp = lv->currentlySelectedExperiment();
+        SIG_GUIGPExperiment *exp = lv->currentlySelectedExperiment();
         QSignalSpy *evo = exp ? new QSignalSpy(exp, SIGNAL(signalEvolutionNotRunning(bool)))
                               : nullptr;
         // slotStartEvolution() BLOCKS. It calls guiGPManager->start(), which runs
@@ -5364,7 +5364,7 @@ static int guidriveMain(int argc, char **argv)
         // been re-enabled by the run ending.
         int cfgEnabledDuringRun = -1;
         // Same three states, sampled again AFTER a tree click. D29 greys the
-        // MetaGP actions from SIG_Experiment's signalEvolutionNotRunning, but
+        // MetaGP actions from SIG_GUIGPExperiment's signalEvolutionNotRunning, but
         // SIG_ExperimentListView::slotSelectionChanged emits actExpChanged() on
         // the very next line and SIG_MainWindow::slotActExpChanged
         // re-enables mtConfigureAction with NO run check at all. So
@@ -5374,7 +5374,7 @@ static int guidriveMain(int argc, char **argv)
         int cfgAfterTreeClick = -1;
         // D29's ARMING LINE, and this is the only thing that reaches it.
         // SIG_ExperimentListView::slotSelectionChanged emits
-        // evolutionNotRunning( !SIG_Experiment::anyEvolutionRunning() ), and
+        // evolutionNotRunning( !SIG_GUIGPExperiment::anyEvolutionRunning() ), and
         // anyEvolutionRunning() reads g_runningEvolutions, which ONLY
         // `RunScope runScope;' (SIG_Experiment.cpp:326) sets. Delete that line
         // and a tree click mid-run emits TRUE and hands back all 27 locked
@@ -5664,7 +5664,7 @@ static int guidriveMain(int argc, char **argv)
         // that, and invoking the slot again starts a SECOND evolution over the
         // population this scenario exists to compare -- so it is skipped
         // whenever a generation count was asked for.
-        if (SIG_Experiment *ex = wantGens > 0 ? nullptr
+        if (SIG_GUIGPExperiment *ex = wantGens > 0 ? nullptr
                                               : lv->currentlySelectedExperiment()) {
             bool ok = QMetaObject::invokeMethod(ex, "slotStartEvolution",
                                                 Qt::DirectConnection);

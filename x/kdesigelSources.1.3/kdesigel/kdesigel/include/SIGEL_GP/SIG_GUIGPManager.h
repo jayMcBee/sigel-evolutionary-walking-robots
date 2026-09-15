@@ -25,7 +25,7 @@
 
 #include <QList>
 #include "SIGEL_GP/SIG_GPManager.h"
-namespace SIGEL_MasterGUI { class SIG_Experiment; class SIG_IndividualListItem; }
+namespace SIGEL_MasterGUI { class SIG_GUIGPExperiment; class SIG_IndividualListItem; }
 
 namespace SIGEL_GP
 {
@@ -34,12 +34,12 @@ namespace SIGEL_GP
     {
 
     public:
-      SIG_GUIGPManager( SIGEL_MasterGUI::SIG_Experiment &guiExperiment );
+      SIG_GUIGPManager( SIGEL_MasterGUI::SIG_GUIGPExperiment &guiExperiment );
 
     private:
       QList< SIGEL_MasterGUI::SIG_IndividualListItem * > individualItems;
 
-      SIGEL_MasterGUI::SIG_Experiment &guiExperiment;
+      SIGEL_MasterGUI::SIG_GUIGPExperiment &guiExperiment;
 
       void haveABreak();
 

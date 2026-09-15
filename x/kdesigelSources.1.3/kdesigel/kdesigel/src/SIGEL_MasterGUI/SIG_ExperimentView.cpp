@@ -78,7 +78,7 @@ void SIG_ExperimentView::putIntoExperiment() {
   lcdnumberGenerations->display(theExperiment.population.getPoolGeneration());
   // generationProgBar
 
-  if ( SIG_Experiment::anyEvolutionRunning() )
+  if ( SIG_GUIGPExperiment::anyEvolutionRunning() )
     return;
 
   // put comment into the box dedicated to the comment !
