@@ -3168,6 +3168,12 @@ one per second: the PVM task ids rose by 3937 from 18:34:11 to 19:33:18, and a
 10-second sample saw 10 slaves. The cause is not known. The two-generation run in
 §7, "A real evolution under `guidrive`", had no fitness value of 0.
 
+**`real clicks` failed once on a raw event count.** On 2026-09-15 at 23:41 its
+`fast pair` line counted one extra X motion event (`motion=2 xi2=10` against the
+baseline's `motion=1 xi2=9`). Every Qt-level count on that line stayed the same.
+The next run on the same tree passed. Watch for a second time before changing the
+check.
+
 **Start is not locked during a run yet, nor are the pages of the other
 experiments.** `slotStartEvolution` has no run check. It greys only its own
 experiment's `pushbuttonStart` and its own five pages. The right-click `Start` in
