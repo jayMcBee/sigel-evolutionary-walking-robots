@@ -3846,12 +3846,36 @@ static int guidriveMain(int argc, char **argv)
             (void)imp;
         }
 
-        // This checks only that slotEvolutionStopped clears the flag. Neither
-        // call to it in slotStartEvolution runs here. The `[locked]
-        // isRunning=1' line above is its positive control.
+        // This checks that slotEvolutionStopped clears the flag and shows the
+        // pool generation. Neither call to it in slotStartEvolution runs here.
+        // The `[locked] isRunning=1' line above is the flag's positive control.
+        //
+        // slotEvolutionStopped also shows the generation the run reached. A
+        // run raises poolGeneration and leaves the display alone, so this does
+        // the same: the `before' value must differ from the model, which is
+        // the positive control for the `after' value.
+        QLCDNumber *gens = theExp->experimentView->lcdnumberGenerations;
+        const int genAtRest = theExp->gpExperiment.population.getPoolGeneration();
+        theExp->gpExperiment.population.poolGeneration = genAtRest + 3;
+        printf("  [counter] model=%d display before slotEvolutionStopped=%d\n",
+               theExp->gpExperiment.population.getPoolGeneration(), gens->intValue());
+        if (gens->intValue() == theExp->gpExperiment.population.getPoolGeneration()) {
+            printf("!! the counter already showed the new generation, so the check"
+                   " below cannot fail\n");
+            fflush(stdout); return 1;
+        }
         theExp->slotEvolutionStopped();
         printf("  [released] after slotEvolutionStopped: isRunning=%d (0 = released)\n",
                lv->isRunning() ? 1 : 0);
+        const int refreshed =
+            gens->intValue() == theExp->gpExperiment.population.getPoolGeneration() ? 1 : 0;
+        printf("  [counter] display after slotEvolutionStopped=%d refreshed=%d\n",
+               gens->intValue(), refreshed);
+        theExp->gpExperiment.population.poolGeneration = genAtRest;
+        if (!refreshed) {
+            printf("!! slotEvolutionStopped left the generation counter stale\n");
+            fflush(stdout); return 1;
+        }
         lv->setCurrentItem(lv->topLevelItem(0));
         QTest::qWait(300);
         const long after = writtenAge(before + 33);

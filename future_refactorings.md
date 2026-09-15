@@ -780,19 +780,19 @@ happening??"*
 as results come in, and that rewrites the name, fitness and age of the row.
 
 **What does not.** The generation counter on the Experiment page,
-`lcdnumberGenerations`. Only `SIG_ExperimentView::putIntoExperiment` writes it.
+`lcdnumberGenerations`. During a run, only `SIG_ExperimentView::putIntoExperiment`
+writes it.
 The manager's two calls that would update it are commented out in
 `SIG_GUIGPManager.cpp`, in the constructor and in `updateIndividualView`. 1.3 has
 them commented out too. But in 1.3, `putAllIntoExperiment` always called
 `experimentView->putIntoExperiment()`, so every tree click refreshed the counter.
 In the port, `SIG_GUIGPExperiment::putAllIntoExperiment` returns first while a run
-is on, so the counter does not refresh during a run.
+is on, so a tree click does not refresh the counter during a run.
 
-**Nor after it.** `SIG_GUIGPExperiment::slotEvolutionStopped` enables Start,
-disables Stop, enables the five pages again, and does not refresh the counter. It
-moves again when something calls `SIG_ExperimentView::putIntoExperiment`, for
-example the next Start, through `putAllIntoExperiment`, or a click on a different
-tree item. Jan,
+**After it, since 2026-09-15.** `SIG_GUIGPExperiment::slotEvolutionStopped` writes
+the model's generation into the counter when a run ends. The `runlock` scenario
+checks it. Before that change the counter moved only when something called
+`SIG_ExperimentView::putIntoExperiment`, such as the next Start. Jan,
 2026-09-15: *"Major annoyance: generations counter does NOT update, not even when
 stopped - only when RESTARTING!"*
 

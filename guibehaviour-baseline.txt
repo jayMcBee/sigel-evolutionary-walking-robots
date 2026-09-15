@@ -2366,7 +2366,9 @@ Do you want to replace it?]
 # every check green. Teeth-tested: with it reverted this line reads
 # NewExperiment=1 OpenExperiment=1 and the scenario fails. Found by review.
   [locked] the two doors: NewExperiment=0 OpenExperiment=0  (0 = locked during a run)
+  [counter] model=535 display before slotEvolutionStopped=532
   [released] after slotEvolutionStopped: isRunning=0 (0 = released)
+  [counter] display after slotEvolutionStopped=535 refreshed=1
   [released] typed=83, model reads 83  writtenAgain=1
 == SCENARIO rngseed ==
 

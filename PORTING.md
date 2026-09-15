@@ -2475,8 +2475,9 @@ else that stops matching 1.3 still needs justifying as a defect.
 | **Icons whose two pixmaps straddle the chosen size are resampled.** Qt 2 named Small and Large explicitly and blitted each at its own size; a Qt 6 toolbar has one `iconSize` and picks from the `QIcon` by pixel size | removing it means splitting every `QIcon`. Sizes were re-measured across every referenced XPM — **five distinct sizes each** — and set to 25×25 / 48×48, the measured maxima, so nothing is enlarged past what 1.3 drew | — |
 | **1.3 drops a spin box's suffix while editing; this port keeps it.** The register-width box reads `3 bit` at rest, plain `100` during typing and `99 bit` after commit on 1.3; here it reads `10 bit` throughout | Qt 2's `updateDisplay()` wrote prefix + text + suffix into the line edit unprotected, where Qt 6's `QAbstractSpinBox` keeps them out of the editable text | **Recorded, not chased.** No value differs; only what is on screen mid-edit |
 | **Clicking the outer edge of a ticked slider pages on 1.3 and does nothing here.** Qt 2's Motif slider treats the WHOLE widget as clickable — the oracle got a clean page step at all twenty of `yawSlider`'s cross-axis offsets — where Qt 6 honours the groove sub-rect only: on `yawSlider`, y=3,5,7,9 page it and y=1,11,13,15,17,19 do not | a Qt framework behaviour rather than anything the conversion did. Nobody is likely to notice, but it is a fidelity difference | §7's probe-craft list: **take the cross-axis from `SC_SliderGroove`, never from the widget's middle**, and populate the `QStyleOptionSlider` fully — `tickPosition` unset makes `subControlRect` return a tickless groove. *Added here 2026-09-03: the divergences table was billed as complete and omitted this one* |
-| **A click that closes an open menu is swallowed here. 1.3 passes it on.** On 1.3 one real click closes the File menu and selects the list row under it. Here the menu closes and the row does not move, so the user must click again | Qt’s own popup handling, not SIGEL code. The Qt 2 side is in the vendored source: `qapplication_x11.cpp:3402-3416`, in `QApplication::closePopup`, calls **`XAllowEvents(…, ReplayPointer, CurrentTime)`** when the last popup closes on a press outside it. The X server then delivers that press again to the window below. The same code subtracts 10 s from `mouseButtonPressTime`, so the repeated press cannot count as a double click. Qt 6 does not do this. That half is measured, not read, because Qt 6’s sources are not on this machine. Matching 1.3 means overriding popup dismissal for the whole application, which is D28’s "owning a custom widget forever" applied to every popup. The swallowing behaviour is also what every modern toolkit does | `xtest-baseline.txt` section 4, with the control click printed below it |
 | **Overwrite on save and export — D35.** 1.3 asks "File exists... Do you want to overwrite?" after the file dialog, and in five exports and `slotRobotSave` writes the file whatever the answer. The port does not ask: the file dialog's own confirmation asks when the chosen name exists, and a name to which `checkEnding` adds the extension gets a date stamp when that file exists | a decision, 2026-09-15 | `overwrite` in `gui behaviour`: a date-stamped file and `sentinelSurvived=1` without the extension, `childOfTheFileDialog=1` and `sentinelSurvived=1` after No |
+| **The generation counter is refreshed when a run ends.** 1.3's `slotEvolutionStopped` does not write the counter, so it keeps the last value `SIG_ExperimentView::putIntoExperiment` wrote until that function runs again | a decision, 2026-09-15 | `runlock` in `gui behaviour`: the `[counter]` lines |
+| **A click that closes an open menu is swallowed here. 1.3 passes it on.** On 1.3 one real click closes the File menu and selects the list row under it. Here the menu closes and the row does not move, so the user must click again | Qt’s own popup handling, not SIGEL code. The Qt 2 side is in the vendored source: `qapplication_x11.cpp:3402-3416`, in `QApplication::closePopup`, calls **`XAllowEvents(…, ReplayPointer, CurrentTime)`** when the last popup closes on a press outside it. The X server then delivers that press again to the window below. The same code subtracts 10 s from `mouseButtonPressTime`, so the repeated press cannot count as a double click. Qt 6 does not do this. That half is measured, not read, because Qt 6’s sources are not on this machine. Matching 1.3 means overriding popup dismissal for the whole application, which is D28’s "owning a custom widget forever" applied to every popup. The swallowing behaviour is also what every modern toolkit does | `xtest-baseline.txt` section 4, with the control click printed below it |
 | **A second click on the same menubar item closes the menu here. On 1.3 it stays open** | Same cause and same answer as the row above. Qt 6’s menubar toggles on a second click and Qt 2’s did not. Nothing in SIGEL decides it | `xtest-baseline.txt` section 4 |
 
 **Three 1.3 defects preserved on purpose**, plus the one below them. `MT_GUI`'s
@@ -3452,15 +3453,17 @@ run, then back. **The fitness curve is `experimentHistory`, one entry per
 generation**, and it grew by exactly 3 to 139 entries, gen 1..139 contiguous, on
 both machines.
 
-**The generation counter DOES NOT MOVE during a run, and that is 1.3 behaviour to
-preserve.** The two statements that would update it (`SIG_GUIGPManager.cpp`) are
-**commented out in the sources as released**, one under `// update generations
-display (this line looks cool, doesn't it ?!)`. The only live update is inside
+**On 1.3 the generation counter DOES NOT MOVE during a run.** The two statements
+that would update it (`SIG_GUIGPManager.cpp`) are **commented out in the sources
+as released**, one under `// update generations display (this line looks cool,
+doesn't it ?!)`. On 1.3 the only live update is inside
 `SIG_ExperimentView::putIntoExperiment()`, not a refresh hook — so it moves on
 experiment selection and page switch, and never when a run ends. 187 samples here
 over 554 s and 172 on the oracle across two generation boundaries all read the
-starting value, and both versions keep the old value after the run until a page
-switch.
+starting value, and both versions then kept the old value after the run until a
+page switch. *Since 2026-09-15 the port also writes the counter in
+`SIG_GUIGPExperiment::slotEvolutionStopped`, when a run ends; see the
+divergences table.*
 
 **EVERY SHIPPED EXPERIMENT TERMINATES ON A DATE IN 2001** —
 `TERMINATIONUSESDATE 1`, `TERMINATIONTIME 2001`, all 14 — **so a correct Start
@@ -5537,8 +5540,9 @@ impossible under the lock because `Save Experiment` is itself locked.
 **NOT COVERED:** `runlock` sets `evolutionRunning` itself, so it cannot check
 the line in `slotStartEvolution` that sets it. Delete that line and the gate
 still passes. Nor does it run the call to `slotEvolutionStopped` in the `catch`
-of `slotStartEvolution`: it calls that slot directly, so it checks only that the
-slot clears the flag. Checking it
+of `slotStartEvolution`: it calls that slot directly, so it checks what the
+slot does — clear the flag and show the pool generation — not that the `catch`
+calls it. Checking it
 needs a real run, and every shipped experiment stops on a date in 2001, so a
 correct Start returns in under 100 ms.
 

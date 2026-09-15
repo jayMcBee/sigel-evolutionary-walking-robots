@@ -701,6 +701,9 @@ void SIG_GUIGPExperiment::slotEvolutionStopped()
   experimentView->pushbuttonStart->setEnabled( true );
   experimentView->pushbuttonStop->setEnabled( false );
 
+  // The run raises the pool generation but does not update this display.
+  experimentView->lcdnumberGenerations->display( gpExperiment.population.getPoolGeneration() );
+
   // enable the widgets
   gpParameter->setEnabled( true );
   simulationParameter->setEnabled( true );
