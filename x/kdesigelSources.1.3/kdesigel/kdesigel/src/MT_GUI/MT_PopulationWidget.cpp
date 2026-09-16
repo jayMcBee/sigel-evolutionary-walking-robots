@@ -97,7 +97,7 @@ MT_PopulationWidget::MT_PopulationWidget(QMainWindow* parent, const char* name, 
 	icon_savePopAction.addPixmap(QPixmap(pixPath+"saveExperimentLarge.xpm"));
 	savePopAction = new QAction(icon_savePopAction, "&Save Population", parentWindow);
 	savePopAction->setToolTip("Save Population");
-	savePopAction->setStatusTip("Save the complete population to a file.");
+	savePopAction->setStatusTip("Saves the complete population to a file.");
 	popToolBar->addAction(savePopAction);
 
 	// establish connections
@@ -345,7 +345,7 @@ void MT_PopulationWidget::slotDelInd()
  ***/
 void MT_PopulationWidget::slotImpInd()
 {
-	QStringList files( QFileDialog::getOpenFileNames( this, "Import Individuals", QString(), "Individuals(*.mind);;All Files(*)"));
+	QStringList files( QFileDialog::getOpenFileNames( this, "Import Individuals", QString(), "Individuals (*.mind);;All Files (*)"));
 
 	if(!files.isEmpty()){
 	
@@ -385,7 +385,7 @@ void MT_PopulationWidget::slotExpInd()
 	bool saveAsPop = false;
 	QString fileName;
 	if(list->count() > 1){
-		saveAsPop = !QMessageBox::information(this, "Save individuals", "There are more than one individual selected.\n"
+		saveAsPop = !QMessageBox::information(this, "Save individuals", "There is more than one individual selected.\n"
 			"Shall we save them as a population?", "Save as population", "Save separately");
 	}
 	if(saveAsPop){
@@ -397,7 +397,7 @@ void MT_PopulationWidget::slotExpInd()
 
 			if(file.exists()){
 				if(0 == QMessageBox::warning(this, "Save population", "There is another file with this name. This will overwrite\n"
-					"the existing file. Do really want to continue?", "Ok", "Cancel", 0, 1))
+					"the existing file. Do you really want to continue?", "Ok", "Cancel", 0, 1))
 					return;
 			}
 
@@ -419,7 +419,7 @@ void MT_PopulationWidget::slotExpInd()
 
 				file.close();
 			} else {
-				QMessageBox::critical(this, "Save population", "An error occured during saving the population.\nAborting operation.", "Ok");
+				QMessageBox::critical(this, "Save population", "An error occurred during saving the population.\nAborting operation.", "Ok");
 			}
 		}
 	} else {
@@ -430,7 +430,7 @@ void MT_PopulationWidget::slotExpInd()
 				QFile file( fileName.append("%1.mind").arg(i) );
 				if(file.exists()){
 					if(0 == QMessageBox::warning(this, "Save population", "There is another file with this name. This will overwrite\n"
-						"the existing file. Do really want to continue?", "Ok", "Cancel", 0, 1))
+						"the existing file. Do you really want to continue?", "Ok", "Cancel", 0, 1))
 						return;
 				}
 				if(file.open(QIODevice::WriteOnly)){
@@ -442,7 +442,7 @@ void MT_PopulationWidget::slotExpInd()
 					population->getIndividual(list->last()->getPos())->writeToFileIndi(str);
 					file.close();
 				} else {
-					QMessageBox::critical(this, "Save individual", "An error occured during saving the individual.\nAborting operation.", "Ok");
+					QMessageBox::critical(this, "Save individual", "An error occurred during saving the individual.\nAborting operation.", "Ok");
 				}
 			}
 
@@ -507,7 +507,7 @@ void MT_PopulationWidget::slotSavePop()
 
 		if(file.exists()){
 			if(0 == QMessageBox::warning(this, "Save population", "There is another file with this name. This will overwrite\n"
-				"the existing file. Do really want to continue?", "Ok", "Cancel", 0, 1))
+				"the existing file. Do you really want to continue?", "Ok", "Cancel", 0, 1))
 				return;
 		}
 
@@ -516,7 +516,7 @@ void MT_PopulationWidget::slotSavePop()
 			population->writeToFilePop(str);
 			file.close();
 		} else {
-			QMessageBox::critical(this, "Save population", "An error occured during saving the population.\nAborting operation.", "Ok");
+			QMessageBox::critical(this, "Save population", "An error occurred during saving the population.\nAborting operation.", "Ok");
 		}
 	}
 }

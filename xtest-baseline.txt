@@ -111,7 +111,7 @@
   [page] count=8 current=SIGEL_MasterGUI::SIG_ExperimentView objectName=[ExperimentView]
   [widgets]
     group    [Evolution controls] enabled=1
-    group    [Fitnesscurve] enabled=1
+    group    [Fitness curve] enabled=1
     group    [Experiment properties] enabled=1
     button   [&Start] enabled=1 checkable=0 checked=0
     button   [S&top] enabled=0 checkable=0 checked=0

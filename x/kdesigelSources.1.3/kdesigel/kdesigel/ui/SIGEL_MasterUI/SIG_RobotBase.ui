@@ -113,7 +113,7 @@
                           <enum>QAbstractItemView::NoSelection</enum>
                         </property>
                         <property name="toolTip">
-                          <string>All Materials the current robot model uses</string>
+                          <string>All materials that the current robot model uses</string>
                         </property>
                       </widget>
                     </item>
@@ -173,7 +173,7 @@
                           <enum>QAbstractItemView::NoSelection</enum>
                         </property>
                         <property name="toolTip">
-                          <string>The Sensors used, Icons indicate Sensortype&lt;BR&gt;(Joint, Pitch, Roll, Contact)</string>
+                          <string>The sensors used. Icons indicate sensor type&lt;BR&gt;(Joint, Pitch, Roll, Contact)</string>
                         </property>
                       </widget>
                     </item>
@@ -203,7 +203,7 @@
                           <enum>QAbstractItemView::NoSelection</enum>
                         </property>
                         <property name="toolTip">
-                          <string>All joints of the current robot model, Icons indicate type (Rotational, Translational, Cylindrical)</string>
+                          <string>All joints of the current robot model. Icons indicate type (Rotational, Translational, Cylindrical)</string>
                         </property>
                       </widget>
                     </item>
@@ -233,7 +233,7 @@
                           <enum>QAbstractItemView::NoSelection</enum>
                         </property>
                         <property name="toolTip">
-                          <string>Drives used in the current robot model, Icons indicate type (absolute, relative, force, servo)</string>
+                          <string>Drives used in the current robot model. Icons indicate type (absolute, relative, force, servo)</string>
                         </property>
                       </widget>
                     </item>

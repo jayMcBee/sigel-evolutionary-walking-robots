@@ -644,7 +644,7 @@ SIG_MainWindow::SIG_MainWindow( QWidget * parent, const char * name, Qt::WindowF
   mtChoiceClassifierAction->setToolTip( "choose classifier system" );
   mtChoiceClassifierAction->setIconText( "choose classifier system" );
   mtChoiceClassifierAction->setCheckable( true );
-  mtChoiceClassifierAction->setStatusTip( "Chooses the Classifer System. Replaces the fitness based tournament decision by a MetaGP System which needs less fitness calculation." );
+  mtChoiceClassifierAction->setStatusTip( "Chooses the Classifier System. Replaces the fitness based tournament decision by a MetaGP System which needs less fitness calculation." );
   mtMenu->addActions( mtChoiceTypeActionGroup->actions() );
   mtChoiceTypeActionGroup->setEnabled(false);
   QObject::connect(mtChoiceTypeActionGroup, SIGNAL( triggered( QAction * ) ), SLOT( slotMTSwitchSystem(QAction*) ));

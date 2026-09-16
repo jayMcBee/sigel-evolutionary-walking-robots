@@ -89,9 +89,9 @@ void SIG_ExperimentView::getOutOfExperiment() {
 
 void SIG_ExperimentView::streamToGnuPlot( QTextStream &stream ) {
   stream << "set data style lines\n"
-	 << "set title \"Maximal, minimal and average fitnessvalues\"\n"
+	 << "set title \"Maximal, minimal and average fitness values\"\n"
 	 << "set xlabel 'Generation'\n"
-	 << "set ylabel 'Fitnessvalue'\n";
+	 << "set ylabel 'Fitness value'\n";
 
   stream << "plot '-' title 'Maximal fitness', '-' title 'Minimal fitness', '-' title 'Average fitness'\n";
 

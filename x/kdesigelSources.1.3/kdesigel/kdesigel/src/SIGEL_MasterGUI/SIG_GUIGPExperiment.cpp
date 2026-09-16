@@ -372,7 +372,7 @@ void SIG_GUIGPExperiment::slotStartEvolution()
     }
   else
     {
-      QMessageBox::warning( experimentListView, "Can't start evolution...", "The evolution cannot be started. There may be several reasons:<ul><li>There is no robot loaded.</li><li>There are less than four individuals in the population</li><li>No fitness function name was specified.</li></ul>");
+      QMessageBox::warning( experimentListView, "Can't start evolution...", "The evolution cannot be started. There may be several reasons:<ul><li>There is no robot loaded.</li><li>There are fewer than four individuals in the population</li><li>No fitness function name was specified.</li></ul>");
     }
 };
 
@@ -659,7 +659,7 @@ void SIG_GUIGPExperiment::slotRobotLoad()
 
 void SIG_GUIGPExperiment::slotRobotSave()
 {
-  QString fileName = QFileDialog::getSaveFileName( experimentListView, "Save Robot...", QString(), "Cooked Robot Files (*.crb);;All Files (*)" );
+  QString fileName = QFileDialog::getSaveFileName( experimentListView, "Save Robot...", QString(), "Compiled Robot Files (*.crb);;All Files (*)" );
   if( !fileName.isEmpty() )
     {
       fileName = checkEnding( fileName, "crb" );
@@ -679,7 +679,7 @@ void SIG_GUIGPExperiment::slotRobotInfo()
 
   // need DynaMechs for that..
   if (gpExperiment.simulationParameter.getSimulationLibrary() != SIGEL_Simulation::SIG_SimulationParameters::DynaMechs)
-  { QMessageBox::information( experimentListView, "Can't display Robot Information..", "<B>DynaMechs required for this operation to function properly.</B>");
+  { QMessageBox::information( experimentListView, "Can't display Robot Information..", "<B>DynaMechs is required for this operation to work properly.</B>");
     return;
   }
 

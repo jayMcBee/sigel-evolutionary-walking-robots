@@ -369,7 +369,7 @@ void MT_StatisticsWidget::slotEstDButton()
 	QFile file(fileName);
 	if(file.exists()){
 		if(0 == QMessageBox::warning(0, "Export Data", "There is another file with this name. This will overwrite\n"
-			"the existing file. Do really want to continue?", "Ok", "Cancel", 0, 1))
+			"the existing file. Do you really want to continue?", "Ok", "Cancel", 0, 1))
 			return;
 	}
 
@@ -408,7 +408,7 @@ void MT_StatisticsWidget::slotFitnessDButton()
 	QFile file(fileName);
 	if(file.exists()){
 		if(0 == QMessageBox::warning(0, "Export Data", "There is another file with this name. This will overwrite\n"
-			"the existing file. Do really want to continue?", "Ok", "Cancel", 0, 1))
+			"the existing file. Do you really want to continue?", "Ok", "Cancel", 0, 1))
 			return;
 	}
 
@@ -416,7 +416,7 @@ void MT_StatisticsWidget::slotFitnessDButton()
 	QTextStream pipeStream(&file);
 
 	// write data
-	pipeStream << "# Meta generations\t\tmax fitness\t\taverage fitness\t\tstreuung\n#\n";
+	pipeStream << "# Meta generations\t\tmax fitness\t\taverage fitness\t\tvariance\n#\n";
 
 	MT_StatisticsElement *el=0;
 	for(int i=0; i<metaGens; i++){
@@ -450,7 +450,7 @@ void MT_StatisticsWidget::slotSearchEffectsDButton()
 	QFile file(fileName);
 	if(file.exists()){
 		if(0 == QMessageBox::warning(0, "Export Data", "There is another file with this name. This will overwrite\n"
-			"the existing file. Do really want to continue?", "Ok", "Cancel", 0, 1))
+			"the existing file. Do you really want to continue?", "Ok", "Cancel", 0, 1))
 			return;
 	}
 
@@ -500,7 +500,7 @@ void MT_StatisticsWidget::slotEstPSExport()
 	QFile file(fileName);
 	if(file.exists()){
 		if(0 == QMessageBox::warning(0, "Export to Postscript", "There is another file with this name. This will overwrite\n"
-			"the existing file. Do really want to continue?", "Ok", "Cancel", 0, 1))
+			"the existing file. Do you really want to continue?", "Ok", "Cancel", 0, 1))
 			return;
 	}
 
@@ -528,7 +528,7 @@ void MT_StatisticsWidget::slotFitnessPSExport()
 	QFile file(fileName);
 	if(file.exists()){
 		if(0 == QMessageBox::warning(0, "Export to Postscript", "There is another file with this name. This will overwrite\n"
-			"the existing file. Do really want to continue?", "Ok", "Cancel", 0, 1))
+			"the existing file. Do you really want to continue?", "Ok", "Cancel", 0, 1))
 			return;
 	}
 
@@ -556,7 +556,7 @@ void MT_StatisticsWidget::slotSearchEffectsPSExport()
 	QFile file(fileName);
 	if(file.exists()){
 		if(0 == QMessageBox::warning(0, "Export to Postscript", "There is another file with this name. This will overwrite\n"
-			"the existing file. Do really want to continue?", "Ok", "Cancel", 0, 1))
+			"the existing file. Do you really want to continue?", "Ok", "Cancel", 0, 1))
 			return;
 	}
 	
@@ -647,7 +647,7 @@ void MT_StatisticsWidget::plotFitness(QString fileName)
 			<< "set output \"" << fileName << "\"\n";
 	}
 
-	pipeStream 	<< "set title \"Fitnesscurve\"\n"
+	pipeStream 	<< "set title \"Fitness curve\"\n"
 		<< "set xlabel 'Generation'\n"
 		<< "set ylabel\n"
 		<< "plot '-' title 'variance' with yerrorbars, '-' smooth bezier title 'average fitness' with lines, '-' smooth bezier title 'max fitness' with lines\n";

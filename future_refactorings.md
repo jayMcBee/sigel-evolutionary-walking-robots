@@ -882,6 +882,34 @@ German", further up this file.
 
 ---
 
+## Rename the German-English `act` prefix to `current`
+
+**Asked for 2026-09-16.** `act` is German `aktuell`, meaning current. It is not
+English and it reads as the verb "act". The interface and the model use it for
+"the one in use right now".
+
+**Measured, `src/` and `include/` only:** 754 occurrences, 51 distinct names.
+The largest are `actExperiment` 115, `actTour` 54, `actRealPosition` 53,
+`actInd` 48, `actSuccessor` 35, `actFitness` 30, `actFitTask` 29.
+
+**`actExperiment` is the one Jan named.** It is a member, a parameter and a local
+in four files, three of them in `SIGEL_GP` and one in `SIGEL_MasterGUI`, and it
+reaches four function names: `actExperiment()`, `getActExperiment()`,
+`actExpChanged()` and `slotActExpChanged()`. The last two are a signal and a
+slot, so the string-based connect must change with them or the connect dies at
+run time. `check.sh` has a check for exactly that failure.
+
+**Scope to settle before starting.** `actExperiment` alone is 115 sites, and most
+of them are in `SIGEL_GP`, which D33 keeps untouched for behaviour — a rename is
+not behaviour, but it is still a large diff in a frozen module. Doing the whole
+`act` family is 754 sites across every module. Ask Jan which.
+
+**Nothing in the reference files holds these names**, so no stored output moves.
+The risk is the signal and slot pair, and `guidrive.cpp`, which names
+`actExpChanged` in its own checks.
+
+---
+
 ## Confirm the run lock is finished, and nothing of the earlier attempts is left
 
 **Asked for 2026-09-16, after the UI label check.** The run lock went through

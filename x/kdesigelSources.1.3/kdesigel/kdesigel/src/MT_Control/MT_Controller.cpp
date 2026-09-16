@@ -209,7 +209,7 @@ bool MT_Controller::switchSystem(int wantedSystem)
 	if(gpManager || substCache.inUse || substitution){
 
 		if(QMessageBox::warning(0, "Switching the meta system", 
-			"Switching the system requires deleting the actual\n"
+			"Switching the system requires deleting the current\n"
 			"gp-system. Do you want to delete it?",
 			"Yes", "No", 0, 1, 1) == 0){
 
@@ -850,7 +850,7 @@ void MT_Controller::slotLoadDefault()
 
 void MT_Controller::slotLoadSetup()
 {
-	QString fileName = QFileDialog::getOpenFileName(mainWindow, QString(), QString(), "Setup(*.mcnf);;All Files(*)");
+	QString fileName = QFileDialog::getOpenFileName(mainWindow, QString(), QString(), "Setup (*.mcnf);;All Files (*)");
 	
 	if(fileName.isEmpty())
 		return;
@@ -896,7 +896,7 @@ void MT_Controller::slotLoadSetup()
 
 void MT_Controller::slotSaveSetup()
 {
-	QString fileName = QFileDialog::getSaveFileName(mainWindow, QString(), QString(), "Setup(*.mcnf);;All Files(*)");
+	QString fileName = QFileDialog::getSaveFileName(mainWindow, QString(), QString(), "Setup (*.mcnf);;All Files (*)");
 
 	if(fileName.isEmpty())
 		return;
@@ -907,7 +907,7 @@ void MT_Controller::slotSaveSetup()
 	QFile file(fileName);
 	if(file.exists()){
 		if(0 == QMessageBox::warning(0, "Save configuration", "There is another file with this name. This will overwrite\n"
-			"the existing file. Do really want to continue?", "Ok", "Cancel", 0, 1))
+			"the existing file. Do you really want to continue?", "Ok", "Cancel", 0, 1))
 			return;
 	}
 	if(file.open(QIODevice::WriteOnly)){

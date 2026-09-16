@@ -268,7 +268,7 @@ bool MT_IndividualsWidget::onHide(MT_GPManager *manager, subst_cache *subst)
 
 void MT_IndividualsWidget::slotImportConstants()
 {
-	QStringList files( QFileDialog::getOpenFileNames( this, "Import Constants", QString(), "Constants(*.mcon);;All Files(*)"));
+	QStringList files( QFileDialog::getOpenFileNames( this, "Import Constants", QString(), "Constants (*.mcon);;All Files (*)"));
 
 
 	if(files.isEmpty())
@@ -324,7 +324,7 @@ void MT_IndividualsWidget::slotImportConstants()
 
 void MT_IndividualsWidget::slotExportConstants()
 {
-	QString fileName = QFileDialog::getSaveFileName(this, QString(), QString(), "Constants(*.mcon);;All Files(*)");
+	QString fileName = QFileDialog::getSaveFileName(this, QString(), QString(), "Constants (*.mcon);;All Files (*)");
 	if(fileName.isEmpty()) return;
 	if(fileName.right(5) != ".mcon")
 		fileName += ".mcon";
@@ -332,7 +332,7 @@ void MT_IndividualsWidget::slotExportConstants()
 	QFile file(fileName);
 	if(file.exists()){
 		if(0 == QMessageBox::warning(this, "Save constants", "There is another file with this name. This will overwrite\n"
-			"the existing file. Do really want to continue?", "Ok", "Cancel", 0, 1))
+			"the existing file. Do you really want to continue?", "Ok", "Cancel", 0, 1))
 			return;
 	}
 	
@@ -355,7 +355,7 @@ void MT_IndividualsWidget::slotExportConstants()
 	} else {
 		QMessageBox::critical(this, "Export Constants",
 			"Couldn't open file for writing.\n"
-			"Constant won't be saved.", 1, 0);
+			"Constants won't be saved.", 1, 0);
 	}
 }
 

@@ -479,7 +479,7 @@
                       <widget class="QComboBox" name="comboboxSolveMode">
                         <item>
                           <property name="text">
-                            <string>Single Value Decomposition</string>
+                            <string>Singular Value Decomposition</string>
                           </property>
                         </item>
                         <item>

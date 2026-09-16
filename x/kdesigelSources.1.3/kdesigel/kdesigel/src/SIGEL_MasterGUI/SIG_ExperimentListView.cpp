@@ -198,7 +198,7 @@ void SIG_ExperimentListView::slotLoadExperiment()
 	    }
 	  else
 	    {
-	      QMessageBox::warning( this, "File could not be opened...", "The file " + fileName + "could not be opened for reading." );
+	      QMessageBox::warning( this, "File could not be opened...", "The file " + fileName + " could not be opened for reading." );
 	    }
 	  experimentDict.insert( fileName , theNewExperiment );
 	  emit isNotEmpty( true );

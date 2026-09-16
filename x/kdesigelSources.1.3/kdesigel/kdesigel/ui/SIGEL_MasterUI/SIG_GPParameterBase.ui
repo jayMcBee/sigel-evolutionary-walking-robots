@@ -1301,7 +1301,7 @@
                     <item>
                       <widget class="QRadioButton" name="radiobuttonInterpreteAsDate">
                         <property name="text">
-                          <string>Interprete as date</string>
+                          <string>Interpret as date</string>
                         </property>
                         <property name="checked">
                           <bool>true</bool>
@@ -1311,7 +1311,7 @@
                     <item>
                       <widget class="QRadioButton" name="radiobuttonInterpreteAsDuration">
                         <property name="text">
-                          <string>Interprete as duration</string>
+                          <string>Interpret as duration</string>
                         </property>
                       </widget>
                     </item>
@@ -1659,7 +1659,7 @@
                           <enum>Qt::Horizontal</enum>
                         </property>
                         <property name="toolTip">
-                          <string>Ajust how many tournaments are to be considered a 'Generation'</string>
+                          <string>Adjust how many tournaments are to be considered a 'Generation'</string>
                         </property>
                       </widget>
                     </item>

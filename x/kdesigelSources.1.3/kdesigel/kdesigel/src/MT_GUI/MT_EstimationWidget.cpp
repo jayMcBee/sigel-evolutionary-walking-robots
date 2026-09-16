@@ -153,7 +153,7 @@ bool MT_EstimationWidget::onHide(MT_GPManager *manager, subst_cache *subst)
 		subst->refreshInt = refInt;
 	}
 	else
-		QMessageBox::critical(this, "Configuring System", "Couldn't set information to current Meta-System.", "Ok");
+		QMessageBox::critical(this, "Configuring System", "Couldn't set the information for the current Meta-System.", "Ok");
 
 	return true;
 }
@@ -171,7 +171,7 @@ void MT_EstimationWidget::onShow(MT_GPManager *manager, subst_cache *subst)
 		tolerance = subst->tolerance;
 	}
 	else {
-		QMessageBox::critical(this, "Configuring System", "Couldn't retrieve information of current Meta-System.", "Ok");
+		QMessageBox::critical(this, "Configuring System", "Couldn't retrieve the information for the current Meta-System.", "Ok");
 		return;
 	}
 

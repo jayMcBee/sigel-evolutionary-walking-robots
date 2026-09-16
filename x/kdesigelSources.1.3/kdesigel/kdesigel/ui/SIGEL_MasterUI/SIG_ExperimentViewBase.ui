@@ -133,7 +133,7 @@
           <item>
             <widget class="QGroupBox" name="groupboxFitnesscurve">
               <property name="title">
-                <string>Fitnesscurve</string>
+                <string>Fitness curve</string>
               </property>
               <layout class="QVBoxLayout">
                 <property name="margin">
@@ -180,14 +180,14 @@
                       <bool>true</bool>
                     </property>
                     <property name="toolTip">
-                      <string>check the box if you want to save history for each individual with your experiment</string>
+                      <string>Check the box if you want to save history for each individual in your experiment</string>
                     </property>
                   </widget>
                 </item>
                 <item>
                   <widget class="QLabel" name="textlabelAutosave">
                     <property name="text">
-                      <string>Autosave Intervall (Generations):</string>
+                      <string>Autosave Interval (Generations):</string>
                     </property>
                     <property name="wordWrap">
                       <bool>false</bool>

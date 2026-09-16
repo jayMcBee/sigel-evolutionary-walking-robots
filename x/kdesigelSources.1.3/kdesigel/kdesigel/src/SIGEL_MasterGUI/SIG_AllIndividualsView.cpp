@@ -402,7 +402,7 @@ void SIG_AllIndividualsView::slotVisualize()
          pvmData.sendQStringToPVM( pvmDataString, taskId, 23 );
    	  }
    	  else {
-   	      QMessageBox::critical( this, "Error while starting slave!", "The slave could not be started.\n Either there is not executable or a PVM problem occured." );
+   	      QMessageBox::critical( this, "Error while starting slave!", "The slave could not be started.\n Either there is no executable or a PVM problem occurred." );
    	  };
    	} // if-statement
   } //for-loop
