@@ -2357,9 +2357,21 @@ Do you want to replace it?]
 # so enabled=1 proved a click had happened and not that MetaGP was on. Found by
 # review.
   [control] MetaGP on at rest: UseMetaGP checked=1  ConfigureSystem enabled=1  (both 1 = the checks below can fail)
+# The three `live=' lines below cover the six widgets of the experiment itself.
+# slotStartEvolution disables them for its own experiment only; this scenario
+# never calls it, so only SIG_GUIGPExperiment::slotEvolutionNotRunning can
+# move them. Teeth-tested: without its connect the locked line reads live=6
+# and the scenario fails.
+# The `set=' line above used to read `typed='. Once the GP page is disabled
+# during a run Qt drops key events to it, so typing reported a refusal that no
+# guard performed: with putAllIntoExperiment's check deleted the line still
+# read refused=1. It now sets the value and commits it by hand, and with that
+# check deleted it reads refused=0 and the scenario fails.
+  [atRest] Start=1 GP=1 Sim=1 Robot=1 Lang=1 Env=1  live=6
   [locked] isRunning=1
-  [locked] typed=71, model reads 57  refused=1
+  [locked] set=71, model reads 57  refused=1
   [locked] after a tree click ([twoBasesSimpleFitness2.exp]): Add=0 ConfigureSystem=0  UseMetaGP=0  (0 = still locked)
+  [locked] Start=0 GP=0 Sim=0 Robot=0 Lang=0 Env=0  live=0
   [locked] after slotEnableNoExperimentActions(true): Add=0 ConfigureSystem=0 UseMetaGP=0  (0 = still locked)
 # The two doors themselves. Putting New Experiment and Open Experiment into the
 # run lock is a third of D30 and NOTHING read them -- reverting that append left
@@ -2369,7 +2381,13 @@ Do you want to replace it?]
   [counter] model=535 display before slotEvolutionStopped=532
   [released] after slotEvolutionStopped: isRunning=0 (0 = released)
   [counter] display after slotEvolutionStopped=535 refreshed=1
+  [released] Start=1 GP=1 Sim=1 Robot=1 Lang=1 Env=1  live=6
   [released] typed=83, model reads 83  writtenAgain=1
+# The second experiment is the point of the slot: a run in ONE experiment
+# must lock the OTHERS. It is created last, because it changes the tree.
+  [second atRest] Start=1 GP=1 Sim=1 Robot=1 Lang=1 Env=1  live=6
+  [second locked] Start=0 GP=0 Sim=0 Robot=0 Lang=0 Env=0  live=0
+  [second released] Start=1 GP=1 Sim=1 Robot=1 Lang=1 Env=1  live=6
 == SCENARIO rngseed ==
 
 == STEP 1: fresh start, no experiment ==

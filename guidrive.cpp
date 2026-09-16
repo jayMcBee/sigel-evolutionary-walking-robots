@@ -3825,6 +3825,31 @@ static int guidriveMain(int argc, char **argv)
         }
         fflush(stdout);
 
+        // The experiment's own six widgets. slotStartEvolution disables them
+        // for its own experiment only. SIG_GUIGPExperiment::slotEvolutionNotRunning
+        // does it for every experiment, from the list view's signal. This
+        // scenario never calls slotStartEvolution, so only that second route
+        // can move these numbers.
+        auto widgetsOf = [](SIG_GUIGPExperiment *e, const char *when) -> int {
+            const int start = e->experimentView->pushbuttonStart->isEnabled() ? 1 : 0;
+            const int gp    = e->gpParameter->isEnabled() ? 1 : 0;
+            const int sim   = e->simulationParameter->isEnabled() ? 1 : 0;
+            const int rob   = e->robotView->isEnabled() ? 1 : 0;
+            const int lang  = e->languageParameters->isEnabled() ? 1 : 0;
+            const int env   = e->environmentView->isEnabled() ? 1 : 0;
+            const int live  = start + gp + sim + rob + lang + env;
+            printf("  [%s] Start=%d GP=%d Sim=%d Robot=%d Lang=%d Env=%d  live=%d\n",
+                   when, start, gp, sim, rob, lang, env, live);
+            return live;
+        };
+        auto expWidgets = [&](const char *when) -> int { return widgetsOf(theExp, when); };
+        // The control. All six off at rest would make the locked read vacuous.
+        if (expWidgets("atRest") != 6) {
+            printf("!! the experiment's widgets are not all live at rest, so the"
+                   " locked check below cannot fail\n");
+            fflush(stdout); return 1;
+        }
+
         // evolutionRunning is protected. A pointer to it, formed inside a
         // derived class, sets it on the real experiment.
         struct RunState : SIG_GUIGPExperiment {
@@ -3833,9 +3858,27 @@ static int guidriveMain(int argc, char **argv)
         {
             theExp->*RunState::flag() = true;
             printf("  [locked] isRunning=%d\n", lv->isRunning() ? 1 : 0);
-            const long locked = writtenAge(before + 21);
-            printf("  [locked] typed=%d, model reads %ld  refused=%d\n",
+            // The GP page is disabled during a run, so Qt drops key events to
+            // it and typing would report a refusal that no guard performed.
+            // Set the value and commit it by hand: what is under test is
+            // SIG_GUIGPExperiment::putAllIntoExperiment's own check.
+            QWidget *gpPage = page("&GP Parameters");
+            QSpinBox *maxAge = gpPage ? gpPage->findChild<QSpinBox *>("spinboxMaxAge") : nullptr;
+            if (!maxAge) { printf("!! no spinboxMaxAge\n"); fflush(stdout); return 1; }
+            maxAge->setValue(before + 21);
+            if (maxAge->value() != before + 21) {
+                printf("!! the spin box did not take the value, so the check below"
+                       " cannot fail\n");
+                fflush(stdout); return 1;
+            }
+            theExp->putAllIntoExperiment();
+            const long locked = modelAge();
+            printf("  [locked] set=%d, model reads %ld  refused=%d\n",
                    before + 21, locked, locked == before + 7 ? 1 : 0);
+            if (locked != before + 7) {
+                printf("!! a parameter reached the model during a run\n");
+                fflush(stdout); return 1;
+            }
 
             // The tree-click emit, which drives the 23 locked actions. While
             // the flag is set a selection change must NOT re-enable them, and that is
@@ -3867,6 +3910,12 @@ static int guidriveMain(int argc, char **argv)
                    "  UseMetaGP=%d  (0 = still locked)\n",
                    qPrintable(other->text(0)), add && add->isEnabled() ? 1 : 0,
                    en("&Configure System"), en("&Use MetaGP"));
+            if (expWidgets("locked") != 0) {
+                printf("!! a run left the experiment's own Start button or"
+                       " parameter pages live\n");
+                fflush(stdout); return 1;
+            }
+
             // Assert HERE. The slot call below re-applies the lock, so a
             // regression in the tree-click guard alone was silently repaired
             // before the end-of-block check could see it -- the gate stayed
@@ -3940,9 +3989,41 @@ static int guidriveMain(int argc, char **argv)
         }
         lv->setCurrentItem(lv->topLevelItem(0));
         QTest::qWait(300);
+        if (expWidgets("released") != 6) {
+            printf("!! the experiment's widgets did not come back after the run\n");
+            fflush(stdout); return 1;
+        }
         const long after = writtenAge(before + 33);
         printf("  [released] typed=%d, model reads %ld  writtenAgain=%d\n",
                before + 33, after, after == before + 33 ? 1 : 0);
+
+        // The reason the slot exists: a run in ONE experiment must lock the
+        // OTHERS. Last, because it puts a second experiment into the tree.
+        QTreeWidgetItem *firstItem = lv->currentItem();
+        while (firstItem && firstItem->parent()) firstItem = firstItem->parent();
+        lv->slotNewExperiment();
+        QTest::qWait(200);
+        SIG_GUIGPExperiment *second = lv->currentlySelectedExperiment();
+        if (!second || second == theExp) {
+            printf("!! no second experiment, so the cross-experiment check did"
+                   " NOT run\n");
+            fflush(stdout); return 1;
+        }
+        if (widgetsOf(second, "second atRest") != 6) {
+            printf("!! the second experiment is not live at rest, so the check"
+                   " below cannot fail\n");
+            fflush(stdout); return 1;
+        }
+        theExp->*RunState::flag() = true;
+        lv->setCurrentItem(firstItem);          // a tree click carries the lock
+        QTest::qWait(300);
+        if (widgetsOf(second, "second locked") != 0) {
+            printf("!! a run in one experiment left another experiment live\n");
+            fflush(stdout); return 1;
+        }
+        theExp->slotEvolutionStopped();
+        QTest::qWait(200);
+        widgetsOf(second, "second released");
         fflush(stdout);
         return 0;
     }

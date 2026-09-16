@@ -189,6 +189,13 @@ namespace SIGEL_MasterGUI
 		    SIGNAL( signalEvolutionNotRunning( bool ) ),
 		    allIndividualsView,
 		    SLOT( slotEvolutionNotRunning( bool ) ) );
+
+  // Any experiment's run locks every experiment, so this one asks the list
+  // view rather than itself.
+  QObject::connect( experimentListView,
+		    SIGNAL( evolutionNotRunning( bool ) ),
+		    this,
+		    SLOT( slotEvolutionNotRunning( bool ) ) );
   getAllOutOfExperiment();
 };
 
@@ -313,6 +320,16 @@ void SIG_GUIGPExperiment::slotSelectionChanged( QString option )
   // missing key was a silent no-op; Qt 6 warns and does nothing instead.
   if ( QWidget *showWidget = widgetDict.value( option ) )
     widgetStack->setCurrentWidget( showWidget );
+};
+
+void SIG_GUIGPExperiment::slotEvolutionNotRunning( bool isNotRunning )
+{
+  experimentView->pushbuttonStart->setEnabled( isNotRunning );
+  gpParameter->setEnabled( isNotRunning );
+  simulationParameter->setEnabled( isNotRunning );
+  robotView->setEnabled( isNotRunning );
+  languageParameters->setEnabled( isNotRunning );
+  environmentView->setEnabled( isNotRunning );
 };
 
 void SIG_GUIGPExperiment::slotStartEvolution()

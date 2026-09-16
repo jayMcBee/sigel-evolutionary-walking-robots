@@ -146,6 +146,11 @@ namespace SIGEL_MasterGUI
       void slotSelectionChanged( QString option );
       
       /**
+       * Locks this experiment while any evolution runs.
+       */
+      void slotEvolutionNotRunning( bool isNotRunning );
+
+      /**
        * This slot is called whenever the evolution shall be started.
        */
       void slotStartEvolution();
