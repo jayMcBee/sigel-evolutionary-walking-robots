@@ -269,7 +269,7 @@ class SIG_ExperimentListView : public QTreeWidget
    * It tells the main window wether the currently selected experiment
    * makes use of the meta gp-system.
    */
-  void actExpChanged();
+  void currentExperimentChanged();
 
  protected:
 

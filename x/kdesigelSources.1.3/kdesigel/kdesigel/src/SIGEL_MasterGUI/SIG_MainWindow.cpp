@@ -663,9 +663,9 @@ SIG_MainWindow::SIG_MainWindow( QWidget * parent, const char * name, Qt::WindowF
   evolutionRunningActions.append( mtChoiceEvaluatorAction );
   evolutionRunningActions.append( mtChoiceClassifierAction );
   QObject::connect(experimentListView,
-	  SIGNAL( actExpChanged() ),
+	  SIGNAL( currentExperimentChanged() ),
 	  this,
-	  SLOT( slotActExpChanged() ));
+	  SLOT( slotCurrentExperimentChanged() ));
 //  noExperimentActions.append( mtChoiceTypeActionGroup );
 //  noExperimentActions.append( mtConfigureAction );
 
@@ -782,9 +782,9 @@ void SIG_MainWindow::slotMTUseMT(bool state)
 	// itself is another.
 	if (experimentListView->isRunning())
 		return;
-	SIG_GUIGPExperiment *actExperiment = experimentListView->currentlySelectedExperiment();
-	if(actExperiment){
-		if(actExperiment->gpExperiment.mtController->useMeta(state)){
+	SIG_GUIGPExperiment *currentExperiment = experimentListView->currentlySelectedExperiment();
+	if(currentExperiment){
+		if(currentExperiment->gpExperiment.mtController->useMeta(state)){
 			mtConfigureAction->setEnabled(state);
 			mtChoiceTypeActionGroup->setEnabled(state);
 		}
@@ -798,9 +798,9 @@ void SIG_MainWindow::slotMTConfigureSystem()
 	// Refuse during a run, as well as greying the menu.
 	if (experimentListView->isRunning())
 		return;
-	SIG_GUIGPExperiment *actExperiment = experimentListView->currentlySelectedExperiment();
-	if(actExperiment){
-		actExperiment->gpExperiment.mtController->configureSystem();
+	SIG_GUIGPExperiment *currentExperiment = experimentListView->currentlySelectedExperiment();
+	if(currentExperiment){
+		currentExperiment->gpExperiment.mtController->configureSystem();
 	};
 };
 
@@ -819,13 +819,13 @@ void SIG_MainWindow::slotMTSwitchSystem(QAction *selSystem)
 	if (selSystem == mtSelectedSystem)
 		return;
 
-	SIG_GUIGPExperiment *actExperiment = experimentListView->currentlySelectedExperiment();
-	if(actExperiment){
+	SIG_GUIGPExperiment *currentExperiment = experimentListView->currentlySelectedExperiment();
+	if(currentExperiment){
 		if(mtChoiceClassifierAction->isChecked()){
-			if(!actExperiment->gpExperiment.mtController->switchSystem(CLASSIFIER_SUBST))
+			if(!currentExperiment->gpExperiment.mtController->switchSystem(CLASSIFIER_SUBST))
 				mtChoiceEvaluatorAction->setChecked(true);
 		} else {
-			if(!actExperiment->gpExperiment.mtController->switchSystem(EVALUATOR_SUBST))
+			if(!currentExperiment->gpExperiment.mtController->switchSystem(EVALUATOR_SUBST))
 				mtChoiceClassifierAction->setChecked(true);
 		}
 	}
@@ -836,11 +836,11 @@ void SIG_MainWindow::slotMTSwitchSystem(QAction *selSystem)
 	                   ? mtChoiceClassifierAction : mtChoiceEvaluatorAction;
 };
 
-void SIG_MainWindow::slotActExpChanged()
+void SIG_MainWindow::slotCurrentExperimentChanged()
 {
-	SIG_GUIGPExperiment *actExperiment = experimentListView->currentlySelectedExperiment();
-	if(actExperiment){
-		if(actExperiment->gpExperiment.mtController->IsEnabled()){
+	SIG_GUIGPExperiment *currentExperiment = experimentListView->currentlySelectedExperiment();
+	if(currentExperiment){
+		if(currentExperiment->gpExperiment.mtController->IsEnabled()){
 
 			// currently selected experiment use meta gp-system
 			//
@@ -853,7 +853,7 @@ void SIG_MainWindow::slotActExpChanged()
 				mtConfigureAction->setEnabled(true);
 			}
 			mtUseAction->setChecked(true);
-			if(actExperiment->gpExperiment.mtController->UsedSystem() == EVALUATOR_SUBST){
+			if(currentExperiment->gpExperiment.mtController->UsedSystem() == EVALUATOR_SUBST){
 				mtChoiceEvaluatorAction->setChecked(true);
 			} else {
 				mtChoiceClassifierAction->setChecked(true);

@@ -290,7 +290,7 @@ void SIG_ExperimentListView::slotSelectionChanged( QTreeWidgetItem * theItem )
       // locked, so a mid-run click can select a not-running experiment; asking
       // that one would hand back every locked action.
       emit evolutionNotRunning( !isRunning() );
- 	  emit actExpChanged();
+ 	  emit currentExperimentChanged();
       theExperiment->putAllIntoExperiment();
     }
 };

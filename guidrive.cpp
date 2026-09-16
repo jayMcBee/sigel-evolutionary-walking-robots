@@ -5610,8 +5610,8 @@ static int guidriveMain(int argc, char **argv)
         int cfgEnabledDuringRun = -1;
         // Same three states, sampled again AFTER a tree click. D29 greys the
         // MetaGP actions from SIG_GUIGPExperiment's signalEvolutionNotRunning, but
-        // SIG_ExperimentListView::slotSelectionChanged emits actExpChanged() on
-        // the very next line and SIG_MainWindow::slotActExpChanged
+        // SIG_ExperimentListView::slotSelectionChanged emits currentExperimentChanged() on
+        // the very next line and SIG_MainWindow::slotCurrentExperimentChanged
         // re-enables mtConfigureAction with NO run check at all. So
         // one click in the tree is expected to hand the crash path straight
         // back. Found by review; the scenario sampled only before the click and
@@ -5780,8 +5780,8 @@ static int guidriveMain(int argc, char **argv)
         //
         // D29 greys the four MetaGP actions for the duration of a run, so the
         // click is refused -- UNTIL one click in the experiment tree, which
-        // emits actExpChanged() (SIG_ExperimentListView::slotSelectionChanged) into
-        // SIG_MainWindow::slotActExpChanged(), which re-enables
+        // emits currentExperimentChanged() (SIG_ExperimentListView::slotSelectionChanged) into
+        // SIG_MainWindow::slotCurrentExperimentChanged(), which re-enables
         // mtConfigureAction with no run check. That is what the second sample
         // is for. An earlier version of this scenario sampled only before the
         // tree click and reported the door closed. Found by review.
@@ -5800,7 +5800,7 @@ static int guidriveMain(int argc, char **argv)
                 printf("\n!! D29 IS INCOMPLETE: Configure System was greyed during the"
                        " run and ONE TREE CLICK made it live again.\n"
                        "!! The 1.3 crash path is OPEN on this port by that route.\n"
-                       "!! SIG_MainWindow::slotActExpChanged has no run"
+                       "!! SIG_MainWindow::slotCurrentExperimentChanged has no run"
                        " check; SIG_ExperimentListView::slotSelectionChanged emits into it.\n");
                 fflush(stdout); return 1;
             }
@@ -5815,7 +5815,7 @@ static int guidriveMain(int argc, char **argv)
             // Only claim the arming line held when the click is PROVEN to have
             // landed. Save Experiment was already greyed at Start, so 0 on its
             // own is equally consistent with a click that reached nothing. The
-            // proof is cfgAfterTreeClick flipping 0 -> 1: actExpChanged() has
+            // proof is cfgAfterTreeClick flipping 0 -> 1: currentExperimentChanged() has
             // exactly one emit site (SIG_ExperimentListView::slotSelectionChanged), one line
             // after the emit that reaches the arming line, so the flip cannot
             // happen without the evolutionNotRunning emit having run. Found by review.

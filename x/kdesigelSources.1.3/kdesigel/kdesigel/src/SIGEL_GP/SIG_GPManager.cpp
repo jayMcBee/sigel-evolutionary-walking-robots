@@ -48,20 +48,20 @@ SIGEL_GP::SIG_GPManager::SIG_GPManager(SIGEL_GP::SIG_GPExperiment &experiment)
     disconnectClients( false ),
     serverIsUp( false ),
     taskCanDoList(),
-    actExperiment( experiment ),
+    currentExperiment( experiment ),
     schlussJetzt( false ),
     tours(),
-    randomizer( actExperiment.gpParameter.getRandomSeed() ),
+    randomizer( currentExperiment.gpParameter.getRandomSeed() ),
     fitnessCalculated( false ),
     currentGenerationNo(0)
 {
 	trainer = 0;
-	if(actExperiment.mtController->IsEnabled() && actExperiment.mtController->UsedSystem() == EVALUATOR_SUBST){
-		trainer = dynamic_cast<SIG_GPFitnessTrainer*>(actExperiment.mtController->getFitnessTrainer());
+	if(currentExperiment.mtController->IsEnabled() && currentExperiment.mtController->UsedSystem() == EVALUATOR_SUBST){
+		trainer = dynamic_cast<SIG_GPFitnessTrainer*>(currentExperiment.mtController->getFitnessTrainer());
 		if(!trainer)
-			trainer = new SIG_GPFitnessTrainer(actExperiment);
+			trainer = new SIG_GPFitnessTrainer(currentExperiment);
 	} else {
-		trainer = new SIG_GPFitnessTrainer(actExperiment);
+		trainer = new SIG_GPFitnessTrainer(currentExperiment);
 	}
 	// tours.setAutoDelete(true) was the free for every tournament: it ran in
 	// Qt 2's ~QVector, in clear(), in insert() on the old occupant and in a
@@ -76,16 +76,16 @@ SIGEL_GP::SIG_GPFitnessTrainer &SIGEL_GP::SIG_GPManager::getActTrainer()
 };
 
  //Returns a reference to the experiment
-SIGEL_GP::SIG_GPExperiment &SIGEL_GP::SIG_GPManager::getActExperiment()
+SIGEL_GP::SIG_GPExperiment &SIGEL_GP::SIG_GPManager::getCurrentExperiment()
 {
-  return actExperiment;
+  return currentExperiment;
 };
 
 void SIGEL_GP::SIG_GPManager::evolutionLoop() {
-  int maxTouchsPerLoop = actExperiment.gpParameter.getMaxTouchsPerLoop();
-  int toDoSweepsPerLoop = actExperiment.gpParameter.getToDoSweepsPerLoop();
+  int maxTouchsPerLoop = currentExperiment.gpParameter.getMaxTouchsPerLoop();
+  int toDoSweepsPerLoop = currentExperiment.gpParameter.getToDoSweepsPerLoop();
 
-  SIG_GPPopulation &pop = actExperiment.population;  
+  SIG_GPPopulation &pop = currentExperiment.population;  
 
   while ( !taskCanDoList.isEmpty() ) {
     stopIfNecessary( false );
@@ -237,7 +237,7 @@ void SIGEL_GP::SIG_GPManager::createTours(int quantity) {
 #endif
 
   //The experiment's population
-  SIG_GPPopulation &pop = actExperiment.population;
+  SIG_GPPopulation &pop = currentExperiment.population;
 
   //The tournament set size is fixed
   // clear(): setAutoDelete made this delete every tournament. Real free.
@@ -254,9 +254,9 @@ void SIGEL_GP::SIG_GPManager::createTours(int quantity) {
 
     poolPositions[1] = (poolPositions[1] >= poolPositions[0]) ? poolPositions[1] + 1 : poolPositions[1];
 
-    int totalProbCount =   actExperiment.gpParameter.getReproductionProb()
-                         + actExperiment.gpParameter.getMutationProb()
-                         + actExperiment.gpParameter.getXoverProb();
+    int totalProbCount =   currentExperiment.gpParameter.getReproductionProb()
+                         + currentExperiment.gpParameter.getMutationProb()
+                         + currentExperiment.gpParameter.getXoverProb();
 
     // ToDo: Throw Exception!
     if (!totalProbCount) {
@@ -268,7 +268,7 @@ void SIGEL_GP::SIG_GPManager::createTours(int quantity) {
 
     SIG_GPTournament *actTour = 0;
 
-    if (randomResult <= actExperiment.gpParameter.getReproductionProb()) {
+    if (randomResult <= currentExperiment.gpParameter.getReproductionProb()) {
 
 #ifdef SIG_DEBUG
       SIGEL_Tools::SIG_IO::cerr << "SIG_GPManager creates a Simple Tournament.\n"
@@ -282,13 +282,13 @@ void SIGEL_GP::SIG_GPManager::createTours(int quantity) {
       actTour = new SIG_GPSimpleTournament(randomizer,
         *trainer,
         pop,
-        actExperiment.gpParameter,
-        *actExperiment.robot.getLangParam(),
+        currentExperiment.gpParameter,
+        *currentExperiment.robot.getLangParam(),
         poolPositions[0],
         poolPositions[1]);
     }
-    else if ( randomResult <=   actExperiment.gpParameter.getReproductionProb()
-                                    + actExperiment.gpParameter.getMutationProb() ) {
+    else if ( randomResult <=   currentExperiment.gpParameter.getReproductionProb()
+                                    + currentExperiment.gpParameter.getMutationProb() ) {
 #ifdef SIG_DEBUG
       SIGEL_Tools::SIG_IO::cerr << "SIG_GPManager creates a Mutation Tournament.\n"
         << "Player's positions are "
@@ -301,8 +301,8 @@ void SIGEL_GP::SIG_GPManager::createTours(int quantity) {
      actTour = new SIG_GPMutationTournament(randomizer,
        *trainer,
        pop,
-       actExperiment.gpParameter,
-       *actExperiment.robot.getLangParam(),
+       currentExperiment.gpParameter,
+       *currentExperiment.robot.getLangParam(),
        poolPositions[0],
        poolPositions[1]);
     }
@@ -343,8 +343,8 @@ void SIGEL_GP::SIG_GPManager::createTours(int quantity) {
       actTour = new SIG_GPCrossOverTournament(randomizer,
         *trainer,
         pop,
-        actExperiment.gpParameter,
-        *actExperiment.robot.getLangParam(),
+        currentExperiment.gpParameter,
+        *currentExperiment.robot.getLangParam(),
         poolPositions[0],
         poolPositions[1],
         poolPositions[2],
@@ -404,7 +404,7 @@ void SIGEL_GP::SIG_GPManager::evalNewIndis() {
   FitTaskListGuard fitTaskListGuard{ &fitTaskList };
 
   //The experiment's population
-  SIG_GPPopulation &pop=actExperiment.population;
+  SIG_GPPopulation &pop=currentExperiment.population;
 
   //The population size is determined
   int poolSize=pop.getSize();
@@ -520,7 +520,7 @@ void SIGEL_GP::SIG_GPManager::calcInitTourSet() {
     taskCanDoList.clear();
 
     // The experiment's population
-    SIG_GPPopulation &pop=getActExperiment().population;
+    SIG_GPPopulation &pop=getCurrentExperiment().population;
 
     QList<int> lastAccesses( pop.getSize() );
 
@@ -595,12 +595,12 @@ void SIGEL_GP::SIG_GPManager::stopIfNecessary(bool generationBreak) {
     messageEvolutionStop();
 
 	// and now eventually stop the Meta-GP-System
-	actExperiment.mtController->stopEvolution();
+	currentExperiment.mtController->stopEvolution();
   };
 };
 
 bool SIGEL_GP::SIG_GPManager::checkTerminationConditions(bool generationBreak) {
-  bool exitIsPermitted = (!actExperiment.gpParameter.getSaveExit() || generationBreak);
+  bool exitIsPermitted = (!currentExperiment.gpParameter.getSaveExit() || generationBreak);
 
   // ToDo: Check for maxFitness
 
@@ -616,24 +616,24 @@ bool SIGEL_GP::SIG_GPManager::checkTerminationConditions(bool generationBreak) {
   if (exitIsPermitted) {
     bool timeExpired = false;
 
-    if (actExperiment.gpParameter.getTerminationUsesDate())
-      timeExpired =  ( actExperiment.gpParameter.getTerminationTime() <= QDateTime::currentDateTime() );
+    if (currentExperiment.gpParameter.getTerminationUsesDate())
+      timeExpired =  ( currentExperiment.gpParameter.getTerminationTime() <= QDateTime::currentDateTime() );
     else {
-      int durationHours =   ( actExperiment.gpParameter.getTerminationDurationDays() * 24)
-                                    + actExperiment.gpParameter.getTerminationDurationHours();
+      int durationHours =   ( currentExperiment.gpParameter.getTerminationDurationDays() * 24)
+                                    + currentExperiment.gpParameter.getTerminationDurationHours();
       int durationMinutes =   ( durationHours * 60 )
-                                    + actExperiment.gpParameter.getTerminationDurationMinutes();
+                                    + currentExperiment.gpParameter.getTerminationDurationMinutes();
       int durationSeconds =   ( durationMinutes * 60 )
-                                    + actExperiment.gpParameter.getTerminationDurationSeconds();
+                                    + currentExperiment.gpParameter.getTerminationDurationSeconds();
 
       QDateTime terminationTime = startTime.addSecs( durationSeconds );
 
       timeExpired = ( terminationTime <= QDateTime::currentDateTime() );
     }
 
-    bool generationsReached = ( actExperiment.gpParameter.getTerminationGenerationNo() <= currentGenerationNo );
+    bool generationsReached = ( currentExperiment.gpParameter.getTerminationGenerationNo() <= currentGenerationNo );
 
-    switch (actExperiment.gpParameter.getTerminationModel()) {
+    switch (currentExperiment.gpParameter.getTerminationModel()) {
       case SIG_GPParameter::byTime:
         return timeExpired;
         break;
@@ -655,8 +655,8 @@ bool SIGEL_GP::SIG_GPManager::checkTerminationConditions(bool generationBreak) {
 
 void SIGEL_GP::SIG_GPManager::start()
 {
-	if(actExperiment.mtController->IsEnabled() && actExperiment.mtController->UsedSystem() == CLASSIFIER_SUBST)
-		run(dynamic_cast<MT_Classifier*>(actExperiment.mtController->getClassifier()));
+	if(currentExperiment.mtController->IsEnabled() && currentExperiment.mtController->UsedSystem() == CLASSIFIER_SUBST)
+		run(dynamic_cast<MT_Classifier*>(currentExperiment.mtController->getClassifier()));
 	else
 		run();
 };
@@ -665,8 +665,8 @@ void SIGEL_GP::SIG_GPManager::run() {
 
 	// start the MT_GP-System only if the SIGEL-GP-System would start
 	// Qt 2's isEmpty() was count()==0 -- NO NON-NULL SLOTS -- not size()==0.
-	if(toursAreEmpty( tours ) && actExperiment.getPopulation().getSize() > 3)
-		actExperiment.mtController->startEvolution();
+	if(toursAreEmpty( tours ) && currentExperiment.getPopulation().getSize() > 3)
+		currentExperiment.mtController->startEvolution();
 
 #ifdef _WINDOWS
   HANDLE mutex = CreateMutex(NULL, false, NULL);
@@ -686,7 +686,7 @@ void SIGEL_GP::SIG_GPManager::run() {
     messageEvolutionStop();
   };
 
-  if (actExperiment.getPopulation().getSize() < 4) {
+  if (currentExperiment.getPopulation().getSize() < 4) {
     SIGEL_Tools::SIG_IO::cerr << "Population contains less than 4 Individuals, cannot evolve!\n";
     messageEvolutionStop();
   };
@@ -707,9 +707,9 @@ void SIGEL_GP::SIG_GPManager::run() {
     // recomputes them. If the fitness function supports it, this allows a different target every "resetGeneration" generations
     // Apply the fitness criterion.
     // Do not divide by zero
-    if ( actExperiment.gpParameter.getResetEveryGeneration() != 0) {
-      if ( (actExperiment.population.getPoolGeneration() % actExperiment.gpParameter.getResetEveryGeneration()) == 0)
-        actExperiment.population.resetPool();
+    if ( currentExperiment.gpParameter.getResetEveryGeneration() != 0) {
+      if ( (currentExperiment.population.getPoolGeneration() % currentExperiment.gpParameter.getResetEveryGeneration()) == 0)
+        currentExperiment.population.resetPool();
     }
     // evaluate the individuals which have no fitness value
     evalNewIndis();
@@ -719,7 +719,7 @@ void SIGEL_GP::SIG_GPManager::run() {
     if (schlussJetzt)
       return;
     // creates a set of tournaments
-    createTours( actExperiment.gpParameter.getTournamentsPerGeneration() * actExperiment.getPopulation().getSize() );
+    createTours( currentExperiment.gpParameter.getTournamentsPerGeneration() * currentExperiment.getPopulation().getSize() );
     // sorts the tournaments, how they should evolve on the pvm clients
     calcInitTourSet();
     // the heart of the genetic algorithm, it executes the tournaments
@@ -732,23 +732,23 @@ void SIGEL_GP::SIG_GPManager::run() {
     // this gives us the current generation and it starts with 0 every time we start the evolution
     currentGenerationNo++;
     // this is the total amount of generations evolved, since the project is created
-    actExperiment.population.poolGeneration++;
+    currentExperiment.population.poolGeneration++;
 
     SIGEL_Tools::SIG_IO::cerr << "Computing Generation " << currentGenerationNo << "\t(" << (QDateTime::currentDateTime()).toString() << ")\n";
 
     // increment the age of the individuals
-    for (int i=0; i < actExperiment.population.getSize(); i++) {
-      actExperiment.population.getIndividual( i ).increaseAge();
+    for (int i=0; i < currentExperiment.population.getSize(); i++) {
+      currentExperiment.population.getIndividual( i ).increaseAge();
       updateIndividualView( i );
     };
 
-    int poolImageGeneration = actExperiment.getGPParameter().getPoolImageGeneration();
+    int poolImageGeneration = currentExperiment.getGPParameter().getPoolImageGeneration();
 
-    int poolGenerationNo = actExperiment.population.poolGeneration;
+    int poolGenerationNo = currentExperiment.population.poolGeneration;
     QDateTime generationBreak = QDateTime::currentDateTime();
-    double bestFitness = actExperiment.population.getBestFitness( true );
-    double minFitness = actExperiment.population.getWorstFitness( true );
-    double averageFitness = actExperiment.population.getAverageFitness();
+    double bestFitness = currentExperiment.population.getBestFitness( true );
+    double minFitness = currentExperiment.population.getWorstFitness( true );
+    double averageFitness = currentExperiment.population.getAverageFitness();
     // write the stats of the evolution into a history
     SIG_GPExperimentHistoryEntry *newExpHistEntry = new SIG_GPExperimentHistoryEntry( poolGenerationNo,
       generationBreak,
@@ -756,7 +756,7 @@ void SIGEL_GP::SIG_GPManager::run() {
       minFitness,
       averageFitness );
 
-    actExperiment.experimentHistory.append( newExpHistEntry );
+    currentExperiment.experimentHistory.append( newExpHistEntry );
 
 	// tell the Meta-System that the current generation ended
 	MT_Evaluator * MetaFitnessTrainer;
@@ -766,11 +766,11 @@ void SIGEL_GP::SIG_GPManager::run() {
 
     // if the user wants a poolImage and it the generation where it should generate, then he gets it
     if ( poolImageGeneration && ((currentGenerationNo % poolImageGeneration) == 0) ) {
-      QDir poolImageDir = actExperiment.getGPParameter().getPoolImageDirectory();
+      QDir poolImageDir = currentExperiment.getGPParameter().getPoolImageDirectory();
 
       QString poolImageName =   poolImageDir.path()
                               + QString( "/" )
-                              + actExperiment.experimentName
+                              + currentExperiment.experimentName
                               + QString( "_PoolImage_" )
                               + QDateTime::currentDateTime().toString()
                               + ".pol";
@@ -788,7 +788,7 @@ void SIGEL_GP::SIG_GPManager::run() {
       if (poolImage.open( QIODeviceBase::WriteOnly )) {
         QTextStream buffer( &poolImage );
 
-        actExperiment.getPopulation().writeToFile( buffer );
+        currentExperiment.getPopulation().writeToFile( buffer );
         poolImage.close();
       }
       else
@@ -800,13 +800,13 @@ void SIGEL_GP::SIG_GPManager::run() {
     // autosave function	
     // checks whether to save the population or not
     // only save if getAutosave() not zero
-    if (actExperiment.environment.getAutosave()!=0) {
+    if (currentExperiment.environment.getAutosave()!=0) {
       // only save if the modulo rest is zero
-      if ( (actExperiment.population.poolGeneration%actExperiment.environment.getAutosave())==0) {
-        QFile file( actExperiment.getPath() );
+      if ( (currentExperiment.population.poolGeneration%currentExperiment.environment.getAutosave())==0) {
+        QFile file( currentExperiment.getPath() );
         if (file.open(QIODeviceBase::WriteOnly)) {
           QTextStream stream(&file);
-          actExperiment.saveExperiment(stream);
+          currentExperiment.saveExperiment(stream);
           file.close();
         }
         else {
@@ -1058,7 +1058,7 @@ void SIGEL_GP::SIG_GPManager::RegisterDynPVMClients( void ) {
 
 SIGEL_GP::SIG_GPManager::~SIG_GPManager()
 {
-	if(!actExperiment.mtController->IsEnabled() || actExperiment.mtController->UsedSystem() != EVALUATOR_SUBST){
+	if(!currentExperiment.mtController->IsEnabled() || currentExperiment.mtController->UsedSystem() != EVALUATOR_SUBST){
 		delete trainer;
 	}
 
@@ -1089,8 +1089,8 @@ void SIGEL_GP::SIG_GPManager::run(MT_Classifier *MetaClassifier)
 	 ****/
 
 	// start the MT_GP-System only if the SIGEL-GP-System would start
-	if(toursAreEmpty( tours ) && actExperiment.getPopulation().getSize() > 3)
-		actExperiment.mtController->startEvolution();
+	if(toursAreEmpty( tours ) && currentExperiment.getPopulation().getSize() > 3)
+		currentExperiment.mtController->startEvolution();
 
 	/***************************************
 	 *  end of Meta-System specific part
@@ -1115,7 +1115,7 @@ void SIGEL_GP::SIG_GPManager::run(MT_Classifier *MetaClassifier)
 			messageEvolutionStop();
     };
 
-    if (actExperiment.getPopulation().getSize() < 4)
+    if (currentExperiment.getPopulation().getSize() < 4)
     {	SIGEL_Tools::SIG_IO::cerr << "Population contains less than 4 Individuals, cannot evolve!\n";
 			messageEvolutionStop();
     };
@@ -1142,9 +1142,9 @@ void SIGEL_GP::SIG_GPManager::run(MT_Classifier *MetaClassifier)
 	double BestFitness =-1.0;
 	double PresentFitness =0.0;
 	
-	for(int k=0; k<actExperiment.population.getSize(); k++)
+	for(int k=0; k<currentExperiment.population.getSize(); k++)
 	{
-		PresentFitness= actExperiment.population.getIndividualPointer(k)->getFitness();
+		PresentFitness= currentExperiment.population.getIndividualPointer(k)->getFitness();
 		if(PresentFitness>BestFitness)
 		{
 			PosBestSigelIndi=k;
@@ -1154,7 +1154,7 @@ void SIGEL_GP::SIG_GPManager::run(MT_Classifier *MetaClassifier)
 	}
 
 
-	createTours( actExperiment.gpParameter.getTournamentsPerGeneration() * actExperiment.getPopulation().getSize() );
+	createTours( currentExperiment.gpParameter.getTournamentsPerGeneration() * currentExperiment.getPopulation().getSize() );
 
 	MetaClassifier->preEvolution(&tours, PosBestSigelIndi);
 	
@@ -1168,33 +1168,33 @@ void SIGEL_GP::SIG_GPManager::run(MT_Classifier *MetaClassifier)
 	  return;
 
 	currentGenerationNo++;
-	actExperiment.population.poolGeneration++;
+	currentExperiment.population.poolGeneration++;
 
 	SIGEL_Tools::SIG_IO::cerr << "Computing Generation " << currentGenerationNo << "\t(" << (QDateTime::currentDateTime()).toString() << ")\n";
 
-	for (int i=0; i < actExperiment.population.getSize(); i++)
+	for (int i=0; i < currentExperiment.population.getSize(); i++)
 	  {
-	    actExperiment.population.getIndividual( i ).increaseAge();
+	    currentExperiment.population.getIndividual( i ).increaseAge();
 	    updateIndividualView( i );
 	  };
 
-	int poolImageGeneration = actExperiment.getGPParameter().getPoolImageGeneration();
+	int poolImageGeneration = currentExperiment.getGPParameter().getPoolImageGeneration();
 
-	int poolGenerationNo = actExperiment.population.poolGeneration;
+	int poolGenerationNo = currentExperiment.population.poolGeneration;
 	QDateTime generationBreak = QDateTime::currentDateTime();
-	double bestFitness = actExperiment.population.getBestFitness( true );
-	double minFitness = actExperiment.population.getWorstFitness( true );
+	double bestFitness = currentExperiment.population.getBestFitness( true );
+	double minFitness = currentExperiment.population.getWorstFitness( true );
 
-	// double averageFitness = actExperiment.population.getAverageFitness();
+	// double averageFitness = currentExperiment.population.getAverageFitness();
 	// In the meta-classifier approach the average fitness is computed over those
 	// SIG_Individuals whose fitness was computed exactly, by simulation
 	double averageFitness = 0.0;
 	double Fitt = 0.0;
 	double NumOfCorrectFit = 0.0;
 
-	for ( int i=0; i<actExperiment.population.getSize(); i++)
+	for ( int i=0; i<currentExperiment.population.getSize(); i++)
 	{
-		Fitt= actExperiment.population.getIndividualPointer(i)->getFitness();
+		Fitt= currentExperiment.population.getIndividualPointer(i)->getFitness();
 		if (Fitt >= 0.0)
 		{
 			averageFitness = averageFitness + Fitt;
@@ -1214,14 +1214,14 @@ void SIGEL_GP::SIG_GPManager::run(MT_Classifier *MetaClassifier)
 											  minFitness,
 											  averageFitness );
 
-	actExperiment.experimentHistory.append( newExpHistEntry );
+	currentExperiment.experimentHistory.append( newExpHistEntry );
 
 	if ( poolImageGeneration && ((currentGenerationNo % poolImageGeneration) == 0) ) {
-		QDir poolImageDir = actExperiment.getGPParameter().getPoolImageDirectory();
+		QDir poolImageDir = currentExperiment.getGPParameter().getPoolImageDirectory();
 
 	  QString poolImageName =   poolImageDir.path()
 	                            + QString( "/" )
-                                    + actExperiment.experimentName
+                                    + currentExperiment.experimentName
 	                            + QString( "_PoolImage_" )
                                     + QDateTime::currentDateTime().toString()
 	                            + ".pol";
@@ -1239,7 +1239,7 @@ void SIGEL_GP::SIG_GPManager::run(MT_Classifier *MetaClassifier)
 	  if (poolImage.open( QIODeviceBase::WriteOnly )) {
 			QTextStream buffer( &poolImage );
 
-			actExperiment.getPopulation().writeToFile( buffer );
+			currentExperiment.getPopulation().writeToFile( buffer );
 			poolImage.close();
 	  }
 	  else
@@ -1251,13 +1251,13 @@ void SIGEL_GP::SIG_GPManager::run(MT_Classifier *MetaClassifier)
 		// autosave function	
   		// checks whether to save the population or not
 		// only save if getAutosave() not zero
-		if (actExperiment.environment.getAutosave()!=0) {
+		if (currentExperiment.environment.getAutosave()!=0) {
 			// only save if the modulo rest is zero
-			if ( (actExperiment.population.poolGeneration%actExperiment.environment.getAutosave())==0) {
-				QFile file( actExperiment.getPath() );
+			if ( (currentExperiment.population.poolGeneration%currentExperiment.environment.getAutosave())==0) {
+				QFile file( currentExperiment.getPath() );
 				if (file.open(QIODeviceBase::WriteOnly)) {
 					QTextStream stream(&file);
-					actExperiment.saveExperiment(stream);
+					currentExperiment.saveExperiment(stream);
 					file.close();
 				}
 				else {
@@ -1318,10 +1318,10 @@ void SIGEL_GP::SIG_GPManager::evolutionLoop(MT_Classifier *MetaClassifier)
 	*/
 
 
-  int maxTouchsPerLoop = actExperiment.gpParameter.getMaxTouchsPerLoop();
-  int toDoSweepsPerLoop = actExperiment.gpParameter.getToDoSweepsPerLoop();
+  int maxTouchsPerLoop = currentExperiment.gpParameter.getMaxTouchsPerLoop();
+  int toDoSweepsPerLoop = currentExperiment.gpParameter.getToDoSweepsPerLoop();
 
-  SIG_GPPopulation &pop = actExperiment.population;  
+  SIG_GPPopulation &pop = currentExperiment.population;  
 
   while ( !taskCanDoList.isEmpty() )
     {
@@ -1496,7 +1496,7 @@ void SIGEL_GP::SIG_GPManager::evalNeededIndis()
   FitTaskListGuard fitTaskListGuard{ &fitTaskList };
 
   //The experiment's population
-  SIG_GPPopulation &pop=actExperiment.population;
+  SIG_GPPopulation &pop=currentExperiment.population;
 
   //The population size is determined
   int poolSize=pop.getSize();

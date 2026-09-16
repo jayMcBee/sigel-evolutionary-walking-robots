@@ -40,7 +40,7 @@ namespace SIGEL_GP
     QTreeWidgetItemIterator listIter( listView );
 
     // update generations display (this line looks cool, doesn't it ?!)
-   // guiExperiment.experimentView->lcdnumberGenerations->display(actExperiment.population.getPoolGeneration());
+   // guiExperiment.experimentView->lcdnumberGenerations->display(currentExperiment.population.getPoolGeneration());
 
     while ( *listIter )
       {
@@ -63,7 +63,7 @@ namespace SIGEL_GP
     // not what the name says: a millisecond budget for the event pump, not a
     // pause between generations. No pause is implemented anywhere.
     qApp->processEvents( QEventLoop::AllEvents,
-                         actExperiment.gpParameter.getPassiveTime() );
+                         currentExperiment.gpParameter.getPassiveTime() );
   };
 
   void SIG_GUIGPManager::messageEvolutionStop()
@@ -77,7 +77,7 @@ namespace SIGEL_GP
 
   void SIG_GUIGPManager::updateIndividualView( int poolPos )
   {
-    SIG_GPIndividual &actInd = actExperiment.population.getIndividual( poolPos );
+    SIG_GPIndividual &actInd = currentExperiment.population.getIndividual( poolPos );
 
     // Keep the warning: without it a missing list item fails silently.
     SIGEL_MasterGUI::SIG_IndividualListItem *item = individualItems.value( poolPos );
@@ -88,7 +88,7 @@ namespace SIGEL_GP
                 poolPos, static_cast< long long >( individualItems.size() ) );
 
     // update generations display (this line looks cool, doesn't it ?!)
-    guiExperiment.experimentView->lcdnumberGenerations->display(actExperiment.population.getPoolGeneration());
+    guiExperiment.experimentView->lcdnumberGenerations->display(currentExperiment.population.getPoolGeneration());
   };
 
 }

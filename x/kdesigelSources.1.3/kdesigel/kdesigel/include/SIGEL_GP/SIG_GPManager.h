@@ -117,7 +117,7 @@ namespace SIGEL_GP
    * current experiment.
    */
  protected:
-  SIG_GPExperiment &actExperiment;
+  SIG_GPExperiment &currentExperiment;
 
  protected:
   bool schlussJetzt;
@@ -302,7 +302,7 @@ namespace SIGEL_GP
    * The actual experiment.
    */
 private:
-  SIG_GPExperiment& getActExperiment();
+  SIG_GPExperiment& getCurrentExperiment();
 
   /**
    * This operation returns a refernces of the actual GPFitnessTrainer.

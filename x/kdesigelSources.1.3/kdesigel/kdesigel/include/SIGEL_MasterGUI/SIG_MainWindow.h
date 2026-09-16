@@ -228,7 +228,7 @@ namespace SIGEL_MasterGUI
 		  void slotMTUseMT(bool state);
 		  void slotMTConfigureSystem();
 		  void slotMTSwitchSystem(QAction *selSystem);
-		  void slotActExpChanged();
+		  void slotCurrentExperimentChanged();
 
     };
   
