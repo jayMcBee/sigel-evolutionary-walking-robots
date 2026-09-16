@@ -723,7 +723,7 @@ void SIG_MainWindow::slotAbout()
 {
   //QMessageBox::about( this, "Sigel", "Sigel Version 1.0\nDeveloped by:\n\tChristian 'Krasstexta' Aue\n\tAbdeladim 'Silent Ad' Benkacem\n\tMichael 'CJ QT' Gregorius\n\tAndree 'MC Overload' Ross\n\tAbdallah 'The Raiyan' Salah Raiyan\n\tDaniel 'Tabmaster Ispell' Sawitzki\n\tVolker 'SEXmaschine' Strunk\n\tHolger 'DJ NOOP' Tuerk\n\tChris 'MC Royal' Varcol" );
 
-  SIG_InfoBox theInfoBox( 0, "InfoBox", true );
+  SIG_InfoBox theInfoBox( this, "InfoBox", true );
   theInfoBox.resize( 600, -1 );
   theInfoBox.exec();
 };

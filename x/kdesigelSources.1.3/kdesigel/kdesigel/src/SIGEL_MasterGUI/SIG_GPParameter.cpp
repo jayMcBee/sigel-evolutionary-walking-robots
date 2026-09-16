@@ -132,7 +132,7 @@ void SIG_GPParameter::putIntoExperiment()
      	break;
 
 		default:
-			QMessageBox::information( 0, "Error !", "Internal Error -- fitness function is unknown to class SIG_GPParameter.");
+			QMessageBox::information( this, "Error !", "Internal Error -- fitness function is unknown to class SIG_GPParameter.");
     }
 
   // put the probabilities into the experiment
@@ -407,7 +407,7 @@ void SIG_GPParameter::getOutOfExperiment()
 void SIG_GPParameter::slotAddHost()
 {
   // create an show the dialog
-  SIG_EditHostDialog editDialog( 0, "editDialogAddHosts", true, Qt::WindowFlags() );
+  SIG_EditHostDialog editDialog( this, "editDialogAddHosts", true, Qt::WindowFlags() );
   editDialog.checkboxEnableHost->setChecked( true );
   editDialog.lineeditHostName->setFocus();
   editDialog.lineeditSlaveDirectory->setText( QDir::currentPath() );
@@ -454,7 +454,7 @@ void SIG_GPParameter::slotAddHost()
 	}
       else
 	{
-	  QMessageBox::information( 0, "Error...", "The host " + editDialog.lineeditHostName->text() + " is either already present or you entered no name!" );
+	  QMessageBox::information( this, "Error...", "The host " + editDialog.lineeditHostName->text() + " is either already present or you entered no name!" );
 	}
       break;
     }
@@ -587,7 +587,7 @@ void SIG_GPParameter::slotItemDoubleClicked( QTreeWidgetItem * theItem )
 	    }
 	}
       
-      SIG_EditHostDialog editDialog( 0, "editDialogEditHosts", true, Qt::WindowFlags() );
+      SIG_EditHostDialog editDialog( this, "editDialogEditHosts", true, Qt::WindowFlags() );
       if( numberOfSelectedHosts == 1 )
 	{
 	  editDialog.lineeditHostName->setText( theHost->name );
@@ -665,7 +665,7 @@ void SIG_GPParameter::slotItemDoubleClicked( QTreeWidgetItem * theItem )
 		}
 	      else
 		{
-		  QMessageBox::information( 0, "Error...", "The host " + editDialog.lineeditHostName->text() + " is either already present or you entered no name!" );
+		  QMessageBox::information( this, "Error...", "The host " + editDialog.lineeditHostName->text() + " is either already present or you entered no name!" );
 		}
 	    }
 	  else

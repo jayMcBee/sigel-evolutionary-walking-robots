@@ -301,6 +301,8 @@ QString SIG_GUIGPExperiment::checkEnding( QString fileName, QString ending )
   return stampedName;
 };
 
+// Dialogs here take experimentListView as their parent: this widget is never
+// shown, so a dialog parented to it is not tied to the main window.
 void SIG_GUIGPExperiment::slotRightClick( QString option, const QPoint & thePoint )
 {
   QMenu *showMenu = menuDict.value( option );
@@ -391,7 +393,7 @@ void SIG_GUIGPExperiment::slotStartEvolution()
     }
   else
     {
-      QMessageBox::warning( this, "Can't start evolution...", "The evolution cannot be started. There may be several reasons:<ul><li>There is no robot loaded.</li><li>There are less than four individuals in the population</li><li>No fitness function name was specified.</li></ul>");
+      QMessageBox::warning( experimentListView, "Can't start evolution...", "The evolution cannot be started. There may be several reasons:<ul><li>There is no robot loaded.</li><li>There are less than four individuals in the population</li><li>No fitness function name was specified.</li></ul>");
     }
 };
 
@@ -430,7 +432,7 @@ void SIG_GUIGPExperiment::slotSimulationParameterImport()
   if ( experimentListView->isRunning() )
     return;
 
-  QString fileName = QFileDialog::getOpenFileName( nullptr, "Import Simulation Parameters...", QString(), "Simulation Parameter Files (*.sip);;All Files (*)" );
+  QString fileName = QFileDialog::getOpenFileName( experimentListView, "Import Simulation Parameters...", QString(), "Simulation Parameter Files (*.sip);;All Files (*)" );
   if ( !fileName.isEmpty() )
     {
       QFile file( fileName );
@@ -472,7 +474,7 @@ void SIG_GUIGPExperiment::slotEnvironmentImport()
   if ( experimentListView->isRunning() )
     return;
 
-  QString fileName = QFileDialog::getOpenFileName( nullptr, "Import Environment...", QString(), "Environment Files (*.env);;All Files (*)" );
+  QString fileName = QFileDialog::getOpenFileName( experimentListView, "Import Environment...", QString(), "Environment Files (*.env);;All Files (*)" );
   if ( !fileName.isEmpty() )
     {
       QFile file( fileName );
@@ -514,7 +516,7 @@ void SIG_GUIGPExperiment::slotGPParameterImport()
   if ( experimentListView->isRunning() )
     return;
 
-  QString fileName = QFileDialog::getOpenFileName( nullptr, "Import GP Parameter...", QString(), "GP Parameter Files (*.gpp);;All Files (*)" );
+  QString fileName = QFileDialog::getOpenFileName( experimentListView, "Import GP Parameter...", QString(), "GP Parameter Files (*.gpp);;All Files (*)" );
   if ( !fileName.isEmpty() )
     {
       QFile file( fileName );
@@ -556,7 +558,7 @@ void SIG_GUIGPExperiment::slotLanguageParameterImport()
   if ( experimentListView->isRunning() )
     return;
 
-  QString fileName = QFileDialog::getOpenFileName( nullptr, "Import Language Parameter...", QString(), "Language Parameter Files (*.lap);;All Files (*)" );
+  QString fileName = QFileDialog::getOpenFileName( experimentListView, "Import Language Parameter...", QString(), "Language Parameter Files (*.lap);;All Files (*)" );
   if ( !fileName.isEmpty() )
     {
       QFile file( fileName );
@@ -599,7 +601,7 @@ void SIG_GUIGPExperiment::slotPopulationImport()
   if ( experimentListView->isRunning() )
     return;
 
-  QString fileName = QFileDialog::getOpenFileName( nullptr, "Import Population...", QString(), "Population Files (*.pop);;All Files (*)" );
+  QString fileName = QFileDialog::getOpenFileName( experimentListView, "Import Population...", QString(), "Population Files (*.pop);;All Files (*)" );
   if ( !fileName.isEmpty() )
     {
       QFile file( fileName );
@@ -640,7 +642,7 @@ void SIG_GUIGPExperiment::slotRobotImport()
   if ( experimentListView->isRunning() )
     return;
 
-  QString fileName = QFileDialog::getOpenFileName( nullptr, "Import Robot...", QString(), "Raw Robot Files (*.rrb);;All Files (*)" );
+  QString fileName = QFileDialog::getOpenFileName( experimentListView, "Import Robot...", QString(), "Raw Robot Files (*.rrb);;All Files (*)" );
   if( !fileName.isEmpty() )
     {
       try
@@ -651,7 +653,7 @@ void SIG_GUIGPExperiment::slotRobotImport()
 	}
       catch( SIGEL_Tools::SIG_Exception e )
 	{
-	  QMessageBox::warning( this, "Robot import error!", e.getMessage() );
+	  QMessageBox::warning( experimentListView, "Robot import error!", e.getMessage() );
 	  gpExperiment.robot.clear();
 	}
       // perhaps it is enough to update the language parameter screen and the robot view
@@ -680,7 +682,7 @@ void SIG_GUIGPExperiment::slotRobotLoad()
   if ( experimentListView->isRunning() )
     return;
 
-  QString fileName = QFileDialog::getOpenFileName( nullptr, "Load Robot...", QString(), "Compiled Robot Files (*.crb);;All Files (*)" );
+  QString fileName = QFileDialog::getOpenFileName( experimentListView, "Load Robot...", QString(), "Compiled Robot Files (*.crb);;All Files (*)" );
   if( !fileName.isEmpty() )
     {
       QFile file( fileName );
@@ -694,7 +696,7 @@ void SIG_GUIGPExperiment::slotRobotLoad()
 	    }
 	  catch( SIGEL_Tools::SIG_Exception e )
 	    {
-	      QMessageBox::warning( this, "Robot import error!", e.getMessage() );
+	      QMessageBox::warning( experimentListView, "Robot import error!", e.getMessage() );
 	      gpExperiment.robot.clear();
 	    }
 	}
@@ -726,17 +728,17 @@ void SIG_GUIGPExperiment::slotRobotInfo()
 
   // need DynaMechs for that..
   if (gpExperiment.simulationParameter.getSimulationLibrary() != SIGEL_Simulation::SIG_SimulationParameters::DynaMechs)
-  { QMessageBox::information( 0, "Can't display Robot Information..", "<B>DynaMechs required for this operation to function properly.</B>");
+  { QMessageBox::information( experimentListView, "Can't display Robot Information..", "<B>DynaMechs required for this operation to function properly.</B>");
     return;
   }
 
   // get info and display
   if( (gpExperiment.robot.getBodies().size() != 0))
   { gpExperiment.robot.getRobotInformation(robInf, 4096);
-    QMessageBox::information( 0, "Robot Information", robInf );
+    QMessageBox::information( experimentListView, "Robot Information", robInf );
   }
   else
-  { QMessageBox::information( 0, "Can't display Robot Information..", "<B>Erm..<BR><BR></B>maybe you should *load* a robot first ?");
+  { QMessageBox::information( experimentListView, "Can't display Robot Information..", "<B>Erm..<BR><BR></B>maybe you should *load* a robot first ?");
   }
 }
 

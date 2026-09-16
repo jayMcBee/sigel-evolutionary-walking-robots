@@ -1108,7 +1108,7 @@ selected=55658
 -- Export > Program
   [modal] class=QFileDialog title=[Export program...]
   [dialog] title=[Export program...] filters=[Program files (*.prg) ;; All Files (*)] accept=[&Save]
-  [dialog] parentIsTheMainWindow=0
+  [dialog] parentIsTheMainWindow=1
   bytes=6616 sha256=f940751765c869f16f62333dafd34dbe0e66b6474577bf4209e9e8de70cc3214 newlines=299 endsWithNewline=1
   crCount=0
   head0  [       MOD -19712,-1602]
@@ -1121,7 +1121,7 @@ selected=55658
 -- Export > Individual
   [modal] class=QFileDialog title=[Export individual...]
   [dialog] title=[Export individual...] filters=[Individual files (*.ind) ;; All Files (*)] accept=[&Save]
-  [dialog] parentIsTheMainWindow=0
+  [dialog] parentIsTheMainWindow=1
   bytes=22113 sha256=3e56bf03233a1603bf26671262cebbe7b4fa37dee4cff7a8d5fe1048916e2138 newlines=1076 endsWithNewline=0
   crCount=0
   head0  []
@@ -1415,6 +1415,7 @@ Do you want to replace it?]
     edit   [lineeditHostName] text=[herz] selected=[] focus=1
     button [&OK         ] default=1 enabled=1 focus=0
     button [&Cancel     ] default=0 enabled=1 focus=0
+    parent [SIGEL_MasterGUI::SIG_GPParameter] tiedToMainWindow=1
     check  [Enable host] checked=1
     edit   [qt_spinbox_lineedit] text=[2] empty=0
     edit   [lineeditSlaveDirectory] text=[/home/pg368b/ross/projects/sigel] empty=0
@@ -1423,6 +1424,7 @@ Do you want to replace it?]
 == ABOUT / INFOBOX ==
   [modal] class=QDialog title=[Sigel InfoBox]
   [dialog] class=QDialog title=[Sigel InfoBox] modal=1
+    parent [SIGEL_MasterGUI::SIG_MainWindow] tiedToMainWindow=1
     label pixmap=1 size=256x256
     text lines=16 vScrollPolicy=1
     | Sigel v1.1

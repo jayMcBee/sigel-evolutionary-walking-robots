@@ -2799,6 +2799,14 @@ static int guidriveMain(int argc, char **argv)
         }
 
         // ---- 2. Edit Host ------------------------------------------------
+        // A modal dialog with no parent is not tied to the main window and can
+        // end up behind it, taking every other window's input with it.
+        auto tiedToMainWindow = [](QWidget *m) {
+            printf("    parent [%s] tiedToMainWindow=%d\n",
+                   m->parentWidget() ? m->parentWidget()->metaObject()->className()
+                                     : "(none)",
+                   m->parentWidget() && m->parentWidget()->window() == W ? 1 : 0);
+        };
         printf("\n== EDIT HOST ==\n");
         QWidget *gp = page("&GP Parameters");
         QTabWidget *gptabs = gp ? gp->findChild<QTabWidget *>() : nullptr;
@@ -2824,8 +2832,9 @@ static int guidriveMain(int argc, char **argv)
                    qPrintable(hosts->topLevelItem(0)->text(3)));
             hosts->setCurrentItem(hosts->topLevelItem(0));
             hosts->topLevelItem(0)->setSelected(true);
-            whenModal([](QWidget *m) {
+            whenModal([&](QWidget *m) {
                 describeDialog(m);
+                tiedToMainWindow(m);
                 for (QCheckBox *cb : m->findChildren<QCheckBox *>())
                     printf("    check  [%s] checked=%d\n", qPrintable(cb->text()),
                            cb->isChecked() ? 1 : 0);
@@ -2848,10 +2857,11 @@ static int guidriveMain(int argc, char **argv)
         // is NOT dumped -- it would make this scenario unbaselineable. The
         // text and the geometry are what is compared.
         printf("\n== ABOUT / INFOBOX ==\n");
-        whenModal([](QWidget *m) {
+        whenModal([&](QWidget *m) {
             printf("  [dialog] class=%s title=[%s] modal=%d\n",
                    m->metaObject()->className(), qPrintable(m->windowTitle()),
                    m->isModal() ? 1 : 0);
+            tiedToMainWindow(m);
             for (QLabel *l : m->findChildren<QLabel *>())
                 printf("    label pixmap=%d size=%dx%d\n", l->pixmap().isNull() ? 0 : 1,
                        l->pixmap().width(), l->pixmap().height());

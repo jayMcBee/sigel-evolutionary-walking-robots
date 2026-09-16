@@ -167,7 +167,7 @@ void SIG_ExperimentListView::slotDeleteExperiment()
 
 void SIG_ExperimentListView::slotLoadExperiment()
 {
-  QStringList filesToOpen = QFileDialog::getOpenFileNames( nullptr, "Load Experiments...", QString(), "Experiment Files (*.exp);;All Files (*)" );
+  QStringList filesToOpen = QFileDialog::getOpenFileNames( this, "Load Experiments...", QString(), "Experiment Files (*.exp);;All Files (*)" );
   if( !filesToOpen.isEmpty() )
     {
       for( int i = 0; i < filesToOpen.count(); i++)
@@ -203,7 +203,7 @@ void SIG_ExperimentListView::slotLoadExperiment()
 	    }
 	  else
 	    {
-	      QMessageBox::warning( 0, "File could not be opened...", "The file " + fileName + "could not be opened for reading." );
+	      QMessageBox::warning( this, "File could not be opened...", "The file " + fileName + "could not be opened for reading." );
 	    }
 	  experimentDict.insert( fileName , theNewExperiment );
 	  emit isNotEmpty( true );
