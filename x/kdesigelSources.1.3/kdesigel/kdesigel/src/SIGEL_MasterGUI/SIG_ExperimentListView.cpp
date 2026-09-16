@@ -179,9 +179,11 @@ void SIG_ExperimentListView::slotLoadExperiment()
 	    fileName = getAlternativeName( fileName );
 	  SIG_ExperimentItem *theNewItem = new SIG_ExperimentItem( this, fileName );
 
-	  // lets test something
+	  // SIG_GPPopulation::readFromFile and SIG_AllIndividualsView::slotCompleteRefreshList
+	  // run processEvents below, before this name is in experimentDict. Qt 6
+	  // makes even a non-selectable item current on focus-in; a disabled one not.
 	  theNewItem->setExpanded(false);
-	  theNewItem->setFlags( theNewItem->flags() & ~Qt::ItemIsSelectable );
+	  theNewItem->setFlags( theNewItem->flags() & ~( Qt::ItemIsSelectable | Qt::ItemIsEnabled ) );
 
 	  SIG_GUIGPExperiment *theNewExperiment = new SIG_GUIGPExperiment( fileName, widgetStack, theNewItem );
 	  QObject::connect( theNewExperiment,
@@ -206,8 +208,7 @@ void SIG_ExperimentListView::slotLoadExperiment()
 	  experimentDict.insert( fileName , theNewExperiment );
 	  emit isNotEmpty( true );
 
-	  // lets test something 2
-	  theNewItem->setFlags( theNewItem->flags() | Qt::ItemIsSelectable );
+	  theNewItem->setFlags( theNewItem->flags() | Qt::ItemIsSelectable | Qt::ItemIsEnabled );
 	  theNewItem->setExpanded(true);
 	  
 	} // for each filename end
@@ -268,7 +269,8 @@ void SIG_ExperimentListView::slotRightButtonClicked( const QPoint & pos )
 	  theItem = theItem->parent();
 	}
       experimentName = theItem->text(0);
-      experimentDict.value( experimentName )->slotRightClick( option, thePoint );
+      if( SIG_GUIGPExperiment *theExperiment = experimentDict.value( experimentName ) )
+	theExperiment->slotRightClick( option, thePoint );
     }
 };
 
@@ -284,13 +286,17 @@ void SIG_ExperimentListView::slotSelectionChanged( QTreeWidgetItem * theItem )
 	  theItem = theItem->parent();
 	}
       experimentName = theItem->text(0);
-      experimentDict.value( experimentName )->slotSelectionChanged( option );
+      // slotLoadExperiment builds the item before the experiment exists.
+      SIG_GUIGPExperiment *theExperiment = experimentDict.value( experimentName );
+      if( !theExperiment )
+	return;
+      theExperiment->slotSelectionChanged( option );
       // ANY run, not the clicked experiment's. The tree itself is never
       // locked, so a mid-run click can select a not-running experiment; asking
       // that one would hand back every locked action.
       emit evolutionNotRunning( !isRunning() );
  	  emit actExpChanged();
-      experimentDict.value( experimentName )->putAllIntoExperiment();
+      theExperiment->putAllIntoExperiment();
     }
 };
 

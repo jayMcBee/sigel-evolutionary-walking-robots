@@ -39,11 +39,12 @@
     evolution  Start and Stop  (needs PVM and a real sigel_slave)
     hold       open, start PVM, then leave the window to a person; no watchdog
   ... and pages, pagesave, exportall, roundtrip, overwrite, dialogs, metagui,
-  clipcheck, formsize, slavegui, metadrive, runlock, rngseed, pvmcrash.
+  clipcheck, formsize, slavegui, metadrive, runlock, rngseed, pvmcrash,
+  openfocus.
   The list above is not maintained in step with the code. The count that
   cannot go stale is
     command grep -o 'scenario == "[a-z]*"' guidrive.cpp | sed 's/.*"\(.*\)"/\1/' | sort -u | wc -l
-  which reads 32 today. A plain -c over the same pattern gives 36, which is a
+  which reads 33 today. A plain -c over the same pattern gives 36, which is a
   count of LINES rather than of matches (`grep -o | wc -l' gives 40): four
   names -- evolution, visualize, pvmcrash and hold -- are each tested in more
   than one condition. The old wording said "two scenarios are tested twice", which stopped
@@ -110,6 +111,7 @@
 #include <QValidator>
 #include <QAbstractSpinBox>
 #include <QContextMenuEvent>
+#include <QFocusEvent>
 #include <QFile>
 #include <QFileInfo>
 #include <QDir>
@@ -1786,6 +1788,66 @@ static int guidriveMain(int argc, char **argv)
     prevEnabled = collectEnabled();
     printf("== SCENARIO %s ==\n", qPrintable(scenario));
     step("fresh start, no experiment");
+
+    // `openfocus': the tree is given focus while File > Open is still reading
+    // the file. SIG_ExperimentListView::slotLoadExperiment inserts into
+    // experimentDict only after the read, so a selection that lands before that
+    // finds no experiment under the item's name.
+    if (scenario == "openfocus") {
+        SIG_ExperimentListView *lv = listView();
+        if (!lv) { printf("!! no experiment list\n"); return 1; }
+
+        // CONTROL: the same event, built and sent the same way, on a plain
+        // item. Without it, a count of 0 below could equally mean the event
+        // never reached QAbstractItemView::focusInEvent.
+        {
+            QTreeWidget probe;
+            QTreeWidgetItem *ci = new QTreeWidgetItem(QStringList("control"));
+            probe.insertTopLevelItem(0, ci);
+            ci->setFlags(ci->flags() & ~Qt::ItemIsSelectable);   // the pre-fix item
+            int fired = 0;
+            QObject::connect(&probe, &QTreeWidget::currentItemChanged,
+                             [&fired](QTreeWidgetItem *, QTreeWidgetItem *) { ++fired; });
+            QFocusEvent ev(QEvent::FocusIn, Qt::ActiveWindowFocusReason);
+            QApplication::sendEvent(&probe, &ev);
+            printf("  [control] non-selectable item currentItemChanged=%d current=%d\n",
+                   fired, probe.currentItem() ? 1 : 0);
+        }
+
+        int total = 0, orphan = 0, inWindow = 0;
+        QMetaObject::Connection watch = QObject::connect(
+            lv, &QTreeWidget::currentItemChanged,
+            [lv, &total, &orphan](QTreeWidgetItem *it, QTreeWidgetItem *) {
+                if (!it) return;
+                ++total;
+                while (it->parent()) it = it->parent();
+                if (!lv->getByExperimentName(it->text(0))) ++orphan;
+            });
+        QTimer focusPoke;
+        QObject::connect(&focusPoke, &QTimer::timeout, [lv, &inWindow]() {
+            // An item with no experiment behind it IS the window. Counting the
+            // pokes that land in it is what stops this scenario passing green
+            // on a load too fast to poke.
+            if (lv->topLevelItemCount() > 0
+                && !lv->getByExperimentName(lv->topLevelItem(0)->text(0)))
+                ++inWindow;
+            QFocusEvent ev(QEvent::FocusIn, Qt::ActiveWindowFocusReason);
+            QApplication::sendEvent(lv, &ev);
+        });
+        focusPoke.start(10);
+        openExperiment(expFile);
+        focusPoke.stop();
+        QObject::disconnect(watch);
+        // The count itself is timing, so only the yes/no is printed.
+        printf("  [focus] pokedInsideTheWindow=%s currentItemChanged total=%d orphan=%d\n",
+               inWindow > 0 ? "yes" : "no", total, orphan);
+        if (inWindow == 0)
+            printf("  !! no poke landed between the tree item and its experiment;\n"
+                   "  !! this scenario tested NOTHING\n");
+        step("after File > Open Experiment with the tree taking focus",
+             true, true, false, true);
+        return 0;
+    }
 
     // --- open through the application's own File > Open path ---------------
     openExperiment(expFile);
@@ -6288,9 +6350,9 @@ int main(int argc, char **argv)
     // comment is about. The watchdog already had this order; main did not.
     // Found by review.
     flushSigelStreams();
-    // ONLY when PVM is actually up. The fourteen scenarios check.sh runs never
-    // start it, and their stdout is diffed against guibehaviour-baseline.txt --
-    // an unconditional line here would have failed all ten baseline scenarios
+    // ONLY when PVM is actually up. The scenarios check.sh runs never start
+    // it, and their stdout is diffed against guibehaviour-baseline.txt --
+    // an unconditional line here would have failed every baseline scenario
     // on a cosmetic addition. It says the status is already decided, so a hang
     // in the halt below is visibly cleanup and not the scenario.
     if (g_pvmOurDaemon || g_pvmEnrolled) {
