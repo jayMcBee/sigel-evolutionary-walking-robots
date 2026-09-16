@@ -772,6 +772,14 @@ needs a decision first.
 
 ## Show progress during a run
 
+**PARTLY DONE 2026-09-16, D38.** `generationProgBar` is driven now. It counts the
+individuals that hold a fitness value, which is progress through the expensive
+part of a generation and steps back when a tournament makes offspring. What is
+still missing is a true per-generation figure: the numerator does not exist
+outside `SIG_GPManager`, whose `tours`, `taskCanDoList` and `currentGenerationNo`
+are private, so counting the work done inside one generation needs new state
+there and D33 forbids it.
+
 **Asked by Jan, 2026-09-15,** during a run: *"no feedback in UI - is anything
 happening??"*
 
@@ -832,12 +840,72 @@ prompt closed.
 `0`, and 13 of 43 `QFileDialog` calls pass `nullptr`. In 1.3, 56 of 135 `QMessageBox` calls
 pass no parent: 39 with `0`, 17 with `NULL`.
 
+**INTERFACE HALF DONE 2026-09-16, D39** — all 32 sites in `SIGEL_MasterGUI`
+now pass a parent, and Jan confirmed on the real desktop that the main window can
+no longer cover them. What is left is listed in D39.
+
 **Decided as D36.** Jan, 2026-09-15: *"we need to make sure NO SIGEL dialog ever
 can end up out of sight and block the window"*. D35 gave the eight save and
 export file dialogs a parent in the main window. The rest is open. Not measured
 yet: whether a parent attaches GTK's own file dialog on Wayland. Part of it is
 in model classes that D33 keeps untouched: `MT_Controller`, `SIG_GPPopulation`
 and `SIG_GPRemoteZORCFitnessFunction`.
+
+---
+
+## Comments over two lines must earn their place
+
+**Jan's rule, 2026-09-16.** A comment longer than two lines has to carry
+something vital that the code cannot say. Everything else is trimmed. **Comments
+the port itself wrote come first**, because they are the ones that pile up.
+
+He named one: the nine lines above `setIconSize( QSize( 25, 25 ) )` in
+`SIG_MainWindow::SIG_MainWindow`. All nine describe what Qt 2 did. Two lines
+carry the whole fact — Qt 6 has one icon size per toolbar, and 25 is the largest
+of the small pixmaps, so nothing is scaled up past what 1.3 drew.
+
+**Every trim is shown to Jan before it goes in.** File by file, as its own pass.
+He called nine lines *"completely outrageous"*, which is the measure to use.
+
+---
+
+## Check every UI label for grammar and typos
+
+**Asked for 2026-09-16.** One pass over every label, button, menu entry, tooltip
+and dialog title the user can read, for spelling and grammar. The forms under
+`ui/` hold most of them; the rest are string literals in `src/`.
+
+`pushbuttonShowFitnessCurve` is the one already spotted: "Fitnesscurve" appears
+in `SIG_ExperimentView::slotShowFitnesscurve`, and the label needs checking too.
+The German that survives in the interface is a separate item, "Translate the
+German", further up this file.
+
+---
+
+## Twelve setEnabled lines the run lock made redundant
+
+`SIG_GUIGPExperiment::slotStartEvolution` and `slotEvolutionStopped` each set six
+widgets directly for their own experiment.
+`SIG_GUIGPExperiment::slotEvolutionNotRunning` now sets the same widgets for every
+experiment, from the same signal and with the same value, so the twelve direct
+calls are duplicates. `pushbuttonStop` is **not** one of them and must stay:
+nothing else enables it.
+
+They are 2003 code and they are harmless. Left in place under "port preserves
+behaviour"; each of the two slots could become one call plus its own
+`pushbuttonStop` line.
+
+---
+
+## Six overwrite prompts D35 wants deleted
+
+`MT_StatisticsWidget` shows its own "There is another file with this name"
+prompt at six export sites, each after a `getSaveFileName` that already asks. D35
+decided the file dialog's own prompt is the only one. They also pass no parent,
+so they are part of D36 as well — but re-parenting them is the wrong fix, because
+they should not exist. `MT_PopulationWidget::slotExpInd` and `slotSavePop`,
+`MT_IndividualsWidget::slotExportConstants` and `MT_Controller::slotSaveSetup`
+are in the same family; the last is in a module D33 keeps untouched.
 
 ---
 

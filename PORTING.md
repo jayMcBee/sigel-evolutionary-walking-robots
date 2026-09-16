@@ -531,6 +531,9 @@ D20 supersedes D5, D24 supersedes D3.
 | **D35** *(signed off 2026-09-15)* | Overwrite prompts on save and export | **In these slots the file dialog's own prompt is the only one.** SIGEL's "File exists..." prompt is gone from `SIG_ExperimentListView::slotSaveExperiment`, the five parameter and population exports and `SIG_GUIGPExperiment::slotRobotSave`; the file is written once. When SIGEL adds the extension itself and that file exists, `SIG_GUIGPExperiment::checkEnding` puts the date stamp `-yyyy-MM-dd-hh-mm-ss` between name and ending, one second later while that name is taken too. So nothing is overwritten and nothing asks; `slotGNUPlotExport` gets the same rule. Jan: *"we will refactor to use the file dialog's own prompt now. IF we enter no extension and IF SIGEL adds one and IF the file exists we simply append the datestamp (YYYY-MM-DD-HH-MM-SS) to the provided filename so nothing is ever overwroitten and no prompt is required in that rare edge case"*. **Not covered yet:** save paths that add an extension without `checkEnding` — `SIG_AllIndividualsView` (`.prg`, `.ind`), MT_GUI, and `MT_Controller`. Several of them still show their own "There is another file with this name" prompt: `MT_PopulationWidget::slotExpInd` and `slotSavePop`, six `MT_StatisticsWidget` exports, `MT_IndividualsWidget::slotExportConstants` and `MT_Controller::slotSaveSetup` |
 | **D36** *(signed off 2026-09-15)* | Dialogs out of sight | **No SIGEL dialog may end up out of sight and block the window.** Jan: *"we need to make sure NO SIGEL dialog ever can end up out of sight and block the window, regardless of how we decide to handle save"*. **Not done yet.** D35 gave the eight save and export file dialogs a parent in the main window. The other dialogs without a parent are counted in `future_refactorings.md`, "Dialogs with no parent can end up out of sight"; some of them are in model classes that D33 keeps untouched |
 | **D37** *(signed off 2026-09-15; its review passed 2026-09-16)* | One exception to D33: the generation counter during a run | **`SIG_GUIGPManager::updateIndividualView` writes the pool generation into the Experiment page's counter.** The line was commented out in 1.3 and is active again; nothing else in `SIGEL_GP` changes. `SIG_GPManager::run` calls `updateIndividualView` for every individual right after it raises `poolGeneration`, so the counter changes when a generation completes. Jan chose it over a timer in `SIGEL_MasterGUI` that would read the generation. Jan: *"then #4 in dedicated pass with a thorough dedicated sub-agent review with fresh eyes, if passes launch me this one in a fresh SIGEL instance"*; #4 was this line. **Not gated:** no gate starts a run. The ungated `evolution` scenario samples the counter during a run |
+| **D38** *(signed off 2026-09-16)* | The generation progress bar | **`generationProgBar` is driven from the interface.** The widget sat in `SIG_ExperimentViewBase.ui` since before 1.3 and nothing ever wrote to it. A `QTimer` in `SIG_GUIGPExperiment` counts the individuals whose `SIG_GPIndividual::upToDate()` is true and sets the bar; it starts in `slotStartEvolution` and stops in `slotEvolutionStopped`. **Nothing in `SIGEL_GP` changes, so this is not a second exception to D33.** The count is not monotonic: a tournament writes offspring with fitness -1, so the bar steps back when new work appears. Jan drove it and accepted that: *"it does eventually end up at 100%, but it jumps up AND down quite a bit… But at least SOMETHING is happening between the counter refreshes."* Its tooltip says what it counts. **Not gated:** no gate starts a run |
+| **D39** *(signed off 2026-09-16)* | Dialogs out of sight — the interface half of D36 | **Every dialog in `SIGEL_MasterGUI` has a parent.** 32 sites: 26 static `QMessageBox` and `QFileDialog` calls that passed `0` or `nullptr`, plus three constructed dialogs (`SIG_EditHostDialog` twice, `SIG_InfoBox` once) and three `QMessageBox` calls that passed `this` inside `SIG_GUIGPExperiment` — where `this` is a `QWidget` that never gets a parent and is never shown, which is no better than none. Real widgets use `this`; `SIG_GUIGPExperiment` uses `experimentListView`, as D35's seven export dialogs already did. Jan confirmed on the real desktop that the main window can no longer cover them. Gated: the `dialogs` scenario prints the parent of Edit Host and of About, and the `exportall` scenario's two `parentIsTheMainWindow` lines moved from 0 to 1. **Still open:** six prompts in `MT_StatisticsWidget` that D35 wants deleted rather than re-parented, five in `MT_Control` and two `QProgressDialog` in `SIGEL_GP` that D33 keeps untouched, and three in `SIG_EnvironmentRenderer` that are reachable but were not asked for |
+| **D40** *(signed off 2026-09-16)* | The window and splitter at start-up | **1280x860, tree 280 px, splash unscaled.** 1.3's `resize( 900, 750 )` already opened taller than the work area on a 1366x768 screen. The splitter asked for `setSizes( {2, 6} )` meaning a 1:3 split; **measured, Qt gives the tree 71 %** — numbers far below the splitter's width are ignored and the surplus goes by size policy, and `QTreeWidget` expands where the stacked widget does not. Real pixel widths and `setStretchFactor( 0, 0 )` / `( 1, 1 )` fix it and keep it fixed on resize. `widgetBase` had `setScaledContents( true )`, which stretched the square 448x448 `noExperiment.png` across the whole content area; it is centred at its own size instead. All three are deliberate divergences from 1.3. Jan: *"don't try to be smart - fixed size for now"*. Geometry is **not** remembered between sessions; `QSettings` was proposed and rejected as overkill |
 
 
 ---
@@ -3138,28 +3141,20 @@ lines, 28 doc comments naming a Qt 2 type, and six form minimums — closed on
 and `guiGPManager` is 0 until a Start passes the three checks in
 `slotStartEvolution`. 1.3 has the same code. Jan, 2026-09-15: investigate later.
 
-**File > Open Experiment can crash when the tree gets focus during the load.**
-`SIG_ExperimentListView::slotLoadExperiment` adds the tree item, then calls
-`SIG_GPExperiment::loadExperiment`, then inserts the experiment into
-`experimentDict`. The load reaches `SIG_GPPopulation::readFromFile`, which calls
-`processEvents`. A focus event from the window manager arrives there.
-`QAbstractItemView::focusInEvent` sets the current item, `currentItemChanged`
-calls `SIG_ExperimentListView::slotSelectionChanged`, and that calls
-`SIG_GUIGPExperiment::slotSelectionChanged` on a null pointer. 1.3 connected
-`selectionChanged` and made the item non-selectable during the load. The port
-connects `currentItemChanged`, and Qt 6 sets the current item even when the item
-is not selectable. Seen 2026-09-15 under xcb on the real desktop:
-`guidrive hold` exited 139, and `guidrive open` under gdb gave the backtrace.
-Not seen offscreen, nor
-on `Xvfb` with no window manager. The real `sigel`, as a native Wayland window,
-loaded the same file once without a crash, and crashed the same way at 20:21,
-under gdb. In the Wayland log of that run, the "Updating..." progress window of
-`SIG_AllIndividualsView::slotCompleteRefreshList` closed just before the crash.
-On 2026-09-16 at 00:14 the real `sigel` crashed the same way on a second route:
-`slotLoadExperiment` calls `SIG_GUIGPExperiment::getAllOutOfExperiment`, which
-reaches `SIG_AllIndividualsView::slotCompleteRefreshList`. Its progress loop runs
-`processEvents`, and a window-focus event reaches the tree from there. So far the
-real `sigel` has crashed on 2 of 4 opens. The fix is not decided.
+**File > Open Experiment no longer crashes when the tree gets focus during the
+load — FIXED 2026-09-16, `2312c39`.** `SIG_ExperimentListView::slotLoadExperiment`
+adds the tree item, then reads the file, then inserts the experiment into
+`experimentDict`. The read runs `processEvents`, in
+`SIG_GPPopulation::readFromFile` and again in
+`SIG_AllIndividualsView::slotCompleteRefreshList`, so a focus event from the
+window manager could make the item current before its experiment existed and
+`SIG_ExperimentListView::slotSelectionChanged` dereferenced a null pointer. 1.3
+made the item non-selectable during the load; **Qt 6 makes even a non-selectable
+item current on focus-in, and a disabled one it leaves alone** — measured with a
+control. The load now clears `Qt::ItemIsEnabled` as well, and the two
+`experimentDict` lookups the tree reaches are null-checked. Gated by the
+`openfocus` scenario, which sends the focus event the window manager sends while
+the file is being read; without the fix it segfaults.
 
 **Slaves crash during a GUI run.** Seen 2026-09-15 in a run of
 `twoBasesLocal.exp`, saved in the repo root at 18:33: termination by time, with a
@@ -3178,11 +3173,29 @@ baseline's `motion=1 xi2=9`). Every Qt-level count on that line stayed the same.
 The next run on the same tree passed. Watch for a second time before changing the
 check.
 
-**Start is not locked during a run yet, nor are the pages of the other
-experiments.** `slotStartEvolution` has no run check. It greys only its own
-experiment's `pushbuttonStart` and its own five pages. The right-click `Start` in
-`menuExperimentView` is never greyed. No check proves a lock on any of them. The
-next step locks them.
+**The run lock is DONE — 2026-09-16, `49cb4a2`, `c984574`, `aa2ebfc`.** One
+evolution at a time, and the whole application is locked while one runs.
+`SIG_GUIGPExperiment::slotStartEvolution` refuses a second run, whichever route
+reaches it — that also closed a **use-after-free**, because a right-click `Start`
+during a run re-entered the slot through `haveABreak`'s `processEvents` and ran
+`delete guiGPManager` on the manager whose `start()` was still on the stack.
+`SIG_GUIGPExperiment::slotRightClick` sets `startEvolutionAction` from
+`SIG_ExperimentListView::isRunning()` and `stopEvolutionAction` from this
+experiment's own `isRunning()`, which also makes the right-click `Stop` crash
+unreachable. `SIG_GUIGPExperiment::slotEvolutionNotRunning`, driven by
+`SIG_ExperimentListView::evolutionNotRunning`, locks **every** experiment: the
+Start button, the five parameter pages, and the Experiment page's history box,
+autosave slider, comment box and two plot buttons. The same signal now drives
+`SIG_AllIndividualsView::slotEvolutionNotRunning` for every experiment, so no
+individuals list can start a slave through `Visualize` mid-run. `Stop` stays live
+for the experiment that is running. **Two defects came out of it**:
+`SIG_GUIGPExperiment::setName` re-keyed `widgetDict` but not `menuDict`, so the
+tree menu was dead for every saved experiment; and
+`SIG_AllIndividualsView::slotEvolutionNotRunning` disconnected with a wildcard,
+which also cut `QTreeWidget`'s own relay for `itemDoubleClicked` — 1.3's line,
+and it killed double-click on an individual. Both fixed. Gated by `runlock`,
+which reads eleven widgets of two experiments and the second experiment's
+individuals list, each with a control.
 
 **D29's arming line was checked by the `evolution` scenario, and it held.** The
 tree click is the only thing that reaches it —
