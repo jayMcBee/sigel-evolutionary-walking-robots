@@ -87,7 +87,7 @@
                           <cursor>0</cursor>
                         </property>
                         <property name="toolTip">
-                          <string>Progress of current generation</string>
+                          <string>Progress of current generation. Counts individuals that have a fitness value.</string>
                         </property>
                       </widget>
                     </item>
