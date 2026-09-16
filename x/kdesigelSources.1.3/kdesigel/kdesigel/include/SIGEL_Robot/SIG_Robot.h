@@ -57,10 +57,7 @@ namespace SIGEL_Robot
   private:
     SIG_LanguageParameters *language;
     SIG_Link *rootlink;
-    // Qt 2 held these in a QDict, whose hash order numbered the links and
-    // joints; the order now comes from the data files, so a plain ordered list
-    // of pointers is the whole requirement. The key was always x->getName(),
-    // so no key is stored.
+    // The order is the file's; see SIG_LanguageParameters.
     QList<SIG_Body *> bodies;
     QList<SIG_Material *> materials;
     QList<SIG_Link *> links;

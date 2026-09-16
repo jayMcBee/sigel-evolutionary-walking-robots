@@ -354,28 +354,9 @@
 		  }
 	  }
 
-	  // QPixmap::grabWindow was REMOVED in Qt 6, and for a QOpenGLWidget it was
-	  // the wrong call anyway: it read the window's on-screen pixels through the
-	  // window system, whereas this widget now renders into an FBO. The
-	  // equivalent is grabFramebuffer(), which returns a QImage of this widget's
-	  // own content -- hence QImage/QTransform above rather than QPixmap/QWMatrix.
-	  //
-	  // BEHAVIOUR CHANGE, FORCED BY THE REMOVAL AND NOT CHOSEN. grabWindow read
-	  // the LAST PRESENTED frame; every caller runs `makeTimeSteps(n); update();'
-	  // and the grab happens inside makeTimeSteps, so 1.3 recorded frame N-1
-	  // while the simulation stood at N. grabFramebuffer() renders current
-	  // content, so this records frame N, not 1.3's N-1.
-	  // Qt 2's grabWindow read w<0 / h<0 as "to the window edge"
-	  // (qpixmap_x11.cpp: `if (w < 0) w = a.width - x;'). QImage::copy has no
-	  // such rule and returns a NULL image, which then saves nothing while
-	  // callRenderPixMap still returns true -- a recording that writes no
-	  // files and reports success. pW/pH really do reach here as -1: the
-	  // keepRatio branch sets neither, and the third branch sets exactly one.
-	  // grabFramebuffer() returns DEVICE pixels -- widget size x
-	  // devicePixelRatio -- while pX/pY/pW/pH are all logical, computed from
-	  // width()/height() and movieWidth/Height. On a scaled display the crop
-	  // would take a fraction of the frame. Normalise to logical pixels so the
-	  // arithmetic above means what it did in 1.3, where dpr was always 1.
+	  // Records frame N where 1.3 recorded N-1. pW/pH reach here as -1 and
+	  // QImage::copy returns a null image for that -- it would save nothing and
+	  // report success. grabFramebuffer returns device pixels, not logical.
 	  QImage grabbed = grabFramebuffer();
 	  if ( grabbed.devicePixelRatio() != 1.0 )
 	    {

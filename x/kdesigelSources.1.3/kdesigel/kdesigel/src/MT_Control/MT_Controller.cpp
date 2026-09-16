@@ -122,18 +122,8 @@ void MT_Controller::slotEvolutionRunning(bool running)
 	if(!running){
 		if(startWOSigel && !withGUI){
 			QObject::disconnect(gpManager, SIGNAL(metaEvolutionRunning(bool)), this, SLOT(slotEvolutionRunning(bool)));
-			// NOT qApp. This TU pulls qapplication.h transitively (MT_MainWindow.h ->
-			// MT_EstimationWidget.h -> ...Base.h -> ui_...h -> <QtWidgets/QApplication>,
-			// the only inclusion of it in the whole TU), so qApp expands to
-			// static_cast<QApplication *>(QCoreApplication::instance()). On the
-			// -mtevolve / -me path sigel.cpp, main builds a PLAIN QCoreApplication, so
-			// the CAST is undefined behaviour in itself -- C++17 [expr.static.cast]/11,
-			// the pointee is not a base subobject of any QApplication. Nothing has ever
-			// faulted because exit() is STATIC (qcoreapplication.h:200), so no this is
-			// formed and the pointer is never read -- which also means a clean UBSan
-			// run proves nothing here. Qualified, not instance()->: exit() being static,
-			// instance() would be evaluated for nothing. Same symbol either way,
-			// _ZN16QCoreApplication4exitEi.
+			// Not qApp: on the -mtevolve path main builds a plain QCoreApplication,
+			// and qApp's cast to QApplication would be undefined.
 			QCoreApplication::exit(0);
 		}
 	}
@@ -270,16 +260,8 @@ bool MT_Controller::useMeta(bool state)
 											"we do with the system?",
 											"Disable",
 											"Remove",
-											// 1.3 showed a LITERAL ampersand here. Qt 2's text drawing only
-											// treated "&x" as a prefix when x passed its own ISPRINT,
-											// "((x).row() || (x).cell()>' ')" (qpainter.cpp:2317), and a
-											// space FAILS that -- so the '&' was drawn as itself. Qt 6 has no
-											// such exclusion: it eats the '&' and underlines the space,
-											// rendering "Save _Remove". "&&" is Qt 6's escape for a literal
-											// ampersand and restores exactly what 1.3 displayed. (Qt 2 also
-											// registered Alt+Space from QAccel::shortcutKey, which uses the
-											// real QChar::isPrint; that accelerator is unreachable under any
-											// window manager and is not restored.)
+											// Qt reads & in a label as the shortcut marker and draws an underline
+											// instead. "&&" is how Qt shows one real ampersand.
 											"Save && Remove",
 											0, 0) )
 			{
@@ -637,11 +619,7 @@ bool MT_Controller::saveSystem(QString sigExpName)
 				// system uses the default configuration
 				// therefore copy the default configuration file
 				QFile stdFile(defConfFileName);
-				// Qt 2's QTextStream::read() did an unconditional s/\r\n/\n on the way in
-				// (qtextstream.cpp:1531), with no dependence on the open mode. Qt 6's
-				// readAll() returns raw bytes unless the device is opened with Text, so
-				// without this a CRLF default-config file is copied verbatim into the
-				// saved .mexp where 1.3 wrote LF.
+				// Text, or a CRLF config file is copied verbatim into the saved .mexp.
 				if(stdFile.open(QIODevice::ReadOnly | QIODevice::Text)){
 					QTextStream stdStr(&stdFile);
 					fileStr << stdStr.readAll();

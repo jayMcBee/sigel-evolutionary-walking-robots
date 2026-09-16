@@ -59,11 +59,8 @@
   {
     delete visualisation;
 
-    // The labels are Qt CHILDREN of this widget and were ALSO owned by the
-    // Qt 2 vector's autoDelete. That was not a double free: the member is
-    // destroyed before the QWidget base, so each label unparented itself and
-    // ~QWidget then found no children left. This body runs before the base
-    // destructor, so the order is preserved.
+    // The labels are children of this widget too. This body runs before the
+    // QWidget base destructor, so each unparents itself first -- not a double free.
     qDeleteAll( floatingTextWidgets );
     floatingTextWidgets.clear();
   };

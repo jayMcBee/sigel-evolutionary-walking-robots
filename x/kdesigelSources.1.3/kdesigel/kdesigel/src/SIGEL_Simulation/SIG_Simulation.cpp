@@ -53,19 +53,9 @@ SIGEL_Simulation::SIG_Simulation::SIG_Simulation(SIGEL_Robot::SIG_Robot const & 
       };
       break;
 
-    // SIMULATIONLIBRARY 0 names the Dynamo backend, which this tree does not
-    // have. This case must not fall through: the three interface pointers below
-    // would stay uninitialised, and silently constructing a DynaMechs simulation
-    // instead would answer with a fitness from a different physics engine than
-    // the file asked for. All 14 shipped experiments carry SIMULATIONLIBRARY 1.
-    //
-    // The printed line is load-bearing. The fitness functions construct
-    // SIG_Simulation OUTSIDE their own try block, and sigel_slave.cpp, main wraps
-    // evalFitness() in catch (SIG_Exception &) { fitnessValue = 0; }, so under PVM
-    // the throw is swallowed and the individual scores 0.0 as though it had been
-    // evaluated. The message is then the only evidence that reaches anyone. It
-    // goes to std::cerr rather than SIG_IO::cerr because SIG_IO buffers until
-    // it is flushed.
+    // Must not fall through: the three interface pointers below would stay
+    // uninitialised. Under PVM the throw is swallowed and the individual scores
+    // 0.0, so this message is the only evidence; std::cerr because SIG_IO buffers.
     default:
       std::cerr << "SIG_Simulation: SIMULATIONLIBRARY "
 		<< static_cast<int>( simulationParameter.getSimulationLibrary() )
@@ -91,15 +81,8 @@ SIGEL_Simulation::SIG_Simulation::SIG_Simulation(SIGEL_Robot::SIG_Robot const & 
 SIGEL_Simulation::SIG_Simulation::~SIG_Simulation()
 { };
 
-// NOTE: in 2003 this carried throw(SIG_SimulationCannotSolveException).
-// C++17 removed dynamic exception specifications, but removing it outright
-// would change behaviour: SIG_Recorder and the simulation backend can throw
-// other SIG_Exception subclasses through this frame, which the old
-// specification
-// turned into terminate(). Every caller is a GP fitness function that does
-// catch (SIG_Exception &) { }, so without the boundary those become a
-// silently wrong fitness value instead of a crash. The guarantee is kept
-// explicitly below.
+// The boundary below is deliberate. Every caller is a fitness function that
+// catches SIG_Exception, so an escaping one becomes a wrong fitness, not a crash.
 void SIGEL_Simulation::SIG_Simulation::start()
 {
   try {
@@ -134,15 +117,8 @@ void SIGEL_Simulation::SIG_Simulation::start()
 };
 
 
-// NOTE: in 2003 this carried throw(SIG_SimulationCannotSolveException).
-// C++17 removed dynamic exception specifications, but removing it outright
-// would change behaviour: SIG_Recorder and the simulation backend can throw
-// other SIG_Exception subclasses through this frame, which the old
-// specification
-// turned into terminate(). Every caller is a GP fitness function that does
-// catch (SIG_Exception &) { }, so without the boundary those become a
-// silently wrong fitness value instead of a crash. The guarantee is kept
-// explicitly below.
+// The boundary below is deliberate. Every caller is a fitness function that
+// catches SIG_Exception, so an escaping one becomes a wrong fitness, not a crash.
 void SIGEL_Simulation::SIG_Simulation::makeTimeSteps(int numTimeSteps)
 {
   try {

@@ -41,18 +41,11 @@ namespace SIGEL_SlaveGUI
     // Qt 2's setUsesTextLabel(false) is Qt 6's ToolButtonIconOnly.
     this->setToolButtonStyle( Qt::ToolButtonIconOnly );
 
-    // Qt 2's setUsesBigPixmaps(true) selected the QIconSet::Large pixmap, which
-    // is the size these actually are: 25x25 for seven of the eight toolbar
-    // XPMs, 24x24 for quitApplicationSmall. Qt 6 has no icon size classes, so
-    // the toolbar's iconSize is where that choice now lives -- measured from
-    // the files, not chosen.
+    // 25x25 is what these XPMs are, measured from the files.
     this->setIconSize( QSize( 25, 25 ) );
 
-    // Qt 2's QMainWindow adopted a QStatusBar child through childEvent
-    // (qmainwindow.cpp: `if (e->child()->inherits("QStatusBar")) d->sb = ...').
-    // Qt 6 does not: without setStatusBar the bar is an unmanaged child painted
-    // over the central widget, and the seven setStatusTip strings this
-    // constructor sets could never be shown.
+    // Without setStatusBar the bar is an unmanaged child painted over the
+    // central widget, and the setStatusTip strings below never show.
     setStatusBar( new QStatusBar( this ) );
 
     simulationWidget = new SIG_SimulationWidget(this, "simulationWidget");

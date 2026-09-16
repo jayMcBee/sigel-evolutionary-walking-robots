@@ -59,10 +59,6 @@ SIG_MovieSettingsDialog::~SIG_MovieSettingsDialog()
  */
 void SIG_MovieSettingsDialog::slotToolButtonClicked()
 {
-  // Qt 2: getExistingDirectory( dir, parent, name, caption, dirOnly )
-  // Qt 6: getExistingDirectory( parent, caption, dir, options )
-  // Every argument survives but the widget `name', which Qt 6 has no place for;
-  // dirOnly=true becomes ShowDirsOnly.
   QString newDirectory =
     QFileDialog::getExistingDirectory( this,
 				       "Select movie directory...",

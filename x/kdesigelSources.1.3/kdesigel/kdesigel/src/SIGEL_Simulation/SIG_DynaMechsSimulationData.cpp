@@ -355,13 +355,8 @@ void SIGEL_Simulation::SIG_DynaMechsSimulationData::initializeArticulation()
 								0,
 								0 );
 
-  // Qt 2's autoDelete made QVector::insert() free whatever occupied the
-  // slot; the delete below is that same free, written out. Kept exactly,
-  // including its consequences: two joints between the same pair of
-  // links both pass SIG_Joint::continuable, so the second build frees a link
-  // that is already in its parent's successors list and already registered
-  // with dynaMechsSystem. That use-after-free is 1.3's; no shipped
-  // robot has such a pair.
+  // Two joints between the same pair of links make this free a link that is
+  // still in use. A preserved defect; no shipped robot has such a pair.
   delete dynaMechsLinks[ rootLink->getNumber() ];
   dynaMechsLinks[ rootLink->getNumber() ] = dynaMechsRootLink;
 
@@ -442,11 +437,8 @@ SIGEL_Simulation::SIG_DynaMechsLink *SIGEL_Simulation::SIG_DynaMechsSimulationDa
 					   d,
 					   theta);
 
-  // The MDH parameters are non-integrating: they come from
-  // the robot model by fixed arithmetic, so unlike fitness they must agree with
-  // 1.3 exactly rather than approximately. Raw IEEE 754 bit patterns, because
-  // decimal printing hides the last few bits, and keyed by joint NAME so the
-  // comparison does not depend on container order. Off unless SIGEL_MDH is set.
+  // Raw bit patterns, because decimal printing hides the last few bits, and
+  // keyed by joint name so the comparison does not depend on container order.
   if (getenv("SIGEL_MDH")) {
     const double mdh[4] = { a, alpha, d, theta };
     printf("mdh %-20s", qPrintable(joint->getName()));

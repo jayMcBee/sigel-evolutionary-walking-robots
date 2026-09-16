@@ -172,11 +172,8 @@ namespace SIGEL_Robot {
                 POLYHEDRON *p = f->poly;
                 double dx1, dy1, dz1, dx2, dy2, dz2, nx, ny, nz, len;
 
-                // verts[0..2] are read unconditionally below, and len divides.
-                // A face with fewer than three vertices reads off the end of a
-                // new int[numVerts]; three collinear ones divide by zero. The
-                // Qt 2 clamp made the first unreachable by never producing a
-                // short face; nothing else did.
+                // verts[0..2] are read below and len divides: a face with fewer than three
+                // vertices reads off the end, three collinear ones divide by zero.
                 if (f->numVerts < 3) {
                         f->norm[X] = f->norm[Y] = f->norm[Z] = 0.0;
                         f->w = 0.0;

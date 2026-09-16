@@ -31,16 +31,8 @@ namespace SIGEL_Robot {
 		  maximalDelayTime(5000),
                   allowedCommands ()
         {
-	  // ORDER MATTERS AND IS NOT ALPHABETICAL. Qt 2 held these in a QDict
-	  // and writeToFileTransfer walked it with a QDictIterator, so the
-	  // order a default-constructed object writes is that dict's HASH
-	  // order -- bucket 0 upward over 17 buckets, each chain in reverse
-	  // insertion order because look_string prepends (qgdict.cpp:356,
-	  // qdict.h:49). The container is an ordered QList, which
-	  // reproduces the file's order when there IS a file but has to be
-	  // given this order when there is not: a robot import and File >
-	  // New Experiment both default-construct, and both write it out.
-	  // This order matches 1.3's output character for character.
+	  // ORDER MATTERS AND IS NOT ALPHABETICAL. A default-constructed object
+	  // writes this order, and it must match what a loaded file writes.
 	  SIG_CommandParameters *commandParameters = new SIG_CommandParameters();
 	  commandParameters->setDuration( 0.001 );
 	  this->addCommand( "MUL", commandParameters );
