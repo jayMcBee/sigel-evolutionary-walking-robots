@@ -317,18 +317,8 @@ void SIG_LanguageParameters::slotCommandDoubleClicked( QTreeWidgetItem *theItem 
 	    editCommandDialog.radiobuttonDisallow->setChecked( true );
 	  editCommandDialog.lineeditDuration->setText( theItem->text( 2 ) );
 	  editCommandDialog.lineeditDuration->setFocus();
-	  // Qt 2's QLineEdit did not select its text when it took focus; Qt 6's
-	  // does, because a QDialog hands initial focus down the tab chain and
-	  // QLineEdit::focusInEvent selects all for that focus reason. The
-	  // consequence is not cosmetic: 1.3 leaves the pre-filled value intact
-	  // so a typed digit APPENDS to it, where a selection would replace it.
-	  // 1.3 does the same in the Edit Host dialog. Rename does NOT get this
-	  // treatment and must not: it calls selectAll() explicitly
-	  // (SIG_ExperimentListView.cpp, slotRenameExperiment) and pre-selects in 1.3 too.
-	  // end(false) rather than deselect(): deselect leaves the cursor at
-	  // position 0, so a typed digit lands BEFORE the value -- 1 + "2" gives
-	  // 21 where 1.3 gives 12. end(false) clears the selection AND puts the
-	  // cursor after the text, which is where 1.3 leaves it.
+	  // end(false), not deselect(): deselect leaves the cursor at 0, so a typed
+	  // digit lands in front of the value.
 	  { QLineEdit *le = editCommandDialog.lineeditDuration; QTimer::singleShot( 0, le, [le]{ le->end( false ); } ); }
 	}
       else

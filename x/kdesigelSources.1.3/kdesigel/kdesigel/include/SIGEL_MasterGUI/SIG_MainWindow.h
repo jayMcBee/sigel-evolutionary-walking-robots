@@ -146,12 +146,7 @@ namespace SIGEL_MasterGUI
        * The action group that is disabled when there is no
        * experiment present.
        */
-      // Qt 2's QActionGroup kept its own member list (qaction.cpp:892-899), so
-      // one action could sit in several groups and each group's setEnabled()
-      // walked its own list. A Qt 6 QAction belongs to at most ONE QActionGroup
-      // -- adding it to a second EVICTS it from the first -- and 23 of these 30
-      // actions are also in evolutionRunningActions, which left only 7 of them
-      // being disabled. A plain list restores Qt 2's behaviour exactly.
+      // A plain list: a QAction belongs to at most one QActionGroup.
       QList<QAction *> noExperimentActions;
 
       /**

@@ -52,9 +52,6 @@ SIG_AddIndividualsDialog::SIG_AddIndividualsDialog( QWidget* parent,  const char
     : QDialog( parent, fl )
 {
     setObjectName( QString::fromUtf8( name ) );
-    // Qt 2's QDialog folded modal into WType_Modal (qdialog.cpp:80), which set
-    // WState_Modal and called qt_enter_modal() -- real application modality,
-    // not merely a window type. setModal() sets WA_ShowModal, which is that.
     setModal( modal );
 
     if ( !name )

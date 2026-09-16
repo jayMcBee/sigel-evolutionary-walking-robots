@@ -32,11 +32,6 @@ namespace SIGEL_MasterGUI
 SIG_IndividualListItem::SIG_IndividualListItem( QTreeWidget *parent )
   : QTreeWidgetItem()
 {
-  // Qt 2's QListViewItem( QListView * ) PREPENDED (qlistview.cpp:585);
-  // Qt 6's QTreeWidgetItem( QTreeWidget * ) appends, so the item is built
-  // detached and inserted at the head instead. Nothing listens to
-  // itemChanged, so doing it first -- as Qt 2 did, before the body ran --
-  // is unobservable either way.
   parent->insertTopLevelItem( 0, this );
 #ifdef _WINDOWS
   QString sigelRoot( ::getenv( "SIGEL_ROOT" ) );

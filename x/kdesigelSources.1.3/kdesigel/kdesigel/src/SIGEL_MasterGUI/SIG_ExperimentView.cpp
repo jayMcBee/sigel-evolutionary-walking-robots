@@ -58,21 +58,9 @@ SIG_ExperimentView::~SIG_ExperimentView() {
 }
 
 void SIG_ExperimentView::putIntoExperiment() {
-  // slotStartEvolution disables gpParameter, simulationParameter, robotView,
-  // languageParameters and environmentView -- but NOT experimentView, which is
-  // the page the user is looking at when they press Start and which stays
-  // fully live for the whole run. Its history checkbox and autosave slider
-  // reach this function through slotHistory and slotIntervallChanged, not
-  // through putAllIntoExperiment, so this function needs its own guard.
-  //
-  // It is a live path in the strong sense: the running GP reads
-  // getAutosave() every generation (both SIG_GPManager::run bodies) to decide
-  // whether to save, and getHistory() decides what that save writes.
-  //
-  // The LCD read below is display-only and sits AHEAD of the guard, so
-  // slotHistory and slotIntervallChanged still refresh it during a run;
-  // poolGeneration IS incremented per generation inside the loop
-  // (SIG_GPManager.cpp, run).
+  // slotHistory and slotIntervallChanged reach this function without going
+  // through putAllIntoExperiment, so it needs its own check. The LCD read
+  // below is display-only and sits ahead of it.
 
   // update the generations display + progress-bar
   lcdnumberGenerations->display(theExperiment.population.getPoolGeneration());

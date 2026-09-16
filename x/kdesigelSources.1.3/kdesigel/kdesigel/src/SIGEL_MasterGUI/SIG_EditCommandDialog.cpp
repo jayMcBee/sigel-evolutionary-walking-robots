@@ -57,9 +57,6 @@ SIG_EditCommandDialog::SIG_EditCommandDialog( QWidget* parent,  const char* name
     : QDialog( parent, fl )
 {
     setObjectName( QString::fromUtf8( name ) );
-    // Qt 2's QDialog folded modal into WType_Modal (qdialog.cpp:80), which set
-    // WState_Modal and called qt_enter_modal() -- real application modality,
-    // not merely a window type. setModal() sets WA_ShowModal, which is that.
     setModal( modal );
 
     if ( !name )
@@ -124,16 +121,8 @@ SIG_EditCommandDialog::SIG_EditCommandDialog( QWidget* parent,  const char* name
     connect( pushbuttonOK, SIGNAL( clicked() ), this, SLOT( accept() ) );
     connect( pushbuttonCancel, SIGNAL( clicked() ), this, SLOT( reject() ) );
 
-  // Qt 2 forced LC_NUMERIC="C" for the whole process (qapplication_x11.cpp:1389)
-  // and its QDoubleValidator hard-coded '.' (qvalidator.cpp:387). Qt 6 validators
-  // follow the system locale, but the read-back below is QString::toDouble(),
-  // which is locale-independent and always wants '.'. Left to disagree, a typed
-  // "9,81" validates under a comma-decimal locale and reads back as 0.
-  // The C locale's GROUP separator is ',', so QLocale::c() alone still accepts
-  // "0,375" -- as 375 grouped -- and QString::toDouble() then returns 0. Qt 2
-  // ran the whole string through strtod and demanded it be consumed to the NUL
-  // (qstring.cpp toDouble), so a comma made ok=false and validate() returned
-  // Invalid. RejectGroupSeparator is what reproduces that.
+  // The read-back is QString::toDouble(), which always wants '.'. The C locale
+  // alone still takes "0,375" as grouped, so the group separator is rejected.
   QLocale cLocale = QLocale::c();
   cLocale.setNumberOptions( QLocale::RejectGroupSeparator );
   for ( QValidator *v : findChildren<QValidator *>() )

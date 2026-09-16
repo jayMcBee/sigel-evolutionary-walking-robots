@@ -13,12 +13,7 @@ SIG_LanguageParametersBase::SIG_LanguageParametersBase(QWidget* parent, const ch
 
   setupUi( this );
 
-  // Qt 2's QListView sorted by column 0 ASCENDING by default (qlistview.cpp:
-  // 1836-1837 sets sortcolumn=0, ascending=TRUE in init()). The .ui carries
-  // sortingEnabled, but Qt 6's
-  // setSortingEnabled(true) leaves the indicator on column 0 DESCENDING --
-  // measured. Without this the rows come out reversed wherever column 0 holds
-  // text, which it does here.
+  // setSortingEnabled leaves the indicator descending, so the order is set here.
   listviewCommands->sortByColumn( 0, Qt::AscendingOrder );
 }
 

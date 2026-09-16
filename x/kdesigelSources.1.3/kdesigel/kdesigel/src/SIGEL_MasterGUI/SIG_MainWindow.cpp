@@ -40,15 +40,7 @@ namespace SIGEL_MasterGUI
 SIG_MainWindow::SIG_MainWindow( QWidget * parent, const char * name, Qt::WindowFlags f ) : QMainWindow( parent, f )
 {
   setObjectName( QString::fromUtf8( name ) );
-  // Qt 2's QMainWindow defaulted to small pixmaps (qmainwindow.cpp:177, ubp
-  // FALSE) and drew each QIconSet member at its OWN size. These pixmaps are not
-  // a uniform size -- measured across the 30 referenced files, Small runs
-  // 9x25..25x25 and Large 19x48..48x48 -- and Qt 6 has exactly one iconSize per
-  // toolbar, choosing from the QIcon by pixel size rather than by the Small and
-  // Large roles Qt 2 named explicitly. 25 is the largest Small, so nothing is
-  // scaled UP past what 1.3 drew; icons whose two pixmaps straddle it are still
-  // resampled where Qt 2 blitted natively. That residue is not removable
-  // without splitting each QIcon.
+  // One icon size per toolbar in Qt 6, and 25 is the largest of the small pixmaps.
   setIconSize( QSize( 25, 25 ) );
 #ifdef _WINDOWS
   QString sigelRoot( ::getenv( "SIGEL_ROOT" ) );

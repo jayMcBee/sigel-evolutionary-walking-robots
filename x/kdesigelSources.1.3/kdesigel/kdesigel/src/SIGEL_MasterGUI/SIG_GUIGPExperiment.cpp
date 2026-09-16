@@ -237,25 +237,10 @@ bool SIG_GUIGPExperiment::isRunning()
 
 void SIG_GUIGPExperiment::putAllIntoExperiment()
 {
-  // DELIBERATE DEVIATION FROM 1.3: parameters may not
-  // change once a run has started. That is how GP is normally implemented --
-  // the parameters define the run -- and 1.3's behaviour here is not the
-  // specification.
-  //
-  // The guard belongs HERE rather than on the widgets, because this function
-  // is reached by a path no widget guard covers:
-  // SIG_ExperimentListView::slotSelectionChanged ends with an UNCONDITIONAL
-  // putAllIntoExperiment(), two lines after it has already asked
-  // SIG_ExperimentListView::isRunning() for a different purpose. So disabling the pages
-  // leaves a page switch able to push widget state into a live run.
-  //
-  // 1.3 does disable the five pages while running (slotStartEvolution below),
-  // so no user-typed value can currently reach here mid-run -- this makes the
-  // property structural instead of incidental, and covers any future caller.
-  //
-  // slotStartEvolution calls this BEFORE guiGPManager->start(), so the settings a
-  // user chose are still committed at start; only writes after that are
-  // refused.
+  // Parameters may not change once a run has started: the parameters define
+  // the run. The check belongs here rather than on the widgets, because
+  // SIG_ExperimentListView::slotSelectionChanged calls this unconditionally, so
+  // a page switch could otherwise push widget state into a live run.
   if ( experimentListView->isRunning() )
     return;
 
@@ -369,14 +354,8 @@ void SIG_GUIGPExperiment::slotStartEvolution()
       environmentView->setEnabled( false );
       // allIndividualsView->setEnabled( false );
       
-      // Set AFTER putAllIntoExperiment() above, so the settings the user
-      // chose are committed, and before start(), so nothing can change them
-      // from here on. start() runs the evolution synchronously and services
-      // the GUI through haveABreak()'s processEvents, so widgets and menus
-      // really are reachable during it.
-      //
-      // slotEvolutionStopped() clears evolutionRunning and re-enables Start
-      // and the five pages disabled above, so it must run even if start()
+      // Set after putAllIntoExperiment above, so the user's settings commit,
+      // and before start(). slotEvolutionStopped() must run even if start()
       // throws.
       evolutionRunning = true;
       experimentView->generationProgBar->setRange( 0, gpExperiment.population.getSize() );
@@ -423,12 +402,8 @@ void SIG_GUIGPExperiment::slotStopEvolution()
 
 void SIG_GUIGPExperiment::slotSimulationParameterImport()
 {
-  // These write gpExperiment.* DIRECTLY -- slotRobotLoad replaces the
-  // whole robot -- so none of them passes through putAllIntoExperiment and the
-  // guard there does not cover them. Their page buttons are disabled during a
-  // run, but menuSimulationParameter and menuEnvironmentView are parented on
-  // SIG_GUIGPExperiment rather than on the pages, so a right-click on the tree item
-  // pops them regardless, and slotRightClick does not test enablement.
+  // These write gpExperiment.* directly, so putAllIntoExperiment's check does
+  // not cover them.
   if ( experimentListView->isRunning() )
     return;
 
@@ -465,12 +440,8 @@ void SIG_GUIGPExperiment::slotSimulationParameterExport()
 
 void SIG_GUIGPExperiment::slotEnvironmentImport()
 {
-  // These write gpExperiment.* DIRECTLY -- slotRobotLoad replaces the
-  // whole robot -- so none of them passes through putAllIntoExperiment and the
-  // guard there does not cover them. Their page buttons are disabled during a
-  // run, but menuSimulationParameter and menuEnvironmentView are parented on
-  // SIG_GUIGPExperiment rather than on the pages, so a right-click on the tree item
-  // pops them regardless, and slotRightClick does not test enablement.
+  // These write gpExperiment.* directly, so putAllIntoExperiment's check does
+  // not cover them.
   if ( experimentListView->isRunning() )
     return;
 
@@ -507,12 +478,8 @@ void SIG_GUIGPExperiment::slotEnvironmentExport()
 
 void SIG_GUIGPExperiment::slotGPParameterImport()
 {
-  // These write gpExperiment.* DIRECTLY -- slotRobotLoad replaces the
-  // whole robot -- so none of them passes through putAllIntoExperiment and the
-  // guard there does not cover them. Their page buttons are disabled during a
-  // run, but menuSimulationParameter and menuEnvironmentView are parented on
-  // SIG_GUIGPExperiment rather than on the pages, so a right-click on the tree item
-  // pops them regardless, and slotRightClick does not test enablement.
+  // These write gpExperiment.* directly, so putAllIntoExperiment's check does
+  // not cover them.
   if ( experimentListView->isRunning() )
     return;
 
@@ -549,12 +516,8 @@ void SIG_GUIGPExperiment::slotGPParameterExport()
 
 void SIG_GUIGPExperiment::slotLanguageParameterImport()
 {
-  // These write gpExperiment.* DIRECTLY -- slotRobotLoad replaces the
-  // whole robot -- so none of them passes through putAllIntoExperiment and the
-  // guard there does not cover them. Their page buttons are disabled during a
-  // run, but menuSimulationParameter and menuEnvironmentView are parented on
-  // SIG_GUIGPExperiment rather than on the pages, so a right-click on the tree item
-  // pops them regardless, and slotRightClick does not test enablement.
+  // These write gpExperiment.* directly, so putAllIntoExperiment's check does
+  // not cover them.
   if ( experimentListView->isRunning() )
     return;
 
@@ -592,12 +555,8 @@ void SIG_GUIGPExperiment::slotLanguageParameterExport()
 
 void SIG_GUIGPExperiment::slotPopulationImport()
 {
-  // These write gpExperiment.* DIRECTLY -- slotRobotLoad replaces the
-  // whole robot -- so none of them passes through putAllIntoExperiment and the
-  // guard there does not cover them. Their page buttons are disabled during a
-  // run, but menuSimulationParameter and menuEnvironmentView are parented on
-  // SIG_GUIGPExperiment rather than on the pages, so a right-click on the tree item
-  // pops them regardless, and slotRightClick does not test enablement.
+  // These write gpExperiment.* directly, so putAllIntoExperiment's check does
+  // not cover them.
   if ( experimentListView->isRunning() )
     return;
 
@@ -633,12 +592,8 @@ void SIG_GUIGPExperiment::slotPopulationExport()
 
 void SIG_GUIGPExperiment::slotRobotImport()
 {
-  // These write gpExperiment.* DIRECTLY -- slotRobotLoad replaces the
-  // whole robot -- so none of them passes through putAllIntoExperiment and the
-  // guard there does not cover them. Their page buttons are disabled during a
-  // run, but menuSimulationParameter and menuEnvironmentView are parented on
-  // SIG_GUIGPExperiment rather than on the pages, so a right-click on the tree item
-  // pops them regardless, and slotRightClick does not test enablement.
+  // These write gpExperiment.* directly, so putAllIntoExperiment's check does
+  // not cover them.
   if ( experimentListView->isRunning() )
     return;
 
@@ -673,12 +628,8 @@ void SIG_GUIGPExperiment::slotGNUPlotExport()
 
 void SIG_GUIGPExperiment::slotRobotLoad()
 {
-  // These write gpExperiment.* DIRECTLY -- slotRobotLoad replaces the
-  // whole robot -- so none of them passes through putAllIntoExperiment and the
-  // guard there does not cover them. Their page buttons are disabled during a
-  // run, but menuSimulationParameter and menuEnvironmentView are parented on
-  // SIG_GUIGPExperiment rather than on the pages, so a right-click on the tree item
-  // pops them regardless, and slotRightClick does not test enablement.
+  // These write gpExperiment.* directly, so putAllIntoExperiment's check does
+  // not cover them.
   if ( experimentListView->isRunning() )
     return;
 

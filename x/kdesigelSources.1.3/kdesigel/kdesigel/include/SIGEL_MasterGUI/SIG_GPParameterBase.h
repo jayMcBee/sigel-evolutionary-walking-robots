@@ -45,9 +45,7 @@ public slots:
     virtual void slotTourPerGenChanged( int );
 
 protected:
-    // Qt 3 called languageChange() itself on a language change. Qt 6 has no
-    // such hook, so it is driven from changeEvent -- the documented successor.
-    // Without this the slot below would never run.
+    // Drives languageChange; without it the slot never runs.
     void changeEvent( QEvent *e ) override;
 
 protected slots:

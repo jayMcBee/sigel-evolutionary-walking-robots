@@ -39,9 +39,6 @@ namespace SIGEL_MasterGUI
   SIG_ExperimentListView::SIG_ExperimentListView( QWidget * parent, const char * name, QStackedWidget *theWidgetStack ) : QTreeWidget( parent ), widgetStack( theWidgetStack ), numberOfExperiments(1)
 {
   setHeaderLabels( QStringList( "Experiments" ) );
-  // Qt 2's QListView::rightButtonClicked has no Qt 6 counterpart. It passed a
-  // GLOBAL position, column -1 when the click hit no item, and called
-  // clearSelection() first in that case (qlistview.cpp:3388-3396).
   setContextMenuPolicy( Qt::CustomContextMenu );
   QObject::connect( this,
 		    SIGNAL( customContextMenuRequested( const QPoint & ) ),
@@ -60,8 +57,6 @@ namespace SIGEL_MasterGUI
 
 SIG_ExperimentListView::~SIG_ExperimentListView()
 {
-  // experimentDict had setAutoDelete(true), so ~QDict deleted every
-  // experiment it still held. QHash owns nothing.
   qDeleteAll( experimentDict );
 };
 

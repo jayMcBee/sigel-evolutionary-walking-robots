@@ -158,16 +158,8 @@ void SIG_AllIndividualsView::slotCompleteRefreshList()
   progress.setWindowTitle( "Updating..." );
   progress.show();
   
-  // Qt 2's QListView::clear() blocked its OWN signals for its whole body,
-  // clearSelection() included -- "bool block = signalsBlocked(); blockSignals(
-  // TRUE ); d->clearing = TRUE; clearSelection(); ... blockSignals( block );"
-  // (qlistview.cpp). Qt 6's QTreeWidget::clear() does not, so clearing the list
-  // emits itemSelectionChanged() while currentItem() still points at an item
-  // from the OLD pool. slotSelectionChanged() then asks the population for that
-  // item's poolPosition, and after a large delete that position no longer
-  // exists: getIndividual() prints "Wrong Position requested from Population!"
-  // and calls exit(1). Deleting most of the pool KILLED the application.
-  // Restoring Qt 2's blocking is the whole fix.
+  // clear() emits itemSelectionChanged while currentItem() still points into
+  // the old pool, and getIndividual() calls exit(1) on a position that is gone.
   {
     const bool wasBlocked = individualList->listviewIndividuals->blockSignals( true );
     individualList->listviewIndividuals->clear();
@@ -187,15 +179,8 @@ void SIG_AllIndividualsView::slotAddIndividuals()
 {
   SIG_AddIndividualsDialog addDialog( this, "Add Individual Dialog", true );
   addDialog.spinboxNumber->setFocus();
-  // Same Qt 6 select-on-dialog-focus difference as the Edit Command and
-  // Edit Host line edits (see SIG_LanguageParameters.cpp), and this is the
-  // site where it costs most: 1.3 leaves the "1" unselected with the cursor
-  // after it, so a user who types 2 gets 12 and adds TWELVE individuals.
-  // Unlike a wrong duration there is nothing wrong-looking left behind --
-  // the pool is simply twelve bigger.
-  // The spin box's editor is its only QLineEdit child; lineEdit() is
-  // protected. Queued because the selection does not exist until exec()
-  // shows the dialog and focus travels the tab chain.
+  // The value must stay unselected, or a typed 2 replaces the 1.
+  // Queued: the selection does not exist until exec() shows the dialog.
   if ( QLineEdit *le = addDialog.spinboxNumber->findChild<QLineEdit *>() )
     QTimer::singleShot( 0, le, [le]{ le->end( false ); } );
   switch( addDialog.exec() )

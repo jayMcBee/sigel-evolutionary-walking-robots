@@ -52,9 +52,6 @@ SIG_RenameDialog::SIG_RenameDialog( QWidget* parent,  const char* name, bool mod
     : QDialog( parent, fl )
 {
     setObjectName( QString::fromUtf8( name ) );
-    // Qt 2's QDialog folded modal into WType_Modal (qdialog.cpp:80), which set
-    // WState_Modal and called qt_enter_modal() -- real application modality,
-    // not merely a window type. setModal() sets WA_ShowModal, which is that.
     setModal( modal );
 
     if ( !name )
