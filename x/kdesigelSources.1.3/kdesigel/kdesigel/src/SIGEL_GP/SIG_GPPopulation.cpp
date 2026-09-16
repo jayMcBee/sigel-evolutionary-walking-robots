@@ -128,13 +128,6 @@ SIGEL_GP::SIG_GPPopulation::SIG_GPPopulation(int size,
     
 namespace {
 
-// Qt 2's QVector::resize() DELETED every truncated item when autoDelete was
-// set, and that was the only free at three sites in this file. QList::resize()
-// frees nothing. Written out once rather than three times.
-//
-// Negative sizes are clamped. Qt 2's QVector took a uint, so a negative reached
-// it as a huge value and the allocation simply failed; QList takes a signed
-// qsizetype, where a negative index would reach delete pool[-3].
 void resizeOwning( QList< SIGEL_GP::SIG_GPIndividual * > &v, qsizetype want )
 {
   if (want < 0)

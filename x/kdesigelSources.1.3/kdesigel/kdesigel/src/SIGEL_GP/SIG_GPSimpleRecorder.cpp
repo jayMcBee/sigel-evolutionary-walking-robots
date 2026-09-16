@@ -35,13 +35,8 @@ SIGEL_GP::SIG_GPSimpleRecorder::SIG_GPSimpleRecorder()
 
 void SIGEL_GP::SIG_GPSimpleRecorder::init()
 {
-  // NOTE: 2003 declared throw(SIG_RecorderNoQueriesSetException,
-  // SIG_RecorderBadRecordingOrderException) here. Unlike record() and
-  // finish(), init() is called from SIG_Simulation's CONSTRUCTOR, which
-  // every fitness function builds OUTSIDE its own try block. Without this
-  // boundary a SIG_Exception from simulationQueries->getLinkPosition()
-  // escapes to sigel_slave.cpp, main, which reports fitness 0.0 and the master
-  // accepts it as a real result.
+  // init() runs from SIG_Simulation's constructor, outside every fitness
+  // function's try. Without this boundary the master accepts 0.0 as a result.
   try {
 
   		SIG_Recorder::init();

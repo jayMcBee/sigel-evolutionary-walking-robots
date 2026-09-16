@@ -85,11 +85,6 @@ void MT_FitnessTrainer::loadSetup(QTextStream &File)
 		Interpreter.setDuration((File.readLine()).toInt());
 		Interpreter.setVariableNumber((File.readLine()).toInt());
 	
-		// TSetSize was not updated here, so the training set took the
-		// file's size while Result and ResultIst kept the old one -- any
-		// setup file with a larger set made calculateFitness write past
-		// both. Qt 2's QArray::at absorbed it by clamping to index 0; plain
-		// QList does not. setSelektionValue below always did this right.
 		TSetSize = NewTSetSize;
 		TSet->changeTSize(TSetSize);
 		Result.resize(TSetSize);

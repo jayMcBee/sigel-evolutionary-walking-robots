@@ -49,16 +49,9 @@ SIGEL_GP::SIG_GPPVMData::~SIG_GPPVMData() {};
 
 void SIGEL_GP::SIG_GPPVMData::sendQStringToPVM(QString str, int taskId, int messageId)
 {
-  // finalLength sizes the receiver's buffer, so it counts the BYTES that go on
-  // the wire, not the characters: 1.3's str.length() + 1 is the same number only
-  // for ASCII, and for 20 'u'-umlauts (40 UTF-8 bytes) getQStringFromPVM() below
-  // let pvm_upkstr write 41 bytes into a 21-byte buffer.
-  //
-  // NOTE THE + 2, which is not a typo: one byte for the NUL that pvm_upkstr
-  // writes, and one spare. For ASCII, 1.3 sent one less.
-  //
-  // A null string sends an empty string: pvm_pkstr does strlen(cp) unguarded,
-  // so it must never get a null pointer.
+  // Bytes, not characters: pvm_upkstr writes into a buffer of this size.
+  // The + 2 is not a typo: one byte for the NUL it writes, and one spare.
+  // A null string must be sent as empty -- pvm_pkstr does strlen unguarded.
   const QByteArray qCStringBuffer = str.toUtf8();
   int finalLength = qCStringBuffer.size() + 2;
 
