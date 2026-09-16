@@ -1453,7 +1453,7 @@ Do you want to replace it?]
   button [OK] default=1
 
 == INDIVIDUAL VIEW (double-click a population row) ==
-  double-clicking row0 = 55658 at (282,9) itemAt=the row
+  double-clicking row0 = 55658 at (284,9) itemAt=the row
   itemDoubleClicked emitted 1 time(s)
   [window] class=SIGEL_MasterGUI::SIG_IndividualView title=[Individual View] modal=0 visible=1 deleteOnClose=1
   name=[55658] age=[111] fitness=[1.14825] historyLines=768

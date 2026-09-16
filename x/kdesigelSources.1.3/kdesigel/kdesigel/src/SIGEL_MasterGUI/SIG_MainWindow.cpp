@@ -56,7 +56,7 @@ SIG_MainWindow::SIG_MainWindow( QWidget * parent, const char * name, Qt::WindowF
   QString sigelRoot( std::getenv( "SIGEL_ROOT" ) );
 #endif
 
-  resize( 900, 750 );
+  resize( 1280, 860 );
   setWindowTitle( "SIGEL" );
 
   splitter = new QSplitter( this );
@@ -75,10 +75,14 @@ SIG_MainWindow::SIG_MainWindow( QWidget * parent, const char * name, Qt::WindowF
   splitter->insertWidget( 0, experimentListView );
   splitter->setOpaqueResize();
   
+  // Real pixel widths. Numbers far below the splitter's width are ignored and
+  // the surplus goes by size policy instead, which hands most of it to the tree.
   QList<int> valList;
-  valList += 2;
-  valList += 6;
+  valList += 280;
+  valList += 1000;
   splitter->setSizes( valList );
+  splitter->setStretchFactor( 0, 0 );
+  splitter->setStretchFactor( 1, 1 );
 
   splitter->setContentsMargins( 6, 6, 6, 6 );
 
@@ -701,7 +705,8 @@ SIG_MainWindow::SIG_MainWindow( QWidget * parent, const char * name, Qt::WindowF
   widgetBase = new QLabel( this );
   widgetBase->setObjectName( "baseWidget" ); // new QLabel( "I am the void", this );
   widgetBase->setPixmap( QPixmap( sigelRoot + "/pixmaps/noExperiment.png" ) );
-  widgetBase->setScaledContents( true );
+  // The image is square. Scaling it to the widget stretches it.
+  widgetBase->setAlignment( Qt::AlignCenter );
   widgetStack->addWidget( widgetBase );
   widgetStack->setCurrentWidget( widgetBase );
 
