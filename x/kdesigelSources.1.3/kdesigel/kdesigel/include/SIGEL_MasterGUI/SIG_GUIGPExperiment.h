@@ -28,6 +28,7 @@
 #include <QMenu>
 #include <qpushbutton.h>
 #include <QHash>
+#include <QTimer>
 
 #include "SIGEL_MasterGUI/SIG_GPParameter.h"
 #include "SIGEL_MasterGUI/SIG_SimulationParameter.h"
@@ -338,6 +339,17 @@ namespace SIGEL_MasterGUI
        * item in the experiment list view.
        */
       QMenu *menuExperimentView;
+
+      /**
+       * The two actions of menuExperimentView.
+       */
+      QAction *startEvolutionAction;
+      QAction *stopEvolutionAction;
+
+      /**
+       * Drives generationProgBar while the evolution runs.
+       */
+      QTimer progressTimer;
       
       /**
        * The SIG_ExperimentItem belonging to the experiment.

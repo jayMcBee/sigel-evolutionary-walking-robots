@@ -62,8 +62,8 @@ namespace SIGEL_MasterGUI
 
   // build experiment view menu
   menuExperimentView = new QMenu( this );
-  menuExperimentView->addAction( "Start", this, SLOT( slotStartEvolution() ) );
-  menuExperimentView->addAction( "Stop", this, SLOT( slotStopEvolution() ) );
+  startEvolutionAction = menuExperimentView->addAction( "Start", this, SLOT( slotStartEvolution() ) );
+  stopEvolutionAction = menuExperimentView->addAction( "Stop", this, SLOT( slotStopEvolution() ) );
 
   gpParameter = new SIG_GPParameter( this , "GPParameter", Qt::WindowFlags(), gpExperiment );
   simulationParameter = new SIG_SimulationParameter( this, "SimulationParameter", Qt::WindowFlags(), gpExperiment);
@@ -98,6 +98,18 @@ namespace SIGEL_MasterGUI
   menuDict.insert( "Robot" , menuRobotView );
   menuDict.insert( experimentName, menuExperimentView );
   
+  // An individual keeps fitness -1 until a slave has evaluated it, so the share
+  // of the pool that is up to date is the work done.
+  QObject::connect( &progressTimer, &QTimer::timeout, this, [this]()
+    {
+      const int size = gpExperiment.population.getSize();
+      int upToDate = 0;
+      for( int i = 0; i < size; i++ )
+	if( gpExperiment.population.getIndividual( i ).upToDate() )
+	  upToDate++;
+      experimentView->generationProgBar->setValue( upToDate );
+    } );
+
   QObject::connect( experimentView->pushbuttonStart,
 		    SIGNAL( clicked() ),
 		    this,
@@ -182,6 +194,7 @@ namespace SIGEL_MasterGUI
 
 SIG_GUIGPExperiment::~SIG_GUIGPExperiment()
 {
+  progressTimer.stop();
   // Before destroying the experiment take all widgets in the widgetDict from the widgetStack
   for ( QWidget *w : widgetDict )
     widgetStack->removeWidget( w );
@@ -204,7 +217,8 @@ QString SIG_GUIGPExperiment::getName() const
 void SIG_GUIGPExperiment::setName( QString newName )
 {
   widgetDict.insert( newName, widgetDict.take( experimentName ) );
-  
+  menuDict.insert( newName, menuDict.take( experimentName ) );
+
   experimentName = newName;
   experimentItem->setText( 0, newName );
 };
@@ -286,6 +300,8 @@ void SIG_GUIGPExperiment::slotRightClick( QString option, const QPoint & thePoin
   QWidget *showWidget = widgetDict.value( option );
   if( showMenu && showWidget )
     {
+      startEvolutionAction->setEnabled( !experimentListView->isRunning() );
+      stopEvolutionAction->setEnabled( isRunning() );
       showMenu->popup( thePoint );
       widgetStack->setCurrentWidget( showWidget );
     }
@@ -301,6 +317,10 @@ void SIG_GUIGPExperiment::slotSelectionChanged( QString option )
 
 void SIG_GUIGPExperiment::slotStartEvolution()
 {
+  // One run at a time.
+  if( experimentListView->isRunning() )
+    return;
+
   if( (gpExperiment.robot.getBodies().size() != 0) && (gpExperiment.population.getSize() >= 4) && (gpExperiment.gpParameter.getFitnessName() != QString()) )
     {
       delete guiGPManager;
@@ -333,6 +353,8 @@ void SIG_GUIGPExperiment::slotStartEvolution()
       // and the five pages disabled above, so it must run even if start()
       // throws.
       evolutionRunning = true;
+      experimentView->generationProgBar->setRange( 0, gpExperiment.population.getSize() );
+      progressTimer.start( 200 );
       try {
         guiGPManager->start();
       }
@@ -697,6 +719,8 @@ void SIG_GUIGPExperiment::slotRobotInfo()
 void SIG_GUIGPExperiment::slotEvolutionStopped()
 {
   evolutionRunning = false;
+  progressTimer.stop();
+  experimentView->generationProgBar->reset();
   emit signalEvolutionNotRunning( true );
   experimentView->pushbuttonStart->setEnabled( true );
   experimentView->pushbuttonStop->setEnabled( false );
