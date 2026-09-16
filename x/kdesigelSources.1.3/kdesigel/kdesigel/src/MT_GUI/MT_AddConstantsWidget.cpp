@@ -11,29 +11,8 @@
 
 namespace
 {
-  // BOTH validator classes are TRANSCRIBED from vendored Qt 2's
-  // qvalidator.cpp rather than patched on top of Qt 6's answers, because Qt 6
-  // says Invalid in three places Qt 2 said Intermediate and post-processing
-  // one of them missed the other two. Qt 2 returns Invalid ONLY when the text
-  // is not a number at all; out of range, too many decimals and a bare "-"
-  // are all Intermediate, so QLineEdit keeps accepting keystrokes and the
-  // range bites on commit instead of on typing.
-  //
-  // WHY: the parameter pages' spin boxes keep Qt 6's stricter rule, because
-  // the changed value shows before saving. Here it does not: accept() copies
-  // these two fields into boss->minValue/maxValue, which
-  // go straight to randomizer->createConstant() and become the generated
-  // constants. 1.3 generates -50000 when min = max = -50000 in integer mode,
-  // with no clamping; Qt 6's rule would silently produce different data.
-  //
-  // Three separate divergences, all measured on Qt 6.10.2, all fixed here:
-  //   QIntValidator(-10000,10000)        typed -50000  -> "-5000"  (tenfold)
-  //   QDoubleValidator(100000,-100000,4) typed -50000  -> "50000"  (SIGN FLIP)
-  //   QDoubleValidator(...,4)            typed 1.23456 -> "1.2345" (precision)
-  // The second is the worst: the
-  // dialog OPENS in float mode, and 2003 built that validator with bottom
-  // above top -- QDoubleValidator(100000.0, -100000.0, 4) -- which makes
-  // Qt 6 reject a leading minus outright, where Qt 2 had no such rule.
+  // Transcribed, not Qt 6's own: these values reach generated constants unseen,
+  // and Qt 6 turned -50000 into "-5000", or "50000" with 2003's reversed bounds.
 
   // Qt 2: qvalidator.cpp's QIntValidator::validate, verbatim in behaviour.
   class Qt2IntValidator : public QIntValidator
@@ -59,16 +38,8 @@ namespace
                                                : QValidator::Acceptable;
     }
 
-    // fixup() MUST BE A NO-OP, and leaving it inherited re-introduces the
-    // defect this class removes. Qt 2's QIntValidator and QDoubleValidator do
-    // NOT override fixup at all -- the only definition is QValidator::fixup,
-    // an empty body (qvalidator.cpp:175) -- and Qt 2's QLineEdit called it
-    // only on Return, never from focusOutEvent. Qt 6 overrides it in both
-    // validators AND calls it on Return *and* focus-out. Measured: with the
-    // float validator at (-10000, 10000, 4), typing 123.456789 and then
-    // clicking away rewrites the field to "1.2346e+02", and accept() stores
-    // 123.46. So fixup stays empty: without that the precision is lost one focus
-    // change later, in the data path this class exists to protect.
+    // Must stay empty. Qt 6 calls fixup on focus-out, and the inherited one
+    // rewrites 123.456789 to "1.2346e+02".
     void fixup( QString & ) const override {}
 
   };
@@ -126,16 +97,8 @@ namespace
                                                : QValidator::Acceptable;
     }
 
-    // fixup() MUST BE A NO-OP, and leaving it inherited re-introduces the
-    // defect this class removes. Qt 2's QIntValidator and QDoubleValidator do
-    // NOT override fixup at all -- the only definition is QValidator::fixup,
-    // an empty body (qvalidator.cpp:175) -- and Qt 2's QLineEdit called it
-    // only on Return, never from focusOutEvent. Qt 6 overrides it in both
-    // validators AND calls it on Return *and* focus-out. Measured: with the
-    // float validator at (-10000, 10000, 4), typing 123.456789 and then
-    // clicking away rewrites the field to "1.2346e+02", and accept() stores
-    // 123.46. So fixup stays empty: without that the precision is lost one focus
-    // change later, in the data path this class exists to protect.
+    // Must stay empty. Qt 6 calls fixup on focus-out, and the inherited one
+    // rewrites 123.456789 to "1.2346e+02".
     void fixup( QString & ) const override {}
 
   };

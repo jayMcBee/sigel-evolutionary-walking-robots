@@ -85,6 +85,9 @@
 # but land 20 per cent away, and the run reports a false difference from 1.3.
 # check.sh clears the scaling variables and the scenario refuses any ratio other
 # than 1.
+# The native motion count is printed as motion>0, and the XInput2 total
+# excludes motion. The X server sends a spare motion event under load, which
+# failed this check twice on lines whose Qt-level counts were all identical.
 == SCENARIO xtest ==
 
 == STEP 1: fresh start, no experiment ==
@@ -192,16 +195,16 @@
     asked for (40,40), server reports (40,40) -- AGREE
 
   -- 2. provenance --
-    real XTEST click           native[press=2 rel=2 motion=1 enter=2 leave=1 focusIn=1 xi2=6 core=3] qt[press=2 dbl=0 enter=8 leave=0 act=1 deact=0]
+    real XTEST click           native[press=2 rel=2 motion>0=1 enter=2 leave=1 focusIn=1 xi2NoMotion=5 core=3] qt[press=2 dbl=0 enter=8 leave=0 act=1 deact=0]
                                pressOn=[QWidgetWindow, QWidget]
-    QTest::mouseClick          native[press=0 rel=0 motion=0 enter=0 leave=0 focusIn=0 xi2=0 core=0] qt[press=1 dbl=0 enter=0 leave=0 act=0 deact=0]
+    QTest::mouseClick          native[press=0 rel=0 motion>0=0 enter=0 leave=0 focusIn=0 xi2NoMotion=0 core=0] qt[press=1 dbl=0 enter=0 leave=0 act=0 deact=0]
                                pressOn=[QWidget]
     native ButtonPress: real=2 QTest=0 -- DISCRIMINATES (this is the whole point)
 
   -- 3. activation --
     before: isActiveWindow=1 activeWindow=SIGEL_MasterGUI::SIG_MainWindow xfocus=main window
     after : isActiveWindow=1 activeWindow=SIGEL_MasterGUI::SIG_MainWindow xfocus=main window
-    after real click           native[press=2 rel=2 motion=1 enter=2 leave=1 focusIn=0 xi2=6 core=2] qt[press=2 dbl=0 enter=8 leave=0 act=0 deact=0]
+    after real click           native[press=2 rel=2 motion>0=1 enter=2 leave=1 focusIn=0 xi2NoMotion=5 core=2] qt[press=2 dbl=0 enter=8 leave=0 act=0 deact=0]
                                pressOn=[QWidgetWindow, QWidget]
 
   -- 4. pointer grab --
@@ -210,10 +213,10 @@
     second click on [&File]: popup still up=0
     outside point is list row 3, outside the popup=1, widgetThere=QWidget
     then a real click on list row 3: popup before=1 after=0, list current before=[55658] after=[55658] xfocus=main window
-    outside click              native[press=2 rel=2 motion=1 enter=2 leave=2 focusIn=1 xi2=7 core=3] qt[press=2 dbl=0 enter=8 leave=0 act=0 deact=0]
+    outside click              native[press=2 rel=2 motion>0=1 enter=2 leave=2 focusIn=1 xi2NoMotion=6 core=3] qt[press=2 dbl=0 enter=8 leave=0 act=0 deact=0]
                                pressOn=[QWidgetWindow, QMenu]
     CONTROL, same point with no menu up: list current before=[55658] after=[56349] -- row selectable, so the probe can see a change
-    control click              native[press=2 rel=2 motion=1 enter=0 leave=0 focusIn=0 xi2=5 core=0] qt[press=2 dbl=0 enter=0 leave=0 act=0 deact=0]
+    control click              native[press=2 rel=2 motion>0=1 enter=0 leave=0 focusIn=0 xi2NoMotion=4 core=0] qt[press=2 dbl=0 enter=0 leave=0 act=0 deact=0]
                                pressOn=[QWidgetWindow, QWidget]
     vs 1.3: menu closes AND the row under the click is selected -- DIFFERS -- the port SWALLOWS the dismissing click
 
@@ -221,7 +224,7 @@
     doubleClickInterval=400 ms
     two SLOW clicks (1200 ms apart): qtDblClick=0 itemDoubleClicked=0 views 0 -> 0
     two FAST clicks (80 ms apart) : qtDblClick=2 itemDoubleClicked=1 views 0 -> 1
-    fast pair                  native[press=4 rel=4 motion=1 enter=0 leave=0 focusIn=0 xi2=9 core=0] qt[press=3 dbl=2 enter=0 leave=0 act=0 deact=0]
+    fast pair                  native[press=4 rel=4 motion>0=1 enter=0 leave=0 focusIn=0 xi2NoMotion=8 core=0] qt[press=3 dbl=2 enter=0 leave=0 act=0 deact=0]
                                pressOn=[QWidgetWindow, QWidget, QWidgetWindow]
 
   -- 6. enter / leave --

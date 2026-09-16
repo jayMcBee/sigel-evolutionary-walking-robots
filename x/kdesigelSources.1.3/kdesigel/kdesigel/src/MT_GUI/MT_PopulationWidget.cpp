@@ -220,15 +220,8 @@ void MT_PopulationWidget::slotNumChanged()
  ***/ 
 void MT_PopulationWidget::slotRButtonClicked(const QPoint &pos)
 {
-	// Qt 2's rightButtonClicked is gone. Two things it did must be restored by
-	// hand. (1) It delivered a GLOBAL position (viewport()->mapToGlobal, see
-	// qlistview.cpp:3396); customContextMenuRequested delivers viewport
-	// coordinates. (2) When the click MISSED an item, Qt 2 called
-	// clearSelection() before emitting (qlistview.cpp:3390) -- which is why
-	// 1.3 greys out Delete on blank space: clearing fires selectionChanged,
-	// and slotSelectionChanged disables the action. Qt 6 does neither.
-	// In 1.3, on a row all four entries are enabled; on
-	// blank space Delete is greyed and the other three are not.
+	// customContextMenuRequested gives viewport coordinates, and a click on
+	// blank space must clear the selection so Delete greys out.
 	if(!individualListView->itemAt(pos))
 		individualListView->clearSelection();
 	popContextMenu->popup(individualListView->viewport()->mapToGlobal(pos));
@@ -258,11 +251,6 @@ void MT_PopulationWidget::slotCurrentChanged(QTreeWidgetItem *item)
 	// clean the display
 	individualProgramView->clear();
 
-	// Belt and braces. Qt 2 DID signal a removal -- QListViewItem::takeItem
-	// emits currentChanged (qlistview.cpp:713-714), with 0 when the view
-	// empties (:688-689) -- so this is not a Qt 6 invention. It is unreachable
-	// either way, because slotDelInd refuses to delete the last item, and on
-	// the reachable case Qt 6 matches Qt 2. Returning is the faithful no-op.
 	if(!item) return;
 
 	// get the currently selected individual
@@ -291,9 +279,6 @@ void MT_PopulationWidget::slotAddInd()
 		// ok button pressed
 		number = numDialog.spinboxNumber->value();
 
-		// Qt 2: (label, cancelText, totalSteps, creator, name, modal).
-		// Qt 6: (label, cancelText, minimum, maximum, parent); modality separate.
-		// cancelText was 0 in 1.3, i.e. NO Cancel button -- QString() keeps that.
 		QProgressDialog progress("Generating individuals", QString(), 0, number, this);
 		progress.setWindowModality(Qt::ApplicationModal);
 
@@ -368,9 +353,6 @@ void MT_PopulationWidget::slotImpInd()
 		QStringList::Iterator it = files.begin();
 		uint i = 0;
 		uint count = files.count();
-		// Qt 2: (label, cancelText, totalSteps, creator, name, modal).
-		// Qt 6: (label, cancelText, minimum, maximum, parent); modality separate.
-		// cancelText was 0 in 1.3, i.e. NO Cancel button -- QString() keeps that.
 		QProgressDialog progress("Importing individuals", QString(), 0, count, this);
 		progress.setWindowModality(Qt::ApplicationModal);
 		for( ; it != files.end(); ++it){

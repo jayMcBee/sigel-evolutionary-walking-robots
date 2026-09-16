@@ -180,9 +180,9 @@ removing `libsolid.a` was outside the brief for this change and was not
 attempted. It is now dead weight — ~4,800 lines and a vendored patch — and
 dropping it is a one-line follow-up, to be measured the way `libdynalib.a` was.
 
-### Gates — all clean, which is the point
+### Checks — all clean, which is the point
 
-| gate | result |
+| check | result |
 |---|---|
 | `dictorder-dump.sh` vs baseline | **empty diff** |
 | `fitness-check.sh` vs baseline | **empty diff**, 42 of 42 |
@@ -289,7 +289,7 @@ is what "dead code" was supposed to mean.
 **`SIG_DynaMoSimulationData` is not "the site that numbers the DynaMechs
 bodies"** (§10 D1, §10 D2, `sigel_eval.cpp:46`). It was the **Dynamo** site.
 Both backends walked links → joints → sensors → drives in that order, so the
-orders the gate protects are unchanged and `dictorder-baseline.txt` is
+orders the check protects are unchanged and `dictorder-baseline.txt` is
 untouched — but the file those sections cite is the wrong one, and it no longer
 exists. The live site is `SIG_DynaMechsSimulationData.cpp`.
 

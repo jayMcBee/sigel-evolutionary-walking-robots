@@ -29,12 +29,8 @@ protected:
 
 signals:
 	void newText(const QString &);
-	// NOT QLineEdit's signal -- Qt 2.3's QLineEdit had no lostFocus() at all
-	// (it arrived in Qt 3). This is MT_Editor's own, emitted from hideEvent on
-	// EVERY dismissal. editingFinished()
-	// is not a substitute: it fires on Return as well as focus-out, and the
-	// whole point of acceptChange is that Return commits and focus-out does
-	// not, as in 1.3.
+	// MT_Editor's own signal, from hideEvent. editingFinished is no substitute:
+	// it also fires on Return, and Return must commit where focus-out does not.
 	void lostFocus();
 };
 

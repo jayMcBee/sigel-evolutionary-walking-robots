@@ -43,10 +43,7 @@ MT_StatisticsWidget::MT_StatisticsWidget(QMainWindow* parent, const char* name, 
 	intervalSpinBox->setRange(10, 6000);
 	intervalSpinBox->setSingleStep(10);
 	intervalLabel = new QLabel(" sec.", statToolbar);
-	// Qt 2's QToolBar::init() did boxLayout()->setAutoAdd(TRUE)
-	// (qtoolbar.cpp:300): any child widget joined the toolbar's layout on
-	// construction, in creation order. Qt 6 has no autoAdd, so a child parented
-	// to a toolbar is an unmanaged overlay at 0,0 unless addWidget() is called.
+	// A child parented to a toolbar is an overlay unless addWidget is called.
 	statToolbar->addWidget(autoUpdateCheckBox);
 	statToolbar->addWidget(intervalSpinBox);
 	statToolbar->addWidget(intervalLabel);

@@ -567,6 +567,16 @@ static void describeMessageBox(QWidget *m)
 // Generic dialog description: everything a person reading 1.3's dialog can see.
 static void describeDialog(QWidget *m)
 {
+    // The focus= fields below are read too early on a loaded machine: a dialog
+    // hands focus down the tab chain after it is shown, and focusWidget() is
+    // already non-null while it is still moving. Wait for two polls to agree.
+    QWidget *settled = nullptr;
+    QTest::qWaitFor([m, &settled] {
+        QWidget *w = m->focusWidget();
+        const bool same = w && w == settled;
+        settled = w;
+        return same;
+    }, 2000);
     printf("  [dialog] class=%s title=[%s] modal=%d\n", m->metaObject()->className(),
            qPrintable(m->windowTitle()), m->isModal());
     for (QLabel *l : m->findChildren<QLabel *>())
@@ -1677,10 +1687,14 @@ static void settle(int ms = 300) { QTest::qWait(ms); }
 
 static void spies(const char *what)
 {
-    printf("    %-26s native[press=%d rel=%d motion=%d enter=%d leave=%d focusIn=%d "
-           "xi2=%d core=%d] qt[press=%d dbl=%d enter=%d leave=%d act=%d deact=%d]\n",
-           what, g_nspy.press, g_nspy.release, g_nspy.motion, g_nspy.enter,
-           g_nspy.leave, g_nspy.focusIn, g_nspy.viaXi2, g_nspy.viaCore,
+    // The X server sends a spare motion event under load, so the raw motion
+    // count and any total holding it are printed as present or absent. What
+    // this line exists to prove is that a NATIVE press reached Qt, and press,
+    // release and the button counts are exact.
+    printf("    %-26s native[press=%d rel=%d motion>0=%d enter=%d leave=%d focusIn=%d "
+           "xi2NoMotion=%d core=%d] qt[press=%d dbl=%d enter=%d leave=%d act=%d deact=%d]\n",
+           what, g_nspy.press, g_nspy.release, g_nspy.motion > 0 ? 1 : 0, g_nspy.enter,
+           g_nspy.leave, g_nspy.focusIn, g_nspy.viaXi2 - g_nspy.motion, g_nspy.viaCore,
            g_qspy.press, g_qspy.dbl, g_qspy.enter,
            g_qspy.leave, g_qspy.activate, g_qspy.deactivate);
     if (!g_qspy.pressOn.isEmpty())

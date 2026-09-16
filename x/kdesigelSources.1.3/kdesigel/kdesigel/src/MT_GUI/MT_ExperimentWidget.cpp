@@ -56,12 +56,8 @@ void MT_ExperimentWidget::slotCurrentChanged(QTreeWidgetItem *newSelection)
 
 void MT_ExperimentWidget::lastSelected()
 {
-	// Qt 2's QQueue was pointer-based over QGList and head() returned 0 on an
-	// empty queue (qqueue.h:62), and QListView::setCurrentItem(0) was an
-	// explicit no-op (qlistview.cpp:4124). Qt 6's QQueue is a QList and head()
-	// on an empty list is undefined -- it segfaults in a release build.
-	// Reachable on the first refused page switch, because slotRaiseWidget only
-	// enqueues in its success branch.
+	// head() on an empty queue is undefined and segfaults. Reached on the
+	// first refused page switch.
 	if(prevSelectedItems.isEmpty())
 		return;
 	MT_ExperimentItem *stickingItem = prevSelectedItems.head();

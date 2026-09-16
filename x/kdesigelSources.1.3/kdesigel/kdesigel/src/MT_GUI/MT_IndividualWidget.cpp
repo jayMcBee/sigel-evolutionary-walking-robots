@@ -47,14 +47,8 @@ MT_IndividualsWidget::MT_IndividualsWidget(QWidget* parent, const char* name, Qt
 	edit16->setValidator(validator);
 	edit17->setValidator(validator);
 	edit18->setValidator(validator);
-// These validators are pinned to the C locale. An unpinned one needs no
-// foreign locale to bite: under en_US the GROUP separator is ',', so an unpinned
-// QIntValidator(0,1000) calls "1,000" ACCEPTABLE while the read-back --
-// text().toInt() -- returns 0 with ok=false. A user types one thousand, the
-// field says it is fine, and zero reaches the system. Under de_DE the same
-// happens with "1.000". Qt 2 forced LC_NUMERIC="C" process-wide, so 1.3 had
-// no such field. RejectGroupSeparator is what reproduces that, exactly as in
-// SIG_EnvironmentView.cpp.
+// Pinned to the C locale: unpinned, "1,000" is ACCEPTABLE while text().toInt()
+// returns 0.
 {
 	QLocale cLocale = QLocale::c();
 	cLocale.setNumberOptions(QLocale::RejectGroupSeparator);
@@ -301,9 +295,6 @@ void MT_IndividualsWidget::slotImportConstants()
 				if(found && s=="count"){
 					s = stream.readLine();
 					int tc = count = s.toInt();
-					// Qt 2: (label, cancelText, totalSteps, creator, name, modal).
-		// Qt 6: (label, cancelText, minimum, maximum, parent); modality separate.
-		// cancelText was 0 in 1.3, i.e. NO Cancel button -- QString() keeps that.
 		QProgressDialog progress("Loading constants", QString(), 0, count, this);
 		progress.setWindowModality(Qt::ApplicationModal);
 					while(tc && !stream.atEnd()){
@@ -426,15 +417,8 @@ void MT_IndividualsWidget::slotDelConst()
 
 void MT_IndividualsWidget::slotRButtonClicked(const QPoint &pos)
 {
-	// Qt 2's rightButtonClicked is gone. Two things it did must be restored by
-	// hand. (1) It delivered a GLOBAL position (viewport()->mapToGlobal, see
-	// qlistbox.cpp:1825); customContextMenuRequested delivers viewport
-	// coordinates. (2) When the click MISSED an item, Qt 2 called
-	// clearSelection() before emitting (qlistbox.cpp:1656-1658) -- which is why
-	// 1.3 greys out Delete on blank space: clearing fires selectionChanged,
-	// and slotSelectionChanged disables the action. Qt 6 does neither.
-	// In 1.3, on a row all four entries are enabled; on
-	// blank space Delete is greyed and the other three are not.
+	// customContextMenuRequested gives viewport coordinates, and a click on
+	// blank space must clear the selection so Delete greys out.
 	if(!constantsListBox->itemAt(pos))
 		constantsListBox->clearSelection();
 	constContextMenu->popup(constantsListBox->viewport()->mapToGlobal(pos));
@@ -448,8 +432,6 @@ void MT_IndividualsWidget::slotCreateConstants()
 
 		if(numToCreate > 0){
 		
-			// Qt 2: (label, cancelText, totalSteps, creator, name, modal).
-			// Qt 6: (label, cancelText, minimum, maximum, parent).
 			QProgressDialog progress("Generating constants", QString(), 0, numToCreate+1, this);
 			progress.setWindowModality(Qt::ApplicationModal);
 			progress.setValue(0);

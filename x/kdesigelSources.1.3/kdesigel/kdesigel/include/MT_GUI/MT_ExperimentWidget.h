@@ -18,10 +18,7 @@ public slots:
 	void slotCurrentChanged(QTreeWidgetItem *newSelection);
 
 private:
-	// Qt 2's QQueue held POINTERS and did not own them here -- QGList's
-	// del_item defaults to FALSE and nothing calls setAutoDelete. The items
-	// belong to the tree, so the element type is spelled out and remove()
-	// becomes dequeue().
+	// The items belong to the tree; the queue does not own them.
 	QQueue<MT_ExperimentItem *> prevSelectedItems;
 };
 

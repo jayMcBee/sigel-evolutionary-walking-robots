@@ -25,19 +25,8 @@ DISpinBox::DISpinBox(int decimals, QWidget *parent, const char *name) : QSpinBox
 	dValidator = new QDoubleValidator(this);
 	iValidator = new QIntValidator(this);
 
-	// 1.3 was locale-INDEPENDENT and the decimal point was always '.'. Two
-	// things made that true: QApplication forced setlocale(LC_NUMERIC, "C")
-	// at startup (qapplication_x11.cpp:1389), and Qt 2's QDoubleValidator
-	// hard-coded the separator -- input.find('.') (qvalidator.cpp:387).
-	// Qt 6's validators follow QLocale::system() while QString::toDouble stays
-	// locale-independent, so under a comma-decimal locale the validator would
-	// reject "0.375" and accept "0,375", which toDouble then reads as 0. That
-	// is worse than the bug the validate() override exists to fix. Pinning the
-	// validators to the C locale restores 1.3 in every locale.
-	// QLocale::c() alone is not enough: C's GROUP separator is ',', so the
-	// validator accepts "0,375" as 375 grouped while QString::toDouble()
-	// rejects it and yields 0. Qt 2 fed the whole string to strtod and
-	// required it be consumed to the NUL, so a comma was Invalid.
+	// Pinned to the C locale, and the group separator rejected: C's group
+	// separator is ',' so "0,375" would validate and read back as 0.
 	QLocale cLocale = QLocale::c();
 	cLocale.setNumberOptions(QLocale::RejectGroupSeparator);
 	dValidator->setLocale(cLocale);

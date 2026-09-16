@@ -9,15 +9,8 @@ MT_MainWindow::MT_MainWindow(MT_Controller *controller, MT_GPManager *manager, s
 	if ( name )
 		setObjectName( QString::fromUtf8( name ) );
 
-	// Qt 2's WType_Modal did not merely name a window type -- it set
-	// WState_Modal (qwidget.cpp:725) and show() called qt_enter_modal()
-	// (qwidget.cpp:3365), so the MetaGP configuration window was APPLICATION
-	// MODAL. Qt 6's Qt::Dialog is a window type only; windowModality defaults
-	// to NonModal and nothing else sets it. The bit values happen to coincide
-	// at 0x3, which is a coincidence and not an equivalence.
-	// Qt::Dialog is Window|0x2, so `f & Qt::Dialog' is also true for a plain
-	// Qt::Window, Qt::Tool, or anything else with bit 0 set. The window TYPE is
-	// the masked value.
+	// The window TYPE is the masked value; Qt::Dialog also matches a plain
+	// Qt::Window without the mask.
 	if ( ( f & Qt::WindowType_Mask ) == Qt::Dialog )
 		setWindowModality( Qt::ApplicationModal );
 	evolRunning = false;
@@ -42,10 +35,7 @@ MT_MainWindow::MT_MainWindow(MT_Controller *controller, MT_GPManager *manager, s
 	mainToolBar = new QToolBar(this);
 	mainToolBar->setObjectName("mtFileToolBar");
 	mainToolBar->setWindowTitle("MT File");
-	// Qt 2's QToolBar(QMainWindow*, name) docked ITSELF -- the constructor
-	// called parent->addToolBar(this, QString::null, QMainWindow::Top)
-	// (qtoolbar.cpp:279). Qt 6's does not, so an undocked toolbar floats at
-	// 0,0 over the central widget.
+	// Without this an undocked toolbar floats at 0,0 over the central widget.
 	addToolBar(Qt::TopToolBarArea, mainToolBar);
 
 	// toolbar for evolution control
@@ -75,10 +65,7 @@ MT_MainWindow::MT_MainWindow(MT_Controller *controller, MT_GPManager *manager, s
 	mtEvolutionStatus = new QLabel(evolCtrlToolbar);
 	mtEvolutionStatus->setObjectName("mtEvolStatus");
 	mtEvolutionStatus->setText(" stopped ");
-	// Qt 2's QToolBar::init() did boxLayout()->setAutoAdd(TRUE)
-	// (qtoolbar.cpp:300): any child widget joined the toolbar's layout on
-	// construction, in creation order. Qt 6 has no autoAdd, so a child parented
-	// to a toolbar is an unmanaged overlay at 0,0 unless addWidget() is called.
+	// A child parented to a toolbar is an overlay unless addWidget is called.
 	evolCtrlToolbar->addWidget(mtEvolutionStatus);
 
 	evolCtrlToolbar->addSeparator();

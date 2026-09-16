@@ -162,7 +162,7 @@ Additive only — nothing changes at runtime. The value is that failures are
 Both were converted rather than changed, because the port's rule is to move the
 Qt API and nothing else.
 
-Both are reached by the gates and neither is observable by them. `usedByLinks`
+Both are reached by the checks and neither is observable by them. `usedByLinks`
 is appended on every one of the 7 `.rrb` loads and read nowhere in the tree.
 `friction` is walked by `writeToFileTransfer` on every run, always empty.
 
@@ -270,7 +270,7 @@ created. Counts measured 2026-08-30 by grep over the extracted 1.3 tree.
   an encoding sweep. Any future check for German has to look for words, not
   bytes.
 
-  **No compiler and no gate checks this phase.** All three persisted paths were
+  **No compiler and no check checks this phase.** All three persisted paths were
   checked and all three are safe:
   - `SIG_GPIndividual::writeToFile` writes history; `readFromFile` parses only
     `NAME='`, `POOLPOS=`, `FITNESS=`, `AGE=`, `PROGRAM BEGIN{`. History is never
@@ -310,7 +310,7 @@ created. Counts measured 2026-08-30 by grep over the extracted 1.3 tree.
 `Sigel.dsw`. MSVC-generated German, not built by this port. Delete them or leave
 them; do not hand-edit generated files.
 
-**Gate:** `./check.sh` after each phase, `./dictorder-dump.sh | diff -u
+**Check:** `./check.sh` after each phase, `./dictorder-dump.sh | diff -u
 dictorder-baseline.txt -` empty, `fitness-check.sh` clean. Phase 10 cannot move
 any of them, which is why it goes first.
 
@@ -363,7 +363,7 @@ warn about the pattern.
 
 **Do:** name the three signals being disconnected, which is what the code
 below the call immediately reconnects anyway. **Do not** do it before the
-`gui behaviour` gate has a run under an actual evolution — that path is the
+`gui behaviour` check has a run under an actual evolution — that path is the
 one C10 could not exercise, so a change there is currently unguarded.
 
 **The history block grows by one line per individual per save.**
@@ -517,7 +517,7 @@ value that is ever written.
 
 **Until it is decided, the current behaviour is pinned.** Every spin box's
 `commits=` value is in `guibehaviour-baseline.txt`, so the port cannot drift
-further without the gate saying so.
+further without the check saying so.
 
 ---
 
@@ -566,7 +566,7 @@ installed with a status of 0, this process reports 0 for *any* SIGTERM for the
 rest of its life — including a person killing a `guidrive` wedged in the
 `pvm_halt()` above. The scenario really did pass by then, so the status is not a
 lie about the scenario; it is a lie about the cleanup. A "we are in teardown"
-flag, or preserving only a non-zero status, would close it. Nothing gates on it
+flag, or preserving only a non-zero status, would close it. Nothing checks on it
 today because none of the three PVM scenarios is in `check.sh`. Found by
 review.
 
@@ -655,9 +655,9 @@ live the moment any caller catches that throw and continues.
 
 `pvm-check.sh:124` and `:128` are `"$PVM_TMP/pvm_smoke"; p3=$?` and
 `"$LINK"; p4=$?` — a bare command followed by `$?`, which is exactly the shape
-that made `check.sh`'s form-minimums gate unable to report a failure (PORTING.md,
+that made `check.sh`'s form-minimums check unable to report a failure (PORTING.md,
 form minimums). It is **not** a defect today, and that is the whole point of
-recording it: `pvm-check.sh:49` is `set -u` alone, the only one of the four gate
+recording it: `pvm-check.sh:49` is `set -u` alone, the only one of the four check
 scripts without `-e`, so nothing aborts and `p3`/`p4` are read correctly.
 
 **The risk is that somebody adds `-e` to that line.** It is the obvious
@@ -669,7 +669,7 @@ the script instead of printing PASS/FAIL. The same line would also leave
 
 **What to do:** if `-e` is ever added, convert both captures to `p3=0; cmd || p3=$?`
 in the same move, and check the four sites above. Doing it the other way round —
-adding `-e` first and fixing the fallout after — is how the form-minimums gate
+adding `-e` first and fixing the fallout after — is how the form-minimums check
 lost its teeth for two days without anyone noticing.
 
 *Found by review 2026-09-07, while auditing check.sh for the same defect class.*
@@ -794,9 +794,9 @@ after it raises `poolGeneration`, so the counter changes when a generation
 completes. The next pass of the event loop, in `haveABreak`, repaints it. The
 matching call in the `SIG_GUIGPManager` constructor stays commented out:
 `slotStartEvolution` already refreshes the counter through
-`putAllIntoExperiment` before the run. 1.3 has both calls commented out. No gate
-covers it, because no gate starts a run. The ungated `evolution` scenario samples
-the counter during a run. A gate without PVM may be possible with a run that has
+`putAllIntoExperiment` before the run. 1.3 has both calls commented out. No check
+covers it, because no check starts a run. The unchecked `evolution` scenario samples
+the counter during a run. A check without PVM may be possible with a run that has
 no tournaments; it is not tried.
 
 **After it, since 2026-09-15.** `SIG_GUIGPExperiment::slotEvolutionStopped` writes
@@ -879,6 +879,35 @@ and dialog title the user can read, for spelling and grammar. The forms under
 in `SIG_ExperimentView::slotShowFitnesscurve`, and the label needs checking too.
 The German that survives in the interface is a separate item, "Translate the
 German", further up this file.
+
+---
+
+## Confirm the run lock is finished, and nothing of the earlier attempts is left
+
+**Asked for 2026-09-16, after the UI label check.** The run lock went through
+several mechanisms before the present one. This item is to prove, not assume,
+that only the last one survives.
+
+**What to look for.** `g_runningEvolutions`, the D29 counter D33 ordered removed
+rather than moved. `SIG_GPManager::running()`, the 2003 stub that returned false.
+`evolutionRunningActionGroup`, replaced by a plain list because a `QAction`
+belongs to at most one group. Any other flag, counter or group that once meant
+"a run is on". Search the tree, not this file: a name that survives only in a
+comment is also a leftover.
+
+**What to prove.** Every route that can start a run, change a parameter or spend
+a slave is refused while a run is on, and each refusal has a check behind it that
+fails when the guard is removed. The present mechanism is one flag per
+experiment, `SIG_GUIGPExperiment::evolutionRunning`, read through
+`SIG_ExperimentListView::isRunning()`, and one signal,
+`SIG_ExperimentListView::evolutionNotRunning`, driving
+`SIG_GUIGPExperiment::slotEvolutionNotRunning` and
+`SIG_AllIndividualsView::slotEvolutionNotRunning`. Anything that locks by another
+route is either a leftover or an undocumented second mechanism.
+
+**Known still open when this was written:** the twelve redundant `setEnabled`
+lines below, and PORTING.md's D29 passage, which still describes
+`SIG_AllIndividualsView::slotEvolutionNotRunning` as running only during a run.
 
 ---
 
@@ -992,10 +1021,10 @@ SIGEL_Simulation/SIG_DynaMechsSimulationQueries.h
 SIGEL_Visualisation/SIG_Renderer.h
 ```
 
-**IT ALSO MOVES A PINNED GATE TOTAL.** The 9 project files and the 2 `WIN_`
-sources are 11 of the 611 files the `encodings` gate counts, so deleting them
+**IT ALSO MOVES A PINNED CHECK TOTAL.** The 9 project files and the 2 `WIN_`
+sources are 11 of the 611 files the `encodings` check counts, so deleting them
 takes `./check.sh` from 1136 pass to 1125. PORTING.md pins that number twice — the per-step exit criterion in §7, and the
-gate list — both say. Move them in the same commit, or the next session reads a green tree as a
+check list — both say. Move them in the same commit, or the next session reads a green tree as a
 regression. This is the same class of coupling the rest of this entry lists.
 
 **When to do it:** after the MetaGP guard step and its review. Not before.
