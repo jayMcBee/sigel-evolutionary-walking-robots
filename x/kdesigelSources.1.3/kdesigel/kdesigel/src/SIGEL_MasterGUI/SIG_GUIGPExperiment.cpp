@@ -185,13 +185,13 @@ namespace SIGEL_MasterGUI
 		    this,
 		    SLOT( putAllIntoExperiment() ) );
 
-  QObject::connect( this,
-		    SIGNAL( signalEvolutionNotRunning( bool ) ),
+  // Any experiment's run locks every experiment, so both of these ask the list
+  // view rather than this experiment.
+  QObject::connect( experimentListView,
+		    SIGNAL( evolutionNotRunning( bool ) ),
 		    allIndividualsView,
 		    SLOT( slotEvolutionNotRunning( bool ) ) );
 
-  // Any experiment's run locks every experiment, so this one asks the list
-  // view rather than itself.
   QObject::connect( experimentListView,
 		    SIGNAL( evolutionNotRunning( bool ) ),
 		    this,
@@ -325,6 +325,13 @@ void SIG_GUIGPExperiment::slotSelectionChanged( QString option )
 void SIG_GUIGPExperiment::slotEvolutionNotRunning( bool isNotRunning )
 {
   experimentView->pushbuttonStart->setEnabled( isNotRunning );
+  // Start and Stop are on this page too, and a disabled parent takes its
+  // children with it, so the page is locked widget by widget.
+  experimentView->checkboxHistory->setEnabled( isNotRunning );
+  experimentView->sliderIntervall->setEnabled( isNotRunning );
+  experimentView->multilineeditComment->setEnabled( isNotRunning );
+  experimentView->pushbuttonPostscript->setEnabled( isNotRunning );
+  experimentView->pushbuttonShowFitnessCurve->setEnabled( isNotRunning );
   gpParameter->setEnabled( isNotRunning );
   simulationParameter->setEnabled( isNotRunning );
   robotView->setEnabled( isNotRunning );

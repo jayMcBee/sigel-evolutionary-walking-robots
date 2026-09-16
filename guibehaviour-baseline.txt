@@ -2367,11 +2367,11 @@ Do you want to replace it?]
 # guard performed: with putAllIntoExperiment's check deleted the line still
 # read refused=1. It now sets the value and commits it by hand, and with that
 # check deleted it reads refused=0 and the scenario fails.
-  [atRest] Start=1 GP=1 Sim=1 Robot=1 Lang=1 Env=1  live=6
+  [atRest] Start=1 Hist=1 Auto=1 Comment=1 PS=1 Curve=1 GP=1 Sim=1 Robot=1 Lang=1 Env=1  live=11
   [locked] isRunning=1
   [locked] set=71, model reads 57  refused=1
   [locked] after a tree click ([twoBasesSimpleFitness2.exp]): Add=0 ConfigureSystem=0  UseMetaGP=0  (0 = still locked)
-  [locked] Start=0 GP=0 Sim=0 Robot=0 Lang=0 Env=0  live=0
+  [locked] Start=0 Hist=0 Auto=0 Comment=0 PS=0 Curve=0 GP=0 Sim=0 Robot=0 Lang=0 Env=0  live=0
   [locked] after slotEnableNoExperimentActions(true): Add=0 ConfigureSystem=0 UseMetaGP=0  (0 = still locked)
 # The two doors themselves. Putting New Experiment and Open Experiment into the
 # run lock is a third of D30 and NOTHING read them -- reverting that append left
@@ -2381,13 +2381,17 @@ Do you want to replace it?]
   [counter] model=535 display before slotEvolutionStopped=532
   [released] after slotEvolutionStopped: isRunning=0 (0 = released)
   [counter] display after slotEvolutionStopped=535 refreshed=1
-  [released] Start=1 GP=1 Sim=1 Robot=1 Lang=1 Env=1  live=6
+  [released] Start=1 Hist=1 Auto=1 Comment=1 PS=1 Curve=1 GP=1 Sim=1 Robot=1 Lang=1 Env=1  live=11
   [released] typed=83, model reads 83  writtenAgain=1
-# The second experiment is the point of the slot: a run in ONE experiment
-# must lock the OTHERS. It is created last, because it changes the tree.
-  [second atRest] Start=1 GP=1 Sim=1 Robot=1 Lang=1 Env=1  live=6
-  [second locked] Start=0 GP=0 Sim=0 Robot=0 Lang=0 Env=0  live=0
-  [second released] Start=1 GP=1 Sim=1 Robot=1 Lang=1 Env=1  live=6
+# The second experiment is the point of the slot: a run in ONE experiment must
+# lock the OTHERS. It is created last, because it changes the tree. The two
+# `individuals list' lines are a disconnect that reports whether anything was
+# connected; the released one is the positive control for the locked one.
+  [second atRest] Start=1 Hist=1 Auto=1 Comment=1 PS=1 Curve=1 GP=1 Sim=1 Robot=1 Lang=1 Env=1  live=11
+  [second locked] Start=0 Hist=0 Auto=0 Comment=0 PS=0 Curve=0 GP=0 Sim=0 Robot=0 Lang=0 Env=0  live=0
+  [second locked] individuals list still connected=0  (0 = cut)
+  [second released] Start=1 Hist=1 Auto=1 Comment=1 PS=1 Curve=1 GP=1 Sim=1 Robot=1 Lang=1 Env=1  live=11
+  [second released] individuals list connected again=1  (1 = the check above can fail)
 == SCENARIO rngseed ==
 
 == STEP 1: fresh start, no experiment ==

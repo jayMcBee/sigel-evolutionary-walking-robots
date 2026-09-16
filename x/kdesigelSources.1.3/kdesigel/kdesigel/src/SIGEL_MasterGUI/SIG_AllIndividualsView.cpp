@@ -451,16 +451,19 @@ void SIG_AllIndividualsView::slotEvolutionNotRunning( bool isNotRunning )
   if( !isNotRunning ) // means that the evolution is running...
     {
       individualView->clear();
+      // Name the receiver. A wildcard also cuts QTreeWidget's own relays, so
+      // itemDoubleClicked stops being emitted at all and slotDoubleClicked is
+      // reconnected below to a signal nothing raises.
       QObject::disconnect( individualList->listviewIndividuals,
 			   0,
-			   0,
+			   this,
 			   0 );
     }
   else
     {
       QObject::disconnect( individualList->listviewIndividuals,
 			   0,
-			   0,
+			   this,
 			   0 );
 
       individualList->listviewIndividuals->setContextMenuPolicy( Qt::CustomContextMenu );

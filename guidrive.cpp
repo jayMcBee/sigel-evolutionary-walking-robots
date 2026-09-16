@@ -3825,26 +3825,34 @@ static int guidriveMain(int argc, char **argv)
         }
         fflush(stdout);
 
-        // The experiment's own six widgets. slotStartEvolution disables them
-        // for its own experiment only. SIG_GUIGPExperiment::slotEvolutionNotRunning
-        // does it for every experiment, from the list view's signal. This
-        // scenario never calls slotStartEvolution, so only that second route
-        // can move these numbers.
+        // slotStartEvolution disables these for its own experiment only.
+        // SIG_GUIGPExperiment::slotEvolutionNotRunning does it for every
+        // experiment, from the list view's signal. This scenario never calls
+        // slotStartEvolution, so only that second route can move these numbers.
         auto widgetsOf = [](SIG_GUIGPExperiment *e, const char *when) -> int {
-            const int start = e->experimentView->pushbuttonStart->isEnabled() ? 1 : 0;
+            SIG_ExperimentView *ev = e->experimentView;
+            const int start = ev->pushbuttonStart->isEnabled() ? 1 : 0;
+            const int hist  = ev->checkboxHistory->isEnabled() ? 1 : 0;
+            const int autos = ev->sliderIntervall->isEnabled() ? 1 : 0;
+            const int comm  = ev->multilineeditComment->isEnabled() ? 1 : 0;
+            const int ps    = ev->pushbuttonPostscript->isEnabled() ? 1 : 0;
+            const int curve = ev->pushbuttonShowFitnessCurve->isEnabled() ? 1 : 0;
             const int gp    = e->gpParameter->isEnabled() ? 1 : 0;
             const int sim   = e->simulationParameter->isEnabled() ? 1 : 0;
             const int rob   = e->robotView->isEnabled() ? 1 : 0;
             const int lang  = e->languageParameters->isEnabled() ? 1 : 0;
             const int env   = e->environmentView->isEnabled() ? 1 : 0;
-            const int live  = start + gp + sim + rob + lang + env;
-            printf("  [%s] Start=%d GP=%d Sim=%d Robot=%d Lang=%d Env=%d  live=%d\n",
-                   when, start, gp, sim, rob, lang, env, live);
+            const int live  = start + hist + autos + comm + ps + curve
+                            + gp + sim + rob + lang + env;
+            printf("  [%s] Start=%d Hist=%d Auto=%d Comment=%d PS=%d Curve=%d"
+                   " GP=%d Sim=%d Robot=%d Lang=%d Env=%d  live=%d\n",
+                   when, start, hist, autos, comm, ps, curve,
+                   gp, sim, rob, lang, env, live);
             return live;
         };
         auto expWidgets = [&](const char *when) -> int { return widgetsOf(theExp, when); };
-        // The control. All six off at rest would make the locked read vacuous.
-        if (expWidgets("atRest") != 6) {
+        // The control. Anything off at rest would make the locked read vacuous.
+        if (expWidgets("atRest") != 11) {
             printf("!! the experiment's widgets are not all live at rest, so the"
                    " locked check below cannot fail\n");
             fflush(stdout); return 1;
@@ -3989,7 +3997,7 @@ static int guidriveMain(int argc, char **argv)
         }
         lv->setCurrentItem(lv->topLevelItem(0));
         QTest::qWait(300);
-        if (expWidgets("released") != 6) {
+        if (expWidgets("released") != 11) {
             printf("!! the experiment's widgets did not come back after the run\n");
             fflush(stdout); return 1;
         }
@@ -4009,7 +4017,7 @@ static int guidriveMain(int argc, char **argv)
                    " NOT run\n");
             fflush(stdout); return 1;
         }
-        if (widgetsOf(second, "second atRest") != 6) {
+        if (widgetsOf(second, "second atRest") != 11) {
             printf("!! the second experiment is not live at rest, so the check"
                    " below cannot fail\n");
             fflush(stdout); return 1;
@@ -4021,9 +4029,29 @@ static int guidriveMain(int argc, char **argv)
             printf("!! a run in one experiment left another experiment live\n");
             fflush(stdout); return 1;
         }
+        // The lock cuts this view's own connections to the list, so a
+        // disconnect that finds none is the lock holding. Destructive, so it
+        // runs last, and the release below is its positive control.
+        QTreeWidget *secondList = second->allIndividualsView->individualList->listviewIndividuals;
+        const bool stillWired = QObject::disconnect(secondList, 0, second->allIndividualsView, 0);
+        printf("  [second locked] individuals list still connected=%d  (0 = cut)\n",
+               stillWired ? 1 : 0);
+        if (stillWired) {
+            printf("!! a run left another experiment's individuals list live\n");
+            fflush(stdout); return 1;
+        }
+
         theExp->slotEvolutionStopped();
         QTest::qWait(200);
         widgetsOf(second, "second released");
+        const bool rewired = QObject::disconnect(secondList, 0, second->allIndividualsView, 0);
+        printf("  [second released] individuals list connected again=%d"
+               "  (1 = the check above can fail)\n", rewired ? 1 : 0);
+        if (!rewired) {
+            printf("!! the individuals list never came back, so the check above"
+                   " could not have failed\n");
+            fflush(stdout); return 1;
+        }
         fflush(stdout);
         return 0;
     }
