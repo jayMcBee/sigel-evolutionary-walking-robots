@@ -5574,10 +5574,15 @@ needs a real run, and every shipped experiment stops on a date in 2001, so a
 correct Start returns in under 100 ms.
 
 **The Individuals view is locked, not disabled.** `allIndividualsView->setEnabled(
-false )` is commented out in the 2003 source. During a run,
+false )` is commented out in the 2003 source.
 `SIG_AllIndividualsView::slotEvolutionNotRunning` disconnects the list's context
 menu, double-click and selection, and the Individuals actions are in
-`evolutionRunningActions`.
+`evolutionRunningActions`. **That slot runs on every tree click, not only at run
+start and stop** — since 2026-09-16 it is driven by
+`SIG_ExperimentListView::evolutionNotRunning`, so every experiment's list is cut,
+not just the running one. It disconnects by receiver: a wildcard also cuts
+`QTreeWidget`'s own relay for `itemDoubleClicked`, which killed double-click
+everywhere until it was found.
 
 ### PRE-EXISTING LEAK — the simulation backend is never freed
 

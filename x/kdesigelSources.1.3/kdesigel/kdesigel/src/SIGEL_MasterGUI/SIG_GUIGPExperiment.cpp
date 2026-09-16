@@ -342,17 +342,10 @@ void SIG_GUIGPExperiment::slotStartEvolution()
 #endif
       putAllIntoExperiment();
       
+      // The emit locks every experiment through slotEvolutionNotRunning. Stop is
+      // not one of the widgets it touches, so it is set here.
       emit signalEvolutionNotRunning( false );
-      experimentView->pushbuttonStart->setEnabled( false );
       experimentView->pushbuttonStop->setEnabled( true );
-      
-      // disable all the widgets while the evolution is running...
-      gpParameter->setEnabled( false );
-      simulationParameter->setEnabled( false );
-      robotView->setEnabled( false );
-      languageParameters->setEnabled( false );
-      environmentView->setEnabled( false );
-      // allIndividualsView->setEnabled( false );
       
       // Set after putAllIntoExperiment above, so the user's settings commit,
       // and before start(). slotEvolutionStopped() must run even if start()
@@ -423,6 +416,10 @@ void SIG_GUIGPExperiment::slotSimulationParameterImport()
 
 void SIG_GUIGPExperiment::slotSimulationParameterExport()
 {
+  // The tree menu that reaches this is never greyed, so the check is here.
+  if ( experimentListView->isRunning() )
+    return;
+
   simulationParameter->putIntoExperiment();
   QString fileName = QFileDialog::getSaveFileName( experimentListView, "Export Simulation Parameters...", QString(), "Simulation Parameter Files (*.sip);;All Files (*)" );
   if( !fileName.isEmpty() )
@@ -461,6 +458,10 @@ void SIG_GUIGPExperiment::slotEnvironmentImport()
 
 void SIG_GUIGPExperiment::slotEnvironmentExport()
 {
+  // The tree menu that reaches this is never greyed, so the check is here.
+  if ( experimentListView->isRunning() )
+    return;
+
   environmentView->putIntoExperiment();
   QString fileName = QFileDialog::getSaveFileName( experimentListView, "Export Environment...", QString(), "Environment Files (*.env);;All Files (*)" );
   if( !fileName.isEmpty() )
@@ -699,19 +700,11 @@ void SIG_GUIGPExperiment::slotEvolutionStopped()
   progressTimer.stop();
   experimentView->generationProgBar->reset();
   emit signalEvolutionNotRunning( true );
-  experimentView->pushbuttonStart->setEnabled( true );
   experimentView->pushbuttonStop->setEnabled( false );
 
   // Show the generation the run reached.
   experimentView->lcdnumberGenerations->display( gpExperiment.population.getPoolGeneration() );
 
-  // enable the widgets
-  gpParameter->setEnabled( true );
-  simulationParameter->setEnabled( true );
-  robotView->setEnabled( true );
-  languageParameters->setEnabled( true );
-  environmentView->setEnabled( true );
-  // allIndividualsView->setEnabled( true );
 
   /*
   if( guiGPManager )

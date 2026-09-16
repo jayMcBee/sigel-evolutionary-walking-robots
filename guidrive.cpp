@@ -4053,6 +4053,35 @@ static int guidriveMain(int argc, char **argv)
             printf("!! a run in one experiment left another experiment live\n");
             fflush(stdout); return 1;
         }
+        // The tree's own context menu on Simulation-Parameters and Environment is
+        // never greyed, so the only thing stopping its Export during a run is the
+        // check inside the slot. Nothing else in this file opens that menu.
+        {
+            QSpinBox *hours = second->simulationParameter->findChild<QSpinBox *>("spinboxHours");
+            if (!hours) { printf("!! no spinboxHours\n"); fflush(stdout); return 1; }
+            const int wasHours = second->gpExperiment.simulationParameter.getTimeToSimulate().hour();
+            hours->setValue(wasHours + 3);
+            if (hours->value() != wasHours + 3) {
+                printf("!! the spin box did not take the value, so the check below"
+                       " cannot fail\n");
+                fflush(stdout); return 1;
+            }
+            // Without the check the slot writes the model and then opens a file
+            // dialog, which would hang this scenario to the watchdog instead of
+            // failing on the line below.
+            whenModal([](QWidget *m) { m->close(); }, 3000);
+            second->slotSimulationParameterExport();
+            QTest::qWait(400);
+            const int nowHours = second->gpExperiment.simulationParameter.getTimeToSimulate().hour();
+            printf("  [second locked] tree-menu Export: set=%d, model reads %d  refused=%d\n",
+                   wasHours + 3, nowHours, nowHours == wasHours ? 1 : 0);
+            if (nowHours != wasHours) {
+                printf("!! the tree menu's Export wrote the model during a run\n");
+                fflush(stdout); return 1;
+            }
+            hours->setValue(wasHours);
+        }
+
         // The lock cuts this view's own connections to the list, so a
         // disconnect that finds none is the lock holding. Destructive, so it
         // runs last, and the release below is its positive control.
