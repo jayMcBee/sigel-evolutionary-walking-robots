@@ -763,17 +763,27 @@ leaves its string **unchanged** when the sentry fails at end of file, so the
 previous token is silently reused. A picture file holding exactly `P2` makes the
 writer emit `P2 ` as the terrain header, `dmEnvironment::loadTerrainData` reads
 `x_dim` as 0, and the slave dies in `getGroundElevation` exactly as before. A
-file of `P2` and `50` gives `50 50 1` and a silent all-zero floor. No shipped
-experiment reaches this branch — all 14 carry `FLOORFUNCSELECTED 1` — so no
-check sees it. The fix is to test the stream in that loop and refuse the file.
+file of `P2` and `50` gives `50 50 1` and a silent all-zero floor.
+
+**DROPPED by Jan, 2026-09-17: there is nothing to test it with.** No shipped
+experiment reaches this branch — all 14 carry an empty `FLOORPICTUREFILE` — and
+the repository holds no P2 file at all. The five `.pnm` under `textures/` are P6
+colour images for `SIG_EnvironmentRenderer`, not height maps. A fix here would
+be code no check could exercise. *"if there's not even test files for #4 we drop
+it as well".* Reopen only if a picture-file experiment ever exists.
 
 **The vendored reader trusts what it is given.** `dmEnvironment::loadTerrainData`
 tests the open and calls `exit(3)` on a missing file, but never tests the read,
 so a file that exists and does not parse leaves `x_dim`, `y_dim` and
 `grid_resolution` at 0. `dmEnvironment::getGroundElevation` then clamps
 `xindex` to `x_dim - 2`, which is -2, with no lower bound, and dereferences
-`depth[-2]`. Both are in DynaMechs, unchanged from the vendor. A lower bound
-there would make every route to this crash harmless rather than only the one.
+`depth[-2]`. Both are in DynaMechs, unchanged from the vendor.
+
+**DROPPED by Jan, 2026-09-17: vendored DynaMechs is not touched.** A lower bound
+there would have made every route to this crash harmless rather than only the
+one, but that is not a trade this port makes. *"we certainly don't touch vendored
+DynaMechs".* The guard therefore has to sit in SIGEL, before the path reaches
+`loadTerrainData`.
 
 **Two calls in one process share the partial name.** The name carries the host
 and the process id, so it is unique per process. `MT_Controller` runs an
