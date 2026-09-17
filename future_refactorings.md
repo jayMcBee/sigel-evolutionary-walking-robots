@@ -785,6 +785,14 @@ one, but that is not a trade this port makes. *"we certainly don't touch vendore
 DynaMechs".* The guard therefore has to sit in SIGEL, before the path reaches
 `loadTerrainData`.
 
+**DROPPED by Jan, 2026-09-17: nothing reachable is left to guard.** After the
+atomic write, no route in the tree produces a `Terrain.ter` that exists and does
+not parse. A failed write keeps the previous file, a missing file is caught by
+`loadTerrainData`'s own open test, and the picture-file branch is dropped above.
+A guard in `SIG_Environment` would protect against a disk fault and an outside
+edit only, and it would have to be repeated in `SIG_DynaMechsSimulationData`,
+which this port does not touch.
+
 **Two calls in one process share the partial name.** The name carries the host
 and the process id, so it is unique per process. `MT_Controller` runs an
 evolution on its own thread, so two `generateTerrain` calls in one process would
