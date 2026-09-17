@@ -2391,6 +2391,10 @@ Do you want to replace it?]
 # connected; the released one is the positive control for the locked one.
   [second atRest] Start=1 Hist=1 Auto=1 Comment=1 PS=1 Curve=1 GP=1 Sim=1 Robot=1 Lang=1 Env=1  live=11
   [second locked] Start=0 Hist=0 Auto=0 Comment=0 PS=0 Curve=0 GP=0 Sim=0 Robot=0 Lang=0 Env=0  live=0
+  [locked] every locked action: total=29 stillEnabled=0
+  [modal] class=QMessageBox title=[Do you really...]
+  [answering] &No
+  [locked] close during a run: asked=1 namesTheRun=1 stillUp=1
   [second locked] tree-menu Export: set=3, model reads 0  refused=1
   [second locked] individuals list still connected=0  (0 = cut)
   [second released] Start=1 Hist=1 Auto=1 Comment=1 PS=1 Curve=1 GP=1 Sim=1 Robot=1 Lang=1 Env=1  live=11

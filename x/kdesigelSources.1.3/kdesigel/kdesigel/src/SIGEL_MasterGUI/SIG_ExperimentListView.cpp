@@ -601,16 +601,16 @@ void SIG_ExperimentListView::slotResetIndividuals()
 void SIG_ExperimentListView::slotVisualizeIndividuals()
 {
   SIG_GUIGPExperiment *theExperiment = currentlySelectedExperiment();
+  if( !theExperiment )
+    {
+      QMessageBox::information( this, "There is no experiment selected...", "Currently there is no experiment selected." );
+      return;
+    }
+
   // write all changes back to generate a new dynamechs terrain
   theExperiment->putAllIntoExperiment();
-
-  if( theExperiment )
-    {
-      slotShowIndividuals();
-      theExperiment->allIndividualsView->slotVisualize();
-    }
-  else
-    QMessageBox::information( this, "There is no experiment selected...", "Currently there is no experiment selected." );
+  slotShowIndividuals();
+  theExperiment->allIndividualsView->slotVisualize();
 };
 
 void SIG_ExperimentListView::slotProgramExport()

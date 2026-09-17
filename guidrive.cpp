@@ -4053,6 +4053,59 @@ static int guidriveMain(int argc, char **argv)
             printf("!! a run in one experiment left another experiment live\n");
             fflush(stdout); return 1;
         }
+        // EVERY action in the lock list, not the five this scenario used to read.
+        // The list is protected; a pointer to it, formed inside a derived class,
+        // reads it on the real window. The total is printed as well, so removing
+        // an action from the list moves this line too.
+        struct LockList : SIG_MainWindow {
+            static QList<QAction *> SIG_MainWindow::*list() {
+                return &LockList::evolutionRunningActions;
+            }
+        };
+        {
+            const QList<QAction *> &locked = W->*LockList::list();
+            // Seven texts appear twice, once under Import and once under Export,
+            // so the menu a leaking action sits in is part of its name.
+            auto whereIs = [](QAction *a) {
+                for (QObject *o : a->associatedObjects())
+                    if (QMenu *m = qobject_cast<QMenu *>(o))
+                        if (!m->title().isEmpty())
+                            return m->title() + ">" + a->text();
+                return a->text();
+            };
+            int live = 0;
+            QStringList liveNames;
+            for (QAction *a : locked)
+                if (a->isEnabled()) { ++live; liveNames << whereIs(a); }
+            printf("  [locked] every locked action: total=%d stillEnabled=%d\n",
+                   (int)locked.count(), live);
+            if (live) {
+                printf("!! these stayed clickable during a run: %s\n",
+                       qPrintable(liveNames.join(", ")));
+                fflush(stdout); return 1;
+            }
+        }
+
+        // Quit during a run must ask, and No must leave the window alone. Nothing
+        // else in this file closes the main window.
+        {
+            QString asked;
+            whenModal([&asked](QWidget *m) {
+                if (QMessageBox *mb = qobject_cast<QMessageBox *>(m)) asked = mb->text();
+                clickMsgButton(m, QMessageBox::No);
+            }, 3000);
+            W->close();
+            QTest::qWait(600);
+            printf("  [locked] close during a run: asked=%d namesTheRun=%d stillUp=%d\n",
+                   asked.isEmpty() ? 0 : 1,
+                   asked.contains("evolution is running") ? 1 : 0,
+                   W->isVisible() ? 1 : 0);
+            if (asked.isEmpty() || !W->isVisible()) {
+                printf("!! closing the window during a run did not ask, or closed anyway\n");
+                fflush(stdout); return 1;
+            }
+        }
+
         // The tree's own context menu on Simulation-Parameters and Environment is
         // never greyed, so the only thing stopping its Export during a run is the
         // check inside the slot. Nothing else in this file opens that menu.

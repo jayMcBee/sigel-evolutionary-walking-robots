@@ -103,6 +103,11 @@ namespace SIGEL_MasterGUI
        */
       void slotAboutToQuit();
 
+      /**
+       * Asks whether to quit, naming a running evolution if there is one.
+       */
+      bool askBeforeQuitting();
+
       void slotUseBigPixmaps();
 
       void slotUseTextLabels();

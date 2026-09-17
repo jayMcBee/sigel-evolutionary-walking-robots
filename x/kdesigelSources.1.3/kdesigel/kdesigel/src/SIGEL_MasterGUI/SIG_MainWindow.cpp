@@ -733,15 +733,22 @@ void SIG_MainWindow::slotShowEmpty( bool isNotEmpty )
     }
 };
 
+bool SIG_MainWindow::askBeforeQuitting()
+{
+  QString question = "Do you really want to quit?\nThere may be unsaved experiments!";
+  if ( experimentListView->isRunning() )
+    question = "An evolution is running.\n"
+	       "Do you really want to quit?\nThere may be unsaved experiments!";
+
+  return QMessageBox::warning( this, "Do you really...", question,
+			       QMessageBox::Yes | QMessageBox::Default,
+			       QMessageBox::No | QMessageBox::Escape ) == QMessageBox::Yes;
+};
+
 void SIG_MainWindow::slotAboutToQuit()
 {
-  switch( QMessageBox::warning( this, "Do you really...", "Do you really want to quit?\n"
-				"There may be unsaved experiments!", QMessageBox::Yes | QMessageBox::Default, QMessageBox::No | QMessageBox::Escape ) )
-    {
-    case QMessageBox::Yes:
-      qApp->quit();
-      break;
-    }
+  if ( askBeforeQuitting() )
+    qApp->quit();
 };
 
 void SIG_MainWindow::slotUseBigPixmaps()
@@ -896,8 +903,14 @@ void SIG_MainWindow::slotEnableEvolutionRunningActions( bool enable )
 void SIG_MainWindow::closeEvent( QCloseEvent *event )
 {
   QMainWindow::closeEvent( event );
-  if ( event->isAccepted() )
+  if ( !event->isAccepted() )
+    return;
+
+  // The window button asks the same question File > Quit asks.
+  if ( askBeforeQuitting() )
     qApp->quit();
+  else
+    event->ignore();
 };
 
 }

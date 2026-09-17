@@ -719,6 +719,35 @@ assess the pattern from it when the time comes.
 
 ---
 
+## A run does not notice when the PVM daemon goes away
+
+**Seen 2026-09-17.** A run was started at 22:14 and was still in the "started"
+state ten hours later, having done nothing since 23:22. The window answered, the
+Stop button worked, and the interface showed a run in progress. The main thread
+sat in `hrtimer_nanosleep` with 13 seconds of CPU used in ten hours, and no
+`sigel_slave` existed.
+
+**The cause on the day was external** — the daemon's socket was removed from
+`PVM_TMP` by `pvm-check.sh`, which was run against the same directory while the
+evolution was live. That is a harness fault and is fixed there. **The SIGEL fault
+is that losing the daemon is silent.**
+
+`SIG_GPFitnessTrainer` dispatches through `pvm_spawn` and waits for results. It
+has no timeout on the wait as a whole, and nothing asks whether the daemon is
+still there. When PVM disappears the trainer waits for a message that can never
+arrive, and the interface goes on saying a run is in progress.
+
+**What a fix has to do:** notice, then say so. `pvm_mytid()` returns a negative
+error once the daemon is gone, so a periodic check is cheap. The awkward part is
+what to do next — the run cannot continue, so it has to end the way `Stop` ends
+it, and the reason has to reach the user. That is the same missing piece as
+"Say why a run ended at once" below, and the two should be done together.
+
+Do not confuse this with the slave crashes recorded in PORTING.md section 9,
+where slaves die individually and return fitness 0. Here nothing starts at all.
+
+---
+
 ## Say why a run ended at once
 
 **Asked for by Jan, 2026-09-15:** *"we need some kind of feedback in the UI for
@@ -907,6 +936,52 @@ not behaviour, but it is still a large diff in a frozen module. Doing the whole
 **Nothing in the reference files holds these names**, so no stored output moves.
 The risk is the signal and slot pair, and `guidrive.cpp`, which names
 `actExpChanged` in its own checks.
+
+---
+
+## The 3D camera never sizes the view to the robot
+
+**Seen by Jan 2026-09-16: the camera sits far too close to see the whole robot.**
+Investigated the same day. **Not a port defect.** Every camera file was diffed
+against the pristine 1.3 source — `SIG_VisualisationWidget::updateEyePoint`,
+`SIG_Visualisation::updateAspectRatio`, `SIG_Visualisation::visualize`, the
+tracking block in `SIG_SimulationVisualisationWidget::makeTimeSteps` and
+`slotNavigateCenter` — and the arithmetic is identical. Only Qt renames changed.
+
+**Two faults, both 2003's.**
+
+1. **The distance is a constant.** `SIG_SimulationWidget::slotSetDistance` takes
+   `distanceSlider` and divides by 10. The slider's default is 10, so the camera
+   starts at **1.0 world unit**. With the 100 degree field of view in
+   `SIG_Visualisation::updateAspectRatio` that shows about **2.4 units** of
+   height. **Nothing in the program computes a robot's size** — there is no
+   bounding box, extent or measurement anywhere. The shipped robots are 3 to 13
+   units long: hammer about 12.9, shortHammer 10.9, octopus 7, twoBases 5,
+   walker 4 plus legs, insect 3. Only the insect nearly fits. The ground grid
+   squares are 1 unit, which says the authors were working at insect scale.
+2. **The look target is the wrong point.** Both the tracking block and
+   `slotNavigateCenter` aim at the **root link's model origin**, not the robot's
+   centre. On the hammer that origin is 2 units from the tail and 10.9 from the
+   head, so even at a correct distance the robot sits at the edge of the frame.
+
+**What a fix needs, and why it is not small.** Measure the robot: walk
+`SIG_Robot::getLinks()`, place each link's `SIG_Geometry::getVertices()` with
+`SIG_Link::getInitialLocation`, reduce to a box. That belongs next to
+`SIG_Robot`, not in the interface. Then set the **slider** — not the widget —
+from `margin * halfExtent / tan( fovy / 2 )`, because the next slider touch
+would otherwise snap the view back. The slider's maximum of 200, distance 20, is
+enough for every shipped robot. Finally add the box centre, rotated by
+`SIG_SimulationVisualisation::getRobotRotation`, to the look point.
+
+`fovy` is a local constant inside `SIG_Visualisation::updateAspectRatio` and
+would have to be named in one shared place rather than copied.
+
+**Found on the way, unrelated to the complaint:**
+`SIG_SimulationVisualisationWidget::visualizeThis` calls `resizeGL( width(),
+height() )` by hand with **logical** pixels, while Qt calls it with device
+pixels. On a display with a device pixel ratio above 1 the viewport then covers
+only part of the framebuffer. Not measurable here — the harness pins the ratio
+to 1.
 
 ---
 
