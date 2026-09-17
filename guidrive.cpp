@@ -5816,6 +5816,19 @@ static int guidriveMain(int argc, char **argv)
         }
         fflush(stdout);
 
+        // slotEvolutionStopped puts up a modal box when a run ends for a reason
+        // other than Stop -- losing PVM is the one that exists today. Unattended,
+        // that box would hold the scenario until the watchdog. Dismiss it and
+        // print what it said, which is the only record of why the run ended.
+        whenModal([](QWidget *m) {
+            for (QLabel *l : m->findChildren<QLabel *>())
+                if (!l->text().isEmpty())
+                    printf("  [run ended] %s\n", qPrintable(l->text()));
+            fflush(stdout);
+            clickMsgButton(m, QMessageBox::Ok);
+        }, qEnvironmentVariableIntValue("SIGEL_WATCHDOG_MS") > 0
+               ? qEnvironmentVariableIntValue("SIGEL_WATCHDOG_MS") : 900000);
+
         runClock.start();
         printf("\n  >> clicking Start\n"); fflush(stdout);
         QTest::mouseClick(start, Qt::LeftButton, Qt::NoModifier, start->rect().center());

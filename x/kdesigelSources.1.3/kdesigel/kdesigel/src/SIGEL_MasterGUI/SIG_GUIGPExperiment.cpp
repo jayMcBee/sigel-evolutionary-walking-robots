@@ -108,6 +108,17 @@ namespace SIGEL_MasterGUI
 	if( gpExperiment.population.getIndividual( i ).upToDate() )
 	  upToDate++;
       experimentView->generationProgBar->setValue( upToDate );
+
+      // SIG_GPFitnessTrainer waits for results with no timeout on the wait as a
+      // whole, so a run that has lost PVM sits there for ever and the window
+      // goes on saying an evolution is in progress. Stopping it is this class's
+      // decision, not the trainer's.
+      if( guiGPManager && guiGPManager->pvmIsLost() && endedBecause.isEmpty() )
+	{
+	  endedBecause = "PVM can no longer be reached, so no further individual"
+			 " can be evaluated. The evolution has been stopped.";
+	  guiGPManager->userTerminated = true;
+	}
     } );
 
   QObject::connect( experimentView->pushbuttonStart,
@@ -351,6 +362,7 @@ void SIG_GUIGPExperiment::slotStartEvolution()
       // and before start(). slotEvolutionStopped() must run even if start()
       // throws.
       evolutionRunning = true;
+      endedBecause = QString();
       experimentView->generationProgBar->setRange( 0, gpExperiment.population.getSize() );
       progressTimer.start( 200 );
       try {
@@ -704,6 +716,12 @@ void SIG_GUIGPExperiment::slotEvolutionStopped()
 
   // Show the generation the run reached.
   experimentView->lcdnumberGenerations->display( gpExperiment.population.getPoolGeneration() );
+
+  if( !endedBecause.isEmpty() )
+    {
+      QMessageBox::warning( experimentListView, "Evolution stopped", endedBecause );
+      endedBecause = QString();
+    }
 
 
   /*

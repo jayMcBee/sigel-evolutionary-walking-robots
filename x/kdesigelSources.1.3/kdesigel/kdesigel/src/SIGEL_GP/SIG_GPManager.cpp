@@ -575,6 +575,11 @@ void SIGEL_GP::SIG_GPManager::calcInitTourSet() {
       };
   };
 
+bool SIGEL_GP::SIG_GPManager::pvmIsLost() const
+{
+  return trainer && trainer->pvmLost;
+};
+
 void SIGEL_GP::SIG_GPManager::haveABreak()
 {
   // Empty in the base. SIG_GUIGPManager overrides it to pump the event loop.
@@ -655,6 +660,11 @@ bool SIGEL_GP::SIG_GPManager::checkTerminationConditions(bool generationBreak) {
 
 void SIGEL_GP::SIG_GPManager::start()
 {
+	// The Meta system hands the same trainer to every run, so what the last one
+	// learned about PVM must not end this one.
+	if (trainer)
+		trainer->pvmLost = false;
+
 	if(currentExperiment.mtController->IsEnabled() && currentExperiment.mtController->UsedSystem() == CLASSIFIER_SUBST)
 		run(dynamic_cast<MT_Classifier*>(currentExperiment.mtController->getClassifier()));
 	else

@@ -206,15 +206,14 @@ Constructs the language removed. A current compiler rejects them.
 All present in 1.3, none introduced here. Each needs a decision before it is
 touched, because changing one changes behaviour against the reference binary.
 
-- [ ] **17. `pvm_probe`'s error return is read as "a message is ready".**
-  `SIG_GPFitnessTrainer::checkTask` tests `if (info != 0)`, but `pvm_probe`
-  returns a negative error code as well as a positive buffer id. Two outcomes:
-  `pvm_recv` blocks and the evolution stops dead — and **no `TIMEOUTMINUTES`
-  value rescues it**, because the timeout lives in the `else` branch — or
-  `pvm_recv` fails, `pvm_upkdouble` leaves `result` at -1, the task record is
-  destroyed anyway, and all four callers in `SIG_GPManager` read -1 as "not ready
-  yet" and wait for ever for a task that no longer exists. The individual is
-  lost. Do it before any claim rests on `noOfSlaves` accounting.
+- [x] **17. `pvm_probe`'s error return is read as "a message is ready"** —
+  done 2026-09-17, D41. `checkTask` now splits the three returns: above zero
+  receive, zero wait, below zero give up on the task, kill it and re-queue the
+  individual. The old `if (info != 0)` sent an error into the receive branch,
+  where `pvm_recv` blocks for a message that cannot come — and **no
+  `TIMEOUTMINUTES` value rescued it**, because the timeout lives in the `else`
+  branch — or fails and leaves the task record destroyed while every caller in
+  `SIG_GPManager` reads -1 as "not ready yet" and waits for ever.
 
 - [ ] **18. `SIG_GPPVMTask` holds a reference to a host that can be deleted
   under it.** `SIG_GPPVMTask` declares `SIG_GPActivePVMHost &host`;
@@ -243,20 +242,16 @@ touched, because changing one changes behaviour against the reference binary.
 
 ## 7 · The interface
 
-- [ ] **21. A run does not notice when the PVM daemon goes away.**
-  `SIG_GPFitnessTrainer` dispatches through `pvm_spawn` and waits with no
-  timeout on the wait as a whole. Nothing asks whether the daemon is still
-  there, so the trainer waits for a message that can never arrive while the
-  interface says a run is in progress.
-  **`pvm_mytid()` does NOT detect this.** `BEATASK` is
-  `( pvmmytid == -1 ? pvmbeatask() : 0 )`, so once the task is enrolled
-  `pvm_mytid` returns the cached tid without touching the daemon. Detecting a
-  dead daemon needs a real round trip, or a check outside PVM. The hard part is
-  what to do next: the run has to end the way `Stop` ends it, and the reason has to
-  reach the user. **Do it with item 22.**
-  *Signature: main thread in `hrtimer_nanosleep`, seconds of CPU over hours, no
-  `sigel_slave` at all. A slave crash looks different — slaves keep starting and
-  fitness 0 comes back.*
+- [x] **21. A run does not notice when the PVM daemon goes away** — done
+  2026-09-17, D41. `pvm_probe` and `pvm_spawn` both report `PvmSysErr`, the
+  trainer records it, and the interface ends the run and says why.
+  **Two ways of detecting it were measured and rejected.** `pvm_mytid` cannot:
+  `BEATASK` is `( pvmmytid == -1 ? pvmbeatask() : 0 )`, so an enrolled task gets
+  its cached tid back without touching the daemon. Watching
+  `$PVM_TMP/pvmd.<uid>` disappear cannot either: a run completed three further
+  generations with that file removed, because an enrolled task keeps its socket.
+  *Signature of the fault: main thread in `hrtimer_nanosleep`, seconds of CPU
+  over hours, no `sigel_slave` at all.*
 
 - [ ] **22. Say why a run ended at once.** Start runs the evolution and it ends
   immediately when the termination condition already holds — every shipped
@@ -267,6 +262,9 @@ touched, because changing one changes behaviour against the reference binary.
   window shows nothing else. The GUI must say which condition ended the run.
   `SIG_GUIGPExperiment::slotStartEvolution`, and the setting is on the GP
   Parameters page, tab Evolution control, "Termination by".
+  **The machinery exists.** D41 added `endedBecause`, which
+  `slotEvolutionStopped` shows when it is not empty. This item is the second
+  reason to fill it in.
 
 - [ ] **23. The window stops answering during a run.**
   `SIG_GUIGPExperiment::slotStartEvolution` runs the whole evolution on the GUI

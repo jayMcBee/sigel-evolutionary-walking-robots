@@ -159,6 +159,15 @@ virtual int spawnTask(SIG_GPIndividual const& ind);
 virtual double checkTask(int task);
 
   /**
+   * True once PVM has reported that it can no longer be reached. checkTask is
+   * the only place that sees this, because pvm_probe is the only call on the
+   * run path that touches the daemon. Nothing here acts on it: the environment
+   * that owns the evolution reads it and decides.
+   */
+ public:
+  bool pvmLost;
+
+  /**
    * This operation will stop all PVM-tasks.
    * @pre
    * There is a signal of an userbreak and the GPFitnessTrainer have to stop all computations 

@@ -43,7 +43,8 @@ SIGEL_GP::SIG_GPFitnessTrainer::SIG_GPFitnessTrainer(SIGEL_GP::SIG_GPExperiment&
      exp.gpParameter.getFitnessName(),
      false),
    modifiedRobot( exp.robot ),
-   nextFreeNumber(0)
+   nextFreeNumber(0),
+   pvmLost(false)
 {
 
   switch (exp.simulationParameter.getSimulationLibrary()) {
@@ -315,6 +316,14 @@ int SIGEL_GP::SIG_GPFitnessTrainer::spawnTask(SIGEL_GP::SIG_GPIndividual const& 
         // an error occurred: process cannot been spawned
         QString errorText;
 
+        // pvm_spawn reports a per-task error through taskId and a whole-call
+        // error through its return, and an unreachable daemon is the second
+        // kind: taskId is left at 0 and only the return says why. Spawning is
+        // the first thing that touches the daemon, so this is where a run that
+        // can never start finds out.
+        if (spawnInfo == PvmSysErr || taskId == PvmSysErr)
+          pvmLost = true;
+
         switch(taskId) {
           case PvmBadParam :
             errorText = QString::asprintf("Invalid parameter in call to pvm_spawn.");
@@ -368,7 +377,10 @@ double SIGEL_GP::SIG_GPFitnessTrainer::checkTask(int taskId)
   {
 		int info = pvm_probe(pvmTask->pvmTaskId, 5);
 
-    if (info != 0)
+    // pvm_probe answers three ways: a buffer id above zero, zero for nothing
+    // waiting, and a negative error code. A negative must not reach the receive
+    // below, which would block for a message that cannot come.
+    if (info > 0)
   	{
 	  	pvm_recv(pvmTask->pvmTaskId, 5);
 	  	pvm_upkdouble(&result,1,1);
@@ -376,6 +388,31 @@ double SIGEL_GP::SIG_GPFitnessTrainer::checkTask(int taskId)
 	  	pvmTask->host.noOfSlaves--;
 	  	delete pvmTasks[ taskId ];   // insert() freed the finished task
 	  	pvmTasks[ taskId ] = 0;
+		}
+
+    else if (info < 0)
+		{
+		  // PvmSysErr is the daemon itself; anything else leaves a slave running
+		  // that nothing will collect from, so it is killed here exactly as the
+		  // timeout below kills one that has to be given up.
+		  if (info == PvmSysErr)
+		    pvmLost = true;
+
+		  SIGEL_Tools::SIG_IO::cerr << "pvm_probe() failed with "
+					    << ( info == PvmSysErr ? "pvmd is not responding"
+								   : "an error" )
+					    << " (" << info << ") -- giving up on this task"
+					    << Qt::endl;
+
+		  pvm_kill( pvmTask->pvmTaskId );
+		  pvmTask->host.noOfSlaves--;
+		  QList<int> *toSpawn = new QList<int>(2);
+		  (*toSpawn)[0] = taskId;
+		  (*toSpawn)[1] = pvmTask->indPosition;
+		  toSpawnList.append( toSpawn );
+
+		  delete pvmTasks[ taskId ];
+		  pvmTasks[ taskId ] = 0;
 		}
 
     else

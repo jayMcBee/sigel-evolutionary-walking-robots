@@ -73,6 +73,14 @@ namespace SIGEL_GP
   bool userTerminated;
 
   /**
+   * Whether PVM has been reported unreachable. Reading it is the only way an
+   * environment can tell a run that cannot continue from one that is merely
+   * slow.
+   */
+ public:
+  bool pvmIsLost() const;
+
+  /**
    * Two flags to synchronize the main thread and server thread when disconnecting
    * dynamically registered clients; if 'disconnectClients' is set, the server thread
    * will disconnect all clients causing them to cleanup temp. files since it'll be

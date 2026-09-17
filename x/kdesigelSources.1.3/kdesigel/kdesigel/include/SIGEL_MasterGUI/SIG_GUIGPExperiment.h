@@ -352,9 +352,16 @@ namespace SIGEL_MasterGUI
       QAction *stopEvolutionAction;
 
       /**
-       * Drives generationProgBar while the evolution runs.
+       * Drives generationProgBar while the evolution runs, and watches for a
+       * run that can no longer make progress.
        */
       QTimer progressTimer;
+
+      /**
+       * Why the run ended, shown by slotEvolutionStopped. Empty when the run
+       * ended on its own terms.
+       */
+      QString endedBecause;
       
       /**
        * The SIG_ExperimentItem belonging to the experiment.
