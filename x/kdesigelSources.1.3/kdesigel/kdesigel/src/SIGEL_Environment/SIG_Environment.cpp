@@ -23,6 +23,9 @@
 #include "SIGEL_Environment/SIG_Environment.h"
 #include "fparser.h"
 #include <QByteArray>
+#include <QCoreApplication>
+#include <QSysInfo>
+#include <cstdio>
 #include "SIGEL_Tools/SIG_IO.h"
 
 #ifdef _WINDOWS
@@ -455,9 +458,15 @@ namespace SIGEL_Environment {
   	}
   	std::string terrain(sigelRootCString);
   	terrain += "/Terrain.ter";
-  	
-  	
-  	std::ofstream ausgabeTerrain(terrain.c_str(), std::ios::trunc | std::ios::out);
+
+	// Every process writes Terrain.ter and reads it straight back, so a reader
+	// must never see a half-written one. The host belongs in the name as well
+	// as the process id: hosts share SIGEL_ROOT and repeat each other's pids.
+  	std::string partialTerrain(terrain);
+  	partialTerrain += "." + QSysInfo::machineHostName().toStdString();
+  	partialTerrain += "." + std::to_string( QCoreApplication::applicationPid() );
+
+  	std::ofstream ausgabeTerrain(partialTerrain.c_str(), std::ios::trunc | std::ios::out);
   	
   	if (floorFuncSelected) {
   		QString str = floorFunction;
@@ -472,6 +481,8 @@ namespace SIGEL_Environment {
   		FunctionParser fp;
   		if (fp.Parse(func,"xz") != -1) {
   			SIGEL_Tools::SIG_IO::cerr << "Warning: the specified terrain function could not be parsed. It must depend on x and z, and contain only valid expressions -- see the documentation in supportingLibs/fparser." << Qt::endl;
+  			ausgabeTerrain.close();
+  			std::remove( partialTerrain.c_str() );
   			return false;
   		}
   	
@@ -495,6 +506,8 @@ namespace SIGEL_Environment {
   		std::ifstream pgm(input.toUtf8().constData());
   		if (!pgm) {
   			SIGEL_Tools::SIG_IO::cerr << "Warning: the specified terrain file does not exist." << Qt::endl;
+  			ausgabeTerrain.close();
+  			std::remove( partialTerrain.c_str() );
   			return false;
   		}
   		
@@ -513,6 +526,8 @@ namespace SIGEL_Environment {
     					case 0: // Magic Key
     						if (s.compare("P2")!=0) {
 									SIGEL_Tools::SIG_IO::cerr << "Warning: the specified picture file is not in PGM format." << Qt::endl;
+									ausgabeTerrain.close();
+									std::remove( partialTerrain.c_str() );
 									return false;
     						}
 								else ++counter;
@@ -542,6 +557,16 @@ namespace SIGEL_Environment {
   	} // else, picturefile specified
   	
   	ausgabeTerrain.close();
+
+	// The rename is what makes the file appear whole, so a write that did not
+	// finish must not be renamed. Terrain.ter then keeps what it held.
+  	if (!ausgabeTerrain || std::rename( partialTerrain.c_str(), terrain.c_str() ) != 0) {
+  		SIGEL_Tools::SIG_IO::cerr << "Warning: could not write the terrain file "
+  			<< terrain.c_str() << "." << Qt::endl;
+  		std::remove( partialTerrain.c_str() );
+  		return false;
+  	}
+
   	return true;
 	};
 

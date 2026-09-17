@@ -1829,13 +1829,15 @@ translation of `ssvdc`, and `vptr` in cv97. The exemptions were written for
 qhull too, which is no longer compiled as of 2026-08-28; they are left in place
 because `ssvdc` still needs them.
 
-**AddressSanitizer.** Clean, but only with one `SIGEL_ROOT` per worker.
-`SIG_Environment::generateTerrain` rewrites `$SIGEL_ROOT/Terrain.ter` on **every
-evaluation** and reads it straight back, so workers sharing a root read it
-half-written, get a zero-size grid, and take a real heap-buffer-overflow in
-`dmEnvironment::getGroundElevation`. `replicate.sh` gives each worker its own
-root and treats a non-zero exit as an error; an earlier version scored crashes
-as a fitness of 0, which made the headline number load-dependent.
+**AddressSanitizer.** Clean. `SIG_Environment::generateTerrain` rewrites
+`$SIGEL_ROOT/Terrain.ter` on **every evaluation** and reads it straight back.
+Workers sharing a root used to read it half-written, get a zero-size grid, and
+take a real heap-buffer-overflow in `dmEnvironment::getGroundElevation`; the
+write is now atomic, so a reader sees the old file or the new one and never a
+half-written one. `replicate.sh` still gives each worker its own root, which
+keeps the runs independent of each other, and treats a non-zero exit as an
+error; an earlier version scored crashes as a fitness of 0, which made the
+headline number load-dependent.
 
 **Leak baseline (D18): 41,254 bytes in 109 allocations** per evaluation, from
 §10's pre-existing leak — `SIG_Simulation` is `new`ed and never deleted, and
@@ -3125,6 +3127,19 @@ without PVM the ported interface builds and shows its windows, and nothing
 happens behind the Start button. **With the vendored PVM up it runs locally** —
 three generations driven end to end on 2026-09-02.
 
+**CLOSED 2026-09-16, sixteen commits, each with the five checks green.** The
+File > Open crash; the whole run lock — one evolution at a time, every
+experiment's Start button, five parameter pages, Experiment page and individuals
+list dead during a run, the tree menu's Start, Stop and Export too; every dialog
+in the master interface given a parent; the spelling and grammar of the text the
+user reads; the comments cut from about 1300 lines to 400; `actExperiment`
+renamed to `currentExperiment`; the window and splitter sizes; and a prompt
+before quitting that names a running evolution. Decisions D38, D39 and D40 in
+§5c. **Defects found on the way and fixed:** a use-after-free on right-click
+Start during a run, `setName` not re-keying `menuDict` which left the tree menu
+dead for every saved experiment, a wildcard disconnect that killed double-click
+everywhere, and two harness reads that failed under load.
+
 **WHAT IS ACTUALLY OPEN, as of 2026-09-07.** Closed items are not listed; their
 lessons live in the step sections above.
 
@@ -3156,22 +3171,81 @@ control. The load now clears `Qt::ItemIsEnabled` as well, and the two
 `openfocus` scenario, which sends the focus event the window manager sends while
 the file is being read; without the fix it segfaults.
 
-**Slaves crash during a GUI run.** Seen 2026-09-15 in a run of
-`twoBasesLocal.exp`, saved in the repo root at 18:33: termination by time, with a
-date in 2030, and 4 slaves on this machine. The PVM daemon log has 123 lines
-`Invalid storage access`, from 18:34:11 to 19:53:02.
+**~~Slaves crash during a GUI run~~ — FOUND AND FIXED 2026-09-17. The cause was
+the shared `Terrain.ter`.** `SIG_Environment::generateTerrain` wrote
+`$SIGEL_ROOT/Terrain.ter` in place with `trunc` and
+`SIG_Environment::loadDynaMechsEnvironment` read it straight back;
+`SIG_DynaMechsSimulationData` reads the same path again. **One evaluation opens
+that file five times: two truncating writes and three reads**, measured with
+`strace`. Four slaves share it, so a reader could open the file between another
+slave's truncate and its first write, get an empty one, and end with
+`x_dim = 0`. `dmEnvironment::loadTerrainData` tests the open but never the read,
+so a file that does not parse leaves the grid at 0; `getGroundElevation` then
+clamps `xindex` to `x_dim - 2`, which is -2, and dereferences `depth[-2]`.
+**The fix is in `generateTerrain` alone:** write `Terrain.ter.<host>.<pid>`,
+then `rename` it over `Terrain.ter`, so a reader sees the old file or the new
+one. Readers, `SIGEL_Simulation` and DynaMechs are untouched.
+
+**What was measured, on both sides of the fix.** A reader loop parsing the
+header the way `loadTerrainData` does, with four writers running: **9553
+unreadable headers in 15,903,454 samples before, 0 in 16,444,433 after**, and 0
+in about 1.5 M with no writers either way. Two real slaves caught under `gdb`
+during real runs both showed `x_dim` 0, `y_dim` 0, `grid_resolution` 0 at the
+fault, with an ordinary contact position — so it was never a runaway simulation
+or a bad individual.
+
+**The 2026-09-15 evidence this was found from.** A run of `twoBasesLocal.exp`,
+termination by time with a date in 2030, 4 slaves on this machine. The PVM
+daemon log has 123 lines `Invalid storage access`, from 18:34:11 to 19:53:02.
 `sigel_slave.cpp, sigelStandardSignalHandler` prints that text on SIGSEGV, sends
 fitness 0 to the master and exits. 1.3 has the same handler. Each line is one
 individual: its slave crashed, so it got fitness 0. Slaves kept starting at about
 one per second: the PVM task ids rose by 3937 from 18:34:11 to 19:33:18, and a
-10-second sample saw 10 slaves. The cause is not known. The two-generation run in
-§7, "A real evolution under `guidrive`", had no fitness value of 0.
+10-second sample saw 10 slaves. The two-generation run in §7, "A real evolution
+under `guidrive`", had no fitness value of 0. **The crashes come in bursts** —
+86 seconds held one, 14 held two and 3 held three — which is what one shared
+file does and not what a bad individual does. *`twoBasesLocal.exp` was deleted
+2026-09-17 at Jan's instruction: nothing to compare it against, the robot behaved
+oddly, and it no longer improved. Any experiment reproduces this, since the
+defect does not depend on the experiment.*
+
+**NOT OURS — confirmed on the 1.3 binary by the oracle.** `dmEnvironment.cpp`,
+`dmEnvironment.hpp` and `dmContactModel.cpp` are byte-identical to
+`v1.3-pristine` and no patch touches them; pristine `SIG_Environment.cpp` has
+the same writer and the same callers, and the port changed only
+`ios::trunc+ios::out` to `std::ios::trunc | std::ios::out`. The oracle ran
+`sigel_slave` against an empty read-only `Terrain.ter` and got the same call
+path with `x_dim` 0, `y_dim` 0, `grid_resolution` 0 and `xindex` -2, and
+disassembled the clamp: `x_dim` at offset `0x24`, `add $0xfffffffe,%eax`, no
+lower guard. Its control with a valid 5058-byte file simulated normally. **How
+often 1.3 hits this was never measured** — those probes were stood down.
+`future_refactorings.md`, "`Terrain.ter` can still be read as an empty grid",
+carries the two routes the fix does not close.
+
+**Before blaming the slaves, rule out a hang from outside.** On 2026-09-17 a run that had
+been "started" for ten hours turned out to have lost its PVM daemon at the one-hour
+mark: `pvm-check.sh` was run against the same `PVM_TMP` and deletes the daemon
+socket. The symptom is easy to mistake for a slave problem — the window answers,
+`Stop` works, the interface still says a run is on. **What it looks like:** the
+main thread in `hrtimer_nanosleep`, a few seconds of CPU over many hours, and no
+`sigel_slave` process at all. A slave crash looks different: slaves keep starting,
+the daemon log fills with `Invalid storage access`, and fitness values of exactly
+0 come back. `future_refactorings.md`, "A run does not notice when the PVM daemon
+goes away", carries the SIGEL-side defect — nothing checks that the daemon is
+still there, so the wait is silent and endless.
+
+**Do not run `pvm-check.sh` while an evolution is live.** It removes
+`$PVM_TMP/pvmd.$(id -u)` and `pvml.$(id -u)` and starts its own daemon. Give it
+its own `PVM_TMP`, which it honours, or wait.
 
 **`real clicks` failed once on a raw event count.** On 2026-09-15 at 23:41 its
 `fast pair` line counted one extra X motion event (`motion=2 xi2=10` against the
 baseline's `motion=1 xi2=9`). Every Qt-level count on that line stayed the same.
-The next run on the same tree passed. Watch for a second time before changing the
-check.
+The next run on the same tree passed. **It happened a second time on 2026-09-16**,
+on the `outside click` line rather than `fast pair`, again with every Qt-level
+count unchanged. The counts are now printed as `motion>0` and `xi2NoMotion`, so a
+spare X motion event cannot move them; two runs under load are byte identical.
+`guidrive.cpp, spies` carries the reason.
 
 **The run lock is DONE — 2026-09-16, `49cb4a2`, `c984574`, `aa2ebfc`.** One
 evolution at a time, and the whole application is locked while one runs.

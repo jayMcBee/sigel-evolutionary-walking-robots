@@ -15,9 +15,10 @@
 #            writeToFileTransfer and so reverses every colliding chain
 #   rrb      the standalone model, read in declaration order by SIGEL_RobotIO
 #
-# Serial on purpose: SIG_Environment::generateTerrain rewrites
-# $SIGEL_ROOT/Terrain.ter on every evaluation, so parallel workers sharing a
-# root read it half-written (PORTING.md §7).
+# Serial on purpose. SIG_Environment::generateTerrain rewrites
+# $SIGEL_ROOT/Terrain.ter on every evaluation; parallel workers sharing a root
+# used to read it half-written, and the write is now atomic. Serial stays,
+# because the dump is compared line by line and a worker pool would reorder it.
 set -eu
 ROOT=$(cd "$(dirname "$0")" && pwd)
 B=${1:-build-fast}

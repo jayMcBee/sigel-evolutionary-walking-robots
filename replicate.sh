@@ -14,9 +14,9 @@
 # are detected and reported once.
 #
 # EACH WORKER GETS ITS OWN SIGEL_ROOT. SIG_Environment::generateTerrain rewrites
-# $SIGEL_ROOT/Terrain.ter on every single evaluation and reads it straight back,
-# so workers sharing one root read it half-written, get a zero-size grid and
-# take a heap-buffer-overflow in dmEnvironment::getGroundElevation.
+# $SIGEL_ROOT/Terrain.ter on every single evaluation and reads it straight back.
+# That write is atomic, so sharing one root no longer corrupts a reader; a root
+# each still keeps every worker independent of the others.
 #
 # A crashed evaluation is an ERROR, never a fitness of 0. Scoring crashes as 0
 # made an earlier version of this script load-dependent.
