@@ -296,7 +296,7 @@ created. Counts measured 2026-08-30 by grep over the extracted 1.3 tree.
   | `masse` | `SIG_Mirtich.h, SIG_Mirtich`, `.cpp:265,330` |
   | `dichte`, `konstante`, `anderes_material`, `rot`/`gruen`/`blau` | `SIG_RobotCompiler.cpp:167–236` |
   | `betrag`, `betraege`, `varianz`, `durchschnittProGelenk` | `SIG_GPForceFitnessFunction.cpp:105–122` |
-  | `ausgabeTerrain` | `SIG_Environment.cpp:460–536` |
+  | `ausgabeTerrain` | `SIG_Environment.cpp, SIG_Environment::generateTerrain` |
   | `zeiger` | `SIG_EnvironmentRenderer.cpp:447–455` |
   | `zahl` | `SIG_Geometry.cpp, SIG_Geometry` |
 
@@ -748,6 +748,42 @@ where slaves die individually and return fitness 0. Here nothing starts at all.
 
 ---
 
+## `Terrain.ter` can still be read as an empty grid
+
+**The concurrency route is closed. Two others are not.** Slaves used to crash
+because they read `$SIGEL_ROOT/Terrain.ter` while another slave had truncated
+it; `SIG_Environment::generateTerrain` now writes a partial file and renames it,
+so no reader sees a half-written one. That was measured, and it was confirmed on
+the 1.3 binary that the defect is 1.3's. Everything below is untouched.
+
+**A malformed picture file writes a malformed terrain.** With
+`FLOORFUNCSELECTED 0`, `generateTerrain` copies the PGM header into the terrain
+file without testing a single extraction. `operator>>(istream &, string &)`
+leaves its string **unchanged** when the sentry fails at end of file, so the
+previous token is silently reused. A picture file holding exactly `P2` makes the
+writer emit `P2 ` as the terrain header, `dmEnvironment::loadTerrainData` reads
+`x_dim` as 0, and the slave dies in `getGroundElevation` exactly as before. A
+file of `P2` and `50` gives `50 50 1` and a silent all-zero floor. No shipped
+experiment reaches this branch — all 14 carry `FLOORFUNCSELECTED 1` — so no
+check sees it. The fix is to test the stream in that loop and refuse the file.
+
+**The vendored reader trusts what it is given.** `dmEnvironment::loadTerrainData`
+tests the open and calls `exit(3)` on a missing file, but never tests the read,
+so a file that exists and does not parse leaves `x_dim`, `y_dim` and
+`grid_resolution` at 0. `dmEnvironment::getGroundElevation` then clamps
+`xindex` to `x_dim - 2`, which is -2, with no lower bound, and dereferences
+`depth[-2]`. Both are in DynaMechs, unchanged from the vendor. A lower bound
+there would make every route to this crash harmless rather than only the one.
+
+**Two calls in one process share the partial name.** The name carries the host
+and the process id, so it is unique per process. `MT_Controller` runs an
+evolution on its own thread, so two `generateTerrain` calls in one process would
+write the same partial file and interleave. This is not new — they interleaved
+in `Terrain.ter` itself before — and closing it needs per-call state, which the
+port is not allowed to add.
+
+---
+
 ## Say why a run ended at once
 
 **Asked for by Jan, 2026-09-15:** *"we need some kind of feedback in the UI for
@@ -775,8 +811,9 @@ page, tab Evolution control, "Termination by".
 
 ## The window stops answering during a run
 
-**Reported by Jan, 2026-09-15,** during a run of `twoBasesLocal.exp`: now and then
-the desktop says SIGEL is not responding. *"we should look into that as well"*.
+**Reported by Jan, 2026-09-15,** during a run of `twoBasesLocal.exp`, an
+experiment deleted since: now and then the desktop says SIGEL is not
+responding. *"we should look into that as well"*.
 
 **What the source shows.** `SIG_GUIGPExperiment::slotStartEvolution` runs the
 whole evolution inside `guiGPManager->start()`, on the GUI thread. During the
