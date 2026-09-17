@@ -247,9 +247,12 @@ touched, because changing one changes behaviour against the reference binary.
   `SIG_GPFitnessTrainer` dispatches through `pvm_spawn` and waits with no
   timeout on the wait as a whole. Nothing asks whether the daemon is still
   there, so the trainer waits for a message that can never arrive while the
-  interface says a run is in progress. `pvm_mytid()` returns a negative error
-  once the daemon is gone, so a periodic check is cheap. The hard part is what
-  to do next: the run has to end the way `Stop` ends it, and the reason has to
+  interface says a run is in progress.
+  **`pvm_mytid()` does NOT detect this.** `BEATASK` is
+  `( pvmmytid == -1 ? pvmbeatask() : 0 )`, so once the task is enrolled
+  `pvm_mytid` returns the cached tid without touching the daemon. Detecting a
+  dead daemon needs a real round trip, or a check outside PVM. The hard part is
+  what to do next: the run has to end the way `Stop` ends it, and the reason has to
   reach the user. **Do it with item 22.**
   *Signature: main thread in `hrtimer_nanosleep`, seconds of CPU over hours, no
   `sigel_slave` at all. A slave crash looks different — slaves keep starting and
