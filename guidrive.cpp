@@ -533,6 +533,11 @@ static void whenModal(std::function<void(QWidget *)> fn, int budgetMs = 8000)
     clock->start();
     QObject::connect(t, &QTimer::timeout, [t, fn, clock, budgetMs]() {
         QWidget *m = QApplication::activeModalWidget();
+        // The evolution scenario owns this one with a poller of its own, armed
+        // for the whole run. Latching onto it here would consume the handler a
+        // step armed for its own dialog, and lose the only record of why the
+        // run ended.
+        if (m && m->windowTitle() == "Evolution stopped") m = nullptr;
         if (m) {
             t->stop(); t->deleteLater();
             if (g_modalPoller == t) g_modalPoller = nullptr;
@@ -5816,18 +5821,25 @@ static int guidriveMain(int argc, char **argv)
         }
         fflush(stdout);
 
-        // slotEvolutionStopped puts up a modal box when a run ends for a reason
-        // other than Stop -- losing PVM is the one that exists today. Unattended,
-        // that box would hold the scenario until the watchdog. Dismiss it and
-        // print what it said, which is the only record of why the run ended.
-        whenModal([](QWidget *m) {
+        // slotEvolutionStopped puts up a modal box whenever a run ends for a
+        // reason other than Stop: a termination condition that already held, or
+        // PVM lost. Unattended, that box holds the scenario until the watchdog.
+        // This repeats rather than firing once, because a scenario can start
+        // more than one run and every one of them can raise it. It sits outside
+        // whenModal's single-poller rule on purpose and owns this title alone --
+        // whenModal skips it. The title is the only link to the QMessageBox in
+        // SIG_GUIGPExperiment::slotEvolutionStopped, so the two move together.
+        QTimer runEndedBox;
+        QObject::connect(&runEndedBox, &QTimer::timeout, []() {
+            QWidget *m = QApplication::activeModalWidget();
+            if (!m || m->windowTitle() != "Evolution stopped") return;
             for (QLabel *l : m->findChildren<QLabel *>())
                 if (!l->text().isEmpty())
                     printf("  [run ended] %s\n", qPrintable(l->text()));
             fflush(stdout);
             clickMsgButton(m, QMessageBox::Ok);
-        }, qEnvironmentVariableIntValue("SIGEL_WATCHDOG_MS") > 0
-               ? qEnvironmentVariableIntValue("SIGEL_WATCHDOG_MS") : 900000);
+        });
+        runEndedBox.start(50);
 
         runClock.start();
         printf("\n  >> clicking Start\n"); fflush(stdout);

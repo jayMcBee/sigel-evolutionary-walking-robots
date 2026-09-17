@@ -40,7 +40,7 @@
 namespace SIGEL_MasterGUI
 {
 
-  SIG_GUIGPExperiment::SIG_GUIGPExperiment( QString name, QStackedWidget *theWidgetStack, SIG_ExperimentItem *theExperimentItem ) : gpExperiment(), guiGPManager(0), experimentName(name), widgetStack( theWidgetStack ), evolutionRunning(false), experimentItem(theExperimentItem), experimentListView( static_cast<SIG_ExperimentListView *>( theExperimentItem->treeWidget() ) )
+  SIG_GUIGPExperiment::SIG_GUIGPExperiment( QString name, QStackedWidget *theWidgetStack, SIG_ExperimentItem *theExperimentItem ) : gpExperiment(), guiGPManager(0), experimentName(name), widgetStack( theWidgetStack ), evolutionRunning(false), generationAtStart(0), experimentItem(theExperimentItem), experimentListView( static_cast<SIG_ExperimentListView *>( theExperimentItem->treeWidget() ) )
 {
   // build the gp parameter menu
   menuGPParameter = new QMenu( this );
@@ -363,12 +363,15 @@ void SIG_GUIGPExperiment::slotStartEvolution()
       // throws.
       evolutionRunning = true;
       endedBecause = QString();
+      generationAtStart = gpExperiment.population.getPoolGeneration();
+      runStartedAt = QDateTime::currentDateTime();
       experimentView->generationProgBar->setRange( 0, gpExperiment.population.getSize() );
       progressTimer.start( 200 );
       try {
         guiGPManager->start();
       }
       catch (...) {
+        endedBecause = "The evolution stopped because of an error.";
         slotEvolutionStopped();
         throw;
       }
@@ -379,6 +382,56 @@ void SIG_GUIGPExperiment::slotStartEvolution()
     {
       QMessageBox::warning( experimentListView, "Can't start evolution...", "The evolution cannot be started. There may be several reasons:<ul><li>There is no robot loaded.</li><li>There are fewer than four individuals in the population</li><li>No fitness function name was specified.</li></ul>");
     }
+};
+
+// The termination condition is tested the way SIG_GPManager tests it, against
+// the settings this run was started with. A duration counts from runStartedAt,
+// which is why the interface has to keep its own copy of the start time.
+QString SIG_GUIGPExperiment::terminationAlreadyMet() const
+{
+  const SIGEL_GP::SIG_GPParameter &parameter = gpExperiment.gpParameter;
+  const QDateTime now = QDateTime::currentDateTime();
+
+  QString byTime;
+  if( parameter.getTerminationUsesDate() )
+    {
+      const QDateTime end = parameter.getTerminationTime();
+      if( end <= now )
+	byTime = "it terminates by time, on " + end.toString( "d MMMM yyyy, hh:mm" )
+		 + ", which has passed. Change the date under \"By time\"";
+    }
+  else
+    {
+      const int seconds =   ( ( ( parameter.getTerminationDurationDays() * 24
+				  + parameter.getTerminationDurationHours() ) * 60
+				+ parameter.getTerminationDurationMinutes() ) * 60 )
+			  + parameter.getTerminationDurationSeconds();
+      if( runStartedAt.addSecs( seconds ) <= now )
+	byTime = "its running time of " + QString::number( seconds )
+		 + " seconds is up. Change the duration under \"By time\"";
+    }
+
+  QString byGeneration;
+  if( parameter.getTerminationGenerationNo() <= 0 )
+    byGeneration = "it terminates after "
+		   + QString::number( parameter.getTerminationGenerationNo() )
+		   + " generations. Change the number under \"By generation\"";
+
+  QString reason;
+  switch( parameter.getTerminationModel() )
+    {
+    case SIGEL_GP::SIG_GPParameter::byTime:           reason = byTime; break;
+    case SIGEL_GP::SIG_GPParameter::byGeneration:     reason = byGeneration; break;
+    case SIGEL_GP::SIG_GPParameter::byTimeGeneration:
+      reason = byTime.isEmpty() ? byGeneration : byTime; break;
+    case SIGEL_GP::SIG_GPParameter::byUser:           break;
+    }
+
+  if( reason.isEmpty() )
+    return QString();
+
+  return "The evolution ended at once, because " + reason
+	 + " on the GP Parameters page, tab Evolution control.";
 };
 
 void SIG_GUIGPExperiment::slotStopEvolution()
@@ -716,6 +769,14 @@ void SIG_GUIGPExperiment::slotEvolutionStopped()
 
   // Show the generation the run reached.
   experimentView->lcdnumberGenerations->display( gpExperiment.population.getPoolGeneration() );
+
+  // A run that completed no generation, and that nobody stopped, leaves the
+  // window looking exactly like one that worked: the Start button simply comes
+  // back. Say why when the termination condition is what ended it.
+  if(    endedBecause.isEmpty()
+      && gpExperiment.population.getPoolGeneration() == generationAtStart
+      && guiGPManager && !guiGPManager->userTerminated )
+    endedBecause = terminationAlreadyMet();
 
   if( !endedBecause.isEmpty() )
     {

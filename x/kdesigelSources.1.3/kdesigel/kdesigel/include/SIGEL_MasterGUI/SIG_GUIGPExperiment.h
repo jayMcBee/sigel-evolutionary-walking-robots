@@ -259,6 +259,7 @@ namespace SIGEL_MasterGUI
        */
       bool isRunning();
 
+
       /**
        * Returns fileName with the given ending.
        *
@@ -272,6 +273,14 @@ namespace SIGEL_MasterGUI
        */
       QString checkEnding( QString fileName, QString ending );
 
+
+    private:
+      /**
+       * What to tell the user when the termination condition of this experiment
+       * holds at the end of a run that completed no generation. Empty when the
+       * condition does not hold.
+       */
+      QString terminationAlreadyMet() const;
 
     protected:
 
@@ -358,10 +367,22 @@ namespace SIGEL_MasterGUI
       QTimer progressTimer;
 
       /**
-       * Why the run ended, shown by slotEvolutionStopped. Empty when the run
-       * ended on its own terms.
+       * What slotEvolutionStopped tells the user about the run that just ended.
+       * Empty means there is nothing to say, which is the ordinary case.
        */
       QString endedBecause;
+
+      /**
+       * The pool generation as the run started. slotEvolutionStopped compares
+       * it to tell a run that completed no generation from one that did.
+       */
+      int generationAtStart;
+
+      /**
+       * When the run started, which is what a termination by duration counts
+       * from. SIG_GPManager keeps its own and does not show it.
+       */
+      QDateTime runStartedAt;
       
       /**
        * The SIG_ExperimentItem belonging to the experiment.

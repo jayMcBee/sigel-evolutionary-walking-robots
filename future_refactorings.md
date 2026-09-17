@@ -253,18 +253,14 @@ touched, because changing one changes behaviour against the reference binary.
   *Signature of the fault: main thread in `hrtimer_nanosleep`, seconds of CPU
   over hours, no `sigel_slave` at all.*
 
-- [ ] **22. Say why a run ended at once.** Start runs the evolution and it ends
-  immediately when the termination condition already holds — every shipped
-  experiment carries `TERMINATIONUSESDATE 1` and `TERMINATIONMODEL 0`, which is
-  `byTime`, on a date in 2001, and the shipped populations are
-  already evaluated, so `SIG_GPManager::checkTerminationConditions` returns true
-  after the first `evalNewIndis`. The Start button greys and comes back and the
-  window shows nothing else. The GUI must say which condition ended the run.
-  `SIG_GUIGPExperiment::slotStartEvolution`, and the setting is on the GP
-  Parameters page, tab Evolution control, "Termination by".
-  **The machinery exists.** D41 added `endedBecause`, which
-  `slotEvolutionStopped` shows when it is not empty. This item is the second
-  reason to fill it in.
+- [x] **22. Say why a run ended at once** — done 2026-09-17, D42.
+  `SIG_GUIGPExperiment::slotEvolutionStopped` says so when the run completed no
+  generation, nobody stopped it, and `terminationAlreadyMet` finds the condition
+  already true. It names the setting that caused it and the tab to change it on.
+  **Two cases it deliberately does not cover.** MetaGP with `SAVEEXIT` set —
+  which all 14 shipped experiments carry — completes its first generation, so
+  the branch never runs and only the counter moves. And a run that ends for any
+  other silent reason says nothing rather than guess.
 
 - [ ] **23. The window stops answering during a run.**
   `SIG_GUIGPExperiment::slotStartEvolution` runs the whole evolution on the GUI
