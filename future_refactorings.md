@@ -408,6 +408,44 @@ touched, because changing one changes behaviour against the reference binary.
   Matters before `check.sh` ever runs one of the three PVM scenarios.
   *Any printf on an early-return path here is lost unless it flushes itself.*
 
+- [ ] **39. Clear the 2003 Dortmund PVM hosts out of the experiments.**
+  All 14 shipped `.exp` carry them: 22 distinct host names — `wickie`, `bube`,
+  `eiche`, `pappel`, `urobe` and the rest — in 210 `PVMHOST` lines, with slave
+  directories under `/home/pg368/sawitzki/sigel` and
+  `/home/pg368b/ross/projects/sigel`, and 28 `GRAVEYARDDIRECTORY` and
+  `POOLIMAGEDIRECTORY` values under the same roots. None has existed since 2003,
+  so every one of them is a spawn that fails.
+  **The robot block carries them too.** Each of the 31 `Body` entries names its
+  2001 directory, as in `Body base.wrl /home/pg368/sawitzki/hammer/ y`.
+  `check.sh`'s `v2 round trip` section pins an md5 over hammer's whole robot
+  block and an `expstruct` shape hash that covers those entries, so changing the
+  paths moves both pins. The 2026-09-18 attempt changed them without saying so.
+  **Where they are expected output:**
+  - `pagesave-baseline.txt`: 16 host lines and 4 directory values — 1.3's OWN
+    output, captured from the 2003 binary and impossible to make again here.
+  - `v8-1.3-gp-blocks.txt`: the 20 hammer host names, in the order the
+    `v2 round trip` section compares against.
+  - `check.sh`: the three pinned `pvmhost` lines of that section, and its
+    host-parser test.
+  - `guibehaviour-baseline.txt`: 19 lines — 10 from the `pages` scenario, 2 from
+    `exportall`, 7 from `dialogs`. Regenerable here.
+  `v6-1.3-friction-nocollide.txt` names two such paths in its method note; no
+  check reads them. `dictorder`, `fitness`, `guidump` and `xtest` carry none.
+  **Settle one conflict first.** Changing `twoBasesSimpleFitness2.exp` changes
+  what `pagesave-baseline.txt` must hold, and that file is 1.3's output for
+  exactly this experiment — PORTING.md, the paragraph beginning
+  "`pagesave-baseline.txt` is the one that cannot be made again here". The
+  handover says to map distinct placeholders consistently across the
+  experiments, `pagesave-baseline.txt` and `check.sh`'s host-parser test, which
+  means editing 1.3's output by the same map. Decide which. Every scenario in
+  `guibehaviour-baseline.txt` loads that experiment, so its 19 lines move only
+  if the experiment changes.
+  **Copy both data trees before the first write.** The 2026-09-18 attempt did
+  not, and lost the only copy of `data-reordered/`.
+  **Decide first what replaces them** — this machine, or an empty list. An empty
+  list makes `slotStartEvolution` run with nowhere to spawn, which is a
+  different silent failure from the one D41 and D42 just closed.
+
 - [ ] **35. Remove the Windows and Visual Studio support.** Decided by Jan
   2026-09-09. It does not build here and nothing tests it.
   **What is there:** 9 Visual Studio project files at the source root, 7,962

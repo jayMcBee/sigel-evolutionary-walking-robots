@@ -1,20 +1,20 @@
 #!/usr/bin/env python3
 """Rewrite robot data so declaration order IS the order the simulation uses.
 
-PORTING.md Phase D. Q2Dict's hash order currently numbers the links, joints,
-sensors and drives (SIG_DynaMechsSimulationData.cpp). Deleting the shim makes
-the containers insertion-ordered, so that numbering has to come from the file
-instead. This permutes each file's declarations into the order the shim produces
-today, taken from dictorder-baseline.txt.
+PORTING.md Phase D. The Qt 2 build iterated links, joints, sensors and drives in
+Q2Dict's hash order. The Qt 6 containers keep insertion order, so that order has
+to come from the file. This permutes each file's declarations into the order
+dictorder-baseline.txt records: its `rrb` lines for a .rrb, its `copy` lines for
+a .exp.
 
 Reads data/, writes data-reordered/. Never writes data/.
 
-Bodies and materials are deliberately left alone: nothing numbers them
-(loadGeometries is order-free, materials are looked up by name), and for octopus
-the target body order is not even reachable by permuting links.
+Bodies and materials are not permuted: nothing numbers them (loadGeometries is
+order-free, materials are looked up by name), and body order follows link order.
 
-Every rewrite is checked to be a pure permutation -- same multiset of lines in
-and out. A reorderer that quietly drops a line is worse than one that fails.
+Each target must name exactly the entities the file declares, and each rewrite
+must be a pure permutation of the file's lines. One file failing either stops
+the run before anything is written.
 """
 import collections, pathlib, re, sys
 
@@ -35,7 +35,7 @@ def read_baseline(path):
             tag, link, name = m.groups()
             cur.setdefault(tag, {}).setdefault(("point", link), []).append(name)
             continue
-        m = re.match(r"(\w+)\s+(\w+)\s+\d+\s+(\S+)$", line)
+        m = re.match(r"(\w+)\s+(\w+)\s+\d+\s+#-?\d+\s+(\S+)$", line)
         if m:
             tag, kind, name = m.groups()
             cur.setdefault(tag, {}).setdefault(kind, []).append(name)
@@ -47,11 +47,11 @@ def permutation_ok(before, after):
 
 
 def reorder(seq, key_of, target):
-    """Order seq by target; anything not named in target keeps its place."""
-    rank = {n: i for i, n in enumerate(target)}
-    known = sorted((x for x in seq if key_of(x) in rank), key=lambda x: rank[key_of(x)])
-    it = iter(known)
-    return [next(it) if key_of(x) in rank else x for x in seq]
+    """Order seq by target. Both must name the same entities."""
+    names = [key_of(x) for x in seq]
+    if sorted(names) != sorted(target) or len(set(target)) != len(target):
+        raise ValueError(f"file declares {names}, baseline orders {target}")
+    return sorted(seq, key=lambda x: target.index(key_of(x)))
 
 
 # --- .rrb ------------------------------------------------------------------
@@ -84,21 +84,18 @@ def split_rrb(text):
 def rewrite_rrb(text, target):
     blocks = split_rrb(text)
     for kind in NUMBERED:
-        if kind not in target:
-            continue
         idx = [i for i, b in enumerate(blocks) if b[0] == kind]
-        chosen = reorder([blocks[i] for i in idx], lambda b: b[1], target[kind])
+        chosen = reorder([blocks[i] for i in idx], lambda b: b[1], target.get(kind, []))
         for i, b in zip(idx, chosen):
             blocks[i] = b
     # point lines inside each link block
     out = []
     for kind, name, lines in blocks:
-        key = ("point", name)
-        if kind == "link" and key in target:
+        if kind == "link":
             pidx = [i for i, l in enumerate(lines) if l.lstrip().startswith("point ")]
             pts = [lines[i] for i in pidx]
             got = reorder(pts, lambda l: l.split("point ", 1)[1].split("=")[0].strip(),
-                          target[key])
+                          target.get(("point", name), []))
             for i, l in zip(pidx, got):
                 lines[i] = l
         out.append(lines)
@@ -114,8 +111,8 @@ def rewrite_rrb(text, target):
 #
 # Stored numbers are read straight back by SIG_Link's stream constructor
 # (SIG_Link.cpp:65 "tx >> name >> number"), so permuting lines leaves every
-# number exactly as 2001 wrote it. Only the order changes, which is the thing
-# SIG_DynaMechsSimulationData turns into the DynaMechs body index.
+# number exactly as 2001 wrote it. Only the order changes: the order the next
+# reader of the robot's stream sees, and so each link's joint order there.
 EXP_UNITS = {          # leading token -> (name field, extra continuation lines)
     "Link": (1, 0),
     "RotationalJoint": (2, 1),
@@ -132,7 +129,7 @@ def rewrite_exp(text, target):
         lo = lines.index("StreamedRobot\n")
         hi = lines.index("RobotComplete\n", lo)
     except ValueError:
-        return text                      # no robot block, nothing to do
+        raise ValueError("no line that is exactly StreamedRobot or RobotComplete")
 
     units, i = [], lo + 1                # [(kind, name, [lines])], gaps as (None,..)
     while i < hi:
@@ -146,10 +143,8 @@ def rewrite_exp(text, target):
         i += 1 + extra
 
     for kind in NUMBERED:
-        if kind not in target:
-            continue
         idx = [n for n, u in enumerate(units) if u[0] == kind]
-        chosen = reorder([units[n] for n in idx], lambda u: u[1], target[kind])
+        chosen = reorder([units[n] for n in idx], lambda u: u[1], target.get(kind, []))
         for n, u in zip(idx, chosen):
             units[n] = u
 
@@ -161,34 +156,31 @@ def main():
     base = read_baseline(ROOT / "dictorder-baseline.txt")
     if not DST.exists():
         sys.exit(f"{DST} does not exist -- cp -a data data-reordered first")
-    changed = failed = 0
-    for src in sorted(SRC.rglob("*.rrb")):
-        target = base.get(src.name, {}).get("rrb")
+    jobs = [(p, "rrb", rewrite_rrb) for p in sorted(SRC.rglob("*.rrb"))] \
+         + [(p, "copy", rewrite_exp) for p in sorted(SRC.glob("Experiments/*.exp"))]
+    names = sorted(p.name for p, _, _ in jobs)
+    if names != sorted(base):
+        sys.exit(f"data/ holds {names}, the baseline names {sorted(base)} -- nothing written")
+    done = []
+    for src, tag, rewrite in jobs:
+        target = base.get(src.name, {}).get(tag)
         if target is None:
-            sys.exit(f"no baseline entry for {src.name}")
-        text = src.read_text()
-        new = rewrite_rrb(text, target)
+            sys.exit(f"no baseline entry for {src.name} -- nothing written")
+        text = src.read_bytes().decode(errors="surrogateescape")    # keeps CRLF
+        try:
+            new = rewrite(text, target)
+        except ValueError as e:
+            sys.exit(f"{src.name}: {e} -- nothing written")
         if not permutation_ok(text.splitlines(), new.splitlines()):
-            print(f"NOT A PERMUTATION: {src.name}", file=sys.stderr); failed += 1; continue
-        dst = DST / src.relative_to(SRC)
-        dst.write_text(new)
-        changed += text != new
+            sys.exit(f"NOT A PERMUTATION: {src.name} -- nothing written")
+        if not (DST / src.relative_to(SRC)).parent.is_dir():
+            sys.exit(f"no directory for {src.relative_to(SRC)} in {DST} -- nothing written")
+        done.append((src, text, new))
+    for src, text, new in done:
+        (DST / src.relative_to(SRC)).write_bytes(new.encode(errors="surrogateescape"))
         print(f"  {'reordered' if text != new else 'unchanged'}  {src.name}")
-    for src in sorted(SRC.glob("Experiments/*.exp")):
-        target = base.get(src.name, {}).get("copy")
-        if target is None:
-            sys.exit(f"no baseline entry for {src.name}")
-        text = src.read_text(errors="surrogateescape")
-        new = rewrite_exp(text, target)
-        if not permutation_ok(text.splitlines(), new.splitlines()):
-            print(f"NOT A PERMUTATION: {src.name}", file=sys.stderr); failed += 1; continue
-        dst = DST / src.relative_to(SRC)
-        dst.write_text(new, errors="surrogateescape")
-        changed += text != new
-        print(f"  {'reordered' if text != new else 'unchanged'}  {src.name}")
-
-    print(f"{changed} rewritten, {failed} failed")
-    return 1 if failed else 0
+    print(f"{sum(text != new for _, text, new in done)} rewritten")
+    return 0
 
 
 if __name__ == "__main__":

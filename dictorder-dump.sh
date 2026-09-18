@@ -1,9 +1,11 @@
 #!/bin/sh
 # Every Q2Dict iteration order that reaches the simulation -- PORTING.md Phase D.
 #
-# Q2Dict's hash order numbers the links, joints, bodies, materials, drives,
-# sensors and each link's significant points. DynaMechs numbers its bodies from
-# that. Phase D deletes the shim, so the order has to move into the data files.
+# Q2Dict's hash order set the order of the links, joints, bodies, materials,
+# drives, sensors and each link's significant points. A robot that is copied or
+# sent to a PVM slave is rebuilt from a stream in that order, and DynaMechs
+# numbers its bodies from the joint order that rebuild leaves on each link.
+# Phase D deletes the shim, so the order has to move into the data files.
 # This prints the order the current build produces; dictorder-baseline.txt is that
 # output, committed. The check is a diff:
 #

@@ -284,3 +284,252 @@ WHAT BOUNDS A VALUE-LEVEL PROBE, AND WHY THE FORCE HALF CANNOT BE BIT-COMPARED
     double -- Queries.cpp:151 in the joint branch, :209 in pitch/roll and :261
     in the third -- and cross the same boundary.
     So a future value probe should stop at scaledState, not at registerValue.
+
+================================================================================
+2026-09-18 -- initializeJoint call order, negative zeros, fitness per individual
+================================================================================
+# The note near the top of this file says its rows are matched by call order,
+# "which V1 gates independently". V1 checks CONTAINER order. Call order is the
+# depth-first walk SIG_DynaMechsSimulationData makes over SIG_Link::getJoints().
+# It is measured here for the first time, on both machines.
+
+--- initializeJoint, octopusSimpleFitness, 1.3, verbatim ---
+Route: `sigel_slave -visualize <exp>`, attach gdb, arm, then STOP then PLAY to force
+a full reconstruction. Names read out of the Qt2 QString at obj+4. The constructor
+fired ONCE; initializeJoint fired 18 times = 9 joints x 2 (once from each adjacent link):
+   #1  joint='secondLegJoint1' 3   caller link='base' 0
+   #2  joint='secondLegJoint1' 3   caller link='secondLegLink1' 4
+   #3  joint='secondLegJoint2' 4   caller link='secondLegLink1' 4
+   #4  joint='secondLegJoint2' 4   caller link='secondLegLink2' 5
+   #5  joint='secondLegJoint3' 5   caller link='secondLegLink2' 5
+   #6  joint='secondLegJoint3' 5   caller link='secondFootLink' 6
+   #7  joint='thirdLegJoint1'  6   caller link='base' 0
+   #8  joint='thirdLegJoint1'  6   caller link='thirdLegLink1' 7
+   #9  joint='thirdLegJoint2'  7   caller link='thirdLegLink1' 7
+   #10 joint='thirdLegJoint2'  7   caller link='thirdLegLink2' 8
+   #11 joint='thirdLegJoint3'  8   caller link='thirdLegLink2' 8
+   #12 joint='thirdLegJoint3'  8   caller link='thirdFootLink' 9
+   #13 joint='firstLegJoint1'  0   caller link='base' 0
+   #14 joint='firstLegJoint1'  0   caller link='firstLegLink1' 1
+   #15 joint='firstLegJoint2'  1   caller link='firstLegLink1' 1
+   #16 joint='firstLegJoint2'  1   caller link='firstLegLink2' 2
+   #17 joint='firstLegJoint3'  2   caller link='firstLegLink2' 2
+   #18 joint='firstLegJoint3'  2   caller link='firstFootLink' 3
+
+--- initializeJoint, octopusSimpleFitness, OURS: gdb on build-fast/sigel_eval, individual 0 ---
+#1   joint='secondLegJoint1' 3   caller link='base' 0
+#2   joint='secondLegJoint1' 3   caller link='secondLegLink1' 4
+#3   joint='secondLegJoint2' 4   caller link='secondLegLink1' 4
+#4   joint='secondLegJoint2' 4   caller link='secondLegLink2' 5
+#5   joint='secondLegJoint3' 5   caller link='secondLegLink2' 5
+#6   joint='secondLegJoint3' 5   caller link='secondFootLink' 6
+#7   joint='thirdLegJoint1' 6   caller link='base' 0
+#8   joint='thirdLegJoint1' 6   caller link='thirdLegLink1' 7
+#9   joint='thirdLegJoint2' 7   caller link='thirdLegLink1' 7
+#10  joint='thirdLegJoint2' 7   caller link='thirdLegLink2' 8
+#11  joint='thirdLegJoint3' 8   caller link='thirdLegLink2' 8
+#12  joint='thirdLegJoint3' 8   caller link='thirdFootLink' 9
+#13  joint='firstLegJoint1' 0   caller link='base' 0
+#14  joint='firstLegJoint1' 0   caller link='firstLegLink1' 1
+#15  joint='firstLegJoint2' 1   caller link='firstLegLink1' 1
+#16  joint='firstLegJoint2' 1   caller link='firstLegLink2' 2
+#17  joint='firstLegJoint3' 2   caller link='firstLegLink2' 2
+#18  joint='firstLegJoint3' 2   caller link='firstFootLink' 3
+# Diffed after whitespace normalisation: identical, 18 of 18. Two samples identical.
+# Our tables at the end of the constructor, against the stored numbers in 1.3's
+# payload (v1, result 2026-09-18): 28 entries, 0 differ.
+drives[0] = firstLegJoint1Drive
+drives[1] = firstLegJoint2Drive
+drives[2] = firstLegJoint3Drive
+drives[3] = secondLegJoint1Drive
+drives[4] = secondLegJoint2Drive
+drives[5] = secondLegJoint3Drive
+drives[6] = thirdLegJoint1Drive
+drives[7] = thirdLegJoint2Drive
+drives[8] = thirdLegJoint3Drive
+sensors[0] = firstLegJoint1Sensor
+sensors[1] = firstLegJoint2Sensor
+sensors[2] = firstLegJoint3Sensor
+sensors[3] = secondLegJoint1Sensor
+sensors[4] = secondLegJoint2Sensor
+sensors[5] = secondLegJoint3Sensor
+sensors[6] = thirdLegJoint1Sensor
+sensors[7] = thirdLegJoint2Sensor
+sensors[8] = thirdLegJoint3Sensor
+dynaMechsLinks[0]->link = base
+dynaMechsLinks[1]->link = firstLegLink1
+dynaMechsLinks[2]->link = firstLegLink2
+dynaMechsLinks[3]->link = firstFootLink
+dynaMechsLinks[4]->link = secondLegLink1
+dynaMechsLinks[5]->link = secondLegLink2
+dynaMechsLinks[6]->link = secondFootLink
+dynaMechsLinks[7]->link = thirdLegLink1
+dynaMechsLinks[8]->link = thirdLegLink2
+dynaMechsLinks[9]->link = thirdFootLink
+
+--- initializeJoint, walkerNiceWalkingFitness, 1.3, verbatim ---
+Same route as octopus, on a freshly prepared walkerNiceWalkingFitness whose robot
+block was verified equal to the shipped order. The constructor fired ONCE,
+initializeJoint 36 times.
+   #1  joint='leg6Joint1' 15   caller link='body' 0
+   #2  joint='leg6Joint1' 15   caller link='shoulder6' 16
+   #3  joint='leg6Joint2' 16   caller link='shoulder6' 16
+   #4  joint='leg6Joint2' 16   caller link='leg6' 17
+   #5  joint='leg6Joint3' 17   caller link='leg6' 17
+   #6  joint='leg6Joint3' 17   caller link='foot6' 18
+   #7  joint='leg1Joint1' 0    caller link='body' 0
+   #8  joint='leg1Joint1' 0    caller link='shoulder1' 1
+   #9  joint='leg1Joint2' 1    caller link='shoulder1' 1
+   #10 joint='leg1Joint2' 1    caller link='leg1' 2
+   #11 joint='leg1Joint3' 2    caller link='leg1' 2
+   #12 joint='leg1Joint3' 2    caller link='foot1' 3
+   #13 joint='leg2Joint1' 3    caller link='body' 0
+   #14 joint='leg2Joint1' 3    caller link='shoulder2' 4
+   #15 joint='leg2Joint2' 4    caller link='shoulder2' 4
+   #16 joint='leg2Joint2' 4    caller link='leg2' 5
+   #17 joint='leg2Joint3' 5    caller link='leg2' 5
+   #18 joint='leg2Joint3' 5    caller link='foot2' 6
+   #19 joint='leg3Joint1' 6    caller link='body' 0
+   #20 joint='leg3Joint1' 6    caller link='shoulder3' 7
+   #21 joint='leg3Joint2' 7    caller link='shoulder3' 7
+   #22 joint='leg3Joint2' 7    caller link='leg3' 8
+   #23 joint='leg3Joint3' 8    caller link='leg3' 8
+   #24 joint='leg3Joint3' 8    caller link='foot3' 9
+   #25 joint='leg4Joint1' 9    caller link='body' 0
+   #26 joint='leg4Joint1' 9    caller link='shoulder4' 10
+   #27 joint='leg4Joint2' 10   caller link='shoulder4' 10
+   #28 joint='leg4Joint3' 11   caller link='leg4' 11
+   #29 joint='leg4Joint3' 11   caller link='foot4' 12
+   #30 joint='leg4Joint2' 10   caller link='leg4' 11
+   #31 joint='leg5Joint1' 12   caller link='body' 0
+   #32 joint='leg5Joint2' 13   caller link='shoulder5' 13
+   #33 joint='leg5Joint2' 13   caller link='leg5' 14
+   #34 joint='leg5Joint3' 14   caller link='leg5' 14
+   #35 joint='leg5Joint3' 14   caller link='foot5' 15
+   #36 joint='leg5Joint1' 12   caller link='shoulder5' 13
+RAW POINTS (the oracle's): legs are entered in the order 6, 1, 2, 3, 4, 5. For legs
+6, 1, 2, 3 each joint's two calls are adjacent. Leg 4 is not: #27 leg4Joint2
+(shoulder4), then #28/#29 leg4Joint3, then #30 leg4Joint2 (leg4). Leg 5 is not, and
+differently: leg5Joint1's successor-side call arrives last, at #36.
+
+--- initializeJoint, walkerNiceWalkingFitness, OURS: gdb on build-fast/sigel_eval, individual 0 ---
+# Captured 23:33:59, before the 1.3 capture above arrived.
+#1   joint='leg6Joint1' 15   caller link='body' 0
+#2   joint='leg6Joint1' 15   caller link='shoulder6' 16
+#3   joint='leg6Joint2' 16   caller link='shoulder6' 16
+#4   joint='leg6Joint2' 16   caller link='leg6' 17
+#5   joint='leg6Joint3' 17   caller link='leg6' 17
+#6   joint='leg6Joint3' 17   caller link='foot6' 18
+#7   joint='leg1Joint1' 0   caller link='body' 0
+#8   joint='leg1Joint1' 0   caller link='shoulder1' 1
+#9   joint='leg1Joint2' 1   caller link='shoulder1' 1
+#10  joint='leg1Joint2' 1   caller link='leg1' 2
+#11  joint='leg1Joint3' 2   caller link='leg1' 2
+#12  joint='leg1Joint3' 2   caller link='foot1' 3
+#13  joint='leg2Joint1' 3   caller link='body' 0
+#14  joint='leg2Joint1' 3   caller link='shoulder2' 4
+#15  joint='leg2Joint2' 4   caller link='shoulder2' 4
+#16  joint='leg2Joint2' 4   caller link='leg2' 5
+#17  joint='leg2Joint3' 5   caller link='leg2' 5
+#18  joint='leg2Joint3' 5   caller link='foot2' 6
+#19  joint='leg3Joint1' 6   caller link='body' 0
+#20  joint='leg3Joint1' 6   caller link='shoulder3' 7
+#21  joint='leg3Joint2' 7   caller link='shoulder3' 7
+#22  joint='leg3Joint2' 7   caller link='leg3' 8
+#23  joint='leg3Joint3' 8   caller link='leg3' 8
+#24  joint='leg3Joint3' 8   caller link='foot3' 9
+#25  joint='leg4Joint1' 9   caller link='body' 0
+#26  joint='leg4Joint1' 9   caller link='shoulder4' 10
+#27  joint='leg4Joint2' 10   caller link='shoulder4' 10
+#28  joint='leg4Joint3' 11   caller link='leg4' 11
+#29  joint='leg4Joint3' 11   caller link='foot4' 12
+#30  joint='leg4Joint2' 10   caller link='leg4' 11
+#31  joint='leg5Joint1' 12   caller link='body' 0
+#32  joint='leg5Joint2' 13   caller link='shoulder5' 13
+#33  joint='leg5Joint2' 13   caller link='leg5' 14
+#34  joint='leg5Joint3' 14   caller link='leg5' 14
+#35  joint='leg5Joint3' 14   caller link='foot5' 15
+#36  joint='leg5Joint1' 12   caller link='shoulder5' 13
+# Diffed after whitespace normalisation: identical, 36 of 36.
+
+--- negative zeros our master writes, and whether the slave's copy scores the same ---
+# gdb on a scratch probe that builds the tag-23 payload the way
+# SIG_GPFitnessTrainer does (copy, prepareDynaMechs, savePVMDataTransfer), with a
+# breakpoint on QTextStream::operator<<(double) while SIG_Robot::writeToFileTransfer
+# runs; each double's sign bit is read before formatting.
+octopusSimpleFitness      copy constructor's write:  715 doubles, 0 negative zeros
+                          payload write:            1057 doubles, 2 negative zeros
+walkerNiceWalkingFitness  copy constructor's write: 1395 doubles, 0 negative zeros
+                          payload write:            2295 doubles, 88 negative zeros
+# 1.3's payload text carries 2 and 88 '-0' tokens; ours carries 0 and 0, because
+# Qt 6 prints -0.0 as '0'. The counts agree. For octopus the places agree too:
+# v1-1.3-roundtrip.txt, the payload diff. For walker only the count is measured.
+# Same probe, one process: fitness on the master's prepared robot, and on the
+# robot rebuilt from the payload text by SIG_GPPVMData::loadPVMDataTransfer.
+octopusSimpleFitness.exp 0  master 0.70032546752673586  slave 0.70032546752673586  same
+octopusSimpleFitness.exp 1  master 0.75282618952442282  slave 0.75282618952442282  same
+octopusSimpleFitness.exp 2  master 0.47469276511341008  slave 0.47469276511341008  same
+walkerNiceWalkingFitness.exp 0  master 0  slave 0  same
+walkerNiceWalkingFitness.exp 1  master 0.14151186129657561  slave 0.14151186129657561  same
+walkerNiceWalkingFitness.exp 2  master 0.14151186129657561  slave 0.14151186129657561  same
+# Not observed on these 6. No other individual measured.
+
+--- fitness per individual, 42 values ---
+# 1.3: SLAVES=1, POOLPOS 0/1/2 forced to FITNESS=-1 so evalNewIndis evaluates
+# exactly those three first. Values read with gdb in the master at pvm_upkdouble on
+# return. Each experiment run twice: 42 of 42 bit-identical between the runs.
+# Binding checked by the program block inside each payload: 42 matched.
+# Ours: fitness-baseline.txt, aarch64. ./fitness-check.sh on the repaired
+# data-reordered/ gives exactly these values: its diff against the file is empty.
+# Our index i is INDIVIDUAL(i) in the file, which carries the NAME below and POOLPOS=i
+# for all 42.
+# A value on x87 and a value on aarch64 are not expected to agree (PORTING.md,
+# Replication). Nothing is concluded from the numbers.
+experiment                     i  name   1.3 bits          1.3 %.17g                   ours
+hammerNiceWalkingFitness       0  10443  3fd6875d24e1fced  0.35201195337135865         0.35196750402063648
+hammerNiceWalkingFitness       1  10138  3fdd14169277b09b  0.45435108474226532         0.4532453878972949
+hammerNiceWalkingFitness       2  10483  3fd865c440357cc3  0.38121134062198453         0.35462296984749009
+insectNiceWalkingFitness       0  4436   0000000000000000  0                           0
+insectNiceWalkingFitness       1  4396   0000000000000000  0                           0
+insectNiceWalkingFitness       2  4731   3fe1f35780c5b1cb  0.5609548106272596          0.47364198148006198
+octopusNiceWalkingFitness      0  17469  3fdf5df85c066315  0.49011048304377997         0.50126372434136857
+octopusNiceWalkingFitness      1  17053  3fe035576ea03043  0.50651141745175499         0.49643405009181318
+octopusNiceWalkingFitness      2  17264  0000000000000000  0                           0.50680244374877925
+octopusSimpleFitness           0  5367   3fda93068b7f7a97  0.4152237283978279          0.70032546752673586
+octopusSimpleFitness           1  5192   3fe7452411c0ed87  0.72719005076889764         0.75282618952442282
+octopusSimpleFitness           2  5220   3fdc31f06e3e3be4  0.44054804578712337         0.47469276511341008
+runnerNiceWalkingFitness       0  34376  0000000000000000  0                           0
+runnerNiceWalkingFitness       1  34644  0000000000000000  0                           0
+runnerNiceWalkingFitness       2  34431  0000000000000000  0                           0
+runnerSimpleFitness            0  14430  3fe73fe64649b683  0.72655023315537937         0.60660924575645803
+runnerSimpleFitness            1  13751  3fe73fe64649b683  0.72655023315537937         0.60660924575645803
+runnerSimpleFitness            2  13901  3fe73fe64649b683  0.72655023315537937         0.60660924575645803
+shortHammerNiceWalkingFitness  0  28989  0000000000000000  0                           0
+shortHammerNiceWalkingFitness  1  29023  0000000000000000  0                           0
+shortHammerNiceWalkingFitness  2  28958  0000000000000000  0                           0
+twoBasesHardlyReducedIS        0  17211  3f67dd86b380680a  0.00291324909995883         0.0045802847516633778
+twoBasesHardlyReducedIS        1  16611  3f67dd86b380680a  0.00291324909995883         0.0045802847516633778
+twoBasesHardlyReducedIS        2  17187  3f871af9ecad94e8  0.011281921897259697        0.0070264802539394943
+twoBasesHighCrossOverRate      0  12266  3f05bdc7f95e4544  4.1468301034029129e-05      4.1468301034030979e-05
+twoBasesHighCrossOverRate      1  12040  3f837e0ef34c67fb  0.0095177810667799092       0.0080872082076901188
+twoBasesHighCrossOverRate      2  11958  3f6ab35b8e3b828e  0.0032593525119042959       0.0027995166972942785
+twoBasesHighMutationRate       0  12360  3f5eb41cb9926310  0.0018739967838767337       0.007422283340153794
+twoBasesHighMutationRate       1  12352  3f97e99a712abe37  0.0233520633288988          0.019382675867195703
+twoBasesHighMutationRate       2  12347  3f0a9b4e3fb35065  5.0748181786326026e-05      5.074818178632749e-05
+twoBasesReducedInstructionSet  0  35277  3f78748f3965acdb  0.00597053477245454         0.019060221640418963
+twoBasesReducedInstructionSet  1  35239  3f75fc3471734850  0.0053674744187493656       0.043387118290438328
+twoBasesReducedInstructionSet  2  35144  3f73711fbdd379fc  0.0047465553190861841       0.0053041876845426527
+twoBasesSimpleFitness1         0  12266  3f05bdc7f95e4544  4.1468301034029129e-05      4.1468301034030979e-05
+twoBasesSimpleFitness1         1  12040  3f837e0ef34c67fb  0.0095177810667799092       0.0080872082076901188
+twoBasesSimpleFitness1         2  11958  3f6ab35b8e3b828e  0.0032593525119042959       0.0027995166972942785
+twoBasesSimpleFitness2         0  57478  3f0209d70354a672  3.4405588318198256e-05      3.4405588318134227e-05
+twoBasesSimpleFitness2         1  57198  3f92da788a5daa26  0.018411525197203592        0.02488790895212422
+twoBasesSimpleFitness2         2  57488  3f0db5cbd94fd83d  5.6667598222690377e-05      5.6667598222681242e-05
+walkerNiceWalkingFitness       0  11775  3fb0baa31008c2ef  0.065347854055982188        0
+walkerNiceWalkingFitness       1  11496  0000000000000000  0                           0.14151186129657561
+walkerNiceWalkingFitness       2  11265  0000000000000000  0                           0.14151186129657561
+# Bit-equal: 8 of 42, every one an exact 0. Where 1.3 gives several individuals one
+# value, ours gives those same individuals one value: runnerSimpleFitness 0=1=2,
+# twoBasesHardlyReducedIS 0=1 (the same program twice), walkerNiceWalkingFitness 1=2.
+# twoBasesSimpleFitness1 and twoBasesHighCrossOverRate agree with each other on
+# both machines because the two shipped files are byte-identical.

@@ -7,7 +7,9 @@
 # where a porting error would show. Raw IEEE 754, big-endian hex.
 #
 # WHY KEYED BY NAME. So the comparison does not depend on container order --
-# V1 already checks ordering separately, and this must not re-test it.
+# V1 checks CONTAINER order separately. The order of the calls themselves is
+# the depth-first joint walk; v5-1.3-mdh-compared.txt measures it on both
+# machines in its result dated 2026-09-18.
 #
 # CALL COUNT IS ITSELF A CHECK. setMDHParameters sits in
 # SIG_DynaMechsSimulationData::initializeJoint below "if (predecessor != caller)

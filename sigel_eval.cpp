@@ -48,14 +48,14 @@
 
 using SIGEL_Simulation::SIG_SimulationParameters;
 
-// Every Q2Dict whose iteration order reaches the simulation -- PORTING.md
-// Phase D. SIG_Robot holds six (SIG_Robot.h:60-65); all six are written in
-// iteration order by SIG_Robot::writeToFileTransfer and read back in that
-// order by SIG_DynaMechsSimulationData, which is what numbers the DynaMechs
-// bodies. (This named SIG_DynaMoSimulationData until 2026-08-28 -- that was
-// the Dynamo class, deleted with that backend. Both walked the same four
-// dicts in the same order, so the ordering this gate protects is unchanged.)
-// SIG_Link::points is a seventh, one per link.
+// Every robot container whose order reaches the simulation -- PORTING.md
+// Phase D. SIG_Robot holds six (SIG_Robot.h, its private lists); all six are
+// written in order by SIG_Robot::writeToFileTransfer, so that is the stream
+// order the next reader sees -- the copy constructor, and a PVM slave. The
+// reader appends each joint to its links' lists in stream order, and
+// SIG_DynaMechsSimulationData numbers the DynaMechs bodies by a depth-first walk
+// over SIG_Link::getJoints(); it does not use the containers' own order. That
+// walk is not printed here. SIG_Link::points is a seventh, one per link.
 //
 // D1 first dumped only links and joints. A review rebuilt the core with a
 // perturbed Q2Dict::hash and found 6 of 14 experiments whose order changed
@@ -67,12 +67,12 @@ static int SIG_NUMBER_OF(const SIGEL_Robot::SIG_Material *) { return -1; }
 
 static void dumpOrder(const SIGEL_Robot::SIG_Robot &r, const char *which)
 {
-// Position AND stored number. The two are independent: position becomes the
-// DynaMechs body index, while the stored number is what an evolved program's
-// SENSE and MOVE operands resolve through (SIG_DynaMechsSimulationQueries.cpp:
-// 93-95, SIG_DynaMechsCommandInterface.cpp, moveDrive). Reordering a .rrb changes the
-// number; reordering an .exp would change the position. A gate that watched
-// only position could not see the first.
+// Position AND stored number. The two are independent: position is the order
+// the next reader of the robot's stream sees, while the stored number is what
+// an evolved program's SENSE and MOVE operands resolve through
+// (SIG_DynaMechsSimulationQueries.cpp, sense; SIG_DynaMechsCommandInterface.cpp,
+// moveDrive). Reordering a .rrb changes the number; reordering an .exp would
+// change the position. A check that watched only position could not see the first.
 #define SIG_DUMP(label, Type, accessor)                                    \
   do {                                                                     \
     int n = 0;                                                             \

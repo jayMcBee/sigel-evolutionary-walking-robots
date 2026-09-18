@@ -97,9 +97,9 @@ Both non-default calls are 1.3's own, so the port carried them faithfully.
 |---|---|
 | shipped `.exp` and `.rrb` | **none** — precision 6, see below |
 | POV | a sub-pixel shift in a rendered image. **Nothing reads a `.pov` back**, zero readers in the tree; it is input to an external renderer |
-| PVM transfer | ours at both ends within one run. Only matters against a 1.3 slave, which nobody runs |
+| PVM transfer | ours at both ends within one run. Only matters against a 1.3 slave, which nobody runs. **Measured against 1.3's octopus payload 2026-09-18:** 15 tokens differ at 50th-digit ties, each the same double on both sides |
 | the graveyard `.ind` file name, `SIG_GPTournament.cpp, inhume` | **never written.** `LIVEUNDEAD` is 0 in all 14 shipped experiments, and nothing lists or parses the graveyard — it has a writer and no reader |
-| `-0` (Qt 6 `0`, glibc `-0`, differs at every precision) | absent from all shipped data, and the port writes none |
+| `-0` (Qt 6 `0`, glibc `-0`, differs at every precision) | absent from all shipped data. **Not absent from the PVM stream:** our master formats as many −0.0 values as 1.3's — 2 in octopus's payload, 88 in walker's — and prints each as `0` where 1.3 printed `-0`, so our slave reads +0 where 1.3's reads −0 (oracle, 2026-09-18; `v5-1.3-mdh-compared.txt`). On our machine the slave's robot scores the same as the master's for individuals 0 to 2 of both experiments; no other individual measured |
 
 **THE SHIPPED-DATA CLAIM WAS WRONG AND IS WITHDRAWN.** This section used to say
 the difference "is in a shipped file, `twoBasesHighMutationRate.exp:112290`". The
@@ -845,6 +845,167 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 
 ### Handover — one owner at a time
+
+**2026-09-18 — THE EXPERIMENT DATA WAS DAMAGED, AND IT IS REPAIRED.**
+
+**What happened.** Both untracked trees were written over while clearing the
+2003 Dortmund PVM hosts out of the experiments (item 39 in
+`future_refactorings.md`), and neither was copied first. `data-reordered/` was
+the only copy of the tree the checks had proved. `data/` was then deleted.
+
+**`data/` is the clean download again**, built from archives that are
+byte-identical to `sigel.sourceforge.net` today: `experiments.tar.gz`,
+`robots.tar.gz` and the 14 `*Experiment.tar.gz` from `seiten/ergebnisse_de.html`.
+The two `runner*.exp` come from their archives, and each archive is also
+extracted to `results/<name>/`. `results/endbericht.pdf` matches the live copy;
+`endbericht.txt` is the local `pdftotext` output from before the loss. **The two
+tarballs are git-ignored, not tracked.** Everything that reads `data/` works
+unchanged: `check.sh` in three places, `replicate.sh` in two, and
+`dictorder-reorder.py` as its source; `check.sh` and `dictorder-dump.sh` also
+name it in messages. `check.sh`'s v2 round trip still reads the clean input that
+1.3's reference was captured from.
+
+**`data-reordered/` is the proved tree again**, and three measurements say so:
+
+- `./dictorder-dump.sh | diff -u dictorder-baseline.txt -` is **empty**, sampled
+  twice. The script reorders 7 of 7 `.rrb` and 0 of 14 `.exp`, which is what D2
+  recorded in August.
+- `dictorder-reorder.py` and `dictorder-baseline.txt` **from `e94e3ad`**, the
+  commit that built the August tree, run on today's `data/`, give a tree
+  byte-identical to today's `data-reordered/` in all 21 files.
+- `diff -rq data data-reordered` lists the 7 `.rrb` and nothing else. Every
+  `.rrb` is a pure permutation of whole blocks and point lines.
+
+**The script defect, fixed.** `read_baseline` expected four fields; the dump has
+printed five — `rrb      link       0 #0   base` — since `9638f2e`, so no link,
+joint, sensor or drive target was parsed, and the script reordered points only
+without a word. It now refuses a target that does not name exactly the entities
+the file declares, an `.exp` without a robot block, a file set that differs from
+the baseline's, and a missing destination directory — and it writes nothing
+until every file has passed. Tested by breaking the baseline or the tree nine
+ways: each exits 1 and writes nothing.
+
+**What the rebuild before this repair still carried, measured.** It restored the
+12 `.exp` from `experiments.tar.gz` and nothing else: both `runner*.exp` and all
+14 `results/*/*.exp` still carried the host edit, and that edit had also
+rewritten 37 `Body … /home/pg368/…/ y` entries inside robot blocks. Its dump
+differed from the baseline in 602 changed lines, 16 hunks, all in 6 `.rrb`
+sections; no `.exp` section differed.
+**`~/sigel-data-download-20260918.tar.gz` is not the clean download** — its
+`runner*.exp` and `results/` carry the edit. It,
+`~/sigel-experiments-qt6-20260918.tar.gz` and
+`~/sigel-data-reordered-session-start-20260918.tar.gz` all hold the damaged
+state. The clean state comes from the archives, not from any of them.
+Two check outputs from 2026-09-02, `x11b-gpp.gpp` and `x11b-ow.sip`, were
+removed from `data-reordered/Experiments/`; `guidrive` writes to
+`$SIGEL_SCRATCH` or `/tmp` now.
+
+**What three independent reviews found**, one told to disprove the claim:
+
+- **The 7 `.rrb` do not number like 1.3, and never did.** 185 of 212 stored
+  numbers name a different entity — D2's choice, recorded below as open to
+  reversal, and unchanged. 1.3's side is now measured; see the `.rrb` bullet
+  below. The 14 `.exp` carry their own numbers and are not affected.
+- **The dump does not print the order that numbers the DynaMechs bodies.**
+  `SIG_DynaMechsSimulationData::initializeArticulation` numbers them by a
+  depth-first walk over `SIG_Link::getJoints()`. That list is in the order the
+  joints were attached: the stream's order for a robot read from an `.exp`, a
+  copy or PVM, and declaration order for a `.rrb`. `drives` and `sensors` are
+  indexed by stored number, and the containers' own order is not used.
+  `sigel_eval.cpp`, `dictorder-dump.sh`, `dictorder-reorder.py`,
+  `physics_backends.md` and D2 below said container position becomes the body
+  index; corrected. V5's note that V1 checks call order was wrong too: V1 checks
+  container order.
+- **1.3's real evolution rebuilds the robot once more than `sigel_eval` does**:
+  `SIG_GPFitnessTrainer` copies it, and the slave re-reads it from the PVM
+  stream. The slave receives that stream in file order (below), and its
+  containers then hold `insect`, both `octopus` and `walker` in hash order.
+  Derived from source; nothing in the simulation reads that order. Each link's joint order, which does reach the physics, comes out
+  the same under file order and hash order for all 14 `.exp` — derived for all
+  14, and measured on both machines for octopus and walker, below.
+
+**What 1.3 itself says, asked through the oracle 2026-09-18.** Raw output in
+`verification-against-sigel-1.3/`: `v1-1.3-roundtrip.txt` and
+`v5-1.3-mdh-compared.txt`, each under a result dated 2026-09-18. Our half is
+beside it in the same place.
+
+- **Same inputs.** The oracle fetched the four archives fresh; each sha256 equals
+  ours. The robot blocks of all 14 `.exp` hash the same on both machines.
+- **A real 1.3 slave receives the robot in file order.** Captured at the
+  master's `pvm_send`, tag 23: octopus 70 of 70 payloads, walker 37 of 37. The
+  robot our master writes for a slave matches octopus in all 43 entities, in
+  order and stored number.
+- **The physics walk is the same.** `initializeJoint`: octopus 18 of 18 calls
+  and walker 36 of 36 identical on 1.3 and ours, in name, number, calling link
+  and order — walker's two legs whose calls come out of order included. Ours was
+  captured before 1.3's arrived. Our `drives`, `sensors` and link tables for
+  octopus: 28 entries, each the entity whose stored number in 1.3's payload is
+  its index.
+- **Load and save, all 14, robot block only.** 1.3's second save has the input's
+  robot block for 14 of 14; its first differs for 8. Our robot block is a fixed
+  point on all 14 and equals 1.3's second save byte for byte on 14 of 14. The 8
+  are D3's known difference. Whole files differ, as V8 result 5 says: 1.3 adds
+  ten keys on the first save.
+- **Fitness per individual, 42 values**, the same individuals on both sides,
+  bound by name. 1.3 repeats bit for bit. Bit-equal across the two machines:
+  8 of 42, every one an exact 0. Where 1.3 gives several individuals one value,
+  ours does too, on the same individuals. Nothing more is read from the numbers:
+  x87 against aarch64.
+- **The payload, octopus, all 259 lines.** The 182 Polygon lines are
+  byte-identical. The 13 Geometry lines carry the same values; four differ in
+  text only, at exact decimal ties in the 50th digit, where glibc rounds half
+  to even and Qt 6 rounds half away from zero — the fourth family below. Of the
+  64 other lines, 46 are identical; the rest differ in computed link frames and
+  joint values, by at most 4.4e-16, in 7 more such ties, and in two `-0` tokens.
+  Ties are common at precision 50; the fourth family below has the counts. No
+  name, stored number or token count differs.
+- **One difference found: `-0` on the PVM wire.** Our master formats as many −0.0
+  values as 1.3's — 2 in octopus's payload, at the same two places, and 88 in walker's,
+  counted only; read as sign bits before formatting — but Qt 6 prints them as
+  `0` where 1.3 printed `-0`, so our slave reads +0 where 1.3's reads −0. On our
+  machine the master's robot and the slave's rebuilt robot score the same, bit
+  for bit, for individuals 0 to 2 of both experiments. Not observed on those 6;
+  no other individual measured. See the `-0` row in §2.
+- **How 1.3 numbers a robot built from a `.rrb`: by declaration index.**
+  Measured through 1.3's own File > Import > Robot for hammer, octopus and
+  walker, and the shipped experiments carry exactly that numbering: 212 of 212
+  entities over all 7 models. Our port numbers by declaration position too.
+  From the `.rrb` as shipped, in `data/`, 123 of 123 entities of those three
+  robots carry 1.3's number; from D2's reordered `.rrb`, 12 of 123. **So D2's
+  reordering costs 1.3's numbering for a new experiment built from a model.**
+  It also changes each link's joint list for insect, octopus, runner and walker,
+  because a `.rrb` attaches joints in declaration order.
+- **What joint order a 1.3 slave gets, measured on octopus.** It depends on how
+  often the experiment was saved: a fresh import and the same robot saved and
+  reloaded hand the slave different joint orders, 16 payloads each. But in both,
+  base's three joints come second leg, third leg, first leg, and that is the
+  order DynaMechs numbers the legs' bodies in. D2's reordered `octopus.rrb`
+  declares them in that order; the shipped one declares first, second, third.
+  **So Jan has a choice, not taken here:** keep D2, and match 1.3's body order
+  but not its numbering, 185 of 212 entities; or reverse D2, and match 1.3's
+  numbering but not its body order for insect, octopus, runner and walker —
+  measured on octopus, derived from the files for the other three.
+  Numbering decides which joint `MOVE` and `SENSE` address. Body order decides
+  the order in which DynaMechs numbers and processes the links. Neither touches
+  the 14 shipped experiments, which carry their own numbers.
+- **Not yet answered:** walker's payload line by line.
+
+**The job that caused this is still open** — item 39 in `future_refactorings.md`,
+clearing the 2003 Dortmund hosts. Jan: *"This is a privacy concern and defunct
+logic!"*. **Do not use one repeated placeholder name.** `check.sh`'s
+`v2 round trip` section compares the *order* of 20 host names against the
+oracle's capture in `v8-1.3-gp-blocks.txt`; identical names would leave that
+check testing nothing. Distinct placeholders, mapped consistently across the
+experiments, `pagesave-baseline.txt` and `check.sh`'s host-parser test. Item 39
+records where that rule conflicts with another.
+
+**Uncommitted at handover, and why.** D43 in four `SIGEL_GP` files, the
+responsiveness probe in `guidrive.cpp`, and the matching text in this file and
+`future_refactorings.md`. Reviewed, both controls measured, and Jan confirmed it
+on the real desktop. It waited for this repair, because the checks that clear it
+read the data tree. With it in the working tree and the repaired tree in place,
+`./check.sh` gives 1136 pass, 0 fail; checks 2 and 3 diff empty; check 4 exits 0;
+`./pvm-check.sh` passes both halves.
 
 **Never two sessions on this repository at once.** Sequential is fine;
 concurrent is not. On 2026-08-27 three concurrent sessions nearly corrupted a
@@ -2055,7 +2216,7 @@ minimum-difference assignment optimises for the quantity the comparison exists
 to measure**: it picks whichever pairing makes the two sides agree best, so it
 cannot report a large disagreement even when one is there. It is circular, and it
 fails silently and in the flattering direction. Rematched by call order — which
-both sides emit natively and which V1 already checks independently — two
+both sides emit natively — two
 attributions swapped, the residual proved to be on one joint rather than two, and
 **three joints are exact rather than one**: the circular method had also made the
 result look worse than it was. The verdict never moved; the per-joint table did,
@@ -4709,8 +4870,9 @@ are exactly what geometry is made of.
 
 **What is still established:** 0 differences over the shipped corpus, so nothing
 we *read back* moves. **What is not:** any file this port *writes* whose values
-are exact binary fractions AND are written at a precision that cuts them. Only
-the POV-Ray export does that, at precision 5. The `.exp`, `.rrb` and `.pol`
+are exact binary fractions AND are written at a precision that cuts them. The
+POV-Ray export does that, at precision 5, and so does the PVM stream, at 50 —
+see the correction below. The `.exp`, `.rrb` and `.pol`
 writers use precision 6, where no shipped value is long enough to round.
 `QTextStream` has no tie-breaking control, so matching 1.3 would mean routing
 every real number through a C-style formatter. **§0 now measures what that would
@@ -4732,11 +4894,17 @@ difference is not.** Nothing writes an `.exp` at precision 5, and at precision 6
 that value has exactly six significant digits and prints verbatim. Measured by
 round-tripping the file: the experiment-history section comes back
 byte-identical. The class reaches synthetic grids and the POV export, and no
-shipped data.
+shipped file. **It does reach the PVM stream, measured 2026-09-18.** At precision
+50 the exact decimal expansions of these doubles cluster at 50 to 55 significant
+digits, so ties are common: built from the shipped experiments, our octopus
+payload prints 18 non-zero tokens differently from C's rounding and walker's 83,
+and 15 of octopus's differ from 1.3's own payload text. Each is the same double at both
+ends, so the slave rebuilds the same robot.
 *Found by the C5 review. The audit was correct and its sampling method could not
 see the failure — §9's "test with a representative value, not an extreme", in
 the other direction.* *`-0` remains the one
-known exception and appears in no shipped stream.*
+known exception. It appears in no shipped file, but it is in the PVM stream; the
+handover has the measurement.*
 
 *Scope: this characterises decimal literals in the shipped `.exp` and `.rrb`.
 Integers and any binary-format path are outside it.*
@@ -4923,7 +5091,12 @@ migration must reproduce exactly. **The citation here was wrong and is corrected
 class, deleted with that backend. Both backends walked the same four dicts in
 the same order, so nothing this section concludes changes and
 `dictorder-baseline.txt` did not move — but the live file is
-`SIG_DynaMechsSimulationData.cpp`.
+`SIG_DynaMechsSimulationData.cpp`. **Corrected again 2026-09-18, by review:**
+that file does not walk the four containers in order. It takes their count,
+indexes `drives`, `sensors` and its links by stored number, and numbers the
+DynaMechs bodies by a depth-first walk over `SIG_Link::getJoints()`. Container
+order reaches that walk only through the next stream written from it — a copy
+or a PVM send. The handover section has the measurement.
 
 Bodies and materials are free of *numbering* — but an earlier draft said they
 were "touched only by `loadGeometries`" and "only through `lookupMaterial`",
@@ -5004,7 +5177,8 @@ sensor `#0` was `leg1Joint1Sensor`, now `leg6Joint2Sensor`. So `MOVE 0` on a
 **Iteration order and numbering cannot both be preserved for a `.rrb`**, because
 the number *is* the declaration position (`SIG_RobotCompilerObjects.cpp, linkFind`,
 `linknumber++`) and the file has nowhere to record a number independently. The
-migration chose **iteration order**, which is what §10 asks for and what feeds
+migration chose **iteration order**, which is what §10 asks for. For a robot
+built from a `.rrb`, declaration order also sets each link's joint list, and so
 the DynaMechs body index. That choice was made silently and should not have
 been; it is written down now, and it is **open to reversal** — leaving the 7
 `.rrb` untouched would instead give declaration order = position = number =
