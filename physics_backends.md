@@ -288,8 +288,11 @@ is what "dead code" was supposed to mean.
 
 **`SIG_DynaMoSimulationData` is not "the site that numbers the DynaMechs
 bodies"** (§10 D1, §10 D2, `sigel_eval.cpp:46`). It was the **Dynamo** site.
-Both backends walked links → joints → sensors → drives in that order, so the
-orders the check protects are unchanged and `dictorder-baseline.txt` is
+Both backends were said to walk links → joints → sensors → drives in that
+order. **DynaMechs does not, corrected 2026-09-18:** it numbers its bodies by a
+depth-first walk over each link's joint list and indexes drives and sensors by
+stored number (PORTING.md, the handover). Either way the orders the check
+protects are unchanged and `dictorder-baseline.txt` is
 untouched — but the file those sections cite is the wrong one, and it no longer
 exists. The live site is `SIG_DynaMechsSimulationData.cpp`.
 
