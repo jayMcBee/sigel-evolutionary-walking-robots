@@ -173,20 +173,18 @@ Constructs the language removed. A current compiler rejects them.
   `fitness-check.sh` clean.
 
 - [ ] **15. Rename the `act` prefix to `current`.** German `aktuell`; reads as
-  the verb "act". 754 occurrences, 51 distinct names — `actExperiment` 115,
-  `actTour` 54, `actRealPosition` 53, `actInd` 48, `actSuccessor` 35,
-  `actFitness` 30, `actFitTask` 29.
-  Measured over `src/` and `include/` only.
-  **Settle the scope first:** `actExperiment` alone is 115 sites — a member, a
-  parameter and a local in four files, three in `SIGEL_GP` and one in
-  `SIGEL_MasterGUI`. D33 keeps `SIGEL_GP` untouched for behaviour; a rename is
-  not behaviour, but it is still a large diff in a frozen module. Ask Jan whether
-  it is `actExperiment` or the whole 754.
-  It reaches `actExperiment()`, `getActExperiment()`, `actExpChanged()` and
-  `slotActExpChanged()`. The last two are a signal and a slot, so the
-  string-based connect must change with them — `check.sh` has a check for exactly
-  that failure. `guidrive.cpp` names `actExpChanged` too. No reference file holds
-  these names.
+  the verb "act". **`actExperiment` is already done** — 115 sites, renamed
+  2026-09-16 along with `actExpChanged` and `slotActExpChanged`, a signal and a
+  slot whose string-based connects went with them. **636 occurrences over 49
+  distinct names remain**, measured over `src/` and `include/`: the largest are
+  `actTour`, `actRealPosition`, `actInd`, `actSuccessor`, `actFitness` and
+  `actFitTask`. Re-measure before starting.
+  **Settle the scope first.** Most of what is left is in `SIGEL_GP`, which D33
+  keeps untouched for behaviour; a rename is not behaviour, but it is still a
+  large diff in a frozen module. Ask Jan whether to do it at all.
+  Any signal or slot in the set breaks its string-based connect if only one side
+  moves — `check.sh` has a check for exactly that failure. No reference file
+  holds these names.
 
 - [ ] **16. Set the version to 2.0 — the last commit of the port.**
   The tree disagrees with itself: `configure.in` says
@@ -362,22 +360,21 @@ touched, because changing one changes behaviour against the reference binary.
   lines carry the whole fact — Qt 6 has one icon size per toolbar, and 25 is the
   largest of the small pixmaps, so nothing is scaled past what 1.3 drew.
 
-- [ ] **31. Confirm the run lock is finished.** Prove, do not assume, that only
-  the present mechanism survives: one flag per experiment,
-  `SIG_GUIGPExperiment::evolutionRunning`, read through
-  `SIG_ExperimentListView::isRunning`, and one signal,
-  `SIG_ExperimentListView::evolutionNotRunning`, driving
-  `SIG_GUIGPExperiment::slotEvolutionNotRunning` and
-  `SIG_AllIndividualsView::slotEvolutionNotRunning`.
-  Search the tree — not this file — for the earlier mechanisms:
-  `g_runningEvolutions`, the D29 counter D33 ordered removed rather than moved;
-  `SIG_GPManager::running()`, the 2003 stub that returned false;
-  `evolutionRunningActionGroup`, replaced because a `QAction` belongs to at most
-  one group. A name surviving only in a comment is also a leftover. Every route
-  that can start a run, change a parameter or spend a slave must be refused, with
-  a check behind each refusal that fails when the guard is removed.
-  **Also open:** PORTING.md's D29 passage still describes
-  `SIG_AllIndividualsView::slotEvolutionNotRunning` as running only during a run.
+- [ ] **31. Confirm the run lock is finished** — swept 2026-09-18, one gap
+  left. **No leftovers:** `g_runningEvolutions`, `SIG_GPManager::running()` and
+  `evolutionRunningActionGroup` have no match in `src/`, `include/`, `ui/`,
+  `guidrive.cpp` or `check.sh`. Of the other names holding "running",
+  `evolRunning` and `metaEvolutionRunning` are MetaGP's own run state,
+  `slotEvolutionRunning` is `MT_Controller`'s and `simulationRunning` is the
+  slave's 3D playback — none is a second mechanism.
+  **One mechanism:** `SIG_GUIGPExperiment::evolutionRunning`, read through
+  `SIG_ExperimentListView::isRunning`, and one signal `evolutionNotRunning`
+  driving `SIG_MainWindow::slotEnableEvolutionRunningActions` over 29 actions
+  and the two `slotEvolutionNotRunning` slots.
+  **The gap: `startEvolutionAction` and `stopEvolutionAction` have no check.**
+  They appear nowhere in `guidrive.cpp`, and they are what keeps the right-click
+  `Stop` off an experiment that never ran. Add both states to `runlock`, at rest
+  and during a run, each with its control.
 
 - [ ] **32. Twelve redundant `setEnabled` lines.**
   `SIG_GUIGPExperiment::slotStartEvolution` and `slotEvolutionStopped` each set

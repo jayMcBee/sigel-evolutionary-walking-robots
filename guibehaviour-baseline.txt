@@ -35,7 +35,25 @@
 #     escape that renders the literal ampersand 1.3 showed; unescaped, Qt 6
 #     eats it and underlines the space instead.
 #
-# A failure here is a regression against SIGEL 1.3, not against this file.
+# A failure here is a regression against SIGEL 1.3, not against this file --
+# EXCEPT in four scenarios, which have no 1.3 side and say so here rather than
+# inheriting the sentence above:
+#   roundtrip   export, import, export on ONE machine. It needs no 1.3
+#               reference and has none; it checks the port against itself.
+#   metadrive   MT_GUI's toolbar actions. Pressed here, never pressed on 1.3,
+#               so this is coverage on one side and not an agreement.
+#   openfocus   the port's own crash. 1.3 made the tree item non-selectable and
+#               never had the fault, so there is nothing to compare.
+#   rngseed     the randomiser DOES agree with 1.3 -- PORTING.md, section 10 --
+#               but this scenario's own lines are the port's measurement.
+#
+# QTEST IS NOT A MOUSE, and it applies to every section below. QTest posts
+# QMouseEvent, QKeyEvent and QContextMenuEvent through QApplication::notify, so
+# hit-testing, key handling, item-view selection and the slots behind them all
+# run -- but it bypasses QWindowSystemInterface, so activation, grabs and
+# double-click synthesis are not what a real click produces. The oracle's side
+# was driven by real XTest, so every comparison with 1.3 has a genuine click on
+# one end.
 #
 # ---------------------------------------------------------------------------
 # From here on: PORTING.md step C11, the five View pages C10 never opened.
@@ -80,12 +98,6 @@
 # it -- so the generic probe measures a slider that cannot move, which is
 # correct and says nothing; it is driven for real after the checkbox.
 #
-# QTest IS NOT A MOUSE. It posts QMouseEvent, QKeyEvent and QContextMenuEvent
-# through QApplication::notify, so hit-testing, key handling, item-view
-# selection and the slots behind them all run -- but it bypasses
-# QWindowSystemInterface, so activation, grabs and double-click synthesis are
-# not what a real click produces. The oracle's side WAS driven by real XTest,
-# so every comparison above has a genuine click on one end.
 # ---------------------------------------------------------------------------
 #
 # ---------------------------------------------------------------------------
@@ -116,10 +128,10 @@
 # commands in a QDict and wrote them with a QDictIterator, so it emits them in
 # HASH order; Phase D replaced that with an ordered QList, so the port emits
 # the order the file supplied. Loading twoBasesSimpleFitness2.exp and exporting
-# straight back, 1.3 returns a DIFFERENT order from the one it read -- exactly
-# four pairwise swaps, MOVE/CMP, SUB/DIV, MIN/ADD and MOD/MAX, the four chains
-# that collide -- because Q2Dict::insert prepends and re-inserting in iteration
-# order reverses every colliding chain. The port preserves what it read. That
+# straight back, 1.3 returns a DIFFERENT order from the one it read: eight of
+# the thirteen commands move, in three pairs and one triple -- because
+# Q2Dict::insert prepends and re-inserting in iteration order reverses every
+# colliding chain. The port preserves what it read. That
 # is Phase D's documented consequence, not a C11b defect: "once the shim goes,
 # load and save become order-preserving".
 #
@@ -134,8 +146,6 @@
 #   extension, Yes       the same confirmation; the file is written.
 # 1.3 asked, and then wrote the file whatever the answer.
 #
-# QTest IS NOT A MOUSE -- see the C11a note above. The oracle's side was driven
-# by real XTest, so every comparison here has a genuine click on one end.
 # ---------------------------------------------------------------------------
 #
 # ---------------------------------------------------------------------------
@@ -143,22 +153,23 @@
 #
 # THE LOAD-BEARING LINES ARE THE TWO `typing' ONES. Qt 6's QLineEdit selects
 # its text when a dialog hands it focus down the tab chain; Qt 2's did not, and
-# SIGEL only calls setText() then setFocus(). So before C11c a typed digit
-# REPLACED the pre-filled value where 1.3 appends to it:
+# SIGEL only calls setText() then setFocus(), so a typed digit would REPLACE the
+# pre-filled value where 1.3 appends to it:
 #
-#     Edit Command duration  0.01 + "5"  ->  1.3: 0.015   port was: 5
-#     Add individuals number 1    + "2"  ->  1.3: 12      port was: 2
+#     Edit Command duration  0.01 + "5"  ->  0.015
+#     Add individuals number 1    + "2"  ->  12
 #
-# Both 1.3 figures are the oracle's, read off the running 2003 binary. The
-# second is the one that costs: adding TWELVE individuals where two were meant
-# leaves nothing wrong-looking behind, where a wrong duration at least shows.
-# Fixed at four sites with a QUEUED end(false) -- queued because the selection
-# does not exist until exec() shows the dialog, and end() rather than
-# deselect() because deselect leaves the cursor at position 0, which made
+# Both figures are the oracle's, read off the running 2003 binary. The second is
+# the one that costs: adding TWELVE individuals where two were meant leaves
+# nothing wrong-looking behind, where a wrong duration at least shows. Four
+# dialogs clear the selection with a QUEUED end(false) -- queued because the
+# selection does not exist until exec() shows the dialog, and end() rather than
+# deselect() because deselect leaves the cursor at position 0, which makes
 # 1 + "2" read 21 rather than 12.
 #
 # Rename is deliberately NOT in that set: it calls selectAll() explicitly
-# (SIG_ExperimentListView.cpp:97) and the oracle measured it pre-selecting in
+# (SIG_ExperimentListView.cpp, slotRenameExperiment) and the oracle measured it
+# pre-selecting in
 # BOTH versions back in C10. Two of its readings eight steps apart, explained
 # by three lines of code.
 #
@@ -182,7 +193,6 @@
 # ignores Escape -- which it is because SIG_IndividualViewBase derives from
 # QWidget, not QDialog.
 #
-# QTest IS NOT A MOUSE -- see the C11a note above.
 # ---------------------------------------------------------------------------
 #
 # ---------------------------------------------------------------------------
@@ -230,22 +240,16 @@
 # Selection = MT_SelectionWidget, Statistics = MT_StatisticsWidget.
 # MT_ExperimentWidget is not a page at all -- it is the tree on the left.
 #
-# QTest IS NOT A MOUSE -- see the C11a note above.
 # ---------------------------------------------------------------------------
 #
-# 2026-09-05: THE ONE LINE THAT MOVED, and why it is not a regression.
-# `[window] class=MT_MainWindow ... 680x595' became 680x654 when the six form
-# minimums were raised to what Qt 6.10.2's minimumSizeHint actually reports.
-# MT_MainWindow.cpp:33 asks for resize(680, 595) and does NOT get it on EITHER
-# version: the oracle measured 1.3 opening that window at 680x605 with a
-# WM_NORMAL_HINTS minimum of 625x605, so Qt 2 already overrode the resize() by
-# 10 px to satisfy its own layout. 1.3's window cannot be dragged shorter than
-# it opens, and at its own 605 the Statistics page is ALREADY clipped -- group
-# border and frame border both cut -- becoming complete at 654, which is where
-# the port now opens. Raising the minimum reproduces 1.3's BEHAVIOUR (honour the
-# layout minimum over the resize call); matching 595 would reproduce neither its
-# size nor its behaviour. Recaptured from a run that carried no failure marker.
-# PORTING.md, "The MetaGP window grew 59 px".
+# WHY THE MetaGP WINDOW IS 680x654. MT_MainWindow asks for resize(680, 595) and
+# does not get it on either version: the oracle measured 1.3 opening at 680x605
+# with a WM_NORMAL_HINTS minimum of 625x605, so Qt 2 already overrode the resize
+# to satisfy its own layout. 1.3 cannot be dragged shorter than it opens, and at
+# its own 605 the Statistics page is clipped -- group border and frame border
+# both cut -- becoming complete at 654. The port honours the layout minimum over
+# the resize call, which is 1.3's behaviour; matching 595 would reproduce
+# neither its size nor its behaviour. PORTING.md, "The MetaGP window grew 59 px".
 == SCENARIO gate ==
 
 == STEP 1: fresh start, no experiment ==
@@ -2335,9 +2339,8 @@ Do you want to replace it?]
   maxAge as loaded=50
   [unlocked] typed=57, model reads 57  written=1
 #
-# D30, 2026-09-07. Three lines change here and nothing else in this file moves.
-# The run lock had two holes, both MEASURED by reverting the fix and re-running
-# this scenario:
+# D30. Two holes the run lock had, both MEASURED by reverting the fix and
+# re-running this scenario:
 #   after a tree click                          Configure System came back
 #   after slotEnableNoExperimentActions(true)   Add, Configure System AND
 #                                               Use MetaGP all came back
@@ -2356,29 +2359,28 @@ Do you want to replace it?]
 # it greys neither the four MetaGP actions nor New/Open at all.
 # The control reads UseMetaGP's CHECKED state, not Configure System's enabled
 # state. Configure System is enabled by ANY tree click at rest, MetaGP or not,
-# so enabled=1 proved a click had happened and not that MetaGP was on. Found by
-# review.
+# so enabled=1 proved a click had happened and not that MetaGP was on.
   [control] MetaGP on at rest: UseMetaGP checked=1  ConfigureSystem enabled=1  (both 1 = the checks below can fail)
 # The three `live=' lines below cover the six widgets of the experiment itself.
 # slotStartEvolution disables them for its own experiment only; this scenario
 # never calls it, so only SIG_GUIGPExperiment::slotEvolutionNotRunning can
 # move them. Teeth-tested: without its connect the locked line reads live=6
 # and the scenario fails.
-# The `set=' line above used to read `typed='. Once the GP page is disabled
-# during a run Qt drops key events to it, so typing reported a refusal that no
-# guard performed: with putAllIntoExperiment's check deleted the line still
-# read refused=1. It now sets the value and commits it by hand, and with that
-# check deleted it reads refused=0 and the scenario fails.
+# The `set=' line sets the value and commits it by hand rather than typing it.
+# Once the GP page is disabled during a run Qt drops key events to it, so typing
+# reports a refusal that no guard performed. Teeth-tested: with
+# putAllIntoExperiment's check deleted this line reads refused=0 and the
+# scenario fails.
   [atRest] Start=1 Hist=1 Auto=1 Comment=1 PS=1 Curve=1 GP=1 Sim=1 Robot=1 Lang=1 Env=1  live=11
   [locked] isRunning=1
   [locked] set=71, model reads 57  refused=1
   [locked] after a tree click ([twoBasesSimpleFitness2.exp]): Add=0 ConfigureSystem=0  UseMetaGP=0  (0 = still locked)
   [locked] Start=0 Hist=0 Auto=0 Comment=0 PS=0 Curve=0 GP=0 Sim=0 Robot=0 Lang=0 Env=0  live=0
   [locked] after slotEnableNoExperimentActions(true): Add=0 ConfigureSystem=0 UseMetaGP=0  (0 = still locked)
-# The two doors themselves. Putting New Experiment and Open Experiment into the
-# run lock is a third of D30 and NOTHING read them -- reverting that append left
-# every check green. Teeth-tested: with it reverted this line reads
-# NewExperiment=1 OpenExperiment=1 and the scenario fails. Found by review.
+# The two doors themselves. New Experiment and Open Experiment are a third of
+# D30 and this is the only line that reads them. Teeth-tested: with their append
+# to the lock list reverted it reads NewExperiment=1 OpenExperiment=1 and the
+# scenario fails.
   [locked] the two doors: NewExperiment=0 OpenExperiment=0  (0 = locked during a run)
   [counter] model=535 display before slotEvolutionStopped=532
   [released] after slotEvolutionStopped: isRunning=0 (0 = released)

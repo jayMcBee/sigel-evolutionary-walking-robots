@@ -194,8 +194,8 @@ found a real defect.** §0 has the rule; it is not optional.
 - Verify: `./check.sh` from the repo root compiles every module and header.
   Takes several minutes, and **exits non-zero if anything fails or is skipped**.
   *This said "it runs no code", which was true between D27 and Phase C.* It now
-  runs `sigel_slave`, a headless GUI structure probe, and `guidrive` through six
-  scenarios plus two locale re-runs. Further execution is in `./fitness-check.sh`,
+  runs `sigel_slave`, a headless GUI structure probe, and `guidrive` through
+  eleven scenarios plus two locale re-runs. Further execution is in `./fitness-check.sh`,
   which runs `sigel_eval -selfcheck`.
 - PVM: `make pvm && make pvm-link`, then `./pvm-check.sh` starts a daemon and
   runs both round trips. Not one of the three checks below — it has no baseline,
@@ -230,7 +230,7 @@ found a real defect.** §0 has the rule; it is not optional.
 ├── check.sh                                per-file compile check, §7
 ├── dictorder-dump.sh                       dictionary-order check, §7
 ├── expstruct.py                            structural fingerprint of an .exp, C11
-├── guidrive.cpp                            the GUI behaviour harness, 32 scenarios
+├── guidrive.cpp                            the GUI behaviour harness, 33 scenarios
 ├── fitness-check.sh                        fitness check, §7
 ├── pvm-check.sh                            does PVM run? Phase P, P3 and P4
 ├── pvm_link.cpp                            SIGEL's PVM objects vs real PVM
@@ -250,8 +250,8 @@ found a real defect.** §0 has the rule; it is not optional.
 ├── kbin.tar.gz                             2003 i386 binary, reference only
 ├── pvm3.4.6.tgz                            upstream PVM, tracked -- Phase P
 ├── x/kdesigelSources.1.3/kdesigel/kdesigel/
-│   ├── src/       19 module dirs           ~40k LOC
-│   ├── include/   16 module dirs           ~25k LOC
+│   ├── src/       15 module dirs           ~40k LOC
+│   ├── include/   15 module dirs           ~25k LOC
 │   └── ui/        20 .ui files             Qt 2 Designer format
 ├── x/supportingLibs/supportingLibs/        Qt 2.3, dynamechs, cv97, newmat09,
 │                                           fparser, pvm3, Dynamo (maths only),
@@ -522,14 +522,15 @@ D20 supersedes D5, D24 supersedes D3.
 | # | Decision | Answer |
 |---|---|---|
 | **D27** *(decision; §10 also has a **step** D27, the shim deletion — the two D-series overlap and this is the first collision)* | The duplicate MetaGP `A&bout` | **removed**, with its trailing separator. Present in 1.3 and verified there; wired to the same `slotAbout()` as `Help > About` and opening the identical `SIG_InfoBox`. The port's first intentional difference from 1.3. `Help > About` untouched |
-| **D28** | The `QSpinBox` over-range divergence (C11a) | **accepted, not fixed.** 1.3 accepts out-of-range digits and clamps on commit; the port refuses the keystroke and commits a truncated prefix. It is reachable **only by typing a number outside the box's own range**, and the differing value is **visible in the box** before anything is saved — 1.3 shows 99, the port shows 10. Contrast what the port did fix: `clear()` killed the application, the ampersand rendered wrong, a negative width silently wrote no file — all reachable with valid use. The fix is not the 33 lines of it, it is **owning a custom widget forever**: every future form edit and every new spin box must remember `SIG_SpinBox` or silently opt out. Pinned in `guibehaviour-baseline.txt` (`commits=`) so it cannot drift; prototype and the measured comparison in `future_refactorings.md`. **Revisit if** a dialog spin box turns out to feed something unvalidated, or if anyone actually hits it |
+| **D28** | The `QSpinBox` over-range divergence (C11a) | **accepted, not fixed.** 1.3 accepts out-of-range digits and clamps on commit; the port refuses the keystroke and commits a truncated prefix. It is reachable **only by typing a number outside the box's own range**, and the differing value is **visible in the box** before anything is saved — 1.3 shows 99, the port shows 10. Contrast what the port did fix: `clear()` killed the application, the ampersand rendered wrong, a negative width silently wrote no file — all reachable with valid use. The fix is not the 33 lines of it, it is **owning a custom widget forever**: every future form edit and every new spin box must remember `SIG_SpinBox` or silently opt out. Pinned in `guibehaviour-baseline.txt` (`commits=`) so it cannot drift; the prototype and the measured comparison are in `future_refactorings.md`'s history at `f694f3a`, and its "Not doing" list points there. **Revisit if** a dialog spin box turns out to feed something unvalidated, or if anyone actually hits it |
 | **D29** *(signed off 2026-09-04)* | Changing run parameters **while an evolution is running** | **FORBIDDEN in the port, whatever 1.3 permits.** The reason is the specification, not 1.3: *"that's not how GAs/GPs are commonly implemented"* — the parameters define the run. **The port's second intentional divergence**, after D27. **Implementation, and the wrong versions it went through, are in §10 — read that before changing the guard** |
-| **D31** *(signed off 2026-09-09)* | Line endings | **LF ONLY, tree-wide. No more DOS.** Jan's decision, and it overrides the guard that existed to prevent it. **100 files under `x/kdesigelSources.1.3` converted, 17,750 CRLF pairs.** **The conversion is line endings only except for two bytes, and `git diff --ignore-cr-at-eol` is NOT what proves it** — that flag strips a trailing CR from *both* sides, so it would equally hide a CRLF being *introduced*. The proof is a direct comparison of every one of the 100 files: `re.sub(rb"\r+\n", b"\n", git show HEAD:f) == working file`, exact, with no `\r` surviving anywhere. Zero anomalies. Zero anomalies. **Two lines of `sigel_slave.mak` are the one real content change**, and calling them line endings flatters them: `:598` and `:647` ended `\r\r\n`, so the byte removed is an INTERIOR one — under NMAKE that trailing CR is part of the variable's value. The `\r+` in the proof above is what swallows the case, so the proof cannot tell it from a line ending; it is called out here instead. Nothing else in the tree has a run of two. **Binaries are excluded and this is not cosmetic** — three tracked binaries hold 12 incidental `\r\n` byte pairs (`pvm3.4.6.tgz` 9, `altLogo.png` 2, `noExperiment.png` 1), and a blind repo-wide replace would corrupt all three. Extensions touched: 36 `.cpp`, 35 `.h`, 19 `.xpm`, 5 `.dsp`, 3 `.mak`, 1 `.mt`, 1 `.dsw`. **No `.exp` and no `.ui`**, so no reference artefact was touched. **Lone CRs are left alone, and NOT because they are Mac-classic line endings** — the first version of this row said that and it was wrong. Six tracked files hold lone CRs and git calls **all six** binary, so this check never even reads them: `pvm3.4.6.tgz` 3859, `noExperiment.png` 691, `JustGreen.pnm` 2848, `altLogo.png` 208, `Hippie.pnm` 208, `Stone.pnm` 68. All five `.pnm` are **P6 raw raster**: those bytes are pixel values that happen to equal `0x0d`. They were never line endings. **The `encodings` check was turned round in the same commit**, so that commit is not line endings alone — `check.sh`, `PORTING.md` and `future_refactorings.md` change with it. The check used to say *a file that HAD a CR must still have one*, with `ENC_BASELINE=25`; it now says **no tracked text file may carry CRLF**, expected zero, reads every tracked file rather than five extensions present in the root commit, lists them with `-z` so a C-quoted path cannot break `open()`, and reconciles — every file lands in exactly one of ok / CRLF / binary / unreadable, or it aborts. **It asks `git ls-files --eol` what is binary rather than testing for a NUL byte**, because the NUL test got two files wrong: `Hippie.pnm` has no NUL in its 196,668 bytes and `UniDo_LSXI.pnm`'s first NUL is at offset 15,456, so both were judged as text and passed only by luck. **Read the `w/` column, not `i/`**: while this change was being made, `sigel_slave.mak`'s index blob read `i/-text` — HEAD still held its two `\r\r\n`, which git's own heuristic calls binary — against a working file of `w/lf`, and testing both columns dropped a real text file out of the check. **Both columns read `lf` once this is committed, so the demonstration is gone and only the rule survives.** Reads 610 text files and 8 binaries. **A floor of 500 was added**, because zero failures is also what a check that read nothing reports: a dead `git ls-files` gave `COUNTS 0 0 0 0 0 0`, two non-empty numbers, which the fail-closed branch did not catch. Teeth-tested: CRLF into a `.cpp` and into `sigel_slave.mak` both caught and named, CRLF into a texture correctly ignored, and all seven branch states driven by hand — including a **tree-wide** CRLF regression, which the first version of the floor misreported as *"it did not run"* with one failure instead of 611, and a below-floor count, which the first version printed as `0 pass` while adding up to 499 passes to the total. Both found by review 2026-09-09. The bucket reconciliation is a tautology as the loop is now written and is **not** counted as coverage; it is kept only so the earlier bare-`continue` shape cannot come back. **`SIGEL_ROOT` is the source tree**, so `stdConf.mt` and the 19 `.xpm` pixmaps the conversion touched are the very files the GUI checks load at runtime; the `gui behaviour` check covers them. The `.xpm` are loaded by path and `#include`d nowhere, and a C string literal cannot span a raw newline, so no removed CR was ever inside a quoted pixel row. **No `.gitattributes` exists and none was added.** `* text=auto eol=lf` would make git enforce this rather than only detect it; not done, because it changes what every future checkout writes and that is a separate decision. On a clone with `core.autocrlf=true` the working tree comes back CRLF and this check goes red tree-wide — which is the check working |
-| **D32** *(signed off 2026-09-09)* | `SIG_Experiment::gpManager` renamed to `guiGPManager` | **A deliberate divergence from the 1.3 name, and the only one of its kind so far.** Four members across the tracked tree were called `gpManager`; three hold an `MT_GPManager *` inside the meta modules, where the name is right. The fourth, `SIG_Experiment.h, SIG_Experiment`, holds a `SIG_GUIGPManager *` — and it was the **only** `SIG_`-typed member in that class not named after its own type with the `SIG_` prefix stripped. The other nine follow the rule exactly (`gpExperiment`, `gpParameter`, `simulationParameter`, `environmentView`, `robotView`, `experimentView`, `allIndividualsView`, `languageParameters`, `experimentItem`); the class's remaining members are named by role (`widgetDict`, `menuGPParameter`, …) and were never in scope. So this is the class's own rule applied to the one member that broke it, not a new scheme. **20 sites**: 13 in `SIG_Experiment.{h,cpp}`, 5 in this file, 2 in `guidrive.cpp`, both comments. The three `MT_GPManager` members and the `SIG_GPManager gpManager` local at `sigel.cpp:261` are correctly named and were left alone; the 1.0 tree holds the same member and is untracked, so a future sweep will re-find it there and should leave it. **VERIFIED AS `.text`-IDENTICAL, NOT AS BYTE-IDENTICAL OBJECTS** — a data member's name never reaches a mangled symbol, but `-g` is on and DWARF records member names, so the objects legitimately differ. `sigel.cpp` is the interesting one and was checked: it is the single translation unit where both names coexist, and its `.text` is unchanged |
-| **D33** *(signed off 2026-09-09)* | Where the mid-run protection lives | **IN THE UI. The model is not to be touched.** Jan: *"we'll focus on the UI side from now on, NO TOUCHING the gp manager or other model classes."* No new behaviour goes into the model. Removing a dead 2003 stub is not new behaviour, so `SIG_GPManager::running()` was deleted — see D29's passage in §10. Nothing is added to `SIG_GPManager` or `MT_Controller`. **The D29 counter, `g_runningEvolutions`, is to be removed, not moved into the model.** Jan, rejecting a move into `SIGEL_GP`: *"I strongly reject changes to the core model just to hot-fix a UI enablement issue."* **Replaced 2026-09-15 by a UI-side run state.** Each experiment has `evolutionRunning`, which `SIG_GUIGPExperiment::isRunning()` returns. Every run check asks `SIG_ExperimentListView::isRunning()`, which is true while any experiment runs. The decision is to lock the whole application during a run; §9 lists what is not locked yet. Jan: *"multiple simul. experiments running makes no sense, we need all resources we can get"*. **One exception: D37.** |
+| **D30** *(signed off 2026-09-07)* | The mid-run lock's first two holes | **A run check belongs wherever an action is RE-ENABLED, not only where it is disabled.** `SIG_MainWindow::slotEnableNoExperimentActions` handed 24 run-locked actions back on a tree click, and `New Experiment` and `Open Experiment` were in no lock list at all. Both measured by reverting the fix and re-running `runlock`. The pattern for any further route: a run check where the action is re-enabled, plus the action in `evolutionRunningActions`, plus a `runlock` case with a positive control. **Its own section is in §7, "D30 — parameter changes during a run are forbidden"**, and D30a is the hole it missed |
+| **D31** *(signed off 2026-09-09)* | Line endings | **LF ONLY, tree-wide. No more DOS.** Jan's decision, and it overrides the guard that existed to prevent it. **100 files under `x/kdesigelSources.1.3` converted, 17,750 CRLF pairs.** **The conversion is line endings only except for two bytes, and `git diff --ignore-cr-at-eol` is NOT what proves it** — that flag strips a trailing CR from *both* sides, so it would equally hide a CRLF being *introduced*. The proof is a direct comparison of every one of the 100 files: `re.sub(rb"\r+\n", b"\n", git show HEAD:f) == working file`, exact, with no `\r` surviving anywhere. Zero anomalies. **Two lines of `sigel_slave.mak` are the one real content change**, and calling them line endings flatters them: `:598` and `:647` ended `\r\r\n`, so the byte removed is an INTERIOR one — under NMAKE that trailing CR is part of the variable's value. The `\r+` in the proof above is what swallows the case, so the proof cannot tell it from a line ending; it is called out here instead. Nothing else in the tree has a run of two. **Binaries are excluded and this is not cosmetic** — three tracked binaries hold 12 incidental `\r\n` byte pairs (`pvm3.4.6.tgz` 9, `altLogo.png` 2, `noExperiment.png` 1), and a blind repo-wide replace would corrupt all three. Extensions touched: 36 `.cpp`, 35 `.h`, 19 `.xpm`, 5 `.dsp`, 3 `.mak`, 1 `.mt`, 1 `.dsw`. **No `.exp` and no `.ui`**, so no reference artefact was touched. **Lone CRs are left alone, and NOT because they are Mac-classic line endings** — the first version of this row said that and it was wrong. Six tracked files hold lone CRs and git calls **all six** binary, so this check never even reads them: `pvm3.4.6.tgz` 3859, `noExperiment.png` 691, `JustGreen.pnm` 2848, `altLogo.png` 208, `Hippie.pnm` 208, `Stone.pnm` 68. All five `.pnm` are **P6 raw raster**: those bytes are pixel values that happen to equal `0x0d`. They were never line endings. **The `encodings` check was turned round in the same commit**, so that commit is not line endings alone — `check.sh`, `PORTING.md` and `future_refactorings.md` change with it. The check used to say *a file that HAD a CR must still have one*, with `ENC_BASELINE=25`; it now says **no tracked text file may carry CRLF**, expected zero, reads every tracked file rather than five extensions present in the root commit, lists them with `-z` so a C-quoted path cannot break `open()`, and reconciles — every file lands in exactly one of ok / CRLF / binary / unreadable, or it aborts. **It asks `git ls-files --eol` what is binary rather than testing for a NUL byte**, because the NUL test got two files wrong: `Hippie.pnm` has no NUL in its 196,668 bytes and `UniDo_LSXI.pnm`'s first NUL is at offset 15,456, so both were judged as text and passed only by luck. **Read the `w/` column, not `i/`**: while this change was being made, `sigel_slave.mak`'s index blob read `i/-text` — HEAD still held its two `\r\r\n`, which git's own heuristic calls binary — against a working file of `w/lf`, and testing both columns dropped a real text file out of the check. **Both columns read `lf` once this is committed, so the demonstration is gone and only the rule survives.** Reads 610 text files and 8 binaries. **A floor of 500 was added**, because zero failures is also what a check that read nothing reports: a dead `git ls-files` gave `COUNTS 0 0 0 0 0 0`, two non-empty numbers, which the fail-closed branch did not catch. Teeth-tested: CRLF into a `.cpp` and into `sigel_slave.mak` both caught and named, CRLF into a texture correctly ignored, and all seven branch states driven by hand — including a **tree-wide** CRLF regression, which the first version of the floor misreported as *"it did not run"* with one failure instead of 611, and a below-floor count, which the first version printed as `0 pass` while adding up to 499 passes to the total. Both found by review 2026-09-09. The bucket reconciliation is a tautology as the loop is now written and is **not** counted as coverage; it is kept only so the earlier bare-`continue` shape cannot come back. **`SIGEL_ROOT` is the source tree**, so `stdConf.mt` and the 19 `.xpm` pixmaps the conversion touched are the very files the GUI checks load at runtime; the `gui behaviour` check covers them. The `.xpm` are loaded by path and `#include`d nowhere, and a C string literal cannot span a raw newline, so no removed CR was ever inside a quoted pixel row. **No `.gitattributes` exists and none was added.** `* text=auto eol=lf` would make git enforce this rather than only detect it; not done, because it changes what every future checkout writes and that is a separate decision. On a clone with `core.autocrlf=true` the working tree comes back CRLF and this check goes red tree-wide — which is the check working |
+| **D32** *(signed off 2026-09-09)* | `SIG_Experiment::gpManager` renamed to `guiGPManager` | **A deliberate divergence from the 1.3 name, and the only one of its kind so far.** Four members across the tracked tree were called `gpManager`; three hold an `MT_GPManager *` inside the meta modules, where the name is right. The fourth, `SIG_Experiment.h, SIG_Experiment`, holds a `SIG_GUIGPManager *` — and it was the **only** `SIG_`-typed member in that class not named after its own type with the `SIG_` prefix stripped. The other nine follow the rule exactly (`gpExperiment`, `gpParameter`, `simulationParameter`, `environmentView`, `robotView`, `experimentView`, `allIndividualsView`, `languageParameters`, `experimentItem`); the class's remaining members are named by role (`widgetDict`, `menuGPParameter`, …) and were never in scope. So this is the class's own rule applied to the one member that broke it, not a new scheme. **20 sites** when this was signed off: 13 in the files D34 has since renamed to `SIG_GUIGPExperiment.{h,cpp}`, 5 in this file, 2 in `guidrive.cpp`, both comments. The three `MT_GPManager` members and the `SIG_GPManager gpManager` local in `sigel.cpp, main` are correctly named and were left alone; the 1.0 tree holds the same member and is untracked, so a future sweep will re-find it there and should leave it. **VERIFIED AS `.text`-IDENTICAL, NOT AS BYTE-IDENTICAL OBJECTS** — a data member's name never reaches a mangled symbol, but `-g` is on and DWARF records member names, so the objects legitimately differ. `sigel.cpp` is the interesting one and was checked: it is the single translation unit where both names coexist, and its `.text` is unchanged |
+| **D33** *(signed off 2026-09-09)* | Where the mid-run protection lives | **IN THE UI. The model is not to be touched.** Jan: *"we'll focus on the UI side from now on, NO TOUCHING the gp manager or other model classes."* No new behaviour goes into the model. Removing a dead 2003 stub is not new behaviour, so `SIG_GPManager::running()` was deleted — see D29's passage in §10. Nothing is added to `SIG_GPManager` or `MT_Controller`. **The D29 counter, `g_runningEvolutions`, is to be removed, not moved into the model.** Jan, rejecting a move into `SIGEL_GP`: *"I strongly reject changes to the core model just to hot-fix a UI enablement issue."* **Replaced 2026-09-15 by a UI-side run state.** Each experiment has `evolutionRunning`, which `SIG_GUIGPExperiment::isRunning()` returns. Every run check asks `SIG_ExperimentListView::isRunning()`, which is true while any experiment runs. The decision is to lock the whole application during a run, and it is done — §9, "The run lock is DONE". Jan: *"multiple simul. experiments running makes no sense, we need all resources we can get"*. **Exceptions: D37 and D41.** |
 | **D34** *(signed off 2026-09-15)* | `SIG_Experiment` renamed to `SIG_GUIGPExperiment` | **By Jan's decision, and the second deliberate divergence from a 1.3 name, after D32.** The interface experiment class now follows the rule the manager pair already uses: model `SIG_GPManager`, interface `SIG_GUIGPManager`; model `SIG_GPExperiment`, interface `SIG_GUIGPExperiment`. Its files follow it: `SIG_Experiment.h` and `SIG_Experiment.cpp` became `SIG_GUIGPExperiment.h` and `SIG_GUIGPExperiment.cpp`, with the include guard, every include and the 2003 build files. D32's row keeps the old class name, because it records a rename made under it |
 | **D35** *(signed off 2026-09-15)* | Overwrite prompts on save and export | **In these slots the file dialog's own prompt is the only one.** SIGEL's "File exists..." prompt is gone from `SIG_ExperimentListView::slotSaveExperiment`, the five parameter and population exports and `SIG_GUIGPExperiment::slotRobotSave`; the file is written once. When SIGEL adds the extension itself and that file exists, `SIG_GUIGPExperiment::checkEnding` puts the date stamp `-yyyy-MM-dd-hh-mm-ss` between name and ending, one second later while that name is taken too. So nothing is overwritten and nothing asks; `slotGNUPlotExport` gets the same rule. Jan: *"we will refactor to use the file dialog's own prompt now. IF we enter no extension and IF SIGEL adds one and IF the file exists we simply append the datestamp (YYYY-MM-DD-HH-MM-SS) to the provided filename so nothing is ever overwroitten and no prompt is required in that rare edge case"*. **Not covered yet:** save paths that add an extension without `checkEnding` — `SIG_AllIndividualsView` (`.prg`, `.ind`), MT_GUI, and `MT_Controller`. Several of them still show their own "There is another file with this name" prompt: `MT_PopulationWidget::slotExpInd` and `slotSavePop`, six `MT_StatisticsWidget` exports, `MT_IndividualsWidget::slotExportConstants` and `MT_Controller::slotSaveSetup` |
-| **D36** *(signed off 2026-09-15)* | Dialogs out of sight | **No SIGEL dialog may end up out of sight and block the window.** Jan: *"we need to make sure NO SIGEL dialog ever can end up out of sight and block the window, regardless of how we decide to handle save"*. **Not done yet.** D35 gave the eight save and export file dialogs a parent in the main window. The other dialogs without a parent are counted in `future_refactorings.md`, "Dialogs with no parent can end up out of sight"; some of them are in model classes that D33 keeps untouched |
+| **D36** *(signed off 2026-09-15)* | Dialogs out of sight | **No SIGEL dialog may end up out of sight and block the window.** Jan: *"we need to make sure NO SIGEL dialog ever can end up out of sight and block the window, regardless of how we decide to handle save"*. **The interface half is done — D39**, all 32 sites in `SIGEL_MasterGUI`, after D35 gave the eight save and export file dialogs a parent. What is left is in D39's row and in `future_refactorings.md` item 25; some of it is in model classes that D33 keeps untouched |
 | **D37** *(signed off 2026-09-15; its review passed 2026-09-16)* | One exception to D33: the generation counter during a run | **`SIG_GUIGPManager::updateIndividualView` writes the pool generation into the Experiment page's counter.** The line was commented out in 1.3 and is active again; nothing else in `SIGEL_GP` changes. `SIG_GPManager::run` calls `updateIndividualView` for every individual right after it raises `poolGeneration`, so the counter changes when a generation completes. Jan chose it over a timer in `SIGEL_MasterGUI` that would read the generation. Jan: *"then #4 in dedicated pass with a thorough dedicated sub-agent review with fresh eyes, if passes launch me this one in a fresh SIGEL instance"*; #4 was this line. **Not checked:** no check starts a run. The unchecked `evolution` scenario samples the counter during a run |
 | **D38** *(signed off 2026-09-16)* | The generation progress bar | **`generationProgBar` is driven from the interface.** The widget sat in `SIG_ExperimentViewBase.ui` since before 1.3 and nothing ever wrote to it. A `QTimer` in `SIG_GUIGPExperiment` counts the individuals whose `SIG_GPIndividual::upToDate()` is true and sets the bar; it starts in `slotStartEvolution` and stops in `slotEvolutionStopped`. **Nothing in `SIGEL_GP` changes, so this is not a second exception to D33.** The count is not monotonic: a tournament writes offspring with fitness -1, so the bar steps back when new work appears. Jan drove it and accepted that: *"it does eventually end up at 100%, but it jumps up AND down quite a bit… But at least SOMETHING is happening between the counter refreshes."* Its tooltip says what it counts. **Not checked:** no check starts a run |
 | **D39** *(signed off 2026-09-16)* | Dialogs out of sight — the interface half of D36 | **Every dialog in `SIGEL_MasterGUI` has a parent.** 32 sites: 26 static `QMessageBox` and `QFileDialog` calls that passed `0` or `nullptr`, plus three constructed dialogs (`SIG_EditHostDialog` twice, `SIG_InfoBox` once) and three `QMessageBox` calls that passed `this` inside `SIG_GUIGPExperiment` — where `this` is a `QWidget` that never gets a parent and is never shown, which is no better than none. Real widgets use `this`; `SIG_GUIGPExperiment` uses `experimentListView`, as D35's seven export dialogs already did. Jan confirmed on the real desktop that the main window can no longer cover them. Checked: the `dialogs` scenario prints the parent of Edit Host and of About, and the `exportall` scenario's two `parentIsTheMainWindow` lines moved from 0 to 1. **Still open:** six prompts in `MT_StatisticsWidget` that D35 wants deleted rather than re-parented, five in `MT_Control` and two `QProgressDialog` in `SIGEL_GP` that D33 keeps untouched, and three in `SIG_EnvironmentRenderer` that are reachable but were not asked for |
@@ -553,7 +554,7 @@ Established while answering these:
 
 - **`autoDelete` splits 38 owning / 9 non-owning**, all literal `TRUE`/`FALSE`,
   which is what makes D7(a) a lookup rather than a judgement.
-- **Non-ASCII exists only in comments** — 46 of 380 files, 119 lines, no string
+- **Non-ASCII existed only in comments** — 46 of 380 files, 119 lines, no string
   literal. So no runtime string carries a byte ≥ 0x80 and `.toLatin1()` /
   `.toUtf8()` are identical over all real data. The three explicit `.latin1()`
   sites feed POSIX paths, where UTF-8 is right.
@@ -583,14 +584,16 @@ through `f0f2daa`.
 
 ## 7. Steps
 
-**Exit criterion per step:** `./check.sh` at the repo root — **1136 pass, 0 fail,
-508 warnings** as of 2026-09-09, after D31 and D32.
-**It was 853 until D31 and the jump is not new coverage of SIGEL's code.** The
-`encodings` check used to read 404 files of five extensions and now reads all 619
-tracked files, 8 of which git calls binary: its pass count went 327 → 610, and
-853 + 283 = 1136 exactly. *611 until portinglog.txt was deleted 2026-09-09; the
-check reads every tracked file, so removing one moves the total by one.* The warning count did not move, which is the half that
-says the conversion changed no code.
+**Exit criterion per step:** `./check.sh` at the repo root — **1136 pass, 0 fail**.
+**The pass count was 853 until D31 and the jump is not new coverage of SIGEL's
+code.** The `encodings` check used to read 404 files of five extensions and now
+reads all 618 tracked files, 8 of which git calls binary: its pass count went
+327 → 610, and 853 + 283 = 1136 exactly. *The check reads every tracked file, so
+adding or deleting one moves the total by one; `portinglog.txt` did that on
+2026-09-09.*
+**The warning figure is not an exit criterion and moves with the code.** It was
+508 at D31 and D32 and reads 503 today. A step that changes no code should not
+move it; one that does, will.
 **It now needs `sigel_eval` built**, which `check.sh` does not build for you:
 the V5 section reads constants out of `build-fast/sigel_eval`, so run
 `make B=build-fast SAN= SIGSAN= all` first or that section fails, correctly,
@@ -610,12 +613,13 @@ figure is the one in "Handover" below; every historical arithmetic trail that us
 to sit here was superseded, and it sat at the top of the section §0 sends a new
 session to. Warnings are on an unchanged basis and remain comparable throughout.
 
-**There are four checks, not three, and the full list with its caveats is in
-"Handover" below — use that one.** `check.sh` compiles every converted module
+**There are four baseline checks plus `pvm-check.sh`, which has no baseline —
+five invocations in all. The full list with its caveats is in "Handover" below;
+use that one.** `check.sh` compiles every converted module
 and every converted header standalone, and since C1 also runs `uic`, `moc` and
-`rcc` over the converted forms. **It also RUNS SIGEL**: **twenty-two
-`guidrive` invocations over fifteen distinct scenarios**, twenty-one where no
-comma-decimal locale is installed — the ten of
+`rcc` over the converted forms. **It also RUNS SIGEL**: **twenty-three
+`guidrive` invocations over sixteen distinct scenarios**, twenty-two where no
+comma-decimal locale is installed — the eleven of
 `gui behaviour`, plus **two locale re-runs of `pages`**, `clipcheck`, `formsize`,
 `slavegui`, `xtest`, `pagesave` twice, and **`pagesave` four more times in
 `v2 round trip vs 1.3`**, which chains two saves each over two experiments.
@@ -623,7 +627,8 @@ comma-decimal locale is installed — the ten of
 revision so far: the list once gave 14 distinct and 15 invocations while the
 prose said 12/13 then 13/14; the two locale re-runs went uncounted; then
 `xtest` was added 2026-09-07 and left out of both the count and the list.
-Re-counted from `check.sh` 2026-09-08, site by site. **Do not trust the line
+Re-counted from `check.sh` 2026-09-18, site by site; `openfocus` was the one
+missing that time. **Do not trust the line
 numbers in this sentence; re-derive them.** They were `1716` for the last site
 when first written and are `1898` now, because two later edits in the same
 session inserted lines above it — a citation into a file that is still being
@@ -987,7 +992,7 @@ are `wc -l`; the consumer column is `grep` over `check.sh`, the `.sh` scripts an
 the `Makefile`.
 
 *Check inputs. Deleting one fails loudly in every case, but only two say why:
-`check.sh:1562` and `:1407` name the missing file. The other four fail as a
+the `pagesave vs 1.3` and `real clicks` sections name the missing file. The other four fail as a
 maximal diff — every line of the dump reported as an addition — which is loud and
 uninformative.*
 
@@ -995,10 +1000,10 @@ uninformative.*
 |---|---|---|
 | `dictorder-baseline.txt` | 2740 | every container order that reaches the simulation, as `dictorder-dump.sh` prints it. Check 2 is a diff against this |
 | `fitness-baseline.txt` | 42 | the 42 fitness values. Check 3 is a diff against this |
-| `guibehaviour-baseline.txt` | 2490 | the `guidrive` scenarios under QTest |
+| `guibehaviour-baseline.txt` | 2603 | the `guidrive` scenarios under QTest |
 | `guidump-baseline.txt` | 122 | the widget dump |
 | `pagesave-baseline.txt` | 438 | **holds 1.3's OWN OUTPUT** — see below |
-| `xtest-baseline.txt` | 231 | what the port does under real X11 input — see below |
+| `xtest-baseline.txt` | 234 | what the port does under real X11 input — see below |
 
 **`pagesave-baseline.txt` is the one that cannot be made again here.** Its BASE
 block was captured from the 2003 i386 binary on 2026-09-03: load
@@ -1007,8 +1012,8 @@ lines, sha256 `a327150c…`. Our writer reproduces it byte for byte, so a failur
 in that half is a regression against 1.3. **Regenerating it from our own build
 would turn the only cross-machine anchor for the widget-to-file path into a
 port-against-itself baseline**, which is precisely what it exists not to be.
-Only the oracle machine can produce it. `check.sh:1561` guards it and `:1562` prints *"this check tested
-NOTHING"* if it is absent.
+Only the oracle machine can produce it. `check.sh`'s `pagesave vs 1.3` section
+guards it and prints *"this check tested NOTHING"* if it is absent.
 
 **`xtest-baseline.txt` covers what QTest structurally cannot.** QTest's **widget** overload — the only one `guidrive` uses — builds a
 `QMouseEvent` and hands it to `QApplication::notify`, so it never passes through
@@ -1016,7 +1021,8 @@ NOTHING"* if it is absent.
 synthesis of a double click from two presses are all invisible to it. This file
 is `guidrive` driven by `xdotool` XTEST inside a nested Xvfb. Reproducible here,
 unlike the one above, but it is the only reference for that class of behaviour.
-`check.sh:1406` guards it and `:1407` prints the same *"tested NOTHING"* warning.
+`check.sh`'s `real clicks` section guards it and prints the same *"tested
+NOTHING"* warning.
 
 *Referenced by no script. These are evidence, not inputs, and each one is at risk
 of being deleted as a stale file precisely because no script points at it.*
@@ -1520,7 +1526,7 @@ by a check. **Nor are the three slot refusals above**: `guidrive` never reaches
 `runlock` checks only that `Use MetaGP` and `Configure System` are grey.
 
 **Two slots re-enabled locked actions, neither with a run check.**
-`SIG_MainWindow::slotActExpChanged` runs on every change of the current tree
+`SIG_MainWindow::slotCurrentExperimentChanged` runs on every change of the current tree
 item, one line after the emit that applies the lock
 (`SIG_ExperimentListView::slotSelectionChanged`), and, when MetaGP was on, turned
 `Configure System` and the Evaluator/Classifier group back on.
@@ -1529,7 +1535,7 @@ item, one line after the emit that applies the lock
 
 **THE FIX, three places in `SIG_MainWindow.cpp`:**
 
-1. `slotActExpChanged` enables the two MetaGP controls only when
+1. `slotCurrentExperimentChanged` enables the two MetaGP controls only when
    `!experimentListView->isRunning()`.
 2. `slotEnableNoExperimentActions` re-applies the run lock after its own loop,
    rather than filtering its list — so the two lists cannot drift apart.
@@ -2470,7 +2476,9 @@ else that stops matching 1.3 still needs justifying as a defect.
 
 | divergence | why it is not fixed | pinned by |
 |---|---|---|
-| **`QIntValidator` out-of-range clamp — D28.** 1.3 clamps a typed over-range number to the maximum; the port commits the truncated prefix | reachable only by typing outside the box's own range, and the differing value is visible before anything is saved. The cost is not the code — a 25-line `QSpinBox` subclass in `future_refactorings.md` reproduces all four readings — but **owning a custom widget forever**, promoted across 29 spin boxes in three forms and then the dialogs | the `commits=` value in `guibehaviour-baseline.txt`. **Measured 2026-09-03: 44 `spin` lines, of which 40 carry a committed value — 29 on the five pages and 11 more in the MetaGP block, which C11d added after C11a wrote the TRAP.** Four are not pinned: three survey-only lines (214, 1347, 1399) and one reading `commits=not-pressed(in a dialog)` (1404). *The TRAP block below still says "the other 18 … are not pinned". It is preserved as C11a wrote it and is out of date twice over — see the correction beneath it — and **the 18 does not reproduce as any real population either**: the 20 forms declare 46 spin boxes, 29 of them exactly the three page forms, so the non-page count is 17 in the forms and 20 counting the three declared in code. Do not carry the 18 forward.* |
+| **`QIntValidator` out-of-range clamp — D28.** 1.3 clamps a typed over-range number to the maximum; the port commits the truncated prefix | reachable only by typing outside the box's own range, and the differing value is visible before anything is saved. The cost is not the code — a 25-line `QSpinBox` subclass, in `future_refactorings.md`'s history at `f694f3a`, reproduces all four readings — but **owning a custom widget forever**, promoted across 29 spin boxes in three forms and then the dialogs | the `commits=` value in `guibehaviour-baseline.txt`. **Measured 2026-09-03: 44 `spin` lines, of which 40 carry a committed value — 29 on the five pages and 11 more in the MetaGP block, which C11d added after C11a wrote the TRAP.** Four are not pinned: three survey-only lines (214, 1347, 1399) and one reading `commits=not-pressed(in a dialog)` (1404). *The TRAP block below still says "the other 18 … are not pinned". It is preserved as C11a wrote it and is out of date twice over — see the correction beneath it — and **the 18 does not reproduce as any real population either**: the 20 forms declare 46 spin boxes, 29 of them exactly the three page forms, so the non-page count is 17 in the forms and 20 counting the three declared in code. Do not carry the 18 forward.* |
+| **A run that loses PVM ends and says so — D41.** 1.3 waits for a message that cannot arrive, for ever, with the interface still showing a run in progress | `pvm_probe` reports `PvmSysErr` and the trainer records it; the interface ends the run the way `Stop` does | none. No check starts a run. Measured by hand: SIGKILL the daemon mid-run and the dialog appears |
+| **A run that ends at once says why — D42.** 1.3 shows nothing, so Start looks as though it did nothing | the message names the termination setting that ended the run and the tab it is on | none. No check starts a run. Measured by hand for a date and for a duration |
 | **The duplicate MetaGP About is removed**, with its trailing separator. 1.3 has 43 menu items, the port 42 | a decision, 2026-09-02 — the port's first intentional behavioural difference. Not a defect, not a regression | `guidump-baseline.txt` |
 | **`.lap` export order.** 1.3 does not round-trip its own order — `Q2Dict::insert` prepends, so re-inserting in iteration order reverses every colliding chain (three pairs and one triple; eight of thirteen commands move). The port is the stable one | §10 already says load and save become order-preserving once the shim goes. Restoring it means reimplementing `Q2Dict`'s bucket permutation on read — writing the defect back in | measured on the running binary, C11b |
 | **The robot block in a saved `.exp` is a fixed point here and an involution on 1.3.** Same cause as the row above, on the larger surface: load and save is the identity for us, and a permutation that undoes itself on the second save for 1.3. Measured over four states of `hammer` 2026-09-08 — our md5 never moves; 1.3's toggles, `state0 == state2` and `state1 == state3`. Three things toggle on hammer: material order, `Body` emission order, and `middle3`'s axis points. On `octopus` it is joint, drive and sensor order, the body order and the command list, from V1 | D3, deliberate. Same answer as the row above — matching it means reimplementing `Q2Dict`'s bucket permutation on read. **It has not bitten anyone yet, and here is when it would:** a robot written by one side and read by the other keeps every name and every mesh, and only their order moves. That order composes with V7's friction rule, so read V6 RESULT before revisiting D3 | `v2 round trip vs 1.3` pins OUR side as a fixed point on both robots; `v8-1.3-gp-blocks.txt` result 6 and `v1-1.3-roundtrip.txt` hold 1.3's |
@@ -3065,7 +3073,7 @@ Both end on a *valid* value; they are **different valid values**, and
 
 **ACCEPTED, NOT FIXED — D28.** Reachable only by typing outside the box's own
 range, and the differing value is visible in the box before anything is saved.
-The cost is not the 25-line `QSpinBox` subclass (written out in
+The cost is not the 25-line `QSpinBox` subclass (in `f694f3a`'s copy of
 `future_refactorings.md`, and it reproduces all four readings) but **owning a
 custom widget forever** across 29 spin boxes in three forms and then the
 dialogs. Pinned by the `commits=` value in `guibehaviour-baseline.txt`: **44 `spin`
@@ -3099,7 +3107,7 @@ becomes data — so Qt 2's rule is restored there instead. See §9's C12.
   `poolPosition` still resolves to the same individual and reverting it is
   invisible to any GUI observation. Kept because Qt 2 emitted nothing there
   either, but it is **faithfulness without a test**.
-- **THE EVOLUTION PATH IS NOT IN `gui behaviour` AT ALL** — the ten scenarios do
+- **THE EVOLUTION PATH IS NOT IN `gui behaviour` AT ALL** — the eleven scenarios do
   not include `evolution`, so nothing in `check.sh` runs a generation. It was
   driven by hand on both machines and the result is prose; see §9's open box.
 - **Native file dialogs.** Qt's own non-native dialog throughout.
@@ -3142,8 +3150,10 @@ Start during a run, `setName` not re-keying `menuDict` which left the tree menu
 dead for every saved experiment, a wildcard disconnect that killed double-click
 everywhere, and two harness reads that failed under load.
 
-**WHAT IS ACTUALLY OPEN, as of 2026-09-07.** Closed items are not listed; their
-lessons live in the step sections above.
+**WHAT IS ACTUALLY OPEN, as of 2026-09-18.** Closed items are not listed; their
+lessons live in the step sections above. **Closed 2026-09-17:** the slave
+crashes, the swallowed `pvm_probe` error, a run that loses PVM in silence, and a
+run that ends at once in silence — D41 and D42.
 
 **THE PORT IS NOT FINISHED.** No Qt 2 API remains in live code — swept
 2026-09-05 over 33 spellings across `src/` and `include/`, code split from
@@ -3153,10 +3163,18 @@ comment, zero in code. **Phase 0 closed 2026-09-05.**
 lines, 28 doc comments naming a Qt 2 type, and six form minimums — closed on
 2026-09-05. Each is written up in §7.
 
-**Right-click `Stop` on an experiment that never ran crashes.**
-`SIG_GUIGPExperiment::slotStopEvolution` sets `guiGPManager->userTerminated`,
-and `guiGPManager` is 0 until a Start passes the three checks in
-`slotStartEvolution`. 1.3 has the same code. Jan, 2026-09-15: investigate later.
+**~~Right-click `Stop` on an experiment that never ran crashes~~ — UNREACHABLE,
+read in the source 2026-09-18.** `SIG_GUIGPExperiment::slotStopEvolution` sets
+`guiGPManager->userTerminated` and `guiGPManager` is 0 until a Start passes the
+three checks in `slotStartEvolution`, so the slot still has no null check and
+1.3 still has the same code. **Both routes to it are shut.** `pushbuttonStop`
+carries `enabled=false` in `SIG_ExperimentViewBase.ui`, and only
+`slotStartEvolution` turns it on; `slotEvolutionStopped` and `slotStopEvolution`
+turn it off again. `SIG_GUIGPExperiment::slotRightClick` sets
+`stopEvolutionAction` from this experiment's own `isRunning()` on every popup.
+**Nothing checks either guard** — `startEvolutionAction` and
+`stopEvolutionAction` appear nowhere in `guidrive.cpp`. That is the gap to
+close, not the crash.
 
 **File > Open Experiment no longer crashes when the tree gets focus during the
 load — FIXED 2026-09-16, `2312c39`.** `SIG_ExperimentListView::slotLoadExperiment`
@@ -3221,8 +3239,8 @@ path with `x_dim` 0, `y_dim` 0, `grid_resolution` 0 and `xindex` -2, and
 disassembled the clamp: `x_dim` at offset `0x24`, `add $0xfffffffe,%eax`, no
 lower guard. Its control with a valid 5058-byte file simulated normally. **How
 often 1.3 hits this was never measured** — those probes were stood down.
-`future_refactorings.md`, "`Terrain.ter` can still be read as an empty grid",
-carries the two routes the fix does not close.
+`future_refactorings.md`'s "Not doing" list carries the two routes the fix does
+not close, and item 37 the one that is still open.
 
 **Before blaming the slaves, rule out a hang from outside.** On 2026-09-17 a run that had
 been "started" for ten hours turned out to have lost its PVM daemon at the one-hour
@@ -3232,9 +3250,9 @@ socket. The symptom is easy to mistake for a slave problem — the window answer
 main thread in `hrtimer_nanosleep`, a few seconds of CPU over many hours, and no
 `sigel_slave` process at all. A slave crash looks different: slaves keep starting,
 the daemon log fills with `Invalid storage access`, and fitness values of exactly
-0 come back. `future_refactorings.md`, "A run does not notice when the PVM daemon
-goes away", carries the SIGEL-side defect — nothing checks that the daemon is
-still there, so the wait is silent and endless.
+0 come back. **That SIGEL-side defect is fixed — D41.** `SIG_GPFitnessTrainer::checkTask`
+records `PvmSysErr` and `SIG_GUIGPExperiment`'s progress timer ends the run and
+says so, so the wait is no longer silent or endless.
 
 **Do not run `pvm-check.sh` while an evolution is live.** It removes
 `$PVM_TMP/pvmd.$(id -u)` and `pvml.$(id -u)` and starts its own daemon. Give it
@@ -3245,8 +3263,11 @@ its own `PVM_TMP`, which it honours, or wait.
 baseline's `motion=1 xi2=9`). Every Qt-level count on that line stayed the same.
 The next run on the same tree passed. **It happened a second time on 2026-09-16**,
 on the `outside click` line rather than `fast pair`, again with every Qt-level
-count unchanged. The counts are now printed as `motion>0` and `xi2NoMotion`, so a
-spare X motion event cannot move them; two runs under load are byte identical.
+count unchanged. Sections 1 to 5 of `xtest-baseline.txt` now print `motion>0` and
+`xi2NoMotion`, which a spare X motion event cannot move. **Section 6, enter and
+leave, still prints three raw `nativeMotion=` counts, and that is where it
+failed a third time on 2026-09-18** — every Qt-level count again unchanged, and
+the next run on the same tree passed. The mitigation never reached that section.
 `guidrive.cpp, spies` carries the reason.
 
 **The run lock is DONE — 2026-09-16, `49cb4a2`, `c984574`, `aa2ebfc`.** One
@@ -3276,7 +3297,7 @@ individuals list, each with a control.
 **D29's arming line was checked by the `evolution` scenario, and it held.** The
 tree click is the only thing that reaches it —
 `SIG_ExperimentListView::slotSelectionChanged` asks `isRunning()`, which only
-`slotStartEvolution` sets — and `Save Experiment`, one of the 23 locked actions
+`slotStartEvolution` sets — and `Save Experiment`, one of the 29 locked actions
 that nothing re-enables, stayed greyed through it. *That run used the counter
 that the run state replaced on 2026-09-15. Re-running it is open.*
 
@@ -3804,7 +3825,7 @@ to be preserved.
 
 **No `setAutoDelete` call remains anywhere — this said 11, and C6/C7 removed the last of them.** Every remaining occurrence of the name, and of `QDict`, `QArray`, `QListViewItem`, `QPtrList` and `QCString`, is in a comment. Re-measured 2026-09-05 by sweeping `src/` and `include/` for 33 Qt 2 spellings and splitting code from comment: **zero in code.** The only apparent exception, `QButtonGroup`, is Qt 6's class, not Qt 2's widget-flavoured one.
 
-**But 28 of those comments are now WRONG, and that is unfinished work.** They are 2003 doc comments that name the member by its Qt 2 type as though it were current — `SIG_GPManager.h` says *"This QArray is used to store the randomly created tournaments"* of what is now a `QList`. Across 16 files: `SIG_GPManager.h` 4, `SIG_GPParameter.h` 4, `MT_Trainingset.h` 4, `SIG_LanguageParameters.cpp` 2, `SIG_VisualSceneObject.h` 2, `MT_Statistics.h` 2, and one each in ten more. *This is separate from the port's own historical notes — "Qt 2's `QArray` was writable through `at()`; `QList`'s is not" — which are correct and stay. The sweep excludes those by looking for `Qt 2` / `used to` / `was` / a step number on the same line.* Listed as open.
+**Those comments named the member by its Qt 2 type as though it were current — SWEPT 2026-09-05, 26 lines in 14 files.** See "Doc comments naming a member by its Qt 2 type" below. *The port's own historical notes — "Qt 2's `QArray` was writable through `at()`; `QList`'s is not" — are correct and stay; the sweep excluded them by looking for `Qt 2` / `used to` / `was` / a step number on the same line.* **One residue the sweep missed**, found 2026-09-18: `SIG_GPFitnessTrainer.h`'s constructor `@post` still says *"The QArrays are initialized with ZERO."* It is the only 2003 mention left; the other three in the tree are the port's own notes.
 
 *Every step is DONE and enforced by a compiler that no longer accepts the Qt 2 alternative — the types themselves are gone from Qt 6, and the whole tree builds.*
 
@@ -4261,24 +4282,24 @@ compiled at all. It went with the Dynamo backend, its only caller
   and will abort now. **STALE — Phase C closed this.** `MT_GUI` is in `check.sh`'s `MODULES` (`check.sh:94`) and the Makefile's `CORE` (`Makefile:312`), and C11c's `metagui` scenario drives the whole MetaGP window. *It said:* `MT_GUI` is in neither `check.sh`'s `MODULES` nor the
   Makefile's `CORE`, so nothing flags it.
 
-### TRAP — plain `grep` in this environment SILENTLY SKIPS 9 SOURCE FILES
+### TRAP — plain `grep` in this environment SKIPS A NON-UTF-8 FILE SILENTLY
 
-Found 2026-09-02, chasing a reported defect that turned out not to be one. In
-this shell `grep` is a **function**, not the binary: it execs `ugrep` with
-`-I`, which means *ignore binary files*. Nine files in the tree are ISO-8859
-(Latin-1) rather than UTF-8, ugrep classifies them as binary, and `-I` drops
-them **with no message and exit status 0** — indistinguishable from "no
-matches".
+In this shell `grep` is a **function**, not the binary: it execs `ugrep` with
+`-I`, which means *ignore binary files*. ugrep classifies a non-UTF-8 file as
+binary, and `-I` drops it **with no message and exit status 0** —
+indistinguishable from "no matches". Use `command grep`, which bypasses the
+function, or `grep -a`. Both were verified against a file with a known match.
 
-    src/SIGEL_MasterGUI/SIG_MainWindow.cpp
-    src/SIGEL_SlaveGUI/SIG_SimulationVisualisationWidget.cpp
-    src/MT_GUI/MT_PopulationWidget.cpp
-    src/MT_GUI/MT_StatisticsWidget.cpp
-    include/MT_GUI/{MT_ExperimentItem,MT_PopListViewItem,MT_Editor,DoubleSpinBox,MT_WidgetBase}.h
-
-`SIG_MainWindow.cpp` is on that list, so **"grep found nothing in the main
-window" has meant nothing all along.** Use `command grep` (bypasses the
-function) or `grep -a`. Both were verified against a file with a known match.
+**The nine source files this used to name are all `us-ascii` today**, and a
+scan of `src/` and `include/` finds no non-ASCII `.c`, `.cpp` or `.h` at all, so
+the mechanism no longer bites there. Four Windows build files are still 8-bit:
+`Sigel.dsw`, `Sigel.mak`, `sigel_slave.mak`, `manage_dyn_slave.mak`. **The rule
+stands whatever the current file list is** — a file only has to stop being ASCII
+once. The nine were `SIG_MainWindow.cpp`,
+`SIG_SimulationVisualisationWidget.cpp`, `MT_PopulationWidget.cpp`,
+`MT_StatisticsWidget.cpp` and five `MT_GUI` headers, which is why **any NEGATIVE
+search in this file's history that was produced with plain `grep` before
+2026-09-09 is worth redoing.**
 
 **`check.sh` is NOT affected, and that is not luck** — every load-bearing search
 in it already uses `command grep`. Checked explicitly: the dead-signal counters
@@ -5268,7 +5289,7 @@ which is why the list exists.
 | `SIG_GPParameter::writeToFile`'s `PVMHOST` loop, D13 | ~~linked, never called~~ **COVERED as of C11b** — `exportall` writes it and `guibehaviour-baseline.txt` pins the bytes |
 | `readFromFile`'s `qDeleteAll` + `clear`, D13 | runs every load, always on an **empty** list |
 | **all four sites in `SIG_GPExperiment.cpp`**, D14 | the master variant is compiled into `libSIGEL_GP.a` and **never linked** — `SIG_GPExperimentClean.o` satisfies the symbols first. `readelf --debug-dump=info` on `sigel_eval` has a CU for Clean and none for the master |
-| `writeHistoryToFileTransfer`, D14 | linked, never called — no check saves an `.exp` |
+| `writeHistoryToFileTransfer`, D14 | called — `check.sh`'s `pagesave vs 1.3` and `v2 round trip vs 1.3` sections save six `.exp` per run, and `twoBasesSimpleFitness2.exp` carries 532 history entries |
 | `exportExperimentHistoryToGNUPlot`, D14 | linked; its only caller is `SIG_GUIGPExperiment.cpp, slotGNUPlotExport`, Phase C |
 | **five of D15's eight `delete pool[…]`** | the three sized constructors, `importNewIndividual`, and `addRandomIndividuals`' — which is `delete nullptr` on every possible call, since `resize()` just made those slots. *D16 said six of nine; nine was a `grep` hit that counted a comment, and three of the eight are entered by the self-check as of D16* |
 | both `wasCanceled()` shrinks, D15 | need a `QApplication`; `sigel_eval` has none, so `if (qApp)` is false |
@@ -5581,7 +5602,7 @@ checks, by group:
 | `putAllIntoExperiment()` | the aggregator; a **page switch** reaches it — `slotSelectionChanged` ends with an unconditional call |
 | `SIG_ExperimentView::putIntoExperiment()` | **the page that stays live.** See below |
 | the seven import/load slots | they write `gpExperiment.*` directly and never go through the aggregator. `slotRobotLoad` replaces the whole robot. Reachable mid-run through context menus parented on `SIG_GUIGPExperiment`, not on the pages |
-| the tree-click emit | drives the 23 `evolutionRunningActions` |
+| the tree-click emit | drives the 29 `evolutionRunningActions` |
 | the four MetaGP actions | none was in `evolutionRunningActions` at all |
 
 **Version 1 was wrong: it guarded only the aggregator.**
@@ -5606,7 +5627,7 @@ commented out in release 1.0 (**September 2001** — `sigelSourceDistribution.1.
 is stamped 2001-09-06, and the file itself 2001-09-05; August 2001 is the date of
 the shipped experiment DATA, not of the release) and in 1.3, so `running()`,
 `wait()` and `msleep()` are its orphaned methods. The team's own final report
-(`sigelEndbericht.pdf`, PG 368 Dortmund) never uses the word *thread* in 11,579
+(`data/results/endbericht.pdf`, PG 368 Dortmund) never uses the word *thread* in 11,579
 lines — their parallelism is PVM, separate processes. **So making `running()`
 answer honestly is new design by us, not restoration**, and there is no earlier
 revision to consult. **Where that comes from, since none of it is in this repo's
