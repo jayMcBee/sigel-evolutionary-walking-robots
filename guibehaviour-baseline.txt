@@ -2371,8 +2371,19 @@ Do you want to replace it?]
 # reports a refusal that no guard performed. Teeth-tested: with
 # putAllIntoExperiment's check deleted this line reads refused=0 and the
 # scenario fails.
+# THE THREE `tree menu' LINES ARE WHAT KEEPS THE RIGHT-CLICK CRASH OUT OF REACH.
+# SIG_GUIGPExperiment::slotStopEvolution writes through guiGPManager, which is 0
+# until a Start, so Stop must be off for any experiment that is not itself
+# running. Only slotRightClick sets the two actions, so the menu is opened for
+# real and closed again. The at-rest Start=1 is the positive control: without it
+# the Stop=0 beside it is also what a dead probe reports. Teeth-tested both ways
+# -- with slotRightClick's Stop guard forced true the at-rest line reads Stop=1
+# and the scenario fails; with its Start guard forced true the locked line reads
+# Start=1 and it fails there.
   [atRest] Start=1 Hist=1 Auto=1 Comment=1 PS=1 Curve=1 GP=1 Sim=1 Robot=1 Lang=1 Env=1  live=11
+  [at rest] tree menu: Start=1 Stop=0
   [locked] isRunning=1
+  [locked] tree menu: Start=0 Stop=1
   [locked] set=71, model reads 57  refused=1
   [locked] after a tree click ([twoBasesSimpleFitness2.exp]): Add=0 ConfigureSystem=0  UseMetaGP=0  (0 = still locked)
   [locked] Start=0 Hist=0 Auto=0 Comment=0 PS=0 Curve=0 GP=0 Sim=0 Robot=0 Lang=0 Env=0  live=0
@@ -2398,6 +2409,7 @@ Do you want to replace it?]
   [answering] &No
   [locked] close during a run: asked=1 namesTheRun=1 stillUp=1
   [second locked] tree-menu Export: set=3, model reads 0  refused=1
+  [second locked] tree menu: Start=0 Stop=0
   [second locked] individuals list still connected=0  (0 = cut)
   [second released] Start=1 Hist=1 Auto=1 Comment=1 PS=1 Curve=1 GP=1 Sim=1 Robot=1 Lang=1 Env=1  live=11
   [second released] individuals list connected again=1  (1 = the check above can fail)

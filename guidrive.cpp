@@ -3891,10 +3891,50 @@ static int guidriveMain(int argc, char **argv)
         // derived class, sets it on the real experiment.
         struct RunState : SIG_GUIGPExperiment {
             static bool SIG_GUIGPExperiment::*flag() { return &RunState::evolutionRunning; }
+            static QAction *SIG_GUIGPExperiment::*startAct()
+                { return &RunState::startEvolutionAction; }
+            static QAction *SIG_GUIGPExperiment::*stopAct()
+                { return &RunState::stopEvolutionAction; }
         };
+
+        // The tree menu's Start and Stop. Only slotRightClick sets them, so the
+        // menu is opened for real and closed again. Stop is what keeps the
+        // right-click crash out of reach: slotStopEvolution writes through
+        // guiGPManager, which is 0 until a Start, so Stop must be off for any
+        // experiment that is not itself running.
+        auto treeMenu = [&](SIG_GUIGPExperiment *e, const char *when) {
+            e->slotRightClick(e->getName(), QPoint(0, 0));
+            QTest::qWait(150);
+            QAction *st = e->*RunState::startAct();
+            QAction *sp = e->*RunState::stopAct();
+            const int s = st && st->isEnabled() ? 1 : 0;
+            const int p = sp && sp->isEnabled() ? 1 : 0;
+            printf("  [%s] tree menu: Start=%d Stop=%d\n", when, s, p);
+            fflush(stdout);
+            for (QMenu *m : W->findChildren<QMenu *>())
+                if (m->isVisible()) m->close();
+            QTest::qWait(80);
+            return s * 2 + p;
+        };
+
+        // At rest, on an experiment that has never run: Start offered, Stop not.
+        // Start=1 is the control -- without it the Stop=0 below would also be
+        // what a dead probe reports.
+        if (treeMenu(theExp, "at rest") != 2) {
+            printf("!! at rest the tree menu should offer Start and not Stop\n");
+            fflush(stdout); return 1;
+        }
+
         {
             theExp->*RunState::flag() = true;
             printf("  [locked] isRunning=%d\n", lv->isRunning() ? 1 : 0);
+
+            // The running experiment: Stop offered, Start refused.
+            if (treeMenu(theExp, "locked") != 1) {
+                printf("!! during a run the tree menu should offer Stop and not"
+                       " Start\n");
+                fflush(stdout); return 1;
+            }
             // The GP page is disabled during a run, so Qt drops key events to
             // it and typing would report a refusal that no guard performed.
             // Set the value and commit it by hand: what is under test is
@@ -4143,6 +4183,14 @@ static int guidriveMain(int argc, char **argv)
         // The lock cuts this view's own connections to the list, so a
         // disconnect that finds none is the lock holding. Destructive, so it
         // runs last, and the release below is its positive control.
+        // Another experiment while the first runs: neither offered. Stop here
+        // would reach a null guiGPManager.
+        if (treeMenu(second, "second locked") != 0) {
+            printf("!! a run left another experiment's tree menu offering Start"
+                   " or Stop\n");
+            fflush(stdout); return 1;
+        }
+
         QTreeWidget *secondList = second->allIndividualsView->individualList->listviewIndividuals;
         const bool stillWired = QObject::disconnect(secondList, 0, second->allIndividualsView, 0);
         printf("  [second locked] individuals list still connected=%d  (0 = cut)\n",

@@ -360,8 +360,8 @@ touched, because changing one changes behaviour against the reference binary.
   lines carry the whole fact — Qt 6 has one icon size per toolbar, and 25 is the
   largest of the small pixmaps, so nothing is scaled past what 1.3 drew.
 
-- [ ] **31. Confirm the run lock is finished** — swept 2026-09-18, one gap
-  left. **No leftovers:** `g_runningEvolutions`, `SIG_GPManager::running()` and
+- [x] **31. Confirm the run lock is finished** — done 2026-09-18.
+  **No leftovers:** `g_runningEvolutions`, `SIG_GPManager::running()` and
   `evolutionRunningActionGroup` have no match in `src/`, `include/`, `ui/`,
   `guidrive.cpp` or `check.sh`. Of the other names holding "running",
   `evolRunning` and `metaEvolutionRunning` are MetaGP's own run state,
@@ -371,10 +371,11 @@ touched, because changing one changes behaviour against the reference binary.
   `SIG_ExperimentListView::isRunning`, and one signal `evolutionNotRunning`
   driving `SIG_MainWindow::slotEnableEvolutionRunningActions` over 29 actions
   and the two `slotEvolutionNotRunning` slots.
-  **The gap: `startEvolutionAction` and `stopEvolutionAction` have no check.**
-  They appear nowhere in `guidrive.cpp`, and they are what keeps the right-click
-  `Stop` off an experiment that never ran. Add both states to `runlock`, at rest
-  and during a run, each with its control.
+  **The one gap is closed.** `startEvolutionAction` and `stopEvolutionAction`
+  had no check; `runlock` now reads both at rest, during a run on the running
+  experiment, and during a run on another experiment. Teeth-tested both ways.
+  That is also what makes the right-click `Stop` crash unreachable — PORTING.md
+  section 9.
 
 - [ ] **32. Twelve redundant `setEnabled` lines.**
   `SIG_GUIGPExperiment::slotStartEvolution` and `slotEvolutionStopped` each set
