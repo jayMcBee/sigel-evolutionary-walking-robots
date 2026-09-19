@@ -522,6 +522,24 @@ touched, because changing one changes behaviour against the reference binary.
   The 2026-09-18 oracle measurements named "octopus" in PORTING.md were taken on
   this file; they stay as the record of what was measured.
 
+- [ ] **45. Keep one runner experiment; remove `runnerSimpleFitness`, here and on
+  the x86 machine.** Jan, 2026-09-19, judging it side by side with individual 30:
+  *"to be removed, the first one was the better experiment"*. Keep
+  `runnerNiceWalkingFitness`. The same wait as item 40.
+  **What names it:** `fitness-baseline.txt` (3 lines) and
+  `dictorder-baseline.txt` (its section). No check loads it.
+  `verification-against-sigel-1.3/` holds oracle measurements on it; they stay as
+  the record of what was measured.
+
+- [ ] **46. Rename the kept experiments to their base names, here and on the x86
+  machine.** Jan, 2026-09-19: the names carry notes added run by run as a kind of
+  versioning, such as the fitness function used; *"when we're done with our
+  review we need to strip all such versioning and just keep the base names! We'll
+  do this interactively, you suggest and I approve."* One name at a time, after
+  the review and after items 40, 44 and 45. `twoBasesHardlyReducedIS` →
+  `twoBases` is already decided. Both machines use the same names, so the two
+  stay comparable.
+
 - [ ] **35. Remove the Windows and Visual Studio support.** Decided by Jan
   2026-09-09. It does not build here and nothing tests it.
   **What is there:** 9 Visual Studio project files at the source root, 7,962
