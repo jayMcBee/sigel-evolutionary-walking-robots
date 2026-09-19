@@ -850,12 +850,11 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 PORT.** Start here.
 
 - **Done.** `hammerNiceWalkingFitness`: a keeper. `insectNiceWalkingFitness`: a
-  keeper. The two-bases family: keep
+  keeper. `octopusNiceWalkingFitness`: a keeper. The two-bases family: keep
   `twoBasesHardlyReducedIS`, to be renamed `twoBases`; the other five go — item 40
   in `future_refactorings.md`. The clean-up waits until every experiment has been
   judged; do not start it unasked.
-- **Next: `octopusNiceWalkingFitness`.** Then `octopusSimpleFitness`,
-  `runnerNiceWalkingFitness`, `runnerSimpleFitness`,
+- **Next: `octopusSimpleFitness`.** Then `runnerNiceWalkingFitness`, `runnerSimpleFitness`,
   `shortHammerNiceWalkingFitness`, `walkerNiceWalkingFitness`.
 - **How each one is shown.** Score every individual with `build-fast/sigel_eval`
   (a scratch `SIGEL_ROOT` holding a copy of `Terrain.ter`). Make a viewing copy:
@@ -986,7 +985,10 @@ beside it in the same place.
   scoring: they behave alike on both, 1.3 only slower on its machine; Jan keeps
   `twoBasesHardlyReducedIS` and drops the other five — item 40.
   `insectNiceWalkingFitness`, individual 56, score 0.611: Jan: *"confirmed
-  working on both machines, a keeper."*
+  working on both machines, a keeper."* `octopusNiceWalkingFitness`, individual
+  13, score 0.515: Jan: *"looking good and comparable on both, Qt6 and SIGEL 1.3.
+  Keeper."* Six individuals share that score — 13, 27, 45, 61, 82 and 84, six
+  different programs by the oracle's check; 13 is the lowest number.
 - **The payload, octopus, all 259 lines.** The 182 Polygon lines are
   byte-identical. The 13 Geometry lines carry the same values; four differ in
   text only, at exact decimal ties in the 50th digit, where glibc rounds half
