@@ -441,7 +441,7 @@ touched, because changing one changes behaviour against the reference binary.
   list makes `slotStartEvolution` run with nowhere to spawn, which is a
   different silent failure from the one D41 and D42 just closed.
 
-- [ ] **40. Keep one two-bases experiment; remove the other five, here and on the
+- [x] **40. Keep one two-bases experiment; remove the other five, here and on the
   x86 machine.** Jan judged all six side by side on 1.3 and the port, 2026-09-19,
   each with its best individual by the port's own scoring: **keep
   `twoBasesHardlyReducedIS`**; remove `twoBasesHighMutationRate` (a close second),
@@ -465,8 +465,9 @@ touched, because changing one changes behaviour against the reference binary.
   matched it. It now holds the port's own save of `twoBases.exp`; no new
   capture from the oracle — see item 44.
   Removing it also ends item 39's conflict over this file.
-  **Done on this machine 2026-09-19.** The x86 machine is still open: sigel-x86
-  deletes or renames files only on Jan's own word.
+  **Done on both machines 2026-09-19.** On the x86 machine with Jan's approval
+  there; its seven files hash as ours. Its copy of all 14 as downloaded is
+  `/home/debian/sigel-shipped-original-2026-09-19/`.
 
 - [ ] **41. The simulation viewer starts too close, and follows the robot.** Jan,
   2026-09-19: *"On both machines and SIGEL versions we're defaulting to trace
@@ -499,7 +500,7 @@ touched, because changing one changes behaviour against the reference binary.
   the call may reach no context; and ambient light has no effect while lighting
   is off, which may be so in wireframe mode. Not yet compared with 1.3.
 
-- [ ] **44. Keep one octopus experiment; remove `octopusSimpleFitness`, here and
+- [x] **44. Keep one octopus experiment; remove `octopusSimpleFitness`, here and
   on the x86 machine.** Jan, 2026-09-19: *"once again two octopus experiments -
   ok, we'll keep only one! the first one, the current one is a failed/early
   run"*. Keep `octopusNiceWalkingFitness`, judged a keeper side by side with
@@ -518,10 +519,11 @@ touched, because changing one changes behaviour against the reference binary.
   now-proven Qt6 baseline"*. The same holds for item 40.
   The 2026-09-18 oracle measurements named "octopus" in PORTING.md were taken on
   this file; they stay as the record of what was measured.
-  **Done on this machine 2026-09-19.** The x86 machine is still open: sigel-x86
-  deletes or renames files only on Jan's own word.
+  **Done on both machines 2026-09-19.** On the x86 machine with Jan's approval
+  there; its seven files hash as ours. Its copy of all 14 as downloaded is
+  `/home/debian/sigel-shipped-original-2026-09-19/`.
 
-- [ ] **45. Keep one runner experiment; remove `runnerSimpleFitness`, here and on
+- [x] **45. Keep one runner experiment; remove `runnerSimpleFitness`, here and on
   the x86 machine.** Jan, 2026-09-19, judging it side by side with individual 30:
   *"to be removed, the first one was the better experiment"*. Keep
   `runnerNiceWalkingFitness`. The same wait as item 40.
@@ -529,10 +531,11 @@ touched, because changing one changes behaviour against the reference binary.
   `dictorder-baseline.txt` (its section). No check loads it.
   `verification-against-sigel-1.3/` holds oracle measurements on it; they stay as
   the record of what was measured.
-  **Done on this machine 2026-09-19.** The x86 machine is still open: sigel-x86
-  deletes or renames files only on Jan's own word.
+  **Done on both machines 2026-09-19.** On the x86 machine with Jan's approval
+  there; its seven files hash as ours. Its copy of all 14 as downloaded is
+  `/home/debian/sigel-shipped-original-2026-09-19/`.
 
-- [ ] **46. Rename the kept experiments to their base names, here and on the x86
+- [x] **46. Rename the kept experiments to their base names, here and on the x86
   machine.** Jan, 2026-09-19: the names carry notes added run by run as a kind of
   versioning, such as the fitness function used; *"when we're done with our
   review we need to strip all such versioning and just keep the base names! We'll
@@ -544,8 +547,9 @@ touched, because changing one changes behaviour against the reference binary.
   `octopus`; `runnerNiceWalkingFitness` → `runner`;
   `shortHammerNiceWalkingFitness` → `shortHammer`; `walkerNiceWalkingFitness` →
   `walker`. All seven approved 2026-09-19.
-  **Done on this machine 2026-09-19.** The x86 machine is still open: sigel-x86
-  deletes or renames files only on Jan's own word.
+  **Done on both machines 2026-09-19.** On the x86 machine with Jan's approval
+  there; its seven files hash as ours. Its copy of all 14 as downloaded is
+  `/home/debian/sigel-shipped-original-2026-09-19/`.
 
 - [ ] **35. Remove the Windows and Visual Studio support.** Decided by Jan
   2026-09-09. It does not build here and nothing tests it.

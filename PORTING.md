@@ -858,8 +858,9 @@ Start here.
   `runnerSimpleFitness` — item 45. **Done on this machine 2026-09-19**, at Jan's
   word: both data trees hold the 7 under their new names, and every check that
   loaded a dropped file now loads a kept one, against the port's own output.
-  The x86 machine is still open; sigel-x86 acts on its files only on Jan's own
-  word.
+  **Done on the x86 machine the same day**, with Jan's approval there: its seven
+  files hash as ours, and its copy of all 14 as downloaded is
+  `/home/debian/sigel-shipped-original-2026-09-19/`.
   **Both machines end with the same set under the same names**, Jan, 2026-09-19:
   *"keeping just the ones I've picked on both machines (otherwise we won't ever
   be able to compare them)"*. Each kept experiment is renamed to its robot's
