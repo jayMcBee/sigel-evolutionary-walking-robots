@@ -5123,23 +5123,26 @@ that reasoning is wrong. Once the shim goes, load and save become
 order-preserving and all three collapse into one — a baseline that recorded only
 `copy` could not have seen `loaded` move.
 
-**The script refuses to run** unless it finds exactly 14 `.exp` and 7 `.rrb`,
+**The script refuses to run** unless it finds exactly 8 `.exp` and 7 `.rrb`,
 and it inspects `sigel_eval`'s stderr instead of discarding it. Both were real
 holes: the previous version exited 0 on a missing build directory, a missing
 `data/`, and a wrong `SIGEL_ROOT`, emitting a short file each time — and
 Phase D re-captures this baseline at every step, so a silent short run would
 have overwritten it and reported success.
 
-**`data/` needs 14 `.exp`, and `experiments.tar.gz` carries 12.** The two
-`runner*.exp` come from `data/results/runner*Experiment.tar.gz` (§7). Provision
-`data/` the way §9 describes and the baseline is 6 robots, not 7.
+**`data/` holds the kept experiments, not the 14 of the download.** Jan judged
+all 14 by eye on 2026-09-19 and kept one per robot, each renamed to its robot's
+name: `hammer`, `insect`, `octopus`, `runner`, `shortHammer`, `twoBases`,
+`walker` — items 40, 44, 45 and 46 in `future_refactorings.md`. The files'
+bytes are the download's; only the names and the set changed. A `data/` built
+from the downloads again must be cut and renamed the same way.
 
 ### D2 — what the migration actually has to preserve
 
 Names, so this stops being ambiguous: `dictorder-dump.sh` produces the order,
 `dictorder-baseline.txt` is the committed reference, and **`data-reordered/`**
-is the working copy. `data/` is never written to — it is the untracked download
-and the only clean original we have.
+is the working copy. `dictorder-reorder.py` never writes `data/` — it is the
+untracked download, cut to the kept experiments and renamed.
 
 **Only four of the six dicts are numbered.** The walk is, in this order,
 **links → joints → sensors → drives**, and those four orders are the ones a

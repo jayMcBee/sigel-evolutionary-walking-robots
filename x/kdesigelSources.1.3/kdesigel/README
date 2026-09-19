@@ -101,7 +101,7 @@ The cronjob starts in a "naked" shell. The script contains one line setting the 
 variable. This is the only line you need to modify. Then you can use it for example in the
 folowing crontab-entry:
 
-00      21      20      8       *       /home/sawitzki/sigelLauncher -evolve insectNiceWalkingFitness.exp
+00      21      20      8       *       /home/sawitzki/sigelLauncher -evolve insect.exp
 
 2.4 Using gnuplot
 

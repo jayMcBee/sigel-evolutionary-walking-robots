@@ -555,7 +555,7 @@ static void eq( const char *what, QString got, QString want )
 }
 int main()
 {
-    // 1.3's own data: data/Experiments/twoBasesSimpleFitness1.exp
+    // 1.3's own data: data/Experiments/twoBases.exp
     SIGEL_GP::SIG_GPPVMHost h( "eiche 2 1 \"/home/pg368b/ross/projects/sigel\"" );
     eq( "name",      h.name,                       "eiche" );
     eq( "maxSlaves", QString::number(h.maxSlaves), "2" );
@@ -900,7 +900,7 @@ pass=$((pass+sp)); fail=$((fail+sf))
 # and by blinding the program matcher (caught).
 ep=0; ef=0
 if python3 "$ROOT/expstruct.py" --selfcheck \
-       "$ROOT/data/Experiments/twoBasesSimpleFitness1.exp" >/tmp/eps.$$ 2>&1; then
+       "$ROOT/data/Experiments/twoBases.exp" >/tmp/eps.$$ 2>&1; then
     ep=1
 else
     ef=1
@@ -1842,16 +1842,18 @@ printf '%-22s %2d pass  %2d fail\n' "truncated pi (V5)" "$v5p" "$v5f"
 pass=$((pass+v5p)); fail=$((fail+v5f))
 
 # ---------------------------------------------------------------------------
-# V2 -- whole experiments through File > Save Experiment, against 1.3's own.
+# V2 -- whole experiments through File > Save Experiment.
 #
-# Every other section here compares the port against itself. This one does not.
-# The expected report is copied from two captures of the running 2003 binary,
-# both taken before this conversion existed:
+# The hammer half of the expected report is copied from a capture of the
+# running 2003 binary, taken before this conversion existed:
 #
 #   verification-against-sigel-1.3/v8-1.3-gp-blocks.txt   hammer, 2026-08-29
-#   verification-against-sigel-1.3/v1-1.3-roundtrip.txt   octopus, 2026-08-27
 #
-# So a failure here is a regression against 1.3, not against yesterday.
+# So a failure in the hammer half is a regression against 1.3. The octopus half
+# is the port's own output. What 1.3 does with this robot is in
+# verification-against-sigel-1.3/v1-1.3-roundtrip.txt, captured on
+# octopusSimpleFitness: the same robot stored in the other order, which 1.3
+# writes back as the order octopus.exp stores.
 #
 # TWO EXPERIMENTS, BECAUSE ONE OF THEM PROVES LESS THAN IT LOOKS.
 # hammer has 5 links, 4 joints, 4 drives and no sensors at all -- few enough
@@ -1861,10 +1863,10 @@ pass=$((pass+v5p)); fail=$((fail+v5f))
 # points, plus everything outside the robot: the section line counts, PVMHOST
 # order, the experiment history, the HISTORY growth defect and the ten
 # first-save keys.
-#   octopusSimpleFitness supplies the rest. Its joint, drive and sensor
-# containers DO collide -- V1 measured 1.3 permuting all three, plus the body
-# order and the command list. That is where "we reproduced the order" and "we
-# never permute" come apart.
+#   octopus supplies the rest. Its joint, drive and sensor containers DO
+# collide -- 1.3 permutes all three on every save, plus the body order and the
+# command list, and the port keeps the stored order. That is where "we
+# reproduced the order" and "we never permute" come apart.
 #
 # TWO SAVES EACH, NOT V8'S THREE. Pass 0 to 1 shows the ten keys arrive; pass 1
 # to 2 shows them hold and gives the steady-state growth. A third save only
@@ -1887,7 +1889,7 @@ pass=$((pass+v5p)); fail=$((fail+v5f))
 #                 state1 == state3. That is D3's flip to insertion order,
 #                 decided deliberately, and PORTING.md's V2, V6 and D3 carry
 #                 it. Measured on 1.3 for hammer through the sigel-x86 session
-#                 2026-09-08, and for octopus by V1 in 2026-08.
+#                 2026-09-08, and for the octopus robot by V1 in 2026-08.
 #                 A SINGLE SAVE CANNOT SEE THIS. It only shows the order we
 #                 wrote, not whether a second save would move it. That is why
 #                 there are two saves and why octopus is here.
@@ -1898,8 +1900,8 @@ pass=$((pass+v5p)); fail=$((fail+v5f))
 #                 differ in EXACTLY ONE LINE and nothing else -- 255 against
 #                 99, with the rest byte-identical including markers, PVMHOST,
 #                 the experiment history and the HISTORY growth. The same
-#                 split shows on a second robot: pagesave-baseline.txt is 1.3's
-#                 own GUI save of twoBases and reads 99.
+#                 split shows on a second robot: 1.3's own GUI save of
+#                 twoBasesSimpleFitness2, captured 2026-09-03, reads 99.
 #                 The mechanism, in 1.3's source and Qt 2's:
 #                 SIG_Environment.cpp:47 defaults texAlpha to 0xFF;
 #                 SIG_EnvironmentView.cpp, getOutOfExperiment pushes it into sliderAlpha and
@@ -1915,18 +1917,19 @@ pass=$((pass+v5p)); fail=$((fail+v5f))
 #
 # NOT EVERY LINE BELOW IS 1.3's, and the diff labels say so. Three kinds:
 #
-#   1.3's own numbers, from the two captures -- the markers, PVMHOST, the
+#   1.3's own numbers, from the hammer capture -- the markers, PVMHOST, the
 #   experiment-history line count and its first and last entry, the first
-#   block's character counts, the HISTORY growth, the ten first-save keys,
-#   and octopus's material and link order.
+#   block's character counts, the HISTORY growth and the ten first-save keys.
 #
-#   1.3's DATA, read back out. The individual names, the robot-block hash and
-#   the octopus container rows are the shipped file's own bytes, so pinning
-#   them pins this build against 1.3's artefact even though no capture quotes
-#   them.
+#   1.3's DATA, read back out. The individual names and the hammer robot-block
+#   hash are the shipped file's own bytes, so pinning them pins this build
+#   against 1.3's artefact even though no capture quotes them.
 #
-#   OURS, and only ours: the `expstruct' hash. V8 never ran that tool. It is
-#   kept because it covers the population, which nothing else here reaches.
+#   OURS, and only ours: the `expstruct' hash, and the whole octopus half. V8
+#   never ran expstruct; it is kept because it covers the population, which
+#   nothing else here reaches. The octopus rows are the stored order, which the
+#   port writes back unchanged; v1-1.3-roundtrip.txt quotes the other order,
+#   the one 1.3 writes.
 #
 # WHY ONE DIFF RATHER THAN A DOZEN ifs: so that a generator which produces the
 # wrong text, or stops early, fails on the whole report instead of on the one
@@ -1961,8 +1964,8 @@ pass=$((pass+v5p)); fail=$((fail+v5f))
 # stale binary FAILS, suppressed Qt connect logging FAILS, and the section was
 # run from OUTSIDE the repo root to check the `make -q -C "$ROOT"' fix.
 v2p=0; v2f=0
-V2HAM=$ROOT/data/Experiments/hammerNiceWalkingFitness.exp
-V2OCT=$ROOT/data/Experiments/octopusSimpleFitness.exp
+V2HAM=$ROOT/data/Experiments/hammer.exp
+V2OCT=$ROOT/data/Experiments/octopus.exp
 V2D=${TMPDIR:-/tmp}/v2.$$
 if [ ! -f "$V2HAM" ] || [ ! -f "$V2OCT" ]; then
     # Same data dependency and the same policy as the sections above: say
@@ -2076,7 +2079,7 @@ else
     else
         genok=1
         {
-        echo "== V2 round trip, against v8-1.3-gp-blocks.txt (hammer) and v1-1.3-roundtrip.txt (octopus)"
+        echo "== V2 round trip, against v8-1.3-gp-blocks.txt (hammer) and the port's own output (octopus)"
         for p in 0 1 2; do echo "markers ham$p        $(v2marks "$V2D/ham$p.exp")"; done
         for p in 0 1 2; do echo "pvmhost ham$p        $(v2hosts "$V2D/ham$p.exp")"; done
         echo "exp history lines    $(v2s6n "$V2D/ham0.exp") $(v2s6n "$V2D/ham1.exp") $(v2s6n "$V2D/ham2.exp")"
@@ -2128,12 +2131,12 @@ else
         echo "octopus body         $(v2body "$V2D/oct2.exp")"
         echo "octopus commands     $(v2cmds "$V2D/oct2.exp")"
         } > "$V2D/report.txt" || genok=0
-        # The octopus rows are OUR order. 1.3's is in v1-1.3-roundtrip.txt:
-        # material and link come back unchanged there too, but joint, drive,
-        # sensor, body and the command list are all PERMUTED on 1.3 and are not
-        # here. That is the divergence, recorded, not filtered.
+        # The octopus rows are the port's order, which is the stored order. On
+        # this robot 1.3 keeps material and link but permutes joint, drive,
+        # sensor, body and the command list on every save -- see
+        # v1-1.3-roundtrip.txt. That is the divergence, recorded, not filtered.
         cat > "$V2D/expect.txt" <<'V2EXPECT'
-== V2 round trip, against v8-1.3-gp-blocks.txt (hammer) and v1-1.3-roundtrip.txt (octopus)
+== V2 round trip, against v8-1.3-gp-blocks.txt (hammer) and the port's own output (octopus)
 markers ham0        37 65 190 75242 75329 75491
 markers ham1        37 82 209 75363 75450 75612
 markers ham2        37 82 209 75463 75550 75712
@@ -2183,26 +2186,26 @@ WITHTEXTURE        x1 0
 AUTOSAVETIME       x1 0
 RESEVGEN           x1 0
 WITHHISTORY        x1 1
-octopus section 5    identical in all three 127 lines 82215b5620a0f271
+octopus section 5    identical in all three 127 lines fbb7d019a2d69145
 octopus material     greenPlastic bluePlastic redPlastic
 octopus link         thirdFootLink firstFootLink base firstLegLink1 firstLegLink2 secondFootLink secondLegLink1 secondLegLink2 thirdLegLink1 thirdLegLink2
-octopus joint        secondLegJoint1 thirdLegJoint1 secondLegJoint2 thirdLegJoint2 secondLegJoint3 thirdLegJoint3 firstLegJoint1 firstLegJoint2 firstLegJoint3
-octopus drive        firstLegJoint2Drive firstLegJoint1Drive secondLegJoint1Drive thirdLegJoint2Drive secondLegJoint3Drive thirdLegJoint3Drive secondLegJoint2Drive thirdLegJoint1Drive firstLegJoint3Drive
-octopus sensor       thirdLegJoint3Sensor secondLegJoint1Sensor secondLegJoint2Sensor firstLegJoint3Sensor thirdLegJoint2Sensor secondLegJoint3Sensor thirdLegJoint1Sensor firstLegJoint1Sensor firstLegJoint2Sensor
-octopus body         footLink.wrl legLink.wrl tripleBase.wrl
-octopus commands     MUL CMP MOVE COPY LOAD SENSE DIV SUB ADD DELAY MIN MAX MOD
+octopus joint        secondLegJoint1 secondLegJoint2 thirdLegJoint1 secondLegJoint3 thirdLegJoint2 thirdLegJoint3 firstLegJoint1 firstLegJoint2 firstLegJoint3
+octopus drive        firstLegJoint2Drive firstLegJoint1Drive secondLegJoint1Drive secondLegJoint3Drive thirdLegJoint2Drive secondLegJoint2Drive thirdLegJoint3Drive thirdLegJoint1Drive firstLegJoint3Drive
+octopus sensor       secondLegJoint1Sensor thirdLegJoint3Sensor secondLegJoint2Sensor firstLegJoint3Sensor secondLegJoint3Sensor thirdLegJoint2Sensor thirdLegJoint1Sensor firstLegJoint1Sensor firstLegJoint2Sensor
+octopus body         legLink.wrl footLink.wrl tripleBase.wrl
+octopus commands     MUL MOVE CMP COPY LOAD SENSE SUB DIV MIN DELAY ADD MOD MAX
 V2EXPECT
         if [ "$genok" = 0 ]; then
             v2f=1
             echo "  the report generator could not write its report at all:"
             ls -l "$V2D/report.txt" 2>&1 | sed 's/^/    /'
-        elif diff -u --label "1.3's numbers, plus our two known divergences" \
+        elif diff -u --label "1.3's numbers for hammer, two known divergences, the port's for octopus" \
                      --label "what this build wrote" \
                      "$V2D/expect.txt" "$V2D/report.txt" > "$V2D/diff.txt"; then
             v2p=1
         else
             v2f=1
-            echo "  our round trip no longer matches what SIGEL 1.3 wrote:"
+            echo "  our round trip no longer matches the expected report:"
             # The CHANGED lines, not the first 20 lines of the diff. The
             # report is 58 lines, so a plain head shows context and can stop
             # before reaching the difference -- measured 2026-09-08, when a

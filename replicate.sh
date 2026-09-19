@@ -4,14 +4,12 @@
 #   ./replicate.sh              build/sigel_eval, under ASan and UBSan
 #   ./replicate.sh build-fast   an unsanitised build, ~15x faster
 #
-# THE ORACLE IS SIGEL 1.0, NOT THE 1.3 SOURCE BEING PORTED. The 14 published
+# THE ORACLE IS SIGEL 1.0, NOT THE 1.3 SOURCE BEING PORTED. The published
 # .exp files are dated August-September 2001; 1.0 was rolled 2001-09-06 and
 # 1.3's ChangeLog starts 2001-12-18. Every 1.0 -> 1.3 change is a confound in
 # this comparison -- see PORTING.md §7.
 #
-# Two of the 14 files are byte-identical (twoBasesSimpleFitness1 and
-# twoBasesHighCrossOverRate), so there are 13 distinct experiments. Duplicates
-# are detected and reported once.
+# Byte-identical files are detected and reported once.
 #
 # EACH WORKER GETS ITS OWN SIGEL_ROOT. SIG_Environment::generateTerrain rewrites
 # $SIGEL_ROOT/Terrain.ter on every single evaluation and reads it straight back.

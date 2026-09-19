@@ -105,9 +105,9 @@ def rewrite_rrb(text, target):
 # --- .exp ------------------------------------------------------------------
 # The robot lives between "StreamedRobot" and "RobotComplete" as one entity per
 # line, except joints and sensors, which take two. Only one joint type appears
-# in the 14 files: RotationalJoint. Census over all 14: Link 87, RotationalJoint
-# 73 (+73 continuation), Drive 73, JointSensor 66 (+66), Material 31, Body 31,
-# Geometry 31, Polygon 488.
+# in the 8 files: RotationalJoint. Census over all 8: Link 62, RotationalJoint
+# 54 (+54 continuation), Drive 54, JointSensor 47 (+47), Material 21, Body 21,
+# Geometry 21, Polygon 352.
 #
 # Stored numbers are read straight back by SIG_Link's stream constructor
 # (SIG_Link.cpp:65 "tx >> name >> number"), so permuting lines leaves every

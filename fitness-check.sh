@@ -3,7 +3,7 @@
 #
 #   ./fitness-check.sh | diff -u fitness-baseline.txt -
 #
-# Three individuals of each of the 14 experiments. This is the check that the
+# Three individuals of each of the 8 experiments. This is the check that the
 # shim removal did not move a simulated number: dictorder-dump.sh proves the
 # ordering is preserved, this proves the physics that comes out of it is.
 #
@@ -63,7 +63,7 @@ else
 fi
 
 n=$(find "$ROOT/$DATA/Experiments" -name '*.exp' | wc -l)
-[ "$n" -eq 14 ] || { echo "expected 14 .exp under $DATA/, found $n" >&2; exit 1; }
+[ "$n" -eq 8 ] || { echo "expected 8 .exp under $DATA/, found $n" >&2; exit 1; }
 # CAPTURE, TEST THE STATUS, THEN FILTER -- do NOT pipe sigel_eval straight into
 # tail. This line used to read
 #

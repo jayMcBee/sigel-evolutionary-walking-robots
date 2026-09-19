@@ -24,7 +24,7 @@
 set -eu
 ROOT=$(cd "$(dirname "$0")" && pwd)
 B=${1:-build-fast}
-DATA=${2:-data-reordered}   # data/ is the pristine download, never written
+DATA=${2:-data-reordered}   # data/ holds the robots as downloaded
 EVAL=$ROOT/$B/sigel_eval
 [ -x "$EVAL" ] || { echo "no $EVAL -- make B=$B SAN= SIGSAN=" >&2; exit 1; }
 
@@ -47,10 +47,10 @@ export SIGEL_ROOT
 exps=$(find "$ROOT/$DATA/Experiments" -name '*.exp' | sort)
 rrbs=$(find "$ROOT/$DATA" -name '*.rrb' | sort)
 ne=$(echo "$exps" | grep -c . || true); nr=$(echo "$rrbs" | grep -c . || true)
-[ "$ne" -eq 14 ] && [ "$nr" -eq 7 ] || {
-	echo "expected 14 .exp and 7 .rrb under $DATA/, found $ne and $nr." >&2
-	echo "PORTING.md §7: experiments.tar.gz carries only 12 -- the two runner" >&2
-	echo ".exp come from data/results/runner*Experiment.tar.gz." >&2
+[ "$ne" -eq 8 ] && [ "$nr" -eq 7 ] || {
+	echo "expected 8 .exp and 7 .rrb under $DATA/, found $ne and $nr." >&2
+	echo "data/ holds the kept experiments under their robot names, not the" >&2
+	echo "14 of the download -- PORTING.md section 10, D2." >&2
 	exit 1
 }
 
