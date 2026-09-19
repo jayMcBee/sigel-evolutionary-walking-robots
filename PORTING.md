@@ -849,12 +849,12 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 **2026-09-19 — IN PROGRESS: JAN JUDGES EACH EXPERIMENT BY EYE, 1.3 BESIDE THE
 PORT.** Start here.
 
-- **Done.** `hammerNiceWalkingFitness`: a keeper. The two-bases family: keep
+- **Done.** `hammerNiceWalkingFitness`: a keeper. `insectNiceWalkingFitness`: a
+  keeper. The two-bases family: keep
   `twoBasesHardlyReducedIS`, to be renamed `twoBases`; the other five go — item 40
   in `future_refactorings.md`. The clean-up waits until every experiment has been
   judged; do not start it unasked.
-- **Next: `insectNiceWalkingFitness`.** Its best individual in the port is number
-  56, score 0.611. Then `octopusNiceWalkingFitness`, `octopusSimpleFitness`,
+- **Next: `octopusNiceWalkingFitness`.** Then `octopusSimpleFitness`,
   `runnerNiceWalkingFitness`, `runnerSimpleFitness`,
   `shortHammerNiceWalkingFitness`, `walkerNiceWalkingFitness`.
 - **How each one is shown.** Score every individual with `build-fast/sigel_eval`
@@ -985,6 +985,8 @@ beside it in the same place.
   keeper."* The six two-bases experiments, each with its best individual by our
   scoring: they behave alike on both, 1.3 only slower on its machine; Jan keeps
   `twoBasesHardlyReducedIS` and drops the other five — item 40.
+  `insectNiceWalkingFitness`, individual 56, score 0.611: Jan: *"confirmed
+  working on both machines, a keeper."*
 - **The payload, octopus, all 259 lines.** The 182 Polygon lines are
   byte-identical. The 13 Geometry lines carry the same values; four differ in
   text only, at exact decimal ties in the 50th digit, where glibc rounds half
