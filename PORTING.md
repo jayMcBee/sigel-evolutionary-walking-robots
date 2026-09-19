@@ -859,9 +859,9 @@ Start here.
   them unasked.
   **Both machines end with the same set under the same names**, Jan, 2026-09-19:
   *"keeping just the ones I've picked on both machines (otherwise we won't ever
-  be able to compare them)"*. After the review every kept experiment is renamed
-  to its base name, one at a time, suggested by Claude and approved by Jan — item
-  46.
+  be able to compare them)"*. Each kept experiment is renamed to its robot's
+  name — `hammer`, `insect`, `octopus`, `runner`, `shortHammer`, `twoBases`,
+  `walker` — all seven approved by Jan; the renaming waits for him — item 46.
 - **How each one was shown.** Score every individual with `build-fast/sigel_eval`
   (a scratch `SIGEL_ROOT` holding a copy of `Terrain.ter`). Make a viewing copy:
   swap the text between the `INDIVIDUAL(0)` and `INDIVIDUAL(k)` labels and swap

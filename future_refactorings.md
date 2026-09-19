@@ -541,7 +541,8 @@ touched, because changing one changes behaviour against the reference binary.
   Approved: `twoBasesHardlyReducedIS` → `twoBases`; `hammerNiceWalkingFitness` →
   `hammer`; `insectNiceWalkingFitness` → `insect`; `octopusNiceWalkingFitness` →
   `octopus`; `runnerNiceWalkingFitness` → `runner`;
-  `shortHammerNiceWalkingFitness` → `shortHammer`.
+  `shortHammerNiceWalkingFitness` → `shortHammer`; `walkerNiceWalkingFitness` →
+  `walker`. All seven approved 2026-09-19; the renaming itself waits for Jan.
 
 - [ ] **35. Remove the Windows and Visual Studio support.** Decided by Jan
   2026-09-09. It does not build here and nothing tests it.
