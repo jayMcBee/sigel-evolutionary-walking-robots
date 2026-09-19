@@ -1,0 +1,190 @@
+material bluePlastic {
+	density 1;
+	colour red 0 green 0 blue 1;
+}
+
+material greenPlastic {
+	density 1;
+	colour red 0 green 1 blue 0;
+}
+
+material redPlastic {
+	density 1;
+	colour red 1 green 0 blue 0;
+}
+
+link firstFootLink {
+	geometry "footLink.wrl";
+	material redPlastic;
+	point firstFootLinkNormal=(0.38,0,-0.37);
+	point firstFootLinkDir=(0,0,0.37);
+	point firstFootLinkBase=(0,0,-0.37);
+}
+
+link base {
+	torso;
+	geometry "base.wrl";
+	material bluePlastic;
+	point baseSecondBase=(-0.59,0.01,-0.37);
+	point baseSecondNormal=(-1,0.01,-0.37);
+	point baseSecondDir=(-0.59,0.01,0.37);
+	point baseFirstNormal=(1,0.01,0.37);
+	point baseFirstBase=(0.59,0.01,0.37);
+	point baseFirstDir=(0.59,0.01,-0.37);
+}
+
+link firstLegLink1 {
+	geometry "legLink.wrl";
+	material greenPlastic;
+	point firstLegLink1PredDir=(-0.5,0,0.37);
+	point firstLegLink1PredBase=(-0.5,0,-0.37);
+	point firstLegLink1SuccBase=(0.5,-0.37,0);
+	point firstLegLink1SuccNormal=(0.87,-0.37,0);
+	point firstLegLink1PredNormal=(-0.17,0,-0.37);
+	point firstLegLink1SuccDir=(0.5,0.37,0);
+}
+
+link firstLegLink2 {
+	geometry "legLink.wrl";
+	material greenPlastic;
+	point firstLegLink2PredDir=(-0.5,0,0.37);
+	point firstLegLink2PredBase=(-0.5,0,-0.37);
+	point firstLegLink2SuccBase=(0.5,-0.37,0);
+	point firstLegLink2SuccNormal=(0.87,-0.37,0);
+	point firstLegLink2SuccDir=(0.5,0.37,0);
+	point firstLegLink2PredNormal=(-0.17,0,-0.37);
+}
+
+link secondFootLink {
+	geometry "footLink.wrl";
+	material redPlastic;
+	point secondFootLinkDir=(0,0,0.37);
+	point secondFootLinkBase=(0,0,-0.37);
+	point secondFootLinkNormal=(0.38,0,-0.37);
+}
+
+link secondLegLink1 {
+	geometry "legLink.wrl";
+	material greenPlastic;
+	point secondLegLink1PredNormal=(-0.17,0,-0.37);
+	point secondLegLink1PredBase=(-0.5,0,-0.37);
+	point secondLegLink1SuccNormal=(0.87,-0.37,0);
+	point secondLegLink1SuccDir=(0.5,0.37,0);
+	point secondLegLink1SuccBase=(0.5,-0.37,0);
+	point secondLegLink1PredDir=(-0.5,0,0.37);
+}
+
+link secondLegLink2 {
+	geometry "legLink.wrl";
+	material greenPlastic;
+	point secondLegLink2PredNormal=(-0.17,0,-0.37);
+	point secondLegLink2PredBase=(-0.5,0,-0.37);
+	point secondLegLink2SuccDir=(0.5,0.37,0);
+	point secondLegLink2SuccNormal=(0.87,-0.37,0);
+	point secondLegLink2SuccBase=(0.5,-0.37,0);
+	point secondLegLink2PredDir=(-0.5,0,0.37);
+}
+
+
+
+joint rotational secondLegJoint1 {
+	between base (baseSecondBase,baseSecondDir,baseSecondNormal) and secondLegLink1 (secondLegLink1PredBase,secondLegLink1PredDir,secondLegLink1PredNormal);
+	minimal -90;
+	maximal -50;
+	init -45;
+}
+
+joint rotational secondLegJoint2 {
+	between secondLegLink1 (secondLegLink1SuccBase,secondLegLink1SuccDir,secondLegLink1SuccNormal) and secondLegLink2 (secondLegLink2PredBase,secondLegLink2PredDir,secondLegLink2PredNormal);
+	minimal -45;
+	maximal 45;
+	init 0;
+}
+
+joint rotational secondLegJoint3 {
+	between secondLegLink2 (secondLegLink2SuccBase,secondLegLink2SuccDir,secondLegLink2SuccNormal) and secondFootLink (secondFootLinkBase,secondFootLinkDir,secondFootLinkNormal);
+	minimal -45;
+	maximal 45;
+	init -30;
+}
+
+joint rotational firstLegJoint1 {
+	between base (baseFirstBase,baseFirstDir,baseFirstNormal) and firstLegLink1 (firstLegLink1PredBase,firstLegLink1PredDir,firstLegLink1PredNormal);
+	minimal -90;
+	maximal -50;
+	init -45;
+}
+
+joint rotational firstLegJoint2 {
+	between firstLegLink1 (firstLegLink1SuccBase,firstLegLink1SuccDir,firstLegLink1SuccNormal) and firstLegLink2 (firstLegLink2PredBase,firstLegLink2PredDir,firstLegLink2PredNormal);
+	minimal -45;
+	maximal 45;
+	init 0;
+}
+
+joint rotational firstLegJoint3 {
+	between firstLegLink2 (firstLegLink2SuccBase,firstLegLink2SuccDir,firstLegLink2SuccNormal) and firstFootLink (firstFootLinkBase,firstFootLinkDir,firstFootLinkNormal);
+	minimal -45;
+	maximal 45;
+	init -30;
+}
+
+drive firstLegJoint2Drive {
+	force firstLegJoint2;
+	minimalforce 0;
+	maximalforce 50;
+}
+
+drive firstLegJoint1Drive {
+	force firstLegJoint1;
+	minimalforce 0;
+	maximalforce 50;
+}
+
+drive secondLegJoint1Drive {
+	force secondLegJoint1;
+	minimalforce 0;
+	maximalforce 50;
+}
+
+drive secondLegJoint3Drive {
+	force secondLegJoint3;
+	minimalforce 0;
+	maximalforce 50;
+}
+
+drive secondLegJoint2Drive {
+	force secondLegJoint2;
+	minimalforce 0;
+	maximalforce 50;
+}
+
+drive firstLegJoint3Drive {
+	force firstLegJoint3;
+	minimalforce 0;
+	maximalforce 50;
+}
+
+sensor secondLegJoint1Sensor {
+	joint secondLegJoint1;
+}
+
+sensor secondLegJoint2Sensor {
+	joint secondLegJoint2;
+}
+
+sensor firstLegJoint3Sensor {
+	joint firstLegJoint3;
+}
+
+sensor secondLegJoint3Sensor {
+	joint secondLegJoint3;
+}
+
+sensor firstLegJoint1Sensor {
+	joint firstLegJoint1;
+}
+
+sensor firstLegJoint2Sensor {
+	joint firstLegJoint2;
+}

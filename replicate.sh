@@ -30,7 +30,7 @@ ROOT=$(cd "$(dirname "$0")" && pwd)
 BUILD=${1:-build}
 case $BUILD in /*) EVAL=$BUILD/sigel_eval ;; *) EVAL=$ROOT/$BUILD/sigel_eval ;; esac
 [ -x "$EVAL" ] || { echo "no $EVAL -- run: make${1:+ B=$1 SAN= SIGSAN=}"; exit 1; }
-[ -d "$ROOT/data/Experiments" ] || { echo "no data/ -- see PORTING.md §9"; exit 1; }
+[ -d "$ROOT/experiments" ] || { echo "no experiments/ -- restore it from git"; exit 1; }
 
 ASAN_OPTIONS=detect_leaks=0
 export ASAN_OPTIONS
@@ -68,7 +68,7 @@ def one(args):
     return float(m.group(1))
 
 seen, rows, wide = {}, [], 0
-for exp in sorted(glob.glob(os.path.join(root, 'data/Experiments/*.exp'))):
+for exp in sorted(glob.glob(os.path.join(root, 'experiments/*.exp'))):
     name = os.path.basename(exp)[:-4]
     text = open(exp, encoding='latin-1').read()
     digest = hashlib.md5(text.encode('latin-1')).hexdigest()

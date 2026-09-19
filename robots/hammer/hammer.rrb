@@ -1,0 +1,116 @@
+material metal {
+	density 2;
+	colour red 0.0 green 0.0 blue 1;
+}
+
+material plastic {
+	density 1.5;
+	colour red 0.0 green 1 blue 0;
+}
+
+material rubber {
+	density 1;
+	colour red 1 green 0.0 blue 0;
+}
+
+link base {
+	torso;
+	geometry "base.wrl";
+	material metal;
+	point BaseAxisSuccNormal=(2,0,0);
+	point BaseAxisSuccDir=(1,0,1);
+	point BaseAxisSuccBase=(1,0,0);
+}
+
+link hammer {
+	geometry "effector.wrl";
+	material rubber;
+	point HammerPredAxisBase=(0,0,0);
+	point HammerPredAxisDir=(0,0,1);
+	point HammerPredAxisNormal=(1,0,0);
+}
+
+link middle1 {
+	geometry "middle.wrl";
+	material plastic;
+	point Middle1SuccAxisBase=(1,0,0);
+	point Middle1PredAxisNormal=(0,0,0);
+	point Middle1PredAxisBase=(-1,0,0);
+	point Middle1SuccAxisNormal=(2,0,0);
+	point Middle1SuccAxisDir=(1,1,0);
+	point Middle1PredAxisDir=(-1,0,1);
+}
+
+link middle2 {
+	geometry "middle.wrl";
+	material plastic;
+	point Middle2PredAxisDir=(-1,0,1);
+	point Middle2PredAxisNormal=(0,0,0);
+	point Middle2SuccAxisNormal=(2,0,0);
+	point Middle2SuccAxisBase=(1,0,0);
+	point Middle2PredAxisBase=(-1,0,0);
+	point Middle2SuccAxisDir=(1,1,0);
+}
+
+link middle3 {
+	geometry "middle.wrl";
+	material plastic;
+	point Middle3PredAxisNormal=(0,0,0);
+	point Middle3SuccAxisBase=(1,0,0);
+	point Middle3SuccAxisNormal=(2,0,0);
+	point Middle3SuccAxisDir=(1,1,0);
+	point Middle3PredAxisDir=(-1,0,1);
+	point Middle3PredAxisBase=(-1,0,0);
+}
+
+joint rotational hinge1 {
+	between base (BaseAxisSuccBase,BaseAxisSuccDir,BaseAxisSuccNormal) and middle1 (Middle1PredAxisBase,Middle1PredAxisDir,Middle1PredAxisNormal);
+	minimal -90;
+	maximal 90;
+	init 0;
+}
+
+joint rotational hinge2 {
+	between middle1 (Middle1SuccAxisBase,Middle1SuccAxisDir,Middle1SuccAxisNormal) and middle2 (Middle2PredAxisBase,Middle2PredAxisDir,Middle2PredAxisNormal);
+	minimal -90;
+	maximal 90;
+	init 0;
+}
+
+joint rotational hinge3 {
+	between middle2 (Middle2SuccAxisBase,Middle2SuccAxisDir,Middle2SuccAxisNormal) and middle3 (Middle3PredAxisBase,Middle3PredAxisDir,Middle3PredAxisNormal);
+	minimal -90;
+	maximal 90;
+	init 0;
+}
+
+joint rotational hinge4 {
+	between middle3 (Middle3SuccAxisBase,Middle3SuccAxisDir,Middle3SuccAxisNormal) and hammer (HammerPredAxisBase,HammerPredAxisDir,HammerPredAxisNormal);
+	minimal -90;
+	maximal 90;
+	init 0;
+}
+
+drive hinge1Drive {
+	force hinge1;
+	minimalforce 0;
+	maximalforce 2000;
+}
+
+drive hinge3Drive {
+	force hinge3;
+	minimalforce 0;
+	maximalforce 2000;
+}
+
+drive hinge2Drive {
+	force hinge2;
+	minimalforce 0;
+	maximalforce 2000;
+}
+
+drive hinge4Drive {
+	force hinge4;
+	minimalforce 0;
+	maximalforce 2000;
+}

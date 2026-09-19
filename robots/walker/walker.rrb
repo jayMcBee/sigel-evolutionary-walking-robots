@@ -1,0 +1,529 @@
+material bodyMaterial {
+	density 0.5;
+	colour red 0 green 0 blue 1;
+}
+
+material shoulderMaterial {
+	density 0.5;
+	colour red 1 green 1 blue 0;
+}
+
+material legMaterial {
+	density 0.5;
+	colour red 0 green 1 blue 0;
+}
+
+material footMaterial {
+	density 0.5;
+	colour red 1 green 0 blue 0;
+}
+
+link shoulder5 {
+	geometry "shoulder.wrl";
+	material shoulderMaterial;
+	point shoulder5SuccNormal=(1.1,0,-0.23);
+	point shoulder5PredDir=(-0.1,0.23,0);
+	point shoulder5PredBase=(-0.1,-0.23,0);
+	point shoulder5SuccDir=(0.1,0,0.23);
+	point shoulder5PredNormal=(1,-0.23,0);
+	point shoulder5SuccBase=(0.1,0,-0.23);
+}
+
+link body {
+	torso;
+	geometry "body.wrl";
+	material bodyMaterial;
+	point bodyLeg4Normal=(-1.79,-0.23,1.69);
+	point bodyLeg6Dir=(-0.79,0.23,-1.69);
+	point bodyLeg5Base=(-0.79,-0.23,0);
+	point bodyLeg4Dir=(-0.79,0.23,1.69);
+	point bodyLeg4Base=(-0.79,-0.23,1.69);
+	point bodyLeg6Normal=(-1.79,-0.23,-1.69);
+	point bodyLeg5Dir=(-0.79,0.23,0);
+	point bodyLeg1Normal=(1.79,-0.23,-1.69);
+	point bodyLeg6Base=(-0.79,-0.23,-1.69);
+	point bodyLeg3Normal=(1.79,-0.23,1.69);
+	point bodyLeg2Normal=(1.79,-0.23,0);
+	point bodyLeg1Base=(0.79,-0.23,-1.69);
+	point bodyLeg3Base=(0.79,-0.23,1.69);
+	point bodyLeg2Base=(0.79,-0.23,0);
+	point bodyLeg2Dir=(0.79,0.23,0);
+	point bodyLeg3Dir=(0.79,0.23,1.69);
+	point bodyLeg5Normal=(-1.79,-0.23,0);
+	point bodyLeg1Dir=(0.79,0.23,-1.69);
+}
+
+link shoulder6 {
+	geometry "shoulder.wrl";
+	material shoulderMaterial;
+	point shoulder6SuccBase=(0.1,0,-0.23);
+	point shoulder6PredDir=(-0.1,0.23,0);
+	point shoulder6SuccNormal=(1.1,0,-0.23);
+	point shoulder6SuccDir=(0.1,0,0.23);
+	point shoulder6PredBase=(-0.1,-0.23,0);
+	point shoulder6PredNormal=(1,-0.23,0);
+}
+
+link foot1 {
+	geometry "foot.wrl";
+	material footMaterial;
+	point foot1PredBase=(-0.41,-0.23,0);
+	point foot1PredDir=(-0.41,0.23,0);
+	point foot1PredNormal=(-0.2,-0.23,0);
+}
+
+link foot2 {
+	geometry "foot.wrl";
+	material footMaterial;
+	point foot2PredBase=(-0.41,-0.23,0);
+	point foot2PredDir=(-0.41,0.23,0);
+	point foot2PredNormal=(-0.2,-0.23,0);
+}
+
+link foot3 {
+	geometry "foot.wrl";
+	material footMaterial;
+	point foot3PredDir=(-0.41,0.23,0);
+	point foot3PredBase=(-0.41,-0.23,0);
+	point foot3PredNormal=(-0.2,-0.23,0);
+}
+
+link foot4 {
+	geometry "foot.wrl";
+	material footMaterial;
+	point foot4PredDir=(-0.41,0.23,0);
+	point foot4PredBase=(-0.41,-0.23,0);
+	point foot4PredNormal=(-0.2,-0.23,0);
+}
+
+link foot5 {
+	geometry "foot.wrl";
+	material footMaterial;
+	point foot5PredDir=(-0.41,0.23,0);
+	point foot5PredNormal=(-0.2,-0.23,0);
+	point foot5PredBase=(-0.41,-0.23,0);
+}
+
+link foot6 {
+	geometry "foot.wrl";
+	material footMaterial;
+	point foot6PredDir=(-0.41,0.23,0);
+	point foot6PredNormal=(-0.2,-0.23,0);
+	point foot6PredBase=(-0.41,-0.23,0);
+}
+
+link leg1 {
+	geometry "leg.wrl";
+	material legMaterial;
+	point leg1PredNormal=(-0.2,-0.23,0);
+	point leg1SuccNormal=(0.6,-0.23,0);
+	point leg1SuccBase=(0.41,-0.23,0);
+	point leg1SuccDir=(0.41,0.23,0);
+	point leg1PredDir=(-0.41,0.23,0);
+	point leg1PredBase=(-0.41,-0.23,0);
+}
+
+link leg2 {
+	geometry "leg.wrl";
+	material legMaterial;
+	point leg2PredNormal=(-0.2,-0.23,0);
+	point leg2SuccDir=(0.41,0.23,0);
+	point leg2SuccNormal=(0.6,-0.23,0);
+	point leg2SuccBase=(0.41,-0.23,0);
+	point leg2PredDir=(-0.41,0.23,0);
+	point leg2PredBase=(-0.41,-0.23,0);
+}
+
+link leg3 {
+	geometry "leg.wrl";
+	material legMaterial;
+	point leg3SuccNormal=(0.6,-0.23,0);
+	point leg3SuccDir=(0.41,0.23,0);
+	point leg3PredDir=(-0.41,0.23,0);
+	point leg3SuccBase=(0.41,-0.23,0);
+	point leg3PredNormal=(-0.2,-0.23,0);
+	point leg3PredBase=(-0.41,-0.23,0);
+}
+
+link leg4 {
+	geometry "leg.wrl";
+	material legMaterial;
+	point leg4SuccNormal=(0.6,-0.23,0);
+	point leg4SuccDir=(0.41,0.23,0);
+	point leg4PredDir=(-0.41,0.23,0);
+	point leg4SuccBase=(0.41,-0.23,0);
+	point leg4PredNormal=(-0.2,-0.23,0);
+	point leg4PredBase=(-0.41,-0.23,0);
+}
+
+link leg5 {
+	geometry "leg.wrl";
+	material legMaterial;
+	point leg5PredBase=(-0.41,-0.23,0);
+	point leg5SuccNormal=(0.6,-0.23,0);
+	point leg5SuccDir=(0.41,0.23,0);
+	point leg5PredDir=(-0.41,0.23,0);
+	point leg5PredNormal=(-0.2,-0.23,0);
+	point leg5SuccBase=(0.41,-0.23,0);
+}
+
+link leg6 {
+	geometry "leg.wrl";
+	material legMaterial;
+	point leg6PredBase=(-0.41,-0.23,0);
+	point leg6SuccNormal=(0.6,-0.23,0);
+	point leg6SuccDir=(0.41,0.23,0);
+	point leg6PredDir=(-0.41,0.23,0);
+	point leg6PredNormal=(-0.2,-0.23,0);
+	point leg6SuccBase=(0.41,-0.23,0);
+}
+
+link shoulder1 {
+	geometry "shoulder.wrl";
+	material shoulderMaterial;
+	point shoulder1SuccDir=(0.1,0,0.23);
+	point shoulder1SuccBase=(0.1,0,-0.23);
+	point shoulder1PredNormal=(1,-0.23,0);
+	point shoulder1PredBase=(-0.1,-0.23,0);
+	point shoulder1PredDir=(-0.1,0.23,0);
+	point shoulder1SuccNormal=(1.1,0,-0.23);
+}
+
+link shoulder2 {
+	geometry "shoulder.wrl";
+	material shoulderMaterial;
+	point shoulder2SuccDir=(0.1,0,0.23);
+	point shoulder2SuccBase=(0.1,0,-0.23);
+	point shoulder2PredNormal=(1,-0.23,0);
+	point shoulder2PredBase=(-0.1,-0.23,0);
+	point shoulder2PredDir=(-0.1,0.23,0);
+	point shoulder2SuccNormal=(1.1,0,-0.23);
+}
+
+link shoulder3 {
+	geometry "shoulder.wrl";
+	material shoulderMaterial;
+	point shoulder3SuccNormal=(1.1,0,-0.23);
+	point shoulder3PredDir=(-0.1,0.23,0);
+	point shoulder3SuccBase=(0.1,0,-0.23);
+	point shoulder3SuccDir=(0.1,0,0.23);
+	point shoulder3PredNormal=(1,-0.23,0);
+	point shoulder3PredBase=(-0.1,-0.23,0);
+}
+
+link shoulder4 {
+	geometry "shoulder.wrl";
+	material shoulderMaterial;
+	point shoulder4SuccNormal=(1.1,0,-0.23);
+	point shoulder4SuccBase=(0.1,0,-0.23);
+	point shoulder4SuccDir=(0.1,0,0.23);
+	point shoulder4PredNormal=(1,-0.23,0);
+	point shoulder4PredBase=(-0.1,-0.23,0);
+	point shoulder4PredDir=(-0.1,0.23,0);
+}
+
+joint rotational leg6Joint1 {
+	between body (bodyLeg6Base,bodyLeg6Dir,bodyLeg6Normal) and shoulder6 (shoulder6PredBase,shoulder6PredDir,shoulder6PredNormal);
+	minimal -45;
+	maximal 45;
+	init 0;
+}
+
+joint rotational leg5Joint2 {
+	between shoulder5 (shoulder5SuccBase,shoulder5SuccDir,shoulder5SuccNormal) and leg5 (leg5PredBase,leg5PredDir,leg5PredNormal);
+	minimal 45;
+	maximal 80;
+	init 45;
+}
+
+joint rotational leg4Joint3 {
+	between leg4 (leg4SuccBase,leg4SuccDir,leg4SuccNormal) and foot4 (foot4PredBase,foot4PredDir,foot4PredNormal);
+	minimal 0;
+	maximal 35;
+	init 0;
+}
+
+joint rotational leg6Joint2 {
+	between shoulder6 (shoulder6SuccBase,shoulder6SuccDir,shoulder6SuccNormal) and leg6 (leg6PredBase,leg6PredDir,leg6PredNormal);
+	minimal 45;
+	maximal 80;
+	init 45;
+}
+
+joint rotational leg5Joint3 {
+	between leg5 (leg5SuccBase,leg5SuccDir,leg5SuccNormal) and foot5 (foot5PredBase,foot5PredDir,foot5PredNormal);
+	minimal 0;
+	maximal 35;
+	init 0;
+}
+
+joint rotational leg6Joint3 {
+	between leg6 (leg6SuccBase,leg6SuccDir,leg6SuccNormal) and foot6 (foot6PredBase,foot6PredDir,foot6PredNormal);
+	minimal 0;
+	maximal 35;
+	init 0;
+}
+
+joint rotational leg1Joint1 {
+	between body (bodyLeg1Base,bodyLeg1Dir,bodyLeg1Normal) and shoulder1 (shoulder1PredBase,shoulder1PredDir,shoulder1PredNormal);
+	minimal -45;
+	maximal 45;
+	init 0;
+}
+
+joint rotational leg2Joint1 {
+	between body (bodyLeg2Base,bodyLeg2Dir,bodyLeg2Normal) and shoulder2 (shoulder2PredBase,shoulder2PredDir,shoulder2PredNormal);
+	minimal -45;
+	maximal 45;
+	init 0;
+}
+
+joint rotational leg1Joint2 {
+	between shoulder1 (shoulder1SuccBase,shoulder1SuccDir,shoulder1SuccNormal) and leg1 (leg1PredBase,leg1PredDir,leg1PredNormal);
+	minimal 0;
+	maximal 90;
+	init 45;
+}
+
+joint rotational leg3Joint1 {
+	between body (bodyLeg3Base,bodyLeg3Dir,bodyLeg3Normal) and shoulder3 (shoulder3PredBase,shoulder3PredDir,shoulder3PredNormal);
+	minimal -45;
+	maximal 45;
+	init 0;
+}
+
+joint rotational leg2Joint2 {
+	between shoulder2 (shoulder2SuccBase,shoulder2SuccDir,shoulder2SuccNormal) and leg2 (leg2PredBase,leg2PredDir,leg2PredNormal);
+	minimal 45;
+	maximal 80;
+	init 45;
+}
+
+joint rotational leg1Joint3 {
+	between leg1 (leg1SuccBase,leg1SuccDir,leg1SuccNormal) and foot1 (foot1PredBase,foot1PredDir,foot1PredNormal);
+	minimal 0;
+	maximal 35;
+	init 0;
+}
+
+joint rotational leg4Joint1 {
+	between body (bodyLeg4Base,bodyLeg4Dir,bodyLeg4Normal) and shoulder4 (shoulder4PredBase,shoulder4PredDir,shoulder4PredNormal);
+	minimal -45;
+	maximal 45;
+	init 0;
+}
+
+joint rotational leg3Joint2 {
+	between shoulder3 (shoulder3SuccBase,shoulder3SuccDir,shoulder3SuccNormal) and leg3 (leg3PredBase,leg3PredDir,leg3PredNormal);
+	minimal 45;
+	maximal 80;
+	init 45;
+}
+
+joint rotational leg2Joint3 {
+	between leg2 (leg2SuccBase,leg2SuccDir,leg2SuccNormal) and foot2 (foot2PredBase,foot2PredDir,foot2PredNormal);
+	minimal 0;
+	maximal 35;
+	init 0;
+}
+
+joint rotational leg5Joint1 {
+	between body (bodyLeg5Base,bodyLeg5Dir,bodyLeg5Normal) and shoulder5 (shoulder5PredBase,shoulder5PredDir,shoulder5PredNormal);
+	minimal -45;
+	maximal 45;
+	init 0;
+}
+
+joint rotational leg4Joint2 {
+	between shoulder4 (shoulder4SuccBase,shoulder4SuccDir,shoulder4SuccNormal) and leg4 (leg4PredBase,leg4PredDir,leg4PredNormal);
+	minimal 45;
+	maximal 80;
+	init 45;
+}
+
+joint rotational leg3Joint3 {
+	between leg3 (leg3SuccBase,leg3SuccDir,leg3SuccNormal) and foot3 (foot3PredBase,foot3PredDir,foot3PredNormal);
+	minimal 0;
+	maximal 35;
+	init 0;
+}
+
+drive leg6Joint3Drive {
+	force leg6Joint3;
+	minimalforce 0;
+	maximalforce 50;
+}
+
+drive leg5Joint2Drive {
+	force leg5Joint2;
+	minimalforce 0;
+	maximalforce 50;
+}
+
+drive leg4Joint1Drive {
+	force leg4Joint1;
+	minimalforce 0;
+	maximalforce 50;
+}
+
+drive leg1Joint1Drive {
+	force leg1Joint1;
+	minimalforce 0;
+	maximalforce 50;
+}
+
+drive leg2Joint1Drive {
+	force leg2Joint1;
+	minimalforce 0;
+	maximalforce 50;
+}
+
+drive leg2Joint2Drive {
+	force leg2Joint2;
+	minimalforce 0;
+	maximalforce 50;
+}
+
+drive leg1Joint3Drive {
+	force leg1Joint3;
+	minimalforce 0;
+	maximalforce 50;
+}
+
+drive leg2Joint3Drive {
+	force leg2Joint3;
+	minimalforce 0;
+	maximalforce 50;
+}
+
+drive leg1Joint2Drive {
+	force leg1Joint2;
+	minimalforce 0;
+	maximalforce 50;
+}
+
+drive leg5Joint1Drive {
+	force leg5Joint1;
+	minimalforce 0;
+	maximalforce 50;
+}
+
+drive leg4Joint2Drive {
+	force leg4Joint2;
+	minimalforce 0;
+	maximalforce 50;
+}
+
+drive leg3Joint3Drive {
+	force leg3Joint3;
+	minimalforce 0;
+	maximalforce 50;
+}
+
+drive leg6Joint1Drive {
+	force leg6Joint1;
+	minimalforce 0;
+	maximalforce 50;
+}
+
+drive leg4Joint3Drive {
+	force leg4Joint3;
+	minimalforce 0;
+	maximalforce 50;
+}
+
+drive leg3Joint2Drive {
+	force leg3Joint2;
+	minimalforce 0;
+	maximalforce 50;
+}
+
+drive leg6Joint2Drive {
+	force leg6Joint2;
+	minimalforce 0;
+	maximalforce 50;
+}
+
+drive leg5Joint3Drive {
+	force leg5Joint3;
+	minimalforce 0;
+	maximalforce 50;
+}
+
+drive leg3Joint1Drive {
+	force leg3Joint1;
+	minimalforce 0;
+	maximalforce 50;
+}
+
+sensor leg6Joint2Sensor {
+	joint leg6Joint2;
+}
+
+sensor leg5Joint1Sensor {
+	joint leg5Joint1;
+}
+
+sensor leg6Joint1Sensor {
+	joint leg6Joint1;
+}
+
+sensor leg5Joint2Sensor {
+	joint leg5Joint2;
+}
+
+sensor leg4Joint2Sensor {
+	joint leg4Joint2;
+}
+
+sensor leg3Joint1Sensor {
+	joint leg3Joint1;
+}
+
+sensor leg1Joint3Sensor {
+	joint leg1Joint3;
+}
+
+sensor leg4Joint1Sensor {
+	joint leg4Joint1;
+}
+
+sensor leg3Joint2Sensor {
+	joint leg3Joint2;
+}
+
+sensor leg2Joint3Sensor {
+	joint leg2Joint3;
+}
+
+sensor leg3Joint3Sensor {
+	joint leg3Joint3;
+}
+
+sensor leg2Joint2Sensor {
+	joint leg2Joint2;
+}
+
+sensor leg1Joint1Sensor {
+	joint leg1Joint1;
+}
+
+sensor leg4Joint3Sensor {
+	joint leg4Joint3;
+}
+
+sensor leg2Joint1Sensor {
+	joint leg2Joint1;
+}
+
+sensor leg1Joint2Sensor {
+	joint leg1Joint2;
+}
+
+sensor leg5Joint3Sensor {
+	joint leg5Joint3;
+}
+
+sensor leg6Joint3Sensor {
+	joint leg6Joint3;
+}

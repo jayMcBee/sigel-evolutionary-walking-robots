@@ -282,11 +282,11 @@ printf '%-22s %2d dead (baseline %d -- §2 has the per-signal table)\n' \
 # printable-byte ratio when there is no NUL. Ask git. Found by review 2026-09-09.
 #
 # Lone CRs are left alone, and NOT because they are Mac-classic line endings --
-# an earlier version of this comment said that and it was wrong. Six tracked
-# files hold lone CRs and git calls ALL SIX binary: pvm3.4.6.tgz 3859,
+# an earlier version of this comment said that and it was wrong. 26 tracked
+# files hold lone CRs and git calls ALL 26 binary: pvm3.4.6.tgz 3859,
 # noExperiment.png 691, JustGreen.pnm 2848, altLogo.png 208, Hippie.pnm 208,
-# Stone.pnm 68. Those bytes are pixel values and archive data that happen to
-# equal 0x0d. They were never line endings, and nothing here treats them as any
+# Stone.pnm 68, and the 20 robot .blend files, 22 to 40 each. Those bytes are
+# pixel values, archive and model data that happen to equal 0x0d. They were never line endings, and nothing here treats them as any
 # -- the binary skip below means this gate never even reads them.
 #
 # THE NON-ASCII HALF IS UNCHANGED, in value AND in scope: it still runs over the
@@ -381,7 +381,7 @@ ENC_BASELINE=0
 # numbers are all NON-EMPTY, so the empty-result branch below does not catch it:
 # the gate printed a green row having read no files at all. The helper above now
 # aborts on a non-zero git status, and this floor is the second half -- the tree
-# holds 619 tracked files, so anything under 500 means the check did not run.
+# holds 672 tracked files, so anything under 500 means the check did not run.
 #
 # IT COUNTS FILES SEEN, NOT FILES THAT PASSED, AND IT IS TESTED LAST. Both
 # matter, and the first version got both wrong. `ep' alone is the LF-only count,
@@ -555,7 +555,7 @@ static void eq( const char *what, QString got, QString want )
 }
 int main()
 {
-    // 1.3's own data: data/Experiments/twoBases.exp
+    // 1.3's own data: experiments/twoBases.exp
     SIGEL_GP::SIG_GPPVMHost h( "eiche 2 1 \"/home/pg368b/ross/projects/sigel\"" );
     eq( "name",      h.name,                       "eiche" );
     eq( "maxSlaves", QString::number(h.maxSlaves), "2" );
@@ -707,7 +707,7 @@ rm -f /tmp/gdb.$$
 
 cp=0; cf=0
 if SIGEL_ROOT="$SRC" QT_QPA_PLATFORM=offscreen \
-       SIGEL_EXP="$ROOT/data-reordered/Experiments/twoBases.exp" \
+       SIGEL_EXP="$ROOT/experiments/twoBases.exp" \
        timeout 300 "$ROOT/build-fast/guidrive" clipcheck >/tmp/clip.$$ 2>/dev/null; then
     cp=1
 else
@@ -773,7 +773,7 @@ else
     # scenario's table, which is what it is for. Corrected by review.
     mrc=0
     SIGEL_ROOT="$SRC" QT_QPA_PLATFORM=offscreen \
-      SIGEL_EXP="$ROOT/data-reordered/Experiments/twoBases.exp" \
+      SIGEL_EXP="$ROOT/experiments/twoBases.exp" \
       SIGEL_SCRATCH="${TMPDIR:-/tmp}" \
       timeout 300 "$ROOT/build-fast/guidrive" formsize >/tmp/fmin.$$ 2>/tmp/fmerr.$$ \
       || mrc=$?
@@ -845,7 +845,7 @@ pass=$((pass+mp)); fail=$((fail+mf))
 # stderr means the logging was suppressed, not that the connects are sound.
 sp=0; sf=0
 if SIGEL_ROOT="$SRC" QT_QPA_PLATFORM=offscreen \
-       SIGEL_EXP="$ROOT/data-reordered/Experiments/twoBases.exp" \
+       SIGEL_EXP="$ROOT/experiments/twoBases.exp" \
        SIGEL_SCRATCH="${TMPDIR:-/tmp}" \
        timeout 300 "$ROOT/build-fast/guidrive" slavegui >/tmp/sclip.$$ 2>/tmp/serr.$$; then
     # Both lines must be PRESENT and read 0. A missing line is a walk that did
@@ -900,7 +900,7 @@ pass=$((pass+sp)); fail=$((fail+sf))
 # and by blinding the program matcher (caught).
 ep=0; ef=0
 if python3 "$ROOT/expstruct.py" --selfcheck \
-       "$ROOT/data/Experiments/twoBases.exp" >/tmp/eps.$$ 2>&1; then
+       "$ROOT/experiments/twoBases.exp" >/tmp/eps.$$ 2>&1; then
     ep=1
 else
     ef=1
@@ -1115,17 +1115,17 @@ pass=$((pass+gp)); fail=$((fail+gf))
 # covers a stale index that stays in range. SURVIVED is a liveness check.
 #
 # It needs an experiment to open, so it is skipped rather than failed when the
-# reference data is absent -- the data ships separately from the tarballs.
+# experiment file is absent.
 bp=0; bf=0
-BEXP=$ROOT/data-reordered/Experiments/twoBases.exp
+BEXP=$ROOT/experiments/twoBases.exp
 if [ ! -f "$BEXP" ]; then
-    # data-reordered/ is gitignored, so a fresh clone lands here. Say SKIPPED
-    # loudly and count it: reporting `0 pass 0 fail' made the section vanish
-    # from the total and left the exit status clean, which is the same shape as
-    # the three silent-short-run holes this file has already been bitten by.
-    echo "  SKIPPED: no $BEXP -- the data ships separately from the tarballs;"
-    echo "  provision data/ as section 9 describes, then re-run. THIS SECTION"
-    echo "  TESTED NOTHING."
+    # experiments/ is tracked, so only a damaged checkout lands here. Say
+    # SKIPPED loudly and count it: reporting `0 pass 0 fail' made the section
+    # vanish from the total and left the exit status clean, which is the same
+    # shape as the three silent-short-run holes this file has already been
+    # bitten by.
+    echo "  SKIPPED: no $BEXP -- restore experiments/ from git, then re-run."
+    echo "  THIS SECTION TESTED NOTHING."
     skipped=$((skipped+1))
 elif make -s -C "$ROOT" B=build-fast SAN= SIGSAN= guidrive >/tmp/bdb.$$ 2>&1; then
     # SIGEL_ROOT must be the SOURCE tree: the driver loads pixmaps and terrain
@@ -1412,10 +1412,10 @@ XTDISP=:97
 if [ ! -f "$ROOT/xtest-baseline.txt" ]; then
     xtf=1; echo "  xtest-baseline.txt is missing -- this gate tested NOTHING"
 elif [ ! -f "$BEXP" ]; then
-    # Same data dependency as the two sections above: a fresh clone has no
-    # data-reordered/, and without the file the run hangs in the modal Load
-    # dialog until the timeout and blames the driver for a missing file.
-    echo "  SKIPPED: no $BEXP -- the data ships separately. THIS SECTION"
+    # Same data dependency as the two sections above: without the file the run
+    # hangs in the modal Load dialog until the timeout and blames the driver
+    # for a missing file.
+    echo "  SKIPPED: no $BEXP -- restore experiments/ from git. THIS SECTION"
     echo "  TESTED NOTHING."
     skipped=$((skipped+1))
 elif ! command -v Xvfb >/dev/null 2>&1 || ! command -v xdotool >/dev/null 2>&1 \
@@ -1567,10 +1567,10 @@ if [ ! -f "$ROOT/pagesave-baseline.txt" ]; then
     pf=1; echo "  pagesave-baseline.txt is missing -- this gate tested NOTHING"
 elif [ ! -f "$BEXP" ]; then
     # Same data dependency and therefore the same policy as `gui behaviour'
-    # above -- a fresh clone has no data-reordered/. Without this the two runs
-    # HANG in the modal Load dialog until the 300 s timeout, twice, and report
-    # "did not finish", which blames the driver for a missing file.
-    echo "  SKIPPED: no $BEXP -- the data ships separately. THIS SECTION"
+    # above. Without this the two runs HANG in the modal Load dialog until the
+    # 300 s timeout, twice, and report "did not finish", which blames the
+    # driver for a missing file.
+    echo "  SKIPPED: no $BEXP -- restore experiments/ from git. THIS SECTION"
     echo "  TESTED NOTHING."
     skipped=$((skipped+1))
 elif [ -x "$ROOT/build-fast/guidrive" ]; then
@@ -1869,10 +1869,6 @@ pass=$((pass+v5p)); fail=$((fail+v5f))
 # to 2 shows them hold and gives the steady-state growth. A third save only
 # repeats the second.
 #
-# THE PRISTINE data/ COPIES, not data-reordered/: dictorder-reorder.py rewrites
-# the other tree. (They are byte-identical for both files today. The point is
-# which one the reference was taken from.)
-#
 # INPUT AGAINST PASS 1 CANNOT BE THE TEST -- V8 result 5. The shipped .exp are
 # a 2001 format revision and the 2003 binary adds ten keys with defaults on the
 # first save. A gate comparing a shipped file against its own round trip fails
@@ -1961,15 +1957,14 @@ pass=$((pass+v5p)); fail=$((fail+v5f))
 # stale binary FAILS, suppressed Qt connect logging FAILS, and the section was
 # run from OUTSIDE the repo root to check the `make -q -C "$ROOT"' fix.
 v2p=0; v2f=0
-V2HAM=$ROOT/data/Experiments/hammer.exp
-V2OCT=$ROOT/data/Experiments/octopus.exp
+V2HAM=$ROOT/experiments/hammer.exp
+V2OCT=$ROOT/experiments/octopus.exp
 V2D=${TMPDIR:-/tmp}/v2.$$
 if [ ! -f "$V2HAM" ] || [ ! -f "$V2OCT" ]; then
     # Same data dependency and the same policy as the sections above: say
     # SKIPPED loudly and count it, never report 0 pass 0 fail.
-    echo "  SKIPPED: no $V2HAM or $V2OCT -- the data ships separately from the"
-    echo "  tarballs; provision data/ as section 9 describes, then re-run."
-    echo "  THIS SECTION TESTED NOTHING."
+    echo "  SKIPPED: no $V2HAM or $V2OCT -- restore experiments/ from git,"
+    echo "  then re-run. THIS SECTION TESTED NOTHING."
     skipped=$((skipped+1))
 elif [ ! -x "$ROOT/build-fast/guidrive" ]; then
     v2f=1; echo "  build-fast/guidrive is missing -- run 'make B=build-fast SAN= SIGSAN= guidrive'"

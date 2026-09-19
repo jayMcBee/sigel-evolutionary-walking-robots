@@ -24,7 +24,7 @@
 set -eu
 ROOT=$(cd "$(dirname "$0")" && pwd)
 B=${1:-build-fast}
-DATA=${2:-data-reordered}   # data/ holds the robots as downloaded
+[ $# -le 1 ] || { echo "usage: $0 [build-dir] -- it reads experiments/ and robots/" >&2; exit 1; }
 EVAL=$ROOT/$B/sigel_eval
 [ -x "$EVAL" ] || { echo "no $EVAL -- make B=$B SAN= SIGSAN=" >&2; exit 1; }
 
@@ -44,13 +44,12 @@ export SIGEL_ROOT
 # A silently short dump is the dangerous failure: Phase D re-captures this file
 # at every step, so an empty run that exited 0 would overwrite the baseline and
 # report success. Count what we expect to find and refuse to run if it is off.
-exps=$(find "$ROOT/$DATA/Experiments" -name '*.exp' | sort)
-rrbs=$(find "$ROOT/$DATA" -name '*.rrb' | sort)
+exps=$(find "$ROOT/experiments" -name '*.exp' | sort)
+rrbs=$(find "$ROOT/robots" -name '*.rrb' | sort)
 ne=$(echo "$exps" | grep -c . || true); nr=$(echo "$rrbs" | grep -c . || true)
 [ "$ne" -eq 7 ] && [ "$nr" -eq 7 ] || {
-	echo "expected 7 .exp and 7 .rrb under $DATA/, found $ne and $nr." >&2
-	echo "data/ holds the kept experiments under their robot names, not the" >&2
-	echo "14 of the download -- PORTING.md section 10, D2." >&2
+	echo "expected 7 .exp under experiments/ and 7 .rrb under robots/," >&2
+	echo "found $ne and $nr." >&2
 	exit 1
 }
 

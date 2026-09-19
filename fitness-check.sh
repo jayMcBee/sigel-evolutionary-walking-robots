@@ -13,7 +13,7 @@
 set -eu
 ROOT=$(cd "$(dirname "$0")" && pwd)
 B=${1:-build-fast}
-DATA=${2:-data-reordered}
+[ $# -le 1 ] || { echo "usage: $0 [build-dir] -- it reads experiments/ and robots/" >&2; exit 1; }
 [ -x "$ROOT/$B/sigel_eval" ] || { echo "no $ROOT/$B/sigel_eval" >&2; exit 1; }
 
 # A failed `make` stops at the first bad compile and leaves the PREVIOUS
@@ -62,8 +62,8 @@ else
 	echo "      run 'ASAN_OPTIONS=detect_leaks=0 ./fitness-check.sh build' for it." >&2
 fi
 
-n=$(find "$ROOT/$DATA/Experiments" -name '*.exp' | wc -l)
-[ "$n" -eq 7 ] || { echo "expected 7 .exp under $DATA/, found $n" >&2; exit 1; }
+n=$(find "$ROOT/experiments" -name '*.exp' | wc -l)
+[ "$n" -eq 7 ] || { echo "expected 7 .exp under experiments/, found $n" >&2; exit 1; }
 # CAPTURE, TEST THE STATUS, THEN FILTER -- do NOT pipe sigel_eval straight into
 # tail. This line used to read
 #
@@ -82,7 +82,7 @@ n=$(find "$ROOT/$DATA/Experiments" -name '*.exp' | wc -l)
 # dictorder-dump.sh:62-77 closed this exact hole and says so; this script did
 # not. Found by review 2026-09-07.
 out=$(mktemp); err=$(mktemp)
-for f in $(find "$ROOT/$DATA/Experiments" -name '*.exp' | sort); do
+for f in $(find "$ROOT/experiments" -name '*.exp' | sort); do
 	for i in 0 1 2; do
 		rc=0; "$ROOT/$B/sigel_eval" "$f" "$i" >"$out" 2>"$err" || rc=$?
 		if [ "$rc" -ne 0 ]; then

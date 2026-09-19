@@ -1,0 +1,40 @@
+material metal {
+	density 2;
+	colour red 0.0 green 0.0 blue 0.5;
+}
+
+link base1 {
+	torso;
+	geometry "base.wrl";
+	material metal;
+	point Base1AxisSuccNormal=(2,0,0);
+	point Base1AxisSuccBase=(1,0,0);
+	point Base1AxisSuccDir=(1,0,1);
+}
+
+link base2 {
+	geometry "base.wrl";
+	material metal;
+	point Base2AxisSuccNormal=(0,0,0);
+	point Base2AxisSuccBase=(1,0,0);
+	point Base2AxisSuccDir=(1,0,1);
+}
+
+
+
+joint rotational hinge1 {
+	between base1 (Base1AxisSuccBase,Base1AxisSuccDir,Base1AxisSuccNormal) and base2 (Base2AxisSuccBase,Base2AxisSuccDir,Base2AxisSuccNormal);
+	minimal -85;
+	maximal 85;
+	init 0;
+}
+
+drive hinge1Drive {
+	force hinge1;
+	minimalforce 0;
+	maximalforce 800;
+}
+
+sensor hinge1Sensor {
+	joint hinge1;
+}

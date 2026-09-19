@@ -1,0 +1,45 @@
+#VRML V2.0 utf8
+
+# This file is converted using vrml1to2 version 1.6
+# This converter is based on Final VRML2.0 - August 4, 1996.
+# This converter is provided by Sony.
+
+Transform {
+	children [
+		Shape {
+			appearance Appearance {
+				material Material {
+					diffuseColor  1 1 1
+					specularColor 1 1 1
+				}
+			}
+			geometry IndexedFaceSet {
+				coord Coordinate {
+					point [
+						0 -0.23 0.23,
+						0 0.23 0.23,
+						-0.104247 0.23 0,
+						-0.104247 -0.23 0,
+						0 -0.23 -0.23,
+						0 0.23 -0.23,
+						0.1 -8.2e-05 0.23,
+						0.1 -8.2e-05 -0.23
+					]
+				}
+				coordIndex [
+					0, 1, 2, 3, -1,
+					0, 3, 4, -1,
+					2, 5, 4, 3, -1,
+					1, 5, 2, -1,
+					0, 6, 1, -1,
+					0, 4, 7, 6, -1,
+					4, 5, 7, -1,
+					7, 5, 1, 6, -1
+				]
+				normalPerVertex FALSE
+				solid           FALSE
+				creaseAngle     0.5
+			}
+		}
+	]
+}

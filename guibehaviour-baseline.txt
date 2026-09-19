@@ -1,6 +1,6 @@
 # Baseline for check.sh's `gui behaviour' section -- PORTING.md, step C10.
 #
-# THE VALUES ARE THE PORT'S OWN, for data-reordered/Experiments/twoBases.exp,
+# THE VALUES ARE THE PORT'S OWN, for experiments/twoBases.exp,
 # so a failure here means the port moved against itself. The behaviours below
 # marked as compared with 1.3 match the running 1.3 binary, read through the
 # sigel-x86 oracle driving the 2003 i386 build with XTest on
@@ -1975,7 +1975,7 @@ Do you want to replace it?]
 
 -- Robot (import only; there is no Export > Robot)
   [modal] class=QFileDialog title=[Export Language Parameters...]
-  importing data-reordered/twoBases/twoBases.rrb (exists=1)
+  importing robots/twoBases/twoBases.rrb (exists=1)
   [modal] class=QFileDialog title=[Import Robot...]
   list listboxLinks           count=2
   list listboxMaterials       count=1

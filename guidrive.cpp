@@ -1771,7 +1771,7 @@ static int guidriveMain(int argc, char **argv)
     QString scenario = argc > 1 ? argv[1] : "open";
     QString expFile  = argc > 2 ? argv[2]
         : qEnvironmentVariable("SIGEL_EXP",
-              "data-reordered/Experiments/twoBases.exp");
+              "experiments/twoBases.exp");
 
     // sigel.cpp, main brings PVM up before the window exists. Only the visualize
     // scenario needs it, and starting a daemon for the others would be noise.
@@ -2443,7 +2443,7 @@ static int guidriveMain(int argc, char **argv)
         const QString lapBefore = exportTo("Language-Parameters",
                                            scratch() + "/rt-rob-before", "lap");
         const QString before = lapBefore.isEmpty() ? QString() : sha256Of(lapBefore);
-        const QString rrb = QStringLiteral("data-reordered/twoBases/twoBases.rrb");
+        const QString rrb = QStringLiteral("robots/twoBases/twoBases.rrb");
         printf("  importing %s (exists=%d)\n", qPrintable(rrb), QFile::exists(rrb));
         importFrom("Robot", QFileInfo(rrb).absoluteFilePath());
         clickMenu("&View", "&Robot");
