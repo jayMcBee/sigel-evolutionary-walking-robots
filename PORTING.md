@@ -846,23 +846,23 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-19 — IN PROGRESS: JAN JUDGES EACH EXPERIMENT BY EYE, 1.3 BESIDE THE
-PORT.** Start here.
+**2026-09-19 — DONE: JAN JUDGED EVERY EXPERIMENT BY EYE, 1.3 BESIDE THE PORT.**
+Start here.
 
-- **Done.** `hammerNiceWalkingFitness`: a keeper. `insectNiceWalkingFitness`: a
-  keeper. `octopusNiceWalkingFitness`: a keeper. `walkerNiceWalkingFitness`: a
-  keeper. `runnerNiceWalkingFitness`: a keeper. The two-bases family: keep
+- **All 14 judged.** Keepers: `hammerNiceWalkingFitness`,
+  `insectNiceWalkingFitness`, `octopusNiceWalkingFitness`,
+  `walkerNiceWalkingFitness`, `runnerNiceWalkingFitness`,
+  `shortHammerNiceWalkingFitness`. The two-bases family: keep
   `twoBasesHardlyReducedIS`, to be renamed `twoBases`; the other five go — item 40
   in `future_refactorings.md`. `octopusSimpleFitness` goes too — item 44 — and
-  `runnerSimpleFitness` — item 45. The clean-ups wait until every experiment has
-  been judged; do not start them unasked.
+  `runnerSimpleFitness` — item 45. The clean-ups are Jan's to start; do not start
+  them unasked.
   **Both machines end with the same set under the same names**, Jan, 2026-09-19:
   *"keeping just the ones I've picked on both machines (otherwise we won't ever
   be able to compare them)"*. After the review every kept experiment is renamed
   to its base name, one at a time, suggested by Claude and approved by Jan — item
   46.
-- **Next: `shortHammerNiceWalkingFitness`**, the last one.
-- **How each one is shown.** Score every individual with `build-fast/sigel_eval`
+- **How each one was shown.** Score every individual with `build-fast/sigel_eval`
   (a scratch `SIGEL_ROOT` holding a copy of `Terrain.ter`). Make a viewing copy:
   swap the text between the `INDIVIDUAL(0)` and `INDIVIDUAL(k)` labels and swap
   their `POOLPOS`; check that individual 0 of the copy scores what k scored. Show
@@ -877,7 +877,7 @@ PORT.** Start here.
   for us. Stop every viewer, here and on x86, when he says.
 - **Open with Jan:** the `.rrb` reordering choice (below, under 1.3's numbering);
   D43, uncommitted — both `SIGEL_GP` comments are done, 12 other review findings
-  remain; items 40 to 43.
+  remain; items 40 to 46.
 
 **2026-09-18 — THE EXPERIMENT DATA WAS DAMAGED, AND IT IS REPAIRED.**
 
@@ -1005,6 +1005,10 @@ beside it in the same place.
   oracle's 1.3 gives 0 for numbers 0, 1 and 2, as ours does.
   `runnerSimpleFitness`, individual 30, score 0.734: Jan: *"to be removed, the
   first one was the better experiment"* — item 45.
+  `shortHammerNiceWalkingFitness`, individual 5, score 0.491: Jan: *"it does move
+  - keeper."* 87 of 100 score exactly 0 here. Number 5 is stored at 0 in the
+  file, yet its own history has it bred in this run — crossovers, then a mutation
+  at pool position 5 on 13 August 2001 — from ancestors stored at 0.490151.
 - **The payload, octopus, all 259 lines.** The 182 Polygon lines are
   byte-identical. The 13 Geometry lines carry the same values; four differ in
   text only, at exact decimal ties in the 50th digit, where glibc rounds half
