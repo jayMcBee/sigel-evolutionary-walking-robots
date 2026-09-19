@@ -381,7 +381,7 @@ ENC_BASELINE=0
 # numbers are all NON-EMPTY, so the empty-result branch below does not catch it:
 # the gate printed a green row having read no files at all. The helper above now
 # aborts on a non-zero git status, and this floor is the second half -- the tree
-# holds 671 tracked files, so anything under 500 means the check did not run.
+# holds 670 tracked files, so anything under 500 means the check did not run.
 #
 # IT COUNTS FILES SEEN, NOT FILES THAT PASSED, AND IT IS TESTED LAST. Both
 # matter, and the first version got both wrong. `ep' alone is the LF-only count,

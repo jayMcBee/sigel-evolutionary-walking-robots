@@ -165,20 +165,14 @@ a vendored file, which is a separate decision and was not taken.
 the build and `check.sh`: the maths headers live in the same directory as the
 physics ones.
 
-**`patches/dynamo-containerlist-null.patch` is now dead but kept.**
-`containerlist.h` is included by `containerlist.cpp` and by nothing else, and
-that is one of the 46 sources no longer compiled. The patch still applies
-cleanly against the untracked tree, so it was left alone rather than removed in
-this changeset.
-
 ~~**SOLID is still built and still linked.**~~ **NO LONGER TRUE, and this
 paragraph contradicted the section 70 lines above it.** SOLID and qhull went
 with the Dynamo backend on 2026-08-28; no `libsolid.a` exists in either build
 tree. Only the `-isystem .../SOLID-2.0/include` path survives. This document claimed SOLID would go
 with Dynamo. Its 15 API references were indeed all in deleted files, but
 removing `libsolid.a` was outside the brief for this change and was not
-attempted. It is now dead weight — ~4,800 lines and a vendored patch — and
-dropping it is a one-line follow-up, to be measured the way `libdynalib.a` was.
+attempted. It is now dead weight — ~4,800 lines — and dropping it is a
+one-line follow-up, to be measured the way `libdynalib.a` was.
 
 ### Checks — all clean, which is the point
 

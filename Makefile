@@ -15,7 +15,7 @@
 # separate directory. One evaluation is 0.2 s either way.
 #
 # The vendored tree is not tracked (it comes out of supportingLibs.tar.gz), so
-# the edits gcc 15 needs live in patches/ and are applied here against a
+# our edits to it live in vendor-patches/ and are applied here against a
 # stamp file inside that tree. tar does not delete files it does not carry, so
 # re-extracting the tarball over the tree leaves the stamp behind: rm -rf the
 # vendored tree first, or the build silently keeps objects built from patched
@@ -33,17 +33,15 @@
 # libpvm3.a still holds objects built from patched sources that are no longer
 # there. The version guard cannot see this: the header still reads 3.4.6.
 #
-# patches/pvm3-*.patch are the nine that make PVM build here: the four config
-# lines, and every Debian source patch that touches one of the 28 objects PVM
-# compiles. They go through the same stamp as the rest, so nothing below needed
-# changing to pick them up.
+# vendor-patches/pvm3-*.patch are the nine PVM gets here: one with the four
+# config lines it needs to build, and every Debian source patch that touches one
+# of the 28 objects PVM compiles. They go through the same stamp as the rest, so
+# nothing below needed changing to pick them up.
 #
 # Vendored code is built with -w -fpermissive, which SIGEL's own code does not
 # get: check.sh already treats these headers as -isystem for the same reason.
 # -fpermissive covers exactly newmat1.cpp and newmat9.cpp, which pass a string
-# literal to char* and a long to ios_base::fmtflags. Dynamo/containerlist.h was
-# a third -- a missing #include <cstddef> that -fpermissive was hiding, so it is
-# a patch instead.
+# literal to char* and a long to ios_base::fmtflags.
 #
 # The vendored libraries get UndefinedBehaviorSanitizer too, minus three checks
 # they trip by construction: alignment and signed overflow throughout qhull and
@@ -69,7 +67,7 @@ VCXX := g++ -std=c++17 -O1 -g -w -fpermissive -DMINMAX_H $(SAN)
 VCC  := gcc -std=gnu17 -O1 -g -w $(SAN)
 
 STAMP := $(SL)/.sigel-patched
-PATCHES := $(wildcard patches/*.patch)
+PATCHES := $(wildcard vendor-patches/*.patch)
 
 # PVM: the vendored 3.4.3 was replaced by upstream 3.4.6 -- PORTING.md Phase P.
 # 3.4.3 has no conf/LINUX64.def at all, so it cannot describe this machine.
@@ -125,9 +123,9 @@ VENDOR_LIBS := $(LIB)/libnewmat.a $(LIB)/libdm.a $(LIB)/libcv97.a \
 # -lpvm3 and nothing else, so none of those is built.
 #
 # LINUX64 is hardcoded rather than read from lib/pvmgetarch, because a target
-# name is expanded when this file is read -- before patches/ has been applied,
-# and the aarch64 line is one of those patches. ia64, x86_64 and aarch64 all
-# map to LINUX64 (lib/pvmgetarch:71-74).
+# name is expanded when this file is read -- before vendor-patches/ has been
+# applied, and the aarch64 line is one of those patches. ia64, x86_64 and
+# aarch64 all map to LINUX64 (lib/pvmgetarch:71-74).
 #
 # On any OTHER arch PVM's build succeeds into lib/$(PVM_ARCH) and leaves
 # lib/LINUX64 empty -- and make does not check that a recipe made its targets,
@@ -144,7 +142,8 @@ pvm: $(PVM_LIB) $(PVM_D)
 pvm-link: $(B)/pvm_link
 
 # One rule for both products; PVM's own make builds them together. Depending on
-# the patch stamp is what rebuilds this when a patches/pvm3-*.patch changes.
+# the patch stamp is what rebuilds this when a vendor-patches/pvm3-*.patch
+# changes.
 $(PVM_LIB) $(PVM_D) &: $(STAMP)
 	cd $(PVM_DIR) && PVM_ROOT=$$PWD $(MAKE) s
 	@test -f $(PVM_LIB) && test -x $(PVM_D) || { \
