@@ -950,6 +950,11 @@ beside it in the same place.
   8 of 42, every one an exact 0. Where 1.3 gives several individuals one value,
   ours does too, on the same individuals. Nothing more is read from the numbers:
   x87 against aarch64.
+- **Side by side by eye, Jan, 2026-09-19.** Individual 0 of each experiment,
+  1.3's simulation viewer beside ours. `twoBasesSimpleFitness2`: both barely
+  move — item 40. `hammerNiceWalkingFitness`: it walks on both. Jan: *"It behaves
+  well, confirming it works similarly on Qt6 and x86/1.3 SIGEL, so that's a
+  keeper."*
 - **The payload, octopus, all 259 lines.** The 182 Polygon lines are
   byte-identical. The 13 Geometry lines carry the same values; four differ in
   text only, at exact decimal ties in the 50th digit, where glibc rounds half
