@@ -260,7 +260,7 @@ printf '%-22s %2d dead (baseline %d -- §2 has the per-signal table)\n' \
 # Every file under x/kdesigelSources.1.3 was converted -- 100 files, 17,750
 # CRLF pairs -- and this half of the check was turned round to match. It used to
 # say "a file that HAD a CR must still have one", with a baseline of 25 for the
-# files 762c87f had already stripped. It now says NO TRACKED TEXT FILE MAY
+# files 03ac805 had already stripped. It now says NO TRACKED TEXT FILE MAY
 # CARRY CRLF, expected count zero, and it fails the moment one comes back
 # through a Windows editor, an unpacked archive or a patch.
 #
@@ -372,7 +372,7 @@ et=$(enc_field '[0-9]* [0-9]* [0-9]* \([0-9]*\) ')
 eb=$(enc_field '[0-9]* [0-9]* [0-9]* [0-9]* \([0-9]*\) ')
 eu=$(enc_field '[0-9]* [0-9]* [0-9]* [0-9]* [0-9]* \([0-9]*\)')
 # ZERO, and it stays zero. The tree is LF only since 2026-09-09, so there is no
-# pre-existing damage left to carry: the 25 files 762c87f stripped are no longer
+# pre-existing damage left to carry: the 25 files 03ac805 stripped are no longer
 # a special case, they are simply what every file looks like now. Never raise
 # this to make a diff go away -- a non-zero count means CRLF has come back.
 ENC_BASELINE=0

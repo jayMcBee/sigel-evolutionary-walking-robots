@@ -173,7 +173,7 @@ walkerNiceWalkingFitness: robot block 547 lines, sha256 b1041438a1b59150..., roo
 
 --- NOTES ON THE 1.3 TEXT ABOVE, ours; the raw text is left as it came ---
 # "Axis groups permute INSIDE a single Link line, in 6 of 14": the list names 7 --
-#   hammer, insect, both octopus, both runner, walker. The e94e3ad baseline gives 7
+#   hammer, insect, both octopus, both runner, walker. The ff6db93 baseline gives 7
 #   too (loaded against copy point order). The per-link figures agree exactly.
 # "Body 17" counts lines that START with Body. There are 31 Body entities; the
 #   other 14 follow the leading 12-number transform on the same line.

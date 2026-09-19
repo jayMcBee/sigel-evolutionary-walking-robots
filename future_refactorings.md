@@ -625,7 +625,7 @@ Decisions, not work. Each is settled; reopen only with a reason.
   cost is owning a custom widget for ever. Current behaviour is pinned in
   `guibehaviour-baseline.txt`. The worked-out `SIG_SpinBox` subclass, the three
   cheaper routes that were measured and rejected, and the 47-widget promotion
-  plan are in this file's history at `f694f3a`.
+  plan are in this file's history at `1dba5f4`.
 - **The history block grows by one line per individual per save.** Confirmed on
   the 1.3 binary; the port reproduces it exactly, which is the correct outcome.
   Recorded so nobody "fixes" it and silently diverges. If it is ever changed

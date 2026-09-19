@@ -524,7 +524,7 @@ D20 supersedes D5, D24 supersedes D3.
 | # | Decision | Answer |
 |---|---|---|
 | **D27** *(decision; §10 also has a **step** D27, the shim deletion — the two D-series overlap and this is the first collision)* | The duplicate MetaGP `A&bout` | **removed**, with its trailing separator. Present in 1.3 and verified there; wired to the same `slotAbout()` as `Help > About` and opening the identical `SIG_InfoBox`. The port's first intentional difference from 1.3. `Help > About` untouched |
-| **D28** | The `QSpinBox` over-range divergence (C11a) | **accepted, not fixed.** 1.3 accepts out-of-range digits and clamps on commit; the port refuses the keystroke and commits a truncated prefix. It is reachable **only by typing a number outside the box's own range**, and the differing value is **visible in the box** before anything is saved — 1.3 shows 99, the port shows 10. Contrast what the port did fix: `clear()` killed the application, the ampersand rendered wrong, a negative width silently wrote no file — all reachable with valid use. The fix is not the 33 lines of it, it is **owning a custom widget forever**: every future form edit and every new spin box must remember `SIG_SpinBox` or silently opt out. Pinned in `guibehaviour-baseline.txt` (`commits=`) so it cannot drift; the prototype and the measured comparison are in `future_refactorings.md`'s history at `f694f3a`, and its "Not doing" list points there. **Revisit if** a dialog spin box turns out to feed something unvalidated, or if anyone actually hits it |
+| **D28** | The `QSpinBox` over-range divergence (C11a) | **accepted, not fixed.** 1.3 accepts out-of-range digits and clamps on commit; the port refuses the keystroke and commits a truncated prefix. It is reachable **only by typing a number outside the box's own range**, and the differing value is **visible in the box** before anything is saved — 1.3 shows 99, the port shows 10. Contrast what the port did fix: `clear()` killed the application, the ampersand rendered wrong, a negative width silently wrote no file — all reachable with valid use. The fix is not the 33 lines of it, it is **owning a custom widget forever**: every future form edit and every new spin box must remember `SIG_SpinBox` or silently opt out. Pinned in `guibehaviour-baseline.txt` (`commits=`) so it cannot drift; the prototype and the measured comparison are in `future_refactorings.md`'s history at `1dba5f4`, and its "Not doing" list points there. **Revisit if** a dialog spin box turns out to feed something unvalidated, or if anyone actually hits it |
 | **D29** *(signed off 2026-09-04)* | Changing run parameters **while an evolution is running** | **FORBIDDEN in the port, whatever 1.3 permits.** The reason is the specification, not 1.3: *"that's not how GAs/GPs are commonly implemented"* — the parameters define the run. **The port's second intentional divergence**, after D27. **Implementation, and the wrong versions it went through, are in §10 — read that before changing the guard** |
 | **D30** *(signed off 2026-09-07)* | The mid-run lock's first two holes | **A run check belongs wherever an action is RE-ENABLED, not only where it is disabled.** `SIG_MainWindow::slotEnableNoExperimentActions` handed 24 run-locked actions back on a tree click, and `New Experiment` and `Open Experiment` were in no lock list at all. Both measured by reverting the fix and re-running `runlock`. The pattern for any further route: a run check where the action is re-enabled, plus the action in `evolutionRunningActions`, plus a `runlock` case with a positive control. **Its own section is in §7, "D30 — parameter changes during a run are forbidden"**, and D30a is the hole it missed |
 | **D31** *(signed off 2026-09-09)* | Line endings | **LF ONLY, tree-wide. No more DOS.** Jan's decision, and it overrides the guard that existed to prevent it. **100 files under `x/kdesigelSources.1.3` converted, 17,750 CRLF pairs.** **The conversion is line endings only except for two bytes, and `git diff --ignore-cr-at-eol` is NOT what proves it** — that flag strips a trailing CR from *both* sides, so it would equally hide a CRLF being *introduced*. The proof is a direct comparison of every one of the 100 files: `re.sub(rb"\r+\n", b"\n", git show HEAD:f) == working file`, exact, with no `\r` surviving anywhere. Zero anomalies. **Two lines of `sigel_slave.mak` are the one real content change**, and calling them line endings flatters them: `:598` and `:647` ended `\r\r\n`, so the byte removed is an INTERIOR one — under NMAKE that trailing CR is part of the variable's value. The `\r+` in the proof above is what swallows the case, so the proof cannot tell it from a line ending; it is called out here instead. Nothing else in the tree has a run of two. **Binaries are excluded and this is not cosmetic** — three tracked binaries hold 12 incidental `\r\n` byte pairs (`pvm3.4.6.tgz` 9, `altLogo.png` 2, `noExperiment.png` 1), and a blind repo-wide replace would corrupt all three. Extensions touched: 36 `.cpp`, 35 `.h`, 19 `.xpm`, 5 `.dsp`, 3 `.mak`, 1 `.mt`, 1 `.dsw`. **No `.exp` and no `.ui`**, so no reference artefact was touched. **Lone CRs are left alone, and NOT because they are Mac-classic line endings** — the first version of this row said that and it was wrong. Six tracked files hold lone CRs and git calls **all six** binary, so this check never even reads them: `pvm3.4.6.tgz` 3859, `noExperiment.png` 691, `JustGreen.pnm` 2848, `altLogo.png` 208, `Hippie.pnm` 208, `Stone.pnm` 68. All five `.pnm` are **P6 raw raster**: those bytes are pixel values that happen to equal `0x0d`. They were never line endings. **The `encodings` check was turned round in the same commit**, so that commit is not line endings alone — `check.sh`, `PORTING.md` and `future_refactorings.md` change with it. The check used to say *a file that HAD a CR must still have one*, with `ENC_BASELINE=25`; it now says **no tracked text file may carry CRLF**, expected zero, reads every tracked file rather than five extensions present in the root commit, lists them with `-z` so a C-quoted path cannot break `open()`, and reconciles — every file lands in exactly one of ok / CRLF / binary / unreadable, or it aborts. **It asks `git ls-files --eol` what is binary rather than testing for a NUL byte**, because the NUL test got two files wrong: `Hippie.pnm` has no NUL in its 196,668 bytes and `UniDo_LSXI.pnm`'s first NUL is at offset 15,456, so both were judged as text and passed only by luck. **Read the `w/` column, not `i/`**: while this change was being made, `sigel_slave.mak`'s index blob read `i/-text` — HEAD still held its two `\r\r\n`, which git's own heuristic calls binary — against a working file of `w/lf`, and testing both columns dropped a real text file out of the check. **Both columns read `lf` once this is committed, so the demonstration is gone and only the rule survives.** Reads 610 text files and 8 binaries. **A floor of 500 was added**, because zero failures is also what a check that read nothing reports: a dead `git ls-files` gave `COUNTS 0 0 0 0 0 0`, two non-empty numbers, which the fail-closed branch did not catch. Teeth-tested: CRLF into a `.cpp` and into `sigel_slave.mak` both caught and named, CRLF into a texture correctly ignored, and all seven branch states driven by hand — including a **tree-wide** CRLF regression, which the first version of the floor misreported as *"it did not run"* with one failure instead of 611, and a below-floor count, which the first version printed as `0 pass` while adding up to 499 passes to the total. Both found by review 2026-09-09. The bucket reconciliation is a tautology as the loop is now written and is **not** counted as coverage; it is kept only so the earlier bare-`continue` shape cannot come back. **`SIGEL_ROOT` is the source tree**, so `stdConf.mt` and the 19 `.xpm` pixmaps the conversion touched are the very files the GUI checks load at runtime; the `gui behaviour` check covers them. The `.xpm` are loaded by path and `#include`d nowhere, and a C string literal cannot span a raw newline, so no removed CR was ever inside a quoted pixel row. **No `.gitattributes` exists and none was added.** `* text=auto eol=lf` would make git enforce this rather than only detect it; not done, because it changes what every future checkout writes and that is a separate decision. On a clone with `core.autocrlf=true` the working tree comes back CRLF and this check goes red tree-wide — which is the check working |
@@ -873,6 +873,16 @@ Start here.
 - **The kept experiments are in git**, in `experiments/` and `robots/`, and every
   check reads them there. `main` is the working branch; the old `main` is tagged
   `old-main`.
+- **The repo is on GitHub**: `origin` is
+  `git@github.com:jayMcBee/sigel-evolutionary-walking-robots.git`, `main` and all
+  13 tags pushed 2026-09-19. **The history was rewritten once, before that first
+  push**, by Jan's decision: a build folder, `build-fp/` (761 files, 407 MB), had
+  been committed by mistake on 2026-08-22 and deleted on 2026-08-27, and it made
+  the push 104 MB instead of 4. It is gone from every commit; each of the 329
+  commits was checked equal to its original apart from that folder, and 276
+  hashes changed. The docs cite the new ones. The old history is in
+  `~/sigel-repo-before-rewrite-20260919.bundle` (verified), the uncommitted D43
+  edits of that moment in `~/sigel-d43-uncommitted-20260919.patch`.
 - **Next, Jan's plan:** drop the historical copies except one backup. The backup
   taken before the clean-up is `~/sigel-data-both-20260919.tar.gz`, sha256
   `37006ffb…2035`: both data trees, checked by unpacking and diffing.
@@ -919,14 +929,14 @@ name it in messages. `check.sh`'s v2 round trip still reads the clean input that
 - `./dictorder-dump.sh | diff -u dictorder-baseline.txt -` is **empty**, sampled
   twice. The script reorders 7 of 7 `.rrb` and 0 of 14 `.exp`, which is what D2
   recorded in August.
-- `dictorder-reorder.py` and `dictorder-baseline.txt` **from `e94e3ad`**, the
+- `dictorder-reorder.py` and `dictorder-baseline.txt` **from `ff6db93`**, the
   commit that built the August tree, run on today's `data/`, give a tree
   byte-identical to today's `data-reordered/` in all 21 files.
 - `diff -rq data data-reordered` lists the 7 `.rrb` and nothing else. Every
   `.rrb` is a pure permutation of whole blocks and point lines.
 
 **The script defect, fixed.** `read_baseline` expected four fields; the dump has
-printed five — `rrb      link       0 #0   base` — since `9638f2e`, so no link,
+printed five — `rrb      link       0 #0   base` — since `70087ae`, so no link,
 joint, sensor or drive target was parsed, and the script reordered points only
 without a word. It now refuses a target that does not name exactly the entities
 the file declares, an `.exp` without a robot block, a file set that differs from
@@ -1270,7 +1280,7 @@ of being deleted as a stale file precisely because no script points at it.*
 **`portinglog.txt` WAS DELETED 2026-09-09, and this paragraph is what it held.**
 It was the raw output of Qt 4.8's `qt3to4` from one run in the `tools/qtmig`
 container, over one file, `SIG_GPParameter.cpp`, captured 2026-08-27 — container
-paths, `/w/.q34tmp/…`. No script ever read it. It is recoverable from git at any commit up to and including `67caf61` if the raw text is ever wanted; the two things it evidenced are here so
+paths, `/w/.q34tmp/…`. No script ever read it. It is recoverable from git at any commit up to and including `65c57f9` if the raw text is ever wanted; the two things it evidenced are here so
 that it does not need to be:
 
 - **17 of its 19 entries pull in Qt3Support.** `QListViewItem` →
@@ -1502,11 +1512,11 @@ read as a clean pass. And the section was measured the other way: putting
 by name with `TOO SMALL: 1`, then restoring it passes again.
 
 **THAT SECOND MEASUREMENT STOPPED BEING TRUE 34 MINUTES AFTER IT WAS TAKEN, and
-this file went on asserting it for two days.** `5f6da9d` (2026-09-05 16:15:49)
+this file went on asserting it for two days.** `0bdc4ee` (2026-09-05 16:15:49)
 wrote the section as `if make -q ... && ... guidrive formsize ...; then`, with
 the run **inside the `if` condition**, where `set -e` is exempt — so a failing
 `formsize` set `mf=1`, printed, and the script carried on. That is the version
-the teeth test above was measured against. `640cfad` (2026-09-05 16:49:51),
+the teeth test above was measured against. `2527c0a` (2026-09-05 16:49:51),
 *"Close four holes in the form-minimums check"*, restructured it into an `else`
 branch with a bare run followed by `mrc=$?`. A bare command in an `else` branch
 is **not** exempt: `check.sh` sets `-e`, so from that commit a real form-minimum
@@ -1550,7 +1560,7 @@ was.** `gui behaviour` moves under the same perturbation, to
 595 the oracle settled below (*"The MetaGP window grew 59 px"*) — so a second
 section *can* see this defect. **But it never got the chance.** `form minimums`
 prints at `check.sh:730` and `gui behaviour` at `check.sh:1280`: under the
-`640cfad` shape the shell died 550 lines before `gui behaviour` ran. The second
+`2527c0a` shape the shell died 550 lines before `gui behaviour` ran. The second
 check only helps somebody running that scenario by hand. *An earlier version of
 this paragraph claimed the opposite — that `gui behaviour` "would have caught
 it" — which is exactly backwards for a failure that stops the script. Corrected
@@ -2710,7 +2720,7 @@ else that stops matching 1.3 still needs justifying as a defect.
 
 | divergence | why it is not fixed | pinned by |
 |---|---|---|
-| **`QIntValidator` out-of-range clamp — D28.** 1.3 clamps a typed over-range number to the maximum; the port commits the truncated prefix | reachable only by typing outside the box's own range, and the differing value is visible before anything is saved. The cost is not the code — a 25-line `QSpinBox` subclass, in `future_refactorings.md`'s history at `f694f3a`, reproduces all four readings — but **owning a custom widget forever**, promoted across 29 spin boxes in three forms and then the dialogs | the `commits=` value in `guibehaviour-baseline.txt`. **Measured 2026-09-03: 44 `spin` lines, of which 40 carry a committed value — 29 on the five pages and 11 more in the MetaGP block, which C11d added after C11a wrote the TRAP.** Four are not pinned: three survey-only lines (214, 1347, 1399) and one reading `commits=not-pressed(in a dialog)` (1404). *The TRAP block below still says "the other 18 … are not pinned". It is preserved as C11a wrote it and is out of date twice over — see the correction beneath it — and **the 18 does not reproduce as any real population either**: the 20 forms declare 46 spin boxes, 29 of them exactly the three page forms, so the non-page count is 17 in the forms and 20 counting the three declared in code. Do not carry the 18 forward.* |
+| **`QIntValidator` out-of-range clamp — D28.** 1.3 clamps a typed over-range number to the maximum; the port commits the truncated prefix | reachable only by typing outside the box's own range, and the differing value is visible before anything is saved. The cost is not the code — a 25-line `QSpinBox` subclass, in `future_refactorings.md`'s history at `1dba5f4`, reproduces all four readings — but **owning a custom widget forever**, promoted across 29 spin boxes in three forms and then the dialogs | the `commits=` value in `guibehaviour-baseline.txt`. **Measured 2026-09-03: 44 `spin` lines, of which 40 carry a committed value — 29 on the five pages and 11 more in the MetaGP block, which C11d added after C11a wrote the TRAP.** Four are not pinned: three survey-only lines (214, 1347, 1399) and one reading `commits=not-pressed(in a dialog)` (1404). *The TRAP block below still says "the other 18 … are not pinned". It is preserved as C11a wrote it and is out of date twice over — see the correction beneath it — and **the 18 does not reproduce as any real population either**: the 20 forms declare 46 spin boxes, 29 of them exactly the three page forms, so the non-page count is 17 in the forms and 20 counting the three declared in code. Do not carry the 18 forward.* |
 | **A run that loses PVM ends and says so — D41.** 1.3 waits for a message that cannot arrive, for ever, with the interface still showing a run in progress | `pvm_probe` reports `PvmSysErr` and the trainer records it; the interface ends the run the way `Stop` does | none. No check starts a run. Measured by hand: SIGKILL the daemon mid-run and the dialog appears |
 | **A run that ends at once says why — D42.** 1.3 shows nothing, so Start looks as though it did nothing | the message names the termination setting that ended the run and the tab it is on | none. No check starts a run. Measured by hand for a date and for a duration |
 | **The duplicate MetaGP About is removed**, with its trailing separator. 1.3 has 43 menu items, the port 42 | a decision, 2026-09-02 — the port's first intentional behavioural difference. Not a defect, not a regression | `guidump-baseline.txt` |
@@ -3308,7 +3318,7 @@ Both end on a *valid* value; they are **different valid values**, and
 
 **ACCEPTED, NOT FIXED — D28.** Reachable only by typing outside the box's own
 range, and the differing value is visible in the box before anything is saved.
-The cost is not the 25-line `QSpinBox` subclass (in `f694f3a`'s copy of
+The cost is not the 25-line `QSpinBox` subclass (in `1dba5f4`'s copy of
 `future_refactorings.md`, and it reproduces all four readings) but **owning a
 custom widget forever** across 29 spin boxes in three forms and then the
 dialogs. Pinned by the `commits=` value in `guibehaviour-baseline.txt`: **44 `spin`
@@ -3412,7 +3422,7 @@ turn it off again. `SIG_GUIGPExperiment::slotRightClick` sets
 close, not the crash.
 
 **File > Open Experiment no longer crashes when the tree gets focus during the
-load — FIXED 2026-09-16, `2312c39`.** `SIG_ExperimentListView::slotLoadExperiment`
+load — FIXED 2026-09-16, `5de5776`.** `SIG_ExperimentListView::slotLoadExperiment`
 adds the tree item, then reads the file, then inserts the experiment into
 `experimentDict`. The read runs `processEvents`, in
 `SIG_GPPopulation::readFromFile` and again in
@@ -3505,7 +3515,7 @@ failed a third time on 2026-09-18** — every Qt-level count again unchanged, an
 the next run on the same tree passed. The mitigation never reached that section.
 `guidrive.cpp, spies` carries the reason.
 
-**The run lock is DONE — 2026-09-16, `49cb4a2`, `c984574`, `aa2ebfc`.** One
+**The run lock is DONE — 2026-09-16, `69b3e4a`, `6494ab6`, `a541679`.** One
 evolution at a time, and the whole application is locked while one runs.
 `SIG_GUIGPExperiment::slotStartEvolution` refuses a second run, whichever route
 reaches it — that also closed a **use-after-free**, because a right-click `Start`
