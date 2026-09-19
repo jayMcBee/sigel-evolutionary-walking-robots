@@ -590,7 +590,7 @@ touched, because changing one changes behaviour against the reference binary.
   The `winskip` counter behind that line goes with them, and its line
   disappearing will look like a lost check unless it is done knowingly.
   **It moves a pinned check total:** the 11 deleted files are counted by the
-  `encodings` check, so `check.sh` goes from 1170 pass to 1159. PORTING.md pins
+  `encodings` check, so `check.sh` goes from 1169 pass to 1158. PORTING.md pins
   that number twice — the per-step exit criterion in §7 and the check list. Move
   both in the same commit.
   **Do not mix it with any other change. When:** after the MetaGP guard step and

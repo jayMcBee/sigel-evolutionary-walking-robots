@@ -246,7 +246,6 @@ found a real defect.** §0 has the rule; it is not optional.
 ├── build/                                  untracked, removed by `make clean`
 ├── experiments/                            the 7 kept experiments, tracked
 ├── robots/                                 the 7 robots: .rrb, .wrl, .blend, tracked
-├── data/                                   untracked, the download tree cut to the 7
 ├── kdesigelSources.1.3.tar.gz              upstream source (2003-04-30)
 ├── supportingLibs.tar.gz                   vendored deps
 ├── kbin.tar.gz                             2003 i386 binary, reference only
@@ -586,9 +585,10 @@ through `f0f2daa`.
 
 ## 7. Steps
 
-**Exit criterion per step:** `./check.sh` at the repo root — **1170 pass, 0 fail**.
-*1136 until 2026-09-19, when `experiments/` and `robots/` added 34 text files; their
-20 `.blend` files are binary, which the `encodings` check skips.*
+**Exit criterion per step:** `./check.sh` at the repo root — **1169 pass, 0 fail**.
+*1136 until 2026-09-19, when `experiments/` and `robots/` added 34 text files (their
+20 `.blend` files are binary, which the `encodings` check skips) and removing
+`dictorder-reorder.py` took one away.*
 **The pass count was 853 until D31 and the jump is not new coverage of SIGEL's
 code.** The `encodings` check used to read 404 files of five extensions and now
 read all 618 tracked files then, 8 of which git called binary: its pass count went
@@ -883,11 +883,18 @@ Start here.
   hashes changed. The docs cite the new ones. The old history is in
   `~/sigel-repo-before-rewrite-20260919.bundle` (verified), the uncommitted D43
   edits of that moment in `~/sigel-d43-uncommitted-20260919.patch`.
-- **Next, Jan's plan:** drop the historical copies except one backup. The backup
-  taken before the clean-up is `~/sigel-data-both-20260919.tar.gz`, sha256
-  `37006ffb…2035`: both data trees, checked by unpacking and diffing.
-  `dictorder-reorder.py` still reads `data/` and writes `data-reordered/`, so it
-  goes with them, or is pointed at `robots/`.
+- **The old copies are gone**, at Jan's word, 2026-09-19: `data/`,
+  `data-reordered/`, the two download archives, an older backup and the git
+  bundle of the history before the rewrite. **The one backup is
+  `~/sigel-data-both-20260919.tar.gz`**, sha256 `37006ffb…2035`: both data trees
+  as they were before the clean-up — all 14 experiments as downloaded, the 14
+  result archives, the robots in both orders — checked by unpacking and diffing.
+  `dictorder-reorder.py` went too: its input and output are gone, and `robots/`
+  holds its result. Git history keeps the script.
+- **Next: review every folder and file for what the port no longer needs**, Jan,
+  2026-09-19. Interactive, one at a time, Jan approves each: first the folders,
+  then the scripts, checks and baselines at the root, one by one. For each, say
+  what reads it and what removing it would lose, measured, then wait for his word.
 - **How each one was shown.** Score every individual with `build-fast/sigel_eval`
   (a scratch `SIGEL_ROOT` holding a copy of `Terrain.ter`). Make a viewing copy:
   swap the text between the `INDIVIDUAL(0)` and `INDIVIDUAL(k)` labels and swap
@@ -1088,7 +1095,7 @@ responsiveness probe in `guidrive.cpp`, and the matching text in this file and
 `future_refactorings.md`. Reviewed, both controls measured, and Jan confirmed it
 on the real desktop. It waited for this repair, because the checks that clear it
 read the data tree. With it in the working tree and the repaired tree in place,
-`./check.sh` gives 1170 pass, 0 fail; checks 2 and 3 diff empty; check 4 exits 0;
+`./check.sh` gives 1169 pass, 0 fail; checks 2 and 3 diff empty; check 4 exits 0;
 `./pvm-check.sh` passes both halves.
 
 **Never two sessions on this repository at once.** Sequential is fine;
@@ -1215,7 +1222,7 @@ succeeded.**
 **Checks any session must keep green**, all committed:
 
 ```
-./check.sh                                           1170 pass, 0 fail, exit 0
+./check.sh                                           1169 pass, 0 fail, exit 0
 ./dictorder-dump.sh | diff -u dictorder-baseline.txt -    empty
 ./fitness-check.sh  | diff -u fitness-baseline.txt -      empty
 ASAN_OPTIONS=detect_leaks=0 ./fitness-check.sh build      exit 0
@@ -1231,7 +1238,7 @@ here.
 Never edit a baseline to make a diff go away. If a change moves one, that is the
 finding.
 
-**THE TEN ROOT FILES NOTHING OBVIOUSLY NEEDS, AND WHY THEY STAY.** The root holds 25 tracked files; the other 15 explain themselves by name or are named in the build. Asked 2026-09-09,
+**THE TEN ROOT FILES NOTHING OBVIOUSLY NEEDS, AND WHY THEY STAY.** The root holds 24 tracked files; the other 14 explain themselves by name or are named in the build. Asked 2026-09-09,
 answered by measurement, and written down so it is not asked again. Line counts
 are `wc -l`; the consumer column is `grep` over `check.sh`, the `.sh` scripts and
 the `Makefile`.
@@ -2789,7 +2796,7 @@ is 80-bit.
 | **`real clicks`** (`xtest`, `xtest-baseline.txt`) — NEW 2026-09-07 | **the platform layer, which nothing else here touches.** Every other section drives Qt through `QApplication::notify`. This one runs `guidrive` as a real X11 client in a nested `Xvfb` under `xcb`, and sends XTEST input with `xdotool`. It is the only section that exercises activation, the popup's pointer grab and Qt's double-click synthesis. It found C13's swallowed dismissing click on its first run. **Its control is inside the scenario, and the section fails without it.** The scenario compares one real click and one `QTest::mouseClick` at the same point, through a native event filter. It prints `DISCRIMINATES` only when the real click produced native `ButtonPress` events and `QTest` produced none. *Teeth-tested. `xdotool` was replaced by a stub that exits 0 and does nothing. The scenario stops at the coordinate check with a line-initial `!!` and exit 1, so the section fails on three predicates. **An earlier version of this row claimed it failed "on the control and on the `!!` marker", and review showed that was false**: all three of the scenario's mis-target messages put their `!!` in the MIDDLE of a line, and `check.sh` greps `^ *!!`, so not one of them was visible. A run whose own output said the finding was undecidable passed every guard the section had. The markers start their lines now, and the scenario returns 1 rather than carrying on.* `QEvent::spontaneous()` would not work as that control, because `qtestmouse.h` marks QTest's own events spontaneous. A missing `Xvfb` or `xdotool` **fails** rather than skips. The display is refused if something is already on it. The server is killed by pid, so a real session's own `Xvfb` survives |
 | **`truncated pi (V5)`** — NEW 2026-09-08 | **that nobody "fixes" 1.3's truncated pi.** The sensor path converts radians to degrees with `3.14159265`, not `M_PI`. Every evolved program in the shipped experiments was selected against sensor readings carrying that 1.14e-09 error, and they feed a chaotic simulation, so correcting it changes what the robots do. **The edit that breaks it is one word and looks like tidying**, and 1.3 uses the true `M_PI` in `IFunctions.cpp, calculateAnyJoint`, so the truncated literal reads as an oversight to anyone who meets that line first. **Two checks, because neither covers the other:** the SOURCE check catches an edit at one of the four sites even while another site still supplies the constant, which no binary search can see, and it is compiler-independent; the BINARY check catches any spelling that yields the true value — `M_PI`, `4*atan(1)`, a longer literal, a header constant — which a grep for `M_PI` would miss. Only the radian factor is checked, and the reason is measured rather than assumed: on aarch64 four of the other seven appear ZERO times as 8-byte doubles in our image and two appear only in debug sections, so there is nothing of theirs in `.rodata` to compare. Costs 0.18 s. *Teeth-tested six ways, and the testing found three defects in the check itself. **The binary search covered the whole file, so its "the constant is missing" arm could never fire** — the Makefile compiles with `-g`, so two debug copies survive any patch of the real one; the search is bounded to `.rodata` now. **The source pattern was a prefix match**, so lengthening a site to `3.14159265358979` changed the factor while the count stayed at 4 and neither forbidden double appeared — the whole section passed on that edit. **And a comment mentioning `M_PI` or the literal failed the check**, which is documentation, not a defect; comments are stripped now. The six probes: a site tidied to `M_PI`, a site deleted, a site lengthened, the true `180/pi` patched into `.rodata`, the kept constant patched out of `.rodata`, and a comment naming both. Five fail with the message aimed at them, one passes. Two orderings had to be fixed for that: `M_PI` is tested before the site count, and the forbidden constant before the missing one, because each of those edits trips both tests and the specific diagnosis has to win.* |
 | **`v2 round trip vs 1.3`** — NEW 2026-09-08 | **a whole experiment through `File > Save Experiment`, twice, against what the 2003 binary wrote.** `pagesave` compares a 192-line parameter block, over two saves that differ only in whether the pages were edited; this compares the WHOLE file across two CHAINED saves, where each save's output is the next one's input — marker line numbers, `PVMHOST` order, the experiment history, the per-individual HISTORY growth, the individual names, the robot block, the ten first-save keys, and `expstruct.py` over pass 1 against pass 2. The expected text is copied from `verification-against-sigel-1.3/v8-1.3-gp-blocks.txt`, captured before this conversion existed, so a failure is a regression against 1.3 rather than against yesterday. **Input against pass 1 is not the test** — the first save adds ten keys and would fail however correct the port is (V8 result 5). It is ONE diff of a 58-line report. Costs 35 s measured, four `pagesave` runs over two experiments; no new scenario was added. *Teeth-tested 2026-09-08, and the testing found two holes in the check itself, both since closed — see the V2 row above. Every predicate has been shown to fail on a change of the kind it exists to catch. The claim is one-way: a mutation moves the line it is aimed at, and usually others too, because a deleted key shifts every marker below it. It is NOT that each mutation moves exactly one line, which an earlier version of this row claimed and which the measurements never showed. The wrapper was tested too: missing data SKIPS and counts, a missing or stale binary FAILS, suppressed Qt connect logging FAILS, and the section was run from outside the repo root to check the `make -q -C` fix.* |
-| `encodings` | **INVERTED BY D31 2026-09-09 — this row used to say the opposite.** It no longer catches *a file whose CRLF was stripped*; it catches **CRLF present at all**, in any tracked text file, expected zero. 644 LF-only files and 28 that git calls binary, with 44 translated and 61 that postdate the root (2026-09-19). Baseline 0, floor 500 |
+| `encodings` | **INVERTED BY D31 2026-09-09 — this row used to say the opposite.** It no longer catches *a file whose CRLF was stripped*; it catches **CRLF present at all**, in any tracked text file, expected zero. 643 LF-only files and 28 that git calls binary, with 44 translated and 61 that postdate the root (2026-09-19). Baseline 0, floor 500 |
 | `dead item virtuals` | a class declaring Qt 2's `key(int,bool)` without the `operator<` that replaces it. Matched against a **flattened** header and demanding the signature that actually overrides — a decoy `operator<( QTreeWidgetItem * )` and a two-line declaration both bypassed the first version |
 | `widgets` | `DISpinBox` losing the fraction, under **`C` and `de_DE`** — without the second row it was blind to the locale bug the first fix introduced |
 | **`expstruct selfcheck`** | that the structural fingerprint is **blind to fitness and sighted on structure** — nine assertions: both spellings of fitness in both float and integer form, a program-operand change that must move `PROGRAMS`, two individuals swapped that must move `ORDER`, and a structural floor recomputed from the raw bytes (individual count, total program lines, history length against `POOLGENERATION`) that catches a matcher which died and dumped its content into `SHAPE`. Costs 0.34 s. *Teeth-tested by disabling both fitness filters and by blinding the program matcher* |
@@ -5165,16 +5172,17 @@ renamed to its robot's name: `hammer`, `insect`, `octopus`, `runner`,
 `future_refactorings.md`. The `.exp` bytes are the download's; only the names
 and the set changed. `robots/<robot>/` holds the migrated `.rrb` (the order D2
 proves), the `.wrl` meshes and the `.blend` model sources the meshes were
-exported from. Both folders were copied byte for byte from `data-reordered/`.
-The untracked `data/` is the download tree cut and renamed the same way.
+exported from. Both folders were copied byte for byte from `data-reordered/`,
+which with `data/` was then removed; `~/sigel-data-both-20260919.tar.gz` holds
+both trees as they were before the clean-up.
 
 ### D2 — what the migration actually has to preserve
 
 Names, so this stops being ambiguous: `dictorder-dump.sh` produces the order
 from `experiments/` and `robots/`, and `dictorder-baseline.txt` is the committed
-reference. `dictorder-reorder.py` builds the untracked **`data-reordered/`** from
-the untracked download tree `data/` and never writes `data/`; `robots/` was
-copied from its result.
+reference. `dictorder-reorder.py` built **`data-reordered/`** from the download
+tree `data/`, and `robots/` was copied from its result. The script and both
+trees were removed on 2026-09-19; git history keeps the script.
 
 **Only four of the six dicts are numbered.** The walk is, in this order,
 **links → joints → sensors → drives**, and those four orders are the ones a
