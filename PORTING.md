@@ -850,12 +850,15 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 PORT.** Start here.
 
 - **Done.** `hammerNiceWalkingFitness`: a keeper. `insectNiceWalkingFitness`: a
-  keeper. `octopusNiceWalkingFitness`: a keeper. The two-bases family: keep
+  keeper. `octopusNiceWalkingFitness`: a keeper. `walkerNiceWalkingFitness`: a
+  keeper. The two-bases family: keep
   `twoBasesHardlyReducedIS`, to be renamed `twoBases`; the other five go — item 40
   in `future_refactorings.md`. `octopusSimpleFitness` goes too — item 44. The
   clean-ups wait until every experiment has been judged; do not start them unasked.
-- **Next: `walkerNiceWalkingFitness`**, Jan's choice. Then
-  `runnerNiceWalkingFitness`, `runnerSimpleFitness`,
+  **Both machines end with the same set under the same names**, Jan, 2026-09-19:
+  *"keeping just the ones I've picked on both machines (otherwise we won't ever
+  be able to compare them)"*. Names other than `twoBases` are not yet chosen.
+- **Next: `runnerNiceWalkingFitness`.** Then `runnerSimpleFitness`,
   `shortHammerNiceWalkingFitness`.
 - **How each one is shown.** Score every individual with `build-fast/sigel_eval`
   (a scratch `SIGEL_ROOT` holding a copy of `Terrain.ter`). Make a viewing copy:
@@ -992,7 +995,8 @@ beside it in the same place.
   different programs by the oracle's check; 13 is the lowest number.
   `octopusSimpleFitness`, individual 4, score 0.841: Jan: *"once again two octopus
   experiments - ok, we'll keep only one! the first one, the current one is a
-  failed/early run"* — item 44.
+  failed/early run"* — item 44. `walkerNiceWalkingFitness`, individual 35, score
+  0.255: Jan: *"the current Walker experiment is a keeper"*.
 - **The payload, octopus, all 259 lines.** The 182 Polygon lines are
   byte-identical. The 13 Geometry lines carry the same values; four differ in
   text only, at exact decimal ties in the 50th digit, where glibc rounds half
