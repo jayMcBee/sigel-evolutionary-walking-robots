@@ -446,12 +446,21 @@ touched, because changing one changes behaviour against the reference binary.
   list makes `slotStartEvolution` run with nowhere to spawn, which is a
   different silent failure from the one D41 and D42 just closed.
 
-- [ ] **40. Remove `twoBasesSimpleFitness2.exp`, here and on the x86 machine.**
-  Jan, 2026-09-19: *"The first exp. we've tried is bogus and should be removed,
-  both here and on the x86 machine, it's broken everywhere and provides no
-  value."* Its individual 0 (NAME 57478) scores 3.4e-05 on 1.3 and here, and Jan
-  saw it barely move on both.
-  **It is the experiment most checks load**, so removing it moves them all:
+- [ ] **40. Keep one two-bases experiment; remove the other five, here and on the
+  x86 machine.** Jan judged all six side by side on 1.3 and the port, 2026-09-19,
+  each with its best individual by the port's own scoring: **keep
+  `twoBasesHardlyReducedIS`**; remove `twoBasesHighMutationRate` (a close second),
+  `twoBasesSimpleFitness1`, `twoBasesReducedInstructionSet`,
+  `twoBasesHighCrossOverRate` (the same file as `twoBasesSimpleFitness1`) and
+  `twoBasesSimpleFitness2`. Jan on the last: *"it's broken everywhere and
+  provides no value"* — its individual 0 scores 3.4e-05 on both, and its best
+  (number 78) moved only slightly.
+  **Every one of the five is in `dictorder-baseline.txt` and
+  `fitness-baseline.txt`**, so both move. `twoBasesSimpleFitness1` is also the
+  input of `check.sh`'s `expstruct selfcheck`, and `replicate.sh` names it and
+  `twoBasesHighCrossOverRate` as the identical pair.
+  **`twoBasesSimpleFitness2` is the hard one.** It is the experiment most checks
+  load, so removing it moves them all:
   in `check.sh` it drives six sections — `gui behaviour`, `real clicks` and
   `pagesave vs 1.3` through `BEXP`, and `no clipped controls`, `form minimums` and
   `slave gui`, which name the file directly; `guidrive.cpp` loads it by default;
@@ -471,6 +480,26 @@ touched, because changing one changes behaviour against the reference binary.
   To see the twoBases and hammer robots on 1.3, the oracle moved the slider 3
   page steps out, from 10 to 70. A new default is a deliberate divergence from
   1.3; the value, and whether trace stays on, are Jan's to set.
+
+- [ ] **42. The 3-D view puts the robot at a corner of the grid, not in its
+  middle.** Jan, 2026-09-19: *"in 3D View we're placing the robot at the corner
+  of the grid, not centered"*. What the code does: `SIG_EnvironmentRenderer::
+  buildGrid` draws the terrain grid from the origin out to the terrain's size,
+  with the grid spacing forced to 1 because, by its own note, `getTerrainData`
+  does not set it; the robot starts at the experiment's `STARTPOSITION`, which is
+  `0 1 0` in `twoBasesSimpleFitness1`, so at the grid's corner. The same code is
+  in 1.3. Not yet compared with 1.3 by eye.
+
+- [ ] **43. The ambient light slider seems to do nothing in the 3-D view.** Jan,
+  2026-09-19: *"in 3D mode the ambient slider doesn't appear to DO anything?!"*
+  What the code does: `SIG_VisualisationWidget::setAmbientLighting` calls
+  `SIG_Visualisation::setAmbientSceneColor`, which keeps the value for the
+  POV-Ray export and calls `glLightModelfv( GL_LIGHT_MODEL_AMBIENT, … )` straight
+  from the slider's slot, outside `paintGL`. Two things to check first, neither
+  measured: a Qt 6 `QOpenGLWidget` has its context current only inside
+  `initializeGL`, `paintGL` and `resizeGL` unless `makeCurrent()` is called, so
+  the call may reach no context; and ambient light has no effect while lighting
+  is off, which may be so in wireframe mode. Not yet compared with 1.3.
 
 - [ ] **35. Remove the Windows and Visual Studio support.** Decided by Jan
   2026-09-09. It does not build here and nothing tests it.
