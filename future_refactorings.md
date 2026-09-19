@@ -501,6 +501,23 @@ touched, because changing one changes behaviour against the reference binary.
   the call may reach no context; and ambient light has no effect while lighting
   is off, which may be so in wireframe mode. Not yet compared with 1.3.
 
+- [ ] **44. Keep one octopus experiment; remove `octopusSimpleFitness`, here and
+  on the x86 machine.** Jan, 2026-09-19: *"once again two octopus experiments -
+  ok, we'll keep only one! the first one, the current one is a failed/early
+  run"*. Keep `octopusNiceWalkingFitness`, judged a keeper side by side with
+  individual 13. The same wait as item 40: not before every experiment has been
+  judged, and not unasked.
+  **What names it:** `fitness-baseline.txt` (3 lines), `dictorder-baseline.txt`
+  (its section) and `check.sh`'s v2 round trip, which loads it as `V2OCT` for the
+  containers that collide.
+  **That check compares against 1.3's own output for this file**, in
+  `verification-against-sigel-1.3/v1-1.3-roundtrip.txt`. The two octopus robot
+  blocks differ — sha256 `2b56be22…a2d1` against `8934a27c…fc2d` for
+  `octopusNiceWalkingFitness` — so moving the check to the kept file needs a new
+  capture from the oracle, as item 40 says for `twoBasesSimpleFitness2`.
+  The 2026-09-18 oracle measurements named "octopus" in PORTING.md were taken on
+  this file; they stay as the record of what was measured.
+
 - [ ] **35. Remove the Windows and Visual Studio support.** Decided by Jan
   2026-09-09. It does not build here and nothing tests it.
   **What is there:** 9 Visual Studio project files at the source root, 7,962
