@@ -536,9 +536,10 @@ touched, because changing one changes behaviour against the reference binary.
   versioning, such as the fitness function used; *"when we're done with our
   review we need to strip all such versioning and just keep the base names! We'll
   do this interactively, you suggest and I approve."* One name at a time, after
-  the review and after items 40, 44 and 45. `twoBasesHardlyReducedIS` →
-  `twoBases` is already decided. Both machines use the same names, so the two
-  stay comparable.
+  the review and after items 40, 44 and 45. Both machines use the same names, so
+  the two stay comparable. Each kept experiment takes its robot's name.
+  Approved: `twoBasesHardlyReducedIS` → `twoBases`; `hammerNiceWalkingFitness` →
+  `hammer`.
 
 - [ ] **35. Remove the Windows and Visual Studio support.** Decided by Jan
   2026-09-09. It does not build here and nothing tests it.
