@@ -446,6 +446,32 @@ touched, because changing one changes behaviour against the reference binary.
   list makes `slotStartEvolution` run with nowhere to spawn, which is a
   different silent failure from the one D41 and D42 just closed.
 
+- [ ] **40. Remove `twoBasesSimpleFitness2.exp`, here and on the x86 machine.**
+  Jan, 2026-09-19: *"The first exp. we've tried is bogus and should be removed,
+  both here and on the x86 machine, it's broken everywhere and provides no
+  value."* Its individual 0 (NAME 57478) scores 3.4e-05 on 1.3 and here, and Jan
+  saw it barely move on both.
+  **It is the experiment most checks load**, so removing it moves them all:
+  in `check.sh` it drives six sections — `gui behaviour`, `real clicks` and
+  `pagesave vs 1.3` through `BEXP`, and `no clipped controls`, `form minimums` and
+  `slave gui`, which name the file directly; `guidrive.cpp` loads it by default;
+  `guibehaviour-baseline.txt` names it 24 times, `xtest-baseline.txt` 2,
+  `fitness-baseline.txt` 3, and `dictorder-baseline.txt` has its section.
+  **`pagesave-baseline.txt` is 1.3's own output for this file** and cannot be made
+  again here, so a replacement experiment needs a new capture from the oracle.
+  Removing it also ends item 39's conflict over this file.
+
+- [ ] **41. The simulation viewer starts too close, and follows the robot.** Jan,
+  2026-09-19: *"On both machines and SIGEL versions we're defaulting to trace
+  robot and are zooming in way way way too much."* Both come from the form and
+  are the same in 1.3's: `distanceSlider` in `SIG_SimulationWidgetBase.ui` starts
+  at 10 of 2 to 200, page step 20; trace robot is on — `traceRobotCheckBox`
+  starts ticked, `SIG_SimulationVisualisationWidget`'s constructor sets
+  `traceRobot` true, and `visualizeThis` calls `slotSetTraceRobot( true )` again.
+  To see the twoBases and hammer robots on 1.3, the oracle moved the slider 3
+  page steps out, from 10 to 70. A new default is a deliberate divergence from
+  1.3; the value, and whether trace stays on, are Jan's to set.
+
 - [ ] **35. Remove the Windows and Visual Studio support.** Decided by Jan
   2026-09-09. It does not build here and nothing tests it.
   **What is there:** 9 Visual Studio project files at the source root, 7,962
