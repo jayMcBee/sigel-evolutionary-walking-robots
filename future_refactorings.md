@@ -466,8 +466,9 @@ touched, because changing one changes behaviour against the reference binary.
   `slave gui`, which name the file directly; `guidrive.cpp` loads it by default;
   `guibehaviour-baseline.txt` names it 24 times, `xtest-baseline.txt` 2,
   `fitness-baseline.txt` 3, and `dictorder-baseline.txt` has its section.
-  **`pagesave-baseline.txt` is 1.3's own output for this file** and cannot be made
-  again here, so a replacement experiment needs a new capture from the oracle.
+  **`pagesave-baseline.txt` is 1.3's own output for this file**, and the port
+  matches it. A replacement experiment takes the port's own output as its
+  reference; no new capture from the oracle — see item 44.
   Removing it also ends item 39's conflict over this file.
 
 - [ ] **41. The simulation viewer starts too close, and follows the robot.** Jan,
@@ -511,10 +512,13 @@ touched, because changing one changes behaviour against the reference binary.
   (its section) and `check.sh`'s v2 round trip, which loads it as `V2OCT` for the
   containers that collide.
   **That check compares against 1.3's own output for this file**, in
-  `verification-against-sigel-1.3/v1-1.3-roundtrip.txt`. The two octopus robot
-  blocks differ — sha256 `2b56be22…a2d1` against `8934a27c…fc2d` for
-  `octopusNiceWalkingFitness` — so moving the check to the kept file needs a new
-  capture from the oracle, as item 40 says for `twoBasesSimpleFitness2`.
+  `verification-against-sigel-1.3/v1-1.3-roundtrip.txt`, and the port matches it.
+  The two octopus robot blocks differ — sha256 `2b56be22…a2d1` against
+  `8934a27c…fc2d` for `octopusNiceWalkingFitness` — so the kept file has no 1.3
+  capture. It needs none: moved to the kept file, the check takes the port's own
+  output as its reference. Jan, 2026-09-19: *"since it passes why do we keep
+  re-checking a known fact? Future refactorings only need to check against the
+  now-proven Qt6 baseline"*. The same holds for item 40.
   The 2026-09-18 oracle measurements named "octopus" in PORTING.md were taken on
   this file; they stay as the record of what was measured.
 
