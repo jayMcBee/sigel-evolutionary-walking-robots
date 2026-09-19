@@ -891,11 +891,10 @@ ways: each exits 1 and writes nothing.
 rewritten 37 `Body … /home/pg368/…/ y` entries inside robot blocks. Its dump
 differed from the baseline in 602 changed lines, 16 hunks, all in 6 `.rrb`
 sections; no `.exp` section differed.
-**`~/sigel-data-download-20260918.tar.gz` is not the clean download** — its
-`runner*.exp` and `results/` carry the edit. It,
-`~/sigel-experiments-qt6-20260918.tar.gz` and
-`~/sigel-data-reordered-session-start-20260918.tar.gz` all hold the damaged
-state. The clean state comes from the archives, not from any of them.
+The three backups in `~` taken during the loss held that damaged state and were
+deleted. **The one backup is `~/sigel-data-reordered-verified-20260919.tar.gz`**,
+sha256 `b7077af6…e5a3`: `data-reordered/` after the repair, checked by extracting
+it and diffing it against the tree.
 Two check outputs from 2026-09-02, `x11b-gpp.gpp` and `x11b-ow.sip`, were
 removed from `data-reordered/Experiments/`; `guidrive` writes to
 `$SIGEL_SCRATCH` or `/tmp` now.
