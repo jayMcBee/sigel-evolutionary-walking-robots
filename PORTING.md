@@ -846,6 +846,34 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-09-19 — IN PROGRESS: JAN JUDGES EACH EXPERIMENT BY EYE, 1.3 BESIDE THE
+PORT.** Start here.
+
+- **Done.** `hammerNiceWalkingFitness`: a keeper. The two-bases family: keep
+  `twoBasesHardlyReducedIS`, to be renamed `twoBases`; the other five go — item 40
+  in `future_refactorings.md`. The clean-up waits until every experiment has been
+  judged; do not start it unasked.
+- **Next: `insectNiceWalkingFitness`.** Its best individual in the port is number
+  56, score 0.611. Then `octopusNiceWalkingFitness`, `octopusSimpleFitness`,
+  `runnerNiceWalkingFitness`, `runnerSimpleFitness`,
+  `shortHammerNiceWalkingFitness`, `walkerNiceWalkingFitness`.
+- **How each one is shown.** Score every individual with `build-fast/sigel_eval`
+  (a scratch `SIGEL_ROOT` holding a copy of `Terrain.ter`). Make a viewing copy:
+  swap the text between the `INDIVIDUAL(0)` and `INDIVIDUAL(k)` labels and swap
+  their `POOLPOS`; check that individual 0 of the copy scores what k scored. Show
+  it here with `DISPLAY=:0 QT_QPA_PLATFORM=xcb`, `SIGEL_ROOT` the source tree,
+  `build-fast/sigel_slave -visualize <copy>`. Send `sigel-x86` the shipped file's
+  sha256, k, and the copy's sha256; it builds the same bytes, repoints the `Body`
+  lines and shows it in a nested display that can draw (`Xephyr :98` with
+  `-glamor`, `LIBGL_ALWAYS_SOFTWARE=1`, a live `pvmd3`), camera 3 steps out, at
+  time 0.
+- **Jan's rules from this session.** Do only what he asks, one step at a time. The
+  x86 machine is the 1.3 reference and nothing more; never ask it to keep records
+  for us. Stop every viewer, here and on x86, when he says.
+- **Open with Jan:** the `.rrb` reordering choice (below, under 1.3's numbering);
+  D43, uncommitted — both `SIGEL_GP` comments are done, 12 other review findings
+  remain; items 40 to 43.
+
 **2026-09-18 — THE EXPERIMENT DATA WAS DAMAGED, AND IT IS REPAIRED.**
 
 **What happened.** Both untracked trees were written over while clearing the
