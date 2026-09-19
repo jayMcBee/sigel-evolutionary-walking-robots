@@ -32,7 +32,7 @@ INCS="-I$ROOT/shim -I$SRC/include -isystem $QTINC -isystem $QTINC/QtCore"
 INCS="$INCS -isystem $QTINC/QtGui -isystem $QTINC/QtWidgets"
 # QOpenGLWidget arrived with C3's SIG_VisualisationWidget.
 INCS="$INCS -isystem $QTINC/QtOpenGL -isystem $QTINC/QtOpenGLWidgets"
-for d in newmat09 dynamechs/dm Dynamo/Src/Inc fparser cv97 SOLID-2.0/include pvm3/include; do
+for d in newmat09 dynamechs/dm Dynamo/Src/Inc fparser cv97 pvm3/include; do
     INCS="$INCS -isystem $SL/$d"
 done
 

@@ -292,7 +292,7 @@ SIGINC := -Ishim -I$(SRC)/include -I$(B)/ui -isystem $(QTINC) \
           $(addprefix -isystem $(QTINC)/,QtCore QtGui QtWidgets \
                                         QtOpenGL QtOpenGLWidgets) \
           $(addprefix -isystem $(SL)/,newmat09 dynamechs/dm Dynamo/Src/Inc \
-                                      fparser cv97 SOLID-2.0/include pvm3/include)
+                                      fparser cv97 pvm3/include)
 SIGCXX := g++ -std=c++17 -O1 -g -Wall -Wextra \
               -DMINMAX_H $(SIGSAN)
 
