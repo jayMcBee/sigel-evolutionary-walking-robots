@@ -1,6 +1,7 @@
 # xtest-baseline.txt -- what the port does with REAL X INPUT.
 #
-# Captured 2026-09-07. build-fast/guidrive runs as a normal X11 client inside a
+# The values are the port's for twoBases.exp. build-fast/guidrive runs as a
+# normal X11 client inside a
 # nested Xvfb, 1400x1000x24, with no window manager, under
 # QT_QPA_PLATFORM=xcb. xdotool sends XTEST input. check.sh's `real clicks'
 # section reproduces this file. Lines starting with # are stripped before the
@@ -101,7 +102,7 @@
 == STEP 2: after File > Open Experiment ==
   [title] SIGEL
   [tree] header=[Experiments] topLevel=1
-      twoBasesSimpleFitness2.exp sel=1 exp=1 cur=1 selectable=1
+      twoBases.exp             sel=1 exp=1 cur=1 selectable=1
         Individuals              sel=0 exp=0 cur=0 selectable=1
         Robot                    sel=0 exp=1 cur=0 selectable=1
           Language-Parameters      sel=0 exp=0 cur=0 selectable=1
@@ -118,7 +119,7 @@
     button   [Show in GNU-Plot] enabled=1 checkable=0 checked=0
     button   [Export PostScript] enabled=1 checkable=0 checked=0
     check    [Save the history] enabled=1 checkable=1 checked=1
-    lcd      [lcdnumberGenerations] value=532 digits=4
+    lcd      [lcdnumberGenerations] value=203 digits=4
     lcd      [lcdnumberAutosave] value=0 digits=4
     slider   [sliderIntervall] value=0 min=0 max=100 enabled=1
     progress [generationProgBar] value=-1 min=0 max=100
@@ -169,7 +170,7 @@
 == STEP 3: after View > Population ==
   [title] SIGEL
   [tree] header=[Experiments] topLevel=1
-      twoBasesSimpleFitness2.exp sel=0 exp=1 cur=0 selectable=1
+      twoBases.exp             sel=0 exp=1 cur=0 selectable=1
         Individuals              sel=1 exp=0 cur=1 selectable=1
         Robot                    sel=0 exp=1 cur=0 selectable=1
           Language-Parameters      sel=0 exp=0 cur=0 selectable=1
@@ -177,15 +178,15 @@
         Simulation-Parameters    sel=0 exp=0 cur=0 selectable=1
         Environment              sel=0 exp=0 cur=0 selectable=1
   [page] count=8 current=SIGEL_MasterGUI::SIG_AllIndividualsView objectName=[]
-  [individuals] rows=120 cols=3 headers=[Name               ][Fitness          ][Age               ] selected=0
-    row0  | 55658         | 1.14825       | 111           | sel=0
-    row1  | 56091         | 1.14825       | 109           | sel=0
-    row2  | 56248         | 1.14825       | 259           | sel=0
-    row3  | 56349         | 1.06261       | 97            | sel=0
-    row4  | 56432         | 1.14825       | 111           | sel=0
-    row5  | 56447         | 1.14825       | 107           | sel=0
-    ... 114 more
-    allrows sha256=ee0c3372fe5769ccf63f449dfcf2b301eb7d4acd4924cc5291e6f1e0c303e198
+  [individuals] rows=100 cols=3 headers=[Name               ][Fitness          ][Age               ] selected=0
+    row0  | 16269         | 0.558099      | 58            | sel=0
+    row1  | 16430         | 0.563401      | 27            | sel=0
+    row2  | 16486         | 0.569652      | 16            | sel=0
+    row3  | 16494         | 0.558099      | 60            | sel=0
+    row4  | 16611         | 0.563401      | 37            | sel=0
+    row5  | 16623         | 0.569652      | 14            | sel=0
+    ... 94 more
+    allrows sha256=893d98e2f4cb3f0951994592285055305ccd94067f8d2d6ed70904824bb45a32
   [action changes] none
 
 == REAL X INPUT ==
@@ -212,10 +213,10 @@
     real click on [&File]: popup=QMenu mouseGrabber=(none) keyboardGrabber=(none) xfocus=main window
     second click on [&File]: popup still up=0
     outside point is list row 3, outside the popup=1, widgetThere=QWidget
-    then a real click on list row 3: popup before=1 after=0, list current before=[55658] after=[55658] xfocus=main window
+    then a real click on list row 3: popup before=1 after=0, list current before=[16269] after=[16269] xfocus=main window
     outside click              native[press=2 rel=2 motion>0=1 enter=2 leave=2 focusIn=1 xi2NoMotion=6 core=3] qt[press=2 dbl=0 enter=8 leave=0 act=0 deact=0]
                                pressOn=[QWidgetWindow, QMenu]
-    CONTROL, same point with no menu up: list current before=[55658] after=[56349] -- row selectable, so the probe can see a change
+    CONTROL, same point with no menu up: list current before=[16269] after=[16494] -- row selectable, so the probe can see a change
     control click              native[press=2 rel=2 motion>0=1 enter=0 leave=0 focusIn=0 xi2NoMotion=4 core=0] qt[press=2 dbl=0 enter=0 leave=0 act=0 deact=0]
                                pressOn=[QWidgetWindow, QWidget]
     vs 1.3: menu closes AND the row under the click is selected -- DIFFERS -- the port SWALLOWS the dismissing click

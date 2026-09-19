@@ -409,20 +409,20 @@ touched, because changing one changes behaviour against the reference binary.
   *Any printf on an early-return path here is lost unless it flushes itself.*
 
 - [ ] **39. Clear the 2003 Dortmund PVM hosts out of the experiments.**
-  All 14 shipped `.exp` carry them: 22 distinct host names — `wickie`, `bube`,
-  `eiche`, `pappel`, `urobe` and the rest — in 210 `PVMHOST` lines, with slave
+  All 7 kept `.exp` carry them: 22 distinct host names — `wickie`, `bube`,
+  `eiche`, `pappel`, `urobe` and the rest — in 130 `PVMHOST` lines, with slave
   directories under `/home/pg368/sawitzki/sigel` and
-  `/home/pg368b/ross/projects/sigel`, and 28 `GRAVEYARDDIRECTORY` and
+  `/home/pg368b/ross/projects/sigel`, and 14 `GRAVEYARDDIRECTORY` and
   `POOLIMAGEDIRECTORY` values under the same roots. None has existed since 2003,
   so every one of them is a spawn that fails.
-  **The robot block carries them too.** Each of the 31 `Body` entries names its
+  **The robot block carries them too.** Each of the 20 `Body` entries names its
   2001 directory, as in `Body base.wrl /home/pg368/sawitzki/hammer/ y`.
   `check.sh`'s `v2 round trip` section pins an md5 over hammer's whole robot
   block and an `expstruct` shape hash that covers those entries, so changing the
   paths moves both pins. The 2026-09-18 attempt changed them without saying so.
   **Where they are expected output:**
-  - `pagesave-baseline.txt`: 16 host lines and 4 directory values — 1.3's OWN
-    output, captured from the 2003 binary and impossible to make again here.
+  - `pagesave-baseline.txt`: 16 host lines and 4 directory values — the port's
+    own save of `twoBases.exp`. Regenerable here.
   - `v8-1.3-gp-blocks.txt`: the 20 hammer host names, in the order the
     `v2 round trip` section compares against.
   - `check.sh`: the three pinned `pvmhost` lines of that section, and its
@@ -431,15 +431,10 @@ touched, because changing one changes behaviour against the reference binary.
     `exportall`, 7 from `dialogs`. Regenerable here.
   `v6-1.3-friction-nocollide.txt` names two such paths in its method note; no
   check reads them. `dictorder`, `fitness`, `guidump` and `xtest` carry none.
-  **Settle one conflict first.** Changing `twoBasesSimpleFitness2.exp` changes
-  what `pagesave-baseline.txt` must hold, and that file is 1.3's output for
-  exactly this experiment — PORTING.md, the paragraph beginning
-  "`pagesave-baseline.txt` is the one that cannot be made again here". The
-  handover says to map distinct placeholders consistently across the
-  experiments, `pagesave-baseline.txt` and `check.sh`'s host-parser test, which
-  means editing 1.3's output by the same map. Decide which. Every scenario in
-  `guibehaviour-baseline.txt` loads that experiment, so its 19 lines move only
-  if the experiment changes.
+  Every scenario behind `guibehaviour-baseline.txt` and `pagesave-baseline.txt`
+  loads `twoBases.exp`, so their host lines move with that file, and both are
+  the port's own output. Map distinct placeholders consistently across the
+  experiments, those two files and `check.sh`'s host-parser test.
   **Copy both data trees before the first write.** The 2026-09-18 attempt did
   not, and lost the only copy of `data-reordered/`.
   **Decide first what replaces them** — this machine, or an empty list. An empty
@@ -462,14 +457,16 @@ touched, because changing one changes behaviour against the reference binary.
   **`twoBasesSimpleFitness2` is the hard one.** It is the experiment most checks
   load, so removing it moves them all:
   in `check.sh` it drives six sections — `gui behaviour`, `real clicks` and
-  `pagesave vs 1.3` through `BEXP`, and `no clipped controls`, `form minimums` and
+  `pagesave` through `BEXP`, and `no clipped controls`, `form minimums` and
   `slave gui`, which name the file directly; `guidrive.cpp` loads it by default;
   `guibehaviour-baseline.txt` names it 24 times, `xtest-baseline.txt` 2,
   `fitness-baseline.txt` 3, and `dictorder-baseline.txt` has its section.
-  **`pagesave-baseline.txt` is 1.3's own output for this file**, and the port
-  matches it. A replacement experiment takes the port's own output as its
-  reference; no new capture from the oracle — see item 44.
+  **`pagesave-baseline.txt` was 1.3's own output for this file**, and the port
+  matched it. It now holds the port's own save of `twoBases.exp`; no new
+  capture from the oracle — see item 44.
   Removing it also ends item 39's conflict over this file.
+  **Done on this machine 2026-09-19.** The x86 machine is still open: sigel-x86
+  deletes or renames files only on Jan's own word.
 
 - [ ] **41. The simulation viewer starts too close, and follows the robot.** Jan,
   2026-09-19: *"On both machines and SIGEL versions we're defaulting to trace
@@ -521,6 +518,8 @@ touched, because changing one changes behaviour against the reference binary.
   now-proven Qt6 baseline"*. The same holds for item 40.
   The 2026-09-18 oracle measurements named "octopus" in PORTING.md were taken on
   this file; they stay as the record of what was measured.
+  **Done on this machine 2026-09-19.** The x86 machine is still open: sigel-x86
+  deletes or renames files only on Jan's own word.
 
 - [ ] **45. Keep one runner experiment; remove `runnerSimpleFitness`, here and on
   the x86 machine.** Jan, 2026-09-19, judging it side by side with individual 30:
@@ -530,6 +529,8 @@ touched, because changing one changes behaviour against the reference binary.
   `dictorder-baseline.txt` (its section). No check loads it.
   `verification-against-sigel-1.3/` holds oracle measurements on it; they stay as
   the record of what was measured.
+  **Done on this machine 2026-09-19.** The x86 machine is still open: sigel-x86
+  deletes or renames files only on Jan's own word.
 
 - [ ] **46. Rename the kept experiments to their base names, here and on the x86
   machine.** Jan, 2026-09-19: the names carry notes added run by run as a kind of
@@ -542,7 +543,9 @@ touched, because changing one changes behaviour against the reference binary.
   `hammer`; `insectNiceWalkingFitness` → `insect`; `octopusNiceWalkingFitness` →
   `octopus`; `runnerNiceWalkingFitness` → `runner`;
   `shortHammerNiceWalkingFitness` → `shortHammer`; `walkerNiceWalkingFitness` →
-  `walker`. All seven approved 2026-09-19; the renaming itself waits for Jan.
+  `walker`. All seven approved 2026-09-19.
+  **Done on this machine 2026-09-19.** The x86 machine is still open: sigel-x86
+  deletes or renames files only on Jan's own word.
 
 - [ ] **35. Remove the Windows and Visual Studio support.** Decided by Jan
   2026-09-09. It does not build here and nothing tests it.

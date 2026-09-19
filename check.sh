@@ -707,7 +707,7 @@ rm -f /tmp/gdb.$$
 
 cp=0; cf=0
 if SIGEL_ROOT="$SRC" QT_QPA_PLATFORM=offscreen \
-       SIGEL_EXP="$ROOT/data-reordered/Experiments/twoBasesSimpleFitness2.exp" \
+       SIGEL_EXP="$ROOT/data-reordered/Experiments/twoBases.exp" \
        timeout 300 "$ROOT/build-fast/guidrive" clipcheck >/tmp/clip.$$ 2>/dev/null; then
     cp=1
 else
@@ -773,7 +773,7 @@ else
     # scenario's table, which is what it is for. Corrected by review.
     mrc=0
     SIGEL_ROOT="$SRC" QT_QPA_PLATFORM=offscreen \
-      SIGEL_EXP="$ROOT/data-reordered/Experiments/twoBasesSimpleFitness2.exp" \
+      SIGEL_EXP="$ROOT/data-reordered/Experiments/twoBases.exp" \
       SIGEL_SCRATCH="${TMPDIR:-/tmp}" \
       timeout 300 "$ROOT/build-fast/guidrive" formsize >/tmp/fmin.$$ 2>/tmp/fmerr.$$ \
       || mrc=$?
@@ -845,7 +845,7 @@ pass=$((pass+mp)); fail=$((fail+mf))
 # stderr means the logging was suppressed, not that the connects are sound.
 sp=0; sf=0
 if SIGEL_ROOT="$SRC" QT_QPA_PLATFORM=offscreen \
-       SIGEL_EXP="$ROOT/data-reordered/Experiments/twoBasesSimpleFitness2.exp" \
+       SIGEL_EXP="$ROOT/data-reordered/Experiments/twoBases.exp" \
        SIGEL_SCRATCH="${TMPDIR:-/tmp}" \
        timeout 300 "$ROOT/build-fast/guidrive" slavegui >/tmp/sclip.$$ 2>/tmp/serr.$$; then
     # Both lines must be PRESENT and read 0. A missing line is a walk that did
@@ -1108,17 +1108,16 @@ pass=$((pass+gp)); fail=$((fail+gf))
 # double-click synthesis -- so this proves the application's logic, not the
 # platform layer's. guidrive.cpp's header says so at more length.
 #
-# The baseline was diffed against the RUNNING 1.3 binary, so a failure here is
-# a regression against 1.3. guibehaviour-baseline.txt says which fact came from
-# where. The load-bearing line is `nameIsASurvivor=0', NOT the word SURVIVED:
-# after the fitness sort the stale index stays in range, so reverting the fix
-# does not crash this scenario -- it repoints the detail pane at a survivor,
-# and that flip is what the teeth test measured. SURVIVED is a liveness check.
+# The behaviour matches the RUNNING 1.3 binary, compared on
+# twoBasesSimpleFitness2.exp; the values are the port's own for twoBases.exp.
+# guibehaviour-baseline.txt says which fact came from where. On twoBases.exp,
+# reverting the deletion fix makes the scenario exit 1; `nameIsASurvivor=0'
+# covers a stale index that stays in range. SURVIVED is a liveness check.
 #
 # It needs an experiment to open, so it is skipped rather than failed when the
 # reference data is absent -- the data ships separately from the tarballs.
 bp=0; bf=0
-BEXP=$ROOT/data-reordered/Experiments/twoBasesSimpleFitness2.exp
+BEXP=$ROOT/data-reordered/Experiments/twoBases.exp
 if [ ! -f "$BEXP" ]; then
     # data-reordered/ is gitignored, so a fresh clone lands here. Say SKIPPED
     # loudly and count it: reporting `0 pass 0 fail' made the section vanish
@@ -1145,11 +1144,10 @@ elif make -s -C "$ROOT" B=build-fast SAN= SIGSAN= guidrive >/tmp/bdb.$$ 2>&1; th
     #   pages      C11a -- the five View pages C10 never opened, every spin
     #              box, slider, combo, checkbox and validator on them
     #   exportall  C11b -- all eight File > Export children, each file's
-    #              sha256, size, line count and ends. SEVEN of the eight are
-    #              byte-identical to what the 2003 i386 binary writes, checked
-    #              by the oracle, so a move here is a regression against 1.3
-    #              and not merely against yesterday. The eighth, .lap, differs
-    #              for a reason the baseline records.
+    #              sha256, size, line count and ends. SEVEN of the eight
+    #              match what the 2003 i386 binary writes byte for byte,
+    #              checked by the oracle on twoBasesSimpleFitness2.exp. The
+    #              eighth, .lap, differs for a reason the baseline records.
     #   overwrite  D35 -- an export over an existing file. A name without
     #              the extension must give a date-stamped file and no prompt.
     #              The name with it must raise the file dialog's own
@@ -1294,7 +1292,7 @@ elif make -s -C "$ROOT" B=build-fast SAN= SIGSAN= guidrive >/tmp/bdb.$$ 2>&1; th
         elif command grep -v '^#' "$ROOT/guibehaviour-baseline.txt" | diff -u - /tmp/ball.$$ > /tmp/bd.$$; then
             bp=1
         else
-            bf=1; echo "  the GUI no longer BEHAVES the way SIGEL 1.3 does:"
+            bf=1; echo "  the GUI no longer behaves the way the baseline records:"
             head -16 /tmp/bd.$$ | sed 's/^/    /'
         fi
     else
@@ -1555,14 +1553,13 @@ pass=$((pass+xtp)); fail=$((fail+xtf))
 # did not produce itself -- §7's rule that every gate here compares the port
 # against itself.
 #
-# It now has one. pagesave-baseline.txt's BASE half is the 2003 i386 binary's
-# own output, and the port reproduces it byte for byte, so a failure in that
-# half is a regression against 1.3 rather than against yesterday. The EDITED
-# half is that same 1.3 block plus C11a's eleven page edits; the file's header
-# says which is captured and which is derived, and why the derivation holds.
+# It has one: the port's save matches the 2003 i386 binary's own byte for
+# byte, compared on twoBasesSimpleFitness2.exp. pagesave-baseline.txt holds the
+# port's own save of twoBases.exp, on that proven ground. The EDITED half is
+# the base plus C11a's eleven page edits; the file's header says why.
 #
 # LanguageParameters is checked separately because it is NOT in the block --
-# it sits at line 133288 of the saved file, far below POPULATION BEGIN{ at 193,
+# it sits at line 71664 of the saved file, far below POPULATION BEGIN{ at 193,
 # so a check over the block alone would silently miss the registers edit.
 pp=0; pf=0
 PSD="${TMPDIR:-/tmp}"
@@ -1642,7 +1639,7 @@ elif [ -x "$ROOT/build-fast/guidrive" ]; then
                 pp=1
             else
                 pf=1
-                echo "  what the pages WRITE no longer matches SIGEL 1.3:"
+                echo "  what the pages WRITE no longer matches the baseline:"
                 head -14 /tmp/psd.$$ | sed 's/^/    /'
             fi
         fi
@@ -1680,7 +1677,7 @@ else
     pf=1; echo "  build-fast/guidrive is missing -- run 'make B=build-fast SAN= SIGSAN= guidrive'"
 fi
 rm -f /tmp/ps1.$$ /tmp/ps2.$$ /tmp/psall.$$ /tmp/psd.$$ /tmp/pserr.$$
-printf '%-22s %2d pass  %2d fail\n' "pagesave vs 1.3" "$pp" "$pf"
+printf '%-22s %2d pass  %2d fail\n' "pagesave" "$pp" "$pf"
 pass=$((pass+pp)); fail=$((fail+pf))
 
 

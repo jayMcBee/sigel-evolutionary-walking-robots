@@ -1,12 +1,14 @@
 # Baseline for check.sh's `gui behaviour' section -- PORTING.md, step C10.
 #
-# NOT merely yesterday's output. Every fact below was compared against the
-# RUNNING SIGEL 1.3 binary through the sigel-x86 oracle, which drove the 2003
-# i386 build with XTest and read the same things off the screen:
+# THE VALUES ARE THE PORT'S OWN, for data-reordered/Experiments/twoBases.exp,
+# so a failure here means the port moved against itself. The behaviours below
+# marked as compared with 1.3 match the running 1.3 binary, read through the
+# sigel-x86 oracle driving the 2003 i386 build with XTest on
+# twoBasesSimpleFitness2.exp, an experiment no longer shipped. Compared:
 #   - the Fitness sort order, ascending on one click, INCLUDING the tie order
-#     of the two 4.19675e-05 rows and the three 1.14825 rows at the end
-#   - the Add dialog's shape and the five individuals it creates: names
-#     57533..57537 (57532 is skipped in 1.3 too), fitness -1, age 0, sorting to
+#     of equal-fitness rows
+#   - the Add dialog's shape and the five individuals it creates: names from
+#     the file's NEXTIDENTIFIER up, fitness -1, age 0, sorting to
 #     the TOP of a fitness-ascending list because -1 is below every real value
 #   - the deletion confirmation's title, body, and Yes-as-default
 #   - THAT THE APPLICATION SURVIVES deleting most of the pool. It did not:
@@ -14,15 +16,12 @@
 #     QListView::clear() blocked its own signals, and the stale item drove
 #     1.3's getIndividual() into exit(1).
 #
-# WHICH LINE ACTUALLY GUARDS THAT REGRESSION: it is `nameIsASurvivor=0', not
-# the word SURVIVED. Whether the stale index is out of range depends on which
-# row happens to be current, and after the fitness sort below it is not -- so
-# reverting the fix does NOT crash this scenario. What it does, every time, is
-# let slotSelectionChanged run during clear() and repoint the detail pane at a
-# SURVIVING individual; the flip of nameIsASurvivor from 0 to 1 is the signal
-# firing, and that is what the teeth test measured. The crash itself reproduces
-# under the `ctxempty' scenario, where the list is unsorted and the stale
-# position was 103 against a pool of 5. SURVIVED is a liveness check only.
+# WHICH LINES GUARD THAT REGRESSION. Whether the stale index is out of range
+# depends on which row is current. On twoBases.exp it is: reverting the fix
+# makes this scenario exit 1 at the deletion, so the section fails before any
+# diff. Where the index stays in range, the signal repoints the detail pane at
+# a SURVIVING individual instead and `nameIsASurvivor=0' flips to 1. SURVIVED
+# is a liveness check only.
 #   - that the detail pane keeps the DELETED individual's values afterwards
 #     rather than blanking: 1.3 only calls individualView->clear() when the
 #     list becomes empty, and the oracle read a non-survivor's name and a
@@ -35,9 +34,8 @@
 #     escape that renders the literal ampersand 1.3 showed; unescaped, Qt 6
 #     eats it and underlines the space instead.
 #
-# A failure here is a regression against SIGEL 1.3, not against this file --
-# EXCEPT in four scenarios, which have no 1.3 side and say so here rather than
-# inheriting the sentence above:
+# Every scenario here is compared with SIGEL 1.3 EXCEPT four, which have no
+# 1.3 side and say so here:
 #   roundtrip   export, import, export on ONE machine. It needs no 1.3
 #               reference and has none; it checks the port against itself.
 #   metadrive   MT_GUI's toolbar actions. Pressed here, never pressed on 1.3,
@@ -108,16 +106,16 @@
 # aarch64-IEEE cannot muddy, which is why this item was ordered ahead of the
 # dialogs.
 #
-# SEVEN OF THE EIGHT EXPORTS ARE BYTE-IDENTICAL TO WHAT THE 2003 i386 BINARY
-# WRITES. The sigel-x86 oracle drove the same eight exports on 1.3 with XTest
-# against the same experiment with the same individual selected, and compared
-# sha256, byte count, LF count, CR count and the trailing byte. So a move in
-# any checksum below is a regression against 1.3, not against yesterday.
+# SEVEN OF THE EIGHT EXPORTS MATCH THE 2003 i386 BINARY BYTE FOR BYTE. The
+# sigel-x86 oracle drove the same eight exports on 1.3 with XTest on
+# twoBasesSimpleFitness2.exp, with the same individual selected, and compared
+# sha256, byte count, LF count, CR count and the trailing byte. The checksums
+# below are the port's own for twoBases.exp.
 #
 #   .gpp .sip .env .pop .prg .ind .dat   identical
 #   .lap                                 differs, and the reason is below
 #
-# The .dat is the one worth pausing on: 532 lines of floating-point output --
+# The .dat is the one worth pausing on: on that file, 532 lines of floating-point output --
 # generation, best, worst, average -- byte-identical across the two
 # architectures. That was NOT expected and is a stronger result than the
 # parameter files, which are text.
@@ -263,7 +261,7 @@
 == STEP 2: after File > Open Experiment ==
   [title] SIGEL
   [tree] header=[Experiments] topLevel=1
-      twoBasesSimpleFitness2.exp sel=1 exp=1 cur=1 selectable=1
+      twoBases.exp             sel=1 exp=1 cur=1 selectable=1
         Individuals              sel=0 exp=0 cur=0 selectable=1
         Robot                    sel=0 exp=1 cur=0 selectable=1
           Language-Parameters      sel=0 exp=0 cur=0 selectable=1
@@ -280,7 +278,7 @@
     button   [Show in GNU-Plot] enabled=1 checkable=0 checked=0
     button   [Export PostScript] enabled=1 checkable=0 checked=0
     check    [Save the history] enabled=1 checkable=1 checked=1
-    lcd      [lcdnumberGenerations] value=532 digits=4
+    lcd      [lcdnumberGenerations] value=203 digits=4
     lcd      [lcdnumberAutosave] value=0 digits=4
     slider   [sliderIntervall] value=0 min=0 max=100 enabled=1
     progress [generationProgBar] value=-1 min=0 max=100
@@ -331,7 +329,7 @@
 == STEP 3: after View > Population ==
   [title] SIGEL
   [tree] header=[Experiments] topLevel=1
-      twoBasesSimpleFitness2.exp sel=0 exp=1 cur=0 selectable=1
+      twoBases.exp             sel=0 exp=1 cur=0 selectable=1
         Individuals              sel=1 exp=0 cur=1 selectable=1
         Robot                    sel=0 exp=1 cur=0 selectable=1
           Language-Parameters      sel=0 exp=0 cur=0 selectable=1
@@ -339,15 +337,15 @@
         Simulation-Parameters    sel=0 exp=0 cur=0 selectable=1
         Environment              sel=0 exp=0 cur=0 selectable=1
   [page] count=8 current=SIGEL_MasterGUI::SIG_AllIndividualsView objectName=[]
-  [individuals] rows=120 cols=3 headers=[Name               ][Fitness          ][Age               ] selected=0
-    row0  | 55658         | 1.14825       | 111           | sel=0
-    row1  | 56091         | 1.14825       | 109           | sel=0
-    row2  | 56248         | 1.14825       | 259           | sel=0
-    row3  | 56349         | 1.06261       | 97            | sel=0
-    row4  | 56432         | 1.14825       | 111           | sel=0
-    row5  | 56447         | 1.14825       | 107           | sel=0
-    ... 114 more
-    allrows sha256=ee0c3372fe5769ccf63f449dfcf2b301eb7d4acd4924cc5291e6f1e0c303e198
+  [individuals] rows=100 cols=3 headers=[Name               ][Fitness          ][Age               ] selected=0
+    row0  | 16269         | 0.558099      | 58            | sel=0
+    row1  | 16430         | 0.563401      | 27            | sel=0
+    row2  | 16486         | 0.569652      | 16            | sel=0
+    row3  | 16494         | 0.558099      | 60            | sel=0
+    row4  | 16611         | 0.563401      | 37            | sel=0
+    row5  | 16623         | 0.569652      | 14            | sel=0
+    ... 94 more
+    allrows sha256=893d98e2f4cb3f0951994592285055305ccd94067f8d2d6ed70904824bb45a32
   [action changes] none
 
 == ICONS ==
@@ -413,14 +411,14 @@ actions=58 withIcon=32 loadedNothing=0
 
 == SORT BY FITNESS (one click) ==
 order=Ascending
-  first0 57511 | 2.34536e-05 | 1
-  first1 57478 | 3.09259e-05 | 1
-  first2 57490 | 4.19675e-05 | 1
-  first3 57508 | 4.19675e-05 | 1
-  first4 57488 | 4.42652e-05 | 1
-  last   57363 | 1.14825 | 253
-  last   57364 | 1.14825 | 115
-  last   57482 | 1.14825 | 109
+  first0 17078 | 1.08716e-05 | 1
+  first1 17162 | 1.3967e-05 | 1
+  first2 17210 | 1.57655e-05 | 1
+  first3 17160 | 2.41021e-05 | 1
+  first4 17119 | 6.32523e-05 | 1
+  last   17125 | 0.568817 | 34
+  last   16486 | 0.569652 | 16
+  last   16623 | 0.569652 | 14
 
 == ADD 5 ==
   [modal] class=SIGEL_MasterGUI::SIG_AddIndividualsDialog title=[Add individuals...]
@@ -428,22 +426,22 @@ dialog [Add individuals...]
   spin default=1 min=1 max=999
   button [&OK] default=1
   button [&Cancel] default=0
-rows=125
-  new 57537 | -1 | 0
-  new 57536 | -1 | 0
-  new 57535 | -1 | 0
-  new 57534 | -1 | 0
-  new 57533 | -1 | 0
+rows=105
+  new 17219 | -1 | 0
+  new 17218 | -1 | 0
+  new 17217 | -1 | 0
+  new 17216 | -1 | 0
+  new 17215 | -1 | 0
 
 == DELETE A LARGE BLOCK ==
-selected=120
+selected=100
   [modal] class=QMessageBox title=[Continue deletion?]
-dialog [Continue deletion?] text=[Do you really want to delete the 120 selected individuals?]
+dialog [Continue deletion?] text=[Do you really want to delete the 100 selected individuals?]
   button [&Yes] default=1
   button [&No] default=0
   [answering] &Yes
 SURVIVED, rows=5 selected=0
-detail pane name=[56933] age=[111] fitness=[1.14825] historyEmpty=0 nameIsASurvivor=0
+detail pane name=[16623] age=[14] fitness=[0.569652] historyEmpty=0 nameIsASurvivor=0
 
 == CONTEXT MENUS ==
 itemAt(empty)=null
@@ -483,7 +481,7 @@ we do with the system?]
 == STEP 2: after File > Open Experiment ==
   [title] SIGEL
   [tree] header=[Experiments] topLevel=1
-      twoBasesSimpleFitness2.exp sel=1 exp=1 cur=1 selectable=1
+      twoBases.exp             sel=1 exp=1 cur=1 selectable=1
         Individuals              sel=0 exp=0 cur=0 selectable=1
         Robot                    sel=0 exp=1 cur=0 selectable=1
           Language-Parameters      sel=0 exp=0 cur=0 selectable=1
@@ -500,7 +498,7 @@ we do with the system?]
     button   [Show in GNU-Plot] enabled=1 checkable=0 checked=0
     button   [Export PostScript] enabled=1 checkable=0 checked=0
     check    [Save the history] enabled=1 checkable=1 checked=1
-    lcd      [lcdnumberGenerations] value=532 digits=4
+    lcd      [lcdnumberGenerations] value=203 digits=4
     lcd      [lcdnumberAutosave] value=0 digits=4
     slider   [sliderIntervall] value=0 min=0 max=100 enabled=1
     progress [generationProgBar] value=-1 min=0 max=100
@@ -551,7 +549,7 @@ we do with the system?]
 == STEP 3: after View > Population ==
   [title] SIGEL
   [tree] header=[Experiments] topLevel=1
-      twoBasesSimpleFitness2.exp sel=0 exp=1 cur=0 selectable=1
+      twoBases.exp             sel=0 exp=1 cur=0 selectable=1
         Individuals              sel=1 exp=0 cur=1 selectable=1
         Robot                    sel=0 exp=1 cur=0 selectable=1
           Language-Parameters      sel=0 exp=0 cur=0 selectable=1
@@ -559,15 +557,15 @@ we do with the system?]
         Simulation-Parameters    sel=0 exp=0 cur=0 selectable=1
         Environment              sel=0 exp=0 cur=0 selectable=1
   [page] count=8 current=SIGEL_MasterGUI::SIG_AllIndividualsView objectName=[]
-  [individuals] rows=120 cols=3 headers=[Name               ][Fitness          ][Age               ] selected=0
-    row0  | 55658         | 1.14825       | 111           | sel=0
-    row1  | 56091         | 1.14825       | 109           | sel=0
-    row2  | 56248         | 1.14825       | 259           | sel=0
-    row3  | 56349         | 1.06261       | 97            | sel=0
-    row4  | 56432         | 1.14825       | 111           | sel=0
-    row5  | 56447         | 1.14825       | 107           | sel=0
-    ... 114 more
-    allrows sha256=ee0c3372fe5769ccf63f449dfcf2b301eb7d4acd4924cc5291e6f1e0c303e198
+  [individuals] rows=100 cols=3 headers=[Name               ][Fitness          ][Age               ] selected=0
+    row0  | 16269         | 0.558099      | 58            | sel=0
+    row1  | 16430         | 0.563401      | 27            | sel=0
+    row2  | 16486         | 0.569652      | 16            | sel=0
+    row3  | 16494         | 0.558099      | 60            | sel=0
+    row4  | 16611         | 0.563401      | 37            | sel=0
+    row5  | 16623         | 0.569652      | 14            | sel=0
+    ... 94 more
+    allrows sha256=893d98e2f4cb3f0951994592285055305ccd94067f8d2d6ed70904824bb45a32
   [action changes] none
 
 == VALIDATOR BATTERY ==
@@ -630,32 +628,32 @@ we do with the system?]
   -- tab 1 [Command probabilities] shown=1 visible=1
   [survey]
   [drive]
-    slider sliderMAX                            v=500    [0..1000] page=1 up=501    pgup=502    end=1000   lcd=lcdnumberMAX 500/501/502/1000 enabled=1
-    click  sliderMAX                            500 -> 501 (delta +1) focusPolicy=11 hasFocus=0
-    slider sliderMIN                            v=500    [0..1000] page=1 up=501    pgup=502    end=1000   lcd=lcdnumberMIN 500/501/502/1000 enabled=1
-    click  sliderMIN                            500 -> 501 (delta +1) focusPolicy=11 hasFocus=0
-    slider sliderMOD                            v=500    [0..1000] page=1 up=501    pgup=502    end=1000   lcd=lcdnumberMOD 500/501/502/1000 enabled=1
-    click  sliderMOD                            500 -> 501 (delta +1) focusPolicy=11 hasFocus=0
+    slider sliderMAX                            v=0      [0..1000] page=1 up=1      pgup=2      end=1000   lcd=lcdnumberMAX 0/1/2/1000 enabled=1
+    click  sliderMAX                            0 -> 1 (delta +1) focusPolicy=11 hasFocus=0
+    slider sliderMIN                            v=0      [0..1000] page=1 up=1      pgup=2      end=1000   lcd=lcdnumberMIN 0/1/2/1000 enabled=1
+    click  sliderMIN                            0 -> 1 (delta +1) focusPolicy=11 hasFocus=0
+    slider sliderMOD                            v=0      [0..1000] page=1 up=1      pgup=2      end=1000   lcd=lcdnumberMOD 0/1/2/1000 enabled=1
+    click  sliderMOD                            0 -> 1 (delta +1) focusPolicy=11 hasFocus=0
     slider sliderMOVE                           v=500    [0..1000] page=1 up=501    pgup=502    end=1000   lcd=lcdnumberMOVE 500/501/502/1000 enabled=1
     click  sliderMOVE                           500 -> 501 (delta +1) focusPolicy=11 hasFocus=0
-    slider sliderMUL                            v=500    [0..1000] page=1 up=501    pgup=502    end=1000   lcd=lcdnumberMUL 500/501/502/1000 enabled=1
-    click  sliderMUL                            500 -> 501 (delta +1) focusPolicy=11 hasFocus=0
+    slider sliderMUL                            v=0      [0..1000] page=1 up=1      pgup=2      end=1000   lcd=lcdnumberMUL 0/1/2/1000 enabled=1
+    click  sliderMUL                            0 -> 1 (delta +1) focusPolicy=11 hasFocus=0
     slider sliderNOP                            v=0      [0..1000] page=1 up=1      pgup=2      end=1000   lcd=lcdnumberNOP 0/1/2/1000 enabled=1
     click  sliderNOP                            0 -> 1 (delta +1) focusPolicy=11 hasFocus=0
     slider sliderSENSE                          v=500    [0..1000] page=1 up=501    pgup=502    end=1000   lcd=lcdnumberSENSE 500/501/502/1000 enabled=1
     click  sliderSENSE                          500 -> 501 (delta +1) focusPolicy=11 hasFocus=0
-    slider sliderSUB                            v=500    [0..1000] page=1 up=501    pgup=502    end=1000   lcd=lcdnumberSUB 500/501/502/1000 enabled=1
-    click  sliderSUB                            500 -> 501 (delta +1) focusPolicy=11 hasFocus=0
+    slider sliderSUB                            v=0      [0..1000] page=1 up=1      pgup=2      end=1000   lcd=lcdnumberSUB 0/1/2/1000 enabled=1
+    click  sliderSUB                            0 -> 1 (delta +1) focusPolicy=11 hasFocus=0
     slider sliderADD                            v=500    [0..1000] page=1 up=501    pgup=502    end=1000   lcd=lcdnumberADD 500/501/502/1000 enabled=1
     click  sliderADD                            500 -> 501 (delta +1) focusPolicy=11 hasFocus=0
-    slider sliderCMP                            v=500    [0..1000] page=1 up=501    pgup=502    end=1000   lcd=lcdnumberCMP 500/501/502/1000 enabled=1
-    click  sliderCMP                            500 -> 501 (delta +1) focusPolicy=11 hasFocus=0
+    slider sliderCMP                            v=0      [0..1000] page=1 up=1      pgup=2      end=1000   lcd=lcdnumberCMP 0/1/2/1000 enabled=1
+    click  sliderCMP                            0 -> 1 (delta +1) focusPolicy=11 hasFocus=0
     slider sliderCOPY                           v=500    [0..1000] page=1 up=501    pgup=502    end=1000   lcd=lcdnumberCOPY 500/501/502/1000 enabled=1
     click  sliderCOPY                           500 -> 501 (delta +1) focusPolicy=11 hasFocus=0
-    slider sliderDIV                            v=500    [0..1000] page=1 up=501    pgup=502    end=1000   lcd=lcdnumberDIV 500/501/502/1000 enabled=1
-    click  sliderDIV                            500 -> 501 (delta +1) focusPolicy=11 hasFocus=0
-    slider sliderDELAY                          v=500    [0..1000] page=1 up=501    pgup=502    end=1000   lcd=lcdnumberDELAY 500/501/502/1000 enabled=1
-    click  sliderDELAY                          500 -> 501 (delta +1) focusPolicy=11 hasFocus=0
+    slider sliderDIV                            v=0      [0..1000] page=1 up=1      pgup=2      end=1000   lcd=lcdnumberDIV 0/1/2/1000 enabled=1
+    click  sliderDIV                            0 -> 1 (delta +1) focusPolicy=11 hasFocus=0
+    slider sliderDELAY                          v=0      [0..1000] page=1 up=1      pgup=2      end=1000   lcd=lcdnumberDELAY 0/1/2/1000 enabled=1
+    click  sliderDELAY                          0 -> 1 (delta +1) focusPolicy=11 hasFocus=0
     slider sliderJMP                            v=0      [0..1000] page=1 up=1      pgup=2      end=1000   lcd=lcdnumberJMP 0/1/2/1000 enabled=1
     click  sliderJMP                            0 -> 1 (delta +1) focusPolicy=11 hasFocus=0
     slider sliderLOAD                           v=500    [0..1000] page=1 up=501    pgup=502    end=1000   lcd=lcdnumberLOAD 500/501/502/1000 enabled=1
@@ -671,7 +669,7 @@ we do with the system?]
     spin   spinboxByTimeHour                    v=7         [0..23] step=1 pre=[] suf=[] up=8         dn2=6         typed(max+1)=[2]->2 commits=2 enabled=1
     spin   spinboxByTimeYear                    v=2001      [1752..8000] step=1 pre=[] suf=[] up=2002      dn2=2000      typed(max+1)=[800]->2001 commits=2001 enabled=1
     spin   spinboxByTimeSecs                    v=0         [0..59] step=1 pre=[] suf=[] up=1         dn2=0         typed(max+1)=[6]->6 commits=6 enabled=1
-    spin   spinboxByTimeDay                     v=12        [1..31] step=1 pre=[] suf=[] up=13        dn2=11        typed(max+1)=[3]->3 commits=3 enabled=1
+    spin   spinboxByTimeDay                     v=14        [1..31] step=1 pre=[] suf=[] up=15        dn2=13        typed(max+1)=[3]->3 commits=3 enabled=1
     spin   spinboxByTimeMins                    v=0         [0..59] step=1 pre=[] suf=[] up=1         dn2=0         typed(max+1)=[6]->6 commits=6 enabled=1
     spin   spinboxByTimeMonth                   v=8         [1..12] step=1 pre=[] suf=[] up=9         dn2=7         typed(max+1)=[1]->1 commits=1 enabled=1
     spin   spinboxByDurationDays                v=0         [0..365] step=1 pre=[] suf=[] up=1         dn2=0         typed(max+1)=[36]->36 commits=36 enabled=1
@@ -679,7 +677,7 @@ we do with the system?]
     spin   spinboxByDurationMins                v=0         [0..59] step=1 pre=[] suf=[] up=1         dn2=0         typed(max+1)=[6]->6 commits=6 enabled=1
     spin   spinboxByDurationSecs                v=0         [0..59] step=1 pre=[] suf=[] up=1         dn2=0         typed(max+1)=[6]->6 commits=6 enabled=1
     spin   spinboxByGenerationNumber            v=0         [0..99999999] step=1 pre=[] suf=[] up=1         dn2=0         typed(max+1)=[10000000]->10000000 commits=10000000 enabled=1
-    slider sliderTournamentsPerGeneration       v=500    [1..1000] page=5 up=501    pgup=506    end=1000   lcd=lcdnumberTournamentsPerGeneration 60/60/60/120 enabled=1
+    slider sliderTournamentsPerGeneration       v=500    [1..1000] page=5 up=501    pgup=506    end=1000   lcd=lcdnumberTournamentsPerGeneration 50/50/50/100 enabled=1
     click  sliderTournamentsPerGeneration       500 -> 505 (delta +5) focusPolicy=11 hasFocus=0
     combo  comboboxTerminationBy                count=4 current=1 [Time] editable=0 enabled=1
       item0  [User]
@@ -954,7 +952,7 @@ we do with the system?]
 == STEP 2: after File > Open Experiment ==
   [title] SIGEL
   [tree] header=[Experiments] topLevel=1
-      twoBasesSimpleFitness2.exp sel=1 exp=1 cur=1 selectable=1
+      twoBases.exp             sel=1 exp=1 cur=1 selectable=1
         Individuals              sel=0 exp=0 cur=0 selectable=1
         Robot                    sel=0 exp=1 cur=0 selectable=1
           Language-Parameters      sel=0 exp=0 cur=0 selectable=1
@@ -971,7 +969,7 @@ we do with the system?]
     button   [Show in GNU-Plot] enabled=1 checkable=0 checked=0
     button   [Export PostScript] enabled=1 checkable=0 checked=0
     check    [Save the history] enabled=1 checkable=1 checked=1
-    lcd      [lcdnumberGenerations] value=532 digits=4
+    lcd      [lcdnumberGenerations] value=203 digits=4
     lcd      [lcdnumberAutosave] value=0 digits=4
     slider   [sliderIntervall] value=0 min=0 max=100 enabled=1
     progress [generationProgBar] value=-1 min=0 max=100
@@ -1022,7 +1020,7 @@ we do with the system?]
 == STEP 3: after View > Population ==
   [title] SIGEL
   [tree] header=[Experiments] topLevel=1
-      twoBasesSimpleFitness2.exp sel=0 exp=1 cur=0 selectable=1
+      twoBases.exp             sel=0 exp=1 cur=0 selectable=1
         Individuals              sel=1 exp=0 cur=1 selectable=1
         Robot                    sel=0 exp=1 cur=0 selectable=1
           Language-Parameters      sel=0 exp=0 cur=0 selectable=1
@@ -1030,25 +1028,25 @@ we do with the system?]
         Simulation-Parameters    sel=0 exp=0 cur=0 selectable=1
         Environment              sel=0 exp=0 cur=0 selectable=1
   [page] count=8 current=SIGEL_MasterGUI::SIG_AllIndividualsView objectName=[]
-  [individuals] rows=120 cols=3 headers=[Name               ][Fitness          ][Age               ] selected=0
-    row0  | 55658         | 1.14825       | 111           | sel=0
-    row1  | 56091         | 1.14825       | 109           | sel=0
-    row2  | 56248         | 1.14825       | 259           | sel=0
-    row3  | 56349         | 1.06261       | 97            | sel=0
-    row4  | 56432         | 1.14825       | 111           | sel=0
-    row5  | 56447         | 1.14825       | 107           | sel=0
-    ... 114 more
-    allrows sha256=ee0c3372fe5769ccf63f449dfcf2b301eb7d4acd4924cc5291e6f1e0c303e198
+  [individuals] rows=100 cols=3 headers=[Name               ][Fitness          ][Age               ] selected=0
+    row0  | 16269         | 0.558099      | 58            | sel=0
+    row1  | 16430         | 0.563401      | 27            | sel=0
+    row2  | 16486         | 0.569652      | 16            | sel=0
+    row3  | 16494         | 0.558099      | 60            | sel=0
+    row4  | 16611         | 0.563401      | 37            | sel=0
+    row5  | 16623         | 0.569652      | 14            | sel=0
+    ... 94 more
+    allrows sha256=893d98e2f4cb3f0951994592285055305ccd94067f8d2d6ed70904824bb45a32
   [action changes] none
 
 == EXPORT ALL ==
-selected=55658
+selected=17013
 
 -- Export > GP-Parameters
   [modal] class=QFileDialog title=[Export GP Parameter...]
   [dialog] title=[Export GP Parameter...] filters=[GP Parameter Files (*.gpp) ;; All Files (*)] accept=[&Save]
   [dialog] parentIsTheMainWindow=1
-  bytes=1299 sha256=88e851e2b9d1b23185bf453c6c99cdc581be01d2547961c6fdb50fc3c6873234 newlines=101 endsWithNewline=1
+  bytes=1283 sha256=4ff9e8b50c404a636b715dfc8871237b106d58eb95fce7604c41461be5e6cffe newlines=101 endsWithNewline=1
   crCount=0
   head0  [RANDOMSEED]
   head1  [0]
@@ -1074,14 +1072,14 @@ selected=55658
   [modal] class=QFileDialog title=[Export Language Parameters...]
   [dialog] title=[Export Language Parameters...] filters=[Language Parameter Files (*.lap) ;; All Files (*)] accept=[&Save]
   [dialog] parentIsTheMainWindow=1
-  bytes=401 sha256=e40ca1caa26dd424faf1eca7d336b16e963a714a8c95b059dabed79a3ce72af0 newlines=14 endsWithNewline=1
+  bytes=401 sha256=6828590f91539e7159a6b22dd0aca26815ee24c8cb99deefeed050937df3c718 newlines=14 endsWithNewline=1
   crCount=0
   head0  [LanguageParameters 3 8 5000 13]
   head1  [MUL CommandParameters 0.001]
-  head2  [MOVE CommandParameters 0.01]
-  tail-2 [ADD CommandParameters 0.001]
-  tail-1 [MOD CommandParameters 0.001]
-  tail0  [MAX CommandParameters 0.001]
+  head2  [CMP CommandParameters 0.001]
+  tail-2 [MIN CommandParameters 0.001]
+  tail-1 [MAX CommandParameters 0.001]
+  tail0  [MOD CommandParameters 0.001]
 
 -- Export > Environment
   [modal] class=QFileDialog title=[Export Environment...]
@@ -1100,12 +1098,12 @@ selected=55658
   [modal] class=QFileDialog title=[Export Population...]
   [dialog] title=[Export Population...] filters=[Population files (*.pop) ;; All Files (*)] accept=[&Save]
   [dialog] parentIsTheMainWindow=1
-  bytes=2738900 sha256=ccca841d6b6b4be23e9004c555c4a0a9b64f399c582f0a25a65aed0b1cdb5ad5 newlines=133076 endsWithNewline=0
+  bytes=1488729 sha256=3d89d359feb484300f413e725018dcb9131121e70ea55937f9b792c1be340615 newlines=71452 endsWithNewline=0
   crCount=0
   head0  [WITHHISTORY]
   head1  [1]
   head2  []
-  tail-2 [  }INDIVIDUAL(119) END;]
+  tail-2 [  }INDIVIDUAL(99) END;]
   tail-1 []
   tail0  [}POPULATION END]
 
@@ -1113,25 +1111,25 @@ selected=55658
   [modal] class=QFileDialog title=[Export program...]
   [dialog] title=[Export program...] filters=[Program files (*.prg) ;; All Files (*)] accept=[&Save]
   [dialog] parentIsTheMainWindow=1
-  bytes=6616 sha256=f940751765c869f16f62333dafd34dbe0e66b6474577bf4209e9e8de70cc3214 newlines=299 endsWithNewline=1
+  bytes=2950 sha256=882279cff0dfd01cc9498995e88f94e42ecc1fdb06fda8884b9ad6b76e5a37ec newlines=136 endsWithNewline=1
   crCount=0
-  head0  [       MOD -19712,-1602]
-  head1  [       CMP -6459,30784]
-  head2  [       MOVE -7329]
-  tail-2 [       SENSE 29660]
-  tail-1 [       SENSE -22046]
-  tail0  [       MOD -22082,24751]
+  head0  [       MOVE 28552]
+  head1  [       MOVE 1931]
+  head2  [       LOAD 21803,-8488]
+  tail-2 [       LOAD 29471,-724]
+  tail-1 [       SENSE 2180]
+  tail0  [       LOAD 56,12951]
 
 -- Export > Individual
   [modal] class=QFileDialog title=[Export individual...]
   [dialog] title=[Export individual...] filters=[Individual files (*.ind) ;; All Files (*)] accept=[&Save]
   [dialog] parentIsTheMainWindow=1
-  bytes=22113 sha256=3e56bf03233a1603bf26671262cebbe7b4fa37dee4cff7a8d5fe1048916e2138 newlines=1076 endsWithNewline=0
+  bytes=14123 sha256=3a2b52b467d1bb56d2de540a337577caa6e260ecbce5d4487ef1c87fabf05bdb newlines=678 endsWithNewline=0
   crCount=0
   head0  []
   head1  [    INDIVIDUAL BEGIN{ ]
-  head2  [      NAME='55658';]
-  tail-2 [       MOD -22082,24751]
+  head2  [      NAME='17013';]
+  tail-2 [       LOAD 56,12951]
   tail-1 [        }PROGRAM END;]
   tail0  [    }INDIVIDUAL END]
 
@@ -1139,14 +1137,14 @@ selected=55658
   [modal] class=QFileDialog title=[Export to GNU plot...]
   [dialog] title=[Export to GNU plot...] filters=[GNU plot data file (*.dat) ;; All Files (*)] accept=[&Save]
   [dialog] parentIsTheMainWindow=1
-  bytes=17420 sha256=7f5c3162ee74483fe925badf413bbba23e1f50bf3e6dc8a6a81d10fe96591a3f newlines=532 endsWithNewline=1
+  bytes=6848 sha256=63fd5ec555504bb890512d583f82d2fde49b248c18085793f9273f882942c83d newlines=203 endsWithNewline=1
   crCount=0
-  head0  [1 0.00112766 6.99488e-06 0.000109007]
-  head1  [2 0.0774405 6.99488e-06 0.00136046]
-  head2  [3 0.0774405 2.18826e-05 0.00146899]
-  tail-2 [530 1.14825 3.87891e-05 0.43338]
-  tail-1 [531 1.14825 4.19675e-05 0.413908]
-  tail0  [532 1.14825 2.34536e-05 0.382249]
+  head0  [1 0.0115613 3.60329e-06 0.00102811]
+  head1  [2 0.0189301 3.60329e-06 0.00209892]
+  head2  [3 0.0320079 3.70515e-05 0.00389802]
+  tail-2 [201 0.569652 1.00313e-05 0.211989]
+  tail-1 [202 0.569652 1.08716e-05 0.245696]
+  tail0  [203 0.569652 1.08716e-05 0.251924]
 == SCENARIO overwrite ==
 
 == STEP 1: fresh start, no experiment ==
@@ -1160,7 +1158,7 @@ selected=55658
 == STEP 2: after File > Open Experiment ==
   [title] SIGEL
   [tree] header=[Experiments] topLevel=1
-      twoBasesSimpleFitness2.exp sel=1 exp=1 cur=1 selectable=1
+      twoBases.exp             sel=1 exp=1 cur=1 selectable=1
         Individuals              sel=0 exp=0 cur=0 selectable=1
         Robot                    sel=0 exp=1 cur=0 selectable=1
           Language-Parameters      sel=0 exp=0 cur=0 selectable=1
@@ -1177,7 +1175,7 @@ selected=55658
     button   [Show in GNU-Plot] enabled=1 checkable=0 checked=0
     button   [Export PostScript] enabled=1 checkable=0 checked=0
     check    [Save the history] enabled=1 checkable=1 checked=1
-    lcd      [lcdnumberGenerations] value=532 digits=4
+    lcd      [lcdnumberGenerations] value=203 digits=4
     lcd      [lcdnumberAutosave] value=0 digits=4
     slider   [sliderIntervall] value=0 min=0 max=100 enabled=1
     progress [generationProgBar] value=-1 min=0 max=100
@@ -1228,7 +1226,7 @@ selected=55658
 == STEP 3: after View > Population ==
   [title] SIGEL
   [tree] header=[Experiments] topLevel=1
-      twoBasesSimpleFitness2.exp sel=0 exp=1 cur=0 selectable=1
+      twoBases.exp             sel=0 exp=1 cur=0 selectable=1
         Individuals              sel=1 exp=0 cur=1 selectable=1
         Robot                    sel=0 exp=1 cur=0 selectable=1
           Language-Parameters      sel=0 exp=0 cur=0 selectable=1
@@ -1236,15 +1234,15 @@ selected=55658
         Simulation-Parameters    sel=0 exp=0 cur=0 selectable=1
         Environment              sel=0 exp=0 cur=0 selectable=1
   [page] count=8 current=SIGEL_MasterGUI::SIG_AllIndividualsView objectName=[]
-  [individuals] rows=120 cols=3 headers=[Name               ][Fitness          ][Age               ] selected=0
-    row0  | 55658         | 1.14825       | 111           | sel=0
-    row1  | 56091         | 1.14825       | 109           | sel=0
-    row2  | 56248         | 1.14825       | 259           | sel=0
-    row3  | 56349         | 1.06261       | 97            | sel=0
-    row4  | 56432         | 1.14825       | 111           | sel=0
-    row5  | 56447         | 1.14825       | 107           | sel=0
-    ... 114 more
-    allrows sha256=ee0c3372fe5769ccf63f449dfcf2b301eb7d4acd4924cc5291e6f1e0c303e198
+  [individuals] rows=100 cols=3 headers=[Name               ][Fitness          ][Age               ] selected=0
+    row0  | 16269         | 0.558099      | 58            | sel=0
+    row1  | 16430         | 0.563401      | 27            | sel=0
+    row2  | 16486         | 0.569652      | 16            | sel=0
+    row3  | 16494         | 0.558099      | 60            | sel=0
+    row4  | 16611         | 0.563401      | 37            | sel=0
+    row5  | 16623         | 0.569652      | 14            | sel=0
+    ... 94 more
+    allrows sha256=893d98e2f4cb3f0951994592285055305ccd94067f8d2d6ed70904824bb45a32
   [action changes] none
 
 == OVERWRITE ==
@@ -1281,7 +1279,7 @@ Do you want to replace it?]
 == STEP 2: after File > Open Experiment ==
   [title] SIGEL
   [tree] header=[Experiments] topLevel=1
-      twoBasesSimpleFitness2.exp sel=1 exp=1 cur=1 selectable=1
+      twoBases.exp             sel=1 exp=1 cur=1 selectable=1
         Individuals              sel=0 exp=0 cur=0 selectable=1
         Robot                    sel=0 exp=1 cur=0 selectable=1
           Language-Parameters      sel=0 exp=0 cur=0 selectable=1
@@ -1298,7 +1296,7 @@ Do you want to replace it?]
     button   [Show in GNU-Plot] enabled=1 checkable=0 checked=0
     button   [Export PostScript] enabled=1 checkable=0 checked=0
     check    [Save the history] enabled=1 checkable=1 checked=1
-    lcd      [lcdnumberGenerations] value=532 digits=4
+    lcd      [lcdnumberGenerations] value=203 digits=4
     lcd      [lcdnumberAutosave] value=0 digits=4
     slider   [sliderIntervall] value=0 min=0 max=100 enabled=1
     progress [generationProgBar] value=-1 min=0 max=100
@@ -1349,7 +1347,7 @@ Do you want to replace it?]
 == STEP 3: after View > Population ==
   [title] SIGEL
   [tree] header=[Experiments] topLevel=1
-      twoBasesSimpleFitness2.exp sel=0 exp=1 cur=0 selectable=1
+      twoBases.exp             sel=0 exp=1 cur=0 selectable=1
         Individuals              sel=1 exp=0 cur=1 selectable=1
         Robot                    sel=0 exp=1 cur=0 selectable=1
           Language-Parameters      sel=0 exp=0 cur=0 selectable=1
@@ -1357,15 +1355,15 @@ Do you want to replace it?]
         Simulation-Parameters    sel=0 exp=0 cur=0 selectable=1
         Environment              sel=0 exp=0 cur=0 selectable=1
   [page] count=8 current=SIGEL_MasterGUI::SIG_AllIndividualsView objectName=[]
-  [individuals] rows=120 cols=3 headers=[Name               ][Fitness          ][Age               ] selected=0
-    row0  | 55658         | 1.14825       | 111           | sel=0
-    row1  | 56091         | 1.14825       | 109           | sel=0
-    row2  | 56248         | 1.14825       | 259           | sel=0
-    row3  | 56349         | 1.06261       | 97            | sel=0
-    row4  | 56432         | 1.14825       | 111           | sel=0
-    row5  | 56447         | 1.14825       | 107           | sel=0
-    ... 114 more
-    allrows sha256=ee0c3372fe5769ccf63f449dfcf2b301eb7d4acd4924cc5291e6f1e0c303e198
+  [individuals] rows=100 cols=3 headers=[Name               ][Fitness          ][Age               ] selected=0
+    row0  | 16269         | 0.558099      | 58            | sel=0
+    row1  | 16430         | 0.563401      | 27            | sel=0
+    row2  | 16486         | 0.569652      | 16            | sel=0
+    row3  | 16494         | 0.558099      | 60            | sel=0
+    row4  | 16611         | 0.563401      | 37            | sel=0
+    row5  | 16623         | 0.569652      | 14            | sel=0
+    ... 94 more
+    allrows sha256=893d98e2f4cb3f0951994592285055305ccd94067f8d2d6ed70904824bb45a32
   [action changes] none
 
 == EDIT COMMAND ==
@@ -1404,7 +1402,7 @@ Do you want to replace it?]
   JMP duration now [0.007]
   [modal] class=QFileDialog title=[Export Language Parameters...]
   header  [LanguageParameters 3 8 5000 14]
-  written [MUL MOVE CMP COPY LOAD SENSE SUB DIV MIN DELAY ADD MOD MAX JMP]
+  written [MUL CMP MOVE COPY LOAD SENSE DIV SUB ADD DELAY MIN MAX MOD JMP]
 
 == EDIT HOST ==
   rows=8 row0=[herz|2|/home/pg368b/ross/projects/sigel]
@@ -1457,10 +1455,10 @@ Do you want to replace it?]
   button [OK] default=1
 
 == INDIVIDUAL VIEW (double-click a population row) ==
-  double-clicking row0 = 55658 at (284,9) itemAt=the row
+  double-clicking row0 = 16269 at (284,9) itemAt=the row
   itemDoubleClicked emitted 1 time(s)
   [window] class=SIGEL_MasterGUI::SIG_IndividualView title=[Individual View] modal=0 visible=1 deleteOnClose=1
-  name=[55658] age=[111] fitness=[1.14825] historyLines=768
+  name=[16269] age=[58] fitness=[0.558099] historyLines=539
   after close, main window still alive=1
 
 == ADD INDIVIDUALS (Cancel) ==
@@ -1474,7 +1472,7 @@ Do you want to replace it?]
     prefill=[1] selected=[]; typing "2" gives [12] value=12  (1.3 appends -> 12)
     spin                                        v=1         [1..999] step=1 pre=[] suf=[] up=2         dn2=1         typed(max+1)=[100]->100 commits=not-pressed(in a dialog) enabled=1
     [still open before Cancel] visible=1
-  rows 120 -> 120 (Cancel must add nothing)
+  rows 100 -> 100 (Cancel must add nothing)
 == SCENARIO metagui ==
 
 == STEP 1: fresh start, no experiment ==
@@ -1488,7 +1486,7 @@ Do you want to replace it?]
 == STEP 2: after File > Open Experiment ==
   [title] SIGEL
   [tree] header=[Experiments] topLevel=1
-      twoBasesSimpleFitness2.exp sel=1 exp=1 cur=1 selectable=1
+      twoBases.exp             sel=1 exp=1 cur=1 selectable=1
         Individuals              sel=0 exp=0 cur=0 selectable=1
         Robot                    sel=0 exp=1 cur=0 selectable=1
           Language-Parameters      sel=0 exp=0 cur=0 selectable=1
@@ -1505,7 +1503,7 @@ Do you want to replace it?]
     button   [Show in GNU-Plot] enabled=1 checkable=0 checked=0
     button   [Export PostScript] enabled=1 checkable=0 checked=0
     check    [Save the history] enabled=1 checkable=1 checked=1
-    lcd      [lcdnumberGenerations] value=532 digits=4
+    lcd      [lcdnumberGenerations] value=203 digits=4
     lcd      [lcdnumberAutosave] value=0 digits=4
     slider   [sliderIntervall] value=0 min=0 max=100 enabled=1
     progress [generationProgBar] value=-1 min=0 max=100
@@ -1556,7 +1554,7 @@ Do you want to replace it?]
 == STEP 3: after View > Population ==
   [title] SIGEL
   [tree] header=[Experiments] topLevel=1
-      twoBasesSimpleFitness2.exp sel=0 exp=1 cur=0 selectable=1
+      twoBases.exp             sel=0 exp=1 cur=0 selectable=1
         Individuals              sel=1 exp=0 cur=1 selectable=1
         Robot                    sel=0 exp=1 cur=0 selectable=1
           Language-Parameters      sel=0 exp=0 cur=0 selectable=1
@@ -1564,15 +1562,15 @@ Do you want to replace it?]
         Simulation-Parameters    sel=0 exp=0 cur=0 selectable=1
         Environment              sel=0 exp=0 cur=0 selectable=1
   [page] count=8 current=SIGEL_MasterGUI::SIG_AllIndividualsView objectName=[]
-  [individuals] rows=120 cols=3 headers=[Name               ][Fitness          ][Age               ] selected=0
-    row0  | 55658         | 1.14825       | 111           | sel=0
-    row1  | 56091         | 1.14825       | 109           | sel=0
-    row2  | 56248         | 1.14825       | 259           | sel=0
-    row3  | 56349         | 1.06261       | 97            | sel=0
-    row4  | 56432         | 1.14825       | 111           | sel=0
-    row5  | 56447         | 1.14825       | 107           | sel=0
-    ... 114 more
-    allrows sha256=ee0c3372fe5769ccf63f449dfcf2b301eb7d4acd4924cc5291e6f1e0c303e198
+  [individuals] rows=100 cols=3 headers=[Name               ][Fitness          ][Age               ] selected=0
+    row0  | 16269         | 0.558099      | 58            | sel=0
+    row1  | 16430         | 0.563401      | 27            | sel=0
+    row2  | 16486         | 0.569652      | 16            | sel=0
+    row3  | 16494         | 0.558099      | 60            | sel=0
+    row4  | 16611         | 0.563401      | 37            | sel=0
+    row5  | 16623         | 0.569652      | 14            | sel=0
+    ... 94 more
+    allrows sha256=893d98e2f4cb3f0951994592285055305ccd94067f8d2d6ed70904824bb45a32
   [action changes] none
 
 == METAGP: enabling ==
@@ -1838,7 +1836,7 @@ Do you want to replace it?]
 == STEP 2: after File > Open Experiment ==
   [title] SIGEL
   [tree] header=[Experiments] topLevel=1
-      twoBasesSimpleFitness2.exp sel=1 exp=1 cur=1 selectable=1
+      twoBases.exp             sel=1 exp=1 cur=1 selectable=1
         Individuals              sel=0 exp=0 cur=0 selectable=1
         Robot                    sel=0 exp=1 cur=0 selectable=1
           Language-Parameters      sel=0 exp=0 cur=0 selectable=1
@@ -1855,7 +1853,7 @@ Do you want to replace it?]
     button   [Show in GNU-Plot] enabled=1 checkable=0 checked=0
     button   [Export PostScript] enabled=1 checkable=0 checked=0
     check    [Save the history] enabled=1 checkable=1 checked=1
-    lcd      [lcdnumberGenerations] value=532 digits=4
+    lcd      [lcdnumberGenerations] value=203 digits=4
     lcd      [lcdnumberAutosave] value=0 digits=4
     slider   [sliderIntervall] value=0 min=0 max=100 enabled=1
     progress [generationProgBar] value=-1 min=0 max=100
@@ -1906,7 +1904,7 @@ Do you want to replace it?]
 == STEP 3: after View > Population ==
   [title] SIGEL
   [tree] header=[Experiments] topLevel=1
-      twoBasesSimpleFitness2.exp sel=0 exp=1 cur=0 selectable=1
+      twoBases.exp             sel=0 exp=1 cur=0 selectable=1
         Individuals              sel=1 exp=0 cur=1 selectable=1
         Robot                    sel=0 exp=1 cur=0 selectable=1
           Language-Parameters      sel=0 exp=0 cur=0 selectable=1
@@ -1914,15 +1912,15 @@ Do you want to replace it?]
         Simulation-Parameters    sel=0 exp=0 cur=0 selectable=1
         Environment              sel=0 exp=0 cur=0 selectable=1
   [page] count=8 current=SIGEL_MasterGUI::SIG_AllIndividualsView objectName=[]
-  [individuals] rows=120 cols=3 headers=[Name               ][Fitness          ][Age               ] selected=0
-    row0  | 55658         | 1.14825       | 111           | sel=0
-    row1  | 56091         | 1.14825       | 109           | sel=0
-    row2  | 56248         | 1.14825       | 259           | sel=0
-    row3  | 56349         | 1.06261       | 97            | sel=0
-    row4  | 56432         | 1.14825       | 111           | sel=0
-    row5  | 56447         | 1.14825       | 107           | sel=0
-    ... 114 more
-    allrows sha256=ee0c3372fe5769ccf63f449dfcf2b301eb7d4acd4924cc5291e6f1e0c303e198
+  [individuals] rows=100 cols=3 headers=[Name               ][Fitness          ][Age               ] selected=0
+    row0  | 16269         | 0.558099      | 58            | sel=0
+    row1  | 16430         | 0.563401      | 27            | sel=0
+    row2  | 16486         | 0.569652      | 16            | sel=0
+    row3  | 16494         | 0.558099      | 60            | sel=0
+    row4  | 16611         | 0.563401      | 37            | sel=0
+    row5  | 16623         | 0.569652      | 14            | sel=0
+    ... 94 more
+    allrows sha256=893d98e2f4cb3f0951994592285055305ccd94067f8d2d6ed70904824bb45a32
   [action changes] none
 
 == ROUND TRIP ==
@@ -1932,8 +1930,8 @@ Do you want to replace it?]
   mutated spinboxRandomSeed -> 321
   [modal] class=QFileDialog title=[Import GP Parameter...]
   [modal] class=QFileDialog title=[Export GP Parameter...]
-  export1 1299 bytes  88e851e2b9d1b23185bf453c6c99cdc581be01d2547961c6fdb50fc3c6873234
-  export2 1299 bytes  88e851e2b9d1b23185bf453c6c99cdc581be01d2547961c6fdb50fc3c6873234
+  export1 1283 bytes  4ff9e8b50c404a636b715dfc8871237b106d58eb95fce7604c41461be5e6cffe
+  export2 1283 bytes  4ff9e8b50c404a636b715dfc8871237b106d58eb95fce7604c41461be5e6cffe
   ROUND TRIP STABLE (and the import undid the change)
 
 -- Simulation-Parameters
@@ -1950,8 +1948,8 @@ Do you want to replace it?]
   mutated spinboxNumberOfRegisters -> 7
   [modal] class=QFileDialog title=[Import Language Parameter...]
   [modal] class=QFileDialog title=[Export Language Parameters...]
-  export1 401 bytes  e40ca1caa26dd424faf1eca7d336b16e963a714a8c95b059dabed79a3ce72af0
-  export2 401 bytes  e40ca1caa26dd424faf1eca7d336b16e963a714a8c95b059dabed79a3ce72af0
+  export1 401 bytes  6828590f91539e7159a6b22dd0aca26815ee24c8cb99deefeed050937df3c718
+  export2 401 bytes  6828590f91539e7159a6b22dd0aca26815ee24c8cb99deefeed050937df3c718
   ROUND TRIP STABLE (and the import undid the change)
 
 -- Environment
@@ -1967,13 +1965,13 @@ Do you want to replace it?]
   [modal] class=QFileDialog title=[Export Population...]
   [modal] class=QMessageBox title=[Continue deletion?]
   [answering] &Yes
-  mutated the pool -> 117 rows
+  mutated the pool -> 97 rows
   [modal] class=QFileDialog title=[Import Population...]
   [modal] class=QFileDialog title=[Export Population...]
-  export1 2738900 bytes  ccca841d6b6b4be23e9004c555c4a0a9b64f399c582f0a25a65aed0b1cdb5ad5
-  export2 2739740 bytes  fa8388322e1d070289ca96207cb4c05a24d44ce0122e46887b2e82b1c01b4804
+  export1 1488729 bytes  3d89d359feb484300f413e725018dcb9131121e70ea55937f9b792c1be340615
+  export2 1489429 bytes  713d1d2f12558cc2242720b730b00463e4493162846592bebe48472996e6f0eb
   ROUND TRIP differs ONLY in blank lines -- C10's history growth, not a reader/writer disagreement
-  delta=840 bytes  blankLineDelta=120
+  delta=700 bytes  blankLineDelta=100
 
 -- Robot (import only; there is no Export > Robot)
   [modal] class=QFileDialog title=[Export Language Parameters...]
@@ -1986,7 +1984,7 @@ Do you want to replace it?]
   list listboxJoints          count=1
   list listboxDrives          count=1
   [modal] class=QFileDialog title=[Export Language Parameters...]
-  language-parameters before e40ca1caa26dd424faf1eca7d336b16e963a714a8c95b059dabed79a3ce72af0
+  language-parameters before 6828590f91539e7159a6b22dd0aca26815ee24c8cb99deefeed050937df3c718
   language-parameters after  dc48b8ea613ad127eb95812a1c5da85c86eaadc17d7c58686cefcd60781c335a
   ROBOT IMPORT *** CHANGED the language parameters ***
 
@@ -1994,17 +1992,17 @@ Do you want to replace it?]
   [modal] class=QFileDialog title=[Export program...]
   [modal] class=QFileDialog title=[Import program...]
   [modal] class=QFileDialog title=[Export program...]
-  rows 120 -> 120 (delta +0, 0 is correct -- it replaces)
-  export1 f940751765c869f16f62333dafd34dbe0e66b6474577bf4209e9e8de70cc3214
-  export2 f940751765c869f16f62333dafd34dbe0e66b6474577bf4209e9e8de70cc3214
+  rows 100 -> 100 (delta +0, 0 is correct -- it replaces)
+  export1 882279cff0dfd01cc9498995e88f94e42ecc1fdb06fda8884b9ad6b76e5a37ec
+  export2 882279cff0dfd01cc9498995e88f94e42ecc1fdb06fda8884b9ad6b76e5a37ec
   ROUND TRIP STABLE
 
 -- Individual import (adds one)
   [modal] class=QFileDialog title=[Export individual...]
   [modal] class=QFileDialog title=[Import individual...]
-  rows 120 -> 121 (delta +1)
-  individuals now named 55658: 1
-  last row: 57533 | -1 | 111
+  rows 100 -> 101 (delta +1)
+  individuals now named 17013: 1
+  last row: 17215 | -1 | 72
 == SCENARIO metadrive ==
 
 == STEP 1: fresh start, no experiment ==
@@ -2018,7 +2016,7 @@ Do you want to replace it?]
 == STEP 2: after File > Open Experiment ==
   [title] SIGEL
   [tree] header=[Experiments] topLevel=1
-      twoBasesSimpleFitness2.exp sel=1 exp=1 cur=1 selectable=1
+      twoBases.exp             sel=1 exp=1 cur=1 selectable=1
         Individuals              sel=0 exp=0 cur=0 selectable=1
         Robot                    sel=0 exp=1 cur=0 selectable=1
           Language-Parameters      sel=0 exp=0 cur=0 selectable=1
@@ -2035,7 +2033,7 @@ Do you want to replace it?]
     button   [Show in GNU-Plot] enabled=1 checkable=0 checked=0
     button   [Export PostScript] enabled=1 checkable=0 checked=0
     check    [Save the history] enabled=1 checkable=1 checked=1
-    lcd      [lcdnumberGenerations] value=532 digits=4
+    lcd      [lcdnumberGenerations] value=203 digits=4
     lcd      [lcdnumberAutosave] value=0 digits=4
     slider   [sliderIntervall] value=0 min=0 max=100 enabled=1
     progress [generationProgBar] value=-1 min=0 max=100
@@ -2086,7 +2084,7 @@ Do you want to replace it?]
 == STEP 3: after View > Population ==
   [title] SIGEL
   [tree] header=[Experiments] topLevel=1
-      twoBasesSimpleFitness2.exp sel=0 exp=1 cur=0 selectable=1
+      twoBases.exp             sel=0 exp=1 cur=0 selectable=1
         Individuals              sel=1 exp=0 cur=1 selectable=1
         Robot                    sel=0 exp=1 cur=0 selectable=1
           Language-Parameters      sel=0 exp=0 cur=0 selectable=1
@@ -2094,15 +2092,15 @@ Do you want to replace it?]
         Simulation-Parameters    sel=0 exp=0 cur=0 selectable=1
         Environment              sel=0 exp=0 cur=0 selectable=1
   [page] count=8 current=SIGEL_MasterGUI::SIG_AllIndividualsView objectName=[]
-  [individuals] rows=120 cols=3 headers=[Name               ][Fitness          ][Age               ] selected=0
-    row0  | 55658         | 1.14825       | 111           | sel=0
-    row1  | 56091         | 1.14825       | 109           | sel=0
-    row2  | 56248         | 1.14825       | 259           | sel=0
-    row3  | 56349         | 1.06261       | 97            | sel=0
-    row4  | 56432         | 1.14825       | 111           | sel=0
-    row5  | 56447         | 1.14825       | 107           | sel=0
-    ... 114 more
-    allrows sha256=ee0c3372fe5769ccf63f449dfcf2b301eb7d4acd4924cc5291e6f1e0c303e198
+  [individuals] rows=100 cols=3 headers=[Name               ][Fitness          ][Age               ] selected=0
+    row0  | 16269         | 0.558099      | 58            | sel=0
+    row1  | 16430         | 0.563401      | 27            | sel=0
+    row2  | 16486         | 0.569652      | 16            | sel=0
+    row3  | 16494         | 0.558099      | 60            | sel=0
+    row4  | 16611         | 0.563401      | 37            | sel=0
+    row5  | 16623         | 0.569652      | 14            | sel=0
+    ... 94 more
+    allrows sha256=893d98e2f4cb3f0951994592285055305ccd94067f8d2d6ed70904824bb45a32
   [action changes] none
   [modal] class=MT_MainWindow title=[SIGEL MetaGP]
   [window] visible=1 hidden=0
@@ -2247,7 +2245,7 @@ Do you want to replace it?]
 == STEP 2: after File > Open Experiment ==
   [title] SIGEL
   [tree] header=[Experiments] topLevel=1
-      twoBasesSimpleFitness2.exp sel=1 exp=1 cur=1 selectable=1
+      twoBases.exp             sel=1 exp=1 cur=1 selectable=1
         Individuals              sel=0 exp=0 cur=0 selectable=1
         Robot                    sel=0 exp=1 cur=0 selectable=1
           Language-Parameters      sel=0 exp=0 cur=0 selectable=1
@@ -2264,7 +2262,7 @@ Do you want to replace it?]
     button   [Show in GNU-Plot] enabled=1 checkable=0 checked=0
     button   [Export PostScript] enabled=1 checkable=0 checked=0
     check    [Save the history] enabled=1 checkable=1 checked=1
-    lcd      [lcdnumberGenerations] value=532 digits=4
+    lcd      [lcdnumberGenerations] value=203 digits=4
     lcd      [lcdnumberAutosave] value=0 digits=4
     slider   [sliderIntervall] value=0 min=0 max=100 enabled=1
     progress [generationProgBar] value=-1 min=0 max=100
@@ -2315,7 +2313,7 @@ Do you want to replace it?]
 == STEP 3: after View > Population ==
   [title] SIGEL
   [tree] header=[Experiments] topLevel=1
-      twoBasesSimpleFitness2.exp sel=0 exp=1 cur=0 selectable=1
+      twoBases.exp             sel=0 exp=1 cur=0 selectable=1
         Individuals              sel=1 exp=0 cur=1 selectable=1
         Robot                    sel=0 exp=1 cur=0 selectable=1
           Language-Parameters      sel=0 exp=0 cur=0 selectable=1
@@ -2323,15 +2321,15 @@ Do you want to replace it?]
         Simulation-Parameters    sel=0 exp=0 cur=0 selectable=1
         Environment              sel=0 exp=0 cur=0 selectable=1
   [page] count=8 current=SIGEL_MasterGUI::SIG_AllIndividualsView objectName=[]
-  [individuals] rows=120 cols=3 headers=[Name               ][Fitness          ][Age               ] selected=0
-    row0  | 55658         | 1.14825       | 111           | sel=0
-    row1  | 56091         | 1.14825       | 109           | sel=0
-    row2  | 56248         | 1.14825       | 259           | sel=0
-    row3  | 56349         | 1.06261       | 97            | sel=0
-    row4  | 56432         | 1.14825       | 111           | sel=0
-    row5  | 56447         | 1.14825       | 107           | sel=0
-    ... 114 more
-    allrows sha256=ee0c3372fe5769ccf63f449dfcf2b301eb7d4acd4924cc5291e6f1e0c303e198
+  [individuals] rows=100 cols=3 headers=[Name               ][Fitness          ][Age               ] selected=0
+    row0  | 16269         | 0.558099      | 58            | sel=0
+    row1  | 16430         | 0.563401      | 27            | sel=0
+    row2  | 16486         | 0.569652      | 16            | sel=0
+    row3  | 16494         | 0.558099      | 60            | sel=0
+    row4  | 16611         | 0.563401      | 37            | sel=0
+    row5  | 16623         | 0.569652      | 14            | sel=0
+    ... 94 more
+    allrows sha256=893d98e2f4cb3f0951994592285055305ccd94067f8d2d6ed70904824bb45a32
   [action changes] none
 
 == D29 RUN LOCK ==
@@ -2385,7 +2383,7 @@ Do you want to replace it?]
   [locked] isRunning=1
   [locked] tree menu: Start=0 Stop=1
   [locked] set=71, model reads 57  refused=1
-  [locked] after a tree click ([twoBasesSimpleFitness2.exp]): Add=0 ConfigureSystem=0  UseMetaGP=0  (0 = still locked)
+  [locked] after a tree click ([twoBases.exp]): Add=0 ConfigureSystem=0  UseMetaGP=0  (0 = still locked)
   [locked] Start=0 Hist=0 Auto=0 Comment=0 PS=0 Curve=0 GP=0 Sim=0 Robot=0 Lang=0 Env=0  live=0
   [locked] after slotEnableNoExperimentActions(true): Add=0 ConfigureSystem=0 UseMetaGP=0  (0 = still locked)
 # The two doors themselves. New Experiment and Open Experiment are a third of
@@ -2393,9 +2391,9 @@ Do you want to replace it?]
 # to the lock list reverted it reads NewExperiment=1 OpenExperiment=1 and the
 # scenario fails.
   [locked] the two doors: NewExperiment=0 OpenExperiment=0  (0 = locked during a run)
-  [counter] model=535 display before slotEvolutionStopped=532
+  [counter] model=206 display before slotEvolutionStopped=203
   [released] after slotEvolutionStopped: isRunning=0 (0 = released)
-  [counter] display after slotEvolutionStopped=535 refreshed=1
+  [counter] display after slotEvolutionStopped=206 refreshed=1
   [released] Start=1 Hist=1 Auto=1 Comment=1 PS=1 Curve=1 GP=1 Sim=1 Robot=1 Lang=1 Env=1  live=11
   [released] typed=83, model reads 83  writtenAgain=1
 # The second experiment is the point of the slot: a run in ONE experiment must
@@ -2426,7 +2424,7 @@ Do you want to replace it?]
 == STEP 2: after File > Open Experiment ==
   [title] SIGEL
   [tree] header=[Experiments] topLevel=1
-      twoBasesSimpleFitness2.exp sel=1 exp=1 cur=1 selectable=1
+      twoBases.exp             sel=1 exp=1 cur=1 selectable=1
         Individuals              sel=0 exp=0 cur=0 selectable=1
         Robot                    sel=0 exp=1 cur=0 selectable=1
           Language-Parameters      sel=0 exp=0 cur=0 selectable=1
@@ -2443,7 +2441,7 @@ Do you want to replace it?]
     button   [Show in GNU-Plot] enabled=1 checkable=0 checked=0
     button   [Export PostScript] enabled=1 checkable=0 checked=0
     check    [Save the history] enabled=1 checkable=1 checked=1
-    lcd      [lcdnumberGenerations] value=532 digits=4
+    lcd      [lcdnumberGenerations] value=203 digits=4
     lcd      [lcdnumberAutosave] value=0 digits=4
     slider   [sliderIntervall] value=0 min=0 max=100 enabled=1
     progress [generationProgBar] value=-1 min=0 max=100
@@ -2494,7 +2492,7 @@ Do you want to replace it?]
 == STEP 3: after View > Population ==
   [title] SIGEL
   [tree] header=[Experiments] topLevel=1
-      twoBasesSimpleFitness2.exp sel=0 exp=1 cur=0 selectable=1
+      twoBases.exp             sel=0 exp=1 cur=0 selectable=1
         Individuals              sel=1 exp=0 cur=1 selectable=1
         Robot                    sel=0 exp=1 cur=0 selectable=1
           Language-Parameters      sel=0 exp=0 cur=0 selectable=1
@@ -2502,21 +2500,21 @@ Do you want to replace it?]
         Simulation-Parameters    sel=0 exp=0 cur=0 selectable=1
         Environment              sel=0 exp=0 cur=0 selectable=1
   [page] count=8 current=SIGEL_MasterGUI::SIG_AllIndividualsView objectName=[]
-  [individuals] rows=120 cols=3 headers=[Name               ][Fitness          ][Age               ] selected=0
-    row0  | 55658         | 1.14825       | 111           | sel=0
-    row1  | 56091         | 1.14825       | 109           | sel=0
-    row2  | 56248         | 1.14825       | 259           | sel=0
-    row3  | 56349         | 1.06261       | 97            | sel=0
-    row4  | 56432         | 1.14825       | 111           | sel=0
-    row5  | 56447         | 1.14825       | 107           | sel=0
-    ... 114 more
-    allrows sha256=ee0c3372fe5769ccf63f449dfcf2b301eb7d4acd4924cc5291e6f1e0c303e198
+  [individuals] rows=100 cols=3 headers=[Name               ][Fitness          ][Age               ] selected=0
+    row0  | 16269         | 0.558099      | 58            | sel=0
+    row1  | 16430         | 0.563401      | 27            | sel=0
+    row2  | 16486         | 0.569652      | 16            | sel=0
+    row3  | 16494         | 0.558099      | 60            | sel=0
+    row4  | 16611         | 0.563401      | 37            | sel=0
+    row5  | 16623         | 0.569652      | 14            | sel=0
+    ... 94 more
+    allrows sha256=893d98e2f4cb3f0951994592285055305ccd94067f8d2d6ed70904824bb45a32
   [action changes] none
 
 == RANDOMISER STREAM (seed=12345 n=5) ==
   experiments after New=2
     row0 [Experiment-1.exp]
-    row1 [twoBasesSimpleFitness2.exp]
+    row1 [twoBases.exp]
   [modal] class=QMessageBox title=[Do you really...]
   [answering] &Yes
   experiments after deleting the loaded one=1
@@ -2549,7 +2547,7 @@ Do you want to replace it?]
 == STEP 2: after File > Open Experiment with the tree taking focus ==
   [title] SIGEL
   [tree] header=[Experiments] topLevel=1
-      twoBasesSimpleFitness2.exp sel=1 exp=1 cur=1 selectable=1
+      twoBases.exp             sel=1 exp=1 cur=1 selectable=1
         Individuals              sel=0 exp=0 cur=0 selectable=1
         Robot                    sel=0 exp=1 cur=0 selectable=1
           Language-Parameters      sel=0 exp=0 cur=0 selectable=1
@@ -2566,7 +2564,7 @@ Do you want to replace it?]
     button   [Show in GNU-Plot] enabled=1 checkable=0 checked=0
     button   [Export PostScript] enabled=1 checkable=0 checked=0
     check    [Save the history] enabled=1 checkable=1 checked=1
-    lcd      [lcdnumberGenerations] value=532 digits=4
+    lcd      [lcdnumberGenerations] value=203 digits=4
     lcd      [lcdnumberAutosave] value=0 digits=4
     slider   [sliderIntervall] value=0 min=0 max=100 enabled=1
     progress [generationProgBar] value=-1 min=0 max=100

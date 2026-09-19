@@ -53,7 +53,7 @@
   Environment:
     SIGEL_ROOT      as the application needs it; must hold sigel_slave for
                     the visualize and evolution scenarios
-    SIGEL_EXP       experiment file to open (default the twoBases reference)
+    SIGEL_EXP       experiment file to open (default twoBases.exp)
     SIGEL_SCRATCH   where save/export scenarios write (default /tmp)
     SIGEL_GENERATIONS=N evolution only, and the PRIMARY lever: terminate by
                     GENERATION after N, set through the Evolution control tab.
@@ -930,8 +930,8 @@ static void probeSlider(QWidget *page, QSlider *sl)
     // A one-step nudge is too small to move some paired displays, and an LCD
     // that does not move reads exactly like a dead connect. sliderTournaments-
     // PerGeneration is the case: its slot shows int(slider/1000 * poolSize),
-    // which with 120 individuals only changes every ~8.34 units, so up/pgup
-    // both printed 60 and would have printed 60 with nothing connected at all.
+    // which with 100 individuals only changes every 10 units, so up/pgup
+    // both print 50 and would print 50 with nothing connected at all.
     // End is one keystroke and moves every slider to its maximum.
     QTest::keyClick(sl, Qt::Key_End);
     const int endV = sl->value();
@@ -1771,7 +1771,7 @@ static int guidriveMain(int argc, char **argv)
     QString scenario = argc > 1 ? argv[1] : "open";
     QString expFile  = argc > 2 ? argv[2]
         : qEnvironmentVariable("SIGEL_EXP",
-              "data-reordered/Experiments/twoBasesSimpleFitness2.exp");
+              "data-reordered/Experiments/twoBases.exp");
 
     // sigel.cpp, main brings PVM up before the window exists. Only the visualize
     // scenario needs it, and starting a daemon for the others would be noise.
@@ -1892,7 +1892,7 @@ static int guidriveMain(int argc, char **argv)
         if (!t) { printf("!! no individuals list\n"); return 1; }
 
         // 1. sort by Fitness -- pins SIG_IndividualListItem::key(), including
-        //    the tie order of the two 4.19675e-05 rows.
+        //    the tie order of equal-fitness rows.
         QHeaderView *h = t->header();
         // viewport coordinates: sectionPosition() is in header space and only
             // agrees while nothing scrolls horizontally.
@@ -1934,17 +1934,14 @@ static int guidriveMain(int argc, char **argv)
             printf("  new %s | %s | %s\n", qPrintable(t->topLevelItem(i)->text(0)),
                    qPrintable(t->topLevelItem(i)->text(1)), qPrintable(t->topLevelItem(i)->text(2)));
 
-        // 3. The large delete. NOTE WHAT THIS DOES AND DOES NOT CATCH: the
-        //    list is sorted by Fitness here, and the item that is current when
-        //    clear() runs turns out to be poolPosition 4 against a surviving
-        //    pool of 5 -- IN RANGE. So reverting the blockSignals guard does
-        //    NOT crash this scenario; getIndividual() is never called out of
-        //    range. What it does, every time, is let slotSelectionChanged()
-        //    run during clear() and repoint the detail pane at a SURVIVING
-        //    individual, which is why `nameIsASurvivor' below is the line that
-        //    actually guards the fix. The crash itself reproduces under the
-        //    `ctxempty' scenario, where the list is unsorted and the stale
-        //    position was 103 against a pool of 5.
+        // 3. The large delete. What it catches depends on the item that is
+        //    current when clear() runs. The list is sorted by Fitness here, and
+        //    with twoBases.exp that item's pool position lies past the five
+        //    survivors, so reverting the blockSignals guard makes getIndividual()
+        //    exit(1) and this scenario fails. Where the position stays in range,
+        //    the same revert lets slotSelectionChanged() repoint the detail pane
+        //    at a SURVIVING individual instead, and `nameIsASurvivor' below
+        //    reports it.
         printf("\n== DELETE A LARGE BLOCK ==\n");
         clickRow(t, 5);
         clickRow(t, t->topLevelItemCount() - 1, Qt::ShiftModifier);
@@ -2022,7 +2019,7 @@ static int guidriveMain(int argc, char **argv)
     // --- the five View pages C10 never opened ------------------------------
     // Population was the only one of the six that was ever driven. These five
     // hold every spin box, slider, combo, checkbox and validator in the
-    // application. The population is untouched here (120 individuals), which
+    // application. The population is untouched here (the whole loaded pool), which
     // matters: slotTourPerGenChanged reads the pool size to compute what its
     // LCD shows, so this scenario must not follow a delete.
     if (scenario == "pages") {
@@ -2214,13 +2211,13 @@ static int guidriveMain(int argc, char **argv)
         };
 
         // Program and Individual export whatever is SELECTED, so pick a named
-        // individual -- the same 55658 C10 used, so the two steps compare.
+        // individual -- the same 17013 the export scenario picks, so the two compare.
         QTreeWidget *t = indList();
         if (!t) { printf("!! no individuals list\n"); return 1; }
         int want = -1;
         for (int i = 0; i < t->topLevelItemCount(); ++i)
-            if (t->topLevelItem(i)->text(0) == "55658") { want = i; break; }
-        if (want < 0) { printf("!! individual 55658 not found\n"); return 1; }
+            if (t->topLevelItem(i)->text(0) == "17013") { want = i; break; }
+        if (want < 0) { printf("!! individual 17013 not found\n"); return 1; }
         clickRow(t, want);
         printf("\n== EXPORT ALL ==\nselected=%s\n",
                qPrintable(t->topLevelItem(want)->text(0)));
@@ -2325,9 +2322,7 @@ static int guidriveMain(int argc, char **argv)
         // before export2 whether the reader ran or not.
         //
         // Demonstrated: with `gpExperiment.gpParameter.readFromFile()' commented
-        // out entirely, the scenario still printed
-        //   export1 1299 bytes 88e851e2...
-        //   export2 1299 bytes 88e851e2...
+        // out entirely, the scenario still printed two identical exports and
         //   ROUND TRIP STABLE (and the import undid the change)
         // -- the exact words, on a gutted importer.
         //
@@ -2478,8 +2473,8 @@ static int guidriveMain(int argc, char **argv)
             QTreeWidget *tl = indList();
             int row = -1;
             for (int i = 0; tl && i < tl->topLevelItemCount(); ++i)
-                if (tl->topLevelItem(i)->text(0) == "55658") { row = i; break; }
-            if (row < 0) printf("  !! 55658 not found\n");
+                if (tl->topLevelItem(i)->text(0) == "17013") { row = i; break; }
+            if (row < 0) printf("  !! 17013 not found\n");
             else {
                 clickRow(tl, row);
                 const QString a1 = exportTo("Program", scratch() + "/rt-prg-a", "prg");
@@ -2490,7 +2485,7 @@ static int guidriveMain(int argc, char **argv)
                     QTest::qWait(300);
                     tl = indList();
                     for (int i = 0; tl && i < tl->topLevelItemCount(); ++i)
-                        if (tl->topLevelItem(i)->text(0) == "55658") { clickRow(tl, i); break; }
+                        if (tl->topLevelItem(i)->text(0) == "17013") { clickRow(tl, i); break; }
                     const QString b1 = exportTo("Program", scratch() + "/rt-prg-b", "prg");
                     printf("  rows %d -> %d (delta %+d, 0 is correct -- it replaces)\n",
                            before, tl ? tl->topLevelItemCount() : -1,
@@ -2508,7 +2503,7 @@ static int guidriveMain(int argc, char **argv)
             QTreeWidget *tl = indList();
             int row = -1;
             for (int i = 0; tl && i < tl->topLevelItemCount(); ++i)
-                if (tl->topLevelItem(i)->text(0) == "55658") { row = i; break; }
+                if (tl->topLevelItem(i)->text(0) == "17013") { row = i; break; }
             if (row >= 0) clickRow(tl, row);
             const QString a1 = exportTo("Individual", scratch() + "/rt-ind-a", "ind");
             const int before = tl ? tl->topLevelItemCount() : -1;
@@ -2519,11 +2514,11 @@ static int guidriveMain(int argc, char **argv)
                 tl = indList();
                 const int after = tl ? tl->topLevelItemCount() : -1;
                 printf("  rows %d -> %d (delta %+d)\n", before, after, after - before);
-                // Where does the newcomer land, and is it a copy of 55658?
+                // Where does the newcomer land, and is it a copy of 17013?
                 int copies = 0;
                 for (int i = 0; tl && i < tl->topLevelItemCount(); ++i)
-                    if (tl->topLevelItem(i)->text(0) == "55658") ++copies;
-                printf("  individuals now named 55658: %d\n", copies);
+                    if (tl->topLevelItem(i)->text(0) == "17013") ++copies;
+                printf("  individuals now named 17013: %d\n", copies);
                 if (tl && after > 0) {
                     QTreeWidgetItem *last = tl->topLevelItem(after - 1);
                     printf("  last row: %s | %s | %s\n", qPrintable(last->text(0)),
@@ -4247,9 +4242,8 @@ static int guidriveMain(int argc, char **argv)
 
         // The driver loads an experiment at startup, so New Experiment leaves
         // TWO in the tree -- and a first version of this scenario then added
-        // to, and saved, the WRONG one: 125 programs and 40,346 instruction
-        // lines, which is the loaded 120-individual population plus the 5
-        // added. The count 120 + 5 is what gave it away. Delete the loaded one
+        // to, and saved, the WRONG one: the whole loaded population plus the 5
+        // added, which its program count gave away. Delete the loaded one
         // first so that exactly one experiment exists and nothing is ambiguous.
         SIG_ExperimentListView *lv = listView();
         clickMenu("&File", "&New Experiment");
@@ -4261,8 +4255,8 @@ static int guidriveMain(int argc, char **argv)
         // and C7 restored Qt 2's PREPENDING item insertion -- so the new
         // experiment lands at index 0 and the loaded one moves to 1. A first
         // version deleted topLevelItem(0) as "the loaded one" and removed the
-        // new empty experiment instead, leaving the 120-individual population
-        // to be added to and saved.
+        // new empty experiment instead, leaving the loaded population to be
+        // added to and saved.
         QTreeWidgetItem *loaded = nullptr;
         for (int i = 0; i < lv->topLevelItemCount(); ++i)
             if (!lv->topLevelItem(i)->text(0).startsWith("Experiment-"))
@@ -4598,7 +4592,7 @@ static int guidriveMain(int argc, char **argv)
     }
 
     // --- context menu on genuinely EMPTY space in the individuals list -----
-    // With 120 rows the viewport is full, so a click near its bottom edge still
+    // With the loaded pool the viewport is full, so a click near its bottom edge still
     // lands ON a row and returns the row menu. itemAt() must actually be null,
     // which means shrinking the pool first -- the same thing a user would have
     // to do, and what the 1.3 oracle did.
@@ -4643,8 +4637,8 @@ static int guidriveMain(int argc, char **argv)
         if (!t) { printf("!! no individuals list\n"); return 1; }
         int want = -1;
         for (int i = 0; i < t->topLevelItemCount(); ++i)
-            if (t->topLevelItem(i)->text(0) == "55658") { want = i; break; }
-        if (want < 0) { printf("!! individual 55658 not found\n"); return 1; }
+            if (t->topLevelItem(i)->text(0) == "17013") { want = i; break; }
+        if (want < 0) { printf("!! individual 17013 not found\n"); return 1; }
         clickRow(t, want);
         printf("\n  [exporting] name=%s selected=%d current=%s\n",
                qPrintable(t->topLevelItem(want)->text(0)),
@@ -4652,7 +4646,7 @@ static int guidriveMain(int argc, char **argv)
                t->currentItem() ? qPrintable(t->currentItem()->text(0)) : "(none)");
         fflush(stdout);
 
-        QString out = scratch() + "/prog55658.prg";
+        QString out = scratch() + "/prog17013.prg";
         QFile::remove(out);
         whenModal([out](QWidget *m) {
             QFileDialog *fd = qobject_cast<QFileDialog *>(m);
@@ -5422,7 +5416,7 @@ static int guidriveMain(int argc, char **argv)
         SIG_ExperimentListView *lv = listView();
 
         // A generation is one evaluation per individual, each a full physics
-        // run dispatched to a PVM slave. With the shipped 120 the counter does
+        // run dispatched to a PVM slave. With the whole loaded pool the counter does
         // not move inside any reasonable budget, and "nothing happened" then
         // looks identical to "Start is broken". Shrinking the pool through the
         // GUI first is what makes a generation observable.
@@ -6172,8 +6166,8 @@ static int guidriveMain(int argc, char **argv)
         // oracle can be asked about the same one.
         int want = -1;
         for (int i = 0; i < t->topLevelItemCount(); ++i)
-            if (t->topLevelItem(i)->text(0) == "55658") { want = i; break; }
-        if (want < 0) { printf("!! individual 55658 not in the list\n"); return 1; }
+            if (t->topLevelItem(i)->text(0) == "17013") { want = i; break; }
+        if (want < 0) { printf("!! individual 17013 not in the list\n"); return 1; }
         clickRow(t, want);
         printf("\n  [selected] row=%d name=%s fitness=%s age=%s (selected=%d)\n", want,
                qPrintable(t->topLevelItem(want)->text(0)),

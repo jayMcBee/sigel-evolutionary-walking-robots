@@ -47,8 +47,8 @@ export SIGEL_ROOT
 exps=$(find "$ROOT/$DATA/Experiments" -name '*.exp' | sort)
 rrbs=$(find "$ROOT/$DATA" -name '*.rrb' | sort)
 ne=$(echo "$exps" | grep -c . || true); nr=$(echo "$rrbs" | grep -c . || true)
-[ "$ne" -eq 8 ] && [ "$nr" -eq 7 ] || {
-	echo "expected 8 .exp and 7 .rrb under $DATA/, found $ne and $nr." >&2
+[ "$ne" -eq 7 ] && [ "$nr" -eq 7 ] || {
+	echo "expected 7 .exp and 7 .rrb under $DATA/, found $ne and $nr." >&2
 	echo "data/ holds the kept experiments under their robot names, not the" >&2
 	echo "14 of the download -- PORTING.md section 10, D2." >&2
 	exit 1

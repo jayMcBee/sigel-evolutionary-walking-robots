@@ -855,13 +855,20 @@ Start here.
   `shortHammerNiceWalkingFitness`. The two-bases family: keep
   `twoBasesHardlyReducedIS`, to be renamed `twoBases`; the other five go — item 40
   in `future_refactorings.md`. `octopusSimpleFitness` goes too — item 44 — and
-  `runnerSimpleFitness` — item 45. The clean-ups are Jan's to start; do not start
-  them unasked.
+  `runnerSimpleFitness` — item 45. **Done on this machine 2026-09-19**, at Jan's
+  word: both data trees hold the 7 under their new names, and every check that
+  loaded a dropped file now loads a kept one, against the port's own output.
+  The x86 machine is still open; sigel-x86 acts on its files only on Jan's own
+  word.
   **Both machines end with the same set under the same names**, Jan, 2026-09-19:
   *"keeping just the ones I've picked on both machines (otherwise we won't ever
   be able to compare them)"*. Each kept experiment is renamed to its robot's
   name — `hammer`, `insect`, `octopus`, `runner`, `shortHammer`, `twoBases`,
-  `walker` — all seven approved by Jan; the renaming waits for him — item 46.
+  `walker` — all seven approved by Jan — item 46.
+- **Next, Jan's plan:** add the kept, renamed experiments to git, and drop the
+  historical copies except one backup. The backup taken before the clean-up is
+  `~/sigel-data-both-20260919.tar.gz`, sha256 `37006ffb…2035`: both data trees,
+  checked by unpacking and diffing.
 - **How each one was shown.** Score every individual with `build-fast/sigel_eval`
   (a scratch `SIGEL_ROOT` holding a copy of `Terrain.ter`). Make a viewing copy:
   swap the text between the `INDIVIDUAL(0)` and `INDIVIDUAL(k)` labels and swap
@@ -1211,28 +1218,27 @@ are `wc -l`; the consumer column is `grep` over `check.sh`, the `.sh` scripts an
 the `Makefile`.
 
 *Check inputs. Deleting one fails loudly in every case, but only two say why:
-the `pagesave vs 1.3` and `real clicks` sections name the missing file. The other four fail as a
+the `pagesave` and `real clicks` sections name the missing file. The other four fail as a
 maximal diff — every line of the dump reported as an addition — which is loud and
 uninformative.*
 
 | file | lines | what it holds |
 |---|---|---|
-| `dictorder-baseline.txt` | 2740 | every container order that reaches the simulation, as `dictorder-dump.sh` prints it. Check 2 is a diff against this |
-| `fitness-baseline.txt` | 42 | the 42 fitness values. Check 3 is a diff against this |
-| `guibehaviour-baseline.txt` | 2603 | the `guidrive` scenarios under QTest |
+| `dictorder-baseline.txt` | 2071 | every container order that reaches the simulation, as `dictorder-dump.sh` prints it. Check 2 is a diff against this |
+| `fitness-baseline.txt` | 21 | the 21 fitness values, three for each of the 7 experiments. Check 3 is a diff against this |
+| `guibehaviour-baseline.txt` | 2613 | the `guidrive` scenarios under QTest |
 | `guidump-baseline.txt` | 122 | the widget dump |
-| `pagesave-baseline.txt` | 438 | **holds 1.3's OWN OUTPUT** — see below |
-| `xtest-baseline.txt` | 234 | what the port does under real X11 input — see below |
+| `pagesave-baseline.txt` | 432 | the port's own save of `twoBases.exp` — see below |
+| `xtest-baseline.txt` | 235 | what the port does under real X11 input — see below |
 
-**`pagesave-baseline.txt` is the one that cannot be made again here.** Its BASE
-block was captured from the 2003 i386 binary on 2026-09-03: load
-`twoBasesSimpleFitness2.exp`, visit no page, change nothing, save once — 192
-lines, sha256 `a327150c…`. Our writer reproduces it byte for byte, so a failure
-in that half is a regression against 1.3. **Regenerating it from our own build
-would turn the only cross-machine anchor for the widget-to-file path into a
-port-against-itself baseline**, which is precisely what it exists not to be.
-Only the oracle machine can produce it. `check.sh`'s `pagesave vs 1.3` section
-guards it and prints *"this check tested NOTHING"* if it is absent.
+**`pagesave-baseline.txt` holds the port's own save of `twoBases.exp`.** Its
+BASE block used to be 1.3's own output for `twoBasesSimpleFitness2.exp`,
+captured from the 2003 i386 binary on 2026-09-03 — 192 lines, sha256
+`a327150c…` — and our writer reproduced it byte for byte. That experiment was
+dropped on 2026-09-19, and so was the rule that only the oracle may make this
+file: Jan, the same day, *"Future refactorings only need to check against the
+now-proven Qt6 baseline"*. `check.sh`'s `pagesave` section guards it and prints
+*"this check tested NOTHING"* if it is absent.
 
 **`xtest-baseline.txt` covers what QTest structurally cannot.** QTest's **widget** overload — the only one `guidrive` uses — builds a
 `QMouseEvent` and hands it to `QApplication::notify`, so it never passes through
@@ -2756,14 +2762,14 @@ is 80-bit.
 | `$DEAD_SIGNALS`, baseline **0 for every module** | **only the nine Qt 2 spellings §2 tabulates, and only inside `SIGNAL(`.** It is a closed regex (`check.sh:89-92`), so a **tenth** kind of dead signal is invisible to it and a `SLOT()` naming a slot that no longer exists is invisible by construction. *Demonstrated 2026-09-03: injecting `connect(…, SIGNAL(highlighted(int)), …)` — Qt 2's `QListBox` signal, which `QTreeWidget` does not have — left `Qt 6 signals` at `0 dead (baseline 0)` and every other section green, while Qt itself printed `QObject::connect: No such signal QTreeWidget::highlighted( int )` on stderr. The positive control is that runtime line: the injected connect really was dead.* C7 measured every `SLOT()` in `SIGEL_MasterGUI` against its headers by hand — 0 mismatches — and nothing repeats that |
 | **`runtime connect`** — NEW 2026-09-03 | Qt's own `No such signal` / `No such slot` warning, from a driver run — the only thing that catches a dead connect the regex has never heard of. `guidrive`'s stderr had been going to `/dev/null`; it is captured now and any such line fails the check. **It is NOT the general case the regex is a special case of, and a first draft of this row said so wrongly**: the regex is *static* over all 14 modules, this is *runtime* over only what the **ten** `gui behaviour` scenarios execute. **Partly disjoint, so both are kept.** What THIS row does not reach: the `clipcheck` run still discards stderr, and the two locale re-runs append to the log *after* it has been grepped. *`SIGEL_SlaveGUI` used to be the largest hole here — 44 `SIGNAL(` and 44 `SLOT(` with no runtime coverage — and is now covered by `slave gui` below, which runs its own copy of this check on its own stderr. There are three such checks in `check.sh` now, one per stderr stream, and they are deliberate duplicates: each stream has a different producer* |
 | its **positive control**, and the reason the row above is not simply "and now it is covered" | **Qt emits that warning under the logging category `qt.core.qobject.connect`, and categories are filterable.** `QT_LOGGING_RULES='*=false'` in the ambient environment — `guidrive_run` uses `env` without `-i`, so everything passes through — or a `qtlogging.ini` silences it, and an empty stderr then looks exactly like a clean run. **Demonstrated: the full check ran green with a genuinely dead connect injected.** So `guidrive` now makes one deliberately bogus connect at startup and the check **fails if that warning is absent**. It must be a real connect, not a `qWarning`: `qt.core.qobject.connect` can be disabled on its own, leaving a `default`-category control visible and the check blind. *`check.sh` already says of `clipcheck` that "0 clipped" from a check that cannot detect clipping is worth nothing; this row is that sentence applied to itself* |
-| **`pagesave vs 1.3`** — NEW 2026-09-03 | **`putAllIntoExperiment()`, the widget-to-file path, which nothing covered.** `pages` is widget to widget; `exportall` is widget to file for the eight export formats, and **none of the three compares what the SAVE path writes**. *A first version said the export scenarios "bypass the aggregator entirely"; they do not — `putAllIntoExperiment()` runs on every tree selection change, so `check`, `pages` and `exportall` all execute it many times. What none of them did was compare its output to a file.* Teeth-tested three ways: breaking the register write and the `WITHHISTORY` write both fail it — *but `gui behaviour` catches those too, through the `.lap` and `.pop` export checksums, so neither shows unique coverage.* **Dropping one page from `putAllIntoExperiment` does**: `pagesave vs 1.3` fails on `TEXALPHA 99 → 255` while `gui behaviour` passes 1/0. That is the gap §9 named, exactly |
+| **`pagesave`** — NEW 2026-09-03; named `pagesave vs 1.3` until 2026-09-19 | **`putAllIntoExperiment()`, the widget-to-file path, which nothing covered.** `pages` is widget to widget; `exportall` is widget to file for the eight export formats, and **none of the three compares what the SAVE path writes**. *A first version said the export scenarios "bypass the aggregator entirely"; they do not — `putAllIntoExperiment()` runs on every tree selection change, so `check`, `pages` and `exportall` all execute it many times. What none of them did was compare its output to a file.* Teeth-tested three ways: breaking the register write and the `WITHHISTORY` write both fail it — *but `gui behaviour` catches those too, through the `.lap` and `.pop` export checksums, so neither shows unique coverage.* **Dropping one page from `putAllIntoExperiment` does**: `pagesave vs 1.3` fails on `TEXALPHA 99 → 255` while `gui behaviour` passes 1/0. That is the gap §9 named, exactly |
 | **`roundtrip`** — NEW 2026-09-03, the other half of it | **that a READER actually reads.** Export, change something, import the export, export again, require the two exports to match — so an importer that opens nothing, parses nothing or is never reached cannot pass. `exportall` cannot see this: it never reads anything back. **Teeth-tested by gutting each of the five readers in turn — `.gpp` `.sip` `.lap` `.env` `.pop` — and every one fails the check.** *Checking it is what exposed that it could not fail* |
 | **`freed-pointer null`** | that `visualisation` is nulled between its `delete` and its `new`. `SIG_Simulation`'s `default:` case throws for `SIMULATIONLIBRARY 0` and unwinds out of `visualizeThis()` between the two statements. **The defect is real but not reachable today, and the argument matters because the first version of it was wrong in three ways.** The widget has 21 `visualisation->` dereferences behind 14 `if (visualisation)` guards, all reached constantly (`paintGL` runs every frame). `sigel_slave` is **not** the sole caller — `SIG_SimulationVisualisationWidget::slotStopSimulation()` calls `visualizeThis()` from a live Stop action, **inside `a.exec()` with no try/catch**. And `visualisation` is a **base-class** member that `~SIG_VisualisationWidget` deletes, so destruction after a throw **is** a double free; it does not bite on the slave path only because `simWindow` is leaked past the catch's `return 1`. **Why it is still unreachable:** every other caller is downstream of a first `visualizeThis()` that must have SUCCEEDED, and nothing in the slave calls `setSimulationLibrary`. **Deliberately NOT generalised** — the tree's other `delete x; ... x = new` pairs are benign, so a blanket rule would be noise. Teeth-tested by deleting the line |
 | **`no clipped controls`** (`clipcheck`) | any widget whose rect leaves its parent's, over the master's **six View pages and their tabs only** — and it carries a positive control that FAILS the check if it does not fire, because "0 clipped" from a check that cannot detect clipping is worth nothing. Shrinking the window is not usable as that control: the converted pages carry real layouts and reflow where 1.3, absolutely positioned, clips — so **the port is better behaved than 1.3 on resize** — and it displaces a real widget instead |
 | **`slave gui`** (`slavegui`) — NEW 2026-09-05 | **two things `check.sh` had never reached, because it never ran this scenario.** (a) The clipping defect **in the two containers where it was actually found**, which `clipcheck` structurally cannot see: they belong to the slave window and its movie dialog, not to anything the master's menus open. *Both fixes were UNCHECKED while this table said the section above covered them — found by review.* It greps the two clip totals rather than diffing the whole scenario, whose GL view does not render offscreen. **Teeth-tested by deleting each `<minimumSize>` block and rebuilding**: without `GroupBox6`'s, 14 controls clip; without `groupboxDirectory`'s, 1. (b) **`SIGEL_SlaveGUI`'s 44 `SIGNAL(` and 44 `SLOT(` sites, which had no runtime coverage at all** — its stderr is kept and checked for Qt's `No such signal`/`No such slot`, behind the same `guidriveStderrControl` positive control. **Teeth-tested both ways**: `QT_LOGGING_RULES='*=false'` fails it as suppressed, and renaming one live signal in `SIG_SimulationWindow.cpp` fails it by name |
 | **`real clicks`** (`xtest`, `xtest-baseline.txt`) — NEW 2026-09-07 | **the platform layer, which nothing else here touches.** Every other section drives Qt through `QApplication::notify`. This one runs `guidrive` as a real X11 client in a nested `Xvfb` under `xcb`, and sends XTEST input with `xdotool`. It is the only section that exercises activation, the popup's pointer grab and Qt's double-click synthesis. It found C13's swallowed dismissing click on its first run. **Its control is inside the scenario, and the section fails without it.** The scenario compares one real click and one `QTest::mouseClick` at the same point, through a native event filter. It prints `DISCRIMINATES` only when the real click produced native `ButtonPress` events and `QTest` produced none. *Teeth-tested. `xdotool` was replaced by a stub that exits 0 and does nothing. The scenario stops at the coordinate check with a line-initial `!!` and exit 1, so the section fails on three predicates. **An earlier version of this row claimed it failed "on the control and on the `!!` marker", and review showed that was false**: all three of the scenario's mis-target messages put their `!!` in the MIDDLE of a line, and `check.sh` greps `^ *!!`, so not one of them was visible. A run whose own output said the finding was undecidable passed every guard the section had. The markers start their lines now, and the scenario returns 1 rather than carrying on.* `QEvent::spontaneous()` would not work as that control, because `qtestmouse.h` marks QTest's own events spontaneous. A missing `Xvfb` or `xdotool` **fails** rather than skips. The display is refused if something is already on it. The server is killed by pid, so a real session's own `Xvfb` survives |
 | **`truncated pi (V5)`** — NEW 2026-09-08 | **that nobody "fixes" 1.3's truncated pi.** The sensor path converts radians to degrees with `3.14159265`, not `M_PI`. Every evolved program in the shipped experiments was selected against sensor readings carrying that 1.14e-09 error, and they feed a chaotic simulation, so correcting it changes what the robots do. **The edit that breaks it is one word and looks like tidying**, and 1.3 uses the true `M_PI` in `IFunctions.cpp, calculateAnyJoint`, so the truncated literal reads as an oversight to anyone who meets that line first. **Two checks, because neither covers the other:** the SOURCE check catches an edit at one of the four sites even while another site still supplies the constant, which no binary search can see, and it is compiler-independent; the BINARY check catches any spelling that yields the true value — `M_PI`, `4*atan(1)`, a longer literal, a header constant — which a grep for `M_PI` would miss. Only the radian factor is checked, and the reason is measured rather than assumed: on aarch64 four of the other seven appear ZERO times as 8-byte doubles in our image and two appear only in debug sections, so there is nothing of theirs in `.rodata` to compare. Costs 0.18 s. *Teeth-tested six ways, and the testing found three defects in the check itself. **The binary search covered the whole file, so its "the constant is missing" arm could never fire** — the Makefile compiles with `-g`, so two debug copies survive any patch of the real one; the search is bounded to `.rodata` now. **The source pattern was a prefix match**, so lengthening a site to `3.14159265358979` changed the factor while the count stayed at 4 and neither forbidden double appeared — the whole section passed on that edit. **And a comment mentioning `M_PI` or the literal failed the check**, which is documentation, not a defect; comments are stripped now. The six probes: a site tidied to `M_PI`, a site deleted, a site lengthened, the true `180/pi` patched into `.rodata`, the kept constant patched out of `.rodata`, and a comment naming both. Five fail with the message aimed at them, one passes. Two orderings had to be fixed for that: `M_PI` is tested before the site count, and the forbidden constant before the missing one, because each of those edits trips both tests and the specific diagnosis has to win.* |
-| **`v2 round trip vs 1.3`** — NEW 2026-09-08 | **a whole experiment through `File > Save Experiment`, twice, against what the 2003 binary wrote.** `pagesave vs 1.3` compares a 192-line parameter block, over two saves that differ only in whether the pages were edited; this compares the WHOLE file across two CHAINED saves, where each save's output is the next one's input — marker line numbers, `PVMHOST` order, the experiment history, the per-individual HISTORY growth, the individual names, the robot block, the ten first-save keys, and `expstruct.py` over pass 1 against pass 2. The expected text is copied from `verification-against-sigel-1.3/v8-1.3-gp-blocks.txt`, captured before this conversion existed, so a failure is a regression against 1.3 rather than against yesterday. **Input against pass 1 is not the test** — the first save adds ten keys and would fail however correct the port is (V8 result 5). It is ONE diff of a 58-line report. Costs 35 s measured, four `pagesave` runs over two experiments; no new scenario was added. *Teeth-tested 2026-09-08, and the testing found two holes in the check itself, both since closed — see the V2 row above. Every predicate has been shown to fail on a change of the kind it exists to catch. The claim is one-way: a mutation moves the line it is aimed at, and usually others too, because a deleted key shifts every marker below it. It is NOT that each mutation moves exactly one line, which an earlier version of this row claimed and which the measurements never showed. The wrapper was tested too: missing data SKIPS and counts, a missing or stale binary FAILS, suppressed Qt connect logging FAILS, and the section was run from outside the repo root to check the `make -q -C` fix.* |
+| **`v2 round trip vs 1.3`** — NEW 2026-09-08 | **a whole experiment through `File > Save Experiment`, twice, against what the 2003 binary wrote.** `pagesave` compares a 192-line parameter block, over two saves that differ only in whether the pages were edited; this compares the WHOLE file across two CHAINED saves, where each save's output is the next one's input — marker line numbers, `PVMHOST` order, the experiment history, the per-individual HISTORY growth, the individual names, the robot block, the ten first-save keys, and `expstruct.py` over pass 1 against pass 2. The expected text is copied from `verification-against-sigel-1.3/v8-1.3-gp-blocks.txt`, captured before this conversion existed, so a failure is a regression against 1.3 rather than against yesterday. **Input against pass 1 is not the test** — the first save adds ten keys and would fail however correct the port is (V8 result 5). It is ONE diff of a 58-line report. Costs 35 s measured, four `pagesave` runs over two experiments; no new scenario was added. *Teeth-tested 2026-09-08, and the testing found two holes in the check itself, both since closed — see the V2 row above. Every predicate has been shown to fail on a change of the kind it exists to catch. The claim is one-way: a mutation moves the line it is aimed at, and usually others too, because a deleted key shifts every marker below it. It is NOT that each mutation moves exactly one line, which an earlier version of this row claimed and which the measurements never showed. The wrapper was tested too: missing data SKIPS and counts, a missing or stale binary FAILS, suppressed Qt connect logging FAILS, and the section was run from outside the repo root to check the `make -q -C` fix.* |
 | `encodings` | **INVERTED BY D31 2026-09-09 — this row used to say the opposite.** It no longer catches *a file whose CRLF was stripped*; it catches **CRLF present at all**, in any tracked text file, expected zero. 611 LF-only files and 8 that git calls binary, with 44 translated and 52 that postdate the root. Baseline 0, floor 500 |
 | `dead item virtuals` | a class declaring Qt 2's `key(int,bool)` without the `operator<` that replaces it. Matched against a **flattened** header and demanding the signature that actually overrides — a decoy `operator<( QTreeWidgetItem * )` and a two-line declaration both bypassed the first version |
 | `widgets` | `DISpinBox` losing the fraction, under **`C` and `de_DE`** — without the second row it was blind to the locale bug the first fix introduced |
@@ -3207,14 +3213,15 @@ architectures** — `STEPSIZE`, `MAXIMALERROR`, `DYNAMECHSINTEGRATOR`,
 `LanguageParameters` field, typed identically on both sides from a fresh load,
 **as bytes, not as numbers x87 and IEEE can round differently**.
 
-**Now checked as `pagesave vs 1.3`, and this is the reference it uses.** Load
-`twoBasesSimpleFitness2.exp`, visit no page, change nothing, save once, and take
-everything above `POPULATION BEGIN{`. **The port writes those 192 lines byte for
-byte — 2069 bytes, sha256 `a327150c…` on both machines** — so a failure in that
-half is a regression against 1.3, not against yesterday's output. *The capture
-carried a positive control: a second save after one parameter change differed in
-exactly one line.* **`LanguageParameters` is checked separately and would
-otherwise have been missed**: it sits at line 133288 of the saved file, far below
+**Checked as `pagesave`.** Load `twoBasesSimpleFitness2.exp`, visit no page,
+change nothing, save once, and take everything above `POPULATION BEGIN{`. **The
+port wrote those 192 lines byte for byte — 2069 bytes, sha256 `a327150c…` on
+both machines.** *The capture carried a positive control: a second save after
+one parameter change differed in exactly one line.* Since 2026-09-19 the check
+loads `twoBases.exp` and compares against the port's own save, 192 lines and
+2053 bytes, by Jan's rule above. **`LanguageParameters` is checked separately and
+would otherwise have been missed**: it sat at line 133288 of that saved file (71664 in
+`twoBases.exp`'s), far below
 `POPULATION BEGIN{` at 193, so the 192-line block covers eleven of C11a's twelve
 edits. That was found because the oracle reported where `POPULATION BEGIN{` had
 moved to — not by reading the code.
@@ -3672,7 +3679,7 @@ pass.** All are fixed and all are demonstrated:
 
 **The control makes the finding readable.** The baseline prints it directly
 below the result. The same click, at the same point, with no menu open, does
-select the row: 55658 → 56091. Without that line the result means nothing. If
+select the row: 16269 → 16494 in `twoBases.exp`. Without that line the result means nothing. If
 the control ever stops working, the check prints `UNDECIDABLE` instead of a
 verdict.
 
@@ -5123,7 +5130,7 @@ that reasoning is wrong. Once the shim goes, load and save become
 order-preserving and all three collapse into one — a baseline that recorded only
 `copy` could not have seen `loaded` move.
 
-**The script refuses to run** unless it finds exactly 8 `.exp` and 7 `.rrb`,
+**The script refuses to run** unless it finds exactly 7 `.exp` and 7 `.rrb`,
 and it inspects `sigel_eval`'s stderr instead of discarding it. Both were real
 holes: the previous version exited 0 on a missing build directory, a missing
 `data/`, and a wrong `SIGEL_ROOT`, emitting a short file each time — and
@@ -5524,7 +5531,7 @@ which is why the list exists.
 | `SIG_GPParameter::writeToFile`'s `PVMHOST` loop, D13 | ~~linked, never called~~ **COVERED as of C11b** — `exportall` writes it and `guibehaviour-baseline.txt` pins the bytes |
 | `readFromFile`'s `qDeleteAll` + `clear`, D13 | runs every load, always on an **empty** list |
 | **all four sites in `SIG_GPExperiment.cpp`**, D14 | the master variant is compiled into `libSIGEL_GP.a` and **never linked** — `SIG_GPExperimentClean.o` satisfies the symbols first. `readelf --debug-dump=info` on `sigel_eval` has a CU for Clean and none for the master |
-| `writeHistoryToFileTransfer`, D14 | called — `check.sh`'s `pagesave vs 1.3` and `v2 round trip vs 1.3` sections save six `.exp` per run, and `twoBasesSimpleFitness2.exp` carries 532 history entries |
+| `writeHistoryToFileTransfer`, D14 | called — `check.sh`'s `pagesave` and `v2 round trip vs 1.3` sections save six `.exp` per run, and `twoBases.exp` carries 203 history entries |
 | `exportExperimentHistoryToGNUPlot`, D14 | linked; its only caller is `SIG_GUIGPExperiment.cpp, slotGNUPlotExport`, Phase C |
 | **five of D15's eight `delete pool[…]`** | the three sized constructors, `importNewIndividual`, and `addRandomIndividuals`' — which is `delete nullptr` on every possible call, since `resize()` just made those slots. *D16 said six of nine; nine was a `grep` hit that counted a comment, and three of the eight are entered by the self-check as of D16* |
 | both `wasCanceled()` shrinks, D15 | need a `QApplication`; `sigel_eval` has none, so `if (qApp)` is false |

@@ -954,61 +954,6 @@ copy     point base1  2  Base1AxisSuccDir
 copy     point base2  0  Base2AxisSuccNormal
 copy     point base2  1  Base2AxisSuccBase
 copy     point base2  2  Base2AxisSuccDir
-== twoBasesSimpleFitness2.exp
-loaded   body       0 #-1  base.wrl
-loaded   material   0 #-1  metal
-loaded   link       0 #0   base1
-loaded   link       1 #1   base2
-loaded   joint      0 #0   hinge1
-loaded   drive      0 #0   hinge1Drive
-loaded   sensor     0 #0   hinge1Sensor
-loaded   geom     10 v   11 p  -5.999868000e+00  base.wrl
-loaded   command    0      MUL
-loaded   command    1      MOVE
-loaded   command    2      CMP
-loaded   command    3      COPY
-loaded   command    4      LOAD
-loaded   command    5      SENSE
-loaded   command    6      SUB
-loaded   command    7      DIV
-loaded   command    8      MIN
-loaded   command    9      DELAY
-loaded   command   10      ADD
-loaded   command   11      MOD
-loaded   command   12      MAX
-loaded   point base1  0  Base1AxisSuccNormal
-loaded   point base1  1  Base1AxisSuccBase
-loaded   point base1  2  Base1AxisSuccDir
-loaded   point base2  0  Base2AxisSuccNormal
-loaded   point base2  1  Base2AxisSuccBase
-loaded   point base2  2  Base2AxisSuccDir
-copy     body       0 #-1  base.wrl
-copy     material   0 #-1  metal
-copy     link       0 #0   base1
-copy     link       1 #1   base2
-copy     joint      0 #0   hinge1
-copy     drive      0 #0   hinge1Drive
-copy     sensor     0 #0   hinge1Sensor
-copy     geom     10 v   11 p  -5.999868000e+00  base.wrl
-copy     command    0      MUL
-copy     command    1      MOVE
-copy     command    2      CMP
-copy     command    3      COPY
-copy     command    4      LOAD
-copy     command    5      SENSE
-copy     command    6      SUB
-copy     command    7      DIV
-copy     command    8      MIN
-copy     command    9      DELAY
-copy     command   10      ADD
-copy     command   11      MOD
-copy     command   12      MAX
-copy     point base1  0  Base1AxisSuccNormal
-copy     point base1  1  Base1AxisSuccBase
-copy     point base1  2  Base1AxisSuccDir
-copy     point base2  0  Base2AxisSuccNormal
-copy     point base2  1  Base2AxisSuccBase
-copy     point base2  2  Base2AxisSuccDir
 == walker.exp
 loaded   body       0 #-1  foot.wrl
 loaded   body       1 #-1  body.wrl

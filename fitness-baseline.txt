@@ -16,9 +16,6 @@ shortHammer                        2  0
 twoBases                           0  0.0045802847516633778
 twoBases                           1  0.0045802847516633778
 twoBases                           2  0.0070264802539394943
-twoBasesSimpleFitness2             0  3.4405588318134227e-05
-twoBasesSimpleFitness2             1  0.02488790895212422
-twoBasesSimpleFitness2             2  5.6667598222681242e-05
 walker                             0  0
 walker                             1  0.14151186129657561
 walker                             2  0.14151186129657561
