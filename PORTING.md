@@ -851,15 +851,14 @@ PORT.** Start here.
 
 - **Done.** `hammerNiceWalkingFitness`: a keeper. `insectNiceWalkingFitness`: a
   keeper. `octopusNiceWalkingFitness`: a keeper. `walkerNiceWalkingFitness`: a
-  keeper. The two-bases family: keep
+  keeper. `runnerNiceWalkingFitness`: a keeper. The two-bases family: keep
   `twoBasesHardlyReducedIS`, to be renamed `twoBases`; the other five go — item 40
   in `future_refactorings.md`. `octopusSimpleFitness` goes too — item 44. The
   clean-ups wait until every experiment has been judged; do not start them unasked.
   **Both machines end with the same set under the same names**, Jan, 2026-09-19:
   *"keeping just the ones I've picked on both machines (otherwise we won't ever
   be able to compare them)"*. Names other than `twoBases` are not yet chosen.
-- **Next: `runnerNiceWalkingFitness`.** Then `runnerSimpleFitness`,
-  `shortHammerNiceWalkingFitness`.
+- **Next: `runnerSimpleFitness`.** Then `shortHammerNiceWalkingFitness`.
 - **How each one is shown.** Score every individual with `build-fast/sigel_eval`
   (a scratch `SIGEL_ROOT` holding a copy of `Terrain.ter`). Make a viewing copy:
   swap the text between the `INDIVIDUAL(0)` and `INDIVIDUAL(k)` labels and swap
@@ -997,6 +996,10 @@ beside it in the same place.
   experiments - ok, we'll keep only one! the first one, the current one is a
   failed/early run"* — item 44. `walkerNiceWalkingFitness`, individual 35, score
   0.255: Jan: *"the current Walker experiment is a keeper"*.
+  `runnerNiceWalkingFitness`, individual 86, score 0.083: Jan: *"It's another
+  keeper."* 83 of 100 score exactly 0 here. The 2001 values stored in the file
+  are 0.9195 for 59, 0 for 40 — number 86 among them — and 0.8569 for one; the
+  oracle's 1.3 gives 0 for numbers 0, 1 and 2, as ours does.
 - **The payload, octopus, all 259 lines.** The 182 Polygon lines are
   byte-identical. The 13 Geometry lines carry the same values; four differ in
   text only, at exact decimal ties in the 50th digit, where glibc rounds half
