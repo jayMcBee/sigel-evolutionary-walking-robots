@@ -540,7 +540,8 @@ touched, because changing one changes behaviour against the reference binary.
   the two stay comparable. Each kept experiment takes its robot's name.
   Approved: `twoBasesHardlyReducedIS` → `twoBases`; `hammerNiceWalkingFitness` →
   `hammer`; `insectNiceWalkingFitness` → `insect`; `octopusNiceWalkingFitness` →
-  `octopus`; `runnerNiceWalkingFitness` → `runner`.
+  `octopus`; `runnerNiceWalkingFitness` → `runner`;
+  `shortHammerNiceWalkingFitness` → `shortHammer`.
 
 - [ ] **35. Remove the Windows and Visual Studio support.** Decided by Jan
   2026-09-09. It does not build here and nothing tests it.
