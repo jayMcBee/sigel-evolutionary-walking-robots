@@ -301,11 +301,11 @@ printf '%-22s %2d dead (baseline %d -- §2 has the per-signal table)\n' \
 # pixel values, archive and model data that happen to equal 0x0d. They were never line endings, and nothing here treats them as any
 # -- the binary skip below means this gate never even reads them.
 #
-# THE NON-ASCII HALF IS UNCHANGED, in value AND in scope: it still runs over the
-# five extensions that carried the German comments, judged against the root
-# commit, and the binary skip above is deliberately NOT upstream of it. A file
-# that had bytes above 127 and now has none is COUNTED and reported, never
-# failed. That is Phase 0 turning the German comments into English.
+# IT ONLY TESTS LINE ENDINGS. A second half used to count how many files had
+# been converted from the German character set, by reading each file as it was
+# in the first commit. It could not fail, and the source moved to sigel/ in
+# 2026-09-20, so it found nothing and reported every source file as new. Dropped
+# the same day; the conversion figures are in PORTING.md.
 #
 # Written in Python rather than shell: this is byte counting against git, and
 # the first, shell version skipped files silently while reporting a clean pass.
@@ -316,7 +316,6 @@ def git(*a):
     if r.returncode != 0:
         raise SystemExit("git %s failed" % " ".join(a))
     return r.stdout
-base = git("rev-list","--max-parents=0","HEAD").decode().split()[0]
 # -z, NOT the default. Without it git C-quotes any path holding a space, a
 # tab, a quote or a byte above 127 -- "l\303\244tin.txt" -- and open() then
 # fails on the literal quoted string, so four readable files were reported as
@@ -339,7 +338,7 @@ for line in git("ls-files","--eol","-z").decode("utf-8","surrogateescape").split
     w = [t for t in cols[0].split() if t.startswith("w/")]
     if w and w[0] == "w/-text":
         binary.add(cols[-1])
-ok = bad = skip = translated = binfiles = unreadable = 0
+ok = bad = binfiles = unreadable = 0
 for rel in files:
     try: cur = open(rel,"rb").read()
     except OSError: cur = None
@@ -354,14 +353,6 @@ for rel in files:
         print("  %s: CRLF is back (%d pairs)" % (rel, cur.count(b"\r\n")))
     else:
         ok += 1
-    # --- the non-ASCII half, same files and same order as before the inversion ---
-    if not rel.endswith((".cpp",".h",".ui",".exp",".mt")): continue
-    r = subprocess.run(["git","show","%s:%s" % (base, rel)], capture_output=True)
-    if r.returncode != 0: skip += 1; continue      # added after the root commit
-    if cur is None: skip += 1; continue
-    old = r.stdout
-    if any(x > 127 for x in old) and not any(x > 127 for x in cur):
-        translated += 1
 # EVERY TRACKED FILE MUST LAND IN EXACTLY ONE BUCKET. AS THE LOOP IS WRITTEN
 # ABOVE THIS CANNOT FAIL -- the four branches are one if/elif chain over `files',
 # so the identity holds by construction. It is kept anyway, and the honest
@@ -373,23 +364,21 @@ for rel in files:
 if ok + bad + binfiles + unreadable != len(files):
     raise SystemExit("encodings: %d files but %d + %d + %d + %d accounted" %
                      (len(files), ok, bad, binfiles, unreadable))
-print("COUNTS %d %d %d %d %d %d" % (ok, bad, skip, translated, binfiles, unreadable))
+print("COUNTS %d %d %d %d" % (ok, bad, binfiles, unreadable))
 ENCPY
 )
 enc_field() { echo "$enc_out" | sed -n "s/^COUNTS $1.*/\\1/p"; }
 ep=$(enc_field '\([0-9]*\) ')
 ef=$(enc_field '[0-9]* \([0-9]*\) ')
-es=$(enc_field '[0-9]* [0-9]* \([0-9]*\) ')
-et=$(enc_field '[0-9]* [0-9]* [0-9]* \([0-9]*\) ')
-eb=$(enc_field '[0-9]* [0-9]* [0-9]* [0-9]* \([0-9]*\) ')
-eu=$(enc_field '[0-9]* [0-9]* [0-9]* [0-9]* [0-9]* \([0-9]*\)')
+eb=$(enc_field '[0-9]* [0-9]* \([0-9]*\) ')
+eu=$(enc_field '[0-9]* [0-9]* [0-9]* \([0-9]*\)')
 # ZERO, and it stays zero. The tree is LF only since 2026-09-09, so there is no
 # pre-existing damage left to carry: the 25 files 03ac805 stripped are no longer
 # a special case, they are simply what every file looks like now. Never raise
 # this to make a diff go away -- a non-zero count means CRLF has come back.
 ENC_BASELINE=0
 # A FLOOR, because zero failures is also what a check that ran over nothing
-# reports. `git ls-files' returning empty gives COUNTS 0 0 0 0 0 0, whose six
+# reports. `git ls-files' returning empty gives COUNTS 0 0 0 0, whose four
 # numbers are all NON-EMPTY, so the empty-result branch below does not catch it:
 # the gate printed a green row having read no files at all. The helper above now
 # aborts on a non-zero git status, and this floor is the second half -- the tree
@@ -432,8 +421,8 @@ elif [ "$((ep+ef+eb+eu))" -lt "$ENC_FLOOR" ]; then
     # first version printed 0 and added up to 499 phantom passes to `total:'.
     ep=0
 else
-    printf '%-22s %2d LF-only  %2d CRLF, %s binary (git), %s translated, %s postdate root\n' \
-           "encodings" "$ep" "$ef" "$eb" "$et" "$es"
+    printf '%-22s %2d LF-only  %2d CRLF, %s binary (git)\n' \
+           "encodings" "$ep" "$ef" "$eb"
 fi
 pass=$((pass+ep))
 
