@@ -18,6 +18,11 @@ ROOT=$(cd "$(dirname "$0")/.." && pwd)
 [ -f "$ROOT/Makefile" ] && [ -d "$ROOT/checks" ] || {
 	echo "$0: $ROOT is not the repo root -- run the script by its real path,"\
 	     "not through a symlink or a copy" >&2; exit 1; }
+
+# Run from the repo root whatever the caller's directory is: guidrive opens
+# robots/twoBases/twoBases.rrb relative to the process, and this script
+# never cd'd before launching it.
+cd "$ROOT" || exit 1
 B=${1:-build-fast}
 [ $# -le 1 ] || { echo "usage: $0 [build-dir] -- it reads experiments/ and robots/" >&2; exit 1; }
 [ -x "$ROOT/$B/sigel_eval" ] || { echo "no $ROOT/$B/sigel_eval" >&2; exit 1; }
