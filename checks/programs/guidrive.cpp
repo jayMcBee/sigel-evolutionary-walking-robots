@@ -5884,29 +5884,9 @@ static int guidriveMain(int argc, char **argv)
         });
         runEndedBox.start(50);
 
-        // How long does the window go without handling an event? The evolution
-        // runs on the GUI thread and the window answers only when
-        // SIG_GUIGPManager::processInterfaceEvents runs, which
-        // SIG_GPManager::evolutionLoop calls after every 200 ms wait. This timer
-        // asks to fire every 50 ms; the gap it actually sees is the time the
-        // window was dead.
-        QElapsedTimer gapClock;
-        qint64 worstGapMs = 0, gapSamples = 0;
-        QTimer gapProbe;
-        QObject::connect(&gapProbe, &QTimer::timeout, [&]() {
-            const qint64 since = gapClock.restart();
-            if (gapSamples++ && since > worstGapMs) worstGapMs = since;
-        });
-        gapClock.start();
-        gapProbe.start(50);
-
         runClock.start();
         printf("\n  >> clicking Start\n"); fflush(stdout);
         QTest::mouseClick(start, Qt::LeftButton, Qt::NoModifier, start->rect().center());
-        gapProbe.stop();
-        printf("  [responsiveness] worst gap between event pumps: %lld ms over %lld"
-               " samples (the timer asked for 50 ms)\n", worstGapMs, gapSamples);
-        fflush(stdout);
         if (crashProbe) {
             inject.stop();
             flushSigelStreams();
