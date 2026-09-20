@@ -14,26 +14,27 @@
 # make B=build-fast SAN= SIGSAN=   the same thing without the sanitizers, in a
 # separate directory. One evaluation is 0.2 s either way.
 #
-# The vendored tree is not tracked (it comes out of supportingLibs.tar.gz), so
-# our edits to it live in vendor-patches/ and are applied here against a
-# stamp file inside that tree. tar does not delete files it does not carry, so
-# re-extracting the tarball over the tree leaves the stamp behind: rm -rf the
-# vendored tree first, or the build silently keeps objects built from patched
-# sources.
+# The vendored tree is not tracked (it comes out of
+# vendor/supportingLibs.tar.gz), so our edits to it live in vendor/patches/ and
+# are applied here against a stamp file inside that tree. tar does not delete
+# files it does not carry, so re-extracting the tarball over the tree leaves the
+# stamp behind: rm -rf the vendored tree first, or the build silently keeps
+# objects built from patched sources.
 #
-# ONE EXCEPTION: pvm3/ no longer comes from supportingLibs.tar.gz. It is
-# upstream PVM 3.4.6 out of the tracked pvm3.4.6.tgz, and that tarball still
+# ONE EXCEPTION: pvm3/ no longer comes from vendor/supportingLibs.tar.gz. It is
+# upstream PVM 3.4.6 out of vendor/pvm3.4.6.tgz, and that tarball still
 # carries 3.4.3. So after any rm -rf of the vendored tree, restore pvm3/ from
-# pvm3.4.6.tgz as well -- the guard below tells you so if you forget.
+# vendor/pvm3.4.6.tgz as well -- the guard below tells you so if you forget.
 #
 # ALWAYS rm -rf pvm3/ before re-extracting, never extract over it. PVM builds
-# in its own tree, and pvm3.4.6.tgz carries 1997-2007 mtimes -- older than any
-# object. Extracting over the top restores vanilla sources, leaves lib/LINUX64
-# and src/LINUX64 in place, and `make pvm' then says "Nothing to be done" while
-# libpvm3.a still holds objects built from patched sources that are no longer
-# there. The version guard cannot see this: the header still reads 3.4.6.
+# in its own tree, and vendor/pvm3.4.6.tgz carries 1997-2007 mtimes -- older
+# than any object. Extracting over the top restores vanilla sources, leaves
+# lib/LINUX64 and src/LINUX64 in place, and `make pvm' then says "Nothing to be
+# done" while libpvm3.a still holds objects built from patched sources that are
+# no longer there. The version guard cannot see this: the header still reads
+# 3.4.6.
 #
-# vendor-patches/pvm3-*.patch are the nine PVM gets here: one with the four
+# vendor/patches/pvm3-*.patch are the nine PVM gets here: one with the four
 # config lines it needs to build, and every Debian source patch that touches one
 # of the 28 objects PVM compiles. They go through the same stamp as the rest, so
 # nothing below needed changing to pick them up.
@@ -67,7 +68,7 @@ VCXX := g++ -std=c++17 -O1 -g -w -fpermissive -DMINMAX_H $(SAN)
 VCC  := gcc -std=gnu17 -O1 -g -w $(SAN)
 
 STAMP := $(SL)/.sigel-patched
-PATCHES := $(wildcard vendor-patches/*.patch)
+PATCHES := $(wildcard vendor/patches/*.patch)
 
 # PVM: the vendored 3.4.3 was replaced by upstream 3.4.6 -- PORTING.md Phase P.
 # 3.4.3 has no conf/LINUX64.def at all, so it cannot describe this machine.
@@ -75,8 +76,8 @@ PATCHES := $(wildcard vendor-patches/*.patch)
 # line is one of the four config lines Phase P adds, not something the version
 # bump supplies.)
 #
-# Re-extract supportingLibs.tar.gz over the tree and 3.4.3 comes back: tar
-# overwrites but never deletes, the paths and the file count both still look
+# Re-extract vendor/supportingLibs.tar.gz over the tree and 3.4.3 comes back:
+# tar overwrites but never deletes, the paths and the file count both still look
 # right, and nothing errors. So check the version on every make rather than in
 # the patch stamp -- the stamp file survives exactly this accident, which is
 # the same trap the header above warns about for the patches.
@@ -95,7 +96,7 @@ PVM_VERSION := $(shell sed -n 's/^\#define[[:space:]]*PVM_VER[[:space:]]*"\(.*\)
                        $(SL)/pvm3/include/pvm3.h)
 ifneq ($(PVM_VERSION),3.4.6)
 $(error vendored pvm3 is "$(PVM_VERSION)", expected 3.4.6 -- \
-        rm -rf $(SL)/pvm3 && tar xzf pvm3.4.6.tgz -C $(SL) --strip-components=1 ./pvm3)
+        rm -rf $(SL)/pvm3 && tar xzf vendor/pvm3.4.6.tgz -C $(SL) --strip-components=1 ./pvm3)
 endif
 endif
 endif
@@ -123,7 +124,7 @@ VENDOR_LIBS := $(LIB)/libnewmat.a $(LIB)/libdm.a $(LIB)/libcv97.a \
 # -lpvm3 and nothing else, so none of those is built.
 #
 # LINUX64 is hardcoded rather than read from lib/pvmgetarch, because a target
-# name is expanded when this file is read -- before vendor-patches/ has been
+# name is expanded when this file is read -- before vendor/patches/ has been
 # applied, and the aarch64 line is one of those patches. ia64, x86_64 and
 # aarch64 all map to LINUX64 (lib/pvmgetarch:71-74).
 #
@@ -142,7 +143,7 @@ pvm: $(PVM_LIB) $(PVM_D)
 pvm-link: $(B)/pvm_link
 
 # One rule for both products; PVM's own make builds them together. Depending on
-# the patch stamp is what rebuilds this when a vendor-patches/pvm3-*.patch
+# the patch stamp is what rebuilds this when a vendor/patches/pvm3-*.patch
 # changes.
 $(PVM_LIB) $(PVM_D) &: $(STAMP)
 	cd $(PVM_DIR) && PVM_ROOT=$$PWD $(MAKE) s
@@ -340,8 +341,8 @@ $(OBJ)/sigel/%.o: $(SRC)/src/%.cpp $(STAMP)
 #
 # Qt 2 shipped the .ui as <!DOCTYPE UI> with no version attribute; Qt 4.8's
 # uic3 -convert carries that to version="4.0", which Qt 6's uic reads. That
-# conversion happens ONCE, in tools/qtmig, and its result is committed -- the
-# forms in ui/ are Qt 6 forms now, so nothing here needs docker.
+# conversion happened ONCE, in a Qt 4.8 container, and its result is committed
+# -- the forms in ui/ are Qt 6 forms now, so nothing here needs docker.
 #
 # Qt 6's uic emits only Ui::<Form>, a struct with setupUi(). The QWidget-derived
 # class the hand-written subclasses inherit from is a committed source file per

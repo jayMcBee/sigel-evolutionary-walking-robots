@@ -282,8 +282,9 @@ printf '%-22s %2d dead (baseline %d -- §2 has the per-signal table)\n' \
 # printable-byte ratio when there is no NUL. Ask git. Found by review 2026-09-09.
 #
 # Lone CRs are left alone, and NOT because they are Mac-classic line endings --
-# an earlier version of this comment said that and it was wrong. 26 tracked
-# files hold lone CRs and git calls ALL 26 binary: pvm3.4.6.tgz 3859,
+# an earlier version of this comment said that and it was wrong. 27 tracked
+# files hold lone CRs and git calls ALL 27 binary: supportingLibs.tar.gz 26002,
+# pvm3.4.6.tgz 3859,
 # noExperiment.png 691, JustGreen.pnm 2848, altLogo.png 208, Hippie.pnm 208,
 # Stone.pnm 68, and the 20 robot .blend files, 22 to 40 each. Those bytes are
 # pixel values, archive and model data that happen to equal 0x0d. They were never line endings, and nothing here treats them as any
@@ -381,7 +382,7 @@ ENC_BASELINE=0
 # numbers are all NON-EMPTY, so the empty-result branch below does not catch it:
 # the gate printed a green row having read no files at all. The helper above now
 # aborts on a non-zero git status, and this floor is the second half -- the tree
-# holds 670 tracked files, so anything under 500 means the check did not run.
+# holds 665 tracked files, so anything under 500 means the check did not run.
 #
 # IT COUNTS FILES SEEN, NOT FILES THAT PASSED, AND IT IS TESTED LAST. Both
 # matter, and the first version got both wrong. `ep' alone is the LF-only count,

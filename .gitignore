@@ -1,22 +1,24 @@
 # upstream tarballs — re-downloadable from sourceforge.net/projects/sigel
 *.tar.gz
 
-# pvm3.4.6.tgz is deliberately NOT here. It replaces the vendored PVM 3.4.3
-# (PORTING.md Phase P) and netlib is the only host still publishing it: Fedora
-# retired PVM in 2015 and Debian removed it in 2024. Copies survive elsewhere
-# -- Debian's pvm_3.4.6.orig.tar.gz, an AUR PKGBUILD -- but no upstream does.
-# The other tarballs are still on sourceforge, so they stay untracked.
+# The two the build needs are tracked, in vendor/, so a clone builds with no
+# download: vendor/pvm3.4.6.tgz (its extension keeps it out of the rule above)
+# and vendor/supportingLibs.tar.gz (the exception below). netlib is PVM's last
+# host -- Fedora retired it in 2015, Debian removed it in 2024, and the only
+# other copies are Debian's pvm_3.4.6.orig.tar.gz and an AUR PKGBUILD -- and
+# sourceforge is the only other copy of the supporting libraries. Everything
+# else that matches the rule stays untracked, so a new archive here needs
+# `git add -f' or its own exception.
+!vendor/supportingLibs.tar.gz
 
-# extracted 2003 i386 binary, reference only
+# extracted 2003 i386 binary; the tarball and the tree are both gone, and this
+# keeps a re-extract out of `git status'
 xb/
-
-# throwaway header shims from the initial analysis
-
 
 # vendored deps (Qt 2.3, dynamechs, SOLID, cv97, newmat09, qhull, fparser,
 # Dynamo) — separate upstream tarball, out of scope for the Qt port.
-# Add deliberately if the build ever needs them tracked. pvm3/ lives here too
-# but comes from pvm3.4.6.tgz above, not from supportingLibs.tar.gz.
+# Extracted from vendor/supportingLibs.tar.gz. pvm3/ lives here too but comes
+# from vendor/pvm3.4.6.tgz, not from that tarball.
 x/supportingLibs/
 
 # older 1.0 release, not used

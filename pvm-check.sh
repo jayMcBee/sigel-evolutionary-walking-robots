@@ -45,7 +45,7 @@
 # gcc warns about a DIFFERENT overflow in the same function -- pvmd.c:5178
 # sprintf's into a char buf[128] -- but nothing ever reaches it, because the
 # strcpy above aborts first.  None of the 26 Debian patches that apply to 3.4.6
-# fixes either one; the 8 that touch what we compile are in vendor-patches/.
+# fixes either one; the 8 that touch what we compile are in vendor/patches/.
 set -u
 
 ROOT=$(cd "$(dirname "$0")" && pwd)
