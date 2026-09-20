@@ -495,7 +495,7 @@ MASTER_OBJ := $(OBJ)/sigel/SIGEL_GP/SIG_GPExperiment.o
 # counted 45 and passed while linking exactly the wrong variant.
 ctor_size = nm -C -S $(1) | awk '/SIG_GPExperiment::SIG_GPExperiment\(\)$$/{print $$2; exit}'
 
-$(B)/sigel_eval: sigel_eval.cpp $(MOC_OBJS_CORE) $(CLEAN_OBJ) $(CORE_LIBS) $(VENDOR_LIBS)
+$(B)/sigel_eval: checks/programs/sigel_eval.cpp $(MOC_OBJS_CORE) $(CLEAN_OBJ) $(CORE_LIBS) $(VENDOR_LIBS)
 	$(SIGCXX) $(SIGINC) $< $(MOC_OBJS_CORE) $(CLEAN_OBJ) -o $@ \
 	  -Wl,--start-group $(CORE_LIBS) $(VENDOR_LIBS) -Wl,--end-group \
 	  -L$(QTLIB) -lQt6OpenGLWidgets -lQt6OpenGL -lQt6Widgets -lQt6Gui -lQt6Core -lGL -lGLU -lm
@@ -535,7 +535,7 @@ $(B)/sigel_eval: sigel_eval.cpp $(MOC_OBJS_CORE) $(CLEAN_OBJ) $(CORE_LIBS) $(VEN
 PVM_OBJS := $(OBJ)/sigel/SIGEL_GP/SIG_GPFitnessTrainer.o \
             $(OBJ)/sigel/SIGEL_GP/SIG_GPPVMData.o
 
-$(B)/pvm_link: pvm_link.cpp $(PVM_OBJS) $(MOC_OBJS_CORE) $(CORE_LIBS) $(VENDOR_LIBS) \
+$(B)/pvm_link: checks/programs/pvm_link.cpp $(PVM_OBJS) $(MOC_OBJS_CORE) $(CORE_LIBS) $(VENDOR_LIBS) \
                $(PVM_LIB) $(PVM_D)
 	$(SIGCXX) $(SIGINC) $< $(PVM_OBJS) $(MOC_OBJS_CORE) -o $@ \
 	  -Wl,--start-group $(CORE_LIBS) $(VENDOR_LIBS) -Wl,--end-group \
@@ -607,7 +607,7 @@ $(B)/sigel_slave: $(SRC)/src/sigel_slave.cpp $(MOC_OBJS_SLAVE) $(QRC_SLAVE) $(CL
 .PHONY: guidrive
 guidrive: $(B)/guidrive
 
-$(B)/guidrive: guidrive.cpp $(MOC_OBJS) $(QRC_OBJS) $(GUI_LIBS) $(CORE_LIBS) \
+$(B)/guidrive: checks/programs/guidrive.cpp $(MOC_OBJS) $(QRC_OBJS) $(GUI_LIBS) $(CORE_LIBS) \
                $(VENDOR_LIBS) $(PVM_LIB)
 	$(SIGCXX) -DQT_CORE_LIB -DQT_GUI_LIB -DQT_WIDGETS_LIB -DQT_TESTLIB_LIB \
 	  $(SIGINC) -isystem $(QTINC)/QtTest $< $(MOC_OBJS) $(QRC_MASTER) $(QRC_SLAVE) $(MASTER_OBJ) -o $@ \

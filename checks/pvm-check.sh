@@ -93,7 +93,7 @@ cleanup() {
 }
 trap cleanup EXIT INT TERM
 
-cc -I"$PVM/include" "$ROOT/pvm_smoke.c" "$BIN/libpvm3.a" -ltirpc \
+cc -I"$PVM/include" "$ROOT/checks/programs/pvm_smoke.c" "$BIN/libpvm3.a" -ltirpc \
 	-o "$PVM_TMP/pvm_smoke" || exit 1
 
 # pvm_link constructs a SIG_Environment, whose default constructor loads

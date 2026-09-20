@@ -906,7 +906,7 @@ pass=$((pass+sp)); fail=$((fail+sf))
 # leaking into SHAPE. Teeth-tested by disabling both fitness filters (caught)
 # and by blinding the program matcher (caught).
 ep=0; ef=0
-if python3 "$ROOT/expstruct.py" --selfcheck \
+if python3 "$ROOT/checks/programs/expstruct.py" --selfcheck \
        "$ROOT/experiments/twoBases.exp" >/tmp/eps.$$ 2>&1; then
     ep=1
 else
@@ -2115,8 +2115,8 @@ else
         # empty, cmp called them identical, and the gate passed 1/0 with the
         # tool gone. The line count fails on the same input.
         echo "hammer robot block   $(v2eq3 'identical in all three' "$(v2robot "$V2D/ham0.exp")" "$(v2robot "$V2D/ham1.exp")" "$(v2robot "$V2D/ham2.exp")") $(v2robotn "$V2D/ham2.exp") lines $(v2robot "$V2D/ham2.exp")"
-        "$ROOT/expstruct.py" "$V2D/ham1.exp" > "$V2D/e1.txt"
-        "$ROOT/expstruct.py" "$V2D/ham2.exp" > "$V2D/e2.txt"
+        "$ROOT/checks/programs/expstruct.py" "$V2D/ham1.exp" > "$V2D/e1.txt"
+        "$ROOT/checks/programs/expstruct.py" "$V2D/ham2.exp" > "$V2D/e2.txt"
         echo "expstruct ham1==ham2 $(cmp -s "$V2D/e1.txt" "$V2D/e2.txt" && echo yes || echo NO) $(wc -l < "$V2D/e2.txt" | tr -d ' ') lines $(md5sum < "$V2D/e2.txt" | cut -c1-16)"
         for p in 0 1 2; do echo "-- first-save keys, ham$p"; v2keys "$V2D/ham$p.exp"; done
         # octopus: the containers that actually collide. Printed from the LAST
