@@ -102,7 +102,7 @@ endif
 endif
 
 # SOLID and qhull went with the Dynamo backend on 2026-08-28
-# (physics_backends.md). SOLID was the collision library the Dynamo path used;
+# (PORTING.md, "Dynamo removed"). SOLID was the collision library it used;
 # qhull was built only to give SOLID its convex hulls, which is what -DQHULL
 # selected. Measured before removing: zero dt* API calls left anywhere in
 # SIGEL, zero in vendored DynaMechs, and zero qh_* references outside qhull
@@ -212,7 +212,7 @@ $(LIB)/libcv97.a: $(patsubst $(SL)/%.cpp,$(OBJ)/%.o,\
 # Dynamo -- the maths library and what it drags with it. -ldynalib is the name
 # the 2003 link line uses.
 #
-# SIGEL's Dynamo BACKEND was deleted on 2026-08-28 (physics_backends.md), but
+# SIGEL's Dynamo BACKEND was deleted on 2026-08-28 (PORTING.md), but
 # Dynamo is also the maths library the whole of SIGEL is built on: DL_vector,
 # DL_point, DL_matrix, DL_Scalar, 1,101 references across 93 files. So the
 # archive stays; what changes is which of its 60 .cpp go into it.
@@ -412,7 +412,7 @@ $(OBJ)/qrc/%.o: $(B)/qrc/qrc_%.cpp
 
 # The Q_OBJECT classes in core. Their vtable and typeinfo live in the generated
 # code, so without these the link fails on SIG_Simulation. SIG_DynaSystem.h was
-# the third entry until the Dynamo backend was deleted (physics_backends.md).
+# the third entry until the Dynamo backend was deleted (PORTING.md).
 # This was a hand-written list of the two core Q_OBJECT classes. The GUI adds
 # 54 more, and a hand-kept list of 56 is a list that goes stale silently: a
 # missing entry is not a compile error, it is an undefined vtable at link time

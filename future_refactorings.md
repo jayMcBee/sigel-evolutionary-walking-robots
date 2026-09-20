@@ -5,13 +5,15 @@ Independent of the port. Do not combine commits across the two.
 **Protocol:** one commit per item. Jan reviews and approves each. Items 1 and 2
 are mechanical; everything from 3 on is discussed before it lands.
 
-**Status:** `[ ]` open · `[~]` in review · `[x]` done · `[!]` blocked
+**Status:** `[ ]` open · `[~]` in review · `[!]` blocked. **Finished items are
+not kept here.** They move to `PORTING.md`, which is the only log of what was
+done; their numbers stay with them, because other items cite them.
 
 **Counts are stale. Re-measure before acting on any item.** A 2026-09-02 audit
 found item 1 is 6 sites not 7, item 2's lines are 125/505/607, item 5's table
 sums to 322 not 313 and its per-module split has moved hard since Phase C, and
-item 6 is 63 sites not 75. Paths are relative to
-`x/kdesigelSources.1.3/kdesigel/kdesigel/`.
+item 6 is 63 sites not 75. Paths are relative to `sigel/`, the source tree,
+renamed and hoisted 2026-09-20.
 
 **Three things here are proposed, not approved:** the section ordering, item 5's
 per-module split, and item 8's blocked status.
@@ -26,8 +28,10 @@ Constructs the language removed. A current compiler rejects them.
   `<vector.h>` → `<vector>`. `SIG_GPIndividual.cpp`, `MT_GPManager.cpp`,
   `MT_Randomizer.cpp`, `SIG_RobotScanner.cpp`, `SIG_SimulationQueries.h`,
   `SIG_DynaMechsSimulationQueries.h`.
-  Does **not** retire `shim/`: the Makefile puts it on cv97's include path and
-  32 vendored files need it.
+  Does **not** retire `shim/`: the Makefile puts it on every vendored library's
+  include path, and 25 files in the libraries we build include one of the four
+  headers — cv97 16, Dynamo 6, dynamechs 2, newmat09 1. *Re-measured 2026-09-20;
+  this said 32.*
 
 - [ ] **2. `register` keyword** — 3 sites in `SIG_EnvironmentRenderer.cpp`.
   Removed in C++17. Delete the keyword.
@@ -38,10 +42,6 @@ Constructs the language removed. A current compiler rejects them.
   `MT_StatisticsElement`, `MT_Tournament`, `MT_TournamentManager`,
   `MT_TranslatedIndividual`, `MT_Trainingset`. Hoist the declaration.
   The pattern is `for (int i=…){…}` then `i` used after the loop.
-
-- [x] **4. Dynamic exception specifications** — done by the port, Phase A7.
-  Three sites keep them only as `// NOTE: in 2003 this carried…` comments,
-  which item 30 covers.
 
 ---
 
@@ -168,9 +168,9 @@ Constructs the language removed. A current compiler rejects them.
   **Do not translate `Sigel.mak`, `sigel_slave.mak`, `manage_dyn_slave.mak` or
   `Sigel.dsw`** — MSVC-generated German, not built here. Item 35 deletes them.
   Do not hand-edit generated files.
-  **Check after each phase:** `./check.sh`, then
-  `./dictorder-dump.sh | diff -u dictorder-baseline.txt -` empty, then
-  `fitness-check.sh` clean.
+  **Check after each phase:** `./checks/check.sh`, then
+  `./checks/dictorder-dump.sh | diff -u checks/baselines/dictorder-baseline.txt -`
+  empty, then `./checks/fitness-check.sh` clean.
 
 - [ ] **15. Rename the `act` prefix to `current`.** German `aktuell`; reads as
   the verb "act". **`actExperiment` is already done** — 115 sites, renamed
@@ -187,15 +187,15 @@ Constructs the language removed. A current compiler rejects them.
   holds these names.
 
 - [ ] **16. Set the version to 2.0 — the last commit of the port.**
-  The tree disagrees with itself: `configure.in` says
-  `AM_INIT_AUTOMAKE(kdesigel,1.0)` and is the only real declaration, `README`
-  says `KDESIGEL v1.1 Readme File`, the About box in `SIG_InfoBox` prints
-  `Sigel v1.1` and `pixmaps/altLogo.png` carries a `Sigel v1.0` caption. "1.3" exists only in the tarball
-  and directory names. Set `configure.in` and the README, and move both About
-  box and logo or 2.0 ships the same mismatch.
-  **Do not touch `kdevprj_version`** — that is KDevelop's file format version.
-  Nothing prints a version today — `sigel --version` does not exist. Whether it
-  should is a separate decision.
+  The tree disagrees with itself: `README` says `KDESIGEL v1.1 Readme File`, the
+  About box in `SIG_InfoBox` prints `Sigel v1.1`, and `pixmaps/altLogo.png`
+  carries a `Sigel v1.0` caption. "1.3" exists only in the tarball name.
+  **Rewritten 2026-09-20:** `configure.in` used to be the only real declaration
+  and this item said to set it; it went with the 2003 autotools build, so the
+  three above are now the whole story. Move all three or 2.0 ships the same
+  mismatch. **Decide first whether a version is declared anywhere at all** —
+  nothing prints one today, `sigel --version` does not exist, and the honest
+  alternative is that the About box is the only place a user ever sees it.
 
 ---
 
@@ -203,15 +203,6 @@ Constructs the language removed. A current compiler rejects them.
 
 All present in 1.3, none introduced here. Each needs a decision before it is
 touched, because changing one changes behaviour against the reference binary.
-
-- [x] **17. `pvm_probe`'s error return is read as "a message is ready"** —
-  done 2026-09-17, D41. `checkTask` now splits the three returns: above zero
-  receive, zero wait, below zero give up on the task, kill it and re-queue the
-  individual. The old `if (info != 0)` sent an error into the receive branch,
-  where `pvm_recv` blocks for a message that cannot come — and **no
-  `TIMEOUTMINUTES` value rescued it**, because the timeout lives in the `else`
-  branch — or fails and leaves the task record destroyed while every caller in
-  `SIG_GPManager` reads -1 as "not ready yet" and waits for ever.
 
 - [ ] **18. `SIG_GPPVMTask` holds a reference to a host that can be deleted
   under it.** `SIG_GPPVMTask` declares `SIG_GPActivePVMHost &host`;
@@ -240,25 +231,20 @@ touched, because changing one changes behaviour against the reference binary.
 
 ## 7 · The interface
 
-- [x] **21. A run does not notice when the PVM daemon goes away** — done
-  2026-09-17, D41. `pvm_probe` and `pvm_spawn` both report `PvmSysErr`, the
-  trainer records it, and the interface ends the run and says why.
-  **Two ways of detecting it were measured and rejected.** `pvm_mytid` cannot:
-  `BEATASK` is `( pvmmytid == -1 ? pvmbeatask() : 0 )`, so an enrolled task gets
-  its cached tid back without touching the daemon. Watching
-  `$PVM_TMP/pvmd.<uid>` disappear cannot either: a run completed three further
-  generations with that file removed, because an enrolled task keeps its socket.
-  *Signature of the fault: main thread in `hrtimer_nanosleep`, seconds of CPU
-  over hours, no `sigel_slave` at all.*
-
-- [x] **22. Say why a run ended at once** — done 2026-09-17, D42.
-  `SIG_GUIGPExperiment::slotEvolutionStopped` says so when the run completed no
-  generation, nobody stopped it, and `terminationAlreadyMet` finds the condition
-  already true. It names the setting that caused it and the tab to change it on.
-  **Two cases it deliberately does not cover.** MetaGP with `SAVEEXIT` set —
-  which all 14 shipped experiments carry — completes its first generation, so
-  the branch never runs and only the counter moves. And a run that ends for any
-  other silent reason says nothing rather than guess.
+- [ ] **38. Does the poll interval in `evolutionLoop` earn its length?**
+  The wait before `checkTask` carried the comment *"experiments show gain in
+  performance when we add some minor delay"* from 2003, and nobody has measured
+  it here. It is a poll interval: `checkTask` only asks whether a result has
+  arrived, so a longer wait leaves every finished result sitting, and the
+  successor tournament waiting behind it. At 120 individuals a generation that
+  is not a small number.
+  **What little is measured:** cutting it from 300 ms to 200 ms moved one
+  two-generation run from 73.3 s to 69.8 s per generation. One run each, a
+  randomised pool, one machine — that is not a result, only a reason to think
+  the claim is worth testing.
+  **How:** the `evolution` scenario already prints ms per generation and the
+  worst gap between pumps. Sweep the value, hold everything else, repeat enough
+  runs to see past the noise.
 
 - [ ] **23. The window stops answering during a run.**
   `SIG_GUIGPExperiment::slotStartEvolution` runs the whole evolution on the GUI
@@ -360,23 +346,6 @@ touched, because changing one changes behaviour against the reference binary.
   lines carry the whole fact — Qt 6 has one icon size per toolbar, and 25 is the
   largest of the small pixmaps, so nothing is scaled past what 1.3 drew.
 
-- [x] **31. Confirm the run lock is finished** — done 2026-09-18.
-  **No leftovers:** `g_runningEvolutions`, `SIG_GPManager::running()` and
-  `evolutionRunningActionGroup` have no match in `src/`, `include/`, `ui/`,
-  `guidrive.cpp` or `check.sh`. Of the other names holding "running",
-  `evolRunning` and `metaEvolutionRunning` are MetaGP's own run state,
-  `slotEvolutionRunning` is `MT_Controller`'s and `simulationRunning` is the
-  slave's 3D playback — none is a second mechanism.
-  **One mechanism:** `SIG_GUIGPExperiment::evolutionRunning`, read through
-  `SIG_ExperimentListView::isRunning`, and one signal `evolutionNotRunning`
-  driving `SIG_MainWindow::slotEnableEvolutionRunningActions` over 29 actions
-  and the two `slotEvolutionNotRunning` slots.
-  **The one gap is closed.** `startEvolutionAction` and `stopEvolutionAction`
-  had no check; `runlock` now reads both at rest, during a run on the running
-  experiment, and during a run on another experiment. Teeth-tested both ways.
-  That is also what makes the right-click `Stop` crash unreachable — PORTING.md
-  section 9.
-
 - [ ] **32. Twelve redundant `setEnabled` lines.**
   `SIG_GUIGPExperiment::slotStartEvolution` and `slotEvolutionStopped` each set
   six widgets for their own experiment; `slotEvolutionNotRunning` now sets the
@@ -440,34 +409,15 @@ touched, because changing one changes behaviour against the reference binary.
   **Decide first what replaces them** — this machine, or an empty list. An empty
   list makes `slotStartEvolution` run with nowhere to spawn, which is a
   different silent failure from the one D41 and D42 just closed.
-
-- [x] **40. Keep one two-bases experiment; remove the other five, here and on the
-  x86 machine.** Jan judged all six side by side on 1.3 and the port, 2026-09-19,
-  each with its best individual by the port's own scoring: **keep
-  `twoBasesHardlyReducedIS`**; remove `twoBasesHighMutationRate` (a close second),
-  `twoBasesSimpleFitness1`, `twoBasesReducedInstructionSet`,
-  `twoBasesHighCrossOverRate` (the same file as `twoBasesSimpleFitness1`) and
-  `twoBasesSimpleFitness2`. Jan on the last: *"it's broken everywhere and
-  provides no value"* — its individual 0 scores 3.4e-05 on both, and its best
-  (number 78) moved only slightly.
-  **Every one of the five is in `dictorder-baseline.txt` and
-  `fitness-baseline.txt`**, so both move. `twoBasesSimpleFitness1` is also the
-  input of `check.sh`'s `expstruct selfcheck`, and `replicate.sh` names it and
-  `twoBasesHighCrossOverRate` as the identical pair.
-  **`twoBasesSimpleFitness2` is the hard one.** It is the experiment most checks
-  load, so removing it moves them all:
-  in `check.sh` it drives six sections — `gui behaviour`, `real clicks` and
-  `pagesave` through `BEXP`, and `no clipped controls`, `form minimums` and
-  `slave gui`, which name the file directly; `guidrive.cpp` loads it by default;
-  `guibehaviour-baseline.txt` names it 24 times, `xtest-baseline.txt` 2,
-  `fitness-baseline.txt` 3, and `dictorder-baseline.txt` has its section.
-  **`pagesave-baseline.txt` was 1.3's own output for this file**, and the port
-  matched it. It now holds the port's own save of `twoBases.exp`; no new
-  capture from the oracle — see item 44.
-  Removing it also ends item 39's conflict over this file.
-  **Done on both machines 2026-09-19.** On the x86 machine with Jan's approval
-  there; its seven files hash as ours. Its copy of all 14 as downloaded is
-  `/home/debian/sigel-shipped-original-2026-09-19/`.
+  **RAISED IN PRIORITY 2026-09-20**, Jan: the files are public on GitHub, and
+  they carry the 2003 authors' names in paths such as `/home/pg368/sawitzki/…`.
+  Do it **on both machines**, the same replacements, so the two stay comparable —
+  the rule items 40, 44 and 46 followed. Talk the plan through and get Jan's
+  approval before any file changes, here or on the x86 machine. The old warning
+  about copying the data trees first is met: `experiments/` and `robots/` are
+  tracked now. Two more things to check rather than assume: `replicate.sh`
+  hashes whole files for its duplicate detection, and `expstruct.py` fingerprints
+  them, so run checks 2 and 3 before and after.
 
 - [ ] **41. The simulation viewer starts too close, and follows the robot.** Jan,
   2026-09-19: *"On both machines and SIGEL versions we're defaulting to trace
@@ -500,56 +450,18 @@ touched, because changing one changes behaviour against the reference binary.
   the call may reach no context; and ambient light has no effect while lighting
   is off, which may be so in wireframe mode. Not yet compared with 1.3.
 
-- [x] **44. Keep one octopus experiment; remove `octopusSimpleFitness`, here and
-  on the x86 machine.** Jan, 2026-09-19: *"once again two octopus experiments -
-  ok, we'll keep only one! the first one, the current one is a failed/early
-  run"*. Keep `octopusNiceWalkingFitness`, judged a keeper side by side with
-  individual 13. The same wait as item 40: not before every experiment has been
-  judged, and not unasked.
-  **What names it:** `fitness-baseline.txt` (3 lines), `dictorder-baseline.txt`
-  (its section) and `check.sh`'s v2 round trip, which loads it as `V2OCT` for the
-  containers that collide.
-  **That check compares against 1.3's own output for this file**, in
-  `verification-against-sigel-1.3/v1-1.3-roundtrip.txt`, and the port matches it.
-  The two octopus robot blocks differ — sha256 `2b56be22…a2d1` against
-  `8934a27c…fc2d` for `octopusNiceWalkingFitness` — so the kept file has no 1.3
-  capture. It needs none: moved to the kept file, the check takes the port's own
-  output as its reference. Jan, 2026-09-19: *"since it passes why do we keep
-  re-checking a known fact? Future refactorings only need to check against the
-  now-proven Qt6 baseline"*. The same holds for item 40.
-  The 2026-09-18 oracle measurements named "octopus" in PORTING.md were taken on
-  this file; they stay as the record of what was measured.
-  **Done on both machines 2026-09-19.** On the x86 machine with Jan's approval
-  there; its seven files hash as ours. Its copy of all 14 as downloaded is
-  `/home/debian/sigel-shipped-original-2026-09-19/`.
-
-- [x] **45. Keep one runner experiment; remove `runnerSimpleFitness`, here and on
-  the x86 machine.** Jan, 2026-09-19, judging it side by side with individual 30:
-  *"to be removed, the first one was the better experiment"*. Keep
-  `runnerNiceWalkingFitness`. The same wait as item 40.
-  **What names it:** `fitness-baseline.txt` (3 lines) and
-  `dictorder-baseline.txt` (its section). No check loads it.
-  `verification-against-sigel-1.3/` holds oracle measurements on it; they stay as
-  the record of what was measured.
-  **Done on both machines 2026-09-19.** On the x86 machine with Jan's approval
-  there; its seven files hash as ours. Its copy of all 14 as downloaded is
-  `/home/debian/sigel-shipped-original-2026-09-19/`.
-
-- [x] **46. Rename the kept experiments to their base names, here and on the x86
-  machine.** Jan, 2026-09-19: the names carry notes added run by run as a kind of
-  versioning, such as the fitness function used; *"when we're done with our
-  review we need to strip all such versioning and just keep the base names! We'll
-  do this interactively, you suggest and I approve."* One name at a time, after
-  the review and after items 40, 44 and 45. Both machines use the same names, so
-  the two stay comparable. Each kept experiment takes its robot's name.
-  Approved: `twoBasesHardlyReducedIS` → `twoBases`; `hammerNiceWalkingFitness` →
-  `hammer`; `insectNiceWalkingFitness` → `insect`; `octopusNiceWalkingFitness` →
-  `octopus`; `runnerNiceWalkingFitness` → `runner`;
-  `shortHammerNiceWalkingFitness` → `shortHammer`; `walkerNiceWalkingFitness` →
-  `walker`. All seven approved 2026-09-19.
-  **Done on both machines 2026-09-19.** On the x86 machine with Jan's approval
-  there; its seven files hash as ours. Its copy of all 14 as downloaded is
-  `/home/debian/sigel-shipped-original-2026-09-19/`.
+- [ ] **47. Modernise the two launcher scripts in the 1.3 tree.** Jan,
+  2026-09-20. `sigelLauncher` and `sigelDynClient` still set up a 2003 Solaris
+  machine: `uname = SunOS` branches, `QTDIR=/app/unido-inf/sun4_56/libqt/2.30/`,
+  `PVM_ROOT=/usr/lib/pvm3`, a `tcsh` shebang, and the Dortmund host names item 39
+  removes from the experiments. **Modernise in place, do not replace:** both
+  serve features the port still has — `sigel.cpp` still accepts `-devolve` /
+  `-de`. `sigelLauncher` becomes: set `SIGEL_ROOT` to the source tree and
+  `PVM_ROOT` to the vendored `pvm3`, then run the built program — which is what
+  every check does inline today and what a person otherwise sets by hand.
+  **When:** after the source tree is hoisted and renamed, so the paths are final.
+  `sigelDynClient` needs a second machine to prove it on; the 1.3 reference
+  machine is not ours to use for tooling, so that half waits until there is one.
 
 - [ ] **35. Remove the Windows and Visual Studio support.** Decided by Jan
   2026-09-09. It does not build here and nothing tests it.
@@ -590,9 +502,10 @@ touched, because changing one changes behaviour against the reference binary.
   The `winskip` counter behind that line goes with them, and its line
   disappearing will look like a lost check unless it is done knowingly.
   **It moves a pinned check total:** the 11 deleted files are counted by the
-  `encodings` check, so `check.sh` goes from 1168 pass to 1157. PORTING.md pins
-  that number three times — the per-step exit criterion in §7, the Handover's
-  note on uncommitted work and the check list. Move all three in the same commit.
+  `encodings` check, so `check.sh` goes from 1097 pass to 1086. PORTING.md pins
+  that number in three places — the per-step exit criterion in §7, the
+  Handover's note on uncommitted work and the check list — and its trail in §7
+  records each step. Move all of them in the same commit.
   **Do not mix it with any other change. When:** after the MetaGP guard step and
   its review.
 
@@ -613,36 +526,6 @@ touched, because changing one changes behaviour against the reference binary.
   `MT_Controller` runs an evolution on its own thread. Not new — they interleaved
   in `Terrain.ter` itself before the atomic write — and closing it needs per-call
   state, which the port may not add.
-
----
-
-## Not doing
-
-Decisions, not work. Each is settled; reopen only with a reason.
-
-- **Restore Qt 2's spin-box editing.** D28. Reachable only by typing a number
-  outside a box's range, the value is visible before anything is saved, and the
-  cost is owning a custom widget for ever. Current behaviour is pinned in
-  `guibehaviour-baseline.txt`. The worked-out `SIG_SpinBox` subclass, the three
-  cheaper routes that were measured and rejected, and the 47-widget promotion
-  plan are in this file's history at `1dba5f4`.
-- **The history block grows by one line per individual per save.** Confirmed on
-  the 1.3 binary; the port reproduces it exactly, which is the correct outcome.
-  Recorded so nobody "fixes" it and silently diverges. If it is ever changed
-  deliberately, that is a product decision and needs a note in PORTING.md saying
-  the port stopped matching 1.3 on purpose.
-- **A lower bound on the terrain index in DynaMechs.** Vendored code is not
-  touched.
-- **Validating the terrain header in `SIG_Environment`.** After the atomic
-  write, nothing in the tree produces a `Terrain.ter` that exists and does not
-  parse, and the guard would have to be repeated in the second reader,
-  `SIG_DynaMechsSimulationData`, which this port does not touch.
-- **The malformed-picture-file branch of `generateTerrain`.** Reached only with
-  `FLOORFUNCSELECTED 0`; `operator>>(istream &, string &)` leaves its string
-  unchanged when the sentry fails, so the previous token is reused and the
-  terrain header comes out malformed. No P2 file exists in the repository and all
-  14 shipped experiments have an empty `FLOORPICTUREFILE`, so a fix would be code
-  no check could exercise. Reopen only if a picture-file experiment ever exists.
 
 ---
 

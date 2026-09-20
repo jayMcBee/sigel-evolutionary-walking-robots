@@ -382,7 +382,7 @@ ENC_BASELINE=0
 # numbers are all NON-EMPTY, so the empty-result branch below does not catch it:
 # the gate printed a green row having read no files at all. The helper above now
 # aborts on a non-zero git status, and this floor is the second half -- the tree
-# holds 601 tracked files, so anything under 500 means the check did not run.
+# holds 600 tracked files, so anything under 500 means the check did not run.
 #
 # IT COUNTS FILES SEEN, NOT FILES THAT PASSED, AND IT IS TESTED LAST. Both
 # matter, and the first version got both wrong. `ep' alone is the LF-only count,
@@ -623,7 +623,7 @@ pass=$((pass+kp)); fail=$((fail+kf))
 # A freed pointer kept behind a guard that still passes.
 #
 # SIG_Simulation's constructor throws whenever SIMULATIONLIBRARY names the
-# Dynamo backend, which physics_backends.md deleted on 2026-08-28. That throw
+# Dynamo backend, deleted on 2026-08-28 (PORTING.md, "Dynamo removed"). That throw
 # unwinds out of visualizeThis() BETWEEN the `delete visualisation;' and the
 # assignment meant to replace it, so without an explicit null the member keeps
 # the pointer it just freed. Twenty-one sites dereference it behind fourteen

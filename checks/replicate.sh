@@ -6,8 +6,8 @@
 #
 # THE ORACLE IS SIGEL 1.0, NOT THE 1.3 SOURCE BEING PORTED. The published
 # .exp files are dated August-September 2001; 1.0 was rolled 2001-09-06 and
-# 1.3's ChangeLog starts 2001-12-18. Every 1.0 -> 1.3 change is a confound in
-# this comparison -- see PORTING.md §7.
+# 1.3's CVS vendor import is dated 2001-12-18. Every 1.0 -> 1.3 change is a
+# confound in this comparison -- see PORTING.md §7.
 #
 # Byte-identical files are detected and reported once.
 #

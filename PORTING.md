@@ -29,7 +29,8 @@ build and run, because nothing else can be verified without it — see §3.
 | A — core onto Qt 6 | **done**, tags `step-A0`…`step-A9` |
 | B — ownership explicit | **subsumed by Phase D**, which deletes the containers rather than converting them. **0 `setAutoDelete` calls left in core**, re-measured 2026-08-30 after D25c: D11 removed the last in `SIGEL_Robot`, D24 the last in `MT_Control`, D25b replaced the two `fitTaskList` calls with an RAII guard, and D25c wrote out `tours`' two real frees at their sites. **0 tree-wide as of 2026-09-05** — every remaining `autoDelete` mention is a comment explaining what the Qt 2 original did |
 | R — build and run | core builds and runs. **No longer checked only against itself** — Phase V has confirmed both the ordering and the arithmetic against the 1.3 binary, §7 |
-| T — old-Qt tool container | **done 2026-08-27.** `tools/qtmig`, §4 |
+| T — old-Qt tool container | **done 2026-08-27**, §4. `tools/` removed
+2026-09-20; the forms it converted are committed |
 | D — delete the shim, migrate the data | **DONE 2026-08-30.** `q2compat.h` and `q2compat_check.cpp` deleted; `include/compat/` gone; **no `Q2*` shim type is used anywhere**. D1–D27. *D27 once said 71 lines of Qt 2 containers survived for Phase C to convert. **Phase C is done and none survive**: re-measured 2026-09-05, five textual mentions remain in the GUI modules and all five are comments.* The shim's self-check step is gone from `check.sh`. §10 |
 | P — PVM | **DONE 2026-08-28.** Vendored 3.4.3 replaced by upstream 3.4.6; nine patches carry the four config lines and Debian's eight source fixes; `libpvm3.a` and `pvmd3` build; SIGEL's two PVM objects link against them and `SIG_GPPVMData` round-trips through real PVM. `sigel`/`sigel_slave` still need Phase C. §7 |
 | C — GUI | **DONE.** C1–C10, C11a–C11d, C12. *The API conversion is complete — zero Qt 2 spellings in live code, swept 2026-09-05.* All 20 Designer forms converted; five GUI modules build as archives; both programs link and run; 100 dead `connect()`s repaired, tree-wide count 0. Nine port defects were found by DRIVING the interface that reading it could not see — `clear()` emitting a signal Qt 2 blocked and killing the app on a large delete, an eaten ampersand, a dead `key()` virtual, `truncate(-1)`, a pre-filled field Qt 6 selects and Qt 2 did not, ten unpinned validators in `MT_GUI`, and three in the Create-constants dialog that reached generated data. Detail in §9 |
@@ -38,7 +39,7 @@ build and run, because nothing else can be verified without it — see §3.
 **SCOPE — DECIDED 2026-08-23. Read this before changing anything.**
 
 **The reference for this port is SIGEL 1.3 and nothing else.** The 1.3 source in
-`x/kdesigelSources.1.3/` and the 1.3 binary running on the x86 box, reachable
+`sigel/` and the 1.3 binary running on the x86 box, reachable
 through the `sigel-x86` Claude session. A port must not change results, so the
 target is that our build reproduces what the 1.3 binary does.
 
@@ -83,7 +84,8 @@ So every rounding decision is glibc's. Qt 6 formats doubles itself, through
 
 Both non-default calls are 1.3's own, so the port carried them faithfully.
 
-**Tie rates, `tiecheck.cpp` at the repo root.** Ties live at precision 5:
+**Tie rates**, measured with `tiecheck.cpp`, removed 2026-09-20 and recoverable
+from git history. Ties live at precision 5:
 
 | sample | prec 5 | prec 6 | prec 50 |
 |---|---|---|---|
@@ -150,7 +152,7 @@ ported interface has nothing to drive.
 
 1. ~~Build core plus a small program that runs one fitness evaluation, under
    AddressSanitizer.~~ **Done.**
-2. ~~**Stand up the old-Qt container**~~ — **done**, `tools/qtmig`. §4.
+2. ~~**Stand up the old-Qt container**~~ — **done**. §4. Removed 2026-09-20.
 3. ~~**Get a reference from the 1.3 binary**~~ — **V1 and V5's MDH probe done,
    both pass.** This was item 1's missing half and is no longer outstanding.
 4. **Phase D — delete the shim.** **DONE 2026-08-30, D1–D27.** The data
@@ -183,7 +185,7 @@ found a real defect.** §0 has the rule; it is not optional.
 
 ## 0. Working on this
 
-- Source root: `x/kdesigelSources.1.3/kdesigel/kdesigel/`
+- Source root: `sigel/`
 - ~~The shim: `include/compat/q2compat.h`; its self-check:
   `include/compat/q2compat_check.cpp`~~ **Both deleted in D27.** Recover them
   from git history if you need the Qt 2 semantics they recorded — see D27 for
@@ -191,18 +193,17 @@ found a real defect.** §0 has the rule; it is not optional.
 - Build: `make` at the repo root gives `build/sigel_eval` under ASan and UBSan.
   `make B=build-fast SAN= SIGSAN=` gives an unsanitised build about 15x faster,
   in its own directory.
-- Verify: `./check.sh` from the repo root compiles every module and header.
+- Verify: `./checks/check.sh`, from anywhere, compiles every module and header.
   Takes several minutes, and **exits non-zero if anything fails or is skipped**.
   *This said "it runs no code", which was true between D27 and Phase C.* It now
   runs `sigel_slave`, a headless GUI structure probe, and `guidrive` through
-  eleven scenarios plus two locale re-runs. Further execution is in `./fitness-check.sh`,
-  which runs `sigel_eval -selfcheck`.
-- PVM: `make pvm && make pvm-link`, then `./pvm-check.sh` starts a daemon and
-  runs both round trips. Not one of the three checks below — it has no baseline,
-  it is PASS/FAIL.
-- Run the published experiments: `./replicate.sh build-fast`. Read the scope
-  note at the top of this file first — those experiments are from SIGEL 1.0 and
-  do not test this port.
+  eleven scenarios plus two locale re-runs. Further execution is in
+  `./checks/fitness-check.sh`, which runs `sigel_eval -selfcheck`.
+- PVM: `make pvm && make pvm-link`, then `./checks/pvm-check.sh` starts a daemon
+  and runs both round trips. It has no baseline: it is PASS/FAIL.
+- Run the published experiments: `./checks/replicate.sh build-fast`. Read the
+  scope note at the top first — those experiments are from SIGEL 1.0 and do not
+  test this port.
 - **After every step, an independent agent reviews the diff with fresh eyes.**
   Not optional — every round so far has found a real defect, and a compile check
   proves nothing about ownership.
@@ -214,11 +215,11 @@ found a real defect.** §0 has the rule; it is not optional.
   and confirm the check aborts. Nine assertions have passed on broken code.
   *This rule was written for the shim self-check, deleted in D27; it applies
   unchanged to its successor.*
-- Sibling docs, both independent of this port: `future_refactorings.md` (C++
-  language level) and `physics_backends.md` (**decided and executed 2026-08-28**:
-  the Dynamo backend is deleted, the Dynamo maths library stays).
-  Do not mix their commits with this work. Third sibling:
-  `regression_1.0_to_1.3.md`, deferred until the port is done.
+- **This file is the only log of what was done, besides git.** Jan, 2026-09-20.
+  Anything that records finished work belongs here, not in a new file.
+  `future_refactorings.md` holds the to-do list and nothing else.
+  `regression_1.0_to_1.3.md` is deferred analysis of that regression, and is not
+  touched. `physics_backends.md` was folded into this file on 2026-09-20.
 
 ---
 
@@ -226,45 +227,58 @@ found a real defect.** §0 has the rule; it is not optional.
 
 ```
 /home/jan/Downloads/sigel/
-├── PORTING.md                              this file
-├── check.sh                                per-file compile check, §7
-├── dictorder-dump.sh                       dictionary-order check, §7
-├── expstruct.py                            structural fingerprint of an .exp, C11
-├── guidrive.cpp                            the GUI behaviour harness, 33 scenarios
-├── fitness-check.sh                        fitness check, §7
-├── pvm-check.sh                            does PVM run? Phase P, P3 and P4
-├── pvm_link.cpp                            SIGEL's PVM objects vs real PVM
-├── pvm_smoke.c                             one PVM round trip, driven by it
-├── replicate.sh                            runs the published experiments, §7
 ├── Makefile                                the build, §7 Phase R
-├── sigel_eval.cpp                          one fitness evaluation, §7 Phase R
-├── future_refactorings.md                  sibling doc, independent of the port
-├── physics_backends.md                     sibling doc, independent of the port
+├── PORTING.md                              this file
+├── future_refactorings.md                  the to-do list this work defers into
 ├── regression_1.0_to_1.3.md                sibling doc, DEFERRED
-├── vendor-patches/                         12 patches to the vendored tree
-├── shim/                                   pre-standard C++ headers
-├── build/                                  untracked, removed by `make clean`
-├── experiments/                            the 7 kept experiments, tracked
-├── robots/                                 the 7 robots: .rrb, .wrl, .blend, tracked
-├── kdesigelSources.1.3.tar.gz              upstream source (2003-04-30)
-├── supportingLibs.tar.gz                   vendored deps
-├── kbin.tar.gz                             2003 i386 binary, reference only
-├── pvm3.4.6.tgz                            upstream PVM, tracked -- Phase P
-├── x/kdesigelSources.1.3/kdesigel/kdesigel/
+├── checks/                                 the four gates and replicate, §7
+│   ├── check.sh                            compiles every module and header,
+│   │                                       runs the interface. The gate
+│   ├── dictorder-dump.sh                   prints the container order; the
+│   │                                       check is the diff vs its baseline
+│   ├── fitness-check.sh                    21 fitness values, and -selfcheck
+│   ├── pvm-check.sh                        does PVM run? Phase P, P3 and P4
+│   ├── replicate.sh                        the 1.0 experiments; not a gate
+│   ├── baselines/                          the six files the gates diff against
+│   └── programs/
+│       ├── guidrive.cpp                    the GUI harness, 33 scenarios
+│       ├── sigel_eval.cpp                  one fitness evaluation
+│       ├── expstruct.py                    fingerprint of an .exp, C11
+│       ├── pvm_link.cpp                    SIGEL's PVM objects vs real PVM
+│       └── pvm_smoke.c                     one PVM round trip
+├── sigel/                                  the 2003 source and its data
 │   ├── src/       15 module dirs           ~40k LOC
 │   ├── include/   15 module dirs           ~25k LOC
-│   └── ui/        20 .ui files             Qt 2 Designer format
-├── x/supportingLibs/supportingLibs/        Qt 2.3, dynamechs, cv97, newmat09,
-│                                           fparser, pvm3, Dynamo (maths only),
-│                                           SOLID + qhull (present, not built)
-└── xb/                                     extracted 2003 binary
+│   ├── ui/        20 .ui files             Qt 2 Designer format
+│   ├── pixmaps/  textures/                 loaded at run time by name
+│   ├── Terrain.ter  stdConf.mt             run-time data
+│   ├── doc/                                2 Doxygen settings files, 2003
+│   ├── sigelLauncher  sigelDynClient       2003, item 47
+│   ├── povrayLauncher                      renders the POV-Ray export
+│   ├── COPYING  README  kdesigel.doxygen   upstream, 2003
+│   └── 9 Windows build files               future_refactorings.md item 35
+├── vendor/                                 third-party code and our fixes to it
+│   ├── patches/                            12 patches, applied by `make`
+│   ├── supportingLibs.tar.gz               tracked, so a clone builds offline
+│   └── pvm3.4.6.tgz                        upstream PVM, tracked -- Phase P
+├── experiments/                            the 7 kept experiments, tracked
+├── robots/                                 the 7 robots, tracked
+├── shim/                                   4 pre-standard C++ headers
+├── verification-against-sigel-1.3/         the 1.3 captures, Phase V
+├── build/  build-fast/                     untracked, removed by `make clean`
+└── x/                                      UNTRACKED ONLY
+    ├── supportingLibs/supportingLibs/      dynamechs, cv97, newmat09, fparser,
+    │                                       pvm3, Dynamo (maths only). Extracted
+    │                                       from vendor/, then patched by `make`
+    └── sigelSourceDistribution.1.0/        the 1.0 release, for the regression
 ```
 
 Pristine source tagged `v1.3-pristine`. Everything diffs against it.
 
 SIGEL, Uni Dortmund LS11, 2001–2003, GPLv2. Genetic programming evolves walking
-gaits for simulated robots. Despite the name "KDESIGEL" there is **no KDE
-dependency** — zero `k*.h` includes. Plain Qt 2.3.
+gaits for simulated robots. Upstream called it "KDESIGEL" and there is **no KDE
+dependency** — zero `k*.h` includes — so the source folder is `sigel/`, renamed
+2026-09-20, when it was hoisted out of its three levels of nesting.
 
 ---
 
@@ -383,7 +397,7 @@ and near-misses that must not, including a converted
 |---|---|
 | Core files needing **no** container work | **210 of 266** |
 | Core files touching dead Qt 2 containers | 56 — worst is `SIG_Robot.cpp` (30) |
-| `Q_OBJECT` in core | **3** — `SIG_Simulation`, `MT_GPManager`, `MT_Controller`. Was 4; `SIG_DynaSystem` went with the Dynamo backend, `physics_backends.md` |
+| `Q_OBJECT` in core | **3** — `SIG_Simulation`, `MT_GPManager`, `MT_Controller`. Was 4; `SIG_DynaSystem` went with the Dynamo backend, §7 |
 | Core files touching dialogs | 7 |
 | Core → GUI back-edges | 4 edges, 5 includes |
 
@@ -441,9 +455,10 @@ project already has the precedent: the 2003 i386 binary runs against Debian
 woody libraries on the x86 box (§9).
 
 **`qt20fix` is not a Qt 2 → Qt 3 tool**, and nobody should go looking for one.
-It is Qt 2's own Qt **1.x** → Qt **2.x** script; the proof is vendored here —
-`x/supportingLibs/supportingLibs/qt/src/doc/porting.doc` is headed *"Help with
-porting from Qt 1.x to Qt 2.x"* and line 156 points at `qt/bin/qt20fix`. The
+It is Qt 2's own Qt **1.x** → Qt **2.x** script; the proof is `src/doc/porting.doc`
+in the Qt 2.3 source, headed *"Help with porting from Qt 1.x to Qt 2.x"*, whose
+line 156 points at `qt/bin/qt20fix`. That extract was deleted 2026-09-20 and is
+in `vendor/supportingLibs.tar.gz`. The
 "20" is "2.0". **Qt never shipped a Qt 2 → Qt 3 converter at all**; Qt 3's
 porting guidance is a manual change list plus the `QT_COMPAT` headers.
 
@@ -523,10 +538,10 @@ D20 supersedes D5, D24 supersedes D3.
 | # | Decision | Answer |
 |---|---|---|
 | **D27** *(decision; §10 also has a **step** D27, the shim deletion — the two D-series overlap and this is the first collision)* | The duplicate MetaGP `A&bout` | **removed**, with its trailing separator. Present in 1.3 and verified there; wired to the same `slotAbout()` as `Help > About` and opening the identical `SIG_InfoBox`. The port's first intentional difference from 1.3. `Help > About` untouched |
-| **D28** | The `QSpinBox` over-range divergence (C11a) | **accepted, not fixed.** 1.3 accepts out-of-range digits and clamps on commit; the port refuses the keystroke and commits a truncated prefix. It is reachable **only by typing a number outside the box's own range**, and the differing value is **visible in the box** before anything is saved — 1.3 shows 99, the port shows 10. Contrast what the port did fix: `clear()` killed the application, the ampersand rendered wrong, a negative width silently wrote no file — all reachable with valid use. The fix is not the 33 lines of it, it is **owning a custom widget forever**: every future form edit and every new spin box must remember `SIG_SpinBox` or silently opt out. Pinned in `guibehaviour-baseline.txt` (`commits=`) so it cannot drift; the prototype and the measured comparison are in `future_refactorings.md`'s history at `1dba5f4`, and its "Not doing" list points there. **Revisit if** a dialog spin box turns out to feed something unvalidated, or if anyone actually hits it |
+| **D28** | The `QSpinBox` over-range divergence (C11a) | **accepted, not fixed.** 1.3 accepts out-of-range digits and clamps on commit; the port refuses the keystroke and commits a truncated prefix. It is reachable **only by typing a number outside the box's own range**, and the differing value is **visible in the box** before anything is saved — 1.3 shows 99, the port shows 10. Contrast what the port did fix: `clear()` killed the application, the ampersand rendered wrong, a negative width silently wrote no file — all reachable with valid use. The fix is not the 33 lines of it, it is **owning a custom widget forever**: every future form edit and every new spin box must remember `SIG_SpinBox` or silently opt out. Pinned in `guibehaviour-baseline.txt` (`commits=`) so it cannot drift; the prototype and the measured comparison are in `future_refactorings.md`'s history at `1dba5f4`, and the "Not doing" list in §7 points there. **Revisit if** a dialog spin box turns out to feed something unvalidated, or if anyone actually hits it |
 | **D29** *(signed off 2026-09-04)* | Changing run parameters **while an evolution is running** | **FORBIDDEN in the port, whatever 1.3 permits.** The reason is the specification, not 1.3: *"that's not how GAs/GPs are commonly implemented"* — the parameters define the run. **The port's second intentional divergence**, after D27. **Implementation, and the wrong versions it went through, are in §10 — read that before changing the guard** |
 | **D30** *(signed off 2026-09-07)* | The mid-run lock's first two holes | **A run check belongs wherever an action is RE-ENABLED, not only where it is disabled.** `SIG_MainWindow::slotEnableNoExperimentActions` handed 24 run-locked actions back on a tree click, and `New Experiment` and `Open Experiment` were in no lock list at all. Both measured by reverting the fix and re-running `runlock`. The pattern for any further route: a run check where the action is re-enabled, plus the action in `evolutionRunningActions`, plus a `runlock` case with a positive control. **Its own section is in §7, "D30 — parameter changes during a run are forbidden"**, and D30a is the hole it missed |
-| **D31** *(signed off 2026-09-09)* | Line endings | **LF ONLY, tree-wide. No more DOS.** Jan's decision, and it overrides the guard that existed to prevent it. **100 files under `x/kdesigelSources.1.3` converted, 17,750 CRLF pairs.** **The conversion is line endings only except for two bytes, and `git diff --ignore-cr-at-eol` is NOT what proves it** — that flag strips a trailing CR from *both* sides, so it would equally hide a CRLF being *introduced*. The proof is a direct comparison of every one of the 100 files: `re.sub(rb"\r+\n", b"\n", git show HEAD:f) == working file`, exact, with no `\r` surviving anywhere. Zero anomalies. **Two lines of `sigel_slave.mak` are the one real content change**, and calling them line endings flatters them: `:598` and `:647` ended `\r\r\n`, so the byte removed is an INTERIOR one — under NMAKE that trailing CR is part of the variable's value. The `\r+` in the proof above is what swallows the case, so the proof cannot tell it from a line ending; it is called out here instead. Nothing else in the tree has a run of two. **Binaries are excluded and this is not cosmetic** — three tracked binaries hold 12 incidental `\r\n` byte pairs (`pvm3.4.6.tgz` 9, `altLogo.png` 2, `noExperiment.png` 1), and a blind repo-wide replace would corrupt all three. Extensions touched: 36 `.cpp`, 35 `.h`, 19 `.xpm`, 5 `.dsp`, 3 `.mak`, 1 `.mt`, 1 `.dsw`. **No `.exp` and no `.ui`**, so no reference artefact was touched. **Lone CRs are left alone, and NOT because they are Mac-classic line endings** — the first version of this row said that and it was wrong. Six tracked files hold lone CRs and git calls **all six** binary, so this check never even reads them: `pvm3.4.6.tgz` 3859, `noExperiment.png` 691, `JustGreen.pnm` 2848, `altLogo.png` 208, `Hippie.pnm` 208, `Stone.pnm` 68. All five `.pnm` are **P6 raw raster**: those bytes are pixel values that happen to equal `0x0d`. They were never line endings. **The `encodings` check was turned round in the same commit**, so that commit is not line endings alone — `check.sh`, `PORTING.md` and `future_refactorings.md` change with it. The check used to say *a file that HAD a CR must still have one*, with `ENC_BASELINE=25`; it now says **no tracked text file may carry CRLF**, expected zero, reads every tracked file rather than five extensions present in the root commit, lists them with `-z` so a C-quoted path cannot break `open()`, and reconciles — every file lands in exactly one of ok / CRLF / binary / unreadable, or it aborts. **It asks `git ls-files --eol` what is binary rather than testing for a NUL byte**, because the NUL test got two files wrong: `Hippie.pnm` has no NUL in its 196,668 bytes and `UniDo_LSXI.pnm`'s first NUL is at offset 15,456, so both were judged as text and passed only by luck. **Read the `w/` column, not `i/`**: while this change was being made, `sigel_slave.mak`'s index blob read `i/-text` — HEAD still held its two `\r\r\n`, which git's own heuristic calls binary — against a working file of `w/lf`, and testing both columns dropped a real text file out of the check. **Both columns read `lf` once this is committed, so the demonstration is gone and only the rule survives.** Reads 610 text files and 8 binaries. **A floor of 500 was added**, because zero failures is also what a check that read nothing reports: a dead `git ls-files` gave `COUNTS 0 0 0 0 0 0`, two non-empty numbers, which the fail-closed branch did not catch. Teeth-tested: CRLF into a `.cpp` and into `sigel_slave.mak` both caught and named, CRLF into a texture correctly ignored, and all seven branch states driven by hand — including a **tree-wide** CRLF regression, which the first version of the floor misreported as *"it did not run"* with one failure instead of 611, and a below-floor count, which the first version printed as `0 pass` while adding up to 499 passes to the total. Both found by review 2026-09-09. The bucket reconciliation is a tautology as the loop is now written and is **not** counted as coverage; it is kept only so the earlier bare-`continue` shape cannot come back. **`SIGEL_ROOT` is the source tree**, so `stdConf.mt` and the 19 `.xpm` pixmaps the conversion touched are the very files the GUI checks load at runtime; the `gui behaviour` check covers them. The `.xpm` are loaded by path and `#include`d nowhere, and a C string literal cannot span a raw newline, so no removed CR was ever inside a quoted pixel row. **No `.gitattributes` exists and none was added.** `* text=auto eol=lf` would make git enforce this rather than only detect it; not done, because it changes what every future checkout writes and that is a separate decision. On a clone with `core.autocrlf=true` the working tree comes back CRLF and this check goes red tree-wide — which is the check working |
+| **D31** *(signed off 2026-09-09)* | Line endings | **LF ONLY, tree-wide. No more DOS.** Jan's decision, and it overrides the guard that existed to prevent it. **100 files of the 2003 source converted, 17,750 CRLF pairs.** **The conversion is line endings only except for two bytes, and `git diff --ignore-cr-at-eol` is NOT what proves it** — that flag strips a trailing CR from *both* sides, so it would equally hide a CRLF being *introduced*. The proof is a direct comparison of every one of the 100 files: `re.sub(rb"\r+\n", b"\n", git show HEAD:f) == working file`, exact, with no `\r` surviving anywhere. Zero anomalies. **Two lines of `sigel_slave.mak` are the one real content change**, and calling them line endings flatters them: `:598` and `:647` ended `\r\r\n`, so the byte removed is an INTERIOR one — under NMAKE that trailing CR is part of the variable's value. The `\r+` in the proof above is what swallows the case, so the proof cannot tell it from a line ending; it is called out here instead. Nothing else in the tree has a run of two. **Binaries are excluded and this is not cosmetic** — three tracked binaries hold 12 incidental `\r\n` byte pairs (`pvm3.4.6.tgz` 9, `altLogo.png` 2, `noExperiment.png` 1), and a blind repo-wide replace would corrupt all three. Extensions touched: 36 `.cpp`, 35 `.h`, 19 `.xpm`, 5 `.dsp`, 3 `.mak`, 1 `.mt`, 1 `.dsw`. **No `.exp` and no `.ui`**, so no reference artefact was touched. **Lone CRs are left alone, and NOT because they are Mac-classic line endings** — the first version of this row said that and it was wrong. Six tracked files held lone CRs then and git called all six binary, so this check never even reads them; 27 do today: `pvm3.4.6.tgz` 3859, `noExperiment.png` 691, `JustGreen.pnm` 2848, `altLogo.png` 208, `Hippie.pnm` 208, `Stone.pnm` 68. All five `.pnm` are **P6 raw raster**: those bytes are pixel values that happen to equal `0x0d`. They were never line endings. **The `encodings` check was turned round in the same commit**, so that commit is not line endings alone — `check.sh`, `PORTING.md` and `future_refactorings.md` change with it. The check used to say *a file that HAD a CR must still have one*, with `ENC_BASELINE=25`; it now says **no tracked text file may carry CRLF**, expected zero, reads every tracked file rather than five extensions present in the root commit, lists them with `-z` so a C-quoted path cannot break `open()`, and reconciles — every file lands in exactly one of ok / CRLF / binary / unreadable, or it aborts. **It asks `git ls-files --eol` what is binary rather than testing for a NUL byte**, because the NUL test got two files wrong: `Hippie.pnm` has no NUL in its 196,668 bytes and `UniDo_LSXI.pnm`'s first NUL is at offset 15,456, so both were judged as text and passed only by luck. **Read the `w/` column, not `i/`**: while this change was being made, `sigel_slave.mak`'s index blob read `i/-text` — HEAD still held its two `\r\r\n`, which git's own heuristic calls binary — against a working file of `w/lf`, and testing both columns dropped a real text file out of the check. **Both columns read `lf` once this is committed, so the demonstration is gone and only the rule survives.** Read 610 text files and 8 binaries then; 571 and 29 today. **A floor of 500 was added**, because zero failures is also what a check that read nothing reports: a dead `git ls-files` gave `COUNTS 0 0 0 0`, four non-empty numbers, which the fail-closed branch did not catch. Teeth-tested: CRLF into a `.cpp` and into `sigel_slave.mak` both caught and named, CRLF into a texture correctly ignored, and all seven branch states driven by hand — including a **tree-wide** CRLF regression, which the first version of the floor misreported as *"it did not run"* with one failure instead of 611, and a below-floor count, which the first version printed as `0 pass` while adding up to 499 passes to the total. Both found by review 2026-09-09. The bucket reconciliation is a tautology as the loop is now written and is **not** counted as coverage; it is kept only so the earlier bare-`continue` shape cannot come back. **`SIGEL_ROOT` is the source tree**, so `stdConf.mt` and the 19 `.xpm` pixmaps the conversion touched are the very files the GUI checks load at runtime; the `gui behaviour` check covers them. The `.xpm` are loaded by path and `#include`d nowhere, and a C string literal cannot span a raw newline, so no removed CR was ever inside a quoted pixel row. **No `.gitattributes` exists and none was added.** `* text=auto eol=lf` would make git enforce this rather than only detect it; not done, because it changes what every future checkout writes and that is a separate decision. On a clone with `core.autocrlf=true` the working tree comes back CRLF and this check goes red tree-wide — which is the check working |
 | **D32** *(signed off 2026-09-09)* | `SIG_Experiment::gpManager` renamed to `guiGPManager` | **A deliberate divergence from the 1.3 name, and the only one of its kind so far.** Four members across the tracked tree were called `gpManager`; three hold an `MT_GPManager *` inside the meta modules, where the name is right. The fourth, `SIG_Experiment.h, SIG_Experiment`, holds a `SIG_GUIGPManager *` — and it was the **only** `SIG_`-typed member in that class not named after its own type with the `SIG_` prefix stripped. The other nine follow the rule exactly (`gpExperiment`, `gpParameter`, `simulationParameter`, `environmentView`, `robotView`, `experimentView`, `allIndividualsView`, `languageParameters`, `experimentItem`); the class's remaining members are named by role (`widgetDict`, `menuGPParameter`, …) and were never in scope. So this is the class's own rule applied to the one member that broke it, not a new scheme. **20 sites** when this was signed off: 13 in the files D34 has since renamed to `SIG_GUIGPExperiment.{h,cpp}`, 5 in this file, 2 in `guidrive.cpp`, both comments. The three `MT_GPManager` members and the `SIG_GPManager gpManager` local in `sigel.cpp, main` are correctly named and were left alone; the 1.0 tree holds the same member and is untracked, so a future sweep will re-find it there and should leave it. **VERIFIED AS `.text`-IDENTICAL, NOT AS BYTE-IDENTICAL OBJECTS** — a data member's name never reaches a mangled symbol, but `-g` is on and DWARF records member names, so the objects legitimately differ. `sigel.cpp` is the interesting one and was checked: it is the single translation unit where both names coexist, and its `.text` is unchanged |
 | **D33** *(signed off 2026-09-09)* | Where the mid-run protection lives | **IN THE UI. The model is not to be touched.** Jan: *"we'll focus on the UI side from now on, NO TOUCHING the gp manager or other model classes."* No new behaviour goes into the model. Removing a dead 2003 stub is not new behaviour, so `SIG_GPManager::running()` was deleted — see D29's passage in §10. Nothing is added to `SIG_GPManager` or `MT_Controller`. **The D29 counter, `g_runningEvolutions`, is to be removed, not moved into the model.** Jan, rejecting a move into `SIGEL_GP`: *"I strongly reject changes to the core model just to hot-fix a UI enablement issue."* **Replaced 2026-09-15 by a UI-side run state.** Each experiment has `evolutionRunning`, which `SIG_GUIGPExperiment::isRunning()` returns. Every run check asks `SIG_ExperimentListView::isRunning()`, which is true while any experiment runs. The decision is to lock the whole application during a run, and it is done — §9, "The run lock is DONE". Jan: *"multiple simul. experiments running makes no sense, we need all resources we can get"*. **Exceptions: D37 and D41.** |
 | **D34** *(signed off 2026-09-15)* | `SIG_Experiment` renamed to `SIG_GUIGPExperiment` | **By Jan's decision, and the second deliberate divergence from a 1.3 name, after D32.** The interface experiment class now follows the rule the manager pair already uses: model `SIG_GPManager`, interface `SIG_GUIGPManager`; model `SIG_GPExperiment`, interface `SIG_GUIGPExperiment`. Its files follow it: `SIG_Experiment.h` and `SIG_Experiment.cpp` became `SIG_GUIGPExperiment.h` and `SIG_GUIGPExperiment.cpp`, with the include guard, every include and the 2003 build files. D32's row keeps the old class name, because it records a rename made under it |
@@ -547,7 +562,7 @@ D20 supersedes D5, D24 supersedes D3.
 | # | Decision | Answer |
 |---|---|---|
 | **D15** | Where the robot models come from | downloaded from `sigel.sourceforge.net`, §9. ~~Untracked, in `data/`~~ **superseded 2026-09-19:** the 7 kept experiments and their robots are tracked, in `experiments/` and `robots/`, by Jan's decision |
-| **D16** | The Dynamo branch in `SIG_Simulation.cpp` | ~~build Dynamo, SOLID and qhull~~ **superseded 2026-08-28.** `physics_backends.md` was decided and executed: the branch and its 13 file pairs are deleted, `SIMULATIONLIBRARY 0` now fails loudly, and the Dynamo archive is cut to the maths objects. SOLID and qhull went with it — no `libsolid.a` is built; only the include path survives |
+| **D16** | The Dynamo branch in `SIG_Simulation.cpp` | ~~build Dynamo, SOLID and qhull~~ **superseded 2026-08-28**, recorded in §7: it was decided and executed: the branch and its 13 file pairs are deleted, `SIMULATIONLIBRARY 0` now fails loudly, and the Dynamo archive is cut to the maths objects. SOLID and qhull went with it, and both were deleted from disk on 2026-09-20, with SOLID's include path |
 | **D17** | Build system | **plain `Makefile`** at the repo root. Phase C can bring its own for `moc` and `uic` |
 | **D18** | What "runs clean under ASan" means for R3 | ASan and UBSan errors are pass/fail; LeakSanitizer output is a recorded baseline, because §10's leaks are out of scope |
 
@@ -585,11 +600,15 @@ through `f0f2daa`.
 
 ## 7. Steps
 
-**Exit criterion per step:** `./check.sh` at the repo root — **1168 pass, 0 fail**.
-*1136 until 2026-09-19, when `experiments/` and `robots/` added 34 text files (their
-20 `.blend` files are binary, which the `encodings` check skips) and removing
-`dictorder-reorder.py` took one away. 1169 until later that day, when two unused
-vendored patches went and `vendor-patches/README.md` came.*
+**Exit criterion per step:** `./checks/check.sh` from anywhere — **1097 pass, 0
+fail**. *The figure moves with the number of tracked text files, because the
+`encodings` check adds its own count to the total. Measured trail: **1136**
+until 2026-09-19, when `experiments/` and `robots/` arrived and
+`dictorder-reorder.py` went; **1168** once two unused vendored patches went the
+same evening; **1162** after the 2026-09-20 clean-up of three shim headers, the
+qtmig container and `tiecheck.cpp`; **1098** once 64 files of 2003 build
+machinery went — 64 files, 64 passes; **1097** when `physics_backends.md` was
+folded into this file.*
 **The pass count was 853 until D31 and the jump is not new coverage of SIGEL's
 code.** The `encodings` check used to read 404 files of five extensions and now
 read all 618 tracked files then, 8 of which git called binary: its pass count went
@@ -638,8 +657,9 @@ numbers in this sentence; re-derive them.** They were `1716` for the last site
 when first written and are `1898` now, because two later edits in the same
 session inserted lines above it — a citation into a file that is still being
 edited goes stale within the hour. Find them with
-`command grep -n 'timeout 300 "$ROOT/build-fast/guidrive"' check.sh`, which
-today gives 618, 685, 757, 1106 (twelve), 1398, 1484 (two) and 1898 (four).
+`command grep -n 'timeout 300 "$ROOT/build-fast/guidrive"' checks/check.sh`,
+which
+on 2026-09-20 gave 712, 779, 851, 1205, 1498, 1583 and 1995.
 Count them again; do not increment.*  — the slave's
 headless smoke test, the `widgets` and `parsers` probes and
 `expstruct --selfcheck`. *"Ten" counted only the `gui behaviour` list and stood
@@ -664,7 +684,7 @@ running `uic`, compiling the generated header standalone, compiling the
 committed base class, running `moc` over it, and checking the `.qrc` against
 the header in both directions. Extending it further is part of each step, not
 an afterthought.
-The repo-root programs are still in the hole: `sigel_eval.cpp`, `pvm_smoke.c`
+The gates' own programs are still in the hole: `sigel_eval.cpp`, `pvm_smoke.c`
 and `pvm_link.cpp` are compiled only by their own targets, never by `check.sh`.
 A break in them shows up as a build failure rather than a check failure.
 
@@ -678,13 +698,13 @@ single-slave, at 185 s/generation. C11 has the result.
 ```
 make pvm         libpvm3.a, pvmd3         28 objects, 0 errors, 6 warnings
 make pvm-link    build/pvm_link           P4's link and round trip
-./pvm-check.sh   starts a daemon, runs both, PASS/FAIL, non-zero if either fails
+./checks/pvm-check.sh   starts a daemon, runs both, PASS/FAIL, non-zero if either fails
 ```
 
 #### P1 — the tree
 
 `x/supportingLibs/supportingLibs/pvm3/` is upstream 3.4.6, 844 files where
-3.4.3 had 576. `pvm3.4.6.tgz` is committed at the repo root, md5
+3.4.3 had 576. `vendor/pvm3.4.6.tgz` is committed, md5
 `7b5f0c80ea50b6b4b10b6128e197747b`, identical to netlib's and to Debian's
 `.orig`. **It is the one tarball tracked here**: netlib is the only host still
 publishing it, Fedora retired PVM in 2015 and Debian removed it in 2024.
@@ -715,7 +735,7 @@ The rule is "everything Debian applies that we compile", so the last column is a
 record, not the reason any of them is there. Line numbers are **pre-patch**.
 
 
-| `vendor-patches/` file | Debian | Fixes something here? |
+| `vendor/patches/` file | Debian | Fixes something here? |
 |---|---|---|
 | `pvm3-linux64-aarch64-tirpc` | ours | n/a — this is the port |
 | `pvm3-debian24-ddpro-unistd-include` | 24 | **yes.** `ddpro.c:1509` casts `getcwd`'s implicit `int` back to a pointer; on 64-bit the address is cut in half |
@@ -743,12 +763,12 @@ do not compile ourselves**: `pvmd3` is a daemon `libpvm3` locates under
 `$PVM_ROOT/lib/$PVM_ARCH`, so the products must sit in that layout inside the
 vendored tree rather than in `build/`, and `make clean` names them or they
 survive it. `LINUX64` is hardcoded because a target name expands before
-`vendor-patches/` is applied, and **the recipe tests for the products
+`vendor/patches/` is applied, and **the recipe tests for the products
 explicitly** — make does not check that a recipe made its targets, so without
 that `make pvm` would exit 0 having produced nothing. 439 KB `libpvm3.a`, 235 KB
 `pvmd3`, all 13 `pvm_*` symbols the built core leaves undefined defined.
 
-`./pvm-check.sh` runs `pvm_smoke.c` against a live daemon: double, int and
+`./checks/pvm-check.sh` runs `pvm_smoke.c` against a live daemon: double, int and
 string exact. **The round trip really goes through XDR** — `pvm_send` to one's
 own tid does not short-circuit, measured with
 `-Wl,--wrap=xdr_double,--wrap=xdr_int` at 2 and 30 calls. **And it fails when it
@@ -851,15 +871,75 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-19 — DONE: JAN JUDGED EVERY EXPERIMENT BY EYE, 1.3 BESIDE THE PORT.**
+**2026-09-20 — DONE: THE REPO WAS AUDITED FILE BY FILE AND REORGANISED.**
 Start here.
 
 - **All 14 judged.** Keepers: `hammerNiceWalkingFitness`,
+- **Every folder and every root file was reviewed with Jan, one at a time**, for
+  what the finished port no longer needs. Each removal was proved first: the
+  copy that survives it was compared byte for byte before anything went.
+- **Removed:** a stale `build/guidrive`, 198 MB by `ls`; two vendored patches
+  nothing compiles, on the evening of 2026-09-19; three `shim` headers nothing
+  includes; `tools/`, the Qt 4.8 container whose conversion is committed;
+  `tiecheck.cpp`, which nothing ran; the vendored `qt`, `qhull` and `SOLID-2.0`
+  extracts, with SOLID's include path; `xb/` and `kbin.tar.gz`, the 2003 binary;
+  `kdesigelSources.1.3.tar.gz`, whose content is in git at `v1.3-pristine`; and
+  64 files of 2003 build machinery from the source tree — the autotools build,
+  the KDevelop project and its templates, and four upstream files holding
+  nothing. The untracked deletions are not in git; the tracked ones are, in the
+  commits of 2026-09-19 and 2026-09-20.
+- **Kept, with the reason measured:** `experiments/` and `robots/`;
+  `verification-against-sigel-1.3/`, because `v1-1.3-roundtrip.txt` holds 1.3's
+  answer to the open `.rrb` question; the 1.0 release and its archive until the
+  regression is assessed; the three Doxygen settings files, because nothing has
+  ever run them and a check comes first; and the two launcher scripts, to be
+  modernised in place — item 47.
+- **The layout is now:** `checks/` holds the four gates and `replicate.sh`,
+  `checks/baselines/` their six reference files, `checks/programs/` their five
+  programs; `vendor/`
+  holds the 12 patches and **both upstream archives, tracked**, so a clone
+  builds with no download; `sigel/` is the 2003 source, hoisted out of three
+  levels of nesting and renamed — upstream's "kdesigel" claimed a KDE dependency
+  that never existed. The only tracked files left at the root are the
+  `Makefile`, `.gitignore` and the three documents.
+  `sigelSourceDistribution.1.0.tar.gz` still sits there, untracked.
+- **Each gate refuses to run from a wrong repo root**, and runs from the repo
+  root whatever the caller's directory is. Both guards came from review
+  findings: a copy at the old path would have pointed `rm -rf $ROOT/build/ui` at
+  the parent of the repo, and `guidrive` opens `robots/twoBases/twoBases.rrb`
+  relative to the caller.
+- **The encodings check lost its two counts.** They could not fail, and after
+  the rename they measured nothing. The line-ending test, the floor and the
+  one-bucket assertion stay.
+- **Every commit had the five gates green and an independent review**, except
+  `662bb14`, reviewed after it was pushed. The gate logs of each round are in
+  the session scratchpad, not in the repo. **Three defects were found by review
+  and fixed:**
+  a `make -q` guard that reported a false failure from another directory, a
+  clone setup command that could not work, and a self-counting command in
+  `guidrive.cpp` that printed a plausible wrong answer. **Two mistakes of mine
+  were caught and repaired:** a commit that swept in D43's uncommitted lines,
+  and two commits that left a file at both its old and its new path.
+- **`physics_backends.md` was folded into this file** and deleted, on Jan's
+  word: *"we CANNOT POSSIBLY create YET MORE documents ... PORTING.md should be
+  the ONLY log of what has been done apart from git"*.
+- **Open with Jan, in his order of priority:** item 39, the 2003 host names and
+  the authors' home directories in the experiment files, now public on GitHub —
+  to be done on both machines so they stay comparable, planned and approved
+  first; the `.rrb` numbering, the one measured divergence from 1.3; the 1.0
+  regression; and the names of the gates, which say what they run and not what
+  they compare against.
+- **Still uncommitted: D43.** Jan confirmed the behaviour on the desktop
+  2026-09-18; the 2026-09-19 entry below records that its review left 12
+  findings unacted. Untouched all day.
+
+**2026-09-19 — DONE: JAN JUDGED EVERY EXPERIMENT BY EYE, 1.3 BESIDE THE PORT.**
+
   `insectNiceWalkingFitness`, `octopusNiceWalkingFitness`,
   `walkerNiceWalkingFitness`, `runnerNiceWalkingFitness`,
   `shortHammerNiceWalkingFitness`. The two-bases family: keep
-  `twoBasesHardlyReducedIS`, to be renamed `twoBases`; the other five go — item 40
-  in `future_refactorings.md`. `octopusSimpleFitness` goes too — item 44 — and
+  `twoBasesHardlyReducedIS`, to be renamed `twoBases`; the other five go — item
+  40 in `future_refactorings.md`. `octopusSimpleFitness` goes too — item 44 — and
   `runnerSimpleFitness` — item 45. **Done on this machine 2026-09-19**, at Jan's
   word: both data trees hold the 7 under their new names, and every check that
   loaded a dropped file now loads a kept one, against the port's own output.
@@ -892,10 +972,8 @@ Start here.
   result archives, the robots in both orders — checked by unpacking and diffing.
   `dictorder-reorder.py` went too: its input and output are gone, and `robots/`
   holds its result. Git history keeps the script.
-- **Next: review every folder and file for what the port no longer needs**, Jan,
-  2026-09-19. Interactive, one at a time, Jan approves each: first the folders,
-  then the scripts, checks and baselines at the root, one by one. For each, say
-  what reads it and what removing it would lose, measured, then wait for his word.
+- ~~**Next: review every folder and file for what the port no longer needs**~~ —
+  **DONE 2026-09-20**, see the entry above.
 - **How each one was shown.** Score every individual with `build-fast/sigel_eval`
   (a scratch `SIGEL_ROOT` holding a copy of `Terrain.ter`). Make a viewing copy:
   swap the text between the `INDIVIDUAL(0)` and `INDIVIDUAL(k)` labels and swap
@@ -934,7 +1012,7 @@ name it in messages. `check.sh`'s v2 round trip still reads the clean input that
 
 **`data-reordered/` is the proved tree again**, and three measurements say so:
 
-- `./dictorder-dump.sh | diff -u dictorder-baseline.txt -` is **empty**, sampled
+- `./checks/dictorder-dump.sh | diff -u dictorder-baseline.txt -` is **empty**, sampled
   twice. The script reorders 7 of 7 `.rrb` and 0 of 14 `.exp`, which is what D2
   recorded in August.
 - `dictorder-reorder.py` and `dictorder-baseline.txt` **from `ff6db93`**, the
@@ -978,9 +1056,9 @@ removed from `data-reordered/Experiments/`; `guidrive` writes to
   joints were attached: the stream's order for a robot read from an `.exp`, a
   copy or PVM, and declaration order for a `.rrb`. `drives` and `sensors` are
   indexed by stored number, and the containers' own order is not used.
-  `sigel_eval.cpp`, `dictorder-dump.sh`, `dictorder-reorder.py`,
-  `physics_backends.md` and D2 below said container position becomes the body
-  index; corrected. V5's note that V1 checks call order was wrong too: V1 checks
+  `sigel_eval.cpp`, `dictorder-dump.sh`, `dictorder-reorder.py`, "Dynamo removed,
+  DynaMechs kept" below and D2 said container position becomes the body index;
+  corrected. V5's note that V1 checks call order was wrong too: V1 checks
   container order.
 - **1.3's real evolution rebuilds the robot once more than `sigel_eval` does**:
   `SIG_GPFitnessTrainer` copies it, and the slave re-reads it from the PVM
@@ -1096,8 +1174,8 @@ responsiveness probe in `guidrive.cpp`, and the matching text in this file and
 `future_refactorings.md`. Reviewed, both controls measured, and Jan confirmed it
 on the real desktop. It waited for this repair, because the checks that clear it
 read the data tree. With it in the working tree and the repaired tree in place,
-`./check.sh` gives 1168 pass, 0 fail; checks 2 and 3 diff empty; check 4 exits 0;
-`./pvm-check.sh` passes both halves.
+`./checks/check.sh` gives 1097 pass, 0 fail; checks 2 and 3 diff empty; check 4 exits 0;
+`./checks/pvm-check.sh` passes both halves.
 
 **Never two sessions on this repository at once.** Sequential is fine;
 concurrent is not. On 2026-08-27 three concurrent sessions nearly corrupted a
@@ -1178,9 +1256,9 @@ between check 1 and check 4**, then re-run. *Measured 2026-09-07.* The order tha
 works:
 
 ```
-make (all five targets, named)  →  ./check.sh  →  ./dictorder-dump.sh
-  →  ./fitness-check.sh  →  make B=build && make B=build pvm-link
-  →  ASAN_OPTIONS=detect_leaks=0 ./fitness-check.sh build  →  ./pvm-check.sh
+make (all five targets, named)  →  ./checks/check.sh  →  ./checks/dictorder-dump.sh
+  →  ./checks/fitness-check.sh  →  make B=build && make B=build pvm-link
+  →  ASAN_OPTIONS=detect_leaks=0 ./checks/fitness-check.sh build  →  ./checks/pvm-check.sh
 ```
 
 **And pipe check 3 without `2>&1`.** `fitness-check.sh` prints `selfcheck: ok` and
@@ -1223,13 +1301,17 @@ succeeded.**
 **Checks any session must keep green**, all committed:
 
 ```
-./check.sh                                           1168 pass, 0 fail, exit 0
-./dictorder-dump.sh | diff -u dictorder-baseline.txt -    empty
-./fitness-check.sh  | diff -u fitness-baseline.txt -      empty
-ASAN_OPTIONS=detect_leaks=0 ./fitness-check.sh build      exit 0
+./checks/check.sh                                        1097 pass, 0 fail, exit 0
+./checks/dictorder-dump.sh | diff -u checks/baselines/dictorder-baseline.txt -   empty
+./checks/fitness-check.sh  | diff -u checks/baselines/fitness-baseline.txt -     empty
+ASAN_OPTIONS=detect_leaks=0 ./checks/fitness-check.sh build   exit 0
+./checks/pvm-check.sh                                    both PASS
 ```
 
 **The fourth line is not optional and was missing from this list until
+**The fifth line has no baseline** and is PASS/FAIL, which is why older copies of
+this block listed four. It needs `make B=build && make B=build pvm-link` first.
+
 2026-08-29.** The default `fitness-check.sh` runs `build-fast`, which has no
 sanitizer, so it **skips the self-check's leak test** — and says so on stderr,
 which `| diff` discards. The self-check is what covers the evolution loop's
@@ -1239,15 +1321,15 @@ here.
 Never edit a baseline to make a diff go away. If a change moves one, that is the
 finding.
 
-**THE TEN ROOT FILES NOTHING OBVIOUSLY NEEDS, AND WHY THEY STAY.** The root holds 24 tracked files; the other 14 explain themselves by name or are named in the build. Asked 2026-09-09,
-answered by measurement, and written down so it is not asked again. Line counts
-are `wc -l`; the consumer column is `grep` over `check.sh`, the `.sh` scripts and
-the `Makefile`.
+**WHAT THE GATES READ, AND WHAT IS EVIDENCE.** Asked 2026-09-09 of the flat
+root, answered by measurement; rewritten 2026-09-20 after the reorganisation. The six
+baselines now live in `checks/baselines/`, and the gates that read them in
+`checks/`. Line counts are `wc -l`.
 
 *Check inputs. Deleting one fails loudly in every case, but only two say why:
-the `pagesave` and `real clicks` sections name the missing file. The other four fail as a
-maximal diff — every line of the dump reported as an addition — which is loud and
-uninformative.*
+the `pagesave` and `real clicks` sections name the missing file. The others fail
+as a maximal diff — every line of the dump reported as an addition — which is
+loud and uninformative.*
 
 | file | lines | what it holds |
 |---|---|---|
@@ -1267,8 +1349,9 @@ file: Jan, the same day, *"Future refactorings only need to check against the
 now-proven Qt6 baseline"*. `check.sh`'s `pagesave` section guards it and prints
 *"this check tested NOTHING"* if it is absent.
 
-**`xtest-baseline.txt` covers what QTest structurally cannot.** QTest's **widget** overload — the only one `guidrive` uses — builds a
-`QMouseEvent` and hands it to `QApplication::notify`, so it never passes through
+**`xtest-baseline.txt` covers what QTest structurally cannot.** QTest's
+**widget** overload — the only one `guidrive` uses — builds a `QMouseEvent` and
+hands it to `QApplication::notify`, so it never passes through
 `QWindowSystemInterface` — window activation, a popup's pointer grab and Qt's
 synthesis of a double click from two presses are all invisible to it. This file
 is `guidrive` driven by `xdotool` XTEST inside a nested Xvfb. Reproducible here,
@@ -1276,14 +1359,11 @@ unlike the one above, but it is the only reference for that class of behaviour.
 `check.sh`'s `real clicks` section guards it and prints the same *"tested
 NOTHING"* warning.
 
-*Referenced by no script. These are evidence, not inputs, and each one is at risk
-of being deleted as a stale file precisely because no script points at it.*
-
-| file | lines | why it stays |
-|---|---|---|
-| `tiecheck.cpp` | 132 | re-derives the double-printing tie rates quoted in §0 and C5, so they can be checked rather than trusted. Deliberately not a check, and exits 0 on purpose — differences are the expected result |
-| `regression_1.0_to_1.3.md` | 194 | the deferred 1.0 → 1.3 regression, and the oracle's diagnostics wishlist |
-| `future_refactorings.md` | — | the to-do list this file defers work into. No count: it moves every session |
+*Evidence, read by no script.* `regression_1.0_to_1.3.md`, 194 lines, holds the
+deferred 1.0 → 1.3 regression and the oracle's diagnostics wishlist.
+`future_refactorings.md` is the to-do list this file defers work into; no line
+count, it moves every session. **`tiecheck.cpp` was the third and is gone**,
+removed 2026-09-20: nothing ran it, and its figures are in §0 and C5.
 
 **`portinglog.txt` WAS DELETED 2026-09-09, and this paragraph is what it held.**
 It was the raw output of Qt 4.8's `qt3to4` from one run in the `tools/qtmig`
@@ -1322,7 +1402,7 @@ was OOM-killed, and `2>/dev/null` discarded the stream a sanitizer reports on.
 comment; this script never did. The first three check lines would still have
 caught a *changed number* through the baseline diff — **but the fourth line is
 checked by exit status alone**, so a UBSan `runtime error:` under
-`ASAN_OPTIONS=detect_leaks=0 ./fitness-check.sh build` went to `/dev/null` and
+`ASAN_OPTIONS=detect_leaks=0 ./checks/fitness-check.sh build` went to `/dev/null` and
 the check read green. `[ -n "$v" ]` was not a substitute: it only catches a crash
 that printed *nothing*.
 
@@ -1335,7 +1415,7 @@ beneath it. It now captures to files, tests the status, greps stderr for
 `AddressSanitizer|LeakSanitizer|runtime error:`, and only then reads the value —
 the shape `dictorder-dump.sh` already used. *Found by review 2026-09-07.*
 
-**`./pvm-check.sh` is a fifth check but not a fifth check.** It has no baseline —
+**`./checks/pvm-check.sh` is a fifth check but not a fifth check.** It has no baseline —
 it prints PASS/FAIL and exits non-zero if either half fails. Needs
 `make pvm && make pvm-link` first. Run it after touching PVM, `SIG_GPPVMData` or
 `SIG_GPFitnessTrainer`; **the four lines above cannot see any of them.**
@@ -1409,7 +1489,7 @@ nothing. It and the same shape at `SIG_Program.cpp, ~SIG_Program` are both trans
 `Ungültige Konfiguration`, `Sie können beim Ausführen`. They are **generated
 MSVC 6 project files**, not comments and not built by anything here. Left as
 found; recorded so the next reader does not have to rediscover them. The port's
-own repo-root harness files (`guidrive.cpp`, `sigel_eval.cpp`) keep a `§` in
+own harness files (`guidrive.cpp`, `sigel_eval.cpp`) keep a `§` in
 four places, but as **well-formed UTF-8** — the rule that came out of pass 1 is
 that files under the SIGEL source root are ASCII-only, and the port's own files
 may be UTF-8. What pass 1 removed from `sigel.cpp` and
@@ -1562,7 +1642,7 @@ form minimums           0 pass   1 fail
 `gui behaviour` and `pagesave vs 1.3` after it.** The form was restored with
 `git checkout`, the five targets rebuilt, and the check re-measured green.
 
-**Was the regression unchecked for those two days? YES — within `./check.sh` it
+**Was the regression unchecked for those two days? YES — within `./checks/check.sh` it
 was.** `gui behaviour` moves under the same perturbation, to
 `[window] class=MT_MainWindow title=[SIGEL MetaGP] 680x595`, which is the same
 595 the oracle settled below (*"The MetaGP window grew 59 px"*) — so a second
@@ -1648,9 +1728,10 @@ during a run by itself.*
 
 ### MetaGP needs `stdConf.mt`
 
-`Configure System` needs a real `stdConf.mt` in `SIGEL_ROOT`. Of the tarballs
-on disk, only `kdesigelSources.1.3.tar.gz` holds it. This repo has it in the
-source root, which is the `SIGEL_ROOT` the checks use. In the GUI, without it,
+`Configure System` needs a real `stdConf.mt` in `SIGEL_ROOT`. Only the 1.3
+source carries one, and this repo has it at `sigel/stdConf.mt`, which is the
+`SIGEL_ROOT` the checks use. *The tarball it came from,
+`kdesigelSources.1.3.tar.gz`, was deleted on 2026-09-20; git holds the file.* In the GUI, without it,
 `MT_Controller::readFromFile` shows "An error occurred in loading the meta
 experiment".
 
@@ -1965,7 +2046,7 @@ one-slave host is not self-blocking; `pvm_addhosts`' return is ignored
 (`SIG_GPFitnessTrainer.cpp, SIG_GPFitnessTrainer`) so `PvmDupHost` cannot stop it; the slave binary
 is healthy — run by hand against a live daemon it enrols and answers `Program
 hasn't been started as a PVM slave!`; PVM itself is up (`pvm_start_pvmd`
-succeeds, the daemon logs `ready`, `./pvm-check.sh` passes); a stalled trainer
+succeeds, the daemon logs `ready`, `./checks/pvm-check.sh` passes); a stalled trainer
 waits in `hrtimer_nanosleep` at ~15% CPU; and **`PVM_ROOT`, `PVM_ARCH` and
 `PVM_TMP` must be exported** or `libpvm` prints `PVM_ROOT environment variable
 not set` and the run produces no transcript at all (`pvm-check.sh:66-77`).
@@ -2025,15 +2106,15 @@ value and the only match in the file today is a comment.*
 
 `make` at the repo root builds 205 vendored objects, 108 of SIGEL's 109 core
 sources, two moc outputs and `build/sigel_eval`. Was 251 / 118 of 122 / three
-until the Dynamo backend was deleted (`physics_backends.md`): 46 vendored
+until the Dynamo backend was deleted (see that section in §7): 46 vendored
 Dynamo `.cpp`, 13 of SIGEL's own and the `SIG_DynaSystem` moc target went with
 it.
 `make B=build-fast SAN= SIGSAN=` gives the same thing without the sanitizers,
 in its own directory.
 
 ```
-SIGEL_ROOT=$PWD/x/kdesigelSources.1.3/kdesigel/kdesigel \
-  ./build/sigel_eval data/Experiments/twoBasesSimpleFitness1.exp 0
+SIGEL_ROOT=$PWD/sigel \
+  ./build/sigel_eval experiments/twoBases.exp 0
 ```
 
 One evaluation is 0.2 s. **All 14 published experiments run clean under
@@ -2069,8 +2150,9 @@ untracked tree:
 | `cv97/CLinkedList.h:37` | the list header node is a bare `CLinkedListNode<T>`, so `(T *)` is a downcast that never holds and UndefinedBehaviorSanitizer reports it. `reinterpret_cast` |
 | `dynamechs/dm/svd_linpack.cpp:180` | the inlined copy of `f2c.h` declares `struct complex`, ambiguous with `std::complex` under the `using namespace std` the pre-standard `<iomanip.h>` carried. `::complex` |
 
-Two shim headers went with them: `new.h` is new (5 SOLID sources include it),
-and `iomanip.h` now includes `<iostream>`, which the pre-standard header did.
+One shim header changed with them: `iomanip.h` now includes `<iostream>`, which
+the pre-standard header did. A second, `new.h`, was added for SOLID's 5 sources
+and deleted again on 2026-09-20 with SOLID itself.
 
 **OpenGL is on the link line and is never called.** `dmLink::draw()` is pure
 virtual and every override lives in `gldraw.cpp`, so every `dm*` vtable
@@ -2103,7 +2185,7 @@ its destructor is empty. Check on ASan and UBSan errors, not on this.
 
 ### Replication — checked against the 1.3 binary since Phase V
 
-`./replicate.sh` runs every individual of every published experiment. It is
+`./checks/replicate.sh` runs every individual of every published experiment. It is
 **not currently a test of this port**, because the 14 published `.exp` files
 were produced in August 2001 by SIGEL 1.0 and the source being ported is 1.3.
 See the scope note at the top and `regression_1.0_to_1.3.md`.
@@ -2162,10 +2244,14 @@ never changes. Each step captures a reference file once, commits it under
 needed **once per quantity, not once per step** — after V1 this is another line
 in `check.sh`, not a remote call.
 
-**The 1.3 binary is in this repository, and static inspection does not need the
-remote box at all.** `xb/kdesigel/sigel` — ELF 32-bit i386, **not stripped**,
-dated 30 April 2003. `nm` and `objdump -d` run on it locally — this host is **aarch64**, and the
-tools work cross-architecture. Verified
+**Static inspection of the 1.3 binary does not need the remote box.** It was
+`xb/kdesigel/sigel` and `xb/kdesigel/sigel_slave` — ELF 32-bit i386, **not
+stripped**, dated 30 April 2003 — and `nm` and `objdump -d` read them locally,
+cross-architecture, on this aarch64 host. **Both were deleted on 2026-09-20**,
+with `kbin.tar.gz` that held them: nothing read them any more, the port is
+finished and its agreement with 1.3 is proved. Every figure below was taken
+while they were here; to re-check one, download `kbin.tar.gz` from sourceforge
+again. Verified
 by reproducing the remote session's figures exactly: 24 `MT_FitnessTranier`,
 0 `MT_FitnessTrainer`, 22 `SIG_GPFitnessTrainer`, 0
 `SIG_GPEnergyFitnessFunction`. *Several V9 questions were sent to the remote
@@ -2496,7 +2582,7 @@ the only independent source of numbers. All in `data/`, untracked.
 
 | # | Work | state |
 |---|---|---|
-| T1 | `tools/Dockerfile.qtmig` + `tools/qtmig`: Qt 4.8's `uic3` and `qt3to4` over this repo | **done** |
+| T1 | `tools/Dockerfile.qtmig` + `tools/qtmig`: Qt 4.8's `uic3` and `qt3to4` over this repo | **done.** Both removed 2026-09-20, in git history. They carried one fact recorded nowhere else: jessie has left the mirrors, so the image needs `archive.debian.org` and `Acquire::Check-Valid-Until false` |
 | T2 | Prove it on one form, then all 20 | **done** |
 
 **T2 EXERCISED ONE OF `uic3`'s SIX MODES.** *This said five; C1 corrects the count and the list.* Everything below, and the residue
@@ -2795,7 +2881,7 @@ is 80-bit.
 | **`real clicks`** (`xtest`, `xtest-baseline.txt`) — NEW 2026-09-07 | **the platform layer, which nothing else here touches.** Every other section drives Qt through `QApplication::notify`. This one runs `guidrive` as a real X11 client in a nested `Xvfb` under `xcb`, and sends XTEST input with `xdotool`. It is the only section that exercises activation, the popup's pointer grab and Qt's double-click synthesis. It found C13's swallowed dismissing click on its first run. **Its control is inside the scenario, and the section fails without it.** The scenario compares one real click and one `QTest::mouseClick` at the same point, through a native event filter. It prints `DISCRIMINATES` only when the real click produced native `ButtonPress` events and `QTest` produced none. *Teeth-tested. `xdotool` was replaced by a stub that exits 0 and does nothing. The scenario stops at the coordinate check with a line-initial `!!` and exit 1, so the section fails on three predicates. **An earlier version of this row claimed it failed "on the control and on the `!!` marker", and review showed that was false**: all three of the scenario's mis-target messages put their `!!` in the MIDDLE of a line, and `check.sh` greps `^ *!!`, so not one of them was visible. A run whose own output said the finding was undecidable passed every guard the section had. The markers start their lines now, and the scenario returns 1 rather than carrying on.* `QEvent::spontaneous()` would not work as that control, because `qtestmouse.h` marks QTest's own events spontaneous. A missing `Xvfb` or `xdotool` **fails** rather than skips. The display is refused if something is already on it. The server is killed by pid, so a real session's own `Xvfb` survives |
 | **`truncated pi (V5)`** — NEW 2026-09-08 | **that nobody "fixes" 1.3's truncated pi.** The sensor path converts radians to degrees with `3.14159265`, not `M_PI`. Every evolved program in the shipped experiments was selected against sensor readings carrying that 1.14e-09 error, and they feed a chaotic simulation, so correcting it changes what the robots do. **The edit that breaks it is one word and looks like tidying**, and 1.3 uses the true `M_PI` in `IFunctions.cpp, calculateAnyJoint`, so the truncated literal reads as an oversight to anyone who meets that line first. **Two checks, because neither covers the other:** the SOURCE check catches an edit at one of the four sites even while another site still supplies the constant, which no binary search can see, and it is compiler-independent; the BINARY check catches any spelling that yields the true value — `M_PI`, `4*atan(1)`, a longer literal, a header constant — which a grep for `M_PI` would miss. Only the radian factor is checked, and the reason is measured rather than assumed: on aarch64 four of the other seven appear ZERO times as 8-byte doubles in our image and two appear only in debug sections, so there is nothing of theirs in `.rodata` to compare. Costs 0.18 s. *Teeth-tested six ways, and the testing found three defects in the check itself. **The binary search covered the whole file, so its "the constant is missing" arm could never fire** — the Makefile compiles with `-g`, so two debug copies survive any patch of the real one; the search is bounded to `.rodata` now. **The source pattern was a prefix match**, so lengthening a site to `3.14159265358979` changed the factor while the count stayed at 4 and neither forbidden double appeared — the whole section passed on that edit. **And a comment mentioning `M_PI` or the literal failed the check**, which is documentation, not a defect; comments are stripped now. The six probes: a site tidied to `M_PI`, a site deleted, a site lengthened, the true `180/pi` patched into `.rodata`, the kept constant patched out of `.rodata`, and a comment naming both. Five fail with the message aimed at them, one passes. Two orderings had to be fixed for that: `M_PI` is tested before the site count, and the forbidden constant before the missing one, because each of those edits trips both tests and the specific diagnosis has to win.* |
 | **`v2 round trip vs 1.3`** — NEW 2026-09-08 | **a whole experiment through `File > Save Experiment`, twice, against what the 2003 binary wrote.** `pagesave` compares a 192-line parameter block, over two saves that differ only in whether the pages were edited; this compares the WHOLE file across two CHAINED saves, where each save's output is the next one's input — marker line numbers, `PVMHOST` order, the experiment history, the per-individual HISTORY growth, the individual names, the robot block, the ten first-save keys, and `expstruct.py` over pass 1 against pass 2. The expected text is copied from `verification-against-sigel-1.3/v8-1.3-gp-blocks.txt`, captured before this conversion existed, so a failure is a regression against 1.3 rather than against yesterday. **Input against pass 1 is not the test** — the first save adds ten keys and would fail however correct the port is (V8 result 5). It is ONE diff of a 58-line report. Costs 35 s measured, four `pagesave` runs over two experiments; no new scenario was added. *Teeth-tested 2026-09-08, and the testing found two holes in the check itself, both since closed — see the V2 row above. Every predicate has been shown to fail on a change of the kind it exists to catch. The claim is one-way: a mutation moves the line it is aimed at, and usually others too, because a deleted key shifts every marker below it. It is NOT that each mutation moves exactly one line, which an earlier version of this row claimed and which the measurements never showed. The wrapper was tested too: missing data SKIPS and counts, a missing or stale binary FAILS, suppressed Qt connect logging FAILS, and the section was run from outside the repo root to check the `make -q -C` fix.* |
-| `encodings` | **INVERTED BY D31 2026-09-09 — this row used to say the opposite.** It no longer catches *a file whose CRLF was stripped*; it catches **CRLF present at all**, in any tracked text file, expected zero. 642 LF-only files and 28 that git calls binary, with 44 translated and 61 that postdate the root (2026-09-19). Baseline 0, floor 500 |
+| `encodings` | **INVERTED BY D31 2026-09-09 — this row used to say the opposite.** It no longer catches *a file whose CRLF was stripped*; it catches **CRLF present at all**, in any tracked text file, expected zero. 571 LF-only files and 29 that git calls binary (2026-09-20). Baseline 0, floor 500. *Two counts went the same day — how many files had been converted from the German character set, and how many postdate the first commit. Neither could fail, and after the source tree was renamed neither could find a file* |
 | `dead item virtuals` | a class declaring Qt 2's `key(int,bool)` without the `operator<` that replaces it. Matched against a **flattened** header and demanding the signature that actually overrides — a decoy `operator<( QTreeWidgetItem * )` and a two-line declaration both bypassed the first version |
 | `widgets` | `DISpinBox` losing the fraction, under **`C` and `de_DE`** — without the second row it was blind to the locale bug the first fix introduced |
 | **`expstruct selfcheck`** | that the structural fingerprint is **blind to fitness and sighted on structure** — nine assertions: both spellings of fitness in both float and integer form, a program-operand change that must move `PROGRAMS`, two individuals swapped that must move `ORDER`, and a structural floor recomputed from the raw bytes (individual count, total program lines, history length against `POOLGENERATION`) that catches a matcher which died and dumped its content into `SHAPE`. Costs 0.34 s. *Teeth-tested by disabling both fitness filters and by blinding the program matcher* |
@@ -2810,7 +2896,7 @@ Each was demonstrated, not argued:
 - **`no clipped controls` did not cover either fix it was credited with** — see
   its row above. Closed by the new `slave gui` section.
 - **`guidrive` was scored STALE by the two clip sections**, which run 240 lines
-  before the `gui behaviour` section that builds it. So the first `./check.sh`
+  before the `gui behaviour` section that builds it. So the first `./checks/check.sh`
   after editing `guidrive.cpp` — or anything it links — measured yesterday's
   binary there and today's binary later in the same run. **And `make -q
   B=build-fast SAN= SIGSAN=` with no target answers for `all`, which does not
@@ -3375,6 +3461,549 @@ becomes data — so Qt 2's rule is restored there instead. See §9's C12.
 ---
 
 ## 9. Status and what is open
+### Dynamo removed, DynaMechs kept — 2026-08-28
+
+**DONE.** Analysed 2026-08-20, executed 2026-08-28. SIGEL shipped two physics
+engines and chose one at run time. Dynamo crashed on most shipped robots, its own
+authors labelled it "not recommended", and all 14 shipped experiments selected
+DynaMechs. It is gone. This section records what was removed, what was kept and
+why, and the follow-ups not taken. *Held in its own file until
+2026-09-20, then folded in here: this file is the only log of what was done.*
+
+#### The two engines
+
+- **Dynamo** — "Dynamic Motion library", Bart Barenbrug, TU Eindhoven,
+  1996–1999. Constraint-based. LGPL. **Deleted.**
+- **DynaMechs** — Scott McMillan. Articulated-body (Featherstone). **Kept.**
+
+Both implemented `SIG_SimulationData`, `SIG_SimulationQueries` and
+`SIG_CommandInterface`; `SIG_Simulation.cpp` switched between them at run time
+on the `SIMULATIONLIBRARY` key, which is `1` in 14 of 14 shipped `.exp`.
+
+---
+
+#### What was actually done — 2026-08-28
+
+##### SOLID and qhull went too
+
+The Dynamo backend was deleted in `5addd66`. **SOLID and qhull followed in a
+separate commit**, because their only caller was the deleted code:
+
+| library | files | lines no longer compiled |
+|---|---|---|
+| SOLID | 16 | 1,999 |
+| qhull | 11 | 20,705 |
+| **total** | **27** | **22,704** |
+
+Measured before removing, not assumed: **zero `dt*` SOLID API calls anywhere in
+SIGEL, zero in vendored DynaMechs, and zero `qh_*` references outside qhull
+itself.** qhull existed only to give SOLID its convex hulls — that is what the
+`-DQHULL` flag selected — so it could not outlive it.
+
+The one surviving mention is `maximalSOLIDIterations`, a simulation parameter
+still parsed, stored and written back but now read by nothing. It joins the six
+others the Dynamo removal left in that state.
+
+`libdynalib.a` is the one that could **not** go: see the deletion commit. Its
+maths half is not separable from its physics half.
+
+##### Deleted
+
+**SIGEL's 13 Dynamo file pairs, 26 files, 3,226 lines.** `SIG_Dyna`,
+`SIG_DynaCallbacks`, `SIG_DynaDrive`, `SIG_DynaJoint`, `SIG_DynaLink`,
+`SIG_DynaMoCommandInterface`, `SIG_DynaMoSimulationData`,
+`SIG_DynaMoSimulationQueries`, `SIG_DynaSensor`, `SIG_DynaSystem`,
+`SIG_DynaSystemWrongNumberException`, `SIG_RotationalController`,
+`SIG_TranslationalController` — every one of them `.cpp` and `.h`.
+
+**3,226, not the 3,247 counted above.** The list of files was right; four of
+them changed size between 2026-08-20 and the deletion, all in Phase D:
+`SIG_DynaSystem` −8, `SIG_DynaMoSimulationData` −15,
+`SIG_DynaMoSimulationQueries` +1, `SIG_DynaMoCommandInterface` +1.
+
+**The backend switch.** `SIG_Simulation.cpp` keeps its `DynaMechs` case and
+gains a `default:` that prints to `std::cerr` and throws. It does not fall
+through — the previous switch had no `default` at all, so an unknown library
+would have left `simulationData`, `simulationQueries` and `commandInterface`
+uninitialised. Verified by building a copy of `sigel_eval` without its own
+`SIMULATIONLIBRARY` guard (`sigel_eval.cpp, selfcheck`) and running an `.exp` edited to
+`SIMULATIONLIBRARY 0`: one line of diagnostic, then abort, exit 134. It never
+falls through and never runs DynaMechs.
+
+**"Loud" is true of `sigel_eval` only.** The throw clears all six fitness
+functions, which construct `SIG_Simulation` outside their own `try` — but one
+frame further out, `sigel_slave.cpp:361-367` wraps `evalFitness()` in
+`catch (SIG_Exception &) { fitnessValue = 0; }`. So under PVM the exception is
+swallowed and the individual is scored 0.0 as though evaluated, the failure
+`SIG_GPSimpleRecorder.cpp, init` documents. The printed line is therefore the only
+evidence anyone gets, which is why it goes to `std::cerr` and not the buffered
+`SIG_IO::cerr`. Hardening that `catch` is pre-existing and out of scope.
+
+**Three dead includes and one wrong one.** `SIG_SimulationQueries.cpp` included
+`SIG_DynaLink.h`, `SIG_Dyna.h` and `SIG_DynaSensor.h` and used none of them.
+`SIG_Environment.h:26` included `<constraint.h>`, a Dynamo *physics* header,
+only to reach `DL_vector`; it is `<pointvector.h>` now, as this document asked.
+
+**One `moc` target.** `SIG_DynaSystem.h` is off `MOC_HDRS`.
+
+**`SIG_Simulation` stays a `QObject`, and that is now vestigial — recorded
+rather than glossed.** The deleted `connect()` was the only thing that wired
+`slotDynamoMessage`, which is the class's only slot; it declares no signals. So
+`Q_OBJECT`, the `QObject` base and the surviving `moc` target exist for a slot
+nothing can invoke. Two consequences follow and are annotated in the source:
+`stopSimulation` had no other writer, so `makeTimeSteps`' `if (stopSimulation)`
+is permanently false — and that is the **only** throw site of
+`SIG_SimulationCannotSolveException` in the tree, which makes the 2003-behaviour
+boundary around `start()` and `makeTimeSteps()` guard a type that can no longer
+arrive. All of it is left in place: removing a slot changes the Qt surface of a
+class Phase C still has to port, which is a different decision from deleting a
+physics backend.
+
+**46 of the 60 vendored Dynamo `.cpp` stop being compiled**, 10,084 of 13,567
+lines. Nothing vendored is *deleted* — that tree is untracked and comes out of
+a tarball — only the `dynamo_SRC` list the build feeds `ar`.
+
+**Four build files, and the fourth is the one that matters.** Both `Makefile.am`
+in `SIGEL_Simulation` lose the 39 filenames that no longer exist, and
+`SIGELCommon.dsp` — the 2003 Visual Studio project — loses 27 `Source File`
+blocks: the 26 files plus `moc_SIG_DynaSystem.cpp` and its two custom-build
+rules.
+
+**`kdesigel.kdevprj` was the fourth**, and at the time it had to be kept in step:
+both `Makefile.am` carried the marker `####### kdevelop will overwrite this
+part!!! (begin)`, so the `.kdevprj` was what KDevelop 2 regenerated them from,
+and a regeneration would have put `SIG_DynaSystem.cpp` and its twelve siblings
+back. It named the 26 deleted files in 28 places, all removed then.
+**All of that is moot since 2026-09-20**: the `.kdevprj` and all 43 `Makefile.am`
+were deleted with the rest of the 2003 autotools build, which had been unrunnable
+for years.
+
+##### Kept, and why
+
+**The maths library, and more of Dynamo than expected.**
+
+- `pointvector.cpp` and `list.cpp` are genuinely empty — "no non-inline
+  methods". `DL_vector` and `DL_point` really are header-only.
+- **`matrix.cpp` is not.** It carries 27 out-of-line `DL_matrix` members, all 28
+  of its symbols link into `sigel_eval`, so `libdynalib.a` **cannot** be dropped
+  from the link line. Tested, not assumed.
+- **`matrix.cpp` is not pure maths either.** It `#include`s `dyna_system.h` so
+  that `DL_matrix::invert` can report a singular matrix through the physics
+  engine's global callback: `matrix.cpp:233`,
+  `DL_dsystem->get_companion()->Msg("singular matrix can't be inverted\n")`.
+  That call, plus the `DL_geo` vtable `matrix.o` emits, is an undefined
+  reference to `dyna_system.o` and `geo.o`, whose closure is nine more physics
+  translation units.
+
+So **the maths and the physics are not cleanly separable**. The archive holds
+14 objects and **the linker pulls 12 of them**: `pointvector.o` and `list.o`
+define no symbols at all and are never extracted, so they are compiled only to
+keep the maths half of the library named rather than implied. The 11 physics
+objects below are all pulled. Measured with `nm` over all 60 objects and
+confirmed against a linker map; each entry names the symbol that pulled it in:
+
+| object | pulled in by |
+|---|---|
+| `dyna_system` | `DL_dsystem` |
+| `geo` | `DL_geo::move` |
+| `dyna` | `DL_dyna::newkinenergy` |
+| `constraint` | `DL_constraint::reset_undo` |
+| `constraint_manager` | `DL_constraints` |
+| `euler` | `DL_euler::DL_euler` |
+| `m_integrator` | `DL_m_integrator::stepsize` |
+| `largematrix` | `DL_largematrix::prep_for_solve` |
+| `supvec` | `DL_supvec::A2q` |
+| `force_drawable` | `DL_force_drawable::get_fd_info` |
+| `vector4` | `DL_vector4::assign` |
+
+3,056 lines of physics survive for one error message. Nothing is stubbed and no
+symbol is defined away: breaking the coupling means patching a diagnostic out of
+a vendored file, which is a separate decision and was not taken.
+
+**The whole Dynamo include path.** `-isystem .../Dynamo/Src/Inc` stays on both
+the build and `check.sh`: the maths headers live in the same directory as the
+physics ones.
+
+**SOLID and qhull are gone from disk, 2026-09-20.** They stopped being compiled
+with the Dynamo backend on 2026-08-28, and for three weeks only the
+`-isystem .../SOLID-2.0/include` path survived. Both folders were then deleted
+from the vendored extract, the include path was removed from the `Makefile` and
+from `check.sh`, and everything was rebuilt from scratch with no error. They
+remain inside `vendor/supportingLibs.tar.gz`.
+
+##### Checks — all clean, which is the point
+
+| check | result |
+|---|---|
+| `dictorder-dump.sh` vs baseline | **empty diff** |
+| `fitness-check.sh` vs baseline | **empty diff**, 42 of 42 |
+| `sigel_eval -selfcheck` | pass |
+| sanitized `fitness-check.sh build` | **empty diff**, no ASan or UBSan report |
+| `check.sh` **as of 2026-08-28** | **105 pass, 4 fail** — see §7 for the current figure |
+
+`check.sh` was 118 pass, 4 fail before this change. The pass count falls by
+exactly 13 because 13 fewer `.cpp` exist, and "headers standalone" by exactly 13
+for the same reason. The warning count is not quoted here because Phase D keeps
+moving it; §7 has the current figure. **The 4 failures are the same 4 files** — `MT_Controller.cpp`,
+`SIG_GUIGPManager.cpp` and the two ZORC files — and the one header failure is
+the same one. No fitness value and no line of container ordering moved, which
+is what "dead code" was supposed to mean.
+
+##### Dead but not deleted — the predictions, re-measured
+
+| predicted | measured 2026-08-28 |
+|---|---|
+| `SIG_GlueJoint`, `SIG_CylindricalJoint` | **holds.** Both still parsed (`SIG_Robot.cpp:367,369`), still compiled by `SIGEL_RobotIO`, still listed by `SIG_RobotView.cpp, getOutOfExperiment`. No simulator reads either |
+| `getFrictionValue`, `getElasticity`, `getVeloDamping` | **holds, exactly.** Zero call sites anywhere in the tree; only the definition and the declaration remain |
+| `getYPlaneLevel` | survives, as predicted — `SIG_EnvironmentRenderer.cpp, SIG_EnvironmentRenderer` and `SIG_EnvironmentView.cpp, getOutOfExperiment` |
+| the six simulation parameters | **holds, with a correction.** `getAnalytical`, `getIntegrator`, `getMaximalIterations`, `getMaximalCollisionLoops`, `getSkipFrames` and `getSolveMode` lose their only *simulation* reader, but each is still read by `SIG_SimulationParameter.cpp` to fill its dialog. They are now exactly as dead as `getMaximalError` and `getMaximalSOLIDIterations` already were: parsed, displayed, editable, simulated by nothing |
+
+**Three things the prediction missed, found by review of the change:**
+
+| now dead | where |
+|---|---|
+| `SIG_Robot::prepareDynaMo` and `SIG_Link::transformToDynaMo` | `SIG_Robot.cpp:274-282` and `SIG_Link.cpp:200-206` — **16 lines of definition, 23 with the declarations and their doxygen blocks.** An earlier draft said "~45", which was a guess; this project's rule is that only measured figures go in a planning document. Their only callers are the three surviving `case DynaMo:` arms below |
+| three `case DynaMo:` arms | `SIG_GPFitnessTrainer.cpp, SIG_GPFitnessTrainer`, `sigel_slave.cpp:252`, `SIG_AllIndividualsView.cpp, slotStatsClicked`. Each transforms the robot for a simulation that now always throws. Left because the `SimulationLibrary` enum has to survive — the parser, the GUI and four other switches name it |
+| `SIG_Simulation::slotDynamoMessage`, `stopSimulation`, and the only throw of `SIG_SimulationCannotSolveException` | see "One `moc` target" above |
+
+##### Follow-up this change deliberately did not take
+
+1. **The GUI can still author an experiment that now aborts.**
+   **Four surviving surfaces**: `SIG_SimulationParameter.cpp, putIntoExperiment` calls
+   `setSimulationLibrary(DynaMo)`; `:224-225` reads the value back to re-check
+   that button; `SIG_SimulationParameterBase.ui:143` offers "Dynamo  (not
+   recommended)" and `:566-568` is a whole tab titled `DynaMo`; and
+   `SIG_EnvironmentBase.ui:916-918` is a second such tab. Removing only the
+   radio button leaves two dead tabs and a read-back for a value nothing can
+   set.
+
+   **The throw has a second consequence.**
+   `SIG_SimulationVisualisationWidget.cpp:376-381` does
+   `delete visualisation;` and then assigns the result of a constructor that
+   now throws — so `visualisation` keeps a freed pointer. Fourteen sites in that
+   widget test `if (visualisation)` and then dereference it, so the guard
+   passes and each is a use-after-free; `renderRecorder` leaks with it. The
+   path pre-existed — Dynamo's own constructor could throw — but this change
+   turns a conditional hazard into a certain one for every robot.
+   **FIXED 2026-09-02:** `visualisation = nullptr;` now sits between the delete
+   and the new, at **line 414** (the 376-381 above is line drift). `check.sh`'s
+   `freed-pointer null` holds it there.
+
+   **Not reachable today, on the argument that survives review.** Two earlier
+   arguments were wrong and are dropped rather than restated: `sigel_slave.cpp:293`
+   is not the only caller, and the destructor is empty only in the DERIVED class
+   (the base does `delete visualisation`, so a throw would be a double free).
+   What holds: every other caller is downstream of a first `visualizeThis()` that
+   must have succeeded, and nothing in the slave calls `setSimulationLibrary`, so
+   the same parameters cannot begin throwing later. **The oracle then settled
+   1.3's behaviour: with Dynamo selected the viewer opens and the slave SEGFAULTS
+   on Play**, no dialog, master surviving — so that path was non-functional in
+   1.3 and deleting it lost nothing. `renderRecorder` still leaks on the throwing
+   path; recorded in `future_refactorings.md`.
+
+2. **`SIG_SimulationQueries.cpp`: all seven non-self includes are dead.**
+   Verified by compiling a translation unit
+   holding only the class's own header and the empty constructor, under
+   `check.sh`'s full flags: it passes. `<qdatetime.h>` and `SIGEL_Tools/SIG_IO.h`
+   are dead too. This change removed only the three that named deleted files.
+3. **Extract the maths into a small local header, and drop `libdynalib.a`.**
+   *Decided 2026-08-28, deliberately not now.* The archive survives at 14
+   objects — ~3,000 lines of physics — for **one line**: `DL_matrix::invert`
+   reports a singular matrix through the physics engine's global system object
+   (`matrix.cpp:233`), and that call plus the `DL_geo` vtable pulls in ten more
+   translation units.
+
+   The API is tiny: `DL_vector` is 18 methods in 296 lines, `DL_matrix` 81
+   lines, and the whole vocabulary is get/set a component, add and subtract in
+   place, scale, negate, norm, normalise, inner and cross product, multiply,
+   invert. A 3-vector and a 3×3 matrix.
+
+   **Pragmatic and minimal: a local header, not a dependency.** Boost's real
+   candidate would be QVM rather than uBLAS, and Eigen would be the better
+   library — but the port's direction is removing 2003 dependencies, not
+   swapping them, and NEWMAT is already compiled and linked and used in 13
+   files, so the tree already carries two matrix libraries. Replacing both with
+   ~250 lines we own removes the last of Dynamo and adds nothing.
+
+   **After Phase C, not before.** It is mechanical across ~1,100 references in
+   93 files, and the payoff today is zero: the surviving objects link and
+   nothing calls them. Doing it during the interface port would collide two
+   large mechanical diffs in the same files.
+
+   One thing to check when it happens: `matrix.cpp:233` is live code on a real
+   error path, now calling into an engine with no running system behind it. It
+   should be established whether that is a null dereference or something
+   quieter.
+
+##### Two corrections this deletion forced on this file
+
+**`SIG_DynaMoSimulationData` is not "the site that numbers the DynaMechs
+bodies"** (§10 D1, §10 D2, `sigel_eval.cpp:46`). It was the **Dynamo** site.
+Both backends were said to walk links → joints → sensors → drives in that
+order. **DynaMechs does not, corrected 2026-09-18:** it numbers its bodies by a
+depth-first walk over each link's joint list and indexes drives and sensors by
+stored number (the Handover section). Either way the orders the check
+protects are unchanged and `dictorder-baseline.txt` is
+untouched — but the file those sections cite is the wrong one, and it no longer
+exists. The live site is `SIG_DynaMechsSimulationData.cpp`.
+
+**V5's zero-hit `applyForce` probe is explained.** §7 records the `applyForce`
+breakpoint arming and taking no hits "in a session where the MDH breakpoint
+fired 18 times ... real but unexplained". `SIG_DynaDrive::applyForce` is called
+from exactly one place, `SIG_DynaMoCommandInterface.cpp:54`, on the **Dynamo**
+path. Every shipped experiment selects DynaMechs, so that breakpoint could
+never fire. The same holds for the other open probe:
+`SIG_DynaSensor::senseJoint1`/`senseJoint2` are called only from
+`SIG_DynaMoSimulationQueries.cpp:45,47`. **Both remaining V5 probes were aimed
+at code no shipped experiment executes**, and have to be re-pointed at
+`SIG_DynaMechsSimulationQueries` / `SIG_DynaMechsCommandInterface` before they
+can say anything about this port.
+
+##### Two repo-state findings from checking this work
+
+**Nothing vendored was deleted *by this change*.** That tree is untracked and was
+left exactly as it extracts; 10,084 lines merely stopped being compiled. `diff -rq`
+against a fresh extract showed five differences across the whole vendored tree:
+the four recorded patches, plus the `.sigel-patched` stamp. *(Three folders —
+`qt`, `qhull` and `SOLID-2.0` — were deleted from that tree on 2026-09-20, and
+the patch count is 12 today, 3 of them outside PVM.)* — ~~**and three stale `.rej` files**~~ *(this listed `cv97/JVector.h.rej`,
+`dynamechs/dm/svd_linpack.cpp.rej` and `SOLID-2.0/include/3D/Basic.h.rej`, and
+concluded the re-extract cycle was not as clean as §4 describes)* —
+**none remains; `find . -name "*.rej"` is empty, so the cycle is clean after
+all.**
+
+**The DynaMechs adapters are 2,077 lines**, not the 2,013 measured on
+2026-08-20. They grew with Phase V5's MDH probe.
+
+##### Still not fixed, deliberately
+
+The `exit(1)` a glue joint would reach under DynaMechs is at
+**`SIG_DynaMechsSimulationData.cpp, initializeJoint`**, not `:394` as recorded above — the
+line moved with Phase V5's probe. It is still an `exit(1)` and should still
+become a thrown exception. Left alone to keep this changeset single-purpose.
+
+---
+
+#### What was given up
+
+Measured 2026-08-20, before the decision, and unchanged by it.
+
+**Two joint types become dead data.** `SIG_GlueJoint` (186 lines) is still
+parsed and still editable, and no simulator reads it. `SIG_CylindricalJoint`
+(219) was already dead — both backends dropped it to `default:`. No shipped
+robot uses either: all joints in all 7 `.rrb` are rotational — 18, 12, 9, 6, 4,
+3, 1.
+
+**Four properties lose their only reader.** `SIG_Material::getFrictionValue`,
+`getElasticity` and `SIG_Environment::getVeloDamping` were read by
+`SIG_DynaSystem.cpp` alone and are now write-only: parsed, editable, read by
+nothing. `getYPlaneLevel` survives for the two renderers. DynaMechs uses global
+friction constants rather than a per-material-pair table, so **per-material
+friction is the one genuine capability loss.**
+
+**Six simulation parameters become dead**: `getAnalytical`, `getIntegrator`,
+`getMaximalIterations`, `getMaximalCollisionLoops`, `getSkipFrames`,
+`getSolveMode`. They join `getMaximalError` and `getMaximalSOLIDIterations`,
+which were already parsed, displayed, editable and simulated by nothing.
+
+**In full:** glue joints, closed kinematic loops, link-to-link self-collision,
+mesh-accurate collision geometry, per-material-pair friction. **None of it is
+used by any shipped robot or experiment.**
+
+---
+
+#### Why Dynamo was the one to go
+
+**It crashes on any robot with a joint sensor.** `SIG_DynaSystem.cpp:801` sets
+a new sensor's joint pointer to zero and nothing ever assigns it. Then
+`SIG_DynaSensor.cpp:28` does `switch (joint->joint->getJointType())`, and
+`SIG_DynaMoSimulationQueries.cpp:46` dereferences `sensor.joint->joint`
+directly. A null dereference on the first `SENSE` instruction.
+
+Joint sensors per shipped robot: walker 18, insect 12, octopus 9, runner 6,
+twoBases 1, hammer 0, shortHammer 0. **5 of 7 robots could not run on Dynamo at
+all.**
+
+Two more defects in the same files: `SIG_DynaSystem.cpp:335` inverts the
+no-collision test, permitting collision precisely when the pair is on the
+must-not-collide list; and `SIG_Simulation.cpp:120-149` throws on every Dynamo
+diagnostic, including plain `"Warning:"` lines.
+
+**The authors agreed.** `SIG_SimulationParameterBase.ui:143,154` labels the two
+choices `"Dynamo  (not recommended)"` and `"DynaMechs   (preferred)"`, and
+`SIG_GUIGPExperiment.cpp, slotRobotInfo` refuses to open the Robot Information dialog unless
+DynaMechs is selected. All 14 shipped experiments carry `SIMULATIONLIBRARY 1`.
+
+---
+
+### Finished to-do items, and the refusals — moved here 2026-09-20
+
+`future_refactorings.md` is the to-do list and holds only work to do. What had
+been ticked there, and what was refused there, is recorded here instead, because
+this file is the only log of what was done. The numbers are the ones the items
+carried; other items and this file cite them, so they do not change.
+
+#### Done
+
+- [x] **4. Dynamic exception specifications** — done by the port, Phase A7.
+  Three sites keep them only as `// NOTE: in 2003 this carried…` comments,
+  which item 30 covers.
+
+- [x] **17. `pvm_probe`'s error return is read as "a message is ready"** —
+  done 2026-09-17, D41. `checkTask` now splits the three returns: above zero
+  receive, zero wait, below zero give up on the task, kill it and re-queue the
+  individual. The old `if (info != 0)` sent an error into the receive branch,
+  where `pvm_recv` blocks for a message that cannot come — and **no
+  `TIMEOUTMINUTES` value rescued it**, because the timeout lives in the `else`
+  branch — or fails and leaves the task record destroyed while every caller in
+  `SIG_GPManager` reads -1 as "not ready yet" and waits for ever.
+
+- [x] **21. A run does not notice when the PVM daemon goes away** — done
+  2026-09-17, D41. `pvm_probe` and `pvm_spawn` both report `PvmSysErr`, the
+  trainer records it, and the interface ends the run and says why.
+  **Two ways of detecting it were measured and rejected.** `pvm_mytid` cannot:
+  `BEATASK` is `( pvmmytid == -1 ? pvmbeatask() : 0 )`, so an enrolled task gets
+  its cached tid back without touching the daemon. Watching
+  `$PVM_TMP/pvmd.<uid>` disappear cannot either: a run completed three further
+  generations with that file removed, because an enrolled task keeps its socket.
+  *Signature of the fault: main thread in `hrtimer_nanosleep`, seconds of CPU
+  over hours, no `sigel_slave` at all.*
+
+- [x] **22. Say why a run ended at once** — done 2026-09-17, D42.
+  `SIG_GUIGPExperiment::slotEvolutionStopped` says so when the run completed no
+  generation, nobody stopped it, and `terminationAlreadyMet` finds the condition
+  already true. It names the setting that caused it and the tab to change it on.
+  **Two cases it deliberately does not cover.** MetaGP with `SAVEEXIT` set —
+  which all 14 shipped experiments carry — completes its first generation, so
+  the branch never runs and only the counter moves. And a run that ends for any
+  other silent reason says nothing rather than guess.
+
+- [x] **31. Confirm the run lock is finished** — done 2026-09-18.
+  **No leftovers:** `g_runningEvolutions`, `SIG_GPManager::running()` and
+  `evolutionRunningActionGroup` have no match in `src/`, `include/`, `ui/`,
+  `guidrive.cpp` or `check.sh`. Of the other names holding "running",
+  `evolRunning` and `metaEvolutionRunning` are MetaGP's own run state,
+  `slotEvolutionRunning` is `MT_Controller`'s and `simulationRunning` is the
+  slave's 3D playback — none is a second mechanism.
+  **One mechanism:** `SIG_GUIGPExperiment::evolutionRunning`, read through
+  `SIG_ExperimentListView::isRunning`, and one signal `evolutionNotRunning`
+  driving `SIG_MainWindow::slotEnableEvolutionRunningActions` over 29 actions
+  and the two `slotEvolutionNotRunning` slots.
+  **The one gap is closed.** `startEvolutionAction` and `stopEvolutionAction`
+  had no check; `runlock` now reads both at rest, during a run on the running
+  experiment, and during a run on another experiment. Teeth-tested both ways.
+  That is also what makes the right-click `Stop` crash unreachable — PORTING.md
+  section 9.
+
+- [x] **40. Keep one two-bases experiment; remove the other five, here and on the
+  x86 machine.** Jan judged all six side by side on 1.3 and the port, 2026-09-19,
+  each with its best individual by the port's own scoring: **keep
+  `twoBasesHardlyReducedIS`**; remove `twoBasesHighMutationRate` (a close second),
+  `twoBasesSimpleFitness1`, `twoBasesReducedInstructionSet`,
+  `twoBasesHighCrossOverRate` (the same file as `twoBasesSimpleFitness1`) and
+  `twoBasesSimpleFitness2`. Jan on the last: *"it's broken everywhere and
+  provides no value"* — its individual 0 scores 3.4e-05 on both, and its best
+  (number 78) moved only slightly.
+  **Every one of the five is in `dictorder-baseline.txt` and
+  `fitness-baseline.txt`**, so both move. `twoBasesSimpleFitness1` is also the
+  input of `check.sh`'s `expstruct selfcheck`, and `replicate.sh` names it and
+  `twoBasesHighCrossOverRate` as the identical pair.
+  **`twoBasesSimpleFitness2` is the hard one.** It is the experiment most checks
+  load, so removing it moves them all:
+  in `check.sh` it drives six sections — `gui behaviour`, `real clicks` and
+  `pagesave` through `BEXP`, and `no clipped controls`, `form minimums` and
+  `slave gui`, which name the file directly; `guidrive.cpp` loads it by default;
+  `guibehaviour-baseline.txt` names it 24 times, `xtest-baseline.txt` 2,
+  `fitness-baseline.txt` 3, and `dictorder-baseline.txt` has its section.
+  **`pagesave-baseline.txt` was 1.3's own output for this file**, and the port
+  matched it. It now holds the port's own save of `twoBases.exp`; no new
+  capture from the oracle — see item 44.
+  Removing it also ends item 39's conflict over this file.
+  **Done on both machines 2026-09-19.** On the x86 machine with Jan's approval
+  there; its seven files hash as ours. Its copy of all 14 as downloaded is
+  `/home/debian/sigel-shipped-original-2026-09-19/`.
+
+- [x] **44. Keep one octopus experiment; remove `octopusSimpleFitness`, here and
+  on the x86 machine.** Jan, 2026-09-19: *"once again two octopus experiments -
+  ok, we'll keep only one! the first one, the current one is a failed/early
+  run"*. Keep `octopusNiceWalkingFitness`, judged a keeper side by side with
+  individual 13. The same wait as item 40: not before every experiment has been
+  judged, and not unasked.
+  **What names it:** `fitness-baseline.txt` (3 lines), `dictorder-baseline.txt`
+  (its section) and `check.sh`'s v2 round trip, which loads it as `V2OCT` for the
+  containers that collide.
+  **That check compares against 1.3's own output for this file**, in
+  `verification-against-sigel-1.3/v1-1.3-roundtrip.txt`, and the port matches it.
+  The two octopus robot blocks differ — sha256 `2b56be22…a2d1` against
+  `8934a27c…fc2d` for `octopusNiceWalkingFitness` — so the kept file has no 1.3
+  capture. It needs none: moved to the kept file, the check takes the port's own
+  output as its reference. Jan, 2026-09-19: *"since it passes why do we keep
+  re-checking a known fact? Future refactorings only need to check against the
+  now-proven Qt6 baseline"*. The same holds for item 40.
+  The 2026-09-18 oracle measurements named "octopus" in PORTING.md were taken on
+  this file; they stay as the record of what was measured.
+  **Done on both machines 2026-09-19.** On the x86 machine with Jan's approval
+  there; its seven files hash as ours. Its copy of all 14 as downloaded is
+  `/home/debian/sigel-shipped-original-2026-09-19/`.
+
+- [x] **45. Keep one runner experiment; remove `runnerSimpleFitness`, here and on
+  the x86 machine.** Jan, 2026-09-19, judging it side by side with individual 30:
+  *"to be removed, the first one was the better experiment"*. Keep
+  `runnerNiceWalkingFitness`. The same wait as item 40.
+  **What names it:** `fitness-baseline.txt` (3 lines) and
+  `dictorder-baseline.txt` (its section). No check loads it.
+  `verification-against-sigel-1.3/` holds oracle measurements on it; they stay as
+  the record of what was measured.
+  **Done on both machines 2026-09-19.** On the x86 machine with Jan's approval
+  there; its seven files hash as ours. Its copy of all 14 as downloaded is
+  `/home/debian/sigel-shipped-original-2026-09-19/`.
+
+- [x] **46. Rename the kept experiments to their base names, here and on the x86
+  machine.** Jan, 2026-09-19: the names carry notes added run by run as a kind of
+  versioning, such as the fitness function used; *"when we're done with our
+  review we need to strip all such versioning and just keep the base names! We'll
+  do this interactively, you suggest and I approve."* One name at a time, after
+  the review and after items 40, 44 and 45. Both machines use the same names, so
+  the two stay comparable. Each kept experiment takes its robot's name.
+  Approved: `twoBasesHardlyReducedIS` → `twoBases`; `hammerNiceWalkingFitness` →
+  `hammer`; `insectNiceWalkingFitness` → `insect`; `octopusNiceWalkingFitness` →
+  `octopus`; `runnerNiceWalkingFitness` → `runner`;
+  `shortHammerNiceWalkingFitness` → `shortHammer`; `walkerNiceWalkingFitness` →
+  `walker`. All seven approved 2026-09-19.
+  **Done on both machines 2026-09-19.** On the x86 machine with Jan's approval
+  there; its seven files hash as ours. Its copy of all 14 as downloaded is
+  `/home/debian/sigel-shipped-original-2026-09-19/`.
+
+#### Not doing
+
+Decisions, not work. Each is settled; reopen only with a reason.
+
+- **Restore Qt 2's spin-box editing.** D28. Reachable only by typing a number
+  outside a box's range, the value is visible before anything is saved, and the
+  cost is owning a custom widget for ever. Current behaviour is pinned in
+  `guibehaviour-baseline.txt`. The worked-out `SIG_SpinBox` subclass, the three
+  cheaper routes that were measured and rejected, and the 47-widget promotion
+  plan are in `future_refactorings.md`'s history at `1dba5f4`.
+- **The history block grows by one line per individual per save.** Confirmed on
+  the 1.3 binary; the port reproduces it exactly, which is the correct outcome.
+  Recorded so nobody "fixes" it and silently diverges. If it is ever changed
+  deliberately, that is a product decision and needs a note in PORTING.md saying
+  the port stopped matching 1.3 on purpose.
+- **A lower bound on the terrain index in DynaMechs.** Vendored code is not
+  touched.
+- **Validating the terrain header in `SIG_Environment`.** After the atomic
+  write, nothing in the tree produces a `Terrain.ter` that exists and does not
+  parse, and the guard would have to be repeated in the second reader,
+  `SIG_DynaMechsSimulationData`, which this port does not touch.
+- **The malformed-picture-file branch of `generateTerrain`.** Reached only with
+  `FLOORFUNCSELECTED 0`; `operator>>(istream &, string &)` leaves its string
+  unchanged when the sentry fails, so the previous token is reused and the
+  terrain header comes out malformed. No P2 file exists in the repository and all
+  14 shipped experiments have an empty `FLOORPICTUREFILE`, so a fix would be code
+  no check could exercise. Reopen only if a picture-file experiment ever exists.
+
+---
+
 
 **No effort estimates in this file.** The column that held them carried six
 invented figures. Step counts are counted and stay. **Do not put estimates back.**
@@ -3490,7 +4119,7 @@ path with `x_dim` 0, `y_dim` 0, `grid_resolution` 0 and `xindex` -2, and
 disassembled the clamp: `x_dim` at offset `0x24`, `add $0xfffffffe,%eax`, no
 lower guard. Its control with a valid 5058-byte file simulated normally. **How
 often 1.3 hits this was never measured** — those probes were stood down.
-`future_refactorings.md`'s "Not doing" list carries the two routes the fix does
+§7's "Not doing" list carries the two routes the fix does
 not close, and item 37 the one that is still open.
 
 **Before blaming the slaves, rule out a hang from outside.** On 2026-09-17 a run that had
@@ -4473,7 +5102,7 @@ every D8 site for a stored `const char *`.
 | `Q2Array::sort()` | `memcmp` byte order | numeric | Three sites need ascending numeric order and break once any element reaches 256: `SIG_GPManager.cpp:304,311`, `SIG_AllIndividualsView.cpp, slotDeleteIndividuals`. Qt 2's own source says *"Qt 3.0: Add a virtual compareItems()"* |
 | out-of-range array access | ~~warn, clamp to 0~~ **BOTH HALVES OF THIS ROW ARE WRONG, corrected 2026-09-03.** "2003 warned and clamped" is true of **`QGArray::at`** (`qgarray.h:108-117`, `msg_index(index); index = 0;`) and **false of `QGVector::at`** (`qgvector.h:85-92`, which warns and then *reads out of range*) and of **`QGList::at`** (`qglist.h:172-176`, which returns **null**). Three behaviours, and this row is the **fourth** recorded instance of fusing them — in the very table §10's corrected semantics row points at | ~~same, in the shim~~ **nothing clamps today**: `q2compat.h` went with D27, and `shim/` now holds only `fstream.h`, `iomanip.h`, `iostream.h`, `minmax.h`, `new.h`, `strstream.h`, `vector.h`. The port uses `value()`, which yields null — **safer than Qt 2, not equal to it** | The original reason still stands for why a clamp was not replaced by `Q_ASSERT`: it compiles to nothing under `QT_NO_DEBUG`, so a release build would corrupt memory silently where 2003 returned a wrong value. *Neither `QT_NO_DEBUG` nor `NDEBUG` is defined by the Makefile or `check.sh`, so `QList`'s assert is live in both build trees today* |
 | ~~`SIG_ProgramLine.cpp:215-224`~~ | writes `element[no]` in the branch entered *because* `no >= size()` | **FIXED** — `:215-232` now guards `if( no >= 0 && no < int(element.size()) )` | Its own comment is `// ToDo: Exception!` |
-| ~~`SIG_DynaSystem.cpp:266-268`~~ | deletes `dynaJoints[k]` while looping to `dynaDrives.size()` | **moot 2026-08-28** — the file is deleted with the Dynamo backend, `physics_backends.md` | The two vectors grew independently |
+| ~~`SIG_DynaSystem.cpp:266-268`~~ | deletes `dynaJoints[k]` while looping to `dynaDrives.size()` | **moot 2026-08-28** — the file is deleted with the Dynamo backend, §7 | The two vectors grew independently |
 | `SIG_EarlyRunTermSimulation.cpp, getMaxRecorderSteps` | `QTime zeroHour;` | `QTime( 0, 0 )` | Same class as the other 11 `QTime()` sites but a declaration, so the first sweep's pattern missed it. `getMaxRecorderSteps` returned 2 instead of 182 — a factor of 91 on the denominator of three fitness functions. No shipped experiment selects them, so `replicate.sh` cannot see it |
 | `sigel_slave`, `getenv("SIGEL_ROOT")` | dereferenced unchecked | to be fixed | Segfaults if unset; the SIGSEGV handler masks it with no core. Bites under PVM specifically — spawned tasks inherit *pvmd's* environment, not the master's |
 | `SIG_GPPVMData.cpp, sendQStringToPVM` `sendQStringToPVM` | sends `str.length() + 1`, a **character** count, then sends `str.toUtf8()`, up to 4x longer in bytes | `qCStringBuffer.size() + 2` (D21; was `+ 1` on a `Q2CString`) | `getQStringFromPVM` sizes its receive buffer from that count and lets `pvm_upkstr` write the bytes in. 20 `ü` gives `heap-buffer-overflow ... in byteupk` under ASan; short strings survive only because `QList` over-allocates. Qt 2's `length()` was the Latin-1 byte count, so 2003 was right for its own data. **Changes the wire format for non-ASCII** — safe only because both ends are this file and no distributed run exists. Found by Phase P's P4, regression-tested by `pvm_link.cpp` |
@@ -4488,7 +5117,7 @@ every D8 site for a stored `const char *`.
 `Make-config` sets, so eight `assert(!eqz(x))` guards ahead of a division are
 live that were not in 2003.~~ **Moot as of 2026-08-28** — SOLID is no longer
 compiled at all. It went with the Dynamo backend, its only caller
-(`physics_backends.md`).
+(see "Dynamo removed, DynaMechs kept" in §7).
 
 ### Name collisions that survive into Qt 6
 
@@ -4856,7 +5485,8 @@ in the selected backend. The live `SIG_DynaMechsCommandInterface::moveDrive`
 calls no `applyForce` at all; it computes the drive value inline.
 
 **Verified locally against `xb/kdesigel/sigel_slave`** — a second unstripped 1.3
-binary in this repository, alongside `xb/kdesigel/sigel`. `moveDrive` is at
+binary, alongside `xb/kdesigel/sigel`, while both were on disk; they went on
+2026-09-20 and come back from sourceforge's `kbin.tar.gz`. `moveDrive` is at
 `0x080b787c`:
 
 | claim | measured |
@@ -4976,7 +5606,7 @@ things are now known that sharpen it. **The writers do not all use precision 6**
 `SIG_Renderer.cpp, vectorToPovray` sets **5** for every POV `<x, y, z>` and
 `SIG_GPPVMData.cpp:116, :157` set **50** for the master↔slave transfer — so this
 table's precision-6 column is the *least* affected case. At 5, **22.49%** of
-multiples of 1/16 differ against 0% at 6. `tiecheck.cpp` at the repo root is the
+multiples of 1/16 differ against 0% at 6. `tiecheck.cpp`, in git history, is the
 measurement.
 
 **CORRECTED 2026-09-09.** This paragraph used to add that `0.703125` "is in a
@@ -5123,7 +5753,7 @@ binary until the x86 box gives us fitness numbers (§7). The link-order half
 *can* be self-checked, and **that check now exists — step D1, done 2026-08-27**:
 
 ```
-./dictorder-dump.sh | diff -u dictorder-baseline.txt -
+./checks/dictorder-dump.sh | diff -u dictorder-baseline.txt -
 ```
 
 `dictorder-baseline.txt` is **2,189 lines over 21 blocks** — 14 experiments and 7 `.rrb`.
@@ -5901,13 +6531,15 @@ commented out in release 1.0 (**September 2001** — `sigelSourceDistribution.1.
 is stamped 2001-09-06, and the file itself 2001-09-05; August 2001 is the date of
 the shipped experiment DATA, not of the release) and in 1.3, so `running()`,
 `wait()` and `msleep()` are its orphaned methods. The team's own final report
-(`data/results/endbericht.pdf`, PG 368 Dortmund) never uses the word *thread* in 11,579
+(the PG 368 Dortmund `endbericht.pdf`, read from `data/` before it was deleted on
+2026-09-19, and still on sourceforge) never uses the word *thread* in 11,579
 lines — their parallelism is PVM, separate processes. **So making `running()`
 answer honestly is new design by us, not restoration**, and there is no earlier
 revision to consult. **Where that comes from, since none of it is in this repo's
 git:** SourceForge's CVS is shut down (rsync refused, ViewVC redirects to the
-download page); the CVS metadata in the UNTRACKED `xb/` tree — a 2003 working
-copy, `xb/kdesigel/pixmaps/CVS/Root` and `Entries` — names
+download page); the CVS metadata in the `xb/` tree — a 2003 working copy,
+`xb/kdesigel/pixmaps/CVS/Root` and `Entries`, read there before `xb/` and
+`kbin.tar.gz` were deleted on 2026-09-20 — names
 `:ext:…@cvs.sigel.sourceforge.net:/cvsroot/sigel` and dates its oldest revision
 `1.1.1.1` to 18 December 2001, a vendor import and therefore *after* the change;
 and the project's own file listing offers source tarballs for **1.0 and 1.3
