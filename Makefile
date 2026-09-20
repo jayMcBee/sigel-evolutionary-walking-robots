@@ -506,7 +506,7 @@ $(B)/sigel_eval: sigel_eval.cpp $(MOC_OBJS_CORE) $(CLEAN_OBJ) $(CORE_LIBS) $(VEN
 
 # ---------------------------------------------------------------------------
 # Does SIGEL's own PVM code link and run against real PVM? -- PORTING.md
-# Phase P, step P4.  ./pvm-check.sh runs this.
+# Phase P, step P4.  ./checks/pvm-check.sh runs this.
 #
 # The two objects are named on the command line rather than left to the
 # archive, so the linker takes them whether or not anything references them.
