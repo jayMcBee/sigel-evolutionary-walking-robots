@@ -25,7 +25,7 @@ ROOT=$(cd "$(dirname "$0")/.." && pwd)
 [ -f "$ROOT/Makefile" ] && [ -d "$ROOT/checks" ] || {
 	echo "$0: $ROOT is not the repo root -- run the script by its real path,"\
 	     "not through a symlink or a copy" >&2; exit 1; }
-SRC=$ROOT/x/kdesigelSources.1.3/kdesigel/kdesigel
+SRC=$ROOT/sigel
 SL=$ROOT/x/supportingLibs/supportingLibs
 QTINC=$(qmake6 -query QT_INSTALL_HEADERS)
 QTLIBDIR=$(qmake6 -query QT_INSTALL_LIBS)
@@ -263,7 +263,7 @@ printf '%-22s %2d dead (baseline %d -- §2 has the per-signal table)\n' \
 # Encoding and line-ending fidelity.
 #
 # THE LINE-ENDING RULE CHANGED ON 2026-09-09, BY DECISION: the tree is LF only.
-# Every file under x/kdesigelSources.1.3 was converted -- 100 files, 17,750
+# Every DOS file in the 2003 source was converted -- 100 files, 17,750
 # CRLF pairs -- and this half of the check was turned round to match. It used to
 # say "a file that HAD a CR must still have one", with a baseline of 25 for the
 # files 03ac805 had already stripped. It now says NO TRACKED TEXT FILE MAY

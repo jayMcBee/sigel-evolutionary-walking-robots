@@ -44,7 +44,7 @@ export ASAN_OPTIONS
 python3 - "$EVAL" "$ROOT" <<'PY'
 import concurrent.futures as cf, glob, hashlib, os, queue, re, shutil, subprocess, sys, tempfile
 ev, root = sys.argv[1], sys.argv[2]
-src = os.path.join(root, 'x/kdesigelSources.1.3/kdesigel/kdesigel')
+src = os.path.join(root, 'sigel')
 
 # One SIGEL_ROOT per worker, each with its own Terrain.ter to rewrite.
 workers = min(os.cpu_count() or 1, 4)

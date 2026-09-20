@@ -104,7 +104,7 @@ cc -I"$PVM/include" "$ROOT/checks/programs/pvm_smoke.c" "$BIN/libpvm3.a" -ltirpc
 cat > "$PVM_TMP/lsan.supp" <<'SUPP'
 leak:dmEnvironment::loadTerrainData
 SUPP
-SIGEL_ROOT=$ROOT/x/kdesigelSources.1.3/kdesigel/kdesigel
+SIGEL_ROOT=$ROOT/sigel
 LSAN_OPTIONS=suppressions=$PVM_TMP/lsan.supp
 export SIGEL_ROOT LSAN_OPTIONS
 

@@ -5,6 +5,7 @@ The third-party code SIGEL is built on, and our fixes to it.
 `supportingLibs.tar.gz` and `pvm3.4.6.tgz` are the upstream archives, tracked
 here so the project builds without downloading anything. From the repo root:
 
+    mkdir -p x/supportingLibs
     tar xzf vendor/supportingLibs.tar.gz -C x/supportingLibs
     rm -rf x/supportingLibs/supportingLibs/pvm3
     tar xzf vendor/pvm3.4.6.tgz -C x/supportingLibs/supportingLibs \

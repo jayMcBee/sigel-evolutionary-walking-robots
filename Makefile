@@ -280,7 +280,7 @@ $(LIB)/libfparser.a: $(OBJ)/fparser/fparser.o
 # These get -Wall -Wextra and no -fpermissive, unlike the vendored code, and
 # UndefinedBehaviorSanitizer as well as AddressSanitizer.
 
-SRC   := x/kdesigelSources.1.3/kdesigel/kdesigel
+SRC   := sigel
 QTINC := $(shell qmake6 -query QT_INSTALL_HEADERS)
 QTLIB := $(shell qmake6 -query QT_INSTALL_LIBS)
 QTBIN := $(shell qmake6 -query QT_INSTALL_LIBEXECS)

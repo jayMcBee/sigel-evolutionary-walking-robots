@@ -37,7 +37,7 @@ make -q --no-print-directory -C "$ROOT" B="$B" >/dev/null 2>&1 || {
 	if [ "$B" = build ]; then hint="make B=$B"; else hint="make B=$B SAN= SIGSAN="; fi
 	echo ""$ROOT/$B/sigel_eval" is out of date -- run '$hint'" >&2; exit 1; }
 
-SIGEL_ROOT=$ROOT/x/kdesigelSources.1.3/kdesigel/kdesigel
+SIGEL_ROOT=$ROOT/sigel
 export SIGEL_ROOT
 # Duplicate-key tie-breaking, which no amount of shipped data can exercise --
 # no robot has a duplicate name, so both baselines stay empty when it breaks.

@@ -44,7 +44,7 @@ EVAL=$ROOT/$B/sigel_eval
 make -q --no-print-directory -C "$ROOT" B="$B" >/dev/null 2>&1 || {
 	echo ""$EVAL" is out of date -- run 'make B=$B SAN= SIGSAN='" >&2; exit 1; }
 
-SIGEL_ROOT=$ROOT/x/kdesigelSources.1.3/kdesigel/kdesigel
+SIGEL_ROOT=$ROOT/sigel
 export SIGEL_ROOT
 
 # A silently short dump is the dangerous failure: Phase D re-captures this file
