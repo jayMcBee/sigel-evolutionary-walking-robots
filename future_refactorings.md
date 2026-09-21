@@ -381,21 +381,6 @@ touched, because changing one changes behaviour against the reference binary.
   destroyed while running, the handler's SIGABRT branch prints `Abort` and calls
   `pvm_halt()` again, and the process stayed until SIGKILL.
 
-- [ ] **39. Finish clearing the 2003 Dortmund names.** The experiments are done
-  — PORTING.md, 2026-09-21. Left:
-  - **The 20 `robots/*/*.blend`.** Each holds a 2001 home directory. They are
-    binary, so a grep that skips binary files reports them clean; `grep -a`
-    finds all 20. They are the original Blender sources from SourceForge;
-    nothing reads them.
-  - **`sigel/README`**: the 2003 contact address, and a crontab example that
-    runs the launcher from an author's home directory.
-  - **`sigel/sigelDynClient`**: three lines that copy from, run from and change
-    into another author's home directory.
-  - **`v8-1.3-gp-blocks.txt` and `v6-1.3-friction-nocollide.txt`** quote the
-    hosts and paths as 1.3 printed them. They cannot be regenerated here.
-  - **PORTING.md and this file** still quote some of the old hosts and paths.
-  - **Git history** holds every old byte.
-
 - [ ] **41. The simulation viewer starts too close, and follows the robot.** Jan,
   2026-09-19: *"On both machines and SIGEL versions we're defaulting to trace
   robot and are zooming in way way way too much."* Both come from the form and
@@ -427,22 +412,45 @@ touched, because changing one changes behaviour against the reference binary.
   the call may reach no context; and ambient light has no effect while lighting
   is off, which may be so in wireframe mode. Not yet compared with 1.3.
 
-- [ ] **47. Modernise the two launcher scripts in the 1.3 tree.** Jan,
-  2026-09-20. `sigelLauncher` and `sigelDynClient` still set up a 2003 Solaris
-  machine: `uname = SunOS` branches, `QTDIR=/app/unido-inf/sun4_56/libqt/2.30/`,
-  `PVM_ROOT=/usr/lib/pvm3`, a `tcsh` shebang, and the Dortmund host names item 39
-  removes from the experiments. **Modernise in place, do not replace:** both
-  serve features the port still has — `sigel.cpp` still accepts `-devolve` /
-  `-de`. **`sigelLauncher` works:** `make` copies it into `sigelApp/`, and
-  `cd sigelApp && ./sigelLauncher` starts SIGEL. It still carries the
-  SunOS branch and the dead default `PVM_ROOT=/usr/lib/pvm3`.
-  **`sigelDynClient` does not work:** it runs `manage_dyn_slave`, which the port
-  does not build, from a 2003 home directory (item 39). It needs a second
-  machine to prove it on; the 1.3 reference machine is not ours to use for
-  tooling, so that half waits until there is one.
+- [ ] **47. `sigelDynClient` and `manage_dyn_slave`.** `sigelDynClient` makes a
+  second machine a dynamic slave of a master started with `sigel -de`, which
+  `sigel.cpp` still accepts. It is still 1.3's Solaris `tcsh` script, its home
+  folder paths are placeholders, and it runs `manage_dyn_slave`, which 1.3 built
+  and the port does not. **Modernise in place, do not replace.** It needs a
+  second machine to prove it on; the 1.3 reference machine is not ours to use
+  for tooling, so it waits until there is one.
+
+- [ ] **36. `SIG_Body::usedByLinks` is dead, and
+  `SIG_Material::FrictionValue` could be a value type.** Left converted rather
+  than changed during D11, on instruction, because the port moves the Qt API and
+  nothing else — which is a port-scope rule, not a refusal, so both belong here.
+  `addUsingLink` appends to `usedByLinks` from
+  `SIG_RobotCompilerObjects.cpp, linkGeometryFile` on every model load and
+  nothing in the tree reads it back; the member, the method and the one call can
+  all go. `FrictionValue` is two words held as `QList<FrictionValue *>` with a
+  `new` per entry and a `qDeleteAll` in `~SIG_Material`; values would delete
+  both, as D8 did for `SIG_Register`. The destructor already frees, so this one
+  is tidiness.
+
+- [ ] **37. Two `generateTerrain` calls in one process share the partial file
+  name.** The name carries host and process id, so it is unique per process, but
+  `MT_Controller` runs an evolution on its own thread. Not new — they interleaved
+  in `Terrain.ter` itself before the atomic write — and closing it needs per-call
+  state, which the port may not add.
+
+- [ ] **49. Set the experiments' termination date to 1 January 2030, 12:00.**
+  Jan, 2026-09-21. All 7 stop by date (`TERMINATIONUSESDATE 1`), on a day in
+  August or September 2001, so Start ends at once and a user must change the
+  date first. What moves with it: 8 lines in `pagesave-baseline.txt` — the
+  year, month, day and hour of both saves' `TERMINATIONTIME` — the year field in the GUI dump, and `guidrive`'s
+  `evolution` scenario, which counts on the past date to end a run at once.
 
 - [ ] **35. Remove the Windows and Visual Studio support.** Decided by Jan
   2026-09-09. It does not build here and nothing tests it.
+  **It could not build in 2003 either:** `Sigel.dsw` lists 13 projects and only
+  5 exist; the project files are Visual C++ 6 and link `msvcirt.lib`, which
+  Microsoft removed, and `qt-mt230nc.lib`, Qt 2.3.0 for Windows, which is not
+  obtainable; Release and Debug link PVM from different paths.
   **What is there:** 9 Visual Studio project files at the source root, 7,962
   lines — `.dsp` for `Sigel`, `SIGELCommon`, `MetaSIGEL`, `sigel_slave` and
   `manage_dyn_slave`, plus `Sigel.dsw`, `Sigel.mak`, `sigel_slave.mak` and
@@ -457,6 +465,15 @@ touched, because changing one changes behaviour against the reference binary.
   `pthread_t`, and the thread entry point twice.
   **`src/manage_dyn_slave.c` is in this list and is easy to miss** — the only
   `.c` file in the tree, 9 occurrences, invisible to a `--include=*.cpp` sweep.
+  **Keep the file itself**: 1.3 built it on Linux, and `sigelDynClient` needs it
+  (item 47). Only its Windows branches go.
+  **The two `WIN_` files are the `SIG_GPExperiment` trap again:** they declare
+  the same class, with the same include guard, as
+  `SIG_GPRemoteZORCFitnessFunction`, and only the project file chose between
+  them. `sigel_slave.cpp` includes the `WIN_` header inside its `_WINDOWS`
+  branch, so delete that branch and the two files in the same commit.
+  **The gates cannot see deleted code**: nothing ever compiled it. Read every
+  diff.
   **How:** delete the project files and the `WIN_` sources first, with
   `EXCLUDE_SIGEL_GP` and the four `winskip` sites in `check.sh`. Then take the
   `#ifdef _WINDOWS` blocks one module at a time, keeping the `#else` half; the
@@ -484,26 +501,9 @@ touched, because changing one changes behaviour against the reference binary.
   that number in three places — the per-step exit criterion in §7, the
   Handover's note on uncommitted work and the check list — and its trail in §7
   records each step. Move all of them in the same commit.
-  **Do not mix it with any other change. When:** after the MetaGP guard step and
-  its review.
-
-- [ ] **36. `SIG_Body::usedByLinks` is dead, and
-  `SIG_Material::FrictionValue` could be a value type.** Left converted rather
-  than changed during D11, on instruction, because the port moves the Qt API and
-  nothing else — which is a port-scope rule, not a refusal, so both belong here.
-  `addUsingLink` appends to `usedByLinks` from
-  `SIG_RobotCompilerObjects.cpp, linkGeometryFile` on every model load and
-  nothing in the tree reads it back; the member, the method and the one call can
-  all go. `FrictionValue` is two words held as `QList<FrictionValue *>` with a
-  `new` per entry and a `qDeleteAll` in `~SIG_Material`; values would delete
-  both, as D8 did for `SIG_Register`. The destructor already frees, so this one
-  is tidiness.
-
-- [ ] **37. Two `generateTerrain` calls in one process share the partial file
-  name.** The name carries host and process id, so it is unique per process, but
-  `MT_Controller` runs an evolution on its own thread. Not new — they interleaved
-  in `Terrain.ter` itself before the atomic write — and closing it needs per-call
-  state, which the port may not add.
+  **Do not mix it with any other change. When:** after every other item in this
+  section — Jan moved it to the back 2026-09-21, because it touches the whole
+  codebase.
 
 ---
 

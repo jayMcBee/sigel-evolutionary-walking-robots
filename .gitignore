@@ -16,8 +16,8 @@
 xb/
 
 # Unpacked from archives; neither is ours.
-#   supportingLibs/  vendored deps (Qt 2.3, dynamechs, SOLID, cv97, newmat09,
-#                    qhull, fparser, Dynamo) from vendor/supportingLibs.tar.gz,
+#   supportingLibs/  vendored deps (cv97, dynamechs, Dynamo, fparser, newmat09)
+#                    from vendor/supportingLibs.tar.gz,
 #                    patched by `make'; its pvm3/ comes from vendor/pvm3.4.6.tgz
 #   sigelSourceDistribution.1.0/  the older 1.0 release, kept for the deferred
 #                                 1.0 regression

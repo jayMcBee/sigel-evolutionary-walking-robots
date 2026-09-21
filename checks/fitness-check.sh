@@ -71,7 +71,9 @@ else
 	echo "      run 'ASAN_OPTIONS=detect_leaks=0 ./checks/fitness-check.sh build-asan' for it." >&2
 fi
 
-n=$(find "$ROOT/experiments" -name '*.exp' | wc -l)
+# Tracked files only: an untracked file there must not change what this reads.
+tracked() { git -C "$ROOT" ls-files -- "$1" | sed "s|^|$ROOT/|" | sort; }
+n=$(tracked 'experiments/*.exp' | wc -l)
 [ "$n" -eq 7 ] || { echo "expected 7 .exp under experiments/, found $n" >&2; exit 1; }
 # CAPTURE, TEST THE STATUS, THEN FILTER -- do NOT pipe sigel_eval straight into
 # tail. This line used to read
@@ -88,10 +90,10 @@ n=$(find "$ROOT/experiments" -name '*.exp' | wc -l)
 # catches a crash that printed NOTHING, and a crash after the last fitness line
 # still leaves one to read.
 #
-# dictorder-dump.sh:62-77 closed this exact hole and says so; this script did
-# not. Found by review 2026-09-07.
+# dictorder-dump.sh's evaluation loop closed this exact hole and says so; this
+# script did not. Found by review 2026-09-07.
 out=$(mktemp); err=$(mktemp)
-for f in $(find "$ROOT/experiments" -name '*.exp' | sort); do
+for f in $(tracked 'experiments/*.exp'); do
 	for i in 0 1 2; do
 		rc=0; "$ROOT/$B/sigel_eval" "$f" "$i" >"$out" 2>"$err" || rc=$?
 		if [ "$rc" -ne 0 ]; then

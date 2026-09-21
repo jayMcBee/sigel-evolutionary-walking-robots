@@ -58,8 +58,10 @@ export SIGEL_ROOT
 # A silently short dump is the dangerous failure: Phase D re-captures this file
 # at every step, so an empty run that exited 0 would overwrite the baseline and
 # report success. Count what we expect to find and refuse to run if it is off.
-exps=$(find "$ROOT/experiments" -name '*.exp' | sort)
-rrbs=$(find "$ROOT/robots" -name '*.rrb' | sort)
+# Tracked files only: an untracked file there must not change what this reads.
+tracked() { git -C "$ROOT" ls-files -- "$1" | sed "s|^|$ROOT/|" | sort; }
+exps=$(tracked 'experiments/*.exp')
+rrbs=$(tracked 'robots/*.rrb')
 ne=$(echo "$exps" | grep -c . || true); nr=$(echo "$rrbs" | grep -c . || true)
 [ "$ne" -eq 7 ] && [ "$nr" -eq 7 ] || {
 	echo "expected 7 .exp under experiments/ and 7 .rrb under robots/," >&2

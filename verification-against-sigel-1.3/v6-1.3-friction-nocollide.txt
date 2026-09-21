@@ -16,8 +16,9 @@ that is not yet loaded (V7 result 2), so both edits name a loaded partner.
 METHOD
 ------
 Scratch copy. The pristine hammer was md5-verified unchanged afterwards. The
-two dead 2003 roots were repointed separately -- /home/pg368/sawitzki/sigel,
-and /home/pg368/sawitzki/hammer/ on the three Body lines, all of which sit
+two dead 2003 roots were repointed separately -- /home/user/sigel,
+and /home/user/hammer/ on the three Body lines (2003 home folders, written
+here as /home/user), all of which sit
 inside the StreamedRobot block that opens at line 75243. Each edit asserted
 the expected token before substituting it. No pvmd, so the run is a pure load
 and save with zero generations evaluated.

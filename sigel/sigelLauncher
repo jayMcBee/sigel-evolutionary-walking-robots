@@ -1,36 +1,19 @@
 #!/bin/sh
 
 # Just modify the next line.
-SIGEL_ROOT=$PWD;
+SIGEL_ROOT=$PWD
 
 # Don't change the following lines.
-export SIGEL_ROOT;
-PVM_ROOT=/usr/lib/pvm3;
-
-if [ "`uname`" = "SunOS" ]
-  then PVM_ARCHDIR=SUN4SOL2
-    QTDIR="/app/unido-inf/sun4_56/libqt/2.30/"
-    LD_LIBRARY_PATH="${QTDIR}lib:${LD_LIBRARY_PATH}"
-    export QTDIR
-    export LD_LIBRARY_PATH
-fi
-
-if [ "`uname`" = "Linux" ]
-  then PVM_ARCHDIR=LINUX64
-    PVM_ROOT=$PWD/supportingLibs/pvm3
-fi
-
-export PVM_ROOT;
-PVM_ARCH=$PVM_ARCHDIR;
-export PVM_ARCH;
+export SIGEL_ROOT
+PVM_ROOT=$SIGEL_ROOT/supportingLibs/pvm3
+PVM_ARCH=LINUX64
+export PVM_ROOT PVM_ARCH
 
 # An experiment's slave directory of "." means PVM's own search path.
-mkdir -p $PVM_ROOT/bin/$PVM_ARCHDIR;
-ln -sf $SIGEL_ROOT/sigel_slave $PVM_ROOT/bin/$PVM_ARCHDIR/sigel_slave;
+mkdir -p "$PVM_ROOT/bin/$PVM_ARCH"
+ln -sf "$SIGEL_ROOT/sigel_slave" "$PVM_ROOT/bin/$PVM_ARCH/sigel_slave"
 
-PATH=$PVM_ROOT/bin/$PVM_ARCHDIR:$PVM_ROOT/lib:$PATH;
-export PATH;
-#PVM_DPATH=$PVM_ROOT/lib/pvmd;
-#export PVM_DPATH;
-cd $SIGEL_ROOT;
-./sigel $@;
+PATH=$PVM_ROOT/bin/$PVM_ARCH:$PVM_ROOT/lib:$PATH
+export PATH
+cd "$SIGEL_ROOT" || exit 1
+./sigel "$@"

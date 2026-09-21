@@ -286,7 +286,7 @@ printf '%-22s %2d dead (baseline %d -- §2 has the per-signal table)\n' \
 # file instead.
 #
 # WHAT IS BINARY IS GIT'S ANSWER, NOT A HOME-MADE ONE. \r\n inside a PNG or a
-# tarball is pixel data, not a line ending -- three tracked binaries hold 12
+# tarball is pixel data, not a line ending -- four tracked binaries hold 19
 # such pairs between them -- so binaries must be skipped. The first version of
 # this check tested for a NUL byte in the first 8 KB and GOT TWO FILES WRONG:
 # textures/Hippie.pnm has no NUL anywhere in its 196,668 bytes, and
@@ -299,7 +299,7 @@ printf '%-22s %2d dead (baseline %d -- §2 has the per-signal table)\n' \
 #
 # Lone CRs are left alone, and NOT because they are Mac-classic line endings --
 # an earlier version of this comment said that and it was wrong. 27 tracked
-# files hold lone CRs and git calls ALL 27 binary: supportingLibs.tar.gz 26002,
+# files hold lone CRs and git calls ALL 27 binary: supportingLibs.tar.gz 2415,
 # pvm3.4.6.tgz 3859,
 # noExperiment.png 691, JustGreen.pnm 2848, altLogo.png 208, Hippie.pnm 208,
 # Stone.pnm 68, and the 20 robot .blend files, 22 to 40 each. Those bytes are
@@ -1937,8 +1937,8 @@ pass=$((pass+v5p)); fail=$((fail+v5f))
 #   NOT 1.3's: `markers', `pvmhost' and the hammer robot-block hash. The
 #   experiment's host block and Body directories are not the shipped ones, so
 #   these pin this build against the file in experiments/. The file has one
-#   host, so host order is not tested. v8-1.3-gp-blocks.txt keeps 1.3's 20
-#   host names and their order for the file as shipped.
+#   host, so host order is not tested. v8-1.3-gp-blocks.txt keeps the order
+#   of 1.3's 20 hosts for the file as shipped.
 #
 #   OURS, and only ours: the `expstruct' hash, and the whole octopus half. V8
 #   never ran expstruct; it is kept because it covers the population, which

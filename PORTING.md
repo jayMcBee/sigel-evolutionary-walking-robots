@@ -68,7 +68,7 @@ The question: whether to route every real number through a C-style formatter to
 match 1.3's tie rounding.
 
 **WHAT 1.3 DOES.** Its `QTextStream` does not format doubles — it builds a format
-string and calls `sprintf` (`qtextstream.cpp:1776-1805`, vendored; the oracle
+string and calls `sprintf` (`qtextstream.cpp:1776-1805`, Qt 2.3's source; the oracle
 disassembled `__ls__11QTextStreamd` in `libqt-mt.so.2.3.1` and found the same).
 So every rounding decision is glibc's. Qt 6 formats doubles itself, through
 `libdouble-conversion`, and rounds a tie **away from zero** where glibc rounds
@@ -255,7 +255,7 @@ found a real defect.** §0 has the rule; it is not optional.
 │   ├── pixmaps/  textures/                 loaded at run time by name
 │   ├── Terrain.ter  stdConf.mt             run-time data
 │   ├── doc/                                2 Doxygen settings files, 2003
-│   ├── sigelLauncher  sigelDynClient       2003, item 47
+│   ├── sigelLauncher  sigelDynClient       sigelDynClient: item 47
 │   ├── povrayLauncher                      renders the POV-Ray export
 │   ├── COPYING  README  kdesigel.doxygen   upstream, 2003
 │   └── 9 Windows build files               future_refactorings.md item 35
@@ -460,8 +460,8 @@ woody libraries on the x86 box (§9).
 **`qt20fix` is not a Qt 2 → Qt 3 tool**, and nobody should go looking for one.
 It is Qt 2's own Qt **1.x** → Qt **2.x** script; the proof is `src/doc/porting.doc`
 in the Qt 2.3 source, headed *"Help with porting from Qt 1.x to Qt 2.x"*, whose
-line 156 points at `qt/bin/qt20fix`. That extract was deleted 2026-09-20 and is
-in `vendor/supportingLibs.tar.gz`. The
+line 156 points at `qt/bin/qt20fix`. That extract was deleted 2026-09-20; it is
+in the full supportingLibs archive, on SourceForge and in git history. The
 "20" is "2.0". **Qt never shipped a Qt 2 → Qt 3 converter at all**; Qt 3's
 porting guidance is a manual change list plus the `QT_COMPAT` headers.
 
@@ -707,7 +707,7 @@ make B=build-asan pvm-link   build-asan/pvm_link   P4's link and round trip
 `downloads/supportingLibs/pvm3/` is upstream 3.4.6, 844 files where
 3.4.3 had 576. `vendor/pvm3.4.6.tgz` is committed, md5
 `7b5f0c80ea50b6b4b10b6128e197747b`, identical to netlib's and to Debian's
-`.orig`. **It is the one tarball tracked here**: netlib is the only host still
+`.orig`. **It is tracked here**: netlib is the only host still
 publishing it, Fedora retired PVM in 2015 and Debian removed it in 2024.
 **3.4.3 could not have been patched instead: it has no `conf/LINUX64.def`**, and
 neither version contains any `aarch64` in `lib/pvmgetarch`. **Nothing of SIGEL's
@@ -719,7 +719,7 @@ is provenance, not a byte-for-byte proof.* *For 1.3 the supporting libraries wer
 a separate download; only the 1.0 distribution bundled them.*
 
 **The Makefile guards the swap** (`PVM_GUARD`). Re-extracting
-`supportingLibs.tar.gz` over the tree restores 3.4.3 with no error and a
+the full supportingLibs archive over the tree restores 3.4.3 with no error and a
 plausible file count, because `tar` overwrites but never deletes. **The guard
 reads `PVM_VER` from `include/pvm3.h` on every `make`, not from the patch
 stamp**, which survives exactly that accident; `clean` and `unpatch` still run
@@ -872,8 +872,45 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-21 — DONE: ITEM 48. SIGEL IS STARTED THE WAY EVERY USER STARTS IT.**
+**2026-09-21 — DONE: ITEM 39 FINISHED, AND `sigelLauncher` MODERNISED.**
 Start here.
+
+- **No 2003 author home folder and no 2003 machine name is left in any tracked
+  file.** Home folders became `/home/user/…`: in `sigel/README`,
+  `sigelDynClient`, the v6 capture's method note, `PORTING.md`, and inside the 20
+  `robots/*/*.blend`. The 2003 machine names became `hostNN`, one name per
+  machine, in the v8 capture and `PORTING.md`; the capture says so.
+- **The `.blend` files were edited byte for byte.** Each holds the path once, in
+  a zero-padded text field of Blender's file dialog. The new path and zeros
+  were written over it: size unchanged, 15 to 23 bytes changed per file, all
+  inside that field, carriage-return counts unchanged. Blender 2.11 and 2.14
+  files. Not opened in Blender — none is available here.
+- **`vendor/supportingLibs.tar.gz` is cut down to the five libraries the build
+  uses**, at Jan's word. The full archive held 27 generated Qt makefiles and an
+  old SPARC binary naming 2003 home folders, all in its unused `qt/`, and every
+  entry was owned by an author's login. The new one keeps `cv97`, `dynamechs`,
+  `Dynamo`, `fparser` and `newmat09` byte for byte, with the owner reset: 525
+  entries and 653 KB, against 2843 and 6.7 MB. Its PVM 3.4.3 went too — the
+  build takes PVM from `pvm3.4.6.tgz`. The full archive is on SourceForge and in
+  git history. Checked by unpacking it fresh, rebuilding from clean, and running
+  the five gates.
+- **`sigel/kdesigel.doxygen`** named an author's login in three `/tmp/…` paths;
+  they read `/tmp/user/…` now.
+- **Kept, at Jan's word:** the project's contact email in `sigel/README` and the
+  authors' credits — this is open source. **Git history is not rewritten.**
+- **`sigelLauncher`:** the dead Solaris branch, with its 2003 Qt path, and the
+  dead `PVM_ROOT` default are gone; paths are quoted, and arguments pass as
+  `"$@"`. `PVM_ROOT` now follows `SIGEL_ROOT`, so a cron start that edits only
+  the `SIGEL_ROOT` line, as 1.3's README describes, finds PVM. Tested from
+  `sigelApp/`, and cron-style from the home folder with an almost empty
+  environment.
+- **Not done:** `sigelDynClient` and `manage_dyn_slave` need a second machine —
+  item 47.
+- **Item 35, removing Windows support, moved to the back:** it touches the whole
+  codebase. What `~/sigel-vs-state.md` held and item 35 lacked is now in item 35;
+  the note is deleted.
+
+**2026-09-21 — DONE: ITEM 48. SIGEL IS STARTED THE WAY EVERY USER STARTS IT.**
 
 - **`make` fills `sigelApp/`**, and a user runs `cd sigelApp && ./sigelLauncher`,
   as 1.3's README describes. The folder holds the two programs, the three
@@ -929,7 +966,7 @@ Start here.
   `build/` and `build-fast/` named `x/`, and the next vendor rebuild would have
   stopped on them. None do now.
 
-**2026-09-21 — DONE: ITEM 39, THE EXPERIMENTS. THE 2003 HOSTS AND HOME DIRECTORIES ARE OUT.**
+**2026-09-21 — DONE: ITEM 39, THE EXPERIMENTS. THE 2003 HOSTS AND HOMES ARE OUT.**
 
 - **Replaced in all 7 `.exp`**, by one script:
 
@@ -961,7 +998,8 @@ Start here.
 - **Checks.** `markers`, `pvmhost` and the hammer robot-block hash in the
   `v2 round trip` section now pin the file in `experiments/`, not 1.3; with one
   host, host order is no longer tested. `v8-1.3-gp-blocks.txt` still holds
-  1.3's 20 names for the file as shipped. Both baselines were regenerated from
+  the order of 1.3's 20 hosts for the file as shipped. Both baselines were
+  regenerated from
   runs. The GUI dump replaces the repo's location with a token, because the GUI
   shows a slave directory as an absolute path. Five gates green, run on the
   committed content alone in a clean checkout.
@@ -1130,7 +1168,7 @@ ways: each exits 1 and writes nothing.
 **What the rebuild before this repair still carried, measured.** It restored the
 12 `.exp` from `experiments.tar.gz` and nothing else: both `runner*.exp` and all
 14 `results/*/*.exp` still carried the host edit, and that edit had also
-rewritten 37 `Body … /home/pg368/…/ y` entries inside robot blocks. Its dump
+rewritten 37 `Body … /home/user/…/ y` entries inside robot blocks. Its dump
 differed from the baseline in 602 changed lines, 16 hunks, all in 6 `.rrb`
 sections; no `.exp` section differed.
 The three backups in `~` taken during the loss held that damaged state and were
@@ -1489,7 +1527,8 @@ v=$("$ROOT/$B/sigel_eval" "$f" "$i" 2>/dev/null | tail -1 | awk '{print $3}')
 which throws away both halves of the evidence: a pipeline's status is its
 **last** command's, so `awk`'s 0 hid a `sigel_eval` that segfaulted, aborted or
 was OOM-killed, and `2>/dev/null` discarded the stream a sanitizer reports on.
-`dictorder-dump.sh:62-77` had closed this exact hole and says so in its own
+`dictorder-dump.sh`'s evaluation loop had closed this exact hole and says so
+in its own
 comment; this script never did. The first three check lines would still have
 caught a *changed number* through the baseline diff — **but the fourth line is
 checked by exit status alone**, so a UBSan `runtime error:` under
@@ -2125,7 +2164,8 @@ a `QMessageBox` opens, and the scenario sits on it until the watchdog fires with
 One session was spent on that. From `data/Experiments/twoBasesSimpleFitness1.exp`
 (C11's recipe): the GP `RANDOMSEED` (**the second of the two**) to 12345, the
 eight 2003 `PVMHOST` blocks replaced by ONE local block, and every
-`/home/pg368b/ross/projects/sigel` rewritten to the build directory. The host
+2003 home folder path, written here as `/home/user/projects/sigel`, rewritten
+to the build directory. The host
 line is `<hostname> <maxSlaves> 1 "<dir holding sigel_slave>"`, and the shipped
 file repeats the bare keyword `PVMHOST` before *every* host line rather than once
 as a header. Correct result: 70,779 lines, 14 fewer than the source, differing
@@ -2646,9 +2686,8 @@ ADD MOD MAX`, neither alphabetical nor declaration order, so it is hash order to
 
 **Traps this run found:**
 
-- **The dead 2003 paths differ per experiment.** `twoBases*` use
-  `/home/pg368b/ross/projects/sigel`; `octopus*` and `walker*` use a different
-  2001 author — `/home/pg368/sawitzki/sigel`, note `pg368` not `pg368b` — plus a
+- **The dead 2003 paths differ per experiment.** `twoBases*` use one 2001
+  author's home folder; `octopus*` and `walker*` use another's, plus a
   separate model directory on the `Body` lines. One of those occurrences is
   *inside* the `StreamedRobot` block, so repointing necessarily edits what is
   being compared; V1 diffed edited-input against output for that reason.
@@ -3724,7 +3763,7 @@ with the Dynamo backend on 2026-08-28, and for three weeks only the
 `-isystem .../SOLID-2.0/include` path survived. Both folders were then deleted
 from the vendored extract, the include path was removed from the `Makefile` and
 from `check.sh`, and everything was rebuilt from scratch with no error. They
-remain inside `vendor/supportingLibs.tar.gz`.
+remain in the full supportingLibs archive, on SourceForge and in git history.
 
 ##### Checks — all clean, which is the point
 
@@ -4355,7 +4394,7 @@ that claims focus against a version that never does.
 |---|---|---|---|
 | Double click opens the Individual View | yes, and only a real double click does it | yes: `itemDoubleClicked` once, one window | **agree** |
 | Two single clicks 1.2–2.0 s apart | no window. The probe still worked: the same clicks moved the selection and filled the properties pane | no window, `itemDoubleClicked` 0 | **agree**. This control is what makes the row above mean anything |
-| The interval | 400 ms. The oracle bracketed it between 0.3807 s (opens) and 0.4012 s (does not), over twelve trials | `QApplication::doubleClickInterval()` reports 400 | **agree**. The two halves are independent. The oracle measured the behaviour and read no source. This side read the number and did not run 1.3. The vendored Qt 2.3 gives the same number: `qapplication.cpp:280`, `int QApplication::mouse_double_click_time = 400` |
+| The interval | 400 ms. The oracle bracketed it between 0.3807 s (opens) and 0.4012 s (does not), over twelve trials | `QApplication::doubleClickInterval()` reports 400 | **agree**. The two halves are independent. The oracle measured the behaviour and read no source. This side read the number and did not run 1.3. Qt 2.3's source gives the same number: `qapplication.cpp:280`, `int QApplication::mouse_double_click_time = 400` |
 | Is there a real pointer grab while a menu is open? | yes. `XGrabPointer` from a second X client answers `AlreadyGrabbed` while the File menu is open, and `GrabSuccess` when it is closed | the popup is a `QMenu`. `QWidget::mouseGrabber()` is null, which is Qt's own record and not the X grab | not compared directly. See below |
 | Does the dismissing click reach the widget below? | yes. One click closes the menu and selects the row under it. The list moved from row 1 to row 3. On the tree it also changed the right-hand page | no. The press goes to the `QMenu` only. The list selection does not move | **DIFFERS** |
 | Second click on the same menubar item | the menu stays open. The oracle checked the map state, not the focus | the menu closes | **DIFFERS** |
@@ -4363,7 +4402,7 @@ that claims focus against a version that never does.
 | Where focus sits while a menu is open | on the popup. After an outside click it is `None(0)`, so keys go nowhere until something sets focus again | on the main window the whole time | differs. This is Qt, not SIGEL |
 
 **The swallowed click is the difference that matters.** It is in the divergences
-table. 1.3's side is not a guess, because the Qt 2 source is vendored here.
+table. 1.3's side is not a guess, because Qt 2's source is on SourceForge and in git history.
 `qapplication_x11.cpp:3402-3416` runs when the last popup closes. If the press
 was outside the popup, it calls `XAllowEvents(…, ReplayPointer, CurrentTime)`.
 The X server then delivers that press again, to the window below. The same code
@@ -4830,7 +4869,8 @@ the space and the opening quote, then walks to the closing quote:
     inputStream >> name >> maxSlaves >> enabledInt >> buffer >> buffer;
     while (buffer != '"') { dirString.append(buffer); inputStream >> buffer; }
 
-Measured on 6.10.2 with 1.3's own line `eiche 2 1 "/home/pg368b/ross/…"`: the
+Measured on 6.10.2 with 1.3's own line, with its host and folder replaced,
+`host05 2 1 "/home/user/…"`: the
 first read returns `' '` where Qt 2 returned `'"'`, the second returns `'"'`
 where Qt 2 returned `'/'`, the loop therefore never executes, and **every PVM
 host parsed from an `.exp` file gets an empty slave directory.**
@@ -4894,8 +4934,8 @@ and nothing in the compiler, in `check.sh` or in either baseline can see it.
 
 **Confirmed on the running 1.3 binary, not only in `qlistview.cpp`.** The x86
 box loaded `twoBasesSimpleFitness1.exp`, whose `PVMHOST` entries are in file
-order `wickie, bube, birke, urobe, pappel, lithium, eiche, herz`, and
-GP-Parameters → PVM draws them **exactly reversed**, `herz` first and `wickie`
+order `host06, host16, host04, host07, host02, host22, host05, host01`, and
+GP-Parameters → PVM draws them **exactly reversed**, `host01` first and `host06`
 last.
 
 **And it is visible there for a reason that generalises.** The view is sorted on
@@ -5669,7 +5709,7 @@ trailing zero after the point anywhere.
 | every distinct decimal literal in `data/Experiments/*.exp` and `data/Robots/*.rrb` — parse to `double`, write back through `QTextStream`, compare text | **4,330 literals, 0 differ** |
 
 **THIS FAMILY IS NOT CLOSED, AND THE AUDIT'S METHOD IS WHY IT LOOKED CLOSED.**
-Qt 2 wrote through `sprintf("%.*lg")` (`qtextstream.cpp:1776-1805`, vendored
+Qt 2 wrote through `sprintf("%.*lg")` (`qtextstream.cpp:1776-1805`, Qt 2.3's
 source). glibc rounds an exact decimal tie **half to even**; Qt 6's
 `QTextStream` rounds **half away from zero**. Measured at C5:
 

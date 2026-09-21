@@ -357,7 +357,7 @@ static int selfcheck()
   // replaced. Those semantics used to come from Q2PtrList, but the shim is
   // being deleted, so the reference has to outlive it.
   //
-  // Written from the vendored Qt 2.3 source, not from the shim:
+  // Written from Qt 2.3's source, not from the shim:
   //   first/next/last/current   qglist.cpp:203-260, qglist.h:186-196
   //   remove()                  qglist.cpp:504-516 -- removes CURRENT
   //   the cursor after removal  qglist.cpp:436-473 -- unlink() sets
@@ -415,7 +415,7 @@ static int selfcheck()
       // otherwise ship unverified.
       //
       // Run the same sequence against the rewrite and against Qt2CursorList
-      // above -- a model of the Qt 2 semantics taken from the vendored
+      // above -- a model of the Qt 2 semantics taken from Qt 2.3's
       // source -- and require they agree at every step. This used to compare
       // against the shim; the model replaces it so the check outlives the
       // shim's deletion.

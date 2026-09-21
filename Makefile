@@ -23,10 +23,10 @@
 # stamp behind: rm -rf the vendored tree first, or the build silently keeps
 # objects built from patched sources.
 #
-# ONE EXCEPTION: pvm3/ no longer comes from vendor/supportingLibs.tar.gz. It is
-# upstream PVM 3.4.6 out of vendor/pvm3.4.6.tgz, and that tarball still
-# carries 3.4.3. So after any rm -rf of the vendored tree, restore pvm3/ from
-# vendor/pvm3.4.6.tgz as well -- the guard below tells you so if you forget.
+# ONE EXCEPTION: pvm3/ does not come from vendor/supportingLibs.tar.gz. It is
+# upstream PVM 3.4.6 out of vendor/pvm3.4.6.tgz. So after any rm -rf of the
+# vendored tree, restore pvm3/ from vendor/pvm3.4.6.tgz as well -- the guard
+# below tells you so if you forget.
 #
 # ALWAYS rm -rf pvm3/ before re-extracting, never extract over it. PVM builds
 # in its own tree, and vendor/pvm3.4.6.tgz carries 1997-2007 mtimes -- older
@@ -47,8 +47,8 @@
 # literal to char* and a long to ios_base::fmtflags.
 #
 # In build-asan the vendored libraries get UndefinedBehaviorSanitizer too, minus
-# three checks they trip by construction: alignment and signed overflow
-# throughout qhull and the f2c translation of LINPACK's ssvdc, and vptr in cv97,
+# three checks they trip by construction: alignment and signed overflow in the
+# f2c translation of LINPACK's ssvdc, and vptr in cv97,
 # whose CLinkedList header node is a bare CLinkedListNode<T> that
 # CLinkedList.h:37 downcasts to T.
 # SIGEL's own code gets the full set.
@@ -89,7 +89,8 @@ PATCHES := $(wildcard vendor/patches/*.patch)
 # line is one of the four config lines Phase P adds, not something the version
 # bump supplies.)
 #
-# Re-extract vendor/supportingLibs.tar.gz over the tree and 3.4.3 comes back:
+# The full supportingLibs archive -- on SourceForge and in git history --
+# carries 3.4.3. Extract it over the tree and 3.4.3 comes back:
 # tar overwrites but never deletes, the paths and the file count both still look
 # right, and nothing errors. So check the version on every make rather than in
 # the patch stamp -- the stamp file survives exactly this accident, which is
