@@ -755,7 +755,7 @@ void SIG_GUIGPExperiment::slotRobotInfo()
     QMessageBox::information( experimentListView, "Robot Information", robInf );
   }
   else
-  { QMessageBox::information( experimentListView, "Can't display Robot Information..", "<B>Erm..<BR><BR></B>maybe you should *load* a robot first ?");
+  { QMessageBox::information( experimentListView, "Robot information", "No robot is loaded. Load a robot first.");
   }
 }
 

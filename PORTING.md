@@ -901,6 +901,12 @@ Start here.
   - `Phat processing of ` → `Computing the transformation of `, a debug line
     in `calculateAnyJoint` in `IFunctions.cpp`, inside `#ifdef SIG_DEBUG`: not
     compiled. The function it announces keeps its name.
+  - `SIG_GUIGPExperiment::slotRobotInfo`, the box shown when no robot is loaded:
+    title `Can't display Robot Information..` → `Robot information`, text
+    `<B>Erm..<BR><BR></B>maybe you should *load* a robot first ?` → `No robot is
+    loaded. Load a robot first.` The box for a loaded robot keeps its title
+    `Robot Information`, and the DynaMechs box in the same function keeps its
+    old title.
 - **Renamed:**
   - `SIG_GPManager::schlussJetzt` → `stopEvolutionNow`. `messageEvolutionStop()`
     sets it; each loop reads it straight after `stopIfNecessary()` and returns.
