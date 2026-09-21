@@ -1,6 +1,6 @@
 # xtest-baseline.txt -- what the port does with REAL X INPUT.
 #
-# The values are the port's for twoBases.exp. build-fast/guidrive runs as a
+# The values are the port's for twoBases.exp. build/guidrive runs as a
 # normal X11 client inside a
 # nested Xvfb, 1400x1000x24, with no window manager, under
 # QT_QPA_PLATFORM=xcb. xdotool sends XTEST input. check.sh's `real clicks'

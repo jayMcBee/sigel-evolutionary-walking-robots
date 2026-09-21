@@ -37,8 +37,8 @@
 # The host line and the two output directories are kept verbatim on save.
 #
 # Regenerate with:
-#   SIGEL_ROOT=... SIGEL_EXP=... build-fast/guidrive pagesave
-#   SIGEL_PAGEEDIT=1 ... build-fast/guidrive pagesave
+#   SIGEL_ROOT=sigelApp SIGEL_EXP=... build/guidrive pagesave
+#   SIGEL_PAGEEDIT=1 ... build/guidrive pagesave
 # and take everything before POPULATION BEGIN{ from each written file.
 == BASE BLOCK ==
 TIMETOSIMULATE

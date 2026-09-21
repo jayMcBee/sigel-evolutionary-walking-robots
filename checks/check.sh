@@ -21,7 +21,7 @@ set -e
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
 # ROOT is derived, not the script's own directory, so check it: a symlink or
 # a copy left at the old path would point it at the PARENT of the repo, and
-# check.sh removes $ROOT/build/ui before any other guard runs.
+# every path below is built from it.
 [ -f "$ROOT/Makefile" ] && [ -d "$ROOT/checks" ] || {
 	echo "$0: $ROOT is not the repo root -- run the script by its real path,"\
 	     "not through a symlink or a copy" >&2; exit 1; }
@@ -31,6 +31,8 @@ ROOT=$(cd "$(dirname "$0")/.." && pwd)
 # never cd'd before launching it.
 cd "$ROOT" || exit 1
 SRC=$ROOT/sigel
+# The folder SIGEL is started from -- the Makefile's sigelApp target.
+APP=$ROOT/sigelApp
 SL=$ROOT/downloads/supportingLibs
 QTINC=$(qmake6 -query QT_INSTALL_HEADERS)
 QTLIBDIR=$(qmake6 -query QT_INSTALL_LIBS)
@@ -49,9 +51,11 @@ done
 
 # SIGEL_Visualisation joined at C5, SIGEL_CommonGUI at C3 and SIGEL_SlaveGUI at
 # C4 -- a GUI module joins this list only when EVERY file in it compiles.
-# The converted forms generate ui_<Form>.h into build/ui, and GUI module headers
-# include them -- so they must exist and be on the include path BEFORE the module
-# and header passes, not only inside the forms section. C4 found this: five
+# The converted forms generate ui_<Form>.h, and GUI module headers include them
+# -- so they must exist and be on the include path BEFORE the module and header
+# passes, not only inside the forms section. They go to a scratch build folder
+# of this script's own: regenerating the real build/ui would leave every
+# program built from it out of date halfway through this run. C4 found this: five
 # SIGEL_SlaveGUI headers failed the standalone pass for want of the flag.
 FORMS_FAILED=
 # Regenerate unconditionally. make only re-runs uic when a .ui is newer than its
@@ -59,9 +63,10 @@ FORMS_FAILED=
 # below sees an empty log -- green with the defect still in the .ui. Review
 # proved it: injecting an <images> block failed the FIRST run and passed the
 # second. Deleting the output directory costs one uic pass over 20 forms.
-rm -rf "$ROOT/build/ui"
-if make -s -C "$ROOT" forms >/tmp/mkforms.$$ 2>&1; then
-    INCS="$INCS -I$ROOT/build/ui"
+FORMSB=${TMPDIR:-/tmp}/forms.$$
+rm -rf "$FORMSB"
+if make -s -C "$ROOT" B="$FORMSB" forms >/tmp/mkforms.$$ 2>&1; then
+    INCS="$INCS -I$FORMSB/ui"
 else
     FORMS_FAILED=1
     echo "  make forms FAILED -- every GUI module check below is unreliable:"
@@ -703,19 +708,19 @@ pass=$((pass+vp)); fail=$((fail+vf))
 # ./checks/check.sh after editing guidrive.cpp -- or after editing anything guidrive
 # links -- scored a STALE binary here and a fresh one there. That is the exact
 # shape fitness-check.sh and pvm-check.sh already guard against, applied to the
-# wrong end of this script. Note also that `make -q B=build-fast SAN= SIGSAN='
-# with no target answers for `all', which does NOT depend on guidrive: it
-# reports up to date while build-fast/guidrive is stale. Name the target.
-if ! make -s -C "$ROOT" B=build-fast SAN= SIGSAN= guidrive >/tmp/gdb.$$ 2>&1; then
+# wrong end of this script. Note also that `make -q' with no target answers
+# for `all', which does NOT depend on guidrive: it reports up to date while
+# build/guidrive is stale. Name the target.
+if ! make -s -C "$ROOT" guidrive sigelApp >/tmp/gdb.$$ 2>&1; then
     echo "  guidrive does not build; the two clip checks below prove nothing:"
     tail -6 /tmp/gdb.$$ | sed 's/^/    /'
 fi
 rm -f /tmp/gdb.$$
 
 cp=0; cf=0
-if SIGEL_ROOT="$SRC" QT_QPA_PLATFORM=offscreen \
+if SIGEL_ROOT="$APP" QT_QPA_PLATFORM=offscreen \
        SIGEL_EXP="$ROOT/experiments/twoBases.exp" \
-       timeout 300 "$ROOT/build-fast/guidrive" clipcheck >/tmp/clip.$$ 2>/dev/null; then
+       timeout 300 "$ROOT/build/guidrive" clipcheck >/tmp/clip.$$ 2>/dev/null; then
     cp=1
 else
     cf=1
@@ -761,10 +766,10 @@ pass=$((pass+cp)); fail=$((fail+cf))
 # section depended on the caller's working directory.
 mp=0; mf=0
 : > /tmp/fmin.$$
-if ! make -q --no-print-directory -C "$ROOT" B=build-fast SAN= SIGSAN= guidrive 2>/dev/null; then
+if ! make -q --no-print-directory -C "$ROOT" guidrive sigelApp 2>/dev/null; then
     mf=1
-    echo "  build-fast/guidrive is missing or out of date -- this section did NOT"
-    echo "  run. Build it with 'make B=build-fast SAN= SIGSAN= guidrive'."
+    echo "  build/guidrive or sigelApp/ is missing or out of date -- this section did NOT"
+    echo "  run. Build it with 'make guidrive sigelApp'."
 else
     # `|| mrc=$?', not a bare run followed by `mrc=$?'. This script sets -e and
     # this call is a plain command in an `else' branch, so a non-zero formsize
@@ -779,10 +784,10 @@ else
     # 20 forms, so that branch fires on a 21st .ui nobody added to the
     # scenario's table, which is what it is for. Corrected by review.
     mrc=0
-    SIGEL_ROOT="$SRC" QT_QPA_PLATFORM=offscreen \
+    SIGEL_ROOT="$APP" QT_QPA_PLATFORM=offscreen \
       SIGEL_EXP="$ROOT/experiments/twoBases.exp" \
       SIGEL_SCRATCH="${TMPDIR:-/tmp}" \
-      timeout 300 "$ROOT/build-fast/guidrive" formsize >/tmp/fmin.$$ 2>/tmp/fmerr.$$ \
+      timeout 300 "$ROOT/build/guidrive" formsize >/tmp/fmin.$$ 2>/tmp/fmerr.$$ \
       || mrc=$?
     # The .ui files on disk are the independent source. The scenario's form
     # table is a HAND list, so "20 forms" asserted against itself catches only
@@ -851,10 +856,10 @@ pass=$((pass+mp)); fail=$((fail+mf))
 # below -- guidrive makes one deliberately bogus connect at startup, so an empty
 # stderr means the logging was suppressed, not that the connects are sound.
 sp=0; sf=0
-if SIGEL_ROOT="$SRC" QT_QPA_PLATFORM=offscreen \
+if SIGEL_ROOT="$APP" QT_QPA_PLATFORM=offscreen \
        SIGEL_EXP="$ROOT/experiments/twoBases.exp" \
        SIGEL_SCRATCH="${TMPDIR:-/tmp}" \
-       timeout 300 "$ROOT/build-fast/guidrive" slavegui >/tmp/sclip.$$ 2>/tmp/serr.$$; then
+       timeout 300 "$ROOT/build/guidrive" slavegui >/tmp/sclip.$$ 2>/tmp/serr.$$; then
     # Both lines must be PRESENT and read 0. A missing line is a walk that did
     # not happen, which is the "0 clipped from a check that never ran" shape.
     got=$(sed -n 's/.*\(slave window\|movie settings dialog\) *[0-9]* visible widgets, \([0-9]*\) clipped.*/\1=\2/p' /tmp/sclip.$$)
@@ -946,11 +951,11 @@ rm -f /tmp/prog.$$
 # directory and, run from anywhere else, failed into "the two programs are not
 # built or are out of date" -- blaming the build for the invocation. That
 # comment was written 165 lines up and this line was missed. Found by review.
-if make -q --no-print-directory -C "$ROOT" B=build-fast SAN= SIGSAN= programs 2>/dev/null; then
+if make -q --no-print-directory -C "$ROOT" programs sigelApp 2>/dev/null; then
     for prog in sigel sigel_slave; do
-        f=$ROOT/build-fast/$prog
+        f=$ROOT/build/$prog
         if [ ! -x "$f" ]; then
-            pf=$((pf+1)); echo "  build-fast/$prog missing"
+            pf=$((pf+1)); echo "  build/$prog missing"
         elif [ "$(head -c 4 "$f" | tail -c 3)" != ELF ]; then
             # A SHELL WRAPPER LEFT IN PLACE OF THE BINARY PASSED EVERYTHING
             # ELSE. It is -x, it execs the real binary so the smoke test below
@@ -960,14 +965,14 @@ if make -q --no-print-directory -C "$ROOT" B=build-fast SAN= SIGSAN= programs 2>
             # the ctor_size assertion inside it. Measured: check.sh went fully
             # green against a 122-byte /bin/sh script standing in for
             # sigel_slave. Found by review.
-            pf=$((pf+1)); echo "  build-fast/$prog is not an ELF binary"
+            pf=$((pf+1)); echo "  build/$prog is not an ELF binary"
         else pp=$((pp+1)); fi
     done
     # sigel_slave with no PVM daemon must reach its own guard and exit cleanly.
     # sigel needs a display and starts a pvmd, so its run is driven by hand and
     # against the 1.3 oracle -- see PORTING.md C9.
-    out=$(SIGEL_ROOT="$SRC" QT_QPA_PLATFORM=offscreen \
-          timeout 60 "$ROOT/build-fast/sigel_slave" 2>&1 </dev/null || true)
+    out=$(SIGEL_ROOT="$APP" QT_QPA_PLATFORM=offscreen \
+          timeout 60 "$ROOT/build/sigel_slave" 2>&1 </dev/null || true)
     case $out in
         *"hasn't been started as a PVM slave"*) pp=$((pp+1)) ;;
         *) pf=$((pf+1))
@@ -977,7 +982,7 @@ if make -q --no-print-directory -C "$ROOT" B=build-fast SAN= SIGSAN= programs 2>
 else
     pf=$((pf+1))
     echo "  the two programs are not built or are out of date --"
-    echo "    run 'make B=build-fast SAN= SIGSAN= programs'"
+    echo "    run 'make programs sigelApp'"
 fi
 printf '%-22s %2d pass  %2d fail\n' "programs" "$pp" "$pf"
 pass=$((pass+pp)); fail=$((fail+pf))
@@ -997,7 +1002,7 @@ pass=$((pass+pp)); fail=$((fail+pf))
 # instead of the short one, or a checkable action that quietly stopped being
 # checkable. All of those compile, link and run perfectly.
 gp=0; gf=0
-if [ -d "$ROOT/build-fast/lib" ] && [ -d "$ROOT/build-fast/obj/moc" ]; then
+if [ -d "$ROOT/build/lib" ] && [ -d "$ROOT/build/obj/moc" ]; then
     cat > /tmp/gui.$$.cpp <<'GUIEOF'
 // Headless structural dump of the ported GUI, in the same shape the 1.3 oracle
 // reports, so the two can be diffed mechanically.
@@ -1076,14 +1081,14 @@ int main(int argc, char **argv)
     return 0;
 }
 GUIEOF
-    if g++ -std=c++17 -O1 -DMINMAX_H $INCS -I"$ROOT/build-fast/ui" /tmp/gui.$$.cpp \
-         $(find "$ROOT/build-fast/obj/moc" -name '*.o') \
-         "$ROOT/build-fast/obj/qrc/SIG_GPParameterBase.o" -o /tmp/gui.$$ \
-         -Wl,--start-group "$ROOT/build-fast"/lib/*.a -Wl,--end-group \
+    if g++ -std=c++17 -O1 -DMINMAX_H $INCS -I"$ROOT/build/ui" /tmp/gui.$$.cpp \
+         $(find "$ROOT/build/obj/moc" -name '*.o') \
+         "$ROOT/build/obj/qrc/SIG_GPParameterBase.o" -o /tmp/gui.$$ \
+         -Wl,--start-group "$ROOT/build"/lib/*.a -Wl,--end-group \
          "$SL/pvm3/lib/LINUX64/libpvm3.a" -ltirpc \
          -L"$QTLIBDIR" -lQt6OpenGLWidgets -lQt6OpenGL -lQt6Widgets -lQt6Gui \
          -lQt6Core -lGL -lGLU -lm 2>/tmp/guib.$$; then
-        SIGEL_ROOT="$SRC" QT_QPA_PLATFORM=offscreen timeout 120 /tmp/gui.$$ \
+        SIGEL_ROOT="$APP" QT_QPA_PLATFORM=offscreen timeout 120 /tmp/gui.$$ \
             > /tmp/guio.$$ 2>/dev/null || true
         if command grep -v '^#' "$ROOT/checks/baselines/guidump-baseline.txt" | diff -u - /tmp/guio.$$ > /tmp/guid.$$; then
             gp=1
@@ -1097,7 +1102,7 @@ GUIEOF
     rm -f /tmp/gui.$$ /tmp/gui.$$.cpp /tmp/guib.$$ /tmp/guid.$$ /tmp/guio.$$
 else
     gf=1
-    echo "  no built GUI libraries -- run 'make B=build-fast SAN= SIGSAN= gui'"
+    echo "  no built GUI libraries -- run 'make gui'"
 fi
 printf '%-22s %2d pass  %2d fail\n' "gui vs 1.3" "$gp" "$gf"
 pass=$((pass+gp)); fail=$((fail+gf))
@@ -1134,9 +1139,9 @@ if [ ! -f "$BEXP" ]; then
     echo "  SKIPPED: no $BEXP -- restore experiments/ from git, then re-run."
     echo "  THIS SECTION TESTED NOTHING."
     skipped=$((skipped+1))
-elif make -s -C "$ROOT" B=build-fast SAN= SIGSAN= guidrive >/tmp/bdb.$$ 2>&1; then
-    # SIGEL_ROOT must be the SOURCE tree: the driver loads pixmaps and terrain
-    # from it. Neither scenario spawns a sigel_slave, so neither needs one.
+elif make -s -C "$ROOT" guidrive sigelApp >/tmp/bdb.$$ 2>&1; then
+    # SIGEL_ROOT is sigelApp/, the folder SIGEL is started from: the driver
+    # loads pixmaps and terrain from it. Neither scenario spawns a sigel_slave, so neither needs one.
     #
     # ELEVEN scenarios make up the baseline, concatenated in this order
     # (`roundtrip' 2026-09-03, `metadrive' 2026-09-04, `runlock' 2026-09-05,
@@ -1206,9 +1211,9 @@ elif make -s -C "$ROOT" B=build-fast SAN= SIGSAN= guidrive >/tmp/bdb.$$ 2>&1; th
     # review 2026-09-03.
     guidrive_run() {
         local sc="$1" out="$2"; shift 2
-        env "$@" SIGEL_ROOT="$SRC" SIGEL_EXP="$BEXP" \
+        env "$@" SIGEL_ROOT="$APP" SIGEL_EXP="$BEXP" \
             SIGEL_SCRATCH="${TMPDIR:-/tmp}" QT_QPA_PLATFORM=offscreen \
-            timeout 300 "$ROOT/build-fast/guidrive" "$sc" > "$out" 2>>/tmp/berr.$$
+            timeout 300 "$ROOT/build/guidrive" "$sc" > "$out" 2>>/tmp/berr.$$
     }
     # `|| bf=1' because this runs under `set -e' with no trap: a bare `: > path'
     # that fails (unwritable or full /tmp) would abort the WHOLE script here,
@@ -1436,9 +1441,9 @@ elif ! command -v Xvfb >/dev/null 2>&1 || ! command -v xdotool >/dev/null 2>&1 \
     echo "  delivered and the only section that tests the platform layer did"
     echo "  not run. Install x11-utils/xvfb and xdotool, or delete this section"
     echo "  deliberately -- do not leave it passing silently."
-elif [ ! -x "$ROOT/build-fast/guidrive" ]; then
+elif [ ! -x "$ROOT/build/guidrive" ]; then
     xtf=1; echo "  guidrive is not built -- the real-input section tested NOTHING"
-elif ! (cd "$ROOT" && make -q B=build-fast SAN= SIGSAN= guidrive) 2>/dev/null; then
+elif ! (cd "$ROOT" && make -q guidrive sigelApp) 2>/dev/null; then
     # NAME THE TARGET. `make -q' with no target answers for `all', which does
     # not depend on guidrive. The section above builds it and only sets bf=1 if
     # that build fails, so without this check a compile failure leaves the
@@ -1447,7 +1452,7 @@ elif ! (cd "$ROOT" && make -q B=build-fast SAN= SIGSAN= guidrive) 2>/dev/null; t
     # of PORTING.md already states this rule for the three gate scripts; it was
     # missing here.
     xtf=1
-    echo "  build-fast/guidrive is out of date, so this section would have"
+    echo "  build/guidrive or sigelApp/ is out of date, so this section would have"
     echo "  measured a binary that is not the source in the tree."
 elif true; then
     # A display already in use would make every click land in someone else's
@@ -1500,12 +1505,12 @@ elif true; then
             # because it pins the ratio, which is why no other section needs
             # this. guidrive also refuses a devicePixelRatio other than 1 on its
             # own, so a caller who runs it directly is covered too.
-            if env DISPLAY="$XTDISP" SIGEL_ROOT="$SRC" SIGEL_EXP="$BEXP" \
+            if env DISPLAY="$XTDISP" SIGEL_ROOT="$APP" SIGEL_EXP="$BEXP" \
                    SIGEL_SCRATCH="${TMPDIR:-/tmp}" QT_QPA_PLATFORM=xcb \
                    QT_SCALE_FACTOR=1 QT_SCREEN_SCALE_FACTORS= \
                    QT_ENABLE_HIGHDPI_SCALING=0 QT_AUTO_SCREEN_SCALE_FACTOR=0 \
                    QT_FONT_DPI= QT_SCALE_FACTOR_ROUNDING_POLICY=Round \
-                   timeout 300 "$ROOT/build-fast/guidrive" xtest \
+                   timeout 300 "$ROOT/build/guidrive" xtest \
                    > /tmp/xt.$$ 2>/tmp/xterr.$$; then
                 # The control, before the diff: if the run could not tell a real
                 # click from a QTest one, the numbers below mean nothing and the
@@ -1584,13 +1589,13 @@ elif [ ! -f "$BEXP" ]; then
     echo "  SKIPPED: no $BEXP -- restore experiments/ from git. THIS SECTION"
     echo "  TESTED NOTHING."
     skipped=$((skipped+1))
-elif [ -x "$ROOT/build-fast/guidrive" ]; then
+elif [ -x "$ROOT/build/guidrive" ]; then
     # Same env as guidrive_run above, minus the locale extras. The two runs
     # differ only in SIGEL_PAGEEDIT, which selects the eleven-edit set.
     psrun() {
-        env ${2:+SIGEL_PAGEEDIT=1} SIGEL_ROOT="$SRC" SIGEL_EXP="$BEXP" \
+        env ${2:+SIGEL_PAGEEDIT=1} SIGEL_ROOT="$APP" SIGEL_EXP="$BEXP" \
             SIGEL_SCRATCH="$PSD" QT_QPA_PLATFORM=offscreen \
-            timeout 300 "$ROOT/build-fast/guidrive" pagesave > "$1" 2>>/tmp/pserr.$$
+            timeout 300 "$ROOT/build/guidrive" pagesave > "$1" 2>>/tmp/pserr.$$
     }
     rm -f "$PSD/pagesave-base.exp" "$PSD/pagesave-edited.exp"
     : > /tmp/pserr.$$
@@ -1685,7 +1690,7 @@ elif [ -x "$ROOT/build-fast/guidrive" ]; then
     fi
     rm -f "$PSD/pagesave-base.exp" "$PSD/pagesave-edited.exp"
 else
-    pf=1; echo "  build-fast/guidrive is missing -- run 'make B=build-fast SAN= SIGSAN= guidrive'"
+    pf=1; echo "  build/guidrive is missing -- run 'make guidrive sigelApp'"
 fi
 rm -f /tmp/ps1.$$ /tmp/ps2.$$ /tmp/psall.$$ /tmp/psd.$$ /tmp/pserr.$$
 printf '%-22s %2d pass  %2d fail\n' "pagesave" "$pp" "$pf"
@@ -1751,7 +1756,7 @@ v5p=0; v5f=0
 V5SRC=$SRC/src/SIGEL_Simulation
 V5Q=$V5SRC/SIG_DynaMechsSimulationQueries.cpp
 V5C=$V5SRC/SIG_DynaMechsCommandInterface.cpp
-V5BIN=$ROOT/build-fast/sigel_eval
+V5BIN=$ROOT/build/sigel_eval
 if [ ! -f "$V5Q" ] || [ ! -f "$V5C" ]; then
     v5f=1; echo "  the two simulation sources are missing -- nothing was checked"
 else
@@ -1784,9 +1789,9 @@ else
         echo "  If a site was legitimately added or removed, move the count"
         echo "  deliberately and say why."
     elif [ ! -x "$V5BIN" ]; then
-        v5f=1; echo "  no $V5BIN -- run 'make B=build-fast SAN= SIGSAN= all'"
-    elif ! make -q -C "$ROOT" --no-print-directory B=build-fast SAN= SIGSAN= all 2>/dev/null; then
-        v5f=1; echo "  $V5BIN is out of date -- run 'make B=build-fast SAN= SIGSAN= all'"
+        v5f=1; echo "  no $V5BIN -- run 'make sigel_eval'"
+    elif ! make -q -C "$ROOT" --no-print-directory sigel_eval 2>/dev/null; then
+        v5f=1; echo "  $V5BIN is out of date -- run 'make sigel_eval'"
     else
         # .rodata ONLY, and that bound is load-bearing rather than tidiness.
         # The Makefile compiles with -g, so the constant also appears twice in
@@ -1983,16 +1988,16 @@ if [ ! -f "$V2HAM" ] || [ ! -f "$V2OCT" ]; then
     echo "  SKIPPED: no $V2HAM or $V2OCT -- restore experiments/ from git,"
     echo "  then re-run. THIS SECTION TESTED NOTHING."
     skipped=$((skipped+1))
-elif [ ! -x "$ROOT/build-fast/guidrive" ]; then
-    v2f=1; echo "  build-fast/guidrive is missing -- run 'make B=build-fast SAN= SIGSAN= guidrive'"
-elif ! make -q -C "$ROOT" --no-print-directory B=build-fast SAN= SIGSAN= guidrive 2>/dev/null; then
+elif [ ! -x "$ROOT/build/guidrive" ]; then
+    v2f=1; echo "  build/guidrive is missing -- run 'make guidrive sigelApp'"
+elif ! make -q -C "$ROOT" --no-print-directory guidrive sigelApp 2>/dev/null; then
     # A failed make leaves the previous binary in place, so a test for
     # existence passes on a stale one. D13 was scored green that way.
     # -C "$ROOT" because this script never cd's -- without it the check
     # depends on the caller's working directory and reports a false failure
     # from anywhere but the repo root. The rule is stated at the top of the
     # `form minimums' section and two other sites already obey it.
-    v2f=1; echo "  build-fast/guidrive is out of date -- run 'make B=build-fast SAN= SIGSAN= guidrive'"
+    v2f=1; echo "  build/guidrive or sigelApp/ is out of date -- run 'make guidrive sigelApp'"
 elif ! mkdir -p "$V2D"; then
     v2f=1; echo "  cannot create $V2D"
 else
@@ -2007,8 +2012,8 @@ else
     # $1 = stem, $2 = input pass number.
     v2run() {
         rm -f "$V2D/pagesave-base.exp"
-        env SIGEL_ROOT="$SRC" SIGEL_EXP="$V2D/$1$2.exp" SIGEL_SCRATCH="$V2D" \
-            QT_QPA_PLATFORM=offscreen timeout 300 "$ROOT/build-fast/guidrive" \
+        env SIGEL_ROOT="$APP" SIGEL_EXP="$V2D/$1$2.exp" SIGEL_SCRATCH="$V2D" \
+            QT_QPA_PLATFORM=offscreen timeout 300 "$ROOT/build/guidrive" \
             pagesave > "$V2D/$1$2.out" 2>>"$V2D/err" \
         && mv "$V2D/pagesave-base.exp" "$V2D/$1$(($2 + 1)).exp"
     }
@@ -2339,7 +2344,7 @@ else
         # Found by the C1 review.
         pfx=
         [ -f "$qrc" ] && pfx=$(sed -n 's/.*<qresource prefix="\([^"]*\)".*/\1/p' "$qrc")
-        for want in $(command grep -ao ':/[A-Za-z0-9_/.-]*' "$ROOT/build/ui/ui_$base.h" | sort -u); do
+        for want in $(command grep -ao ':/[A-Za-z0-9_/.-]*' "$FORMSB/ui/ui_$base.h" | sort -u); do
             [ -f "$qrc" ] || { ff=$((ff+1)); echo "  form FAIL: $want but no $form.qrc"; continue; }
             rel=${want#:$pfx/}
             if [ "$rel" != "$want" ] && command grep -aq "<file>$rel</file>" "$qrc" \
@@ -2349,7 +2354,7 @@ else
         done
         if [ -f "$qrc" ]; then
             for have in $(sed -n 's|.*<file>\(.*\)</file>.*|\1|p' "$qrc"); do
-                if command grep -aq ":$pfx/$have" "$ROOT/build/ui/ui_$base.h"; then fp=$((fp+1))
+                if command grep -aq ":$pfx/$have" "$FORMSB/ui/ui_$base.h"; then fp=$((fp+1))
                 else ff=$((ff+1)); echo "  form FAIL: $form.qrc carries $have, ui_$base.h never uses it"; fi
             done
         fi
@@ -2359,9 +2364,9 @@ else
         # come out reversed wherever column 0 holds text. C1 found this and
         # fixed one view; C2 re-created it in four more. This is why it is a
         # check and not a habit.
-        if [ -f "$ROOT/build/ui/ui_$base.h" ]; then
+        if [ -f "$FORMSB/ui/ui_$base.h" ]; then
             for v in $(command grep -aoE '^        [A-Za-z0-9_]+->setSortingEnabled\(true\)' \
-                       "$ROOT/build/ui/ui_$base.h" | sed 's/->.*//;s/ *//' | sort -u); do
+                       "$FORMSB/ui/ui_$base.h" | sed 's/->.*//;s/ *//' | sort -u); do
                 nsort=$((nsort+1))
                 if [ -n "$blocked" ] || command grep -aq "$v->sortByColumn(" "$SRC/src/$mod/$base.cpp"; then fp=$((fp+1))
                 else ff=$((ff+1)); echo "  form FAIL: $base sorts $v but never pins the direction"; fi
@@ -2405,6 +2410,7 @@ printf '%-22s %2d pass  %2d fail  %3d warnings\n' "forms (Phase C)" "$fp" "$ff" 
 pass=$((pass+fp)); fail=$((fail+ff)); warn=$((warn+fw))
 
 rm -f /tmp/chk.$$ /tmp/hdr.$$.cpp /tmp/uic.$$ /tmp/uic2.$$ /tmp/moc.$$.cpp /tmp/mkforms.$$
+rm -rf "$FORMSB"
 echo "-----"
 echo "total: $pass pass, $fail fail, $warn warnings in SIGEL code"
 [ "$winskip" = 0 ] || echo "$winskip Windows-only WIN_* file(s) excluded -- permanent, §7"

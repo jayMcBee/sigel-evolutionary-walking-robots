@@ -1,18 +1,20 @@
 # Build for the Qt 6 port -- PORTING.md §3.
 #
-# Two halves: the vendored third-party libraries, then SIGEL's own code and a
-# program that runs one fitness evaluation.
+# Two halves: the vendored third-party libraries, then SIGEL's own code.
 #
-#   make            build/sigel_eval -- one fitness evaluation
+#   make            sigel and sigel_slave, then sigelApp/ -- the folder SIGEL is
+#                   started from: cd sigelApp && ./sigelLauncher
+#   make sigel_eval build/sigel_eval -- one fitness evaluation, for the checks
 #   make vendor     the five vendored libraries only
 #   make pvm        libpvm3.a and pvmd3, built by PVM's own make
 #   make pvm-link   build/pvm_link -- SIGEL's PVM code against real PVM
 #   make core       the nine SIGEL core modules only
-#   make clean      remove build/ and PVM's products
+#   make clean      remove build/ and PVM's products; sigelApp/ stays, and
+#                   needs `make' again before SIGEL can start PVM
 #   make unpatch    revert the vendored tree to the tarball contents
 #
-# make B=build-fast SAN= SIGSAN=   the same thing without the sanitizers, in a
-# separate directory. One evaluation is 0.2 s either way.
+# make B=build-asan ...   the same with AddressSanitizer and
+# UndefinedBehaviorSanitizer, in its own directory. Only the checks use it.
 #
 # The vendored tree is not tracked (it comes out of
 # vendor/supportingLibs.tar.gz), so our edits to it live in vendor/patches/ and
@@ -44,10 +46,11 @@
 # -fpermissive covers exactly newmat1.cpp and newmat9.cpp, which pass a string
 # literal to char* and a long to ios_base::fmtflags.
 #
-# The vendored libraries get UndefinedBehaviorSanitizer too, minus three checks
-# they trip by construction: alignment and signed overflow throughout qhull and
-# the f2c translation of LINPACK's ssvdc, and vptr in cv97, whose CLinkedList
-# header node is a bare CLinkedListNode<T> that CLinkedList.h:37 downcasts to T.
+# In build-asan the vendored libraries get UndefinedBehaviorSanitizer too, minus
+# three checks they trip by construction: alignment and signed overflow
+# throughout qhull and the f2c translation of LINPACK's ssvdc, and vptr in cv97,
+# whose CLinkedList header node is a bare CLinkedListNode<T> that
+# CLinkedList.h:37 downcasts to T.
 # SIGEL's own code gets the full set.
 
 # A recipe that fails AFTER creating its target leaves that target on disk,
@@ -59,11 +62,21 @@
 SL   := downloads/supportingLibs
 SHIM := shim
 B    := build
+# One spelling per folder: build-asan/, ./build-asan and an absolute path in
+# this tree all become build-asan. Otherwise the targets are spelled
+# differently from the ones the .d files name, header changes go unseen, and
+# `make -q' passes on a stale program.
+override B := $(patsubst $(CURDIR)/%,%,$(patsubst ./%,%,$(patsubst %/,%,$(B))))
 LIB  := $(B)/lib
 OBJ  := $(B)/obj
 
+# The sanitizers are on in build-asan only, and only the checks build it.
+ifeq ($(B),build-asan)
 SAN  := -fsanitize=address,undefined -fno-omit-frame-pointer \
         -fno-sanitize=alignment,signed-integer-overflow,vptr
+else
+SAN  :=
+endif
 VCXX := g++ -std=c++17 -O1 -g -w -fpermissive -DMINMAX_H $(SAN)
 VCC  := gcc -std=gnu17 -O1 -g -w $(SAN)
 
@@ -136,8 +149,14 @@ PVM_DIR  := $(SL)/pvm3
 PVM_LIB  := $(PVM_DIR)/lib/LINUX64/libpvm3.a
 PVM_D    := $(PVM_DIR)/lib/LINUX64/pvmd3
 
-.PHONY: all vendor core clean unpatch pvm pvm-link
-all: $(B)/sigel_eval
+.PHONY: all vendor core clean unpatch pvm pvm-link sigel_eval
+# sigelApp/ takes the plain build only, so a sanitized `make' does not fill it.
+ifeq ($(B),build)
+all: programs sigelApp
+else
+all: programs
+endif
+sigel_eval: $(B)/sigel_eval
 vendor: $(VENDOR_LIBS)
 pvm: $(PVM_LIB) $(PVM_D)
 pvm-link: $(B)/pvm_link
@@ -277,8 +296,8 @@ $(LIB)/libfparser.a: $(OBJ)/fparser/fparser.o
 # way -- a static_cast of a NULL pointer is well defined. Found by review
 # 2026-09-07, alongside the same mistake in MT_Controller.cpp.
 #
-# These get -Wall -Wextra and no -fpermissive, unlike the vendored code, and
-# UndefinedBehaviorSanitizer as well as AddressSanitizer.
+# These get -Wall -Wextra and no -fpermissive, unlike the vendored code, and in
+# build-asan UndefinedBehaviorSanitizer as well as AddressSanitizer.
 
 SRC   := sigel
 QTINC := $(shell qmake6 -query QT_INSTALL_HEADERS)
@@ -288,7 +307,11 @@ MOC   := $(QTBIN)/moc
 UIC   := $(QTBIN)/uic
 RCC   := $(QTBIN)/rcc
 
+ifeq ($(B),build-asan)
 SIGSAN := -fsanitize=address,undefined -fno-omit-frame-pointer
+else
+SIGSAN :=
+endif
 SIGINC := -Ishim -I$(SRC)/include -I$(B)/ui -isystem $(QTINC) \
           $(addprefix -isystem $(QTINC)/,QtCore QtGui QtWidgets \
                                         QtOpenGL QtOpenGLWidgets) \
@@ -331,10 +354,6 @@ gui: $(GUI_LIBS)
 # caught precisely that.
 GUI_SLAVE := SIGEL_CommonGUI SIGEL_Visualisation SIGEL_SlaveGUI
 GUI_SLAVE_LIBS := $(patsubst %,$(LIB)/lib%.a,$(GUI_SLAVE))
-
-$(OBJ)/sigel/%.o: $(SRC)/src/%.cpp $(STAMP)
-	@mkdir -p $(dir $@)
-	$(SIGCXX) -MMD -MP $(SIGINC) -c $< -o $@
 
 # ---------------------------------------------------------------------------
 # The 20 Designer forms -- PORTING.md Phase C, §7.
@@ -410,6 +429,14 @@ $(OBJ)/qrc/%.o: $(B)/qrc/qrc_%.cpp
 	@mkdir -p $(dir $@)
 	$(SIGCXX) -MMD -MP $(SIGINC) -c $< -o $@
 
+# SIGEL's objects include the patched vendored headers and the generated form
+# headers, so both come first. Without the order, a fresh unpack compiles
+# against unpatched cv97 headers and fails, and a fresh build fails on a missing
+# ui_*.h. The form headers are order-only: the .d files track real changes.
+$(OBJ)/sigel/%.o: $(SRC)/src/%.cpp $(STAMP) | $(UI_HDRS)
+	@mkdir -p $(dir $@)
+	$(SIGCXX) -MMD -MP $(SIGINC) -c $< -o $@
+
 # The Q_OBJECT classes in core. Their vtable and typeinfo live in the generated
 # code, so without these the link fails on SIG_Simulation. SIG_DynaSystem.h was
 # the third entry until the Dynamo backend was deleted (PORTING.md).
@@ -446,7 +473,7 @@ $(B)/moc/%.cpp: $(SRC)/include/%.h
 	@mkdir -p $(dir $@)
 	$(MOC) $(subst -isystem ,-I,$(SIGINC)) $< -o $@   # moc rejects -isystem
 
-$(OBJ)/moc/%.o: $(B)/moc/%.cpp
+$(OBJ)/moc/%.o: $(B)/moc/%.cpp $(STAMP) | $(UI_HDRS)
 	@mkdir -p $(dir $@)
 	$(SIGCXX) -MMD -MP $(SIGINC) -c $< -o $@
 
@@ -592,6 +619,39 @@ $(B)/sigel_slave: $(SRC)/src/sigel_slave.cpp $(MOC_OBJS_SLAVE) $(QRC_SLAVE) $(CL
 	 test -n "$$want" && test "$$got" = "$$want" || { \
 	   echo "sigel_slave linked the WRONG SIG_GPExperiment: constructor is $$got," \
 	        "Clean's is $$want -- see PORTING.md section 9." >&2; exit 1; }
+
+# ---------------------------------------------------------------------------
+# sigelApp/ -- the folder SIGEL is started from, as 1.3's README describes it:
+# the two programs, the three scripts, Terrain.ter, stdConf.mt, pixmaps/,
+# textures/ and supportingLibs/pvm3. Start SIGEL there with ./sigelLauncher.
+#
+# The data are copies, not links: SIGEL rewrites Terrain.ter and writes movie/
+# in the folder it runs from, and the tracked files must not change. cp -p keeps
+# the source's time, so a copy that SIGEL has since rewritten is newer and is
+# left alone. The programs always come from the plain build/ and go through a
+# temporary name, so a running copy is not overwritten in place. `make clean'
+# leaves this folder alone -- what a user saved or generated here stays -- but
+# it removes PVM's build, so run `make' again before starting SIGEL.
+APP      := sigelApp
+APP_DATA := sigelLauncher povrayLauncher sigelDynClient Terrain.ter stdConf.mt \
+            $(patsubst $(SRC)/%,%,$(wildcard $(SRC)/pixmaps/* $(SRC)/textures/*))
+
+.PHONY: sigelApp
+sigelApp: $(APP)/sigel $(APP)/sigel_slave $(addprefix $(APP)/,$(APP_DATA)) \
+          $(APP)/supportingLibs/pvm3
+
+$(APP)/sigel $(APP)/sigel_slave: $(APP)/%: build/%
+	@mkdir -p $(dir $@)
+	cp $< $@.tmp && mv -f $@.tmp $@
+
+$(addprefix $(APP)/,$(APP_DATA)): $(APP)/%: $(SRC)/%
+	@mkdir -p $(dir $@)
+	cp -p $< $@
+
+# PVM stays where it was built; the launcher's PVM_ROOT reaches it through this.
+$(APP)/supportingLibs/pvm3: | $(PVM_LIB)
+	@mkdir -p $(dir $@)
+	ln -sfn ../../$(PVM_DIR) $@
 
 # The GUI behaviour driver -- PORTING.md Phase C, step C10.
 #

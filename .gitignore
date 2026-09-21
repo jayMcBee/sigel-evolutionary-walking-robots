@@ -25,7 +25,11 @@ xb/
 
 build/
 
-build-fast/
+# the checks' sanitised build: make B=build-asan
+build-asan/
+
+# the folder SIGEL is started from, made by make; a user's results land here
+/sigelApp/
 
 # python bytecode
 __pycache__/

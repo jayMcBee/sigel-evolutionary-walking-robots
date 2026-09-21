@@ -1,9 +1,9 @@
 #!/bin/sh
 # Does PVM work?  PORTING.md Phase P, steps P3 and P4.
 #
-#   ./checks/pvm-check.sh [builddir]        default build
+#   ./checks/pvm-check.sh [builddir]        default build-asan
 #
-# Run `make pvm && make pvm-link' first.  Compiles pvm_smoke.c, then starts its
+# Run `make pvm && make B=build-asan pvm-link' first.  Compiles pvm_smoke.c, then starts its
 # own pvmd3 and runs two round trips against it before stopping it again:
 #
 #   pvm_smoke   PVM alone, C, no SIGEL and no sanitizers      -- step P3
@@ -51,7 +51,7 @@ set -u
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
 # ROOT is derived, not the script's own directory, so check it: a symlink or
 # a copy left at the old path would point it at the PARENT of the repo, and
-# check.sh removes $ROOT/build/ui before any other guard runs.
+# every path below is built from it.
 [ -f "$ROOT/Makefile" ] && [ -d "$ROOT/checks" ] || {
 	echo "$0: $ROOT is not the repo root -- run the script by its real path,"\
 	     "not through a symlink or a copy" >&2; exit 1; }
@@ -62,7 +62,7 @@ ROOT=$(cd "$(dirname "$0")/.." && pwd)
 cd "$ROOT" || exit 1
 PVM=$ROOT/downloads/supportingLibs/pvm3
 BIN=$PVM/lib/LINUX64
-B=${1:-build}
+B=${1:-build-asan}
 LINK=$ROOT/$B/pvm_link
 
 [ -f "$BIN/libpvm3.a" ] && [ -x "$BIN/pvmd3" ] || {
@@ -109,7 +109,10 @@ cc -I"$PVM/include" "$ROOT/checks/programs/pvm_smoke.c" "$BIN/libpvm3.a" -ltirpc
 cat > "$PVM_TMP/lsan.supp" <<'SUPP'
 leak:dmEnvironment::loadTerrainData
 SUPP
-SIGEL_ROOT=$ROOT/sigel
+# SIGEL rewrites $SIGEL_ROOT/Terrain.ter on every evaluation, so run it in the
+# folder SIGEL is started from, never in the tracked source.
+SIGEL_ROOT=$ROOT/sigelApp
+[ -f "$SIGEL_ROOT/Terrain.ter" ] || { echo "no $SIGEL_ROOT/Terrain.ter -- run 'make'" >&2; exit 1; }
 LSAN_OPTIONS=suppressions=$PVM_TMP/lsan.supp
 export SIGEL_ROOT LSAN_OPTIONS
 

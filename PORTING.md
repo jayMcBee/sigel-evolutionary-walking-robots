@@ -190,18 +190,20 @@ found a real defect.** §0 has the rule; it is not optional.
   `include/compat/q2compat_check.cpp`~~ **Both deleted in D27.** Recover them
   from git history if you need the Qt 2 semantics they recorded — see D27 for
   the four that unported code still depends on.
-- Build: `make` at the repo root gives `build/sigel_eval` under ASan and UBSan.
-  `make B=build-fast SAN= SIGSAN=` gives an unsanitised build about 15x faster,
-  in its own directory.
+- Build: `make` at the repo root builds `sigel` and `sigel_slave` into `build/`
+  and fills `sigelApp/`, the folder SIGEL is started from:
+  `cd sigelApp && ./sigelLauncher`. The checks also need `make guidrive
+  sigel_eval`, and `make B=build-asan sigel_eval pvm-link` for the two gates
+  that run under AddressSanitizer and UndefinedBehaviorSanitizer.
 - Verify: `./checks/check.sh`, from anywhere, compiles every module and header.
   Takes several minutes, and **exits non-zero if anything fails or is skipped**.
   *This said "it runs no code", which was true between D27 and Phase C.* It now
   runs `sigel_slave`, a headless GUI structure probe, and `guidrive` through
   eleven scenarios plus two locale re-runs. Further execution is in
   `./checks/fitness-check.sh`, which runs `sigel_eval -selfcheck`.
-- PVM: `make pvm && make pvm-link`, then `./checks/pvm-check.sh` starts a daemon
+- PVM: `make pvm && make B=build-asan pvm-link`, then `./checks/pvm-check.sh` starts a daemon
   and runs both round trips. It has no baseline: it is PASS/FAIL.
-- Run the published experiments: `./checks/replicate.sh build-fast`. Read the
+- Run the published experiments: `./checks/replicate.sh`. Read the
   scope note at the top first — those experiments are from SIGEL 1.0 and do not
   test this port.
 - **After every step, an independent agent reviews the diff with fresh eyes.**
@@ -265,7 +267,8 @@ found a real defect.** §0 has the rule; it is not optional.
 ├── robots/                                 the 7 robots, tracked
 ├── shim/                                   4 pre-standard C++ headers
 ├── verification-against-sigel-1.3/         the 1.3 captures, Phase V
-├── build/  build-fast/                     untracked, removed by `make clean`
+├── build/  build-asan/                     untracked; `make clean` removes build/
+├── sigelApp/                               untracked, made by `make`: start SIGEL here
 └── downloads/                              UNTRACKED ONLY
     ├── supportingLibs/                     dynamechs, cv97, newmat09, fparser,
     │                                       pvm3, Dynamo (maths only). Extracted
@@ -619,10 +622,10 @@ adding or deleting one moves the total by one; `portinglog.txt` did that on
 508 at D31 and D32 and reads 503 today. A step that changes no code should not
 move it; one that does, will.
 **It now needs `sigel_eval` built**, which `check.sh` does not build for you:
-the V5 section reads constants out of `build-fast/sigel_eval`, so run
-`make B=build-fast SAN= SIGSAN= all` first or that section fails, correctly,
-with 852 pass and 1 fail. `check.sh` builds `guidrive` itself but has never
-built the programs — the `programs` section has always required them.
+the V5 section reads constants out of `build/sigel_eval`, so run
+`make sigel_eval` first or that section fails, correctly,
+with 852 pass and 1 fail. `check.sh` builds `guidrive` and `sigelApp/` itself,
+which builds the two programs too, but not `sigel_eval`.
 *It was 851 after `real clicks`, earlier the same day.* It was 850 on
 2026-09-05, after the `slave gui` and `form minimums`
 sections and the two forms corpus assertions. It **exits non-zero** when
@@ -657,9 +660,7 @@ numbers in this sentence; re-derive them.** They were `1716` for the last site
 when first written and are `1898` now, because two later edits in the same
 session inserted lines above it — a citation into a file that is still being
 edited goes stale within the hour. Find them with
-`command grep -n 'timeout 300 "$ROOT/build-fast/guidrive"' checks/check.sh`,
-which
-on 2026-09-20 gave 712, 779, 851, 1205, 1498, 1583 and 1995.
+`command grep -n 'timeout 300 "$ROOT/build/guidrive"' checks/check.sh`.
 Count them again; do not increment.*  — the slave's
 headless smoke test, the `widgets` and `parsers` probes and
 `expstruct --selfcheck`. *"Ten" counted only the `gui behaviour` list and stood
@@ -697,7 +698,7 @@ single-slave, at 185 s/generation. C11 has the result.
 
 ```
 make pvm         libpvm3.a, pvmd3         28 objects, 0 errors, 6 warnings
-make pvm-link    build/pvm_link           P4's link and round trip
+make B=build-asan pvm-link   build-asan/pvm_link   P4's link and round trip
 ./checks/pvm-check.sh   starts a daemon, runs both, PASS/FAIL, non-zero if either fails
 ```
 
@@ -871,8 +872,46 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-21 — DONE: `x/` IS NOW `downloads/`.**
+**2026-09-21 — DONE: ITEM 48. SIGEL IS STARTED THE WAY EVERY USER STARTS IT.**
 Start here.
+
+- **`make` fills `sigelApp/`**, and a user runs `cd sigelApp && ./sigelLauncher`,
+  as 1.3's README describes. The folder holds the two programs, the three
+  scripts, `Terrain.ter`, `stdConf.mt`, `pixmaps/`, `textures/`, and
+  `supportingLibs/pvm3`, a link to the built PVM. The data are copies, because
+  SIGEL rewrites `Terrain.ter` on every evaluation and writes `movie/` where it
+  runs. `make clean` leaves the folder alone, but removes PVM's build, so run
+  `make` again before starting SIGEL.
+- **1.3 had no separate folder.** Its autotools `make` built the programs in the
+  source folder, beside the data, and the README told users to delete the rest
+  by hand. Jan chose a separate folder and its name.
+- **`build-fast` is gone.** Plain `make` builds without the sanitizers, as a user
+  expects. The sanitized build is `make B=build-asan`, for the two gates that
+  need it; the Makefile switches the sanitizers on by that folder name.
+- **A fresh clone builds with plain `make`.** SIGEL's objects and the moc
+  objects now wait for the vendor patches and the generated form headers.
+  Measured: a fresh checkout, the libraries unpacked with `vendor/README.md`'s
+  commands, plain `make`, the four build lines of §7, then all five gates
+  green.
+- **The checks run SIGEL from `sigelApp/`**, not from `sigel/`, so no gate
+  rewrites the tracked `Terrain.ter` any more. Measured: a full gate run changed
+  no tracked file. `check.sh` generates the forms into a scratch folder of its
+  own, because regenerating `build/ui` would leave its own programs out of date
+  halfway through the run.
+- **Jan checked it on the desktop 2026-09-21**, SIGEL started by `sigelLauncher`
+  alone: evolution runs with the experiments' `. 1 1 "."`, and Visualize works.
+  SIGEL's working folder is `sigelApp/`, where `robots/<robot>/` does not exist,
+  so the slave does not open the experiments' `Body` directories.
+- **Found on the way:** `sigelDynClient` runs `manage_dyn_slave`, which the port
+  does not build, from a fourth 2003 home directory. Items 39 and 47.
+- **D43 is parked on branch `d43-unfinished`**, pushed, with its 12 review
+  findings open.
+- **Item 39 is not carried out on the x86 machine**, at Jan's word: its
+  experiment files stay exactly as shipped. They are not published, its prepare
+  script replaces the host block before every run, and no check compares the
+  two machines' files.
+
+**2026-09-21 — DONE: `x/` IS NOW `downloads/`.**
 
 - **Renamed, at Jan's word.** `x/` held two unpacked archives under a name that
   said nothing. It is now `downloads/`, still untracked, with the same 4399
@@ -1282,42 +1321,36 @@ direction: the control proves the probe can see a positive, and the second sampl
 proves it can see a *change*.
 
 **REBUILD EVERYTHING BEFORE RUNNING THE CHECKS, and name the targets.** Touching
-one source file makes five things stale, and the checks refuse a stale binary
-rather than scoring it — correctly, but it costs a full run each time. This cost
-three runs on 2026-09-05:
+one source file makes every program below stale, and the checks refuse a stale
+binary rather than scoring it — correctly, but it costs a full run each time.
+This cost three runs on 2026-09-05:
 
 ```
-make B=build-fast SAN= SIGSAN=            the fast tree
-make B=build-fast SAN= SIGSAN= programs   sigel and sigel_slave
-make B=build-fast SAN= SIGSAN= guidrive   the driver
-make B=build                              the sanitized tree
-make B=build pvm-link                     pvm-check's binary
+make                              sigel, sigel_slave and sigelApp/
+make guidrive sigel_eval          the driver and the evaluator
+make B=build-asan sigel_eval      the sanitized evaluator, for the fourth gate
+make B=build-asan pvm-link        pvm-check's binary
 ```
 
-**`make -q B=build-fast SAN= SIGSAN=` with no target answers for `all`, which
-does NOT depend on `guidrive` or on `programs`** — it reports up to date while
-both are stale. Always name the target.
+**`make -q` with no target answers for `all`, which does NOT depend on
+`guidrive` or on `sigel_eval`** — it reports up to date while both are stale.
+Always name the target.
 
-**AND DO NOT RUN THE CHECKS CONCURRENTLY.** `check.sh` regenerates `build/ui/*.h`
-with `uic`, which makes `build/sigel_eval` and `build/pvm_link` stale in the
-middle of its own run — so a `fitness-check.sh build` or `pvm-check.sh` started
-alongside it is refused for staleness that did not exist when it began. Run them
-in sequence. *Measured 2026-09-05; the refusal is the guard working, not a
-defect.*
-
-**RUNNING THEM IN SEQUENCE IS NOT ENOUGH — THE STALENESS OUTLIVES `check.sh`.**
-`uic` rewrote those headers on disk; finishing the run does not put them back.
-So the fourth check, straight after a clean `check.sh`, refuses with
-`/home/jan/Downloads/sigel/build/sigel_eval is out of date -- run 'make B=build'`
-and exits 1, which reads exactly like a failure and is not one. **Rebuild `B=build` and `B=build pvm-link`
-between check 1 and check 4**, then re-run. *Measured 2026-09-07.* The order that
-works:
+**`check.sh` no longer makes the other gates' programs stale.** It used to
+regenerate the forms into `build/ui`, which left `sigel_eval` and `pvm_link` out
+of date during its run and after it. It now generates them into a scratch folder
+of its own. Run the gates in sequence all the same, in this order:
 
 ```
-make (all five targets, named)  →  ./checks/check.sh  →  ./checks/dictorder-dump.sh
-  →  ./checks/fitness-check.sh  →  make B=build && make B=build pvm-link
-  →  ASAN_OPTIONS=detect_leaks=0 ./checks/fitness-check.sh build  →  ./checks/pvm-check.sh
+the four make lines above  →  ./checks/check.sh  →  ./checks/dictorder-dump.sh
+  →  ./checks/fitness-check.sh
+  →  ASAN_OPTIONS=detect_leaks=0 ./checks/fitness-check.sh build-asan
+  →  ./checks/pvm-check.sh
 ```
+
+**Do not run the gates while SIGEL runs from `sigelApp/`.** Both write
+`sigelApp/Terrain.ter`, and `check.sh` rebuilds the `sigel_slave` a running
+evolution spawns.
 
 **And pipe check 3 without `2>&1`.** `fitness-check.sh` prints `selfcheck: ok` and
 the two-line "no sanitizer, leak test SKIPPED" note on **stderr**, deliberately,
@@ -1362,19 +1395,19 @@ succeeded.**
 ./checks/check.sh                                        1097 pass, 0 fail, exit 0
 ./checks/dictorder-dump.sh | diff -u checks/baselines/dictorder-baseline.txt -   empty
 ./checks/fitness-check.sh  | diff -u checks/baselines/fitness-baseline.txt -     empty
-ASAN_OPTIONS=detect_leaks=0 ./checks/fitness-check.sh build   exit 0
+ASAN_OPTIONS=detect_leaks=0 ./checks/fitness-check.sh build-asan   exit 0
 ./checks/pvm-check.sh                                    both PASS
 ```
 
 **The fourth line is not optional and was missing from this list until
-**The fifth line has no baseline** and is PASS/FAIL, which is why older copies of
-this block listed four. It needs `make B=build && make B=build pvm-link` first.
-
-2026-08-29.** The default `fitness-check.sh` runs `build-fast`, which has no
+2026-08-29.** The default `fitness-check.sh` runs `build`, which has no
 sanitizer, so it **skips the self-check's leak test** — and says so on stderr,
 which `| diff` discards. The self-check is what covers the evolution loop's
 ownership (D16), so without that fourth line a dropped free passes everything
 here.
+
+**The fifth line has no baseline** and is PASS/FAIL, which is why older copies of
+this block listed four. It needs `make pvm && make B=build-asan pvm-link` first.
 
 Never edit a baseline to make a diff go away. If a change moves one, that is the
 finding.
@@ -1475,7 +1508,7 @@ the shape `dictorder-dump.sh` already used. *Found by review 2026-09-07.*
 
 **`./checks/pvm-check.sh` is a fifth check but not a fifth check.** It has no baseline —
 it prints PASS/FAIL and exits non-zero if either half fails. Needs
-`make pvm && make pvm-link` first. Run it after touching PVM, `SIG_GPPVMData` or
+`make pvm && make B=build-asan pvm-link` first. Run it after touching PVM, `SIG_GPPVMData` or
 `SIG_GPFitnessTrainer`; **the four lines above cannot see any of them.**
 
 ---
@@ -2036,7 +2069,7 @@ passed the whole check: it is `-x`, it execs the real binary so the no-PVM smoke
 test still prints its guard, and `make -q` calls the target current because the
 wrapper's mtime is newer than every prerequisite — so the link recipe, and the
 `ctor_size` assertion inside it, never ran. `check.sh` now requires ELF magic on
-both `build-fast` programs. *It closes the wrapper shape only: a copy of the real
+both programs in `build/`. *It closes the wrapper shape only: a copy of the real
 binary, a symlink, or a stale ELF still passes and still skips the link recipe.*
 
 **INHERITED, NOT A PORT DEFECT: with MetaGP enabled, `File > Save Experiment`
@@ -2164,16 +2197,18 @@ value and the only match in the file today is a comment.*
 
 ### Phase R — build and run (§3, order item 1) — DONE
 
-`make` at the repo root builds 205 vendored objects, 108 of SIGEL's 109 core
+`make` at the repo root built 205 vendored objects, 108 of SIGEL's 109 core
 sources, two moc outputs and `build/sigel_eval`. Was 251 / 118 of 122 / three
 until the Dynamo backend was deleted (see that section in §7): 46 vendored
 Dynamo `.cpp`, 13 of SIGEL's own and the `SIG_DynaSystem` moc target went with
 it.
-`make B=build-fast SAN= SIGSAN=` gives the same thing without the sanitizers,
-in its own directory.
+*Since item 48, plain `make` builds `sigel`, `sigel_slave` and `sigelApp/`
+without the sanitizers; `make sigel_eval` builds the evaluator, and
+`make B=build-asan` the sanitized tree, in its own directory.*
 
 ```
-SIGEL_ROOT=$PWD/sigel \
+make sigel_eval
+SIGEL_ROOT=$PWD/sigelApp \
   ./build/sigel_eval experiments/twoBases.exp 0
 ```
 
@@ -2958,8 +2993,8 @@ Each was demonstrated, not argued:
 - **`guidrive` was scored STALE by the two clip sections**, which run 240 lines
   before the `gui behaviour` section that builds it. So the first `./checks/check.sh`
   after editing `guidrive.cpp` — or anything it links — measured yesterday's
-  binary there and today's binary later in the same run. **And `make -q
-  B=build-fast SAN= SIGSAN=` with no target answers for `all`, which does not
+  binary there and today's binary later in the same run. **And `make -q`
+  with no target answers for `all`, which does not
   depend on `guidrive`: it reports up to date while the binary is stale.** Name
   the target. The clip sections now build it first.
 - **`expstruct.py`'s float net had a real hole, and the probe for it failed on
@@ -6073,7 +6108,7 @@ build. *Reproduced 2026-09-03 by review, unchanged.*
 
 **`QT_NO_DEBUG` and `NDEBUG` are defined by neither the Makefile nor
 `check.sh`**, so `QList::operator[]`'s `Q_ASSERT_X` is **live in both `build/`
-and `build-fast/`** — confirmed to abort on a negative index. Several coverage
+and `build-asan/`** — confirmed to abort on a negative index. Several coverage
 arguments above lean on this (an out-of-range index anywhere in a covered run
 would have aborted rather than been absorbed), and the residual risk is a
 release build alone.
@@ -6270,7 +6305,7 @@ which is why the list exists.
 | all six `Q2CString` sites in `SIG_GPFitnessTrainer`, D21 | zero trainer symbols in `sigel_eval`; `pvm_link` links the object but never constructs a trainer, so they are **link-checked and never run** |
 | `SIG_GPPVMData`'s `+ 2`, D21 | `pvm_link` runs the function, but `pvm-check.sh` passes with `+ 1` **and** `+ 0` — `QList` over-allocation hides a shortfall under about 8 bytes |
 | all five **unlinked** fitness functions' walks, D20 — `Adaptive`, `Zorc`, `Stepper`, `RealSpeed`, `Force` — plus `SIG_EarlyRunTermSimulation` | `nm` finds 0 symbols for each in `sigel_eval`. `Stepper` is the **only reader of `touchdowns`** in the tree; `Force` the only reader of `listForces` and the only code that ever frees a force vector |
-| `sigel_eval`'s trace walk, D20 | runs on all 21 dictorder inputs; its output is dropped by the check's `sed`, so only a crash or a sanitizer report would show — **and there is no sanitizer report to be had.** `dictorder-dump.sh` defaults to `build-fast`, which has no sanitizer, and it **cannot be run against `build/` at all**: the `.rrb` load path aborts under ASan inside vendored cv97 (see the blind-spot section in §10). So this row's second half is empty and the walk is covered by a crash only. *Reconciled 2026-09-03; the restored blind spot falsified it* |
+| `sigel_eval`'s trace walk, D20 | runs on all 21 dictorder inputs; its output is dropped by the check's `sed`, so only a crash or a sanitizer report would show — **and there is no sanitizer report to be had.** `dictorder-dump.sh` defaults to `build`, which has no sanitizer, and it **cannot be run against `build-asan/` at all**: the `.rrb` load path aborts under ASan inside vendored cv97 (see the blind-spot section in §10). So this row's second half is empty and the walk is covered by a crash only. *Reconciled 2026-09-03; the restored blind spot falsified it* |
 | `SIG_GPNiceWalkingFitnessFunction`'s walk, D20 | runs for 18 individuals, but the check has **one bit** of discrimination — an off-by-one in the index is invisible to it |
 | **everything D17, D18 and D19 changed** in `SIG_GPFitnessTrainer` — including all six `delete v[i]`, `resizeOwningHosts`, both `qDeleteAll` in the destructor and both `static_cast<uint>` moduli | `nm -C build/sigel_eval \| grep -c SIG_GPFitnessTrainer` is **0**. `pvm_link` links the object but never constructs a trainer, so it is link-checked and never run. The rewritten walk needs a live `pvm_spawn`; `flushAllDynHosts` is `-devolve`-only; the destructor's three `qDeleteAll` run for no check |
 

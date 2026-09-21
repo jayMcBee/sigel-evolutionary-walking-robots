@@ -1,8 +1,8 @@
 #!/bin/sh
 # Replicate the published SIGEL experiments and compare against the 2001 record.
 #
-#   ./checks/replicate.sh              build/sigel_eval, under ASan and UBSan
-#   ./checks/replicate.sh build-fast   an unsanitised build, ~15x faster
+#   ./checks/replicate.sh              build/sigel_eval
+#   ./checks/replicate.sh build-asan   under ASan and UBSan, ~15x slower
 #
 # THE ORACLE IS SIGEL 1.0, NOT THE 1.3 SOURCE BEING PORTED. The published
 # .exp files are dated August-September 2001; 1.0 was rolled 2001-09-06 and
@@ -29,7 +29,7 @@ set -e
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
 # ROOT is derived, not the script's own directory, so check it: a symlink or
 # a copy left at the old path would point it at the PARENT of the repo, and
-# check.sh removes $ROOT/build/ui before any other guard runs.
+# every path below is built from it.
 [ -f "$ROOT/Makefile" ] && [ -d "$ROOT/checks" ] || {
 	echo "$0: $ROOT is not the repo root -- run the script by its real path,"\
 	     "not through a symlink or a copy" >&2; exit 1; }
@@ -40,7 +40,7 @@ ROOT=$(cd "$(dirname "$0")/.." && pwd)
 cd "$ROOT" || exit 1
 BUILD=${1:-build}
 case $BUILD in /*) EVAL=$BUILD/sigel_eval ;; *) EVAL=$ROOT/$BUILD/sigel_eval ;; esac
-[ -x "$EVAL" ] || { echo "no $EVAL -- run: make${1:+ B=$1 SAN= SIGSAN=}"; exit 1; }
+[ -x "$EVAL" ] || { echo "no $EVAL -- run: make${1:+ B=$1} sigel_eval"; exit 1; }
 [ -d "$ROOT/experiments" ] || { echo "no experiments/ -- restore it from git"; exit 1; }
 
 ASAN_OPTIONS=detect_leaks=0

@@ -383,14 +383,14 @@ touched, because changing one changes behaviour against the reference binary.
 
 - [ ] **39. Finish clearing the 2003 Dortmund names.** The experiments are done
   — PORTING.md, 2026-09-21. Left:
-  - **The x86 machine's copies.** The same script; its 7 files must hash as ours
-    afterwards. Jan approves before it runs there.
   - **The 20 `robots/*/*.blend`.** Each holds a 2001 home directory. They are
     binary, so a grep that skips binary files reports them clean; `grep -a`
     finds all 20. They are the original Blender sources from SourceForge;
     nothing reads them.
   - **`sigel/README`**: the 2003 contact address, and a crontab example that
     runs the launcher from an author's home directory.
+  - **`sigel/sigelDynClient`**: three lines that copy from, run from and change
+    into another author's home directory.
   - **`v8-1.3-gp-blocks.txt` and `v6-1.3-friction-nocollide.txt`** quote the
     hosts and paths as 1.3 printed them. They cannot be regenerated here.
   - **PORTING.md and this file** still quote some of the old hosts and paths.
@@ -433,35 +433,13 @@ touched, because changing one changes behaviour against the reference binary.
   `PVM_ROOT=/usr/lib/pvm3`, a `tcsh` shebang, and the Dortmund host names item 39
   removes from the experiments. **Modernise in place, do not replace:** both
   serve features the port still has — `sigel.cpp` still accepts `-devolve` /
-  `-de`. `sigelLauncher` runs inside 1.3's one folder, as it did in 2003 —
-  item 48. **Partly done by item 39:** `LINUX64`, `PVM_ARCH`, and the link
-  that puts `sigel_slave` on PVM's search path.
-  **When:** with item 48.
-  `sigelDynClient` needs a second machine to prove it on; the 1.3 reference
-  machine is not ours to use for tooling, so that half waits until there is one.
-
-- [ ] **48. Launch SIGEL the way every user did: drop `build-fast`, bring back
-  1.3's one folder.** Jan, 2026-09-21. 1.3's README: after the build a user keeps
-  one folder holding `sigel`, `sigel_slave`, `manage_dyn_slave`, `sigelLauncher`,
-  `povrayLauncher`, `sigelDynClient`, `Terrain.ter`, `pixmaps/` and
-  `supportingLibs/pvm3`, and runs `sigelLauncher` in it. The port builds into
-  `build/` or `build-fast/`, keeps PVM under `downloads/` and the data in `sigel/`, so no
-  such folder exists and SIGEL has been started by hand. **Make the build
-  assemble that folder, and start SIGEL only through `sigelLauncher` in it.**
-  **Drop `build-fast`**: it is a test build no user sees, and starting SIGEL from
-  it produced problems that do not exist in 1.3's layout. Until this is done,
-  the experiments' `. 1 1 "."` cannot spawn on a fresh clone: nothing puts
-  `sigel_slave` on PVM's search path.
-  **Visualize needs the same folder.** `SIG_AllIndividualsView` starts
-  `$SIGEL_ROOT/sigel_slave` on the local host name, whatever the host list says.
-  With `SIGEL_ROOT` at `sigel/` it reports *"The slave could not be started"*.
-  Measured by Jan 2026-09-21.
-  **A fresh checkout does not build with `make`.** `MT_Controller.cpp` includes
-  generated form headers before any rule has made them; the main tree builds
-  only because old output is left over. Nor are the vendored headers patched in
-  time: SIGEL's own objects include them, but only the vendor libraries depend
-  on the patch step, so the first compile fails in `cv97/JVector.h`. Measured
-  2026-09-21 on a fresh unpack. `make vendor forms` first works round both.
+  `-de`. **`sigelLauncher` works:** `make` copies it into `sigelApp/`, and
+  `cd sigelApp && ./sigelLauncher` starts SIGEL. It still carries the
+  SunOS branch and the dead default `PVM_ROOT=/usr/lib/pvm3`.
+  **`sigelDynClient` does not work:** it runs `manage_dyn_slave`, which the port
+  does not build, from a 2003 home directory (item 39). It needs a second
+  machine to prove it on; the 1.3 reference machine is not ours to use for
+  tooling, so that half waits until there is one.
 
 - [ ] **35. Remove the Windows and Visual Studio support.** Decided by Jan
   2026-09-09. It does not build here and nothing tests it.

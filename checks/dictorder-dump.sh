@@ -25,7 +25,7 @@ set -eu
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
 # ROOT is derived, not the script's own directory, so check it: a symlink or
 # a copy left at the old path would point it at the PARENT of the repo, and
-# check.sh removes $ROOT/build/ui before any other guard runs.
+# every path below is built from it.
 [ -f "$ROOT/Makefile" ] && [ -d "$ROOT/checks" ] || {
 	echo "$0: $ROOT is not the repo root -- run the script by its real path,"\
 	     "not through a symlink or a copy" >&2; exit 1; }
@@ -34,10 +34,10 @@ ROOT=$(cd "$(dirname "$0")/.." && pwd)
 # robots/twoBases/twoBases.rrb relative to the process, and this script
 # never cd'd before launching it.
 cd "$ROOT" || exit 1
-B=${1:-build-fast}
+B=${1:-build}
 [ $# -le 1 ] || { echo "usage: $0 [build-dir] -- it reads experiments/ and robots/" >&2; exit 1; }
 EVAL=$ROOT/$B/sigel_eval
-[ -x "$EVAL" ] || { echo "no $EVAL -- make B=$B SAN= SIGSAN=" >&2; exit 1; }
+[ -x "$EVAL" ] || { echo "no $EVAL -- make B=$B sigel_eval" >&2; exit 1; }
 
 # A failed `make` stops at the first bad compile and leaves the PREVIOUS
 # sigel_eval in place, so a test-for-existence passes and the gate silently
@@ -46,10 +46,13 @@ EVAL=$ROOT/$B/sigel_eval
 # the binary from before the change. Gate results mean nothing unless the
 # build that produced them succeeded. pvm-check.sh has carried this guard
 # from the start; these two did not.
-make -q --no-print-directory -C "$ROOT" B="$B" >/dev/null 2>&1 || {
-	echo ""$EVAL" is out of date -- run 'make B=$B SAN= SIGSAN='" >&2; exit 1; }
+make -q --no-print-directory -C "$ROOT" B="$B" sigel_eval >/dev/null 2>&1 || {
+	echo ""$EVAL" is out of date -- run 'make B=$B sigel_eval'" >&2; exit 1; }
 
-SIGEL_ROOT=$ROOT/sigel
+# SIGEL rewrites $SIGEL_ROOT/Terrain.ter on every evaluation, so run it in the
+# folder SIGEL is started from, never in the tracked source.
+SIGEL_ROOT=$ROOT/sigelApp
+[ -f "$SIGEL_ROOT/Terrain.ter" ] || { echo "no $SIGEL_ROOT/Terrain.ter -- run 'make'" >&2; exit 1; }
 export SIGEL_ROOT
 
 # A silently short dump is the dangerous failure: Phase D re-captures this file
