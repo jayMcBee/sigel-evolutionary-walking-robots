@@ -49,7 +49,7 @@ SIGEL_GP::SIG_GPManager::SIG_GPManager(SIGEL_GP::SIG_GPExperiment &experiment)
     serverIsUp( false ),
     taskCanDoList(),
     currentExperiment( experiment ),
-    schlussJetzt( false ),
+    stopEvolutionNow( false ),
     tours(),
     randomizer( currentExperiment.gpParameter.getRandomSeed() ),
     fitnessCalculated( false ),
@@ -90,7 +90,7 @@ void SIGEL_GP::SIG_GPManager::evolutionLoop() {
   while ( !taskCanDoList.isEmpty() ) {
     stopIfNecessary( false );
 
-    if (schlussJetzt)
+    if (stopEvolutionNow)
       return;
 
     haveABreak();
@@ -412,7 +412,7 @@ void SIGEL_GP::SIG_GPManager::evalNewIndis() {
   for (int i=0;i<poolSize;i++) {
     stopIfNecessary( true );
 
-    if (schlussJetzt)
+    if (stopEvolutionNow)
       return;
 
     haveABreak();
@@ -452,7 +452,7 @@ void SIGEL_GP::SIG_GPManager::evalNewIndis() {
 
     stopIfNecessary( true );
 
-    if (schlussJetzt)
+    if (stopEvolutionNow)
       return;
 
     haveABreak();
@@ -588,7 +588,7 @@ void SIGEL_GP::SIG_GPManager::haveABreak()
 void SIGEL_GP::SIG_GPManager::messageEvolutionStop() {
   // Sets the flag the evolution loop reads. Stops nothing itself; the loop
   // notices at its next check.
-  schlussJetzt = true;
+  stopEvolutionNow = true;
 };
 
 void SIGEL_GP::SIG_GPManager::updateIndividualView( int ) {
@@ -710,7 +710,7 @@ void SIGEL_GP::SIG_GPManager::run() {
 
     stopIfNecessary( true );
 
-    if (schlussJetzt)
+    if (stopEvolutionNow)
       return;
 
     // Every "resetGeneration" generations all fitness values are set to -1 so that evalNewIndis()
@@ -726,7 +726,7 @@ void SIGEL_GP::SIG_GPManager::run() {
 
     stopIfNecessary( true );
 
-    if (schlussJetzt)
+    if (stopEvolutionNow)
       return;
     // creates a set of tournaments
     createTours( currentExperiment.gpParameter.getTournamentsPerGeneration() * currentExperiment.getPopulation().getSize() );
@@ -735,7 +735,7 @@ void SIGEL_GP::SIG_GPManager::run() {
     // the heart of the genetic algorithm, it executes the tournaments
     evolutionLoop();
 
-    if (schlussJetzt)
+    if (stopEvolutionNow)
       return;
 
     // increment the generation, because there is one evolution-loop evolved
@@ -1140,7 +1140,7 @@ void SIGEL_GP::SIG_GPManager::run(MT_Classifier *MetaClassifier)
 
 	stopIfNecessary( true );
 
-	if (schlussJetzt)
+	if (stopEvolutionNow)
 	  return;
 
 	
@@ -1174,7 +1174,7 @@ void SIGEL_GP::SIG_GPManager::run(MT_Classifier *MetaClassifier)
 
 	evolutionLoop(MetaClassifier);
 
-	if (schlussJetzt)
+	if (stopEvolutionNow)
 	  return;
 
 	currentGenerationNo++;
@@ -1337,7 +1337,7 @@ void SIGEL_GP::SIG_GPManager::evolutionLoop(MT_Classifier *MetaClassifier)
     {
       stopIfNecessary( false );
 
-      if (schlussJetzt)
+      if (stopEvolutionNow)
       	return;
 
       haveABreak();
@@ -1542,7 +1542,7 @@ int DebugInfo =0;
     {
       stopIfNecessary( true );
 
-      if (schlussJetzt)
+      if (stopEvolutionNow)
 	return;
 
       haveABreak();
@@ -1569,7 +1569,7 @@ int DebugInfo =0;
   {
 	  stopIfNecessary( true );
 
-	if (schlussJetzt)
+	if (stopEvolutionNow)
 	  return;
 
 	haveABreak();

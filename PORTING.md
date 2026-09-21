@@ -873,8 +873,21 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-21 — DONE: ITEM 49. THE EXPERIMENTS RUN UNTIL 1 JANUARY 2030, 12:00.**
+**2026-09-21 — IN PROGRESS: ITEM 14. THE GERMAN NAMES IN `sigel/` BECOME ENGLISH.**
 Start here.
+
+- **One name per step.** Each step has a clean build with no new compiler
+  warning, the five gates green, no baseline change, and an independent review.
+  Behaviour does not change.
+- **Out of scope:** string literals — the German output text and the history
+  text saved in `.exp` files — and the authors' names and nicknames in the
+  credits.
+- **Renamed:**
+  - `SIG_GPManager::schlussJetzt` → `stopEvolutionNow`. `messageEvolutionStop()`
+    sets it; each loop reads it straight after `stopIfNecessary()` and returns.
+- **`check.sh` passes 1098, not 1097:** `README.md` added one tracked file.
+
+**2026-09-21 — DONE: ITEM 49. THE EXPERIMENTS RUN UNTIL 1 JANUARY 2030, 12:00.**
 
 - **All 7 experiments stopped by a date in August or September 2001**, so Start
   ended at once and a user had to change the date first. Their

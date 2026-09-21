@@ -142,7 +142,6 @@ Constructs the language removed. A current compiler rejects them.
 
   | symbol | where |
   |---|---|
-  | `schlussJetzt` | `SIG_GPManager.h` + 5 uses |
   | `liesdas` | `SIG_Scanner`, `SIG_RobotScanner`, `SIG_UnstreamerScanner`, + 3 `.cpp` |
   | `getRandomInstruktion`, `ProbInstruktion` | `MT_Randomizer.h` |
   | `T_Instruktion`, `T_Instruk` | `MT_TranslatedIndividual.h` |

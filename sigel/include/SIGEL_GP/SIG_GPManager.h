@@ -128,7 +128,7 @@ namespace SIGEL_GP
   SIG_GPExperiment &currentExperiment;
 
  protected:
-  bool schlussJetzt;
+  bool stopEvolutionNow;
 
  private:
   QDateTime startTime;

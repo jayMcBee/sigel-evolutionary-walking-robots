@@ -71,7 +71,7 @@ namespace SIGEL_GP
     // Sets the flag, stops nothing itself. slotEvolutionStopped() stays
     // commented out: SIG_GUIGPExperiment calls it after start() returns, and
     // calling it here too would announce the run finished while it still runs.
-    schlussJetzt = true;
+    stopEvolutionNow = true;
     //    guiExperiment.slotEvolutionStopped();
   };
 
