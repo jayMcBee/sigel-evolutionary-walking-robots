@@ -1,6 +1,6 @@
 # SIGEL
 
-An independent fork of SIGEL 1.3 that brings the code up to current standards.
+An independent fork of the SIGEL project that modernizes the code in an attempt to bring it up to current standards.
 It is not made, maintained or endorsed by SIGEL's original authors.
 
 SIGEL evolves control programs for walking robots by genetic programming and
