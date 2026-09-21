@@ -872,8 +872,21 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-21 — DONE: ITEM 39 FINISHED, AND `sigelLauncher` MODERNISED.**
+**2026-09-21 — DONE: THE D18 CURSOR MODEL IS GONE FROM THE SELF-CHECK.**
 Start here.
+
+- **`Qt2CursorList` and its test are removed from `sigel_eval.cpp`**, 149 lines,
+  at Jan's word: *"it is DONE and PROVEN and it needs to GO"*. D18's rewrite of
+  `SIG_GPFitnessTrainer::sweepToSpawn` was proven by its review's run against
+  the shim: 28,672 walks, 0 divergences. When the shim went, D27 put this model
+  in its place. But the self-check ran the model against its own copy of the
+  walk, never `sweepToSpawn`, so it guarded nothing: a change to the real walk
+  passed every gate. The proof stays recorded in the D18 row of the steps table
+  and in D27.
+- **Five gates green** afterwards; `-selfcheck` passes on both builds, with no
+  new compiler warning.
+
+**2026-09-21 — DONE: ITEM 39 FINISHED, AND `sigelLauncher` MODERNISED.**
 
 - **No 2003 author home folder and no 2003 machine name is left in any tracked
   file.** Home folders became `/home/user/…`: in `sigel/README`,
@@ -6092,7 +6105,7 @@ D25c each shipped or nearly shipped a defect.
 | `Q2Array::at()` | **clamped** an out-of-range index | dropped. It fired in none of the 42 evaluations, and both defects §9 said it masked are already fixed |
 | `Q2Queue::dequeue()` / `head()` / `current()` | returned **0** on an empty queue (`qglist.cpp:438-439`, via `cfirst()`) | **`QQueue::dequeue()` is `QList::takeFirst()`, which is `Q_ASSERT(!isEmpty())`** — abort at `-O1 -g`, segfault under `-DQT_NO_DEBUG`. *The divergence runs the other way round from the obvious guess: the shim matched the reference and `QQueue` is the divergence* |
 | `Q2ValueList::Iterator` | a **doubly-linked** list, so an iterator stays valid when the list is modified elsewhere, and `end()` is a fixed sentinel that appends splice in front of | `QList` is contiguous and an append can reallocate. **The faithful conversion is an index walk** — D25a |
-| `Q2PtrList`'s internal cursor | `first()`/`next()` are real state; `remove()` returns the *next*; a dead cursor stays dead | an explicit index plus `cursorAfterRemoval`: stay on whatever slid in, step back if the removed one was last, die if the list emptied, and **do not advance on `next()` from dead** |
+| `Q2PtrList`'s internal cursor | `first()`/`next()` are real state; `remove()` returns the *next*; a dead cursor stays dead | an explicit index plus a step-back after `takeAt`: stay on whatever slid in, step back if the removed one was last, die if the list emptied, and **do not advance on `next()` from dead** |
 | `Q2CString::size()` | `QByteArray::size() + 1` for a non-null string — Qt 2's `QCString` counted the terminating NUL — but **0 for a null string** | the plain byte count. **This is why `SIG_GPPVMData`'s wire length is `+ 2`, not `+ 1`**, and a mechanical rename would have quietly shortened every message by a byte |
 | `Q2CString::operator const char *` | **nullptr** for a null string | `constData()` returns a pointer to an empty string. `pvm_pkstr` does `strlen(cp)` unguarded, so the old code **segfaulted** on a null `QString` — a crash removed, not a value changed |
 | `setAutoDelete(true)` | at 8 sites, `insert()` or a shrinking `resize()` **was the only free** and the word `delete` appears nowhere | every one of those frees is now written out. **`setAutoDelete` in core is 0** |
@@ -6117,7 +6130,7 @@ D25c each shipped or nearly shipped a defect.
 | **D15** | `SIG_GPPopulation::pool` — five of §9's eight hidden frees | **`deleteIndividual` performed exactly one delete and nothing in the function said so**: it shifted with `insert(x, take(x+1))`, and `take` nulled each source slot, so only the *first* insert freed anything. **D15 then missed one of the five** — `readFromFile`'s `wasCanceled()` shrink, dead today only because `sigel_eval` has no `QApplication` and live the moment `slotPopulationImport` runs. Measured: **4,850 bytes in 45 allocations**. *`SIG_GPPopulation::sort()` has an EMPTY BODY despite a header comment saying it sorts the pool by fitness — a reader could implement it and silently renumber every individual and every stored `poolPos`* |
 | **D16** | a self-check for the evolution loop's containers | **built because D15 proved the checks cannot see this code**: D15 shipped a real leak that `check.sh`, both diffs, the sanitized run, the self-check *and* the leak baseline all reported clean. Found **four pre-existing `SIG_GPPopulation` constructor defects**; two are fixed (missing initialiser lists) and **two are not**: `(int, SIG_Randomizer&)` and its four-argument sibling store `&r` and the destructor **deletes it** — a bad free on a borrowed randomizer. Repairing them means choosing an ownership policy, which is a design decision for whoever calls them. **Only the default constructor is used today** — exhaustive grep over the 1.3 tree and the 1.0 distribution |
 | **D17** | the trainer's two host lists | **unexercised, not dead**, and the difference matters: `addDynHost` is reached only through a `pthread_create` **thread entry point** behind `-devolve`, and `flushAllDynHosts`' two call sites are both behind `if (serverIsUp)`, which only that thread sets — **so it is never entered under `-evolve`**. *And the modulus concern cannot be settled from the reference machine*: all four reference evolutions used exactly **one** `PVMHOST` (the `8` is slave slots on one host), so `nextHostNumber % 1` is 0 on every one of ~56,000 spawns. **Host rotation has never been exercised by anything** |
-| **D18** | `toSpawnList` — the cursor walk | **the self-check tests a TRANSCRIPTION, not `sweepToSpawn`**, because the trainer is not linked into `sigel_eval`: dropping `cursorAfterRemoval`'s step-back **in production** leaves `check.sh`, `-selfcheck` and `pvm-check.sh` all passing, while the same mutation in the copy fails it. The evidence for the shipped rewrite is the review's differential run — **28,672 walks, 0 divergences**, mutation-tested at 8,256 and 12,544 divergences |
+| **D18** | `toSpawnList` — the cursor walk | **no check covers it.** `sigel_eval -selfcheck` tested a copy of the walk, not `sweepToSpawn`, because the trainer is not linked into `sigel_eval`. That test was removed 2026-09-21. Dropping the step-back after `takeAt` in `sweepToSpawn` **in production** passed `check.sh`, `-selfcheck` and `pvm-check.sh`; the same change in the copy failed it. The evidence for the shipped rewrite is the review's differential run — **28,672 walks, 0 divergences**, mutation-tested at 8,256 and 12,544 divergences |
 | **D19** | `pvmTasks`, `pvmHosts` | **D19 shipped a leak**: it removed both `setAutoDelete` flags and gave only `pvmTasks` a `qDeleteAll`, so every enabled `PVMHOST` leaked one `SIG_GPActivePVMHost` per trainer destruction, and **all 56 shipped `.exp` have at least one**. Found by a **19,500-scenario differential sweep**: 41 diverged, the smallest being one static host and no spawns; with the missing `delete`, all 19,500 agree. **It was the only behavioural difference in the entire conversion.** *Pre-existing and written down: `nextFreeNumber` is never reset — two writes in the 1.3 binary, `movl $0x0` in the constructor and `incl` in `spawnTask` — so `pvmTasks` grows without bound (~226 KB at 56,333 spawns, arithmetic not measurement), and `stopTrainersSlaves` uses it as its loop bound, making shutdown **O(total spawns ever)*** |
 | **D20** | `SIG_GPFullDataRecorder`'s four lists, 10 files | **a null dereference fixed rather than reproduced**, per D13: `SIG_GPForceFitnessFunction`'s cleanup was a `do`/`while` that dereferenced `first()` before testing, so an evaluation recording no frames took a null dereference **while freeing**. *Same shape as D10's `do`/`while`, opposite conclusion — there the once-through was load-bearing and had to be preserved, here it is a crash. **The difference is which side of the null the body is written for, and it has to be read each time rather than pattern-matched.*** Coverage: `SIG_GPNiceWalkingFitnessFunction`'s walk runs on every check, but **setting its index to 1 — the classic error for this conversion — leaves the fitness check byte-identical across all 42 individuals.** The check discriminates one bit per individual, not which frame or how many |
 | **D21** | `Q2CString`, 7 sites, all PVM | the **`+ 2`** above. **NOTHING VERIFIES IT** and D21 claimed `pvm-check.sh` did: with `+ 1` it passes, and with **`+ 0`** — one byte shorter than `pvm_upkstr` writes — it also passes with no sanitizer report, because `QList` over-allocates. The check is blind to a shortfall under about eight bytes |
@@ -6385,6 +6398,9 @@ from `QList<type>::deleteItem` in `qlist.h` (`if ( del_item ) delete`). **Backed
 implementation with either side, so agreement means agreement. A differential
 test needs a reference independent of the code under test; that is what the
 model is, and it is not a second shim.
+*Removed 2026-09-21, at Jan's word: the conversion is done and proven, and the
+check ran its own copy of the walk, never `sweepToSpawn`, so it guarded nothing
+further.*
 
 **2. Twenty files got `<QList>` (and often `<QString>`, `<QTextStream>`) only
 through the shim** — 16 headers and 3 `.cpp` under `src/`, **plus
@@ -6445,9 +6461,10 @@ against vendored `qglist.cpp`, ran it against the recovered `Q2PtrList` over
 step (0 divergences), repeated that against an independent node-for-node
 `QGList` transcription so a *shared misreading* would surface (0 divergences),
 and mutation-tested both the probe and the shipped check — perturbing D18's
-index walk makes `-selfcheck` fail and exit 1. It covers 6 operations where the
+index walk made `-selfcheck` fail and exit 1. It covered 6 operations where the
 self-check covered 11; the missing five (`prepend`, `at(i)`, `remove(idx)`,
-`removeFirst`, `removeLast`) have no converted consumer.
+`removeFirst`, `removeLast`) had no converted consumer. *The model and its test
+were removed 2026-09-21 — see the D18 row of the steps table.*
 
 **Checks unchanged: 105 pass, 4 fail, 309 warnings, both baselines empty,
 sanitized clean, PVM both PASS, `sigel_eval -selfcheck` ok.**
