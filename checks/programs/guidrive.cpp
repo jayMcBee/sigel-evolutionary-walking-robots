@@ -56,14 +56,18 @@
                     the visualize and evolution scenarios
     SIGEL_EXP       experiment file to open (default twoBases.exp)
     SIGEL_SCRATCH   where save/export scenarios write (default /tmp)
-    SIGEL_GENERATIONS=N evolution only, and the PRIMARY lever: terminate by
-                    GENERATION after N, set through the Evolution control tab.
-                    Refuses a non-positive or unparseable value rather than
-                    silently falling through. Saves the evolved experiment to
-                    $SIGEL_SCRATCH/evolved.exp and asserts the run is in it.
-    SIGEL_RUN_LONGER=1  evolution only: change the termination through the GUI
-                    first, because every shipped experiment terminates on a
-                    date in 2001 and would otherwise finish instantly
+    SIGEL_GENERATIONS=N evolution and pvmcrash, and the PRIMARY lever:
+                    terminate by GENERATION after N, set through the Evolution
+                    control tab. Refuses a non-positive or unparseable value.
+                    Saves the evolved experiment to $SIGEL_SCRATCH/evolved.exp
+                    and asserts the run is in it.
+    SIGEL_RUN_LONGER=1  evolution and pvmcrash: terminate after a 5-minute
+                    duration, set through the GUI. With SAVEEXIT 1, as in
+                    experiments/, SIGEL stops only at a generation break, so
+                    the run lasts until the first break after 5 minutes.
+                    With neither lever, both scenarios refuse to Start an
+                    experiment that ends on a date still to come; the seven in
+                    experiments/ end in 2030.
 
   Build: see check.sh, or the guidrive target in the Makefile. It MUST be
   linked with the master SIG_GPExperiment, exactly as sigel is -- linking the
@@ -5486,23 +5490,12 @@ static int guidriveMain(int argc, char **argv)
         } else printf("  [start guard] no experiment selected\n");
         fflush(stdout);
 
-        // EVERY shipped experiment terminates on a DATE in 2001, so Start
-        // correctly runs and finishes at once. To see a running evolution the
-        // termination has to be changed first -- through the GUI, by clicking
-        // the "interprete as duration" radio and typing a duration, exactly as
-        // a user would.
-        // Terminate by GENERATION, not by duration. Every shipped experiment
-        // terminates on a DATE in 2001, so a correct Start runs and finishes at
-        // once -- MEASURED here rather than assumed: with the shipped
-        // termination this scenario saw signalEvolutionNotRunning emit false
-        // then true with the generation LCD unmoved at 136. A generation count
+        // Terminate by GENERATION, not by duration. A generation count
         // is the lever that gives a run which measurably starts, progresses and
         // stops, and it is the same lever the oracle's fifteen reference runs
         // were produced with -- TERMINATIONGENERATIONNO, PORTING.md's C11 evolution notes.
         // qEnvironmentVariableIntValue returns 0 for UNSET and for UNPARSEABLE
-        // alike, so SIGEL_GENERATIONS=abc silently fell through to the old
-        // date-terminated branch, saved nothing and still exited 0. Tell the
-        // two apart and refuse the bad one.
+        // alike, so tell the two apart and refuse the bad one.
         bool gensOk = true;
         const int wantGens = qEnvironmentVariableIntValue("SIGEL_GENERATIONS", &gensOk);
         if (!qEnvironmentVariableIsEmpty("SIGEL_GENERATIONS") && (!gensOk || wantGens <= 0)) {
@@ -5510,6 +5503,22 @@ static int guidriveMain(int argc, char **argv)
                    qPrintable(qEnvironmentVariable("SIGEL_GENERATIONS")));
             fflush(stdout);
             return 1;
+        }
+        // With neither lever the run lasts until the experiment's own end
+        // date. The seven in experiments/ end in 2030, so refuse; a 1.3
+        // original ends in 2001 and still starts and ends at once.
+        if (wantGens <= 0 && qgetenv("SIGEL_RUN_LONGER") != "1") {
+            SIG_GUIGPExperiment *ex = lv->currentlySelectedExperiment();
+            const SIGEL_GP::SIG_GPParameter *par = ex ? &ex->gpExperiment.gpParameter : nullptr;
+            if (par && par->getTerminationModel() == SIGEL_GP::SIG_GPParameter::byTime
+                    && par->getTerminationUsesDate()
+                    && par->getTerminationTime() > QDateTime::currentDateTime()) {
+                printf("!! set SIGEL_GENERATIONS=N or SIGEL_RUN_LONGER=1: this"
+                       " experiment runs until %s\n",
+                       qPrintable(par->getTerminationTime().toString(Qt::ISODate)));
+                fflush(stdout);
+                return 1;
+            }
         }
         // The pool generation BEFORE the run, so the assertion after it can say
         // the run actually advanced rather than that a file merely exists.
@@ -5570,8 +5579,8 @@ static int guidriveMain(int argc, char **argv)
                 printf("  [termination in experiment] model=%d (1=byGeneration) generationNo=%d\n",
                        gotModel, gotGens);
                 // ASSERT rather than merely print. If the widget values did not
-                // reach the experiment the run terminates instantly, the counts
-                // come out wrong, and a scenario that only printed would have
+                // reach the experiment the run does not stop after N
+                // generations, the counts come out wrong, and a scenario that only printed would have
                 // produced a plausible-looking artefact to diff. Fail here, where
                 // the reason is still visible.
                 if (gotModel != 1 || gotGens != wantGens) {
@@ -6005,10 +6014,8 @@ static int guidriveMain(int argc, char **argv)
                    (long long)runMs, wantGens, (long long)(runMs / wantGens),
                    samples, wantGens);
         fflush(stdout);
-        // Sample FAST: this experiment terminates on a DATE that is long past,
-        // so a correct Start can run to completion and re-enable itself well
-        // inside a 5-second sampling gap. A slow poll cannot tell that apart
-        // from a Start that never fired.
+        // Start has returned, so the run is over: print the first sample and
+        // any that still shows Start greyed or Stop enabled.
         for (int i = 0; i < 50; ++i) {
             QTest::qWait(100);
             bool se = start->isEnabled(), pe = stop->isEnabled();
@@ -6049,25 +6056,6 @@ static int guidriveMain(int argc, char **argv)
         }
         fflush(stdout);
 
-        // Distinguish a dead connect from a guard that declines: invoke the
-        // slot directly on the same object the button is connected to. If THIS
-        // greys Start, the click path is broken; if it does not, the slot is
-        // running and choosing to do nothing.
-        // C10 added this to tell a dead connect from a guard that declines. A
-        // run that has just moved the generation counter has already answered
-        // that, and invoking the slot again starts a SECOND evolution over the
-        // population this scenario exists to compare -- so it is skipped
-        // whenever a generation count was asked for.
-        if (SIG_GUIGPExperiment *ex = wantGens > 0 ? nullptr
-                                              : lv->currentlySelectedExperiment()) {
-            bool ok = QMetaObject::invokeMethod(ex, "slotStartEvolution",
-                                                Qt::DirectConnection);
-            QTest::qWait(600);
-            printf("  [direct invoke] accepted=%d -> Start=%s Stop=%s\n", ok,
-                   start->isEnabled() ? "enabled" : "GREYED",
-                   stop->isEnabled()  ? "ENABLED" : "greyed");
-            fflush(stdout);
-        }
         for (int i = 1; i <= 6; ++i) {
             QTest::qWait(5000);
             printf("  [t+%2ds] Start=%s Stop=%s", i * 5,

@@ -873,8 +873,25 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-21 — DONE: THE D18 CURSOR MODEL IS GONE FROM THE SELF-CHECK.**
+**2026-09-21 — DONE: ITEM 49. THE EXPERIMENTS RUN UNTIL 1 JANUARY 2030, 12:00.**
 Start here.
+
+- **All 7 experiments stopped by a date in August or September 2001**, so Start
+  ended at once and a user had to change the date first. Their
+  `TERMINATIONTIME` is now 2030-01-01 12:00; nothing else in them changed.
+  The x86 oracle's copies stay as shipped.
+- **What moved with it, regenerated from a run:** the four date fields and the
+  parameter export's checksum in `guibehaviour-baseline.txt`, the date lines of
+  both saves in `pagesave-baseline.txt`, and the `expstruct` checksum in
+  `check.sh`'s `v2 round trip` section.
+- **`guidrive`'s `evolution` and `pvmcrash` scenarios** relied on the past date
+  to end a run at once. Without `SIGEL_GENERATIONS` or `SIGEL_RUN_LONGER=1` they
+  now refuse to Start while the loaded experiment's end date is still to come,
+  since that run would last until then. A 1.3 original with its 2001 date still
+  starts and ends at once.
+- **The gate-names item on the 2026-09-20 open list is dropped** by decision.
+
+**2026-09-21 — DONE: THE D18 CURSOR MODEL IS GONE FROM THE SELF-CHECK.**
 
 - **`Qt2CursorList` and its test are removed from `sigel_eval.cpp`**, 149 lines,
   by decision: the conversion is done and proven. D18's rewrite of
@@ -3546,12 +3563,14 @@ typing then Return:
 | field | range | typed | 1.3 commits | port commits |
 |---|---|---|---|---|
 | Maximal program length | 2..32000 | `32001` | **32000** | **3200** |
-| Year | 1752..8000 | `8001` | **8000** | **2001** |
+| Year | 1752..8000 | `8001` | **8000** | **2030** |
 | Hour | 0..23 | `24` | **23** | **2** |
 | Register width | 1..99 | `100` | **99** | **10** |
 
 Both end on a *valid* value; they are **different valid values**, and
-`putAllIntoExperiment()` writes whichever the widget holds.
+`putAllIntoExperiment()` writes whichever the widget holds. *For Year the kept
+prefix `800` is below the minimum, so the box falls back to the value it held:
+the loaded experiment's year, 2030 since 2026-09-21.*
 
 **ACCEPTED, NOT FIXED — D28.** Reachable only by typing outside the box's own
 range, and the differing value is visible in the box before anything is saved.
@@ -4621,7 +4640,8 @@ finishes in under 100 ms.** Sampling at 5 s and at 100 ms both missed it, and
 only a `QSignalSpy` on `signalEvolutionNotRunning` catching `false` then `true`
 distinguished it from a Start that did nothing. *The oracle measured ≈4 minutes
 per generation on the 2003 i386 box, which is why C10 could not have seen a
-generation either.*
+generation either.* *Since 2026-09-21 the seven files in `experiments/` stop on
+1 January 2030, 12:00, so a Start there runs until a lever stops it.*
 
 **Reproducing the evolution comparison.** `guidrive.cpp`'s `evolution` scenario
 takes **`SIGEL_GENERATIONS=N`**, which selects `Generation` in
@@ -4631,7 +4651,9 @@ than trusting the widget. It saves through `File > Save Experiment` at the end,
 because a run that leaves no artefact cannot be diffed. The combo's items are
 User / Time / Generation / Time-or-generation, which is **not** the enum order
 (`byTime`, `byGeneration`, `byTimeGeneration`, `byUser`): index 2 maps to enum 1.
-The old `SIGEL_RUN_LONGER` duration path is kept as the `else` branch.
+The old `SIGEL_RUN_LONGER` duration path is kept as the `else` branch. With
+neither lever, the `evolution` and `pvmcrash` scenarios refuse to Start while
+the loaded experiment's end date is still to come.
 *The input is BUILT, not shipped:* `data/Experiments/twoBasesSimpleFitness1.exp`
 with the GP `RANDOMSEED` — the **second** of the two, the first being the
 simulation's — set to 12345, the eight 2003 PVMHOST lines replaced by one local
@@ -6724,8 +6746,7 @@ still passes. Nor does it run the call to `slotEvolutionStopped` in the `catch`
 of `slotStartEvolution`: it calls that slot directly, so it checks what the
 slot does — clear the flag and show the pool generation — not that the `catch`
 calls it. Checking it
-needs a real run, and every shipped experiment stops on a date in 2001, so a
-correct Start returns in under 100 ms.
+needs a real run.
 
 **The Individuals view is locked, not disabled.** `allIndividualsView->setEnabled(
 false )` is commented out in the 2003 source.

@@ -666,12 +666,12 @@ we do with the system?]
     group  [By generation] enabled=1 checkable=0
     group  [Tournaments per generation] enabled=1 checkable=0
   [drive]
-    spin   spinboxByTimeHour                    v=7         [0..23] step=1 pre=[] suf=[] up=8         dn2=6         typed(max+1)=[2]->2 commits=2 enabled=1
-    spin   spinboxByTimeYear                    v=2001      [1752..8000] step=1 pre=[] suf=[] up=2002      dn2=2000      typed(max+1)=[800]->2001 commits=2001 enabled=1
+    spin   spinboxByTimeHour                    v=12        [0..23] step=1 pre=[] suf=[] up=13        dn2=11        typed(max+1)=[2]->2 commits=2 enabled=1
+    spin   spinboxByTimeYear                    v=2030      [1752..8000] step=1 pre=[] suf=[] up=2031      dn2=2029      typed(max+1)=[800]->2030 commits=2030 enabled=1
     spin   spinboxByTimeSecs                    v=0         [0..59] step=1 pre=[] suf=[] up=1         dn2=0         typed(max+1)=[6]->6 commits=6 enabled=1
-    spin   spinboxByTimeDay                     v=14        [1..31] step=1 pre=[] suf=[] up=15        dn2=13        typed(max+1)=[3]->3 commits=3 enabled=1
+    spin   spinboxByTimeDay                     v=1         [1..31] step=1 pre=[] suf=[] up=2         dn2=1         typed(max+1)=[3]->3 commits=3 enabled=1
     spin   spinboxByTimeMins                    v=0         [0..59] step=1 pre=[] suf=[] up=1         dn2=0         typed(max+1)=[6]->6 commits=6 enabled=1
-    spin   spinboxByTimeMonth                   v=8         [1..12] step=1 pre=[] suf=[] up=9         dn2=7         typed(max+1)=[1]->1 commits=1 enabled=1
+    spin   spinboxByTimeMonth                   v=1         [1..12] step=1 pre=[] suf=[] up=2         dn2=1         typed(max+1)=[1]->1 commits=1 enabled=1
     spin   spinboxByDurationDays                v=0         [0..365] step=1 pre=[] suf=[] up=1         dn2=0         typed(max+1)=[36]->36 commits=36 enabled=1
     spin   spinboxByDurationHours               v=0         [0..23] step=1 pre=[] suf=[] up=1         dn2=0         typed(max+1)=[2]->2 commits=2 enabled=1
     spin   spinboxByDurationMins                v=0         [0..59] step=1 pre=[] suf=[] up=1         dn2=0         typed(max+1)=[6]->6 commits=6 enabled=1
@@ -1039,7 +1039,7 @@ selected=17013
   [modal] class=QFileDialog title=[Export GP Parameter...]
   [dialog] title=[Export GP Parameter...] filters=[GP Parameter Files (*.gpp) ;; All Files (*)] accept=[&Save]
   [dialog] parentIsTheMainWindow=1
-  bytes=819 sha256=324514d60dd69f0038f25b38aee457b57dcfc5bbd0e3ea126b39f58dcc6b91f3 newlines=87 endsWithNewline=1
+  bytes=819 sha256=56b819402928ae0983be4a2aa98047828a4616e5c06b37a9cf350a9b91c95aee newlines=87 endsWithNewline=1
   crCount=0
   head0  [RANDOMSEED]
   head1  [0]
@@ -1923,8 +1923,8 @@ Do you want to replace it?]
   mutated spinboxRandomSeed -> 321
   [modal] class=QFileDialog title=[Import GP Parameter...]
   [modal] class=QFileDialog title=[Export GP Parameter...]
-  export1 819 bytes  324514d60dd69f0038f25b38aee457b57dcfc5bbd0e3ea126b39f58dcc6b91f3
-  export2 819 bytes  324514d60dd69f0038f25b38aee457b57dcfc5bbd0e3ea126b39f58dcc6b91f3
+  export1 819 bytes  56b819402928ae0983be4a2aa98047828a4616e5c06b37a9cf350a9b91c95aee
+  export2 819 bytes  56b819402928ae0983be4a2aa98047828a4616e5c06b37a9cf350a9b91c95aee
   ROUND TRIP STABLE (and the import undid the change)
 
 -- Simulation-Parameters

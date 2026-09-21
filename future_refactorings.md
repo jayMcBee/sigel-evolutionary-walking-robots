@@ -438,13 +438,6 @@ touched, because changing one changes behaviour against the reference binary.
   in `Terrain.ter` itself before the atomic write — and closing it needs per-call
   state, which the port may not add.
 
-- [ ] **49. Set the experiments' termination date to 1 January 2030, 12:00.**
-  Decided 2026-09-21. All 7 stop by date (`TERMINATIONUSESDATE 1`), on a day in
-  August or September 2001, so Start ends at once and a user must change the
-  date first. What moves with it: 8 lines in `pagesave-baseline.txt` — the
-  year, month, day and hour of both saves' `TERMINATIONTIME` — the year field in the GUI dump, and `guidrive`'s
-  `evolution` scenario, which counts on the past date to end a run at once.
-
 - [ ] **35. Remove the Windows and Visual Studio support.** Decided
   2026-09-09. It does not build here and nothing tests it.
   **It could not build in 2003 either:** `Sigel.dsw` lists 13 projects and only
