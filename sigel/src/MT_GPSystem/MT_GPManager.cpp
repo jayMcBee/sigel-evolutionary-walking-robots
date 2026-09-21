@@ -274,7 +274,7 @@ void MT_GPManager::writeToFileGPSystem(QTextStream &File)
 	int PresentTSize = FitnessTrainer->getPresentTSize();
 	MT_Individual * NewBestIndi= Parent->getBestIndividual();
 
-	File << "beste Fitness vor Berechnung: " << NewBestIndi->getFitness() << Qt::endl;
+	File << "best fitness before calculation: " << NewBestIndi->getFitness() << Qt::endl;
 	NewBestIndi->setTrainingsSet(-1);
 	int fitFct, tDur, tSize;
 	FitnessTrainer->getSelektionValue(&fitFct, &tDur, &tSize);
@@ -329,8 +329,8 @@ void MT_GPManager::writeToFileGPSystem(QTextStream &File)
 			NumOfPositivSigelFit ++;
 		
 		File << "Nr.: " << k << Qt::endl;
-		File << " Sigel Fitness/Sieger : " << (*CorrectFit)[k] << Qt::endl;
-		File << " Meta Vorhersage      : " << (*Outcome)[k] << Qt::endl;
+		File << " Sigel Fitness/Winner : " << (*CorrectFit)[k] << Qt::endl;
+		File << " Meta Prediction      : " << (*Outcome)[k] << Qt::endl;
 	}
 	
 	File << "#CorrectFit >=0 : " << NumOfPositivSigelFit << Qt::endl << Qt::endl;
@@ -338,7 +338,7 @@ void MT_GPManager::writeToFileGPSystem(QTextStream &File)
 	File << "Generation: "<< GenerationNumber <<Qt::endl;
 	File << "max.Fitness   : " << corFitValue << Qt::endl; 
 	File << "simple max.Fit: " << NewBestIndi->getFitness() << Qt::endl;
-	File << "durch.Fitness: " << Statistics->getStatisticElement(GenerationNumber-2)->AverageFitness << Qt::endl;
+	File << "avg. Fitness: " << Statistics->getStatisticElement(GenerationNumber-2)->AverageFitness << Qt::endl;
 	File << "average Error/ Percent of Correct Estimation: " << ErrorCorrect << Qt::endl;
 
 	

@@ -892,6 +892,11 @@ Start here.
   - `>>> im Randomizer <<<` → `>>> in Randomizer <<<`, a debug line in
     `MT_Randomizer::MT_Randomizer(QTextStream&)`. Item 13 did not list it: "im"
     is also an English word, so a search for German words missed it.
+  - Four labels in `MT_GPManager::writeToFileGPSystem`, which writes the Meta-GP
+    save file: `beste Fitness vor Berechnung:` → `best fitness before
+    calculation:`, `Sigel Fitness/Sieger :` → `Sigel Fitness/Winner :`,
+    `Meta Vorhersage      :` → `Meta Prediction      :` and `durch.Fitness:` →
+    `avg. Fitness:`. The padded labels keep their width.
 - **Renamed:**
   - `SIG_GPManager::schlussJetzt` → `stopEvolutionNow`. `messageEvolutionStop()`
     sets it; each loop reads it straight after `stopIfNecessary()` and returns.
