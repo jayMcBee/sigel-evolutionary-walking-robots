@@ -376,48 +376,25 @@ touched, because changing one changes behaviour against the reference binary.
   survives PVM's own shutdown, so today's behaviour is safe, only untidy.
   Matters before `check.sh` ever runs one of the three PVM scenarios.
   *Any printf on an early-return path here is lost unless it flushes itself.*
+  **Closing `sigel` with SIGTERM does not end it either.** Measured 2026-09-21:
+  `sigelStandardSignalHandler` calls `pvm_halt()`, Qt then reports a `QThread`
+  destroyed while running, the handler's SIGABRT branch prints `Abort` and calls
+  `pvm_halt()` again, and the process stayed until SIGKILL.
 
-- [ ] **39. Clear the 2003 Dortmund PVM hosts out of the experiments.**
-  All 7 kept `.exp` carry them: 22 distinct host names — `wickie`, `bube`,
-  `eiche`, `pappel`, `urobe` and the rest — in 130 `PVMHOST` lines, with slave
-  directories under `/home/pg368/sawitzki/sigel` and
-  `/home/pg368b/ross/projects/sigel`, and 14 `GRAVEYARDDIRECTORY` and
-  `POOLIMAGEDIRECTORY` values under the same roots. None has existed since 2003,
-  so every one of them is a spawn that fails.
-  **The robot block carries them too.** Each of the 20 `Body` entries names its
-  2001 directory, as in `Body base.wrl /home/pg368/sawitzki/hammer/ y`.
-  `check.sh`'s `v2 round trip` section pins an md5 over hammer's whole robot
-  block and an `expstruct` shape hash that covers those entries, so changing the
-  paths moves both pins. The 2026-09-18 attempt changed them without saying so.
-  **Where they are expected output:**
-  - `pagesave-baseline.txt`: 16 host lines and 4 directory values — the port's
-    own save of `twoBases.exp`. Regenerable here.
-  - `v8-1.3-gp-blocks.txt`: the 20 hammer host names, in the order the
-    `v2 round trip` section compares against.
-  - `check.sh`: the three pinned `pvmhost` lines of that section, and its
-    host-parser test.
-  - `guibehaviour-baseline.txt`: 19 lines — 10 from the `pages` scenario, 2 from
-    `exportall`, 7 from `dialogs`. Regenerable here.
-  `v6-1.3-friction-nocollide.txt` names two such paths in its method note; no
-  check reads them. `dictorder`, `fitness`, `guidump` and `xtest` carry none.
-  Every scenario behind `guibehaviour-baseline.txt` and `pagesave-baseline.txt`
-  loads `twoBases.exp`, so their host lines move with that file, and both are
-  the port's own output. Map distinct placeholders consistently across the
-  experiments, those two files and `check.sh`'s host-parser test.
-  **Copy both data trees before the first write.** The 2026-09-18 attempt did
-  not, and lost the only copy of `data-reordered/`.
-  **Decide first what replaces them** — this machine, or an empty list. An empty
-  list makes `slotStartEvolution` run with nowhere to spawn, which is a
-  different silent failure from the one D41 and D42 just closed.
-  **RAISED IN PRIORITY 2026-09-20**, Jan: the files are public on GitHub, and
-  they carry the 2003 authors' names in paths such as `/home/pg368/sawitzki/…`.
-  Do it **on both machines**, the same replacements, so the two stay comparable —
-  the rule items 40, 44 and 46 followed. Talk the plan through and get Jan's
-  approval before any file changes, here or on the x86 machine. The old warning
-  about copying the data trees first is met: `experiments/` and `robots/` are
-  tracked now. Two more things to check rather than assume: `replicate.sh`
-  hashes whole files for its duplicate detection, and `expstruct.py` fingerprints
-  them, so run checks 2 and 3 before and after.
+- [ ] **39. Finish clearing the 2003 Dortmund names.** The experiments are done
+  — PORTING.md, 2026-09-21. Left:
+  - **The x86 machine's copies.** The same script; its 7 files must hash as ours
+    afterwards. Jan approves before it runs there.
+  - **The 20 `robots/*/*.blend`.** Each holds a 2001 home directory. They are
+    binary, so a grep that skips binary files reports them clean; `grep -a`
+    finds all 20. They are the original Blender sources from SourceForge;
+    nothing reads them.
+  - **`sigel/README`**: the 2003 contact address, and a crontab example that
+    runs the launcher from an author's home directory.
+  - **`v8-1.3-gp-blocks.txt` and `v6-1.3-friction-nocollide.txt`** quote the
+    hosts and paths as 1.3 printed them. They cannot be regenerated here.
+  - **PORTING.md and this file** still quote some of the old hosts and paths.
+  - **Git history** holds every old byte.
 
 - [ ] **41. The simulation viewer starts too close, and follows the robot.** Jan,
   2026-09-19: *"On both machines and SIGEL versions we're defaulting to trace
@@ -456,12 +433,32 @@ touched, because changing one changes behaviour against the reference binary.
   `PVM_ROOT=/usr/lib/pvm3`, a `tcsh` shebang, and the Dortmund host names item 39
   removes from the experiments. **Modernise in place, do not replace:** both
   serve features the port still has — `sigel.cpp` still accepts `-devolve` /
-  `-de`. `sigelLauncher` becomes: set `SIGEL_ROOT` to the source tree and
-  `PVM_ROOT` to the vendored `pvm3`, then run the built program — which is what
-  every check does inline today and what a person otherwise sets by hand.
-  **When:** after the source tree is hoisted and renamed, so the paths are final.
+  `-de`. `sigelLauncher` runs inside 1.3's one folder, as it did in 2003 —
+  item 48. **Partly done by item 39:** `LINUX64`, `PVM_ARCH`, and the link
+  that puts `sigel_slave` on PVM's search path.
+  **When:** with item 48.
   `sigelDynClient` needs a second machine to prove it on; the 1.3 reference
   machine is not ours to use for tooling, so that half waits until there is one.
+
+- [ ] **48. Launch SIGEL the way every user did: drop `build-fast`, bring back
+  1.3's one folder.** Jan, 2026-09-21. 1.3's README: after the build a user keeps
+  one folder holding `sigel`, `sigel_slave`, `manage_dyn_slave`, `sigelLauncher`,
+  `povrayLauncher`, `sigelDynClient`, `Terrain.ter`, `pixmaps/` and
+  `supportingLibs/pvm3`, and runs `sigelLauncher` in it. The port builds into
+  `build/` or `build-fast/`, keeps PVM under `x/` and the data in `sigel/`, so no
+  such folder exists and SIGEL has been started by hand. **Make the build
+  assemble that folder, and start SIGEL only through `sigelLauncher` in it.**
+  **Drop `build-fast`**: it is a test build no user sees, and starting SIGEL from
+  it produced problems that do not exist in 1.3's layout. Until this is done,
+  the experiments' `. 1 1 "."` cannot spawn on a fresh clone: nothing puts
+  `sigel_slave` on PVM's search path.
+  **Visualize needs the same folder.** `SIG_AllIndividualsView` starts
+  `$SIGEL_ROOT/sigel_slave` on the local host name, whatever the host list says.
+  With `SIGEL_ROOT` at `sigel/` it reports *"The slave could not be started"*.
+  Measured by Jan 2026-09-21.
+  **A fresh checkout does not build with `make`.** `MT_Controller.cpp` includes
+  generated form headers before any rule has made them; the main tree builds
+  only because old output is left over. `make forms` first works round it.
 
 - [ ] **35. Remove the Windows and Visual Studio support.** Decided by Jan
   2026-09-09. It does not build here and nothing tests it.

@@ -16,11 +16,17 @@ if [ "`uname`" = "SunOS" ]
 fi
 
 if [ "`uname`" = "Linux" ]
-  then PVM_ARCHDIR=LINUX
+  then PVM_ARCHDIR=LINUX64
     PVM_ROOT=$PWD/supportingLibs/pvm3
 fi
 
 export PVM_ROOT;
+PVM_ARCH=$PVM_ARCHDIR;
+export PVM_ARCH;
+
+# An experiment's slave directory of "." means PVM's own search path.
+mkdir -p $PVM_ROOT/bin/$PVM_ARCHDIR;
+ln -sf $SIGEL_ROOT/sigel_slave $PVM_ROOT/bin/$PVM_ARCHDIR/sigel_slave;
 
 PATH=$PVM_ROOT/bin/$PVM_ARCHDIR:$PVM_ROOT/lib:$PATH;
 export PATH;

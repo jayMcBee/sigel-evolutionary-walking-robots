@@ -701,8 +701,8 @@ we do with the system?]
   [survey]
     group  [Graveyard] enabled=1 checkable=0
     group  [Pool image options] enabled=1 checkable=0
-    edit   lineeditGraveyardDir                 text=[/home/pg368b/ross/projects/sigel] enabled=1 validator=none
-    edit   lineeditPoolImageDir                 text=[/home/pg368b/ross/projects/sigel] enabled=1 validator=none
+    edit   lineeditGraveyardDir                 text=[/tmp] enabled=1 validator=none
+    edit   lineeditPoolImageDir                 text=[/tmp] enabled=1 validator=none
   [drive]
     spin   spinboxPoolImageFrequency            v=1         [1..32000] step=1 pre=[] suf=[] up=2         dn2=1         typed(max+1)=[3200]->3200 commits=3200 enabled=1
     check  checkboxUseGraveyard                 text=[Use graveyard] checkable=1 0->1 enabled=1
@@ -710,15 +710,8 @@ we do with the system?]
   -- tab 4 [PVM] shown=1 visible=1
   [survey]
     group  [Hosts] enabled=1 checkable=0
-    tree   listviewHosts                        cols=4 rows=8
-      row0  |                       | herz                  | 2                     | /home/pg368b/ross/projects/sigel| col0icon=1 col0check=0
-      row1  |                       | eiche                 | 2                     | /home/pg368b/ross/projects/sigel| col0icon=1 col0check=0
-      row2  |                       | lithium               | 2                     | /home/pg368b/ross/projects/sigel| col0icon=1 col0check=0
-      row3  |                       | pappel                | 2                     | /home/pg368b/ross/projects/sigel| col0icon=1 col0check=0
-      row4  |                       | urobe                 | 2                     | /home/pg368b/ross/projects/sigel| col0icon=1 col0check=0
-      row5  |                       | birke                 | 2                     | /home/pg368b/ross/projects/sigel| col0icon=1 col0check=0
-      row6  |                       | bube                  | 2                     | /home/pg368b/ross/projects/sigel| col0icon=1 col0check=0
-      row7  |                       | wickie                | 2                     | /home/pg368b/ross/projects/sigel| col0icon=1 col0check=0
+    tree   listviewHosts                        cols=4 rows=1
+      row0  |                       | .                     | 1                     | <REPOROOT>| col0icon=1 col0check=0
   [drive]
     spin   spinboxTimeout                       v=0         [0..32000] step=1 pre=[] suf=[ min] up=1         dn2=0         typed(max+1)=[3200 min]->3200 commits=3200 enabled=1
   -- outside the tab widget
@@ -1046,14 +1039,14 @@ selected=17013
   [modal] class=QFileDialog title=[Export GP Parameter...]
   [dialog] title=[Export GP Parameter...] filters=[GP Parameter Files (*.gpp) ;; All Files (*)] accept=[&Save]
   [dialog] parentIsTheMainWindow=1
-  bytes=1283 sha256=4ff9e8b50c404a636b715dfc8871237b106d58eb95fce7604c41461be5e6cffe newlines=101 endsWithNewline=1
+  bytes=819 sha256=324514d60dd69f0038f25b38aee457b57dcfc5bbd0e3ea126b39f58dcc6b91f3 newlines=87 endsWithNewline=1
   crCount=0
   head0  [RANDOMSEED]
   head1  [0]
   head2  [MININDLENGTH]
-  tail-2 [eiche 2 1 "/home/pg368b/ross/projects/sigel"]
+  tail-2 [0]
   tail-1 [PVMHOST]
-  tail0  [herz 2 1 "/home/pg368b/ross/projects/sigel"]
+  tail0  [. 1 1 "."]
 
 -- Export > Simulation-Parameters
   [modal] class=QFileDialog title=[Export Simulation Parameters...]
@@ -1405,23 +1398,23 @@ Do you want to replace it?]
   written [MUL CMP MOVE COPY LOAD SENSE DIV SUB ADD DELAY MIN MAX MOD JMP]
 
 == EDIT HOST ==
-  rows=8 row0=[herz|2|/home/pg368b/ross/projects/sigel]
-  [modal] class=SIGEL_MasterGUI::SIG_EditHostDialog title=[Edit host herz...]
-  [dialog] class=SIGEL_MasterGUI::SIG_EditHostDialog title=[Edit host herz...] modal=1
+  rows=1 row0=[.|1|<REPOROOT>]
+  [modal] class=SIGEL_MasterGUI::SIG_EditHostDialog title=[Edit host ....]
+  [dialog] class=SIGEL_MasterGUI::SIG_EditHostDialog title=[Edit host ....] modal=1
     label  [Max. number of processes:]
     label  [Slave directory:]
     label  [Host name:]
-    spin   [spinboxMaximalNumberOfProcesses] value=2 min=1 max=1000
-    edit   [qt_spinbox_lineedit] text=[2] selected=[] focus=0
-    edit   [lineeditSlaveDirectory] text=[/home/pg368b/ross/projects/sigel] selected=[] focus=0
-    edit   [lineeditHostName] text=[herz] selected=[] focus=1
+    spin   [spinboxMaximalNumberOfProcesses] value=1 min=1 max=1000
+    edit   [qt_spinbox_lineedit] text=[1] selected=[] focus=0
+    edit   [lineeditSlaveDirectory] text=[<REPOROOT>] selected=[] focus=0
+    edit   [lineeditHostName] text=[.] selected=[] focus=1
     button [&OK         ] default=1 enabled=1 focus=0
     button [&Cancel     ] default=0 enabled=1 focus=0
     parent [SIGEL_MasterGUI::SIG_GPParameter] tiedToMainWindow=1
     check  [Enable host] checked=1
-    edit   [qt_spinbox_lineedit] text=[2] empty=0
-    edit   [lineeditSlaveDirectory] text=[/home/pg368b/ross/projects/sigel] empty=0
-    edit   [lineeditHostName] text=[herz] empty=0
+    edit   [qt_spinbox_lineedit] text=[1] empty=0
+    edit   [lineeditSlaveDirectory] text=[<REPOROOT>] empty=0
+    edit   [lineeditHostName] text=[.] empty=0
 
 == ABOUT / INFOBOX ==
   [modal] class=QDialog title=[Sigel InfoBox]
@@ -1930,8 +1923,8 @@ Do you want to replace it?]
   mutated spinboxRandomSeed -> 321
   [modal] class=QFileDialog title=[Import GP Parameter...]
   [modal] class=QFileDialog title=[Export GP Parameter...]
-  export1 1283 bytes  4ff9e8b50c404a636b715dfc8871237b106d58eb95fce7604c41461be5e6cffe
-  export2 1283 bytes  4ff9e8b50c404a636b715dfc8871237b106d58eb95fce7604c41461be5e6cffe
+  export1 819 bytes  324514d60dd69f0038f25b38aee457b57dcfc5bbd0e3ea126b39f58dcc6b91f3
+  export2 819 bytes  324514d60dd69f0038f25b38aee457b57dcfc5bbd0e3ea126b39f58dcc6b91f3
   ROUND TRIP STABLE (and the import undid the change)
 
 -- Simulation-Parameters

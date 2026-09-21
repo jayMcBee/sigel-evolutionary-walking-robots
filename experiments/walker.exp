@@ -93,11 +93,11 @@ TERMINATIONMODEL
 SAVEEXIT
 1
 GRAVEYARDDIRECTORY
-/home/pg368/sawitzki/sigel
+/tmp
 LIVEUNDEAD
 0
 POOLIMAGEDIRECTORY
-/home/pg368/sawitzki/sigel
+/tmp
 POOLIMAGEGENERATION
 0
 PRIORITY
@@ -147,47 +147,7 @@ TERMINATIONDURATIONMINUTES
 TERMINATIONDURATIONSECONDS
 0
 PVMHOST
-herz 1 1 "/home/pg368/sawitzki/sigel"
-PVMHOST
-pappel 1 1 "/home/pg368/sawitzki/sigel"
-PVMHOST
-platane 1 1 "/home/pg368/sawitzki/sigel"
-PVMHOST
-birke 1 0 "/home/pg368/sawitzki/sigel"
-PVMHOST
-eiche 1 1 "/home/pg368/sawitzki/sigel"
-PVMHOST
-wickie 1 1 "/home/pg368/sawitzki/sigel"
-PVMHOST
-urobe 1 1 "/home/pg368/sawitzki/sigel"
-PVMHOST
-sven 1 0 "/home/pg368/sawitzki/sigel"
-PVMHOST
-hamlet 1 0 "/home/pg368/sawitzki/sigel"
-PVMHOST
-honi 1 0 "/home/pg368/sawitzki/sigel"
-PVMHOST
-kunibert 1 0 "/home/pg368/sawitzki/sigel"
-PVMHOST
-moritz 1 0 "/home/pg368/sawitzki/sigel"
-PVMHOST
-zehn 1 1 "/home/pg368/sawitzki/sigel"
-PVMHOST
-koenig 1 0 "/home/pg368/sawitzki/sigel"
-PVMHOST
-pik 1 1 "/home/pg368/sawitzki/sigel"
-PVMHOST
-bube 1 1 "/home/pg368/sawitzki/sigel"
-PVMHOST
-kreuz 1 1 "/home/pg368/sawitzki/sigel"
-PVMHOST
-bolte 1 1 "/home/pg368/sawitzki/sigel"
-PVMHOST
-laempel 1 0 "/home/pg368/sawitzki/sigel"
-PVMHOST
-esche 1 1 "/home/pg368/sawitzki/sigel"
-PVMHOST
-tjure 1 0 "/home/pg368/sawitzki/sigel"
+. 1 1 "."
 
 #####
 
@@ -69295,7 +69255,7 @@ Fitness (Elter 2): 0.275476
 }POPULATION END
 #####
 StreamedRobot
-0 0 0 1 0 0 0 1 0 0 0 1 Body foot.wrl /home/pg368/sawitzki/walker/ y
+0 0 0 1 0 0 0 1 0 0 0 1 Body foot.wrl robots/walker/ y
 Geometry 24 -0.272222 0.23 0.112441 -0.410957 0.23 -0.000193 -0.410957 -0.23 -0.000193 -0.272222 -0.23 0.112441 0.023023 0.229787 0.112444 0.02316 -0.23 0.112441 -0.272222 -0.23 -0.112828 0.02316 -0.23 -0.112828 -0.272222 0.23 -0.112828 0.023296 0.229787 -0.112872 0.02316 -0.229781 -0.000214 0.111325 -0.229781 -0.070349 0.133024 -0.229781 -0.02515 0.02316 0.229787 -0.000214 0.133024 0.229787 -0.02515 0.111325 0.229787 -0.070349 0.132963 -0.229781 0.024988 0.132963 0.229787 0.024988 0.111155 -0.229781 0.070134 0.111155 0.229787 0.070134 0.071918 -0.229781 0.101347 0.071918 0.229787 0.101347 0.072163 -0.229781 -0.101656 0.072163 0.229787 -0.101656 29
 Polygon 4 0 1 2 3
 Polygon 4 4 0 3 5
@@ -69326,7 +69286,7 @@ Polygon 4 18 19 21 20
 Polygon 4 20 21 4 5
 Polygon 4 7 9 23 22
 Polygon 4 22 23 15 11
-Body body.wrl /home/pg368/sawitzki/walker/ y
+Body body.wrl robots/walker/ y
 Geometry 36 0.509644 -0.23 1.38079 0.509643 0.23 1.38079 0.786984 0.23 1.6903 0.786985 -0.23 1.6903 0.509643 -0.23 2.00005 0.509644 0.23 2.00005 0.79 0.23 -1.69011 0.509643 0.23 -1.99964 0.509643 0.23 -1.38038 0.509643 -0.23 -1.99964 0.79 -0.23 -1.69011 0.509644 -0.23 -0.308463 0.509643 0.23 -0.308463 0.786984 0.23 0.001045 0.786985 -0.23 0.001045 0.509643 -0.23 0.310794 0.509644 0.23 0.310794 -0.509644 -0.23 -1.38093 -0.509643 0.23 -1.38093 -0.786984 0.23 -1.69044 -0.786984 -0.23 -1.69044 -0.509643 -0.23 -2.00019 -0.509643 0.23 -2.00019 -0.79 0.23 1.68997 -0.509644 0.23 1.9995 -0.509643 0.23 1.38024 -0.509644 -0.23 1.9995 -0.79 -0.23 1.68997 -0.509644 -0.23 0.308463 -0.509643 0.23 0.308463 -0.786984 0.23 -0.001046 -0.786985 -0.23 -0.001046 -0.509643 -0.23 -0.310794 -0.509644 0.23 -0.310794 0.509643 -0.23 -1.38038 -0.509643 -0.23 1.38024 32
 Polygon 4 0 1 2 3
 Polygon 3 0 3 4
@@ -69360,7 +69320,7 @@ Polygon 4 1 0 15 16
 Polygon 4 34 8 12 11
 Polygon 4 33 18 17 32
 Polygon 4 29 28 35 25
-Body shoulder.wrl /home/pg368/sawitzki/walker/ y
+Body shoulder.wrl robots/walker/ y
 Geometry 8 0 -0.23 0.23 0 0.23 0.23 -0.104247 0.23 0 -0.104247 -0.23 0 0 -0.23 -0.23 0 0.23 -0.23 0.1 -8.2e-05 0.23 0.1 -8.2e-05 -0.23 8
 Polygon 4 0 1 2 3
 Polygon 3 0 3 4
@@ -69370,7 +69330,7 @@ Polygon 3 0 6 1
 Polygon 4 0 4 7 6
 Polygon 3 4 5 7
 Polygon 4 7 5 1 6
-Body leg.wrl /home/pg368/sawitzki/walker/ y
+Body leg.wrl robots/walker/ y
 Geometry 12 -0.272222 0.23 0.112441 -0.410957 0.23 -0.000193 -0.410957 -0.23 -0.000193 -0.272222 -0.23 0.112441 0.268778 0.23 0.112441 0.268778 -0.23 0.112441 0.410957 -0.23 -0.000252 0.410957 0.23 -0.000252 0.268778 -0.23 -0.112828 0.268778 0.23 -0.112828 -0.272222 -0.23 -0.112828 -0.272222 0.23 -0.112828 12
 Polygon 4 0 1 2 3
 Polygon 4 4 0 3 5

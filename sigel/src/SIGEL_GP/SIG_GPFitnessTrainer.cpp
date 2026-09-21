@@ -276,7 +276,11 @@ int SIGEL_GP::SIG_GPFitnessTrainer::spawnTask(SIGEL_GP::SIG_GPIndividual const& 
    		executableName = usedHost->executableDir.canonicalPath() + "sigel_slave";
   		}
 #else
-		executableName = usedHost->executableDir.path() + "/sigel_slave";
+		// "." asks PVM to find sigel_slave on its own search path.
+		if (usedHost->executableDir.path() == ".")
+			executableName = "sigel_slave";
+		else
+			executableName = usedHost->executableDir.path() + "/sigel_slave";
 #endif		
       const QByteArray executableNameQCString = executableName.toUtf8();
 
@@ -508,7 +512,11 @@ void SIGEL_GP::SIG_GPFitnessTrainer::sweepToSpawn()
 			executableName = usedHost->executableDir.canonicalPath() + "/sigel_slave";
 		}
 #else
-	  executableName = usedHost->executableDir.path() + "/sigel_slave";
+	  // "." asks PVM to find sigel_slave on its own search path.
+	  if (usedHost->executableDir.path() == ".")
+		executableName = "sigel_slave";
+	  else
+		executableName = usedHost->executableDir.path() + "/sigel_slave";
 #endif	
 	  const QByteArray executableNameQCString = executableName.toUtf8();
 

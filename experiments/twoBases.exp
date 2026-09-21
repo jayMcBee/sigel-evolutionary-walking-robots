@@ -93,11 +93,11 @@ TERMINATIONMODEL
 SAVEEXIT
 1
 GRAVEYARDDIRECTORY
-/home/pg368b/ross/projects/sigel
+/tmp
 LIVEUNDEAD
 0
 POOLIMAGEDIRECTORY
-/home/pg368b/ross/projects/sigel
+/tmp
 POOLIMAGEGENERATION
 0
 PRIORITY
@@ -147,21 +147,7 @@ TERMINATIONDURATIONMINUTES
 TERMINATIONDURATIONSECONDS
 0
 PVMHOST
-wickie 2 1 "/home/pg368b/ross/projects/sigel"
-PVMHOST
-bube 2 1 "/home/pg368b/ross/projects/sigel"
-PVMHOST
-birke 2 1 "/home/pg368b/ross/projects/sigel"
-PVMHOST
-urobe 2 1 "/home/pg368b/ross/projects/sigel"
-PVMHOST
-pappel 2 1 "/home/pg368b/ross/projects/sigel"
-PVMHOST
-lithium 2 1 "/home/pg368b/ross/projects/sigel"
-PVMHOST
-eiche 2 1 "/home/pg368b/ross/projects/sigel"
-PVMHOST
-herz 2 1 "/home/pg368b/ross/projects/sigel"
+. 1 1 "."
 
 #####
 
@@ -71517,7 +71503,7 @@ Fitness (Elter 2): 0.558099
 }POPULATION END
 #####
 StreamedRobot
-0 0 0 1 0 0 0 1 0 0 0 1 Body base.wrl /home/pg368b/ross/projects/sigel/ y
+0 0 0 1 0 0 0 1 0 0 0 1 Body base.wrl robots/twoBases/ y
 Geometry 10 1.00092 -0.000427 -1 1.00092 -0.000427 1 0 -1 1 0 -1 -1 0 1 -1 0 1 1 -2 1 -1 -2 -1 -1 -2 -1 1 -2 1 1 11
 Polygon 4 0 1 2 3
 Polygon 4 0 4 5 1

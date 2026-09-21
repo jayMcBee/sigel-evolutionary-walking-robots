@@ -93,11 +93,11 @@ TERMINATIONMODEL
 SAVEEXIT
 1
 GRAVEYARDDIRECTORY
-/home/pg368/sawitzki/sigel
+/tmp
 LIVEUNDEAD
 0
 POOLIMAGEDIRECTORY
-/home/pg368/sawitzki/sigel
+/tmp
 POOLIMAGEGENERATION
 0
 PRIORITY
@@ -147,45 +147,7 @@ TERMINATIONDURATIONMINUTES
 TERMINATIONDURATIONSECONDS
 0
 PVMHOST
-herz 1 0 "/home/pg368/sawitzki/sigel"
-PVMHOST
-pappel 1 0 "/home/pg368/sawitzki/sigel"
-PVMHOST
-platane 1 0 "/home/pg368/sawitzki/sigel"
-PVMHOST
-birke 1 0 "/home/pg368/sawitzki/sigel"
-PVMHOST
-eiche 1 0 "/home/pg368/sawitzki/sigel"
-PVMHOST
-wickie 1 0 "/home/pg368/sawitzki/sigel"
-PVMHOST
-urobe 1 0 "/home/pg368/sawitzki/sigel"
-PVMHOST
-sven 1 0 "/home/pg368/sawitzki/sigel"
-PVMHOST
-hamlet 1 0 "/home/pg368/sawitzki/sigel"
-PVMHOST
-honi 1 0 "/home/pg368/sawitzki/sigel"
-PVMHOST
-kunibert 1 0 "/home/pg368/sawitzki/sigel"
-PVMHOST
-moritz 1 0 "/home/pg368/sawitzki/sigel"
-PVMHOST
-zehn 1 0 "/home/pg368/sawitzki/sigel"
-PVMHOST
-koenig 1 1 "/home/pg368/sawitzki/sigel"
-PVMHOST
-pik 1 1 "/home/pg368/sawitzki/sigel"
-PVMHOST
-bube 1 0 "/home/pg368/sawitzki/sigel"
-PVMHOST
-kreuz 1 0 "/home/pg368/sawitzki/sigel"
-PVMHOST
-bolte 1 0 "/home/pg368/sawitzki/sigel"
-PVMHOST
-laempel 1 1 "/home/pg368/sawitzki/sigel"
-PVMHOST
-esche 1 1 "/home/pg368/sawitzki/sigel"
+. 1 1 "."
 
 #####
 
@@ -184021,7 +183983,7 @@ Fitness Value (before Mutation): 0.919513
 }POPULATION END
 #####
 StreamedRobot
-0 0 0 1 0 0 0 1 0 0 0 1 Body footLink.wrl /home/pg368/sawitzki/runner/ y
+0 0 0 1 0 0 0 1 0 0 0 1 Body footLink.wrl robots/runner/ y
 Geometry 18 -0.00158 -0.000169 -0.367322 0.620855 0.293475 -0.367322 0.620855 -0.293475 -0.367322 0.927383 0.290063 -0.367322 0.932073 -0.293475 -0.367322 1.11667 -0.232066 -0.367322 1.11667 -0.232066 0.367322 0.932073 -0.293475 0.367322 1.10908 0.237265 -0.367322 0.927383 0.290063 0.367322 1.10908 0.237265 0.367322 1.22607 -0.085428 -0.367322 1.22607 -0.085428 0.367322 1.22317 0.09384 -0.367322 1.22317 0.09384 0.367322 0.620855 0.293475 0.367322 0.620855 -0.293475 0.367322 -0.00158 -0.000169 0.367322 21
 Polygon 3 0 1 2
 Polygon 4 1 3 4 2
@@ -184044,7 +184006,7 @@ Polygon 3 4 3 8
 Polygon 3 4 8 13
 Polygon 3 4 13 11
 Polygon 3 4 11 5
-Body legLink.wrl /home/pg368/sawitzki/runner/ y
+Body legLink.wrl robots/runner/ y
 Geometry 8 0 0.367115 0.367239 -0.496287 0 0.367239 0 -0.367114 0.367239 0 0.367115 -0.367239 -0.496287 0 -0.367239 0 -0.367114 -0.367239 0.496287 -0.367114 0 0.496287 0.367115 0 10
 Polygon 3 0 1 2
 Polygon 4 1 0 3 4
@@ -184056,7 +184018,7 @@ Polygon 3 5 3 7
 Polygon 3 3 0 7
 Polygon 3 6 0 2
 Polygon 3 7 0 6
-Body base.wrl /home/pg368/sawitzki/runner/ y
+Body base.wrl robots/runner/ y
 Geometry 12 0.21172 -0.331768 -0.36671 0.21172 0.353886 -0.36671 0.59 0.008693 -0.36671 0.59 0.008693 0.36671 0.21172 -0.331768 0.36671 0.21172 0.353886 0.36671 -0.21172 -0.331768 0.36671 -0.21172 0.353886 0.36671 -0.59 0.008693 0.36671 -0.59 0.008693 -0.36671 -0.21172 -0.331768 -0.36671 -0.21172 0.353886 -0.36671 16
 Polygon 3 0 1 2
 Polygon 4 0 2 3 4

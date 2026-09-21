@@ -7,7 +7,7 @@
 # `File > Save Experiment' writes would have been caught by nothing.
 #
 # The BASE block below is the port's own save of twoBases.exp: load it, visit
-# no View page, change nothing, save once. 192 lines, 2053 bytes. The port's
+# no View page, change nothing, save once. 178 lines, 1589 bytes. The port's
 # save matches 1.3's own byte for byte, compared on twoBasesSimpleFitness2.exp
 # against a capture from the 2003 i386 binary (192 lines, 2069 bytes, sha256
 # a327150ccf498d57cead7a5d745670999b499a26b398e07335c20e8ee94d7197, with a
@@ -24,8 +24,8 @@
 # values" and then listed the fitness-name combo separately, which counted the
 # integrator combo as typed and made the arithmetic work only by accident.*
 #
-# LanguageParameters IS NOT IN THE BLOCK. It lives at line 71664 of the saved
-# file, far below `POPULATION BEGIN{' at 193, so a check over the 192-line
+# LanguageParameters IS NOT IN THE BLOCK. It lives at line 71650 of the saved
+# file, far below `POPULATION BEGIN{' at 179, so a check over the 178-line
 # block alone covers eleven of the twelve edits and silently misses the
 # registers one. It gets its own line here. That was found because the oracle
 # reported where POPULATION BEGIN{ had moved to, not by reading the code.
@@ -34,7 +34,7 @@
 # is raw bytes rather than key/value pairs: FLOORPICTUREFILE and TEXTUREFILE
 # each have an EMPTY value line after them, so anything that skips blank lines
 # consumes the next key as a value; and the block ends with a blank line.
-# The 2003 paths and the eight PVMHOST lines are preserved verbatim on save.
+# The host line and the two output directories are kept verbatim on save.
 #
 # Regenerate with:
 #   SIGEL_ROOT=... SIGEL_EXP=... build-fast/guidrive pagesave
@@ -155,11 +155,11 @@ TERMINATIONMODEL
 SAVEEXIT
 1
 GRAVEYARDDIRECTORY
-/home/pg368b/ross/projects/sigel
+/tmp
 LIVEUNDEAD
 0
 POOLIMAGEDIRECTORY
-/home/pg368b/ross/projects/sigel
+/tmp
 POOLIMAGEGENERATION
 0
 PRIORITY
@@ -209,21 +209,7 @@ TERMINATIONDURATIONMINUTES
 TERMINATIONDURATIONSECONDS
 0
 PVMHOST
-wickie 2 1 "/home/pg368b/ross/projects/sigel"
-PVMHOST
-bube 2 1 "/home/pg368b/ross/projects/sigel"
-PVMHOST
-birke 2 1 "/home/pg368b/ross/projects/sigel"
-PVMHOST
-urobe 2 1 "/home/pg368b/ross/projects/sigel"
-PVMHOST
-pappel 2 1 "/home/pg368b/ross/projects/sigel"
-PVMHOST
-lithium 2 1 "/home/pg368b/ross/projects/sigel"
-PVMHOST
-eiche 2 1 "/home/pg368b/ross/projects/sigel"
-PVMHOST
-herz 2 1 "/home/pg368b/ross/projects/sigel"
+. 1 1 "."
 
 #####
 WITHHISTORY
@@ -350,11 +336,11 @@ TERMINATIONMODEL
 SAVEEXIT
 1
 GRAVEYARDDIRECTORY
-/home/pg368b/ross/projects/sigel
+/tmp
 LIVEUNDEAD
 0
 POOLIMAGEDIRECTORY
-/home/pg368b/ross/projects/sigel
+/tmp
 POOLIMAGEGENERATION
 0
 PRIORITY
@@ -404,21 +390,7 @@ TERMINATIONDURATIONMINUTES
 TERMINATIONDURATIONSECONDS
 0
 PVMHOST
-wickie 2 1 "/home/pg368b/ross/projects/sigel"
-PVMHOST
-bube 2 1 "/home/pg368b/ross/projects/sigel"
-PVMHOST
-birke 2 1 "/home/pg368b/ross/projects/sigel"
-PVMHOST
-urobe 2 1 "/home/pg368b/ross/projects/sigel"
-PVMHOST
-pappel 2 1 "/home/pg368b/ross/projects/sigel"
-PVMHOST
-lithium 2 1 "/home/pg368b/ross/projects/sigel"
-PVMHOST
-eiche 2 1 "/home/pg368b/ross/projects/sigel"
-PVMHOST
-herz 2 1 "/home/pg368b/ross/projects/sigel"
+. 1 1 "."
 
 #####
 WITHHISTORY

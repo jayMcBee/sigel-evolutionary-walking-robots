@@ -556,15 +556,21 @@ static void eq( const char *what, QString got, QString want )
 }
 int main()
 {
-    // 1.3's own data: experiments/twoBases.exp
-    SIGEL_GP::SIG_GPPVMHost h( "eiche 2 1 \"/home/pg368b/ross/projects/sigel\"" );
-    eq( "name",      h.name,                       "eiche" );
-    eq( "maxSlaves", QString::number(h.maxSlaves), "2" );
+    // The experiments' own line: "." is the local machine, and PVM's search path.
+    SIGEL_GP::SIG_GPPVMHost h( ". 1 1 \".\"" );
+    eq( "name",      h.name,                       "." );
+    eq( "maxSlaves", QString::number(h.maxSlaves), "1" );
     eq( "enabled",   QString::number(h.enabled),   "1" );
-    eq( "dir",       h.executableDir.path(),       "/home/pg368b/ross/projects/sigel" );
+    eq( "dir",       h.executableDir.path(),       "." );
+    // A named host with a multi-part path, which "." does not cover.
+    SIGEL_GP::SIG_GPPVMHost m( "otherbox 2 0 \"/opt/sigel/bin\"" );
+    eq( "name (named)",      m.name,                       "otherbox" );
+    eq( "maxSlaves (named)", QString::number(m.maxSlaves), "2" );
+    eq( "enabled (named)",   QString::number(m.enabled),   "0" );
+    eq( "dir (named)",       m.executableDir.path(),       "/opt/sigel/bin" );
     // Qt 2 skipped whitespace on EVERY char read, so it silently dropped spaces
     // inside the quoted path too. That is a 2003 defect and it is preserved.
-    SIGEL_GP::SIG_GPPVMHost s( "herz 4 0 \"/tmp/with space/sigel\"" );
+    SIGEL_GP::SIG_GPPVMHost s( "otherbox 4 0 \"/tmp/with space/sigel\"" );
     eq( "dir (2003 defect)", s.executableDir.path(), "/tmp/withspace/sigel" );
     return fails ? 1 : 0;
 }
@@ -1225,8 +1231,12 @@ elif make -s -C "$ROOT" B=build-fast SAN= SIGSAN= guidrive >/tmp/bdb.$$ 2>&1; th
        && guidrive_run runlock /tmp/bk.$$ \
        && guidrive_run rngseed /tmp/bz.$$ \
        && guidrive_run openfocus /tmp/bq.$$; then
+        # The GUI shows a slave directory by its physical path; strip the repo's.
         cat /tmp/bo.$$ /tmp/bp.$$ /tmp/bx.$$ /tmp/bw.$$ /tmp/bg.$$ /tmp/bm.$$ \
-            /tmp/br.$$ /tmp/bv.$$ /tmp/bk.$$ /tmp/bz.$$ /tmp/bq.$$ > /tmp/ball.$$
+            /tmp/br.$$ /tmp/bv.$$ /tmp/bk.$$ /tmp/bz.$$ /tmp/bq.$$ \
+            | awk -v r="$(cd "$ROOT" && pwd -P)" '{ while ((i = index($0, r)) > 0)
+                  $0 = substr($0, 1, i - 1) "<REPOROOT>" substr($0, i + length(r)); print }' \
+            > /tmp/ball.$$
         # THE RUNTIME-CONNECT CHECK AND ITS POSITIVE CONTROL.
         #
         # Qt says "No such signal"/"No such slot" at RUNTIME when a
@@ -1560,7 +1570,7 @@ pass=$((pass+xtp)); fail=$((fail+xtf))
 # the base plus C11a's eleven page edits; the file's header says why.
 #
 # LanguageParameters is checked separately because it is NOT in the block --
-# it sits at line 71664 of the saved file, far below POPULATION BEGIN{ at 193,
+# it sits at line 71650 of the saved file, far below POPULATION BEGIN{ at 179,
 # so a check over the block alone would silently miss the registers edit.
 pp=0; pf=0
 PSD="${TMPDIR:-/tmp}"
@@ -1847,7 +1857,8 @@ pass=$((pass+v5p)); fail=$((fail+v5f))
 #
 #   verification-against-sigel-1.3/v8-1.3-gp-blocks.txt   hammer, 2026-08-29
 #
-# So a failure in the hammer half is a regression against 1.3. The octopus half
+# So a failure in the hammer half's 1.3 lines is a regression against 1.3 --
+# the list of kinds below says which lines those are. The octopus half
 # is the port's own output. What 1.3 does with this robot is in
 # verification-against-sigel-1.3/v1-1.3-roundtrip.txt, captured on
 # octopusSimpleFitness: the same robot stored in the other order, which 1.3
@@ -1858,9 +1869,8 @@ pass=$((pass+v5p)); fail=$((fail+v5f))
 # that no hash bucket need collide. 1.3 does not permute its link, joint or
 # drive containers either, so agreement there is not evidence. What hammer
 # really tests is material order, `Body' emission order and `middle3''s axis
-# points, plus everything outside the robot: the section line counts, PVMHOST
-# order, the experiment history, the HISTORY growth defect and the ten
-# first-save keys.
+# points, plus everything outside the robot: the section line counts, the
+# experiment history, the HISTORY growth defect and the ten first-save keys.
 #   octopus supplies the rest. Its joint, drive and sensor containers DO
 # collide -- 1.3 permutes all three on every save, plus the body order and the
 # command list, and the port keeps the stored order. That is where "we
@@ -1909,15 +1919,21 @@ pass=$((pass+v5p)); fail=$((fail+v5f))
 #                 The headless path has no slider and keeps 255.
 #                 Ours is a GUI save, so 99 is 1.3's own GUI value.
 #
-# NOT EVERY LINE BELOW IS 1.3's, and the diff labels say so. Three kinds:
+# NOT EVERY LINE BELOW IS 1.3's, and the diff labels say so. Four kinds:
 #
-#   1.3's own numbers, from the hammer capture -- the markers, PVMHOST, the
-#   experiment-history line count and its first and last entry, the first
-#   block's character counts, the HISTORY growth and the ten first-save keys.
+#   1.3's own numbers, from the hammer capture -- the experiment-history line
+#   count and its first and last entry, the first block's character counts, the
+#   HISTORY growth and the ten first-save keys.
 #
-#   1.3's DATA, read back out. The individual names and the hammer robot-block
-#   hash are the shipped file's own bytes, so pinning them pins this build
-#   against 1.3's artefact even though no capture quotes them.
+#   1.3's DATA, read back out. The individual names are the shipped file's own
+#   bytes, so pinning them pins this build against 1.3's artefact even though no
+#   capture quotes them.
+#
+#   NOT 1.3's: `markers', `pvmhost' and the hammer robot-block hash. The
+#   experiment's host block and Body directories are not the shipped ones, so
+#   these pin this build against the file in experiments/. The file has one
+#   host, so host order is not tested. v8-1.3-gp-blocks.txt keeps 1.3's 20
+#   host names and their order for the file as shipped.
 #
 #   OURS, and only ours: the `expstruct' hash, and the whole octopus half. V8
 #   never ran expstruct; it is kept because it covers the population, which
@@ -2098,9 +2114,10 @@ else
         # line here passes when the INPUT changes, because all three passes
         # change together -- measured 2026-09-08 by renaming an individual in
         # the input, which the gate did not notice. So each such line also
-        # carries content: a hash, or the first and last entry. The names,
-        # the robot block and the population come from the shipped 1.3 data,
-        # so pinning their bytes pins them against 1.3.
+        # carries content: a hash, or the first and last entry. The names and
+        # the population come from the shipped 1.3 data, so pinning their
+        # bytes pins them against 1.3. The robot block does not: its Body
+        # directories are not the shipped ones.
         echo "names stable         $(v2eq3 yes "$(v2names "$V2D/ham0.exp")" "$(v2names "$V2D/ham1.exp")" "$(v2names "$V2D/ham2.exp")") $(command grep -c "NAME='" "$V2D/ham0.exp" || true) $(v2namee "$V2D/ham2.exp" 1) $(v2namee "$V2D/ham2.exp" '$')"
         # THE SIZE IS PART OF THE ASSERTION, not decoration. Every line here
         # that hashes an extract and compares three hashes says "identical"
@@ -2130,12 +2147,12 @@ else
         # v1-1.3-roundtrip.txt. That is the divergence, recorded, not filtered.
         cat > "$V2D/expect.txt" <<'V2EXPECT'
 == V2 round trip, against v8-1.3-gp-blocks.txt (hammer) and the port's own output (octopus)
-markers ham0        37 65 190 75242 75329 75491
-markers ham1        37 82 209 75363 75450 75612
-markers ham2        37 82 209 75463 75550 75712
-pvmhost ham0        20 herz pappel platane birke eiche wickie urobe sven hamlet honi kunibert moritz zehn koenig pik bube kreuz bolte laempel esche
-pvmhost ham1        20 herz pappel platane birke eiche wickie urobe sven hamlet honi kunibert moritz zehn koenig pik bube kreuz bolte laempel esche
-pvmhost ham2        20 herz pappel platane birke eiche wickie urobe sven hamlet honi kunibert moritz zehn koenig pik bube kreuz bolte laempel esche
+markers ham0        37 65 152 75204 75291 75453
+markers ham1        37 82 171 75325 75412 75574
+markers ham2        37 82 171 75425 75512 75674
+pvmhost ham0        1 .
+pvmhost ham1        1 .
+pvmhost ham2        1 .
 exp history lines    161 161 161
 exp history stable   yes
 exp history first    1 2001 8 8 21 13 32 0.0821164 0 0.00939138
@@ -2144,8 +2161,8 @@ first block chars    10574 10581 10588
 history growth 0->1  100 blocks +1
 history growth 1->2  100 blocks +1
 names stable         yes 100 NAME='10443' NAME='10194'
-hammer robot block   identical in all three 70 lines 666f06787942ddb6
-expstruct ham1==ham2 yes 108 lines 1ca79cc55948de76
+hammer robot block   identical in all three 70 lines dde685bd78c14a9d
+expstruct ham1==ham2 yes 108 lines 0f1dea65a8528e57
 -- first-save keys, ham0
 FLOORDIMENSION     x0
 FLOORFUNCTION      x0
@@ -2179,7 +2196,7 @@ WITHTEXTURE        x1 0
 AUTOSAVETIME       x1 0
 RESEVGEN           x1 0
 WITHHISTORY        x1 1
-octopus section 5    identical in all three 127 lines fbb7d019a2d69145
+octopus section 5    identical in all three 127 lines ecf08203808e2687
 octopus material     greenPlastic bluePlastic redPlastic
 octopus link         thirdFootLink firstFootLink base firstLegLink1 firstLegLink2 secondFootLink secondLegLink1 secondLegLink2 thirdLegLink1 thirdLegLink2
 octopus joint        secondLegJoint1 secondLegJoint2 thirdLegJoint1 secondLegJoint3 thirdLegJoint2 thirdLegJoint3 firstLegJoint1 firstLegJoint2 firstLegJoint3

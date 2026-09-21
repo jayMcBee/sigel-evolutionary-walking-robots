@@ -93,11 +93,11 @@ TERMINATIONMODEL
 SAVEEXIT
 1
 GRAVEYARDDIRECTORY
-/home/pg368/sawitzki/sigel
+/tmp
 LIVEUNDEAD
 0
 POOLIMAGEDIRECTORY
-/home/pg368/sawitzki/sigel
+/tmp
 POOLIMAGEGENERATION
 0
 PRIORITY
@@ -147,45 +147,7 @@ TERMINATIONDURATIONMINUTES
 TERMINATIONDURATIONSECONDS
 0
 PVMHOST
-herz 1 1 "/home/pg368/sawitzki/sigel"
-PVMHOST
-pappel 1 1 "/home/pg368/sawitzki/sigel"
-PVMHOST
-platane 1 1 "/home/pg368/sawitzki/sigel"
-PVMHOST
-birke 1 0 "/home/pg368/sawitzki/sigel"
-PVMHOST
-eiche 1 1 "/home/pg368/sawitzki/sigel"
-PVMHOST
-wickie 1 1 "/home/pg368/sawitzki/sigel"
-PVMHOST
-urobe 1 1 "/home/pg368/sawitzki/sigel"
-PVMHOST
-sven 1 1 "/home/pg368/sawitzki/sigel"
-PVMHOST
-hamlet 1 1 "/home/pg368/sawitzki/sigel"
-PVMHOST
-honi 1 1 "/home/pg368/sawitzki/sigel"
-PVMHOST
-kunibert 1 1 "/home/pg368/sawitzki/sigel"
-PVMHOST
-moritz 1 1 "/home/pg368/sawitzki/sigel"
-PVMHOST
-zehn 1 1 "/home/pg368/sawitzki/sigel"
-PVMHOST
-koenig 1 1 "/home/pg368/sawitzki/sigel"
-PVMHOST
-pik 1 1 "/home/pg368/sawitzki/sigel"
-PVMHOST
-bube 1 1 "/home/pg368/sawitzki/sigel"
-PVMHOST
-kreuz 1 1 "/home/pg368/sawitzki/sigel"
-PVMHOST
-bolte 1 1 "/home/pg368/sawitzki/sigel"
-PVMHOST
-laempel 1 1 "/home/pg368/sawitzki/sigel"
-PVMHOST
-esche 1 1 "/home/pg368/sawitzki/sigel"
+. 1 1 "."
 
 #####
 
@@ -75241,7 +75203,7 @@ Fitness Value (before Crossover): -1
 }POPULATION END
 #####
 StreamedRobot
-0 0 0 1 0 0 0 1 0 0 0 1 Body base.wrl /home/pg368/sawitzki/hammer/ y
+0 0 0 1 0 0 0 1 0 0 0 1 Body base.wrl robots/hammer/ y
 Geometry 10 1.00092 -0.000427 -1 1.00092 -0.000427 1 0 -1 1 0 -1 -1 0 1 -1 0 1 1 -2 1 -1 -2 -1 -1 -2 -1 1 -2 1 1 11
 Polygon 4 0 1 2 3
 Polygon 4 0 4 5 1
@@ -75254,7 +75216,7 @@ Polygon 3 7 0 3
 Polygon 3 8 5 9
 Polygon 3 8 1 5
 Polygon 3 8 2 1
-Body middle.wrl /home/pg368/sawitzki/hammer/ y
+Body middle.wrl robots/hammer/ y
 Geometry 8 0 1 1 -1 0 1 0 -1 1 0 1 -1 -1 0 -1 0 -1 -1 1 -1 0 1 1 0 10
 Polygon 3 0 1 2
 Polygon 4 1 0 3 4
@@ -75266,7 +75228,7 @@ Polygon 3 5 3 7
 Polygon 3 3 0 7
 Polygon 3 6 0 2
 Polygon 3 7 0 6
-Body effector.wrl /home/pg368/sawitzki/hammer/ y
+Body effector.wrl robots/hammer/ y
 Geometry 18 0 -0.000576 -1 2 1 -1 2 -1 -1 2.98493 0.988374 -1 3 -1 -1 3.59314 -0.790753 -1 3.59314 -0.790753 1 3 -1 1 3.56876 0.808469 -1 2.98493 0.988374 1 3.56876 0.808469 1 3.94466 -0.291092 -1 3.94466 -0.291092 1 3.93534 0.319756 -1 3.93534 0.319756 1 2 1 1 2 -1 1 0 -0.000576 1 21
 Polygon 3 0 1 2
 Polygon 4 1 3 4 2
