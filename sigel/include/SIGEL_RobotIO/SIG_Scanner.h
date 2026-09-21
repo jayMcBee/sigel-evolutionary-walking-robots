@@ -40,7 +40,7 @@ namespace SIGEL_RobotIO {
                 QString currentSymbol;
                 int currentSymType;
         public:
-                SIG_Scanner (QString liesdas);
+                SIG_Scanner (QString sourceText);
                 virtual ~SIG_Scanner (void);
 
                 void skipWhiteSpace (void);

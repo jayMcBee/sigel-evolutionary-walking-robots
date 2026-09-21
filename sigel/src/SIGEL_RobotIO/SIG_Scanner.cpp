@@ -29,8 +29,8 @@ namespace SIGEL_RobotIO {
                 int const EOS = -2;
         }
         
-        SIG_Scanner::SIG_Scanner (QString liesdas)
-                : text (liesdas),
+        SIG_Scanner::SIG_Scanner (QString sourceText)
+                : text (sourceText),
                   position (0),
                   lineposition (1),
                   currentSymType (Symbol::None)

@@ -23,8 +23,8 @@
 #include "SIGEL_RobotIO/SIG_UnstreamerScanner.h"
 
 namespace SIGEL_RobotIO {
-        SIG_UnstreamerScanner::SIG_UnstreamerScanner (QString liesdas)
-                : SIG_Scanner (liesdas)
+        SIG_UnstreamerScanner::SIG_UnstreamerScanner (QString sourceText)
+                : SIG_Scanner (sourceText)
         { }
         
         SIG_UnstreamerScanner::~SIG_UnstreamerScanner (void)

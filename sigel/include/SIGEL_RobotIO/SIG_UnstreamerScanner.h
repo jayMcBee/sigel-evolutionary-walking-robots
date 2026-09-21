@@ -31,7 +31,7 @@ namespace SIGEL_RobotIO { class SIG_UnstreamerScanner; }
 namespace SIGEL_RobotIO {
         class SIG_UnstreamerScanner : public SIG_Scanner {
         public:
-                SIG_UnstreamerScanner (QString liesdas);
+                SIG_UnstreamerScanner (QString sourceText);
                 virtual ~SIG_UnstreamerScanner (void);
                 virtual void nextSymbol (void);
         };

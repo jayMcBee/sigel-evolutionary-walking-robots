@@ -45,7 +45,7 @@ namespace SIGEL_RobotIO {
         
         class SIG_RobotScanner : public SIG_Scanner {
         public:
-                SIG_RobotScanner (QString liesdas);
+                SIG_RobotScanner (QString sourceText);
                 virtual ~SIG_RobotScanner (void);
                 virtual void nextSymbol (void);
         };

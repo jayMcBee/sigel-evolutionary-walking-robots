@@ -43,8 +43,8 @@ namespace SIGEL_RobotIO {
         int const slash = 11;
         }
         
-        SIG_RobotScanner::SIG_RobotScanner (QString liesdas)
-                : SIG_Scanner (liesdas)
+        SIG_RobotScanner::SIG_RobotScanner (QString sourceText)
+                : SIG_Scanner (sourceText)
         { }
 
         SIG_RobotScanner::~SIG_RobotScanner (void)
