@@ -164,10 +164,10 @@ namespace SIGEL_RobotIO {
                                                "'density' expected",
                                                "(unknown)",
                                                myScanner.currentLine ());
-                DL_Scalar dichte = expectNumber ();
+                DL_Scalar density = expectNumber ();
                 expect (RobotSymbol::semicolon);
                 // Insertion point: the material density is known.
-                materialDensity (mater, dichte);
+                materialDensity (mater, density);
 
                 myScanner.peekSymbol (symtype, symstr);
                 while ((symtype == RobotSymbol::word) &&
