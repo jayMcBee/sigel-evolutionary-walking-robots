@@ -897,6 +897,10 @@ Start here.
     calculation:`, `Sigel Fitness/Sieger :` → `Sigel Fitness/Winner :`,
     `Meta Vorhersage      :` → `Meta Prediction      :` and `durch.Fitness:` →
     `avg. Fitness:`. The padded labels keep their width.
+- **Joke text replaced:**
+  - `Phat processing of ` → `Computing the transformation of `, a debug line
+    in `calculateAnyJoint` in `IFunctions.cpp`, inside `#ifdef SIG_DEBUG`: not
+    compiled. The function it announces keeps its name.
 - **Renamed:**
   - `SIG_GPManager::schlussJetzt` → `stopEvolutionNow`. `messageEvolutionStop()`
     sets it; each loop reads it straight after `stopIfNecessary()` and returns.

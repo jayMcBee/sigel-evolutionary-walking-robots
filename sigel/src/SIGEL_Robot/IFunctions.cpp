@@ -358,7 +358,7 @@ namespace SIGEL_Robot {
                 // End of the covering construction
 
 #ifdef SIG_DEBUG
-		SIGEL_Tools::SIG_IO::cerr << "Phat processing of "
+		SIGEL_Tools::SIG_IO::cerr << "Computing the transformation of "
 					  << someIdentifier
 					  << "\n";
 #endif
