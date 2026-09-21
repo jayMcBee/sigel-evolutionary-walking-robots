@@ -889,6 +889,9 @@ Start here.
   - `reproduction: Konnte kein neues Individuum erzeugen.` →
     `reproduction: could not create a new individual.`, in
     `SIG_GPOperations::reproduction`, inside `#ifdef SIG_DEBUG`: not compiled.
+  - `>>> im Randomizer <<<` → `>>> in Randomizer <<<`, a debug line in
+    `MT_Randomizer::MT_Randomizer(QTextStream&)`. Item 13 did not list it: "im"
+    is also an English word, so a search for German words missed it.
 - **Renamed:**
   - `SIG_GPManager::schlussJetzt` → `stopEvolutionNow`. `messageEvolutionStop()`
     sets it; each loop reads it straight after `stopIfNecessary()` and returns.
