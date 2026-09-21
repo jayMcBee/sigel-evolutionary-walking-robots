@@ -445,7 +445,7 @@ touched, because changing one changes behaviour against the reference binary.
   one folder holding `sigel`, `sigel_slave`, `manage_dyn_slave`, `sigelLauncher`,
   `povrayLauncher`, `sigelDynClient`, `Terrain.ter`, `pixmaps/` and
   `supportingLibs/pvm3`, and runs `sigelLauncher` in it. The port builds into
-  `build/` or `build-fast/`, keeps PVM under `x/` and the data in `sigel/`, so no
+  `build/` or `build-fast/`, keeps PVM under `downloads/` and the data in `sigel/`, so no
   such folder exists and SIGEL has been started by hand. **Make the build
   assemble that folder, and start SIGEL only through `sigelLauncher` in it.**
   **Drop `build-fast`**: it is a test build no user sees, and starting SIGEL from
@@ -458,7 +458,10 @@ touched, because changing one changes behaviour against the reference binary.
   Measured by Jan 2026-09-21.
   **A fresh checkout does not build with `make`.** `MT_Controller.cpp` includes
   generated form headers before any rule has made them; the main tree builds
-  only because old output is left over. `make forms` first works round it.
+  only because old output is left over. Nor are the vendored headers patched in
+  time: SIGEL's own objects include them, but only the vendor libraries depend
+  on the patch step, so the first compile fails in `cv97/JVector.h`. Measured
+  2026-09-21 on a fresh unpack. `make vendor forms` first works round both.
 
 - [ ] **35. Remove the Windows and Visual Studio support.** Decided by Jan
   2026-09-09. It does not build here and nothing tests it.

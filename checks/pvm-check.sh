@@ -60,7 +60,7 @@ ROOT=$(cd "$(dirname "$0")/.." && pwd)
 # robots/twoBases/twoBases.rrb relative to the process, and this script
 # never cd'd before launching it.
 cd "$ROOT" || exit 1
-PVM=$ROOT/x/supportingLibs/supportingLibs/pvm3
+PVM=$ROOT/downloads/supportingLibs/pvm3
 BIN=$PVM/lib/LINUX64
 B=${1:-build}
 LINK=$ROOT/$B/pvm_link

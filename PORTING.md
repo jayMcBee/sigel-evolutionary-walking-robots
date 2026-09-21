@@ -266,8 +266,8 @@ found a real defect.** §0 has the rule; it is not optional.
 ├── shim/                                   4 pre-standard C++ headers
 ├── verification-against-sigel-1.3/         the 1.3 captures, Phase V
 ├── build/  build-fast/                     untracked, removed by `make clean`
-└── x/                                      UNTRACKED ONLY
-    ├── supportingLibs/supportingLibs/      dynamechs, cv97, newmat09, fparser,
+└── downloads/                              UNTRACKED ONLY
+    ├── supportingLibs/                     dynamechs, cv97, newmat09, fparser,
     │                                       pvm3, Dynamo (maths only). Extracted
     │                                       from vendor/, then patched by `make`
     └── sigelSourceDistribution.1.0/        the 1.0 release, for the regression
@@ -703,7 +703,7 @@ make pvm-link    build/pvm_link           P4's link and round trip
 
 #### P1 — the tree
 
-`x/supportingLibs/supportingLibs/pvm3/` is upstream 3.4.6, 844 files where
+`downloads/supportingLibs/pvm3/` is upstream 3.4.6, 844 files where
 3.4.3 had 576. `vendor/pvm3.4.6.tgz` is committed, md5
 `7b5f0c80ea50b6b4b10b6128e197747b`, identical to netlib's and to Debian's
 `.orig`. **It is the one tarball tracked here**: netlib is the only host still
@@ -871,8 +871,26 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-21 — DONE: ITEM 39, THE EXPERIMENTS. THE 2003 HOSTS AND HOME DIRECTORIES ARE OUT.**
+**2026-09-21 — DONE: `x/` IS NOW `downloads/`.**
 Start here.
+
+- **Renamed, at Jan's word.** `x/` held two unpacked archives under a name that
+  said nothing. It is now `downloads/`, still untracked, with the same 4399
+  files. The libraries moved up one level: `x/supportingLibs/supportingLibs/` is
+  now `downloads/supportingLibs/`, because the archive is unpacked into
+  `downloads/` itself rather than into a folder of the same name.
+- **Changed with it:** the `Makefile`'s library path, `check.sh`, `pvm-check.sh`,
+  `.gitignore`, and the unpack commands in `vendor/README.md`. Run in a scratch
+  copy, those commands give the tree the old ones gave, one level up. That
+  includes `qt`, `qhull` and `SOLID-2.0`, which the archive holds and the build
+  does not use.
+- **Backup:** `~/sigel-x-before-downloads-20260921.tar.gz`, checked by unpacking
+  and diffing.
+- **Both build folders were cleaned and rebuilt.** 354 dependency files in
+  `build/` and `build-fast/` named `x/`, and the next vendor rebuild would have
+  stopped on them. None do now.
+
+**2026-09-21 — DONE: ITEM 39, THE EXPERIMENTS. THE 2003 HOSTS AND HOME DIRECTORIES ARE OUT.**
 
 - **Replaced in all 7 `.exp`**, by one script:
 
@@ -2365,7 +2383,7 @@ yields a non-negative result either way.
 **Seed 0 means "seed from the clock"** — `QTime(0,0,0,0).secsTo(currentTime())`,
 seconds since midnight, in both, and `QTime(0,0)` is explicitly constructed so
 §9's `QTime()` collision does not touch it. **Original 2001 code**, identical in
-`x/sigelSourceDistribution.1.0`.
+`downloads/sigelSourceDistribution.1.0`.
 
 **There are two `RANDOMSEED` keys per `.exp`, and only one of them seeds
 anything.** Measured over all 14 files in `data/Experiments/`:
@@ -6245,7 +6263,7 @@ which is why the list exists.
 | **`MT_Statistics`'s three converted functions, D24** | linked, never run. `gdb` breakpoints on `updateStatistics`, `getStatisticElement` and `writeToFileMT_Statistics` across **all 14** shipped experiments at individual 0: **zero hits** |
 | `MT_GUI/MT_StatisticsWidget.cpp`'s nine `.count()` calls on the converted member, D24 | ~~`MT_GUI` is in neither `check.sh`'s `MODULES` nor the Makefile's `CORE`~~ — **STALE, it is in both, and `metagui` drives the widget (C11c)** |
 | **the whole `taskCanDoList` index walk, D25a** | compiled and archived (21 `SIG_GPManager::` symbols in `libSIGEL_GP.a`) but **linked into nothing** — 0 in `sigel_eval`, `build-fast/sigel_eval` and `pvm_link`. The `removeAt` path, the append path and the `:122` reference never execute here. The 1.3 binary shows the path is live in a real run (80 appends in two generations); our checks cannot reach it |
-| **four of D25a's six `at(canDoIdx)` sites** | `:127`, `:151`, `:1310`, `:1336` sit inside `#ifdef SIG_DEBUG`, and **`SIG_DEBUG` is defined nowhere in this build** — its only occurrence in the repo is `x/sigelSourceDistribution.1.0/sigel/makefile:72`, the abandoned 1.0 tree. Neither `make` nor `check.sh` parses them. Compiled explicitly with `-DSIG_DEBUG` by review: exit 0, no errors — so no latent defect, but only two of the six were checked by the build |
+| **four of D25a's six `at(canDoIdx)` sites** | `:127`, `:151`, `:1310`, `:1336` sit inside `#ifdef SIG_DEBUG`, and **`SIG_DEBUG` is defined nowhere in this build** — its only occurrence is the `CPP_FLAGS += -DSIG_DEBUG` line of `downloads/sigelSourceDistribution.1.0/sigel/makefile`, the abandoned 1.0 tree. Neither `make` nor `check.sh` parses them. Compiled explicitly with `-DSIG_DEBUG` by review: exit 0, no errors — so no latent defect, but only two of the six were checked by the build |
 | the `maxTouchsPerLoop` break, D25a | **dead on every shipped configuration**: the value is persisted in none of the 28 `.exp`, and all five presets call `setMaxTouchsPerLoop(-1)` (`SIG_GPParameter.cpp:325,330,335,340,345`), so `(maxTouchsPerLoop != -1)` is always false |
 | all **seven** D23 sites | linked and never called — *in `sigel_eval`, which is a test harness, not the program*. 1.3's master links the whole MT subsystem (`MT_Evaluator` 16 symbols, `MT_Classifier` 25, `MT_Statistics` 83, `MT_Substitute` 20, `MT_TrainingCase` 46, `MT_Trainingset` 14; all 0 in `sigel_slave`), so "never linked" is a fact about our harness and Phase C will link these. Detail: `MT_Substitute`, `MT_Trainingset` and `MT_FitnessTrainer` **are** in `sigel_eval` and `pvm_link` — 59 symbols, pulled in by `moc/MT_GPSystem/MT_GPManager.o` on the link line — but `gdb` breakpoints on all three converted functions and on `MT_GPManager::checkForNewTCase` were not hit across a full evaluation. The classes that never link are **`MT_Classifier` and `MT_Evaluator`**, the queue's two fillers, both evolution-loop. *This row previously said the first three were the unlinked ones: inverted, and asserted without running the `nm` the D22 row had already established for exactly this* |
 | **all six D22 sites** | `nm -C build/sigel_eval` finds **0** `SIG_GPOperations::` and **0** `SIG_GPCrossOverTournament::`, and the same in `pvm_link`. The objects are archived in `libSIGEL_GP.a` and never pulled into a link. The evolution loop needs `sigel`, which Phase C blocks |

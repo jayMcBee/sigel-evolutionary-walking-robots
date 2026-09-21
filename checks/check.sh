@@ -31,7 +31,7 @@ ROOT=$(cd "$(dirname "$0")/.." && pwd)
 # never cd'd before launching it.
 cd "$ROOT" || exit 1
 SRC=$ROOT/sigel
-SL=$ROOT/x/supportingLibs/supportingLibs
+SL=$ROOT/downloads/supportingLibs
 QTINC=$(qmake6 -query QT_INSTALL_HEADERS)
 QTLIBDIR=$(qmake6 -query QT_INSTALL_LIBS)
 

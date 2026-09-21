@@ -15,14 +15,13 @@
 # keeps a re-extract out of `git status'
 xb/
 
-# vendored deps (Qt 2.3, dynamechs, SOLID, cv97, newmat09, qhull, fparser,
-# Dynamo) — separate upstream tarball, out of scope for the Qt port.
-# Extracted from vendor/supportingLibs.tar.gz. pvm3/ lives here too but comes
-# from vendor/pvm3.4.6.tgz, not from that tarball.
-x/supportingLibs/
-
-# older 1.0 release, not used
-x/sigelSourceDistribution.1.0/
+# Unpacked from archives; neither is ours.
+#   supportingLibs/  vendored deps (Qt 2.3, dynamechs, SOLID, cv97, newmat09,
+#                    qhull, fparser, Dynamo) from vendor/supportingLibs.tar.gz,
+#                    patched by `make'; its pvm3/ comes from vendor/pvm3.4.6.tgz
+#   sigelSourceDistribution.1.0/  the older 1.0 release, kept for the deferred
+#                                 1.0 regression
+/downloads/
 
 build/
 

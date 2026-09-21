@@ -56,7 +56,7 @@
 # that shape. Found by the C5 review.
 .DELETE_ON_ERROR:
 
-SL   := x/supportingLibs/supportingLibs
+SL   := downloads/supportingLibs
 SHIM := shim
 B    := build
 LIB  := $(B)/lib
