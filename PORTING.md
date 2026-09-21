@@ -893,6 +893,9 @@ Start here.
     `friction <number> on <material>;`.
   - `anderes_material` → `otherMaterialName`, in the same function: the name
     after `on` in that line.
+  - `rot`, `gruen`, `blau` → `red`, `green`, `blue`, in the same function: the
+    three numbers of `colour red <r> green <g> blue <b>;`. Here `rot` means
+    "red"; the `rot` that means rotation, in other files, stays.
 - **`check.sh` passes 1098, not 1097:** `README.md` added one tracked file.
 
 **2026-09-21 — DONE: ITEM 49. THE EXPERIMENTS RUN UNTIL 1 JANUARY 2030, 12:00.**

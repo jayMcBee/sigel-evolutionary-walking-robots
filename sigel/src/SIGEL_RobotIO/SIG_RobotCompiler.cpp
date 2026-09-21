@@ -208,32 +208,32 @@ namespace SIGEL_RobotIO {
                     (symstr == "colour")) {
                         myScanner.nextSymbol ();
 
-                        DL_Scalar rot, gruen, blau;
+                        DL_Scalar red, green, blue;
 
                         if (expectWord () != "red")
                                 throw SIG_SyntaxError
                                         (__FILE__, __LINE__,
                                          "'red' expected", "(unknown)",
                                          myScanner.currentLine ());
-                        rot = expectNumber ();
+                        red = expectNumber ();
 
                         if (expectWord () != "green")
                                 throw SIG_SyntaxError
                                         (__FILE__, __LINE__,
                                          "'green' expected", "(unknown)",
                                          myScanner.currentLine ());
-                        gruen = expectNumber ();
+                        green = expectNumber ();
 
                         if (expectWord () != "blue")
                                 throw SIG_SyntaxError
                                         (__FILE__, __LINE__,
                                          "'blue' expected", "(unknown)",
                                          myScanner.currentLine ());
-                        blau = expectNumber ();
+                        blue = expectNumber ();
 
                         expect (RobotSymbol::semicolon);
                         // Insertion point: colour fully read
-                        materialColour (mater, rot, gruen, blau);
+                        materialColour (mater, red, green, blue);
 
                         myScanner.peekSymbol (symtype, symstr);
                 }
