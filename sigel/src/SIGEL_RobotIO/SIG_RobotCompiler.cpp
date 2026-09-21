@@ -183,12 +183,12 @@ namespace SIGEL_RobotIO {
                                          "'on' expected", "(unknown)",
                                          myScanner.currentLine ());
 
-                        QString anderes_material = expectWord ();
+                        QString otherMaterialName = expectWord ();
 
                         expect (RobotSymbol::semicolon);
 
                         // Insertion point: friction constant complete
-                        materialFriction (mater, anderes_material, frictionConstant);
+                        materialFriction (mater, otherMaterialName, frictionConstant);
                         myScanner.peekSymbol (symtype, symstr);
                 }
 
