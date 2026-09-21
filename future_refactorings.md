@@ -2,7 +2,7 @@
 
 Independent of the port. Do not combine commits across the two.
 
-**Protocol:** one commit per item. Jan reviews and approves each. Items 1 and 2
+**Protocol:** one commit per item, each reviewed and approved. Items 1 and 2
 are mechanical; everything from 3 on is discussed before it lands.
 
 **Status:** `[ ]` open · `[~]` in review · `[!]` blocked. **Finished items are
@@ -181,7 +181,7 @@ Constructs the language removed. A current compiler rejects them.
   `actFitTask`. Re-measure before starting.
   **Settle the scope first.** Most of what is left is in `SIGEL_GP`, which D33
   keeps untouched for behaviour; a rename is not behaviour, but it is still a
-  large diff in a frozen module. Ask Jan whether to do it at all.
+  large diff in a frozen module, so it needs sign-off before it is done at all.
   Any signal or slot in the set breaks its string-based connect if only one side
   moves — `check.sh` has a check for exactly that failure. No reference file
   holds these names.
@@ -336,11 +336,11 @@ touched, because changing one changes behaviour against the reference binary.
   **Do not fix this by adding `Qt::endl` to 232 call sites.** It needs levels,
   one place that decides where output goes and when it flushes, and something
   the GUI can display. It replaces both `SIG_IO` and the console-warning
-  stopgap. **Start at `SIG_IO::cerr`** — Jan's instruction; it is the hook.
+  stopgap. **Start at `SIG_IO::cerr`** — decided; it is the hook.
 
 - [ ] **30. Comments over two lines must earn their place.** A comment longer
   than two lines must carry something the code cannot say. **Comments the port
-  itself wrote come first.** File by file, each pass shown to Jan first.
+  itself wrote come first.** File by file, each pass signed off first.
   **The named instance:** the nine lines above `setIconSize( QSize( 25, 25 ) )`
   in `SIG_MainWindow::SIG_MainWindow`, all nine describing what Qt 2 did. Two
   lines carry the whole fact — Qt 6 has one icon size per toolbar, and 25 is the
@@ -381,28 +381,28 @@ touched, because changing one changes behaviour against the reference binary.
   destroyed while running, the handler's SIGABRT branch prints `Abort` and calls
   `pvm_halt()` again, and the process stayed until SIGKILL.
 
-- [ ] **41. The simulation viewer starts too close, and follows the robot.** Jan,
-  2026-09-19: *"On both machines and SIGEL versions we're defaulting to trace
-  robot and are zooming in way way way too much."* Both come from the form and
+- [ ] **41. The simulation viewer starts too close, and follows the robot.** Seen
+  2026-09-19 on both machines, in the port and in 1.3: trace robot is on by
+  default, and the view starts far too close. Both come from the form and
   are the same in 1.3's: `distanceSlider` in `SIG_SimulationWidgetBase.ui` starts
   at 10 of 2 to 200, page step 20; trace robot is on — `traceRobotCheckBox`
   starts ticked, `SIG_SimulationVisualisationWidget`'s constructor sets
   `traceRobot` true, and `visualizeThis` calls `slotSetTraceRobot( true )` again.
   To see the twoBases and hammer robots on 1.3, the oracle moved the slider 3
   page steps out, from 10 to 70. A new default is a deliberate divergence from
-  1.3; the value, and whether trace stays on, are Jan's to set.
+  1.3; the value, and whether trace stays on, need sign-off.
 
 - [ ] **42. The 3-D view puts the robot at a corner of the grid, not in its
-  middle.** Jan, 2026-09-19: *"in 3D View we're placing the robot at the corner
-  of the grid, not centered"*. What the code does: `SIG_EnvironmentRenderer::
+  middle.** Seen 2026-09-19: in the 3-D view the robot stands at a corner of the
+  grid, not at its centre. What the code does: `SIG_EnvironmentRenderer::
   buildGrid` draws the terrain grid from the origin out to the terrain's size,
   with the grid spacing forced to 1 because, by its own note, `getTerrainData`
   does not set it; the robot starts at the experiment's `STARTPOSITION`, which is
   `0 1 0` in `twoBasesSimpleFitness1`, so at the grid's corner. The same code is
   in 1.3. Not yet compared with 1.3 by eye.
 
-- [ ] **43. The ambient light slider seems to do nothing in the 3-D view.** Jan,
-  2026-09-19: *"in 3D mode the ambient slider doesn't appear to DO anything?!"*
+- [ ] **43. The ambient light slider seems to do nothing in the 3-D view.** Seen
+  2026-09-19: moving the ambient slider in the 3-D view shows no change.
   What the code does: `SIG_VisualisationWidget::setAmbientLighting` calls
   `SIG_Visualisation::setAmbientSceneColor`, which keeps the value for the
   POV-Ray export and calls `glLightModelfv( GL_LIGHT_MODEL_AMBIENT, … )` straight
@@ -422,7 +422,7 @@ touched, because changing one changes behaviour against the reference binary.
 
 - [ ] **36. `SIG_Body::usedByLinks` is dead, and
   `SIG_Material::FrictionValue` could be a value type.** Left converted rather
-  than changed during D11, on instruction, because the port moves the Qt API and
+  than changed during D11, by decision, because the port moves the Qt API and
   nothing else — which is a port-scope rule, not a refusal, so both belong here.
   `addUsingLink` appends to `usedByLinks` from
   `SIG_RobotCompilerObjects.cpp, linkGeometryFile` on every model load and
@@ -439,13 +439,13 @@ touched, because changing one changes behaviour against the reference binary.
   state, which the port may not add.
 
 - [ ] **49. Set the experiments' termination date to 1 January 2030, 12:00.**
-  Jan, 2026-09-21. All 7 stop by date (`TERMINATIONUSESDATE 1`), on a day in
+  Decided 2026-09-21. All 7 stop by date (`TERMINATIONUSESDATE 1`), on a day in
   August or September 2001, so Start ends at once and a user must change the
   date first. What moves with it: 8 lines in `pagesave-baseline.txt` — the
   year, month, day and hour of both saves' `TERMINATIONTIME` — the year field in the GUI dump, and `guidrive`'s
   `evolution` scenario, which counts on the past date to end a run at once.
 
-- [ ] **35. Remove the Windows and Visual Studio support.** Decided by Jan
+- [ ] **35. Remove the Windows and Visual Studio support.** Decided
   2026-09-09. It does not build here and nothing tests it.
   **It could not build in 2003 either:** `Sigel.dsw` lists 13 projects and only
   5 exist; the project files are Visual C++ 6 and link `msvcirt.lib`, which
@@ -502,7 +502,7 @@ touched, because changing one changes behaviour against the reference binary.
   Handover's note on uncommitted work and the check list — and its trail in §7
   records each step. Move all of them in the same commit.
   **Do not mix it with any other change. When:** after every other item in this
-  section — Jan moved it to the back 2026-09-21, because it touches the whole
+  section — moved to the back 2026-09-21, because it touches the whole
   codebase.
 
 ---

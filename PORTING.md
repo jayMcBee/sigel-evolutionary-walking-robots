@@ -61,7 +61,8 @@ Three jobs, in order, no overlap:
    Not part of either job above.
 
 **THE ROUNDING QUESTION — IMPACT MEASURED AT ZERO 2026-09-09. The decision is
-still Jan's**, per the 2026-09-07 parking note; he reviews the options in code.
+still open and needs sign-off**, per the 2026-09-07 parking note, after the
+options are reviewed in code.
 Nothing is recorded here as decided. What follows is measurement.
 
 The question: whether to route every real number through a C-style formatter to
@@ -217,7 +218,7 @@ found a real defect.** §0 has the rule; it is not optional.
   and confirm the check aborts. Nine assertions have passed on broken code.
   *This rule was written for the shim self-check, deleted in D27; it applies
   unchanged to its successor.*
-- **This file is the only log of what was done, besides git.** Jan, 2026-09-20.
+- **This file is the only log of what was done, besides git.** Decided 2026-09-20.
   Anything that records finished work belongs here, not in a new file.
   `future_refactorings.md` holds the to-do list and nothing else.
   `regression_1.0_to_1.3.md` is deferred analysis of that regression, and is not
@@ -228,7 +229,7 @@ found a real defect.** §0 has the rule; it is not optional.
 ## 1. Repo
 
 ```
-/home/jan/Downloads/sigel/
+sigel/                                      the repo root
 ├── Makefile                                the build, §7 Phase R
 ├── PORTING.md                              this file
 ├── future_refactorings.md                  the to-do list this work defers into
@@ -542,20 +543,20 @@ D20 supersedes D5, D24 supersedes D3.
 |---|---|---|
 | **D27** *(decision; §10 also has a **step** D27, the shim deletion — the two D-series overlap and this is the first collision)* | The duplicate MetaGP `A&bout` | **removed**, with its trailing separator. Present in 1.3 and verified there; wired to the same `slotAbout()` as `Help > About` and opening the identical `SIG_InfoBox`. The port's first intentional difference from 1.3. `Help > About` untouched |
 | **D28** | The `QSpinBox` over-range divergence (C11a) | **accepted, not fixed.** 1.3 accepts out-of-range digits and clamps on commit; the port refuses the keystroke and commits a truncated prefix. It is reachable **only by typing a number outside the box's own range**, and the differing value is **visible in the box** before anything is saved — 1.3 shows 99, the port shows 10. Contrast what the port did fix: `clear()` killed the application, the ampersand rendered wrong, a negative width silently wrote no file — all reachable with valid use. The fix is not the 33 lines of it, it is **owning a custom widget forever**: every future form edit and every new spin box must remember `SIG_SpinBox` or silently opt out. Pinned in `guibehaviour-baseline.txt` (`commits=`) so it cannot drift; the prototype and the measured comparison are in `future_refactorings.md`'s history at `1dba5f4`, and the "Not doing" list in §7 points there. **Revisit if** a dialog spin box turns out to feed something unvalidated, or if anyone actually hits it |
-| **D29** *(signed off 2026-09-04)* | Changing run parameters **while an evolution is running** | **FORBIDDEN in the port, whatever 1.3 permits.** The reason is the specification, not 1.3: *"that's not how GAs/GPs are commonly implemented"* — the parameters define the run. **The port's second intentional divergence**, after D27. **Implementation, and the wrong versions it went through, are in §10 — read that before changing the guard** |
+| **D29** *(signed off 2026-09-04)* | Changing run parameters **while an evolution is running** | **FORBIDDEN in the port, whatever 1.3 permits.** The reason is the specification, not 1.3: GA and GP systems are not commonly built that way — the parameters define the run. **The port's second intentional divergence**, after D27. **Implementation, and the wrong versions it went through, are in §10 — read that before changing the guard** |
 | **D30** *(signed off 2026-09-07)* | The mid-run lock's first two holes | **A run check belongs wherever an action is RE-ENABLED, not only where it is disabled.** `SIG_MainWindow::slotEnableNoExperimentActions` handed 24 run-locked actions back on a tree click, and `New Experiment` and `Open Experiment` were in no lock list at all. Both measured by reverting the fix and re-running `runlock`. The pattern for any further route: a run check where the action is re-enabled, plus the action in `evolutionRunningActions`, plus a `runlock` case with a positive control. **Its own section is in §7, "D30 — parameter changes during a run are forbidden"**, and D30a is the hole it missed |
-| **D31** *(signed off 2026-09-09)* | Line endings | **LF ONLY, tree-wide. No more DOS.** Jan's decision, and it overrides the guard that existed to prevent it. **100 files of the 2003 source converted, 17,750 CRLF pairs.** **The conversion is line endings only except for two bytes, and `git diff --ignore-cr-at-eol` is NOT what proves it** — that flag strips a trailing CR from *both* sides, so it would equally hide a CRLF being *introduced*. The proof is a direct comparison of every one of the 100 files: `re.sub(rb"\r+\n", b"\n", git show HEAD:f) == working file`, exact, with no `\r` surviving anywhere. Zero anomalies. **Two lines of `sigel_slave.mak` are the one real content change**, and calling them line endings flatters them: `:598` and `:647` ended `\r\r\n`, so the byte removed is an INTERIOR one — under NMAKE that trailing CR is part of the variable's value. The `\r+` in the proof above is what swallows the case, so the proof cannot tell it from a line ending; it is called out here instead. Nothing else in the tree has a run of two. **Binaries are excluded and this is not cosmetic** — three tracked binaries hold 12 incidental `\r\n` byte pairs (`pvm3.4.6.tgz` 9, `altLogo.png` 2, `noExperiment.png` 1), and a blind repo-wide replace would corrupt all three. Extensions touched: 36 `.cpp`, 35 `.h`, 19 `.xpm`, 5 `.dsp`, 3 `.mak`, 1 `.mt`, 1 `.dsw`. **No `.exp` and no `.ui`**, so no reference artefact was touched. **Lone CRs are left alone, and NOT because they are Mac-classic line endings** — the first version of this row said that and it was wrong. Six tracked files held lone CRs then and git called all six binary, so this check never even reads them; 27 do today: `pvm3.4.6.tgz` 3859, `noExperiment.png` 691, `JustGreen.pnm` 2848, `altLogo.png` 208, `Hippie.pnm` 208, `Stone.pnm` 68. All five `.pnm` are **P6 raw raster**: those bytes are pixel values that happen to equal `0x0d`. They were never line endings. **The `encodings` check was turned round in the same commit**, so that commit is not line endings alone — `check.sh`, `PORTING.md` and `future_refactorings.md` change with it. The check used to say *a file that HAD a CR must still have one*, with `ENC_BASELINE=25`; it now says **no tracked text file may carry CRLF**, expected zero, reads every tracked file rather than five extensions present in the root commit, lists them with `-z` so a C-quoted path cannot break `open()`, and reconciles — every file lands in exactly one of ok / CRLF / binary / unreadable, or it aborts. **It asks `git ls-files --eol` what is binary rather than testing for a NUL byte**, because the NUL test got two files wrong: `Hippie.pnm` has no NUL in its 196,668 bytes and `UniDo_LSXI.pnm`'s first NUL is at offset 15,456, so both were judged as text and passed only by luck. **Read the `w/` column, not `i/`**: while this change was being made, `sigel_slave.mak`'s index blob read `i/-text` — HEAD still held its two `\r\r\n`, which git's own heuristic calls binary — against a working file of `w/lf`, and testing both columns dropped a real text file out of the check. **Both columns read `lf` once this is committed, so the demonstration is gone and only the rule survives.** Read 610 text files and 8 binaries then; 571 and 29 today. **A floor of 500 was added**, because zero failures is also what a check that read nothing reports: a dead `git ls-files` gave `COUNTS 0 0 0 0`, four non-empty numbers, which the fail-closed branch did not catch. Teeth-tested: CRLF into a `.cpp` and into `sigel_slave.mak` both caught and named, CRLF into a texture correctly ignored, and all seven branch states driven by hand — including a **tree-wide** CRLF regression, which the first version of the floor misreported as *"it did not run"* with one failure instead of 611, and a below-floor count, which the first version printed as `0 pass` while adding up to 499 passes to the total. Both found by review 2026-09-09. The bucket reconciliation is a tautology as the loop is now written and is **not** counted as coverage; it is kept only so the earlier bare-`continue` shape cannot come back. **`SIGEL_ROOT` is the source tree**, so `stdConf.mt` and the 19 `.xpm` pixmaps the conversion touched are the very files the GUI checks load at runtime; the `gui behaviour` check covers them. The `.xpm` are loaded by path and `#include`d nowhere, and a C string literal cannot span a raw newline, so no removed CR was ever inside a quoted pixel row. **No `.gitattributes` exists and none was added.** `* text=auto eol=lf` would make git enforce this rather than only detect it; not done, because it changes what every future checkout writes and that is a separate decision. On a clone with `core.autocrlf=true` the working tree comes back CRLF and this check goes red tree-wide — which is the check working |
+| **D31** *(signed off 2026-09-09)* | Line endings | **LF ONLY, tree-wide. No more DOS.** This decision overrides the guard that existed to prevent it. **100 files of the 2003 source converted, 17,750 CRLF pairs.** **The conversion is line endings only except for two bytes, and `git diff --ignore-cr-at-eol` is NOT what proves it** — that flag strips a trailing CR from *both* sides, so it would equally hide a CRLF being *introduced*. The proof is a direct comparison of every one of the 100 files: `re.sub(rb"\r+\n", b"\n", git show HEAD:f) == working file`, exact, with no `\r` surviving anywhere. Zero anomalies. **Two lines of `sigel_slave.mak` are the one real content change**, and calling them line endings flatters them: `:598` and `:647` ended `\r\r\n`, so the byte removed is an INTERIOR one — under NMAKE that trailing CR is part of the variable's value. The `\r+` in the proof above is what swallows the case, so the proof cannot tell it from a line ending; it is called out here instead. Nothing else in the tree has a run of two. **Binaries are excluded and this is not cosmetic** — three tracked binaries hold 12 incidental `\r\n` byte pairs (`pvm3.4.6.tgz` 9, `altLogo.png` 2, `noExperiment.png` 1), and a blind repo-wide replace would corrupt all three. Extensions touched: 36 `.cpp`, 35 `.h`, 19 `.xpm`, 5 `.dsp`, 3 `.mak`, 1 `.mt`, 1 `.dsw`. **No `.exp` and no `.ui`**, so no reference artefact was touched. **Lone CRs are left alone, and NOT because they are Mac-classic line endings** — the first version of this row said that and it was wrong. Six tracked files held lone CRs then and git called all six binary, so this check never even reads them; 27 do today: `pvm3.4.6.tgz` 3859, `noExperiment.png` 691, `JustGreen.pnm` 2848, `altLogo.png` 208, `Hippie.pnm` 208, `Stone.pnm` 68. All five `.pnm` are **P6 raw raster**: those bytes are pixel values that happen to equal `0x0d`. They were never line endings. **The `encodings` check was turned round in the same commit**, so that commit is not line endings alone — `check.sh`, `PORTING.md` and `future_refactorings.md` change with it. The check used to say *a file that HAD a CR must still have one*, with `ENC_BASELINE=25`; it now says **no tracked text file may carry CRLF**, expected zero, reads every tracked file rather than five extensions present in the root commit, lists them with `-z` so a C-quoted path cannot break `open()`, and reconciles — every file lands in exactly one of ok / CRLF / binary / unreadable, or it aborts. **It asks `git ls-files --eol` what is binary rather than testing for a NUL byte**, because the NUL test got two files wrong: `Hippie.pnm` has no NUL in its 196,668 bytes and `UniDo_LSXI.pnm`'s first NUL is at offset 15,456, so both were judged as text and passed only by luck. **Read the `w/` column, not `i/`**: while this change was being made, `sigel_slave.mak`'s index blob read `i/-text` — HEAD still held its two `\r\r\n`, which git's own heuristic calls binary — against a working file of `w/lf`, and testing both columns dropped a real text file out of the check. **Both columns read `lf` once this is committed, so the demonstration is gone and only the rule survives.** Read 610 text files and 8 binaries then; 571 and 29 today. **A floor of 500 was added**, because zero failures is also what a check that read nothing reports: a dead `git ls-files` gave `COUNTS 0 0 0 0`, four non-empty numbers, which the fail-closed branch did not catch. Teeth-tested: CRLF into a `.cpp` and into `sigel_slave.mak` both caught and named, CRLF into a texture correctly ignored, and all seven branch states driven by hand — including a **tree-wide** CRLF regression, which the first version of the floor misreported as *"it did not run"* with one failure instead of 611, and a below-floor count, which the first version printed as `0 pass` while adding up to 499 passes to the total. Both found by review 2026-09-09. The bucket reconciliation is a tautology as the loop is now written and is **not** counted as coverage; it is kept only so the earlier bare-`continue` shape cannot come back. **`SIGEL_ROOT` is the source tree**, so `stdConf.mt` and the 19 `.xpm` pixmaps the conversion touched are the very files the GUI checks load at runtime; the `gui behaviour` check covers them. The `.xpm` are loaded by path and `#include`d nowhere, and a C string literal cannot span a raw newline, so no removed CR was ever inside a quoted pixel row. **No `.gitattributes` exists and none was added.** `* text=auto eol=lf` would make git enforce this rather than only detect it; not done, because it changes what every future checkout writes and that is a separate decision. On a clone with `core.autocrlf=true` the working tree comes back CRLF and this check goes red tree-wide — which is the check working |
 | **D32** *(signed off 2026-09-09)* | `SIG_Experiment::gpManager` renamed to `guiGPManager` | **A deliberate divergence from the 1.3 name, and the only one of its kind so far.** Four members across the tracked tree were called `gpManager`; three hold an `MT_GPManager *` inside the meta modules, where the name is right. The fourth, `SIG_Experiment.h, SIG_Experiment`, holds a `SIG_GUIGPManager *` — and it was the **only** `SIG_`-typed member in that class not named after its own type with the `SIG_` prefix stripped. The other nine follow the rule exactly (`gpExperiment`, `gpParameter`, `simulationParameter`, `environmentView`, `robotView`, `experimentView`, `allIndividualsView`, `languageParameters`, `experimentItem`); the class's remaining members are named by role (`widgetDict`, `menuGPParameter`, …) and were never in scope. So this is the class's own rule applied to the one member that broke it, not a new scheme. **20 sites** when this was signed off: 13 in the files D34 has since renamed to `SIG_GUIGPExperiment.{h,cpp}`, 5 in this file, 2 in `guidrive.cpp`, both comments. The three `MT_GPManager` members and the `SIG_GPManager gpManager` local in `sigel.cpp, main` are correctly named and were left alone; the 1.0 tree holds the same member and is untracked, so a future sweep will re-find it there and should leave it. **VERIFIED AS `.text`-IDENTICAL, NOT AS BYTE-IDENTICAL OBJECTS** — a data member's name never reaches a mangled symbol, but `-g` is on and DWARF records member names, so the objects legitimately differ. `sigel.cpp` is the interesting one and was checked: it is the single translation unit where both names coexist, and its `.text` is unchanged |
-| **D33** *(signed off 2026-09-09)* | Where the mid-run protection lives | **IN THE UI. The model is not to be touched.** Jan: *"we'll focus on the UI side from now on, NO TOUCHING the gp manager or other model classes."* No new behaviour goes into the model. Removing a dead 2003 stub is not new behaviour, so `SIG_GPManager::running()` was deleted — see D29's passage in §10. Nothing is added to `SIG_GPManager` or `MT_Controller`. **The D29 counter, `g_runningEvolutions`, is to be removed, not moved into the model.** Jan, rejecting a move into `SIGEL_GP`: *"I strongly reject changes to the core model just to hot-fix a UI enablement issue."* **Replaced 2026-09-15 by a UI-side run state.** Each experiment has `evolutionRunning`, which `SIG_GUIGPExperiment::isRunning()` returns. Every run check asks `SIG_ExperimentListView::isRunning()`, which is true while any experiment runs. The decision is to lock the whole application during a run, and it is done — §9, "The run lock is DONE". Jan: *"multiple simul. experiments running makes no sense, we need all resources we can get"*. **Exceptions: D37, D41, and a slave directory of `.` in `SIG_GPFitnessTrainer`, which spawns a bare `sigel_slave` for PVM to find on its own path** — item 39, Jan 2026-09-21: *"is what we determined is required for this to work"*. |
-| **D34** *(signed off 2026-09-15)* | `SIG_Experiment` renamed to `SIG_GUIGPExperiment` | **By Jan's decision, and the second deliberate divergence from a 1.3 name, after D32.** The interface experiment class now follows the rule the manager pair already uses: model `SIG_GPManager`, interface `SIG_GUIGPManager`; model `SIG_GPExperiment`, interface `SIG_GUIGPExperiment`. Its files follow it: `SIG_Experiment.h` and `SIG_Experiment.cpp` became `SIG_GUIGPExperiment.h` and `SIG_GUIGPExperiment.cpp`, with the include guard, every include and the 2003 build files. D32's row keeps the old class name, because it records a rename made under it |
-| **D35** *(signed off 2026-09-15)* | Overwrite prompts on save and export | **In these slots the file dialog's own prompt is the only one.** SIGEL's "File exists..." prompt is gone from `SIG_ExperimentListView::slotSaveExperiment`, the five parameter and population exports and `SIG_GUIGPExperiment::slotRobotSave`; the file is written once. When SIGEL adds the extension itself and that file exists, `SIG_GUIGPExperiment::checkEnding` puts the date stamp `-yyyy-MM-dd-hh-mm-ss` between name and ending, one second later while that name is taken too. So nothing is overwritten and nothing asks; `slotGNUPlotExport` gets the same rule. Jan: *"we will refactor to use the file dialog's own prompt now. IF we enter no extension and IF SIGEL adds one and IF the file exists we simply append the datestamp (YYYY-MM-DD-HH-MM-SS) to the provided filename so nothing is ever overwroitten and no prompt is required in that rare edge case"*. **Not covered yet:** save paths that add an extension without `checkEnding` — `SIG_AllIndividualsView` (`.prg`, `.ind`), MT_GUI, and `MT_Controller`. Several of them still show their own "There is another file with this name" prompt: `MT_PopulationWidget::slotExpInd` and `slotSavePop`, six `MT_StatisticsWidget` exports, `MT_IndividualsWidget::slotExportConstants` and `MT_Controller::slotSaveSetup` |
-| **D36** *(signed off 2026-09-15)* | Dialogs out of sight | **No SIGEL dialog may end up out of sight and block the window.** Jan: *"we need to make sure NO SIGEL dialog ever can end up out of sight and block the window, regardless of how we decide to handle save"*. **The interface half is done — D39**, all 32 sites in `SIGEL_MasterGUI`, after D35 gave the eight save and export file dialogs a parent. What is left is in D39's row and in `future_refactorings.md` item 25; some of it is in model classes that D33 keeps untouched |
-| **D37** *(signed off 2026-09-15; its review passed 2026-09-16)* | One exception to D33: the generation counter during a run | **`SIG_GUIGPManager::updateIndividualView` writes the pool generation into the Experiment page's counter.** The line was commented out in 1.3 and is active again; nothing else in `SIGEL_GP` changes. `SIG_GPManager::run` calls `updateIndividualView` for every individual right after it raises `poolGeneration`, so the counter changes when a generation completes. Jan chose it over a timer in `SIGEL_MasterGUI` that would read the generation. Jan: *"then #4 in dedicated pass with a thorough dedicated sub-agent review with fresh eyes, if passes launch me this one in a fresh SIGEL instance"*; #4 was this line. **Not checked:** no check starts a run. The unchecked `evolution` scenario samples the counter during a run |
-| **D38** *(signed off 2026-09-16)* | The generation progress bar | **`generationProgBar` is driven from the interface.** The widget sat in `SIG_ExperimentViewBase.ui` since before 1.3 and nothing ever wrote to it. A `QTimer` in `SIG_GUIGPExperiment` counts the individuals whose `SIG_GPIndividual::upToDate()` is true and sets the bar; it starts in `slotStartEvolution` and stops in `slotEvolutionStopped`. **Nothing in `SIGEL_GP` changes, so this is not a second exception to D33.** The count is not monotonic: a tournament writes offspring with fitness -1, so the bar steps back when new work appears. Jan drove it and accepted that: *"it does eventually end up at 100%, but it jumps up AND down quite a bit… But at least SOMETHING is happening between the counter refreshes."* Its tooltip says what it counts. **Not checked:** no check starts a run |
-| **D39** *(signed off 2026-09-16)* | Dialogs out of sight — the interface half of D36 | **Every dialog in `SIGEL_MasterGUI` has a parent.** 32 sites: 26 static `QMessageBox` and `QFileDialog` calls that passed `0` or `nullptr`, plus three constructed dialogs (`SIG_EditHostDialog` twice, `SIG_InfoBox` once) and three `QMessageBox` calls that passed `this` inside `SIG_GUIGPExperiment` — where `this` is a `QWidget` that never gets a parent and is never shown, which is no better than none. Real widgets use `this`; `SIG_GUIGPExperiment` uses `experimentListView`, as D35's seven export dialogs already did. Jan confirmed on the real desktop that the main window can no longer cover them. Checked: the `dialogs` scenario prints the parent of Edit Host and of About, and the `exportall` scenario's two `parentIsTheMainWindow` lines moved from 0 to 1. **Still open:** six prompts in `MT_StatisticsWidget` that D35 wants deleted rather than re-parented, five in `MT_Control` and two `QProgressDialog` in `SIGEL_GP` that D33 keeps untouched, and three in `SIG_EnvironmentRenderer` that are reachable but were not asked for |
-| **D40** *(signed off 2026-09-16)* | The window and splitter at start-up | **1280x860, tree 280 px, splash unscaled.** 1.3's `resize( 900, 750 )` already opened taller than the work area on a 1366x768 screen. The splitter asked for `setSizes( {2, 6} )` meaning a 1:3 split; **measured, Qt gives the tree 71 %** — numbers far below the splitter's width are ignored and the surplus goes by size policy, and `QTreeWidget` expands where the stacked widget does not. Real pixel widths and `setStretchFactor( 0, 0 )` / `( 1, 1 )` fix it and keep it fixed on resize. `widgetBase` had `setScaledContents( true )`, which stretched the square 448x448 `noExperiment.png` across the whole content area; it is centred at its own size instead. All three are deliberate divergences from 1.3. Jan: *"don't try to be smart - fixed size for now"*. Geometry is **not** remembered between sessions; `QSettings` was proposed and rejected as overkill |
-| **D41** *(signed off 2026-09-17)* | The second exception to D33: a run that has lost PVM | **`SIG_GPFitnessTrainer` may REPORT that PVM is unreachable; it may not act on it.** `checkTask` split `pvm_probe`'s three returns — above zero receive, zero wait, below zero give up — because the old `if (info != 0)` sent an error into the receive branch, where `pvm_recv` blocks for a message that cannot come or fails and leaves the caller waiting for a task already destroyed. On `PvmSysErr` it sets `pvmLost`; `spawnTask` sets it too, because an unreachable daemon shows up there first and `pvm_spawn` reports that through its own return rather than through `taskId`. `SIG_GPManager::pvmIsLost()` is the only way out, `start()` clears it, and nothing in `SIGEL_GP` acts on it. `SIG_GUIGPExperiment`'s progress timer reads it, ends the run the way `Stop` does and names the reason. Jan: *"D confirmed already"*. **The option that was measured and rejected:** watching `$PVM_TMP/pvmd.<uid>` disappear — a run completed three further generations with that file removed, because an enrolled task keeps its socket. **Not checked:** no check starts a run; the `evolution` scenario dismisses the new dialog and prints it |
-| **D42** *(signed off 2026-09-17)* | Saying why a run ended | **The interface tells the user when a run ended without doing anything.** `SIG_GUIGPExperiment::slotEvolutionStopped` shows the message when three things hold: the pool generation did not move, `guiGPManager->userTerminated` is false, and `terminationAlreadyMet()` finds the condition already true. The message names the setting — the date, the duration or the generation number — and the tab it is on. 1.3 shows nothing, so this is a deliberate divergence. Jan, 2026-09-15: *"we need some kind of feedback in the UI for that case"*. **Nothing in `SIGEL_GP` changes**, so this is not a third exception to D33: `terminationAlreadyMet` reads `gpParameter` and the interface's own copy of the run start time, because `SIG_GPManager::startTime` is private. **That copy is what makes the duration model work** — testing for an all-zero duration, as a first version did, missed every non-zero duration that expires inside the first evaluation, which is the ordinary case at about 98 s per generation. **Two cases not covered:** MetaGP with `SAVEEXIT` completes its first generation so the branch never runs, and a run that throws says only that an error stopped it. **Not checked:** no check starts a run; the `evolution` scenario dismisses the dialog and prints it, measured for a date and for a duration |
+| **D33** *(signed off 2026-09-09)* | Where the mid-run protection lives | **IN THE UI. The model is not to be touched.** Work stays on the interface side; the GP manager and the other model classes are not touched. No new behaviour goes into the model. Removing a dead 2003 stub is not new behaviour, so `SIG_GPManager::running()` was deleted — see D29's passage in §10. Nothing is added to `SIG_GPManager` or `MT_Controller`. **The D29 counter, `g_runningEvolutions`, is to be removed, not moved into the model.** A move into `SIGEL_GP` was rejected: the core model is not changed to fix an interface enablement issue. **Replaced 2026-09-15 by a UI-side run state.** Each experiment has `evolutionRunning`, which `SIG_GUIGPExperiment::isRunning()` returns. Every run check asks `SIG_ExperimentListView::isRunning()`, which is true while any experiment runs. The decision is to lock the whole application during a run, and it is done — §9, "The run lock is DONE". Running several experiments at once makes no sense: a run needs all the resources there are. **Exceptions: D37, D41, and a slave directory of `.` in `SIG_GPFitnessTrainer`, which spawns a bare `sigel_slave` for PVM to find on its own path** — item 39, 2026-09-21: required for the experiments' `. 1 1 "."` host entry to work. |
+| **D34** *(signed off 2026-09-15)* | `SIG_Experiment` renamed to `SIG_GUIGPExperiment` | **By decision, and the second deliberate divergence from a 1.3 name, after D32.** The interface experiment class now follows the rule the manager pair already uses: model `SIG_GPManager`, interface `SIG_GUIGPManager`; model `SIG_GPExperiment`, interface `SIG_GUIGPExperiment`. Its files follow it: `SIG_Experiment.h` and `SIG_Experiment.cpp` became `SIG_GUIGPExperiment.h` and `SIG_GUIGPExperiment.cpp`, with the include guard, every include and the 2003 build files. D32's row keeps the old class name, because it records a rename made under it |
+| **D35** *(signed off 2026-09-15)* | Overwrite prompts on save and export | **In these slots the file dialog's own prompt is the only one.** SIGEL's "File exists..." prompt is gone from `SIG_ExperimentListView::slotSaveExperiment`, the five parameter and population exports and `SIG_GUIGPExperiment::slotRobotSave`; the file is written once. When SIGEL adds the extension itself and that file exists, `SIG_GUIGPExperiment::checkEnding` puts the date stamp `-yyyy-MM-dd-hh-mm-ss` between name and ending, one second later while that name is taken too. So nothing is overwritten and nothing asks; `slotGNUPlotExport` gets the same rule. **Not covered yet:** save paths that add an extension without `checkEnding` — `SIG_AllIndividualsView` (`.prg`, `.ind`), MT_GUI, and `MT_Controller`. Several of them still show their own "There is another file with this name" prompt: `MT_PopulationWidget::slotExpInd` and `slotSavePop`, six `MT_StatisticsWidget` exports, `MT_IndividualsWidget::slotExportConstants` and `MT_Controller::slotSaveSetup` |
+| **D36** *(signed off 2026-09-15)* | Dialogs out of sight | **No SIGEL dialog may end up out of sight and block the window.** This holds whatever the save rules become. **The interface half is done — D39**, all 32 sites in `SIGEL_MasterGUI`, after D35 gave the eight save and export file dialogs a parent. What is left is in D39's row and in `future_refactorings.md` item 25; some of it is in model classes that D33 keeps untouched |
+| **D37** *(signed off 2026-09-15; its review passed 2026-09-16)* | One exception to D33: the generation counter during a run | **`SIG_GUIGPManager::updateIndividualView` writes the pool generation into the Experiment page's counter.** The line was commented out in 1.3 and is active again; nothing else in `SIGEL_GP` changes. `SIG_GPManager::run` calls `updateIndividualView` for every individual right after it raises `poolGeneration`, so the counter changes when a generation completes. It was chosen over a timer in `SIGEL_MasterGUI` that would read the generation. It was done as its own step, with an independent review. **Not checked:** no check starts a run. The unchecked `evolution` scenario samples the counter during a run |
+| **D38** *(signed off 2026-09-16)* | The generation progress bar | **`generationProgBar` is driven from the interface.** The widget sat in `SIG_ExperimentViewBase.ui` since before 1.3 and nothing ever wrote to it. A `QTimer` in `SIG_GUIGPExperiment` counts the individuals whose `SIG_GPIndividual::upToDate()` is true and sets the bar; it starts in `slotStartEvolution` and stops in `slotEvolutionStopped`. **Nothing in `SIGEL_GP` changes, so this is not a second exception to D33.** The count is not monotonic: a tournament writes offspring with fitness -1, so the bar steps back when new work appears. Tried in use and accepted: the bar reaches 100%, but moves up and down a good deal on the way, and shows progress between counter updates. Its tooltip says what it counts. **Not checked:** no check starts a run |
+| **D39** *(signed off 2026-09-16)* | Dialogs out of sight — the interface half of D36 | **Every dialog in `SIGEL_MasterGUI` has a parent.** 32 sites: 26 static `QMessageBox` and `QFileDialog` calls that passed `0` or `nullptr`, plus three constructed dialogs (`SIG_EditHostDialog` twice, `SIG_InfoBox` once) and three `QMessageBox` calls that passed `this` inside `SIG_GUIGPExperiment` — where `this` is a `QWidget` that never gets a parent and is never shown, which is no better than none. Real widgets use `this`; `SIG_GUIGPExperiment` uses `experimentListView`, as D35's seven export dialogs already did. Confirmed on the real desktop: the main window can no longer cover them. Checked: the `dialogs` scenario prints the parent of Edit Host and of About, and the `exportall` scenario's two `parentIsTheMainWindow` lines moved from 0 to 1. **Still open:** six prompts in `MT_StatisticsWidget` that D35 wants deleted rather than re-parented, five in `MT_Control` and two `QProgressDialog` in `SIGEL_GP` that D33 keeps untouched, and three in `SIG_EnvironmentRenderer` that are reachable but were not asked for |
+| **D40** *(signed off 2026-09-16)* | The window and splitter at start-up | **1280x860, tree 280 px, splash unscaled.** 1.3's `resize( 900, 750 )` already opened taller than the work area on a 1366x768 screen. The splitter asked for `setSizes( {2, 6} )` meaning a 1:3 split; **measured, Qt gives the tree 71 %** — numbers far below the splitter's width are ignored and the surplus goes by size policy, and `QTreeWidget` expands where the stacked widget does not. Real pixel widths and `setStretchFactor( 0, 0 )` / `( 1, 1 )` fix it and keep it fixed on resize. `widgetBase` had `setScaledContents( true )`, which stretched the square 448x448 `noExperiment.png` across the whole content area; it is centred at its own size instead. All three are deliberate divergences from 1.3. A fixed size, on purpose: no sizing to the screen, for now. Geometry is **not** remembered between sessions; `QSettings` was proposed and rejected as overkill |
+| **D41** *(signed off 2026-09-17)* | The second exception to D33: a run that has lost PVM | **`SIG_GPFitnessTrainer` may REPORT that PVM is unreachable; it may not act on it.** `checkTask` split `pvm_probe`'s three returns — above zero receive, zero wait, below zero give up — because the old `if (info != 0)` sent an error into the receive branch, where `pvm_recv` blocks for a message that cannot come or fails and leaves the caller waiting for a task already destroyed. On `PvmSysErr` it sets `pvmLost`; `spawnTask` sets it too, because an unreachable daemon shows up there first and `pvm_spawn` reports that through its own return rather than through `taskId`. `SIG_GPManager::pvmIsLost()` is the only way out, `start()` clears it, and nothing in `SIGEL_GP` acts on it. `SIG_GUIGPExperiment`'s progress timer reads it, ends the run the way `Stop` does and names the reason. **The option that was measured and rejected:** watching `$PVM_TMP/pvmd.<uid>` disappear — a run completed three further generations with that file removed, because an enrolled task keeps its socket. **Not checked:** no check starts a run; the `evolution` scenario dismisses the new dialog and prints it |
+| **D42** *(signed off 2026-09-17)* | Saying why a run ended | **The interface tells the user when a run ended without doing anything.** `SIG_GUIGPExperiment::slotEvolutionStopped` shows the message when three things hold: the pool generation did not move, `guiGPManager->userTerminated` is false, and `terminationAlreadyMet()` finds the condition already true. The message names the setting — the date, the duration or the generation number — and the tab it is on. 1.3 shows nothing, so this is a deliberate divergence. Decided 2026-09-15: the interface must give feedback in that case. **Nothing in `SIGEL_GP` changes**, so this is not a third exception to D33: `terminationAlreadyMet` reads `gpParameter` and the interface's own copy of the run start time, because `SIG_GPManager::startTime` is private. **That copy is what makes the duration model work** — testing for an all-zero duration, as a first version did, missed every non-zero duration that expires inside the first evaluation, which is the ordinary case at about 98 s per generation. **Two cases not covered:** MetaGP with `SAVEEXIT` completes its first generation so the branch never runs, and a run that throws says only that an error stopped it. **Not checked:** no check starts a run; the `evolution` scenario dismisses the dialog and prints it, measured for a date and for a duration |
 
 
 ---
@@ -564,7 +565,7 @@ D20 supersedes D5, D24 supersedes D3.
 
 | # | Decision | Answer |
 |---|---|---|
-| **D15** | Where the robot models come from | downloaded from `sigel.sourceforge.net`, §9. ~~Untracked, in `data/`~~ **superseded 2026-09-19:** the 7 kept experiments and their robots are tracked, in `experiments/` and `robots/`, by Jan's decision |
+| **D15** | Where the robot models come from | downloaded from `sigel.sourceforge.net`, §9. ~~Untracked, in `data/`~~ **superseded 2026-09-19:** the 7 kept experiments and their robots are tracked, in `experiments/` and `robots/`, by decision |
 | **D16** | The Dynamo branch in `SIG_Simulation.cpp` | ~~build Dynamo, SOLID and qhull~~ **superseded 2026-08-28**, recorded in §7: it was decided and executed: the branch and its 13 file pairs are deleted, `SIMULATIONLIBRARY 0` now fails loudly, and the Dynamo archive is cut to the maths objects. SOLID and qhull went with it, and both were deleted from disk on 2026-09-20, with SOLID's include path |
 | **D17** | Build system | **plain `Makefile`** at the repo root. Phase C can bring its own for `moc` and `uic` |
 | **D18** | What "runs clean under ASan" means for R3 | ASan and UBSan errors are pass/fail; LeakSanitizer output is a recorded baseline, because §10's leaks are out of scope |
@@ -592,8 +593,8 @@ self-check and independent review are the substitute.
 - No squashing — the per-step history is what makes a bad step bisectable.
 - Commit messages: **one line, no body**. Detail goes in this file. The code is the commit.
 
-**Phase P departed from this, on instruction.** No `step-P*` tags exist — the
-session owner asked for none, so the last tags are `step-R1` and `step-A9`. P1's
+**Phase P departed from this, by decision.** No `step-P*` tags exist — none
+were wanted, so the last tags are `step-R1` and `step-A9`. P1's
 commit is not prefixed either. And each step has **two** commits, not one: the
 step, then the fix for what its review found. Every round found something, so
 folding the fix into the step would have hidden it. Eight commits, `ee981a1`
@@ -876,7 +877,7 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 Start here.
 
 - **`Qt2CursorList` and its test are removed from `sigel_eval.cpp`**, 149 lines,
-  at Jan's word: *"it is DONE and PROVEN and it needs to GO"*. D18's rewrite of
+  by decision: the conversion is done and proven. D18's rewrite of
   `SIG_GPFitnessTrainer::sweepToSpawn` was proven by its review's run against
   the shim: 28,672 walks, 0 divergences. When the shim went, D27 put this model
   in its place. But the self-check ran the model against its own copy of the
@@ -899,7 +900,7 @@ Start here.
   inside that field, carriage-return counts unchanged. Blender 2.11 and 2.14
   files. Not opened in Blender — none is available here.
 - **`vendor/supportingLibs.tar.gz` is cut down to the five libraries the build
-  uses**, at Jan's word. The full archive held 27 generated Qt makefiles and an
+  uses**, by decision. The full archive held 27 generated Qt makefiles and an
   old SPARC binary naming 2003 home folders, all in its unused `qt/`, and every
   entry was owned by an author's login. The new one keeps `cv97`, `dynamechs`,
   `Dynamo`, `fparser` and `newmat09` byte for byte, with the owner reset: 525
@@ -909,7 +910,7 @@ Start here.
   the five gates.
 - **`sigel/kdesigel.doxygen`** named an author's login in three `/tmp/…` paths;
   they read `/tmp/user/…` now.
-- **Kept, at Jan's word:** the project's contact email in `sigel/README` and the
+- **Kept, by decision:** the project's contact email in `sigel/README` and the
   authors' credits — this is open source. **Git history is not rewritten.**
 - **`sigelLauncher`:** the dead Solaris branch, with its 2003 Qt path, and the
   dead `PVM_ROOT` default are gone; paths are quoted, and arguments pass as
@@ -934,7 +935,7 @@ Start here.
   `make` again before starting SIGEL.
 - **1.3 had no separate folder.** Its autotools `make` built the programs in the
   source folder, beside the data, and the README told users to delete the rest
-  by hand. Jan chose a separate folder and its name.
+  by hand. A separate folder was chosen instead, and its name.
 - **`build-fast` is gone.** Plain `make` builds without the sanitizers, as a user
   expects. The sanitized build is `make B=build-asan`, for the two gates that
   need it; the Makefile switches the sanitizers on by that folder name.
@@ -948,7 +949,7 @@ Start here.
   no tracked file. `check.sh` generates the forms into a scratch folder of its
   own, because regenerating `build/ui` would leave its own programs out of date
   halfway through the run.
-- **Jan checked it on the desktop 2026-09-21**, SIGEL started by `sigelLauncher`
+- **Checked on the desktop 2026-09-21**, SIGEL started by `sigelLauncher`
   alone: evolution runs with the experiments' `. 1 1 "."`, and Visualize works.
   SIGEL's working folder is `sigelApp/`, where `robots/<robot>/` does not exist,
   so the slave does not open the experiments' `Body` directories.
@@ -956,14 +957,14 @@ Start here.
   does not build, from a fourth 2003 home directory. Items 39 and 47.
 - **D43 is parked on branch `d43-unfinished`**, pushed, with its 12 review
   findings open.
-- **Item 39 is not carried out on the x86 machine**, at Jan's word: its
+- **Item 39 is not carried out on the x86 machine**, by decision: its
   experiment files stay exactly as shipped. They are not published, its prepare
   script replaces the host block before every run, and no check compares the
   two machines' files.
 
 **2026-09-21 — DONE: `x/` IS NOW `downloads/`.**
 
-- **Renamed, at Jan's word.** `x/` held two unpacked archives under a name that
+- **Renamed, by decision.** `x/` held two unpacked archives under a name that
   said nothing. It is now `downloads/`, still untracked, with the same 4399
   files. The libraries moved up one level: `x/supportingLibs/supportingLibs/` is
   now `downloads/supportingLibs/`, because the archive is unpacked into
@@ -1000,12 +1001,12 @@ Start here.
   set. The `_WINDOWS` branch already did this.
 - **`sigel_slave` must be on that path, and nothing puts it there yet.**
   `sigelLauncher` links it, now for `LINUX64`, but it works only inside 1.3's
-  one-folder layout, which the port's build does not produce — item 48. Jan's
+  one-folder layout, which the port's build does not produce — item 48. The
   desktop run used a link made by hand.
 - **`/tmp`, not `.`, for the two output directories.** `SIG_GPParameter` shows
   them through `absolutePath()` and saves that back, so `.` became the saving
   machine's path. Both are off in all 7.
-- **Jan checked it on the desktop 2026-09-21**: loads without error, evolution
+- **Checked on the desktop 2026-09-21**: loads without error, evolution
   runs, and a save after three generations keeps all three fields and adds only
   1.3's ten first-save keys.
 - **Checks.** `markers`, `pvmhost` and the hammer robot-block hash in the
@@ -1023,7 +1024,8 @@ Start here.
 **2026-09-20 — DONE: THE REPO WAS AUDITED FILE BY FILE AND REORGANISED.**
 
 - **All 14 judged.** Keepers: `hammerNiceWalkingFitness`,
-- **Every folder and every root file was reviewed with Jan, one at a time**, for
+- **Every folder and every root file was reviewed and signed off one at a
+time**, for
   what the finished port no longer needs. Each removal was proved first: the
   copy that survives it was compared byte for byte before anything went.
 - **Removed:** a stale `build/guidrive`, 198 MB by `ls`; two vendored patches
@@ -1068,51 +1070,50 @@ Start here.
   `guidrive.cpp` that printed a plausible wrong answer. **Two mistakes of mine
   were caught and repaired:** a commit that swept in D43's uncommitted lines,
   and two commits that left a file at both its old and its new path.
-- **`physics_backends.md` was folded into this file** and deleted, on Jan's
-  word: *"we CANNOT POSSIBLY create YET MORE documents ... PORTING.md should be
-  the ONLY log of what has been done apart from git"*.
-- **Open with Jan, in his order of priority:** item 39, the 2003 host names and
+- **`physics_backends.md` was folded into this file** and deleted, by decision:
+  no new documents; this file is the only log of what was done, besides git.
+- **Open, in order of priority:** item 39, the 2003 host names and
   the authors' home directories in the experiment files, now public on GitHub —
   to be done on both machines so they stay comparable, planned and approved
   first; the `.rrb` numbering, the one measured divergence from 1.3; the 1.0
   regression; and the names of the gates, which say what they run and not what
   they compare against.
-- **Still uncommitted: D43.** Jan confirmed the behaviour on the desktop
+- **Still uncommitted: D43.** The behaviour was confirmed on the desktop
   2026-09-18; the 2026-09-19 entry below records that its review left 12
   findings unacted. Untouched all day.
 
-**2026-09-19 — DONE: JAN JUDGED EVERY EXPERIMENT BY EYE, 1.3 BESIDE THE PORT.**
+**2026-09-19 — DONE: EVERY EXPERIMENT WAS JUDGED BY EYE, 1.3 BESIDE THE PORT.**
 
   `insectNiceWalkingFitness`, `octopusNiceWalkingFitness`,
   `walkerNiceWalkingFitness`, `runnerNiceWalkingFitness`,
   `shortHammerNiceWalkingFitness`. The two-bases family: keep
   `twoBasesHardlyReducedIS`, to be renamed `twoBases`; the other five go — item
   40 in `future_refactorings.md`. `octopusSimpleFitness` goes too — item 44 — and
-  `runnerSimpleFitness` — item 45. **Done on this machine 2026-09-19**, at Jan's
-  word: both data trees hold the 7 under their new names, and every check that
+  `runnerSimpleFitness` — item 45. **Done on this machine 2026-09-19**, by
+  decision: both data trees hold the 7 under their new names, and every check that
   loaded a dropped file now loads a kept one, against the port's own output.
-  **Done on the x86 machine the same day**, with Jan's approval there: its seven
+  **Done on the x86 machine the same day**, with approval there: its seven
   files hash as ours, and its copy of all 14 as downloaded is
   `/home/debian/sigel-shipped-original-2026-09-19/`.
-  **Both machines end with the same set under the same names**, Jan, 2026-09-19:
-  *"keeping just the ones I've picked on both machines (otherwise we won't ever
-  be able to compare them)"*. Each kept experiment is renamed to its robot's
+  **Both machines end with the same set under the same names**, decided
+  2026-09-19, so the two can still be compared. Each kept experiment is renamed
+  to its robot's
   name — `hammer`, `insect`, `octopus`, `runner`, `shortHammer`, `twoBases`,
-  `walker` — all seven approved by Jan — item 46.
+  `walker` — all seven approved — item 46.
 - **The kept experiments are in git**, in `experiments/` and `robots/`, and every
   check reads them there. `main` is the working branch; the old `main` is tagged
   `old-main`.
 - **The repo is on GitHub**: `origin` is
   `git@github.com:jayMcBee/sigel-evolutionary-walking-robots.git`, `main` and all
   13 tags pushed 2026-09-19. **The history was rewritten once, before that first
-  push**, by Jan's decision: a build folder, `build-fp/` (761 files, 407 MB), had
+  push**, by decision: a build folder, `build-fp/` (761 files, 407 MB), had
   been committed by mistake on 2026-08-22 and deleted on 2026-08-27, and it made
   the push 104 MB instead of 4. It is gone from every commit; each of the 329
   commits was checked equal to its original apart from that folder, and 276
   hashes changed. The docs cite the new ones. The old history is in
   `~/sigel-repo-before-rewrite-20260919.bundle` (verified), the uncommitted D43
   edits of that moment in `~/sigel-d43-uncommitted-20260919.patch`.
-- **The old copies are gone**, at Jan's word, 2026-09-19: `data/`,
+- **The old copies are gone**, by decision, 2026-09-19: `data/`,
   `data-reordered/`, the two download archives, an older backup and the git
   bundle of the history before the rewrite. **The one backup is
   `~/sigel-data-both-20260919.tar.gz`**, sha256 `37006ffb…2035`: both data trees
@@ -1132,10 +1133,9 @@ Start here.
   lines and shows it in a nested display that can draw (`Xephyr :98` with
   `-glamor`, `LIBGL_ALWAYS_SOFTWARE=1`, a live `pvmd3`), camera 3 steps out, at
   time 0.
-- **Jan's rules from this session.** Do only what he asks, one step at a time. The
-  x86 machine is the 1.3 reference and nothing more; never ask it to keep records
-  for us. Stop every viewer, here and on x86, when he says.
-- **Open with Jan:** the `.rrb` reordering choice (below, under 1.3's numbering);
+- **The x86 machine is the 1.3 reference and nothing more**; it keeps no
+  records for this project.
+- **Open:** the `.rrb` reordering choice (below, under 1.3's numbering);
   D43, uncommitted — both `SIGEL_GP` comments are done, 12 other review findings
   remain; items 40 to 46.
 
@@ -1243,30 +1243,28 @@ beside it in the same place.
   8 of 42, every one an exact 0. Where 1.3 gives several individuals one value,
   ours does too, on the same individuals. Nothing more is read from the numbers:
   x87 against aarch64.
-- **Side by side by eye, Jan, 2026-09-19.** 1.3's simulation viewer beside
+- **Side by side by eye, 2026-09-19.** 1.3's simulation viewer beside
   ours, the same individual on both — the same bytes, checked by hash.
-  `hammerNiceWalkingFitness`, individual 0: it walks on both. Jan: *"It behaves
-  well, confirming it works similarly on Qt6 and x86/1.3 SIGEL, so that's a
-  keeper."* The six two-bases experiments, each with its best individual by our
-  scoring: they behave alike on both, 1.3 only slower on its machine; Jan keeps
-  `twoBasesHardlyReducedIS` and drops the other five — item 40.
-  `insectNiceWalkingFitness`, individual 56, score 0.611: Jan: *"confirmed
-  working on both machines, a keeper."* `octopusNiceWalkingFitness`, individual
-  13, score 0.515: Jan: *"looking good and comparable on both, Qt6 and SIGEL 1.3.
-  Keeper."* Six individuals share that score — 13, 27, 45, 61, 82 and 84, six
+  `hammerNiceWalkingFitness`, individual 0: it walks on both and behaves alike
+  on the port and on 1.3 — kept. The six two-bases experiments, each with its
+  best individual by our
+  scoring: they behave alike on both, 1.3 only slower on its machine;
+  `twoBasesHardlyReducedIS` is kept and the other five dropped — item 40.
+  `insectNiceWalkingFitness`, individual 56, score 0.611: works on both machines
+  — kept. `octopusNiceWalkingFitness`, individual 13, score 0.515: alike on both
+  — kept. Six individuals share that score — 13, 27, 45, 61, 82 and 84, six
   different programs by the oracle's check; 13 is the lowest number.
-  `octopusSimpleFitness`, individual 4, score 0.841: Jan: *"once again two octopus
-  experiments - ok, we'll keep only one! the first one, the current one is a
-  failed/early run"* — item 44. `walkerNiceWalkingFitness`, individual 35, score
-  0.255: Jan: *"the current Walker experiment is a keeper"*.
-  `runnerNiceWalkingFitness`, individual 86, score 0.083: Jan: *"It's another
-  keeper."* 83 of 100 score exactly 0 here. The 2001 values stored in the file
+  `octopusSimpleFitness`, individual 4, score 0.841: an early or failed run of the
+  same robot, so only the first octopus experiment is kept — item 44.
+  `walkerNiceWalkingFitness`, individual 35, score 0.255: kept.
+  `runnerNiceWalkingFitness`, individual 86, score 0.083: kept. 83 of 100 score
+  exactly 0 here. The 2001 values stored in the file
   are 0.9195 for 59, 0 for 40 — number 86 among them — and 0.8569 for one; the
   oracle's 1.3 gives 0 for numbers 0, 1 and 2, as ours does.
-  `runnerSimpleFitness`, individual 30, score 0.734: Jan: *"to be removed, the
-  first one was the better experiment"* — item 45.
-  `shortHammerNiceWalkingFitness`, individual 5, score 0.491: Jan: *"it does move
-  - keeper."* 87 of 100 score exactly 0 here. Number 5 is stored at 0 in the
+  `runnerSimpleFitness`, individual 30, score 0.734: removed, the first runner
+  experiment being the better one — item 45.
+  `shortHammerNiceWalkingFitness`, individual 5, score 0.491: it moves — kept.
+  87 of 100 score exactly 0 here. Number 5 is stored at 0 in the
   file, yet its own history has it bred in this run — crossovers, then a mutation
   at pool position 5 on 13 August 2001 — from ancestors stored at 0.490151.
 - **The payload, octopus, all 259 lines.** The 182 Polygon lines are
@@ -1299,7 +1297,7 @@ beside it in the same place.
   base's three joints come second leg, third leg, first leg, and that is the
   order DynaMechs numbers the legs' bodies in. D2's reordered `octopus.rrb`
   declares them in that order; the shipped one declares first, second, third.
-  **So Jan has a choice, not taken here:** keep D2, and match 1.3's body order
+  **So there is a choice, not taken here:** keep D2, and match 1.3's body order
   but not its numbering, 185 of 212 entities; or reverse D2, and match 1.3's
   numbering but not its body order for insect, octopus, runner and walker —
   measured on octopus, derived from the files for the other three.
@@ -1309,8 +1307,8 @@ beside it in the same place.
 - **Not yet answered:** walker's payload line by line.
 
 **The job that caused this is still open** — item 39 in `future_refactorings.md`,
-clearing the 2003 Dortmund hosts. Jan: *"This is a privacy concern and defunct
-logic!"*. **Do not use one repeated placeholder name.** `check.sh`'s
+clearing the 2003 Dortmund hosts, which are both a privacy concern and dead
+logic. **Do not use one repeated placeholder name.** `check.sh`'s
 `v2 round trip` section compares the *order* of 20 host names against the
 oracle's capture in `v8-1.3-gp-blocks.txt`; identical names would leave that
 check testing nothing. Distinct placeholders, mapped consistently across the
@@ -1319,8 +1317,8 @@ records where that rule conflicts with another.
 
 **Uncommitted at handover, and why.** D43 in four `SIGEL_GP` files, the
 responsiveness probe in `guidrive.cpp`, and the matching text in this file and
-`future_refactorings.md`. Reviewed, both controls measured, and Jan confirmed it
-on the real desktop. It waited for this repair, because the checks that clear it
+`future_refactorings.md`. Reviewed, both controls measured, and confirmed on the
+real desktop. It waited for this repair, because the checks that clear it
 read the data tree. With it in the working tree and the repaired tree in place,
 `./checks/check.sh` gives 1097 pass, 0 fail; checks 2 and 3 diff empty; check 4 exits 0;
 `./checks/pvm-check.sh` passes both halves.
@@ -1334,10 +1332,9 @@ This document is the handover. A new session should read §0, this section,
 first** — and then the phase it is taking on.
 
 **CHANGING ANY PARAMETER AFTER A RUN HAS STARTED IS USELESS AND IS FORBIDDEN.**
-Jan's instruction, 2026-09-07, and it settles a whole class of question before
-it is asked: *"changing parameters WHILE A RUN IS ONGOING is COMPLETELY
-nonsensical… There is absolutely NO purpose in testing this — IT NEEDS TO BE
-FORBIDDEN."*
+Decided 2026-09-07, and it settles a whole class of question before it is
+asked: changing parameters while a run is going makes no sense, so it is not
+tested — it is forbidden.
 
 - **Whether 1.3 allows it is irrelevant.** Do not preserve it, do not test it,
   and do not compare it against 1.3. **What 1.3 actually does**, checked in the
@@ -1487,8 +1484,9 @@ BASE block used to be 1.3's own output for `twoBasesSimpleFitness2.exp`,
 captured from the 2003 i386 binary on 2026-09-03 — 192 lines, sha256
 `a327150c…` — and our writer reproduced it byte for byte. That experiment was
 dropped on 2026-09-19, and so was the rule that only the oracle may make this
-file: Jan, the same day, *"Future refactorings only need to check against the
-now-proven Qt6 baseline"*. `check.sh`'s `pagesave` section guards it and prints
+file, decided the same day: once proven, the port's own output is the
+baseline later work checks against. `check.sh`'s `pagesave` section guards it
+and prints
 *"this check tested NOTHING"* if it is absent.
 
 **`xtest-baseline.txt` covers what QTest structurally cannot.** QTest's
@@ -1931,9 +1929,9 @@ legibility. *The 3-8 px figure was never measured on either binary.*
 ### D30 — parameter changes during a run are forbidden — 2026-09-07
 
 **A DELIBERATE DIVERGENCE FROM 1.3, and it is a decision rather than a finding.**
-Jan's, in his words: changing parameters while a run is ongoing "is silly and
-makes no sense whatsoever and needs to be blocked… Whether 1.3 allows it or not
-is irrelevant, it's useless and a bug." *An earlier version of this section said
+Changing parameters while a run is going makes no sense and is blocked;
+whether 1.3 allows it is irrelevant — in 1.3 it is a bug, not behaviour to keep.
+*An earlier version of this section said
 "1.3 greys none of these during a run", which is **false** and was asserted with
 no measurement behind it. 1.3 greys 23 of them at run start
 (`evolutionRunningActionGroup`, `SIG_MainWindow.cpp:417-440` in the tarball); what
@@ -1991,8 +1989,8 @@ own.** `slotMTUseMT`, `slotMTConfigureSystem` and `slotMTSwitchSystem` each
 refuse when a run is going, on top of the greying. `slotMTUseMT` was the same
 shape as the hole D30 fixed — `mtConfigureAction->setEnabled(state)` with no run
 check — and was unreachable only because `useMeta()` returns false when the state
-is unchanged, which is luck rather than a guard. *This is the layering Jan asked
-for: keep the greying, add the refusal.*
+is unchanged, which is luck rather than a guard. *This is the layering that was
+decided: keep the greying, add the refusal.*
 
 **NOT CHECKED: the `Stop` fix.** `runlock` fakes a run by setting `evolutionRunning`
 itself and never calls `slotStopEvolution`, which dereferences `guiGPManager` and would need a
@@ -2185,7 +2183,7 @@ as a header. Correct result: 70,779 lines, 14 fewer than the source, differing
 only in the host block and that one seed.
 
 **Ruled out along the way, so nobody repeats it:** the host list loads
-(`listviewHosts rows=1`, name `jan-UbuntuVM25`, `maxSlaves 1`, right directory);
+(`listviewHosts rows=1`, this machine's host name, `maxSlaves 1`, right directory);
 `col0check=0` is an icon column, not a disabled flag — all eight shipped hosts
 read it too; `noOfSlaves` starts at 0 (`SIG_GPActivePVMHost.cpp:30`) so a
 one-slave host is not self-blocking; `pvm_addhosts`' return is ignored
@@ -3477,7 +3475,7 @@ port wrote those 192 lines byte for byte — 2069 bytes, sha256 `a327150c…` on
 both machines.** *The capture carried a positive control: a second save after
 one parameter change differed in exactly one line.* Since 2026-09-19 the check
 loads `twoBases.exp` and compares against the port's own save, 178 lines and
-1589 bytes, by Jan's rule above. **`LanguageParameters` is checked separately and
+1589 bytes, by the rule above. **`LanguageParameters` is checked separately and
 would otherwise have been missed**: it sat at line 133288 of that saved file, far below
 `POPULATION BEGIN{` at 193, so the 192-line block covers eleven of C11a's twelve
 edits. In `twoBases.exp`'s saved file it is at line 71650, below a
@@ -4043,13 +4041,13 @@ carried; other items and this file cite them, so they do not change.
   section 9.
 
 - [x] **40. Keep one two-bases experiment; remove the other five, here and on the
-  x86 machine.** Jan judged all six side by side on 1.3 and the port, 2026-09-19,
+  x86 machine.** All six were judged side by side on 1.3 and the port, 2026-09-19,
   each with its best individual by the port's own scoring: **keep
   `twoBasesHardlyReducedIS`**; remove `twoBasesHighMutationRate` (a close second),
   `twoBasesSimpleFitness1`, `twoBasesReducedInstructionSet`,
   `twoBasesHighCrossOverRate` (the same file as `twoBasesSimpleFitness1`) and
-  `twoBasesSimpleFitness2`. Jan on the last: *"it's broken everywhere and
-  provides no value"* — its individual 0 scores 3.4e-05 on both, and its best
+  `twoBasesSimpleFitness2`, which is broken everywhere and adds nothing — its
+  individual 0 scores 3.4e-05 on both, and its best
   (number 78) moved only slightly.
   **Every one of the five is in `dictorder-baseline.txt` and
   `fitness-baseline.txt`**, so both move. `twoBasesSimpleFitness1` is also the
@@ -4066,16 +4064,16 @@ carried; other items and this file cite them, so they do not change.
   matched it. It now holds the port's own save of `twoBases.exp`; no new
   capture from the oracle — see item 44.
   Removing it also ends item 39's conflict over this file.
-  **Done on both machines 2026-09-19.** On the x86 machine with Jan's approval
+  **Done on both machines 2026-09-19.** On the x86 machine with approval
   there; its seven files hash as ours. Its copy of all 14 as downloaded is
   `/home/debian/sigel-shipped-original-2026-09-19/`.
 
 - [x] **44. Keep one octopus experiment; remove `octopusSimpleFitness`, here and
-  on the x86 machine.** Jan, 2026-09-19: *"once again two octopus experiments -
-  ok, we'll keep only one! the first one, the current one is a failed/early
-  run"*. Keep `octopusNiceWalkingFitness`, judged a keeper side by side with
+  on the x86 machine.** Decided 2026-09-19: one octopus experiment is enough, and
+  this one is an early or failed run. Keep `octopusNiceWalkingFitness`, judged a
+  keeper side by side with
   individual 13. The same wait as item 40: not before every experiment has been
-  judged, and not unasked.
+  judged.
   **What names it:** `fitness-baseline.txt` (3 lines), `dictorder-baseline.txt`
   (its section) and `check.sh`'s v2 round trip, which loads it as `V2OCT` for the
   containers that collide.
@@ -4084,32 +4082,31 @@ carried; other items and this file cite them, so they do not change.
   The two octopus robot blocks differ — sha256 `2b56be22…a2d1` against
   `8934a27c…fc2d` for `octopusNiceWalkingFitness` — so the kept file has no 1.3
   capture. It needs none: moved to the kept file, the check takes the port's own
-  output as its reference. Jan, 2026-09-19: *"since it passes why do we keep
-  re-checking a known fact? Future refactorings only need to check against the
-  now-proven Qt6 baseline"*. The same holds for item 40.
+  output as its reference. Decided 2026-09-19: a fact already proven is not
+  re-checked, and later work checks against the proven port. The same holds for
+  item 40.
   The 2026-09-18 oracle measurements named "octopus" in PORTING.md were taken on
   this file; they stay as the record of what was measured.
-  **Done on both machines 2026-09-19.** On the x86 machine with Jan's approval
+  **Done on both machines 2026-09-19.** On the x86 machine with approval
   there; its seven files hash as ours. Its copy of all 14 as downloaded is
   `/home/debian/sigel-shipped-original-2026-09-19/`.
 
 - [x] **45. Keep one runner experiment; remove `runnerSimpleFitness`, here and on
-  the x86 machine.** Jan, 2026-09-19, judging it side by side with individual 30:
-  *"to be removed, the first one was the better experiment"*. Keep
+  the x86 machine.** Judged side by side with individual 30, 2026-09-19: the first
+  runner experiment is the better one. Keep
   `runnerNiceWalkingFitness`. The same wait as item 40.
   **What names it:** `fitness-baseline.txt` (3 lines) and
   `dictorder-baseline.txt` (its section). No check loads it.
   `verification-against-sigel-1.3/` holds oracle measurements on it; they stay as
   the record of what was measured.
-  **Done on both machines 2026-09-19.** On the x86 machine with Jan's approval
+  **Done on both machines 2026-09-19.** On the x86 machine with approval
   there; its seven files hash as ours. Its copy of all 14 as downloaded is
   `/home/debian/sigel-shipped-original-2026-09-19/`.
 
 - [x] **46. Rename the kept experiments to their base names, here and on the x86
-  machine.** Jan, 2026-09-19: the names carry notes added run by run as a kind of
-  versioning, such as the fitness function used; *"when we're done with our
-  review we need to strip all such versioning and just keep the base names! We'll
-  do this interactively, you suggest and I approve."* One name at a time, after
+  machine.** The names carry notes added run by run as a kind of versioning, such
+  as the fitness function used. Decided 2026-09-19: once the review is done, only
+  the base names stay, each proposed and approved. One name at a time, after
   the review and after items 40, 44 and 45. Both machines use the same names, so
   the two stay comparable. Each kept experiment takes its robot's name.
   Approved: `twoBasesHardlyReducedIS` → `twoBases`; `hammerNiceWalkingFitness` →
@@ -4117,7 +4114,7 @@ carried; other items and this file cite them, so they do not change.
   `octopus`; `runnerNiceWalkingFitness` → `runner`;
   `shortHammerNiceWalkingFitness` → `shortHammer`; `walkerNiceWalkingFitness` →
   `walker`. All seven approved 2026-09-19.
-  **Done on both machines 2026-09-19.** On the x86 machine with Jan's approval
+  **Done on both machines 2026-09-19.** On the x86 machine with approval
   there; its seven files hash as ours. Its copy of all 14 as downloaded is
   `/home/debian/sigel-shipped-original-2026-09-19/`.
 
@@ -4252,7 +4249,7 @@ one per second: the PVM task ids rose by 3937 from 18:34:11 to 19:33:18, and a
 under `guidrive`", had no fitness value of 0. **The crashes come in bursts** —
 86 seconds held one, 14 held two and 3 held three — which is what one shared
 file does and not what a bad individual does. *`twoBasesLocal.exp` was deleted
-2026-09-17 at Jan's instruction: nothing to compare it against, the robot behaved
+2026-09-17 by decision: nothing to compare it against, the robot behaved
 oddly, and it no longer improved. Any experiment reproduces this, since the
 defect does not depend on the experiment.*
 
@@ -4329,16 +4326,16 @@ that nothing re-enables, stayed greyed through it. *That run used the counter
 that the run state replaced on 2026-09-15. Re-running it is open.*
 
 **THREE COVERAGE ITEMS WERE DROPPED 2026-09-07. The attribution on this line
-was corrected 2026-09-08: only the first one is Jan's.** It is the one that
-quotes him. The other two are this document's own arguments, written under his
-name. A note filed that way cannot be argued with, and nobody decided it should
-be. Each of the three was this document's own proposal, and each failed a plain
+was corrected 2026-09-08: only the first one was a decision.** The other two are
+this document's own arguments, once written as if they were decisions. A note
+filed that way cannot be argued with, and nobody decided it should be. Each of
+the three was this document's own proposal, and each failed a plain
 question about what it would prove:
 
 - **"Commit the 30-generation curve."** A randomised search gives a different
   curve every run. What matters is that the GP system works at all, not any one
-  result. *Jan: "concrete results will always vary in randomised search… not be
-  married to any specific experiment or run."*
+  result. *Decided: concrete results always vary in a randomised search, and the
+  port is not tied to any one experiment or run.*
 - **"Check the evolution path."** Checked before dropping: the pieces are already
   checked separately — the arithmetic by `fitness-check` (42 evaluations, also
   sanitised), the PVM transfer by `pvm-check`'s `pvm_link`, the ordering by
@@ -4356,11 +4353,13 @@ question about what it would prove:
   missing in code.** If a comparison against 1.3 is ever wanted it is
   `expstruct.py` on a file from each side, which needs the oracle rather than a
   new save path.
-  *Re-opened 2026-09-08, because this bullet carried Jan's name and the argument
-  is not his. The conclusion holds, and the reason is now much stronger than
+  *Re-opened 2026-09-08, because this bullet was written as a decision and the
+  argument was this document's own. The conclusion holds, and the reason is now
+  much stronger than
   "the wrong shape": `sigel_eval` links the SLAVE variant of the writer, and
-  `sigel_slave` never calls it, so a save path there would test dead code. Jan,
-  2026-09-08: "no need to test dead code". The V2 row in the Phase V table has
+  `sigel_slave` never calls it, so a save path there would test dead code, which
+  is not
+  tested — decided 2026-09-08. The V2 row in the Phase V table has
   the full argument and the reshaped step.*
 
 **A MetaGP evolution is NOT open — it is unreachable on both versions.** `Start`
@@ -5075,7 +5074,7 @@ verified live 2026-08-18:
 `.../robotermodelle/robots.tar.gz` (7 models, `.rrb` + `.wrl`).
 
 Both downloaded 2026-08-22 to `data/`, which is untracked, with the two runner
-`.exp` from their own archives. **Since 2026-09-19 the 7 experiments Jan kept are
+`.exp` from their own archives. **Since 2026-09-19 the 7 experiments kept are
 tracked** in `experiments/`, and their robots in `robots/<robot>/` with the
 `.rrb`, `.wrl` and `.blend` — §10, after D2's migration note.
 
@@ -5167,7 +5166,7 @@ on the headless `-me` path. Either the GUI wiring moves out into `MT_GUI`, or
 
 **AND ON THAT SAME PATH `qApp` WAS A `static_cast` TO A TYPE THE OBJECT IS NOT.
 FIXED 2026-09-07** — C8 left it for C9, C9 never closed it, and it stood open until
-Jan asked for the one-line fix. Measured 2026-09-03 by
+the one-line fix was asked for. Measured 2026-09-03 by
 preprocessing the real translation unit with the Makefile's own include set, not
 by grepping a header:
 
@@ -5639,7 +5638,7 @@ binary, alongside `xb/kdesigel/sigel`, while both were on disk; they went on
 
 | claim | measured |
 |---|---|
-| extended-precision ops | **14 `fstpt` + 22 `fldt` = 36**, over the function's true extent `0x080b787c`–`0x080b8094` (2072 bytes). *Reported to me as "seven pairs". I answered "nine ops" — also wrong, and wrong the same way: I had stopped at an arbitrary `0x080b7b80`, covering 772 of 2072 bytes. **I made the truncation error in the same message in which I corrected it.** The boundary is the next symbol, `__static_initialization_and_destruction_0`.* |
+| extended-precision ops | **14 `fstpt` + 22 `fldt` = 36**, over the function's true extent `0x080b787c`–`0x080b8094` (2072 bytes). *An earlier count said seven pairs, and its correction said nine ops — also wrong, and wrong the same way: it stopped at an arbitrary `0x080b7b80`, covering 772 of 2072 bytes. **The correction repeated the truncation error it corrected.** The boundary is the next symbol, `__static_initialization_and_destruction_0`.* |
 | the exponent | **`getSize() - 1`**, from `lea -0x1(%eax),%edx` at `0x80b78d8`. *Reported as `pow(2.0, size)`, which is one instruction short.* Our source has `getSize() - 1` at `SIG_DynaMechsCommandInterface.cpp:66,69,103,107` — **it matches the binary** |
 | `pow` itself | called with **doubles** (`fstpl`, 64-bit, at `0x80b78f6`/`0x80b7902`), not extended. Only the surrounding intermediates are 80-bit |
 
@@ -5942,8 +5941,8 @@ holes: the previous version exited 0 on a missing build directory, a missing
 Phase D re-captures this baseline at every step, so a silent short run would
 have overwritten it and reported success.
 
-**The experiments and robots are tracked, in `experiments/` and `robots/`.** Jan
-judged all 14 experiments by eye on 2026-09-19 and kept one per robot, each
+**The experiments and robots are tracked, in `experiments/` and `robots/`.** All
+14 experiments were judged by eye on 2026-09-19 and kept one per robot, each
 renamed to its robot's name: `hammer`, `insect`, `octopus`, `runner`,
 `shortHammer`, `twoBases`, `walker` — items 40, 44, 45 and 46 in
 `future_refactorings.md`. The `.exp` bytes are the download's; only the names
@@ -6398,7 +6397,7 @@ from `QList<type>::deleteItem` in `qlist.h` (`if ( del_item ) delete`). **Backed
 implementation with either side, so agreement means agreement. A differential
 test needs a reference independent of the code under test; that is what the
 model is, and it is not a second shim.
-*Removed 2026-09-21, at Jan's word: the conversion is done and proven, and the
+*Removed 2026-09-21, by decision: the conversion is done and proven, and the
 check ran its own copy of the walk, never `sweepToSpawn`, so it guarded nothing
 further.*
 
