@@ -873,15 +873,19 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-21 — IN PROGRESS: ITEM 14. THE GERMAN NAMES IN `sigel/` BECOME ENGLISH.**
+**2026-09-21 — IN PROGRESS: ITEMS 14 AND 13. THE GERMAN NAMES AND OUTPUT TEXT
+IN `sigel/` BECOME ENGLISH.**
 Start here.
 
-- **One name per step.** Each step has a clean build with no new compiler
-  warning, the five gates green, no baseline change, and an independent review.
-  Behaviour does not change.
-- **Out of scope:** string literals — the German output text and the history
-  text saved in `.exp` files — and the authors' names and nicknames in the
-  credits.
+- **One name or one output text per step.** Each step has a clean build with no
+  new compiler warning, the five gates green, no baseline change, and an
+  independent review. Behaviour does not change, apart from the translated text.
+- **Out of scope, by decision:** the history text saved in `.exp` files —
+  `Fitness (Elter 1)`, `(Elter 2)`, `CREATED NEW INDIVIDUUM` and `INDIVIDUUM IS
+  GENERATED RANDOMLY` — and the authors' names and nicknames in the credits.
+- **Translated:**
+  - `SIG_GPManager::run() wurde mehr als einmal aufgerufen!` →
+    `SIG_GPManager::run() was called more than once!`, in both `run` variants.
 - **Renamed:**
   - `SIG_GPManager::schlussJetzt` → `stopEvolutionNow`. `messageEvolutionStop()`
     sets it; each loop reads it straight after `stopIfNecessary()` and returns.

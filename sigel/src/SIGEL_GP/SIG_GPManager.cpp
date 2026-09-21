@@ -692,7 +692,7 @@ void SIGEL_GP::SIG_GPManager::run() {
 #endif
 
   if (!toursAreEmpty( tours )) {
-    SIGEL_Tools::SIG_IO::cerr << "SIG_GPManager::run() wurde mehr als einmal aufgerufen!\n";
+    SIGEL_Tools::SIG_IO::cerr << "SIG_GPManager::run() was called more than once!\n";
     messageEvolutionStop();
   };
 
@@ -1121,7 +1121,7 @@ void SIGEL_GP::SIG_GPManager::run(MT_Classifier *MetaClassifier)
 #endif
 
     if (!toursAreEmpty( tours ))
-    {	SIGEL_Tools::SIG_IO::cerr << "SIG_GPManager::run() wurde mehr als einmal aufgerufen!\n";
+    {	SIGEL_Tools::SIG_IO::cerr << "SIG_GPManager::run() was called more than once!\n";
 			messageEvolutionStop();
     };
 

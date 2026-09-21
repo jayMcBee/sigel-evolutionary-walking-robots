@@ -123,12 +123,11 @@ Constructs the language removed. A current compiler rejects them.
 - [ ] **12. Translate the German — comments.** 118 lines in 46 files, including
   15 `NEU NEU NEU` banners and 6 MSVC German file headers. Nothing executes.
 
-- [ ] **13. Translate the German — strings.** 9 lines in 4 files:
-  `MT_GPManager.cpp`, `SIG_GPIndividual.cpp`, `SIGEL_GP/SIG_GPManager.cpp`,
+- [ ] **13. Translate the German — strings.** 7 lines in 3 files:
+  `MT_GPManager.cpp`, `SIG_GPIndividual.cpp`,
   `SIG_GPOperations.cpp, reproduction`. The strings: "beste Fitness vor
   Berechnung", "Sigel Fitness/Sieger", "Meta Vorhersage", "durch.Fitness",
-  "Fitness (Elter 1)", "(Elter 2)", "SIG_GPManager::run() wurde mehr als einmal
-  aufgerufen!" — **the same string twice** — and "reproduction: Konnte kein neues
+  "Fitness (Elter 1)", "(Elter 2)" and "reproduction: Konnte kein neues
   Individuum erzeugen".
   **No compiler and no check covers this phase.** All three persisted paths are
   write-only: `SIG_GPIndividual::readFromFile` parses only `NAME='`, `POOLPOS=`,
