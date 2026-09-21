@@ -292,7 +292,7 @@
             <enum>QFrame::StyledPanel</enum>
           </property>
           <property name="text">
-            <string>aiaiaiaia !!!!!</string>
+            <string>n/a</string>
           </property>
           <property name="toolTip">
             <string>Add some description for the experiment here</string>
