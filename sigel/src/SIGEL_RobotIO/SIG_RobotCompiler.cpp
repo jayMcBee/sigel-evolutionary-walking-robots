@@ -174,7 +174,7 @@ namespace SIGEL_RobotIO {
                        (symstr == "friction")) {
                         myScanner.nextSymbol ();
 
-                        DL_Scalar konstante = expectNumber ();
+                        DL_Scalar frictionConstant = expectNumber ();
 
                         symstr = expectWord ();
                         if (symstr != "on")
@@ -188,7 +188,7 @@ namespace SIGEL_RobotIO {
                         expect (RobotSymbol::semicolon);
 
                         // Insertion point: friction constant complete
-                        materialFriction (mater, anderes_material, konstante);
+                        materialFriction (mater, anderes_material, frictionConstant);
                         myScanner.peekSymbol (symtype, symstr);
                 }
 

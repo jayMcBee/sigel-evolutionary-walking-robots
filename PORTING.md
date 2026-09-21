@@ -889,6 +889,8 @@ Start here.
     `SIG_RobotScanner` and `SIG_UnstreamerScanner`: the whole text to scan.
   - `dichte` → `density`, a local in `SIG_RobotCompiler::nextIsMaterial`: the
     number after the `density` keyword of a material in a robot file.
+  - `konstante` → `frictionConstant`, in the same function: the number in
+    `friction <number> on <material>;`.
 - **`check.sh` passes 1098, not 1097:** `README.md` added one tracked file.
 
 **2026-09-21 — DONE: ITEM 49. THE EXPERIMENTS RUN UNTIL 1 JANUARY 2030, 12:00.**
