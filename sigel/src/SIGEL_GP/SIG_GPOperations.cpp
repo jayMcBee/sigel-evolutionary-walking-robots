@@ -694,7 +694,7 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::reproduction( SIGEL_GP::
 
   if (!reproducedInd)
     {
-      SIGEL_Tools::SIG_IO::cerr << "reproduction: Konnte kein neues Individuum erzeugen.\n";
+      SIGEL_Tools::SIG_IO::cerr << "reproduction: could not create a new individual.\n";
       exit(1);
     };
 

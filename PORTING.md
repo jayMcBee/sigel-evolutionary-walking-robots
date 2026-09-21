@@ -886,6 +886,9 @@ Start here.
 - **Translated:**
   - `SIG_GPManager::run() wurde mehr als einmal aufgerufen!` →
     `SIG_GPManager::run() was called more than once!`, in both `run` variants.
+  - `reproduction: Konnte kein neues Individuum erzeugen.` →
+    `reproduction: could not create a new individual.`, in
+    `SIG_GPOperations::reproduction`, inside `#ifdef SIG_DEBUG`: not compiled.
 - **Renamed:**
   - `SIG_GPManager::schlussJetzt` → `stopEvolutionNow`. `messageEvolutionStop()`
     sets it; each loop reads it straight after `stopIfNecessary()` and returns.
