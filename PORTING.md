@@ -950,6 +950,8 @@ Start here.
     in a frame, and their average.
   - `zeiger` → `currentPixel`, in `SIG_EnvironmentRenderer::loadPNMTexture`: the
     write position in the texture buffer.
+  - `thema` → `link`, in `SIG_RobotCompiler::nextIsLink`: the link that a
+    `link <name> { … }` block of a robot file defines.
 - **`check.sh` passes 1098, not 1097:** `README.md` added one tracked file.
 
 **2026-09-21 — DONE: ITEM 49. THE EXPERIMENTS RUN UNTIL 1 JANUARY 2030, 12:00.**

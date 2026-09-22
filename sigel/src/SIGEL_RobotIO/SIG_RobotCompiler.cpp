@@ -247,18 +247,18 @@ namespace SIGEL_RobotIO {
         {
                 int symtype;
                 QString symstr;
-                SIG_Link *thema;
+                SIG_Link *link;
                 
                 QString objectName = expectWord ();
                 expect (RobotSymbol::openingBrace);
 
                 // Insertion point: create or look up the object
-                thema = linkFind (objectName);
+                link = linkFind (objectName);
 
                 symstr = expectWord ();
                 if (symstr == "torso") {
                         // Insertion point: trunk link
-                        linkIsTorso (thema);
+                        linkIsTorso (link);
                         expect (RobotSymbol::semicolon);
                         symstr = expectWord ();
                 }
@@ -270,7 +270,7 @@ namespace SIGEL_RobotIO {
                                                myScanner.currentLine ());
                 symstr = expectString ();
                 // Insertion point: geometry file
-                linkGeometryFile (thema, symstr);
+                linkGeometryFile (link, symstr);
                 expect (RobotSymbol::semicolon);
 
                 symstr = expectWord ();
@@ -281,7 +281,7 @@ namespace SIGEL_RobotIO {
                                                myScanner.currentLine ());
                 symstr = expectWord ();
                 // Insertion point: the material is known
-                linkMaterial (thema, symstr);
+                linkMaterial (link, symstr);
                 expect (RobotSymbol::semicolon);
 
                 myScanner.peekSymbol (symtype, symstr);
@@ -304,7 +304,7 @@ namespace SIGEL_RobotIO {
                         expect (RobotSymbol::semicolon);
 
                         // Insertion point: a point is known.
-                        linkPoint (thema, pointname, xval, yval, zval);
+                        linkPoint (link, pointname, xval, yval, zval);
                         myScanner.peekSymbol (symtype, symstr);
                 }
 
@@ -317,7 +317,7 @@ namespace SIGEL_RobotIO {
                         do {
                                 ncl = expectWord ();
                                 // Insertion point: non-collision specification
-                                linkNoCollide (thema, ncl);
+                                linkNoCollide (link, ncl);
                                 myScanner.readSymbol (symtype, symstr);
                         } while (symtype == RobotSymbol::comma);
 
@@ -330,7 +330,7 @@ namespace SIGEL_RobotIO {
 
                 expect (RobotSymbol::closingBrace);
                 // Insertion point: end of reading
-                linkFinish (thema);
+                linkFinish (link);
         }
 
         void SIG_RobotCompiler::nextIsJoint (void)
