@@ -235,6 +235,29 @@ touched, because changing one changes behaviour against the reference binary.
   the 7 shipped experiments does. The library code is unpatched, as SIGEL's
   `supportingLibs` ships it. Found 2026-09-22.
 
+- [ ] **56. The MetaGP window can free the trainer during a run.**
+  `MT_Controller::slotLoadDefault` and `slotLoadSetup` run `delete
+  substitution`. In Evaluator mode that is the object `SIG_GPManager::trainer`
+  points to; in Classifier mode it is the `MetaClassifier` that
+  `SIG_GPManager::run(MT_Classifier*)` and its `evolutionLoop` hold. The run
+  lock greys Configure System, but a MetaGP window opened before Start stays
+  open, and its Load and Default follow the Meta thread's
+  `metaEvolutionRunning` signal, not SIGEL's run. So: MetaGP on, open the
+  window, Start, stop the Meta evolution there (or let its timer do it), press
+  Default — the next `checkTask` or `actTour.run(MetaClassifier)` uses freed
+  memory. Older than D43; the pump before each pass could already reach it.
+  Fix: disable the window's Load and Default for the whole run, or refuse Start
+  while the window is open. Found by review 2026-09-22; not reproduced.
+
+- [ ] **57. Quit during a run leaves the run going.**
+  `SIG_MainWindow::slotAboutToQuit` and `closeEvent` ask for confirmation and
+  call `qApp->quit()`, but nothing sets `userTerminated`. The window closes,
+  `start()` is still on the stack, and `exec()` cannot return until the run
+  ends. The shipped experiments stop on 1 January 2030, so the process keeps
+  running without a window and keeps spawning slaves. Nothing is freed early.
+  Fix: set `userTerminated` on the running experiment before `quit()`. Found
+  by review 2026-09-22; not reproduced.
+
 ---
 
 ## 7 · The interface
@@ -253,18 +276,6 @@ touched, because changing one changes behaviour against the reference binary.
   **How:** the `evolution` scenario already prints ms per generation and the
   worst gap between pumps. Sweep the value, hold everything else, repeat enough
   runs to see past the noise.
-
-- [ ] **23. The window stops answering during a run.**
-  `SIG_GUIGPExperiment::slotStartEvolution` runs the whole evolution on the GUI
-  thread. Input is handled in `SIG_GUIGPManager::haveABreak`, which pumps events
-  for at most `getPassiveTime()` milliseconds. `SIG_GPManager::evolutionLoop`
-  calls it once per outer pass, and the inner loop over `taskCanDoList` calls
-  `usleep(300000)` per entry, so the gap between pumps grows with the entries a
-  pass visits. `evalNewIndis` and `evalNeededIndis` also call `haveABreak`, and
-  `SIG_GPPopulation::writeToFile` calls `processEvents` of its own — a
-  measurement needs all of them. **Not measured:** how long that gap is.
-  **Constraint:** the pump and the sleep are in `SIGEL_GP`, which D33 keeps
-  untouched. Needs a decision first.
 
 - [ ] **24. Show progress during a run.** Partly done. D38 drives
   `generationProgBar` from the count of individuals holding a fitness value,

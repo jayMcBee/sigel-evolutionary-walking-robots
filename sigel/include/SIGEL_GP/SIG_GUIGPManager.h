@@ -41,7 +41,7 @@ namespace SIGEL_GP
 
       SIGEL_MasterGUI::SIG_GUIGPExperiment &guiExperiment;
 
-      void haveABreak();
+      void processInterfaceEvents();
 
       void messageEvolutionStop();
 

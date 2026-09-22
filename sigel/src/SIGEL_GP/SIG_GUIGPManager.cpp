@@ -57,11 +57,10 @@ namespace SIGEL_GP
       };
   };
 
-  void SIG_GUIGPManager::haveABreak()
+  void SIG_GUIGPManager::processInterfaceEvents()
   {
-    // The ONLY read of the `passive time' GP parameter in the tree, and it is
-    // not what the name says: a millisecond budget for the event pump, not a
-    // pause between generations. No pause is implemented anywhere.
+    // The run holds this thread, so the window handles its events here.
+    // `passive time' caps that in ms; it is not a pause between generations.
     qApp->processEvents( QEventLoop::AllEvents,
                          currentExperiment.gpParameter.getPassiveTime() );
   };

@@ -5688,10 +5688,10 @@ static int guidriveMain(int argc, char **argv)
                               : nullptr;
         // slotStartEvolution() BLOCKS. It calls guiGPManager->start(), which runs
         // the whole evolution inline and returns only when it has stopped
-        // (SIG_GUIGPExperiment.cpp, slotRightClick, with slotEvolutionStopped() on the next
-        // line). The loop stays responsive only because
-        // SIG_GUIGPManager::haveABreak() calls qApp->processEvents(), so a
-        // timer armed BEFORE the click fires DURING the run. The sampling loop
+        // (SIG_GUIGPExperiment::slotStartEvolution, with slotEvolutionStopped() on the
+        // next line). The loop stays responsive only because
+        // SIG_GUIGPManager::processInterfaceEvents() calls qApp->processEvents(),
+        // so a timer armed BEFORE the click fires DURING the run. The sampling loop
         // further down runs after start() has returned and can therefore only
         // ever see the finished state -- which is why a generation counter that
         // moves has to be caught from here.
@@ -5722,8 +5722,9 @@ static int guidriveMain(int argc, char **argv)
         sampler.start(2000);
 
         // THE INJECTED EVENT. slotStartEvolution() blocks for the whole run and
-        // the loop stays responsive only through SIG_GUIGPManager::haveABreak()'s
-        // processEvents(), so a single-shot timer armed HERE fires from inside
+        // the loop stays responsive only through
+        // SIG_GUIGPManager::processInterfaceEvents()'s processEvents(), so a
+        // single-shot timer armed HERE fires from inside
         // the running evolution -- which is the only way to reach the unchecked
         // pvmTasks[ taskId ] read in checkTask() the way a user's click does.
         //
@@ -5891,9 +5892,34 @@ static int guidriveMain(int argc, char **argv)
         });
         runEndedBox.start(50);
 
+        // How long does the window go without handling an event? The evolution
+        // runs on the GUI thread, and the window answers only when
+        // SIG_GUIGPManager::processInterfaceEvents runs -- after every 200 ms
+        // wait in SIG_GPManager::evolutionLoop, and in evalNewIndis and
+        // evalNeededIndis -- or when SIG_GPPopulation::writeToFile processes
+        // events. This timer asks to fire every 50 ms; a missed tick fires once
+        // at the next pump, so the gap it sees is the time the window was dead.
+        // The first tick is not a gap: it ends the time before the first pump.
+        QElapsedTimer gapClock;
+        qint64 worstGapMs = 0, gapSamples = 0;
+        QTimer gapProbe;
+        QObject::connect(&gapProbe, &QTimer::timeout, [&]() {
+            const qint64 since = gapClock.restart();
+            if (gapSamples++ && since > worstGapMs) worstGapMs = since;
+        });
+        gapClock.start();
+        gapProbe.start(50);
+
         runClock.start();
         printf("\n  >> clicking Start\n"); fflush(stdout);
         QTest::mouseClick(start, Qt::LeftButton, Qt::NoModifier, start->rect().center());
+        gapProbe.stop();
+        if (gapSamples < 2)
+            printf("  [responsiveness] not measured: fewer than two timer ticks\n");
+        else
+            printf("  [responsiveness] worst gap between event pumps: %lld ms over %lld"
+                   " gaps (the timer asked for 50 ms)\n", worstGapMs, gapSamples - 1);
+        fflush(stdout);
         if (crashProbe) {
             inject.stop();
             flushSigelStreams();

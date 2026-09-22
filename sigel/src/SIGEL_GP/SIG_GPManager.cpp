@@ -93,7 +93,7 @@ void SIGEL_GP::SIG_GPManager::evolutionLoop() {
     if (stopEvolutionNow)
       return;
 
-    haveABreak();
+    processInterfaceEvents();
 
     trainer->sweepToSpawn();
 
@@ -111,13 +111,15 @@ void SIGEL_GP::SIG_GPManager::evolutionLoop() {
       qsizetype canDoIdx = 0;   // was an iterator: Qt 2's list was linked
 
       while (canDoIdx < taskCanDoList.size()) {
-      // this loop implements some sort of busy-waiting;
-      // experiments show gain in performance when we add some minor delay !
+      // Wait before each entry; most entries only poll checkTask for a result.
+      // The interface cannot handle input while this thread sleeps, so process
+      // its events after the wait.
 #ifdef _WINDOWS
-      Sleep(300);
+      Sleep(200);
 #else
-      usleep(300000);
+      usleep(200000);
 #endif	
+      processInterfaceEvents();
 
       if ((touchsCounter == maxTouchsPerLoop) && (maxTouchsPerLoop != -1)) {
         break;
@@ -415,7 +417,7 @@ void SIGEL_GP::SIG_GPManager::evalNewIndis() {
     if (stopEvolutionNow)
       return;
 
-    haveABreak();
+    processInterfaceEvents();
 
     SIG_GPIndividual &actInd=pop.getIndividual(i);
 
@@ -455,7 +457,7 @@ void SIGEL_GP::SIG_GPManager::evalNewIndis() {
     if (stopEvolutionNow)
       return;
 
-    haveABreak();
+    processInterfaceEvents();
 
     trainer->sweepToSpawn();
     // first(): Qt 2 returned null on empty, Qt 6's first() is UB there.
@@ -580,9 +582,10 @@ bool SIGEL_GP::SIG_GPManager::pvmIsLost() const
   return trainer && trainer->pvmLost;
 };
 
-void SIGEL_GP::SIG_GPManager::haveABreak()
+void SIGEL_GP::SIG_GPManager::processInterfaceEvents()
 {
-  // Empty in the base. SIG_GUIGPManager overrides it to pump the event loop.
+  // Empty in the base: a manager with no interface has no events to process.
+  // SIG_GUIGPManager overrides it.
 };
 
 void SIGEL_GP::SIG_GPManager::messageEvolutionStop() {
@@ -1340,7 +1343,7 @@ void SIGEL_GP::SIG_GPManager::evolutionLoop(MT_Classifier *MetaClassifier)
       if (stopEvolutionNow)
       	return;
 
-      haveABreak();
+      processInterfaceEvents();
 
       trainer->sweepToSpawn();
 
@@ -1361,13 +1364,15 @@ void SIGEL_GP::SIG_GPManager::evolutionLoop(MT_Classifier *MetaClassifier)
 
   	  while (canDoIdx < taskCanDoList.size())
 	    {
-				// this loop implements some sort of busy-waiting;
-				// experiments show gain in performance when we add some minor delay !
+				// Wait before each entry; most entries only poll checkTask for a
+				// result. The interface cannot handle input while this thread
+				// sleeps, so process its events after the wait.
 #ifdef _WINDOWS
-				Sleep(300);
+				Sleep(200);
 #else								
-				usleep(300000);
+				usleep(200000);
 #endif				
+				processInterfaceEvents();
 
 	      if ((touchsCounter == maxTouchsPerLoop) && (maxTouchsPerLoop != -1))
 				{  break;
@@ -1545,7 +1550,7 @@ int DebugInfo =0;
       if (stopEvolutionNow)
 	return;
 
-      haveABreak();
+      processInterfaceEvents();
 
       SIG_GPIndividual &actInd=pop.getIndividual(i);
 
@@ -1572,7 +1577,7 @@ int DebugInfo =0;
 	if (stopEvolutionNow)
 	  return;
 
-	haveABreak();
+	processInterfaceEvents();
 
 	trainer->sweepToSpawn();
 	// first(): Qt 2 returned null on empty, Qt 6's first() is UB there.

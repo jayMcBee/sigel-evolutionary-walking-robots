@@ -259,7 +259,7 @@ namespace SIGEL_GP
   void calcInitTourSet();
 
  private:
-  virtual void haveABreak();
+  virtual void processInterfaceEvents();
 
  private:
   virtual void messageEvolutionStop();
