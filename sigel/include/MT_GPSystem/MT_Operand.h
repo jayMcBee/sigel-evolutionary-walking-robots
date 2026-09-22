@@ -16,12 +16,12 @@ class MT_Operand
 public:
 	MT_Operand(MT_Operand * Original);
 	
-	/*OpTyp indicate that the Operand is a Variable (Optyp =1) 
-	or that the Operand is a Constant (Optyp 2).*/
+	/*OPType indicate that the Operand is a Variable (OPType =1) 
+	or that the Operand is a Constant (OPType 2).*/
 	int OPType;
-    /* If Optyp= 1 then Variable represent the VariableName*/
+    /* If OPType= 1 then Variable represent the VariableName*/
 	int VariableName;
-	/* If Optyp= 2 then Data represent a constant */
+	/* If OPType= 2 then Data represent a constant */
 	double Data;
 	
 	MT_Operand(int Op, double Da, int na);

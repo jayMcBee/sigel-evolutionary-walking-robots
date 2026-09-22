@@ -130,7 +130,7 @@ public:
 
 private:
 	// fitnessfunction for the classifier approach 
-	// @pre: PresentTSize>0; else div by Null!
+	// @pre: PresentTSize>0; else division by zero!
 	double weightYesNo();
 	double simpleYesNo();
 	

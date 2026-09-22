@@ -48,7 +48,7 @@ public:
 	*/
 	void changeTSize (int NewTSize);
 
-	/* This function writes the MT_TrainingsSet (T-set) to a QTextStream.
+	/* This function writes the MT_Trainingset (T-set) to a QTextStream.
 	* @param:
 	* @post: The T-Set is written to the given QTextStream.
 	*/

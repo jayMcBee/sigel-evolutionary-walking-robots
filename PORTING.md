@@ -924,6 +924,12 @@ Start here.
   the renames of the `Typ` names it describes. In the same step, three copies of
   "If occurred a error" in `MT_Interpreter.h` became proper English. Only
   language and style changed; what these comments claim is left as it was.
+  A second step replaced six more, again by decision: `OpTyp`/`Optyp` → `OPType`
+  (`MT_Operand.h`), `if Typ true` → `if Type is true` and the decimal commas in
+  `30,5%`, `22,25%`, `52,75%` (`MT_Randomizer.h`), `MT_TrainingsSet` →
+  `MT_Trainingset` (`MT_Trainingset.h`), `Selektion-Window` → `Selection window`
+  (`MT_GPManager.h`), `div by Null!` → `division by zero!`
+  (`MT_FitnessTrainer.h`).
 - **Renamed:**
   - `SIG_GPManager::schlussJetzt` → `stopEvolutionNow`. `messageEvolutionStop()`
     sets it; each loop reads it straight after `stopIfNecessary()` and returns.

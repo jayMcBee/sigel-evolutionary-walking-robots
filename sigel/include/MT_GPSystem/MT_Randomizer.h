@@ -60,7 +60,7 @@ public:
 	int getProgLength();
 
 	/*serve the random creat of NumOfConstant Constnant
-	* of the type int if Typ true else double between underBoun and upperboun */
+	* of the type int if Type is true else double between underBoun and upperboun */
 	void createConstant (int NumOfConstant, bool Type , double underBoun, double upperBoun);
 	
 	/* method for fitness proportional selection,
@@ -121,8 +121,8 @@ private:
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////
 	// a lot of array, which contain the relative probability and not the real probability
-	// that mean e.g. the  probability of the Search Operators are 30,5% (Crossover) 22,25% (Mutation)
-	// and 52,75% Reproduction so are the entries in the array: 3050 / 2225/ 5275.
+	// that mean e.g. the  probability of the Search Operators are 30.5% (Crossover) 22.25% (Mutation)
+	// and 52.75% Reproduction so are the entries in the array: 3050 / 2225/ 5275.
 	//////////////////////////////////////////////////////////////////////////////////////////////////
 
 	/* contain the probability of the SearchOperators, which are desired from the user

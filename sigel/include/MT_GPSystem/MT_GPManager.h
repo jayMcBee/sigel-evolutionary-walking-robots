@@ -67,7 +67,7 @@ public:
 	* @pre: the Offspring must be empty! Flush it first.*/
 	void setSelektionValue( int _OffspringSize, int _TournamentSize, int _SMethod, int _FitnessFunction, int _TrainingSetSize, int _TrainingDuration);
 	
-	/* for update the Selektion-Window;
+	/* for update the Selection window;
 	* the GP-System will change direct the value in the GUI-class 
 	*/
 	void getSelektionValue (int *_OffspringSize, int  * _TournamentSize, int * _SMethod, int * _FitnessFunction, int *_TrainingSetSize, int * _TrainingDuration);
