@@ -258,6 +258,13 @@ touched, because changing one changes behaviour against the reference binary.
   Fix: set `userTerminated` on the running experiment before `quit()`. Found
   by review 2026-09-22; not reproduced.
 
+- [ ] **58. Individuals > Add allows at most 999; allow at least 10000.**
+  `SIG_AddIndividualsDialog`'s `spinboxNumber` has a maximum of 999, as in
+  1.3. Typing 10000 stops at `100`, because the spin box refuses the fourth
+  digit. Raising it is a deliberate divergence from 1.3, and it moves
+  `guibehaviour-baseline.txt` in three lines: `max=999` twice and
+  `typed(max+1)=[100]`. Found on the desktop 2026-09-22.
+
 ---
 
 ## 7 · The interface
@@ -344,6 +351,12 @@ touched, because changing one changes behaviour against the reference binary.
   one place that decides where output goes and when it flushes, and something
   the GUI can display. It replaces both `SIG_IO` and the console-warning
   stopgap. **Start at `SIG_IO::cerr`** — decided; it is the hook.
+  **Review every dialog outside the interface modules as part of this.** The
+  layering is not clean: classes that should have no user interface open
+  dialogs themselves. `SIG_EnvironmentRenderer` shows three texture warnings;
+  `MT_Controller`, `SIG_GPPopulation`, `SIG_GPFitnessTrainer` (one, commented
+  out) and `SIG_GPRemoteZORCFitnessFunction` do the same. Decide for each
+  whether it belongs in the interface or goes through the new error reporter.
 
 - [ ] **30. Comments over two lines must earn their place.** A comment longer
   than two lines must carry something the code cannot say. **Comments the port

@@ -4235,11 +4235,11 @@ carried; other items and this file cite them, so they do not change.
     `saveSystem`'s file dialog after the Save dialog or the `useMeta` prompt,
     and `SIG_GPPopulation`'s two after the Add and Import dialogs.
   Left: the six prompts in `MT_StatisticsWidget`, for item 33, and the
-  Windows-only `WIN_` copy of the ZORC function, which is not built. **Not
-  checked:** no scenario prints the parent of these dialogs, and none was
-  driven on the desktop. With a parent the MetaGP window stays above the main
-  window and is minimised with it; GNOME may also attach it to the main
-  window's title bar. **Not measured:** whether a parent attaches GTK's own
+  Windows-only `WIN_` copy of the ZORC function, which is not built. **Confirmed
+  on the real desktop 2026-09-22:** the dialogs tested cannot be hidden behind
+  the main window. **Not checked:** no scenario prints the parent of these
+  dialogs. With a parent the MetaGP window stays above the main window and is
+  minimised with it; GNOME may also attach it to the main window's title bar. **Not measured:** whether a parent attaches GTK's own
   file dialog on Wayland.
 
 - [x] **31. Confirm the run lock is finished** — done 2026-09-18.
