@@ -873,16 +873,27 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-21 — IN PROGRESS: ITEMS 14 AND 13. THE GERMAN NAMES AND OUTPUT TEXT
-IN `sigel/` BECOME ENGLISH.**
+**2026-09-22 — PAUSED: ITEMS 14 AND 13. THE GERMAN OUTPUT TEXT IS ENGLISH NOW;
+34 GERMAN NAMES ARE LEFT, BY DECISION.**
 Start here.
 
-- **One name or one output text per step.** Each step has a clean build with no
-  new compiler warning, the five gates green, no baseline change, and an
-  independent review. Behaviour does not change, apart from the translated text.
-- **Out of scope, by decision:** the history text saved in `.exp` files —
+- **Where it stands:** everything below is committed and pushed, and the tree is
+  clean. Item 13 is finished apart from the text kept by decision. Item 14 is
+  paused; the names it has left are listed at the end of this entry, because
+  item 14's own table is incomplete.
+- **How a round works:** Jan approves a set of names first. The whole set then
+  gets one round: one build compared before and after, one run of the five
+  gates, one independent review that checks each name on its own, and one
+  commit. A round per name is a waste and is not wanted. Behaviour does not
+  change, apart from translated text.
+- **Text that SIGEL writes into a saved file does not change**, unless no reader
+  parses it and no file holds it. Jan decides, on both facts; see `No.:` and
+  `invalid_mode` below.
+- **Kept, by decision:** the history text saved in `.exp` files —
   `Fitness (Elter 1)`, `(Elter 2)`, `CREATED NEW INDIVIDUUM` and `INDIVIDUUM IS
-  GENERATED RANDOMLY` — and the authors' names and nicknames in the credits.
+  GENERATED RANDOMLY` — because the shipped experiments hold it;
+  `sliderIntervall` and `slotIntervallChanged`, because the GUI baselines record
+  the widget by name; and the authors' names and nicknames in the credits.
 - **Translated:**
   - `SIG_GPManager::run() wurde mehr als einmal aufgerufen!` →
     `SIG_GPManager::run() was called more than once!`, in both `run` variants.
@@ -972,6 +983,27 @@ Start here.
     `shim/iostream.h` brings `using namespace std;` into scope, so it would hide
     `std::count`.
 - **`check.sh` passes 1098, not 1097:** `README.md` added one tracked file.
+- **Left, by decision for now: 34 names**, measured 2026-09-22 over code only,
+  not comments or strings.
+  - `SIGEL_GP`, the force fitness function: `varianz`, `fitnessGes`,
+    `usedForceLoes`.
+  - `SIGEL_Robot`: `winkel`, `verschiebung`, `schiebung`, `drehmatrix`,
+    `stflorianhilf`, `hilf` and `zw` in `calculateAnyJoint`; `masse` in
+    `SIG_Mirtich::computePhysics`; `summa` in `SIG_Robot::getNrOfPoints`.
+  - Meta-GP: `getRandomInstruktion`, `ProbInstruktion`, `T_Instruktion`,
+    `T_Instruk`, `Instruktion`; `setSelektionValue`, `getSelektionValue`;
+    `Varianz`; `BrutSize`, `SizeOfBrut`, `getBrutSize`, `setBrutSize`,
+    `BrutString`, where the file key `"BrutSize:"` must stay; `Typ`,
+    `TypOfGenesis`, `TypOfIndividual`, `getTyp`, `getTypOfGenesis`,
+    `setTypOfGenesis`, `setTypOfIndividual`, and the comments that name them in
+    `MT_Substitute.h` and `MT_TournamentManager.h`; `ResultIst`,
+    `getResultIstArray`.
+  - Borderline, not decided: `typ` in `DoubleSpinBox`, `setTrainingsSet`, `nr`
+    and `getNrOfPoints`.
+- **Found on the way, now to-do items:** 50 (`SIG_UnstreamerScanner`), 52 (unset
+  drive mode), 53 (uninitialised forces from DynaMechs), 54 (empty catch blocks)
+  and 55 (marker checks that do nothing). Item 11 (`tours`) was looked at and
+  set aside: it touches about 30 names, a baseline and a slot connected by name.
 
 **2026-09-21 — DONE: ITEM 49. THE EXPERIMENTS RUN UNTIL 1 JANUARY 2030, 12:00.**
 
