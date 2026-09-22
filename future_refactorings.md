@@ -150,7 +150,6 @@ Constructs the language removed. A current compiler rejects them.
   | `masse` | `SIG_Mirtich.h`, `.cpp` |
   | `varianz` | `SIG_GPForceFitnessFunction.cpp` |
   | `ausgabeTerrain` | `SIG_Environment.cpp, generateTerrain` |
-  | `zeiger` | `SIG_EnvironmentRenderer.cpp` |
   | `zahl` | `SIG_Geometry.cpp` |
 
   The robot grammar is entirely English — `density`, `red`, `green`, `blue`,

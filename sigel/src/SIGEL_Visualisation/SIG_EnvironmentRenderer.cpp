@@ -449,15 +449,15 @@ namespace SIGEL_Visualisation
 
   	// this for loop reads the the image data of the specified file and
   	// adds the missing (RGB)A information
-  	char *zeiger;
+  	char *currentPixel;
   	int alpha = environment.getTexAlpha();
-  	zeiger = (char*) texture.imageData;
+  	currentPixel = (char*) texture.imageData;
   	
   	for(int i = 0; i < imageSize; i += bytesPerPixel) {
-  		fread(zeiger, 1, 3, file);
+  		fread(currentPixel, 1, 3, file);
   		// this is the A information for RGBA
   		texture.imageData[i + 3] = alpha;
-  		zeiger += 4;
+  		currentPixel += 4;
   	}
   	
   	fclose (file);
