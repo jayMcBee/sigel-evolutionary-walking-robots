@@ -1751,8 +1751,7 @@ static int guidriveMain(int argc, char **argv)
     // be a real dead connect rather than a plain qWarning. That check greps
     // this process's stderr for Qt's "No such signal"/"No such slot", which is
     // the only thing that catches a string-based connect naming something
-    // Qt 6 does not have -- $DEAD_SIGNALS is a closed regex over nine Qt 2
-    // spellings and cannot see a tenth.
+    // Qt 6 does not have.
     //
     // Qt emits that warning under the LOGGING CATEGORY qt.core.qobject.connect,
     // and categories are filterable: QT_LOGGING_RULES='*=false' in the ambient
@@ -4885,8 +4884,7 @@ static int guidriveMain(int argc, char **argv)
         // carries them out of the .ui, and every form becomes `unset':
         // tooSmall stays 0, the corpus is still 20, and the control still
         // fires because it sets its own minimum. Exit 0 with all six fixes
-        // gone and nothing measured. check.sh:1502 learned this two commits
-        // ago for the forms corpus; this is the same assertion.
+        // gone and nothing measured.
         // SEVEN forms declare a minimum today. Raise this when one more does;
         // never lower it to make the gate quiet.
         const int wantCompared = 7;

@@ -1,7 +1,7 @@
 #!/bin/sh
-# The main check of the Qt 6 port (PORTING.md §7). It compiles every module,
-# header and form, runs the probes and guidrive scenarios below, and prints one
-# row per section and a total.
+# The main check of the Qt 6 port (PORTING.md §7). It compiles every module
+# and header, checks the forms, runs the probes and guidrive scenarios below,
+# and prints one row per section and a total.
 #
 #   ./checks/check.sh                 every module
 #   ./checks/check.sh MT_GPSystem     one module in the compile passes; the
@@ -63,90 +63,9 @@ else
     cat /tmp/mkforms.$$
 fi
 
-# Signals that existed in Qt 2 and do NOT exist in Qt 6, in SIGNAL() spelling.
-# Each was checked with QMetaObject::indexOfSignal against Qt 6.10.2. NOT here,
-# because they still exist: clicked() (moc clones the default argument of
-# clicked(bool)), activated(int) on a QComboBox, valueChanged(int),
-# textChanged(...), stateChanged(int), toggled(bool), pressed(), timeout().
-#
-# A name that SIGEL declares as its own signal must not be here: MT_Editor
-# declares lostFocus(), which Qt 2's QLineEdit never had. To check the list,
-# collect the names in every `signals:' block in the tree and intersect them
-# with it; the result must be empty.
-#
-# selectionChanged is matched with no arguments and with the QListViewItem*
-# and QTreeWidgetItem* overloads. The QItemSelection overload is NOT matched,
-# so selectionModel()->selectionChanged(sel, desel) passes.
-#
-# A regex cannot know the sender's class. selectionChanged() still exists on
-# QLineEdit, QTextEdit and QPlainTextEdit, so a connect to one of those would
-# be a false positive. The gate prints every matching line, so a false
-# positive is visible and not silently believed.
-DEAD_SIGNALS='SIGNAL\( *(activated *\( *\)|activated *\( *const *QString'\
-'|clicked *\( *int|selected *\(|selectionChanged *\( *(\)|Q(ListView|TreeWidget)Item)'\
-'|currentChanged *\( *Q(ListView|ListBox|TreeWidget|ListWidget)Item|rightButtonClicked'\
-'|doubleClicked *\( *Q(ListView|TreeWidget)Item)'
-
 MODULES="${*:-SIGEL_Tools SIGEL_Environment MT_GPSystem SIGEL_Robot SIGEL_Program SIGEL_RobotIO SIGEL_Simulation MT_Control SIGEL_GP SIGEL_Visualisation SIGEL_CommonGUI SIGEL_SlaveGUI MT_GUI SIGEL_MasterGUI}"
 pass=0; fail=0; warn=0; skipped=0; winskip=0
 
-# Self-test of $DEAD_SIGNALS. It is a regex, so it can silently stop matching.
-# Rows marked 1 are Qt 2 spellings that must match. Rows marked 0 are live
-# spellings from this tree, or near-misses, that must NOT match.
-rt_p=0; rt_f=0
-while IFS='|' read -r want line; do
-    [ -z "$want" ] && continue
-    # grep -c exits 1 when the count is 0, which under `set -e' kills the whole
-    # script before it prints anything.
-    got=$(printf '%s\n' "$line" | command grep -cE "$DEAD_SIGNALS" || true)
-    if [ "$got" = "$want" ]; then rt_p=$((rt_p+1)); else
-        rt_f=$((rt_f+1)); echo "  regex self-test: want $want got $got for: $line"
-    fi
-done <<'RXEOF'
-1|	connect(a, SIGNAL(activated()), b);
-1|	connect(a, SIGNAL( activated() ), b);
-1|	connect(a, SIGNAL(activated(const QString &)), b);
-1|	connect(a, SIGNAL(clicked(int)), b);
-1|	connect(a, SIGNAL(selected(QListBoxItem*)), b);
-1|	connect(a, SIGNAL(selected(QAction *)), b);
-1|	connect(a, SIGNAL(selectionChanged()), b);
-1|	connect(a, SIGNAL(selectionChanged(QListViewItem*)), b);
-1|		    SIGNAL( selectionChanged( QListViewItem * ) ),
-1|	connect(a, SIGNAL(currentChanged(QListViewItem*)), b);
-1|	connect(a, SIGNAL(currentChanged(QListBoxItem*)), b);
-1|	connect(a, SIGNAL(currentChanged(QTreeWidgetItem*)), b);
-1|	connect(a, SIGNAL(currentChanged(QListWidgetItem*)), b);
-1|	connect(a, SIGNAL(doubleClicked(QTreeWidgetItem*)), b);
-1|	connect(a, SIGNAL(selectionChanged(QTreeWidgetItem*)), b);
-0|	connect(a, SIGNAL(currentItemChanged(QTreeWidgetItem*,QTreeWidgetItem*)), b);
-0|	connect(a, SIGNAL(customContextMenuRequested(const QPoint&)), b);
-1|	connect(a, SIGNAL(doubleClicked( QListViewItem * )), b);
-1|	connect(a, SIGNAL(rightButtonClicked(QListBoxItem*, const QPoint&)), b);
-1|		    SIGNAL( rightButtonClicked ( QListViewItem *, const QPoint &, int ) ),
-0|	connect(a, SIGNAL(clicked()), b);
-0|	connect(a, SIGNAL(activated(int)), b);
-0|	connect(a, SIGNAL(valueChanged(int)), b);
-0|	connect(a, SIGNAL(textChanged(const QString&)), b);
-0|	connect(a, SIGNAL(stateChanged(int)), b);
-0|	connect(a, SIGNAL(toggled(bool)), b);
-0|	connect(a, SIGNAL(pressed()), b);
-0|	connect(a, SIGNAL(timeout()), b);
-0|	connect(editor, SIGNAL(lostFocus()), SLOT(slotResetFocus()));
-0|	connect(a, SIGNAL(newText(const QString &)), b);
-0|	connect(a, SIGNAL(triggered()), b);
-0|	connect(a, SIGNAL(textActivated(const QString &)), b);
-0|	connect(a, SIGNAL(idClicked(int)), b);
-0|	connect(a, SIGNAL(itemSelectionChanged()), b);
-0|	connect(a, SIGNAL(itemDoubleClicked(QTreeWidgetItem*,int)), b);
-0|	connect(a, SIGNAL(currentChanged(int)), b);
-0|	connect(a, SIGNAL(currentItemChanged(QListWidgetItem*,QListWidgetItem*)), b);
-0|	connect(sel, SIGNAL(selectionChanged(QItemSelection,QItemSelection)), b);
-0|	connect(sel, SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), b);
-RXEOF
-printf '%-22s %2d pass  %2d fail\n' "dead-signal regex" "$rt_p" "$rt_f"
-pass=$((pass+rt_p)); fail=$((fail+rt_f))
-
-dead=0; deadbase=0
 for m in $MODULES; do
     mp=0; mf=0; mw=0
     for f in "$SRC/src/$m"/*.cpp; do
@@ -160,27 +79,6 @@ for m in $MODULES; do
         if g++ $FLAGS $INCS "$f" 2>/tmp/chk.$$; then mp=$((mp+1)); else mf=$((mf+1)); fi
         mw=$((mw + $(command grep -ac "$SRC.*warning:" /tmp/chk.$$ || true)))
     done
-    # Dead string-based connects. A SIGNAL() that names a signal Qt 6 does not
-    # have compiles, links and runs, and the connect never fires; the compiler
-    # cannot see it. Every module's baseline is 0, so any match fails the
-    # module.
-    #
-    # -o | wc -l, not -c: grep -c counts matching LINES, and one line could
-    # carry two SIGNAL() macros.
-    md=$(command grep -rhoE "$DEAD_SIGNALS" "$SRC/src/$m" "$SRC/include/$m" 2>/dev/null | wc -l)
-    case "$m" in
-        SIGEL_MasterGUI) base=0  ;;
-        MT_GUI)          base=0  ;;
-        MT_Control)      base=0  ;;
-        *)               base=0  ;;
-    esac
-    dead=$((dead+md)); deadbase=$((deadbase+base))
-    if [ "$md" -gt "$base" ]; then
-        echo "  $m: $md connect(s) to a signal Qt 6 does not have, baseline $base:"
-        command grep -rnE "$DEAD_SIGNALS" "$SRC/src/$m" "$SRC/include/$m" 2>/dev/null \
-            | sed "s|$SRC/|    |" | cut -c1-140
-        mf=$((mf+md-base))
-    fi
     printf '%-22s %2d pass  %2d fail  %3d warnings\n' "$m" "$mp" "$mf" "$mw"
     pass=$((pass+mp)); fail=$((fail+mf)); warn=$((warn+mw))
 done
@@ -198,31 +96,6 @@ for m in $MODULES; do
 done
 printf '%-22s %2d pass  %2d fail\n' "headers standalone" "$hp" "$hf"
 pass=$((pass+hp)); fail=$((fail+hf))
-# The module loop reaches only src/<Module>/ and include/<Module>/ of the
-# modules in MODULES. This covers what lies outside them:
-#   - sigel.cpp and sigel_slave.cpp, at the top of src/;
-#   - SIGEL_RealInterface, a module directory in no list (a stub);
-#   - the forms. Their <connection> blocks are XML and carry the bare signal
-#     name, not a SIGNAL() macro, so $DEAD_SIGNALS cannot match them and a
-#     separate pattern is used. All of them are live today: clicked,
-#     valueChanged, toggled, sliderReleased.
-stray=$(command grep -rhoE "$DEAD_SIGNALS" \
-        "$SRC"/src/*.cpp "$SRC"/src/SIGEL_RealInterface "$SRC"/include/SIGEL_RealInterface \
-        2>/dev/null | wc -l)
-uistray=$(command grep -rhoE '<signal>(activated|selected|rightButtonClicked|doubleClicked|selectionChanged|currentChanged) *\(' \
-          "$SRC"/ui 2>/dev/null | wc -l)
-stray=$((stray+uistray))
-if [ "$stray" -gt 0 ]; then
-    echo "  dead signal outside every module baseline:"
-    command grep -rnE "$DEAD_SIGNALS" \
-        "$SRC"/src/*.cpp "$SRC"/src/SIGEL_RealInterface "$SRC"/include/SIGEL_RealInterface \
-        2>/dev/null | sed "s|$SRC/|    |" | cut -c1-140
-    command grep -rnE '<signal>(activated|selected|rightButtonClicked|doubleClicked|selectionChanged|currentChanged) *\(' \
-        "$SRC"/ui 2>/dev/null | sed "s|$SRC/|    |" | cut -c1-140
-    fail=$((fail+stray))
-fi
-printf '%-22s %2d dead (baseline %d -- §2 has the per-signal table)\n' \
-       "Qt 6 signals" "$((dead+stray))" "$deadbase"
 
 # ---------------------------------------------------------------------------
 # Line endings. The tree is LF only: no tracked text file may contain CRLF.
@@ -498,38 +371,6 @@ pass=$((pass+pp)); fail=$((fail+pf))
 rm -f /tmp/pvm.$$ /tmp/pvm.$$.cpp /tmp/pvmb.$$
 
 # ---------------------------------------------------------------------------
-# Qt 2 item virtuals that Qt 6 no longer calls.
-#
-# QListViewItem::key( int, bool ) drove QListView's sort. QTreeWidgetItem has
-# no key(); it sorts through operator<. A class that still declares key() but
-# not operator< compiles and looks right. But key() is never called, and the
-# list sorts column 0 as raw TEXT: 0, 1, 10, 100, 11. 1.3 shows 0, 1, 2 ... 10.
-# Neither the compiler nor the dead-signal check can see this.
-#
-# Rule: a class that declares key(int, ...) must also declare
-# operator<( const QTreeWidgetItem & ).
-kp=0; kf=0
-# Each header is flattened to one line before matching, so a declaration split
-# over two lines is still found. The operator< pattern is the signature that
-# overrides QTreeWidgetItem::operator<; "operator<( QTreeWidgetItem * )" takes
-# a pointer, overrides nothing and must not count. find, not a fixed-depth
-# glob.
-for h in $(find "$SRC/include" -name '*.h' | sort); do
-    flat=$(tr '\n' ' ' < "$h")
-    printf '%s' "$flat" | command grep -qE 'QString[[:space:]]+key[[:space:]]*\([[:space:]]*int' || continue
-    if printf '%s' "$flat" | command grep -qE 'operator<[[:space:]]*\([[:space:]]*const[[:space:]]+QTreeWidgetItem[[:space:]]*&'; then
-        kp=$((kp+1))
-    else
-        kf=$((kf+1))
-        echo "  ${h#$SRC/}: declares Qt 2's key(int,bool) but no"
-        echo "    operator<( const QTreeWidgetItem & ) -- Qt 6 sorts through operator<,"
-        echo "    so key() is never called and the column sorts as raw text."
-    fi
-done
-printf '%-22s %2d pass  %2d fail\n' "dead item virtuals" "$kp" "$kf"
-pass=$((pass+kp)); fail=$((fail+kf))
-
-# ---------------------------------------------------------------------------
 # A freed pointer kept behind a guard that still passes.
 #
 # SIG_Simulation's constructor throws when SIMULATIONLIBRARY names the removed
@@ -592,19 +433,27 @@ pass=$((pass+vp)); fail=$((fail+vf))
 # positioned and does clip. So it moves one real widget outside its parent and
 # requires the report.
 #
-# guidrive is BUILT HERE, before its first use. If that build fails, only a
-# message is printed: `no clipped controls' and `slave gui' then run the
-# previous binary, and only `form minimums' fails, because it tests `make -q'.
+# guidrive is BUILT HERE, before its first use. A failed build leaves the
+# previous binary in place, so each section below that uses the build first
+# tests that it is current, and fails if it is not.
 # `make -q' or `make' with no target answers for `all', which does NOT depend
 # on guidrive, so always name the target.
 if ! make -s -C "$ROOT" guidrive sigelApp >/tmp/gdb.$$ 2>&1; then
-    echo "  guidrive does not build; the two clip checks below prove nothing:"
+    echo "  guidrive does not build:"
     tail -6 /tmp/gdb.$$ | sed 's/^/    /'
 fi
 rm -f /tmp/gdb.$$
+guidrive_current() {
+    make -q --no-print-directory -C "$ROOT" guidrive sigelApp 2>/dev/null && return 0
+    echo "  build/guidrive or sigelApp/ is missing or out of date -- this section did NOT"
+    echo "  run. Build it with 'make guidrive sigelApp'."
+    return 1
+}
 
 cp=0; cf=0
-if SIGEL_ROOT="$APP" QT_QPA_PLATFORM=offscreen \
+if ! guidrive_current; then
+    cf=1
+elif SIGEL_ROOT="$APP" QT_QPA_PLATFORM=offscreen \
        SIGEL_EXP="$ROOT/experiments/twoBases.exp" \
        timeout 300 "$ROOT/build/guidrive" clipcheck >/tmp/clip.$$ 2>/dev/null; then
     cp=1
@@ -639,11 +488,8 @@ pass=$((pass+cp)); fail=$((fail+cf))
 # count each get their own message. Stderr is kept, because a crash or a Qt
 # fatal shows up there and nowhere else.
 mp=0; mf=0
-: > /tmp/fmin.$$
-if ! make -q --no-print-directory -C "$ROOT" guidrive sigelApp 2>/dev/null; then
+if ! guidrive_current; then
     mf=1
-    echo "  build/guidrive or sigelApp/ is missing or out of date -- this section did NOT"
-    echo "  run. Build it with 'make guidrive sigelApp'."
 else
     # `|| mrc=$?', not a bare run followed by `mrc=$?': under set -e a
     # non-zero formsize would stop the whole script here, with no row and no
@@ -716,7 +562,9 @@ pass=$((pass+mp)); fail=$((fail+mf))
 # connect logging was suppressed and an empty stderr proves nothing. The
 # `gui behaviour' section explains this control in full.
 sp=0; sf=0
-if SIGEL_ROOT="$APP" QT_QPA_PLATFORM=offscreen \
+if ! guidrive_current; then
+    sf=1
+elif SIGEL_ROOT="$APP" QT_QPA_PLATFORM=offscreen \
        SIGEL_EXP="$ROOT/experiments/twoBases.exp" \
        SIGEL_SCRATCH="${TMPDIR:-/tmp}" \
        timeout 300 "$ROOT/build/guidrive" slavegui >/tmp/sclip.$$ 2>/tmp/serr.$$; then
@@ -844,7 +692,10 @@ pass=$((pass+pp)); fail=$((fail+pf))
 # the long menu label instead of the short one, or an action that is no longer
 # checkable.
 gp=0; gf=0
-if [ -d "$ROOT/build/lib" ] && [ -d "$ROOT/build/obj/moc" ]; then
+# It links the libraries, moc and resource objects that guidrive links, and
+# reads its data from sigelApp/ through SIGEL_ROOT, so guidrive_current is
+# the test that they are current.
+if guidrive_current; then
     cat > /tmp/gui.$$.cpp <<'GUIEOF'
 // Headless dump of the GUI's structure, in the shape of guidump-baseline.txt.
 #include <QApplication>
@@ -943,7 +794,6 @@ GUIEOF
     rm -f /tmp/gui.$$ /tmp/gui.$$.cpp /tmp/guib.$$ /tmp/guid.$$ /tmp/guio.$$
 else
     gf=1
-    echo "  no built GUI libraries -- run 'make gui'"
 fi
 printf '%-22s %2d pass  %2d fail\n' "gui vs 1.3" "$gp" "$gf"
 pass=$((pass+gp)); fail=$((fail+gf))
@@ -1034,10 +884,10 @@ elif make -s -C "$ROOT" guidrive sigelApp >/tmp/bdb.$$ 2>&1; then
             SIGEL_SCRATCH="${TMPDIR:-/tmp}" QT_QPA_PLATFORM=offscreen \
             timeout 300 "$ROOT/build/guidrive" "$sc" > "$out" 2>>/tmp/berr.$$
     }
-    # `|| bf=1' does NOT catch a failed `: > path' (full or unwritable /tmp):
-    # in dash a redirection error on the special built-in `:' ends the shell,
-    # with no row and no total. `true > path || bf=1' would catch it.
-    : > /tmp/berr.$$ || bf=1
+    # `true', not `:'. In dash a redirection error on the special built-in `:'
+    # ends the shell even inside `||', with no row and no total. On `true' it
+    # is an ordinary failure that `||' catches.
+    true > /tmp/berr.$$ || { bf=1; echo "  cannot create /tmp/berr.$$"; }
     if guidrive_run gate /tmp/bo.$$ && guidrive_run pages /tmp/bp.$$ \
        && guidrive_run exportall /tmp/bx.$$ && guidrive_run overwrite /tmp/bw.$$ \
        && guidrive_run dialogs /tmp/bg.$$ && guidrive_run metagui /tmp/bm.$$ \
@@ -1056,12 +906,8 @@ elif make -s -C "$ROOT" guidrive sigelApp >/tmp/bdb.$$ 2>&1; then
         #
         # Qt says "No such signal" or "No such slot" at RUNTIME when a
         # string-based connect names something that does not exist. It
-        # compiles and links, and the slot never fires. $DEAD_SIGNALS does not
-        # replace this: it is a closed list of Qt 2 spellings and matches
-        # SIGNAL( only, so a new kind of dead signal and every bad SLOT() are
-        # invisible to it. Nor does this replace the regex: the regex is
-        # static over every module, while this sees only what the scenarios
-        # execute. Both are kept.
+        # compiles and links, and the slot never fires. The compiler cannot see
+        # it. This check sees only the connects that the scenarios execute.
         #
         # Qt logs the warning under the category qt.core.qobject.connect, and
         # categories can be switched off: QT_LOGGING_RULES='*=false' in the
@@ -1174,14 +1020,14 @@ rm -f /tmp/bo.$$ /tmp/bp.$$ /tmp/bx.$$ /tmp/bw.$$ /tmp/bg.$$ /tmp/bm.$$ /tmp/br.
       /tmp/bv.$$ /tmp/bk.$$ /tmp/bz.$$ /tmp/bq.$$ \
       /tmp/bl.$$ /tmp/bl2.$$ /tmp/ball.$$ \
       /tmp/bd.$$ /tmp/bdb.$$ /tmp/berr.$$
-# exportall, overwrite, roundtrip and dialogs write files to TMPDIR, several MB
-# in all. They are removed here.
+# exportall, overwrite, roundtrip, dialogs and rngseed write files to TMPDIR,
+# several MB in all. They are removed here.
 rm -f "${TMPDIR:-/tmp}"/x11b-gpp.gpp "${TMPDIR:-/tmp}"/x11b-sip.sip \
       "${TMPDIR:-/tmp}"/x11b-lap.lap "${TMPDIR:-/tmp}"/x11b-env.env \
       "${TMPDIR:-/tmp}"/x11b-pop.pop "${TMPDIR:-/tmp}"/x11b-prg.prg \
       "${TMPDIR:-/tmp}"/x11b-ind.ind "${TMPDIR:-/tmp}"/x11b-dat.dat \
       "${TMPDIR:-/tmp}"/x11b-ow.sip "${TMPDIR:-/tmp}"/x11b-ow "${TMPDIR:-/tmp}"/x11b-ow-*.sip \
-      "${TMPDIR:-/tmp}"/c11c-lap.lap
+      "${TMPDIR:-/tmp}"/c11c-lap.lap "${TMPDIR:-/tmp}"/rngseed.exp
 for e in gpp sip lap env pop; do
     rm -f "${TMPDIR:-/tmp}/rt-a-$e.$e" "${TMPDIR:-/tmp}/rt-b-$e.$e" \
           "${TMPDIR:-/tmp}/rt-a-$e"    "${TMPDIR:-/tmp}/rt-b-$e"
@@ -1274,12 +1120,6 @@ elif true; then
             echo "  Xvfb never came up on $XTDISP:"
             head -5 /tmp/xtv.$$ 2>/dev/null | sed 's/^/    /'
         else
-            # `|| xtf=1' does NOT catch a failed `: > path' (full or
-            # unwritable /tmp): in dash a redirection error on `:' ends the
-            # shell. That happens AFTER Xvfb started and BEFORE the kill
-            # below, so a server stays on $XTDISP and every later run refuses
-            # the display. `true > path || xtf=1' would catch it.
-            : > /tmp/xterr.$$ || xtf=1
             # SCRUB THE SCALING VARIABLES. This is the only section whose
             # result depends on Qt's coordinate scaling. mapToGlobal() returns
             # logical pixels and xdotool takes device pixels, so at a ratio of
@@ -1369,7 +1209,7 @@ elif [ ! -f "$BEXP" ]; then
     echo "  SKIPPED: no $BEXP -- restore experiments/ from git. THIS SECTION"
     echo "  TESTED NOTHING."
     skipped=$((skipped+1))
-elif [ -x "$ROOT/build/guidrive" ]; then
+elif guidrive_current; then
     # Same env as guidrive_run above, minus the locale extras. The two runs
     # differ only in SIGEL_PAGEEDIT, which selects the eleven-edit set.
     psrun() {
@@ -1378,7 +1218,7 @@ elif [ -x "$ROOT/build/guidrive" ]; then
             timeout 300 "$ROOT/build/guidrive" pagesave > "$1" 2>>/tmp/pserr.$$
     }
     rm -f "$PSD/pagesave-base.exp" "$PSD/pagesave-edited.exp"
-    : > /tmp/pserr.$$
+    true > /tmp/pserr.$$ || { pf=1; echo "  cannot create /tmp/pserr.$$"; }
     if psrun /tmp/ps1.$$ && psrun /tmp/ps2.$$ 1; then
         if [ ! -s "$PSD/pagesave-base.exp" ] || [ ! -s "$PSD/pagesave-edited.exp" ]; then
             pf=1
@@ -1463,7 +1303,7 @@ elif [ -x "$ROOT/build/guidrive" ]; then
     fi
     rm -f "$PSD/pagesave-base.exp" "$PSD/pagesave-edited.exp"
 else
-    pf=1; echo "  build/guidrive is missing -- run 'make guidrive sigelApp'"
+    pf=1
 fi
 rm -f /tmp/ps1.$$ /tmp/ps2.$$ /tmp/psall.$$ /tmp/psd.$$ /tmp/pserr.$$
 printf '%-22s %2d pass  %2d fail\n' "pagesave" "$pp" "$pf"
@@ -1720,7 +1560,7 @@ else
     cpok=1
     { cp "$V2HAM" "$V2D/ham0.exp" && chmod u+w "$V2D/ham0.exp" \
       && cp "$V2OCT" "$V2D/oct0.exp" && chmod u+w "$V2D/oct0.exp"; } || cpok=0
-    : > "$V2D/err" || cpok=0
+    true > "$V2D/err" || cpok=0
     # pagesave with SIGEL_PAGEEDIT unset is exactly File > Open then File >
     # Save Experiment.
     # $1 = stem, $2 = input pass number.
@@ -1936,99 +1776,38 @@ printf '%-22s %2d pass  %2d fail\n' "v2 round trip vs 1.3" "$v2p" "$v2f"
 pass=$((pass+v2p)); fail=$((fail+v2f))
 
 # ---------------------------------------------------------------------------
-# The Designer forms.
+# The Designer forms: two checks that nothing else makes.
 #
-# Seven checks, because they break independently. Check 1 covers all forms at
-# once; the others run per form:
-#   1. Qt 6's uic accepts the .ui, with no warning      (make forms, above)
-#   2. the generated ui_<Form>.h compiles standalone
-#   3. the committed QWidget-derived base class compiles
-#   4. moc accepts that base class, and its output compiles
-#   5. the .qrc and the generated header agree, in BOTH directions
-#   6. every view that switches sorting on also pins the direction
-#   7. every Designer Line still carries an orientation
-# 5, 6 and 7 cover losses that are silent everywhere else: a dropped image, a
-# reversed sort and a dropped separator orientation all compile and run, and
-# just look wrong.
+#   uic      Qt 6's form compiler accepts every .ui with no warning. uic
+#            prints a warning and still exits 0, for example when it renames
+#            a duplicate widget name or drops an <images> block. The build
+#            prints the warning and carries on, so this is the only place
+#            that fails on it.
+#   images   every ":/..." that a generated header asks for is in the form's
+#            .qrc and on disk, and every file in the .qrc is asked for. A
+#            missing image shows as a blank button and fails nothing else.
+#            The second direction matters most: a form that LOST its images
+#            asks for nothing, so the first direction passes.
 #
-# Generation is left to the Makefile, so that this script and the Makefile
-# cannot disagree about flags.
-FORM_LIST="MT_UI/MT_AddConstantsWidgetBase:MT_GUI \
-            MT_UI/MT_AddIndividualsWidget:MT_GUI \
-            MT_UI/MT_EstimationWidgetBase:MT_GUI \
-            MT_UI/MT_ExperimentWidgetBase:MT_GUI \
-            MT_UI/MT_IndividualWidgetBase:MT_GUI \
-            MT_UI/MT_PopulationWidgetBase:MT_GUI \
-            MT_UI/MT_SearchWidgetBase:MT_GUI \
-            MT_UI/MT_SelectionWidgetBase:MT_GUI \
-            MT_UI/MT_StatisticsWidgetBase:MT_GUI \
-            SIGEL_MasterUI/SIG_EditHostDialogBase:SIGEL_MasterGUI \
-            SIGEL_MasterUI/SIG_EnvironmentBase:SIGEL_MasterGUI \
-            SIGEL_MasterUI/SIG_ExperimentViewBase:SIGEL_MasterGUI \
-            SIGEL_MasterUI/SIG_GPParameterBase:SIGEL_MasterGUI \
-            SIGEL_MasterUI/SIG_IndividualListBase:SIGEL_MasterGUI \
-            SIGEL_MasterUI/SIG_IndividualViewBase:SIGEL_MasterGUI \
-            SIGEL_MasterUI/SIG_LanguageParametersBase:SIGEL_MasterGUI \
-            SIGEL_MasterUI/SIG_RobotBase:SIGEL_MasterGUI \
-            SIGEL_MasterUI/SIG_SimulationParameterBase:SIGEL_MasterGUI \
-            SIGEL_SlaveUI/SIG_MovieSettingsDialogBase:SIGEL_SlaveGUI \
-            SIGEL_SlaveUI/SIG_SimulationWidgetBase:SIGEL_SlaveGUI"
-
-MOCBIN=$(qmake6 -query QT_INSTALL_LIBEXECS)/moc
-fp=0; ff=0; fw=0; nlinetot=0; nsort=0
+# Every .ui under sigel/ui is checked. A .ui that is not in the Makefile's
+# FORMS has no generated header, and fails here.
+fp=0; ff=0
 # `make forms' ran at the top, before the module passes, because GUI headers
-# need its output. REUSE THAT LOG; do not run make again here. A second
-# `make forms' does nothing and prints nothing, so its empty log would replace
-# the first run's warnings, and the uic-warning check below could never fire.
-cp /tmp/mkforms.$$ /tmp/uic.$$ 2>/dev/null || : > /tmp/uic.$$
+# need its output. Its log is read here; do not run make again. A second
+# `make forms' does nothing and prints nothing, so its empty log would hide
+# the first run's warnings.
 if [ -n "$FORMS_FAILED" ]; then
-    echo "  make forms FAILED -- checks 2-7 below did not run:"; cat /tmp/uic.$$; ff=$((ff+1))
+    echo "  make forms FAILED -- the form checks did not run"; ff=$((ff+1))
 else
-    # uic writes warnings to stderr and still exits 0 -- a dropped <images>
-    # block or a renamed duplicate widget is reported exactly this way, and
-    # both change the rendered form. Treat any output as a failure, minus Qt's
-    # locale banner, which every Qt tool prints under a non-UTF-8 LC_ALL and
-    # which says nothing about the form.
+    # Any output is a failure, minus Qt's locale banner, which every Qt tool
+    # prints under a non-UTF-8 LC_ALL and which says nothing about the form.
     grep -v '^Detected locale \|^Qt depends on a UTF-8 locale\|^If this causes problems\|^for more information' \
-         /tmp/uic.$$ > /tmp/uic2.$$ || true
+         /tmp/mkforms.$$ > /tmp/uic2.$$ || true
     if [ -s /tmp/uic2.$$ ]; then echo "  uic WARNED:"; cat /tmp/uic2.$$; ff=$((ff+1)); fi
-    for entry in $FORM_LIST; do
-        # <uidir>/<Form>:<Module>[:blocked]  -- "blocked" means the form itself
-        # is converted but a custom widget it embeds is not, so its generated
-        # header cannot compile yet. Checks 1, 5 and 7 still run; 2-4 cannot,
-        # and 6 passes without a test.
-        blocked=""
-        case $entry in *:*:*) blocked=${entry##*:}; entry=${entry%:*};; esac
-        form=${entry%:*}; mod=${entry#*:}; base=$(basename "$form")
-        if [ -n "$blocked" ]; then
-            echo "  form SKIP: $base compile/moc -- blocked on $blocked:" \
-                 "it embeds a custom widget whose header is still Qt 2"
-        else
-        # 2. the generated header, standalone
-        printf '#include "ui_%s.h"\nint main(){return 0;}\n' "$base" > /tmp/hdr.$$.cpp
-        if g++ $FLAGS $INCS /tmp/hdr.$$.cpp 2>/dev/null; then fp=$((fp+1))
-        else ff=$((ff+1)); echo "  form FAIL: ui_$base.h"; fi
-        # 3. the committed base class
-        if g++ $FLAGS $INCS "$SRC/src/$mod/$base.cpp" 2>/tmp/chk.$$; then fp=$((fp+1))
-        else ff=$((ff+1)); echo "  form FAIL: $mod/$base.cpp"; fi
-        fw=$((fw + $(command grep -ac "$SRC.*warning:" /tmp/chk.$$ || true)))
-        # 4. moc, and its output
-        if $MOCBIN $(echo "$INCS" | sed 's/-isystem /-I/g') \
-               "$SRC/include/$mod/$base.h" -o /tmp/moc.$$.cpp 2>/tmp/chk.$$ \
-           && g++ $FLAGS $INCS /tmp/moc.$$.cpp 2>>/tmp/chk.$$; then fp=$((fp+1))
-        else ff=$((ff+1)); echo "  form FAIL: moc $mod/$base.h"; cat /tmp/chk.$$; fi
-        fi
-        # 5. the form's images, checked in BOTH directions.
-        #
-        # Qt 2 embedded images in the .ui; here they live in a .qrc beside the
-        # form. Qt 6's uic drops a leftover <images> block with only a warning
-        # and emits NO icon at all: the button or combo item renders blank, and
-        # every other check here passes.
-        #
-        # forward : every ":/..." the header asks for is in the .qrc and on disk
-        # reverse : every file in the .qrc is actually asked for
-        # The reverse direction is the one that matters. Without it a form that
-        # LOST its images passes, because there is then no ":/..." to check.
+    for ui in $(find "$SRC/ui" -name '*.ui' | sort); do
+        form=${ui#$SRC/ui/}; form=${form%.ui}; base=$(basename "$form")
+        [ -f "$FORMSB/ui/ui_$base.h" ] || { ff=$((ff+1))
+            echo "  form FAIL: no ui_$base.h -- $form.ui is not in the Makefile's FORMS"; continue; }
         qrc="$SRC/ui/$form.qrc"
         # `pfx=$(sed ...)' takes sed's exit status, and sed on a missing file
         # exits 2, which under set -e would stop the script. Most forms have no
@@ -2049,52 +1828,12 @@ else
                 else ff=$((ff+1)); echo "  form FAIL: $form.qrc carries $have, ui_$base.h never uses it"; fi
             done
         fi
-        # 6. every view the form switches sorting on also pins the DIRECTION.
-        # Qt 2's QListView sorted column 0 ascending by default; Qt 6's
-        # setSortingEnabled(true) leaves the indicator descending, so the rows
-        # come out reversed wherever column 0 holds text.
-        if [ -f "$FORMSB/ui/ui_$base.h" ]; then
-            for v in $(command grep -aoE '^        [A-Za-z0-9_]+->setSortingEnabled\(true\)' \
-                       "$FORMSB/ui/ui_$base.h" | sed 's/->.*//;s/ *//' | sort -u); do
-                nsort=$((nsort+1))
-                if [ -n "$blocked" ] || command grep -aq "$v->sortByColumn(" "$SRC/src/$mod/$base.cpp"; then fp=$((fp+1))
-                else ff=$((ff+1)); echo "  form FAIL: $base sorts $v but never pins the direction"; fi
-            done
-        fi
-        # 7. every Designer separator still says which way it runs.
-        # A Line's `orientation' is the only thing Qt 6's uic reads to choose a
-        # frame shape: without it the widget is a bare QFrame with NoFrame,
-        # and the separator paints nothing. An explicit frameShape does the
-        # same job, so either property satisfies this.
-        nline=$(command grep -ac '<widget class="Line"' "$SRC/ui/$form.ui" || true)
-        nlinetot=$((nlinetot+nline))
-        nshape=$(command grep -aA3 '<widget class="Line"' "$SRC/ui/$form.ui" \
-                 | command grep -acE '<property name="(orientation|frameShape)"' || true)
-        if [ "$nline" -le "$nshape" ]; then fp=$((fp+1))
-        else ff=$((ff+1)); echo "  form FAIL: $form.ui has $nline Line widgets but $nshape with a shape"; fi
     done
-    # Checks 6 and 7 are a for-loop over a grep and a `-le', so ZERO matches
-    # looks like a clean pass. A pattern that quietly stops matching (uic
-    # changes its indentation, Designer renames the class) would make every
-    # form pass with nothing checked. So the totals over all forms are
-    # asserted: 6 Line widgets across the 20 forms and 5
-    # setSortingEnabled(true) in the generated headers. Raise them if a form
-    # gains one; never lower them to make this quiet.
-    if [ "$nlinetot" -lt 6 ]; then
-        ff=$((ff+1))
-        echo "  form FAIL: found $nlinetot Line widgets across the forms, expected at least 6 --"
-        echo "             the separator check matched nothing and proves nothing"
-    else fp=$((fp+1)); fi
-    if [ "$nsort" -lt 5 ]; then
-        ff=$((ff+1))
-        echo "  form FAIL: found $nsort setSortingEnabled(true) sites, expected at least 5 --"
-        echo "             the sort-direction check matched nothing and proves nothing"
-    else fp=$((fp+1)); fi
 fi
-printf '%-22s %2d pass  %2d fail  %3d warnings\n' "forms (Phase C)" "$fp" "$ff" "$fw"
-pass=$((pass+fp)); fail=$((fail+ff)); warn=$((warn+fw))
+printf '%-22s %2d pass  %2d fail\n' "forms" "$fp" "$ff"
+pass=$((pass+fp)); fail=$((fail+ff))
 
-rm -f /tmp/chk.$$ /tmp/hdr.$$.cpp /tmp/uic.$$ /tmp/uic2.$$ /tmp/moc.$$.cpp /tmp/mkforms.$$
+rm -f /tmp/chk.$$ /tmp/hdr.$$.cpp /tmp/uic2.$$ /tmp/mkforms.$$
 rm -rf "$FORMSB"
 echo "-----"
 echo "total: $pass pass, $fail fail, $warn warnings in SIGEL code"

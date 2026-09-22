@@ -381,19 +381,21 @@ declared it too and Qt 6's does not (`currentTextChanged`), and
 not the spelling.**
 
 **100 dead connects in the pristine tree; C4, C6, C7 and C8 repaired all of
-them, and `check.sh` fails any module whose count exceeds its baseline of zero.**
-83 are `connect()` and 17 `disconnect()` — a dead `disconnect` is equally a
-no-op. The check also scans `sigel.cpp`, `sigel_slave.cpp` and
-`SIGEL_RealInterface`, which sit in no module directory. **The forms need a
+them.** 83 are `connect()` and 17 `disconnect()` — a dead `disconnect` is
+equally a no-op. `check.sh` failed any module whose count exceeded its
+baseline of zero. The check also scanned `sigel.cpp`, `sigel_slave.cpp` and
+`SIGEL_RealInterface`, which sit in no module directory. **The forms needed a
 separate pattern**: a `.ui` `<connection>` carries the bare signal name as XML,
-so the main regex structurally cannot match one — *it was pointed at the `.ui`
-directory anyway and claimed a coverage it could not have.* All 49 form
-connections are live. **And the regex self-tests**, because it is the one check
-here that is a pattern rather than a compiler and so the only one that can
+so the main regex structurally could not match one — *it was pointed at the
+`.ui` directory anyway and claimed a coverage it could not have.* All 49 form
+connections are live. **And the regex had self-tests**, because a pattern can
 quietly stop matching — which it did, for a whole commit, when
 `selectionChanged` was anchored to `( )`. 33 rows of spellings that must match
 and near-misses that must not, including a converted
 `selectionModel()->selectionChanged(sel, desel)`, which must pass.
+*`check.sh` dropped this check on 2026-09-22: the port is finished and the
+tree has none. Qt's run-time "No such signal" warning still covers the
+connects that the scenarios of four sections run.*
 
 ### Structure
 
@@ -604,7 +606,7 @@ through `f0f2daa`.
 
 ## 7. Steps
 
-**Exit criterion per step:** `./checks/check.sh` from anywhere — **1097 pass, 0
+**Exit criterion per step:** `./checks/check.sh` from anywhere — **971 pass, 0
 fail**. *The figure moves with the number of tracked text files, because the
 `encodings` check adds its own count to the total. Measured trail: **1136**
 until 2026-09-19, when `experiments/` and `robots/` arrived and
@@ -612,7 +614,10 @@ until 2026-09-19, when `experiments/` and `robots/` arrived and
 same evening; **1162** after the 2026-09-20 clean-up of three shim headers, the
 qtmig container and `tiecheck.cpp`; **1098** once 64 files of 2003 build
 machinery went — 64 files, 64 passes; **1097** when `physics_backends.md` was
-folded into this file.*
+folded into this file; **1098** when `README.md` arrived; **971** on
+2026-09-22, when three checks that guarded only the Qt 2 conversion were
+dropped: the dead-signal regex (39 passes), `dead item virtuals` (1) and
+five of the form checks (87).*
 **The pass count was 853 until D31 and the jump is not new coverage of SIGEL's
 code.** The `encodings` check used to read 404 files of five extensions and now
 read all 618 tracked files then, 8 of which git called binary: its pass count went
@@ -644,8 +649,8 @@ session to. Warnings are on an unchanged basis and remain comparable throughout.
 **There are four baseline checks plus `pvm-check.sh`, which has no baseline —
 five invocations in all. The full list with its caveats is in "Handover" below;
 use that one.** `check.sh` compiles every converted module
-and every converted header standalone, and since C1 also runs `uic`, `moc` and
-`rcc` over the converted forms. **It also RUNS SIGEL**: **twenty-three
+and every converted header standalone, and runs `uic` and `rcc` over the
+forms. **It also RUNS SIGEL**: **twenty-three
 `guidrive` invocations over sixteen distinct scenarios**, twenty-two where no
 comma-decimal locale is installed — the eleven of
 `gui behaviour`, plus **two locale re-runs of `pages`**, `clipcheck`, `formsize`,
@@ -680,12 +685,12 @@ introduced it, then shipped as "0 errors".
 plus `SIGEL_Visualisation` (C5) and `SIGEL_CommonGUI` (C3) — a GUI module joins
 only when every file in it compiles. *When this was written, `sigel.cpp`, `sigel_slave.cpp` and three GUI modules
 were checked by nothing.* **All five GUI modules are in `MODULES` as of C7, and
-C8 added the `programs` section for the two `.cpp` files.** What C1 added is a
-`forms (Phase C)` section listing the forms converted so far and, per form,
-running `uic`, compiling the generated header standalone, compiling the
-committed base class, running `moc` over it, and checking the `.qrc` against
-the header in both directions. Extending it further is part of each step, not
-an afterthought.
+C8 added the `programs` section for the two `.cpp` files.** The `forms` section
+now makes two checks over every `.ui`: `uic` prints no warning, and each
+form's `.qrc` and generated header agree in both directions. Its other checks
+were dropped on 2026-09-22: the module and header passes and the build already
+compile the forms, and the sort-direction and `Line` checks guarded against
+the Qt 2 conversion only.
 The gates' own programs are still in the hole: `sigel_eval.cpp`, `pvm_smoke.c`
 and `pvm_link.cpp` are compiled only by their own targets, never by `check.sh`.
 A break in them shows up as a build failure rather than a check failure.
@@ -982,7 +987,17 @@ Start here.
     and `vertexCount` (`SIG_Polygon`). `count` was not used for `SIG_Geometry`:
     `shim/iostream.h` brings `using namespace std;` into scope, so it would hide
     `std::count`.
-- **`check.sh` passes 1098, not 1097:** `README.md` added one tracked file.
+- **`check.sh` passes 971.** Two steps on 2026-09-22, each proven by a clean
+  run against the one before and by a broken input per touched section:
+  - Its comments now describe the current code; no code changed (`6157557`).
+  - Three checks that guarded only the Qt 2 conversion were dropped: the
+    dead-signal regex, `dead item virtuals`, and five of the seven form
+    checks. The form checks kept are uic warnings and images, now over every
+    `.ui`. Three defects were fixed in the same step. A failed guidrive build
+    let `no clipped controls`, `slave gui`, `gui vs 1.3` and `pagesave` pass on
+    the old build; they now test that the build is current. `: > file || x`
+    ended the script in dash if the file could not be created; it is
+    `true > file || x`. `rngseed.exp` was left in `$TMPDIR`; it is removed.
 - **Left, by decision for now: 34 names**, measured 2026-09-22 over code only,
   not comments or strings.
   - `SIGEL_GP`, the force fitness function: `varianz`, `fitnessGes`,
@@ -1588,7 +1603,7 @@ succeeded.**
 **Checks any session must keep green**, all committed:
 
 ```
-./checks/check.sh                                        1097 pass, 0 fail, exit 0
+./checks/check.sh                                        971 pass, 0 fail, exit 0
 ./checks/dictorder-dump.sh | diff -u checks/baselines/dictorder-baseline.txt -   empty
 ./checks/fitness-check.sh  | diff -u checks/baselines/fitness-baseline.txt -     empty
 ASAN_OPTIONS=detect_leaks=0 ./checks/fitness-check.sh build-asan   exit 0
@@ -3162,9 +3177,9 @@ is 80-bit.
 
 | check | what only it can see |
 |---|---|
-| `forms` — seven checks a form | a dropped `<images>` block; a `Line` that lost its `orientation` and now draws nothing; a `.qrc` disagreeing with the header **in either direction**; a view enabling sorting without pinning the direction |
-| `$DEAD_SIGNALS`, baseline **0 for every module** | **only the nine Qt 2 spellings §2 tabulates, and only inside `SIGNAL(`.** It is a closed regex (`check.sh:89-92`), so a **tenth** kind of dead signal is invisible to it and a `SLOT()` naming a slot that no longer exists is invisible by construction. *Demonstrated 2026-09-03: injecting `connect(…, SIGNAL(highlighted(int)), …)` — Qt 2's `QListBox` signal, which `QTreeWidget` does not have — left `Qt 6 signals` at `0 dead (baseline 0)` and every other section green, while Qt itself printed `QObject::connect: No such signal QTreeWidget::highlighted( int )` on stderr. The positive control is that runtime line: the injected connect really was dead.* C7 measured every `SLOT()` in `SIGEL_MasterGUI` against its headers by hand — 0 mismatches — and nothing repeats that |
-| **`runtime connect`** — NEW 2026-09-03 | Qt's own `No such signal` / `No such slot` warning, from a driver run — the only thing that catches a dead connect the regex has never heard of. `guidrive`'s stderr had been going to `/dev/null`; it is captured now and any such line fails the check. **It is NOT the general case the regex is a special case of, and a first draft of this row said so wrongly**: the regex is *static* over all 14 modules, this is *runtime* over only what the **ten** `gui behaviour` scenarios execute. **Partly disjoint, so both are kept.** What THIS row does not reach: the `clipcheck` run still discards stderr, and the two locale re-runs append to the log *after* it has been grepped. *`SIGEL_SlaveGUI` used to be the largest hole here — 44 `SIGNAL(` and 44 `SLOT(` with no runtime coverage — and is now covered by `slave gui` below, which runs its own copy of this check on its own stderr. There are three such checks in `check.sh` now, one per stderr stream, and they are deliberate duplicates: each stream has a different producer* |
+| `forms` — `uic` warnings and images; seven checks a form until 2026-09-22 | a dropped `<images>` block or any other `uic` warning; a `.qrc` disagreeing with the header **in either direction**. *The dropped checks also saw a `Line` that lost its `orientation` and a view enabling sorting without pinning the direction, both left by the Qt 2 conversion* |
+| `$DEAD_SIGNALS`, baseline **0 for every module** | **Dropped 2026-09-22.** **Only the nine Qt 2 spellings §2 tabulates, and only inside `SIGNAL(`.** It was a closed regex, so a **tenth** kind of dead signal was invisible to it and a `SLOT()` naming a slot that no longer exists was invisible by construction. *Demonstrated 2026-09-03: injecting `connect(…, SIGNAL(highlighted(int)), …)` — Qt 2's `QListBox` signal, which `QTreeWidget` does not have — left `Qt 6 signals` at `0 dead (baseline 0)` and every other section green, while Qt itself printed `QObject::connect: No such signal QTreeWidget::highlighted( int )` on stderr. The positive control is that runtime line: the injected connect really was dead.* C7 measured every `SLOT()` in `SIGEL_MasterGUI` against its headers by hand — 0 mismatches — and nothing repeats that |
+| **`runtime connect`** — NEW 2026-09-03 | Qt's own `No such signal` / `No such slot` warning, from a driver run — since 2026-09-22 the only check of string-based connects. `guidrive`'s stderr had been going to `/dev/null`; it is captured now and any such line fails the check. It sees only what the scenarios execute; the static regex over all 14 modules was dropped on 2026-09-22. What THIS row does not reach: the `clipcheck` run still discards stderr, and the two locale re-runs append to the log *after* it has been grepped. *`SIGEL_SlaveGUI` used to be the largest hole here — 44 `SIGNAL(` and 44 `SLOT(` with no runtime coverage — and is now covered by `slave gui` below, which runs its own copy of this check on its own stderr. There are four such checks in `check.sh` now (`slave gui`, `gui behaviour`, `pagesave`, `v2 round trip vs 1.3`), one per stderr stream, and they are deliberate duplicates: each stream has a different producer* |
 | its **positive control**, and the reason the row above is not simply "and now it is covered" | **Qt emits that warning under the logging category `qt.core.qobject.connect`, and categories are filterable.** `QT_LOGGING_RULES='*=false'` in the ambient environment — `guidrive_run` uses `env` without `-i`, so everything passes through — or a `qtlogging.ini` silences it, and an empty stderr then looks exactly like a clean run. **Demonstrated: the full check ran green with a genuinely dead connect injected.** So `guidrive` now makes one deliberately bogus connect at startup and the check **fails if that warning is absent**. It must be a real connect, not a `qWarning`: `qt.core.qobject.connect` can be disabled on its own, leaving a `default`-category control visible and the check blind. *`check.sh` already says of `clipcheck` that "0 clipped" from a check that cannot detect clipping is worth nothing; this row is that sentence applied to itself* |
 | **`pagesave`** — NEW 2026-09-03; named `pagesave vs 1.3` until 2026-09-19 | **`putAllIntoExperiment()`, the widget-to-file path, which nothing covered.** `pages` is widget to widget; `exportall` is widget to file for the eight export formats, and **none of the three compares what the SAVE path writes**. *A first version said the export scenarios "bypass the aggregator entirely"; they do not — `putAllIntoExperiment()` runs on every tree selection change, so `check`, `pages` and `exportall` all execute it many times. What none of them did was compare its output to a file.* Teeth-tested three ways: breaking the register write and the `WITHHISTORY` write both fail it — *but `gui behaviour` catches those too, through the `.lap` and `.pop` export checksums, so neither shows unique coverage.* **Dropping one page from `putAllIntoExperiment` does**: `pagesave vs 1.3` fails on `TEXALPHA 99 → 255` while `gui behaviour` passes 1/0. That is the gap §9 named, exactly |
 | **`roundtrip`** — NEW 2026-09-03, the other half of it | **that a READER actually reads.** Export, change something, import the export, export again, require the two exports to match — so an importer that opens nothing, parses nothing or is never reached cannot pass. `exportall` cannot see this: it never reads anything back. **Teeth-tested by gutting each of the five readers in turn — `.gpp` `.sip` `.lap` `.env` `.pop` — and every one fails the check.** *Checking it is what exposed that it could not fail* |
@@ -3175,7 +3190,7 @@ is 80-bit.
 | **`truncated pi (V5)`** — NEW 2026-09-08 | **that nobody "fixes" 1.3's truncated pi.** The sensor path converts radians to degrees with `3.14159265`, not `M_PI`. Every evolved program in the shipped experiments was selected against sensor readings carrying that 1.14e-09 error, and they feed a chaotic simulation, so correcting it changes what the robots do. **The edit that breaks it is one word and looks like tidying**, and 1.3 uses the true `M_PI` in `IFunctions.cpp, calculateAnyJoint`, so the truncated literal reads as an oversight to anyone who meets that line first. **Two checks, because neither covers the other:** the SOURCE check catches an edit at one of the four sites even while another site still supplies the constant, which no binary search can see, and it is compiler-independent; the BINARY check catches any spelling that yields the true value — `M_PI`, `4*atan(1)`, a longer literal, a header constant — which a grep for `M_PI` would miss. Only the radian factor is checked, and the reason is measured rather than assumed: on aarch64 four of the other seven appear ZERO times as 8-byte doubles in our image and two appear only in debug sections, so there is nothing of theirs in `.rodata` to compare. Costs 0.18 s. *Teeth-tested six ways, and the testing found three defects in the check itself. **The binary search covered the whole file, so its "the constant is missing" arm could never fire** — the Makefile compiles with `-g`, so two debug copies survive any patch of the real one; the search is bounded to `.rodata` now. **The source pattern was a prefix match**, so lengthening a site to `3.14159265358979` changed the factor while the count stayed at 4 and neither forbidden double appeared — the whole section passed on that edit. **And a comment mentioning `M_PI` or the literal failed the check**, which is documentation, not a defect; comments are stripped now. The six probes: a site tidied to `M_PI`, a site deleted, a site lengthened, the true `180/pi` patched into `.rodata`, the kept constant patched out of `.rodata`, and a comment naming both. Five fail with the message aimed at them, one passes. Two orderings had to be fixed for that: `M_PI` is tested before the site count, and the forbidden constant before the missing one, because each of those edits trips both tests and the specific diagnosis has to win.* |
 | **`v2 round trip vs 1.3`** — NEW 2026-09-08 | **a whole experiment through `File > Save Experiment`, twice, against what the 2003 binary wrote.** `pagesave` compares a 178-line parameter block, over two saves that differ only in whether the pages were edited; this compares the WHOLE file across two CHAINED saves, where each save's output is the next one's input — marker line numbers, the experiment history, the per-individual HISTORY growth, the individual names, the robot block, the ten first-save keys, and `expstruct.py` over pass 1 against pass 2. The expected text is copied from `verification-against-sigel-1.3/v8-1.3-gp-blocks.txt`, captured before this conversion existed, so a failure is a regression against 1.3 rather than against yesterday — except the markers, the one-entry host list and the robot-block hash, which pin the file in `experiments/` since item 39. **Input against pass 1 is not the test** — the first save adds ten keys and would fail however correct the port is (V8 result 5). It is ONE diff of a 58-line report. Costs 35 s measured, four `pagesave` runs over two experiments; no new scenario was added. *Teeth-tested 2026-09-08, and the testing found two holes in the check itself, both since closed — see the V2 row above. Every predicate has been shown to fail on a change of the kind it exists to catch. The claim is one-way: a mutation moves the line it is aimed at, and usually others too, because a deleted key shifts every marker below it. It is NOT that each mutation moves exactly one line, which an earlier version of this row claimed and which the measurements never showed. The wrapper was tested too: missing data SKIPS and counts, a missing or stale binary FAILS, suppressed Qt connect logging FAILS, and the section was run from outside the repo root to check the `make -q -C` fix.* |
 | `encodings` | **INVERTED BY D31 2026-09-09 — this row used to say the opposite.** It no longer catches *a file whose CRLF was stripped*; it catches **CRLF present at all**, in any tracked text file, expected zero. 571 LF-only files and 29 that git calls binary (2026-09-20). Baseline 0, floor 500. *Two counts went the same day — how many files had been converted from the German character set, and how many postdate the first commit. Neither could fail, and after the source tree was renamed neither could find a file* |
-| `dead item virtuals` | a class declaring Qt 2's `key(int,bool)` without the `operator<` that replaces it. Matched against a **flattened** header and demanding the signature that actually overrides — a decoy `operator<( QTreeWidgetItem * )` and a two-line declaration both bypassed the first version |
+| `dead item virtuals` | **Dropped 2026-09-22.** a class declaring Qt 2's `key(int,bool)` without the `operator<` that replaces it. Matched against a **flattened** header and demanding the signature that actually overrides — a decoy `operator<( QTreeWidgetItem * )` and a two-line declaration both bypassed the first version |
 | `widgets` | `DISpinBox` losing the fraction, under **`C` and `de_DE`** — without the second row it was blind to the locale bug the first fix introduced |
 | **`expstruct selfcheck`** | that the structural fingerprint is **blind to fitness and sighted on structure** — nine assertions: both spellings of fitness in both float and integer form, a program-operand change that must move `PROGRAMS`, two individuals swapped that must move `ORDER`, and a structural floor recomputed from the raw bytes (individual count, total program lines, history length against `POOLGENERATION`) that catches a matcher which died and dumped its content into `SHAPE`. Costs 0.34 s. *Teeth-tested by disabling both fitness filters and by blinding the program matcher* |
 | `parsers` | a file format the program parses but no other check opens: a `PVMHOST` round trip against `SIG_GPPVMHost`, pinning 1.3's own line. *Written because a defect of exactly that shape was found in `SIGEL_GP`* |
@@ -5486,12 +5501,8 @@ search in this file's history that was produced with plain `grep` before
 2026-09-09 is worth redoing.**
 
 **`check.sh` is NOT affected, and that is not luck** — every load-bearing search
-in it already uses `command grep`. Checked explicitly: the dead-signal counters
-find an injected `rightButtonClicked` in a Latin-1 file (2 of 2 matches). The
-five plain `grep` uses left in it read generated `ui_*.h`, `.qrc` and `.ui`
-files, all ASCII; the one that reads a module source (`check.sh:869`,
-`sortByColumn`) would report a loud `form FAIL` rather than a silent pass, and
-no form base class is on the list anyway.
+in it already uses `command grep`. The one plain `grep` left in it filters the
+`make forms` log.
 
 **What this cost.** Nothing that shipped: the C10 fixes live in
 `SIG_AllIndividualsView.cpp` and `MT_Controller.cpp`, neither of which is

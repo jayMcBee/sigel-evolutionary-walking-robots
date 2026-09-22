@@ -540,10 +540,10 @@ touched, because changing one changes behaviour against the reference binary.
   The `winskip` counter behind that line goes with them, and its line
   disappearing will look like a lost check unless it is done knowingly.
   **It moves a pinned check total:** the 11 deleted files are counted by the
-  `encodings` check, so `check.sh` goes from 1097 pass to 1086. PORTING.md pins
-  that number in three places — the per-step exit criterion in §7, the
-  Handover's note on uncommitted work and the check list — and its trail in §7
-  records each step. Move all of them in the same commit.
+  `encodings` check, so `check.sh` goes from 971 pass to 960. PORTING.md pins
+  that number in two places — the per-step exit criterion in §7 and the check
+  list — and its trail in §7 records each step. Move all of them in the same
+  commit.
   **Do not mix it with any other change. When:** after every other item in this
   section — moved to the back 2026-09-21, because it touches the whole
   codebase.
