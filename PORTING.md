@@ -897,6 +897,11 @@ Start here.
     calculation:`, `Sigel Fitness/Sieger :` → `Sigel Fitness/Winner :`,
     `Meta Vorhersage      :` → `Meta Prediction      :` and `durch.Fitness:` →
     `avg. Fitness:`. The padded labels keep their width.
+  - `Nr.: ` → `No.: `, in the same block. This block is text in a saved file,
+    and file formats do not change. It was allowed here by decision, on two
+    facts: no loader reads the block, because the loaders match whole-line
+    section markers only; and no `.mexp` file exists, in the repo, its history
+    or `~`.
 - **Joke text replaced:**
   - `Phat processing of ` → `Computing the transformation of `, a debug line
     in `calculateAnyJoint` in `IFunctions.cpp`, inside `#ifdef SIG_DEBUG`: not

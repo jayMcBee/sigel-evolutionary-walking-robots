@@ -123,15 +123,12 @@ Constructs the language removed. A current compiler rejects them.
 - [ ] **12. Translate the German — comments.** 118 lines in 46 files, including
   15 `NEU NEU NEU` banners and 6 MSVC German file headers. Nothing executes.
 
-- [ ] **13. Translate the German — strings.** 5 lines in 2 files are left:
-  - **Kept, by decision:** the history text of `SIG_GPIndividual`, which is
-    saved in `.exp` files. "Fitness (Elter 1)" and "(Elter 2)" in
-    `addCrossOverInfo`, "CREATED NEW INDIVIDUUM" in the constructor and
-    "INDIVIDUUM IS GENERATED RANDOMLY" in `generateRandomIndividual`. The shipped
-    experiments hold the "Elter" lines.
-  - **Not decided:** "Nr.: " in `MT_GPManager::writeToFileGPSystem`, the German
-    short form of "number". A search for German words missed it: it is two
-    letters long.
+- [ ] **13. Translate the German — strings.** 4 lines in 1 file are left, all
+  **kept, by decision:** the history text of `SIG_GPIndividual`, which is saved
+  in `.exp` files. "Fitness (Elter 1)" and "(Elter 2)" in `addCrossOverInfo`,
+  "CREATED NEW INDIVIDUUM" in the constructor and "INDIVIDUUM IS GENERATED
+  RANDOMLY" in `generateRandomIndividual`. The shipped experiments hold the
+  "Elter" lines.
   **No compiler and no check covers this phase.** All three persisted paths are
   write-only: `SIG_GPIndividual::readFromFile` parses only `NAME='`, `POOLPOS=`,
   `FITNESS=`, `AGE=` and `PROGRAM BEGIN{`; the `MT_GPManager` block sits after

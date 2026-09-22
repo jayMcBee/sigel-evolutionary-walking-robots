@@ -328,7 +328,7 @@ void MT_GPManager::writeToFileGPSystem(QTextStream &File)
 		if ((*CorrectFit)[k]>=0.0)
 			NumOfPositivSigelFit ++;
 		
-		File << "Nr.: " << k << Qt::endl;
+		File << "No.: " << k << Qt::endl;
 		File << " Sigel Fitness/Winner : " << (*CorrectFit)[k] << Qt::endl;
 		File << " Meta Prediction      : " << (*Outcome)[k] << Qt::endl;
 	}
