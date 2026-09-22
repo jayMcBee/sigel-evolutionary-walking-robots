@@ -28,7 +28,7 @@ private:
 
 	int LastError;
 	
-	/*Indicate which FitnessFunktion is choose for the fitness calculation
+	/*Indicate which fitness function is choose for the fitness calculation
 	@param: 1 = fitSimpleError for the evaluator  approach 
 	@param: 2 = fitSquareError for the evaluator  approach 
 	@param: 3 = simpleYesNo  for the classifier approach 

@@ -910,6 +910,15 @@ Start here.
   - `aiaiaiaia !!!!!` → `n/a`, the starting text of the comment box in
     `SIG_ExperimentViewBase.ui`. `SIG_GUIGPExperiment`'s constructor fills the
     box from the experiment's own comment, so neither text is ever shown.
+- **German fragments in comments:** six in four Meta-GP headers, by decision.
+  `Trainingsdata` → training data (`MT_Substitute.h`), `FitnessFunktion` →
+  fitness function (`MT_FitnessTrainer.h`), `negativ` → negative and
+  `TraningsDuration` → training duration (`MT_Interpreter.h`), `Trainingsset` →
+  training set and `evolutionsloop` → evolution loop (`MT_GPManager.h`). The
+  `Typ` in comments of `MT_Substitute.h` and `MT_TournamentManager.h` goes with
+  the renames of the `Typ` names it describes. In the same step, three copies of
+  "If occurred a error" in `MT_Interpreter.h` became proper English. Only
+  language and style changed; what these comments claim is left as it was.
 - **Renamed:**
   - `SIG_GPManager::schlussJetzt` → `stopEvolutionNow`. `messageEvolutionStop()`
     sets it; each loop reads it straight after `stopIfNecessary()` and returns.

@@ -118,7 +118,7 @@ private:
 	/*read out parameter about the creating of the individual and set this into the Statistics*/
 	void collectOffspringParameter(MT_StatisticsElement * SElement);
 
-	/* serve the updating of the  Trainingsset  */
+	/* serve the updating of the  training set  */
 	int checkForNewTCase();
 	/* exchange the momentary BestIndividual with the individual in the
 	Substituter*/
@@ -148,7 +148,7 @@ private:
 	MT_Substitute * Substituter;
 
 	/* this individuals is equal to the individual into the Substituter !
-	* after a evolutionsloop it will updating */
+	* after a evolution loop it will updating */
 	MT_Individual * BestIndividual;
 	
 	

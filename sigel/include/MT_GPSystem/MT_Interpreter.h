@@ -43,7 +43,7 @@ public:
 	int getVariableNumber();
 
 		
-	/* the constructor receive the VariableNumber and the TraningsDuration 
+	/* the constructor receive the VariableNumber and the training duration 
 	*/
 	MT_Interpreter (int VarNum, int TDuration);
 
@@ -63,7 +63,7 @@ public:
 	int getDuration();
 
 	/* load a given MT_Program (by a pointer) to the Interpreter 
-	* If occurred a error, the return value isn't 1.
+	* If an error occurs, the return value is not 1.
 	*/ 
 	int loadProgram (MT_Program * Prog);
 
@@ -73,11 +73,11 @@ public:
 	* @pre: the all (!) VariableNames from the Program < NumberVariable !
 	* @pre: the first Operand of the Programline is a variable !
 	* @post: the output is the fitness of the robot control program
-	* If occurred a error, the return value is negativ.
+	* If an error occurs, the return value is negative.
 	*/
 	double interpret(MT_TranslatedIndividual * RobPro);
 
-	/* If occurred a error, this function supply a reason
+	/* If an error occurred, this function supplies a reason
 	*	a 1 indicate, that no error occurred  
 	*/
 	int getLastError();

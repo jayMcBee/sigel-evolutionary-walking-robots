@@ -98,7 +98,7 @@ protected:
 	//for EstimationStrategy: indicate the goodness of the BestMETAProgram
 	double MetaProgError;
 	
-	// for EstimationStrategy: to determinate the MetaProgError, the Trainingsdata are needed  
+	// for EstimationStrategy: to determinate the MetaProgError, the training data are needed  
 	QList<double> CorrectFitness;
 	QList<double> AssumedFitness; 
 
