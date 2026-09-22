@@ -1,34 +1,30 @@
 #!/bin/sh
-# Exit criterion for the Qt 6 port (PORTING.md D11).
+# The main check of the Qt 6 port (PORTING.md §7). It compiles every module,
+# header and form, runs the probes and guidrive scenarios below, and prints one
+# row per section and a total.
 #
-#   ./checks/check.sh                 all converted modules, syntax only
-#   ./checks/check.sh MT_GPSystem     one module
+#   ./checks/check.sh                 every module
+#   ./checks/check.sh MT_GPSystem     one module in the compile passes; the
+#                                     other sections still run
 #
-# Vendored headers use -isystem so their warnings do not drown SIGEL's own:
-# with -I the tree produces ~12,979 warnings, with -isystem ~300, all of them
-# in code we are responsible for. WARNINGS ARE PART OF THE CRITERION -- the
-# A3 Qt::endl regression was reported by this command at the step that
-# introduced it and went unread.
+# It exits non-zero if any check fails or any section is skipped.
 #
-# replaces the blanket -fpermissive used up to A8. It
-# suppresses exactly one vendored defect (cv97/JVector.h:29 calls a base-class
-# member unqualified from a class template) instead of downgrading errors
-# everywhere. Verified identical pass/fail across all 90 files.
+# Vendored headers use -isystem, so their warnings do not hide SIGEL's own.
+# The warning count on the total line is part of the result; read it.
 #
 # -DMINMAX_H empties vendored Dynamo's minmax.h, which defines min/max as
-# macros and poisons libstdc++. No SIGEL code calls unqualified min/max.
+# macros and breaks libstdc++. No SIGEL code calls unqualified min/max.
 set -e
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
-# ROOT is derived, not the script's own directory, so check it: a symlink or
-# a copy left at the old path would point it at the PARENT of the repo, and
-# every path below is built from it.
+# ROOT comes from the script's path, so check it: run through a symlink or a
+# copy elsewhere, it would name the wrong directory, and every path below is
+# built from it.
 [ -f "$ROOT/Makefile" ] && [ -d "$ROOT/checks" ] || {
 	echo "$0: $ROOT is not the repo root -- run the script by its real path,"\
 	     "not through a symlink or a copy" >&2; exit 1; }
 
-# Run from the repo root whatever the caller's directory is: guidrive opens
-# robots/twoBases/twoBases.rrb relative to the process, and this script
-# never cd'd before launching it.
+# Work from the repo root, whatever the caller's directory: guidrive opens
+# robots/twoBases/twoBases.rrb relative to its working directory.
 cd "$ROOT" || exit 1
 SRC=$ROOT/sigel
 # The folder SIGEL is started from -- the Makefile's sigelApp target.
@@ -38,31 +34,25 @@ QTINC=$(qmake6 -query QT_INSTALL_HEADERS)
 QTLIBDIR=$(qmake6 -query QT_INSTALL_LIBS)
 
 FLAGS="-fsyntax-only -std=c++17 -Wall -Wextra -DMINMAX_H"
-# QtGui and QtWidgets are here because the Makefile has them: without them
-# SIG_GPPopulation.cpp fails on <QApplication> and this script reported a
-# "failure" the real build does not have. Found by review.
+# The include paths match the Makefile's. A path missing here makes a file
+# fail that the real build compiles.
 INCS="-I$ROOT/shim -I$SRC/include -isystem $QTINC -isystem $QTINC/QtCore"
 INCS="$INCS -isystem $QTINC/QtGui -isystem $QTINC/QtWidgets"
-# QOpenGLWidget arrived with C3's SIG_VisualisationWidget.
+# QtOpenGL and QtOpenGLWidgets, for SIG_VisualisationWidget's QOpenGLWidget.
 INCS="$INCS -isystem $QTINC/QtOpenGL -isystem $QTINC/QtOpenGLWidgets"
 for d in newmat09 dynamechs/dm Dynamo/Src/Inc fparser cv97 pvm3/include; do
     INCS="$INCS -isystem $SL/$d"
 done
 
-# SIGEL_Visualisation joined at C5, SIGEL_CommonGUI at C3 and SIGEL_SlaveGUI at
-# C4 -- a GUI module joins this list only when EVERY file in it compiles.
-# The converted forms generate ui_<Form>.h, and GUI module headers include them
-# -- so they must exist and be on the include path BEFORE the module and header
-# passes, not only inside the forms section. They go to a scratch build folder
-# of this script's own: regenerating the real build/ui would leave every
-# program built from it out of date halfway through this run. C4 found this: five
-# SIGEL_SlaveGUI headers failed the standalone pass for want of the flag.
+# The forms generate ui_<Form>.h, and GUI module headers include them, so they
+# are generated here, BEFORE the module and header passes. They go to a scratch
+# build folder of this script's own: regenerating the real build/ui would leave
+# every program built from it out of date during this run.
 FORMS_FAILED=
-# Regenerate unconditionally. make only re-runs uic when a .ui is newer than its
-# ui_*.h, so on a warm tree `make forms' prints nothing and the uic-warning check
-# below sees an empty log -- green with the defect still in the .ui. Review
-# proved it: injecting an <images> block failed the FIRST run and passed the
-# second. Deleting the output directory costs one uic pass over 20 forms.
+# Regenerated every time, into an empty folder. make re-runs uic only when a
+# .ui is newer than its ui_*.h, so on a warm tree `make forms' prints nothing,
+# and the uic-warning check in the forms section would pass on an empty log
+# with a defect still in the .ui.
 FORMSB=${TMPDIR:-/tmp}/forms.$$
 rm -rf "$FORMSB"
 if make -s -C "$ROOT" B="$FORMSB" forms >/tmp/mkforms.$$ 2>&1; then
@@ -74,34 +64,24 @@ else
 fi
 
 # Signals that existed in Qt 2 and do NOT exist in Qt 6, in SIGNAL() spelling.
-# Verified one by one with QMetaObject::indexOfSignal against Qt 6.10.2, not
-# read off a porting guide. Deliberately NOT here because they are still live:
-# clicked() (moc clones the default argument of clicked(bool)), activated(int)
-# on a QComboBox, valueChanged(int), textChanged(...), stateChanged(int),
-# toggled(bool), pressed(), timeout().
+# Each was checked with QMetaObject::indexOfSignal against Qt 6.10.2. NOT here,
+# because they still exist: clicked() (moc clones the default argument of
+# clicked(bool)), activated(int) on a QComboBox, valueChanged(int),
+# textChanged(...), stateChanged(int), toggled(bool), pressed(), timeout().
 #
-# lostFocus() was here and was WRONG: MT_Editor declares its own lostFocus()
-# signal (include/MT_GUI/MT_Editor.h, MT_Editor) and Qt 2.3's QLineEdit never had one.
-# A name shared with a framework signal is a false positive in EITHER
-# direction, so the class has to be established per site. The counter-check is
-# to parse every `signals:' block in the tree and intersect with the names
-# below; against the CORRECTED list that intersection is now EMPTY, because
-# lostFocus is exactly the name it removed.
+# A name that SIGEL declares as its own signal must not be here: MT_Editor
+# declares lostFocus(), which Qt 2's QLineEdit never had. To check the list,
+# collect the names in every `signals:' block in the tree and intersect them
+# with it; the result must be empty.
 #
-# selectionChanged was anchored to `( )' and so missed the QListViewItem*
-# overload, which Qt 2's QListView also declared and which is equally dead.
-# Both errors were found by review, and they cancelled in the total.
+# selectionChanged is matched with no arguments and with the QListViewItem*
+# and QTreeWidgetItem* overloads. The QItemSelection overload is NOT matched,
+# so selectionModel()->selectionChanged(sel, desel) passes.
 #
-# KNOWN FALSE-POSITIVE SURFACE, since a regex cannot know the sender's class:
-#   selectionChanged()  is LIVE on QLineEdit, QTextEdit and QPlainTextEdit.
-#     Zero such senders today (all 4 sites are QListView/QListBox), but the
-#     tree has 6 QMultiLineEdit -> QTextEdit, so C6/C7 could introduce one.
-#     The QItemSelection overload is deliberately NOT matched, so converting a
-#     view to selectionModel()->selectionChanged(sel, desel) passes cleanly.
-#   selected(), currentChanged(), clicked(int), activated() are unambiguous
-#     in this tree; each was checked sender-by-sender.
-# The gate PRINTS every offending line precisely so a false positive is
-# visible rather than silently believed.
+# A regex cannot know the sender's class. selectionChanged() still exists on
+# QLineEdit, QTextEdit and QPlainTextEdit, so a connect to one of those would
+# be a false positive. The gate prints every matching line, so a false
+# positive is visible and not silently believed.
 DEAD_SIGNALS='SIGNAL\( *(activated *\( *\)|activated *\( *const *QString'\
 '|clicked *\( *int|selected *\(|selectionChanged *\( *(\)|Q(ListView|TreeWidget)Item)'\
 '|currentChanged *\( *Q(ListView|ListBox|TreeWidget|ListWidget)Item|rightButtonClicked'\
@@ -110,22 +90,14 @@ DEAD_SIGNALS='SIGNAL\( *(activated *\( *\)|activated *\( *const *QString'\
 MODULES="${*:-SIGEL_Tools SIGEL_Environment MT_GPSystem SIGEL_Robot SIGEL_Program SIGEL_RobotIO SIGEL_Simulation MT_Control SIGEL_GP SIGEL_Visualisation SIGEL_CommonGUI SIGEL_SlaveGUI MT_GUI SIGEL_MasterGUI}"
 pass=0; fail=0; warn=0; skipped=0; winskip=0
 
-# The shim self-check was here: it built and RAN q2compat_check.cpp under
-# ASan+UBSan, and was the only mechanical check that could see an ownership
-# error. Deleted with the shim -- it only ever tested the compatibility
-# layer, so nothing is left for it to check. It was reported separately and
-# never counted in the module totals, so 105/4 is unchanged by its removal.
-
-# The gate's own self-test. $DEAD_SIGNALS is the only check here that is a
-# REGEX rather than a compiler, so it is the only one that can silently stop
-# matching -- which it did: anchoring selectionChanged to `( )' hid the
-# QListViewItem* overload for a whole commit. Every row below is a spelling
-# that appears in this tree or a near-miss that must NOT match.
+# Self-test of $DEAD_SIGNALS. It is a regex, so it can silently stop matching.
+# Rows marked 1 are Qt 2 spellings that must match. Rows marked 0 are live
+# spellings from this tree, or near-misses, that must NOT match.
 rt_p=0; rt_f=0
 while IFS='|' read -r want line; do
     [ -z "$want" ] && continue
     # grep -c exits 1 when the count is 0, which under `set -e' kills the whole
-    # script before it prints anything. Same trap C1 hit with a sed.
+    # script before it prints anything.
     got=$(printf '%s\n' "$line" | command grep -cE "$DEAD_SIGNALS" || true)
     if [ "$got" = "$want" ]; then rt_p=$((rt_p+1)); else
         rt_f=$((rt_f+1)); echo "  regex self-test: want $want got $got for: $line"
@@ -179,40 +151,27 @@ for m in $MODULES; do
     mp=0; mf=0; mw=0
     for f in "$SRC/src/$m"/*.cpp; do
         [ -e "$f" ] || continue
-        # WIN_* is Windows-only and PERMANENTLY out of scope:
+        # WIN_* files are Windows-only and permanently out of scope:
         # WIN_SIG_GPRemoteZORCFitnessFunction needs HANDLE and OVERLAPPED
-        # from windows.h and has no Qt 2 API left in it, so it cannot
-        # compile on Linux at all -- section 7 records that its failure is
-        # correct rather than debt. Counted as a KNOWN EXCLUSION rather
-        # than a failure, so that "0 fail" means something and the exit
-        # status this script now returns is usable. Skipping it is the
-        # only honest alternative to a red run for ever.
+        # from windows.h and cannot compile on Linux. They are counted as a
+        # known exclusion, not as a failure, so that "0 fail" and the exit
+        # status stay usable.
         case "${f##*/}" in WIN_*) winskip=$((winskip+1)); continue ;; esac
         if g++ $FLAGS $INCS "$f" 2>/tmp/chk.$$; then mp=$((mp+1)); else mf=$((mf+1)); fi
         mw=$((mw + $(command grep -ac "$SRC.*warning:" /tmp/chk.$$ || true)))
     done
-    # Dead string-based connects. A SIGNAL() naming a signal Qt 6 does not have
-    # compiles, links, runs and never fires -- there is no other check in this
-    # script, or in the compiler, that can see it. The list is not guessed: each
-    # signature was run through QMetaObject::indexOfSignal on the real Qt 6.10.2
-    # meta-object, which is exactly what connect() does at run time. C4 shipped
-    # ten of these and only review caught them.
-    # Counted against a per-module baseline, NOT folded into mf: an unconverted
-    # module's dead connects are known debt (§2 has the table), and folding them
-    # in would misreport them as compile failures and leave the script standing
-    # red until C8. Any count ABOVE the baseline fails. The baseline is zero for
-    # every CONVERTED module. As of C8 there is no non-zero baseline left at all:
-    # the whole tree is at zero and any new dead connect fails the gate wherever
-    # it appears.
+    # Dead string-based connects. A SIGNAL() that names a signal Qt 6 does not
+    # have compiles, links and runs, and the connect never fires; the compiler
+    # cannot see it. Every module's baseline is 0, so any match fails the
+    # module.
     #
-    # -o|wc -l, not -c: grep -c counts matching LINES. No line carries two
-    # SIGNAL() macros today, so the two agree -- but the baselines are exact
-    # numbers and should not quietly drift if that ever stops being true.
+    # -o | wc -l, not -c: grep -c counts matching LINES, and one line could
+    # carry two SIGNAL() macros.
     md=$(command grep -rhoE "$DEAD_SIGNALS" "$SRC/src/$m" "$SRC/include/$m" 2>/dev/null | wc -l)
     case "$m" in
-        SIGEL_MasterGUI) base=0  ;;   # C7 repaired all 44
-        MT_GUI)          base=0  ;;   # C6 repaired all 31
-        MT_Control)      base=0  ;;   # C8 repaired all 15
+        SIGEL_MasterGUI) base=0  ;;
+        MT_GUI)          base=0  ;;
+        MT_Control)      base=0  ;;
         *)               base=0  ;;
     esac
     dead=$((dead+md)); deadbase=$((deadbase+base))
@@ -237,20 +196,16 @@ for m in $MODULES; do
     if g++ $FLAGS $INCS /tmp/hdr.$$.cpp 2>/dev/null; then hp=$((hp+1)); else hf=$((hf+1)); echo "  header FAIL: $rel"; fi
  done
 done
-# hp/hf were reported but never folded into the totals, so the headline "N fail"
-# silently excluded the standalone-header failure. Found by review.
 printf '%-22s %2d pass  %2d fail\n' "headers standalone" "$hp" "$hf"
 pass=$((pass+hp)); fail=$((fail+hf))
-# The module loop only reaches src/<Module>/ and include/<Module>/ for the
-# modules in MODULES. Three things sit outside every baseline above:
-#   - sigel.cpp and sigel_slave.cpp, at the top of src/ (C8's files);
-#   - SIGEL_RealInterface, a module directory in no list (a stub today);
-#   - the forms, whose <connection> blocks are XML and carry the bare signal
-#     name, NOT a SIGNAL() macro -- so $DEAD_SIGNALS structurally cannot match
-#     them and a separate pattern is needed. All 49 are live today
-#     (clicked, valueChanged, toggled, sliderReleased).
-# An earlier version of this scan pointed $DEAD_SIGNALS at the .ui directory and
-# so claimed a coverage it could never have had.
+# The module loop reaches only src/<Module>/ and include/<Module>/ of the
+# modules in MODULES. This covers what lies outside them:
+#   - sigel.cpp and sigel_slave.cpp, at the top of src/;
+#   - SIGEL_RealInterface, a module directory in no list (a stub);
+#   - the forms. Their <connection> blocks are XML and carry the bare signal
+#     name, not a SIGNAL() macro, so $DEAD_SIGNALS cannot match them and a
+#     separate pattern is used. All of them are live today: clicked,
+#     valueChanged, toggled, sliderReleased.
 stray=$(command grep -rhoE "$DEAD_SIGNALS" \
         "$SRC"/src/*.cpp "$SRC"/src/SIGEL_RealInterface "$SRC"/include/SIGEL_RealInterface \
         2>/dev/null | wc -l)
@@ -270,50 +225,23 @@ printf '%-22s %2d dead (baseline %d -- §2 has the per-signal table)\n' \
        "Qt 6 signals" "$((dead+stray))" "$deadbase"
 
 # ---------------------------------------------------------------------------
-# Encoding and line-ending fidelity.
+# Line endings. The tree is LF only: no tracked text file may contain CRLF.
+# This fails as soon as CRLF comes back through a Windows editor, an unpacked
+# archive, a patch or a clone with core.autocrlf=true. It reads every tracked
+# file, so adding or deleting a tracked text file moves the pass count by one.
 #
-# THE LINE-ENDING RULE CHANGED ON 2026-09-09, BY DECISION: the tree is LF only.
-# Every DOS file in the 2003 source was converted -- 100 files, 17,750
-# CRLF pairs -- and this half of the check was turned round to match. It used to
-# say "a file that HAD a CR must still have one", with a baseline of 25 for the
-# files 03ac805 had already stripped. It now says NO TRACKED TEXT FILE MAY
-# CARRY CRLF, expected count zero, and it fails the moment one comes back
-# through a Windows editor, an unpacked archive or a patch.
+# Git decides what is binary, not this script. \r\n inside a PNG or a tarball
+# is data, not a line ending, so binaries are skipped. A test for a NUL in the
+# first 8 KB gets that wrong: sigel/textures/Hippie.pnm has no NUL at all, and
+# sigel/textures/UniDo_LSXI.pnm has its first NUL at offset 15,456. Both are
+# raw raster data. `git ls-files --eol' calls all five .pnm binary, because git
+# falls back to a printable-byte ratio when there is no NUL.
 #
-# Turning it round widened it as well. The old form could only judge files that
-# existed in the root commit and had one of five extensions, so a NEW file
-# arriving with CRLF was invisible to it. The rule below reads every tracked
-# file instead.
+# Lone CRs are not tested. Every tracked file that holds one is binary
+# (archives, images, .blend models), where 0x0d is data.
 #
-# WHAT IS BINARY IS GIT'S ANSWER, NOT A HOME-MADE ONE. \r\n inside a PNG or a
-# tarball is pixel data, not a line ending -- four tracked binaries hold 19
-# such pairs between them -- so binaries must be skipped. The first version of
-# this check tested for a NUL byte in the first 8 KB and GOT TWO FILES WRONG:
-# textures/Hippie.pnm has no NUL anywhere in its 196,668 bytes, and
-# textures/UniDo_LSXI.pnm has its first NUL at offset 15,456. Both are P6 raw
-# raster and both were judged as text. They passed only because neither happens
-# to contain a 0d 0a pair; a re-rendered texture that did would have failed this
-# gate, and the obvious way to make it green again corrupts the image.
-# `git ls-files --eol' gets all five .pnm right, because git falls back to a
-# printable-byte ratio when there is no NUL. Ask git. Found by review 2026-09-09.
-#
-# Lone CRs are left alone, and NOT because they are Mac-classic line endings --
-# an earlier version of this comment said that and it was wrong. 27 tracked
-# files hold lone CRs and git calls ALL 27 binary: supportingLibs.tar.gz 2415,
-# pvm3.4.6.tgz 3859,
-# noExperiment.png 691, JustGreen.pnm 2848, altLogo.png 208, Hippie.pnm 208,
-# Stone.pnm 68, and the 20 robot .blend files, 22 to 40 each. Those bytes are
-# pixel values, archive and model data that happen to equal 0x0d. They were never line endings, and nothing here treats them as any
-# -- the binary skip below means this gate never even reads them.
-#
-# IT ONLY TESTS LINE ENDINGS. A second half used to count how many files had
-# been converted from the German character set, by reading each file as it was
-# in the first commit. It could not fail, and the source moved to sigel/ in
-# 2026-09-20, so it found nothing and reported every source file as new. Dropped
-# the same day; the conversion figures are in PORTING.md.
-#
-# Written in Python rather than shell: this is byte counting against git, and
-# the first, shell version skipped files silently while reporting a clean pass.
+# Written in Python: this is byte counting against git, and in shell it is
+# easy to skip a file silently while reporting a clean pass.
 enc_out=$(cd "$ROOT" && python3 - <<'ENCPY'
 import subprocess
 def git(*a):
@@ -321,21 +249,15 @@ def git(*a):
     if r.returncode != 0:
         raise SystemExit("git %s failed" % " ".join(a))
     return r.stdout
-# -z, NOT the default. Without it git C-quotes any path holding a space, a
-# tab, a quote or a byte above 127 -- "l\303\244tin.txt" -- and open() then
-# fails on the literal quoted string, so four readable files were reported as
-# unreadable and the whole gate went red. No such path exists in this tree
-# today; -z means one never can. Found by review 2026-09-09.
+# -z, NOT the default. Without it git C-quotes any path that holds a tab, a
+# quote, a backslash or a byte above 127 -- "l\303\244tin.txt" -- and open()
+# then fails on the quoted string.
 files = [f for f in git("ls-files","-z").decode("utf-8","surrogateescape").split(chr(0)) if f]
 # THE w/ COLUMN, NOT THE i/ COLUMN. `ls-files --eol' prints both: i/ is the
 # blob in the index, w/ is the file on disk, and this check reads the file on
-# disk. Testing both together got sigel_slave.mak wrong: while D31 was being
-# made, its index blob read i/-text -- the version still in HEAD held two
-# \r\r\n, which git's own heuristic calls binary -- against a working file of
-# plain w/lf. That would have dropped a tracked text file out of the check
-# entirely. BOTH COLUMNS READ lf ONCE D31 IS COMMITTED, so the demonstration is
-# gone and only the rule survives; do not "simplify" this back to cols[0].
-# Found by testing, 2026-09-09.
+# disk. The two differ while a change is not yet staged (git add), and testing
+# i/ could then drop a tracked text file out of the check. Do not change this to
+# test the whole first column.
 binary = set()
 for line in git("ls-files","--eol","-z").decode("utf-8","surrogateescape").split(chr(0)):
     if not line: continue
@@ -347,7 +269,6 @@ ok = bad = binfiles = unreadable = 0
 for rel in files:
     try: cur = open(rel,"rb").read()
     except OSError: cur = None
-    # --- line endings ---
     if cur is None:
         unreadable += 1
         print("  %s: tracked but unreadable" % rel)
@@ -358,14 +279,9 @@ for rel in files:
         print("  %s: CRLF is back (%d pairs)" % (rel, cur.count(b"\r\n")))
     else:
         ok += 1
-# EVERY TRACKED FILE MUST LAND IN EXACTLY ONE BUCKET. AS THE LOOP IS WRITTEN
-# ABOVE THIS CANNOT FAIL -- the four branches are one if/elif chain over `files',
-# so the identity holds by construction. It is kept anyway, and the honest
-# reason is not that it catches something today: the FIRST version of this gate
-# had a bare `continue' for binaries that landed in no bucket at all, and a file
-# acquiring a NUL then dropped out of the check and out of the totals with no
-# number saying so. This line makes that shape fail loudly if anyone writes it
-# again. Do not quote it as coverage. Found by review 2026-09-09.
+# Every tracked file must land in exactly one bucket. The if/elif chain above
+# makes this true by construction. The test is there so that an edit which
+# lets a file fall out of every bucket fails loudly. It is not coverage.
 if ok + bad + binfiles + unreadable != len(files):
     raise SystemExit("encodings: %d files but %d + %d + %d + %d accounted" %
                      (len(files), ok, bad, binfiles, unreadable))
@@ -377,35 +293,27 @@ ep=$(enc_field '\([0-9]*\) ')
 ef=$(enc_field '[0-9]* \([0-9]*\) ')
 eb=$(enc_field '[0-9]* [0-9]* \([0-9]*\) ')
 eu=$(enc_field '[0-9]* [0-9]* [0-9]* \([0-9]*\)')
-# ZERO, and it stays zero. The tree is LF only since 2026-09-09, so there is no
-# pre-existing damage left to carry: the 25 files 03ac805 stripped are no longer
-# a special case, they are simply what every file looks like now. Never raise
-# this to make a diff go away -- a non-zero count means CRLF has come back.
+# Zero. A non-zero count means CRLF has come back; never raise this to make a
+# failure go away.
 ENC_BASELINE=0
-# A FLOOR, because zero failures is also what a check that ran over nothing
-# reports. `git ls-files' returning empty gives COUNTS 0 0 0 0, whose four
-# numbers are all NON-EMPTY, so the empty-result branch below does not catch it:
-# the gate printed a green row having read no files at all. The helper above now
-# aborts on a non-zero git status, and this floor is the second half -- the tree
-# holds 600 tracked files, so anything under 500 means the check did not run.
+# A floor on the files SEEN, because zero failures is also what a check that
+# read nothing reports. `git ls-files' returning empty gives COUNTS 0 0 0 0,
+# whose four numbers are all non-empty, so the empty-result branch below does
+# not catch it. The tree has about 600 tracked files, so fewer than 500 means
+# the check did not run.
 #
-# IT COUNTS FILES SEEN, NOT FILES THAT PASSED, AND IT IS TESTED LAST. Both
-# matter, and the first version got both wrong. `ep' alone is the LF-only count,
-# which a tree-wide CRLF regression drives to ZERO -- exactly the case D31 says
-# this gate exists for, a clone with core.autocrlf=true -- so the floor fired
-# first and reported "it did not run", blaming the harness, and recorded ONE
-# failure for 611 broken files. Found by review 2026-09-09.
+# It counts files seen, not files that passed, and it is tested last. A
+# tree-wide CRLF regression drives the LF-only count to zero; tested first, or
+# on that count, the floor would report "it did not run" and one failure
+# instead of every CRLF file.
 ENC_FLOOR=500
-# Fail CLOSED on an empty result. The failure this catches is "python exited 0
-# but printed no COUNTS line": $ep/$ef come back empty, the numeric test errors,
-# and because that is an `if' CONDITION set -e does not fire -- so the gate used
-# to print blanks and score 0/0 while claiming to have run.
+# Fail closed on an empty result. If python exits 0 but prints no COUNTS line,
+# the fields come back empty, the numeric test errors, and because that is an
+# `if' condition set -e does not fire.
 #
-# If python exits NON-zero instead, set -e trips on the enc_out assignment above
-# and the script stops there, printing no encodings row and no total: line. That
-# is loud rather than silent, so it is left alone -- but a reader should not
-# expect this branch to be what handles it. An earlier version of this comment
-# said set -e does not fire at all, which is wrong.
+# If python exits non-zero instead, set -e stops the script at the enc_out
+# assignment above, with no encodings row and no total line. That is loud, so
+# it is left as it is; this branch does not handle it.
 if [ -z "$ep" ] || [ -z "$ef" ] || [ -z "$eb" ] || [ -z "$eu" ]; then
     echo "  encodings check produced no COUNTS line -- treating as FAILED"
     printf '%-22s %2d pass  %2d fail\n' "encodings" 0 1
@@ -422,8 +330,7 @@ elif [ "$((ep+ef+eb+eu))" -lt "$ENC_FLOOR" ]; then
     printf '%-22s %2d pass  %2d fail  (saw only %d tracked files, floor is %d -- it did not run)\n' \
            "encodings" 0 1 "$((ep+ef+eb+eu))" "$ENC_FLOOR"
     fail=$((fail+1))
-    # NOT $ep. The row says 0 pass, so 0 pass is what the total must get: the
-    # first version printed 0 and added up to 499 phantom passes to `total:'.
+    # Not $ep: the row says 0 pass, so the total must get 0.
     ep=0
 else
     printf '%-22s %2d LF-only  %2d CRLF, %s binary (git)\n' \
@@ -432,13 +339,13 @@ fi
 pass=$((pass+ep))
 
 # ---------------------------------------------------------------------------
-# Widgets whose behaviour no gate reads.
+# DISpinBox's decimal text. `gui behaviour' steps and types whole numbers into
+# DISpinBoxes; only this probe types a fraction or a comma.
 #
-# Same blind spot as `parsers' below, one layer up: DISpinBox overrides Qt's
-# text/value mapping, and a conversion that compiles perfectly can still throw
-# away what the user typed. Qt 6's QSpinBox::validate()/fixup() are an INTEGER
-# parser and run BEFORE the virtual valueFromText, so "0.375" became 0 and the
-# override never saw the fraction. Nothing else here could see that.
+# DISpinBox overrides Qt's text/value mapping, and code that compiles can still
+# lose what the user typed. Qt 6's QSpinBox::validate() and fixup() parse an
+# INTEGER and run BEFORE the virtual valueFromText, so "0.375" can become 0
+# before the override sees the fraction.
 cat > /tmp/dsp.$$.cpp <<'DSPEOF'
 #include "MT_GUI/DoubleSpinBox.h"
 #include <QApplication>
@@ -487,28 +394,25 @@ int main(int c, char **v)
     // QDoubleValidator hard-coded '.'. Qt 6's validators follow the system
     // locale while QString::toDouble does not, so without QLocale::c() on the
     // validator a comma-decimal locale reads 0.375 as 0. This row runs the same
-    // input under de_DE and is the only thing here that can see that.
+    // input under de_DE.
     QLocale::setDefault(QLocale(QLocale::German, QLocale::Germany));
     P g(3); g.setRange(3, 0.0, 100.0); g.type("0.375");
     eq("3dp text de_DE",  g.text(),                  "0.375");
     eq("3dp value de_DE", QString::number(g.value()), "375");
-    // ...and pinning to QLocale::c() is NOT sufficient on its own, which is the
-    // trap these rows exist for. C's GROUP separator is ',', so a bare
-    // QLocale::c() validator accepts "0,375" as 375-with-a-group-separator, and
-    // QString::toDouble() -- which never takes group separators -- then returns
-    // 0. Qt 2 could not: its validator ran the whole string through strtod and
-    // demanded it be consumed to the NUL (qstring.cpp toDouble), so ok was false
-    // and validate() returned Invalid outright -- the keystroke was refused.
+    // Pinning to QLocale::c() is NOT enough on its own, and these rows exist
+    // for that trap. C's GROUP separator is ',', so a bare QLocale::c()
+    // validator accepts "0,375" as 375 with a group separator, and
+    // QString::toDouble(), which never takes group separators, then returns 0.
+    // Qt 2's validator ran the whole string through strtod and required all of
+    // it to be consumed, so validate() returned Invalid and the keystroke was
+    // refused.
     //
-    // Asserted through lineEdit()->validator(), which is the object the locale
-    // is pinned on and is reachable with public API: DISpinBox::validate() is
-    // private (DoubleSpinBox.h), and a probe calling it through a derived struct
-    // does not compile -- which silently took the whole widgets section, this
-    // block and the C6 rows above it, out of the build when first written.
+    // Asserted through lineEdit()->validator(), the object the locale is
+    // pinned on: DISpinBox::validate() is private (DoubleSpinBox.h), and a
+    // probe that calls it through a derived struct does not compile.
     //
     // Invalid, not merely "not Acceptable": without RejectGroupSeparator the
-    // state is Intermediate, so only checking for Acceptable passes either way
-    // and the row cannot see the bug it exists for.
+    // state is Intermediate, so a test for Acceptable passes either way.
     vcomma("de_DE", QLocale(QLocale::German, QLocale::Germany));
     vcomma("C", QLocale::c());
     QLocale::setDefault(QLocale::c());
@@ -534,18 +438,16 @@ pass=$((pass+wp)); fail=$((fail+wf))
 rm -f /tmp/dsp.$$ /tmp/dsp.$$.cpp /tmp/dspb.$$
 
 # ---------------------------------------------------------------------------
-# Parsers that no gate reads.
+# SIG_GPPVMHost's parser.
 #
-# Every other check here is a COMPILE check, and the four behaviour gates only
-# exercise what a fitness evaluation touches. A file format the program parses
-# but the gates never open is therefore covered by nothing at all -- which is
-# exactly how Qt 2's QTextStream::operator>>(char&) skipping whitespace, and
-# Qt 6's not, survived the whole of SIGEL_GP's conversion while every gate
-# stayed green. It emptied the slave directory of every PVM host.
+# The other gates read only the experiments' own host line, `. 1 1 "."'. This
+# probe adds a named host, a path with several parts, and a path with a space.
+# Qt 2's QTextStream::operator>>(char&) skipped whitespace and Qt 6's does
+# not, which changes how a PVM host line is read; with it wrong, every host
+# loses its slave directory.
 #
-# Kept as a heredoc rather than a committed .cpp for the same reason the header
-# pass is: it needs no source file of its own, and the expectations belong next
-# to the reason they exist.
+# A heredoc rather than a committed .cpp: it needs no source file of its own,
+# and the expectations belong next to the reason they exist.
 cat > /tmp/pvm.$$.cpp <<'PVMEOF'
 #include "SIGEL_GP/SIG_GPPVMHost.h"
 #include <QString>
@@ -596,25 +498,22 @@ pass=$((pass+pp)); fail=$((fail+pf))
 rm -f /tmp/pvm.$$ /tmp/pvm.$$.cpp /tmp/pvmb.$$
 
 # ---------------------------------------------------------------------------
-# Qt 2 item virtuals that Qt 6 does not call any more.
+# Qt 2 item virtuals that Qt 6 no longer calls.
 #
-# QListViewItem::key( int, bool ) drove QListView's sort (qlistview.cpp:802).
-# QTreeWidgetItem has no key() at all -- it sorts through operator< -- so the
-# moment C7 renamed the base class, SIG_IndividualListItem::key() became dead
-# code that still compiles, still looks right, and is never called. The
-# individuals list silently fell back to sorting column 0 as raw TEXT:
-# 0, 1, 10, 100, 11 where 1.3 shows 0, 1, 2, ... 10. The 1.3 binary confirmed
-# the numeric order. Nothing in a compiler or in the dead-signal gate can see
-# this: it is a virtual that stopped being virtual.
+# QListViewItem::key( int, bool ) drove QListView's sort. QTreeWidgetItem has
+# no key(); it sorts through operator<. A class that still declares key() but
+# not operator< compiles and looks right. But key() is never called, and the
+# list sorts column 0 as raw TEXT: 0, 1, 10, 100, 11. 1.3 shows 0, 1, 2 ... 10.
+# Neither the compiler nor the dead-signal check can see this.
 #
-# Rule: a class that still declares one of these must also declare the Qt 6
-# member that replaced it.
+# Rule: a class that declares key(int, ...) must also declare
+# operator<( const QTreeWidgetItem & ).
 kp=0; kf=0
-# Flattened to one line before matching: review demonstrated that a declaration
-# split as "QString\nkey(int, bool) const;" was invisible to a line-based grep,
-# and that a decoy "operator<( QTreeWidgetItem * )" -- a pointer parameter, which
-# overrides nothing -- was accepted. The signature below is the one that actually
-# overrides QTreeWidgetItem::operator<. find, not a fixed-depth glob.
+# Each header is flattened to one line before matching, so a declaration split
+# over two lines is still found. The operator< pattern is the signature that
+# overrides QTreeWidgetItem::operator<; "operator<( QTreeWidgetItem * )" takes
+# a pointer, overrides nothing and must not count. find, not a fixed-depth
+# glob.
 for h in $(find "$SRC/include" -name '*.h' | sort); do
     flat=$(tr '\n' ' ' < "$h")
     printf '%s' "$flat" | command grep -qE 'QString[[:space:]]+key[[:space:]]*\([[:space:]]*int' || continue
@@ -633,40 +532,32 @@ pass=$((pass+kp)); fail=$((fail+kf))
 # ---------------------------------------------------------------------------
 # A freed pointer kept behind a guard that still passes.
 #
-# SIG_Simulation's constructor throws whenever SIMULATIONLIBRARY names the
-# Dynamo backend, deleted on 2026-08-28 (PORTING.md, "Dynamo removed"). That throw
-# unwinds out of visualizeThis() BETWEEN the `delete visualisation;' and the
-# assignment meant to replace it, so without an explicit null the member keeps
-# the pointer it just freed. Twenty-one sites dereference it behind fourteen
-# `if (visualisation)' guards -- the guard passes -- and, because `visualisation'
-# is a BASE-class member whose base destructor does `delete visualisation'
-# (SIGEL_CommonGUI/SIG_VisualisationWidget.cpp, ~SIG_VisualisationWidget), destroying the widget after
-# such a throw is a double free as well.
+# SIG_Simulation's constructor throws when SIMULATIONLIBRARY names the removed
+# Dynamo backend. In visualizeThis() that throw leaves BETWEEN
+# `delete visualisation;' and the assignment that replaces it, so without an
+# explicit null the member keeps the pointer it just freed. The
+# `if (visualisation)' guards then pass, and because the base destructor
+# (SIGEL_CommonGUI/SIG_VisualisationWidget.cpp, ~SIG_VisualisationWidget) also
+# deletes `visualisation', destroying the widget afterwards is a double free.
 #
-# Guarded rather than trusted because the null LOOKS redundant three lines above
+# Checked because the null LOOKS redundant two lines above
 # `visualisation = new ...' and reads like tidying.
 #
-# WHAT THIS CAN AND CANNOT SEE. An earlier version counted only the exact
-# spelling `delete visualisation;' and required delete-count == null-count; a
-# fresh-eyes review then showed THREE false passes, because a second delete in
-# any other spelling was invisible to the count and so kept the two equal.
-# It now requires exactly ONE delete of that member, in any spelling a regex can
-# reach, and that it be followed by a null. Still invisible, and stated rather
-# than papered over: a delete through an ALIAS
-# (`SIG_SimulationVisualisation *v = visualisation; delete v;'). No grep closes
-# that; it needs the compiler or a human.
+# Rule: exactly ONE delete of that member, in any spelling the regex can reach,
+# followed by a null. Not visible to this check: a delete through an ALIAS
+# (`SIG_SimulationVisualisation *v = visualisation; delete v;'). No grep can
+# see that; it needs the compiler or a human.
 #
 # A `delete visualisation' in this widget's OWN destructor would fail here, and
 # that is correct rather than a false alarm: the base destructor already frees
 # it, so a second one is a double free, not a leak fix.
 vp=0; vf=0
 vsrc=$SRC/src/SIGEL_SlaveGUI/SIG_SimulationVisualisationWidget.cpp
-# Comments stripped and newlines flattened before matching, for the same reason
-# the item-virtuals check above flattens: the delete, its explanation and the
-# null sit on separate lines and a line-based grep would see none of the pair.
-# LC_ALL=C because this file is Latin-1 (4 of its 781 lines carry non-ASCII
-# bytes) and flattening puts them all on ONE line: under a UTF-8 locale that
-# line is invalid multibyte, which is the silent-skip TRAP in PORTING.md.
+# `//' comments are stripped and newlines flattened before matching: the
+# delete and the null sit on separate lines, and a line-based grep would not
+# see the pair.
+# LC_ALL=C, so that a byte that is not valid in the caller's locale cannot make
+# grep treat the one flattened line as binary and skip it.
 vflat=$(LC_ALL=C sed 's://.*::' "$vsrc" | tr '\n' ' ' | tr -s ' ')
 vdel=$(printf '%s' "$vflat" | LC_ALL=C command grep -oE \
        'delete *\(* *(this-> *)?visualisation *\)* *;' | wc -l)
@@ -689,28 +580,23 @@ pass=$((pass+vp)); fail=$((fail+vf))
 # ---------------------------------------------------------------------------
 # Controls the user cannot see or reach.
 #
-# The one real user-facing defect SIGEL_SlaveGUI turned up was a QGroupBox too
-# small to hold its own children: seven 50x50 navigation buttons and three
-# position readouts, all present, enabled and correctly sized, all clipped out
-# of existence by a container that had collapsed to 90x37. No widget-level probe
-# saw it -- every child reported healthy -- and it took a screenshot of the
-# running program to notice. This is that defect made mechanical: walk every
-# View page and every tab and report any widget whose rect leaves its parent.
+# A container too small for its children hides them, while every child still
+# reports itself present, enabled and correctly sized. No widget-level probe
+# sees that. The clipcheck scenario walks every View page and every tab and
+# reports any widget whose rect leaves its parent.
 #
 # The scenario carries its own positive control and FAILS if the control does
 # not fire, because "0 clipped" from a check that cannot detect clipping is
-# worth nothing. Shrinking the window is NOT usable as that control here -- the
-# converted pages carry real layouts and reflow instead of clipping, where 1.3
-# is absolutely positioned and does clip. So it displaces a real widget instead
-# and requires the report.
-# BUILD IT FIRST. This section and the one below it run 240 lines BEFORE the
-# `gui behaviour' section that builds guidrive, so until 2026-09-05 the first
-# ./checks/check.sh after editing guidrive.cpp -- or after editing anything guidrive
-# links -- scored a STALE binary here and a fresh one there. That is the exact
-# shape fitness-check.sh and pvm-check.sh already guard against, applied to the
-# wrong end of this script. Note also that `make -q' with no target answers
-# for `all', which does NOT depend on guidrive: it reports up to date while
-# build/guidrive is stale. Name the target.
+# worth nothing. Shrinking the window cannot be the control: the pages carry
+# real layouts and reflow instead of clipping, where 1.3 is absolutely
+# positioned and does clip. So it moves one real widget outside its parent and
+# requires the report.
+#
+# guidrive is BUILT HERE, before its first use. If that build fails, only a
+# message is printed: `no clipped controls' and `slave gui' then run the
+# previous binary, and only `form minimums' fails, because it tests `make -q'.
+# `make -q' or `make' with no target answers for `all', which does NOT depend
+# on guidrive, so always name the target.
 if ! make -s -C "$ROOT" guidrive sigelApp >/tmp/gdb.$$ 2>&1; then
     echo "  guidrive does not build; the two clip checks below prove nothing:"
     tail -6 /tmp/gdb.$$ | sed 's/^/    /'
@@ -733,37 +619,25 @@ pass=$((pass+cp)); fail=$((fail+cf))
 # ---------------------------------------------------------------------------
 # Forms that can be dragged smaller than Qt 6 can lay them out.
 #
-# The question clipcheck structurally CANNOT ask. clipcheck walks widgets at
-# one size and reports any child that leaves its parent; this asks what the
-# smallest permitted size IS. An explicit <minimumSize> in a .ui becomes
-# setMinimumSize(), which overrides minimumSizeHint() -- so a form whose
-# declared minimum is below what its layout needs can be dragged down until its
-# children compress, and a walk at the default size sees nothing wrong. Six
-# forms were in that state until 2026-09-05; MT_StatisticsWidgetBase was the
-# worst, 220x390 against a needed 402x555, and it sits in the MetaTrainer's
-# QSplitter where a user can really drag it there.
+# clipcheck walks the widgets at one size. This asks what the smallest
+# permitted size IS. An explicit <minimumSize> in a .ui becomes
+# setMinimumSize(), which overrides minimumSizeHint(), so a form whose declared
+# minimum is below what its layout needs can be dragged down until its
+# children compress, and a walk at the default size sees nothing wrong.
+# MT_StatisticsWidgetBase sits in the MetaTrainer's QSplitter, where a user can
+# really drag it that small.
 #
-# All TWENTY forms are measured, not the six that were wrong -- the scenario
-# asserts the corpus is 20, so a shortened list cannot pass by testing nothing,
-# which is the shape this file has been bitten by three times.
+# All twenty forms are measured, and the scenario asserts that there are 20,
+# so a shortened list cannot pass by testing nothing.
 #
-# The teeth: guidrive's own selftest forces one form's minimum below its hint
-# and requires the same comparison to report it, so "TOO SMALL: 0" is not a
-# clean result from a check that cannot fire. Measured the other way too --
-# putting MT_StatisticsWidgetBase back to 220x390 makes this section fail by
-# name. See PORTING.md.
+# The scenario's selftest forces one form's minimum below its hint and
+# requires the same comparison to report it, so "TOO SMALL: 0" comes from a
+# check that can fire. To test this row: set MT_StatisticsWidgetBase's
+# minimum to 220x390; the row then fails with "TOO SMALL: 1".
 #
-# FOUR CAUSES, FOUR MESSAGES. The first version collapsed "a form is too small",
-# "guidrive is stale", "timeout killed it" and "it crashed" into one sentence
-# asserting the first -- and on the stale path /tmp/fmin.$$ was never created,
-# because the `&&' short-circuits before the redirect, so the operator got that
-# assertion with an empty body and no hint that the binary was the problem.
-# `programs' and `slave gui' both do better and this now follows them. Stderr is
-# KEPT for the same reason `gui behaviour' keeps it: a crash, a Qt fatal or a
-# timeout kill lands there and nowhere else. Found by review.
-#
-# `make -q' carries -C "$ROOT" because this script never cd's; without it the
-# section depended on the caller's working directory.
+# A stale binary, a timeout, a killed process, a failed run and a wrong form
+# count each get their own message. Stderr is kept, because a crash or a Qt
+# fatal shows up there and nowhere else.
 mp=0; mf=0
 : > /tmp/fmin.$$
 if ! make -q --no-print-directory -C "$ROOT" guidrive sigelApp 2>/dev/null; then
@@ -771,18 +645,12 @@ if ! make -q --no-print-directory -C "$ROOT" guidrive sigelApp 2>/dev/null; then
     echo "  build/guidrive or sigelApp/ is missing or out of date -- this section did NOT"
     echo "  run. Build it with 'make guidrive sigelApp'."
 else
-    # `|| mrc=$?', not a bare run followed by `mrc=$?'. This script sets -e and
-    # this call is a plain command in an `else' branch, so a non-zero formsize
-    # made the SHELL exit right here: no form-minimums line, no pagesave
-    # section, no forms section, no total. The silent-short-run shape this
-    # file guards against everywhere else, in the one place that could not
-    # report it.
+    # `|| mrc=$?', not a bare run followed by `mrc=$?': under set -e a
+    # non-zero formsize would stop the whole script here, with no row and no
+    # total.
     #
-    # TWO of the branches below, not three: `mrc = 124' and `mrc != 0' were
-    # unreachable dead code, but the `ngot != nui' one sits on the mrc=0 path
-    # and has been live throughout -- guidrive returns 0 only when it measured
-    # 20 forms, so that branch fires on a 21st .ui nobody added to the
-    # scenario's table, which is what it is for. Corrected by review.
+    # guidrive returns 0 only when it measured 20 forms, so the `ngot != nui'
+    # branch below fires on a 21st .ui that the scenario's table lacks.
     mrc=0
     SIGEL_ROOT="$APP" QT_QPA_PLATFORM=offscreen \
       SIGEL_EXP="$ROOT/experiments/twoBases.exp" \
@@ -801,13 +669,8 @@ else
         echo "  means nothing:"
         tail -4 /tmp/fmin.$$ | sed 's/^/    /'
     elif [ "$mrc" -gt 128 ]; then
-        # A KILLED PROCESS IS NOT A FORM DEFECT. This branch used to lead with
-        # "a form declares a minimum below what Qt 6 needs" for EVERY non-124
-        # status, which includes 137 (SIGKILL, i.e. the OOM killer this file
-        # warns about at the pagesave section) and 139 (SIGSEGV). It had never
-        # run in production to show that, because until 2026-09-07 `set -e'
-        # killed the script before it -- so the message was never read against
-        # a real signal. Split out by review.
+        # A killed process is not a form defect: 137 is SIGKILL, often the OOM
+        # killer, and 139 is SIGSEGV.
         mf=1
         echo "  formsize was KILLED by signal $((mrc-128)) -- it did not finish,"
         echo "  so its result means nothing. 137 is SIGKILL: CHECK FREE MEMORY"
@@ -835,26 +698,23 @@ rm -f /tmp/fmin.$$ /tmp/fmerr.$$
 printf '%-22s %2d pass  %2d fail\n' "form minimums" "$mp" "$mf"
 pass=$((pass+mp)); fail=$((fail+mf))
 
-# The same defect, in the two containers where it was actually FOUND -- and
-# clipcheck cannot see either of them. Its own comment says so: the slave's
-# simulation window and its movie-settings dialog belong to the slave, not to
-# anything the master's menus can open, so they are walked by the `slavegui'
-# scenario instead. Nothing here ran `slavegui', so until this section existed
-# BOTH fixes -- GroupBox6 "Navigation" 90x37 against a needed 220x331, and
-# groupboxDirectory "File conventions" 465x37 against 401x99 -- were ungated,
-# while PORTING.md said they were gated by the section above. Found by review.
+# The same check for the slave's simulation window and its movie-settings
+# dialog. clipcheck cannot reach either: they belong to the slave, not to
+# anything the master's menus open, so the `slavegui' scenario walks them. The
+# two containers that clipped there are GroupBox6 "Navigation" and
+# groupboxDirectory "File conventions"; their <minimumSize> blocks prevent it.
 #
-# This greps the two totals rather than diffing the whole scenario, because the
-# rest of slavegui's output covers a GL view that does not render offscreen and
-# would baseline noise. The teeth are the fixes themselves: deleting either
-# <minimumSize> block from its .ui and rebuilding makes the matching line
-# non-zero and this section fail -- measured both ways, see PORTING.md.
+# This reads the two totals and does not diff the whole scenario. The rest of
+# slavegui's output covers a GL view that does not render offscreen, and would
+# put noise in a baseline. To test this row: delete either <minimumSize> block
+# from its .ui and rebuild; the matching line becomes non-zero and the row
+# fails.
 #
-# Its stderr is KEPT, not discarded, because this is also the only run of
-# SIGEL_SlaveGUI in the whole gate: 44 SIGNAL( and 44 SLOT( sites that had no
-# runtime coverage at all until now. Same positive control as the two sections
-# below -- guidrive makes one deliberately bogus connect at startup, so an empty
-# stderr means the logging was suppressed, not that the connects are sound.
+# Stderr is KEPT, because this is the only run of SIGEL_SlaveGUI in the gate,
+# and so the only runtime check of its string-based connects. guidrive makes
+# one deliberately bogus connect at startup; if its warning is absent, the
+# connect logging was suppressed and an empty stderr proves nothing. The
+# `gui behaviour' section explains this control in full.
 sp=0; sf=0
 if SIGEL_ROOT="$APP" QT_QPA_PLATFORM=offscreen \
        SIGEL_EXP="$ROOT/experiments/twoBases.exp" \
@@ -891,25 +751,20 @@ printf '%-22s %2d pass  %2d fail\n' "slave gui" "$sp" "$sf"
 pass=$((pass+sp)); fail=$((fail+sf))
 
 # ---------------------------------------------------------------------------
-# The structural fingerprint tool's own teeth.
+# expstruct.py's self-test.
 #
-# expstruct.py is what compares an evolved .exp across the two architectures
-# (PORTING.md 9, the evolution path). Everything it concludes rests on ONE
-# property: it must be blind to fitness and sighted on structure. Fitness is
-# not a cross-machine reference in either direction -- D26 and section 7
-# measure a 1-ULP change in start height moving fitness 45%, and the reference
-# box is i386/x87 against this one's aarch64 -- while the tournament that picks
-# survivors is a bare `>=' between two of those doubles
-# (SIG_GPSimpleTournament.cpp, run). So a tool that let one fitness value reach
-# its output would report an unavoidable divergence as a regression.
+# expstruct.py compares evolved .exp files across machines by structure. It
+# must be blind to fitness and see structure. Fitness is not comparable across
+# machines: a 1-ULP change in start height moves fitness by 45 %, and the
+# reference machine is i386/x87 where this one is aarch64. The tournament that
+# picks survivors is a bare `>=' between two such doubles
+# (SIG_GPSimpleTournament.cpp, run). A tool that let fitness into its report
+# would report an unavoidable difference as a regression.
 #
-# --selfcheck asserts BOTH halves, because a tool that saw nothing at all would
-# pass the fitness half on its own: a changed FITNESS value must not move the
-# report, a changed program operand must, and two swapped individuals must.
-# It compares the WHOLE report including SHAPE -- an earlier version compared
-# only the counts and the content hashes, and could not have caught fitness
-# leaking into SHAPE. Teeth-tested by disabling both fitness filters (caught)
-# and by blinding the program matcher (caught).
+# --selfcheck asserts BOTH halves, because a tool that saw nothing would pass
+# the fitness half alone: a changed FITNESS value must not move the report,
+# while a changed program operand and two swapped individuals must. It
+# compares the WHOLE report, SHAPE included.
 ep=0; ef=0
 if python3 "$ROOT/checks/programs/expstruct.py" --selfcheck \
        "$ROOT/experiments/twoBases.exp" >/tmp/eps.$$ 2>&1; then
@@ -923,10 +778,8 @@ printf '%-22s %2d pass  %2d fail\n' "expstruct selfcheck" "$ep" "$ef"
 pass=$((pass+ep)); fail=$((fail+ef))
 
 # ---------------------------------------------------------------------------
-# The two programs. They are src/*.cpp, so no entry in MODULES reaches them and
-# nothing compiled them until C8 -- which is how a QMotifPlusStyle that Qt 6
-# does not have, and a pthread_create cast C++17 rejects, both survived this
-# far. C9 needs them to build, link and run; this covers the first of the three.
+# The two programs, sigel and sigel_slave. They are src/*.cpp, so the module
+# loop does not reach them.
 pp=0; pf=0
 for prog in sigel sigel_slave; do
     if g++ $FLAGS $INCS "$SRC/src/$prog.cpp" 2>/tmp/prog.$$; then
@@ -937,40 +790,31 @@ for prog in sigel sigel_slave; do
 done
 rm -f /tmp/prog.$$
 
-# ...but compiling was never the hard part. Every C9 defect -- a missing moc, an
-# unemitted vtable, a resource dropped from a static archive, the master
-# SIG_GPExperiment reaching the slave -- is invisible to -fsyntax-only and shows
-# up only at link. So the gate also requires the two binaries to be BUILT and
-# CURRENT, and runs the one of the two that can smoke-test itself headlessly.
+# Compiling is not enough: a missing moc, an unemitted vtable or a resource
+# dropped from a static archive shows up only at link. So the two binaries
+# must also be BUILT and CURRENT, and sigel_slave, which can test itself
+# headlessly, is run.
 #
-# Fails rather than skips when they are absent: a gate that quietly passes when
-# the thing it checks is missing is the failure mode this port has already hit
-# twice (the C7 comma probe, the C6 spin-box rows).
-# -C "$ROOT" for the reason the `form minimums' section states above: this
-# script never cd's, so without it this gate depended on the CALLER's working
-# directory and, run from anywhere else, failed into "the two programs are not
-# built or are out of date" -- blaming the build for the invocation. That
-# comment was written 165 lines up and this line was missed. Found by review.
+# Missing binaries fail rather than skip: a check that passes when the thing
+# it checks is missing tests nothing.
 if make -q --no-print-directory -C "$ROOT" programs sigelApp 2>/dev/null; then
     for prog in sigel sigel_slave; do
         f=$ROOT/build/$prog
         if [ ! -x "$f" ]; then
             pf=$((pf+1)); echo "  build/$prog missing"
         elif [ "$(head -c 4 "$f" | tail -c 3)" != ELF ]; then
-            # A SHELL WRAPPER LEFT IN PLACE OF THE BINARY PASSED EVERYTHING
-            # ELSE. It is -x, it execs the real binary so the smoke test below
-            # still prints the no-PVM guard, and `make -q' calls the target
-            # current because the wrapper's mtime is newer than every
-            # prerequisite -- so the link recipe never runs and neither does
-            # the ctor_size assertion inside it. Measured: check.sh went fully
-            # green against a 122-byte /bin/sh script standing in for
-            # sigel_slave. Found by review.
+            # A SHELL WRAPPER in place of the binary would pass everything
+            # else. It is -x, and it can exec the real binary, so the smoke
+            # test below still sees the no-PVM guard. `make -q' calls the
+            # target current, because the wrapper is newer than every
+            # prerequisite, so the link recipe and its ctor_size assertion
+            # never run.
             pf=$((pf+1)); echo "  build/$prog is not an ELF binary"
         else pp=$((pp+1)); fi
     done
-    # sigel_slave with no PVM daemon must reach its own guard and exit cleanly.
-    # sigel needs a display and starts a pvmd, so its run is driven by hand and
-    # against the 1.3 oracle -- see PORTING.md C9.
+    # sigel_slave with no PVM daemon must reach its own guard and print its
+    # no-PVM message.
+    # sigel needs a display and starts a pvmd, so it is not run here.
     out=$(SIGEL_ROOT="$APP" QT_QPA_PLATFORM=offscreen \
           timeout 60 "$ROOT/build/sigel_slave" 2>&1 </dev/null || true)
     case $out in
@@ -988,24 +832,21 @@ printf '%-22s %2d pass  %2d fail\n' "programs" "$pp" "$pf"
 pass=$((pass+pp)); fail=$((fail+pf))
 
 # ---------------------------------------------------------------------------
-# The master GUI's structure, against what the running SIGEL 1.3 actually shows.
+# The master GUI's structure, against what the running SIGEL 1.3 shows.
 #
-# Every other check here proves code COMPILES or LINKS. This one checks what the
-# user sees: each menu entry and toolbar button with its shortcut, its enabled
-# state and its check state. guidump-baseline.txt is not a snapshot of whatever
-# the port emitted -- the 42 menu entries the 1.3 oracle read off the RUNNING
-# 1.3 binary were diffed against it mechanically, zero mismatches, so a
-# difference here is a regression against 1.3 itself.
+# Each menu entry and toolbar button, with its shortcut, enabled state and
+# check state, against guidump-baseline.txt. The 42 menu entries read off the
+# running 1.3 binary match that file, apart from one deliberate divergence
+# named in its header. So a difference here is a difference from 1.3.
 #
-# It is the only thing that can see an accelerator that went missing, an action
-# that stopped being greyed, a toolbar button showing the long menu label
-# instead of the short one, or a checkable action that quietly stopped being
-# checkable. All of those compile, link and run perfectly.
+# It sees what compiles, links and runs but is still wrong: a lost
+# accelerator, an action that is no longer greyed, a toolbar button that shows
+# the long menu label instead of the short one, or an action that is no longer
+# checkable.
 gp=0; gf=0
 if [ -d "$ROOT/build/lib" ] && [ -d "$ROOT/build/obj/moc" ]; then
     cat > /tmp/gui.$$.cpp <<'GUIEOF'
-// Headless structural dump of the ported GUI, in the same shape the 1.3 oracle
-// reports, so the two can be diffed mechanically.
+// Headless dump of the GUI's structure, in the shape of guidump-baseline.txt.
 #include <QApplication>
 #include <QMenuBar>
 #include <QMenu>
@@ -1057,11 +898,11 @@ int main(int argc, char **argv)
         }
     }
     // The individuals list sorts through SIG_IndividualListItem::key(), which
-    // zero-pads so the compare is NUMERIC. The 1.3 oracle read these exact
-    // Fitness values off the running binary and reported the e-05 values
-    // sorting first; as raw text 1.14825 would lead. This also pins the
-    // exponent branch of key(), where Qt 2's unsigned truncate() silently
-    // became a signed one that cleared the string.
+    // zero-pads so that the compare is NUMERIC. The running 1.3 binary sorts
+    // these Fitness values with the e-05 values first; as raw text 1.14825
+    // would lead. This also covers the exponent branch of key(): Qt 2's
+    // truncate() took an unsigned length, Qt 6's takes a signed one, and a
+    // negative length clears the string.
     printf("== FITNESS SORT ==\n");
     {
         QTreeWidget t; t.setColumnCount(3);
@@ -1108,126 +949,95 @@ printf '%-22s %2d pass  %2d fail\n' "gui vs 1.3" "$gp" "$gf"
 pass=$((pass+gp)); fail=$((fail+gf))
 
 # ---------------------------------------------------------------------------
-# Phase C, step C10 -- what the GUI DOES, not merely what it shows.
+# What the GUI DOES, not only what it shows.
 #
-# `gui vs 1.3' above is static: menus, toolbars, and the values a freshly
-# loaded experiment displays. It cannot see a wrong answer to a click, because
-# nothing in it ever clicks. This section drives the real SIG_MainWindow with
-# real Qt input events -- QTest posts QMouseEvent, QKeyEvent and
-# QContextMenuEvent through QApplication::notify, so hit-testing, menu popups,
-# item-view selection and the slots behind them all run. It is NOT the same as
-# a mouse -- bypassing QWindowSystemInterface changes activation, grabs and
-# double-click synthesis -- so this proves the application's logic, not the
-# platform layer's. guidrive.cpp's header says so at more length.
+# `gui vs 1.3' above is static and cannot see a wrong answer to a click. This
+# section drives the real SIG_MainWindow with Qt input events: QTest posts
+# QMouseEvent, QKeyEvent and QContextMenuEvent through QApplication::notify, so
+# hit-testing, menu popups, item-view selection and the slots behind them all
+# run. It bypasses QWindowSystemInterface, so window activation, grabs and
+# double-click synthesis are not tested here; `real clicks' below covers them.
 #
-# The behaviour matches the RUNNING 1.3 binary, compared on
-# twoBasesSimpleFitness2.exp; the values are the port's own for twoBases.exp.
-# guibehaviour-baseline.txt says which fact came from where. On twoBases.exp,
-# reverting the deletion fix makes the scenario exit 1; `nameIsASurvivor=0'
-# covers a stale index that stays in range. SURVIVED is a liveness check.
+# Where a 1.3 side exists, the behaviour matches the running 1.3 binary;
+# roundtrip, metadrive, openfocus and rngseed have none. The values are the
+# port's own for twoBases.exp, and guibehaviour-baseline.txt says which fact
+# came from where. `gate' exits 1 on an out-of-range pool index after a
+# deletion, and its `nameIsASurvivor=0' line covers a stale index that stays
+# in range. SURVIVED shows only that the run did not crash.
 #
-# It needs an experiment to open, so it is skipped rather than failed when the
-# experiment file is absent.
+# It needs an experiment to open, so a missing experiment file SKIPS it,
+# loudly, and the skip fails the exit status.
 bp=0; bf=0
 BEXP=$ROOT/experiments/twoBases.exp
 if [ ! -f "$BEXP" ]; then
-    # experiments/ is tracked, so only a damaged checkout lands here. Say
-    # SKIPPED loudly and count it: reporting `0 pass 0 fail' made the section
-    # vanish from the total and left the exit status clean, which is the same
-    # shape as the three silent-short-run holes this file has already been
-    # bitten by.
+    # experiments/ is tracked, so only a damaged checkout lands here. The skip
+    # is counted: `0 pass 0 fail' would drop the section from the total and
+    # leave the exit status clean.
     echo "  SKIPPED: no $BEXP -- restore experiments/ from git, then re-run."
     echo "  THIS SECTION TESTED NOTHING."
     skipped=$((skipped+1))
 elif make -s -C "$ROOT" guidrive sigelApp >/tmp/bdb.$$ 2>&1; then
     # SIGEL_ROOT is sigelApp/, the folder SIGEL is started from: the driver
-    # loads pixmaps and terrain from it. Neither scenario spawns a sigel_slave, so neither needs one.
+    # loads pixmaps and terrain from it. No scenario here spawns a sigel_slave.
     #
-    # ELEVEN scenarios make up the baseline, concatenated in this order
-    # (`roundtrip' 2026-09-03, `metadrive' 2026-09-04, `runlock' 2026-09-05,
-    # `openfocus' 2026-09-16; this said SIX until the first of those).
-    # `runlock' is the ONLY thing that
-    # executes D29's guard in its locked state -- a review measured that both
-    # of D29's mechanisms could be reverted wholesale with all 846 checks
-    # green, and that the emit it tests IS observable, so those passes were a
-    # real absence of teeth rather than a blind probe:
-    #   gate       C10 -- the tree, sorting, add/delete/reset, the dialogs,
-    #              the context menus, the MetaGP warning
-    #   pages      C11a -- the five View pages C10 never opened, every spin
-    #              box, slider, combo, checkbox and validator on them
-    #   exportall  C11b -- all eight File > Export children, each file's
-    #              sha256, size, line count and ends. SEVEN of the eight
-    #              match what the 2003 i386 binary writes byte for byte,
-    #              checked by the oracle on twoBasesSimpleFitness2.exp. The
-    #              eighth, .lap, differs for a reason the baseline records.
-    #   overwrite  D35 -- an export over an existing file. A name without
-    #              the extension must give a date-stamped file and no prompt.
-    #              The name with it must raise the file dialog's own
-    #              confirmation, as a child of the dialog, and No must leave
-    #              the file alone.
-    #   metagui    MT_GUI -- the MetaGP window, which nothing had ever
-    #              opened. Its ten validators had never been given C7's C-locale
-    #              treatment, so an unpinned QIntValidator(0,1000) called
-    #              "1,000" ACCEPTABLE under en_US while text().toInt() returned
-    #              0: a user types one thousand and zero reaches the system.
-    #              1.3 rejects both separators -- measured on the binary -- so
-    #              the fix restores Qt 2 rather than improving on it.
-    #   openfocus  the flag guard in
-    #              SIG_ExperimentListView::slotLoadExperiment. It sends the
-    #              focus event a window manager sends while the file is being
-    #              read. Reverting the guard alone moves `orphan'; reverting
-    #              the null checks too makes it segfault, which fails the run
-    #              rather than the diff.
-    #   dialogs    C11c -- the six dialogs, C7's 21st validator, and the
-    #              select-on-focus defect. The load-bearing lines are the two
-    #              `typing "5" gives [0.015]' / `typing "2" gives [12]' ones:
-    #              Qt 6 selects a pre-filled field when a dialog hands it focus
-    #              and Qt 2 did not, so before the fix a typed digit REPLACED
-    #              the value instead of appending to it -- 2 individuals added
-    #              where 1.3 adds 12. Both figures are the oracle's, off the
-    #              running binary.
+    # ELEVEN scenarios make up the baseline, concatenated in this order:
+    #   gate       the tree, sorting, add/delete/reset, the dialogs, the
+    #              context menus, the MetaGP warning
+    #   pages      the five View pages: every spin box, slider, combo,
+    #              checkbox and validator on them
+    #   exportall  all eight File > Export children: each file's sha256, size,
+    #              line count and ends. Seven of the eight were shown
+    #              byte-identical to what the 2003 i386 binary writes; the
+    #              baseline records why the eighth, .lap, differs.
+    #   overwrite  an export over an existing file. A name without the
+    #              extension gives a date-stamped file and no prompt. The name
+    #              with it raises the file dialog's own confirmation, as a
+    #              child of the dialog, and No leaves the file alone.
+    #   dialogs    the six dialogs, their validators, and select-on-focus.
+    #              Qt 6 selects a pre-filled field when a dialog gives it focus
+    #              and Qt 2 did not, so a typed digit would REPLACE the value
+    #              instead of appending to it. The load-bearing lines are
+    #              `typing "5" gives [0.015]' and `typing "2" gives [12]':
+    #              1.3 adds 12 individuals there, not 2.
+    #   metagui    the MetaGP window. Its validators are pinned to the C
+    #              locale: unpinned, a QIntValidator(0,1000) accepts "1,000"
+    #              under en_US while text().toInt() returns 0. 1.3 rejects
+    #              both separators.
+    #   roundtrip  export, import, export on one machine. The READER must undo
+    #              a change made between the two exports, so a reader that
+    #              does nothing cannot pass. Breaking any of the five readers
+    #              moves roundtrip and not exportall, which never reads back.
+    #   metadrive  the MetaGP controls that metagui only lists: MT_Editor,
+    #              MT_AddConstantsWidget, `update statistics' and MT_GUI's
+    #              toolbar actions, each pressed. Every line is a boolean or a
+    #              count, because the constants are random.
+    #   runlock    the lock on the parameter pages while an evolution runs,
+    #              in its locked state. Nothing else executes it.
+    #   rngseed    a new experiment, a GP seed, N individuals added and saved:
+    #              pins the random stream with no PVM, simulation or fitness.
+    #   openfocus  the flag guard in SIG_ExperimentListView::slotLoadExperiment.
+    #              It sends the focus event a window manager sends while the
+    #              file is being read. Reverting the guard alone moves
+    #              `orphan'; reverting the null checks too makes it segfault,
+    #              which fails the run rather than the diff.
     #
-    # `roundtrip' IS run here as of 2026-09-03 -- PORTING.md's pagesave/roundtrip gap. This comment used
-    # to say it was not, on the grounds that "what it uniquely covers is
-    # largely covered by exportall (a broken reader moves the export)". THAT
-    # ARGUMENT IS FALSE and gating it is what showed so: gutting each of the
-    # five readers in turn moves roundtrip and NOT exportall, because exportall
-    # never reads anything back. It costs 103 s measured, against 30 for
-    # exportall -- the most expensive scenario here by 3.4x, and worth it.
     # $1 scenario, $2 outfile, $3.. extra NAME=VALUE for the child only.
-    # The extras go through env rather than being written as a prefix on the
-    # function call: a prefix would also apply to the SHELL, and bash then
-    # prints "warning: setlocale: LC_ALL: cannot change locale" on any box
-    # where the locale is not generated -- which is most of them, and is
-    # exactly the box this check is designed to run on.
-    # stderr is KEPT, appended to /tmp/berr.$$, and checked below. It used to
-    # go to /dev/null, which threw away the only thing that can catch a dead
-    # connect the $DEAD_SIGNALS regex has never heard of: Qt's own runtime
-    # "No such signal". That regex is a closed list of the nine Qt 2 spellings
-    # in §2 and matches SIGNAL( only, so a tenth kind -- or any SLOT() naming a
-    # slot that no longer exists -- was invisible to the whole gate. Injecting
-    # SIGNAL(highlighted(int)), which QTreeWidget does not have, passed every
-    # section green while Qt printed the warning into /dev/null. Found by
-    # review 2026-09-03.
+    # The extras go through env, not as a prefix on the function call: a
+    # prefix would also apply to the SHELL, and bash then prints "warning:
+    # setlocale: LC_ALL: cannot change locale" wherever the locale is not
+    # generated.
+    # Stderr is appended to /tmp/berr.$$ and checked below for Qt's runtime
+    # "No such signal" and "No such slot" warnings.
     guidrive_run() {
         local sc="$1" out="$2"; shift 2
         env "$@" SIGEL_ROOT="$APP" SIGEL_EXP="$BEXP" \
             SIGEL_SCRATCH="${TMPDIR:-/tmp}" QT_QPA_PLATFORM=offscreen \
             timeout 300 "$ROOT/build/guidrive" "$sc" > "$out" 2>>/tmp/berr.$$
     }
-    # `|| bf=1' because this runs under `set -e' with no trap: a bare `: > path'
-    # that fails (unwritable or full /tmp) would abort the WHOLE script here,
-    # with no summary line and no total -- the silent-short-run shape this file
-    # has already been bitten by three times, but applied to everything rather
-    # than one section.
+    # `|| bf=1' does NOT catch a failed `: > path' (full or unwritable /tmp):
+    # in dash a redirection error on the special built-in `:' ends the shell,
+    # with no row and no total. `true > path || bf=1' would catch it.
     : > /tmp/berr.$$ || bf=1
-    # roundtrip joined the list 2026-09-03, the other half of PORTING.md's pagesave/roundtrip gap. It is
-    # export-import-export on ONE machine and needs no 1.3 reference: its point
-    # is that the READER undoes a mutation made between the two exports, so a
-    # no-op importer -- the likelier failure -- cannot pass it. C11c had to fix
-    # exactly that: the probe used to serialise the same in-memory object twice
-    # and printed STABLE regardless. It is deterministic across runs and costs
-    # 103 s, the most expensive scenario here by a wide margin.
     if guidrive_run gate /tmp/bo.$$ && guidrive_run pages /tmp/bp.$$ \
        && guidrive_run exportall /tmp/bx.$$ && guidrive_run overwrite /tmp/bw.$$ \
        && guidrive_run dialogs /tmp/bg.$$ && guidrive_run metagui /tmp/bm.$$ \
@@ -1244,30 +1054,26 @@ elif make -s -C "$ROOT" guidrive sigelApp >/tmp/bdb.$$ 2>&1; then
             > /tmp/ball.$$
         # THE RUNTIME-CONNECT CHECK AND ITS POSITIVE CONTROL.
         #
-        # Qt says "No such signal"/"No such slot" at RUNTIME when a
+        # Qt says "No such signal" or "No such slot" at RUNTIME when a
         # string-based connect names something that does not exist. It
-        # compiles, it links, and the slot simply never fires -- the failure
-        # class C4 found. $DEAD_SIGNALS cannot replace this: it is a closed
-        # regex over the nine Qt 2 spellings in §2, matching SIGNAL( only, so a
-        # tenth kind and every bad SLOT() are invisible to it. Nor is it the
-        # other way round -- the regex is STATIC over all 14 modules while this
-        # is runtime over only what these eleven scenarios execute. Partly
-        # disjoint, so both are kept.
+        # compiles and links, and the slot never fires. $DEAD_SIGNALS does not
+        # replace this: it is a closed list of Qt 2 spellings and matches
+        # SIGNAL( only, so a new kind of dead signal and every bad SLOT() are
+        # invisible to it. Nor does this replace the regex: the regex is
+        # static over every module, while this sees only what the scenarios
+        # execute. Both are kept.
         #
-        # But Qt emits it under the logging category qt.core.qobject.connect,
-        # and categories are filterable. QT_LOGGING_RULES='*=false' in the
-        # ambient environment (guidrive_run uses `env' without -i, so the whole
-        # environment passes through) or a qtlogging.ini silences it, and an
-        # empty stderr then looks exactly like a clean run. Review demonstrated
-        # the full gate passing green with a genuinely dead connect injected.
+        # Qt logs the warning under the category qt.core.qobject.connect, and
+        # categories can be switched off: QT_LOGGING_RULES='*=false' in the
+        # environment (guidrive_run uses env without -i, so the whole
+        # environment passes through) or a qtlogging.ini. An empty stderr then
+        # looks exactly like a clean run.
         #
-        # So guidrive makes ONE deliberately bogus connect at startup and this
-        # requires its warning to be present. Same category, same mechanism --
-        # a control in `default' would not do, because qt.core.qobject.connect
-        # can be disabled on its own. An unfired control means this check could
-        # not have fired either, which is worth a failure on its own: check.sh
-        # already says of clipcheck that "0 clipped" from a check that cannot
-        # detect clipping is worth nothing.
+        # So guidrive makes ONE deliberately bogus connect at startup, and this
+        # requires its warning. It uses the same category and mechanism; a
+        # control in `default' would not do, because qt.core.qobject.connect
+        # can be switched off on its own. If the control did not fire, this
+        # check could not have fired either, and that is a failure on its own.
         CTL=guidriveStderrControl
         if ! command grep -q "$CTL" /tmp/berr.$$; then
             bf=1
@@ -1275,10 +1081,10 @@ elif make -s -C "$ROOT" guidrive sigelApp >/tmp/bdb.$$ 2>&1; then
             echo "  could not have fired, so this run proves nothing about connects."
             echo "  Unset QT_LOGGING_RULES (or remove a qtlogging.ini) and re-run."
         fi
-        # NOT an elif chain with the `!!' check below: a dead connect is the
-        # most likely CAUSE of a `!!' -- the driver clicks, the slot never
-        # fires, the driver reports it could not do the thing -- so reporting
-        # only the symptom hides the diagnosis exactly when it explains it.
+        # NOT an elif chain with the `!!' check below. A dead connect is the
+        # most likely CAUSE of a `!!': the driver clicks, the slot never
+        # fires, and the driver reports that it could not do the thing.
+        # Reporting only the symptom would hide the cause.
         if command grep -E 'No such (signal|slot)' /tmp/berr.$$ \
                | command grep -qv "$CTL"; then
             bf=1
@@ -1289,10 +1095,8 @@ elif make -s -C "$ROOT" guidrive sigelApp >/tmp/bdb.$$ 2>&1; then
         fi
         # The driver prints `!!' when it could not do what it was asked -- a
         # dialog that would not accept, a file that never appeared. Such a run
-        # must not pass, and must not be diffed into a baseline either: one
-        # DID get committed that way, a population export that silently wrote
-        # nothing, and only a later diff caught it. Checked before the diff so
-        # the message is about the right thing.
+        # must not pass and must never become a baseline. Checked before the
+        # diff, so that the message names the right thing.
         if command grep -q '^ *!!' /tmp/ball.$$; then
             bf=1
             echo "  the driver could not carry out part of a scenario:"
@@ -1317,36 +1121,33 @@ elif make -s -C "$ROOT" guidrive sigelApp >/tmp/bdb.$$ 2>&1; then
         echo "  position, which is how the Qt 6 clear() regression showed up:"
         tail -6 /tmp/bo.$$ /tmp/bp.$$ /tmp/bx.$$ /tmp/bw.$$ /tmp/bg.$$ /tmp/bm.$$ \
              /tmp/br.$$ /tmp/bv.$$ /tmp/bk.$$ /tmp/bz.$$ /tmp/bq.$$ 2>/dev/null | sed 's/^/    /'
-        # stderr is captured now, and this is the path where it is most likely
-        # to say why. Printing it here is the whole reason for capturing it
-        # rather than discarding it: a crash, a Qt fatal, an ASan report or a
-        # timeout kill all land here.
+        # Stderr is most likely to say why on this path: a crash or a Qt fatal
+        # lands there.
         if [ -s /tmp/berr.$$ ]; then
             echo "  and the driver's stderr said:"
             tail -8 /tmp/berr.$$ | sed 's/^/    /'
         fi
     fi
 
-    # C7 pinned 21 validators to QLocale::c() with RejectGroupSeparator because
-    # Qt 2 forced LC_NUMERIC="C" process-wide and its QDoubleValidator hard-coded
-    # '.', while Qt 6 validators follow the system locale and the read-back is
-    # QString::toDouble(), which does not. Left to disagree, a typed "9,81"
-    # validates under a comma locale and reads back as ZERO -- silent data loss
-    # into the saved experiment. The 1.3 oracle measured the 2003 binary under a
-    # de_DE built with woody's own localedef and found it locale-independent, so
-    # this is 1.3 behaviour to preserve and not a Qt 6 nicety.
+    # The pages again, under comma-decimal locales. The output must be
+    # IDENTICAL to the run above, so no baseline of its own is needed.
     #
-    # This needs no baseline of its own: the runs must simply be IDENTICAL.
+    # Qt 2 forced LC_NUMERIC="C" process-wide and its QDoubleValidator
+    # hard-coded '.'. Qt 6 validators follow the system locale, while the
+    # read-back is QString::toDouble(), which does not. So the validators are
+    # pinned to QLocale::c() with RejectGroupSeparator; unpinned, a typed
+    # "9,81" validates under a comma locale and reads back as ZERO, and the
+    # saved experiment silently loses it. The 2003 binary was measured under
+    # de_DE and is locale-independent, so this is 1.3 behaviour to keep.
     #
-    # TWO locales, and the reason is that one of them alone was a tautology.
-    # de_DE exercises QT's half: QLocale reads the environment directly, so it
-    # reports de_DE with a comma decimal even where no such locale is
-    # GENERATED -- measured -- which is what C7's validator pinning is tested
-    # against. But setlocale() then fails and LC_NUMERIC stays "C", so libc's
-    # half was never touched. en_DK is a comma-decimal locale that IS installed
-    # here (`locale -a`), so under it libc really does switch: a stray
-    # sprintf("%f") or strtod in a reader or writer shows up only in this one.
-    # Found by review, which measured the difference between them.
+    # TWO locales, because each covers one half. de_DE tests Qt's half:
+    # QLocale reads the environment directly and reports a comma decimal even
+    # where no de_DE locale is generated. But setlocale() then fails and
+    # LC_NUMERIC stays "C", so libc's half is not touched. en_DK is a
+    # comma-decimal locale that is installed here (`locale -a`), and under it
+    # libc really does switch: a stray sprintf("%f") or strtod in a reader or
+    # writer shows up only there. Without en_DK only Qt's half runs, and the
+    # script says so.
     LOCTEST=en_DK.utf8
     locale -a 2>/dev/null | command grep -qx "$LOCTEST" || LOCTEST=
     if [ "$bf" = 0 ]; then
@@ -1373,10 +1174,8 @@ rm -f /tmp/bo.$$ /tmp/bp.$$ /tmp/bx.$$ /tmp/bw.$$ /tmp/bg.$$ /tmp/bm.$$ /tmp/br.
       /tmp/bv.$$ /tmp/bk.$$ /tmp/bz.$$ /tmp/bq.$$ \
       /tmp/bl.$$ /tmp/bl2.$$ /tmp/ball.$$ \
       /tmp/bd.$$ /tmp/bdb.$$ /tmp/berr.$$
-# exportall, overwrite and roundtrip WRITE FILES -- 8.2 MB between them, the
-# two population exports being most of it. Fixed names, so they are overwritten
-# rather than accumulated, but leaving them in TMPDIR is untidy. roundtrip's
-# fifteen were missed when it joined the list and left 5.5 MB per run behind.
+# exportall, overwrite, roundtrip and dialogs write files to TMPDIR, several MB
+# in all. They are removed here.
 rm -f "${TMPDIR:-/tmp}"/x11b-gpp.gpp "${TMPDIR:-/tmp}"/x11b-sip.sip \
       "${TMPDIR:-/tmp}"/x11b-lap.lap "${TMPDIR:-/tmp}"/x11b-env.env \
       "${TMPDIR:-/tmp}"/x11b-pop.pop "${TMPDIR:-/tmp}"/x11b-prg.prg \
@@ -1396,41 +1195,36 @@ printf '%-22s %2d pass  %2d fail\n' "gui behaviour" "$bp" "$bf"
 pass=$((pass+bp)); fail=$((fail+bf))
 
 # ---------------------------------------------------------------------------
-# REAL X INPUT -- the only section here that does not drive Qt through QTest.
+# REAL X INPUT -- the only section that clicks through the X server.
 #
-# Everything above posts QMouseEvent through QApplication::notify. That reaches
-# every slot SIGEL has, which is why those sections are worth something, but it
-# never goes through QWindowSystemInterface. PORTING.md's C10 section named the
-# four things that leaves untested: activation, the pointer grab a popup takes,
-# Qt's synthesis of a double click out of two presses. Enter and leave was
-# listed here too and that was wrong: QTest::mouseMove on a widget calls
-# QCursor::setPos(), a real pointer warp. Offscreen could not deliver them,
-# QTest can. See PORTING.md C13.
+# The guidrive scenarios above post QMouseEvent through QApplication::notify.
+# That reaches every slot SIGEL has, but never goes through
+# QWindowSystemInterface. So three things are untested above: window
+# activation, the pointer grab a popup takes, and Qt's synthesis of a double
+# click from two presses. Enter and leave ARE covered above: QTest::mouseMove
+# on a widget calls QCursor::setPos(), a real pointer warp.
 #
-# This section runs guidrive as a REAL X11 CLIENT inside a nested Xvfb with
-# QT_QPA_PLATFORM=xcb and drives it with XTEST through xdotool, so the port
-# gets a genuine click where until now only the 1.3 oracle's side did.
+# This section runs guidrive as a REAL X11 CLIENT on a separate Xvfb server
+# with QT_QPA_PLATFORM=xcb, and drives it with XTEST through xdotool.
 #
-# ITS POSITIVE CONTROL IS INSIDE THE SCENARIO AND IS CHECKED HERE. The whole
-# section is worthless if the clicks are not real -- a broken xdotool, a display
-# that never came up, or a fallback to a synthetic path would leave every count
-# at zero, which looks exactly like "the port ignores real clicks". So the
-# scenario compares one real click against one QTest::mouseClick at the same
-# point through a native event filter and prints DISCRIMINATES only when the
-# real one produced native ButtonPress events and QTest produced none. Its
-# absence fails this section on its own.
+# ITS POSITIVE CONTROL IS INSIDE THE SCENARIO AND IS CHECKED HERE. If the
+# clicks are not real -- a broken xdotool, a display that never came up, or a
+# fallback to a synthetic path -- every count is zero, which looks exactly like
+# "the port ignores real clicks". So the scenario compares one real click with
+# one QTest::mouseClick at the same point through a native event filter, and
+# prints DISCRIMINATES only when the real one produced native ButtonPress
+# events and QTest produced none. Without that line this row fails.
 #
-# NOT skipped when Xvfb or xdotool is missing. A skip here is a section that
-# tested nothing while reporting no failure, which is the shape check.sh has
-# been bitten by before.
+# A missing Xvfb or xdotool FAILS this row rather than skipping it: a skip
+# would be a section that tested nothing and reported no failure.
 xtp=0; xtf=0
 XTDISP=:97
 if [ ! -f "$ROOT/checks/baselines/xtest-baseline.txt" ]; then
     xtf=1; echo "  checks/baselines/xtest-baseline.txt is missing -- this gate tested NOTHING"
 elif [ ! -f "$BEXP" ]; then
-    # Same data dependency as the two sections above: without the file the run
-    # hangs in the modal Load dialog until the timeout and blames the driver
-    # for a missing file.
+    # Same data dependency as `gui behaviour': without the file the run hangs
+    # in the modal Load dialog until the timeout, and the message would blame
+    # the driver for a missing file.
     echo "  SKIPPED: no $BEXP -- restore experiments/ from git. THIS SECTION"
     echo "  TESTED NOTHING."
     skipped=$((skipped+1))
@@ -1444,13 +1238,10 @@ elif ! command -v Xvfb >/dev/null 2>&1 || ! command -v xdotool >/dev/null 2>&1 \
 elif [ ! -x "$ROOT/build/guidrive" ]; then
     xtf=1; echo "  guidrive is not built -- the real-input section tested NOTHING"
 elif ! (cd "$ROOT" && make -q guidrive sigelApp) 2>/dev/null; then
-    # NAME THE TARGET. `make -q' with no target answers for `all', which does
-    # not depend on guidrive. The section above builds it and only sets bf=1 if
-    # that build fails, so without this check a compile failure leaves the
-    # PREVIOUS binary in place and this section scores it -- printing
-    # "1 pass 0 fail" for source it never compiled. Found by review. Section 7
-    # of PORTING.md already states this rule for the three gate scripts; it was
-    # missing here.
+    # NAME THE TARGET: `make -q' with no target answers for `all', which does
+    # not depend on guidrive. `gui behaviour' builds guidrive but fails only
+    # its own row if that build fails, so without this test a compile failure
+    # leaves the PREVIOUS binary in place and this row would score it.
     xtf=1
     echo "  build/guidrive or sigelApp/ is out of date, so this section would have"
     echo "  measured a binary that is not the source in the tree."
@@ -1460,12 +1251,8 @@ elif true; then
     #
     # DISPLAY=, NOT --display. xdotool has no --display option: it answers
     # "getdisplaygeometry: unrecognized option" and exits 1 whatever the state
-    # of the server. The first version of this section used --display in both
-    # places, so this guard could never fire and the readiness poll below could
-    # never succeed -- and the poll, written as `... && break', silently
-    # degraded into a fixed 15 s sleep that happened to be long enough. The
-    # gate caught it by failing on its first real run; a run by hand had not,
-    # because nothing there checked the loop's outcome.
+    # of the server. With --display this guard could never fire, and the
+    # readiness poll below could never succeed.
     if DISPLAY="$XTDISP" xdotool getdisplaygeometry >/dev/null 2>&1; then
         xtf=1
         echo "  display $XTDISP is already in use -- refusing to drive it."
@@ -1487,24 +1274,21 @@ elif true; then
             echo "  Xvfb never came up on $XTDISP:"
             head -5 /tmp/xtv.$$ 2>/dev/null | sed 's/^/    /'
         else
-            # `|| xtf=1', not bare. This file runs under `set -e' with no
-            # trap, so a bare `: > path' that fails on a full or unwritable
-            # /tmp would abort the WHOLE script here. It would do that AFTER the
-            # Xvfb above was started and BEFORE the kill below, leaving a server
-            # on $XTDISP that makes every later run refuse the display. The
-            # neighbouring section already writes `: > /tmp/berr.$$ || bf=1' for
-            # the same reason. Found by review.
+            # `|| xtf=1' does NOT catch a failed `: > path' (full or
+            # unwritable /tmp): in dash a redirection error on `:' ends the
+            # shell. That happens AFTER Xvfb started and BEFORE the kill
+            # below, so a server stays on $XTDISP and every later run refuses
+            # the display. `true > path || xtf=1' would catch it.
             : > /tmp/xterr.$$ || xtf=1
-            # SCRUB THE SCALING VARIABLES. This is the only section here whose
+            # SCRUB THE SCALING VARIABLES. This is the only section whose
             # result depends on Qt's coordinate scaling. mapToGlobal() returns
             # logical pixels and xdotool takes device pixels, so at a ratio of
             # 1.25 every click is real but lands 20 per cent away, and the run
-            # reports a false difference from 1.3. `env' is used without `-i',
-            # so the caller's whole environment passes through. Review
-            # demonstrated it with QT_SCALE_FACTOR=1.25. Offscreen is immune,
-            # because it pins the ratio, which is why no other section needs
-            # this. guidrive also refuses a devicePixelRatio other than 1 on its
-            # own, so a caller who runs it directly is covered too.
+            # reports a false difference. env is used without -i, so the
+            # caller's whole environment passes through. Offscreen pins the
+            # ratio, which is why no other section needs this. guidrive also
+            # refuses a devicePixelRatio other than 1, so a caller who runs it
+            # directly is covered too.
             if env DISPLAY="$XTDISP" SIGEL_ROOT="$APP" SIGEL_EXP="$BEXP" \
                    SIGEL_SCRATCH="${TMPDIR:-/tmp}" QT_QPA_PLATFORM=xcb \
                    QT_SCALE_FACTOR=1 QT_SCREEN_SCALE_FACTORS= \
@@ -1514,7 +1298,7 @@ elif true; then
                    > /tmp/xt.$$ 2>/tmp/xterr.$$; then
                 # The control, before the diff: if the run could not tell a real
                 # click from a QTest one, the numbers below mean nothing and the
-                # baseline would happily match a run in which nothing was
+                # baseline would match a run in which nothing was
                 # clicked at all.
                 if ! command grep -q 'DISCRIMINATES' /tmp/xt.$$; then
                     xtf=1
@@ -1559,33 +1343,29 @@ printf '%-22s %2d pass  %2d fail\n' "real clicks" "$xtp" "$xtf"
 pass=$((pass+xtp)); fail=$((fail+xtf))
 
 # ---------------------------------------------------------------------------
-# PORTING.md's pagesave/roundtrip gap -- the widget-to-file path, which nothing covered until now.
+# The widget-to-file path: File > Save Experiment.
 #
 # `pages' proves typing reaches the widgets. `exportall' proves widgets reach a
-# file, in one direction, for the eight export formats. NEITHER of them runs
-# putAllIntoExperiment(), so a regression between what a parameter page holds
-# and what `File > Save Experiment' writes was caught by nothing at all. That
-# was PORTING.md's pagesave/roundtrip gap, and it stood open because gating it needs a reference the port
-# did not produce itself -- §7's rule that every gate here compares the port
-# against itself.
+# file, in one direction, for the eight export formats. Neither writes the
+# experiment file, so this section covers what the pages put into a saved
+# .exp.
 #
-# It has one: the port's save matches the 2003 i386 binary's own byte for
-# byte, compared on twoBasesSimpleFitness2.exp. pagesave-baseline.txt holds the
-# port's own save of twoBases.exp, on that proven ground. The EDITED half is
-# the base plus C11a's eleven page edits; the file's header says why.
+# pagesave-baseline.txt holds the port's own save of twoBases.exp. On another
+# experiment, the port's save matched the 2003 i386 binary's byte for byte.
+# The EDITED half is the base plus eleven page edits; the file's header says
+# which.
 #
-# LanguageParameters is checked separately because it is NOT in the block --
-# it sits at line 71650 of the saved file, far below POPULATION BEGIN{ at 179,
-# so a check over the block alone would silently miss the registers edit.
+# LanguageParameters is checked separately because it is NOT in the block: it
+# sits far below POPULATION BEGIN{ in the saved file, so a check over the block
+# alone would miss the registers edit.
 pp=0; pf=0
 PSD="${TMPDIR:-/tmp}"
 if [ ! -f "$ROOT/checks/baselines/pagesave-baseline.txt" ]; then
     pf=1; echo "  checks/baselines/pagesave-baseline.txt is missing -- this gate tested NOTHING"
 elif [ ! -f "$BEXP" ]; then
-    # Same data dependency and therefore the same policy as `gui behaviour'
-    # above. Without this the two runs HANG in the modal Load dialog until the
-    # 300 s timeout, twice, and report "did not finish", which blames the
-    # driver for a missing file.
+    # Same data dependency and the same policy as `gui behaviour'. Without
+    # this the two runs HANG in the modal Load dialog until the 300 s timeout,
+    # and the message would blame the driver for a missing file.
     echo "  SKIPPED: no $BEXP -- restore experiments/ from git. THIS SECTION"
     echo "  TESTED NOTHING."
     skipped=$((skipped+1))
@@ -1616,26 +1396,23 @@ elif [ -x "$ROOT/build/guidrive" ]; then
             echo "  were not checked. Unset QT_LOGGING_RULES and re-run."
         elif command grep -E 'No such (signal|slot)' /tmp/pserr.$$ \
                  | command grep -qv guidriveStderrControl; then
-            # This is the only thing that catches a string-based connect naming
-            # something Qt 6 does not have, and File > Save Experiment is not
-            # exercised by any other scenario.
+            # A string-based connect on the save path that names something Qt 6
+            # does not have. It is checked on this run's own stderr.
             pf=1
             echo "  a connect on the save path names a signal or slot that does not exist:"
             command grep -E 'No such (signal|slot)' /tmp/pserr.$$ \
                 | command grep -v guidriveStderrControl | sort -u | head -4 | sed 's/^/    /'
         else
             # Everything before POPULATION BEGIN{ is the parameter block the
-            # five View pages own. Raw bytes, not key/value pairs: two keys in
+            # five View pages own. Raw bytes, not key/value pairs. Two keys in
             # this data (FLOORPICTUREFILE, TEXTUREFILE) have an EMPTY value
-            # line after them, so anything that skips blanks reads the next key
-            # as a value and desynchronises silently from there on.
-            # `|| true' on both greps is LOAD-BEARING, not tidiness. This runs
-            # under `set -e' with no trap, so a grep that matches NOTHING exits
-            # 1 and kills the WHOLE SCRIPT here -- no pagesave line, no forms
-            # section, no total, no summary. And a missing LanguageParameters
-            # line is EXACTLY the regression this check was added to catch, so
-            # without these the gate would abort silently on its own quarry.
-            # The empty output then fails the diff, which is the right outcome.
+            # line after them. Anything that skips blank lines reads the next
+            # key as a value and goes out of step from there on.
+            # `|| true' on both greps is LOAD-BEARING. Under set -e with no
+            # trap, a grep that matches NOTHING exits 1 and stops the whole
+            # script here, with no row and no total -- and a missing
+            # LanguageParameters line is exactly the regression this looks
+            # for. The empty output then fails the diff, which is right.
             {
                 echo "== BASE BLOCK =="
                 awk '/^POPULATION BEGIN\{/{exit} {print}' "$PSD/pagesave-base.exp"
@@ -1646,10 +1423,9 @@ elif [ -x "$ROOT/build/guidrive" ]; then
                 echo "== EDITED LanguageParameters =="
                 command grep -h '^LanguageParameters' "$PSD/pagesave-edited.exp" || true
             } > /tmp/psall.$$
-            # NOT `grep -v ^#': the DATA contains six `#####' separator
-            # lines, and stripping every #-leading line ate them -- caught by
-            # this gate failing on its own first run. Header comments are
-            # `# text' or bare `#', so this strips those and nothing else.
+            # NOT `grep -v ^#': the DATA contains `#####' separator lines.
+            # Header comments are `# text' or a bare `#', so this removes
+            # those and nothing else.
             if sed '/^# /d; /^#$/d' "$ROOT/checks/baselines/pagesave-baseline.txt" \
                    | diff -u - /tmp/psall.$$ > /tmp/psd.$$; then
                 pp=1
@@ -1661,11 +1437,8 @@ elif [ -x "$ROOT/build/guidrive" ]; then
         fi
     else
         pf=1
-        # SAY WHY. The first time this fired it printed this header and NOTHING
-        # else -- both stdout files were empty and the captured stderr was
-        # deleted unread, so an intermittent failure produced no evidence at
-        # all. That is the shape this file keeps being bitten by, and the
-        # `gui behaviour' section above had already been fixed for it.
+        # SAY WHY: sizes, the tail of each output and the stderr, so that an
+        # intermittent failure leaves evidence.
         echo "  a pagesave run did not finish. Exit codes and sizes:"
         for f in /tmp/ps1.$$ /tmp/ps2.$$; do
             if [ -f "$f" ]; then
@@ -1698,60 +1471,50 @@ pass=$((pass+pp)); fail=$((fail+pf))
 
 
 # ---------------------------------------------------------------------------
-# V5 -- the truncated pi, and the constants the sensor path is built on.
+# The truncated pi, and the constants the sensor path is built on.
 #
-# SIGEL 1.3 converts radians to degrees with pi TRUNCATED TO EIGHT DECIMALS.
-# Not 180/pi but 180/3.14159265, which is 57.29577957855229 against the true
-# 57.295779513082323 -- a relative error of 1.14e-09.
+# SIGEL 1.3 converts radians to degrees with pi TRUNCATED TO EIGHT DECIMALS:
+# not 180/pi but 180/3.14159265, which is 57.29577957855229 against the true
+# 57.295779513082323, a relative error of 1.14e-09.
 #
-# THAT IS NOT A DEFECT TO FIX. IT IS THE BEHAVIOUR BEING PRESERVED. Every
-# evolved program in the shipped experiments was selected against sensor
-# values carrying that error, and the values feed a chaotic simulation, so
-# "correcting" it changes what the robots do. The port's rule is convert, do
-# not improve; PORTING.md lists this with the 1.3 behaviour preserved on
-# purpose. This section exists because the change is a ONE-WORD EDIT that
-# looks like tidying -- write M_PI and the gate is the only thing that
-# notices.
+# This is not a defect to fix; it is behaviour to keep. Every evolved program
+# in the shipped experiments was selected against sensor values that carry
+# this error, and the values feed a chaotic simulation, so "correcting" it
+# changes what the robots do. The change is a one-word edit that looks like
+# tidying: write M_PI and this row is the only thing that notices.
 #
-# AND 1.3 INVITES THE EDIT, because it is inconsistent with itself. It
-# uses the true M_PI in SIGEL_Robot/IFunctions.cpp, calculateAnyJoint and the truncated
-# literal in the two simulation files. That is 1.3's own inconsistency,
-# preserved verbatim -- IFunctions.cpp is untouched since the vendor drop
-# apart from comment translation. A reader who finds the M_PI first will read
-# the 3.14159265 as an oversight.
+# 1.3 invites the edit, because it is not consistent with itself: it uses the
+# true M_PI in SIGEL_Robot/IFunctions.cpp, calculateAnyJoint, and the
+# truncated literal in the two simulation files. Both are kept as 1.3 has
+# them. A reader who finds the M_PI first will read 3.14159265 as an
+# oversight.
 #
-# MEASURED ON THE 1.3 BINARY, through the sigel-x86 session 2026-09-08, and
-# the decisive part is an ABSENCE:
+# The shipped 1.3 binaries do not contain the true constant at all:
 #     sigel_slave   404ca5dc1af05a77 (truncated)   1 occurrence
 #                   404ca5dc1a63c1f8 (true 180/pi) 0 occurrences
 #     sigel         both                           0 occurrences
-# The correct constant is in NEITHER shipped 1.3 binary. So this is not "1.3
-# happens to use a truncated pi somewhere"; the true value is absent from the
-# image. Full capture, with the .rodata table and the disassembly, in
+# The full capture, with the .rodata table and the disassembly, is in
 # verification-against-sigel-1.3/v5-1.3-mdh-compared.txt.
 #
-# TWO CHECKS, because neither covers the other.
+# Two checks, because neither covers the other.
 #   SOURCE  catches an edit at one of the four sites even when another site
 #           still supplies the same constant, which a binary search cannot
-#           see. It is also independent of the compiler.
+#           see. It does not depend on the compiler.
 #   BINARY  catches any SPELLING that produces the true value -- M_PI,
 #           4*atan(1), a longer literal, a header constant -- which a grep for
 #           `M_PI' would miss.
 #
-# WHY ONLY THE RADIAN FACTOR IS GATED. The sensor path references eight
-# constants and all eight agree with 1.3 AS VALUES, checked from the source.
-# Only the radian factor can be gated in the binary, and the reason is
-# measured, not assumed: on this machine -DBL_MAX, +DBL_MAX, 360.0 and -90.0
-# appear ZERO times as 8-byte doubles in our image, and 90.0 and 180.0 appear
-# only inside debug sections. aarch64 folds them into immediates or into
-# larger expressions instead of emitting them. 2.0 does appear, 442 times,
-# which is noise. So the radian factor is the only one of the eight with a
+# Only the radian factor is checked in the binary. The sensor path uses eight
+# constants, and all eight match 1.3 as values in the source. In our aarch64
+# image, -DBL_MAX, +DBL_MAX, 360.0 and -90.0 appear zero times as 8-byte
+# doubles, and 90.0 and 180.0 appear only in debug sections. 2.0 appears so
+# often that it is noise. The compiler folds these into immediates or larger
+# expressions. So the radian factor is the only one of the eight with a
 # .rodata entry to compare, and it is also the only one anybody would edit.
 #
-# NOTE ON SPELLING: our sense writes `360.0 / (2.0*3.14159265)' where 1.3's
-# image holds the folded 180/3.14159265. Different expression, IDENTICAL
-# bits -- 2.0*x is exact and 360/2x is the same correctly-rounded quotient as
-# 180/x. Verified, not assumed.
+# Spelling: our sense writes `360.0 / (2.0*3.14159265)' where 1.3's image
+# holds the folded 180/3.14159265. Different expression, IDENTICAL bits:
+# 2.0*x is exact, and 360/2x is the same correctly rounded quotient as 180/x.
 v5p=0; v5f=0
 V5SRC=$SRC/src/SIGEL_Simulation
 V5Q=$V5SRC/SIG_DynaMechsSimulationQueries.cpp
@@ -1761,22 +1524,20 @@ if [ ! -f "$V5Q" ] || [ ! -f "$V5C" ]; then
     v5f=1; echo "  the two simulation sources are missing -- nothing was checked"
 else
     # 4 sites: three in sense (rad->deg) and one in moveDrive (deg->rad).
-    # ANCHORED. A bare `3\.14159265' is a PREFIX match, so lengthening one site
-    # to 3.14159265358979 keeps the count at 4 while changing the factor to
-    # 404ca5dc1a63c200 -- which is neither the kept constant nor either
-    # forbidden one, so the binary half misses it too. Measured: the whole
-    # section passed on that edit. The trailing class closes it.
-    # COMMENTS STRIPPED BEFORE BOTH COUNTS. A note saying "do not change this
-    # to M_PI" is documentation, not a defect, and a comment quoting the
-    # literal is not a fifth site. Measured: without this, adding either kind
-    # of comment failed the gate.
+    # ANCHORED. A bare `3\.14159265' is a PREFIX match. Lengthening one site
+    # to 3.14159265358979 would keep the count at 4 but change the factor to
+    # 404ca5dc1a63c200. That is neither the kept constant nor a forbidden
+    # one, so the binary half would miss it too. The trailing class closes
+    # that.
+    # `//' comments are stripped before both counts. A note saying "do not
+    # change this to M_PI" is documentation, not a defect, and a comment that
+    # quotes the literal is not a fifth site.
     v5t=$(sed 's://.*::' "$V5Q" "$V5C")
     v5n=$(printf '%s\n' "$v5t" | command grep -Ec '3\.14159265([^0-9]|$)' || true)
     v5m=$(printf '%s\n' "$v5t" | command grep -c 'M_PI' || true)
-    # M_PI FIRST. Tidying a site to M_PI also drops the count, so both tests
-    # fire; the substitution is the specific diagnosis and must be the one
-    # printed. Measured -- with the count tested first, an M_PI edit reported
-    # only "expected 4", which points at the wrong thing.
+    # M_PI FIRST. Changing a site to M_PI also drops the count, so both tests
+    # fire; the substitution is the specific message and must be the one
+    # printed.
     if [ "$v5m" != 0 ]; then
         v5f=1
         echo "  M_PI has appeared in the simulation sources, where 1.3 uses 3.14159265:"
@@ -1793,13 +1554,11 @@ else
     elif ! make -q -C "$ROOT" --no-print-directory sigel_eval 2>/dev/null; then
         v5f=1; echo "  $V5BIN is out of date -- run 'make sigel_eval'"
     else
-        # .rodata ONLY, and that bound is load-bearing rather than tidiness.
-        # The Makefile compiles with -g, so the constant also appears twice in
-        # .debug_loclists. Searching the whole file made the "it is missing"
-        # arm UNREACHABLE: patching the real constant out of .rodata still
-        # left two debug copies, so the count never fell below one. Measured
-        # on this binary -- 1 in .rodata at 0x141658, 2 in .debug_loclists.
-        # Debug sections are not what the program computes with.
+        # .rodata ONLY, and that bound is load-bearing. The Makefile compiles
+        # with -g, so the constant also appears in .debug_loclists. Searched
+        # over the whole file, the debug copies would keep the count above
+        # zero, and the "it is missing" branch could never fire. Debug
+        # sections are not what the program computes with.
         v5out=$(python3 - "$V5BIN" <<'V5PY'
 import struct, sys, math
 d = open(sys.argv[1], 'rb').read()
@@ -1829,11 +1588,10 @@ V5PY
             v5keep=$(echo "$v5out" | awk '{print $1}')
             v5bad=$(echo "$v5out" | awk '{print $2 + $3}')
             # FORBIDDEN FIRST, for the same reason M_PI is tested before the
-            # site count: replacing the kept constant with the true one does
-            # BOTH -- it removes the kept value and introduces the forbidden
-            # one. Measured with the .rodata word patched: tested the other
-            # way round, the run reported only "is NOT in", which describes
-            # the symptom and not the change.
+            # site count. Replacing the kept constant with the true one does
+            # BOTH: it removes the kept value and adds the forbidden one.
+            # "The true pi has reached the binary" names the change; "is NOT
+            # in" names only the symptom.
             if [ "$v5bad" != 0 ]; then
                 v5f=1
                 echo "  the TRUE pi has reached the binary: 180/M_PI or M_PI/180 is"
@@ -1855,129 +1613,89 @@ printf '%-22s %2d pass  %2d fail\n' "truncated pi (V5)" "$v5p" "$v5f"
 pass=$((pass+v5p)); fail=$((fail+v5f))
 
 # ---------------------------------------------------------------------------
-# V2 -- whole experiments through File > Save Experiment.
+# Whole experiments through File > Save Experiment.
 #
-# The hammer half of the expected report is copied from a capture of the
-# running 2003 binary, taken before this conversion existed:
+# The hammer half of the expected report comes from a capture of the running
+# 2003 binary: verification-against-sigel-1.3/v8-1.3-gp-blocks.txt. A failure
+# in the hammer half's 1.3 lines is a difference from 1.3; the list of kinds
+# below says which lines those are. The octopus half is the port's own output.
+# What 1.3 does with that robot is in
+# verification-against-sigel-1.3/v1-1.3-roundtrip.txt, captured on the same
+# robot stored in the other order, which 1.3 writes back as the order
+# octopus.exp stores.
 #
-#   verification-against-sigel-1.3/v8-1.3-gp-blocks.txt   hammer, 2026-08-29
-#
-# So a failure in the hammer half's 1.3 lines is a regression against 1.3 --
-# the list of kinds below says which lines those are. The octopus half
-# is the port's own output. What 1.3 does with this robot is in
-# verification-against-sigel-1.3/v1-1.3-roundtrip.txt, captured on
-# octopusSimpleFitness: the same robot stored in the other order, which 1.3
-# writes back as the order octopus.exp stores.
-#
-# TWO EXPERIMENTS, BECAUSE ONE OF THEM PROVES LESS THAN IT LOOKS.
-# hammer has 5 links, 4 joints, 4 drives and no sensors at all -- few enough
-# that no hash bucket need collide. 1.3 does not permute its link, joint or
-# drive containers either, so agreement there is not evidence. What hammer
-# really tests is material order, `Body' emission order and `middle3''s axis
-# points, plus everything outside the robot: the section line counts, the
-# experiment history, the HISTORY growth defect and the ten first-save keys.
+# Two experiments, because hammer alone proves less than it seems.
+#   hammer has 5 links, 4 joints, 4 drives and no sensors, too few to share a
+#   hash slot, and 1.3 does not permute its link, joint or drive containers.
+#   So agreement there is no evidence. hammer tests material
+#   order, `Body' emission order and `middle3''s axis points, plus everything
+#   outside the robot: the section line counts, the experiment history, the
+#   HISTORY growth defect and the ten first-save keys.
 #   octopus supplies the rest. Its joint, drive and sensor containers DO
-# collide -- 1.3 permutes all three on every save, plus the body order and the
-# command list, and the port keeps the stored order. That is where "we
-# reproduced the order" and "we never permute" come apart.
+#   collide: 1.3 permutes all three on every save, and the body order and the
+#   command list too, while the port keeps the stored order.
 #
-# TWO SAVES EACH, NOT V8'S THREE. Pass 0 to 1 shows the ten keys arrive; pass 1
-# to 2 shows them hold and gives the steady-state growth. A third save only
-# repeats the second.
+# Two saves each. Pass 0 to 1 shows the ten keys arrive; pass 1 to 2 shows
+# they hold and gives the steady-state growth.
 #
-# INPUT AGAINST PASS 1 CANNOT BE THE TEST -- V8 result 5. The shipped .exp are
-# a 2001 format revision and the 2003 binary adds ten keys with defaults on the
-# first save. A gate comparing a shipped file against its own round trip fails
-# however correct the port is. So the test is pass 1 against pass 2, and the
-# ten keys are asserted by name and value instead.
+# The input cannot be compared with pass 1: the shipped .exp are a 2001 format
+# revision, and the 2003 binary adds ten keys with defaults on the first save.
+# So pass 1 is compared with pass 2, and the ten keys are checked by name and
+# value.
 #
-# THE TWO DIVERGENCES ARE IN THE EXPECTED TEXT ON PURPOSE, not filtered out:
+# The two divergences from 1.3 are in the expected text on purpose, not
+# filtered out:
 #
-#   robot block   Ours is a FIXED POINT -- byte-identical in all three passes,
-#                 on both robots. 1.3's is an involution: state0 == state2 and
-#                 state1 == state3. That is D3's flip to insertion order,
-#                 decided deliberately, and PORTING.md's V2, V6 and D3 carry
-#                 it. Measured on 1.3 for hammer through the sigel-x86 session
-#                 2026-09-08, and for the octopus robot by V1 in 2026-08.
-#                 A SINGLE SAVE CANNOT SEE THIS. It only shows the order we
-#                 wrote, not whether a second save would move it. That is why
-#                 there are two saves and why octopus is here.
+#   robot block   Ours does not change on a save: byte-identical in all
+#                 three passes, on both robots. 1.3's flips between two
+#                 orders on every save. The port writes insertion order by
+#                 decision: Q2Dict was made insertion-ordered (PORTING.md, D3
+#                 under "the shim's users"). A single save cannot see this: it
+#                 shows the order written, not whether a second save moves it.
+#                 That is why there are two saves and why octopus is here.
 #
-#   TEXALPHA      99 here, 255 in the V8 capture. IT IS NOT A PORT DEFECT.
-#                 1.3 writes BOTH values, from its two save paths. Measured on
-#                 1.3 for hammer 2026-09-08: its GUI save and its headless save
-#                 differ in EXACTLY ONE LINE and nothing else -- 255 against
-#                 99, with the rest byte-identical including markers, PVMHOST,
-#                 the experiment history and the HISTORY growth. The same
-#                 split shows on a second robot: 1.3's own GUI save of
-#                 twoBasesSimpleFitness2, captured 2026-09-03, reads 99.
-#                 The mechanism, in 1.3's source and Qt 2's:
-#                 SIG_Environment.cpp:47 defaults texAlpha to 0xFF;
-#                 SIG_EnvironmentView.cpp, getOutOfExperiment pushes it into sliderAlpha and
-#                 :112 reads it back out. The pristine form gives that slider
-#                 no maximum -- `git show 0516d62:…/SIG_EnvironmentBase.ui',
-#                 not the converted file at that path today -- and Qt 2 then
-#                 caps it at QRangeControl's default of 99
-#                 (qrangecontrol.cpp:111-119, reached from qslider.cpp:124).
-#                 Qt 6 has no QRangeControl; its 0-99 default comes from
-#                 QAbstractSlider. Different class, same number, same result.
-#                 The headless path has no slider and keeps 255.
-#                 Ours is a GUI save, so 99 is 1.3's own GUI value.
+#   TEXALPHA      99 here, 255 in the v8 capture. Not a port defect: 1.3
+#                 writes BOTH values, from its two save paths. Its GUI save
+#                 and its headless save of hammer differ in exactly this one
+#                 line. SIG_Environment's constructors default texAlpha to
+#                 0xFF; SIG_EnvironmentView::getOutOfExperiment pushes it into
+#                 sliderAlpha, and putIntoExperiment reads it back. 1.3's
+#                 form gives that slider no maximum, so Qt 2 caps it at
+#                 QRangeControl's default of 99. Qt 6 has no QRangeControl;
+#                 its 0-99 default comes from QAbstractSlider. The headless
+#                 path has no slider and keeps 255. Ours is a GUI save, so 99
+#                 is 1.3's own GUI value.
 #
-# NOT EVERY LINE BELOW IS 1.3's, and the diff labels say so. Four kinds:
+# Not every line below is 1.3's, and the diff labels say so. Four kinds:
 #
-#   1.3's own numbers, from the hammer capture -- the experiment-history line
-#   count and its first and last entry, the first block's character counts, the
-#   HISTORY growth and the ten first-save keys.
+#   1.3's own numbers, from the hammer capture: the experiment-history line
+#   count and its first and last entry, the first block's character counts,
+#   the HISTORY growth and the ten first-save keys.
 #
-#   1.3's DATA, read back out. The individual names are the shipped file's own
-#   bytes, so pinning them pins this build against 1.3's artefact even though no
-#   capture quotes them.
+#   1.3's DATA, read back. The individual names are the shipped file's own
+#   bytes, so pinning them pins this build against 1.3's file.
 #
 #   NOT 1.3's: `markers', `pvmhost' and the hammer robot-block hash. The
 #   experiment's host block and Body directories are not the shipped ones, so
 #   these pin this build against the file in experiments/. The file has one
-#   host, so host order is not tested. v8-1.3-gp-blocks.txt keeps the order
-#   of 1.3's 20 hosts for the file as shipped.
+#   host, so host order is not tested; v8-1.3-gp-blocks.txt keeps the order of
+#   1.3's 20 hosts for the file as shipped.
 #
-#   OURS, and only ours: the `expstruct' hash, and the whole octopus half. V8
-#   never ran expstruct; it is kept because it covers the population, which
-#   nothing else here reaches. The octopus rows are the stored order, which the
-#   port writes back unchanged; v1-1.3-roundtrip.txt quotes the other order,
-#   the one 1.3 writes.
+#   OURS only: the `expstruct' hash and the whole octopus half. expstruct is
+#   kept because it covers the population, which nothing else here reaches.
+#   The octopus rows are the stored order, which the port writes back
+#   unchanged; v1-1.3-roundtrip.txt quotes the order 1.3 writes.
 #
-# WHY ONE DIFF RATHER THAN A DOZEN ifs: so that a generator which produces the
-# wrong text, or stops early, fails on the whole report instead of on the one
-# predicate someone remembered to write. The generator runs inside `|| v2f=1',
-# which suspends `set -e' for it -- without that a single failing command in
-# there would kill the WHOLE script, with no v2 line, no forms section and no
-# total. That is the shape this file has been bitten by three times.
+# One diff rather than a dozen ifs, so that a generator which writes the wrong
+# text, or stops early, fails on the whole report and not only on the tests
+# someone remembered to write. The generator runs inside `|| genok=0', which
+# suspends set -e for it. Without that, one failing command in it would stop
+# the whole script, with no row and no total.
 #
-# TEETH-TESTED 2026-09-08, IN TWO ROUNDS, AND IT FOUND TWO HOLES IN THIS
-# SECTION. Both are closed above and both are the same mistake in two
-# directions -- a line that compares this run against itself and nothing else.
-#
-#   Round one mutated an intermediate pass file. It found that three lines
-#   hashed an extract and compared three hashes, which says "identical" when
-#   the EXTRACTOR dies, since three empty strings are equal. Replacing
-#   expstruct.py with /bin/false passed the gate 1 pass 0 fail. Those lines
-#   now print the size of what they hashed.
-#
-#   Round two mutated the INPUT experiment instead. It found that every
-#   "identical in all three" line passes when the input changes, because all
-#   three passes change with it. Renaming an individual, permuting hammer's
-#   materials and editing an experiment-history entry all went unnoticed.
-#   Those lines now print content too -- a hash, or a first and last entry.
-#
-# What the mutations show is one-way: each predicate CAN fail on a change of
-# the kind it exists to catch. It is not that each mutation moves exactly one
-# line, and an earlier version of this comment claimed that wrongly. A deleted
-# key shifts every marker below it, and any edit to pass 1 or 2 also moves
-# `expstruct'.
-#
-# The wrapper was tested too: missing data SKIPS and counts, a missing or
-# stale binary FAILS, suppressed Qt connect logging FAILS, and the section was
-# run from OUTSIDE the repo root to check the `make -q -C "$ROOT"' fix.
+# No line may compare this run only with itself. Three passes change together
+# when the INPUT changes, and three hashes of an empty extract are equal when
+# the extractor dies. So every "identical in all three" line also prints
+# content: a size, a hash, or a first and last entry.
 v2p=0; v2f=0
 V2HAM=$ROOT/experiments/hammer.exp
 V2OCT=$ROOT/experiments/octopus.exp
@@ -1992,11 +1710,7 @@ elif [ ! -x "$ROOT/build/guidrive" ]; then
     v2f=1; echo "  build/guidrive is missing -- run 'make guidrive sigelApp'"
 elif ! make -q -C "$ROOT" --no-print-directory guidrive sigelApp 2>/dev/null; then
     # A failed make leaves the previous binary in place, so a test for
-    # existence passes on a stale one. D13 was scored green that way.
-    # -C "$ROOT" because this script never cd's -- without it the check
-    # depends on the caller's working directory and reports a false failure
-    # from anywhere but the repo root. The rule is stated at the top of the
-    # `form minimums' section and two other sites already obey it.
+    # existence passes on a stale one.
     v2f=1; echo "  build/guidrive or sigelApp/ is out of date -- run 'make guidrive sigelApp'"
 elif ! mkdir -p "$V2D"; then
     v2f=1; echo "  cannot create $V2D"
@@ -2008,7 +1722,7 @@ else
       && cp "$V2OCT" "$V2D/oct0.exp" && chmod u+w "$V2D/oct0.exp"; } || cpok=0
     : > "$V2D/err" || cpok=0
     # pagesave with SIGEL_PAGEEDIT unset is exactly File > Open then File >
-    # Save Experiment. No new scenario was added.
+    # Save Experiment.
     # $1 = stem, $2 = input pass number.
     v2run() {
         rm -f "$V2D/pagesave-base.exp"
@@ -2030,8 +1744,9 @@ else
     # Byte offsets rather than awk's RS="\0": mawk reads a NUL record separator
     # as one whole-file record, busybox awk reads it as RS="" and returns one
     # number per paragraph. grep -b is the same answer without the dialect.
-    # Prefixed names because dash has no function scope and this script is one
-    # namespace: a bare s= and e= here would be visible to every later section.
+    # Prefixed names, because a function's variables are global unless
+    # declared local: a bare s= and e= here would be visible to every later
+    # section.
     v2first() { v2fs=$(command grep -abo 'HISTORY BEGIN{' "$1" | head -1 | cut -d: -f1)
                 v2fe=$(command grep -abo '}HISTORY END'  "$1" | head -1 | cut -d: -f1)
                 echo $((v2fe - v2fs - 14)); }
@@ -2043,11 +1758,10 @@ else
     v2list()  { command grep "$2" "$1" | awk -v k="$3" '{printf "%s ", $k}' | sed 's/ $//'; }
     v2body()  { command grep -o 'Body [^ ]*' "$1" | awk '{printf "%s ", $2}' | sed 's/ $//'; }
     v2cmds()  { command grep -o '^[A-Z]* CommandParameters' "$1" | awk '{printf "%s ", $1}' | sed 's/ $//'; }
-    # A key's value line COUNT is part of the shape and is declared, not
-    # discovered: FLOORDIMENSION has two (X and Z), the other nine have one.
-    # Without the cap a key swallows every line down to the next ALL-CAPS one,
-    # and AUTOSAVETIME then reports GPSconst, GNSconst and four more as its
-    # own value -- measured while writing this, not supposed.
+    # A key's number of value lines is declared, not discovered:
+    # FLOORDIMENSION has two (X and Z), the other nine have one. Without the
+    # cap a key takes every line down to the next ALL-CAPS one, and
+    # AUTOSAVETIME would report GPSconst, GNSconst and more as its value.
     v2keys()  { awk '/^POPULATION BEGIN\{/{exit}
                      BEGIN{split("FLOORDIMENSION FLOORFUNCTION FLOORPICTUREFILE FLOORFUNCSELECTED TEXTUREFILE TEXALPHA WITHTEXTURE AUTOSAVETIME RESEVGEN WITHHISTORY",K," ");
                            for(i=1;i<=10;i++){want[K[i]]=1}; want["FLOORDIMENSION"]=2}
@@ -2076,11 +1790,9 @@ else
         echo "  the driver could not carry out part of a save:"
         command grep -h '^ *!!' "$V2D"/ham*.out "$V2D"/oct*.out | head -4 | sed 's/^/    /'
     elif ! command grep -q guidriveStderrControl "$V2D/err"; then
-        # Its own positive control, on its own stderr. The `pagesave' section
-        # above checks the same scenario, but on a DIFFERENT stream from a
-        # different run -- `slave gui' carries a duplicate of this check for
-        # exactly that reason. Without it an empty stderr cannot be told from
-        # a suppressed one.
+        # Its own positive control, on its own stderr: `pagesave' checks the
+        # same scenario, but from a different run. Without it an empty stderr
+        # cannot be told from a suppressed one.
         v2f=1
         echo "  Qt's connect logging is SUPPRESSED -- the save path's connects"
         echo "  were not checked. Unset QT_LOGGING_RULES and re-run."
@@ -2098,13 +1810,12 @@ else
         for p in 0 1 2; do echo "pvmhost ham$p        $(v2hosts "$V2D/ham$p.exp")"; done
         echo "exp history lines    $(v2s6n "$V2D/ham0.exp") $(v2s6n "$V2D/ham1.exp") $(v2s6n "$V2D/ham2.exp")"
         echo "exp history stable   $(v2eq3 yes "$(v2s6 "$V2D/ham0.exp")" "$(v2s6 "$V2D/ham1.exp")" "$(v2s6 "$V2D/ham2.exp")")"
-        # CONTENT, not only stability. Without these two the section compares
-        # section 6 against ITSELF across the three passes and never against
-        # 1.3 -- a mutated input passes, measured 2026-09-08. V8 result 4
-        # quotes both lines from the 1.3 run, so they are 1.3's bytes.
-        # The floats here are read and written as text, never recomputed, so
-        # comparing them byte for byte is legitimate where a fitness value
-        # would not be.
+        # CONTENT, not only stability: without these two, section 6 is
+        # compared only with ITSELF across the three passes, never with 1.3.
+        # The v8 capture quotes both lines from the 1.3 run, so they are
+        # 1.3's bytes. The floats here are read and written as text, never
+        # recomputed, so comparing them byte for byte is legitimate where a
+        # fitness value would not be.
         echo "exp history first    $(v2s6e "$V2D/ham2.exp" 1)"
         echo "exp history last     $(v2s6e "$V2D/ham2.exp" '$')"
         echo "first block chars    $(v2first "$V2D/ham0.exp") $(v2first "$V2D/ham1.exp") $(v2first "$V2D/ham2.exp")"
@@ -2115,21 +1826,13 @@ else
             echo "history growth $p->$q  $(paste "$V2D/b$p.txt" "$V2D/b$q.txt" \
                 | awk '{d[$2-$1]++} END{n=0; for(k in d){printf "%s%d blocks %+d", (n++?" ":""), d[k], k} if(n==0) printf "NO BLOCKS"}')"
         done
-        # STABILITY IS NOT ENOUGH ON ITS OWN. Every "identical in all three"
-        # line here passes when the INPUT changes, because all three passes
-        # change together -- measured 2026-09-08 by renaming an individual in
-        # the input, which the gate did not notice. So each such line also
-        # carries content: a hash, or the first and last entry. The names and
-        # the population come from the shipped 1.3 data, so pinning their
-        # bytes pins them against 1.3. The robot block does not: its Body
-        # directories are not the shipped ones.
+        # The names and the population come from the shipped 1.3 data, so
+        # pinning their bytes pins them against 1.3. The robot block does
+        # not: its Body directories are not the shipped ones.
         echo "names stable         $(v2eq3 yes "$(v2names "$V2D/ham0.exp")" "$(v2names "$V2D/ham1.exp")" "$(v2names "$V2D/ham2.exp")") $(command grep -c "NAME='" "$V2D/ham0.exp" || true) $(v2namee "$V2D/ham2.exp" 1) $(v2namee "$V2D/ham2.exp" '$')"
-        # THE SIZE IS PART OF THE ASSERTION, not decoration. Every line here
-        # that hashes an extract and compares three hashes says "identical"
-        # when the extractor DIES, because three empty strings are equal.
-        # Measured: replacing expstruct.py with /bin/false left both reports
-        # empty, cmp called them identical, and the gate passed 1/0 with the
-        # tool gone. The line count fails on the same input.
+        # THE SIZE IS PART OF THE ASSERTION: three hashes of an empty extract
+        # are equal, and cmp calls two empty expstruct reports identical. The
+        # line count fails on that.
         echo "hammer robot block   $(v2eq3 'identical in all three' "$(v2robot "$V2D/ham0.exp")" "$(v2robot "$V2D/ham1.exp")" "$(v2robot "$V2D/ham2.exp")") $(v2robotn "$V2D/ham2.exp") lines $(v2robot "$V2D/ham2.exp")"
         "$ROOT/checks/programs/expstruct.py" "$V2D/ham1.exp" > "$V2D/e1.txt"
         "$ROOT/checks/programs/expstruct.py" "$V2D/ham2.exp" > "$V2D/e2.txt"
@@ -2221,10 +1924,9 @@ V2EXPECT
         else
             v2f=1
             echo "  our round trip no longer matches the expected report:"
-            # The CHANGED lines, not the first 20 lines of the diff. The
-            # report is 58 lines, so a plain head shows context and can stop
-            # before reaching the difference -- measured 2026-09-08, when a
-            # changed TEXALPHA failed the gate and printed no TEXALPHA line.
+            # The CHANGED lines, not the first 20 lines of the diff: the report
+            # is 58 lines, so a plain head shows context and can stop before
+            # it reaches the difference.
             command grep -E '^([-+]|@@)' "$V2D/diff.txt" | head -20 | sed 's/^/    /'
         fi
     fi
@@ -2234,28 +1936,23 @@ printf '%-22s %2d pass  %2d fail\n' "v2 round trip vs 1.3" "$v2p" "$v2f"
 pass=$((pass+v2p)); fail=$((fail+v2f))
 
 # ---------------------------------------------------------------------------
-# Phase C -- the converted Designer forms.
+# The Designer forms.
 #
-# MODULES above is the nine core modules. A GUI module can only join that list
-# once EVERY file in it compiles, which is C3-C7; until then the forms converted
-# so far would be covered by nothing at all, and §7 says extending this script
-# is part of the first Phase C step rather than an afterthought.
-#
-# Six things per form, because they break independently:
-#   1. Qt 6's uic accepts the converted .ui           (make forms)
+# Seven checks, because they break independently. Check 1 covers all forms at
+# once; the others run per form:
+#   1. Qt 6's uic accepts the .ui, with no warning      (make forms, above)
 #   2. the generated ui_<Form>.h compiles standalone
 #   3. the committed QWidget-derived base class compiles
-#   4. moc accepts that base class and its output compiles
+#   4. moc accepts that base class, and its output compiles
 #   5. the .qrc and the generated header agree, in BOTH directions
-#   6. every Designer Line still carries an orientation
-# (4) is here because nothing links SIGEL_MasterGUI yet, so a Q_OBJECT that moc
-# chokes on would otherwise not be found until C7. (5) and (6) cover the two
-# losses that are silent everywhere else -- a dropped image and a dropped
-# separator orientation both compile, run, and just render wrong.
+#   6. every view that switches sorting on also pins the direction
+#   7. every Designer Line still carries an orientation
+# 5, 6 and 7 cover losses that are silent everywhere else: a dropped image, a
+# reversed sort and a dropped separator orientation all compile and run, and
+# just look wrong.
 #
-# Generation is delegated to the Makefile rather than repeated here: check.sh
-# disagreeing with the Makefile about flags has already produced one phantom
-# failure (the QtGui/QtWidgets include path, found by review).
+# Generation is left to the Makefile, so that this script and the Makefile
+# cannot disagree about flags.
 FORM_LIST="MT_UI/MT_AddConstantsWidgetBase:MT_GUI \
             MT_UI/MT_AddIndividualsWidget:MT_GUI \
             MT_UI/MT_EstimationWidgetBase:MT_GUI \
@@ -2279,13 +1976,10 @@ FORM_LIST="MT_UI/MT_AddConstantsWidgetBase:MT_GUI \
 
 MOCBIN=$(qmake6 -query QT_INSTALL_LIBEXECS)/moc
 fp=0; ff=0; fw=0; nlinetot=0; nsort=0
-# `forms' already ran above, before the module passes, because GUI headers need
-# its output. REUSE THAT LOG -- do not re-run make here. A second `make forms'
-# is a no-op that emits nothing, so its (empty) output would replace the first
-# run's warnings and the uic-warning check below would become unreachable. That
-# is exactly what happened when this section was hoisted: the gate C1 added to
-# catch a dropped <images> block stopped being able to fire. Found by the C4
-# review, which proved it by injecting one.
+# `make forms' ran at the top, before the module passes, because GUI headers
+# need its output. REUSE THAT LOG; do not run make again here. A second
+# `make forms' does nothing and prints nothing, so its empty log would replace
+# the first run's warnings, and the uic-warning check below could never fire.
 cp /tmp/mkforms.$$ /tmp/uic.$$ 2>/dev/null || : > /tmp/uic.$$
 if [ -n "$FORMS_FAILED" ]; then
     echo "  make forms FAILED -- checks 2-7 below did not run:"; cat /tmp/uic.$$; ff=$((ff+1))
@@ -2301,7 +1995,8 @@ else
     for entry in $FORM_LIST; do
         # <uidir>/<Form>:<Module>[:blocked]  -- "blocked" means the form itself
         # is converted but a custom widget it embeds is not, so its generated
-        # header cannot compile yet. Checks 1, 5 and 6 still run; 2-4 cannot.
+        # header cannot compile yet. Checks 1, 5 and 7 still run; 2-4 cannot,
+        # and 6 passes without a test.
         blocked=""
         case $entry in *:*:*) blocked=${entry##*:}; entry=${entry%:*};; esac
         form=${entry%:*}; mod=${entry#*:}; base=$(basename "$form")
@@ -2325,23 +2020,19 @@ else
         fi
         # 5. the form's images, checked in BOTH directions.
         #
-        # Qt 2 embedded them in the .ui; uic3 -extract pulled them into a .qrc
-        # beside the form. Qt 6's uic drops any leftover <images> block with
-        # nothing but a warning and emits NO icon at all -- the button or combo
-        # item just renders blank, and every other check here stays green.
+        # Qt 2 embedded images in the .ui; here they live in a .qrc beside the
+        # form. Qt 6's uic drops a leftover <images> block with only a warning
+        # and emits NO icon at all: the button or combo item renders blank, and
+        # every other check here passes.
         #
         # forward : every ":/..." the header asks for is in the .qrc and on disk
         # reverse : every file in the .qrc is actually asked for
         # The reverse direction is the one that matters. Without it a form that
-        # LOST its images passes trivially, because there is then no ":/..." to
-        # check -- which is exactly the failure this exists to catch.
+        # LOST its images passes, because there is then no ":/..." to check.
         qrc="$SRC/ui/$form.qrc"
         # `pfx=$(sed ...)' takes sed's exit status, and sed on a missing file
-        # exits 2 -- so under `set -e' this killed the script before the
-        # [ -f "$qrc" ] guard below, which exists for exactly that case, could
-        # run. 19 of the 20 forms have no .qrc, so C2's first added form would
-        # have aborted the gate with no forms line and no total printed.
-        # Found by the C1 review.
+        # exits 2, which under set -e would stop the script. Most forms have no
+        # .qrc, hence the [ -f "$qrc" ] test first.
         pfx=
         [ -f "$qrc" ] && pfx=$(sed -n 's/.*<qresource prefix="\([^"]*\)".*/\1/p' "$qrc")
         for want in $(command grep -ao ':/[A-Za-z0-9_/.-]*' "$FORMSB/ui/ui_$base.h" | sort -u); do
@@ -2358,12 +2049,10 @@ else
                 else ff=$((ff+1)); echo "  form FAIL: $form.qrc carries $have, ui_$base.h never uses it"; fi
             done
         fi
-        # 7. every view the form switches sorting on also pins the DIRECTION.
+        # 6. every view the form switches sorting on also pins the DIRECTION.
         # Qt 2's QListView sorted column 0 ascending by default; Qt 6's
         # setSortingEnabled(true) leaves the indicator descending, so the rows
-        # come out reversed wherever column 0 holds text. C1 found this and
-        # fixed one view; C2 re-created it in four more. This is why it is a
-        # check and not a habit.
+        # come out reversed wherever column 0 holds text.
         if [ -f "$FORMSB/ui/ui_$base.h" ]; then
             for v in $(command grep -aoE '^        [A-Za-z0-9_]+->setSortingEnabled\(true\)' \
                        "$FORMSB/ui/ui_$base.h" | sed 's/->.*//;s/ *//' | sort -u); do
@@ -2372,14 +2061,11 @@ else
                 else ff=$((ff+1)); echo "  form FAIL: $base sorts $v but never pins the direction"; fi
             done
         fi
-        # 6. every Designer separator still says which way it runs.
-        # `uic3 -convert' DROPS a Line's `orientation', and that property is the
-        # only thing Qt 6's uic reads to choose a frame shape: without it the
-        # widget is a bare QFrame, i.e. NoFrame, and the separator paints
-        # nothing. Invisible to every other check here. C2 measured which:
-        # uic3 KEEPS an explicit frameShape and drops only the then-redundant
-        # orientation, so 3 of the 6 Lines were affected, not 6 -- the ones
-        # whose Qt 2 form set orientation ALONE. Either property satisfies it.
+        # 7. every Designer separator still says which way it runs.
+        # A Line's `orientation' is the only thing Qt 6's uic reads to choose a
+        # frame shape: without it the widget is a bare QFrame with NoFrame,
+        # and the separator paints nothing. An explicit frameShape does the
+        # same job, so either property satisfies this.
         nline=$(command grep -ac '<widget class="Line"' "$SRC/ui/$form.ui" || true)
         nlinetot=$((nlinetot+nline))
         nshape=$(command grep -aA3 '<widget class="Line"' "$SRC/ui/$form.ui" \
@@ -2387,14 +2073,13 @@ else
         if [ "$nline" -le "$nshape" ]; then fp=$((fp+1))
         else ff=$((ff+1)); echo "  form FAIL: $form.ui has $nline Line widgets but $nshape with a shape"; fi
     done
-    # Both checks above are `-le' or a for-loop over a grep, so ZERO matches is
-    # indistinguishable from a clean pass -- and a pattern that quietly stops
-    # matching (uic changes its indentation, Designer renames the class) would
-    # make every form pass with nothing checked. The corpus totals are known and
-    # asserted here for that reason: 6 Line widgets across the 20 forms and 5
+    # Checks 6 and 7 are a for-loop over a grep and a `-le', so ZERO matches
+    # looks like a clean pass. A pattern that quietly stops matching (uic
+    # changes its indentation, Designer renames the class) would make every
+    # form pass with nothing checked. So the totals over all forms are
+    # asserted: 6 Line widgets across the 20 forms and 5
     # setSortingEnabled(true) in the generated headers. Raise them if a form
-    # gains one; never lower them to make this quiet. Added 2026-09-05 after a
-    # review pointed out that both checks pass on zero.
+    # gains one; never lower them to make this quiet.
     if [ "$nlinetot" -lt 6 ]; then
         ff=$((ff+1))
         echo "  form FAIL: found $nlinetot Line widgets across the forms, expected at least 6 --"
@@ -2415,9 +2100,7 @@ echo "-----"
 echo "total: $pass pass, $fail fail, $warn warnings in SIGEL code"
 [ "$winskip" = 0 ] || echo "$winskip Windows-only WIN_* file(s) excluded -- permanent, §7"
 [ "$skipped" = 0 ] || echo "$skipped SECTION(S) SKIPPED -- see above; they tested nothing"
-# EXIT NON-ZERO WHEN ANYTHING FAILED. There was no exit here at all, so the
-# script always returned 0 and `./checks/check.sh && ...' proceeded through a red run.
-# A skipped section counts as a failure for the exit status: it is the shape
-# this file has been bitten by three times -- a section that quietly tests
-# nothing and reports no failures. Found by review.
+# Exit non-zero when anything failed, so that `./checks/check.sh && ...' stops
+# on a red run. A skipped section counts as a failure too: it tested nothing
+# and reported no failure.
 [ "$fail" = 0 ] && [ "$skipped" = 0 ]
