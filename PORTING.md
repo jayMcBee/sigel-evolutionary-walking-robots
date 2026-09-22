@@ -912,6 +912,15 @@ Start here.
     loaded. Load a robot first.` The box for a loaded robot keeps its title
     `Robot Information`, and the DynaMechs box in the same function keeps its
     old title.
+  - `Starting Evolution (Haha)` / `Stopping Evolution (Haha)` → `Starting
+    Evolution` / `Stopping Evolution`, debug lines in
+    `SIG_GUIGPExperiment::slotStartEvolution` and `slotStopEvolution`, inside
+    `#ifdef SIG_DEBUG`: not compiled.
+  - `huh_grumpf` → `invalid_mode`, the word `SIG_Drive::writeToFileTransfer` writes
+    when the drive mode is none of the four known ones. It is text in the
+    robot transfer format, allowed by decision on two facts: the only reader,
+    `SIG_Drive`'s stream constructor, treats every unknown word the same, and
+    no saved file holds the word.
   - `aiaiaiaia !!!!!` → `n/a`, the starting text of the comment box in
     `SIG_ExperimentViewBase.ui`. `SIG_GUIGPExperiment`'s constructor fills the
     box from the experiment's own comment, so neither text is ever shown.
@@ -4400,7 +4409,9 @@ count unchanged. Sections 1 to 5 of `xtest-baseline.txt` now print `motion>0` an
 `xi2NoMotion`, which a spare X motion event cannot move. **Section 6, enter and
 leave, still prints three raw `nativeMotion=` counts, and that is where it
 failed a third time on 2026-09-18** — every Qt-level count again unchanged, and
-the next run on the same tree passed. The mitigation never reached that section.
+the next run on the same tree passed. **A fourth time on 2026-09-22**, the same
+line (`nativeMotion=2` against 1): the scenario alone then matched the baseline
+twice, and the next full run passed. The mitigation never reached that section.
 `guidrive.cpp, spies` carries the reason.
 
 **The run lock is DONE — 2026-09-16, `69b3e4a`, `6494ab6`, `a541679`.** One

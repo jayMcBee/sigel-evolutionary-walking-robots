@@ -113,7 +113,7 @@ namespace SIGEL_Robot {
 		else if (mode == tServoSimpleMode)
 			tx << "simpleservo ";
 		else
-			tx << "huh_grumpf ";
+			tx << "invalid_mode ";
                 tx << name << ' ' << number << ' '
                    << minforce << ' ' << maxforce << ' '
                    << theJoint->getName () << '\n';
