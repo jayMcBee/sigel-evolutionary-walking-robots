@@ -102,24 +102,24 @@ double SIGEL_GP::SIG_GPForceFitnessFunction::evalFitness() {
       // The first value is always garbage, so take the second from the list straight away
       // The while loop always fetches the next frame
       while ( (usedForce = recorder.listForces.value( ++forceIdx )) != 0 ) {
-        double betrag = 0;
-        double durchschnittProGelenk = 0;
-        vector<double> betraege;
+        double momentMagnitude = 0;
+        double averageMomentPerJoint = 0;
+        vector<double> momentMagnitudes;
         // usedForce.size() gives the number of joints
         for (unsigned int i=0;i<(*usedForce).size();++i) {
           momentX = (*usedForce)[i][0];
           momentY = (*usedForce)[i][1];
           momentZ = (*usedForce)[i][2];
-          betrag = sqrt( pow(momentX,2) + pow(momentY,2) + pow(momentZ,2) );
-          betraege.push_back(betrag);
+          momentMagnitude = sqrt( pow(momentX,2) + pow(momentY,2) + pow(momentZ,2) );
+          momentMagnitudes.push_back(momentMagnitude);
 
           // Compute the average force per joint
-          durchschnittProGelenk += betrag/((*usedForce).size());
+          averageMomentPerJoint += momentMagnitude/((*usedForce).size());
         } // end of for loop
 
         double varianz = 0;
         for (unsigned int i=0;i<(*usedForce).size();++i) {
-          varianz += fabs(betraege[i]-durchschnittProGelenk);
+          varianz += fabs(momentMagnitudes[i]-averageMomentPerJoint);
         }
         variance.push_back(varianz);
       } // end of while loop [fetch next frame]

@@ -944,6 +944,10 @@ Start here.
   - `rot`, `gruen`, `blau` → `red`, `green`, `blue`, in the same function: the
     three numbers of `colour red <r> green <g> blue <b>;`. Here `rot` means
     "red"; the `rot` that means rotation, in other files, stays.
+  - `betrag`, `betraege`, `durchschnittProGelenk` → `momentMagnitude`,
+    `momentMagnitudes`, `averageMomentPerJoint`, in the per-frame loop of the
+    force fitness function: a joint's moment length, the lengths of all joints
+    in a frame, and their average.
 - **`check.sh` passes 1098, not 1097:** `README.md` added one tracked file.
 
 **2026-09-21 — DONE: ITEM 49. THE EXPERIMENTS RUN UNTIL 1 JANUARY 2030, 12:00.**

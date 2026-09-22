@@ -148,7 +148,7 @@ Constructs the language removed. A current compiler rejects them.
   | `Varianz` | `MT_StatisticsElement.h` |
   | `winkel`, `verschiebung`, `schiebung`, `drehmatrix`, `hilf`, `stflorianhilf` | `IFunctions.h`, `IFunctions.cpp` |
   | `masse` | `SIG_Mirtich.h`, `.cpp` |
-  | `betrag`, `betraege`, `varianz`, `durchschnittProGelenk` | `SIG_GPForceFitnessFunction.cpp` |
+  | `varianz` | `SIG_GPForceFitnessFunction.cpp` |
   | `ausgabeTerrain` | `SIG_Environment.cpp, generateTerrain` |
   | `zeiger` | `SIG_EnvironmentRenderer.cpp` |
   | `zahl` | `SIG_Geometry.cpp` |
