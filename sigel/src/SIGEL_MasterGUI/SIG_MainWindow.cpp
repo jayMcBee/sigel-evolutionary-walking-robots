@@ -771,7 +771,7 @@ void SIG_MainWindow::slotUseTextLabels()
 void SIG_MainWindow::slotChangeFont()
 {
   bool ok;
-  QFont newFont = QFontDialog::getFont( &ok, QApplication::font() );
+  QFont newFont = QFontDialog::getFont( &ok, QApplication::font(), this );
   if( ok )
     qApp->setFont( newFont );
 };
@@ -807,7 +807,7 @@ void SIG_MainWindow::slotMTConfigureSystem()
 		return;
 	SIG_GUIGPExperiment *currentExperiment = experimentListView->currentlySelectedExperiment();
 	if(currentExperiment){
-		currentExperiment->gpExperiment.mtController->configureSystem();
+		currentExperiment->gpExperiment.mtController->configureSystem( this );
 	};
 };
 

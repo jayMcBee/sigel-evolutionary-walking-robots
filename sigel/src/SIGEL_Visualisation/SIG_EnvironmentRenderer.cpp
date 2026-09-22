@@ -27,6 +27,7 @@
 
 #include "dm.h"
 #include "qmessagebox.h"
+#include "SIGEL_Tools/SIG_DialogParent.h"
 
 #include <cmath>
 #include <stdlib.h>
@@ -413,7 +414,7 @@ namespace SIGEL_Visualisation
   			memcmp(pnmMagic, fileMagic, sizeof(pnmMagic)) != 0                			||
   			fread(header, 1, sizeof(header), file)        != sizeof(header))
   	{
-  		QMessageBox warn("Warning", "Could not open the texture-file!\nDisplay it without a texture!",QMessageBox::Warning, QMessageBox::Retry, QMessageBox::NoButton,QMessageBox::NoButton);
+  		QMessageBox warn("Warning", "Could not open the texture-file!\nDisplay it without a texture!",QMessageBox::Warning, QMessageBox::Retry, QMessageBox::NoButton,QMessageBox::NoButton, SIGEL_Tools::dialogParent());
   		warn.exec();  	
 
   		return false;
@@ -440,7 +441,7 @@ namespace SIGEL_Visualisation
   	if(texture.imageData == NULL) { //  ||
   			//fread(texture.imageData, 1, imageSize, file) != imageSize) {
   		//if(texture.imageData != NULL) free(texture.imageData);
-  		QMessageBox warn("Warning", "The specified texture-file does not contain valid data!\nDisplay it without a texture!",QMessageBox::Warning, QMessageBox::Retry, QMessageBox::NoButton,QMessageBox::NoButton);
+  		QMessageBox warn("Warning", "The specified texture-file does not contain valid data!\nDisplay it without a texture!",QMessageBox::Warning, QMessageBox::Retry, QMessageBox::NoButton,QMessageBox::NoButton, SIGEL_Tools::dialogParent());
   		warn.exec();  		
 
 			fclose(file);
@@ -470,7 +471,7 @@ namespace SIGEL_Visualisation
     QString texFile = environment.getTextureFile();
 
     if ( texFile.length() == 0 ) {
-  		QMessageBox warn("Warning", "The specified texture-file does not exist!\n Display it without a texture!",QMessageBox::Warning, QMessageBox::Retry, QMessageBox::NoButton,QMessageBox::NoButton);
+  		QMessageBox warn("Warning", "The specified texture-file does not exist!\n Display it without a texture!",QMessageBox::Warning, QMessageBox::Retry, QMessageBox::NoButton,QMessageBox::NoButton, SIGEL_Tools::dialogParent());
   		warn.exec();
     	return false;
     }

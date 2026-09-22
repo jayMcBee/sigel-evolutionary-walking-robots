@@ -6,6 +6,7 @@
 #include <QTextStream>
 #include <QFile>
 class MT_MainWindow;
+class QWidget;
 #include "MT_Control/MT_Substitute.h"
 #include "MT_GPSystem/MT_GPManager.h"
 
@@ -43,7 +44,7 @@ public:
 public:
 	bool startWOSigel;
 
-	void configureSystem();
+	void configureSystem(QWidget *owner);
 	bool useMeta(bool state);
 	bool switchSystem(int wantedSystem);
 	bool startEvolution();

@@ -23,6 +23,7 @@
 
 #include "SIGEL_GP/SIG_GPRemoteZORCFitnessFunction.h"
 #include <QInputDialog>   // widget used in this file only
+#include "SIGEL_Tools/SIG_DialogParent.h"
 #include "SIGEL_Tools/SIG_IO.h"
 
 
@@ -187,7 +188,7 @@ namespace SIGEL_GP
                      <OL><LI>Set ZORC down to start executing the current program</LI><LI>Enter the distance travelled by ZORC</LI></OL> \
                      <BR><BR><I>Execute the program as many times as you want by restarting the program manually on ZORC</I> <BR><BR><BR>\
                      Enter the distance travelled by the robot (centimeters, 1 decimal):";
-      distance = QInputDialog::getDouble(nullptr, dlogTitle, expInstruct, 1.0, 0, 500.0, 1, &wasOk);
+      distance = QInputDialog::getDouble(SIGEL_Tools::dialogParent(), dlogTitle, expInstruct, 1.0, 0, 500.0, 1, &wasOk);
 
       // something went wrong, set fitness to -1 -> will be re-evaluated by SIGEL
       if (!wasOk)

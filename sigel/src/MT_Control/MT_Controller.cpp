@@ -1,4 +1,5 @@
 #include <QCoreApplication>   // QCoreApplication::exit
+#include "SIGEL_Tools/SIG_DialogParent.h"
 #include "SIGEL_Tools/SIG_IO.h"
 #include "MT_GUI/MT_MainWindow.h"
 #include "MT_Control/MT_Controller.h"
@@ -208,7 +209,7 @@ bool MT_Controller::switchSystem(int wantedSystem)
 	// if we have constructed a substituter or a gpmanager yet, we have to destroy them
 	if(gpManager || substCache.inUse || substitution){
 
-		if(QMessageBox::warning(0, "Switching the meta system", 
+		if(QMessageBox::warning(SIGEL_Tools::dialogParent(), "Switching the meta system", 
 			"Switching the system requires deleting the current\n"
 			"gp-system. Do you want to delete it?",
 			"Yes", "No", 0, 1, 1) == 0){
@@ -254,7 +255,7 @@ bool MT_Controller::useMeta(bool state)
 	if(state == false){		// the meta-system isn't needed anymore - therefore delete it?
 		QString proposedName = saveName;
 		if(guiEnabled){
-			switch( QMessageBox::information(0, 
+			switch( QMessageBox::information(SIGEL_Tools::dialogParent(), 
 											"Disabling MetaGP",
 											"You are about to disable the Meta GP-System. What shall\n"
 											"we do with the system?",
@@ -354,9 +355,9 @@ bool MT_Controller::createGPSystem()
 
 /***
  * popup the configuration window
- * called by sigel mainwindow
+ * called by sigel mainwindow, which passes itself as the window's owner
  ***/
-void MT_Controller::configureSystem()
+void MT_Controller::configureSystem(QWidget *owner)
 {
 	// if there is an up to date substituter, fill the substCache with 
 	// the data from this substituter
@@ -380,7 +381,7 @@ void MT_Controller::configureSystem()
 		}
 	}
 	if(!mainWindow){
-		if(!(mainWindow = new MT_MainWindow(this, gpManager, &substCache, 0, "MTMainWindow"))){
+		if(!(mainWindow = new MT_MainWindow(this, gpManager, &substCache, owner, "MTMainWindow"))){
 			SIGEL_Tools::SIG_IO::cerr << "Configure meta system: couldn't open the configuration window." << Qt::endl;
 			return;
 		}
@@ -432,7 +433,7 @@ bool MT_Controller::readFromFile(QString fileName)
 
 	} else {
 		if(guiEnabled){
-			switch(QMessageBox::critical(0,
+			switch(QMessageBox::critical(SIGEL_Tools::dialogParent(),
 								"Loading experiment",
 								"An error occurred in loading the meta experiment.\n"
 								"Press <standard> to load the default setup or\n"
@@ -579,7 +580,7 @@ bool MT_Controller::saveSystem(QString sigExpName)
 	if(saveName.isEmpty()){
 		stdConf = true;
 		if(guiEnabled)
-			saveName = QFileDialog::getSaveFileName(nullptr, QString(), proposedName, "*.mexp;;*");
+			saveName = QFileDialog::getSaveFileName(SIGEL_Tools::dialogParent(), QString(), proposedName, "*.mexp;;*");
 		else
 			saveName = "lastExperiment.mexp";
 
@@ -906,7 +907,7 @@ void MT_Controller::slotSaveSetup()
 
 	QFile file(fileName);
 	if(file.exists()){
-		if(0 == QMessageBox::warning(0, "Save configuration", "There is another file with this name. This will overwrite\n"
+		if(0 == QMessageBox::warning(mainWindow, "Save configuration", "There is another file with this name. This will overwrite\n"
 			"the existing file. Do you really want to continue?", "Ok", "Cancel", 0, 1))
 			return;
 	}

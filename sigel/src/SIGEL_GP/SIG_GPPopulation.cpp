@@ -22,6 +22,7 @@
 */
 #include <QApplication>   // qApp and QProgressDialog need QtWidgets
 #include <QProgressDialog>   // widget used in this file only
+#include "SIGEL_Tools/SIG_DialogParent.h"
 #include "SIGEL_GP/SIG_GPPopulation.h"
 
 #include<iostream>
@@ -199,7 +200,7 @@ void SIGEL_GP::SIG_GPPopulation::addRandomIndividuals(int quantity,
 
    QProgressDialog *progress;
    
-   if( qApp ) progress = new QProgressDialog( "Progress:", "Cancel", 0, quantity );
+   if( qApp ) progress = new QProgressDialog( "Progress:", "Cancel", 0, quantity, SIGEL_Tools::dialogParent() );
    if( qApp ) progress->setWindowModality( Qt::ApplicationModal );
    if( qApp ) progress->setWindowTitle( "Generating" );
    
@@ -382,7 +383,7 @@ void SIGEL_GP::SIG_GPPopulation::readFromFile(QTextStream &file)
 #endif
 
         if( qApp ) 
-           progress = new QProgressDialog( "Progress:", "Cancel", 0, getSize() );
+           progress = new QProgressDialog( "Progress:", "Cancel", 0, getSize(), SIGEL_Tools::dialogParent() );
         if( qApp ) progress->setWindowModality( Qt::ApplicationModal );
         if( qApp ) progress->setWindowTitle( "Loading" );
 

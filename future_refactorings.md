@@ -294,18 +294,6 @@ touched, because changing one changes behaviour against the reference binary.
   in `slotEvolutionStopped`. **Untried:** a check without PVM may be possible
   with a run that has no tournaments.
 
-- [ ] **25. Dialogs with no parent can end up out of sight.** D36. A modal
-  prompt with no parent blocks the window, Quit included — seen when
-  `SIG_ExperimentListView::slotSaveExperiment`'s overwrite prompt sent
-  `set_modal` and no `set_parent` on Wayland. D35 covered the eight save and
-  export file dialogs; D39 finished the interface, all 32 sites in
-  `SIGEL_MasterGUI`. **What is left, counted after D35:** 24 of 100
-  `QMessageBox` calls pass parent `0`, and 13 of 43 `QFileDialog` calls pass
-  `nullptr`. D39's list has the detail, part of it
-  in `MT_Controller`, `SIG_GPPopulation` and `SIG_GPRemoteZORCFitnessFunction`,
-  which D33 keeps untouched. **Not measured:** whether a parent attaches GTK's
-  own file dialog on Wayland.
-
 - [ ] **26. The 3D camera never sizes the view to the robot.** Not a port
   defect — every camera file matches pristine 1.3. Two 2003 faults:
   the distance is a constant (`SIG_SimulationWidget::slotSetDistance` divides
@@ -376,9 +364,11 @@ touched, because changing one changes behaviour against the reference binary.
   `MT_StatisticsWidget` prompts at six export sites after a `getSaveFileName`
   that already asks. Same family: `MT_PopulationWidget::slotExpInd` and
   `slotSavePop`, `MT_IndividualsWidget::slotExportConstants`,
-  `MT_Controller::slotSaveSetup` — the last in a module D33 keeps untouched.
-  They pass no parent, so they are item 25 sites too — but **delete rather than
-  re-parent them.**
+  `MT_Controller::slotSaveSetup`. The six in `MT_StatisticsWidget` pass no
+  parent; item 25 left them for this item. `slotSaveSetup`'s prompt got a
+  parent in item 25 and is still to go; it is in `MT_Controller`, and D33 says
+  only that a dialog's parent is outside it, not whether deleting a prompt is.
+  **Delete rather than re-parent them.**
 
 - [ ] **34. `tearDownPvm()`'s `pvm_halt()` never returns.** It sends `TM_HALT`
   and waits for a reply the daemon never sends; the daemon's `pvmbailout()` then
@@ -551,7 +541,7 @@ touched, because changing one changes behaviour against the reference binary.
   The `winskip` counter behind that line goes with them, and its line
   disappearing will look like a lost check unless it is done knowingly.
   **It moves a pinned check total:** the 11 deleted files are counted by the
-  `encodings` check, so `check.sh` goes from 971 pass to 960. PORTING.md pins
+  `encodings` check, so `check.sh` goes from 973 pass to 962. PORTING.md pins
   that number in two places — the per-step exit criterion in §7 and the check
   list — and its trail in §7 records each step. Move all of them in the same
   commit.
