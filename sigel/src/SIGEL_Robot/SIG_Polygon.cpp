@@ -45,16 +45,16 @@ namespace SIGEL_Robot {
                 : myGeometry (mygeom)
         {
                 QString tmpstr;
-                int zahl;
+                int vertexCount;
 
                 tx >> tmpstr;
                 if (tmpstr != "Polygon")
                         // ERROR
                         ;
                 
-                tx >> zahl;
-                vertices.resize (zahl);
-                for (int i = 0; i < zahl; i++)
+                tx >> vertexCount;
+                vertices.resize (vertexCount);
+                for (int i = 0; i < vertexCount; i++)
                         tx >> vertices [i];
         }
 

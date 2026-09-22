@@ -99,7 +99,7 @@ namespace SIGEL_Robot {
                                                         bool nir)
         { // nir = not in robot
                 QString tmpstr;
-                int zahl;
+                int commandCount;
 
                 if (nir) {
 			tx >> tmpstr;
@@ -113,8 +113,8 @@ namespace SIGEL_Robot {
                 tx >> memSize;
 		tx >> maximalDelayTime;
 
-                tx >> zahl;
-                for (int i = 0; i < zahl; i++) {
+                tx >> commandCount;
+                for (int i = 0; i < commandCount; i++) {
                         tx >> tmpstr;
                         allowedCommands.append (NamedCommand{ tmpstr, new SIG_CommandParameters (tx) });
                 }

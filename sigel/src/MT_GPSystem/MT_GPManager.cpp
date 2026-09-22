@@ -320,20 +320,20 @@ void MT_GPManager::writeToFileGPSystem(QTextStream &File)
 
 	QList<double> * Outcome =FitnessTrainer->getResultIstArray();
 	QList<double> * CorrectFit =FitnessTrainer->getResultArray();
-	int NumOfPositivSigelFit =0; 
+	int NumOfPositiveSigelFit =0; 
 	int FitArrayLEnght = Outcome->count();
 
 	for (int k=0; k<Outcome->count(); k++)
 	{
 		if ((*CorrectFit)[k]>=0.0)
-			NumOfPositivSigelFit ++;
+			NumOfPositiveSigelFit ++;
 		
 		File << "No.: " << k << Qt::endl;
 		File << " Sigel Fitness/Winner : " << (*CorrectFit)[k] << Qt::endl;
 		File << " Meta Prediction      : " << (*Outcome)[k] << Qt::endl;
 	}
 	
-	File << "#CorrectFit >=0 : " << NumOfPositivSigelFit << Qt::endl << Qt::endl;
+	File << "#CorrectFit >=0 : " << NumOfPositiveSigelFit << Qt::endl << Qt::endl;
 
 	File << "Generation: "<< GenerationNumber <<Qt::endl;
 	File << "max.Fitness   : " << corFitValue << Qt::endl; 
@@ -500,10 +500,10 @@ void MT_GPManager::startEvolution(MT_Substitute *Substitute)
 
 	int tmp1 =0;
 	int tmp2 =0;
-	int FitFkt =0;
-	FitnessTrainer->getSelektionValue(&FitFkt, &tmp1, &tmp2);
+	int FitFunction =0;
+	FitnessTrainer->getSelektionValue(&FitFunction, &tmp1, &tmp2);
 	
-	if (FitFkt < 3)
+	if (FitFunction < 3)
 		Selector->setTypOfIndividual(0); // Evaluator Meta System;
 	else 
 		Selector->setTypOfIndividual(1); // Classifier Meta System;

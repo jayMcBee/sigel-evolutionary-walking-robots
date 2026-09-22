@@ -50,21 +50,21 @@ namespace SIGEL_Robot {
         SIG_Geometry::SIG_Geometry (QTextStream & tx)
         {
                 QString tmpstr;
-                int zahl;
+                int itemCount;
                 
                 tx >> tmpstr;
                 if (tmpstr != "Geometry")
                         // ERROR
                         ;
 
-                tx >> zahl;
-                for (int i = 0; i < zahl; i++) {
+                tx >> itemCount;
+                for (int i = 0; i < itemCount; i++) {
                         DL_vector d = SIG_Robot::streamToVector (tx);
                         vertices.append (new DL_vector (&d));
                 }
 
-                tx >> zahl;
-                for (int j = 0; j < zahl; j++)
+                tx >> itemCount;
+                for (int j = 0; j < itemCount; j++)
                         polygons.append (new SIG_Polygon (this, tx));
         }
 

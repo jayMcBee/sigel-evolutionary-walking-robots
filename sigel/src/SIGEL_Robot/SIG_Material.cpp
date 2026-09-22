@@ -38,15 +38,15 @@ namespace SIGEL_Robot {
                 : parent (par)
         {
                 QString tmpstr;
-                int zahl;
+                int frictionCount;
 
                 // "Material" has already been read by SIG_Robot.
                 tx >> name
                    >> elasticity
                    >> density;
                 
-                tx >> zahl;
-                for (int i = 0; i < zahl; i++) {
+                tx >> frictionCount;
+                for (int i = 0; i < frictionCount; i++) {
                         QString fname;
                         DL_Scalar fval;
                         SIG_Material *fother;

@@ -149,8 +149,6 @@ Constructs the language removed. A current compiler rejects them.
   | `winkel`, `verschiebung`, `schiebung`, `drehmatrix`, `hilf`, `stflorianhilf` | `IFunctions.h`, `IFunctions.cpp` |
   | `masse` | `SIG_Mirtich.h`, `.cpp` |
   | `varianz` | `SIG_GPForceFitnessFunction.cpp` |
-  | `ausgabeTerrain` | `SIG_Environment.cpp, generateTerrain` |
-  | `zahl` | `SIG_Geometry.cpp` |
 
   The robot grammar is entirely English — `density`, `red`, `green`, `blue`,
   `friction`, `minimal_rot` — so the German names in `SIG_RobotCompiler.cpp`

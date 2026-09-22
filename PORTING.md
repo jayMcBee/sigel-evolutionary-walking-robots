@@ -952,6 +952,16 @@ Start here.
     write position in the texture buffer.
   - `thema` → `link`, in `SIG_RobotCompiler::nextIsLink`: the link that a
     `link <name> { … }` block of a robot file defines.
+  - Five more in one round: `FitFkt` → `FitFunction` and `NumOfPositivSigelFit`
+    → `NumOfPositiveSigelFit` in `MT_GPManager.cpp`; `ausgabeTerrain` →
+    `partialTerrainFile`, the stream to the temporary terrain file, and
+    `ausgabe` → `greyValue`, one pixel of a PGM terrain image, in
+    `SIG_Environment::generateTerrain`; `zahl`, a count read from the transfer
+    text, → `itemCount` (`SIG_Geometry`, where it holds two counts in turn),
+    `commandCount` (`SIG_LanguageParameters`), `frictionCount` (`SIG_Material`)
+    and `vertexCount` (`SIG_Polygon`). `count` was not used for `SIG_Geometry`:
+    `shim/iostream.h` brings `using namespace std;` into scope, so it would hide
+    `std::count`.
 - **`check.sh` passes 1098, not 1097:** `README.md` added one tracked file.
 
 **2026-09-21 — DONE: ITEM 49. THE EXPERIMENTS RUN UNTIL 1 JANUARY 2030, 12:00.**
