@@ -150,6 +150,10 @@ Constructs the language removed. A current compiler rejects them.
   | `masse` | `SIG_Mirtich.h`, `.cpp` |
   | `varianz` | `SIG_GPForceFitnessFunction.cpp` |
 
+  **Kept, by decision:** `sliderIntervall` and `slotIntervallChanged`, German
+  spelling of "interval". The GUI baselines record the widget by name, and the
+  form connects the slot by name.
+
   The robot grammar is entirely English — `density`, `red`, `green`, `blue`,
   `friction`, `minimal_rot` — so the German names in `SIG_RobotCompiler.cpp`
   hold the value of an English keyword and the target name is already written in
@@ -219,6 +223,17 @@ touched, because changing one changes behaviour against the reference binary.
   leaks one `SIG_RenderRecorder`. The other half was fixed by nulling
   `visualisation`. Becomes live the moment any caller catches that throw and
   continues.
+
+- [ ] **53. DynaMechs returns uninitialised forces for end links.**
+  `dmArticulation::getForces` copies the `f_star` of each movable link. But
+  `dmArticulation::ABBackwardDynamics` never writes the `f_star` of a link
+  without children: `ABBackwardDynamicsN` writes into the parent's `f_star`, or
+  into a temporary. `dmArticulation::addNode` creates the struct with
+  `new LinkInfoStruct` and does not zero it. So the values for end links are
+  uninitialised memory, and `SIG_GPForceFitnessFunction::evalFitness` uses them.
+  It matters only for experiments that select `ForceFitnessFunction`; none of
+  the 7 shipped experiments does. The library code is unpatched, as SIGEL's
+  `supportingLibs` ships it. Found 2026-09-22.
 
 ---
 
@@ -430,6 +445,48 @@ touched, because changing one changes behaviour against the reference binary.
   `MT_Controller` runs an evolution on its own thread. Not new — they interleaved
   in `Terrain.ter` itself before the atomic write — and closing it needs per-call
   state, which the port may not add.
+
+- [ ] **50. `SIG_UnstreamerScanner` looks unused. Prove it, then remove it.**
+  Found 2026-09-21. Nothing in `sigel/` constructs it. `SIG_RobotUnstreamer.h`
+  includes its header but uses nothing from it. `SIG_RobotUnstreamer`'s only
+  method, `readFromFileTransfer`, returns `NULL`. **One search is not the
+  proof.** Check every reference: the `Makefile`, the module lists in
+  `check.sh`, the other gates, `kdesigel.doxygen`, the docs, and any code that
+  could create a scanner in another way. Ask the 1.3 oracle whether 1.3 used it. `SIGELCommon.dsp` names
+  both files; it is generated, so do not edit it by hand. Item 35 deletes it.
+  Only then remove the class, its two files and the include, and run the five
+  gates.
+
+- [ ] **52. `SIG_Drive`'s stream constructor can leave `mode` unset.**
+  `SIG_Drive(SIG_Robot*, QTextStream&)` prints `Unsupported Drive Mode <…> !!`
+  when it reads an unknown word, and does not set `mode`.
+  `SIG_Drive::writeToFileTransfer` then writes `invalid_mode` as the mode, unless
+  the unset value happens to equal one of the four known ones. The robot
+  compiler rejects unknown modes, so only transfer text can bring an unknown
+  word in.
+
+- [ ] **54. Empty catch blocks. Review them in a round of their own.** 7 of the
+  31 `catch` clauses in `sigel/` are empty, all
+  `catch (SIGEL_Tools::SIG_Exception &e) { };` around `simulation->start()` in
+  the fitness evaluation of seven fitness functions: AdaptiveWalking, Force,
+  NiceWalking, RealSpeed, Simple, Stepper and ZorcWalking. A simulation that
+  throws is ignored, and the fitness is computed from what was recorded until
+  then. NiceWalking and Simple are the fitness functions of all 7 shipped
+  experiments, so a change can move fitness values against 1.3. Each site needs
+  its own decision. Measured 2026-09-22.
+
+- [ ] **55. Marker checks that do nothing. Review them with item 54.** The
+  transfer-text readers in `SIGEL_Robot` check a marker word first. Two throw
+  `SIG_UnstreamingError` when it is wrong: `SIG_Robot` for `StreamedRobot` and
+  `SIG_LanguageParameters` for `LanguageParameters`. Three hold only a
+  `// ERROR` comment and go on reading the wrong data: the stream constructors
+  of `SIG_Geometry`, `SIG_Polygon` and `SIG_CommandParameters`. Throwing would
+  make a malformed transfer text fail at once; valid files are not affected.
+  The same measurement found other empty bodies, for the same round:
+  `if (running) {} else {}` in five `MT_*Widget.cpp`, seven empty `else {}` in
+  `SIG_GPIndividual.cpp` and `SIG_GPPopulation.cpp`, and `SIG_Robot`'s
+  `if (isroot)`, whose only content is "Something seems to be missing here".
+  Measured 2026-09-22.
 
 - [ ] **35. Remove the Windows and Visual Studio support.** Decided
   2026-09-09. It does not build here and nothing tests it.
