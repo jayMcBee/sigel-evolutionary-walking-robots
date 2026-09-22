@@ -235,20 +235,6 @@ touched, because changing one changes behaviour against the reference binary.
   the 7 shipped experiments does. The library code is unpatched, as SIGEL's
   `supportingLibs` ships it. Found 2026-09-22.
 
-- [ ] **56. The MetaGP window can free the trainer during a run.**
-  `MT_Controller::slotLoadDefault` and `slotLoadSetup` run `delete
-  substitution`. In Evaluator mode that is the object `SIG_GPManager::trainer`
-  points to; in Classifier mode it is the `MetaClassifier` that
-  `SIG_GPManager::run(MT_Classifier*)` and its `evolutionLoop` hold. The run
-  lock greys Configure System, but a MetaGP window opened before Start stays
-  open, and its Load and Default follow the Meta thread's
-  `metaEvolutionRunning` signal, not SIGEL's run. So: MetaGP on, open the
-  window, Start, stop the Meta evolution there (or let its timer do it), press
-  Default — the next `checkTask` or `actTour.run(MetaClassifier)` uses freed
-  memory. Older than D43; the pump before each pass could already reach it.
-  Fix: disable the window's Load and Default for the whole run, or refuse Start
-  while the window is open. Found by review 2026-09-22; not reproduced.
-
 - [ ] **57. Quit during a run leaves the run going.**
   `SIG_MainWindow::slotAboutToQuit` and `closeEvent` ask for confirmation and
   call `qApp->quit()`, but nothing sets `userTerminated`. The window closes,
@@ -258,12 +244,36 @@ touched, because changing one changes behaviour against the reference binary.
   Fix: set `userTerminated` on the running experiment before `quit()`. Found
   by review 2026-09-22; not reproduced.
 
-- [ ] **58. Individuals > Add allows at most 999; allow at least 10000.**
-  `SIG_AddIndividualsDialog`'s `spinboxNumber` has a maximum of 999, as in
-  1.3. Typing 10000 stops at `100`, because the spin box refuses the fourth
-  digit. Raising it is a deliberate divergence from 1.3, and it moves
-  `guibehaviour-baseline.txt` in three lines: `max=999` twice and
-  `typed(max+1)=[100]`. Found on the desktop 2026-09-22.
+- [ ] **59. Investigate the pool limit of 32768.** Tournament selection draws
+  each player's pool position with `SIG_Randomizer::getRandomInt`, which
+  returns 0 to 32767 before the modulo. `SIG_GPManager::createTours` draws with
+  `getSize()`, `getSize()-1`, `-2` and `-3` and shifts the later draws past the
+  earlier ones, so it reaches index 32770 at most: only the first 32771
+  individuals can ever play. The pool itself can grow past that, through
+  repeated Adds or a loaded file, whose `POPULATIONSIZE` and `INDIVIDUAL(x)`
+  indexes both grow it. An individual further down is evaluated — every
+  generation, because `resetPool` clears its fitness — but never enters a
+  tournament.
+  **The modulo also favours low positions** at every pool size that does not
+  divide 32768: 4 draws against 3 for the first 2471 positions of a pool of
+  10099, and 2 against 1 for any pool of 16385 to 32767.
+  The generator is 1.3's, and its bits are the same on a 32-bit machine, so
+  the limit is 1.3's too; confirm that on the oracle. All seven shipped
+  experiments hold 100 individuals, so none comes near it. To decide: leave it
+  as 1.3 has it, refuse a larger pool, or draw differently — and the last
+  makes every run differ from 1.3's. Found by review 2026-09-22.
+
+- [ ] **60. The tournaments-per-generation counter has four digits.**
+  `lcdnumberTournamentsPerGeneration` in `SIG_GPParameterBase.ui` has
+  `digitCount` 4, and `SIG_GPParameter::getOutOfExperiment` and
+  `slotTourPerGenChanged` display the ratio times the pool size. On
+  `runner.exp`, whose ratio is 1, one Add of 9900 or more takes that past
+  9999: `QLCDNumber` then keeps the old digits while its value holds the new
+  number. 1.3 has the same four digits, but its Add of at most 999 could not
+  reach them in one step. Item 58 made it reachable. Giving the counter five
+  digits is one more divergence from 1.3, and it moves
+  `guibehaviour-baseline.txt`, which prints each counter's digits. Found by
+  review 2026-09-22.
 
 ---
 

@@ -559,7 +559,7 @@ D20 supersedes D5, D24 supersedes D3.
 | **D40** *(signed off 2026-09-16)* | The window and splitter at start-up | **1280x860, tree 280 px, splash unscaled.** 1.3's `resize( 900, 750 )` already opened taller than the work area on a 1366x768 screen. The splitter asked for `setSizes( {2, 6} )` meaning a 1:3 split; **measured, Qt gives the tree 71 %** — numbers far below the splitter's width are ignored and the surplus goes by size policy, and `QTreeWidget` expands where the stacked widget does not. Real pixel widths and `setStretchFactor( 0, 0 )` / `( 1, 1 )` fix it and keep it fixed on resize. `widgetBase` had `setScaledContents( true )`, which stretched the square 448x448 `noExperiment.png` across the whole content area; it is centred at its own size instead. All three are deliberate divergences from 1.3. A fixed size, on purpose: no sizing to the screen, for now. Geometry is **not** remembered between sessions; `QSettings` was proposed and rejected as overkill |
 | **D41** *(signed off 2026-09-17)* | The second exception to D33: a run that has lost PVM | **`SIG_GPFitnessTrainer` may REPORT that PVM is unreachable; it may not act on it.** `checkTask` split `pvm_probe`'s three returns — above zero receive, zero wait, below zero give up — because the old `if (info != 0)` sent an error into the receive branch, where `pvm_recv` blocks for a message that cannot come — and **no `TIMEOUTMINUTES` value rescued it**, because the timeout sits in the `else` branch that an error never reaches — or fails and leaves the caller waiting for a task already destroyed. On `PvmSysErr` it sets `pvmLost`; `spawnTask` sets it too, because an unreachable daemon shows up there first and `pvm_spawn` reports that through its own return rather than through `taskId`. `SIG_GPManager::pvmIsLost()` is the only way out, `start()` clears it, and nothing in `SIGEL_GP` acts on it. `SIG_GUIGPExperiment`'s progress timer reads it, ends the run the way `Stop` does and names the reason. **`pvm_mytid` cannot be used to detect this**, and the reason is worth keeping so nobody retries it: `BEATASK` is `( pvmmytid == -1 ? pvmbeatask() : 0 )`, so an enrolled task gets its cached tid back without touching the daemon. **The other option that was measured and rejected:** watching `$PVM_TMP/pvmd.<uid>` disappear — a run completed three further generations with that file removed, because an enrolled task keeps its socket. **Not checked:** no check starts a run; the `evolution` scenario dismisses the new dialog and prints it |
 | **D42** *(signed off 2026-09-17)* | Saying why a run ended | **The interface tells the user when a run ended without doing anything.** `SIG_GUIGPExperiment::slotEvolutionStopped` shows the message when three things hold: the pool generation did not move, `guiGPManager->userTerminated` is false, and `terminationAlreadyMet()` finds the condition already true. The message names the setting — the date, the duration or the generation number — and the tab it is on. 1.3 shows nothing, so this is a deliberate divergence. Decided 2026-09-15: the interface must give feedback in that case. **Nothing in `SIGEL_GP` changes**, so this is not a third exception to D33: `terminationAlreadyMet` reads `gpParameter` and the interface's own copy of the run start time, because `SIG_GPManager::startTime` is private. **That copy is what makes the duration model work** — testing for an all-zero duration, as a first version did, missed every non-zero duration that expires inside the first evaluation, which is the ordinary case at about 98 s per generation. **Two cases not covered:** MetaGP with `SAVEEXIT` — which every experiment in `experiments/` carries — completes its first generation so the branch never runs, and a run that throws says only that an error stopped it. **Not checked:** no check starts a run; the `evolution` scenario dismisses the dialog and prints it, measured for a date and for a duration |
-| **D43** *(signed off 2026-09-18)* | An exception to D33: the window during a run | **`SIG_GPManager::evolutionLoop` pumps the interface after every wait, not once per pass.** It pumped once per pass of the outer loop and then slept 300 ms before every entry of `taskCanDoList` with no pump, so the window was dead for `300 ms x entries` — **measured 8092 ms**, against about five seconds before a desktop calls a window unresponsive. The wait is now 200 ms and `processInterfaceEvents()` follows every one of them, **in both `evolutionLoop` overloads**; the MetaGP one carries the same loop and a change to one only is a half fix. **Measured after: 397 ms**, which is one iteration; **on `main` 2026-09-22, 210 ms** worst over 800 gaps, one generation of `twoBases`. Time per generation: 73.3 s before, 69.8 s after, one run each. The headless `sigel <experiment>` run gets the 200 ms wait too, with no interface to serve. `passive time` now caps every pump, not one per pass. **`haveABreak` is renamed `processInterfaceEvents`**: it takes no break, it gives the interface its only chance to handle input while the run holds the thread. Ten sites. **The risk this accepts:** the pump now runs inside the sweep over `taskCanDoList`, before each entry's tournament is taken. `canDoIdx`, `touchsCounter`, `sweepCounter`, the population and, in the MetaGP overload, `MetaClassifier` are live across it. Nothing the run lock leaves open changes them: during a run Start is refused, 29 actions are greyed, every experiment's individuals list is cut, and the tree menu offers only Stop. **One way round the lock, older than D43:** the MetaGP window's Load and Default — item 56. **Stop still waits for the end of the pass**, as it did before D43; the inner loop does not test `userTerminated`. Left so by decision 2026-09-22. **Not checked:** no check starts a run; the `evolution` scenario prints the worst gap between pumps and the time per generation. **Confirmed on the real desktop on 2026-09-18: the window answers during a run.** |
+| **D43** *(signed off 2026-09-18)* | An exception to D33: the window during a run | **`SIG_GPManager::evolutionLoop` pumps the interface after every wait, not once per pass.** It pumped once per pass of the outer loop and then slept 300 ms before every entry of `taskCanDoList` with no pump, so the window was dead for `300 ms x entries` — **measured 8092 ms**, against about five seconds before a desktop calls a window unresponsive. The wait is now 200 ms and `processInterfaceEvents()` follows every one of them, **in both `evolutionLoop` overloads**; the MetaGP one carries the same loop and a change to one only is a half fix. **Measured after: 397 ms**, which is one iteration; **on `main` 2026-09-22, 210 ms** worst over 800 gaps, one generation of `twoBases`. Time per generation: 73.3 s before, 69.8 s after, one run each. The headless `sigel <experiment>` run gets the 200 ms wait too, with no interface to serve. `passive time` now caps every pump, not one per pass. **`haveABreak` is renamed `processInterfaceEvents`**: it takes no break, it gives the interface its only chance to handle input while the run holds the thread. Ten sites. **The risk this accepts:** the pump now runs inside the sweep over `taskCanDoList`, before each entry's tournament is taken. `canDoIdx`, `touchsCounter`, `sweepCounter`, the population and, in the MetaGP overload, `MetaClassifier` are live across it. Nothing the run lock leaves open changes them: during a run Start is refused, 29 actions are greyed, every experiment's individuals list is cut, and the tree menu offers only Stop. **Stop still waits for the end of the pass**, as it did before D43; the inner loop does not test `userTerminated`. Left so by decision 2026-09-22. **Not checked:** no check starts a run; the `evolution` scenario prints the worst gap between pumps and the time per generation. **Confirmed on the real desktop on 2026-09-18: the window answers during a run.** |
 
 
 ---
@@ -989,6 +989,8 @@ Start here.
     and `vertexCount` (`SIG_Polygon`). `count` was not used for `SIG_Geometry`:
     `shim/iostream.h` brings `using namespace std;` into scope, so it would hide
     `std::count`.
+- **Item 58 is done.** Individuals > Add allows up to 9999, by decision a
+  divergence from 1.3's 999. Item 59 looks at the pool limit of 32768.
 - **Item 25 is done.** Every dialog outside item 33's six prompts has a
   parent now, through the new `SIGEL_Tools::dialogParent()` where the code
   holds no window. D33 does not cover a dialog's parent, by decision; the D33
@@ -997,7 +999,8 @@ Start here.
   2026-09-21, with 12 review findings that were never written down. It was
   applied again by hand on `main`, where `schlussJetzt` had become
   `stopEvolutionNow`, and a new review replaces the lost one. Its findings in
-  scope are fixed. Two older risks it found are items 56 and 57. The branch
+  scope are fixed. It also found two older risks: item 57, still open,
+  and item 56, which the desktop check settled — see "Not doing". The branch
   is deleted, here and on GitHub; everything on it is on `main`.
 - **The `evolution` scenario must start in `sigelApp/`**, with the launcher's
   `PVM_ROOT`, `PVM_ARCH`, `PATH` and its link
@@ -3158,6 +3161,7 @@ else that stops matching 1.3 still needs justifying as a defect.
 | **The generation counter is refreshed when a run ends.** 1.3's `slotEvolutionStopped` does not write the counter, so it keeps the last value `SIG_ExperimentView::putIntoExperiment` wrote until that function runs again | a decision, 2026-09-15 | `runlock` in `gui behaviour`: the `[counter]` lines |
 | **A click that closes an open menu is swallowed here. 1.3 passes it on.** On 1.3 one real click closes the File menu and selects the list row under it. Here the menu closes and the row does not move, so the user must click again | Qt’s own popup handling, not SIGEL code. The Qt 2 side is in the vendored source: `qapplication_x11.cpp:3402-3416`, in `QApplication::closePopup`, calls **`XAllowEvents(…, ReplayPointer, CurrentTime)`** when the last popup closes on a press outside it. The X server then delivers that press again to the window below. The same code subtracts 10 s from `mouseButtonPressTime`, so the repeated press cannot count as a double click. Qt 6 does not do this. That half is measured, not read, because Qt 6’s sources are not on this machine. Matching 1.3 means overriding popup dismissal for the whole application, which is D28’s "owning a custom widget forever" applied to every popup. The swallowing behaviour is also what every modern toolkit does | `xtest-baseline.txt` section 4, with the control click printed below it |
 | **A second click on the same menubar item closes the menu here. On 1.3 it stays open** | Same cause and same answer as the row above. Qt 6’s menubar toggles on a second click and Qt 2’s did not. Nothing in SIGEL decides it | `xtest-baseline.txt` section 4 |
+| **Individuals > Add allows up to 9999 — item 58.** 1.3 allows 999 | by decision 2026-09-22: four digits. Five digits were not taken, because one Add would then pass the tournament draw's limit — item 59 | `guibehaviour-baseline.txt`, three lines, and a note in its header |
 
 **Three 1.3 defects preserved on purpose**, plus the one below them. `MT_GUI`'s
 gnuplot export puts a constant x on datasets `2pt destr.` and `3pt destr.`
@@ -4337,9 +4341,28 @@ carried; other items and this file cite them, so they do not change.
   there; its seven files hash as ours. Its copy of all 14 as downloaded is
   `/home/debian/sigel-shipped-original-2026-09-19/`.
 
+- [x] **58. Individuals > Add allows at most 999** — done 2026-09-22, by
+  decision a deliberate divergence from 1.3. `SIG_AddIndividualsDialog`'s
+  `spinboxNumber` now allows up to 9999, four digits. 1.3 allows 999, and
+  typing 10000 gives 999 there, because it clamps (D28); the port allowed 999
+  too, and typing 10000 gave `100`. Now it gives `1000`.
+  `guibehaviour-baseline.txt` moved in exactly three lines, and its header
+  records the divergence. Five digits were not taken: tournament selection
+  reaches pool index 32770 at most, item 59. One case is left open as item
+  60: on `runner.exp` an Add of 9900 or more takes the tournaments-per-
+  generation counter past its four digits.
+
 #### Not doing
 
 Decisions, not work. Each is settled; reopen only with a reason.
+
+- **56. The MetaGP window can free the trainer during a run.** Not an issue,
+  checked on the desktop 2026-09-22: the MetaGP window is application-modal, so
+  while it is open the rest of the interface is blocked and Start cannot be
+  pressed. In the code: `MT_MainWindow`'s constructor sets
+  `Qt::ApplicationModal` for its default `Qt::Dialog` flag, and
+  `SIG_MainWindow::slotMTConfigureSystem`, the only opener, refuses while any
+  experiment runs.
 
 - **Restore Qt 2's spin-box editing.** D28. Reachable only by typing a number
   outside a box's range, the value is visible before anything is saved, and the

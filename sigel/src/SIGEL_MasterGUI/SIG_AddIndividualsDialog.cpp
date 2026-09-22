@@ -72,7 +72,7 @@ SIG_AddIndividualsDialog::SIG_AddIndividualsDialog( QWidget* parent,  const char
     Layout4->addWidget( textlabelNumber );
 
     spinboxNumber = new QSpinBox( this );
-    spinboxNumber->setMaximum( 999 );
+    spinboxNumber->setMaximum( 9999 );
     spinboxNumber->setMinimum( 1 );
     spinboxNumber->setValue( 1 );
     Layout4->addWidget( spinboxNumber );
