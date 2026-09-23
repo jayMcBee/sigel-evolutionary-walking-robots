@@ -37,6 +37,8 @@ namespace SIGEL_MasterGUI
 SIG_EditHostDialog::SIG_EditHostDialog( QWidget* parent,  const char* name, bool modal, Qt::WindowFlags fl )
     : SIG_EditHostDialogBase( parent, name, modal, fl )
 {
+  // A note, not a field label: drawn in the theme's secondary text colour.
+  textlabelProcessesHint->setForegroundRole( QPalette::PlaceholderText );
 }
 
 /*  
