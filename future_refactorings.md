@@ -450,6 +450,15 @@ touched, because changing one changes behaviour against the reference binary.
   `STARTPOSITION` in the `.exp` files, a file change, or the terrain's place
   in DynaMechs, a vendor patch. Positions and fitness move with it.
 
+- [ ] **69. While Play waits for a frame, one core stays busy.** Found
+  2026-09-23 with the Play pacing fix. `simulationTimer` fires at Frame Delay,
+  0 ms by default, and `SIG_SimulationVisualisationWidget::
+  slotSimulationProgress` returns at once until `frameSwapped` has come; while
+  the window is not exposed that is all the time. A single-shot timer
+  restarted from `slotFrameShown` would end it, but `simulationRunning` reads
+  `simulationTimer->isActive()`, so it needs its own running flag, used by the
+  Play slots, Step, Fast-forward and the dialog pause.
+
 - [ ] **47. `sigelDynClient` and `manage_dyn_slave`.** `sigelDynClient` makes a
   second machine a dynamic slave of a master started with `sigel -de`, which
   `sigel.cpp` still accepts. It is still 1.3's Solaris `tcsh` script, its home

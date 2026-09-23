@@ -3228,7 +3228,7 @@ else that stops matching 1.3 still needs justifying as a defect.
 | **The 3-D view starts fitted to the robot and aims at its centre.** 1.3 starts at distance 1.0 for every robot and aims at the root link's model origin | by decision 2026-09-23, item 26. `SIG_SimulationVisualisation`'s constructor, `getFittingDistance`, `SIG_SimulationWidget::visualizeThis` | nothing: no check covers the camera |
 | **The headlight does not dim with distance.** 1.3 gives LIGHT0 linear attenuation 0.4 | by decision 2026-09-23, item 26, so the fitted camera does not darken the lit modes. `SIG_Visualisation`'s constructor | nothing |
 | **Play pauses while a modal dialog is open.** 1.3 keeps the simulation running under a dialog | by decision 2026-09-23, item 65: at Frame Delay 0 the dialog was never drawn and the viewer hung. `SIG_SimulationWindow::event`, `SIG_SimulationVisualisationWidget::pauseForDialog` and `resumeAfterDialog` | nothing: no scenario plays the simulation under a dialog |
-| **Play waits while the viewer window is minimised or on another workspace.** 1.3 on X11 keeps stepping | by decision 2026-09-23: Play steps once per frame on screen, and a window that is not exposed shows no frames. `SIG_SimulationVisualisationWidget::slotSimulationProgress` and `slotFrameShown` | nothing: `guidrive`'s `slavegui` scenario plays offscreen, where no frame is composed, so its `play +` lines read 0 s; no gate reads them |
+| **Play steps once per frame on screen, and waits while the viewer window is minimised or on another workspace.** At Frame Delay 0 it is capped at about the display's refresh rate. 1.3 drew each step with `updateGL()`, not tied to the refresh, and on X11 kept stepping while minimised | by decision 2026-09-23: Play steps once per frame on screen, and a window that is not exposed shows no frames. `SIG_SimulationVisualisationWidget::slotSimulationProgress` and `slotFrameShown` | nothing: `guidrive`'s `slavegui` scenario plays offscreen, where no `frameSwapped` comes, so its `play +` lines read 0 s; no gate reads them |
 | **The viewer window opens at 1014 x 810, so the 3-D view is square.** 1.3 opens it at 780 x 810; at that size the port's view is 422 x 655 | by decision 2026-09-23, item 66. `SIG_SimulationWindow`'s constructor | nothing: `guidrive`'s slave-GUI scenario sets 780 x 810 itself |
 | **The 3-D view draws the ground on both sides of the start.** 1.3 draws the terrain only from 0 to its size, so the robot starts at its corner. 1.0 drew a flat floor that moved with the camera | by decision 2026-09-23, item 42: the ground on the negative side too, each edge continued outward at the heights the physics uses. `SIG_EnvironmentRenderer::drawInit`, `buildGrid` and `groundDepth` | nothing: no check covers the floor |
 | **A render mode "Hidden lines".** 1.3 has Wireframe, Flatshaded and Gouraudshaded | by decision 2026-09-23, item 63. `SIG_ViewSettings::hiddenLine`, `SIG_SimulationVisualisation::visualize` | nothing: no check covers the render modes |
@@ -4500,13 +4500,12 @@ carried; other items and this file cite them, so they do not change.
     clears it; `slotFrameShown`, connected to `QOpenGLWidget::frameSwapped`,
     sets it; `slotStartSimulation` sets it when Play starts. One step per frame
     on screen, as in 1.3. It waits only when `isValid()`, so a widget whose
-    GL context could not be set up still steps; not tested, since context
-    creation cannot be made to fail here.
+    GL context could not be set up still steps; not tested.
   - **Offscreen, Play now waits for ever.** Found by review, measured:
     `guidrive`'s `slavegui` scenario under `QT_QPA_PLATFORM=offscreen` prints
     `play +5s` to `+30s` as 1 min 29 s to 9 min 42 s before the change and 0 s
     after it. The offscreen platform creates a context, so `isValid()` is true,
-    but never composes, so `frameSwapped` never comes. Only the harness uses
+    but no `frameSwapped` comes there. Only the harness uses
     that platform, no gate reads those lines, and a platform test in SIGEL's
     code was not wanted.
   - **Checked by an independent review against Qt 6.10's source:**
@@ -4524,8 +4523,8 @@ carried; other items and this file cite them, so they do not change.
 
 - [x] **63, second half. A Points mode in the 3-D view** — done 2026-09-23,
   by decision. The render mode "Points", after Hidden lines, draws only the
-  vertices, 3 px, without lighting, and hides the ones behind a polygon: it
-  uses the same first pass as Hidden lines in
+  vertices, 2 px by decision (3 px at first), without lighting, and hides the
+  ones behind a polygon: it uses the same first pass as Hidden lines in
   `SIG_SimulationVisualisation::visualize`, then `glPolygonMode( GL_POINT )`.
   A see-through variant was built and dropped by decision, so the one mode
   keeps the plain name. `SIG_ViewSettings::points`; `SIG_Visualisation::

@@ -178,7 +178,7 @@ namespace SIGEL_Visualisation
      // The robot's anchor points set their own point size, so it is set
      // again here, before the visible pass.
      if (pointMode)
-       glPointSize( 3 );
+       glPointSize( 2 );
 
      environmentRenderer.render();
      robotRenderer.render();
