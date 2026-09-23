@@ -894,8 +894,39 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-23 — DONE: ITEM 38. THE POLL WAIT IN `evolutionLoop` IS 5 MS.**
+**2026-09-23 — DONE: THE 3-D VIEWER ROUND. NEXT: THE 1.0 → 1.3 REGRESSION.**
 Start here.
+
+- **SIGEL 2.0.** The work is SIGEL 2.0, not only a port. 1.3 is the reference
+  for regression checks, not a specification; see THE GOAL at the top and §0.
+- **Done today**, each with a Done entry in "Finished to-do items": 43 (the
+  ambient slider), 26 (the camera fits the robot), 65 (a dialog during Play),
+  66 (a square 3-D view), 42 (ground on both sides of the start), 63 (the
+  render modes Hidden lines and Points), 67 (a failed movie frame), and two
+  found by Jan: the doubled floor lines, Mesa joining triangle strips, and Play
+  running ahead of the screen, now one step per frame on screen. Each change
+  from 1.3 has a row in "Changes from 1.3". Items 41 and 62 were dropped; see
+  "Not doing".
+- **Open, and waiting for a decision:** 20, the `renderRecorder` leak, waits
+  for a rule on which C++ features SIGEL 2.0 code may use: match the code
+  around it, C++11 features already in the tree, or all of C++17. 61 (the
+  terrain transpose) and 68 (the robot's start in the middle of the terrain)
+  change physics or experiment setup. 64 (the rest of Dynamo) touches the file
+  format. 69 (a busy core while Play waits) is small.
+- **Raised and not recorded as items:** a textured floor uploads its texture
+  on every frame, because `initTexture` runs inside the plane's display list;
+  in the hidden modes the label of a hidden anchor point still shows.
+- **Next, by Jan's choice: the 1.0 → 1.3 regression.**
+  `regression_1.0_to_1.3.md` holds the analysis, deferred until the port was
+  done. The port is done. §0 still says that file is not touched, and the note
+  near the top of this file still calls the regression DEFERRED; reopening it
+  is the decision to make first.
+- **Gates:** `check.sh` 974 pass, 0 fail; warnings 502.
+- **Working notes:** another session also commits in this repo (it added
+  `LIBRARIES.md`), so commit by path. The 1.3 oracle answers as
+  `sigel-experimenter-x86` in ListAgents.
+
+**2026-09-23 — DONE: ITEM 38. THE POLL WAIT IN `evolutionLoop` IS 5 MS.**
 
 - **The wait before each `taskCanDoList` entry is 5 ms**, in both
   `evolutionLoop` overloads, by decision; it was 200 ms. On `twoBases` with 1
@@ -912,36 +943,6 @@ Start here.
   the list is in "Changes from 1.3". Menu items and buttons are
   unchanged.
 - **Items 14 and 13 are still paused**, as in the entry below.
-- **The OpenGL items 20, 26, 41, 42 and 43 were assessed**, read-only. Causes,
-  evidence and fix options are in each item in `future_refactorings.md`, with
-  two new items from the same work: 61, the terrain row order, and 62, GL state
-  set outside `initializeGL`. Suggested order: 43, 20, 41, then 26 and 42.
-- **Item 43 is done:** the ambient slider works again in the lit modes and is
-  disabled in Wireframe. See its Done entry.
-- **Item 26 is done:** the 3-D view starts fitted to the robot, with a 25 %
-  margin, aims at the robot's centre, and the headlight no longer dims with
-  distance. Item 41 is left with the trace question only.
-- **Item 65 is done:** a modal dialog opened during Play no longer hangs the
-  viewer; Play pauses until it closes.
-- **Item 66 is done:** the viewer opens at 1014 x 810, and the 3-D view is
-  square. **Item 62 was dropped** by decision; see "Not doing".
-- **Item 42 is done:** the ground is drawn on both sides of the robot's start.
-  **Item 41 was dropped.** Item 68, starting the robot in the middle of the
-  terrain, waits for a later discussion.
-- **Item 63's first half is done:** the render mode "Hidden lines".
-- **The doubled floor lines are fixed:** Mesa joined the floor's triangle
-  strips, and the joins showed in the line modes; the floor is now separate
-  triangles. See its Done entry.
-- **Item 63 is done:** the render mode "Points" hides the back points.
-- **Play no longer runs ahead of the screen:** one step per frame on screen,
-  as in 1.3. See its Done entry.
-- **Item 67 is done:** a movie frame that cannot be saved now warns, stops
-  the recording and turns the movie button to "recording not allowed"; image
-  formats used to fail silently.
-- **SIGEL 2.0.** The work is now SIGEL 2.0, not only a port. 1.3 is the
-  reference for regression checks, not a specification; see THE GOAL at the
-  top. Two new items: 63, hidden lines and a Points mode; 64, remove what is
-  left of Dynamo.
 
 **2026-09-22 — PAUSED: ITEMS 14 AND 13. THE GERMAN OUTPUT TEXT IS ENGLISH NOW;
 34 GERMAN NAMES ARE LEFT, BY DECISION.**
