@@ -232,7 +232,9 @@ found a real defect.** §0 has the rule; it is not optional.
   Anything that records finished work belongs here, not in a new file.
   `future_refactorings.md` holds the to-do list and nothing else.
   `regression_1.0_to_1.3.md` is deferred analysis of that regression, and is not
-  touched. `physics_backends.md` was folded into this file on 2026-09-20.
+  touched. `LIBRARIES.md` lists the third-party libraries, by decision
+  2026-09-23; `README.md` links to it. `physics_backends.md` was folded into
+  this file on 2026-09-20.
 
 ---
 
@@ -617,7 +619,7 @@ through `f0f2daa`.
 
 ## 7. Steps
 
-**Exit criterion per step:** `./checks/check.sh` from anywhere — **973 pass, 0
+**Exit criterion per step:** `./checks/check.sh` from anywhere — **974 pass, 0
 fail**. *The figure moves with the number of tracked text files, because the
 `encodings` check adds its own count to the total. Measured trail: **1136**
 until 2026-09-19, when `experiments/` and `robots/` arrived and
@@ -629,7 +631,8 @@ folded into this file; **1098** when `README.md` arrived; **971** on
 2026-09-22, when three checks that guarded only the Qt 2 conversion were
 dropped: the dead-signal regex (39 passes), `dead item virtuals` (1) and
 five of the form checks (87); **973** when `SIGEL_Tools/SIG_DialogParent.h`
-arrived, one pass in `headers standalone` and one in `encodings`.*
+arrived, one pass in `headers standalone` and one in `encodings`; **974** when
+`LIBRARIES.md` arrived.*
 **The pass count was 853 until D31 and the jump is not new coverage of SIGEL's
 code.** The `encodings` check used to read 404 files of five extensions and now
 read all 618 tracked files then, 8 of which git called binary: its pass count went
@@ -1660,7 +1663,7 @@ succeeded.**
 **Checks any session must keep green**, all committed:
 
 ```
-./checks/check.sh                                        973 pass, 0 fail, exit 0
+./checks/check.sh                                        974 pass, 0 fail, exit 0
 ./checks/dictorder-dump.sh | diff -u checks/baselines/dictorder-baseline.txt -   empty
 ./checks/fitness-check.sh  | diff -u checks/baselines/fitness-baseline.txt -     empty
 ASAN_OPTIONS=detect_leaks=0 ./checks/fitness-check.sh build-asan   exit 0
