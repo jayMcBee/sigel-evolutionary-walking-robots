@@ -1,6 +1,6 @@
-# To do — after the Qt 6 port
+# To do — SIGEL 2.0
 
-Independent of the port. Do not combine commits across the two.
+Independent of the port, which is done. Do not combine commits across the two.
 
 **Protocol:** one commit per item, each reviewed and approved. Items 1 and 2
 are mechanical; everything from 3 on is discussed before it lands.
@@ -279,7 +279,7 @@ touched, because changing one changes behaviour against the reference binary.
   9999: `QLCDNumber` then keeps the old digits while its value holds the new
   number. 1.3 has the same four digits, but its Add of at most 999 could not
   reach them in one step. Item 58 made it reachable. Giving the counter five
-  digits is one more divergence from 1.3, and it moves
+  digits is one more change from 1.3, and it moves
   `guibehaviour-baseline.txt`, which prints each counter's digits. Found by
   review 2026-09-22.
 
@@ -330,7 +330,7 @@ touched, because changing one changes behaviour against the reference binary.
   `SIG_RenderRecorder`, plus a margin, all inside the viewer. LIGHT0 sits at the
   eye with linear attenuation (`SIG_Visualisation`'s constructor), so a camera
   further out makes the lit modes darker; this touches 41 and 43 too. A fit is a
-  divergence from 1.3; item 41's fixed start value can stand in until then.
+  change from 1.3; item 41's fixed start value can stand in until then.
 
 - [ ] **27. Name the three signals in the wildcard disconnect.**
   `SIG_AllIndividualsView::slotEvolutionNotRunning` calls
@@ -421,8 +421,8 @@ touched, because changing one changes behaviour against the reference binary.
   starts ticked, `SIG_SimulationVisualisationWidget`'s constructor sets
   `traceRobot` true, and `visualizeThis` calls `slotSetTraceRobot( true )` again.
   To see the twoBases and hammer robots on 1.3, the oracle moved the slider 3
-  page steps out, from 10 to 70. A new default is a deliberate divergence from
-  1.3; the value, and whether trace stays on, need sign-off.
+  page steps out, from 10 to 70. A new default is a change from 1.3; Jan decides
+  the value, and whether trace stays on.
   **Assessed 2026-09-23, read-only.** The checkbox decides in the end:
   `SIG_SimulationWidget::visualizeThis` calls `slotSetTraceRobot` with its state,
   and with trace on the seven navigation buttons are disabled. Fixes, each a
@@ -453,30 +453,6 @@ touched, because changing one changes behaviour against the reference binary.
   to the centre (every position, the floating-point results and fitness move
   against 1.3 — risky); or write the behaviour down.
 
-- [ ] **43. The ambient light slider seems to do nothing in the 3-D view.** Seen
-  2026-09-19: moving the ambient slider in the 3-D view shows no change.
-  What the code does: `SIG_VisualisationWidget::setAmbientLighting` calls
-  `SIG_Visualisation::setAmbientSceneColor`, which keeps the value for the
-  POV-Ray export and calls `glLightModelfv( GL_LIGHT_MODEL_AMBIENT, … )` straight
-  from the slider's slot, outside `paintGL`. Two things to check first, neither
-  measured: a Qt 6 `QOpenGLWidget` has its context current only inside
-  `initializeGL`, `paintGL` and `resizeGL` unless `makeCurrent()` is called, so
-  the call may reach no context; and ambient light has no effect while lighting
-  is off, which may be so in wireframe mode. Not yet compared with 1.3.
-  **Assessed 2026-09-23, read-only; both causes hold.** Wireframe, the default
-  render mode, turns lighting off in `SIG_Visualisation::visualize`, as in 1.3.
-  The context is the port's: no `makeCurrent()` precedes the call (confirmed in
-  the code). Qt 2's `updateGL()` left the context current, so 1.3's slider worked
-  in the lit modes. The first value, 50, still reaches the scene, because
-  `SIG_SimulationWidget::visualizeThis` sets it just after
-  `SIG_SimulationVisualisationWidget::visualizeThis` made the context current.
-  To confirm: set Flatshaded and move the slider. Fixes, both restoring 1.3's
-  behaviour: `makeCurrent()`/`doneCurrent()` in
-  `SIG_VisualisationWidget::setAmbientLighting`; or keep the value and call
-  `glLightModelfv` in `SIG_Visualisation::visualize`, inside `paintGL`, which
-  also survives a new context. Greying the slider in wireframe mode would be a
-  divergence and needs sign-off.
-
 - [ ] **61. The terrain is the transpose of its floor function.** Found
   2026-09-23 in the item 42 assessment, read-only.
   `SIG_Environment::generateTerrain` writes the rows z-major; DynaMechs'
@@ -495,6 +471,58 @@ touched, because changing one changes behaviour against the reference binary.
   is initialised, so `visualizeThis` depends on the window being shown first;
   `sigel_slave` shows it first, so this works today. It matters only if the
   viewer is ever docked or moved to another window.
+
+- [ ] **63. Hidden lines in the 3-D view, and a Points mode.** Asked for
+  2026-09-23. Wireframe draws every edge, the back ones too. Hidden-line
+  drawing needs two passes in `SIG_Visualisation::visualize`: first the
+  filled faces in the background colour, into the depth buffer only, then the
+  edges with `glPolygonOffset`. To decide: a separate mode, or always on in
+  Wireframe; the second is a change from 1.3. Points is
+  `glPolygonMode( GL_FRONT_AND_BACK, GL_POINT )`, and the same first pass
+  hides the back points. The modes are listed in `SIG_ViewSettings` and named
+  by `SIG_VisualisationWidget::setRenderMode` and the `renderModeComboBox` in
+  `SIG_SimulationWidgetBase.ui`.
+
+- [ ] **64. Remove what is left of Dynamo.** Asked for 2026-09-23. The Dynamo
+  backend was deleted on 2026-08-28; PORTING.md, "Dynamo removed, DynaMechs
+  kept", has the details. The original project dropped Dynamo as its physics
+  engine early and kept only some of its classes
+  (https://sigel.sourceforge.net/seiten/links_en.html). Two parts are left:
+  - **The choice of Dynamo in the interface and the model.** The "Dynamo  (not
+    recommended)" radio button and the `DynaMo` tab in
+    `SIG_SimulationParameterBase.ui`, a second `DynaMo` tab in
+    `SIG_EnvironmentBase.ui`, the write in
+    `SIG_SimulationParameter::putIntoExperiment` and the read-back in
+    `getOutOfExperiment`, the `DynaMo`
+    value of `SIG_SimulationParameters::SimulationLibrary`, the `DynaMo` cases in
+    `SIG_GPFitnessTrainer`, `SIG_AllIndividualsView` and `sigel_slave.cpp` that call
+    `SIG_Robot::prepareDynaMo`, `SIG_Link::transformToDynaMo`, and
+    `SIG_Simulation::slotDynamoMessage`, and the DynaMechs check in
+    `SIG_GUIGPExperiment::slotRobotInfo`. Today the interface can still make an
+    experiment that the simulation refuses. `SIG_Simulation` throws for it,
+    which is one way into item 20; the other, a `SIG_CannotMirtich` from a
+    bad mass, stays after Dynamo goes. Also Dynamo's: the `stopSimulation`
+    flag, which only `slotDynamoMessage` sets, and so the throw in
+    `SIG_Simulation::makeTimeSteps`, the class
+    `SIG_SimulationCannotSolveException` and its two catch sites in
+    `SIG_Simulation.cpp`; four files include its header, so they change
+    with it.
+    `SIG_SimulationParameters::writeToFile` saves Dynamo's settings, which only the
+    parameter dialog reads: `MAXIMALERROR`, `MAXIMALITERATIONS`, `SKIPFRAMES`,
+    `ANALYTICAL`, `MAXIMALCOLLISIONLOOPS`, `SOLVEMODE`, `INTEGRATOR` and
+    `MAXIMALSOLIDITERATIONS`. `SIMULATIONLIBRARY` is read by the simulation
+    too, and loses its Dynamo value only. `STEPSIZE` stays: DynaMechs uses
+    it. All 7 shipped experiments hold these lines, so removing
+    them changes the file format, and Jan decides.
+  - **The maths library `libdynalib.a`.** SIGEL is built on its `DL_vector`
+    and `DL_matrix`. PORTING.md, "Follow-up this change deliberately did not
+    take", point 3, has the plan: a small local header in its place.
+  Doc comments that name Dynamo, in `SIG_SimulationParameters.h`,
+  `SIG_Simulation.h`, `SIG_SimulationCannotSolveException.h`, `SIG_Robot.h`,
+  `SIG_Link.h`, `SIG_Material.h` and `SIG_Body.h`, go with the code they
+  describe. The comment on the guard in
+  `SIG_SimulationVisualisationWidget::visualizeThis` names Dynamo too; the
+  guard stays, for `SIG_CannotMirtich`.
 
 - [ ] **47. `sigelDynClient` and `manage_dyn_slave`.** `sigelDynClient` makes a
   second machine a dynamic slave of a master started with `sigel -de`, which

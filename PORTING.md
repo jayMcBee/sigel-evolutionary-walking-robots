@@ -1,6 +1,13 @@
-# SIGEL — Qt 2.3 → Qt 6 migration plan
+# SIGEL 2.0 — modernisation
 
-**THE GOAL — restated 2026-08-27, and it governs every decision below.**
+**THE GOAL — SIGEL 2.0.** Set 2026-09-23. SIGEL 2.0 is the modernised SIGEL.
+Its first phase, the port from Qt 2 to Qt 6, is done. SIGEL 2.0 may improve
+behaviour and the interface. 1.3 stays the reference for regression checks; it
+is not a specification. Jan decides each change to behaviour and to file
+formats, and "Changes from 1.3" in Phase C lists them.
+
+**The port's goal — phase one, done.** Restated 2026-08-27; it governed every
+port decision below.
 
 **SIGEL runs under modern Qt 6, complete, with its original interface migrated
 progressively from Qt 2 to Qt 6.** Not the core alone. Not a rewritten
@@ -186,6 +193,9 @@ found a real defect.** §0 has the rule; it is not optional.
 
 ## 0. Working on this
 
+- **This is SIGEL 2.0, not only a port.** Improvements are allowed. 1.3 is
+  the reference for regression checks, not a specification. Propose the better
+  behaviour; Jan decides it.
 - Source root: `sigel/`
 - ~~The shim: `include/compat/q2compat.h`; its self-check:
   `include/compat/q2compat_check.cpp`~~ **Both deleted in D27.** Recover them
@@ -889,16 +899,25 @@ Start here.
   item 38's Done entry.
 - **After item 38: a new host starts at 4 processes**, by decision; it was 1.
   The Edit host dialog has a new line: "For best speed, use one process per CPU
-  core." A divergence from 1.3, in its table.
+  core", with no dot, by decision. A change from 1.3, in its table.
+- **The Edit host dialog puts the host's name in quotes:** `Edit host "."`.
+  The shipped experiments name their one host `.`, PVM's word for this
+  computer, and `Edit host .` read as a stray dot. By decision.
 - **Dialog titles no longer end in "..."**, by decision: 39 titles at 68 code
   sites and one `.ui`. Two are reworded, "Delete Experiment" and "Quit SIGEL";
-  the list is in the table of divergences from 1.3. Menu items and buttons are
+  the list is in "Changes from 1.3". Menu items and buttons are
   unchanged.
 - **Items 14 and 13 are still paused**, as in the entry below.
 - **The OpenGL items 20, 26, 41, 42 and 43 were assessed**, read-only. Causes,
   evidence and fix options are in each item in `future_refactorings.md`, with
   two new items from the same work: 61, the terrain row order, and 62, GL state
   set outside `initializeGL`. Suggested order: 43, 20, 41, then 26 and 42.
+- **Item 43 is done:** the ambient slider works again in the lit modes and is
+  disabled in Wireframe. See its Done entry.
+- **SIGEL 2.0.** The work is now SIGEL 2.0, not only a port. 1.3 is the
+  reference for regression checks, not a specification; see THE GOAL at the
+  top. Two new items: 63, hidden lines and a Points mode; 64, remove what is
+  left of Dynamo.
 
 **2026-09-22 — PAUSED: ITEMS 14 AND 13. THE GERMAN OUTPUT TEXT IS ENGLISH NOW;
 34 GERMAN NAMES ARE LEFT, BY DECISION.**
@@ -3151,7 +3170,7 @@ field, C11d's ten unpinned `MT_GUI` validators, and C12's three.
 | C11c | **A pre-filled field that 1.3 does not select and Qt 6 does.** SIGEL does `setText()` then `setFocus()`; Qt 6's `QLineEdit` selects on focus down the tab chain and Qt 2's did not. Edit Command `0.01` + `5` gives `0.015` on 1.3 and `5` here; **Add Individuals `1` + `2` gives 12 on 1.3 and gave 2 here — twelve individuals added where two were meant** | driving it. **The third needs no invalid input and leaves nothing wrong-looking behind** |
 | C11d | **C7 never reached `MT_GUI`'s ten validators.** No foreign locale needed: an unpinned `QIntValidator(0,1000)` under `en_US` calls `"1,000"` ACCEPTABLE while `"1,000".toInt()` returns **0** — a user types one thousand and zero reaches the system | opening the window. 1.3 rejects both separators, so the fix **restores** Qt 2 |
 
-##### The divergences from 1.3, all deliberate
+##### Changes from 1.3, all deliberate
 
 **This is the list to check before calling anything a regression.** Everything
 else that stops matching 1.3 still needs justifying as a defect.
@@ -3183,6 +3202,8 @@ else that stops matching 1.3 still needs justifying as a defect.
 | **Individuals > Add allows up to 9999 — item 58.** 1.3 allows 999 | by decision 2026-09-22: four digits. Five digits were not taken, because one Add would then pass the tournament draw's limit — item 59 | `guibehaviour-baseline.txt`, three lines, and a note in its header |
 | **A new host starts at 4 processes, and the Edit host dialog says to use one per CPU core.** 1.3 starts at 1 and has no hint. The hint is a note, drawn in the palette's `PlaceholderText` colour by `SIG_EditHostDialog`'s constructor | by decision 2026-09-23, after item 38's measurements: on this 4-core machine, at the 5 ms wait, a generation took 3.7 s with 4 slaves against 13.3 s with 1; 4-slave runs evolve differently, so the work is not identical. The start value applies only to Add; Edit shows the host's own value, and the shipped experiments keep their `PVMHOST . 1 1 "."` | `guibehaviour-baseline.txt`: the hint label, and `value=1` in Edit, which shows that Edit replaces the start value. The start value of 4 itself is not checked, because no scenario adds a host |
 | **Dialog titles do not end in "...".** 1.3 ends 39 titles in dots, at 68 code sites in `SIGEL_MasterGUI` and the movie settings dialog plus the default title in `SIG_EditHostDialogBase.ui`; the ellipsis belongs on the command that opens a dialog, not on its title. Menu items, buttons, status tips and progress labels are unchanged. Two titles are reworded: "Do you really..." is "Delete Experiment" in `SIG_ExperimentListView::slotDeleteExperiment` and "Quit SIGEL" in `SIG_MainWindow::askBeforeQuitting`. "There is no experiment selected..." (22 sites) and "No experiment selected..." (1) are all "No experiment selected"; "Import Language Parameter..." is "Import Language Parameters", as its export is; the DynaMechs box in `SIG_GUIGPExperiment::slotRobotInfo` loses its two dots and keeps its wording | by decision 2026-09-23 | `guibehaviour-baseline.txt`, 76 title lines, each checked against the approved list; `xtest-baseline.txt`, 2 lines |
+| **The ambient light slider and its label are disabled in Wireframe.** 1.3 leaves them enabled, and the slider has no effect there, because Wireframe draws without lighting | by decision 2026-09-23, item 43. `SIG_SimulationWidget`'s constructor | nothing: no scenario checks the slider's enabled state |
+| **The Edit host title quotes the host name: `Edit host "."`.** 1.3 shows `Edit host ....`; with the dots removed it read `Edit host .`, because the shipped experiments' one host is named `.`, PVM's word for this computer | by decision 2026-09-23. `SIG_GPParameter::slotItemDoubleClicked`, which the Edit button calls too | `guibehaviour-baseline.txt`: the two title lines of the Edit host scenario |
 
 **Three 1.3 defects preserved on purpose**, plus the one below them. `MT_GUI`'s
 gnuplot export puts a constant x on datasets `2pt destr.` and `3pt destr.`
@@ -4363,6 +4384,20 @@ carried; other items and this file cite them, so they do not change.
   there; its seven files hash as ours. Its copy of all 14 as downloaded is
   `/home/debian/sigel-shipped-original-2026-09-19/`.
 
+- [x] **43. The ambient light slider seems to do nothing in the 3-D view** —
+  done 2026-09-23. Two causes. The port's: `SIG_VisualisationWidget::
+  setAmbientLighting` changed GL state outside `paintGL` with no
+  `makeCurrent()`. Measured under gdb: at start the widget's own context is
+  current, so the first value of 50 took effect; from the slider another Qt
+  context is current, so `glLightModelfv` changed that one. In Flatshaded the
+  view had the same pixels at 0, 50 and 100. The call now sits between
+  `makeCurrent()` and `doneCurrent()`, and the view's mean grey reads 0.88,
+  0.93 and 0.98 at those values. The second cause is 1.3's: Wireframe draws
+  without lighting, so ambient light cannot change it. By decision the slider
+  and its label are now disabled in Wireframe, in `SIG_SimulationWidget`'s
+  constructor; a change from 1.3. The label is disabled too because the
+  theme draws a disabled slider the same as an enabled one.
+
 - [x] **44. Keep one octopus experiment; remove `octopusSimpleFitness`, here and
   on the x86 machine.** Decided 2026-09-19: one octopus experiment is enough, and
   this one is an early or failed run. Keep `octopusNiceWalkingFitness`, judged a
@@ -4911,7 +4946,7 @@ entries — 42 menu items, 16 toolbar buttons. C11a drove all six View pages,
 C11b all sixteen Import/Export children, C11c the six dialogs, C11d `MT_GUI` and
 `SIGEL_SlaveGUI`, C12 MT_GUI's remaining toolbar actions, and the evolution path
 ran end to end on both machines. Per-step findings are in the Phase C step table,
-the divergences in the divergences table, the probe lessons in §7. Kept below is
+the changes in "Changes from 1.3", the probe lessons in §7. Kept below is
 only what a future run of this comparison needs.
 
 **The enable/disable sweep matches**: Start GREYED and Stop ENABLED for the whole
@@ -4929,7 +4964,7 @@ over 554 s and 172 on the oracle across two generation boundaries all read the
 starting value, and both versions then kept the old value after the run until a
 page switch. *Since 2026-09-15 the port also writes the counter during a run, in
 `SIG_GUIGPManager::updateIndividualView` (D37), and when a run ends, in
-`SIG_GUIGPExperiment::slotEvolutionStopped`; see the divergences table.*
+`SIG_GUIGPExperiment::slotEvolutionStopped`; see "Changes from 1.3".*
 
 **EVERY SHIPPED EXPERIMENT TERMINATES ON A DATE IN 2001** —
 `TERMINATIONUSESDATE 1`, `TERMINATIONTIME 2001`, all 14 — **so a correct Start
