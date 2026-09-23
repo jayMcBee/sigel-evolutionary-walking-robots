@@ -130,13 +130,7 @@ void SIGEL_Simulation::SIG_DynaMechsSimulationQueries::sense(int sensorNo,
 																q = minPos;
 														};
 
-														// NOTE: this multiply is a 1.3 regression against 1.0, which had a
-														// plain (q - minPos) / posRange. Kept, because
-														// SIGEL 1.3 behaves this way.
-														scaledState  = (q - minPos);
-														scaledState *= 360.0 / (2.0*3.14159265);
-
-														scaledState /= posRange;
+														scaledState = (q - minPos) / posRange;
 
 #ifdef _WINDOWS
 														minRegisterValue = - ::pow( static_cast<long double>(2),

@@ -128,7 +128,7 @@ were among them.** Item 46 renamed the kept seven. The originals are on
 sourceforge; see "Reference material" in `PORTING.md`. The oracle's machine
 keeps all 14 as downloaded, at `/home/debian/sigel-shipped-original-2026-09-19/`.
 
-Today's code, with the 1.3 multiply, `checks/replicate.sh`, 2026-09-23:
+Before the joint-sensor fix, with the 1.3 multiply, `checks/replicate.sh`, 2026-09-23:
 
 | experiment | 2001 best | ours | best | match |
 |---|---|---|---|---|
@@ -142,6 +142,25 @@ Today's code, with the 1.3 multiply, `checks/replicate.sh`, 2026-09-23:
 
 5 of 7 within 10% on best-of-population. The two failures are `runner` and
 `twoBases`, the two that 1.0's line restores in the table above.
+
+**The joint-sensor fix is applied, 2026-09-23:** `sense` has 1.0's
+`(q - minPos) / posRange`.
+The same run after it:
+
+| experiment | 2001 best | ours | best | match |
+|---|---|---|---|---|
+| hammer | 0.45972 | 0.45668 | 0.993 | 10/100 |
+| insect | 0.63896 | 0.61079 | 0.956 | 5/100 |
+| octopus | 0.52013 | 0.51471 | 0.990 | 38/100 |
+| runner | 0.91951 | 0.91951 | **1.000** | **100/100** |
+| shortHammer | 0.49015 | 0.49085 | 1.001 | 30/100 |
+| twoBases | 0.56965 | 0.57356 | **1.007** | 16/100 |
+| walker | 0.27548 | 0.25485 | 0.925 | 12/100 |
+
+7 of 7 within 10%. Only `runner` and `twoBases` move. No insect program holds a
+`SENSE` instruction; the octopus population holds one and walker's holds 11
+`SENSE` lines, and neither best nor match moves. The two cases left open above
+are not in the repo and are still open.
 
 ---
 

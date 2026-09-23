@@ -1317,11 +1317,11 @@ pass=$((pass+pp)); fail=$((fail+pf))
 # not 180/pi but 180/3.14159265, which is 57.29577957855229 against the true
 # 57.295779513082323, a relative error of 1.14e-09.
 #
-# This is not a defect to fix; it is behaviour to keep. Every evolved program
-# in the shipped experiments was selected against sensor values that carry
-# this error, and the values feed a chaotic simulation, so "correcting" it
-# changes what the robots do. The change is a one-word edit that looks like
-# tidying: write M_PI and this row is the only thing that notices.
+# The constant reaches two paths: pitch/roll sensors, in sense, and servo
+# drives, in moveDrive. No shipped robot or experiment uses either, so no
+# shipped result depends on it today. The values feed a chaotic simulation,
+# so a change to the constant is a change of behaviour, not a tidy-up. It is
+# a one-word edit: write M_PI and this row is the only thing that notices.
 #
 # 1.3 invites the edit, because it is not consistent with itself: it uses the
 # true M_PI in SIGEL_Robot/IFunctions.cpp, calculateAnyJoint, and the
@@ -1337,7 +1337,7 @@ pass=$((pass+pp)); fail=$((fail+pf))
 # verification-against-sigel-1.3/v5-1.3-mdh-compared.txt.
 #
 # Two checks, because neither covers the other.
-#   SOURCE  catches an edit at one of the four sites even when another site
+#   SOURCE  catches an edit at one of the three sites even when another site
 #           still supplies the same constant, which a binary search cannot
 #           see. It does not depend on the compiler.
 #   BINARY  catches any SPELLING that produces the true value -- M_PI,
@@ -1363,15 +1363,17 @@ V5BIN=$ROOT/build/sigel_eval
 if [ ! -f "$V5Q" ] || [ ! -f "$V5C" ]; then
     v5f=1; echo "  the two simulation sources are missing -- nothing was checked"
 else
-    # 4 sites: three in sense (rad->deg) and one in moveDrive (deg->rad).
+    # 3 sites: two in sense, the pitch/roll branch (rad->deg), and one in
+    # moveDrive (deg->rad). The joint-sensor branch of sense divides radians by
+    # radians and needs no factor.
     # ANCHORED. A bare `3\.14159265' is a PREFIX match. Lengthening one site
-    # to 3.14159265358979 would keep the count at 4 but change the factor to
+    # to 3.14159265358979 would keep the count at 3 but change the factor to
     # 404ca5dc1a63c200. That is neither the kept constant nor a forbidden
     # one, so the binary half would miss it too. The trailing class closes
     # that.
     # `//' comments are stripped before both counts. A note saying "do not
     # change this to M_PI" is documentation, not a defect, and a comment that
-    # quotes the literal is not a fifth site.
+    # quotes the literal is not a fourth site.
     v5t=$(sed 's://.*::' "$V5Q" "$V5C")
     v5n=$(printf '%s\n' "$v5t" | command grep -Ec '3\.14159265([^0-9]|$)' || true)
     v5m=$(printf '%s\n' "$v5t" | command grep -c 'M_PI' || true)
@@ -1383,9 +1385,9 @@ else
         echo "  M_PI has appeared in the simulation sources, where 1.3 uses 3.14159265:"
         command grep -n 'M_PI' "$V5Q" "$V5C" | sed 's/^/    /'
         echo "  This is the one-word edit this section exists to catch. See above."
-    elif [ "$v5n" != 4 ]; then
+    elif [ "$v5n" != 3 ]; then
         v5f=1
-        echo "  the truncated pi is at $v5n sites in the simulation sources, expected 4:"
+        echo "  the truncated pi is at $v5n sites in the simulation sources, expected 3:"
         command grep -n '3\.14159265' "$V5Q" "$V5C" | sed 's/^/    /'
         echo "  If a site was legitimately added or removed, move the count"
         echo "  deliberately and say why."
@@ -1436,9 +1438,9 @@ V5PY
                 v5f=1
                 echo "  the TRUE pi has reached the binary: 180/M_PI or M_PI/180 is"
                 echo "  present $v5bad time(s) in $V5BIN, and 1.3's own binaries"
-                echo "  contain neither. Every joint-sensor reading would shift by"
-                echo "  1.14e-09 -- invisible in print, and fed into a chaotic"
-                echo "  simulation the shipped programs were evolved against."
+                echo "  contain neither. Every pitch/roll reading and servo"
+                echo "  target would shift by 1.14e-09 -- invisible in print,"
+                echo "  and fed into a chaotic simulation."
             elif [ "$v5keep" -lt 1 ]; then
                 v5f=1
                 echo "  180/3.14159265 (404ca5dc1af05a77) is NOT in $V5BIN's"
