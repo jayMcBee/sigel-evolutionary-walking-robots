@@ -133,6 +133,16 @@ namespace SIGEL_SlaveGUI
 		      visualisationWidget,
 		      SLOT(setAmbientLighting(int)) );
 
+    // Wireframe draws without lighting, so the ambient light has no effect there.
+    auto const enableAmbientLighting = [this]( QString const &mode )
+      {
+	TextLabel1_4->setEnabled( mode != "Wireframe" );
+	ambientLightingSlider->setEnabled( mode != "Wireframe" );
+      };
+    enableAmbientLighting( renderModeComboBox->currentText() );
+    QObject::connect( renderModeComboBox, &QComboBox::textActivated, this,
+		      enableAmbientLighting );
+
     QObject::connect( planecolorPushButton,
 		      SIGNAL(clicked()),
 		      visualisationWidget,

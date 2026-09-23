@@ -86,9 +86,12 @@
       {
 	double const ambientSceneColor = double( newValue ) / 100;
 
+	// Outside paintGL another context may be current.
+	makeCurrent();
 	visualisation->setAmbientSceneColor( ambientSceneColor,
 					     ambientSceneColor,
 					     ambientSceneColor );
+	doneCurrent();
 
 	if (automaticRefresh)
 	  update();
