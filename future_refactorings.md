@@ -427,16 +427,6 @@ touched, because changing one changes behaviour against the reference binary.
   too; no shipped experiment sets `FLOORDIMENSION`, so none reaches it. A fix
   changes physics for asymmetric or non-square floors, so it needs a decision.
 
-- [ ] **62. The 3-D view sets its GL state outside `initializeGL`.** Found
-  2026-09-23 in the OpenGL assessment, read-only. `SIG_Visualisation`'s
-  constructor sets up the lights, and the renderers build their display lists in
-  their constructors. Qt 6 destroys a `QOpenGLWidget`'s context and makes a new
-  one when the widget moves to another top-level window, and all that state
-  would be lost. `QOpenGLWidget::makeCurrent` also does nothing until the widget
-  is initialised, so `visualizeThis` depends on the window being shown first;
-  `sigel_slave` shows it first, so this works today. It matters only if the
-  viewer is ever docked or moved to another window.
-
 - [ ] **63. Hidden lines in the 3-D view, and a Points mode.** Asked for
   2026-09-23. Wireframe draws every edge, the back ones too. Hidden-line
   drawing needs two passes in `SIG_Visualisation::visualize`: first the

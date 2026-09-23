@@ -4534,6 +4534,15 @@ carried; other items and this file cite them, so they do not change.
 
 Decisions, not work. Each is settled; reopen only with a reason.
 
+- **62. The 3-D view sets its GL state outside `initializeGL`.** Dropped
+  2026-09-23 by decision: not an issue today. `SIG_Visualisation`'s
+  constructor sets the lights, and the renderers build their display lists in
+  their constructors. Qt 6 gives a `QOpenGLWidget` a new, empty context only
+  when it moves to another top-level window, and the viewer never does: it
+  lives only in `SIG_SimulationWindow`, which `sigel_slave.cpp` shows before
+  `visualizeThis`. Reopen if the viewer is ever docked or moved into another
+  window.
+
 - **56. The MetaGP window can free the trainer during a run.** Not an issue,
   checked on the desktop 2026-09-22: the MetaGP window is application-modal, so
   while it is open the rest of the interface is blocked and Start cannot be
