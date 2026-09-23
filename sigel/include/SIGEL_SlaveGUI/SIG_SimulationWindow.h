@@ -94,6 +94,14 @@ namespace SIGEL_SlaveGUI
     public slots:
       void slotStopPressed();
 
+  protected:
+
+    /**
+     * Pauses the simulation while a modal dialog blocks this window.
+     * Play keeps the event loop full, and the dialog would not be drawn.
+     */
+    bool event( QEvent *e ) override;
+
   private:
 
     /**

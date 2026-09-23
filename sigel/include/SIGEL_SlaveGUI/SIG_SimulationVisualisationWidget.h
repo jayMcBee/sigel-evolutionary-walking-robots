@@ -95,6 +95,17 @@
        */
       double getFittingDistance() const;
 
+      /**
+       * Stops the running simulation while a modal dialog is open.
+       * Does nothing if the simulation is not running.
+       */
+      void pauseForDialog();
+
+      /**
+       * Starts the simulation again if pauseForDialog stopped it.
+       */
+      void resumeAfterDialog();
+
     public slots:
 
       void setShowAncorPoints( int state );
@@ -173,6 +184,11 @@
        * The time in ms to wait between to simulationframes.
        */
       int frameDelay;
+
+      /**
+       * True while a modal dialog holds the simulation paused.
+       */
+      bool pausedForDialog;
 
       /**
        * The number of timesteps that equal 5 seconds.

@@ -46,6 +46,7 @@
 									Qt::WindowFlags f )
     : SIG_VisualisationWidget( parent, name, f ),
 		       frameDelay(0),
+		       pausedForDialog(false),
 		       noOfFFSteps(0),
 		       traceRobot(true),
 		       robot(0),
@@ -438,6 +439,24 @@ void SIG_SimulationVisualisationWidget::resetRecorder()
     else
       {
 	automaticRefresh = false;
+	simulationTimer->start( frameDelay );
+      };
+  };
+
+  void SIG_SimulationVisualisationWidget::pauseForDialog()
+  {
+    if (simulationRunning())
+      {
+	simulationTimer->stop();
+	pausedForDialog = true;
+      };
+  };
+
+  void SIG_SimulationVisualisationWidget::resumeAfterDialog()
+  {
+    if (pausedForDialog)
+      {
+	pausedForDialog = false;
 	simulationTimer->start( frameDelay );
       };
   };

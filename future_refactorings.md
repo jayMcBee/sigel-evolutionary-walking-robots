@@ -489,18 +489,6 @@ touched, because changing one changes behaviour against the reference binary.
   `SIG_SimulationVisualisationWidget::visualizeThis` names Dynamo too; the
   guard stays, for `SIG_CannotMirtich`.
 
-- [ ] **65. A dialog opened during Play hangs the viewer.** Found 2026-09-23
-  in item 26's check. Play runs `simulationTimer`, a repeating timer at Frame
-  Delay, 0 ms by default; each tick, `SIG_SimulationVisualisationWidget::
-  slotSimulationProgress` steps the simulation and draws a frame. A modal dialog
-  opened then, such as `QColorDialog::getColor` in `choosePlaneColor`, is
-  mapped but never drawn, and it blocks the viewer; the process runs at full
-  CPU. With Frame Delay 50 ms the dialog appears. The same holds for Qt's own
-  dialog and GTK's. Other dialogs the viewer can open during Play: the movie
-  settings dialog, and the "Unable to write file" warning while recording,
-  which can come every frame. A generic design is to be agreed before any
-  change.
-
 - [ ] **66. Give the 3-D view a square shape.** Asked for 2026-09-23.
   `SIG_SimulationWindow`'s constructor sizes the viewer window to 780 x 810
   and makes that its minimum. The control panel on the right takes about a
@@ -508,6 +496,14 @@ touched, because changing one changes behaviour against the reference binary.
   and the robot is drawn in a tall, narrow picture. The view should be
   square; the window's size and the layout in `SIG_SimulationWidgetBase.ui`
   need to change to give it that room.
+
+- [ ] **67. The movie button keeps "recording allowed" after a failed
+  frame.** Found 2026-09-23 by review, with item 65. When a movie frame cannot
+  be written, `SIG_SimulationVisualisationWidget::makeTimeSteps` sets
+  `record = false` and shows "Unable to write file" once; Play goes on without
+  recording. But it does not emit `signalRecordingAllowed( false )`, so the
+  movie settings button keeps its "recording allowed" icon; the code's own
+  comment asks for the reset.
 
 - [ ] **47. `sigelDynClient` and `manage_dyn_slave`.** `sigelDynClient` makes a
   second machine a dynamic slave of a master started with `sigel -de`, which

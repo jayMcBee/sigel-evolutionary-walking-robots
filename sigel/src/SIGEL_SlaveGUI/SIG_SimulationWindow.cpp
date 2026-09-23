@@ -112,6 +112,16 @@ namespace SIGEL_SlaveGUI
   SIG_SimulationWindow::~SIG_SimulationWindow()
   { };
 
+  bool SIG_SimulationWindow::event( QEvent *e )
+  {
+    if (e->type() == QEvent::WindowBlocked)
+      simulationWidget->visualisationWidget->pauseForDialog();
+    else if (e->type() == QEvent::WindowUnblocked)
+      simulationWidget->visualisationWidget->resumeAfterDialog();
+
+    return QMainWindow::event( e );
+  };
+
   void SIG_SimulationWindow::visualizeThis(SIGEL_Robot::SIG_Robot const &robot,
 					   SIGEL_Environment::SIG_Environment const &environment,
 					   SIGEL_Simulation::SIG_SimulationParameters const &simulationParameters,

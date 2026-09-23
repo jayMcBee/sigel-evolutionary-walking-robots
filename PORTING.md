@@ -920,11 +920,9 @@ Start here.
 - **Item 26 is done:** the 3-D view starts fitted to the robot, with a 25 %
   margin, aims at the robot's centre, and the headlight no longer dims with
   distance. Item 41 is left with the trace question only.
-- **Found in item 26's check, not fixed:** "Choose planecolor" during Play
-  hangs the viewer. Play runs a repeating 0 ms timer that draws a frame per
-  tick; the modal colour dialog opens but is never drawn, and it blocks the
-  viewer. With Frame Delay 50 ms it appears. A generic design is to be agreed
-  first.
+- **Item 65 is done:** a modal dialog opened during Play no longer hangs the
+  viewer; Play pauses until it closes. Open: item 66, a square 3-D view, and
+  item 67, the movie button's icon after a failed frame.
 - **SIGEL 2.0.** The work is now SIGEL 2.0, not only a port. 1.3 is the
   reference for regression checks, not a specification; see THE GOAL at the
   top. Two new items: 63, hidden lines and a Points mode; 64, remove what is
@@ -3217,6 +3215,7 @@ else that stops matching 1.3 still needs justifying as a defect.
 | **The Edit host title quotes the host name: `Edit host "."`.** 1.3 shows `Edit host ....`; with the dots removed it read `Edit host .`, because the shipped experiments' one host is named `.`, PVM's word for this computer | by decision 2026-09-23. `SIG_GPParameter::slotItemDoubleClicked`, which the Edit button calls too | `guibehaviour-baseline.txt`: the two title lines of the Edit host scenario |
 | **The 3-D view starts fitted to the robot and aims at its centre.** 1.3 starts at distance 1.0 for every robot and aims at the root link's model origin | by decision 2026-09-23, item 26. `SIG_SimulationVisualisation`'s constructor, `getFittingDistance`, `SIG_SimulationWidget::visualizeThis` | nothing: no check covers the camera |
 | **The headlight does not dim with distance.** 1.3 gives LIGHT0 linear attenuation 0.4 | by decision 2026-09-23, item 26, so the fitted camera does not darken the lit modes. `SIG_Visualisation`'s constructor | nothing |
+| **Play pauses while a modal dialog is open.** 1.3 keeps the simulation running under a dialog | by decision 2026-09-23, item 65: at Frame Delay 0 the dialog was never drawn and the viewer hung. `SIG_SimulationWindow::event`, `SIG_SimulationVisualisationWidget::pauseForDialog` and `resumeAfterDialog` | nothing: no scenario plays the simulation under a dialog |
 
 **Three 1.3 defects preserved on purpose**, plus the one below them. `MT_GUI`'s
 gnuplot export puts a constant x on datasets `2pt destr.` and `3pt destr.`
@@ -4352,6 +4351,31 @@ carried; other items and this file cite them, so they do not change.
     visualizeThis` calls `resizeGL` with logical pixels where Qt uses device
     pixels. Qt 6.10's `QOpenGLWidget` sets the viewport in device pixels
     itself before each `paintGL`, and the aspect ratio is the same in both.
+
+- [x] **65. A dialog opened during Play hangs the viewer** — done
+  2026-09-23, by decision, option B of four. Play runs `simulationTimer`, a
+  repeating timer at Frame Delay, 0 ms by default; each tick,
+  `slotSimulationProgress` steps the simulation and draws a frame. A modal
+  dialog opened then was mapped but never drawn, and it blocked the viewer at
+  full CPU. Measured in `Xvfb`: the colour dialog did not appear at 0 ms, with
+  GTK's dialog or Qt's own, and did appear at 50 ms.
+  - **The fix is generic.** Qt sends the viewer window `QEvent::WindowBlocked`
+    when any modal dialog opens and `WindowUnblocked` when it closes.
+    `SIG_SimulationWindow::event` then calls
+    `SIG_SimulationVisualisationWidget::pauseForDialog` and
+    `resumeAfterDialog`. They stop and restart only the timer, and only if
+    Play was running; the Play button, `automaticRefresh` and recording keep
+    their state. It covers the colour dialog, the movie settings dialog, the
+    warnings, and any dialog added later.
+  - **Checked:** in `Xvfb` at Frame Delay 0 the colour dialog appeared with
+    the simulation paused, and Play carried on after Select; on the desktop
+    by Jan.
+  - The other options: pausing at each dialog site, per-site and easy to
+    forget; pacing Play to the display, the root cause, larger; a simulation
+    thread, not wanted.
+  - Left open: after a failed movie frame the button keeps its "recording
+    allowed" icon, item 67. The warning itself shows once, because
+    `makeTimeSteps` sets `record = false` first.
 
 - [x] **38. Does the poll interval in `evolutionLoop` earn its length?** —
   done 2026-09-23, by decision: **the wait is 5 ms**, in both `evolutionLoop`
