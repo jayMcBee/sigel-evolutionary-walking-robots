@@ -133,11 +133,11 @@ namespace SIGEL_SlaveGUI
 		      visualisationWidget,
 		      SLOT(setAmbientLighting(int)) );
 
-    // Wireframe and Hidden lines draw without lighting, so the ambient light
-    // has no effect there.
+    // Only the shaded modes draw with lighting; elsewhere the ambient light
+    // has no effect.
     auto const enableAmbientLighting = [this]( QString const &mode )
       {
-	bool const lit = (mode != "Wireframe") && (mode != "Hidden lines");
+	bool const lit = (mode == "Flatshaded") || (mode == "Gouraudshaded");
 	TextLabel1_4->setEnabled( lit );
 	ambientLightingSlider->setEnabled( lit );
       };

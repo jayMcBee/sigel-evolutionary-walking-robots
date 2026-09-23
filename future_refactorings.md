@@ -394,16 +394,6 @@ touched, because changing one changes behaviour against the reference binary.
   too; no shipped experiment sets `FLOORDIMENSION`, so none reaches it. A fix
   changes physics for asymmetric or non-square floors, so it needs a decision.
 
-- [ ] **63. A Points mode in the 3-D view.** Asked for 2026-09-23; the hidden
-  lines half is done, as the Hidden lines mode. Points is
-  `glPolygonMode( GL_FRONT_AND_BACK, GL_POINT )` without lighting, as
-  Wireframe; the first pass of Hidden lines, in
-  `SIG_SimulationVisualisation::visualize`, can hide the back points too. Set
-  the point size every frame: the robot's anchor points set size 5 inside
-  their display lists in `SIG_RobotRenderer::buildDisplayLists`, and it would
-  leak. The ambient slider goes disabled there too, in `SIG_SimulationWidget`'s
-  constructor.
-
 - [ ] **64. Remove what is left of Dynamo.** Asked for 2026-09-23. The Dynamo
   backend was deleted on 2026-08-28; PORTING.md, "Dynamo removed, DynaMechs
   kept", has the details. The original project dropped Dynamo as its physics

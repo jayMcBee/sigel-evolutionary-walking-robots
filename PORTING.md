@@ -928,11 +928,16 @@ Start here.
 - **Item 42 is done:** the ground is drawn on both sides of the robot's start.
   **Item 41 was dropped.** Item 68, starting the robot in the middle of the
   terrain, waits for a later discussion.
-- **Item 63's first half is done:** the render mode "Hidden lines". Points is
-  still open, as item 63.
+- **Item 63's first half is done:** the render mode "Hidden lines".
 - **The doubled floor lines are fixed:** Mesa joined the floor's triangle
   strips, and the joins showed in the line modes; the floor is now separate
   triangles. See its Done entry.
+- **Item 63 is done:** the render mode "Points" hides the back points.
+- **Open, next:** Play jumps ahead, by seconds up to a minute, on the desktop.
+  1.3 drew each step at once with `updateGL()`; the port's `update()` only
+  posts a paint, and the 0 ms timer keeps stepping until Qt paints. In `Xvfb`
+  steps and frames are 1:1 (1,031 to 1,033 in 10 s), so the effect needs the
+  desktop compositor; not yet measured there.
 - **SIGEL 2.0.** The work is now SIGEL 2.0, not only a port. 1.3 is the
   reference for regression checks, not a specification; see THE GOAL at the
   top. Two new items: 63, hidden lines and a Points mode; 64, remove what is
@@ -3221,7 +3226,7 @@ else that stops matching 1.3 still needs justifying as a defect.
 | **Individuals > Add allows up to 9999 — item 58.** 1.3 allows 999 | by decision 2026-09-22: four digits. Five digits were not taken, because one Add would then pass the tournament draw's limit — item 59 | `guibehaviour-baseline.txt`, three lines, and a note in its header |
 | **A new host starts at 4 processes, and the Edit host dialog says to use one per CPU core.** 1.3 starts at 1 and has no hint. The hint is a note, drawn in the palette's `PlaceholderText` colour by `SIG_EditHostDialog`'s constructor | by decision 2026-09-23, after item 38's measurements: on this 4-core machine, at the 5 ms wait, a generation took 3.7 s with 4 slaves against 13.3 s with 1; 4-slave runs evolve differently, so the work is not identical. The start value applies only to Add; Edit shows the host's own value, and the shipped experiments keep their `PVMHOST . 1 1 "."` | `guibehaviour-baseline.txt`: the hint label, and `value=1` in Edit, which shows that Edit replaces the start value. The start value of 4 itself is not checked, because no scenario adds a host |
 | **Dialog titles do not end in "...".** 1.3 ends 39 titles in dots, at 68 code sites in `SIGEL_MasterGUI` and the movie settings dialog plus the default title in `SIG_EditHostDialogBase.ui`; the ellipsis belongs on the command that opens a dialog, not on its title. Menu items, buttons, status tips and progress labels are unchanged. Two titles are reworded: "Do you really..." is "Delete Experiment" in `SIG_ExperimentListView::slotDeleteExperiment` and "Quit SIGEL" in `SIG_MainWindow::askBeforeQuitting`. "There is no experiment selected..." (22 sites) and "No experiment selected..." (1) are all "No experiment selected"; "Import Language Parameter..." is "Import Language Parameters", as its export is; the DynaMechs box in `SIG_GUIGPExperiment::slotRobotInfo` loses its two dots and keeps its wording | by decision 2026-09-23 | `guibehaviour-baseline.txt`, 76 title lines, each checked against the approved list; `xtest-baseline.txt`, 2 lines |
-| **The ambient light slider and its label are disabled in Wireframe.** 1.3 leaves them enabled, and the slider has no effect there, because Wireframe draws without lighting | by decision 2026-09-23, item 43. `SIG_SimulationWidget`'s constructor | nothing: no scenario checks the slider's enabled state |
+| **The ambient light slider and its label are disabled except in Flatshaded and Gouraudshaded.** 1.3 leaves them enabled in Wireframe, where the slider has no effect, because Wireframe draws without lighting; Hidden lines and Points draw without lighting too | by decision 2026-09-23, item 43. `SIG_SimulationWidget`'s constructor | nothing: no scenario checks the slider's enabled state |
 | **The Edit host title quotes the host name: `Edit host "."`.** 1.3 shows `Edit host ....`; with the dots removed it read `Edit host .`, because the shipped experiments' one host is named `.`, PVM's word for this computer | by decision 2026-09-23. `SIG_GPParameter::slotItemDoubleClicked`, which the Edit button calls too | `guibehaviour-baseline.txt`: the two title lines of the Edit host scenario |
 | **The 3-D view starts fitted to the robot and aims at its centre.** 1.3 starts at distance 1.0 for every robot and aims at the root link's model origin | by decision 2026-09-23, item 26. `SIG_SimulationVisualisation`'s constructor, `getFittingDistance`, `SIG_SimulationWidget::visualizeThis` | nothing: no check covers the camera |
 | **The headlight does not dim with distance.** 1.3 gives LIGHT0 linear attenuation 0.4 | by decision 2026-09-23, item 26, so the fitted camera does not darken the lit modes. `SIG_Visualisation`'s constructor | nothing |
@@ -3229,6 +3234,7 @@ else that stops matching 1.3 still needs justifying as a defect.
 | **The viewer window opens at 1014 x 810, so the 3-D view is square.** 1.3 opens it at 780 x 810; at that size the port's view is 422 x 655 | by decision 2026-09-23, item 66. `SIG_SimulationWindow`'s constructor | nothing: `guidrive`'s slave-GUI scenario sets 780 x 810 itself |
 | **The 3-D view draws the ground on both sides of the start.** 1.3 draws the terrain only from 0 to its size, so the robot starts at its corner. 1.0 drew a flat floor that moved with the camera | by decision 2026-09-23, item 42: the ground on the negative side too, each edge continued outward at the heights the physics uses. `SIG_EnvironmentRenderer::drawInit`, `buildGrid` and `groundDepth` | nothing: no check covers the floor |
 | **A render mode "Hidden lines".** 1.3 has Wireframe, Flatshaded and Gouraudshaded | by decision 2026-09-23, item 63. `SIG_ViewSettings::hiddenLine`, `SIG_SimulationVisualisation::visualize` | nothing: no check covers the render modes |
+| **A render mode "Points", with the back points hidden.** 1.3 has Wireframe, Flatshaded and Gouraudshaded | by decision 2026-09-23, item 63. `SIG_ViewSettings::points`, `SIG_SimulationVisualisation::visualize` | nothing: no check covers the render modes |
 
 **Three 1.3 defects preserved on purpose**, plus the one below them. `MT_GUI`'s
 gnuplot export puts a constant x on datasets `2pt destr.` and `3pt destr.`
@@ -4478,6 +4484,20 @@ carried; other items and this file cite them, so they do not change.
   **Done on both machines 2026-09-19.** On the x86 machine with approval
   there; its seven files hash as ours. Its copy of all 14 as downloaded is
   `/home/debian/sigel-shipped-original-2026-09-19/`.
+
+- [x] **63, second half. A Points mode in the 3-D view** — done 2026-09-23,
+  by decision. The render mode "Points", after Hidden lines, draws only the
+  vertices, 3 px, without lighting, and hides the ones behind a polygon: it
+  uses the same first pass as Hidden lines in
+  `SIG_SimulationVisualisation::visualize`, then `glPolygonMode( GL_POINT )`.
+  A see-through variant was built and dropped by decision, so the one mode
+  keeps the plain name. `SIG_ViewSettings::points`; `SIG_Visualisation::
+  visualize` sets it up as Wireframe with `GL_POINT`. The point size is set
+  before the visible pass, because the robot's anchor points set size 5 inside
+  their display lists. The ambient slider is enabled only in Flatshaded and
+  Gouraudshaded now, in `SIG_SimulationWidget`'s constructor. The grid and the
+  robot path are line lists and stay lines. Checked in `Xvfb` on twoBases and
+  walker, and on the desktop by Jan.
 
 - [x] **The 3-D floor drew its rows twice in the line modes** — done
   2026-09-23, by decision; found by Jan, not a numbered item. In Wireframe,

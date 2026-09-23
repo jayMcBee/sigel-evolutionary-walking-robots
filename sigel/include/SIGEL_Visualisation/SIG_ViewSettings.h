@@ -62,6 +62,13 @@ namespace SIGEL_Visualisation
 	 */
 	hiddenLine,
 	/**
+	 * Point rendering.
+	 *
+	 * Only the vertices are drawn, as points, and a vertex behind a
+	 * polygon is not drawn. No lighting is active.
+	 */
+	points,
+	/**
 	 * Flat shaded rendering.
 	 *
 	 * The polygons are filled.

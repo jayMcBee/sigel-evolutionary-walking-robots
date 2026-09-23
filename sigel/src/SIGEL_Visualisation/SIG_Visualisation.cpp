@@ -117,6 +117,13 @@ namespace SIGEL_Visualisation
        	glDisable( GL_COLOR_MATERIAL );
        	glDisable( GL_CULL_FACE );
        	break;
+      case SIG_ViewSettings::points:
+       	glPolygonMode( GL_FRONT_AND_BACK, GL_POINT );
+       	glShadeModel( GL_FLAT );
+       	glDisable( GL_LIGHTING );
+       	glDisable( GL_COLOR_MATERIAL );
+       	glDisable( GL_CULL_FACE );
+       	break;
       case SIG_ViewSettings::flatShaded:
        	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
        	glShadeModel( GL_FLAT );

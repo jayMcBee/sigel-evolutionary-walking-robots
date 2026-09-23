@@ -153,11 +153,13 @@ namespace SIGEL_Visualisation
      environmentRenderer.setLookPoint( viewSettings.lookPoint );
      environmentRenderer.setRenderMode( viewSettings.renderMode );
 
-     bool const hiddenLine = (viewSettings.renderMode == SIG_ViewSettings::hiddenLine);
-     if (hiddenLine)
+     bool const pointMode = (viewSettings.renderMode == SIG_ViewSettings::points);
+     bool const hidden = (viewSettings.renderMode == SIG_ViewSettings::hiddenLine)
+                      || (viewSettings.renderMode == SIG_ViewSettings::points);
+     if (hidden)
        {
 	 // The filled polygons go into the depth buffer only, pushed back a
-	 // little, so that the edges drawn next are hidden behind them.
+	 // little, so that the edges or points drawn next are hidden behind them.
 	 glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 	 glColorMask( GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE );
 	 glEnable( GL_POLYGON_OFFSET_FILL );
@@ -168,15 +170,20 @@ namespace SIGEL_Visualisation
 
 	 glDisable( GL_POLYGON_OFFSET_FILL );
 	 glColorMask( GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE );
-	 glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+	 glPolygonMode( GL_FRONT_AND_BACK, pointMode ? GL_POINT : GL_LINE );
 	 // Lines and points were drawn at the same depth in the first pass.
 	 glDepthFunc( GL_LEQUAL );
        };
 
+     // The robot's anchor points set their own point size, so it is set
+     // again here, before each frame is drawn.
+     if (pointMode)
+       glPointSize( 3 );
+
      environmentRenderer.render();
      robotRenderer.render();
 
-     if (hiddenLine)
+     if (hidden)
        glDepthFunc( GL_LESS );
    };
 
