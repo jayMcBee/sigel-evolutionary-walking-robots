@@ -2582,8 +2582,9 @@ in August 2001 by SIGEL 1.0 and the source being ported is 1.3. See the scope
 note at the top and `regression_1.0_to_1.3.md`.
 
 Before the joint-sensor fix of 2026-09-23 it gave 5 of 7 within 10%. After
-it, 7 of 7, and `runner` matches 100 of 100. See `regression_1.0_to_1.3.md`,
-"The data today". Over the full
+it, 7 of 7, and `runner` matched 100 of 100. After the fix of the register's
+top the same day, 6 of 7: the 2001 runner programs depend on the old wrap. See
+`regression_1.0_to_1.3.md`, "The data today". Over the full
 set of 14, the 1.3 build gave 7 of 13 distinct experiments within 10%.
 
 **What is needed to make this a port test is Phase V**, below. Not fitness:
@@ -3240,7 +3241,8 @@ else that stops matching 1.3 still needs justifying as a defect.
 | **The 3-D view draws the ground on both sides of the start.** 1.3 draws the terrain only from 0 to its size, so the robot starts at its corner. 1.0 drew a flat floor that moved with the camera | by decision 2026-09-23, item 42: the ground on the negative side too, each edge continued outward at the heights the physics uses. `SIG_EnvironmentRenderer::drawInit`, `buildGrid` and `groundDepth` | nothing: no check covers the floor |
 | **A render mode "Hidden lines".** 1.3 has Wireframe, Flatshaded and Gouraudshaded | by decision 2026-09-23, item 63. `SIG_ViewSettings::hiddenLine`, `SIG_SimulationVisualisation::visualize` | nothing: no check covers the render modes |
 | **A render mode "Points", with the back points hidden.** 1.3 has Wireframe, Flatshaded and Gouraudshaded | by decision 2026-09-23, item 63. `SIG_ViewSettings::points`, `SIG_SimulationVisualisation::visualize` | nothing: no check covers the render modes |
-| **A joint sensor reports the joint's position again.** 1.3 multiplies the radian reading by 57.3 before it divides by the radian range, so the register wraps the value into noise. 1.0 had the plain division | by decision 2026-09-23, the joint-sensor fix of the 1.0 → 1.3 regression: 1.0's `(q - minPos) / posRange` restored in `SIG_DynaMechsSimulationQueries::sense`. With it, `checks/replicate.sh` gives 7 of 7 kept experiments within 10% of their 2001 results, and `runner` matches 100 of 100 individuals. See `regression_1.0_to_1.3.md`, "The data today" | `fitness-baseline.txt`; the site count in `truncated pi (V5)` |
+| **A joint sensor reports the joint's position again.** 1.3 multiplies the radian reading by 57.3 before it divides by the radian range, so the register wraps the value into noise. 1.0 had the plain division | by decision 2026-09-23, the joint-sensor fix of the 1.0 → 1.3 regression: 1.0's `(q - minPos) / posRange` restored in `SIG_DynaMechsSimulationQueries::sense`. With it alone, `checks/replicate.sh` gave 7 of 7 kept experiments within 10% of their 2001 results, and `runner` matched 100 of 100 individuals. The next row changes that. See `regression_1.0_to_1.3.md`, "The data today" | `fitness-baseline.txt`; the site count in `truncated pi (V5)` |
+| **A sensor at the top of its range reads the register's top.** 1.3, and 1.0, map a reading of exactly 1 one past the register's top, and the register wraps it to the bottom: a joint on its max stop reads as its min, and a contact sensor reads the same with and without contact | by decision 2026-09-23, from the 1.0 → 1.3 regression work: `SIG_DynaMechsSimulationQueries::sense` caps the value at the register's top. The 2001 `runner` programs depend on the wrap and no longer reproduce. Next: evolve the runner again under the fixed sensors. See `regression_1.0_to_1.3.md`, "The top of the register range" | `fitness-baseline.txt` |
 
 **Two 1.3 defects preserved on purpose**, plus the one below them. `MT_GUI`'s
 gnuplot export puts a constant x on datasets `2pt destr.` and `3pt destr.`

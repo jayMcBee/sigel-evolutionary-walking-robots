@@ -97,11 +97,13 @@ Nothing that already passed changed. The failures correlate perfectly with a
 3-bit register width — 6 of 6 fail, 8 of 8 pass — because at 3 bits the wrap
 destroys the reading entirely.
 
-**Two cases remain outside 10% even with 1.0's line**:
+**Two cases stayed outside 10% even with 1.0's line.** Both experiments were
+later removed from the repo by decision, so they are closed and not
+investigated further:
 `twoBasesHighCrossOverRate` 0.819 and `twoBasesReducedInstructionSet` 0.721.
 Both stable and crash-free when run serially, so they are a deterministic
 difference, not noise. Ranked by comment-stripped 1.0 → 1.3 delta on the
-evaluation path, the places to look:
+evaluation path, the places that were to be looked at:
 
 | file | changed lines | what changed |
 |---|---|---|
@@ -123,8 +125,8 @@ holds 7 of them**, in `experiments/`: `hammer`, `insect`, `octopus`, `runner`,
 `…NiceWalkingFitness` file, except `twoBases`, which is
 `twoBasesHardlyReducedIS`. Items 40, 44 and 45 in `PORTING.md`, "Finished to-do
 items", removed the other seven: five `twoBases` variants,
-`octopusSimpleFitness` and `runnerSimpleFitness`. **Both cases left open above
-were among them.** Item 46 renamed the kept seven. The originals are on
+`octopusSimpleFitness` and `runnerSimpleFitness`. Both cases that stayed outside
+10% above were among them, so they are closed. Item 46 renamed the kept seven. The originals are on
 sourceforge; see "Reference material" in `PORTING.md`. The oracle's machine
 keeps all 14 as downloaded, at `/home/debian/sigel-shipped-original-2026-09-19/`.
 
@@ -157,10 +159,39 @@ The same run after it:
 | twoBases | 0.56965 | 0.57356 | **1.007** | 16/100 |
 | walker | 0.27548 | 0.25485 | 0.925 | 12/100 |
 
-7 of 7 within 10%. Only `runner` and `twoBases` move. No insect program holds a
-`SENSE` instruction; the octopus population holds one and walker's holds 11
-`SENSE` lines, and neither best nor match moves. The two cases left open above
-are not in the repo and are still open.
+Then 7 of 7 within 10%. Only `runner` and `twoBases` moved. No insect
+program holds a `SENSE` instruction; the octopus population holds one and
+walker's holds 11 `SENSE` lines, and neither best nor match moved. The next
+section has the data after the second fix.
+
+### The top of the register range, fixed 2026-09-23
+
+Every sensor branch of `sense` maps its reading, 0 to 1, onto the register as
+`int(scaledState * 2^n - 2^(n-1))`. A reading of exactly 1 gives `2^(n-1)`, one
+past the register's top, and `SIG_Register::makeValid` wraps it to the bottom.
+So a joint pressed against its max stop read as its min, and a contact sensor
+read the same value with and without contact. 1.0 had this too. `sense` now
+caps the value at `SIG_Register::getMaxValue`. This holds for register widths
+up to 31. At 32, the default width for a new experiment, the cast to `int` in `sense`
+and `makeValid` itself both overflow; that is a separate bug.
+
+The same run after this fix:
+
+| experiment | 2001 best | ours | best | match |
+|---|---|---|---|---|
+| hammer | 0.45972 | 0.45668 | 0.993 | 10/100 |
+| insect | 0.63896 | 0.61079 | 0.956 | 5/100 |
+| octopus | 0.52013 | 0.51471 | 0.990 | 38/100 |
+| runner | 0.91951 | 0.12227 | **0.133** | **37/100** |
+| shortHammer | 0.49015 | 0.49085 | 1.001 | 30/100 |
+| twoBases | 0.56965 | 0.57356 | 1.007 | **13/100** |
+| walker | 0.27548 | 0.25485 | 0.925 | 12/100 |
+
+6 of 7 within 10%. The runner programs were evolved in 2001 with the wrap, and
+they depend on it: with correct readings they no longer walk as they did.
+`twoBases` keeps its best, and 3 fewer of its individuals match (16 to 13).
+The other five do not move. The fix causes this change; it is not a defect.
+Next: evolve the runner again under the fixed sensors.
 
 ---
 

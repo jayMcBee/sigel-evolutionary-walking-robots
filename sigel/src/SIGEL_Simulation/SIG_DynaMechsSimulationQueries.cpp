@@ -259,6 +259,11 @@ void SIGEL_Simulation::SIG_DynaMechsSimulationQueries::sense(int sensorNo,
 		default:	SIGEL_Tools::SIG_IO::cerr << "\tPANIC !!  UNKNOWN SENSOR TYPE !!\n\n";	//	somebody want to change this to this funky throw/catch thingy ?
 	}
 
+      // A scaledState of exactly 1 maps one past the register's top, and
+      // SIG_Register::makeValid would wrap it to the bottom.
+      if ( registerValue > registers[0].getMaxValue() )
+        registerValue = registers[0].getMaxValue();
+
 #ifdef SIG_DEBUG
       SIGEL_Tools::SIG_IO::cerr << "Reading sensor value from sensor "
 				<< sensor->getName()
