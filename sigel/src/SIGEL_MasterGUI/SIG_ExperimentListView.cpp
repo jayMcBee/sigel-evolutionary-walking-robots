@@ -114,7 +114,7 @@ void SIG_ExperimentListView::slotRenameExperiment()
 	      // enable autodelete
 	    } // close if
 	  else
-	    QMessageBox::information( this, "Error...", "Either you have entered no name or there is\nalready an experiment under that name." );
+	    QMessageBox::information( this, "Error", "Either you have entered no name or there is\nalready an experiment under that name." );
 	  break;
 	} // close switch
     } // close if
@@ -133,7 +133,7 @@ void SIG_ExperimentListView::slotDeleteExperiment()
       QString name = current->text(0);
       // lets ask first if we really want to do this
       
-      switch( QMessageBox::warning( this, "Do you really...", "Do you really want to delete\n"
+      switch( QMessageBox::warning( this, "Delete Experiment", "Do you really want to delete\n"
 				    "the experiment " + name + "?", QMessageBox::Yes | QMessageBox::Default, QMessageBox::No) )
 	{
 	case QMessageBox::Yes:
@@ -148,7 +148,7 @@ void SIG_ExperimentListView::slotDeleteExperiment()
     }
   else
     {
-      QMessageBox::information( this, "There is no experiment selected...", "Currently there is no experiment selected." );
+      QMessageBox::information( this, "No experiment selected", "Currently there is no experiment selected." );
     };
   if( topLevelItemCount() == 0 )
     {
@@ -162,7 +162,7 @@ void SIG_ExperimentListView::slotDeleteExperiment()
 
 void SIG_ExperimentListView::slotLoadExperiment()
 {
-  QStringList filesToOpen = QFileDialog::getOpenFileNames( this, "Load Experiments...", QString(), "Experiment Files (*.exp);;All Files (*)" );
+  QStringList filesToOpen = QFileDialog::getOpenFileNames( this, "Load Experiments", QString(), "Experiment Files (*.exp);;All Files (*)" );
   if( !filesToOpen.isEmpty() )
     {
       for( int i = 0; i < filesToOpen.count(); i++)
@@ -198,7 +198,7 @@ void SIG_ExperimentListView::slotLoadExperiment()
 	    }
 	  else
 	    {
-	      QMessageBox::warning( this, "File could not be opened...", "The file " + fileName + " could not be opened for reading." );
+	      QMessageBox::warning( this, "File could not be opened", "The file " + fileName + " could not be opened for reading." );
 	    }
 	  experimentDict.insert( fileName , theNewExperiment );
 	  emit isNotEmpty( true );
@@ -218,7 +218,7 @@ void SIG_ExperimentListView::slotSaveExperiment()
   if (currentExperiment != QString() ) {
       SIG_GUIGPExperiment *theExperiment = getByExperimentName( currentExperiment );
       theExperiment->putAllIntoExperiment();
-      QString fileName = QFileDialog::getSaveFileName( this, "Save Experiment...", theExperiment->getName(), "Experiment Files (*.exp);;All Files (*)" );
+      QString fileName = QFileDialog::getSaveFileName( this, "Save Experiment", theExperiment->getName(), "Experiment Files (*.exp);;All Files (*)" );
       if( !fileName.isEmpty() ) {
 	  fileName = theExperiment->checkEnding( fileName, "exp" );
 	  QFile file( fileName );
@@ -242,7 +242,7 @@ void SIG_ExperimentListView::slotSaveExperiment()
 		} // filename not empty
   } // save selected experiment
   else	{ // no experiment selected
-  	QMessageBox::warning( this, "No experiment selected...", "Currently there is no experiment selected!" );
+  	QMessageBox::warning( this, "No experiment selected", "Currently there is no experiment selected!" );
   }
 };
 
@@ -385,7 +385,7 @@ void SIG_ExperimentListView::selectItem( QString label )
     }
   else
     {
-      QMessageBox::information( this, "There is no experiment selected...", "Currently there is no experiment selected." );
+      QMessageBox::information( this, "No experiment selected", "Currently there is no experiment selected." );
     }
 };
 
@@ -428,7 +428,7 @@ void SIG_ExperimentListView::slotGPParametersImport()
       theExperiment->slotGPParameterImport();
     }
   else
-    QMessageBox::information( this, "There is no experiment selected...", "Currently there is no experiment selected." );
+    QMessageBox::information( this, "No experiment selected", "Currently there is no experiment selected." );
 };
   
 void SIG_ExperimentListView::slotSimulationParametersImport()
@@ -440,7 +440,7 @@ void SIG_ExperimentListView::slotSimulationParametersImport()
       theExperiment->slotSimulationParameterImport();
     }
   else
-    QMessageBox::information( this, "There is no experiment selected...", "Currently there is no experiment selected." );
+    QMessageBox::information( this, "No experiment selected", "Currently there is no experiment selected." );
 };
 
 void SIG_ExperimentListView::slotRobotImport()
@@ -452,7 +452,7 @@ void SIG_ExperimentListView::slotRobotImport()
       theExperiment->slotRobotImport();
     }
   else
-    QMessageBox::information( this, "There is no experiment selected...", "Currently there is no experiment selected." );
+    QMessageBox::information( this, "No experiment selected", "Currently there is no experiment selected." );
 };
 
 void SIG_ExperimentListView::slotLanguageParametersImport()
@@ -464,7 +464,7 @@ void SIG_ExperimentListView::slotLanguageParametersImport()
       theExperiment->slotLanguageParameterImport();
     }
   else
-    QMessageBox::information( this, "There is no experiment selected...", "Currently there is no experiment selected." );
+    QMessageBox::information( this, "No experiment selected", "Currently there is no experiment selected." );
 };
 
 void SIG_ExperimentListView::slotPopulationImport()
@@ -476,7 +476,7 @@ void SIG_ExperimentListView::slotPopulationImport()
       theExperiment->slotPopulationImport();
     }
   else
-    QMessageBox::information( this, "There is no experiment selected...", "Currently there is no experiment selected." );
+    QMessageBox::information( this, "No experiment selected", "Currently there is no experiment selected." );
 };
 
 void SIG_ExperimentListView::slotEnvironmentImport()
@@ -488,7 +488,7 @@ void SIG_ExperimentListView::slotEnvironmentImport()
       theExperiment->slotEnvironmentImport();
     }
   else
-    QMessageBox::information( this, "There is no experiment selected...", "Currently there is no experiment selected." );
+    QMessageBox::information( this, "No experiment selected", "Currently there is no experiment selected." );
 };
 
 void SIG_ExperimentListView::slotGPParametersExport()
@@ -500,7 +500,7 @@ void SIG_ExperimentListView::slotGPParametersExport()
       theExperiment->slotGPParameterExport();
     }
   else
-    QMessageBox::information( this, "There is no experiment selected...", "Currently there is no experiment selected." );
+    QMessageBox::information( this, "No experiment selected", "Currently there is no experiment selected." );
 };
 
 void SIG_ExperimentListView::slotSimulationParametersExport()
@@ -512,7 +512,7 @@ void SIG_ExperimentListView::slotSimulationParametersExport()
       theExperiment->slotSimulationParameterExport();
     }
   else
-    QMessageBox::information( this, "There is no experiment selected...", "Currently there is no experiment selected." );
+    QMessageBox::information( this, "No experiment selected", "Currently there is no experiment selected." );
 };
 
 void SIG_ExperimentListView::slotLanguageParametersExport()
@@ -524,7 +524,7 @@ void SIG_ExperimentListView::slotLanguageParametersExport()
       theExperiment->slotLanguageParameterExport();
     }
   else
-    QMessageBox::information( this, "There is no experiment selected...", "Currently there is no experiment selected." );
+    QMessageBox::information( this, "No experiment selected", "Currently there is no experiment selected." );
 };
 
 void SIG_ExperimentListView::slotPopulationExport()
@@ -536,7 +536,7 @@ void SIG_ExperimentListView::slotPopulationExport()
       theExperiment->slotPopulationExport();
     }
   else
-    QMessageBox::information( this, "There is no experiment selected...", "Currently there is no experiment selected." );
+    QMessageBox::information( this, "No experiment selected", "Currently there is no experiment selected." );
 };
 
 void SIG_ExperimentListView::slotEnvironmentExport()
@@ -548,7 +548,7 @@ void SIG_ExperimentListView::slotEnvironmentExport()
       theExperiment->slotEnvironmentExport();
     }
   else
-    QMessageBox::information( this, "There is no experiment selected...", "Currently there is no experiment selected." );
+    QMessageBox::information( this, "No experiment selected", "Currently there is no experiment selected." );
 };
 
 void SIG_ExperimentListView::slotGNUPlotExport()
@@ -559,7 +559,7 @@ void SIG_ExperimentListView::slotGNUPlotExport()
       theExperiment->slotGNUPlotExport();
     }
   else
-    QMessageBox::information( this, "There is no experiment selected...", "Currently there is no experiment selected." );
+    QMessageBox::information( this, "No experiment selected", "Currently there is no experiment selected." );
 };
 
 void SIG_ExperimentListView::slotAddIndividuals()
@@ -571,7 +571,7 @@ void SIG_ExperimentListView::slotAddIndividuals()
       theExperiment->allIndividualsView->slotAddIndividuals();
     }
   else
-    QMessageBox::information( this, "There is no experiment selected...", "Currently there is no experiment selected." );
+    QMessageBox::information( this, "No experiment selected", "Currently there is no experiment selected." );
 };
 
 void SIG_ExperimentListView::slotDeleteIndividuals()
@@ -583,7 +583,7 @@ void SIG_ExperimentListView::slotDeleteIndividuals()
       theExperiment->allIndividualsView->slotDeleteIndividuals();
     }
   else
-    QMessageBox::information( this, "There is no experiment selected...", "Currently there is no experiment selected." );
+    QMessageBox::information( this, "No experiment selected", "Currently there is no experiment selected." );
 };
 
 void SIG_ExperimentListView::slotResetIndividuals()
@@ -595,7 +595,7 @@ void SIG_ExperimentListView::slotResetIndividuals()
       theExperiment->allIndividualsView->slotResetPool();
     }
   else
-    QMessageBox::information( this, "There is no experiment selected...", "Currently there is no experiment selected." );
+    QMessageBox::information( this, "No experiment selected", "Currently there is no experiment selected." );
 };
 
 void SIG_ExperimentListView::slotVisualizeIndividuals()
@@ -603,7 +603,7 @@ void SIG_ExperimentListView::slotVisualizeIndividuals()
   SIG_GUIGPExperiment *theExperiment = currentlySelectedExperiment();
   if( !theExperiment )
     {
-      QMessageBox::information( this, "There is no experiment selected...", "Currently there is no experiment selected." );
+      QMessageBox::information( this, "No experiment selected", "Currently there is no experiment selected." );
       return;
     }
 
@@ -622,7 +622,7 @@ void SIG_ExperimentListView::slotProgramExport()
       theExperiment->allIndividualsView->slotExportProgram();
     }
   else
-    QMessageBox::information( this, "There is no experiment selected...", "Currently there is no experiment selected." );
+    QMessageBox::information( this, "No experiment selected", "Currently there is no experiment selected." );
 };
 
 void SIG_ExperimentListView::slotIndividualExport()
@@ -634,7 +634,7 @@ void SIG_ExperimentListView::slotIndividualExport()
       theExperiment->allIndividualsView->slotExportIndividual();
     }
   else
-    QMessageBox::information( this, "There is no experiment selected...", "Currently there is no experiment selected." );
+    QMessageBox::information( this, "No experiment selected", "Currently there is no experiment selected." );
 };
 
 void SIG_ExperimentListView::slotProgramImport()
@@ -646,7 +646,7 @@ void SIG_ExperimentListView::slotProgramImport()
       theExperiment->allIndividualsView->slotImportProgram();
     }
   else
-    QMessageBox::information( this, "There is no experiment selected...", "Currently there is no experiment selected." );
+    QMessageBox::information( this, "No experiment selected", "Currently there is no experiment selected." );
 };
 
 void SIG_ExperimentListView::slotIndividualImport()
@@ -658,7 +658,7 @@ void SIG_ExperimentListView::slotIndividualImport()
       theExperiment->allIndividualsView->slotImportIndividual();
     }
   else
-    QMessageBox::information( this, "There is no experiment selected...", "Currently there is no experiment selected." );
+    QMessageBox::information( this, "No experiment selected", "Currently there is no experiment selected." );
 };
 
 } // close namespace

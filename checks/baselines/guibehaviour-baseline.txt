@@ -256,8 +256,8 @@
   [tree] header=[Experiments] topLevel=0
   [page] count=1 current=QLabel objectName=[baseWidget]
   [action changes] none
-  [modal] class=QFileDialog title=[Load Experiments...]
-  [filedialog] title=[Load Experiments...] mode=3 nameFilters=[Experiment Files (*.exp) ;; All Files (*)] labelAccept=[&Open]
+  [modal] class=QFileDialog title=[Load Experiments]
+  [filedialog] title=[Load Experiments] mode=3 nameFilters=[Experiment Files (*.exp) ;; All Files (*)] labelAccept=[&Open]
 
 == STEP 2: after File > Open Experiment ==
   [title] SIGEL
@@ -422,8 +422,8 @@ order=Ascending
   last   16623 | 0.569652 | 14
 
 == ADD 5 ==
-  [modal] class=SIGEL_MasterGUI::SIG_AddIndividualsDialog title=[Add individuals...]
-dialog [Add individuals...]
+  [modal] class=SIGEL_MasterGUI::SIG_AddIndividualsDialog title=[Add individuals]
+dialog [Add individuals]
   spin default=1 min=1 max=9999
   button [&OK] default=1
   button [&Cancel] default=0
@@ -476,8 +476,8 @@ we do with the system?]
   [tree] header=[Experiments] topLevel=0
   [page] count=1 current=QLabel objectName=[baseWidget]
   [action changes] none
-  [modal] class=QFileDialog title=[Load Experiments...]
-  [filedialog] title=[Load Experiments...] mode=3 nameFilters=[Experiment Files (*.exp) ;; All Files (*)] labelAccept=[&Open]
+  [modal] class=QFileDialog title=[Load Experiments]
+  [filedialog] title=[Load Experiments] mode=3 nameFilters=[Experiment Files (*.exp) ;; All Files (*)] labelAccept=[&Open]
 
 == STEP 2: after File > Open Experiment ==
   [title] SIGEL
@@ -940,8 +940,8 @@ we do with the system?]
   [tree] header=[Experiments] topLevel=0
   [page] count=1 current=QLabel objectName=[baseWidget]
   [action changes] none
-  [modal] class=QFileDialog title=[Load Experiments...]
-  [filedialog] title=[Load Experiments...] mode=3 nameFilters=[Experiment Files (*.exp) ;; All Files (*)] labelAccept=[&Open]
+  [modal] class=QFileDialog title=[Load Experiments]
+  [filedialog] title=[Load Experiments] mode=3 nameFilters=[Experiment Files (*.exp) ;; All Files (*)] labelAccept=[&Open]
 
 == STEP 2: after File > Open Experiment ==
   [title] SIGEL
@@ -1037,8 +1037,8 @@ we do with the system?]
 selected=17013
 
 -- Export > GP-Parameters
-  [modal] class=QFileDialog title=[Export GP Parameter...]
-  [dialog] title=[Export GP Parameter...] filters=[GP Parameter Files (*.gpp) ;; All Files (*)] accept=[&Save]
+  [modal] class=QFileDialog title=[Export GP Parameter]
+  [dialog] title=[Export GP Parameter] filters=[GP Parameter Files (*.gpp) ;; All Files (*)] accept=[&Save]
   [dialog] parentIsTheMainWindow=1
   bytes=819 sha256=56b819402928ae0983be4a2aa98047828a4616e5c06b37a9cf350a9b91c95aee newlines=87 endsWithNewline=1
   crCount=0
@@ -1050,8 +1050,8 @@ selected=17013
   tail0  [. 1 1 "."]
 
 -- Export > Simulation-Parameters
-  [modal] class=QFileDialog title=[Export Simulation Parameters...]
-  [dialog] title=[Export Simulation Parameters...] filters=[Simulation Parameter Files (*.sip) ;; All Files (*)] accept=[&Save]
+  [modal] class=QFileDialog title=[Export Simulation Parameters]
+  [dialog] title=[Export Simulation Parameters] filters=[Simulation Parameter Files (*.sip) ;; All Files (*)] accept=[&Save]
   [dialog] parentIsTheMainWindow=1
   bytes=305 sha256=c672eeabd54245663e8a308d68cdec2343a0b66840426cf4d7648606e1a1df10 newlines=35 endsWithNewline=1
   crCount=0
@@ -1063,8 +1063,8 @@ selected=17013
   tail0  [0.35]
 
 -- Export > Language-Parameters
-  [modal] class=QFileDialog title=[Export Language Parameters...]
-  [dialog] title=[Export Language Parameters...] filters=[Language Parameter Files (*.lap) ;; All Files (*)] accept=[&Save]
+  [modal] class=QFileDialog title=[Export Language Parameters]
+  [dialog] title=[Export Language Parameters] filters=[Language Parameter Files (*.lap) ;; All Files (*)] accept=[&Save]
   [dialog] parentIsTheMainWindow=1
   bytes=401 sha256=6828590f91539e7159a6b22dd0aca26815ee24c8cb99deefeed050937df3c718 newlines=14 endsWithNewline=1
   crCount=0
@@ -1076,8 +1076,8 @@ selected=17013
   tail0  [MOD CommandParameters 0.001]
 
 -- Export > Environment
-  [modal] class=QFileDialog title=[Export Environment...]
-  [dialog] title=[Export Environment...] filters=[Environment Files (*.env) ;; All Files (*)] accept=[&Save]
+  [modal] class=QFileDialog title=[Export Environment]
+  [dialog] title=[Export Environment] filters=[Environment Files (*.env) ;; All Files (*)] accept=[&Save]
   [dialog] parentIsTheMainWindow=1
   bytes=299 sha256=383d1f4f142ff26bff698d9a62e73a441154d8d0329bc36b1ae560935b1f73b1 newlines=43 endsWithNewline=1
   crCount=0
@@ -1089,8 +1089,8 @@ selected=17013
   tail0  [1]
 
 -- Export > Population
-  [modal] class=QFileDialog title=[Export Population...]
-  [dialog] title=[Export Population...] filters=[Population files (*.pop) ;; All Files (*)] accept=[&Save]
+  [modal] class=QFileDialog title=[Export Population]
+  [dialog] title=[Export Population] filters=[Population files (*.pop) ;; All Files (*)] accept=[&Save]
   [dialog] parentIsTheMainWindow=1
   bytes=1488729 sha256=3d89d359feb484300f413e725018dcb9131121e70ea55937f9b792c1be340615 newlines=71452 endsWithNewline=0
   crCount=0
@@ -1102,8 +1102,8 @@ selected=17013
   tail0  [}POPULATION END]
 
 -- Export > Program
-  [modal] class=QFileDialog title=[Export program...]
-  [dialog] title=[Export program...] filters=[Program files (*.prg) ;; All Files (*)] accept=[&Save]
+  [modal] class=QFileDialog title=[Export program]
+  [dialog] title=[Export program] filters=[Program files (*.prg) ;; All Files (*)] accept=[&Save]
   [dialog] parentIsTheMainWindow=1
   bytes=2950 sha256=882279cff0dfd01cc9498995e88f94e42ecc1fdb06fda8884b9ad6b76e5a37ec newlines=136 endsWithNewline=1
   crCount=0
@@ -1115,8 +1115,8 @@ selected=17013
   tail0  [       LOAD 56,12951]
 
 -- Export > Individual
-  [modal] class=QFileDialog title=[Export individual...]
-  [dialog] title=[Export individual...] filters=[Individual files (*.ind) ;; All Files (*)] accept=[&Save]
+  [modal] class=QFileDialog title=[Export individual]
+  [dialog] title=[Export individual] filters=[Individual files (*.ind) ;; All Files (*)] accept=[&Save]
   [dialog] parentIsTheMainWindow=1
   bytes=14123 sha256=3a2b52b467d1bb56d2de540a337577caa6e260ecbce5d4487ef1c87fabf05bdb newlines=678 endsWithNewline=0
   crCount=0
@@ -1128,8 +1128,8 @@ selected=17013
   tail0  [    }INDIVIDUAL END]
 
 -- Export > ...to GNU plot
-  [modal] class=QFileDialog title=[Export to GNU plot...]
-  [dialog] title=[Export to GNU plot...] filters=[GNU plot data file (*.dat) ;; All Files (*)] accept=[&Save]
+  [modal] class=QFileDialog title=[Export to GNU plot]
+  [dialog] title=[Export to GNU plot] filters=[GNU plot data file (*.dat) ;; All Files (*)] accept=[&Save]
   [dialog] parentIsTheMainWindow=1
   bytes=6848 sha256=63fd5ec555504bb890512d583f82d2fde49b248c18085793f9273f882942c83d newlines=203 endsWithNewline=1
   crCount=0
@@ -1146,8 +1146,8 @@ selected=17013
   [tree] header=[Experiments] topLevel=0
   [page] count=1 current=QLabel objectName=[baseWidget]
   [action changes] none
-  [modal] class=QFileDialog title=[Load Experiments...]
-  [filedialog] title=[Load Experiments...] mode=3 nameFilters=[Experiment Files (*.exp) ;; All Files (*)] labelAccept=[&Open]
+  [modal] class=QFileDialog title=[Load Experiments]
+  [filedialog] title=[Load Experiments] mode=3 nameFilters=[Experiment Files (*.exp) ;; All Files (*)] labelAccept=[&Open]
 
 == STEP 2: after File > Open Experiment ==
   [title] SIGEL
@@ -1240,21 +1240,21 @@ selected=17013
   [action changes] none
 
 == OVERWRITE ==
-  [modal] class=QFileDialog title=[Export Simulation Parameters...]
+  [modal] class=QFileDialog title=[Export Simulation Parameters]
   [export dialog] parentIsTheMainWindow=1
   [first export] exists=1 size=305
   [overwritten with sentinel] size=9
-  [modal] class=QFileDialog title=[Export Simulation Parameters...]
+  [modal] class=QFileDialog title=[Export Simulation Parameters]
   [modal] NONE appeared within 4000 ms
   [no extension] modals=1 stampedFiles=1 stampedSize=305 firstLine=[SENTINEL] sentinelSurvived=1
-  [modal] class=QFileDialog title=[Export Simulation Parameters...]
+  [modal] class=QFileDialog title=[Export Simulation Parameters]
   [answering] &No
   [filedialog] STILL open after clicking accept -- rejecting it
   [answered No] confirmations=1 childOfTheFileDialog=1
     text=[x11b-ow.sip already exists.
 Do you want to replace it?]
   [answered No] size=9 firstLine=[SENTINEL] sentinelSurvived=1 stampedFiles=1
-  [modal] class=QFileDialog title=[Export Simulation Parameters...]
+  [modal] class=QFileDialog title=[Export Simulation Parameters]
   [answering] &Yes
   [answered Yes] confirmations=1 childOfTheFileDialog=1
     text=[x11b-ow.sip already exists.
@@ -1267,8 +1267,8 @@ Do you want to replace it?]
   [tree] header=[Experiments] topLevel=0
   [page] count=1 current=QLabel objectName=[baseWidget]
   [action changes] none
-  [modal] class=QFileDialog title=[Load Experiments...]
-  [filedialog] title=[Load Experiments...] mode=3 nameFilters=[Experiment Files (*.exp) ;; All Files (*)] labelAccept=[&Open]
+  [modal] class=QFileDialog title=[Load Experiments]
+  [filedialog] title=[Load Experiments] mode=3 nameFilters=[Experiment Files (*.exp) ;; All Files (*)] labelAccept=[&Open]
 
 == STEP 2: after File > Open Experiment ==
   [title] SIGEL
@@ -1394,14 +1394,14 @@ Do you want to replace it?]
     as opened: [Disallow] checked=1
     typed duration [0.007]
   JMP duration now [0.007]
-  [modal] class=QFileDialog title=[Export Language Parameters...]
+  [modal] class=QFileDialog title=[Export Language Parameters]
   header  [LanguageParameters 3 8 5000 14]
   written [MUL CMP MOVE COPY LOAD SENSE DIV SUB ADD DELAY MIN MAX MOD JMP]
 
 == EDIT HOST ==
   rows=1 row0=[.|1|<REPOROOT>]
-  [modal] class=SIGEL_MasterGUI::SIG_EditHostDialog title=[Edit host ....]
-  [dialog] class=SIGEL_MasterGUI::SIG_EditHostDialog title=[Edit host ....] modal=1
+  [modal] class=SIGEL_MasterGUI::SIG_EditHostDialog title=[Edit host .]
+  [dialog] class=SIGEL_MasterGUI::SIG_EditHostDialog title=[Edit host .] modal=1
     label  [Max. number of processes:]
     label  [For best speed, use one process per CPU core.]
     label  [Slave directory:]
@@ -1457,8 +1457,8 @@ Do you want to replace it?]
   after close, main window still alive=1
 
 == ADD INDIVIDUALS (Cancel) ==
-  [modal] class=SIGEL_MasterGUI::SIG_AddIndividualsDialog title=[Add individuals...]
-  [dialog] class=SIGEL_MasterGUI::SIG_AddIndividualsDialog title=[Add individuals...] modal=1
+  [modal] class=SIGEL_MasterGUI::SIG_AddIndividualsDialog title=[Add individuals]
+  [dialog] class=SIGEL_MasterGUI::SIG_AddIndividualsDialog title=[Add individuals] modal=1
     label  [Number to add:]
     spin   [] value=1 min=1 max=9999
     edit   [qt_spinbox_lineedit] text=[1] selected=[] focus=1
@@ -1475,8 +1475,8 @@ Do you want to replace it?]
   [tree] header=[Experiments] topLevel=0
   [page] count=1 current=QLabel objectName=[baseWidget]
   [action changes] none
-  [modal] class=QFileDialog title=[Load Experiments...]
-  [filedialog] title=[Load Experiments...] mode=3 nameFilters=[Experiment Files (*.exp) ;; All Files (*)] labelAccept=[&Open]
+  [modal] class=QFileDialog title=[Load Experiments]
+  [filedialog] title=[Load Experiments] mode=3 nameFilters=[Experiment Files (*.exp) ;; All Files (*)] labelAccept=[&Open]
 
 == STEP 2: after File > Open Experiment ==
   [title] SIGEL
@@ -1825,8 +1825,8 @@ Do you want to replace it?]
   [tree] header=[Experiments] topLevel=0
   [page] count=1 current=QLabel objectName=[baseWidget]
   [action changes] none
-  [modal] class=QFileDialog title=[Load Experiments...]
-  [filedialog] title=[Load Experiments...] mode=3 nameFilters=[Experiment Files (*.exp) ;; All Files (*)] labelAccept=[&Open]
+  [modal] class=QFileDialog title=[Load Experiments]
+  [filedialog] title=[Load Experiments] mode=3 nameFilters=[Experiment Files (*.exp) ;; All Files (*)] labelAccept=[&Open]
 
 == STEP 2: after File > Open Experiment ==
   [title] SIGEL
@@ -1921,80 +1921,80 @@ Do you want to replace it?]
 == ROUND TRIP ==
 
 -- GP-Parameters
-  [modal] class=QFileDialog title=[Export GP Parameter...]
+  [modal] class=QFileDialog title=[Export GP Parameter]
   mutated spinboxRandomSeed -> 321
-  [modal] class=QFileDialog title=[Import GP Parameter...]
-  [modal] class=QFileDialog title=[Export GP Parameter...]
+  [modal] class=QFileDialog title=[Import GP Parameter]
+  [modal] class=QFileDialog title=[Export GP Parameter]
   export1 819 bytes  56b819402928ae0983be4a2aa98047828a4616e5c06b37a9cf350a9b91c95aee
   export2 819 bytes  56b819402928ae0983be4a2aa98047828a4616e5c06b37a9cf350a9b91c95aee
   ROUND TRIP STABLE (and the import undid the change)
 
 -- Simulation-Parameters
-  [modal] class=QFileDialog title=[Export Simulation Parameters...]
+  [modal] class=QFileDialog title=[Export Simulation Parameters]
   mutated lineeditStepSize -> [0.09]
-  [modal] class=QFileDialog title=[Import Simulation Parameters...]
-  [modal] class=QFileDialog title=[Export Simulation Parameters...]
+  [modal] class=QFileDialog title=[Import Simulation Parameters]
+  [modal] class=QFileDialog title=[Export Simulation Parameters]
   export1 305 bytes  c672eeabd54245663e8a308d68cdec2343a0b66840426cf4d7648606e1a1df10
   export2 305 bytes  c672eeabd54245663e8a308d68cdec2343a0b66840426cf4d7648606e1a1df10
   ROUND TRIP STABLE (and the import undid the change)
 
 -- Language-Parameters
-  [modal] class=QFileDialog title=[Export Language Parameters...]
+  [modal] class=QFileDialog title=[Export Language Parameters]
   mutated spinboxNumberOfRegisters -> 7
-  [modal] class=QFileDialog title=[Import Language Parameter...]
-  [modal] class=QFileDialog title=[Export Language Parameters...]
+  [modal] class=QFileDialog title=[Import Language Parameters]
+  [modal] class=QFileDialog title=[Export Language Parameters]
   export1 401 bytes  6828590f91539e7159a6b22dd0aca26815ee24c8cb99deefeed050937df3c718
   export2 401 bytes  6828590f91539e7159a6b22dd0aca26815ee24c8cb99deefeed050937df3c718
   ROUND TRIP STABLE (and the import undid the change)
 
 -- Environment
-  [modal] class=QFileDialog title=[Export Environment...]
+  [modal] class=QFileDialog title=[Export Environment]
   mutated lineeditGravityX -> [3.5]
-  [modal] class=QFileDialog title=[Import Environment...]
-  [modal] class=QFileDialog title=[Export Environment...]
+  [modal] class=QFileDialog title=[Import Environment]
+  [modal] class=QFileDialog title=[Export Environment]
   export1 299 bytes  383d1f4f142ff26bff698d9a62e73a441154d8d0329bc36b1ae560935b1f73b1
   export2 299 bytes  383d1f4f142ff26bff698d9a62e73a441154d8d0329bc36b1ae560935b1f73b1
   ROUND TRIP STABLE (and the import undid the change)
 
 -- Population
-  [modal] class=QFileDialog title=[Export Population...]
+  [modal] class=QFileDialog title=[Export Population]
   [modal] class=QMessageBox title=[Continue deletion?]
   [answering] &Yes
   mutated the pool -> 97 rows
-  [modal] class=QFileDialog title=[Import Population...]
-  [modal] class=QFileDialog title=[Export Population...]
+  [modal] class=QFileDialog title=[Import Population]
+  [modal] class=QFileDialog title=[Export Population]
   export1 1488729 bytes  3d89d359feb484300f413e725018dcb9131121e70ea55937f9b792c1be340615
   export2 1489429 bytes  713d1d2f12558cc2242720b730b00463e4493162846592bebe48472996e6f0eb
   ROUND TRIP differs ONLY in blank lines -- C10's history growth, not a reader/writer disagreement
   delta=700 bytes  blankLineDelta=100
 
 -- Robot (import only; there is no Export > Robot)
-  [modal] class=QFileDialog title=[Export Language Parameters...]
+  [modal] class=QFileDialog title=[Export Language Parameters]
   importing robots/twoBases/twoBases.rrb (exists=1)
-  [modal] class=QFileDialog title=[Import Robot...]
+  [modal] class=QFileDialog title=[Import Robot]
   list listboxLinks           count=2
   list listboxMaterials       count=1
   list listboxBodies          count=1
   list listboxSensors         count=1
   list listboxJoints          count=1
   list listboxDrives          count=1
-  [modal] class=QFileDialog title=[Export Language Parameters...]
+  [modal] class=QFileDialog title=[Export Language Parameters]
   language-parameters before 6828590f91539e7159a6b22dd0aca26815ee24c8cb99deefeed050937df3c718
   language-parameters after  dc48b8ea613ad127eb95812a1c5da85c86eaadc17d7c58686cefcd60781c335a
   ROBOT IMPORT *** CHANGED the language parameters ***
 
 -- Program import (replaces the selected individual's program)
-  [modal] class=QFileDialog title=[Export program...]
-  [modal] class=QFileDialog title=[Import program...]
-  [modal] class=QFileDialog title=[Export program...]
+  [modal] class=QFileDialog title=[Export program]
+  [modal] class=QFileDialog title=[Import program]
+  [modal] class=QFileDialog title=[Export program]
   rows 100 -> 100 (delta +0, 0 is correct -- it replaces)
   export1 882279cff0dfd01cc9498995e88f94e42ecc1fdb06fda8884b9ad6b76e5a37ec
   export2 882279cff0dfd01cc9498995e88f94e42ecc1fdb06fda8884b9ad6b76e5a37ec
   ROUND TRIP STABLE
 
 -- Individual import (adds one)
-  [modal] class=QFileDialog title=[Export individual...]
-  [modal] class=QFileDialog title=[Import individual...]
+  [modal] class=QFileDialog title=[Export individual]
+  [modal] class=QFileDialog title=[Import individual]
   rows 100 -> 101 (delta +1)
   individuals now named 17013: 1
   last row: 17215 | -1 | 72
@@ -2005,8 +2005,8 @@ Do you want to replace it?]
   [tree] header=[Experiments] topLevel=0
   [page] count=1 current=QLabel objectName=[baseWidget]
   [action changes] none
-  [modal] class=QFileDialog title=[Load Experiments...]
-  [filedialog] title=[Load Experiments...] mode=3 nameFilters=[Experiment Files (*.exp) ;; All Files (*)] labelAccept=[&Open]
+  [modal] class=QFileDialog title=[Load Experiments]
+  [filedialog] title=[Load Experiments] mode=3 nameFilters=[Experiment Files (*.exp) ;; All Files (*)] labelAccept=[&Open]
 
 == STEP 2: after File > Open Experiment ==
   [title] SIGEL
@@ -2234,8 +2234,8 @@ Do you want to replace it?]
   [tree] header=[Experiments] topLevel=0
   [page] count=1 current=QLabel objectName=[baseWidget]
   [action changes] none
-  [modal] class=QFileDialog title=[Load Experiments...]
-  [filedialog] title=[Load Experiments...] mode=3 nameFilters=[Experiment Files (*.exp) ;; All Files (*)] labelAccept=[&Open]
+  [modal] class=QFileDialog title=[Load Experiments]
+  [filedialog] title=[Load Experiments] mode=3 nameFilters=[Experiment Files (*.exp) ;; All Files (*)] labelAccept=[&Open]
 
 == STEP 2: after File > Open Experiment ==
   [title] SIGEL
@@ -2398,7 +2398,7 @@ Do you want to replace it?]
   [second atRest] Start=1 Hist=1 Auto=1 Comment=1 PS=1 Curve=1 GP=1 Sim=1 Robot=1 Lang=1 Env=1  live=11
   [second locked] Start=0 Hist=0 Auto=0 Comment=0 PS=0 Curve=0 GP=0 Sim=0 Robot=0 Lang=0 Env=0  live=0
   [locked] every locked action: total=29 stillEnabled=0
-  [modal] class=QMessageBox title=[Do you really...]
+  [modal] class=QMessageBox title=[Quit SIGEL]
   [answering] &No
   [locked] close during a run: asked=1 namesTheRun=1 stillUp=1
   [second locked] tree-menu Export: set=3, model reads 0  refused=1
@@ -2413,8 +2413,8 @@ Do you want to replace it?]
   [tree] header=[Experiments] topLevel=0
   [page] count=1 current=QLabel objectName=[baseWidget]
   [action changes] none
-  [modal] class=QFileDialog title=[Load Experiments...]
-  [filedialog] title=[Load Experiments...] mode=3 nameFilters=[Experiment Files (*.exp) ;; All Files (*)] labelAccept=[&Open]
+  [modal] class=QFileDialog title=[Load Experiments]
+  [filedialog] title=[Load Experiments] mode=3 nameFilters=[Experiment Files (*.exp) ;; All Files (*)] labelAccept=[&Open]
 
 == STEP 2: after File > Open Experiment ==
   [title] SIGEL
@@ -2510,16 +2510,16 @@ Do you want to replace it?]
   experiments after New=2
     row0 [Experiment-1.exp]
     row1 [twoBases.exp]
-  [modal] class=QMessageBox title=[Do you really...]
+  [modal] class=QMessageBox title=[Delete Experiment]
   [answering] &Yes
   experiments after deleting the loaded one=1
   remaining experiment=[Experiment-1.exp]
   GP random seed set to 12345
   individuals before Add=0 (0 expected from a new experiment)
-  [modal] class=SIGEL_MasterGUI::SIG_AddIndividualsDialog title=[Add individuals...]
+  [modal] class=SIGEL_MasterGUI::SIG_AddIndividualsDialog title=[Add individuals]
   add dialog: n=5
   individuals after Add=5
-  [modal] class=QFileDialog title=[Save Experiment...]
+  [modal] class=QFileDialog title=[Save Experiment]
   [savedialog] parentIsTheMainWindow=1
   programs=5  instructionLines=1018
   perProgramLengths=[30,152,638,45,153]
@@ -2535,8 +2535,8 @@ Do you want to replace it?]
   [page] count=1 current=QLabel objectName=[baseWidget]
   [action changes] none
   [control] non-selectable item currentItemChanged=1 current=1
-  [modal] class=QFileDialog title=[Load Experiments...]
-  [filedialog] title=[Load Experiments...] mode=3 nameFilters=[Experiment Files (*.exp) ;; All Files (*)] labelAccept=[&Open]
+  [modal] class=QFileDialog title=[Load Experiments]
+  [filedialog] title=[Load Experiments] mode=3 nameFilters=[Experiment Files (*.exp) ;; All Files (*)] labelAccept=[&Open]
   [focus] pokedInsideTheWindow=yes currentItemChanged total=1 orphan=0
 
 == STEP 2: after File > Open Experiment with the tree taking focus ==

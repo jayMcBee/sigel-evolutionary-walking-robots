@@ -155,7 +155,7 @@ void SIG_AllIndividualsView::slotCompleteRefreshList()
   QProgressDialog progress( "Updating pool...", QString(), 0, poolSize, this );
   // Qt 2\'s trailing modal flag made it application modal.
   progress.setWindowModality( Qt::ApplicationModal );
-  progress.setWindowTitle( "Updating..." );
+  progress.setWindowTitle( "Updating" );
   progress.show();
   
   // clear() emits itemSelectionChanged while currentItem() still points into
@@ -202,7 +202,7 @@ void SIG_AllIndividualsView::slotAddIndividuals()
       QProgressDialog progress( "Populating pool...", QString(), 0, theExperiment.population.getSize(), this );
   // Qt 2\'s trailing modal flag made it application modal.
   progress.setWindowModality( Qt::ApplicationModal );
-      progress.setWindowTitle( "Add individuals..." );
+      progress.setWindowTitle( "Add individuals" );
       progress.show();
       for( int counter = 0; counter < theExperiment.population.getSize(); counter++ )
 	{
@@ -477,7 +477,7 @@ void SIG_AllIndividualsView::slotImportProgram()
       SIG_IndividualListItem *individualListItem = static_cast<SIG_IndividualListItem *> ( currentItem );
       if( numberOfSelectedItems() == 1 )
 	{
-	  QString fileName = QFileDialog::getOpenFileName( this, "Import program...", QString(), "Program files (*.prg);;All Files (*)" );
+	  QString fileName = QFileDialog::getOpenFileName( this, "Import program", QString(), "Program files (*.prg);;All Files (*)" );
 	  if( !fileName.isEmpty() )
 	    {
 	      individualListItem->theIndividual->importProgram( fileName );
@@ -486,10 +486,10 @@ void SIG_AllIndividualsView::slotImportProgram()
 	  slotCompleteRefreshList(); // can be done more efficiently!!!
 	}
       else
-	QMessageBox::information( this, "Select exactly one individual...", "There must be exactly one individual selected!" );
+	QMessageBox::information( this, "Select exactly one individual", "There must be exactly one individual selected!" );
     } // if( currentitem )
   else
-    QMessageBox::information( this, "No individual selected...", "There is no individual selected!" );
+    QMessageBox::information( this, "No individual selected", "There is no individual selected!" );
 };
 
 void SIG_AllIndividualsView::slotExportProgram()
@@ -501,7 +501,7 @@ void SIG_AllIndividualsView::slotExportProgram()
       if( numberOfSelectedItems() == 1 )
 	{
 	  QString individualName = individualListItem->theIndividual->getName();
-	  QString fileName = QFileDialog::getSaveFileName( this, "Export program...", QString(), "Program files (*.prg);;All Files (*)" );
+	  QString fileName = QFileDialog::getSaveFileName( this, "Export program", QString(), "Program files (*.prg);;All Files (*)" );
 	  if( !fileName.isEmpty() )
 	    {
 	      if( fileName.right(4) != ".prg" )
@@ -510,15 +510,15 @@ void SIG_AllIndividualsView::slotExportProgram()
 	    }
 	}
       else
-	QMessageBox::information( this, "More than one individual selected...", "There is more than one individual selected!" );
+	QMessageBox::information( this, "More than one individual selected", "There is more than one individual selected!" );
     }
   else
-    QMessageBox::information( this, "No individual selected...", "There is no individual selected!" );
+    QMessageBox::information( this, "No individual selected", "There is no individual selected!" );
 };
 
 void SIG_AllIndividualsView::slotImportIndividual()
 {
-  QString fileName = QFileDialog::getOpenFileName( this, "Import individual...", QString(), "Individual files (*.ind);;All Files (*)" );
+  QString fileName = QFileDialog::getOpenFileName( this, "Import individual", QString(), "Individual files (*.ind);;All Files (*)" );
   if( !fileName.isEmpty() )
     {
       theExperiment.population.importNewIndividual( fileName );
@@ -535,7 +535,7 @@ void SIG_AllIndividualsView::slotExportIndividual()
       if( numberOfSelectedItems() == 1 )
 	{
 	  QString individualName = individualListItem->theIndividual->getName();
-	  QString fileName = QFileDialog::getSaveFileName( this, "Export individual...", QString(), "Individual files (*.ind);;All Files (*)" );
+	  QString fileName = QFileDialog::getSaveFileName( this, "Export individual", QString(), "Individual files (*.ind);;All Files (*)" );
 	  if( !fileName.isEmpty() )
 	    {
 	      if( fileName.right(4) != ".ind" )
@@ -544,10 +544,10 @@ void SIG_AllIndividualsView::slotExportIndividual()
 	    }
 	}
       else
-	QMessageBox::information( this, "More than one individual selected...", "There is more than one individual selected!" );
+	QMessageBox::information( this, "More than one individual selected", "There is more than one individual selected!" );
     }
   else
-    QMessageBox::information( this, "No individual selected...", "There is no individual selected!" );
+    QMessageBox::information( this, "No individual selected", "There is no individual selected!" );
 };
 
 }

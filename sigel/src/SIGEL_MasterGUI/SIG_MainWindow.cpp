@@ -740,7 +740,7 @@ bool SIG_MainWindow::askBeforeQuitting()
     question = "An evolution is running.\n"
 	       "Do you really want to quit?\nThere may be unsaved experiments!";
 
-  return QMessageBox::warning( this, "Do you really...", question,
+  return QMessageBox::warning( this, "Quit SIGEL", question,
 			       QMessageBox::Yes | QMessageBox::Default,
 			       QMessageBox::No | QMessageBox::Escape ) == QMessageBox::Yes;
 };

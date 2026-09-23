@@ -323,7 +323,7 @@ void SIG_LanguageParameters::slotCommandDoubleClicked( QTreeWidgetItem *theItem 
 	}
       else
 	{
-	  editCommandDialog.setWindowTitle( "Edit commands..." );
+	  editCommandDialog.setWindowTitle( "Edit commands" );
 	  editCommandDialog.textlabelCommand->hide( );
 	  if( theExperiment.robot.getLangParam()->hasCommand( command ) )
 	    editCommandDialog.radiobuttonAllow->setChecked( true );

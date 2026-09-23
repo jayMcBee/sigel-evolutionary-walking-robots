@@ -380,7 +380,7 @@ void SIG_GUIGPExperiment::slotStartEvolution()
     }
   else
     {
-      QMessageBox::warning( experimentListView, "Can't start evolution...", "The evolution cannot be started. There may be several reasons:<ul><li>There is no robot loaded.</li><li>There are fewer than four individuals in the population</li><li>No fitness function name was specified.</li></ul>");
+      QMessageBox::warning( experimentListView, "Can't start evolution", "The evolution cannot be started. There may be several reasons:<ul><li>There is no robot loaded.</li><li>There are fewer than four individuals in the population</li><li>No fitness function name was specified.</li></ul>");
     }
 };
 
@@ -465,7 +465,7 @@ void SIG_GUIGPExperiment::slotSimulationParameterImport()
   if ( experimentListView->isRunning() )
     return;
 
-  QString fileName = QFileDialog::getOpenFileName( experimentListView, "Import Simulation Parameters...", QString(), "Simulation Parameter Files (*.sip);;All Files (*)" );
+  QString fileName = QFileDialog::getOpenFileName( experimentListView, "Import Simulation Parameters", QString(), "Simulation Parameter Files (*.sip);;All Files (*)" );
   if ( !fileName.isEmpty() )
     {
       QFile file( fileName );
@@ -486,7 +486,7 @@ void SIG_GUIGPExperiment::slotSimulationParameterExport()
     return;
 
   simulationParameter->putIntoExperiment();
-  QString fileName = QFileDialog::getSaveFileName( experimentListView, "Export Simulation Parameters...", QString(), "Simulation Parameter Files (*.sip);;All Files (*)" );
+  QString fileName = QFileDialog::getSaveFileName( experimentListView, "Export Simulation Parameters", QString(), "Simulation Parameter Files (*.sip);;All Files (*)" );
   if( !fileName.isEmpty() )
     {
       fileName = checkEnding( fileName, "sip" );
@@ -507,7 +507,7 @@ void SIG_GUIGPExperiment::slotEnvironmentImport()
   if ( experimentListView->isRunning() )
     return;
 
-  QString fileName = QFileDialog::getOpenFileName( experimentListView, "Import Environment...", QString(), "Environment Files (*.env);;All Files (*)" );
+  QString fileName = QFileDialog::getOpenFileName( experimentListView, "Import Environment", QString(), "Environment Files (*.env);;All Files (*)" );
   if ( !fileName.isEmpty() )
     {
       QFile file( fileName );
@@ -528,7 +528,7 @@ void SIG_GUIGPExperiment::slotEnvironmentExport()
     return;
 
   environmentView->putIntoExperiment();
-  QString fileName = QFileDialog::getSaveFileName( experimentListView, "Export Environment...", QString(), "Environment Files (*.env);;All Files (*)" );
+  QString fileName = QFileDialog::getSaveFileName( experimentListView, "Export Environment", QString(), "Environment Files (*.env);;All Files (*)" );
   if( !fileName.isEmpty() )
     {
       fileName = checkEnding( fileName, "env" );
@@ -549,7 +549,7 @@ void SIG_GUIGPExperiment::slotGPParameterImport()
   if ( experimentListView->isRunning() )
     return;
 
-  QString fileName = QFileDialog::getOpenFileName( experimentListView, "Import GP Parameter...", QString(), "GP Parameter Files (*.gpp);;All Files (*)" );
+  QString fileName = QFileDialog::getOpenFileName( experimentListView, "Import GP Parameter", QString(), "GP Parameter Files (*.gpp);;All Files (*)" );
   if ( !fileName.isEmpty() )
     {
       QFile file( fileName );
@@ -566,7 +566,7 @@ void SIG_GUIGPExperiment::slotGPParameterImport()
 void SIG_GUIGPExperiment::slotGPParameterExport()
 {
   gpParameter->putIntoExperiment();
-  QString fileName = QFileDialog::getSaveFileName( experimentListView, "Export GP Parameter...", QString(), "GP Parameter Files (*.gpp);;All Files (*)" );
+  QString fileName = QFileDialog::getSaveFileName( experimentListView, "Export GP Parameter", QString(), "GP Parameter Files (*.gpp);;All Files (*)" );
   if( !fileName.isEmpty() )
     {
       fileName = checkEnding( fileName, "gpp" );
@@ -587,7 +587,7 @@ void SIG_GUIGPExperiment::slotLanguageParameterImport()
   if ( experimentListView->isRunning() )
     return;
 
-  QString fileName = QFileDialog::getOpenFileName( experimentListView, "Import Language Parameter...", QString(), "Language Parameter Files (*.lap);;All Files (*)" );
+  QString fileName = QFileDialog::getOpenFileName( experimentListView, "Import Language Parameters", QString(), "Language Parameter Files (*.lap);;All Files (*)" );
   if ( !fileName.isEmpty() )
     {
       QFile file( fileName );
@@ -605,7 +605,7 @@ void SIG_GUIGPExperiment::slotLanguageParameterImport()
 void SIG_GUIGPExperiment::slotLanguageParameterExport()
 {
   languageParameters->putIntoExperiment();
-  QString fileName = QFileDialog::getSaveFileName( experimentListView, "Export Language Parameters...", QString(), "Language Parameter Files (*.lap);;All Files (*)" );
+  QString fileName = QFileDialog::getSaveFileName( experimentListView, "Export Language Parameters", QString(), "Language Parameter Files (*.lap);;All Files (*)" );
   if( !fileName.isEmpty() )
     {
       fileName = checkEnding( fileName, "lap" );
@@ -626,7 +626,7 @@ void SIG_GUIGPExperiment::slotPopulationImport()
   if ( experimentListView->isRunning() )
     return;
 
-  QString fileName = QFileDialog::getOpenFileName( experimentListView, "Import Population...", QString(), "Population Files (*.pop);;All Files (*)" );
+  QString fileName = QFileDialog::getOpenFileName( experimentListView, "Import Population", QString(), "Population Files (*.pop);;All Files (*)" );
   if ( !fileName.isEmpty() )
     {
       QFile file( fileName );
@@ -642,7 +642,7 @@ void SIG_GUIGPExperiment::slotPopulationImport()
 
 void SIG_GUIGPExperiment::slotPopulationExport()
 {
-  QString fileName = QFileDialog::getSaveFileName( experimentListView, "Export Population...", QString(), "Population files (*.pop);;All Files (*)" );
+  QString fileName = QFileDialog::getSaveFileName( experimentListView, "Export Population", QString(), "Population files (*.pop);;All Files (*)" );
   if( !fileName.isEmpty() )
     {
       fileName = checkEnding( fileName, "pop" );
@@ -663,7 +663,7 @@ void SIG_GUIGPExperiment::slotRobotImport()
   if ( experimentListView->isRunning() )
     return;
 
-  QString fileName = QFileDialog::getOpenFileName( experimentListView, "Import Robot...", QString(), "Raw Robot Files (*.rrb);;All Files (*)" );
+  QString fileName = QFileDialog::getOpenFileName( experimentListView, "Import Robot", QString(), "Raw Robot Files (*.rrb);;All Files (*)" );
   if( !fileName.isEmpty() )
     {
       try
@@ -684,7 +684,7 @@ void SIG_GUIGPExperiment::slotRobotImport()
 
 void SIG_GUIGPExperiment::slotGNUPlotExport()
 {
-  QString fileName = QFileDialog::getSaveFileName( experimentListView, "Export to GNU plot...", QString(), "GNU plot data file (*.dat);;All Files (*)" );
+  QString fileName = QFileDialog::getSaveFileName( experimentListView, "Export to GNU plot", QString(), "GNU plot data file (*.dat);;All Files (*)" );
   if( !fileName.isEmpty() )
     {
       fileName = checkEnding( fileName, "dat" );
@@ -699,7 +699,7 @@ void SIG_GUIGPExperiment::slotRobotLoad()
   if ( experimentListView->isRunning() )
     return;
 
-  QString fileName = QFileDialog::getOpenFileName( experimentListView, "Load Robot...", QString(), "Compiled Robot Files (*.crb);;All Files (*)" );
+  QString fileName = QFileDialog::getOpenFileName( experimentListView, "Load Robot", QString(), "Compiled Robot Files (*.crb);;All Files (*)" );
   if( !fileName.isEmpty() )
     {
       QFile file( fileName );
@@ -725,7 +725,7 @@ void SIG_GUIGPExperiment::slotRobotLoad()
 
 void SIG_GUIGPExperiment::slotRobotSave()
 {
-  QString fileName = QFileDialog::getSaveFileName( experimentListView, "Save Robot...", QString(), "Compiled Robot Files (*.crb);;All Files (*)" );
+  QString fileName = QFileDialog::getSaveFileName( experimentListView, "Save Robot", QString(), "Compiled Robot Files (*.crb);;All Files (*)" );
   if( !fileName.isEmpty() )
     {
       fileName = checkEnding( fileName, "crb" );
@@ -745,7 +745,7 @@ void SIG_GUIGPExperiment::slotRobotInfo()
 
   // need DynaMechs for that..
   if (gpExperiment.simulationParameter.getSimulationLibrary() != SIGEL_Simulation::SIG_SimulationParameters::DynaMechs)
-  { QMessageBox::information( experimentListView, "Can't display Robot Information..", "<B>DynaMechs is required for this operation to work properly.</B>");
+  { QMessageBox::information( experimentListView, "Can't display Robot Information", "<B>DynaMechs is required for this operation to work properly.</B>");
     return;
   }
 

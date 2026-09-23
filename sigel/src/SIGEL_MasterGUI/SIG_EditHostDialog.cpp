@@ -51,7 +51,7 @@ SIG_EditHostDialog::~SIG_EditHostDialog()
 
 void SIG_EditHostDialog::slotToolbuttonSlaveDirectoryClicked()
 {
-  lineeditSlaveDirectory->setText( QFileDialog::getExistingDirectory( this, "Select Directory...", "./" ) );
+  lineeditSlaveDirectory->setText( QFileDialog::getExistingDirectory( this, "Select Directory", "./" ) );
 };
 
 }

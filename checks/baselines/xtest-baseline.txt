@@ -96,8 +96,8 @@
   [tree] header=[Experiments] topLevel=0
   [page] count=1 current=QLabel objectName=[baseWidget]
   [action changes] none
-  [modal] class=QFileDialog title=[Load Experiments...]
-  [filedialog] title=[Load Experiments...] mode=3 nameFilters=[Experiment Files (*.exp) ;; All Files (*)] labelAccept=[&Open]
+  [modal] class=QFileDialog title=[Load Experiments]
+  [filedialog] title=[Load Experiments] mode=3 nameFilters=[Experiment Files (*.exp) ;; All Files (*)] labelAccept=[&Open]
 
 == STEP 2: after File > Open Experiment ==
   [title] SIGEL

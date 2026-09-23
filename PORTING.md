@@ -890,6 +890,10 @@ Start here.
 - **After item 38: a new host starts at 4 processes**, by decision; it was 1.
   The Edit host dialog has a new line: "For best speed, use one process per CPU
   core." A divergence from 1.3, in its table.
+- **Dialog titles no longer end in "..."**, by decision: 39 titles at 68 code
+  sites and one `.ui`. Two are reworded, "Delete Experiment" and "Quit SIGEL";
+  the list is in the table of divergences from 1.3. Menu items and buttons are
+  unchanged.
 - **Items 14 and 13 are still paused**, as in the entry below.
 - **The OpenGL items 20, 26, 41, 42 and 43 were assessed**, read-only, not
   recorded yet. One finding for item 43: `SIG_Visualisation::setAmbientSceneColor`
@@ -3178,6 +3182,7 @@ else that stops matching 1.3 still needs justifying as a defect.
 | **A second click on the same menubar item closes the menu here. On 1.3 it stays open** | Same cause and same answer as the row above. Qt 6’s menubar toggles on a second click and Qt 2’s did not. Nothing in SIGEL decides it | `xtest-baseline.txt` section 4 |
 | **Individuals > Add allows up to 9999 — item 58.** 1.3 allows 999 | by decision 2026-09-22: four digits. Five digits were not taken, because one Add would then pass the tournament draw's limit — item 59 | `guibehaviour-baseline.txt`, three lines, and a note in its header |
 | **A new host starts at 4 processes, and the Edit host dialog says to use one per CPU core.** 1.3 starts at 1 and has no hint. The hint is a note, drawn in the palette's `PlaceholderText` colour by `SIG_EditHostDialog`'s constructor | by decision 2026-09-23, after item 38's measurements: on this 4-core machine, at the 5 ms wait, a generation took 3.7 s with 4 slaves against 13.3 s with 1; 4-slave runs evolve differently, so the work is not identical. The start value applies only to Add; Edit shows the host's own value, and the shipped experiments keep their `PVMHOST . 1 1 "."` | `guibehaviour-baseline.txt`: the hint label, and `value=1` in Edit, which shows that Edit replaces the start value. The start value of 4 itself is not checked, because no scenario adds a host |
+| **Dialog titles do not end in "...".** 1.3 ends 39 titles in dots, at 68 code sites in `SIGEL_MasterGUI` and the movie settings dialog plus the default title in `SIG_EditHostDialogBase.ui`; the ellipsis belongs on the command that opens a dialog, not on its title. Menu items, buttons, status tips and progress labels are unchanged. Two titles are reworded: "Do you really..." is "Delete Experiment" in `SIG_ExperimentListView::slotDeleteExperiment` and "Quit SIGEL" in `SIG_MainWindow::askBeforeQuitting`. "There is no experiment selected..." (22 sites) and "No experiment selected..." (1) are all "No experiment selected"; "Import Language Parameter..." is "Import Language Parameters", as its export is; the DynaMechs box in `SIG_GUIGPExperiment::slotRobotInfo` loses its two dots and keeps its wording | by decision 2026-09-23 | `guibehaviour-baseline.txt`, 76 title lines, each checked against the approved list; `xtest-baseline.txt`, 2 lines |
 
 **Three 1.3 defects preserved on purpose**, plus the one below them. `MT_GUI`'s
 gnuplot export puts a constant x on datasets `2pt destr.` and `3pt destr.`

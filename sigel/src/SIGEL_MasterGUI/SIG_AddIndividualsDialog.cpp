@@ -58,7 +58,7 @@ SIG_AddIndividualsDialog::SIG_AddIndividualsDialog( QWidget* parent,  const char
 	setObjectName( "SIG_AddIndividualsDialogBase" );
     resize( 222, 92 ); 
     setSizePolicy( QSizePolicy( (QSizePolicy::Policy)5, (QSizePolicy::Policy)1 ) );
-    setWindowTitle( tr( "Add individuals..." ) );
+    setWindowTitle( tr( "Add individuals" ) );
     SIG_AddIndividualsDialogBaseLayout = new QVBoxLayout( this ); 
     SIG_AddIndividualsDialogBaseLayout->setSpacing( 6 );
     SIG_AddIndividualsDialogBaseLayout->setContentsMargins( 11, 11, 11, 11 );
