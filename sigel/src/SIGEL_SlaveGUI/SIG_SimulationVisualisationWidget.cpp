@@ -47,6 +47,7 @@
     : SIG_VisualisationWidget( parent, name, f ),
 		       frameDelay(0),
 		       pausedForDialog(false),
+		       frameShown(true),
 		       noOfFFSteps(0),
 		       traceRobot(true),
 		       robot(0),
@@ -72,6 +73,11 @@
     connect( simulationTimer,
 	     SIGNAL(timeout()),
 	     SLOT(slotSimulationProgress()) );
+
+    // Play steps once per frame on screen; see slotSimulationProgress.
+    connect( this,
+	     SIGNAL(frameSwapped()),
+	     SLOT(slotFrameShown()) );
 
 #ifdef _WINDOWS
     char *sigelRoot = ::getenv( "SIGEL_ROOT" );
@@ -439,6 +445,7 @@ void SIG_SimulationVisualisationWidget::resetRecorder()
     else
       {
 	automaticRefresh = false;
+	frameShown = true;
 	simulationTimer->start( frameDelay );
       };
   };
@@ -502,8 +509,20 @@ void SIG_SimulationVisualisationWidget::resetRecorder()
 
   void SIG_SimulationVisualisationWidget::slotSimulationProgress()
   {
+    // The next step waits until this one is on screen, so the simulation
+    // never runs ahead of what is shown. A widget without a working GL
+    // context shows no frames, so it does not wait.
+    if (!frameShown && isValid())
+      return;
+
+    frameShown = false;
     makeTimeSteps(1);
     update();
+  };
+
+  void SIG_SimulationVisualisationWidget::slotFrameShown()
+  {
+    frameShown = true;
   };
 
   void SIG_SimulationVisualisationWidget::slotSetTraceRobot( bool newValue )

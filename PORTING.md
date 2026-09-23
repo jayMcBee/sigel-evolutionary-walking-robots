@@ -933,11 +933,8 @@ Start here.
   strips, and the joins showed in the line modes; the floor is now separate
   triangles. See its Done entry.
 - **Item 63 is done:** the render mode "Points" hides the back points.
-- **Open, next:** Play jumps ahead, by seconds up to a minute, on the desktop.
-  1.3 drew each step at once with `updateGL()`; the port's `update()` only
-  posts a paint, and the 0 ms timer keeps stepping until Qt paints. In `Xvfb`
-  steps and frames are 1:1 (1,031 to 1,033 in 10 s), so the effect needs the
-  desktop compositor; not yet measured there.
+- **Play no longer runs ahead of the screen:** one step per frame on screen,
+  as in 1.3. See its Done entry.
 - **SIGEL 2.0.** The work is now SIGEL 2.0, not only a port. 1.3 is the
   reference for regression checks, not a specification; see THE GOAL at the
   top. Two new items: 63, hidden lines and a Points mode; 64, remove what is
@@ -3231,6 +3228,7 @@ else that stops matching 1.3 still needs justifying as a defect.
 | **The 3-D view starts fitted to the robot and aims at its centre.** 1.3 starts at distance 1.0 for every robot and aims at the root link's model origin | by decision 2026-09-23, item 26. `SIG_SimulationVisualisation`'s constructor, `getFittingDistance`, `SIG_SimulationWidget::visualizeThis` | nothing: no check covers the camera |
 | **The headlight does not dim with distance.** 1.3 gives LIGHT0 linear attenuation 0.4 | by decision 2026-09-23, item 26, so the fitted camera does not darken the lit modes. `SIG_Visualisation`'s constructor | nothing |
 | **Play pauses while a modal dialog is open.** 1.3 keeps the simulation running under a dialog | by decision 2026-09-23, item 65: at Frame Delay 0 the dialog was never drawn and the viewer hung. `SIG_SimulationWindow::event`, `SIG_SimulationVisualisationWidget::pauseForDialog` and `resumeAfterDialog` | nothing: no scenario plays the simulation under a dialog |
+| **Play waits while the viewer window is minimised or on another workspace.** 1.3 on X11 keeps stepping | by decision 2026-09-23: Play steps once per frame on screen, and a window that is not exposed shows no frames. `SIG_SimulationVisualisationWidget::slotSimulationProgress` and `slotFrameShown` | nothing: `guidrive`'s `slavegui` scenario plays offscreen, where no frame is composed, so its `play +` lines read 0 s; no gate reads them |
 | **The viewer window opens at 1014 x 810, so the 3-D view is square.** 1.3 opens it at 780 x 810; at that size the port's view is 422 x 655 | by decision 2026-09-23, item 66. `SIG_SimulationWindow`'s constructor | nothing: `guidrive`'s slave-GUI scenario sets 780 x 810 itself |
 | **The 3-D view draws the ground on both sides of the start.** 1.3 draws the terrain only from 0 to its size, so the robot starts at its corner. 1.0 drew a flat floor that moved with the camera | by decision 2026-09-23, item 42: the ground on the negative side too, each edge continued outward at the heights the physics uses. `SIG_EnvironmentRenderer::drawInit`, `buildGrid` and `groundDepth` | nothing: no check covers the floor |
 | **A render mode "Hidden lines".** 1.3 has Wireframe, Flatshaded and Gouraudshaded | by decision 2026-09-23, item 63. `SIG_ViewSettings::hiddenLine`, `SIG_SimulationVisualisation::visualize` | nothing: no check covers the render modes |
@@ -3466,7 +3464,10 @@ missing key, and `menuDict` has such a key by construction. Every lookup is
 **`updateGL()` → `update()` is not an equivalence.** Qt 2's *is* `glDraw()`:
 `makeCurrent(); paintGL(); swapBuffers();`, all before the call returns. Qt 6's
 posts a paint event. Safe at all 19 sites only because no caller reads back what
-`paintGL` produced, and on the movie path the grab precedes the repaint.
+`paintGL` produced, and on the movie path the grab precedes the repaint. *It was not
+safe at one site, for pacing: `slotSimulationProgress` let Play run ahead of
+the screen; fixed 2026-09-23, see "Play ran ahead of the screen" in the Done
+list.*
 Likewise `QMouseEvent::state()` → `buttons()` is safe only because both uses are
 in `mouseMoveEvent`; on press and release Qt 2's `state()` was the state
 *before* the event.
@@ -4484,6 +4485,42 @@ carried; other items and this file cite them, so they do not change.
   **Done on both machines 2026-09-19.** On the x86 machine with approval
   there; its seven files hash as ours. Its copy of all 14 as downloaded is
   `/home/debian/sigel-shipped-original-2026-09-19/`.
+
+- [x] **Play ran ahead of the screen, and the simulation time jumped** — done
+  2026-09-23, by decision; found by Jan, not a numbered item. A change from the
+  port, phase C4: 1.3's `slotSimulationProgress` did `makeTimeSteps(1);
+  updateGL();`, and Qt 2's `updateGL()` painted at once. The port's `update()`
+  only asks for a paint; Qt Wayland composes when the compositor's frame
+  callback comes, and the 0 ms timer stepped on in between.
+  - **Measured under gdb:** on the desktop, window visible and in focus,
+    36,053 steps against 889 `paintGL` calls in one Play session; in `Xvfb`,
+    1,031 against 1,033. At twoBases' 0.01 s step that is about 0.4 simulated
+    seconds per frame on average, and far more across a slow frame.
+  - **Fix:** `slotSimulationProgress` steps only when `frameShown` is true and
+    clears it; `slotFrameShown`, connected to `QOpenGLWidget::frameSwapped`,
+    sets it; `slotStartSimulation` sets it when Play starts. One step per frame
+    on screen, as in 1.3. It waits only when `isValid()`, so a widget whose
+    GL context could not be set up still steps; not tested, since context
+    creation cannot be made to fail here.
+  - **Offscreen, Play now waits for ever.** Found by review, measured:
+    `guidrive`'s `slavegui` scenario under `QT_QPA_PLATFORM=offscreen` prints
+    `play +5s` to `+30s` as 1 min 29 s to 9 min 42 s before the change and 0 s
+    after it. The offscreen platform creates a context, so `isValid()` is true,
+    but never composes, so `frameSwapped` never comes. Only the harness uses
+    that platform, no gate reads those lines, and a platform test in SIGEL's
+    code was not wanted.
+  - **Checked by an independent review against Qt 6.10's source:**
+    `frameSwapped` is emitted after every compose of the window, a
+    `grabFramebuffer` does not emit it, and a window that Qt Wayland marks not
+    exposed composes nothing, so Play waits and resumes when it is shown.
+    `repaint()` would not have fixed it: Qt 6 turns it into a later update when
+    the window composed less than one refresh ago. Checked on the desktop by
+    Jan.
+  - **Costs:** at Frame Delay 0 Play runs at one step per frame on screen, not
+    as fast as the CPU can step. While Play waits for a frame the 0 ms timer
+    still fires and returns, so one core stays busy; a single-shot timer with
+    its own running flag would end that, and touches `simulationRunning`, the
+    dialog pause and the Play slots.
 
 - [x] **63, second half. A Points mode in the 3-D view** — done 2026-09-23,
   by decision. The render mode "Points", after Hidden lines, draws only the

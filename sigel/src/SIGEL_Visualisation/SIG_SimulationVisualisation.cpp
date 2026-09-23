@@ -176,7 +176,7 @@ namespace SIGEL_Visualisation
        };
 
      // The robot's anchor points set their own point size, so it is set
-     // again here, before each frame is drawn.
+     // again here, before the visible pass.
      if (pointMode)
        glPointSize( 3 );
 

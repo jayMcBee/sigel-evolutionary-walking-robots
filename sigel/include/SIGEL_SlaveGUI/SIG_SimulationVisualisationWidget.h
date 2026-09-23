@@ -191,6 +191,11 @@
       bool pausedForDialog;
 
       /**
+       * False from one Play step until that step's frame is on screen.
+       */
+      bool frameShown;
+
+      /**
        * The number of timesteps that equal 5 seconds.
        */
       int noOfFFSteps;
@@ -293,7 +298,14 @@
     private slots:
 
       /**
-       * Lets the simulation progress about one timestep.
+       * Marks the last step's frame as on screen, so Play may step again.
+       * This slot is connected to the frameSwapped signal.
+       */
+      void slotFrameShown();
+
+      /**
+       * Lets the simulation progress about one timestep, once the frame of
+       * the previous step is on screen.
        *
        * Updates the widget's contents.
        * This slot is connected to the timeout signal of the
