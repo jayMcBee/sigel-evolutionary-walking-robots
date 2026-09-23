@@ -640,7 +640,8 @@ read all 618 tracked files then, 8 of which git called binary: its pass count we
 adding or deleting one moves the total by one; `portinglog.txt` did that on
 2026-09-09.*
 **The warning figure is not an exit criterion and moves with the code.** It was
-508 at D31 and D32 and reads 503 today. A step that changes no code should not
+508 at D31 and D32 and reads 502 today; it was 503 until item 67 removed
+`callRenderPixMap`'s unused-but-set `res`. A step that changes no code should not
 move it; one that does, will.
 **It now needs `sigel_eval` built**, which `check.sh` does not build for you:
 the V5 section reads constants out of `build/sigel_eval`, so run
@@ -921,8 +922,7 @@ Start here.
   margin, aims at the robot's centre, and the headlight no longer dims with
   distance. Item 41 is left with the trace question only.
 - **Item 65 is done:** a modal dialog opened during Play no longer hangs the
-  viewer; Play pauses until it closes. Open: item 67, the movie button's icon
-  after a failed frame.
+  viewer; Play pauses until it closes.
 - **Item 66 is done:** the viewer opens at 1014 x 810, and the 3-D view is
   square. **Item 62 was dropped** by decision; see "Not doing".
 - **Item 42 is done:** the ground is drawn on both sides of the robot's start.
@@ -935,6 +935,9 @@ Start here.
 - **Item 63 is done:** the render mode "Points" hides the back points.
 - **Play no longer runs ahead of the screen:** one step per frame on screen,
   as in 1.3. See its Done entry.
+- **Item 67 is done:** a movie frame that cannot be saved now warns, stops
+  the recording and turns the movie button to "recording not allowed"; image
+  formats used to fail silently.
 - **SIGEL 2.0.** The work is now SIGEL 2.0, not only a port. 1.3 is the
   reference for regression checks, not a specification; see THE GOAL at the
   top. Two new items: 63, hidden lines and a Points mode; 64, remove what is
@@ -3229,19 +3232,18 @@ else that stops matching 1.3 still needs justifying as a defect.
 | **The headlight does not dim with distance.** 1.3 gives LIGHT0 linear attenuation 0.4 | by decision 2026-09-23, item 26, so the fitted camera does not darken the lit modes. `SIG_Visualisation`'s constructor | nothing |
 | **Play pauses while a modal dialog is open.** 1.3 keeps the simulation running under a dialog | by decision 2026-09-23, item 65: at Frame Delay 0 the dialog was never drawn and the viewer hung. `SIG_SimulationWindow::event`, `SIG_SimulationVisualisationWidget::pauseForDialog` and `resumeAfterDialog` | nothing: no scenario plays the simulation under a dialog |
 | **Play steps once per frame on screen, and waits while the viewer window is minimised or on another workspace.** At Frame Delay 0 it is capped at about the display's refresh rate. 1.3 drew each step with `updateGL()`, not tied to the refresh, and on X11 kept stepping while minimised | by decision 2026-09-23: Play steps once per frame on screen, and a window that is not exposed shows no frames. `SIG_SimulationVisualisationWidget::slotSimulationProgress` and `slotFrameShown` | nothing: `guidrive`'s `slavegui` scenario plays offscreen, where no `frameSwapped` comes, so its `play +` lines read 0 s; no gate reads them |
+| **A movie frame that cannot be saved stops the recording with a warning, for every format.** 1.3 warned only for POV-Ray; for the image formats `callRenderPixMap` returned true whatever the save gave | by decision 2026-09-23, item 67. `SIG_SimulationVisualisationWidget::callRenderPixMap` and `makeTimeSteps` | nothing: no scenario records a movie |
 | **The viewer window opens at 1014 x 810, so the 3-D view is square.** 1.3 opens it at 780 x 810; at that size the port's view is 422 x 655 | by decision 2026-09-23, item 66. `SIG_SimulationWindow`'s constructor | nothing: `guidrive`'s slave-GUI scenario sets 780 x 810 itself |
 | **The 3-D view draws the ground on both sides of the start.** 1.3 draws the terrain only from 0 to its size, so the robot starts at its corner. 1.0 drew a flat floor that moved with the camera | by decision 2026-09-23, item 42: the ground on the negative side too, each edge continued outward at the heights the physics uses. `SIG_EnvironmentRenderer::drawInit`, `buildGrid` and `groundDepth` | nothing: no check covers the floor |
 | **A render mode "Hidden lines".** 1.3 has Wireframe, Flatshaded and Gouraudshaded | by decision 2026-09-23, item 63. `SIG_ViewSettings::hiddenLine`, `SIG_SimulationVisualisation::visualize` | nothing: no check covers the render modes |
 | **A render mode "Points", with the back points hidden.** 1.3 has Wireframe, Flatshaded and Gouraudshaded | by decision 2026-09-23, item 63. `SIG_ViewSettings::points`, `SIG_SimulationVisualisation::visualize` | nothing: no check covers the render modes |
 
-**Three 1.3 defects preserved on purpose**, plus the one below them. `MT_GUI`'s
+**Two 1.3 defects preserved on purpose**, plus the one below them. `MT_GUI`'s
 gnuplot export puts a constant x on datasets `2pt destr.` and `3pt destr.`
 (pre-standard `for` scoping); `MT_PopulationWidget`'s save-individuals loop never
-advances the cursor and writes the same individual into every file;
-`callRenderPixMap` assigns `res` from `save()` and then `return true`
-unconditionally, so a failed frame write is reported as success and the caller's
-message box is dead code — **which is why that module carries a
-`-Wunused-but-set-variable`**. And one that is checked: **saving grows the file**
+advances the cursor and writes the same individual into every file. A third,
+`callRenderPixMap` reporting every frame write as a success, was fixed by item
+67. And one that is checked: **saving grows the file**
 by exactly **840 bytes = 120 × 7**, one `"      \n"` per individual per save,
 because the reader takes everything between `HISTORY BEGIN{` and `}HISTORY END`
 as ONE string and the writer re-emits it before a fresh terminator. The
@@ -4404,9 +4406,8 @@ carried; other items and this file cite them, so they do not change.
   - The other options: pausing at each dialog site, per-site and easy to
     forget; pacing Play to the display, the root cause, larger; a simulation
     thread, not wanted.
-  - Left open: after a failed movie frame the button keeps its "recording
-    allowed" icon, item 67. The warning itself shows once, because
-    `makeTimeSteps` sets `record = false` first.
+  - Found alongside: after a failed movie frame the button kept its
+    "recording allowed" icon; item 67 fixed it.
 
 - [x] **38. Does the poll interval in `evolutionLoop` earn its length?** —
   done 2026-09-23, by decision: **the wait is 5 ms**, in both `evolutionLoop`
@@ -4534,6 +4535,24 @@ carried; other items and this file cite them, so they do not change.
   Gouraudshaded now, in `SIG_SimulationWidget`'s constructor. The grid and the
   robot path are line lists and stay lines. Checked in `Xvfb` on twoBases and
   walker, and on the desktop by Jan.
+
+- [x] **67. The movie button kept "recording allowed" after a failed frame**
+  — done 2026-09-23, by decision.
+  - **Image formats failed silently.**
+    `SIG_SimulationVisualisationWidget::callRenderPixMap` saved the frame into
+    `res` and returned `true` regardless, as in 1.3, so recording into a folder
+    that cannot be written wrote nothing and said nothing. It returns `res`.
+  - **The button was not told.** On a failed frame, `makeTimeSteps` sets
+    `record = false` and shows "Unable to write file" once. It now also emits
+    `signalRecordingAllowed( false )`, and
+    `SIG_SimulationControls::slotRecordingAllowed` shows the "recording not
+    allowed" icon.
+  - **Stop was always right:** `SIG_SimulationWindow::slotStopPressed` sets that
+    icon itself before `resetRecorder` switches recording off; found by review.
+  - **Checked** on the desktop by Jan: with the directory `/`, one warning, and
+    the icon turns to "not allowed". `slotRecordClicked` toggles `record`, but
+    nothing is connected to it, because the record action is commented out; left
+    as it is.
 
 - [x] **The 3-D floor drew its rows twice in the line modes** — done
   2026-09-23, by decision; found by Jan, not a numbered item. In Wireframe,

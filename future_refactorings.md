@@ -435,14 +435,6 @@ touched, because changing one changes behaviour against the reference binary.
   `SIG_SimulationVisualisationWidget::visualizeThis` names Dynamo too; the
   guard stays, for `SIG_CannotMirtich`.
 
-- [ ] **67. The movie button keeps "recording allowed" after a failed
-  frame.** Found 2026-09-23 by review, with item 65. When a movie frame cannot
-  be written, `SIG_SimulationVisualisationWidget::makeTimeSteps` sets
-  `record = false` and shows "Unable to write file" once; Play goes on without
-  recording. But it does not emit `signalRecordingAllowed( false )`, so the
-  movie settings button keeps its "recording allowed" icon; the code's own
-  comment asks for the reset.
-
 - [ ] **68. Start the robot in the middle of the terrain?** Raised
   2026-09-23 with item 42, for discussion later. The robot starts at the
   experiment's `STARTPOSITION`; x and z are 0 in every shipped experiment,

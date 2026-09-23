@@ -289,9 +289,9 @@
 
 		if ( !renderSuccess )
 		  {
-		    // stop the recording!
-		    // reset the record button!!!
+		    // stop the recording, and show it on the movie button
 		    record = false;
+		    emit signalRecordingAllowed( false );
 		    QMessageBox::warning( this, "File error", "Unable to write file " + fileName + ".\nPerhaps you don't have permission to write the file.");
 		  };
 		currentFrameName++;
@@ -376,7 +376,7 @@
 			      fileFormat.toUpper().toUtf8().constData(),
 			      movieQuality );
 
-	  return true;
+	  return res;
   }
 
 
