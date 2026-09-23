@@ -89,6 +89,12 @@
 
       void resetRecorder();
 
+      /**
+       * Returns the camera distance at which the whole robot
+       * fits in the view, with a margin around it.
+       */
+      double getFittingDistance() const;
+
     public slots:
 
       void setShowAncorPoints( int state );

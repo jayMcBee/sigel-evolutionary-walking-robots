@@ -304,34 +304,6 @@ touched, because changing one changes behaviour against the reference binary.
   in `slotEvolutionStopped`. **Untried:** a check without PVM may be possible
   with a run that has no tournaments.
 
-- [ ] **26. The 3D camera never sizes the view to the robot.** Not a port
-  defect — every camera file matches pristine 1.3. Two 2003 faults:
-  the distance is a constant (`SIG_SimulationWidget::slotSetDistance` divides
-  `distanceSlider` by 10, the default 10 gives 1.0 world unit, and the 100 degree
-  field of view shows about 2.4 units, against robots 3 to 13 units long —
-  hammer 12.9, shortHammer 10.9, octopus 7, twoBases 5, walker 4 plus legs,
-  insect 3); and both the tracking block in
-  `SIG_SimulationVisualisationWidget::makeTimeSteps` and `slotNavigateCenter`
-  aim at the **root link's model origin**, not the robot's centre.
-  **A fix needs a measurement that does not exist:** walk `SIG_Robot::getLinks`,
-  place each `SIG_Geometry::getVertices` with `SIG_Link::getInitialLocation`,
-  reduce to a box. That belongs next to `SIG_Robot`, not the interface. Then set
-  the **slider**, not the widget, from `margin * halfExtent / tan(fovy / 2)`, or
-  the next slider touch snaps the view back — the slider's maximum of 200,
-  distance 20, is enough for every shipped robot. Add the box centre, rotated by
-  `SIG_SimulationVisualisation::getRobotRotation`, to the look point. `fovy` is a local constant in
-  `SIG_Visualisation::updateAspectRatio` and needs one shared home.
-  *Found alongside:* `SIG_SimulationVisualisationWidget::visualizeThis` calls
-  `resizeGL` with logical pixels where Qt uses device pixels. **Harmless,
-  assessed 2026-09-23:** Qt 6.10's `QOpenGLWidget` sets the viewport in device
-  pixels itself before each `paintGL`, and the aspect ratio is the same in both.
-  **Assessed 2026-09-23, read-only:** the analysis above holds against the code.
-  A simpler fit than the vertex walk: a box from the link positions at time 0 in
-  `SIG_RenderRecorder`, plus a margin, all inside the viewer. LIGHT0 sits at the
-  eye with linear attenuation (`SIG_Visualisation`'s constructor), so a camera
-  further out makes the lit modes darker; this touches 41 and 43 too. A fit is a
-  change from 1.3; item 41's fixed start value can stand in until then.
-
 - [ ] **27. Name the three signals in the wildcard disconnect.**
   `SIG_AllIndividualsView::slotEvolutionNotRunning` calls
   `QObject::disconnect(individualList->listviewIndividuals, 0, 0, 0)`,
@@ -413,24 +385,17 @@ touched, because changing one changes behaviour against the reference binary.
   destroyed while running, the handler's SIGABRT branch prints `Abort` and calls
   `pvm_halt()` again, and the process stayed until SIGKILL.
 
-- [ ] **41. The simulation viewer starts too close, and follows the robot.** Seen
+- [ ] **41. The simulation viewer follows the robot from the start.** Seen
   2026-09-19 on both machines, in the port and in 1.3: trace robot is on by
-  default, and the view starts far too close. Both come from the form and
-  are the same in 1.3's: `distanceSlider` in `SIG_SimulationWidgetBase.ui` starts
-  at 10 of 2 to 200, page step 20; trace robot is on — `traceRobotCheckBox`
-  starts ticked, `SIG_SimulationVisualisationWidget`'s constructor sets
-  `traceRobot` true, and `visualizeThis` calls `slotSetTraceRobot( true )` again.
-  To see the twoBases and hammer robots on 1.3, the oracle moved the slider 3
-  page steps out, from 10 to 70. A new default is a change from 1.3; Jan decides
-  the value, and whether trace stays on.
-  **Assessed 2026-09-23, read-only.** The checkbox decides in the end:
-  `SIG_SimulationWidget::visualizeThis` calls `slotSetTraceRobot` with its state,
-  and with trace on the seven navigation buttons are disabled. Fixes, each a
-  change to `SIG_SimulationWidgetBase.ui` only: start the slider at 70; untick
-  `traceRobotCheckBox` (the two hard-coded `true` values can stay); or leave it
-  to item 26's fit. Unticking alone lets the robot walk out of view. The GUI
-  baseline records widget values and will move. The view is dimmer further out,
-  as item 26 says.
+  default. `traceRobotCheckBox` in `SIG_SimulationWidgetBase.ui` starts
+  ticked, `SIG_SimulationVisualisationWidget`'s constructor sets `traceRobot`
+  true, and `visualizeThis` calls `slotSetTraceRobot( true )` again. The
+  checkbox decides in the end: `SIG_SimulationWidget::visualizeThis` calls
+  `slotSetTraceRobot` with its state, and with trace on the seven navigation
+  buttons are disabled. The fix is to untick `traceRobotCheckBox`; the two
+  hard-coded `true` values can stay. Unticking lets the robot walk out of view.
+  A change from 1.3; Jan decides. The start distance, the other half of this
+  item, was fixed by item 26.
 
 - [ ] **42. The 3-D view puts the robot at a corner of the grid, not in its
   middle.** Seen 2026-09-19: in the 3-D view the robot stands at a corner of the
@@ -523,6 +488,26 @@ touched, because changing one changes behaviour against the reference binary.
   describe. The comment on the guard in
   `SIG_SimulationVisualisationWidget::visualizeThis` names Dynamo too; the
   guard stays, for `SIG_CannotMirtich`.
+
+- [ ] **65. A dialog opened during Play hangs the viewer.** Found 2026-09-23
+  in item 26's check. Play runs `simulationTimer`, a repeating timer at Frame
+  Delay, 0 ms by default; each tick, `SIG_SimulationVisualisationWidget::
+  slotSimulationProgress` steps the simulation and draws a frame. A modal dialog
+  opened then, such as `QColorDialog::getColor` in `choosePlaneColor`, is
+  mapped but never drawn, and it blocks the viewer; the process runs at full
+  CPU. With Frame Delay 50 ms the dialog appears. The same holds for Qt's own
+  dialog and GTK's. Other dialogs the viewer can open during Play: the movie
+  settings dialog, and the "Unable to write file" warning while recording,
+  which can come every frame. A generic design is to be agreed before any
+  change.
+
+- [ ] **66. Give the 3-D view a square shape.** Asked for 2026-09-23.
+  `SIG_SimulationWindow`'s constructor sizes the viewer window to 780 x 810
+  and makes that its minimum. The control panel on the right takes about a
+  third of the width, so the 3-D view is about 420 x 650, taller than wide,
+  and the robot is drawn in a tall, narrow picture. The view should be
+  square; the window's size and the layout in `SIG_SimulationWidgetBase.ui`
+  need to change to give it that room.
 
 - [ ] **47. `sigelDynClient` and `manage_dyn_slave`.** `sigelDynClient` makes a
   second machine a dynamic slave of a master started with `sigel -de`, which

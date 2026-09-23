@@ -115,6 +115,18 @@ namespace SIGEL_Visualisation
 
       DL_matrix getRobotRotation() const;
 
+      /**
+       * Returns the centre of the box around the robot, where the
+       * robot is now. The box is measured at time 0 and moves with
+       * the root link.
+       */
+      DL_vector getRobotCentre() const;
+
+      /**
+       * Returns the radius of the sphere around that box.
+       */
+      double getRobotRadius() const;
+
       bool exportToPovray( QString includeFilename,
 			   QString fileName );
 
@@ -192,6 +204,17 @@ namespace SIGEL_Visualisation
       int frameCounter;
 
       int robotPathPointAddingRate;
+
+      /**
+       * The centre of the robot's box at time 0, in the
+       * root link's frame.
+       */
+      DL_vector centreInRootLink;
+
+      /**
+       * The radius of the sphere around the robot's box at time 0.
+       */
+      double robotRadius;
 
       /**
        * Reads the actual positions and rotations of the

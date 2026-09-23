@@ -36,6 +36,8 @@
 #include <QColorDialog>
 #include <QTransform>
 
+#include <cmath>
+
 // namespace SIGEL_SlaveGUI
 // {
 
@@ -223,15 +225,8 @@
 
 	if ( traceRobot )
 	  {
-	    DL_vector robotsRealOrigin = robot->initialLocation;
-	    robotsRealOrigin.timesis( -1 );
-
-	    simulationVisualisation.getRobotRotation().times( &robotsRealOrigin,
-							      &simulationVisualisation.viewSettings.lookPoint );
-
-	    DL_vector robotPosition = simulationVisualisation.getRobotPosition();
-
-	    simulationVisualisation.viewSettings.lookPoint.plusis( &robotPosition );
+	    DL_vector robotCentre = simulationVisualisation.getRobotCentre();
+	    simulationVisualisation.viewSettings.lookPoint.assign( &robotCentre );
 	  };
 
 	if ( record )
@@ -652,6 +647,26 @@ void SIG_SimulationVisualisationWidget::resetRecorder()
       };
   };
 
+  double SIG_SimulationVisualisationWidget::getFittingDistance() const
+  {
+    if (!visualisation)
+      return distance;
+
+    SIGEL_Visualisation::SIG_SimulationVisualisation const *simulationVisualisation =
+      static_cast< SIGEL_Visualisation::SIG_SimulationVisualisation const* >( visualisation );
+
+    // The margin leaves room around the robot. The narrower of the two
+    // view angles decides, so the robot fits both ways.
+    double const margin = 1.25;
+    double const halfHeightAngle = SIGEL_Visualisation::SIG_Visualisation::fieldOfView / 360 * pi;
+    double halfAngle = halfHeightAngle;
+    double const aspectRatio = visualisation->viewSettings.aspectRatio;
+    if (aspectRatio < 1)
+      halfAngle = std::atan( std::tan( halfHeightAngle ) * aspectRatio );
+
+    return margin * simulationVisualisation->getRobotRadius() / std::sin( halfAngle );
+  };
+
   void SIG_SimulationVisualisationWidget::slotNavigateCenter()
   {
     if (visualisation)
@@ -659,15 +674,8 @@ void SIG_SimulationVisualisationWidget::resetRecorder()
 	SIGEL_Visualisation::SIG_SimulationVisualisation *simulationVisualisation =
 	  static_cast< SIGEL_Visualisation::SIG_SimulationVisualisation* >( visualisation );
 
-	DL_vector robotsRealOrigin = robot->initialLocation;
-	robotsRealOrigin.timesis( -1 );
-
-	simulationVisualisation->getRobotRotation().times( &robotsRealOrigin,
-							   &simulationVisualisation->viewSettings.lookPoint );
-
-	DL_vector robotPosition = simulationVisualisation->getRobotPosition();
-
-	simulationVisualisation->viewSettings.lookPoint.plusis( &robotPosition );
+	DL_vector robotCentre = simulationVisualisation->getRobotCentre();
+	simulationVisualisation->viewSettings.lookPoint.assign( &robotCentre );
 
 	if (automaticRefresh)
 	  update();

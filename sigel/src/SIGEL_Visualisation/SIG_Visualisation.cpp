@@ -32,6 +32,8 @@
 namespace SIGEL_Visualisation
 {
 
+  double const SIG_Visualisation::fieldOfView = 100;
+
   SIG_Visualisation::SIG_Visualisation()
     : viewSettings(),
       floatingTexts(),
@@ -64,8 +66,6 @@ namespace SIGEL_Visualisation
     glLightfv( GL_LIGHT1, GL_SPECULAR, specularLightColor1 );
     GLfloat positionLight1[4] = {0.0,10.0,0.0,1.0};
     glLightfv( GL_LIGHT1, GL_POSITION, positionLight1 );
-
-    glLightf( GL_LIGHT0, GL_LINEAR_ATTENUATION, 0.4 );
 
     QList< GLfloat > fogColor( 4 );
     fogColor.fill( 1 );
@@ -153,7 +153,7 @@ namespace SIGEL_Visualisation
 
   void SIG_Visualisation::updateAspectRatio()
   {
-    GLdouble const fovy = 100;
+    GLdouble const fovy = fieldOfView;
     GLdouble const _winport_near = 0.01;
     GLdouble const _winport_far = 50;
     GLdouble const aspectRatio = static_cast<GLdouble>(viewSettings.aspectRatio);

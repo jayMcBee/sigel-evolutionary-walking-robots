@@ -231,6 +231,8 @@ namespace SIGEL_SlaveGUI
   {
     visualisationWidget->visualizeThis(robot, environment, simulationParameters, program);
 
+    distanceSlider->setValue( qRound( visualisationWidget->getFittingDistance() * 10 ) );
+
     slotSetYaw( yawSlider->value() );
     slotSetPitch ( pitchSlider->value() );
     slotSetDistance( distanceSlider->value() );

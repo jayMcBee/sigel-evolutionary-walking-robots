@@ -96,6 +96,11 @@ namespace SIGEL_Visualisation
       void updateAspectRatio();
 
       /**
+       * The vertical field of view of the projection, in degrees.
+       */
+      static double const fieldOfView;
+
+      /**
        * The current view settings.
        *
        * These should be used by the method visualize.

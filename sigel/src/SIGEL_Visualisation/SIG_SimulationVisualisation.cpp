@@ -63,6 +63,48 @@ namespace SIGEL_Visualisation
      for (int i=0; i<robot.getNrOfPoints(); i++)
        floatingTexts[ i ] = robotRenderer.floatingTexts[ i ];
 
+     // The box around every vertex at time 0 gives the robot's centre and size.
+     // A robot without vertices keeps a box of size 0 at the origin.
+     DL_vector lowest( 0, 0, 0 ), highest( 0, 0, 0 );
+     bool anyVertex = false;
+     for ( SIGEL_Robot::SIG_Link *link : robot.getLinks() )
+       {
+	 SIG_SceneObject *recordedLink = renderRecorder->robotLinks[ link->getNumber() ];
+	 for ( DL_vector *vertex : link->getGeometry()->getVertices() )
+	   {
+	     DL_vector worldVertex;
+	     recordedLink->rotation.times( vertex, &worldVertex );
+	     worldVertex.plusis( &recordedLink->position );
+	     if (!anyVertex)
+	       {
+		 lowest.assign( &worldVertex );
+		 highest.assign( &worldVertex );
+		 anyVertex = true;
+	       };
+	     for (int k=0; k<3; k++)
+	       {
+		 if (worldVertex.get(k) < lowest.get(k))
+		   lowest.set( k, worldVertex.get(k) );
+		 if (worldVertex.get(k) > highest.get(k))
+		   highest.set( k, worldVertex.get(k) );
+	       };
+	   };
+       };
+
+     DL_vector centre;
+     centre.assign( &lowest );
+     centre.plusis( &highest );
+     centre.timesis( 0.5 );
+
+     DL_vector diagonal;
+     diagonal.assign( &highest );
+     diagonal.minusis( &lowest );
+     robotRadius = diagonal.norm() / 2;
+
+     SIG_SceneObject *recordedRoot = renderRecorder->robotLinks[ robot.getRootLink()->getNumber() ];
+     centre.minusis( &recordedRoot->position );
+     recordedRoot->rotation.transposetimes( &centre, &centreInRootLink );
+
      updateRobotLinks();
      updateRobotPoints();
    };
@@ -185,6 +227,23 @@ namespace SIGEL_Visualisation
     int rootLinkNumber = robot.getRootLink()->getNumber();
 
     return renderRecorder->robotLinks[ rootLinkNumber ]->rotation;
+  };
+
+  DL_vector SIG_SimulationVisualisation::getRobotCentre() const
+  {
+    DL_vector offset = centreInRootLink;
+    DL_vector centre;
+    getRobotRotation().times( &offset, &centre );
+
+    DL_vector position = getRobotPosition();
+    centre.plusis( &position );
+
+    return centre;
+  };
+
+  double SIG_SimulationVisualisation::getRobotRadius() const
+  {
+    return robotRadius;
   };
 
   bool SIG_SimulationVisualisation::exportToPovray( QString includeFilename,

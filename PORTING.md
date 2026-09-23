@@ -917,6 +917,14 @@ Start here.
   set outside `initializeGL`. Suggested order: 43, 20, 41, then 26 and 42.
 - **Item 43 is done:** the ambient slider works again in the lit modes and is
   disabled in Wireframe. See its Done entry.
+- **Item 26 is done:** the 3-D view starts fitted to the robot, with a 25 %
+  margin, aims at the robot's centre, and the headlight no longer dims with
+  distance. Item 41 is left with the trace question only.
+- **Found in item 26's check, not fixed:** "Choose planecolor" during Play
+  hangs the viewer. Play runs a repeating 0 ms timer that draws a frame per
+  tick; the modal colour dialog opens but is never drawn, and it blocks the
+  viewer. With Frame Delay 50 ms it appears. A generic design is to be agreed
+  first.
 - **SIGEL 2.0.** The work is now SIGEL 2.0, not only a port. 1.3 is the
   reference for regression checks, not a specification; see THE GOAL at the
   top. Two new items: 63, hidden lines and a Points mode; 64, remove what is
@@ -3207,6 +3215,8 @@ else that stops matching 1.3 still needs justifying as a defect.
 | **Dialog titles do not end in "...".** 1.3 ends 39 titles in dots, at 68 code sites in `SIGEL_MasterGUI` and the movie settings dialog plus the default title in `SIG_EditHostDialogBase.ui`; the ellipsis belongs on the command that opens a dialog, not on its title. Menu items, buttons, status tips and progress labels are unchanged. Two titles are reworded: "Do you really..." is "Delete Experiment" in `SIG_ExperimentListView::slotDeleteExperiment` and "Quit SIGEL" in `SIG_MainWindow::askBeforeQuitting`. "There is no experiment selected..." (22 sites) and "No experiment selected..." (1) are all "No experiment selected"; "Import Language Parameter..." is "Import Language Parameters", as its export is; the DynaMechs box in `SIG_GUIGPExperiment::slotRobotInfo` loses its two dots and keeps its wording | by decision 2026-09-23 | `guibehaviour-baseline.txt`, 76 title lines, each checked against the approved list; `xtest-baseline.txt`, 2 lines |
 | **The ambient light slider and its label are disabled in Wireframe.** 1.3 leaves them enabled, and the slider has no effect there, because Wireframe draws without lighting | by decision 2026-09-23, item 43. `SIG_SimulationWidget`'s constructor | nothing: no scenario checks the slider's enabled state |
 | **The Edit host title quotes the host name: `Edit host "."`.** 1.3 shows `Edit host ....`; with the dots removed it read `Edit host .`, because the shipped experiments' one host is named `.`, PVM's word for this computer | by decision 2026-09-23. `SIG_GPParameter::slotItemDoubleClicked`, which the Edit button calls too | `guibehaviour-baseline.txt`: the two title lines of the Edit host scenario |
+| **The 3-D view starts fitted to the robot and aims at its centre.** 1.3 starts at distance 1.0 for every robot and aims at the root link's model origin | by decision 2026-09-23, item 26. `SIG_SimulationVisualisation`'s constructor, `getFittingDistance`, `SIG_SimulationWidget::visualizeThis` | nothing: no check covers the camera |
+| **The headlight does not dim with distance.** 1.3 gives LIGHT0 linear attenuation 0.4 | by decision 2026-09-23, item 26, so the fitted camera does not darken the lit modes. `SIG_Visualisation`'s constructor | nothing |
 
 **Three 1.3 defects preserved on purpose**, plus the one below them. `MT_GUI`'s
 gnuplot export puts a constant x on datasets `2pt destr.` and `3pt destr.`
@@ -4308,6 +4318,40 @@ carried; other items and this file cite them, so they do not change.
   experiment, and during a run on another experiment. Teeth-tested both ways.
   That is also what makes the right-click `Stop` crash unreachable — PORTING.md
   section 9.
+
+- [x] **26. The 3D camera never sizes the view to the robot** — done
+  2026-09-23, by decision. Two faults from 2003: the start distance was a
+  constant, 1.0 world unit, against robots 3 to 13 units long; and the
+  tracking in `SIG_SimulationVisualisationWidget::makeTimeSteps` and
+  `slotNavigateCenter` aimed at the root link's model origin, not at the robot.
+  - **Centre and size.** `SIG_SimulationVisualisation`'s constructor measures
+    the box around every vertex at time 0: each link's geometry, placed by that
+    link's position and rotation in `SIG_RenderRecorder`. It keeps the box
+    centre in the root link's frame, and the radius of the sphere around the
+    box. `getRobotCentre` returns that centre where the root link is now; both
+    tracking sites aim at it.
+  - **Distance.** `SIG_SimulationVisualisationWidget::getFittingDistance`
+    returns `1.25 × radius / sin(halfAngle)`, a 25 % margin by decision, where
+    `halfAngle` is the narrower half-angle of the view: the view is taller than
+    wide, so the horizontal one. `SIG_SimulationWidget::visualizeThis` sets
+    `distanceSlider` from it once, when the viewer opens; Stop does not fit
+    again. The field of view of the 3-D view is `SIG_Visualisation::
+    fieldOfView`, 100 degrees. The POV-Ray camera keeps its own `xAngle` of
+    100 in `SIG_SimulationVisualisation::createPovrayIncludeFile`.
+  - **Light.** LIGHT0, the headlight, no longer has linear attenuation 0.4,
+    by decision; a camera further out would have made the lit modes darker.
+    The POV-Ray export keeps its own `fade_distance 3`.
+  - **Measured, in `Xvfb` with the viewer's default size, slider = distance ×
+    10:** twoBases 68, hammer 136, shortHammer 116, octopus 84, walker 59,
+    insect 48, runner 71. Each robot fitted and was centred on screen; checked
+    by eye on the desktop as well.
+  - The start-distance half of item 41 goes with it.
+  - **Not changed:** the robot path in `SIG_SimulationVisualisation::
+    makeTimeSteps` still marks the model origin, not the box centre.
+  - **Checked alongside, harmless:** `SIG_SimulationVisualisationWidget::
+    visualizeThis` calls `resizeGL` with logical pixels where Qt uses device
+    pixels. Qt 6.10's `QOpenGLWidget` sets the viewport in device pixels
+    itself before each `paintGL`, and the aspect ratio is the same in both.
 
 - [x] **38. Does the poll interval in `evolutionLoop` earn its length?** —
   done 2026-09-23, by decision: **the wait is 5 ms**, in both `evolutionLoop`
