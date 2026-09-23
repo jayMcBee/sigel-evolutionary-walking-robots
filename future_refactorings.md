@@ -479,14 +479,6 @@ touched, because changing one changes behaviour against the reference binary.
   `SIG_SimulationVisualisationWidget::visualizeThis` names Dynamo too; the
   guard stays, for `SIG_CannotMirtich`.
 
-- [ ] **66. Give the 3-D view a square shape.** Asked for 2026-09-23.
-  `SIG_SimulationWindow`'s constructor sizes the viewer window to 780 x 810
-  and makes that its minimum. The control panel on the right takes about a
-  third of the width, so the 3-D view is about 420 x 650, taller than wide,
-  and the robot is drawn in a tall, narrow picture. The view should be
-  square; the window's size and the layout in `SIG_SimulationWidgetBase.ui`
-  need to change to give it that room.
-
 - [ ] **67. The movie button keeps "recording allowed" after a failed
   frame.** Found 2026-09-23 by review, with item 65. When a movie frame cannot
   be written, `SIG_SimulationVisualisationWidget::makeTimeSteps` sets

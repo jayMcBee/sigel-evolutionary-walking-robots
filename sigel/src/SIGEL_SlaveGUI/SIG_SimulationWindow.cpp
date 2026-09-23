@@ -105,7 +105,7 @@ namespace SIGEL_SlaveGUI
 		      this,
 		      SLOT( slotStopPressed()) );
 
-    this->resize( 780, 810 );
+    this->resize( 1014, 810 );
     this->setMinimumSize( 780, 810 );
   };
 

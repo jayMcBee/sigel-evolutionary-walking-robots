@@ -921,8 +921,10 @@ Start here.
   margin, aims at the robot's centre, and the headlight no longer dims with
   distance. Item 41 is left with the trace question only.
 - **Item 65 is done:** a modal dialog opened during Play no longer hangs the
-  viewer; Play pauses until it closes. Open: item 66, a square 3-D view, and
-  item 67, the movie button's icon after a failed frame.
+  viewer; Play pauses until it closes. Open: item 67, the movie button's icon
+  after a failed frame.
+- **Item 66 is done:** the viewer opens at 1014 x 810, and the 3-D view is
+  square. **Item 62 was dropped** by decision; see "Not doing".
 - **SIGEL 2.0.** The work is now SIGEL 2.0, not only a port. 1.3 is the
   reference for regression checks, not a specification; see THE GOAL at the
   top. Two new items: 63, hidden lines and a Points mode; 64, remove what is
@@ -3216,6 +3218,7 @@ else that stops matching 1.3 still needs justifying as a defect.
 | **The 3-D view starts fitted to the robot and aims at its centre.** 1.3 starts at distance 1.0 for every robot and aims at the root link's model origin | by decision 2026-09-23, item 26. `SIG_SimulationVisualisation`'s constructor, `getFittingDistance`, `SIG_SimulationWidget::visualizeThis` | nothing: no check covers the camera |
 | **The headlight does not dim with distance.** 1.3 gives LIGHT0 linear attenuation 0.4 | by decision 2026-09-23, item 26, so the fitted camera does not darken the lit modes. `SIG_Visualisation`'s constructor | nothing |
 | **Play pauses while a modal dialog is open.** 1.3 keeps the simulation running under a dialog | by decision 2026-09-23, item 65: at Frame Delay 0 the dialog was never drawn and the viewer hung. `SIG_SimulationWindow::event`, `SIG_SimulationVisualisationWidget::pauseForDialog` and `resumeAfterDialog` | nothing: no scenario plays the simulation under a dialog |
+| **The viewer window opens at 1014 x 810, so the 3-D view is square.** 1.3 opens it at 780 x 810; at that size the port's view is 422 x 655 | by decision 2026-09-23, item 66. `SIG_SimulationWindow`'s constructor | nothing: `guidrive`'s slave-GUI scenario sets 780 x 810 itself |
 
 **Three 1.3 defects preserved on purpose**, plus the one below them. `MT_GUI`'s
 gnuplot export puts a constant x on datasets `2pt destr.` and `3pt destr.`
@@ -4351,6 +4354,17 @@ carried; other items and this file cite them, so they do not change.
     visualizeThis` calls `resizeGL` with logical pixels where Qt uses device
     pixels. Qt 6.10's `QOpenGLWidget` sets the viewport in device pixels
     itself before each `paintGL`, and the aspect ratio is the same in both.
+
+- [x] **66. Give the 3-D view a square shape** — done 2026-09-23, by
+  decision, option A of three. `SIG_SimulationWindow`'s constructor starts the
+  viewer window at 1014 x 810, where it was 780 x 810; the minimum stays
+  780 x 810. The control panel is at most 250 px wide, so the extra width goes
+  to the 3-D view. Measured in `Xvfb` on the white area of the view: 422 x 655
+  at 780 wide, 656 x 655 at 1014 wide. Item 26's fit runs after this size is
+  set. Checked on the desktop by Jan. Not taken: a view that stays square on
+  resize, which needs a container widget of our own, and a minimum of 1014,
+  which would not fit screens narrower than about 1024. `guidrive`'s slave-GUI
+  scenario still sets 780 x 810, 1.3's size.
 
 - [x] **65. A dialog opened during Play hangs the viewer** — done
   2026-09-23, by decision, option B of four. Play runs `simulationTimer`, a
