@@ -1,9 +1,7 @@
 # SIGEL 1.0 → 1.3 — a regression that predates the Qt port
 
-**Status: analysis only. DEFERRED until the Qt 6 port is complete.**
-Written 2026-08-23. **Independent of the port — do not mix its commits with
-`PORTING.md` work.** Same rule as `physics_backends.md` and
-`future_refactorings.md`.
+**Status: open work since 2026-09-23.** Written 2026-08-23 and deferred until
+the Qt 6 port was done; the port is done.
 
 ---
 
@@ -58,13 +56,15 @@ file grew from 251 lines to 479 in the same change.
 
 ### It is genuinely in the shipped 1.3 binary
 
-`xb/kdesigel/sigel_slave` (2003-04-30, unstripped i386) at
+`vendor/kdesigel/sigel_slave` on the x86 box (2003-04-30, unstripped i386,
+md5 `5e20d30cc43b4aaea63b729d3627e446`) at
 `0x080b1f08`–`0x080b1f3a`: `fld [ebp-0xc8]` / `fsub [ebp-0xd8]` for
 `q - minPos`, then `fld QWORD PTR ds:0x81ec320` / `fmulp`, then
 `fdiv [ebp-0xe8]` for `posRange`. The constant decodes to **57.29577957855229**
 — the folded value of `360.0/(2.0*3.14159265)`, distinguishable from exact
 `180/pi` (57.29577951308232) because the source truncates pi. One occurrence;
-the exact value has none.
+the exact value has none. The oracle confirmed all of this again on
+2026-09-23, in raw `objdump` output.
 
 So 1.3 really did behave this way. It simply postdates the published record.
 
@@ -82,7 +82,8 @@ blind.
 
 ### What removing it does
 
-Restoring 1.0's line, measured with `./replicate.sh`:
+Restoring 1.0's line, measured with `checks/replicate.sh` over the 14
+published experiments:
 
 | | with the 1.3 multiply | with 1.0's line |
 |---|---|---|
@@ -114,6 +115,34 @@ evaluation path, the places to look:
 `SIG_Interpreter`, `SIG_Register`, `SIG_ProgramLine` and
 `SIG_GPNiceWalkingFitnessFunction` are functionally identical 1.0 → 1.3.
 
+### The data today
+
+The measurements above used all 14 published experiments. **The repo now
+holds 7 of them**, in `experiments/`: `hammer`, `insect`, `octopus`, `runner`,
+`shortHammer`, `twoBases` and `walker`. Each is its robot's
+`…NiceWalkingFitness` file, except `twoBases`, which is
+`twoBasesHardlyReducedIS`. Items 40, 44 and 45 in `PORTING.md`, "Finished to-do
+items", removed the other seven: five `twoBases` variants,
+`octopusSimpleFitness` and `runnerSimpleFitness`. **Both cases left open above
+were among them.** Item 46 renamed the kept seven. The originals are on
+sourceforge; see "Reference material" in `PORTING.md`. The oracle's machine
+keeps all 14 as downloaded, at `/home/debian/sigel-shipped-original-2026-09-19/`.
+
+Today's code, with the 1.3 multiply, `checks/replicate.sh`, 2026-09-23:
+
+| experiment | 2001 best | ours | best | match |
+|---|---|---|---|---|
+| hammer | 0.45972 | 0.45668 | 0.993 | 10/100 |
+| insect | 0.63896 | 0.61079 | 0.956 | 5/100 |
+| octopus | 0.52013 | 0.51471 | 0.990 | 38/100 |
+| runner | 0.91951 | 0.083121 | **0.090** | 26/100 |
+| shortHammer | 0.49015 | 0.49085 | 1.001 | 30/100 |
+| twoBases | 0.56965 | 0.053302 | **0.094** | 1/100 |
+| walker | 0.27548 | 0.25485 | 0.925 | 12/100 |
+
+5 of 7 within 10% on best-of-population. The two failures are `runner` and
+`twoBases`, the two that 1.0's line restores in the table above.
+
 ---
 
 ## Measuring any of this
@@ -122,7 +151,7 @@ Fitness is a **chaotic** metric. A 1-ULP change to the robot's start height
 moves an individual's fitness by 45% and best-of-100 by up to 18%. Use it only
 in aggregate, and never to compare across machines.
 
-`replicate.sh` reports two numbers. `best` compares best-of-population and is
+`checks/replicate.sh` reports two numbers. `best` compares best-of-population and is
 loose — the more individuals share the recorded best, the more chances `max()`
 has to hit it, and the count of distinct programs carrying that value tracks
 which experiments "pass" (`runnerNiceWalkingFitness` 45, `twoBasesSimpleFitness1`

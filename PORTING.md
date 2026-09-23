@@ -54,15 +54,15 @@ target is that our build reproduces what the 1.3 binary does.
 August 2001 by SIGEL 1.0. Validating a port of 1.3 against them measures every
 1.0 → 1.3 change as though it were ours.
 
-**The 1.0 → 1.3 regression is real, pre-dates this migration, and is DEFERRED.**
-Written up in `regression_1.0_to_1.3.md`. Not to be worked on, and not to be
-mixed into these commits, until the Qt port is complete.
+**The 1.0 → 1.3 regression is real and pre-dates this migration. It is open
+work since 2026-09-23**, because the port is done. Written up in
+`regression_1.0_to_1.3.md`.
 
 Three jobs, in order, no overlap:
 
-1. **The Qt port** — the interface (Phase C), and PVM so the app can actually
-   evolve a gait. This is the work.
-2. **The 1.0 → 1.3 regression** — after, if wanted.
+1. **The Qt port** — **done.** The interface (Phase C), and PVM so the app
+   can actually evolve a gait.
+2. **The 1.0 → 1.3 regression** — open since 2026-09-23.
 3. **The diagnostics wishlist** from the `sigel-x86` session — 9 items on
    validating robot models at load. Recorded in `regression_1.0_to_1.3.md`.
    Not part of either job above.
@@ -231,8 +231,8 @@ found a real defect.** §0 has the rule; it is not optional.
 - **This file is the only log of what was done, besides git.** Decided 2026-09-20.
   Anything that records finished work belongs here, not in a new file.
   `future_refactorings.md` holds the to-do list and nothing else.
-  `regression_1.0_to_1.3.md` is deferred analysis of that regression, and is not
-  touched. `LIBRARIES.md` lists the third-party libraries, by decision
+  `regression_1.0_to_1.3.md` holds the analysis of the 1.0 → 1.3
+  regression, which is open work. `LIBRARIES.md` lists the third-party libraries, by decision
   2026-09-23; `README.md` links to it. `physics_backends.md` was folded into
   this file on 2026-09-20.
 
@@ -245,7 +245,7 @@ sigel/                                      the repo root
 ├── Makefile                                the build, §7 Phase R
 ├── PORTING.md                              this file
 ├── future_refactorings.md                  the to-do list this work defers into
-├── regression_1.0_to_1.3.md                sibling doc, DEFERRED
+├── regression_1.0_to_1.3.md                sibling doc, open work
 ├── checks/                                 the four gates and replicate, §7
 │   ├── check.sh                            compiles every module and header,
 │   │                                       runs the interface. The gate
@@ -1744,8 +1744,8 @@ unlike the one above, but it is the only reference for that class of behaviour.
 `check.sh`'s `real clicks` section guards it and prints the same *"tested
 NOTHING"* warning.
 
-*Evidence, read by no script.* `regression_1.0_to_1.3.md`, 194 lines, holds the
-deferred 1.0 → 1.3 regression and the oracle's diagnostics wishlist.
+*Evidence, read by no script.* `regression_1.0_to_1.3.md` holds the 1.0 → 1.3
+regression, which is open work, and the oracle's diagnostics wishlist.
 `future_refactorings.md` is the to-do list this file defers work into; no line
 count, it moves every session. **`tiecheck.cpp` was the third and is gone**,
 removed 2026-09-20: nothing ran it, and its figures are in §0 and C5.
@@ -2576,13 +2576,14 @@ its destructor is empty. Check on ASan and UBSan errors, not on this.
 
 ### Replication — checked against the 1.3 binary since Phase V
 
-`./checks/replicate.sh` runs every individual of every published experiment. It is
-**not currently a test of this port**, because the 14 published `.exp` files
-were produced in August 2001 by SIGEL 1.0 and the source being ported is 1.3.
-See the scope note at the top and `regression_1.0_to_1.3.md`.
+`./checks/replicate.sh` runs every individual of the 7 kept experiments. It is
+**not a test of this port**, because the published `.exp` files were produced
+in August 2001 by SIGEL 1.0 and the source being ported is 1.3. See the scope
+note at the top and `regression_1.0_to_1.3.md`.
 
-Against those 2001 files the current 1.3-faithful build gets 7 of 13 distinct
-experiments within 10%. That number measures the 1.0 → 1.3 regression, not us.
+On 2026-09-23 it gave 5 of 7 within 10%; the two failures are the 1.0 → 1.3
+regression. See `regression_1.0_to_1.3.md`, "The data today". Over the full
+set of 14, the 1.3 build gave 7 of 13 distinct experiments within 10%.
 
 **What is needed to make this a port test is Phase V**, below. Not fitness:
 fitness is chaotic across architectures — the next paragraph measures it — and
