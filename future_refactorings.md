@@ -394,16 +394,15 @@ touched, because changing one changes behaviour against the reference binary.
   too; no shipped experiment sets `FLOORDIMENSION`, so none reaches it. A fix
   changes physics for asymmetric or non-square floors, so it needs a decision.
 
-- [ ] **63. Hidden lines in the 3-D view, and a Points mode.** Asked for
-  2026-09-23. Wireframe draws every edge, the back ones too. Hidden-line
-  drawing needs two passes in `SIG_Visualisation::visualize`: first the
-  filled faces in the background colour, into the depth buffer only, then the
-  edges with `glPolygonOffset`. To decide: a separate mode, or always on in
-  Wireframe; the second is a change from 1.3. Points is
-  `glPolygonMode( GL_FRONT_AND_BACK, GL_POINT )`, and the same first pass
-  hides the back points. The modes are listed in `SIG_ViewSettings` and named
-  by `SIG_VisualisationWidget::setRenderMode` and the `renderModeComboBox` in
-  `SIG_SimulationWidgetBase.ui`.
+- [ ] **63. A Points mode in the 3-D view.** Asked for 2026-09-23; the hidden
+  lines half is done, as the Hidden lines mode. Points is
+  `glPolygonMode( GL_FRONT_AND_BACK, GL_POINT )` without lighting, as
+  Wireframe; the first pass of Hidden lines, in
+  `SIG_SimulationVisualisation::visualize`, can hide the back points too. Set
+  the point size every frame: the robot's anchor points set size 5 inside
+  their display lists in `SIG_RobotRenderer::buildDisplayLists`, and it would
+  leak. The ambient slider goes disabled there too, in `SIG_SimulationWidget`'s
+  constructor.
 
 - [ ] **64. Remove what is left of Dynamo.** Asked for 2026-09-23. The Dynamo
   backend was deleted on 2026-08-28; PORTING.md, "Dynamo removed, DynaMechs

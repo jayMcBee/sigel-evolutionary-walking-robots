@@ -928,6 +928,8 @@ Start here.
 - **Item 42 is done:** the ground is drawn on both sides of the robot's start.
   **Item 41 was dropped.** Item 68, starting the robot in the middle of the
   terrain, waits for a later discussion.
+- **Item 63's first half is done:** the render mode "Hidden lines". Points is
+  still open, as item 63.
 - **SIGEL 2.0.** The work is now SIGEL 2.0, not only a port. 1.3 is the
   reference for regression checks, not a specification; see THE GOAL at the
   top. Two new items: 63, hidden lines and a Points mode; 64, remove what is
@@ -3223,6 +3225,7 @@ else that stops matching 1.3 still needs justifying as a defect.
 | **Play pauses while a modal dialog is open.** 1.3 keeps the simulation running under a dialog | by decision 2026-09-23, item 65: at Frame Delay 0 the dialog was never drawn and the viewer hung. `SIG_SimulationWindow::event`, `SIG_SimulationVisualisationWidget::pauseForDialog` and `resumeAfterDialog` | nothing: no scenario plays the simulation under a dialog |
 | **The viewer window opens at 1014 x 810, so the 3-D view is square.** 1.3 opens it at 780 x 810; at that size the port's view is 422 x 655 | by decision 2026-09-23, item 66. `SIG_SimulationWindow`'s constructor | nothing: `guidrive`'s slave-GUI scenario sets 780 x 810 itself |
 | **The 3-D view draws the ground on both sides of the start.** 1.3 draws the terrain only from 0 to its size, so the robot starts at its corner. 1.0 drew a flat floor that moved with the camera | by decision 2026-09-23, item 42: the ground on the negative side too, each edge continued outward at the heights the physics uses. `SIG_EnvironmentRenderer::drawInit`, `buildGrid` and `groundDepth` | nothing: no check covers the floor |
+| **A render mode "Hidden lines".** 1.3 has Wireframe, Flatshaded and Gouraudshaded | by decision 2026-09-23, item 63. `SIG_ViewSettings::hiddenLine`, `SIG_SimulationVisualisation::visualize` | nothing: no check covers the render modes |
 
 **Three 1.3 defects preserved on purpose**, plus the one below them. `MT_GUI`'s
 gnuplot export puts a constant x on datasets `2pt destr.` and `3pt destr.`
@@ -4472,6 +4475,21 @@ carried; other items and this file cite them, so they do not change.
   **Done on both machines 2026-09-19.** On the x86 machine with approval
   there; its seven files hash as ours. Its copy of all 14 as downloaded is
   `/home/debian/sigel-shipped-original-2026-09-19/`.
+
+- [x] **63, first half. Hidden lines in the 3-D view** — done 2026-09-23, by
+  decision, as a new render mode "Hidden lines", after Wireframe; the Points
+  half stays open as item 63. `SIG_ViewSettings` has `hiddenLine`, which
+  `SIG_Visualisation::visualize` sets up as Wireframe. For it,
+  `SIG_SimulationVisualisation::visualize` draws the scene twice: first the
+  filled polygons into the depth buffer only, colour writes off and
+  `glPolygonOffset( 1, 1 )`; then the wireframe with `glDepthFunc( GL_LEQUAL )`,
+  so lines and points drawn at the same depth in the first pass are not hidden
+  by themselves, and `GL_LESS` again after. The floor hides what is below
+  ground. The ambient slider is disabled in the mode, as in Wireframe.
+  - **Checked** in `Xvfb` on twoBases and walker: the back edges and the floor
+    lines behind the robot are gone. Play at Frame Delay 0, simulated seconds
+    after 10 s in one sitting: Wireframe 13 and 14, Hidden lines 13 and 13.
+    Checked on the desktop by Jan.
 
 - [x] **42. The 3-D view puts the robot at a corner of the grid** — done
   2026-09-23, by decision, option A. A change from 1.0 to 1.3, not from the

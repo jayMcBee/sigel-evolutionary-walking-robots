@@ -56,6 +56,12 @@ namespace SIGEL_Visualisation
 	 */
 	wireFrame,
 	/**
+	 * Wireframe rendering without the hidden lines.
+	 *
+	 * As wireFrame, but an edge behind a polygon is not drawn.
+	 */
+	hiddenLine,
+	/**
 	 * Flat shaded rendering.
 	 *
 	 * The polygons are filled.

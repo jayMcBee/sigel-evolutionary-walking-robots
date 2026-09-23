@@ -152,8 +152,32 @@ namespace SIGEL_Visualisation
 
      environmentRenderer.setLookPoint( viewSettings.lookPoint );
      environmentRenderer.setRenderMode( viewSettings.renderMode );
+
+     bool const hiddenLine = (viewSettings.renderMode == SIG_ViewSettings::hiddenLine);
+     if (hiddenLine)
+       {
+	 // The filled polygons go into the depth buffer only, pushed back a
+	 // little, so that the edges drawn next are hidden behind them.
+	 glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+	 glColorMask( GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE );
+	 glEnable( GL_POLYGON_OFFSET_FILL );
+	 glPolygonOffset( 1, 1 );
+
+	 environmentRenderer.render();
+	 robotRenderer.render();
+
+	 glDisable( GL_POLYGON_OFFSET_FILL );
+	 glColorMask( GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE );
+	 glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+	 // Lines and points were drawn at the same depth in the first pass.
+	 glDepthFunc( GL_LEQUAL );
+       };
+
      environmentRenderer.render();
      robotRenderer.render();
+
+     if (hiddenLine)
+       glDepthFunc( GL_LESS );
    };
 
    void SIG_SimulationVisualisation::makeTimeSteps(int noOfTimeSteps)

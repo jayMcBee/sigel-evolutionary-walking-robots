@@ -223,6 +223,11 @@
                   </item>
                   <item>
                     <property name="text">
+                      <string>Hidden lines</string>
+                    </property>
+                  </item>
+                  <item>
+                    <property name="text">
                       <string>Flatshaded</string>
                     </property>
                   </item>

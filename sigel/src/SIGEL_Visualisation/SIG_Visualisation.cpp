@@ -110,6 +110,7 @@ namespace SIGEL_Visualisation
     switch (viewSettings.renderMode)
       {
       case SIG_ViewSettings::wireFrame:
+      case SIG_ViewSettings::hiddenLine:
        	glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
        	glShadeModel( GL_FLAT );
        	glDisable( GL_LIGHTING );
