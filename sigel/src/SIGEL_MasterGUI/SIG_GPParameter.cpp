@@ -605,7 +605,7 @@ void SIG_GPParameter::slotItemDoubleClicked( QTreeWidgetItem * theItem )
 	  // the same setFocus() and does NOT need this, because the field it
 	  // focuses is empty there.
 	  { QLineEdit *le = editDialog.lineeditHostName; QTimer::singleShot( 0, le, [le]{ le->end( false ); } ); }
-	  editDialog.setWindowTitle( "Edit host " + theHost->name );
+	  editDialog.setWindowTitle( "Edit host \"" + theHost->name + "\"" );
 	}
       else
 	{

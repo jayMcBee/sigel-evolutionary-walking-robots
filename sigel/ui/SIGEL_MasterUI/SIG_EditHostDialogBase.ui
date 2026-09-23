@@ -75,7 +75,7 @@
       <item row="2" column="0" rowspan="1" colspan="2">
         <widget class="QLabel" name="textlabelProcessesHint">
           <property name="text">
-            <string>For best speed, use one process per CPU core.</string>
+            <string>For best speed, use one process per CPU core</string>
           </property>
           <property name="wordWrap">
             <bool>false</bool>

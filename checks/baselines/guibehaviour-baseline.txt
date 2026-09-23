@@ -1400,10 +1400,10 @@ Do you want to replace it?]
 
 == EDIT HOST ==
   rows=1 row0=[.|1|<REPOROOT>]
-  [modal] class=SIGEL_MasterGUI::SIG_EditHostDialog title=[Edit host .]
-  [dialog] class=SIGEL_MasterGUI::SIG_EditHostDialog title=[Edit host .] modal=1
+  [modal] class=SIGEL_MasterGUI::SIG_EditHostDialog title=[Edit host "."]
+  [dialog] class=SIGEL_MasterGUI::SIG_EditHostDialog title=[Edit host "."] modal=1
     label  [Max. number of processes:]
-    label  [For best speed, use one process per CPU core.]
+    label  [For best speed, use one process per CPU core]
     label  [Slave directory:]
     label  [Host name:]
     spin   [spinboxMaximalNumberOfProcesses] value=1 min=1 max=1000
