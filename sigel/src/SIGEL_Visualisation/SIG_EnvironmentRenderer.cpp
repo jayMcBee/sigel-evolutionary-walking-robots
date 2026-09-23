@@ -93,6 +93,15 @@ namespace SIGEL_Visualisation
 					    blue ) );
   };
 
+  // The robot starts at the terrain's corner, so the ground is drawn as far
+  // again on the negative side of each axis, with the start in the middle.
+  // Past the terrain, DynaMechs gives each point the height of the nearest
+  // edge, so the ground continues each edge outward; this lookup does the same.
+  static double groundDepth( double **depth, int x_dim, int z_dim, int x, int z )
+  {
+    return depth[ qBound( 0, x, x_dim - 1 ) ][ qBound( 0, z, z_dim - 1 ) ];
+  }
+
   void SIG_EnvironmentRenderer::buildDisplayLists()
   {
     GLuint planeListIndex = displayListsOffset;
@@ -142,17 +151,17 @@ namespace SIGEL_Visualisation
 	 	glTranslatef(0,0.01,0);
 	 	glRotated(180,1,0,0);
 
-   	for (z=0; z<z_dim-1; ++z) {
+   	for (z=1-z_dim; z<z_dim-1; ++z) {
 
       glBegin(GL_LINES);
-    	for (x=0; x<x_dim-1; ++x) {
+    	for (x=1-x_dim; x<x_dim-1; ++x) {
           	
       	vertex[0][0] = ((GLfloat) x)*grid_resolution;
-      	vertex[0][1] = -depth[x][z];
+      	vertex[0][1] = -groundDepth(depth, x_dim, z_dim, x, z);
       	vertex[0][2] = ((GLfloat) z)*grid_resolution;
 
       	vertex[1][0] = ((GLfloat) x+1)*grid_resolution;
-      	vertex[1][1] = -depth[x+1][z];
+      	vertex[1][1] = -groundDepth(depth, x_dim, z_dim, x+1, z);
       	vertex[1][2] = ((GLfloat) z)*grid_resolution;
 	
       	glVertex3fv(vertex[0]);
@@ -161,17 +170,17 @@ namespace SIGEL_Visualisation
       glEnd();
     }
     	
-    for (x=0; x<x_dim-1; ++x) {
+    for (x=1-x_dim; x<x_dim-1; ++x) {
 
       glBegin(GL_LINES);
-      for (z=0; z<z_dim-1; ++z) {
+      for (z=1-z_dim; z<z_dim-1; ++z) {
           	
       	vertex[0][0] = ((GLfloat) x)*grid_resolution;
-      	vertex[0][1] = -depth[x][z];
+      	vertex[0][1] = -groundDepth(depth, x_dim, z_dim, x, z);
       	vertex[0][2] = ((GLfloat) z)*grid_resolution;
 
       	vertex[1][0] = ((GLfloat) x)*grid_resolution;
-      	vertex[1][1] = -depth[x][z+1];
+      	vertex[1][1] = -groundDepth(depth, x_dim, z_dim, x, z+1);
       	vertex[1][2] = ((GLfloat) z+1)*grid_resolution;
         	
       	glVertex3fv(vertex[0]);
@@ -524,22 +533,22 @@ namespace SIGEL_Visualisation
 
    glRotated(180,1,0,0);
 
-   for (z=0; z<z_dim-1; ++z) {
+   for (z=1-z_dim; z<z_dim-1; ++z) {
        glBegin(GL_TRIANGLE_STRIP);
        {
-    	   for (x=0; x<x_dim; ++x) {
+    	   for (x=1-x_dim; x<x_dim; ++x) {
     	
             vertex[0][0] = ((GLfloat) x)*grid_resolution;
-            vertex[0][1] = -depth[x][z+1];
+            vertex[0][1] = -groundDepth(depth, x_dim, z_dim, x, z+1);
             vertex[0][2] = ((GLfloat) z + 1.0)*grid_resolution;
   	
-            if (x > 0) {
+            if (x > 1-x_dim) {
         		   vertex[1][0] = ((GLfloat) x - 1.0)*grid_resolution;
-        		 	 vertex[1][1] = -depth[x-1][z+1];
+        		 	 vertex[1][1] = -groundDepth(depth, x_dim, z_dim, x-1, z+1);
         		   vertex[1][2] = ((GLfloat) z + 1.0)*grid_resolution;
         		
         		   vertex[2][0] = ((GLfloat) x - 1.0)*grid_resolution;
-        		   vertex[2][1] = -depth[x-1][z];
+        		   vertex[2][1] = -groundDepth(depth, x_dim, z_dim, x-1, z);
         		   vertex[2][2] = ((GLfloat) z)*grid_resolution;
         		
         		   compute_face_normal(vertex[1], vertex[2], vertex[0], normal);
@@ -558,10 +567,10 @@ namespace SIGEL_Visualisation
   					
   					
             vertex[1][0] = ((GLfloat) x)*grid_resolution;
-            vertex[1][1] = -depth[x][z];
+            vertex[1][1] = -groundDepth(depth, x_dim, z_dim, x, z);
             vertex[1][2] = ((GLfloat) z)*grid_resolution;
   	
-            if (x > 0) {
+            if (x > 1-x_dim) {
                compute_face_normal(vertex[1], vertex[0], vertex[2], normal);
         		   glNormal3fv(normal);
             }

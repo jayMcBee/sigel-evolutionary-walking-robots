@@ -385,39 +385,6 @@ touched, because changing one changes behaviour against the reference binary.
   destroyed while running, the handler's SIGABRT branch prints `Abort` and calls
   `pvm_halt()` again, and the process stayed until SIGKILL.
 
-- [ ] **41. The simulation viewer follows the robot from the start.** Seen
-  2026-09-19 on both machines, in the port and in 1.3: trace robot is on by
-  default. `traceRobotCheckBox` in `SIG_SimulationWidgetBase.ui` starts
-  ticked, `SIG_SimulationVisualisationWidget`'s constructor sets `traceRobot`
-  true, and `visualizeThis` calls `slotSetTraceRobot( true )` again. The
-  checkbox decides in the end: `SIG_SimulationWidget::visualizeThis` calls
-  `slotSetTraceRobot` with its state, and with trace on the seven navigation
-  buttons are disabled. The fix is to untick `traceRobotCheckBox`; the two
-  hard-coded `true` values can stay. Unticking lets the robot walk out of view.
-  A change from 1.3; Jan decides. The start distance, the other half of this
-  item, was fixed by item 26.
-
-- [ ] **42. The 3-D view puts the robot at a corner of the grid, not in its
-  middle.** Seen 2026-09-19: in the 3-D view the robot stands at a corner of the
-  grid, not at its centre. What the code does: `SIG_EnvironmentRenderer::
-  buildGrid` draws the terrain grid from the origin out to the terrain's size,
-  with the grid spacing forced to 1 because, by its own note, `getTerrainData`
-  does not set it; the robot starts at the experiment's `STARTPOSITION`, which is
-  `0 1 0` in `twoBasesSimpleFitness1`, so at the grid's corner. The same code is
-  in 1.3. Not yet compared with 1.3 by eye.
-  **Assessed 2026-09-23, read-only.** The view shows the physics correctly.
-  `SIG_Environment::generateTerrain` writes the grid for x and z from 0 up, and
-  DynaMechs' `dmEnvironment::getGroundDepth` clamps to the nearest edge height
-  past it, so the physics ground goes on flat without end; only the drawing
-  stops. No shipped experiment sets `FLOORDIMENSION`, so the default 50 x 50 flat
-  floor applies. The change is from 1.0 to 1.3, not from the port: 1.0 drew a
-  plane centred on the look point and moved it with the camera; 1.3 left the
-  `xPos` and `zPos` for that computed in `SIG_EnvironmentRenderer::render` and
-  unused. The forced grid spacing of 1 is harmless. Fixes: draw ground past the
-  terrain, at the edge height (view only; care for hilly floors); move the start
-  to the centre (every position, the floating-point results and fitness move
-  against 1.3 — risky); or write the behaviour down.
-
 - [ ] **61. The terrain is the transpose of its floor function.** Found
   2026-09-23 in the item 42 assessment, read-only.
   `SIG_Environment::generateTerrain` writes the rows z-major; DynaMechs'
@@ -486,6 +453,13 @@ touched, because changing one changes behaviour against the reference binary.
   recording. But it does not emit `signalRecordingAllowed( false )`, so the
   movie settings button keeps its "recording allowed" icon; the code's own
   comment asks for the reset.
+
+- [ ] **68. Start the robot in the middle of the terrain?** Raised
+  2026-09-23 with item 42, for discussion later. The robot starts at the
+  experiment's `STARTPOSITION`; x and z are 0 in every shipped experiment,
+  which is the terrain's corner. Moving it is a change to the experiment setup: either
+  `STARTPOSITION` in the `.exp` files, a file change, or the terrain's place
+  in DynaMechs, a vendor patch. Positions and fitness move with it.
 
 - [ ] **47. `sigelDynClient` and `manage_dyn_slave`.** `sigelDynClient` makes a
   second machine a dynamic slave of a master started with `sigel -de`, which

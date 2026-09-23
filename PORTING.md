@@ -925,6 +925,9 @@ Start here.
   after a failed frame.
 - **Item 66 is done:** the viewer opens at 1014 x 810, and the 3-D view is
   square. **Item 62 was dropped** by decision; see "Not doing".
+- **Item 42 is done:** the ground is drawn on both sides of the robot's start.
+  **Item 41 was dropped.** Item 68, starting the robot in the middle of the
+  terrain, waits for a later discussion.
 - **SIGEL 2.0.** The work is now SIGEL 2.0, not only a port. 1.3 is the
   reference for regression checks, not a specification; see THE GOAL at the
   top. Two new items: 63, hidden lines and a Points mode; 64, remove what is
@@ -3219,6 +3222,7 @@ else that stops matching 1.3 still needs justifying as a defect.
 | **The headlight does not dim with distance.** 1.3 gives LIGHT0 linear attenuation 0.4 | by decision 2026-09-23, item 26, so the fitted camera does not darken the lit modes. `SIG_Visualisation`'s constructor | nothing |
 | **Play pauses while a modal dialog is open.** 1.3 keeps the simulation running under a dialog | by decision 2026-09-23, item 65: at Frame Delay 0 the dialog was never drawn and the viewer hung. `SIG_SimulationWindow::event`, `SIG_SimulationVisualisationWidget::pauseForDialog` and `resumeAfterDialog` | nothing: no scenario plays the simulation under a dialog |
 | **The viewer window opens at 1014 x 810, so the 3-D view is square.** 1.3 opens it at 780 x 810; at that size the port's view is 422 x 655 | by decision 2026-09-23, item 66. `SIG_SimulationWindow`'s constructor | nothing: `guidrive`'s slave-GUI scenario sets 780 x 810 itself |
+| **The 3-D view draws the ground on both sides of the start.** 1.3 draws the terrain only from 0 to its size, so the robot starts at its corner. 1.0 drew a flat floor that moved with the camera | by decision 2026-09-23, item 42: the ground on the negative side too, each edge continued outward at the heights the physics uses. `SIG_EnvironmentRenderer::drawInit`, `buildGrid` and `groundDepth` | nothing: no check covers the floor |
 
 **Three 1.3 defects preserved on purpose**, plus the one below them. `MT_GUI`'s
 gnuplot export puts a constant x on datasets `2pt destr.` and `3pt destr.`
@@ -4469,6 +4473,33 @@ carried; other items and this file cite them, so they do not change.
   there; its seven files hash as ours. Its copy of all 14 as downloaded is
   `/home/debian/sigel-shipped-original-2026-09-19/`.
 
+- [x] **42. The 3-D view puts the robot at a corner of the grid** — done
+  2026-09-23, by decision, option A. A change from 1.0 to 1.3, not from the
+  port. 1.0's `SIG_EnvironmentRenderer` drew a flat plane and grid of 70
+  fields each way and moved them to the look point in `render`. 1.3 drew
+  DynaMechs' terrain instead, from 0 to its size, and dropped the move; the
+  `xPos` and `zPos` for it are still computed in `render` and unused. The robot
+  starts at the terrain's corner, so towards -x and -z it stood on nothing
+  drawn.
+  - **The physics past the edge:** `dmEnvironment::getGroundDepth` clamps the
+    cell index and fixes `t` or `u` at 0 or 1, so a point off the terrain gets
+    the height of the nearest edge: each edge continues outward.
+  - **The fix, view only:** `drawInit` and `buildGrid` now also draw the
+    ground on the negative side of each axis, from `1 - x_dim` and
+    `1 - z_dim`, as far again as the terrain reaches, with the robot's start in
+    the middle; the default floor is drawn from -49 to 49. There each edge is
+    continued outward: `groundDepth` clamps the index as DynaMechs does, so
+    the drawing matches what the robot stands on, hilly floors too.
+  - **Measured, in `Xvfb` with software GL, plane shown, Play at Frame Delay
+    0; simulated seconds after 10 s:** Wireframe, the default, 25, 27 and 24
+    before, 19, 17 and 17 after; Flatshaded 23 and 20 before, 16 and 12 after.
+    The plane grows from 4,802 triangles to 19,208. A trial 189 x 189 floor gave
+    16 and 16 in Flatshaded, so the cost does not follow the cells; most likely
+    it is the extra pixels filled, not measured. On the desktop Jan found it
+    fine.
+  - Not taken: moving the start to the middle, item 68; 1.0's camera-following
+    plane, wrong for hilly floors.
+
 - [x] **43. The ambient light slider seems to do nothing in the 3-D view** —
   done 2026-09-23. Two causes. The port's: `SIG_VisualisationWidget::
   setAmbientLighting` changed GL state outside `paintGL` with no
@@ -4547,6 +4578,10 @@ carried; other items and this file cite them, so they do not change.
 #### Not doing
 
 Decisions, not work. Each is settled; reopen only with a reason.
+
+- **41. The simulation viewer follows the robot from the start.** Dropped
+  2026-09-23 by decision: not an issue. Trace Robot stays ticked at start, as
+  in 1.3; the start-distance half of the item was done by item 26.
 
 - **62. The 3-D view sets its GL state outside `initializeGL`.** Dropped
   2026-09-23 by decision: not an issue today. `SIG_Visualisation`'s
