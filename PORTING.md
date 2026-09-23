@@ -930,6 +930,9 @@ Start here.
   terrain, waits for a later discussion.
 - **Item 63's first half is done:** the render mode "Hidden lines". Points is
   still open, as item 63.
+- **The doubled floor lines are fixed:** Mesa joined the floor's triangle
+  strips, and the joins showed in the line modes; the floor is now separate
+  triangles. See its Done entry.
 - **SIGEL 2.0.** The work is now SIGEL 2.0, not only a port. 1.3 is the
   reference for regression checks, not a specification; see THE GOAL at the
   top. Two new items: 63, hidden lines and a Points mode; 64, remove what is
@@ -4475,6 +4478,29 @@ carried; other items and this file cite them, so they do not change.
   **Done on both machines 2026-09-19.** On the x86 machine with approval
   there; its seven files hash as ours. Its copy of all 14 as downloaded is
   `/home/debian/sigel-shipped-original-2026-09-19/`.
+
+- [x] **The 3-D floor drew its rows twice in the line modes** — done
+  2026-09-23, by decision; found by Jan, not a numbered item. In Wireframe,
+  and so in Hidden lines, each line along one floor axis had a second line
+  beside it at a slightly different slope, and the lines along the other axis
+  jogged at each row. The grid, `GL_LINES`, was clean.
+  - **Cause:** `SIG_EnvironmentRenderer::drawInit` drew one
+    `GL_TRIANGLE_STRIP` per row into a display list. Mesa 26.0.8 here joins
+    consecutive strips of a list into one draw; the joining triangles have no
+    area, so the lit modes do not show them, but in line mode their edges run
+    from the end of one row to the start of the next. The terrain data was
+    checked in gdb: 50 x 50, spacing 1, all 0. llvmpipe and softpipe showed the
+    same. The oracle's 1.3, on Mesa 22.3 swrast through indirect GLX, draws
+    single lines, and so did a test build with separate triangles.
+  - **Fix:** each cell is two `GL_TRIANGLES`, with the strip's winding, the
+    normal the strip gave each triangle, and the same texture coordinates,
+    through the file-static `setTerrainVertex` and `terrainVertex`.
+  - **Checked** in `Xvfb`: Wireframe from above draws single lines;
+    Flatshaded is identical to the strip build, 0 of 429,680 pixels differ in
+    an oblique view and from above. Play in Wireframe, simulated seconds after
+    10 s in one sitting: strips 11 and 11, triangles 9 and 10. On a hilly floor
+    Gouraud shading differs slightly: each triangle now uses one normal at all
+    three corners. Checked on the desktop by Jan.
 
 - [x] **63, first half. Hidden lines in the 3-D view** — done 2026-09-23, by
   decision, as a new render mode "Hidden lines", after Wireframe; the Points

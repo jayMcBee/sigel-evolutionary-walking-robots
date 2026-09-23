@@ -102,6 +102,23 @@ namespace SIGEL_Visualisation
     return depth[ qBound( 0, x, x_dim - 1 ) ][ qBound( 0, z, z_dim - 1 ) ];
   }
 
+  // A terrain vertex at column x and row z.
+  static void setTerrainVertex( GLfloat v[3], int x, int z, double grid_resolution,
+				double **depth, int x_dim, int z_dim )
+  {
+    v[0] = ((GLfloat) x)*grid_resolution;
+    v[1] = -groundDepth( depth, x_dim, z_dim, x, z );
+    v[2] = ((GLfloat) z)*grid_resolution;
+  }
+
+  // The texture repeats every two columns; t is 1 on row z+1 and 0 on row z.
+  static void terrainVertex( GLfloat const v[3], int x, GLfloat t, bool withTexture )
+  {
+    if (withTexture)
+      glTexCoord2f( (x % 2 == 0) ? 0.0 : 1.0, t );
+    glVertex3fv( v );
+  }
+
   void SIG_EnvironmentRenderer::buildDisplayLists()
   {
     GLuint planeListIndex = displayListsOffset;
@@ -514,7 +531,7 @@ namespace SIGEL_Visualisation
   void SIG_EnvironmentRenderer::drawInit() {
    register int x, z;
 
-   GLfloat vertex[3][3], normal[3];
+   GLfloat normal[3];
 	 int x_dim, z_dim;
 	 double grid_resolution;
 	 double **depth;
@@ -533,60 +550,31 @@ namespace SIGEL_Visualisation
 
    glRotated(180,1,0,0);
 
+   // Each cell is drawn as two separate triangles. Strips in a display
+   // list may be joined into one draw, and the joins show as lines in the
+   // line modes.
+   GLfloat a0[3], b0[3], a1[3], b1[3];
    for (z=1-z_dim; z<z_dim-1; ++z) {
-       glBegin(GL_TRIANGLE_STRIP);
-       {
-    	   for (x=1-x_dim; x<x_dim; ++x) {
-    	
-            vertex[0][0] = ((GLfloat) x)*grid_resolution;
-            vertex[0][1] = -groundDepth(depth, x_dim, z_dim, x, z+1);
-            vertex[0][2] = ((GLfloat) z + 1.0)*grid_resolution;
-  	
-            if (x > 1-x_dim) {
-        		   vertex[1][0] = ((GLfloat) x - 1.0)*grid_resolution;
-        		 	 vertex[1][1] = -groundDepth(depth, x_dim, z_dim, x-1, z+1);
-        		   vertex[1][2] = ((GLfloat) z + 1.0)*grid_resolution;
-        		
-        		   vertex[2][0] = ((GLfloat) x - 1.0)*grid_resolution;
-        		   vertex[2][1] = -groundDepth(depth, x_dim, z_dim, x-1, z);
-        		   vertex[2][2] = ((GLfloat) z)*grid_resolution;
-        		
-        		   compute_face_normal(vertex[1], vertex[2], vertex[0], normal);
-        		   glNormal3fv(normal);
-            }
-          	
-          	if (withTexture) {
-              if (x%2 == 0) {
-              	glTexCoord2f(0.0, 1.0); glVertex3fv(vertex[0]);
-    					}
-    					else {
-      					glTexCoord2f(1.0, 1.0); glVertex3fv(vertex[0]);
-    					}
-    				}
-    				else glVertex3fv(vertex[0]);
-  					
-  					
-            vertex[1][0] = ((GLfloat) x)*grid_resolution;
-            vertex[1][1] = -groundDepth(depth, x_dim, z_dim, x, z);
-            vertex[1][2] = ((GLfloat) z)*grid_resolution;
-  	
-            if (x > 1-x_dim) {
-               compute_face_normal(vertex[1], vertex[0], vertex[2], normal);
-        		   glNormal3fv(normal);
-            }
-						
-            if (withTexture) {
-              if ( x%2 == 0) {
-                glTexCoord2f(0.0, 0.0); glVertex3fv(vertex[1]);
-            	}
-            	else {
-              	glTexCoord2f(1.0, 0.0); glVertex3fv(vertex[1]);
-            	}        	
-    				}
-    				else glVertex3fv(vertex[1]);
-            	          	
-    	   } // for-loop (x)
-       } // glBegin(GL_TRIANGLE_STRIP)
+       glBegin(GL_TRIANGLES);
+       for (x=2-x_dim; x<x_dim; ++x) {
+            // a is row z+1, b is row z; 0 is column x-1, 1 is column x.
+            setTerrainVertex( a0, x-1, z+1, grid_resolution, depth, x_dim, z_dim );
+            setTerrainVertex( b0, x-1, z,   grid_resolution, depth, x_dim, z_dim );
+            setTerrainVertex( a1, x,   z+1, grid_resolution, depth, x_dim, z_dim );
+            setTerrainVertex( b1, x,   z,   grid_resolution, depth, x_dim, z_dim );
+
+            compute_face_normal(a0, b0, a1, normal);
+            glNormal3fv(normal);
+            terrainVertex( a0, x-1, 1.0, withTexture );
+            terrainVertex( b0, x-1, 0.0, withTexture );
+            terrainVertex( a1, x,   1.0, withTexture );
+
+            compute_face_normal(b1, a1, b0, normal);
+            glNormal3fv(normal);
+            terrainVertex( a1, x,   1.0, withTexture );
+            terrainVertex( b0, x-1, 0.0, withTexture );
+            terrainVertex( b1, x,   0.0, withTexture );
+       } // for-loop (x)
        glEnd();
    } // for-loop (z)
 
