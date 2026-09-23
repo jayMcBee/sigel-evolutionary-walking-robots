@@ -279,21 +279,6 @@ touched, because changing one changes behaviour against the reference binary.
 
 ## 7 · The interface
 
-- [ ] **38. Does the poll interval in `evolutionLoop` earn its length?**
-  The wait before `checkTask` carried the comment *"experiments show gain in
-  performance when we add some minor delay"* from 2003, and nobody has measured
-  it here. It is a poll interval: `checkTask` only asks whether a result has
-  arrived, so a longer wait leaves every finished result sitting, and the
-  successor tournament waiting behind it. At 120 individuals a generation that
-  is not a small number.
-  **What little is measured:** cutting it from 300 ms to 200 ms moved one
-  two-generation run from 73.3 s to 69.8 s per generation. One run each, a
-  randomised pool, one machine — that is not a result, only a reason to think
-  the claim is worth testing.
-  **How:** the `evolution` scenario already prints ms per generation and the
-  worst gap between pumps. Sweep the value, hold everything else, repeat enough
-  runs to see past the noise.
-
 - [ ] **24. Show progress during a run.** Partly done. D38 drives
   `generationProgBar` from the count of individuals holding a fitness value,
   which steps back when a tournament makes offspring. D37 writes the pool

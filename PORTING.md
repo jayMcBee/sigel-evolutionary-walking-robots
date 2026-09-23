@@ -559,7 +559,7 @@ D20 supersedes D5, D24 supersedes D3.
 | **D40** *(signed off 2026-09-16)* | The window and splitter at start-up | **1280x860, tree 280 px, splash unscaled.** 1.3's `resize( 900, 750 )` already opened taller than the work area on a 1366x768 screen. The splitter asked for `setSizes( {2, 6} )` meaning a 1:3 split; **measured, Qt gives the tree 71 %** — numbers far below the splitter's width are ignored and the surplus goes by size policy, and `QTreeWidget` expands where the stacked widget does not. Real pixel widths and `setStretchFactor( 0, 0 )` / `( 1, 1 )` fix it and keep it fixed on resize. `widgetBase` had `setScaledContents( true )`, which stretched the square 448x448 `noExperiment.png` across the whole content area; it is centred at its own size instead. All three are deliberate divergences from 1.3. A fixed size, on purpose: no sizing to the screen, for now. Geometry is **not** remembered between sessions; `QSettings` was proposed and rejected as overkill |
 | **D41** *(signed off 2026-09-17)* | The second exception to D33: a run that has lost PVM | **`SIG_GPFitnessTrainer` may REPORT that PVM is unreachable; it may not act on it.** `checkTask` split `pvm_probe`'s three returns — above zero receive, zero wait, below zero give up — because the old `if (info != 0)` sent an error into the receive branch, where `pvm_recv` blocks for a message that cannot come — and **no `TIMEOUTMINUTES` value rescued it**, because the timeout sits in the `else` branch that an error never reaches — or fails and leaves the caller waiting for a task already destroyed. On `PvmSysErr` it sets `pvmLost`; `spawnTask` sets it too, because an unreachable daemon shows up there first and `pvm_spawn` reports that through its own return rather than through `taskId`. `SIG_GPManager::pvmIsLost()` is the only way out, `start()` clears it, and nothing in `SIGEL_GP` acts on it. `SIG_GUIGPExperiment`'s progress timer reads it, ends the run the way `Stop` does and names the reason. **`pvm_mytid` cannot be used to detect this**, and the reason is worth keeping so nobody retries it: `BEATASK` is `( pvmmytid == -1 ? pvmbeatask() : 0 )`, so an enrolled task gets its cached tid back without touching the daemon. **The other option that was measured and rejected:** watching `$PVM_TMP/pvmd.<uid>` disappear — a run completed three further generations with that file removed, because an enrolled task keeps its socket. **Not checked:** no check starts a run; the `evolution` scenario dismisses the new dialog and prints it |
 | **D42** *(signed off 2026-09-17)* | Saying why a run ended | **The interface tells the user when a run ended without doing anything.** `SIG_GUIGPExperiment::slotEvolutionStopped` shows the message when three things hold: the pool generation did not move, `guiGPManager->userTerminated` is false, and `terminationAlreadyMet()` finds the condition already true. The message names the setting — the date, the duration or the generation number — and the tab it is on. 1.3 shows nothing, so this is a deliberate divergence. Decided 2026-09-15: the interface must give feedback in that case. **Nothing in `SIGEL_GP` changes**, so this is not a third exception to D33: `terminationAlreadyMet` reads `gpParameter` and the interface's own copy of the run start time, because `SIG_GPManager::startTime` is private. **That copy is what makes the duration model work** — testing for an all-zero duration, as a first version did, missed every non-zero duration that expires inside the first evaluation, which is the ordinary case at about 98 s per generation. **Two cases not covered:** MetaGP with `SAVEEXIT` — which every experiment in `experiments/` carries — completes its first generation so the branch never runs, and a run that throws says only that an error stopped it. **Not checked:** no check starts a run; the `evolution` scenario dismisses the dialog and prints it, measured for a date and for a duration |
-| **D43** *(signed off 2026-09-18)* | An exception to D33: the window during a run | **`SIG_GPManager::evolutionLoop` pumps the interface after every wait, not once per pass.** It pumped once per pass of the outer loop and then slept 300 ms before every entry of `taskCanDoList` with no pump, so the window was dead for `300 ms x entries` — **measured 8092 ms**, against about five seconds before a desktop calls a window unresponsive. The wait is now 200 ms and `processInterfaceEvents()` follows every one of them, **in both `evolutionLoop` overloads**; the MetaGP one carries the same loop and a change to one only is a half fix. **Measured after: 397 ms**, which is one iteration; **on `main` 2026-09-22, 210 ms** worst over 800 gaps, one generation of `twoBases`. Time per generation: 73.3 s before, 69.8 s after, one run each. The headless `sigel <experiment>` run gets the 200 ms wait too, with no interface to serve. `passive time` now caps every pump, not one per pass. **`haveABreak` is renamed `processInterfaceEvents`**: it takes no break, it gives the interface its only chance to handle input while the run holds the thread. Ten sites. **The risk this accepts:** the pump now runs inside the sweep over `taskCanDoList`, before each entry's tournament is taken. `canDoIdx`, `touchsCounter`, `sweepCounter`, the population and, in the MetaGP overload, `MetaClassifier` are live across it. Nothing the run lock leaves open changes them: during a run Start is refused, 29 actions are greyed, every experiment's individuals list is cut, and the tree menu offers only Stop. **Stop still waits for the end of the pass**, as it did before D43; the inner loop does not test `userTerminated`. Left so by decision 2026-09-22. **Not checked:** no check starts a run; the `evolution` scenario prints the worst gap between pumps and the time per generation. **Confirmed on the real desktop on 2026-09-18: the window answers during a run.** |
+| **D43** *(signed off 2026-09-18)* | An exception to D33: the window during a run | **`SIG_GPManager::evolutionLoop` pumps the interface after every wait, not once per pass.** It pumped once per pass of the outer loop and then slept 300 ms before every entry of `taskCanDoList` with no pump, so the window was dead for `300 ms x entries` — **measured 8092 ms**, against about five seconds before a desktop calls a window unresponsive. The wait became 200 ms and `processInterfaceEvents()` follows every one of them, **in both `evolutionLoop` overloads**; the MetaGP one carries the same loop and a change to one only is a half fix. **Item 38 cut the wait to 5 ms on 2026-09-23, by decision, measured in its Done entry.** **Measured after, at 200 ms: 397 ms**, which is one iteration; **on `main` 2026-09-22, 210 ms** worst over 800 gaps, one generation of `twoBases`. Time per generation: 73.3 s at 300 ms, 69.8 s at 200 ms, one seed-0 run each. The headless `sigel <experiment>` run gets the same wait, with no interface to serve. `passive time` now caps every pump, not one per pass. **`haveABreak` is renamed `processInterfaceEvents`**: it takes no break, it gives the interface its only chance to handle input while the run holds the thread. Ten sites. **The risk this accepts:** the pump now runs inside the sweep over `taskCanDoList`, before each entry's tournament is taken. `canDoIdx`, `touchsCounter`, `sweepCounter`, the population and, in the MetaGP overload, `MetaClassifier` are live across it. Nothing the run lock leaves open changes them: during a run Start is refused, 29 actions are greyed, every experiment's individuals list is cut, and the tree menu offers only Stop. **Stop still waits for the end of the pass**, as it did before D43; the inner loop does not test `userTerminated`. Left so by decision 2026-09-22. **Not checked:** no check starts a run; the `evolution` scenario prints the worst gap between pumps and the time per generation. **Confirmed on the real desktop on 2026-09-18: the window answers during a run.** |
 
 
 ---
@@ -880,9 +880,21 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-09-23 — DONE: ITEM 38. THE POLL WAIT IN `evolutionLoop` IS 5 MS.**
+Start here.
+
+- **The wait before each `taskCanDoList` entry is 5 ms**, in both
+  `evolutionLoop` overloads, by decision; it was 200 ms. On `twoBases` with 1
+  slave a generation takes 13.3 s, against 128.7 s. The measurements are in
+  item 38's Done entry.
+- **Items 14 and 13 are still paused**, as in the entry below.
+- **The OpenGL items 20, 26, 41, 42 and 43 were assessed**, read-only, not
+  recorded yet. One finding for item 43: `SIG_Visualisation::setAmbientSceneColor`
+  calls `glLightModelfv` from the slider's slot with no `makeCurrent()`, so
+  the call may not reach the view's context.
+
 **2026-09-22 — PAUSED: ITEMS 14 AND 13. THE GERMAN OUTPUT TEXT IS ENGLISH NOW;
 34 GERMAN NAMES ARE LEFT, BY DECISION.**
-Start here.
 
 - **Where it stands:** everything below is committed and pushed, and the tree is
   clean. Item 13 is finished apart from the text kept by decision. Item 14 is
@@ -4212,8 +4224,9 @@ carried; other items and this file cite them, so they do not change.
   committed 2026-09-22. `SIG_GPManager::evolutionLoop` pumped the interface
   once per pass of its outer loop and then slept 300 ms before every entry of
   `taskCanDoList` with no pump, so the window was dead for `300 ms x entries`.
-  **Measured 8092 ms.** The wait is now 200 ms and `processInterfaceEvents`
-  follows every one of them, in both `evolutionLoop` overloads. **Measured
+  **Measured 8092 ms.** The wait became 200 ms (5 ms since item 38) and
+  `processInterfaceEvents` follows every one of them, in both `evolutionLoop`
+  overloads. **Measured
   after: 397 ms**, one iteration. Confirmed on the real desktop.
 
 - [x] **25. Dialogs with no parent can end up out of sight** — done
@@ -4262,6 +4275,56 @@ carried; other items and this file cite them, so they do not change.
   experiment, and during a run on another experiment. Teeth-tested both ways.
   That is also what makes the right-click `Stop` crash unreachable — PORTING.md
   section 9.
+
+- [x] **38. Does the poll interval in `evolutionLoop` earn its length?** —
+  done 2026-09-23, by decision: **the wait is 5 ms**, in both `evolutionLoop`
+  overloads, where it was 200 ms (D43) and 300 ms in 1.3. An exception to D33,
+  like D43. The comment now gives the reason for the value.
+  - **Why a wait at all.** `checkTask` only polls (`pvm_probe`), so the loop
+    has nothing that blocks. 1.3's comment said a delay gained performance;
+    its measurements are not on record. A wait costs time because a finished
+    result sits until the loop reaches its entry.
+  - **Method.** `guidrive`'s `evolution` scenario from `sigelApp/` with the
+    launcher's environment, `QT_QPA_PLATFORM=offscreen`,
+    `SIGEL_GENERATIONS=2`, `twoBases` with the GP `RANDOMSEED` set to 12345, a
+    fresh copy per run. One guidrive build per value, the tree restored after
+    each build. Values rotated per round. Master CPU from `/usr/bin/time`.
+    Every run was valid: `POOLGENERATION` 203 → 205, 100 fitness values, no
+    `pvmd3` left.
+  - **Same work.** With 1 slave, all 60 saved populations are identical, so
+    only timing differs. With 4 slaves each run evolves differently, because
+    results arrive in a different order.
+  - **Seconds per generation**, median (min–max), 5 runs per cell, 10 where two
+    sweeps ran the same cell:
+
+    | wait | 1 slave | 4 slaves |
+    |---|---|---|
+    | `usleep(0)` | 9.0 (9.0–10.5), 10 runs | 2.4 (2.4–2.8) |
+    | 1 ms | 10.3 (10.1–10.6) | 2.8 (2.7–3.1) |
+    | 5 ms | 13.3 (12.9–13.4) | 3.7 (3.4–4.1) |
+    | 10 ms | 16.0 (15.9–17.0) | 4.1 (4.0–5.0) |
+    | 25 ms | 28.9 (27.8–29.0) | 7.6 (6.3–8.2) |
+    | 50 ms | 53.6 (53.5–54.1), 10 runs | 13.6 (12.5–14.4) |
+    | 100 ms | 105.7 (105.7–105.9) | — |
+    | 200 ms | 128.7 (128.6–136.0), 10 runs | 45.6 (42.5–47.8) |
+    | 300 ms | 192.4 (192.4–196.9) | — |
+
+  - Above 100 ms the time does not grow in proportion to the wait; not
+    explained. D43's 73.3 s and 69.8 s came from seed-0 runs, which evolve
+    different programs, so they do not compare with this table.
+  - **Worst gap between event pumps**, median: about 50–65 ms at 0, 10, 25 and
+    50 ms; 184–204 ms at 1 and 5 ms, not explained; 214 ms at 200 ms. No run
+    exceeded 433 ms.
+  - **Headless `sigel -e`**, 1 slave, 2 generations, one run each: `usleep(0)`
+    18.3 s, 1.0 s master CPU, about 5.7% in `ps`; 1 ms 21.1 s, 0.17 s, about
+    0.8%; 5 ms 26.7 s, 0.12 s, about 0.4%; 200 ms 256.7 s, 0.21 s.
+  - **`usleep(0)` is not "no wait".** It still calls `clock_nanosleep`, and the
+    kernel's timer slack here is 50 µs, so the master sleeps about 50 µs per
+    call. Under `strace -f` the loop made 3.9 million of those calls and
+    629,000 `pselect6` calls. Removing the call was not measured; nothing
+    would then sleep in the loop.
+  - **Not measured:** remote hosts, more than 4 slaves, other experiments, other
+    machines. This machine has 4 cores.
 
 - [x] **40. Keep one two-bases experiment; remove the other five, here and on the
   x86 machine.** All six were judged side by side on 1.3 and the port, 2026-09-19,

@@ -5892,19 +5892,16 @@ static int guidriveMain(int argc, char **argv)
         });
         runEndedBox.start(50);
 
-        // How long does the window go without handling an event? The evolution
-        // runs on the GUI thread, and the window answers only when
-        // SIG_GUIGPManager::processInterfaceEvents runs -- after every 200 ms
-        // wait in SIG_GPManager::evolutionLoop, and in evalNewIndis and
-        // evalNeededIndis -- or when SIG_GPPopulation::writeToFile processes
-        // events. This timer asks to fire every 50 ms; a missed tick fires once
-        // at the next pump, so the gap it sees is the time the window was dead.
-        // The first tick is not a gap: it ends the time before the first pump.
+        // Worst time the window cannot answer. The run holds the GUI thread and
+        // pumps events only in SIG_GUIGPManager::processInterfaceEvents and
+        // SIG_GPPopulation::writeToFile. This 50 ms timer can tick only at a pump, so
+        // the longest time between two ticks is the longest the window was dead.
         QElapsedTimer gapClock;
         qint64 worstGapMs = 0, gapSamples = 0;
         QTimer gapProbe;
         QObject::connect(&gapProbe, &QTimer::timeout, [&]() {
             const qint64 since = gapClock.restart();
+            // The first tick marks the first pump; there is no gap before it.
             if (gapSamples++ && since > worstGapMs) worstGapMs = since;
         });
         gapClock.start();

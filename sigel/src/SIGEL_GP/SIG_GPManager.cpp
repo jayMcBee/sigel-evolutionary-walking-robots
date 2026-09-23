@@ -111,13 +111,12 @@ void SIGEL_GP::SIG_GPManager::evolutionLoop() {
       qsizetype canDoIdx = 0;   // was an iterator: Qt 2's list was linked
 
       while (canDoIdx < taskCanDoList.size()) {
-      // Wait before each entry; most entries only poll checkTask for a result.
-      // The interface cannot handle input while this thread sleeps, so process
-      // its events after the wait.
+      // Poll interval: long enough not to spin a core, short enough that
+      // finished results do not wait. Interface events are processed after it.
 #ifdef _WINDOWS
-      Sleep(200);
+      Sleep(5);
 #else
-      usleep(200000);
+      usleep(5000);
 #endif	
       processInterfaceEvents();
 
@@ -1364,13 +1363,12 @@ void SIGEL_GP::SIG_GPManager::evolutionLoop(MT_Classifier *MetaClassifier)
 
   	  while (canDoIdx < taskCanDoList.size())
 	    {
-				// Wait before each entry; most entries only poll checkTask for a
-				// result. The interface cannot handle input while this thread
-				// sleeps, so process its events after the wait.
+				// Poll interval: long enough not to spin a core, short enough that
+				// finished results do not wait. Interface events are processed after it.
 #ifdef _WINDOWS
-				Sleep(200);
-#else								
-				usleep(200000);
+				Sleep(5);
+#else
+				usleep(5000);
 #endif				
 				processInterfaceEvents();
 
