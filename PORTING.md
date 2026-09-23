@@ -895,10 +895,10 @@ Start here.
   the list is in the table of divergences from 1.3. Menu items and buttons are
   unchanged.
 - **Items 14 and 13 are still paused**, as in the entry below.
-- **The OpenGL items 20, 26, 41, 42 and 43 were assessed**, read-only, not
-  recorded yet. One finding for item 43: `SIG_Visualisation::setAmbientSceneColor`
-  calls `glLightModelfv` from the slider's slot with no `makeCurrent()`, so
-  the call may not reach the view's context.
+- **The OpenGL items 20, 26, 41, 42 and 43 were assessed**, read-only. Causes,
+  evidence and fix options are in each item in `future_refactorings.md`, with
+  two new items from the same work: 61, the terrain row order, and 62, GL state
+  set outside `initializeGL`. Suggested order: 43, 20, 41, then 26 and 42.
 
 **2026-09-22 — PAUSED: ITEMS 14 AND 13. THE GERMAN OUTPUT TEXT IS ENGLISH NOW;
 34 GERMAN NAMES ARE LEFT, BY DECISION.**

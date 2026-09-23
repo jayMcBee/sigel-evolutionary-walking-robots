@@ -223,6 +223,14 @@ touched, because changing one changes behaviour against the reference binary.
   leaks one `SIG_RenderRecorder`. The other half was fixed by nulling
   `visualisation`. Becomes live the moment any caller catches that throw and
   continues.
+  **Assessed 2026-09-23, read-only.** Latent today: the only caller that
+  catches the throw, `sigel_slave`'s `main`, returns at once. Three fixes, none
+  changes behaviour: `renderRecorder` as a `std::unique_ptr` (the destructor
+  must still delete `simulation` first, because `SIG_Simulation` holds a
+  reference to the recorder); a try/catch in the constructor that deletes it and
+  throws again; or a value member. *Larger and related:*
+  `SIG_Simulation::~SIG_Simulation` is empty, in 1.3 too, so every Stop in the
+  viewer leaks the whole simulation — the §10 leak in PORTING.md.
 
 - [ ] **53. DynaMechs returns uninitialised forces for end links.**
   `dmArticulation::getForces` copies the `f_star` of each movable link. But
@@ -314,8 +322,15 @@ touched, because changing one changes behaviour against the reference binary.
   `SIG_SimulationVisualisation::getRobotRotation`, to the look point. `fovy` is a local constant in
   `SIG_Visualisation::updateAspectRatio` and needs one shared home.
   *Found alongside:* `SIG_SimulationVisualisationWidget::visualizeThis` calls
-  `resizeGL` with logical pixels where Qt uses device pixels. Not measurable
-  here; the harness pins the ratio to 1.
+  `resizeGL` with logical pixels where Qt uses device pixels. **Harmless,
+  assessed 2026-09-23:** Qt 6.10's `QOpenGLWidget` sets the viewport in device
+  pixels itself before each `paintGL`, and the aspect ratio is the same in both.
+  **Assessed 2026-09-23, read-only:** the analysis above holds against the code.
+  A simpler fit than the vertex walk: a box from the link positions at time 0 in
+  `SIG_RenderRecorder`, plus a margin, all inside the viewer. LIGHT0 sits at the
+  eye with linear attenuation (`SIG_Visualisation`'s constructor), so a camera
+  further out makes the lit modes darker; this touches 41 and 43 too. A fit is a
+  divergence from 1.3; item 41's fixed start value can stand in until then.
 
 - [ ] **27. Name the three signals in the wildcard disconnect.**
   `SIG_AllIndividualsView::slotEvolutionNotRunning` calls
@@ -408,6 +423,14 @@ touched, because changing one changes behaviour against the reference binary.
   To see the twoBases and hammer robots on 1.3, the oracle moved the slider 3
   page steps out, from 10 to 70. A new default is a deliberate divergence from
   1.3; the value, and whether trace stays on, need sign-off.
+  **Assessed 2026-09-23, read-only.** The checkbox decides in the end:
+  `SIG_SimulationWidget::visualizeThis` calls `slotSetTraceRobot` with its state,
+  and with trace on the seven navigation buttons are disabled. Fixes, each a
+  change to `SIG_SimulationWidgetBase.ui` only: start the slider at 70; untick
+  `traceRobotCheckBox` (the two hard-coded `true` values can stay); or leave it
+  to item 26's fit. Unticking alone lets the robot walk out of view. The GUI
+  baseline records widget values and will move. The view is dimmer further out,
+  as item 26 says.
 
 - [ ] **42. The 3-D view puts the robot at a corner of the grid, not in its
   middle.** Seen 2026-09-19: in the 3-D view the robot stands at a corner of the
@@ -417,6 +440,18 @@ touched, because changing one changes behaviour against the reference binary.
   does not set it; the robot starts at the experiment's `STARTPOSITION`, which is
   `0 1 0` in `twoBasesSimpleFitness1`, so at the grid's corner. The same code is
   in 1.3. Not yet compared with 1.3 by eye.
+  **Assessed 2026-09-23, read-only.** The view shows the physics correctly.
+  `SIG_Environment::generateTerrain` writes the grid for x and z from 0 up, and
+  DynaMechs' `dmEnvironment::getGroundDepth` clamps to the nearest edge height
+  past it, so the physics ground goes on flat without end; only the drawing
+  stops. No shipped experiment sets `FLOORDIMENSION`, so the default 50 x 50 flat
+  floor applies. The change is from 1.0 to 1.3, not from the port: 1.0 drew a
+  plane centred on the look point and moved it with the camera; 1.3 left the
+  `xPos` and `zPos` for that computed in `SIG_EnvironmentRenderer::render` and
+  unused. The forced grid spacing of 1 is harmless. Fixes: draw ground past the
+  terrain, at the edge height (view only; care for hilly floors); move the start
+  to the centre (every position, the floating-point results and fitness move
+  against 1.3 — risky); or write the behaviour down.
 
 - [ ] **43. The ambient light slider seems to do nothing in the 3-D view.** Seen
   2026-09-19: moving the ambient slider in the 3-D view shows no change.
@@ -428,6 +463,38 @@ touched, because changing one changes behaviour against the reference binary.
   `initializeGL`, `paintGL` and `resizeGL` unless `makeCurrent()` is called, so
   the call may reach no context; and ambient light has no effect while lighting
   is off, which may be so in wireframe mode. Not yet compared with 1.3.
+  **Assessed 2026-09-23, read-only; both causes hold.** Wireframe, the default
+  render mode, turns lighting off in `SIG_Visualisation::visualize`, as in 1.3.
+  The context is the port's: no `makeCurrent()` precedes the call (confirmed in
+  the code). Qt 2's `updateGL()` left the context current, so 1.3's slider worked
+  in the lit modes. The first value, 50, still reaches the scene, because
+  `SIG_SimulationWidget::visualizeThis` sets it just after
+  `SIG_SimulationVisualisationWidget::visualizeThis` made the context current.
+  To confirm: set Flatshaded and move the slider. Fixes, both restoring 1.3's
+  behaviour: `makeCurrent()`/`doneCurrent()` in
+  `SIG_VisualisationWidget::setAmbientLighting`; or keep the value and call
+  `glLightModelfv` in `SIG_Visualisation::visualize`, inside `paintGL`, which
+  also survives a new context. Greying the slider in wireframe mode would be a
+  divergence and needs sign-off.
+
+- [ ] **61. The terrain is the transpose of its floor function.** Found
+  2026-09-23 in the item 42 assessment, read-only.
+  `SIG_Environment::generateTerrain` writes the rows z-major; DynaMechs'
+  `dmEnvironment::loadTerrainData` reads them x-major. So the floor is f(z, x),
+  not f(x, z), and a floor whose X and Z sizes differ is misread. Physics and
+  drawing read the same array, so the view stays true to the physics. In 1.3
+  too; no shipped experiment sets `FLOORDIMENSION`, so none reaches it. A fix
+  changes physics for asymmetric or non-square floors, so it needs a decision.
+
+- [ ] **62. The 3-D view sets its GL state outside `initializeGL`.** Found
+  2026-09-23 in the OpenGL assessment, read-only. `SIG_Visualisation`'s
+  constructor sets up the lights, and the renderers build their display lists in
+  their constructors. Qt 6 destroys a `QOpenGLWidget`'s context and makes a new
+  one when the widget moves to another top-level window, and all that state
+  would be lost. `QOpenGLWidget::makeCurrent` also does nothing until the widget
+  is initialised, so `visualizeThis` depends on the window being shown first;
+  `sigel_slave` shows it first, so this works today. It matters only if the
+  viewer is ever docked or moved to another window.
 
 - [ ] **47. `sigelDynClient` and `manage_dyn_slave`.** `sigelDynClient` makes a
   second machine a dynamic slave of a master started with `sigel -de`, which
