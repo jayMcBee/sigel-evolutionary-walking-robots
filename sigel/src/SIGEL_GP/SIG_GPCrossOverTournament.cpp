@@ -125,7 +125,7 @@ bool SIGEL_GP::SIG_GPCrossOverTournament::run()
      };
 
 #ifdef SIG_DEBUG
-   SIGEL_Tools::SIG_IO::cerr <<"\nthe Individuals " <<winnerPos1<<" and "<<winnerPos2<<" winns the Tournament and will be crossed..\n";
+   SIGEL_Tools::SIG_IO::cerr <<"\nthe Individuals " <<winnerPos1<<" and "<<winnerPos2<<" winns the Tournament and will be crossed.." << Qt::endl;
 #endif
 
    QList< SIG_GPIndividual * > cinds = SIG_GPOperations::crossOver(*winner1,
@@ -139,7 +139,7 @@ bool SIGEL_GP::SIG_GPCrossOverTournament::run()
 								   languageP);
 
 #ifdef SIG_DEBUG
-   SIGEL_Tools::SIG_IO::cerr <<"the Individuals have been crossed and inserted at the Pool Positions " <<looserPos1<<" and "<<looserPos2<<" .\n";
+   SIGEL_Tools::SIG_IO::cerr <<"the Individuals have been crossed and inserted at the Pool Positions " <<looserPos1<<" and "<<looserPos2<<" ." << Qt::endl;
 #endif
 
    SIG_GPIndividual &looser1 = gpPool.getIndividual( looserPos1 );

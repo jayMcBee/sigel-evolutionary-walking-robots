@@ -125,22 +125,22 @@ namespace SIGEL_Robot {
 	  SIGEL_Tools::SIG_IO::cerr << "B:";
 	  for (int i=0; i<3; i++)
 	    SIGEL_Tools::SIG_IO::cerr << " " << _winportB.get( i );
-	  SIGEL_Tools::SIG_IO::cerr << "\n";
+	  SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 
 	  SIGEL_Tools::SIG_IO::cerr << "C:";
 	  for (int i=0; i<3; i++)
 	    SIGEL_Tools::SIG_IO::cerr << " " << _winportC.get( i );
-	  SIGEL_Tools::SIG_IO::cerr << "\n";
+	  SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 
 	  SIGEL_Tools::SIG_IO::cerr << "otherB:";
 	  for (int i=0; i<3; i++)
 	    SIGEL_Tools::SIG_IO::cerr << " " << otherB.get( i );
-	  SIGEL_Tools::SIG_IO::cerr << "\n";
+	  SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 
 	  SIGEL_Tools::SIG_IO::cerr << "otherC:";
 	  for (int i=0; i<3; i++)
 	    SIGEL_Tools::SIG_IO::cerr << " " << otherC.get( i );
-	  SIGEL_Tools::SIG_IO::cerr << "\n";
+	  SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 #endif
 
 	  DL_matrix firstRotation;
@@ -186,26 +186,26 @@ namespace SIGEL_Robot {
 	  firstRotation.times( &bufferVector, &otherC );
 
 #ifdef SIG_DEBUG
-	  SIGEL_Tools::SIG_IO::cerr << "otherB and otherC have been rotated.\n";
+	  SIGEL_Tools::SIG_IO::cerr << "otherB and otherC have been rotated." << Qt::endl;
 	  SIGEL_Tools::SIG_IO::cerr << "B:";
 	  for (int i=0; i<3; i++)
 	    SIGEL_Tools::SIG_IO::cerr << " " << _winportB.get( i );
-	  SIGEL_Tools::SIG_IO::cerr << "\n";
+	  SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 
 	  SIGEL_Tools::SIG_IO::cerr << "C:";
 	  for (int i=0; i<3; i++)
 	    SIGEL_Tools::SIG_IO::cerr << " " << _winportC.get( i );
-	  SIGEL_Tools::SIG_IO::cerr << "\n";
+	  SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 
 	  SIGEL_Tools::SIG_IO::cerr << "otherB:";
 	  for (int i=0; i<3; i++)
 	    SIGEL_Tools::SIG_IO::cerr << " " << otherB.get( i );
-	  SIGEL_Tools::SIG_IO::cerr << "\n";
+	  SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 
 	  SIGEL_Tools::SIG_IO::cerr << "otherC:";
 	  for (int i=0; i<3; i++)
 	    SIGEL_Tools::SIG_IO::cerr << " " << otherC.get( i );
-	  SIGEL_Tools::SIG_IO::cerr << "\n";
+	  SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 #endif
 
 	  DL_matrix secondRotation;
@@ -266,26 +266,26 @@ namespace SIGEL_Robot {
 	  bufferVector = otherC;
 	  secondRotation.times( &bufferVector, &otherC );
 
-	  SIGEL_Tools::SIG_IO::cerr << "otherB and otherC have been rotated.\n";
+	  SIGEL_Tools::SIG_IO::cerr << "otherB and otherC have been rotated." << Qt::endl;
 	  SIGEL_Tools::SIG_IO::cerr << "B:";
 	  for (int i=0; i<3; i++)
 	    SIGEL_Tools::SIG_IO::cerr << " " << _winportB.get( i );
-	  SIGEL_Tools::SIG_IO::cerr << "\n";
+	  SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 
 	  SIGEL_Tools::SIG_IO::cerr << "C:";
 	  for (int i=0; i<3; i++)
 	    SIGEL_Tools::SIG_IO::cerr << " " << _winportC.get( i );
-	  SIGEL_Tools::SIG_IO::cerr << "\n";
+	  SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 
 	  SIGEL_Tools::SIG_IO::cerr << "otherB:";
 	  for (int i=0; i<3; i++)
 	    SIGEL_Tools::SIG_IO::cerr << " " << otherB.get( i );
-	  SIGEL_Tools::SIG_IO::cerr << "\n";
+	  SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 
 	  SIGEL_Tools::SIG_IO::cerr << "otherC:";
 	  for (int i=0; i<3; i++)
 	    SIGEL_Tools::SIG_IO::cerr << " " << otherC.get( i );
-	  SIGEL_Tools::SIG_IO::cerr << "\n";
+	  SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 #endif
 
 	  NEWMAT::Matrix transformation( 4, 4 );
@@ -360,7 +360,7 @@ namespace SIGEL_Robot {
 #ifdef SIG_DEBUG
 		SIGEL_Tools::SIG_IO::cerr << "Computing the transformation of "
 					  << someIdentifier
-					  << "\n";
+					  << Qt::endl;
 #endif
 
 

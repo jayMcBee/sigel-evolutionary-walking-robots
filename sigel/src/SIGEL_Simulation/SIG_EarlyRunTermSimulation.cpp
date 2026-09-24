@@ -38,7 +38,7 @@ SIGEL_Simulation::SIG_EarlyRunTermSimulation::SIG_EarlyRunTermSimulation(SIGEL_R
   // need a SIG_GPFullDataRecorder type recorder !
   ertRecorder = dynamic_cast<SIGEL_GP::SIG_GPFullDataRecorder *>(&theRecorder);
   if (!ertRecorder)
-  {   SIGEL_Tools::SIG_IO::cerr << "SIG_EarlyRunTermSimulation needs a recorder of type SIG_GPFullDataRecorder to work !\n";
+  {   SIGEL_Tools::SIG_IO::cerr << "SIG_EarlyRunTermSimulation needs a recorder of type SIG_GPFullDataRecorder to work !" << Qt::endl;
   }
 }
 

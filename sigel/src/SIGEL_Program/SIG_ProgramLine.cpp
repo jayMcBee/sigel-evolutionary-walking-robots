@@ -177,7 +177,7 @@ int SIGEL_Program::SIG_ProgramLine::getInstructionElement( int no )
 
       SIGEL_Tools::SIG_IO::cerr << "\n[ProgramLine.cpp<getInstructionElement>]: Invalid access, no="
 				<< no << ", elementNo=" 
-				<< getNumberOfElements() << "\n";
+				<< getNumberOfElements() << Qt::endl;
 #endif
 
       // ToDo: Exception ???
@@ -203,7 +203,7 @@ int SIGEL_Program::SIG_ProgramLine::getElement( int no )
 
       SIGEL_Tools::SIG_IO::cerr << "\n[ProgramLine.cpp<getInstructionElement>]: Invalid access, no="
 				<< no << ", elementNo=" 
-				<< getNumberOfElements() << "\n";
+				<< getNumberOfElements() << Qt::endl;
       
 #endif
 
@@ -231,7 +231,7 @@ void SIGEL_Program::SIG_ProgramLine::setElement(int no, int value)
 
       SIGEL_Tools::SIG_IO::cerr << "\n[ProgramLine.cpp<setElement>]: Invalid access, no="
 				<< no << ", elementNo=" 
-				<< getNumberOfElements() << "\n";
+				<< getNumberOfElements() << Qt::endl;
      
 #endif
 
@@ -248,7 +248,7 @@ void SIGEL_Program::SIG_ProgramLine::print()
   QString prgLine = "";
 
   printToString( prgLine );
-  SIGEL_Tools::SIG_IO::cerr << prgLine;
+  SIGEL_Tools::SIG_IO::cerr << prgLine << Qt::flush;
 
 }
 
@@ -256,13 +256,6 @@ void SIGEL_Program::SIG_ProgramLine::printToString(QString &lineStr)
 {
   
   bool ok = false;
-
-#ifdef SIG_DEBUG
-
-  //SIGEL_Tools::SIG_IO::cerr << "\n LINE: ";
-  //print(); 
- 
-#endif
 
    lineStr="";
 
@@ -371,26 +364,11 @@ void SIGEL_Program::SIG_ProgramLine::readOneRegister(QString &str, int &reg)
 
      str=str.simplified() + '\n' ;
 
-#ifdef SIG_DEBUG
-
-     // SIGEL_Tools::SIG_IO::cerr << "\nLINE TO READ: ";    
-     // SIGEL_Tools::SIG_IO::cerr << str;
-     
-#endif     
-
      pos1    = str.indexOf(QChar(' '), 1, Qt::CaseInsensitive);
      pos2    = str.indexOf(QChar('\n'), 1, Qt::CaseInsensitive);
 
      regStr1 = str.mid( pos1 + 1, pos2 - pos1 - 1 );
      reg     = regStr1.toInt( &ok, 10 );
-
-#ifdef SIG_DEBUG     
-
-     // SIGEL_Tools::SIG_IO::cerr << " One Register <"
-     //                           << regStr1
-     //                           << "> found.";
-
-#endif
 
 }
 
@@ -403,13 +381,6 @@ void SIGEL_Program::SIG_ProgramLine::readOneRegisterAndIntegerConstant(QString &
 
      str=str.simplified() + '\n';
 
-#ifdef SIG_DEBUG
-
-     // SIGEL_Tools::SIG_IO::cerr << "\nLINE TO READ: ";    
-     // SIGEL_Tools::SIG_IO::cerr << str;
-     
-#endif
-  
      pos1     = str.indexOf(QChar(' '), 1, Qt::CaseInsensitive);
      pos2     = str.indexOf(QChar(','), pos1, Qt::CaseInsensitive);
 
@@ -421,17 +392,6 @@ void SIGEL_Program::SIG_ProgramLine::readOneRegisterAndIntegerConstant(QString &
 
      cnstStr1 = str.mid( pos3 + 1, pos4 - pos3 - 1 );         
      cnst     = cnstStr1.toInt( &ok, 10 );
-
-#ifdef SIG_DEBUG
-
-     // SIGEL_Tools::SIG_IO::cerr << " One Register <"
-     //                           << regStr1
-     //                           << "> and one constant ";
-     // SIGEL_Tools::SIG_IO::cerr << "<"
-     //                           << cnstStr1
-     //                           << "> found.";
-     
-#endif
 
 }
 
@@ -445,13 +405,6 @@ void SIGEL_Program::SIG_ProgramLine::readTwoRegisters(QString &str,int &reg1,int
 
      pos1 = str.indexOf(QChar(' '), pos1, Qt::CaseInsensitive);
 
-#ifdef SIG_DEBUG
-
-     // SIGEL_Tools::SIG_IO::cerr << "\nLINE TO READ: ";    
-     // SIGEL_Tools::SIG_IO::cerr << str;
-     
-#endif
-
      pos1    = str.indexOf(QChar(' '), 1, Qt::CaseInsensitive);
      pos2    = str.indexOf(QChar(','), pos1, Qt::CaseInsensitive);
 
@@ -464,17 +417,6 @@ void SIGEL_Program::SIG_ProgramLine::readTwoRegisters(QString &str,int &reg1,int
      regStr2 = str.mid( pos3 + 1, pos4 - pos3 - 1 );         
      reg2    = regStr2.toInt( &ok, 10 );
 
-#ifdef SIG_DEBUG
-
-     // SIGEL_Tools::SIG_IO::cerr << " Two Registers <"
-     //                           << regStr1
-     //                           << "> and ";
-     // SIGEL_Tools::SIG_IO::cerr << "<"
-     //                           << regStr2
-     //                           << "> found.";
-     
-#endif
-
 }
 
 
@@ -483,12 +425,6 @@ bool SIGEL_Program::SIG_ProgramLine::readFromFile(QString &str, SIGEL_Program::S
      int  reg1=0, reg2=0;
      int  cnst1=0;
      bool lineOK = false;
-
-#ifdef SIG_DEBUG
-
-     //     SIGEL_Tools::SIG_IO::cerr << ".";
-     
-#endif
 
      if(str.contains(QLatin1String("COPY"), Qt::CaseInsensitive))
 	{
@@ -798,7 +734,7 @@ void SIGEL_Program::SIG_ProgramLine::randomRobotinstruction(SIGEL_Robot::SIG_Lan
        }
         	
      if( maximumValue == 0 )
-        SIGEL_Tools::SIG_IO::cerr << "\nERROR: If no instructions are allowed, no instructions can be used !\n";
+        SIGEL_Tools::SIG_IO::cerr << "\nERROR: If no instructions are allowed, no instructions can be used !" << Qt::endl;
 
      randomValue = r.getRandomLong( maximumValue );
   

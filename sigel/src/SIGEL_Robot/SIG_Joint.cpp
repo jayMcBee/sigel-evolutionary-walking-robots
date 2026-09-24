@@ -259,12 +259,12 @@ namespace SIGEL_Robot {
 #ifdef SIG_DEBUG
 	 SIGEL_Tools::SIG_IO::cerr << "Initial rotation of link "
 				   << successor->getName()
-				   << ":\n";
+				   << ":" << Qt::endl;
 	 for (int i=0; i<3; i++)
 	   {
 	     for (int j=0; j<3; j++)
 	       SIGEL_Tools::SIG_IO::cerr << successorsInitialRotation.get( i, j ) << " ";
-	     SIGEL_Tools::SIG_IO::cerr << "\n";
+	     SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 	   };
 #endif
 
@@ -310,32 +310,32 @@ namespace SIGEL_Robot {
 	 SIGEL_Tools::SIG_IO::cerr << "succOrigin: ";
 	 for (int i=0; i<3; i++)
 	   SIGEL_Tools::SIG_IO::cerr << " " << succOrigin.get( i );
-	 SIGEL_Tools::SIG_IO::cerr << "\n";
+	 SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 
 	 SIGEL_Tools::SIG_IO::cerr << "succZAxis: ";
 	 for (int i=0; i<3; i++)
 	   SIGEL_Tools::SIG_IO::cerr << " " << succZAxis.get( i );
-	 SIGEL_Tools::SIG_IO::cerr << "\n";
+	 SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 
 	 SIGEL_Tools::SIG_IO::cerr << "predXSuccZNormal: ";
 	 for (int i=0; i<3; i++)
 	   SIGEL_Tools::SIG_IO::cerr << " " << predXSuccZNormal.get( i );
-	 SIGEL_Tools::SIG_IO::cerr << "\n";
+	 SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 
 	 SIGEL_Tools::SIG_IO::cerr << "predOrigin: ";
 	 for (int i=0; i<3; i++)
 	   SIGEL_Tools::SIG_IO::cerr << " " << predOrigin.get( i );
-	 SIGEL_Tools::SIG_IO::cerr << "\n";
+	 SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 
 	 SIGEL_Tools::SIG_IO::cerr << "predXAxis: ";
 	 for (int i=0; i<3; i++)
 	   SIGEL_Tools::SIG_IO::cerr << " " << predXAxis.get( i );
-	 SIGEL_Tools::SIG_IO::cerr << "\n";
+	 SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 
 	 SIGEL_Tools::SIG_IO::cerr << "Cut: ";
 	 for (int i=0; i<3; i++)
 	   SIGEL_Tools::SIG_IO::cerr << " " << cut.get( i );
-	 SIGEL_Tools::SIG_IO::cerr << "\n";
+	 SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 #endif
 
 	 mdh_a = h.norm();
@@ -350,12 +350,12 @@ namespace SIGEL_Robot {
 	 SIGEL_Tools::SIG_IO::cerr << "predZAxis:";
 	 for (int i=0; i<3; i++)
 	   SIGEL_Tools::SIG_IO::cerr << " " << predZAxis.get( i );
-	 SIGEL_Tools::SIG_IO::cerr << "\n";
+	 SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 
 	 SIGEL_Tools::SIG_IO::cerr << "succZAxis:";
 	 for (int i=0; i<3; i++)
 	   SIGEL_Tools::SIG_IO::cerr << " " << succZAxis.get( i );
-	 SIGEL_Tools::SIG_IO::cerr << "\n";
+	 SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 #endif
 
 	 mdh_alpha = tolerantACos( predZAxis.inprod( &succZAxis ) );
@@ -396,12 +396,12 @@ namespace SIGEL_Robot {
 	 SIGEL_Tools::SIG_IO::cerr << "Predecessor's X-Axis:";
 	 for (int i=0; i<3; i++)
 	   SIGEL_Tools::SIG_IO::cerr << " " << predXAxis.get( i );
-	 SIGEL_Tools::SIG_IO::cerr << "\n";
+	 SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 
 	 SIGEL_Tools::SIG_IO::cerr << "Successor's X-Axis:";
 	 for (int i=0; i<3; i++)
 	   SIGEL_Tools::SIG_IO::cerr << " " << succXAxis.get( i );
-	 SIGEL_Tools::SIG_IO::cerr << "\n";
+	 SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 #endif
 
 	 mdh_theta = tolerantACos( predXAxis.inprod( &succXAxis ) );
@@ -568,42 +568,42 @@ namespace SIGEL_Robot {
 		   SIGEL_Tools::SIG_IO::cerr << "predHand:";
 		   for (int i=0; i<3; i++)
 		     SIGEL_Tools::SIG_IO::cerr << " " << predHand.get( i );
-		   SIGEL_Tools::SIG_IO::cerr << "\n";
+		   SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 
 		   SIGEL_Tools::SIG_IO::cerr << "predHandProjected:";
 		   for (int i=0; i<3; i++)
 		     SIGEL_Tools::SIG_IO::cerr << " " << predHandProjected.get( i );
-		   SIGEL_Tools::SIG_IO::cerr << "\n";
+		   SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 
 		   SIGEL_Tools::SIG_IO::cerr << "predHandProjectedDir:";
 		   for (int i=0; i<3; i++)
 		     SIGEL_Tools::SIG_IO::cerr << " " << predHandProjectedDir.get( i );
-		   SIGEL_Tools::SIG_IO::cerr << "\n";
+		   SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 
 		   SIGEL_Tools::SIG_IO::cerr << "Predecessors X-Axis:";
 		   for (int i=0; i<3; i++)
 		     SIGEL_Tools::SIG_IO::cerr << " " << predXAxis.get( i );
-		   SIGEL_Tools::SIG_IO::cerr << "\n";
+		   SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 
 		   SIGEL_Tools::SIG_IO::cerr << "succHand:";
 		   for (int i=0; i<3; i++)
 		     SIGEL_Tools::SIG_IO::cerr << " " << succHand.get( i );
-		   SIGEL_Tools::SIG_IO::cerr << "\n";
+		   SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 
 		   SIGEL_Tools::SIG_IO::cerr << "succHandProjected:";
 		   for (int i=0; i<3; i++)
 		     SIGEL_Tools::SIG_IO::cerr << " " << succHandProjected.get( i );
-		   SIGEL_Tools::SIG_IO::cerr << "\n";
+		   SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 
 		   SIGEL_Tools::SIG_IO::cerr << "succHandProjectedDir:";
 		   for (int i=0; i<3; i++)
 		     SIGEL_Tools::SIG_IO::cerr << " " << succHandProjectedDir.get( i );
-		   SIGEL_Tools::SIG_IO::cerr << "\n";
+		   SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 
 		   SIGEL_Tools::SIG_IO::cerr << "Successor's X-Axis:";
 		   for (int i=0; i<3; i++)
 		     SIGEL_Tools::SIG_IO::cerr << " " << succXAxis.get( i );
-		   SIGEL_Tools::SIG_IO::cerr << "\n";
+		   SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 #endif
 
 		   double beta = tolerantACos( predHandProjectedDir.inprod( &predXAxis ) );
@@ -655,7 +655,7 @@ namespace SIGEL_Robot {
 						 << sigelMax
 						 << ", sigelMin: "
 						 << sigelMin
-						 << "\n";
+						 << Qt::endl;
 #endif
 
 		       mechsMinPos = (2 * pi) - ( (sigelMax / 360) * 2 * pi );
@@ -669,7 +669,7 @@ namespace SIGEL_Robot {
 						 << "\n"
 						 << "beta: "
 						 << beta
-						 << "\n";
+						 << Qt::endl;
 #endif
 
 		       mechsMinPos -= beta;
@@ -680,7 +680,7 @@ namespace SIGEL_Robot {
 						 << mechsMinPos
 						 << ", new mechsMaxPos: "
 						 << mechsMaxPos
-						 << "\n";
+						 << Qt::endl;
 #endif
 
 		       mechsMinPos = normalizeRadAngle( mechsMinPos );
@@ -694,7 +694,7 @@ namespace SIGEL_Robot {
 						 << "\n"
 						 << "gamma: "
 						 << gamma
-						 << "\n";
+						 << Qt::endl;
 #endif
 
 		       mechsMinPos += gamma;
@@ -705,7 +705,7 @@ namespace SIGEL_Robot {
 						 << mechsMinPos
 						 << ", new mechsMaxPos: "
 						 << mechsMaxPos
-						 << "\n";
+						 << Qt::endl;
 #endif
 
 		       mechsMinPos = normalizeRadAngle( mechsMinPos );
@@ -716,7 +716,7 @@ namespace SIGEL_Robot {
 						 << mechsMinPos
 						 << ", new mechsMaxPos: "
 						 << mechsMaxPos
-						 << "\n";
+						 << Qt::endl;
 #endif
 
 		       double const minimalAngleDistance = 0.00001;
@@ -744,7 +744,7 @@ namespace SIGEL_Robot {
 						 << mechsMinPos
 						 << ", new mechsMaxPos: "
 						 << mechsMaxPos
-						 << "\n";
+						 << Qt::endl;
 #endif
 		     };
 		 };

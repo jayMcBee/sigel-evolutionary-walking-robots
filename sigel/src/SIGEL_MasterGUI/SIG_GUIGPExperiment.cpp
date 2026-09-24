@@ -349,7 +349,7 @@ void SIG_GUIGPExperiment::slotStartEvolution()
       
       guiGPManager = new SIGEL_GP::SIG_GUIGPManager( *this );
 #ifdef SIG_DEBUG
-      SIGEL_Tools::SIG_IO::cout << "Starting Evolution\n";
+      SIGEL_Tools::SIG_IO::cout << "Starting Evolution" << Qt::endl;
 #endif
       putAllIntoExperiment();
       
@@ -441,7 +441,7 @@ void SIG_GUIGPExperiment::slotStopEvolution()
   // so the locked actions must stay locked. slotEvolutionStopped() emits it
   // after start() returns.
 #ifdef SIG_DEBUG
-  SIGEL_Tools::SIG_IO::cout << "Stopping Evolution\n";
+  SIGEL_Tools::SIG_IO::cout << "Stopping Evolution" << Qt::endl;
 #endif
   // experimentView->pushbuttonStart->setEnabled( true ); // will be done
   experimentView->pushbuttonStop->setEnabled( false );

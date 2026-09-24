@@ -51,22 +51,21 @@ extern "C"
 
     switch ( signal ) {
       case SIGABRT:
-        SIGEL_Tools::SIG_IO::cerr << "Abort\n";
+        SIGEL_Tools::SIG_IO::cerr << "Abort" << Qt::endl;
         break;
       case SIGFPE:
-        SIGEL_Tools::SIG_IO::cerr << "Arithmetic error signal\n";
+        SIGEL_Tools::SIG_IO::cerr << "Arithmetic error signal" << Qt::endl;
         break;
       case SIGILL:
-        SIGEL_Tools::SIG_IO::cerr << "Invalid execution\n";
+        SIGEL_Tools::SIG_IO::cerr << "Invalid execution" << Qt::endl;
         break;
       case SIGINT:
-        SIGEL_Tools::SIG_IO::cerr << "Asynchronous interactive attention\n";
+        SIGEL_Tools::SIG_IO::cerr << "Asynchronous interactive attention" << Qt::endl;
         break;
       case SIGSEGV:
-        SIGEL_Tools::SIG_IO::cerr << "Invalid storage access\n";
+        SIGEL_Tools::SIG_IO::cerr << "Invalid storage access" << Qt::endl;
         break;
       case SIGTERM:
-        // SIGEL_Tools::SIG_IO::cerr << "Asynchronous termination request\n";
         result = 0;
         break;
      }
@@ -229,10 +228,10 @@ int main( int argc, char *argv[] ) {
 #ifdef _WINDOWS
     SetPriorityClass( GetCurrentProcess(), IDLE_PRIORITY_CLASS);
 #endif
-    SIGEL_Tools::SIG_IO::cerr << "Master is used to evolve.\n";
+    SIGEL_Tools::SIG_IO::cerr << "Master is used to evolve." << Qt::endl;
 
     if (argc < 3) {
-      SIGEL_Tools::SIG_IO::cerr << "No experiment name supplied! Cannot start evolution loop!\n";
+      SIGEL_Tools::SIG_IO::cerr << "No experiment name supplied! Cannot start evolution loop!" << Qt::endl;
       pvm_halt();
       return 1;
     }
@@ -240,7 +239,7 @@ int main( int argc, char *argv[] ) {
     QString experimentName( argv[2] );
     QFile experimentFile( experimentName );
     if (!experimentFile.open( QIODevice::ReadOnly )) {
-      SIGEL_Tools::SIG_IO::cerr << "Error opening " << experimentName << "!\n";
+      SIGEL_Tools::SIG_IO::cerr << "Error opening " << experimentName << "!" << Qt::endl;
       pvm_halt();
       return 1;
     }
@@ -283,14 +282,14 @@ int main( int argc, char *argv[] ) {
 		// start just the meta evolution (w/o sigel)
 		if(argc < 4)
 		{
-			SIGEL_Tools::SIG_IO::cerr << "No time limit supplied. Can't start meta evolution.\nYou have to supply the time limit in minutes after the experiment filename.\n";
+			SIGEL_Tools::SIG_IO::cerr << "No time limit supplied. Can't start meta evolution.\nYou have to supply the time limit in minutes after the experiment filename." << Qt::endl;
 			pvm_halt();
 			return 1;
 		}
 		int minutes = QString(argv[3]).toInt();
 		if(minutes < 0 || minutes > 34560)
 		{
-			SIGEL_Tools::SIG_IO::cerr << "Minutes must be in the interval [0-34560].\n";
+			SIGEL_Tools::SIG_IO::cerr << "Minutes must be in the interval [0-34560]." << Qt::endl;
 			pvm_halt();
 			return 1;
 		}
@@ -306,7 +305,7 @@ int main( int argc, char *argv[] ) {
 	}
 
     if (!experimentFile.open( QIODevice::WriteOnly )) {
-      SIGEL_Tools::SIG_IO::cerr << "Error opening " << experimentName << "!\n";
+      SIGEL_Tools::SIG_IO::cerr << "Error opening " << experimentName << "!" << Qt::endl;
       pvm_halt();
       return 1;
     }

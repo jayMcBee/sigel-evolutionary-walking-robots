@@ -103,7 +103,7 @@ void SIGEL_GP::SIG_GPManager::evolutionLoop() {
 #ifdef SIG_DEBUG
       SIGEL_Tools::SIG_IO::cerr << "SIG_GPManager sweeping the taskCanDoList (sweepCounter: "
           << sweepCounter
-          << ").\n";
+          << ")." << Qt::endl;
 #endif
 
       int touchsCounter = 0;
@@ -137,7 +137,7 @@ void SIGEL_GP::SIG_GPManager::evolutionLoop() {
         << "depNumber: "
         << actTour.depNumber
         << "\n"
-        << "indis:\n";
+        << "indis:" << Qt::endl;
       for (int i = 0; i < actTour.indis.size(); i++)
         SIGEL_Tools::SIG_IO::cerr << "  indNumber: "
           << (*actTour.indis[ i ]).indNumber
@@ -147,14 +147,14 @@ void SIGEL_GP::SIG_GPManager::evolutionLoop() {
           << "\n"
           << "    fitTaskId: "
           << (*actTour.indis[ i ]).fitTaskId
-          << "\n";
+          << Qt::endl;
 #endif
 
       if (!actTour.justWaiting) {
 #ifdef SIG_DEBUG
         SIGEL_Tools::SIG_IO::cerr << "Playing tournament "
           << taskCanDoList.at( canDoIdx )
-          << "\n";
+          << Qt::endl;
 #endif
 
       actTour.run();
@@ -166,7 +166,7 @@ void SIGEL_GP::SIG_GPManager::evolutionLoop() {
 #ifdef SIG_DEBUG
           SIGEL_Tools::SIG_IO::cerr << "Individual "
             << actInd.getPoolPos()
-            << " is up to date.\n";
+            << " is up to date." << Qt::endl;
 #endif
 
           int actSuccessor = actTour.indis[i]->successor;
@@ -181,7 +181,7 @@ void SIGEL_GP::SIG_GPManager::evolutionLoop() {
 #ifdef SIG_DEBUG
           SIGEL_Tools::SIG_IO::cerr << "Individual "
             << actInd.getPoolPos()
-            << " is not up to date.\n";
+            << " is not up to date." << Qt::endl;
 #endif
 
           actTour.justWaiting = true;
@@ -234,7 +234,7 @@ void SIGEL_GP::SIG_GPManager::createTours(int quantity) {
 #ifdef SIG_DEBUG
   SIGEL_Tools::SIG_IO::cerr << "SIG_GPManager creates "
     << quantity
-    << " Tournaments.\n";
+    << " Tournaments." << Qt::endl;
 #endif
 
   //The experiment's population
@@ -261,7 +261,7 @@ void SIGEL_GP::SIG_GPManager::createTours(int quantity) {
 
     // ToDo: Throw Exception!
     if (!totalProbCount) {
-      SIGEL_Tools::SIG_IO::cerr << "Cannot create tournaments - bad probabilities!\n";
+      SIGEL_Tools::SIG_IO::cerr << "Cannot create tournaments - bad probabilities!" << Qt::endl;
       return;
     };
 
@@ -277,7 +277,7 @@ void SIGEL_GP::SIG_GPManager::createTours(int quantity) {
         << poolPositions[0]
         << " and "
         << poolPositions[1]
-        << ".\n";
+        << "." << Qt::endl;
 #endif
 
       actTour = new SIG_GPSimpleTournament(randomizer,
@@ -296,7 +296,7 @@ void SIGEL_GP::SIG_GPManager::createTours(int quantity) {
         << poolPositions[0]
         << " and "
         << poolPositions[1]
-        << ".\n";
+        << "." << Qt::endl;
 #endif
 
      actTour = new SIG_GPMutationTournament(randomizer,
@@ -338,7 +338,7 @@ void SIGEL_GP::SIG_GPManager::createTours(int quantity) {
         << poolPositions[2]
         << " and "
         << poolPositions[3]
-        << ".\n";
+        << "." << Qt::endl;
 #endif
 
       actTour = new SIG_GPCrossOverTournament(randomizer,
@@ -398,7 +398,7 @@ namespace {
 void SIGEL_GP::SIG_GPManager::evalNewIndis() {
 
 #ifdef SIG_DEBUG
-  SIGEL_Tools::SIG_IO::cerr << "SIG_GPManager evaluates new Individuals.\n";
+  SIGEL_Tools::SIG_IO::cerr << "SIG_GPManager evaluates new Individuals." << Qt::endl;
 #endif
 
   QList< QList<int> * > fitTaskList;
@@ -434,7 +434,7 @@ void SIGEL_GP::SIG_GPManager::evalNewIndis() {
 #ifdef SIG_DEBUG
       SIGEL_Tools::SIG_IO::cerr << "SIG_GPManager: Individual Number "
         << i
-        << " hasn't an actual fitness value and will be evaluated.\n";
+        << " hasn't an actual fitness value and will be evaluated." << Qt::endl;
 #endif
 
       QList<int> *actFitTask = new QList<int>(2);
@@ -448,7 +448,7 @@ void SIGEL_GP::SIG_GPManager::evalNewIndis() {
   while (!fitTaskList.isEmpty()) {
 
 #ifdef SIG_DEBUG
-    SIGEL_Tools::SIG_IO::cerr << "SIG_GPManager entering loop sweeping the fitTaskList\n";
+    SIGEL_Tools::SIG_IO::cerr << "SIG_GPManager entering loop sweeping the fitTaskList" << Qt::endl;
 #endif
 
     stopIfNecessary( true );
@@ -472,13 +472,13 @@ void SIGEL_GP::SIG_GPManager::evalNewIndis() {
         << (*actFitTask)[0]
         << ", has fitness "
         << actFitness
-        << ".\n";
+        << "." << Qt::endl;
 #endif
 
       if (actFitness != -1) {
 
 #ifdef SIG_DEBUG
-        SIGEL_Tools::SIG_IO::cerr << "Fitness is ready.\n";
+        SIGEL_Tools::SIG_IO::cerr << "Fitness is ready." << Qt::endl;
 #endif
 
         pop.getIndividual( (*actFitTask)[1] ).setFitness( actFitness );
@@ -496,7 +496,7 @@ void SIGEL_GP::SIG_GPManager::evalNewIndis() {
       else {
 
 #ifdef SIG_DEBUG
-        SIGEL_Tools::SIG_IO::cerr << "Fitness is not yet ready.\n";
+        SIGEL_Tools::SIG_IO::cerr << "Fitness is not yet ready." << Qt::endl;
 #endif
 
         prevFitTask = actFitTask;
@@ -515,7 +515,7 @@ void SIGEL_GP::SIG_GPManager::evalNewIndis() {
 void SIGEL_GP::SIG_GPManager::calcInitTourSet() {
 
 #ifdef SIG_DEBUG
-    SIGEL_Tools::SIG_IO::cerr << "SIG_GPManager is calculating the initial set of active tournaments.\n";
+    SIGEL_Tools::SIG_IO::cerr << "SIG_GPManager is calculating the initial set of active tournaments." << Qt::endl;
 #endif
 
     taskCanDoList.clear();
@@ -532,7 +532,7 @@ void SIGEL_GP::SIG_GPManager::calcInitTourSet() {
 
 #ifdef SIG_DEBUG
 	SIGEL_Tools::SIG_IO::cerr << "SIG_GPManager inspecting tournament "
-				  << i << ".\n";
+				  << i << "." << Qt::endl;
 #endif
 
         // The current tournament
@@ -546,7 +546,7 @@ void SIGEL_GP::SIG_GPManager::calcInitTourSet() {
 
 #ifdef SIG_DEBUG
 	    SIGEL_Tools::SIG_IO::cerr << "SIG_GPManager inspecting tournament individual"
-				      << j << ".\n";
+				      << j << "." << Qt::endl;
 #endif
 
 	    SIG_GPTournamentIndividual &actInd = *actTour.indis[j];
@@ -705,12 +705,12 @@ void SIGEL_GP::SIG_GPManager::run() {
 #endif
 
   if (!toursAreEmpty( tours )) {
-    SIGEL_Tools::SIG_IO::cerr << "SIG_GPManager::run() was called more than once!\n";
+    SIGEL_Tools::SIG_IO::cerr << "SIG_GPManager::run() was called more than once!" << Qt::endl;
     messageEvolutionStop();
   };
 
   if (currentExperiment.getPopulation().getSize() < 4) {
-    SIGEL_Tools::SIG_IO::cerr << "Population contains less than 4 Individuals, cannot evolve!\n";
+    SIGEL_Tools::SIG_IO::cerr << "Population contains less than 4 Individuals, cannot evolve!" << Qt::endl;
     messageEvolutionStop();
   };
 
@@ -718,7 +718,7 @@ void SIGEL_GP::SIG_GPManager::run() {
 
   for (;;) {
 #ifdef SIG_DEBUG
-    SIGEL_Tools::SIG_IO::cerr << "SIG_GPManager entering endless for-loop.\n";
+    SIGEL_Tools::SIG_IO::cerr << "SIG_GPManager entering endless for-loop." << Qt::endl;
 #endif
 
     stopIfNecessary( true );
@@ -757,7 +757,7 @@ void SIGEL_GP::SIG_GPManager::run() {
     // this is the total amount of generations evolved, since the project is created
     currentExperiment.population.poolGeneration++;
 
-    SIGEL_Tools::SIG_IO::cerr << "Computing Generation " << currentGenerationNo << "\t(" << (QDateTime::currentDateTime()).toString() << ")\n";
+    SIGEL_Tools::SIG_IO::cerr << "Computing Generation " << currentGenerationNo << "\t(" << (QDateTime::currentDateTime()).toString() << ")" << Qt::endl;
 
     // increment the age of the individuals
     for (int i=0; i < currentExperiment.population.getSize(); i++) {
@@ -803,7 +803,7 @@ void SIGEL_GP::SIG_GPManager::run() {
           << currentGenerationNo
           << ", filename: "
           << poolImageName
-          << "\n";
+          << Qt::endl;
 #endif
 
       QFile poolImage( poolImageName );
@@ -817,7 +817,7 @@ void SIGEL_GP::SIG_GPManager::run() {
       else
         SIGEL_Tools::SIG_IO::cerr << "Could not save Pool under "
           << poolImageName
-          << "!\n";
+          << "!" << Qt::endl;
     };
 
     // autosave function	
@@ -1134,12 +1134,12 @@ void SIGEL_GP::SIG_GPManager::run(MT_Classifier *MetaClassifier)
 #endif
 
     if (!toursAreEmpty( tours ))
-    {	SIGEL_Tools::SIG_IO::cerr << "SIG_GPManager::run() was called more than once!\n";
+    {	SIGEL_Tools::SIG_IO::cerr << "SIG_GPManager::run() was called more than once!" << Qt::endl;
 			messageEvolutionStop();
     };
 
     if (currentExperiment.getPopulation().getSize() < 4)
-    {	SIGEL_Tools::SIG_IO::cerr << "Population contains less than 4 Individuals, cannot evolve!\n";
+    {	SIGEL_Tools::SIG_IO::cerr << "Population contains less than 4 Individuals, cannot evolve!" << Qt::endl;
 			messageEvolutionStop();
     };
 
@@ -1148,7 +1148,7 @@ void SIGEL_GP::SIG_GPManager::run(MT_Classifier *MetaClassifier)
     for (;;)
       {
 #ifdef SIG_DEBUG
-	SIGEL_Tools::SIG_IO::cerr << "SIG_GPManager entering endless for-loop.\n";
+	SIGEL_Tools::SIG_IO::cerr << "SIG_GPManager entering endless for-loop." << Qt::endl;
 #endif
 
 	stopIfNecessary( true );
@@ -1193,7 +1193,7 @@ void SIGEL_GP::SIG_GPManager::run(MT_Classifier *MetaClassifier)
 	currentGenerationNo++;
 	currentExperiment.population.poolGeneration++;
 
-	SIGEL_Tools::SIG_IO::cerr << "Computing Generation " << currentGenerationNo << "\t(" << (QDateTime::currentDateTime()).toString() << ")\n";
+	SIGEL_Tools::SIG_IO::cerr << "Computing Generation " << currentGenerationNo << "\t(" << (QDateTime::currentDateTime()).toString() << ")" << Qt::endl;
 
 	for (int i=0; i < currentExperiment.population.getSize(); i++)
 	  {
@@ -1254,7 +1254,7 @@ void SIGEL_GP::SIG_GPManager::run(MT_Classifier *MetaClassifier)
 				      << currentGenerationNo
 				      << ", filename: "
 				      << poolImageName
-				      << "\n";
+				      << Qt::endl;
 #endif
 
 	  QFile poolImage( poolImageName );
@@ -1268,7 +1268,7 @@ void SIGEL_GP::SIG_GPManager::run(MT_Classifier *MetaClassifier)
 	  else
 	    SIGEL_Tools::SIG_IO::cerr << "Could not save Pool under "
 					<< poolImageName
-					<< "!\n";
+					<< "!" << Qt::endl;
 	  };
 
 		// autosave function	
@@ -1365,7 +1365,7 @@ void SIGEL_GP::SIG_GPManager::evolutionLoop(MT_Classifier *MetaClassifier)
 #ifdef SIG_DEBUG
     	  SIGEL_Tools::SIG_IO::cerr << "SIG_GPManager sweeping the taskCanDoList (sweepCounter: "
     				    << sweepCounter
-    				    << ").\n";
+    				    << ")." << Qt::endl;
 #endif
 
     	  int touchsCounter = 0;
@@ -1400,7 +1400,7 @@ void SIGEL_GP::SIG_GPManager::evolutionLoop(MT_Classifier *MetaClassifier)
 					<< "depNumber: "
 					<< actTour.depNumber
 					<< "\n"
-					<< "indis:\n";
+					<< "indis:" << Qt::endl;
 	      for (int i = 0; i < actTour.indis.size(); i++)
 		SIGEL_Tools::SIG_IO::cerr << "  indNumber: "
 					  << (*actTour.indis[ i ]).indNumber
@@ -1410,7 +1410,7 @@ void SIGEL_GP::SIG_GPManager::evolutionLoop(MT_Classifier *MetaClassifier)
 					  << "\n"
 					  << "    fitTaskId: "
 					  << (*actTour.indis[ i ]).fitTaskId
-					  << "\n";
+					  << Qt::endl;
 
 #endif
 
@@ -1419,7 +1419,7 @@ void SIGEL_GP::SIG_GPManager::evolutionLoop(MT_Classifier *MetaClassifier)
 #ifdef SIG_DEBUG
 		  SIGEL_Tools::SIG_IO::cerr << "Playing tournament "
 					    << taskCanDoList.at( canDoIdx )
-					    << "\n";
+					    << Qt::endl;
 #endif
 //*********************** META change 1)
 		  actTour.run(MetaClassifier);
@@ -1433,7 +1433,7 @@ void SIGEL_GP::SIG_GPManager::evolutionLoop(MT_Classifier *MetaClassifier)
 #ifdef SIG_DEBUG
 			  SIGEL_Tools::SIG_IO::cerr << "Individual "
 						    << actInd.getPoolPos()
-						    << " is up to date.\n";
+						    << " is up to date." << Qt::endl;
 #endif
 
 			  int actSuccessor = actTour.indis[i]->successor;
@@ -1451,7 +1451,7 @@ void SIGEL_GP::SIG_GPManager::evolutionLoop(MT_Classifier *MetaClassifier)
 #ifdef SIG_DEBUG
 			  SIGEL_Tools::SIG_IO::cerr << "Individual "
 						    << actInd.getPoolPos()
-						    << " is not up to date.\n";
+						    << " is not up to date." << Qt::endl;
 #endif
 
 //*********************** META change 2) :=  if(actTour.indis[i]->successor != -1)

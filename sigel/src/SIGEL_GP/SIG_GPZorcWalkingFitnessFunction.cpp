@@ -122,14 +122,14 @@ namespace SIGEL_GP
 			else
 			{ // really hi ?
         if (actRealPosition.y > 1.5*startHeight)
-        {   SIGEL_Tools::SIG_IO::cerr << "\to quite high -- " << actRealPosition.y << "\n";
+        {   SIGEL_Tools::SIG_IO::cerr << "\to quite high -- " << actRealPosition.y << Qt::endl;
         }
 
 				avgHeight += startHeight;
 
 				// but check for strange effects..
 				if (actRealPosition.y > 2.0*startHeight)
-				{   SIGEL_Tools::SIG_IO::cerr << "\t## r u ready 2 fly ?  ##  height is > 2*startHeight  (actRealPosition.y=" << actRealPosition.y << " ##\n";
+				{   SIGEL_Tools::SIG_IO::cerr << "\t## r u ready 2 fly ?  ##  height is > 2*startHeight  (actRealPosition.y=" << actRealPosition.y << " ##" << Qt::endl;
 				}
 			}
 

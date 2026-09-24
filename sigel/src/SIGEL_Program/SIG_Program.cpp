@@ -42,7 +42,7 @@ SIGEL_Program::SIG_Program& SIGEL_Program::SIG_Program::operator =(SIGEL_Program
   for ( long int i=0; i<lines.size(); i++ )
     if (!lines[i])
       {
-	SIGEL_Tools::SIG_IO::cerr << "Ouch [1] !!!! " << i << "\n";
+	SIGEL_Tools::SIG_IO::cerr << "Ouch [1] !!!! " << i << Qt::endl;
 	exit(1);
       };
 #endif
@@ -57,7 +57,7 @@ SIGEL_Program::SIG_Program& SIGEL_Program::SIG_Program::operator =(SIGEL_Program
 #ifdef SIG_DEBUG
   if( prg.getProgramLength() != lines.size() )
     {
-      SIGEL_Tools::SIG_IO::cerr << "Ouch [2] !!!!\n"; 
+      SIGEL_Tools::SIG_IO::cerr << "Ouch [2] !!!!" << Qt::endl; 
       exit(1);
     };
 #endif
@@ -66,7 +66,7 @@ SIGEL_Program::SIG_Program& SIGEL_Program::SIG_Program::operator =(SIGEL_Program
   for ( long int i=0; i<lines.size(); i++ )
     if (!lines[i])
       {
-	SIGEL_Tools::SIG_IO::cerr << "Ouch [3] !!!! " << i << "\n";
+	SIGEL_Tools::SIG_IO::cerr << "Ouch [3] !!!! " << i << Qt::endl;
 	exit(1);
       };
 #endif
@@ -129,7 +129,7 @@ void SIGEL_Program::SIG_Program::readFromFile( QTextStream &file )
  
 #ifdef SIG_DEBUG
 
-   SIGEL_Tools::SIG_IO::cerr << "Reading Program: ... ";
+   SIGEL_Tools::SIG_IO::cerr << "Reading Program: ..." << Qt::endl;
    
 
 #endif
@@ -138,13 +138,6 @@ void SIGEL_Program::SIG_Program::readFromFile( QTextStream &file )
    
    prg=file.readAll();
 
-#ifdef SIG_DEBUG
-
-   // SIGEL_Tools::SIG_IO::cerr << "The received program:\n";
-   // cout<<"["<<prg<<"]\n\n";
-
-#endif
-   
    while((pos=prg.indexOf(QChar('\n'), oldpos, Qt::CaseInsensitive))!=-1)
      {
         tmpLine = prg.mid( oldpos, pos - oldpos );
@@ -159,7 +152,7 @@ void SIGEL_Program::SIG_Program::readFromFile( QTextStream &file )
 
 #ifdef SIG_DEBUG
 
-   SIGEL_Tools::SIG_IO::cerr << lineCnt << " LINES READ.\n";
+   SIGEL_Tools::SIG_IO::cerr << lineCnt << " LINES READ." << Qt::endl;
 
 #endif
    
@@ -172,7 +165,7 @@ SIGEL_Program::SIG_ProgramLine *SIGEL_Program::SIG_Program::getLine( long no )
 #ifdef SIG_DEBUG
   if ((no < 0) || (no >= lines.size()) || (!lines[no]))
   {
-    SIGEL_Tools::SIG_IO::cerr << "Ouch [4] ! " << no << " " << lines[no] << "\n";
+    SIGEL_Tools::SIG_IO::cerr << "Ouch [4] ! " << no << " " << lines[no] << Qt::endl;
     exit(1);
   };
 #endif
@@ -204,7 +197,7 @@ void SIGEL_Program::SIG_Program::appendLine( SIGEL_Program::SIG_ProgramLine *l )
   for ( long int i=0; i<lines.size(); i++ )
     if (!lines[i])
       {
-	SIGEL_Tools::SIG_IO::cerr << "Ouch [5] ! " << i << "\n";
+	SIGEL_Tools::SIG_IO::cerr << "Ouch [5] ! " << i << Qt::endl;
 	exit(1);
       };
 #endif
@@ -235,7 +228,7 @@ void SIGEL_Program::SIG_Program::importProgram( QString& filename )
    else
      SIGEL_Tools::SIG_IO::cerr << "Could not import program from "
 			       << filename
-			       << "!\n";  
+			       << "!" << Qt::endl;  
 
 }
 
@@ -252,7 +245,7 @@ void SIGEL_Program::SIG_Program::exportProgram( QString& filename )
    else
      SIGEL_Tools::SIG_IO::cerr << "Could not export program to "
 			       << filename
-			       << "!\n";  
+			       << "!" << Qt::endl;  
 }
 
 
@@ -264,7 +257,7 @@ SIGEL_Program::SIG_Program::SIG_Program()
   for ( long int i=0; i<lines.size(); i++ )
     if (!lines[i])
       {
-	SIGEL_Tools::SIG_IO::cerr << "Ouch [4] ! " << i << "\n";
+	SIGEL_Tools::SIG_IO::cerr << "Ouch [4] ! " << i << Qt::endl;
 	exit(1);
       };
 #endif
@@ -317,7 +310,7 @@ void SIGEL_Program::SIG_Program::checkLength( long minimumLength,
 
        SIGEL_Tools::SIG_IO::cerr << "Program increased to " 
 				 << getProgramLength()
-	                         << " lines.\n";
+	                         << " lines." << Qt::endl;
 #endif
        
       }
@@ -346,7 +339,7 @@ void SIGEL_Program::SIG_Program::checkLength( long minimumLength,
 
        SIGEL_Tools::SIG_IO::cerr << "Program decreased to " 
 				 << getProgramLength()
-	                         << " lines.\n";
+	                         << " lines." << Qt::endl;
 #endif
        historyInfo = 2;
       }
@@ -383,11 +376,6 @@ void SIGEL_Program::SIG_Program::generateRandomProgram( SIGEL_GP::SIG_GPParamete
    
 SIGEL_Program::SIG_Program::~SIG_Program()
 {
-#ifdef SIG_DEBUG
-
-  //  SIGEL_Tools::SIG_IO::cerr << "\nDestructor of PROGRAM called!\n";
-
-#endif
   
    clear();
 }

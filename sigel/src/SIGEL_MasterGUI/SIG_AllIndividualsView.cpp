@@ -323,7 +323,7 @@ void SIG_AllIndividualsView::slotDoubleClicked( QTreeWidgetItem *theItem )
 void SIG_AllIndividualsView::slotVisualize()
 {
 #ifdef SIG_DEBUG
-  SIGEL_Tools::SIG_IO::cerr << "Starting visualization!\n";
+  SIGEL_Tools::SIG_IO::cerr << "Starting visualization!" << Qt::endl;
 #endif
 
   QTreeWidgetItemIterator it( individualList->listviewIndividuals );

@@ -100,7 +100,6 @@ namespace SIGEL_GP
         // append these Forces to a list
         listForces.append(usedForces);
 
-        // SIGEL_Tools::SIG_IO::cerr << "Touchdowns: " << *curTD << "\n";
         touchdowns.append(curTD);
     }
 

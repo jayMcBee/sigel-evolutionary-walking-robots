@@ -33,9 +33,6 @@ Constructs the language removed. A current compiler rejects them.
   headers — cv97 16, Dynamo 6, dynamechs 2, newmat09 1. *Re-measured 2026-09-20;
   this said 32.*
 
-- [ ] **2. `register` keyword** — 3 sites in `SIG_EnvironmentRenderer.cpp`.
-  Removed in C++17. Delete the keyword.
-
 - [ ] **3. Loop-variable scope leaks** — 13 files in `src/MT_GPSystem/`:
   `MT_FitnessTrainer`, `MT_GPManager`, `MT_Interpreter`, `MT_Population`,
   `MT_Program`, `MT_Randomizer`, `MT_Search`, `MT_Statistics`,
@@ -502,6 +499,11 @@ touched, because changing one changes behaviour against the reference binary.
   functions, not named in its report, defeated by individuals scoring 268 and
   292 on 1.3; not re-measured here.
   Any bound is a heuristic and needs more thought.
+  **Related, found 2026-09-24:** `SIG_GPAdaptiveWalkingFitnessFunction`,
+  `SIG_GPStepperFitnessFunction` and `SIG_GPZorcWalkingFitnessFunction` already
+  test each recorded height. Above 1.5 times the start height they log "o quite
+  high", above 2 times "r u ready 2 fly ?". Both are only written to
+  `SIG_IO::cerr`, once per recorded sample, and do not change the score.
 
 - [ ] **76. A mesh with negative volume loads with no message.** Found
   2026-09-24. `SIG_Mirtich::computePhysics` computes a link's mass as density

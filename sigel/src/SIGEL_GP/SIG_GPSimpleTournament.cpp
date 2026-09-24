@@ -89,7 +89,7 @@ bool SIGEL_GP::SIG_GPSimpleTournament::run()
      };
 
 #ifdef SIG_DEBUG
-    SIGEL_Tools::SIG_IO::cerr <<"\nthe Individual " <<winnerPos<<" winns the Tournament and will be reproduced..\n";
+    SIGEL_Tools::SIG_IO::cerr <<"\nthe Individual " <<winnerPos<<" winns the Tournament and will be reproduced.." << Qt::endl;
 #endif
 
      SIG_GPIndividual& rind = SIG_GPOperations::reproduction( *winner,
@@ -102,7 +102,7 @@ bool SIGEL_GP::SIG_GPSimpleTournament::run()
      rind.setFitness( winner->getFitness() );
 
 #ifdef SIG_DEBUG
-    SIGEL_Tools::SIG_IO::cerr <<"the Individual " <<winnerPos<<" have been reproduced and inserted at the Pool Position " << looserPos << " .\n";
+    SIGEL_Tools::SIG_IO::cerr <<"the Individual " <<winnerPos<<" have been reproduced and inserted at the Pool Position " << looserPos << " ." << Qt::endl;
 #endif
 
     SIG_GPIndividual &looser = gpPool.getIndividual( looserPos );

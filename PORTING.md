@@ -632,8 +632,9 @@ read all 618 tracked files then, 8 of which git called binary: its pass count we
 adding or deleting one moves the total by one; `portinglog.txt` did that on
 2026-09-09.*
 **The warning figure is not an exit criterion and moves with the code.** It was
-508 at D31 and D32 and reads 502 today; it was 503 until item 67 removed
-`callRenderPixMap`'s unused-but-set `res`. A step that changes no code should not
+508 at D31 and D32 and reads 497 today; it was 503 until item 67 removed
+`callRenderPixMap`'s unused-but-set `res`, and 502 until item 2 removed the
+`register` keyword and the `SIG_IO::cerr` round of 2026-09-24. A step that changes no code should not
 move it; one that does, will.
 **It now needs `sigel_eval` built**, which `check.sh` does not build for you:
 the V5 section reads constants out of `build/sigel_eval`, so run
@@ -886,8 +887,26 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-09-24, later — DONE: ITEMS 24, 60, 2, AND TWO CLEAN-UP ROUNDS.** Start here.
+
+- **Item 24, the progress bar:** it counts the generation's finished
+  tournaments through `SIG_GPManager::tournamentProgress()`; D38 is revised.
+- **Item 60:** the tournaments-per-generation counter keeps 4 digits and
+  logs an overflow to `SIG_IO::cerr`.
+- **The `qWarning` stubs:** 27 slots in six form base classes are pure
+  virtual; `guidrive`'s `formsize` builds them through stand-in subclasses.
+- **`SIG_IO::cerr` and `cout`:** every complete log message ends with
+  `Qt::endl`, so it is written at once. Commented-out debug logging is gone.
+- **Item 2:** the `register` keyword is gone.
+- **New item 80:** rename `SIG_GPPopulation::resetPool`, which resets only
+  fitness. **Item 75** has a note on the height warnings in three fitness
+  functions.
+- **Gates:** `check.sh` 972 pass, 0 fail; warnings 497. One run failed
+  `gui behaviour` with "first export failed" and "menu [&File] did not open";
+  the rerun on the same code passed. The step waits a fixed 2.5 s for the
+  export.
+
 **2026-09-24 — DONE: TWO SENSOR FIXES, A NEW RUNNER, THE REGRESSION CLOSED.**
-Start here.
 
 - **Reopened** the regression (`57912a1`) and finished it; §7, "The 1.0 → 1.3
   regression — DONE 2026-09-24", has the summary. The two experiments that stayed outside 10% with 1.0's line were
@@ -4797,6 +4816,21 @@ carried; other items and this file cite them, so they do not change.
   writes its one runtime warning to `SIG_IO::cerr`, SIGEL's own log, ended
   with `Qt::endl`: a line ending in `"\n"` stays in the stream's buffer, so
   item 60's overflow line got `Qt::endl` too.
+
+- [x] **Every `SIG_IO` log message ends its line with `Qt::endl`** — done
+  2026-09-24. `SIG_IO::cerr` and `cout` are `QTextStream`s that keep text in
+  memory until a flush or about 16 KB; measured: a line ending in `"\n"`
+  appeared after a later direct write to stderr. 262 messages ending in
+  `"\n"` now end in `Qt::endl`; messages with no newline, or with the newline
+  first, got one at the end; exception messages, which end in `"\n"`
+  already, get `Qt::flush`. Pieces of one line keep one `Qt::endl` on the
+  last piece. Commented-out debug logging is deleted, with the `SIG_DEBUG`
+  blocks it left empty. An unqualified `endl` in `SIG_Interpreter` would not
+  have compiled with `SIG_DEBUG`; every changed file now compiles with and
+  without it. Mechanical: no message text changed.
+
+- [x] **2. `register` keyword** — done 2026-09-24. Deleted at its 3 sites in
+  `SIG_EnvironmentRenderer.cpp`; no other use in SIGEL's code.
 
 #### Not doing
 

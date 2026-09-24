@@ -74,7 +74,7 @@ void SIGEL_Simulation::SIG_DynaMechsSimulationQueries::sense(int sensorNo,
 
 #ifdef SIG_DEBUG
 	for (int iInt=0; iInt<simulationData.sensors.size(); iInt++)
-	{	SIGEL_Tools::SIG_IO::cerr << "Sensor #" << iInt << ": \"" << simulationData.sensors[iInt]->getName() << "\"\n";
+	{	SIGEL_Tools::SIG_IO::cerr << "Sensor #" << iInt << ": \"" << simulationData.sensors[iInt]->getName() << "\"" << Qt::endl;
 	}
 #endif
 
@@ -98,7 +98,7 @@ void SIGEL_Simulation::SIG_DynaMechsSimulationQueries::sense(int sensorNo,
 
 
   if (!sensor)
-	{	SIGEL_Tools::SIG_IO::cerr << "attempt to read invalid sensor (sensorNo=" << sensorNo << ") in 'SIG_DynaMechsSimulationQueries::sense()'\n";
+	{	SIGEL_Tools::SIG_IO::cerr << "attempt to read invalid sensor (sensorNo=" << sensorNo << ") in 'SIG_DynaMechsSimulationQueries::sense()'" << Qt::endl;
 		return;
 	}
 
@@ -146,7 +146,7 @@ void SIGEL_Simulation::SIG_DynaMechsSimulationQueries::sense(int sensorNo,
 														break;
 
 		// pitch/roll type
-		case SIGEL_Robot::SIG_Sensor::tPitchRollSensor: //printf("Reading tPitchRollSensor '%s' ", (const char *)sensor->getName());
+		case SIGEL_Robot::SIG_Sensor::tPitchRollSensor:
 
 														prSensor = static_cast< SIGEL_Robot::SIG_PitchRollSensor* >(sensor);
 														link = prSensor->getLink();
@@ -161,12 +161,6 @@ void SIGEL_Simulation::SIG_DynaMechsSimulationQueries::sense(int sensorNo,
 														pitch = std::acos( myMat.get(1,0) );
 														roll = -std::asin( myMat.get(0,0) );
 #endif														
-														//printf("attached link '%s':\n\t roll: %3.2f, pitch: %3.2g\n", (const char *)link->getName(), roll, pitch);
-
-														/*
-														for (i=0; i<3; i++)
-														{	printf("\t%4.2f  %4.2f  %4.2f\n", myMat.get(0,i), myMat.get(1,i), myMat.get(2,i) );
-														}*/
 
 														// what type (0..360 Grad) ?
 														if (prSensor->IsPitchType())
@@ -204,7 +198,7 @@ void SIGEL_Simulation::SIG_DynaMechsSimulationQueries::sense(int sensorNo,
 														break;
 
 		// contact type
-		case SIGEL_Robot::SIG_Sensor::tContactSensor:	//printf("Reading tContactSensor '%s'  --  ", (const char *)sensor->getName());
+		case SIGEL_Robot::SIG_Sensor::tContactSensor:
 
 														ctSensor = static_cast< SIGEL_Robot::SIG_ContactSensor* >(sensor);
 														link = ctSensor->getLink();
@@ -216,7 +210,7 @@ void SIGEL_Simulation::SIG_DynaMechsSimulationQueries::sense(int sensorNo,
 														// this seems to work since we add only one force to this bloody object..
 														contactModel = static_cast<dmContactModel *>(rBody->getForce(0));
 														if (contactModel == NULL)
-														{	SIGEL_Tools::SIG_IO::cerr << "failed to get the dmContactModel\n";
+														{	SIGEL_Tools::SIG_IO::cerr << "failed to get the dmContactModel" << Qt::endl;
 															break;
 														}
 
@@ -256,7 +250,7 @@ void SIGEL_Simulation::SIG_DynaMechsSimulationQueries::sense(int sensorNo,
 														break;
 
 		// dunno this type !
-		default:	SIGEL_Tools::SIG_IO::cerr << "\tPANIC !!  UNKNOWN SENSOR TYPE !!\n\n";	//	somebody want to change this to this funky throw/catch thingy ?
+		default:	SIGEL_Tools::SIG_IO::cerr << "\tPANIC !!  UNKNOWN SENSOR TYPE !!\n" << Qt::endl;	//	somebody want to change this to this funky throw/catch thingy ?
 	}
 
       // A scaledState of exactly 1 maps one past the register's top, and
@@ -293,7 +287,7 @@ void SIGEL_Simulation::SIG_DynaMechsSimulationQueries::sense(int sensorNo,
 				<< scaledState
 				<< ", registerValue: "
 				<< registerValue
-				<< "\n";
+				<< Qt::endl;
 #endif
 
       registers[0].loadValue( registerValue );
@@ -324,7 +318,7 @@ DL_vector SIGEL_Simulation::SIG_DynaMechsSimulationQueries::getLinkPosition(int 
       for (int i=1; i<=3; i++)
 	SIGEL_Tools::SIG_IO::cerr << " "
 				  << dynaMechsLink->transformation( i, 4 );
-      SIGEL_Tools::SIG_IO::cerr << "\n";
+      SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 
       SIGEL_Tools::SIG_IO::cerr << "Position of link (DynaMechs forward kinematics) "
 				<< dynaMechsLink->link->getName()
@@ -336,7 +330,7 @@ DL_vector SIGEL_Simulation::SIG_DynaMechsSimulationQueries::getLinkPosition(int 
       for (int i=1; i<=3; i++)
 	SIGEL_Tools::SIG_IO::cerr << " "
 				  << dynaMechsPosition( i );
-      SIGEL_Tools::SIG_IO::cerr << "\n";
+      SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 #endif
 
       return SIG_TypeConverter::toDL_vector( position );
@@ -361,19 +355,19 @@ DL_matrix SIGEL_Simulation::SIG_DynaMechsSimulationQueries::getLinkOrientation(i
 #ifdef SIG_DEBUG
       SIGEL_Tools::SIG_IO::cerr << "\n-----\n\nOrientation of link "
 				<< dynaMechsLink->link->getName()
-				<< ":\n\n";
+				<< ":\n" << Qt::endl;
       for (int i=1; i<=3; i++)
 	  {
 		for (int j=1; j<=3; j++)
 			SIGEL_Tools::SIG_IO::cerr << " " << dynaMechsLink->transformation( i, j );
-		SIGEL_Tools::SIG_IO::cerr << "\n";
+		SIGEL_Tools::SIG_IO::cerr << Qt::endl;
       }
 
       SIGEL_Tools::SIG_IO::cerr << "\nOrientation of link (DynaMechs forward kinematics) "
 				<< dynaMechsLink->link->getName()
 				<< ", internal number "
 				<< dynaMechsLink->dynaMechsLinkNumber
-				<< ":\n\n";
+				<< ":\n" << Qt::endl;
       dmABForKinStruct const *forKinStruct = simulationData.dynaMechsSystem.getForKinStruct( dynaMechsLink->dynaMechsLinkNumber );
       NEWMAT::Matrix dynaMechsOrientation = SIG_TypeConverter::toMatrix( forKinStruct->R_ICS );
       for (int i=1; i<=3; i++)
@@ -381,7 +375,7 @@ DL_matrix SIGEL_Simulation::SIG_DynaMechsSimulationQueries::getLinkOrientation(i
 		for (int j=1; j<=3; j++)
 			SIGEL_Tools::SIG_IO::cerr << " " << dynaMechsOrientation( i, j );
 
-		SIGEL_Tools::SIG_IO::cerr << "\n";
+		SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 	  }
 #endif
 
@@ -446,7 +440,7 @@ int	  SIGEL_Simulation::SIG_DynaMechsSimulationQueries::getNumberOfTouchdowns( v
 		// contact model is at index 0 in dmRigidBody
 		contactModel = static_cast<dmContactModel *>(rBody->getForce(0));
 		if (contactModel == NULL)
-		{	SIGEL_Tools::SIG_IO::cerr << "failed to get the dmContactModel\n";
+		{	SIGEL_Tools::SIG_IO::cerr << "failed to get the dmContactModel" << Qt::endl;
 			return 0;
 		}
 

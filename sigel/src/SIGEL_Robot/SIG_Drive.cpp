@@ -45,7 +45,7 @@ namespace SIGEL_Robot {
 			else if (buf == "simpleservo")
 				mode = tServoSimpleMode;
 			else
-			{	SIGEL_Tools::SIG_IO::cerr << "Unsupported Drive Mode <" << buf << "> !!\n\n";
+			{	SIGEL_Tools::SIG_IO::cerr << "Unsupported Drive Mode <" << buf << "> !!\n" << Qt::endl;
 			}
 
 			tx >> name >> number >> minforce >> maxforce >> buf;

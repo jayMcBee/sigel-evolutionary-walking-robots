@@ -43,7 +43,7 @@ SIGEL_GP::SIG_GPPopulation::SIG_GPPopulation(int size)
 {
    if( getRandomizerPointer()==0 )
      {
-       SIGEL_Tools::SIG_IO::cerr << "\n\nA randomizer is needed to initialize a population ! Program terminated.\n";
+       SIGEL_Tools::SIG_IO::cerr << "\n\nA randomizer is needed to initialize a population ! Program terminated." << Qt::endl;
        exit(1); 
        // ToDo: Exception
      }
@@ -73,7 +73,7 @@ SIGEL_GP::SIG_GPPopulation::SIG_GPPopulation(QString data)
 
 #ifdef SIG_DEBUG
 
-     SIGEL_Tools::SIG_IO::cerr << "\n\nREADING POPULATION DATA FROM FILE:\n";    
+     SIGEL_Tools::SIG_IO::cerr << "\n\nREADING POPULATION DATA FROM FILE:" << Qt::endl;    
      
 #endif
 
@@ -81,7 +81,7 @@ SIGEL_GP::SIG_GPPopulation::SIG_GPPopulation(QString data)
 
 #ifdef SIG_DEBUG
 
-     SIGEL_Tools::SIG_IO::cerr << "\n\nREADING FINISHED.\n\n";
+     SIGEL_Tools::SIG_IO::cerr << "\n\nREADING FINISHED.\n" << Qt::endl;
      
 #endif
 
@@ -143,12 +143,6 @@ void resizeOwning( QList< SIGEL_GP::SIG_GPIndividual * > &v, qsizetype want )
 SIGEL_GP::SIG_GPPopulation::~SIG_GPPopulation()
 {
 
-#ifdef SIG_DEBUG
-
-  //   SIGEL_Tools::SIG_IO::cerr << "\nDestructor of POPULATION called!\n";
-
-#endif
-
   qDeleteAll( pool );
   pool.clear();
   delete randomizer;
@@ -171,7 +165,7 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPPopulation::getIndividual(int poolpo
   else
     {
       // Todo: Exception!
-      SIGEL_Tools::SIG_IO::cerr << "Wrong Position requested from Population!\n";
+      SIGEL_Tools::SIG_IO::cerr << "Wrong Position requested from Population!" << Qt::endl;
       exit( 1 );
     } 
 };
@@ -363,12 +357,10 @@ void SIGEL_GP::SIG_GPPopulation::readFromFile(QTextStream &file)
 
 #ifdef SIG_DEBUG
 
-     SIGEL_Tools::SIG_IO::cerr << "\n\nREADING POPULATION DATA FROM FILE:\n";    
+     SIGEL_Tools::SIG_IO::cerr << "\n\nREADING POPULATION DATA FROM FILE:" << Qt::endl;    
      
 #endif
   
-  //cout<<"TEST Population : \n"<<populationStr<<"\n\n";  
-	     
   if( (pos=populationStr.indexOf("POPULATIONSIZE=", 0, Qt::CaseInsensitive) )!=-1 ) 
     { 
         pos2=populationStr.indexOf(";", pos + 16, Qt::CaseInsensitive); 
@@ -376,9 +368,9 @@ void SIGEL_GP::SIG_GPPopulation::readFromFile(QTextStream &file)
 
 #ifdef SIG_DEBUG
 
-	SIGEL_Tools::SIG_IO::cerr << "\n<Poolsize loaded:"
+	SIGEL_Tools::SIG_IO::cerr << "<Poolsize loaded:"
 				  << populationStr.mid(pos+15,pos2-pos-15).toLong()
-	                          << ">";
+	                          << ">" << Qt::endl;
 
 #endif
 
@@ -393,9 +385,9 @@ void SIGEL_GP::SIG_GPPopulation::readFromFile(QTextStream &file)
 
 #ifdef SIG_DEBUG
 
-	     SIGEL_Tools::SIG_IO::cerr << "\n<Identifier loaded:"
+	     SIGEL_Tools::SIG_IO::cerr << "<Identifier loaded:"
 				       << populationStr.mid(pos+15,pos2-pos-15).toLong()
-	                               << ">";
+	                               << ">" << Qt::endl;
 
 #endif
 	     setNextIdentifier(populationStr.mid(pos+15,pos2-pos-15));
@@ -409,9 +401,9 @@ void SIGEL_GP::SIG_GPPopulation::readFromFile(QTextStream &file)
 	  {
 #ifdef SIG_DEBUG
 
-	     SIGEL_Tools::SIG_IO::cerr << "\n<Poolgeneration loaded:"
+	     SIGEL_Tools::SIG_IO::cerr << "<Poolgeneration loaded:"
 				       << populationStr.mid(pos+15,pos2-pos-15)
-	                               << ">\n\n";
+	                               << ">\n" << Qt::endl;
 #endif
              setPoolGeneration((populationStr.mid(pos+15,pos2-pos-15)).toLong());
           }
@@ -456,7 +448,7 @@ void SIGEL_GP::SIG_GPPopulation::readFromFile(QTextStream &file)
           } 
 #ifdef SIG_DEBUG
 
-        SIGEL_Tools::SIG_IO::cerr << "\n\nREADING POPULATION FINISHED.\n";    
+        SIGEL_Tools::SIG_IO::cerr << "\n\nREADING POPULATION FINISHED." << Qt::endl;    
      
 #endif
 

@@ -87,7 +87,7 @@ bool SIGEL_GP::SIG_GPMutationTournament::run()
      };
 
 #ifdef SIG_DEBUG
-   SIGEL_Tools::SIG_IO::cerr <<"\nthe Individual " <<winnerPos<<" winns the Tournament and will be mutated..\n";
+   SIGEL_Tools::SIG_IO::cerr <<"\nthe Individual " <<winnerPos<<" winns the Tournament and will be mutated.." << Qt::endl;
 #endif
 
    SIG_GPIndividual& mind = SIG_GPOperations::mutation(*winner,
@@ -98,7 +98,7 @@ bool SIGEL_GP::SIG_GPMutationTournament::run()
 						       languageP);
 
 #ifdef SIG_DEBUG
-   SIGEL_Tools::SIG_IO::cerr <<"the Individual " <<winnerPos<<" have been mutated and inserted at the Pool Position " << looserPos << " .\n";
+   SIGEL_Tools::SIG_IO::cerr <<"the Individual " <<winnerPos<<" have been mutated and inserted at the Pool Position " << looserPos << " ." << Qt::endl;
 #endif
 
    SIG_GPIndividual &looser = gpPool.getIndividual( looserPos );

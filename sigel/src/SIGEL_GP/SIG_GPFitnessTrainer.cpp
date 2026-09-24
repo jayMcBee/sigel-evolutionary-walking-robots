@@ -53,7 +53,7 @@ SIGEL_GP::SIG_GPFitnessTrainer::SIG_GPFitnessTrainer(SIGEL_GP::SIG_GPExperiment&
        modifiedRobot.prepareDynaMo();
       }
       catch (SIGEL_Tools::SIG_Exception &e) {
-        SIGEL_Tools::SIG_IO::cerr << e.getMessage();
+        SIGEL_Tools::SIG_IO::cerr << e.getMessage() << Qt::flush;
         exit( 1 );
       };
       break;
@@ -62,7 +62,7 @@ SIGEL_GP::SIG_GPFitnessTrainer::SIG_GPFitnessTrainer(SIGEL_GP::SIG_GPExperiment&
         modifiedRobot.prepareDynaMechs();
       }
             catch (SIGEL_Tools::SIG_Exception &e) {
-        SIGEL_Tools::SIG_IO::cerr << e.getMessage();
+        SIGEL_Tools::SIG_IO::cerr << e.getMessage() << Qt::flush;
         exit( 1 );
       };
       break;
@@ -231,7 +231,7 @@ void SIGEL_GP::SIG_GPFitnessTrainer::flushAllDynHosts( void ) {
     qDeleteAll( freshDynHosts );
     freshDynHosts.clear();
 
-    SIGEL_Tools::SIG_IO::cerr << "\t(all " << dynDelNum << " dynamic hosts removed | " <<  pvmHosts.size() << " static hosts remaining)\n\n";
+    SIGEL_Tools::SIG_IO::cerr << "\t(all " << dynDelNum << " dynamic hosts removed | " <<  pvmHosts.size() << " static hosts remaining)\n" << Qt::endl;
   }
 }
 
@@ -246,7 +246,7 @@ int SIGEL_GP::SIG_GPFitnessTrainer::spawnTask(SIGEL_GP::SIG_GPIndividual const& 
 #ifdef SIG_DEBUG
   SIGEL_Tools::SIG_IO::cerr << "Trying to spawn task for individual "
 			    << ind.getPoolPos()
-			    << "\n";
+			    << Qt::endl;
 #endif
 
   int oldSize = pvmTasks.size();
@@ -353,7 +353,7 @@ int SIGEL_GP::SIG_GPFitnessTrainer::spawnTask(SIGEL_GP::SIG_GPIndividual const& 
         //errorText = QString::asprintf("pvm_spawn() failed on %s (%d/%d) %s.",hostNameQCString,spawnInfo,taskId,errorText);
         //QMessageBox warn("Error", errorText ,QMessageBox::Warning, QMessageBox::Retry, QMessageBox::NoButton,QMessageBox::NoButton);
         //warn.exec();
-        SIGEL_Tools::SIG_IO::cerr << "pvm_spawn() failed on \"" << hostNameQCString << "\"   (" << spawnInfo << "/" << taskId << ") - " << errorText.toUtf8() << "\n";
+        SIGEL_Tools::SIG_IO::cerr << "pvm_spawn() failed on \"" << hostNameQCString << "\"   (" << spawnInfo << "/" << taskId << ") - " << errorText.toUtf8() << Qt::endl;
       }
 
   };
@@ -429,7 +429,7 @@ double SIGEL_GP::SIG_GPFitnessTrainer::checkTask(int taskId)
 
 	      if (QDateTime::currentDateTime() >= timeOutTime)
 				{
-		      SIGEL_Tools::SIG_IO::cerr << "sigel_slave timed out -- force quit via 'pvm_kill()'\n";
+		      SIGEL_Tools::SIG_IO::cerr << "sigel_slave timed out -- force quit via 'pvm_kill()'" << Qt::endl;
 
 		  		pvm_kill( pvmTask->pvmTaskId );
 		  		pvmTask->host.noOfSlaves--;
@@ -449,7 +449,7 @@ double SIGEL_GP::SIG_GPFitnessTrainer::checkTask(int taskId)
 #ifdef SIG_DEBUG
   SIGEL_Tools::SIG_IO::cerr << "Checking task "
 			    << taskId
-			    << "\n";
+			    << Qt::endl;
 #endif
 
   return result;
@@ -484,13 +484,13 @@ void SIGEL_GP::SIG_GPFitnessTrainer::sweepToSpawn()
   QList< int > *prevJob = 0;
 
 #ifdef SIG_DEBUG
-  SIGEL_Tools::SIG_IO::cerr << "Sweeping to spawn!\n";
+  SIGEL_Tools::SIG_IO::cerr << "Sweeping to spawn!" << Qt::endl;
 #endif
 
   while (actJob)
     {
 #ifdef SIG_DEBUG
-      SIGEL_Tools::SIG_IO::cerr << "Entering spawn loop!\n";
+      SIGEL_Tools::SIG_IO::cerr << "Entering spawn loop!" << Qt::endl;
 #endif
 
       int hostNumber = getNextHost();
@@ -649,7 +649,7 @@ int SIGEL_GP::SIG_GPFitnessTrainer::getNextHost() {
 #ifdef SIG_DEBUG
   SIGEL_Tools::SIG_IO::cerr << "Next Host: "
 			    << result
-			    << "\n";
+			    << Qt::endl;
 #endif
 
   return result;

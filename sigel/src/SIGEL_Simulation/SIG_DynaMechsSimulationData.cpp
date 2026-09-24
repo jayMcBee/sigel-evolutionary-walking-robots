@@ -142,7 +142,7 @@ SIGEL_Simulation::SIG_DynaMechsSimulationData::SIG_DynaMechsSimulationData( SIGE
 					  << linkNumber
 					  << ": "
 					  << dynaMechsLinks[ linkNumber ]->link->getName()
-					  << ".\n";
+					  << "." << Qt::endl;
 #endif
 
 		drives[ actDrive->getNumber() ] = actDrive;
@@ -169,7 +169,7 @@ SIGEL_Simulation::SIG_DynaMechsSimulationData::SIG_DynaMechsSimulationData( SIGE
 	    if (dynaMechsLinks[ linkNumber ])
 		{	sensors[ actSensor->getNumber() ] = actSensor;
 		}
-		else SIGEL_Tools::SIG_IO::cerr << "Houston, we've got a problem here !  No link, no fun in  SIG_DynaMechsSimulationData (1)\n";
+		else SIGEL_Tools::SIG_IO::cerr << "Houston, we've got a problem here !  No link, no fun in  SIG_DynaMechsSimulationData (1)" << Qt::endl;
 	  }
 	  break;
 
@@ -182,7 +182,7 @@ SIGEL_Simulation::SIG_DynaMechsSimulationData::SIG_DynaMechsSimulationData( SIGE
 	    if (dynaMechsLinks[ link->getNumber() ])
 		{	sensors[ actSensor->getNumber() ] = actSensor;
 		}
-		else SIGEL_Tools::SIG_IO::cerr << "Houston, we've got a problem here !  No link, no fun in  SIG_DynaMechsSimulationData (2)\n";
+		else SIGEL_Tools::SIG_IO::cerr << "Houston, we've got a problem here !  No link, no fun in  SIG_DynaMechsSimulationData (2)" << Qt::endl;
 
 	  }
 	  break;
@@ -196,7 +196,7 @@ SIGEL_Simulation::SIG_DynaMechsSimulationData::SIG_DynaMechsSimulationData( SIGE
 	    if (dynaMechsLinks[ link->getNumber() ])
 		{	sensors[ actSensor->getNumber() ] = actSensor;
 		}
-		else SIGEL_Tools::SIG_IO::cerr << "Houston, we've got a problem here !  No link, no fun in  SIG_DynaMechsSimulationData (3)\n";
+		else SIGEL_Tools::SIG_IO::cerr << "Houston, we've got a problem here !  No link, no fun in  SIG_DynaMechsSimulationData (3)" << Qt::endl;
 
 	  }
 	  break;
@@ -241,7 +241,7 @@ void SIGEL_Simulation::SIG_DynaMechsSimulationData::simulationProgress()
 				    << actDrive->getName()
 				    << ": "
 				    << driveForcesTimeAccounts[ i ]
-				    << "\n";
+				    << Qt::endl;
 #endif
 
 	  if (driveForcesTimeAccounts[ i ] <= 0)
@@ -249,7 +249,7 @@ void SIGEL_Simulation::SIG_DynaMechsSimulationData::simulationProgress()
 #ifdef SIG_DEBUG
 	      SIGEL_Tools::SIG_IO::cerr << "Resetting drive "
 					<< actDrive->getName()
-					<< ".\n";
+					<< "." << Qt::endl;
 #endif
 	      driveForcesTimeAccounts[ i ] = 0;
 
@@ -335,13 +335,13 @@ void SIGEL_Simulation::SIG_DynaMechsSimulationData::initializeArticulation()
   SIGEL_Tools::SIG_IO::cerr << "Setting initial robot location: ";
   for (int i=1; i<=3; i++)
     SIGEL_Tools::SIG_IO::cerr << " " << startPosition( i );
-  SIGEL_Tools::SIG_IO::cerr << "\n";
-  SIGEL_Tools::SIG_IO::cerr << "Setting initial robot orientation:\n";
+  SIGEL_Tools::SIG_IO::cerr << Qt::endl;
+  SIGEL_Tools::SIG_IO::cerr << "Setting initial robot orientation:" << Qt::endl;
   for (int i=1; i<=3; i++)
     {
       for (int j=1; j<=3; j++)
 	SIGEL_Tools::SIG_IO::cerr << startRotation( i, j ) << " ";
-      SIGEL_Tools::SIG_IO::cerr << "\n";
+      SIGEL_Tools::SIG_IO::cerr << Qt::endl;
     };
 #endif
 
@@ -411,7 +411,7 @@ SIGEL_Simulation::SIG_DynaMechsLink *SIGEL_Simulation::SIG_DynaMechsSimulationDa
       internalDynaMechsLink = new dmRevoluteLink();
       break;
     default:
-      SIGEL_Tools::SIG_IO::cerr << "Cannot simulate robot with DynaMechs: Joint type not allowed!\n";
+      SIGEL_Tools::SIG_IO::cerr << "Cannot simulate robot with DynaMechs: Joint type not allowed!" << Qt::endl;
       exit( 1 );
     };
 
@@ -471,7 +471,7 @@ SIGEL_Simulation::SIG_DynaMechsLink *SIGEL_Simulation::SIG_DynaMechsSimulationDa
 			    << minLimit
 			    << " Max: "
 			    << maxLimit
-			    << "\n";
+			    << Qt::endl;
 #endif
 
   internalDynaMechsLink->setJointLimits( minLimit,

@@ -173,7 +173,7 @@ void SIGEL_GP::SIG_GPExperiment::exportExperimentHistoryToGNUPlot( QString fileN
   else
     SIGEL_Tools::SIG_IO::cerr << "Could not export experiment history under "
 			      << fileName
-			      << "!\n";
+			      << "!" << Qt::endl;
 };
 
 QString SIGEL_GP::SIG_GPExperiment::getPath() {

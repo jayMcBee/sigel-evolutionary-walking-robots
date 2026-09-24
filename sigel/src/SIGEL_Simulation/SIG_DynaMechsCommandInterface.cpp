@@ -40,7 +40,7 @@ void SIGEL_Simulation::SIG_DynaMechsCommandInterface::moveDrive(int driveNo,
 								QList<SIG_Register> const& registers)
 {
 #ifdef SIG_DEBUG
-  SIGEL_Tools::SIG_IO::cerr << "entering method moveDrive\n";
+  SIGEL_Tools::SIG_IO::cerr << "entering method moveDrive" << Qt::endl;
 #endif
   SIGEL_Robot::SIG_Drive *drive = 0;
   dmLink	*internalLink;
@@ -54,7 +54,7 @@ void SIGEL_Simulation::SIG_DynaMechsCommandInterface::moveDrive(int driveNo,
 
 #ifdef SIG_DEBUG
 	for (int iInt=0; iInt<simulationData.drives.size(); iInt++)
-	{	SIGEL_Tools::SIG_IO::cerr << "Drive #" << iInt << ": \"" << simulationData.drives[iInt]->getName() << "\"\n";
+	{	SIGEL_Tools::SIG_IO::cerr << "Drive #" << iInt << ": \"" << simulationData.drives[iInt]->getName() << "\"" << Qt::endl;
 	}
 #endif
 
@@ -78,7 +78,7 @@ void SIGEL_Simulation::SIG_DynaMechsCommandInterface::moveDrive(int driveNo,
 
 
 #ifdef SIG_DEBUG
-      SIGEL_Tools::SIG_IO::cerr << "Drive index: " << driveIndex << "\n";
+      SIGEL_Tools::SIG_IO::cerr << "Drive index: " << driveIndex << Qt::endl;
 #endif
 
      drive = simulationData.drives[ driveIndex ];
@@ -89,7 +89,7 @@ void SIGEL_Simulation::SIG_DynaMechsCommandInterface::moveDrive(int driveNo,
   }
 
 #ifdef SIG_DEBUG
-      SIGEL_Tools::SIG_IO::cerr << "Drive exists!\n";
+      SIGEL_Tools::SIG_IO::cerr << "Drive exists!" << Qt::endl;
 #endif
 
 #ifdef _WINDOWS
@@ -120,8 +120,6 @@ void SIGEL_Simulation::SIG_DynaMechsCommandInterface::moveDrive(int driveNo,
 	  // and partly by the active motor force ... hope that works..!
 	 if (drive->getMode() == SIGEL_Robot::SIG_Drive::tServoSimpleMode)
 	 {
-		//printf("tServoSimpleMode Drive '%s'\n", (const char *)drive->getName());
-
 		int linkNumber = simulationData.jointIndices[ drive->getJoint()->getNumber() ];
 		SIG_DynaMechsLink *dynaMechsLink = simulationData.dynaMechsLinks[ linkNumber ];
 
@@ -129,7 +127,7 @@ void SIGEL_Simulation::SIG_DynaMechsCommandInterface::moveDrive(int driveNo,
 		SIGEL_Robot::SIG_Joint *myJoint = const_cast<SIGEL_Robot::SIG_Joint *>( drive->getJoint() );
 
 		if (myJoint->getJointType() != SIGEL_Robot::SIG_Joint::tRotationalJoint)
-		{	SIGEL_Tools::SIG_IO::cerr << "tServoSimpleMode type drives can work on rotational joints only !!\n";
+		{	SIGEL_Tools::SIG_IO::cerr << "tServoSimpleMode type drives can work on rotational joints only !!" << Qt::endl;
 			return;
 		}
 		// get the DynaMechs joint for current angle -- joint limits might be manipulated !
@@ -162,14 +160,11 @@ void SIGEL_Simulation::SIG_DynaMechsCommandInterface::moveDrive(int driveNo,
     // make it relative, i.e. zero means minimal allowed (defined) joint angle
     sigelDestAngle = destAngle - (long double)(myRotJ->getMin());
 
-    //fprintf(stderr, "\tsigelDestAngle: %5.3f for registerValue: %d (min: %5.3f, max: %5.3f)\n", sigelDestAngle, registerValue, myRotJ->getMin(),myRotJ->getMax());
-
 		// transform to a dynamechs position -> 0..2*pi, please ! Add dm-internal min. joint value here, therefore not above ...
 		dmDestAngle = sigelDestAngle * (3.14159265 / 180.0) + intMin;
 
 		//	q is our current angle
 		intRevLink->getState( &q, &qd );
-		//printf("; current dmAngle=%5.3f\tSIGEL Destination=%4.1f, dmDest=%5.3f\n", q, sigelDestAngle+ (long double)(myRotJ->getMin()), dmDestAngle);
 
 		// power joint w. max. force (we only know [on/off]-type servos)
 		double jointInput = drive->getMaxForce();
@@ -198,8 +193,6 @@ void SIGEL_Simulation::SIG_DynaMechsCommandInterface::moveDrive(int driveNo,
 			}
 		}
 
-		//printf("AFTER MANIP.:  dmMin: %5.3f, dmMax: %5.3f\n\n", intMin, intMax);
-
 		// now fall down on your knees and pray to the lord this really works :-)
 		intRevLink->setJointLimits(intMin, intMax, intSpring, intDamper);
 
@@ -225,7 +218,7 @@ void SIGEL_Simulation::SIG_DynaMechsCommandInterface::moveDrive(int driveNo,
 #ifdef SIG_DEBUG
 		SIGEL_Tools::SIG_IO::cerr << "minRegisterValue: " << static_cast< double >(minRegisterValue) << "\n"
 					<< "registerValueRange: " << static_cast< double >(registerValueRange)	<< "\n"
-					<< "registerValue: " << registerValue << "\n" << "maxForce: " << drive->getMaxForce() << "\n";
+					<< "registerValue: " << registerValue << "\n" << "maxForce: " << drive->getMaxForce() << Qt::endl;
 #endif
 
 		// we act only if the force is >min. force applicable
@@ -237,7 +230,7 @@ void SIGEL_Simulation::SIG_DynaMechsCommandInterface::moveDrive(int driveNo,
 			double jointInput = static_cast< double >(force);
 
 #ifdef SIG_DEBUG
-			SIGEL_Tools::SIG_IO::cerr << "Applying force/torque " << jointInput << " at drive "	<< drive->getName()	<< ".\n";
+			SIGEL_Tools::SIG_IO::cerr << "Applying force/torque " << jointInput << " at drive "	<< drive->getName()	<< "." << Qt::endl;
 #endif
 
 			int linkNumber = simulationData.jointIndices[ drive->getJoint()->getNumber() ];

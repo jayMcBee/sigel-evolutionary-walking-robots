@@ -75,7 +75,7 @@ void SIGEL_GP::SIG_GPTournament::inhume( SIG_GPIndividual &corps )
 #ifdef SIG_DEBUG
       SIGEL_Tools::SIG_IO::cerr << "SIG_GPTournament saving dead Individual "
 				<< corps.getName()
-				<< "\n";
+				<< Qt::endl;
 #endif
 
       QFile corpsFile( corpsFileName );
@@ -89,7 +89,7 @@ void SIGEL_GP::SIG_GPTournament::inhume( SIG_GPIndividual &corps )
       else
 	SIGEL_Tools::SIG_IO::cerr << "Could not save corps under "
 				  << corpsFileName
-				  << "!\n";
+				  << "!" << Qt::endl;
     };
 };
 

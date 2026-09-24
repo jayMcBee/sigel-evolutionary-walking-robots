@@ -349,7 +349,7 @@ namespace SIGEL_Robot {
 #ifdef SIG_DEBUG
 	  SIGEL_Tools::SIG_IO::cerr << "\n\nTransforming link "
 				    << getName()
-				    <<" to DynaMechs!\n";
+				    <<" to DynaMechs!" << Qt::endl;
 #endif
 
 	  mdh_visited = true;
@@ -386,11 +386,11 @@ namespace SIGEL_Robot {
 					  << getName()
 					  << " accordingly to successor "
 					  << actSuccessor->getName()
-					  << ".\n";
+					  << "." << Qt::endl;
 	      else
 		SIGEL_Tools::SIG_IO::cerr << "Tansforming link "
 					  << getName()
-					  << " without successor.\n";
+					  << " without successor." << Qt::endl;
 #endif
 
 	      bool processingRealSuccessor = (actSuccessor == realSuccessor);
@@ -410,7 +410,7 @@ namespace SIGEL_Robot {
 		  SIGEL_Tools::SIG_IO::cerr << "Z-Axis transformed:";
 		  for (int i=0; i<3; i++)
 		    SIGEL_Tools::SIG_IO::cerr << " " << newZAxis.get( i );
-		  SIGEL_Tools::SIG_IO::cerr << "\n";
+		  SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 #endif
 
 		};
@@ -460,12 +460,12 @@ namespace SIGEL_Robot {
 		  SIGEL_Tools::SIG_IO::cerr << "X-Axis transformed:";
 		  for (int i=0; i<3; i++)
 		    SIGEL_Tools::SIG_IO::cerr << " " << newXAxis.get( i );
-		  SIGEL_Tools::SIG_IO::cerr << "\n";
+		  SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 
 		  SIGEL_Tools::SIG_IO::cerr << "Origin transformed:";
 		  for (int i=0; i<3; i++)
 		    SIGEL_Tools::SIG_IO::cerr << " " << newOrigin.get( i );
-		  SIGEL_Tools::SIG_IO::cerr << "\n";
+		  SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 #endif
 
 		}
@@ -494,12 +494,12 @@ namespace SIGEL_Robot {
 		  SIGEL_Tools::SIG_IO::cerr << "X-Axis transformed:";
 		  for (int i=0; i<3; i++)
 		    SIGEL_Tools::SIG_IO::cerr << " " << newXAxis.get( i );
-		  SIGEL_Tools::SIG_IO::cerr << "\n";
+		  SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 
 		  SIGEL_Tools::SIG_IO::cerr << "Origin transformed:";
 		  for (int i=0; i<3; i++)
 		    SIGEL_Tools::SIG_IO::cerr << " " << newOrigin.get( i );
-		  SIGEL_Tools::SIG_IO::cerr << "\n";
+		  SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 #endif
 
 		};
@@ -559,7 +559,7 @@ namespace SIGEL_Robot {
 #ifdef SIG_DEBUG
 		  SIGEL_Tools::SIG_IO::cerr << "screwD: " << screwD
 					    << " screwTheta: " << screwTheta
-					    << "\n";
+					    << Qt::endl;
 
 		  DL_vector debugScrewTranslationVector = newZAxis;
 		  debugScrewTranslationVector.timesis( screwD );
@@ -590,32 +590,32 @@ namespace SIGEL_Robot {
 		  SIGEL_Tools::SIG_IO::cerr << "New origin:";
 		  for (int i=0; i<3; i++)
 		    SIGEL_Tools::SIG_IO::cerr << " " << newOrigin.get( i );
-		  SIGEL_Tools::SIG_IO::cerr << "\n";
+		  SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 
 		  SIGEL_Tools::SIG_IO::cerr << "Translated real new origin:";
 		  for (int i=0; i<3; i++)
 		    SIGEL_Tools::SIG_IO::cerr << " " << debugTranslatedOrigin.get( i );
-		  SIGEL_Tools::SIG_IO::cerr << "\n";
+		  SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 
 		  SIGEL_Tools::SIG_IO::cerr << "New X-Axis:";
 		  for (int i=0; i<3; i++)
 		    SIGEL_Tools::SIG_IO::cerr << " " << newXAxis.get( i );
-		  SIGEL_Tools::SIG_IO::cerr << "\n";
+		  SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 
 		  SIGEL_Tools::SIG_IO::cerr << "Rotated real new X-Axis:";
 		  for (int i=0; i<3; i++)
 		    SIGEL_Tools::SIG_IO::cerr << " " << debugRotatedXAxis.get( i );
-		  SIGEL_Tools::SIG_IO::cerr << "\n";
+		  SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 
 		  SIGEL_Tools::SIG_IO::cerr << "New Y-Axis:";
 		  for (int i=0; i<3; i++)
 		    SIGEL_Tools::SIG_IO::cerr << " " << debugNewYAxis.get( i );
-		  SIGEL_Tools::SIG_IO::cerr << "\n";
+		  SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 
 		  SIGEL_Tools::SIG_IO::cerr << "Rotated real new Y-Axis:";
 		  for (int i=0; i<3; i++)
 		    SIGEL_Tools::SIG_IO::cerr << " " << debugRotatedYAxis.get( i );
-		  SIGEL_Tools::SIG_IO::cerr << "\n";
+		  SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 #endif
 
 		};
@@ -640,7 +640,7 @@ namespace SIGEL_Robot {
 	      SIGEL_Tools::SIG_IO::cerr << "Y-Axis transformed:";
 	      for (int i=0; i<3; i++)
 		SIGEL_Tools::SIG_IO::cerr << " " << realNewYAxis.get( i );
-	      SIGEL_Tools::SIG_IO::cerr << "\n";
+	      SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 #endif
 
 	      NEWMAT::Matrix newCoordinates( 3, 3 );
@@ -661,13 +661,13 @@ namespace SIGEL_Robot {
 		  SIGEL_Tools::SIG_IO::cerr << "Initial robot location: ";
 		  for (int i=0; i<3; i++)
 		    SIGEL_Tools::SIG_IO::cerr << " " << parent->initialLocation.get( i );
-		  SIGEL_Tools::SIG_IO::cerr << "\n";
-		  SIGEL_Tools::SIG_IO::cerr << "Initial robot orientation:\n";
+		  SIGEL_Tools::SIG_IO::cerr << Qt::endl;
+		  SIGEL_Tools::SIG_IO::cerr << "Initial robot orientation:" << Qt::endl;
 		  for (int i=0; i<3; i++)
 		    {
 		      for (int j=0; j<3; j++)
 			SIGEL_Tools::SIG_IO::cerr << parent->initialOrientation.get( i, j ) << " ";
-		      SIGEL_Tools::SIG_IO::cerr << "\n";
+		      SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 		    };
 #endif
 
@@ -680,23 +680,23 @@ namespace SIGEL_Robot {
 			       SIG_TypeConverter::toDL_matrix( rotation ) );
 
 #ifdef SIG_DEBUG
-	      SIGEL_Tools::SIG_IO::cerr << "Rotation matrix:\n";
+	      SIGEL_Tools::SIG_IO::cerr << "Rotation matrix:" << Qt::endl;
 	      for (int i=1; i<=3; i++)
 		{
 		  for (int j=1; j<=3; j++)
 		    SIGEL_Tools::SIG_IO::cerr << rotation( i, j ) << " ";
-		  SIGEL_Tools::SIG_IO::cerr << "\n";
+		  SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 		};
 	      SIGEL_Tools::SIG_IO::cerr << "Translation vector:";
 	      for (int i=1; i<=3; i++)
 		SIGEL_Tools::SIG_IO::cerr << " " << translation( i );
-	      SIGEL_Tools::SIG_IO::cerr << "\n";
-	      SIGEL_Tools::SIG_IO::cerr << "Transformed points:\n";
+	      SIGEL_Tools::SIG_IO::cerr << Qt::endl;
+	      SIGEL_Tools::SIG_IO::cerr << "Transformed points:" << Qt::endl;
 	      for (const NamedPoint &p : points)
 		{
 		  for (int i=0; i<3; i++)
 		    SIGEL_Tools::SIG_IO::cerr << " " << p.value->get( i );
-		  SIGEL_Tools::SIG_IO::cerr << "\n";
+		  SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 		};
 #endif	      
 
@@ -706,7 +706,7 @@ namespace SIGEL_Robot {
 #ifdef SIG_DEBUG
 		  SIGEL_Tools::SIG_IO::cerr << "Link "
 					    << getName()
-					    << " transformed.\n";
+					    << " transformed." << Qt::endl;
 #endif
 	}
 
@@ -725,19 +725,19 @@ namespace SIGEL_Robot {
 				    << "a:";
 	  for (int i=0; i<3; i++)
 	    SIGEL_Tools::SIG_IO::cerr << " " << a.get( i );
-	  SIGEL_Tools::SIG_IO::cerr << "\n";
+	  SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 	  SIGEL_Tools::SIG_IO::cerr << "u:";
 	  for (int i=0; i<3; i++)
 	    SIGEL_Tools::SIG_IO::cerr << " " << u.get( i );
-	  SIGEL_Tools::SIG_IO::cerr << "\n";
+	  SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 	  SIGEL_Tools::SIG_IO::cerr << "b:";
 	  for (int i=0; i<3; i++)
 	    SIGEL_Tools::SIG_IO::cerr << " " << b.get( i );
-	  SIGEL_Tools::SIG_IO::cerr << "\n";
+	  SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 	  SIGEL_Tools::SIG_IO::cerr << "v:";
 	  for (int i=0; i<3; i++)
 	    SIGEL_Tools::SIG_IO::cerr << " " << v.get( i );
-	  SIGEL_Tools::SIG_IO::cerr << "\n";
+	  SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 #endif
 
 	  c.init(0, 0, 0);
@@ -756,7 +756,7 @@ namespace SIGEL_Robot {
 	  if (uvParallel)
 	    {
 #ifdef SIG_DEBUG
-	      SIGEL_Tools::SIG_IO::cerr << "u and v are parallel.\n";
+	      SIGEL_Tools::SIG_IO::cerr << "u and v are parallel." << Qt::endl;
 #endif
 
 	      c = a;
@@ -783,7 +783,7 @@ namespace SIGEL_Robot {
 	  else
 	    {
 #ifdef SIG_DEBUG
-	      SIGEL_Tools::SIG_IO::cerr << "u and v are not parallel.\n";
+	      SIGEL_Tools::SIG_IO::cerr << "u and v are not parallel." << Qt::endl;
 #endif
 
 	      u.crossprod( &v, &w );
@@ -799,23 +799,23 @@ namespace SIGEL_Robot {
 	      NEWMAT::ColumnVector solutions = linEqSystem.i() * rightSide;
 
 #ifdef SIG_DEBUG
-	      SIGEL_Tools::SIG_IO::cerr << "Linear equation system:\n";
+	      SIGEL_Tools::SIG_IO::cerr << "Linear equation system:" << Qt::endl;
 	      for (int i=1; i<=3; i++)
 		{
 		  for (int j=1; j<=3; j++)
 		    SIGEL_Tools::SIG_IO::cerr << linEqSystem( i, j ) << " ";
-		  SIGEL_Tools::SIG_IO::cerr << "\n";
+		  SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 		};
 
 	      SIGEL_Tools::SIG_IO::cerr << "Right side";
 	      for (int i=1; i<=3; i++)
 		SIGEL_Tools::SIG_IO::cerr << " " << rightSide( i );
-	      SIGEL_Tools::SIG_IO::cerr << "\n";
+	      SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 
 	      SIGEL_Tools::SIG_IO::cerr << "Solution vector (t0, t1, t2)^T:";
 	      for (int i=1; i<=3; i++)
 		SIGEL_Tools::SIG_IO::cerr << " " << solutions( i );
-	      SIGEL_Tools::SIG_IO::cerr << "\n";
+	      SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 #endif
 
 	      c = u;
@@ -849,12 +849,12 @@ namespace SIGEL_Robot {
 	      SIGEL_Tools::SIG_IO::cerr << "c:";
 	      for (int i=0; i<3; i++)
 		SIGEL_Tools::SIG_IO::cerr << " " << c.get( i );
-	      SIGEL_Tools::SIG_IO::cerr << "\n";
+	      SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 
 	      SIGEL_Tools::SIG_IO::cerr << "w:";
 	      for (int i=0; i<3; i++)
 		SIGEL_Tools::SIG_IO::cerr << " " << w.get( i );
-	      SIGEL_Tools::SIG_IO::cerr << "\n";
+	      SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 #endif
 	}
 }

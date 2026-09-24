@@ -264,7 +264,7 @@
 		// append the format ending (bmp or png)
 		fileName.append( "." + fileFormat );
 #ifdef SIG_DEBUG
-		SIGEL_Tools::SIG_IO::cerr << "Writing " << fileName << " in format " << movieWidth << " x " << movieHeight << " in quality " << movieQuality << ".\n";
+		SIGEL_Tools::SIG_IO::cerr << "Writing " << fileName << " in format " << movieWidth << " x " << movieHeight << " in quality " << movieQuality << "." << Qt::endl;
 #endif
 		// check if the directory exists. otherwise create it.
 		QDir movieDir( movieDirectory );

@@ -157,7 +157,7 @@ void SIGEL_Simulation::SIG_Simulation::slotDynamoMessage(QString theMessage)
 {
   // Process theMessage; currently it always aborts
 #ifdef SIG_DEBUG
-  SIGEL_Tools::SIG_IO::cout << theMessage;
+  SIGEL_Tools::SIG_IO::cout << theMessage << Qt::endl;
 #endif
 
   stopSimulation=true;

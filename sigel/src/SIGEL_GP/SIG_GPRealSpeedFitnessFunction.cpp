@@ -94,7 +94,7 @@ namespace SIGEL_GP
 #ifdef SIG_DEBUG
         SIGEL_Tools::SIG_IO::cerr << "localDistance: "
           << localDistance
-          << "\n";
+          << Qt::endl;
 #endif
 
         totalDistance += localDistance;

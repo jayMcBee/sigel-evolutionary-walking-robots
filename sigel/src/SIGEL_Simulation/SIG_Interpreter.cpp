@@ -83,17 +83,17 @@ namespace SIGEL_Simulation
 	     * ONLY FOR DEBUGGING-PURPOSES!
 	     */
 #ifdef SIG_DEBUG
-	    SIGEL_Tools::SIG_IO::cerr << "--------------------------------------------------------\n";
+	    SIGEL_Tools::SIG_IO::cerr << "--------------------------------------------------------" << Qt::endl;
 	    SIGEL_Tools::SIG_IO::cerr << "Remaining Time:" << timeAccountSize<< Qt::endl;
 	    SIGEL_Tools::SIG_IO::cerr << "PC: " << programCounter << Qt::endl;
 	    if( compareFlag )
-	      SIGEL_Tools::SIG_IO::cerr << "CF: 1\n";
+	      SIGEL_Tools::SIG_IO::cerr << "CF: 1" << Qt::endl;
 	    else
-	      SIGEL_Tools::SIG_IO::cerr << "CF: 0\n";
+	      SIGEL_Tools::SIG_IO::cerr << "CF: 0" << Qt::endl;
 	    QString theQLine;
 	    theLine->printToString( theQLine );
 	    SIGEL_Tools::SIG_IO::cerr << theQLine;
-	    SIGEL_Tools::SIG_IO::cerr << "Registers:\n";
+	    SIGEL_Tools::SIG_IO::cerr << "Registers:" << Qt::endl;
 	    for( int loop=0; loop < numberOfRegisters; loop++ )
 	      {
 		SIGEL_Tools::SIG_IO::cerr << "R" << loop << ":" << registers[loop].getValue() << "  ";
@@ -352,7 +352,7 @@ namespace SIGEL_Simulation
 		    else
 		      compareFlag = false;
 #ifdef SIG_DEBUG
-		    SIGEL_Tools::SIG_IO::cerr << "Reg0: " << reg0 << "; Reg1: " << reg1 << endl;
+		    SIGEL_Tools::SIG_IO::cerr << "Reg0: " << reg0 << "; Reg1: " << reg1 << Qt::endl;
 #endif
 		    programCounter = (programCounter + 1) % programLength;
 
@@ -436,7 +436,7 @@ namespace SIGEL_Simulation
 		    int reg0 = theLine->getInstructionElement(0) % numberOfRegisters;
 		    int numberOfJoint = registers[reg0].getValue();
 #ifdef SIG_DEBUG
-		    SIGEL_Tools::SIG_IO::cerr << "Moving drive " << numberOfJoint << ".\n";
+		    SIGEL_Tools::SIG_IO::cerr << "Moving drive " << numberOfJoint << "." << Qt::endl;
 #endif
 		    commandInterface.moveDrive( numberOfJoint, registers );
 		    programCounter = (programCounter + 1) % programLength;
@@ -518,7 +518,7 @@ namespace SIGEL_Simulation
 
 	      default:
 #ifdef SIG_DEBUG
-		SIGEL_Tools::SIG_IO::cerr << "Something went horribly wrong in the interpreter! Default was called!!! Didn't recognize command. PC++\n";
+		SIGEL_Tools::SIG_IO::cerr << "Something went horribly wrong in the interpreter! Default was called!!! Didn't recognize command. PC++" << Qt::endl;
 #endif
 		programCounter = (programCounter + 1) % programLength;
 		break;

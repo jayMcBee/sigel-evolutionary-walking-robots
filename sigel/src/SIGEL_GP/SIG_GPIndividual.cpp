@@ -154,11 +154,6 @@ SIGEL_GP::SIG_GPIndividual::SIG_GPIndividual(QString data)
 
 SIGEL_GP::SIG_GPIndividual::~SIG_GPIndividual()
 {
-#ifdef SIG_DEBUG
-
-  //   SIGEL_Tools::SIG_IO::cerr << "\nDestructor of INDIVIDUAL called!\n";
-
-#endif
 }
 
 
@@ -474,7 +469,7 @@ void SIGEL_GP::SIG_GPIndividual::importIndividual( QString& filename )
    else
      SIGEL_Tools::SIG_IO::cerr << "Could not import Individual from "
 					<< filename
-					<< "!\n";   
+					<< "!" << Qt::endl;   
 }
 
 
@@ -491,7 +486,7 @@ void SIGEL_GP::SIG_GPIndividual::exportIndividual( QString& filename )
    else
      SIGEL_Tools::SIG_IO::cerr << "Could not export Individual to "
 			       << filename
-			       << "!\n";   
+			       << "!" << Qt::endl;   
 }
 
 
@@ -536,7 +531,7 @@ void SIGEL_GP::SIG_GPIndividual::print()
                             << getFitness()
                             << "\n- Age    : "
                             << getAge()
-                            << "\n- Program:\n\n";
+                            << "\n- Program:\n" << Qt::endl;
 
   getProgramVar().print();
   
@@ -583,13 +578,8 @@ void SIGEL_GP::SIG_GPIndividual::readFromFile(QString indStr)
   QTextStream                 outputFile(&prgStr, QIODeviceBase::WriteOnly);  
   QTextStream                 inputFile(&prgStr, QIODeviceBase::ReadOnly);
 
-
-  // cout<<"Received string:\n"<<indStr<<"\n";  
-  
-
   if((pos=indStr.indexOf("NAME='", 0, Qt::CaseInsensitive))!=-1)
     {
-      // cout<<indStr.mid(pos+6,indStr.indexOf("'", pos+7, Qt::CaseInsensitive)-pos-6);
       setName(indStr.mid(pos+6,indStr.indexOf("'", pos+7, Qt::CaseInsensitive)-pos-6));
     }
   else
@@ -599,7 +589,6 @@ void SIGEL_GP::SIG_GPIndividual::readFromFile(QString indStr)
 
   if((pos=indStr.indexOf("POOLPOS=", 0, Qt::CaseInsensitive))!=-1)
     {
-      //cout<<indStr.mid(pos+8,indStr.indexOf(";", pos+9, Qt::CaseInsensitive)-pos-8);
       setPoolPos((indStr.mid(pos+8,indStr.indexOf(";", pos+9, Qt::CaseInsensitive)-pos-8)).toLong());
     }
   else
@@ -609,7 +598,6 @@ void SIGEL_GP::SIG_GPIndividual::readFromFile(QString indStr)
 
   if((pos=indStr.indexOf("FITNESS=", 0, Qt::CaseInsensitive))!=-1)
     {
-      //cout<<indStr.mid(pos+8,indStr.indexOf(";", pos+9, Qt::CaseInsensitive)-pos-8);
       setFitness((indStr.mid(pos+8,indStr.indexOf(";", pos+9, Qt::CaseInsensitive)-pos-8)).toDouble());
     }
   else
@@ -619,7 +607,6 @@ void SIGEL_GP::SIG_GPIndividual::readFromFile(QString indStr)
 
   if((pos=indStr.indexOf("AGE=", 0, Qt::CaseInsensitive))!=-1)
     {
-      //cout<<indStr.mid(pos+4,indStr.indexOf(";", pos+5, Qt::CaseInsensitive)-pos-4);
       setAge((indStr.mid(pos+4,indStr.indexOf(";", pos+5, Qt::CaseInsensitive)-pos-4)).toLong());
     }
   else
@@ -629,7 +616,6 @@ void SIGEL_GP::SIG_GPIndividual::readFromFile(QString indStr)
   
   if((pos=indStr.indexOf("PROGRAM BEGIN{", 0, Qt::CaseInsensitive))!=-1)
     {
-      //cout<<indStr.mid(pos+14,indStr.indexOf("}PROGRAM END", pos+15, Qt::CaseInsensitive)-pos-14);
       prgStr=indStr.mid(pos+15,indStr.indexOf("}PROGRAM END", pos+16, Qt::CaseInsensitive)-pos-14);
       getProgramPointer()->clear();
       getProgramPointer()->readFromFile(inputFile);

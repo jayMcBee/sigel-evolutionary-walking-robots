@@ -76,18 +76,18 @@ namespace SIGEL_Simulation
 				      inertiaTensor );
 
 #ifdef SIG_DEBUG
-    SIGEL_Tools::SIG_IO::cerr << "Density: " << density << "\n";
-    SIGEL_Tools::SIG_IO::cerr << "Mass: " << mass << "\n";
+    SIGEL_Tools::SIG_IO::cerr << "Density: " << density << Qt::endl;
+    SIGEL_Tools::SIG_IO::cerr << "Mass: " << mass << Qt::endl;
     SIGEL_Tools::SIG_IO::cerr << "Center of mass:";
     for (int i=0; i<3; i++)
       SIGEL_Tools::SIG_IO::cerr << " " << centerOfMass.get( i );
-    SIGEL_Tools::SIG_IO::cerr << "\n";
-    SIGEL_Tools::SIG_IO::cerr << "Inertia tensor:\n";
+    SIGEL_Tools::SIG_IO::cerr << Qt::endl;
+    SIGEL_Tools::SIG_IO::cerr << "Inertia tensor:" << Qt::endl;
     for (int i=0; i<3; i++)
       {
 	for (int j=0; j<3; j++)
 	  SIGEL_Tools::SIG_IO::cerr << inertiaTensor.get( i, j ) << " ";
-	    SIGEL_Tools::SIG_IO::cerr << "\n";
+	    SIGEL_Tools::SIG_IO::cerr << Qt::endl;
       };
 #endif
 
@@ -180,14 +180,14 @@ namespace SIGEL_Simulation
 				  << theta
 				  << ", d: "
 				  << d
-				  << "\n";
+				  << Qt::endl;
 
-	SIGEL_Tools::SIG_IO::cerr << "New Transformation:\n";
+	SIGEL_Tools::SIG_IO::cerr << "New Transformation:" << Qt::endl;
 	for (int i=1; i<=4; i++)
 	  {
 	    for (int j=1; j<=4; j++)
 	      SIGEL_Tools::SIG_IO::cerr << transformation( i, j ) << " ";
-	    SIGEL_Tools::SIG_IO::cerr << "\n";
+	    SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 	  };
 #endif
 
@@ -216,12 +216,12 @@ namespace SIGEL_Simulation
 
 #ifdef SIG_DEBUG
     SIGEL_Tools::SIG_IO::cerr << "X-Angle: " << angle << "\n"
-			      << "Matrix:\n";
+			      << "Matrix:" << Qt::endl;
     for (int i=1; i<=4; i++)
       {
 	for (int j=1; j<=4; j++)
 	  SIGEL_Tools::SIG_IO::cerr << transformation( i, j ) << " ";
-	SIGEL_Tools::SIG_IO::cerr << "\n";
+	SIGEL_Tools::SIG_IO::cerr << Qt::endl;
       };
 #endif
 
@@ -247,12 +247,12 @@ namespace SIGEL_Simulation
 
 #ifdef SIG_DEBUG
     SIGEL_Tools::SIG_IO::cerr << "Z-Angle: " << angle << "\n"
-			      << "Matrix:\n";
+			      << "Matrix:" << Qt::endl;
     for (int i=1; i<=4; i++)
       {
 	for (int j=1; j<=4; j++)
 	  SIGEL_Tools::SIG_IO::cerr << transformation( i, j ) << " ";
-	SIGEL_Tools::SIG_IO::cerr << "\n";
+	SIGEL_Tools::SIG_IO::cerr << Qt::endl;
       };
 #endif
 
@@ -272,12 +272,12 @@ namespace SIGEL_Simulation
 
 #ifdef SIG_DEBUG
     SIGEL_Tools::SIG_IO::cerr << "Move: " << x << " " << y << " " << z << "\n"
-			      << "Matrix:\n";
+			      << "Matrix:" << Qt::endl;
     for (int i=1; i<=4; i++)
       {
 	for (int j=1; j<=4; j++)
 	  SIGEL_Tools::SIG_IO::cerr << transformation( i, j ) << " ";
-	SIGEL_Tools::SIG_IO::cerr << "\n";
+	SIGEL_Tools::SIG_IO::cerr << Qt::endl;
       };
 #endif
 
