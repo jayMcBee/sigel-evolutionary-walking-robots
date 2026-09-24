@@ -529,16 +529,16 @@ SIG_MainWindow::SIG_MainWindow( QWidget * parent, const char * name, Qt::WindowF
 		    SLOT( slotDeleteIndividuals() ) );
   deleteIndividualsAction->setStatusTip( "Delete the selected individuals from the currently selected experiment." );
 
-  QAction *resetIndividualsAction = new QAction( "Reset", this );
-  resetIndividualsAction->setToolTip( "Reset" );
-  resetIndividualsAction->setIconText( "Reset" );
-  resetIndividualsAction->setShortcut( Qt::ALT | Qt::Key_O );
-  individualsMenu->addAction( resetIndividualsAction );
-  QObject::connect( resetIndividualsAction,
+  QAction *resetAllFitnessValuesAction = new QAction( "Reset All Fitness Values", this );
+  resetAllFitnessValuesAction->setToolTip( "Reset All Fitness Values" );
+  resetAllFitnessValuesAction->setIconText( "Reset All Fitness Values" );
+  resetAllFitnessValuesAction->setShortcut( Qt::ALT | Qt::Key_O );
+  individualsMenu->addAction( resetAllFitnessValuesAction );
+  QObject::connect( resetAllFitnessValuesAction,
 		    SIGNAL( triggered() ),
 		    experimentListView,
-		    SLOT( slotResetIndividuals() ) );
-  resetIndividualsAction->setStatusTip( "Reset the selected individuals." );
+		    SLOT( slotResetAllFitnessValues() ) );
+  resetAllFitnessValuesAction->setStatusTip( "Clear the fitness of every individual." );
 
   individualsMenu->addSeparator();
   individualsToolBar->addSeparator();
@@ -559,7 +559,7 @@ SIG_MainWindow::SIG_MainWindow( QWidget * parent, const char * name, Qt::WindowF
 
   noExperimentActions.append( addIndividualsAction );
   noExperimentActions.append( deleteIndividualsAction );
-  noExperimentActions.append( resetIndividualsAction );
+  noExperimentActions.append( resetAllFitnessValuesAction );
   noExperimentActions.append( visualizeIndividualsAction );
 
   slotEnableNoExperimentActions( false );
@@ -588,7 +588,7 @@ SIG_MainWindow::SIG_MainWindow( QWidget * parent, const char * name, Qt::WindowF
   evolutionRunningActions.append( exportIndividualAction );
   evolutionRunningActions.append( addIndividualsAction );
   evolutionRunningActions.append( deleteIndividualsAction );
-  evolutionRunningActions.append( resetIndividualsAction );
+  evolutionRunningActions.append( resetAllFitnessValuesAction );
   evolutionRunningActions.append( visualizeIndividualsAction );
 
   /**

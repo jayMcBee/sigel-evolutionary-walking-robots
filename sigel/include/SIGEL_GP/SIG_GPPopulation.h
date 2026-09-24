@@ -408,7 +408,7 @@ class SIG_GPPopulation
     double getAverageFitness();
 
   public:
-    void resetPool();
+    void resetAllFitnessValues();
 
     /**
      * This function imports a new individual. A new individual will be created automatically before. Hence, the population

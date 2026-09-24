@@ -520,7 +520,7 @@ double SIGEL_GP::SIG_GPPopulation::getBestFitness(bool high)
     return 0;
 }
 
-void SIGEL_GP::SIG_GPPopulation::resetPool()
+void SIGEL_GP::SIG_GPPopulation::resetAllFitnessValues()
 {
   for(unsigned int counter = 0; counter < pool.size(); counter++ )
     pool[ counter ]->setFitness( -1 );

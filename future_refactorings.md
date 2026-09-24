@@ -191,12 +191,6 @@ Constructs the language removed. A current compiler rejects them.
   nothing prints one today, `sigel --version` does not exist, and the honest
   alternative is that the About box is the only place a user ever sees it.
 
-- [ ] **80. Rename `SIG_GPPopulation::resetPool`.** It keeps every individual
-  and only sets each fitness to -1, so the name is wrong. Callers:
-  `SIG_GPManager::run`, every `ResetEveryGeneration` generations, and
-  `SIG_AllIndividualsView::slotResetPool`, which needs the same rename. Check
-  the slot's `connect` and any menu text that says "reset pool".
-
 ---
 
 ## 6 · Defects preserved by the port
@@ -263,7 +257,7 @@ touched, because changing one changes behaviour against the reference binary.
   individuals can ever play. The pool itself can grow past that, through
   repeated Adds or a loaded file, whose `POPULATIONSIZE` and `INDIVIDUAL(x)`
   indexes both grow it. An individual further down is evaluated — every
-  generation, because `resetPool` clears its fitness — but never enters a
+  generation, because `resetAllFitnessValues` clears its fitness — but never enters a
   tournament.
   **The modulo also favours low positions** at every pool size that does not
   divide 32768: 4 draws against 3 for the first 2471 positions of a pool of

@@ -335,10 +335,11 @@ static int selfcheck()
 
     // Every SIG_GPIndividual constructor already sets fitness to -1, so
     // asserting -1 on a fresh pool cannot fail. Move one off it first, and
-    // check BOTH slots -- a resetPool that reset only the first would pass.
+    // check BOTH slots -- a resetAllFitnessValues that reset only the first
+    // would pass.
     pop.getIndividualPointer( 0 )->setFitness( 3.5 );
     pop.getIndividualPointer( 1 )->setFitness( 7.5 );
-    pop.resetPool();
+    pop.resetAllFitnessValues();
     SIG_WANT(pop.getIndividualPointer( 0 )->getFitness() == -1);
     SIG_WANT(pop.getIndividualPointer( 1 )->getFitness() == -1);
 

@@ -120,9 +120,10 @@ namespace SIGEL_MasterGUI
       void slotDeleteIndividuals();
 
       /**
-       * This slot is called to reset all individuals in the pool to -1.
+       * Sets the fitness of every individual in the pool to -1 and refreshes
+       * the list.
        */
-      void slotResetPool();
+      void slotResetAllFitnessValues();
       
       /**
        * This slot is called whenever the pushbutton Stats is clicked.

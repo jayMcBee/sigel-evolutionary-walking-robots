@@ -306,7 +306,7 @@
     &Individuals/&Add                                          ENABLED
     &Individuals/&Delete                                       ENABLED
     &Individuals/&Visualize                                    ENABLED
-    &Individuals/Reset                                         ENABLED
+    &Individuals/Reset All Fitness Values                      ENABLED
     &MetaGP/&Use MetaGP                                        ENABLED
     &View/&Environment                                         ENABLED
     &View/&GP Parameters                                       ENABLED
@@ -379,7 +379,7 @@ actions=58 withIcon=32 loadedNothing=0
   &Individuals/&Add                                        icon=1 sizes=2
   &Individuals/&Delete                                     icon=1 sizes=2
   &Individuals/&Visualize                                  icon=1 sizes=2
-  &Individuals/Reset                                       icon=0 sizes=0
+  &Individuals/Reset All Fitness Values                    icon=0 sizes=0
   &MetaGP/&Configure System                                icon=1 sizes=1
   &MetaGP/&Evaluator System                                icon=0 sizes=0
   &MetaGP/&Use MetaGP                                      icon=1 sizes=1
@@ -526,7 +526,7 @@ we do with the system?]
     &Individuals/&Add                                          ENABLED
     &Individuals/&Delete                                       ENABLED
     &Individuals/&Visualize                                    ENABLED
-    &Individuals/Reset                                         ENABLED
+    &Individuals/Reset All Fitness Values                      ENABLED
     &MetaGP/&Use MetaGP                                        ENABLED
     &View/&Environment                                         ENABLED
     &View/&GP Parameters                                       ENABLED
@@ -990,7 +990,7 @@ we do with the system?]
     &Individuals/&Add                                          ENABLED
     &Individuals/&Delete                                       ENABLED
     &Individuals/&Visualize                                    ENABLED
-    &Individuals/Reset                                         ENABLED
+    &Individuals/Reset All Fitness Values                      ENABLED
     &MetaGP/&Use MetaGP                                        ENABLED
     &View/&Environment                                         ENABLED
     &View/&GP Parameters                                       ENABLED
@@ -1196,7 +1196,7 @@ selected=17013
     &Individuals/&Add                                          ENABLED
     &Individuals/&Delete                                       ENABLED
     &Individuals/&Visualize                                    ENABLED
-    &Individuals/Reset                                         ENABLED
+    &Individuals/Reset All Fitness Values                      ENABLED
     &MetaGP/&Use MetaGP                                        ENABLED
     &View/&Environment                                         ENABLED
     &View/&GP Parameters                                       ENABLED
@@ -1317,7 +1317,7 @@ Do you want to replace it?]
     &Individuals/&Add                                          ENABLED
     &Individuals/&Delete                                       ENABLED
     &Individuals/&Visualize                                    ENABLED
-    &Individuals/Reset                                         ENABLED
+    &Individuals/Reset All Fitness Values                      ENABLED
     &MetaGP/&Use MetaGP                                        ENABLED
     &View/&Environment                                         ENABLED
     &View/&GP Parameters                                       ENABLED
@@ -1525,7 +1525,7 @@ Do you want to replace it?]
     &Individuals/&Add                                          ENABLED
     &Individuals/&Delete                                       ENABLED
     &Individuals/&Visualize                                    ENABLED
-    &Individuals/Reset                                         ENABLED
+    &Individuals/Reset All Fitness Values                      ENABLED
     &MetaGP/&Use MetaGP                                        ENABLED
     &View/&Environment                                         ENABLED
     &View/&GP Parameters                                       ENABLED
@@ -1875,7 +1875,7 @@ Do you want to replace it?]
     &Individuals/&Add                                          ENABLED
     &Individuals/&Delete                                       ENABLED
     &Individuals/&Visualize                                    ENABLED
-    &Individuals/Reset                                         ENABLED
+    &Individuals/Reset All Fitness Values                      ENABLED
     &MetaGP/&Use MetaGP                                        ENABLED
     &View/&Environment                                         ENABLED
     &View/&GP Parameters                                       ENABLED
@@ -2055,7 +2055,7 @@ Do you want to replace it?]
     &Individuals/&Add                                          ENABLED
     &Individuals/&Delete                                       ENABLED
     &Individuals/&Visualize                                    ENABLED
-    &Individuals/Reset                                         ENABLED
+    &Individuals/Reset All Fitness Values                      ENABLED
     &MetaGP/&Use MetaGP                                        ENABLED
     &View/&Environment                                         ENABLED
     &View/&GP Parameters                                       ENABLED
@@ -2284,7 +2284,7 @@ Do you want to replace it?]
     &Individuals/&Add                                          ENABLED
     &Individuals/&Delete                                       ENABLED
     &Individuals/&Visualize                                    ENABLED
-    &Individuals/Reset                                         ENABLED
+    &Individuals/Reset All Fitness Values                      ENABLED
     &MetaGP/&Use MetaGP                                        ENABLED
     &View/&Environment                                         ENABLED
     &View/&GP Parameters                                       ENABLED
@@ -2463,7 +2463,7 @@ Do you want to replace it?]
     &Individuals/&Add                                          ENABLED
     &Individuals/&Delete                                       ENABLED
     &Individuals/&Visualize                                    ENABLED
-    &Individuals/Reset                                         ENABLED
+    &Individuals/Reset All Fitness Values                      ENABLED
     &MetaGP/&Use MetaGP                                        ENABLED
     &View/&Environment                                         ENABLED
     &View/&GP Parameters                                       ENABLED
@@ -2586,7 +2586,7 @@ Do you want to replace it?]
     &Individuals/&Add                                          ENABLED
     &Individuals/&Delete                                       ENABLED
     &Individuals/&Visualize                                    ENABLED
-    &Individuals/Reset                                         ENABLED
+    &Individuals/Reset All Fitness Values                      ENABLED
     &MetaGP/&Use MetaGP                                        ENABLED
     &View/&Environment                                         ENABLED
     &View/&GP Parameters                                       ENABLED

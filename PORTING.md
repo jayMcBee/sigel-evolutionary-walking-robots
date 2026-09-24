@@ -898,8 +898,10 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 - **`SIG_IO::cerr` and `cout`:** every complete log message ends with
   `Qt::endl`, so it is written at once. Commented-out debug logging is gone.
 - **Item 2:** the `register` keyword is gone.
-- **New item 80:** rename `SIG_GPPopulation::resetPool`, which resets only
-  fitness. **Item 75** has a note on the height warnings in three fitness
+- **Item 80:** `SIG_GPPopulation::resetPool` is `resetAllFitnessValues`; the
+  menu item Individuals > Reset reads "Reset All Fitness Values", and its two
+  slots are `slotResetAllFitnessValues`.
+  **Item 75** has a note on the height warnings in three fitness
   functions.
 - **Gates:** `check.sh` 972 pass, 0 fail; warnings 497. One run failed
   `gui behaviour` with "first export failed" and "menu [&File] did not open";
@@ -4831,6 +4833,20 @@ carried; other items and this file cite them, so they do not change.
 
 - [x] **2. `register` keyword** — done 2026-09-24. Deleted at its 3 sites in
   `SIG_EnvironmentRenderer.cpp`; no other use in SIGEL's code.
+
+- [x] **80. Rename `SIG_GPPopulation::resetPool`** — done 2026-09-24. It
+  keeps every individual and only sets each fitness to -1, so it is
+  `resetAllFitnessValues` now. The menu item Individuals > Reset read as
+  "reset the individuals", and its status tip said "Reset the selected
+  individuals.", but it clears every individual's fitness. By decision the
+  item and its tooltip read "Reset All Fitness Values", the status tip "Clear
+  the fitness of every individual.", and the names follow:
+  `SIG_AllIndividualsView::slotResetPool` and
+  `SIG_ExperimentListView::slotResetIndividuals` are both
+  `slotResetAllFitnessValues`, and the action is
+  `resetAllFitnessValuesAction`. Only the lines that print the menu text
+  moved: 1 in `guidump-baseline.txt`, 1 in `xtest-baseline.txt` and 12 in
+  `guibehaviour-baseline.txt`.
 
 #### Not doing
 

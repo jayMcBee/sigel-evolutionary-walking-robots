@@ -223,7 +223,7 @@ class SIG_ExperimentListView : public QTreeWidget
 
   void slotDeleteIndividuals();
 
-  void slotResetIndividuals();
+  void slotResetAllFitnessValues();
 
   void slotVisualizeIndividuals();
 

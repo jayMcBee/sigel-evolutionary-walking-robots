@@ -732,7 +732,7 @@ void SIGEL_GP::SIG_GPManager::run() {
     // Do not divide by zero
     if ( currentExperiment.gpParameter.getResetEveryGeneration() != 0) {
       if ( (currentExperiment.population.getPoolGeneration() % currentExperiment.gpParameter.getResetEveryGeneration()) == 0)
-        currentExperiment.population.resetPool();
+        currentExperiment.population.resetAllFitnessValues();
     }
     // evaluate the individuals which have no fitness value
     evalNewIndis();

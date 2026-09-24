@@ -280,9 +280,9 @@ void SIG_AllIndividualsView::slotDeleteIndividuals()
   
 };
 
-void SIG_AllIndividualsView::slotResetPool()
+void SIG_AllIndividualsView::slotResetAllFitnessValues()
 {
-  theExperiment.population.resetPool();
+  theExperiment.population.resetAllFitnessValues();
   slotCompleteRefreshList();
 };
 

@@ -146,7 +146,7 @@
     &Individuals/&Add                                          ENABLED
     &Individuals/&Delete                                       ENABLED
     &Individuals/&Visualize                                    ENABLED
-    &Individuals/Reset                                         ENABLED
+    &Individuals/Reset All Fitness Values                      ENABLED
     &MetaGP/&Use MetaGP                                        ENABLED
     &View/&Environment                                         ENABLED
     &View/&GP Parameters                                       ENABLED

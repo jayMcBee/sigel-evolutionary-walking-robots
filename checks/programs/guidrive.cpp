@@ -26,7 +26,7 @@
     sort       clicking the Fitness header, both directions
     add        Individuals > Add and where new individuals land
     delete     Individuals > Delete, answered No then Yes
-    reset      Individuals > Reset
+    reset      Individuals > Reset All Fitness Values
     rename     File > Rename, cancelled then applied
     delexp     File > Delete Experiment, answered No
     quit       File > Quit, answered No
@@ -4423,7 +4423,7 @@ static int guidriveMain(int argc, char **argv)
         return 0;
     }
 
-    // --- Individuals > Reset ----------------------------------------------
+    // --- Individuals > Reset All Fitness Values -----------------------------
     if (scenario == "reset") {
         QTreeWidget *t = indList();
         printf("\n  [before reset] rows=%d row0=[%s|%s|%s]\n", t->topLevelItemCount(),
@@ -4431,9 +4431,9 @@ static int guidriveMain(int argc, char **argv)
                qPrintable(t->topLevelItem(0)->text(2)));
         whenModal([](QWidget *m) { printf("  [unexpected modal on reset]\n");
                                    describeDialog(m); m->close(); }, 2500);
-        clickMenu("&Individuals", "Reset");
+        clickMenu("&Individuals", "Reset All Fitness Values");
         QTest::qWait(2000);
-        step("after Individuals > Reset", false, false, true);
+        step("after Individuals > Reset All Fitness Values", false, false, true);
         return 0;
     }
 
@@ -5462,8 +5462,9 @@ static int guidriveMain(int argc, char **argv)
         }
 
         // SIGEL_RESET_POOL=1 clears every stored fitness to -1 through the real
-        // GUI path (Individuals > Reset -> SIG_GPPopulation::resetPool), so the
-        // whole pool is re-evaluated ON THIS MACHINE. Without it the pool still
+        // GUI path (Individuals > Reset All Fitness Values ->
+        // SIG_GPPopulation::resetAllFitnessValues), so the whole pool is
+        // re-evaluated ON THIS MACHINE. Without it the pool still
         // carries the 2003 i386 numbers for whichever individuals survive, and
         // any fitness curve drawn from it mixes two architectures and means
         // nothing -- which is exactly how a first attempt at this went wrong.
@@ -5471,7 +5472,7 @@ static int guidriveMain(int argc, char **argv)
             clickMenu("&View", "&Population");
             QTest::qWait(400);
             whenModal([](QWidget *m) { clickMsgButton(m, QMessageBox::Yes); });
-            clickMenu("&Individuals", "Reset");
+            clickMenu("&Individuals", "Reset All Fitness Values");
             QTest::qWait(3000);
             cancelModalHandler();
             if (SIG_GUIGPExperiment *ex = lv->currentlySelectedExperiment()) {

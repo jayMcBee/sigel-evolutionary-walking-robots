@@ -586,13 +586,13 @@ void SIG_ExperimentListView::slotDeleteIndividuals()
     QMessageBox::information( this, "No experiment selected", "Currently there is no experiment selected." );
 };
 
-void SIG_ExperimentListView::slotResetIndividuals()
+void SIG_ExperimentListView::slotResetAllFitnessValues()
 {
   SIG_GUIGPExperiment *theExperiment = currentlySelectedExperiment();
   if( theExperiment )
     {
       slotShowIndividuals();
-      theExperiment->allIndividualsView->slotResetPool();
+      theExperiment->allIndividualsView->slotResetAllFitnessValues();
     }
   else
     QMessageBox::information( this, "No experiment selected", "Currently there is no experiment selected." );

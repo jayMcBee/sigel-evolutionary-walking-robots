@@ -74,7 +74,7 @@
 &View | &Environment | Alt+E | greyed | n/a
 &Individuals | &Add | Alt+A | greyed | n/a
 &Individuals | &Delete | Alt+D | greyed | n/a
-&Individuals | Reset | Alt+O | greyed | n/a
+&Individuals | Reset All Fitness Values | Alt+O | greyed | n/a
 &Individuals | --- | - | - | -
 &Individuals | &Visualize | Alt+V | greyed | n/a
 &Options | Use big pixmaps | - | enabled | no-tick
