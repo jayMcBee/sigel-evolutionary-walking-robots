@@ -918,8 +918,8 @@ Start here.
   From the `sigel-x86` session's diagnostics wishlist: 75 to 77.
 - **New item 70:** a menu command that clones an experiment with a fresh
   population.
-- **Jan's observations from the runner run, settled:**
-  - The run handed out individual IDs up to 366,740 (`NEXTIDENTIFIER`), so IDs
+- **Jan's observations from the runner run, now filed:**
+  - The run handed out 366,740 individual IDs (`NEXTIDENTIFIER=366740`), so IDs
     pass 32,767 without trouble; `SIG_GPPopulation::getNextIdentifier` counts
     in an `int`. Item 59, the pool size, is a different limit; a direction for
     it is pencilled in there.

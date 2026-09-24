@@ -536,15 +536,6 @@ touched, because changing one changes behaviour against the reference binary.
     (`dmRigidBody::getForce(0)` is NULL), or on the `default:` branch,
     `registerValue` is never set and `loadValue` still reads it.
 
-- [ ] **78. The Name column on the Individuals page is too narrow.** Raised
-  2026-09-24 after the runner run: it should be 50% wider, and the table has
-  empty space. Interface work, to go with item 70.
-
-- [ ] **79. File > Save Experiment always asks for a file name.** Raised
-  2026-09-24. `SIG_ExperimentListView::slotSaveExperiment` opens
-  `QFileDialog::getSaveFileName` every time, so Save acts as Save As.
-  Interface work, to go with item 70.
-
 - [ ] **74. A timed-out individual is evaluated again, for ever.** Found
   2026-09-24. When `TIMEOUTMINUTES` expires, `SIG_GPFitnessTrainer::checkTask`
   kills the slave and puts the same individual back on `toSpawnList`; the
@@ -587,6 +578,17 @@ touched, because changing one changes behaviour against the reference binary.
     `maximalforce / (mass * g * half-length)`. It is 0.60 to 0.92 in all
     seven shipped models, whose masses span 1.2 to 49; nothing documents it,
     so a new model can be badly under- or over-powered.
+
+- [ ] **78. The Name column on the Individuals page is too narrow.** Raised
+  2026-09-24 after the runner run: it should be 50% wider, and the table has
+  empty space. The width comes from the space-padded header text of the Name
+  column of `listviewIndividuals` in `SIG_IndividualListBase.ui`; no code sets
+  a column width. Interface work, to go with item 70.
+
+- [ ] **79. File > Save Experiment always asks for a file name.** Raised
+  2026-09-24. `SIG_ExperimentListView::slotSaveExperiment` opens
+  `QFileDialog::getSaveFileName` every time, so Save acts as Save As.
+  Interface work, to go with item 70.
 
 - [ ] **47. `sigelDynClient` and `manage_dyn_slave`.** `sigelDynClient` makes a
   second machine a dynamic slave of a master started with `sigel -de`, which
