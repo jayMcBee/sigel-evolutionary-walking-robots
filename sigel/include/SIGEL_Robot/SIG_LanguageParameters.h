@@ -43,6 +43,12 @@ namespace SIGEL_Robot {
                 /** One allowed command, with the name it is declared under. */
                 struct NamedCommand { QString name; SIG_CommandParameters *value; };
 
+                /**
+                 * The widest register allowed. A product of two
+                 * registers must fit in an int.
+                 */
+                static const int maxRegisterWidth = 16;
+
         private:
                 /**
                  * A dictionary of the commands allowed in the
@@ -70,7 +76,7 @@ namespace SIGEL_Robot {
         public:
                 /**
                  * Standard constructor. Empty dictionary and
-                 * 32-bit-registers.
+                 * 8-bit-registers.
                  */
                 SIG_LanguageParameters (void);
                 /**

@@ -818,7 +818,7 @@ we do with the system?]
       row14 |                       | SUB                   | 0.001                 | col0icon=1 col0check=0
   [drive]
     spin   spinboxNumberOfRegisters             v=8         [1..32000] step=1 pre=[] suf=[] up=9         dn2=7         typed(max+1)=[3200]->3200 commits=3200 enabled=1
-    spin   spinboxRegisterWidth                 v=3         [1..99] step=1 pre=[] suf=[ bit] up=4         dn2=2         typed(max+1)=[10 bit]->10 commits=10 enabled=1
+    spin   spinboxRegisterWidth                 v=3         [1..16] step=1 pre=[] suf=[ bit] up=4         dn2=2         typed(max+1)=[1 bit]->1 commits=1 enabled=1
     spin   spinboxMaximalDelayTime              v=5000      [0..64000] step=1 pre=[] suf=[ msec] up=5001      dn2=4999      typed(max+1)=[6400 msec]->6400 commits=6400 enabled=1
 
 == PAGE &Robot ==
@@ -1980,7 +1980,7 @@ Do you want to replace it?]
   list listboxDrives          count=1
   [modal] class=QFileDialog title=[Export Language Parameters]
   language-parameters before 6828590f91539e7159a6b22dd0aca26815ee24c8cb99deefeed050937df3c718
-  language-parameters after  dc48b8ea613ad127eb95812a1c5da85c86eaadc17d7c58686cefcd60781c335a
+  language-parameters after  ec7bcab7386a54bd47c3f0362185732be9cff75d105363d05630636834e6a362
   ROBOT IMPORT *** CHANGED the language parameters ***
 
 -- Program import (replaces the selected individual's program)

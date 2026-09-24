@@ -181,8 +181,11 @@
                     <property name="minimum">
                       <number>1</number>
                     </property>
+                    <property name="maximum">
+                      <number>16</number>
+                    </property>
                     <property name="value">
-                      <number>32</number>
+                      <number>8</number>
                     </property>
                   </widget>
                 </item>

@@ -432,23 +432,6 @@ touched, because changing one changes behaviour against the reference binary.
   `SIG_GPExperiment::experimentHistory`, then
   `SIG_GPPopulation::addRandomIndividuals` and `saveExperiment`.
 
-- [ ] **71. Register widths above 16 bits reach undefined behaviour.**
-  Researched 2026-09-23, nothing decided. A new
-  experiment gets 32 (`SIG_LanguageParameters(void)`); the spin box
-  `spinboxRegisterWidth` allows 1 to 99, and so does `SIG_Register`'s
-  constructor. Largest width free of undefined behaviour, found with a
-  sanitizer test of the copied operations over widths 1 to 40: `mulReg` 16,
-  `makeValid` 30, the casts in `sense` and `moveDrive` 31. At 32 every
-  `makeValid` overflows, and a sensor's top and bottom swap. The shipped
-  experiments use 8 (six) and 3 (twoBases). Program generation draws operands
-  in -31999..31999, which fit in 16 bits. **One option:** cap at 16 in
-  the spin box, clamp to 1..16 after `tx >> bitsPerRegister` in the
-  `SIG_LanguageParameters` stream constructor, narrow `SIG_Register`'s
-  constructor, and make 8 the default: 17 lines, counted from a draft. No file format change;
-  a file wider than 16 loads as 16 and saves back as 16 — none exists. Another
-  option, 64-bit register values capped
-  at 32, touches 40 lines, counted from a draft, and the interpreter's hot path.
-
 - [ ] **72. A slave result of exactly -1.0 hangs the run.** Found 2026-09-23
   by reading `SIG_GPFitnessTrainer::checkTask` and its callers in
   `SIG_GPManager`: `checkTask` receives the result and deletes the task, but

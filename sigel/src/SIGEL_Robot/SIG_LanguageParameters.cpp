@@ -26,7 +26,7 @@
 
 namespace SIGEL_Robot {
         SIG_LanguageParameters::SIG_LanguageParameters (void)
-                : bitsPerRegister (32),
+                : bitsPerRegister (8),
                   memSize (8),
 		  maximalDelayTime(5000),
                   allowedCommands ()
@@ -110,6 +110,9 @@ namespace SIGEL_Robot {
                 // else "LanguageParameters" already read by SIG_Robot
 
                 tx >> bitsPerRegister;
+                if (bitsPerRegister < 1 || bitsPerRegister > maxRegisterWidth)
+                        throw SIG_UnstreamingError (__FILE__, __LINE__,
+                                QString ("Register width %1 is outside 1..%2").arg (bitsPerRegister).arg (maxRegisterWidth));
                 tx >> memSize;
 		tx >> maximalDelayTime;
 

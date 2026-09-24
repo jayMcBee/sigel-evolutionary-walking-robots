@@ -24,15 +24,16 @@
 #endif
 
 #include "SIGEL_Simulation/SIG_Register.h"
+#include "SIGEL_Robot/SIG_LanguageParameters.h"
 #include <cmath> // needed for computing the power of a number
 
 SIGEL_Simulation::SIG_Register::SIG_Register(int size)
   : value(0)
 {
-  if ( (size>0) && (size<100) )
+  if ( (size>0) && (size<=SIGEL_Robot::SIG_LanguageParameters::maxRegisterWidth) )
     this->size = size;
   else 
-    throw SIG_RegisterWrongSizeException(__FILE__,__LINE__,"Size of Register must be between 1 and 99");
+    throw SIG_RegisterWrongSizeException(__FILE__,__LINE__,"Size of Register must be between 1 and 16");
 };
 
 void SIGEL_Simulation::SIG_Register::makeValid()

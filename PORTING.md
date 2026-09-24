@@ -887,6 +887,15 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-09-24, evening — DONE: ITEM 71, THE REGISTER WIDTH.** Start here.
+
+- **Item 71:** register widths are 1 to 16, and a new experiment gets 8. A
+  file with a width outside 1..16 is refused on load. The Done entry has the
+  detail; "Changes from 1.3" has a row.
+- **Gates:** `check.sh` 972 pass, 0 fail; warnings 497. Two lines of
+  `guibehaviour-baseline.txt` moved: the spin box range, and the
+  language-parameters hash after a robot import, which exports the defaults.
+
 **2026-09-24, later — DONE: ITEMS 24, 60, 2, 80, AND TWO CLEAN-UP ROUNDS.** Start here.
 
 - **Item 24, the progress bar:** it counts the generation's finished
@@ -3322,6 +3331,7 @@ else that stops matching 1.3 still needs justifying as a defect.
 | **A click that closes an open menu is swallowed here. 1.3 passes it on.** On 1.3 one real click closes the File menu and selects the list row under it. Here the menu closes and the row does not move, so the user must click again | Qt’s own popup handling, not SIGEL code. The Qt 2 side is in the vendored source: `qapplication_x11.cpp:3402-3416`, in `QApplication::closePopup`, calls **`XAllowEvents(…, ReplayPointer, CurrentTime)`** when the last popup closes on a press outside it. The X server then delivers that press again to the window below. The same code subtracts 10 s from `mouseButtonPressTime`, so the repeated press cannot count as a double click. Qt 6 does not do this. That half is measured, not read, because Qt 6’s sources are not on this machine. Matching 1.3 means overriding popup dismissal for the whole application, which is D28’s "owning a custom widget forever" applied to every popup. The swallowing behaviour is also what every modern toolkit does | `xtest-baseline.txt` section 4, with the control click printed below it |
 | **A second click on the same menubar item closes the menu here. On 1.3 it stays open** | Same cause and same answer as the row above. Qt 6’s menubar toggles on a second click and Qt 2’s did not. Nothing in SIGEL decides it | `xtest-baseline.txt` section 4 |
 | **Individuals > Add allows up to 9999 — item 58.** 1.3 allows 999 | by decision 2026-09-22: four digits. Five digits were not taken, because one Add would then pass the tournament draw's limit — item 59 | `guibehaviour-baseline.txt`, three lines, and a note in its header |
+| **Register widths are 1 to 16, and a new experiment gets 8 — item 71.** 1.3 allows 1 to 99 and gives 32 | by decision 2026-09-24. Above 16, `SIG_Register::mulReg` overflows `int`; at 32 every `SIG_Register::makeValid` does. A file with a width outside 1..16 is refused on load. The shipped experiments use 8 and 3 | `guibehaviour-baseline.txt`: the `spinboxRegisterWidth` line and the language-parameters hash after a robot import |
 | **A new host starts at 4 processes, and the Edit host dialog says to use one per CPU core.** 1.3 starts at 1 and has no hint. The hint is a note, drawn in the palette's `PlaceholderText` colour by `SIG_EditHostDialog`'s constructor | by decision 2026-09-23, after item 38's measurements: on this 4-core machine, at the 5 ms wait, a generation took 3.7 s with 4 slaves against 13.3 s with 1; 4-slave runs evolve differently, so the work is not identical. The start value applies only to Add; Edit shows the host's own value, and the shipped experiments keep their `PVMHOST . 1 1 "."` | `guibehaviour-baseline.txt`: the hint label, and `value=1` in Edit, which shows that Edit replaces the start value. The start value of 4 itself is not checked, because no scenario adds a host |
 | **Dialog titles do not end in "...".** 1.3 ends 39 titles in dots, at 68 code sites in `SIGEL_MasterGUI` and the movie settings dialog plus the default title in `SIG_EditHostDialogBase.ui`; the ellipsis belongs on the command that opens a dialog, not on its title. Menu items, buttons, status tips and progress labels are unchanged. Two titles are reworded: "Do you really..." is "Delete Experiment" in `SIG_ExperimentListView::slotDeleteExperiment` and "Quit SIGEL" in `SIG_MainWindow::askBeforeQuitting`. "There is no experiment selected..." (22 sites) and "No experiment selected..." (1) are all "No experiment selected"; "Import Language Parameter..." is "Import Language Parameters", as its export is; the DynaMechs box in `SIG_GUIGPExperiment::slotRobotInfo` loses its two dots and keeps its wording | by decision 2026-09-23 | `guibehaviour-baseline.txt`, 76 title lines, each checked against the approved list; `xtest-baseline.txt`, 2 lines |
 | **The ambient light slider and its label are disabled except in Flatshaded and Gouraudshaded.** 1.3 leaves them enabled in Wireframe, where the slider has no effect, because Wireframe draws without lighting; Hidden lines and Points draw without lighting too | by decision 2026-09-23, item 43. `SIG_SimulationWidget`'s constructor | nothing: no scenario checks the slider's enabled state |
@@ -3908,6 +3918,8 @@ typing then Return:
 | Year | 1752..8000 | `8001` | **8000** | **2030** |
 | Hour | 0..23 | `24` | **23** | **2** |
 | Register width | 1..99 | `100` | **99** | **10** |
+
+*The register width box is 1..16 since item 71, 2026-09-24. Typing `17` there now commits `1`.*
 
 Both end on a *valid* value; they are **different valid values**, and
 `putAllIntoExperiment()` writes whichever the widget holds. *For Year the kept
@@ -4856,6 +4868,19 @@ carried; other items and this file cite them, so they do not change.
   moved: 1 in `guidump-baseline.txt`, 1 in `xtest-baseline.txt` and 12 in
   `guibehaviour-baseline.txt`.
 
+- [x] **71. Register widths above 16 bits reach undefined behaviour** — done
+  2026-09-24, by decision. Widths are 1 to 16:
+  `SIG_LanguageParameters::maxRegisterWidth`, the `spinboxRegisterWidth`
+  maximum and the `SIG_Register` constructor. A new experiment gets 8, which
+  six of the seven shipped experiments use. The `SIG_LanguageParameters` stream
+  constructor refuses a width outside 1..16 with `SIG_UnstreamingError`; no
+  such file exists. The file format does not change.
+  Largest width free of undefined behaviour, measured with a sanitizer test of
+  copies of the operations over widths 1 to 40, twice: `mulReg` 16,
+  `makeValid` 30, the casts in `sense` and `moveDrive` 31. Generated operands
+  are in -31999..31999 and fit in 16 bits. Tested: a copy of `twoBases` at
+  width 16 loads and evaluates; at width 17 `sigel_eval` refuses it.
+
 #### Not doing
 
 Decisions, not work. Each is settled; reopen only with a reason.
@@ -5802,15 +5827,11 @@ visible: `gcc` does not warn on `int % qsizetype`, so the five vanished
 `-Wsign-compare` warnings were **not** the full inventory of `uint size()`
 dependencies, and treating them as one was the mistake.
 
-**Under it sits a real defect, preserved not fixed.** `minRegisterValue` is
-`-2^(w-1)` for register width `w`, and `SIG_LanguageParameters`'s default
-constructor sets `bitsPerRegister (32)` (`SIG_LanguageParameters.cpp:29`). At
-`w = 32`, `driveNo - (int)(-2^31)` overflows `int` for every non-negative
-`driveNo` — undefined behaviour, and the wrapped result is what the modulus then
-folds back into range. All 14 shipped `.exp` carry `w` of 3 or 8, where
-`absoluteDriveNo` stays in `[0, 2^w)` and nothing overflows, so no check sees it.
-**Not fixed here**: the wrap decides which actuator a `MOVE` drives, so changing
-it changes simulation results against 1.3. It predates the port.
+**Under it sat a real defect, closed by item 71 on 2026-09-24.** `minRegisterValue` is
+`-2^(w-1)` for register width `w`. At `w = 32`, then the default,
+`driveNo - (int)(-2^31)` overflowed `int` for every non-negative `driveNo`.
+Widths are now 1 to 16, so `absoluteDriveNo` stays in `[0, 2^w)` and nothing
+overflows.
 
 ### `QTextStream` default codec
 
@@ -7098,7 +7119,7 @@ which is why the list exists.
 | `DynaMechsLinkGuard`'s free, D9 | no shipped robot throws from the constructor, **and `sigel_eval` has no handler anywhere on that path** — see D9 |
 | `sensors[…] = …` on the `tPitchRollSensor` and `tContactSensor` branches, D9 (`SIG_DynaMechsSimulationData.cpp:183,197`), and the two `dynaMechsLinks[…]` reads guarding them (`:182,:196`) | **0 `PitchRollSensor` and 0 `ContactSensor` in any shipped file** — 66 sensors, all `JointSensor`. Two of the four converted indexed writes in that constructor |
 | `delete dynaMechsLinks[…]` on a **non-null** slot (`:365,:501`), D9 | needs two joints between one pair of links; no shipped robot has one. Only `delete nullptr` ever runs |
-| the restored `uint` modulus, D9 | needs `bitsPerRegister` 32; all 14 `.exp` carry 3 or 8 |
+| the restored `uint` modulus, D9 | needs a negative `absoluteDriveNo`, which needs a width above 16; widths are 1 to 16 since item 71 |
 | `SIG_Link::addNoCollide`, `getNoCollides()`, the `noCollide` write loop, D10 | **0 `nocollide` in all 7 `.rrb`, and `noCollideCount` is 0 in all 87 `Link` records of the 14 `.exp`** (348 over `data/` and `data-reordered/` together; an earlier draft said 261, which is neither scope). `getNoCollides()` has no caller in the tree at all |
 | `SIG_Material::friction` — three walks and the owning free, D11 | **0 friction declarations in any `.rrb`, and `nfric` is 0 on all 31 `Material` lines**. The list is empty on every check run |
 | `SIG_Body::usedByLinks`, D11 | appended on every `.rrb` load and **read nowhere in the tree** |

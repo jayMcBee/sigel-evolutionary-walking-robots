@@ -71,9 +71,8 @@ void SIGEL_Simulation::SIG_DynaMechsCommandInterface::moveDrive(int driveNo,
 
       int absoluteDriveNo = driveNo - static_cast< int >(minRegisterValue);
 
-      // Unsigned on purpose: absoluteDriveNo goes negative when bitsPerRegister
-      // is 32, the default, and a signed modulus would index drives[] and
-      // driveForcesTimeAccounts[] negatively -- the second is a write.
+      // Unsigned on purpose: a negative absoluteDriveNo must never index
+      // drives[] or driveForcesTimeAccounts[] -- the second is a write.
       driveIndex = absoluteDriveNo % static_cast< uint >(simulationData.drives.size());
 
 

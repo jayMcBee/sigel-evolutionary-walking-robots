@@ -47,13 +47,13 @@ class SIG_Register {
    * @exception SIG_RegisterWrongSizeException
    *            The supplid size parameter was @f$\le 0@f$.
    * @exception SIG_RegisterWrongSizeException
-   *            The supplid size parameter was @f$\ge 100@f$.
+   *            The supplid size parameter was @f$> 16@f$.
    *
    * @post size is set to parameter size, if @f$size>0@f$.
    * @post value is set to 0.
    *
    * @param size The desired size of this SIG_Register in Bits.
-   *             Has to be @f$>0@f$ and @f$<100@f$.
+   *             Has to be @f$>0@f$ and @f$\le 16@f$.
    */
   SIG_Register(int size);
 
