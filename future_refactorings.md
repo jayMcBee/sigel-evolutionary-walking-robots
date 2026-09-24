@@ -270,6 +270,8 @@ touched, because changing one changes behaviour against the reference binary.
   experiments hold 100 individuals, so none comes near it. To decide: leave it
   as 1.3 has it, refuse a larger pool, or draw differently — and the last
   makes every run differ from 1.3's. Found by review 2026-09-22.
+  **Pencilled in 2026-09-24:** limit the pool to 30,000 in the interface, and
+  add a check with a warning in the code for any pool above 32,767.
 
 - [ ] **60. The tournaments-per-generation counter has four digits.**
   `lcdnumberTournamentsPerGeneration` in `SIG_GPParameterBase.ui` has
@@ -533,6 +535,15 @@ touched, because changing one changes behaviour against the reference binary.
   - **An uninitialised value is loaded.** With no contact model
     (`dmRigidBody::getForce(0)` is NULL), or on the `default:` branch,
     `registerValue` is never set and `loadValue` still reads it.
+
+- [ ] **78. The Name column on the Individuals page is too narrow.** Raised
+  2026-09-24 after the runner run: it should be 50% wider, and the table has
+  empty space. Interface work, to go with item 70.
+
+- [ ] **79. File > Save Experiment always asks for a file name.** Raised
+  2026-09-24. `SIG_ExperimentListView::slotSaveExperiment` opens
+  `QFileDialog::getSaveFileName` every time, so Save acts as Save As.
+  Interface work, to go with item 70.
 
 - [ ] **74. A timed-out individual is evaluated again, for ever.** Found
   2026-09-24. When `TIMEOUTMINUTES` expires, `SIG_GPFitnessTrainer::checkTask`

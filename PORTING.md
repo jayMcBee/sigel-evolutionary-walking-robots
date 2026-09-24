@@ -886,8 +886,8 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-24 — DONE: TWO SENSOR FIXES AND A NEW RUNNER. NEXT: THE THREE RUN
-OBSERVATIONS.** Start here.
+**2026-09-24 — DONE: TWO SENSOR FIXES, A NEW RUNNER, THE REGRESSION CLOSED.**
+Start here.
 
 - **Reopened** the regression (`57912a1`) and finished it; §7, "The 1.0 → 1.3
   regression — DONE 2026-09-24", has the summary. The two experiments that stayed outside 10% with 1.0's line were
@@ -918,14 +918,12 @@ OBSERVATIONS.** Start here.
   From the `sigel-x86` session's diagnostics wishlist: 75 to 77.
 - **New item 70:** a menu command that clones an experiment with a fresh
   population.
-- **Jan's observations from the runner run, to discuss when the open points
-  are done:**
-  - The run made more than 360,000 individuals (`NEXTIDENTIFIER=366740` in the
-    saved file, population 250), which bears on the 32k limit of item 59.
-    Item 59 is about the pool size; to be discussed.
-  - Individuals page, the Name column is too narrow: it should be 50% wider;
-    the table has empty space.
-  - File > Save asks for a file name every time: it acts as Save As.
+- **Jan's observations from the runner run, settled:**
+  - The run handed out individual IDs up to 366,740 (`NEXTIDENTIFIER`), so IDs
+    pass 32,767 without trouble; `SIG_GPPopulation::getNextIdentifier` counts
+    in an `int`. Item 59, the pool size, is a different limit; a direction for
+    it is pencilled in there.
+  - The Name column width is item 78; Save acting as Save As is item 79.
 - **Deleted, by decision:** `regression_1.0_to_1.3.md`, folded into §7, and
   `checks/replicate.sh`; the unpacked 1.0 source in `downloads/` and its
   archive at the repo root, both untracked. The archive is still on
