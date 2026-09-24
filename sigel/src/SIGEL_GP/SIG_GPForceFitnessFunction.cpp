@@ -57,7 +57,7 @@ double SIGEL_GP::SIG_GPForceFitnessFunction::evalFitness() {
   double const toleranceBandWidth = 0.5;
 
   double fitness = 0;
-  vector<double> variance;
+  vector<double> absDeviations;
   unsigned int frames;
   double momentX, momentY, momentZ;
 
@@ -117,16 +117,16 @@ double SIGEL_GP::SIG_GPForceFitnessFunction::evalFitness() {
           averageMomentPerJoint += momentMagnitude/((*usedForce).size());
         } // end of for loop
 
-        double varianz = 0;
+        double absDeviationSum = 0;
         for (unsigned int i=0;i<(*usedForce).size();++i) {
-          varianz += fabs(momentMagnitudes[i]-averageMomentPerJoint);
+          absDeviationSum += fabs(momentMagnitudes[i]-averageMomentPerJoint);
         }
-        variance.push_back(varianz);
+        absDeviations.push_back(absDeviationSum);
       } // end of while loop [fetch next frame]
 
-      // The mean of the variance over all frames
-      for (unsigned int i=0;i<(variance.size());++i) {
-        fitness += variance[i]/(frames*distance)*simulatedSeconds;
+      // The mean over all frames, divided by the average speed
+      for (unsigned int i=0;i<(absDeviations.size());++i) {
+        fitness += absDeviations[i]/(frames*distance)*simulatedSeconds;
       }
 
      if (finite(fitness)!=0) {

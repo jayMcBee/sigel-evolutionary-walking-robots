@@ -133,7 +133,7 @@ Constructs the language removed. A current compiler rejects them.
   **Phase 0 could not have caught these** — they are pure ASCII, and Phase 0
   swept for bytes above 127. A check for German must look for words, not bytes.
 
-- [ ] **14. Translate the German — symbols.** 217 lines in 39 files, not
+- [ ] **14. Translate the German — symbols.** 214 lines in 38 files, not
   user-visible. Every miss is a compile error, so `check.sh` verifies it.
 
   | symbol | where |
@@ -145,7 +145,6 @@ Constructs the language removed. A current compiler rejects them.
   | `Varianz` | `MT_StatisticsElement.h` |
   | `winkel`, `verschiebung`, `schiebung`, `drehmatrix`, `hilf`, `stflorianhilf` | `IFunctions.h`, `IFunctions.cpp` |
   | `masse` | `SIG_Mirtich.h`, `.cpp` |
-  | `varianz` | `SIG_GPForceFitnessFunction.cpp` |
 
   **Kept, by decision:** `sliderIntervall` and `slotIntervallChanged`, German
   spelling of "interval". The GUI baselines record the widget by name, and the
@@ -598,9 +597,7 @@ touched, because changing one changes behaviour against the reference binary.
     one recorded frame, divides by zero; the `finite()` test afterwards turns
     the result into a score of 0. `frames` is unsigned `count - 1`, so an
     empty recording wraps it to 4294967295.
-  - **Misnamed:** in the same function, `varianz` is the sum of each joint's
-    absolute difference from the mean moment, not a variance; the vector it
-    goes into is named `variance`.
+  - ~~**Misnamed:** `varianz` and `variance`~~ renamed 2026-09-24.
 
 - [ ] **88. Any load error kills the interface.** Found 2026-09-24. Nothing
   catches a `SIG_Exception` from `SIG_GPExperiment::loadExperiment` in

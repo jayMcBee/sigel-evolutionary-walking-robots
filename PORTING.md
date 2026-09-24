@@ -898,7 +898,22 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-24, night — DONE: TOUCHDOWNS REMOVED, AFTER ITEM 82.** Start here.
+**2026-09-24, night — ITEM 87, PART 1: FORCE'S MISNAMED VARIANCE RENAMED.**
+Start here.
+
+- **Renamed, by decision:** in `SIG_GPForceFitnessFunction::evalFitness`,
+  `varianz` is `absDeviationSum` and `variance` is `absDeviations`. They hold
+  each joint's absolute difference from the mean moment, summed per frame, not
+  a variance. The object file's disassembly is identical before and after.
+- **Item 87 stays open:** the undefined behaviour in Adaptive Walking's
+  `fprintf`, the run-time and recording-rate divisions, and the Force
+  division are still to decide.
+- **Item 14:** the `varianz` row is gone, and its count is 214 lines in 38
+  files.
+- **Gates:** `check.sh` 944 pass, 0 fail; warnings 492. The other four gates
+  are green.
+
+**2026-09-24, night — DONE: TOUCHDOWNS REMOVED, AFTER ITEM 82.**
 
 - **Removed, by decision:** `SIG_GPFullDataRecorder::touchdowns`, which
   recorded the number of links on the floor for every sample. Stepper was its
