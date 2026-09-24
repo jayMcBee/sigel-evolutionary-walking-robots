@@ -604,6 +604,40 @@ touched, because changing one changes behaviour against the reference binary.
   selection changes. Write the texts after items 82 and 83, so the dropped
   functions get none.
 
+- [ ] **86. The generation log line restarts at 1 with every run.** Seen
+  2026-09-24: a run stopped at "Computing Generation 1033", and the restarted
+  run printed "Computing Generation 1", "2", ... `SIG_GPManager::run`, and
+  `run(MT_Classifier*)` the same, prints `currentGenerationNo`, which counts
+  from 0 at every start, not the pool generation (`poolGeneration`), which the
+  Experiment page and the `.exp` file show. The line should at least name the
+  pool generation, for example "Computing Generation 1034 (1 in this run)".
+  Related: the termination test in `SIG_GPManager::stopIfNecessary` also
+  compares the termination generation with `currentGenerationNo`.
+
+- [ ] **87. Defects in the fitness functions that stay.** Found reading the
+  code 2026-09-24, not tested.
+  - **Undefined behaviour:** `SIG_GPAdaptiveWalkingFitnessFunction::evalFitness`
+    builds its summary with `sprintf`, where `%%` becomes a single `%`, then
+    passes it to `fprintf(stderr, infStr)` as the format string. `% |` is then
+    read as a conversion. Stepper has the same line; item 82 drops Stepper.
+  - **Division by zero, run time:** every simulated fitness function divides
+    by `QTime(0,0).secsTo(getTimeToSimulate())`, the run time in whole
+    seconds. A time to simulate below 1 s divides by zero.
+  - **Division by zero, recording rate:** `SIG_GPRealSpeedFitnessFunction`
+    records every `int(0.5 / stepSize)` frames, which is 0 for a step above
+    0.5 s. The guard in the `SIG_GPFullDataRecorder` constructor sets the
+    parameter `recordingFrequency` to 1, not the member of the same name, so
+    the member stays 0 and `SIG_GPFullDataRecorder::record` takes
+    `frameCounter %= recordingFrequency` by zero.
+  - **Division by zero, Force:** `SIG_GPForceFitnessFunction::evalFitness`
+    divides by `frames * distance`. A robot that does not move, or a run with
+    one recorded frame, divides by zero; the `finite()` test afterwards turns
+    the result into a score of 0. `frames` is unsigned `count - 1`, so an
+    empty recording wraps it to 4294967295.
+  - **Misnamed:** in the same function, `varianz` is the sum of each joint's
+    absolute difference from the mean moment, not a variance; the vector it
+    goes into is named `variance`.
+
 - [ ] **47. `sigelDynClient` and `manage_dyn_slave`.** `sigelDynClient` makes a
   second machine a dynamic slave of a master started with `sigel -de`, which
   `sigel.cpp` still accepts. It is still 1.3's Solaris `tcsh` script, its home

@@ -908,7 +908,9 @@ classes and leave truncation a hard error. **They are not interchangeable.**
   Windows Remote ZORC; 83, all ZORC code behind a compile-time switch, off by
   default; 84, an unknown fitness name crashes `sigel_slave`, and a friend
   class that does not exist; 85, a two-line description of the selected
-  fitness function on the GP Parameters page.
+  fitness function on the GP Parameters page; 86, the generation log line
+  restarts at 1 with every run; 87, undefined behaviour, three divisions by
+  zero and a misnamed variable in the fitness functions that stay.
 - **Gates:** `check.sh` 972 pass, 0 fail; warnings 497. One run failed
   `gui behaviour` with "first export failed" and "menu [&File] did not open";
   the rerun on the same code passed. The step waits a fixed 2.5 s for the
