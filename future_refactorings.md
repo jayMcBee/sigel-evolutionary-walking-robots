@@ -577,20 +577,29 @@ touched, because changing one changes behaviour against the reference binary.
   Related: the termination test in `SIG_GPManager::stopIfNecessary` also
   compares the termination generation with `currentGenerationNo`.
 
-- [ ] **87. Defects in the fitness functions that stay.** Found reading the
-  code 2026-09-24; the open bullets are not tested.
-  - ~~**Undefined behaviour:** Adaptive Walking's summary `fprintf`~~ fixed
-    2026-09-24.
-  - **Division by zero, run time:** every simulated fitness function divides
-    by `QTime(0,0).secsTo(getTimeToSimulate())`, the run time in whole
-    seconds. A time to simulate below 1 s divides by zero.
-  - **Division by zero, recording rate:** `SIG_GPRealSpeedFitnessFunction`
-    records every `int(0.5 / stepSize)` frames, which is 0 for a step above
-    0.5 s. The guard in the `SIG_GPFullDataRecorder` constructor sets the
-    parameter `recordingFrequency` to 1, not the member of the same name, so
-    the member stays 0 and `SIG_GPFullDataRecorder::record` takes
-    `frameCounter %= recordingFrequency` by zero.
-  - ~~**Misnamed:** `varianz` and `variance`~~ renamed 2026-09-24.
+- [ ] **89. Refuse bad simulation parameters.** Found 2026-09-24 in item 87;
+  needs more thought. Two values reach divisions with nothing to stop them:
+  - **Time to simulate of 0:** every simulated fitness function divides the
+    distance by `QTime(0,0).secsTo(getTimeToSimulate())`, the run time in
+    whole seconds. The three time spin boxes each go down to 0, and a loaded
+    file can carry less than 1 s. The result is `inf`, or `NaN` for a robot
+    that does not move. What the GP does with that fitness is not measured.
+  - **Step size of 0 or less:** Real Speed and `SIG_SimulationVisualisation`
+    divide 0.5 by it, `SIG_SimulationVisualisationWidget` divides 5 by it,
+    `SIG_EarlyRunTermSimulation` divides the run time by it, and DynaMechs
+    integrates with it. A step of 0 makes `int(inf)`, undefined behaviour, in
+    Real Speed. For the other functions the run never ends:
+    `SIG_DynaMechsSimulationQueries::getActualSimulationTime` is frames times
+    the step, so the time stays at 0 and `SIG_Simulation::start` loops. What a
+    negative step does is not measured. `lineeditStepSize` has a
+    `QDoubleValidator` with no range, and `SIG_SimulationParameters` loads any
+    number.
+
+  **Where to refuse, not decided:** (1) a validator range on the field, which
+  stops typing only and needs a smallest step; (2) on load, in
+  `SIG_SimulationParameters`, like item 71, but any load error kills the
+  interface until item 88 is done; (3) when a run starts, with a message box,
+  which catches typed and loaded values and kills nothing.
 
 - [ ] **88. Any load error kills the interface.** Found 2026-09-24. Nothing
   catches a `SIG_Exception` from `SIG_GPExperiment::loadExperiment` in

@@ -36,7 +36,7 @@ namespace SIGEL_GP
   {
 
     if (recordingFrequency <= 0) {
-      recordingFrequency = 1;
+      this->recordingFrequency = 1;
     }
   };
 

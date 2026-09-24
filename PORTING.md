@@ -899,8 +899,22 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-09-24, night — DONE: ITEM 87, PART 3: THE RECORDER GUARD. ITEM 87
+CLOSED.** Start here.
+
+- **Fixed, by decision:** `SIG_GPFullDataRecorder`'s constructor set its
+  parameter `recordingFrequency` to 1, not the member, so a frequency of 0
+  stayed 0 and `record` took the remainder by zero. Real Speed asks for 0
+  when the step is above 0.5 s. Tested with a recorder built with frequency
+  0 over a 2 s run of `twoBases`: 201 samples, every frame; with the old line,
+  1 sample on this machine.
+- **Moved to new item 89, by decision:** the time to simulate of 0 and the
+  step size of 0 or less. Where to refuse them needs more thought.
+- **Item 87 is done;** the Done entry has the detail.
+- **Gates:** `check.sh` 944 pass, 0 fail; warnings 491. The other four gates
+  are green.
+
 **2026-09-24, night — ITEM 87, PART 2: ADAPTIVE WALKING'S SUMMARY LINE.**
-Start here.
 
 - **Fixed, by decision:** `SIG_GPAdaptiveWalkingFitnessFunction::evalFitness`
   built its summary with `sprintf` into a 256-byte buffer and passed the
@@ -5035,6 +5049,19 @@ carried; other items and this file cite them, so they do not change.
     and saves back with the same name. A copy naming
     `StepperFitnessFunction` saves back as `SimpleFitnessFunction`, as any
     unknown name does.
+
+- [x] **87. Defects in the fitness functions that stay** — done 2026-09-24,
+  by decision, in four commits.
+  - Force's `varianz` and `variance` are `absDeviationSum` and
+    `absDeviations`; the disassembly did not change.
+  - Adaptive Walking writes its summary line through `SIG_IO::cerr`; it used
+    the text as a `fprintf` format, which was undefined.
+  - `SIG_GPFullDataRecorder`'s guard sets the member, so a frequency of 0
+    records every frame.
+  - Dropped: the Force division. Only a robot that does not move divides by
+    zero, and `finite()` makes that a score of 0, which is right.
+  - Moved to item 89: the time to simulate of 0 and the step size of 0 or
+    less.
 
 #### Not doing
 
