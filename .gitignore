@@ -15,12 +15,10 @@
 # keeps a re-extract out of `git status'
 xb/
 
-# Unpacked from archives; neither is ours.
+# Unpacked from archives; not ours.
 #   supportingLibs/  vendored deps (cv97, dynamechs, Dynamo, fparser, newmat09)
 #                    from vendor/supportingLibs.tar.gz,
 #                    patched by `make'; its pvm3/ comes from vendor/pvm3.4.6.tgz
-#   sigelSourceDistribution.1.0/  the older 1.0 release, kept for the deferred
-#                                 1.0 regression
 /downloads/
 
 build/
