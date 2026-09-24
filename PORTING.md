@@ -610,7 +610,7 @@ through `f0f2daa`.
 
 ## 7. Steps
 
-**Exit criterion per step:** `./checks/check.sh` from anywhere — **952 pass, 0
+**Exit criterion per step:** `./checks/check.sh` from anywhere — **948 pass, 0
 fail**. *The figure moves with the number of tracked text files, because the
 `encodings` check adds its own count to the total. Measured trail: **1136**
 until 2026-09-19, when `experiments/` and `robots/` arrived and
@@ -632,7 +632,8 @@ when `gui vs 1.3` and `guidump-baseline.txt` went, one pass each; **963** when
 `truncated pi (V5)` went; **954** when item 50 removed
 `SIG_UnstreamerScanner`, `SIG_RobotUnstreamer` and `LEERE_DATEI`, four
 passes per class and one for the file; **952** when item 82 removed
-`WIN_SIG_GPRemoteZORCFitnessFunction`, two `encodings` passes.*
+`WIN_SIG_GPRemoteZORCFitnessFunction`, two `encodings` passes; **948** when
+it removed `SIG_GPZorcWalkingFitnessFunction`, four passes.*
 **The pass count was 853 until D31 and the jump is not new coverage of SIGEL's
 code.** The `encodings` check used to read 404 files of five extensions and now
 read all 618 tracked files then, 8 of which git called binary: its pass count went
@@ -894,8 +895,20 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-24, night — ITEM 82, PART 1: `WIN_SIG_GPRemoteZORCFitnessFunction`
+**2026-09-24, night — ITEM 82, PART 2: `SIG_GPZorcWalkingFitnessFunction`
 REMOVED.** Start here.
+
+- **Removed, by decision:** `SIG_GPZorcWalkingFitnessFunction`, its `.h`,
+  `.cpp` and friend declaration in `SIG_GPFullDataRecorder.h`. Nothing created
+  it: `sigel_slave` maps "ZorcWalkingFitnessFunction" to
+  `SIG_GPAdaptiveWalkingFitnessFunction`, and that name stays, because
+  experiment files store it for Adaptive Walking.
+- **Next:** Stepper. Item 82 stays open.
+- **Gates:** `check.sh` 948 pass, 0 fail; warnings 496. The other four gates
+  are green.
+
+**2026-09-24, night — ITEM 82, PART 1: `WIN_SIG_GPRemoteZORCFitnessFunction`
+REMOVED.**
 
 - **Removed, by decision:** the Windows-only copy of the Remote ZORC fitness
   function, which nothing built. Its `.h` and `.cpp`, the `_WINDOWS` include

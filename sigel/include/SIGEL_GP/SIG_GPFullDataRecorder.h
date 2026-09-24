@@ -37,7 +37,6 @@ namespace SIGEL_GP
       friend class SIG_GPNiceWalkingFitnessFunction;
       friend class SIG_GPAdaptiveWalkingFitnessFunction;
       friend class SIG_GPStepperFitnessFunction;
-      friend class SIG_GPZorcWalkingFitnessFunction;
       friend class SIG_GPForceFitnessFunction;
       friend class SIG_GPEnergyFitnessFunction;
 
