@@ -458,7 +458,7 @@ touched, because changing one changes behaviour against the reference binary.
     `MAXIMALSOLIDITERATIONS`. `SIMULATIONLIBRARY` is read by the simulation
     too, and loses its Dynamo value only. `STEPSIZE` stays: DynaMechs uses
     it. All 7 shipped experiments hold these lines, so removing
-    them changes the file format, and Jan decides.
+    them changes the file format, and the maintainer decides.
   - **The maths library `libdynalib.a`.** SIGEL is built on its `DL_vector`
     and `DL_matrix`. PORTING.md, "Follow-up this change deliberately did not
     take", point 3, has the plan: a small local header in its place.

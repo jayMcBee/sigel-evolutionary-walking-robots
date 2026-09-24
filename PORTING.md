@@ -3,7 +3,7 @@
 **THE GOAL — SIGEL 2.0.** Set 2026-09-23. SIGEL 2.0 is the modernised SIGEL.
 Its first phase, the port from Qt 2 to Qt 6, is done. SIGEL 2.0 may improve
 behaviour and the interface. 1.3 stays the reference for regression checks; it
-is not a specification. Jan decides each change to behaviour and to file
+is not a specification. The maintainer decides each change to behaviour and to file
 formats, and "Changes from 1.3" in Phase C lists them.
 
 **The port's goal — phase one, done.** Restated 2026-08-27; it governed every
@@ -193,7 +193,7 @@ found a real defect.** §0 has the rule; it is not optional.
 
 - **This is SIGEL 2.0, not only a port.** Improvements are allowed. 1.3 is
   the reference for regression checks, not a specification. Propose the better
-  behaviour; Jan decides it.
+  behaviour; the maintainer decides it.
 - Source root: `sigel/`
 - ~~The shim: `include/compat/q2compat.h`; its self-check:
   `include/compat/q2compat_check.cpp`~~ **Both deleted in D27.** Recover them
@@ -940,7 +940,7 @@ Start here.
   ambient slider), 26 (the camera fits the robot), 65 (a dialog during Play),
   66 (a square 3-D view), 42 (ground on both sides of the start), 63 (the
   render modes Hidden lines and Points), 67 (a failed movie frame), and two
-  found by Jan: the doubled floor lines, Mesa joining triangle strips, and Play
+  found in use: the doubled floor lines, Mesa joining triangle strips, and Play
   running ahead of the screen, now one step per frame on screen. Each change
   from 1.3 has a row in "Changes from 1.3". Items 41 and 62 were dropped; see
   "Not doing".
@@ -953,7 +953,7 @@ Start here.
 - **Raised and not recorded as items:** a textured floor uploads its texture
   on every frame, because `initTexture` runs inside the plane's display list;
   in the hidden modes the label of a hidden anchor point still shows.
-- **Next, by Jan's choice: the 1.0 → 1.3 regression.**
+- **Next, by decision: the 1.0 → 1.3 regression.**
   `regression_1.0_to_1.3.md` holds the analysis, deferred until the port was
   done. The port is done. §0 still says that file is not touched, and the note
   near the top of this file still calls the regression DEFERRED; reopening it
@@ -988,13 +988,13 @@ Start here.
   clean. Item 13 is finished apart from the text kept by decision. Item 14 is
   paused; the names it has left are listed at the end of this entry, because
   item 14's own table is incomplete.
-- **How a round works:** Jan approves a set of names first. The whole set then
+- **How a round works:** the maintainer approves a set of names first. The whole set then
   gets one round: one build compared before and after, one run of the five
   gates, one independent review that checks each name on its own, and one
   commit. A round per name is a waste and is not wanted. Behaviour does not
   change, apart from translated text.
 - **Text that SIGEL writes into a saved file does not change**, unless no reader
-  parses it and no file holds it. Jan decides, on both facts; see `No.:` and
+  parses it and no file holds it. The maintainer decides, on both facts; see `No.:` and
   `invalid_mode` below.
 - **Kept, by decision:** the history text saved in `.exp` files —
   `Fitness (Elter 1)`, `(Elter 2)`, `CREATED NEW INDIVIDUUM` and `INDIVIDUUM IS
@@ -4451,7 +4451,7 @@ carried; other items and this file cite them, so they do not change.
   780 x 810. The control panel is at most 250 px wide, so the extra width goes
   to the 3-D view. Measured in `Xvfb` on the white area of the view: 422 x 655
   at 780 wide, 656 x 655 at 1014 wide. Item 26's fit runs after this size is
-  set. Checked on the desktop by Jan. Not taken: a view that stays square on
+  set. Checked on the desktop. Not taken: a view that stays square on
   resize, which needs a container widget of our own, and a minimum of 1014,
   which would not fit screens narrower than about 1024. `guidrive`'s slave-GUI
   scenario still sets 780 x 810, 1.3's size.
@@ -4472,8 +4472,7 @@ carried; other items and this file cite them, so they do not change.
     their state. It covers the colour dialog, the movie settings dialog, the
     warnings, and any dialog added later.
   - **Checked:** in `Xvfb` at Frame Delay 0 the colour dialog appeared with
-    the simulation paused, and Play carried on after Select; on the desktop
-    by Jan.
+    the simulation paused, and Play carried on after Select; on the desktop.
   - The other options: pausing at each dialog site, per-site and easy to
     forget; pacing Play to the display, the root cause, larger; a simulation
     thread, not wanted.
@@ -4559,7 +4558,7 @@ carried; other items and this file cite them, so they do not change.
   `/home/debian/sigel-shipped-original-2026-09-19/`.
 
 - [x] **Play ran ahead of the screen, and the simulation time jumped** — done
-  2026-09-23, by decision; found by Jan, not a numbered item. A change from the
+  2026-09-23, by decision; found in use, not a numbered item. A change from the
   port, phase C4: 1.3's `slotSimulationProgress` did `makeTimeSteps(1);
   updateGL();`, and Qt 2's `updateGL()` painted at once. The port's `update()`
   only asks for a paint; Qt Wayland composes when the compositor's frame
@@ -4585,8 +4584,7 @@ carried; other items and this file cite them, so they do not change.
     `grabFramebuffer` does not emit it, and a window that Qt Wayland marks not
     exposed composes nothing, so Play waits and resumes when it is shown.
     `repaint()` would not have fixed it: Qt 6 turns it into a later update when
-    the window composed less than one refresh ago. Checked on the desktop by
-    Jan.
+    the window composed less than one refresh ago. Checked on the desktop.
   - **Costs:** at Frame Delay 0 Play runs at one step per frame on screen, not
     as fast as the CPU can step. While Play waits for a frame the 0 ms timer
     still fires and returns, so one core stays busy; a single-shot timer with
@@ -4605,7 +4603,7 @@ carried; other items and this file cite them, so they do not change.
   their display lists. The ambient slider is enabled only in Flatshaded and
   Gouraudshaded now, in `SIG_SimulationWidget`'s constructor. The grid and the
   robot path are line lists and stay lines. Checked in `Xvfb` on twoBases and
-  walker, and on the desktop by Jan.
+  walker, and on the desktop.
 
 - [x] **67. The movie button kept "recording allowed" after a failed frame**
   — done 2026-09-23, by decision.
@@ -4620,13 +4618,13 @@ carried; other items and this file cite them, so they do not change.
     allowed" icon.
   - **Stop was always right:** `SIG_SimulationWindow::slotStopPressed` sets that
     icon itself before `resetRecorder` switches recording off; found by review.
-  - **Checked** on the desktop by Jan: with the directory `/`, one warning, and
+  - **Checked** on the desktop: with the directory `/`, one warning, and
     the icon turns to "not allowed". `slotRecordClicked` toggles `record`, but
     nothing is connected to it, because the record action is commented out; left
     as it is.
 
 - [x] **The 3-D floor drew its rows twice in the line modes** — done
-  2026-09-23, by decision; found by Jan, not a numbered item. In Wireframe,
+  2026-09-23, by decision; found in use, not a numbered item. In Wireframe,
   and so in Hidden lines, each line along one floor axis had a second line
   beside it at a slightly different slope, and the lines along the other axis
   jogged at each row. The grid, `GL_LINES`, was clean.
@@ -4646,7 +4644,7 @@ carried; other items and this file cite them, so they do not change.
     an oblique view and from above. Play in Wireframe, simulated seconds after
     10 s in one sitting: strips 11 and 11, triangles 9 and 10. On a hilly floor
     Gouraud shading differs slightly: each triangle now uses one normal at all
-    three corners. Checked on the desktop by Jan.
+    three corners. Checked on the desktop.
 
 - [x] **63, first half. Hidden lines in the 3-D view** — done 2026-09-23, by
   decision, as a new render mode "Hidden lines", after Wireframe; the Points
@@ -4661,7 +4659,7 @@ carried; other items and this file cite them, so they do not change.
   - **Checked** in `Xvfb` on twoBases and walker: the back edges and the floor
     lines behind the robot are gone. Play at Frame Delay 0, simulated seconds
     after 10 s in one sitting: Wireframe 13 and 14, Hidden lines 13 and 13.
-    Checked on the desktop by Jan.
+    Checked on the desktop.
 
 - [x] **42. The 3-D view puts the robot at a corner of the grid** — done
   2026-09-23, by decision, option A. A change from 1.0 to 1.3, not from the
@@ -4685,7 +4683,7 @@ carried; other items and this file cite them, so they do not change.
     before, 19, 17 and 17 after; Flatshaded 23 and 20 before, 16 and 12 after.
     The plane grows from 4,802 triangles to 19,208. A trial 189 x 189 floor gave
     16 and 16 in Flatshaded, so the cost does not follow the cells; most likely
-    it is the extra pixels filled, not measured. On the desktop Jan found it
+    it is the extra pixels filled, not measured. On the desktop it looked
     fine.
   - Not taken: moving the start to the middle, item 68; 1.0's camera-following
     plane, wrong for hilly floors.
