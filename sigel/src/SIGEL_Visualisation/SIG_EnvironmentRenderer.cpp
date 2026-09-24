@@ -149,7 +149,7 @@ namespace SIGEL_Visualisation
 
 	void SIG_EnvironmentRenderer::buildGrid(GLuint number)
   {
-   	register int x,z;
+   	int x,z;
    	GLfloat vertex[2][3], normal[3];
 	 	int x_dim, z_dim;
 	 	double grid_resolution;
@@ -529,7 +529,7 @@ namespace SIGEL_Visualisation
   };
 
   void SIG_EnvironmentRenderer::drawInit() {
-   register int x, z;
+   int x, z;
 
    GLfloat normal[3];
 	 int x_dim, z_dim;
@@ -602,7 +602,7 @@ namespace SIGEL_Visualisation
 
   inline void SIG_EnvironmentRenderer::compute_face_normal(float v0[3], float v1[3], float v2[3],float normal[3]) {
       float a[3], b[3];
-      register int i;
+      int i;
 
       for (i=0; i<3; ++i) {
           a[i] = v1[i] - v0[i];
