@@ -531,6 +531,25 @@ touched, because changing one changes behaviour against the reference binary.
   `QFileDialog::getSaveFileName` every time, so Save acts as Save As.
   Interface work, to go with item 70.
 
+- [ ] **81. A fitness function that rewards steady walking.** Idea, 2026-09-24.
+  No existing function rewards an even pace: `SIG_GPNiceWalkingFitnessFunction`
+  only tests a fixed height band, pass or fail, and all but
+  `SIG_GPRealSpeedFitnessFunction` score net distance from start to end.
+  Decided so far, preliminary name "Steady Walking",
+  `SteadyWalkingFitnessFunction`, class `SIG_GPSteadyWalkingFitnessFunction`:
+  - split the run into 1 s windows; drop a partial last window;
+  - pᵢ = horizontal progress in window i along the line from the run's start
+    to its end, so no direction is fixed, as in the existing functions;
+  - v̄ = mean of pᵢ per second; cv = std(pᵢ) / v̄;
+  - h = std(body height) / start height;
+  - score = v̄ / (1 + cv) / (1 + h), the height weight being 1;
+  - no settling time at the start; a full run, never the early-stop
+    simulation;
+  - 0 when v̄ is 0 or below, or a position is Inf or NaN.
+  It records every frame with `SIG_GPFullDataRecorder`, as Nice Walking does,
+  and needs one entry in the GP parameter combo box and one in
+  `sigel_slave`'s name mapping. No file format changes.
+
 - [ ] **47. `sigelDynClient` and `manage_dyn_slave`.** `sigelDynClient` makes a
   second machine a dynamic slave of a master started with `sigel -de`, which
   `sigel.cpp` still accepts. It is still 1.3's Solaris `tcsh` script, its home
