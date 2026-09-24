@@ -194,6 +194,12 @@ Constructs the language removed. A current compiler rejects them.
   nothing prints one today, `sigel --version` does not exist, and the honest
   alternative is that the About box is the only place a user ever sees it.
 
+- [ ] **80. Rename `SIG_GPPopulation::resetPool`.** It keeps every individual
+  and only sets each fitness to -1, so the name is wrong. Callers:
+  `SIG_GPManager::run`, every `ResetEveryGeneration` generations, and
+  `SIG_AllIndividualsView::slotResetPool`, which needs the same rename. Check
+  the slot's `connect` and any menu text that says "reset pool".
+
 ---
 
 ## 6 · Defects preserved by the port
