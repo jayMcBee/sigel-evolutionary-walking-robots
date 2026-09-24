@@ -590,11 +590,6 @@ touched, because changing one changes behaviour against the reference binary.
     parameter `recordingFrequency` to 1, not the member of the same name, so
     the member stays 0 and `SIG_GPFullDataRecorder::record` takes
     `frameCounter %= recordingFrequency` by zero.
-  - **Division by zero, Force:** `SIG_GPForceFitnessFunction::evalFitness`
-    divides by `frames * distance`. A robot that does not move, or a run with
-    one recorded frame, divides by zero; the `finite()` test afterwards turns
-    the result into a score of 0. `frames` is unsigned `count - 1`, so an
-    empty recording wraps it to 4294967295.
   - ~~**Misnamed:** `varianz` and `variance`~~ renamed 2026-09-24.
 
 - [ ] **88. Any load error kills the interface.** Found 2026-09-24. Nothing

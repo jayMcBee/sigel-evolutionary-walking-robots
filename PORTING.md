@@ -909,8 +909,11 @@ Start here.
   Tested on `twoBases`, individuals 0 to 2: the line reads
   `avgHeight: 98.9%  |`, where glibc printed `98.9% |` before. The fitness
   computation is not touched.
-- **Item 87 stays open:** the run-time and recording-rate divisions, and the
-  Force division.
+- **Item 87 stays open:** the run-time and recording-rate divisions. The
+  Force bullet is removed, by decision: only a robot that does not move
+  divides by zero there, and `finite()` turns that into a score of 0, which is
+  right. The one-frame and empty-recording cases cannot divide: the loop does
+  not run, and the recorder always holds the first sample.
 - **Gates:** `check.sh` 944 pass, 0 fail; warnings 491. The other four gates
   are green.
 
