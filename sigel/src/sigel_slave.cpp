@@ -49,7 +49,6 @@
 #include "SIGEL_GP/SIG_GPRealSpeedFitnessFunction.h"
 #include "SIGEL_GP/SIG_GPNiceWalkingFitnessFunction.h"
 #include "SIGEL_GP/SIG_GPAdaptiveWalkingFitnessFunction.h"
-#include "SIGEL_GP/SIG_GPStepperFitnessFunction.h"
 #include "SIGEL_GP/SIG_GPForceFitnessFunction.h"
 #include "SIGEL_GP/SIG_GPRemoteZORCFitnessFunction.h"
 
@@ -323,10 +322,6 @@ int main( int argc, char *argv[] ) {
 		// prepare using the AdaptiveWalkingFitnessFunction
       else if (fitnessFunctionName == "ZorcWalkingFitnessFunction")
 				fitnessFunction = new SIGEL_GP::SIG_GPAdaptiveWalkingFitnessFunction( *program, *robot, *environment, *simulationParameters );
-
-		// prepare using the StepperFitnessFunction
-      else if (fitnessFunctionName == "StepperFitnessFunction")
-				fitnessFunction = new SIGEL_GP::SIG_GPStepperFitnessFunction( *program, *robot, *environment,	*simulationParameters );
 
       // prepare for using the ForceFitnessFunction
      else if (fitnessFunctionName == "ForceFitnessFunction")

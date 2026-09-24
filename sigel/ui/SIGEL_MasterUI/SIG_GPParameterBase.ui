@@ -456,11 +456,6 @@
                         </item>
                         <item>
                           <property name="text">
-                            <string>Stepper</string>
-                          </property>
-                        </item>
-                        <item>
-                          <property name="text">
                             <string>Remote ZORC</string>
                           </property>
                           <property name="icon">

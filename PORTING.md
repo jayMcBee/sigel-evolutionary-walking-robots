@@ -610,7 +610,7 @@ through `f0f2daa`.
 
 ## 7. Steps
 
-**Exit criterion per step:** `./checks/check.sh` from anywhere — **948 pass, 0
+**Exit criterion per step:** `./checks/check.sh` from anywhere — **944 pass, 0
 fail**. *The figure moves with the number of tracked text files, because the
 `encodings` check adds its own count to the total. Measured trail: **1136**
 until 2026-09-19, when `experiments/` and `robots/` arrived and
@@ -633,7 +633,8 @@ when `gui vs 1.3` and `guidump-baseline.txt` went, one pass each; **963** when
 `SIG_UnstreamerScanner`, `SIG_RobotUnstreamer` and `LEERE_DATEI`, four
 passes per class and one for the file; **952** when item 82 removed
 `WIN_SIG_GPRemoteZORCFitnessFunction`, two `encodings` passes; **948** when
-it removed `SIG_GPZorcWalkingFitnessFunction`, four passes.*
+it removed `SIG_GPZorcWalkingFitnessFunction`, four passes; **944** when it
+removed `SIG_GPStepperFitnessFunction`, four passes.*
 **The pass count was 853 until D31 and the jump is not new coverage of SIGEL's
 code.** The `encodings` check used to read 404 files of five extensions and now
 read all 618 tracked files then, 8 of which git called binary: its pass count went
@@ -641,10 +642,11 @@ read all 618 tracked files then, 8 of which git called binary: its pass count we
 adding or deleting one moves the total by one; `portinglog.txt` did that on
 2026-09-09.*
 **The warning figure is not an exit criterion and moves with the code.** It was
-508 at D31 and D32 and reads 496 today; it was 503 until item 67 removed
+508 at D31 and D32 and reads 494 today; it was 503 until item 67 removed
 `callRenderPixMap`'s unused-but-set `res`, and 502 until item 2 removed the
 `register` keyword and the `SIG_IO::cerr` round of 2026-09-24, and 497 until
-item 50 removed `SIG_RobotUnstreamer`, whose unused parameter warned. A step
+item 50 removed `SIG_RobotUnstreamer`, whose unused parameter warned, and
+496 until item 82 removed `SIG_GPStepperFitnessFunction`, which had two. A step
 that changes no code should not
 move it; one that does, will.
 `check.sh` builds `guidrive` and `sigelApp/` itself, which builds the two
@@ -895,8 +897,21 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-24, night — ITEM 82, PART 2: `SIG_GPZorcWalkingFitnessFunction`
+**2026-09-24, night — DONE: ITEM 82, PART 3: `SIG_GPStepperFitnessFunction`
 REMOVED.** Start here.
+
+- **Removed, by decision:** `SIG_GPStepperFitnessFunction`, its `.h`, `.cpp`,
+  include and branch in `sigel_slave.cpp`'s `main`, its friend declaration in
+  `SIG_GPFullDataRecorder.h`, and the "Stepper" entry in the fitness combo
+  box. `SIG_GPParameter` maps the combo box by index, so Remote ZORC is 4 and
+  Force is 5. Item 82 is done; the Done entry has the detail.
+- **Baseline:** `guibehaviour-baseline.txt` moved in the combo box lines only:
+  six items, and the clamps at 5.
+- **Gates:** `check.sh` 944 pass, 0 fail; warnings 494. The other four gates
+  are green.
+
+**2026-09-24, night — ITEM 82, PART 2: `SIG_GPZorcWalkingFitnessFunction`
+REMOVED.**
 
 - **Removed, by decision:** `SIG_GPZorcWalkingFitnessFunction`, its `.h`,
   `.cpp` and friend declaration in `SIG_GPFullDataRecorder.h`. Nothing created
@@ -3409,6 +3424,7 @@ else that stops matching 1.3 still needs justifying as a defect.
 | **A render mode "Points", with the back points hidden.** 1.3 has Wireframe, Flatshaded and Gouraudshaded | by decision 2026-09-23, item 63. `SIG_ViewSettings::points`, `SIG_SimulationVisualisation::visualize` | nothing: no check covers the render modes |
 | **A joint sensor reports the joint's position again.** 1.3 multiplies the radian reading by 57.3 before it divides by the radian range, so the register wraps the value into noise. 1.0 had the plain division | by decision 2026-09-23, the joint-sensor fix of the 1.0 → 1.3 regression: 1.0's `(q - minPos) / posRange` restored in `SIG_DynaMechsSimulationQueries::sense`. With it alone, `checks/replicate.sh` gave 7 of 7 kept experiments within 10% of their 2001 results, and `runner` matched 100 of 100 individuals. The next row changes that. See §7, "The 1.0 → 1.3 regression — DONE 2026-09-24" | `fitness-baseline.txt` |
 | **A sensor at the top of its range reads the register's top.** 1.3, and 1.0, map a reading of exactly 1 one past the register's top, and the register wraps it to the bottom: a joint on its max stop reads as its min, and a contact sensor reads the same with and without contact | by decision 2026-09-23, from the 1.0 → 1.3 regression work: `SIG_DynaMechsSimulationQueries::sense` caps the value at the register's top. The 2001 `runner` programs depend on the wrap and no longer reproduce. Done 2026-09-24: `experiments/runner.exp` is a new population evolved under the fixed sensors. See §7, "The 1.0 → 1.3 regression — DONE 2026-09-24" | `fitness-baseline.txt` |
+| **The Stepper fitness function is gone — item 82.** 1.3's fitness combo box has 7 entries, ours 6. An experiment file that names `StepperFitnessFunction` shows Simple, and saving it or starting a run writes `SimpleFitnessFunction`, with no message | by decision 2026-09-24. No shipped experiment uses it. The silent change to Simple is what `SIG_GPParameter::getOutOfExperiment` does with any unknown name | `guibehaviour-baseline.txt`: the `comboboxFitnessName` lines |
 
 **Two 1.3 defects preserved on purpose**, plus the one below them. `MT_GUI`'s
 gnuplot export puts a constant x on datasets `2pt destr.` and `3pt destr.`
@@ -4957,6 +4973,23 @@ carried; other items and this file cite them, so they do not change.
   `sigelDynClient` hold no symbol, call or string of them, asked through the
   oracle. `LEERE_DATEI` held the one line `Dies ist nix.`, and nothing named
   it.
+
+- [x] **82. Drop three fitness functions** — done 2026-09-24, by decision, in
+  three commits. None was used by a shipped experiment: six store
+  `NiceWalkingFitnessFunction` and `twoBases` stores `SimpleFitnessFunction`.
+  - `WIN_SIG_GPRemoteZORCFitnessFunction`, the Windows-only copy that nothing
+    built, with the `Makefile`'s exclusion and `check.sh`'s `WIN_*` skip.
+  - `SIG_GPZorcWalkingFitnessFunction`, which nothing created: `sigel_slave`
+    maps "ZorcWalkingFitnessFunction" to
+    `SIG_GPAdaptiveWalkingFitnessFunction`. The name stays, because experiment
+    files store it for Adaptive Walking.
+  - `SIG_GPStepperFitnessFunction` and its combo box entry. `SIG_GPParameter`
+    maps the combo box by index in `putIntoExperiment` and by name in
+    `getOutOfExperiment`; Remote ZORC moved from 5 to 4 and Force from 6 to 5.
+    Tested: a copy of `twoBases` with each of the six remaining names loads
+    and saves back with the same name. A copy naming
+    `StepperFitnessFunction` saves back as `SimpleFitnessFunction`, as any
+    unknown name does.
 
 #### Not doing
 

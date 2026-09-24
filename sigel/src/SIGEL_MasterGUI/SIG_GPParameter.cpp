@@ -129,14 +129,10 @@ void SIG_GPParameter::putIntoExperiment()
       break;
 
     case 4:
-      theExperiment.gpParameter.setFitnessName("StepperFitnessFunction");
-      break;
-
-    case 5:
       theExperiment.gpParameter.setFitnessName("RemoteZORCFitnessFunction");
       break;
 
-    case 6:
+    case 5:
     	theExperiment.gpParameter.setFitnessName("ForceFitnessFunction");
      	break;
 
@@ -270,12 +266,10 @@ void SIG_GPParameter::getOutOfExperiment()
       comboboxFitnessName->setCurrentIndex(2);
   else if ( fitnessName == "ZorcWalkingFitnessFunction" )
       comboboxFitnessName->setCurrentIndex(3);
-  else if ( fitnessName == "StepperFitnessFunction" )
-      comboboxFitnessName->setCurrentIndex(4);
   else if ( fitnessName == "RemoteZORCFitnessFunction" )
-      comboboxFitnessName->setCurrentIndex(5);
+      comboboxFitnessName->setCurrentIndex(4);
   else if ( fitnessName == "ForceFitnessFunction" )
-  		comboboxFitnessName->setCurrentIndex(6);
+  		comboboxFitnessName->setCurrentIndex(5);
   else comboboxFitnessName->setCurrentIndex(0);
 
   // get the probabilities

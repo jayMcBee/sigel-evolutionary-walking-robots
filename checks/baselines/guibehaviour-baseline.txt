@@ -614,16 +614,15 @@ we do with the system?]
     click  sliderMutation                       50 -> 51 (delta +1) focusPolicy=11 hasFocus=0
     slider sliderCrossover                      v=670    [0..1000] page=1 up=671    pgup=672    end=950    lcd=lcdnumberCrossover 67/67.1/67.2/95 enabled=1
     click  sliderCrossover                      670 -> 671 (delta +1) focusPolicy=11 hasFocus=0
-    combo  comboboxFitnessName                  count=7 current=0 [Simple] editable=0 enabled=1
+    combo  comboboxFitnessName                  count=6 current=0 [Simple] editable=0 enabled=1
       item0  [Simple]
       item1  [Real Speed]
       item2  [Nice Walking]
       item3  [Adaptive Walking]
-      item4  [Stepper]
-      item5  [Remote ZORC]
-      item6  [Force]
-      7 Down clamps at current=6 [Force]
-      7 Up   clamps at current=0 [Simple]
+      item4  [Remote ZORC]
+      item5  [Force]
+      6 Down clamps at current=5 [Force]
+      6 Up   clamps at current=0 [Simple]
     check  checkboxIgnoreMaxIndLength           text=[Ignore maximal length] checkable=1 0->1 enabled=1
       side effect: spinboxMaxIndLength now greyed
   -- tab 1 [Command probabilities] shown=1 visible=1

@@ -476,10 +476,9 @@ touched, because changing one changes behaviour against the reference binary.
   functions, not named in its report, defeated by individuals scoring 268 and
   292 on 1.3; not re-measured here.
   Any bound is a heuristic and needs more thought.
-  **Related, found 2026-09-24:** `SIG_GPAdaptiveWalkingFitnessFunction` and
-  `SIG_GPStepperFitnessFunction` already test each recorded height. Above 1.5
-  times the start height they log "o quite high", above 2 times "r u ready 2
-  fly ?". Both are only written to
+  **Related, found 2026-09-24:** `SIG_GPAdaptiveWalkingFitnessFunction`
+  already tests each recorded height. Above 1.5 times the start height it logs
+  "o quite high", above 2 times "r u ready 2 fly ?". Both are only written to
   `SIG_IO::cerr`, once per recorded sample, and do not change the score.
 
 - [ ] **76. A mesh with negative volume loads with no message.** Found
@@ -533,25 +532,14 @@ touched, because changing one changes behaviour against the reference binary.
   and needs one entry in the GP parameter combo box and one in
   `sigel_slave`'s name mapping. No file format changes.
 
-- [ ] **82. Drop three fitness functions.** Decided 2026-09-24. None is used
-  by a shipped experiment.
-  - `SIG_GPStepperFitnessFunction`: its `.h`/`.cpp`, the include and the
-    `"StepperFitnessFunction"` branch in `sigel_slave.cpp`'s `main`, the
-    friend declaration in `SIG_GPFullDataRecorder.h`, and the "Stepper" entry
-    in the combo box of `SIG_GPParameterBase.ui`. `SIG_GPParameter` maps the
-    combo box by index in `putIntoExperiment` and by name in
-    `getOutOfExperiment`, so the entries after it move up one; the combo list
-    in `guibehaviour-baseline.txt` moves with them.
-  - ~~`SIG_GPZorcWalkingFitnessFunction`~~ removed 2026-09-24.
-  - ~~`WIN_SIG_GPRemoteZORCFitnessFunction`~~ removed 2026-09-24.
-
 - [ ] **83. ZORC support behind a compile-time switch, off by default.**
   Decided 2026-09-24. ZORC is a real robot driven over a serial line; the
   simulation does not need it. One global `#define`, off by default, removes
   everything ZORC-related from the build: `SIG_GPRemoteZORCFitnessFunction`,
   its branches in `sigel_slave.cpp`'s `main` (the fitness function and the
   visualise-mode program transfer), and the "Remote ZORC" entry in the combo
-  box, handled in `SIG_GPParameter` like item 82's index shift. Not ZORC:
+  box, handled in `SIG_GPParameter` like item 82's index shift, which is
+  in PORTING.md's Done entry for item 82. Not ZORC:
   `SIG_GPAdaptiveWalkingFitnessFunction` is a simulated function whose stored
   name happens to be "ZorcWalkingFitnessFunction"; it stays. To decide: where
   the switch lives (the `Makefile` or a header), and what an experiment file
@@ -595,7 +583,7 @@ touched, because changing one changes behaviour against the reference binary.
   - **Undefined behaviour:** `SIG_GPAdaptiveWalkingFitnessFunction::evalFitness`
     builds its summary with `sprintf`, where `%%` becomes a single `%`, then
     passes it to `fprintf(stderr, infStr)` as the format string. `% |` is then
-    read as a conversion. Stepper has the same line; item 82 drops Stepper.
+    read as a conversion.
   - **Division by zero, run time:** every simulated fitness function divides
     by `QTime(0,0).secsTo(getTimeToSimulate())`, the run time in whole
     seconds. A time to simulate below 1 s divides by zero.
@@ -656,11 +644,11 @@ touched, because changing one changes behaviour against the reference binary.
   compiler rejects unknown modes, so only transfer text can bring an unknown
   word in.
 
-- [ ] **54. Empty catch blocks. Review them in a round of their own.** 6 of the
-  30 `catch` clauses in `sigel/` are empty, all
+- [ ] **54. Empty catch blocks. Review them in a round of their own.** 5 of the
+  29 `catch` clauses in `sigel/` are empty, all
   `catch (SIGEL_Tools::SIG_Exception &e) { };` around `simulation->start()` in
-  the fitness evaluation of six fitness functions: AdaptiveWalking, Force,
-  NiceWalking, RealSpeed, Simple and Stepper. A simulation that
+  the fitness evaluation of five fitness functions: AdaptiveWalking, Force,
+  NiceWalking, RealSpeed and Simple. A simulation that
   throws is ignored, and the fitness is computed from what was recorded until
   then. NiceWalking and Simple are the fitness functions of all 7 shipped
   experiments, so a change can move fitness values against 1.3. Each site needs
