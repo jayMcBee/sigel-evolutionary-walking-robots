@@ -301,22 +301,6 @@ namespace SIGEL_GP
   bool parsimonyPressure;
 
   /**
-   * Maximum program length during (!) GP runs: If maximumLength=0 is chosen, the length
-   * control mechanism will be ignored. WARNING: The program lengths may increase very fast. 
-   */
-
-  private:
-  long maximumLength;
-  
-  /**
-   * Minimum program length during (!) GP runs: If minimumLength=0 is chosen, the minimum length
-   * is set to 3.
-   */
-
-  private:
-  long minimumLength;
-
-  /**
    * Probability of the instructions (ADD,...) to be created or to be chosen for variation: The 
    * probabilities are given as an integer value that defines the relative probability of this 
    * instruction. The relative probability is dependend on the other instruction probabilities.

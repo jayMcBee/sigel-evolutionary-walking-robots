@@ -899,8 +899,31 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-09-24, night — DONE: TWO UNUSED LENGTH FIELDS REMOVED.** Start here.
+
+- **Removed, by decision:** `SIG_GPParameter::maximumLength` and
+  `minimumLength`, two `long` fields with doc comments. Nothing set, read,
+  saved or loaded them, and no widget showed them. The used pair is
+  `minIndLength` and `maxIndLength`. The removed comments said that 0 turns
+  length control off and that a minimum of 0 becomes 3. They were not moved:
+  neither is fully true of the used pair.
+- **Found on the way, not filed yet:**
+  - With "Ignore maximal length" ticked, the maximum is 0 and
+    `SIG_GPOperations::mutation` never inserts a line; it only changes or
+    deletes lines. `generateRandomProgram` then gives new programs min to
+    2·min−1 lines.
+  - A file with a minimum of 0 lets `mutation` empty a program, and the next
+    mutation reads line 0 of it. The interface allows 2 at least.
+  - `SIG_Program::checkLength` records every cut as "length increased by 2".
+  - `SIG_GPOperations::crossOver` removes only about half the excess, every
+    other line, before `checkLength` trims the rest.
+- **Gates:** `check.sh` 944 pass, 0 fail; warnings 491. The first run failed
+  `gui behaviour` once: the Export Language Parameters dialog did not appear.
+  The eleven scenarios alone matched the baseline, and a second full run
+  passed. The other four gates are green.
+
 **2026-09-24, night — DONE: ITEM 87, PART 3: THE RECORDER GUARD. ITEM 87
-CLOSED.** Start here.
+CLOSED.**
 
 - **Fixed, by decision:** `SIG_GPFullDataRecorder`'s constructor set its
   parameter `recordingFrequency` to 1, not the member, so a frequency of 0
@@ -1031,7 +1054,7 @@ REMOVED.**
   `guibehaviour-baseline.txt` moved: the spin box range, and the
   language-parameters hash after a robot import, which exports the defaults.
 
-**2026-09-24, later — DONE: ITEMS 24, 60, 2, 80, AND TWO CLEAN-UP ROUNDS.** Start here.
+**2026-09-24, later — DONE: ITEMS 24, 60, 2, 80, AND TWO CLEAN-UP ROUNDS.**
 
 - **Item 24, the progress bar:** it counts the generation's finished
   tournaments through `SIG_GPManager::tournamentProgress()`; D38 is revised.
