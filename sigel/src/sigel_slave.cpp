@@ -51,11 +51,7 @@
 #include "SIGEL_GP/SIG_GPAdaptiveWalkingFitnessFunction.h"
 #include "SIGEL_GP/SIG_GPStepperFitnessFunction.h"
 #include "SIGEL_GP/SIG_GPForceFitnessFunction.h"
-#ifdef _WINDOWS
-#include "SIGEL_GP/WIN_SIG_GPRemoteZORCFitnessFunction.h"
-#else
 #include "SIGEL_GP/SIG_GPRemoteZORCFitnessFunction.h"
-#endif
 
 #include <pvm3.h>
 

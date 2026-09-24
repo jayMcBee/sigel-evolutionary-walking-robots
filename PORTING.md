@@ -610,7 +610,7 @@ through `f0f2daa`.
 
 ## 7. Steps
 
-**Exit criterion per step:** `./checks/check.sh` from anywhere — **954 pass, 0
+**Exit criterion per step:** `./checks/check.sh` from anywhere — **952 pass, 0
 fail**. *The figure moves with the number of tracked text files, because the
 `encodings` check adds its own count to the total. Measured trail: **1136**
 until 2026-09-19, when `experiments/` and `robots/` arrived and
@@ -631,7 +631,8 @@ with the `guidrive` scenarios `clipcheck`, `formsize` and `slavegui`; **964**
 when `gui vs 1.3` and `guidump-baseline.txt` went, one pass each; **963** when
 `truncated pi (V5)` went; **954** when item 50 removed
 `SIG_UnstreamerScanner`, `SIG_RobotUnstreamer` and `LEERE_DATEI`, four
-passes per class and one for the file.*
+passes per class and one for the file; **952** when item 82 removed
+`WIN_SIG_GPRemoteZORCFitnessFunction`, two `encodings` passes.*
 **The pass count was 853 until D31 and the jump is not new coverage of SIGEL's
 code.** The `encodings` check used to read 404 files of five extensions and now
 read all 618 tracked files then, 8 of which git called binary: its pass count went
@@ -651,9 +652,9 @@ section was dropped on 2026-09-24; `fitness-check.sh` still needs it.
 *It was 851 after `real clicks`, earlier the same day.* It was 850 on
 2026-09-05, after the `slave gui` and `form minimums`
 sections and the two forms corpus assertions. It **exits non-zero** when
-anything fails or is skipped. Zero is reachable because the two permanently
-Windows-only `WIN_*` files are an explicit exclusion rather than a standing
-red — see C11c.
+anything fails or is skipped. *Zero was first reached by skipping the two
+Windows-only `WIN_*` files as an explicit exclusion, C11c; item 82 removed
+them, and no file is skipped now.*
 
 **Earlier pass/fail figures are not comparable and have been removed.** The basis
 changed at C4 (standalone headers folded into the totals, plus the regex self-test
@@ -893,7 +894,19 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-24, night — DONE: ITEM 50, TWO UNUSED CLASSES REMOVED.** Start here.
+**2026-09-24, night — ITEM 82, PART 1: `WIN_SIG_GPRemoteZORCFitnessFunction`
+REMOVED.** Start here.
+
+- **Removed, by decision:** the Windows-only copy of the Remote ZORC fitness
+  function, which nothing built. Its `.h` and `.cpp`, the `_WINDOWS` include
+  in `sigel_slave.cpp`, the `Makefile`'s `EXCLUDE_SIGEL_GP` and the
+  exclusion filter in `core_lib`, and the `WIN_*` skip in `check.sh`. The
+  `_WINDOWS` `setStyle` block in `sigel_slave.cpp` stays for item 35.
+- **Next:** Stepper and Zorc Walking, one commit each. Item 82 stays open.
+- **Gates:** `check.sh` 952 pass, 0 fail; warnings 496. The other four gates
+  are green.
+
+**2026-09-24, night — DONE: ITEM 50, TWO UNUSED CLASSES REMOVED.**
 
 - **Removed, by decision:** `SIG_UnstreamerScanner`, `SIG_RobotUnstreamer`
   and `sigel/include/SIGEL_RobotIO/LEERE_DATEI`. The Done entry has the proof.
@@ -2578,7 +2591,8 @@ Back-edges cost nothing: 2 were dead includes, 3 forward-declare.
 them and the Makefile now excludes exactly one**,
 `WIN_SIG_GPRemoteZORCFitnessFunction.cpp`, which needs `windows.h` and is
 permanently out of scope. `check.sh` reports **0 fail** and skips that one
-explicitly. *An earlier version of this said 5 and listed
+explicitly. *Item 82 removed it on 2026-09-24; the Makefile excludes nothing
+now.* *An earlier version of this said 5 and listed
 `SIG_GPPopulation.cpp`, which Phase R fixed.*
 
 ### Phase B — make ownership explicit — SUBSUMED BY PHASE D
@@ -2636,7 +2650,8 @@ reads.
 *This said four core files do not build — `MT_Controller.cpp`,
 `SIG_GUIGPManager.cpp` and both ZORC fitness files.* **Three were fixed by C6,
 C7 and C8; one remains and always will**, the `WIN_` ZORC variant, which needs
-`HANDLE` and `OVERLAPPED` from `windows.h`. None was ever on the evaluation
+`HANDLE` and `OVERLAPPED` from `windows.h`. *Item 82 removed it on
+2026-09-24.* None was ever on the evaluation
 path.
 
 **Three vendored patches**, applied by `make` against a stamp inside the
@@ -4462,7 +4477,8 @@ carried; other items and this file cite them, so they do not change.
     `saveSystem`'s file dialog after the Save dialog or the `useMeta` prompt,
     and `SIG_GPPopulation`'s two after the Add and Import dialogs.
   Left: the six prompts in `MT_StatisticsWidget`, for item 33, and the
-  Windows-only `WIN_` copy of the ZORC function, which is not built. **Confirmed
+  Windows-only `WIN_` copy of the ZORC function, which is not built; *item 82
+  removed it on 2026-09-24*. **Confirmed
   on the real desktop 2026-09-22:** the dialogs tested cannot be hidden behind
   the main window. **Not checked:** no scenario prints the parent of these
   dialogs. With a parent the MetaGP window stays above the main window and is

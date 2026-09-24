@@ -324,20 +324,6 @@ SIGCXX := g++ -std=c++17 -O1 -g -Wall -Wextra \
 CORE := SIGEL_Tools SIGEL_Environment MT_GPSystem SIGEL_Robot SIGEL_Program \
         SIGEL_RobotIO SIGEL_Simulation MT_Control SIGEL_GP
 
-# These three exclusions all existed for one reason -- the GUI was not ported --
-# and C6/C7/C8 removed it. MT_Controller.cpp constructs an MT_MainWindow and
-# makes 23 mainWindow-> accesses (MT_GUI, C6); SIG_GUIGPManager.cpp is its
-# counterpart in SIGEL_GP and reaches into SIG_GUIGPExperiment (SIGEL_MasterGUI, C7);
-# the non-WIN ZORC fitness function was still on the Qt 2 API until C8. All
-# three now compile, and C9 needs all three: linking `sigel' without them fails
-# on 20 undefined MT_Controller symbols plus SIG_GUIGPManager's vtable.
-#
-# WIN_SIG_GPRemoteZORCFitnessFunction.cpp is the one real exclusion left. It
-# needs HANDLE and OVERLAPPED from windows.h and has no Qt 2 API left in it, so
-# it cannot be compiled on this platform at any point -- it is excluded because
-# of the platform, not because of the port.
-EXCLUDE_SIGEL_GP   := $(SRC)/src/SIGEL_GP/WIN_SIG_GPRemoteZORCFitnessFunction.cpp
-
 CORE_LIBS := $(patsubst %,$(LIB)/lib%.a,$(CORE))
 core: $(CORE_LIBS)
 
@@ -480,7 +466,7 @@ $(OBJ)/moc/%.o: $(B)/moc/%.cpp $(STAMP) | $(UI_HDRS)
 
 define core_lib
 $(LIB)/lib$(1).a: $$(patsubst $(SRC)/src/%.cpp,$(OBJ)/sigel/%.o,\
-  $$(filter-out $$(EXCLUDE_$(1)),$$(wildcard $(SRC)/src/$(1)/*.cpp)))
+  $$(wildcard $(SRC)/src/$(1)/*.cpp))
 endef
 $(foreach m,$(CORE),$(eval $(call core_lib,$(m))))
 $(foreach m,$(GUI),$(eval $(call core_lib,$(m))))

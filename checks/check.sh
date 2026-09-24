@@ -63,18 +63,12 @@ else
 fi
 
 MODULES="${*:-SIGEL_Tools SIGEL_Environment MT_GPSystem SIGEL_Robot SIGEL_Program SIGEL_RobotIO SIGEL_Simulation MT_Control SIGEL_GP SIGEL_Visualisation SIGEL_CommonGUI SIGEL_SlaveGUI MT_GUI SIGEL_MasterGUI}"
-pass=0; fail=0; warn=0; skipped=0; winskip=0
+pass=0; fail=0; warn=0; skipped=0
 
 for m in $MODULES; do
     mp=0; mf=0; mw=0
     for f in "$SRC/src/$m"/*.cpp; do
         [ -e "$f" ] || continue
-        # WIN_* files are Windows-only and permanently out of scope:
-        # WIN_SIG_GPRemoteZORCFitnessFunction needs HANDLE and OVERLAPPED
-        # from windows.h and cannot compile on Linux. They are counted as a
-        # known exclusion, not as a failure, so that "0 fail" and the exit
-        # status stay usable.
-        case "${f##*/}" in WIN_*) winskip=$((winskip+1)); continue ;; esac
         if g++ $FLAGS $INCS "$f" 2>/tmp/chk.$$; then mp=$((mp+1)); else mf=$((mf+1)); fi
         mw=$((mw + $(command grep -ac "$SRC.*warning:" /tmp/chk.$$ || true)))
     done
@@ -88,7 +82,6 @@ for m in $MODULES; do
  for h in "$SRC/include/$m"/*.h; do
     [ -e "$h" ] || continue
     rel=${h#$SRC/include/}
-    case "${h##*/}" in WIN_*) winskip=$((winskip+1)); continue ;; esac
     printf '#include "%s"\nint main(){return 0;}\n' "$rel" > /tmp/hdr.$$.cpp
     if g++ $FLAGS $INCS /tmp/hdr.$$.cpp 2>/dev/null; then hp=$((hp+1)); else hf=$((hf+1)); echo "  header FAIL: $rel"; fi
  done
@@ -1205,7 +1198,6 @@ rm -f /tmp/chk.$$ /tmp/hdr.$$.cpp /tmp/uic2.$$ /tmp/mkforms.$$
 rm -rf "$FORMSB"
 echo "-----"
 echo "total: $pass pass, $fail fail, $warn warnings in SIGEL code"
-[ "$winskip" = 0 ] || echo "$winskip Windows-only WIN_* file(s) excluded -- permanent, §7"
 [ "$skipped" = 0 ] || echo "$skipped SECTION(S) SKIPPED -- see above; they tested nothing"
 # Exit non-zero when anything failed, so that `./checks/check.sh && ...' stops
 # on a red run. A skipped section counts as a failure too: it tested nothing

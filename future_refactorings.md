@@ -547,10 +547,7 @@ touched, because changing one changes behaviour against the reference binary.
     `SIG_GPAdaptiveWalkingFitnessFunction`. That string stays: it is what
     experiment files store for Adaptive Walking. Drop its friend declaration
     in `SIG_GPFullDataRecorder.h` too.
-  - `WIN_SIG_GPRemoteZORCFitnessFunction`: never built. Its `.h`/`.cpp`, the
-    `_WINDOWS` include in `sigel_slave.cpp`, the `EXCLUDE_SIGEL_GP` line and
-    its comment in the `Makefile`, and the `WIN_*` skip in `check.sh`, whose
-    count line then reads 1. Related: item 35.
+  - ~~`WIN_SIG_GPRemoteZORCFitnessFunction`~~ removed 2026-09-24.
 
 - [ ] **83. ZORC support behind a compile-time switch, off by default.**
   Decided 2026-09-24. ZORC is a real robot driven over a serial line; the
@@ -695,9 +692,8 @@ touched, because changing one changes behaviour against the reference binary.
   **What is there:** 9 Visual Studio project files at the source root, 7,962
   lines — `.dsp` for `Sigel`, `SIGELCommon`, `MetaSIGEL`, `sigel_slave` and
   `manage_dyn_slave`, plus `Sigel.dsw`, `Sigel.mak`, `sigel_slave.mak` and
-  `manage_dyn_slave.mak`; the 2 `WIN_SIG_GPRemoteZORCFitnessFunction` sources,
-  451 lines, already excluded by `EXCLUDE_SIGEL_GP`; **206 `_WINDOWS`
-  occurrences across 57 files** — 195 `#ifdef`, 9 `#ifndef` and **2 inside
+  `manage_dyn_slave.mak`; **205 `_WINDOWS`
+  occurrences across 57 files** — 194 `#ifdef`, 9 `#ifndef` and **2 inside
   commented-out code in `MT_GPManager.cpp`, which no compile break will show**;
   4 `#include <windows.h>` in `MT_Controller.h`, `MT_Substitute.h`,
   `MT_GPManager.h` and `MT_GPManager.cpp`; and `HANDLE`, `DWORD WINAPI`,
@@ -708,15 +704,9 @@ touched, because changing one changes behaviour against the reference binary.
   `.c` file in the tree, 9 occurrences, invisible to a `--include=*.cpp` sweep.
   **Keep the file itself**: 1.3 built it on Linux, and `sigelDynClient` needs it
   (item 47). Only its Windows branches go.
-  **The two `WIN_` files are the `SIG_GPExperiment` trap again:** they declare
-  the same class, with the same include guard, as
-  `SIG_GPRemoteZORCFitnessFunction`, and only the project file chose between
-  them. `sigel_slave.cpp` includes the `WIN_` header inside its `_WINDOWS`
-  branch, so delete that branch and the two files in the same commit.
   **The gates cannot see deleted code**: nothing ever compiled it. Read every
   diff.
-  **How:** delete the project files and the `WIN_` sources first, with
-  `EXCLUDE_SIGEL_GP` and the four `winskip` sites in `check.sh`. Then take the
+  **How:** delete the project files first. Then take the
   `#ifdef _WINDOWS` blocks one module at a time, keeping the `#else` half; the
   object file must not change.
   **Watch:** the 9 `#ifndef _WINDOWS` blocks are reverse polarity — the body is
@@ -731,14 +721,8 @@ touched, because changing one changes behaviour against the reference binary.
   Three live call sites — `sigel.cpp, main` and two in `sigel_slave.cpp`.
   Keeping the `#else` half deletes them, which is right once Windows is gone, but
   say that a decision is being overturned.
-  **It overturns three "permanent" statements about the `WIN_*` files,** all to
-  be edited in the same move: PORTING.md's Phase C exclusions ("an explicit
-  exclusion rather than a standing gap"), its C7/C8 row ("one remains and always
-  will"), and `check.sh`'s "Windows-only WIN_* file(s) excluded -- permanent".
-  The `winskip` counter behind that line goes with them, and its line
-  disappearing will look like a lost check unless it is done knowingly.
-  **It moves a pinned check total:** the 11 deleted files are counted by the
-  `encodings` check, so `check.sh` goes from 972 pass to 961. PORTING.md pins
+  **It moves a pinned check total:** the 9 deleted project files are counted
+  by the `encodings` check, so `check.sh` loses 9 passes. PORTING.md pins
   that number in two places — the per-step exit criterion in §7 and the check
   list — and its trail in §7 records each step. Move all of them in the same
   commit.
