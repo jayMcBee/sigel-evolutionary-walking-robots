@@ -887,7 +887,7 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-24, later — DONE: ITEMS 24, 60, 2, AND TWO CLEAN-UP ROUNDS.** Start here.
+**2026-09-24, later — DONE: ITEMS 24, 60, 2, 80, AND TWO CLEAN-UP ROUNDS.** Start here.
 
 - **Item 24, the progress bar:** it counts the generation's finished
   tournaments through `SIG_GPManager::tournamentProgress()`; D38 is revised.
@@ -903,6 +903,12 @@ classes and leave truncation a hard error. **They are not interchangeable.**
   slots are `slotResetAllFitnessValues`.
   **Item 75** has a note on the height warnings in three fitness
   functions.
+- **New items from reading every fitness function:** 81, a Steady Walking
+  function, its formula decided; 82, drop Stepper, Zorc Walking and the
+  Windows Remote ZORC; 83, all ZORC code behind a compile-time switch, off by
+  default; 84, an unknown fitness name crashes `sigel_slave`, and a friend
+  class that does not exist; 85, a two-line description of the selected
+  fitness function on the GP Parameters page.
 - **Gates:** `check.sh` 972 pass, 0 fail; warnings 497. One run failed
   `gui behaviour` with "first export failed" and "menu [&File] did not open";
   the rerun on the same code passed. The step waits a fixed 2.5 s for the
