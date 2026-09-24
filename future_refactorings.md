@@ -568,8 +568,6 @@ touched, because changing one changes behaviour against the reference binary.
     `_WINDOWS` include in `sigel_slave.cpp`, the `EXCLUDE_SIGEL_GP` line and
     its comment in the `Makefile`, and the `WIN_*` skip in `check.sh`, whose
     count line then reads 1. Related: item 35.
-  - While there: `SIG_GPFullDataRecorder.h` also names a friend
-    `SIG_GPEnergyFitnessFunction`, a class that exists nowhere.
 
 - [ ] **83. ZORC support behind a compile-time switch, off by default.**
   Decided 2026-09-24. ZORC is a real robot driven over a serial line; the
@@ -582,6 +580,16 @@ touched, because changing one changes behaviour against the reference binary.
   name happens to be "ZorcWalkingFitnessFunction"; it stays. To decide: where
   the switch lives (the `Makefile` or a header), and what an experiment file
   naming "RemoteZORCFitnessFunction" does when the switch is off.
+
+- [ ] **84. Two defects found reading the fitness functions.** 2026-09-24.
+  - **An unknown fitness-function name crashes `sigel_slave`.** In
+    `sigel_slave.cpp`'s `main`, the last `else` prints "Error: Unknown fitness
+    function!" and leaves `fitnessFunction` null, but `setActGeneration` and
+    `setResetEveryGeneration` are called on it before the
+    `if (fitnessFunction)` test.
+  - **A friend class that does not exist.** `SIG_GPFullDataRecorder.h`
+    declares `friend class SIG_GPEnergyFitnessFunction`; no such class is in
+    the tree. Delete the line.
 
 - [ ] **47. `sigelDynClient` and `manage_dyn_slave`.** `sigelDynClient` makes a
   second machine a dynamic slave of a master started with `sigel -de`, which
