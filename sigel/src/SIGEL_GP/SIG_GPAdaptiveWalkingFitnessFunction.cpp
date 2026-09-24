@@ -50,7 +50,6 @@ namespace SIGEL_GP
             avgHeightPercent = 0;
     int     steps     = 0,
             perfSteps = 0;
-		char		infStr[256];
 
     // let SIG_EarlyRunTermSimulation record the positions or our robot, each 100. frame
     SIGEL_GP::SIG_GPFullDataRecorder recorder( 100 );
@@ -147,8 +146,7 @@ namespace SIGEL_GP
   	fitness = (100*fitness) * avgHeightPercent;
 
 		// give some information
-		sprintf(infStr, "fitness: %5.4f  |  avgHeight: %4.1f%%  |  distance: %4.3f  |  steps (calc./total): %d/%d\n", fitness, avgHeightPercent*100.0, distance, perfSteps, steps);
-		fprintf(stderr, infStr);
+		SIGEL_Tools::SIG_IO::cerr << QString::asprintf("fitness: %5.4f  |  avgHeight: %4.1f%%  |  distance: %4.3f  |  steps (calc./total): %d/%d", fitness, avgHeightPercent*100.0, distance, perfSteps, steps) << Qt::endl;
 
   	delete simulation;
 

@@ -578,11 +578,9 @@ touched, because changing one changes behaviour against the reference binary.
   compares the termination generation with `currentGenerationNo`.
 
 - [ ] **87. Defects in the fitness functions that stay.** Found reading the
-  code 2026-09-24, not tested.
-  - **Undefined behaviour:** `SIG_GPAdaptiveWalkingFitnessFunction::evalFitness`
-    builds its summary with `sprintf`, where `%%` becomes a single `%`, then
-    passes it to `fprintf(stderr, infStr)` as the format string. `% |` is then
-    read as a conversion.
+  code 2026-09-24; the open bullets are not tested.
+  - ~~**Undefined behaviour:** Adaptive Walking's summary `fprintf`~~ fixed
+    2026-09-24.
   - **Division by zero, run time:** every simulated fitness function divides
     by `QTime(0,0).secsTo(getTimeToSimulate())`, the run time in whole
     seconds. A time to simulate below 1 s divides by zero.

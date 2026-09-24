@@ -642,14 +642,15 @@ read all 618 tracked files then, 8 of which git called binary: its pass count we
 adding or deleting one moves the total by one; `portinglog.txt` did that on
 2026-09-09.*
 **The warning figure is not an exit criterion and moves with the code.** It was
-508 at D31 and D32 and reads 492 today; it was 503 until item 67 removed
+508 at D31 and D32 and reads 491 today; it was 503 until item 67 removed
 `callRenderPixMap`'s unused-but-set `res`, and 502 until item 2 removed the
 `register` keyword and the `SIG_IO::cerr` round of 2026-09-24, and 497 until
 item 50 removed `SIG_RobotUnstreamer`, whose unused parameter warned, and
 496 until item 82 removed `SIG_GPStepperFitnessFunction`, which had two,
 and 494 until `SIG_DynaMechsSimulationQueries::getNumberOfTouchdowns` went,
-which had two. A step that changes no code should not move it; one that
-does, will.
+which had two, and 492 until item 87 removed Adaptive Walking's
+`fprintf(stderr, infStr)`. A step that changes no code should not move it; one
+that does, will.
 `check.sh` builds `guidrive` and `sigelApp/` itself, which builds the two
 programs too. It needed `sigel_eval` built for the V5 section until that
 section was dropped on 2026-09-24; `fitness-check.sh` still needs it.
@@ -898,8 +899,22 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-24, night — ITEM 87, PART 1: FORCE'S MISNAMED VARIANCE RENAMED.**
+**2026-09-24, night — ITEM 87, PART 2: ADAPTIVE WALKING'S SUMMARY LINE.**
 Start here.
+
+- **Fixed, by decision:** `SIG_GPAdaptiveWalkingFitnessFunction::evalFitness`
+  built its summary with `sprintf` into a 256-byte buffer and passed the
+  result to `fprintf` as the format string, where `%  |` is read as a
+  conversion. It now writes one `QString::asprintf` line to `SIG_IO::cerr`.
+  Tested on `twoBases`, individuals 0 to 2: the line reads
+  `avgHeight: 98.9%  |`, where glibc printed `98.9% |` before. The fitness
+  computation is not touched.
+- **Item 87 stays open:** the run-time and recording-rate divisions, and the
+  Force division.
+- **Gates:** `check.sh` 944 pass, 0 fail; warnings 491. The other four gates
+  are green.
+
+**2026-09-24, night — ITEM 87, PART 1: FORCE'S MISNAMED VARIANCE RENAMED.**
 
 - **Renamed, by decision:** in `SIG_GPForceFitnessFunction::evalFitness`,
   `varianz` is `absDeviationSum` and `variance` is `absDeviations`. They hold
