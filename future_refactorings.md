@@ -550,6 +550,39 @@ touched, because changing one changes behaviour against the reference binary.
   and needs one entry in the GP parameter combo box and one in
   `sigel_slave`'s name mapping. No file format changes.
 
+- [ ] **82. Drop three fitness functions.** Decided 2026-09-24. None is used
+  by a shipped experiment.
+  - `SIG_GPStepperFitnessFunction`: its `.h`/`.cpp`, the include and the
+    `"StepperFitnessFunction"` branch in `sigel_slave.cpp`'s `main`, the
+    friend declaration in `SIG_GPFullDataRecorder.h`, and the "Stepper" entry
+    in the combo box of `SIG_GPParameterBase.ui`. `SIG_GPParameter` maps the
+    combo box by index in `putIntoExperiment` and by name in
+    `getOutOfExperiment`, so the entries after it move up one; the combo list
+    in `guibehaviour-baseline.txt` moves with them.
+  - `SIG_GPZorcWalkingFitnessFunction`: dead code. Nothing creates it, because
+    `sigel_slave` maps its name string, "ZorcWalkingFitnessFunction", to
+    `SIG_GPAdaptiveWalkingFitnessFunction`. That string stays: it is what
+    experiment files store for Adaptive Walking. Drop its friend declaration
+    in `SIG_GPFullDataRecorder.h` too.
+  - `WIN_SIG_GPRemoteZORCFitnessFunction`: never built. Its `.h`/`.cpp`, the
+    `_WINDOWS` include in `sigel_slave.cpp`, the `EXCLUDE_SIGEL_GP` line and
+    its comment in the `Makefile`, and the `WIN_*` skip in `check.sh`, whose
+    count line then reads 1. Related: item 35.
+  - While there: `SIG_GPFullDataRecorder.h` also names a friend
+    `SIG_GPEnergyFitnessFunction`, a class that exists nowhere.
+
+- [ ] **83. ZORC support behind a compile-time switch, off by default.**
+  Decided 2026-09-24. ZORC is a real robot driven over a serial line; the
+  simulation does not need it. One global `#define`, off by default, removes
+  everything ZORC-related from the build: `SIG_GPRemoteZORCFitnessFunction`,
+  its branches in `sigel_slave.cpp`'s `main` (the fitness function and the
+  visualise-mode program transfer), and the "Remote ZORC" entry in the combo
+  box, handled in `SIG_GPParameter` like item 82's index shift. Not ZORC:
+  `SIG_GPAdaptiveWalkingFitnessFunction` is a simulated function whose stored
+  name happens to be "ZorcWalkingFitnessFunction"; it stays. To decide: where
+  the switch lives (the `Makefile` or a header), and what an experiment file
+  naming "RemoteZORCFitnessFunction" does when the switch is off.
+
 - [ ] **47. `sigelDynClient` and `manage_dyn_slave`.** `sigelDynClient` makes a
   second machine a dynamic slave of a master started with `sigel -de`, which
   `sigel.cpp` still accepts. It is still 1.3's Solaris `tcsh` script, its home
