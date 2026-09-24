@@ -8,7 +8,7 @@ octopus                            0  0.50126372434136857
 octopus                            1  0.49643405009181318
 octopus                            2  0.50680244374877925
 runner                             0  0
-runner                             1  0
+runner                             1  1.2059789752438166
 runner                             2  0
 shortHammer                        0  0
 shortHammer                        1  0

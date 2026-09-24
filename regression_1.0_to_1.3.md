@@ -191,7 +191,9 @@ The same run after this fix:
 they depend on it: with correct readings they no longer walk as they did.
 `twoBases` keeps its best, and 3 fewer of its individuals match (16 to 13).
 The other five do not move. The fix causes this change; it is not a defect.
-Next: evolve the runner again under the fixed sensors.
+Done 2026-09-24: `experiments/runner.exp` is a new population evolved under
+the fixed sensors. With it, 7 of 7 within 10%; runner 1.000, 187 of 250
+matching, and the other 63 were left unscored by the run.
 
 ---
 

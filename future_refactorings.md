@@ -293,9 +293,41 @@ touched, because changing one changes behaviour against the reference binary.
   generation into `lcdnumberGenerations` from
   `SIG_GUIGPManager::updateIndividualView`, which also calls
   `SIG_IndividualListItem::setTo` as results come in.
-  A true per-generation figure needs `tours`, `taskCanDoList` and
-  `currentGenerationNo`, all private to `SIG_GPManager`, so it needs new state
-  there and D33 forbids it.
+  **Researched 2026-09-23, not yet decided.** `createTours` makes every
+  tournament of a generation before `evolutionLoop` runs, so the exact work is
+  known: a mutation tournament causes 1 evaluation, a crossover 2, a
+  reproduction 0. A timeout re-spawns the same task, so each offspring still
+  gets one `setFitness`. No new state is needed: of what the first option
+  reads, only `tours` and `taskCanDoList` are private, and `depNumber`,
+  `justWaiting`, `indis`, `fitTaskId` are public. Three options, each checked
+  in a Python model of the loop over 12,100 simulated generations of the 7
+  kept experiments. In the model, today's bar stepped back 14,572 times in
+  1,000 walker generations; the three options never did, and each was exactly
+  full at every generation end. The model's evaluation times are assumed, so
+  it only ranks the options. Line counts are counted from drafts:
+  - **Evaluations settled out of evaluations due.** A const accessor
+    `SIG_GPManager::tournamentProgress(settled, due, toursDone, toursTotal)`:
+    `due` sums 1 per mutation and 2 per crossover tournament in `tours`; a
+    tournament is played when `depNumber == 0` and it is not queued unplayed
+    in `taskCanDoList` (`!queued || justWaiting`); `settled` adds its weight
+    minus its members with `fitTaskId != -1`. The timer lambda in the
+    `SIG_GUIGPExperiment` constructor shows the pool count when every
+    tournament is done (first generation, `resetPool`), else `settled` of
+    `due`. 33 lines in the manager and 13 in the lambda. Gap: in the MetaGP
+    `run(MT_Classifier*)`, the `evalNeededIndis` phase shows 0%; no kept
+    experiment turns MetaGP on. Needs a D33 exception for one read-only
+    accessor, like `pvmIsLost` (D41).
+  - **Tournaments finished out of tournaments planned.** 15 + 8 lines. Exact,
+    but runs ahead when reproduction is above 0 (twoBases).
+  - **Counters at the events** — reset and count in `evalNewIndis`,
+    `evalNeededIndis` and both `evolutionLoop`s. Exact everywhere, MetaGP too.
+    45 + 9 lines, and new state inside the loops: a larger D33 exception.
+  Rejected by Jan: the maximum within a generation, a running average, a busy
+  indicator, and an estimate from the last generation's time. An estimate of
+  the evaluation count from the probabilities has a tail, because the true
+  count varies from generation to generation.
+  With any option: the tooltip in `SIG_ExperimentViewBase.ui` and D38 change;
+  no check baseline holds an in-run bar value.
   **The matching call in the `SIG_GUIGPManager` constructor stays commented out**
   — `slotStartEvolution` already refreshes the counter through
   `putAllIntoExperiment`. 1.3 has both commented out.
@@ -450,6 +482,100 @@ touched, because changing one changes behaviour against the reference binary.
   restarted from `slotFrameShown` would end it, but `simulationRunning` reads
   `simulationTimer->isActive()`, so it needs its own running flag, used by the
   Play slots, Step, Fast-forward and the dialog pause.
+
+- [ ] **70. A menu command that clones an experiment with a fresh population.**
+  Asked for 2026-09-23. It keeps the robot and every parameter, and replaces
+  the population with new random individuals at generation 0, with no
+  history. Today the interface cannot do this in one step: deleting all
+  individuals keeps the generation count and the history. The runner's fresh
+  start after the sensor fixes was made outside the interface, with SIGEL's
+  own calls: `SIG_GPPopulation::deleteIndividual` for every individual,
+  `setPoolGeneration(0)`, `setNextIdentifier("0")`, clear
+  `SIG_GPExperiment::experimentHistory`, then
+  `SIG_GPPopulation::addRandomIndividuals` and `saveExperiment`.
+
+- [ ] **71. Register widths above 16 bits reach undefined behaviour.**
+  Researched 2026-09-23, nothing decided. A new
+  experiment gets 32 (`SIG_LanguageParameters(void)`); the spin box
+  `spinboxRegisterWidth` allows 1 to 99, and so does `SIG_Register`'s
+  constructor. Largest width free of undefined behaviour, found with a
+  sanitizer test of the copied operations over widths 1 to 40: `mulReg` 16,
+  `makeValid` 30, the casts in `sense` and `moveDrive` 31. At 32 every
+  `makeValid` overflows, and a sensor's top and bottom swap. The shipped
+  experiments use 8 (six) and 3 (twoBases). Program generation draws operands
+  in -31999..31999, which fit in 16 bits. **One option:** cap at 16 in
+  the spin box, clamp to 1..16 after `tx >> bitsPerRegister` in the
+  `SIG_LanguageParameters` stream constructor, narrow `SIG_Register`'s
+  constructor, and make 8 the default: 17 lines, counted from a draft. No file format change;
+  a file wider than 16 loads as 16 and saves back as 16 — none exists. Another
+  option, 64-bit register values capped
+  at 32, touches 40 lines, counted from a draft, and the interpreter's hot path.
+
+- [ ] **72. A slave result of exactly -1.0 hangs the run.** Found 2026-09-23
+  by reading `SIG_GPFitnessTrainer::checkTask` and its callers in
+  `SIG_GPManager`: `checkTask` receives the result and deletes the task, but
+  -1 is also its "not ready" value, so every caller keeps polling a task that
+  no longer exists, for ever. Never observed.
+
+- [ ] **73. Latent sensor bugs in `SIG_DynaMechsSimulationQueries::sense`.**
+  Found 2026-09-23 with the two sensor fixes. No shipped robot or experiment
+  triggers any of them: every shipped sensor is a joint sensor on a joint with
+  two different limits.
+  - **A joint with equal limits reads NaN.** `SIG_Joint::calculateMDH` gives
+    `mechsMinPos == mechsMaxPos` when the limits are equal or normalise to the
+    same angle (0/360, -180/180), so `posRange` is 0 and `scaledState` is 0/0.
+    The cast of NaN to `int` is undefined behaviour. The `±DBL_MAX` test in
+    `sense` never matches, because `SIG_Joint` never stores those values.
+  - **Pitch at 90° or more reads as exactly 1.** Pitch comes from `acos`, 0° to
+    180°, and the branch clamps to ±90°, so the upper half of the range reads
+    the same. `acos` and `asin` get no clamp against rounding past ±1, which
+    gives NaN.
+  - **An uninitialised value is loaded.** With no contact model
+    (`dmRigidBody::getForce(0)` is NULL), or on the `default:` branch,
+    `registerValue` is never set and `loadValue` still reads it.
+
+- [ ] **74. A timed-out individual is evaluated again, for ever.** Found
+  2026-09-24. When `TIMEOUTMINUTES` expires, `SIG_GPFitnessTrainer::checkTask`
+  kills the slave and puts the same individual back on `toSpawnList`; the
+  probe-error branch does the same. It never gives up. On one machine the same
+  individual gives the same simulation, so an individual that is too slow is
+  likely to time out again at every attempt, and the generation does not end.
+  1.0 has the same timeout and the same re-spawn. The shipped experiments set
+  0, 10 or 30 minutes. No rule exists for when to give up on an individual, or
+  what score it then gets.
+
+- [ ] **75. The position check in the fitness functions rejects only Inf and
+  NaN.** Observation, 2026-09-24; no fix decided.
+  `SIG_GPFitnessFunction::isValid`, applied to each coordinate of a robot
+  position, accepts any finite value. `SIG_GPSimpleFitnessFunction` scores the straight distance
+  from start to end over the simulated time, so a finite physics blow-up that
+  throws the robot far scores high. `SIG_GPNiceWalkingFitnessFunction` checks
+  every recorded position against a minimal and maximal height, but not
+  against horizontal jumps. The `sigel-x86` session reported two fitness
+  functions, not named in its report, defeated by individuals scoring 268 and
+  292 on 1.3; not re-measured here.
+  Any bound is a heuristic and needs more thought.
+
+- [ ] **76. A mesh with negative volume loads with no message.** Found
+  2026-09-24. `SIG_Mirtich::computePhysics` computes a link's mass as density
+  times the mesh volume, and throws `SIG_CannotMirtich` only when the centre
+  of mass, the inertia tensor or the mass is NaN. A mesh with inverted face
+  winding has a negative volume, so its mass and inertia are negative; the
+  robot loads and the simulation runs into NaN without a message. A warning
+  at load, naming the link and the mesh file, is one option.
+
+- [ ] **77. An analysis view in the robot panel?** Idea, 2026-09-24. Two
+  figures that help whoever builds a robot model, reported by the x86 session
+  on 1.3 and not re-measured here:
+  - joint-limit stability per joint, `timestep * sqrt(K / I)` and
+    `timestep * damper / I`. The shipped models sit in a narrow band. A
+    `JOINTLIMITSK_SPRING` of 25000, taken from a one-joint robot onto a
+    three-joint chain, put the limit-spring torque above half the full drive
+    torque, with no warning;
+  - drive strength against weight per drive,
+    `maximalforce / (mass * g * half-length)`. It is 0.60 to 0.92 in all
+    seven shipped models, whose masses span 1.2 to 49; nothing documents it,
+    so a new model can be badly under- or over-powered.
 
 - [ ] **47. `sigelDynClient` and `manage_dyn_slave`.** `sigelDynClient` makes a
   second machine a dynamic slave of a master started with `sigel -de`, which

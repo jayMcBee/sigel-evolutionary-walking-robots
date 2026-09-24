@@ -4,6 +4,9 @@
 #   ./checks/replicate.sh              build/sigel_eval
 #   ./checks/replicate.sh build-asan   under ASan and UBSan, ~15x slower
 #
+# runner.exp is not the 2001 file: it holds a population evolved in 2026 under
+# the fixed joint sensors, so its row compares against that run's own record.
+#
 # THE ORACLE IS SIGEL 1.0, NOT THE 1.3 SOURCE BEING PORTED. The published
 # .exp files are dated August-September 2001; 1.0 was rolled 2001-09-06 and
 # 1.3's CVS vendor import is dated 2001-12-18. Every 1.0 -> 1.3 change is a

@@ -894,8 +894,54 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-09-24 — DONE: TWO SENSOR FIXES AND A NEW RUNNER. NEXT: THE THREE RUN
+OBSERVATIONS, THEN THE STATE OF THE REGRESSION DOC.** Start here.
+
+- **Reopened** the regression (`57912a1`); `regression_1.0_to_1.3.md` has the
+  data. The two experiments that stayed outside 10% with 1.0's line were
+  removed from the repo earlier, by decision, so they are closed.
+- **Joint-sensor fix** (`ff5c468`): `sense` has 1.0's `(q - minPos) / posRange` in place of
+  1.3's radian multiply, which wrapped every joint reading into noise.
+  `replicate.sh` then gave 7 of 7 within 10%; `runner` matched 100 of 100.
+- **Register-top fix** (`e0b1f3e`): a reading of exactly 1 mapped one past the register's
+  top and wrapped to the bottom, so a joint on its max stop read as its min
+  and a contact sensor read the same with and without contact. `sense` now
+  caps at `SIG_Register::getMaxValue`. The 2001 `runner` programs depend on
+  the wrap: 6 of 7 within 10% then. Both fixes have rows in "Changes from
+  1.3".
+- **The runner was evolved again.** A fresh population was made outside the
+  interface from `runner.exp`, with the robot and every setting kept, at
+  generation 0 with no history (item 70 describes how). Jan evolved it in the
+  interface and changed processes 1 to 4, priority 4 to 2 and texture alpha to
+  99; the population is 250. 1,125 generations in about 8 hours. Best fitness
+  0.699 at generation 100, 0.919 at 268, 1.193 at 750, 1.218 at 1,125. It
+  replaces `experiments/runner.exp`, by decision, with Jan's settings kept;
+  only the host directory is set to `"."`. `fitness-baseline.txt` and the
+  runner row of `replicate.sh` now measure this population, not the 2001 one.
+  `replicate.sh` with it: 7 of 7 within 10%; runner 1.000 and 187 of 250
+  matching — the other 63 are the individuals the run left unscored.
+- **Investigated, nothing decided:** 71, the register width, and 24, the
+  progress bar. The findings are in the items. Found on the way: 72, a slave
+  result of exactly -1.0 hangs the run; 73, three latent sensor bugs; 74, a
+  timed-out individual is sent again with no limit, found reading `checkTask`.
+  From the diagnostics wishlist in `regression_1.0_to_1.3.md`: 75 to 77.
+- **New item 70:** a menu command that clones an experiment with a fresh
+  population.
+- **Jan's observations from the runner run, to discuss when the open points
+  are done:**
+  - The run made more than 360,000 individuals (`NEXTIDENTIFIER=366740` in the
+    saved file, population 250), which bears on the 32k limit of item 59.
+    Item 59 is about the pool size; to be discussed.
+  - Individuals page, the Name column is too narrow: it should be 50% wider;
+    the table has empty space.
+  - File > Save asks for a file name every time: it acts as Save As.
+- **Still to discuss:** the state of `regression_1.0_to_1.3.md` — keep it as a
+  finished record, or fold it into this file and delete it.
+- **Gates:** `check.sh` 974 pass, 0 fail; warnings 502.
+- **Working notes:** do not run the gates while SIGEL or its PVM daemon runs;
+  the PVM check replaces the daemon.
+
 **2026-09-23 — DONE: THE 3-D VIEWER ROUND. NEXT: THE 1.0 → 1.3 REGRESSION.**
-Start here.
 
 - **SIGEL 2.0.** The work is SIGEL 2.0, not only a port. 1.3 is the reference
   for regression checks, not a specification; see THE GOAL at the top and §0.
@@ -3242,7 +3288,7 @@ else that stops matching 1.3 still needs justifying as a defect.
 | **A render mode "Hidden lines".** 1.3 has Wireframe, Flatshaded and Gouraudshaded | by decision 2026-09-23, item 63. `SIG_ViewSettings::hiddenLine`, `SIG_SimulationVisualisation::visualize` | nothing: no check covers the render modes |
 | **A render mode "Points", with the back points hidden.** 1.3 has Wireframe, Flatshaded and Gouraudshaded | by decision 2026-09-23, item 63. `SIG_ViewSettings::points`, `SIG_SimulationVisualisation::visualize` | nothing: no check covers the render modes |
 | **A joint sensor reports the joint's position again.** 1.3 multiplies the radian reading by 57.3 before it divides by the radian range, so the register wraps the value into noise. 1.0 had the plain division | by decision 2026-09-23, the joint-sensor fix of the 1.0 → 1.3 regression: 1.0's `(q - minPos) / posRange` restored in `SIG_DynaMechsSimulationQueries::sense`. With it alone, `checks/replicate.sh` gave 7 of 7 kept experiments within 10% of their 2001 results, and `runner` matched 100 of 100 individuals. The next row changes that. See `regression_1.0_to_1.3.md`, "The data today" | `fitness-baseline.txt`; the site count in `truncated pi (V5)` |
-| **A sensor at the top of its range reads the register's top.** 1.3, and 1.0, map a reading of exactly 1 one past the register's top, and the register wraps it to the bottom: a joint on its max stop reads as its min, and a contact sensor reads the same with and without contact | by decision 2026-09-23, from the 1.0 → 1.3 regression work: `SIG_DynaMechsSimulationQueries::sense` caps the value at the register's top. The 2001 `runner` programs depend on the wrap and no longer reproduce. Next: evolve the runner again under the fixed sensors. See `regression_1.0_to_1.3.md`, "The top of the register range" | `fitness-baseline.txt` |
+| **A sensor at the top of its range reads the register's top.** 1.3, and 1.0, map a reading of exactly 1 one past the register's top, and the register wraps it to the bottom: a joint on its max stop reads as its min, and a contact sensor reads the same with and without contact | by decision 2026-09-23, from the 1.0 → 1.3 regression work: `SIG_DynaMechsSimulationQueries::sense` caps the value at the register's top. The 2001 `runner` programs depend on the wrap and no longer reproduce. Done 2026-09-24: `experiments/runner.exp` is a new population evolved under the fixed sensors. See `regression_1.0_to_1.3.md`, "The top of the register range" | `fitness-baseline.txt` |
 
 **Two 1.3 defects preserved on purpose**, plus the one below them. `MT_GUI`'s
 gnuplot export puts a constant x on datasets `2pt destr.` and `3pt destr.`
@@ -4896,7 +4942,9 @@ leave, still prints three raw `nativeMotion=` counts, and that is where it
 failed a third time on 2026-09-18** — every Qt-level count again unchanged, and
 the next run on the same tree passed. **A fourth time on 2026-09-22**, the same
 line (`nativeMotion=2` against 1): the scenario alone then matched the baseline
-twice, and the next full run passed. The mitigation never reached that section.
+twice, and the next full run passed. **A fifth time on 2026-09-24**, the same
+line, on a tree that changed only documents, `runner.exp` and the fitness
+baseline. The mitigation never reached that section.
 `guidrive.cpp, spies` carries the reason.
 
 **The run lock is DONE — 2026-09-16, `69b3e4a`, `6494ab6`, `a541679`.** One
