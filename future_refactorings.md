@@ -655,17 +655,6 @@ touched, because changing one changes behaviour against the reference binary.
   in `Terrain.ter` itself before the atomic write — and closing it needs per-call
   state, which the port may not add.
 
-- [ ] **50. `SIG_UnstreamerScanner` looks unused. Prove it, then remove it.**
-  Found 2026-09-21. Nothing in `sigel/` constructs it. `SIG_RobotUnstreamer.h`
-  includes its header but uses nothing from it. `SIG_RobotUnstreamer`'s only
-  method, `readFromFileTransfer`, returns `NULL`. **One search is not the
-  proof.** Check every reference: the `Makefile`, the module lists in
-  `check.sh`, the other gates, `kdesigel.doxygen`, the docs, and any code that
-  could create a scanner in another way. Ask the 1.3 oracle whether 1.3 used it. `SIGELCommon.dsp` names
-  both files; it is generated, so do not edit it by hand. Item 35 deletes it.
-  Only then remove the class, its two files and the include, and run the five
-  gates.
-
 - [ ] **52. `SIG_Drive`'s stream constructor can leave `mode` unset.**
   `SIG_Drive(SIG_Robot*, QTextStream&)` prints `Unsupported Drive Mode <…> !!`
   when it reads an unknown word, and does not set `mode`.

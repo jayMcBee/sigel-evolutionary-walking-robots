@@ -610,7 +610,7 @@ through `f0f2daa`.
 
 ## 7. Steps
 
-**Exit criterion per step:** `./checks/check.sh` from anywhere — **963 pass, 0
+**Exit criterion per step:** `./checks/check.sh` from anywhere — **954 pass, 0
 fail**. *The figure moves with the number of tracked text files, because the
 `encodings` check adds its own count to the total. Measured trail: **1136**
 until 2026-09-19, when `experiments/` and `robots/` arrived and
@@ -629,7 +629,9 @@ that guarded only the Qt 6 conversion were dropped: `widgets`, `parsers`,
 `freed-pointer null`, `no clipped controls`, `form minimums` and `slave gui`,
 with the `guidrive` scenarios `clipcheck`, `formsize` and `slavegui`; **964**
 when `gui vs 1.3` and `guidump-baseline.txt` went, one pass each; **963** when
-`truncated pi (V5)` went.*
+`truncated pi (V5)` went; **954** when item 50 removed
+`SIG_UnstreamerScanner`, `SIG_RobotUnstreamer` and `LEERE_DATEI`, four
+passes per class and one for the file.*
 **The pass count was 853 until D31 and the jump is not new coverage of SIGEL's
 code.** The `encodings` check used to read 404 files of five extensions and now
 read all 618 tracked files then, 8 of which git called binary: its pass count went
@@ -637,9 +639,11 @@ read all 618 tracked files then, 8 of which git called binary: its pass count we
 adding or deleting one moves the total by one; `portinglog.txt` did that on
 2026-09-09.*
 **The warning figure is not an exit criterion and moves with the code.** It was
-508 at D31 and D32 and reads 497 today; it was 503 until item 67 removed
+508 at D31 and D32 and reads 496 today; it was 503 until item 67 removed
 `callRenderPixMap`'s unused-but-set `res`, and 502 until item 2 removed the
-`register` keyword and the `SIG_IO::cerr` round of 2026-09-24. A step that changes no code should not
+`register` keyword and the `SIG_IO::cerr` round of 2026-09-24, and 497 until
+item 50 removed `SIG_RobotUnstreamer`, whose unused parameter warned. A step
+that changes no code should not
 move it; one that does, will.
 `check.sh` builds `guidrive` and `sigelApp/` itself, which builds the two
 programs too. It needed `sigel_eval` built for the V5 section until that
@@ -889,7 +893,15 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-24, night — DONE: `truncated pi (V5)` DROPPED.** Start here.
+**2026-09-24, night — DONE: ITEM 50, TWO UNUSED CLASSES REMOVED.** Start here.
+
+- **Removed, by decision:** `SIG_UnstreamerScanner`, `SIG_RobotUnstreamer`
+  and `sigel/include/SIGEL_RobotIO/LEERE_DATEI`. The Done entry has the proof.
+  `SIGELCommon.dsp` still names the four files; item 35 deletes it.
+- **Gates:** `check.sh` 954 pass, 0 fail; warnings 496. The other four gates
+  are green.
+
+**2026-09-24, night — DONE: `truncated pi (V5)` DROPPED.**
 
 - **Dropped, by decision:** the `truncated pi (V5)` section. The truncated pi
   stays at its three sites; no shipped file uses them. `check.sh` no longer
@@ -4902,6 +4914,20 @@ carried; other items and this file cite them, so they do not change.
   `makeValid` 30, the casts in `sense` and `moveDrive` 31. Generated operands
   are in -31999..31999 and fit in 16 bits. Tested: a copy of `twoBases` at
   width 16 loads and evaluates; at width 17 `sigel_eval` refuses it.
+
+- [x] **50. `SIG_UnstreamerScanner` looks unused** — done 2026-09-24, by
+  decision, with `SIG_RobotUnstreamer` and `LEERE_DATEI`. Nothing created
+  either class. `SIG_RobotBuilder` is the only code that creates a scanner,
+  and it creates a `SIG_RobotScanner`; the robot compilers take only that
+  type. Every `readFromFileTransfer` call is `SIG_Robot`'s.
+  `SIG_RobotUnstreamer::readFromFileTransfer` returned `NULL`, and only
+  `SIG_RobotUnstreamer.h` included the scanner's header. The Makefile and
+  `check.sh` named neither class; they build every file in a module folder.
+  No gate, doc or `kdesigel.doxygen` named them. Our four binaries held no
+  symbol of either class, and 1.3's `sigel`, `sigel_slave` and
+  `sigelDynClient` hold no symbol, call or string of them, asked through the
+  oracle. `LEERE_DATEI` held the one line `Dies ist nix.`, and nothing named
+  it.
 
 #### Not doing
 
