@@ -142,11 +142,6 @@ namespace SIGEL_Simulation
    */
   int getLinkCount() const;
 
-   /**
-    *Return the number of links currently touching the floor.
-    */
-   int getNumberOfTouchdowns( void ) const;
-
   void checkDynas() const;
 };
 

@@ -122,11 +122,6 @@ class SIG_SimulationQueries {
    */
   virtual std::vector<double*>* getUsedForces() const = 0;
 
-		/**
-		*	Return the number of links currently touching the floor.
-		*/
-			virtual 	int	 getNumberOfTouchdowns( void ) const = 0;
-
   /** gets the number of links
    * @pre
    *  none

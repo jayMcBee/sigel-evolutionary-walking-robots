@@ -40,12 +40,11 @@ namespace SIGEL_GP
     }
   };
 
-  // This class owns positions, rotations and touchdowns.
+  // This class owns positions and rotations.
   SIG_GPFullDataRecorder::~SIG_GPFullDataRecorder()
   {
     qDeleteAll( positions );   positions.clear();
     qDeleteAll( rotations );   rotations.clear();
-    qDeleteAll( touchdowns );  touchdowns.clear();
     // listForces is NOT freed here and never was, even in 1.3: the force
     // vectors belong to SIG_GPForceFitnessFunction, which frees them at the
     // end of its evaluation.
@@ -76,8 +75,6 @@ namespace SIGEL_GP
 
   void SIG_GPFullDataRecorder::record()
   {
-    int *curTD;
-
     if (frameCounter == 0) {
         int rootLinkNumber = simulationQueries->getRootNumber();
 
@@ -91,16 +88,10 @@ namespace SIGEL_GP
         positions.append( newPosition );
         rotations.append( newRotation );
 
-        // get the number of links touching the floor
-        curTD = new int;
-        *curTD = simulationQueries->getNumberOfTouchdowns();
-
         // get the used forces of one iteration,
 		std::vector<double*>* usedForces = simulationQueries->getUsedForces();
         // append these Forces to a list
         listForces.append(usedForces);
-
-        touchdowns.append(curTD);
     }
 
     frameCounter++;

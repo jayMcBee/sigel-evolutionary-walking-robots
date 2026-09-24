@@ -43,7 +43,7 @@ namespace SIGEL_GP
 
       SIG_GPFullDataRecorder( int recordingFrequency );
 
-      /** This recorder owns its positions, rotations and touchdowns. */
+      /** This recorder owns its positions and rotations. */
 
       ~SIG_GPFullDataRecorder();
 
@@ -55,7 +55,6 @@ namespace SIGEL_GP
 
       QList< DL_vector * > positions;
       QList< DL_matrix * > rotations;
-      QList< int * > touchdowns;
 
 
     private:

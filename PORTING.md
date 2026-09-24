@@ -642,13 +642,14 @@ read all 618 tracked files then, 8 of which git called binary: its pass count we
 adding or deleting one moves the total by one; `portinglog.txt` did that on
 2026-09-09.*
 **The warning figure is not an exit criterion and moves with the code.** It was
-508 at D31 and D32 and reads 494 today; it was 503 until item 67 removed
+508 at D31 and D32 and reads 492 today; it was 503 until item 67 removed
 `callRenderPixMap`'s unused-but-set `res`, and 502 until item 2 removed the
 `register` keyword and the `SIG_IO::cerr` round of 2026-09-24, and 497 until
 item 50 removed `SIG_RobotUnstreamer`, whose unused parameter warned, and
-496 until item 82 removed `SIG_GPStepperFitnessFunction`, which had two. A step
-that changes no code should not
-move it; one that does, will.
+496 until item 82 removed `SIG_GPStepperFitnessFunction`, which had two,
+and 494 until `SIG_DynaMechsSimulationQueries::getNumberOfTouchdowns` went,
+which had two. A step that changes no code should not move it; one that
+does, will.
 `check.sh` builds `guidrive` and `sigelApp/` itself, which builds the two
 programs too. It needed `sigel_eval` built for the V5 section until that
 section was dropped on 2026-09-24; `fitness-check.sh` still needs it.
@@ -897,8 +898,19 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-09-24, night — DONE: TOUCHDOWNS REMOVED, AFTER ITEM 82.** Start here.
+
+- **Removed, by decision:** `SIG_GPFullDataRecorder::touchdowns`, which
+  recorded the number of links on the floor for every sample. Stepper was its
+  only reader. With it went its only source,
+  `getNumberOfTouchdowns`, from `SIG_SimulationQueries` and
+  `SIG_DynaMechsSimulationQueries`. The query only read contact states, so the
+  simulation is unchanged.
+- **Gates:** `check.sh` 944 pass, 0 fail; warnings 492. The other four gates
+  are green; the fitness values did not move.
+
 **2026-09-24, night — DONE: ITEM 82, PART 3: `SIG_GPStepperFitnessFunction`
-REMOVED.** Start here.
+REMOVED.**
 
 - **Removed, by decision:** `SIG_GPStepperFitnessFunction`, its `.h`, `.cpp`,
   include and branch in `sigel_slave.cpp`'s `main`, its friend declaration in
@@ -7253,7 +7265,7 @@ which is why the list exists.
 | **all six D22 sites** | `nm -C build/sigel_eval` finds **0** `SIG_GPOperations::` and **0** `SIG_GPCrossOverTournament::`, and the same in `pvm_link`. The objects are archived in `libSIGEL_GP.a` and never pulled into a link. The evolution loop needs `sigel`, which Phase C blocks |
 | all six `Q2CString` sites in `SIG_GPFitnessTrainer`, D21 | zero trainer symbols in `sigel_eval`; `pvm_link` links the object but never constructs a trainer, so they are **link-checked and never run** |
 | `SIG_GPPVMData`'s `+ 2`, D21 | `pvm_link` runs the function, but `pvm-check.sh` passes with `+ 1` **and** `+ 0` — `QList` over-allocation hides a shortfall under about 8 bytes |
-| all five **unlinked** fitness functions' walks, D20 — `Adaptive`, `Zorc`, `Stepper`, `RealSpeed`, `Force` — plus `SIG_EarlyRunTermSimulation` | `nm` finds 0 symbols for each in `sigel_eval`. `Stepper` is the **only reader of `touchdowns`** in the tree; `Force` the only reader of `listForces` and the only code that ever frees a force vector |
+| all five **unlinked** fitness functions' walks, D20 — `Adaptive`, `Zorc`, `Stepper`, `RealSpeed`, `Force` — plus `SIG_EarlyRunTermSimulation` | `nm` finds 0 symbols for each in `sigel_eval`. `Stepper` is the **only reader of `touchdowns`** in the tree *(Zorc, Stepper and `touchdowns` removed since, item 82)*; `Force` the only reader of `listForces` and the only code that ever frees a force vector |
 | `sigel_eval`'s trace walk, D20 | runs on all 21 dictorder inputs; its output is dropped by the check's `sed`, so only a crash or a sanitizer report would show — **and there is no sanitizer report to be had.** `dictorder-dump.sh` defaults to `build`, which has no sanitizer, and it **cannot be run against `build-asan/` at all**: the `.rrb` load path aborts under ASan inside vendored cv97 (see the blind-spot section in §10). So this row's second half is empty and the walk is covered by a crash only. *Reconciled 2026-09-03; the restored blind spot falsified it* |
 | `SIG_GPNiceWalkingFitnessFunction`'s walk, D20 | runs for 18 individuals, but the check has **one bit** of discrimination — an off-by-one in the index is invisible to it |
 | **everything D17, D18 and D19 changed** in `SIG_GPFitnessTrainer` — including all six `delete v[i]`, `resizeOwningHosts`, both `qDeleteAll` in the destructor and both `static_cast<uint>` moduli | `nm -C build/sigel_eval \| grep -c SIG_GPFitnessTrainer` is **0**. `pvm_link` links the object but never constructs a trainer, so it is link-checked and never run. The rewritten walk needs a live `pvm_spawn`; `flushAllDynHosts` is `-devolve`-only; the destructor's three `qDeleteAll` run for no check |
