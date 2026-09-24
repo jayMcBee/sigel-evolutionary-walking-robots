@@ -1,7 +1,6 @@
 /*
   The class the 2003 uic generated, in uic3 implementation-mode shape,
-  adapted to Qt 6. The qWarning stubs warn at runtime when the subclass
-  forgot to override a connected slot, as the 2003 uic stubs did.
+  adapted to Qt 6.
 */
 #include "SIGEL_SlaveGUI/SIG_MovieSettingsDialogBase.h"
 
@@ -30,24 +29,4 @@ void SIG_MovieSettingsDialogBase::changeEvent( QEvent *e )
 void SIG_MovieSettingsDialogBase::languageChange()
 {
   retranslateUi( this );
-}
-
-void SIG_MovieSettingsDialogBase::slotChangedAspectRatio(bool)
-{
-qWarning("SIG_MovieSettingsDialogBase::slotChangedAspectRatio(bool): Not implemented yet");
-}
-
-void SIG_MovieSettingsDialogBase::slotSetHeight(int)
-{
-qWarning("SIG_MovieSettingsDialogBase::slotSetHeight(int): Not implemented yet");
-}
-
-void SIG_MovieSettingsDialogBase::slotSetWidth(int)
-{
-qWarning("SIG_MovieSettingsDialogBase::slotSetWidth(int): Not implemented yet");
-}
-
-void SIG_MovieSettingsDialogBase::slotToolButtonClicked()
-{
-qWarning("SIG_MovieSettingsDialogBase::slotToolButtonClicked(): Not implemented yet");
 }

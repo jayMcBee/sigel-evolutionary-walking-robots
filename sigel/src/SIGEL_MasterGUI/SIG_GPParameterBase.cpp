@@ -1,8 +1,6 @@
 /*
   The class the 2003 uic generated, in uic3 implementation-mode shape,
-  with the two Qt 6 adjustments marked below. The qWarning stubs warn at
-  runtime when the subclass forgot to override a connected slot, as the
-  2003 uic stubs did.
+  with the two Qt 6 adjustments marked below.
 */
 #include "SIGEL_MasterGUI/SIG_GPParameterBase.h"
 
@@ -56,54 +54,4 @@ void SIG_GPParameterBase::changeEvent( QEvent *e )
 void SIG_GPParameterBase::languageChange()
 {
   retranslateUi( this );
-}
-
-void SIG_GPParameterBase::slotAddHost()
-{
-  qWarning( "SIG_GPParameterBase::slotAddHost(): Not implemented yet" );
-}
-
-void SIG_GPParameterBase::slotChangeGraveyardDir()
-{
-  qWarning( "SIG_GPParameterBase::slotChangeGraveyardDir(): Not implemented yet" );
-}
-
-void SIG_GPParameterBase::slotChangePoolImageDir()
-{
-  qWarning( "SIG_GPParameterBase::slotChangePoolImageDir(): Not implemented yet" );
-}
-
-void SIG_GPParameterBase::slotCrossoverChanged( int )
-{
-  qWarning( "SIG_GPParameterBase::slotCrossoverChanged(int): Not implemented yet" );
-}
-
-void SIG_GPParameterBase::slotDeleteHost()
-{
-  qWarning( "SIG_GPParameterBase::slotDeleteHost(): Not implemented yet" );
-}
-
-void SIG_GPParameterBase::slotDisableAllHosts()
-{
-  qWarning( "SIG_GPParameterBase::slotDisableAllHosts(): Not implemented yet" );
-}
-
-void SIG_GPParameterBase::slotEditHost()
-{
-  qWarning( "SIG_GPParameterBase::slotEditHost(): Not implemented yet" );
-}
-
-void SIG_GPParameterBase::slotEnableAllHosts()
-{
-  qWarning( "SIG_GPParameterBase::slotEnableAllHosts(): Not implemented yet" );
-}
-
-void SIG_GPParameterBase::slotMutationChanged( int )
-{
-  qWarning( "SIG_GPParameterBase::slotMutationChanged(int): Not implemented yet" );
-}
-
-void SIG_GPParameterBase::slotTourPerGenChanged( int )
-{
-  qWarning( "SIG_GPParameterBase::slotTourPerGenChanged(int): Not implemented yet" );
 }

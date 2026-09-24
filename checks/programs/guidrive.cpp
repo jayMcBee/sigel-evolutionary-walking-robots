@@ -4769,6 +4769,31 @@ static int guidriveMain(int argc, char **argv)
     // A declared 0 means "unset", and Qt then uses the hint by itself -- those
     // forms are correct as they are and are reported, not failed.
     if (scenario == "formsize") {
+        // Six bases declare their slots pure virtual; these fill them with
+        // nothing, so each form can be built alone and measured.
+        struct EditHostForm : SIG_EditHostDialogBase {
+            void slotToolbuttonSlaveDirectoryClicked() override {} };
+        struct EnvironmentForm : SIG_EnvironmentBase {
+            void slotAlpha() override {} void slotFloorSelectionChanged() override {}
+            void slotSelectFile() override {} void slotSelectTextureFile() override {}
+            void slotTextureSelect() override {} };
+        struct ExperimentViewForm : SIG_ExperimentViewBase {
+            void slotExportPostScript() override {} void slotHistory(bool) override {}
+            void slotIntervallChanged(int) override {} void slotShowFitnesscurve() override {} };
+        struct GPParameterForm : SIG_GPParameterBase {
+            void slotAddHost() override {} void slotChangeGraveyardDir() override {}
+            void slotChangePoolImageDir() override {} void slotCrossoverChanged(int) override {}
+            void slotDeleteHost() override {} void slotDisableAllHosts() override {}
+            void slotEditHost() override {} void slotEnableAllHosts() override {}
+            void slotMutationChanged(int) override {} void slotTourPerGenChanged(int) override {} };
+        struct LanguageParametersForm : SIG_LanguageParametersBase {
+            void slotPushButtonDisallowAllClicked() override {}
+            void slotPushButtonAllowAllClicked() override {}
+            void slotPushButtonEditClicked() override {} };
+        struct MovieSettingsForm : SIG_MovieSettingsDialogBase {
+            void slotToolButtonClicked() override {} void slotChangedAspectRatio(bool) override {}
+            void slotSetHeight(int) override {} void slotSetWidth(int) override {} };
+
         struct Row { const char *name; std::function<QWidget *()> make; };
         const Row forms[] = {
             { "MT_AddConstantsWidgetBase",  [] { return (QWidget *) new MT_AddConstantsWidgetBase; } },
@@ -4780,16 +4805,16 @@ static int guidriveMain(int argc, char **argv)
             { "MT_SearchWidgetBase",        [] { return (QWidget *) new MT_SearchWidgetBase; } },
             { "MT_SelectionWidgetBase",     [] { return (QWidget *) new MT_SelectionWidgetBase; } },
             { "MT_StatisticsWidgetBase",    [] { return (QWidget *) new MT_StatisticsWidgetBase; } },
-            { "SIG_EditHostDialogBase",     [] { return (QWidget *) new SIG_EditHostDialogBase; } },
-            { "SIG_EnvironmentBase",        [] { return (QWidget *) new SIG_EnvironmentBase; } },
-            { "SIG_ExperimentViewBase",     [] { return (QWidget *) new SIG_ExperimentViewBase; } },
-            { "SIG_GPParameterBase",        [] { return (QWidget *) new SIG_GPParameterBase; } },
+            { "SIG_EditHostDialogBase",     [] { return (QWidget *) new EditHostForm; } },
+            { "SIG_EnvironmentBase",        [] { return (QWidget *) new EnvironmentForm; } },
+            { "SIG_ExperimentViewBase",     [] { return (QWidget *) new ExperimentViewForm; } },
+            { "SIG_GPParameterBase",        [] { return (QWidget *) new GPParameterForm; } },
             { "SIG_IndividualListBase",     [] { return (QWidget *) new SIG_IndividualListBase; } },
             { "SIG_IndividualViewBase",     [] { return (QWidget *) new SIG_IndividualViewBase; } },
-            { "SIG_LanguageParametersBase", [] { return (QWidget *) new SIG_LanguageParametersBase; } },
+            { "SIG_LanguageParametersBase", [] { return (QWidget *) new LanguageParametersForm; } },
             { "SIG_RobotBase",              [] { return (QWidget *) new SIG_RobotBase; } },
             { "SIG_SimulationParameterBase",[] { return (QWidget *) new SIG_SimulationParameterBase; } },
-            { "SIG_MovieSettingsDialogBase",[] { return (QWidget *) new SIG_MovieSettingsDialogBase; } },
+            { "SIG_MovieSettingsDialogBase",[] { return (QWidget *) new MovieSettingsForm; } },
             { "SIG_SimulationWidgetBase",   [] { return (QWidget *) new SIG_SimulationWidgetBase; } },
         };
         const int nForms = (int)(sizeof(forms) / sizeof(forms[0]));

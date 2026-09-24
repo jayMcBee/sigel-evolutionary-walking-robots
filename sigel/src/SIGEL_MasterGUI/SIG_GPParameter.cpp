@@ -69,7 +69,7 @@ SIG_GPParameter::SIG_GPParameter( QWidget* parent,  const char* name, Qt::Window
       SIGEL_Tools::SIG_IO::cerr << "The tournaments per generation counter shows "
 				<< lcdnumberTournamentsPerGeneration->digitCount()
 				<< " digits and cannot display "
-				<< lcdnumberTournamentsPerGeneration->intValue() << ".\n";
+				<< lcdnumberTournamentsPerGeneration->intValue() << "." << Qt::endl;
     } );
 }
 

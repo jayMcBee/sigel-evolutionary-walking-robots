@@ -22,7 +22,7 @@ public:
     ~SIG_MovieSettingsDialogBase() override;
 
 public slots:
-    virtual void slotToolButtonClicked();
+    virtual void slotToolButtonClicked() = 0;
 
 protected:
     // Qt 3 called languageChange() itself; Qt 6 has no such hook, so it is
@@ -32,9 +32,9 @@ protected:
 protected slots:
     virtual void languageChange();
 
-    virtual void slotChangedAspectRatio(bool);
-    virtual void slotSetHeight(int);
-    virtual void slotSetWidth(int);
+    virtual void slotChangedAspectRatio(bool) = 0;
+    virtual void slotSetHeight(int) = 0;
+    virtual void slotSetWidth(int) = 0;
 
 
 };

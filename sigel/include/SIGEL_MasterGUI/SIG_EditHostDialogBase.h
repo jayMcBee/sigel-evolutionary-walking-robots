@@ -22,7 +22,7 @@ public:
     ~SIG_EditHostDialogBase() override;
 
 public slots:
-    virtual void slotToolbuttonSlaveDirectoryClicked();
+    virtual void slotToolbuttonSlaveDirectoryClicked() = 0;
 
 protected:
     // Qt 3 called languageChange() itself; Qt 6 has no such hook, so it is

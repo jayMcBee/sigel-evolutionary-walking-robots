@@ -22,10 +22,10 @@ public:
     ~SIG_ExperimentViewBase() override;
 
 public slots:
-    virtual void slotExportPostScript();
-    virtual void slotHistory(bool);
-    virtual void slotIntervallChanged(int);
-    virtual void slotShowFitnesscurve();
+    virtual void slotExportPostScript() = 0;
+    virtual void slotHistory(bool) = 0;
+    virtual void slotIntervallChanged(int) = 0;
+    virtual void slotShowFitnesscurve() = 0;
 
 protected:
     // Qt 3 called languageChange() itself; Qt 6 has no such hook, so it is

@@ -1,7 +1,6 @@
 /*
   The class the 2003 uic generated, in uic3 implementation-mode shape,
-  adapted to Qt 6. The qWarning stubs warn at runtime when the subclass
-  forgot to override a connected slot, as the 2003 uic stubs did.
+  adapted to Qt 6.
 */
 #include "MT_GUI/MT_ExperimentWidgetBase.h"
 

@@ -8,8 +8,9 @@
   IT IS NOT HAND-INVENTED. Qt 4.8's uic3 in declaration mode
   (`uic3 SIG_GPParameterBase.ui`) generates exactly this shape --
   the QWidget + Ui:: multiple inheritance, the three-argument constructor, the
-  custom slots as virtuals with "Not implemented yet" bodies, and languageChange.
-  Only three things needed changing for Qt 6, each marked below.
+  custom slots as virtuals, and languageChange. The custom slots are pure
+  virtual here, so SIG_GPParameter must supply each one. Three other things
+  needed changing for Qt 6, each marked below.
 
   Global namespace, as uic generated it in 2003: SIG_GPParameter is in
   namespace SIGEL_MasterGUI and names this class unqualified.
@@ -33,16 +34,16 @@ public:
     ~SIG_GPParameterBase() override;
 
 public slots:
-    virtual void slotAddHost();
-    virtual void slotChangeGraveyardDir();
-    virtual void slotChangePoolImageDir();
-    virtual void slotCrossoverChanged( int );
-    virtual void slotDeleteHost();
-    virtual void slotDisableAllHosts();
-    virtual void slotEditHost();
-    virtual void slotEnableAllHosts();
-    virtual void slotMutationChanged( int );
-    virtual void slotTourPerGenChanged( int );
+    virtual void slotAddHost() = 0;
+    virtual void slotChangeGraveyardDir() = 0;
+    virtual void slotChangePoolImageDir() = 0;
+    virtual void slotCrossoverChanged( int ) = 0;
+    virtual void slotDeleteHost() = 0;
+    virtual void slotDisableAllHosts() = 0;
+    virtual void slotEditHost() = 0;
+    virtual void slotEnableAllHosts() = 0;
+    virtual void slotMutationChanged( int ) = 0;
+    virtual void slotTourPerGenChanged( int ) = 0;
 
 protected:
     // Drives languageChange; without it the slot never runs.

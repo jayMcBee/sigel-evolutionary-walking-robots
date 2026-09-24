@@ -1,7 +1,6 @@
 /*
   The class the 2003 uic generated, in uic3 implementation-mode shape,
-  adapted to Qt 6. The qWarning stubs warn at runtime when the subclass
-  forgot to override a connected slot, as the 2003 uic stubs did.
+  adapted to Qt 6.
 */
 #include "SIGEL_MasterGUI/SIG_LanguageParametersBase.h"
 
@@ -32,19 +31,4 @@ void SIG_LanguageParametersBase::changeEvent( QEvent *e )
 void SIG_LanguageParametersBase::languageChange()
 {
   retranslateUi( this );
-}
-
-void SIG_LanguageParametersBase::slotPushButtonDisallowAllClicked()
-{
-qWarning("SIG_LanguageParametersBase::slotPushButtonDisallowAllClicked(): Not implemented yet");
-}
-
-void SIG_LanguageParametersBase::slotPushButtonAllowAllClicked()
-{
-qWarning("SIG_LanguageParametersBase::slotPushButtonAllowAllClicked(): Not implemented yet");
-}
-
-void SIG_LanguageParametersBase::slotPushButtonEditClicked()
-{
-qWarning("SIG_LanguageParametersBase::slotPushButtonEditClicked(): Not implemented yet");
 }

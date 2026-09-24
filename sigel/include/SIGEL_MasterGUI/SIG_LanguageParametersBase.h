@@ -22,9 +22,9 @@ public:
     ~SIG_LanguageParametersBase() override;
 
 public slots:
-    virtual void slotPushButtonDisallowAllClicked();
-    virtual void slotPushButtonAllowAllClicked();
-    virtual void slotPushButtonEditClicked();
+    virtual void slotPushButtonDisallowAllClicked() = 0;
+    virtual void slotPushButtonAllowAllClicked() = 0;
+    virtual void slotPushButtonEditClicked() = 0;
 
 protected:
     // Qt 3 called languageChange() itself; Qt 6 has no such hook, so it is

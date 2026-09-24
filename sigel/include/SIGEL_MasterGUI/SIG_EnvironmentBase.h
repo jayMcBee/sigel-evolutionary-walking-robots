@@ -22,11 +22,11 @@ public:
     ~SIG_EnvironmentBase() override;
 
 public slots:
-    virtual void slotAlpha();
-    virtual void slotFloorSelectionChanged();
-    virtual void slotSelectFile();
-    virtual void slotSelectTextureFile();
-    virtual void slotTextureSelect();
+    virtual void slotAlpha() = 0;
+    virtual void slotFloorSelectionChanged() = 0;
+    virtual void slotSelectFile() = 0;
+    virtual void slotSelectTextureFile() = 0;
+    virtual void slotTextureSelect() = 0;
 
 protected:
     // Qt 3 called languageChange() itself; Qt 6 has no such hook, so it is

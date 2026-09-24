@@ -4786,6 +4786,18 @@ carried; other items and this file cite them, so they do not change.
   `SIG_IO::cerr` that names the value. Measured: `QLCDNumber::intValue()`
   holds the new value when `overflow()` fires. No baseline moves.
 
+- [x] **The `qWarning` calls, found with item 60** — done 2026-09-24.
+  Six form base classes held 27 slot bodies that only printed "Not
+  implemented yet"; every one is overridden in its subclass. The bodies are
+  gone and the slots are pure virtual, so a missing override fails the build.
+  Checked by review: no base constructor or destructor can call one. The
+  `formsize` scenario in `guidrive` builds the bases alone, so it has six
+  stand-in subclasses with empty slots. The "qWarning stubs" sentence left
+  the headers of all 20 base files. `SIG_GUIGPManager::updateIndividualView`
+  writes its one runtime warning to `SIG_IO::cerr`, SIGEL's own log, ended
+  with `Qt::endl`: a line ending in `"\n"` stays in the stream's buffer, so
+  item 60's overflow line got `Qt::endl` too.
+
 #### Not doing
 
 Decisions, not work. Each is settled; reopen only with a reason.
