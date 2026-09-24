@@ -621,6 +621,14 @@ touched, because changing one changes behaviour against the reference binary.
     absolute difference from the mean moment, not a variance; the vector it
     goes into is named `variance`.
 
+- [ ] **88. Any load error kills the interface.** Found 2026-09-24. Nothing
+  catches a `SIG_Exception` from `SIG_GPExperiment::loadExperiment` in
+  `SIG_ExperimentListView`'s open slot, or anywhere above it. Measured: a copy
+  of `twoBases` with its `StreamedRobot` keyword broken aborts the interface
+  with "terminate called after throwing an instance of
+  `SIGEL_Robot::SIG_UnstreamingError`". A file with a register width outside
+  1..16 does the same.
+
 - [ ] **47. `sigelDynClient` and `manage_dyn_slave`.** `sigelDynClient` makes a
   second machine a dynamic slave of a master started with `sigel -de`, which
   `sigel.cpp` still accepts. It is still 1.3's Solaris `tcsh` script, its home
