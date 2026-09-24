@@ -591,6 +591,19 @@ touched, because changing one changes behaviour against the reference binary.
     declares `friend class SIG_GPEnergyFitnessFunction`; no such class is in
     the tree. Delete the line.
 
+- [ ] **85. A short description of the selected fitness function.** Idea,
+  2026-09-24. Below the fitness-function combo box on the GP Parameters page,
+  a label of at most two lines says what the selected function rewards, in
+  the style of the Edit host dialog's line "For best speed, use one process
+  per CPU core". The text belongs to the fitness function, not to the
+  interface: each class gets a const getter returning it (name to decide,
+  for example `uiDescription()`). It must work without an object, because the
+  master never creates a fitness function; only `sigel_slave` does. So a
+  static member, or one lookup by the stored name next to the one
+  `sigel_slave`'s `main` does. `SIG_GPParameter` updates the label when the
+  selection changes. Write the texts after items 82 and 83, so the dropped
+  functions get none.
+
 - [ ] **47. `sigelDynClient` and `manage_dyn_slave`.** `sigelDynClient` makes a
   second machine a dynamic slave of a master started with `sigel -de`, which
   `sigel.cpp` still accepts. It is still 1.3's Solaris `tcsh` script, its home
