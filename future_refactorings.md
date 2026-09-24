@@ -567,15 +567,17 @@ touched, because changing one changes behaviour against the reference binary.
   selection changes. Write the texts after items 82 and 83, so the dropped
   functions get none.
 
-- [ ] **86. The generation log line restarts at 1 with every run.** Seen
-  2026-09-24: a run stopped at "Computing Generation 1033", and the restarted
-  run printed "Computing Generation 1", "2", ... `SIG_GPManager::run`, and
-  `run(MT_Classifier*)` the same, prints `currentGenerationNo`, which counts
-  from 0 at every start, not the pool generation (`poolGeneration`), which the
-  Experiment page and the `.exp` file show. The line should at least name the
-  pool generation, for example "Computing Generation 1034 (1 in this run)".
-  Related: the termination test in `SIG_GPManager::stopIfNecessary` also
-  compares the termination generation with `currentGenerationNo`.
+- [ ] **90. "Stop at generation N" counts from each start.** Found
+  2026-09-24 with item 86. `SIG_GPManager::checkTerminationConditions`,
+  called from `stopIfNecessary`, compares the termination generation with
+  `currentGenerationNo`, which counts from 0 at
+  every start, not with the pool generation that the Experiment page and the
+  `.exp` file show. A run restarted at pool generation 1034 with a
+  termination generation of 1100 would stop at pool generation 2134,
+  by reading the code. Changing it changes when a run stops; not decided.
+  `SIG_GUIGPExperiment::terminationAlreadyMet` tells the user the run
+  "terminates after N generations", a count per run; its text changes with
+  it.
 
 - [ ] **89. Refuse bad simulation parameters.** Found 2026-09-24 in item 87;
   needs more thought. Two values reach divisions with nothing to stop them:

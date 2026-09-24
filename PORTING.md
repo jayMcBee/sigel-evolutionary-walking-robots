@@ -899,7 +899,18 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-24, night — DONE: TWO UNUSED LENGTH FIELDS REMOVED.** Start here.
+**2026-09-24, night — DONE: ITEM 86, THE GENERATION LOG LINE.** Start here.
+
+- **Changed, by decision:** `SIG_GPManager::run` and `run(MT_Classifier*)`
+  print the pool generation and the count in this run:
+  `Computing Generation 1034 (1 in this run)`. Nothing in the tree reads the
+  line. Tested with a two-generation run of a copy of `twoBases` at pool
+  generation 203: it printed 204 (1 in this run) and 205 (2 in this run).
+- **New item 90:** the termination test still counts from each start.
+- **Gates:** `check.sh` 944 pass, 0 fail; warnings 491. The other four gates
+  are green.
+
+**2026-09-24, night — DONE: TWO UNUSED LENGTH FIELDS REMOVED.**
 
 - **Removed, by decision:** `SIG_GPParameter::maximumLength` and
   `minimumLength`, two `long` fields with doc comments. Nothing set, read,
@@ -5072,6 +5083,13 @@ carried; other items and this file cite them, so they do not change.
     and saves back with the same name. A copy naming
     `StepperFitnessFunction` saves back as `SimpleFitnessFunction`, as any
     unknown name does.
+
+- [x] **86. The generation log line restarts at 1 with every run** — done
+  2026-09-24, by decision. `SIG_GPManager::run` and `run(MT_Classifier*)`
+  printed `currentGenerationNo`, which counts from 0 at every start. They now
+  print the pool generation first and the run's count after it:
+  `Computing Generation 1034 (1 in this run)`. The termination test is item
+  90.
 
 - [x] **87. Defects in the fitness functions that stay** — done 2026-09-24,
   by decision, in four commits.
