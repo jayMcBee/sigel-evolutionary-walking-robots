@@ -81,6 +81,20 @@ namespace SIGEL_GP
   bool pvmIsLost() const;
 
   /**
+   * How many of the current generation's tournaments are finished, out of
+   * how many createTours planned. Both are 0 before the first createTours.
+   */
+ public:
+  struct TournamentProgress
+  {
+    int doneCount;
+    int plannedCount;
+  };
+
+ public:
+  TournamentProgress tournamentProgress() const;
+
+  /**
    * Two flags to synchronize the main thread and server thread when disconnecting
    * dynamically registered clients; if 'disconnectClients' is set, the server thread
    * will disconnect all clients causing them to cleanup temp. files since it'll be

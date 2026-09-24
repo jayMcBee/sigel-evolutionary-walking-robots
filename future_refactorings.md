@@ -295,55 +295,6 @@ touched, because changing one changes behaviour against the reference binary.
 
 ## 7 · The interface
 
-- [ ] **24. Show progress during a run.** Partly done. D38 drives
-  `generationProgBar` from the count of individuals holding a fitness value,
-  which steps back when a tournament makes offspring. D37 writes the pool
-  generation into `lcdnumberGenerations` from
-  `SIG_GUIGPManager::updateIndividualView`, which also calls
-  `SIG_IndividualListItem::setTo` as results come in.
-  **Researched 2026-09-23, not yet decided.** `createTours` makes every
-  tournament of a generation before `evolutionLoop` runs, so the exact work is
-  known: a mutation tournament causes 1 evaluation, a crossover 2, a
-  reproduction 0. A timeout re-spawns the same task, so each offspring still
-  gets one `setFitness`. No new state is needed: of what the first option
-  reads, only `tours` and `taskCanDoList` are private, and `depNumber`,
-  `justWaiting`, `indis`, `fitTaskId` are public. Three options, each checked
-  in a Python model of the loop over 12,100 simulated generations of the 7
-  kept experiments. In the model, today's bar stepped back 14,572 times in
-  1,000 walker generations; the three options never did, and each was exactly
-  full at every generation end. The model's evaluation times are assumed, so
-  it only ranks the options. Line counts are counted from drafts:
-  - **Evaluations settled out of evaluations due.** A const accessor
-    `SIG_GPManager::tournamentProgress(settled, due, toursDone, toursTotal)`:
-    `due` sums 1 per mutation and 2 per crossover tournament in `tours`; a
-    tournament is played when `depNumber == 0` and it is not queued unplayed
-    in `taskCanDoList` (`!queued || justWaiting`); `settled` adds its weight
-    minus its members with `fitTaskId != -1`. The timer lambda in the
-    `SIG_GUIGPExperiment` constructor shows the pool count when every
-    tournament is done (first generation, `resetPool`), else `settled` of
-    `due`. 33 lines in the manager and 13 in the lambda. Gap: in the MetaGP
-    `run(MT_Classifier*)`, the `evalNeededIndis` phase shows 0%; no kept
-    experiment turns MetaGP on. Needs a D33 exception for one read-only
-    accessor, like `pvmIsLost` (D41).
-  - **Tournaments finished out of tournaments planned.** 15 + 8 lines. Exact,
-    but runs ahead when reproduction is above 0 (twoBases).
-  - **Counters at the events** — reset and count in `evalNewIndis`,
-    `evalNeededIndis` and both `evolutionLoop`s. Exact everywhere, MetaGP too.
-    45 + 9 lines, and new state inside the loops: a larger D33 exception.
-  Rejected by decision: the maximum within a generation, a running average, a busy
-  indicator, and an estimate from the last generation's time. An estimate of
-  the evaluation count from the probabilities has a tail, because the true
-  count varies from generation to generation.
-  With any option: the tooltip in `SIG_ExperimentViewBase.ui` and D38 change;
-  no check baseline holds an in-run bar value.
-  **The matching call in the `SIG_GUIGPManager` constructor stays commented out**
-  — `slotStartEvolution` already refreshes the counter through
-  `putAllIntoExperiment`. 1.3 has both commented out.
-  **No check covers the counter during a run, because no check starts a run.**
-  Only the unchecked `evolution` scenario samples it; `runlock` covers the write
-  in `slotEvolutionStopped`. **Untried:** a check without PVM may be possible
-  with a run that has no tournaments.
-
 - [ ] **27. Name the three signals in the wildcard disconnect.**
   `SIG_AllIndividualsView::slotEvolutionNotRunning` calls
   `QObject::disconnect(individualList->listviewIndividuals, 0, 0, 0)`,

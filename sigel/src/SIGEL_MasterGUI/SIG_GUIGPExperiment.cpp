@@ -98,16 +98,16 @@ namespace SIGEL_MasterGUI
   menuDict.insert( "Robot" , menuRobotView );
   menuDict.insert( experimentName, menuExperimentView );
   
-  // An individual keeps fitness -1 until a slave has evaluated it, so the share
-  // of the pool that is up to date is the work done.
+  // The bar counts the generation's finished tournaments. Before the first
+  // tournaments exist both counts are 0, and the bar shows it is busy.
   QObject::connect( &progressTimer, &QTimer::timeout, this, [this]()
     {
-      const int size = gpExperiment.population.getSize();
-      int upToDate = 0;
-      for( int i = 0; i < size; i++ )
-	if( gpExperiment.population.getIndividual( i ).upToDate() )
-	  upToDate++;
-      experimentView->generationProgBar->setValue( upToDate );
+      if( guiGPManager )
+	{
+	  const auto [doneCount, plannedCount] = guiGPManager->tournamentProgress();
+	  experimentView->generationProgBar->setRange( 0, plannedCount );
+	  experimentView->generationProgBar->setValue( doneCount );
+	}
 
       // SIG_GPFitnessTrainer waits for results with no timeout on the wait as a
       // whole, so a run that has lost PVM sits there for ever and the window
@@ -365,7 +365,6 @@ void SIG_GUIGPExperiment::slotStartEvolution()
       endedBecause = QString();
       generationAtStart = gpExperiment.population.getPoolGeneration();
       runStartedAt = QDateTime::currentDateTime();
-      experimentView->generationProgBar->setRange( 0, gpExperiment.population.getSize() );
       progressTimer.start( 200 );
       try {
         guiGPManager->start();

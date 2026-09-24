@@ -23,7 +23,7 @@
 #include <QList>
 #include <QString>
 #include <QTextStream>
-#include <algorithm>   // std::sort, numeric; Qt 2's QArray::sort compared raw bytes (memcmp)
+#include <algorithm>   // std::sort, std::count_if, numeric; Qt 2's QArray::sort compared raw bytes (memcmp)
 #include "SIGEL_GP/SIG_GPManager.h"
 
 #ifndef _WINDOWS
@@ -579,6 +579,17 @@ void SIGEL_GP::SIG_GPManager::calcInitTourSet() {
 bool SIGEL_GP::SIG_GPManager::pvmIsLost() const
 {
   return trainer && trainer->pvmLost;
+};
+
+SIGEL_GP::SIG_GPManager::TournamentProgress SIGEL_GP::SIG_GPManager::tournamentProgress() const
+{
+  // A tournament is unfinished while it waits for an earlier one, or while it
+  // is in taskCanDoList: not played yet, or waiting for its results.
+  const int plannedCount = int( tours.size() );
+  const int waitingCount = int( std::count_if( tours.cbegin(), tours.cend(),
+    []( const SIG_GPTournament *t ) { return t && t->depNumber > 0; } ) );
+  const int queuedCount = int( taskCanDoList.size() );
+  return { plannedCount - waitingCount - queuedCount, plannedCount };
 };
 
 void SIGEL_GP::SIG_GPManager::processInterfaceEvents()
