@@ -324,7 +324,7 @@ touched, because changing one changes behaviour against the reference binary.
   - **Counters at the events** — reset and count in `evalNewIndis`,
     `evalNeededIndis` and both `evolutionLoop`s. Exact everywhere, MetaGP too.
     45 + 9 lines, and new state inside the loops: a larger D33 exception.
-  Rejected by Jan: the maximum within a generation, a running average, a busy
+  Rejected by decision: the maximum within a generation, a running average, a busy
   indicator, and an estimate from the last generation's time. An estimate of
   the evaluation count from the probabilities has a tail, because the true
   count varies from generation to generation.

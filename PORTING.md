@@ -903,11 +903,11 @@ Start here.
   1.3".
 - **The runner was evolved again.** A fresh population was made outside the
   interface from `runner.exp`, with the robot and every setting kept, at
-  generation 0 with no history (item 70 describes how). Jan evolved it in the
-  interface and changed processes 1 to 4, priority 4 to 2 and texture alpha to
-  99; the population is 250. 1,125 generations in about 8 hours. Best fitness
+  generation 0 with no history (item 70 describes how). It was evolved in the
+  interface, with processes changed from 1 to 4, priority from 4 to 2 and
+  texture alpha to 99; the population is 250. 1,125 generations in about 8 hours. Best fitness
   0.699 at generation 100, 0.919 at 268, 1.193 at 750, 1.218 at 1,125. It
-  replaces `experiments/runner.exp`, by decision, with Jan's settings kept;
+  replaces `experiments/runner.exp`, by decision, with those settings kept;
   only the host directory is set to `"."`. `fitness-baseline.txt` now
   measures this population, not the 2001 one. The replay with it gave: 7 of 7 within 10%; runner 1.000 and 187 of 250
   matching — the other 63 are the individuals the run left unscored.
@@ -918,7 +918,7 @@ Start here.
   From the `sigel-x86` session's diagnostics wishlist: 75 to 77.
 - **New item 70:** a menu command that clones an experiment with a fresh
   population.
-- **Jan's observations from the runner run, now filed:**
+- **Observations from the runner run, now filed:**
   - The run handed out 366,740 individual IDs (`NEXTIDENTIFIER=366740`), so IDs
     pass 32,767 without trouble; `SIG_GPPopulation::getNextIdentifier` counts
     in an `int`. Item 59, the pool size, is a different limit; a direction for
