@@ -39,7 +39,7 @@
 
 #include "SIGEL_Program/SIG_Program.h"
 
-#include "SIGEL_Tools/SIG_IO.h" // take it out! Only DEBUG!
+#include "SIGEL_Tools/SIG_IO.h"
 
 #ifndef _WINDOWS
 #include <cstdlib>
@@ -62,6 +62,15 @@ SIG_GPParameter::SIG_GPParameter( QWidget* parent,  const char* name, Qt::Window
   QObject::connect( listviewHosts,
 		    SIGNAL( itemDoubleClicked( QTreeWidgetItem *, int ) ),
 		    SLOT( slotItemDoubleClicked( QTreeWidgetItem * ) ) );
+
+  // The counter has four digits, and on overflow it keeps showing the old ones.
+  QObject::connect( lcdnumberTournamentsPerGeneration, &QLCDNumber::overflow, this, [this]()
+    {
+      SIGEL_Tools::SIG_IO::cerr << "The tournaments per generation counter shows "
+				<< lcdnumberTournamentsPerGeneration->digitCount()
+				<< " digits and cannot display "
+				<< lcdnumberTournamentsPerGeneration->intValue() << ".\n";
+    } );
 }
 
 /*  

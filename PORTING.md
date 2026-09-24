@@ -4778,6 +4778,14 @@ carried; other items and this file cite them, so they do not change.
   run; only the unchecked `evolution` scenario samples it, and `runlock` covers
   the write in `slotEvolutionStopped`.
 
+- [x] **60. The tournaments-per-generation counter has four digits** — done
+  2026-09-24. The counter keeps 4 digits: only a population of 10,000 or more
+  with a ratio of 1 goes past them, and the run always uses the right value.
+  So the overflow is not silent, `SIG_GPParameter`'s constructor connects
+  `lcdnumberTournamentsPerGeneration`'s `overflow()` to one line on
+  `SIG_IO::cerr` that names the value. Measured: `QLCDNumber::intValue()`
+  holds the new value when `overflow()` fires. No baseline moves.
+
 #### Not doing
 
 Decisions, not work. Each is settled; reopen only with a reason.

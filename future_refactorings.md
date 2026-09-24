@@ -279,18 +279,6 @@ touched, because changing one changes behaviour against the reference binary.
   **Pencilled in 2026-09-24:** limit the pool to 30,000 in the interface, and
   add a check with a warning in the code for any pool above 32,767.
 
-- [ ] **60. The tournaments-per-generation counter has four digits.**
-  `lcdnumberTournamentsPerGeneration` in `SIG_GPParameterBase.ui` has
-  `digitCount` 4, and `SIG_GPParameter::getOutOfExperiment` and
-  `slotTourPerGenChanged` display the ratio times the pool size. On
-  `runner.exp`, whose ratio is 1, one Add of 9900 or more takes that past
-  9999: `QLCDNumber` then keeps the old digits while its value holds the new
-  number. 1.3 has the same four digits, but its Add of at most 999 could not
-  reach them in one step. Item 58 made it reachable. Giving the counter five
-  digits is one more change from 1.3, and it moves
-  `guibehaviour-baseline.txt`, which prints each counter's digits. Found by
-  review 2026-09-22.
-
 ---
 
 ## 7 · The interface
