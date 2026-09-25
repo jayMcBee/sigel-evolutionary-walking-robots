@@ -17,14 +17,15 @@ SIG_IndividualListBase::SIG_IndividualListBase(QWidget* parent, const char* name
   // setSortingEnabled leaves the indicator descending, so the order is set here.
   listviewIndividuals->sortByColumn( 0, Qt::AscendingOrder );
 
-  // The name takes the free width; fitness and age are as wide as their
-  // text. No column is narrower than fourteen digits.
+  // The name takes the free width; fitness, length and age are as wide as
+  // their text. No column is narrower than fourteen digits.
   QHeaderView *header = listviewIndividuals->header();
   header->setMinimumSectionSize( header->fontMetrics().horizontalAdvance( QString( 14, '0' ) ) );
   header->setStretchLastSection( false );
   header->setSectionResizeMode( 0, QHeaderView::Stretch );
   header->setSectionResizeMode( 1, QHeaderView::ResizeToContents );
   header->setSectionResizeMode( 2, QHeaderView::ResizeToContents );
+  header->setSectionResizeMode( 3, QHeaderView::ResizeToContents );
 }
 
 SIG_IndividualListBase::~SIG_IndividualListBase()

@@ -1850,10 +1850,10 @@ static int guidriveMain(int argc, char **argv)
                h->sortIndicatorOrder() == Qt::AscendingOrder ? "Ascending" : "Descending");
         for (int i = 0; i < 5; ++i)
             printf("  first%d %s | %s | %s\n", i, qPrintable(t->topLevelItem(i)->text(0)),
-                   qPrintable(t->topLevelItem(i)->text(1)), qPrintable(t->topLevelItem(i)->text(2)));
+                   qPrintable(t->topLevelItem(i)->text(1)), qPrintable(t->topLevelItem(i)->text(3)));
         for (int i = t->topLevelItemCount() - 3; i < t->topLevelItemCount(); ++i)
             printf("  last   %s | %s | %s\n", qPrintable(t->topLevelItem(i)->text(0)),
-                   qPrintable(t->topLevelItem(i)->text(1)), qPrintable(t->topLevelItem(i)->text(2)));
+                   qPrintable(t->topLevelItem(i)->text(1)), qPrintable(t->topLevelItem(i)->text(3)));
 
         // 2. add -- dialog shape and where the new individuals land
         whenModal([](QWidget *m) {
@@ -1878,7 +1878,7 @@ static int guidriveMain(int argc, char **argv)
         printf("rows=%d\n", t->topLevelItemCount());
         for (int i = 0; i < 5; ++i)
             printf("  new %s | %s | %s\n", qPrintable(t->topLevelItem(i)->text(0)),
-                   qPrintable(t->topLevelItem(i)->text(1)), qPrintable(t->topLevelItem(i)->text(2)));
+                   qPrintable(t->topLevelItem(i)->text(1)), qPrintable(t->topLevelItem(i)->text(3)));
 
         // 3. The large delete. What it catches depends on the item that is
         //    current when clear() runs. The list is sorted by Fitness here, and
@@ -2468,7 +2468,7 @@ static int guidriveMain(int argc, char **argv)
                 if (tl && after > 0) {
                     QTreeWidgetItem *last = tl->topLevelItem(after - 1);
                     printf("  last row: %s | %s | %s\n", qPrintable(last->text(0)),
-                           qPrintable(last->text(1)), qPrintable(last->text(2)));
+                           qPrintable(last->text(1)), qPrintable(last->text(3)));
                 }
             }
         }
@@ -4337,7 +4337,7 @@ static int guidriveMain(int argc, char **argv)
                 printf("    row%-3d | %-12s | %-14s | %-6s\n", i,
                        qPrintable(t->topLevelItem(i)->text(0)),
                        qPrintable(t->topLevelItem(i)->text(1)),
-                       qPrintable(t->topLevelItem(i)->text(2)));
+                       qPrintable(t->topLevelItem(i)->text(3)));
         }
         return 0;
     }
@@ -5391,7 +5391,7 @@ static int guidriveMain(int argc, char **argv)
         printf("\n  [selected] row=%d name=%s fitness=%s age=%s (selected=%d)\n", want,
                qPrintable(t->topLevelItem(want)->text(0)),
                qPrintable(t->topLevelItem(want)->text(1)),
-               qPrintable(t->topLevelItem(want)->text(2)),
+               qPrintable(t->topLevelItem(want)->text(3)),
                (int)t->selectedItems().count());
         fflush(stdout);
 
@@ -5430,7 +5430,7 @@ static int guidriveMain(int argc, char **argv)
                     printf("    row%-3d | %-12s | %-14s | %-6s\n", i,
                            qPrintable(t->topLevelItem(i)->text(0)),
                            qPrintable(t->topLevelItem(i)->text(1)),
-                           qPrintable(t->topLevelItem(i)->text(2)));
+                           qPrintable(t->topLevelItem(i)->text(3)));
                 fflush(stdout);
             }
             QTest::mouseClick(h->viewport(), Qt::LeftButton, Qt::NoModifier,

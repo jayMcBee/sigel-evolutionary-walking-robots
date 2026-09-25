@@ -338,15 +338,15 @@
         Simulation-Parameters    sel=0 exp=0 cur=0 selectable=1
         Environment              sel=0 exp=0 cur=0 selectable=1
   [page] count=8 current=SIGEL_MasterGUI::SIG_AllIndividualsView objectName=[]
-  [individuals] rows=100 cols=3 headers=[Name][Fitness][Age] selected=0
-    row0  | 16269         | 0.558099      | 58            | sel=0
-    row1  | 16430         | 0.563401      | 27            | sel=0
-    row2  | 16486         | 0.569652      | 16            | sel=0
-    row3  | 16494         | 0.558099      | 60            | sel=0
-    row4  | 16611         | 0.563401      | 37            | sel=0
-    row5  | 16623         | 0.569652      | 14            | sel=0
+  [individuals] rows=100 cols=4 headers=[Name][Fitness][Length][Age] selected=0
+    row0  | 16269         | 0.558099      | 135           | 58            | sel=0
+    row1  | 16430         | 0.563401      | 156           | 27            | sel=0
+    row2  | 16486         | 0.569652      | 143           | 16            | sel=0
+    row3  | 16494         | 0.558099      | 135           | 60            | sel=0
+    row4  | 16611         | 0.563401      | 156           | 37            | sel=0
+    row5  | 16623         | 0.569652      | 143           | 14            | sel=0
     ... 94 more
-    allrows sha256=893d98e2f4cb3f0951994592285055305ccd94067f8d2d6ed70904824bb45a32
+    allrows sha256=52b60532c3dba131a332f6c9fc3d310d3f625b1e05ac0d785197004797b54868
   [action changes] none
 
 == ICONS ==
@@ -558,15 +558,15 @@ we do with the system?]
         Simulation-Parameters    sel=0 exp=0 cur=0 selectable=1
         Environment              sel=0 exp=0 cur=0 selectable=1
   [page] count=8 current=SIGEL_MasterGUI::SIG_AllIndividualsView objectName=[]
-  [individuals] rows=100 cols=3 headers=[Name][Fitness][Age] selected=0
-    row0  | 16269         | 0.558099      | 58            | sel=0
-    row1  | 16430         | 0.563401      | 27            | sel=0
-    row2  | 16486         | 0.569652      | 16            | sel=0
-    row3  | 16494         | 0.558099      | 60            | sel=0
-    row4  | 16611         | 0.563401      | 37            | sel=0
-    row5  | 16623         | 0.569652      | 14            | sel=0
+  [individuals] rows=100 cols=4 headers=[Name][Fitness][Length][Age] selected=0
+    row0  | 16269         | 0.558099      | 135           | 58            | sel=0
+    row1  | 16430         | 0.563401      | 156           | 27            | sel=0
+    row2  | 16486         | 0.569652      | 143           | 16            | sel=0
+    row3  | 16494         | 0.558099      | 135           | 60            | sel=0
+    row4  | 16611         | 0.563401      | 156           | 37            | sel=0
+    row5  | 16623         | 0.569652      | 143           | 14            | sel=0
     ... 94 more
-    allrows sha256=893d98e2f4cb3f0951994592285055305ccd94067f8d2d6ed70904824bb45a32
+    allrows sha256=52b60532c3dba131a332f6c9fc3d310d3f625b1e05ac0d785197004797b54868
   [action changes] none
 
 == VALIDATOR BATTERY ==
@@ -1021,15 +1021,15 @@ we do with the system?]
         Simulation-Parameters    sel=0 exp=0 cur=0 selectable=1
         Environment              sel=0 exp=0 cur=0 selectable=1
   [page] count=8 current=SIGEL_MasterGUI::SIG_AllIndividualsView objectName=[]
-  [individuals] rows=100 cols=3 headers=[Name][Fitness][Age] selected=0
-    row0  | 16269         | 0.558099      | 58            | sel=0
-    row1  | 16430         | 0.563401      | 27            | sel=0
-    row2  | 16486         | 0.569652      | 16            | sel=0
-    row3  | 16494         | 0.558099      | 60            | sel=0
-    row4  | 16611         | 0.563401      | 37            | sel=0
-    row5  | 16623         | 0.569652      | 14            | sel=0
+  [individuals] rows=100 cols=4 headers=[Name][Fitness][Length][Age] selected=0
+    row0  | 16269         | 0.558099      | 135           | 58            | sel=0
+    row1  | 16430         | 0.563401      | 156           | 27            | sel=0
+    row2  | 16486         | 0.569652      | 143           | 16            | sel=0
+    row3  | 16494         | 0.558099      | 135           | 60            | sel=0
+    row4  | 16611         | 0.563401      | 156           | 37            | sel=0
+    row5  | 16623         | 0.569652      | 143           | 14            | sel=0
     ... 94 more
-    allrows sha256=893d98e2f4cb3f0951994592285055305ccd94067f8d2d6ed70904824bb45a32
+    allrows sha256=52b60532c3dba131a332f6c9fc3d310d3f625b1e05ac0d785197004797b54868
   [action changes] none
 
 == EXPORT ALL ==
@@ -1227,15 +1227,15 @@ selected=17013
         Simulation-Parameters    sel=0 exp=0 cur=0 selectable=1
         Environment              sel=0 exp=0 cur=0 selectable=1
   [page] count=8 current=SIGEL_MasterGUI::SIG_AllIndividualsView objectName=[]
-  [individuals] rows=100 cols=3 headers=[Name][Fitness][Age] selected=0
-    row0  | 16269         | 0.558099      | 58            | sel=0
-    row1  | 16430         | 0.563401      | 27            | sel=0
-    row2  | 16486         | 0.569652      | 16            | sel=0
-    row3  | 16494         | 0.558099      | 60            | sel=0
-    row4  | 16611         | 0.563401      | 37            | sel=0
-    row5  | 16623         | 0.569652      | 14            | sel=0
+  [individuals] rows=100 cols=4 headers=[Name][Fitness][Length][Age] selected=0
+    row0  | 16269         | 0.558099      | 135           | 58            | sel=0
+    row1  | 16430         | 0.563401      | 156           | 27            | sel=0
+    row2  | 16486         | 0.569652      | 143           | 16            | sel=0
+    row3  | 16494         | 0.558099      | 135           | 60            | sel=0
+    row4  | 16611         | 0.563401      | 156           | 37            | sel=0
+    row5  | 16623         | 0.569652      | 143           | 14            | sel=0
     ... 94 more
-    allrows sha256=893d98e2f4cb3f0951994592285055305ccd94067f8d2d6ed70904824bb45a32
+    allrows sha256=52b60532c3dba131a332f6c9fc3d310d3f625b1e05ac0d785197004797b54868
   [action changes] none
 
 == OVERWRITE ==
@@ -1348,15 +1348,15 @@ Do you want to replace it?]
         Simulation-Parameters    sel=0 exp=0 cur=0 selectable=1
         Environment              sel=0 exp=0 cur=0 selectable=1
   [page] count=8 current=SIGEL_MasterGUI::SIG_AllIndividualsView objectName=[]
-  [individuals] rows=100 cols=3 headers=[Name][Fitness][Age] selected=0
-    row0  | 16269         | 0.558099      | 58            | sel=0
-    row1  | 16430         | 0.563401      | 27            | sel=0
-    row2  | 16486         | 0.569652      | 16            | sel=0
-    row3  | 16494         | 0.558099      | 60            | sel=0
-    row4  | 16611         | 0.563401      | 37            | sel=0
-    row5  | 16623         | 0.569652      | 14            | sel=0
+  [individuals] rows=100 cols=4 headers=[Name][Fitness][Length][Age] selected=0
+    row0  | 16269         | 0.558099      | 135           | 58            | sel=0
+    row1  | 16430         | 0.563401      | 156           | 27            | sel=0
+    row2  | 16486         | 0.569652      | 143           | 16            | sel=0
+    row3  | 16494         | 0.558099      | 135           | 60            | sel=0
+    row4  | 16611         | 0.563401      | 156           | 37            | sel=0
+    row5  | 16623         | 0.569652      | 143           | 14            | sel=0
     ... 94 more
-    allrows sha256=893d98e2f4cb3f0951994592285055305ccd94067f8d2d6ed70904824bb45a32
+    allrows sha256=52b60532c3dba131a332f6c9fc3d310d3f625b1e05ac0d785197004797b54868
   [action changes] none
 
 == EDIT COMMAND ==
@@ -1556,15 +1556,15 @@ Do you want to replace it?]
         Simulation-Parameters    sel=0 exp=0 cur=0 selectable=1
         Environment              sel=0 exp=0 cur=0 selectable=1
   [page] count=8 current=SIGEL_MasterGUI::SIG_AllIndividualsView objectName=[]
-  [individuals] rows=100 cols=3 headers=[Name][Fitness][Age] selected=0
-    row0  | 16269         | 0.558099      | 58            | sel=0
-    row1  | 16430         | 0.563401      | 27            | sel=0
-    row2  | 16486         | 0.569652      | 16            | sel=0
-    row3  | 16494         | 0.558099      | 60            | sel=0
-    row4  | 16611         | 0.563401      | 37            | sel=0
-    row5  | 16623         | 0.569652      | 14            | sel=0
+  [individuals] rows=100 cols=4 headers=[Name][Fitness][Length][Age] selected=0
+    row0  | 16269         | 0.558099      | 135           | 58            | sel=0
+    row1  | 16430         | 0.563401      | 156           | 27            | sel=0
+    row2  | 16486         | 0.569652      | 143           | 16            | sel=0
+    row3  | 16494         | 0.558099      | 135           | 60            | sel=0
+    row4  | 16611         | 0.563401      | 156           | 37            | sel=0
+    row5  | 16623         | 0.569652      | 143           | 14            | sel=0
     ... 94 more
-    allrows sha256=893d98e2f4cb3f0951994592285055305ccd94067f8d2d6ed70904824bb45a32
+    allrows sha256=52b60532c3dba131a332f6c9fc3d310d3f625b1e05ac0d785197004797b54868
   [action changes] none
 
 == METAGP: enabling ==
@@ -1906,15 +1906,15 @@ Do you want to replace it?]
         Simulation-Parameters    sel=0 exp=0 cur=0 selectable=1
         Environment              sel=0 exp=0 cur=0 selectable=1
   [page] count=8 current=SIGEL_MasterGUI::SIG_AllIndividualsView objectName=[]
-  [individuals] rows=100 cols=3 headers=[Name][Fitness][Age] selected=0
-    row0  | 16269         | 0.558099      | 58            | sel=0
-    row1  | 16430         | 0.563401      | 27            | sel=0
-    row2  | 16486         | 0.569652      | 16            | sel=0
-    row3  | 16494         | 0.558099      | 60            | sel=0
-    row4  | 16611         | 0.563401      | 37            | sel=0
-    row5  | 16623         | 0.569652      | 14            | sel=0
+  [individuals] rows=100 cols=4 headers=[Name][Fitness][Length][Age] selected=0
+    row0  | 16269         | 0.558099      | 135           | 58            | sel=0
+    row1  | 16430         | 0.563401      | 156           | 27            | sel=0
+    row2  | 16486         | 0.569652      | 143           | 16            | sel=0
+    row3  | 16494         | 0.558099      | 135           | 60            | sel=0
+    row4  | 16611         | 0.563401      | 156           | 37            | sel=0
+    row5  | 16623         | 0.569652      | 143           | 14            | sel=0
     ... 94 more
-    allrows sha256=893d98e2f4cb3f0951994592285055305ccd94067f8d2d6ed70904824bb45a32
+    allrows sha256=52b60532c3dba131a332f6c9fc3d310d3f625b1e05ac0d785197004797b54868
   [action changes] none
 
 == ROUND TRIP ==
@@ -2086,15 +2086,15 @@ Do you want to replace it?]
         Simulation-Parameters    sel=0 exp=0 cur=0 selectable=1
         Environment              sel=0 exp=0 cur=0 selectable=1
   [page] count=8 current=SIGEL_MasterGUI::SIG_AllIndividualsView objectName=[]
-  [individuals] rows=100 cols=3 headers=[Name][Fitness][Age] selected=0
-    row0  | 16269         | 0.558099      | 58            | sel=0
-    row1  | 16430         | 0.563401      | 27            | sel=0
-    row2  | 16486         | 0.569652      | 16            | sel=0
-    row3  | 16494         | 0.558099      | 60            | sel=0
-    row4  | 16611         | 0.563401      | 37            | sel=0
-    row5  | 16623         | 0.569652      | 14            | sel=0
+  [individuals] rows=100 cols=4 headers=[Name][Fitness][Length][Age] selected=0
+    row0  | 16269         | 0.558099      | 135           | 58            | sel=0
+    row1  | 16430         | 0.563401      | 156           | 27            | sel=0
+    row2  | 16486         | 0.569652      | 143           | 16            | sel=0
+    row3  | 16494         | 0.558099      | 135           | 60            | sel=0
+    row4  | 16611         | 0.563401      | 156           | 37            | sel=0
+    row5  | 16623         | 0.569652      | 143           | 14            | sel=0
     ... 94 more
-    allrows sha256=893d98e2f4cb3f0951994592285055305ccd94067f8d2d6ed70904824bb45a32
+    allrows sha256=52b60532c3dba131a332f6c9fc3d310d3f625b1e05ac0d785197004797b54868
   [action changes] none
   [modal] class=MT_MainWindow title=[SIGEL MetaGP]
   [window] visible=1 hidden=0
@@ -2315,15 +2315,15 @@ Do you want to replace it?]
         Simulation-Parameters    sel=0 exp=0 cur=0 selectable=1
         Environment              sel=0 exp=0 cur=0 selectable=1
   [page] count=8 current=SIGEL_MasterGUI::SIG_AllIndividualsView objectName=[]
-  [individuals] rows=100 cols=3 headers=[Name][Fitness][Age] selected=0
-    row0  | 16269         | 0.558099      | 58            | sel=0
-    row1  | 16430         | 0.563401      | 27            | sel=0
-    row2  | 16486         | 0.569652      | 16            | sel=0
-    row3  | 16494         | 0.558099      | 60            | sel=0
-    row4  | 16611         | 0.563401      | 37            | sel=0
-    row5  | 16623         | 0.569652      | 14            | sel=0
+  [individuals] rows=100 cols=4 headers=[Name][Fitness][Length][Age] selected=0
+    row0  | 16269         | 0.558099      | 135           | 58            | sel=0
+    row1  | 16430         | 0.563401      | 156           | 27            | sel=0
+    row2  | 16486         | 0.569652      | 143           | 16            | sel=0
+    row3  | 16494         | 0.558099      | 135           | 60            | sel=0
+    row4  | 16611         | 0.563401      | 156           | 37            | sel=0
+    row5  | 16623         | 0.569652      | 143           | 14            | sel=0
     ... 94 more
-    allrows sha256=893d98e2f4cb3f0951994592285055305ccd94067f8d2d6ed70904824bb45a32
+    allrows sha256=52b60532c3dba131a332f6c9fc3d310d3f625b1e05ac0d785197004797b54868
   [action changes] none
 
 == D29 RUN LOCK ==
@@ -2494,15 +2494,15 @@ Do you want to replace it?]
         Simulation-Parameters    sel=0 exp=0 cur=0 selectable=1
         Environment              sel=0 exp=0 cur=0 selectable=1
   [page] count=8 current=SIGEL_MasterGUI::SIG_AllIndividualsView objectName=[]
-  [individuals] rows=100 cols=3 headers=[Name][Fitness][Age] selected=0
-    row0  | 16269         | 0.558099      | 58            | sel=0
-    row1  | 16430         | 0.563401      | 27            | sel=0
-    row2  | 16486         | 0.569652      | 16            | sel=0
-    row3  | 16494         | 0.558099      | 60            | sel=0
-    row4  | 16611         | 0.563401      | 37            | sel=0
-    row5  | 16623         | 0.569652      | 14            | sel=0
+  [individuals] rows=100 cols=4 headers=[Name][Fitness][Length][Age] selected=0
+    row0  | 16269         | 0.558099      | 135           | 58            | sel=0
+    row1  | 16430         | 0.563401      | 156           | 27            | sel=0
+    row2  | 16486         | 0.569652      | 143           | 16            | sel=0
+    row3  | 16494         | 0.558099      | 135           | 60            | sel=0
+    row4  | 16611         | 0.563401      | 156           | 37            | sel=0
+    row5  | 16623         | 0.569652      | 143           | 14            | sel=0
     ... 94 more
-    allrows sha256=893d98e2f4cb3f0951994592285055305ccd94067f8d2d6ed70904824bb45a32
+    allrows sha256=52b60532c3dba131a332f6c9fc3d310d3f625b1e05ac0d785197004797b54868
   [action changes] none
 
 == RANDOMISER STREAM (seed=12345 n=5) ==

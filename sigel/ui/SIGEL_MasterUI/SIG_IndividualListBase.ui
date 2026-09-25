@@ -46,6 +46,11 @@
           </column>
           <column>
             <property name="text">
+              <string>Length</string>
+            </property>
+          </column>
+          <column>
+            <property name="text">
               <string>Age</string>
             </property>
           </column>

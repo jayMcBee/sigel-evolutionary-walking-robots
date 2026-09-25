@@ -52,15 +52,8 @@ SIG_IndividualListItem::SIG_IndividualListItem( QTreeWidget *parent, int poolPos
 #endif
   if( theIndividual )
     {
-      QString name = theIndividual->getName();
-      setText(0, name ); // has to be theIndividual->getName()
-      QString fitness = QString::number( theIndividual->getFitness() );
-      setText(1, fitness );
-      QString age = QString::number( theIndividual->getAge() );
-      setText(2, age );
       setIcon( 0, QIcon( QPixmap( sigelRoot + "/pixmaps/individualSmall.xpm" ) ) );
-      this->theIndividual = theIndividual;
-      this->poolPosition = theIndividual->getPoolPos();
+      setTo( theIndividual );
     }
 };
 
@@ -111,13 +104,14 @@ QString SIG_IndividualListItem::key(int column, bool ascending) const {
       return result;
       }
       break;
-    case 2: {
+    case 2:
+    case 3: {
       QString result;
-      int length = this->text(2).length();
+      int length = this->text(column).length();
       int difference = zeros - length;
       for( int i=0; i < difference; i++ )
         result.prepend("0");
-      result.append(this->text(2));
+      result.append(this->text(column));
       return result;
       }
       break;
@@ -147,9 +141,9 @@ void SIG_IndividualListItem::setTo( SIGEL_GP::SIG_GPIndividual *theIndividual )
       setText(0, name ); // has to be theIndividual->getName()
       QString fitness = QString::number( theIndividual->getFitness() );
       setText(1, fitness );
+      setText(2, QString::number( theIndividual->getProgram().getProgramLength() ) );
       QString age = QString::number( theIndividual->getAge() );
-      setText(2, age );
-      //  setPixmap( 0, QPixmap( "./pixmaps/individualSmall.xpm" ) );
+      setText(3, age );
       this->theIndividual = theIndividual;
       this->poolPosition = theIndividual->getPoolPos();
     }
