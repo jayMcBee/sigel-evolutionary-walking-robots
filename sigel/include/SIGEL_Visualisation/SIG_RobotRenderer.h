@@ -61,6 +61,22 @@ namespace SIGEL_Visualisation
      */
     void render();
 
+    /**
+     * Calls the display lists of the robot's links only.
+     * No anchor points and no feedback for the floating texts.
+     *
+     * @pre The display lists are builded.
+     */
+    void renderLinks();
+
+    /**
+     * Calls the display lists of the robot's anchor points and
+     * updates the positions of their floating texts.
+     *
+     * @pre The display lists are builded.
+     */
+    void renderPoints();
+
     QString exportToPovray();
 
     QString createPovrayDeclarations();

@@ -899,7 +899,52 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-24, night — DONE: ITEM 86, THE GENERATION LOG LINE.** Start here.
+**2026-09-25 — DONE: SHADOWS IN THE SIMULATION VIEW.** Start here.
+
+- **Added, by decision:** shadow mapping with percentage-closer filtering in
+  `SIG_SimulationVisualisation`. A sun fixed in the world, `sunDirection`,
+  casts the robot's shadow. Only the flatshaded and gouraudshaded modes use
+  it; the other three draw as before.
+  - A depth pass from the sun draws the robot's links into a 2048² depth
+    texture. The box it covers is centred on `getRobotCentre` and sized by
+    `robotRadius`.
+  - One GLSL 1.20 program in the compatibility context repeats the
+    fixed-function lighting and multiplies the sun's diffuse term by the
+    shadow factor: 16 Poisson taps, each a hardware 2×2 compare.
+  - To tune: `sunDirection`, `sunIntensity` (0.5), `shadowMapSize` (2048),
+    `shadowFilterRadius` (1.5 texels).
+  - `initShadowMapping` returns nothing. On a failure it prints
+    `Error: shadow mapping failed: <reason>` and leaves `shadowProgram`
+    null, and the view draws without shadows. A robot without vertices gets
+    no shadow and no message.
+  - `setShowShadows( bool )` switches shadows at run time. Nothing calls it
+    yet.
+  - To let the depth pass skip the labels, the anchor points and the ground,
+    `SIG_RobotRenderer::render` calls the new `renderLinks` and
+    `renderPoints`, and `SIG_EnvironmentRenderer::render` calls the new
+    `renderPlane` and `renderGridAndPath`, in the old order.
+    `SIG_Renderer::renderSceneObjects` takes a range.
+- **Tested** by eye on Xvfb with a copy of `walker.exp`, llvmpipe, GL 4.5
+  compatibility. With the sun at intensity 0 the shader matched the old
+  image: 0 pixels differed in flat mode, 2 in gouraud. No check covers the
+  3-D view. Not tested: a textured terrain, recording, real GPU hardware.
+- **Next:**
+  - A "Show shadows" check box. It follows "Show grid": a slot on
+    `SIG_SimulationVisualisationWidget` that calls `setShowShadows` and
+    `update()`, the `connect` and the resend in `SIG_SimulationWidget`.
+    Disable the box when `shadowProgram` is null.
+  - Ambient lighting is too bright at the default. Today's brightness
+    becomes the 90% slider position, the middle default drops by at least
+    25%, and the range goes lower; the values are set by eye. Open: the
+    slider already reaches 0 ambient (0–100, divided by 100, default 50), so
+    "lower" means a new scale, not a lower minimum.
+  - The shadow box uses the robot's bounding sphere at time 0. A limb that
+    swings outside it loses its shadow. Fit the box to the links each frame,
+    or add a margin once a value is measured.
+- **Gates:** `check.sh` 944 pass, 0 fail; warnings 491. The other four gates
+  are green.
+
+**2026-09-24, night — DONE: ITEM 86, THE GENERATION LOG LINE.**
 
 - **Changed, by decision:** `SIG_GPManager::run` and `run(MT_Classifier*)`
   print the pool generation and the count in this run:

@@ -24,6 +24,8 @@
 #define SIGEL_VISUALISATION_SIG_SIMULATIONVISUALISATION_H
 
 #include <qcolor.h>
+#include <QMatrix4x4>
+#include <QVector3D>
 
 #include "SIGEL_Visualisation/SIG_Visualisation.h"
 #include "SIGEL_Visualisation/SIG_RobotRenderer.h"
@@ -34,6 +36,10 @@
 #include "SIGEL_Program/SIG_Program.h"
 #include "SIGEL_Simulation/SIG_Simulation.h"
 #include "SIGEL_Simulation/SIG_SimulationParameters.h"
+
+class QOpenGLContext;
+class QOpenGLExtraFunctions;
+class QOpenGLShaderProgram;
 
 namespace SIGEL_Visualisation
 {
@@ -89,6 +95,8 @@ namespace SIGEL_Visualisation
 
       void setShowRobotPath( bool newShowRobotPath );
 
+      void setShowShadows( bool newShowShadows );
+
       /**
        * This method finally initiates the calling
        * of certain OpenGL rendering commands.
@@ -134,6 +142,80 @@ namespace SIGEL_Visualisation
 				    double aspectRatio );
 
     private:
+
+      /**
+       * The direction from the scene towards the sun, in world
+       * coordinates, not normalised. The sun is a directional light
+       * fixed to the world; only its light is shadowed.
+       */
+      static constexpr QVector3D sunDirection = QVector3D( -0.6f, 1.0f, 0.4f );
+
+      /**
+       * The diffuse intensity of the sun, the same for red, green and blue.
+       */
+      static constexpr float sunIntensity = 0.5f;
+
+      /**
+       * The width and height of the shadow map in texels.
+       */
+      static constexpr int shadowMapSize = 2048;
+
+      /**
+       * The radius of the filter around each shadow map lookup, in texels.
+       */
+      static constexpr float shadowFilterRadius = 1.5f;
+
+      /**
+       * The GLSL sources of the program that draws the lit plane and
+       * robot links with the sun's shadow.
+       */
+      static char const *const shadowVertexShaderSource;
+      static char const *const shadowFragmentShaderSource;
+
+      /**
+       * Creates the shadow map, its framebuffer and the program in the
+       * current OpenGL context and sets shadowProgram. On a failure it
+       * prints the error to SIG_IO::cerr, frees what it created and
+       * leaves shadowProgram nullptr. A robot without vertices gets no
+       * shadow and no message.
+       */
+      void initShadowMapping();
+
+      /**
+       * Draws the robot links into the shadow map, seen from the sun
+       * around the robot. Returns the sun's projection times its view.
+       */
+      QMatrix4x4 renderShadowMap();
+
+      /**
+       * Draws the scene lit, with the sun's shadow on the plane and the
+       * robot links. Grid, robot path and anchor points are drawn as
+       * without shadows.
+       *
+       * @param lightMatrix The matrix renderShadowMap returned for
+       *        this frame.
+       * @pre The camera's modelview matrix is set.
+       */
+      void renderShadowedScene( QMatrix4x4 const &lightMatrix );
+
+      /**
+       * The context the shadow objects below belong to.
+       */
+      QOpenGLContext *shadowContext;
+
+      QOpenGLExtraFunctions *glFunctions;
+
+      /**
+       * The program that draws with shadows, or nullptr when shadow
+       * mapping could not be set up.
+       */
+      QOpenGLShaderProgram *shadowProgram;
+
+      GLuint shadowFramebuffer;
+
+      GLuint shadowTexture;
+
+      bool showShadows;
 
       /**
        * The SIG_EnvironmentRenderer object that is

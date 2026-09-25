@@ -164,7 +164,18 @@ namespace SIGEL_Visualisation
 
   void SIG_RobotRenderer::render()
   {
-    renderSceneObjects();
+    renderLinks();
+    renderPoints();
+  };
+
+  void SIG_RobotRenderer::renderLinks()
+  {
+    renderSceneObjects( 0, static_cast<GLuint>(robot.getLinks().size()) );
+  };
+
+  void SIG_RobotRenderer::renderPoints()
+  {
+    renderSceneObjects( static_cast<GLuint>(robot.getLinks().size()), noOfObjects );
 
     for (GLuint i=static_cast<GLuint>(robot.getLinks().size()); i<noOfObjects; i++)
       {

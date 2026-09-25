@@ -90,6 +90,26 @@ namespace SIGEL_Visualisation
      */
     void render();
 
+    /**
+     * Calls the display list of the plane only.
+     *
+     * @pre The display lists are builded.
+     */
+    void renderPlane();
+
+    /**
+     * Calls the display list of the grid and draws the robot path,
+     * each if it is shown.
+     *
+     * @pre The display lists are builded.
+     */
+    void renderGridAndPath();
+
+    /**
+     * Returns true if the plane's display list draws the texture.
+     */
+    bool getWithTexture() const;
+
     QString exportToPovray();
 
     QString createPovrayDeclarations();

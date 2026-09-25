@@ -154,6 +154,14 @@ namespace SIGEL_Visualisation
      */
     void renderSceneObjects();
 
+    /**
+     * Calls the display lists of the scene objects from
+     * index first up to, but not including, index end.
+     *
+     * @pre The display lists are builded.
+     */
+    void renderSceneObjects( GLuint first, GLuint end );
+
     QString exportSceneObjectsToPovray();
   };
 

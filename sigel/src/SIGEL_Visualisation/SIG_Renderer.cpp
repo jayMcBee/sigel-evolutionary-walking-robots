@@ -53,8 +53,13 @@ namespace SIGEL_Visualisation
 
   void SIG_Renderer::renderSceneObjects()
   {
+    renderSceneObjects( 0, noOfObjects );
+  };
+
+  void SIG_Renderer::renderSceneObjects( GLuint first, GLuint end )
+  {
     glMatrixMode(GL_MODELVIEW);
-    for (GLuint i=0; i < noOfObjects; i++)
+    for (GLuint i=first; i < end; i++)
 	if (sceneObjects[i]->getVisible())
 	  {
 	    sceneObjects[i]->applyColor();

@@ -244,10 +244,26 @@ namespace SIGEL_Visualisation
 
     glMatrixMode( GL_MODELVIEW );
 
-    renderSceneObjects();
+    renderPlane();
+    renderGridAndPath();
+  };
+
+  void SIG_EnvironmentRenderer::renderPlane()
+  {
+    renderSceneObjects( 0, 1 );
+  };
+
+  void SIG_EnvironmentRenderer::renderGridAndPath()
+  {
+    renderSceneObjects( 1, noOfObjects );
 
     if (showRobotPath)
       renderRobotPath();
+  };
+
+  bool SIG_EnvironmentRenderer::getWithTexture() const
+  {
+    return withTexture;
   };
 
   QString SIG_EnvironmentRenderer::exportToPovray()
