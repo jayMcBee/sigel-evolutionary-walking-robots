@@ -148,9 +148,15 @@ class SIG_ExperimentListView : public QTreeWidget
   void slotLoadExperiment();
 
   /**
-   * Slot that is called when an experiment should be saved.
+   * Slot that is called when an experiment should be saved to its own file.
+   * An experiment without a file asks for one, as slotSaveExperimentAs does.
    */
   void slotSaveExperiment();
+
+  /**
+   * Slot that is called when an experiment should be saved under a new file name.
+   */
+  void slotSaveExperimentAs();
   
   /**
    * This slot is needed so one can select the GP parameters via the main menu.

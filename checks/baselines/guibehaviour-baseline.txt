@@ -287,6 +287,7 @@
     &File/&Delete Experiment                                   ENABLED
     &File/&Rename Experiment                                   ENABLED
     &File/&Save Experiment                                     ENABLED
+    &File/Save Experiment &As...                               ENABLED
     &File>Export/...to GNU plot                                ENABLED
     &File>Export/Environment                                   ENABLED
     &File>Export/GP-Parameters                                 ENABLED
@@ -350,7 +351,7 @@
   [action changes] none
 
 == ICONS ==
-actions=58 withIcon=32 loadedNothing=0
+actions=59 withIcon=32 loadedNothing=0
   &File/&Delete Experiment                                 icon=1 sizes=2
   &File/&New Experiment                                    icon=1 sizes=2
   &File/&Open Experiment                                   icon=1 sizes=2
@@ -359,6 +360,7 @@ actions=58 withIcon=32 loadedNothing=0
   &File/&Save Experiment                                   icon=1 sizes=2
   &File/Export                                             icon=0 sizes=0
   &File/Import                                             icon=0 sizes=0
+  &File/Save Experiment &As...                             icon=0 sizes=0
   &File>Export/...to GNU plot                              icon=0 sizes=0
   &File>Export/Environment                                 icon=0 sizes=0
   &File>Export/GP-Parameters                               icon=0 sizes=0
@@ -507,6 +509,7 @@ we do with the system?]
     &File/&Delete Experiment                                   ENABLED
     &File/&Rename Experiment                                   ENABLED
     &File/&Save Experiment                                     ENABLED
+    &File/Save Experiment &As...                               ENABLED
     &File>Export/...to GNU plot                                ENABLED
     &File>Export/Environment                                   ENABLED
     &File>Export/GP-Parameters                                 ENABLED
@@ -970,6 +973,7 @@ we do with the system?]
     &File/&Delete Experiment                                   ENABLED
     &File/&Rename Experiment                                   ENABLED
     &File/&Save Experiment                                     ENABLED
+    &File/Save Experiment &As...                               ENABLED
     &File>Export/...to GNU plot                                ENABLED
     &File>Export/Environment                                   ENABLED
     &File>Export/GP-Parameters                                 ENABLED
@@ -1176,6 +1180,7 @@ selected=17013
     &File/&Delete Experiment                                   ENABLED
     &File/&Rename Experiment                                   ENABLED
     &File/&Save Experiment                                     ENABLED
+    &File/Save Experiment &As...                               ENABLED
     &File>Export/...to GNU plot                                ENABLED
     &File>Export/Environment                                   ENABLED
     &File>Export/GP-Parameters                                 ENABLED
@@ -1297,6 +1302,7 @@ Do you want to replace it?]
     &File/&Delete Experiment                                   ENABLED
     &File/&Rename Experiment                                   ENABLED
     &File/&Save Experiment                                     ENABLED
+    &File/Save Experiment &As...                               ENABLED
     &File>Export/...to GNU plot                                ENABLED
     &File>Export/Environment                                   ENABLED
     &File>Export/GP-Parameters                                 ENABLED
@@ -1505,6 +1511,7 @@ Do you want to replace it?]
     &File/&Delete Experiment                                   ENABLED
     &File/&Rename Experiment                                   ENABLED
     &File/&Save Experiment                                     ENABLED
+    &File/Save Experiment &As...                               ENABLED
     &File>Export/...to GNU plot                                ENABLED
     &File>Export/Environment                                   ENABLED
     &File>Export/GP-Parameters                                 ENABLED
@@ -1855,6 +1862,7 @@ Do you want to replace it?]
     &File/&Delete Experiment                                   ENABLED
     &File/&Rename Experiment                                   ENABLED
     &File/&Save Experiment                                     ENABLED
+    &File/Save Experiment &As...                               ENABLED
     &File>Export/...to GNU plot                                ENABLED
     &File>Export/Environment                                   ENABLED
     &File>Export/GP-Parameters                                 ENABLED
@@ -2035,6 +2043,7 @@ Do you want to replace it?]
     &File/&Delete Experiment                                   ENABLED
     &File/&Rename Experiment                                   ENABLED
     &File/&Save Experiment                                     ENABLED
+    &File/Save Experiment &As...                               ENABLED
     &File>Export/...to GNU plot                                ENABLED
     &File>Export/Environment                                   ENABLED
     &File>Export/GP-Parameters                                 ENABLED
@@ -2264,6 +2273,7 @@ Do you want to replace it?]
     &File/&Delete Experiment                                   ENABLED
     &File/&Rename Experiment                                   ENABLED
     &File/&Save Experiment                                     ENABLED
+    &File/Save Experiment &As...                               ENABLED
     &File>Export/...to GNU plot                                ENABLED
     &File>Export/Environment                                   ENABLED
     &File>Export/GP-Parameters                                 ENABLED
@@ -2396,7 +2406,7 @@ Do you want to replace it?]
 # connected; the released one is the positive control for the locked one.
   [second atRest] Start=1 Hist=1 Auto=1 Comment=1 PS=1 Curve=1 GP=1 Sim=1 Robot=1 Lang=1 Env=1  live=11
   [second locked] Start=0 Hist=0 Auto=0 Comment=0 PS=0 Curve=0 GP=0 Sim=0 Robot=0 Lang=0 Env=0  live=0
-  [locked] every locked action: total=29 stillEnabled=0
+  [locked] every locked action: total=30 stillEnabled=0
   [modal] class=QMessageBox title=[Quit SIGEL]
   [answering] &No
   [locked] close during a run: asked=1 namesTheRun=1 stillUp=1
@@ -2443,6 +2453,7 @@ Do you want to replace it?]
     &File/&Delete Experiment                                   ENABLED
     &File/&Rename Experiment                                   ENABLED
     &File/&Save Experiment                                     ENABLED
+    &File/Save Experiment &As...                               ENABLED
     &File>Export/...to GNU plot                                ENABLED
     &File>Export/Environment                                   ENABLED
     &File>Export/GP-Parameters                                 ENABLED
@@ -2518,7 +2529,7 @@ Do you want to replace it?]
   [modal] class=SIGEL_MasterGUI::SIG_AddIndividualsDialog title=[Add individuals]
   add dialog: n=5
   individuals after Add=5
-  [modal] class=QFileDialog title=[Save Experiment]
+  [modal] class=QFileDialog title=[Save Experiment As]
   [savedialog] parentIsTheMainWindow=1
   programs=5  instructionLines=1018
   perProgramLengths=[30,152,638,45,153]
@@ -2566,6 +2577,7 @@ Do you want to replace it?]
     &File/&Delete Experiment                                   ENABLED
     &File/&Rename Experiment                                   ENABLED
     &File/&Save Experiment                                     ENABLED
+    &File/Save Experiment &As...                               ENABLED
     &File>Export/...to GNU plot                                ENABLED
     &File>Export/Environment                                   ENABLED
     &File>Export/GP-Parameters                                 ENABLED

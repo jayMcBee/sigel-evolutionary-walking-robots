@@ -214,11 +214,27 @@ void SIG_ExperimentListView::slotLoadExperiment()
 
 void SIG_ExperimentListView::slotSaveExperiment()
 {
+  SIG_GUIGPExperiment *theExperiment = currentlySelectedExperiment();
+  // "new" is the path of an experiment that has no file yet
+  if( !theExperiment || theExperiment->gpExperiment.getPath() == "new" ) {
+      slotSaveExperimentAs();
+      return;
+  }
+  theExperiment->putAllIntoExperiment();
+  QFile file( theExperiment->gpExperiment.getPath() );
+  if( file.open(QIODevice::WriteOnly) ) {
+      QTextStream theStream( &file );
+      theExperiment->gpExperiment.saveExperiment( theStream );
+  }
+};
+
+void SIG_ExperimentListView::slotSaveExperimentAs()
+{
   QString currentExperiment = currentlySelectedExperimentName();
   if (currentExperiment != QString() ) {
       SIG_GUIGPExperiment *theExperiment = getByExperimentName( currentExperiment );
       theExperiment->putAllIntoExperiment();
-      QString fileName = QFileDialog::getSaveFileName( this, "Save Experiment", theExperiment->getName(), "Experiment Files (*.exp);;All Files (*)" );
+      QString fileName = QFileDialog::getSaveFileName( this, "Save Experiment As", theExperiment->getName(), "Experiment Files (*.exp);;All Files (*)" );
       if( !fileName.isEmpty() ) {
 	  fileName = theExperiment->checkEnding( fileName, "exp" );
 	  QFile file( fileName );

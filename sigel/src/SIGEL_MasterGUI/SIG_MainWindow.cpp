@@ -169,7 +169,16 @@ SIG_MainWindow::SIG_MainWindow( QWidget * parent, const char * name, Qt::WindowF
 		    SIGNAL( triggered() ),
 		    experimentListView,
 		    SLOT( slotSaveExperiment() ) );
-  saveExperimentAction->setStatusTip( "Save the selected experiment..." );
+  saveExperimentAction->setStatusTip( "Save the selected experiment" );
+
+  QAction *saveExperimentAsAction = new QAction( "Save Experiment &As...", this );
+  fileMenu->addAction( saveExperimentAsAction );
+  experimentListView->experimentListViewMenu->addAction( saveExperimentAsAction );
+  QObject::connect( saveExperimentAsAction,
+		    SIGNAL( triggered() ),
+		    experimentListView,
+		    SLOT( slotSaveExperimentAs() ) );
+  saveExperimentAsAction->setStatusTip( "Save the selected experiment under a new name..." );
 
   fileMenu->addSeparator();
 
@@ -468,6 +477,7 @@ SIG_MainWindow::SIG_MainWindow( QWidget * parent, const char * name, Qt::WindowF
   noExperimentActions.append( renameExperimentAction );
   noExperimentActions.append( deleteExperimentAction );
   noExperimentActions.append( saveExperimentAction );
+  noExperimentActions.append( saveExperimentAsAction );
   noExperimentActions.append( viewGPParametersAction );
   noExperimentActions.append( viewSimulationParametersAction );
   noExperimentActions.append( viewLanguageParametersAction );
@@ -570,6 +580,7 @@ SIG_MainWindow::SIG_MainWindow( QWidget * parent, const char * name, Qt::WindowF
   evolutionRunningActions.append( renameExperimentAction );
   evolutionRunningActions.append( deleteExperimentAction );
   evolutionRunningActions.append( saveExperimentAction );
+  evolutionRunningActions.append( saveExperimentAsAction );
   evolutionRunningActions.append( importGPParametersAction );
   evolutionRunningActions.append( importSimulationParametersAction );
   evolutionRunningActions.append( importRobotAction );

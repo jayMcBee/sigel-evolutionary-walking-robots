@@ -547,11 +547,6 @@ touched, because changing one changes behaviour against the reference binary.
     count, so `MOVE -128` with 24 registers reads R8, not a register near
     R0.
 
-- [ ] **79. File > Save Experiment always asks for a file name.** Raised
-  2026-09-24. `SIG_ExperimentListView::slotSaveExperiment` opens
-  `QFileDialog::getSaveFileName` every time, so Save acts as Save As.
-  Interface work, to go with item 70.
-
 - [ ] **81. A fitness function that rewards steady walking.** Idea, 2026-09-24.
   No existing function rewards an even pace: `SIG_GPNiceWalkingFitnessFunction`
   only tests a fixed height band, pass or fail, and all but

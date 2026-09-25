@@ -2115,7 +2115,7 @@ static int guidriveMain(int argc, char **argv)
             if (!fd) { printf("  !! save modal is not a QFileDialog\n"); m->close(); return; }
             acceptFileDialog(fd, out);
         });
-        clickMenu("&File", "&Save Experiment");
+        clickMenu("&File", "Save Experiment &As...");
         QTest::qWait(4000);
         printf("  [saved] exists=%d size=%lld\n", QFile::exists(out),
                QFileInfo(out).size());
@@ -4386,7 +4386,7 @@ static int guidriveMain(int argc, char **argv)
         QString outB = scratch() + "/roundB.exp";
         QFile::remove(outA); QFile::remove(outB);
 
-        // Save the freshly loaded experiment through File > Save Experiment.
+        // Save the freshly loaded experiment through File > Save Experiment As.
         whenModal([outA](QWidget *m) {
             QFileDialog *fd = qobject_cast<QFileDialog *>(m);
             if (!fd) { printf("  !! save modal is not a QFileDialog\n"); m->close(); return; }
@@ -4406,11 +4406,11 @@ static int guidriveMain(int argc, char **argv)
             fflush(stdout);
             acceptFileDialog(fd, outA);
         });
-        clickMenu("&File", "&Save Experiment");
+        clickMenu("&File", "Save Experiment &As...");
         QTest::qWait(3000);
         printf("  [saved A] exists=%d size=%lld\n", QFile::exists(outA),
                QFileInfo(outA).size());
-        step("after File > Save Experiment", true, false);
+        step("after File > Save Experiment As", true, false);
 
         // Load the file we just wrote, as a SECOND experiment.
         openExperiment(outA);
@@ -4422,7 +4422,7 @@ static int guidriveMain(int argc, char **argv)
             if (!fd) { m->close(); return; }
             acceptFileDialog(fd, outB);
         });
-        clickMenu("&File", "&Save Experiment");
+        clickMenu("&File", "Save Experiment &As...");
         QTest::qWait(3000);
         printf("  [saved B] exists=%d size=%lld\n", QFile::exists(outB),
                QFileInfo(outB).size());
@@ -5321,7 +5321,7 @@ static int guidriveMain(int argc, char **argv)
                 if (!fd) { printf("  !! save modal is not a QFileDialog\n"); m->close(); return; }
                 acceptFileDialog(fd, evolved);   // never hand-roll a second one
             });
-            clickMenu("&File", "&Save Experiment");
+            clickMenu("&File", "Save Experiment &As...");
             QTest::qWait(8000);
             printf("  [evolved saved] exists=%d size=%lld path=%s\n",
                    QFile::exists(evolved), QFileInfo(evolved).size(),

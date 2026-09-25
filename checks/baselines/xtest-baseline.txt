@@ -127,6 +127,7 @@
     &File/&Delete Experiment                                   ENABLED
     &File/&Rename Experiment                                   ENABLED
     &File/&Save Experiment                                     ENABLED
+    &File/Save Experiment &As...                               ENABLED
     &File>Export/...to GNU plot                                ENABLED
     &File>Export/Environment                                   ENABLED
     &File>Export/GP-Parameters                                 ENABLED
