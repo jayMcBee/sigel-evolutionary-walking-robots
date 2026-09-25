@@ -902,8 +902,25 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-09-25 — DONE: THE TERRAIN CODE STREAMLINED.** Start here.
+
+- **Changed, in `SIG_EnvironmentRenderer`:**
+  - `drawInit` takes each face normal from `QVector3D::normal`;
+    `compute_face_normal`, `cross` and `normalize`, copied from DynaMechs,
+    are gone. Same formula and argument order. Measured over 1,000,000
+    random cells: flat cells identical, elsewhere at most 8.6e-6 per
+    component, because Qt uses `qHypot` and leaves a length within 1e-5 of
+    1 as it is. One step of an 8-bit colour is 3.9e-3.
+  - `buildGrid` uses `setTerrainVertex` in place of four written-out copies.
+  - `groundDepth`, `setTerrainVertex` and `terrainVertex` are private static
+    members, no longer file-static functions.
+  - `getTerrainDepth` holds the `getTerrainData` call that `drawInit` and
+    `buildGrid` both made. It drops the spacing DynaMechs returns, as both
+    did, so `setTerrainVertex` has no resolution parameter; it was always 1.
+- **Gates:** `check.sh` 936 pass, 0 fail; warnings 487. The other four gates
+  are green.
+
 **2026-09-25 — DONE: SIG_EnvironmentRenderer'S WRITE-ONLY FLAGS REMOVED.**
-Start here.
 
 - **Removed:** `renderMode`, `showPlane`, `showGrid` and `setRenderMode`,
   with its call on every frame in `SIG_SimulationVisualisation::visualize`.

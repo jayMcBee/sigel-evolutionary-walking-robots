@@ -159,28 +159,6 @@ namespace SIGEL_Visualisation
 			*/
     void drawInit();
 
-    /**	
-			*	The next three functions are copied from the gldraw.cpp file in the dynamechs
-			*	directory. For more information have a look at gldraw.cpp. These functions are
-			* used by drawInit() and computes the normal vector. This function uses the next two
-			*	functions to fullfill his task.
-			*
-			*
-			*/
-    inline void compute_face_normal(float v0[3], float v1[3], float v2[3],float normal[3]);
-
-		/**
-			*	This function computes the cross product. It is used by compute_face_normal.
-			*
-			*/
-    inline void cross(float a[3], float b[3], float c[3]);
-
-		/**
-			* This function normalizes a vector. It is used by compute_face_normal.
-			*
-			*/
-    inline float normalize(float v[3]);
-
 
   private:
 
@@ -200,6 +178,34 @@ namespace SIGEL_Visualisation
     void buildPlane(GLuint number);
 
     void buildGrid(GLuint number);
+
+    /**
+     * Returns the terrain's depth field and its size. The terrain is drawn
+     * with one unit between points; the spacing DynaMechs returns is not
+     * used.
+     */
+    double **getTerrainDepth( int &x_dim, int &z_dim ) const;
+
+    /**
+     * The depth at column x and row z. The robot starts at the terrain's
+     * corner, so the ground is drawn as far again on the negative side of
+     * each axis, with the start in the middle. Past the terrain, DynaMechs
+     * gives each point the height of the nearest edge, so the ground
+     * continues each edge outward; this lookup does the same.
+     */
+    static double groundDepth( double **depth, int x_dim, int z_dim, int x, int z );
+
+    /**
+     * Sets v to the terrain vertex at column x and row z.
+     */
+    static void setTerrainVertex( GLfloat v[3], int x, int z,
+				  double **depth, int x_dim, int z_dim );
+
+    /**
+     * Draws the vertex v. The texture repeats every two columns; t is 1 on
+     * row z+1 and 0 on row z.
+     */
+    static void terrainVertex( GLfloat const v[3], int x, GLfloat t, bool withTexture );
 
     void renderRobotPath();
 

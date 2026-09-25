@@ -21,6 +21,7 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 #include <QIODevice>
+#include <QVector3D>
 #include "SIGEL_Visualisation/SIG_EnvironmentRenderer.h"
 
 #include "SIGEL_Tools/SIG_TypeConverter.h"
@@ -92,26 +93,26 @@ namespace SIGEL_Visualisation
 					    blue ) );
   };
 
-  // The robot starts at the terrain's corner, so the ground is drawn as far
-  // again on the negative side of each axis, with the start in the middle.
-  // Past the terrain, DynaMechs gives each point the height of the nearest
-  // edge, so the ground continues each edge outward; this lookup does the same.
-  static double groundDepth( double **depth, int x_dim, int z_dim, int x, int z )
+  double **SIG_EnvironmentRenderer::getTerrainDepth( int &x_dim, int &z_dim ) const
+  {
+    double spacing;
+    return environment.getDMEnvironment()->getTerrainData( x_dim, z_dim, spacing );
+  }
+
+  double SIG_EnvironmentRenderer::groundDepth( double **depth, int x_dim, int z_dim, int x, int z )
   {
     return depth[ qBound( 0, x, x_dim - 1 ) ][ qBound( 0, z, z_dim - 1 ) ];
   }
 
-  // A terrain vertex at column x and row z.
-  static void setTerrainVertex( GLfloat v[3], int x, int z, double grid_resolution,
-				double **depth, int x_dim, int z_dim )
+  void SIG_EnvironmentRenderer::setTerrainVertex( GLfloat v[3], int x, int z,
+						  double **depth, int x_dim, int z_dim )
   {
-    v[0] = ((GLfloat) x)*grid_resolution;
+    v[0] = x;
     v[1] = -groundDepth( depth, x_dim, z_dim, x, z );
-    v[2] = ((GLfloat) z)*grid_resolution;
+    v[2] = z;
   }
 
-  // The texture repeats every two columns; t is 1 on row z+1 and 0 on row z.
-  static void terrainVertex( GLfloat const v[3], int x, GLfloat t, bool withTexture )
+  void SIG_EnvironmentRenderer::terrainVertex( GLfloat const v[3], int x, GLfloat t, bool withTexture )
   {
     if (withTexture)
       glTexCoord2f( (x % 2 == 0) ? 0.0 : 1.0, t );
@@ -151,17 +152,10 @@ namespace SIGEL_Visualisation
    	int x,z;
    	GLfloat vertex[2][3];
 	 	int x_dim, z_dim;
-	 	double grid_resolution;
-	 	double **depth;
+	 	double **depth = getTerrainDepth( x_dim, z_dim );
 	 	
   	glNewList(number, GL_COMPILE);
     glFrontFace( GL_CCW );
-
-	 	dmEnvironment *dynaMechsEnvironment = environment.getDMEnvironment();
-		depth = dynaMechsEnvironment->getTerrainData(x_dim, z_dim, grid_resolution);
-	 	// TODO: the method getTerrainData(...) doesn't correctly sets the grid_resolution
-	 	//	so it must be done manually
-	 	grid_resolution =1; 	 	
 
 	 	glTranslatef(0,0.01,0);
 	 	glRotated(180,1,0,0);
@@ -171,13 +165,8 @@ namespace SIGEL_Visualisation
       glBegin(GL_LINES);
     	for (x=1-x_dim; x<x_dim-1; ++x) {
           	
-      	vertex[0][0] = ((GLfloat) x)*grid_resolution;
-      	vertex[0][1] = -groundDepth(depth, x_dim, z_dim, x, z);
-      	vertex[0][2] = ((GLfloat) z)*grid_resolution;
-
-      	vertex[1][0] = ((GLfloat) x+1)*grid_resolution;
-      	vertex[1][1] = -groundDepth(depth, x_dim, z_dim, x+1, z);
-      	vertex[1][2] = ((GLfloat) z)*grid_resolution;
+      	setTerrainVertex( vertex[0], x,   z, depth, x_dim, z_dim );
+      	setTerrainVertex( vertex[1], x+1, z, depth, x_dim, z_dim );
 	
       	glVertex3fv(vertex[0]);
       	glVertex3fv(vertex[1]);
@@ -190,13 +179,8 @@ namespace SIGEL_Visualisation
       glBegin(GL_LINES);
       for (z=1-z_dim; z<z_dim-1; ++z) {
           	
-      	vertex[0][0] = ((GLfloat) x)*grid_resolution;
-      	vertex[0][1] = -groundDepth(depth, x_dim, z_dim, x, z);
-      	vertex[0][2] = ((GLfloat) z)*grid_resolution;
-
-      	vertex[1][0] = ((GLfloat) x)*grid_resolution;
-      	vertex[1][1] = -groundDepth(depth, x_dim, z_dim, x, z+1);
-      	vertex[1][2] = ((GLfloat) z+1)*grid_resolution;
+      	setTerrainVertex( vertex[0], x, z,   depth, x_dim, z_dim );
+      	setTerrainVertex( vertex[1], x, z+1, depth, x_dim, z_dim );
         	
       	glVertex3fv(vertex[0]);
       	glVertex3fv(vertex[1]);
@@ -514,17 +498,8 @@ namespace SIGEL_Visualisation
   void SIG_EnvironmentRenderer::drawInit() {
    int x, z;
 
-   GLfloat normal[3];
 	 int x_dim, z_dim;
-	 double grid_resolution;
-	 double **depth;
-	
-	 dmEnvironment *dynaMechsEnvironment = environment.getDMEnvironment();
-	
-	 depth = dynaMechsEnvironment->getTerrainData(x_dim, z_dim, grid_resolution);
-	 // TODO: the method getTerrainData(...) doesn't correctly sets the grid_resolution
-	 //	so it must be done manually
-	 grid_resolution =1;
+	 double **depth = getTerrainDepth( x_dim, z_dim );
 
 	 if (withTexture) {
    	 glEnable(GL_TEXTURE_2D);
@@ -541,19 +516,23 @@ namespace SIGEL_Visualisation
        glBegin(GL_TRIANGLES);
        for (x=2-x_dim; x<x_dim; ++x) {
             // a is row z+1, b is row z; 0 is column x-1, 1 is column x.
-            setTerrainVertex( a0, x-1, z+1, grid_resolution, depth, x_dim, z_dim );
-            setTerrainVertex( b0, x-1, z,   grid_resolution, depth, x_dim, z_dim );
-            setTerrainVertex( a1, x,   z+1, grid_resolution, depth, x_dim, z_dim );
-            setTerrainVertex( b1, x,   z,   grid_resolution, depth, x_dim, z_dim );
+            setTerrainVertex( a0, x-1, z+1, depth, x_dim, z_dim );
+            setTerrainVertex( b0, x-1, z,   depth, x_dim, z_dim );
+            setTerrainVertex( a1, x,   z+1, depth, x_dim, z_dim );
+            setTerrainVertex( b1, x,   z,   depth, x_dim, z_dim );
 
-            compute_face_normal(a0, b0, a1, normal);
-            glNormal3fv(normal);
+            QVector3D normal = QVector3D::normal( QVector3D( a0[0], a0[1], a0[2] ),
+						  QVector3D( b0[0], b0[1], b0[2] ),
+						  QVector3D( a1[0], a1[1], a1[2] ) );
+            glNormal3f( normal.x(), normal.y(), normal.z() );
             terrainVertex( a0, x-1, 1.0, withTexture );
             terrainVertex( b0, x-1, 0.0, withTexture );
             terrainVertex( a1, x,   1.0, withTexture );
 
-            compute_face_normal(b1, a1, b0, normal);
-            glNormal3fv(normal);
+            normal = QVector3D::normal( QVector3D( b1[0], b1[1], b1[2] ),
+					QVector3D( a1[0], a1[1], a1[2] ),
+					QVector3D( b0[0], b0[1], b0[2] ) );
+            glNormal3f( normal.x(), normal.y(), normal.z() );
             terrainVertex( a1, x,   1.0, withTexture );
             terrainVertex( b0, x-1, 0.0, withTexture );
             terrainVertex( b1, x,   0.0, withTexture );
@@ -562,39 +541,6 @@ namespace SIGEL_Visualisation
    } // for-loop (z)
 
 	 if (withTexture) glDisable(GL_TEXTURE_2D);
-  }
-
-  inline void SIG_EnvironmentRenderer::cross(float a[3], float b[3], float c[3]) {
-     c[0] = a[1]*b[2] - a[2]*b[1];
-     c[1] = a[2]*b[0] - a[0]*b[2];
-     c[2] = a[0]*b[1] - a[1]*b[0];
-  }
-
-  inline float SIG_EnvironmentRenderer::normalize(float v[3]) {
-      float norm = sqrt(v[0]*v[0] + v[1]*v[1] + v[2]*v[2]);
-
-      if (norm > 0.0) {
-         v[0] /= norm;
-         v[1] /= norm;
-         v[2] /= norm;
-      }
-
-      return norm;
-  }
-
-
-  inline void SIG_EnvironmentRenderer::compute_face_normal(float v0[3], float v1[3], float v2[3],float normal[3]) {
-      float a[3], b[3];
-      int i;
-
-      for (i=0; i<3; ++i) {
-          a[i] = v1[i] - v0[i];
-          b[i] = v2[i] - v0[i];
-      }
-
-      cross(a, b, normal);
-      normalize(normal);
-
   }
 
 }
