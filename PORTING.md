@@ -902,8 +902,25 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-09-25 — DONE: QUIT IS GREYED DURING A RUN.** Start here.
+
+- **Changed, by decision:** `quitProgramAction` is one of the
+  `evolutionRunningActions`, so File > Quit, its toolbar button and Ctrl+Q
+  are greyed during a run, like every other locked action. 1.3 kept Quit
+  enabled and asked a different question during a run; no reason was
+  recorded. Checked on the desktop with a copy of `runner.exp`.
+- **Not changed:** the window's close button during a run. Item 57 stays open
+  for it.
+- **Baselines:** one line of `guibehaviour-baseline.txt`, the locked-action
+  count, 30 to 31. Two runs gave identical output.
+- **Review:** no defects.
+- **Gates:** `check.sh` 936 pass, 0 fail; warnings 487. The other four gates
+  are green.
+- **Next:** Quit asks twice. Qt 6's `quit()` closes every window, so
+  `SIG_MainWindow::closeEvent` asks again after `slotAboutToQuit` has asked.
+  Agreed fix: `slotAboutToQuit` calls `close()`, and only `closeEvent` asks.
+
 **2026-09-25 — DONE: ITEM 79, SAVE WRITES TO THE EXPERIMENT'S OWN FILE.**
-Start here.
 
 - **Changed, by decision:** Save writes without a dialog; a new experiment
   asks. A new "Save Experiment As..." always asks. Details are in item 79's

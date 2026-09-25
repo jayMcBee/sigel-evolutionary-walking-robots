@@ -581,6 +581,7 @@ SIG_MainWindow::SIG_MainWindow( QWidget * parent, const char * name, Qt::WindowF
   evolutionRunningActions.append( deleteExperimentAction );
   evolutionRunningActions.append( saveExperimentAction );
   evolutionRunningActions.append( saveExperimentAsAction );
+  evolutionRunningActions.append( quitProgramAction );
   evolutionRunningActions.append( importGPParametersAction );
   evolutionRunningActions.append( importSimulationParametersAction );
   evolutionRunningActions.append( importRobotAction );
