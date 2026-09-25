@@ -250,12 +250,6 @@ namespace SIGEL_Visualisation
       SIGEL_Robot::SIG_Robot const &robot;
 
       /**
-       * The SIG_Environment object that should take part
-       * in the simulation.
-       */
-      SIGEL_Environment::SIG_Environment const &environment;
-
-      /**
        * The pointer to the SIG_RenderRecorder object that
        * is used to retrieve acutal information about the
        * elements of the simulation.
@@ -270,18 +264,6 @@ namespace SIGEL_Visualisation
        * Is created in the constructor.
        */
       SIGEL_Simulation::SIG_Simulation *simulation;
-
-      /**
-       * The SIG_SimulationParameter that should be used in
-       * the simulation.
-       */
-      SIGEL_Simulation::SIG_SimulationParameters const simulationParameter;
-
-      /**
-       * The SIG_Program object that should take part in
-       * the simulation.
-       */
-      SIGEL_Program::SIG_Program const &program;
 
       int frameCounter;
 

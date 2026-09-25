@@ -118,9 +118,6 @@ namespace SIGEL_Visualisation
        environmentRenderer(environment),
        robotRenderer(robot),
        robot(robot),
-       environment(environment),
-       simulationParameter(simulationParameter),
-       program(program),
        frameCounter( 0 )
    {
      robotPathPointAddingRate = static_cast< int >( 0.5 / simulationParameter.getStepSize() );

@@ -901,8 +901,18 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-09-25 — DONE: THREE DEAD MEMBERS OF SIG_SimulationVisualisation
+REMOVED.** Start here.
+
+- **Removed:** `environment`, `simulationParameter` (a full copy) and
+  `program`. The constructor's parameters have the same names, so every use
+  in the constructor read the parameter. No method read the members. The
+  simulation keeps references to the caller's objects, as before.
+- **Gates:** `check.sh` 936 pass, 0 fail; warnings 491. The other four gates
+  are green.
+
 **2026-09-25 — DONE: TWO UNUSED VISUALISATIONS REMOVED; THE ROBOT PATH
-STARTS OFF.** Start here.
+STARTS OFF.**
 
 - **Removed:** `SIG_RobotVisualisation` and `SIG_EnvironmentVisualisation`,
   4 files, 301 lines. The Makefile built them into the library, and nothing
@@ -914,8 +924,6 @@ STARTS OFF.** Start here.
   check box states, so the first view read whatever the memory held. Fresh
   heap memory is usually zero, so the path showed as off. It is now `false`,
   as the check box is unchecked by default.
-- **Next:** the dead members `environment`, `simulationParameter` and
-  `program` of `SIG_SimulationVisualisation`.
 - **Gates:** `check.sh` 936 pass, 0 fail; warnings 491. The other four gates
   are green.
 
