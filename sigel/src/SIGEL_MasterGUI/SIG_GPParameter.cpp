@@ -63,6 +63,30 @@ SIG_GPParameter::SIG_GPParameter( QWidget* parent,  const char* name, Qt::Window
 		    SIGNAL( itemDoubleClicked( QTreeWidgetItem *, int ) ),
 		    SLOT( slotItemDoubleClicked( QTreeWidgetItem * ) ) );
 
+  // Each instruction's slider drives its counter. These are connected here,
+  // not in the .ui: QLCDNumber::display is overloaded, and some uic versions
+  // write the connection without choosing an overload, which does not compile.
+  const QList<QPair<QSlider *, QLCDNumber *>> instructionCounters = {
+      { sliderADD, lcdnumberADD },
+      { sliderCMP, lcdnumberCMP },
+      { sliderCOPY, lcdnumberCOPY },
+      { sliderDELAY, lcdnumberDELAY },
+      { sliderDIV, lcdnumberDIV },
+      { sliderJMP, lcdnumberJMP },
+      { sliderLOAD, lcdnumberLOAD },
+      { sliderMAX, lcdnumberMAX },
+      { sliderMIN, lcdnumberMIN },
+      { sliderMOD, lcdnumberMOD },
+      { sliderMOVE, lcdnumberMOVE },
+      { sliderMUL, lcdnumberMUL },
+      { sliderNOP, lcdnumberNOP },
+      { sliderSENSE, lcdnumberSENSE },
+      { sliderSUB, lcdnumberSUB }
+    };
+  for ( const auto &[slider, counter] : instructionCounters )
+    QObject::connect( slider, &QSlider::valueChanged,
+		      counter, qOverload<int>( &QLCDNumber::display ) );
+
   // The counter has four digits, and on overflow it keeps showing the old ones.
   QObject::connect( lcdnumberTournamentsPerGeneration, &QLCDNumber::overflow, this, [this]()
     {

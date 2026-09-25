@@ -903,8 +903,25 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-09-25 — DONE: SIGEL BUILDS WITH QT 6.4's UIC.** Start here.
+
+- **Fixed, by decision:** the x86 machine, Debian 12 with Qt 6.4.2, could
+  not build `sigel`. Its uic writes the 15 slider-to-counter connections of
+  `SIG_GPParameterBase.ui` as `&QLCDNumber::display`, which is overloaded,
+  where Qt 6.10's uic writes `qOverload<int>`. The 15 connections moved from
+  the `.ui` into `SIG_GPParameter`'s constructor, with `qOverload<int>`. The
+  form keeps its other 11 connections. Checked on the desktop.
+- **Review:** no defects. No other connection in any form targets an
+  overloaded Qt slot; the others are `QDialog::accept`, `reject` and
+  `QWidget::setDisabled`.
+- **Baselines:** unchanged. The `pages` scenario prints every counter after
+  its slider moves. Two runs gave identical output.
+- **Gates:** `check.sh` 938 pass, 0 fail; warnings 487. The other four gates
+  are green.
+- **Next:** the x86 machine rebuilds. A separate copy of SIGEL for an
+  overnight evolution, then item 28.
+
 **2026-09-25 — DONE: ITEM 93, THE BUILD DATE AND TIME IN THE WINDOW TITLE.**
-Start here.
 
 - **Changed, by decision:** the title reads "SIGEL 1.4 (built <date> <time>)".
   Details are in item 93's entry in "Done". Checked on the desktop.
@@ -916,10 +933,7 @@ Start here.
   its list from `$(CORE)` and `$(GUI)`. The gates ran after the fix.
 - **Gates:** `check.sh` 938 pass, 0 fail; warnings 487. The other four gates
   are green.
-- **Next:** the x86 machine's build fails with Qt 6.4.2: its uic writes the 15
-  slider-to-LCD connections in `SIG_GPParameterBase.ui` without
-  `qOverload<int>`, and `QLCDNumber::display` is overloaded. The fix is to be
-  decided. Then the options for `sigel/README`'s version line.
+- **Next:** the x86 build failure with Qt 6.4.2.
 
 **2026-09-25 — DONE: A VERSION NUMBER, AND THE NEW LOGO IN THE ABOUT BOX.**
 
