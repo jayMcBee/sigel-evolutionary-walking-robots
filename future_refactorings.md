@@ -315,6 +315,13 @@ touched, because changing one changes behaviour against the reference binary.
   spotted — "Fitnesscurve" also appears in
   `SIG_ExperimentView::slotShowFitnesscurve`.
 
+- [ ] **93. The build date and time in the window title.** Asked for
+  2026-09-25, as a simple version mark. `SIG_MainWindow`'s constructor sets
+  the title to "SIGEL"; it gets the standard `__DATE__` and `__TIME__`. Those
+  are the time the file that uses them was compiled, not the time of the
+  link. `guidrive` prints the title (`[title] SIGEL`), so a title that
+  changes with each build must be masked in its output or kept out of it.
+
 ---
 
 ## 8 · Cleanup
