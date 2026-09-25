@@ -36,6 +36,7 @@
 #include <QColorDialog>
 #include <QTransform>
 
+#include <QtMath>
 #include <cmath>
 
 // namespace SIGEL_SlaveGUI
@@ -535,7 +536,7 @@ void SIG_SimulationVisualisationWidget::resetRecorder()
 	if (viewDirectionAngle > 360)
 	  viewDirectionAngle -= 360;
 
-	double radViewDirectionAngle = (viewDirectionAngle / 360) * 2 * pi;
+	double radViewDirectionAngle = qDegreesToRadians( viewDirectionAngle );
 
 #ifdef _WINDOWS
 	double newXPos = actXPos + ( ::sin( radViewDirectionAngle ) * distance );
@@ -562,7 +563,7 @@ void SIG_SimulationVisualisationWidget::resetRecorder()
 	double actXPos = visualisation->viewSettings.lookPoint.get( 0 );
 	double actZPos = visualisation->viewSettings.lookPoint.get( 2 );
 
-	double radViewDirectionAngle = (yaw / 360) * 2 * pi;
+	double radViewDirectionAngle = qDegreesToRadians( yaw );
 
 #ifdef _WINDOWS
 	double newXPos = actXPos + ( ::sin( radViewDirectionAngle ) * distance );
@@ -594,7 +595,7 @@ void SIG_SimulationVisualisationWidget::resetRecorder()
 	if (viewDirectionAngle > 360)
 	  viewDirectionAngle -= 360;
 
-	double radViewDirectionAngle = (viewDirectionAngle / 360) * 2 * pi;
+	double radViewDirectionAngle = qDegreesToRadians( viewDirectionAngle );
 
 #ifdef _WINDOWS
 	double newXPos = actXPos + ( ::sin( radViewDirectionAngle ) * distance );
@@ -625,7 +626,7 @@ void SIG_SimulationVisualisationWidget::resetRecorder()
 	if (viewDirectionAngle < 360)
 	  viewDirectionAngle += 360;
 
-	double radViewDirectionAngle = (viewDirectionAngle / 360) * 2 * pi;
+	double radViewDirectionAngle = qDegreesToRadians( viewDirectionAngle );
 
 #ifdef _WINDOWS
 	double newXPos = actXPos + ( ::sin( radViewDirectionAngle ) * distance );
@@ -684,7 +685,7 @@ void SIG_SimulationVisualisationWidget::resetRecorder()
     // The margin leaves room around the robot. The narrower of the two
     // view angles decides, so the robot fits both ways.
     double const margin = 1.25;
-    double const halfHeightAngle = SIGEL_Visualisation::SIG_Visualisation::fieldOfView / 360 * pi;
+    double const halfHeightAngle = qDegreesToRadians( SIGEL_Visualisation::SIG_Visualisation::fieldOfView / 2 );
     double halfAngle = halfHeightAngle;
     double const aspectRatio = visualisation->viewSettings.aspectRatio;
     if (aspectRatio < 1)

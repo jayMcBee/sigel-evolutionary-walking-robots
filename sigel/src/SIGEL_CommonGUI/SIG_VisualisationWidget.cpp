@@ -23,6 +23,7 @@
 #include <QMouseEvent>
 #include "SIGEL_CommonGUI/SIG_VisualisationWidget.h"
 
+#include <QtMath>
 #include <cmath>
 
 
@@ -41,12 +42,7 @@
       mouseXPos(0),
       mouseYPos(0),
       automaticRefresh(true),
-      mouseSensity(0.5),
-#ifdef _WINDOWS
-		pi( ::atan(1) * 4 )
-#else
-      pi( std::atan(1) * 4 )
-#endif
+      mouseSensity(0.5)
   {
     if ( name )
       setObjectName( QString::fromUtf8( name ) );
@@ -136,8 +132,8 @@
   {
     if (visualisation)
       {
-	double const radEyeYaw = (yaw / 360) * 2 * pi;
-	double const radEyePitch = (pitch / 360) * 2 * pi;
+	double const radEyeYaw = qDegreesToRadians( yaw );
+	double const radEyePitch = qDegreesToRadians( pitch );
 
 #ifdef _WINDOWS
 	double const sinEyeYaw = ::sin(radEyeYaw);
@@ -164,8 +160,8 @@
 	// its pitch, yaw and distance values.
 	// To guarantee that the line of sight is not parallel to
 	// the up-vector, the latter is recalculated.
-	double const radUpYaw = ( radEyeYaw < pi ) ? radEyeYaw + pi : radEyeYaw - pi;
-	double const radUpPitch = (pi / 2) - radEyePitch;
+	double const radUpYaw = ( radEyeYaw < M_PI ) ? radEyeYaw + M_PI : radEyeYaw - M_PI;
+	double const radUpPitch = (M_PI / 2) - radEyePitch;
 
 #ifdef _WINDOWS	
 	double const sinUpYaw = ::sin(radUpYaw);

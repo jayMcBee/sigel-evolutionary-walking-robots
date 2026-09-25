@@ -677,8 +677,8 @@ touched, because changing one changes behaviour against the reference binary.
   **What is there:** 9 Visual Studio project files at the source root, 7,962
   lines — `.dsp` for `Sigel`, `SIGELCommon`, `MetaSIGEL`, `sigel_slave` and
   `manage_dyn_slave`, plus `Sigel.dsw`, `Sigel.mak`, `sigel_slave.mak` and
-  `manage_dyn_slave.mak`; **202 `_WINDOWS`
-  occurrences across 55 files** — 191 `#ifdef`, 9 `#ifndef` and **2 inside
+  `manage_dyn_slave.mak`; **200 `_WINDOWS`
+  occurrences across 55 files** — 189 `#ifdef`, 9 `#ifndef` and **2 inside
   commented-out code in `MT_GPManager.cpp`, which no compile break will show**;
   4 `#include <windows.h>` in `MT_Controller.h`, `MT_Substitute.h`,
   `MT_GPManager.h` and `MT_GPManager.cpp`; and `HANDLE`, `DWORD WINAPI`,

@@ -56,7 +56,7 @@ using namespace SIGEL_CommonGUI;
       /**
        * The constructor of the SIG_VisualisationWidget.
        *
-       * Initializes the eyepoint and calculates @f$\pi@f$.
+       * Initializes the eyepoint.
        * MouseSensity is set to 0\. 5 at the moment.
        *
        * @param parent Pointer to this widget's parent.
@@ -262,14 +262,6 @@ using namespace SIGEL_CommonGUI;
        * of mouse movements.
        */
       double const mouseSensity;
-
-      /**
-       * The mathematical constant @f$\pi@f$.
-       *
-       * Its value is calculated in the constructor
-       * as @f$arctan(1)\cdot 4@f$.
-       */
-      double const pi;
 
       QList< SIGEL_CommonGUI::SIG_FloatingTextLabel * > floatingTextWidgets;
 

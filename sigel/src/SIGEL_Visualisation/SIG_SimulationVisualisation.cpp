@@ -29,6 +29,7 @@
 #include "SIGEL_Tools/SIG_IO.h"
 #include "SIGEL_Tools/SIG_TypeConverter.h"
 
+#include <QtMath>
 #include <cmath>
 
 using namespace SIGEL_Tools;
@@ -610,15 +611,9 @@ namespace SIGEL_Visualisation
 
     QTextStream stream( &file );
 
-#ifdef _WINDOWS
-    static double const pi = 4 * ::atan( 1 );
-#else
-    static double const pi = 4 * std::atan( 1 );
-#endif
-
     static double const xAngle = 100;
 
-    static double const xAngleRad = (xAngle / 360) * 2 * pi;
+    static double const xAngleRad = qDegreesToRadians( xAngle );
 
 #ifdef _WINDOWS
     static double const directionLength = 0.5 * 1 / ::tan( xAngleRad / 2 );

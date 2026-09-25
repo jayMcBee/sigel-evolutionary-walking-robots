@@ -902,8 +902,23 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-09-25 — DONE: THE VISUALISER USES Qt'S DEGREE CONVERSION.** Start
+here.
+
+- **Changed:** the two hand-made `pi` constants are gone: the member of
+  `SIG_VisualisationWidget` and the static in
+  `SIG_SimulationVisualisation::createPovrayIncludeFile`, each with a
+  `_WINDOWS` twin. The eight `(angle / 360) * 2 * pi` conversions use
+  `qDegreesToRadians`, and the up vector in `updateEyePoint` uses `M_PI`.
+  Measured: `atan(1) * 4` is `M_PI` exactly; over −720° to 720° in 0.1°
+  steps the two conversions agree exactly for 73% of angles and otherwise
+  differ by at most 2.2e-16 relative, one bit. The Windows item's
+  `_WINDOWS` tally drops by the two twins.
+- **Gates:** `check.sh` 936 pass, 0 fail; warnings 487. The other four gates
+  are green.
+
 **2026-09-25 — DONE: THE VISUALISER'S COMMENTS DESCRIBE THE CODE AS IT
-IS.** Start here.
+IS.**
 
 - **Changed, comments only:** the visualiser's comments about Qt 2, 1.3,
   `autoDelete`, `QGVector`, Visual C++ and "the original code" now say what
