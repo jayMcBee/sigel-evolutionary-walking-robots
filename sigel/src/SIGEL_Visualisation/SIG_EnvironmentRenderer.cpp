@@ -48,7 +48,8 @@ namespace SIGEL_Visualisation
       fieldEdgeLength( 1 ),
       renderMode( SIG_ViewSettings::wireFrame ),
       showPlane( true ),
-      showGrid( false )
+      showGrid( false ),
+      showRobotPath( false )
   {
 
     DL_matrix idRotation;

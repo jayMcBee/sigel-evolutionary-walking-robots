@@ -610,7 +610,7 @@ through `f0f2daa`.
 
 ## 7. Steps
 
-**Exit criterion per step:** `./checks/check.sh` from anywhere — **944 pass, 0
+**Exit criterion per step:** `./checks/check.sh` from anywhere — **936 pass, 0
 fail**. *The figure moves with the number of tracked text files, because the
 `encodings` check adds its own count to the total. Measured trail: **1136**
 until 2026-09-19, when `experiments/` and `robots/` arrived and
@@ -634,7 +634,9 @@ when `gui vs 1.3` and `guidump-baseline.txt` went, one pass each; **963** when
 passes per class and one for the file; **952** when item 82 removed
 `WIN_SIG_GPRemoteZORCFitnessFunction`, two `encodings` passes; **948** when
 it removed `SIG_GPZorcWalkingFitnessFunction`, four passes; **944** when it
-removed `SIG_GPStepperFitnessFunction`, four passes.*
+removed `SIG_GPStepperFitnessFunction`, four passes; **936** on 2026-09-25,
+when `SIG_RobotVisualisation` and `SIG_EnvironmentVisualisation` went, four
+passes each.*
 **The pass count was 853 until D31 and the jump is not new coverage of SIGEL's
 code.** The `encodings` check used to read 404 files of five extensions and now
 read all 618 tracked files then, 8 of which git called binary: its pass count went
@@ -899,7 +901,25 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-25 — DONE: SHADOWS IN THE SIMULATION VIEW.** Start here.
+**2026-09-25 — DONE: TWO UNUSED VISUALISATIONS REMOVED; THE ROBOT PATH
+STARTS OFF.** Start here.
+
+- **Removed:** `SIG_RobotVisualisation` and `SIG_EnvironmentVisualisation`,
+  4 files, 301 lines. The Makefile built them into the library, and nothing
+  used them. `SIGELCommon.dsp` still names them; the Windows item deletes that
+  file. That item's `_WINDOWS` tallies drop by the one `#ifdef` each
+  `SIG_EnvironmentVisualisation` file held.
+- **Fixed:** `SIG_EnvironmentRenderer`'s constructor did not set
+  `showRobotPath`. `SIG_SimulationWidget::visualizeThis` does not send the
+  check box states, so the first view read whatever the memory held. Fresh
+  heap memory is usually zero, so the path showed as off. It is now `false`,
+  as the check box is unchecked by default.
+- **Next:** the dead members `environment`, `simulationParameter` and
+  `program` of `SIG_SimulationVisualisation`.
+- **Gates:** `check.sh` 936 pass, 0 fail; warnings 491. The other four gates
+  are green.
+
+**2026-09-25 — DONE: SHADOWS IN THE SIMULATION VIEW.**
 
 - **Added, by decision:** shadow mapping with percentage-closer filtering in
   `SIG_SimulationVisualisation`. A sun fixed in the world, `sunDirection`,

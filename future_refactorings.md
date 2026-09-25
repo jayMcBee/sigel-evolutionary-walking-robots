@@ -677,8 +677,8 @@ touched, because changing one changes behaviour against the reference binary.
   **What is there:** 9 Visual Studio project files at the source root, 7,962
   lines — `.dsp` for `Sigel`, `SIGELCommon`, `MetaSIGEL`, `sigel_slave` and
   `manage_dyn_slave`, plus `Sigel.dsw`, `Sigel.mak`, `sigel_slave.mak` and
-  `manage_dyn_slave.mak`; **205 `_WINDOWS`
-  occurrences across 57 files** — 194 `#ifdef`, 9 `#ifndef` and **2 inside
+  `manage_dyn_slave.mak`; **203 `_WINDOWS`
+  occurrences across 55 files** — 192 `#ifdef`, 9 `#ifndef` and **2 inside
   commented-out code in `MT_GPManager.cpp`, which no compile break will show**;
   4 `#include <windows.h>` in `MT_Controller.h`, `MT_Substitute.h`,
   `MT_GPManager.h` and `MT_GPManager.cpp`; and `HANDLE`, `DWORD WINAPI`,
@@ -695,12 +695,11 @@ touched, because changing one changes behaviour against the reference binary.
   `#ifdef _WINDOWS` blocks one module at a time, keeping the `#else` half; the
   object file must not change.
   **Watch:** the 9 `#ifndef _WINDOWS` blocks are reverse polarity — the body is
-  kept and only the guard goes. **12 headers carry `_WINDOWS`**, and a mistake
+  kept and only the guard goes. **11 headers carry `_WINDOWS`**, and a mistake
   in one changes what every including translation unit sees: `MT_Controller.h`,
   `MT_Substitute.h`, `MT_GPManager.h`, `SIG_GPManager.h`, `SIG_Program.h`,
   `SIG_DynaMechsSimulationQueries.h`, `SIG_Recorder.h`, `SIG_Register.h`,
-  `SIG_SimulationQueries.h`, `SIG_EnvironmentRenderer.h`,
-  `SIG_EnvironmentVisualisation.h`, `SIG_Renderer.h`.
+  `SIG_SimulationQueries.h`, `SIG_EnvironmentRenderer.h`, `SIG_Renderer.h`.
   **It supersedes D22**, a signed decision: Fusion for the `#else` half, and the
   `#ifdef` half keeps Windows by name because Qt 6 still creates that style.
   Three live call sites — `sigel.cpp, main` and two in `sigel_slave.cpp`.
