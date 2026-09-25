@@ -159,7 +159,6 @@ namespace SIGEL_Visualisation
   	glNewList(number, GL_COMPILE);
     glFrontFace( GL_CCW );
 
-    //glNormal3i( 0, 1, 0 );
 	 	dmEnvironment *dynaMechsEnvironment = environment.getDMEnvironment();
 		depth = dynaMechsEnvironment->getTerrainData(x_dim, z_dim, grid_resolution);
 	 	// TODO: the method getTerrainData(...) doesn't correctly sets the grid_resolution
@@ -463,27 +462,17 @@ namespace SIGEL_Visualisation
   		return false;
   	}
   	
-  	// Determine width and height from header data.
+  	// The size and colour depth are fixed, not read from the header.
   	
-  	texture.width  = 256; //header[1] * 256 + header[0];
-  	texture.height = 256; //header[3] * 256 + header[2];
-
-  	// Determine color bit depth of the image (24 or 32).
-
-  	/*if(texture.width <= 0 || texture.height <= 0 || (header[4] != 24 && header[4] != 32)) {
-  		fclose(file);
-  		return;
-  	}*/
-
+  	texture.width  = 256;
+  	texture.height = 256;
   	texture.bpp  = 24;
-  	bytesPerPixel = 4; //texture.bpp / 8;
+  	bytesPerPixel = 4;
   	imageSize     = texture.width * texture.height * bytesPerPixel;
 
   	texture.imageData = (GLubyte *)malloc(imageSize);
 
-  	if(texture.imageData == NULL) { //  ||
-  			//fread(texture.imageData, 1, imageSize, file) != imageSize) {
-  		//if(texture.imageData != NULL) free(texture.imageData);
+  	if(texture.imageData == NULL) {
   		QMessageBox warn("Warning", "The specified texture-file does not contain valid data!\nDisplay it without a texture!",QMessageBox::Warning, QMessageBox::Retry, QMessageBox::NoButton,QMessageBox::NoButton, SIGEL_Tools::dialogParent());
   		warn.exec();  		
 

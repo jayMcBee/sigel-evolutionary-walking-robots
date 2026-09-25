@@ -901,8 +901,20 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-09-25 — DONE: COMMENTED-OUT CODE IN THE VISUALISER REMOVED.** Start
+here.
+
+- **Removed:** the commented-out code in
+  `SIG_SimulationWidget::slotSetSimulationTime`,
+  `SIG_EnvironmentRenderer::loadPNMTexture` and
+  `SIG_EnvironmentRenderer::buildGrid`. In `loadPNMTexture`, two comments
+  said the size and colour depth come from the header; one comment now says
+  they are fixed. No live code changed.
+- **Gates:** `check.sh` 936 pass, 0 fail; warnings 491. The other four gates
+  are green.
+
 **2026-09-25 — DONE: THREE DEAD MEMBERS OF SIG_SimulationVisualisation
-REMOVED.** Start here.
+REMOVED.**
 
 - **Removed:** `environment`, `simulationParameter` (a full copy) and
   `program`. The constructor's parameters have the same names, so every use

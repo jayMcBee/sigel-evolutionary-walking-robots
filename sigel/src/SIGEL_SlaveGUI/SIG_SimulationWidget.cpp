@@ -205,24 +205,9 @@ namespace SIGEL_SlaveGUI
   { char txt[256];
   	QString myTime;
 
-  // this had only a second resolution.. changed !
-  // simulationTimeTextLabel->setText( simulationTime.toString() );
-
   	sprintf(txt, "%d hours  %d min.  %d secs.", simulationTime.hour(), simulationTime.minute(), simulationTime.second());
 	myTime = txt;
 
-/*
-// hmm, simulationTime's microseconds field is not filled in by the caller..... someone should change that......
-	if (simulationTime.msec() < 10)
-	{	sprintf(txt, ".00%d seconds", simulationTime.msec());
-	}
-	else if (simulationTime.msec() < 100)
-	{	sprintf(txt, ".0%d seconds", simulationTime.msec());
-	}
-	else sprintf(txt, ".%d seconds", simulationTime.msec());
-
-	myTime += txt;
-*/
 	simulationTimeTextLabel->setText( myTime );
   };
 
