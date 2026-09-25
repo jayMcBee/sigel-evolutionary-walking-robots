@@ -1429,7 +1429,7 @@ Do you want to replace it?]
     parent [SIGEL_MasterGUI::SIG_MainWindow] tiedToMainWindow=1
     label pixmap=1 size=256x256
     text lines=16 vScrollPolicy=1
-    | Sigel v1.1
+    | Sigel v1.4
     | Developed by PG 368:
     | Christian "Krasstexta" Aue
     | Abdeladim "Silent Ad" Benkacem

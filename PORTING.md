@@ -610,7 +610,7 @@ through `f0f2daa`.
 
 ## 7. Steps
 
-**Exit criterion per step:** `./checks/check.sh` from anywhere — **936 pass, 0
+**Exit criterion per step:** `./checks/check.sh` from anywhere — **938 pass, 0
 fail**. *The figure moves with the number of tracked text files, because the
 `encodings` check adds its own count to the total. Measured trail: **1136**
 until 2026-09-19, when `experiments/` and `robots/` arrived and
@@ -636,7 +636,8 @@ passes per class and one for the file; **952** when item 82 removed
 it removed `SIG_GPZorcWalkingFitnessFunction`, four passes; **944** when it
 removed `SIG_GPStepperFitnessFunction`, four passes; **936** on 2026-09-25,
 when `SIG_RobotVisualisation` and `SIG_EnvironmentVisualisation` went, four
-passes each.*
+passes each; **938** when `SIGEL_Tools/SIG_Version.h` arrived, one pass in
+`headers standalone` and one in `encodings`.*
 **The pass count was 853 until D31 and the jump is not new coverage of SIGEL's
 code.** The `encodings` check used to read 404 files of five extensions and now
 read all 618 tracked files then, 8 of which git called binary: its pass count went
@@ -902,8 +903,28 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-25 — DONE: ITEM 57, THE WINDOW CANNOT BE CLOSED DURING A RUN.**
+**2026-09-25 — DONE: A VERSION NUMBER, AND THE NEW LOGO IN THE ABOUT BOX.**
 Start here.
+
+- **Added, by decision:** `SIGEL_Tools/SIG_Version.h`, class `SIG_Version`,
+  holds the version SIGEL shows, `number = "1.4"`, the work-in-progress
+  version. It holds only the version; the build date and time go into the
+  window title directly (item 93).
+- **Changed:** the About box, `SIG_InfoBox`, builds its heading from
+  `SIG_Version::number`, "Sigel v1.4" where it said "Sigel v1.1". It shows
+  `newLogoNoVersion.png`, which has no version drawn in, scaled from 1024 to
+  256 × 256 px, where it showed `altLogo.png` with "Sigel v1.0" drawn in.
+  `altLogo.png` stays in the tree for now, unused. Checked on the desktop.
+- **Baselines:** one line of `guibehaviour-baseline.txt`, the About text,
+  v1.1 to v1.4. Two runs gave identical output.
+- **Review:** no defects.
+- **Gates:** `check.sh` 938 pass, 0 fail; warnings 487. The other four gates
+  are green.
+- **Next:** item 93, the build date and time in the window title, with the
+  Makefile compiling `SIG_MainWindow.cpp` on every build. After it: the
+  options for `sigel/README`'s version line.
+
+**2026-09-25 — DONE: ITEM 57, THE WINDOW CANNOT BE CLOSED DURING A RUN.**
 
 - **Changed, by decision:** during a run, `SIG_MainWindow::closeEvent`
   ignores the close and asks nothing. Details are in item 57's entry in

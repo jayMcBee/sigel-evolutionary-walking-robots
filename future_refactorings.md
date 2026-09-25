@@ -204,16 +204,13 @@ Constructs the language removed. A current compiler rejects them.
   moves — `check.sh` has a check for exactly that failure. No reference file
   holds these names.
 
-- [ ] **16. Set the version to 2.0 — the last commit of the port.**
-  The tree disagrees with itself: `README` says `KDESIGEL v1.1 Readme File`, the
-  About box in `SIG_InfoBox` prints `Sigel v1.1`, and `pixmaps/altLogo.png`
-  carries a `Sigel v1.0` caption. "1.3" exists only in the tarball name.
-  **Rewritten 2026-09-20:** `configure.in` used to be the only real declaration
-  and this item said to set it; it went with the 2003 autotools build, so the
-  three above are now the whole story. Move all three or 2.0 ships the same
-  mismatch. **Decide first whether a version is declared anywhere at all** —
-  nothing prints one today, `sigel --version` does not exist, and the honest
-  alternative is that the About box is the only place a user ever sees it.
+- [ ] **16. Set the version to 2.0.** Since 2026-09-25 the version SIGEL
+  shows is declared once, in `SIGEL_Tools/SIG_Version.h`, as the
+  work-in-progress "1.4". The About box reads it, and its logo is
+  `newLogoNoVersion.png`, with no version drawn in. Left: `sigel/README`
+  still says `KDESIGEL v1.1 Readme File`; its options are still to be
+  discussed. `pixmaps/altLogo.png`, with a `Sigel v1.0` caption, is kept
+  but unused. Set "2.0" in `SIG_Version.h` when it is time.
 
 ---
 

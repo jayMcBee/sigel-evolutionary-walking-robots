@@ -26,6 +26,7 @@
 
 #include "SIGEL_MasterGUI/SIG_InfoBox.h"
 #include "SIGEL_MasterGUI/SIG_TextView.h"
+#include "SIGEL_Tools/SIG_Version.h"
 
 #include <cstdlib>
 
@@ -42,7 +43,9 @@ SIG_InfoBox::SIG_InfoBox( QWidget *parent, const char *name, bool modal, Qt::Win
 #endif
   this->setWindowTitle( "Sigel InfoBox" );
   QLabel *pixmapLabel = new QLabel( this );
-  pixmapLabel->setPixmap( QPixmap( sigelRoot + "/pixmaps/altLogo.png" ) );
+  // The image is 1024 x 1024; the box shows it at 256 x 256.
+  pixmapLabel->setPixmap( QPixmap( sigelRoot + "/pixmaps/newLogoNoVersion.png" )
+			  .scaled( 256, 256, Qt::KeepAspectRatio, Qt::SmoothTransformation ) );
   pixmapLabel->setFrameStyle( QFrame::Box | QFrame::Sunken );
   // pixmapLabel->setScaledContents( true );
 
@@ -54,7 +57,7 @@ SIG_InfoBox::SIG_InfoBox( QWidget *parent, const char *name, bool modal, Qt::Win
   hL->addLayout( vL );
   SIG_TextView *theView = new SIG_TextView( this, nullptr );
   theView->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
-  theView->setText("<h3>Sigel v1.1</h3>"
+  theView->setText(QString("<h3>Sigel v%1</h3>").arg( SIGEL_Tools::SIG_Version::number ) +
 		   "<h3>Developed by PG 368:</h3>"
 		   "<ul>"
 		   "<li>Christian <b>&quot;Krasstexta&quot;</b> Aue</li>"
