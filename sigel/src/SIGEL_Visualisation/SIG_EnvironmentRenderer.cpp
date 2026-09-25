@@ -46,9 +46,6 @@ namespace SIGEL_Visualisation
 #endif
       lookPoint(0, 0, 0),
       fieldEdgeLength( 1 ),
-      renderMode( SIG_ViewSettings::wireFrame ),
-      showPlane( true ),
-      showGrid( false ),
       showRobotPath( false )
   {
 
@@ -71,6 +68,7 @@ namespace SIGEL_Visualisation
 
     grid->setPosition( DL_vector(0, planeLevel, 0) );
     grid->setRotation( idRotation );
+    grid->setVisible( false );
 
     delete sceneObjects[ 1 ];
     sceneObjects[ 1 ] = grid;
@@ -387,25 +385,14 @@ namespace SIGEL_Visualisation
     lookPoint = newPosition;
   };
 
-  void SIG_EnvironmentRenderer::setRenderMode( SIG_ViewSettings::renderModeType newRenderMode )
-  {
-    renderMode = newRenderMode;
-
-    setShowGrid( showGrid );
-  };
-
   void SIG_EnvironmentRenderer::setShowPlane( bool newShowPlane )
   {
-    showPlane = newShowPlane;
-
-    sceneObjects[ 0 ]->setVisible( showPlane );
+    sceneObjects[ 0 ]->setVisible( newShowPlane );
   };
 
   void SIG_EnvironmentRenderer::setShowGrid( bool newShowGrid )
   {
-    showGrid = newShowGrid;
-
-    sceneObjects[ 1 ]->setVisible( showGrid );
+    sceneObjects[ 1 ]->setVisible( newShowGrid );
   };
 
   void SIG_EnvironmentRenderer::setShowRobotPath( bool newShowRobotPath )

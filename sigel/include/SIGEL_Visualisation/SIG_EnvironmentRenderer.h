@@ -116,8 +116,6 @@ namespace SIGEL_Visualisation
 
     void setLookPoint( DL_vector newPosition );
 
-    void setRenderMode( SIG_ViewSettings::renderModeType newRenderMode );
-
     void setPlaneColor( double red,
 			double green,
 			double blue );
@@ -218,12 +216,6 @@ namespace SIGEL_Visualisation
     GLint const fieldEdgeLength;
 
     DL_vector lookPoint;
-
-    SIG_ViewSettings::renderModeType renderMode;
-
-    bool showPlane;
-
-    bool showGrid;
 
     bool showRobotPath;
 

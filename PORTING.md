@@ -902,7 +902,24 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-25 — DONE: DEAD LOCALS IN THE VISUALISER REMOVED.** Start here.
+**2026-09-25 — DONE: SIG_EnvironmentRenderer'S WRITE-ONLY FLAGS REMOVED.**
+Start here.
+
+- **Removed:** `renderMode`, `showPlane`, `showGrid` and `setRenderMode`,
+  with its call on every frame in `SIG_SimulationVisualisation::visualize`.
+  `setShowPlane` and `setShowGrid` set the scene object's visibility
+  directly.
+- **Kept, by moving it:** a scene object starts visible, and the grid was
+  hidden only because that call re-applied `showGrid` (false) on every
+  frame; the first view does not send the check box states. The constructor
+  now hides the grid, as the "Show grid" box starts unchecked. Checked on
+  Xvfb: no grid on the first view, the grid shows when ticked, the plane goes
+  when unticked. A POV-Ray export before the first draw no longer includes
+  the hidden grid.
+- **Gates:** `check.sh` 936 pass, 0 fail; warnings 487. The other four gates
+  are green.
+
+**2026-09-25 — DONE: DEAD LOCALS IN THE VISUALISER REMOVED.**
 
 - **Removed:** `normal[3]` in `SIG_EnvironmentRenderer::buildGrid`; `xPos`,
   `zPos` and a repeated `glMatrixMode` in `SIG_EnvironmentRenderer::render`

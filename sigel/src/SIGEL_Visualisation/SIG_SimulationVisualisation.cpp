@@ -414,7 +414,6 @@ namespace SIGEL_Visualisation
      SIG_Visualisation::visualize();
 
      environmentRenderer.setLookPoint( viewSettings.lookPoint );
-     environmentRenderer.setRenderMode( viewSettings.renderMode );
 
      bool const pointMode = (viewSettings.renderMode == SIG_ViewSettings::points);
      bool const hidden = (viewSettings.renderMode == SIG_ViewSettings::hiddenLine)
