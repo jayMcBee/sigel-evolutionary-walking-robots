@@ -196,6 +196,17 @@
       };
   };
 
+  void SIG_SimulationVisualisationWidget::setShowShadows( bool show )
+  {
+    if (visualisation)
+      {
+	static_cast< SIGEL_Visualisation::SIG_SimulationVisualisation* >( visualisation )->setShowShadows( show );
+
+	if (automaticRefresh)
+	  update();
+      };
+  };
+
 
 
   void SIG_SimulationVisualisationWidget::makeTimeSteps(int noOfSteps)
@@ -672,6 +683,12 @@ void SIG_SimulationVisualisationWidget::resetRecorder()
 	if (automaticRefresh)
 	  update();
       };
+  };
+
+  bool SIG_SimulationVisualisationWidget::canShowShadows() const
+  {
+    return visualisation
+      && static_cast< SIGEL_Visualisation::SIG_SimulationVisualisation const* >( visualisation )->canShowShadows();
   };
 
   double SIG_SimulationVisualisationWidget::getFittingDistance() const

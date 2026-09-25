@@ -402,6 +402,11 @@ namespace SIGEL_Visualisation
     showShadows = newShowShadows;
   };
 
+  bool SIG_SimulationVisualisation::canShowShadows() const
+  {
+    return shadowProgram != nullptr;
+  };
+
    void SIG_SimulationVisualisation::visualize()
    {
      bool const shadowed = showShadows

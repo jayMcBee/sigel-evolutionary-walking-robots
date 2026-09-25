@@ -98,6 +98,12 @@ namespace SIGEL_Visualisation
       void setShowShadows( bool newShowShadows );
 
       /**
+       * Returns false when shadow mapping could not be set up; then
+       * setShowShadows has no effect.
+       */
+      bool canShowShadows() const;
+
+      /**
        * This method finally initiates the calling
        * of certain OpenGL rendering commands.
        *

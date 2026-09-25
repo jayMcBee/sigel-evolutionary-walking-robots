@@ -602,6 +602,16 @@
                 </widget>
               </item>
               <item row="14" column="0">
+                <widget class="QCheckBox" name="showShadowsCheckBox">
+                  <property name="text">
+                    <string>Show shadows</string>
+                  </property>
+                  <property name="checked">
+                    <bool>true</bool>
+                  </property>
+                </widget>
+              </item>
+              <item row="15" column="0">
                 <spacer name="Spacer3">
                   <property name="sizeHint">
                     <size>

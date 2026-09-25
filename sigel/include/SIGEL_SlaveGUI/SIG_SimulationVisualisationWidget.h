@@ -96,6 +96,12 @@
       double getFittingDistance() const;
 
       /**
+       * Returns false when there is no visualisation or it could not
+       * set up shadow mapping.
+       */
+      bool canShowShadows() const;
+
+      /**
        * Stops the running simulation while a modal dialog is open.
        * Does nothing if the simulation is not running.
        */
@@ -117,6 +123,8 @@
       void setShowGrid( int state );
 
       void setShowRobotPath( int state );
+
+      void setShowShadows( bool show );
 
       /**
        * Toggles between playing and pause state of the simulation.

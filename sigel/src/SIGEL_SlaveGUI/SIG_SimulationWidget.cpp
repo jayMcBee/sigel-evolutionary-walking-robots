@@ -164,6 +164,9 @@ namespace SIGEL_SlaveGUI
 		      SIGNAL(stateChanged(int)),
 		      visualisationWidget,
 		      SLOT(setShowRobotPath(int)) );
+
+    QObject::connect( showShadowsCheckBox, &QCheckBox::toggled,
+		      visualisationWidget, &SIG_SimulationVisualisationWidget::setShowShadows );
   };
 
   SIG_SimulationWidget::~SIG_SimulationWidget()
@@ -228,6 +231,9 @@ namespace SIGEL_SlaveGUI
     visualisationWidget->setRenderMode( renderModeComboBox->currentText() );
     visualisationWidget->setAmbientLighting( ambientLightingSlider->value() );
 
+    showShadowsCheckBox->setEnabled( visualisationWidget->canShowShadows() );
+    visualisationWidget->setShowShadows( showShadowsCheckBox->isChecked() );
+
     QString programCode;
     SIGEL_Program::SIG_Program &varProgram = const_cast< SIGEL_Program::SIG_Program& >( program );
     varProgram.printToString( programCode );
@@ -272,6 +278,8 @@ namespace SIGEL_SlaveGUI
     visualisationWidget->setShowPlane( showPlaneCheckBox->isChecked() ? 2 : 0 );
     visualisationWidget->setShowGrid( showGridCheckBox->isChecked() ? 2 : 0 );
     visualisationWidget->setShowRobotPath( showRobotPathCheckBox->isChecked() ? 2 : 0 );
+    showShadowsCheckBox->setEnabled( visualisationWidget->canShowShadows() );
+    visualisationWidget->setShowShadows( showShadowsCheckBox->isChecked() );
 
     int showAnchorPointsState;
 

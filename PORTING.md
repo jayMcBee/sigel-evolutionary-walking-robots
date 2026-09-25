@@ -902,8 +902,34 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-09-25 — DONE: A "SHOW SHADOWS" CHECK BOX.** Start here.
+
+- **Added:** a "Show shadows" check box under "Show anchor points", ticked at
+  the start. `SIG_SimulationVisualisationWidget::setShowShadows( bool )`
+  calls `SIG_SimulationVisualisation::setShowShadows` and repaints as "Show
+  grid" does; it is connected to `toggled`. `SIG_SimulationWidget` sends the
+  box state again in `visualizeThis` and `slotStopSimulation`, where the
+  visualisation is made again. There it also greys the box out when the new
+  `canShowShadows` of both classes returns false: shadow mapping could not
+  be set up.
+- **Changed, by decision:** the viewer window opens at 1098 x 900, where it
+  was 1014 x 810, and its minimum is 780 x 839, where it was 780 x 810. At
+  810 px the panel had no free space, and the new row pushed the Navigation
+  group over "Simulationtime". Measured on Xvfb: the 3-D view is 740 x 740
+  at 1098 x 900, and at 780 x 839 the panel shows without overlap.
+- **Tested** on Xvfb with a copy of `walker.exp`: in flatshaded mode the box
+  switches the shadow off and on, and the image after ticking it again is
+  the same to the pixel. With the vertex shader broken on purpose in a local
+  build, the error was printed and the box was greyed out. Checked on the
+  desktop.
+- **Review** found one gap: Stop did not grey the box again. Fixed.
+- **Gates:** `check.sh` 936 pass, 0 fail; warnings 487. The other four gates
+  are green.
+- **Next:** the ambient lighting scale and the shadow box that clips limbs,
+  from the shadows entry below.
+
 **2026-09-25 — DONE: ONE EYE-POINT CALCULATION; VISUALISER CLEAN-UP
-PAUSED.** Start here.
+PAUSED.**
 
 - **Changed:** `SIG_ViewSettings::getAbsoluteEyePoint` returns the eye
   point in world coordinates. `SIG_Visualisation::visualize` and
@@ -3737,7 +3763,7 @@ else that stops matching 1.3 still needs justifying as a defect.
 | **Play pauses while a modal dialog is open.** 1.3 keeps the simulation running under a dialog | by decision 2026-09-23, item 65: at Frame Delay 0 the dialog was never drawn and the viewer hung. `SIG_SimulationWindow::event`, `SIG_SimulationVisualisationWidget::pauseForDialog` and `resumeAfterDialog` | nothing: no scenario plays the simulation under a dialog |
 | **Play steps once per frame on screen, and waits while the viewer window is minimised or on another workspace.** At Frame Delay 0 it is capped at about the display's refresh rate. 1.3 drew each step with `updateGL()`, not tied to the refresh, and on X11 kept stepping while minimised | by decision 2026-09-23: Play steps once per frame on screen, and a window that is not exposed shows no frames. `SIG_SimulationVisualisationWidget::slotSimulationProgress` and `slotFrameShown` | nothing |
 | **A movie frame that cannot be saved stops the recording with a warning, for every format.** 1.3 warned only for POV-Ray; for the image formats `callRenderPixMap` returned true whatever the save gave | by decision 2026-09-23, item 67. `SIG_SimulationVisualisationWidget::callRenderPixMap` and `makeTimeSteps` | nothing: no scenario records a movie |
-| **The viewer window opens at 1014 x 810, so the 3-D view is square.** 1.3 opens it at 780 x 810; at that size the port's view is 422 x 655 | by decision 2026-09-23, item 66. `SIG_SimulationWindow`'s constructor | nothing |
+| **The viewer window opens at 1098 x 900, so the 3-D view is square, 740 x 740.** 1.3 opens it at 780 x 810. The minimum is 780 x 839, the smallest height at which the control panel fits | by decision 2026-09-23, item 66; 1098 x 900 on 2026-09-25, when "Show shadows" added a row. `SIG_SimulationWindow`'s constructor | nothing |
 | **The 3-D view draws the ground on both sides of the start.** 1.3 draws the terrain only from 0 to its size, so the robot starts at its corner. 1.0 drew a flat floor that moved with the camera | by decision 2026-09-23, item 42: the ground on the negative side too, each edge continued outward at the heights the physics uses. `SIG_EnvironmentRenderer::drawInit`, `buildGrid` and `groundDepth` | nothing: no check covers the floor |
 | **A render mode "Hidden lines".** 1.3 has Wireframe, Flatshaded and Gouraudshaded | by decision 2026-09-23, item 63. `SIG_ViewSettings::hiddenLine`, `SIG_SimulationVisualisation::visualize` | nothing: no check covers the render modes |
 | **A render mode "Points", with the back points hidden.** 1.3 has Wireframe, Flatshaded and Gouraudshaded | by decision 2026-09-23, item 63. `SIG_ViewSettings::points`, `SIG_SimulationVisualisation::visualize` | nothing: no check covers the render modes |
