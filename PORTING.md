@@ -903,8 +903,25 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-25 — DONE: A VERSION NUMBER, AND THE NEW LOGO IN THE ABOUT BOX.**
+**2026-09-25 — DONE: ITEM 93, THE BUILD DATE AND TIME IN THE WINDOW TITLE.**
 Start here.
+
+- **Changed, by decision:** the title reads "SIGEL 1.4 (built <date> <time>)".
+  Details are in item 93's entry in "Done". Checked on the desktop.
+- **Baselines:** 32 `[title]` lines of `guibehaviour-baseline.txt` and 3 of
+  `xtest-baseline.txt`, each `SIGEL` to `SIGEL 1.4 (built <DATE>)`, and
+  nothing else. Two runs gave identical output.
+- **Review:** no defects. Its one finding, that the first rule also compiled
+  `SIG_RealInterface.cpp`, which no module builds, was fixed: the rule takes
+  its list from `$(CORE)` and `$(GUI)`. The gates ran after the fix.
+- **Gates:** `check.sh` 938 pass, 0 fail; warnings 487. The other four gates
+  are green.
+- **Next:** the x86 machine's build fails with Qt 6.4.2: its uic writes the 15
+  slider-to-LCD connections in `SIG_GPParameterBase.ui` without
+  `qOverload<int>`, and `QLCDNumber::display` is overloaded. The fix is to be
+  decided. Then the options for `sigel/README`'s version line.
+
+**2026-09-25 — DONE: A VERSION NUMBER, AND THE NEW LOGO IN THE ABOUT BOX.**
 
 - **Added, by decision:** `SIGEL_Tools/SIG_Version.h`, class `SIG_Version`,
   holds the version SIGEL shows, `number = "1.4"`, the work-in-progress
@@ -920,9 +937,7 @@ Start here.
 - **Review:** no defects.
 - **Gates:** `check.sh` 938 pass, 0 fail; warnings 487. The other four gates
   are green.
-- **Next:** item 93, the build date and time in the window title, with the
-  Makefile compiling `SIG_MainWindow.cpp` on every build. After it: the
-  options for `sigel/README`'s version line.
+- **Next:** item 93.
 
 **2026-09-25 — DONE: ITEM 57, THE WINDOW CANNOT BE CLOSED DURING A RUN.**
 
@@ -5102,6 +5117,16 @@ carried; other items and this file cite them, so they do not change.
     visualizeThis` calls `resizeGL` with logical pixels where Qt uses device
     pixels. Qt 6.10's `QOpenGLWidget` sets the viewport in device pixels
     itself before each `paintGL`, and the aspect ratio is the same in both.
+
+- [x] **93. The build date and time in the window title** — done
+  2026-09-25, by decision. `SIG_MainWindow`'s constructor sets the title to
+  "SIGEL 1.4 (built Sep 25 2026 21:02:07)": the version from `SIG_Version`,
+  then `__DATE__` and `__TIME__`. The Makefile's `TITLE_OBJ` rule compiles
+  `SIG_MainWindow.cpp` again whenever any other object of the built modules,
+  `$(CORE)` and `$(GUI)`, is compiled, so the date is the latest build's. A
+  relink with nothing compiled keeps the older date. An always-rebuild target
+  was not taken: every `make -q` in `check.sh` would fail. `guidrive` masks
+  the date as `(built <DATE>)`, and only where one is there.
 
 - [x] **57. Quit during a run left the run going** — done 2026-09-25, by
   decision, in two steps. File > Quit, its toolbar button and Ctrl+Q are

@@ -471,6 +471,14 @@ endef
 $(foreach m,$(CORE),$(eval $(call core_lib,$(m))))
 $(foreach m,$(GUI),$(eval $(call core_lib,$(m))))
 
+# The main window's title shows the build date and time, which __DATE__ and
+# __TIME__ fix when SIG_MainWindow.cpp is compiled. So it is compiled again
+# whenever any other SIGEL object is. A target that always rebuilds would do
+# it too, but would make every `make -q' in checks/check.sh fail.
+TITLE_OBJ := $(OBJ)/sigel/SIGEL_MasterGUI/SIG_MainWindow.o
+$(TITLE_OBJ): $(filter-out $(TITLE_OBJ),$(patsubst $(SRC)/src/%.cpp,$(OBJ)/sigel/%.o,\
+  $(foreach m,$(CORE) $(GUI),$(wildcard $(SRC)/src/$(m)/*.cpp))))
+
 # One fitness evaluation. --start-group because the core modules have cycles:
 # SIGEL_GP calls SIGEL_Simulation, which reaches back through SIG_Robot.
 #

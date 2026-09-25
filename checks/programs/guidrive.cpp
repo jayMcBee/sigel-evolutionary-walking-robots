@@ -363,7 +363,13 @@ static void step(const char *what, bool tree = true, bool page = true,
                  bool inds = false, bool wid = false)
 {
     printf("\n== STEP %d: %s ==\n", ++stepNo, what);
-    printf("  [title] %s\n", qPrintable(W->windowTitle()));
+    // The title carries the build date and time, which change with every
+    // build. Masked only where they are there, so the output still shows them.
+    static const QRegularExpression built(QStringLiteral(
+        R"(\(built [A-Z][a-z]{2} [ 0-9]\d \d{4} \d\d:\d\d:\d\d\)$)"));
+    QString title = W->windowTitle();
+    title.replace(built, QStringLiteral("(built <DATE>)"));
+    printf("  [title] %s\n", qPrintable(title));
     if (tree) dumpTree();
     if (page) dumpPage();
     if (inds) dumpIndividuals();

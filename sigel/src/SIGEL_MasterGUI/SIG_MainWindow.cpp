@@ -31,6 +31,7 @@
 
 #include "SIGEL_MasterGUI/SIG_MainWindow.h"
 #include "SIGEL_MasterGUI/SIG_InfoBox.h"
+#include "SIGEL_Tools/SIG_Version.h"
 
 #include <cstdlib>
 
@@ -49,7 +50,10 @@ SIG_MainWindow::SIG_MainWindow( QWidget * parent, const char * name, Qt::WindowF
 #endif
 
   resize( 1280, 860 );
-  setWindowTitle( "SIGEL" );
+  // The Makefile compiles this file again whenever any other SIGEL object is
+  // compiled, so the date is the latest build's.
+  setWindowTitle( QString( "SIGEL %1 (built %2 %3)" )
+		  .arg( SIGEL_Tools::SIG_Version::number, __DATE__, __TIME__ ) );
 
   splitter = new QSplitter( this );
   splitter->setObjectName( "Splitter" );

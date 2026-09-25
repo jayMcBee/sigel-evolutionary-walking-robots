@@ -92,7 +92,7 @@
 == SCENARIO xtest ==
 
 == STEP 1: fresh start, no experiment ==
-  [title] SIGEL
+  [title] SIGEL 1.4 (built <DATE>)
   [tree] header=[Experiments] topLevel=0
   [page] count=1 current=QLabel objectName=[baseWidget]
   [action changes] none
@@ -100,7 +100,7 @@
   [filedialog] title=[Load Experiments] mode=3 nameFilters=[Experiment Files (*.exp) ;; All Files (*)] labelAccept=[&Open]
 
 == STEP 2: after File > Open Experiment ==
-  [title] SIGEL
+  [title] SIGEL 1.4 (built <DATE>)
   [tree] header=[Experiments] topLevel=1
       twoBases.exp             sel=1 exp=1 cur=1 selectable=1
         Individuals              sel=0 exp=0 cur=0 selectable=1
@@ -169,7 +169,7 @@
     TB:viewToolBar/&Simulation Parameters                      ENABLED
 
 == STEP 3: after View > Population ==
-  [title] SIGEL
+  [title] SIGEL 1.4 (built <DATE>)
   [tree] header=[Experiments] topLevel=1
       twoBases.exp             sel=0 exp=1 cur=0 selectable=1
         Individuals              sel=1 exp=0 cur=1 selectable=1
