@@ -301,14 +301,6 @@ touched, because changing one changes behaviour against the reference binary.
 
 ## 7 · The interface
 
-- [ ] **27. Name the three signals in the wildcard disconnect.**
-  `SIG_AllIndividualsView::slotEvolutionNotRunning` calls
-  `QObject::disconnect(individualList->listviewIndividuals, 0, 0, 0)`,
-  byte-identical to 2003, and Qt 6 warns on
-  stderr each time an evolution starts. The code below it reconnects the same
-  three signals. **Not before the `gui behaviour` check covers an actual
-  evolution** — that path is unguarded today.
-
 - [ ] **28. Check every UI label for grammar and typos.** One pass over every
   label, button, menu entry, tooltip and dialog title. Most are in `ui/`; the
   rest are literals in `src/`. `pushbuttonShowFitnessCurve` is one already

@@ -5069,6 +5069,12 @@ carried; other items and this file cite them, so they do not change.
     pixels. Qt 6.10's `QOpenGLWidget` sets the viewport in device pixels
     itself before each `paintGL`, and the aspect ratio is the same in both.
 
+- [x] **27. The wildcard disconnect in `SIG_AllIndividualsView::
+  slotEvolutionNotRunning`** — dropped 2026-09-25, by decision: no defect is
+  left. Commit `a541679` already names the receiver, so the disconnect cuts
+  only the list's links to this view, and the three it reconnects are all of
+  them.
+
 - [x] **79. File > Save Experiment always asked for a file name** — done
   2026-09-25, by decision. `SIG_ExperimentListView::slotSaveExperiment` now
   writes to the experiment's own file, `SIG_GPExperiment::getPath()`, which
