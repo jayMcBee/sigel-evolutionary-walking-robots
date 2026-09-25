@@ -479,18 +479,48 @@ touched, because changing one changes behaviour against the reference binary.
   robot loads and the simulation runs into NaN without a message. A warning
   at load, naming the link and the mesh file, is one option.
 
-- [ ] **77. An analysis view in the robot panel?** Idea, 2026-09-24. Two
-  figures that help whoever builds a robot model, reported by the x86 session
-  on 1.3 and not re-measured here:
-  - joint-limit stability per joint, `timestep * sqrt(K / I)` and
-    `timestep * damper / I`. The shipped models sit in a narrow band. A
+- [ ] **77. A robot checker.** Idea, 2026-09-24; the name is still open:
+  checker, advisor or sanity check. It reads a robot model and its Language
+  Parameters and warns about what will make evolution fail or mislead.
+  - **Joint-limit stability per joint**, `timestep * sqrt(K / I)` and
+    `timestep * damper / I`. Reported by the x86 session on 1.3, not
+    re-measured here. The shipped models sit in a narrow band. A
     `JOINTLIMITSK_SPRING` of 25000, taken from a one-joint robot onto a
     three-joint chain, put the limit-spring torque above half the full drive
-    torque, with no warning;
-  - drive strength against weight per drive,
-    `maximalforce / (mass * g * half-length)`. It is 0.60 to 0.92 in all
-    seven shipped models, whose masses span 1.2 to 49; nothing documents it,
-    so a new model can be badly under- or over-powered.
+    torque, with no warning.
+  - **Drive strength against weight per drive**,
+    `maximalforce / (mass * g * half-length)`. Same source. It is 0.60 to
+    0.92 in all seven shipped models, whose masses span 1.2 to 49; nothing
+    documents it, so a new model can be badly under- or over-powered.
+  - **The following come from reading 1.3's `SIG_Interpreter::interprete` and
+    `SIG_DynaMechsCommandInterface::moveDrive`, 2026-09-25.** The port is
+    expected to match; not checked yet.
+    - **Unreachable drives.** MOVE picks drive
+      `(register value + 2^(w-1)) % number of drives`, w the register width.
+      With more drives than 2^w values, some drives can never move.
+    - **Unevenly chosen drives.** With 2^w not a multiple of the number of
+      drives, the first drives get one register value more: 43 against 42
+      for 6 drives at 8 bits. It grows as w shrinks.
+    - **A register width of 1 breaks force drives:** the force divides by
+      2 * (2^(w-1) - 1), which is 0.
+    - **Torque resolution.** A force drive gives
+      `maximalforce * R0 / (2^(w-1) - 1)`; a small w gives few torque levels.
+    - **`minimalforce` is a dead band.** Torques below it are not applied. A
+      minimum above the maximum means the drive never acts; a minimum large
+      against one torque step makes most register values do nothing.
+    - **Servo drives read the register value as an angle in degrees**,
+      clamped to the joint's limits. With 8 bits only -128 to 127 degrees
+      can be reached.
+    - **Drive numbers are the order in the model.** Reordering, adding or
+      removing a drive silently changes which joint an evolved program moves,
+      so an existing population stops meaning what it did.
+    - **SENSE picks its sensor from a register value too;** the same two
+      reach and balance checks likely apply to sensors. Not read yet.
+  - **Program facts to show beside it, not model defects:** every MOVE takes
+    its torque from R0, so a program that moves several drives must reload
+    R0; and a negative register operand is taken modulo an unsigned register
+    count, so `MOVE -128` with 24 registers reads R8, not a register near
+    R0.
 
 - [ ] **78. The Name column on the Individuals page is too narrow.** Raised
   2026-09-24 after the runner run: it should be 50% wider, and the table has
