@@ -67,6 +67,31 @@ Constructs the language removed. A current compiler rejects them.
 - [ ] **7. `explicit` on single-argument constructors** — per module. Every
   break is an implicit conversion that was happening silently.
 
+- [ ] **92. Remove the `const_cast`s where the API allows it, and the `(void)`
+  parameter lists.** Counted 2026-09-25.
+  - **25 `const_cast`s in six modules.** None is undefined behaviour today:
+    each object was created non-const and is only read through the cast. But
+    a later write through one would be, and the compiler would not say so.
+    - **Keep, 10:** PVM's C functions take `char*` for strings they only
+      read: `SIG_GPFitnessTrainer` (8), `SIG_GPPVMData::sendQStringToPVM`
+      (1), `SIG_AllIndividualsView`'s spawn (1).
+    - **Meta-GP, 9:** the three tournament classes and `MT_Evaluator` cast
+      programs and an individual because `MT_Classifier::createNewTCase` and
+      `classifier` take non-const pointers. Make those take `const` if they
+      only read.
+    - **`getLine`, 2:** `SIG_Interpreter::interprete` and
+      `SIG_ProgramLine::operator=`; item 91.
+    - **Robot and environment, 4:** `SIG_DynaMechsCommandInterface::moveDrive`
+      (`SIG_Joint` from a const drive), `SIG_DynaMechsLink` (`SIG_Geometry`),
+      `SIG_EarlyRunTermSimulation` (keeps a mutable robot pointer),
+      `SIG_EnvironmentRenderer` (keeps a mutable environment reference).
+      Needs const getters on `SIG_Joint` and `SIG_Geometry`, and the two
+      stored references made const.
+  - **289 `(void)` parameter lists in 61 files**, a C habit: `SIGEL_Robot`
+    (40 files), `SIGEL_RobotIO` (14), `SIGEL_GP` (4), `SIGEL_Simulation` (3).
+    `f(void)` becomes `f()`; mechanical, one commit. No `(void)x` casts were
+    found.
+
 ---
 
 ## 3 · Ownership
