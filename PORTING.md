@@ -903,7 +903,27 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-25 — DONE: SIGEL BUILDS WITH QT 6.4's UIC.** Start here.
+**2026-09-26 — DONE: ITEM 70, CLONE EXPERIMENT (EMPTY POOL).** Start here.
+
+- **Added, by decision:** File > Clone Experiment (Empty Pool)... Details are
+  in item 70's entry in "Done". The name was chosen from five options.
+- **Review:** two risks found. Saving over another open experiment's file is
+  left as it is, by decision. An experiment that uses MetaGP is refused, by
+  decision; the second review found no defects in that check. A comment in
+  `SIG_MainWindow::slotEnableNoExperimentActions` no longer gives action
+  counts, which were wrong.
+- **Baselines:** `guibehaviour-baseline.txt` gains the menu entry (12 lines),
+  the action count 59 to 60 and the locked-action count 31 to 32;
+  `xtest-baseline.txt` gains one entry line. Two runs gave identical output.
+- **Gates:** `check.sh` 938 pass, 0 fail; warnings 487. The other four gates
+  are green.
+- **Also since the last entry:** item 94 recorded (adding many individuals is
+  slow). The overnight copy of SIGEL runs from the scratchpad with its own
+  PVM tree and `PVM_TMP`.
+- **Next:** item 88, options to be tried locally and presented. Item 28
+  waits for decisions on the proposed label list.
+
+**2026-09-25 — DONE: SIGEL BUILDS WITH QT 6.4's UIC.**
 
 - **Fixed, by decision:** the x86 machine, Debian 12 with Qt 6.4.2, could
   not build `sigel`. Its uic writes the 15 slider-to-counter connections of
@@ -918,8 +938,7 @@ classes and leave truncation a hard error. **They are not interchangeable.**
   its slider moves. Two runs gave identical output.
 - **Gates:** `check.sh` 938 pass, 0 fail; warnings 487. The other four gates
   are green.
-- **Next:** the x86 machine rebuilds. A separate copy of SIGEL for an
-  overnight evolution, then item 28.
+- **Next:** the x86 machine rebuilds.
 
 **2026-09-25 — DONE: ITEM 93, THE BUILD DATE AND TIME IN THE WINDOW TITLE.**
 
@@ -5131,6 +5150,23 @@ carried; other items and this file cite them, so they do not change.
     visualizeThis` calls `resizeGL` with logical pixels where Qt uses device
     pixels. Qt 6.10's `QOpenGLWidget` sets the viewport in device pixels
     itself before each `paintGL`, and the aspect ratio is the same in both.
+
+- [x] **70. A menu command that clones an experiment with a fresh
+  population** — done 2026-09-26, by decision. File > Clone Experiment (Empty
+  Pool)..., also in the experiment list's right-click menu, asks for a file
+  name first, so the clone has its own file and autosave works. It copies the
+  selected experiment through `saveExperiment` into a string and
+  `loadExperiment` into a temporary `SIG_GPExperiment`, deletes every
+  individual, sets generation and next identifier to 0, clears the history,
+  writes the result to the chosen file and opens it as File > Open does. No
+  random individuals are added; the pool is filled with Individuals > Add.
+  File > Open's loop body is now `SIG_ExperimentListView::openExperimentFile`,
+  shared by both. **An experiment that uses MetaGP is refused:** saving it
+  writes its MetaGP file, and the clone would share that file. **Not
+  guarded, by decision:** choosing the file of another open experiment; the
+  file dialog asks before it overwrites. Greyed with no experiment and during
+  a run. Checked on the desktop: a clone of an octopus experiment matches it
+  up to the population block, which holds 0 individuals at generation 0.
 
 - [x] **93. The build date and time in the window title** — done
   2026-09-25, by decision. `SIG_MainWindow`'s constructor sets the title to

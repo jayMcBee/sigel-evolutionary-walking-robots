@@ -427,17 +427,6 @@ touched, because changing one changes behaviour against the reference binary.
   `STARTPOSITION` in the `.exp` files, a file change, or the terrain's place
   in DynaMechs, a vendor patch. Positions and fitness move with it.
 
-- [ ] **70. A menu command that clones an experiment with a fresh population.**
-  Asked for 2026-09-23. It keeps the robot and every parameter, and replaces
-  the population with new random individuals at generation 0, with no
-  history. Today the interface cannot do this in one step: deleting all
-  individuals keeps the generation count and the history. The runner's fresh
-  start after the sensor fixes was made outside the interface, with SIGEL's
-  own calls: `SIG_GPPopulation::deleteIndividual` for every individual,
-  `setPoolGeneration(0)`, `setNextIdentifier("0")`, clear
-  `SIG_GPExperiment::experimentHistory`, then
-  `SIG_GPPopulation::addRandomIndividuals` and `saveExperiment`.
-
 - [ ] **72. A slave result of exactly -1.0 hangs the run.** Found 2026-09-23
   by reading `SIG_GPFitnessTrainer::checkTask` and its callers in
   `SIG_GPManager`: `checkTask` receives the result and deletes the task, but

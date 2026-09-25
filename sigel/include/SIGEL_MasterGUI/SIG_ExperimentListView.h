@@ -33,6 +33,8 @@
 namespace SIGEL_MasterGUI
 {
 
+class SIG_ExperimentItem;
+
   /**
    * The class that lets the user view the experiments.
    */
@@ -131,6 +133,13 @@ class SIG_ExperimentListView : public QTreeWidget
      * Slot that is called when "New Experiment" was selected.
      */
   void slotNewExperiment();
+
+    /**
+     * Slot that is called when "Clone Experiment (Empty Pool)" was selected.
+     * Asks for a file and writes a copy of the selected experiment to it, with
+     * no individuals, generation 0 and no history, then opens that file.
+     */
+  void slotCloneExperiment();
 
  /**
   * Slot that is called whenever an experiment shall be renamed.
@@ -276,6 +285,12 @@ class SIG_ExperimentListView : public QTreeWidget
    * makes use of the meta gp-system.
    */
   void currentExperimentChanged();
+
+ private:
+  /**
+   * Opens one experiment file as a new list entry, as File > Open does.
+   */
+  SIG_ExperimentItem *openExperimentFile( const QString &absFileName );
 
  protected:
 

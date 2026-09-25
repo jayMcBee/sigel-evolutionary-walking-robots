@@ -115,6 +115,15 @@ SIG_MainWindow::SIG_MainWindow( QWidget * parent, const char * name, Qt::WindowF
 		    SLOT( slotNewExperiment() ) );
   newExperimentAction->setStatusTip( "Create a new experiment..." );
 
+  QAction *cloneExperimentAction = new QAction( "&Clone Experiment (Empty Pool)...", this );
+  fileMenu->addAction( cloneExperimentAction );
+  experimentListView->experimentListViewMenu->addAction( cloneExperimentAction );
+  QObject::connect( cloneExperimentAction,
+		    SIGNAL( triggered() ),
+		    experimentListView,
+		    SLOT( slotCloneExperiment() ) );
+  cloneExperimentAction->setStatusTip( "Copy the selected experiment into a new file, with an empty pool and no history..." );
+
   QAction *renameExperimentAction = new QAction( "&Rename Experiment", this );
   renameExperimentAction->setToolTip( "Rename" );
   renameExperimentAction->setIconText( "Rename" );
@@ -482,6 +491,7 @@ SIG_MainWindow::SIG_MainWindow( QWidget * parent, const char * name, Qt::WindowF
   noExperimentActions.append( deleteExperimentAction );
   noExperimentActions.append( saveExperimentAction );
   noExperimentActions.append( saveExperimentAsAction );
+  noExperimentActions.append( cloneExperimentAction );
   noExperimentActions.append( viewGPParametersAction );
   noExperimentActions.append( viewSimulationParametersAction );
   noExperimentActions.append( viewLanguageParametersAction );
@@ -585,6 +595,7 @@ SIG_MainWindow::SIG_MainWindow( QWidget * parent, const char * name, Qt::WindowF
   evolutionRunningActions.append( deleteExperimentAction );
   evolutionRunningActions.append( saveExperimentAction );
   evolutionRunningActions.append( saveExperimentAsAction );
+  evolutionRunningActions.append( cloneExperimentAction );
   evolutionRunningActions.append( quitProgramAction );
   evolutionRunningActions.append( importGPParametersAction );
   evolutionRunningActions.append( importSimulationParametersAction );
@@ -898,10 +909,9 @@ void SIG_MainWindow::slotEnableNoExperimentActions( bool enable )
   for ( QAction *a : noExperimentActions )
     a->setEnabled( enable );
 
-  // 24 of these 30 actions are ALSO in evolutionRunningActions (30, not
-  // 32: the appends of mtChoiceTypeActionGroup and mtConfigureAction are
-  // commented out). During a run, re-apply the lock after this loop rather
-  // than filtering the list, so the two lists cannot drift apart.
+  // Most of these actions are also in evolutionRunningActions. During a run,
+  // re-apply the lock after this loop rather than filtering the list, so the
+  // two lists cannot drift apart.
   if ( enable && experimentListView->isRunning() )
     slotEnableEvolutionRunningActions( false );
 };

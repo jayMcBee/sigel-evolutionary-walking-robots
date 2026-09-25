@@ -166,50 +166,105 @@ void SIG_ExperimentListView::slotLoadExperiment()
   if( !filesToOpen.isEmpty() )
     {
       for( int i = 0; i < filesToOpen.count(); i++)
-	{
-	  QString absFileName = filesToOpen[i];
-	  int slashPosition = absFileName.lastIndexOf( "/" );
-	  QString fileName = absFileName.right( absFileName.length() - (slashPosition + 1) );
-	  if ( experimentExists( fileName ) )
-	    fileName = getAlternativeName( fileName );
-	  SIG_ExperimentItem *theNewItem = new SIG_ExperimentItem( this, fileName );
-
-	  // SIG_GPPopulation::readFromFile and SIG_AllIndividualsView::slotCompleteRefreshList
-	  // run processEvents below, before this name is in experimentDict. Qt 6
-	  // makes even a non-selectable item current on focus-in; a disabled one not.
-	  theNewItem->setExpanded(false);
-	  theNewItem->setFlags( theNewItem->flags() & ~( Qt::ItemIsSelectable | Qt::ItemIsEnabled ) );
-
-	  SIG_GUIGPExperiment *theNewExperiment = new SIG_GUIGPExperiment( fileName, widgetStack, theNewItem );
-	  QObject::connect( theNewExperiment,
-			    SIGNAL( signalEvolutionNotRunning( bool ) ),
-			    this,
-			    SIGNAL( evolutionNotRunning( bool ) ) );
-	  
-	  QFile file( absFileName );
-	  if( file.open(QIODevice::ReadOnly) )
-	    {
-	      QTextStream theStream( &file );
-	      // this is for the autosave function
-	      // so the gpExperiment knows where to save the experiment
-	      theNewExperiment->gpExperiment.setPath(absFileName);
-	      theNewExperiment->gpExperiment.loadExperiment( theStream );
-	      theNewExperiment->getAllOutOfExperiment();
-	    }
-	  else
-	    {
-	      QMessageBox::warning( this, "File could not be opened", "The file " + fileName + " could not be opened for reading." );
-	    }
-	  experimentDict.insert( fileName , theNewExperiment );
-	  emit isNotEmpty( true );
-
-	  theNewItem->setFlags( theNewItem->flags() | Qt::ItemIsSelectable | Qt::ItemIsEnabled );
-	  theNewItem->setExpanded(true);
-	  
-	} // for each filename end
+	openExperimentFile( filesToOpen[i] );
       if ( QTreeWidgetItem *firstItem = topLevelItem( 0 ) )
 	    setCurrentItem( firstItem );
     };
+};
+
+SIG_ExperimentItem *SIG_ExperimentListView::openExperimentFile( const QString &absFileName )
+{
+  int slashPosition = absFileName.lastIndexOf( "/" );
+  QString fileName = absFileName.right( absFileName.length() - (slashPosition + 1) );
+  if ( experimentExists( fileName ) )
+    fileName = getAlternativeName( fileName );
+  SIG_ExperimentItem *theNewItem = new SIG_ExperimentItem( this, fileName );
+
+  // SIG_GPPopulation::readFromFile and SIG_AllIndividualsView::slotCompleteRefreshList
+  // run processEvents below, before this name is in experimentDict. Qt 6
+  // makes even a non-selectable item current on focus-in; a disabled one not.
+  theNewItem->setExpanded(false);
+  theNewItem->setFlags( theNewItem->flags() & ~( Qt::ItemIsSelectable | Qt::ItemIsEnabled ) );
+
+  SIG_GUIGPExperiment *theNewExperiment = new SIG_GUIGPExperiment( fileName, widgetStack, theNewItem );
+  QObject::connect( theNewExperiment,
+		    SIGNAL( signalEvolutionNotRunning( bool ) ),
+		    this,
+		    SIGNAL( evolutionNotRunning( bool ) ) );
+
+  QFile file( absFileName );
+  if( file.open(QIODevice::ReadOnly) )
+    {
+      QTextStream theStream( &file );
+      // this is for the autosave function
+      // so the gpExperiment knows where to save the experiment
+      theNewExperiment->gpExperiment.setPath(absFileName);
+      theNewExperiment->gpExperiment.loadExperiment( theStream );
+      theNewExperiment->getAllOutOfExperiment();
+    }
+  else
+    {
+      QMessageBox::warning( this, "File could not be opened", "The file " + fileName + " could not be opened for reading." );
+    }
+  experimentDict.insert( fileName , theNewExperiment );
+  emit isNotEmpty( true );
+
+  theNewItem->setFlags( theNewItem->flags() | Qt::ItemIsSelectable | Qt::ItemIsEnabled );
+  theNewItem->setExpanded(true);
+  return theNewItem;
+};
+
+void SIG_ExperimentListView::slotCloneExperiment()
+{
+  SIG_GUIGPExperiment *theExperiment = currentlySelectedExperiment();
+  if( !theExperiment ) {
+      QMessageBox::warning( this, "No experiment selected", "Currently there is no experiment selected!" );
+      return;
+  }
+  // Saving writes the MetaGP system's own file, and the clone would share it.
+  if( theExperiment->gpExperiment.mtController->IsEnabled() ) {
+      QMessageBox::information( this, "Clone Experiment (Empty Pool)", "An experiment that uses MetaGP cannot be cloned." );
+      return;
+  }
+  QString fileName = QFileDialog::getSaveFileName( this, "Clone Experiment (Empty Pool)", QString(), "Experiment Files (*.exp);;All Files (*)" );
+  if( fileName.isEmpty() )
+    return;
+  fileName = theExperiment->checkEnding( fileName, "exp" );
+
+  // A copy of everything, made with the same calls as Save and Open, in an
+  // experiment that is never shown. The selected one is only read.
+  theExperiment->putAllIntoExperiment();
+  QString copy;
+  {
+    QTextStream copyOut( &copy, QIODevice::WriteOnly );
+    theExperiment->gpExperiment.saveExperiment( copyOut );
+  }
+  SIGEL_GP::SIG_GPExperiment fresh;
+  {
+    QTextStream copyIn( &copy, QIODevice::ReadOnly );
+    fresh.loadExperiment( copyIn );
+  }
+
+  // No individuals, generation 0, no history: filled like a new experiment.
+  while( fresh.population.getSize() > 0 )
+    fresh.population.deleteIndividual( fresh.population.getSize() - 1 );
+  fresh.population.setPoolGeneration( 0 );
+  fresh.population.setNextIdentifier( "0" );
+  qDeleteAll( fresh.experimentHistory );
+  fresh.experimentHistory.clear();
+
+  QFile file( fileName );
+  if( !file.open(QIODevice::WriteOnly) ) {
+      QMessageBox::warning( this, "File could not be written", "The file " + fileName + " could not be opened for writing." );
+      return;
+  }
+  {
+    QTextStream theStream( &file );
+    fresh.saveExperiment( theStream );
+  }
+  file.close();
+
+  setCurrentItem( openExperimentFile( fileName ) );
 };
 
 void SIG_ExperimentListView::slotSaveExperiment()

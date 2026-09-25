@@ -124,6 +124,7 @@
     slider   [sliderIntervall] value=0 min=0 max=100 enabled=1
     progress [generationProgBar] value=-1 min=0 max=100
   [action changes]
+    &File/&Clone Experiment (Empty Pool)...                    ENABLED
     &File/&Delete Experiment                                   ENABLED
     &File/&Rename Experiment                                   ENABLED
     &File/&Save Experiment                                     ENABLED
