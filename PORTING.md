@@ -644,14 +644,15 @@ read all 618 tracked files then, 8 of which git called binary: its pass count we
 adding or deleting one moves the total by one; `portinglog.txt` did that on
 2026-09-09.*
 **The warning figure is not an exit criterion and moves with the code.** It was
-508 at D31 and D32 and reads 491 today; it was 503 until item 67 removed
+508 at D31 and D32 and reads 487 today; it was 503 until item 67 removed
 `callRenderPixMap`'s unused-but-set `res`, and 502 until item 2 removed the
 `register` keyword and the `SIG_IO::cerr` round of 2026-09-24, and 497 until
 item 50 removed `SIG_RobotUnstreamer`, whose unused parameter warned, and
 496 until item 82 removed `SIG_GPStepperFitnessFunction`, which had two,
 and 494 until `SIG_DynaMechsSimulationQueries::getNumberOfTouchdowns` went,
 which had two, and 492 until item 87 removed Adaptive Walking's
-`fprintf(stderr, infStr)`. A step that changes no code should not move it; one
+`fprintf(stderr, infStr)`, and 491 until four unused locals in the
+visualiser went on 2026-09-25. A step that changes no code should not move it; one
 that does, will.
 `check.sh` builds `guidrive` and `sigelApp/` itself, which builds the two
 programs too. It needed `sigel_eval` built for the V5 section until that
@@ -901,7 +902,18 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-25 — DONE: TWO FORWARDING MOUSE HANDLERS REMOVED.** Start here.
+**2026-09-25 — DONE: DEAD LOCALS IN THE VISUALISER REMOVED.** Start here.
+
+- **Removed:** `normal[3]` in `SIG_EnvironmentRenderer::buildGrid`; `xPos`,
+  `zPos` and a repeated `glMatrixMode` in `SIG_EnvironmentRenderer::render`
+  (`renderSceneObjects` sets the mode before any drawing); `fogColor` in the
+  `SIG_Visualisation` constructor; `noOfPoints` in
+  `SIG_SimulationVisualisation::updateRobotPoints`. The Windows item's
+  `_WINDOWS` tally drops by the one `#ifdef` that went with `xPos`.
+- **Gates:** `check.sh` 936 pass, 0 fail; warnings 487, from 491: the four
+  unused locals warned. The other four gates are green.
+
+**2026-09-25 — DONE: TWO FORWARDING MOUSE HANDLERS REMOVED.**
 
 - **Removed:** `SIG_SimulationVisualisationWidget::mousePressEvent` and
   `mouseMoveEvent`. Each only called the `SIG_VisualisationWidget` version,

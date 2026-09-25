@@ -151,7 +151,7 @@ namespace SIGEL_Visualisation
 	void SIG_EnvironmentRenderer::buildGrid(GLuint number)
   {
    	int x,z;
-   	GLfloat vertex[2][3], normal[3];
+   	GLfloat vertex[2][3];
 	 	int x_dim, z_dim;
 	 	double grid_resolution;
 	 	double **depth;
@@ -234,16 +234,6 @@ namespace SIGEL_Visualisation
 
   void SIG_EnvironmentRenderer::render()
   {
-#ifdef _WINDOWS
-    GLdouble xPos = static_cast< GLdouble >( ::floor( lookPoint.get( 0 ) / fieldEdgeLength ) * fieldEdgeLength );
-    GLdouble zPos = static_cast< GLdouble >( ::floor( lookPoint.get( 2 ) / fieldEdgeLength ) * fieldEdgeLength );
-#else
-    GLdouble xPos = static_cast< GLdouble >( std::floor( lookPoint.get( 0 ) / fieldEdgeLength ) * fieldEdgeLength );
-    GLdouble zPos = static_cast< GLdouble >( std::floor( lookPoint.get( 2 ) / fieldEdgeLength ) * fieldEdgeLength );
-#endif
-
-    glMatrixMode( GL_MODELVIEW );
-
     renderPlane();
     renderGridAndPath();
   };

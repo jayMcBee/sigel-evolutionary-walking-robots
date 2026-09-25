@@ -498,8 +498,6 @@ namespace SIGEL_Visualisation
 
   void SIG_SimulationVisualisation::updateRobotPoints()
   {
-    int noOfPoints = robotRenderer.sceneObjects.size() - robot.getLinks().size();
-
     for (int i=robot.getLinks().size(); i<robotRenderer.sceneObjects.size(); i++)
       {
 	int linkNumber = robotRenderer.sceneObjects[i]->getNumber();

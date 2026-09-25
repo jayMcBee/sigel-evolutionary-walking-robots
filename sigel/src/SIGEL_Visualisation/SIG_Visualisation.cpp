@@ -67,9 +67,6 @@ namespace SIGEL_Visualisation
     GLfloat positionLight1[4] = {0.0,10.0,0.0,1.0};
     glLightfv( GL_LIGHT1, GL_POSITION, positionLight1 );
 
-    QList< GLfloat > fogColor( 4 );
-    fogColor.fill( 1 );
-
     updateAspectRatio();
   };
 
