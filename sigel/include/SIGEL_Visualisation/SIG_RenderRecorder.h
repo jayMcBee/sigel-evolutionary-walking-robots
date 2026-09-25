@@ -87,18 +87,6 @@ namespace SIGEL_Visualisation
        */
       void record();
 
-      /**
-       * This method does nothing at the moment.
-       *
-       * It should'nt even called by the simulation,
-       * because there is no defined end of a
-       * simulation visualisation.
-       *
-       * First it calls the method finish of the superclass
-       * SIGEL_Simulation::SIG_Recorder.
-       */
-      void finish();
-
     private:
 
       /**

@@ -720,11 +720,6 @@ void SIG_SimulationVisualisationWidget::resetRecorder()
       };
   };
 
-  void SIG_SimulationVisualisationWidget::slotRecordClicked()
-  {
-    record = !record;
-  };
-
   void SIG_SimulationVisualisationWidget::slotAlterMovieSettingsClicked()
   {
     SIGEL_SlaveGUI::SIG_MovieSettingsDialog movieSettingsDialog( width(), height(), this, "movieSettingsDialog", true );

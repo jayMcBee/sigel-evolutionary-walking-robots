@@ -60,9 +60,4 @@ namespace SIGEL_Visualisation
     simulationTime = simulationQueries->getActualSimulationTime();
   };
 
-  void SIG_RenderRecorder::finish()
-  {
-    SIG_Recorder::finish();
-  };
-
 }

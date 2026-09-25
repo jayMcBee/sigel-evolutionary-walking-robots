@@ -143,18 +143,6 @@ namespace SIGEL_Visualisation
     virtual void buildDisplayLists() = 0;
 
     /**
-     * This method calls all the display lists
-     * of this SIG_Renderer.
-     *
-     * This is the same procedure
-     * for every subclass. This method should
-     * be called from the method render.
-     *
-     * @pre The display lists are builded.
-     */
-    void renderSceneObjects();
-
-    /**
      * Calls the display lists of the scene objects from
      * index first up to, but not including, index end.
      *

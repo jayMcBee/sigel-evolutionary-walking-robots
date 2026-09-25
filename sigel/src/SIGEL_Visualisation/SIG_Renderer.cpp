@@ -51,11 +51,6 @@ namespace SIGEL_Visualisation
     glDeleteLists( displayListsOffset, static_cast<GLsizei>(noOfObjects) );
   };
 
-  void SIG_Renderer::renderSceneObjects()
-  {
-    renderSceneObjects( 0, noOfObjects );
-  };
-
   void SIG_Renderer::renderSceneObjects( GLuint first, GLuint end )
   {
     glMatrixMode(GL_MODELVIEW);

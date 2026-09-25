@@ -164,11 +164,6 @@
       void slotNavigateCenter();
 
       /**
-       * Sets whether the simulation shall be recorded.
-       */
-      void slotRecordClicked();
-
-      /**
        * Used to alter the movie settings.
        */
       void slotAlterMovieSettingsClicked();
