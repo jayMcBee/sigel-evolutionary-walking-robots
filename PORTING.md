@@ -901,8 +901,16 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-25 — DONE: THREE UNCALLED OR FORWARDING METHODS REMOVED.** Start
-here.
+**2026-09-25 — DONE: TWO FORWARDING MOUSE HANDLERS REMOVED.** Start here.
+
+- **Removed:** `SIG_SimulationVisualisationWidget::mousePressEvent` and
+  `mouseMoveEvent`. Each only called the `SIG_VisualisationWidget` version,
+  which Qt now reaches directly. The base class comments no longer ask
+  subclasses to override them.
+- **Gates:** `check.sh` 936 pass, 0 fail; warnings 491. The other four gates
+  are green.
+
+**2026-09-25 — DONE: THREE UNCALLED OR FORWARDING METHODS REMOVED.**
 
 - **Removed:** `SIG_Renderer::renderSceneObjects()`, the version with no
   arguments, which had no caller; `SIG_RenderRecorder::finish`, which only

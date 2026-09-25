@@ -202,24 +202,16 @@ using namespace SIGEL_CommonGUI;
       void initFloatingTextWidgets();
 
       /**
-       * This methid is inherited from the QWidget.
+       * This method is inherited from the QWidget.
        *
-       * Subclasses of SIG_VisualisationWidget should
-       * reimplement this method and call
-       * SIG_VisualisationWidget::mousePressEvent from there,
-       * supplied with their QMouseEvent.
        * When the user presses a mousebutton the actual
        * mouse position is stored in mouseXPos and mouseYPos.
        */
       virtual void mousePressEvent( QMouseEvent *event );
 
       /**
-       * This methid is inherited from the QWidget.
+       * This method is inherited from the QWidget.
        *
-       * Subclasses of SIG_VisualisationWidget should
-       * reimplement this method and call
-       * SIG_VisualisationWidget::mouseMoveEvent from there,
-       * supplied with their QMouseEvent.
        * When the user moves the mouse,
        * this method emits the appropriate signals.
        */

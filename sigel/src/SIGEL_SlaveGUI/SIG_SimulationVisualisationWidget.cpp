@@ -195,16 +195,6 @@
       };
   };
 
-  void SIG_SimulationVisualisationWidget::mousePressEvent( QMouseEvent *event )
-  {
-    SIG_VisualisationWidget::mousePressEvent( event );
-  }; 
-
-  void SIG_SimulationVisualisationWidget::mouseMoveEvent( QMouseEvent *event )
-  {
-    SIG_VisualisationWidget::mouseMoveEvent( event );
-  };
-
 
 
   void SIG_SimulationVisualisationWidget::makeTimeSteps(int noOfSteps)

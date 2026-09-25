@@ -259,18 +259,6 @@
 
 
       /**
-       * Just calls SIG_VisualisationWidget::mousePressEvent with
-       * the same QMouseEvent.
-       */
-      void mousePressEvent( QMouseEvent *event );
-
-      /**
-       * Just calls SIG_VisualisationWidget::mouseMoveEvent with
-       * the same QMouseEvent.
-       */
-      void mouseMoveEvent( QMouseEvent *event );
-
-      /**
        * The actual robot to simulate.
        */
       SIGEL_Robot::SIG_Robot const *robot;
