@@ -902,7 +902,22 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-25 — DONE: QUIT ASKS ONCE.** Start here.
+**2026-09-25 — DONE: ITEM 57, THE WINDOW CANNOT BE CLOSED DURING A RUN.**
+Start here.
+
+- **Changed, by decision:** during a run, `SIG_MainWindow::closeEvent`
+  ignores the close and asks nothing. Details are in item 57's entry in
+  "Done". Checked on the desktop with a copy of `runner.exp`.
+- **`guidrive`:** the `runlock` scenario expected the 1.3 question; it now
+  expects the close to be refused with no question. In
+  `guibehaviour-baseline.txt` three lines, the question and its No, became
+  one: `close during a run: asked=0 stillUp=1`. Two runs gave identical
+  output.
+- **Review:** no defects. It noted the logout case in the Done entry.
+- **Gates:** `check.sh` 936 pass, 0 fail; warnings 487. The other four gates
+  are green.
+
+**2026-09-25 — DONE: QUIT ASKS ONCE.**
 
 - **Fixed:** File > Quit, its toolbar button and Ctrl+Q asked twice. Qt 6's
   `quit()` closes every window, so `SIG_MainWindow::closeEvent` asked again
@@ -914,8 +929,6 @@ classes and leave truncation a hard error. **They are not interchangeable.**
   window refuses its close, Quit leaves SIGEL running with only that window.
 - **Gates:** `check.sh` 936 pass, 0 fail; warnings 487. The other four gates
   are green. `guidrive` output is unchanged.
-- **Next, decided:** during a run, the window's close button is refused:
-  `closeEvent` ignores the close without asking.
 
 **2026-09-25 — DONE: QUIT IS GREYED DURING A RUN.**
 
@@ -5068,6 +5081,16 @@ carried; other items and this file cite them, so they do not change.
     visualizeThis` calls `resizeGL` with logical pixels where Qt uses device
     pixels. Qt 6.10's `QOpenGLWidget` sets the viewport in device pixels
     itself before each `paintGL`, and the aspect ratio is the same in both.
+
+- [x] **57. Quit during a run left the run going** — done 2026-09-25, by
+  decision, in two steps. File > Quit, its toolbar button and Ctrl+Q are
+  among the `evolutionRunningActions`, so they are greyed during a run.
+  `SIG_MainWindow::closeEvent` ignores the window's close button during a run
+  and asks nothing. The window can therefore no longer disappear while the
+  run goes on. `askBeforeQuitting` lost its "An evolution is running" wording,
+  which nothing reaches. A desktop logout during a run is refused where the
+  session manager allows it; where it does not, the session ends SIGEL by a
+  signal. The `userTerminated` fix the item proposed was not taken.
 
 - [x] **27. The wildcard disconnect in `SIG_AllIndividualsView::
   slotEvolutionNotRunning`** — dropped 2026-09-25, by decision: no defect is

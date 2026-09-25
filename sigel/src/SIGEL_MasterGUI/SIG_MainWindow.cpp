@@ -747,12 +747,8 @@ void SIG_MainWindow::slotShowEmpty( bool isNotEmpty )
 
 bool SIG_MainWindow::askBeforeQuitting()
 {
-  QString question = "Do you really want to quit?\nThere may be unsaved experiments!";
-  if ( experimentListView->isRunning() )
-    question = "An evolution is running.\n"
-	       "Do you really want to quit?\nThere may be unsaved experiments!";
-
-  return QMessageBox::warning( this, "Quit SIGEL", question,
+  return QMessageBox::warning( this, "Quit SIGEL",
+			       "Do you really want to quit?\nThere may be unsaved experiments!",
 			       QMessageBox::Yes | QMessageBox::Default,
 			       QMessageBox::No | QMessageBox::Escape ) == QMessageBox::Yes;
 };
@@ -918,6 +914,13 @@ void SIG_MainWindow::closeEvent( QCloseEvent *event )
   QMainWindow::closeEvent( event );
   if ( !event->isAccepted() )
     return;
+
+  // Quit is greyed during a run; the window's close button cannot be.
+  if ( experimentListView->isRunning() )
+    {
+      event->ignore();
+      return;
+    }
 
   // File > Quit closes the window too, so this is the only place that asks.
   if ( askBeforeQuitting() )

@@ -264,18 +264,6 @@ touched, because changing one changes behaviour against the reference binary.
   the 7 shipped experiments does. The library code is unpatched, as SIGEL's
   `supportingLibs` ships it. Found 2026-09-22.
 
-- [ ] **57. Quit during a run leaves the run going.**
-  `SIG_MainWindow::slotAboutToQuit` and `closeEvent` ask for confirmation and
-  call `qApp->quit()`, but nothing sets `userTerminated`. The window closes,
-  `start()` is still on the stack, and `exec()` cannot return until the run
-  ends. The shipped experiments stop on 1 January 2030, so the process keeps
-  running without a window and keeps spawning slaves. Nothing is freed early.
-  Fix: set `userTerminated` on the running experiment before `quit()`. Found
-  by review 2026-09-22; not reproduced. Since 2026-09-25 File > Quit, its
-  toolbar button and Ctrl+Q are greyed during a run, as one of
-  `evolutionRunningActions`. The window's close button still reaches
-  `closeEvent`, and what it does during a run is still to be decided.
-
 - [ ] **59. Investigate the pool limit of 32768.** Tournament selection draws
   each player's pool position with `SIG_Randomizer::getRandomInt`, which
   returns 0 to 32767 before the modulo. `SIG_GPManager::createTours` draws with

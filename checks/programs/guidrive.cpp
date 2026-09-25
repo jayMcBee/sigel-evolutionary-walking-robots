@@ -4072,8 +4072,9 @@ static int guidriveMain(int argc, char **argv)
             }
         }
 
-        // Quit during a run must ask, and No must leave the window alone. Nothing
-        // else in this file closes the main window.
+        // Closing the window during a run must be refused without a question.
+        // A question that appears anyway is answered No, so the run goes on.
+        // Nothing else in this file closes the main window.
         {
             QString asked;
             whenModal([&asked](QWidget *m) {
@@ -4082,12 +4083,11 @@ static int guidriveMain(int argc, char **argv)
             }, 3000);
             W->close();
             QTest::qWait(600);
-            printf("  [locked] close during a run: asked=%d namesTheRun=%d stillUp=%d\n",
-                   asked.isEmpty() ? 0 : 1,
-                   asked.contains("evolution is running") ? 1 : 0,
-                   W->isVisible() ? 1 : 0);
-            if (asked.isEmpty() || !W->isVisible()) {
-                printf("!! closing the window during a run did not ask, or closed anyway\n");
+            cancelModalHandler();
+            printf("  [locked] close during a run: asked=%d stillUp=%d\n",
+                   asked.isEmpty() ? 0 : 1, W->isVisible() ? 1 : 0);
+            if (!asked.isEmpty() || !W->isVisible()) {
+                printf("!! closing the window during a run asked, or closed\n");
                 fflush(stdout); return 1;
             }
         }
