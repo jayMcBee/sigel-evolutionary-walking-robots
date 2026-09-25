@@ -286,6 +286,17 @@ touched, because changing one changes behaviour against the reference binary.
 
 ## 7 · The interface
 
+- [ ] **94. Adding many individuals is slow, and slower as the pool grows.**
+  Observed 2026-09-26: Individuals > Add with 1000 individuals takes a long
+  time, and the rate drops as the pool grows. Creating random programs should
+  be quick. Not measured yet. What the code does: after
+  `SIG_GPPopulation::addRandomIndividuals`,
+  `SIG_AllIndividualsView::slotAddIndividuals` clears the whole list and
+  builds every row again, with a progress dialog update and a
+  `processEvents` call per row. Measure first, with a profiler or gdb,
+  where the time goes: the random programs, the list rebuild, or the
+  sorted inserts into the list.
+
 - [ ] **28. Check every UI label for grammar and typos.** One pass over every
   label, button, menu entry, tooltip and dialog title. Most are in `ui/`; the
   rest are literals in `src/`. `pushbuttonShowFitnessCurve` is one already
