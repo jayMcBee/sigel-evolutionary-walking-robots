@@ -74,7 +74,7 @@ Constructs the language removed. A current compiler rejects them.
     a later write through one would be, and the compiler would not say so.
     - **Keep, 10:** PVM's C functions take `char*` for strings they only
       read: `SIG_GPFitnessTrainer` (8), `SIG_GPPVMData::sendQStringToPVM`
-      (1), `SIG_AllIndividualsView`'s spawn (1).
+      (1), `SIG_AllIndividualsView::slotVisualize` (1).
     - **Meta-GP, 9:** the three tournament classes and `MT_Evaluator` cast
       programs and an individual because `MT_Classifier::createNewTCase` and
       `classifier` take non-const pointers. Make those take `const` if they
