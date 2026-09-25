@@ -902,8 +902,33 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-09-25 — DONE: THE SHADOW MAP HAS ROOM FOR SWINGING LIMBS.** Start
+here.
+
+- **Changed, by decision:** `SIG_SimulationVisualisation::renderShadowMap`
+  makes the box's half-size `robotRadius` × `shadowBoxMargin` (1.1), where
+  it was `robotRadius`. The same value sets the depth range. This costs 10%
+  of the shadow's resolution. The box keeps one size, so the texel snapping
+  still holds.
+- **Measured** with a temporary probe, not committed: at every time step
+  over 60 s of simulated time, on copies of all seven experiments, the
+  largest offset of any link vertex from the box centre in the sun's view,
+  in units of `robotRadius`. Sideways: hammer 1.045, runner 1.027, walker
+  0.986, twoBases 0.957, octopus 0.953, shortHammer 0.941, insect 0.780. In
+  depth, at most 0.964. Each run showed the individual that `sigel_slave -v`
+  opens. An individual that stretches further still loses part of its
+  shadow.
+- **Not taken:** fitting the box to the links on every frame. The size would
+  change from frame to frame, and so would the shadow's edge.
+- **Tested** on Xvfb: hammer's whole shadow shows after 45 s.
+- **Review:** stopped before it reported. Committed without it, by decision.
+- **Gates:** `check.sh` 936 pass, 0 fail; warnings 487. The other four gates
+  are green.
+- **Next:** item 69 in `future_refactorings.md`, for discussion. The three
+  follow-ups of the shadows entry are closed.
+
 **2026-09-25 — DONE: DARKER AMBIENT LIGHT; THE PLANE FADED IN THE UNLIT
-MODES.** Start here.
+MODES.**
 
 - **Changed, by decision, values set by eye:**
   - `SIG_VisualisationWidget::setAmbientLighting` divides the slider value

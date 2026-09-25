@@ -280,9 +280,10 @@ namespace SIGEL_Visualisation
 
   QMatrix4x4 SIG_SimulationVisualisation::renderShadowMap()
   {
-    // The map covers the robot as the sun sees it. Its centre moves in
-    // whole texels, so the shadow's edge does not shimmer as the robot moves.
-    float const halfSize = robotRadius;
+    // The map covers the robot as the sun sees it, with room for limbs that
+    // swing out. Its centre moves in whole texels, so the shadow's edge does
+    // not shimmer as the robot moves.
+    float const halfSize = robotRadius * shadowBoxMargin;
     float const texelSize = 2 * halfSize / shadowMapSize;
 
     QMatrix4x4 lightView;

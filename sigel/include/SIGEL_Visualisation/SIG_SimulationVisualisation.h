@@ -173,6 +173,12 @@ namespace SIGEL_Visualisation
       static constexpr int shadowMapSize = 2048;
 
       /**
+       * The shadow map covers robotRadius times this, because the limbs
+       * swing outside the robot's sphere at time 0.
+       */
+      static constexpr float shadowBoxMargin = 1.1f;
+
+      /**
        * The radius of the filter around each shadow map lookup, in texels.
        */
       static constexpr float shadowFilterRadius = 1.5f;
