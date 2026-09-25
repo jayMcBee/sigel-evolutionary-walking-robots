@@ -44,6 +44,12 @@ namespace SIGEL_Visualisation
       SIG_ViewSettings();
 
       /**
+       * The eye point in world coordinates: lookPoint + eyePoint when
+       * relativeEyePoint is set, else eyePoint.
+       */
+      DL_vector getAbsoluteEyePoint() const;
+
+      /**
        * The type of the render Mode.
        */
       enum renderModeType

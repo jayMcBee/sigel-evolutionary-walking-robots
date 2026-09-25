@@ -902,8 +902,55 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-25 — DONE: THE VISUALISER USES Qt'S DEGREE CONVERSION.** Start
-here.
+**2026-09-25 — DONE: ONE EYE-POINT CALCULATION; VISUALISER CLEAN-UP
+PAUSED.** Start here.
+
+- **Changed:** `SIG_ViewSettings::getAbsoluteEyePoint` returns the eye
+  point in world coordinates. `SIG_Visualisation::visualize` and
+  `SIG_SimulationVisualisation::exportToPovray` each computed it in eight
+  lines; both call it now. It adds in the same order as `plusis`, so the
+  result is the same to the last bit.
+- **Gates:** `check.sh` 936 pass, 0 fail; warnings 487. The other four gates
+  are green.
+- **Still open from the review of the whole visualiser, paused by
+  decision:**
+  - The plane, grid and path check boxes are not tristate, yet
+    `SIG_SimulationVisualisationWidget::setShowPlane`, `setShowGrid` and
+    `setShowRobotPath` switch on 0/2 and `SIG_SimulationWidget` encodes
+    `? 2 : 0`. They could be `bool` slots on `toggled(bool)`; the tristate
+    anchor-point box could pass `checkState()` as it is.
+  - The six navigate slots of `SIG_SimulationVisualisationWidget` differ
+    only in an angle; one private method could serve them. `0.1` is written
+    six times.
+  - `SIG_VisualisationWidget` and, now, `SIG_Visualisation` each have one
+    subclass. The widget holds its visualisation as the base type and casts
+    to `SIG_SimulationVisualisation` ten times. Six virtual methods have no
+    override.
+  - `SIG_RobotRenderer::renderPoints` places each label with
+    `glRenderMode(GL_FEEDBACK)` every frame; projecting on the CPU with the
+    known matrices could replace it if the clipping stays the same.
+  - The floating texts are listed three times: `SIG_Visualisation`,
+    `SIG_RobotRenderer` and each `SIG_VisualSceneObject`.
+  - `SIG_SceneObject`'s constructor takes unnamed parameters that no caller
+    passes, and initialises members from themselves.
+  - `SIG_SimulationWidget::visualizeThis` and `slotStopSimulation` send
+    the same view settings; one private method could serve both, and send
+    the check box states on the first view too.
+  - `createPovrayIncludeFile`'s `xAngle = 100` is `SIG_Visualisation::fieldOfView`
+    under another name; `directionLength` could be computed from
+    `fieldOfView`.
+  - The link colour is darkened by `- 0.3` in two places in
+    `SIG_RobotRenderer`.
+  - `keepRatio` and `cropImage` in `SIG_SimulationVisualisationWidget`
+    start unset; nothing reads them before the movie dialog sets them.
+  - The absolute eye point (`relativeEyePoint` false) is never used.
+  - `SIG_EnvironmentRenderer::loadPNMTexture` assumes 256×256 and ignores
+    what `fread` returns; its image data and GL texture are never freed.
+  - The floating labels are probably misplaced when the device pixel ratio
+    is not 1: feedback gives framebuffer pixels, the labels use widget
+    pixels.
+
+**2026-09-25 — DONE: THE VISUALISER USES Qt'S DEGREE CONVERSION.**
 
 - **Changed:** the two hand-made `pi` constants are gone: the member of
   `SIG_VisualisationWidget` and the static in

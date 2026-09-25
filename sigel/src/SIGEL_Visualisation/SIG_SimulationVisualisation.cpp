@@ -553,16 +553,7 @@ namespace SIGEL_Visualisation
 
     QTextStream stream( &file );
 
-    DL_vector finalEyePoint;
-    if (viewSettings.relativeEyePoint)
-      {
-	finalEyePoint.assign( &viewSettings.lookPoint );
-	finalEyePoint.plusis( &viewSettings.eyePoint );
-      }
-    else
-      {
-	finalEyePoint.assign( &viewSettings.eyePoint );
-      };
+    DL_vector finalEyePoint = viewSettings.getAbsoluteEyePoint();
 
     NEWMAT::ColumnVector finalEyePointColumnVector = SIG_TypeConverter::toColumnVector( finalEyePoint );
 

@@ -34,4 +34,14 @@ namespace SIGEL_Visualisation
       aspectRatio(1)
   { };
 
+  DL_vector SIG_ViewSettings::getAbsoluteEyePoint() const
+  {
+    if (!relativeEyePoint)
+      return DL_vector( eyePoint.x, eyePoint.y, eyePoint.z );
+
+    return DL_vector( lookPoint.x + eyePoint.x,
+		      lookPoint.y + eyePoint.y,
+		      lookPoint.z + eyePoint.z );
+  };
+
 }

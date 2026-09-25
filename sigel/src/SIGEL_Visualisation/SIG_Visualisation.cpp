@@ -74,14 +74,7 @@ namespace SIGEL_Visualisation
   {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    DL_vector finalEyePoint;
-    if (viewSettings.relativeEyePoint) {
-     	finalEyePoint.assign( &viewSettings.lookPoint );
-     	finalEyePoint.plusis( &viewSettings.eyePoint );
-    }
-    else {
-    	finalEyePoint.assign( &viewSettings.eyePoint );
-    };
+    DL_vector finalEyePoint = viewSettings.getAbsoluteEyePoint();
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
