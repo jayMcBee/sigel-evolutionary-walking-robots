@@ -522,12 +522,6 @@ touched, because changing one changes behaviour against the reference binary.
     count, so `MOVE -128` with 24 registers reads R8, not a register near
     R0.
 
-- [ ] **78. The Name column on the Individuals page is too narrow.** Raised
-  2026-09-24 after the runner run: it should be 50% wider, and the table has
-  empty space. The width comes from the space-padded header text of the Name
-  column of `listviewIndividuals` in `SIG_IndividualListBase.ui`; no code sets
-  a column width. Interface work, to go with item 70.
-
 - [ ] **79. File > Save Experiment always asks for a file name.** Raised
   2026-09-24. `SIG_ExperimentListView::slotSaveExperiment` opens
   `QFileDialog::getSaveFileName` every time, so Save acts as Save As.

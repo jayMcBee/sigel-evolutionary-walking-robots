@@ -36,17 +36,17 @@
           </property>
           <column>
             <property name="text">
-              <string>Name               </string>
+              <string>Name</string>
             </property>
           </column>
           <column>
             <property name="text">
-              <string>Fitness          </string>
+              <string>Fitness</string>
             </property>
           </column>
           <column>
             <property name="text">
-              <string>Age               </string>
+              <string>Age</string>
             </property>
           </column>
         </widget>

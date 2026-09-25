@@ -902,8 +902,20 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-25 — DONE: ITEM 69, PLAY NO LONGER KEEPS A CORE BUSY.** Start
+**2026-09-25 — DONE: ITEM 78, THE INDIVIDUALS TABLE'S COLUMNS.** Start
 here.
+
+- **Changed, by decision:** the Name column takes the free width; Fitness and
+  Age fit their contents, at least fourteen digits wide. Details are in item
+  78's entry in "Done". Checked on the desktop with a copy of `runner.exp`.
+- **Review:** nothing breaks. It noted that the columns can no longer be
+  dragged, which was chosen, and that the comment named only two columns for
+  a minimum that applies to all three. The comment was corrected after the
+  gate run; that change is a comment only and was rebuilt, not gated again.
+- **Gates:** `check.sh` 936 pass, 0 fail; warnings 487. The other four gates
+  are green.
+
+**2026-09-25 — DONE: ITEM 69, PLAY NO LONGER KEEPS A CORE BUSY.**
 
 - **Changed, by decision:** `simulationTimer` waits at least 1 ms. Details and
   measurements are in item 69's entry in "Done".
@@ -4969,6 +4981,18 @@ carried; other items and this file cite them, so they do not change.
     visualizeThis` calls `resizeGL` with logical pixels where Qt uses device
     pixels. Qt 6.10's `QOpenGLWidget` sets the viewport in device pixels
     itself before each `paintGL`, and the aspect ratio is the same in both.
+
+- [x] **78. The Name column on the Individuals page is too narrow** — done
+  2026-09-25, by decision. The widths came only from header texts padded
+  with spaces. The padding is gone; `SIG_IndividualListBase`'s constructor
+  sets Name to `QHeaderView::Stretch` and Fitness and Age to
+  `ResizeToContents`, turns off the stretch of the last column, and sets the
+  header's minimum section size to the width of fourteen `0` in the header's
+  font. The minimum applies to every column. The user can no longer drag the
+  column borders. Not taken: padding the header text, fixed pixel widths,
+  and header padding by style sheet. `guibehaviour-baseline.txt` and
+  `xtest-baseline.txt` print the header texts; their ten `[individuals]`
+  lines and one were changed to the unpadded texts, and nothing else in them.
 
 - [x] **69. While Play waits for a frame, one core stays busy** — done
   2026-09-25, by decision, the smallest fix. `simulationTimer` fired at Frame

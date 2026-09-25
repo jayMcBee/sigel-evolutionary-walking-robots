@@ -178,7 +178,7 @@
         Simulation-Parameters    sel=0 exp=0 cur=0 selectable=1
         Environment              sel=0 exp=0 cur=0 selectable=1
   [page] count=8 current=SIGEL_MasterGUI::SIG_AllIndividualsView objectName=[]
-  [individuals] rows=100 cols=3 headers=[Name               ][Fitness          ][Age               ] selected=0
+  [individuals] rows=100 cols=3 headers=[Name][Fitness][Age] selected=0
     row0  | 16269         | 0.558099      | 58            | sel=0
     row1  | 16430         | 0.563401      | 27            | sel=0
     row2  | 16486         | 0.569652      | 16            | sel=0
