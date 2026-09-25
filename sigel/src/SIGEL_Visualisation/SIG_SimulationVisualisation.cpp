@@ -450,6 +450,19 @@ namespace SIGEL_Visualisation
 
      if (shadowed)
        renderShadowedScene( lightMatrix );
+     else if (hidden || (viewSettings.renderMode == SIG_ViewSettings::wireFrame))
+       {
+	 // The plane's many edges or points are blended in, so the robot stands out.
+	 glPushAttrib( GL_COLOR_BUFFER_BIT );
+	 glEnable( GL_BLEND );
+	 glBlendColor( 0, 0, 0, unlitPlaneAlpha );
+	 glBlendFunc( GL_CONSTANT_ALPHA, GL_ONE_MINUS_CONSTANT_ALPHA );
+	 environmentRenderer.renderPlane();
+	 glPopAttrib();
+
+	 environmentRenderer.renderGridAndPath();
+	 robotRenderer.render();
+       }
      else
        {
 	 environmentRenderer.render();

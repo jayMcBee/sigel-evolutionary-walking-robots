@@ -81,7 +81,7 @@
   {
     if (visualisation)
       {
-	double const ambientSceneColor = double( newValue ) / 100;
+	double const ambientSceneColor = double( newValue ) / 200;
 
 	// Outside paintGL another context may be current.
 	makeCurrent();

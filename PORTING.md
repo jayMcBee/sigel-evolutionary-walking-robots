@@ -902,7 +902,33 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-25 — DONE: A "SHOW SHADOWS" CHECK BOX.** Start here.
+**2026-09-25 — DONE: DARKER AMBIENT LIGHT; THE PLANE FADED IN THE UNLIT
+MODES.** Start here.
+
+- **Changed, by decision, values set by eye:**
+  - `SIG_VisualisationWidget::setAmbientLighting` divides the slider value
+    by 200, where it divided by 100. The full slider gives 0.5, the old
+    default brightness; the default, 50, gives 0.25. The slider stays 0–100.
+    This closes the ambient item of the shadows entry's "Next" list; its
+    "90% position" was not taken. A POV-Ray export writes the same value as
+    `ambient_light`, so exported scenes are darker too.
+  - In the wireframe, hidden lines and points modes,
+    `SIG_SimulationVisualisation::visualize` draws the plane blended at a
+    constant alpha, `unlitPlaneAlpha` (0.3), so the robot stands out. Grid,
+    robot path and robot are drawn as before.
+- **Found on the way:** without `glPushAttrib( GL_COLOR_BUFFER_BIT )` around
+  the plane, the flatshaded and gouraudshaded modes were drawn pale. Blending
+  is enabled between frames by something outside SIGEL's code, and the
+  changed blend function then applied to the whole lit scene. The push and
+  pop fixed it.
+- **Tested** on Xvfb with a copy of `walker.exp`, all five modes. Checked on
+  the desktop.
+- **Review:** no defects.
+- **Gates:** `check.sh` 936 pass, 0 fail; warnings 487. The other four gates
+  are green.
+- **Next:** the shadow box that clips limbs, from the shadows entry below.
+
+**2026-09-25 — DONE: A "SHOW SHADOWS" CHECK BOX.**
 
 - **Added:** a "Show shadows" check box under "Show anchor points", ticked at
   the start. `SIG_SimulationVisualisationWidget::setShowShadows( bool )`
