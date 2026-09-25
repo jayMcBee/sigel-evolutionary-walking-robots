@@ -25,9 +25,6 @@
 
 #include <cmath>
 
-//namespace SIGEL_CommonGUI		// The visual c++ compiler gets in trouble with the
-//{										// corresponding moc file if this namespace is used
-											// and moc ignore preprocessor statements.
 
 
   SIG_VisualisationWidget::SIG_VisualisationWidget( QWidget *parent,
@@ -199,8 +196,8 @@
   {
     if (visualisation)
       {
-	// clear() with autoDelete was the free for the previous labels; without
-	// it they would survive as children of this widget and stay on screen.
+	// Without this the previous labels would survive as children of this
+	// widget and stay on screen.
 	qDeleteAll( floatingTextWidgets );
 	floatingTextWidgets.clear();
 	floatingTextWidgets.resize( visualisation->floatingTexts.size() );
@@ -208,7 +205,6 @@
 	for (int i=0; i<floatingTextWidgets.size(); i++)
 	  {
 	    SIG_FloatingTextLabel *newLabel = new SIG_FloatingTextLabel( this );
-	    // Qt 2's QVector::insert overwrote slot i; QList::insert SHIFTS.
 	    floatingTextWidgets[ i ] = newLabel;
 	    newLabel->raise();
 	  };
@@ -298,4 +294,3 @@
       else
 	glClear(GL_COLOR_BUFFER_BIT);
     };
-//}

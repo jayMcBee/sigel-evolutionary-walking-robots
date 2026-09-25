@@ -79,7 +79,7 @@ namespace SIGEL_Visualisation
 
   SIG_EnvironmentRenderer::~SIG_EnvironmentRenderer()
   {
-    // robotPathPoints had setAutoDelete(true) and nothing else freed it.
+    // Nothing else frees the path points.
     qDeleteAll( robotPathPoints );
     robotPathPoints.clear();
   };
@@ -199,8 +199,6 @@ namespace SIGEL_Visualisation
 	glColor3d( 1, 1, 0 );
 
 	glBegin( GL_LINE_STRIP );
-	// Qt 2 cursor walk. The count() >= 2 guard above is what kept first()
-	// off an empty list, which is UB in Qt 6.
 	for ( qsizetype i = 0; i < robotPathPoints.size(); i++ )
 	  {
 	    DL_vector *actPoint = robotPathPoints.at( i );
@@ -264,8 +262,7 @@ namespace SIGEL_Visualisation
     if (showRobotPath)
       if (robotPathPoints.count() >= 2)
 	{
-	  // pairs walk: (0,1), (1,2), ... -- the Qt 2 cursor version stepped
-	  // prevPoint up behind actPoint
+	  // One cylinder from each point to the next.
 	  for ( qsizetype i = 1; i < robotPathPoints.size(); i++ )
 	    {
 	      DL_vector *prevPoint = robotPathPoints.at( i - 1 );

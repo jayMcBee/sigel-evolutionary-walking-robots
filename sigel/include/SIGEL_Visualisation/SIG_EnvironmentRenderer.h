@@ -75,8 +75,7 @@ namespace SIGEL_Visualisation
      */
     ~SIG_EnvironmentRenderer();
     // This class owns raw pointers in a QList and frees them in its
-    // destructor, so a copy would free them twice. Qt 2's QGVector copy
-    // cleared del_item and freed nothing.
+    // destructor, so a copy would free them twice.
     SIG_EnvironmentRenderer( const SIG_EnvironmentRenderer & ) = delete;
     SIG_EnvironmentRenderer &operator=( const SIG_EnvironmentRenderer & ) = delete;
 
@@ -202,8 +201,8 @@ namespace SIGEL_Visualisation
 				  double **depth, int x_dim, int z_dim );
 
     /**
-     * Draws the vertex v. The texture repeats every two columns; t is 1 on
-     * row z+1 and 0 on row z.
+     * Draws the vertex v in column x. The texture repeats every two columns;
+     * t is 1 on the cell's upper row and 0 on its lower row.
      */
     static void terrainVertex( GLfloat const v[3], int x, GLfloat t, bool withTexture );
 

@@ -271,9 +271,7 @@
 									    fileName );
 		  }
 		else
-		{	// this has been moved to an external method;
-			// the original code created a new pixmap each call w/o destroying it
-			// which caused the rendering process to trash the machine pretty soon...
+		{
 		  renderSuccess = callRenderPixMap(fileName);
 		}
 
@@ -346,9 +344,9 @@
 		  }
 	  }
 
-	  // Records frame N where 1.3 recorded N-1. pW/pH reach here as -1 and
-	  // QImage::copy returns a null image for that -- it would save nothing and
-	  // report success. grabFramebuffer returns device pixels, not logical.
+	  // pW/pH can reach here as -1, and QImage::copy returns a null image
+	  // for that -- it would save nothing and report success.
+	  // grabFramebuffer returns device pixels, not logical.
 	  QImage grabbed = grabFramebuffer();
 	  if ( grabbed.devicePixelRatio() != 1.0 )
 	    {
@@ -386,8 +384,8 @@
     // NOT redundant with the assignment below: the constructor throws
     // whenever SIMULATIONLIBRARY names the removed Dynamo backend
     // (SIG_Simulation.cpp, default case), and the throw leaves this
-    // member holding the pointer just freed. Fourteen sites here test
-    // if (visualisation) and then dereference it, so the guard passes
+    // member holding the pointer just freed. Fifteen sites here test
+    // visualisation for null and then dereference it, so the guard passes
     // and every one is a use-after-free.
     visualisation = nullptr;
 

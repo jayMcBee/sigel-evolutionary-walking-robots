@@ -32,7 +32,7 @@ namespace SIGEL_Visualisation
   {
 
     for (int i=0; i<noOfObjects; i++)
-      robotLinks[i] = new SIG_SceneObject(i);   // slot was value-initialised to null
+      robotLinks[i] = new SIG_SceneObject(i);
   };
 
   SIG_RenderRecorder::~SIG_RenderRecorder()

@@ -53,16 +53,11 @@ namespace SIGEL_Visualisation
       SIG_RenderRecorder(int noOfObjects);
 
       /**
-       * The destructor.
-       *
-       * robotLinks had setAutoDelete(true), so ~QVector was its only free and
-       * this class had no destructor at all. Qt 6's QList frees nothing, so
-       * the free is written out.
+       * The destructor. It frees the scene objects in robotLinks.
        */
       ~SIG_RenderRecorder();
       // This class owns raw pointers in a QList and frees them in its
-      // destructor, so a copy would free them twice. Qt 2's QGVector copy
-      // cleared del_item and freed nothing.
+      // destructor, so a copy would free them twice.
       SIG_RenderRecorder( const SIG_RenderRecorder & ) = delete;
       SIG_RenderRecorder &operator=( const SIG_RenderRecorder & ) = delete;
 

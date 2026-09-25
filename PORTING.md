@@ -902,7 +902,21 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-25 — DONE: THE TERRAIN CODE STREAMLINED.** Start here.
+**2026-09-25 — DONE: THE VISUALISER'S COMMENTS DESCRIBE THE CODE AS IT
+IS.** Start here.
+
+- **Changed, comments only:** the visualiser's comments about Qt 2, 1.3,
+  `autoDelete`, `QGVector`, Visual C++ and "the original code" now say what
+  the code does, or are gone where the code says it. The commented-out
+  `SIGEL_CommonGUI` namespace lines and the namespace's doc block went with
+  them. `visualizeThis` counts fifteen null tests, not fourteen: fourteen
+  `if (visualisation)` and one `if (!visualisation) return`. Also fixed:
+  "mousePresseEvent", and the `terrainVertex` comment, which named a `z`
+  it does not take.
+- **Gates:** `check.sh` 936 pass, 0 fail; warnings 487. The other four gates
+  are green.
+
+**2026-09-25 — DONE: THE TERRAIN CODE STREAMLINED.**
 
 - **Changed, in `SIG_EnvironmentRenderer`:**
   - `drawInit` takes each face normal from `QVector3D::normal`;

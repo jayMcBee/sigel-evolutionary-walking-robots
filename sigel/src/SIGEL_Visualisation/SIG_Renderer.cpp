@@ -41,8 +41,7 @@ namespace SIGEL_Visualisation
 
   SIG_Renderer::~SIG_Renderer()
   {
-    // In 1.3, setAutoDelete(true) on both vectors was their ONLY free --
-    // ~QVector did it. Written out here.
+    // Only this destructor frees the objects still in the lists.
     qDeleteAll( sceneObjects );
     sceneObjects.clear();
     qDeleteAll( floatingTexts );

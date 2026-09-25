@@ -32,14 +32,6 @@
 
 using namespace SIGEL_CommonGUI;
 
-/**
- * This namespace contains GUI-classes that are used both in the
- * Master's GUI and the Slave's GUI.
- */
-//namespace SIGEL_CommonGUI		// The visual c++ compiler gets in trouble with the
-//{										// corresponding moc file if this namespace is used
-											// and moc ignore preprocessor statements.
-
   /**
    * This is the superclass of all widget-classes that should
    * be used to integrate the OpenGL-Visualisation-classes
@@ -243,7 +235,7 @@ using namespace SIGEL_CommonGUI;
        * The last X-position of the mouse.
        *
        * This is used to calculate the amount of pixels the mouse
-       * was moved since the last mousePresseEvent respectively
+       * was moved since the last mousePressEvent respectively
        * mouseMoveEvent.
        */
       int mouseXPos;
@@ -252,7 +244,7 @@ using namespace SIGEL_CommonGUI;
        * The last Y-position of the mouse.
        *
        * This is used to calculate the amount of pixels the mouse
-       * was moved since the last mousePresseEvent respectively
+       * was moved since the last mousePressEvent respectively
        * mouseMoveEvent.
        */
       int mouseYPos;
@@ -287,6 +279,5 @@ using namespace SIGEL_CommonGUI;
 
     };
 
-//}
 
 #endif // SIGEL_COMMONGUI_SIG_VISUALISATIONWIDGET_H
