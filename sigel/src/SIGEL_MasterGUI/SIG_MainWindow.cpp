@@ -759,8 +759,9 @@ bool SIG_MainWindow::askBeforeQuitting()
 
 void SIG_MainWindow::slotAboutToQuit()
 {
-  if ( askBeforeQuitting() )
-    qApp->quit();
+  // closeEvent asks. Qt 6's quit() closes every window, so asking here too
+  // would ask twice.
+  close();
 };
 
 void SIG_MainWindow::slotUseBigPixmaps()
@@ -918,7 +919,7 @@ void SIG_MainWindow::closeEvent( QCloseEvent *event )
   if ( !event->isAccepted() )
     return;
 
-  // The window button asks the same question File > Quit asks.
+  // File > Quit closes the window too, so this is the only place that asks.
   if ( askBeforeQuitting() )
     qApp->quit();
   else

@@ -902,7 +902,22 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-25 — DONE: QUIT IS GREYED DURING A RUN.** Start here.
+**2026-09-25 — DONE: QUIT ASKS ONCE.** Start here.
+
+- **Fixed:** File > Quit, its toolbar button and Ctrl+Q asked twice. Qt 6's
+  `quit()` closes every window, so `SIG_MainWindow::closeEvent` asked again
+  after `slotAboutToQuit` had asked. Seen in gdb: the second question came
+  from `closeEvent`. `slotAboutToQuit` now calls `close()`, and only
+  `closeEvent` asks. Checked on the desktop under gdb: one question per
+  Quit, No keeps the window, Yes ends SIGEL.
+- **Review:** no defects. It noted a case that is not new: if the MetaGP
+  window refuses its close, Quit leaves SIGEL running with only that window.
+- **Gates:** `check.sh` 936 pass, 0 fail; warnings 487. The other four gates
+  are green. `guidrive` output is unchanged.
+- **Next, decided:** during a run, the window's close button is refused:
+  `closeEvent` ignores the close without asking.
+
+**2026-09-25 — DONE: QUIT IS GREYED DURING A RUN.**
 
 - **Changed, by decision:** `quitProgramAction` is one of the
   `evolutionRunningActions`, so File > Quit, its toolbar button and Ctrl+Q
@@ -916,9 +931,7 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 - **Review:** no defects.
 - **Gates:** `check.sh` 936 pass, 0 fail; warnings 487. The other four gates
   are green.
-- **Next:** Quit asks twice. Qt 6's `quit()` closes every window, so
-  `SIG_MainWindow::closeEvent` asks again after `slotAboutToQuit` has asked.
-  Agreed fix: `slotAboutToQuit` calls `close()`, and only `closeEvent` asks.
+- **Next:** Quit asks twice.
 
 **2026-09-25 — DONE: ITEM 79, SAVE WRITES TO THE EXPERIMENT'S OWN FILE.**
 
