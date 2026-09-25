@@ -53,7 +53,7 @@ namespace SIGEL_Simulation
 
   void SIG_Interpreter::interprete(double timeAccountSize)
   {
-    long programLength = const_cast<SIGEL_Program::SIG_Program &>(robotProgram).getProgramLength();
+    long programLength = robotProgram.getProgramLength();
 
     // save how many registers are available as it will be needed very often...
     uint numberOfRegisters = registers.size();

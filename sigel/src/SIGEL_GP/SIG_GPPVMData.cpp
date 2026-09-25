@@ -136,14 +136,12 @@ void SIGEL_GP::SIG_GPPVMData::savePVMDataTransfer(QTextStream & file,
 {
   file.setRealNumberPrecision( 50 );
 
-  SIGEL_Program::SIG_Program &usedProgram = const_cast< SIGEL_Program::SIG_Program& >(program);
-
   QString fiveHashesLine("\n#####\n");
   simulationParameter.writeToFile(file);
   file << fiveHashesLine;
   environment.writeToFile(file);
   file << fiveHashesLine;
-  usedProgram.writeToFile(file);
+  program.writeToFile(file);
   file << fiveHashesLine;
   robot.writeToFileTransfer(file);
   file << fiveHashesLine;

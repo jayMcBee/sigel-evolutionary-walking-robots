@@ -594,6 +594,18 @@ touched, because changing one changes behaviour against the reference binary.
   "terminates after N generations", a count per run; its text changes with
   it.
 
+- [ ] **91. Make `SIG_ProgramLine`'s getters const, then `getLine`.** Found
+  2026-09-25 by the review of the `SIG_Program` const step. None of these
+  change the line: `getRobotinstructionType`, `getInstructionElement`,
+  `getElement`, `getNumberOfElements`, `getElementsArray`, `printToString`,
+  `print`, `writeToFile`. With them const, `SIG_ProgramLine::operator=` loses
+  its `const_cast`, and `SIG_Program` can offer
+  `const SIG_ProgramLine *getLine( long no ) const` beside the non-const one
+  that `SIG_GPOperations`' mutation needs; `SIG_Interpreter::interprete` then
+  loses its last `const_cast`. `SIG_GPIndividual::exportProgram` and `print`
+  can use `getProgram()` instead of `getProgramVar()`. `SIG_Program::print`'s
+  comment says stdout; it writes to `SIG_IO::cerr`.
+
 - [ ] **89. Refuse bad simulation parameters.** Found 2026-09-24 in item 87;
   needs more thought. Two values reach divisions with nothing to stop them:
   - **Time to simulate of 0:** every simulated fitness function divides the

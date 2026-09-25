@@ -74,7 +74,7 @@ SIGEL_Program::SIG_Program& SIGEL_Program::SIG_Program::operator =(SIGEL_Program
   return *this;
 }
 
-long SIGEL_Program::SIG_Program::getProgramLength()
+long SIGEL_Program::SIG_Program::getProgramLength() const
 {
      return lines.size();
 }
@@ -84,7 +84,7 @@ std::vector< SIGEL_Program::SIG_ProgramLine* > &SIGEL_Program::SIG_Program::getP
      return lines;
 }
 
-void SIGEL_Program::SIG_Program::printToString( QString &str )
+void SIGEL_Program::SIG_Program::printToString( QString &str ) const
 {
   
   for( long i=0; i<lines.size(); i++ )
@@ -96,7 +96,7 @@ void SIGEL_Program::SIG_Program::printToString( QString &str )
 
 }
 
-void SIGEL_Program::SIG_Program::print()
+void SIGEL_Program::SIG_Program::print() const
 
 {
 
@@ -104,7 +104,7 @@ void SIGEL_Program::SIG_Program::print()
 
 }
 
-void SIGEL_Program::SIG_Program::writeToFile( QTextStream &file )
+void SIGEL_Program::SIG_Program::writeToFile( QTextStream &file ) const
 {
   for( long i=0; i<getProgramLength(); i++ )
     {
@@ -232,7 +232,7 @@ void SIGEL_Program::SIG_Program::importProgram( QString& filename )
 
 }
 
-void SIGEL_Program::SIG_Program::exportProgram( QString& filename )
+void SIGEL_Program::SIG_Program::exportProgram( QString& filename ) const
 {
    QFile prgFile( filename );
 

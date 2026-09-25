@@ -235,8 +235,7 @@ namespace SIGEL_SlaveGUI
     visualisationWidget->setShowShadows( showShadowsCheckBox->isChecked() );
 
     QString programCode;
-    SIGEL_Program::SIG_Program &varProgram = const_cast< SIGEL_Program::SIG_Program& >( program );
-    varProgram.printToString( programCode );
+    program.printToString( programCode );
     robotProgramView->setText( programCode );
   };
 

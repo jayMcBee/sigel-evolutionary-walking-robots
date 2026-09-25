@@ -902,8 +902,25 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-25 — DONE: ITEM 78, THE INDIVIDUALS TABLE'S COLUMNS.** Start
+**2026-09-25 — DONE: FIVE READ-ONLY `SIG_Program` METHODS ARE CONST.** Start
 here.
+
+- **Changed:** `getProgramLength`, `printToString`, `print`, `writeToFile` and
+  `exportProgram` are const. None changes the program or its lines. Three
+  `const_cast`s that existed only to call them are gone: in
+  `SIG_Interpreter::interprete`, `SIG_SimulationWidget::visualizeThis` and
+  `SIG_GPPVMData::savePVMDataTransfer`. The remaining `const_cast`s are
+  there for `getLine`, for `MetaClassifier`'s non-const API, and for PVM and
+  other classes.
+- **None of the casts was undefined behaviour:** each object was created
+  non-const and only read through the cast.
+- **Review:** no defects. Its follow-up for `getLine` is new item 91.
+- **Gates:** `check.sh` 936 pass, 0 fail; warnings 487. The other four gates
+  are green.
+- **Next:** a program length column on the Individuals page, between Fitness
+  and Age.
+
+**2026-09-25 — DONE: ITEM 78, THE INDIVIDUALS TABLE'S COLUMNS.**
 
 - **Changed, by decision:** the Name column takes the free width; Fitness and
   Age fit their contents, at least fourteen digits wide. Details are in item

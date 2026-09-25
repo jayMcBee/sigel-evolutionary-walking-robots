@@ -130,7 +130,7 @@ class SIG_Program
  * The current program will be attached to the given text stream.
  */
   public:
-  void writeToFile(QTextStream &file);
+  void writeToFile(QTextStream &file) const;
 
 /**
  * This function reads a program out of a given text stream. 
@@ -155,7 +155,7 @@ class SIG_Program
  * The QString contains the complete program.
  */
    public:
-   void printToString(QString &str);
+   void printToString(QString &str) const;
 
 /**
  * This function deletes a complete program.
@@ -171,7 +171,7 @@ class SIG_Program
  * The program will be printed to stdout.
  */
    public:
-   void print();
+   void print() const;
 
 
 /**
@@ -180,7 +180,7 @@ class SIG_Program
  * The returned long is the current program length.
  */
    public:
-   long getProgramLength();
+   long getProgramLength() const;
 
 /**
  * This functions returns a program line.
@@ -267,7 +267,7 @@ class SIG_Program
  */
 
    public:
-   void exportProgram( QString& filename );
+   void exportProgram( QString& filename ) const;
 
 /**
  * This function checks if the current program length is too long or too short.
