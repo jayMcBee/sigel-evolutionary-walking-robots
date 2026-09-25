@@ -5744,8 +5744,21 @@ the same writer and the same callers, and the port changed only
 `sigel_slave` against an empty read-only `Terrain.ter` and got the same call
 path with `x_dim` 0, `y_dim` 0, `grid_resolution` 0 and `xindex` -2, and
 disassembled the clamp: `x_dim` at offset `0x24`, `add $0xfffffffe,%eax`, no
-lower guard. Its control with a valid 5058-byte file simulated normally. **How
-often 1.3 hits this was never measured** — those probes were stood down.
+lower guard. Its control with a valid 5058-byte file simulated normally.
+
+**What it does to 1.3, measured on the x86 machine in September 2026.** In
+1.3 runs with several slaves on one host, 0.5–0.85% of slave evaluations
+end in `Invalid storage access`. **The race also gives absurd scores.** One
+program scored 249.503 with `SimpleFitnessFunction` under 8 slaves, although
+its replay moves the torso 0.03 units in 20 s. Three unmutated copies of the
+same program, evaluated with one slave process on the whole PVM, scored
+0.0327516 each, bit for bit, with no crash. **That the absurd score comes
+from a half-read floor is inferred, not observed:** a file cut after its
+header leaves the heights that `loadTerrainData` could not read as
+uninitialised memory from `new Float[]`, and a number cut in the middle
+gives a wrong height. Neither crashes. So 1.3's high scores with fitness
+functions that score distance, Simple and RealSpeed among them, are not
+trusted when the run used several slaves on one host.
 §7's "Not doing" list carries the two routes the fix does
 not close, and item 37 the one that is still open.
 

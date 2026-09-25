@@ -479,7 +479,11 @@ touched, because changing one changes behaviour against the reference binary.
   every recorded position against a minimal and maximal height, but not
   against horizontal jumps. The `sigel-x86` session reported two fitness
   functions, not named in its report, defeated by individuals scoring 268 and
-  292 on 1.3; not re-measured here.
+  292 on 1.3; not re-measured here. Those runs used several slaves on one
+  host, and a 249.503 found the same way turned out to be the shared
+  `Terrain.ter` race, fixed in 2.0: the program scored 0.0327516 with one
+  slave. PORTING.md has the measurement with the `Terrain.ter` fix. So the
+  1.3 scores are no evidence for this item; it rests on the code alone.
   Any bound is a heuristic and needs more thought.
   **Related, found 2026-09-24:** `SIG_GPAdaptiveWalkingFitnessFunction`
   already tests each recorded height. Above 1.5 times the start height it logs
