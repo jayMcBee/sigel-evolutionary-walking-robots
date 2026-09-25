@@ -902,8 +902,17 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-25 — DONE: THE SHADOW MAP HAS ROOM FOR SWINGING LIMBS.** Start
+**2026-09-25 — DONE: ITEM 69, PLAY NO LONGER KEEPS A CORE BUSY.** Start
 here.
+
+- **Changed, by decision:** `simulationTimer` waits at least 1 ms. Details and
+  measurements are in item 69's entry in "Done".
+- **Review:** no defects; it found three doc passages that still described
+  the busy core. Fixed.
+- **Gates:** `check.sh` 936 pass, 0 fail; warnings 487. The other four gates
+  are green.
+
+**2026-09-25 — DONE: THE SHADOW MAP HAS ROOM FOR SWINGING LIMBS.**
 
 - **Changed, by decision:** `SIG_SimulationVisualisation::renderShadowMap`
   makes the box's half-size `robotRadius` × `shadowBoxMargin` (1.1), where
@@ -1459,7 +1468,7 @@ REMOVED.**
   around it, C++11 features already in the tree, or all of C++17. 61 (the
   terrain transpose) and 68 (the robot's start in the middle of the terrain)
   change physics or experiment setup. 64 (the rest of Dynamo) touches the file
-  format. 69 (a busy core while Play waits) is small.
+  format.
 - **Raised and not recorded as items:** a textured floor uploads its texture
   on every frame, because `initTexture` runs inside the plane's display list;
   in the hidden modes the label of a hidden anchor point still shows.
@@ -4961,6 +4970,19 @@ carried; other items and this file cite them, so they do not change.
     pixels. Qt 6.10's `QOpenGLWidget` sets the viewport in device pixels
     itself before each `paintGL`, and the aspect ratio is the same in both.
 
+- [x] **69. While Play waits for a frame, one core stays busy** — done
+  2026-09-25, by decision, the smallest fix. `simulationTimer` fired at Frame
+  Delay, 0 ms by default, and `slotSimulationProgress` returned at once until
+  the last frame was on screen, so a hidden window kept one core busy. The
+  timer's interval is now `qMax( frameDelay, 1 )` in `slotStartSimulation`,
+  `resumeAfterDialog` and `slotSetFrameDelay`; `frameDelay` keeps the spin
+  box value, and Frame Delay 0 and 1 now behave the same. Measured on Xvfb,
+  walker, Play with the window unmapped: 102% of one core before, 1% after.
+  Simulated time after 20 s of Play: 3 s in both. Not taken: a single-shot
+  timer restarted from `slotFrameShown`, with its own running flag. Not
+  measured: whether a shown window on a real display also spun between
+  frames.
+
 - [x] **66. Give the 3-D view a square shape** — done 2026-09-23, by
   decision, option A of three. `SIG_SimulationWindow`'s constructor starts the
   viewer window at 1014 x 810, where it was 780 x 810; the minimum stays
@@ -5102,10 +5124,8 @@ carried; other items and this file cite them, so they do not change.
     `repaint()` would not have fixed it: Qt 6 turns it into a later update when
     the window composed less than one refresh ago. Checked on the desktop.
   - **Costs:** at Frame Delay 0 Play runs at one step per frame on screen, not
-    as fast as the CPU can step. While Play waits for a frame the 0 ms timer
-    still fires and returns, so one core stays busy; a single-shot timer with
-    its own running flag would end that, and touches `simulationRunning`, the
-    dialog pause and the Play slots.
+    as fast as the CPU can step. The timer waits at least 1 ms, so the wait
+    for a frame does not keep a core busy; see item 69.
 
 - [x] **63, second half. A Points mode in the 3-D view** — done 2026-09-23,
   by decision. The render mode "Points", after Hidden lines, draws only the

@@ -411,15 +411,6 @@ touched, because changing one changes behaviour against the reference binary.
   `STARTPOSITION` in the `.exp` files, a file change, or the terrain's place
   in DynaMechs, a vendor patch. Positions and fitness move with it.
 
-- [ ] **69. While Play waits for a frame, one core stays busy.** Found
-  2026-09-23 with the Play pacing fix. `simulationTimer` fires at Frame Delay,
-  0 ms by default, and `SIG_SimulationVisualisationWidget::
-  slotSimulationProgress` returns at once until `frameSwapped` has come; while
-  the window is not exposed that is all the time. A single-shot timer
-  restarted from `slotFrameShown` would end it, but `simulationRunning` reads
-  `simulationTimer->isActive()`, so it needs its own running flag, used by the
-  Play slots, Step, Fast-forward and the dialog pause.
-
 - [ ] **70. A menu command that clones an experiment with a fresh population.**
   Asked for 2026-09-23. It keeps the robot and every parameter, and replaces
   the population with new random individuals at generation 0, with no

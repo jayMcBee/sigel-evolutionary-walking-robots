@@ -446,7 +446,7 @@ void SIG_SimulationVisualisationWidget::resetRecorder()
       {
 	automaticRefresh = false;
 	frameShown = true;
-	simulationTimer->start( frameDelay );
+	simulationTimer->start( qMax( frameDelay, 1 ) );
       };
   };
 
@@ -464,7 +464,7 @@ void SIG_SimulationVisualisationWidget::resetRecorder()
     if (pausedForDialog)
       {
 	pausedForDialog = false;
-	simulationTimer->start( frameDelay );
+	simulationTimer->start( qMax( frameDelay, 1 ) );
       };
   };
 
@@ -504,7 +504,7 @@ void SIG_SimulationVisualisationWidget::resetRecorder()
     frameDelay = fframeDelay;
 
     if (simulationTimer->isActive())
-      simulationTimer->setInterval( frameDelay );
+      simulationTimer->setInterval( qMax( frameDelay, 1 ) );
   };
 
   void SIG_SimulationVisualisationWidget::slotSimulationProgress()
