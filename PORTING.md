@@ -5120,7 +5120,7 @@ carried; other items and this file cite them, so they do not change.
 
 - [x] **93. The build date and time in the window title** — done
   2026-09-25, by decision. `SIG_MainWindow`'s constructor sets the title to
-  "SIGEL 1.4 (built Sep 25 2026 21:02:07)": the version from `SIG_Version`,
+  "SIGEL 1.4 (built <__DATE__> <__TIME__>)": the version from `SIG_Version`,
   then `__DATE__` and `__TIME__`. The Makefile's `TITLE_OBJ` rule compiles
   `SIG_MainWindow.cpp` again whenever any other object of the built modules,
   `$(CORE)` and `$(GUI)`, is compiled, so the date is the latest build's. A
