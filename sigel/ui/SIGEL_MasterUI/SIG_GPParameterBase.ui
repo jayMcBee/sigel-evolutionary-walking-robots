@@ -51,7 +51,7 @@
                     <item row="4" column="2">
                       <widget class="QLabel" name="textlabelGeneration">
                         <property name="text">
-                          <string>Generations</string>
+                          <string>generations</string>
                         </property>
                         <property name="wordWrap">
                           <bool>false</bool>
@@ -74,7 +74,7 @@
                     <item row="2" column="2" rowspan="1" colspan="2">
                       <widget class="QCheckBox" name="checkboxIgnoreMaxIndLength">
                         <property name="text">
-                          <string>Ignore maximal length</string>
+                          <string>Ignore maximum length</string>
                         </property>
                       </widget>
                     </item>
@@ -126,7 +126,7 @@
                     <item row="1" column="0">
                       <widget class="QLabel" name="textlabelMinIndLength">
                         <property name="text">
-                          <string>Minimal program length:</string>
+                          <string>Minimum program length:</string>
                         </property>
                         <property name="alignment">
                           <set>Qt::AlignVCenter|Qt::AlignRight</set>
@@ -227,7 +227,7 @@
                     <item row="3" column="0">
                       <widget class="QLabel" name="textlabelMaxAge">
                         <property name="text">
-                          <string>Maximal age:</string>
+                          <string>Maximum age:</string>
                         </property>
                         <property name="alignment">
                           <set>Qt::AlignVCenter|Qt::AlignRight</set>
@@ -240,7 +240,7 @@
                     <item row="2" column="0">
                       <widget class="QLabel" name="textlabelMaxIndLength">
                         <property name="text">
-                          <string>Maximal program length:</string>
+                          <string>Maximum program length:</string>
                         </property>
                         <property name="alignment">
                           <set>Qt::AlignVCenter|Qt::AlignRight</set>
@@ -432,7 +432,7 @@
                     <item>
                       <widget class="QComboBox" name="comboboxFitnessName">
                         <property name="toolTip">
-                          <string>Select the fitness function to be used</string>
+                          <string>Select the fitness function to be used.</string>
                         </property>
                         <item>
                           <property name="text">
@@ -1254,7 +1254,7 @@
                       </property>
                       <item>
                         <property name="text">
-                          <string>Very Low</string>
+                          <string>Very low</string>
                         </property>
                       </item>
                       <item>
@@ -1274,7 +1274,7 @@
                       </item>
                       <item>
                         <property name="text">
-                          <string>Very High</string>
+                          <string>Very high</string>
                         </property>
                       </item>
                     </widget>
@@ -1654,7 +1654,7 @@
                           <enum>Qt::Horizontal</enum>
                         </property>
                         <property name="toolTip">
-                          <string>Adjust how many tournaments are to be considered a 'Generation'</string>
+                          <string>Adjust how many tournaments are to be considered a 'generation'.</string>
                         </property>
                       </widget>
                     </item>
@@ -1921,7 +1921,7 @@
                         </column>
                         <column>
                           <property name="text">
-                            <string>Hostname</string>
+                            <string>Host name</string>
                           </property>
                         </column>
                         <column>

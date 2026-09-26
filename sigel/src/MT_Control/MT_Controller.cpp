@@ -209,9 +209,9 @@ bool MT_Controller::switchSystem(int wantedSystem)
 	// if we have constructed a substituter or a gpmanager yet, we have to destroy them
 	if(gpManager || substCache.inUse || substitution){
 
-		if(QMessageBox::warning(SIGEL_Tools::dialogParent(), "Switching the meta system", 
+		if(QMessageBox::warning(SIGEL_Tools::dialogParent(), "Switching the MetaGP System", 
 			"Switching the system requires deleting the current\n"
-			"gp-system. Do you want to delete it?",
+			"GP system. Do you want to delete it?",
 			"Yes", "No", 0, 1, 1) == 0){
 
 			if(mainWindow){
@@ -257,7 +257,7 @@ bool MT_Controller::useMeta(bool state)
 		if(guiEnabled){
 			switch( QMessageBox::information(SIGEL_Tools::dialogParent(), 
 											"Disabling MetaGP",
-											"You are about to disable the Meta GP-System. What shall\n"
+											"You are about to disable the MetaGP system. What shall\n"
 											"we do with the system?",
 											"Disable",
 											"Remove",
@@ -434,10 +434,10 @@ bool MT_Controller::readFromFile(QString fileName)
 	} else {
 		if(guiEnabled){
 			switch(QMessageBox::critical(SIGEL_Tools::dialogParent(),
-								"Loading experiment",
-								"An error occurred in loading the meta experiment.\n"
+								"Loading Experiment",
+								"An error occurred while loading the meta experiment.\n"
 								"Press <standard> to load the default setup or\n"
-								"press <deactivate> to disable the meta system.",
+								"press <deactivate> to disable the MetaGP system.",
 								"Standard", "Deactivate", 0, 0))
 			{
 			case 0 :	// load default settings
@@ -907,8 +907,8 @@ void MT_Controller::slotSaveSetup()
 
 	QFile file(fileName);
 	if(file.exists()){
-		if(0 == QMessageBox::warning(mainWindow, "Save configuration", "There is another file with this name. This will overwrite\n"
-			"the existing file. Do you really want to continue?", "Ok", "Cancel", 0, 1))
+		if(0 == QMessageBox::warning(mainWindow, "Save Configuration", "There is another file with this name. This will overwrite\n"
+			"the existing file. Do you really want to continue?", "OK", "Cancel", 0, 1))
 			return;
 	}
 	if(file.open(QIODevice::WriteOnly)){

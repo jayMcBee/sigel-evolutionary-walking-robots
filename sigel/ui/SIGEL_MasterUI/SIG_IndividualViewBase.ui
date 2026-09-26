@@ -42,7 +42,7 @@
               <item>
                 <widget class="QLabel" name="textlabelProgramCode">
                   <property name="text">
-                    <string>Program Code:</string>
+                    <string>Program code:</string>
                   </property>
                   <property name="wordWrap">
                     <bool>false</bool>

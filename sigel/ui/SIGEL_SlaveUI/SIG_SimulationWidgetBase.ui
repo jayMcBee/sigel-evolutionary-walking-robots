@@ -35,7 +35,7 @@
       <item row="0" column="0">
         <widget class="QGroupBox" name="threeDView">
           <property name="title">
-            <string>3D View</string>
+            <string>3D view</string>
           </property>
           <property name="alignment">
             <set>Qt::AlignLeft</set>
@@ -175,7 +175,7 @@
               <item row="1" column="0">
                 <widget class="QLabel" name="TextLabel1_3">
                   <property name="text">
-                    <string>Simulationtime:</string>
+                    <string>Simulation time:</string>
                   </property>
                   <property name="wordWrap">
                     <bool>false</bool>
@@ -201,7 +201,7 @@
               <item row="3" column="0">
                 <widget class="QLabel" name="TextLabel1">
                   <property name="text">
-                    <string>Rendermode:</string>
+                    <string>Render mode:</string>
                   </property>
                   <property name="alignment">
                     <set>Qt::AlignVCenter|Qt::AlignLeft</set>
@@ -233,12 +233,12 @@
                   </item>
                   <item>
                     <property name="text">
-                      <string>Flatshaded</string>
+                      <string>Flat shaded</string>
                     </property>
                   </item>
                   <item>
                     <property name="text">
-                      <string>Gouraudshaded</string>
+                      <string>Gouraud shaded</string>
                     </property>
                   </item>
                 </widget>
@@ -280,7 +280,7 @@
                       </rect>
                     </property>
                     <property name="text">
-                      <string>Z-Position:</string>
+                      <string>Z-position:</string>
                     </property>
                     <property name="wordWrap">
                       <bool>false</bool>
@@ -296,7 +296,7 @@
                       </rect>
                     </property>
                     <property name="text">
-                      <string>X-Position:</string>
+                      <string>X-position:</string>
                     </property>
                     <property name="alignment">
                       <set>Qt::AlignVCenter|Qt::AlignLeft</set>
@@ -315,7 +315,7 @@
                       </rect>
                     </property>
                     <property name="text">
-                      <string>Y-Position:</string>
+                      <string>Y-position:</string>
                     </property>
                     <property name="wordWrap">
                       <bool>false</bool>
@@ -533,7 +533,7 @@
                       </rect>
                     </property>
                     <property name="text">
-                      <string>Trace Robot</string>
+                      <string>Trace robot</string>
                     </property>
                     <property name="checked">
                       <bool>true</bool>
@@ -560,7 +560,7 @@
               <item row="5" column="0">
                 <widget class="QLabel" name="TextLabel1_2">
                   <property name="text">
-                    <string>Frame Delay (ms):</string>
+                    <string>Frame delay (ms):</string>
                   </property>
                   <property name="wordWrap">
                     <bool>false</bool>
@@ -580,7 +580,7 @@
               <item row="9" column="0">
                 <widget class="QPushButton" name="planecolorPushButton">
                   <property name="text">
-                    <string>Choose planecolor</string>
+                    <string>Choose plane color</string>
                   </property>
                 </widget>
               </item>
@@ -648,7 +648,7 @@
           </widget>
           <widget class="QWidget" name="tab1">
             <attribute name="title">
-              <string>Robot Program</string>
+              <string>Robot program</string>
             </attribute>
             <layout class="QGridLayout">
               <property name="margin">

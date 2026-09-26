@@ -137,7 +137,7 @@ namespace SIGEL_SlaveGUI
     // has no effect.
     auto const enableAmbientLighting = [this]( QString const &mode )
       {
-	bool const lit = (mode == "Flatshaded") || (mode == "Gouraudshaded");
+	bool const lit = (mode == "Flat shaded") || (mode == "Gouraud shaded");
 	TextLabel1_4->setEnabled( lit );
 	ambientLightingSlider->setEnabled( lit );
       };

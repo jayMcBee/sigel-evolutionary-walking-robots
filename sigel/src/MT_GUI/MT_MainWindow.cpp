@@ -47,7 +47,7 @@ MT_MainWindow::MT_MainWindow(MT_Controller *controller, MT_GPManager *manager, s
 	QIcon icon_mtStartEvolutionAction(QPixmap(pixPath+"mt_StartSmall.xpm"));
 	icon_mtStartEvolutionAction.addPixmap(QPixmap(pixPath+"mt_StartLarge.xpm"));
 	mtStartEvolutionAction = new QAction(icon_mtStartEvolutionAction, "Start", this);
-	mtStartEvolutionAction->setToolTip("start evolution");
+	mtStartEvolutionAction->setToolTip("Start evolution");
 	mtStartEvolutionAction->setStatusTip("Starts the evolution without running SIGEL.");
 	mtStartEvolutionAction->setEnabled(false);
 	evolCtrlToolbar->addAction(mtStartEvolutionAction);
@@ -56,7 +56,7 @@ MT_MainWindow::MT_MainWindow(MT_Controller *controller, MT_GPManager *manager, s
 	QIcon icon_mtStopEvolutionAction(QPixmap(pixPath+"mt_StopSmall.xpm"));
 	icon_mtStopEvolutionAction.addPixmap(QPixmap(pixPath+"mt_StopLarge.xpm"));
 	mtStopEvolutionAction = new QAction(icon_mtStopEvolutionAction, "Stop", this);
-	mtStopEvolutionAction->setToolTip("stop evolution");
+	mtStopEvolutionAction->setToolTip("Stop evolution");
 	mtStopEvolutionAction->setStatusTip("Stops the evolution.");
 	mtStopEvolutionAction->setEnabled(false);
 	evolCtrlToolbar->addAction(mtStopEvolutionAction);
@@ -71,10 +71,10 @@ MT_MainWindow::MT_MainWindow(MT_Controller *controller, MT_GPManager *manager, s
 	evolCtrlToolbar->addSeparator();
 	QIcon icon_mtAutoStopAction(QPixmap(pixPath+"mt_AutoStopSmall.xpm"));
 	icon_mtAutoStopAction.addPixmap(QPixmap(pixPath+"mt_AutoStopLarge.xpm"));
-	mtAutoStopAction = new QAction(icon_mtAutoStopAction, "manual/timed stop", this);
-	mtAutoStopAction->setToolTip("manual/timed stop");
+	mtAutoStopAction = new QAction(icon_mtAutoStopAction, "Manual/timed stop", this);
+	mtAutoStopAction->setToolTip("Manual/timed stop");
 	mtAutoStopAction->setCheckable(true);
-	mtAutoStopAction->setStatusTip("If on, evolution is stopped after the given time period is run down.");
+	mtAutoStopAction->setStatusTip("If on, the evolution stops when the given time has run out.");
 	mtAutoStopAction->setChecked(false);
 	evolCtrlToolbar->addAction(mtAutoStopAction);
 
@@ -154,17 +154,17 @@ MT_MainWindow::MT_MainWindow(MT_Controller *controller, MT_GPManager *manager, s
 	// - load settings
 	QIcon icon_mtLoadAction(QPixmap(pixPath+"openExperimentSmall.xpm"));
 	icon_mtLoadAction.addPixmap(QPixmap(pixPath+"openExperimentLarge.xpm"));
-	mtLoadAction = new QAction(icon_mtLoadAction, "&Open", this);
-	mtLoadAction->setToolTip("Load");
+	mtLoadAction = new QAction(icon_mtLoadAction, "&Open...", this);
+	mtLoadAction->setToolTip("Open");
 	mtLoadAction->setShortcut(Qt::CTRL | Qt::Key_O);
-	mtLoadAction->setStatusTip("Load settings from a file.");
+	mtLoadAction->setStatusTip("Opens a settings file.");
 	fileMenu->addAction(mtLoadAction);
 	mainToolBar->addAction(mtLoadAction);
 
 	// - save settings
 	QIcon icon_mtSaveAction(QPixmap(pixPath+"saveExperimentSmall.xpm"));
 	icon_mtSaveAction.addPixmap(QPixmap(pixPath+"saveExperimentLarge.xpm"));
-	mtSaveAction = new QAction(icon_mtSaveAction, "&Save", this);
+	mtSaveAction = new QAction(icon_mtSaveAction, "&Save...", this);
 	mtSaveAction->setToolTip("Save");
 	mtSaveAction->setShortcut(Qt::CTRL | Qt::Key_S);
 	mtSaveAction->setStatusTip("Saves the current settings to a file.");

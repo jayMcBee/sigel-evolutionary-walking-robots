@@ -41,7 +41,7 @@ SIG_InfoBox::SIG_InfoBox( QWidget *parent, const char *name, bool modal, Qt::Win
 #else
   QString sigelRoot( std::getenv( "SIGEL_ROOT" ) );
 #endif
-  this->setWindowTitle( "Sigel InfoBox" );
+  this->setWindowTitle( "About SIGEL" );
   QLabel *pixmapLabel = new QLabel( this );
   // The image is 1024 x 1024; the box shows it at 256 x 256.
   pixmapLabel->setPixmap( QPixmap( sigelRoot + "/pixmaps/newLogoNoVersion.png" )
@@ -57,7 +57,7 @@ SIG_InfoBox::SIG_InfoBox( QWidget *parent, const char *name, bool modal, Qt::Win
   hL->addLayout( vL );
   SIG_TextView *theView = new SIG_TextView( this, nullptr );
   theView->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
-  theView->setText(QString("<h3>Sigel v%1</h3>").arg( SIGEL_Tools::SIG_Version::number ) +
+  theView->setText(QString("<h3>SIGEL v%1</h3>").arg( SIGEL_Tools::SIG_Version::number ) +
 		   "<h3>Developed by PG 368:</h3>"
 		   "<ul>"
 		   "<li>Christian <b>&quot;Krasstexta&quot;</b> Aue</li>"

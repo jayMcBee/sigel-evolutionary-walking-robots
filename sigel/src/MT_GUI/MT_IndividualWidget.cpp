@@ -210,7 +210,7 @@ void MT_IndividualsWidget::onShow(MT_GPManager *manager, subst_cache *subst)
 		}
 
 	} else
-		QMessageBox::critical(this, "Configure Meta-System", "Couldn't get randomizer to set/get settings.", "Ok");
+		QMessageBox::critical(this, "Configure MetaGP System", "Couldn't get randomizer to set/get settings.", "OK");
 }
 
 bool MT_IndividualsWidget::onHide(MT_GPManager *manager, subst_cache *subst)
@@ -310,7 +310,7 @@ void MT_IndividualsWidget::slotImportConstants()
 			if(!found || !count){
 				QMessageBox::information(this, "Load Constants",
 					"Import operation aborted.\n"
-					"The loaded file is not a correct constants-file.",	1, 0);
+					"The loaded file is not a valid constants file.",	1, 0);
 			}
 			file.close();
 
@@ -331,8 +331,8 @@ void MT_IndividualsWidget::slotExportConstants()
 
 	QFile file(fileName);
 	if(file.exists()){
-		if(0 == QMessageBox::warning(this, "Save constants", "There is another file with this name. This will overwrite\n"
-			"the existing file. Do you really want to continue?", "Ok", "Cancel", 0, 1))
+		if(0 == QMessageBox::warning(this, "Save Constants", "There is another file with this name. This will overwrite\n"
+			"the existing file. Do you really want to continue?", "OK", "Cancel", 0, 1))
 			return;
 	}
 	
@@ -341,8 +341,8 @@ void MT_IndividualsWidget::slotExportConstants()
 		int count = constantsListBox->count();
 		if(!count){
 			QMessageBox::information(this, "Export Constants",
-				"Listbox doesn't contain constants.\n"
-				"Couldn't save constants.", 1, 0);
+				"The list contains no constants.\n"
+				"The constants were not saved.", 1, 0);
 			return;
 		}
 		str << "[constants]\n";

@@ -55,7 +55,7 @@ MT_PopulationWidget::MT_PopulationWidget(QMainWindow* parent, const char* name, 
 	// create the actions and insert them
 	QIcon icon_addIndAction(QPixmap(pixPath+"addIndividualsSmall.xpm"));
 	icon_addIndAction.addPixmap(QPixmap(pixPath+"addIndividualsLarge.xpm"));
-	addIndAction = new QAction(icon_addIndAction, "&Add", parentWindow);
+	addIndAction = new QAction(icon_addIndAction, "&Add...", parentWindow);
 	addIndAction->setToolTip("Add Individual");
 	addIndAction->setStatusTip("Adds a randomly created individual to the population.");
 	popToolBar->addAction(addIndAction);
@@ -72,7 +72,7 @@ MT_PopulationWidget::MT_PopulationWidget(QMainWindow* parent, const char* name, 
 
 	QIcon icon_impIndAction(QPixmap(pixPath+"mt_ImpIndSmall.xpm"));
 	icon_impIndAction.addPixmap(QPixmap(pixPath+"/mt_ImpIndSmall.xpm"));
-	impIndAction = new QAction(icon_impIndAction, "&Import", parentWindow);
+	impIndAction = new QAction(icon_impIndAction, "&Import...", parentWindow);
 	impIndAction->setToolTip("Import Individual");
 	impIndAction->setStatusTip("Imports one or more individuals from a file.");
 	popToolBar->addAction(impIndAction);
@@ -80,9 +80,9 @@ MT_PopulationWidget::MT_PopulationWidget(QMainWindow* parent, const char* name, 
 
 	QIcon icon_expIndAction(QPixmap(pixPath+"mt_ExpIndSmall.xpm"));
 	icon_expIndAction.addPixmap(QPixmap(pixPath+"mt_ExpIndSmall.xpm"));
-	expIndAction = new QAction(icon_expIndAction, "&Export", parentWindow);
+	expIndAction = new QAction(icon_expIndAction, "&Export...", parentWindow);
 	expIndAction->setToolTip("Export Individual");
-	expIndAction->setStatusTip("Writes the selected Individuals to a file.");
+	expIndAction->setStatusTip("Writes the selected individuals to a file.");
 	popToolBar->addAction(expIndAction);
 	popContextMenu->addAction(expIndAction);
 
@@ -152,7 +152,7 @@ void MT_PopulationWidget::onShow(MT_GPManager *manager, subst_cache *subst)
 	// get the current population
 	population = manager->getParent();
 	if(!population){
-		QMessageBox::critical(this, "Configure Meta-System", "Couldn't get current population.", "Ok");
+		QMessageBox::critical(this, "Configure MetaGP System", "Couldn't get current population.", "OK");
 		return;
 	}
 	oldPopSize = population->getSize();
@@ -385,7 +385,7 @@ void MT_PopulationWidget::slotExpInd()
 	bool saveAsPop = false;
 	QString fileName;
 	if(list->count() > 1){
-		saveAsPop = !QMessageBox::information(this, "Save individuals", "There is more than one individual selected.\n"
+		saveAsPop = !QMessageBox::information(this, "Save Individuals", "There is more than one individual selected.\n"
 			"Shall we save them as a population?", "Save as population", "Save separately");
 	}
 	if(saveAsPop){
@@ -396,8 +396,8 @@ void MT_PopulationWidget::slotExpInd()
 			QFile file( fileName );
 
 			if(file.exists()){
-				if(0 == QMessageBox::warning(this, "Save population", "There is another file with this name. This will overwrite\n"
-					"the existing file. Do you really want to continue?", "Ok", "Cancel", 0, 1))
+				if(0 == QMessageBox::warning(this, "Save Population", "There is another file with this name. This will overwrite\n"
+					"the existing file. Do you really want to continue?", "OK", "Cancel", 0, 1))
 					return;
 			}
 
@@ -419,7 +419,7 @@ void MT_PopulationWidget::slotExpInd()
 
 				file.close();
 			} else {
-				QMessageBox::critical(this, "Save population", "An error occurred during saving the population.\nAborting operation.", "Ok");
+				QMessageBox::critical(this, "Save Population", "An error occurred while saving the population.\nThe operation is aborted.", "OK");
 			}
 		}
 	} else {
@@ -429,8 +429,8 @@ void MT_PopulationWidget::slotExpInd()
 			for(int i=0; i<list->count(); i++){
 				QFile file( fileName.append("%1.mind").arg(i) );
 				if(file.exists()){
-					if(0 == QMessageBox::warning(this, "Save population", "There is another file with this name. This will overwrite\n"
-						"the existing file. Do you really want to continue?", "Ok", "Cancel", 0, 1))
+					if(0 == QMessageBox::warning(this, "Save Population", "There is another file with this name. This will overwrite\n"
+						"the existing file. Do you really want to continue?", "OK", "Cancel", 0, 1))
 						return;
 				}
 				if(file.open(QIODevice::WriteOnly)){
@@ -442,7 +442,7 @@ void MT_PopulationWidget::slotExpInd()
 					population->getIndividual(list->last()->getPos())->writeToFileIndi(str);
 					file.close();
 				} else {
-					QMessageBox::critical(this, "Save individual", "An error occurred during saving the individual.\nAborting operation.", "Ok");
+					QMessageBox::critical(this, "Save Individual", "An error occurred while saving the individual.\nThe operation is aborted.", "OK");
 				}
 			}
 
@@ -464,9 +464,9 @@ void MT_PopulationWidget::slotLoadPop()
 		if(file.open(QIODevice::ReadOnly)){
 			QTextStream str(&file);
 
-			if(1 == QMessageBox::warning(this, "Import population",
+			if(1 == QMessageBox::warning(this, "Import Population",
 				"Shall the current population be deleted or shall we append\n"
-				"the new individuals?", "append", "delete"))
+				"the new individuals?", "Append", "Delete"))
 			{
 				// delete
 				population->loadPop(str);
@@ -506,8 +506,8 @@ void MT_PopulationWidget::slotSavePop()
 		QFile file( fileName );
 
 		if(file.exists()){
-			if(0 == QMessageBox::warning(this, "Save population", "There is another file with this name. This will overwrite\n"
-				"the existing file. Do you really want to continue?", "Ok", "Cancel", 0, 1))
+			if(0 == QMessageBox::warning(this, "Save Population", "There is another file with this name. This will overwrite\n"
+				"the existing file. Do you really want to continue?", "OK", "Cancel", 0, 1))
 				return;
 		}
 
@@ -516,7 +516,7 @@ void MT_PopulationWidget::slotSavePop()
 			population->writeToFilePop(str);
 			file.close();
 		} else {
-			QMessageBox::critical(this, "Save population", "An error occurred during saving the population.\nAborting operation.", "Ok");
+			QMessageBox::critical(this, "Save Population", "An error occurred while saving the population.\nThe operation is aborted.", "OK");
 		}
 	}
 }

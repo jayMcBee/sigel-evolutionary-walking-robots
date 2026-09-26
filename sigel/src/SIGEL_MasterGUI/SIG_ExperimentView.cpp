@@ -89,11 +89,11 @@ void SIG_ExperimentView::getOutOfExperiment() {
 
 void SIG_ExperimentView::streamToGnuPlot( QTextStream &stream ) {
   stream << "set data style lines\n"
-	 << "set title \"Maximal, minimal and average fitness values\"\n"
+	 << "set title \"Maximum, minimum and average fitness values\"\n"
 	 << "set xlabel 'Generation'\n"
 	 << "set ylabel 'Fitness value'\n";
 
-  stream << "plot '-' title 'Maximal fitness', '-' title 'Minimal fitness', '-' title 'Average fitness'\n";
+  stream << "plot '-' title 'Maximum fitness', '-' title 'Minimum fitness', '-' title 'Average fitness'\n";
 
   for ( SIGEL_GP::SIG_GPExperimentHistoryEntry *actEntry : theExperiment.experimentHistory )
     {
@@ -129,11 +129,11 @@ void SIG_ExperimentView::streamToGnuPlot( QTextStream &stream ) {
 void SIG_ExperimentView::slotExportPostScript() {
   if (theExperiment.experimentHistory.isEmpty())
     {
-      QMessageBox::information( this, "Info", "There is no evolution data to plot!", "Ok" );
+      QMessageBox::information( this, "Info", "There is no evolution data to plot.", "OK" );
       return;
     };
 
-  QString fileName = QFileDialog::getSaveFileName( this, QString(), QString(), "Encapsulated postscript files (*.eps);;All files (*)" );
+  QString fileName = QFileDialog::getSaveFileName( this, QString(), QString(), "Encapsulated PostScript Files (*.eps);;All Files (*)" );
 
   if (fileName.isNull())
     return;
@@ -165,7 +165,7 @@ void SIG_ExperimentView::slotExportPostScript() {
    gnuCmdLine.prepend("gnuplot.exe \"");
    if(WinExec(gnuCmdLine.toLatin1().constData(), SW_SHOW) < 32){
    	// Qt 2 took the button LABEL here (button0Text); Qt 6 takes StandardButtons.
-      QMessageBox::warning(this, "Error!", "Couldn't start gnuplot!", QMessageBox::Ok);
+      QMessageBox::warning(this, "Error", "Couldn't start gnuplot.", QMessageBox::Ok);
    	return;
    }
    pipeFile.remove();
@@ -176,7 +176,7 @@ void SIG_ExperimentView::slotExportPostScript() {
 
   if (gnuPlotStdInPipe==NULL)
     {
-      QMessageBox::warning( this, "Error!", "Couldn't start gnuplot!", "Ok" );
+      QMessageBox::warning( this, "Error", "Couldn't start gnuplot.", "OK" );
       return;
     };
 
@@ -202,7 +202,7 @@ void SIG_ExperimentView::slotExportPostScript() {
 void SIG_ExperimentView::slotShowFitnesscurve() {
   if (theExperiment.experimentHistory.isEmpty())
     {
-      QMessageBox::information( this, "Info", "There is no evolution data to plot!", "Ok" );
+      QMessageBox::information( this, "Info", "There is no evolution data to plot.", "OK" );
       return;
     };
 
@@ -227,7 +227,7 @@ void SIG_ExperimentView::slotShowFitnesscurve() {
    gnuCmdLine.prepend("gnuplot.exe \"");
    if(WinExec(gnuCmdLine.toLatin1().constData(), SW_SHOW) < 32){
    	// Qt 2 took the button LABEL here (button0Text); Qt 6 takes StandardButtons.
-      QMessageBox::warning(this, "Error!", "Couldn't start gnuplot!", QMessageBox::Ok);
+      QMessageBox::warning(this, "Error", "Couldn't start gnuplot.", QMessageBox::Ok);
    	return;
    }
    pipeFile.remove();
@@ -238,7 +238,7 @@ void SIG_ExperimentView::slotShowFitnesscurve() {
   FILE *gnuPlotStdInPipe = popen( "gnuplot -persist -", "w" );
 
   if (gnuPlotStdInPipe==NULL ) {
-    QMessageBox::warning( this, "Error!", "Couldn't start gnuplot!", "Ok" );
+    QMessageBox::warning( this, "Error", "Couldn't start gnuplot.", "OK" );
     return;
   };
 
@@ -270,7 +270,7 @@ void SIG_ExperimentView::slotIntervallChanged(int value) {
     // this is because a new experiment has no path where it is saved
     // so no autosaving can be done
     sliderIntervall->setValue(0);
-    QMessageBox::warning( this, "Error!", "You have to save the experiment first!", "Ok" );
+    QMessageBox::warning( this, "Error", "You have to save the experiment first.", "OK" );
   }
 };
 

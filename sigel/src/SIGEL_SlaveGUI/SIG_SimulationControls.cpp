@@ -77,10 +77,10 @@ namespace SIGEL_SlaveGUI
 
     stopAction->setStatusTip( "Stops and restarts the simulation." );
     playAction->setStatusTip( "Starts/pauses the simulation." );
-    stepAction->setStatusTip( "Lets the simulation progress about one timestep." );
-    fForwardAction->setStatusTip( "Lets the simulation progress about 5 seconds." );
+    stepAction->setStatusTip( "Lets the simulation progress by one time step." );
+    fForwardAction->setStatusTip( "Lets the simulation progress by 5 seconds." );
     // recordAction->setStatusTip( "Toggle the recording of the simulation." );
-    alterMovieSettingsAction->setStatusTip( "Alter the movie settings." );
+    alterMovieSettingsAction->setStatusTip( "Alters the movie settings." );
     quitAction->setStatusTip( "Closes the simulation visualization." );
 
     connect( playAction,

@@ -36,7 +36,7 @@
           </property>
           <column>
             <property name="text">
-              <string>MetaExperiment</string>
+              <string>Meta experiment</string>
             </property>
             <property name="clickable">
               <bool>false</bool>

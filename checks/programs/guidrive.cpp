@@ -490,7 +490,7 @@ static void whenModal(std::function<void(QWidget *)> fn, int budgetMs = 8000)
         // for the whole run. Latching onto it here would consume the handler a
         // step armed for its own dialog, and lose the only record of why the
         // run ended.
-        if (m && m->windowTitle() == "Evolution stopped") m = nullptr;
+        if (m && m->windowTitle() == "Evolution Stopped") m = nullptr;
         if (m) {
             t->stop(); t->deleteLater();
             if (g_modalPoller == t) g_modalPoller = nullptr;
@@ -1419,7 +1419,7 @@ static void openExperiment(const QString &path)
         acceptFileDialog(fd, path);          // real key events into the dialog
         fflush(stdout);
     });
-    clickMenu("&File", "&Open Experiment");
+    clickMenu("&File", "&Open Experiment...");
     QTest::qWait(800);
 }
 
@@ -1876,7 +1876,7 @@ static int guidriveMain(int argc, char **argv)
             clickDlgButton(m, "OK");
         });
         printf("\n== ADD 5 ==\n");
-        clickMenu("&Individuals", "&Add");
+        clickMenu("&Individuals", "&Add...");
         QTest::qWait(2500);
         // The list is still sorted by Fitness ascending, and new individuals
         // carry -1, so they sort to the TOP. Printing the head both catches the
@@ -2152,14 +2152,14 @@ static int guidriveMain(int argc, char **argv)
     if (scenario == "exportall") {
         struct Item { const char *menu; const char *ext; bool needsIndividual; };
         static const Item items[] = {
-            { "GP-Parameters",         "gpp", false },
-            { "Simulation-Parameters", "sip", false },
-            { "Language-Parameters",   "lap", false },
-            { "Environment",           "env", false },
-            { "Population",            "pop", false },
-            { "Program",               "prg", true  },
-            { "Individual",            "ind", true  },
-            { "...to GNU plot",        "dat", false },
+            { "GP Parameters...",      "gpp", false },
+            { "Simulation Parameters...", "sip", false },
+            { "Language Parameters...", "lap", false },
+            { "Environment...",        "env", false },
+            { "Population...",         "pop", false },
+            { "Program...",            "prg", true  },
+            { "Individual...",         "ind", true  },
+            { "gnuplot Data...",       "dat", false },
         };
 
         // Program and Individual export whatever is SELECTED, so pick a named
@@ -2218,11 +2218,11 @@ static int guidriveMain(int argc, char **argv)
         QStackedWidget *st4b = W->findChild<QStackedWidget *>();
         struct Item { const char *menu; const char *ext; };
         static const Item items[] = {
-            { "GP-Parameters",         "gpp" },
-            { "Simulation-Parameters", "sip" },
-            { "Language-Parameters",   "lap" },
-            { "Environment",           "env" },
-            { "Population",            "pop" },
+            { "GP Parameters...",      "gpp" },
+            { "Simulation Parameters...", "sip" },
+            { "Language Parameters...", "lap" },
+            { "Environment...",        "env" },
+            { "Population...",         "pop" },
         };
         printf("\n== ROUND TRIP ==\n");
         // One field per format, on the page that owns it, changed between the
@@ -2392,19 +2392,19 @@ static int guidriveMain(int argc, char **argv)
         // cannot round-trip through itself. Import the experiment's OWN robot
         // and check nothing moves -- the robot the file already names.
         printf("\n-- Robot (import only; there is no Export > Robot)\n");
-        const QString lapBefore = exportTo("Language-Parameters",
+        const QString lapBefore = exportTo("Language Parameters...",
                                            scratch() + "/rt-rob-before", "lap");
         const QString before = lapBefore.isEmpty() ? QString() : sha256Of(lapBefore);
         const QString rrb = QStringLiteral("robots/twoBases/twoBases.rrb");
         printf("  importing %s (exists=%d)\n", qPrintable(rrb), QFile::exists(rrb));
-        importFrom("Robot", QFileInfo(rrb).absoluteFilePath());
+        importFrom("Robot...", QFileInfo(rrb).absoluteFilePath());
         clickMenu("&View", "&Robot");
         QTest::qWait(300);
         if (QStackedWidget *st = W->findChild<QStackedWidget *>())
             if (QWidget *pg = st->currentWidget())
                 for (QListWidget *lw : pg->findChildren<QListWidget *>())
                     printf("  list %-22s count=%d\n", qPrintable(lw->objectName()), lw->count());
-        const QString lapAfter = exportTo("Language-Parameters",
+        const QString lapAfter = exportTo("Language Parameters...",
                                           scratch() + "/rt-rob-after", "lap");
         const QString after = lapAfter.isEmpty() ? QString() : sha256Of(lapAfter);
         printf("  language-parameters before %s\n  language-parameters after  %s\n",
@@ -2429,16 +2429,16 @@ static int guidriveMain(int argc, char **argv)
             if (row < 0) printf("  !! 17013 not found\n");
             else {
                 clickRow(tl, row);
-                const QString a1 = exportTo("Program", scratch() + "/rt-prg-a", "prg");
+                const QString a1 = exportTo("Program...", scratch() + "/rt-prg-a", "prg");
                 const int before = tl->topLevelItemCount();
                 if (!a1.isEmpty() && QFile::exists(a1)) {
-                    importFrom("Program", a1);
+                    importFrom("Program...", a1);
                     clickMenu("&View", "&Population");
                     QTest::qWait(300);
                     tl = indList();
                     for (int i = 0; tl && i < tl->topLevelItemCount(); ++i)
                         if (tl->topLevelItem(i)->text(0) == "17013") { clickRow(tl, i); break; }
-                    const QString b1 = exportTo("Program", scratch() + "/rt-prg-b", "prg");
+                    const QString b1 = exportTo("Program...", scratch() + "/rt-prg-b", "prg");
                     printf("  rows %d -> %d (delta %+d, 0 is correct -- it replaces)\n",
                            before, tl ? tl->topLevelItemCount() : -1,
                            (tl ? tl->topLevelItemCount() : 0) - before);
@@ -2457,10 +2457,10 @@ static int guidriveMain(int argc, char **argv)
             for (int i = 0; tl && i < tl->topLevelItemCount(); ++i)
                 if (tl->topLevelItem(i)->text(0) == "17013") { row = i; break; }
             if (row >= 0) clickRow(tl, row);
-            const QString a1 = exportTo("Individual", scratch() + "/rt-ind-a", "ind");
+            const QString a1 = exportTo("Individual...", scratch() + "/rt-ind-a", "ind");
             const int before = tl ? tl->topLevelItemCount() : -1;
             if (!a1.isEmpty() && QFile::exists(a1)) {
-                importFrom("Individual", a1);
+                importFrom("Individual...", a1);
                 clickMenu("&View", "&Population");
                 QTest::qWait(300);
                 tl = indList();
@@ -2523,7 +2523,7 @@ static int guidriveMain(int argc, char **argv)
             printf("  [export dialog] parentIsTheMainWindow=%d\n", (fd->parentWidget() && fd->parentWidget()->window() == W) ? 1 : 0);
             acceptFileDialog(fd, stem);
         });
-        clickMenu("&File", "Export", "Simulation-Parameters");
+        clickMenu("&File", "Export", "Simulation Parameters...");
         QTest::qWait(2500);
         printf("  [first export] exists=%d size=%lld\n", QFile::exists(out),
                QFileInfo(out).size());
@@ -2548,7 +2548,7 @@ static int guidriveMain(int argc, char **argv)
             m->close();
         };
         whenModal(handler);
-        clickMenu("&File", "Export", "Simulation-Parameters");
+        clickMenu("&File", "Export", "Simulation Parameters...");
         QTest::qWait(4500);
         cancelModalHandler();
         const QStringList stamped = stampedFiles();
@@ -2587,7 +2587,7 @@ static int guidriveMain(int argc, char **argv)
                 acceptFileDialog(dialog, out);
                 poll.stop();
             });
-            clickMenu("&File", "Export", "Simulation-Parameters");
+            clickMenu("&File", "Export", "Simulation Parameters...");
             QTest::qWait(4500);
             cancelModalHandler();
             printf("  [%s] confirmations=%d childOfTheFileDialog=%d\n",
@@ -2748,7 +2748,7 @@ static int guidriveMain(int argc, char **argv)
                    qPrintable(cmds->topLevelItem(jmpRow)->text(2)));
             // The written order is the measurement, not the list widget, which
             // is always alphabetical because the form builds it that way.
-            const QString out = exportTo("Language-Parameters",
+            const QString out = exportTo("Language Parameters...",
                                          scratch() + "/c11c-lap", "lap");
             if (!out.isEmpty() && QFile::exists(out)) {
                 QFile f(out);
@@ -2948,7 +2948,7 @@ static int guidriveMain(int argc, char **argv)
             printf("    [still open before Cancel] visible=%d\n", m->isVisible());
             clickDlgButton(m, "Cancel");
         });
-        clickMenu("&Individuals", "&Add");
+        clickMenu("&Individuals", "&Add...");
         QTest::qWait(1500);
         printf("  rows %d -> %d (Cancel must add nothing)\n", before6,
                t5 ? t5->topLevelItemCount() : -1);
@@ -3002,7 +3002,7 @@ static int guidriveMain(int argc, char **argv)
             else printf("    (left open -- this is the window under test)\n");
             fflush(stdout);
         }, 4000);
-        clickMenu("&MetaGP", "&Configure System");
+        clickMenu("&MetaGP", "&Configure System...");
         QTest::qWait(3000);
         cancelModalHandler();
 
@@ -3159,7 +3159,7 @@ static int guidriveMain(int argc, char **argv)
         whenModal([](QWidget *m) {
             if (qobject_cast<QMessageBox *>(m)) { describeMessageBox(m); m->close(); }
         }, 4000);
-        clickMenu("&MetaGP", "&Configure System");
+        clickMenu("&MetaGP", "&Configure System...");
         QTest::qWait(2500);
 
         QWidget *mt = nullptr;
@@ -3480,7 +3480,7 @@ static int guidriveMain(int argc, char **argv)
         if (QWidget *stat = raisePage("Statistics")) {
             QAction *upd = nullptr;
             for (QAction *a : mt->findChildren<QAction *>())
-                if (a->text().contains("update statistics")) { upd = a; break; }
+                if (a->text().contains("Update statistics")) { upd = a; break; }
             printf("  action found=%d enabled=%d\n", upd ? 1 : 0,
                    upd && upd->isEnabled() ? 1 : 0);
             const int widgetsBefore = stat->findChildren<QWidget *>().count();
@@ -3584,7 +3584,7 @@ static int guidriveMain(int argc, char **argv)
             // empty, so a lookup of the bare text found NOTHING and both press
             // blocks below were dead code -- the baseline carried neither
             // result line, which is how it went unnoticed.
-            if (QAction *a = acts.value(QStringLiteral("manual/timed stop\t"))) {
+            if (QAction *a = acts.value(QStringLiteral("Manual/timed stop\t"))) {
                 const bool was = a->isChecked();
                 a->trigger(); QTest::qWait(200);
                 const bool mid = a->isChecked();
@@ -3793,8 +3793,8 @@ static int guidriveMain(int argc, char **argv)
         QAction *useMt = actionByText("&Use MetaGP");
         printf("  [control] MetaGP on at rest: UseMetaGP checked=%d"
                "  ConfigureSystem enabled=%d  (both 1 = the checks below can fail)\n",
-               useMt && useMt->isChecked() ? 1 : 0, en("&Configure System"));
-        if (!useMt || !useMt->isChecked() || en("&Configure System") != 1) {
+               useMt && useMt->isChecked() ? 1 : 0, en("&Configure System..."));
+        if (!useMt || !useMt->isChecked() || en("&Configure System...") != 1) {
             printf("!! MetaGP did not come on at rest, so the run-lock checks below"
                    " would pass vacuously\n");
             fflush(stdout); return 1;
@@ -3909,8 +3909,8 @@ static int guidriveMain(int argc, char **argv)
             // the half a review found revertible with the gate still green.
             QAction *imp = nullptr, *add = nullptr;
             for (QAction *a : W->findChildren<QAction *>()) {
-                if (a->text() == "GP-Parameters" && !imp) imp = a;
-                if (a->text() == "&Add") add = a;
+                if (a->text() == "GP Parameters..." && !imp) imp = a;
+                if (a->text() == "&Add...") add = a;
             }
             // A REAL selection change. setCurrentItem on the item that is
             // already current emits nothing, and this check used to re-select
@@ -3933,7 +3933,7 @@ static int guidriveMain(int argc, char **argv)
             printf("  [locked] after a tree click ([%s]): Add=%d ConfigureSystem=%d"
                    "  UseMetaGP=%d  (0 = still locked)\n",
                    qPrintable(other->text(0)), add && add->isEnabled() ? 1 : 0,
-                   en("&Configure System"), en("&Use MetaGP"));
+                   en("&Configure System..."), en("&Use MetaGP"));
             if (expWidgets("locked") != 0) {
                 printf("!! a run left the experiment's own Start button or"
                        " parameter pages live\n");
@@ -3944,7 +3944,7 @@ static int guidriveMain(int argc, char **argv)
             // regression in the tree-click guard alone was silently repaired
             // before the end-of-block check could see it -- the gate stayed
             // green and only the baseline text moved. Found by review.
-            if ((add && add->isEnabled()) || en("&Configure System") == 1
+            if ((add && add->isEnabled()) || en("&Configure System...") == 1
                 || en("&Use MetaGP") == 1) {
                 printf("!! D30: a tree click during a run re-enabled a locked action\n");
                 fflush(stdout); return 1;
@@ -3961,19 +3961,19 @@ static int guidriveMain(int argc, char **argv)
             printf("  [locked] after slotEnableNoExperimentActions(true):"
                    " Add=%d ConfigureSystem=%d UseMetaGP=%d  (0 = still locked)\n",
                    add && add->isEnabled() ? 1 : 0,
-                   en("&Configure System"), en("&Use MetaGP"));
+                   en("&Configure System..."), en("&Use MetaGP"));
             // The two doors themselves. Adding them to evolutionRunningActions
             // is a third of this change and NOTHING read them -- revert that
             // append and every check stayed green. Found by review.
             printf("  [locked] the two doors: NewExperiment=%d OpenExperiment=%d"
                    "  (0 = locked during a run)\n",
-                   en("&New Experiment"), en("&Open Experiment"));
-            if (en("&New Experiment") != 0 || en("&Open Experiment") != 0) {
+                   en("&New Experiment"), en("&Open Experiment..."));
+            if (en("&New Experiment") != 0 || en("&Open Experiment...") != 0) {
                 printf("!! D30: New or Open Experiment is live during a run --"
                        " either is a route that re-enables everything else\n");
                 fflush(stdout); return 1;
             }
-            if ((add && add->isEnabled()) || en("&Configure System") == 1
+            if ((add && add->isEnabled()) || en("&Configure System...") == 1
                 || en("&Use MetaGP") == 1) {
                 printf("!! D30: a locked action came back during a run\n");
                 fflush(stdout); return 1;
@@ -4264,7 +4264,7 @@ static int guidriveMain(int argc, char **argv)
             printf("  add dialog: n=%d\n", sp->value());
             if (QDialog *d = qobject_cast<QDialog *>(m)) d->accept();
         }, 6000);
-        clickMenu("&Individuals", "&Add");
+        clickMenu("&Individuals", "&Add...");
         QTest::qWait(3000);
         printf("  individuals after Add=%d\n", il ? il->topLevelItemCount() : -1);
 
@@ -4332,7 +4332,7 @@ static int guidriveMain(int argc, char **argv)
             printf("  [set spinbox to] %d\n", sp ? sp->value() : -1); fflush(stdout);
             clickDlgButton(m, "OK");
         });
-        clickMenu("&Individuals", "&Add");
+        clickMenu("&Individuals", "&Add...");
         QTest::qWait(1500);
         step("after Individuals > Add (5)", false, false, true);
         QTreeWidget *t = indList();
@@ -4437,7 +4437,7 @@ static int guidriveMain(int argc, char **argv)
 
     if (scenario == "rename") {
         whenModal([](QWidget *m) { describeDialog(m); clickDlgButton(m, "Cancel"); });
-        clickMenu("&File", "&Rename Experiment");
+        clickMenu("&File", "&Rename Experiment...");
         QTest::qWait(600);
         step("rename CANCELLED", true, false);
 
@@ -4449,7 +4449,7 @@ static int guidriveMain(int argc, char **argv)
             clickDlgButton(m, "OK");
         });
         printf("\n  >> about to click OK on rename\n"); fflush(stdout);
-        clickMenu("&File", "&Rename Experiment");
+        clickMenu("&File", "&Rename Experiment...");
         QTest::qWait(800);
         printf("  >> rename dialog returned\n"); fflush(stdout);
         step("rename to 'renamed'", true, false);
@@ -4610,7 +4610,7 @@ static int guidriveMain(int argc, char **argv)
             acceptFileDialog(fd, out);
             fflush(stdout);
         });
-        clickMenu("&File", "Export", "Program");
+        clickMenu("&File", "Export", "Program...");
         QTest::qWait(2500);
         printf("  [exported] exists=%d bytes=%lld\n", QFile::exists(out), QFileInfo(out).size());
         return 0;
@@ -4871,7 +4871,7 @@ static int guidriveMain(int argc, char **argv)
             QTest::qWait(400);
             bool cfgFound = false, cfgEnabled = false;
             for (QAction *a : W->findChildren<QAction *>())
-                if (a->text() == "&Configure System") {
+                if (a->text() == "&Configure System...") {
                     cfgFound = true;
                     cfgEnabled = a->isEnabled();
                 }
@@ -5014,7 +5014,7 @@ static int guidriveMain(int argc, char **argv)
                 auto sampleCfg = [&]() {
                     int v = -1;
                     for (QAction *a : W->findChildren<QAction *>())
-                        if (a->text() == "&Configure System") { v = a->isEnabled() ? 1 : 0; break; }
+                        if (a->text() == "&Configure System...") { v = a->isEnabled() ? 1 : 0; break; }
                     return v;
                 };
                 cfgEnabledDuringRun = sampleCfg();
@@ -5073,7 +5073,7 @@ static int guidriveMain(int argc, char **argv)
                     printf("  >> Configure System IS live -- clicking it, which is"
                            " what kills 1.3\n");
                     fflush(stdout);
-                    clickMenu("&MetaGP", "&Configure System");
+                    clickMenu("&MetaGP", "&Configure System...");
                     printf("  >> the click returned; the process is still alive\n");
                 } else {
                     printf("  >> Configure System is greyed, so it is NOT clicked:"
@@ -5098,7 +5098,7 @@ static int guidriveMain(int argc, char **argv)
         QTimer runEndedBox;
         QObject::connect(&runEndedBox, &QTimer::timeout, []() {
             QWidget *m = QApplication::activeModalWidget();
-            if (!m || m->windowTitle() != "Evolution stopped") return;
+            if (!m || m->windowTitle() != "Evolution Stopped") return;
             for (QLabel *l : m->findChildren<QLabel *>())
                 if (!l->text().isEmpty())
                     printf("  [run ended] %s\n", qPrintable(l->text()));

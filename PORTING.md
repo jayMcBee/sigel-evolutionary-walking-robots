@@ -903,7 +903,25 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-26 — DONE: ITEM 70, CLONE EXPERIMENT (EMPTY POOL).** Start here.
+**2026-09-26 — DONE: ITEM 28, THE UI LABELS.** Start here.
+
+- **Changed, by decision:** 72 proposals over 44 files, decided group by
+  group. Details are in item 28's entry in "Done". Checked on the desktop.
+- **`guidrive`:** every lookup of a renamed text follows it, for example
+  `clickMenu` items that now end in "...". Nothing else changed.
+- **Baselines:** 446 lines of `guibehaviour-baseline.txt` and 28 of
+  `xtest-baseline.txt`. A script matched every removed line to an added
+  line by the recorded old and new texts: 468 lines directly, and 6 that the
+  script cannot parse (format strings, texts split over lines) by hand,
+  each to a decided proposal. Two runs gave identical output.
+- **Review:** no defects.
+- **Gates:** `check.sh` 938 pass, 0 fail; warnings 487. The other four gates
+  are green.
+- **Also since the last entry:** the x86 machine builds SIGEL from GitHub
+  and runs it; it does not run our checks. `README.md` links the 1.3 guide.
+- **Next:** item 88, four variants tested, decision pending.
+
+**2026-09-26 — DONE: ITEM 70, CLONE EXPERIMENT (EMPTY POOL).**
 
 - **Added, by decision:** File > Clone Experiment (Empty Pool)... Details are
   in item 70's entry in "Done". The name was chosen from five options.
@@ -920,8 +938,7 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 - **Also since the last entry:** item 94 recorded (adding many individuals is
   slow). The overnight copy of SIGEL runs from the scratchpad with its own
   PVM tree and `PVM_TMP`.
-- **Next:** item 88, options to be tried locally and presented. Item 28
-  waits for decisions on the proposed label list.
+- **Next:** item 88; item 28.
 
 **2026-09-25 — DONE: SIGEL BUILDS WITH QT 6.4's UIC.**
 
@@ -5150,6 +5167,25 @@ carried; other items and this file cite them, so they do not change.
     visualizeThis` calls `resizeGL` with logical pixels where Qt uses device
     pixels. Qt 6.10's `QOpenGLWidget` sets the viewport in device pixels
     itself before each `paintGL`, and the aspect ratio is the same in both.
+
+- [x] **28. Check every UI label for grammar and typos** — done 2026-09-26,
+  by decision, in 44 files. One pass over every label, button, menu entry,
+  tooltip, status tip and dialog title, in the `.ui` files and the UI
+  literals in `src/`. Decided in four groups: typos (for example "GNU-Plot",
+  "Rendermode", "Maximal"), grammar, one name for one thing ("OK",
+  "gnuplot", "PostScript", "MetaGP", "SIGEL", and the tree items "GP
+  Parameters", "Simulation Parameters" and "Language Parameters" without the
+  hyphen), and style: status tips in the third person ending in ".", labels
+  and group boxes in sentence case, dialog titles and menu entries in Title
+  Case, "..." on every menu entry that opens a dialog, and "Files" in file
+  filters. **British spelling stays**, by decision ("Visualisation",
+  "travelled"). Texts the code compares or uses as keys changed in every
+  place together: the tree items in `SIG_ExperimentItem`,
+  `SIG_GUIGPExperiment`'s dictionaries and `SIG_ExperimentListView`'s
+  `selectItem` calls, and the render modes "Flat shaded" and "Gouraud
+  shaded" in `SIG_VisualisationWidget::setRenderMode` and
+  `SIG_SimulationWidget`. No saved file holds any of the changed texts. Log
+  messages are unchanged.
 
 - [x] **70. A menu command that clones an experiment with a fresh
   population** — done 2026-09-26, by decision. File > Clone Experiment (Empty

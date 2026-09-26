@@ -40,7 +40,7 @@
           <item>
             <widget class="QLabel" name="TextLabel4">
               <property name="text">
-                <string>Individual Program:</string>
+                <string>Individual program:</string>
               </property>
               <property name="wordWrap">
                 <bool>false</bool>
@@ -139,7 +139,7 @@
               <item>
                 <widget class="QLabel" name="TextLabel1">
                   <property name="text">
-                    <string>Population Size:</string>
+                    <string>Population size:</string>
                   </property>
                   <property name="wordWrap">
                     <bool>false</bool>

@@ -79,7 +79,7 @@
                 </sizepolicy>
               </property>
               <property name="text">
-                <string>ranging from</string>
+                <string>Ranging from</string>
               </property>
               <property name="wordWrap">
                 <bool>false</bool>
@@ -125,7 +125,7 @@
             <item>
               <widget class="QRadioButton" name="intRadioButton">
                 <property name="text">
-                  <string>integer</string>
+                  <string>Integer</string>
                 </property>
               </widget>
             </item>
@@ -144,7 +144,7 @@
                   </size>
                 </property>
                 <property name="text">
-                  <string>float</string>
+                  <string>Float</string>
                 </property>
                 <property name="checked">
                   <bool>true</bool>

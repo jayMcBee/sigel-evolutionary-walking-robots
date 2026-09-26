@@ -58,7 +58,7 @@
                       </size>
                     </property>
                     <property name="text">
-                      <string># Constituencies</string>
+                      <string># Constituencies:</string>
                     </property>
                     <property name="alignment">
                       <set>Qt::AlignVCenter|Qt::AlignRight</set>
@@ -77,7 +77,7 @@
                       </size>
                     </property>
                     <property name="text">
-                      <string>Constituency Size</string>
+                      <string>Constituency size:</string>
                     </property>
                     <property name="wordWrap">
                       <bool>false</bool>
@@ -93,7 +93,7 @@
                       </size>
                     </property>
                     <property name="text">
-                      <string>Poolsize</string>
+                      <string>Pool size:</string>
                     </property>
                     <property name="alignment">
                       <set>Qt::AlignVCenter|Qt::AlignRight</set>
@@ -128,7 +128,7 @@
                       </size>
                     </property>
                     <property name="text">
-                      <string>Overproduction Factor</string>
+                      <string>Overproduction factor:</string>
                     </property>
                     <property name="wordWrap">
                       <bool>false</bool>
@@ -144,7 +144,7 @@
                     </item>
                     <item>
                       <property name="text">
-                        <string>Fitness Proportional</string>
+                        <string>Fitness proportional</string>
                       </property>
                     </item>
                   </widget>
@@ -189,7 +189,7 @@
                       </size>
                     </property>
                     <property name="text">
-                      <string>Selection Method</string>
+                      <string>Selection method:</string>
                     </property>
                     <property name="wordWrap">
                       <bool>false</bool>
@@ -199,7 +199,7 @@
                 <item row="2" column="2">
                   <widget class="QLabel" name="TextLabel2">
                     <property name="text">
-                      <string># Win/Const</string>
+                      <string># Win/Const:</string>
                     </property>
                     <property name="alignment">
                       <set>Qt::AlignVCenter|Qt::AlignRight</set>
@@ -416,12 +416,12 @@
                 </property>
                 <item>
                   <property name="text">
-                    <string>Simple Error</string>
+                    <string>Simple error</string>
                   </property>
                 </item>
                 <item>
                   <property name="text">
-                    <string>Square Error</string>
+                    <string>Square error</string>
                   </property>
                 </item>
               </widget>
@@ -429,7 +429,7 @@
             <item row="1" column="1">
               <widget class="QLabel" name="TextLabel17">
                 <property name="text">
-                  <string>Fitness Function</string>
+                  <string>Fitness function:</string>
                 </property>
                 <property name="wordWrap">
                   <bool>false</bool>
@@ -439,7 +439,7 @@
             <item row="2" column="1">
               <widget class="QLabel" name="TextLabel18">
                 <property name="text">
-                  <string>Size of Training Set</string>
+                  <string>Size of training set:</string>
                 </property>
                 <property name="wordWrap">
                   <bool>false</bool>
@@ -497,7 +497,7 @@
             <item row="3" column="1">
               <widget class="QLabel" name="TextLabel1">
                 <property name="text">
-                  <string>Training Duration</string>
+                  <string>Training duration:</string>
                 </property>
                 <property name="wordWrap">
                   <bool>false</bool>

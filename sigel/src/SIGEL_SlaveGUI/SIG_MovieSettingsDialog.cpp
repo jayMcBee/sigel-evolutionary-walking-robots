@@ -61,7 +61,7 @@ void SIG_MovieSettingsDialog::slotToolButtonClicked()
 {
   QString newDirectory =
     QFileDialog::getExistingDirectory( this,
-				       "Select movie directory",
+				       "Select Movie Directory",
 				       lineeditDirectory->text(),
 				       QFileDialog::ShowDirsOnly );
   if( !newDirectory.isNull() )

@@ -96,8 +96,8 @@
   [tree] header=[Experiments] topLevel=0
   [page] count=1 current=QLabel objectName=[baseWidget]
   [action changes] none
-  [modal] class=QFileDialog title=[Load Experiments]
-  [filedialog] title=[Load Experiments] mode=3 nameFilters=[Experiment Files (*.exp) ;; All Files (*)] labelAccept=[&Open]
+  [modal] class=QFileDialog title=[Open Experiments]
+  [filedialog] title=[Open Experiments] mode=3 nameFilters=[Experiment Files (*.exp) ;; All Files (*)] labelAccept=[&Open]
 
 == STEP 2: after File > Open Experiment ==
   [title] SIGEL 1.4 (built <DATE>)
@@ -105,9 +105,9 @@
       twoBases.exp             sel=1 exp=1 cur=1 selectable=1
         Individuals              sel=0 exp=0 cur=0 selectable=1
         Robot                    sel=0 exp=1 cur=0 selectable=1
-          Language-Parameters      sel=0 exp=0 cur=0 selectable=1
-        GP-Parameters            sel=0 exp=0 cur=0 selectable=1
-        Simulation-Parameters    sel=0 exp=0 cur=0 selectable=1
+          Language Parameters      sel=0 exp=0 cur=0 selectable=1
+        GP Parameters            sel=0 exp=0 cur=0 selectable=1
+        Simulation Parameters    sel=0 exp=0 cur=0 selectable=1
         Environment              sel=0 exp=0 cur=0 selectable=1
   [page] count=8 current=SIGEL_MasterGUI::SIG_ExperimentView objectName=[ExperimentView]
   [widgets]
@@ -116,7 +116,7 @@
     group    [Experiment properties] enabled=1
     button   [&Start] enabled=1 checkable=0 checked=0
     button   [S&top] enabled=0 checkable=0 checked=0
-    button   [Show in GNU-Plot] enabled=1 checkable=0 checked=0
+    button   [Show in gnuplot] enabled=1 checkable=0 checked=0
     button   [Export PostScript] enabled=1 checkable=0 checked=0
     check    [Save the history] enabled=1 checkable=1 checked=1
     lcd      [lcdnumberGenerations] value=203 digits=4
@@ -126,26 +126,26 @@
   [action changes]
     &File/&Clone Experiment (Empty Pool)...                    ENABLED
     &File/&Delete Experiment                                   ENABLED
-    &File/&Rename Experiment                                   ENABLED
+    &File/&Rename Experiment...                                ENABLED
     &File/&Save Experiment                                     ENABLED
     &File/Save Experiment &As...                               ENABLED
-    &File>Export/...to GNU plot                                ENABLED
-    &File>Export/Environment                                   ENABLED
-    &File>Export/GP-Parameters                                 ENABLED
-    &File>Export/Individual                                    ENABLED
-    &File>Export/Language-Parameters                           ENABLED
-    &File>Export/Population                                    ENABLED
-    &File>Export/Program                                       ENABLED
-    &File>Export/Simulation-Parameters                         ENABLED
-    &File>Import/Environment                                   ENABLED
-    &File>Import/GP-Parameters                                 ENABLED
-    &File>Import/Individual                                    ENABLED
-    &File>Import/Language-Parameters                           ENABLED
-    &File>Import/Population                                    ENABLED
-    &File>Import/Program                                       ENABLED
-    &File>Import/Robot                                         ENABLED
-    &File>Import/Simulation-Parameters                         ENABLED
-    &Individuals/&Add                                          ENABLED
+    &File>Export/Environment...                                ENABLED
+    &File>Export/GP Parameters...                              ENABLED
+    &File>Export/Individual...                                 ENABLED
+    &File>Export/Language Parameters...                        ENABLED
+    &File>Export/Population...                                 ENABLED
+    &File>Export/Program...                                    ENABLED
+    &File>Export/Simulation Parameters...                      ENABLED
+    &File>Export/gnuplot Data...                               ENABLED
+    &File>Import/Environment...                                ENABLED
+    &File>Import/GP Parameters...                              ENABLED
+    &File>Import/Individual...                                 ENABLED
+    &File>Import/Language Parameters...                        ENABLED
+    &File>Import/Population...                                 ENABLED
+    &File>Import/Program...                                    ENABLED
+    &File>Import/Robot...                                      ENABLED
+    &File>Import/Simulation Parameters...                      ENABLED
+    &Individuals/&Add...                                       ENABLED
     &Individuals/&Delete                                       ENABLED
     &Individuals/&Visualize                                    ENABLED
     &Individuals/Reset All Fitness Values                      ENABLED
@@ -158,7 +158,7 @@
     &View/&Simulation Parameters                               ENABLED
     TB:fileToolbar/&Delete Experiment                          ENABLED
     TB:fileToolbar/&Save Experiment                            ENABLED
-    TB:individualsToolBar/&Add                                 ENABLED
+    TB:individualsToolBar/&Add...                              ENABLED
     TB:individualsToolBar/&Delete                              ENABLED
     TB:individualsToolBar/&Visualize                           ENABLED
     TB:mtToolbar/&Use MetaGP                                   ENABLED
@@ -175,9 +175,9 @@
       twoBases.exp             sel=0 exp=1 cur=0 selectable=1
         Individuals              sel=1 exp=0 cur=1 selectable=1
         Robot                    sel=0 exp=1 cur=0 selectable=1
-          Language-Parameters      sel=0 exp=0 cur=0 selectable=1
-        GP-Parameters            sel=0 exp=0 cur=0 selectable=1
-        Simulation-Parameters    sel=0 exp=0 cur=0 selectable=1
+          Language Parameters      sel=0 exp=0 cur=0 selectable=1
+        GP Parameters            sel=0 exp=0 cur=0 selectable=1
+        Simulation Parameters    sel=0 exp=0 cur=0 selectable=1
         Environment              sel=0 exp=0 cur=0 selectable=1
   [page] count=8 current=SIGEL_MasterGUI::SIG_AllIndividualsView objectName=[]
   [individuals] rows=100 cols=4 headers=[Name][Fitness][Length][Age] selected=0

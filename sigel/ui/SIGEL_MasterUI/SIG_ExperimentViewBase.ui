@@ -87,7 +87,7 @@
                           <cursor>0</cursor>
                         </property>
                         <property name="toolTip">
-                          <string>Progress of current generation. Counts tournaments that are finished.</string>
+                          <string>Progress of the current generation. Counts the finished tournaments.</string>
                         </property>
                       </widget>
                     </item>
@@ -121,7 +121,7 @@
                           <number>0</number>
                         </property>
                         <property name="toolTip">
-                          <string>Age of population in generations</string>
+                          <string>Age of the population in generations.</string>
                         </property>
                       </widget>
                     </item>
@@ -145,7 +145,7 @@
                 <item>
                   <widget class="QPushButton" name="pushbuttonShowFitnessCurve">
                     <property name="text">
-                      <string>Show in GNU-Plot</string>
+                      <string>Show in gnuplot</string>
                     </property>
                   </widget>
                 </item>
@@ -180,14 +180,14 @@
                       <bool>true</bool>
                     </property>
                     <property name="toolTip">
-                      <string>Check the box if you want to save history for each individual in your experiment</string>
+                      <string>Check the box if you want to save the history of each individual in your experiment.</string>
                     </property>
                   </widget>
                 </item>
                 <item>
                   <widget class="QLabel" name="textlabelAutosave">
                     <property name="text">
-                      <string>Autosave Interval (Generations):</string>
+                      <string>Autosave interval (generations):</string>
                     </property>
                     <property name="wordWrap">
                       <bool>false</bool>
@@ -295,7 +295,7 @@
             <string>n/a</string>
           </property>
           <property name="toolTip">
-            <string>Add some description for the experiment here</string>
+            <string>Add a description of the experiment here.</string>
           </property>
         </widget>
       </item>

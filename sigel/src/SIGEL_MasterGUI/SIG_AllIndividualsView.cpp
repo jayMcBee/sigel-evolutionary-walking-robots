@@ -70,15 +70,15 @@ SIG_AllIndividualsView::SIG_AllIndividualsView( QWidget * parent, const char * n
   individualMenu->addSeparator();
   individualMenu->addAction( "&Delete", this, SLOT( slotDeleteIndividuals() ) )->setShortcut( Qt::ALT | Qt::Key_D );
   individualMenu->addSeparator();
-  individualMenu->addAction( "Import program", this, SLOT( slotImportProgram() ) )->setShortcut( Qt::CTRL | Qt::SHIFT | Qt::Key_K );
-  individualMenu->addAction( "Export program", this, SLOT( slotExportProgram() ) )->setShortcut( Qt::CTRL | Qt::ALT | Qt::Key_K );
-  individualMenu->addAction( "Export individual", this, SLOT( slotExportIndividual() ) )->setShortcut( Qt::CTRL | Qt::ALT | Qt::Key_L );
+  individualMenu->addAction( "Import Program...", this, SLOT( slotImportProgram() ) )->setShortcut( Qt::CTRL | Qt::SHIFT | Qt::Key_K );
+  individualMenu->addAction( "Export Program...", this, SLOT( slotExportProgram() ) )->setShortcut( Qt::CTRL | Qt::ALT | Qt::Key_K );
+  individualMenu->addAction( "Export Individual...", this, SLOT( slotExportIndividual() ) )->setShortcut( Qt::CTRL | Qt::ALT | Qt::Key_L );
  
   // create the menu that pops up if one clicks on an empty spot in the list view
   listviewMenu = new QMenu( this );
-  listviewMenu->addAction( "&Add", this, SLOT( slotAddIndividuals() ) )->setShortcut( Qt::ALT | Qt::Key_A );
+  listviewMenu->addAction( "&Add...", this, SLOT( slotAddIndividuals() ) )->setShortcut( Qt::ALT | Qt::Key_A );
   listviewMenu->addSeparator();
-  listviewMenu->addAction( "Import individual", this, SLOT( slotImportIndividual() ) )->setShortcut( Qt::CTRL | Qt::SHIFT | Qt::Key_L );
+  listviewMenu->addAction( "Import Individual...", this, SLOT( slotImportIndividual() ) )->setShortcut( Qt::CTRL | Qt::SHIFT | Qt::Key_L );
 
   // connect some stuff
   /* QObject::connect( individualList->pushbuttonAdd,
@@ -202,7 +202,7 @@ void SIG_AllIndividualsView::slotAddIndividuals()
       QProgressDialog progress( "Populating pool...", QString(), 0, theExperiment.population.getSize(), this );
   // Qt 2\'s trailing modal flag made it application modal.
   progress.setWindowModality( Qt::ApplicationModal );
-      progress.setWindowTitle( "Add individuals" );
+      progress.setWindowTitle( "Add Individuals" );
       progress.show();
       for( int counter = 0; counter < theExperiment.population.getSize(); counter++ )
 	{
@@ -246,7 +246,7 @@ void SIG_AllIndividualsView::slotDeleteIndividuals()
       else
 	question = QString::number( numberOfSelectedItems ) + " selected individuals?";
       
-      switch( QMessageBox::warning( this, "Continue deletion?" , "Do you really want to delete the " + question , QMessageBox::Yes | QMessageBox::Default, QMessageBox::No | QMessageBox::Escape ) )
+      switch( QMessageBox::warning( this, "Continue Deletion?" , "Do you really want to delete the " + question , QMessageBox::Yes | QMessageBox::Default, QMessageBox::No | QMessageBox::Escape ) )
 	{
 	case QMessageBox::Yes:
 	  // resize the array, so we can save all positions
@@ -346,7 +346,7 @@ void SIG_AllIndividualsView::slotVisualize()
        		  modifiedRobot.prepareDynaMo();
        		}
        	  catch (SIGEL_Tools::SIG_Exception &e) {
-       		  QMessageBox::warning( this, "Robot Exception!", e.getMessage() );
+       		  QMessageBox::warning( this, "Robot Exception", e.getMessage() );
        		  return;
        		};
    	      break;
@@ -355,7 +355,7 @@ void SIG_AllIndividualsView::slotVisualize()
        		  modifiedRobot.prepareDynaMechs();
        		}
        	  catch (SIGEL_Tools::SIG_Exception &e) {
-       		  QMessageBox::warning( this, "Robot Exception!", e.getMessage() );
+       		  QMessageBox::warning( this, "Robot Exception", e.getMessage() );
        		  return;
        		};
        	  break;
@@ -402,7 +402,7 @@ void SIG_AllIndividualsView::slotVisualize()
          pvmData.sendQStringToPVM( pvmDataString, taskId, 23 );
    	  }
    	  else {
-   	      QMessageBox::critical( this, "Error while starting slave!", "The slave could not be started.\n Either there is no executable or a PVM problem occurred." );
+   	      QMessageBox::critical( this, "Error While Starting Slave", "The slave could not be started.\nEither there is no executable or a PVM problem occurred." );
    	  };
    	} // if-statement
   } //for-loop
@@ -477,7 +477,7 @@ void SIG_AllIndividualsView::slotImportProgram()
       SIG_IndividualListItem *individualListItem = static_cast<SIG_IndividualListItem *> ( currentItem );
       if( numberOfSelectedItems() == 1 )
 	{
-	  QString fileName = QFileDialog::getOpenFileName( this, "Import program", QString(), "Program files (*.prg);;All Files (*)" );
+	  QString fileName = QFileDialog::getOpenFileName( this, "Import Program", QString(), "Program Files (*.prg);;All Files (*)" );
 	  if( !fileName.isEmpty() )
 	    {
 	      individualListItem->theIndividual->importProgram( fileName );
@@ -486,10 +486,10 @@ void SIG_AllIndividualsView::slotImportProgram()
 	  slotCompleteRefreshList(); // can be done more efficiently!!!
 	}
       else
-	QMessageBox::information( this, "Select exactly one individual", "There must be exactly one individual selected!" );
+	QMessageBox::information( this, "Select Exactly One Individual", "There must be exactly one individual selected." );
     } // if( currentitem )
   else
-    QMessageBox::information( this, "No individual selected", "There is no individual selected!" );
+    QMessageBox::information( this, "No Individual Selected", "There is no individual selected." );
 };
 
 void SIG_AllIndividualsView::slotExportProgram()
@@ -501,7 +501,7 @@ void SIG_AllIndividualsView::slotExportProgram()
       if( numberOfSelectedItems() == 1 )
 	{
 	  QString individualName = individualListItem->theIndividual->getName();
-	  QString fileName = QFileDialog::getSaveFileName( this, "Export program", QString(), "Program files (*.prg);;All Files (*)" );
+	  QString fileName = QFileDialog::getSaveFileName( this, "Export Program", QString(), "Program Files (*.prg);;All Files (*)" );
 	  if( !fileName.isEmpty() )
 	    {
 	      if( fileName.right(4) != ".prg" )
@@ -510,15 +510,15 @@ void SIG_AllIndividualsView::slotExportProgram()
 	    }
 	}
       else
-	QMessageBox::information( this, "More than one individual selected", "There is more than one individual selected!" );
+	QMessageBox::information( this, "More Than One Individual Selected", "There is more than one individual selected." );
     }
   else
-    QMessageBox::information( this, "No individual selected", "There is no individual selected!" );
+    QMessageBox::information( this, "No Individual Selected", "There is no individual selected." );
 };
 
 void SIG_AllIndividualsView::slotImportIndividual()
 {
-  QString fileName = QFileDialog::getOpenFileName( this, "Import individual", QString(), "Individual files (*.ind);;All Files (*)" );
+  QString fileName = QFileDialog::getOpenFileName( this, "Import Individual", QString(), "Individual Files (*.ind);;All Files (*)" );
   if( !fileName.isEmpty() )
     {
       theExperiment.population.importNewIndividual( fileName );
@@ -535,7 +535,7 @@ void SIG_AllIndividualsView::slotExportIndividual()
       if( numberOfSelectedItems() == 1 )
 	{
 	  QString individualName = individualListItem->theIndividual->getName();
-	  QString fileName = QFileDialog::getSaveFileName( this, "Export individual", QString(), "Individual files (*.ind);;All Files (*)" );
+	  QString fileName = QFileDialog::getSaveFileName( this, "Export Individual", QString(), "Individual Files (*.ind);;All Files (*)" );
 	  if( !fileName.isEmpty() )
 	    {
 	      if( fileName.right(4) != ".ind" )
@@ -544,10 +544,10 @@ void SIG_AllIndividualsView::slotExportIndividual()
 	    }
 	}
       else
-	QMessageBox::information( this, "More than one individual selected", "There is more than one individual selected!" );
+	QMessageBox::information( this, "More Than One Individual Selected", "There is more than one individual selected." );
     }
   else
-    QMessageBox::information( this, "No individual selected", "There is no individual selected!" );
+    QMessageBox::information( this, "No Individual Selected", "There is no individual selected." );
 };
 
 }

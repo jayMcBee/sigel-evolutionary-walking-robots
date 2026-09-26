@@ -14,7 +14,7 @@
       </rect>
     </property>
     <property name="windowTitle">
-      <string>Movie settings</string>
+      <string>Movie Settings</string>
     </property>
     <layout class="QGridLayout">
       <property name="margin">
@@ -482,7 +482,7 @@
             <item row="0" column="1">
               <widget class="QLabel" name="TextLabel1">
                 <property name="text">
-                  <string>current screen geometry:</string>
+                  <string>Current screen geometry:</string>
                 </property>
                 <property name="alignment">
                   <set>Qt::AlignVCenter|Qt::AlignLeft</set>

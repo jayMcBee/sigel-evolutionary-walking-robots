@@ -53,13 +53,13 @@ SIGEL_MasterGUI::SIG_ExperimentItem::SIG_ExperimentItem( QTreeWidget * parent, Q
   newItem = new QTreeWidgetItem();
   
   insertChild( 0, newItem );
-  newItem->setText(0, "Simulation-Parameters");
+  newItem->setText(0, "Simulation Parameters");
   newItem->setIcon( 0, QIcon( QPixmap( sigelRootString + "/pixmaps/simulationParameterSmall.xpm" ) ) );
  
   newItem = new QTreeWidgetItem();
  
   insertChild( 0, newItem );
-  newItem->setText(0, "GP-Parameters");
+  newItem->setText(0, "GP Parameters");
   newItem->setIcon( 0, QIcon( QPixmap( sigelRootString + "/pixmaps/dnaSmall.xpm") ) );
 
   // robot
@@ -71,7 +71,7 @@ SIGEL_MasterGUI::SIG_ExperimentItem::SIG_ExperimentItem( QTreeWidget * parent, Q
   QTreeWidgetItem *childItem = new QTreeWidgetItem();
   
   newItem->insertChild( 0, childItem );
-  childItem->setText(0, "Language-Parameters");
+  childItem->setText(0, "Language Parameters");
   childItem->setIcon( 0, QIcon( QPixmap( sigelRootString + "/pixmaps/balloonSmall.xpm" ) ) );
   
   newItem->setExpanded( true );

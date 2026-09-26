@@ -182,9 +182,9 @@ namespace SIGEL_GP
       close(fd);
 
       // ask for the fitness/distance
-      dlogTitle = "Evaluating current Program on ZORC";
-      expInstruct = "<B><BIG>Current program was successfully downloaded to ZORC.<BR> \
-                     Let's start the evaluation:</B></BIG><BR> \
+      dlogTitle = "Evaluating the Current Program on ZORC";
+      expInstruct = "<B><BIG>The current program was successfully downloaded to ZORC.<BR> \
+                     Let's start the evaluation:</BIG></B><BR> \
                      <OL><LI>Set ZORC down to start executing the current program</LI><LI>Enter the distance travelled by ZORC</LI></OL> \
                      <BR><BR><I>Execute the program as many times as you want by restarting the program manually on ZORC</I> <BR><BR><BR>\
                      Enter the distance travelled by the robot (centimeters, 1 decimal):";

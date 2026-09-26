@@ -68,9 +68,9 @@
 	  visualisation->viewSettings.renderMode = SIGEL_Visualisation::SIG_ViewSettings::hiddenLine;
 	else if (string == "Points")
 	  visualisation->viewSettings.renderMode = SIGEL_Visualisation::SIG_ViewSettings::points;
-	else if (string == "Flatshaded")
+	else if (string == "Flat shaded")
 	  visualisation->viewSettings.renderMode = SIGEL_Visualisation::SIG_ViewSettings::flatShaded;
-	else if (string == "Gouraudshaded")
+	else if (string == "Gouraud shaded")
 	  visualisation->viewSettings.renderMode = SIGEL_Visualisation::SIG_ViewSettings::garoudShaded;
 	if (automaticRefresh)
 	  update();

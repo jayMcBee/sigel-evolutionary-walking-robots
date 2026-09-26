@@ -32,7 +32,7 @@
       <item row="0" column="0">
         <widget class="QGroupBox" name="GroupBox11">
           <property name="title">
-            <string>Operator Probability</string>
+            <string>Operator probability</string>
           </property>
           <layout class="QGridLayout">
             <property name="margin">
@@ -84,7 +84,7 @@
                 <item>
                   <widget class="QLabel" name="TextLabel1">
                     <property name="text">
-                      <string>Crossover</string>
+                      <string>Crossover:</string>
                     </property>
                     <property name="wordWrap">
                       <bool>false</bool>
@@ -94,7 +94,7 @@
                 <item>
                   <widget class="QLabel" name="TextLabel2">
                     <property name="text">
-                      <string>Mutation</string>
+                      <string>Mutation:</string>
                     </property>
                     <property name="wordWrap">
                       <bool>false</bool>
@@ -104,7 +104,7 @@
                 <item>
                   <widget class="QLabel" name="TextLabel3">
                     <property name="text">
-                      <string>Reproduction</string>
+                      <string>Reproduction:</string>
                     </property>
                     <property name="wordWrap">
                       <bool>false</bool>
@@ -302,7 +302,7 @@
                       </size>
                     </property>
                     <property name="text">
-                      <string>Line Probability</string>
+                      <string>Line probability:</string>
                     </property>
                     <property name="wordWrap">
                       <bool>false</bool>
@@ -312,7 +312,7 @@
                 <item row="1" column="0">
                   <widget class="QLabel" name="TextLabel20">
                     <property name="text">
-                      <string>Power</string>
+                      <string>Power:</string>
                     </property>
                     <property name="wordWrap">
                       <bool>false</bool>
@@ -554,7 +554,7 @@
                 <item row="1" column="0">
                   <widget class="QLabel" name="TextLabel22">
                     <property name="text">
-                      <string>2 X-Point Prob.</string>
+                      <string>2 X-point prob.:</string>
                     </property>
                     <property name="wordWrap">
                       <bool>false</bool>
@@ -564,7 +564,7 @@
                 <item row="2" column="0">
                   <widget class="QLabel" name="TextLabel23">
                     <property name="text">
-                      <string>3 X-Point Prob.</string>
+                      <string>3 X-point prob.:</string>
                     </property>
                     <property name="wordWrap">
                       <bool>false</bool>
@@ -574,7 +574,7 @@
                 <item row="0" column="0">
                   <widget class="QLabel" name="TextLabel21">
                     <property name="text">
-                      <string>1 X-Point Prob.</string>
+                      <string>1 X-point prob.:</string>
                     </property>
                     <property name="wordWrap">
                       <bool>false</bool>
@@ -648,7 +648,7 @@
                       </size>
                     </property>
                     <property name="text">
-                      <string>Breed Size</string>
+                      <string>Breed size:</string>
                     </property>
                     <property name="wordWrap">
                       <bool>false</bool>

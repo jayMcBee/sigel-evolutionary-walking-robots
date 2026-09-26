@@ -44,17 +44,17 @@ namespace SIGEL_MasterGUI
 {
   // build the gp parameter menu
   menuGPParameter = new QMenu( this );
-  menuGPParameter->addAction( "GPParameter" );
+  menuGPParameter->addAction( "GP Parameters" );
 
   // build the simulation parameter menu
   menuSimulationParameter = new QMenu( this );
-  menuSimulationParameter->addAction( "Import", this, SLOT( slotSimulationParameterImport() ) );
-  menuSimulationParameter->addAction( "Export", this, SLOT( slotSimulationParameterExport() ) );
+  menuSimulationParameter->addAction( "Import...", this, SLOT( slotSimulationParameterImport() ) );
+  menuSimulationParameter->addAction( "Export...", this, SLOT( slotSimulationParameterExport() ) );
 
   // build the environment view menu
   menuEnvironmentView = new QMenu( this );
-  menuEnvironmentView->addAction( "Import", this, SLOT( slotEnvironmentImport() ) );
-  menuEnvironmentView->addAction( "Export", this, SLOT( slotEnvironmentExport() ) );
+  menuEnvironmentView->addAction( "Import...", this, SLOT( slotEnvironmentImport() ) );
+  menuEnvironmentView->addAction( "Export...", this, SLOT( slotEnvironmentExport() ) );
 
   // build the robot view menu
   menuRobotView = new QMenu( this );
@@ -83,17 +83,17 @@ namespace SIGEL_MasterGUI
   widgetStack->addWidget( languageParameters );
 
   // insert the widgets into the widget dictionary
-  widgetDict.insert( "GP-Parameters" , gpParameter );
-  widgetDict.insert( "Simulation-Parameters", simulationParameter );
-  widgetDict.insert( "Language-Parameters", languageParameters );
+  widgetDict.insert( "GP Parameters" , gpParameter );
+  widgetDict.insert( "Simulation Parameters", simulationParameter );
+  widgetDict.insert( "Language Parameters", languageParameters );
   widgetDict.insert( "Environment", environmentView );
   widgetDict.insert( "Robot", robotView );
   widgetDict.insert( "Individuals", allIndividualsView );
   widgetDict.insert( experimentName, experimentView );
 
   // insert the widgets into the menu dictionary
-  menuDict.insert( "GP-Parameters" , menuGPParameter );
-  menuDict.insert( "Simulation-Parameters", menuSimulationParameter );
+  menuDict.insert( "GP Parameters" , menuGPParameter );
+  menuDict.insert( "Simulation Parameters", menuSimulationParameter );
   menuDict.insert( "Environment" , menuEnvironmentView );
   menuDict.insert( "Robot" , menuRobotView );
   menuDict.insert( experimentName, menuExperimentView );
@@ -379,7 +379,7 @@ void SIG_GUIGPExperiment::slotStartEvolution()
     }
   else
     {
-      QMessageBox::warning( experimentListView, "Can't start evolution", "The evolution cannot be started. There may be several reasons:<ul><li>There is no robot loaded.</li><li>There are fewer than four individuals in the population</li><li>No fitness function name was specified.</li></ul>");
+      QMessageBox::warning( experimentListView, "Can't Start Evolution", "The evolution cannot be started. There may be several reasons:<ul><li>There is no robot loaded.</li><li>There are fewer than four individuals in the population.</li><li>No fitness function name was specified.</li></ul>");
     }
 };
 
@@ -548,7 +548,7 @@ void SIG_GUIGPExperiment::slotGPParameterImport()
   if ( experimentListView->isRunning() )
     return;
 
-  QString fileName = QFileDialog::getOpenFileName( experimentListView, "Import GP Parameter", QString(), "GP Parameter Files (*.gpp);;All Files (*)" );
+  QString fileName = QFileDialog::getOpenFileName( experimentListView, "Import GP Parameters", QString(), "GP Parameter Files (*.gpp);;All Files (*)" );
   if ( !fileName.isEmpty() )
     {
       QFile file( fileName );
@@ -565,7 +565,7 @@ void SIG_GUIGPExperiment::slotGPParameterImport()
 void SIG_GUIGPExperiment::slotGPParameterExport()
 {
   gpParameter->putIntoExperiment();
-  QString fileName = QFileDialog::getSaveFileName( experimentListView, "Export GP Parameter", QString(), "GP Parameter Files (*.gpp);;All Files (*)" );
+  QString fileName = QFileDialog::getSaveFileName( experimentListView, "Export GP Parameters", QString(), "GP Parameter Files (*.gpp);;All Files (*)" );
   if( !fileName.isEmpty() )
     {
       fileName = checkEnding( fileName, "gpp" );
@@ -641,7 +641,7 @@ void SIG_GUIGPExperiment::slotPopulationImport()
 
 void SIG_GUIGPExperiment::slotPopulationExport()
 {
-  QString fileName = QFileDialog::getSaveFileName( experimentListView, "Export Population", QString(), "Population files (*.pop);;All Files (*)" );
+  QString fileName = QFileDialog::getSaveFileName( experimentListView, "Export Population", QString(), "Population Files (*.pop);;All Files (*)" );
   if( !fileName.isEmpty() )
     {
       fileName = checkEnding( fileName, "pop" );
@@ -673,7 +673,7 @@ void SIG_GUIGPExperiment::slotRobotImport()
 	}
       catch( SIGEL_Tools::SIG_Exception e )
 	{
-	  QMessageBox::warning( experimentListView, "Robot import error!", e.getMessage() );
+	  QMessageBox::warning( experimentListView, "Robot Import Error", e.getMessage() );
 	  gpExperiment.robot.clear();
 	}
       // perhaps it is enough to update the language parameter screen and the robot view
@@ -683,7 +683,7 @@ void SIG_GUIGPExperiment::slotRobotImport()
 
 void SIG_GUIGPExperiment::slotGNUPlotExport()
 {
-  QString fileName = QFileDialog::getSaveFileName( experimentListView, "Export to GNU plot", QString(), "GNU plot data file (*.dat);;All Files (*)" );
+  QString fileName = QFileDialog::getSaveFileName( experimentListView, "Export to gnuplot", QString(), "gnuplot Data Files (*.dat);;All Files (*)" );
   if( !fileName.isEmpty() )
     {
       fileName = checkEnding( fileName, "dat" );
@@ -712,7 +712,7 @@ void SIG_GUIGPExperiment::slotRobotLoad()
 	    }
 	  catch( SIGEL_Tools::SIG_Exception e )
 	    {
-	      QMessageBox::warning( experimentListView, "Robot import error!", e.getMessage() );
+	      QMessageBox::warning( experimentListView, "Robot Import Error", e.getMessage() );
 	      gpExperiment.robot.clear();
 	    }
 	}
@@ -744,7 +744,7 @@ void SIG_GUIGPExperiment::slotRobotInfo()
 
   // need DynaMechs for that..
   if (gpExperiment.simulationParameter.getSimulationLibrary() != SIGEL_Simulation::SIG_SimulationParameters::DynaMechs)
-  { QMessageBox::information( experimentListView, "Can't display Robot Information", "<B>DynaMechs is required for this operation to work properly.</B>");
+  { QMessageBox::information( experimentListView, "Can't Display Robot Information", "<B>DynaMechs is required for this operation to work properly.</B>");
     return;
   }
 
@@ -754,7 +754,7 @@ void SIG_GUIGPExperiment::slotRobotInfo()
     QMessageBox::information( experimentListView, "Robot Information", robInf );
   }
   else
-  { QMessageBox::information( experimentListView, "Robot information", "No robot is loaded. Load a robot first.");
+  { QMessageBox::information( experimentListView, "Robot Information", "No robot is loaded. Load a robot first.");
   }
 }
 
@@ -779,7 +779,7 @@ void SIG_GUIGPExperiment::slotEvolutionStopped()
 
   if( !endedBecause.isEmpty() )
     {
-      QMessageBox::warning( experimentListView, "Evolution stopped", endedBecause );
+      QMessageBox::warning( experimentListView, "Evolution Stopped", endedBecause );
       endedBecause = QString();
     }
 

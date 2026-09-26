@@ -112,8 +112,8 @@ void MT_SelectionWidget::onShow(MT_GPManager *manager, subst_cache *subst)
 		int index = tourSizeMap.find(tournSize).value();
 		tourSizeComboBox->setCurrentIndex(index);
 	} else {
-		QMessageBox::critical(this, "Configure system", "The tournament size is invalid.\n"
-			"A default value will be used.", "Ok");
+		QMessageBox::critical(this, "Configure MetaGP System", "The tournament size is invalid.\n"
+			"A default value will be used.", "OK");
 		tourSizeComboBox->setCurrentIndex(0);
 	}
 
@@ -129,14 +129,14 @@ void MT_SelectionWidget::onShow(MT_GPManager *manager, subst_cache *subst)
 	fitnessFunctionComboBox->clear();
 	if(subst->strategy < 3){		// of type evaluator */
 	
-		fitnessFunctionComboBox->addItem("simple error");
-		fitnessFunctionComboBox->addItem("square error");
+		fitnessFunctionComboBox->addItem("Simple error");
+		fitnessFunctionComboBox->addItem("Square error");
 		fitnessFunctionComboBox->setCurrentIndex(fitFunc - 1);
 
 	} else {						// of type classifier
 
-		fitnessFunctionComboBox->addItem("simple");
-		fitnessFunctionComboBox->addItem("weighted");
+		fitnessFunctionComboBox->addItem("Simple");
+		fitnessFunctionComboBox->addItem("Weighted");
 		fitnessFunctionComboBox->setCurrentIndex(fitFunc - 3);
 
 	}

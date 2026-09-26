@@ -161,7 +161,7 @@ void SIG_GPParameter::putIntoExperiment()
      	break;
 
 		default:
-			QMessageBox::information( this, "Error !", "Internal Error -- fitness function is unknown to class SIG_GPParameter.");
+			QMessageBox::information( this, "Error", "Internal Error -- fitness function is unknown to class SIG_GPParameter.");
     }
 
   // put the probabilities into the experiment
@@ -438,7 +438,7 @@ void SIG_GPParameter::slotAddHost()
   editDialog.checkboxEnableHost->setChecked( true );
   editDialog.lineeditHostName->setFocus();
   editDialog.lineeditSlaveDirectory->setText( QDir::currentPath() );
-  editDialog.setWindowTitle( "Add host" );
+  editDialog.setWindowTitle( "Add Host" );
   switch ( editDialog.exec() )
     {
       // the OK button was pressed
@@ -481,7 +481,7 @@ void SIG_GPParameter::slotAddHost()
 	}
       else
 	{
-	  QMessageBox::information( this, "Error", "The host " + editDialog.lineeditHostName->text() + " is either already present or you entered no name!" );
+	  QMessageBox::information( this, "Error", "The host " + editDialog.lineeditHostName->text() + " is either already present or you entered no name." );
 	}
       break;
     }
@@ -632,7 +632,7 @@ void SIG_GPParameter::slotItemDoubleClicked( QTreeWidgetItem * theItem )
 	  // the same setFocus() and does NOT need this, because the field it
 	  // focuses is empty there.
 	  { QLineEdit *le = editDialog.lineeditHostName; QTimer::singleShot( 0, le, [le]{ le->end( false ); } ); }
-	  editDialog.setWindowTitle( "Edit host \"" + theHost->name + "\"" );
+	  editDialog.setWindowTitle( "Edit Host \"" + theHost->name + "\"" );
 	}
       else
 	{
@@ -644,7 +644,7 @@ void SIG_GPParameter::slotItemDoubleClicked( QTreeWidgetItem * theItem )
 	    editDialog.checkboxEnableHost->setChecked( true );
 	  else
 	    editDialog.checkboxEnableHost->setChecked( false );
-	  editDialog.setWindowTitle( "Edit hosts" );
+	  editDialog.setWindowTitle( "Edit Hosts" );
 	  editDialog.resize( QSize() );
 	}
       switch( editDialog.exec() )
@@ -692,7 +692,7 @@ void SIG_GPParameter::slotItemDoubleClicked( QTreeWidgetItem * theItem )
 		}
 	      else
 		{
-		  QMessageBox::information( this, "Error", "The host " + editDialog.lineeditHostName->text() + " is either already present or you entered no name!" );
+		  QMessageBox::information( this, "Error", "The host " + editDialog.lineeditHostName->text() + " is either already present or you entered no name." );
 		}
 	    }
 	  else

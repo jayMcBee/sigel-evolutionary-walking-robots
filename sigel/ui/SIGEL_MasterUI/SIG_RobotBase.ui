@@ -26,7 +26,7 @@
       <item row="0" column="0">
         <widget class="QGroupBox" name="groupboxRobotInfo">
           <property name="title">
-            <string>Robot Info</string>
+            <string>Robot information</string>
           </property>
           <layout class="QVBoxLayout">
             <property name="margin">
@@ -38,7 +38,7 @@
             <item>
               <widget class="QLabel" name="textlabelUsedRobot">
                 <property name="text">
-                  <string>Used Robot:</string>
+                  <string>Used robot:</string>
                 </property>
                 <property name="wordWrap">
                   <bool>false</bool>
@@ -77,7 +77,7 @@
                           <enum>QAbstractItemView::NoSelection</enum>
                         </property>
                         <property name="toolTip">
-                          <string>The links of the current robot model</string>
+                          <string>The links of the current robot model.</string>
                         </property>
                       </widget>
                     </item>
@@ -113,7 +113,7 @@
                           <enum>QAbstractItemView::NoSelection</enum>
                         </property>
                         <property name="toolTip">
-                          <string>All materials that the current robot model uses</string>
+                          <string>All materials that the current robot model uses.</string>
                         </property>
                       </widget>
                     </item>
@@ -143,7 +143,7 @@
                           <enum>QAbstractItemView::NoSelection</enum>
                         </property>
                         <property name="toolTip">
-                          <string>The bodies used by the current robot model</string>
+                          <string>The bodies used by the current robot model.</string>
                         </property>
                       </widget>
                     </item>
@@ -173,7 +173,7 @@
                           <enum>QAbstractItemView::NoSelection</enum>
                         </property>
                         <property name="toolTip">
-                          <string>The sensors used. Icons indicate sensor type&lt;BR&gt;(Joint, Pitch, Roll, Contact)</string>
+                          <string>The sensors used. Icons indicate the sensor type&lt;BR&gt;(joint, pitch, roll, contact).</string>
                         </property>
                       </widget>
                     </item>
@@ -203,7 +203,7 @@
                           <enum>QAbstractItemView::NoSelection</enum>
                         </property>
                         <property name="toolTip">
-                          <string>All joints of the current robot model. Icons indicate type (Rotational, Translational, Cylindrical)</string>
+                          <string>All joints of the current robot model. Icons indicate the type (rotational, translational, cylindrical).</string>
                         </property>
                       </widget>
                     </item>
@@ -233,7 +233,7 @@
                           <enum>QAbstractItemView::NoSelection</enum>
                         </property>
                         <property name="toolTip">
-                          <string>Drives used in the current robot model. Icons indicate type (absolute, relative, force, servo)</string>
+                          <string>Drives used in the current robot model. Icons indicate the type (absolute, relative, force, servo).</string>
                         </property>
                       </widget>
                     </item>
@@ -274,7 +274,7 @@
                 <string>Import</string>
               </property>
               <property name="toolTip">
-                <string>Import a *.rrb file</string>
+                <string>Import a *.rrb file.</string>
               </property>
             </widget>
           </item>
@@ -284,7 +284,7 @@
                 <string>Load</string>
               </property>
               <property name="toolTip">
-                <string>Load a Robot (*.crb Format)</string>
+                <string>Load a robot (*.crb format).</string>
               </property>
             </widget>
           </item>
@@ -294,7 +294,7 @@
                 <string>Save</string>
               </property>
               <property name="toolTip">
-                <string>Save this Robot as Cooked Robotmodel (*.crb)</string>
+                <string>Save this robot as a compiled robot model (*.crb).</string>
               </property>
             </widget>
           </item>
@@ -304,7 +304,7 @@
                 <string>Info</string>
               </property>
               <property name="toolTip">
-                <string>Display information about the current robot</string>
+                <string>Display information about the current robot.</string>
               </property>
             </widget>
           </item>

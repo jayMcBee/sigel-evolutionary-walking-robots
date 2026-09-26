@@ -315,7 +315,7 @@
                     <item>
                       <widget class="QGroupBox" name="buttongroupFloor">
                         <property name="title">
-                          <string>Floor Definition</string>
+                          <string>Floor definition</string>
                         </property>
                         <layout class="QVBoxLayout">
                           <property name="margin">
@@ -342,7 +342,7 @@
                               <item>
                                 <widget class="QLineEdit" name="lineeditFunction">
                                   <property name="toolTip">
-                                    <string>The function string understood is very similar to C syntax. The function has to be dependent on the variables x and z. More detailed information can be found in the documentation folder (function parser). &lt;h1&gt;valid operators&lt;/h1&gt; &lt;table&gt; &lt;tr&gt;  &lt;td&gt;()&lt;/td&gt; &lt;td&gt;expressions in parentheses first&lt;/td&gt; &lt;/tr&gt; &lt;tr&gt;  &lt;td&gt;-A&lt;/td&gt; &lt;td&gt;unary minus&lt;/td&gt; &lt;/tr&gt; &lt;tr&gt;  &lt;td&gt;A^B&lt;/td&gt; &lt;td&gt;exponentiation (A raised to the power B)&lt;/td&gt; &lt;/tr&gt; &lt;tr&gt;  &lt;td&gt;A*B  A/B  A%B&lt;/td&gt; &lt;td&gt;multiplication, division and modulo&lt;/td&gt; &lt;/tr&gt; &lt;tr&gt;  &lt;td&gt;A+B  A-B &lt;/td&gt; &lt;td&gt;addition and subtraction&lt;/td&gt; &lt;/tr&gt; &lt;/table&gt;  &lt;h1&gt;valid functions&lt;/h1&gt;  abs(A), acos(A), acosh(A), asin(A), asinh(A), atan(A), atanh(A), ceil(A), cos(A), cosh(A), exp(A), floor(A), int(A), log(A), sin(A), sinh(A), sqrt(A), tan(A), tanh(A)  &lt;h1&gt;Examples of function strings&lt;/h1&gt; 1+2 &lt;br&gt; -sin(sqrt(x^2+z^2))</string>
+                                    <string>The function string understood is very similar to C syntax. The function has to be dependent on the variables x and z. More detailed information can be found in the documentation folder (function parser). &lt;h1&gt;Valid operators&lt;/h1&gt; &lt;table&gt; &lt;tr&gt;  &lt;td&gt;()&lt;/td&gt; &lt;td&gt;expressions in parentheses first&lt;/td&gt; &lt;/tr&gt; &lt;tr&gt;  &lt;td&gt;-A&lt;/td&gt; &lt;td&gt;unary minus&lt;/td&gt; &lt;/tr&gt; &lt;tr&gt;  &lt;td&gt;A^B&lt;/td&gt; &lt;td&gt;exponentiation (A raised to the power B)&lt;/td&gt; &lt;/tr&gt; &lt;tr&gt;  &lt;td&gt;A*B  A/B  A%B&lt;/td&gt; &lt;td&gt;multiplication, division and modulo&lt;/td&gt; &lt;/tr&gt; &lt;tr&gt;  &lt;td&gt;A+B  A-B &lt;/td&gt; &lt;td&gt;addition and subtraction&lt;/td&gt; &lt;/tr&gt; &lt;/table&gt;  &lt;h1&gt;Valid functions&lt;/h1&gt;  abs(A), acos(A), acosh(A), asin(A), asinh(A), atan(A), atanh(A), ceil(A), cos(A), cosh(A), exp(A), floor(A), int(A), log(A), sin(A), sinh(A), sqrt(A), tan(A), tanh(A)  &lt;h1&gt;Examples of function strings&lt;/h1&gt; 1+2 &lt;br&gt; -sin(sqrt(x^2+z^2))</string>
                                   </property>
                                 </widget>
                               </item>
@@ -528,7 +528,7 @@
               <item>
                 <widget class="QGroupBox" name="groupboxGround">
                   <property name="title">
-                    <string>Ground Settings</string>
+                    <string>Ground settings</string>
                   </property>
                   <layout class="QGridLayout">
                     <property name="margin">

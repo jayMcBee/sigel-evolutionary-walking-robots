@@ -227,7 +227,7 @@
 		emit signalSimulationAbort();
 	      };
 
-	    QMessageBox::warning( this, "Simulation Exception!", e.getMessage() );
+	    QMessageBox::warning( this, "Simulation Exception", e.getMessage() );
 	  };
 
 	emit signalSimulationProgress( simulationVisualisation.getSimulationTime() );
@@ -292,7 +292,7 @@
 		    // stop the recording, and show it on the movie button
 		    record = false;
 		    emit signalRecordingAllowed( false );
-		    QMessageBox::warning( this, "File error", "Unable to write file " + fileName + ".\nPerhaps you don't have permission to write the file.");
+		    QMessageBox::warning( this, "File Error", "Unable to write file " + fileName + ".\nPerhaps you don't have permission to write the file.");
 		  };
 		currentFrameName++;
 	      } // end of if( ((currentFrame % movieFrequency) == 0) && currentFrameName < movieMaxFrames )
@@ -785,7 +785,7 @@ void SIG_SimulationVisualisationWidget::resetRecorder()
 	    if ( !simulationVisualisation.createPovrayIncludeFile( fileName, aspectRatio ) )
 	      {
 		record = false;
-		QMessageBox::warning( this, "File error", "Unable to write file " + fileName + ".\nPerhaps you don't have permission to write the file.");
+		QMessageBox::warning( this, "File Error", "Unable to write file " + fileName + ".\nPerhaps you don't have permission to write the file.");
 	      };
 	  };
 

@@ -153,7 +153,7 @@ bool MT_EstimationWidget::onHide(MT_GPManager *manager, subst_cache *subst)
 		subst->refreshInt = refInt;
 	}
 	else
-		QMessageBox::critical(this, "Configuring System", "Couldn't set the information for the current Meta-System.", "Ok");
+		QMessageBox::critical(this, "Configure MetaGP System", "Couldn't set the information for the current MetaGP system.", "OK");
 
 	return true;
 }
@@ -171,7 +171,7 @@ void MT_EstimationWidget::onShow(MT_GPManager *manager, subst_cache *subst)
 		tolerance = subst->tolerance;
 	}
 	else {
-		QMessageBox::critical(this, "Configuring System", "Couldn't retrieve the information for the current Meta-System.", "Ok");
+		QMessageBox::critical(this, "Configure MetaGP System", "Couldn't retrieve the information for the current MetaGP system.", "OK");
 		return;
 	}
 
@@ -190,11 +190,11 @@ void MT_EstimationWidget::onShow(MT_GPManager *manager, subst_cache *subst)
 		// of type evaluator */
 		estimationGroupBox->setTitle("Evaluation");
 		usedSys = evaluator;
-		strategyComboBox->addItem("mean error");
-		strategyComboBox->addItem("cleaned mean error");
-		strategyComboBox->addItem("adaptive error");
-		strategyComboBox->addItem("adaptive cleaned error");
-		strategyComboBox->addItem("don't use meta");
+		strategyComboBox->addItem("Mean error");
+		strategyComboBox->addItem("Cleaned mean error");
+		strategyComboBox->addItem("Adaptive error");
+		strategyComboBox->addItem("Adaptive cleaned error");
+		strategyComboBox->addItem("Don't use MetaGP");
 
 		switch(strategy){
 		case 1 : strategyComboBox->setCurrentIndex(0);
@@ -214,11 +214,11 @@ void MT_EstimationWidget::onShow(MT_GPManager *manager, subst_cache *subst)
 		// of type classifier
 		estimationGroupBox->setTitle("Classification");
 		usedSys = classifier;
-		strategyComboBox->addItem("error percentage");
-		strategyComboBox->addItem("adaptive - Generation");
-		strategyComboBox->addItem("adaptive - Fitness");
-		strategyComboBox->addItem("save the best");
-		strategyComboBox->addItem("don't use meta");
+		strategyComboBox->addItem("Error percentage");
+		strategyComboBox->addItem("Adaptive - generation");
+		strategyComboBox->addItem("Adaptive - fitness");
+		strategyComboBox->addItem("Save the best");
+		strategyComboBox->addItem("Don't use MetaGP");
 
 		switch(strategy){
 		case 3 : strategyComboBox->setCurrentIndex(0); break;

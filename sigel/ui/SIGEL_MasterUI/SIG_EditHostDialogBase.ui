@@ -14,7 +14,7 @@
       </rect>
     </property>
     <property name="windowTitle">
-      <string>Edit host</string>
+      <string>Edit Host</string>
     </property>
     <layout class="QGridLayout">
       <property name="margin">

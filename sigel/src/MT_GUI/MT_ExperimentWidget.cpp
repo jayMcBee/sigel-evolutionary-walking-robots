@@ -19,7 +19,7 @@ MT_ExperimentWidget::MT_ExperimentWidget(QWidget* parent, const char* name, Qt::
 	setSortingEnabled(false);
 	clear();
 	setColumnCount(1);
-	setHeaderLabels(QStringList("Meta Experiment"));
+	setHeaderLabels(QStringList("Meta experiment"));
 
 #ifdef _WINDOWS	
 	QString pixPath = ::getenv("SIGEL_ROOT");
@@ -30,7 +30,7 @@ MT_ExperimentWidget::MT_ExperimentWidget(QWidget* parent, const char* name, Qt::
 	
 	new MT_ExperimentItem(this, 5, "Statistics", QPixmap( pixPath+"mt_StatSmall.xpm" ));
 	new MT_ExperimentItem(this, 4, "Selection", QPixmap( pixPath+"dnaSmall.xpm" ));
-	new MT_ExperimentItem(this, 3, "GP Parameter", QPixmap( pixPath+"dnaSmall.xpm" ));
+	new MT_ExperimentItem(this, 3, "GP Parameters", QPixmap( pixPath+"dnaSmall.xpm" ));
 	new MT_ExperimentItem(this, 2, "Population", QPixmap( pixPath+"individualSmall.xpm" ));
 	new MT_ExperimentItem(this, 1, "Individual",QPixmap( pixPath+"mt_InstrSmall.xpm" ));
 	new MT_ExperimentItem(this, 0, "Strategy",QPixmap( pixPath+"mt_StrategySmall.xpm" ));

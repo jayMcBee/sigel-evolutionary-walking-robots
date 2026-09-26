@@ -39,7 +39,7 @@
         <widget class="QTabWidget" name="TabWidget2">
           <widget class="QWidget" name="tab">
             <attribute name="title">
-              <string>Total Statistics</string>
+              <string>Total statistics</string>
             </attribute>
             <layout class="QVBoxLayout">
               <property name="margin">
@@ -141,7 +141,7 @@
                               </size>
                             </property>
                             <property name="text">
-                              <string># Simulations (total)</string>
+                              <string># Simulations (total):</string>
                             </property>
                             <property name="wordWrap">
                               <bool>false</bool>
@@ -170,7 +170,7 @@
                               </size>
                             </property>
                             <property name="text">
-                              <string># Simulations</string>
+                              <string># Simulations:</string>
                             </property>
                             <property name="wordWrap">
                               <bool>false</bool>
@@ -186,7 +186,7 @@
                               </size>
                             </property>
                             <property name="text">
-                              <string># Estimations</string>
+                              <string># Estimations:</string>
                             </property>
                             <property name="wordWrap">
                               <bool>false</bool>
@@ -252,7 +252,7 @@
                               </size>
                             </property>
                             <property name="text">
-                              <string># Estimations (total)</string>
+                              <string># Estimations (total):</string>
                             </property>
                             <property name="wordWrap">
                               <bool>false</bool>
@@ -287,7 +287,7 @@
                         <item row="0" column="0">
                           <widget class="QLabel" name="TextLabel1">
                             <property name="text">
-                              <string>SIGEL Generations</string>
+                              <string>SIGEL generations:</string>
                             </property>
                             <property name="wordWrap">
                               <bool>false</bool>
@@ -388,7 +388,7 @@
                               </size>
                             </property>
                             <property name="text">
-                              <string>export PS</string>
+                              <string>Export PS</string>
                             </property>
                           </widget>
                         </item>
@@ -407,7 +407,7 @@
                               </size>
                             </property>
                             <property name="text">
-                              <string>export Data</string>
+                              <string>Export data</string>
                             </property>
                           </widget>
                         </item>
@@ -604,7 +604,7 @@
                               </size>
                             </property>
                             <property name="text">
-                              <string>Fitness variance</string>
+                              <string>Fitness variance:</string>
                             </property>
                             <property name="wordWrap">
                               <bool>false</bool>
@@ -620,7 +620,7 @@
                               </size>
                             </property>
                             <property name="text">
-                              <string>max. Fitness:</string>
+                              <string>Max. fitness:</string>
                             </property>
                             <property name="wordWrap">
                               <bool>false</bool>
@@ -714,7 +714,7 @@
                               </size>
                             </property>
                             <property name="text">
-                              <string>average Fitness:</string>
+                              <string>Average fitness:</string>
                             </property>
                             <property name="wordWrap">
                               <bool>false</bool>
@@ -785,7 +785,7 @@
                               </size>
                             </property>
                             <property name="text">
-                              <string>export PS</string>
+                              <string>Export PS</string>
                             </property>
                           </widget>
                         </item>
@@ -798,7 +798,7 @@
                               </size>
                             </property>
                             <property name="text">
-                              <string>export Data</string>
+                              <string>Export data</string>
                             </property>
                           </widget>
                         </item>
@@ -810,7 +810,7 @@
               <item>
                 <widget class="QGroupBox" name="GroupBox16">
                   <property name="title">
-                    <string>Search Operator Effects</string>
+                    <string>Search operator effects</string>
                   </property>
                   <layout class="QGridLayout">
                     <property name="margin">
@@ -903,7 +903,7 @@
                         <item row="2" column="0">
                           <widget class="QLabel" name="TextLabel30_3">
                             <property name="text">
-                              <string>2 X-Point</string>
+                              <string>2 X-point</string>
                             </property>
                             <property name="wordWrap">
                               <bool>false</bool>
@@ -913,7 +913,7 @@
                         <item row="0" column="1">
                           <widget class="QLabel" name="TextLabel31">
                             <property name="text">
-                              <string>total</string>
+                              <string>Total</string>
                             </property>
                             <property name="alignment">
                               <set>Qt::AlignCenter</set>
@@ -1026,7 +1026,7 @@
                         <item row="3" column="0">
                           <widget class="QLabel" name="TextLabel30">
                             <property name="text">
-                              <string>3 X-Point</string>
+                              <string>3 X-point</string>
                             </property>
                             <property name="wordWrap">
                               <bool>false</bool>
@@ -1036,7 +1036,7 @@
                         <item row="0" column="2">
                           <widget class="QLabel" name="TextLabel32">
                             <property name="text">
-                              <string>destructive %</string>
+                              <string>Destructive %</string>
                             </property>
                             <property name="alignment">
                               <set>Qt::AlignCenter</set>
@@ -1049,7 +1049,7 @@
                         <item row="1" column="0">
                           <widget class="QLabel" name="TextLabel30_2">
                             <property name="text">
-                              <string>1 X-Point</string>
+                              <string>1 X-point</string>
                             </property>
                             <property name="wordWrap">
                               <bool>false</bool>
@@ -1110,7 +1110,7 @@
                         <item row="1" column="1">
                           <widget class="QLabel" name="TextLabel6">
                             <property name="text">
-                              <string>Mutations</string>
+                              <string>Mutations:</string>
                             </property>
                             <property name="wordWrap">
                               <bool>false</bool>
@@ -1120,7 +1120,7 @@
                         <item row="2" column="1">
                           <widget class="QLabel" name="TextLabel7">
                             <property name="text">
-                              <string>destructive %</string>
+                              <string>Destructive %:</string>
                             </property>
                             <property name="wordWrap">
                               <bool>false</bool>
@@ -1130,7 +1130,7 @@
                         <item row="0" column="1">
                           <widget class="QLabel" name="TextLabel5">
                             <property name="text">
-                              <string>Reproductions</string>
+                              <string>Reproductions:</string>
                             </property>
                             <property name="wordWrap">
                               <bool>false</bool>
@@ -1291,7 +1291,7 @@
                               </size>
                             </property>
                             <property name="text">
-                              <string>export PS</string>
+                              <string>Export PS</string>
                             </property>
                           </widget>
                         </item>
@@ -1304,7 +1304,7 @@
                               </size>
                             </property>
                             <property name="text">
-                              <string comment="Selects the files to be converted.">export Data</string>
+                              <string comment="Selects the files to be converted.">Export data</string>
                             </property>
                           </widget>
                         </item>
@@ -1317,7 +1317,7 @@
           </widget>
           <widget class="QWidget" name="tab1">
             <attribute name="title">
-              <string>Generational Statistics</string>
+              <string>Generational statistics</string>
             </attribute>
             <layout class="QGridLayout">
               <property name="margin">
@@ -1343,7 +1343,7 @@
                         </size>
                       </property>
                       <property name="text">
-                        <string>Meta Generation</string>
+                        <string>Meta generation:</string>
                       </property>
                       <property name="wordWrap">
                         <bool>false</bool>
@@ -1433,7 +1433,7 @@
                         <item row="0" column="0">
                           <widget class="QLabel" name="TextLabel2_2">
                             <property name="text">
-                              <string>max Fitness</string>
+                              <string>Max. fitness:</string>
                             </property>
                             <property name="wordWrap">
                               <bool>false</bool>
@@ -1474,7 +1474,7 @@
                         <item row="2" column="0">
                           <widget class="QLabel" name="TextLabel4">
                             <property name="text">
-                              <string>Variance</string>
+                              <string>Variance:</string>
                             </property>
                             <property name="wordWrap">
                               <bool>false</bool>
@@ -1515,7 +1515,7 @@
                         <item row="1" column="0">
                           <widget class="QLabel" name="TextLabel3">
                             <property name="text">
-                              <string>average Fitness</string>
+                              <string>Average fitness:</string>
                             </property>
                             <property name="wordWrap">
                               <bool>false</bool>
@@ -1593,7 +1593,7 @@
               <item row="1" column="1">
                 <widget class="QGroupBox" name="GroupBox36">
                   <property name="title">
-                    <string>Parentpool</string>
+                    <string>Parent pool</string>
                   </property>
                   <layout class="QGridLayout">
                     <property name="margin">
@@ -1708,7 +1708,7 @@
                         <item row="0" column="0">
                           <widget class="QLabel" name="TextLabel8">
                             <property name="text">
-                              <string>Reproductions</string>
+                              <string>Reproductions:</string>
                             </property>
                             <property name="wordWrap">
                               <bool>false</bool>
@@ -1749,7 +1749,7 @@
                         <item row="1" column="0">
                           <widget class="QLabel" name="TextLabel9">
                             <property name="text">
-                              <string>Crossovers</string>
+                              <string>Crossovers:</string>
                             </property>
                             <property name="wordWrap">
                               <bool>false</bool>
@@ -1759,7 +1759,7 @@
                         <item row="2" column="0">
                           <widget class="QLabel" name="TextLabel10">
                             <property name="text">
-                              <string>Mutations</string>
+                              <string>Mutations:</string>
                             </property>
                             <property name="wordWrap">
                               <bool>false</bool>
@@ -1769,7 +1769,7 @@
                         <item row="4" column="0">
                           <widget class="QLabel" name="TextLabel11">
                             <property name="text">
-                              <string>el. Mutations</string>
+                              <string>El. mutations:</string>
                             </property>
                             <property name="wordWrap">
                               <bool>false</bool>
@@ -1853,7 +1853,7 @@
               <item row="2" column="0" rowspan="1" colspan="2">
                 <widget class="QGroupBox" name="GroupBox37">
                   <property name="title">
-                    <string>Search Operator Effects</string>
+                    <string>Search operator effects</string>
                   </property>
                   <layout class="QGridLayout">
                     <property name="margin">
@@ -1914,7 +1914,7 @@
                         <item row="2" column="0">
                           <widget class="QLabel" name="TextLabel30_3_2_2">
                             <property name="text">
-                              <string>2 X-Point</string>
+                              <string>2 X-point</string>
                             </property>
                             <property name="wordWrap">
                               <bool>false</bool>
@@ -1924,7 +1924,7 @@
                         <item row="0" column="1">
                           <widget class="QLabel" name="TextLabel31_2_2">
                             <property name="text">
-                              <string>total</string>
+                              <string>Total</string>
                             </property>
                             <property name="alignment">
                               <set>Qt::AlignCenter</set>
@@ -2037,7 +2037,7 @@
                         <item row="3" column="0">
                           <widget class="QLabel" name="TextLabel30_4_2">
                             <property name="text">
-                              <string>3 X-Point</string>
+                              <string>3 X-point</string>
                             </property>
                             <property name="wordWrap">
                               <bool>false</bool>
@@ -2047,7 +2047,7 @@
                         <item row="0" column="2">
                           <widget class="QLabel" name="TextLabel32_2_2">
                             <property name="text">
-                              <string>destructive %</string>
+                              <string>Destructive %</string>
                             </property>
                             <property name="alignment">
                               <set>Qt::AlignCenter</set>
@@ -2060,7 +2060,7 @@
                         <item row="1" column="0">
                           <widget class="QLabel" name="TextLabel30_2_2_2">
                             <property name="text">
-                              <string>1 X-Point</string>
+                              <string>1 X-point</string>
                             </property>
                             <property name="wordWrap">
                               <bool>false</bool>
@@ -2247,7 +2247,7 @@
                         <item row="2" column="0">
                           <widget class="QLabel" name="TextLabel6_2_2">
                             <property name="text">
-                              <string>Mutations</string>
+                              <string>Mutations:</string>
                             </property>
                             <property name="wordWrap">
                               <bool>false</bool>
@@ -2257,7 +2257,7 @@
                         <item row="1" column="0">
                           <widget class="QLabel" name="TextLabel5_2_2">
                             <property name="text">
-                              <string>Reproductions</string>
+                              <string>Reproductions:</string>
                             </property>
                             <property name="wordWrap">
                               <bool>false</bool>
@@ -2267,7 +2267,7 @@
                         <item row="0" column="0">
                           <widget class="QLabel" name="TextLabel12_2">
                             <property name="text">
-                              <string>Crossovers</string>
+                              <string>Crossovers:</string>
                             </property>
                             <property name="wordWrap">
                               <bool>false</bool>
@@ -2339,7 +2339,7 @@
                         <item row="3" column="0">
                           <widget class="QLabel" name="TextLabel7_2_2">
                             <property name="text">
-                              <string>destructive %</string>
+                              <string>Destructive %:</string>
                             </property>
                             <property name="wordWrap">
                               <bool>false</bool>
@@ -2380,7 +2380,7 @@
                         <item row="4" column="0">
                           <widget class="QLabel" name="TextLabel13_2">
                             <property name="text">
-                              <string>el. Mutations</string>
+                              <string>El. mutations:</string>
                             </property>
                             <property name="wordWrap">
                               <bool>false</bool>

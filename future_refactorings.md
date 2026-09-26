@@ -297,12 +297,6 @@ touched, because changing one changes behaviour against the reference binary.
   where the time goes: the random programs, the list rebuild, or the
   sorted inserts into the list.
 
-- [ ] **28. Check every UI label for grammar and typos.** One pass over every
-  label, button, menu entry, tooltip and dialog title. Most are in `ui/`; the
-  rest are literals in `src/`. `pushbuttonShowFitnessCurve` is one already
-  spotted — "Fitnesscurve" also appears in
-  `SIG_ExperimentView::slotShowFitnesscurve`.
-
 ---
 
 ## 8 · Cleanup
