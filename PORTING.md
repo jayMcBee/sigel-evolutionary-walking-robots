@@ -915,7 +915,11 @@ classes and leave truncation a hard error. **They are not interchangeable.**
   with the current STEPSIZE each time it records, and the dialog, which now
   takes the step size, uses it for the info line. Step and Fast Forward
   still write one frame per press. Checked on the desktop.
-- **Gates:** run after the commit.
+- **Gates:** run after the commit: `check.sh` 938 pass, 0 fail; warnings
+  487. The other four gates are green.
+- **Review:** no defects. Left open: a Fast Forward press counts as one
+  step in the frame count, so it writes at most one frame per 5 s jump, as
+  before.
 - **Next:** item 100, the message when recording stops. Open: a STEPSIZE of
   0 or less divides by zero in `stepsPerFrame`, as elsewhere in the viewer;
   item 89.
