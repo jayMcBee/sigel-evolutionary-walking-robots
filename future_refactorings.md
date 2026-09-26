@@ -481,12 +481,6 @@ touched, because changing one changes behaviour against the reference binary.
   `STARTPOSITION` in the `.exp` files, a file change, or the terrain's place
   in DynaMechs, a vendor patch. Positions and fitness move with it.
 
-- [ ] **72. A slave result of exactly -1.0 hangs the run.** Found 2026-09-23
-  by reading `SIG_GPFitnessTrainer::checkTask` and its callers in
-  `SIG_GPManager`: `checkTask` receives the result and deletes the task, but
-  -1 is also its "not ready" value, so every caller keeps polling a task that
-  no longer exists, for ever. Never observed.
-
 - [ ] **73. Latent sensor bugs in `SIG_DynaMechsSimulationQueries::sense`.**
   Found 2026-09-23 with the two sensor fixes. No shipped robot or experiment
   triggers any of them: every shipped sensor is a joint sensor on a joint with

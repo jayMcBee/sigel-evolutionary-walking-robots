@@ -389,6 +389,17 @@ double SIGEL_GP::SIG_GPFitnessTrainer::checkTask(int taskId)
 	  	pvm_recv(pvmTask->pvmTaskId, 5);
 	  	pvm_upkdouble(&result,1,1);
 
+	  	// No fitness is negative. A slave's -1 would also read as this
+	  	// method's "no result yet" and leave the caller polling a task
+	  	// deleted below.
+	  	if (result < 0)
+	  	{
+	  		SIGEL_Tools::SIG_IO::cerr << "Task " << taskId
+	  					  << " for individual " << pvmTask->indPosition
+	  					  << " returned " << result << "; it is recorded as fitness 0." << Qt::endl;
+	  		result = 0;
+	  	}
+
 	  	pvmTask->host.noOfSlaves--;
 	  	delete pvmTasks[ taskId ];   // insert() freed the finished task
 	  	pvmTasks[ taskId ] = 0;

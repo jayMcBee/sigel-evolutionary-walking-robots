@@ -903,8 +903,19 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-26 — DONE: ITEM 97, A HEADLESS RUN STOPS WITH A SAVE.** Start
-here.
+**2026-09-26 — DONE: ITEM 72, A NEGATIVE SLAVE RESULT NO LONGER HANGS THE
+RUN.** Start here.
+
+- **Changed:** `SIG_GPFitnessTrainer::checkTask` records a negative result
+  as fitness 0, with a message. Details are in item 72's entry in "Done".
+- **Baselines:** unchanged. `fitness-check.sh` is identical to its baseline.
+- **Review:** the plan was reviewed before the code; the final diff has no
+  defects. Left open: `MT_Evaluator` uses -1 as "free slot" in
+  `MT_ResultBuffer`, so a MetaGP estimate of exactly -1 collides with it.
+- **Gates:** `check.sh` 938 pass, 0 fail; warnings 487.
+- **Next:** the `MT_ResultBuffer` collision.
+
+**2026-09-26 — DONE: ITEM 97, A HEADLESS RUN STOPS WITH A SAVE.**
 
 - **Changed:** in `sigel -e`, the first SIGINT or SIGTERM sets
   `userTerminated`, so the run stops and saves; a second one exits as
@@ -5927,6 +5938,22 @@ carried; other items and this file cite them, so they do not change.
   page, a label in the secondary text colour shows the description, or says
   that the experiment names a fitness function this build does not have.
   Remote ZORC is the last entry.
+
+- [x] **72. A slave result of exactly -1.0 hung the run** — done
+  2026-09-26. `SIG_GPFitnessTrainer::checkTask` returns -1 as "no result
+  yet"; when a slave's result was exactly -1, the method had already deleted
+  the task, and every caller in `SIG_GPManager` polled it for ever. Remote
+  ZORC returns -1.0 on every serial-port error and on Cancel, so this was
+  reachable. Now `checkTask` writes any negative result to stderr, with its
+  value, task and individual, and records it as fitness 0, the value the
+  slave already sends for its own failures. No fitness function returns a
+  negative score, so nothing else changes; a failed evaluation is not
+  evaluated again, and in MetaGP it counts as a result of 0. `< 0` was
+  chosen over `== -1` so the test is not an exact floating-point one. The
+  stale ZORC comment that promised a re-evaluation is corrected. Tested with
+  a temporary patch, not committed, that made the Simple fitness function
+  return -1: without the fix a headless run made no generation in 90 s;
+  with it the generation completed and all 74 results were recorded as 0.
 
 - [x] **97. A headless run can be stopped early with a save** — done
   2026-09-26. Reported by the x86 machine. `sigel -e` had a handler, but

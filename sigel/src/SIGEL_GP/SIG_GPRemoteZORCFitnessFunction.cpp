@@ -180,7 +180,7 @@ namespace SIGEL_GP
                      Enter the distance travelled by the robot (centimeters, 1 decimal):";
       distance = QInputDialog::getDouble(SIGEL_Tools::dialogParent(), dlogTitle, expInstruct, 1.0, 0, 500.0, 1, &wasOk);
 
-      // something went wrong, set fitness to -1 -> will be re-evaluated by SIGEL
+      // Cancelled: the master records a negative result as fitness 0
       if (!wasOk)
       {  return -1.0;
       }
