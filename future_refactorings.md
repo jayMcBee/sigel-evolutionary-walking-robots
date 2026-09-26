@@ -99,7 +99,13 @@ Constructs the language removed. A current compiler rejects them.
   `QObject` classes. Where the class's `.cpp` calls `new`, check for an owner;
   any leak found goes to item 8. One round: one build, one gate run, one
   review, one commit.
-
+- [ ] **102. C-style casts: replace them with C++ casts.** Found 2026-09-26.
+  `-Wold-style-cast` finds them all; most are in MT_GUI. The `QObject*` casts
+  in `connect` calls do nothing and are deleted. Numeric casts become
+  `static_cast`. The pointer casts (downcasts and casts for C APIs) each need
+  their own choice of cast. Once the count is zero, add `-Wold-style-cast` to
+  `SIGCXX` so no new ones come in. One round: one build, one gate run, one
+  review, one commit.
 ---
 
 ## 3 · Ownership
