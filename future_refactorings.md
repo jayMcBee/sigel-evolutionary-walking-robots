@@ -335,6 +335,16 @@ touched, because changing one changes behaviour against the reference binary.
   where the time goes: the random programs, the list rebuild, or the
   sorted inserts into the list.
 
+- [ ] **99. The visualiser's Stop button is really a reset; show it as one.**
+  Decided 2026-09-26. `SIG_SimulationVisualisationWidget::slotStopSimulation`
+  pauses a running simulation and then reloads it at time zero, so the
+  button always means "back to start". Pause already does a plain stop. Give
+  it a new back-to-start icon (bar and left-pointing triangle) as a new
+  `.xpm` in `pixmaps/`, replacing `stopButton.xpm` in
+  `SIG_SimulationControls`, and change its status tip to say it resets the
+  simulation to the start. It stays always enabled; the behaviour does not
+  change.
+
 ---
 
 ## 8 · Cleanup
