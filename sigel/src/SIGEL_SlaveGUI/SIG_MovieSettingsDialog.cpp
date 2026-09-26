@@ -146,11 +146,16 @@ void SIG_MovieSettingsDialog::slotResizeViewToMatch()
     .boundedTo( available.size() - frameExtra )
     .expandedTo( window->minimumSize() );
 
+  // The window's minimum size can exceed the available area; the window then
+  // goes to the area's top-left corner.
   QSize frameSize = target + frameExtra;
-  QPoint position( qBound( available.left(), window->frameGeometry().left(),
-			   available.right() + 1 - frameSize.width() ),
-		   qBound( available.top(), window->frameGeometry().top(),
-			   available.bottom() + 1 - frameSize.height() ) );
+  int rightmost = available.right() + 1 - frameSize.width();
+  int lowest = available.bottom() + 1 - frameSize.height();
+
+  int x = qMin( window->frameGeometry().left(), rightmost );
+  int y = qMin( window->frameGeometry().top(), lowest );
+  QPoint position( qMax( available.left(), x ),
+		   qMax( available.top(), y ) );
 
   window->resize( target );
   window->move( position );

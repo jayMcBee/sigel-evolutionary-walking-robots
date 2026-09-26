@@ -903,12 +903,29 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-27 — DONE: THE RESET ICON IS ORANGE.** Start here.
+**2026-09-27 — DONE: RESIZE VIEW TO MATCH NO LONGER ABORTS ON A SMALL
+SCREEN.** Start here.
+
+- **Changed:** `SIG_MovieSettingsDialog::slotResizeViewToMatch` placed the
+  window with `qBound`, whose bounds are reversed when the window's minimum
+  size plus its frame exceeds the screen's available area; `Q_ASSERT` then
+  aborted the viewer. The position is now clamped with `qMin` and `qMax`, so
+  such a window goes to the area's top-left corner. Found by the review of
+  the two buttons.
+- **Gates:** not run for this commit.
+- **Next:** item 100, the frame rate field. Open from the same review:
+  "View Size to Movie" is silently limited by the spin boxes' range, 512 to
+  1600 × 1200.
+
+**2026-09-27 — DONE: THE RESET ICON IS ORANGE.**
 
 - **Changed:** `pixmaps/resetButton.xpm` is orange, the same shape and
   shading as before, so Reset no longer shares the blue of Step and Fast
   Forward. Checked on the desktop.
-- **Gates:** one pass for this commit and the two before it; see below.
+- **Gates:** one pass for this commit and the two before it: `check.sh`
+  938 pass, 0 fail; warnings 487. The other four gates are green.
+- **Review:** of the two buttons: `qBound` in `slotResizeViewToMatch` can
+  abort; fixed next.
 - **Next:** item 100, the frame rate field.
 
 **2026-09-27 — DONE: THE DEFAULT MOVIE SIZE IS 1024 × 576.**
