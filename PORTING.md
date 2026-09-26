@@ -910,10 +910,11 @@ RUN.** Start here.
   as fitness 0, with a message. Details are in item 72's entry in "Done".
 - **Baselines:** unchanged. `fitness-check.sh` is identical to its baseline.
 - **Review:** the plan was reviewed before the code; the final diff has no
-  defects. Left open: `MT_Evaluator` uses -1 as "free slot" in
-  `MT_ResultBuffer`, so a MetaGP estimate of exactly -1 collides with it.
+  defects. `MT_Evaluator`'s -1 "free slot" in `MT_ResultBuffer` cannot
+  collide with an estimate: `spawnTask` stores every estimate as -(x + 2)
+  with x above 0.
 - **Gates:** `check.sh` 938 pass, 0 fail; warnings 487.
-- **Next:** the `MT_ResultBuffer` collision.
+- **Next:** item 83, the ZORC switch.
 
 **2026-09-26 — DONE: ITEM 97, A HEADLESS RUN STOPS WITH A SAVE.**
 
