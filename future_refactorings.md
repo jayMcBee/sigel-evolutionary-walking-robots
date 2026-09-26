@@ -300,6 +300,13 @@ touched, because changing one changes behaviour against the reference binary.
 
 ## 7 · The interface
 
+- [ ] **103. The tournaments-per-generation counter goes stale.** Reported
+  2026-09-26 by the x86 machine. `SIG_GPParameter` computes the counter,
+  the slider's fraction times the pool size, only in `getOutOfExperiment`
+  and `slotTourPerGenChanged`. Adding or deleting individuals does not
+  refresh it, so Clone (Empty Pool) followed by Add 250 still shows 0. The
+  run is not affected: `SIG_GPManager` uses 0.5 × 250 = 125.
+
 - [ ] **98. Run the next long evolution under gdb.** Decided 2026-09-26,
   after an overnight run was lost to a crash: build the overnight copy from
   a clean, committed tree, write the commit hash into its folder, and run
