@@ -644,6 +644,19 @@ touched, because changing one changes behaviour against the reference binary.
   interface until item 88 is done; (3) when a run starts, with a message box,
   which catches typed and loaded values and kills nothing.
 
+- [ ] **104. Refuse a step size of 0 or less.** Found 2026-09-27; the
+  step-size half of item 89. `SIG_SimulationVisualisationWidget::stepsPerFrame`
+  and the other divisions item 89 lists break on it. Refuse it where it enters:
+  - **On load:** the `SIG_SimulationParameters` stream reader throws
+    `SIG_UnstreamingError` for a `STEPSIZE` of 0 or less, as item 71 does for
+    register widths. File > Open shows it (item 88); `sigel -e` and
+    `sigel_eval` refuse the file. The shipped experiments use 0.01 and 0.002.
+  - **When typed:** `lineeditStepSize` becomes a `QDoubleSpinBox` with a
+    smallest value above 0, so it cannot hold a bad value; the page uses
+    `setValue` and `value()`.
+  - **Open:** the smallest step and its number of decimals; 0.0001 with 4
+    decimals would keep both shipped values.
+
 - [ ] **47. `sigelDynClient` and `manage_dyn_slave`.** `sigelDynClient` makes a
   second machine a dynamic slave of a master started with `sigel -de`, which
   `sigel.cpp` still accepts. It is still 1.3's Solaris `tcsh` script, its home
