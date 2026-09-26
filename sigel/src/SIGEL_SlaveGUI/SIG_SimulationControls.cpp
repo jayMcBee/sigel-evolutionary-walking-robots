@@ -57,7 +57,7 @@ namespace SIGEL_SlaveGUI
     quitAction = new QAction( this );
     quitAction->setObjectName( "quitAction" );
 
-    stopIcons.addFile( sigelRootString + "/pixmaps/stopButton.xpm" );
+    stopIcons.addFile( sigelRootString + "/pixmaps/resetButton.xpm" );
     playIcons.addFile( sigelRootString + "/pixmaps/startButton.xpm" );
     stepIcons.addFile( sigelRootString + "/pixmaps/stepButton.xpm" );
     pauseIcons.addFile( sigelRootString + "/pixmaps/pauseButton.xpm" );
@@ -75,7 +75,7 @@ namespace SIGEL_SlaveGUI
     alterMovieSettingsAction->setIcon( recordingDisallowedIcons );
     quitAction->setIcon( quitIcons );
 
-    stopAction->setStatusTip( "Stops and restarts the simulation." );
+    stopAction->setStatusTip( "Resets the simulation to the start." );
     playAction->setStatusTip( "Starts/pauses the simulation." );
     stepAction->setStatusTip( "Lets the simulation progress by one time step." );
     fForwardAction->setStatusTip( "Lets the simulation progress by 5 seconds." );

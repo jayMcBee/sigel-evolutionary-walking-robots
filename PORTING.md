@@ -903,8 +903,24 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-09-26 — DONE: ITEM 99, THE VIEWER'S STOP BUTTON IS SHOWN AS A
+RESET.** Start here.
+
+- **Changed:** `SIG_SimulationControls` loads the new
+  `pixmaps/resetButton.xpm`, a blue bar and left-pointing triangle, and the
+  status tip says "Resets the simulation to the start." `stopButton.xpm` is
+  removed. The behaviour does not change. Details are in item 99's entry in
+  "Done". Checked on the desktop.
+- **Baselines:** unchanged. `fitness-check.sh` is identical to its baseline.
+- **Review:** no defects. Acted on: the stale `sigelApp/pixmaps/stopButton.xpm`
+  was deleted by hand, because the Makefile only adds files to `sigelApp/`.
+- **Gates:** `check.sh` 938 pass, 0 fail; warnings 487.
+- **Next:** tooltips for the viewer's buttons. No action in
+  `SIG_SimulationControls` has a text or a tooltip, so hovering shows
+  nothing; 1.3 sets none either. Then item 100, movie recording.
+
 **2026-09-26 — DONE: ITEM 72, A NEGATIVE SLAVE RESULT NO LONGER HANGS THE
-RUN.** Start here.
+RUN.**
 
 - **Changed:** `SIG_GPFitnessTrainer::checkTask` records a negative result
   as fitness 0, with a message. Details are in item 72's entry in "Done".
@@ -5939,6 +5955,16 @@ carried; other items and this file cite them, so they do not change.
   page, a label in the secondary text colour shows the description, or says
   that the experiment names a fitness function this build does not have.
   Remote ZORC is the last entry.
+
+- [x] **99. The viewer's Stop button is shown as a reset** — done
+  2026-09-26. `SIG_SimulationVisualisationWidget::slotStopSimulation`
+  pauses a running simulation and reloads it at time zero, so the button
+  always means "back to start". `SIG_SimulationControls` gives it a new icon,
+  `pixmaps/resetButton.xpm`: a blue bar and left-pointing triangle, in the
+  colour of Step and Fast Forward. `stopButton.xpm` is removed; nothing else
+  used it. The status tip is "Resets the simulation to the start." The
+  behaviour does not change, and the button stays always enabled. Checked on
+  the desktop with `walker.exp`.
 
 - [x] **72. A slave result of exactly -1.0 hung the run** — done
   2026-09-26. `SIG_GPFitnessTrainer::checkTask` returns -1 as "no result
