@@ -333,7 +333,7 @@ touched, because changing one changes behaviour against the reference binary.
   `SIG_SimulationVisualisationWidget::callRenderPixMap`. During Play one frame
   advances the simulation by one step. Only these changes; all other
   recording behaviour stays as it is. One commit per sub-item, in this order.
-  Done: 100a, the default size of 1280 × 720; 100b, frames that are exactly
+  Done: 100a, the default size, now 1024 × 576; 100b, frames that are exactly
   the output size, never scaled, cut or letterboxed in black, with the crop
   and keep-ratio check boxes gone and a minimum of 512 × 512; "View Size to
   Movie" and "Resize View to Match" in the movie settings dialog.

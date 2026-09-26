@@ -903,8 +903,16 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-09-27 — DONE: THE DEFAULT MOVIE SIZE IS 1024 × 576.** Start here.
+
+- **Changed:** the `SIG_SimulationVisualisationWidget` constructor starts
+  the movie at 1024 × 576, in place of 1280 × 720. It is 16:9, so a video
+  player shows it without bars, and a view of that size fits a 1600 × 1200
+  screen; 1280 × 720 did not.
+- **Gates:** one pass after the next commit.
+- **Next:** an orange Reset icon.
+
 **2026-09-27 — DONE: TWO BUTTONS MATCH THE VIEW AND THE MOVIE SIZE.**
-Start here.
 
 - **Changed:** under the frame-fit label, "View Size to Movie" sets the
   output size to the view size, and "Resize View to Match" grows or shrinks
