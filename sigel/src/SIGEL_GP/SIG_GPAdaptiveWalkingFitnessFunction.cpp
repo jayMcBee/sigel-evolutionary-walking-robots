@@ -35,7 +35,7 @@ namespace SIGEL_GP
   double SIG_GPAdaptiveWalkingFitnessFunction::evalFitness( SIGEL_Program::SIG_Program &program,
                                                             SIGEL_Robot::SIG_Robot &rob,
                                                             SIGEL_Environment::SIG_Environment &environment,
-                                                            SIGEL_Simulation::SIG_SimulationParameters &simparameter )
+                                                            SIGEL_Simulation::SIG_SimulationParameters &simparameter ) const
   {
     double  fitness   = 0,
             avgHeight = 0,

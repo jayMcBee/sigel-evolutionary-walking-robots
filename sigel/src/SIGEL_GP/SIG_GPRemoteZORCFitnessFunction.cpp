@@ -38,7 +38,7 @@ namespace SIGEL_GP
    double SIG_GPRemoteZORCFitnessFunction::evalFitness( SIGEL_Program::SIG_Program &program,
                                                         SIGEL_Robot::SIG_Robot &rob,
                                                         SIGEL_Environment::SIG_Environment &,
-                                                        SIGEL_Simulation::SIG_SimulationParameters &simparameter )
+                                                        SIGEL_Simulation::SIG_SimulationParameters &simparameter ) const
    {  double   fitness  = 0,
                distance = 0;
       QString  expInstruct,
@@ -197,7 +197,7 @@ namespace SIGEL_GP
    * Set some parameters of the serial device for proper operation with ZORC.
    * Returns -1 in case any error occurred.
    */
-   int SIG_GPRemoteZORCFitnessFunction::SetSerial(int fd, long baud, int handshake)
+   int SIG_GPRemoteZORCFitnessFunction::SetSerial(int fd, long baud, int handshake) const
    {
       int baudcode;
       struct termios tio;
@@ -250,7 +250,7 @@ namespace SIGEL_GP
     * serial interface specified by the 'serIF' file descriptor.
     * The method returns when all data has been sent and the serial buffer is empty.
     */
-   void SIG_GPRemoteZORCFitnessFunction::sendOverSerialLine(int serIF, const QString &txtToSend)
+   void SIG_GPRemoteZORCFitnessFunction::sendOverSerialLine(int serIF, const QString &txtToSend) const
    {	unsigned char  c,
                      prev = '-';
       int   idx = 0;
@@ -278,7 +278,7 @@ namespace SIGEL_GP
     * Wait for input on the specified serial device for 'timeOutSecs' number of seconds.
     * Returns 'true' when data is pending, 'false' otherwise.
     */
-   bool SIG_GPRemoteZORCFitnessFunction::timedSerialWait(int serIF, int timeOutSecs)
+   bool SIG_GPRemoteZORCFitnessFunction::timedSerialWait(int serIF, int timeOutSecs) const
    {  fd_set rfds;
       struct timeval tv;
       int retval;
@@ -305,7 +305,7 @@ namespace SIGEL_GP
 	/**
     * This method goes one step into the ZORC menu hierarchy.
     */
-	void SIG_GPRemoteZORCFitnessFunction::goZORCMenu(int serIF, char inChoice)
+	void SIG_GPRemoteZORCFitnessFunction::goZORCMenu(int serIF, char inChoice) const
 	{
    	write(serIF, (unsigned char *)&inChoice, 1);
 	   usleep(100 * 1000);

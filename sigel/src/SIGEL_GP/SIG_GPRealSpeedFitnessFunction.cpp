@@ -34,7 +34,7 @@ namespace SIGEL_GP
   double SIG_GPRealSpeedFitnessFunction::evalFitness( SIGEL_Program::SIG_Program &program,
                                                       SIGEL_Robot::SIG_Robot &rob,
                                                       SIGEL_Environment::SIG_Environment &environment,
-                                                      SIGEL_Simulation::SIG_SimulationParameters &simparameter ) {
+                                                      SIGEL_Simulation::SIG_SimulationParameters &simparameter ) const {
     double const recordingRate = 0.5;
 
     int const recordingFrequency = int( recordingRate / simparameter.getStepSize() );

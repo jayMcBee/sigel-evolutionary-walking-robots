@@ -35,7 +35,7 @@ SIGEL_GP::SIG_GPSimpleFitnessFunction::~SIG_GPSimpleFitnessFunction()
 double SIGEL_GP::SIG_GPSimpleFitnessFunction::evalFitness( SIGEL_Program::SIG_Program &program,
                                                            SIGEL_Robot::SIG_Robot &rob,
                                                            SIGEL_Environment::SIG_Environment &environment,
-                                                           SIGEL_Simulation::SIG_SimulationParameters &simparameter ) {
+                                                           SIGEL_Simulation::SIG_SimulationParameters &simparameter ) const {
   SIGEL_GP::SIG_GPSimpleRecorder recorder;
 
   SIGEL_Simulation::SIG_Simulation *simulation = new SIGEL_Simulation::SIG_Simulation( rob,

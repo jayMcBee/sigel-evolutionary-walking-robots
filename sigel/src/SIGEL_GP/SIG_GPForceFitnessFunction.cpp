@@ -39,7 +39,7 @@ SIGEL_GP::SIG_GPForceFitnessFunction::~SIG_GPForceFitnessFunction() {
 double SIGEL_GP::SIG_GPForceFitnessFunction::evalFitness( SIGEL_Program::SIG_Program &program,
                                                           SIGEL_Robot::SIG_Robot &rob,
                                                           SIGEL_Environment::SIG_Environment &environment,
-                                                          SIGEL_Simulation::SIG_SimulationParameters &simparameter ) {
+                                                          SIGEL_Simulation::SIG_SimulationParameters &simparameter ) const {
   SIGEL_GP::SIG_GPFullDataRecorder recorder(1);
 
   SIGEL_Simulation::SIG_Simulation *simulation = new SIGEL_Simulation::SIG_Simulation( rob, environment, program, simparameter, recorder );

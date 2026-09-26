@@ -64,7 +64,7 @@ namespace SIGEL_GP
       double   evalFitness( SIGEL_Program::SIG_Program &program,
                             SIGEL_Robot::SIG_Robot &rob,
                             SIGEL_Environment::SIG_Environment &environment,
-                            SIGEL_Simulation::SIG_SimulationParameters &simparameter );
+                            SIGEL_Simulation::SIG_SimulationParameters &simparameter ) const;
 
       QString  serializedId() const { return "RemoteZORCFitnessFunction"; }
       QString  name() const { return "Remote ZORC"; }
@@ -74,24 +74,24 @@ namespace SIGEL_GP
       * serial interface specified by the 'serIF' file descriptor.
       * The method returns when all data has been sent and the serial buffer is empty.
       */
-      void     sendOverSerialLine(int serIF, const QString &txtToSend);
+      void     sendOverSerialLine(int serIF, const QString &txtToSend) const;
 
     /**
       * Set some parameters of the serial device for proper operation with ZORC.
       * Returns -1 in case any error occurred.
       */
-      int      SetSerial(int fd, long baud, int handshake);
+      int      SetSerial(int fd, long baud, int handshake) const;
 
     /**
       * Wait for input on the specified serial device for 'timeOutSecs' number of seconds.
       * Returns 'true' when data is pending, 'false' otherwise.
       */
-      bool     timedSerialWait(int serIF, int timeOutSecs);
+      bool     timedSerialWait(int serIF, int timeOutSecs) const;
 
 	 /**
      * This method goes one step into the ZORC menu hierarchy.
      */
-		void 		goZORCMenu(int serIF, char inChoice);
+		void 		goZORCMenu(int serIF, char inChoice) const;
 
    };
 

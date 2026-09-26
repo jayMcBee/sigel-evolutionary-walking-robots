@@ -26,14 +26,14 @@
 
 SIGEL_GP::SIG_GPFitnessFunction::~SIG_GPFitnessFunction() {};
 
-bool SIGEL_GP::SIG_GPFitnessFunction::isValid( double value )
+bool SIGEL_GP::SIG_GPFitnessFunction::isValid( double value ) const
 {
   return ( (value != HUGE_VAL) && (value != (-HUGE_VAL)) && (value==value) );
 };
 
 DL_vector SIGEL_GP::SIG_GPFitnessFunction::normalizeRobotPosition( DL_vector originalPosition,
 								   DL_matrix actualRobotRotation,
-								   const SIGEL_Robot::SIG_Robot &rob )
+								   const SIGEL_Robot::SIG_Robot &rob ) const
 {
   DL_vector robotsRealOrigin = rob.initialLocation;
   robotsRealOrigin.timesis( -1 );

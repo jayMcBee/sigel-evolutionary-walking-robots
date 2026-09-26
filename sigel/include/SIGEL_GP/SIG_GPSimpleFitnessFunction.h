@@ -63,7 +63,7 @@ public:
 double evalFitness( SIGEL_Program::SIG_Program &program,
                     SIGEL_Robot::SIG_Robot &rob,
                     SIGEL_Environment::SIG_Environment &environment,
-                    SIGEL_Simulation::SIG_SimulationParameters &simparameter );
+                    SIGEL_Simulation::SIG_SimulationParameters &simparameter ) const;
 
 QString serializedId() const { return "SimpleFitnessFunction"; }
 QString name() const { return "Simple"; }

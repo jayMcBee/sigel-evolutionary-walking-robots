@@ -77,7 +77,7 @@ class SIG_GPFitnessFunction{
  virtual double evalFitness( SIGEL_Program::SIG_Program &program,
                              SIGEL_Robot::SIG_Robot &rob,
                              SIGEL_Environment::SIG_Environment &environment,
-                             SIGEL_Simulation::SIG_SimulationParameters &simparameter ) = 0;
+                             SIGEL_Simulation::SIG_SimulationParameters &simparameter ) const = 0;
 
 /**
  * The key of this fitness function in experiment files and in the PVM data.
@@ -97,10 +97,10 @@ class SIG_GPFitnessFunction{
   int getResetEveryGeneration() { return resetEveryGeneration; }
 
  protected:
- bool isValid( double value );
+ bool isValid( double value ) const;
 
  protected:
- DL_vector normalizeRobotPosition( DL_vector originalPosition,  DL_matrix actualRobotRotation, const SIGEL_Robot::SIG_Robot &rob );
+ DL_vector normalizeRobotPosition( DL_vector originalPosition,  DL_matrix actualRobotRotation, const SIGEL_Robot::SIG_Robot &rob ) const;
 
  /**
   * This variable holds the actual Generation.

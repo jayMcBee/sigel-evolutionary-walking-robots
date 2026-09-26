@@ -903,7 +903,19 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-26 — DONE: ONE LIST OF FITNESS FUNCTIONS.** Start here.
+**2026-09-26 — DONE: evalFitness IS const.** Start here.
+
+- **Changed, mechanical:** `evalFitness` is `const` in `SIG_GPFitnessFunction`
+  and the six classes, and so are `isValid`, `normalizeRobotPosition` and
+  Remote ZORC's four serial-line helpers. Only `const` was added. This is
+  step 4a of item 85, so that step 4b can evaluate the registry's objects.
+- **Baselines:** unchanged. `fitness-check.sh` is identical to its baseline.
+- **Review:** no defects.
+- **Gates:** `check.sh` 938 pass, 0 fail; warnings 487.
+- **Next:** item 85, step 4b: the slave and `sigel_eval` use the registry;
+  item 84.
+
+**2026-09-26 — DONE: ONE LIST OF FITNESS FUNCTIONS.**
 
 - **Changed:** `SIG_GPFitnessFunctionRegistry` holds one object of each
   fitness function. `fitnessFunctions()` lists them and `indexOf()` finds one
@@ -925,8 +937,7 @@ classes and leave truncation a hard error. **They are not interchangeable.**
   describe the registry. Item 85's text is closed with step 5.
 - **Gates:** `check.sh` 938 pass, 0 fail; warnings 487. The forms row drops
   by 2 with the icon; the new header and source add 2.
-- **Next:** item 85, step 4: the slave and `sigel_eval` use the registry;
-  item 84. Stop before the final code and show variants A and B.
+- **Next:** item 85, step 4.
 
 **2026-09-26 — DONE: evalFitness TAKES THE FOUR OBJECTS.**
 
