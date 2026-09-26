@@ -305,6 +305,8 @@
   {
     // grabFramebuffer returns device pixels; drawn at ratio 1, they stay 1:1.
     QImage grabbed = grabFramebuffer();
+    if ( grabbed.isNull() )
+      return false;
     grabbed.setDevicePixelRatio( 1.0 );
 
     QImage frame( movieWidth, movieHeight, QImage::Format_RGB32 );

@@ -903,8 +903,17 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-09-26 — DONE: A FAILED GRAB STOPS THE RECORDING.** Start here.
+
+- **Changed:** `SIG_SimulationVisualisationWidget::callRenderPixMap`
+  returns false when `grabFramebuffer()` gives a null image, so recording
+  stops with the write warning. Since item 100b it saved a black frame and
+  reported success. Found by the review of 100b. The warning still blames
+  file permissions; its text belongs with item 100's stop message.
+- **Gates:** not run, by decision.
+- **Next:** the two buttons under the frame-fit label, to be discussed.
+
 **2026-09-26 — DONE: ITEM 100b, A MOVIE FRAME IS EXACTLY THE OUTPUT SIZE.**
-Start here.
 
 - **Changed, by decision:** `SIG_SimulationVisualisationWidget::callRenderPixMap`
   copies the view pixel for pixel into a frame of the output size: a larger
@@ -918,7 +927,8 @@ Start here.
   `textlabelFrameFit`, says whether frames will be clipped, letterboxed, or
   both; `SIG_MovieSettingsDialog::slotUpdateFrameFit` sets it. Checked on the
   desktop with a temporary preview of one frame, not committed.
-- **Gates:** run after the commit.
+- **Gates:** run after the commit: `check.sh` 938 pass, 0 fail; warnings
+  487. Review: a null grab was saved as a black frame; fixed next.
 - **Next:** two buttons under the frame-fit label, "View Size to Movie"
   and "Resize View to Match"; to be discussed first.
 
