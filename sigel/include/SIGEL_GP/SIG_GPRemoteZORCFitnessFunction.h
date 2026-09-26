@@ -67,6 +67,7 @@ namespace SIGEL_GP
                             SIGEL_Simulation::SIG_SimulationParameters &simparameter );
 
       QString  serializedId() const { return "RemoteZORCFitnessFunction"; }
+      QString  name() const { return "Remote ZORC"; }
 
     /**
       * This method sends all data contained in the QString object over the

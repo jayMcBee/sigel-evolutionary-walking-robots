@@ -46,6 +46,7 @@ namespace SIGEL_GP
 
       // Experiment files store this ID for Adaptive Walking.
       QString serializedId() const { return "ZorcWalkingFitnessFunction"; }
+      QString name() const { return "Adaptive Walking"; }
 
     };
 

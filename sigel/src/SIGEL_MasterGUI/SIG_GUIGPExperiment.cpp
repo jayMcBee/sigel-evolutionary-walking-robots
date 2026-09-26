@@ -29,6 +29,7 @@
 #include "SIGEL_MasterGUI/SIG_GUIGPExperiment.h"
 #include "SIGEL_MasterGUI/SIG_ExperimentListView.h"
 
+#include "SIGEL_GP/SIG_GPFitnessFunctionRegistry.h"
 #include "SIGEL_GP/SIG_GUIGPManager.h"
 
 #include "SIGEL_RobotIO/SIG_RobotBuilder.h"
@@ -343,7 +344,10 @@ void SIG_GUIGPExperiment::slotStartEvolution()
   if( experimentListView->isRunning() )
     return;
 
-  if( (gpExperiment.robot.getBodies().size() != 0) && (gpExperiment.population.getSize() >= 4) && (gpExperiment.gpParameter.getFitnessName() != QString()) )
+  // First: the test and SIG_GUIGPManager's constructor read these values.
+  putAllIntoExperiment();
+
+  if( (gpExperiment.robot.getBodies().size() != 0) && (gpExperiment.population.getSize() >= 4) && SIGEL_GP::SIG_GPFitnessFunctionRegistry::indexOf( gpExperiment.gpParameter.getFitnessName() ) )
     {
       delete guiGPManager;
       
@@ -351,7 +355,6 @@ void SIG_GUIGPExperiment::slotStartEvolution()
 #ifdef SIG_DEBUG
       SIGEL_Tools::SIG_IO::cout << "Starting Evolution" << Qt::endl;
 #endif
-      putAllIntoExperiment();
       
       // The emit locks every experiment through slotEvolutionNotRunning. Stop is
       // not one of the widgets it touches, so it is set here.
@@ -379,7 +382,7 @@ void SIG_GUIGPExperiment::slotStartEvolution()
     }
   else
     {
-      QMessageBox::warning( experimentListView, "Can't Start Evolution", "The evolution cannot be started. There may be several reasons:<ul><li>There is no robot loaded.</li><li>There are fewer than four individuals in the population.</li><li>No fitness function name was specified.</li></ul>");
+      QMessageBox::warning( experimentListView, "Can't Start Evolution", "The evolution cannot be started. There may be several reasons:<ul><li>There is no robot loaded.</li><li>There are fewer than four individuals in the population.</li><li>No fitness function is selected.</li></ul>");
     }
 };
 

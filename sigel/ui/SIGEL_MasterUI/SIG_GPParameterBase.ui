@@ -430,43 +430,10 @@
                       </widget>
                     </item>
                     <item>
-                      <widget class="QComboBox" name="comboboxFitnessName">
+                      <widget class="QComboBox" name="fitnessFunctionList">
                         <property name="toolTip">
                           <string>Select the fitness function to be used.</string>
                         </property>
-                        <item>
-                          <property name="text">
-                            <string>Simple</string>
-                          </property>
-                        </item>
-                        <item>
-                          <property name="text">
-                            <string>Real Speed</string>
-                          </property>
-                        </item>
-                        <item>
-                          <property name="text">
-                            <string>Nice Walking</string>
-                          </property>
-                        </item>
-                        <item>
-                          <property name="text">
-                            <string>Adaptive Walking</string>
-                          </property>
-                        </item>
-                        <item>
-                          <property name="text">
-                            <string>Remote ZORC</string>
-                          </property>
-                          <property name="icon">
-                            <iconset resource="SIG_GPParameterBase.qrc">:/SIG_GPParameterBase/images/image0.xpm</iconset>
-                          </property>
-                        </item>
-                        <item>
-                          <property name="text">
-                            <string>Force</string>
-                          </property>
-                        </item>
                       </widget>
                     </item>
                     <item>
@@ -2154,9 +2121,6 @@
     <tabstop>pushbuttonImport</tabstop>
     <tabstop>pushbuttonExport</tabstop>
   </tabstops>
-  <resources>
-    <include location="SIG_GPParameterBase.qrc"/>
-  </resources>
   <slots>
     <slot>slotAddHost()</slot>
     <slot>slotChangeGraveyardDir()</slot>

@@ -2100,9 +2100,9 @@ static int guidriveMain(int argc, char **argv)
             tab(pg, 0);
             typeSpin(pg, "spinboxRandomSeed", "123");
             typeSpin(pg, "spinboxMaxAge", "42");
-            if (QComboBox *cb = pg->findChild<QComboBox *>("comboboxFitnessName")) {
+            if (QComboBox *cb = pg->findChild<QComboBox *>("fitnessFunctionList")) {
                 cb->setFocus(); QTest::keyClick(cb, Qt::Key_Down);
-                printf("  combo comboboxFitnessName -> %d [%s]\n",
+                printf("  combo fitnessFunctionList -> %d [%s]\n",
                        cb->currentIndex(), qPrintable(cb->currentText()));
             }
             if (QSlider *sl = pg->findChild<QSlider *>("sliderMutation")) {

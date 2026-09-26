@@ -41,6 +41,7 @@ namespace SIGEL_GP
                           SIGEL_Simulation::SIG_SimulationParameters &simparameter );
 
       QString serializedId() const { return "NiceWalkingFitnessFunction"; }
+      QString name() const { return "Nice Walking"; }
 
     };
 

@@ -624,8 +624,8 @@ touched, because changing one changes behaviour against the reference binary.
     simulation;
   - 0 when v̄ is 0 or below, or a position is Inf or NaN.
   It records every frame with `SIG_GPFullDataRecorder`, as Nice Walking does,
-  and needs one entry in the GP parameter combo box and one in
-  `sigel_slave`'s name mapping. No file format changes.
+  and needs one entry in `SIG_GPFitnessFunctionRegistry::fitnessFunctions()`
+  and one in `sigel_slave`'s name mapping. No file format changes.
 
 - [ ] **83. ZORC support behind a compile-time switch, off by default.**
   Decided 2026-09-24. ZORC is a real robot driven over a serial line; the

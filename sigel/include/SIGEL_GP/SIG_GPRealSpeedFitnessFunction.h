@@ -41,6 +41,7 @@ namespace SIGEL_GP
                           SIGEL_Simulation::SIG_SimulationParameters &simparameter );
 
       QString serializedId() const { return "RealSpeedFitnessFunction"; }
+      QString name() const { return "Real Speed"; }
 
     };
 

@@ -35,6 +35,7 @@
 #include "SIGEL_MasterGUI/SIG_GPParameter.h"
 #include "SIGEL_MasterGUI/SIG_EditHostDialog.h"
 
+#include "SIGEL_GP/SIG_GPFitnessFunctionRegistry.h"
 #include "SIGEL_GP/SIG_GPPVMHost.h"
 
 #include "SIGEL_Program/SIG_Program.h"
@@ -59,6 +60,9 @@ SIG_GPParameter::SIG_GPParameter( QWidget* parent,  const char* name, Qt::Window
   : SIG_GPParameterBase( parent, name, fl ), theExperiment( theExperiment ), sigelRoot( std::getenv( "SIGEL_ROOT" ) )
 #endif
 {
+  for ( const SIGEL_GP::SIG_GPFitnessFunction *fitnessFunction : SIGEL_GP::SIG_GPFitnessFunctionRegistry::fitnessFunctions() )
+    fitnessFunctionList->addItem( fitnessFunction->name() );
+
   QObject::connect( listviewHosts,
 		    SIGNAL( itemDoubleClicked( QTreeWidgetItem *, int ) ),
 		    SLOT( slotItemDoubleClicked( QTreeWidgetItem * ) ) );
@@ -105,6 +109,15 @@ SIG_GPParameter::~SIG_GPParameter()
     // no need to delete child widgets, Qt does it all for us
 }
 
+std::optional<int> SIG_GPParameter::selectedFitnessFunction() const
+{
+  // -1 is Qt's "nothing selected"
+  const int index = fitnessFunctionList->currentIndex();
+  if ( index == -1 )
+    return std::nullopt;
+  return index;
+}
+
 void SIG_GPParameter::slotChangeGraveyardDir()
 {
   lineeditGraveyardDir->setText( QFileDialog::getExistingDirectory( this, "Select Directory", "./" ) );
@@ -132,37 +145,9 @@ void SIG_GPParameter::putIntoExperiment()
   theExperiment.gpParameter.setMutationProb( sliderMutation->value() );
   theExperiment.gpParameter.setReproductionProb( 1000 - sliderMutation->value() - sliderCrossover->value() );
 
-  // put the fitness function name into the experiment
-  // theExperiment.gpParameter.setFitnessName( lineeditFitnessFunctionName->text() );
-  switch( comboboxFitnessName->currentIndex() )
-    {
-    case 0: // simple fitnessFunction
-      theExperiment.gpParameter.setFitnessName("SimpleFitnessFunction");
-      break;
-
-    case 1:
-      theExperiment.gpParameter.setFitnessName("RealSpeedFitnessFunction");
-      break;
-
-    case 2:
-      theExperiment.gpParameter.setFitnessName("NiceWalkingFitnessFunction");
-      break;
-
-    case 3:
-      theExperiment.gpParameter.setFitnessName("ZorcWalkingFitnessFunction");
-      break;
-
-    case 4:
-      theExperiment.gpParameter.setFitnessName("RemoteZORCFitnessFunction");
-      break;
-
-    case 5:
-    	theExperiment.gpParameter.setFitnessName("ForceFitnessFunction");
-     	break;
-
-		default:
-			QMessageBox::information( this, "Error", "Internal Error -- fitness function is unknown to class SIG_GPParameter.");
-    }
+  // with nothing selected, the stored ID stays
+  if ( const std::optional<int> index = selectedFitnessFunction() )
+    theExperiment.gpParameter.setFitnessName( SIGEL_GP::SIG_GPFitnessFunctionRegistry::fitnessFunctions()[*index]->serializedId() );
 
   // put the probabilities into the experiment
   theExperiment.gpParameter.setProbability( SIGEL_Program::ADD, sliderADD->value() );
@@ -280,21 +265,9 @@ void SIG_GPParameter::getOutOfExperiment()
   sliderMutation->setValue( theExperiment.gpParameter.getMutationProb() );
   sliderCrossover->setValue( theExperiment.gpParameter.getXoverProb() );
 
-  // get the fitness function name
-  QString fitnessName = theExperiment.gpParameter.getFitnessName();
-  if ( fitnessName == "SimpleFitnessFunction" )
-    comboboxFitnessName->setCurrentIndex(0);
-  else if ( fitnessName == "RealSpeedFitnessFunction" )
-      comboboxFitnessName->setCurrentIndex(1);
-  else if ( fitnessName == "NiceWalkingFitnessFunction" )
-      comboboxFitnessName->setCurrentIndex(2);
-  else if ( fitnessName == "ZorcWalkingFitnessFunction" )
-      comboboxFitnessName->setCurrentIndex(3);
-  else if ( fitnessName == "RemoteZORCFitnessFunction" )
-      comboboxFitnessName->setCurrentIndex(4);
-  else if ( fitnessName == "ForceFitnessFunction" )
-  		comboboxFitnessName->setCurrentIndex(5);
-  else comboboxFitnessName->setCurrentIndex(0);
+  // an unknown ID selects nothing
+  const std::optional<int> fitnessIndex = SIGEL_GP::SIG_GPFitnessFunctionRegistry::indexOf( theExperiment.gpParameter.getFitnessName() );
+  fitnessFunctionList->setCurrentIndex( fitnessIndex ? *fitnessIndex : -1 );
 
   // get the probabilities
   sliderADD->setValue( theExperiment.gpParameter.getProbability( SIGEL_Program::ADD ) );

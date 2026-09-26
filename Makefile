@@ -373,12 +373,10 @@ FORMS :=  MT_UI/MT_AddConstantsWidgetBase MT_UI/MT_AddIndividualsWidget \
             SIGEL_MasterUI/SIG_SimulationParameterBase \
             SIGEL_SlaveUI/SIG_MovieSettingsDialogBase \
             SIGEL_SlaveUI/SIG_SimulationWidgetBase
-QRCS  :=  SIGEL_MasterUI/SIG_GPParameterBase \
-            SIGEL_SlaveUI/SIG_SimulationWidgetBase
+QRCS  :=  SIGEL_SlaveUI/SIG_SimulationWidgetBase
 
 UI_HDRS  := $(patsubst %,$(B)/ui/ui_%.h,$(notdir $(FORMS)))
 QRC_OBJS := $(patsubst %,$(OBJ)/qrc/%.o,$(notdir $(QRCS)))
-QRC_MASTER := $(OBJ)/qrc/SIG_GPParameterBase.o
 QRC_SLAVE  := $(OBJ)/qrc/SIG_SimulationWidgetBase.o
 
 # The qrc objects are built here, not just generated, so that check.sh covers
@@ -598,7 +596,7 @@ SIGLIBS = $(PVM_LIB) -ltirpc \
 
 $(B)/sigel: $(SRC)/src/sigel.cpp $(MOC_OBJS) $(QRC_OBJS) $(GUI_LIBS) $(CORE_LIBS) \
             $(VENDOR_LIBS) $(PVM_LIB)
-	$(SIGCXX) $(SIGINC) $< $(MOC_OBJS) $(QRC_MASTER) $(MASTER_OBJ) -o $@ \
+	$(SIGCXX) $(SIGINC) $< $(MOC_OBJS) $(MASTER_OBJ) -o $@ \
 	  -Wl,--start-group $(GUI_LIBS) $(CORE_LIBS) $(VENDOR_LIBS) -Wl,--end-group $(SIGLIBS)
 	@want=`$(call ctor_size,$(MASTER_OBJ))`; got=`$(call ctor_size,$@)`; \
 	 test -n "$$want" && test "$$got" = "$$want" || { \
@@ -665,7 +663,7 @@ guidrive: $(B)/guidrive
 $(B)/guidrive: checks/programs/guidrive.cpp $(MOC_OBJS) $(QRC_OBJS) $(GUI_LIBS) $(CORE_LIBS) \
                $(VENDOR_LIBS) $(PVM_LIB)
 	$(SIGCXX) -DQT_CORE_LIB -DQT_GUI_LIB -DQT_WIDGETS_LIB -DQT_TESTLIB_LIB \
-	  $(SIGINC) -isystem $(QTINC)/QtTest $< $(MOC_OBJS) $(QRC_MASTER) $(QRC_SLAVE) $(MASTER_OBJ) -o $@ \
+	  $(SIGINC) -isystem $(QTINC)/QtTest $< $(MOC_OBJS) $(QRC_SLAVE) $(MASTER_OBJ) -o $@ \
 	  -Wl,--start-group $(GUI_LIBS) $(CORE_LIBS) $(VENDOR_LIBS) -Wl,--end-group \
 	  -lQt6Test $(SIGLIBS)
 	@want=`$(call ctor_size,$(MASTER_OBJ))`; got=`$(call ctor_size,$@)`; \

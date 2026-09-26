@@ -66,6 +66,7 @@ double evalFitness( SIGEL_Program::SIG_Program &program,
                     SIGEL_Simulation::SIG_SimulationParameters &simparameter );
 
 QString serializedId() const { return "SimpleFitnessFunction"; }
+QString name() const { return "Simple"; }
 
 };
 }

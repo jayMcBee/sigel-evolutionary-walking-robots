@@ -903,7 +903,32 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-26 — DONE: evalFitness TAKES THE FOUR OBJECTS.** Start here.
+**2026-09-26 — DONE: ONE LIST OF FITNESS FUNCTIONS.** Start here.
+
+- **Changed:** `SIG_GPFitnessFunctionRegistry` holds one object of each
+  fitness function. `fitnessFunctions()` lists them and `indexOf()` finds one
+  by its ID. Each function has `name()`, the text in the combo box.
+  `actGeneration` and `resetEveryGeneration` start at 0.
+- **Master:** `SIG_GPParameter` fills the combo box, now called
+  `fitnessFunctionList`, from the registry. The items and the Remote ZORC
+  icon, with its `.qrc` and image, left the `.ui`. An unknown ID selects
+  nothing, and saving keeps it; before, it showed Simple and saved
+  `SimpleFitnessFunction`. Start refuses an ID the registry does not have.
+- **Start:** `slotStartEvolution` puts the pages into the experiment before
+  its test and before it builds `SIG_GUIGPManager`. The manager reads the
+  seed, the fitness ID and the robot when it is built; before, a run used
+  the values from before the last page commit.
+- **Baselines:** `guibehaviour-baseline.txt`, the widget's new name only.
+  `fitness-check.sh` is identical to its baseline.
+- **Review:** no defects. Acted on: the registry comment named the GUI;
+  `indexOf` uses `std::find_if`; item 82's divergence row and item 81 now
+  describe the registry. Item 85's text is closed with step 5.
+- **Gates:** `check.sh` 938 pass, 0 fail; warnings 487. The forms row drops
+  by 2 with the icon; the new header and source add 2.
+- **Next:** item 85, step 4: the slave and `sigel_eval` use the registry;
+  item 84. Stop before the final code and show variants A and B.
+
+**2026-09-26 — DONE: evalFitness TAKES THE FOUR OBJECTS.**
 
 - **Changed:** the fitness functions no longer store the program, robot,
   environment and simulation parameters. `evalFitness` takes them as
@@ -4099,7 +4124,7 @@ else that stops matching 1.3 still needs justifying as a defect.
 | **A render mode "Points", with the back points hidden.** 1.3 has Wireframe, Flatshaded and Gouraudshaded | by decision 2026-09-23, item 63. `SIG_ViewSettings::points`, `SIG_SimulationVisualisation::visualize` | nothing: no check covers the render modes |
 | **A joint sensor reports the joint's position again.** 1.3 multiplies the radian reading by 57.3 before it divides by the radian range, so the register wraps the value into noise. 1.0 had the plain division | by decision 2026-09-23, the joint-sensor fix of the 1.0 → 1.3 regression: 1.0's `(q - minPos) / posRange` restored in `SIG_DynaMechsSimulationQueries::sense`. With it alone, `checks/replicate.sh` gave 7 of 7 kept experiments within 10% of their 2001 results, and `runner` matched 100 of 100 individuals. The next row changes that. See §7, "The 1.0 → 1.3 regression — DONE 2026-09-24" | `fitness-baseline.txt` |
 | **A sensor at the top of its range reads the register's top.** 1.3, and 1.0, map a reading of exactly 1 one past the register's top, and the register wraps it to the bottom: a joint on its max stop reads as its min, and a contact sensor reads the same with and without contact | by decision 2026-09-23, from the 1.0 → 1.3 regression work: `SIG_DynaMechsSimulationQueries::sense` caps the value at the register's top. The 2001 `runner` programs depend on the wrap and no longer reproduce. Done 2026-09-24: `experiments/runner.exp` is a new population evolved under the fixed sensors. See §7, "The 1.0 → 1.3 regression — DONE 2026-09-24" | `fitness-baseline.txt` |
-| **The Stepper fitness function is gone — item 82.** 1.3's fitness combo box has 7 entries, ours 6. An experiment file that names `StepperFitnessFunction` shows Simple, and saving it or starting a run writes `SimpleFitnessFunction`, with no message | by decision 2026-09-24. No shipped experiment uses it. The silent change to Simple is what `SIG_GPParameter::getOutOfExperiment` does with any unknown name | `guibehaviour-baseline.txt`: the `comboboxFitnessName` lines |
+| **The Stepper fitness function is gone — item 82.** 1.3's fitness combo box has 7 entries, ours 6. An experiment file that names `StepperFitnessFunction` shows no fitness function selected; saving keeps the name, and Start refuses to run | by decision 2026-09-24. No shipped experiment uses it. `SIG_GPParameter::getOutOfExperiment` selects nothing for any name `SIG_GPFitnessFunctionRegistry` does not have, and `SIG_GUIGPExperiment::slotStartEvolution` refuses it | `guibehaviour-baseline.txt`: the `fitnessFunctionList` lines |
 
 **Two 1.3 defects preserved on purpose**, plus the one below them. `MT_GUI`'s
 gnuplot export puts a constant x on datasets `2pt destr.` and `3pt destr.`

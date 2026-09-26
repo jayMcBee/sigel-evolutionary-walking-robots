@@ -85,6 +85,12 @@ class SIG_GPFitnessFunction{
  public:
  virtual QString serializedId() const = 0;
 
+/**
+ * The name the user sees, e.g. "Force".
+ */
+ public:
+ virtual QString name() const = 0;
+
   void setActGeneration(int _actGeneration) { actGeneration = _actGeneration;  }
   int getActGeneration() { return actGeneration; }
   void setResetEveryGeneration(int _resEvGen) {  resetEveryGeneration = _resEvGen;  }
@@ -103,13 +109,13 @@ class SIG_GPFitnessFunction{
   /**
     * this attribute specifies the current generation since this project was created.
     */
-  int actGeneration;
+  int actGeneration = 0;
   /**
     * Every resetEveryGeneration the fitness value of all individuals will be reseted. Thus there is
     * a new evalution of the fitness value. The fitness function could switch between different criteria
     * to calculate the fitness value. For a example look at the forceFitnessFunction.
     */
-  int resetEveryGeneration;
+  int resetEveryGeneration = 0;
 
 };
 }

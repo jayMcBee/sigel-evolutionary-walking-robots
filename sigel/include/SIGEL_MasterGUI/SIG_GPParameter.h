@@ -27,6 +27,8 @@
 
 #include "SIGEL_GP/SIG_GPExperiment.h"
 
+#include <optional>
+
 namespace SIGEL_MasterGUI
 {
 
@@ -106,6 +108,11 @@ public slots:
 
 
  private:
+
+ /**
+  * The selected fitness function's position in the registry; empty if none.
+  */
+ std::optional<int> selectedFitnessFunction() const;
 
  /**
   * The SIG_GPExperiment belonging to this experiment.
