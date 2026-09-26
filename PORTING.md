@@ -903,8 +903,25 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-09-26 — DONE: ITEM 100a, AND THE MOVIE SETTINGS DIALOG LAID OUT
+AGAIN.** Start here.
+
+- **Changed:** the default movie size is 1280 × 720, in the
+  `SIG_SimulationVisualisationWidget` constructor. The movie settings dialog
+  is 600 × 450. "Frame size" (was "Geometry") and "Frequency" are equal in
+  width, and the Frequency rows sit at the top. The size fields are "Output
+  width" and "Output height"; "Current view size" is one label,
+  `textlabelViewSize`, set by the `SIG_MovieSettingsDialog` constructor —
+  it is the 3-D view's size, not the screen's. "Output files" (was "File
+  conventions") has its own grid layout in place of a child widget at a
+  fixed position, in two aligned columns. The check box is "Record frames",
+  with a 12 px spacer above it. Checked on the desktop and in an offscreen
+  render of the form.
+- **Gates:** run after the commit.
+- **Next:** item 100b, the offer to resize the window. 100b to 100e are
+  listed in `future_refactorings.md`, in order.
+
 **2026-09-26 — DONE: STEP AND FAST FORWARD NO LONGER LOOK LIKE PLAY.**
-Start here.
 
 - **Changed:** three icons in `pixmaps/`, overwritten in place, no code.
   Step is a triangle followed by a bar, the mirror of Reset; Fast Forward is

@@ -41,9 +41,7 @@ SIG_MovieSettingsDialog::SIG_MovieSettingsDialog( int imgWidth, int imgHeight, Q
 	scrWidth  = imgWidth;
 	scrHeight = imgHeight;
 	ratio 	 = (double)scrWidth / (double)scrHeight;
-	QString num;
-	textlabelCurScreenWidth->setText(num.setNum(imgWidth));
-	textlabelCurScreenHeight->setText(num.setNum(imgHeight));
+	textlabelViewSize->setText( QString( "%1 \u00D7 %2" ).arg( imgWidth ).arg( imgHeight ) );
 };
 
 /*  

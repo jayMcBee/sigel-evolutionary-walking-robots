@@ -332,19 +332,18 @@ touched, because changing one changes behaviour against the reference binary.
   a copy of the on-screen view, scaled to the movie size by
   `SIG_SimulationVisualisationWidget::callRenderPixMap`. During Play one frame
   advances the simulation by one step. Only these additions; all other
-  recording behaviour stays as it is.
-  - Default movie size 1280 × 720, in place of 320 × 200 (the
-    `SIG_SimulationVisualisationWidget` constructor).
-  - When the movie settings dialog is accepted with recording on and the view
+  recording behaviour stays as it is. One commit per sub-item, in this order;
+  100a, the default size of 1280 × 720, is done.
+  - **100b.** When the movie settings dialog is accepted with recording on and the view
     is smaller than the movie size, offer to resize the window so the view
     fits. Check the screen's available area first; if the window would not
     fit, say so instead of offering.
-  - A frame rate field in the movie settings dialog, default 25 fps, in place
+  - **100c.** A frame rate field in the movie settings dialog, default 25 fps, in place
     of the frequency field. Record every n-th frame, with
     `n = round(1 / (STEPSIZE × fps))` and at least 1. The dialog shows the
     actual rate, `1 / (STEPSIZE × n)`.
-  - When recording stops, say how many frames were written and where.
-  - If ffmpeg is present, offer to make an MP4 from the frames at the actual
+  - **100d.** When recording stops, say how many frames were written and where.
+  - **100e.** If ffmpeg is present, offer to make an MP4 from the frames at the actual
     rate, so the movie plays at simulation speed.
 
 ---
