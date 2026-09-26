@@ -903,8 +903,20 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-26 — DONE: ITEM 96, SIGEL STARTS WITH DEBIAN'S QT 6.4.** Start
-here.
+**2026-09-26 — DONE: ITEM 95, AN UNKNOWN NAME IN A FILE NO LONGER CRASHES.**
+Start here.
+
+- **Changed:** nine robot stream reads throw `SIG_UnstreamingError` when a
+  name finds no object, and File > Open shows it. Details are in item 95's
+  entry in "Done". Checked on Xvfb with eight damaged files.
+- **Baselines:** unchanged. `fitness-check.sh` is identical to its baseline.
+- **Review:** no defects. Acted on: `SIG_Link` adds its no-collide links
+  last, so a throw leaves no other link pointing at it. Left open: the
+  points leak on that error path.
+- **Gates:** `check.sh` 938 pass, 0 fail; warnings 487.
+- **Next:** item 83, the ZORC switch.
+
+**2026-09-26 — DONE: ITEM 96, SIGEL STARTS WITH DEBIAN'S QT 6.4.**
 
 - **Changed:** `SIGCXX` compiles with `-fPIC`. Details are in item 96's
   entry in "Done".
@@ -5903,6 +5915,27 @@ carried; other items and this file cite them, so they do not change.
   page, a label in the secondary text colour shows the description, or says
   that the experiment names a fitness function this build does not have.
   Remote ZORC is the last entry.
+
+- [x] **95. An unknown name in an experiment file segfaulted** — done
+  2026-09-26. The robot stream readers passed a `SIG_Robot` lookup that
+  finds no object straight on, and the null pointer was dereferenced later.
+  Nine reads now throw `SIG_UnstreamingError`, which File > Open shows
+  (item 88): the two links of a joint, the root link in
+  `SIG_Robot::readFromFileTransfer`, a link's body and material, a drive's
+  joint, and the joint or link of the three sensors. The no-collide lookup in
+  `SIG_Link` and the friction lookup in `SIG_Material` still skip an unknown
+  name, because they may name a later object. A valid file cannot reach a
+  throw: every writer writes a real name, and the robot writes bodies,
+  materials, links, joints, drives and sensors in that order. `SIG_Link`'s
+  stream constructor adds its no-collide links at its end, because
+  `addNoCollide` also registers the link with the other one and a later throw
+  would leave that one pointing at freed memory. Tested before the fix with a
+  joint that names `base9` (segfault), and after it with eight damaged
+  copies, one per read, each showing the message with nothing added, and
+  with a valid copy that has a contact and a pitch-roll sensor. Left open:
+  on the error path, `SIG_Link` does not free the points it has read; the
+  headless `sigel -e` has no catch, so such a file ends it with an
+  exception.
 
 - [x] **96. SIGEL crashes at startup with Qt 6.4.2** — done 2026-09-26.
   On Debian 12 (x86_64, gcc 12, Qt 6.4.2) `sigel` and `sigel_slave -v`

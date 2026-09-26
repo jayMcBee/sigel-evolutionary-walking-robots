@@ -21,6 +21,7 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 #include "SIGEL_Robot/SIG_ContactSensor.h"
+#include "SIGEL_Robot/SIG_RobotExceptions.h"
 
 namespace SIGEL_Robot {
         SIG_ContactSensor::SIG_ContactSensor (SIG_Robot *par, QString n, int nr )
@@ -37,6 +38,8 @@ namespace SIGEL_Robot {
 			tx >> myLink;
 
 			theLink = par->lookupLink(myLink);
+			if (!theLink)
+				throw SIG_UnstreamingError (__FILE__, __LINE__, "sensor '" + getName () + "' names unknown link '" + myLink + "'");
 		}
 
         SIG_ContactSensor::~SIG_ContactSensor (void)

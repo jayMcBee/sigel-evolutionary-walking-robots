@@ -73,12 +73,15 @@ namespace SIGEL_Robot {
                 }
 
                 // To understand this, please read my paper. Holger.
+                // addNoCollide also registers this link with the other one,
+                // so it waits until nothing below can throw.
+                QList<SIG_Link *> noCollideRead;
                 tx >> anum;
                 for (int j = 0; j < anum; j++) {
                         tx >> tmpstr;
                         SIG_Link *l = parent->lookupLink (tmpstr);
                         if (l)
-                                addNoCollide (l);
+                                noCollideRead.append (l);
                 }
                 
                 initialLocation = SIG_Robot::streamToVector (tx);
@@ -90,14 +93,20 @@ namespace SIGEL_Robot {
 
                 tx >> tmpstr;
                 body = parent->lookupBody (tmpstr);
+                if (!body)
+                        throw SIG_UnstreamingError (__FILE__, __LINE__, "link '" + name + "' names unknown body '" + tmpstr + "'");
                 tx >> tmpstr;
                 material = parent->lookupMaterial (tmpstr);
+                if (!material)
+                        throw SIG_UnstreamingError (__FILE__, __LINE__, "link '" + name + "' names unknown material '" + tmpstr + "'");
 
                 tx >> tmpstr;
                 if (tmpstr == "y") {
                         geometry = new SIG_Geometry (tx);
                         mirtich=new SIG_Mirtich (geometry, name + "(" + body->getName () + ")");
                 }
+                for (SIG_Link *l : noCollideRead)
+                        addNoCollide (l);
         }
 
         SIG_Link::~SIG_Link()

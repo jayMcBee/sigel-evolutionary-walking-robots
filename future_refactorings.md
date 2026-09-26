@@ -300,17 +300,6 @@ touched, because changing one changes behaviour against the reference binary.
 
 ## 7 · The interface
 
-- [ ] **95. An unknown link name in an experiment file segfaults.** Found
-  2026-09-26 with item 88's tests. The `SIG_Joint` stream reader passes
-  `parent->lookupLink (n1)` straight to `setLeftLink`, and a name that no
-  link has gives a null pointer that `setLeftLink` dereferences. Measured: a
-  copy of `twoBases.exp` whose joint names `base9` ends File > Open with a
-  segfault. The same unchecked lookup exists for the root link in
-  `SIG_Robot::readFromFileTransfer`, a link's body and material in the
-  `SIG_Link` reader, and the joint or link names in the drive and sensor
-  readers. A tested fix for the joint and root link threw
-  `SIG_UnstreamingError`, which File > Open then shows (item 88).
-
 - [ ] **97. A headless run cannot be stopped early with a save.** Reported
   2026-09-26 by the x86 machine. `sigel -e` installs no signal handler in
   the master, and the experiment is written only when

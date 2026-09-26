@@ -21,6 +21,7 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 #include "SIGEL_Robot/SIG_Joint.h"
+#include "SIGEL_Robot/SIG_RobotExceptions.h"
 
 #include "SIGEL_Robot/SIG_TranslationalJoint.h"
 #include "SIGEL_Robot/SIG_RotationalJoint.h"
@@ -57,8 +58,12 @@ namespace SIGEL_Robot {
                    >> name
                    >> number;
                 tx >> n1 >> n2; // read da names o' da links.
-                setLeftLink (parent->lookupLink (n1));
-                setRightLink (parent->lookupLink (n2));
+                SIG_Link *l1 = parent->lookupLink (n1);
+                SIG_Link *l2 = parent->lookupLink (n2);
+                if (!l1 || !l2)
+                        throw SIG_UnstreamingError (__FILE__, __LINE__, "joint '" + name + "' names unknown link '" + (l1 ? n2 : n1) + "'");
+                setLeftLink (l1);
+                setRightLink (l2);
                 tx >> mdh_a >> mdh_alpha >> mdh_d >> mdh_theta
 		   >> mdh_screw_d >> mdh_screw_theta
 		   >> mechsMinPos >> mechsMaxPos

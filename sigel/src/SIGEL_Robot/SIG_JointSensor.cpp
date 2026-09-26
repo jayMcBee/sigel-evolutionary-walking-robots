@@ -21,6 +21,7 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 #include "SIGEL_Robot/SIG_JointSensor.h"
+#include "SIGEL_Robot/SIG_RobotExceptions.h"
 
 namespace SIGEL_Robot {
         SIG_JointSensor::SIG_JointSensor (SIG_Robot *par, QString n, int nr)
@@ -34,6 +35,8 @@ namespace SIGEL_Robot {
                 QString b;
                 tx >> b;
                 theJoint = par->lookupJoint (b);
+                if (!theJoint)
+                        throw SIG_UnstreamingError (__FILE__, __LINE__, "sensor '" + getName () + "' names unknown joint '" + b + "'");
         }
         
         SIG_JointSensor::~SIG_JointSensor (void)

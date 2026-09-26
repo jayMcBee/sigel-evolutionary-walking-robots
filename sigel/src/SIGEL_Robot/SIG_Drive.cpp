@@ -21,6 +21,7 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 #include "SIGEL_Robot/SIG_Drive.h"
+#include "SIGEL_Robot/SIG_RobotExceptions.h"
 #include "SIGEL_Tools/SIG_IO.h"
 
 
@@ -50,6 +51,8 @@ namespace SIGEL_Robot {
 
 			tx >> name >> number >> minforce >> maxforce >> buf;
 			theJoint = parent->lookupJoint (buf);
+			if (!theJoint)
+				throw SIG_UnstreamingError (__FILE__, __LINE__, "drive '" + name + "' names unknown joint '" + buf + "'");
         }
 
         SIG_Drive::~SIG_Drive (void)

@@ -378,8 +378,11 @@ namespace SIGEL_Robot {
                 tx >> tmpstr;
                 if (tmpstr == "-")
                         rootlink = 0;
-                else
+                else {
                         rootlink = lookupLink (tmpstr);
+                        if (!rootlink)
+                                throw SIG_UnstreamingError (__FILE__, __LINE__, "unknown root link '" + tmpstr + "'");
+                }
 
                 tx >> tmpstr;
                 if (tmpstr == "LanguageParameters") {
