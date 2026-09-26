@@ -71,13 +71,6 @@ SIGEL_Environment::SIG_Environment & environment;
  protected:
 SIGEL_Simulation::SIG_SimulationParameters & simparameter;
 
-  /**
-   * The name of the fitnessfunction.
-   *
-   */
- public:
-QString const name;
-
 
 /**
  * The function, which creates the object of a fitnessfunction with the needed data,
@@ -101,8 +94,7 @@ QString const name;
  SIG_GPFitnessFunction(SIGEL_Program::SIG_Program & program,
 		       SIGEL_Robot::SIG_Robot & rob,
 		       SIGEL_Environment::SIG_Environment &   environment,
-		       SIGEL_Simulation::SIG_SimulationParameters & simparameter,
-		       QString name);
+		       SIGEL_Simulation::SIG_SimulationParameters & simparameter);
 
 /**
  * The destructor of the fitnessfunction.
@@ -128,6 +120,12 @@ QString const name;
  */
  public:
  virtual double evalFitness()=0;
+
+/**
+ * The key of this fitness function in experiment files and in the PVM data.
+ */
+ public:
+ virtual QString serializedId() const = 0;
 
   void setActGeneration(int _actGeneration) { actGeneration = _actGeneration;  }
   int getActGeneration() { return actGeneration; }

@@ -35,12 +35,16 @@ namespace SIGEL_GP
     : SIG_GPFitnessFunction( program,
 			     robot,
 			     environment,
-			     simulationParameters,
-			     "NiceWalkingFitnessFunction" )
+			     simulationParameters )
   { };
 
   SIG_GPNiceWalkingFitnessFunction::~SIG_GPNiceWalkingFitnessFunction()
   { };
+
+  QString SIG_GPNiceWalkingFitnessFunction::serializedId() const
+  {
+    return "NiceWalkingFitnessFunction";
+  }
 
   double SIG_GPNiceWalkingFitnessFunction::evalFitness()
   {

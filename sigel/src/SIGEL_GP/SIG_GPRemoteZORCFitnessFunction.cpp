@@ -37,8 +37,7 @@ namespace SIGEL_GP
     : SIG_GPFitnessFunction( program,
 			     robot,
 			     environment,
-			     simulationParameters,
-			     "RemoteZORCFitnessFunction" )
+			     simulationParameters )
    {  // nothing
    }
 
@@ -47,6 +46,11 @@ namespace SIGEL_GP
    {  // nothing
    }
 
+
+   QString SIG_GPRemoteZORCFitnessFunction::serializedId() const
+   {
+     return "RemoteZORCFitnessFunction";
+   }
 
    double SIG_GPRemoteZORCFitnessFunction::evalFitness()
    {  double   fitness  = 0,

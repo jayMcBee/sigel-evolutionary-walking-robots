@@ -28,13 +28,11 @@ SIGEL_GP::SIG_GPFitnessFunction::SIG_GPFitnessFunction(
 SIGEL_Program::SIG_Program & pprogram, 
 SIGEL_Robot::SIG_Robot & prob,
 SIGEL_Environment::SIG_Environment & penvironment, 
-SIGEL_Simulation::SIG_SimulationParameters & psimparameter,
-QString pname) : 
+SIGEL_Simulation::SIG_SimulationParameters & psimparameter) : 
   program(pprogram),
   rob(prob),
   environment(penvironment),
-  simparameter(psimparameter),
-  name(pname)
+  simparameter(psimparameter)
   
 {};
 

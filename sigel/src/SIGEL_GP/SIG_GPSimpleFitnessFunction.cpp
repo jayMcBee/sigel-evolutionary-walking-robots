@@ -36,12 +36,16 @@ SIGEL_GP::SIG_GPSimpleFitnessFunction::SIG_GPSimpleFitnessFunction(SIGEL_Program
   : SIG_GPFitnessFunction(program,
       rob,
       environment,
-      simparameter,
-      "SimpleFitnessFunction")
+      simparameter)
 { };
 
 SIGEL_GP::SIG_GPSimpleFitnessFunction::~SIG_GPSimpleFitnessFunction()
 { };
+
+QString SIGEL_GP::SIG_GPSimpleFitnessFunction::serializedId() const
+{
+  return "SimpleFitnessFunction";
+}
 
 double SIGEL_GP::SIG_GPSimpleFitnessFunction::evalFitness() {
   SIGEL_GP::SIG_GPSimpleRecorder recorder;

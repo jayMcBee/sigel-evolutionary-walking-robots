@@ -73,6 +73,8 @@ namespace SIGEL_GP
       */
       double   evalFitness();
 
+      QString  serializedId() const;
+
     /**
       * This method sends all data contained in the QString object over the
       * serial interface specified by the 'serIF' file descriptor.

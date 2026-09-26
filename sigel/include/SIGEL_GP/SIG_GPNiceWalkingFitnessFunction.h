@@ -42,6 +42,8 @@ namespace SIGEL_GP
 
       double evalFitness();
 
+      QString serializedId() const;
+
     };
 
 }

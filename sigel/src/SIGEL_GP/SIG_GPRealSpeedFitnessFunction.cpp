@@ -35,12 +35,16 @@ namespace SIGEL_GP
     : SIG_GPFitnessFunction( program,
 			     robot,
 			     environment,
-			     simulationParameters,
-			     "RealSpeedFitnessFunction" )
+			     simulationParameters )
   { };
 
   SIG_GPRealSpeedFitnessFunction::~SIG_GPRealSpeedFitnessFunction()
   { };
+
+  QString SIG_GPRealSpeedFitnessFunction::serializedId() const
+  {
+    return "RealSpeedFitnessFunction";
+  }
 
   double SIG_GPRealSpeedFitnessFunction::evalFitness() {
     double const recordingRate = 0.5;
