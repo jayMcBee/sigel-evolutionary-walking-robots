@@ -912,7 +912,11 @@ here.
   `resetRecorder` on Reset, each only if recording was on. N counts the
   frames since the last Reset. Nothing is shown if no frame was written.
   Item 100 is done; see "Done". Checked on the desktop.
-- **Gates:** run after the commit.
+- **Gates:** run after the commit: `check.sh` 938 pass, 0 fail; warnings
+  487. The other four gates are green.
+- **Review:** no crash or timing defect. The count is rough, as accepted: it
+  runs on from Reset to Reset, a failed write still counts, and after a
+  failed write no message comes.
 - **Next:** item 105, the MP4 offer, hooks into `reportRecordedFrames`.
 
 **2026-09-27 — DONE: MOVIE FRAMES ARE SET BY A FRAME RATE.**
