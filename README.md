@@ -12,6 +12,9 @@ https://sigel.sourceforge.net/seiten/einleitung_en.html
 Running the original SIGEL 1.3 binaries on current Linux: see the last
 section of [verification-against-sigel-1.3/README.txt](verification-against-sigel-1.3/README.txt).
 
+Running the original SIGEL 1.3 binaries on current Linux: see the last
+section of [verification-against-sigel-1.3/README.txt](verification-against-sigel-1.3/README.txt).
+
 Third-party libraries: see [LIBRARIES.md](LIBRARIES.md).
 
 License: GNU GPL, as the original.
