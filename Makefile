@@ -318,7 +318,11 @@ SIGINC := -Ishim -I$(SRC)/include -I$(B)/ui -isystem $(QTINC) \
                                         QtOpenGL QtOpenGLWidgets) \
           $(addprefix -isystem $(SL)/,newmat09 dynamechs/dm Dynamo/Src/Inc \
                                       fparser cv97 pvm3/include)
-SIGCXX := g++ -std=c++17 -O1 -g -Wall -Wextra \
+# -fPIC, not the compiler's default -fPIE: a Qt built with reduce_relocations,
+# as Debian 12's Qt 6.4 is, requires it. With -fPIE the executable gets copy
+# relocations for Qt data such as QCoreApplication::self, and QApplication's
+# constructor crashes in QGuiApplication::screenAdded.
+SIGCXX := g++ -std=c++17 -O1 -g -fPIC -Wall -Wextra \
               -DMINMAX_H $(SIGSAN)
 
 CORE := SIGEL_Tools SIGEL_Environment MT_GPSystem SIGEL_Robot SIGEL_Program \

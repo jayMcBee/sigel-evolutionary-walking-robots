@@ -903,8 +903,19 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-26 — DONE: ITEM 85, THE FITNESS FUNCTION DESCRIBES ITSELF.** Start
+**2026-09-26 — DONE: ITEM 96, SIGEL STARTS WITH DEBIAN'S QT 6.4.** Start
 here.
+
+- **Changed:** `SIGCXX` compiles with `-fPIC`. Details are in item 96's
+  entry in "Done".
+- **Baselines:** unchanged. `fitness-check.sh` is identical to its baseline.
+- **Review:** no defects. Every compile and link of SIGEL code uses
+  `SIGCXX`; the vendor libraries use no Qt data.
+- **Gates:** `check.sh` 938 pass, 0 fail; warnings 487.
+- **Next:** the x86 machine pulls and rebuilds. Open: item 83, the ZORC
+  switch; item 95, an unknown link name segfaults.
+
+**2026-09-26 — DONE: ITEM 85, THE FITNESS FUNCTION DESCRIBES ITSELF.**
 
 - **Changed:** `SIG_GPFitnessFunction` has `description()`, one sentence
   per function. `SIG_GPParameter` shows it in `fitnessFunctionDescription`,
@@ -922,8 +933,7 @@ here.
   robot with one movable joint; the unknown-ID message in the secondary
   colour; a text of three lines still makes the page grow.
 - **Gates:** `check.sh` 938 pass, 0 fail; warnings 487.
-- **Next:** item 83, the ZORC compile switch. To decide: where the switch
-  lives.
+- **Next:** item 83, the ZORC compile switch.
 
 **2026-09-26 — DONE: THE SLAVE USES THE REGISTRY; ITEM 84.**
 
@@ -5893,6 +5903,16 @@ carried; other items and this file cite them, so they do not change.
   page, a label in the secondary text colour shows the description, or says
   that the experiment names a fitness function this build does not have.
   Remote ZORC is the last entry.
+
+- [x] **96. SIGEL crashes at startup with Qt 6.4.2** — done 2026-09-26.
+  On Debian 12 (x86_64, gcc 12, Qt 6.4.2) `sigel` and `sigel_slave -v`
+  crashed in `QApplication`'s constructor, in
+  `QGuiApplication::screenAdded`. Debian's Qt is built with
+  `reduce_relocations`, which requires applications compiled with `-fPIC`;
+  the `Makefile` compiled with gcc's default `-fPIE`, so the executables got
+  copy relocations for Qt data such as `QCoreApplication::self`. `SIGCXX`
+  now has `-fPIC`. Found and tested on the x86 machine; this aarch64 machine
+  has no copy relocations either way.
 
 - [x] **86. The generation log line restarts at 1 with every run** — done
   2026-09-24, by decision. `SIG_GPManager::run` and `run(MT_Classifier*)`

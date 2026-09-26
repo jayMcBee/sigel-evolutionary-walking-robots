@@ -311,16 +311,6 @@ touched, because changing one changes behaviour against the reference binary.
   readers. A tested fix for the joint and root link threw
   `SIG_UnstreamingError`, which File > Open then shows (item 88).
 
-- [ ] **96. SIGEL crashes at startup with Qt 6.4.2.** Reported 2026-09-26 by
-  the x86 machine: Debian 12, Qt 6.4.2, stock SIGEL built from GitHub. Both
-  the GUI (`sigel`, in `QApplication`'s constructor in `sigel.cpp`'s `main`)
-  and the standalone visualiser (`sigel_slave -v`, the same place in
-  `sigel_slave.cpp`) segfault in `QGuiApplication::screenAdded`, under xcb
-  and offscreen alike. A 5-line Qt program runs on the same machine under
-  both, so the cause is in our binaries. `sigel` exports no symbol that
-  could replace one of Qt's. Headless runs (`sigel -e`) work there. Not
-  reproduced here: this machine has Qt 6.10.
-
 - [ ] **97. A headless run cannot be stopped early with a save.** Reported
   2026-09-26 by the x86 machine. `sigel -e` installs no signal handler in
   the master, and the experiment is written only when
