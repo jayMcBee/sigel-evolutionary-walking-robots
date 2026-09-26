@@ -75,6 +75,13 @@ namespace SIGEL_SlaveGUI
     alterMovieSettingsAction->setIcon( recordingDisallowedIcons );
     quitAction->setIcon( quitIcons );
 
+    stopAction->setToolTip( "Reset" );
+    playAction->setToolTip( "Play / Pause" );
+    stepAction->setToolTip( "Step" );
+    fForwardAction->setToolTip( "Fast Forward (5 s)" );
+    alterMovieSettingsAction->setToolTip( "Movie Settings" );
+    quitAction->setToolTip( "Close Viewer" );
+
     stopAction->setStatusTip( "Resets the simulation to the start." );
     playAction->setStatusTip( "Starts/pauses the simulation." );
     stepAction->setStatusTip( "Lets the simulation progress by one time step." );

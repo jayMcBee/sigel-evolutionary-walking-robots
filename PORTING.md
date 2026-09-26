@@ -903,8 +903,16 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-09-26 — DONE: THE VIEWER'S BUTTONS HAVE TOOLTIPS.** Start here.
+
+- **Changed:** `SIG_SimulationControls` gives its six actions tooltips:
+  "Reset", "Play / Pause", "Step", "Fast Forward (5 s)", "Movie Settings",
+  "Close Viewer". The status tips are unchanged. Checked on the desktop.
+- **Gates:** not run, by decision; the next change follows at once.
+- **Next:** an improved icon.
+
 **2026-09-26 — DONE: ITEM 99, THE VIEWER'S STOP BUTTON IS SHOWN AS A
-RESET.** Start here.
+RESET.**
 
 - **Changed:** `SIG_SimulationControls` loads the new
   `pixmaps/resetButton.xpm`, a blue bar and left-pointing triangle, and the
