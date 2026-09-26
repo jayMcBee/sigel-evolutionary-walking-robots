@@ -903,7 +903,22 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-26 — DONE: A FAILED GRAB STOPS THE RECORDING.** Start here.
+**2026-09-27 — DONE: TWO BUTTONS MATCH THE VIEW AND THE MOVIE SIZE.**
+Start here.
+
+- **Changed:** under the frame-fit label, "View Size to Movie" sets the
+  output size to the view size, and "Resize View to Match" grows or shrinks
+  the window so the view matches the output size, within the screen's
+  available area and the window's minimum size, and keeps the window on the
+  screen. It is disabled while the window is maximised or full screen; it
+  never changes the window mode. `SIG_MovieSettingsDialog` takes the view
+  widget in place of its size and reads the size itself, in framebuffer
+  pixels (`viewSize`); `slotUpdateSizeLabels` updates both labels, also on
+  the view's resize events. Checked on the desktop.
+- **Gates:** one pass after the next two commits.
+- **Next:** default movie size 1024 × 576; an orange Reset icon.
+
+**2026-09-26 — DONE: A FAILED GRAB STOPS THE RECORDING.**
 
 - **Changed:** `SIG_SimulationVisualisationWidget::callRenderPixMap`
   returns false when `grabFramebuffer()` gives a null image, so recording

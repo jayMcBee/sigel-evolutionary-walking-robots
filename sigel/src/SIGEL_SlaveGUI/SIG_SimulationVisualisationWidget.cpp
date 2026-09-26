@@ -672,9 +672,7 @@ void SIG_SimulationVisualisationWidget::resetRecorder()
 
   void SIG_SimulationVisualisationWidget::slotAlterMovieSettingsClicked()
   {
-    SIGEL_SlaveGUI::SIG_MovieSettingsDialog movieSettingsDialog( qRound( width() * devicePixelRatioF() ),
-								      qRound( height() * devicePixelRatioF() ),
-								      this, "movieSettingsDialog", true );
+    SIGEL_SlaveGUI::SIG_MovieSettingsDialog movieSettingsDialog( this, this, "movieSettingsDialog", true );
     movieSettingsDialog.spinboxWidth->setValue( movieWidth );
     movieSettingsDialog.spinboxHeight->setValue( movieHeight );
     movieSettingsDialog.spinboxFrequency->setValue( movieFrequency );

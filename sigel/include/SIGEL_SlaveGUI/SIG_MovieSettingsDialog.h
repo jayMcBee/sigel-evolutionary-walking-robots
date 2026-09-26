@@ -32,18 +32,27 @@ class SIG_MovieSettingsDialog : public SIG_MovieSettingsDialogBase
     Q_OBJECT
 
 public:
-    SIG_MovieSettingsDialog( int imgWidth, int imgHeight, QWidget* parent = 0, const char* name = 0, bool modal = false, Qt::WindowFlags fl = Qt::WindowFlags() );
+    SIG_MovieSettingsDialog( QWidget *view, QWidget* parent = 0, const char* name = 0, bool modal = false, Qt::WindowFlags fl = Qt::WindowFlags() );
     ~SIG_MovieSettingsDialog();
 
 public slots:
     void slotToolButtonClicked();
 
+protected:
+    bool eventFilter( QObject *watched, QEvent *event ) override;
+
 private slots:
-    void slotUpdateFrameFit();
+    void slotUpdateSizeLabels();
+    void slotViewSizeToMovie();
+    void slotResizeViewToMatch();
 
 private:
-    int viewWidth;
-    int viewHeight;
+    /**
+     * The view's size in framebuffer pixels, the pixels a frame is copied from.
+     */
+    QSize viewSize() const;
+
+    QWidget *view;
 
 };
 

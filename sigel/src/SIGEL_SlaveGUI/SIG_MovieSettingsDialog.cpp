@@ -24,6 +24,9 @@
 #include <QFileDialog>
 #include <QLabel>
 #include <QSpinBox>
+#include <QPushButton>
+#include <QScreen>
+#include <QEvent>
 
 namespace SIGEL_SlaveGUI
 {
@@ -35,17 +38,28 @@ namespace SIGEL_SlaveGUI
  *  The dialog will by default be modeless, unless you set 'modal' to
  *  TRUE to construct a modal dialog.
  */
-SIG_MovieSettingsDialog::SIG_MovieSettingsDialog( int imgWidth, int imgHeight, QWidget* parent,  const char* name, bool modal, Qt::WindowFlags fl )
+SIG_MovieSettingsDialog::SIG_MovieSettingsDialog( QWidget *view, QWidget* parent,  const char* name, bool modal, Qt::WindowFlags fl )
     : SIG_MovieSettingsDialogBase( parent, name, modal, fl ),
-      viewWidth( imgWidth ),
-      viewHeight( imgHeight )
+      view( view )
 {
-	textlabelViewSize->setText( QString( "%1 \u00D7 %2" ).arg( imgWidth ).arg( imgHeight ) );
 	textlabelFrameFit->setForegroundRole( QPalette::PlaceholderText );
 
-	connect( spinboxWidth, SIGNAL( valueChanged(int) ), this, SLOT( slotUpdateFrameFit() ) );
-	connect( spinboxHeight, SIGNAL( valueChanged(int) ), this, SLOT( slotUpdateFrameFit() ) );
-	slotUpdateFrameFit();
+	// A maximised window keeps its size, so the resize would do nothing.
+	if ( view->window()->isMaximized() || view->window()->isFullScreen() )
+	  {
+	    pushbuttonResizeViewToMatch->setEnabled( false );
+	    pushbuttonResizeViewToMatch->setToolTip( "The window is maximised; restore it to resize it." );
+	  }
+
+	connect( spinboxWidth, SIGNAL( valueChanged(int) ), this, SLOT( slotUpdateSizeLabels() ) );
+	connect( spinboxHeight, SIGNAL( valueChanged(int) ), this, SLOT( slotUpdateSizeLabels() ) );
+	connect( pushbuttonViewSizeToMovie, SIGNAL( clicked() ), this, SLOT( slotViewSizeToMovie() ) );
+	connect( pushbuttonResizeViewToMatch, SIGNAL( clicked() ), this, SLOT( slotResizeViewToMatch() ) );
+
+	// The window manager resizes the window later, so the labels follow
+	// the view's own resize events.
+	view->installEventFilter( this );
+	slotUpdateSizeLabels();
 };
 
 /*  
@@ -70,16 +84,32 @@ void SIG_MovieSettingsDialog::slotToolButtonClicked()
     lineeditDirectory->setText( newDirectory );
 };
 
-/*
- * Says whether a frame of the output size is cut from the view, padded
- * around it, or both.
- */
-void SIG_MovieSettingsDialog::slotUpdateFrameFit()
+bool SIG_MovieSettingsDialog::eventFilter( QObject *watched, QEvent *event )
 {
-  bool clipped = viewWidth > spinboxWidth->value()
-    || viewHeight > spinboxHeight->value();
-  bool letterboxed = viewWidth < spinboxWidth->value()
-    || viewHeight < spinboxHeight->value();
+  if ( watched == view && event->type() == QEvent::Resize )
+    slotUpdateSizeLabels();
+  return SIG_MovieSettingsDialogBase::eventFilter( watched, event );
+};
+
+QSize SIG_MovieSettingsDialog::viewSize() const
+{
+  return QSize( qRound( view->width() * view->devicePixelRatioF() ),
+		qRound( view->height() * view->devicePixelRatioF() ) );
+};
+
+/*
+ * Shows the view size, and whether a frame of the output size is cut from
+ * the view, padded around it, or both.
+ */
+void SIG_MovieSettingsDialog::slotUpdateSizeLabels()
+{
+  QSize current = viewSize();
+  textlabelViewSize->setText( QString( "%1 \u00D7 %2" ).arg( current.width() ).arg( current.height() ) );
+
+  bool clipped = current.width() > spinboxWidth->value()
+    || current.height() > spinboxHeight->value();
+  bool letterboxed = current.width() < spinboxWidth->value()
+    || current.height() < spinboxHeight->value();
 
   if ( clipped && letterboxed )
     textlabelFrameFit->setText( "Rendered frames will be clipped and letterboxed." );
@@ -89,6 +119,41 @@ void SIG_MovieSettingsDialog::slotUpdateFrameFit()
     textlabelFrameFit->setText( "Rendered frames will be letterboxed." );
   else
     textlabelFrameFit->clear();
+};
+
+void SIG_MovieSettingsDialog::slotViewSizeToMovie()
+{
+  QSize current = viewSize();
+  spinboxWidth->setValue( current.width() );
+  spinboxHeight->setValue( current.height() );
+};
+
+/*
+ * Grows or shrinks the window by the difference between the output size and
+ * the view size, within the screen's available area and the window's minimum
+ * size, and keeps the window on the screen.
+ */
+void SIG_MovieSettingsDialog::slotResizeViewToMatch()
+{
+  QWidget *window = view->window();
+  qreal ratio = view->devicePixelRatioF();
+  QSize change( qRound( spinboxWidth->value() / ratio ) - view->width(),
+		qRound( spinboxHeight->value() / ratio ) - view->height() );
+
+  QRect available = window->screen()->availableGeometry();
+  QSize frameExtra = window->frameGeometry().size() - window->size();
+  QSize target = ( window->size() + change )
+    .boundedTo( available.size() - frameExtra )
+    .expandedTo( window->minimumSize() );
+
+  QSize frameSize = target + frameExtra;
+  QPoint position( qBound( available.left(), window->frameGeometry().left(),
+			   available.right() + 1 - frameSize.width() ),
+		   qBound( available.top(), window->frameGeometry().top(),
+			   available.bottom() + 1 - frameSize.height() ) );
+
+  window->resize( target );
+  window->move( position );
 };
 
 }

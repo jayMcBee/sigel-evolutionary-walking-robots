@@ -486,6 +486,36 @@
               </widget>
             </item>
             <item row="4" column="0" rowspan="1" colspan="2">
+              <layout class="QHBoxLayout">
+                <item>
+                  <widget class="QPushButton" name="pushbuttonViewSizeToMovie">
+                    <property name="text">
+                      <string>View Size to Movie</string>
+                    </property>
+                    <property name="toolTip">
+                      <string>Sets the output size to match the current view size.</string>
+                    </property>
+                    <property name="autoDefault">
+                      <bool>false</bool>
+                    </property>
+                  </widget>
+                </item>
+                <item>
+                  <widget class="QPushButton" name="pushbuttonResizeViewToMatch">
+                    <property name="text">
+                      <string>Resize View to Match</string>
+                    </property>
+                    <property name="toolTip">
+                      <string>Resizes the window so the view matches the output size, as far as the screen allows.</string>
+                    </property>
+                    <property name="autoDefault">
+                      <bool>false</bool>
+                    </property>
+                  </widget>
+                </item>
+              </layout>
+            </item>
+            <item row="5" column="0" rowspan="1" colspan="2">
               <spacer name="spacerFrameSizeBottom">
                 <property name="orientation">
                   <enum>Qt::Vertical</enum>

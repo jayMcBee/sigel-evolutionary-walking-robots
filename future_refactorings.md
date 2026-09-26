@@ -335,9 +335,8 @@ touched, because changing one changes behaviour against the reference binary.
   recording behaviour stays as it is. One commit per sub-item, in this order.
   Done: 100a, the default size of 1280 × 720; 100b, frames that are exactly
   the output size, never scaled, cut or letterboxed in black, with the crop
-  and keep-ratio check boxes gone and a minimum of 512 × 512.
-  - Two buttons in a row under the frame-fit label of the movie settings
-    dialog: "View Size to Movie" and "Resize View to Match". To be discussed.
+  and keep-ratio check boxes gone and a minimum of 512 × 512; "View Size to
+  Movie" and "Resize View to Match" in the movie settings dialog.
   - A frame rate field in the movie settings dialog, default 25 fps, in place
     of the frequency field. Record every n-th frame, with
     `n = round(1 / (STEPSIZE × fps))` and at least 1. The dialog shows the
