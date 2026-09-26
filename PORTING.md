@@ -903,7 +903,20 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-26 — DONE: ITEM 28, THE UI LABELS.** Start here.
+**2026-09-26 — DONE: ITEM 88, A LOAD ERROR NO LONGER ENDS SIGEL.** Start here.
+
+- **Changed, by decision:** File > Open catches a load exception and shows
+  it. Details are in item 88's entry in "Done". Checked on the desktop.
+- **Baselines:** unchanged. Two runs gave identical output.
+- **Review:** no defects.
+- **Gates:** `check.sh` 938 pass, 0 fail; warnings 487. The other four gates
+  are green.
+- **Next:** to discuss what the tests for item 88 found beyond it. The x86
+  machine: headless evolution works; the GUI crashes at startup in
+  `QApplication`'s construction with Qt 6.4.2, in our binary; not yet
+  investigated.
+
+**2026-09-26 — DONE: ITEM 28, THE UI LABELS.**
 
 - **Changed, by decision:** 72 proposals over 44 files, decided group by
   group. Details are in item 28's entry in "Done". Checked on the desktop.
@@ -919,7 +932,7 @@ classes and leave truncation a hard error. **They are not interchangeable.**
   are green.
 - **Also since the last entry:** the x86 machine builds SIGEL from GitHub
   and runs it; it does not run our checks. `README.md` links the 1.3 guide.
-- **Next:** item 88, four variants tested, decision pending.
+- **Next:** item 88.
 
 **2026-09-26 — DONE: ITEM 70, CLONE EXPERIMENT (EMPTY POOL).**
 
@@ -5167,6 +5180,18 @@ carried; other items and this file cite them, so they do not change.
     visualizeThis` calls `resizeGL` with logical pixels where Qt uses device
     pixels. Qt 6.10's `QOpenGLWidget` sets the viewport in device pixels
     itself before each `paintGL`, and the aspect ratio is the same in both.
+
+- [x] **88. A load error ended the interface** — done 2026-09-26, by
+  decision, for the case the item describes: a `SIG_Exception` from
+  `SIG_GPExperiment::loadExperiment` during File > Open.
+  `SIG_ExperimentListView::openExperimentFile` catches it, deletes the
+  half-built experiment and its list entry, and shows "File could not be
+  loaded" with the exception's message. `SIG_Robot::readFromFileTransfer`
+  sets `language` to 0 before it builds the new language parameters, so a
+  bad register width no longer leaves a pointer that the cleanup frees a
+  second time. Tested with a broken `StreamedRobot` keyword and with a
+  register width of 17: both show the message, and SIGEL stays open with
+  nothing added. Four variants were tried first; this one was chosen.
 
 - [x] **28. Check every UI label for grammar and typos** — done 2026-09-26,
   by decision, in 44 files. One pass over every label, button, menu entry,

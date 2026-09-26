@@ -28,6 +28,7 @@
 #include "SIGEL_MasterGUI/SIG_RenameDialog.h"
 #include "SIGEL_MasterGUI/SIG_ExperimentListView.h"
 #include "SIGEL_MasterGUI/SIG_ExperimentItem.h"
+#include "SIGEL_Tools/SIG_Exception.h"
 
 #include "SIGEL_GP/SIG_GUIGPManager.h"
 
@@ -199,7 +200,18 @@ SIG_ExperimentItem *SIG_ExperimentListView::openExperimentFile( const QString &a
       // this is for the autosave function
       // so the gpExperiment knows where to save the experiment
       theNewExperiment->gpExperiment.setPath(absFileName);
-      theNewExperiment->gpExperiment.loadExperiment( theStream );
+      try
+	{
+	  theNewExperiment->gpExperiment.loadExperiment( theStream );
+	}
+      catch ( const SIGEL_Tools::SIG_Exception &e )
+	{
+	  delete theNewExperiment;
+	  delete takeTopLevelItem( indexOfTopLevelItem( theNewItem ) );
+	  QMessageBox::warning( this, "File could not be loaded",
+				"The file " + fileName + " could not be loaded:\n\n" + e.getMessage() );
+	  return nullptr;
+	}
       theNewExperiment->getAllOutOfExperiment();
     }
   else

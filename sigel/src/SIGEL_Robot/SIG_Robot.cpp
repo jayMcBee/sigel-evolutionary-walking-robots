@@ -382,6 +382,7 @@ namespace SIGEL_Robot {
                 tx >> tmpstr;
                 if (tmpstr == "LanguageParameters") {
                         delete language;
+                        language = 0;   // the constructor below can throw
                         language = new SIG_LanguageParameters (tx);
                 } else
                         language = 0;

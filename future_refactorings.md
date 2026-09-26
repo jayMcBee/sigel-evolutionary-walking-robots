@@ -628,14 +628,6 @@ touched, because changing one changes behaviour against the reference binary.
   interface until item 88 is done; (3) when a run starts, with a message box,
   which catches typed and loaded values and kills nothing.
 
-- [ ] **88. Any load error kills the interface.** Found 2026-09-24. Nothing
-  catches a `SIG_Exception` from `SIG_GPExperiment::loadExperiment` in
-  `SIG_ExperimentListView`'s open slot, or anywhere above it. Measured: a copy
-  of `twoBases` with its `StreamedRobot` keyword broken aborts the interface
-  with "terminate called after throwing an instance of
-  `SIGEL_Robot::SIG_UnstreamingError`". A file with a register width outside
-  1..16 does the same.
-
 - [ ] **47. `sigelDynClient` and `manage_dyn_slave`.** `sigelDynClient` makes a
   second machine a dynamic slave of a master started with `sigel -de`, which
   `sigel.cpp` still accepts. It is still 1.3's Solaris `tcsh` script, its home
