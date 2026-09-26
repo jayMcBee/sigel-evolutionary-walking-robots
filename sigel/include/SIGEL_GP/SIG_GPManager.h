@@ -24,6 +24,7 @@
 #define SIGEL_GP_SIG_GPMANAGER_H
 
 #include <QList>
+#include <atomic>
 #include "SIGEL_GP/SIG_GPFitnessTrainer.h"
 #include "SIGEL_GP/SIG_GPTournament.h"
 #include "SIGEL_Tools/SIG_Randomizer.h"
@@ -70,7 +71,7 @@ namespace SIGEL_GP
    * from the saveExit GP-Parameter or the termination type.
    */
  public:
-  bool userTerminated;
+  std::atomic<bool> userTerminated;
 
   /**
    * Whether PVM has been reported unreachable. Reading it is the only way an

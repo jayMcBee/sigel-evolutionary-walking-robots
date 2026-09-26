@@ -300,15 +300,6 @@ touched, because changing one changes behaviour against the reference binary.
 
 ## 7 · The interface
 
-- [ ] **97. A headless run cannot be stopped early with a save.** Reported
-  2026-09-26 by the x86 machine. `sigel -e` installs no signal handler in
-  the master, and the experiment is written only when
-  `SIG_GPManager::start` returns, so a signal loses every generation since
-  the last autosave. `userTerminated` is set nowhere outside the
-  constructor on this path. Their suggestion: SIGINT and SIGTERM set
-  `userTerminated` in the headless master, so the run ends after the
-  current generation and saves.
-
 - [ ] **98. Run the next long evolution under gdb.** Decided 2026-09-26,
   after an overnight run was lost to a crash: build the overnight copy from
   a clean, committed tree, write the commit hash into its folder, and run

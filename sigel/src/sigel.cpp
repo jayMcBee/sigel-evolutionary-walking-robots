@@ -42,11 +42,23 @@
 #include "SIGEL_Tools/SIG_IO.h"
 
 
+// The headless run, while it evolves. The first SIGINT or SIGTERM stops it
+// the way the Stop button does, so it saves; a second one ends it at once.
+static SIGEL_GP::SIG_GPManager *headlessManager = nullptr;
+
 extern "C"
 {
 
   // signal handler to be installed from main()
   void sigelStandardSignalHandler(int signal) {
+    // The first signal stops the run so that it saves; a second one, while
+    // the flag is set, ends a run that no longer reads it.
+    if ( (signal == SIGINT || signal == SIGTERM)
+         && headlessManager && !headlessManager->userTerminated ) {
+      headlessManager->userTerminated = true;
+      return;
+    }
+
     int result = 1;
 
     switch ( signal ) {
@@ -301,8 +313,13 @@ int main( int argc, char *argv[] ) {
 	} else {
 
 		// start() runs the evolution on this thread and returns when it is done
+		headlessManager = &gpManager;
 		gpManager.start();
 	}
+
+    // A signal during the save would leave the file cut short.
+    std::signal( SIGINT, SIG_IGN );
+    std::signal( SIGTERM, SIG_IGN );
 
     if (!experimentFile.open( QIODevice::WriteOnly )) {
       SIGEL_Tools::SIG_IO::cerr << "Error opening " << experimentName << "!" << Qt::endl;

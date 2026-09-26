@@ -903,8 +903,20 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-09-26 — DONE: ITEM 97, A HEADLESS RUN STOPS WITH A SAVE.** Start
+here.
+
+- **Changed:** in `sigel -e`, the first SIGINT or SIGTERM sets
+  `userTerminated`, so the run stops and saves; a second one exits as
+  before. Details are in item 97's entry in "Done".
+- **Baselines:** unchanged. `fitness-check.sh` is identical to its baseline.
+- **Review:** no defects. Left open: a hang with `-de` if the server thread
+  takes the signal; a SIGINT and a SIGTERM together need one more signal to
+  force the exit.
+- **Gates:** `check.sh` 938 pass, 0 fail; warnings 487.
+- **Next:** item 83, the ZORC switch.
+
 **2026-09-26 — DONE: ITEM 95, AN UNKNOWN NAME IN A FILE NO LONGER CRASHES.**
-Start here.
 
 - **Changed:** nine robot stream reads throw `SIG_UnstreamingError` when a
   name finds no object, and File > Open shows it. Details are in item 95's
@@ -5915,6 +5927,27 @@ carried; other items and this file cite them, so they do not change.
   page, a label in the secondary text colour shows the description, or says
   that the experiment names a fitness function this build does not have.
   Remote ZORC is the last entry.
+
+- [x] **97. A headless run can be stopped early with a save** — done
+  2026-09-26. Reported by the x86 machine. `sigel -e` had a handler, but
+  SIGINT and SIGTERM halted PVM and exited without saving, SIGTERM with exit
+  code 0. Now the first SIGINT or SIGTERM sets `userTerminated`, as the Stop
+  button does, so `SIG_GPManager::start` returns and `main` saves the
+  experiment and halts PVM. The run stops between tournaments, not at the
+  end of the generation: `userTerminated` does not wait for SAVEEXIT.
+  Offspring not yet evaluated are saved with fitness -1 and are evaluated at
+  the next start; the pool generation does not move. A second signal takes
+  the old path and exits without saving, for a master that no longer reads
+  the flag. `userTerminated` is `std::atomic<bool>`, because the handler
+  writes it. SIGINT and SIGTERM are ignored while the file is written, so a
+  signal cannot cut the save short. `sigel -me` does not read the flag and is
+  unchanged. Tested on copies of `twoBases.exp`: SIGINT and SIGTERM each
+  saved a complete file one generation on, and the saved files open in the
+  interface; two SIGINTs 5 ms apart also left a complete file. Left open:
+  with `-de` a signal delivered to the server thread can leave `accept`
+  blocked, so the run can wait at the disconnect every 20th generation until
+  a second signal; a SIGINT and a SIGTERM that arrive together can both see
+  the flag unset, so a forced exit needs one more signal.
 
 - [x] **95. An unknown name in an experiment file segfaulted** — done
   2026-09-26. The robot stream readers passed a `SIG_Robot` lookup that
