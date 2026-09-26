@@ -903,7 +903,21 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-26 — DONE: ITEM 88, A LOAD ERROR NO LONGER ENDS SIGEL.** Start here.
+**2026-09-26 — DONE: DAMAGED FILES NO LONGER HANG THE LOAD.** Start here.
+
+- **Changed, by decision:** the two reading loops throw at the end of the
+  file. Details are in the Done entry. Checked on the desktop with four
+  damaged files.
+- **Baselines:** unchanged. Two runs gave identical output.
+- **Review:** no defects; its wording note, seven separators with MetaGP,
+  was fixed in the message.
+- **Gates:** `check.sh` 938 pass, 0 fail; warnings 487. The other four gates
+  are green.
+- **Next:** the other findings of item 88's tests, to discuss: an unknown
+  link name segfaults, and Import > Language Parameters aborts on a bad
+  file. The x86 GUI crash at startup with Qt 6.4.2.
+
+**2026-09-26 — DONE: ITEM 88, A LOAD ERROR NO LONGER ENDS SIGEL.**
 
 - **Changed, by decision:** File > Open catches a load exception and shows
   it. Details are in item 88's entry in "Done". Checked on the desktop.
@@ -911,10 +925,7 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 - **Review:** no defects.
 - **Gates:** `check.sh` 938 pass, 0 fail; warnings 487. The other four gates
   are green.
-- **Next:** to discuss what the tests for item 88 found beyond it. The x86
-  machine: headless evolution works; the GUI crashes at startup in
-  `QApplication`'s construction with Qt 6.4.2, in our binary; not yet
-  investigated.
+- **Next:** the findings of item 88's tests; the x86 GUI crash.
 
 **2026-09-26 — DONE: ITEM 28, THE UI LABELS.**
 
@@ -5180,6 +5191,19 @@ carried; other items and this file cite them, so they do not change.
     visualizeThis` calls `resizeGL` with logical pixels where Qt uses device
     pixels. Qt 6.10's `QOpenGLWidget` sets the viewport in device pixels
     itself before each `paintGL`, and the aspect ratio is the same in both.
+
+- [x] **Damaged experiment files no longer hang the load** — done
+  2026-09-26, by decision; found with item 88. Two reading loops waited for
+  an end marker and never checked for the end of the file:
+  `SIG_GPExperiment::cutAfterFiveHashes`, in both variants, and the object
+  loop in `SIG_Robot::readFromFileTransfer`. They now throw a
+  `SIG_Exception` at the end of the file, which File > Open shows (item 88).
+  Tested with a file that is not an experiment, an empty file, a file cut
+  short and a missing `RobotComplete`. A valid file cannot reach either
+  throw: `readLine` returns a null string only at the end of the stream,
+  and the robot writer always follows `RobotComplete` with the root link
+  and the language section. The headless `sigel -e` has no catch, so such
+  a file now ends it with an exception where it hung before.
 
 - [x] **88. A load error ended the interface** — done 2026-09-26, by
   decision, for the case the item describes: a `SIG_Exception` from

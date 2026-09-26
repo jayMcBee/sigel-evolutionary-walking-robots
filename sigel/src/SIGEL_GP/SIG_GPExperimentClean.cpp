@@ -26,6 +26,7 @@
 #include <qtextstream.h>
 
 #include "SIGEL_Tools/SIG_IO.h"
+#include "SIGEL_Tools/SIG_Exception.h"
 
 #include <pvm3.h>
 
@@ -52,8 +53,11 @@ QString SIGEL_GP::SIG_GPExperiment::cutAfterFiveHashes(QTextStream& source)
   QString bufferString;
   QString resultString;
 
-  while ( (bufferString = source.readLine()) != fiveHashes )
+  while ( (bufferString = source.readLine()) != fiveHashes ) {
+    if ( bufferString.isNull() )   // the end of the file
+      throw SIGEL_Tools::SIG_Exception( __FILE__, __LINE__, "The file ends before a '#####' separator. It is not a complete experiment file." );
     resultString += ( bufferString + "\n" );
+  }
 
   return resultString;
 };

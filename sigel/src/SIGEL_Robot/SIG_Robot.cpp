@@ -347,6 +347,8 @@ namespace SIGEL_Robot {
 		initialOrientation = streamToMatrix (tx);
                 tx >> objtype;
                 while (objtype != "RobotComplete") {
+                        if (tx.atEnd ())
+                                throw SIG_UnstreamingError (__FILE__, __LINE__, "'RobotComplete' is missing");
                         if (objtype == "Body")
                                 addBody (new SIG_Body (this, tx));
                         else if (objtype == "Material")
