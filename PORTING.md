@@ -903,13 +903,23 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-26 — DONE: THE VIEWER'S BUTTONS HAVE TOOLTIPS.** Start here.
+**2026-09-26 — DONE: STEP AND FAST FORWARD NO LONGER LOOK LIKE PLAY.**
+Start here.
+
+- **Changed:** three icons in `pixmaps/`, overwritten in place, no code.
+  Step is a triangle followed by a bar, the mirror of Reset; Fast Forward is
+  two triangles; Reset has a gap between its bar and triangle. All three are
+  blue, so only Play and Pause are green. Checked on the desktop.
+- **Gates:** run after the commit, for this change and the tooltips.
+- **Next:** item 100, movie recording.
+
+**2026-09-26 — DONE: THE VIEWER'S BUTTONS HAVE TOOLTIPS.**
 
 - **Changed:** `SIG_SimulationControls` gives its six actions tooltips:
   "Reset", "Play / Pause", "Step", "Fast Forward (5 s)", "Movie Settings",
   "Close Viewer". The status tips are unchanged. Checked on the desktop.
 - **Gates:** not run, by decision; the next change follows at once.
-- **Next:** an improved icon.
+- **Next:** new icons for Step and Fast Forward.
 
 **2026-09-26 — DONE: ITEM 99, THE VIEWER'S STOP BUTTON IS SHOWN AS A
 RESET.**
