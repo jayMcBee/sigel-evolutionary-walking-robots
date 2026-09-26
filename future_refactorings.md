@@ -286,6 +286,44 @@ touched, because changing one changes behaviour against the reference binary.
 
 ## 7 · The interface
 
+- [ ] **95. An unknown link name in an experiment file segfaults.** Found
+  2026-09-26 with item 88's tests. The `SIG_Joint` stream reader passes
+  `parent->lookupLink (n1)` straight to `setLeftLink`, and a name that no
+  link has gives a null pointer that `setLeftLink` dereferences. Measured: a
+  copy of `twoBases.exp` whose joint names `base9` ends File > Open with a
+  segfault. The same unchecked lookup exists for the root link in
+  `SIG_Robot::readFromFileTransfer`, a link's body and material in the
+  `SIG_Link` reader, and the joint or link names in the drive and sensor
+  readers. A tested fix for the joint and root link threw
+  `SIG_UnstreamingError`, which File > Open then shows (item 88).
+
+- [ ] **96. SIGEL crashes at startup with Qt 6.4.2.** Reported 2026-09-26 by
+  the x86 machine: Debian 12, Qt 6.4.2, stock SIGEL built from GitHub. Both
+  the GUI (`sigel`, in `QApplication`'s constructor in `sigel.cpp`'s `main`)
+  and the standalone visualiser (`sigel_slave -v`, the same place in
+  `sigel_slave.cpp`) segfault in `QGuiApplication::screenAdded`, under xcb
+  and offscreen alike. A 5-line Qt program runs on the same machine under
+  both, so the cause is in our binaries. `sigel` exports no symbol that
+  could replace one of Qt's. Headless runs (`sigel -e`) work there. Not
+  reproduced here: this machine has Qt 6.10.
+
+- [ ] **97. A headless run cannot be stopped early with a save.** Reported
+  2026-09-26 by the x86 machine. `sigel -e` installs no signal handler in
+  the master, and the experiment is written only when
+  `SIG_GPManager::start` returns, so a signal loses every generation since
+  the last autosave. `userTerminated` is set nowhere outside the
+  constructor on this path. Their suggestion: SIGINT and SIGTERM set
+  `userTerminated` in the headless master, so the run ends after the
+  current generation and saves.
+
+- [ ] **98. Run the next long evolution under gdb.** Decided 2026-09-26,
+  after an overnight run was lost to a crash: build the overnight copy from
+  a clean, committed tree, write the commit hash into its folder, and run
+  the master as `gdb -batch -ex run -ex "thread apply all bt"`, detached,
+  with its output in a log. The binary carries its debug information, so a
+  backtrace stays valid while the repo moves on. Turn autosave on in the
+  experiment. Launched only when asked for.
+
 - [ ] **94. Adding many individuals is slow, and slower as the pool grows.**
   Observed 2026-09-26: Individuals > Add with 1000 individuals takes a long
   time, and the rate drops as the pool grows. Creating random programs should

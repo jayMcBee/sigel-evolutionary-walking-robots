@@ -593,8 +593,15 @@ void SIG_GUIGPExperiment::slotLanguageParameterImport()
       if( file.open(QIODevice::ReadOnly) )
 	{
 	  QTextStream theStream( &file );
-	  SIGEL_Robot::SIG_LanguageParameters *newLanguageParameters = new SIGEL_Robot::SIG_LanguageParameters( theStream, true );
-	  gpExperiment.robot.setLangParam( newLanguageParameters );
+	  try
+	    {
+	      SIGEL_Robot::SIG_LanguageParameters *newLanguageParameters = new SIGEL_Robot::SIG_LanguageParameters( theStream, true );
+	      gpExperiment.robot.setLangParam( newLanguageParameters );
+	    }
+	  catch ( const SIGEL_Tools::SIG_Exception &e )
+	    {
+	      QMessageBox::warning( experimentListView, "Import Language Parameters", e.getMessage() );
+	    }
 	}
       file.close();
       languageParameters->getOutOfExperiment();

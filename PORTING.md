@@ -903,7 +903,25 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-26 — DONE: DAMAGED FILES NO LONGER HANG THE LOAD.** Start here.
+**2026-09-26 — DONE: IMPORT > LANGUAGE PARAMETERS CATCHES A BAD FILE.**
+Start here.
+
+- **Changed, by decision:** details are in the Done entry. Checked on the
+  desktop.
+- **Baselines:** unchanged. Two runs gave identical output.
+- **Review:** no defects.
+- **Gates:** `check.sh` 938 pass, 0 fail; warnings 487. The other four gates
+  are green.
+- **Next, for a new session, in `future_refactorings.md`:** item 95 (an
+  unknown link name segfaults), item 96 (SIGEL crashes at startup with Qt
+  6.4.2, reported by the x86 machine), item 97 (a headless run cannot be
+  stopped early with a save), item 94 (adding many individuals is slow,
+  measure first). Item 98, the next long run under gdb, is launched only
+  when asked for.
+- **The x86 machine** builds stock SIGEL from GitHub, runs it and reports.
+  It never runs our checks and never changes code; every fix is made here.
+
+**2026-09-26 — DONE: DAMAGED FILES NO LONGER HANG THE LOAD.**
 
 - **Changed, by decision:** the two reading loops throw at the end of the
   file. Details are in the Done entry. Checked on the desktop with four
@@ -913,9 +931,7 @@ classes and leave truncation a hard error. **They are not interchangeable.**
   was fixed in the message.
 - **Gates:** `check.sh` 938 pass, 0 fail; warnings 487. The other four gates
   are green.
-- **Next:** the other findings of item 88's tests, to discuss: an unknown
-  link name segfaults, and Import > Language Parameters aborts on a bad
-  file. The x86 GUI crash at startup with Qt 6.4.2.
+- **Next:** the other findings of item 88's tests.
 
 **2026-09-26 — DONE: ITEM 88, A LOAD ERROR NO LONGER ENDS SIGEL.**
 
@@ -5191,6 +5207,16 @@ carried; other items and this file cite them, so they do not change.
     visualizeThis` calls `resizeGL` with logical pixels where Qt uses device
     pixels. Qt 6.10's `QOpenGLWidget` sets the viewport in device pixels
     itself before each `paintGL`, and the aspect ratio is the same in both.
+
+- [x] **Import > Language Parameters no longer ends SIGEL on a bad file**
+  — done 2026-09-26, by decision; found with item 88.
+  `SIG_GUIGPExperiment::slotLanguageParameterImport` built the new language
+  parameters with no `try`, so a wrong first word or a register width
+  outside 1..16 ended SIGEL. It now catches `SIG_Exception`, shows the
+  message, and keeps the current parameters: the constructor throws before
+  its command loop, so nothing is half built. Tested on the desktop with
+  both cases and with a good file. An overnight run was lost to exactly
+  this abort the same morning; its experiment had autosave off.
 
 - [x] **Damaged experiment files no longer hang the load** — done
   2026-09-26, by decision; found with item 88. Two reading loops waited for
