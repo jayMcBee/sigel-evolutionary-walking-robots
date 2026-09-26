@@ -27,8 +27,8 @@
 #include "SIGEL_GP/SIG_GPParameter.h"
 #include "SIGEL_GP/SIG_GPIndividual.h"
 #include "SIGEL_Tools/SIG_Randomizer.h"
-#include "SIGEL_GP/SIG_GPNiceWalkingFitnessFunction.h"
-#include "SIGEL_GP/SIG_GPSimpleFitnessFunction.h"
+#include "SIGEL_GP/SIG_GPFitnessFunctionRegistry.h"
+#include "SIGEL_GP/SIG_GPRemoteZORCFitnessFunction.h"
 #include "SIGEL_GP/SIG_GPFullDataRecorder.h"
 #include "SIGEL_Robot/SIG_CommandParameters.h"
 #include "SIGEL_Robot/SIG_Joint.h"
@@ -452,19 +452,20 @@ int main(int argc, char *argv[])
   SIGEL_GP::SIG_GPIndividual &individual = experiment.population.getIndividual(index);
   const QString name = experiment.gpParameter.getFitnessName();
 
-  SIGEL_GP::SIG_GPFitnessFunction *fitnessFunction = 0;
-  if (name == "SimpleFitnessFunction")
-    fitnessFunction = new SIGEL_GP::SIG_GPSimpleFitnessFunction();
-  else if (name == "NiceWalkingFitnessFunction")
-    fitnessFunction = new SIGEL_GP::SIG_GPNiceWalkingFitnessFunction();
-  else {
-    fprintf(stderr, "%s names %s, which this program does not build\n",
+  // Remote ZORC needs a serial line and a QApplication, which this program does not have.
+  const std::optional<int> fitnessIndex =
+      SIGEL_GP::SIG_GPFitnessFunctionRegistry::indexOf(name);
+  const SIGEL_GP::SIG_GPRemoteZORCFitnessFunction remoteZORC;
+  if (!fitnessIndex || name == remoteZORC.serializedId()) {
+    fprintf(stderr, "%s names %s, which this program cannot evaluate\n",
             argv[1], qPrintable(name));
     return 1;
   }
+  const SIGEL_GP::SIG_GPFitnessFunction &fitnessFunction =
+      *SIGEL_GP::SIG_GPFitnessFunctionRegistry::fitnessFunctions()[*fitnessIndex];
 
   const double recorded = individual.getFitness();
-  const double fitness = fitnessFunction->evalFitness(
+  const double fitness = fitnessFunction.evalFitness(
       individual.getProgramVar(), robot,
       experiment.environment, experiment.simulationParameter);
 
@@ -491,7 +492,6 @@ int main(int argc, char *argv[])
     printf("  frames %d  height %.6g .. %.6g  last (%.6g, %.6g, %.6g)\n",
            frames, lo, hi, last.x, last.y, last.z);
   }
-  delete fitnessFunction;
 
   printf("%s individual %d  %s\n", argv[1], index, qPrintable(name));
   printf("  2003 recorded  %.17g\n", recorded);

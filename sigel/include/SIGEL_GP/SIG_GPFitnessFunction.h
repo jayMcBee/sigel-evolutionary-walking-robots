@@ -58,9 +58,9 @@ class SIG_GPFitnessFunction{
  * This operation activates the computation of the fitnessvalue. It is virtual, this means 
  * that the implemantation is for every fitnessfunction different. 
  * @pre 
- * An object of the fitnessfunction is created and everything is ready to run.
+ * Everything is ready to run.
  * @post
- * The fitnessvalue is computed and returned, the object of the fitness function is destructed.
+ * The fitnessvalue is computed and returned.
  * @param program
  * The individual's robot control program.
  * @param rob
@@ -91,31 +91,11 @@ class SIG_GPFitnessFunction{
  public:
  virtual QString name() const = 0;
 
-  void setActGeneration(int _actGeneration) { actGeneration = _actGeneration;  }
-  int getActGeneration() { return actGeneration; }
-  void setResetEveryGeneration(int _resEvGen) {  resetEveryGeneration = _resEvGen;  }
-  int getResetEveryGeneration() { return resetEveryGeneration; }
-
  protected:
  bool isValid( double value ) const;
 
  protected:
  DL_vector normalizeRobotPosition( DL_vector originalPosition,  DL_matrix actualRobotRotation, const SIGEL_Robot::SIG_Robot &rob ) const;
-
- /**
-  * This variable holds the actual Generation.
-  */
- protected:
-  /**
-    * this attribute specifies the current generation since this project was created.
-    */
-  int actGeneration = 0;
-  /**
-    * Every resetEveryGeneration the fitness value of all individuals will be reseted. Thus there is
-    * a new evalution of the fitness value. The fitness function could switch between different criteria
-    * to calculate the fitness value. For a example look at the forceFitnessFunction.
-    */
-  int resetEveryGeneration = 0;
 
 };
 }

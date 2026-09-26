@@ -903,7 +903,27 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-26 — DONE: evalFitness IS const.** Start here.
+**2026-09-26 — DONE: THE SLAVE USES THE REGISTRY; ITEM 84.** Start here.
+
+- **Changed:** `sigel_slave` finds the fitness function with
+  `SIG_GPFitnessFunctionRegistry::indexOf` and evaluates the registry's
+  object; no `new`, no `delete`. An unknown ID is written to stderr and
+  gets fitness 0. Remote ZORC still gets its `QApplication`, tested against
+  its `serializedId()`. The visualise path's Remote ZORC object no longer
+  leaks. `actGeneration`, `resetEveryGeneration` and their four accessors
+  left `SIG_GPFitnessFunction`; the slave no longer copies them from the
+  PVM data, which still carries them. Item 84 is done; see "Done".
+- **`sigel_eval`:** uses the registry, so it also evaluates RealSpeed,
+  Adaptive Walking and Force. It refuses an unknown ID and Remote ZORC.
+- **Baselines:** unchanged. `fitness-check.sh` is identical to its baseline.
+- **Review:** no defects. Acted on: the `evalFitness` doc no longer says the
+  object is created and destroyed; item 84 moved here. Left open:
+  `SIG_GPPVMData::getActGeneration` and `getResetEveryGeneration` have no
+  caller now.
+- **Gates:** `check.sh` 938 pass, 0 fail; warnings 487.
+- **Next:** item 85, step 5: `description()` and the label.
+
+**2026-09-26 — DONE: evalFitness IS const.**
 
 - **Changed, mechanical:** `evalFitness` is `const` in `SIG_GPFitnessFunction`
   and the six classes, and so are `isValid`, `normalizeRobotPosition` and
@@ -912,8 +932,7 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 - **Baselines:** unchanged. `fitness-check.sh` is identical to its baseline.
 - **Review:** no defects.
 - **Gates:** `check.sh` 938 pass, 0 fail; warnings 487.
-- **Next:** item 85, step 4b: the slave and `sigel_eval` use the registry;
-  item 84.
+- **Next:** item 85, step 4b.
 
 **2026-09-26 — DONE: ONE LIST OF FITNESS FUNCTIONS.**
 
@@ -5834,6 +5853,14 @@ carried; other items and this file cite them, so they do not change.
     and saves back with the same name. A copy naming
     `StepperFitnessFunction` saves back as `SimpleFitnessFunction`, as any
     unknown name does.
+
+- [x] **84. Two defects found reading the fitness functions** — done
+  2026-09-26.
+  - `sigel_slave` no longer crashes on an unknown fitness-function name. It
+    looks the name up in `SIG_GPFitnessFunctionRegistry`; for an unknown name
+    it writes the name to stderr and sends fitness 0.
+  - The `friend class SIG_GPEnergyFitnessFunction` line is gone from
+    `SIG_GPFullDataRecorder.h`; no such class exists.
 
 - [x] **86. The generation log line restarts at 1 with every run** — done
   2026-09-24, by decision. `SIG_GPManager::run` and `run(MT_Classifier*)`

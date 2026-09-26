@@ -45,11 +45,7 @@
 #include "SIGEL_GP/SIG_GPExperiment.h"
 #include "SIGEL_Tools/SIG_Exception.h"
 
-#include "SIGEL_GP/SIG_GPSimpleFitnessFunction.h"
-#include "SIGEL_GP/SIG_GPRealSpeedFitnessFunction.h"
-#include "SIGEL_GP/SIG_GPNiceWalkingFitnessFunction.h"
-#include "SIGEL_GP/SIG_GPAdaptiveWalkingFitnessFunction.h"
-#include "SIGEL_GP/SIG_GPForceFitnessFunction.h"
+#include "SIGEL_GP/SIG_GPFitnessFunctionRegistry.h"
 #include "SIGEL_GP/SIG_GPRemoteZORCFitnessFunction.h"
 
 #include <pvm3.h>
@@ -126,8 +122,6 @@ int main( int argc, char *argv[] ) {
   SIGEL_GP::SIG_GPExperiment *experiment = 0;
   bool visualize = false;
   QString fitnessFunctionName;
-  int actGeneration = 0;
-  int resetEveryGeneration = 0;
 
   bool standAlone = false;
 
@@ -225,8 +219,6 @@ int main( int argc, char *argv[] ) {
 
     visualize = pvmData.getVisualize();
     fitnessFunctionName = pvmData.getFitnessFunctionName();
-    actGeneration = pvmData.getActGeneration();
-    resetEveryGeneration = pvmData.getResetEveryGeneration();
   }
 
   int returnValue = 0;
@@ -278,10 +270,9 @@ int main( int argc, char *argv[] ) {
       simWindow->show();
 
       // if we use the RemoteZORC-Fitnessfunction: run evaluation to transmit the program !
-      if (fitnessFunctionName == "RemoteZORCFitnessFunction") {
-        SIGEL_GP::SIG_GPFitnessFunction *fitFunc = new SIGEL_GP::SIG_GPRemoteZORCFitnessFunction();
-        fitFunc->evalFitness( *program, *robot, *environment, *simulationParameters );
-      }
+      const SIGEL_GP::SIG_GPRemoteZORCFitnessFunction remoteZORC;
+      if (fitnessFunctionName == remoteZORC.serializedId())
+        remoteZORC.evalFitness( *program, *robot, *environment, *simulationParameters );
 
      try {
        simWindow->visualizeThis( *modifiedRobot, *environment, *simulationParameters, *program );
@@ -305,55 +296,31 @@ int main( int argc, char *argv[] ) {
       SIGEL_Tools::SIG_IO::cerr << "Slave is used to calculate a fitness!" << Qt::endl;
 #endif
 
-      SIGEL_GP::SIG_GPFitnessFunction *fitnessFunction = 0;
+      const std::optional<int> fitnessIndex = SIGEL_GP::SIG_GPFitnessFunctionRegistry::indexOf( fitnessFunctionName );
 
-		// prepare using the SimpleFitlessFunction
-      if (fitnessFunctionName == "SimpleFitnessFunction")
-				fitnessFunction = new SIGEL_GP::SIG_GPSimpleFitnessFunction();
-
-		// prepare using the RealSpeedFitnessFunction
-      else if (fitnessFunctionName == "RealSpeedFitnessFunction")
-				fitnessFunction = new SIGEL_GP::SIG_GPRealSpeedFitnessFunction();
-
-		// prepare using the NiceWalkingFitnessFunction
-      else if (fitnessFunctionName == "NiceWalkingFitnessFunction")
-				fitnessFunction = new SIGEL_GP::SIG_GPNiceWalkingFitnessFunction();
-
-		// prepare using the AdaptiveWalkingFitnessFunction
-      else if (fitnessFunctionName == "ZorcWalkingFitnessFunction")
-				fitnessFunction = new SIGEL_GP::SIG_GPAdaptiveWalkingFitnessFunction();
-
-      // prepare for using the ForceFitnessFunction
-     else if (fitnessFunctionName == "ForceFitnessFunction")
-  			fitnessFunction = new SIGEL_GP::SIG_GPForceFitnessFunction();
-
-		// prepare to use RemoteZORC-Fitnessfunction, need GUI for requesters
-		else if (fitnessFunctionName == "RemoteZORCFitnessFunction") {
+      // Remote ZORC needs a GUI for its requesters
+      const SIGEL_GP::SIG_GPRemoteZORCFitnessFunction remoteZORC;
+      if (fitnessFunctionName == remoteZORC.serializedId()) {
    				QApplication *app = new QApplication(argc, argv);
 #ifdef _WINDOWS
 				app->setStyle( QStyleFactory::create( "Windows" ) );
 #else					
 				app->setStyle( QStyleFactory::create( "Fusion" ) );
 #endif			
-
-				fitnessFunction = new SIGEL_GP::SIG_GPRemoteZORCFitnessFunction();
 	  	}
 
-		// whoopsie !
-      else SIGEL_Tools::SIG_IO::cerr << "Error: Unknown fitness function!" << Qt::endl;
-
       double fitnessValue = 0;
-      fitnessFunction->setActGeneration(actGeneration);
-      fitnessFunction->setResetEveryGeneration(resetEveryGeneration);
-      if (fitnessFunction) {
+      if (fitnessIndex) {
         try {
-          fitnessValue = fitnessFunction->evalFitness( *program, *robot, *environment, *simulationParameters );
-          delete fitnessFunction;
+          fitnessValue = SIGEL_GP::SIG_GPFitnessFunctionRegistry::fitnessFunctions()[*fitnessIndex]
+                           ->evalFitness( *program, *robot, *environment, *simulationParameters );
         }
         catch (SIGEL_Tools::SIG_Exception &e) {
           fitnessValue = 0;
         };
-      };
+      }
+      else
+        SIGEL_Tools::SIG_IO::cerr << "Unknown fitness function \"" << fitnessFunctionName << "\"; its fitness is 0." << Qt::endl;
 
       pvm_initsend( PvmDataDefault );
       pvm_pkdouble( &fitnessValue, 1, 1 );

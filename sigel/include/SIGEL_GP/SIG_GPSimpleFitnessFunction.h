@@ -52,9 +52,9 @@ class SIG_GPSimpleFitnessFunction : public SIG_GPFitnessFunction
  * This operation activates the computation of the fitnessvalue. It is virtual, this means 
  * that the implemantation is for every fitnessfunction different. 
  * @pre 
- * An object of the fitnessfunction is created and everything is ready to run.
+ * Everything is ready to run.
  * @post
- * The fitnessvalue is computed and returned, the object of the fitness function is destructed.
+ * The fitnessvalue is computed and returned.
  * @return
  * A double is returned, which represents the fitnessvalue. If an error has occurred, the returnvalue of 
  * the double is -1.

@@ -640,16 +640,6 @@ touched, because changing one changes behaviour against the reference binary.
   the switch lives (the `Makefile` or a header), and what an experiment file
   naming "RemoteZORCFitnessFunction" does when the switch is off.
 
-- [ ] **84. Two defects found reading the fitness functions.** 2026-09-24.
-  - **An unknown fitness-function name crashes `sigel_slave`.** In
-    `sigel_slave.cpp`'s `main`, the last `else` prints "Error: Unknown fitness
-    function!" and leaves `fitnessFunction` null, but `setActGeneration` and
-    `setResetEveryGeneration` are called on it before the
-    `if (fitnessFunction)` test.
-  - **A friend class that does not exist.** `SIG_GPFullDataRecorder.h`
-    declares `friend class SIG_GPEnergyFitnessFunction`; no such class is in
-    the tree. Delete the line.
-
 - [ ] **85. A short description of the selected fitness function.** Idea,
   2026-09-24. Below the fitness-function combo box on the GP Parameters page,
   a label of at most two lines says what the selected function rewards, in
