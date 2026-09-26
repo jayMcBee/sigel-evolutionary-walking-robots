@@ -91,6 +91,14 @@ Constructs the language removed. A current compiler rejects them.
     (40 files), `SIGEL_RobotIO` (14), `SIGEL_GP` (4), `SIGEL_Simulation` (3).
     `f(void)` becomes `f()`; mechanical, one commit. No `(void)x` casts were
     found.
+- [ ] **101. Empty destructors: remove them, or default them in the header.**
+  Decided 2026-09-26. Delete every empty destructor whose class already has a
+  virtual destructor above it. A base class without one gets a defaulted
+  virtual destructor in the header. Removing a destructor gives the class
+  implicit move operations, which can change overload resolution outside
+  `QObject` classes. Where the class's `.cpp` calls `new`, check for an owner;
+  any leak found goes to item 8. One round: one build, one gate run, one
+  review, one commit.
 
 ---
 
