@@ -903,7 +903,15 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-27 — DONE: THE DEFAULT MOVIE SIZE IS 1024 × 576.** Start here.
+**2026-09-27 — DONE: THE RESET ICON IS ORANGE.** Start here.
+
+- **Changed:** `pixmaps/resetButton.xpm` is orange, the same shape and
+  shading as before, so Reset no longer shares the blue of Step and Fast
+  Forward. Checked on the desktop.
+- **Gates:** one pass for this commit and the two before it; see below.
+- **Next:** item 100, the frame rate field.
+
+**2026-09-27 — DONE: THE DEFAULT MOVIE SIZE IS 1024 × 576.**
 
 - **Changed:** the `SIG_SimulationVisualisationWidget` constructor starts
   the movie at 1024 × 576, in place of 1280 × 720. It is 16:9, so a video
