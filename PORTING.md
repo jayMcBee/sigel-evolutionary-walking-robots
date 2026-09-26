@@ -903,8 +903,16 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-09-27 — DONE: THE MOVIE SIZE GOES UP TO 4096 × 4096.** Start here.
+
+- **Changed:** the output width and height spin boxes of the movie settings
+  dialog allow up to 4096, in place of 1600 × 1200, so "View Size to Movie"
+  is no longer cut short by a large view.
+- **Gates:** not run for this commit.
+- **Next:** item 100, the frame rate field.
+
 **2026-09-27 — DONE: RESIZE VIEW TO MATCH NO LONGER ABORTS ON A SMALL
-SCREEN.** Start here.
+SCREEN.**
 
 - **Changed:** `SIG_MovieSettingsDialog::slotResizeViewToMatch` placed the
   window with `qBound`, whose bounds are reversed when the window's minimum
@@ -913,9 +921,7 @@ SCREEN.** Start here.
   such a window goes to the area's top-left corner. Found by the review of
   the two buttons.
 - **Gates:** not run for this commit.
-- **Next:** item 100, the frame rate field. Open from the same review:
-  "View Size to Movie" is silently limited by the spin boxes' range, 512 to
-  1600 × 1200.
+- **Next:** item 100, the frame rate field.
 
 **2026-09-27 — DONE: THE RESET ICON IS ORANGE.**
 
