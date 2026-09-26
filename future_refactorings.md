@@ -339,8 +339,6 @@ touched, because changing one changes behaviour against the reference binary.
   Movie" and "Resize View to Match" in the movie settings dialog; a frame
   rate field, default 25 fps, in place of the frequency field.
   - When recording stops, say how many frames were written and where.
-  - If ffmpeg is present, offer to make an MP4 from the frames at the actual
-    rate, so the movie plays at simulation speed.
 
 ---
 
@@ -643,6 +641,11 @@ touched, because changing one changes behaviour against the reference binary.
   `SIG_SimulationParameters`, like item 71, but any load error kills the
   interface until item 88 is done; (3) when a run starts, with a message box,
   which catches typed and loaded values and kills nothing.
+
+- [ ] **105. Offer an MP4 when recording stops.** Split from item 100,
+  2026-09-27. If `ffmpeg` is present, offer to make an MP4 from the recorded
+  frames at the frame rate the frames were taken at, so the movie plays at
+  simulation speed. Image formats only; POV-Ray writes scene files.
 
 - [ ] **104. Refuse a step size of 0 or less.** Found 2026-09-27; the
   step-size half of item 89. `SIG_SimulationVisualisationWidget::stepsPerFrame`
