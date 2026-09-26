@@ -7,7 +7,7 @@ SIGEL evolves control programs for walking robots by genetic programming and
 tests each program in a physics simulator.
 
 Original project, by project group PG 368 at the University of Dortmund:
-https://sigel.sourceforge.net/seiten/einleitung_en.html
+https://sigel.sourceforge.net/seiten/einleitung_en.html  
 (Running its 1.3 binaries today: [guide](verification-against-sigel-1.3/README.txt).)
 
 Third-party libraries: see [LIBRARIES.md](LIBRARIES.md).
