@@ -91,6 +91,12 @@ class SIG_GPFitnessFunction{
  public:
  virtual QString name() const = 0;
 
+/**
+ * What the function scores, in one sentence for the user.
+ */
+ public:
+ virtual QString description() const = 0;
+
  protected:
  bool isValid( double value ) const;
 

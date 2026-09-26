@@ -68,6 +68,7 @@ namespace SIGEL_GP
 
       QString  serializedId() const { return "RemoteZORCFitnessFunction"; }
       QString  name() const { return "Remote ZORC"; }
+      QString  description() const { return "Runs the program on the real ZORC robot; the user enters the distance it travels, which is divided by the simulated time."; }
 
     /**
       * This method sends all data contained in the QString object over the

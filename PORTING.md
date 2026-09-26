@@ -903,7 +903,29 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-26 — DONE: THE SLAVE USES THE REGISTRY; ITEM 84.** Start here.
+**2026-09-26 — DONE: ITEM 85, THE FITNESS FUNCTION DESCRIBES ITSELF.** Start
+here.
+
+- **Changed:** `SIG_GPFitnessFunction` has `description()`, one sentence
+  per function. `SIG_GPParameter` shows it in `fitnessFunctionDescription`,
+  a label under the combo box in the secondary text colour, at least two
+  lines high. For an unknown ID it names the ID. The fitness group box is a
+  grid. Remote ZORC moved to the end of the registry, after Force; files
+  store IDs, so only the combo order changes. Checked on the desktop.
+- **Baselines:** `guibehaviour-baseline.txt`: items 4 and 5 swap, and six
+  Down presses end on Remote ZORC. `fitness-check.sh` is identical to its
+  baseline.
+- **Review:** no code defects. Acted on, by decision: the Real Speed and
+  Remote ZORC texts. Left as they are, by decision: "as soon as" in the Nice
+  Walking and Force texts (the height test runs after the whole run);
+  Adaptive Walking's early stop and its factor 100; Force scoring 0 for a
+  robot with one movable joint; the unknown-ID message in the secondary
+  colour; a text of three lines still makes the page grow.
+- **Gates:** `check.sh` 938 pass, 0 fail; warnings 487.
+- **Next:** item 83, the ZORC compile switch. To decide: where the switch
+  lives.
+
+**2026-09-26 — DONE: THE SLAVE USES THE REGISTRY; ITEM 84.**
 
 - **Changed:** `sigel_slave` finds the fitness function with
   `SIG_GPFitnessFunctionRegistry::indexOf` and evaluates the registry's
@@ -921,7 +943,7 @@ classes and leave truncation a hard error. **They are not interchangeable.**
   `SIG_GPPVMData::getActGeneration` and `getResetEveryGeneration` have no
   caller now.
 - **Gates:** `check.sh` 938 pass, 0 fail; warnings 487.
-- **Next:** item 85, step 5: `description()` and the label.
+- **Next:** item 85, step 5.
 
 **2026-09-26 — DONE: evalFitness IS const.**
 
@@ -5861,6 +5883,16 @@ carried; other items and this file cite them, so they do not change.
     it writes the name to stderr and sends fitness 0.
   - The `friend class SIG_GPEnergyFitnessFunction` line is gone from
     `SIG_GPFullDataRecorder.h`; no such class exists.
+
+- [x] **85. A short description of the selected fitness function** — done
+  2026-09-26, in steps: `serializedId()` replaces the `name` member; the four
+  objects move from the constructor to `evalFitness`, which is `const`;
+  `SIG_GPFitnessFunctionRegistry` is the one list of fitness functions, and
+  the master, `sigel_slave` and `sigel_eval` use it. Each function has
+  `name()` and `description()`. Under the combo box on the GP Parameters
+  page, a label in the secondary text colour shows the description, or says
+  that the experiment names a fitness function this build does not have.
+  Remote ZORC is the last entry.
 
 - [x] **86. The generation log line restarts at 1 with every run** — done
   2026-09-24, by decision. `SIG_GPManager::run` and `run(MT_Classifier*)`

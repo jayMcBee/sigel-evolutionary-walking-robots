@@ -42,6 +42,7 @@ namespace SIGEL_GP
 
       QString serializedId() const { return "RealSpeedFitnessFunction"; }
       QString name() const { return "Real Speed"; }
+      QString description() const { return "Average speed along the path the robot actually travels, rather than the straight line from start to end."; }
 
     };
 

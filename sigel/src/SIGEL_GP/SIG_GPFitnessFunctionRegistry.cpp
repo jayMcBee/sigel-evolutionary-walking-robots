@@ -18,16 +18,16 @@ namespace SIGEL_GP
     static const SIG_GPRealSpeedFitnessFunction realSpeed;
     static const SIG_GPNiceWalkingFitnessFunction niceWalking;
     static const SIG_GPAdaptiveWalkingFitnessFunction adaptiveWalking;
-    static const SIG_GPRemoteZORCFitnessFunction remoteZORC;
     static const SIG_GPForceFitnessFunction force;
+    static const SIG_GPRemoteZORCFitnessFunction remoteZORC;
 
     static const QList<const SIG_GPFitnessFunction *> functions = {
       &simple,
       &realSpeed,
       &niceWalking,
       &adaptiveWalking,
-      &remoteZORC,
-      &force
+      &force,
+      &remoteZORC
     };
     return functions;
   }

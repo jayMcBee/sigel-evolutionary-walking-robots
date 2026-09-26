@@ -640,19 +640,6 @@ touched, because changing one changes behaviour against the reference binary.
   the switch lives (the `Makefile` or a header), and what an experiment file
   naming "RemoteZORCFitnessFunction" does when the switch is off.
 
-- [ ] **85. A short description of the selected fitness function.** Idea,
-  2026-09-24. Below the fitness-function combo box on the GP Parameters page,
-  a label of at most two lines says what the selected function rewards, in
-  the style of the Edit host dialog's line "For best speed, use one process
-  per CPU core". The text belongs to the fitness function, not to the
-  interface: each class gets a const getter returning it (name to decide,
-  for example `uiDescription()`). It must work without an object, because the
-  master never creates a fitness function; only `sigel_slave` does. So a
-  static member, or one lookup by the stored name next to the one
-  `sigel_slave`'s `main` does. `SIG_GPParameter` updates the label when the
-  selection changes. Write the texts after items 82 and 83, so the dropped
-  functions get none.
-
 - [ ] **90. "Stop at generation N" counts from each start.** Found
   2026-09-24 with item 86. `SIG_GPManager::checkTerminationConditions`,
   called from `stopIfNecessary`, compares the termination generation with

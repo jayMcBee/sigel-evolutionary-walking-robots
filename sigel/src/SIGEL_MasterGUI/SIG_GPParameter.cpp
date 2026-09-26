@@ -63,6 +63,16 @@ SIG_GPParameter::SIG_GPParameter( QWidget* parent,  const char* name, Qt::Window
   for ( const SIGEL_GP::SIG_GPFitnessFunction *fitnessFunction : SIGEL_GP::SIG_GPFitnessFunctionRegistry::fitnessFunctions() )
     fitnessFunctionList->addItem( fitnessFunction->name() );
 
+  // A note, not a field label: drawn in the theme's secondary text colour, and
+  // two lines high, so the page does not move when a description wraps.
+  fitnessFunctionDescription->setForegroundRole( QPalette::PlaceholderText );
+  fitnessFunctionDescription->setMinimumHeight( 2 * fitnessFunctionDescription->fontMetrics().lineSpacing() );
+  QObject::connect( fitnessFunctionList, &QComboBox::currentIndexChanged, this, [this]()
+    {
+      const std::optional<int> index = selectedFitnessFunction();
+      fitnessFunctionDescription->setText( index ? SIGEL_GP::SIG_GPFitnessFunctionRegistry::fitnessFunctions()[*index]->description() : QString() );
+    } );
+
   QObject::connect( listviewHosts,
 		    SIGNAL( itemDoubleClicked( QTreeWidgetItem *, int ) ),
 		    SLOT( slotItemDoubleClicked( QTreeWidgetItem * ) ) );
@@ -265,9 +275,14 @@ void SIG_GPParameter::getOutOfExperiment()
   sliderMutation->setValue( theExperiment.gpParameter.getMutationProb() );
   sliderCrossover->setValue( theExperiment.gpParameter.getXoverProb() );
 
-  // an unknown ID selects nothing
-  const std::optional<int> fitnessIndex = SIGEL_GP::SIG_GPFitnessFunctionRegistry::indexOf( theExperiment.gpParameter.getFitnessName() );
+  // an unknown ID selects nothing; the text is set here because selecting the
+  // index already shown emits no signal
+  const QString fitnessName = theExperiment.gpParameter.getFitnessName();
+  const std::optional<int> fitnessIndex = SIGEL_GP::SIG_GPFitnessFunctionRegistry::indexOf( fitnessName );
   fitnessFunctionList->setCurrentIndex( fitnessIndex ? *fitnessIndex : -1 );
+  fitnessFunctionDescription->setText( fitnessIndex
+    ? SIGEL_GP::SIG_GPFitnessFunctionRegistry::fitnessFunctions()[*fitnessIndex]->description()
+    : "The experiment names the fitness function \"" + fitnessName + "\", which this build does not have." );
 
   // get the probabilities
   sliderADD->setValue( theExperiment.gpParameter.getProbability( SIGEL_Program::ADD ) );

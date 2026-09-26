@@ -47,6 +47,7 @@ namespace SIGEL_GP
       // Experiment files store this ID for Adaptive Walking.
       QString serializedId() const { return "ZorcWalkingFitnessFunction"; }
       QString name() const { return "Adaptive Walking"; }
+      QString description() const { return "Average speed from start to end, weighted by how high the body stays compared with its start height."; }
 
     };
 

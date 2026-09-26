@@ -67,6 +67,7 @@ double evalFitness( SIGEL_Program::SIG_Program &program,
 
 QString serializedId() const { return "SimpleFitnessFunction"; }
 QString name() const { return "Simple"; }
+QString description() const { return "Average speed: the straight-line distance from start to end, divided by the simulated time."; }
 
 };
 }

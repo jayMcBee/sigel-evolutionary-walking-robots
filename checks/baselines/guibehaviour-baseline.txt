@@ -625,9 +625,9 @@ we do with the system?]
       item1  [Real Speed]
       item2  [Nice Walking]
       item3  [Adaptive Walking]
-      item4  [Remote ZORC]
-      item5  [Force]
-      6 Down clamps at current=5 [Force]
+      item4  [Force]
+      item5  [Remote ZORC]
+      6 Down clamps at current=5 [Remote ZORC]
       6 Up   clamps at current=0 [Simple]
     check  checkboxIgnoreMaxIndLength           text=[Ignore maximum length] checkable=1 0->1 enabled=1
       side effect: spinboxMaxIndLength now greyed
