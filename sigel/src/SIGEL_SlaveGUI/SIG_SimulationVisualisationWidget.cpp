@@ -34,7 +34,7 @@
 #include <QComboBox>
 #include <QCheckBox>
 #include <QColorDialog>
-#include <QTransform>
+#include <QPainter>
 
 #include <QtMath>
 #include <cmath>
@@ -303,80 +303,22 @@
 
   bool SIG_SimulationVisualisationWidget::callRenderPixMap( QString inFName )
   {
-	  bool	res;
-	  int	pX=0, pY=0;
-	  int	pW=-1,pH=-1;
-	  double	scaleW=1.0, scaleH=1.0;
-	  QImage	pm, resPm;
-	  QTransform	m;
+    // grabFramebuffer returns device pixels; drawn at ratio 1, they stay 1:1.
+    QImage grabbed = grabFramebuffer();
+    grabbed.setDevicePixelRatio( 1.0 );
 
-	  if(cropImage){	// saves the crop of the given size
-							// around the centre point
-							// performs no resizing
-		  pW = movieWidth;
-		  if( (pX = (width()-movieWidth)/2) < 0){
-			pX = 0;
-			pW = width();
-		  }
-		  pH = movieHeight;
-		  if( (pY = (height()-movieHeight)/2) < 0){
-			  pY = 0;
-			  pH = height();
-		  }
+    QImage frame( movieWidth, movieHeight, QImage::Format_RGB32 );
+    frame.fill( Qt::black );
 
-	  } else if(keepRatio){	// save the whole image
-							// fit it to the given size (shrink to fit)
-							// keeping the aspect ratio
-		  scaleW = (double) movieWidth / (double) width();
-		  scaleH = (double) movieHeight/ (double) height();
+    QPainter painter( &frame );
+    painter.drawImage( (movieWidth - grabbed.width()) / 2,
+		       (movieHeight - grabbed.height()) / 2,
+		       grabbed );
+    painter.end();
 
-	  } else {				// zooms/shrinks the image and crops a part of it
-		  scaleW = (double) movieWidth / (double) width();
-		  scaleH = (double) movieHeight/ (double) height();
-		  if( scaleW >= 1.0  ||  scaleH >= 1.0 ){			// we have to zoom in
-			  if(scaleW >= scaleH){
-				  scaleH = scaleW;
-				  pH = (width() * movieHeight) / movieWidth;
-				  pY = 0.5 * ((double) height() - ((double) movieHeight / scaleW));
-			  } else {
-				  scaleW = scaleH;
-				  pW = (movieWidth * height()) / movieHeight;
-				  pX = 0.5 * ((double) width() - ((double) movieWidth / scaleH));
-			  }
-		  } else if( scaleW < 1.0  &&  scaleH < 1.0 ){		// we have to shrink
-			  if(scaleW >= scaleH){
-				  scaleH = scaleW;
-				  pH = (width() * movieHeight) / movieWidth;
-				  pY = 0.5 * (height()-pH);
-			  } else {
-				  scaleW = scaleH;
-				  pW = (movieWidth * height()) / movieHeight;
-				  pX = 0.5 * (width()-pW);
-			  }
-		  }
-	  }
-
-	  // pW/pH can reach here as -1, and QImage::copy returns a null image
-	  // for that -- it would save nothing and report success.
-	  // grabFramebuffer returns device pixels, not logical.
-	  QImage grabbed = grabFramebuffer();
-	  if ( grabbed.devicePixelRatio() != 1.0 )
-	    {
-	      grabbed = grabbed.scaled( QSize( width(), height() ),
-					Qt::IgnoreAspectRatio,
-					Qt::SmoothTransformation );
-	      grabbed.setDevicePixelRatio( 1.0 );
-	    }
-	  if ( pW < 0 ) pW = grabbed.width()  - pX;
-	  if ( pH < 0 ) pH = grabbed.height() - pY;
-	  pm	= grabbed.copy( pX, pY, pW, pH );
-	  m.scale(scaleW, scaleH);
-	  resPm = pm.transformed(m);
-	  res	= resPm.save( inFName,
-			      fileFormat.toUpper().toUtf8().constData(),
-			      movieQuality );
-
-	  return res;
+    return frame.save( inFName,
+		       fileFormat.toUpper().toUtf8().constData(),
+		       movieQuality );
   }
 
 
@@ -728,7 +670,9 @@ void SIG_SimulationVisualisationWidget::resetRecorder()
 
   void SIG_SimulationVisualisationWidget::slotAlterMovieSettingsClicked()
   {
-    SIGEL_SlaveGUI::SIG_MovieSettingsDialog movieSettingsDialog( width(), height(), this, "movieSettingsDialog", true );
+    SIGEL_SlaveGUI::SIG_MovieSettingsDialog movieSettingsDialog( qRound( width() * devicePixelRatioF() ),
+								      qRound( height() * devicePixelRatioF() ),
+								      this, "movieSettingsDialog", true );
     movieSettingsDialog.spinboxWidth->setValue( movieWidth );
     movieSettingsDialog.spinboxHeight->setValue( movieHeight );
     movieSettingsDialog.spinboxFrequency->setValue( movieFrequency );
@@ -754,8 +698,6 @@ void SIG_SimulationVisualisationWidget::resetRecorder()
     switch( movieSettingsDialog.exec() )
       {
       case QDialog::Accepted:
-      keepRatio = movieSettingsDialog.checkboxKeepAspectRatio->isChecked();
-      cropImage = movieSettingsDialog.checkboxCropImage->isChecked();
 	movieWidth = movieSettingsDialog.spinboxWidth->value();
 	movieHeight = movieSettingsDialog.spinboxHeight->value();
 	movieFrequency = movieSettingsDialog.spinboxFrequency->value();

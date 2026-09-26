@@ -32,10 +32,6 @@ protected:
 protected slots:
     virtual void languageChange();
 
-    virtual void slotChangedAspectRatio(bool) = 0;
-    virtual void slotSetHeight(int) = 0;
-    virtual void slotSetWidth(int) = 0;
-
 
 };
 

@@ -224,10 +224,6 @@
 
       int movieQuality;
 
-      bool keepRatio;
-
-      bool cropImage;
-
       /**
        * This is the name for the next frame to be saved (initially 0).
        *
@@ -259,9 +255,9 @@
       void makeTimeSteps(int noOfSteps);
 
 			/**
-			 * Calls the QT-Function renderPixmap(), which creates a new pixmap on the fly.
-   		 * This will be deleted when it gets out of scope;
-       * Returns whether saving was successful.
+			 * Saves the view as one frame of exactly movieWidth x movieHeight,
+			 * pixel for pixel: a larger view is cut to its centre, a smaller one
+			 * is centred on black. Returns whether saving was successful.
 			 */
 			bool callRenderPixMap( QString inFName );
 

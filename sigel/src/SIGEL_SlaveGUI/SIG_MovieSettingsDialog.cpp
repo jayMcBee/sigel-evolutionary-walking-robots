@@ -36,12 +36,16 @@ namespace SIGEL_SlaveGUI
  *  TRUE to construct a modal dialog.
  */
 SIG_MovieSettingsDialog::SIG_MovieSettingsDialog( int imgWidth, int imgHeight, QWidget* parent,  const char* name, bool modal, Qt::WindowFlags fl )
-    : SIG_MovieSettingsDialogBase( parent, name, modal, fl )
+    : SIG_MovieSettingsDialogBase( parent, name, modal, fl ),
+      viewWidth( imgWidth ),
+      viewHeight( imgHeight )
 {
-	scrWidth  = imgWidth;
-	scrHeight = imgHeight;
-	ratio 	 = (double)scrWidth / (double)scrHeight;
 	textlabelViewSize->setText( QString( "%1 \u00D7 %2" ).arg( imgWidth ).arg( imgHeight ) );
+	textlabelFrameFit->setForegroundRole( QPalette::PlaceholderText );
+
+	connect( spinboxWidth, SIGNAL( valueChanged(int) ), this, SLOT( slotUpdateFrameFit() ) );
+	connect( spinboxHeight, SIGNAL( valueChanged(int) ), this, SLOT( slotUpdateFrameFit() ) );
+	slotUpdateFrameFit();
 };
 
 /*  
@@ -66,29 +70,25 @@ void SIG_MovieSettingsDialog::slotToolButtonClicked()
     lineeditDirectory->setText( newDirectory );
 };
 
-void SIG_MovieSettingsDialog::slotChangedAspectRatio(bool on)
+/*
+ * Says whether a frame of the output size is cut from the view, padded
+ * around it, or both.
+ */
+void SIG_MovieSettingsDialog::slotUpdateFrameFit()
 {
-	if(on){
-		connect( (QObject *)spinboxWidth, SIGNAL( valueChanged(int) ), this, SLOT( slotSetHeight(int) ) );
-		connect( (QObject *)spinboxHeight, SIGNAL( valueChanged(int) ), this, SLOT( slotSetWidth(int) ) );
-	} else {
-		disconnect( (QObject *)spinboxWidth, SIGNAL( valueChanged(int) ), this, SLOT( slotSetHeight(int) ) );
-		disconnect( (QObject *)spinboxHeight, SIGNAL( valueChanged(int) ), this, SLOT( slotSetWidth(int) ) );
-	}
-};
+  bool clipped = viewWidth > spinboxWidth->value()
+    || viewHeight > spinboxHeight->value();
+  bool letterboxed = viewWidth < spinboxWidth->value()
+    || viewHeight < spinboxHeight->value();
 
-void SIG_MovieSettingsDialog::slotSetHeight(int nWidth)
-{
-	disconnect( (QObject *)spinboxHeight, SIGNAL( valueChanged(int) ), this, SLOT( slotSetWidth(int) ) );
-	spinboxHeight->setValue( (int) ((double) nWidth / ratio));
-	connect( (QObject *)spinboxHeight, SIGNAL( valueChanged(int) ), this, SLOT( slotSetWidth(int) ) );
-};
-
-void SIG_MovieSettingsDialog::slotSetWidth(int nHeight)
-{
-	disconnect( (QObject *)spinboxWidth, SIGNAL( valueChanged(int) ), this, SLOT( slotSetHeight(int) ) );
-	spinboxWidth->setValue( (int) ((double) nHeight * ratio));
-	connect( (QObject *)spinboxWidth, SIGNAL( valueChanged(int) ), this, SLOT( slotSetHeight(int) ) );
+  if ( clipped && letterboxed )
+    textlabelFrameFit->setText( "Rendered frames will be clipped and letterboxed." );
+  else if ( clipped )
+    textlabelFrameFit->setText( "Rendered frames will be clipped." );
+  else if ( letterboxed )
+    textlabelFrameFit->setText( "Rendered frames will be letterboxed." );
+  else
+    textlabelFrameFit->clear();
 };
 
 }

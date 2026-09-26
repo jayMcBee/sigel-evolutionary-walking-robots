@@ -37,14 +37,13 @@ public:
 
 public slots:
     void slotToolButtonClicked();
-    void slotSetHeight(int nWidth);
-    void slotSetWidth(int nHeight);
-    void slotChangedAspectRatio(bool on);
+
+private slots:
+    void slotUpdateFrameFit();
 
 private:
-	int scrWidth;
-	int scrHeight;
-	double ratio;
+    int viewWidth;
+    int viewHeight;
 
 };
 

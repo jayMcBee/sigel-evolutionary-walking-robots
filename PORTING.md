@@ -903,8 +903,27 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-09-26 — DONE: ITEM 100b, A MOVIE FRAME IS EXACTLY THE OUTPUT SIZE.**
+Start here.
+
+- **Changed, by decision:** `SIG_SimulationVisualisationWidget::callRenderPixMap`
+  copies the view pixel for pixel into a frame of the output size: a larger
+  view is cut to its centre, a smaller one is centred on black. It never
+  scales. Before, the default path scaled a centre band of the view, "Keep
+  aspect ratio" stretched the whole view, and "Crop image" saved a frame of
+  a different size. Both check boxes are gone, with `keepRatio`,
+  `cropImage`, the three aspect-ratio slots and the dialog's ratio members.
+  The output width and height start at, and cannot go below, 512. "Current
+  view size" shows framebuffer pixels. A label under it,
+  `textlabelFrameFit`, says whether frames will be clipped, letterboxed, or
+  both; `SIG_MovieSettingsDialog::slotUpdateFrameFit` sets it. Checked on the
+  desktop with a temporary preview of one frame, not committed.
+- **Gates:** run after the commit.
+- **Next:** two buttons under the frame-fit label, "View Size to Movie"
+  and "Resize View to Match"; to be discussed first.
+
 **2026-09-26 — DONE: ITEM 100a, AND THE MOVIE SETTINGS DIALOG LAID OUT
-AGAIN.** Start here.
+AGAIN.**
 
 - **Changed:** the default movie size is 1280 × 720, in the
   `SIG_SimulationVisualisationWidget` constructor. The movie settings dialog

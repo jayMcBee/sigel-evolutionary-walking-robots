@@ -329,21 +329,21 @@ touched, because changing one changes behaviour against the reference binary.
 - [ ] **100. Movie recording: a usable size, a frame rate, and a movie at the
   end.** Decided 2026-09-26. Recording writes one image per recorded frame to
   `$SIGEL_ROOT/movie/`; the user is not told where, or how many. Each frame is
-  a copy of the on-screen view, scaled to the movie size by
+  a copy of the on-screen view, made by
   `SIG_SimulationVisualisationWidget::callRenderPixMap`. During Play one frame
-  advances the simulation by one step. Only these additions; all other
-  recording behaviour stays as it is. One commit per sub-item, in this order;
-  100a, the default size of 1280 × 720, is done.
-  - **100b.** When the movie settings dialog is accepted with recording on and the view
-    is smaller than the movie size, offer to resize the window so the view
-    fits. Check the screen's available area first; if the window would not
-    fit, say so instead of offering.
-  - **100c.** A frame rate field in the movie settings dialog, default 25 fps, in place
+  advances the simulation by one step. Only these changes; all other
+  recording behaviour stays as it is. One commit per sub-item, in this order.
+  Done: 100a, the default size of 1280 × 720; 100b, frames that are exactly
+  the output size, never scaled, cut or letterboxed in black, with the crop
+  and keep-ratio check boxes gone and a minimum of 512 × 512.
+  - Two buttons in a row under the frame-fit label of the movie settings
+    dialog: "View Size to Movie" and "Resize View to Match". To be discussed.
+  - A frame rate field in the movie settings dialog, default 25 fps, in place
     of the frequency field. Record every n-th frame, with
     `n = round(1 / (STEPSIZE × fps))` and at least 1. The dialog shows the
     actual rate, `1 / (STEPSIZE × n)`.
-  - **100d.** When recording stops, say how many frames were written and where.
-  - **100e.** If ffmpeg is present, offer to make an MP4 from the frames at the actual
+  - When recording stops, say how many frames were written and where.
+  - If ffmpeg is present, offer to make an MP4 from the frames at the actual
     rate, so the movie plays at simulation speed.
 
 ---
