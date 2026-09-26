@@ -376,9 +376,21 @@
 
 void SIG_SimulationVisualisationWidget::resetRecorder()
 {
+  if ( record )
+    reportRecordedFrames();
+
   record = false;
   currentFrame = 0;
   currentFrameName = 0;
+};
+
+void SIG_SimulationVisualisationWidget::reportRecordedFrames()
+{
+  if ( currentFrameName == 0 )
+    return;
+
+  QMessageBox::information( this, "Recording Stopped",
+			    QString( "%1 frames written to %2" ).arg( currentFrameName ).arg( movieDirectory ) );
 };
 
   bool SIG_SimulationVisualisationWidget::simulationRunning()
@@ -705,6 +717,9 @@ void SIG_SimulationVisualisationWidget::resetRecorder()
     switch( movieSettingsDialog.exec() )
       {
       case QDialog::Accepted:
+	if ( record && !movieSettingsDialog.checkboxEnableMovie->isChecked() )
+	  reportRecordedFrames();
+
 	movieWidth = movieSettingsDialog.spinboxWidth->value();
 	movieHeight = movieSettingsDialog.spinboxHeight->value();
 	movieFrameRate = movieSettingsDialog.spinboxFrameRate->value();

@@ -186,6 +186,12 @@
     private:
 
       /**
+       * Tells the user how many frames were written since the last Reset,
+       * and where, if there are any. Called when recording stops.
+       */
+      void reportRecordedFrames();
+
+      /**
        * The timer that controls the progress of the simulation.
        */
       QTimer *simulationTimer;

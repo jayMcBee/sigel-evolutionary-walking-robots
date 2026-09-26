@@ -326,20 +326,6 @@ touched, because changing one changes behaviour against the reference binary.
   where the time goes: the random programs, the list rebuild, or the
   sorted inserts into the list.
 
-- [ ] **100. Movie recording: a usable size, a frame rate, and a movie at the
-  end.** Decided 2026-09-26. Recording writes one image per recorded frame to
-  `$SIGEL_ROOT/movie/`; the user is not told where, or how many. Each frame is
-  a copy of the on-screen view, made by
-  `SIG_SimulationVisualisationWidget::callRenderPixMap`. During Play one frame
-  advances the simulation by one step. Only these changes; all other
-  recording behaviour stays as it is. One commit per sub-item, in this order.
-  Done: 100a, the default size, now 1024 × 576; 100b, frames that are exactly
-  the output size, never scaled, cut or letterboxed in black, with the crop
-  and keep-ratio check boxes gone and a minimum of 512 × 512; "View Size to
-  Movie" and "Resize View to Match" in the movie settings dialog; a frame
-  rate field, default 25 fps, in place of the frequency field.
-  - When recording stops, say how many frames were written and where.
-
 ---
 
 ## 8 · Cleanup
@@ -646,6 +632,9 @@ touched, because changing one changes behaviour against the reference binary.
   2026-09-27. If `ffmpeg` is present, offer to make an MP4 from the recorded
   frames at the frame rate the frames were taken at, so the movie plays at
   simulation speed. Image formats only; POV-Ray writes scene files.
+  Hook it into `SIG_SimulationVisualisationWidget::reportRecordedFrames`,
+  which every stop of a recording already calls; its "frames written"
+  message could become one combined message and question.
 
 - [ ] **104. Refuse a step size of 0 or less.** Found 2026-09-27; the
   step-size half of item 89. `SIG_SimulationVisualisationWidget::stepsPerFrame`

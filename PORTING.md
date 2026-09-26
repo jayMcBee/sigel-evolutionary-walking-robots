@@ -903,7 +903,19 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-27 — DONE: MOVIE FRAMES ARE SET BY A FRAME RATE.** Start here.
+**2026-09-27 — DONE: ITEM 100, A MESSAGE WHEN RECORDING STOPS.** Start
+here.
+
+- **Changed:** `SIG_SimulationVisualisationWidget::reportRecordedFrames`
+  shows "N frames written to <folder>" when recording stops: from the movie
+  settings dialog's OK branch when "Record frames" is unticked, and from
+  `resetRecorder` on Reset, each only if recording was on. N counts the
+  frames since the last Reset. Nothing is shown if no frame was written.
+  Item 100 is done; see "Done". Checked on the desktop.
+- **Gates:** run after the commit.
+- **Next:** item 105, the MP4 offer, hooks into `reportRecordedFrames`.
+
+**2026-09-27 — DONE: MOVIE FRAMES ARE SET BY A FRAME RATE.**
 
 - **Changed:** the movie settings dialog's "Frequency" box is "Frame rate":
   a spin box from 1 to 120 fps, default 25, in place of "Save every #
@@ -6094,6 +6106,22 @@ carried; other items and this file cite them, so they do not change.
   page, a label in the secondary text colour shows the description, or says
   that the experiment names a fitness function this build does not have.
   Remote ZORC is the last entry.
+
+- [x] **100. Movie recording: a usable size, a frame rate, and where the
+  frames went** — done 2026-09-27, in steps. The default movie size is
+  1024 × 576, and the output width and height go from 512 to 4096. Each frame
+  is exactly the output size: `SIG_SimulationVisualisationWidget::callRenderPixMap`
+  copies the view pixel for pixel, cut to its centre or letterboxed in
+  black, never scaled; "Crop image" and "Keep aspect ratio" are gone. The
+  movie settings dialog is laid out again, shows the view size and whether
+  frames will be clipped or letterboxed, and has "View Size to Movie" and
+  "Resize View to Match". A frame rate in fps, default 25, replaces the
+  frequency; the steps per frame are round(1 / (STEPSIZE × fps)), at least 1,
+  and the dialog shows them with the rate they give. When recording stops,
+  by unticking "Record frames" or by Reset, a message gives the number of
+  frames written since the last Reset and their folder. The offer of a
+  resized window on OK was replaced by the button; the MP4 offer became
+  item 105.
 
 - [x] **99. The viewer's Stop button is shown as a reset** — done
   2026-09-26. `SIG_SimulationVisualisationWidget::slotStopSimulation`
