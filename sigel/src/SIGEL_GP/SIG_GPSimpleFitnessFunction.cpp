@@ -29,20 +29,13 @@
 
 #include <qdatetime.h>
 
-SIGEL_GP::SIG_GPSimpleFitnessFunction::SIG_GPSimpleFitnessFunction(SIGEL_Program::SIG_Program & program,
-      SIGEL_Robot::SIG_Robot & rob,
-      SIGEL_Environment::SIG_Environment & environment,
-      SIGEL_Simulation::SIG_SimulationParameters & simparameter)
-  : SIG_GPFitnessFunction(program,
-      rob,
-      environment,
-      simparameter)
-{ };
-
 SIGEL_GP::SIG_GPSimpleFitnessFunction::~SIG_GPSimpleFitnessFunction()
 { };
 
-double SIGEL_GP::SIG_GPSimpleFitnessFunction::evalFitness() {
+double SIGEL_GP::SIG_GPSimpleFitnessFunction::evalFitness( SIGEL_Program::SIG_Program &program,
+                                                           SIGEL_Robot::SIG_Robot &rob,
+                                                           SIGEL_Environment::SIG_Environment &environment,
+                                                           SIGEL_Simulation::SIG_SimulationParameters &simparameter ) {
   SIGEL_GP::SIG_GPSimpleRecorder recorder;
 
   SIGEL_Simulation::SIG_Simulation *simulation = new SIGEL_Simulation::SIG_Simulation( rob,
@@ -61,9 +54,9 @@ double SIGEL_GP::SIG_GPSimpleFitnessFunction::evalFitness() {
 
   // delete simulation;
 
-  DL_vector startPosition = normalizeRobotPosition( recorder.start, recorder.startRotation );
+  DL_vector startPosition = normalizeRobotPosition( recorder.start, recorder.startRotation, rob );
 
-  DL_vector endPosition = normalizeRobotPosition( recorder.end, recorder.endRotation );
+  DL_vector endPosition = normalizeRobotPosition( recorder.end, recorder.endRotation, rob );
 
   if (isValid( endPosition.x ) && isValid( endPosition.y ) && isValid( endPosition.z )) {
     DL_vector distanceVector = endPosition;

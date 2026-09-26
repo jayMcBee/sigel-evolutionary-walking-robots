@@ -454,13 +454,9 @@ int main(int argc, char *argv[])
 
   SIGEL_GP::SIG_GPFitnessFunction *fitnessFunction = 0;
   if (name == "SimpleFitnessFunction")
-    fitnessFunction = new SIGEL_GP::SIG_GPSimpleFitnessFunction(
-        individual.getProgramVar(), robot,
-        experiment.environment, experiment.simulationParameter);
+    fitnessFunction = new SIGEL_GP::SIG_GPSimpleFitnessFunction();
   else if (name == "NiceWalkingFitnessFunction")
-    fitnessFunction = new SIGEL_GP::SIG_GPNiceWalkingFitnessFunction(
-        individual.getProgramVar(), robot,
-        experiment.environment, experiment.simulationParameter);
+    fitnessFunction = new SIGEL_GP::SIG_GPNiceWalkingFitnessFunction();
   else {
     fprintf(stderr, "%s names %s, which this program does not build\n",
             argv[1], qPrintable(name));
@@ -468,7 +464,9 @@ int main(int argc, char *argv[])
   }
 
   const double recorded = individual.getFitness();
-  const double fitness = fitnessFunction->evalFitness();
+  const double fitness = fitnessFunction->evalFitness(
+      individual.getProgramVar(), robot,
+      experiment.environment, experiment.simulationParameter);
 
   if (verbose) {
     // Re-run with a recorder we can read, to see the trajectory the fitness

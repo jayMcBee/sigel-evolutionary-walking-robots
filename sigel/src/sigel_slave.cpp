@@ -279,8 +279,8 @@ int main( int argc, char *argv[] ) {
 
       // if we use the RemoteZORC-Fitnessfunction: run evaluation to transmit the program !
       if (fitnessFunctionName == "RemoteZORCFitnessFunction") {
-        SIGEL_GP::SIG_GPFitnessFunction *fitFunc = new SIGEL_GP::SIG_GPRemoteZORCFitnessFunction( *program, *robot, *environment,	*simulationParameters );
-        fitFunc->evalFitness();
+        SIGEL_GP::SIG_GPFitnessFunction *fitFunc = new SIGEL_GP::SIG_GPRemoteZORCFitnessFunction();
+        fitFunc->evalFitness( *program, *robot, *environment, *simulationParameters );
       }
 
      try {
@@ -309,23 +309,23 @@ int main( int argc, char *argv[] ) {
 
 		// prepare using the SimpleFitlessFunction
       if (fitnessFunctionName == "SimpleFitnessFunction")
-				fitnessFunction = new SIGEL_GP::SIG_GPSimpleFitnessFunction( *program, *robot, *environment, *simulationParameters );
+				fitnessFunction = new SIGEL_GP::SIG_GPSimpleFitnessFunction();
 
 		// prepare using the RealSpeedFitnessFunction
       else if (fitnessFunctionName == "RealSpeedFitnessFunction")
-				fitnessFunction = new SIGEL_GP::SIG_GPRealSpeedFitnessFunction( *program, *robot, *environment, *simulationParameters );
+				fitnessFunction = new SIGEL_GP::SIG_GPRealSpeedFitnessFunction();
 
 		// prepare using the NiceWalkingFitnessFunction
       else if (fitnessFunctionName == "NiceWalkingFitnessFunction")
-				fitnessFunction = new SIGEL_GP::SIG_GPNiceWalkingFitnessFunction( *program, *robot, *environment, *simulationParameters );
+				fitnessFunction = new SIGEL_GP::SIG_GPNiceWalkingFitnessFunction();
 
 		// prepare using the AdaptiveWalkingFitnessFunction
       else if (fitnessFunctionName == "ZorcWalkingFitnessFunction")
-				fitnessFunction = new SIGEL_GP::SIG_GPAdaptiveWalkingFitnessFunction( *program, *robot, *environment, *simulationParameters );
+				fitnessFunction = new SIGEL_GP::SIG_GPAdaptiveWalkingFitnessFunction();
 
       // prepare for using the ForceFitnessFunction
      else if (fitnessFunctionName == "ForceFitnessFunction")
-  			fitnessFunction = new SIGEL_GP::SIG_GPForceFitnessFunction( *program, *robot, *environment, *simulationParameters );
+  			fitnessFunction = new SIGEL_GP::SIG_GPForceFitnessFunction();
 
 		// prepare to use RemoteZORC-Fitnessfunction, need GUI for requesters
 		else if (fitnessFunctionName == "RemoteZORCFitnessFunction") {
@@ -336,7 +336,7 @@ int main( int argc, char *argv[] ) {
 				app->setStyle( QStyleFactory::create( "Fusion" ) );
 #endif			
 
-				fitnessFunction = new SIGEL_GP::SIG_GPRemoteZORCFitnessFunction( *program, *robot, *environment,	*simulationParameters );
+				fitnessFunction = new SIGEL_GP::SIG_GPRemoteZORCFitnessFunction();
 	  	}
 
 		// whoopsie !
@@ -347,7 +347,7 @@ int main( int argc, char *argv[] ) {
       fitnessFunction->setResetEveryGeneration(resetEveryGeneration);
       if (fitnessFunction) {
         try {
-          fitnessValue = fitnessFunction->evalFitness();
+          fitnessValue = fitnessFunction->evalFitness( *program, *robot, *environment, *simulationParameters );
           delete fitnessFunction;
         }
         catch (SIGEL_Tools::SIG_Exception &e) {

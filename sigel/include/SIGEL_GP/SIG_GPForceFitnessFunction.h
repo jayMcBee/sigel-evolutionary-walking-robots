@@ -38,30 +38,6 @@ class SIG_GPForceFitnessFunction : public SIG_GPFitnessFunction
 {
 
 /**
- * The function, which creates the object of a fitnessfunction with the needed data,
- * for the simulationrun.
- * @pre
- * The parameters has to be set, the GPFitnesstrainer takes controll about the
- * PVM-process.
- * @post
- * An object of the FitnessFunction is created and the parameters are set to the attributes.
- * @param ind
- * The individual, which contains the robot controll program.
- * @param robot
- * The robot architecture of the robot, on which the robot controll
- * program shall be executed
- * @param environment
- * The environment of the simulationrun.
- * @param simparameter
- * Parameters for the simulationrun.
-  */
- public:
-  SIG_GPForceFitnessFunction(SIGEL_Program::SIG_Program & program,
-			      SIGEL_Robot::SIG_Robot & rob,
-			      SIGEL_Environment::SIG_Environment &  environment,
-			      SIGEL_Simulation::SIG_SimulationParameters & simparameter);
-
-/**
  * The destructor of the fitnessfunction.
  * @pre
  * The computation of the fitnessvalue is done.
@@ -76,7 +52,7 @@ virtual ~SIG_GPForceFitnessFunction();
  * This operation activates the computation of the fitnessvalue. It is virtual, this means
  * that the implemantation is for every fitnessfunction different.
  * @pre
- * An object of the fitnessfunction is created, the needed datas are set and everything is ready to run.
+ * An object of the fitnessfunction is created and everything is ready to run.
  * @post
  * The fitnessvalue is computed and returned, the object of the fitness function is destructed.
  * @return
@@ -84,7 +60,10 @@ virtual ~SIG_GPForceFitnessFunction();
  * the double is -1.
  */
 public:
-double evalFitness();
+double evalFitness( SIGEL_Program::SIG_Program &program,
+                    SIGEL_Robot::SIG_Robot &rob,
+                    SIGEL_Environment::SIG_Environment &environment,
+                    SIGEL_Simulation::SIG_SimulationParameters &simparameter );
 
 QString serializedId() const { return "ForceFitnessFunction"; }
 

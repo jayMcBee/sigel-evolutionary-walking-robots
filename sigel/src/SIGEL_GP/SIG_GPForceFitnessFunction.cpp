@@ -32,22 +32,14 @@
 #include <math.h>
 #include <qdatetime.h>
 
-SIGEL_GP::SIG_GPForceFitnessFunction::SIG_GPForceFitnessFunction(SIGEL_Program::SIG_Program & program,
-      SIGEL_Robot::SIG_Robot & rob,
-      SIGEL_Environment::SIG_Environment & environment,
-      SIGEL_Simulation::SIG_SimulationParameters & simparameter)
- : SIG_GPFitnessFunction(program,
-      rob,
-      environment,
-      simparameter)
-{
-};
-
 SIGEL_GP::SIG_GPForceFitnessFunction::~SIG_GPForceFitnessFunction() {
 
 };
 
-double SIGEL_GP::SIG_GPForceFitnessFunction::evalFitness() {
+double SIGEL_GP::SIG_GPForceFitnessFunction::evalFitness( SIGEL_Program::SIG_Program &program,
+                                                          SIGEL_Robot::SIG_Robot &rob,
+                                                          SIGEL_Environment::SIG_Environment &environment,
+                                                          SIGEL_Simulation::SIG_SimulationParameters &simparameter ) {
   SIGEL_GP::SIG_GPFullDataRecorder recorder(1);
 
   SIGEL_Simulation::SIG_Simulation *simulation = new SIGEL_Simulation::SIG_Simulation( rob, environment, program, simparameter, recorder );
@@ -69,8 +61,8 @@ double SIGEL_GP::SIG_GPForceFitnessFunction::evalFitness() {
 
   // delete simulation;
 
-    DL_vector realStartPosition = normalizeRobotPosition( *recorder.positions.value( 0 ),  *recorder.rotations.value( 0 ) );
-    DL_vector realEndPosition = normalizeRobotPosition( recorder.endPosition, recorder.endRotation );
+    DL_vector realStartPosition = normalizeRobotPosition( *recorder.positions.value( 0 ),  *recorder.rotations.value( 0 ), rob );
+    DL_vector realEndPosition = normalizeRobotPosition( recorder.endPosition, recorder.endRotation, rob );
 
     double const optimalHeight = realStartPosition.y;
     double const minimalHeight = optimalHeight - toleranceBandWidth;
@@ -155,7 +147,7 @@ double SIGEL_GP::SIG_GPForceFitnessFunction::evalFitness() {
     DL_matrix *actRotation = recorder.rotations.value( recIdx );
 
     while (actPosition) {
-      DL_vector actRealPosition = normalizeRobotPosition( *actPosition, *actRotation );
+      DL_vector actRealPosition = normalizeRobotPosition( *actPosition, *actRotation, rob );
 
       if ( !(isValid( actRealPosition.x ) && isValid( actRealPosition.y ) && isValid( actRealPosition.z )) ) {
         fitness = 0;

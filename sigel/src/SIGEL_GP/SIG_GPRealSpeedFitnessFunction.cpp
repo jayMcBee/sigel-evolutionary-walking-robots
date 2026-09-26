@@ -28,20 +28,13 @@
 namespace SIGEL_GP
 {
 
-  SIG_GPRealSpeedFitnessFunction::SIG_GPRealSpeedFitnessFunction( SIGEL_Program::SIG_Program &program,
-								  SIGEL_Robot::SIG_Robot &robot,
-								  SIGEL_Environment::SIG_Environment &environment,
-								  SIGEL_Simulation::SIG_SimulationParameters & simulationParameters )
-    : SIG_GPFitnessFunction( program,
-			     robot,
-			     environment,
-			     simulationParameters )
-  { };
-
   SIG_GPRealSpeedFitnessFunction::~SIG_GPRealSpeedFitnessFunction()
   { };
 
-  double SIG_GPRealSpeedFitnessFunction::evalFitness() {
+  double SIG_GPRealSpeedFitnessFunction::evalFitness( SIGEL_Program::SIG_Program &program,
+                                                      SIGEL_Robot::SIG_Robot &rob,
+                                                      SIGEL_Environment::SIG_Environment &environment,
+                                                      SIGEL_Simulation::SIG_SimulationParameters &simparameter ) {
     double const recordingRate = 0.5;
 
     int const recordingFrequency = int( recordingRate / simparameter.getStepSize() );
@@ -79,10 +72,10 @@ namespace SIGEL_GP
     DL_vector *actPosition = recorder.positions.value( recIdx );
     DL_matrix *actRotation = recorder.rotations.value( recIdx );
 
-    DL_vector lastRealPosition = normalizeRobotPosition( *actPosition, *actRotation );
+    DL_vector lastRealPosition = normalizeRobotPosition( *actPosition, *actRotation, rob );
 
     while (actPosition) {
-      DL_vector actRealPosition = normalizeRobotPosition( *actPosition, *actRotation );
+      DL_vector actRealPosition = normalizeRobotPosition( *actPosition, *actRotation, rob );
 
       if (isValid( actRealPosition.x ) && isValid( actRealPosition.y ) && isValid( actRealPosition.z )) {
         DL_vector localDistanceVector = actRealPosition;

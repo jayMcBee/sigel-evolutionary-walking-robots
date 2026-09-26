@@ -43,59 +43,6 @@ namespace SIGEL_GP
  */
 class SIG_GPFitnessFunction{
 
-  /**
-   * The individual, which conatins the robot control program.
-   *
-   */
- protected:
-SIGEL_Program::SIG_Program & program;
-
-  /**
-   * The robot artichecture on which the robot control program shall be executed.
-   *
-   */
- protected:
-SIGEL_Robot::SIG_Robot & rob;
-
-  /**
-   * The environment for the simulation run.
-   *
-   */
- protected:
-SIGEL_Environment::SIG_Environment & environment;
-
-  /**
-   * The simulation parameter for the simulation run.
-   *
-   */
- protected:
-SIGEL_Simulation::SIG_SimulationParameters & simparameter;
-
-
-/**
- * The function, which creates the object of a fitnessfunction with the needed data,
- * for the simulationrun.
- * @pre
- * The parameters has to be set, the GPFitnesstrainer takes controll about the
- * PVM-process. 
- * @post
- * An object of the FitnessFunction is created and the parameters are set to the attributes.
- * @param ind
- * The individual, which contains the robot controll program.
- * @param robot
- * The robot architecture of the robot, on which the robot controll
- * program shall be executed
- * @param environment
- * The environment of the simulationrun.
- * @param simparameter
- * Parameters for the simulationrun.
- */
- public: 
- SIG_GPFitnessFunction(SIGEL_Program::SIG_Program & program,
-		       SIGEL_Robot::SIG_Robot & rob,
-		       SIGEL_Environment::SIG_Environment &   environment,
-		       SIGEL_Simulation::SIG_SimulationParameters & simparameter);
-
 /**
  * The destructor of the fitnessfunction.
  * @pre 
@@ -111,15 +58,26 @@ SIGEL_Simulation::SIG_SimulationParameters & simparameter;
  * This operation activates the computation of the fitnessvalue. It is virtual, this means 
  * that the implemantation is for every fitnessfunction different. 
  * @pre 
- * An object of the fitnessfunction is created, the needed datas are set and everything is ready to run.
+ * An object of the fitnessfunction is created and everything is ready to run.
  * @post
  * The fitnessvalue is computed and returned, the object of the fitness function is destructed.
+ * @param program
+ * The individual's robot control program.
+ * @param rob
+ * The robot architecture on which the robot control program is executed.
+ * @param environment
+ * The environment of the simulation run.
+ * @param simparameter
+ * Parameters for the simulation run.
  * @return
  * A double is returned, which represents the fitnessvalue. If an error has occurred, the returnvalue of 
  * the double is -1.
  */
  public:
- virtual double evalFitness()=0;
+ virtual double evalFitness( SIGEL_Program::SIG_Program &program,
+                             SIGEL_Robot::SIG_Robot &rob,
+                             SIGEL_Environment::SIG_Environment &environment,
+                             SIGEL_Simulation::SIG_SimulationParameters &simparameter ) = 0;
 
 /**
  * The key of this fitness function in experiment files and in the PVM data.
@@ -136,7 +94,7 @@ SIGEL_Simulation::SIG_SimulationParameters & simparameter;
  bool isValid( double value );
 
  protected:
- DL_vector normalizeRobotPosition( DL_vector originalPosition,  DL_matrix actualRobotRotation );
+ DL_vector normalizeRobotPosition( DL_vector originalPosition,  DL_matrix actualRobotRotation, const SIGEL_Robot::SIG_Robot &rob );
 
  /**
   * This variable holds the actual Generation.

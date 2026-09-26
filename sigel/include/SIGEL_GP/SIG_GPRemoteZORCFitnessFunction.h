@@ -46,16 +46,6 @@ namespace SIGEL_GP
     public:
 
     /**
-      * The constructor. Environment and Simulationparameters must be assigned
-      * but will not be used since the simulation isn't invoked for this
-      * fitness function.
-      */
-      SIG_GPRemoteZORCFitnessFunction( SIGEL_Program::SIG_Program &program,
-                                       SIGEL_Robot::SIG_Robot &robot,
-                                       SIGEL_Environment::SIG_Environment &environment,
-                                       SIGEL_Simulation::SIG_SimulationParameters & simulationParameters );
-
-    /**
       * The desctructor.
       */
       ~SIG_GPRemoteZORCFitnessFunction();
@@ -71,7 +61,10 @@ namespace SIGEL_GP
 		* actually connected. Lot's of additional checks should help to locate errors
 		* when something else goes wrong.
       */
-      double   evalFitness();
+      double   evalFitness( SIGEL_Program::SIG_Program &program,
+                            SIGEL_Robot::SIG_Robot &rob,
+                            SIGEL_Environment::SIG_Environment &environment,
+                            SIGEL_Simulation::SIG_SimulationParameters &simparameter );
 
       QString  serializedId() const { return "RemoteZORCFitnessFunction"; }
 

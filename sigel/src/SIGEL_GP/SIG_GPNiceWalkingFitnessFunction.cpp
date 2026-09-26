@@ -28,20 +28,13 @@
 namespace SIGEL_GP
 {
 
-  SIG_GPNiceWalkingFitnessFunction::SIG_GPNiceWalkingFitnessFunction( SIGEL_Program::SIG_Program &program,
-								  SIGEL_Robot::SIG_Robot &robot,
-								  SIGEL_Environment::SIG_Environment &environment,
-								  SIGEL_Simulation::SIG_SimulationParameters & simulationParameters )
-    : SIG_GPFitnessFunction( program,
-			     robot,
-			     environment,
-			     simulationParameters )
-  { };
-
   SIG_GPNiceWalkingFitnessFunction::~SIG_GPNiceWalkingFitnessFunction()
   { };
 
-  double SIG_GPNiceWalkingFitnessFunction::evalFitness()
+  double SIG_GPNiceWalkingFitnessFunction::evalFitness( SIGEL_Program::SIG_Program &program,
+                                                        SIGEL_Robot::SIG_Robot &rob,
+                                                        SIGEL_Environment::SIG_Environment &environment,
+                                                        SIGEL_Simulation::SIG_SimulationParameters &simparameter )
   {
     double const toleranceBandWidth = 0.5;
 
@@ -65,10 +58,10 @@ namespace SIGEL_GP
     // delete simulation;
 
     DL_vector realStartPosition = normalizeRobotPosition( *recorder.positions.value( 0 ),
-							  *recorder.rotations.value( 0 ) );
+							  *recorder.rotations.value( 0 ), rob );
 
     DL_vector realEndPosition = normalizeRobotPosition( recorder.endPosition,
-							recorder.endRotation );
+							recorder.endRotation, rob );
 
     double const optimalHeight = realStartPosition.y;
 
@@ -100,7 +93,7 @@ namespace SIGEL_GP
     while (actPosition)
       {
 	DL_vector actRealPosition = normalizeRobotPosition( *actPosition,
-							    *actRotation );
+							    *actRotation, rob );
 
 	if ( !(isValid( actRealPosition.x ) && isValid( actRealPosition.y ) && isValid( actRealPosition.z )) )
 	  {

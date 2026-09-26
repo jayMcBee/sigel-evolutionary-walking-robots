@@ -37,14 +37,12 @@ namespace SIGEL_GP
 
     public:
 
-      SIG_GPAdaptiveWalkingFitnessFunction( SIGEL_Program::SIG_Program &program,
-				      SIGEL_Robot::SIG_Robot &robot,
-				      SIGEL_Environment::SIG_Environment &environment,
-				      SIGEL_Simulation::SIG_SimulationParameters & simulationParameters );
-
       ~SIG_GPAdaptiveWalkingFitnessFunction();
 
-      double evalFitness();
+      double evalFitness( SIGEL_Program::SIG_Program &program,
+                          SIGEL_Robot::SIG_Robot &rob,
+                          SIGEL_Environment::SIG_Environment &environment,
+                          SIGEL_Simulation::SIG_SimulationParameters &simparameter );
 
       // Experiment files store this ID for Adaptive Walking.
       QString serializedId() const { return "ZorcWalkingFitnessFunction"; }

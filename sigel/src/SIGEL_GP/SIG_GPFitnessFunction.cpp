@@ -24,18 +24,6 @@
 
 #include <cmath>
 
-SIGEL_GP::SIG_GPFitnessFunction::SIG_GPFitnessFunction(
-SIGEL_Program::SIG_Program & pprogram, 
-SIGEL_Robot::SIG_Robot & prob,
-SIGEL_Environment::SIG_Environment & penvironment, 
-SIGEL_Simulation::SIG_SimulationParameters & psimparameter) : 
-  program(pprogram),
-  rob(prob),
-  environment(penvironment),
-  simparameter(psimparameter)
-  
-{};
-
 SIGEL_GP::SIG_GPFitnessFunction::~SIG_GPFitnessFunction() {};
 
 bool SIGEL_GP::SIG_GPFitnessFunction::isValid( double value )
@@ -44,7 +32,8 @@ bool SIGEL_GP::SIG_GPFitnessFunction::isValid( double value )
 };
 
 DL_vector SIGEL_GP::SIG_GPFitnessFunction::normalizeRobotPosition( DL_vector originalPosition,
-								   DL_matrix actualRobotRotation )
+								   DL_matrix actualRobotRotation,
+								   const SIGEL_Robot::SIG_Robot &rob )
 {
   DL_vector robotsRealOrigin = rob.initialLocation;
   robotsRealOrigin.timesis( -1 );

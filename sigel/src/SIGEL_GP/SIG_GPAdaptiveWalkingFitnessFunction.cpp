@@ -29,20 +29,13 @@
 namespace SIGEL_GP
 {
 
-  SIG_GPAdaptiveWalkingFitnessFunction::SIG_GPAdaptiveWalkingFitnessFunction( SIGEL_Program::SIG_Program &program,
-								  SIGEL_Robot::SIG_Robot &robot,
-								  SIGEL_Environment::SIG_Environment &environment,
-								  SIGEL_Simulation::SIG_SimulationParameters & simulationParameters )
-    : SIG_GPFitnessFunction( program,
-			     robot,
-			     environment,
-			     simulationParameters )
-  { };
-
   SIG_GPAdaptiveWalkingFitnessFunction::~SIG_GPAdaptiveWalkingFitnessFunction()
   { };
 
-  double SIG_GPAdaptiveWalkingFitnessFunction::evalFitness()
+  double SIG_GPAdaptiveWalkingFitnessFunction::evalFitness( SIGEL_Program::SIG_Program &program,
+                                                            SIGEL_Robot::SIG_Robot &rob,
+                                                            SIGEL_Environment::SIG_Environment &environment,
+                                                            SIGEL_Simulation::SIG_SimulationParameters &simparameter )
   {
     double  fitness   = 0,
             avgHeight = 0,
@@ -69,10 +62,10 @@ namespace SIGEL_GP
     steps = simulation->getMaxRecorderSteps(100);
 
     DL_vector realStartPosition = normalizeRobotPosition( *recorder.positions.value( 0 ),
-							  *recorder.rotations.value( 0 ) );
+							  *recorder.rotations.value( 0 ), rob );
 
     DL_vector realEndPosition = normalizeRobotPosition( recorder.endPosition,
-							recorder.endRotation );
+							recorder.endRotation, rob );
 
     double const startHeight = realStartPosition.y;
 
@@ -101,7 +94,7 @@ namespace SIGEL_GP
         // iterate through recorded positions and evaluate !
     while (actPosition)
 		{
-			DL_vector actRealPosition = normalizeRobotPosition( *actPosition, *actRotation );
+			DL_vector actRealPosition = normalizeRobotPosition( *actPosition, *actRotation, rob );
 
 			if ( !(isValid( actRealPosition.x ) && isValid( actRealPosition.y ) && isValid( actRealPosition.z )) )
 	  	{

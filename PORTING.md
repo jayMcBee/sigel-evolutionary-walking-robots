@@ -903,7 +903,25 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-26 — DONE: FITNESS FUNCTIONS NAME THEIR OWN ID.** Start here.
+**2026-09-26 — DONE: evalFitness TAKES THE FOUR OBJECTS.** Start here.
+
+- **Changed:** the fitness functions no longer store the program, robot,
+  environment and simulation parameters. `evalFitness` takes them as
+  parameters with the old member names, so the bodies are unchanged. The
+  constructors are gone. `normalizeRobotPosition` takes the robot as its
+  last parameter. The slave and `sigel_eval` pass the same four objects as
+  before. Remote ZORC does not use the environment, so its definition leaves
+  that parameter unnamed. This is step 2 of item 85.
+- **Baselines:** unchanged. `fitness-check.sh` is identical to its baseline.
+  It measures only Simple and NiceWalking, the two functions the experiments
+  use. For RealSpeed, AdaptiveWalking and Force the review confirmed that
+  the bodies are unchanged apart from the robot argument.
+- **Review:** no defects. One stale doc phrase, "the needed datas are set",
+  was removed from three `evalFitness` comments.
+- **Gates:** `check.sh` 938 pass, 0 fail; warnings 487.
+- **Next:** item 85, step 3: the registry and the master side.
+
+**2026-09-26 — DONE: FITNESS FUNCTIONS NAME THEIR OWN ID.**
 
 - **Changed:** `SIG_GPFitnessFunction` has a pure virtual `serializedId()`.
   It replaces the public member `name` and the constructor's string
@@ -916,8 +934,7 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 - **Review:** one finding, three blank lines in a row in the base header;
   fixed.
 - **Gates:** `check.sh` 938 pass, 0 fail; warnings 487.
-- **Next:** item 85, the four objects move from the constructor to
-  `evalFitness`.
+- **Next:** item 85, step 2.
 
 **2026-09-26 — DONE: IMPORT > LANGUAGE PARAMETERS CATCHES A BAD FILE.**
 

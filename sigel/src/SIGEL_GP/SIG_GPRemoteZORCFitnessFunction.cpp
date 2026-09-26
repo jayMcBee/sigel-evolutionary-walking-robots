@@ -30,24 +30,15 @@
 namespace SIGEL_GP
 {
 
-   SIG_GPRemoteZORCFitnessFunction::SIG_GPRemoteZORCFitnessFunction( SIGEL_Program::SIG_Program &program,
-								  SIGEL_Robot::SIG_Robot &robot,
-								  SIGEL_Environment::SIG_Environment &environment,
-								  SIGEL_Simulation::SIG_SimulationParameters & simulationParameters )
-    : SIG_GPFitnessFunction( program,
-			     robot,
-			     environment,
-			     simulationParameters )
-   {  // nothing
-   }
-
-
    SIG_GPRemoteZORCFitnessFunction::~SIG_GPRemoteZORCFitnessFunction()
    {  // nothing
    }
 
 
-   double SIG_GPRemoteZORCFitnessFunction::evalFitness()
+   double SIG_GPRemoteZORCFitnessFunction::evalFitness( SIGEL_Program::SIG_Program &program,
+                                                        SIGEL_Robot::SIG_Robot &rob,
+                                                        SIGEL_Environment::SIG_Environment &,
+                                                        SIGEL_Simulation::SIG_SimulationParameters &simparameter )
    {  double   fitness  = 0,
                distance = 0;
       QString  expInstruct,
