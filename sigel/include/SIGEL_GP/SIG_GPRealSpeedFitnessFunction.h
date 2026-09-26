@@ -42,7 +42,7 @@ namespace SIGEL_GP
 
       double evalFitness();
 
-      QString serializedId() const;
+      QString serializedId() const { return "RealSpeedFitnessFunction"; }
 
     };
 

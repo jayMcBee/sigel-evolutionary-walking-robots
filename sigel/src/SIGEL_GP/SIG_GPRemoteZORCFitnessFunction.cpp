@@ -47,11 +47,6 @@ namespace SIGEL_GP
    }
 
 
-   QString SIG_GPRemoteZORCFitnessFunction::serializedId() const
-   {
-     return "RemoteZORCFitnessFunction";
-   }
-
    double SIG_GPRemoteZORCFitnessFunction::evalFitness()
    {  double   fitness  = 0,
                distance = 0;

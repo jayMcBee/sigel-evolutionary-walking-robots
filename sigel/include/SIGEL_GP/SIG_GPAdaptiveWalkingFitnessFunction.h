@@ -46,7 +46,8 @@ namespace SIGEL_GP
 
       double evalFitness();
 
-      QString serializedId() const;
+      // Experiment files store this ID for Adaptive Walking.
+      QString serializedId() const { return "ZorcWalkingFitnessFunction"; }
 
     };
 

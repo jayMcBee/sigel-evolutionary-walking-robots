@@ -41,11 +41,6 @@ namespace SIGEL_GP
   SIG_GPNiceWalkingFitnessFunction::~SIG_GPNiceWalkingFitnessFunction()
   { };
 
-  QString SIG_GPNiceWalkingFitnessFunction::serializedId() const
-  {
-    return "NiceWalkingFitnessFunction";
-  }
-
   double SIG_GPNiceWalkingFitnessFunction::evalFitness()
   {
     double const toleranceBandWidth = 0.5;

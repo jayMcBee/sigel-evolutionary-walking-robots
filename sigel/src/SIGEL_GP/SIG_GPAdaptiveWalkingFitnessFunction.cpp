@@ -42,12 +42,6 @@ namespace SIGEL_GP
   SIG_GPAdaptiveWalkingFitnessFunction::~SIG_GPAdaptiveWalkingFitnessFunction()
   { };
 
-  // Experiment files store this ID for Adaptive Walking.
-  QString SIG_GPAdaptiveWalkingFitnessFunction::serializedId() const
-  {
-    return "ZorcWalkingFitnessFunction";
-  }
-
   double SIG_GPAdaptiveWalkingFitnessFunction::evalFitness()
   {
     double  fitness   = 0,

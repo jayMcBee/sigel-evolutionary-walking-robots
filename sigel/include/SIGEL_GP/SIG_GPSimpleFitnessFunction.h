@@ -86,7 +86,7 @@ class SIG_GPSimpleFitnessFunction : public SIG_GPFitnessFunction
 public:
 double evalFitness();
 
-QString serializedId() const;
+QString serializedId() const { return "SimpleFitnessFunction"; }
 
 };
 }

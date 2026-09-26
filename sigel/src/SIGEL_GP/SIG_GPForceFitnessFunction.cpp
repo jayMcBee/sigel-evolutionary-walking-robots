@@ -47,11 +47,6 @@ SIGEL_GP::SIG_GPForceFitnessFunction::~SIG_GPForceFitnessFunction() {
 
 };
 
-QString SIGEL_GP::SIG_GPForceFitnessFunction::serializedId() const
-{
-  return "ForceFitnessFunction";
-}
-
 double SIGEL_GP::SIG_GPForceFitnessFunction::evalFitness() {
   SIGEL_GP::SIG_GPFullDataRecorder recorder(1);
 

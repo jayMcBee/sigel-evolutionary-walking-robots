@@ -909,8 +909,9 @@ classes and leave truncation a hard error. **They are not interchangeable.**
   It replaces the public member `name` and the constructor's string
   parameter; nothing read `name`. Each of the six classes returns the string
   its constructor passed before. Adaptive Walking returns
-  "ZorcWalkingFitnessFunction", the ID that experiment files store. This is
-  the first step of item 85, with 84 and 83.
+  "ZorcWalkingFitnessFunction", the ID that experiment files store. The six
+  getters are inline in the class declarations. This is the first step of
+  item 85, with 84 and 83.
 - **Baselines:** unchanged. `fitness-check.sh` is identical to its baseline.
 - **Review:** one finding, three blank lines in a row in the base header;
   fixed.

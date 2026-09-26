@@ -73,7 +73,7 @@ namespace SIGEL_GP
       */
       double   evalFitness();
 
-      QString  serializedId() const;
+      QString  serializedId() const { return "RemoteZORCFitnessFunction"; }
 
     /**
       * This method sends all data contained in the QString object over the

@@ -86,7 +86,7 @@ virtual ~SIG_GPForceFitnessFunction();
 public:
 double evalFitness();
 
-QString serializedId() const;
+QString serializedId() const { return "ForceFitnessFunction"; }
 
 };
 }
