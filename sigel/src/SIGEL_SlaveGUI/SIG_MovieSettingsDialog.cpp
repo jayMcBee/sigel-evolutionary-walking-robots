@@ -21,6 +21,7 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 #include "SIGEL_SlaveGUI/SIG_MovieSettingsDialog.h"
+#include "SIGEL_SlaveGUI/SIG_SimulationVisualisationWidget.h"
 #include <QFileDialog>
 #include <QLabel>
 #include <QSpinBox>
@@ -38,11 +39,13 @@ namespace SIGEL_SlaveGUI
  *  The dialog will by default be modeless, unless you set 'modal' to
  *  TRUE to construct a modal dialog.
  */
-SIG_MovieSettingsDialog::SIG_MovieSettingsDialog( QWidget *view, QWidget* parent,  const char* name, bool modal, Qt::WindowFlags fl )
+SIG_MovieSettingsDialog::SIG_MovieSettingsDialog( QWidget *view, double stepSize, QWidget* parent,  const char* name, bool modal, Qt::WindowFlags fl )
     : SIG_MovieSettingsDialogBase( parent, name, modal, fl ),
-      view( view )
+      view( view ),
+      stepSize( stepSize )
 {
 	textlabelFrameFit->setForegroundRole( QPalette::PlaceholderText );
+	textlabelStepsPerFrame->setForegroundRole( QPalette::PlaceholderText );
 
 	// A maximised window keeps its size, so the resize would do nothing.
 	if ( view->window()->isMaximized() || view->window()->isFullScreen() )
@@ -55,11 +58,13 @@ SIG_MovieSettingsDialog::SIG_MovieSettingsDialog( QWidget *view, QWidget* parent
 	connect( spinboxHeight, SIGNAL( valueChanged(int) ), this, SLOT( slotUpdateSizeLabels() ) );
 	connect( pushbuttonViewSizeToMovie, SIGNAL( clicked() ), this, SLOT( slotViewSizeToMovie() ) );
 	connect( pushbuttonResizeViewToMatch, SIGNAL( clicked() ), this, SLOT( slotResizeViewToMatch() ) );
+	connect( spinboxFrameRate, SIGNAL( valueChanged(int) ), this, SLOT( slotUpdateStepsPerFrame() ) );
 
 	// The window manager resizes the window later, so the labels follow
 	// the view's own resize events.
 	view->installEventFilter( this );
 	slotUpdateSizeLabels();
+	slotUpdateStepsPerFrame();
 };
 
 /*  
@@ -119,6 +124,21 @@ void SIG_MovieSettingsDialog::slotUpdateSizeLabels()
     textlabelFrameFit->setText( "Rendered frames will be letterboxed." );
   else
     textlabelFrameFit->clear();
+};
+
+/*
+ * Shows how many simulation steps a frame covers at the chosen frame rate,
+ * and the rate that gives.
+ */
+void SIG_MovieSettingsDialog::slotUpdateStepsPerFrame()
+{
+  int steps = SIG_SimulationVisualisationWidget::stepsPerFrame( stepSize, spinboxFrameRate->value() );
+  QString rate = QString::number( 1.0 / ( stepSize * steps ), 'f', 2 );
+
+  if ( steps == 1 )
+    textlabelStepsPerFrame->setText( "One frame every simulation step, " + rate + " fps." );
+  else
+    textlabelStepsPerFrame->setText( QString( "One frame every %1 simulation steps, " ).arg( steps ) + rate + " fps." );
 };
 
 void SIG_MovieSettingsDialog::slotViewSizeToMovie()

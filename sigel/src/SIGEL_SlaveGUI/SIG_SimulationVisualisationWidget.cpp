@@ -57,7 +57,7 @@
 		       program(0),
 		       movieWidth(1024),
 		       movieHeight(576),
-		       movieFrequency(1),
+		       movieFrameRate(25),
 		       movieMaxFrames(1000),
 		       movieQuality(50),
 		       currentFrame(0),
@@ -93,6 +93,11 @@
 
   SIG_SimulationVisualisationWidget::~SIG_SimulationVisualisationWidget()
   { };
+
+  int SIG_SimulationVisualisationWidget::stepsPerFrame( double stepSize, int frameRate )
+  {
+    return qMax( 1, qRound( 1.0 / ( stepSize * frameRate ) ) );
+  };
 
   void SIG_SimulationVisualisationWidget::setShowAncorPoints( int state )
   {
@@ -240,8 +245,10 @@
 
 	if ( record )
 	  {
+	    int frameSteps = stepsPerFrame( simulationParameters->getStepSize(), movieFrameRate );
+
 	    // only do the stuff every n-th frame if we have not exeeded the maximum frame number.
-	    if( ((currentFrame % movieFrequency) == 0) && currentFrameName < movieMaxFrames )
+	    if( ((currentFrame % frameSteps) == 0) && currentFrameName < movieMaxFrames )
 	      {
 		// this string will hold the fileName which has to be build...
 		QString fileName = QString::number( currentFrameName );
@@ -295,7 +302,7 @@
 		    QMessageBox::warning( this, "File Error", "Unable to write file " + fileName + ".\nPerhaps you don't have permission to write the file.");
 		  };
 		currentFrameName++;
-	      } // end of if( ((currentFrame % movieFrequency) == 0) && currentFrameName < movieMaxFrames )
+	      } // end of if( ((currentFrame % frameSteps) == 0) && currentFrameName < movieMaxFrames )
 	    currentFrame++;
 	  } // end of if(record && !automaticRefresh )
       };
@@ -672,10 +679,10 @@ void SIG_SimulationVisualisationWidget::resetRecorder()
 
   void SIG_SimulationVisualisationWidget::slotAlterMovieSettingsClicked()
   {
-    SIGEL_SlaveGUI::SIG_MovieSettingsDialog movieSettingsDialog( this, this, "movieSettingsDialog", true );
+    SIGEL_SlaveGUI::SIG_MovieSettingsDialog movieSettingsDialog( this, simulationParameters->getStepSize(), this, "movieSettingsDialog", true );
     movieSettingsDialog.spinboxWidth->setValue( movieWidth );
     movieSettingsDialog.spinboxHeight->setValue( movieHeight );
-    movieSettingsDialog.spinboxFrequency->setValue( movieFrequency );
+    movieSettingsDialog.spinboxFrameRate->setValue( movieFrameRate );
     movieSettingsDialog.lineeditDirectory->setText( movieDirectory );
     movieSettingsDialog.lineeditFilePrefix->setText( movieFilePrefix );
     movieSettingsDialog.spinboxMaxFrames->setValue( movieMaxFrames );
@@ -700,7 +707,7 @@ void SIG_SimulationVisualisationWidget::resetRecorder()
       case QDialog::Accepted:
 	movieWidth = movieSettingsDialog.spinboxWidth->value();
 	movieHeight = movieSettingsDialog.spinboxHeight->value();
-	movieFrequency = movieSettingsDialog.spinboxFrequency->value();
+	movieFrameRate = movieSettingsDialog.spinboxFrameRate->value();
 	movieDirectory = movieSettingsDialog.lineeditDirectory->text();
 	if( movieDirectory.right(1) != "/" )
 	  movieDirectory.append( "/" );

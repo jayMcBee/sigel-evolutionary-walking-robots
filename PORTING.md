@@ -903,7 +903,24 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-27 — DONE: THE MOVIE SIZE GOES UP TO 4096 × 4096.** Start here.
+**2026-09-27 — DONE: MOVIE FRAMES ARE SET BY A FRAME RATE.** Start here.
+
+- **Changed:** the movie settings dialog's "Frequency" box is "Frame rate":
+  a spin box from 1 to 120 fps, default 25, in place of "Save every #
+  frames", and an info line, `textlabelStepsPerFrame`, such as "One frame
+  every 4 simulation steps, 25.00 fps." The widget stores
+  `movieFrameRate` in place of `movieFrequency`.
+  `SIG_SimulationVisualisationWidget::stepsPerFrame` gives the steps per
+  frame, round(1 / (STEPSIZE × fps)) and at least 1; `makeTimeSteps` uses it
+  with the current STEPSIZE each time it records, and the dialog, which now
+  takes the step size, uses it for the info line. Step and Fast Forward
+  still write one frame per press. Checked on the desktop.
+- **Gates:** run after the commit.
+- **Next:** item 100, the message when recording stops. Open: a STEPSIZE of
+  0 or less divides by zero in `stepsPerFrame`, as elsewhere in the viewer;
+  item 89.
+
+**2026-09-27 — DONE: THE MOVIE SIZE GOES UP TO 4096 × 4096.**
 
 - **Changed:** the output width and height spin boxes of the movie settings
   dialog allow up to 4096, in place of 1600 × 1200, so "View Size to Movie"

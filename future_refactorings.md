@@ -336,11 +336,8 @@ touched, because changing one changes behaviour against the reference binary.
   Done: 100a, the default size, now 1024 × 576; 100b, frames that are exactly
   the output size, never scaled, cut or letterboxed in black, with the crop
   and keep-ratio check boxes gone and a minimum of 512 × 512; "View Size to
-  Movie" and "Resize View to Match" in the movie settings dialog.
-  - A frame rate field in the movie settings dialog, default 25 fps, in place
-    of the frequency field. Record every n-th frame, with
-    `n = round(1 / (STEPSIZE × fps))` and at least 1. The dialog shows the
-    actual rate, `1 / (STEPSIZE × n)`.
+  Movie" and "Resize View to Match" in the movie settings dialog; a frame
+  rate field, default 25 fps, in place of the frequency field.
   - When recording stops, say how many frames were written and where.
   - If ffmpeg is present, offer to make an MP4 from the frames at the actual
     rate, so the movie plays at simulation speed.

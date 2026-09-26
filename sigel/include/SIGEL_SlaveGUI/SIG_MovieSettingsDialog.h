@@ -32,7 +32,7 @@ class SIG_MovieSettingsDialog : public SIG_MovieSettingsDialogBase
     Q_OBJECT
 
 public:
-    SIG_MovieSettingsDialog( QWidget *view, QWidget* parent = 0, const char* name = 0, bool modal = false, Qt::WindowFlags fl = Qt::WindowFlags() );
+    SIG_MovieSettingsDialog( QWidget *view, double stepSize, QWidget* parent = 0, const char* name = 0, bool modal = false, Qt::WindowFlags fl = Qt::WindowFlags() );
     ~SIG_MovieSettingsDialog();
 
 public slots:
@@ -45,6 +45,7 @@ private slots:
     void slotUpdateSizeLabels();
     void slotViewSizeToMovie();
     void slotResizeViewToMatch();
+    void slotUpdateStepsPerFrame();
 
 private:
     /**
@@ -53,6 +54,8 @@ private:
     QSize viewSize() const;
 
     QWidget *view;
+
+    double stepSize;
 
 };
 
