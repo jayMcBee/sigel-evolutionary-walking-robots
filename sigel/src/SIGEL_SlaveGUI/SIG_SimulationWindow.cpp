@@ -38,7 +38,6 @@ namespace SIGEL_SlaveGUI
     if ( name )
       setObjectName( QString::fromUtf8( name ) );
 
-    // Qt 2's setUsesTextLabel(false) is Qt 6's ToolButtonIconOnly.
     this->setToolButtonStyle( Qt::ToolButtonIconOnly );
 
     // 25x25 is what these XPMs are, measured from the files.
@@ -54,14 +53,10 @@ namespace SIGEL_SlaveGUI
     simulationControlBar = new QToolBar( this );
     simulationControlBar->setObjectName( "simulationControlBar" );
 
-    // Qt 2's QMainWindow::setDockEnabled( Left/Right/Bottom, false ) restricted
-    // where a dock window could go. Qt 6 has no per-window equivalent; the
-    // restriction is per toolbar, and only Top was left enabled.
     simulationControlBar->setAllowedAreas( Qt::TopToolBarArea );
 
     simulationControls = new SIG_SimulationControls(this, "simulationControls");
 
-    // Qt 2's QActionGroup::addTo(w) added every member action to the widget.
     simulationControlBar->addActions( simulationControls->actions() );
     this->addToolBar( simulationControlBar );
 

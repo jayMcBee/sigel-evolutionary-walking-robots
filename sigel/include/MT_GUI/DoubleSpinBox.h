@@ -30,9 +30,6 @@ public:
 	void setRange(int minVal, int maxVal);
 
 private:
-	// Qt 2's QSpinBox had virtual mapValueToText/mapTextToValue; Qt 6 calls
-	// them textFromValue/valueFromText and both are const. valueFromText is
-	// handed the text Qt 2 fetched itself with text().
 	QString textFromValue(int value) const override;
 	int valueFromText(const QString &t) const override;
 

@@ -1,7 +1,3 @@
-/*
-  The class the 2003 uic generated, in uic3 implementation-mode shape,
-  with the two Qt 6 adjustments marked below.
-*/
 #include "SIGEL_MasterGUI/SIG_GPParameterBase.h"
 
 #include <QHeaderView>
@@ -13,8 +9,6 @@
  */
 SIG_GPParameterBase::SIG_GPParameterBase( QWidget *parent, const char *name,
                                           Qt::WindowFlags fl )
-  // uic3 emits QWidget(parent, name, fl). Qt 6's QWidget has no name argument;
-  // it was QT3_SUPPORT and did exactly this.
   : QWidget( parent, fl )
 {
   if ( name )
@@ -22,13 +16,9 @@ SIG_GPParameterBase::SIG_GPParameterBase( QWidget *parent, const char *name,
 
   setupUi( this );
 
-  // The .ui carries sortingEnabled on all four columns. Qt 2's QListView additionally sorted by column 0 ASCENDING
-  // by default (qlistview.cpp:1836-1837); Qt 6 leaves the indicator on column 0
-  // DESCENDING -- measured, not assumed. Restored here because nothing in the
-  // .ui can express it and nothing in SIGEL calls setSorting on this view.
-  // Row order is unaffected on shipped data: column 0 holds a pixmap and no
-  // text, so every sort key is empty. What differs is the indicator arrow, and
-  // therefore which way the user's first header click sorts.
+  // setSortingEnabled leaves the indicator descending, so the order is set here.
+  // Column 0 holds only a pixmap, so this sets only the arrow and the direction
+  // of the first click.
   listviewHosts->sortByColumn( 0, Qt::AscendingOrder );
 }
 

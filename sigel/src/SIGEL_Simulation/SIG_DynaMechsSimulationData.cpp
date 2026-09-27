@@ -53,14 +53,11 @@ using namespace SIGEL_Tools;
 namespace {
 
   /*
-   * Qt 2's autoDelete freed dynaMechsLinks when this constructor threw: a
-   * constructor that throws does not run its own destructor, but its members'
-   * destructors do run, and Qt 2's QVector honoured the flag. Removing the
-   * flag dropped that path, so it is restored here. ~QList frees no pointer
-   * either, so this guard is still the only free on the unwinding path.
-
-   * Reachable, not theoretical: SIG_Mirtich.cpp throws SIG_CannotMirtich on a
-   * NaN mass or inertia, from computePhysics inside the link constructor.
+   * Frees the links if the constructor throws. A constructor that throws does
+   * not run its own destructor, and ~QList frees no pointer.
+   *
+   * This happens: SIG_Mirtich::computePhysics throws SIG_CannotMirtich on a NaN
+   * mass or inertia, and the SIG_DynaMechsLink constructor calls it.
    *
    * Disarm by clearing 'links' once the object is fully built.
    */

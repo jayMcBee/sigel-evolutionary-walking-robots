@@ -164,7 +164,6 @@ void SIG_ExperimentView::slotExportPostScript() {
    gnuCmdLine += "\"";
    gnuCmdLine.prepend("gnuplot.exe \"");
    if(WinExec(gnuCmdLine.toLatin1().constData(), SW_SHOW) < 32){
-   	// Qt 2 took the button LABEL here (button0Text); Qt 6 takes StandardButtons.
       QMessageBox::warning(this, "Error", "Couldn't start gnuplot.", QMessageBox::Ok);
    	return;
    }
@@ -226,7 +225,6 @@ void SIG_ExperimentView::slotShowFitnesscurve() {
    gnuCmdLine += "\" - ";
    gnuCmdLine.prepend("gnuplot.exe \"");
    if(WinExec(gnuCmdLine.toLatin1().constData(), SW_SHOW) < 32){
-   	// Qt 2 took the button LABEL here (button0Text); Qt 6 takes StandardButtons.
       QMessageBox::warning(this, "Error", "Couldn't start gnuplot.", QMessageBox::Ok);
    	return;
    }

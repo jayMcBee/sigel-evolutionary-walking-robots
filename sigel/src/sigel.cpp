@@ -23,9 +23,6 @@
 #include <qapplication.h>
 #include <QCoreApplication>
 #include <QHashSeed>
-// Qt 2 forced a style on both platforms. Qt 6 ships only "Windows" and
-// "Fusion" -- QMotifPlusStyle does not exist and cannot be reproduced, so the
-// X11 branch takes Fusion, the closest cross-platform equivalent.
 #include <QStyleFactory>
 #include <qdir.h>
 
@@ -108,18 +105,10 @@ bool guiEnabled = true;
 
 
 int main( int argc, char *argv[] ) {
-  // Qt 6 randomises QHash iteration order per process unless the seed is
-  // pinned, and `sigel' links THREE QHashes -- SIG_GUIGPExperiment's widgetDict and
-  // menuDict, and SIG_ExperimentListView's experimentDict. ~SIG_GUIGPExperiment
-  // iterates widgetDict and calls widgetStack->removeWidget() on each, and that
-  // stack is SHARED -- SIG_ExperimentListView hands its own widgetStack to every
-  // experiment it constructs. So with a second experiment still loaded, the
-  // order in which one experiment's widgets leave the stack can decide which
-  // page is current afterwards. Pinning the seed makes that the same on every
-  // run. No hashed container's order reaches a file.
-  //
-  // Not needed in sigel_slave.cpp: it links GUI_SLAVE, not SIGEL_MasterGUI, and
-  // has no QHash at all.
+  // Pin the QHash seed so iteration order is the same on every run.
+  // ~SIG_GUIGPExperiment takes each widgetDict widget off the widget stack that
+  // all experiments share, and that order can decide which page is current.
+  // No QHash order reaches a file.
   QHashSeed::setDeterministicGlobalSeed();
 
   int arg;
@@ -222,11 +211,6 @@ int main( int argc, char *argv[] ) {
 #endif
 
     SIGEL_MasterGUI::SIG_MainWindow *mainWindow = new SIGEL_MasterGUI::SIG_MainWindow( 0 , "MainWindow" );
-    // Qt 2's setMainWidget() marked the widget whose closing ends the app and
-    // applied the X11 -geometry / -title command-line options to it
-    // (qapplication_x11.cpp:1846). Qt 6 has no such call: quitOnLastWindowClosed
-    // defaults to true, which covers the first half; -geometry and -title are
-    // gone from Qt entirely and cannot be reproduced.
     mainWindow->show();
 
     int result = app.exec();
@@ -286,9 +270,8 @@ int main( int argc, char *argv[] ) {
 
 	if(mtEvolve){
 	
-		// Qt 2's third argument was GUIenabled: this branch ran with NO GUI
-		// connection at all. QCoreApplication is that in Qt 6, and it keeps the
-		// same restriction -- no QWidget may be created on this path.
+		// This path has no GUI. It uses QCoreApplication, so no QWidget may be
+		// created here.
 		QCoreApplication app( argc, argv );
 
 		// start just the meta evolution (w/o sigel)

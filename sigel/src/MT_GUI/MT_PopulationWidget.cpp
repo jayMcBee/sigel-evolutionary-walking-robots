@@ -1,7 +1,7 @@
 #include "MT_GUI/MT_PopulationWidget.h"
 
-// Qt 2's QListViewItem::nextSibling() has no Qt 6 equivalent. Every item in
-// this view is top level, so the next sibling is the next top-level index.
+// Every item in this view is top level, so the next sibling is the next
+// top-level index.
 static MT_PopListViewItem *nextSiblingOf(QTreeWidget *tree, QTreeWidgetItem *item)
 {
 	if(!item) return 0;
@@ -38,10 +38,7 @@ MT_PopulationWidget::MT_PopulationWidget(QMainWindow* parent, const char* name, 
 	pixPath += "/pixmaps/";
 
 	// create the toolbar
-	// Qt 2's QToolBar(QMainWindow*, name) docked itself (qtoolbar.cpp:279).
 	popToolBar = new QToolBar(parent);
-	// Qt 2 guarded this: `if ( parent ) parent->addToolBar(...)'
-	// (qtoolbar.cpp:278-279), warning rather than crashing otherwise.
 	if(parent)
 		parent->addToolBar(Qt::TopToolBarArea, popToolBar);
 	popToolBar->setObjectName("mtPopToolBar");
@@ -137,10 +134,8 @@ void MT_PopulationWidget::onShow(MT_GPManager *manager, subst_cache *subst)
 	gpManager = manager;
 
 	// clear the widget
-	// Qt 2's QListView::clear() blocked signals for its whole body
-	// (qlistview.cpp:2303-2304, 2341), so currentChanged NEVER fired with a
-	// null item. Qt 6's clear() emits currentItemChanged(nullptr, prev), which
-	// slotCurrentChanged dereferences. Blocking reproduces 1.3 exactly.
+	// Signals are blocked during clear(). Otherwise clear() reports a null
+	// current item, and slotCurrentChanged empties the program view.
 	{
 		const bool wasBlocked = individualListView->blockSignals(true);
 		individualListView->clear();
@@ -406,8 +401,6 @@ void MT_PopulationWidget::slotExpInd()
 				
 				MT_Population npop;
 				npop.changePopSize(0);//list->count());
-				// Qt 2's QPtrList carried an internal cursor: first() then
-				// next() walked it. Qt 6 has no cursor; the index does the job.
 				for(int i=0; i<list->count(); i++){
 					MT_PopListViewItem *actItem = list->at(i);
 					npop.addIndividual(population->getIndividual(actItem->getPos()));//, i);
@@ -526,9 +519,6 @@ void MT_PopulationWidget::slotSavePop()
  ***/
 QList<MT_PopListViewItem *> * MT_PopulationWidget::getSelectedItems()
 {
-	// Qt 2's QPtrList held pointers and this one explicitly did NOT own them
-	// (setAutoDelete(false)); a Qt 6 QList of pointers never owns, so the flag
-	// has no counterpart and is dropped rather than translated.
 	QList<MT_PopListViewItem *> *lst = new QList<MT_PopListViewItem *>;
 	QTreeWidgetItemIterator it(individualListView);
 	for(; (*it); ++it){

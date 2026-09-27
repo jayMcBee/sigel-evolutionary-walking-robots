@@ -221,10 +221,7 @@ void SIGEL_Program::SIG_ProgramLine::setElement(int no, int value)
  
   else
     {
-      // 2003 wrote element[no] here -- in the branch entered BECAUSE no is out
-      // of range. Qt 2's QGArray::at clamped the index to 0, so this silently
-      // corrupted element 0; the original authors left "ToDo: Exception!" on
-      // the next line. The write is dropped: there is no element to set.
+      // no is out of range, so there is no element to set.
       // ToDo: Exception!
 
 #ifdef SIG_DEBUG

@@ -13,9 +13,8 @@ MT_ExperimentWidget::MT_ExperimentWidget(QWidget* parent, const char* name, Qt::
 	if ( fl != Qt::WindowFlags() )
 		setWindowFlags( fl );
 
-	// setSorting(-1) is Qt 2 for "no sorting". Qt 6 defaults to false, but
-	// this is stated because it is load-bearing: with sorting off, the six
-	// pages below appear in insertion order, and Qt 2 inserted by PREPENDING.
+	// Sorting stays off. Each item goes on top of the list, so the pages show
+	// in reverse order: Strategy first, Statistics last.
 	setSortingEnabled(false);
 	clear();
 	setColumnCount(1);

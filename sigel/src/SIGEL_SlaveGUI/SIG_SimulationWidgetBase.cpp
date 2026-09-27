@@ -1,7 +1,3 @@
-/*
-  The class the 2003 uic generated, in uic3 implementation-mode shape,
-  adapted to Qt 6.
-*/
 #include "SIGEL_SlaveGUI/SIG_SimulationWidgetBase.h"
 
 SIG_SimulationWidgetBase::SIG_SimulationWidgetBase(QWidget* parent, const char* name, Qt::WindowFlags fl)

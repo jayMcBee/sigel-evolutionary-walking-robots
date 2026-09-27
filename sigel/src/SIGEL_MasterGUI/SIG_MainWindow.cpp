@@ -41,7 +41,8 @@ namespace SIGEL_MasterGUI
 SIG_MainWindow::SIG_MainWindow( QWidget * parent, const char * name, Qt::WindowFlags f ) : QMainWindow( parent, f )
 {
   setObjectName( QString::fromUtf8( name ) );
-  // One icon size per toolbar in Qt 6, and 25 is the largest of the small pixmaps.
+  // A toolbar has one icon size. 25 is the largest of the small pixmaps,
+  // so no pixmap is drawn larger than its own size.
   setIconSize( QSize( 25, 25 ) );
 #ifdef _WINDOWS
   QString sigelRoot( ::getenv( "SIGEL_ROOT" ) );
@@ -479,8 +480,6 @@ SIG_MainWindow::SIG_MainWindow( QWidget * parent, const char * name, Qt::WindowF
   optionsMenu = new QMenu( this );
   optionsMenu->setObjectName( "optionsMenu" );
   bigPixmapAction = optionsMenu->addAction( "Use Big Pixmaps", this, SLOT( slotUseBigPixmaps() ) );
-  // Qt 2 drew a tick for setItemChecked() on any popup item; a Qt 6 QAction
-  // shows one only once it is checkable.
   bigPixmapAction->setCheckable( true );
   textLabelsAction = optionsMenu->addAction( "Use Text Labels", this, SLOT( slotUseTextLabels() ) );
   textLabelsAction->setCheckable( true );
@@ -665,7 +664,7 @@ SIG_MainWindow::SIG_MainWindow( QWidget * parent, const char * name, Qt::WindowF
   mtChoiceEvaluatorAction->setIconText( "Choose evaluator system" );
   mtChoiceEvaluatorAction->setCheckable( true );
   mtChoiceEvaluatorAction->setChecked(true);
-  mtSelectedSystem = mtChoiceEvaluatorAction;   // Qt 2: d->selected
+  mtSelectedSystem = mtChoiceEvaluatorAction;
   mtChoiceEvaluatorAction->setStatusTip( "Chooses the Evaluator System. Replaces the simulation-based fitness calculation by a MetaGP system which needs fewer simulations." );
   mtChoiceClassifierAction = new QAction( "Cl&assifier System", mtChoiceTypeActionGroup );
   mtChoiceClassifierAction->setToolTip( "Choose classifier system" );
@@ -770,8 +769,8 @@ bool SIG_MainWindow::askBeforeQuitting()
 
 void SIG_MainWindow::slotAboutToQuit()
 {
-  // closeEvent asks. Qt 6's quit() closes every window, so asking here too
-  // would ask twice.
+  // closeEvent asks the user. Asking here and then calling quit() would ask
+  // twice, because quit() closes every window.
   close();
 };
 
@@ -841,12 +840,8 @@ void SIG_MainWindow::slotMTSwitchSystem(QAction *selSystem)
 	// Refuse during a run, as well as greying the group.
 	if (experimentListView->isRunning())
 		return;
-	// Qt 2 reached this slot only when the selection actually CHANGED:
-	// QActionGroup::childToggled gated "emit selected(s)" on "s != d->selected",
-	// and QAction::setOn returned early when the state was already correct.
-	// Qt 6's QActionGroup::triggered(QAction*) fires on every click, so
-	// re-clicking the already-active system would re-enter switchSystem()
-	// where 1.3 did nothing at all.
+	// triggered() also fires when the user clicks the system that is already
+	// selected. Nothing changes then.
 	if (selSystem == mtSelectedSystem)
 		return;
 
@@ -860,9 +855,8 @@ void SIG_MainWindow::slotMTSwitchSystem(QAction *selSystem)
 				mtChoiceClassifierAction->setChecked(true);
 		}
 	}
-	// switchSystem() may have refused and rolled the choice back above, so
-	// track what is actually checked -- Qt 2's d->selected was likewise
-	// re-updated by the second childToggled the rollback's setOn(TRUE) made.
+	// switchSystem() may refuse and roll the choice back above,
+	// so this records what is actually checked.
 	mtSelectedSystem = mtChoiceClassifierAction->isChecked()
 	                   ? mtChoiceClassifierAction : mtChoiceEvaluatorAction;
 };
@@ -904,8 +898,6 @@ void SIG_MainWindow::slotCurrentExperimentChanged()
 
 void SIG_MainWindow::slotEnableNoExperimentActions( bool enable )
 {
-  // Qt 2's QActionGroup::setEnabled walked its own member list
-  // (qaction.cpp:902-908). This is that loop.
   for ( QAction *a : noExperimentActions )
     a->setEnabled( enable );
 

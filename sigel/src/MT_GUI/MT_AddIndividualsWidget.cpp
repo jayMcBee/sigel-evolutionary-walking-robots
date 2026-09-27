@@ -1,7 +1,3 @@
-/*
-  The class the 2003 uic generated, in uic3 implementation-mode shape,
-  adapted to Qt 6.
-*/
 #include "MT_GUI/MT_AddIndividualsWidget.h"
 
 MT_AddIndividualsWidgetBase::MT_AddIndividualsWidgetBase(QWidget* parent, const char* name, bool modal, Qt::WindowFlags fl)

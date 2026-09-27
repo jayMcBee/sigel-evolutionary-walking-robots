@@ -1,9 +1,6 @@
 /*
-  The class the 2003 uic generated, in uic3 declaration-mode shape,
-  adapted to Qt 6. Qt 6's uic emits only Ui::SIG_RobotBase,
-  a struct with setupUi().
-
-  Global namespace, as uic generated it in 2003.
+  uic makes only the struct Ui::SIG_RobotBase. This class inherits it and calls
+  setupUi() on itself.
 */
 #ifndef SIGEL_MASTERGUI_SIG_ROBOTBASE_H
 #define SIGEL_MASTERGUI_SIG_ROBOTBASE_H
@@ -22,8 +19,8 @@ public:
     ~SIG_RobotBase() override;
 
 protected:
-    // Qt 3 called languageChange() itself; Qt 6 has no such hook, so it is
-    // driven from changeEvent -- otherwise the slot below is dead code.
+    // Qt does not call languageChange() itself.
+    // changeEvent calls it on a language change.
     void changeEvent( QEvent *e ) override;
 
 protected slots:

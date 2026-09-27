@@ -64,8 +64,8 @@ void SIG_TextView::updateScroll()
 {
   if( scroll )
     {
-      // Qt 2 QScrollView: contentsHeight() == maximum() + pageStep(),
-      // contentsY() == value(), visibleHeight() == pageStep().
+      // cHeight is the height of the whole text, cY the top of the visible
+      // part, vHeight the visible height, all in scroll bar units.
       QScrollBar *vBar = verticalScrollBar();
       int cHeight = vBar->maximum() + vBar->pageStep();
       int cY = vBar->value();
@@ -93,11 +93,8 @@ void SIG_TextView::updateScroll()
 
 bool SIG_TextView::viewportEvent( QEvent *e )
 {
-  // 1.3 overrode QTextView's three viewport mouse handlers and did NOT chain to
-  // the base, so Qt 2's own drag-SELECTION (qtextview.cpp:884, doSelection())
-  // never ran -- dragging scrolled the view and selected nothing. Returning true
-  // here is what reproduces that: falling through to QTextBrowser::viewportEvent
-  // would give the drag a text selection 1.3 never had, on top of the scroll.
+  // Returns true so that QTextBrowser does not see these events. A drag then
+  // only scrolls the view and selects no text.
   switch ( e->type() )
     {
     case QEvent::MouseButtonPress:

@@ -166,8 +166,8 @@ void MT_IndividualsWidget::onShow(MT_GPManager *manager, subst_cache *subst)
 		numVariablesSpinBox->setValue(*numVar);
 
 		// add the constants to the appropriate listbox
-		// See MT_PopulationWidget: Qt 2's clear() blocked signals, Qt 6's
-		// does not, and slotSelectionChanged reads currentRow().
+		// Signals stay blocked during clear(). slotSelectionChanged reads
+		// currentRow() and must not run while the items are removed.
 		{
 			const bool wasBlocked = constantsListBox->blockSignals(true);
 			constantsListBox->clear();

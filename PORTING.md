@@ -903,7 +903,64 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-27 — DONE: ITEM 108, BATCH 3 OF 12, MT_CONTROL.** Start here.
+**2026-09-27 — DONE: ITEM 108, BATCHES 4 TO 11, THE REST OF THE QT-VERSION
+COMMENTS.** Start here.
+
+- **Changed:** comments only, in 68 files: MT_GPSystem, SIGEL_Program,
+  SIGEL_RobotIO, SIGEL_Simulation, SIGEL_SlaveGUI, SIGEL_MasterGUI, MT_GUI,
+  `sigel.cpp` and `sigel_slave.cpp`, in one commit by decision. Each comment
+  was decided one by one. The `*Base` classes share one header and one
+  `changeEvent` comment; the `.cpp` headers went. A token comparison with the
+  comments stripped shows no code change, apart from the whitespace of one
+  `connect` call in `MT_MainWindow`. Three comments that name Qt 6 stay, by
+  decision: `SIG_ExperimentListView::openExperimentFile` and two in
+  `Qt2DoubleValidator`. The names `readCharQt2`, `Qt2IntValidator` and
+  `Qt2DoubleValidator` are code and stay for now.
+- **Baselines:** unchanged.
+- **Review:** no defects. Wording points, not acted on: `Qt2IntValidator`'s
+  "keeps any whole number" is wider than the code, which rejects a number past
+  the int range; "these events" in `SIG_TextView::viewportEvent` means only
+  the three mouse events; in `MT_PopulationWidget::onShow` the blocked
+  `clear()` protects less than the comment suggests, because `onShow` empties
+  the program view itself two lines later; `DynaMechsLinkGuard` names NaN mass
+  and inertia but not a NaN centre of mass.
+- **Gates:** `check.sh` 938 pass, 0 fail; warnings 486. The other four gates
+  are green.
+- **Left for afterwards, found by the reviews:**
+  - Bugs: `MT_GPManager::startEvolution` sleeps `sleep(10000000)` on POSIX,
+    about 115 days, where Windows sleeps 10 s. `MT_PopulationWidget::slotExpInd`
+    builds file names cumulatively (`fileName.append(...)`), leaks the list
+    from `getSelectedItems()`, and writes the last selected individual to every
+    file. `SIG_ExperimentListView::slotRenameExperiment` appends ".exp" after
+    the `experimentExists` check, so a rename can replace another experiment.
+    `SIG_MainWindow::slotCurrentExperimentChanged` checks the MetaGP action
+    with `setChecked`, so `mtSelectedSystem` goes stale and a later click can
+    be ignored. `MT_AddConstantsWidget`'s float minimum validator has its
+    bounds reversed, and its ranges differ between the constructor and
+    `slotClicked`.
+  - SIGEL installs no translator, so `changeEvent` probably never calls
+    `languageChange()`.
+  - Port history in comments that name no Qt version: the `pthread_create`
+    comment in `main`; "That leak is 1.3's." in `SIG_DynaMechsSimulationData.h`;
+    "2003" comments in `SIG_Simulation.cpp`; "disable/enable autodelete" in
+    `slotRenameExperiment`; the `setAutoDelete` banner in
+    `SIG_AllIndividualsView`; "this was splitter before" in `SIG_MainWindow`;
+    the `typeButtons` comment in `MT_AddConstantsWidget.h`; the "PRESERVED
+    DEFECT" comment in `slotExpInd`; the `SIG_SimulationControls` doc that
+    names `addTo`/`removeFrom`; the "NOT redundant" comment in
+    `SIG_SimulationVisualisationWidget::visualizeThis`.
+  - Dead code: `prefixFile` in `SIG_RobotCompiler`; `MT_ExperimentWidgetBase`
+    and its .ui; commented-out blocks in `SIG_SimulationControls`,
+    `SIG_AllIndividualsView`, `SIG_ExperimentListView::selectItem`,
+    `MT_PopulationWidget::slotLoadPop` and `SIG_ExperimentView`; a stray
+    `#include` inside the switch in `sigel_slave.cpp`.
+  - Names: `DoubleSpinBox.h/.cpp` hold `DISpinBox`; `MT_AddIndividualsWidget`,
+    `MT_IndividualWidgetBase` and `MT_IndividualWidget` files hold other class
+    names; `nextSiblingOf` is a free function.
+- **Next:** item 108 continues with the port-history comments that name no Qt
+  version (listed here and in the batch 1 to 3 entries). Then item 109.
+
+**2026-09-27 — DONE: ITEM 108, BATCH 3 OF 12, MT_CONTROL.**
 
 - **Changed:** comments only, in `MT_Substitute.cpp` and `MT_Classifier.cpp`.
   Of the 5 comments that named a Qt version, 4 were cut and 1 dropped. By

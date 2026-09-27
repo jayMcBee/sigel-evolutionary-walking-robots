@@ -96,8 +96,6 @@ SIG_AllIndividualsView::SIG_AllIndividualsView( QWidget * parent, const char * n
 		    this,
 		    SLOT( slotStatsClicked() ) ); */
   
-  // Qt 2's rightButtonClicked passed a GLOBAL position, column -1 for a click
-  // that hit no item, and cleared the selection first (qlistview.cpp:3388-3396).
   individualList->listviewIndividuals->setContextMenuPolicy( Qt::CustomContextMenu );
   QObject::connect( individualList->listviewIndividuals,
 		    SIGNAL( customContextMenuRequested( const QPoint & ) ),
@@ -153,7 +151,6 @@ void SIG_AllIndividualsView::slotCompleteRefreshList()
   int poolSize = theExperiment.population.getSize();
 
   QProgressDialog progress( "Updating pool...", QString(), 0, poolSize, this );
-  // Qt 2\'s trailing modal flag made it application modal.
   progress.setWindowModality( Qt::ApplicationModal );
   progress.setWindowTitle( "Updating" );
   progress.show();
@@ -198,17 +195,14 @@ void SIG_AllIndividualsView::slotAddIndividuals()
       }
       
       // lets do it inefficiently first. will be corrected later
-      // Same Qt 2 signal blocking as slotCompleteRefreshList above. Adding only
-      // GROWS the pool, so a stale poolPosition still resolves to the same
-      // individual today; the blocking matters the day this path stops being
-      // append-only.
+      // Signals are blocked for the reason given in slotCompleteRefreshList.
+      // Adding only grows the pool, so this matters only if that changes.
       {
         const bool wasBlocked = individualList->listviewIndividuals->blockSignals( true );
         individualList->listviewIndividuals->clear();
         individualList->listviewIndividuals->blockSignals( wasBlocked );
       }
       QProgressDialog progress( "Populating pool...", QString(), 0, theExperiment.population.getSize(), this );
-  // Qt 2\'s trailing modal flag made it application modal.
   progress.setWindowModality( Qt::ApplicationModal );
       progress.setWindowTitle( "Add Individuals" );
       progress.show();
@@ -306,7 +300,7 @@ void SIG_AllIndividualsView::slotRightButtonClicked( const QPoint &pos )
   const QPoint thePoint = theTree->viewport()->mapToGlobal( pos );
   if( !theItem ) // the click was outside
     {
-      theTree->clearSelection();   // Qt 2 did this before emitting
+      theTree->clearSelection();
       listviewMenu->popup( thePoint );
     }
   else
@@ -322,7 +316,7 @@ void SIG_AllIndividualsView::slotDoubleClicked( QTreeWidgetItem *theItem )
       SIG_IndividualListItem *individualListItem = static_cast<SIG_IndividualListItem *> ( theItem );
       SIGEL_GP::SIG_GPIndividual *theGPIndividual = &theExperiment.population.getIndividual( individualListItem->poolPosition );
       SIG_IndividualView *theView = new SIG_IndividualView( 0, "IndividualViewDoubleClicked", Qt::WindowFlags(), theGPIndividual );
-      // Qt 2 got this from WDestructiveClose
+      // No parent owns this window, so it deletes itself when closed.
       theView->setAttribute( Qt::WA_DeleteOnClose );
       theView->show();
     }

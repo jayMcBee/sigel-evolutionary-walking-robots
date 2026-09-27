@@ -1,7 +1,3 @@
-/*
-  The class the 2003 uic generated, in uic3 implementation-mode shape,
-  adapted to Qt 6.
-*/
 #include "SIGEL_MasterGUI/SIG_EditHostDialogBase.h"
 
 SIG_EditHostDialogBase::SIG_EditHostDialogBase(QWidget* parent, const char* name, bool modal, Qt::WindowFlags fl)

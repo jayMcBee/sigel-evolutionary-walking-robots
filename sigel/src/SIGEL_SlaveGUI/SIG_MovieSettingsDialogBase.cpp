@@ -1,7 +1,3 @@
-/*
-  The class the 2003 uic generated, in uic3 implementation-mode shape,
-  adapted to Qt 6.
-*/
 #include "SIGEL_SlaveGUI/SIG_MovieSettingsDialogBase.h"
 
 SIG_MovieSettingsDialogBase::SIG_MovieSettingsDialogBase(QWidget* parent, const char* name, bool modal, Qt::WindowFlags fl)

@@ -44,7 +44,7 @@ SIG_IndividualListItem::SIG_IndividualListItem( QTreeWidget *parent )
 SIG_IndividualListItem::SIG_IndividualListItem( QTreeWidget *parent, int poolPosition, SIGEL_GP::SIG_GPIndividual *theIndividual )
   : QTreeWidgetItem(), poolPosition( poolPosition), theIndividual( theIndividual ) 
 {
-  parent->insertTopLevelItem( 0, this );   // Qt 2 prepended; see above
+  parent->insertTopLevelItem( 0, this );
 #ifdef _WINDOWS
   QString sigelRoot( ::getenv( "SIGEL_ROOT" ) );
 #else
@@ -81,13 +81,8 @@ QString SIG_IndividualListItem::key(int column, bool ascending) const {
       int positionOfExponent = this->text(1).indexOf("e");
       orgString = this->text(1);
       if ( positionOfPoint != -1 ) {
-        // positionOfExponent is -1 when the value has no exponent at all.
-        // Qt 2's truncate took a UINT, so -1 became 4294967295, which is past
-        // the end and did nothing; Qt 6's takes a signed qsizetype and CLEARS
-        // the string. That wiped the mantissa for every plain value like
-        // "1.14825", leaving an all-zero sort key, so those sorted BEFORE the
-        // e-05 values instead of after them. 1.3 puts
-        // the e-05 values first.
+        // positionOfExponent is -1 when the value has no exponent.
+        // truncate(-1) clears the string, so it runs only with an exponent.
         if (positionOfExponent != -1)
           orgString.truncate(positionOfExponent);
         orgString.remove(positionOfPoint,1);
@@ -121,8 +116,7 @@ QString SIG_IndividualListItem::key(int column, bool ascending) const {
 
 bool SIG_IndividualListItem::operator<( const QTreeWidgetItem &other ) const
 {
-  // Direction is Qt 6's business -- it reverses the result for a descending
-  // sort, exactly as Qt 2 reversed the sibling list (qlistview.cpp:814-823) --
+  // QTreeWidget reverses the order itself for a descending sort,
   // so the key is always taken in its ascending form.
   const QTreeWidget *tree = treeWidget();
   const int column = tree ? tree->sortColumn() : 0;

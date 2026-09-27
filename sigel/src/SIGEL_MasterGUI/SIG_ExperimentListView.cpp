@@ -51,7 +51,7 @@ namespace SIGEL_MasterGUI
   experimentListViewMenu->setObjectName( "SIG_ExperimentListViewPopupMenu" );
 
   setRootIsDecorated( true );
-  // Qt 2: setSorting(-1) meant "do not sort at all".
+  // No sorting: each new experiment goes on top of the list.
   setSortingEnabled( false );
   
 };
@@ -138,7 +138,6 @@ void SIG_ExperimentListView::slotDeleteExperiment()
 				    "the experiment " + name + "?", QMessageBox::Yes | QMessageBox::Default, QMessageBox::No) )
 	{
 	case QMessageBox::Yes:
-	  // Qt 2 ran this with autoDelete ON: the removed value was deleted
 	  delete experimentDict.take( name );
 	  takeTopLevelItem( indexOfTopLevelItem( current ) );
 	  delete current;
@@ -336,7 +335,7 @@ void SIG_ExperimentListView::slotRightButtonClicked( const QPoint & pos )
   const QPoint thePoint = viewport()->mapToGlobal( pos );
   if ( !theItem )
     {
-      clearSelection();                        // Qt 2 did this before emitting
+      clearSelection();
       experimentListViewMenu->popup( thePoint ); // the click was outside
     }
   else

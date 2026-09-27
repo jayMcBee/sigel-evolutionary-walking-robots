@@ -217,9 +217,9 @@ SIG_GUIGPExperiment::~SIG_GUIGPExperiment()
   // Before destroying the experiment take all widgets in the widgetDict from the widgetStack
   for ( QWidget *w : widgetDict )
     widgetStack->removeWidget( w );
-  // Qt 2's widgetDict had setAutoDelete(true), so ~QDict deleted every widget
-  // it still held (qgdict.cpp deleteItem). QHash owns nothing, and the widgets
-  // were just orphaned by removeWidget(), so the delete has to be explicit.
+  // removeWidget() takes a page off the stack but does not delete it. The stack
+  // is shared with the other experiments and stays, so this experiment's pages
+  // are deleted here.
   qDeleteAll( widgetDict );
 
    if( guiGPManager )
@@ -315,8 +315,7 @@ void SIG_GUIGPExperiment::slotRightClick( QString option, const QPoint & thePoin
 
 void SIG_GUIGPExperiment::slotSelectionChanged( QString option )
 {
-  // Qt 2's raiseWidget() began "if ( !w || !isMyChild(w) ) return;", so a
-  // missing key was a silent no-op; Qt 6 warns and does nothing instead.
+  // setCurrentWidget() warns on a null widget, so an unknown option is ignored.
   if ( QWidget *showWidget = widgetDict.value( option ) )
     widgetStack->setCurrentWidget( showWidget );
 };

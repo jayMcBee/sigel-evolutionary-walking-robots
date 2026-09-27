@@ -14,10 +14,7 @@ MT_StatisticsWidget::MT_StatisticsWidget(QMainWindow* parent, const char* name, 
 
 	evolRunning = false;
 
-	// Qt 2's QToolBar(label, QMainWindow*, dock) docked itself
-	// (qtoolbar.cpp:240). Qt 6's does not.
 	statToolbar = new QToolBar("MT Statistics", parent);
-	// Qt 2 guarded this (qtoolbar.cpp:278-279).
 	if(parent)
 		parent->addToolBar(Qt::TopToolBarArea, statToolbar);
 	statToolbar->hide();
@@ -37,8 +34,6 @@ MT_StatisticsWidget::MT_StatisticsWidget(QMainWindow* parent, const char* name, 
 	QObject::connect(updateAction, SIGNAL(triggered()), SLOT(slotUpdateGUI()));
 
 	autoUpdateCheckBox = new QCheckBox("Auto update every ", statToolbar);
-	// Qt 2: QSpinBox(minValue, maxValue, step, parent). Qt 6 takes the parent
-	// only; range and step are set afterwards.
 	intervalSpinBox = new QSpinBox(statToolbar);
 	intervalSpinBox->setRange(10, 6000);
 	intervalSpinBox->setSingleStep(10);

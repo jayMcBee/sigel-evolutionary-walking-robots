@@ -1,9 +1,6 @@
 /*
-  The class the 2003 uic generated, in uic3 declaration-mode shape,
-  adapted to Qt 6. Qt 6's uic emits only Ui::SIG_LanguageParametersBase,
-  a struct with setupUi().
-
-  Global namespace, as uic generated it in 2003.
+  uic makes only the struct Ui::SIG_LanguageParametersBase. This class inherits
+  it and calls setupUi() on itself.
 */
 #ifndef SIGEL_MASTERGUI_SIG_LANGUAGEPARAMETERSBASE_H
 #define SIGEL_MASTERGUI_SIG_LANGUAGEPARAMETERSBASE_H
@@ -27,8 +24,8 @@ public slots:
     virtual void slotPushButtonEditClicked() = 0;
 
 protected:
-    // Qt 3 called languageChange() itself; Qt 6 has no such hook, so it is
-    // driven from changeEvent -- otherwise the slot below is dead code.
+    // Qt does not call languageChange() itself.
+    // changeEvent calls it on a language change.
     void changeEvent( QEvent *e ) override;
 
 protected slots:

@@ -32,18 +32,14 @@ DISpinBox::DISpinBox(int decimals, QWidget *parent, const char *name) : QSpinBox
 	dValidator->setLocale(cLocale);
 	iValidator->setLocale(cLocale);
 
-	// Qt 2's textChanged only set an `edited' flag (qspinbox.cpp:780-783);
-	// valueChanged came solely from setValue. Qt 6 interprets every keystroke
-	// unless keyboard tracking is off.
+	// valueChanged comes only from setValue or when editing ends, not on
+	// every keystroke.
 	setKeyboardTracking(false);
 
 	if(decimals != 0){		// create a DoubleSpinBox
 		typ = DBLTYP;
 		precision = pow(10, decimals);
 		dValidator->setRange(0.0, 100.0, decimals);
-		// Qt 2's QSpinBox::setValidator forwarded to its internal QLineEdit
-		// (qspinbox.cpp:680). Qt 6 has no such method, so the line edit is
-		// addressed directly -- which is the same object Qt 2 reached.
 		lineEdit()->setValidator(dValidator);
 		setRange(0, dValidator->top() * precision);
 		setSingleStep(10);
@@ -70,8 +66,7 @@ QValidator::State DISpinBox::validate(QString &input, int &pos) const
 	return v ? v->validate(input, pos) : QValidator::Acceptable;
 }
 
-// Qt 2 had no fixup on this path; leaving the text alone is the no-op that
-// matches. Without the override, QSpinBox::fixup() rewrites "0.375" to "0".
+// Leaves the text alone. QSpinBox::fixup() would rewrite "0.375" to "0".
 void DISpinBox::fixup(QString &) const
 {
 }

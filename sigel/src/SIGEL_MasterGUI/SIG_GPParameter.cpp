@@ -614,12 +614,8 @@ void SIG_GPParameter::slotItemDoubleClicked( QTreeWidgetItem * theItem )
 	  else
 	    editDialog.checkboxEnableHost->setChecked( false );
 	  editDialog.lineeditHostName->setFocus();
-	  // Qt 6 selects a line edit's text when a dialog gives it focus and
-	  // Qt 2 did not, so a typed character REPLACES the pre-filled host
-	  // name here where 1.3 appends to it.
-	  // See SIG_LanguageParameters.cpp for the full note; slotAddHost has
-	  // the same setFocus() and does NOT need this, because the field it
-	  // focuses is empty there.
+	  // The name must stay unselected, or a typed character replaces it.
+	  // Queued: the selection does not exist until exec() shows the dialog.
 	  { QLineEdit *le = editDialog.lineeditHostName; QTimer::singleShot( 0, le, [le]{ le->end( false ); } ); }
 	  editDialog.setWindowTitle( "Edit Host \"" + theHost->name + "\"" );
 	}

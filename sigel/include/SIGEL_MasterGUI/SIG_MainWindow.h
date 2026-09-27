@@ -74,7 +74,6 @@ namespace SIGEL_MasterGUI
    public slots:
 	/**
 	 * Enables or disables every action that requires an experiment.
-	 * Replaces Qt 2's QActionGroup::setEnabled over its own member list.
 	 */
       void slotEnableNoExperimentActions( bool enable );
 
@@ -161,22 +160,15 @@ namespace SIGEL_MasterGUI
       QList<QAction *> evolutionRunningActions;
 
       /**
-       * The MetaGP system currently selected. Qt 2's QActionGroup kept this as
-       * d->selected and emitted selected(s) only when it CHANGED
-       * (qaction.cpp childToggled); Qt 6's triggered(QAction*) fires on every
-       * click, so the comparison has to live here now.
+       * The MetaGP system that is checked. slotMTSwitchSystem compares against
+       * it, because triggered(QAction*) fires on every click.
        */
       QAction *mtSelectedSystem;
 
    protected:
       /**
-       * Qt 2's QWidget::close() ended with "bool isMain = qApp->mainWidget() ==
-       * this; ... if ( isMain ) qApp->quit();", so closing THIS window quit the
-       * application even with other top-level windows still open. Qt 6 has no
-       * main widget; quitOnLastWindowClosed only fires once the LAST window
-       * goes, so with an individual view open this window would close and
-       * SIGEL would keep running. (1.3 showed no unsaved-experiment warning on
-       * this path either -- that warning is on the Quit action alone, in both.)
+       * Closing this window quits SIGEL, also when an individual view is still
+       * open. It refuses during a run and asks before it quits.
        */
       void closeEvent( QCloseEvent *event ) override;
 

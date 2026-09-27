@@ -184,13 +184,10 @@ MT_MainWindow::MT_MainWindow(MT_Controller *controller, MT_GPManager *manager, s
 	mainToolBar->addAction(mtExitAction);
 	QObject::connect(mtExitAction, SIGNAL( triggered() ), SLOT( close() ));
 
-	// Qt 2: QMenuBar::insertItem(text, popup). Qt 6 titles the menu itself.
 	fileMenu->setTitle("&File");
 	menuBar()->addMenu(fileMenu);
 
-	QObject::connect(experimentWidget, // Qt 2 QListView::selectionChanged(item) carried the newly selected item;
-	// Qt 6 has no such overload, and currentItemChanged is the one that does.
-						 SIGNAL( currentItemChanged(QTreeWidgetItem*,QTreeWidgetItem*) ),	SLOT( slotRaiseWidget(QTreeWidgetItem*) ));
+	QObject::connect(experimentWidget, SIGNAL( currentItemChanged(QTreeWidgetItem*,QTreeWidgetItem*) ), SLOT( slotRaiseWidget(QTreeWidgetItem*) ));
 
 	
 	raiseWidget(0);
@@ -208,7 +205,6 @@ void MT_MainWindow::slotAutoStop(bool on)
 		mtMin->setEnabled(false);
 		if(evolRunning){
 			int time = (mtHour->value() * 60 + mtMin->value()) * 60000;
-			// Qt 2: QTimer::start(msec, singleShot). Qt 6 splits the two.
 			evolTimer->setSingleShot(true);
 			evolTimer->start(time);
 		}
@@ -256,9 +252,7 @@ void MT_MainWindow::closeEvent(QCloseEvent *e)
 
 void MT_MainWindow::slotRaiseWidget(QTreeWidgetItem *item)
 {
-	// Same shape as MT_PopulationWidget::slotCurrentChanged: Qt 6's
-	// currentItemChanged carries a null current where Qt 2's currentChanged
-	// did not, e.g. after setCurrentItem(nullptr).
+	// currentItemChanged passes a null item when the list has no current item.
 	if(!item) return;
 
 	int pos = static_cast<MT_ExperimentItem*>(item)->getPos();

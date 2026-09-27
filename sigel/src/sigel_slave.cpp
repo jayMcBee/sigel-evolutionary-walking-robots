@@ -21,9 +21,6 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 #include <qapplication.h>
-// Qt 2 forced a style on both platforms. Qt 6 ships only "Windows" and
-// "Fusion" -- QMotifPlusStyle does not exist and cannot be reproduced, so the
-// X11 branch takes Fusion, the closest cross-platform equivalent.
 #include <QStyleFactory>
 #include <qstring.h>
 #include <qtextstream.h>

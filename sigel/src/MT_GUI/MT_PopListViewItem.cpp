@@ -8,8 +8,8 @@
 // Construction/destruction
 //////////////////////////////////////////////////////////////////////
 
-// Prepends, like Qt 2's QListViewItem(QListView*). See MT_ExperimentItem.cpp
-// for why the parent is not handed to the base class.
+// Inserts the item at the top of the list. QTreeWidgetItem(parent) would
+// append it, so the parent is not handed to the base class.
 MT_PopListViewItem::MT_PopListViewItem(QTreeWidget *parent) : QTreeWidgetItem()
 { 
 	position = -1;

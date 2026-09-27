@@ -32,8 +32,7 @@ class SIG_TextView : public QTextBrowser
   ~SIG_TextView();
 
  protected:
-  // Qt 2 QScrollView called the three handlers below itself; Qt 6 delivers
-  // every viewport event through viewportEvent() instead.
+  // Sends the viewport mouse events to the three handlers below.
   bool viewportEvent( QEvent *e ) override;
 
   void viewportMousePressEvent( QMouseEvent * );

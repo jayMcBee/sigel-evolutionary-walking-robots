@@ -11,10 +11,11 @@
 
 namespace
 {
-  // Transcribed, not Qt 6's own: these values reach generated constants unseen,
-  // and Qt 6 turned -50000 into "-5000", or "50000" with 2003's reversed bounds.
+  // Own validators, not Qt's. Qt's reject some keystrokes, so typing -50000
+  // leaves "-5000". The text goes into the generated constants unchecked.
 
-  // Qt 2: qvalidator.cpp's QIntValidator::validate, verbatim in behaviour.
+  // Keeps any whole number that is typed. Out of range is Intermediate, not
+  // Invalid, so the keystroke stays.
   class Qt2IntValidator : public QIntValidator
   {
   public:
@@ -28,9 +29,8 @@ namespace
                .match( input ).hasMatch() )
         return QValidator::Intermediate;
       bool ok = false;
-      // toInt, not toLongLong: Qt 2 used QString::toLong, whose max_mult is
-      // INT_MAX/base (qstring.cpp), so it reported failure past +/-INT_MAX
-      // whatever the width of `long' was on the platform.
+      // toInt, not toLongLong: a number past INT_MAX must be Invalid, so it
+      // cannot reach the generated constants.
       const int tmp = input.toInt( &ok );
       if ( !ok )
         return QValidator::Invalid;
@@ -38,14 +38,14 @@ namespace
                                                : QValidator::Acceptable;
     }
 
-    // Must stay empty. Qt 6 calls fixup on focus-out, and the inherited one
-    // rewrites 123.456789 to "1.2346e+02".
+    // Must stay empty. QLineEdit calls fixup on focus-out, and the inherited
+    // one rewrites the text in its own number format.
     void fixup( QString & ) const override {}
 
   };
 
-  // Qt 2: qvalidator.cpp's QDoubleValidator::validate, including its exponent
-  // handling and its "too many decimals is Intermediate" rule.
+  // Keeps any number that is typed, also with an exponent. Out of range or too
+  // many decimals is Intermediate, not Invalid, so the keystroke stays.
   class Qt2DoubleValidator : public QDoubleValidator
   {
   public:
@@ -60,12 +60,11 @@ namespace
         return QValidator::Intermediate;
 
       bool ok = false;
-      double tmp = input.toDouble( &ok );   // locale-independent, as Qt 2's was
+      double tmp = input.toDouble( &ok );   // C format, whatever the system locale
       if ( !ok )
         {
-          // Qt 2 allowed a mantissa followed by a partial exponent, and a
-          // string that is nothing but an exponent tail, so that "1e" and
-          // "1e-" stay typeable.
+          // A partial exponent after the number, such as "1e" or "1e-", stays
+          // typeable. So does a string that is only an exponent, such as "e-".
           const QRegularExpression tail( QStringLiteral( "e-?\\d*$" ),
                                          QRegularExpression::CaseInsensitiveOption );
           const QRegularExpressionMatch m = tail.match( input );
@@ -137,16 +136,11 @@ MT_AddConstantsWidget::MT_AddConstantsWidget(MT_IndividualsWidget *parent, const
 	}
 	numConstantsSpinBox->setValue(boss->numToCreate);
 	
-	// Ids in .ui order, which is the order Qt 2's QButtonGroup auto-assigned.
-	// Only the objectName is ever compared, so the values matter merely for
-	// being distinct and stable.
+	// slotClicked compares only the objectName, so the ids only have to differ.
 	typeButtons = new QButtonGroup(this);
 	typeButtons->addButton(intRadioButton, 0);
 	typeButtons->addButton(floatRadioButton, 1);
 
-	// QButtonGroup::clicked(int) is gone in Qt 6; the id-carrying signal is
-	// idClicked(int). clicked() without an id is still live, which is why only
-	// the int overload moves.
 	connect(typeButtons, SIGNAL(idClicked(int)), SLOT(slotClicked(int)));
 }
 
@@ -167,7 +161,6 @@ void MT_AddConstantsWidget::accept()
 
 void MT_AddConstantsWidget::slotClicked(int id)
 {
-	// Qt 2: QButtonGroup::find(int) -> QButton*, QObject::name() -> const char*.
 	if(typeButtons->button(id)->objectName() == QString("intRadioButton")){
 		if(selectedType != intType){
 			selectedType = intType;
