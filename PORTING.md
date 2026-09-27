@@ -903,7 +903,19 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-27 — DONE: ITEM 59, THE POOL IS LIMITED TO 32768.** Start here.
+**2026-09-27 — DONE: METAGP'S FREE-SLOT SEARCH.** Start here.
+
+- **Changed:** `MT_Evaluator::spawnTask` finds a free result slot with
+  `indexOf(-1)`; before, it looked only at slot 0. Details are in its entry
+  in "Done".
+- **Baselines:** unchanged. `fitness-check.sh` is identical to its baseline.
+- **Review:** no defects.
+- **Gates:** `check.sh` 938 pass, 0 fail; warnings 486, one fewer: the
+  removed fill loop compared `int` with `qsizetype`.
+- **Next:** item 108, a critical review of every porting comment, in a new
+  session. Then items 106 and 107, interactive reviews.
+
+**2026-09-27 — DONE: ITEM 59, THE POOL IS LIMITED TO 32768.**
 
 - **Changed:** `SIG_GPPopulation::maximumSize`; Add and Import Individual
   stop at it with a message; a larger loaded pool is kept with a warning.
@@ -6196,6 +6208,19 @@ carried; other items and this file cite them, so they do not change.
   used it. The status tip is "Resets the simulation to the start." The
   behaviour does not change, and the button stays always enabled. Checked on
   the desktop with `walker.exp`.
+
+- [x] **MetaGP's free-slot search looked only at slot 0** — done
+  2026-09-27, by decision; found with item 72. In
+  `MT_Evaluator::spawnTask` the `break` after `NextFreePos=i;` was not
+  governed by its `if`, so when the slot at `NextFreePos` was taken the
+  search stopped after slot 0, and `MT_ResultBuffer` doubled although other
+  slots were free. The same line is in the 1.3 sources. The loop is now
+  `MT_ResultBuffer.indexOf(-1)`, and the buffer grows with `resize(n, -1.0)`
+  instead of a resize and a fill loop; the cursor is unchanged. Results were
+  never wrong: every estimate went to a free slot. Only the task id numbers
+  and memory use change; fitness values, random draws and files do not.
+  `resize` with a fill value exists in Qt 6.4.2. Not run: no check reaches
+  MetaGP estimation during a run.
 
 - [x] **72. A slave result of exactly -1.0 hung the run** — done
   2026-09-26. `SIG_GPFitnessTrainer::checkTask` returns -1 as "no result

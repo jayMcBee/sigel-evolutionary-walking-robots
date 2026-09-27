@@ -413,21 +413,15 @@ int MT_Evaluator::spawnTask(SIGEL_GP::SIG_GPIndividual const& ind)
 	
 		if(MT_ResultBuffer[NextFreePos] !=-1)
 		{
-			for (int i=0; i<MT_ResultSize;i++)
+			qsizetype freeSlot = MT_ResultBuffer.indexOf(-1);
+			if(freeSlot >= 0)
+				NextFreePos = freeSlot;
+			else
 			{
-				if(MT_ResultBuffer[i]==-1)
-					NextFreePos=i; break;
-			}
-
-			if(MT_ResultBuffer[NextFreePos] !=-1)
-			{
-				MT_ResultBuffer.resize(MT_ResultSize*2);
-				for (int k=MT_ResultSize; k< MT_ResultBuffer.size(); k++)
-					MT_ResultBuffer[k] = -1.0;
+				MT_ResultBuffer.resize(MT_ResultSize*2, -1.0);
 				NextFreePos = MT_ResultSize;
 				MT_ResultSize = MT_ResultBuffer.size();
 			}
-	
 		}
 
 		MT_ResultBuffer[NextFreePos] = MetaEstimationResult;
