@@ -323,6 +323,13 @@ touched, because changing one changes behaviour against the reference binary.
 
 ## 8 · Cleanup
 
+- [ ] **106. Review `SIG_GPParameter.cpp`, interactively.** Asked for
+  2026-09-27. The GP Parameters page is hard to read: long methods —
+  `getOutOfExperiment` 163 lines, `slotItemDoubleClicked` 144,
+  `putIntoExperiment` 116 — commented-out code, and porting comments that
+  hide the logic of the method they sit in. Go through it with the
+  maintainer, method by method, deciding each change before it is made.
+
 - [ ] **29. SIGEL needs a real logging system.** Qt 2's `QTextStream` wrote
   straight through to unbuffered `stderr`; Qt 6 buffers and flushes only on
   `flush()`, `Qt::endl`, overflow or destruction. **A trailing newline does not
