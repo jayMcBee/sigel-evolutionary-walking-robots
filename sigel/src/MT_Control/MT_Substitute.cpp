@@ -61,10 +61,8 @@ void MT_Substitute::changeErrorInfo(QList<double> * OutCome, QList<double> * Cor
 		AssumedFitness.resize(OutCome->size());
 	}
 
-	// CorrectFitness only ever grows -- it is a high-water mark -- so looping
-	// to its size read past both arguments once the training set shrank, which
-	// it does whenever the user lowers the selection size. Qt 2's QArray::at clamped
-	// that to index 0; plain QList does not.
+	// CorrectFitness never shrinks, but the training set shrinks when the user
+	// lowers the selection size. So the loop stops at the shortest of the three lists.
 	const int n = qMin(CorrectFitness.size(),
 	                   qMin(CorrectFit->size(), OutCome->size()));
 	for (int i=0; i<n; i++)

@@ -481,7 +481,6 @@ bool MT_Classifier::preEvolution(QList<SIGEL_GP::SIG_GPTournament *> *tours, int
 #endif
 		for(int i=0; i<NumOfClassi; i++)
 		{	
-			// take(i): return the occupant, empty the slot, never delete.
 			Tourna = tours->value(i);
 			if (i < tours->size()) (*tours)[i] = 0;
 			Tourna->classify(this);
@@ -499,14 +498,14 @@ bool MT_Classifier::preEvolution(QList<SIGEL_GP::SIG_GPTournament *> *tours, int
 	
 		for( int i=0; i<TourSize-NumOfClassi; i++)
 		{
-			// take(i+NumOfClassi), then insert(i): slot i is already empty, so
-			// Qt 2's insert deleted nothing here -- the delete is kept anyway.
+			// Move the tournament in slot i+NumOfClassi down to slot i.
+			// Slot i is always empty here, so the delete frees nothing.
 			Tourna = tours->value(i+NumOfClassi);
 			if (i+NumOfClassi < tours->size()) (*tours)[i+NumOfClassi] = 0;
 			if (i < tours->size()) { delete (*tours)[i]; (*tours)[i] = Tourna; }
 		}
 
-		// resize(): Qt 2 deleted the truncated tail. Proven all-null here.
+		// Every slot in the tail is null here, so this delete loop frees nothing.
 		for (qsizetype k = TourSize-NumOfClassi; k < tours->size(); k++)
 			delete tours->at(k);
 		tours->resize(TourSize-NumOfClassi);
@@ -541,7 +540,6 @@ bool MT_Classifier::preEvolution(QList<SIGEL_GP::SIG_GPTournament *> *tours, int
 		{	
 			if(ToursWBestIndi[i] == 0)
 			{
-				// take(i): occupant out, slot emptied, no delete.
 				Tourna = tours->value(i);
 				if (i < tours->size()) (*tours)[i] = 0;
 				Tourna->classify(this);
@@ -558,12 +556,6 @@ bool MT_Classifier::preEvolution(QList<SIGEL_GP::SIG_GPTournament *> *tours, int
 		pthread_mutex_unlock(&interpreterMutex);
 #endif
 
-// for Marco :-)	
-// If tournaments were run via the classifier,
-// tours should now be shrunk and the tournaments not yet run
-// should be carried over, i.e. all those at the start of tours,
-// so that tours->resize(TourSize-NumOfClassi) can simply be called 
-
 		int NumOfTour = TourSize - NewNumOfClassi; // Number of tournaments to be run normally
 		for( int i=0; i<NumOfTour; i++)
 		{
@@ -576,7 +568,6 @@ bool MT_Classifier::preEvolution(QList<SIGEL_GP::SIG_GPTournament *> *tours, int
 					if (NextTourPos < tours->size()) (*tours)[NextTourPos] = 0;
 					if(Tourna != NULL)
 					{
-						// insert(i): slot i is null on this branch, so no delete fires.
 						if (i < tours->size()) { delete (*tours)[i]; (*tours)[i] = Tourna; }
 						break;
 					}
@@ -586,7 +577,7 @@ bool MT_Classifier::preEvolution(QList<SIGEL_GP::SIG_GPTournament *> *tours, int
 		
 		}
 
-		// resize(): Qt 2 deleted the truncated tail. Proven all-null here.
+		// Every slot in the tail is null here, so this delete loop frees nothing.
 		for (qsizetype k = NumOfTour; k < tours->size(); k++)
 			delete tours->at(k);
 		tours->resize(NumOfTour);
@@ -631,7 +622,6 @@ int MT_Classifier::evalNeededTours(QList<SIGEL_GP::SIG_GPTournament *> *  tours,
 		for (int k=0; k <Tourna->indis.size();k++)
 		{
 			if(PosBest == Tourna->indis.value(k)->indNumber){
-				// at() was writable on Qt 2's const QArray; QList's is not.
 				(*ToursWBestIndi)[i] = 1;
 				break;
 			}

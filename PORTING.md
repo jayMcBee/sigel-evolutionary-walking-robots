@@ -903,7 +903,29 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-27 — DONE: ITEM 108, BATCH 2 OF 12, SIGEL_ROBOT.** Start here.
+**2026-09-27 — DONE: ITEM 108, BATCH 3 OF 12, MT_CONTROL.** Start here.
+
+- **Changed:** comments only, in `MT_Substitute.cpp` and `MT_Classifier.cpp`.
+  Of the 5 comments that named a Qt version, 4 were cut and 1 dropped. By
+  decision, four more comments in `MT_Classifier::preEvolution` went too: the
+  three `take(i)` and `insert(i)` notes and the "for Marco" block.
+- **Baselines:** unchanged.
+- **Review:** no defects.
+- **Gates:** `check.sh` 938 pass, 0 fail; warnings 486. The other four gates
+  are green.
+- **Left for afterwards:** in `MT_Classifier::preEvolution`, both
+  `delete (*tours)[i]` calls and both tail delete loops only delete null, the
+  `if (i < tours->size())` guards are always true, and the DebugInfo block
+  assigns an unused local. Entries of `CorrectFitness` past the current
+  training set keep old values that both `evaluationTactic` methods still
+  read. `AssumedFitness` grows only with `CorrectFitness`; a shorter outcome
+  list would be read out of range (not confirmed). Three "2003 …" history
+  comments in `MT_Evaluator::evaluationTactic`.
+- **Next:** item 108, batch 4. Batches left: MT_GUI, SIGEL_MasterGUI,
+  MT_GPSystem, SIGEL_Program, SIGEL_RobotIO, SIGEL_Simulation, SIGEL_SlaveGUI,
+  and `sigel.cpp` with `sigel_slave.cpp`. Then item 109.
+
+**2026-09-27 — DONE: ITEM 108, BATCH 2 OF 12, SIGEL_ROBOT.**
 
 - **Changed:** comments only, in 4 files of `SIGEL_Robot`. All 10 comments
   that named a Qt version were cut to the fact today's code needs: the
