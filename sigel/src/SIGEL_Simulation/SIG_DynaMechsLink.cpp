@@ -58,7 +58,7 @@ namespace SIGEL_Simulation
     if ((screwD != 0 ) || (screwTheta != 0))
       screwLink = new dmZScrewTxLink( screwD, screwTheta );
 
-    SIGEL_Robot::SIG_Geometry *geometry = const_cast< SIGEL_Robot::SIG_Geometry* >(link->getGeometry());
+    SIGEL_Robot::SIG_Geometry const *geometry = link->getGeometry();
 
     SIGEL_Robot::SIG_Material const *material = link->getMaterial();
 

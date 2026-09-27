@@ -909,7 +909,20 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-27 — DONE: ITEM 92, PART 3, THE META-GP CONST_CASTS REMOVED.** Start here.
+**2026-09-27 — DONE: ITEM 92, PART 4, SIG_MIRTICH NO LONGER MOVES ITS GEOMETRY. ITEM 92 IS DONE.** Start here.
+
+- **Changed:** `SIG_Mirtich` holds `SIG_Geometry const *`;
+  `moveToOriginAndMajorAxes` became `computeTransformToOriginAndMajorAxes`,
+  which only computes; `SIG_Link::transformToDynaMo` translates and rotates
+  its geometry and calls `invalidate`, formerly `computeAgain`.
+  `SIG_DynaMechsLink` loses its cast.
+- **Baselines:** unchanged.
+- **Review:** no defects.
+- **Gates:** `check.sh` 758 pass, 0 fail; warnings 486. The other four gates
+  are green.
+- **Next:** remove the `NEW NEW NEW` comment banners; then item 94.
+
+**2026-09-27 — DONE: ITEM 92, PART 3, THE META-GP CONST_CASTS REMOVED.**
 
 - **Changed:** `MT_Classifier::classifier`, `createNewTCase` and
   `createDoubleTransIndi`, `MT_Substitute::translatedSIGProg` and
@@ -6387,6 +6400,17 @@ carried; other items and this file cite them, so they do not change.
   `expstruct selfcheck`, which tested our tool; the syntax compile of the two
   programs; and `real clicks`, with its `xtest` scenario and
   `xtest-baseline.txt`. `check.sh` gives 757 pass.
+
+- [x] **92. `const_cast`s removed where the API allows it, and `f(void)`
+  became `f()`** — done 2026-09-27, four commits. 289 `(void)` parameter
+  lists became `()`. 23 of 33 `const_cast`s went: three where the object was
+  only read (`SIG_EarlyRunTermSimulation`, `SIG_DynaMechsCommandInterface`,
+  `SIG_EnvironmentRenderer`); two with item 91; 17 in Meta-GP, whose methods
+  now take `SIG_Program const *`; and the one in `SIG_DynaMechsLink`, after
+  `SIG_Mirtich` stopped moving its geometry: it holds a const pointer and
+  `computeTransformToOriginAndMajorAxes` only computes, while
+  `SIG_Link::transformToDynaMo` moves the geometry itself. The 10 left stay:
+  PVM's C functions take `char*` for strings they only read.
 
 - [x] **91. `SIG_ProgramLine`'s getters and `SIG_Program::getLine` are
   const** — done 2026-09-27, one commit. The eight read-only getters of

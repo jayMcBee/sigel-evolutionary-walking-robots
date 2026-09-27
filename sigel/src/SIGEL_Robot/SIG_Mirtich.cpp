@@ -249,7 +249,7 @@ namespace SIGEL_Robot {
                 delete [] p.verts;
         }
 
-        SIG_Mirtich::SIG_Mirtich (SIG_Geometry *geometr, QString nameOfGeom)
+        SIG_Mirtich::SIG_Mirtich (SIG_Geometry const *geometr, QString nameOfGeom)
                 : computed (false),
                   myExcName (nameOfGeom),
                   geom (geometr)
@@ -391,8 +391,8 @@ namespace SIGEL_Robot {
                 v3.normalize ();
         }
 
-        void SIG_Mirtich::moveToOriginAndMajorAxes (DL_vector & translation,
-                                                    DL_matrix & rotation)
+        void SIG_Mirtich::computeTransformToOriginAndMajorAxes (DL_vector & translation,
+                                                                DL_matrix & rotation)
         {
                 DL_matrix axes;
 
@@ -400,11 +400,6 @@ namespace SIGEL_Robot {
 
                 axes.invert (&rotation);
                 translation.timesis (-1.0);
-
-                geom->translate (translation);
-                geom->rotate (rotation);
-
-                computed = false;
         }
         
 } // namespace

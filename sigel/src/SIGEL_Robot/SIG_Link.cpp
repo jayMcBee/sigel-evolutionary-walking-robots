@@ -207,7 +207,10 @@ namespace SIGEL_Robot {
         {
                 DL_vector v;
                 DL_matrix m;
-                mirtich->moveToOriginAndMajorAxes (v, m);
+                mirtich->computeTransformToOriginAndMajorAxes (v, m);
+                geometry->translate (v);
+                geometry->rotate (m);
+                mirtich->invalidate ();
                 transformPoints (v, m);
         }
 
@@ -708,7 +711,7 @@ namespace SIGEL_Robot {
 		};
 #endif	      
 
-	      mirtich->computeAgain();
+	      mirtich->invalidate();
 	    };
 
 #ifdef SIG_DEBUG

@@ -53,7 +53,7 @@ namespace SIGEL_Robot {
                 };
         protected:
                 // this is to what we refer
-                SIG_Geometry *geom;
+                SIG_Geometry const *geom;
                 // alpha, beta, gamma
                 int cA, cB, cC;
                 // projection integrals (return values)
@@ -73,7 +73,7 @@ namespace SIGEL_Robot {
                 void compute ();
 
         public:
-                SIG_Mirtich (SIG_Geometry *geom, QString nameOfGeom);
+                SIG_Mirtich (SIG_Geometry const *geom, QString nameOfGeom);
                 virtual ~SIG_Mirtich ();
 
                 void computePhysics (double density,
@@ -82,9 +82,9 @@ namespace SIGEL_Robot {
                                      DL_matrix & inertiaTensor);
                 void computeMajorAxes (DL_vector & centreOfMass,
                                        DL_vector & v1, DL_vector & v2, DL_vector & v3);
-                void moveToOriginAndMajorAxes (DL_vector & translation,
-                                               DL_matrix & rotation);
-                void computeAgain () { computed = false; }
+                void computeTransformToOriginAndMajorAxes (DL_vector & translation,
+                                                           DL_matrix & rotation);
+                void invalidate () { computed = false; }
  		double getT0()  { return T0; }
         };
 

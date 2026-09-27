@@ -62,20 +62,6 @@ Constructs the language removed. A current compiler rejects them.
   | MT_GPSystem | 17 | SIGEL_Program, SIGEL_SlaveGUI | 3 |
   | SIGEL_CommonGUI | 12 | | |
 
-- [ ] **92. Remove the `const_cast`s where the API allows it.** Re-counted
-  2026-09-27. The `(void)` parameter lists and 22 casts are done; see
-  `PORTING.md`.
-  - **11 `const_cast`s left.** None is undefined behaviour today: each object
-    was created non-const and is only read through the cast. But a later
-    write through one would be, and the compiler would not say so.
-    - **Keep, 10:** PVM's C functions take `char*` for strings they only
-      read: `SIG_GPFitnessTrainer` (8), `SIG_GPPVMData::sendQStringToPVM`
-      (1), `SIG_AllIndividualsView::slotVisualize` (1).
-    - **`SIG_DynaMechsLink`, 1:** it hands its geometry to `SIG_Mirtich`,
-      which stores a non-const pointer because `moveToOriginAndMajorAxes`
-      moves the geometry. Only `SIG_Link::transformToDynaMo` calls that. Either
-      keep the cast, or move the translate and rotate into `SIG_Link` so
-      `SIG_Mirtich` holds a const pointer. Undecided.
 - [ ] **101. Empty destructors: remove them, or default them in the header.**
   Decided 2026-09-26. Delete every empty destructor whose class already has a
   virtual destructor above it. A base class without one gets a defaulted
