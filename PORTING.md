@@ -917,8 +917,7 @@ classes and leave truncation a hard error. **They are not interchangeable.**
   `SIG_Mirtich`'s `myExcName` became `geometryName`, and the `NEW NEW NEW`
   comment banners were removed.
 - **Baselines:** unchanged.
-- **Review:** no defects. It found that `addRandomIndividuals` returns the
-  requested count even when cancelled part-way.
+- **Review:** no defects.
 - **Gates:** `check.sh` 758 pass, 0 fail; warnings 485, one fewer because an
   unused variable went. The other four gates are green.
 - **Next:** item 101, then item 102.
