@@ -94,7 +94,7 @@ MT_TranslatedIndividual * MT_Substitute::translatedSIGProg(SIGEL_Program::SIG_Pr
 	for (int k=1; k<16; k++)
 		(*MData)[k] =0;
 	
-	SIGEL_Program::SIG_ProgramLine * SIG_ProLine;
+	SIGEL_Program::SIG_ProgramLine const * SIG_ProLine;
 		
 	for (int i=0; i<ProgSize;i++)
 	{

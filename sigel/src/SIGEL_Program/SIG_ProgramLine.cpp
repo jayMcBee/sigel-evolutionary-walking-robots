@@ -30,14 +30,12 @@
 
 SIGEL_Program::SIG_ProgramLine& SIGEL_Program::SIG_ProgramLine::operator =(SIGEL_Program::SIG_ProgramLine const & prgLine)
 { 
-  SIG_ProgramLine &tmpPrgLine = const_cast< SIG_ProgramLine& >( prgLine );
+  setRobotinstructionType( prgLine.getRobotinstructionType() );
 
-  setRobotinstructionType( tmpPrgLine.getRobotinstructionType() );
+  element.resize( prgLine.getNumberOfElements() );
 
-  element.resize( tmpPrgLine.getNumberOfElements() );
-
-  for( int i=0;i<tmpPrgLine.getNumberOfElements();i++ )
-    setElement( i, tmpPrgLine.getElement(i) );
+  for( int i=0;i<prgLine.getNumberOfElements();i++ )
+    setElement( i, prgLine.getElement(i) );
        
   return *this;
 }
@@ -159,12 +157,12 @@ void SIGEL_Program::SIG_ProgramLine::setRobotinstruction(SIGEL_Program::Robotins
      }
 }
 
-SIGEL_Program::Robotinstruction SIGEL_Program::SIG_ProgramLine::getRobotinstructionType()
+SIGEL_Program::Robotinstruction SIGEL_Program::SIG_ProgramLine::getRobotinstructionType() const
 {
      return instructionType;
 }
 
-int SIGEL_Program::SIG_ProgramLine::getInstructionElement( int no )
+int SIGEL_Program::SIG_ProgramLine::getInstructionElement( int no ) const
 {
   if( no >= 0 && no < int(element.size()) )
     {
@@ -185,12 +183,12 @@ int SIGEL_Program::SIG_ProgramLine::getInstructionElement( int no )
     }  
 }
 
-QList< int > SIGEL_Program::SIG_ProgramLine::getElementsArray()
+QList< int > SIGEL_Program::SIG_ProgramLine::getElementsArray() const
 {
      return element;
 }
 
-int SIGEL_Program::SIG_ProgramLine::getElement( int no )
+int SIGEL_Program::SIG_ProgramLine::getElement( int no ) const
 {
   if( no >= 0 && no < int(element.size()) )
     {
@@ -235,12 +233,12 @@ void SIGEL_Program::SIG_ProgramLine::setElement(int no, int value)
     }
 }
 
-int SIGEL_Program::SIG_ProgramLine::getNumberOfElements()
+int SIGEL_Program::SIG_ProgramLine::getNumberOfElements() const
 {
   return element.size();
 }
 
-void SIGEL_Program::SIG_ProgramLine::print()
+void SIGEL_Program::SIG_ProgramLine::print() const
 {
   QString prgLine = "";
 
@@ -249,7 +247,7 @@ void SIGEL_Program::SIG_ProgramLine::print()
 
 }
 
-void SIGEL_Program::SIG_ProgramLine::printToString(QString &lineStr)
+void SIGEL_Program::SIG_ProgramLine::printToString(QString &lineStr) const
 {
   
   bool ok = false;
@@ -518,7 +516,7 @@ bool SIGEL_Program::SIG_ProgramLine::readFromFile(QString &str, SIGEL_Program::S
 
 
 
-void  SIGEL_Program::SIG_ProgramLine::writeToFile(QTextStream &file)
+void  SIGEL_Program::SIG_ProgramLine::writeToFile(QTextStream &file) const
 {
 
    file<<"       ";

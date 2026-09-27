@@ -63,20 +63,19 @@ Constructs the language removed. A current compiler rejects them.
   | SIGEL_CommonGUI | 12 | | |
 
 - [ ] **92. Remove the `const_cast`s where the API allows it.** Re-counted
-  2026-09-27. The `(void)` parameter lists and three casts are done; see
+  2026-09-27. The `(void)` parameter lists and five casts are done; see
   `PORTING.md`.
-  - **26 `const_cast`s left.** None is undefined behaviour today: each object
+  - **24 `const_cast`s left.** None is undefined behaviour today: each object
     was created non-const and is only read through the cast. But a later
     write through one would be, and the compiler would not say so.
     - **Keep, 10:** PVM's C functions take `char*` for strings they only
       read: `SIG_GPFitnessTrainer` (8), `SIG_GPPVMData::sendQStringToPVM`
       (1), `SIG_AllIndividualsView::slotVisualize` (1).
-    - **After item 91 — `getLine`, 2:** `SIG_Interpreter::interprete` and
-      `SIG_ProgramLine::operator=`.
-    - **After item 91 — Meta-GP, 13:** the three tournament classes and
+    - **Meta-GP, 13:** the three tournament classes and
       `MT_Evaluator::spawnTask` cast programs and an individual because
       `MT_Classifier::createNewTCase` and `classifier` take non-const
-      pointers. They only read, but through `getLine` and the line getters.
+      pointers. They only read, and `getLine` and the line getters are
+      const now.
     - **`SIG_DynaMechsLink`, 1:** it hands its geometry to `SIG_Mirtich`,
       which stores a non-const pointer because `moveToOriginAndMajorAxes`
       moves the geometry. Only `SIG_Link::transformToDynaMo` calls that. Either
@@ -223,6 +222,13 @@ Constructs the language removed. A current compiler rejects them.
 
 All present in 1.3, none introduced here. Each needs a decision before it is
 touched, because changing one changes behaviour against the reference binary.
+
+- [ ] **110. `SIG_GPOperations::crossOver` reads line -1 of a one-line
+  program.** Found 2026-09-27 by the review of item 91, from the code; not
+  reproduced. With a winner of length 1 and a minimum length above 0, the
+  minimum-length branch sets `crossPoint1` to 0 while `segLen1` stays -1, and
+  a copy loop then asks for line -1. Before item 91 that read outside the
+  vector; now `SIG_Program::getLine` throws `SIG_Exception`.
 
 - [ ] **18. `SIG_GPPVMTask` holds a reference to a host that can be deleted
   under it.** `SIG_GPPVMTask` declares `SIG_GPActivePVMHost &host`;
@@ -557,18 +563,6 @@ touched, because changing one changes behaviour against the reference binary.
   `SIG_GUIGPExperiment::terminationAlreadyMet` tells the user the run
   "terminates after N generations", a count per run; its text changes with
   it.
-
-- [ ] **91. Make `SIG_ProgramLine`'s getters const, then `getLine`.** Found
-  2026-09-25 by the review of the `SIG_Program` const step. None of these
-  change the line: `getRobotinstructionType`, `getInstructionElement`,
-  `getElement`, `getNumberOfElements`, `getElementsArray`, `printToString`,
-  `print`, `writeToFile`. With them const, `SIG_ProgramLine::operator=` loses
-  its `const_cast`, and `SIG_Program` can offer
-  `const SIG_ProgramLine *getLine( long no ) const` beside the non-const one
-  that `SIG_GPOperations`' mutation needs; `SIG_Interpreter::interprete` then
-  loses its last `const_cast`. `SIG_GPIndividual::exportProgram` and `print`
-  can use `getProgram()` instead of `getProgramVar()`. `SIG_Program::print`'s
-  comment says stdout; it writes to `SIG_IO::cerr`.
 
 - [ ] **89. Refuse bad simulation parameters.** Found 2026-09-24 in item 87;
   needs more thought. Two values reach divisions with nothing to stop them:

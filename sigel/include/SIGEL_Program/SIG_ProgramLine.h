@@ -178,7 +178,7 @@ class SIG_ProgramLine
  */
  
    public:
-   void print();
+   void print() const;
 
 /**
  * This function sets an element (with index no) to the value. value has to be a pre-defined
@@ -208,7 +208,7 @@ class SIG_ProgramLine
  */
  
    public:
-   void writeToFile( QTextStream &file );
+   void writeToFile( QTextStream &file ) const;
 
 /**
  * This function will generate a program line from the read QTextStream.It will return
@@ -238,14 +238,14 @@ class SIG_ProgramLine
  * The QString will contain the current program line.
  */
    public:
-   void printToString(QString &lineStr);
+   void printToString(QString &lineStr) const;
 
 /**
  * This function returns the array of a line's elements
  */
 
    public:
-   QList< int > getElementsArray();
+   QList< int > getElementsArray() const;
 
 
 /**
@@ -253,7 +253,7 @@ class SIG_ProgramLine
  */
 
    public:
-   Robotinstruction getRobotinstructionType();
+   Robotinstruction getRobotinstructionType() const;
 
 /**
  * This function returns the element of the current robotinstruction.
@@ -266,7 +266,7 @@ class SIG_ProgramLine
  */
  
    public:
-   int getInstructionElement(int no);
+   int getInstructionElement(int no) const;
 
 /**
  * This function returns the element with the index no.
@@ -277,7 +277,7 @@ class SIG_ProgramLine
  */
  
    public:
-   int getElement(int no);
+   int getElement(int no) const;
 
 /**
  * This function gives an inormation about the number of elements at all.
@@ -286,7 +286,7 @@ class SIG_ProgramLine
  */
  
    public:
-   int getNumberOfElements();
+   int getNumberOfElements() const;
 
 /**
  * This operator copies a complete program line.

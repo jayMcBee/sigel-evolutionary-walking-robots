@@ -217,7 +217,7 @@ void SIGEL_GP::SIG_GPIndividual::importProgram( QString& filename )
 
 void SIGEL_GP::SIG_GPIndividual::exportProgram( QString& filename )
 {
-   getProgramVar().exportProgram( filename );
+   getProgram().exportProgram( filename );
 }
 
 
@@ -533,7 +533,7 @@ void SIGEL_GP::SIG_GPIndividual::print()
                             << getAge()
                             << "\n- Program:\n" << Qt::endl;
 
-  getProgramVar().print();
+  getProgram().print();
   
 }
 

@@ -130,7 +130,7 @@ QList<SIGEL_GP::SIG_GPIndividual *> SIGEL_GP::SIG_GPOperations::crossOver( SIGEL
   long const generalRecombinationType = randomizer.getRandomInt(5);
 
 	SIGEL_Program::SIG_ProgramLine *newProgLine = nullptr;
-  SIGEL_Program::SIG_ProgramLine *sourceProgLine = nullptr;
+  SIGEL_Program::SIG_ProgramLine const *sourceProgLine = nullptr;
 
 	// Recombination/Crossover, Variant 1:
 	// (just guessing from the code, obviously nobody thought it was worth commenting..  -jan)
@@ -481,9 +481,14 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::mutation( SIGEL_GP::SIG_
 	     // Generate (randomly) a completely new program line by replacing the old content:
 	     // -------------------------------------------------------------------------------   
 
-             newProgram.getLine( mutPoint )->randomRobotinstruction( languageP, 
-								     randomizer, 
-								     gpParameter.getInstructionProbabilities() );
+             {
+               SIGEL_Program::SIG_ProgramLine mutatedLine;
+               mutatedLine = *newProgram.getLine( mutPoint );
+               mutatedLine.randomRobotinstruction( languageP,
+                                                   randomizer,
+                                                   gpParameter.getInstructionProbabilities() );
+               newProgram.setLine( mutPoint, mutatedLine );
+             }
              break;
 
       case 1:
@@ -535,9 +540,14 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::mutation( SIGEL_GP::SIG_
              
              // Set the new program line properties (in this case the operands):
 
-             newProgram.getLine( mutPoint )->setRobotinstruction( instructionType, 
-								  op1, 
-								  op2 );
+             {
+               SIGEL_Program::SIG_ProgramLine mutatedLine;
+               mutatedLine = *newProgram.getLine( mutPoint );
+               mutatedLine.setRobotinstruction( instructionType,
+                                                op1,
+                                                op2 );
+               newProgram.setLine( mutPoint, mutatedLine );
+             }
              break;
 
       case 2:
@@ -578,9 +588,14 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::mutation( SIGEL_GP::SIG_
                  op2 = 0;
 	       }   
 
-             newProgram.getLine( mutPoint )->setRobotinstruction( newProgLine->getRobotinstructionType(), 
-						 		  op1,
-								  op2 );  
+             {
+               SIGEL_Program::SIG_ProgramLine mutatedLine;
+               mutatedLine = *newProgram.getLine( mutPoint );
+               mutatedLine.setRobotinstruction( newProgLine->getRobotinstructionType(),
+                                                op1,
+                                                op2 );
+               newProgram.setLine( mutPoint, mutatedLine );
+             }
              delete newProgLine;
 
              break;

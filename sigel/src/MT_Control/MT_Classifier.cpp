@@ -333,7 +333,7 @@ MT_TranslatedIndividual * MT_Classifier::createDoubleTransIndi(SIGEL_Program::SI
 		(*MData)[k] =0;
 	(*MData)[16] = SigProgTwoSize;
 	
-	SIGEL_Program::SIG_ProgramLine * SIG_ProLine;
+	SIGEL_Program::SIG_ProgramLine const * SIG_ProLine;
 
 // First SIGEL program is translated 
 	for (int i=0; i<SigProgOneSize;i++)

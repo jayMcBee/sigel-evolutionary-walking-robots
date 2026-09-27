@@ -909,7 +909,19 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-27 — DONE: ITEM 92, PART 2, THREE CONST_CASTS REMOVED.** Start here.
+**2026-09-27 — DONE: ITEM 91, READING AND WRITING A PROGRAM LINE ARE SEPARATE.** Start here.
+
+- **Changed:** `SIG_Program::getLine` is const-only; `setLine` writes a line;
+  both throw on a line that does not exist. Details are in item 91's entry in
+  "Done".
+- **Baselines:** unchanged.
+- **Review:** no defects. It found item 110, a crossover path that reads line
+  -1, which now throws instead.
+- **Gates:** `check.sh` 758 pass, 0 fail; warnings 486. The other four gates
+  are green. Mutation was compared separately, old against new: identical.
+- **Next:** the rest of item 92.
+
+**2026-09-27 — DONE: ITEM 92, PART 2, THREE CONST_CASTS REMOVED.**
 
 - **Changed:** `SIG_EarlyRunTermSimulation` keeps a const robot pointer;
   `SIG_DynaMechsCommandInterface::moveDrive` reads its joint through const
@@ -6362,6 +6374,19 @@ carried; other items and this file cite them, so they do not change.
   `expstruct selfcheck`, which tested our tool; the syntax compile of the two
   programs; and `real clicks`, with its `xtest` scenario and
   `xtest-baseline.txt`. `check.sh` gives 757 pass.
+
+- [x] **91. `SIG_ProgramLine`'s getters and `SIG_Program::getLine` are
+  const** — done 2026-09-27, one commit. The eight read-only getters of
+  `SIG_ProgramLine` are const. `SIG_Program::getLine` exists only as the const
+  version; a line is changed only through `SIG_Program::setLine`, which
+  assigns a copy. Both check the line number and throw `SIG_Exception` when
+  the line does not exist; before, an index out of range read outside the
+  vector. `SIG_GPOperations::mutation` copies the line, changes the copy and
+  writes it back at its three writing sites. Two `const_cast`s went, in
+  `SIG_ProgramLine::operator=` and `SIG_Interpreter::interprete`. The mutation
+  was proven unchanged outside the gates, which run no evolution: 3000
+  mutations with a fixed seed on each of the seven experiments gave output
+  identical byte for byte before and after.
 
 - [x] **6. `NULL` → `nullptr`** — done 2026-09-27, one commit. Every null
   pointer in SIGEL's own C++ is `nullptr`: 62 written `NULL`, and 372 written

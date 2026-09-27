@@ -25,6 +25,7 @@
 #include "SIGEL_Program/SIG_ProgramLine.h"
 #include "SIGEL_Tools/SIG_Randomizer.h"
 #include "SIGEL_Tools/SIG_IO.h"
+#include "SIGEL_Tools/SIG_Exception.h"
 
 #include "stdlib.h"
 #include "iostream.h" 
@@ -159,18 +160,22 @@ void SIGEL_Program::SIG_Program::readFromFile( QTextStream &file )
 }
 
 
-SIGEL_Program::SIG_ProgramLine *SIGEL_Program::SIG_Program::getLine( long no )
+SIGEL_Program::SIG_ProgramLine const *SIGEL_Program::SIG_Program::getLine( long no ) const
 {
-
-#ifdef SIG_DEBUG
-  if ((no < 0) || (no >= lines.size()) || (!lines[no]))
-  {
-    SIGEL_Tools::SIG_IO::cerr << "Ouch [4] ! " << no << " " << lines[no] << Qt::endl;
-    exit(1);
-  };
-#endif
-
+  checkLineNumber( no );
   return lines[no];
+}
+
+void SIGEL_Program::SIG_Program::setLine( long no, SIGEL_Program::SIG_ProgramLine const &line )
+{
+  checkLineNumber( no );
+  *lines[no] = line;
+}
+
+void SIGEL_Program::SIG_Program::checkLineNumber( long no ) const
+{
+  if( no < 0 || no >= getProgramLength() )
+    throw SIGEL_Tools::SIG_Exception( __FILE__, __LINE__, QString( "Program line %1 does not exist; the program has %2 lines." ).arg( no ).arg( lines.size() ) );
 }
 
 

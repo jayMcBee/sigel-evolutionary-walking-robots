@@ -77,7 +77,7 @@ namespace SIGEL_Simulation
 	while ( timeAccountSize > 0)
 	  {
 	    // fetch the next command
-	    SIGEL_Program::SIG_ProgramLine *theLine = const_cast< SIGEL_Program::SIG_Program &>( robotProgram ).getLine( programCounter );
+	    SIGEL_Program::SIG_ProgramLine const *theLine = robotProgram.getLine( programCounter );
 	    
 	    /*
 	     * ONLY FOR DEBUGGING-PURPOSES!

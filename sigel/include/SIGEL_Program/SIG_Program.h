@@ -168,7 +168,7 @@ class SIG_Program
 /**
  * This function has only been implemented for test purposes. It is obsolete.
  * @post
- * The program will be printed to stdout.
+ * The program will be printed to SIG_IO::cerr.
  */
    public:
    void print() const;
@@ -183,15 +183,29 @@ class SIG_Program
    long getProgramLength() const;
 
 /**
- * This functions returns a program line.
- * @pre
- * A program (with program lines) must exist.
+ * This function returns a program line for reading.
  * @return
- * A pointer to the corresponding program line will be returned. If this line is
- * not existing, the functions returns 0.
+ * A pointer to the line with the index no. A line that does not exist throws
+ * SIGEL_Tools::SIG_Exception.
  */
    public:
-   SIGEL_Program::SIG_ProgramLine *getLine(long no);
+   SIGEL_Program::SIG_ProgramLine const *getLine(long no) const;
+
+/**
+ * This function overwrites the line with the index no by a copy of line.
+ * @post
+ * The line with the index no has the instruction and the elements of line. A
+ * line that does not exist throws SIGEL_Tools::SIG_Exception.
+ */
+   public:
+   void setLine(long no, SIGEL_Program::SIG_ProgramLine const &line);
+
+/**
+ * This function throws SIGEL_Tools::SIG_Exception if the line with the index
+ * no does not exist.
+ */
+   private:
+   void checkLineNumber(long no) const;
 
 /**
  * This function deletes the line with the index no.
