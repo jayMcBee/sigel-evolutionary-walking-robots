@@ -302,6 +302,14 @@ touched, because changing one changes behaviour against the reference binary.
 
 ## 8 · Cleanup
 
+- [ ] **108. Review every porting comment critically.** Asked for
+  2026-09-27, to follow item 59. Many "Qt 2 did this, Qt 6 does that" comments
+  tell the history of the port instead of explaining the code. Start with
+  every comment that names a Qt version: 226 lines in 83 files under `src/`
+  and `include/`, counted with `grep -E "Qt ?[0-9]"`. A fresh-eyes sub-agent
+  reviews each comment in its method; then the maintainer decides whether it
+  stays, is cut to the context the code needs, or goes. Related: item 30.
+
 - [ ] **107. Review `SIG_GPPopulation::readFromFile`, interactively.** Asked
   for 2026-09-27. The method is 129 lines and hard to read. Go through it with
   the maintainer, deciding each change before it is made.
