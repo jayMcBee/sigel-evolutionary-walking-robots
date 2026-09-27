@@ -6209,6 +6209,9 @@ carried; other items and this file cite them, so they do not change.
   behaviour does not change, and the button stays always enabled. Checked on
   the desktop with `walker.exp`.
 
+- [x] **98. Run the next long evolution under gdb** — dropped 2026-09-27,
+  by decision: nothing crashes now, so the item has nothing to act on.
+
 - [x] **MetaGP's free-slot search looked only at slot 0** — done
   2026-09-27, by decision; found with item 72. In
   `MT_Evaluator::spawnTask` the `break` after `NextFreePos=i;` was not
