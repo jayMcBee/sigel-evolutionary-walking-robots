@@ -913,7 +913,8 @@ classes and leave truncation a hard error. **They are not interchangeable.**
   capped count, not the real one; it now states only the limit.
 - **Gates:** `check.sh` 938 pass, 0 fail; warnings 487. The other four gates
   are green.
-- **Next:** item 107, a review of `SIG_GPPopulation::readFromFile`.
+- **Next:** item 108, a critical review of every porting comment, in a new
+  session. Then items 106 and 107, interactive reviews.
 
 **2026-09-27 — DONE: ITEM 103, THE TOURNAMENT COUNTER NO LONGER GOES
 STALE.**
