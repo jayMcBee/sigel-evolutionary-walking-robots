@@ -76,7 +76,7 @@ void MT_Substitute::changeErrorInfo(QList<double> * OutCome, QList<double> * Cor
 
 
 
-MT_TranslatedIndividual * MT_Substitute::translatedSIGProg(SIGEL_Program::SIG_Program *SIGProg)
+MT_TranslatedIndividual * MT_Substitute::translatedSIGProg(SIGEL_Program::SIG_Program const *SIGProg)
 {
 	int ProgSize = SIGProg->getProgramLength();
 

@@ -42,7 +42,7 @@ private:
 	* until checkTask() gets the PVM result; it matches this case by getName(),
 	* which is why PVMTaskID is stored as the Name.
 	*/
-	MT_TrainingCase * createNewTCase(SIGEL_Program::SIG_Program * SIGProg, int PVMTaskID);
+	MT_TrainingCase * createNewTCase(SIGEL_Program::SIG_Program const * SIGProg, int PVMTaskID);
 	
 	/*The calibration strategy lives here; if true, MetaProg is used for fitness evaluation
 	* of the SIGEL individual, otherwise SIGEL runs "normally"

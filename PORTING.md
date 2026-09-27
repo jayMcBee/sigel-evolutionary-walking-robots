@@ -909,7 +909,20 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-27 — DONE: ITEM 91, READING AND WRITING A PROGRAM LINE ARE SEPARATE.** Start here.
+**2026-09-27 — DONE: ITEM 92, PART 3, THE META-GP CONST_CASTS REMOVED.** Start here.
+
+- **Changed:** `MT_Classifier::classifier`, `createNewTCase` and
+  `createDoubleTransIndi`, `MT_Substitute::translatedSIGProg` and
+  `MT_Evaluator::createNewTCase` take `SIG_Program const *`. 17 casts went:
+  16 in the three tournament classes, 1 in `MT_Evaluator::spawnTask`. The
+  to-do list said 13; each tournament line held two.
+- **Baselines:** unchanged.
+- **Review:** no defects; the maintainer reviewed the diff.
+- **Gates:** `check.sh` 758 pass, 0 fail; warnings 486. The other four gates
+  are green.
+- **Next:** the last cast of item 92 that can go, `SIG_DynaMechsLink`.
+
+**2026-09-27 — DONE: ITEM 91, READING AND WRITING A PROGRAM LINE ARE SEPARATE.**
 
 - **Changed:** `SIG_Program::getLine` is const-only; `setLine` writes a line;
   both throw on a line that does not exist. Details are in item 91's entry in

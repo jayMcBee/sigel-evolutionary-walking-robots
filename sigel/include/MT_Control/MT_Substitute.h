@@ -87,7 +87,7 @@ protected:
 	int GenerationNumber;
 	
 	// translated a SIGEL Program to three arrays; which by a MetaProgram can used  
-	MT_TranslatedIndividual * translatedSIGProg(SIGEL_Program::SIG_Program *SIGProg);
+	MT_TranslatedIndividual * translatedSIGProg(SIGEL_Program::SIG_Program const *SIGProg);
 
 	// the Program of the present best Meta Individuals 
 	MT_Program * BestMETAProgram;

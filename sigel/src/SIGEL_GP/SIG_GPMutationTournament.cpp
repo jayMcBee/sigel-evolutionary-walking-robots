@@ -127,7 +127,7 @@ bool SIGEL_GP::SIG_GPMutationTournament::run(MT_Classifier *MetaClassifier)
    double var2=ind2.getFitness();
    
 	// Creates a training case in the meta GP system
-   MetaClassifier->createNewTCase(&const_cast<SIGEL_Program::SIG_Program&>(ind1.getProgram()), &const_cast<SIGEL_Program::SIG_Program&>(ind2.getProgram()),var1-var2);
+   MetaClassifier->createNewTCase(&ind1.getProgram(), &ind2.getProgram(),var1-var2);
 
    //The tournament action
 
@@ -185,7 +185,7 @@ bool  SIGEL_GP::SIG_GPMutationTournament::classify(MT_Classifier *MetaClassifier
 
    // Tournament winner determined via the classifier;
    // FitDiff < 0 -> indi2 wins;  FitDiff >= 0 -> indi1 wins
-	double  FitDiff = MetaClassifier->classifier(&const_cast<SIGEL_Program::SIG_Program&>(ind1.getProgram()), &const_cast<SIGEL_Program::SIG_Program&>(ind2.getProgram()));	
+	double  FitDiff = MetaClassifier->classifier(&ind1.getProgram(), &ind2.getProgram());	
 
    if (FitDiff>=0)
      {

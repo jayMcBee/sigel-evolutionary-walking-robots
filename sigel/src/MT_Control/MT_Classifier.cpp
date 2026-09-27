@@ -118,7 +118,7 @@ void MT_Classifier::writeToFileSetup(QTextStream &File)
 // functionally method 
 //////////////////////////////////////////////////////////////////////
 
-double MT_Classifier::classifier(SIGEL_Program::SIG_Program * SigProgOne, SIGEL_Program::SIG_Program * SigProgTwo)
+double MT_Classifier::classifier(SIGEL_Program::SIG_Program const * SigProgOne, SIGEL_Program::SIG_Program const * SigProgTwo)
 {
 
 		double MetaEstimationResult = Interpreter->interpret(createDoubleTransIndi(SigProgOne, SigProgTwo));
@@ -127,7 +127,7 @@ double MT_Classifier::classifier(SIGEL_Program::SIG_Program * SigProgOne, SIGEL_
 
 }
 
-void MT_Classifier::createNewTCase(SIGEL_Program::SIG_Program * SigProgOne, SIGEL_Program::SIG_Program * SigProgTwo, double FitDifference)
+void MT_Classifier::createNewTCase(SIGEL_Program::SIG_Program const * SigProgOne, SIGEL_Program::SIG_Program const * SigProgTwo, double FitDifference)
 {
 
 	MT_TranslatedIndividual * TransIndi = createDoubleTransIndi(SigProgOne, SigProgTwo);
@@ -311,7 +311,7 @@ return NumOfClassi;
 }
 
 
-MT_TranslatedIndividual * MT_Classifier::createDoubleTransIndi(SIGEL_Program::SIG_Program * SigProgOne, SIGEL_Program::SIG_Program * SigProgTwo)
+MT_TranslatedIndividual * MT_Classifier::createDoubleTransIndi(SIGEL_Program::SIG_Program const * SigProgOne, SIGEL_Program::SIG_Program const * SigProgTwo)
 {
 
 	int SigProgOneSize = SigProgOne->getProgramLength();

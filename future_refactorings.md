@@ -63,19 +63,14 @@ Constructs the language removed. A current compiler rejects them.
   | SIGEL_CommonGUI | 12 | | |
 
 - [ ] **92. Remove the `const_cast`s where the API allows it.** Re-counted
-  2026-09-27. The `(void)` parameter lists and five casts are done; see
+  2026-09-27. The `(void)` parameter lists and 22 casts are done; see
   `PORTING.md`.
-  - **24 `const_cast`s left.** None is undefined behaviour today: each object
+  - **11 `const_cast`s left.** None is undefined behaviour today: each object
     was created non-const and is only read through the cast. But a later
     write through one would be, and the compiler would not say so.
     - **Keep, 10:** PVM's C functions take `char*` for strings they only
       read: `SIG_GPFitnessTrainer` (8), `SIG_GPPVMData::sendQStringToPVM`
       (1), `SIG_AllIndividualsView::slotVisualize` (1).
-    - **Meta-GP, 13:** the three tournament classes and
-      `MT_Evaluator::spawnTask` cast programs and an individual because
-      `MT_Classifier::createNewTCase` and `classifier` take non-const
-      pointers. They only read, and `getLine` and the line getters are
-      const now.
     - **`SIG_DynaMechsLink`, 1:** it hands its geometry to `SIG_Mirtich`,
       which stores a non-const pointer because `moveToOriginAndMajorAxes`
       moves the geometry. Only `SIG_Link::transformToDynaMo` calls that. Either

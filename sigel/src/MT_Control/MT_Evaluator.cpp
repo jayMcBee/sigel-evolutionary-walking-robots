@@ -128,7 +128,7 @@ void MT_Evaluator::loadSetup(QTextStream &File)
 // functionally method 
 //////////////////////////////////////////////////////////////////////
 
-MT_TrainingCase * MT_Evaluator::createNewTCase(SIGEL_Program::SIG_Program * SIGProg, int PVMTaskID)
+MT_TrainingCase * MT_Evaluator::createNewTCase(SIGEL_Program::SIG_Program const * SIGProg, int PVMTaskID)
 {
 	MT_TrainingCase * NewTCase;
 	MT_TranslatedIndividual *TransIndi = translatedSIGProg(SIGProg); 
@@ -369,7 +369,6 @@ bool MT_Evaluator::evaluationTactic()
 int MT_Evaluator::spawnTask(SIGEL_GP::SIG_GPIndividual const& ind)
 {
 	int MetaTaskID =0;
-	SIGEL_GP::SIG_GPIndividual &ncInd = const_cast<SIGEL_GP::SIG_GPIndividual&>(ind);
 	
 	bool useMeta=false;
 
@@ -396,7 +395,7 @@ int MT_Evaluator::spawnTask(SIGEL_GP::SIG_GPIndividual const& ind)
 		pthread_mutex_lock(&interpreterMutex);
 #endif
 
-		double MetaEstimationResult = Interpreter->interpret(translatedSIGProg(ncInd.getProgramPointer()));
+		double MetaEstimationResult = Interpreter->interpret(translatedSIGProg(&ind.getProgram()));
 
 		// unlock the interpreter so that the program can be updated
 #ifdef _WINDOWS
@@ -440,7 +439,7 @@ int MT_Evaluator::spawnTask(SIGEL_GP::SIG_GPIndividual const& ind)
 	{
 		MetaTaskID = SIG_GPFitnessTrainer::spawnTask(ind);
 		
-		TmpBuffer.append(createNewTCase(ncInd.getProgramPointer(), MetaTaskID));
+		TmpBuffer.append(createNewTCase(&ind.getProgram(), MetaTaskID));
 	
 		return MetaTaskID;
 

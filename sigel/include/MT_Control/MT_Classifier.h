@@ -39,18 +39,18 @@ public:
 	* Runs the tournament normally, i.e. on exact fitness; 
 	* creates a training case 
 	*/
-	void createNewTCase(SIGEL_Program::SIG_Program * SigProgOne, SIGEL_Program::SIG_Program * SigProgTwo, double FitDifference);
+	void createNewTCase(SIGEL_Program::SIG_Program const * SigProgOne, SIGEL_Program::SIG_Program const * SigProgTwo, double FitDifference);
 	
 	/* Method serves Tournament.classifier(Classifier)
 	* Runs the tournament using the classifier.
 	* Tournament.classifier(Classifier) is called via preEvolution  
 	*/
-	double classifier(SIGEL_Program::SIG_Program * SigProgOne, SIGEL_Program::SIG_Program * SigProgTwo);	
+	double classifier(SIGEL_Program::SIG_Program const * SigProgOne, SIGEL_Program::SIG_Program const * SigProgTwo);	
 	
 
 private:
 
-	MT_TranslatedIndividual* createDoubleTransIndi(SIGEL_Program::SIG_Program * SigProgOne, SIGEL_Program::SIG_Program * SigProgTwo);
+	MT_TranslatedIndividual* createDoubleTransIndi(SIGEL_Program::SIG_Program const * SigProgOne, SIGEL_Program::SIG_Program const * SigProgTwo);
 
 	// Return value indicates how many SIGEL tournaments should be classified rather than run by exact fitness
 	//  

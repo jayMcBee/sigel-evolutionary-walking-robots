@@ -178,8 +178,8 @@ bool SIGEL_GP::SIG_GPCrossOverTournament::run(MT_Classifier *MetaClassifier)
    double fitness2_2=ind2_2.getFitness();
    
    	// Creates two training cases for the meta GP system
-   MetaClassifier->createNewTCase(&const_cast<SIGEL_Program::SIG_Program&>(ind1_1.getProgram()), &const_cast<SIGEL_Program::SIG_Program&>(ind1_2.getProgram()),fitness1_1-fitness1_2);
-   MetaClassifier->createNewTCase(&const_cast<SIGEL_Program::SIG_Program&>(ind2_1.getProgram()), &const_cast<SIGEL_Program::SIG_Program&>(ind2_2.getProgram()),fitness2_1-fitness2_2);
+   MetaClassifier->createNewTCase(&ind1_1.getProgram(), &ind1_2.getProgram(),fitness1_1-fitness1_2);
+   MetaClassifier->createNewTCase(&ind2_1.getProgram(), &ind2_2.getProgram(),fitness2_1-fitness2_2);
    
    SIG_GPIndividual *winner1 = nullptr;
    SIG_GPIndividual *winner2 = nullptr;
@@ -265,8 +265,8 @@ bool  SIGEL_GP::SIG_GPCrossOverTournament::classify(MT_Classifier *MetaClassifie
    
   // Tournament winner determined via the classifier;
    // FitDiff < 0 -> indi2 wins;  FitDiff >= 0 -> indi1 wins
-	double  FitDiff1 = MetaClassifier->classifier(&const_cast<SIGEL_Program::SIG_Program&>(ind1_1.getProgram()), &const_cast<SIGEL_Program::SIG_Program&>(ind1_2.getProgram()));	
-  	double  FitDiff2 = MetaClassifier->classifier(&const_cast<SIGEL_Program::SIG_Program&>(ind2_1.getProgram()), &const_cast<SIGEL_Program::SIG_Program&>(ind2_2.getProgram()));	
+	double  FitDiff1 = MetaClassifier->classifier(&ind1_1.getProgram(), &ind1_2.getProgram());	
+  	double  FitDiff2 = MetaClassifier->classifier(&ind2_1.getProgram(), &ind2_2.getProgram());	
   
    if (FitDiff1 >= 0)
      {
