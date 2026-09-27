@@ -40,9 +40,6 @@ SIGEL_GP::SIG_GPSimpleTournament::SIG_GPSimpleTournament(SIGEL_Tools::SIG_Random
   indis[ 1 ] = new SIG_GPTournamentIndividual( ppos2 );
 };
 
-SIGEL_GP::SIG_GPSimpleTournament::~SIG_GPSimpleTournament()
-{ };
-
 bool SIGEL_GP::SIG_GPSimpleTournament::run()
 {      
    //Positions of the two participants

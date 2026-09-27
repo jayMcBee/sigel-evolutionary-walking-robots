@@ -82,17 +82,6 @@ class SIG_GPCrossOverTournament : public SIGEL_GP::SIG_GPTournament
    
 
 
-/**
-* The destructor of the crossovertournament.
-* @pre
-* The tournament is played, a crossovered copies of the winners are placed 
-* in position of the losers in the pool, the fitnesstask of the new
-* individuals are complete and returned the correct fitness.
-* @post
-* The tournament is destructed.
-*/
- public:
-virtual ~SIG_GPCrossOverTournament();
 
 /**
 * The virtual function effects the tournament to start.

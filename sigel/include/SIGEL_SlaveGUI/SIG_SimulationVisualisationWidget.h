@@ -63,11 +63,6 @@
 					 Qt::WindowFlags f = Qt::WindowFlags() );
 
       /**
-       * The destructor of the SIG_SimulationVisualisationWidget.
-       */
-      ~SIG_SimulationVisualisationWidget();
-
-      /**
        * How many simulation steps one movie frame covers, so that frames
        * come at frameRate per simulated second: round(1 / (stepSize *
        * frameRate)), and at least 1.

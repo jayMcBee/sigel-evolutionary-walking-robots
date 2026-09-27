@@ -26,7 +26,7 @@ public:
 	
 	MT_Operand(int Op, double Da, int na);
 	MT_Operand();
-	virtual ~MT_Operand();
+	virtual ~MT_Operand() = default;
 
 };
 

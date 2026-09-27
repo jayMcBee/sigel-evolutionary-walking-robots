@@ -24,11 +24,6 @@ SIG_IndividualListBase::SIG_IndividualListBase(QWidget* parent, const char* name
   header->setSectionResizeMode( 3, QHeaderView::ResizeToContents );
 }
 
-SIG_IndividualListBase::~SIG_IndividualListBase()
-{
-  // no need to delete child widgets, Qt does it all for us
-}
-
 void SIG_IndividualListBase::changeEvent( QEvent *e )
 {
   QWidget::changeEvent( e );

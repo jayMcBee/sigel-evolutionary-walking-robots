@@ -55,9 +55,6 @@ namespace SIGEL_Robot {
 			}
 		}
 
-        SIG_PitchRollSensor::~SIG_PitchRollSensor ()
-        { }
-
         SIG_Sensor::SensorType SIG_PitchRollSensor::getSensorType () const
         {
                 return tPitchRollSensor;

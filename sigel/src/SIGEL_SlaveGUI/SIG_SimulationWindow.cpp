@@ -104,9 +104,6 @@ namespace SIGEL_SlaveGUI
     this->setMinimumSize( 780, 839 );
   };
 
-  SIG_SimulationWindow::~SIG_SimulationWindow()
-  { };
-
   bool SIG_SimulationWindow::event( QEvent *e )
   {
     if (e->type() == QEvent::WindowBlocked)

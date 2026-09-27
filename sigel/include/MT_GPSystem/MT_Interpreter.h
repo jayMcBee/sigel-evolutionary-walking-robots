@@ -48,7 +48,7 @@ public:
 	MT_Interpreter (int VarNum, int TDuration);
 
 	MT_Interpreter();
-	virtual ~MT_Interpreter();
+	virtual ~MT_Interpreter() = default;
 	
 	/* this both function change the TDuration and the Number of allowed Variable, 
 	* e.g. by a change in the GUI or load a new setup.

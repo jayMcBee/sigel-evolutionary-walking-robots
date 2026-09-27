@@ -58,11 +58,6 @@ namespace SIGEL_SlaveGUI
 			  char const *name=nullptr,
 			  Qt::WindowFlags f = Qt::WindowFlags() );
 
-    /**
-     * The destructor of the SIG_SimulationWidget.
-     */
-    ~SIG_SimulationWidget();
-
   public slots:
 
     /**

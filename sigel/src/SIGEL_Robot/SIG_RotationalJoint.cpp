@@ -41,9 +41,6 @@ namespace SIGEL_Robot {
                 rightHand = SIG_Robot::streamToVector (tx);
                 tx >> minimum >> maximum >> initial;
         }
-        
-        SIG_RotationalJoint::~SIG_RotationalJoint ()
-        { }
 
         SIG_Joint::JointType SIG_RotationalJoint::getJointType () const
         {

@@ -38,9 +38,6 @@ namespace SIGEL_Robot {
                 if (!theJoint)
                         throw SIG_UnstreamingError (__FILE__, __LINE__, "sensor '" + getName () + "' names unknown joint '" + b + "'");
         }
-        
-        SIG_JointSensor::~SIG_JointSensor ()
-        { }
 
         SIG_Sensor::SensorType SIG_JointSensor::getSensorType () const
         {

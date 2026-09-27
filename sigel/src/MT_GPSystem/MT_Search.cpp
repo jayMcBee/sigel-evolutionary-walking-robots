@@ -14,11 +14,6 @@ MT_Search::MT_Search()
 
 }
 
-MT_Search::~MT_Search()
-{
-
-}
-
 MT_Search::MT_Search(MT_Population *ParentPop, MT_Population *OffspringPop, MT_Randomizer *_Randi)
 {
 	LastError =0;

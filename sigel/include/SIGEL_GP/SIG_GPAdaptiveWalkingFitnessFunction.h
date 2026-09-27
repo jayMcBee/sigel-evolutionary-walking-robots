@@ -37,8 +37,6 @@ namespace SIGEL_GP
 
     public:
 
-      ~SIG_GPAdaptiveWalkingFitnessFunction();
-
       double evalFitness( SIGEL_Program::SIG_Program &program,
                           SIGEL_Robot::SIG_Robot &rob,
                           SIGEL_Environment::SIG_Environment &environment,

@@ -37,16 +37,6 @@ namespace SIGEL_GP
 class SIG_GPSimpleFitnessFunction : public SIG_GPFitnessFunction 
 {
 
-/**
- * The destructor of the fitnessfunction.
- * @pre 
- * The computation of the fitnessvalue is done.
- * @post
- * The object of the fitnessfunction is destructed.
- */
- public:
-~SIG_GPSimpleFitnessFunction();
-
 
 /**
  * This operation activates the computation of the fitnessvalue. It is virtual, this means 

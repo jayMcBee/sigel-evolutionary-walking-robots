@@ -16,7 +16,6 @@ class SIG_EnvironmentBase : public QWidget, public Ui::SIG_EnvironmentBase
 
 public:
     SIG_EnvironmentBase(QWidget* parent = nullptr, const char* name = nullptr, Qt::WindowFlags fl = Qt::WindowFlags());
-    ~SIG_EnvironmentBase() override;
 
 public slots:
     virtual void slotAlpha() = 0;

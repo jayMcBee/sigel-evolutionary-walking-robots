@@ -133,9 +133,6 @@ MT_IndividualsWidget::MT_IndividualsWidget(QWidget* parent, const char* name, Qt
 	connect(editor, SIGNAL(newText(const QString &)), SLOT(slotChangeConstant(const QString &)));
 }
 
-MT_IndividualsWidget::~MT_IndividualsWidget()
-{}
-
 /***
  * enables/disables widgets during evolution
  ***/

@@ -9,11 +9,6 @@ MT_SearchWidgetBase::MT_SearchWidgetBase(QWidget* parent, const char* name, Qt::
   setupUi( this );
 }
 
-MT_SearchWidgetBase::~MT_SearchWidgetBase()
-{
-  // no need to delete child widgets, Qt does it all for us
-}
-
 void MT_SearchWidgetBase::changeEvent( QEvent *e )
 {
   QWidget::changeEvent( e );

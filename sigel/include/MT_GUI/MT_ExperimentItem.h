@@ -13,7 +13,6 @@ class MT_ExperimentItem : public QTreeWidgetItem
 {
 public:
 	MT_ExperimentItem(QTreeWidget *parent, int pos, QString title, const QPixmap &pix);
-	virtual ~MT_ExperimentItem();
 
 	int getPos();
 

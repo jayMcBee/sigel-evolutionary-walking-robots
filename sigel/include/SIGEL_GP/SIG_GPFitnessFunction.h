@@ -51,7 +51,7 @@ class SIG_GPFitnessFunction{
  * The object of the fitnessfunction is destructed.
  */
  public:
- virtual ~SIG_GPFitnessFunction();
+ virtual ~SIG_GPFitnessFunction() = default;
 
 
 /**

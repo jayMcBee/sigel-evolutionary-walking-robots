@@ -24,8 +24,6 @@
 
 #include <cmath>
 
-SIGEL_GP::SIG_GPFitnessFunction::~SIG_GPFitnessFunction() {};
-
 bool SIGEL_GP::SIG_GPFitnessFunction::isValid( double value ) const
 {
   return ( (value != HUGE_VAL) && (value != (-HUGE_VAL)) && (value==value) );

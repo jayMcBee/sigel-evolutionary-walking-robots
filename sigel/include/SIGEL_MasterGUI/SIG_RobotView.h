@@ -46,13 +46,6 @@ public:
      */
     SIG_RobotView( QWidget* paren, const char* name, Qt::WindowFlags fl, SIGEL_GP::SIG_GPExperiment &theExperiment );
 
-    /**
-     * The destructor.
-     *
-     * Will be deleted if not used.
-     */
-    ~SIG_RobotView();
-
     void putIntoExperiment();
     
     void getOutOfExperiment();

@@ -13,7 +13,6 @@ class MT_PopListViewItem : public QTreeWidgetItem
 public:
 	MT_PopListViewItem(QTreeWidget *parent);
 	MT_PopListViewItem(QTreeWidget *parent, MT_Individual *ind);
-	virtual ~MT_PopListViewItem();
 	void setPos(int NewPos);
 	int getPos();
 

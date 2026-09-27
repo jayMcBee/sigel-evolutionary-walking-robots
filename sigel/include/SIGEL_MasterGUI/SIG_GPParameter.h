@@ -52,13 +52,6 @@ public:
     SIG_GPParameter( QWidget* parent, const char* name, Qt::WindowFlags fl, SIGEL_GP::SIG_GPExperiment &theExperiment );
 
     /**
-     * The destructor.
-     *
-     * Will be erased if not needed.
-     */
-    ~SIG_GPParameter();
-    
-    /**
      * This slot is called whenever the values of the widgets shall be
      * put into the genetic programming parameters of the experiment.
      */

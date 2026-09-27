@@ -27,9 +27,6 @@ namespace SIGEL_RobotIO {
                 : robot (nullptr)
         { }
 
-        SIG_RobotFactory::~SIG_RobotFactory ()
-        { }
-
         SIG_Robot *SIG_RobotFactory::getModel ()
         {
                 return robot;

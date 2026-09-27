@@ -74,17 +74,6 @@ SIG_GPMutationTournament(SIGEL_Tools::SIG_Randomizer& randomizer,
 private:
  QString name;
 
-/**
-* The destructor of the mutationtournament.
-* @pre
-* The tournament is played, a mutated copy of the winner is placed 
-* in position of the loser in the pool, the fitnesstask of the new
-* individual is complete and returned the correct fitness.
-* @post
-* The tournament is destructed.
-*/
- public:
-virtual ~SIG_GPMutationTournament();
 
 /**
 * The virtual function effects the tournament to start.

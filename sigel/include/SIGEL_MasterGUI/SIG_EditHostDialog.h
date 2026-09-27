@@ -42,11 +42,6 @@ public:
     SIG_EditHostDialog( QWidget* parent = nullptr, const char* name = nullptr, bool modal = false, Qt::WindowFlags fl = Qt::WindowFlags() );
 
     /**
-     * Destructor.
-     */
-    ~SIG_EditHostDialog();
-
-    /**
      * This slot is used to popup a file dialog whenever a user clicks
      * on the ToolButton associated with the slave directory lineedit.
      */

@@ -161,7 +161,4 @@ namespace SIGEL_Visualisation
     gluPerspective( fovy, aspectRatio, _winport_near, _winport_far );
   };
 
-  SIG_Visualisation::~SIG_Visualisation()
-  { };
-
 }

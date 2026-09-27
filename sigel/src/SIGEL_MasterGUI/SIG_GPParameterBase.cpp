@@ -22,14 +22,6 @@ SIG_GPParameterBase::SIG_GPParameterBase( QWidget *parent, const char *name,
   listviewHosts->sortByColumn( 0, Qt::AscendingOrder );
 }
 
-/*
- *  Destroys the object and frees any allocated resources
- */
-SIG_GPParameterBase::~SIG_GPParameterBase()
-{
-  // no need to delete child widgets, Qt does it all for us
-}
-
 void SIG_GPParameterBase::changeEvent( QEvent *e )
 {
   QWidget::changeEvent( e );

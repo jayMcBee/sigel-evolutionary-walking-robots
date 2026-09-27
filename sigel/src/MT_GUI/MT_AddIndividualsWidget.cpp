@@ -10,11 +10,6 @@ MT_AddIndividualsWidgetBase::MT_AddIndividualsWidgetBase(QWidget* parent, const 
   setupUi( this );
 }
 
-MT_AddIndividualsWidgetBase::~MT_AddIndividualsWidgetBase()
-{
-  // no need to delete child widgets, Qt does it all for us
-}
-
 void MT_AddIndividualsWidgetBase::changeEvent( QEvent *e )
 {
   QDialog::changeEvent( e );

@@ -111,9 +111,6 @@ MT_PopulationWidget::MT_PopulationWidget(QMainWindow* parent, const char* name, 
 	QObject::connect(this, SIGNAL(numChanged()), SLOT(slotNumChanged()));
 };
 
-MT_PopulationWidget::~MT_PopulationWidget()
-{};
-
 /***
  * enables/disables widgets during evolution
  ***/

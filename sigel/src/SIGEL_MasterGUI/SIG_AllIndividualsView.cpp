@@ -125,11 +125,6 @@ SIG_AllIndividualsView::SIG_AllIndividualsView( QWidget * parent, const char * n
   setSizes( valList );
 };
 
-SIG_AllIndividualsView::~SIG_AllIndividualsView()
-{
-
-};
-
 int SIG_AllIndividualsView::numberOfSelectedItems()
 {
   int numberOfSelectedItems = 0;

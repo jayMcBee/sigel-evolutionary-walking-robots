@@ -112,14 +112,6 @@ SIG_GPParameter::SIG_GPParameter( QWidget* parent,  const char* name, Qt::Window
     } );
 }
 
-/*  
- *  Destroys the object and frees any allocated resources
- */
-SIG_GPParameter::~SIG_GPParameter()
-{
-    // no need to delete child widgets, Qt does it all for us
-}
-
 std::optional<int> SIG_GPParameter::selectedFitnessFunction() const
 {
   // -1 is Qt's "nothing selected"

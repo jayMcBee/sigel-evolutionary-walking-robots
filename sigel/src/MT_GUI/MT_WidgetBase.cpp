@@ -13,11 +13,6 @@ MT_WidgetBase::MT_WidgetBase(QWidget *parent)
 	parentWindow = parent;
 }
 
-MT_WidgetBase::~MT_WidgetBase()
-{
-
-}
-
 void MT_WidgetBase::onShow(MT_GPManager *manager, subst_cache *subst)
 {
 

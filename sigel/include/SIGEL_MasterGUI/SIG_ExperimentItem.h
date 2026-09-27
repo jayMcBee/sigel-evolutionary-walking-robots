@@ -47,12 +47,6 @@ namespace SIGEL_MasterGUI
        */
       SIG_ExperimentItem( QTreeWidget * parent, QString name );
 
-      /**
-       * The destructor of the SIG_ExperimentItem.
-       *
-       * Will be erased if not needed.
-       */
-      ~SIG_ExperimentItem();
     };
   
 }

@@ -14,7 +14,7 @@ class MT_WidgetBase
 {
 public:
 	MT_WidgetBase(QWidget *parent);
-	virtual ~MT_WidgetBase();
+	virtual ~MT_WidgetBase() = default;
 
 	virtual bool onHide(MT_GPManager *manager, subst_cache *subst);
 	virtual void onShow(MT_GPManager *manager, subst_cache *subst);

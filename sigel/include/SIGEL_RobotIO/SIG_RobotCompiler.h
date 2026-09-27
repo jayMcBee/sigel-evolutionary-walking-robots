@@ -70,7 +70,7 @@ namespace SIGEL_RobotIO {
                 SIG_RobotCompiler (SIG_RobotScanner &sc,
                                    SIG_Robot *tg,
                                    QString homepath);
-                virtual ~SIG_RobotCompiler ();
+                virtual ~SIG_RobotCompiler() = default;
 
                 // QString prefixFile (QString filename);
 

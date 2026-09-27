@@ -93,8 +93,3 @@ SIG_InfoBox::SIG_InfoBox( QWidget *parent, const char *name, bool modal, Qt::Win
 
 };
 
-SIG_InfoBox::~SIG_InfoBox()
-{
-
-};
-

@@ -44,9 +44,6 @@ SIGEL_GP::SIG_GPPVMData::SIG_GPPVMData(SIGEL_Robot::SIG_Robot& robot,
   miscParam.resetEveryGeneration=0;
 };
 
-SIGEL_GP::SIG_GPPVMData::~SIG_GPPVMData() {};
-
-
 void SIGEL_GP::SIG_GPPVMData::sendQStringToPVM(QString str, int taskId, int messageId)
 {
   // Bytes, not characters: pvm_upkstr writes into a buffer of this size.

@@ -28,7 +28,7 @@ public:
 	/******* administrative methods *******/
 	MT_Randomizer (QTextStream &File);
 	MT_Randomizer();
-	virtual ~MT_Randomizer();
+	virtual ~MT_Randomizer() = default;
 	void writeToFileRandi (QTextStream &File);
 	void loadSetup (QTextStream &File);
 	

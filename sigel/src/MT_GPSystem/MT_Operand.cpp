@@ -16,11 +16,6 @@ MT_Operand::MT_Operand()
 	Data =-1;
 }
 
-MT_Operand::~MT_Operand()
-{
-
-}
-
 MT_Operand::MT_Operand(MT_Operand *Original)
 {
 	OPType = Original->OPType;

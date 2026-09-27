@@ -41,9 +41,6 @@ namespace SIGEL_Robot {
                    >> traMin >> traMax >> traIni;
         }
 
-        SIG_CylindricalJoint::~SIG_CylindricalJoint ()
-        { }
-
         SIG_Joint::JointType SIG_CylindricalJoint::getJointType () const
         { return tCylindricalJoint; }
         

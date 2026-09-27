@@ -16,7 +16,6 @@ class SIG_ExperimentViewBase : public QWidget, public Ui::SIG_ExperimentViewBase
 
 public:
     SIG_ExperimentViewBase(QWidget* parent = nullptr, const char* name = nullptr, Qt::WindowFlags fl = Qt::WindowFlags());
-    ~SIG_ExperimentViewBase() override;
 
 public slots:
     virtual void slotExportPostScript() = 0;

@@ -9,11 +9,6 @@ MT_SelectionWidgetBase::MT_SelectionWidgetBase(QWidget* parent, const char* name
   setupUi( this );
 }
 
-MT_SelectionWidgetBase::~MT_SelectionWidgetBase()
-{
-  // no need to delete child widgets, Qt does it all for us
-}
-
 void MT_SelectionWidgetBase::changeEvent( QEvent *e )
 {
   QWidget::changeEvent( e );

@@ -44,9 +44,6 @@ MT_SearchWidget::MT_SearchWidget(QWidget* parent, const char* name, Qt::WindowFl
 	QObject::connect(pt3XOverProbSlider, SIGNAL(valueChanged(int)), SLOT(slotpt3Changed(int)));
 }
 
-MT_SearchWidget::~MT_SearchWidget()
-{}
-
 /***
  * enables/disables widgets during evolution
  ***/

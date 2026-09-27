@@ -16,7 +16,6 @@ class SIG_IndividualListBase : public QWidget, public Ui::SIG_IndividualListBase
 
 public:
     SIG_IndividualListBase(QWidget* parent = nullptr, const char* name = nullptr, Qt::WindowFlags fl = Qt::WindowFlags());
-    ~SIG_IndividualListBase() override;
 
 protected:
     // Qt does not call languageChange() itself.

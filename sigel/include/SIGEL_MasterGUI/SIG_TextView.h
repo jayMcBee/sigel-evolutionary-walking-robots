@@ -29,7 +29,6 @@ class SIG_TextView : public QTextBrowser
 
  public:
   SIG_TextView( QWidget *parent = nullptr, const char *name = nullptr );
-  ~SIG_TextView();
 
  protected:
   // Sends the viewport mouse events to the three handlers below.

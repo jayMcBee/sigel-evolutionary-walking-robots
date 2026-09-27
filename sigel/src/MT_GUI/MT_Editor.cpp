@@ -17,11 +17,6 @@ MT_Editor::MT_Editor(QWidget *parent) : QLineEdit(parent)
 	hide();
 }
 
-MT_Editor::~MT_Editor()
-{
-
-}
-
 void MT_Editor::popup(const QRect &rect, const QString &text)
 {
 	oldText = text;

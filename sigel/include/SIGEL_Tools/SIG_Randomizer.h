@@ -57,8 +57,6 @@ public:
 
 
 
-   ~SIG_Randomizer();
-
     /**
      * This operation returns a randomly generated integer number between 0 and maximum.
      * @param maximum

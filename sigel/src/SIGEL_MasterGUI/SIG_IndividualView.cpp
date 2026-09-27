@@ -53,14 +53,6 @@ SIG_IndividualView::SIG_IndividualView( QWidget* parent,  const char* name, Qt::
   multilineeditHistory->setText( history );
 }
 
-/*  
- *  Destroys the object and frees any allocated resources
- */
-SIG_IndividualView::~SIG_IndividualView()
-{
-  // no need to delete child widgets, Qt does it all for us
-}
-
 void SIG_IndividualView::clear()
 {
   textlabelShowName->setText( QString() );

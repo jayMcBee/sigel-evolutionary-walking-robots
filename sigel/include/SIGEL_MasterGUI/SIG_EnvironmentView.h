@@ -49,11 +49,6 @@ public:
     SIG_EnvironmentView( QWidget* parent, const char* name, Qt::WindowFlags fl, SIGEL_GP::SIG_GPExperiment &theExperiment );
 
     /**
-     * The destructor.
-     */
-    ~SIG_EnvironmentView();
-    
-    /**
      * This slot is called whenever the values of the widgets shall be
      * put into the environment parameters of the experiment.
      */

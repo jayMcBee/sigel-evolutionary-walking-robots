@@ -91,9 +91,6 @@
     movieDirectory = temp + "movie/";
   };
 
-  SIG_SimulationVisualisationWidget::~SIG_SimulationVisualisationWidget()
-  { };
-
   int SIG_SimulationVisualisationWidget::stepsPerFrame( double stepSize, int frameRate )
   {
     return qMax( 1, qRound( 1.0 / ( stepSize * frameRate ) ) );

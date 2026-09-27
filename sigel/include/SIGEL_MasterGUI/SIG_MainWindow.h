@@ -66,11 +66,6 @@ namespace SIGEL_MasterGUI
        */
       SIG_MainWindow( QWidget * parent = nullptr, const char * name = nullptr, Qt::WindowFlags f = Qt::Window );
 
-      /**
-       * The destructor of SIG_MainWindow.
-       */
-      ~SIG_MainWindow();
-      
    public slots:
 	/**
 	 * Enables or disables every action that requires an experiment.

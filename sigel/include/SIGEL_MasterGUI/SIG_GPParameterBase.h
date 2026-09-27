@@ -19,7 +19,6 @@ class SIG_GPParameterBase : public QWidget, public Ui::SIG_GPParameterBase
 public:
     SIG_GPParameterBase( QWidget *parent = nullptr, const char *name = nullptr,
                          Qt::WindowFlags fl = Qt::WindowFlags() );
-    ~SIG_GPParameterBase() override;
 
 public slots:
     virtual void slotAddHost() = 0;

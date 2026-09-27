@@ -29,10 +29,7 @@ namespace SIGEL_RobotIO {
                 : SIG_RobotFactory (),
                   filename (file)
         { }
-        
-        SIG_RobotBuilder::~SIG_RobotBuilder ()
-        { }
-        
+
         SIG_Robot *SIG_RobotBuilder::build ()
         {
                 robot = new SIG_Robot ();

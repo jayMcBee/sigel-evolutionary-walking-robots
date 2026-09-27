@@ -10,11 +10,6 @@ SIG_MovieSettingsDialogBase::SIG_MovieSettingsDialogBase(QWidget* parent, const 
   setupUi( this );
 }
 
-SIG_MovieSettingsDialogBase::~SIG_MovieSettingsDialogBase()
-{
-  // no need to delete child widgets, Qt does it all for us
-}
-
 void SIG_MovieSettingsDialogBase::changeEvent( QEvent *e )
 {
   QDialog::changeEvent( e );

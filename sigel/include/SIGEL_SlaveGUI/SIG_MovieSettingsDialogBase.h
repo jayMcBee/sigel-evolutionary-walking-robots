@@ -16,7 +16,6 @@ class SIG_MovieSettingsDialogBase : public QDialog, public Ui::SIG_MovieSettings
 
 public:
     SIG_MovieSettingsDialogBase(QWidget* parent = nullptr, const char* name = nullptr, bool modal = false, Qt::WindowFlags fl = Qt::WindowFlags());
-    ~SIG_MovieSettingsDialogBase() override;
 
 public slots:
     virtual void slotToolButtonClicked() = 0;

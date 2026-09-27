@@ -79,14 +79,6 @@ SIG_EnvironmentView::SIG_EnvironmentView( QWidget* parent,  const char* name, Qt
     v->setLocale( cLocale );
 }
 
-/*  
- *  Destroys the object and frees any allocated resources
- */
-SIG_EnvironmentView::~SIG_EnvironmentView()
-{
-    // no need to delete child widgets, Qt does it all for us
-}
-
 void SIG_EnvironmentView::putIntoExperiment()
 {
   // put the gravity values out of the widgets into the experiment ( lineedits )

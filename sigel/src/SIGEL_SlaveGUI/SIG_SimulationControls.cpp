@@ -105,9 +105,6 @@ namespace SIGEL_SlaveGUI
 
   };
 
-  SIG_SimulationControls::~SIG_SimulationControls()
-  { };
-
   void SIG_SimulationControls::slotPlayPressed()
   {
     simulationRunning = !simulationRunning;

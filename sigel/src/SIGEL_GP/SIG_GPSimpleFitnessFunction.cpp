@@ -29,9 +29,6 @@
 
 #include <qdatetime.h>
 
-SIGEL_GP::SIG_GPSimpleFitnessFunction::~SIG_GPSimpleFitnessFunction()
-{ };
-
 double SIGEL_GP::SIG_GPSimpleFitnessFunction::evalFitness( SIGEL_Program::SIG_Program &program,
                                                            SIGEL_Robot::SIG_Robot &rob,
                                                            SIGEL_Environment::SIG_Environment &environment,

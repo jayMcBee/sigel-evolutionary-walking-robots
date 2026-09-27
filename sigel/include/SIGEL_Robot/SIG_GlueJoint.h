@@ -42,7 +42,6 @@ namespace SIGEL_Robot
   public:
     SIG_GlueJoint (SIG_Robot *par, QString n, int nr = -1);
     SIG_GlueJoint (SIG_Robot *par, QTextStream & tx);
-    virtual ~SIG_GlueJoint ();
 
     virtual JointType getJointType () const;
 

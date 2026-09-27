@@ -9,11 +9,6 @@ SIG_SimulationWidgetBase::SIG_SimulationWidgetBase(QWidget* parent, const char* 
   setupUi( this );
 }
 
-SIG_SimulationWidgetBase::~SIG_SimulationWidgetBase()
-{
-  // no need to delete child widgets, Qt does it all for us
-}
-
 void SIG_SimulationWidgetBase::changeEvent( QEvent *e )
 {
   QWidget::changeEvent( e );

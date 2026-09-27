@@ -52,7 +52,6 @@ namespace SIGEL_Robot
   public:
     SIG_Drive (SIG_Robot *par, QString n, int nr = -1);
     SIG_Drive (SIG_Robot *par, QTextStream & tx);
-    ~SIG_Drive ();
     QString getName () const;
     int getNumber () const;
     void setJoint (SIG_Joint *j);

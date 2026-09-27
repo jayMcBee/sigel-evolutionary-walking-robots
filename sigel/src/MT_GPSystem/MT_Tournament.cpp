@@ -13,10 +13,6 @@ MT_Tournament::MT_Tournament()
 
 }
 
-MT_Tournament::~MT_Tournament()
-{
-}
-
 MT_Tournament::MT_Tournament(int Size, int num)
 {
 	Individuals.resize(Size);

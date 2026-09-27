@@ -47,7 +47,6 @@ namespace SIGEL_Robot {
   public:
     SIG_PitchRollSensor (SIG_Robot *par, QString n, int nr = -1);
     SIG_PitchRollSensor (SIG_Robot *par, QTextStream & tx);
-    virtual ~SIG_PitchRollSensor ();
 
     virtual SensorType getSensorType () const;
     void setLink (SIG_Link *j);

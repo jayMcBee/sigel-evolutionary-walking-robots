@@ -51,12 +51,6 @@ MT_Randomizer::MT_Randomizer()
 
 }
 
-MT_Randomizer::~MT_Randomizer()
-{
-
-
-}
-
 MT_Randomizer::MT_Randomizer(QTextStream &File)
 {
 	// set seed for the random method

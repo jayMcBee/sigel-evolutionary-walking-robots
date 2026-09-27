@@ -41,9 +41,6 @@ namespace SIGEL_Robot {
                 rightFix = SIG_Robot::streamToVector (tx);
                 tx >> minimum >> maximum >> initial;
         }
-        
-        SIG_TranslationalJoint::~SIG_TranslationalJoint ()
-        { }
 
         SIG_Joint::JointType SIG_TranslationalJoint::getJointType () const
         {

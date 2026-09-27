@@ -58,13 +58,6 @@ class SIG_IndividualListItem : public QTreeWidgetItem
   SIG_IndividualListItem( QTreeWidget *parent, int poolPosition, SIGEL_GP::SIG_GPIndividual *theIndividual );
 
   /**
-   * The destructor.
-   *
-   * Will be erased if not needed.
-   */
-  ~SIG_IndividualListItem();
-
-  /**
    * Inherited function used to sort the entries properly
    */
   QString key(int, bool) const;

@@ -47,9 +47,6 @@ void SIGEL_Tools::SIG_Randomizer::setNewSeed(int seed)
     next = seed;
 }
 
-SIGEL_Tools::SIG_Randomizer::~SIG_Randomizer()
-{ };
-
 int SIGEL_Tools::SIG_Randomizer::getRandomInt(int maximum)
 {
   next = next*1103515245 + 12345;

@@ -65,10 +65,6 @@ namespace SIGEL_Robot {
                  * Reads the polygon data from a stream.
                  */
                 SIG_Polygon (SIG_Geometry *mygeom, QTextStream & tx);
-                /**
-                 * Destructor.
-                 */
-                ~SIG_Polygon ();
 
                 /**
                  * Appends a vertex to the polygon.

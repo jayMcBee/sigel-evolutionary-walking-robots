@@ -66,10 +66,8 @@ namespace SIGEL_Visualisation
 
       /**
        * The destructor of the SIG_Visualisation.
-       *
-       * Maybe cleans up some OpenGL stuff.
        */
-      virtual ~SIG_Visualisation();
+      virtual ~SIG_Visualisation() = default;
 
       /**
        * This method sets up the projection/modelview matrices

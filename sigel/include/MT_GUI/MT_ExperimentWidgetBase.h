@@ -16,7 +16,6 @@ class MT_ExperimentWidgetBase : public QWidget, public Ui::MT_ExperimentWidgetBa
 
 public:
     MT_ExperimentWidgetBase(QWidget* parent = nullptr, const char* name = nullptr, Qt::WindowFlags fl = Qt::WindowFlags());
-    ~MT_ExperimentWidgetBase() override;
 
 protected:
     // Qt does not call languageChange() itself.

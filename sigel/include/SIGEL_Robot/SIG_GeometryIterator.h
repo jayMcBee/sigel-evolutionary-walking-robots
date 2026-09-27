@@ -53,10 +53,6 @@ namespace SIGEL_Robot {
      *             polygons the iterator will return.
      */
     SIG_GeometryIterator (SIG_Geometry const *over);
-    /**
-     * Destructor.
-     */
-    ~SIG_GeometryIterator ();
 
     /**
      * Is there another polygon?

@@ -40,9 +40,6 @@ namespace SIGEL_Robot {
                 tx >> duration;
         }
 
-        SIG_CommandParameters::~SIG_CommandParameters ()
-        { }
-
         void SIG_CommandParameters::setDuration (double dur)
         {
                 duration = dur;

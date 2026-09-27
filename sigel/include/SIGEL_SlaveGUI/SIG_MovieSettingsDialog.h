@@ -33,7 +33,6 @@ class SIG_MovieSettingsDialog : public SIG_MovieSettingsDialogBase
 
 public:
     SIG_MovieSettingsDialog( QWidget *view, double stepSize, QWidget* parent = nullptr, const char* name = nullptr, bool modal = false, Qt::WindowFlags fl = Qt::WindowFlags() );
-    ~SIG_MovieSettingsDialog();
 
 public slots:
     void slotToolButtonClicked();

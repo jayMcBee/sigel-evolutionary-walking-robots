@@ -9,11 +9,6 @@ SIG_SimulationParameterBase::SIG_SimulationParameterBase(QWidget* parent, const 
   setupUi( this );
 }
 
-SIG_SimulationParameterBase::~SIG_SimulationParameterBase()
-{
-  // no need to delete child widgets, Qt does it all for us
-}
-
 void SIG_SimulationParameterBase::changeEvent( QEvent *e )
 {
   QWidget::changeEvent( e );

@@ -9,11 +9,6 @@ SIG_IndividualViewBase::SIG_IndividualViewBase(QWidget* parent, const char* name
   setupUi( this );
 }
 
-SIG_IndividualViewBase::~SIG_IndividualViewBase()
-{
-  // no need to delete child widgets, Qt does it all for us
-}
-
 void SIG_IndividualViewBase::changeEvent( QEvent *e )
 {
   QWidget::changeEvent( e );

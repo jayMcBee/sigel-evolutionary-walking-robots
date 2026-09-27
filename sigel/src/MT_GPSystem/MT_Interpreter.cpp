@@ -15,11 +15,6 @@ MT_Interpreter::MT_Interpreter()
 	Program =nullptr;
 }
 
-MT_Interpreter::~MT_Interpreter()
-{
-
-}
-
 MT_Interpreter::MT_Interpreter(int VarNum, int TDuration)
 {
 	NumberVariable=VarNum;

@@ -210,13 +210,6 @@ class SIG_GPIndividual{
  SIG_GPIndividual(QString data);
 
 
- /**
-  * The destructor of the GPIndividual.
-  */
- public:
- ~SIG_GPIndividual();
- 
-
 
  /**
   * This function increases the age value of an individual at the end of an generation by one.

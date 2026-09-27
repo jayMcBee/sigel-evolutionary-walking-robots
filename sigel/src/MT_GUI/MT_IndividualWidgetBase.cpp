@@ -9,11 +9,6 @@ MT_IndividualsWidgetBase::MT_IndividualsWidgetBase(QWidget* parent, const char* 
   setupUi( this );
 }
 
-MT_IndividualsWidgetBase::~MT_IndividualsWidgetBase()
-{
-  // no need to delete child widgets, Qt does it all for us
-}
-
 void MT_IndividualsWidgetBase::changeEvent( QEvent *e )
 {
   QWidget::changeEvent( e );

@@ -16,7 +16,6 @@ class MT_EstimationWidgetBase : public QWidget, public Ui::MT_EstimationWidgetBa
 
 public:
     MT_EstimationWidgetBase(QWidget* parent = nullptr, const char* name = nullptr, Qt::WindowFlags fl = Qt::WindowFlags());
-    ~MT_EstimationWidgetBase() override;
 
 protected:
     // Qt does not call languageChange() itself.

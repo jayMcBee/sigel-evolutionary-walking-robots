@@ -72,11 +72,6 @@ namespace SIGEL_SlaveGUI
 			  Qt::WindowFlags f = Qt::Window );
 
     /**
-     * The destructor of the SIG_SimulationWindow.
-     */
-    ~SIG_SimulationWindow();
-
-    /**
      * Calls the method visualizeThis of the enclosed SIG_SimulationWidget
      * (which is this QMainWindow's central widget) with the same
      * parameters.

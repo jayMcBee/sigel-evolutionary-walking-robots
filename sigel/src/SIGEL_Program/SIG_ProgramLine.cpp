@@ -43,9 +43,6 @@ SIGEL_Program::SIG_ProgramLine& SIGEL_Program::SIG_ProgramLine::operator =(SIGEL
 SIGEL_Program::SIG_ProgramLine::SIG_ProgramLine()
 {}
 
-SIGEL_Program::SIG_ProgramLine::~SIG_ProgramLine()
-{}
-
 void SIGEL_Program::SIG_ProgramLine::clearLine()
 {
   element.resize(0);

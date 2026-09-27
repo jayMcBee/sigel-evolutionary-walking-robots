@@ -11,7 +11,6 @@ class MT_EstimationWidget : public MT_EstimationWidgetBase, public MT_WidgetBase
 
 public:
 	MT_EstimationWidget(QWidget* parent=nullptr, const char* name=nullptr, Qt::WindowFlags fl = Qt::WindowFlags() );
-	~MT_EstimationWidget();
 
 	void evolutionRunning(bool running);
 	bool onHide(MT_GPManager *manager, subst_cache *subst);

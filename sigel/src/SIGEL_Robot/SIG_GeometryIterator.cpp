@@ -27,10 +27,7 @@ namespace SIGEL_Robot {
                 : iterating (over),
                   iteration (0)
         { }
-        
-        SIG_GeometryIterator::~SIG_GeometryIterator ()
-        { }
-        
+
         bool SIG_GeometryIterator::valid () const
         {
                 return (iteration < iterating->getNumPolygons ());

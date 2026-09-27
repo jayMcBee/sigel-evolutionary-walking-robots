@@ -99,12 +99,4 @@ SIG_AddIndividualsDialog::SIG_AddIndividualsDialog( QWidget* parent,  const char
     connect( pushbuttonCancel, SIGNAL( clicked() ), this, SLOT( reject() ) );
 };
 
-/*  
- *  Destroys the object and frees any allocated resources
- */
-SIG_AddIndividualsDialog::~SIG_AddIndividualsDialog()
-{
-    // no need to delete child widgets, Qt does it all for us
-};
-
 }

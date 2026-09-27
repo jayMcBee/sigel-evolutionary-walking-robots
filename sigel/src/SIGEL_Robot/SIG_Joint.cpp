@@ -70,9 +70,6 @@ namespace SIGEL_Robot {
                    >> mdh_predecessor_is_left;
         }
 
-        SIG_Joint::~SIG_Joint ()
-        { }
-
         QString SIG_Joint::getName () const
         {
                 return name;

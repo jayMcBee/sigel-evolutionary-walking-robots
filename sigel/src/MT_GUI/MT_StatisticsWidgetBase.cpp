@@ -9,11 +9,6 @@ MT_StatisticsWidgetBase::MT_StatisticsWidgetBase(QWidget* parent, const char* na
   setupUi( this );
 }
 
-MT_StatisticsWidgetBase::~MT_StatisticsWidgetBase()
-{
-  // no need to delete child widgets, Qt does it all for us
-}
-
 void MT_StatisticsWidgetBase::changeEvent( QEvent *e )
 {
   QWidget::changeEvent( e );

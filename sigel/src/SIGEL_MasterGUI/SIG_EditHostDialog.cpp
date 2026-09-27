@@ -41,14 +41,6 @@ SIG_EditHostDialog::SIG_EditHostDialog( QWidget* parent,  const char* name, bool
   textlabelProcessesHint->setForegroundRole( QPalette::PlaceholderText );
 }
 
-/*  
- *  Destroys the object and frees any allocated resources
- */
-SIG_EditHostDialog::~SIG_EditHostDialog()
-{
-    // no need to delete child widgets, Qt does it all for us
-}
-
 void SIG_EditHostDialog::slotToolbuttonSlaveDirectoryClicked()
 {
   lineeditSlaveDirectory->setText( QFileDialog::getExistingDirectory( this, "Select Directory", "./" ) );

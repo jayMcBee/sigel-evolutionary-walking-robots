@@ -46,9 +46,6 @@ SIGEL_GP::SIG_GPCrossOverTournament::SIG_GPCrossOverTournament(SIGEL_Tools::SIG_
   indis[ 3 ] = new SIG_GPTournamentIndividual( indPos4 );
 };
 
-SIGEL_GP::SIG_GPCrossOverTournament::~SIG_GPCrossOverTournament()
-{ };
-
 bool SIGEL_GP::SIG_GPCrossOverTournament::run()
 {
   SIG_GPIndividual &ind1_1 = gpPool.getIndividual( indis[0]->indNumber );

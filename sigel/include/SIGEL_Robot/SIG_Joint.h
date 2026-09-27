@@ -77,7 +77,7 @@ namespace SIGEL_Robot
                 /**
                  * Destructor.
                  */
-                virtual ~SIG_Joint ();
+                virtual ~SIG_Joint() = default;
                 /**
                  * Returns the name of the joint.
                  */

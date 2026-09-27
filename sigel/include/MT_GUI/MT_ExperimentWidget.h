@@ -11,7 +11,6 @@ class MT_ExperimentWidget : public QTreeWidget
 
 public:
 	MT_ExperimentWidget(QWidget* parent=nullptr, const char* name=nullptr, Qt::WindowFlags fl=Qt::WindowFlags() );
-	~MT_ExperimentWidget();
 
 public slots:
 	void lastSelected();

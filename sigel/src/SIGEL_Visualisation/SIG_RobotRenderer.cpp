@@ -53,9 +53,6 @@ namespace SIGEL_Visualisation
     setPointsVisible( false );
   };
 
-  SIG_RobotRenderer::~SIG_RobotRenderer()
-  { };
-
   void SIG_RobotRenderer::buildDisplayLists()
   {
     int nextPointIndex = robot.getLinks().size();

@@ -77,10 +77,6 @@ namespace SIGEL_Simulation
 		      SIG_SimulationParameters const & simulationParameter,
 		      SIG_Recorder & theRecorder);
 		
-		/* The destructor of the SIG_Simulation class.
-		 */		
-		~SIG_Simulation();
-      
       /**
        * Starts the simulation.
        *

@@ -36,9 +36,6 @@ namespace SIGEL_RobotIO {
                   currentSymType (Symbol::None)
         { }
 
-        SIG_Scanner::~SIG_Scanner ()
-        { }
-
         void SIG_Scanner::skipWhiteSpace ()
         {
                 bool commentdetected;

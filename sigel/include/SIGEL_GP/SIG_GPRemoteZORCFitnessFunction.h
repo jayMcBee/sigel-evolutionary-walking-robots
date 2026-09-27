@@ -46,11 +46,6 @@ namespace SIGEL_GP
     public:
 
     /**
-      * The desctructor.
-      */
-      ~SIG_GPRemoteZORCFitnessFunction();
-
-    /**
       * Evaluate fitness of the current program.
       * This central method is transferring the current program to ZORC over
       * the serial line and computes the fitness based on the distance travelled

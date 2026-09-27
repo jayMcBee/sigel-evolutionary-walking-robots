@@ -10,11 +10,6 @@ MT_AddConstantsWidgetBase::MT_AddConstantsWidgetBase(QWidget* parent, const char
   setupUi( this );
 }
 
-MT_AddConstantsWidgetBase::~MT_AddConstantsWidgetBase()
-{
-  // no need to delete child widgets, Qt does it all for us
-}
-
 void MT_AddConstantsWidgetBase::changeEvent( QEvent *e )
 {
   QDialog::changeEvent( e );

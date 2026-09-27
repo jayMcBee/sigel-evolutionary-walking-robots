@@ -57,11 +57,6 @@ SIG_IndividualListItem::SIG_IndividualListItem( QTreeWidget *parent, int poolPos
     }
 };
 
-SIG_IndividualListItem::~SIG_IndividualListItem()
-{
-  
-};
-
 QString SIG_IndividualListItem::key(int column, bool ascending) const {
   int const zeros = 999;
   switch(column) {

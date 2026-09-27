@@ -9,11 +9,6 @@ SIG_ExperimentViewBase::SIG_ExperimentViewBase(QWidget* parent, const char* name
   setupUi( this );
 }
 
-SIG_ExperimentViewBase::~SIG_ExperimentViewBase()
-{
-  // no need to delete child widgets, Qt does it all for us
-}
-
 void SIG_ExperimentViewBase::changeEvent( QEvent *e )
 {
   QWidget::changeEvent( e );

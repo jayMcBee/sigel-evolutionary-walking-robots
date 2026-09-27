@@ -47,9 +47,6 @@ namespace SIGEL_RobotIO {
                 : SIG_Scanner (sourceText)
         { }
 
-        SIG_RobotScanner::~SIG_RobotScanner ()
-        { }
-
         void SIG_RobotScanner::nextSymbol ()
         { 
                 skipWhiteSpace ();

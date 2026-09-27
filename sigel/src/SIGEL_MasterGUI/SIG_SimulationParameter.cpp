@@ -52,11 +52,6 @@ SIG_SimulationParameter::SIG_SimulationParameter( QWidget* parent,  const char* 
     v->setLocale( cLocale );
 }
 
-SIG_SimulationParameter::~SIG_SimulationParameter()
-{
-    // no need to delete child widgets, Qt does it all for us
-}
-
 void SIG_SimulationParameter::putIntoExperiment()
 {
   // get time to simulate out of the widget (three spinboxes)

@@ -9,11 +9,6 @@ SIG_EnvironmentBase::SIG_EnvironmentBase(QWidget* parent, const char* name, Qt::
   setupUi( this );
 }
 
-SIG_EnvironmentBase::~SIG_EnvironmentBase()
-{
-  // no need to delete child widgets, Qt does it all for us
-}
-
 void SIG_EnvironmentBase::changeEvent( QEvent *e )
 {
   QWidget::changeEvent( e );

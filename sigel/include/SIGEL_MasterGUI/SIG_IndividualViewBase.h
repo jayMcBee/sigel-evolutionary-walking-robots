@@ -16,7 +16,6 @@ class SIG_IndividualViewBase : public QWidget, public Ui::SIG_IndividualViewBase
 
 public:
     SIG_IndividualViewBase(QWidget* parent = nullptr, const char* name = nullptr, Qt::WindowFlags fl = Qt::WindowFlags());
-    ~SIG_IndividualViewBase() override;
 
 protected:
     // Qt does not call languageChange() itself.

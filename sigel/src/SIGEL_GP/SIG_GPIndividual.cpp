@@ -152,11 +152,6 @@ SIGEL_GP::SIG_GPIndividual::SIG_GPIndividual(QString data)
    loadIndividual(data);
 };
 
-SIGEL_GP::SIG_GPIndividual::~SIG_GPIndividual()
-{
-}
-
-
 void SIGEL_GP::SIG_GPIndividual::generateRandomIndividual(SIGEL_Tools::SIG_Randomizer& random,
                                                           SIGEL_GP::SIG_GPParameter& param, 
                                                           SIGEL_Robot::SIG_LanguageParameters& languageP )

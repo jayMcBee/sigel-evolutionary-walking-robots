@@ -95,12 +95,4 @@ SIG_RenameDialog::SIG_RenameDialog( QWidget* parent,  const char* name, bool mod
     connect( pushbuttonCancel, SIGNAL( clicked() ), this, SLOT( reject() ) );
 }
 
-/*  
- *  Destroys the object and frees any allocated resources
- */
-SIG_RenameDialog::~SIG_RenameDialog()
-{
-    // no need to delete child widgets, Qt does it all for us
-}
-
 }

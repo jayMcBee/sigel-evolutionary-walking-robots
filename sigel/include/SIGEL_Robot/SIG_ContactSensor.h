@@ -44,7 +44,6 @@ namespace SIGEL_Robot {
   public:
     SIG_ContactSensor (SIG_Robot *par, QString n, int nr = -1);
     SIG_ContactSensor (SIG_Robot *par, QTextStream & tx);
-    virtual ~SIG_ContactSensor ();
 
     virtual SensorType getSensorType () const;
 

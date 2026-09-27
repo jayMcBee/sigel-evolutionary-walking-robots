@@ -54,7 +54,6 @@ class SIG_EditCommandDialog : public QDialog
 
 public:
     SIG_EditCommandDialog( QWidget* parent = nullptr, const char* name = nullptr, bool modal = false, Qt::WindowFlags fl = Qt::WindowFlags() );
-    ~SIG_EditCommandDialog();
 
     QLabel* textlabelCommand;
     QGroupBox* buttongroupAllowDisallow;

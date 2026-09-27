@@ -41,14 +41,6 @@ SIG_RobotView::SIG_RobotView( QWidget* parent,  const char* name, Qt::WindowFlag
 {
 }
 
-/*
- *  Destroys the object and frees any allocated resources
- */
-SIG_RobotView::~SIG_RobotView()
-{
-    // no need to delete child widgets, Qt does it all for us
-}
-
 void SIG_RobotView::putIntoExperiment()
 {
 

@@ -67,14 +67,6 @@ SIG_MovieSettingsDialog::SIG_MovieSettingsDialog( QWidget *view, double stepSize
 	slotUpdateStepsPerFrame();
 };
 
-/*  
- *  Destroys the object and frees any allocated resources
- */
-SIG_MovieSettingsDialog::~SIG_MovieSettingsDialog()
-{
-    // no need to delete child widgets, Qt does it all for us
-};
-
 /* 
  * public slot.
  */

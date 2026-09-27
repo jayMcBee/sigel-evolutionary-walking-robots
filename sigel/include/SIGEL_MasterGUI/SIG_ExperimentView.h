@@ -55,13 +55,6 @@ public:
      */
     SIG_ExperimentView( QWidget* parent, const char* name, Qt::WindowFlags fl, SIGEL_GP::SIG_GPExperiment &theExperiment, SIG_GUIGPExperiment &guiExperiment );
 
-    /**
-     * The destructor.
-     *
-     * Will be erased if not needed.
-     */
-    ~SIG_ExperimentView();
-
     void putIntoExperiment();
 
     void getOutOfExperiment();

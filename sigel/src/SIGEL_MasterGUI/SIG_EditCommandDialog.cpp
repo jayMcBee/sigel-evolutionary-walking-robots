@@ -129,12 +129,4 @@ SIG_EditCommandDialog::SIG_EditCommandDialog( QWidget* parent,  const char* name
     v->setLocale( cLocale );
 };
 
-/*  
- *  Destroys the object and frees any allocated resources
- */
-SIG_EditCommandDialog::~SIG_EditCommandDialog()
-{
-    // no need to delete child widgets, Qt does it all for us
-};
-
 }

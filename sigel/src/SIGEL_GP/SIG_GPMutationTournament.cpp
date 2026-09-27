@@ -40,9 +40,6 @@ SIGEL_GP::SIG_GPMutationTournament::SIG_GPMutationTournament(SIGEL_Tools::SIG_Ra
      indis[ 1 ] = new SIG_GPTournamentIndividual( ppos2 );
    };
 
-SIGEL_GP::SIG_GPMutationTournament::~SIG_GPMutationTournament()
-{ };
-
 bool SIGEL_GP::SIG_GPMutationTournament::run()
 {
   SIG_GPIndividual &ind1 = gpPool.getIndividual( indis[0]->indNumber );

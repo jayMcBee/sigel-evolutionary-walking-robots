@@ -58,10 +58,6 @@ namespace SIGEL_Robot {
                  * propagating a robot through the network.
                  */
                 SIG_CommandParameters (QTextStream & tx);
-                /**
-                 * Destructor.
-                 */
-                ~SIG_CommandParameters ();
 
                 /**
                  * Sets the run time duration of the command.

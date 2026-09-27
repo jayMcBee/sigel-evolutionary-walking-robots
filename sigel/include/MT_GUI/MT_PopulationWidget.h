@@ -23,7 +23,6 @@ public:
 	virtual void onShow(MT_GPManager *manager, subst_cache *subst);
 	void evolutionRunning(bool running);
 	MT_PopulationWidget(QMainWindow* parent=nullptr, const char* name=nullptr, Qt::WindowFlags fl = Qt::WindowFlags());
-	~MT_PopulationWidget();
 
 private:
 	int oldPopSize;

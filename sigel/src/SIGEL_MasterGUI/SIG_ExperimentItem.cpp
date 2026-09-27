@@ -84,5 +84,3 @@ SIGEL_MasterGUI::SIG_ExperimentItem::SIG_ExperimentItem( QTreeWidget * parent, Q
 
   this->setExpanded( true );
 };
-
-SIGEL_MasterGUI::SIG_ExperimentItem::~SIG_ExperimentItem(){};

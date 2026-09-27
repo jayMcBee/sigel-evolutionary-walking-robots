@@ -43,7 +43,6 @@ namespace SIGEL_Robot {
   public:
     SIG_JointSensor (SIG_Robot *par, QString n, int nr = -1);
     SIG_JointSensor (SIG_Robot *par, QTextStream & tx);
-    virtual ~SIG_JointSensor ();
 
     virtual SensorType getSensorType () const;
     void setJoint (SIG_Joint *j);

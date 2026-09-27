@@ -67,13 +67,6 @@ public:
     SIG_IndividualView( QWidget* parent, const char* name, Qt::WindowFlags fl, SIGEL_GP::SIG_GPIndividual *theGPIndividual );
 
     /**
-     * The destructor.
-     *
-     * Will be erased if not needed.
-     */
-    ~SIG_IndividualView();
-
-    /**
      * This method clear the individual view.
      */
     void clear();

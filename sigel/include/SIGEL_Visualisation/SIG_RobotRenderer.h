@@ -46,13 +46,6 @@ namespace SIGEL_Visualisation
     SIG_RobotRenderer(SIGEL_Robot::SIG_Robot const &robot);
 
     /**
-     * The destructor of the SIG_EnvironmentRenderer.
-     *
-     * It cleans up the OpenGL stuff like the display lists.
-     */
-    ~SIG_RobotRenderer();
-
-    /**
      * Calls the inherited method renderSceneObjects and
      * eventually does additional rendering like drawing
      * link identifiers onto the particular links.

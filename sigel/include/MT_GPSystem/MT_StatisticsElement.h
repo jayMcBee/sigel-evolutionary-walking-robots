@@ -24,7 +24,7 @@ public:
 	
 	MT_StatisticsElement(QTextStream &File);
 	MT_StatisticsElement();
-	virtual ~MT_StatisticsElement();
+	virtual ~MT_StatisticsElement() = default;
 	void writeToFileElement(QTextStream &File);
 	int Generation; 
 

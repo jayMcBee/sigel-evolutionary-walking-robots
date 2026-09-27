@@ -35,9 +35,6 @@ namespace SIGEL_RobotIO {
                   drivenumber (0),
                   sensornumber (0)
         { }
-        
-        SIG_RobotCompilerObjects::~SIG_RobotCompilerObjects ()
-        { }
 
         SIG_Material *SIG_RobotCompilerObjects::materialFind (QString name)
         {

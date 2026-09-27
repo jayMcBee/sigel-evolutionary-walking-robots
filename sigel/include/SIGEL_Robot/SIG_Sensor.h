@@ -49,7 +49,7 @@ namespace SIGEL_Robot {
   public:
     SIG_Sensor (SIG_Robot *par, QString n, int nr);
     SIG_Sensor (SIG_Robot *par, QTextStream & tx);
-    virtual ~SIG_Sensor ();
+    virtual ~SIG_Sensor() = default;
 
     virtual SensorType getSensorType () const = 0;
     QString getName () const;

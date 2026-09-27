@@ -15,11 +15,6 @@ MT_Statistics::MT_Statistics()
 
 }
 
-MT_Statistics::~MT_Statistics()
-{
-
-}
-
 MT_Statistics::MT_Statistics(QTextStream & File)
 {
 	

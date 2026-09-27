@@ -16,7 +16,6 @@ class SIG_LanguageParametersBase : public QWidget, public Ui::SIG_LanguageParame
 
 public:
     SIG_LanguageParametersBase(QWidget* parent = nullptr, const char* name = nullptr, Qt::WindowFlags fl = Qt::WindowFlags());
-    ~SIG_LanguageParametersBase() override;
 
 public slots:
     virtual void slotPushButtonDisallowAllClicked() = 0;

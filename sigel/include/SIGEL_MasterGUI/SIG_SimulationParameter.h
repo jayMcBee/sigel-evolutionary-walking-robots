@@ -51,13 +51,6 @@ public:
      */
     SIG_SimulationParameter( QWidget* parent, const char* name, Qt::WindowFlags fl, SIGEL_GP::SIG_GPExperiment &theExperiment );
 
-    /**
-     * The destructor.
-     *
-     * Will be erased if unused.
-     */
-    ~SIG_SimulationParameter();
-
  public slots:
       /**
        * This slot is called whenever the values of the widgets shall be

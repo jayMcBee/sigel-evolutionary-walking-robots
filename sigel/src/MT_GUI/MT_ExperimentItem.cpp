@@ -19,11 +19,6 @@ MT_ExperimentItem::MT_ExperimentItem(QTreeWidget *parent, int pos, QString title
 	parent->insertTopLevelItem(0, this);
 }
 
-MT_ExperimentItem::~MT_ExperimentItem()
-{
-
-}
-
 int MT_ExperimentItem::getPos()
 {
 	return position;

@@ -58,10 +58,6 @@ namespace SIGEL_Robot {
                         tx >> vertices [i];
         }
 
-        SIG_Polygon::~SIG_Polygon ()
-        {
-        }
-
         void SIG_Polygon::appendVertex (DL_vector pt)
         {
                 int idx = vertices.size ();

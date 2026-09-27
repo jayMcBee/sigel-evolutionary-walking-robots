@@ -28,7 +28,7 @@ public:
 	MT_Statistics(QTextStream &File);
 	MT_Statistics();
 	void writeToFileMT_Statistics(QTextStream &File);
-	virtual ~MT_Statistics();
+	virtual ~MT_Statistics() = default;
 
 	// all Parameter are for the Offspring
 	/* This QList contain  Information about Crossover Events so far;  

@@ -50,7 +50,6 @@ namespace SIGEL_Robot
   public:
     SIG_CylindricalJoint (SIG_Robot *par, QString n, int nr = -1);
     SIG_CylindricalJoint (SIG_Robot *par, QTextStream & tx);
-    virtual ~SIG_CylindricalJoint ();
     virtual JointType getJointType () const;
 
     void setLeftPoints (DL_vector VB, DL_vector VD, DL_vector VH);

@@ -74,7 +74,7 @@ namespace SIGEL_Robot {
 
         public:
                 SIG_Mirtich (SIG_Geometry const *geom, QString nameOfGeom);
-                virtual ~SIG_Mirtich ();
+                virtual ~SIG_Mirtich() = default;
 
                 void computePhysics (double density,
                                      DL_Scalar & masse,

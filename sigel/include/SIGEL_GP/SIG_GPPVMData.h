@@ -68,10 +68,6 @@ namespace SIGEL_GP
    public:
     SIG_GPPVMData(SIGEL_Robot::SIG_Robot& robot, SIGEL_Environment::SIG_Environment& environment, SIGEL_Simulation::SIG_SimulationParameters& simulationParameter, QString fitnessName, bool visualize);
 
-    /** The destructor of the PVMDataobject.
-     */
-   public:
-    ~SIG_GPPVMData();
 
    /** A function to send QStrings via PVM.
     * @param str

@@ -10,11 +10,6 @@ SIG_EditHostDialogBase::SIG_EditHostDialogBase(QWidget* parent, const char* name
   setupUi( this );
 }
 
-SIG_EditHostDialogBase::~SIG_EditHostDialogBase()
-{
-  // no need to delete child widgets, Qt does it all for us
-}
-
 void SIG_EditHostDialogBase::changeEvent( QEvent *e )
 {
   QDialog::changeEvent( e );

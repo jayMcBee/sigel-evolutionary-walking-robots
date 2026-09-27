@@ -909,7 +909,21 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-27 — DONE: ITEM 94, ADDING INDIVIDUALS IS FAST.** Start here.
+**2026-09-27 — DONE: ITEM 101, EMPTY DESTRUCTORS REMOVED.** Start here.
+
+- **Changed:** 100 empty destructors, in 199 files. Details are in item
+  101's entry in "Done".
+- **Baselines:** unchanged.
+- **Review:** no defects. Its comment leftovers were fixed: 12 orphaned
+  "Destroys the object" comments, 7 access specifiers left with nothing
+  under them, one stale destructor comment. Four leaks went to item 8.
+- **Gates:** `check.sh` 758 pass, 0 fail; warnings 485. The other four gates
+  are green. The comment fixes came after the gate run and were checked by a
+  clean build.
+- **Next:** does loading a large pool have item 94's problem; then the
+  genetic-operator sliders in whole steps; then item 102.
+
+**2026-09-27 — DONE: ITEM 94, ADDING INDIVIDUALS IS FAST.**
 
 - **Changed:** Add inserts only the new rows, sorting is off while rows go
   in, and the sort key is built in one step. Details are in item 94's entry
@@ -6413,6 +6427,15 @@ carried; other items and this file cite them, so they do not change.
   `expstruct selfcheck`, which tested our tool; the syntax compile of the two
   programs; and `real clicks`, with its `xtest` scenario and
   `xtest-baseline.txt`. `check.sh` gives 757 pass.
+
+- [x] **101. Empty destructors removed** — done 2026-09-27, one commit. 100
+  empty destructors went. 84 were deleted with their declaration and doc
+  comment: their class has a virtual destructor above it, or has no base and
+  no subclass. 16 classes at the top of their hierarchy that declared the
+  destructor virtual keep it as `virtual ~X() = default;`. `SIG_RobotRenderer`
+  lost its own although `SIG_Renderer`'s is not virtual; no `SIG_Renderer *`
+  is ever deleted. The review found no behaviour change and four existing
+  leaks, now listed under item 8.
 
 - [x] **94. Adding many individuals was slow, and slower as the pool
   grew** — done 2026-09-27, one commit. Measured with `twoBases.exp` and

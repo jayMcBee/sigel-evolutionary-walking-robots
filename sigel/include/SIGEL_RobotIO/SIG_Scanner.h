@@ -41,7 +41,7 @@ namespace SIGEL_RobotIO {
                 int currentSymType;
         public:
                 SIG_Scanner (QString sourceText);
-                virtual ~SIG_Scanner ();
+                virtual ~SIG_Scanner() = default;
 
                 void skipWhiteSpace ();
                 virtual void nextSymbol () = 0;

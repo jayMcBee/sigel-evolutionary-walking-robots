@@ -222,14 +222,6 @@ SIG_LanguageParameters::SIG_LanguageParameters( QWidget* parent,  const char* na
 		    SLOT( slotCommandDoubleClicked( QTreeWidgetItem *) ) );
 };
 
-/*  
- *  Destroys the object and frees any allocated resources
- */
-SIG_LanguageParameters::~SIG_LanguageParameters()
-{
-    // no need to delete child widgets, Qt does it all for us
-};
-
 void SIG_LanguageParameters::putIntoExperiment()
 {
   // we don't need to update the command as they are updated when one works on them

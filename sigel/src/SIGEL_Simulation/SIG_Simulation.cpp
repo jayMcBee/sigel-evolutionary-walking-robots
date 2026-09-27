@@ -78,9 +78,6 @@ SIGEL_Simulation::SIG_Simulation::SIG_Simulation(SIGEL_Robot::SIG_Robot const & 
 
 };
 
-SIGEL_Simulation::SIG_Simulation::~SIG_Simulation()
-{ };
-
 // The boundary below is deliberate. Every caller is a fitness function that
 // catches SIG_Exception, so an escaping one becomes a wrong fitness, not a crash.
 void SIGEL_Simulation::SIG_Simulation::start()

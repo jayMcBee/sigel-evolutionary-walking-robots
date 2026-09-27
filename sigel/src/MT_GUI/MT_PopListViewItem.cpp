@@ -26,9 +26,6 @@ MT_PopListViewItem::MT_PopListViewItem(QTreeWidget *parent, MT_Individual *ind) 
 	parent->insertTopLevelItem(0, this);
 }
 
-MT_PopListViewItem::~MT_PopListViewItem()
-{}
-
 int MT_PopListViewItem::getPos()
 {
 	return position;

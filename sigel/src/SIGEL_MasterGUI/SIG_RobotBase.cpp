@@ -9,11 +9,6 @@ SIG_RobotBase::SIG_RobotBase(QWidget* parent, const char* name, Qt::WindowFlags 
   setupUi( this );
 }
 
-SIG_RobotBase::~SIG_RobotBase()
-{
-  // no need to delete child widgets, Qt does it all for us
-}
-
 void SIG_RobotBase::changeEvent( QEvent *e )
 {
   QWidget::changeEvent( e );

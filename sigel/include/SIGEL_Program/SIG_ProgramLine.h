@@ -129,7 +129,7 @@ class SIG_ProgramLine
  */
 
    public:
-   virtual ~SIG_ProgramLine();   
+   virtual ~SIG_ProgramLine() = default;
 
 					    
 /**

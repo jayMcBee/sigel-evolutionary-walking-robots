@@ -36,11 +36,6 @@ SIG_TextView::SIG_TextView( QWidget *parent, const char *name )
   scrollTimer->start( 100 );
 };
 
-SIG_TextView::~SIG_TextView()
-{
-
-};
-
 void SIG_TextView::viewportMousePressEvent( QMouseEvent *e )
 {
   oldY = e->y();

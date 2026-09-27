@@ -36,7 +36,6 @@ public:
 	/* create a empty tournament of Size "Size" and a "Winner Array" */
 	MT_Tournament(int Size, int num );
 	MT_Tournament();
-	virtual ~MT_Tournament();
 
 private:
 

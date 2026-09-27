@@ -39,10 +39,6 @@ MT_ExperimentWidget::MT_ExperimentWidget(QWidget* parent, const char* name, Qt::
 	setCurrentItem(topLevelItem(0));
 };
 
-MT_ExperimentWidget::~MT_ExperimentWidget()
-{
-};
-
 void MT_ExperimentWidget::slotCurrentChanged(QTreeWidgetItem *newSelection)
 {
 	// remember the previously selected item to allow reselection

@@ -255,9 +255,6 @@ namespace SIGEL_Robot {
                   geom (geometr)
         { }
 
-        SIG_Mirtich::~SIG_Mirtich ()
-        { }
-
         void SIG_Mirtich::computePhysics (double density,
                                           DL_Scalar & masse,
                                           DL_vector & centreOfMass,

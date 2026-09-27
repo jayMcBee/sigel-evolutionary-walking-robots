@@ -37,11 +37,8 @@ namespace SIGEL_Robot {
                 ptB1 = SIG_Robot::streamToVector (tx);
                 ptB2 = SIG_Robot::streamToVector (tx);
                 ptB3 = SIG_Robot::streamToVector (tx);
-        } 
+        }
 
-        SIG_GlueJoint::~SIG_GlueJoint ()
-        { }
-       
         SIG_Joint::JointType SIG_GlueJoint::getJointType () const
         {
                 return tGlueJoint;

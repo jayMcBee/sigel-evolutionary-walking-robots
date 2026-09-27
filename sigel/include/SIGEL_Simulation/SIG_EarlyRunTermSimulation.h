@@ -55,8 +55,6 @@ namespace SIGEL_Simulation
 		      SIG_SimulationParameters const & simulationParameter,
 		      SIG_Recorder & theRecorder);
 
-      ~SIG_EarlyRunTermSimulation()     {}
-
       /**
       * Returns true if the position of our root link
       * drops below 1/2 of the start height.

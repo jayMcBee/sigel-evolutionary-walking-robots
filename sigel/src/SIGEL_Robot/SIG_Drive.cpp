@@ -55,9 +55,6 @@ namespace SIGEL_Robot {
 				throw SIG_UnstreamingError (__FILE__, __LINE__, "drive '" + name + "' names unknown joint '" + buf + "'");
         }
 
-        SIG_Drive::~SIG_Drive ()
-        { }
-
         QString SIG_Drive::getName () const
         {
                 return name;

@@ -61,13 +61,6 @@ namespace SIGEL_MasterGUI
       SIG_AllIndividualsView( QWidget * parent, const char * name, SIGEL_GP::SIG_GPExperiment &theExperiment );
 
       /**
-       * The destructor.
-       *
-       * Will be erased if not needed.
-       */
-      ~SIG_AllIndividualsView();
-
-      /**
        * This function returns the number of selected items in the listview.
        */
       int numberOfSelectedItems();

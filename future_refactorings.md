@@ -62,14 +62,6 @@ Constructs the language removed. A current compiler rejects them.
   | MT_GPSystem | 17 | SIGEL_Program, SIGEL_SlaveGUI | 3 |
   | SIGEL_CommonGUI | 12 | | |
 
-- [ ] **101. Empty destructors: remove them, or default them in the header.**
-  Decided 2026-09-26. Delete every empty destructor whose class already has a
-  virtual destructor above it. A base class without one gets a defaulted
-  virtual destructor in the header. Removing a destructor gives the class
-  implicit move operations, which can change overload resolution outside
-  `QObject` classes. Where the class's `.cpp` calls `new`, check for an owner;
-  any leak found goes to item 8. One round: one build, one gate run, one
-  review, one commit.
 - [ ] **102. C-style casts: replace them with C++ casts.** Found 2026-09-26.
   `-Wold-style-cast` finds them all; most are in MT_GUI. The `QObject*` casts
   in `connect` calls do nothing and are deleted. Numeric casts become
@@ -86,6 +78,18 @@ Constructs the language removed. A current compiler rejects them.
   Prerequisites in order: one experiment running end to end, a fixed seed, a
   recorded fitness trajectory, then one class at a time with the trajectory
   bit-identical. Do not start before that exists.
+  **Leaks found by item 101's review, 2026-09-27:**
+  - `SIG_Simulation`: the constructor allocates `simulationData`,
+    `simulationQueries`, `commandInterface` and `interpreter`; nothing
+    deletes them.
+  - `SIG_GPSimpleFitnessFunction`, `SIG_GPRealSpeedFitnessFunction`,
+    `SIG_GPNiceWalkingFitnessFunction` and `SIG_GPForceFitnessFunction`:
+    `evalFitness` allocates a `SIG_Simulation` and never deletes it, once per
+    evaluation. `SIG_GPAdaptiveWalkingFitnessFunction` deletes its own.
+  - `MT_Statistics`: the elements added with `addStatisticElement` are never
+    deleted.
+  - `MT_PopulationWidget::slotExpInd`: the `QList` from `getSelectedItems()`
+    is never deleted.
 
 ---
 

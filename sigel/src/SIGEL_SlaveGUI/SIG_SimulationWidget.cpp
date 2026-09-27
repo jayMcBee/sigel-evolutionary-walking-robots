@@ -169,9 +169,6 @@ namespace SIGEL_SlaveGUI
 		      visualisationWidget, &SIG_SimulationVisualisationWidget::setShowShadows );
   };
 
-  SIG_SimulationWidget::~SIG_SimulationWidget()
-  { };
-
   void SIG_SimulationWidget::slotSetYaw( int yaw )
   {
     visualisationWidget->setYaw( 360 - yaw );

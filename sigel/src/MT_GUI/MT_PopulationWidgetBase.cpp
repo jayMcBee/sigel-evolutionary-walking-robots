@@ -12,11 +12,6 @@ MT_PopulationWidgetBase::MT_PopulationWidgetBase(QWidget* parent, const char* na
   individualListView->sortByColumn( 0, Qt::AscendingOrder );
 }
 
-MT_PopulationWidgetBase::~MT_PopulationWidgetBase()
-{
-  // no need to delete child widgets, Qt does it all for us
-}
-
 void MT_PopulationWidgetBase::changeEvent( QEvent *e )
 {
   QWidget::changeEvent( e );

@@ -32,10 +32,6 @@
 #include <math.h>
 #include <qdatetime.h>
 
-SIGEL_GP::SIG_GPForceFitnessFunction::~SIG_GPForceFitnessFunction() {
-
-};
-
 double SIGEL_GP::SIG_GPForceFitnessFunction::evalFitness( SIGEL_Program::SIG_Program &program,
                                                           SIGEL_Robot::SIG_Robot &rob,
                                                           SIGEL_Environment::SIG_Environment &environment,

@@ -9,11 +9,6 @@ MT_EstimationWidgetBase::MT_EstimationWidgetBase(QWidget* parent, const char* na
   setupUi( this );
 }
 
-MT_EstimationWidgetBase::~MT_EstimationWidgetBase()
-{
-  // no need to delete child widgets, Qt does it all for us
-}
-
 void MT_EstimationWidgetBase::changeEvent( QEvent *e )
 {
   QWidget::changeEvent( e );

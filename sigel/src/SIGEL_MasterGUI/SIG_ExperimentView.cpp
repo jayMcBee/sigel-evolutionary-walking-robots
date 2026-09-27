@@ -50,13 +50,6 @@ SIG_ExperimentView::SIG_ExperimentView( QWidget* parent,  const char* name, Qt::
 }
 
 
-/*  
- *  Destroys the object and frees any allocated resources
- */
-SIG_ExperimentView::~SIG_ExperimentView() {
-    // no need to delete child widgets, Qt does it all for us
-}
-
 void SIG_ExperimentView::putIntoExperiment() {
   // slotHistory and slotIntervallChanged reach this function without going
   // through putAllIntoExperiment, so it needs its own check. The LCD read

@@ -144,11 +144,6 @@ MT_AddConstantsWidget::MT_AddConstantsWidget(MT_IndividualsWidget *parent, const
 	connect(typeButtons, SIGNAL(idClicked(int)), SLOT(slotClicked(int)));
 }
 
-MT_AddConstantsWidget::~MT_AddConstantsWidget()
-{
-
-}
-
 void MT_AddConstantsWidget::accept()
 {
 	boss->numToCreate = numConstantsSpinBox->text().toInt();

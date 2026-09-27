@@ -16,7 +16,6 @@ class MT_AddIndividualsWidgetBase : public QDialog, public Ui::MT_AddIndividuals
 
 public:
     MT_AddIndividualsWidgetBase(QWidget* parent = nullptr, const char* name = nullptr, bool modal = false, Qt::WindowFlags fl = Qt::WindowFlags());
-    ~MT_AddIndividualsWidgetBase() override;
 
 protected:
     // Qt does not call languageChange() itself.

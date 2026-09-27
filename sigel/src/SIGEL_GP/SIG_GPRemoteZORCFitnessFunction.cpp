@@ -30,11 +30,6 @@
 namespace SIGEL_GP
 {
 
-   SIG_GPRemoteZORCFitnessFunction::~SIG_GPRemoteZORCFitnessFunction()
-   {  // nothing
-   }
-
-
    double SIG_GPRemoteZORCFitnessFunction::evalFitness( SIGEL_Program::SIG_Program &program,
                                                         SIGEL_Robot::SIG_Robot &rob,
                                                         SIGEL_Environment::SIG_Environment &,

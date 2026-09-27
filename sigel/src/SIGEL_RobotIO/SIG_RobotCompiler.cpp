@@ -32,9 +32,6 @@ namespace SIGEL_RobotIO {
                   dirprefix (homepath)
         { }
 
-        SIG_RobotCompiler::~SIG_RobotCompiler ()
-        { }
-
         /* to be deleted 
         QString SIG_RobotCompiler::prefixFile (QString filename)
         {

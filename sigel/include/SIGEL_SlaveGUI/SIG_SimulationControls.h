@@ -64,11 +64,6 @@ namespace SIGEL_SlaveGUI
 			     QString name = QString());
 
       /**
-       * The destructor of the SIG_SimulationControls.
-       */
-      virtual ~SIG_SimulationControls();
-
-      /**
        * The surrounding QMainWindow that contains the toolbar and menubar
        * where this QActiongroup QActions should be inserted.
        */

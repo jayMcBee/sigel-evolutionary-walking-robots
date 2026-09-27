@@ -37,7 +37,7 @@ public:
 	MT_Search(MT_Population * ParentPop, MT_Population * OffspringPop, MT_Randomizer * _Randi, QTextStream & File);
 	MT_Search(MT_Population * ParentPop, MT_Population * OffspringPop, MT_Randomizer * _Randi);
 	MT_Search();
-	virtual ~MT_Search();
+	virtual ~MT_Search() = default;
 	/* For brood search (see BrutSize/setBrutSize)
 	*	MT_Search(MT_Population * ParentPop, MT_Population * OffspringPop, MT_Randomizer * Randi, MT_FitnessTrainer * Fit Trainer);
 	*/

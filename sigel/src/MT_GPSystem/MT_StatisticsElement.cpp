@@ -72,13 +72,6 @@ MT_StatisticsElement::MT_StatisticsElement()
 
 }
 
-MT_StatisticsElement::~MT_StatisticsElement()
-{
-
-}
-
-
-
 void MT_StatisticsElement::writeToFileElement(QTextStream &File)
 {
 	

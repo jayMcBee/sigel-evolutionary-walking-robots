@@ -71,15 +71,6 @@ SIG_GPSimpleTournament( SIGEL_Tools::SIG_Randomizer& randomizer,
 		        int ppos1, 
 		        int ppos2 );
 
-/**
-* The destructor of the SimpleTournament object.
-* @pre
-* The tournament is played, the winner is reproducted, set to the pool and the next tournament wants to be played.
-* @post
-* The object is destructed.
-*/
- public:
-virtual ~SIG_GPSimpleTournament();
 
 /**
 * This virtual method executes the tournament.

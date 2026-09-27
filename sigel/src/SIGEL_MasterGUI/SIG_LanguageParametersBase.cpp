@@ -12,11 +12,6 @@ SIG_LanguageParametersBase::SIG_LanguageParametersBase(QWidget* parent, const ch
   listviewCommands->sortByColumn( 0, Qt::AscendingOrder );
 }
 
-SIG_LanguageParametersBase::~SIG_LanguageParametersBase()
-{
-  // no need to delete child widgets, Qt does it all for us
-}
-
 void SIG_LanguageParametersBase::changeEvent( QEvent *e )
 {
   QWidget::changeEvent( e );

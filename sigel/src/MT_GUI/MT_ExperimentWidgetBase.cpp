@@ -12,11 +12,6 @@ MT_ExperimentWidgetBase::MT_ExperimentWidgetBase(QWidget* parent, const char* na
   MTExperimentListView->sortByColumn( 0, Qt::AscendingOrder );
 }
 
-MT_ExperimentWidgetBase::~MT_ExperimentWidgetBase()
-{
-  // no need to delete child widgets, Qt does it all for us
-}
-
 void MT_ExperimentWidgetBase::changeEvent( QEvent *e )
 {
   QWidget::changeEvent( e );

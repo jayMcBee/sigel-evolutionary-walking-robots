@@ -63,10 +63,6 @@ MT_StatisticsWidget::MT_StatisticsWidget(QMainWindow* parent, const char* name, 
 	QObject::connect((QObject*)searchEffectsPSButton, SIGNAL(clicked()), SLOT(slotSearchEffectsPSExport()));
 }
 
-
-MT_StatisticsWidget::~MT_StatisticsWidget()
-{}
-
 void MT_StatisticsWidget::onShow(MT_GPManager *manager, subst_cache *subst)
 {
 	statToolbar->show();

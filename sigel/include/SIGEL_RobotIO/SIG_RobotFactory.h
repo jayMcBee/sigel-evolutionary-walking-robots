@@ -35,7 +35,7 @@ namespace SIGEL_RobotIO {
                 SIG_Robot *robot;
         public:
                 SIG_RobotFactory ();
-                virtual ~SIG_RobotFactory ();
+                virtual ~SIG_RobotFactory() = default;
                 virtual SIG_Robot *getModel ();
         };
 }
