@@ -302,6 +302,10 @@ touched, because changing one changes behaviour against the reference binary.
 
 ## 8 · Cleanup
 
+- [ ] **107. Review `SIG_GPPopulation::readFromFile`, interactively.** Asked
+  for 2026-09-27. The method is 129 lines and hard to read. Go through it with
+  the maintainer, deciding each change before it is made.
+
 - [ ] **106. Review `SIG_GPParameter.cpp`, interactively.** Asked for
   2026-09-27. The GP Parameters page is hard to read: long methods —
   `getOutOfExperiment` 163 lines, `slotItemDoubleClicked` 144,
