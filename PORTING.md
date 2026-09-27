@@ -909,7 +909,20 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-27 — DONE: ITEM 92, PART 1, F(VOID) BECOMES F().** Start here.
+**2026-09-27 — DONE: ITEM 92, PART 2, THREE CONST_CASTS REMOVED.** Start here.
+
+- **Changed:** `SIG_EarlyRunTermSimulation` keeps a const robot pointer;
+  `SIG_DynaMechsCommandInterface::moveDrive` reads its joint through const
+  pointers; `SIG_EnvironmentRenderer` keeps a const environment reference on
+  Windows too, as it already did on Linux. The Windows branch is not built
+  here.
+- **Baselines:** unchanged.
+- **Review:** by the maintainer, from the diff.
+- **Gates:** `check.sh` 758 pass, 0 fail; warnings 486. The other four gates
+  are green.
+- **Next:** item 91, then the rest of item 92.
+
+**2026-09-27 — DONE: ITEM 92, PART 1, F(VOID) BECOMES F().**
 
 - **Changed:** 289 `(void)` parameter lists in 61 files become `()`. The C
   file `manage_dyn_slave.c` keeps its own; it includes no SIGEL header.

@@ -33,7 +33,7 @@ SIGEL_Simulation::SIG_EarlyRunTermSimulation::SIG_EarlyRunTermSimulation(SIGEL_R
   SIGEL_Simulation::SIG_Simulation(robot, environment, robotProgram,simulationParameter,theRecorder)
 {
   ertStartHeight = -1;
-  ertRobot = const_cast<SIGEL_Robot::SIG_Robot *>(&robot);
+  ertRobot = &robot;
 
   // need a SIG_GPFullDataRecorder type recorder !
   ertRecorder = dynamic_cast<SIGEL_GP::SIG_GPFullDataRecorder *>(&theRecorder);

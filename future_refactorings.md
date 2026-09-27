@@ -62,26 +62,26 @@ Constructs the language removed. A current compiler rejects them.
   | MT_GPSystem | 17 | SIGEL_Program, SIGEL_SlaveGUI | 3 |
   | SIGEL_CommonGUI | 12 | | |
 
-- [ ] **92. Remove the `const_cast`s where the API allows it.** Counted
-  2026-09-25. The `(void)` parameter lists are done; see `PORTING.md`.
-  - **25 `const_cast`s in six modules.** None is undefined behaviour today:
-    each object was created non-const and is only read through the cast. But
-    a later write through one would be, and the compiler would not say so.
+- [ ] **92. Remove the `const_cast`s where the API allows it.** Re-counted
+  2026-09-27. The `(void)` parameter lists and three casts are done; see
+  `PORTING.md`.
+  - **26 `const_cast`s left.** None is undefined behaviour today: each object
+    was created non-const and is only read through the cast. But a later
+    write through one would be, and the compiler would not say so.
     - **Keep, 10:** PVM's C functions take `char*` for strings they only
       read: `SIG_GPFitnessTrainer` (8), `SIG_GPPVMData::sendQStringToPVM`
       (1), `SIG_AllIndividualsView::slotVisualize` (1).
-    - **Meta-GP, 9:** the three tournament classes and `MT_Evaluator` cast
-      programs and an individual because `MT_Classifier::createNewTCase` and
-      `classifier` take non-const pointers. Make those take `const` if they
-      only read.
-    - **`getLine`, 2:** `SIG_Interpreter::interprete` and
-      `SIG_ProgramLine::operator=`; item 91.
-    - **Robot and environment, 4:** `SIG_DynaMechsCommandInterface::moveDrive`
-      (`SIG_Joint` from a const drive), `SIG_DynaMechsLink` (`SIG_Geometry`),
-      `SIG_EarlyRunTermSimulation` (keeps a mutable robot pointer),
-      `SIG_EnvironmentRenderer` (keeps a mutable environment reference).
-      Needs const getters on `SIG_Joint` and `SIG_Geometry`, and the two
-      stored references made const.
+    - **After item 91 — `getLine`, 2:** `SIG_Interpreter::interprete` and
+      `SIG_ProgramLine::operator=`.
+    - **After item 91 — Meta-GP, 13:** the three tournament classes and
+      `MT_Evaluator::spawnTask` cast programs and an individual because
+      `MT_Classifier::createNewTCase` and `classifier` take non-const
+      pointers. They only read, but through `getLine` and the line getters.
+    - **`SIG_DynaMechsLink`, 1:** it hands its geometry to `SIG_Mirtich`,
+      which stores a non-const pointer because `moveToOriginAndMajorAxes`
+      moves the geometry. Only `SIG_Link::transformToDynaMo` calls that. Either
+      keep the cast, or move the translate and rotate into `SIG_Link` so
+      `SIG_Mirtich` holds a const pointer. Undecided.
 - [ ] **101. Empty destructors: remove them, or default them in the header.**
   Decided 2026-09-26. Delete every empty destructor whose class already has a
   virtual destructor above it. A base class without one gets a defaulted

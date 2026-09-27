@@ -40,11 +40,7 @@ namespace SIGEL_Visualisation
 
   SIG_EnvironmentRenderer::SIG_EnvironmentRenderer(SIGEL_Environment::SIG_Environment const &environment)
     : SIG_Renderer( 2, 0),
-#ifdef _WINDOWS
-		environment( const_cast< SIGEL_Environment::SIG_Environment &>(environment) ),
-#else		
       environment(environment),
-#endif
       lookPoint(0, 0, 0),
       fieldEdgeLength( 1 ),
       showRobotPath( false )

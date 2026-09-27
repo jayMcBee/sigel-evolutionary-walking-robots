@@ -212,11 +212,7 @@ namespace SIGEL_Visualisation
      * The SIG_Environment object that should be rendered
      * by this SIG_EnvironmentRenderer.
      */
-#ifdef _WINDOWS
-    SIGEL_Environment::SIG_Environment &environment;
-#else
     SIGEL_Environment::SIG_Environment const &environment;
-#endif
 
     GLint const fieldEdgeLength;
 

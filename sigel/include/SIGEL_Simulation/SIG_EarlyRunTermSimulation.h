@@ -84,7 +84,7 @@ namespace SIGEL_Simulation
        /**
        * Our pointer to the current robot.
        */
-       SIGEL_Robot::SIG_Robot *ertRobot;
+       SIGEL_Robot::SIG_Robot const *ertRobot;
 
        /**
        * Stolen from GP_FitnessFunction.

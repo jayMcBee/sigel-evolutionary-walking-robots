@@ -123,7 +123,7 @@ void SIGEL_Simulation::SIG_DynaMechsCommandInterface::moveDrive(int driveNo,
 		SIG_DynaMechsLink *dynaMechsLink = simulationData.dynaMechsLinks[ linkNumber ];
 
 		// we work on rotational joints only, we do not look at anything else at all!
-		SIGEL_Robot::SIG_Joint *myJoint = const_cast<SIGEL_Robot::SIG_Joint *>( drive->getJoint() );
+		SIGEL_Robot::SIG_Joint const *myJoint = drive->getJoint();
 
 		if (myJoint->getJointType() != SIGEL_Robot::SIG_Joint::tRotationalJoint)
 		{	SIGEL_Tools::SIG_IO::cerr << "tServoSimpleMode type drives can work on rotational joints only !!" << Qt::endl;
@@ -135,7 +135,7 @@ void SIGEL_Simulation::SIG_DynaMechsCommandInterface::moveDrive(int driveNo,
 
 		// get rel. position within the min-max range we want to turn
 		// in SIGEL (0..360) notation
-		SIGEL_Robot::SIG_RotationalJoint *myRotJ = dynamic_cast<SIGEL_Robot::SIG_RotationalJoint *>(myJoint);
+		SIGEL_Robot::SIG_RotationalJoint const *myRotJ = dynamic_cast<SIGEL_Robot::SIG_RotationalJoint const *>(myJoint);
 		long double rjointrange = (long double)(myRotJ->getMax()) - (long double)(myRotJ->getMin());
 
 		// but restore limits first; don't trust the manipulated values -> use original values stored in SIG_Joint::getMechsMinPos()
