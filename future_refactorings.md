@@ -721,6 +721,8 @@ touched, because changing one changes behaviour against the reference binary.
   that number in two places — the per-step exit criterion in §7 and the check
   list — and its trail in §7 records each step. Move all of them in the same
   commit.
+  That includes comments/directive like
+  `#endif // !defined(AFX_MT_CLASSIFIER_H__22632809_B47E_418D_8C86_EDE8B998506D__INCLUDED_)`
   **Do not mix it with any other change. When:** after every other item in this
   section — moved to the back 2026-09-21, because it touches the whole
   codebase.
