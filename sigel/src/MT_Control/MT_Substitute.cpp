@@ -49,10 +49,6 @@ void MT_Substitute::changeBest(MT_Program * MetaProg)
 	Interpreter->loadProgram(BestMETAProgram);
 }
 
-// NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW
-// NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW 
-// NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW 
-
 void MT_Substitute::changeErrorInfo(QList<double> * OutCome, QList<double> * CorrectFit)
 {
 	if (CorrectFitness.size() < CorrectFit->size())

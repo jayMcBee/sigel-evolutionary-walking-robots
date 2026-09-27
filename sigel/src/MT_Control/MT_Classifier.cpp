@@ -285,10 +285,6 @@ int MT_Classifier::evaluationTactic(int ToursSize)
 
 		}break;
 
-// NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW
-// NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW 
-// NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW 
-
 	case 6: 
 		{
 			if(MetaProgError == -1.0)
@@ -513,10 +509,6 @@ bool MT_Classifier::preEvolution(QList<SIGEL_GP::SIG_GPTournament *> *tours, int
 	}
 
 
-// NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW
-// NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW 
-// NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW 
-
 // only  tournament, which haven't the best Sig Individual inside 
 // will run by the Classifier
 
@@ -605,10 +597,6 @@ for(int d=0; d < tours->size();d++)
 
 
 }
-
-// NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW
-// NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW 
-// NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW 
 
 int MT_Classifier::evalNeededTours(QList<SIGEL_GP::SIG_GPTournament *> *  tours, QList<int> * ToursWBestIndi, int PosBest)
 {

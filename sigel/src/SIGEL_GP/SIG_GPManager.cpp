@@ -1140,9 +1140,6 @@ void SIGEL_GP::SIG_GPManager::run(MT_Classifier *MetaClassifier)
 	  return;
 
 	
-// NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW
-// NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW 
-// NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW // NEW NEW NEW NEW NEW 
 	// Find the population position of the best SIGEL individual  
 	int PosBestSigelIndi =0;
 	double BestFitness =-1.0;
