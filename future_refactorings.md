@@ -230,6 +230,19 @@ touched, because changing one changes behaviour against the reference binary.
   a copy loop then asks for line -1. Before item 91 that read outside the
   vector; now `SIG_Program::getLine` throws `SIG_Exception`.
 
+- [ ] **111. Enforce a minimum program length of 5 everywhere.** Decided
+  2026-09-27. It makes item 110 unreachable.
+  - One constant in `SIG_GPParameter`. The dialog's spin box
+    (`SIG_GPParameterBase.ui`, now 2), the parameter-file loader and
+    `setMinIndLength` all use it. A file value below it throws
+    `SIG_Exception`.
+  - Loading a pool pads a shorter program with the existing NOP logic
+    (`SIG_Program::checkLength`) and records it with
+    `addLengthIncreasedInfo`.
+  - The active population is not checked again when the parameter changes.
+  - Unlikely edge cases, such as a stored fitness after padding, are
+    deliberately not handled.
+
 - [ ] **18. `SIG_GPPVMTask` holds a reference to a host that can be deleted
   under it.** `SIG_GPPVMTask` declares `SIG_GPActivePVMHost &host`;
   `SIG_GPFitnessTrainer::flushAllDynHosts` calls `resizeOwningHosts`, which
