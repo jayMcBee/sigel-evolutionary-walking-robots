@@ -275,27 +275,6 @@ touched, because changing one changes behaviour against the reference binary.
   the 7 shipped experiments does. The library code is unpatched, as SIGEL's
   `supportingLibs` ships it. Found 2026-09-22.
 
-- [ ] **59. Investigate the pool limit of 32768.** Tournament selection draws
-  each player's pool position with `SIG_Randomizer::getRandomInt`, which
-  returns 0 to 32767 before the modulo. `SIG_GPManager::createTours` draws with
-  `getSize()`, `getSize()-1`, `-2` and `-3` and shifts the later draws past the
-  earlier ones, so it reaches index 32770 at most: only the first 32771
-  individuals can ever play. The pool itself can grow past that, through
-  repeated Adds or a loaded file, whose `POPULATIONSIZE` and `INDIVIDUAL(x)`
-  indexes both grow it. An individual further down is evaluated — every
-  generation, because `resetAllFitnessValues` clears its fitness — but never enters a
-  tournament.
-  **The modulo also favours low positions** at every pool size that does not
-  divide 32768: 4 draws against 3 for the first 2471 positions of a pool of
-  10099, and 2 against 1 for any pool of 16385 to 32767.
-  The generator is 1.3's, and its bits are the same on a 32-bit machine, so
-  the limit is 1.3's too; confirm that on the oracle. All seven shipped
-  experiments hold 100 individuals, so none comes near it. To decide: leave it
-  as 1.3 has it, refuse a larger pool, or draw differently — and the last
-  makes every run differ from 1.3's. Found by review 2026-09-22.
-  **Pencilled in 2026-09-24:** limit the pool to 30,000 in the interface, and
-  add a check with a warning in the code for any pool above 32,767.
-
 ---
 
 ## 7 · The interface

@@ -213,6 +213,7 @@ SIG_ExperimentItem *SIG_ExperimentListView::openExperimentFile( const QString &a
 	  return nullptr;
 	}
       theNewExperiment->getAllOutOfExperiment();
+      theNewExperiment->warnIfPoolTooLarge();
     }
   else
     {

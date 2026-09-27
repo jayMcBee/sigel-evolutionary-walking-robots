@@ -187,7 +187,15 @@ void SIG_AllIndividualsView::slotAddIndividuals()
     {
     case QDialog::Accepted:
       emit signalDataRefreshNeeded();
-      theExperiment.population.addRandomIndividuals( addDialog.spinboxNumber->value(), theExperiment.gpParameter, *theExperiment.robot.getLangParam() );
+      {
+        int requested = addDialog.spinboxNumber->value();
+        int added = theExperiment.population.addRandomIndividuals( requested, theExperiment.gpParameter, *theExperiment.robot.getLangParam() );
+        if( added < requested )
+          {
+            QString message = QString( "The pool is limited to %1 individuals." ).arg( SIGEL_GP::SIG_GPPopulation::maximumSize );
+            QMessageBox::information( this, "Pool Full", message );
+          }
+      }
       
       // lets do it inefficiently first. will be corrected later
       // Same Qt 2 signal blocking as slotCompleteRefreshList above. Adding only
@@ -521,7 +529,11 @@ void SIG_AllIndividualsView::slotImportIndividual()
   QString fileName = QFileDialog::getOpenFileName( this, "Import Individual", QString(), "Individual Files (*.ind);;All Files (*)" );
   if( !fileName.isEmpty() )
     {
-      theExperiment.population.importNewIndividual( fileName );
+      if( !theExperiment.population.importNewIndividual( fileName ) )
+        {
+          QString message = QString( "Nothing imported: the pool is limited to %1." ).arg( SIGEL_GP::SIG_GPPopulation::maximumSize );
+          QMessageBox::information( this, "Pool Full", message );
+        }
     }
   slotCompleteRefreshList(); // can be done more efficiently!!!
 };

@@ -903,8 +903,20 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-09-27 — DONE: ITEM 59, THE POOL IS LIMITED TO 32768.** Start here.
+
+- **Changed:** `SIG_GPPopulation::maximumSize`; Add and Import Individual
+  stop at it with a message; a larger loaded pool is kept with a warning.
+  Details are in item 59's entry in "Done".
+- **Baselines:** unchanged. The random draws do not change.
+- **Review:** acted on: after a cancel in a capped Add, the message gave the
+  capped count, not the real one; it now states only the limit.
+- **Gates:** `check.sh` 938 pass, 0 fail; warnings 487. The other four gates
+  are green.
+- **Next:** item 107, a review of `SIG_GPPopulation::readFromFile`.
+
 **2026-09-27 — DONE: ITEM 103, THE TOURNAMENT COUNTER NO LONGER GOES
-STALE.** Start here.
+STALE.**
 
 - **Changed:** `SIG_GPParameter::showEvent` recomputes the tournaments per
   generation each time the GP Parameters page is shown. Details are in item
@@ -6126,6 +6138,27 @@ carried; other items and this file cite them, so they do not change.
   page, a label in the secondary text colour shows the description, or says
   that the experiment names a fitness function this build does not have.
   Remote ZORC is the last entry.
+
+- [x] **59. The pool is limited to 32768** — done 2026-09-27, by
+  decision. Tournament selection draws pool positions with
+  `SIG_Randomizer::getRandomInt`, which gives 0 to 32767, as 1.3 does. Measured
+  with the real generator: in every pool of up to 32768 every position is
+  drawn; above that, positions beyond 32770 (32768 without crossover) are
+  never drawn, and such an individual is evaluated once and then never
+  changes. Nothing limited the pool: Add allows 9999 per call and repeats, and
+  a loaded file sets any size through `POPULATIONSIZE`. Now
+  `SIG_GPPopulation::maximumSize` is 32768: `addRandomIndividuals` adds at most
+  up to it and returns how many, `importNewIndividual` refuses on a full pool,
+  and the interface says "The pool is limited to 32768 individuals." A larger
+  pool that is loaded is kept: `readFromFile` writes a warning to stderr, and
+  `SIG_GUIGPExperiment::warnIfPoolTooLarge` shows it after File > Open and
+  Import > Population. The random draws do not change, so every run with a
+  pool of up to 32768 stays identical. Corrections to the item as written:
+  `INDIVIDUAL(x)` does not grow the pool, only `POPULATIONSIZE` does; fitness is
+  reset every `RESEVGEN` generations, 0 by default, not every generation;
+  `runner.exp` holds 250 individuals. Tested headless on a copy of
+  `walker.exp`: adding 40000 to 100 stopped at 32768, a further Add and an
+  import were refused, and a copy edited to 32770 loaded with the warning.
 
 - [x] **103. The tournaments-per-generation counter went stale** — done
   2026-09-27. Reported by the x86 machine. `SIG_GPParameter` computed the

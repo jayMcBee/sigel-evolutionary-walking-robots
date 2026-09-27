@@ -252,6 +252,11 @@ namespace SIGEL_MasterGUI
     private:
     public:
       /**
+       * Warns if the pool is larger than SIG_GPPopulation::maximumSize.
+       */
+      void warnIfPoolTooLarge();
+
+      /**
        * Returns true while the evolution of this experiment runs.
        *
        * A run check asks SIG_ExperimentListView::isRunning() instead, which

@@ -184,11 +184,15 @@ void SIGEL_GP::SIG_GPPopulation::setIndividual(SIG_GPIndividual& indi,
 
    
 
-void SIGEL_GP::SIG_GPPopulation::addRandomIndividuals(int quantity, 
+int SIGEL_GP::SIG_GPPopulation::addRandomIndividuals(int quantity, 
 						      SIGEL_GP::SIG_GPParameter& param, 
 						      SIGEL_Robot::SIG_LanguageParameters& languageP)
 {
    int maxPos=getSize();
+
+   quantity = qMin( quantity, maximumSize - maxPos );
+   if( quantity <= 0 )
+     return 0;
 
    pool.resize( maxPos + quantity );
 
@@ -227,6 +231,8 @@ void SIGEL_GP::SIG_GPPopulation::addRandomIndividuals(int quantity,
      }
 
     if( qApp ) delete progress;
+
+    return quantity;
 };
     
 int SIGEL_GP::SIG_GPPopulation::getSize()
@@ -318,9 +324,12 @@ SIGEL_Tools::SIG_Randomizer *SIGEL_GP::SIG_GPPopulation::getRandomizerPointer()
   return randomizer;
 }
 
-void SIGEL_GP::SIG_GPPopulation::importNewIndividual( QString& filename )
+bool SIGEL_GP::SIG_GPPopulation::importNewIndividual( QString& filename )
 {
    int lastPos=getSize();
+
+   if( lastPos >= maximumSize )
+     return false;
 
    pool.resize( lastPos + 1 );
 
@@ -335,6 +344,7 @@ void SIGEL_GP::SIG_GPPopulation::importNewIndividual( QString& filename )
 
    delete pool[ lastPos ];
    pool[ lastPos ] = newInd;
+   return true;
 }
 
 void SIGEL_GP::SIG_GPPopulation::readFromFile(QTextStream &file)
@@ -459,7 +469,12 @@ void SIGEL_GP::SIG_GPPopulation::readFromFile(QTextStream &file)
     { 
       
     }
- 
+
+  if( getSize() > maximumSize )
+    {
+      QString message = QString( "Warning: the pool has %1 individuals; only the first %2 take part in tournaments reliably." ).arg( getSize() ).arg( maximumSize );
+      SIGEL_Tools::SIG_IO::cerr << message << Qt::endl;
+    }
 }
 
 void SIGEL_GP::SIG_GPPopulation::writeToFile(QTextStream &file)

@@ -646,6 +646,17 @@ void SIG_GUIGPExperiment::slotPopulationImport()
 	}
       file.close();
       allIndividualsView->slotCompleteRefreshList();
+      warnIfPoolTooLarge();
+    }
+};
+
+void SIG_GUIGPExperiment::warnIfPoolTooLarge()
+{
+  int size = gpExperiment.population.getSize();
+  if ( size > SIGEL_GP::SIG_GPPopulation::maximumSize )
+    {
+      QString message = QString( "The pool has %1 individuals; only the first %2 take part in tournaments reliably." ).arg( size ).arg( SIGEL_GP::SIG_GPPopulation::maximumSize );
+      QMessageBox::warning( experimentListView, "Large Pool", message );
     }
 };
 

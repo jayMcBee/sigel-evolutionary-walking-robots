@@ -217,6 +217,9 @@ class SIG_GPPopulation
      */
   public:
     int getSize();
+
+    // The largest pool in which every individual can enter a tournament.
+    static const int maximumSize = 32768;
     
     /**
      * This operation returns the name for the next new individual. The 
@@ -381,14 +384,17 @@ class SIG_GPPopulation
      * The user wants to add some individuals to the population, which can be
      * empty or already filled with individuals.
      * @post
-     * The demanded quantity fo individuals are appended to the population.
+     * The demanded quantity fo individuals are appended to the population,
+     * but the pool does not grow past maximumSize.
      * @param quantity
      * The quantity expresses how many individuals are to be added to the pool.
+     * @return
+     * How many individuals were to be added after that limit.
      */
 
 
   public:
-    void addRandomIndividuals(int quantity, 
+    int addRandomIndividuals(int quantity, 
 			      SIGEL_GP::SIG_GPParameter& param, 
 			      SIGEL_Robot::SIG_LanguageParameters& languageP);
     
@@ -412,11 +418,12 @@ class SIG_GPPopulation
 
     /**
      * This function imports a new individual. A new individual will be created automatically before. Hence, the population
-     * size will be increased.
+     * size will be increased. Returns false, and imports nothing, if the pool
+     * already holds maximumSize individuals.
      */
 
   public:
-    void importNewIndividual( QString& filename );
+    bool importNewIndividual( QString& filename );
 
     /**
       * This is the set method for the variable history.
