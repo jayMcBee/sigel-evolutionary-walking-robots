@@ -909,7 +909,21 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-27 — DONE: ITEM 92, PART 4, SIG_MIRTICH NO LONGER MOVES ITS GEOMETRY. ITEM 92 IS DONE.** Start here.
+**2026-09-27 — DONE: ITEM 94, ADDING INDIVIDUALS IS FAST.** Start here.
+
+- **Changed:** Add inserts only the new rows, sorting is off while rows go
+  in, and the sort key is built in one step. Details are in item 94's entry
+  in "Done". Two cleanups went in before it, each its own commit:
+  `SIG_Mirtich`'s `myExcName` became `geometryName`, and the `NEW NEW NEW`
+  comment banners were removed.
+- **Baselines:** unchanged.
+- **Review:** no defects. It found that `addRandomIndividuals` returns the
+  requested count even when cancelled part-way.
+- **Gates:** `check.sh` 758 pass, 0 fail; warnings 485, one fewer because an
+  unused variable went. The other four gates are green.
+- **Next:** item 101, then item 102.
+
+**2026-09-27 — DONE: ITEM 92, PART 4, SIG_MIRTICH NO LONGER MOVES ITS GEOMETRY. ITEM 92 IS DONE.**
 
 - **Changed:** `SIG_Mirtich` holds `SIG_Geometry const *`;
   `moveToOriginAndMajorAxes` became `computeTransformToOriginAndMajorAxes`,
@@ -6400,6 +6414,21 @@ carried; other items and this file cite them, so they do not change.
   `expstruct selfcheck`, which tested our tool; the syntax compile of the two
   programs; and `real clicks`, with its `xtest` scenario and
   `xtest-baseline.txt`. `check.sh` gives 757 pass.
+
+- [x] **94. Adding many individuals was slow, and slower as the pool
+  grew** — done 2026-09-27, one commit. Measured with `twoBases.exp` and
+  batches of 1000 through the menu: 420.9 s at a pool of 1100, 3616.4 s at
+  3100, growing with the square of the pool; creating the individuals took
+  0.3 s. `gdb` samples put the time in the list's sort: sorting stayed on
+  while every row was inserted again, and each comparison padded two keys to
+  999 characters one `prepend` at a time. Now
+  `SIG_AllIndividualsView::slotAddIndividuals` inserts rows only for the new
+  individuals, which `addRandomIndividuals` appends, with sorting off until
+  they are in; `slotCompleteRefreshList` turns sorting off during its full
+  rebuild; `SIG_IndividualListItem::key` builds its padding in one step,
+  giving identical keys (3,200,056 compared). After: 0.6 to 1.0 s per batch,
+  flat up to a pool of 20100. The "Add Individuals" progress dialog is gone;
+  the selection and scroll position stay. The refresh path was not measured.
 
 - [x] **92. `const_cast`s removed where the API allows it, and `f(void)`
   became `f()`** — done 2026-09-27, four commits. 289 `(void)` parameter

@@ -270,36 +270,6 @@ touched, because changing one changes behaviour against the reference binary.
 
 ## 7 · The interface
 
-- [ ] **94. Adding many individuals is slow, and slower as the pool grows.**
-  Observed 2026-09-26: Individuals > Add with 1000 individuals takes a long
-  time, and the rate drops as the pool grows. Creating random programs should
-  be quick. Not measured yet. What the code does: after
-  `SIG_GPPopulation::addRandomIndividuals`,
-  `SIG_AllIndividualsView::slotAddIndividuals` clears the whole list and
-  builds every row again, with a progress dialog update and a
-  `processEvents` call per row.
-  **Measured 2026-09-27** with `twoBases.exp`, batches of 1000 through the
-  menu on the desktop, and the same batches with no user interface:
-
-  | pool after the batch | logic only | SIGEL window |
-  |---|---|---|
-  | 1100 | 0.31 s | 420.9 s |
-  | 2100 | 0.27 s | 1603.8 s |
-  | 3100 | 0.33 s | 3616.4 s |
-
-  Creating the individuals is fast and does not slow down (0.3 s per 1000 up
-  to a pool of 10100). The list rebuild takes all the time, and it grows with
-  the square of the pool. 11 of 12 `gdb` stack samples were in
-  `QTreeWidgetItem::sortChildren`, 10 of them in
-  `SIG_IndividualListItem::key`: sorting is on while the list is filled, so
-  `processEvents` lets the list sort again as rows arrive, and every
-  comparison builds two keys padded to 999 characters, one `prepend` at a
-  time.
-
----
-
-## 8 · Cleanup
-
 - [ ] **107. Review `SIG_GPPopulation::readFromFile`, interactively.** Asked
   for 2026-09-27. The method is 129 lines and hard to read. Go through it with
   the maintainer, deciding each change before it is made.

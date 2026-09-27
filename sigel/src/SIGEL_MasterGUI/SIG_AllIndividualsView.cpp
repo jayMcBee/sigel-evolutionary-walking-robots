@@ -162,6 +162,7 @@ void SIG_AllIndividualsView::slotCompleteRefreshList()
     individualList->listviewIndividuals->clear();
     individualList->listviewIndividuals->blockSignals( wasBlocked );
   }
+  individualList->listviewIndividuals->setSortingEnabled( false );
   for( int counter = 0; counter < poolSize; counter++ )
     {
       progress.setValue( counter );
@@ -169,6 +170,7 @@ void SIG_AllIndividualsView::slotCompleteRefreshList()
       SIGEL_GP::SIG_GPIndividual *theGPIndividual = &theExperiment.population.getIndividual( counter );
       SIG_IndividualListItem *theItem = new SIG_IndividualListItem( individualList->listviewIndividuals, counter, theGPIndividual );
     }
+  individualList->listviewIndividuals->setSortingEnabled( true );
   individualList->lcdnumberNumberOfIndividuals->display(theExperiment.population.getSize() );
 };
 
@@ -185,6 +187,8 @@ void SIG_AllIndividualsView::slotAddIndividuals()
     case QDialog::Accepted:
       emit signalDataRefreshNeeded();
       {
+        // New individuals are appended to the pool, so only their rows are added.
+        int firstNew = theExperiment.population.getSize();
         int requested = addDialog.spinboxNumber->value();
         int added = theExperiment.population.addRandomIndividuals( requested, theExperiment.gpParameter, *theExperiment.robot.getLangParam() );
         if( added < requested )
@@ -192,27 +196,12 @@ void SIG_AllIndividualsView::slotAddIndividuals()
             QString message = QString( "The pool is limited to %1 individuals." ).arg( SIGEL_GP::SIG_GPPopulation::maximumSize );
             QMessageBox::information( this, "Pool Full", message );
           }
+        // Sorting stays off while the rows go in; switching it on sorts once.
+        individualList->listviewIndividuals->setSortingEnabled( false );
+        for( int counter = firstNew; counter < theExperiment.population.getSize(); counter++ )
+          new SIG_IndividualListItem( individualList->listviewIndividuals, counter, &theExperiment.population.getIndividual( counter ) );
+        individualList->listviewIndividuals->setSortingEnabled( true );
       }
-      
-      // lets do it inefficiently first. will be corrected later
-      // Signals are blocked for the reason given in slotCompleteRefreshList.
-      // Adding only grows the pool, so this matters only if that changes.
-      {
-        const bool wasBlocked = individualList->listviewIndividuals->blockSignals( true );
-        individualList->listviewIndividuals->clear();
-        individualList->listviewIndividuals->blockSignals( wasBlocked );
-      }
-      QProgressDialog progress( "Populating pool...", QString(), 0, theExperiment.population.getSize(), this );
-  progress.setWindowModality( Qt::ApplicationModal );
-      progress.setWindowTitle( "Add Individuals" );
-      progress.show();
-      for( int counter = 0; counter < theExperiment.population.getSize(); counter++ )
-	{
-	  progress.setValue( counter );
-	  SIGEL_GP::SIG_GPIndividual *theGPIndividual = &theExperiment.population.getIndividual( counter );
-	  SIG_IndividualListItem *theItem = new SIG_IndividualListItem( individualList->listviewIndividuals, counter, theGPIndividual );
-	  qApp->processEvents();
-	}
       break;
     }
   individualList->lcdnumberNumberOfIndividuals->display( theExperiment.population.getSize() );

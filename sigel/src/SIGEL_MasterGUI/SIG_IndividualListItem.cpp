@@ -66,13 +66,8 @@ QString SIG_IndividualListItem::key(int column, bool ascending) const {
   int const zeros = 999;
   switch(column) {
     case 0: {
-      QString result;
-      int length = this->text(0).length();
-      int difference = zeros - length;
-      for( int i=0; i < difference; i++ )
-        result.prepend("0");
-      result.append(this->text(0));
-      return result;
+      int difference = zeros - this->text(0).length();
+      return QString( qMax( difference, 0 ), '0' ) + this->text(0);
       }
       break;
     case 1: {
@@ -87,13 +82,11 @@ QString SIG_IndividualListItem::key(int column, bool ascending) const {
           orgString.truncate(positionOfExponent);
         orgString.remove(positionOfPoint,1);
         positionOfExponent = (positionOfExponent != -1) ? (this->text(1).right(this->text(1).length()-(positionOfExponent+1))).toInt() : 0;
-        for( int i=0; i < zeros - positionOfPoint - positionOfExponent; i++ )
-          result.prepend("0");
+        result = QString( qMax( zeros - positionOfPoint - positionOfExponent, 0 ), '0' );
       }
       else {
         positionOfExponent = (positionOfExponent != -1) ? (this->text(1).right(this->text(1).length()-(positionOfExponent+1))).toInt() : 0;
-        for( int i=0; i < zeros - this->text(1).length() - positionOfExponent; i++ )
-          result.prepend("0");
+        result = QString( qMax( zeros - int( this->text(1).length() ) - positionOfExponent, 0 ), '0' );
       }
       result.append(orgString);
       return result;
@@ -101,13 +94,8 @@ QString SIG_IndividualListItem::key(int column, bool ascending) const {
       break;
     case 2:
     case 3: {
-      QString result;
-      int length = this->text(column).length();
-      int difference = zeros - length;
-      for( int i=0; i < difference; i++ )
-        result.prepend("0");
-      result.append(this->text(column));
-      return result;
+      int difference = zeros - this->text(column).length();
+      return QString( qMax( difference, 0 ), '0' ) + this->text(column);
       }
       break;
   }
