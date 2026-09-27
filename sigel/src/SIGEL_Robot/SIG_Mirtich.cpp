@@ -251,7 +251,7 @@ namespace SIGEL_Robot {
 
         SIG_Mirtich::SIG_Mirtich (SIG_Geometry const *geometr, QString nameOfGeom)
                 : computed (false),
-                  myExcName (nameOfGeom),
+                  geometryName (nameOfGeom),
                   geom (geometr)
         { }
 
@@ -299,8 +299,8 @@ namespace SIGEL_Robot {
 #else
                         if (isnan (r [i])){
 #endif
-                                throw SIG_CannotMirtich (__FILE__, __LINE__,
-                                                         myExcName); }
+                                throw SIG_CannotMirtich (__FILE__, __LINE__, geometryName);
+                        }
                         centreOfMass.set (i, r[i]);
                 }
 
@@ -311,9 +311,8 @@ namespace SIGEL_Robot {
 #else
                                 if (isnan (J[k][j])){
 #endif
-                                        throw SIG_CannotMirtich (__FILE__,
-                                                                 __LINE__,
-                                                                 myExcName); }
+                                        throw SIG_CannotMirtich (__FILE__, __LINE__, geometryName);
+                                }
                                 inertiaTensor.set (k, j, J[k][j]);
                         }
 
@@ -322,8 +321,8 @@ namespace SIGEL_Robot {
 #else
                 if (isnan (mass)){
 #endif
-                        throw SIG_CannotMirtich (__FILE__, __LINE__,
-                                                 myExcName); }
+                        throw SIG_CannotMirtich (__FILE__, __LINE__, geometryName);
+                }
                 masse = mass;
         }
 

@@ -64,7 +64,7 @@ namespace SIGEL_Robot {
                 double T0, T1[3], T2[3], TP[3];
                 // just a flag
                 bool computed;
-                QString myExcName;
+                QString geometryName;
 
                 void compProjectionIntegrals (FACE *f);
                 void compFaceIntegrals (FACE *f);
