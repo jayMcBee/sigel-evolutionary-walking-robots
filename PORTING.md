@@ -611,7 +611,7 @@ through `f0f2daa`.
 
 ## 7. Steps
 
-**Exit criterion per step:** `./checks/check.sh` from anywhere — **757 pass, 0
+**Exit criterion per step:** `./checks/check.sh` from anywhere — **758 pass, 0
 fail**. *The figure moves with the number of tracked text files, because the
 `encodings` check adds its own count to the total. Measured trail: **1136**
 until 2026-09-19, when `experiments/` and `robots/` arrived and
@@ -642,7 +642,8 @@ passes each; **938** when `SIGEL_Tools/SIG_Version.h` arrived, one pass in
 109 dropped the checks that are not vital as regression tests: the pass per
 compiled file in the 14 module rows (176), `expstruct selfcheck` (1), the
 syntax compile of the two programs (2), `real clicks` (1), and
-`xtest-baseline.txt` in `encodings` (1).*
+`xtest-baseline.txt` in `encodings` (1); **758** when `checks/README.md`
+arrived, one pass in `encodings`.*
 **The pass count was 853 until D31 and the jump is not new coverage of SIGEL's
 code.** The `encodings` check used to read 404 files of five extensions and now
 read all 618 tracked files then, 8 of which git called binary: its pass count went
