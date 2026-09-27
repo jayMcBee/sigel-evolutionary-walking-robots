@@ -39,10 +39,10 @@ namespace SIGEL_Robot {
                         throw SIG_UnstreamingError (__FILE__, __LINE__, "sensor '" + getName () + "' names unknown joint '" + b + "'");
         }
         
-        SIG_JointSensor::~SIG_JointSensor (void)
+        SIG_JointSensor::~SIG_JointSensor ()
         { }
 
-        SIG_Sensor::SensorType SIG_JointSensor::getSensorType (void) const
+        SIG_Sensor::SensorType SIG_JointSensor::getSensorType () const
         {
                 return tJointSensor;
         }
@@ -52,7 +52,7 @@ namespace SIGEL_Robot {
                 theJoint = j;
         }
 
-        SIG_Joint const *SIG_JointSensor::getJoint (void) const
+        SIG_Joint const *SIG_JointSensor::getJoint () const
         {
                 return theJoint;
         }

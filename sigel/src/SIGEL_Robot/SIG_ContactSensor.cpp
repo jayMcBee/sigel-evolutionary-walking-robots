@@ -42,10 +42,10 @@ namespace SIGEL_Robot {
 				throw SIG_UnstreamingError (__FILE__, __LINE__, "sensor '" + getName () + "' names unknown link '" + myLink + "'");
 		}
 
-        SIG_ContactSensor::~SIG_ContactSensor (void)
+        SIG_ContactSensor::~SIG_ContactSensor ()
         { }
 
-        SIG_Sensor::SensorType SIG_ContactSensor::getSensorType (void) const
+        SIG_Sensor::SensorType SIG_ContactSensor::getSensorType () const
         {
                 return tContactSensor;
         }
@@ -55,7 +55,7 @@ namespace SIGEL_Robot {
                 theLink = j;
         }
 
-        SIG_Link const *SIG_ContactSensor::getLink(void) const
+        SIG_Link const *SIG_ContactSensor::getLink() const
         {
                 return theLink;
         }

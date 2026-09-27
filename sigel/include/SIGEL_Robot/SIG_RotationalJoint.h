@@ -46,20 +46,20 @@ namespace SIGEL_Robot {
   public:
     SIG_RotationalJoint (SIG_Robot *par, QString n, int nr = -1);
     SIG_RotationalJoint (SIG_Robot *par, QTextStream & tx);
-    virtual ~SIG_RotationalJoint (void);
-    virtual JointType getJointType (void) const;
+    virtual ~SIG_RotationalJoint ();
+    virtual JointType getJointType () const;
     void setLeftPoints (DL_vector _winportB, DL_vector _winportD, DL_vector _winportH);
     void setRightPoints (DL_vector _winportB, DL_vector _winportD, DL_vector _winportH);
     void setRange (DL_Scalar mn, DL_Scalar mx, DL_Scalar ii);
-    DL_vector getLeftBase (void) const;
-    DL_vector getLeftDir (void) const;
-    DL_vector getLeftHand (void) const;
-    DL_vector getRightBase (void) const;
-    DL_vector getRightDir (void) const;
-    DL_vector getRightHand (void) const;
-    DL_Scalar getMin (void) const;
-    DL_Scalar getMax (void) const;
-    DL_Scalar getIni (void) const;
+    DL_vector getLeftBase () const;
+    DL_vector getLeftDir () const;
+    DL_vector getLeftHand () const;
+    DL_vector getRightBase () const;
+    DL_vector getRightDir () const;
+    DL_vector getRightHand () const;
+    DL_Scalar getMin () const;
+    DL_Scalar getMax () const;
+    DL_Scalar getIni () const;
 
     virtual void transformPoints (SIG_Link *side,
                                   DL_vector mov, DL_matrix rot);

@@ -52,16 +52,16 @@ namespace SIGEL_Robot
   public:
     SIG_Drive (SIG_Robot *par, QString n, int nr = -1);
     SIG_Drive (SIG_Robot *par, QTextStream & tx);
-    ~SIG_Drive (void);
-    QString getName (void) const;
-    int getNumber (void) const;
+    ~SIG_Drive ();
+    QString getName () const;
+    int getNumber () const;
     void setJoint (SIG_Joint *j);
     void setMode (DriveMode dm);
-    SIG_Joint const *getJoint (void) const;
-    DriveMode getMode (void) const;
+    SIG_Joint const *getJoint () const;
+    DriveMode getMode () const;
     void setForces(DL_Scalar mn, DL_Scalar mx);
-    DL_Scalar getMinForce (void) const;
-    DL_Scalar getMaxForce (void) const;
+    DL_Scalar getMinForce () const;
+    DL_Scalar getMaxForce () const;
     void writeToFileTransfer (QTextStream & tx);
   };
 }

@@ -77,20 +77,20 @@ namespace SIGEL_Robot
                 /**
                  * Destructor.
                  */
-                virtual ~SIG_Joint (void);
+                virtual ~SIG_Joint ();
                 /**
                  * Returns the name of the joint.
                  */
-                QString getName (void) const;
+                QString getName () const;
                 /**
                  * Returns the number of the joint.
                  */
-                int getNumber (void) const;
+                int getNumber () const;
                 /**
                  * Returns the type of the joint the object
                  * represents.
                  */
-                virtual JointType getJointType (void) const = 0;
+                virtual JointType getJointType () const = 0;
                 /**
                  * Sets the left_side link. Links on both side are
                  * treated equally. Left and right are only

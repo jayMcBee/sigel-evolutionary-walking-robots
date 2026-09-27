@@ -41,13 +41,13 @@ namespace SIGEL_RobotIO {
                 int currentSymType;
         public:
                 SIG_Scanner (QString sourceText);
-                virtual ~SIG_Scanner (void);
+                virtual ~SIG_Scanner ();
 
-                void skipWhiteSpace (void);
-                virtual void nextSymbol (void) = 0;
+                void skipWhiteSpace ();
+                virtual void nextSymbol () = 0;
                 void peekSymbol (int & symType, QString & symbol);
                 void readSymbol (int & symType, QString & symbol);
-                int currentLine (void) const;
+                int currentLine () const;
         };
 }
 

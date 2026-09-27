@@ -32,7 +32,7 @@ namespace SIGEL_RobotIO {
                   dirprefix (homepath)
         { }
 
-        SIG_RobotCompiler::~SIG_RobotCompiler (void)
+        SIG_RobotCompiler::~SIG_RobotCompiler ()
         { }
 
         /* to be deleted 
@@ -63,7 +63,7 @@ namespace SIGEL_RobotIO {
                                                myScanner.currentLine ());
         }
 
-        QString SIG_RobotCompiler::expectWord (void)
+        QString SIG_RobotCompiler::expectWord ()
         {
                 int st;
                 QString sym;
@@ -77,7 +77,7 @@ namespace SIGEL_RobotIO {
                 return sym;
         }
 
-        DL_Scalar SIG_RobotCompiler::expectNumber (void)
+        DL_Scalar SIG_RobotCompiler::expectNumber ()
         {
                 int st;
                 QString sym;
@@ -91,7 +91,7 @@ namespace SIGEL_RobotIO {
                 return sym.toDouble ();
         }
 
-        QString SIG_RobotCompiler::expectString (void)
+        QString SIG_RobotCompiler::expectString ()
         {
                 int st;
                 QString sym;
@@ -105,7 +105,7 @@ namespace SIGEL_RobotIO {
                 return sym;
         }
 
-        bool SIG_RobotCompiler::compileNextEntity (void)
+        bool SIG_RobotCompiler::compileNextEntity ()
         {
                 int symType;
                 QString symbol;
@@ -145,7 +145,7 @@ namespace SIGEL_RobotIO {
                 return true;
         }
 
-        void SIG_RobotCompiler::nextIsMaterial (void)
+        void SIG_RobotCompiler::nextIsMaterial ()
         {
                 int symtype;
                 QString symstr;
@@ -242,7 +242,7 @@ namespace SIGEL_RobotIO {
                 materialFinish (mater);
         }
 
-        void SIG_RobotCompiler::nextIsLink (void)
+        void SIG_RobotCompiler::nextIsLink ()
         {
                 int symtype;
                 QString symstr;
@@ -332,7 +332,7 @@ namespace SIGEL_RobotIO {
                 linkFinish (link);
         }
 
-        void SIG_RobotCompiler::nextIsJoint (void)
+        void SIG_RobotCompiler::nextIsJoint ()
         {
                 QString symstr;
                 int symtype;
@@ -529,7 +529,7 @@ namespace SIGEL_RobotIO {
                                                "(unknown)", myScanner.currentLine ());
         }
 
-        void SIG_RobotCompiler::nextIsGlue (void)
+        void SIG_RobotCompiler::nextIsGlue ()
         {
                 QString name;
                 SIG_GlueJoint *glue;
@@ -570,7 +570,7 @@ namespace SIGEL_RobotIO {
                 glueFinish (glue);
         }
 
-        void SIG_RobotCompiler::nextIsDrive (void)
+        void SIG_RobotCompiler::nextIsDrive ()
         {
                 QString name, m;
                 SIG_Drive *thedrive;
@@ -605,7 +605,7 @@ namespace SIGEL_RobotIO {
                 expect (RobotSymbol::closingBrace);
         }
 
-        void SIG_RobotCompiler::nextIsSensor (void)
+        void SIG_RobotCompiler::nextIsSensor ()
         {
                 QString name, styp;
 
@@ -655,7 +655,7 @@ namespace SIGEL_RobotIO {
                 expect (RobotSymbol::closingBrace);
         }
 
-        void SIG_RobotCompiler::nextIsSurface (void)
+        void SIG_RobotCompiler::nextIsSurface ()
         {
 
                 QString symstr;
@@ -704,7 +704,7 @@ namespace SIGEL_RobotIO {
                 surfaceFinish (geom, filename);
         }
 
-        void SIG_RobotCompiler::nextModScaleall (void)
+        void SIG_RobotCompiler::nextModScaleall ()
         {
                 DL_Scalar sf = expectNumber ();
                 expect (RobotSymbol::semicolon);
@@ -712,7 +712,7 @@ namespace SIGEL_RobotIO {
                 modifierScaleall (sf);
         }
 
-        void SIG_RobotCompiler::runPass (void)
+        void SIG_RobotCompiler::runPass ()
         {
                 while (compileNextEntity ());
         }

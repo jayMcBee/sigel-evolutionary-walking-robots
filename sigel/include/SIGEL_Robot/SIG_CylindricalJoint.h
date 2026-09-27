@@ -50,26 +50,26 @@ namespace SIGEL_Robot
   public:
     SIG_CylindricalJoint (SIG_Robot *par, QString n, int nr = -1);
     SIG_CylindricalJoint (SIG_Robot *par, QTextStream & tx);
-    virtual ~SIG_CylindricalJoint (void);
-    virtual JointType getJointType (void) const;
+    virtual ~SIG_CylindricalJoint ();
+    virtual JointType getJointType () const;
 
     void setLeftPoints (DL_vector VB, DL_vector VD, DL_vector VH);
     void setRightPoints (DL_vector VB, DL_vector VD, DL_vector VH);
     void setRotationalRange (DL_Scalar mn, DL_Scalar mx, DL_Scalar ii);
     void setTranslationalRange (DL_Scalar mn, DL_Scalar mx, DL_Scalar ii);
     
-    DL_vector getLeftBase (void) const;
-    DL_vector getLeftDir (void) const;
-    DL_vector getLeftHand (void) const;
-    DL_vector getRightBase (void) const;
-    DL_vector getRightDir (void) const;
-    DL_vector getRightHand (void) const;
-    DL_Scalar getMinRot (void) const;
-    DL_Scalar getMaxRot (void) const;
-    DL_Scalar getIniRot (void) const;
-    DL_Scalar getMinTrans (void) const;
-    DL_Scalar getMaxTrans (void) const;
-    DL_Scalar getIniTrans (void) const;
+    DL_vector getLeftBase () const;
+    DL_vector getLeftDir () const;
+    DL_vector getLeftHand () const;
+    DL_vector getRightBase () const;
+    DL_vector getRightDir () const;
+    DL_vector getRightHand () const;
+    DL_Scalar getMinRot () const;
+    DL_Scalar getMaxRot () const;
+    DL_Scalar getIniRot () const;
+    DL_Scalar getMinTrans () const;
+    DL_Scalar getMaxTrans () const;
+    DL_Scalar getIniTrans () const;
 
     virtual void transformPoints (SIG_Link *side,
                                   DL_vector mov, DL_matrix rot);

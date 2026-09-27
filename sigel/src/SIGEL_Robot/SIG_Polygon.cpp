@@ -58,7 +58,7 @@ namespace SIGEL_Robot {
                         tx >> vertices [i];
         }
 
-        SIG_Polygon::~SIG_Polygon (void)
+        SIG_Polygon::~SIG_Polygon ()
         {
         }
 
@@ -69,7 +69,7 @@ namespace SIGEL_Robot {
                 vertices [idx] = myGeometry->getOrAddVertex (pt);
         }
 
-        int SIG_Polygon::getNumVertices (void) const
+        int SIG_Polygon::getNumVertices () const
         {
                 return vertices.size ();
         }

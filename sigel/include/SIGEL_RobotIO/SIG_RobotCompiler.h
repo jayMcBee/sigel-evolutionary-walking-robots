@@ -70,14 +70,14 @@ namespace SIGEL_RobotIO {
                 SIG_RobotCompiler (SIG_RobotScanner &sc,
                                    SIG_Robot *tg,
                                    QString homepath);
-                virtual ~SIG_RobotCompiler (void);
+                virtual ~SIG_RobotCompiler ();
 
                 // QString prefixFile (QString filename);
 
                 void expect (int symboltype);
-                QString expectWord (void);
-                DL_Scalar expectNumber (void);
-                QString expectString (void);
+                QString expectWord ();
+                DL_Scalar expectNumber ();
+                QString expectString ();
 
                 virtual SIG_Material *materialFind (QString name) = 0;
                 virtual void materialDensity (SIG_Material *material,
@@ -169,18 +169,18 @@ namespace SIGEL_RobotIO {
 
                 virtual void modifierScaleall (DL_Scalar scalingFactor) { }
 
-                virtual void nextIsMaterial (void);
-                virtual void nextIsLink (void);
-                virtual void nextIsJoint (void);
-                virtual void nextIsGlue (void);
-                virtual void nextIsDrive (void);
-                virtual void nextIsSensor (void);
-                virtual void nextIsSurface (void);
+                virtual void nextIsMaterial ();
+                virtual void nextIsLink ();
+                virtual void nextIsJoint ();
+                virtual void nextIsGlue ();
+                virtual void nextIsDrive ();
+                virtual void nextIsSensor ();
+                virtual void nextIsSurface ();
 
-                virtual void nextModScaleall (void);
+                virtual void nextModScaleall ();
 
-                bool compileNextEntity (void);
-                void runPass (void);
+                bool compileNextEntity ();
+                void runPass ();
         };
 }
 

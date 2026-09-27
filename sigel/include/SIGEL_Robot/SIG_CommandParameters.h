@@ -50,7 +50,7 @@ namespace SIGEL_Robot {
                  * Standard constructor. Default values
                  * are a duration of 1 microsecond.
                  */
-                SIG_CommandParameters (void);
+                SIG_CommandParameters ();
                 /**
                  * A constructor that reads the objects
                  * values from a stream. It is used when loading
@@ -61,7 +61,7 @@ namespace SIGEL_Robot {
                 /**
                  * Destructor.
                  */
-                ~SIG_CommandParameters (void);
+                ~SIG_CommandParameters ();
 
                 /**
                  * Sets the run time duration of the command.
@@ -70,7 +70,7 @@ namespace SIGEL_Robot {
                 /**
                  * Returns the run time duration of the command.
                  */
-                double getDuration (void) const;
+                double getDuration () const;
 
                 /**
                  * Streaming function. This will be used when saving

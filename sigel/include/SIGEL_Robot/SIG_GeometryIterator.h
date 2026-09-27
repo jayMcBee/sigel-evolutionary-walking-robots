@@ -56,28 +56,28 @@ namespace SIGEL_Robot {
     /**
      * Destructor.
      */
-    ~SIG_GeometryIterator (void);
+    ~SIG_GeometryIterator ();
 
     /**
      * Is there another polygon?
      */
-    bool valid (void) const;
+    bool valid () const;
     /**
      * Convenient version of the valid() function.
      */
-    operator bool (void) const { return valid (); }
+    operator bool () const { return valid (); }
     /**
      * Returns the current polygon.
      */
-    SIG_Polygon const & current (void) const;
+    SIG_Polygon const & current () const;
     /**
      * This will make the iterator move over to the next polygon.
      */
-    void next (void);
+    void next ();
     /**
      * Returns the current polygon and moves over to the next.
      */
-    inline SIG_Polygon const & iterate (void)
+    inline SIG_Polygon const & iterate ()
       { SIG_Polygon const & a = current (); next (); return a; }
   };
 }

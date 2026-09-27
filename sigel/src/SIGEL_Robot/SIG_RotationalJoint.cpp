@@ -42,10 +42,10 @@ namespace SIGEL_Robot {
                 tx >> minimum >> maximum >> initial;
         }
         
-        SIG_RotationalJoint::~SIG_RotationalJoint (void)
+        SIG_RotationalJoint::~SIG_RotationalJoint ()
         { }
 
-        SIG_Joint::JointType SIG_RotationalJoint::getJointType (void) const
+        SIG_Joint::JointType SIG_RotationalJoint::getJointType () const
         {
                 return tRotationalJoint;
         }
@@ -71,47 +71,47 @@ namespace SIGEL_Robot {
                 initial = ii;
         }
         
-        DL_vector SIG_RotationalJoint::getLeftBase (void) const
+        DL_vector SIG_RotationalJoint::getLeftBase () const
         {
                 return leftBase;
         }
         
-        DL_vector SIG_RotationalJoint::getLeftDir (void) const
+        DL_vector SIG_RotationalJoint::getLeftDir () const
         {
                 return leftDir;
         }
         
-        DL_vector SIG_RotationalJoint::getLeftHand (void) const
+        DL_vector SIG_RotationalJoint::getLeftHand () const
         {
                 return leftHand;
         }
         
-        DL_vector SIG_RotationalJoint::getRightBase (void) const
+        DL_vector SIG_RotationalJoint::getRightBase () const
         {
                 return rightBase;
         }
         
-        DL_vector SIG_RotationalJoint::getRightDir (void) const
+        DL_vector SIG_RotationalJoint::getRightDir () const
         {
                 return rightDir;
         }
         
-        DL_vector SIG_RotationalJoint::getRightHand (void) const
+        DL_vector SIG_RotationalJoint::getRightHand () const
         {
                 return rightHand;
         }
         
-        DL_Scalar SIG_RotationalJoint::getMin (void) const
+        DL_Scalar SIG_RotationalJoint::getMin () const
         {
                 return minimum;
         }
         
-        DL_Scalar SIG_RotationalJoint::getMax (void) const
+        DL_Scalar SIG_RotationalJoint::getMax () const
         {
                 return maximum;
         }
         
-        DL_Scalar SIG_RotationalJoint::getIni (void) const
+        DL_Scalar SIG_RotationalJoint::getIni () const
         {
                 return initial;
         }

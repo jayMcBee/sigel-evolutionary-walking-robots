@@ -78,7 +78,7 @@ namespace SIGEL_Robot {
                  * Standard constructor. Empty dictionary and
                  * 8-bit-registers.
                  */
-                SIG_LanguageParameters (void);
+                SIG_LanguageParameters ();
                 /**
                  * Reads the contents of the object from a stream,
                  * whose data may be originating from a file or
@@ -88,7 +88,7 @@ namespace SIGEL_Robot {
                 /**
                  * Destructor.
                  */
-                ~SIG_LanguageParameters (void);
+                ~SIG_LanguageParameters ();
 
                 /**
                  * Adds a command to the dictionary.
@@ -110,7 +110,7 @@ namespace SIGEL_Robot {
                 SIG_CommandParameters *getCommand (QString name) const;
 
                 /** All allowed commands, in declaration order. */
-                const QList<NamedCommand> &getCommands (void) const;
+                const QList<NamedCommand> &getCommands () const;
 
                 /**
                  * Sets the width of the memory cells
@@ -120,7 +120,7 @@ namespace SIGEL_Robot {
                 /**
                  * Provides the width of the robot's memory cells.
                  */
-                int getRegisterWidth (void) const;
+                int getRegisterWidth () const;
 
                 /**
                  * This sets the number of registers.
@@ -130,7 +130,7 @@ namespace SIGEL_Robot {
                 /**
                  * How many registers are there?
                  */
-                int getMemorySize (void) const;
+                int getMemorySize () const;
 
 		/**
 		 * Sets the maximal time that a delay may take place.
@@ -140,7 +140,7 @@ namespace SIGEL_Robot {
 		/**
 		 * Gets the maximal time that a delay may take place.
 		 */
-		int getMaximalDelayTime( void ) const;
+		int getMaximalDelayTime() const;
 
                 /**
                  * Writes the object's data to a stream. The stream

@@ -25,7 +25,7 @@
 #include "SIGEL_Robot/SIG_RobotExceptions.h"
 
 namespace SIGEL_Robot {
-        SIG_LanguageParameters::SIG_LanguageParameters (void)
+        SIG_LanguageParameters::SIG_LanguageParameters ()
                 : bitsPerRegister (8),
                   memSize (8),
 		  maximalDelayTime(5000),
@@ -123,7 +123,7 @@ namespace SIGEL_Robot {
                 }
         }
 
-        SIG_LanguageParameters::~SIG_LanguageParameters (void)
+        SIG_LanguageParameters::~SIG_LanguageParameters ()
         {
 		// This class owns the SIG_CommandParameters it inserted.
 		for (const NamedCommand &c : allowedCommands) delete c.value;
@@ -170,7 +170,7 @@ namespace SIGEL_Robot {
                 bitsPerRegister = width;
         }
 
-        int SIG_LanguageParameters::getRegisterWidth (void) const
+        int SIG_LanguageParameters::getRegisterWidth () const
         {
                 return bitsPerRegister;
         }
@@ -180,7 +180,7 @@ namespace SIGEL_Robot {
                 memSize = amount;
         }
 
-        int SIG_LanguageParameters::getMemorySize (void) const
+        int SIG_LanguageParameters::getMemorySize () const
         {
                 return memSize;
         }
@@ -190,13 +190,13 @@ namespace SIGEL_Robot {
 	  maximalDelayTime = amount;
 	}
 
-        int SIG_LanguageParameters::getMaximalDelayTime( void ) const
+        int SIG_LanguageParameters::getMaximalDelayTime() const
 	{
 	  return maximalDelayTime;
 	}
 
         const QList<SIG_LanguageParameters::NamedCommand> &
-        SIG_LanguageParameters::getCommands (void) const
+        SIG_LanguageParameters::getCommands () const
         {
                 return allowedCommands;
         }

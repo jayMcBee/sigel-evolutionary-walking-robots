@@ -203,7 +203,7 @@ namespace SIGEL_Robot {
                         - f->norm[Z] * p->verts[f->verts[0]][Z];
         }
 
-        void SIG_Mirtich::compute (void)
+        void SIG_Mirtich::compute ()
         {
                 if (computed)
                         return;

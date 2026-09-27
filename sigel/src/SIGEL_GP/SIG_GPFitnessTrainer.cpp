@@ -173,7 +173,7 @@ void SIGEL_GP::SIG_GPFitnessTrainer::addDynHost(QString newHost) {
 }
 
 
-void SIGEL_GP::SIG_GPFitnessTrainer::flushAllDynHosts( void ) {
+void SIGEL_GP::SIG_GPFitnessTrainer::flushAllDynHosts() {
   QString        dHostQstr;
   bool           res;
   int            i,dynDelNum;

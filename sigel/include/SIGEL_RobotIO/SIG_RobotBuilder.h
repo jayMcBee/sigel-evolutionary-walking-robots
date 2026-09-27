@@ -43,14 +43,14 @@ namespace SIGEL_RobotIO {
                 QString filename;
         public:
                 SIG_RobotBuilder (QString file);
-                virtual ~SIG_RobotBuilder (void);
+                virtual ~SIG_RobotBuilder ();
 
-                SIG_Robot *build (void);
+                SIG_Robot *build ();
                 void buildInto (SIG_Robot & rob);
         protected:
                 QString loadFile (QString name);
-                void firstPass (void);
-                void secondPass (void);
+                void firstPass ();
+                void secondPass ();
         };
 }
 

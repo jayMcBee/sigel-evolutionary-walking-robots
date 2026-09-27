@@ -41,7 +41,7 @@ namespace SIGEL_Robot {
 
         // getSensorType is ABSTRACT.
 
-        QString SIG_Sensor::getName (void) const
+        QString SIG_Sensor::getName () const
         {
                 return name;
         }

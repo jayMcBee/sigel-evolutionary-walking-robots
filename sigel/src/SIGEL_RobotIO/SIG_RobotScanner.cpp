@@ -47,10 +47,10 @@ namespace SIGEL_RobotIO {
                 : SIG_Scanner (sourceText)
         { }
 
-        SIG_RobotScanner::~SIG_RobotScanner (void)
+        SIG_RobotScanner::~SIG_RobotScanner ()
         { }
 
-        void SIG_RobotScanner::nextSymbol (void)
+        void SIG_RobotScanner::nextSymbol ()
         { 
                 skipWhiteSpace ();
                 if (position >= text.length ()) {

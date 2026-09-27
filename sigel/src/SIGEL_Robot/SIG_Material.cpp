@@ -60,13 +60,13 @@ namespace SIGEL_Robot {
                 colour = SIG_Robot::streamToVector (tx);
         }
 
-        SIG_Material::~SIG_Material (void)
+        SIG_Material::~SIG_Material ()
         {
                 qDeleteAll (friction);
                 friction.clear ();
         }
 
-        QString SIG_Material::getName (void) const
+        QString SIG_Material::getName () const
         {
                 return name;
         }
@@ -76,7 +76,7 @@ namespace SIGEL_Robot {
                 density = dens;
         }
 
-        DL_Scalar SIG_Material::getDensity (void) const
+        DL_Scalar SIG_Material::getDensity () const
         {
                 return density;
         }
@@ -86,7 +86,7 @@ namespace SIGEL_Robot {
                 elasticity = elas;
         }
 
-        DL_Scalar SIG_Material::getElasticity (void) const
+        DL_Scalar SIG_Material::getElasticity () const
         {
                 return elasticity;
         }
@@ -96,7 +96,7 @@ namespace SIGEL_Robot {
                 colour = col;
         }
 
-        DL_vector SIG_Material::getColour (void) const
+        DL_vector SIG_Material::getColour () const
         {
                 return colour;
         }

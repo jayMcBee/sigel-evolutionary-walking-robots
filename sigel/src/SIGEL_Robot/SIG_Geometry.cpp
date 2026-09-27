@@ -34,7 +34,7 @@ namespace SIGEL_Robot {
                 return polygons [i];
         }
 
-        SIG_Geometry::SIG_Geometry (void)
+        SIG_Geometry::SIG_Geometry ()
         {
         }
 
@@ -68,7 +68,7 @@ namespace SIGEL_Robot {
                         polygons.append (new SIG_Polygon (this, tx));
         }
 
-        SIG_Geometry::~SIG_Geometry (void)
+        SIG_Geometry::~SIG_Geometry ()
         {
                 qDeleteAll (polygons);
                 qDeleteAll (vertices);
@@ -85,12 +85,12 @@ namespace SIGEL_Robot {
                 return appending_position;
         }
 
-        QList<DL_vector *> const & SIG_Geometry::getVertices (void) const
+        QList<DL_vector *> const & SIG_Geometry::getVertices () const
         {
                 return vertices;
         }
         
-        int SIG_Geometry::getNumVertices (void) const
+        int SIG_Geometry::getNumVertices () const
         {
                 return vertices.size ();
         }
@@ -100,7 +100,7 @@ namespace SIGEL_Robot {
                 return *vertices.at (i);
         }
 
-        int SIG_Geometry::getNumPolygons (void) const
+        int SIG_Geometry::getNumPolygons () const
         {
                 return polygons.size ();
         }

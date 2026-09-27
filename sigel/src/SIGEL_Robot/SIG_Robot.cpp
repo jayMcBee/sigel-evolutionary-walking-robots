@@ -63,7 +63,7 @@ namespace SIGEL_Robot {
                 readFromFileTransfer (rs);
         }
 
-        SIG_Robot::~SIG_Robot (void)
+        SIG_Robot::~SIG_Robot ()
         {
                 clear ();
                 delete language;
@@ -135,7 +135,7 @@ namespace SIGEL_Robot {
                 language = lp;
         }
 
-        SIG_LanguageParameters *SIG_Robot::getLangParam (void) const
+        SIG_LanguageParameters *SIG_Robot::getLangParam () const
         {
                 return language;
         }
@@ -194,42 +194,42 @@ namespace SIGEL_Robot {
                 return nullptr;
         }
 
-        const QList<SIG_Body *> &SIG_Robot::getBodies (void) const
+        const QList<SIG_Body *> &SIG_Robot::getBodies () const
         {
                 return bodies;
         }
 
-        const QList<SIG_Material *> &SIG_Robot::getMaterials (void) const
+        const QList<SIG_Material *> &SIG_Robot::getMaterials () const
         {
                 return materials;
         }
 
-        const QList<SIG_Link *> &SIG_Robot::getLinks (void) const
+        const QList<SIG_Link *> &SIG_Robot::getLinks () const
         {
                 return links;
         }
 
-        const QList<SIG_Joint *> &SIG_Robot::getJoints (void) const
+        const QList<SIG_Joint *> &SIG_Robot::getJoints () const
         {
                 return joints;
         }
 
-        const QList<SIG_Drive *> &SIG_Robot::getDrives (void) const
+        const QList<SIG_Drive *> &SIG_Robot::getDrives () const
         {
                 return drives;
         }
 
-        const QList<SIG_Sensor *> &SIG_Robot::getSensors (void) const
+        const QList<SIG_Sensor *> &SIG_Robot::getSensors () const
         {
                 return sensors;
         }
 
-        SIG_Link const *SIG_Robot::getRootLink (void) const
+        SIG_Link const *SIG_Robot::getRootLink () const
         {
                 return rootlink;
         }
 
-        int SIG_Robot::getNrOfPoints (void) const
+        int SIG_Robot::getNrOfPoints () const
         {
                 int summa = 0;
                 for (SIG_Link *l : links)
@@ -242,7 +242,7 @@ namespace SIGEL_Robot {
                 rootlink = l;
         }
 
-        void SIG_Robot::initiate (void)
+        void SIG_Robot::initiate ()
         {
                 if (rootlink) {
                         DL_vector rl (0, 0, 0);
@@ -253,19 +253,19 @@ namespace SIGEL_Robot {
                 }
         }
 
-        void SIG_Robot::loadGeometries (void)
+        void SIG_Robot::loadGeometries ()
         {
                 for (SIG_Body *b : bodies)
                         b->load ();
         }
 
-        void SIG_Robot::instantiateGeometries (void)
+        void SIG_Robot::instantiateGeometries ()
         {
                 for (SIG_Link *l : links)
                         l->instantiateGeometry ();
         }
 
-        void SIG_Robot::prepareDynaMo (void)
+        void SIG_Robot::prepareDynaMo ()
         {
                 instantiateGeometries ();
 
@@ -275,7 +275,7 @@ namespace SIGEL_Robot {
 		initiate();
         }
 
-        void SIG_Robot::prepareDynaMechs (void)
+        void SIG_Robot::prepareDynaMechs ()
         {
 	  instantiateGeometries ();
 

@@ -341,7 +341,7 @@ private:
    * submit their hostname.
    */
  public:
-  void RegisterDynPVMClients( void );
+  void RegisterDynPVMClients();
 
 };
 

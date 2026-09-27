@@ -68,7 +68,7 @@ namespace SIGEL_Robot {
                 /**
                  * Destructor.
                  */
-                ~SIG_Polygon (void);
+                ~SIG_Polygon ();
 
                 /**
                  * Appends a vertex to the polygon.
@@ -77,7 +77,7 @@ namespace SIGEL_Robot {
                 /**
                  * Returns the number of vertices.
                  */
-                int getNumVertices (void) const;
+                int getNumVertices () const;
                 /**
                  * Returns the ith vertex.
                  */

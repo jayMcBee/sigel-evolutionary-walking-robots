@@ -55,10 +55,10 @@ namespace SIGEL_Robot {
 			}
 		}
 
-        SIG_PitchRollSensor::~SIG_PitchRollSensor (void)
+        SIG_PitchRollSensor::~SIG_PitchRollSensor ()
         { }
 
-        SIG_Sensor::SensorType SIG_PitchRollSensor::getSensorType (void) const
+        SIG_Sensor::SensorType SIG_PitchRollSensor::getSensorType () const
         {
                 return tPitchRollSensor;
         }
@@ -68,7 +68,7 @@ namespace SIGEL_Robot {
                 theLink = j;
         }
 
-        SIG_Link const *SIG_PitchRollSensor::getLink(void) const
+        SIG_Link const *SIG_PitchRollSensor::getLink() const
         {
                 return theLink;
         }

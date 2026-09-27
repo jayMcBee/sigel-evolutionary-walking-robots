@@ -68,7 +68,7 @@ namespace SIGEL_Robot
                 /**
                  * Destructor.
                  */
-                ~SIG_Body (void);
+                ~SIG_Body ();
                 
                 /**
                  * Register a link as being formed like the surface described in this
@@ -116,7 +116,7 @@ namespace SIGEL_Robot
                 /**
                  * Getting access to the surface of the body.
                  */
-                SIG_Geometry const *getGeometry (void) const;
+                SIG_Geometry const *getGeometry () const;
                 
                 /**
                  * Write the SIG_Body object and the geometry information
@@ -127,13 +127,13 @@ namespace SIGEL_Robot
                 /**
                  * Get the name of the geometry file.
                  */
-                QString getGeometryFile (void) const;
+                QString getGeometryFile () const;
                 
                 /**
                  * Get the name of the geometry file as specified in the
                  * robot description.
                  */
-                QString getName (void) const;
+                QString getName () const;
         };
 }
 

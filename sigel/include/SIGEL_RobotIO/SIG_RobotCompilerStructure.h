@@ -37,7 +37,7 @@ namespace SIGEL_RobotIO {
                 SIG_RobotCompilerStructure (SIG_RobotScanner &sc,
                                             SIG_Robot *tg,
                                             QString homepath);
-                virtual ~SIG_RobotCompilerStructure (void);
+                virtual ~SIG_RobotCompilerStructure ();
 
                 virtual SIG_Material *materialFind (QString name);
                 virtual void materialDensity (SIG_Material *material,

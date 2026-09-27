@@ -30,10 +30,10 @@ namespace SIGEL_RobotIO {
                   filename (file)
         { }
         
-        SIG_RobotBuilder::~SIG_RobotBuilder (void)
+        SIG_RobotBuilder::~SIG_RobotBuilder ()
         { }
         
-        SIG_Robot *SIG_RobotBuilder::build (void)
+        SIG_Robot *SIG_RobotBuilder::build ()
         {
                 robot = new SIG_Robot ();
 
@@ -67,7 +67,7 @@ namespace SIGEL_RobotIO {
                 return stri;
         }
         
-        void SIG_RobotBuilder::firstPass (void)
+        void SIG_RobotBuilder::firstPass ()
         {
                 QString homepath;
                 int occ = filename.lastIndexOf ('/');
@@ -85,7 +85,7 @@ namespace SIGEL_RobotIO {
                 delete s;
         }
         
-        void SIG_RobotBuilder::secondPass (void)
+        void SIG_RobotBuilder::secondPass ()
         {
                 QString homepath;
                 int occ = filename.lastIndexOf ('/');

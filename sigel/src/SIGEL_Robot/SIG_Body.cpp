@@ -49,7 +49,7 @@ namespace SIGEL_Robot
                 }
         };
 
-        SIG_Body::~SIG_Body(void)
+        SIG_Body::~SIG_Body()
         {
                 delete geometry;
         };
@@ -226,12 +226,12 @@ namespace SIGEL_Robot
                 geometry = geo;
         };
 
-        SIG_Geometry const *SIG_Body::getGeometry (void) const
+        SIG_Geometry const *SIG_Body::getGeometry () const
         {
                 return geometry;
         };
 
-        QString SIG_Body::getGeometryFile (void) const
+        QString SIG_Body::getGeometryFile () const
         {
                 // geometryFile is empty when the robot file ends early (see the SIG_Body
                 // QTextStream constructor). QString::at() must not be called on an empty string.
@@ -245,7 +245,7 @@ namespace SIGEL_Robot
                 }
         }
 
-        QString SIG_Body::getName (void) const 
+        QString SIG_Body::getName () const 
         { 
                 return geometryFile;
         }

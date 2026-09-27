@@ -57,24 +57,24 @@ namespace SIGEL_Robot
     public:
       SIG_Link (SIG_Robot *par, QString n, int nr);
       SIG_Link (SIG_Robot *par, QTextStream & tx);
-      ~SIG_Link (void);
+      ~SIG_Link ();
 
-      QString getName (void) const;
-      int getNumber (void) const;
-      bool isRootLink (void) const;
+      QString getName () const;
+      int getNumber () const;
+      bool isRootLink () const;
 
       void setBody (SIG_Body *b);
-      SIG_Body const *getBody (void) const;
+      SIG_Body const *getBody () const;
       void setMaterial (SIG_Material *mtrl);
-      SIG_Material const *getMaterial (void) const;
+      SIG_Material const *getMaterial () const;
       void addPoint (QString pointname, DL_vector point);
       DL_vector getPoint (QString id) const;
       bool hasPoint (QString pointname) const;
-      const QList<NamedPoint> &getPoints (void) const;
-      int getNrOfPoints (void) const;
+      const QList<NamedPoint> &getPoints () const;
+      int getNrOfPoints () const;
 
-      void instantiateGeometry (void);
-      void transformToDynaMo (void);
+      void instantiateGeometry ();
+      void transformToDynaMo ();
       void transformToDynaMechs ( SIG_Joint *predecessor,
 				  DL_vector predBase = DL_vector(0, 0, 0),
 				  DL_vector predDir = DL_vector(0, 0, 0),
@@ -93,16 +93,16 @@ namespace SIGEL_Robot
       void addJoint (SIG_Joint *joint);
       QList<SIG_Joint *> getJoints () const;
 
-      SIG_Geometry const *getGeometry (void) const;
-      SIG_Mirtich const *getMirtich( void )  { return mirtich; }
+      SIG_Geometry const *getGeometry () const;
+      SIG_Mirtich const *getMirtich()  { return mirtich; }
       void getPhysics (DL_Scalar & m,
                        DL_vector & com,
                        DL_matrix & it);
       void propagateInitialLocation (SIG_Link *comingfrom);
       void setInitialLocation (DL_vector p, DL_matrix o, SIG_Link *comingfrom = nullptr);
       void getInitialLocation (DL_vector & p, DL_matrix & o) const;
-      bool isInitiated (void) const;
-      bool isMDHVisited (void) const;
+      bool isInitiated () const;
+      bool isMDHVisited () const;
       void calculateCommonNormal( DL_vector a,
 				  DL_vector u,
 				  DL_vector b,

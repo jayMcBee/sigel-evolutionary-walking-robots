@@ -70,11 +70,11 @@ namespace SIGEL_Robot {
                 void compFaceIntegrals (FACE *f);
                 void compVolumeIntegrals (POLYHEDRON *p);
                 void compFaceNormal (FACE *f);
-                void compute (void);
+                void compute ();
 
         public:
                 SIG_Mirtich (SIG_Geometry *geom, QString nameOfGeom);
-                virtual ~SIG_Mirtich (void);
+                virtual ~SIG_Mirtich ();
 
                 void computePhysics (double density,
                                      DL_Scalar & masse,
@@ -84,8 +84,8 @@ namespace SIGEL_Robot {
                                        DL_vector & v1, DL_vector & v2, DL_vector & v3);
                 void moveToOriginAndMajorAxes (DL_vector & translation,
                                                DL_matrix & rotation);
-                void computeAgain (void) { computed = false; }
- 		double getT0( void )  { return T0; }
+                void computeAgain () { computed = false; }
+ 		double getT0()  { return T0; }
         };
 
 }

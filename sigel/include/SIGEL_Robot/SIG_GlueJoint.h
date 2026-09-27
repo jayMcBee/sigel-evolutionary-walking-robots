@@ -42,9 +42,9 @@ namespace SIGEL_Robot
   public:
     SIG_GlueJoint (SIG_Robot *par, QString n, int nr = -1);
     SIG_GlueJoint (SIG_Robot *par, QTextStream & tx);
-    virtual ~SIG_GlueJoint (void);
+    virtual ~SIG_GlueJoint ();
 
-    virtual JointType getJointType (void) const;
+    virtual JointType getJointType () const;
 
     void setPlaneA (DL_vector p1, DL_vector p2, DL_vector p3);
     void setPlaneB (DL_vector p1, DL_vector p2, DL_vector p3);

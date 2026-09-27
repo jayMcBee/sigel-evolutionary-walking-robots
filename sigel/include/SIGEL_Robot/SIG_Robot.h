@@ -72,7 +72,7 @@ namespace SIGEL_Robot
      * The standard constructor creates an empty robot model with
      * no links and joints.
      */
-    SIG_Robot (void);
+    SIG_Robot ();
     /**
      * File or network constructor.
      *
@@ -92,7 +92,7 @@ namespace SIGEL_Robot
     /**
      * Destructor.
      */
-    ~SIG_Robot (void);
+    ~SIG_Robot ();
 
     DL_vector initialLocation;
     DL_matrix initialOrientation;
@@ -100,7 +100,7 @@ namespace SIGEL_Robot
     /**
      * Makes this a fresh and empty robot object.
      */
-    void clear (void);
+    void clear ();
     /**
      * Adds the geometry information.
      *
@@ -139,7 +139,7 @@ namespace SIGEL_Robot
     /**
      * Returns the language parameter object.
      */
-    SIG_LanguageParameters *getLangParam (void) const;
+    SIG_LanguageParameters *getLangParam () const;
     /**
      * Returns a SIG_Body object.
      *
@@ -180,39 +180,39 @@ namespace SIGEL_Robot
     /**
      * Returns, in order, all SIG_Body objects.
      */
-    const QList<SIG_Body *> &getBodies (void) const;
+    const QList<SIG_Body *> &getBodies () const;
     /**
      * Returns, in order, all SIG_Material objects.
      */
-    const QList<SIG_Material *> &getMaterials (void) const;
+    const QList<SIG_Material *> &getMaterials () const;
     /**
      * Returns, in order, all SIG_Link objects.
      */
-    const QList<SIG_Link *> &getLinks (void) const;
+    const QList<SIG_Link *> &getLinks () const;
     /**
      * Returns, in order, all SIG_Joint objects.
      */
-    const QList<SIG_Joint *> &getJoints (void) const;
+    const QList<SIG_Joint *> &getJoints () const;
     /**
      * Returns, in order, all SIG_Drive objects.
      */
-    const QList<SIG_Drive *> &getDrives (void) const;
+    const QList<SIG_Drive *> &getDrives () const;
     /**
      * Returns, in order, all SIG_Sensor objects.
      */
-    const QList<SIG_Sensor *> &getSensors (void) const;
+    const QList<SIG_Sensor *> &getSensors () const;
     /**
      * Returns the root link.
      *
      * The root link is also contained within the
      * dictionary of links.
      */
-    SIG_Link const *getRootLink (void) const;
+    SIG_Link const *getRootLink () const;
     /**
      * Returns the number of points that are annotated
      * to links by the user.
      */
-    int getNrOfPoints (void) const;
+    int getNrOfPoints () const;
     /**
      * Marks a link as the root link.
      *
@@ -235,27 +235,27 @@ namespace SIGEL_Robot
      * CORRECTION! If the conditions that are described in the
      * warning above are true, an exception will be thrown.
      */
-    void initiate (void);
+    void initiate ();
 
     /**
      * Makes all body objects load its geometr
      * descriptions from file.
      */
-    void loadGeometries (void);
+    void loadGeometries ();
 
     /**
      * Duplicates the geometry descriptions loaded
      * within a previous step. Afterwards, different
      * links do not share a common geometry object.
      */
-    void instantiateGeometries (void);
+    void instantiateGeometries ();
 
     /**
      * Transforms the links' coordinate system to a form
      * which is suitable for simulation with DynaMo. Also
      * calculates initial positions.
      */
-    void prepareDynaMo (void);
+    void prepareDynaMo ();
 
     /**
      * Transforms the links' coordinate system to a form
@@ -263,7 +263,7 @@ namespace SIGEL_Robot
      * Also performs calculation of initial positions and
      * modified Denavit-Hartenberg parameters.
      */
-    void prepareDynaMechs (void);
+    void prepareDynaMechs ();
 
     /**
      * Robot to text stream transformation.

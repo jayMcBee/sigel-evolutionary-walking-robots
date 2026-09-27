@@ -61,7 +61,7 @@ namespace SIGEL_Simulation
       * Returns true if the position of our root link
       * drops below 1/2 of the start height.
       */
-       bool prematureTermination( void );
+       bool prematureTermination();
 
        /**
        * For a given frequency of the SIG_GPFullDataRecorder object this

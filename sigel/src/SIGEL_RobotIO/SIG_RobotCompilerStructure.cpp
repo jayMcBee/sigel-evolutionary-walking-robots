@@ -38,7 +38,7 @@ namespace SIGEL_RobotIO {
                 : SIG_RobotCompiler (sc, tg, homepath)
         { }
         
-        SIG_RobotCompilerStructure::~SIG_RobotCompilerStructure (void)
+        SIG_RobotCompilerStructure::~SIG_RobotCompilerStructure ()
         { }
 
         SIG_Material *SIG_RobotCompilerStructure::materialFind (QString name)

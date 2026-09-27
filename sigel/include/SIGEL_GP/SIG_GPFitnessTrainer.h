@@ -202,7 +202,7 @@ void sweepToSpawn();
   * internal list of PVM hosts (pvmHosts). After flushing the dynamic hosts
   * they'll be no longer used for fitness evaluations.
   */
-  void flushAllDynHosts( void );
+  void flushAllDynHosts();
 
 };
 

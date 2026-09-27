@@ -116,7 +116,7 @@ namespace SIGEL_Simulation
        * Return 'true' if you want the simulation to stop in method start()
        *
        */
-      virtual bool prematureTermination( void )  {  return false;  }
+      virtual bool prematureTermination()  {  return false;  }
 
 
     public slots:

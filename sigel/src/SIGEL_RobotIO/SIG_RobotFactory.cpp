@@ -23,14 +23,14 @@
 #include "SIGEL_RobotIO/SIG_RobotFactory.h"
 
 namespace SIGEL_RobotIO {
-        SIG_RobotFactory::SIG_RobotFactory (void)
+        SIG_RobotFactory::SIG_RobotFactory ()
                 : robot (nullptr)
         { }
 
-        SIG_RobotFactory::~SIG_RobotFactory (void)
+        SIG_RobotFactory::~SIG_RobotFactory ()
         { }
 
-        SIG_Robot *SIG_RobotFactory::getModel (void)
+        SIG_Robot *SIG_RobotFactory::getModel ()
         {
                 return robot;
         }

@@ -47,28 +47,28 @@ namespace SIGEL_Robot {
   public:
     SIG_PitchRollSensor (SIG_Robot *par, QString n, int nr = -1);
     SIG_PitchRollSensor (SIG_Robot *par, QTextStream & tx);
-    virtual ~SIG_PitchRollSensor (void);
+    virtual ~SIG_PitchRollSensor ();
 
-    virtual SensorType getSensorType (void) const;
+    virtual SensorType getSensorType () const;
     void setLink (SIG_Link *j);
-    SIG_Link const *getLink (void) const;
+    SIG_Link const *getLink () const;
     virtual void writeToFileTransfer (QTextStream & tx);
 
 	/**
 	* This method makes the sensor measure the pitch angle (front/back).
 	*/
-	void SetPitchType( void )	{ isPitch = true; isRoll = false; }
+	void SetPitchType()	{ isPitch = true; isRoll = false; }
 
 	/**
 	* This method makes the sensor measure the roll angle (left/right).
 	*/
-	void SetRollType( void )	{ isPitch = false; isRoll = true; }
+	void SetRollType()	{ isPitch = false; isRoll = true; }
 
 	/**
 	* Returns true if this SIG_PitchRollSensor instance is measuring pitch.
 	*/
-	bool  IsPitchType( void )	{ return isPitch; }
-	bool  IsRollType( void )	{ return isRoll; }
+	bool  IsPitchType()	{ return isPitch; }
+	bool  IsRollType()	{ return isRoll; }
 
   };
 }

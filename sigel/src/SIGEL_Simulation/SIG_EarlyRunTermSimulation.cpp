@@ -43,7 +43,7 @@ SIGEL_Simulation::SIG_EarlyRunTermSimulation::SIG_EarlyRunTermSimulation(SIGEL_R
 }
 
 
-bool SIGEL_Simulation::SIG_EarlyRunTermSimulation::prematureTermination( void )
+bool SIGEL_Simulation::SIG_EarlyRunTermSimulation::prematureTermination()
 {
   // implementing this virtual method is the whole purpose of our class.
   // first we need the startheight; this is computed once when we have the

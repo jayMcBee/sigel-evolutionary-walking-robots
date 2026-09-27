@@ -36,10 +36,10 @@ namespace SIGEL_RobotIO {
                   currentSymType (Symbol::None)
         { }
 
-        SIG_Scanner::~SIG_Scanner (void)
+        SIG_Scanner::~SIG_Scanner ()
         { }
 
-        void SIG_Scanner::skipWhiteSpace (void)
+        void SIG_Scanner::skipWhiteSpace ()
         {
                 bool commentdetected;
                 do {
@@ -72,7 +72,7 @@ namespace SIGEL_RobotIO {
                 nextSymbol ();
         }
 
-        int SIG_Scanner::currentLine (void) const
+        int SIG_Scanner::currentLine () const
         {
                 return lineposition;
         }

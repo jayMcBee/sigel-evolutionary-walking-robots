@@ -55,15 +55,15 @@ namespace SIGEL_Robot {
 				throw SIG_UnstreamingError (__FILE__, __LINE__, "drive '" + name + "' names unknown joint '" + buf + "'");
         }
 
-        SIG_Drive::~SIG_Drive (void)
+        SIG_Drive::~SIG_Drive ()
         { }
 
-        QString SIG_Drive::getName (void) const
+        QString SIG_Drive::getName () const
         {
                 return name;
         }
 
-        int SIG_Drive::getNumber (void) const
+        int SIG_Drive::getNumber () const
         {
                 return number;
         }
@@ -78,12 +78,12 @@ namespace SIGEL_Robot {
                 mode = dm;
         }
 
-        SIG_Joint const *SIG_Drive::getJoint (void) const
+        SIG_Joint const *SIG_Drive::getJoint () const
         {
                 return theJoint;
         }
 
-        SIG_Drive::DriveMode SIG_Drive::getMode (void) const
+        SIG_Drive::DriveMode SIG_Drive::getMode () const
         {
                 return mode;
         }
@@ -94,12 +94,12 @@ namespace SIGEL_Robot {
                 maxforce = mx;
         }
 
-        DL_Scalar SIG_Drive::getMinForce (void) const
+        DL_Scalar SIG_Drive::getMinForce () const
         {
                 return minforce;
         }
 
-        DL_Scalar SIG_Drive::getMaxForce (void) const
+        DL_Scalar SIG_Drive::getMaxForce () const
         {
                 return maxforce;
         }

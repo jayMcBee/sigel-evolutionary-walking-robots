@@ -28,20 +28,20 @@ namespace SIGEL_Robot {
                   iteration (0)
         { }
         
-        SIG_GeometryIterator::~SIG_GeometryIterator (void)
+        SIG_GeometryIterator::~SIG_GeometryIterator ()
         { }
         
-        bool SIG_GeometryIterator::valid (void) const
+        bool SIG_GeometryIterator::valid () const
         {
                 return (iteration < iterating->getNumPolygons ());
         }
         
-        SIG_Polygon const & SIG_GeometryIterator::current (void) const
+        SIG_Polygon const & SIG_GeometryIterator::current () const
         {
                 return *iterating->getPolygon (iteration);
         }
         
-        void SIG_GeometryIterator::next (void)
+        void SIG_GeometryIterator::next ()
         {
                 iteration++;
         }  

@@ -67,11 +67,11 @@ namespace SIGEL_Robot
           /**
            * Destructor.
            */
-          ~SIG_Material (void);
+          ~SIG_Material ();
           /**
            * Returns the name of the material.
            */
-          QString getName (void) const;
+          QString getName () const;
           /**
            * Sets the density of the material.
            *

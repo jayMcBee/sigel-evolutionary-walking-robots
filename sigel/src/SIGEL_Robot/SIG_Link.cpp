@@ -121,17 +121,17 @@ namespace SIGEL_Robot {
                 }
         }
 
-        QString SIG_Link::getName (void) const
+        QString SIG_Link::getName () const
         {
                 return name;
         }
         
-        int SIG_Link::getNumber (void) const
+        int SIG_Link::getNumber () const
         {
                 return number;
         }
 
-        bool SIG_Link::isRootLink (void) const
+        bool SIG_Link::isRootLink () const
         {
                 return parent->getRootLink () == this;
         }
@@ -141,7 +141,7 @@ namespace SIGEL_Robot {
                 body = b;
         }
         
-        SIG_Body const *SIG_Link::getBody (void) const
+        SIG_Body const *SIG_Link::getBody () const
         {
                 return body;
         }
@@ -151,7 +151,7 @@ namespace SIGEL_Robot {
                 material = mtrl;
         }
         
-        SIG_Material const *SIG_Link::getMaterial (void) const
+        SIG_Material const *SIG_Link::getMaterial () const
         {
                 return material;
         }
@@ -182,17 +182,17 @@ namespace SIGEL_Robot {
                 return false;
         }
 
-        const QList<SIG_Link::NamedPoint> &SIG_Link::getPoints (void) const
+        const QList<SIG_Link::NamedPoint> &SIG_Link::getPoints () const
         {
                 return points;
         }
 
-        int SIG_Link::getNrOfPoints (void) const
+        int SIG_Link::getNrOfPoints () const
         {
                 return points.count ();
         }
 
-        void SIG_Link::instantiateGeometry (void)
+        void SIG_Link::instantiateGeometry ()
         {
                 if (geometry) {
                         delete mirtich;
@@ -203,7 +203,7 @@ namespace SIGEL_Robot {
                 mirtich = new SIG_Mirtich (geometry, name + "(" + body->getName () + ")");
         }
 
-        void SIG_Link::transformToDynaMo (void)
+        void SIG_Link::transformToDynaMo ()
         {
                 DL_vector v;
                 DL_matrix m;
@@ -247,7 +247,7 @@ namespace SIGEL_Robot {
                 return adjacentJoints;
         }
 
-        SIG_Geometry const *SIG_Link::getGeometry (void) const
+        SIG_Geometry const *SIG_Link::getGeometry () const
         {
                 return geometry;
         }
@@ -314,7 +314,7 @@ namespace SIGEL_Robot {
                 o = initialOrientation;
         }
         
-        bool SIG_Link::isInitiated (void) const
+        bool SIG_Link::isInitiated () const
         {
                 return initiated;
         }
@@ -345,7 +345,7 @@ namespace SIGEL_Robot {
                         tx << "n\n";
         }
 
-        bool SIG_Link::isMDHVisited (void) const
+        bool SIG_Link::isMDHVisited () const
 	{
 	  return mdh_visited;
 	}

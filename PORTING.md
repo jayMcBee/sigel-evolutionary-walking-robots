@@ -909,7 +909,17 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-27 — DONE: ITEM 6, NULL AND 0 BECOME NULLPTR.** Start here.
+**2026-09-27 — DONE: ITEM 92, PART 1, F(VOID) BECOMES F().** Start here.
+
+- **Changed:** 289 `(void)` parameter lists in 61 files become `()`. The C
+  file `manage_dyn_slave.c` keeps its own; it includes no SIGEL header.
+- **Baselines:** unchanged.
+- **Review:** by the maintainer, from the diff.
+- **Gates:** `check.sh` 758 pass, 0 fail; warnings 486. The other four gates
+  are green.
+- **Next:** item 92's `const_cast`s, one group at a time.
+
+**2026-09-27 — DONE: ITEM 6, NULL AND 0 BECOME NULLPTR.**
 
 - **Changed:** 434 null pointers in 109 files, one token each. Details are in
   item 6's entry in "Done".

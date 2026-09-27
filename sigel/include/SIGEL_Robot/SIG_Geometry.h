@@ -105,7 +105,7 @@ private:
     /**
      * Destructor.
      */
-    ~SIG_Geometry (void);
+    ~SIG_Geometry ();
 
     /**
      * getOrAddVertex searches for the vertex and hands out
@@ -125,11 +125,11 @@ private:
     /**
      * Returns the vector of vertices.
      */
-    QList<DL_vector *> const & getVertices (void) const;
+    QList<DL_vector *> const & getVertices () const;
     /**
      * Returns the number of vertices.
      */
-    int getNumVertices (void) const;
+    int getNumVertices () const;
     /**
      * Returns the ith vertex of the geometry.
      *
@@ -143,7 +143,7 @@ private:
      * getNumPolygons reports the number of polygons in
      * the geometry object.
      */
-    int getNumPolygons (void) const;
+    int getNumPolygons () const;
     /**
      * Move the geometry.
      *

@@ -859,7 +859,7 @@ void SIGEL_GP::SIG_GPManager::run() {
 
 
 
-void SIGEL_GP::SIG_GPManager::RegisterDynPVMClients( void ) {
+void SIGEL_GP::SIG_GPManager::RegisterDynPVMClients() {
   enum { kSigelMasterRegPort = 6789, kSuicidalRequest   = 13 };
 
   fd_set mySet;

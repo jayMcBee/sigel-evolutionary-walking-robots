@@ -45,7 +45,7 @@ namespace SIGEL_Robot {
         SIG_TranslationalJoint::~SIG_TranslationalJoint ()
         { }
 
-        SIG_Joint::JointType SIG_TranslationalJoint::getJointType (void) const
+        SIG_Joint::JointType SIG_TranslationalJoint::getJointType () const
         {
                 return tTranslationalJoint;
         }

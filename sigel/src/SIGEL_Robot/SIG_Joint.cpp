@@ -70,15 +70,15 @@ namespace SIGEL_Robot {
                    >> mdh_predecessor_is_left;
         }
 
-        SIG_Joint::~SIG_Joint (void)
+        SIG_Joint::~SIG_Joint ()
         { }
 
-        QString SIG_Joint::getName (void) const
+        QString SIG_Joint::getName () const
         {
                 return name;
         }
 
-        int SIG_Joint::getNumber (void) const
+        int SIG_Joint::getNumber () const
         {
                 return number;
         }
@@ -102,12 +102,12 @@ namespace SIGEL_Robot {
                 rightLink->addJoint (this);
         }
 
-        SIG_Link const *SIG_Joint::getLeftLink (void) const
+        SIG_Link const *SIG_Joint::getLeftLink () const
         {
                 return leftLink;
         }
 
-        SIG_Link const *SIG_Joint::getRightLink (void) const
+        SIG_Link const *SIG_Joint::getRightLink () const
         {
                 return rightLink;
         }

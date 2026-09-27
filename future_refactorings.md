@@ -62,8 +62,8 @@ Constructs the language removed. A current compiler rejects them.
   | MT_GPSystem | 17 | SIGEL_Program, SIGEL_SlaveGUI | 3 |
   | SIGEL_CommonGUI | 12 | | |
 
-- [ ] **92. Remove the `const_cast`s where the API allows it, and the `(void)`
-  parameter lists.** Counted 2026-09-25.
+- [ ] **92. Remove the `const_cast`s where the API allows it.** Counted
+  2026-09-25. The `(void)` parameter lists are done; see `PORTING.md`.
   - **25 `const_cast`s in six modules.** None is undefined behaviour today:
     each object was created non-const and is only read through the cast. But
     a later write through one would be, and the compiler would not say so.
@@ -82,10 +82,6 @@ Constructs the language removed. A current compiler rejects them.
       `SIG_EnvironmentRenderer` (keeps a mutable environment reference).
       Needs const getters on `SIG_Joint` and `SIG_Geometry`, and the two
       stored references made const.
-  - **289 `(void)` parameter lists in 61 files**, a C habit: `SIGEL_Robot`
-    (40 files), `SIGEL_RobotIO` (14), `SIGEL_GP` (4), `SIGEL_Simulation` (3).
-    `f(void)` becomes `f()`; mechanical, one commit. No `(void)x` casts were
-    found.
 - [ ] **101. Empty destructors: remove them, or default them in the header.**
   Decided 2026-09-26. Delete every empty destructor whose class already has a
   virtual destructor above it. A base class without one gets a defaulted
