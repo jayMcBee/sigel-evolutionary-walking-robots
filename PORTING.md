@@ -246,7 +246,7 @@ sigel/                                      the repo root
 │   │                                       check is the diff vs its baseline
 │   ├── fitness-check.sh                    21 fitness values, and -selfcheck
 │   ├── pvm-check.sh                        does PVM run? Phase P, P3 and P4
-│   ├── baselines/                          the six files the gates diff against
+│   ├── baselines/                          the four files the gates diff against
 │   └── programs/
 │       ├── guidrive.cpp                    the GUI harness, 33 scenarios
 │       ├── sigel_eval.cpp                  one fitness evaluation
@@ -610,7 +610,7 @@ through `f0f2daa`.
 
 ## 7. Steps
 
-**Exit criterion per step:** `./checks/check.sh` from anywhere — **938 pass, 0
+**Exit criterion per step:** `./checks/check.sh` from anywhere — **757 pass, 0
 fail**. *The figure moves with the number of tracked text files, because the
 `encodings` check adds its own count to the total. Measured trail: **1136**
 until 2026-09-19, when `experiments/` and `robots/` arrived and
@@ -637,7 +637,11 @@ it removed `SIG_GPZorcWalkingFitnessFunction`, four passes; **944** when it
 removed `SIG_GPStepperFitnessFunction`, four passes; **936** on 2026-09-25,
 when `SIG_RobotVisualisation` and `SIG_EnvironmentVisualisation` went, four
 passes each; **938** when `SIGEL_Tools/SIG_Version.h` arrived, one pass in
-`headers standalone` and one in `encodings`.*
+`headers standalone` and one in `encodings`; **757** on 2026-09-27, when item
+109 dropped the checks that are not vital as regression tests: the pass per
+compiled file in the 14 module rows (176), `expstruct selfcheck` (1), the
+syntax compile of the two programs (2), `real clicks` (1), and
+`xtest-baseline.txt` in `encodings` (1).*
 **The pass count was 853 until D31 and the jump is not new coverage of SIGEL's
 code.** The `encodings` check used to read 404 files of five extensions and now
 read all 618 tracked files then, 8 of which git called binary: its pass count went
@@ -903,8 +907,24 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-09-27 — DONE: ITEM 109, THE GATES REDUCED TO WHAT IS VITAL.** Start
+here.
+
+- **Changed:** `check.sh` no longer counts a pass per compiled module file,
+  runs `expstruct selfcheck`, compiles the two programs separately, or runs
+  `real clicks`. The `xtest` scenario left `guidrive.cpp` and
+  `xtest-baseline.txt` was deleted. Details are in item 109's entry in "Done".
+- **Baselines:** four remain; none changed.
+- **Review:** no defects. Its leftovers were fixed: three unused includes and
+  stale scenario counts in `guidrive.cpp`, one misplaced line in `check.sh`.
+- **Gates:** `check.sh` 757 pass, 0 fail; warnings 486. The other four gates
+  are green.
+- **Not acted on, from the review:** `check.sh` runs no simulation (that is
+  `fitness-check.sh` and `dictorder-dump.sh`); no gate runs an evolution over
+  PVM; `SIGEL_RealInterface` is compiled nowhere.
+
 **2026-09-27 — DONE: ITEM 108, BATCHES 4 TO 11, THE REST OF THE QT-VERSION
-COMMENTS. ITEM 108 IS DONE.** Start here.
+COMMENTS. ITEM 108 IS DONE.**
 
 - **Changed:** comments only, in 68 files: MT_GPSystem, SIGEL_Program,
   SIGEL_RobotIO, SIGEL_Simulation, SIGEL_SlaveGUI, SIGEL_MasterGUI, MT_GUI,
@@ -957,7 +977,7 @@ COMMENTS. ITEM 108 IS DONE.** Start here.
   - Names: `DoubleSpinBox.h/.cpp` hold `DISpinBox`; `MT_AddIndividualsWidget`,
     `MT_IndividualWidgetBase` and `MT_IndividualWidget` files hold other class
     names; `nextSiblingOf` is a free function.
-- **Next:** item 108 is done. Next is item 109, the review of the gates.
+- **Next:** item 109, the review of the gates.
 
 **2026-09-27 — DONE: ITEM 108, BATCH 3 OF 12, MT_CONTROL.**
 
@@ -2996,8 +3016,8 @@ root, answered by measurement; rewritten 2026-09-20 after the reorganisation. Th
 baselines now live in `checks/baselines/`, and the gates that read them in
 `checks/`. Line counts are `wc -l`.
 
-*Check inputs. Deleting one fails loudly in every case, but only two say why:
-the `pagesave` and `real clicks` sections name the missing file. The others fail
+*Check inputs. Deleting one fails loudly in every case, but only one says why:
+the `pagesave` section names the missing file. The others fail
 as a maximal diff — every line of the dump reported as an addition — which is
 loud and uninformative.*
 
@@ -3007,7 +3027,6 @@ loud and uninformative.*
 | `fitness-baseline.txt` | 21 | the 21 fitness values, three for each of the 7 experiments. Check 3 is a diff against this |
 | `guibehaviour-baseline.txt` | 2613 | the `guidrive` scenarios under QTest |
 | `pagesave-baseline.txt` | 432 | the port's own save of `twoBases.exp` — see below |
-| `xtest-baseline.txt` | 235 | what the port does under real X11 input — see below |
 
 **`pagesave-baseline.txt` holds the port's own save of `twoBases.exp`.** Its
 BASE block used to be 1.3's own output for `twoBasesSimpleFitness2.exp`,
@@ -3019,15 +3038,10 @@ baseline later work checks against. `check.sh`'s `pagesave` section guards it
 and prints
 *"this check tested NOTHING"* if it is absent.
 
-**`xtest-baseline.txt` covers what QTest structurally cannot.** QTest's
-**widget** overload — the only one `guidrive` uses — builds a `QMouseEvent` and
-hands it to `QApplication::notify`, so it never passes through
-`QWindowSystemInterface` — window activation, a popup's pointer grab and Qt's
-synthesis of a double click from two presses are all invisible to it. This file
-is `guidrive` driven by `xdotool` XTEST inside a nested Xvfb. Reproducible here,
-unlike the one above, but it is the only reference for that class of behaviour.
-`check.sh`'s `real clicks` section guards it and prints the same *"tested
-NOTHING"* warning.
+**Real X11 input is no longer checked.** `xtest-baseline.txt`, the `xtest`
+scenario and `check.sh`'s `real clicks` section were dropped on 2026-09-27 by
+item 109: they proved Qt 6's platform layer once, and SIGEL's own code rarely
+changes what they cover. Recover them from git for a Qt upgrade.
 
 *Evidence, read by no script.* `future_refactorings.md` is the to-do list this file defers work into; no line
 count, it moves every session. **`tiecheck.cpp` was the third and is gone**,
@@ -4602,13 +4616,13 @@ is 80-bit.
 | **`freed-pointer null`** | **Dropped 2026-09-24.** That `visualisation` is nulled between its `delete` and its `new`. `SIG_Simulation`'s `default:` case throws for `SIMULATIONLIBRARY 0` and unwinds out of `visualizeThis()` between the two statements. **The defect is real but not reachable today, and the argument matters because the first version of it was wrong in three ways.** The widget has 21 `visualisation->` dereferences behind 14 `if (visualisation)` guards, all reached constantly (`paintGL` runs every frame). `sigel_slave` is **not** the sole caller — `SIG_SimulationVisualisationWidget::slotStopSimulation()` calls `visualizeThis()` from a live Stop action, **inside `a.exec()` with no try/catch**. And `visualisation` is a **base-class** member that `~SIG_VisualisationWidget` deletes, so destruction after a throw **is** a double free; it does not bite on the slave path only because `simWindow` is leaked past the catch's `return 1`. **Why it is still unreachable:** every other caller is downstream of a first `visualizeThis()` that must have SUCCEEDED, and nothing in the slave calls `setSimulationLibrary`. **Deliberately NOT generalised** — the tree's other `delete x; ... x = new` pairs are benign, so a blanket rule would be noise. Teeth-tested by deleting the line |
 | **`no clipped controls`** (`clipcheck`) | **Dropped 2026-09-24.** Any widget whose rect leaves its parent's, over the master's **six View pages and their tabs only** — and it carries a positive control that FAILS the check if it does not fire, because "0 clipped" from a check that cannot detect clipping is worth nothing. Shrinking the window is not usable as that control: the converted pages carry real layouts and reflow where 1.3, absolutely positioned, clips — so **the port is better behaved than 1.3 on resize** — and it displaces a real widget instead |
 | **`slave gui`** (`slavegui`) — NEW 2026-09-05 | **Dropped 2026-09-24.** **Two things `check.sh` had never reached, because it never ran this scenario.** (a) The clipping defect **in the two containers where it was actually found**, which `clipcheck` structurally cannot see: they belong to the slave window and its movie dialog, not to anything the master's menus open. *Both fixes were UNCHECKED while this table said the section above covered them — found by review.* It greps the two clip totals rather than diffing the whole scenario, whose GL view does not render offscreen. **Teeth-tested by deleting each `<minimumSize>` block and rebuilding**: without `GroupBox6`'s, 14 controls clip; without `groupboxDirectory`'s, 1. (b) **`SIGEL_SlaveGUI`'s 44 `SIGNAL(` and 44 `SLOT(` sites, which had no runtime coverage at all** — its stderr is kept and checked for Qt's `No such signal`/`No such slot`, behind the same `guidriveStderrControl` positive control. **Teeth-tested both ways**: `QT_LOGGING_RULES='*=false'` fails it as suppressed, and renaming one live signal in `SIG_SimulationWindow.cpp` fails it by name |
-| **`real clicks`** (`xtest`, `xtest-baseline.txt`) — NEW 2026-09-07 | **the platform layer, which nothing else here touches.** Every other section drives Qt through `QApplication::notify`. This one runs `guidrive` as a real X11 client in a nested `Xvfb` under `xcb`, and sends XTEST input with `xdotool`. It is the only section that exercises activation, the popup's pointer grab and Qt's double-click synthesis. It found C13's swallowed dismissing click on its first run. **Its control is inside the scenario, and the section fails without it.** The scenario compares one real click and one `QTest::mouseClick` at the same point, through a native event filter. It prints `DISCRIMINATES` only when the real click produced native `ButtonPress` events and `QTest` produced none. *Teeth-tested. `xdotool` was replaced by a stub that exits 0 and does nothing. The scenario stops at the coordinate check with a line-initial `!!` and exit 1, so the section fails on three predicates. **An earlier version of this row claimed it failed "on the control and on the `!!` marker", and review showed that was false**: all three of the scenario's mis-target messages put their `!!` in the MIDDLE of a line, and `check.sh` greps `^ *!!`, so not one of them was visible. A run whose own output said the finding was undecidable passed every guard the section had. The markers start their lines now, and the scenario returns 1 rather than carrying on.* `QEvent::spontaneous()` would not work as that control, because `qtestmouse.h` marks QTest's own events spontaneous. A missing `Xvfb` or `xdotool` **fails** rather than skips. The display is refused if something is already on it. The server is killed by pid, so a real session's own `Xvfb` survives |
+| **`real clicks`** (`xtest`, `xtest-baseline.txt`) — NEW 2026-09-07 | **Dropped 2026-09-27, item 109.** **the platform layer, which nothing else here touches.** Every other section drives Qt through `QApplication::notify`. This one runs `guidrive` as a real X11 client in a nested `Xvfb` under `xcb`, and sends XTEST input with `xdotool`. It is the only section that exercises activation, the popup's pointer grab and Qt's double-click synthesis. It found C13's swallowed dismissing click on its first run. **Its control is inside the scenario, and the section fails without it.** The scenario compares one real click and one `QTest::mouseClick` at the same point, through a native event filter. It prints `DISCRIMINATES` only when the real click produced native `ButtonPress` events and `QTest` produced none. *Teeth-tested. `xdotool` was replaced by a stub that exits 0 and does nothing. The scenario stops at the coordinate check with a line-initial `!!` and exit 1, so the section fails on three predicates. **An earlier version of this row claimed it failed "on the control and on the `!!` marker", and review showed that was false**: all three of the scenario's mis-target messages put their `!!` in the MIDDLE of a line, and `check.sh` greps `^ *!!`, so not one of them was visible. A run whose own output said the finding was undecidable passed every guard the section had. The markers start their lines now, and the scenario returns 1 rather than carrying on.* `QEvent::spontaneous()` would not work as that control, because `qtestmouse.h` marks QTest's own events spontaneous. A missing `Xvfb` or `xdotool` **fails** rather than skips. The display is refused if something is already on it. The server is killed by pid, so a real session's own `Xvfb` survives |
 | **`truncated pi (V5)`** — NEW 2026-09-08 | **Dropped 2026-09-24: no shipped file uses the three sites, and 1.3 is a regression reference, not a specification.** **That nobody "fixes" 1.3's truncated pi.** The pitch/roll sensor path converts radians to degrees with `3.14159265`, not `M_PI`, and `moveDrive`'s servo mode converts back with it. The joint-sensor fix of the 1.0 → 1.3 regression, 2026-09-23, took the factor out of the joint-sensor branch. No shipped file uses pitch/roll sensors or servo drives. The values feed a chaotic simulation, so a change to the constant is a change of behaviour. **The edit that breaks it is one word and looks like tidying**, and 1.3 uses the true `M_PI` in `IFunctions.cpp, calculateAnyJoint`, so the truncated literal reads as an oversight to anyone who meets that line first. **Two checks, because neither covers the other:** the SOURCE check catches an edit at one of the three sites (four until the joint-sensor fix of the 1.0 → 1.3 regression, 2026-09-23) even while another site still supplies the constant, which no binary search can see, and it is compiler-independent; the BINARY check catches any spelling that yields the true value — `M_PI`, `4*atan(1)`, a longer literal, a header constant — which a grep for `M_PI` would miss. Only the radian factor is checked, and the reason is measured rather than assumed: on aarch64 four of the other seven appear ZERO times as 8-byte doubles in our image and two appear only in debug sections, so there is nothing of theirs in `.rodata` to compare. Costs 0.18 s. *Teeth-tested six ways, and the testing found three defects in the check itself. **The binary search covered the whole file, so its "the constant is missing" arm could never fire** — the Makefile compiles with `-g`, so two debug copies survive any patch of the real one; the search is bounded to `.rodata` now. **The source pattern was a prefix match**, so lengthening a site to `3.14159265358979` changed the factor while the count stayed at 4 and neither forbidden double appeared — the whole section passed on that edit. **And a comment mentioning `M_PI` or the literal failed the check**, which is documentation, not a defect; comments are stripped now. The six probes: a site tidied to `M_PI`, a site deleted, a site lengthened, the true `180/pi` patched into `.rodata`, the kept constant patched out of `.rodata`, and a comment naming both. Five fail with the message aimed at them, one passes. Two orderings had to be fixed for that: `M_PI` is tested before the site count, and the forbidden constant before the missing one, because each of those edits trips both tests and the specific diagnosis has to win.* |
 | **`v2 round trip vs 1.3`** — NEW 2026-09-08 | **a whole experiment through `File > Save Experiment`, twice, against what the 2003 binary wrote.** `pagesave` compares a 178-line parameter block, over two saves that differ only in whether the pages were edited; this compares the WHOLE file across two CHAINED saves, where each save's output is the next one's input — marker line numbers, the experiment history, the per-individual HISTORY growth, the individual names, the robot block, the ten first-save keys, and `expstruct.py` over pass 1 against pass 2. The expected text is copied from `verification-against-sigel-1.3/v8-1.3-gp-blocks.txt`, captured before this conversion existed, so a failure is a regression against 1.3 rather than against yesterday — except the markers, the one-entry host list and the robot-block hash, which pin the file in `experiments/` since item 39. **Input against pass 1 is not the test** — the first save adds ten keys and would fail however correct the port is (V8 result 5). It is ONE diff of a 58-line report. Costs 35 s measured, four `pagesave` runs over two experiments; no new scenario was added. *Teeth-tested 2026-09-08, and the testing found two holes in the check itself, both since closed — see the V2 row above. Every predicate has been shown to fail on a change of the kind it exists to catch. The claim is one-way: a mutation moves the line it is aimed at, and usually others too, because a deleted key shifts every marker below it. It is NOT that each mutation moves exactly one line, which an earlier version of this row claimed and which the measurements never showed. The wrapper was tested too: missing data SKIPS and counts, a missing or stale binary FAILS, suppressed Qt connect logging FAILS, and the section was run from outside the repo root to check the `make -q -C` fix.* |
 | `encodings` | **INVERTED BY D31 2026-09-09 — this row used to say the opposite.** It no longer catches *a file whose CRLF was stripped*; it catches **CRLF present at all**, in any tracked text file, expected zero. 571 LF-only files and 29 that git calls binary (2026-09-20). Baseline 0, floor 500. *Two counts went the same day — how many files had been converted from the German character set, and how many postdate the first commit. Neither could fail, and after the source tree was renamed neither could find a file* |
 | `dead item virtuals` | **Dropped 2026-09-22.** a class declaring Qt 2's `key(int,bool)` without the `operator<` that replaces it. Matched against a **flattened** header and demanding the signature that actually overrides — a decoy `operator<( QTreeWidgetItem * )` and a two-line declaration both bypassed the first version |
 | `widgets` | **Dropped 2026-09-24.** `DISpinBox` losing the fraction, under **`C` and `de_DE`** — without the second row it was blind to the locale bug the first fix introduced |
-| **`expstruct selfcheck`** | that the structural fingerprint is **blind to fitness and sighted on structure** — nine assertions: both spellings of fitness in both float and integer form, a program-operand change that must move `PROGRAMS`, two individuals swapped that must move `ORDER`, and a structural floor recomputed from the raw bytes (individual count, total program lines, history length against `POOLGENERATION`) that catches a matcher which died and dumped its content into `SHAPE`. Costs 0.34 s. *Teeth-tested by disabling both fitness filters and by blinding the program matcher* |
+| **`expstruct selfcheck`** | **Dropped 2026-09-27, item 109.** that the structural fingerprint is **blind to fitness and sighted on structure** — nine assertions: both spellings of fitness in both float and integer form, a program-operand change that must move `PROGRAMS`, two individuals swapped that must move `ORDER`, and a structural floor recomputed from the raw bytes (individual count, total program lines, history length against `POOLGENERATION`) that catches a matcher which died and dumped its content into `SHAPE`. Costs 0.34 s. *Teeth-tested by disabling both fitness filters and by blinding the program matcher* |
 | `parsers` | **Dropped 2026-09-24.** A file format the program parses but no other check opens: a `PVMHOST` round trip against `SIG_GPPVMHost`, pinning 1.3's own line. *Written because a defect of exactly that shape was found in `SIGEL_GP`* |
 | `programs` | a missing moc, an unemitted vtable, a dropped resource, the wrong `SIG_GPExperiment`. It ran `-fsyntax-only` and could see none of them; it now requires both binaries built and current and runs the slave's headless smoke test, **failing rather than skipping** when they are absent |
 | `gui vs 1.3` (`guidump-baseline.txt`) | **Dropped 2026-09-24, with its baseline.** An accelerator that went missing, an action that stopped being greyed, a toolbar showing the long label, a sort key that stopped being numeric. **Because the baseline was diffed against the running 1.3, a failure here is a regression against 1.3, not against yesterday's output** |
@@ -6304,6 +6318,15 @@ carried; other items and this file cite them, so they do not change.
   needs, or dropped. Comments only, in four commits; three comments that name
   Qt 6 stay. The findings the reviews made along the way are in the handover
   entries of 2026-09-27.
+
+- [x] **109. The gates reviewed as ongoing regression tests** — done
+  2026-09-27, by decision. A fresh-eyes review judged every test in
+  `check.sh` and `pvm-check.sh`. The ones that are not vital went: the pass
+  per compiled file in the module rows, because the build proves it (the
+  compile stays, for the warning count and a compile failure);
+  `expstruct selfcheck`, which tested our tool; the syntax compile of the two
+  programs; and `real clicks`, with its `xtest` scenario and
+  `xtest-baseline.txt`. `check.sh` gives 757 pass.
 
 - [x] **103. The tournaments-per-generation counter went stale** — done
   2026-09-27. Reported by the x86 machine. `SIG_GPParameter` computed the

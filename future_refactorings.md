@@ -294,12 +294,6 @@ touched, because changing one changes behaviour against the reference binary.
 
 ## 8 · Cleanup
 
-- [ ] **109. Review the gates as ongoing regression tests.** Asked for
-  2026-09-27, to follow item 108 once it is fully done. A fresh-eyes sub-agent
-  reviews every test in `checks/check.sh` and `checks/pvm-check.sh` and judges,
-  for each one, whether it still has value as an ongoing regression test now
-  that the port is done. The maintainer decides what stays.
-
 - [ ] **107. Review `SIG_GPPopulation::readFromFile`, interactively.** Asked
   for 2026-09-27. The method is 129 lines and hard to read. Go through it with
   the maintainer, deciding each change before it is made.

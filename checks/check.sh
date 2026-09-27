@@ -65,15 +65,17 @@ fi
 MODULES="${*:-SIGEL_Tools SIGEL_Environment MT_GPSystem SIGEL_Robot SIGEL_Program SIGEL_RobotIO SIGEL_Simulation MT_Control SIGEL_GP SIGEL_Visualisation SIGEL_CommonGUI SIGEL_SlaveGUI MT_GUI SIGEL_MasterGUI}"
 pass=0; fail=0; warn=0; skipped=0
 
+# The build proves each file compiles, so a compiled file adds no pass here.
+# This loop is for the warning count; a file that does not compile still fails.
 for m in $MODULES; do
-    mp=0; mf=0; mw=0
+    mf=0; mw=0
     for f in "$SRC/src/$m"/*.cpp; do
         [ -e "$f" ] || continue
-        if g++ $FLAGS $INCS "$f" 2>/tmp/chk.$$; then mp=$((mp+1)); else mf=$((mf+1)); fi
+        g++ $FLAGS $INCS "$f" 2>/tmp/chk.$$ || mf=$((mf+1))
         mw=$((mw + $(command grep -ac "$SRC.*warning:" /tmp/chk.$$ || true)))
     done
-    printf '%-22s %2d pass  %2d fail  %3d warnings\n' "$m" "$mp" "$mf" "$mw"
-    pass=$((pass+mp)); fail=$((fail+mf)); warn=$((warn+mw))
+    printf '%-22s %2d fail  %3d warnings\n' "$m" "$mf" "$mw"
+    fail=$((fail+mf)); warn=$((warn+mw))
 done
 
 # Headers are otherwise only checked when some .cpp happens to include them.
@@ -222,52 +224,15 @@ guidrive_current() {
 }
 
 # ---------------------------------------------------------------------------
-# expstruct.py's self-test.
-#
-# expstruct.py compares evolved .exp files across machines by structure. It
-# must be blind to fitness and see structure. Fitness is not comparable across
-# machines: a 1-ULP change in start height moves fitness by 45 %, and the
-# reference machine is i386/x87 where this one is aarch64. The tournament that
-# picks survivors is a bare `>=' between two such doubles
-# (SIG_GPSimpleTournament.cpp, run). A tool that let fitness into its report
-# would report an unavoidable difference as a regression.
-#
-# --selfcheck asserts BOTH halves, because a tool that saw nothing would pass
-# the fitness half alone: a changed FITNESS value must not move the report,
-# while a changed program operand and two swapped individuals must. It
-# compares the WHOLE report, SHAPE included.
-ep=0; ef=0
-if python3 "$ROOT/checks/programs/expstruct.py" --selfcheck \
-       "$ROOT/experiments/twoBases.exp" >/tmp/eps.$$ 2>&1; then
-    ep=1
-else
-    ef=1
-    sed 's/^/  /' /tmp/eps.$$
-fi
-rm -f /tmp/eps.$$
-printf '%-22s %2d pass  %2d fail\n' "expstruct selfcheck" "$ep" "$ef"
-pass=$((pass+ep)); fail=$((fail+ef))
-
-# ---------------------------------------------------------------------------
 # The two programs, sigel and sigel_slave. They are src/*.cpp, so the module
 # loop does not reach them.
-pp=0; pf=0
-for prog in sigel sigel_slave; do
-    if g++ $FLAGS $INCS "$SRC/src/$prog.cpp" 2>/tmp/prog.$$; then
-        pp=$((pp+1))
-    else
-        pf=$((pf+1)); echo "  $prog.cpp does not compile:"; head -5 /tmp/prog.$$
-    fi
-done
-rm -f /tmp/prog.$$
-
-# Compiling is not enough: a missing moc, an unemitted vtable or a resource
-# dropped from a static archive shows up only at link. So the two binaries
-# must also be BUILT and CURRENT, and sigel_slave, which can test itself
-# headlessly, is run.
+# A missing moc, an unemitted vtable or a resource dropped from a static
+# archive shows up only at link. So the two binaries must be BUILT and
+# CURRENT, and sigel_slave, which can test itself headlessly, is run.
 #
 # Missing binaries fail rather than skip: a check that passes when the thing
 # it checks is missing tests nothing.
+pp=0; pf=0
 if make -q --no-print-directory -C "$ROOT" programs sigelApp 2>/dev/null; then
     for prog in sigel sigel_slave; do
         f=$ROOT/build/$prog
@@ -309,7 +274,7 @@ pass=$((pass+pp)); fail=$((fail+pf))
 # QMouseEvent, QKeyEvent and QContextMenuEvent through QApplication::notify, so
 # hit-testing, menu popups, item-view selection and the slots behind them all
 # run. It bypasses QWindowSystemInterface, so window activation, grabs and
-# double-click synthesis are not tested here; `real clicks' below covers them.
+# double-click synthesis are not tested.
 #
 # Where a 1.3 side exists, the behaviour matches the running 1.3 binary;
 # roundtrip, metadrive, openfocus and rngseed have none. The values are the
@@ -542,148 +507,6 @@ rm -f "${TMPDIR:-/tmp}"/rt-prg-a.prg "${TMPDIR:-/tmp}"/rt-prg-b.prg \
       "${TMPDIR:-/tmp}"/rt-rob-before     "${TMPDIR:-/tmp}"/rt-rob-after
 printf '%-22s %2d pass  %2d fail\n' "gui behaviour" "$bp" "$bf"
 pass=$((pass+bp)); fail=$((fail+bf))
-
-# ---------------------------------------------------------------------------
-# REAL X INPUT -- the only section that clicks through the X server.
-#
-# The guidrive scenarios above post QMouseEvent through QApplication::notify.
-# That reaches every slot SIGEL has, but never goes through
-# QWindowSystemInterface. So three things are untested above: window
-# activation, the pointer grab a popup takes, and Qt's synthesis of a double
-# click from two presses. Enter and leave ARE covered above: QTest::mouseMove
-# on a widget calls QCursor::setPos(), a real pointer warp.
-#
-# This section runs guidrive as a REAL X11 CLIENT on a separate Xvfb server
-# with QT_QPA_PLATFORM=xcb, and drives it with XTEST through xdotool.
-#
-# ITS POSITIVE CONTROL IS INSIDE THE SCENARIO AND IS CHECKED HERE. If the
-# clicks are not real -- a broken xdotool, a display that never came up, or a
-# fallback to a synthetic path -- every count is zero, which looks exactly like
-# "the port ignores real clicks". So the scenario compares one real click with
-# one QTest::mouseClick at the same point through a native event filter, and
-# prints DISCRIMINATES only when the real one produced native ButtonPress
-# events and QTest produced none. Without that line this row fails.
-#
-# A missing Xvfb or xdotool FAILS this row rather than skipping it: a skip
-# would be a section that tested nothing and reported no failure.
-xtp=0; xtf=0
-XTDISP=:97
-if [ ! -f "$ROOT/checks/baselines/xtest-baseline.txt" ]; then
-    xtf=1; echo "  checks/baselines/xtest-baseline.txt is missing -- this gate tested NOTHING"
-elif [ ! -f "$BEXP" ]; then
-    # Same data dependency as `gui behaviour': without the file the run hangs
-    # in the modal Load dialog until the timeout, and the message would blame
-    # the driver for a missing file.
-    echo "  SKIPPED: no $BEXP -- restore experiments/ from git. THIS SECTION"
-    echo "  TESTED NOTHING."
-    skipped=$((skipped+1))
-elif ! command -v Xvfb >/dev/null 2>&1 || ! command -v xdotool >/dev/null 2>&1 \
-     || ! command -v xdpyinfo >/dev/null 2>&1; then
-    xtf=1
-    echo "  Xvfb, xdotool or xdpyinfo is not installed, so no real click could be"
-    echo "  delivered and the only section that tests the platform layer did"
-    echo "  not run. Install x11-utils/xvfb and xdotool, or delete this section"
-    echo "  deliberately -- do not leave it passing silently."
-elif [ ! -x "$ROOT/build/guidrive" ]; then
-    xtf=1; echo "  guidrive is not built -- the real-input section tested NOTHING"
-elif ! (cd "$ROOT" && make -q guidrive sigelApp) 2>/dev/null; then
-    # NAME THE TARGET: `make -q' with no target answers for `all', which does
-    # not depend on guidrive. `gui behaviour' builds guidrive but fails only
-    # its own row if that build fails, so without this test a compile failure
-    # leaves the PREVIOUS binary in place and this row would score it.
-    xtf=1
-    echo "  build/guidrive or sigelApp/ is out of date, so this section would have"
-    echo "  measured a binary that is not the source in the tree."
-elif true; then
-    # A display already in use would make every click land in someone else's
-    # session, so refuse rather than share one.
-    #
-    # DISPLAY=, NOT --display. xdotool has no --display option: it answers
-    # "getdisplaygeometry: unrecognized option" and exits 1 whatever the state
-    # of the server. With --display this guard could never fire, and the
-    # readiness poll below could never succeed.
-    if DISPLAY="$XTDISP" xdotool getdisplaygeometry >/dev/null 2>&1; then
-        xtf=1
-        echo "  display $XTDISP is already in use -- refusing to drive it."
-    else
-        Xvfb "$XTDISP" -screen 0 1400x1000x24 -nolisten tcp >/tmp/xtv.$$ 2>&1 &
-        xtpid=$!
-        # Poll rather than sleep a fixed time: too short is a flake and too
-        # long is dead time on every run. xdotool is already required above,
-        # so this adds no new dependency.
-        xtup=0; xti=0
-        while [ "$xti" -lt 60 ]; do
-            if DISPLAY="$XTDISP" xdotool getdisplaygeometry >/dev/null 2>&1; then
-                xtup=1; break
-            fi
-            xti=$((xti+1)); command sleep 0.25
-        done
-        if [ "$xtup" -eq 0 ]; then
-            xtf=1
-            echo "  Xvfb never came up on $XTDISP:"
-            head -5 /tmp/xtv.$$ 2>/dev/null | sed 's/^/    /'
-        else
-            # SCRUB THE SCALING VARIABLES. This is the only section whose
-            # result depends on Qt's coordinate scaling. mapToGlobal() returns
-            # logical pixels and xdotool takes device pixels, so at a ratio of
-            # 1.25 every click is real but lands 20 per cent away, and the run
-            # reports a false difference. env is used without -i, so the
-            # caller's whole environment passes through. Offscreen pins the
-            # ratio, which is why no other section needs this. guidrive also
-            # refuses a devicePixelRatio other than 1, so a caller who runs it
-            # directly is covered too.
-            if env DISPLAY="$XTDISP" SIGEL_ROOT="$APP" SIGEL_EXP="$BEXP" \
-                   SIGEL_SCRATCH="${TMPDIR:-/tmp}" QT_QPA_PLATFORM=xcb \
-                   QT_SCALE_FACTOR=1 QT_SCREEN_SCALE_FACTORS= \
-                   QT_ENABLE_HIGHDPI_SCALING=0 QT_AUTO_SCREEN_SCALE_FACTOR=0 \
-                   QT_FONT_DPI= QT_SCALE_FACTOR_ROUNDING_POLICY=Round \
-                   timeout 300 "$ROOT/build/guidrive" xtest \
-                   > /tmp/xt.$$ 2>/tmp/xterr.$$; then
-                # The control, before the diff: if the run could not tell a real
-                # click from a QTest one, the numbers below mean nothing and the
-                # baseline would match a run in which nothing was
-                # clicked at all.
-                if ! command grep -q 'DISCRIMINATES' /tmp/xt.$$; then
-                    xtf=1
-                    echo "  the real/QTest control did NOT fire, so this run proves"
-                    echo "  nothing about real input -- no click here was real:"
-                    command grep -E 'native ButtonPress|platform' /tmp/xt.$$ \
-                        | head -3 | sed 's/^/    /'
-                elif command grep -q '^ *!!' /tmp/xt.$$; then
-                    xtf=1
-                    echo "  the driver could not carry out part of the scenario:"
-                    command grep -n '^ *!!' /tmp/xt.$$ | head -6 | sed 's/^/    /'
-                elif command grep -q '^ *!!' "$ROOT/checks/baselines/xtest-baseline.txt"; then
-                    xtf=1
-                    echo "  the BASELINE itself contains a failure marker:"
-                    command grep -n '^ *!!' "$ROOT/checks/baselines/xtest-baseline.txt" | head -4 | sed 's/^/    /'
-                elif command grep -v '^#' "$ROOT/checks/baselines/xtest-baseline.txt" \
-                        | diff -u - /tmp/xt.$$ > /tmp/xtd.$$; then
-                    xtp=1
-                else
-                    xtf=1
-                    echo "  the port no longer responds to REAL input the way it did:"
-                    head -16 /tmp/xtd.$$ | sed 's/^/    /'
-                fi
-            else
-                xtf=1
-                echo "  the xtest run did not finish:"
-                tail -6 /tmp/xt.$$ 2>/dev/null | sed 's/^/    /'
-                if [ -s /tmp/xterr.$$ ]; then
-                    echo "  and its stderr said:"
-                    tail -6 /tmp/xterr.$$ | sed 's/^/    /'
-                fi
-            fi
-        fi
-        # By pid, never `pkill Xvfb': a real session on this machine may have
-        # one of its own, and the gates are not allowed to take it down.
-        kill "$xtpid" 2>/dev/null || true
-        wait "$xtpid" 2>/dev/null || true
-        rm -f /tmp/xtv.$$ /tmp/xt.$$ /tmp/xtd.$$ /tmp/xterr.$$
-    fi
-fi
-printf '%-22s %2d pass  %2d fail\n' "real clicks" "$xtp" "$xtf"
-pass=$((pass+xtp)); fail=$((fail+xtf))
 
 # ---------------------------------------------------------------------------
 # The widget-to-file path: File > Save Experiment.
