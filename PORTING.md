@@ -903,7 +903,29 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-27 — DONE: ITEM 108, BATCH 1 OF 12, SIGEL_GP.** Start here.
+**2026-09-27 — DONE: ITEM 108, BATCH 2 OF 12, SIGEL_ROBOT.** Start here.
+
+- **Changed:** comments only, in 4 files of `SIGEL_Robot`. All 10 comments
+  that named a Qt version were cut to the fact today's code needs: the
+  last-added-wins search order in the six `SIG_Robot::lookup*` methods and in
+  `SIG_LanguageParameters`, the empty-list trap in
+  `SIG_Link::transformToDynaMechs`, and the empty-string guard in
+  `SIG_Body::getGeometryFile`.
+- **Baselines:** unchanged.
+- **Review:** no defects.
+- **Gates:** `check.sh` 938 pass, 0 fail; warnings 486. The other four gates
+  are green.
+- **Left for afterwards:** "newest binding" in `SIG_Link::getPoint` is port
+  wording; one-line ifs in `SIG_Link::getPoint`,
+  `SIG_LanguageParameters::hasCommand` and the `SIG_LanguageParameters`
+  destructor; the empty `if (isroot)` block in `SIG_Robot::addLink`; an empty
+  geometry file name falls back to the directory path in
+  `SIG_Body::getGeometryFile` without a warning.
+- **Next:** item 108, batch 3. Batches left: MT_GUI, SIGEL_MasterGUI,
+  MT_Control, MT_GPSystem, SIGEL_Program, SIGEL_RobotIO, SIGEL_Simulation,
+  SIGEL_SlaveGUI, and `sigel.cpp` with `sigel_slave.cpp`.
+
+**2026-09-27 — DONE: ITEM 108, BATCH 1 OF 12, SIGEL_GP.**
 
 - **Changed:** comments only, in 8 files of `SIGEL_GP`. 26 comments that
   named a Qt version were reviewed one by one: 21 cut to the fact today's code

@@ -139,9 +139,8 @@ namespace SIGEL_Robot {
 
         void SIG_LanguageParameters::removeCommand( QString name )
 	{
-	  // This class owns its commands, so removing one frees it. 2003 armed
-	  // autoDelete in the constructor, which made QDict::remove() delete.
-	  // Removes the LAST match, which is what Qt 2's newest-wins take() did.
+	  // This class owns its commands, so removing one deletes it. It removes the
+	  // last match, which is the entry getCommand() returns.
 	  for (qsizetype i = allowedCommands.size() - 1; i >= 0; --i)
 	    if (allowedCommands.at(i).name == name) {
 	      delete allowedCommands.at(i).value;
@@ -159,7 +158,7 @@ namespace SIGEL_Robot {
         
         SIG_CommandParameters *SIG_LanguageParameters::getCommand (QString name) const
         {
-                // Last match wins, as Qt 2's QDict did.
+                // Search from the end: when a name occurs twice, the last one added wins.
                 for (qsizetype i = allowedCommands.size() - 1; i >= 0; --i)
                         if (allowedCommands.at(i).name == name)
                                 return allowedCommands.at(i).value;

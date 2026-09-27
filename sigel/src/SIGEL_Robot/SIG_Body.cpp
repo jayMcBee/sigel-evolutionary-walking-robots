@@ -233,10 +233,8 @@ namespace SIGEL_Robot
 
         QString SIG_Body::getGeometryFile (void) const
         {
-                // Qt 2's QString::at(uint) was bounds-safe -- it returned QChar::null past
-		// the end (qstring.h:483). Qt 6's asserts, and on a null string it
-		// dereferences a null pointer. SIG_Robot.cpp, readFromFileTransfer produces a null
-		// geometryFile from a truncated stream.
+                // geometryFile is empty when the robot file ends early (see the SIG_Body
+                // QTextStream constructor). QString::at() must not be called on an empty string.
 		if (!geometryFile.isEmpty() && geometryFile.at (0) == '/')
                         return geometryFile;
                 else {

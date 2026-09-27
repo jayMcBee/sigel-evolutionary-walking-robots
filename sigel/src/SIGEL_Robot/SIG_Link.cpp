@@ -369,10 +369,9 @@ namespace SIGEL_Robot {
 	    if (actAdjacentJoint->continuable( this ))
 	      successors.append( actAdjacentJoint );
 
-	  // value() yields null past the end, which is what Qt 2's QList::first()
-	  // and next() did.  The do-while below MUST still run its body once
-	  // when successors is empty -- actSuccessor is null there, the body
-	  // has an explicit "without successor" path, and transformX is false.
+	  // value() gives null when successors is empty; first() or at() would assert.
+	  // The do-while body must still run once then: actSuccessor is null, transformX
+	  // is false, and the body takes its "without successor" path.
 	  SIG_Joint *realSuccessor = successors.value( 0 );
 
 	  bool transformZ = predecessor;
