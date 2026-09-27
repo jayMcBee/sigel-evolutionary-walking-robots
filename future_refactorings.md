@@ -294,6 +294,12 @@ touched, because changing one changes behaviour against the reference binary.
 
 ## 8 · Cleanup
 
+- [ ] **109. Review the gates as ongoing regression tests.** Asked for
+  2026-09-27, to follow item 108 once it is fully done. A fresh-eyes sub-agent
+  reviews every test in `checks/check.sh` and `checks/pvm-check.sh` and judges,
+  for each one, whether it still has value as an ongoing regression test now
+  that the port is done. The maintainer decides what stays.
+
 - [ ] **108. Review every porting comment critically.** Asked for
   2026-09-27, to follow item 59. Many "Qt 2 did this, Qt 6 does that" comments
   tell the history of the port instead of explaining the code. Start with
