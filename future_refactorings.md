@@ -62,9 +62,6 @@ Constructs the language removed. A current compiler rejects them.
   | MT_GPSystem | 17 | SIGEL_Program, SIGEL_SlaveGUI | 3 |
   | SIGEL_CommonGUI | 12 | | |
 
-- [ ] **7. `explicit` on single-argument constructors** — per module. Every
-  break is an implicit conversion that was happening silently.
-
 - [ ] **92. Remove the `const_cast`s where the API allows it, and the `(void)`
   parameter lists.** Counted 2026-09-25.
   - **25 `const_cast`s in six modules.** None is undefined behaviour today:

@@ -6388,6 +6388,10 @@ carried; other items and this file cite them, so they do not change.
 - [x] **98. Run the next long evolution under gdb** — dropped 2026-09-27,
   by decision: nothing crashes now, so the item has nothing to act on.
 
+- [x] **7. `explicit` on single-argument constructors** — dropped
+  2026-09-27, by decision: no bug from an implicit conversion has been found,
+  so the item has nothing to act on.
+
 - [x] **MetaGP's free-slot search looked only at slot 0** — done
   2026-09-27, by decision; found with item 72. In
   `MT_Evaluator::spawnTask` the `break` after `NextFreePos=i;` was not
