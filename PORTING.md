@@ -240,6 +240,7 @@ sigel/                                      the repo root
 ├── PORTING.md                              this file
 ├── future_refactorings.md                  the to-do list this work defers into
 ├── checks/                                 the four gates, §7
+│   ├── README.md                           what each check does, in plain words
 │   ├── check.sh                            compiles every module and header,
 │   │                                       runs the interface. The gate
 │   ├── dictorder-dump.sh                   prints the container order; the
