@@ -904,7 +904,7 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 ### Handover — one owner at a time
 
 **2026-09-27 — DONE: ITEM 108, BATCHES 4 TO 11, THE REST OF THE QT-VERSION
-COMMENTS.** Start here.
+COMMENTS. ITEM 108 IS DONE.** Start here.
 
 - **Changed:** comments only, in 68 files: MT_GPSystem, SIGEL_Program,
   SIGEL_RobotIO, SIGEL_Simulation, SIGEL_SlaveGUI, SIGEL_MasterGUI, MT_GUI,
@@ -957,8 +957,7 @@ COMMENTS.** Start here.
   - Names: `DoubleSpinBox.h/.cpp` hold `DISpinBox`; `MT_AddIndividualsWidget`,
     `MT_IndividualWidgetBase` and `MT_IndividualWidget` files hold other class
     names; `nextSiblingOf` is a free function.
-- **Next:** item 108 continues with the port-history comments that name no Qt
-  version (listed here and in the batch 1 to 3 entries). Then item 109.
+- **Next:** item 108 is done. Next is item 109, the review of the gates.
 
 **2026-09-27 — DONE: ITEM 108, BATCH 3 OF 12, MT_CONTROL.**
 
@@ -6298,6 +6297,13 @@ carried; other items and this file cite them, so they do not change.
   `runner.exp` holds 250 individuals. Tested headless on a copy of
   `walker.exp`: adding 40000 to 100 stopped at 32768, a further Add and an
   import were refused, and a copy edited to 32770 loaded with the warning.
+
+- [x] **108. Every porting comment that names a Qt version, reviewed** —
+  done 2026-09-27, by decision. Each comment was judged in its method by a
+  fresh-eyes review and decided one by one: kept, cut to the fact today's code
+  needs, or dropped. Comments only, in four commits; three comments that name
+  Qt 6 stay. The findings the reviews made along the way are in the handover
+  entries of 2026-09-27.
 
 - [x] **103. The tournaments-per-generation counter went stale** — done
   2026-09-27. Reported by the x86 machine. `SIG_GPParameter` computed the
