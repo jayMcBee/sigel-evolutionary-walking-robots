@@ -12,7 +12,7 @@ MT_Interpreter::MT_Interpreter()
 {
 
 	Error =0;
-	Program =0;
+	Program =nullptr;
 }
 
 MT_Interpreter::~MT_Interpreter()

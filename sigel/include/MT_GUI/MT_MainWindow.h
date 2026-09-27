@@ -30,7 +30,7 @@ class MT_MainWindow : public QMainWindow
 	friend class MT_Controller;
 
 public:
-	MT_MainWindow(MT_Controller *controller, MT_GPManager *manager, subst_cache *substCache, QWidget * parent = 0, const char * name = 0, Qt::WindowFlags f = Qt::Dialog );
+	MT_MainWindow(MT_Controller *controller, MT_GPManager *manager, subst_cache *substCache, QWidget * parent = nullptr, const char * name = nullptr, Qt::WindowFlags f = Qt::Dialog );
 	~MT_MainWindow();
 
 	MT_GPManager* getManager();

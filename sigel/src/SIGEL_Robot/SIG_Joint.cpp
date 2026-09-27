@@ -39,8 +39,8 @@ namespace SIGEL_Robot {
                 : name (n),
                   parent (par),
                   number (nr),
-                  leftLink (0),
-                  rightLink (0),
+                  leftLink (nullptr),
+                  rightLink (nullptr),
                   mdh_a (0), mdh_alpha (0), mdh_d (0), mdh_theta (0),
 		  mdh_screw_d(0), mdh_screw_theta(0), mdh_predecessor_is_left (-1),
 		  mechsMinPos(0), mechsMaxPos(0)
@@ -49,8 +49,8 @@ namespace SIGEL_Robot {
         SIG_Joint::SIG_Joint (SIG_Robot *par, QTextStream & tx)
                 : parent (par),
                   number (-1),
-                  leftLink (0),
-                  rightLink (0)
+                  leftLink (nullptr),
+                  rightLink (nullptr)
         {
                 QString n1, n2;
 
@@ -237,7 +237,7 @@ namespace SIGEL_Robot {
 	     predecessor = leftLink;
 	     break;
 	   default:
-	     predecessor = 0;
+	     predecessor = nullptr;
 	   };
 
 	 if (predecessor!=caller)

@@ -31,7 +31,7 @@ namespace SIGEL_Robot
                 : parent(par),
                   geometryFile(f),
                   directory (d),
-                  geometry(0)
+                  geometry(nullptr)
         { };
         
         SIG_Body::SIG_Body(SIG_Robot *par, QTextStream & tx)
@@ -45,7 +45,7 @@ namespace SIGEL_Robot
                 if (tmpstr == "y") {
                         geometry = new SIG_Geometry (tx);
                 } else {
-                        geometry = 0;
+                        geometry = nullptr;
                 }
         };
 
@@ -178,7 +178,7 @@ namespace SIGEL_Robot
                                                                 vertices[ i ].set( k, actVertex( k+1 ) );
                                                 };
                                                 
-                                                SIG_Polygon *actPolygon = 0;
+                                                SIG_Polygon *actPolygon = nullptr;
                                                 
                                                 for (int j=0; j < noOfIndices; j++) {
                                                         int actIndex = indexedFaceSetNode->getCoordIndex(j);
@@ -187,7 +187,7 @@ namespace SIGEL_Robot
                                                         // constructor, so skipping every vertex would leave a 0-vertex face that
                                                         // SIG_Mirtich::compFaceNormal reads verts[0..2] from.
                                                         if (actIndex < 0)
-                                                                actPolygon = 0;
+                                                                actPolygon = nullptr;
                                                         else if ( actIndex < vertices.size() ) {
                                                                 if (!actPolygon)
                                                                         actPolygon = new SIG_Polygon( geometry );

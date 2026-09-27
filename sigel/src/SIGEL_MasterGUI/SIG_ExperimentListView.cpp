@@ -86,7 +86,7 @@ void SIG_ExperimentListView::slotRenameExperiment()
   SIG_GUIGPExperiment *theExperiment = currentlySelectedExperiment();
   if( theExperiment )
     {
-      SIG_RenameDialog renameDialog( this, 0, true );
+      SIG_RenameDialog renameDialog( this, nullptr, true );
       QString oldName = currentlySelectedExperimentName();
       renameDialog.setWindowTitle( "Rename " + oldName );
       renameDialog.lineeditNewName->setText( oldName );
@@ -127,7 +127,7 @@ void SIG_ExperimentListView::slotDeleteExperiment()
   QTreeWidgetItem *current = currentItem();
   if(current)
     {
-      while(current->parent() != 0)
+      while(current->parent() != nullptr)
 	{
 	  current = current->parent();
 	}
@@ -342,7 +342,7 @@ void SIG_ExperimentListView::slotRightButtonClicked( const QPoint & pos )
     {
       QString option = theItem->text(0);
       QString experimentName;
-      while( theItem->parent() != 0)
+      while( theItem->parent() != nullptr)
 	{
 	  theItem = theItem->parent();
 	}
@@ -359,7 +359,7 @@ void SIG_ExperimentListView::slotSelectionChanged( QTreeWidgetItem * theItem )
     {
       QString option = theItem->text(0);
       QString experimentName;
-      while( theItem->parent() != 0)
+      while( theItem->parent() != nullptr)
 	{
 	  theItem = theItem->parent();
 	}
@@ -382,7 +382,7 @@ SIG_GUIGPExperiment* SIG_ExperimentListView::getByExperimentName( QString name )
 {
   if( name != QString() )
     return experimentDict.value( name );
-  return NULL;
+  return nullptr;
 };
 
 bool SIG_ExperimentListView::experimentExists( QString name )
@@ -410,7 +410,7 @@ SIG_GUIGPExperiment* SIG_ExperimentListView::currentlySelectedExperiment()
   if( experimentName != QString() )
     return experimentDict.value( experimentName );
   else
-    return 0;
+    return nullptr;
 };
 
 bool SIG_ExperimentListView::isRunning()
@@ -426,7 +426,7 @@ QString SIG_ExperimentListView::currentlySelectedExperimentName()
   QTreeWidgetItem *theCurrentItem = currentItem();
   if (theCurrentItem)
     {
-      while( theCurrentItem->parent() != 0)
+      while( theCurrentItem->parent() != nullptr)
 	{
 	  theCurrentItem = theCurrentItem->parent();
 	}
@@ -441,7 +441,7 @@ void SIG_ExperimentListView::selectItem( QString label )
   QTreeWidgetItem *theItem = currentItem();
   if( theItem )
     {
-      while( theItem->parent() != 0)
+      while( theItem->parent() != nullptr)
 	{
 	  theItem = theItem->parent();
 	}

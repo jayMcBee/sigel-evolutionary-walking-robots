@@ -88,8 +88,8 @@ bool SIGEL_GP::SIG_GPCrossOverTournament::run()
    
 
    
-   SIG_GPIndividual *winner1 = 0;
-   SIG_GPIndividual *winner2 = 0;
+   SIG_GPIndividual *winner1 = nullptr;
+   SIG_GPIndividual *winner2 = nullptr;
    int looserPos1 = 0;
    int looserPos2 = 0;
    int winnerPos1 = 0;
@@ -181,8 +181,8 @@ bool SIGEL_GP::SIG_GPCrossOverTournament::run(MT_Classifier *MetaClassifier)
    MetaClassifier->createNewTCase(&const_cast<SIGEL_Program::SIG_Program&>(ind1_1.getProgram()), &const_cast<SIGEL_Program::SIG_Program&>(ind1_2.getProgram()),fitness1_1-fitness1_2);
    MetaClassifier->createNewTCase(&const_cast<SIGEL_Program::SIG_Program&>(ind2_1.getProgram()), &const_cast<SIGEL_Program::SIG_Program&>(ind2_2.getProgram()),fitness2_1-fitness2_2);
    
-   SIG_GPIndividual *winner1 = 0;
-   SIG_GPIndividual *winner2 = 0;
+   SIG_GPIndividual *winner1 = nullptr;
+   SIG_GPIndividual *winner2 = nullptr;
    int looserPos1 = 0;
    int looserPos2 = 0;
    int winnerPos1 = 0;
@@ -254,8 +254,8 @@ bool  SIGEL_GP::SIG_GPCrossOverTournament::classify(MT_Classifier *MetaClassifie
    int popos2_1=ind2_1.getPoolPos();
    int popos2_2=ind2_2.getPoolPos();
 
-   SIG_GPIndividual *winner1 = 0;
-   SIG_GPIndividual *winner2 = 0;
+   SIG_GPIndividual *winner1 = nullptr;
+   SIG_GPIndividual *winner2 = nullptr;
    int looserPos1 = 0;
    int looserPos2 = 0;
    int winnerPos1 = 0;

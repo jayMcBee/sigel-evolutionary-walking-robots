@@ -42,7 +42,7 @@ void SIGEL_Simulation::SIG_DynaMechsCommandInterface::moveDrive(int driveNo,
 #ifdef SIG_DEBUG
   SIGEL_Tools::SIG_IO::cerr << "entering method moveDrive" << Qt::endl;
 #endif
-  SIGEL_Robot::SIG_Drive *drive = 0;
+  SIGEL_Robot::SIG_Drive *drive = nullptr;
   dmLink	*internalLink;
   dmRevoluteLink *intRevLink;
   double	  q, qd, intMin, intMax, intSpring, intDamper;

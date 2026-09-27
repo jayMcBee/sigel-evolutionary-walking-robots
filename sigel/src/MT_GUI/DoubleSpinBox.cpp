@@ -18,8 +18,8 @@ DISpinBox::DISpinBox(int decimals, QWidget *parent, const char *name) : QSpinBox
 
 	typ = -1;
 	precision = 0;
-	dValidator = 0;
-	iValidator = 0;
+	dValidator = nullptr;
+	iValidator = nullptr;
 	iDecimals = decimals;
 
 	dValidator = new QDoubleValidator(this);

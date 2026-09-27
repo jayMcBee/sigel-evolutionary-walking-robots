@@ -12,7 +12,7 @@ class MT_SelectionWidget : public MT_SelectionWidgetBase, public MT_WidgetBase
 	Q_OBJECT
 
 public:
-	MT_SelectionWidget(QWidget* parent=0, const char* name=0, Qt::WindowFlags fl = Qt::WindowFlags());
+	MT_SelectionWidget(QWidget* parent=nullptr, const char* name=nullptr, Qt::WindowFlags fl = Qt::WindowFlags());
 	~MT_SelectionWidget();
 
 	void evolutionRunning(bool running);

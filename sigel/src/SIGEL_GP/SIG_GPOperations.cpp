@@ -129,8 +129,8 @@ QList<SIGEL_GP::SIG_GPIndividual *> SIGEL_GP::SIG_GPOperations::crossOver( SIGEL
 	// has a chance of 3:2 to be selected !
   long const generalRecombinationType = randomizer.getRandomInt(5);
 
-	SIGEL_Program::SIG_ProgramLine *newProgLine = 0;
-  SIGEL_Program::SIG_ProgramLine *sourceProgLine = 0;
+	SIGEL_Program::SIG_ProgramLine *newProgLine = nullptr;
+  SIGEL_Program::SIG_ProgramLine *sourceProgLine = nullptr;
 
 	// Recombination/Crossover, Variant 1:
 	// (just guessing from the code, obviously nobody thought it was worth commenting..  -jan)

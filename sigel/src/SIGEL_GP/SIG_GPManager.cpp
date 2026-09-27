@@ -55,7 +55,7 @@ SIGEL_GP::SIG_GPManager::SIG_GPManager(SIGEL_GP::SIG_GPExperiment &experiment)
     fitnessCalculated( false ),
     currentGenerationNo(0)
 {
-	trainer = 0;
+	trainer = nullptr;
 	if(currentExperiment.mtController->IsEnabled() && currentExperiment.mtController->UsedSystem() == EVALUATOR_SUBST){
 		trainer = dynamic_cast<SIG_GPFitnessTrainer*>(currentExperiment.mtController->getFitnessTrainer());
 		if(!trainer)
@@ -265,7 +265,7 @@ void SIGEL_GP::SIG_GPManager::createTours(int quantity) {
 
     int randomResult = randomizer.getRandomInt( totalProbCount ) + 1;
 
-    SIG_GPTournament *actTour = 0;
+    SIG_GPTournament *actTour = nullptr;
 
     if (randomResult <= currentExperiment.gpParameter.getReproductionProb()) {
 
@@ -445,8 +445,8 @@ void SIGEL_GP::SIG_GPManager::evalNewIndis() {
     trainer->sweepToSpawn();
     // One pass over fitTaskList, as in SIG_GPFitnessTrainer::sweepToSpawn.
     qsizetype fitCur = fitTaskList.isEmpty() ? -1 : 0;
-    QList<int> *actFitTask = (fitCur < 0) ? 0 : fitTaskList.at( fitCur );
-    QList<int> *prevFitTask = 0;
+    QList<int> *actFitTask = (fitCur < 0) ? nullptr : fitTaskList.at( fitCur );
+    QList<int> *prevFitTask = nullptr;
 
     while (actFitTask) {
       double actFitness = trainer->checkTask( (*actFitTask)[0] );
@@ -473,7 +473,7 @@ void SIGEL_GP::SIG_GPManager::evalNewIndis() {
         // Past the end: step back to the last task. That is prevFitTask, so the pass ends.
         if (fitCur >= fitTaskList.size())
           fitCur = fitTaskList.isEmpty() ? -1 : fitTaskList.size() - 1;
-        actFitTask = (fitCur < 0) ? 0 : fitTaskList.at( fitCur );
+        actFitTask = (fitCur < 0) ? nullptr : fitTaskList.at( fitCur );
         if (actFitTask == prevFitTask)
           break;
       }
@@ -486,7 +486,7 @@ void SIGEL_GP::SIG_GPManager::evalNewIndis() {
         prevFitTask = actFitTask;
         // next(): a dead cursor stays dead and does NOT advance.
         if (fitCur < 0 || ++fitCur >= fitTaskList.size())
-          { fitCur = -1; actFitTask = 0; }
+          { fitCur = -1; actFitTask = nullptr; }
         else
           actFitTask = fitTaskList.at( fitCur );
       };
@@ -675,16 +675,16 @@ void SIGEL_GP::SIG_GPManager::run() {
 		currentExperiment.mtController->startEvolution();
 
 #ifdef _WINDOWS
-  HANDLE mutex = CreateMutex(NULL, false, NULL);
+  HANDLE mutex = CreateMutex(nullptr, false, nullptr);
 #else
   pthread_mutex_t     mutex = PTHREAD_MUTEX_INITIALIZER;
 #endif
 
   // init the condition variable
 #ifdef _WINDOWS
-  cond = CreateEvent(NULL, true, false, NULL);
+  cond = CreateEvent(nullptr, true, false, nullptr);
 #else
-   pthread_cond_init(&cond, NULL);
+   pthread_cond_init(&cond, nullptr);
 #endif
 
   if (!toursAreEmpty( tours )) {
@@ -767,7 +767,7 @@ void SIGEL_GP::SIG_GPManager::run() {
 	// tell the Meta-System that the current generation ended
 	MT_Evaluator * MetaFitnessTrainer;
 	MetaFitnessTrainer = dynamic_cast<MT_Evaluator*>(trainer);
-	if (MetaFitnessTrainer !=0)
+	if (MetaFitnessTrainer !=nullptr)
 		MetaFitnessTrainer->nextSIGGeneration(averageFitness);
 
     // if the user wants a poolImage and it the generation where it should generate, then he gets it
@@ -901,7 +901,7 @@ void SIGEL_GP::SIG_GPManager::RegisterDynPVMClients( void ) {
   sad.sin_addr.s_addr = INADDR_ANY;
 
   // map TCP protocol number
-  if ((ptrp = getprotobyname("tcp")) == 0) {
+  if ((ptrp = getprotobyname("tcp")) == nullptr) {
     fprintf(stderr, "ERR:   Can't map 'tcp' to a protocol number\n");
 #ifdef _WINDOWS
     WSACleanup();
@@ -969,7 +969,7 @@ void SIGEL_GP::SIG_GPManager::RegisterDynPVMClients( void ) {
   // the (almost) endless server loop
   while ( true ) {
      // pselect returns zero when timeout occurs..
-     select(socke+1, &mySet, NULL, NULL, &timeOut);
+     select(socke+1, &mySet, nullptr, nullptr, &timeOut);
 
      // check what caused pselect() to exit
      if ( FD_ISSET(socke, &mySet) ) {
@@ -1104,16 +1104,16 @@ void SIGEL_GP::SIG_GPManager::run(MT_Classifier *MetaClassifier)
 
 
 #ifdef _WINDOWS
-	HANDLE mutex = CreateMutex(NULL, false, NULL);
+	HANDLE mutex = CreateMutex(nullptr, false, nullptr);
 #else
   pthread_mutex_t     mutex = PTHREAD_MUTEX_INITIALIZER;
 #endif
 
    // init the condition variable
 #ifdef _WINDOWS
-	cond = CreateEvent(NULL, true, false, NULL);
+	cond = CreateEvent(nullptr, true, false, nullptr);
 #else
-   pthread_cond_init(&cond, NULL);
+   pthread_cond_init(&cond, nullptr);
 #endif
 
     if (!toursAreEmpty( tours ))
@@ -1516,8 +1516,8 @@ void SIGEL_GP::SIG_GPManager::evalNeededIndis()
 		ToursParticipant[l]=0;
 int DebugInfo =0;
 
-	SIG_GPTournamentIndividual * PresentIndi =0;
-	SIG_GPTournament *PresentTour =0;
+	SIG_GPTournamentIndividual * PresentIndi =nullptr;
+	SIG_GPTournament *PresentTour =nullptr;
 	for(int l=0; l<tours.size();l++)
 	{	
 		PresentTour = tours[l];
@@ -1574,8 +1574,8 @@ int DebugInfo =0;
 	trainer->sweepToSpawn();
 	// One pass over fitTaskList, as in SIG_GPFitnessTrainer::sweepToSpawn.
 	qsizetype fitCur = fitTaskList.isEmpty() ? -1 : 0;
-	QList<int> *actFitTask = (fitCur < 0) ? 0 : fitTaskList.at( fitCur );
-	QList<int> *prevFitTask = 0;
+	QList<int> *actFitTask = (fitCur < 0) ? nullptr : fitTaskList.at( fitCur );
+	QList<int> *prevFitTask = nullptr;
 
 	while (actFitTask)
 	  {
@@ -1592,7 +1592,7 @@ int DebugInfo =0;
 		// Past the end: step back to the last task. That is prevFitTask, so the pass ends.
 		if (fitCur >= fitTaskList.size())
 		  fitCur = fitTaskList.isEmpty() ? -1 : fitTaskList.size() - 1;
-		actFitTask = (fitCur < 0) ? 0 : fitTaskList.at( fitCur );
+		actFitTask = (fitCur < 0) ? nullptr : fitTaskList.at( fitCur );
 		if (actFitTask == prevFitTask)
 		  break;
 	      }
@@ -1603,7 +1603,7 @@ int DebugInfo =0;
 		prevFitTask = actFitTask;
 		// next(): a dead cursor stays dead and does NOT advance.
 		if (fitCur < 0 || ++fitCur >= fitTaskList.size())
-		  { fitCur = -1; actFitTask = 0; }
+		  { fitCur = -1; actFitTask = nullptr; }
 		else
 		  actFitTask = fitTaskList.at( fitCur );
 	      };

@@ -13,13 +13,13 @@ MT_Substitute::MT_Substitute()
 {
  // overloaded method
 #ifdef _WINDOWS
-	interpreterMutex = CreateMutex(NULL, false, NULL);
-	tCaseBufferMutex = CreateMutex(NULL, false, NULL);
-	fitnessMutex	 = CreateMutex(NULL, false, NULL);
+	interpreterMutex = CreateMutex(nullptr, false, nullptr);
+	tCaseBufferMutex = CreateMutex(nullptr, false, nullptr);
+	fitnessMutex	 = CreateMutex(nullptr, false, nullptr);
 #else
-	pthread_mutex_init(&interpreterMutex, NULL);
-	pthread_mutex_init(&tCaseBufferMutex, NULL);
-	pthread_mutex_init(&fitnessMutex, NULL);
+	pthread_mutex_init(&interpreterMutex, nullptr);
+	pthread_mutex_init(&tCaseBufferMutex, nullptr);
+	pthread_mutex_init(&fitnessMutex, nullptr);
 #endif
 }
 
@@ -41,7 +41,7 @@ MT_Substitute::~MT_Substitute()
 
 void MT_Substitute::changeBest(MT_Program * MetaProg)
 {
-	if (BestMETAProgram !=0)
+	if (BestMETAProgram !=nullptr)
 		delete BestMETAProgram;
 	
 	BestMETAProgram = new MT_Program(MetaProg);

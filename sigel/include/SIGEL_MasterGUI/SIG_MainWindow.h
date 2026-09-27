@@ -64,7 +64,7 @@ namespace SIGEL_MasterGUI
        * the widget will get its own window.
        * @param name Internal widget name for Qt.
        */
-      SIG_MainWindow( QWidget * parent = 0, const char * name = 0, Qt::WindowFlags f = Qt::Window );
+      SIG_MainWindow( QWidget * parent = nullptr, const char * name = nullptr, Qt::WindowFlags f = Qt::Window );
 
       /**
        * The destructor of SIG_MainWindow.

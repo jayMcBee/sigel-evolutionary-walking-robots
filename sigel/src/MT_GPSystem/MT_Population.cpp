@@ -13,7 +13,7 @@ MT_Population::MT_Population()
 	FirstFreePos=0;
 	PopSize =1;
 	Individuals.resize(1);
-	Individuals[0]=0;
+	Individuals[0]=nullptr;
 	LastError =0;
 	Change =false;
 
@@ -65,7 +65,7 @@ void MT_Population::writeToFilePop(QTextStream &File)
 	File << FirstFreePos << Qt::endl << Qt::endl;
 	
 	for (int i=0; i<FirstFreePos; i++)
-		if (Individuals[i] != NULL)
+		if (Individuals[i] != nullptr)
 			(Individuals[i])->writeToFileIndi(File);
 }
 
@@ -155,7 +155,7 @@ MT_Individual * MT_Population::getIndividual(int Pos)
 	if ((Pos<FirstFreePos)&&(Pos >= 0))
 		return Individuals[Pos];
 	else 
-		return 0;
+		return nullptr;
 }
 
 // ************************ random generation 
@@ -231,7 +231,7 @@ MT_Individual * MT_Population::insertAtPos(MT_Individual *NewIndividual, int Pos
 
 	MT_Individual *Indi = Individuals[Pos];
 
-	if(NewIndividual != 0){
+	if(NewIndividual != nullptr){
 		NewIndividual->setPosition(Pos);
 	}
 
@@ -264,7 +264,7 @@ MT_Individual * MT_Population::delIndividual(int Pos)
 		Pos++;
 	}
 
-	Individuals[Pos] =0; 
+	Individuals[Pos] =nullptr; 
 	
 	Individuals.resize(PopSize-1);
 	PopSize --;
@@ -284,7 +284,7 @@ MT_Individual * MT_Population::removeIndividual(int Pos)
 		Pos++;
 	}
 
-	Individuals[Pos] =0; 
+	Individuals[Pos] =nullptr; 
 	
 	FirstFreePos--;
 	
@@ -294,7 +294,7 @@ MT_Individual * MT_Population::removeIndividual(int Pos)
 void MT_Population::flush()
 {
 	for (int i=0; i<PopSize; i++)
-		Individuals[i] = 0;
+		Individuals[i] = nullptr;
 
 	FirstFreePos=0;
 
@@ -337,10 +337,10 @@ bool MT_Population::changePopSize(int NewPopSize)
 		{	
 			for(int i= NewPopSize; i<PopSize; i++)
 			{
-				if(Individuals[i] !=0)
+				if(Individuals[i] !=nullptr)
 				{
 					delete Individuals[i];
-					Individuals[i] =0;
+					Individuals[i] =nullptr;
 				}
 			}
 
@@ -354,7 +354,7 @@ bool MT_Population::changePopSize(int NewPopSize)
 		{	
 			Individuals.resize(NewPopSize);
 			for(int i=PopSize; i< NewPopSize; i++)
-				Individuals[i] =0;
+				Individuals[i] =nullptr;
 			
 			PopSize=NewPopSize;		
 			Change = true;

@@ -35,15 +35,15 @@ namespace SIGEL_Robot {
 
         SIG_Robot::SIG_Robot ()
                 : language (new SIG_LanguageParameters ()),
-                  rootlink (0),
+                  rootlink (nullptr),
 		  initialLocation(0, 0, 0)
         {
 	  initialOrientation.makeone();
 	}
 
         SIG_Robot::SIG_Robot (QTextStream & tx)
-                : language (0),
-		  rootlink (0),
+                : language (nullptr),
+		  rootlink (nullptr),
 		  initialLocation(0, 0, 0)
         {
 	  initialOrientation.makeone();
@@ -51,8 +51,8 @@ namespace SIGEL_Robot {
         }
 
         SIG_Robot::SIG_Robot (const SIG_Robot & rob)
-	  : language (0),
-	    rootlink (0),
+	  : language (nullptr),
+	    rootlink (nullptr),
 	    initialLocation(0, 0, 0)
         {
 	        initialOrientation.makeone();
@@ -76,7 +76,7 @@ namespace SIGEL_Robot {
 
                 delete language;
                 language = new SIG_LanguageParameters ();
-                rootlink = 0;
+                rootlink = nullptr;
 
                 // Freed in the reverse of construction order, as before.
                 qDeleteAll (sensors);
@@ -146,7 +146,7 @@ namespace SIGEL_Robot {
                 for (qsizetype i = bodies.size () - 1; i >= 0; --i)
                         if (bodies.at (i)->getName () == n)
                                 return bodies.at (i);
-                return 0;
+                return nullptr;
         }
 
         SIG_Material *SIG_Robot::lookupMaterial (QString n) const
@@ -155,7 +155,7 @@ namespace SIGEL_Robot {
                 for (qsizetype i = materials.size () - 1; i >= 0; --i)
                         if (materials.at (i)->getName () == n)
                                 return materials.at (i);
-                return 0;
+                return nullptr;
         }
 
         SIG_Link *SIG_Robot::lookupLink (QString n) const
@@ -164,7 +164,7 @@ namespace SIGEL_Robot {
                 for (qsizetype i = links.size () - 1; i >= 0; --i)
                         if (links.at (i)->getName () == n)
                                 return links.at (i);
-                return 0;
+                return nullptr;
         }
 
         SIG_Joint *SIG_Robot::lookupJoint (QString n) const
@@ -173,7 +173,7 @@ namespace SIGEL_Robot {
                 for (qsizetype i = joints.size () - 1; i >= 0; --i)
                         if (joints.at (i)->getName () == n)
                                 return joints.at (i);
-                return 0;
+                return nullptr;
         }
 
         SIG_Drive *SIG_Robot::lookupDrive (QString n) const
@@ -182,7 +182,7 @@ namespace SIGEL_Robot {
                 for (qsizetype i = drives.size () - 1; i >= 0; --i)
                         if (drives.at (i)->getName () == n)
                                 return drives.at (i);
-                return 0;
+                return nullptr;
         }
 
         SIG_Sensor *SIG_Robot::lookupSensor (QString n) const
@@ -191,7 +191,7 @@ namespace SIGEL_Robot {
                 for (qsizetype i = sensors.size () - 1; i >= 0; --i)
                         if (sensors.at (i)->getName () == n)
                                 return sensors.at (i);
-                return 0;
+                return nullptr;
         }
 
         const QList<SIG_Body *> &SIG_Robot::getBodies (void) const
@@ -279,7 +279,7 @@ namespace SIGEL_Robot {
         {
 	  instantiateGeometries ();
 
-	  rootlink->transformToDynaMechs( 0 );
+	  rootlink->transformToDynaMechs( nullptr );
 
 	  initiate();
 
@@ -371,7 +371,7 @@ namespace SIGEL_Robot {
 
                 tx >> tmpstr;
                 if (tmpstr == "-")
-                        rootlink = 0;
+                        rootlink = nullptr;
                 else {
                         rootlink = lookupLink (tmpstr);
                         if (!rootlink)
@@ -381,10 +381,10 @@ namespace SIGEL_Robot {
                 tx >> tmpstr;
                 if (tmpstr == "LanguageParameters") {
                         delete language;
-                        language = 0;   // the constructor below can throw
+                        language = nullptr;   // the constructor below can throw
                         language = new SIG_LanguageParameters (tx);
                 } else
-                        language = 0;
+                        language = nullptr;
         }
 
         void SIG_Robot::vectorToStream (QTextStream & tx, DL_vector vec)

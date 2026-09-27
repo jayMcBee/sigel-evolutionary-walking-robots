@@ -76,7 +76,7 @@ void MT_Statistics::writeToFileMT_Statistics(QTextStream & File)
 	File << Qt::endl;
 
 	for (int i=0; i<(StatisticsOfGeneration.size());i++)
-		if (getStatisticElement(i) != NULL)
+		if (getStatisticElement(i) != nullptr)
 			getStatisticElement(i)->writeToFileElement(File);
 	
 }

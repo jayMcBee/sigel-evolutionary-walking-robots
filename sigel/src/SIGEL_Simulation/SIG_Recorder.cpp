@@ -28,12 +28,12 @@
 SIGEL_Simulation::SIG_Recorder::SIG_Recorder()
   : initialized(false), finished(false)
 {
-  simulationQueries = 0;
+  simulationQueries = nullptr;
 };
 
 void SIGEL_Simulation::SIG_Recorder::init()
 { 
-  if (simulationQueries==0)
+  if (simulationQueries==nullptr)
     throw SIG_RecorderNoQueriesSetException(__FILE__,__LINE__,"Init called before setSimulationQueries");
   if (initialized)
     throw SIG_RecorderBadRecordingOrderException(__FILE__,__LINE__,"Init called more than once");
@@ -42,7 +42,7 @@ void SIGEL_Simulation::SIG_Recorder::init()
 
 void SIGEL_Simulation::SIG_Recorder::record()
 {
-  if (simulationQueries==0)
+  if (simulationQueries==nullptr)
     throw SIG_RecorderNoQueriesSetException(__FILE__,__LINE__,"Record called before setSimulationQueries");
   if (!initialized)
     throw SIG_RecorderBadRecordingOrderException(__FILE__,__LINE__,"Record called before Init");
@@ -52,7 +52,7 @@ void SIGEL_Simulation::SIG_Recorder::record()
 
 void SIGEL_Simulation::SIG_Recorder::finish()
 {
-  if (simulationQueries==0)
+  if (simulationQueries==nullptr)
     throw SIG_RecorderNoQueriesSetException(__FILE__,__LINE__,"Finish called before setSimulationQueries");
   if (!initialized)
     throw SIG_RecorderBadRecordingOrderException(__FILE__,__LINE__,"Finish called before Init");

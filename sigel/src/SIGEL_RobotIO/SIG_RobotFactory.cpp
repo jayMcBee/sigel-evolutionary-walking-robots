@@ -24,7 +24,7 @@
 
 namespace SIGEL_RobotIO {
         SIG_RobotFactory::SIG_RobotFactory (void)
-                : robot (0)
+                : robot (nullptr)
         { }
 
         SIG_RobotFactory::~SIG_RobotFactory (void)

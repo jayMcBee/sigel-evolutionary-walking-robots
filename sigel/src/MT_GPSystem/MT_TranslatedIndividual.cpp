@@ -12,12 +12,12 @@ MT_TranslatedIndividual::MT_TranslatedIndividual()
 {
 	//Do not use 
 
-	T_Instruktion=0;
-	T_Operand1 = 0;
-	T_Operand2 =0;
+	T_Instruktion=nullptr;
+	T_Operand1 = nullptr;
+	T_Operand2 =nullptr;
 	T_length = 0;
 	Boundary = -1;
-	MetaData = 0;
+	MetaData = nullptr;
 
 }
 

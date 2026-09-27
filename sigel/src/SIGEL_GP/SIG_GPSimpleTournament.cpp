@@ -71,7 +71,7 @@ bool SIGEL_GP::SIG_GPSimpleTournament::run()
    
    //The tournament action
    
-   SIG_GPIndividual *winner = 0;
+   SIG_GPIndividual *winner = nullptr;
    int looserPos = 0;
    int winnerPos = 0;
 
@@ -138,7 +138,7 @@ bool SIGEL_GP::SIG_GPSimpleTournament::run(MT_Classifier *MetaClassifier)
 
    //The tournament action
    
-   SIG_GPIndividual *winner = 0;
+   SIG_GPIndividual *winner = nullptr;
    int looserPos = 0;
    int winnerPos = 0;
 
@@ -190,7 +190,7 @@ bool SIGEL_GP::SIG_GPSimpleTournament::classify(MT_Classifier *MetaClassifier)
 
   //The tournament action
    
-   SIG_GPIndividual *winner = 0;
+   SIG_GPIndividual *winner = nullptr;
    int looserPos = 0;
    int winnerPos = 0;
 

@@ -41,10 +41,10 @@ namespace SIGEL_Robot {
                 : parent (par),
                   name (n),
                   number (nr),
-                  body (0),
-                  geometry (0),
-                  mirtich (0),
-                  material (0),
+                  body (nullptr),
+                  geometry (nullptr),
+                  mirtich (nullptr),
+                  material (nullptr),
                   adjacentJoints (),
                   noCollide (),
                   initialLocation (0.0, 0.0, 0.0),
@@ -55,8 +55,8 @@ namespace SIGEL_Robot {
 
         SIG_Link::SIG_Link (SIG_Robot *par, QTextStream & tx)
                 : parent (par),
-                  geometry (0),
-                  mirtich (0)
+                  geometry (nullptr),
+                  mirtich (nullptr)
         {
                 QString tmpstr;
                 int anum;
@@ -167,7 +167,7 @@ namespace SIGEL_Robot {
                 DL_vector *t;
                 // Backwards, for the newest binding -- see SIG_Robot::lookupLink. A
                 // forward loop with a break would find the oldest.
-                t = 0;
+                t = nullptr;
                 for (qsizetype i = points.size () - 1; i >= 0; --i)
                         if (points.at (i).name == id) { t = points.at (i).value; break; }
                 if (t)

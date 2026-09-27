@@ -32,7 +32,7 @@
 						    char const *name,
 						    Qt::WindowFlags f )
     : QOpenGLWidget(parent, f),
-      visualisation(0),
+      visualisation(nullptr),
       floatingTextWidgets(),
       floatingTextsSize(),
       showAncorPointsState(0),

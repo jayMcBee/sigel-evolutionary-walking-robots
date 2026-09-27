@@ -15,7 +15,7 @@ class SIG_ExperimentViewBase : public QWidget, public Ui::SIG_ExperimentViewBase
     Q_OBJECT
 
 public:
-    SIG_ExperimentViewBase(QWidget* parent = 0, const char* name = 0, Qt::WindowFlags fl = Qt::WindowFlags());
+    SIG_ExperimentViewBase(QWidget* parent = nullptr, const char* name = nullptr, Qt::WindowFlags fl = Qt::WindowFlags());
     ~SIG_ExperimentViewBase() override;
 
 public slots:

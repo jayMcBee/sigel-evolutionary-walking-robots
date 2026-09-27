@@ -105,7 +105,7 @@ namespace SIGEL_Robot {
                                              DL_Scalar fricval,
                                              bool negotiate)
         {
-                FrictionValue *found = 0;
+                FrictionValue *found = nullptr;
                 for (FrictionValue *fv : friction)
                         if (fv->otherSide == otherObj) {
                                 fv->value = fricval;

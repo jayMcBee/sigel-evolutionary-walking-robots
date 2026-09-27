@@ -909,8 +909,18 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-27 — DONE: ITEM 109, THE GATES REDUCED TO WHAT IS VITAL.** Start
-here.
+**2026-09-27 — DONE: ITEM 6, NULL AND 0 BECOME NULLPTR.** Start here.
+
+- **Changed:** 434 null pointers in 109 files, one token each. Details are in
+  item 6's entry in "Done".
+- **Baselines:** unchanged.
+- **Review:** no defects. It noted that code inside `#ifdef _WINDOWS` is not
+  compiled here, so a `0` pointer there was not found.
+- **Gates:** `check.sh` 758 pass, 0 fail; warnings 486. The other four gates
+  are green.
+- **Next:** more mechanical cleaning, as the maintainer chooses.
+
+**2026-09-27 — DONE: ITEM 109, THE GATES REDUCED TO WHAT IS VITAL.**
 
 - **Changed:** `check.sh` no longer counts a pass per compiled module file,
   runs `expstruct selfcheck`, compiles the two programs separately, or runs
@@ -6329,6 +6339,15 @@ carried; other items and this file cite them, so they do not change.
   `expstruct selfcheck`, which tested our tool; the syntax compile of the two
   programs; and `real clicks`, with its `xtest` scenario and
   `xtest-baseline.txt`. `check.sh` gives 757 pass.
+
+- [x] **6. `NULL` → `nullptr`** — done 2026-09-27, one commit. Every null
+  pointer in SIGEL's own C++ is `nullptr`: 62 written `NULL`, and 372 written
+  `0`, which `g++ -Wzero-as-null-pointer-constant` found over every `.cpp`
+  and every header. Left: three `PTHREAD_MUTEX_INITIALIZER` sites in
+  `SIG_GPManager.cpp`, which are glibc's macro; `NULL` in the C file
+  `manage_dyn_slave.c` and in comments; and any `0` pointer inside
+  `#ifdef _WINDOWS`, which is not compiled here, such as the last argument of
+  `CreateThread` in `main` and in `MT_Controller`.
 
 - [x] **103. The tournaments-per-generation counter went stale** — done
   2026-09-27. Reported by the x86 machine. `SIG_GPParameter` computed the

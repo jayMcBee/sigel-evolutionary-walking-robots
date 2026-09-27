@@ -15,7 +15,7 @@ class SIG_SimulationParameterBase : public QWidget, public Ui::SIG_SimulationPar
     Q_OBJECT
 
 public:
-    SIG_SimulationParameterBase(QWidget* parent = 0, const char* name = 0, Qt::WindowFlags fl = Qt::WindowFlags());
+    SIG_SimulationParameterBase(QWidget* parent = nullptr, const char* name = nullptr, Qt::WindowFlags fl = Qt::WindowFlags());
     ~SIG_SimulationParameterBase() override;
 
 protected:

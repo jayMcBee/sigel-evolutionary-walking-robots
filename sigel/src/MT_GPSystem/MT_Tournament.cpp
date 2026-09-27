@@ -21,7 +21,7 @@ MT_Tournament::MT_Tournament(int Size, int num)
 {
 	Individuals.resize(Size);
 	for(int i=0; i<Size; i++)
-		Individuals[i]=0;
+		Individuals[i]=nullptr;
 
 	NumberOfWinner=num;
 	LastError =0;

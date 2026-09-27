@@ -50,7 +50,7 @@ SIGEL_Simulation::SIG_DynaMechsSimulationQueries::SIG_DynaMechsSimulationQueries
 void SIGEL_Simulation::SIG_DynaMechsSimulationQueries::sense(int sensorNo,
 							     QList<SIG_Register> & registers) const
 {
-	SIGEL_Robot::SIG_Sensor		*sensor = 0;
+	SIGEL_Robot::SIG_Sensor		*sensor = nullptr;
 	SIGEL_Robot::SIG_JointSensor	*jointSensor;
 	SIGEL_Robot::SIG_Joint const	*joint;
 	SIGEL_Robot::SIG_PitchRollSensor *prSensor;
@@ -209,7 +209,7 @@ void SIGEL_Simulation::SIG_DynaMechsSimulationQueries::sense(int sensorNo,
 														// always assume our contact model is at index 0 in dmRigidBody !
 														// this seems to work since we add only one force to this bloody object..
 														contactModel = static_cast<dmContactModel *>(rBody->getForce(0));
-														if (contactModel == NULL)
+														if (contactModel == nullptr)
 														{	SIGEL_Tools::SIG_IO::cerr << "failed to get the dmContactModel" << Qt::endl;
 															break;
 														}

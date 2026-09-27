@@ -173,7 +173,7 @@ void SIG_ExperimentView::slotExportPostScript() {
 
   FILE *gnuPlotStdInPipe = popen( "gnuplot -persist -", "w" );
 
-  if (gnuPlotStdInPipe==NULL)
+  if (gnuPlotStdInPipe==nullptr)
     {
       QMessageBox::warning( this, "Error", "Couldn't start gnuplot.", "OK" );
       return;
@@ -235,7 +235,7 @@ void SIG_ExperimentView::slotShowFitnesscurve() {
   //signal(SIGPIPE,sigelSignalStandardHandler);
   FILE *gnuPlotStdInPipe = popen( "gnuplot -persist -", "w" );
 
-  if (gnuPlotStdInPipe==NULL ) {
+  if (gnuPlotStdInPipe==nullptr ) {
     QMessageBox::warning( this, "Error", "Couldn't start gnuplot.", "OK" );
     return;
   };

@@ -33,7 +33,7 @@ namespace SIGEL_CommonGUI
 
     public:
       SIG_FloatingTextLabel( QWidget * parent,
-			     const char * name=0 );
+			     const char * name=nullptr );
 
     private:
       void mousePressEvent( QMouseEvent *e );

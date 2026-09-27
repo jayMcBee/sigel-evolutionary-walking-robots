@@ -118,8 +118,8 @@ namespace SIGEL_RobotIO {
 				virtual void pitchRollSensorLink(SIG_PitchRollSensor *prs, QString linkname);
 		        virtual void pitchRollSensorFinish (SIG_PitchRollSensor *prs);
 
-                virtual SIG_Geometry *surfaceFind (QString name) { return NULL; }
-                virtual SIG_Polygon *surfaceNewPoly (SIG_Geometry *g) { return NULL; }
+                virtual SIG_Geometry *surfaceFind (QString name) { return nullptr; }
+                virtual SIG_Polygon *surfaceNewPoly (SIG_Geometry *g) { return nullptr; }
                 virtual void surfaceNewPoint (SIG_Polygon *p,
                                               DL_Scalar x,
                                               DL_Scalar y,

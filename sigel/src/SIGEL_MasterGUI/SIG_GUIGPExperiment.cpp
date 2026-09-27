@@ -41,7 +41,7 @@
 namespace SIGEL_MasterGUI
 {
 
-  SIG_GUIGPExperiment::SIG_GUIGPExperiment( QString name, QStackedWidget *theWidgetStack, SIG_ExperimentItem *theExperimentItem ) : gpExperiment(), guiGPManager(0), experimentName(name), widgetStack( theWidgetStack ), evolutionRunning(false), generationAtStart(0), experimentItem(theExperimentItem), experimentListView( static_cast<SIG_ExperimentListView *>( theExperimentItem->treeWidget() ) )
+  SIG_GUIGPExperiment::SIG_GUIGPExperiment( QString name, QStackedWidget *theWidgetStack, SIG_ExperimentItem *theExperimentItem ) : gpExperiment(), guiGPManager(nullptr), experimentName(name), widgetStack( theWidgetStack ), evolutionRunning(false), generationAtStart(0), experimentItem(theExperimentItem), experimentListView( static_cast<SIG_ExperimentListView *>( theExperimentItem->treeWidget() ) )
 {
   // build the gp parameter menu
   menuGPParameter = new QMenu( this );

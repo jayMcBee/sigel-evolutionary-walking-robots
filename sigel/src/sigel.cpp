@@ -167,7 +167,7 @@ int main( int argc, char *argv[] ) {
     info = pvm_start_pvmd( 0, 0, 0 );  // start PVM daemon normally
   }
 #else
-  int info = pvm_start_pvmd( 0, 0, 0 );
+  int info = pvm_start_pvmd( 0, nullptr, 0 );
 #endif
 
   // Register to PVM
@@ -210,7 +210,7 @@ int main( int argc, char *argv[] ) {
     app.setStyle( QStyleFactory::create( "Fusion" ) );
 #endif
 
-    SIGEL_MasterGUI::SIG_MainWindow *mainWindow = new SIGEL_MasterGUI::SIG_MainWindow( 0 , "MainWindow" );
+    SIGEL_MasterGUI::SIG_MainWindow *mainWindow = new SIGEL_MasterGUI::SIG_MainWindow( nullptr , "MainWindow" );
     mainWindow->show();
 
     int result = app.exec();
@@ -255,14 +255,14 @@ int main( int argc, char *argv[] ) {
     // clients to register all the time while we're running
     if (dynClients) {
 #ifdef _WINDOWS
-      serv_thread = CreateThread( NULL, 0, &MeJustCallingRegisterDynPVMClients, &gpManager, 0, 0 );
+      serv_thread = CreateThread( nullptr, 0, &MeJustCallingRegisterDynPVMClients, &gpManager, 0, 0 );
 #else
       pthread_t serv_thread;
       // 1.3 cast the thread function to (void *), which pthread_create takes as
       // void *(*)(void *). Older compilers let that through; C++17 does not, so
       // the cast is spelled out. The function still returns nothing and the
       // return value is still never read, exactly as before.
-      pthread_create(&serv_thread, NULL,(void *(*)(void *)) &MeJustCallingRegisterDynPVMClients,(void *) &gpManager);
+      pthread_create(&serv_thread, nullptr,(void *(*)(void *)) &MeJustCallingRegisterDynPVMClients,(void *) &gpManager);
 
 
 #endif

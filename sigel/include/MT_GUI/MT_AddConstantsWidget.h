@@ -11,7 +11,7 @@ class MT_AddConstantsWidget : public MT_AddConstantsWidgetBase
 	Q_OBJECT
 
 public:
-	MT_AddConstantsWidget(MT_IndividualsWidget *parent=0, const char *name=0, bool modal=true, Qt::WindowFlags fl = Qt::WindowFlags() );
+	MT_AddConstantsWidget(MT_IndividualsWidget *parent=nullptr, const char *name=nullptr, bool modal=true, Qt::WindowFlags fl = Qt::WindowFlags() );
 	~MT_AddConstantsWidget();
 
 private:

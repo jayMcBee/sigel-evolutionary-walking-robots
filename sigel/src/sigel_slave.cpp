@@ -112,11 +112,11 @@ int main( int argc, char *argv[] ) {
   std::signal( SIGTERM, sigelStandardSignalHandler );
 #endif
 
-  SIGEL_Robot::SIG_Robot *robot = 0;
-  SIGEL_Environment::SIG_Environment *environment = 0;
-  SIGEL_Simulation::SIG_SimulationParameters *simulationParameters = 0;
-  SIGEL_Program::SIG_Program *program = 0;
-  SIGEL_GP::SIG_GPExperiment *experiment = 0;
+  SIGEL_Robot::SIG_Robot *robot = nullptr;
+  SIGEL_Environment::SIG_Environment *environment = nullptr;
+  SIGEL_Simulation::SIG_SimulationParameters *simulationParameters = nullptr;
+  SIGEL_Program::SIG_Program *program = nullptr;
+  SIGEL_GP::SIG_GPExperiment *experiment = nullptr;
   bool visualize = false;
   QString fitnessFunctionName;
 
@@ -261,7 +261,7 @@ int main( int argc, char *argv[] ) {
 #else
       QApplication::setStyle( QStyleFactory::create( "Fusion" ) );
 #endif		
-      SIG_SimulationWindow *simWindow = new SIG_SimulationWindow(0, "simWindow");
+      SIG_SimulationWindow *simWindow = new SIG_SimulationWindow(nullptr, "simWindow");
 
       simWindow->setWindowTitle("Simulation Visualisation");
       simWindow->show();

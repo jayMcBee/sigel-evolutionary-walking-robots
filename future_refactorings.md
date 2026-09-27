@@ -62,8 +62,6 @@ Constructs the language removed. A current compiler rejects them.
   | MT_GPSystem | 17 | SIGEL_Program, SIGEL_SlaveGUI | 3 |
   | SIGEL_CommonGUI | 12 | | |
 
-- [ ] **6. `NULL` → `nullptr`** — mechanical, one commit.
-
 - [ ] **7. `explicit` on single-argument constructors** — per module. Every
   break is an implicit conversion that was happening silently.
 

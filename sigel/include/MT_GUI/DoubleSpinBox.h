@@ -15,7 +15,7 @@
 class DISpinBox : public QSpinBox  
 {
 public:
-	DISpinBox(int decimals, QWidget *parent=0, const char *name=0);
+	DISpinBox(int decimals, QWidget *parent=nullptr, const char *name=nullptr);
 	virtual ~DISpinBox();
 
 	int getTyp();

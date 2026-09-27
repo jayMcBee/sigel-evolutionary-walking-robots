@@ -11,7 +11,7 @@
 MT_Program::MT_Program()
 {
 	LastError= 0;
-	Program  = 0;
+	Program  = nullptr;
 	Length   = 0;
 }
 
@@ -27,7 +27,7 @@ MT_Program::MT_Program (MT_Randomizer *Randi)
 {
 	LastError= 0;
 	Length   = 0;
-	Program  = 0;
+	Program  = nullptr;
 	int nLength = Randi->getProgLength();
 	MaxLength = Randi->getProgramLengthMax();
 	resize(nLength);
@@ -44,7 +44,7 @@ MT_Program::MT_Program(QTextStream &File)
 {
 	LastError= 0;
 	Length   = 0;
-	Program  = 0;
+	Program  = nullptr;
 	int nLength = 0;
 	QString ProString ("Program:" );
 	QString PresentLine = File.readLine();
@@ -70,7 +70,7 @@ MT_Program::MT_Program(MT_Program *Prog)
 {
 	LastError=0;
 	Length  = 0;
-	Program = 0;
+	Program = nullptr;
 	int nLength = Prog->Length;
 	MaxLength = Prog->MaxLength;
 	
@@ -86,7 +86,7 @@ MT_Program::MT_Program(MT_Program *Prog, int Start, int End)
 {
 	LastError=0;
 	Length  = 0;
-	Program = 0;
+	Program = nullptr;
 	int nLength = End-Start+1;
 	MaxLength = nLength;
 	resize(nLength);
@@ -103,9 +103,9 @@ void MT_Program::writeToFileProgram(QTextStream &File)
 	File << MaxLength << Qt::endl;
 	File << Length << Qt::endl;
 
-	if (Program != NULL)
+	if (Program != nullptr)
 		for (int i=0; i<Length; i++)
-			if (Program[i] != NULL)
+			if (Program[i] != nullptr)
 				(Program[i])->writeToFileProgramLine(File);
 
 	File << Qt::endl;
@@ -118,7 +118,7 @@ void MT_Program::writeToFileProgram(QTextStream &File)
 MT_Programline* MT_Program::getProgramLine(int Index)
 {
 	if(Index<0 || Index>=Length)
-		return NULL;
+		return nullptr;
 
 	return Program[Index];
 }
@@ -158,7 +158,7 @@ void MT_Program::changeMaxProgLen(int NewLen)
 		for (int i=MaxLength; i<Length; i++) 
 		{
 			delete Program[i];
-			Program[i] = 0;
+			Program[i] = nullptr;
 		}
 		resize(MaxLength);
 		Length = MaxLength;
@@ -214,7 +214,7 @@ void MT_Program::clearProgram()
 {
 
 	for(int i=0; i<Length; i++){
-		Program[i] = 0;
+		Program[i] = nullptr;
 	}
 }
 
@@ -239,7 +239,7 @@ void MT_Program::resize(int nSize)
 			for(int i=nSize; i<Length; i++)
 			{
 				delete Program[i];
-				Program[i]=0;
+				Program[i]=nullptr;
 			}
 			
 			Length = nSize; 
@@ -247,7 +247,7 @@ void MT_Program::resize(int nSize)
 			for(int i=0; i<nSize; i++)
 			{
 				tmpArray[i] = Program[i];
-				Program[i] =0;
+				Program[i] =nullptr;
 			}
 			
 		} 
@@ -257,11 +257,11 @@ void MT_Program::resize(int nSize)
 			for(int i=0; i<Length; i++)
 			{
 				tmpArray[i] = Program[i];
-				Program[i] =0;
+				Program[i] =nullptr;
 			}
 			// initialize the empty slots with null
 			for(int i=Length; i<nSize; i++)
-				tmpArray[i] = 0;
+				tmpArray[i] = nullptr;
 		}
 	
 		

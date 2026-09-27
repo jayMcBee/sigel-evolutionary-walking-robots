@@ -65,7 +65,7 @@ namespace {
     {
       QList< SIGEL_Simulation::SIG_DynaMechsLink * > *links;
 
-      ~DynaMechsLinkGuard() { if (links) { qDeleteAll( *links ); links->fill( 0 ); } }
+      ~DynaMechsLinkGuard() { if (links) { qDeleteAll( *links ); links->fill( nullptr ); } }
     };
 
 };
@@ -85,7 +85,7 @@ SIGEL_Simulation::SIG_DynaMechsSimulationData::SIG_DynaMechsSimulationData( SIGE
     pi( std::atan( 1 ) * 4 )
 #endif
 {
-  dynaMechsLinks.fill( 0 );
+  dynaMechsLinks.fill( nullptr );
 
   DynaMechsLinkGuard linkGuard = { &dynaMechsLinks };
 
@@ -93,9 +93,9 @@ SIGEL_Simulation::SIG_DynaMechsSimulationData::SIG_DynaMechsSimulationData( SIGE
 
   driveForcesTimeAccounts.fill( 0 );
 
-  drives.fill( 0 );
+  drives.fill( nullptr );
 
-  sensors.fill( 0 );
+  sensors.fill( nullptr );
 
   initializeEnvironment();
 
@@ -203,7 +203,7 @@ SIGEL_Simulation::SIG_DynaMechsSimulationData::SIG_DynaMechsSimulationData( SIGE
 
   dynaMechsIntegrator->setSystem( &dynaMechsSystem );
 
-  linkGuard.links = 0;
+  linkGuard.links = nullptr;
 };
 
 void SIGEL_Simulation::SIG_DynaMechsSimulationData::setNewFrame( bool newValue )
@@ -213,7 +213,7 @@ SIGEL_Simulation::SIG_DynaMechsSimulationData::~SIG_DynaMechsSimulationData()
 {
   // This class owns the links it built; drives and sensors belong to the robot.
   qDeleteAll( dynaMechsLinks );
-  dynaMechsLinks.fill( 0 );
+  dynaMechsLinks.fill( nullptr );
 };
 
 void SIGEL_Simulation::SIG_DynaMechsSimulationData::simulationProgress()
@@ -263,7 +263,7 @@ void SIGEL_Simulation::SIG_DynaMechsSimulationData::simulationProgress()
 	};
     };
 
-  dynaMechsLinks[ robot.getRootLink()->getNumber() ]->forwardKinematics( 0 );
+  dynaMechsLinks[ robot.getRootLink()->getNumber() ]->forwardKinematics( nullptr );
 };
 
 void SIGEL_Simulation::SIG_DynaMechsSimulationData::initializeEnvironment()
@@ -357,7 +357,7 @@ void SIGEL_Simulation::SIG_DynaMechsSimulationData::initializeArticulation()
   delete dynaMechsLinks[ rootLink->getNumber() ];
   dynaMechsLinks[ rootLink->getNumber() ] = dynaMechsRootLink;
 
-  dynaMechsSystem.addLink( internalRootLink, 0 );
+  dynaMechsSystem.addLink( internalRootLink, nullptr );
 
   const QList< SIGEL_Robot::SIG_Joint * > rootJoints = rootLink->getJoints();
 
@@ -369,7 +369,7 @@ void SIGEL_Simulation::SIG_DynaMechsSimulationData::initializeArticulation()
 	dynaMechsRootLink->successors.append( newDynaMechsLink );
     };
 
-  dynaMechsRootLink->forwardKinematics( 0 );
+  dynaMechsRootLink->forwardKinematics( nullptr );
 };
 
 SIGEL_Simulation::SIG_DynaMechsLink *SIGEL_Simulation::SIG_DynaMechsSimulationData::initializeJoint( SIGEL_Robot::SIG_Joint *joint,
@@ -393,7 +393,7 @@ SIGEL_Simulation::SIG_DynaMechsLink *SIGEL_Simulation::SIG_DynaMechsSimulationDa
 		 screwTheta );
 
   if (predecessor!=caller)
-    return 0;
+    return nullptr;
 
   SIGEL_Robot::SIG_Link const *link = ( joint->getLeftLink() == caller ) ? joint->getRightLink() : joint->getLeftLink();
 

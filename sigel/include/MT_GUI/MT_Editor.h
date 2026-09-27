@@ -12,7 +12,7 @@ class MT_Editor : public QLineEdit
 	Q_OBJECT
 
 public:
-	MT_Editor(QWidget *parent=0);
+	MT_Editor(QWidget *parent=nullptr);
 	virtual ~MT_Editor();
 
 	void popup(const QRect &rect, const QString &text);

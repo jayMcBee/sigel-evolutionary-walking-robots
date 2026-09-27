@@ -15,7 +15,7 @@ class SIG_RobotBase : public QWidget, public Ui::SIG_RobotBase
     Q_OBJECT
 
 public:
-    SIG_RobotBase(QWidget* parent = 0, const char* name = 0, Qt::WindowFlags fl = Qt::WindowFlags());
+    SIG_RobotBase(QWidget* parent = nullptr, const char* name = nullptr, Qt::WindowFlags fl = Qt::WindowFlags());
     ~SIG_RobotBase() override;
 
 protected:

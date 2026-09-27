@@ -22,7 +22,7 @@ public:
 	virtual bool onHide(MT_GPManager *manager, subst_cache *subst);
 	virtual void onShow(MT_GPManager *manager, subst_cache *subst);
 	void evolutionRunning(bool running);
-	MT_PopulationWidget(QMainWindow* parent=0, const char* name=0, Qt::WindowFlags fl = Qt::WindowFlags());
+	MT_PopulationWidget(QMainWindow* parent=nullptr, const char* name=nullptr, Qt::WindowFlags fl = Qt::WindowFlags());
 	~MT_PopulationWidget();
 
 private:

@@ -15,7 +15,7 @@ class SIG_IndividualListBase : public QWidget, public Ui::SIG_IndividualListBase
     Q_OBJECT
 
 public:
-    SIG_IndividualListBase(QWidget* parent = 0, const char* name = 0, Qt::WindowFlags fl = Qt::WindowFlags());
+    SIG_IndividualListBase(QWidget* parent = nullptr, const char* name = nullptr, Qt::WindowFlags fl = Qt::WindowFlags());
     ~SIG_IndividualListBase() override;
 
 protected:

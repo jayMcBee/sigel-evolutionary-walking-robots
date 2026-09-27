@@ -35,7 +35,7 @@ namespace SIGEL_Visualisation
       transformationInternal(16),
       colorInternal(3),
       visible(true),
-      floatingText(0)
+      floatingText(nullptr)
   {
     for (int j=0; j<3; j++)
       transformationInternal[ (j * 4) + 3 ] = 0;

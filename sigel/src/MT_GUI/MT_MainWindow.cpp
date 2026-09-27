@@ -195,7 +195,7 @@ MT_MainWindow::MT_MainWindow(MT_Controller *controller, MT_GPManager *manager, s
 
 MT_MainWindow::~MT_MainWindow()
 {
-	QObject::disconnect(experimentWidget, 0, 0, 0);
+	QObject::disconnect(experimentWidget, nullptr, nullptr, nullptr);
 }
 
 void MT_MainWindow::slotAutoStop(bool on)
@@ -257,7 +257,7 @@ void MT_MainWindow::slotRaiseWidget(QTreeWidgetItem *item)
 
 	int pos = static_cast<MT_ExperimentItem*>(item)->getPos();
 	MT_WidgetBase *nextWidget = widgets[pos];
-	MT_WidgetBase *actWidget  = 0;
+	MT_WidgetBase *actWidget  = nullptr;
 
 	if(!evolRunning)
 		mtStartEvolutionAction->setEnabled( gpManager->separateEvolutionAllowed() );
@@ -284,7 +284,7 @@ void MT_MainWindow::slotRaiseWidget(QTreeWidgetItem *item)
 void MT_MainWindow::raiseWidget(int pos)
 {
 	MT_WidgetBase *nextWidget = widgets[pos];
-	MT_WidgetBase *actWidget  = 0;
+	MT_WidgetBase *actWidget  = nullptr;
 
 	if(!evolRunning)
 		mtStartEvolutionAction->setEnabled( gpManager->separateEvolutionAllowed() );
@@ -314,7 +314,7 @@ MT_GPManager* MT_MainWindow::getManager()
 
 void MT_MainWindow::enforceUpdate(bool GUI)
 {
-	MT_WidgetBase *actWidget  = 0;
+	MT_WidgetBase *actWidget  = nullptr;
 
 	if(actWidgetID != -1){
 		actWidget = widgets[actWidgetID];

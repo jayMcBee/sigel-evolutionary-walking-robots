@@ -58,8 +58,8 @@
        * @param name This widget's name.
        * @param f The widget flag of this widget.
        */
-      SIG_SimulationVisualisationWidget( QWidget *parent=0,
-					 char const *name=0,
+      SIG_SimulationVisualisationWidget( QWidget *parent=nullptr,
+					 char const *name=nullptr,
 					 Qt::WindowFlags f = Qt::WindowFlags() );
 
       /**

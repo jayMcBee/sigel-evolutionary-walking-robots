@@ -409,7 +409,7 @@ namespace SIGEL_Visualisation
   	// Start reading in the header, make sure we
   	// have the right PNM data type.
   	
-  	if(file == NULL                                                           	||
+  	if(file == nullptr                                                           	||
   			fread(fileMagic, 1, sizeof(fileMagic), file)  != sizeof(fileMagic) 			||
   			memcmp(pnmMagic, fileMagic, sizeof(pnmMagic)) != 0                			||
   			fread(header, 1, sizeof(header), file)        != sizeof(header))
@@ -430,7 +430,7 @@ namespace SIGEL_Visualisation
 
   	texture.imageData = (GLubyte *)malloc(imageSize);
 
-  	if(texture.imageData == NULL) {
+  	if(texture.imageData == nullptr) {
   		QMessageBox warn("Warning", "The specified texture file does not contain valid data.\nThe floor is shown without a texture.",QMessageBox::Warning, QMessageBox::Retry, QMessageBox::NoButton,QMessageBox::NoButton, SIGEL_Tools::dialogParent());
   		warn.exec();  		
 

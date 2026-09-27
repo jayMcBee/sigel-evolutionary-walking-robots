@@ -205,7 +205,7 @@ void MT_TournamentManager::performTournaments()
 					// Winner = (Tournaments[i]->getIndividual(k));
 					 // New: transfer ownership to the winner
 				
-					Winner = Tournaments[i]->insertAtPos(0,k);
+					Winner = Tournaments[i]->insertAtPos(nullptr,k);
 				
 					// increase the Age of the individual
 					Winner->increaseAge();
@@ -227,7 +227,7 @@ void MT_TournamentManager::performTournaments()
 
 			for(int k=0;k<WinnerLoser.size();k++)
 			{
-				Winner = Tournaments[i]->insertAtPos(0,k);
+				Winner = Tournaments[i]->insertAtPos(nullptr,k);
 				delete Winner; 
 			}
 		

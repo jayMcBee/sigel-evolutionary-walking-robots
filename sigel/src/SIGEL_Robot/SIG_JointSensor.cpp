@@ -26,7 +26,7 @@
 namespace SIGEL_Robot {
         SIG_JointSensor::SIG_JointSensor (SIG_Robot *par, QString n, int nr)
                 : SIG_Sensor (par, n, nr),
-                  theJoint (0)
+                  theJoint (nullptr)
         { }
 
         SIG_JointSensor::SIG_JointSensor (SIG_Robot *par, QTextStream & tx)

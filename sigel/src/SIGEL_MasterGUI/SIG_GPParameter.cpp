@@ -590,7 +590,7 @@ void SIG_GPParameter::slotItemDoubleClicked( QTreeWidgetItem * theItem )
 	}
       
       QString currentName = theItem->text( 1 );
-      SIGEL_GP::SIG_GPPVMHost *theHost = 0;
+      SIGEL_GP::SIG_GPPVMHost *theHost = nullptr;
       QList<SIGEL_GP::SIG_GPPVMHost *> &hostList = theExperiment.gpParameter.getHostList();
       
       for ( SIGEL_GP::SIG_GPPVMHost *it : hostList )

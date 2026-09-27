@@ -162,7 +162,7 @@ namespace SIGEL_Robot {
                 for (qsizetype i = allowedCommands.size() - 1; i >= 0; --i)
                         if (allowedCommands.at(i).name == name)
                                 return allowedCommands.at(i).value;
-                return 0;
+                return nullptr;
         }
 
         void SIG_LanguageParameters::setRegisterWidth (int width)

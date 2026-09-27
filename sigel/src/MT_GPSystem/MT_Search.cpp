@@ -25,10 +25,10 @@ MT_Search::MT_Search(MT_Population *ParentPop, MT_Population *OffspringPop, MT_R
 	TargetPop = OffspringPop;
 	SourcePop = ParentPop;
 	Randi = _Randi;
-	ChildOne =0;
-	ChildTwo =0;
-	Parent=0;
-	FirstXOverParent=0;
+	ChildOne =nullptr;
+	ChildTwo =nullptr;
+	Parent=nullptr;
+	FirstXOverParent=nullptr;
 
 }
 
@@ -39,10 +39,10 @@ MT_Search::MT_Search(MT_Population *ParentPop, MT_Population *OffspringPop, MT_R
 	SourcePop = ParentPop;
 	Randi = _Randi;
 	
-	ChildOne =0;
-	ChildTwo =0;
-	Parent=0;
-	FirstXOverParent=0;
+	ChildOne =nullptr;
+	ChildTwo =nullptr;
+	Parent=nullptr;
+	FirstXOverParent=nullptr;
 
 	QString BrutString ( "BrutSize:" );
 	QString PresentLine = File.readLine(); 
@@ -267,10 +267,10 @@ int MT_Search::startMatingProcess()
 	int FreePos =0; 
 	int ParentPos = Randi->getRandomInteger(ParentSize); // the parent under consideration 
 
-	ChildOne =0;
-	ChildTwo =0;
-	Parent=0;
-	FirstXOverParent=0;
+	ChildOne =nullptr;
+	ChildTwo =nullptr;
+	Parent=nullptr;
+	FirstXOverParent=nullptr;
 
 	bool CrossOver = false;
 
@@ -288,7 +288,7 @@ int MT_Search::startMatingProcess()
 
 		RandomPos = Randi->getRandomInteger(OffspringSize);
 	
-		while (TargetPop->getIndividual(RandomPos)!= 0)
+		while (TargetPop->getIndividual(RandomPos)!= nullptr)
 		{
 			RandomPos ++;
 			if (RandomPos>=OffspringSize)
@@ -312,14 +312,14 @@ int MT_Search::startMatingProcess()
 				ChildOne->setTypOfGenesis(4);
 				ChildOne->setFitnessOfParent((SourcePop->getIndividual(ParentPos))->getFitness());
 		
-				while(TargetPop->getIndividual(FreePos)!= 0)
+				while(TargetPop->getIndividual(FreePos)!= nullptr)
 					FreePos++;
 								
 				if (FreePos < OffspringSize)
 				{
 					ChildOne->setPosition(FreePos);
 					TargetPop->insertAtPos(ChildOne,FreePos);
-					ChildOne = NULL;
+					ChildOne = nullptr;
 					FreePos++;
 				}
 
@@ -332,14 +332,14 @@ int MT_Search::startMatingProcess()
 				ChildOne = mutate(SourcePop->getIndividual(ParentPos));
 				ChildOne->setFitnessOfParent((SourcePop->getIndividual(ParentPos))->getFitness());
 				
-				while(TargetPop->getIndividual(FreePos)!= 0)
+				while(TargetPop->getIndividual(FreePos)!= nullptr)
 					FreePos++;
 				
 				if (FreePos < OffspringSize)
 				{
 					ChildOne->setPosition(FreePos);
 					TargetPop->insertAtPos(ChildOne,FreePos);
-					ChildOne = NULL;
+					ChildOne = nullptr;
 					FreePos++;
 				}
 
@@ -352,7 +352,7 @@ int MT_Search::startMatingProcess()
 				{
 					crossover(FirstXOverParent, SourcePop->getIndividual(ParentPos));
 
-					while(TargetPop->getIndividual(FreePos)!= 0)
+					while(TargetPop->getIndividual(FreePos)!= nullptr)
 						FreePos++;
 					
 					if (FreePos <OffspringSize)
@@ -360,13 +360,13 @@ int MT_Search::startMatingProcess()
 						ChildOne->setFitnessOfParent(FirstXOverParent->getFitness());
 						ChildOne->setPosition(FreePos);
 						TargetPop->insertAtPos(ChildOne,FreePos);
-						ChildOne =0;
+						ChildOne =nullptr;
 						FreePos++;
 					}
 
 					if (FreePos<OffspringSize)
 					{
-						while(TargetPop->getIndividual(FreePos)!= 0)
+						while(TargetPop->getIndividual(FreePos)!= nullptr)
 							FreePos++;
 					
 						if(FreePos<OffspringSize)
@@ -374,7 +374,7 @@ int MT_Search::startMatingProcess()
 							ChildTwo->setFitnessOfParent((SourcePop->getIndividual(ParentPos))->getFitness());
 							ChildTwo->setPosition(FreePos);
 							TargetPop->insertAtPos(ChildTwo,FreePos);
-							ChildTwo =0;
+							ChildTwo =nullptr;
 							FreePos++;
 						}
 					
@@ -395,9 +395,9 @@ int MT_Search::startMatingProcess()
 			ParentPos =0;
 	} // end of for over offspring
 
-	if (ChildOne != NULL)
+	if (ChildOne != nullptr)
 		delete ChildOne;
-	if (ChildTwo != NULL)
+	if (ChildTwo != nullptr)
 		delete ChildTwo;
 
 	SourcePop->flush();

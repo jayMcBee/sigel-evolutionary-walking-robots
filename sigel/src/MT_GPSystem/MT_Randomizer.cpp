@@ -13,7 +13,7 @@
 MT_Randomizer::MT_Randomizer()
 {
 	
-	srand( (unsigned)time( NULL ) );
+	srand( (unsigned)time( nullptr ) );
 
 // initialization
 	LastError =0;
@@ -60,7 +60,7 @@ MT_Randomizer::~MT_Randomizer()
 MT_Randomizer::MT_Randomizer(QTextStream &File)
 {
 	// set seed for the random method
-	srand( (unsigned)time( NULL ) );
+	srand( (unsigned)time( nullptr ) );
 
 	LastError =0;
 	RandomXPoints.resize(7);

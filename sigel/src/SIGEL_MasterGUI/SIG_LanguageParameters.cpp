@@ -360,7 +360,7 @@ void SIG_LanguageParameters::slotCommandDoubleClicked( QTreeWidgetItem *theItem 
 		  else
 		    {
 		      // we will work on command parameters, so we need this pointer.
-		      SIGEL_Robot::SIG_CommandParameters *commandParameters = 0;
+		      SIGEL_Robot::SIG_CommandParameters *commandParameters = nullptr;
 		      
 		      // lets see if we first need to add the command and create a new SIG_CommandParameters object...
 		      if( !theExperiment.robot.getLangParam()->hasCommand( currentCommand ) )

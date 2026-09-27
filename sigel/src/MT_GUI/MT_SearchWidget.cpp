@@ -65,9 +65,9 @@ void MT_SearchWidget::evolutionRunning(bool running)
  ***/
 void MT_SearchWidget::onShow(MT_GPManager *manager, subst_cache *subst)
 {
-	QList<double> *probMutPow   = 0;
-	QList<double> *probSearchOp = 0;
-	QList<double> *probXPoints  = 0;
+	QList<double> *probMutPow   = nullptr;
+	QList<double> *probSearchOp = nullptr;
+	QList<double> *probXPoints  = nullptr;
 
 	manager->getRandomizer()->returnSearchValue(&probMutPow, &probSearchOp, &probXPoints);
 
@@ -92,9 +92,9 @@ void MT_SearchWidget::onShow(MT_GPManager *manager, subst_cache *subst)
  ***/
 bool MT_SearchWidget::onHide(MT_GPManager *manager, subst_cache *subst)
 {
-	QList<double> *probMutPow   = 0;
-	QList<double> *probSearchOp = 0;
-	QList<double> *probXPoints  = 0;
+	QList<double> *probMutPow   = nullptr;
+	QList<double> *probSearchOp = nullptr;
+	QList<double> *probXPoints  = nullptr;
 
 	manager->getRandomizer()->returnSearchValue(&probMutPow, &probSearchOp, &probXPoints);
 

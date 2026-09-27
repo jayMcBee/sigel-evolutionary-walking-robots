@@ -157,7 +157,7 @@ namespace SIGEL_Robot {
 		switch (mdh_predecessor_is_left) {
 		case 0:  predecessor = rightLink; break;
 		case 1:  predecessor = leftLink; break;
-		default: predecessor = 0;
+		default: predecessor = nullptr;
 		}
 		a = mdh_a;
 		alpha = mdh_alpha;

@@ -28,7 +28,7 @@ class SIG_TextView : public QTextBrowser
   Q_OBJECT
 
  public:
-  SIG_TextView( QWidget *parent = 0, const char *name = 0 );
+  SIG_TextView( QWidget *parent = nullptr, const char *name = nullptr );
   ~SIG_TextView();
 
  protected:

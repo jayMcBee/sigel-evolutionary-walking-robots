@@ -48,7 +48,7 @@ namespace SIGEL_Simulation
       transformation( 4, 4 ),
       screwD( screwD ),
       screwTheta( screwTheta ),
-      screwLink( 0 )
+      screwLink( nullptr )
   {
     for (int j=1; j<=3; j++)
       transformation( 4, j ) = 0;

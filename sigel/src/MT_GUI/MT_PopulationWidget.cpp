@@ -4,9 +4,9 @@
 // top-level index.
 static MT_PopListViewItem *nextSiblingOf(QTreeWidget *tree, QTreeWidgetItem *item)
 {
-	if(!item) return 0;
+	if(!item) return nullptr;
 	int i = tree->indexOfTopLevelItem(item);
-	if(i < 0 || i + 1 >= tree->topLevelItemCount()) return 0;
+	if(i < 0 || i + 1 >= tree->topLevelItemCount()) return nullptr;
 	return (MT_PopListViewItem *)tree->topLevelItem(i + 1);
 }
 #include "MT_GUI/MT_AddIndividualsWidget.h"
@@ -266,7 +266,7 @@ void MT_PopulationWidget::slotAddInd()
 	// opens a window in which the user can enter
 	// the number of individuals to create
 	// shows a progressbar
-	MT_AddIndividualsWidgetBase numDialog(this, 0, true);
+	MT_AddIndividualsWidgetBase numDialog(this, nullptr, true);
 	int number = 0;
 
 	if(QDialog::Accepted  == numDialog.exec()){
@@ -297,9 +297,9 @@ void MT_PopulationWidget::slotAddInd()
  ***/
 void MT_PopulationWidget::slotDelInd()
 {
-	MT_PopListViewItem* actIndNew =0;
+	MT_PopListViewItem* actIndNew =nullptr;
 	
-	MT_PopListViewItem *nextInd=0;
+	MT_PopListViewItem *nextInd=nullptr;
 	MT_PopListViewItem *actInd = (MT_PopListViewItem*) individualListView->topLevelItem(0);
 
 	int DelPos =0;
@@ -307,7 +307,7 @@ void MT_PopulationWidget::slotDelInd()
 
 	// iterate over all items, check if they are selected
 	// and delete the selected ones
-	MT_Individual *actRInd =0;
+	MT_Individual *actRInd =nullptr;
 	while(actInd){
 		nextInd = nextSiblingOf(individualListView, actInd);	// get next individual in list
 		if (( actInd->isSelected()) && (individualListView->topLevelItemCount() != 1) )
@@ -318,7 +318,7 @@ void MT_PopulationWidget::slotDelInd()
 			emit numChanged();
 			
 			actIndNew = (MT_PopListViewItem*) individualListView->topLevelItem(0);
-			while(actIndNew !=0)		// walk over all IndisItem  // for every item with Pos > DelPos --> setPos(Pos-1)
+			while(actIndNew !=nullptr)		// walk over all IndisItem  // for every item with Pos > DelPos --> setPos(Pos-1)
 			{
 				ActPos = actIndNew->getPos();
 				if (ActPos > DelPos)
@@ -392,7 +392,7 @@ void MT_PopulationWidget::slotExpInd()
 
 			if(file.exists()){
 				if(0 == QMessageBox::warning(this, "Save Population", "There is another file with this name. This will overwrite\n"
-					"the existing file. Do you really want to continue?", "OK", "Cancel", 0, 1))
+					"the existing file. Do you really want to continue?", "OK", "Cancel", nullptr, 1))
 					return;
 			}
 
@@ -423,7 +423,7 @@ void MT_PopulationWidget::slotExpInd()
 				QFile file( fileName.append("%1.mind").arg(i) );
 				if(file.exists()){
 					if(0 == QMessageBox::warning(this, "Save Population", "There is another file with this name. This will overwrite\n"
-						"the existing file. Do you really want to continue?", "OK", "Cancel", 0, 1))
+						"the existing file. Do you really want to continue?", "OK", "Cancel", nullptr, 1))
 						return;
 				}
 				if(file.open(QIODevice::WriteOnly)){
@@ -463,7 +463,7 @@ void MT_PopulationWidget::slotLoadPop()
 			{
 				// delete
 				population->loadPop(str);
-				onShow(gpManager, 0);	// update the GUI
+				onShow(gpManager, nullptr);	// update the GUI
 
 			} else {
 				// append
@@ -478,7 +478,7 @@ void MT_PopulationWidget::slotLoadPop()
 
 				npop.flush();
 				*/
-				onShow(gpManager, 0);
+				onShow(gpManager, nullptr);
 
 			}
 			file.close();
@@ -500,7 +500,7 @@ void MT_PopulationWidget::slotSavePop()
 
 		if(file.exists()){
 			if(0 == QMessageBox::warning(this, "Save Population", "There is another file with this name. This will overwrite\n"
-				"the existing file. Do you really want to continue?", "OK", "Cancel", 0, 1))
+				"the existing file. Do you really want to continue?", "OK", "Cancel", nullptr, 1))
 				return;
 		}
 

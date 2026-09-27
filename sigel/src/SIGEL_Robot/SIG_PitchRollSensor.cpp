@@ -26,7 +26,7 @@
 namespace SIGEL_Robot {
         SIG_PitchRollSensor::SIG_PitchRollSensor (SIG_Robot *par, QString n, int nr)
                 : SIG_Sensor (par, n, nr),
-                  theLink (0)
+                  theLink (nullptr)
         {
 			// initially neither pitch nor roll type
 			isPitch = false;

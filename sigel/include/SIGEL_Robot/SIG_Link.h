@@ -99,7 +99,7 @@ namespace SIGEL_Robot
                        DL_vector & com,
                        DL_matrix & it);
       void propagateInitialLocation (SIG_Link *comingfrom);
-      void setInitialLocation (DL_vector p, DL_matrix o, SIG_Link *comingfrom = 0);
+      void setInitialLocation (DL_vector p, DL_matrix o, SIG_Link *comingfrom = nullptr);
       void getInitialLocation (DL_vector & p, DL_matrix & o) const;
       bool isInitiated (void) const;
       bool isMDHVisited (void) const;

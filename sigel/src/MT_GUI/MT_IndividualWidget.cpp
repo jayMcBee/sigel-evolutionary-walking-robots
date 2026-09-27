@@ -152,10 +152,10 @@ void MT_IndividualsWidget::onShow(MT_GPManager *manager, subst_cache *subst)
 {
 	randomizer = manager->getRandomizer();
 
-	int *length = 0;
-	int *numVar = 0;
-	QList<double> *constants = 0;
-	QList<double> *functions = 0;
+	int *length = nullptr;
+	int *numVar = nullptr;
+	QList<double> *constants = nullptr;
+	QList<double> *functions = nullptr;
 
 	if(randomizer){
 		
@@ -215,13 +215,13 @@ void MT_IndividualsWidget::onShow(MT_GPManager *manager, subst_cache *subst)
 
 bool MT_IndividualsWidget::onHide(MT_GPManager *manager, subst_cache *subst)
 {
-	int *length = 0;
-	int *numVar = 0;
+	int *length = nullptr;
+	int *numVar = nullptr;
 
 	manager->getParent()->setMaxProgLen( programLengthSpinBox->value() );
 
-	QList<double> *constants = 0;
-	QList<double> *functions = 0;
+	QList<double> *constants = nullptr;
+	QList<double> *functions = nullptr;
 	randomizer->returnIndividualsValue(&length, &numVar, &constants, &functions);
 
 	*length = programLengthSpinBox->value();
@@ -332,7 +332,7 @@ void MT_IndividualsWidget::slotExportConstants()
 	QFile file(fileName);
 	if(file.exists()){
 		if(0 == QMessageBox::warning(this, "Save Constants", "There is another file with this name. This will overwrite\n"
-			"the existing file. Do you really want to continue?", "OK", "Cancel", 0, 1))
+			"the existing file. Do you really want to continue?", "OK", "Cancel", nullptr, 1))
 			return;
 	}
 	
@@ -401,7 +401,7 @@ void MT_IndividualsWidget::slotSelectionChanged()
 
 void MT_IndividualsWidget::slotDelConst()
 {
-	QListWidgetItem *nextInd=0;
+	QListWidgetItem *nextInd=nullptr;
 
 	// iterate over all items, check if they are selected
 	// and delete the selected ones
@@ -426,7 +426,7 @@ void MT_IndividualsWidget::slotRButtonClicked(const QPoint &pos)
 
 void MT_IndividualsWidget::slotCreateConstants()
 {
-	MT_AddConstantsWidget constDialog(this, 0, true);
+	MT_AddConstantsWidget constDialog(this, nullptr, true);
 
 	if(QDialog::Accepted == constDialog.exec()){
 
@@ -436,10 +436,10 @@ void MT_IndividualsWidget::slotCreateConstants()
 			progress.setWindowModality(Qt::ApplicationModal);
 			progress.setValue(0);
 
-			int *length = 0;
-			int *numVar = 0;
-			QList<double> *constants = 0;
-			QList<double> *functions = 0;
+			int *length = nullptr;
+			int *numVar = nullptr;
+			QList<double> *constants = nullptr;
+			QList<double> *functions = nullptr;
 			randomizer->createConstant(numToCreate, integer, minValue, maxValue);
 			randomizer->returnIndividualsValue(&length, &numVar, &constants, &functions);
 

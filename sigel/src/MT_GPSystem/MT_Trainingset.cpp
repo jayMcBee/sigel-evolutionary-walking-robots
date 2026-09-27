@@ -16,7 +16,7 @@ MT_Trainingset::MT_Trainingset()
 	PresentTSize= 0;
 	FreePosition=0;
 	for(int i=0; i<TSize; i++)
-		TCases[i]=0;
+		TCases[i]=nullptr;
 
 }
 
@@ -43,7 +43,7 @@ MT_Trainingset::MT_Trainingset(QTextStream &File)
 
 		TCases.resize(TSize);
 		for(int i=0; i<TSize; i++)
-		TCases[i]=0;
+		TCases[i]=nullptr;
 
 		for (int i=0; i<PresentTSize; i++)
 			TCases[i] = new MT_TrainingCase(File);
@@ -63,7 +63,7 @@ MT_Trainingset::MT_Trainingset(int TSi, int TNa)
 	PresentTSize= 0;
 	FreePosition= 0;
 	for(int i=0; i<TSize; i++)
-		TCases[i]=0;
+		TCases[i]=nullptr;
 
 }
 
@@ -80,7 +80,7 @@ void MT_Trainingset::writeToFileTSet(QTextStream &File)
 	File << PresentTSize << Qt::endl << Qt::endl;
 
 	for (int i=0; i<PresentTSize; i++)
-		if(TCases[i] != NULL)
+		if(TCases[i] != nullptr)
 			(TCases[i])->writeToFileTCase(File);
 }
 
@@ -102,7 +102,7 @@ void MT_Trainingset::changeTSize(int NewTSize)
 
 	if (NewTSize > TSize)
 		for(int i=TSize; i<NewTSize; i++)
-			TCases[i] =0;
+			TCases[i] =nullptr;
 
 	TSize=NewTSize;
 
@@ -131,7 +131,7 @@ void MT_Trainingset::updateTSet(QQueue<MT_TrainingCase *> *NewTCases)
 void MT_Trainingset::insertTCase(MT_TrainingCase *Tcase)
 {
 
-	if (TCases[FreePosition]==0)
+	if (TCases[FreePosition]==nullptr)
 	{
 		TCases[FreePosition]= Tcase;
 		PresentTSize++;

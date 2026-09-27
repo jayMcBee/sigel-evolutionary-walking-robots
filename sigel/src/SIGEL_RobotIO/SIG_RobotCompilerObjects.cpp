@@ -93,7 +93,7 @@ namespace SIGEL_RobotIO {
 
         void SIG_RobotCompilerObjects::linkIsTorso (SIG_Link *link)
         {
-                if ((target->getRootLink () != 0) &&
+                if ((target->getRootLink () != nullptr) &&
                     (target->getRootLink () != link))
                         throw SIG_SemanticError (__FILE__, __LINE__,
                                                  "Two different links are marked as torsos");
@@ -104,7 +104,7 @@ namespace SIGEL_RobotIO {
                                                          QString geometryfile)
         {
                 SIG_Body *b;
-                if ((b = target->lookupBody (geometryfile)) == 0) {
+                if ((b = target->lookupBody (geometryfile)) == nullptr) {
                         b = new SIG_Body (target, geometryfile, dirprefix);
                         target->addBody (b);
                 }

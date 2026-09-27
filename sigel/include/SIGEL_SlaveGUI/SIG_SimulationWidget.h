@@ -54,8 +54,8 @@ namespace SIGEL_SlaveGUI
      * @param name This widget's name.
      * @param f The widget flag of this widget.
      */
-    SIG_SimulationWidget( QWidget *parent=0,
-			  char const *name=0,
+    SIG_SimulationWidget( QWidget *parent=nullptr,
+			  char const *name=nullptr,
 			  Qt::WindowFlags f = Qt::WindowFlags() );
 
     /**

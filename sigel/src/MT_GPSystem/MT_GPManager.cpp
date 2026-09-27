@@ -35,13 +35,13 @@ MT_GPManager::MT_GPManager(QTextStream &File) : QObject()
 	*/
 
 #ifdef _WINDOWS
-	evolutionMutex = CreateMutex(NULL, false, NULL);
+	evolutionMutex = CreateMutex(nullptr, false, nullptr);
 #else
-	pthread_mutex_init(&evolutionMutex, NULL);
+	pthread_mutex_init(&evolutionMutex, nullptr);
 #endif
 
 	sepEvolPossible = false;
-	Substituter = 0;
+	Substituter = nullptr;
 	EvolStopped = false;
 	LastError =0;
 
@@ -472,7 +472,7 @@ void MT_GPManager::startEvolution(MT_Substitute *Substitute)
 */
 	Substituter = Substitute;
 	// The interpreter's parameters are now updated by the substituter
-	if (Substituter !=0)
+	if (Substituter !=nullptr)
 		Substitute->setInterpreter(Randi->getNumOfVari(), FitnessTrainer->getTDuration());
 	else
 		LastError = 7;
@@ -493,7 +493,7 @@ void MT_GPManager::startEvolution(MT_Substitute *Substitute)
 	Selector->setNameForParent(GreatestName);
 
 	Parent->changeMaxNumVariable(Randi->getNumOfVari());
-	if (BestIndividual !=0)
+	if (BestIndividual !=nullptr)
 		BestIndividual->changeMaxNumVariable(Randi->getNumOfVari());
 
 	FitnessTrainer->setNumberOfVariables(Randi->getNumOfVari());
@@ -522,7 +522,7 @@ void MT_GPManager::startEvolution(MT_Substitute *Substitute)
 	// tell the system that the evolution starts
 	emit metaEvolutionRunning(true);
 
-	if (Substituter !=0)
+	if (Substituter !=nullptr)
 	{
 		while ((EvolStopped != true) && (TSetOK != true))
 		{
@@ -607,7 +607,7 @@ void MT_GPManager::stopEvolution()
 
 void MT_GPManager::exchangeBest()
 {	
-	if (Substituter !=0)
+	if (Substituter !=nullptr)
 	{
 		bool ChangeNecessary = false;
 
@@ -697,7 +697,7 @@ int  MT_GPManager::checkForNewTCase()
 {
 	int PresentTSetSize =0;
 
-	if (Substituter !=0){
+	if (Substituter !=nullptr){
 
 #ifdef _WINDOWS
 		WaitForSingleObject(Substituter->tCaseBufferMutex, INFINITE);
@@ -807,7 +807,7 @@ void MT_GPManager::collectParentParameter(MT_StatisticsElement * SElement)
 void MT_GPManager::setInterpreterNumVar(int NewSize)
 {
 	FitnessTrainer->setNumberOfVariables(NewSize);
-	if (Substituter !=0)
+	if (Substituter !=nullptr)
 		Substituter->setInterpreter(NewSize, FitnessTrainer->getTDuration());
 
 }

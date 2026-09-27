@@ -18,7 +18,7 @@ MT_Evaluator::MT_Evaluator(SIGEL_GP::SIG_GPExperiment& exp, QTextStream &File) :
 	Typ=1;
 	AverageSigelFitness = 0.01; 
 	Interpreter= new MT_Interpreter(10,100); // WARNING: parameters still need changing! setInterpreter(int NumOfVariable, int TimeToInter)
-	BestMETAProgram =0;
+	BestMETAProgram =nullptr;
 	CorrectFitness.resize(0);
 	AssumedFitness.resize(0);
 	MetaProgError =-1.0;
@@ -75,7 +75,7 @@ MT_Evaluator::MT_Evaluator(SIGEL_GP::SIG_GPExperiment& exp, QTextStream &File) :
 MT_Evaluator::~MT_Evaluator()
 {
 	delete Interpreter;
-	if (BestMETAProgram !=0)
+	if (BestMETAProgram !=nullptr)
 		delete BestMETAProgram;
 }
 
@@ -143,7 +143,7 @@ bool MT_Evaluator::evaluationTactic()
 {
 	bool UseMeta = false;
 	
-	if (BestMETAProgram ==0)
+	if (BestMETAProgram ==nullptr)
 		return UseMeta;
 
 	switch (EstimationStrategy)

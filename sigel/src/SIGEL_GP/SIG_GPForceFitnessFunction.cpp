@@ -92,7 +92,7 @@ double SIGEL_GP::SIG_GPForceFitnessFunction::evalFitness( SIGEL_Program::SIG_Pro
 
       // The first value is always garbage, so take the second from the list straight away
       // The while loop always fetches the next frame
-      while ( (usedForce = recorder.listForces.value( ++forceIdx )) != 0 ) {
+      while ( (usedForce = recorder.listForces.value( ++forceIdx )) != nullptr ) {
         double momentMagnitude = 0;
         double averageMomentPerJoint = 0;
         vector<double> momentMagnitudes;

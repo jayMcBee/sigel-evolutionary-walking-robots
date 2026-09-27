@@ -68,7 +68,7 @@ SIGEL_GP::SIG_GPFitnessTrainer::SIG_GPFitnessTrainer(SIGEL_GP::SIG_GPExperiment&
       break;
     };
 
-  pvmTasks.fill( 0 );
+  pvmTasks.fill( nullptr );
 
   int noOfActiveHosts = 0;
   for (SIG_GPPVMHost *actHost : exp.gpParameter.getHostList())
@@ -250,7 +250,7 @@ int SIGEL_GP::SIG_GPFitnessTrainer::spawnTask(SIGEL_GP::SIG_GPIndividual const& 
   if ( oldMaxIndex < (nextFreeNumber + 1) ) {
       pvmTasks.resize( oldSize + exp.population.getSize() );
       for (qsizetype i=oldSize; i<pvmTasks.size(); i++)
-        pvmTasks[ i ] = 0;
+        pvmTasks[ i ] = nullptr;
   };
 
   if (hostNumber != -1) {
@@ -284,7 +284,7 @@ int SIGEL_GP::SIG_GPFitnessTrainer::spawnTask(SIGEL_GP::SIG_GPIndividual const& 
 
       int taskId = 0;
       int spawnInfo = pvm_spawn( const_cast< char* >( executableNameCString ),
-				 0,
+				 nullptr,
 				 PvmTaskHost,
 				 const_cast< char* >( hostNameCString ),
 				 1,
@@ -398,7 +398,7 @@ double SIGEL_GP::SIG_GPFitnessTrainer::checkTask(int taskId)
 
 	  	pvmTask->host.noOfSlaves--;
 	  	delete pvmTasks[ taskId ];   // insert() freed the finished task
-	  	pvmTasks[ taskId ] = 0;
+	  	pvmTasks[ taskId ] = nullptr;
 		}
 
     else if (info < 0)
@@ -423,7 +423,7 @@ double SIGEL_GP::SIG_GPFitnessTrainer::checkTask(int taskId)
 		  toSpawnList.append( toSpawn );
 
 		  delete pvmTasks[ taskId ];
-		  pvmTasks[ taskId ] = 0;
+		  pvmTasks[ taskId ] = nullptr;
 		}
 
     else
@@ -447,7 +447,7 @@ double SIGEL_GP::SIG_GPFitnessTrainer::checkTask(int taskId)
 		  		toSpawnList.append( toSpawn );
 
 		  		delete pvmTasks[ taskId ];   // insert() freed the finished task
-		  		pvmTasks[ taskId ] = 0;
+		  		pvmTasks[ taskId ] = nullptr;
 				}
 			}
 		}
@@ -484,8 +484,8 @@ void SIGEL_GP::SIG_GPFitnessTrainer::sweepToSpawn()
   // One pass over toSpawnList: each job gets one spawn try, and a spawned job
   // is removed. cur is -1 when the pass has run off the end.
   qsizetype cur = toSpawnList.isEmpty() ? -1 : 0;
-  QList< int > *actJob = (cur < 0) ? 0 : toSpawnList.at( cur );
-  QList< int > *prevJob = 0;
+  QList< int > *actJob = (cur < 0) ? nullptr : toSpawnList.at( cur );
+  QList< int > *prevJob = nullptr;
 
 #ifdef SIG_DEBUG
   SIGEL_Tools::SIG_IO::cerr << "Sweeping to spawn!" << Qt::endl;
@@ -570,7 +570,7 @@ void SIGEL_GP::SIG_GPFitnessTrainer::sweepToSpawn()
 	  // Past the end: step back to the last job. That is prevJob, so the pass ends.
 	  if (cur >= toSpawnList.size())
 	    cur = toSpawnList.isEmpty() ? -1 : toSpawnList.size() - 1;
-	  actJob = (cur < 0) ? 0 : toSpawnList.at( cur );
+	  actJob = (cur < 0) ? nullptr : toSpawnList.at( cur );
 	  if (actJob == prevJob)
 	    break;
 	}
@@ -579,7 +579,7 @@ void SIGEL_GP::SIG_GPFitnessTrainer::sweepToSpawn()
 	  prevJob = actJob;
 	  // next(): a dead cursor stays dead and does NOT advance.
 	  if (cur < 0 || ++cur >= toSpawnList.size())
-	    { cur = -1; actJob = 0; }
+	    { cur = -1; actJob = nullptr; }
 	  else
 	    actJob = toSpawnList.at( cur );
 	};
@@ -598,10 +598,10 @@ int SIGEL_GP::SIG_GPFitnessTrainer::getNextHost() {
 
   // now we make ourself running exclusively to add all new hosts from the freshDynHosts list
 #ifdef _WINDOWS
-	mutex = CreateMutex(NULL, false, NULL);	// create a lock if not already created
+	mutex = CreateMutex(nullptr, false, nullptr);	// create a lock if not already created
 	WaitForSingleObject(mutex, INFINITE);
 #else	
-  pthread_mutex_init(&mutex, NULL);
+  pthread_mutex_init(&mutex, nullptr);
   pthread_mutex_lock( &mutex );
 #endif
 

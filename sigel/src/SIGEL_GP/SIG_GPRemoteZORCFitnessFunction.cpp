@@ -291,7 +291,7 @@ namespace SIGEL_GP
       tv.tv_sec  = timeOutSecs;
       tv.tv_usec = 0;
 
-      retval = select(serIF+1, &rfds, NULL, NULL, &tv);
+      retval = select(serIF+1, &rfds, nullptr, nullptr, &tv);
 
       // retval tells us if data is available !
       if (retval)

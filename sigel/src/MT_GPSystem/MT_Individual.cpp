@@ -79,7 +79,7 @@ MT_Individual::MT_Individual(MT_Program *Prog, bool copy)
 	FitnessOfParent = -1.0;
 	TspOfGenesis = 3;
 
-	Program =0;
+	Program =nullptr;
 	
 	if (copy == true)
 	{
@@ -106,7 +106,7 @@ void MT_Individual::writeToFileIndi(QTextStream &File)
 	File << TspOfGenesis << Qt::endl;
 	File << Qt::endl;
 	
-	if (Program !=NULL)
+	if (Program !=nullptr)
 		Program->writeToFileProgram(File);
 }
 

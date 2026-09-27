@@ -16,7 +16,7 @@ MT_Classifier::MT_Classifier(QTextStream &File) : MT_Substitute()
 	Typ=2;
 	AverageSigelFitness = 0.01;
 	Interpreter= new MT_Interpreter(10,100); // WARNING: parameters still need changing! setInterpreter(int NumOfVariable, int TimeToInter)
-	BestMETAProgram =0;
+	BestMETAProgram =nullptr;
 	CorrectFitness.resize(0);
 	AssumedFitness.resize(0);
 	MetaProgError =-1.0;
@@ -65,7 +65,7 @@ MT_Classifier::~MT_Classifier()
 {
 	
 	delete Interpreter;
-	if (BestMETAProgram !=0)
+	if (BestMETAProgram !=nullptr)
 		delete BestMETAProgram;
 
 }
@@ -165,7 +165,7 @@ int MT_Classifier::evaluationTactic(int ToursSize)
 		SigelGeneration =1.0;
 
 		
-	if (BestMETAProgram ==0)
+	if (BestMETAProgram ==nullptr)
 		return NumOfClassi;
 
 
@@ -482,7 +482,7 @@ bool MT_Classifier::preEvolution(QList<SIGEL_GP::SIG_GPTournament *> *tours, int
 		for(int i=0; i<NumOfClassi; i++)
 		{	
 			Tourna = tours->value(i);
-			if (i < tours->size()) (*tours)[i] = 0;
+			if (i < tours->size()) (*tours)[i] = nullptr;
 			Tourna->classify(this);
 			delete Tourna;
 			NumOfMetaEstimation[GenerationNumber] += 1;
@@ -501,7 +501,7 @@ bool MT_Classifier::preEvolution(QList<SIGEL_GP::SIG_GPTournament *> *tours, int
 			// Move the tournament in slot i+NumOfClassi down to slot i.
 			// Slot i is always empty here, so the delete frees nothing.
 			Tourna = tours->value(i+NumOfClassi);
-			if (i+NumOfClassi < tours->size()) (*tours)[i+NumOfClassi] = 0;
+			if (i+NumOfClassi < tours->size()) (*tours)[i+NumOfClassi] = nullptr;
 			if (i < tours->size()) { delete (*tours)[i]; (*tours)[i] = Tourna; }
 		}
 
@@ -541,7 +541,7 @@ bool MT_Classifier::preEvolution(QList<SIGEL_GP::SIG_GPTournament *> *tours, int
 			if(ToursWBestIndi[i] == 0)
 			{
 				Tourna = tours->value(i);
-				if (i < tours->size()) (*tours)[i] = 0;
+				if (i < tours->size()) (*tours)[i] = nullptr;
 				Tourna->classify(this);
 				delete Tourna;
 				NumOfMetaEstimation[GenerationNumber] += 1;
@@ -560,13 +560,13 @@ bool MT_Classifier::preEvolution(QList<SIGEL_GP::SIG_GPTournament *> *tours, int
 		for( int i=0; i<NumOfTour; i++)
 		{
 			Tourna = tours->value(i);
-			if(Tourna == NULL)
+			if(Tourna == nullptr)
 			{
 				for(int NextTourPos = i+1; NextTourPos<TourSize; NextTourPos++)
 				{
 					Tourna = tours->value(NextTourPos);
-					if (NextTourPos < tours->size()) (*tours)[NextTourPos] = 0;
-					if(Tourna != NULL)
+					if (NextTourPos < tours->size()) (*tours)[NextTourPos] = nullptr;
+					if(Tourna != nullptr)
 					{
 						if (i < tours->size()) { delete (*tours)[i]; (*tours)[i] = Tourna; }
 						break;
@@ -586,7 +586,7 @@ bool MT_Classifier::preEvolution(QList<SIGEL_GP::SIG_GPTournament *> *tours, int
 for(int d=0; d < tours->size();d++)
 {
 	Tourna = tours->value(d);
-		if(Tourna == NULL)
+		if(Tourna == nullptr)
 		{
 			int DeugInfo= tours->size();
 		}
@@ -612,7 +612,7 @@ for(int d=0; d < tours->size();d++)
 
 int MT_Classifier::evalNeededTours(QList<SIGEL_GP::SIG_GPTournament *> *  tours, QList<int> * ToursWBestIndi, int PosBest)
 {
-	SIGEL_GP::SIG_GPTournament *Tourna =NULL;
+	SIGEL_GP::SIG_GPTournament *Tourna =nullptr;
 	int NumClassi=0;
 	int ToursSize = tours->size();
 

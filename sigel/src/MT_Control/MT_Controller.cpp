@@ -38,11 +38,11 @@ void StartMetaEvolution(void *inRawSubst)
 
 
 MT_Controller::MT_Controller(SIGEL_GP::SIG_GPExperiment &exp)
- : QObject(), gpManager(0), mainWindow(0), substitution(0), evolTimer(0), sigExp(exp), autoSaveCnt(0)
+ : QObject(), gpManager(nullptr), mainWindow(nullptr), substitution(nullptr), evolTimer(nullptr), sigExp(exp), autoSaveCnt(0)
 {
 	startWOSigel = false;
 	withGUI = true;
-	cacheStrm = 0;
+	cacheStrm = nullptr;
 	saveName = QString();
 	usedSystem = NOMETA_SUBST;
 	selectedSystem = EVALUATOR_SUBST;
@@ -50,8 +50,8 @@ MT_Controller::MT_Controller(SIGEL_GP::SIG_GPExperiment &exp)
 
 	substCache.inUse = false;
 	substCache.genNumber = 0;
-	substCache.numCorrectEst = 0;
-	substCache.numMetaEst = 0;
+	substCache.numCorrectEst = nullptr;
+	substCache.numMetaEst = nullptr;
 	substCache.refreshInt = 0;
 	substCache.strategy = -1;
 	substCache.tolerance = 0;
@@ -83,10 +83,10 @@ void MT_Controller::startSingleEvolution()
 	startWOSigel = true;
 
 #ifdef _WINDOWS
-		meta_thread = CreateThread(NULL, 0, &StartMetaEvolution, this, 0, 0);
+		meta_thread = CreateThread(nullptr, 0, &StartMetaEvolution, this, 0, 0);
 //		SetThreadPriority(meta_thread, THREAD_PRIORITY_BELOW_NORMAL);
 #else
-		pthread_create(&meta_thread, NULL, (void*(*)(void*)) &StartMetaEvolution, (void*) this);
+		pthread_create(&meta_thread, nullptr, (void*(*)(void*)) &StartMetaEvolution, (void*) this);
 #endif
 
 }
@@ -111,10 +111,10 @@ void MT_Controller::startTimedEvolution(int minutes)
 
 	QObject::connect(gpManager, SIGNAL(metaEvolutionRunning(bool)), this, SLOT(slotEvolutionRunning(bool)));
 #ifdef _WINDOWS
-		meta_thread = CreateThread(NULL, 0, &StartMetaEvolution, this, 0, 0);
+		meta_thread = CreateThread(nullptr, 0, &StartMetaEvolution, this, 0, 0);
 //		SetThreadPriority(meta_thread, THREAD_PRIORITY_BELOW_NORMAL);
 #else
-		pthread_create(&meta_thread, NULL, (void*(*)(void*)) &StartMetaEvolution, (void*) this);
+		pthread_create(&meta_thread, nullptr, (void*(*)(void*)) &StartMetaEvolution, (void*) this);
 #endif
 }
 
@@ -164,11 +164,11 @@ bool MT_Controller::startEvolution()
 
 		// create a thread for the meta-evolution
 #ifdef _WINDOWS
-		meta_thread = CreateThread(NULL, 0, &StartMetaEvolution, this, 0, 0);
+		meta_thread = CreateThread(nullptr, 0, &StartMetaEvolution, this, 0, 0);
 //		SetThreadPriority(meta_thread, THREAD_PRIORITY_BELOW_NORMAL);
 //		SetThreadPriorityBoost(meta_thread, true);
 #else
-		pthread_create(&meta_thread, NULL, (void*(*)(void*)) &StartMetaEvolution, (void*) this);
+		pthread_create(&meta_thread, nullptr, (void*(*)(void*)) &StartMetaEvolution, (void*) this);
 #endif
 	}
 
@@ -182,7 +182,7 @@ void MT_Controller::callMetaEvolutionLoop()
 
 void MT_Controller::callMetaEvolutionLoopWOSigel()
 {
-	gpManager->startEvolution( 0 );
+	gpManager->startEvolution( nullptr );
 }
 
 /***
@@ -212,7 +212,7 @@ bool MT_Controller::switchSystem(int wantedSystem)
 		if(QMessageBox::warning(SIGEL_Tools::dialogParent(), "Switching the MetaGP System", 
 			"Switching the system requires deleting the current\n"
 			"GP system. Do you want to delete it?",
-			"Yes", "No", 0, 1, 1) == 0){
+			"Yes", "No", nullptr, 1, 1) == 0){
 
 			if(mainWindow){
 				QObject::disconnect(mainWindow->mtStartEvolutionAction, SIGNAL( triggered() ), this, SLOT( startSingleEvolution() ));
@@ -227,9 +227,9 @@ bool MT_Controller::switchSystem(int wantedSystem)
 			delete gpManager;
 			delete substitution;
 			substCache.inUse = false;
-			mainWindow = 0;
-			gpManager = 0;
-			substitution = 0;
+			mainWindow = nullptr;
+			gpManager = nullptr;
+			substitution = nullptr;
 			confStrm.setDevice(nullptr);
 			if(confFile.isOpen()) confFile.close();
 		} else
@@ -287,9 +287,9 @@ bool MT_Controller::useMeta(bool state)
 				delete mainWindow;
 				delete substitution;
 				substCache.inUse = false;
-				gpManager = 0;
-				mainWindow = 0;
-				substitution = 0;
+				gpManager = nullptr;
+				mainWindow = nullptr;
+				substitution = nullptr;
 				saveName = QString();
 				confStrm.setDevice(nullptr);
 				if(confFile.isOpen()) confFile.close();
@@ -396,7 +396,7 @@ void MT_Controller::configureSystem(QWidget *owner)
 
 	mainWindow->show();
 	delete substitution;
-	substitution = 0;
+	substitution = nullptr;
 }
 
 /***
@@ -438,7 +438,7 @@ bool MT_Controller::readFromFile(QString fileName)
 								"An error occurred while loading the meta experiment.\n"
 								"Press <standard> to load the default setup or\n"
 								"press <deactivate> to disable the MetaGP system.",
-								"Standard", "Deactivate", 0, 0))
+								"Standard", "Deactivate", nullptr, 0))
 			{
 			case 0 :	// load default settings
 				saveName = QString();
@@ -667,7 +667,7 @@ MT_Substitute* MT_Controller::getFitnessTrainer()
 		return substitution;
 	}
 	else
-		return 0;
+		return nullptr;
 }
 
 MT_Substitute* MT_Controller::getClassifier()
@@ -681,7 +681,7 @@ MT_Substitute* MT_Controller::getClassifier()
 		return substitution;
 	}
 	else
-		return 0;
+		return nullptr;
 }
 
 /***
@@ -704,8 +704,8 @@ void MT_Controller::loadCache(QTextStream &File)
 		savedSystem = EVALUATOR_SUBST;
 	}
 
-	substCache.numCorrectEst = 0;
-	substCache.numMetaEst = 0;
+	substCache.numCorrectEst = nullptr;
+	substCache.numMetaEst = nullptr;
 	if(usedSystem == savedSystem){
 		substCache.strategy = (File.readLine()).toInt();
 		substCache.tolerance = (File.readLine()).toDouble();
@@ -815,7 +815,7 @@ void MT_Controller::slotLoadDefault()
 
 		QTextStream strm(&file);
 		delete substitution;
-		substitution = 0;
+		substitution = nullptr;
 
 		// get to know what kind of system to use
 		QString tmpStr = strm.readLine();
@@ -861,7 +861,7 @@ void MT_Controller::slotLoadSetup()
 
 		QTextStream strm(&file);
 		delete substitution;
-		substitution = 0;
+		substitution = nullptr;
 
 		// get to know what kind of system to use
 		QString tmpStr = strm.readLine();
@@ -908,7 +908,7 @@ void MT_Controller::slotSaveSetup()
 	QFile file(fileName);
 	if(file.exists()){
 		if(0 == QMessageBox::warning(mainWindow, "Save Configuration", "There is another file with this name. This will overwrite\n"
-			"the existing file. Do you really want to continue?", "OK", "Cancel", 0, 1))
+			"the existing file. Do you really want to continue?", "OK", "Cancel", nullptr, 1))
 			return;
 	}
 	if(file.open(QIODevice::WriteOnly)){

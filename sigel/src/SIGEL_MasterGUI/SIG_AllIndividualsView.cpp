@@ -315,7 +315,7 @@ void SIG_AllIndividualsView::slotDoubleClicked( QTreeWidgetItem *theItem )
     {
       SIG_IndividualListItem *individualListItem = static_cast<SIG_IndividualListItem *> ( theItem );
       SIGEL_GP::SIG_GPIndividual *theGPIndividual = &theExperiment.population.getIndividual( individualListItem->poolPosition );
-      SIG_IndividualView *theView = new SIG_IndividualView( 0, "IndividualViewDoubleClicked", Qt::WindowFlags(), theGPIndividual );
+      SIG_IndividualView *theView = new SIG_IndividualView( nullptr, "IndividualViewDoubleClicked", Qt::WindowFlags(), theGPIndividual );
       // No parent owns this window, so it deletes itself when closed.
       theView->setAttribute( Qt::WA_DeleteOnClose );
       theView->show();
@@ -385,7 +385,7 @@ void SIG_AllIndividualsView::slotVisualize()
 
    	  int taskId = 0;
    	  int spawnInfo = pvm_spawn( const_cast< char* >(executableNameCString),
-   				     0,
+   				     nullptr,
    				     PvmTaskHost,
    				     hostNameBuffer.data(),
    				     1,
@@ -442,16 +442,16 @@ void SIG_AllIndividualsView::slotEvolutionNotRunning( bool isNotRunning )
       // itemDoubleClicked stops being emitted at all and slotDoubleClicked is
       // reconnected below to a signal nothing raises.
       QObject::disconnect( individualList->listviewIndividuals,
-			   0,
+			   nullptr,
 			   this,
-			   0 );
+			   nullptr );
     }
   else
     {
       QObject::disconnect( individualList->listviewIndividuals,
-			   0,
+			   nullptr,
 			   this,
-			   0 );
+			   nullptr );
 
       individualList->listviewIndividuals->setContextMenuPolicy( Qt::CustomContextMenu );
       QObject::connect( individualList->listviewIndividuals,

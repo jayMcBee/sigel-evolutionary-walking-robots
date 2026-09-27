@@ -15,7 +15,7 @@ class MT_ExperimentWidgetBase : public QWidget, public Ui::MT_ExperimentWidgetBa
     Q_OBJECT
 
 public:
-    MT_ExperimentWidgetBase(QWidget* parent = 0, const char* name = 0, Qt::WindowFlags fl = Qt::WindowFlags());
+    MT_ExperimentWidgetBase(QWidget* parent = nullptr, const char* name = nullptr, Qt::WindowFlags fl = Qt::WindowFlags());
     ~MT_ExperimentWidgetBase() override;
 
 protected:

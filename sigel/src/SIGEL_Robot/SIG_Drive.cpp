@@ -27,11 +27,11 @@
 
 namespace SIGEL_Robot {
         SIG_Drive::SIG_Drive (SIG_Robot *par, QString n, int nr)
-                : parent (par), number (nr), name (n), theJoint (0), minforce (0.0), maxforce (1.0)
+                : parent (par), number (nr), name (n), theJoint (nullptr), minforce (0.0), maxforce (1.0)
         { }
 
         SIG_Drive::SIG_Drive (SIG_Robot *par, QTextStream & tx)
-                : parent (par), number (-1), name (), theJoint (0), minforce (0.0), maxforce (1.0)
+                : parent (par), number (-1), name (), theJoint (nullptr), minforce (0.0), maxforce (1.0)
         {
 			QString buf;
 
