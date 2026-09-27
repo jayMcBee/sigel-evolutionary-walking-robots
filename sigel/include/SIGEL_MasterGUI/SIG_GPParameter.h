@@ -106,6 +106,13 @@ public slots:
 
  void slotTourPerGenChanged( int );
 
+ protected:
+
+ /**
+  * Recomputes the tournaments per generation, because the pool may have
+  * changed while another page was showing.
+  */
+ void showEvent( QShowEvent *event ) override;
 
  private:
 

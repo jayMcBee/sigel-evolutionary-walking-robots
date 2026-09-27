@@ -22,6 +22,7 @@
 */
 #include <QLineEdit>
 #include <QTimer>
+#include <QShowEvent>
 #include <qfiledialog.h>
 #include <qdatetime.h>
 #include <qspinbox.h>
@@ -749,6 +750,13 @@ void SIG_GPParameter::slotTourPerGenChanged( int newParmTPG )
    // CreateTours() and thus the *actual* number of Tournament per generation
    tpg = ((double)sliderTournamentsPerGeneration->value() / 1000.0) * (double)theExperiment.population.getSize();
    lcdnumberTournamentsPerGeneration->display( static_cast<int>( tpg ) );
+}
+
+void SIG_GPParameter::showEvent( QShowEvent *event )
+{
+  // Qt calls this each time this page is shown; the pool may have changed.
+  slotTourPerGenChanged( sliderTournamentsPerGeneration->value() );
+  SIG_GPParameterBase::showEvent( event );
 }
 
 }

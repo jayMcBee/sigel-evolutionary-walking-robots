@@ -903,8 +903,24 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-27 — DONE: ITEM 100, A MESSAGE WHEN RECORDING STOPS.** Start
-here.
+**2026-09-27 — DONE: ITEM 103, THE TOURNAMENT COUNTER NO LONGER GOES
+STALE.** Start here.
+
+- **Changed:** `SIG_GPParameter::showEvent` recomputes the tournaments per
+  generation each time the GP Parameters page is shown. Details are in item
+  103's entry in "Done".
+- **Baselines:** unchanged. The one guidrive line that reads the counter,
+  in the pages scenario, does not change the pool.
+- **Review:** correct and the smallest fix; no risk found. Left open, not
+  caused by this change: `SIG_ExperimentListView::selectItem` walks with
+  `itemBelow`, which skips the children of a collapsed experiment, so a menu
+  action on a collapsed experiment may not switch to its Individuals page.
+  Not tested.
+- **Gates:** `check.sh` 938 pass, 0 fail; warnings 487. The other four gates
+  are green.
+- **Next:** item 59, the pool limit of 32768; an investigation is prepared.
+
+**2026-09-27 — DONE: ITEM 100, A MESSAGE WHEN RECORDING STOPS.**
 
 - **Changed:** `SIG_SimulationVisualisationWidget::reportRecordedFrames`
   shows "N frames written to <folder>" when recording stops: from the movie
@@ -6110,6 +6126,16 @@ carried; other items and this file cite them, so they do not change.
   page, a label in the secondary text colour shows the description, or says
   that the experiment names a fitness function this build does not have.
   Remote ZORC is the last entry.
+
+- [x] **103. The tournaments-per-generation counter went stale** — done
+  2026-09-27. Reported by the x86 machine. `SIG_GPParameter` computed the
+  counter, the slider's fraction times the pool size, only when the page was
+  filled or the slider moved, so Clone (Empty Pool) followed by Add 250 still
+  showed 0. `SIG_GPParameter::showEvent` now recomputes it. The experiment's
+  pages share one `QStackedWidget`, so the pool cannot change while this page
+  shows, and every menu path that changes the pool switches to the
+  Individuals page first. The run was never affected: `SIG_GPManager` uses
+  the pool size itself.
 
 - [x] **100. Movie recording: a usable size, a frame rate, and where the
   frames went** — done 2026-09-27, in steps. The default movie size is
