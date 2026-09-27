@@ -47,10 +47,7 @@ namespace SIGEL_GP
       {
 	SIGEL_MasterGUI::SIG_IndividualListItem *actItem =
 	  static_cast<SIGEL_MasterGUI::SIG_IndividualListItem*>( (*listIter) );
-	// insert(): a slot assignment. This container has no setAutoDelete, so
-	// Qt 2 deleted nothing here -- the items belong to the list view.
-	// Qt 2's QVector::insert took a uint, so a negative index wrapped huge and was
-	// REJECTED. A signed test alone would let it through and index out of range.
+	// The items belong to the list view; individualItems does not own them.
 	if (actItem->poolPosition >= 0
 	    && actItem->poolPosition < individualItems.size())
 	  individualItems[ actItem->poolPosition ] = actItem;

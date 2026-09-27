@@ -198,9 +198,7 @@ namespace SIGEL_GP
  public:
   ~SIG_GPManager();
 
-  // The destructor qDeleteAll's tours, so a copy would free them twice. Qt 2's
-  // QVector copy cleared autoDelete on the copy and freed nothing; a QList copy
-  // shares the raw pointers. Nothing copies a manager.
+  // The destructor deletes the tournaments in tours, so a copy would free them twice.
   SIG_GPManager( SIG_GPManager const & ) = delete;
   SIG_GPManager &operator=( SIG_GPManager const & ) = delete;
 

@@ -103,8 +103,7 @@ SIGEL_GP::SIG_GPFitnessTrainer::SIG_GPFitnessTrainer(SIGEL_GP::SIG_GPExperiment&
 
 namespace {
 
-// Qt 2's QVector::resize() deleted every truncated item when autoDelete was set.
-// QList::resize() frees nothing. One site here shrinks: flushAllDynHosts.
+// Deletes the hosts past the new size, then shortens the list. QList::resize() deletes nothing.
 void resizeOwningHosts( QList< SIGEL_GP::SIG_GPActivePVMHost * > &v, qsizetype want )
 {
   if (want < 0)
@@ -118,8 +117,6 @@ void resizeOwningHosts( QList< SIGEL_GP::SIG_GPActivePVMHost * > &v, qsizetype w
 
 SIGEL_GP::SIG_GPFitnessTrainer::~SIG_GPFitnessTrainer() {
   // This class owns its dynamic host lists and its pending-spawn jobs.
-  // toSpawnList had no deleteContents anywhere: setAutoDelete(true) was its
-  // only ownership, so Qt 2's ~QList was the free.
   qDeleteAll( toSpawnList );
   toSpawnList.clear();
 
@@ -148,8 +145,7 @@ SIGEL_GP::SIG_GPFitnessTrainer::~SIG_GPFitnessTrainer() {
 #endif
     };
 
-  // Qt 2's autoDelete QVector freed these; QList does not. The loop above only
-  // tells PVM to drop the host; it never owned the object.
+  // The loop above only tells PVM to drop each host. The objects are freed here.
   qDeleteAll( pvmHosts );
   pvmHosts.clear();
 };
@@ -485,11 +481,8 @@ void SIGEL_GP::SIG_GPFitnessTrainer::stopTrainersSlaves()
 
 void SIGEL_GP::SIG_GPFitnessTrainer::sweepToSpawn()
 {
-  // Qt 2's QList internal cursor, written out. remove() took the CURRENT
-  // element and freed it, then left the cursor on whatever slid into that
-  // slot -- or on the new last element if the removed one was last, or dead
-  // if the list emptied. current() and next() read that cursor. Qt 6's QList has no
-  // cursor, so it is spelled out here rather than approximated.
+  // One pass over toSpawnList: each job gets one spawn try, and a spawned job
+  // is removed. cur is -1 when the pass has run off the end.
   qsizetype cur = toSpawnList.isEmpty() ? -1 : 0;
   QList< int > *actJob = (cur < 0) ? 0 : toSpawnList.at( cur );
   QList< int > *prevJob = 0;
@@ -574,7 +567,8 @@ void SIGEL_GP::SIG_GPFitnessTrainer::sweepToSpawn()
       if (success)
 	{
 	  delete toSpawnList.takeAt( cur );      // remove() freed it
-	  if (cur >= toSpawnList.size())         // Qt 2's QList cursor after remove()
+	  // Past the end: step back to the last job. That is prevJob, so the pass ends.
+	  if (cur >= toSpawnList.size())
 	    cur = toSpawnList.isEmpty() ? -1 : toSpawnList.size() - 1;
 	  actJob = (cur < 0) ? 0 : toSpawnList.at( cur );
 	  if (actJob == prevJob)

@@ -54,10 +54,8 @@ class SIG_GPPopulation
   private:
     QList<SIG_GPIndividual *> pool;
 
-    // pool owns raw pointers that ~SIG_GPPopulation qDeleteAll's, so a
-    // generated copy would free them twice. Qt 2's QVector copy cleared
-    // autoDelete on the copy; a plain QList does not. Nothing copies a
-    // population; code that tries fails here rather than double-freeing.
+    // pool owns its individuals and ~SIG_GPPopulation deletes them, so a copy
+    // would free them twice. The copy constructor and assignment are deleted.
 
     /**
      * The is a refernce of the SIG_Randomizer object of the GPManager. It is

@@ -903,7 +903,32 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-27 — DONE: METAGP'S FREE-SLOT SEARCH.** Start here.
+**2026-09-27 — DONE: ITEM 108, BATCH 1 OF 12, SIGEL_GP.** Start here.
+
+- **Changed:** comments only, in 8 files of `SIGEL_GP`. 26 comments that
+  named a Qt version were reviewed one by one: 21 cut to the fact today's code
+  needs, 4 dropped, 1 kept (above `readCharQt2` in `SIG_GPPVMHost.cpp`).
+- **Baselines:** unchanged.
+- **Review:** no defects. One nit: in `SIG_GPFitnessTrainer::sweepToSpawn`,
+  "cur is -1 when the pass has run off the end" covers the no-spawn path
+  only; after a spawn at the end, the pass ends by the `prevJob` break.
+- **Gates:** `check.sh` 938 pass, 0 fail; warnings 486. The other four gates
+  are green.
+- **Left for afterwards:** history comments in `SIGEL_GP` that name no Qt
+  version ("remove() freed it", "next(): a dead cursor stays dead",
+  "setAutoDelete was the only free", "insert() freed …", "In 1.3,
+  setAutoDelete(true) made ~QVector the free"). Other findings: `sprintf`
+  with the host name as format string in `flushAllDynHosts`; a local mutex
+  in `getNextHost` that locks nothing; dead `delete tours[ i ]` in
+  `createTours`; the cursor loops in `sweepToSpawn`, `evalNewIndis` and
+  `evalNeededIndis` could be plain forward loops; free functions
+  `resizeOwningHosts` and `readCharQt2`; spaces lost inside quoted host
+  paths, kept from 1.3.
+- **Next:** item 108, batch 2. Batches left: MT_GUI, SIGEL_MasterGUI,
+  MT_Control, MT_GPSystem, SIGEL_Program, SIGEL_RobotIO, SIGEL_Robot,
+  SIGEL_Simulation, SIGEL_SlaveGUI, and `sigel.cpp` with `sigel_slave.cpp`.
+
+**2026-09-27 — DONE: METAGP'S FREE-SLOT SEARCH.**
 
 - **Changed:** `MT_Evaluator::spawnTask` finds a free result slot with
   `indexOf(-1)`; before, it looked only at slot 0. Details are in its entry

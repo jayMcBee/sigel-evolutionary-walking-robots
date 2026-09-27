@@ -23,7 +23,7 @@
 #include <QList>
 #include <QString>
 #include <QTextStream>
-#include <algorithm>   // std::sort, std::count_if, numeric; Qt 2's QArray::sort compared raw bytes (memcmp)
+#include <algorithm>
 #include "SIGEL_GP/SIG_GPManager.h"
 
 #ifndef _WINDOWS
@@ -63,9 +63,7 @@ SIGEL_GP::SIG_GPManager::SIG_GPManager(SIGEL_GP::SIG_GPExperiment &experiment)
 	} else {
 		trainer = new SIG_GPFitnessTrainer(currentExperiment);
 	}
-	// tours.setAutoDelete(true) was the free for every tournament: it ran in
-	// Qt 2's ~QVector, in clear(), in insert() on the old occupant and in a
-	// shrinking resize(). Each of those is written out at its site.
+	// tours owns its tournaments. Each site that drops or replaces one deletes it.
 };
 
 
@@ -108,7 +106,7 @@ void SIGEL_GP::SIG_GPManager::evolutionLoop() {
 
       int touchsCounter = 0;
 
-      qsizetype canDoIdx = 0;   // was an iterator: Qt 2's list was linked
+      qsizetype canDoIdx = 0;   // an index, not an iterator: the loop appends to taskCanDoList
 
       while (canDoIdx < taskCanDoList.size()) {
       // Poll interval: long enough not to spin a core, short enough that
@@ -244,7 +242,7 @@ void SIGEL_GP::SIG_GPManager::createTours(int quantity) {
   // clear(): setAutoDelete made this delete every tournament. Real free.
   qDeleteAll( tours );
   tours.clear();
-  // resize() grows with value-initialised (null) slots, as Qt 2 did.
+  // resize() fills the new slots with null.
   tours.resize(quantity);
 
   for(int i=0;i<quantity;i++) {
@@ -352,8 +350,6 @@ void SIGEL_GP::SIG_GPManager::createTours(int quantity) {
         poolPositions[3]);
     };
 
-    // insert(): overwrite slot i, deleting any previous occupant. Qt 2's
-    // insert did NOT shift, unlike QList::insert. The slot is null here.
     delete tours[ i ];
     tours[ i ] = actTour;
   };
@@ -361,17 +357,8 @@ void SIGEL_GP::SIG_GPManager::createTours(int quantity) {
 
 namespace {
 
-  /* Qt 2's QVector::isEmpty() was count()==0 -- no NON-NULL slots -- while
-   * QList::isEmpty() is size()==0. They disagree between
-   * "tours.clear(); tours.resize(quantity);" and the loop that fills the slots,
-   * and after createTours' !totalProbCount early return, which leaves the
-   * vector resized and entirely null.
-   *
-   * Unreachable at the four call sites today: start()'s two callers, main and
-   * SIG_GUIGPExperiment::slotStartEvolution, each use a freshly built manager, so
-   * tours is default-constructed at each entry to run(). Reproduced anyway,
-   * so a caller that reuses a manager keeps 1.3's behaviour.
-   */
+  /* True when tours holds no tournament. Null slots do not count: createTours
+   * leaves every slot null when it returns early on zero probabilities. */
   bool toursAreEmpty( QList< SIGEL_GP::SIG_GPTournament * > const &tours )
   {
     for (SIGEL_GP::SIG_GPTournament *t : tours)
@@ -381,11 +368,8 @@ namespace {
   }
 
 
-  /* fitTaskList held setAutoDelete(true): Qt 2's ~QList was the ONLY free, and it
-   * ran on every exit -- including the two early returns inside the function.
-   * QList frees nothing, so the guard restores that. Same shape as
-   * DynaMechsLinkGuard in SIG_DynaMechsSimulationData.cpp.
-   */
+  /* Deletes the tasks left in fitTaskList on every exit from evalNewIndis and
+   * evalNeededIndis, including the early returns on a stop. */
   struct FitTaskListGuard
     {
       QList< QList<int> * > *tasks;
@@ -459,7 +443,7 @@ void SIGEL_GP::SIG_GPManager::evalNewIndis() {
     processInterfaceEvents();
 
     trainer->sweepToSpawn();
-    // first(): Qt 2 returned null on empty, Qt 6's first() is UB there.
+    // One pass over fitTaskList, as in SIG_GPFitnessTrainer::sweepToSpawn.
     qsizetype fitCur = fitTaskList.isEmpty() ? -1 : 0;
     QList<int> *actFitTask = (fitCur < 0) ? 0 : fitTaskList.at( fitCur );
     QList<int> *prevFitTask = 0;
@@ -486,7 +470,7 @@ void SIGEL_GP::SIG_GPManager::evalNewIndis() {
 
         // remove(): setAutoDelete(true) made this the free.
         delete fitTaskList.takeAt( fitCur );
-        // Qt 2's QList cursor after remove(): land on whatever slid in, else step back.
+        // Past the end: step back to the last task. That is prevFitTask, so the pass ends.
         if (fitCur >= fitTaskList.size())
           fitCur = fitTaskList.isEmpty() ? -1 : fitTaskList.size() - 1;
         actFitTask = (fitCur < 0) ? 0 : fitTaskList.at( fitCur );
@@ -687,7 +671,6 @@ void SIGEL_GP::SIG_GPManager::start()
 void SIGEL_GP::SIG_GPManager::run() {
 
 	// start the MT_GP-System only if the SIGEL-GP-System would start
-	// Qt 2's isEmpty() was count()==0 -- NO NON-NULL SLOTS -- not size()==0.
 	if(toursAreEmpty( tours ) && currentExperiment.getPopulation().getSize() > 3)
 		currentExperiment.mtController->startEvolution();
 
@@ -1085,7 +1068,7 @@ SIGEL_GP::SIG_GPManager::~SIG_GPManager()
 		delete trainer;
 	}
 
-	// Qt 2's ~QVector freed whatever tournaments were still held. QList does not.
+	// tours owns its tournaments.
 	qDeleteAll( tours );
 };
 
@@ -1370,7 +1353,7 @@ void SIGEL_GP::SIG_GPManager::evolutionLoop(MT_Classifier *MetaClassifier)
 
     	  int touchsCounter = 0;
 
-  	  qsizetype canDoIdx = 0;   // was an iterator: Qt 2's list was linked
+  	  qsizetype canDoIdx = 0;   // an index, not an iterator: the loop appends to taskCanDoList
 
   	  while (canDoIdx < taskCanDoList.size())
 	    {
@@ -1589,7 +1572,7 @@ int DebugInfo =0;
 	processInterfaceEvents();
 
 	trainer->sweepToSpawn();
-	// first(): Qt 2 returned null on empty, Qt 6's first() is UB there.
+	// One pass over fitTaskList, as in SIG_GPFitnessTrainer::sweepToSpawn.
 	qsizetype fitCur = fitTaskList.isEmpty() ? -1 : 0;
 	QList<int> *actFitTask = (fitCur < 0) ? 0 : fitTaskList.at( fitCur );
 	QList<int> *prevFitTask = 0;
@@ -1606,7 +1589,7 @@ int DebugInfo =0;
 
 		// remove(): setAutoDelete(true) made this the free.
 		delete fitTaskList.takeAt( fitCur );
-		// Qt 2's QList cursor after remove(): land on whatever slid in, else step back.
+		// Past the end: step back to the last task. That is prevFitTask, so the pass ends.
 		if (fitCur >= fitTaskList.size())
 		  fitCur = fitTaskList.isEmpty() ? -1 : fitTaskList.size() - 1;
 		actFitTask = (fitCur < 0) ? 0 : fitTaskList.at( fitCur );

@@ -111,8 +111,6 @@ void SIGEL_GP::SIG_GPExperiment::saveExperiment(QTextStream & file)
 
 void SIGEL_GP::SIG_GPExperiment::writeHistoryToFileTransfer( QTextStream &file )
 {
-  // Not first(): Qt 2's QList::first() returned null on an empty list, Qt 6's
-  // is undefined there and still compiles.
   for (const SIG_GPExperimentHistoryEntry *actEntry : experimentHistory)
     file << actEntry->print();
 };

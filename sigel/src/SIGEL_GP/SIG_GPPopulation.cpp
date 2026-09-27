@@ -291,9 +291,6 @@ void SIGEL_GP::SIG_GPPopulation::deleteIndividual(int poolpos)
 
    SIGEL_GP::SIG_GPIndividual *tmpInd;
 
-   // The victim. Qt 2's QVector::insert() freed it on the first iteration below;
-   // take() then nulled each source slot, so the resize at the end truncated
-   // a null and freed nothing. Exactly one delete, and this is it.
    delete pool[ poolpos ];
 
    for( int x=poolpos; x<getSize()-1; x++ )
