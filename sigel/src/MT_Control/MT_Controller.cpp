@@ -904,8 +904,8 @@ void MT_Controller::slotSaveSetup()
 		fileName.append(".mcnf");
 
 	QFile file(fileName);
-	if(file.exists() && 0 == QMessageBox::warning(mainWindow, "Save Configuration", "There is another file with this name. This will overwrite\n"
-		"the existing file. Do you really want to continue?", "OK", "Cancel", nullptr, 1))
+	if(file.exists() && QMessageBox::Ok != QMessageBox::warning(mainWindow, "Save Configuration", "There is another file with this name. This will overwrite\n"
+		"the existing file. Do you really want to continue?", QMessageBox::Ok | QMessageBox::Cancel, QMessageBox::Cancel))
 		return;
 	if(file.open(QIODevice::WriteOnly)){
 

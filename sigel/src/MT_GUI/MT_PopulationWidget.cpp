@@ -386,8 +386,8 @@ void MT_PopulationWidget::slotExpInd()
 				fileName += ".mpop";
 			QFile file( fileName );
 
-			if(file.exists() && 0 == QMessageBox::warning(this, "Save Population", "There is another file with this name. This will overwrite\n"
-				"the existing file. Do you really want to continue?", "OK", "Cancel", nullptr, 1))
+			if(file.exists() && QMessageBox::Ok != QMessageBox::warning(this, "Save Population", "There is another file with this name. This will overwrite\n"
+				"the existing file. Do you really want to continue?", QMessageBox::Ok | QMessageBox::Cancel, QMessageBox::Cancel))
 				return;
 
 			if(file.open(QIODevice::WriteOnly)){
@@ -415,8 +415,8 @@ void MT_PopulationWidget::slotExpInd()
 
 			for(int i=0; i<list->count(); i++){
 				QFile file( fileName + QString("%1.mind").arg(i) );
-				if(file.exists() && 0 == QMessageBox::warning(this, "Save Population", "There is another file with this name. This will overwrite\n"
-					"the existing file. Do you really want to continue?", "OK", "Cancel", nullptr, 1))
+				if(file.exists() && QMessageBox::Ok != QMessageBox::warning(this, "Save Population", "There is another file with this name. This will overwrite\n"
+					"the existing file. Do you really want to continue?", QMessageBox::Ok | QMessageBox::Cancel, QMessageBox::Cancel))
 					return;
 				if(file.open(QIODevice::WriteOnly)){
 					QTextStream str(&file);
@@ -476,8 +476,8 @@ void MT_PopulationWidget::slotSavePop()
 			fileName += ".mpop";
 		QFile file( fileName );
 
-		if(file.exists() && 0 == QMessageBox::warning(this, "Save Population", "There is another file with this name. This will overwrite\n"
-			"the existing file. Do you really want to continue?", "OK", "Cancel", nullptr, 1))
+		if(file.exists() && QMessageBox::Ok != QMessageBox::warning(this, "Save Population", "There is another file with this name. This will overwrite\n"
+			"the existing file. Do you really want to continue?", QMessageBox::Ok | QMessageBox::Cancel, QMessageBox::Cancel))
 			return;
 
 		if(file.open(QIODevice::WriteOnly)){

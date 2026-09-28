@@ -366,8 +366,8 @@ void MT_StatisticsWidget::slotEstDButton()
 		fileName.append(".dat");
 
 	QFile file(fileName);
-	if(file.exists() && 0 == QMessageBox::warning(nullptr, "Export Data", "There is another file with this name. This will overwrite\n"
-		"the existing file. Do you really want to continue?", "OK", "Cancel", nullptr, 1))
+	if(file.exists() && QMessageBox::Ok != QMessageBox::warning(nullptr, "Export Data", "There is another file with this name. This will overwrite\n"
+		"the existing file. Do you really want to continue?", QMessageBox::Ok | QMessageBox::Cancel, QMessageBox::Cancel))
 		return;
 
 	file.open(QIODevice::WriteOnly);
@@ -403,8 +403,8 @@ void MT_StatisticsWidget::slotFitnessDButton()
 		fileName.append(".dat");
 
 	QFile file(fileName);
-	if(file.exists() && 0 == QMessageBox::warning(nullptr, "Export Data", "There is another file with this name. This will overwrite\n"
-		"the existing file. Do you really want to continue?", "OK", "Cancel", nullptr, 1))
+	if(file.exists() && QMessageBox::Ok != QMessageBox::warning(nullptr, "Export Data", "There is another file with this name. This will overwrite\n"
+		"the existing file. Do you really want to continue?", QMessageBox::Ok | QMessageBox::Cancel, QMessageBox::Cancel))
 		return;
 
 	file.open(QIODevice::WriteOnly);
@@ -443,8 +443,8 @@ void MT_StatisticsWidget::slotSearchEffectsDButton()
 		fileName.append(".dat");
 
 	QFile file(fileName);
-	if(file.exists() && 0 == QMessageBox::warning(nullptr, "Export Data", "There is another file with this name. This will overwrite\n"
-		"the existing file. Do you really want to continue?", "OK", "Cancel", nullptr, 1))
+	if(file.exists() && QMessageBox::Ok != QMessageBox::warning(nullptr, "Export Data", "There is another file with this name. This will overwrite\n"
+		"the existing file. Do you really want to continue?", QMessageBox::Ok | QMessageBox::Cancel, QMessageBox::Cancel))
 		return;
 
 	file.open(QIODevice::WriteOnly);
@@ -494,8 +494,8 @@ void MT_StatisticsWidget::slotEstPSExport()
 		fileName.append(".eps");
 
 	QFile file(fileName);
-	if(file.exists() && 0 == QMessageBox::warning(nullptr, "Export to PostScript", "There is another file with this name. This will overwrite\n"
-		"the existing file. Do you really want to continue?", "OK", "Cancel", nullptr, 1))
+	if(file.exists() && QMessageBox::Ok != QMessageBox::warning(nullptr, "Export to PostScript", "There is another file with this name. This will overwrite\n"
+		"the existing file. Do you really want to continue?", QMessageBox::Ok | QMessageBox::Cancel, QMessageBox::Cancel))
 		return;
 
 	plotEstimation(fileName);
@@ -520,8 +520,8 @@ void MT_StatisticsWidget::slotFitnessPSExport()
 		fileName.append(".eps");
 
 	QFile file(fileName);
-	if(file.exists() && 0 == QMessageBox::warning(nullptr, "Export to PostScript", "There is another file with this name. This will overwrite\n"
-		"the existing file. Do you really want to continue?", "OK", "Cancel", nullptr, 1))
+	if(file.exists() && QMessageBox::Ok != QMessageBox::warning(nullptr, "Export to PostScript", "There is another file with this name. This will overwrite\n"
+		"the existing file. Do you really want to continue?", QMessageBox::Ok | QMessageBox::Cancel, QMessageBox::Cancel))
 		return;
 
 	plotFitness(fileName);
@@ -546,8 +546,8 @@ void MT_StatisticsWidget::slotSearchEffectsPSExport()
 		fileName.append(".eps");
 
 	QFile file(fileName);
-	if(file.exists() && 0 == QMessageBox::warning(nullptr, "Export to PostScript", "There is another file with this name. This will overwrite\n"
-		"the existing file. Do you really want to continue?", "OK", "Cancel", nullptr, 1))
+	if(file.exists() && QMessageBox::Ok != QMessageBox::warning(nullptr, "Export to PostScript", "There is another file with this name. This will overwrite\n"
+		"the existing file. Do you really want to continue?", QMessageBox::Ok | QMessageBox::Cancel, QMessageBox::Cancel))
 		return;
 	
 	plotSearchEffects(fileName);
