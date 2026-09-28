@@ -1436,9 +1436,9 @@ Do you want to replace it?]
   [dialog] class=QDialog title=[About SIGEL] modal=1
     parent [SIGEL_MasterGUI::SIG_MainWindow] tiedToMainWindow=1
     label pixmap=1 size=256x256
-    text lines=16 vScrollPolicy=1
+    text lines=25 vScrollPolicy=1
     | SIGEL v1.4
-    | Developed by PG 368:
+    | SIGEL 1.0 (2001) by PG 368:
     | Christian "Krasstexta" Aue
     | Abdeladim "Silent Ad" Benkacem
     | Michael "CJ QT" Gregorius
@@ -1453,6 +1453,15 @@ Do you want to replace it?]
     | Additional programming for v1.x by:
     | Patrick Matters (matters@ls11.cs.uni-dortmund.de)
     | Jan Barnholt (jan.barnholt@epost.de)
+    | 
+    | 
+    | MetaGP (v1.1–1.3):
+    | Implements the fitness meta-models from Jens Ziegler and Wolfgang Banzhaf's research (CLAWAR 2003).
+    | 
+    | 
+    | Modernised edition:
+    | An independent update of SIGEL for current systems.
+    | github.com/jayMcBee/sigel-evolutionary-walking-robots
     button [&OK] default=1
 
 == ROBOT INFO ==

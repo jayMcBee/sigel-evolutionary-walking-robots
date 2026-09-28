@@ -58,7 +58,7 @@ SIG_InfoBox::SIG_InfoBox( QWidget *parent, const char *name, bool modal, Qt::Win
   SIG_TextView *theView = new SIG_TextView( this, nullptr );
   theView->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
   theView->setText(QString("<h3>SIGEL v%1</h3>").arg( SIGEL_Tools::SIG_Version::number ) +
-		   "<h3>Developed by PG 368:</h3>"
+		   "<h3>SIGEL 1.0 (2001) by PG 368:</h3>"
 		   "<ul>"
 		   "<li>Christian <b>&quot;Krasstexta&quot;</b> Aue</li>"
 		   "<li>Abdeladim <b>&quot;Silent Ad&quot;</b> Benkacem</li>"
@@ -74,7 +74,12 @@ SIG_InfoBox::SIG_InfoBox( QWidget *parent, const char *name, bool modal, Qt::Win
 		   "<ul>"
 		   "<li>Patrick Matters (<tt>matters@ls11.cs.uni-dortmund.de</tt>)</li>"
 		   "<li>Jan Barnholt (<tt>jan.barnholt@epost.de</tt>)</li>"
-		   "</ul>"
+		   "</ul><br>"
+		   "<h3>MetaGP (v1.1&ndash;1.3):</h3>"
+		   "Implements the fitness meta-models from Jens Ziegler and Wolfgang Banzhaf's research (CLAWAR 2003).<br><br>"
+		   "<h3>Modernised edition:</h3>"
+		   "An independent update of SIGEL for current systems.<br>"
+		   "<tt>github.com/jayMcBee/sigel-evolutionary-walking-robots</tt>"
 		   );
   vL->addWidget( theView );
 
