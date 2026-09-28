@@ -909,7 +909,27 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-28 — DONE: QMESSAGEBOX BATCH 1, STANDARD BUTTONS INSTEAD OF BUTTON INDEXES.** Start here.
+**2026-09-28 — DONE: QMESSAGEBOX BATCH 2, NO DEPRECATED QMESSAGEBOX CALL IS LEFT.** Start here.
+
+- **Changed:** the four prompts with custom labels build a `QMessageBox`
+  with standard buttons and relabel them. Disabling MetaGP: Disable =
+  `Ignore`, Remove = `Discard`, Save & Remove = `Save`; default and Esc are
+  Disable, as before. Loading Experiment: Standard = `RestoreDefaults`,
+  Deactivate = `Abort`; Esc now deactivates, where it did nothing. Save
+  Individuals: `Yes` / `No`; Esc now saves separately. Import Population:
+  Append = `Ok`, Delete = `Discard`; Esc now appends. Qt orders the buttons
+  by role, so their order can differ from 1.3.
+- **Checked:** a sub-agent reviewed batch 1 and batch 2 against the Qt 6
+  headers: no deprecated call, same branch for the same label. It asked for
+  `<QAbstractButton>` in both files, which is added. Not checked by hand: the
+  MetaGP window's Add is broken, and MetaGP is out of scope for now.
+- **Baselines:** `guibehaviour-baseline.txt` records the Disabling MetaGP
+  buttons in Qt's role order; its header says so.
+- **Gates:** `check.sh` 758 pass, 0 fail; warnings 421. The other four gates
+  are green.
+- **Next:** to be planned with the maintainer.
+
+**2026-09-28 — DONE: QMESSAGEBOX BATCH 1, STANDARD BUTTONS INSTEAD OF BUTTON INDEXES.**
 
 - **Changed:** 49 `QMessageBox` calls leave the overloads Qt 6.2 deprecated,
   in four commits. The 11 overwrite prompts had their logic inverted: button 0
@@ -926,7 +946,7 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 - **Baselines:** unchanged.
 - **Gates:** `check.sh` 758 pass, 0 fail; warnings 425, 46 fewer. The other
   four gates are green on the final tree; each commit compiles on its own.
-- **Next:** batch 2, the four prompts with custom labels: Disabling MetaGP and
+- **Next (done, see above):** batch 2, the four prompts with custom labels: Disabling MetaGP and
   Loading Experiment in `MT_Controller`, Save Individuals and Import
   Population in `MT_PopulationWidget`. Each needs a choice of standard button
   per label, its Esc button and its button order. Item 33 still deletes the
