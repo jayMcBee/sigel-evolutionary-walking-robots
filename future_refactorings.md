@@ -69,6 +69,12 @@ Constructs the language removed. A current compiler rejects them.
   codebase for hard-coded limits and magic numbers that `numeric_limits` or a
   named constant would make readable and robust. One round: one build, one
   gate run, one review, one commit.
+  - The `MOD` case in `MT_Interpreter::interpret` guards `INT_MIN % -1` by
+    setting the divisor to 1. `x % -1` is 0 for every `x`, so the case becomes
+    `if (Mod2 == -1)` giving 0, with no `INT_MIN` at all.
+  - Found by item 113's review, both harmless today: `lum` takes
+    `abs(INT_MIN)`, and `lui`, `lud` and `lus` take `% SigProLengthOne`, which
+    divides by zero for an empty SIGEL program.
 - [ ] **113. MetaGP converts `double` to `int` without a defined result.**
   Found 2026-09-28. `MT_Interpreter::interpret` converts its `double`
   variables to `int` for jump targets, `MOD` and the `lui`/`lud`/`lus`
@@ -78,6 +84,13 @@ Constructs the language removed. A current compiler rejects them.
   `INT_MIN` for NaN and out-of-range values as x86 does, and truncating
   otherwise. MetaGP has no known users, so no results depend on it. Next
   after item 102.
+- [ ] **114. Merge nested `if`s without `else` into `if (A && B)`.** Found
+  2026-09-28: about 31 places where an `if` holds only another `if` and
+  neither has an `else`, most in MetaGP. `&&` evaluates `B` only when `A`
+  holds, so the meaning stays the same; places with an `else` are left out.
+  `clang-tidy` has no check for it. Look at each place: where `A` and `B`
+  are unrelated, the nesting may read better. One round: one build, one gate
+  run, one review, one commit.
 
 ---
 
