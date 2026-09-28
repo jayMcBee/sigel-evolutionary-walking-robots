@@ -120,13 +120,11 @@ void MT_Controller::startTimedEvolution(int minutes)
 
 void MT_Controller::slotEvolutionRunning(bool running)
 {
-	if(!running){
-		if(startWOSigel && !withGUI){
-			QObject::disconnect(gpManager, SIGNAL(metaEvolutionRunning(bool)), this, SLOT(slotEvolutionRunning(bool)));
-			// Not qApp: on the -mtevolve path main builds a plain QCoreApplication,
-			// and qApp's cast to QApplication would be undefined.
-			QCoreApplication::exit(0);
-		}
+	if(!running && startWOSigel && !withGUI){
+		QObject::disconnect(gpManager, SIGNAL(metaEvolutionRunning(bool)), this, SLOT(slotEvolutionRunning(bool)));
+		// Not qApp: on the -mtevolve path main builds a plain QCoreApplication,
+		// and qApp's cast to QApplication would be undefined.
+		QCoreApplication::exit(0);
 	}
 }
 
@@ -906,11 +904,9 @@ void MT_Controller::slotSaveSetup()
 		fileName.append(".mcnf");
 
 	QFile file(fileName);
-	if(file.exists()){
-		if(0 == QMessageBox::warning(mainWindow, "Save Configuration", "There is another file with this name. This will overwrite\n"
-			"the existing file. Do you really want to continue?", "OK", "Cancel", nullptr, 1))
-			return;
-	}
+	if(file.exists() && 0 == QMessageBox::warning(mainWindow, "Save Configuration", "There is another file with this name. This will overwrite\n"
+		"the existing file. Do you really want to continue?", "OK", "Cancel", nullptr, 1))
+		return;
 	if(file.open(QIODevice::WriteOnly)){
 
 		QTextStream strm(&file);

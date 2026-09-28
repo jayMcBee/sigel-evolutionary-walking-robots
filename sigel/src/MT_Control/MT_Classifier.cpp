@@ -210,17 +210,13 @@ int MT_Classifier::evaluationTactic(int ToursSize)
 				MetaProgError = (MetaProgError/ CorrectFitness.size())*100.0;  //MetaProgError := percentage error 
 			}
 
-			if (SigelGeneration >5.0)
+			// Tolerance is weighted by generation count
+			if (SigelGeneration >5.0 && SigelGeneration <= 150.0)
 			{
-			
-				// Tolerance is weighted by generation count
-				if (SigelGeneration <= 150.0)
+				double Rate = (40.0 - Tolerance) / 145.0;
+				if (Rate >0.0)
 				{
-					double Rate = (40.0 - Tolerance) / 145.0;
-					if (Rate >0.0)
-					{
-						ToleranceNew = 40.0 - Rate*SigelGeneration;
-					}
+					ToleranceNew = 40.0 - Rate*SigelGeneration;
 				}
 			}
 		
@@ -253,17 +249,14 @@ int MT_Classifier::evaluationTactic(int ToursSize)
 			}
 
 		// Tolerance weighting: AverageSigelFitness 
-			if (AverageSigelFitness>0.1)
+			if (AverageSigelFitness>0.1 && AverageSigelFitness<1.0)
 			{
-				if(AverageSigelFitness<1.0)
-				{
-					double ASigelFit = AverageSigelFitness - 0.1;
-					double Rate = (40.0-Tolerance)/0.9;
-					if (Rate >0.0)
-						ToleranceNew = 40.0 - Rate*ASigelFit;
-					if (ToleranceNew<0.0)
-						ToleranceNew = 0.0;
-				}
+				double ASigelFit = AverageSigelFitness - 0.1;
+				double Rate = (40.0-Tolerance)/0.9;
+				if (Rate >0.0)
+					ToleranceNew = 40.0 - Rate*ASigelFit;
+				if (ToleranceNew<0.0)
+					ToleranceNew = 0.0;
 			}
 
 

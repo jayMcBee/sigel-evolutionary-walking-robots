@@ -268,16 +268,13 @@ bool MT_Evaluator::evaluationTactic()
 			if (SigelGeneration <1.0)
 				SigelGeneration =1.0;
 
-			if ((SigelGeneration >5.0) && (ToleranceNew<500.0)) // 500 = 0.05*10000;
+			// Tolerance is weighted by generation count
+			if (SigelGeneration >5.0 && ToleranceNew<500.0 && SigelGeneration <= 150.0) // 500 = 0.05*10000;
 			{
-				// Tolerance is weighted by generation count
-				if (SigelGeneration <= 150.0)
+				double Rate =  (500.0 - ToleranceNew) / 145.0;
+				if (Rate >0.0)
 				{
-					double Rate =  (500.0 - ToleranceNew) / 145.0;
-					if (Rate >0.0)
-					{
-						ToleranceNew = 500.0 - Rate*SigelGeneration;
-					}
+					ToleranceNew = 500.0 - Rate*SigelGeneration;
 				}
 			}
 
