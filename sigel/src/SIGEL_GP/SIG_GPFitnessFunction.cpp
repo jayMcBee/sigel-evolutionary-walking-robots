@@ -26,7 +26,7 @@
 
 bool SIGEL_GP::SIG_GPFitnessFunction::isValid( double value ) const
 {
-  return ( (value != HUGE_VAL) && (value != (-HUGE_VAL)) && (value==value) );
+  return std::isfinite( value );
 };
 
 DL_vector SIGEL_GP::SIG_GPFitnessFunction::normalizeRobotPosition( DL_vector originalPosition,

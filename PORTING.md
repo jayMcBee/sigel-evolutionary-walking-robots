@@ -909,7 +909,18 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-28 — DONE: ITEM 112, PART 1, LIMIT LITERALS BECOME NUMERIC_LIMITS.** Start here.
+**2026-09-28 — DONE: ITEM 112, PART 2, ISVALID USES STD::ISFINITE.** Start here.
+
+- **Changed:** `SIG_GPFitnessFunction::isValid` is `std::isfinite( value )`
+  instead of comparing with `±HUGE_VAL` and itself. Same result for every
+  `double`; no compiler flag in the build changes that.
+- **Baselines:** unchanged.
+- **Review:** no defects.
+- **Gates:** `check.sh` 758 pass, 0 fail; warnings 471. The other four gates
+  are green.
+- **Next:** item 112's remaining parts, each its own change.
+
+**2026-09-28 — DONE: ITEM 112, PART 1, LIMIT LITERALS BECOME NUMERIC_LIMITS.**
 
 - **Changed:** `-2147483648` in `MT_Interpreter::interpret` (5 places) and
   `DBL_MAX` in `SIG_DynaMechsSimulationData` and `…Queries` (3 places) are
