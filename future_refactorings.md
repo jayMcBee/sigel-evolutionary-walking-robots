@@ -408,15 +408,6 @@ here changes evolution results, so each is judged only by whether the best
 fitness improves. Each starts with the published GP approaches to the
 problem; the choice is made before any code is written.
 
-- [ ] **115. Give the robot language conditionals that survive evolution.**
-  `CMP a,b` sets one flag to `a <= b`; `JMP n` jumps `n` lines when it is set.
-  There is no unconditional jump and no jump on equality. `JMP`'s distance is
-  almost always larger than the program, so any inserted or deleted line
-  moves every jump target, and a useful branch is rarely
-  passed on intact. Candidates from linear GP: an instruction that skips the
-  next line or a block when a condition fails. New commands change
-  `LanguageParameters` and the experiment files.
-
 - [ ] **116. Let drives hold a torque until the program changes it.**
   `SIG_DynaMechsCommandInterface::moveDrive` applies the torque from R0 for
   the `MOVE` duration, then the drive goes limp. Tristar sets 0.001 s, so
