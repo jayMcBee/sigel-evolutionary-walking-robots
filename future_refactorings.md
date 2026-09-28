@@ -308,6 +308,11 @@ touched, because changing one changes behaviour against the reference binary.
   deciding each change before it is made. The method is long and hard to
   read.
 
+- [ ] **120. Make MetaGP's Add work.** On the MetaGP window's population
+  page, Add does not add individuals, so the population can only be filled by
+  loading one. Found in use; the cause is not known yet
+  (`MT_PopulationWidget::slotAddInd` and its dialog look complete).
+
 - [ ] **106. Review `SIG_GPParameter.cpp` with the maintainer,** method by
   method, deciding each change before it is made. The GP Parameters page is
   hard to read: long methods, commented-out code, and porting comments that
