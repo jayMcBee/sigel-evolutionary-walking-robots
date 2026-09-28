@@ -75,6 +75,15 @@ Constructs the language removed. A current compiler rejects them.
   codebase for hard-coded limits and magic numbers that `numeric_limits` or a
   named constant would make readable and robust. One round: one build, one
   gate run, one review, one commit.
+- [ ] **113. MetaGP converts `double` to `int` without a defined result.**
+  Found 2026-09-28. `MT_Interpreter::interpret` converts its `double`
+  variables to `int` for jump targets, `MOD` and the `lui`/`lud`/`lus`
+  lookups. A value out of range or NaN is undefined behaviour: x86 gives
+  `INT_MIN`, ARM64 saturates and gives 0 for NaN. Decided: one member
+  function `MT_Interpreter::toInt(double)` for every such conversion, giving
+  `INT_MIN` for NaN and out-of-range values as x86 does, and truncating
+  otherwise. MetaGP has no known users, so no results depend on it. Next
+  after item 102.
 
 ---
 
