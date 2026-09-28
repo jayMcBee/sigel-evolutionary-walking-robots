@@ -16,7 +16,7 @@ tests each program in a physics simulator.
 - **MetaGP (1.1–1.3):** implements the fitness meta-models from Jens Ziegler
   and Wolfgang Banzhaf's research
   ([CLAWAR 2003](http://www.cs.mun.ca/~banzhaf/papers/ZieglerBanzhaf.pdf));
-  it cannot start on Linux.
+  it cannot currently start on Linux.
 - Running the 1.3 binaries on today's Linux:
   [Quick Guide](verification-against-sigel-1.3/README.txt).
 
