@@ -10,8 +10,6 @@ done; their numbers stay with them, because other items cite them.
 
 Paths are relative to `sigel/`, the source tree.
 
-**Proposed, not approved:** the section ordering.
-
 ---
 
 ## 1 · Make it legal C++
