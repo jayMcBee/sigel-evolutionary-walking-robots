@@ -27,7 +27,7 @@
 #include "matrix.h"
 #include "pointvector.h"
 #include <cmath>
-#include <cfloat>
+#include <limits>
 
 #include "SIGEL_Robot/SIG_JointSensor.h"
 #include "SIGEL_Robot/SIG_PitchRollSensor.h"
@@ -119,7 +119,7 @@ void SIGEL_Simulation::SIG_DynaMechsSimulationQueries::sense(int sensorNo,
 														minPos = joint->getMechsMinPos();
 														maxPos = joint->getMechsMaxPos();
 
-														if ( (minPos == (- DBL_MAX)) && (maxPos == DBL_MAX) )
+														if ( (minPos == std::numeric_limits<double>::lowest()) && (maxPos == std::numeric_limits<double>::max()) )
 														posRange = 1;
 														else
 														{	posRange = maxPos - minPos;

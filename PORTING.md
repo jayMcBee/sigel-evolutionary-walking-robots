@@ -909,7 +909,17 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-28 — DONE: ITEM 113, METAGP'S DOUBLE TO INT CONVERSION IS DEFINED.** Start here.
+**2026-09-28 — DONE: ITEM 112, PART 1, LIMIT LITERALS BECOME NUMERIC_LIMITS.** Start here.
+
+- **Changed:** `-2147483648` in `MT_Interpreter::interpret` (5 places) and
+  `DBL_MAX` in `SIG_DynaMechsSimulationData` and `…Queries` (3 places) are
+  `std::numeric_limits`; `<cfloat>` became `<limits>`. The logic is unchanged.
+- **Baselines:** unchanged.
+- **Gates:** `check.sh` 758 pass, 0 fail; warnings 471. The other four gates
+  are green.
+- **Next:** item 112's remaining parts, each its own change; see the item.
+
+**2026-09-28 — DONE: ITEM 113, METAGP'S DOUBLE TO INT CONVERSION IS DEFINED.**
 
 - **Changed:** details are in item 113's entry in "Done".
 - **Baselines:** unchanged.

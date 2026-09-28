@@ -46,7 +46,7 @@
 
 #include <cstdlib>
 #include <cmath>
-#include <cfloat>
+#include <limits>
 
 using namespace SIGEL_Tools;
 
@@ -421,8 +421,8 @@ SIGEL_Simulation::SIG_DynaMechsLink *SIGEL_Simulation::SIG_DynaMechsSimulationDa
   if (minLimit==maxLimit)
     {
       k_spring = b_damper = 0;
-      minLimit = - DBL_MAX;
-      maxLimit = DBL_MAX;
+      minLimit = std::numeric_limits<double>::lowest();
+      maxLimit = std::numeric_limits<double>::max();
     };
 
   double jointFriction = simulationParameter.getJointFrictionU_c();

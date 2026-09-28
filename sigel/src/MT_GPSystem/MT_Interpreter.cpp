@@ -251,7 +251,7 @@ double MT_Interpreter::interpret(MT_TranslatedIndividual *RobProg)
 						Mod1 = toInt(Variables[Source]);
 
 						if (Mod2 == -1)
-							if (Mod1 == -2147483648)
+							if (Mod1 == std::numeric_limits<int>::min())
 								Mod2 = 1;
 
 						Variables[Source] = Mod1 % Mod2;
@@ -266,7 +266,7 @@ double MT_Interpreter::interpret(MT_TranslatedIndividual *RobProg)
 						Mod1 = toInt(Variables[Source]);
 
 						if (Mod2 == -1)
-							if (Mod1 == -2147483648)
+							if (Mod1 == std::numeric_limits<int>::min())
 								Mod2 = 1;
 
 						Variables[Source] = Mod1 % Mod2;
@@ -364,7 +364,7 @@ double MT_Interpreter::interpret(MT_TranslatedIndividual *RobProg)
 				if (ProgramCounter < 0)
 				{
 					ProgramCounter = ProgramCounter * -1;
-					if (ProgramCounter == -2147483648)
+					if (ProgramCounter == std::numeric_limits<int>::min())
 						ProgramCounter = 0;
 				}
 				if (ProgramCounter >= NumOfInstruction)
@@ -383,7 +383,7 @@ double MT_Interpreter::interpret(MT_TranslatedIndividual *RobProg)
 					if (ProgramCounter < 0)
 					{
 						ProgramCounter = ProgramCounter * -1;
-						if (ProgramCounter == -2147483648)
+						if (ProgramCounter == std::numeric_limits<int>::min())
 							ProgramCounter = 0;
 					}
 
@@ -406,7 +406,7 @@ double MT_Interpreter::interpret(MT_TranslatedIndividual *RobProg)
 					if (ProgramCounter < 0)
 					{
 						ProgramCounter = ProgramCounter * -1;
-						if (ProgramCounter == -2147483648)
+						if (ProgramCounter == std::numeric_limits<int>::min())
 							ProgramCounter = 0;
 					}
 

@@ -69,6 +69,14 @@ Constructs the language removed. A current compiler rejects them.
   codebase for hard-coded limits and magic numbers that `numeric_limits` or a
   named constant would make readable and robust. One round: one build, one
   gate run, one review, one commit.
+  **Part 1 done 2026-09-28:** the literal `-2147483648` (5 places) and
+  `DBL_MAX` (3 places) are `std::numeric_limits`. A search for other
+  spellings of type limits found none. Left, each its own change:
+  - The three jumps in `MT_Interpreter::interpret` test for `INT_MIN` after
+    negating, when the negation has already overflowed; test first.
+  - `SIG_GPFitnessFunction`'s `HUGE_VAL` test is `std::isfinite`.
+  - The operand range `32000` (4 places in `SIG_GPOperations` and
+    `SIG_ProgramLine`) becomes a named constant.
   - The `MOD` case in `MT_Interpreter::interpret` guards `INT_MIN % -1` by
     setting the divisor to 1. `x % -1` is 0 for every `x`, so the case becomes
     `if (Mod2 == -1)` giving 0, with no `INT_MIN` at all.
