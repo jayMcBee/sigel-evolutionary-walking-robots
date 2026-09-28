@@ -702,36 +702,43 @@ touched, because changing one changes behaviour against the reference binary.
 
 ## 8 · GP engine
 
-Changes to how programs control robots and how evolution changes them. Each
-changes evolution results, so each is judged by whether the best fitness
-improves. Assess published GP approaches first, then decide, then code.
+How programs control a robot, and how evolution changes programs. Every item
+here changes evolution results, so each is judged only by whether the best
+fitness improves. Each starts with the published GP approaches to the
+problem; the choice is made before any code is written.
 
-- [ ] **115. Proper conditionals.** Found 2026-09-28 by the language
-  assessment. The robot language has `CMP a,b`, which sets one flag to
-  `a <= b`, and `JMP n`, which jumps `n` lines relative when the flag is set.
-  There is no unconditional jump and no jump on equality, and a jump target
-  moves whenever a line is inserted or deleted before it. Decide what a
-  proper conditional is here, for example an instruction that skips the
-  next line or a block, as linear GP systems use. New commands change
-  `LanguageParameters` and the experiment files.
+- [ ] **115. Give the robot language conditionals that survive evolution.**
+  Found 2026-09-28 by the language assessment.
+  - **Today:** `CMP a,b` sets one flag to `a <= b`. `JMP n` jumps `n` lines
+    forward or back when the flag is set, and goes to the next line
+    otherwise. There is no unconditional jump and no jump on equality.
+  - **Why it matters:** `n` is almost always larger than the program, so any
+    inserted or deleted line moves every jump target to an unrelated line. A
+    useful branch is rarely passed on intact.
+  - **To assess:** conditional forms used in linear GP, for example an
+    instruction that skips the next line or a block when a condition fails.
+  - **Cost:** new commands change `LanguageParameters` and the experiment
+    files.
 
-- [ ] **116. Motor on, motor off.** Found 2026-09-28.
-  `SIG_DynaMechsCommandInterface::moveDrive` applies the torque from R0 for
-  the `MOVE` duration set in the experiment; then the drive goes limp. In
-  tristar that duration is 0.001 s, so every `MOVE` is a single 10 ms
-  step, and few joints carry load at the same time. Give programs explicit
-  control: two commands (motor on with a torque, motor off), or one command
-  with a duration parameter, so a torque holds until the program changes
-  it. New commands change `LanguageParameters` and the experiment files.
+- [ ] **116. Let drives hold a torque until the program changes it.** Found
+  2026-09-28.
+  - **Today:** `SIG_DynaMechsCommandInterface::moveDrive` applies the torque
+    from R0 for the `MOVE` duration set in the experiment; after that the
+    drive goes limp. Tristar sets 0.001 s, so every `MOVE` acts for a single
+    10 ms step, and few joints carry load at the same time.
+  - **Options:** two commands, one that starts a drive with a torque and one
+    that stops it; or one command with a duration operand.
+  - **Cost:** new commands change `LanguageParameters` and the experiment
+    files.
 
-- [ ] **117. Mutation that tunes parameters.** Found 2026-09-28.
-  `SIG_GPOperations::mutation` changes an operand only by drawing a fresh
-  value over the whole range, never by a small step. Torque, drive number,
-  jump distance and register numbers can therefore not be tuned. Steps of
-  plus or minus 1 would need far too many attempts. Assess published
-  approaches, for example steps from a distribution scaled to the operand's
-  range, or step sizes that adapt during the run, and choose one before
-  coding.
+- [ ] **117. Let mutation tune operands in steps.** Found 2026-09-28.
+  - **Today:** `SIG_GPOperations::mutation` changes an operand only by
+    drawing a new value over the whole range. Torque, drive number, jump
+    distance and register number can be replaced, but never adjusted.
+  - **Why not plus or minus 1:** steps that small need far too many
+    generations to reach a useful value.
+  - **To assess:** step sizes drawn from a distribution scaled to the
+    operand's range, and step sizes that adapt during the run.
 
 ---
 
