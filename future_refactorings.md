@@ -22,13 +22,6 @@ Constructs the language removed. A current compiler rejects them.
   `SIG_DynaMechsSimulationQueries.h`. This does **not** retire `shim/`: the vendored
   libraries still include these headers through it.
 
-- [ ] **3. Fix the loop-variable scope leaks in `src/MT_GPSystem/`:**
-  `for (int i=…){…}` with `i` used after the loop. Hoist the declaration.
-  In `MT_FitnessTrainer`, `MT_GPManager`, `MT_Interpreter`, `MT_Population`,
-  `MT_Program`, `MT_Randomizer`, `MT_Search`, `MT_Statistics`,
-  `MT_StatisticsElement`, `MT_Tournament`, `MT_TournamentManager`,
-  `MT_TranslatedIndividual` and `MT_Trainingset`.
-
 ---
 
 ## 2 · Let the compiler hunt bugs

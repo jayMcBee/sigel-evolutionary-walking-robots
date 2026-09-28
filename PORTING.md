@@ -4859,12 +4859,11 @@ else that stops matching 1.3 still needs justifying as a defect.
 | **A sensor at the top of its range reads the register's top.** 1.3, and 1.0, map a reading of exactly 1 one past the register's top, and the register wraps it to the bottom: a joint on its max stop reads as its min, and a contact sensor reads the same with and without contact | by decision 2026-09-23, from the 1.0 → 1.3 regression work: `SIG_DynaMechsSimulationQueries::sense` caps the value at the register's top. The 2001 `runner` programs depend on the wrap and no longer reproduce. Done 2026-09-24: `experiments/runner.exp` is a new population evolved under the fixed sensors. See §7, "The 1.0 → 1.3 regression — DONE 2026-09-24" | `fitness-baseline.txt` |
 | **The Stepper fitness function is gone — item 82.** 1.3's fitness combo box has 7 entries, ours 6. An experiment file that names `StepperFitnessFunction` shows no fitness function selected; saving keeps the name, and Start refuses to run | by decision 2026-09-24. No shipped experiment uses it. `SIG_GPParameter::getOutOfExperiment` selects nothing for any name `SIG_GPFitnessFunctionRegistry` does not have, and `SIG_GUIGPExperiment::slotStartEvolution` refuses it | `guibehaviour-baseline.txt`: the `fitnessFunctionList` lines |
 
-**Two 1.3 defects preserved on purpose**, plus the one below them. `MT_GUI`'s
-gnuplot export puts a constant x on datasets `2pt destr.` and `3pt destr.`
-(pre-standard `for` scoping); `MT_PopulationWidget`'s save-individuals loop never
-advances the cursor and writes the same individual into every file. A third,
-`callRenderPixMap` reporting every frame write as a success, was fixed by item
-67. And one that is checked: **saving grows the file**
+**Three 1.3 defects the port preserved are fixed since.** `MT_GUI`'s gnuplot
+export put a constant x on datasets `2pt destr.` and `3pt destr.`, and
+`MT_PopulationWidget`'s save-individuals loop wrote the same individual into
+every file; both fixed 2026-09-28. `callRenderPixMap` reporting every frame
+write as a success was fixed by item 67. And one that is checked: **saving grows the file**
 by exactly **840 bytes = 120 × 7**, one `"      \n"` per individual per save,
 because the reader takes everything between `HISTORY BEGIN{` and `}HISTORY END`
 as ONE string and the writer re-emits it before a fresh terminator. The
@@ -6622,6 +6621,14 @@ carried; other items and this file cite them, so they do not change.
   removed its `INT_MIN` test and such a jump crashed. Every other value gives
   the same target as before; 9,000,099 values were compared. Dropped by
   decision: a named constant for the operand range `32000`.
+
+- [x] **3. Loop-variable scope leaks in `MT_GPSystem`** — done 2026-08-19 by
+  115bcf4, which gave each `for` loop its own variable, and 35b460d for
+  `SIGEL_GP`; the item stayed open by mistake. Confirmed 2026-09-28: `-Wshadow`
+  over `MT_GPSystem`, with and without `SIG_DEBUG`, finds no loop variable
+  that hides another name, and a text scan of all of `sigel/src` and
+  `sigel/include`, `_WINDOWS` branches included, finds no loop variable used
+  after its loop.
 
 - [x] **54. The empty catch blocks log the exception** — done 2026-09-28,
   one commit. The catch around `simulation->start()` in `evalFitness` of the
