@@ -909,7 +909,22 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-28 — DONE: ITEM 111, THE MINIMUM PROGRAM LENGTH IS AT LEAST 5 IN THE DIALOG. ITEM 111 IS DONE.** Start here.
+**2026-09-28 — IN PROGRESS: ITEM 114, NESTED IFS MERGED, ONE MODULE AT A TIME.** Start here.
+
+- **Found:** 28 places where an `if` holds only another `if` and neither has
+  an `else`. Two more hits were the `#ifdef _WINDOWS` / `#else` pair of one
+  `if`, not a nesting.
+- **Part 1, MT_Control:** merged in `MT_Classifier::evaluationTactic` (2
+  places), `MT_Controller::slotEvolutionRunning`,
+  `MT_Controller::slotSaveSetup` and `MT_Evaluator::evaluationTactic`. The two
+  places in `MT_Controller::configureSystem` stay nested: the inner condition
+  creates the object and checks for failure.
+- **Baselines:** unchanged.
+- **Gates:** `check.sh` 758 pass, 0 fail; warnings 471. The other four gates
+  are green.
+- **Next:** part 2, MT_GUI. Then MetaGP and the rest of the modules.
+
+**2026-09-28 — DONE: ITEM 111, THE MINIMUM PROGRAM LENGTH IS AT LEAST 5 IN THE DIALOG. ITEM 111 IS DONE.**
 
 - **Changed:** `spinboxMinIndLength` goes down to 5, not 2; a new experiment
   starts with 5, not 3. Details are in item 111's entry in "Done".
