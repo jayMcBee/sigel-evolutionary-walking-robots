@@ -415,7 +415,7 @@ void MT_PopulationWidget::slotExpInd()
 		if(!fileName.isEmpty()){
 
 			for(int i=0; i<list->count(); i++){
-				QFile file( fileName.append("%1.mind").arg(i) );
+				QFile file( fileName + QString("%1.mind").arg(i) );
 				if(file.exists() && 0 == QMessageBox::warning(this, "Save Population", "There is another file with this name. This will overwrite\n"
 					"the existing file. Do you really want to continue?", "OK", "Cancel", nullptr, 1))
 					return;
