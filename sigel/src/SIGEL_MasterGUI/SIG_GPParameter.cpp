@@ -715,9 +715,9 @@ void SIG_GPParameter::slotMutationChanged( int newMutationValue )
     sliderMutation->setValue( 1000 - sliderCrossover->value() );
   double mutationValue = static_cast<double>( sliderMutation->value() );
   double crossoverValue = static_cast<double>( sliderCrossover->value() );
-  lcdnumberMutation->display( mutationValue / 10 );
+  lcdnumberMutation->display( qRound( mutationValue / 10 ) );
   sliderReproduction->setValue( 1000 - sliderMutation->value() - sliderCrossover->value() );
-  lcdnumberReproduction->display( ( 1000 - mutationValue - crossoverValue) / 10 );
+  lcdnumberReproduction->display( qRound( ( 1000 - mutationValue - crossoverValue) / 10 ) );
 }
 
 void SIG_GPParameter::slotCrossoverChanged( int newCrossoverValue )
@@ -726,9 +726,9 @@ void SIG_GPParameter::slotCrossoverChanged( int newCrossoverValue )
     sliderCrossover->setValue( 1000 - sliderMutation->value() );
   double mutationValue = static_cast<double>( sliderMutation->value() );
   double crossoverValue = static_cast<double>( sliderCrossover->value() );
-  lcdnumberCrossover->display( crossoverValue / 10 );
+  lcdnumberCrossover->display( qRound( crossoverValue / 10 ) );
   sliderReproduction->setValue( 1000 - sliderMutation->value() - sliderCrossover->value() );
-  lcdnumberReproduction->display( (1000 - crossoverValue - mutationValue) / 10 );
+  lcdnumberReproduction->display( qRound( (1000 - crossoverValue - mutationValue) / 10 ) );
 }
 
 void SIG_GPParameter::slotTourPerGenChanged( int newParmTPG )

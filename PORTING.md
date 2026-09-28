@@ -909,7 +909,17 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-27 — DONE: ITEM 101, EMPTY DESTRUCTORS REMOVED.** Start here.
+**2026-09-28 — DONE: THE GENETIC-OPERATOR DISPLAYS SHOW WHOLE NUMBERS.** Start here.
+
+- **Changed:** `SIG_GPParameter::slotMutationChanged` and
+  `slotCrossoverChanged` round the three displays to whole percent. The
+  sliders and the experiment keep their thousandths.
+- **Baselines:** `guibehaviour-baseline.txt`, two display readings.
+- **Gates:** `check.sh` 758 pass, 0 fail; warnings 485. The other four gates
+  are green.
+- **Next:** item 102.
+
+**2026-09-27 — DONE: ITEM 101, EMPTY DESTRUCTORS REMOVED.**
 
 - **Changed:** 100 empty destructors, in 199 files. Details are in item
   101's entry in "Done".

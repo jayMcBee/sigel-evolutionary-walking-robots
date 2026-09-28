@@ -616,9 +616,9 @@ we do with the system?]
     spin   spinboxResEvGen                      v=0         [0..99] step=1 pre=[] suf=[] up=1         dn2=0         typed(max+1)=[10]->10 commits=10 enabled=1
     slider sliderReproduction                   v=280    [0..1000] page=1 up=280    pgup=280    end=280    lcd=lcdnumberReproduction 28/28/28/28 enabled=0
     click  sliderReproduction                   280 -> 280 (delta +0) focusPolicy=11 hasFocus=0
-    slider sliderMutation                       v=50     [0..1000] page=1 up=51     pgup=52     end=330    lcd=lcdnumberMutation 5/5.1/5.2/33 enabled=1
+    slider sliderMutation                       v=50     [0..1000] page=1 up=51     pgup=52     end=330    lcd=lcdnumberMutation 5/5/5/33 enabled=1
     click  sliderMutation                       50 -> 51 (delta +1) focusPolicy=11 hasFocus=0
-    slider sliderCrossover                      v=670    [0..1000] page=1 up=671    pgup=672    end=950    lcd=lcdnumberCrossover 67/67.1/67.2/95 enabled=1
+    slider sliderCrossover                      v=670    [0..1000] page=1 up=671    pgup=672    end=950    lcd=lcdnumberCrossover 67/67/67/95 enabled=1
     click  sliderCrossover                      670 -> 671 (delta +1) focusPolicy=11 hasFocus=0
     combo  fitnessFunctionList                  count=6 current=0 [Simple] editable=0 enabled=1
       item0  [Simple]
