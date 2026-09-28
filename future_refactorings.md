@@ -59,6 +59,13 @@ Constructs the language removed. A current compiler rejects them.
   NiceWalking and Force fitness functions, once per evaluation; the elements
   of `MT_Statistics`; the list in `MT_PopulationWidget::slotExpInd`.
 
+- [ ] **36. Delete `SIG_Body::usedByLinks` and make
+  `SIG_Material::FrictionValue` a value type.** `usedByLinks` is written and
+  never read. `FrictionValue` values would drop the `new` and the
+  `qDeleteAll`, as D8 did for `SIG_Register`; tidiness only. D11 left both as
+  they were because the port moved the Qt API and nothing else; that was a
+  port-scope rule, not a refusal.
+
 ---
 
 ## 4 · Program display
@@ -145,6 +152,14 @@ Constructs the language removed. A current compiler rejects them.
   `KDESIGEL v1.1 Readme File`. `pixmaps/altLogo.png`, with a `Sigel v1.0`
   caption, is kept but unused.
 
+- [ ] **30. Cut comments over two lines that do not earn their place.** A
+  longer comment must carry something the code cannot say. **Comments the port
+  itself wrote come first.** File by file, each pass signed off first. The
+  named instance: the comment above `setIconSize( QSize( 25, 25 ) )` in
+  `SIG_MainWindow::SIG_MainWindow`. Two lines carry the whole fact — Qt 6 has
+  one icon size per toolbar, and 25 is the largest of the small pixmaps, so
+  nothing is scaled past what 1.3 drew.
+
 ---
 
 ## 6 · Defects preserved by the port
@@ -191,48 +206,6 @@ touched, because changing one changes behaviour against the reference binary.
   experiment does. The library is unpatched, as SIGEL's `supportingLibs`
   ships it.
 
----
-
-## 7 · The interface
-
-- [ ] **107. Review `SIG_GPPopulation::readFromFile` with the maintainer,**
-  deciding each change before it is made.
-
-- [ ] **106. Review `SIG_GPParameter.cpp` with the maintainer,** method by
-  method, deciding each change before it is made.
-
-- [ ] **29. Give SIGEL a real logging system.** Qt 6's `QTextStream` does not
-  flush on a newline, so diagnostics written through `SIG_IO` are lost when
-  the process dies, which is exactly when they are wanted.
-  **Do not fix this by adding `Qt::endl` everywhere.** It needs levels, one
-  place that decides where output goes and when it flushes, and something the
-  GUI can display. It replaces both `SIG_IO` and the console-warning stopgap.
-  **Start at `SIG_IO::cerr`** — decided; it is the hook.
-  **Review every dialog outside the interface modules as part of this,** for
-  example in `SIG_EnvironmentRenderer`, `MT_Controller`, `SIG_GPPopulation`
-  and `SIG_GPRemoteZORCFitnessFunction`. Decide for each whether it belongs in
-  the interface or goes through the new error reporter.
-
-- [ ] **30. Cut comments over two lines that do not earn their place.** A
-  longer comment must carry something the code cannot say. **Comments the port
-  itself wrote come first.** File by file, each pass signed off first. The
-  named instance: the comment above `setIconSize( QSize( 25, 25 ) )` in
-  `SIG_MainWindow::SIG_MainWindow`. Two lines carry the whole fact — Qt 6 has
-  one icon size per toolbar, and 25 is the largest of the small pixmaps, so
-  nothing is scaled past what 1.3 drew.
-
-- [ ] **32. Remove the redundant `setEnabled` lines** in
-  `SIG_GUIGPExperiment::slotStartEvolution` and `slotEvolutionStopped`;
-  `slotEvolutionNotRunning` already does it. **Keep `pushbuttonStop`** —
-  nothing else enables it.
-
-- [ ] **33. Delete the overwrite prompts D35 wants gone,** rather than
-  re-parent them: after a `getSaveFileName` that already asks, in
-  `MT_StatisticsWidget` (item 25 left these for this item),
-  `MT_PopulationWidget`, `MT_IndividualsWidget` and
-  `MT_Controller::slotSaveSetup`. D33 does not say whether deleting a prompt
-  in `MT_Controller` is outside it.
-
 - [ ] **34. Fix `tearDownPvm()`: `pvm_halt()` never returns.** The daemon
   SIGTERMs this process instead. `guidrive` survives that with
   `keepExitCodeThroughPvmShutdown`, but then reports 0 for any SIGTERM,
@@ -252,37 +225,6 @@ touched, because changing one changes behaviour against the reference binary.
   `dmEnvironment::loadTerrainData` disagree on row order, so a floor whose X
   and Z sizes differ is misread. Physics and drawing agree, and no shipped
   experiment sets `FLOORDIMENSION`. A fix changes physics for such floors.
-
-- [ ] **64. Remove what is left of Dynamo.** PORTING.md, "Dynamo removed,
-  DynaMechs kept", has the background.
-  - **The choice of Dynamo in the interface and the model:** the
-    "Dynamo  (not recommended)" radio button and the `DynaMo` tabs in
-    `SIG_SimulationParameterBase.ui` and `SIG_EnvironmentBase.ui`;
-    `SIG_SimulationParameter::putIntoExperiment` and `getOutOfExperiment`; the
-    `DynaMo` value of `SIG_SimulationParameters::SimulationLibrary` and every
-    case that handles it, with `SIG_Robot::prepareDynaMo`,
-    `SIG_Link::transformToDynaMo` and `SIG_Simulation::slotDynamoMessage`; the
-    DynaMechs check in `SIG_GUIGPExperiment::slotRobotInfo`;
-    `SIG_SimulationCannotSolveException` and the `stopSimulation` flag that
-    only Dynamo sets. Today the interface can make
-    an experiment the simulation refuses, which is one way into item 20.
-    Dynamo's settings in the `.exp` files (`MAXIMALERROR`,
-    `MAXIMALITERATIONS`, `SKIPFRAMES`, `ANALYTICAL`, `MAXIMALCOLLISIONLOOPS`,
-    `SOLVEMODE`, `INTEGRATOR`, `MAXIMALSOLIDITERATIONS`) are in every shipped
-    experiment, so removing them changes the file format, and the maintainer
-    decides. `SIMULATIONLIBRARY` loses its Dynamo value only. `STEPSIZE`
-    stays: DynaMechs uses it.
-  - **The maths library `libdynalib.a`,** whose `DL_vector` and `DL_matrix`
-    SIGEL is built on. PORTING.md, "Follow-up this change deliberately did not
-    take", point 3, has the plan: a small local header in its place.
-  Doc comments that name Dynamo go with the code they describe. The guard in
-  `SIG_SimulationVisualisationWidget::visualizeThis` stays, for
-  `SIG_CannotMirtich`.
-
-- [ ] **68. Decide whether the robot starts in the middle of the terrain.**
-  Every shipped experiment starts it at the terrain's corner. Moving it means
-  either `STARTPOSITION` in the `.exp` files, a file change, or the terrain's
-  place in DynaMechs, a vendor patch. Positions and fitness move with it.
 
 - [ ] **73. Fix the latent sensor bugs in
   `SIG_DynaMechsSimulationQueries::sense`:** a joint with equal limits reads
@@ -310,6 +252,139 @@ touched, because changing one changes behaviour against the reference binary.
   gives negative mass and inertia in `SIG_Mirtich::computePhysics`; the robot
   loads and the simulation runs into NaN without a message. A warning at load,
   naming the link and the mesh file, is one option.
+
+- [ ] **90. Decide whether "stop at generation N" counts pool generations.**
+  By reading the code, `SIG_GPManager::checkTerminationConditions` counts from
+  each start, not in the pool generation the Experiment page and `.exp` file
+  show. Changing it changes when a run stops. The text in
+  `SIG_GUIGPExperiment::terminationAlreadyMet` changes with it.
+
+- [ ] **89. Refuse bad simulation parameters.** Needs more thought.
+  - **Time to simulate under 1 s:** the simulated fitness functions divide by
+    the run time in whole seconds, which gives `inf`, or `NaN` for a robot
+    that does not move. What the GP does with that is not measured.
+  - **Step size of 0 or less:** item 104.
+  **Where to refuse, not decided:** (1) a range on the field, which stops
+  typing only; (2) on load, in `SIG_SimulationParameters`, like item 71, but
+  any load error kills the interface until item 88 is done; (3) when a run
+  starts, with a message box, which catches typed and loaded values and kills
+  nothing.
+
+- [ ] **104. Refuse a step size of 0 or less.** The step-size half of item
+  89. A step of 0 gives `int(inf)`, undefined behaviour, in Real Speed, and
+  loops `SIG_Simulation::start` for ever in the other fitness functions.
+  - **On load:** throw `SIG_UnstreamingError` for a `STEPSIZE` of 0 or less,
+    as item 71 does for register widths. File > Open shows it (item 88);
+    `sigel -e` and `sigel_eval` refuse the file.
+  - **When typed:** `lineeditStepSize` becomes a `QDoubleSpinBox` with a
+    smallest value above 0.
+  - **Open:** the smallest step and its decimals. The shipped experiments use
+    0.01 and 0.002; 0.0001 with 4 decimals would keep both.
+
+- [ ] **37. Give each `generateTerrain` call its own partial file name.** The
+  name is unique per process, but `MT_Controller` runs an evolution on its own
+  thread.
+
+- [ ] **52. Set `mode` in `SIG_Drive`'s stream constructor for an unknown
+  word.** It is left unset, and `writeToFileTransfer` then writes
+  `invalid_mode`. Only transfer text can bring an unknown word in; the robot
+  compiler rejects it.
+
+- [ ] **54. Review the empty catch blocks in a round of their own:** the ones
+  around `simulation->start()` in the fitness functions. A throwing
+  simulation is ignored, and fitness comes from what was recorded until then.
+  NiceWalking and Simple are the fitness functions of all shipped
+  experiments, so a change can move fitness values against 1.3. Each site
+  needs its own decision.
+
+- [ ] **55. Make the marker checks that do nothing throw. Review with item
+  54.** The stream constructors of `SIG_Geometry`, `SIG_Polygon` and
+  `SIG_CommandParameters` hold only `// ERROR` and read on; `SIG_Robot` and
+  `SIG_LanguageParameters` already throw `SIG_UnstreamingError`. Valid files
+  are not affected. The other empty bodies go in the same round:
+  `if (running) {} else {}` in the `MT_*Widget.cpp` files, empty `else {}` in
+  `SIG_GPIndividual.cpp` and `SIG_GPPopulation.cpp`, and `SIG_Robot`'s
+  `if (isroot)`, "Something seems to be missing here".
+
+---
+
+## 7 · The interface
+
+- [ ] **107. Review `SIG_GPPopulation::readFromFile` with the maintainer,**
+  deciding each change before it is made.
+
+- [ ] **106. Review `SIG_GPParameter.cpp` with the maintainer,** method by
+  method, deciding each change before it is made.
+
+- [ ] **29. Give SIGEL a real logging system.** Qt 6's `QTextStream` does not
+  flush on a newline, so diagnostics written through `SIG_IO` are lost when
+  the process dies, which is exactly when they are wanted.
+  **Do not fix this by adding `Qt::endl` everywhere.** It needs levels, one
+  place that decides where output goes and when it flushes, and something the
+  GUI can display. It replaces both `SIG_IO` and the console-warning stopgap.
+  **Start at `SIG_IO::cerr`** — decided; it is the hook.
+  **Review every dialog outside the interface modules as part of this,** for
+  example in `SIG_EnvironmentRenderer`, `MT_Controller`, `SIG_GPPopulation`
+  and `SIG_GPRemoteZORCFitnessFunction`. Decide for each whether it belongs in
+  the interface or goes through the new error reporter.
+
+- [ ] **32. Remove the redundant `setEnabled` lines** in
+  `SIG_GUIGPExperiment::slotStartEvolution` and `slotEvolutionStopped`;
+  `slotEvolutionNotRunning` already does it. **Keep `pushbuttonStop`** —
+  nothing else enables it.
+
+- [ ] **33. Delete the overwrite prompts D35 wants gone,** rather than
+  re-parent them: after a `getSaveFileName` that already asks, in
+  `MT_StatisticsWidget` (item 25 left these for this item),
+  `MT_PopulationWidget`, `MT_IndividualsWidget` and
+  `MT_Controller::slotSaveSetup`. D33 does not say whether deleting a prompt
+  in `MT_Controller` is outside it.
+
+- [ ] **105. Offer an MP4 when recording stops,** if `ffmpeg` is present, at
+  the frame rate the frames were taken at, so the movie plays at simulation
+  speed. Image formats only; POV-Ray writes scene files. Hook it into
+  `SIG_SimulationVisualisationWidget::reportRecordedFrames`; its "frames
+  written" message could become one combined message and question.
+
+---
+
+## 8 · GP engine
+
+How programs control a robot, and how evolution changes programs. Every item
+here changes evolution results, so each is judged only by whether the best
+fitness improves. Each starts with the published GP approaches to the
+problem; the choice is made before any code is written.
+
+- [ ] **115. Give the robot language conditionals that survive evolution.**
+  `CMP a,b` sets one flag to `a <= b`; `JMP n` jumps `n` lines when it is set.
+  There is no unconditional jump and no jump on equality. `JMP`'s distance is almost always larger than the program, so any inserted
+  or deleted line moves every jump target, and a useful branch is rarely
+  passed on intact. Candidates from linear GP: an instruction that skips the
+  next line or a block when a condition fails. New commands change
+  `LanguageParameters` and the experiment files.
+
+- [ ] **116. Let drives hold a torque until the program changes it.**
+  `SIG_DynaMechsCommandInterface::moveDrive` applies the torque from R0 for
+  the `MOVE` duration, then the drive goes limp. Tristar sets 0.001 s, so every
+  `MOVE` acts for a single 10 ms step, so few joints carry load at the same time. Either two
+  commands, start and stop, or one command with a duration operand. New
+  commands change `LanguageParameters` and the experiment files.
+
+- [ ] **117. Let mutation tune operands in steps.**
+  `SIG_GPOperations::mutation` only replaces an operand with a new value over
+  the whole range; torque, drive number, jump distance and register number
+  are never adjusted.
+  Steps of plus or minus 1 need far too many generations. **Start with a
+  research phase:** there is plenty of GP literature on operand mutation, so
+  look at what others have done or proposed before writing anything, starting
+  from the links at https://www.genetic-programming.org/. Candidates so far:
+  step sizes scaled to the operand's range, and step sizes that adapt during
+  the run.
+
+- [ ] **68. Decide whether the robot starts in the middle of the terrain.**
+  Every shipped experiment starts it at the terrain's corner. Moving it means
+  either `STARTPOSITION` in the `.exp` files, a file change, or the terrain's
+  place in DynaMechs, a vendor patch. Positions and fitness move with it.
 
 - [ ] **77. A robot checker.** Idea; the name is open. It reads a robot model
   and its Language Parameters and warns about what will make evolution fail
@@ -357,6 +432,36 @@ touched, because changing one changes behaviour against the reference binary.
   `SIG_GPFitnessFunctionRegistry::fitnessFunctions()` and in `sigel_slave`'s
   name mapping. No file format changes.
 
+---
+
+## 9 · Removals
+
+- [ ] **64. Remove what is left of Dynamo.** PORTING.md, "Dynamo removed,
+  DynaMechs kept", has the background.
+  - **The choice of Dynamo in the interface and the model:** the
+    "Dynamo  (not recommended)" radio button and the `DynaMo` tabs in
+    `SIG_SimulationParameterBase.ui` and `SIG_EnvironmentBase.ui`;
+    `SIG_SimulationParameter::putIntoExperiment` and `getOutOfExperiment`; the
+    `DynaMo` value of `SIG_SimulationParameters::SimulationLibrary` and every
+    case that handles it, with `SIG_Robot::prepareDynaMo`,
+    `SIG_Link::transformToDynaMo` and `SIG_Simulation::slotDynamoMessage`; the
+    DynaMechs check in `SIG_GUIGPExperiment::slotRobotInfo`;
+    `SIG_SimulationCannotSolveException` and the `stopSimulation` flag that
+    only Dynamo sets. Today the interface can make
+    an experiment the simulation refuses, which is one way into item 20.
+    Dynamo's settings in the `.exp` files (`MAXIMALERROR`,
+    `MAXIMALITERATIONS`, `SKIPFRAMES`, `ANALYTICAL`, `MAXIMALCOLLISIONLOOPS`,
+    `SOLVEMODE`, `INTEGRATOR`, `MAXIMALSOLIDITERATIONS`) are in every shipped
+    experiment, so removing them changes the file format, and the maintainer
+    decides. `SIMULATIONLIBRARY` loses its Dynamo value only. `STEPSIZE`
+    stays: DynaMechs uses it.
+  - **The maths library `libdynalib.a`,** whose `DL_vector` and `DL_matrix`
+    SIGEL is built on. PORTING.md, "Follow-up this change deliberately did not
+    take", point 3, has the plan: a small local header in its place.
+  Doc comments that name Dynamo go with the code they describe. The guard in
+  `SIG_SimulationVisualisationWidget::visualizeThis` stays, for
+  `SIG_CannotMirtich`.
+
 - [ ] **83. Put ZORC support behind a compile-time switch, off by default.**
   Decided. One global `#define` removes `SIG_GPRemoteZORCFitnessFunction`, its
   branches in `sigel_slave.cpp`, and the "Remote ZORC" combo box entry,
@@ -366,78 +471,12 @@ touched, because changing one changes behaviour against the reference binary.
   (the `Makefile` or a header), and what an experiment file naming
   "RemoteZORCFitnessFunction" does when the switch is off.
 
-- [ ] **90. Decide whether "stop at generation N" counts pool generations.**
-  By reading the code, `SIG_GPManager::checkTerminationConditions` counts from
-  each start, not in the pool generation the Experiment page and `.exp` file
-  show. Changing it changes when a run stops. The text in
-  `SIG_GUIGPExperiment::terminationAlreadyMet` changes with it.
-
-- [ ] **89. Refuse bad simulation parameters.** Needs more thought.
-  - **Time to simulate under 1 s:** the simulated fitness functions divide by
-    the run time in whole seconds, which gives `inf`, or `NaN` for a robot
-    that does not move. What the GP does with that is not measured.
-  - **Step size of 0 or less:** item 104.
-  **Where to refuse, not decided:** (1) a range on the field, which stops
-  typing only; (2) on load, in `SIG_SimulationParameters`, like item 71, but
-  any load error kills the interface until item 88 is done; (3) when a run
-  starts, with a message box, which catches typed and loaded values and kills
-  nothing.
-
-- [ ] **105. Offer an MP4 when recording stops,** if `ffmpeg` is present, at
-  the frame rate the frames were taken at, so the movie plays at simulation
-  speed. Image formats only; POV-Ray writes scene files. Hook it into
-  `SIG_SimulationVisualisationWidget::reportRecordedFrames`; its "frames
-  written" message could become one combined message and question.
-
-- [ ] **104. Refuse a step size of 0 or less.** The step-size half of item
-  89. A step of 0 gives `int(inf)`, undefined behaviour, in Real Speed, and
-  loops `SIG_Simulation::start` for ever in the other fitness functions.
-  - **On load:** throw `SIG_UnstreamingError` for a `STEPSIZE` of 0 or less,
-    as item 71 does for register widths. File > Open shows it (item 88);
-    `sigel -e` and `sigel_eval` refuse the file.
-  - **When typed:** `lineeditStepSize` becomes a `QDoubleSpinBox` with a
-    smallest value above 0.
-  - **Open:** the smallest step and its decimals. The shipped experiments use
-    0.01 and 0.002; 0.0001 with 4 decimals would keep both.
-
 - [ ] **47. Modernise `sigelDynClient` and build `manage_dyn_slave`.**
   `sigelDynClient` makes a second machine a dynamic slave of `sigel -de`. It
   is still 1.3's Solaris `tcsh` script with placeholder paths.
   **Modernise in place, do not replace.** It needs a second machine to prove
   it on; the 1.3 reference machine is not ours to use for tooling, so it waits
   until there is one.
-
-- [ ] **36. Delete `SIG_Body::usedByLinks` and make
-  `SIG_Material::FrictionValue` a value type.** `usedByLinks` is written and
-  never read. `FrictionValue` values would drop the `new` and the
-  `qDeleteAll`, as D8 did for `SIG_Register`; tidiness only. D11 left both as
-  they were because the port moved the Qt API and nothing else; that was a
-  port-scope rule, not a refusal.
-
-- [ ] **37. Give each `generateTerrain` call its own partial file name.** The
-  name is unique per process, but `MT_Controller` runs an evolution on its own
-  thread.
-
-- [ ] **52. Set `mode` in `SIG_Drive`'s stream constructor for an unknown
-  word.** It is left unset, and `writeToFileTransfer` then writes
-  `invalid_mode`. Only transfer text can bring an unknown word in; the robot
-  compiler rejects it.
-
-- [ ] **54. Review the empty catch blocks in a round of their own:** the ones
-  around `simulation->start()` in the fitness functions. A throwing
-  simulation is ignored, and fitness comes from what was recorded until then.
-  NiceWalking and Simple are the fitness functions of all shipped
-  experiments, so a change can move fitness values against 1.3. Each site
-  needs its own decision.
-
-- [ ] **55. Make the marker checks that do nothing throw. Review with item
-  54.** The stream constructors of `SIG_Geometry`, `SIG_Polygon` and
-  `SIG_CommandParameters` hold only `// ERROR` and read on; `SIG_Robot` and
-  `SIG_LanguageParameters` already throw `SIG_UnstreamingError`. Valid files
-  are not affected. The other empty bodies go in the same round:
-  `if (running) {} else {}` in the `MT_*Widget.cpp` files, empty `else {}` in
-  `SIG_GPIndividual.cpp` and `SIG_GPPopulation.cpp`, and `SIG_Robot`'s
-  `if (isroot)`, "Something seems to be missing here".
 
 - [ ] **35. Remove the Windows and Visual Studio support.** Decided. It does
   not build here, nothing tests it, and it could not build in 2003 either.
@@ -468,41 +507,6 @@ touched, because changing one changes behaviour against the reference binary.
     in the same commit.
   **Do not mix it with any other change. When:** after every other item in
   this section, because it touches the whole codebase.
-
----
-
-## 8 · GP engine
-
-How programs control a robot, and how evolution changes programs. Every item
-here changes evolution results, so each is judged only by whether the best
-fitness improves. Each starts with the published GP approaches to the
-problem; the choice is made before any code is written.
-
-- [ ] **115. Give the robot language conditionals that survive evolution.**
-  `CMP a,b` sets one flag to `a <= b`; `JMP n` jumps `n` lines when it is set.
-  There is no unconditional jump and no jump on equality. `JMP`'s distance is almost always larger than the program, so any inserted
-  or deleted line moves every jump target, and a useful branch is rarely
-  passed on intact. Candidates from linear GP: an instruction that skips the
-  next line or a block when a condition fails. New commands change
-  `LanguageParameters` and the experiment files.
-
-- [ ] **116. Let drives hold a torque until the program changes it.**
-  `SIG_DynaMechsCommandInterface::moveDrive` applies the torque from R0 for
-  the `MOVE` duration, then the drive goes limp. Tristar sets 0.001 s, so every
-  `MOVE` acts for a single 10 ms step, so few joints carry load at the same time. Either two
-  commands, start and stop, or one command with a duration operand. New
-  commands change `LanguageParameters` and the experiment files.
-
-- [ ] **117. Let mutation tune operands in steps.**
-  `SIG_GPOperations::mutation` only replaces an operand with a new value over
-  the whole range; torque, drive number, jump distance and register number
-  are never adjusted.
-  Steps of plus or minus 1 need far too many generations. **Start with a
-  research phase:** there is plenty of GP literature on operand mutation, so
-  look at what others have done or proposed before writing anything, starting
-  from the links at https://www.genetic-programming.org/. Candidates so far:
-  step sizes scaled to the operand's range, and step sizes that adapt during
-  the run.
 
 ---
 
