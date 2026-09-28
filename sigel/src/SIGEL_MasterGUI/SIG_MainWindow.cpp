@@ -756,8 +756,7 @@ bool SIG_MainWindow::askBeforeQuitting()
 {
   return QMessageBox::warning( this, "Quit SIGEL",
 			       "Do you really want to quit?\nThere may be unsaved experiments.",
-			       QMessageBox::Yes | QMessageBox::Default,
-			       QMessageBox::No | QMessageBox::Escape ) == QMessageBox::Yes;
+			       QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes ) == QMessageBox::Yes;
 };
 
 void SIG_MainWindow::slotAboutToQuit()

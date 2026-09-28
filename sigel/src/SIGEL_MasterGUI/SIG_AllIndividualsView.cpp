@@ -236,9 +236,8 @@ void SIG_AllIndividualsView::slotDeleteIndividuals()
       else
 	question = QString::number( numberOfSelectedItems ) + " selected individuals?";
       
-      switch( QMessageBox::warning( this, "Continue Deletion?" , "Do you really want to delete the " + question , QMessageBox::Yes | QMessageBox::Default, QMessageBox::No | QMessageBox::Escape ) )
+      if( QMessageBox::warning( this, "Continue Deletion?" , "Do you really want to delete the " + question , QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes ) == QMessageBox::Yes )
 	{
-	case QMessageBox::Yes:
 	  // resize the array, so we can save all positions
 	  positions.resize( numberOfSelectedItems );
 	  
@@ -264,7 +263,6 @@ void SIG_AllIndividualsView::slotDeleteIndividuals()
 	  slotCompleteRefreshList();
 	  if( individualList->listviewIndividuals->topLevelItemCount() == 0 )
 	    individualView->clear();
-	  break;
 	}
     } // if( numbeOfSelectedItems != 0 )
   

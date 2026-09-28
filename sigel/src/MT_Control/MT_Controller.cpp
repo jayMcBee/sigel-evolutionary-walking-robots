@@ -210,7 +210,7 @@ bool MT_Controller::switchSystem(int wantedSystem)
 		if(QMessageBox::warning(SIGEL_Tools::dialogParent(), "Switching the MetaGP System", 
 			"Switching the system requires deleting the current\n"
 			"GP system. Do you want to delete it?",
-			"Yes", "No", nullptr, 1, 1) == 0){
+			QMessageBox::Yes | QMessageBox::No, QMessageBox::No) == QMessageBox::Yes){
 
 			if(mainWindow){
 				QObject::disconnect(mainWindow->mtStartEvolutionAction, SIGNAL( triggered() ), this, SLOT( startSingleEvolution() ));
