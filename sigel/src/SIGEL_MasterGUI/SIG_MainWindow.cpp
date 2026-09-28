@@ -811,11 +811,9 @@ void SIG_MainWindow::slotMTUseMT(bool state)
 	if (experimentListView->isRunning())
 		return;
 	SIG_GUIGPExperiment *currentExperiment = experimentListView->currentlySelectedExperiment();
-	if(currentExperiment){
-		if(currentExperiment->gpExperiment.mtController->useMeta(state)){
-			mtConfigureAction->setEnabled(state);
-			mtChoiceTypeActionGroup->setEnabled(state);
-		}
+	if(currentExperiment && currentExperiment->gpExperiment.mtController->useMeta(state)){
+		mtConfigureAction->setEnabled(state);
+		mtChoiceTypeActionGroup->setEnabled(state);
 	}
 };
 

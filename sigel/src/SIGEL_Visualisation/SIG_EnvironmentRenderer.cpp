@@ -255,35 +255,34 @@ namespace SIGEL_Visualisation
 	   << "}\n"
 	   << "\n";
 
-    if (showRobotPath)
-      if (robotPathPoints.count() >= 2)
-	{
-	  // One cylinder from each point to the next.
-	  for ( qsizetype i = 1; i < robotPathPoints.size(); i++ )
-	    {
-	      DL_vector *prevPoint = robotPathPoints.at( i - 1 );
-	      DL_vector *actPoint  = robotPathPoints.at( i );
-	      NEWMAT::ColumnVector base =   SIG_TypeConverter::sigelToPovray()
-		                          * SIG_TypeConverter::toColumnVector( *prevPoint );
-	      NEWMAT::ColumnVector cap =   SIG_TypeConverter::sigelToPovray()
-		                         * SIG_TypeConverter::toColumnVector( *actPoint );
+    if (showRobotPath && robotPathPoints.count() >= 2)
+      {
+	// One cylinder from each point to the next.
+	for ( qsizetype i = 1; i < robotPathPoints.size(); i++ )
+	  {
+	    DL_vector *prevPoint = robotPathPoints.at( i - 1 );
+	    DL_vector *actPoint  = robotPathPoints.at( i );
+	    NEWMAT::ColumnVector base =   SIG_TypeConverter::sigelToPovray()
+					* SIG_TypeConverter::toColumnVector( *prevPoint );
+	    NEWMAT::ColumnVector cap =   SIG_TypeConverter::sigelToPovray()
+				       * SIG_TypeConverter::toColumnVector( *actPoint );
 
-	      stream << "cylinder {\n"
-		     << "  "
-		     << vectorToPovray( base )
-		     << ", "
-		     << vectorToPovray( cap )
-		     << ", 0.02\n"
-		     << "  open\n"
-		     << "  pigment { rgb <1,1,0> }\n"
-		     << "  finish { ambient rgb <1,1,0>\n"
-		     << "           diffuse 1 }\n"
-		     << "}\n";
+	    stream << "cylinder {\n"
+		   << "  "
+		   << vectorToPovray( base )
+		   << ", "
+		   << vectorToPovray( cap )
+		   << ", 0.02\n"
+		   << "  open\n"
+		   << "  pigment { rgb <1,1,0> }\n"
+		   << "  finish { ambient rgb <1,1,0>\n"
+		   << "           diffuse 1 }\n"
+		   << "}\n";
 
-	    };
+	  };
 
-	  stream << "\n";
-	};
+	stream << "\n";
+      };
 
     return resultString;
   };

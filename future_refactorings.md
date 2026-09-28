@@ -39,13 +39,6 @@ Constructs the language removed. A current compiler rejects them.
   Needs tooling rather than an editor, because base headers must parse. The
   failure shape is a missing `const`, or `int` against `long`.
 
-- [ ] **114. Merge nested `if`s without `else` into `if (A && B)`.** Only
-  where an `if` holds nothing but another `if` and neither has an `else`; most
-  are in MetaGP. `&&` evaluates `B` only when `A` holds, so the meaning stays
-  the same. Leave out places with an `else`, and places where `A` and `B`
-  are unrelated and the nesting reads better. `clang-tidy` has no check for
-  it. One round: one build, one gate run, one review, one commit.
-
 ---
 
 ## 3 · Ownership

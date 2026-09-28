@@ -279,75 +279,73 @@ void SIGEL_Program::SIG_Program::checkLength( long minimumLength,
   long prgLength = getProgramLength();
   historyInfo    = 0;
 
-  if( minimumLength > 0 )
-    if( prgLength < minimumLength )
-      {
+  if( minimumLength > 0 && prgLength < minimumLength )
+    {
 
 #ifdef SIG_DEBUG
 
-       SIGEL_Tools::SIG_IO::cerr << "\n\n--> PROGRAM LENGTH ("
-                                 << prgLength
-                                 << ") TOO SHORT (minimum="
-                                 << minimumLength
-                                 << "): ";
+     SIGEL_Tools::SIG_IO::cerr << "\n\n--> PROGRAM LENGTH ("
+                               << prgLength
+                               << ") TOO SHORT (minimum="
+                               << minimumLength
+                               << "): ";
 
 #endif   
-       historyInfo = minimumLength - prgLength;
+     historyInfo = minimumLength - prgLength;
 
-       for( long i = 0; i < minimumLength - prgLength; i++ )
-	 {
-          SIG_ProgramLine *newLine = new SIGEL_Program::SIG_ProgramLine( r, 
-								         languageP,
-		 							 prob );
+     for( long i = 0; i < minimumLength - prgLength; i++ )
+       {
+        SIG_ProgramLine *newLine = new SIGEL_Program::SIG_ProgramLine( r, 
+								       languageP,
+								       prob );
 
-          // If there is a problem during the evolution, try to delete the following
-          // instruction:
+        // If there is a problem during the evolution, try to delete the following
+        // instruction:
 
-          newLine->setRobotinstruction( SIGEL_Program::NOP, 0, 0 );
+        newLine->setRobotinstruction( SIGEL_Program::NOP, 0, 0 );
 
-          // If the problem is still existing, please try to delete the line 135 (resizeElements( 0 );)
-          // within the function SIGEL_Program::SIG_ProgramLine::setRobotinstruction.
+        // If the problem is still existing, please try to delete the line 135 (resizeElements( 0 );)
+        // within the function SIGEL_Program::SIG_ProgramLine::setRobotinstruction.
   
-          appendLine( newLine );
-         } 
+        appendLine( newLine );
+       } 
 
 #ifdef SIG_DEBUG
 
-       SIGEL_Tools::SIG_IO::cerr << "Program increased to " 
-				 << getProgramLength()
-	                         << " lines." << Qt::endl;
+     SIGEL_Tools::SIG_IO::cerr << "Program increased to " 
+			       << getProgramLength()
+			       << " lines." << Qt::endl;
 #endif
        
-      }
+    }
 
   prgLength = getProgramLength();
 
-  if( maximumLength > 0 )
-    if( prgLength > maximumLength )
-      {
+  if( maximumLength > 0 && prgLength > maximumLength )
+    {
 
 #ifdef SIG_DEBUG
 
-       SIGEL_Tools::SIG_IO::cerr << "\n\n--> PROGRAM LENGTH ("
-                                 << prgLength
-                                 << ") TOO LONG (maximum="
-	                         << maximumLength
-                                 << "): ";
+     SIGEL_Tools::SIG_IO::cerr << "\n\n--> PROGRAM LENGTH ("
+                               << prgLength
+                               << ") TOO LONG (maximum="
+			       << maximumLength
+                               << "): ";
 
 #endif 
-       historyInfo = - prgLength - maximumLength; 
+     historyInfo = - prgLength - maximumLength; 
 
-       for( long i = prgLength; i >= maximumLength; i-- )
-          deleteLine( i );
+     for( long i = prgLength; i >= maximumLength; i-- )
+        deleteLine( i );
 
 #ifdef SIG_DEBUG
 
-       SIGEL_Tools::SIG_IO::cerr << "Program decreased to " 
-				 << getProgramLength()
-	                         << " lines." << Qt::endl;
+     SIGEL_Tools::SIG_IO::cerr << "Program decreased to " 
+			       << getProgramLength()
+			       << " lines." << Qt::endl;
 #endif
-       historyInfo = 2;
-      }
+     historyInfo = 2;
+    }
 }
 
 SIGEL_Program::SIG_Program::SIG_Program( SIGEL_GP::SIG_GPParameter &param, 

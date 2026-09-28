@@ -148,54 +148,53 @@ namespace SIGEL_Robot
 
                         GeometryNode *geometryNode = shapeNode->getGeometry();
 
-                        if (geometryNode)
-                                if (geometryNode->isIndexedFaceSetNode()) {
-                                        IndexedFaceSetNode *indexedFaceSetNode
-                                                = static_cast<IndexedFaceSetNode*> (geometryNode);
+                        if (geometryNode && geometryNode->isIndexedFaceSetNode()) {
+                                IndexedFaceSetNode *indexedFaceSetNode
+                                        = static_cast<IndexedFaceSetNode*> (geometryNode);
 
-                                        CoordinateNode *coordinateNode = indexedFaceSetNode->getCoordinateNodes();
-                                        if (coordinateNode) {
-                                                int noOfVertices = coordinateNode->getNPoints();
-                                                int noOfIndices = indexedFaceSetNode->getNCoordIndexes();
-                                                // Held by value, not as owned DL_vector pointers: the NEWMAT multiply and
-                                                // the SIG_Polygon allocations below can throw, and values need no free on the
-                                                // unwinding path.
-                                                QList< DL_vector > vertices( noOfVertices );
+                                CoordinateNode *coordinateNode = indexedFaceSetNode->getCoordinateNodes();
+                                if (coordinateNode) {
+                                        int noOfVertices = coordinateNode->getNPoints();
+                                        int noOfIndices = indexedFaceSetNode->getNCoordIndexes();
+                                        // Held by value, not as owned DL_vector pointers: the NEWMAT multiply and
+                                        // the SIG_Polygon allocations below can throw, and values need no free on the
+                                        // unwinding path.
+                                        QList< DL_vector > vertices( noOfVertices );
 
-                                                for (int i=0; i < noOfVertices; i++) {
-                                                        QList< float > coords(3);
+                                        for (int i=0; i < noOfVertices; i++) {
+                                                QList< float > coords(3);
                                                         
-                                                        coordinateNode->getPoint( i, coords.data() );
+                                                coordinateNode->getPoint( i, coords.data() );
                                                         
-                                                        NEWMAT::ColumnVector actVertex(4);
-                                                        for (int j=0; j<3; j++)
-                                                                actVertex( j+1 ) = coords[j];
-                                                        actVertex(4) = 1;
+                                                NEWMAT::ColumnVector actVertex(4);
+                                                for (int j=0; j<3; j++)
+                                                        actVertex( j+1 ) = coords[j];
+                                                actVertex(4) = 1;
                                                         
-                                                        actVertex = transformation * actVertex;
+                                                actVertex = transformation * actVertex;
                                                         
-                                                        for (int k = 0; k<3; k++)
-                                                                vertices[ i ].set( k, actVertex( k+1 ) );
-                                                };
+                                                for (int k = 0; k<3; k++)
+                                                        vertices[ i ].set( k, actVertex( k+1 ) );
+                                        };
                                                 
-                                                SIG_Polygon *actPolygon = nullptr;
+                                        SIG_Polygon *actPolygon = nullptr;
                                                 
-                                                for (int j=0; j < noOfIndices; j++) {
-                                                        int actIndex = indexedFaceSetNode->getCoordIndex(j);
+                                        for (int j=0; j < noOfIndices; j++) {
+                                                int actIndex = indexedFaceSetNode->getCoordIndex(j);
                                                         
-                                                        // Before the polygon is created: SIG_Polygon self-registers in its
-                                                        // constructor, so skipping every vertex would leave a 0-vertex face that
-                                                        // SIG_Mirtich::compFaceNormal reads verts[0..2] from.
-                                                        if (actIndex < 0)
-                                                                actPolygon = nullptr;
-                                                        else if ( actIndex < vertices.size() ) {
-                                                                if (!actPolygon)
-                                                                        actPolygon = new SIG_Polygon( geometry );
-                                                                actPolygon->appendVertex( vertices[ actIndex ] );
-                                                        };
+                                                // Before the polygon is created: SIG_Polygon self-registers in its
+                                                // constructor, so skipping every vertex would leave a 0-vertex face that
+                                                // SIG_Mirtich::compFaceNormal reads verts[0..2] from.
+                                                if (actIndex < 0)
+                                                        actPolygon = nullptr;
+                                                else if ( actIndex < vertices.size() ) {
+                                                        if (!actPolygon)
+                                                                actPolygon = new SIG_Polygon( geometry );
+                                                        actPolygon->appendVertex( vertices[ actIndex ] );
                                                 };
                                         };
                                 };
+                        };
                 };
         };
         

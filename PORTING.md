@@ -909,7 +909,7 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-28 — IN PROGRESS: ITEM 114, NESTED IFS MERGED, ONE MODULE AT A TIME.** Start here.
+**2026-09-28 — DONE: ITEM 114, NESTED IFS WITHOUT ELSE MERGED. ITEM 114 IS DONE.** Start here.
 
 - **Found:** 28 places where an `if` holds only another `if` and neither has
   an `else`. Two more hits were the `#ifdef _WINDOWS` / `#else` pair of one
@@ -927,12 +927,17 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 - **Part 3, SIGEL_GP:** merged in `SIG_GPManager::run()` (the fitness reset
   and the autosave), `SIG_GPManager::run(MT_Classifier *)` (the autosave) and
   `SIG_GPOperations::crossOver` (the minimum length).
+- **Part 4, the other SIGEL modules:** merged in
+  `SIG_MainWindow::slotMTUseMT`, `SIG_Program::checkLength` (2 places),
+  `SIG_Body::readVRMLNode` and `SIG_EnvironmentRenderer::exportToPovray`.
+  `SIG_AllIndividualsView::slotImportIndividual` stays nested.
 - **Baselines:** unchanged.
+- **Review:** no defects, over all four parts.
 - **Gates after each part:** `check.sh` 758 pass, 0 fail; warnings 471. The
   other four gates are green.
-- **Next:** part 4, the other SIGEL modules. After item 114 is closed: comments that
-  tell the port's history, such as the "PRESERVED DEFECT" note in
-  `MT_PopulationWidget::slotExpInd`, are to be discussed with the maintainer.
+- **Next:** comments that tell the port's history, such as the "PRESERVED
+  DEFECT" note in `MT_PopulationWidget::slotExpInd`, are to be discussed with
+  the maintainer.
 
 **2026-09-28 — DONE: ITEM 111, THE MINIMUM PROGRAM LENGTH IS AT LEAST 5 IN THE DIALOG. ITEM 111 IS DONE.**
 
@@ -6567,6 +6572,13 @@ carried; other items and this file cite them, so they do not change.
   removed its `INT_MIN` test and such a jump crashed. Every other value gives
   the same target as before; 9,000,099 values were compared. Dropped by
   decision: a named constant for the operand range `32000`.
+
+- [x] **114. Nested `if`s without `else` became `if (A && B)`** — done
+  2026-09-28, four commits, one per module group. 25 places in MT_Control,
+  MT_GUI, SIGEL_GP, SIGEL_MasterGUI, SIGEL_Program, SIGEL_Robot and
+  SIGEL_Visualisation. Three stay nested, because the inner condition does the
+  work and checks for failure: the two in `MT_Controller::configureSystem` and
+  `SIG_AllIndividualsView::slotImportIndividual`.
 
 - [x] **113. MetaGP converts `double` to `int` with a defined result** —
   done 2026-09-28, one commit. `MT_Interpreter::toInt(double)` does all 15
