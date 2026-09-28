@@ -214,20 +214,10 @@ touched, because changing one changes behaviour against the reference binary.
   reproduced. With a winner of length 1 and a minimum length above 0, the
   minimum-length branch sets `crossPoint1` to 0 while `segLen1` stays -1, and
   a copy loop then asks for line -1. Before item 91 that read outside the
-  vector; now `SIG_Program::getLine` throws `SIG_Exception`.
-
-- [ ] **111. Enforce a minimum program length of 5 everywhere.** Decided
-  2026-09-27. It makes item 110 unreachable.
-  - The dialog's spin box (`SIG_GPParameterBase.ui`) goes down to 5, not 2,
-    and a new experiment starts with 5, not 3. Like every other GP
-    parameter, the minimum length is limited only by its dialog field; a
-    check on load belongs to item 118.
-  - Loading a pool pads a shorter program with the existing NOP logic
-    (`SIG_Program::checkLength`) and records it with
-    `addLengthIncreasedInfo`.
-  - The active population is not checked again when the parameter changes.
-  - Unlikely edge cases, such as a stored fitness after padding, are
-    deliberately not handled.
+  vector; now `SIG_Program::getLine` throws `SIG_Exception`. Since item 111
+  the dialog allows no minimum below 5 and the GP pads every new program to
+  the minimum, so only a loaded program shorter than 2 lines reaches it;
+  item 118 covers loaded programs.
 
 - [ ] **118. Check the GP parameters when a file loads.** Found 2026-09-28.
   The dialog limits each GP field with its widget's range.
@@ -237,6 +227,13 @@ touched, because changing one changes behaviour against the reference binary.
   dialog does not allow, such as a minimum length below 5, loads unchanged.
   Hand-edited files are not the concern. To decide: the valid range of each
   parameter, and what a load does with a value outside it.
+  - **Loaded programs:** `SIG_GPPopulation::readFromFile` and
+    `SIG_GPIndividual::readFromFile` check nothing either. A program shorter
+    than the minimum length or longer than the maximum loads unchanged. A
+    short one could be padded with the NOP logic of
+    `SIG_Program::checkLength` and recorded with `addLengthIncreasedInfo`;
+    unlikely edge cases, such as a stored fitness after padding, would not
+    be handled.
 
 - [ ] **18. `SIG_GPPVMTask` holds a reference to a host that can be deleted
   under it.** `SIG_GPPVMTask` declares `SIG_GPActivePVMHost &host`;

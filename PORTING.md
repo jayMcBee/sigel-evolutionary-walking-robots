@@ -909,7 +909,17 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-28 — DONE: ITEM 112, METAGP'S JUMP TARGET CANNOT OVERFLOW. ITEM 112 IS DONE.** Start here.
+**2026-09-28 — DONE: ITEM 111, THE MINIMUM PROGRAM LENGTH IS AT LEAST 5 IN THE DIALOG. ITEM 111 IS DONE.** Start here.
+
+- **Changed:** `spinboxMinIndLength` goes down to 5, not 2; a new experiment
+  starts with 5, not 3. Details are in item 111's entry in "Done".
+- **Baselines:** `guibehaviour-baseline.txt`: the spin box range, and the
+  rngseed scenario's program lengths, line count and hash, because the
+  default minimum is part of the length draw.
+- **Gates:** `check.sh` 758 pass, 0 fail; warnings 471.
+- **Next:** to be planned with the maintainer.
+
+**2026-09-28 — DONE: ITEM 112, METAGP'S JUMP TARGET CANNOT OVERFLOW. ITEM 112 IS DONE.**
 
 - **Changed:** `jmp`, `jeq` and `jle` in `MT_Interpreter::interpret` set
   `ProgramCounter = abs(Mod1 % NumOfInstruction)`. Details are in item 112's
@@ -6540,6 +6550,14 @@ carried; other items and this file cite them, so they do not change.
   outside `int` give `INT_MIN`, as x86 does; ARM64 used to saturate. Other
   values truncate as before. The jumps' `INT_MIN` test, which comes after an
   overflowing negation, is item 112's.
+
+- [x] **111. The minimum program length is at least 5 in the dialog** —
+  done 2026-09-28, one commit. `spinboxMinIndLength` in
+  `SIG_GPParameterBase.ui` goes down to 5, not 2, and the `SIG_GPParameter`
+  constructor gives a new experiment 5, not 3. Like every other GP
+  parameter, it is limited only by its dialog field. A check on load, for
+  the parameters and for the length of loaded programs, is item 118. The
+  shipped experiments use 10 and 100.
 
 - [x] **102. C-style casts became C++ casts** — done 2026-09-28, three
   commits. The 63 `(QObject*)` casts in `connect` and `disconnect` calls
