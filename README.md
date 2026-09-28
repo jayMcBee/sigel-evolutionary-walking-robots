@@ -13,8 +13,8 @@ tests each program in a physics simulator.
   visualisation
   ([project page](https://sigel.sourceforge.net/seiten/einleitung_en.html),
   [final report](https://sigel.sourceforge.net/download/berichte/endbericht.pdf), German).
-- **MetaGP (1.1–1.3):** added for Jens Ziegler and Wolfgang Banzhaf's fitness
-  meta-model research
+- **MetaGP (1.1–1.3):** implements the fitness meta-models from Jens Ziegler
+  and Wolfgang Banzhaf's research
   ([CLAWAR 2003](http://www.cs.mun.ca/~banzhaf/papers/ZieglerBanzhaf.pdf));
   it cannot start on Linux.
 - Running the 1.3 binaries on today's Linux:
