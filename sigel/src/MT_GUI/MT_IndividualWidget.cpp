@@ -327,11 +327,9 @@ void MT_IndividualsWidget::slotExportConstants()
 		fileName += ".mcon";
 
 	QFile file(fileName);
-	if(file.exists()){
-		if(0 == QMessageBox::warning(this, "Save Constants", "There is another file with this name. This will overwrite\n"
-			"the existing file. Do you really want to continue?", "OK", "Cancel", nullptr, 1))
-			return;
-	}
+	if(file.exists() && 0 == QMessageBox::warning(this, "Save Constants", "There is another file with this name. This will overwrite\n"
+		"the existing file. Do you really want to continue?", "OK", "Cancel", nullptr, 1))
+		return;
 	
 	if(file.open( QIODevice::WriteOnly )){
 		QTextStream str( &file );
@@ -425,28 +423,24 @@ void MT_IndividualsWidget::slotCreateConstants()
 {
 	MT_AddConstantsWidget constDialog(this, nullptr, true);
 
-	if(QDialog::Accepted == constDialog.exec()){
+	if(QDialog::Accepted == constDialog.exec() && numToCreate > 0){
+		QProgressDialog progress("Generating constants", QString(), 0, numToCreate+1, this);
+		progress.setWindowModality(Qt::ApplicationModal);
+		progress.setValue(0);
 
-		if(numToCreate > 0){
-		
-			QProgressDialog progress("Generating constants", QString(), 0, numToCreate+1, this);
-			progress.setWindowModality(Qt::ApplicationModal);
-			progress.setValue(0);
+		int *length = nullptr;
+		int *numVar = nullptr;
+		QList<double> *constants = nullptr;
+		QList<double> *functions = nullptr;
+		randomizer->createConstant(numToCreate, integer, minValue, maxValue);
+		randomizer->returnIndividualsValue(&length, &numVar, &constants, &functions);
 
-			int *length = nullptr;
-			int *numVar = nullptr;
-			QList<double> *constants = nullptr;
-			QList<double> *functions = nullptr;
-			randomizer->createConstant(numToCreate, integer, minValue, maxValue);
-			randomizer->returnIndividualsValue(&length, &numVar, &constants, &functions);
-
-			for(int i=0; i<constants->size(); i++){
-				progress.setValue(i+1);
-				constantsListBox->addItem(QString("%1").arg(constants->at(i)));
-				emit numConstChanged();
-			}
-			progress.setValue(numToCreate+1);
+		for(int i=0; i<constants->size(); i++){
+			progress.setValue(i+1);
+			constantsListBox->addItem(QString("%1").arg(constants->at(i)));
+			emit numConstChanged();
 		}
+		progress.setValue(numToCreate+1);
 	}
 }
 

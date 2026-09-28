@@ -919,10 +919,17 @@ classes and leave truncation a hard error. **They are not interchangeable.**
   `MT_Controller::slotSaveSetup` and `MT_Evaluator::evaluationTactic`. The two
   places in `MT_Controller::configureSystem` stay nested: the inner condition
   creates the object and checks for failure.
+- **Part 2, MT_GUI:** merged the overwrite question in
+  `MT_IndividualsWidget::slotExportConstants`, `MT_PopulationWidget::slotExpInd`
+  (2 places), `MT_PopulationWidget::slotSavePop` and six export slots in
+  `MT_StatisticsWidget`; and the dialog result with the count in
+  `MT_IndividualsWidget::slotCreateConstants`.
 - **Baselines:** unchanged.
-- **Gates:** `check.sh` 758 pass, 0 fail; warnings 471. The other four gates
-  are green.
-- **Next:** part 2, MT_GUI. Then MetaGP and the rest of the modules.
+- **Gates after each part:** `check.sh` 758 pass, 0 fail; warnings 471. The
+  other four gates are green.
+- **Next:** part 3, the SIGEL modules. After item 114 is closed: comments that
+  tell the port's history, such as the "PRESERVED DEFECT" note in
+  `MT_PopulationWidget::slotExpInd`, are to be discussed with the maintainer.
 
 **2026-09-28 — DONE: ITEM 111, THE MINIMUM PROGRAM LENGTH IS AT LEAST 5 IN THE DIALOG. ITEM 111 IS DONE.**
 

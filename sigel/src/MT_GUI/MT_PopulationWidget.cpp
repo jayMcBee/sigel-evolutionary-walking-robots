@@ -387,11 +387,9 @@ void MT_PopulationWidget::slotExpInd()
 				fileName += ".mpop";
 			QFile file( fileName );
 
-			if(file.exists()){
-				if(0 == QMessageBox::warning(this, "Save Population", "There is another file with this name. This will overwrite\n"
-					"the existing file. Do you really want to continue?", "OK", "Cancel", nullptr, 1))
-					return;
-			}
+			if(file.exists() && 0 == QMessageBox::warning(this, "Save Population", "There is another file with this name. This will overwrite\n"
+				"the existing file. Do you really want to continue?", "OK", "Cancel", nullptr, 1))
+				return;
 
 			if(file.open(QIODevice::WriteOnly)){
 				QTextStream str(&file);
@@ -418,11 +416,9 @@ void MT_PopulationWidget::slotExpInd()
 
 			for(int i=0; i<list->count(); i++){
 				QFile file( fileName.append("%1.mind").arg(i) );
-				if(file.exists()){
-					if(0 == QMessageBox::warning(this, "Save Population", "There is another file with this name. This will overwrite\n"
-						"the existing file. Do you really want to continue?", "OK", "Cancel", nullptr, 1))
-						return;
-				}
+				if(file.exists() && 0 == QMessageBox::warning(this, "Save Population", "There is another file with this name. This will overwrite\n"
+					"the existing file. Do you really want to continue?", "OK", "Cancel", nullptr, 1))
+					return;
 				if(file.open(QIODevice::WriteOnly)){
 					QTextStream str(&file);
 					// PRESERVED DEFECT: current() is the QPtrList cursor, which
@@ -495,11 +491,9 @@ void MT_PopulationWidget::slotSavePop()
 			fileName += ".mpop";
 		QFile file( fileName );
 
-		if(file.exists()){
-			if(0 == QMessageBox::warning(this, "Save Population", "There is another file with this name. This will overwrite\n"
-				"the existing file. Do you really want to continue?", "OK", "Cancel", nullptr, 1))
-				return;
-		}
+		if(file.exists() && 0 == QMessageBox::warning(this, "Save Population", "There is another file with this name. This will overwrite\n"
+			"the existing file. Do you really want to continue?", "OK", "Cancel", nullptr, 1))
+			return;
 
 		if(file.open(QIODevice::WriteOnly)){
 			QTextStream str(&file);
