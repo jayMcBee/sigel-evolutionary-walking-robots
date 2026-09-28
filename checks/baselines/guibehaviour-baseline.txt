@@ -33,7 +33,9 @@
 #     silently tests the row menu twice.
 #   - the MetaGP warning's three custom buttons. "Save && Remove" is the Qt 6
 #     escape that renders the literal ampersand 1.3 showed; unescaped, Qt 6
-#     eats it and underlines the space instead.
+#     eats it and underlines the space instead. The labels and the default
+#     agree with 1.3; the ORDER does not, by decision 2026-09-28: they are
+#     standard buttons now, and Qt places them by role.
 #
 # Every scenario here is compared with SIGEL 1.3 EXCEPT four, which have no
 # 1.3 side and say so here:
@@ -470,9 +472,9 @@ selected after=0
 dialog [Disabling MetaGP]
   text=[You are about to disable the MetaGP system. What shall
 we do with the system?]
+  button [Save && Remove] default=0
   button [Disable] default=1
   button [Remove] default=0
-  button [Save && Remove] default=0
 == SCENARIO pages ==
 
 == STEP 1: fresh start, no experiment ==

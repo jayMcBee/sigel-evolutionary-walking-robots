@@ -6,6 +6,7 @@
 #include "MT_Control/MT_Classifier.h"
 #include "MT_Control/MT_Evaluator.h"
 #include <qmessagebox.h>
+#include <QAbstractButton>
 #include <qfiledialog.h>
 #include <qbuffer.h>
 #include <pvm3.h>
@@ -253,24 +254,27 @@ bool MT_Controller::useMeta(bool state)
 	if(state == false){		// the meta-system isn't needed anymore - therefore delete it?
 		QString proposedName = saveName;
 		if(guiEnabled){
-			switch( QMessageBox::information(SIGEL_Tools::dialogParent(), 
-											"Disabling MetaGP",
-											"You are about to disable the MetaGP system. What shall\n"
-											"we do with the system?",
-											"Disable",
-											"Remove",
-											// Qt reads & in a label as the shortcut marker and draws an underline
-											// instead. "&&" is how Qt shows one real ampersand.
-											"Save && Remove",
-											0, 0) )
+			QMessageBox box(QMessageBox::Information, "Disabling MetaGP",
+							"You are about to disable the MetaGP system. What shall\n"
+							"we do with the system?",
+							QMessageBox::Ignore | QMessageBox::Discard | QMessageBox::Save,
+							SIGEL_Tools::dialogParent());
+			box.button(QMessageBox::Ignore)->setText("Disable");
+			box.button(QMessageBox::Discard)->setText("Remove");
+			// Qt reads & in a label as the shortcut marker and draws an underline
+			// instead. "&&" is how Qt shows one real ampersand.
+			box.button(QMessageBox::Save)->setText("Save && Remove");
+			box.setDefaultButton(QMessageBox::Ignore);
+			box.setEscapeButton(QMessageBox::Ignore);
+			switch(box.exec())
 			{
-			case 2 :	// disables the system, saves it and finally delete it from memory
+			case QMessageBox::Save :	// disables the system, saves it and finally delete it from memory
 					// save the gpSystem
 				saveName = QString();	// force the routine to show a filedialog
 				if(!saveSystem(proposedName))
 					return false;
 
-			case 1 :	// disables the system and remove it from memory
+			case QMessageBox::Discard :	// disables the system and remove it from memory
 						// remove it from memory
 				if(mainWindow){
 					QObject::disconnect(mainWindow->mtStartEvolutionAction, SIGNAL( triggered() ), this, SLOT( startSingleEvolution() ));
@@ -292,7 +296,7 @@ bool MT_Controller::useMeta(bool state)
 				confStrm.setDevice(nullptr);
 				if(confFile.isOpen()) confFile.close();
 			
-			case 0 :	// disables the system and keeps it in memory
+			case QMessageBox::Ignore :	// disables the system and keeps it in memory
 						// switch to normal fitness calculation / tournament
 				metaOn = state;
 				usedSystem = NOMETA_SUBST;
@@ -431,14 +435,19 @@ bool MT_Controller::readFromFile(QString fileName)
 
 	} else {
 		if(guiEnabled){
-			switch(QMessageBox::critical(SIGEL_Tools::dialogParent(),
-								"Loading Experiment",
-								"An error occurred while loading the meta experiment.\n"
-								"Press <standard> to load the default setup or\n"
-								"press <deactivate> to disable the MetaGP system.",
-								"Standard", "Deactivate", nullptr, 0))
+			QMessageBox box(QMessageBox::Critical, "Loading Experiment",
+							"An error occurred while loading the meta experiment.\n"
+							"Press <standard> to load the default setup or\n"
+							"press <deactivate> to disable the MetaGP system.",
+							QMessageBox::RestoreDefaults | QMessageBox::Abort,
+							SIGEL_Tools::dialogParent());
+			box.button(QMessageBox::RestoreDefaults)->setText("Standard");
+			box.button(QMessageBox::Abort)->setText("Deactivate");
+			box.setDefaultButton(QMessageBox::RestoreDefaults);
+			box.setEscapeButton(QMessageBox::Abort);
+			switch(box.exec())
 			{
-			case 0 :	// load default settings
+			case QMessageBox::RestoreDefaults :	// load default settings
 				saveName = QString();
 				confFile.setFileName(defConfFileName);
 				if(!confFile.open(QIODevice::ReadOnly)){
@@ -449,7 +458,7 @@ bool MT_Controller::readFromFile(QString fileName)
 				} else {
 					break;
 				}
-			case 1 :	// disable meta system
+			case QMessageBox::Abort :	// disable meta system
 				saveName = QString();
 				useMeta(false);
 				return false;
