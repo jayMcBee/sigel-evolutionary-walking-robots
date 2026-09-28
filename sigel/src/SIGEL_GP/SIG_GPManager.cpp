@@ -713,10 +713,9 @@ void SIGEL_GP::SIG_GPManager::run() {
     // recomputes them. If the fitness function supports it, this allows a different target every "resetGeneration" generations
     // Apply the fitness criterion.
     // Do not divide by zero
-    if ( currentExperiment.gpParameter.getResetEveryGeneration() != 0) {
-      if ( (currentExperiment.population.getPoolGeneration() % currentExperiment.gpParameter.getResetEveryGeneration()) == 0)
-        currentExperiment.population.resetAllFitnessValues();
-    }
+    if ( currentExperiment.gpParameter.getResetEveryGeneration() != 0
+         && (currentExperiment.population.getPoolGeneration() % currentExperiment.gpParameter.getResetEveryGeneration()) == 0)
+      currentExperiment.population.resetAllFitnessValues();
     // evaluate the individuals which have no fitness value
     evalNewIndis();
 
@@ -805,19 +804,17 @@ void SIGEL_GP::SIG_GPManager::run() {
 
     // autosave function	
     // checks whether to save the population or not
-    // only save if getAutosave() not zero
-    if (currentExperiment.environment.getAutosave()!=0) {
-      // only save if the modulo rest is zero
-      if ( (currentExperiment.population.poolGeneration%currentExperiment.environment.getAutosave())==0) {
-        QFile file( currentExperiment.getPath() );
-        if (file.open(QIODeviceBase::WriteOnly)) {
-          QTextStream stream(&file);
-          currentExperiment.saveExperiment(stream);
-          file.close();
-        }
-        else {
-          std::cerr << "could not autosave the experiment!" << endl;
-        }
+    // only save if getAutosave() not zero and the modulo rest is zero
+    if (currentExperiment.environment.getAutosave()!=0
+        && (currentExperiment.population.poolGeneration%currentExperiment.environment.getAutosave())==0) {
+      QFile file( currentExperiment.getPath() );
+      if (file.open(QIODeviceBase::WriteOnly)) {
+        QTextStream stream(&file);
+        currentExperiment.saveExperiment(stream);
+        file.close();
+      }
+      else {
+        std::cerr << "could not autosave the experiment!" << endl;
       }
     }
 
@@ -1253,19 +1250,17 @@ void SIGEL_GP::SIG_GPManager::run(MT_Classifier *MetaClassifier)
 
 		// autosave function	
   		// checks whether to save the population or not
-		// only save if getAutosave() not zero
-		if (currentExperiment.environment.getAutosave()!=0) {
-			// only save if the modulo rest is zero
-			if ( (currentExperiment.population.poolGeneration%currentExperiment.environment.getAutosave())==0) {
-				QFile file( currentExperiment.getPath() );
-				if (file.open(QIODeviceBase::WriteOnly)) {
-					QTextStream stream(&file);
-					currentExperiment.saveExperiment(stream);
-					file.close();
-				}
-				else {
-					std::cerr << "could not autosave the experiment!" << endl;
-				}
+		// only save if getAutosave() not zero and the modulo rest is zero
+		if (currentExperiment.environment.getAutosave()!=0
+			&& (currentExperiment.population.poolGeneration%currentExperiment.environment.getAutosave())==0) {
+			QFile file( currentExperiment.getPath() );
+			if (file.open(QIODeviceBase::WriteOnly)) {
+				QTextStream stream(&file);
+				currentExperiment.saveExperiment(stream);
+				file.close();
+			}
+			else {
+				std::cerr << "could not autosave the experiment!" << endl;
 			}
 		}
 

@@ -924,10 +924,13 @@ classes and leave truncation a hard error. **They are not interchangeable.**
   (2 places), `MT_PopulationWidget::slotSavePop` and six export slots in
   `MT_StatisticsWidget`; and the dialog result with the count in
   `MT_IndividualsWidget::slotCreateConstants`.
+- **Part 3, SIGEL_GP:** merged in `SIG_GPManager::run()` (the fitness reset
+  and the autosave), `SIG_GPManager::run(MT_Classifier *)` (the autosave) and
+  `SIG_GPOperations::crossOver` (the minimum length).
 - **Baselines:** unchanged.
 - **Gates after each part:** `check.sh` 758 pass, 0 fail; warnings 471. The
   other four gates are green.
-- **Next:** part 3, the SIGEL modules. After item 114 is closed: comments that
+- **Next:** part 4, the other SIGEL modules. After item 114 is closed: comments that
   tell the port's history, such as the "PRESERVED DEFECT" note in
   `MT_PopulationWidget::slotExpInd`, are to be discussed with the maintainer.
 

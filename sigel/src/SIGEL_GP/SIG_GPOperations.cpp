@@ -96,33 +96,31 @@ QList<SIGEL_GP::SIG_GPIndividual *> SIGEL_GP::SIG_GPOperations::crossOver( SIGEL
 #endif
 
   // check new program lengths if min. program length was requested
-  if( minLength > 0 )
+  if( minLength > 0 &&
+      ( ( crossPoint1 + winnerProgram2.getProgramLength() - crossPoint2 < minLength ) ||
+        ( crossPoint2 + winnerProgram1.getProgramLength() - crossPoint1 < minLength ) ) )
     {
-      if( ( crossPoint1 + winnerProgram2.getProgramLength() - crossPoint2 < minLength ) ||
-          ( crossPoint2 + winnerProgram1.getProgramLength() - crossPoint1 < minLength ) )
-	{
-          crossPoint1 = winnerProgram1.getProgramLength() / 2;
-          if ((crossPoint1+segLen1) >= winnerProgram1.getProgramLength())
-          {  segLen1 = winnerProgram1.getProgramLength() - crossPoint1 - 1;
-          }
+      crossPoint1 = winnerProgram1.getProgramLength() / 2;
+      if ((crossPoint1+segLen1) >= winnerProgram1.getProgramLength())
+      {  segLen1 = winnerProgram1.getProgramLength() - crossPoint1 - 1;
+      }
 
-          crossPoint2 = winnerProgram2.getProgramLength() / 2;
-				  if ((crossPoint2+segLen2) >= winnerProgram2.getProgramLength())
-          {  segLen2 = winnerProgram2.getProgramLength() - crossPoint2 - 1;
-          }
+      crossPoint2 = winnerProgram2.getProgramLength() / 2;
+      if ((crossPoint2+segLen2) >= winnerProgram2.getProgramLength())
+      {  segLen2 = winnerProgram2.getProgramLength() - crossPoint2 - 1;
+      }
 
 #ifdef SIG_DEBUG
 
-          SIGEL_Tools::SIG_IO::cerr << "-> CrossOver points have been set to "
-				    << crossPoint1
-				    << " and "
-	                            << crossPoint2
-	                            << "\nThe resulting legths are: "
-                                    << crossPoint1 + winnerProgram2.getProgramLength() - crossPoint2
-                                    << " and "
-                                    << crossPoint2 + winnerProgram1.getProgramLength() - crossPoint1 << Qt::endl;
+      SIGEL_Tools::SIG_IO::cerr << "-> CrossOver points have been set to "
+                                << crossPoint1
+                                << " and "
+                                << crossPoint2
+                                << "\nThe resulting legths are: "
+                                << crossPoint1 + winnerProgram2.getProgramLength() - crossPoint2
+                                << " and "
+                                << crossPoint2 + winnerProgram1.getProgramLength() - crossPoint1 << Qt::endl;
 #endif
-        }
     }
 
 	// randomly select any recombination type; currently the 2-point-c/o
