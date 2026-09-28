@@ -612,7 +612,7 @@ we do with the system?]
     spin   spinboxMaxIndLength                  v=1024      [2..32000] step=1 pre=[] suf=[] up=1025      dn2=1023      typed(max+1)=[3200]->3200 commits=3200 enabled=1
     spin   spinboxMaxAge                        v=50        [1..32000] step=1 pre=[] suf=[] up=51        dn2=49        typed(max+1)=[3200]->3200 commits=3200 enabled=1
     spin   spinboxRandomSeed                    v=0         [0..32000] step=1 pre=[] suf=[] up=1         dn2=0         typed(max+1)=[3200]->3200 commits=3200 enabled=1
-    spin   spinboxMinIndLength                  v=10        [2..32000] step=1 pre=[] suf=[] up=11        dn2=9         typed(max+1)=[3200]->3200 commits=3200 enabled=1
+    spin   spinboxMinIndLength                  v=10        [5..32000] step=1 pre=[] suf=[] up=11        dn2=9         typed(max+1)=[3200]->3200 commits=3200 enabled=1
     spin   spinboxResEvGen                      v=0         [0..99] step=1 pre=[] suf=[] up=1         dn2=0         typed(max+1)=[10]->10 commits=10 enabled=1
     slider sliderReproduction                   v=280    [0..1000] page=1 up=280    pgup=280    end=280    lcd=lcdnumberReproduction 28/28/28/28 enabled=0
     click  sliderReproduction                   280 -> 280 (delta +0) focusPolicy=11 hasFocus=0
@@ -2540,9 +2540,9 @@ Do you want to replace it?]
   individuals after Add=5
   [modal] class=QFileDialog title=[Save Experiment As]
   [savedialog] parentIsTheMainWindow=1
-  programs=5  instructionLines=1018
-  perProgramLengths=[30,152,638,45,153]
-  sha256(instructions)=6283c93317ee296b8d16e761ea31ccc7fa01e5b3be6d866569b3cac4075e366f
+  programs=5  instructionLines=2762
+  perProgramLengths=[74,795,392,891,610]
+  sha256(instructions)=034b0c308ba91e1c8ac08e3683af1f37cd9084f71ae8945745a1e5ed3d28ad8c
   first 6 of individual 0: LOAD 9988,-22117 / MOVE 19741 / ADD -5659,-9758 / MAX -26233,15212 / NOP / JMP -23212
   RANDOMSEED at line 10 = 0
   RANDOMSEED at line 83 = 12345

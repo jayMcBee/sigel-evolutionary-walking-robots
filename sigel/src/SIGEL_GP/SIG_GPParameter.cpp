@@ -25,7 +25,7 @@
 
 SIGEL_GP::SIG_GPParameter::SIG_GPParameter()
 : randomSeed(0),
-  minIndLength(3),
+  minIndLength(5),
   maxIndLength(1024),
   resEvGen(0),
   reproductionProb(340),
