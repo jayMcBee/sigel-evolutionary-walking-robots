@@ -409,7 +409,7 @@ namespace SIGEL_Visualisation
   			memcmp(pnmMagic, fileMagic, sizeof(pnmMagic)) != 0                			||
   			fread(header, 1, sizeof(header), file)        != sizeof(header))
   	{
-  		QMessageBox warn("Warning", "Could not open the texture file.\nThe floor is shown without a texture.",QMessageBox::Warning, QMessageBox::Retry, QMessageBox::NoButton,QMessageBox::NoButton, SIGEL_Tools::dialogParent());
+  		QMessageBox warn(QMessageBox::Warning, "Warning", "Could not open the texture file.\nThe floor is shown without a texture.", QMessageBox::Retry, SIGEL_Tools::dialogParent());
   		warn.exec();  	
 
   		return false;
@@ -426,7 +426,7 @@ namespace SIGEL_Visualisation
   	texture.imageData = static_cast<GLubyte*>(malloc(imageSize));
 
   	if(texture.imageData == nullptr) {
-  		QMessageBox warn("Warning", "The specified texture file does not contain valid data.\nThe floor is shown without a texture.",QMessageBox::Warning, QMessageBox::Retry, QMessageBox::NoButton,QMessageBox::NoButton, SIGEL_Tools::dialogParent());
+  		QMessageBox warn(QMessageBox::Warning, "Warning", "The specified texture file does not contain valid data.\nThe floor is shown without a texture.", QMessageBox::Retry, SIGEL_Tools::dialogParent());
   		warn.exec();  		
 
 			fclose(file);
@@ -456,7 +456,7 @@ namespace SIGEL_Visualisation
     QString texFile = environment.getTextureFile();
 
     if ( texFile.length() == 0 ) {
-  		QMessageBox warn("Warning", "The specified texture file does not exist.\nThe floor is shown without a texture.",QMessageBox::Warning, QMessageBox::Retry, QMessageBox::NoButton,QMessageBox::NoButton, SIGEL_Tools::dialogParent());
+  		QMessageBox warn(QMessageBox::Warning, "Warning", "The specified texture file does not exist.\nThe floor is shown without a texture.", QMessageBox::Retry, SIGEL_Tools::dialogParent());
   		warn.exec();
     	return false;
     }
