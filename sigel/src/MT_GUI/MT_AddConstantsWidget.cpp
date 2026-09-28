@@ -106,8 +106,8 @@ namespace
 MT_AddConstantsWidget::MT_AddConstantsWidget(MT_IndividualsWidget *parent, const char *name, bool modal, Qt::WindowFlags fl)
 	: MT_AddConstantsWidgetBase(parent, name, true, fl)
 {
-	boss = parent;
-	if(boss->integer){
+	individualsWidget = parent;
+	if(individualsWidget->integer){
 		selectedType = intType;
 		intRadioButton->setDown(true);
 		floatRadioButton->setDown(false);
@@ -121,9 +121,9 @@ MT_AddConstantsWidget::MT_AddConstantsWidget(MT_IndividualsWidget *parent, const
 		maxValidator = new Qt2DoubleValidator(-100000.0, 100000.0, 4, this);
 	}
 	minValueEdit->setValidator(minValidator);
-	minValueEdit->setText(tr("%1").arg(boss->minValue));
+	minValueEdit->setText(tr("%1").arg(individualsWidget->minValue));
 	maxValueEdit->setValidator(maxValidator);
-	maxValueEdit->setText(tr("%1").arg(boss->maxValue));
+	maxValueEdit->setText(tr("%1").arg(individualsWidget->maxValue));
 	// The C locale for both validators -- see MT_IndividualWidget.cpp. Applied
 	// at BOTH creation sites: the type radio deletes and rebuilds them, so a
 	// constructor-only pinning would be undone the first time a user switches
@@ -134,7 +134,7 @@ MT_AddConstantsWidget::MT_AddConstantsWidget(MT_IndividualsWidget *parent, const
 		for (QValidator *v : findChildren<QValidator *>())
 			v->setLocale(cLocale);
 	}
-	numConstantsSpinBox->setValue(boss->numToCreate);
+	numConstantsSpinBox->setValue(individualsWidget->numToCreate);
 	
 	// slotClicked compares only the objectName, so the ids only have to differ.
 	typeButtons = new QButtonGroup(this);
@@ -146,10 +146,10 @@ MT_AddConstantsWidget::MT_AddConstantsWidget(MT_IndividualsWidget *parent, const
 
 void MT_AddConstantsWidget::accept()
 {
-	boss->numToCreate = numConstantsSpinBox->text().toInt();
-	boss->minValue = minValueEdit->text().toDouble();
-	boss->maxValue = maxValueEdit->text().toDouble();
-	boss->integer  = (selectedType == intType) ? true : false;
+	individualsWidget->numToCreate = numConstantsSpinBox->text().toInt();
+	individualsWidget->minValue = minValueEdit->text().toDouble();
+	individualsWidget->maxValue = maxValueEdit->text().toDouble();
+	individualsWidget->integer  = (selectedType == intType) ? true : false;
 
 	QDialog::accept();
 }

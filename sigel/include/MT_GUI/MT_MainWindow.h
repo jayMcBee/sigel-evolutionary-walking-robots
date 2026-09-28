@@ -59,7 +59,7 @@ private:
 	MT_PopulationWidget *populationWidget;
 	MT_StatisticsWidget	*statisticsWidget;
 	MT_IndividualsWidget *individualsWidget;
-	MT_Controller *boss;
+	MT_Controller *controller;
 
 	QToolBar	*mainToolBar;
 	QMenu	*fileMenu;

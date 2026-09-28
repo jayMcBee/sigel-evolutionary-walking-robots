@@ -909,7 +909,19 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-28 — DONE: ITEM 102, C-STYLE CASTS BECAME C++ CASTS.** Start here.
+**2026-09-28 — DONE: THE BOSS MEMBERS AND TWO TMP LOCALS HAVE REAL NAMES.** Start here.
+
+- **Changed:** `MT_MainWindow::boss` became `controller`,
+  `MT_PopulationWidget::boss` became `mainWindow`,
+  `MT_AddConstantsWidget::boss` became `individualsWidget`; in
+  `MT_GPManager`, `tmp1` and `tmp2` became `trainingDuration` and
+  `trainingSetSize`.
+- **Baselines:** unchanged.
+- **Gates:** `check.sh` 758 pass, 0 fail; warnings 471. The other four gates
+  are green.
+- **Next:** item 113.
+
+**2026-09-28 — DONE: ITEM 102, C-STYLE CASTS BECAME C++ CASTS.**
 
 - **Changed:** details are in item 102's entry in "Done".
 - **Baselines:** unchanged.

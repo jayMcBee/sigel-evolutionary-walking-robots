@@ -15,7 +15,7 @@ MT_MainWindow::MT_MainWindow(MT_Controller *controller, MT_GPManager *manager, s
 	if ( ( f & Qt::WindowType_Mask ) == Qt::Dialog )
 		setWindowModality( Qt::ApplicationModal );
 	evolRunning = false;
-	boss = controller;
+	this->controller = controller;
 	evolTimer = new QTimer(this);
 
 	// initialize variables
@@ -239,12 +239,12 @@ void MT_MainWindow::closeEvent(QCloseEvent *e)
 	if(topWidget->onHide(gpManager, subst)){		// can we close the window savely ?
 		QObject::disconnect(gpManager, SIGNAL( metaEvolutionRunning(bool) ), this, SLOT( slotEvolutionStatus(bool) ));
 
-		QObject::disconnect(mtStartEvolutionAction, SIGNAL( triggered() ), boss, SLOT( startSingleEvolution() ));
-		QObject::disconnect(mtStopEvolutionAction, SIGNAL( triggered() ), boss, SLOT( stopEvolution() ));
-		QObject::disconnect(mtDefaultAction, SIGNAL( triggered() ), boss, SLOT(slotLoadDefault() ) );
-		QObject::disconnect(mtLoadAction, SIGNAL( triggered() ), boss, SLOT( slotLoadSetup() ) );
-		QObject::disconnect(mtSaveAction, SIGNAL( triggered() ), boss, SLOT( slotSaveSetup() ));
-		QObject::disconnect(evolTimer, SIGNAL( timeout() ), boss, SLOT( stopEvolution() ));
+		QObject::disconnect(mtStartEvolutionAction, SIGNAL( triggered() ), controller, SLOT( startSingleEvolution() ));
+		QObject::disconnect(mtStopEvolutionAction, SIGNAL( triggered() ), controller, SLOT( stopEvolution() ));
+		QObject::disconnect(mtDefaultAction, SIGNAL( triggered() ), controller, SLOT(slotLoadDefault() ) );
+		QObject::disconnect(mtLoadAction, SIGNAL( triggered() ), controller, SLOT( slotLoadSetup() ) );
+		QObject::disconnect(mtSaveAction, SIGNAL( triggered() ), controller, SLOT( slotSaveSetup() ));
+		QObject::disconnect(evolTimer, SIGNAL( timeout() ), controller, SLOT( stopEvolution() ));
 
 		e->accept();	// yeah, close it
 	} else
@@ -388,5 +388,5 @@ void MT_MainWindow::slotStopEvolution()
 	mtStopEvolutionAction->setEnabled(false);
 	if(!evolRunning)
 		mtStartEvolutionAction->setEnabled(true);
-	//boss->stopEvolution();
+	//controller->stopEvolution();
 }

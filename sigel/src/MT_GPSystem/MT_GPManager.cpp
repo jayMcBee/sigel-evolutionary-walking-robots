@@ -498,10 +498,10 @@ void MT_GPManager::startEvolution(MT_Substitute *Substitute)
 
 	FitnessTrainer->setNumberOfVariables(Randi->getNumOfVari());
 
-	int tmp1 =0;
-	int tmp2 =0;
+	int trainingDuration =0;
+	int trainingSetSize =0;
 	int FitFunction =0;
-	FitnessTrainer->getSelektionValue(&FitFunction, &tmp1, &tmp2);
+	FitnessTrainer->getSelektionValue(&FitFunction, &trainingDuration, &trainingSetSize);
 	
 	if (FitFunction < 3)
 		Selector->setTypOfIndividual(0); // Evaluator Meta System;

@@ -36,7 +36,7 @@ private:
 	QAction	*loadPopAction;
 	MT_Population *population;
 	MT_GPManager  *gpManager;
-	MT_MainWindow *boss;
+	MT_MainWindow *mainWindow;
 	QList<MT_PopListViewItem *>* getSelectedItems();
 
 private slots:

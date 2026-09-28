@@ -18,7 +18,7 @@ private:
 	// it find(id) and clicked(int) have nothing to talk to.
 	QButtonGroup *typeButtons;
 
-	MT_IndividualsWidget *boss;
+	MT_IndividualsWidget *individualsWidget;
 	enum type { intType, floatType } selectedType;
 	QValidator	*minValidator;
 	QValidator	*maxValidator;

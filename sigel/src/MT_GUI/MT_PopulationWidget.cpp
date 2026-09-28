@@ -32,7 +32,7 @@ MT_PopulationWidget::MT_PopulationWidget(QMainWindow* parent, const char* name, 
 	: MT_PopulationWidgetBase(parent, name, fl), MT_WidgetBase(parent)
 {
 	oldPopSize = -1;
-	boss = static_cast<MT_MainWindow*>(parent);
+	mainWindow = static_cast<MT_MainWindow*>(parent);
 
 	QString pixPath = ::getenv("SIGEL_ROOT");
 	pixPath += "/pixmaps/";
@@ -185,7 +185,7 @@ bool MT_PopulationWidget::onHide(MT_GPManager *manager, subst_cache *subst)
 		offspringSize   = popSize * overProdFac;
 
 		// offspring population size has changed so we have to recalculate a tournament size
-		tournSize = boss->calculateTournSize(popSize, offspringSize, tournSize);
+		tournSize = mainWindow->calculateTournSize(popSize, offspringSize, tournSize);
 
 		// ... and finally set it
 		manager->setSelektionValue(offspringSize, tournSize,
