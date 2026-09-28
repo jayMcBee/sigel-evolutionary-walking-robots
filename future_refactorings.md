@@ -12,12 +12,6 @@ Paths are relative to `sigel/`, the source tree.
 
 ---
 
-## 1 · Make it legal C++
-
-Constructs the language removed. A current compiler rejects them.
-
----
-
 ## 2 · Let the compiler hunt bugs
 
 - [ ] **5. Add `override`**, one commit per module. Highest value on this
