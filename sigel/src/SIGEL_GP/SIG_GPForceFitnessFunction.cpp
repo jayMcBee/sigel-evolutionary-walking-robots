@@ -53,6 +53,7 @@ double SIGEL_GP::SIG_GPForceFitnessFunction::evalFitness( SIGEL_Program::SIG_Pro
     simulation->start();
   }
   catch (SIGEL_Tools::SIG_Exception &e) {
+    SIGEL_Tools::SIG_IO::cerr << e.getMessage() << Qt::flush;
   };
 
   // delete simulation;

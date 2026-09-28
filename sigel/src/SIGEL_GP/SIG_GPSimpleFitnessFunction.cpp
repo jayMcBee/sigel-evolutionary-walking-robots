@@ -47,6 +47,7 @@ double SIGEL_GP::SIG_GPSimpleFitnessFunction::evalFitness( SIGEL_Program::SIG_Pr
     simulation->start();
   }
   catch (SIGEL_Tools::SIG_Exception &e) {
+    SIGEL_Tools::SIG_IO::cerr << e.getMessage() << Qt::flush;
   };
 
   // delete simulation;

@@ -24,6 +24,7 @@
 
 #include "SIGEL_GP/SIG_GPFullDataRecorder.h"
 #include "SIGEL_Simulation/SIG_EarlyRunTermSimulation.h"
+#include "SIGEL_Tools/SIG_IO.h"
 
 
 namespace SIGEL_GP
@@ -52,7 +53,8 @@ namespace SIGEL_GP
     {  simulation->start();
     }
     catch (SIGEL_Tools::SIG_Exception &e)
-    { };
+    {  SIGEL_Tools::SIG_IO::cerr << e.getMessage() << Qt::flush;
+    };
 
     // calculate how many steps a complete simulation takes
     // (usually number of elements in recorder-obj., but we may have terminated earlier)

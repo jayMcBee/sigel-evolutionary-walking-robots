@@ -313,6 +313,7 @@ int main( int argc, char *argv[] ) {
                            ->evalFitness( *program, *robot, *environment, *simulationParameters );
         }
         catch (SIGEL_Tools::SIG_Exception &e) {
+          SIGEL_Tools::SIG_IO::cerr << e.getMessage() << Qt::flush;
           fitnessValue = 0;
         };
       }

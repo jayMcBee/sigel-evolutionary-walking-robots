@@ -301,14 +301,7 @@ touched, because changing one changes behaviour against the reference binary.
   transfer text can bring an unknown word in; the robot
   compiler rejects it.
 
-- [ ] **54. Review the empty catch blocks in a round of their own:** the ones
-  around `simulation->start()` in the fitness functions. A throwing
-  simulation is ignored, and fitness comes from what was recorded until then.
-  NiceWalking and Simple are the fitness functions of all shipped
-  experiments, so a change can move fitness values against 1.3. Each site
-  needs its own decision.
-
-- [ ] **55. Review the marker checks that do nothing, with item 54.** The
+- [ ] **55. Review the marker checks that do nothing.** The
   stream constructors of `SIG_Geometry`, `SIG_Polygon` and
   `SIG_CommandParameters` hold only `// ERROR` and read on; `SIG_Robot` and
   `SIG_LanguageParameters` already throw `SIG_UnstreamingError`. Throwing

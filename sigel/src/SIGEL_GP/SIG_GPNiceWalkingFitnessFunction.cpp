@@ -24,6 +24,7 @@
 
 #include "SIGEL_GP/SIG_GPFullDataRecorder.h"
 #include "SIGEL_Simulation/SIG_Simulation.h"
+#include "SIGEL_Tools/SIG_IO.h"
 
 namespace SIGEL_GP
 {
@@ -50,7 +51,9 @@ namespace SIGEL_GP
 	simulation->start();
       }
     catch (SIGEL_Tools::SIG_Exception &e)
-      { };
+      {
+	SIGEL_Tools::SIG_IO::cerr << e.getMessage() << Qt::flush;
+      };
 
     // delete simulation;
 

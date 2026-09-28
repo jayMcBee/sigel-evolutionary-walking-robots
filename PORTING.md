@@ -6613,6 +6613,14 @@ carried; other items and this file cite them, so they do not change.
   the same target as before; 9,000,099 values were compared. Dropped by
   decision: a named constant for the operand range `32000`.
 
+- [x] **54. The empty catch blocks log the exception** — done 2026-09-28,
+  one commit. The catch around `simulation->start()` in `evalFitness` of the
+  Simple, NiceWalking, RealSpeed, Force and AdaptiveWalking fitness functions,
+  and the catch around `evalFitness` in `sigel_slave.cpp`'s `main`, write
+  `e.getMessage()` to `SIG_IO::cerr`, as the other catches in `sigel_slave.cpp`
+  do. The fitness is computed as before: from what was recorded until the
+  throw, and 0 in the slave. No empty catch block is left.
+
 - [x] **114. Nested `if`s without `else` became `if (A && B)`** — done
   2026-09-28, four commits, one per module group. 25 places in MT_Control,
   MT_GUI, SIGEL_GP, SIGEL_MasterGUI, SIGEL_Program, SIGEL_Robot and
