@@ -8,8 +8,9 @@ tests each program in a physics simulator.
 
 ## Origin
 
-- **SIGEL 1.0 (2001):** project group PG 368, University of Dortmund — the GP
-  system, the robot language, the simulator and the visualisation
+- **SIGEL 1.0 (2001):** written by project group PG 368 at the University of
+  Dortmund, including the GP system, the robot language, the simulator and the
+  visualisation
   ([project page](https://sigel.sourceforge.net/seiten/einleitung_en.html),
   [final report](https://sigel.sourceforge.net/download/berichte/endbericht.pdf), German).
 - **MetaGP (1.1–1.3):** added for Jens Ziegler and Wolfgang Banzhaf's fitness
