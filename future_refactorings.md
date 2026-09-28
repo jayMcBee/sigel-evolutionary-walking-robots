@@ -317,11 +317,6 @@ touched, because changing one changes behaviour against the reference binary.
   and `SIG_GPRemoteZORCFitnessFunction`. Decide for each whether it belongs in
   the interface or goes through the new error reporter.
 
-- [ ] **32. Remove the redundant `setEnabled` lines** in
-  `SIG_GUIGPExperiment::slotStartEvolution` and `slotEvolutionStopped`;
-  `slotEvolutionNotRunning` already does it. **Keep `pushbuttonStop`** —
-  nothing else enables it.
-
 - [ ] **33. Delete the overwrite prompts D35 wants gone,** rather than
   re-parent them: after a `getSaveFileName` that already asks, in
   `MT_StatisticsWidget` (item 25 left these for this item),

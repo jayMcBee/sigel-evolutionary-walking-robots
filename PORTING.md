@@ -6632,6 +6632,11 @@ carried; other items and this file cite them, so they do not change.
   the same target as before; 9,000,099 values were compared. Dropped by
   decision: a named constant for the operand range `32000`.
 
+- [x] **32. The redundant `setEnabled` lines** — closed 2026-09-28, already
+  done by an earlier change. `SIG_GUIGPExperiment::slotStartEvolution` and
+  `slotEvolutionStopped` set only `pushbuttonStop`, which nothing else
+  enables; `slotEvolutionNotRunning` sets everything else.
+
 - [x] **1. The pre-standard headers are replaced** — done 2026-09-28, one
   commit. `<iostream.h>` and `<vector.h>` became `<iostream>` and `<vector>` in
   `SIG_GPIndividual.cpp`, `MT_GPManager.cpp`, `MT_Randomizer.cpp`,
