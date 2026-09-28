@@ -26,6 +26,7 @@ static MT_PopListViewItem *nextSiblingOf(QTreeWidget *tree, QTreeWidgetItem *ite
 #include <QTextEdit>
 #include <QLCDNumber>
 #include <QMessageBox>
+#include <QAbstractButton>
 
 
 MT_PopulationWidget::MT_PopulationWidget(QMainWindow* parent, const char* name, Qt::WindowFlags fl)
@@ -376,8 +377,13 @@ void MT_PopulationWidget::slotExpInd()
 	bool saveAsPop = false;
 	QString fileName;
 	if(list->count() > 1){
-		saveAsPop = !QMessageBox::information(this, "Save Individuals", "There is more than one individual selected.\n"
-			"Shall we save them as a population?", "Save as population", "Save separately");
+		QMessageBox box(QMessageBox::Information, "Save Individuals", "There is more than one individual selected.\n"
+			"Shall we save them as a population?", QMessageBox::Yes | QMessageBox::No, this);
+		box.button(QMessageBox::Yes)->setText("Save as population");
+		box.button(QMessageBox::No)->setText("Save separately");
+		box.setDefaultButton(QMessageBox::Yes);
+		box.setEscapeButton(QMessageBox::No);
+		saveAsPop = box.exec() == QMessageBox::Yes;
 	}
 	if(saveAsPop){
 		fileName = QFileDialog::getSaveFileName(this, QString(), QString(), "Population Files (*.mpop);;All Files (*)");
@@ -445,9 +451,14 @@ void MT_PopulationWidget::slotLoadPop()
 		if(file.open(QIODevice::ReadOnly)){
 			QTextStream str(&file);
 
-			if(1 == QMessageBox::warning(this, "Import Population",
+			QMessageBox box(QMessageBox::Warning, "Import Population",
 				"Shall the current population be deleted or shall we append\n"
-				"the new individuals?", "Append", "Delete"))
+				"the new individuals?", QMessageBox::Ok | QMessageBox::Discard, this);
+			box.button(QMessageBox::Ok)->setText("Append");
+			box.button(QMessageBox::Discard)->setText("Delete");
+			box.setDefaultButton(QMessageBox::Ok);
+			box.setEscapeButton(QMessageBox::Ok);
+			if(box.exec() == QMessageBox::Discard)
 			{
 				// delete
 				population->loadPop(str);
