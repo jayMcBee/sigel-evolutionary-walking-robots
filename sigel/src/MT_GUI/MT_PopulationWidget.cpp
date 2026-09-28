@@ -392,10 +392,6 @@ void MT_PopulationWidget::slotExpInd()
 				fileName += ".mpop";
 			QFile file( fileName );
 
-			if(file.exists() && QMessageBox::Ok != QMessageBox::warning(this, "Save Population", "There is another file with this name. This will overwrite\n"
-				"the existing file. Do you really want to continue?", QMessageBox::Ok | QMessageBox::Cancel, QMessageBox::Cancel))
-				return;
-
 			if(file.open(QIODevice::WriteOnly)){
 				QTextStream str(&file);
 				
@@ -486,10 +482,6 @@ void MT_PopulationWidget::slotSavePop()
 		if(fileName.right(5) != ".mpop")
 			fileName += ".mpop";
 		QFile file( fileName );
-
-		if(file.exists() && QMessageBox::Ok != QMessageBox::warning(this, "Save Population", "There is another file with this name. This will overwrite\n"
-			"the existing file. Do you really want to continue?", QMessageBox::Ok | QMessageBox::Cancel, QMessageBox::Cancel))
-			return;
 
 		if(file.open(QIODevice::WriteOnly)){
 			QTextStream str(&file);

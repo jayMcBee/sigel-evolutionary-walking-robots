@@ -327,9 +327,6 @@ void MT_IndividualsWidget::slotExportConstants()
 		fileName += ".mcon";
 
 	QFile file(fileName);
-	if(file.exists() && QMessageBox::Ok != QMessageBox::warning(this, "Save Constants", "There is another file with this name. This will overwrite\n"
-		"the existing file. Do you really want to continue?", QMessageBox::Ok | QMessageBox::Cancel, QMessageBox::Cancel))
-		return;
 	
 	if(file.open( QIODevice::WriteOnly )){
 		QTextStream str( &file );
