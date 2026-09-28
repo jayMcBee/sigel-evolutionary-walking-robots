@@ -160,8 +160,12 @@ void SIG_AllIndividualsView::slotCompleteRefreshList()
   individualList->listviewIndividuals->setSortingEnabled( false );
   for( int counter = 0; counter < poolSize; counter++ )
     {
-      progress.setValue( counter );
-      qApp->processEvents();
+      // Every 100 rows: each update makes the list measure all its rows again.
+      if( counter % 100 == 0 )
+        {
+          progress.setValue( counter );
+          qApp->processEvents();
+        }
       SIGEL_GP::SIG_GPIndividual *theGPIndividual = &theExperiment.population.getIndividual( counter );
       SIG_IndividualListItem *theItem = new SIG_IndividualListItem( individualList->listviewIndividuals, counter, theGPIndividual );
     }

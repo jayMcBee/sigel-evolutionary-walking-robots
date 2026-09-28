@@ -909,7 +909,19 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-28 — DONE: THE GENETIC-OPERATOR DISPLAYS SHOW WHOLE NUMBERS.** Start here.
+**2026-09-28 — DONE: LOADING A LARGE POOL IS FAST.** Start here.
+
+- **Changed:** `SIG_AllIndividualsView::slotCompleteRefreshList` updates its
+  progress and processes events every 100 rows, not every row; each update
+  made the auto-sized columns measure every row again. Measured with File >
+  Open: 62.7 s to 7.4 s for a pool of 8000, 11.4 s to 2.7 s for 2000; the
+  load without a window takes 6.5 s and 1.3 s.
+- **Baselines:** unchanged.
+- **Gates:** `check.sh` 758 pass, 0 fail; warnings 485. The other four gates
+  are green.
+- **Next:** item 102.
+
+**2026-09-28 — DONE: THE GENETIC-OPERATOR DISPLAYS SHOW WHOLE NUMBERS.**
 
 - **Changed:** `SIG_GPParameter::slotMutationChanged` and
   `slotCrossoverChanged` round the three displays to whole percent. The
