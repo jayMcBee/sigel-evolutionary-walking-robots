@@ -7,7 +7,6 @@
 #include <unistd.h>
 #endif
 #include "MT_Control/MT_Substitute.h"
-#include <iostream>
 #ifdef _WINDOWS
 #include <windows.h>
 #include <malloc.h>

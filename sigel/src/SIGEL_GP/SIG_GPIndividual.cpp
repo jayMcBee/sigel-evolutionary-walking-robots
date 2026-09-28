@@ -21,9 +21,6 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 #include "SIGEL_GP/SIG_GPIndividual.h"
-#ifndef _WINDOWS
-#include <iostream>
-#endif
 
 
 SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPIndividual::operator =(SIG_GPIndividual& ind)
