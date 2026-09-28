@@ -74,7 +74,7 @@ int main()
 		const QString got = data.getQStringFromPVM(tid, TAG);
 		const bool same = (got == c.s);
 		std::printf("%-14s %lld chars / %lld bytes  %s\n", c.what,
-				(long long)c.s.length(), (long long)c.s.toUtf8().size(),
+				static_cast<long long>(c.s.length()), static_cast<long long>(c.s.toUtf8().size()),
 				same ? "exact" : "DIFFERS");
 		ok = ok && same;
 	}

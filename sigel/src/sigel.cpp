@@ -88,13 +88,13 @@ extern "C"
   // this C function is launched as a thread
 #ifdef _WINDOWS
   DWORD WINAPI MeJustCallingRegisterDynPVMClients(LPVOID inRawGPM) {
-    SIGEL_GP::SIG_GPManager *gpm = (SIGEL_GP::SIG_GPManager *)inRawGPM;
+    SIGEL_GP::SIG_GPManager *gpm = static_cast<SIGEL_GP::SIG_GPManager *>(inRawGPM);
     gpm->RegisterDynPVMClients();
     return 0;
   }
 #else
   void MeJustCallingRegisterDynPVMClients(void *inRawGPM) {
-    SIGEL_GP::SIG_GPManager *gpm = (SIGEL_GP::SIG_GPManager *)inRawGPM;
+    SIGEL_GP::SIG_GPManager *gpm = static_cast<SIGEL_GP::SIG_GPManager *>(inRawGPM);
     gpm->RegisterDynPVMClients();
   }
 #endif
@@ -258,11 +258,8 @@ int main( int argc, char *argv[] ) {
       serv_thread = CreateThread( nullptr, 0, &MeJustCallingRegisterDynPVMClients, &gpManager, 0, 0 );
 #else
       pthread_t serv_thread;
-      // 1.3 cast the thread function to (void *), which pthread_create takes as
-      // void *(*)(void *). Older compilers let that through; C++17 does not, so
-      // the cast is spelled out. The function still returns nothing and the
-      // return value is still never read, exactly as before.
-      pthread_create(&serv_thread, nullptr,(void *(*)(void *)) &MeJustCallingRegisterDynPVMClients,(void *) &gpManager);
+      // The function returns void, not void *; nothing reads the thread's result.
+      pthread_create(&serv_thread, nullptr, reinterpret_cast<void *(*)(void *)>(&MeJustCallingRegisterDynPVMClients), &gpManager);
 
 
 #endif

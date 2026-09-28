@@ -895,7 +895,7 @@ void SIGEL_GP::SIG_GPManager::RegisterDynPVMClients() {
 
   // Make a socket to listen to our clients;
   // init sockaddr struct: using Internet family, port kSigelMasterRegPort
-  memset((char *)&sad, 0, sizeof(struct sockaddr_in));
+  memset(&sad, 0, sizeof(struct sockaddr_in));
   sad.sin_family = AF_INET;
   sad.sin_port = htons(kSigelMasterRegPort);
   sad.sin_addr.s_addr = INADDR_ANY;
@@ -926,13 +926,13 @@ void SIGEL_GP::SIG_GPManager::RegisterDynPVMClients() {
 
   // let's bind local address & socket
 #ifdef _WINDOWS
-  if ( bind(socke, (struct sockaddr *)&sad, sizeof(sad)) == SOCKET_ERROR ) {
+  if ( bind(socke, reinterpret_cast<struct sockaddr *>(&sad), sizeof(sad)) == SOCKET_ERROR ) {
     fprintf(stderr, "ERR:   Bind reported an error\n");
     WSACleanup();
      exit(1);
   }
 #else
-  if ( bind(socke, (struct sockaddr *)&sad, sizeof(sad)) < 0 ) {
+  if ( bind(socke, reinterpret_cast<struct sockaddr *>(&sad), sizeof(sad)) < 0 ) {
     fprintf(stderr, "ERR:   Bind reported an error\n");
      exit(1);
   }
@@ -976,7 +976,7 @@ void SIGEL_GP::SIG_GPManager::RegisterDynPVMClients() {
 #ifdef _WINDOWS
       alen = sizeof(caddr);
 #endif
-      sdRecv = accept(socke, (sockaddr *)&caddr, &alen);
+      sdRecv = accept(socke, reinterpret_cast<sockaddr *>(&caddr), &alen);
 
 #ifdef _WINDOWS
       if (sdRecv == INVALID_SOCKET) {
