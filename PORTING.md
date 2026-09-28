@@ -6551,6 +6551,11 @@ carried; other items and this file cite them, so they do not change.
   values truncate as before. The jumps' `INT_MIN` test, which comes after an
   overflowing negation, is item 112's.
 
+- [x] **110. `SIG_GPOperations::crossOver` reads line -1 of a one-line
+  program** — closed 2026-09-28, by decision. With item 111 only a loaded
+  program shorter than 2 lines can reach it, and item 118 covers loaded
+  programs. If it happens, `SIG_Program::getLine` throws `SIG_Exception`.
+
 - [x] **111. The minimum program length is at least 5 in the dialog** —
   done 2026-09-28, one commit. `spinboxMinIndLength` in
   `SIG_GPParameterBase.ui` goes down to 5, not 2, and the `SIG_GPParameter`

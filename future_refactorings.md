@@ -209,16 +209,6 @@ Constructs the language removed. A current compiler rejects them.
 All present in 1.3, none introduced here. Each needs a decision before it is
 touched, because changing one changes behaviour against the reference binary.
 
-- [ ] **110. `SIG_GPOperations::crossOver` reads line -1 of a one-line
-  program.** Found 2026-09-27 by the review of item 91, from the code; not
-  reproduced. With a winner of length 1 and a minimum length above 0, the
-  minimum-length branch sets `crossPoint1` to 0 while `segLen1` stays -1, and
-  a copy loop then asks for line -1. Before item 91 that read outside the
-  vector; now `SIG_Program::getLine` throws `SIG_Exception`. Since item 111
-  the dialog allows no minimum below 5 and the GP pads every new program to
-  the minimum, so only a loaded program shorter than 2 lines reaches it;
-  item 118 covers loaded programs.
-
 - [ ] **118. Check the GP parameters when a file loads.** Found 2026-09-28.
   The dialog limits each GP field with its widget's range.
   `SIG_GPParameter::readFromFile` and the setters check no value: each one
