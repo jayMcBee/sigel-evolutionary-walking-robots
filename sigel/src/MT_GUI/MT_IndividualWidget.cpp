@@ -57,24 +57,24 @@ MT_IndividualsWidget::MT_IndividualsWidget(QWidget* parent, const char* name, Qt
 }
 
 	// connect the sliders to the corresponding lineEdits
-	connect((const QObject*)slider01, SIGNAL(valueChanged(int)), SLOT(slotChangeEdit(int)));
-	connect((const QObject*)slider02, SIGNAL(valueChanged(int)), SLOT(slotChangeEdit(int)));
-	connect((const QObject*)slider03, SIGNAL(valueChanged(int)), SLOT(slotChangeEdit(int)));
-	connect((const QObject*)slider04, SIGNAL(valueChanged(int)), SLOT(slotChangeEdit(int)));
-	connect((const QObject*)slider05, SIGNAL(valueChanged(int)), SLOT(slotChangeEdit(int)));
-	connect((const QObject*)slider06, SIGNAL(valueChanged(int)), SLOT(slotChangeEdit(int)));
-	connect((const QObject*)slider07, SIGNAL(valueChanged(int)), SLOT(slotChangeEdit(int)));
-	connect((const QObject*)slider08, SIGNAL(valueChanged(int)), SLOT(slotChangeEdit(int)));
-	connect((const QObject*)slider09, SIGNAL(valueChanged(int)), SLOT(slotChangeEdit(int)));
-	connect((const QObject*)slider10, SIGNAL(valueChanged(int)), SLOT(slotChangeEdit(int)));
-	connect((const QObject*)slider11, SIGNAL(valueChanged(int)), SLOT(slotChangeEdit(int)));
-	connect((const QObject*)slider12, SIGNAL(valueChanged(int)), SLOT(slotChangeEdit(int)));
-	connect((const QObject*)slider13, SIGNAL(valueChanged(int)), SLOT(slotChangeEdit(int)));
-	connect((const QObject*)slider14, SIGNAL(valueChanged(int)), SLOT(slotChangeEdit(int)));
-	connect((const QObject*)slider15, SIGNAL(valueChanged(int)), SLOT(slotChangeEdit(int)));
-	connect((const QObject*)slider16, SIGNAL(valueChanged(int)), SLOT(slotChangeEdit(int)));
-	connect((const QObject*)slider17, SIGNAL(valueChanged(int)), SLOT(slotChangeEdit(int)));
-	connect((const QObject*)slider18, SIGNAL(valueChanged(int)), SLOT(slotChangeEdit(int)));
+	connect(slider01, SIGNAL(valueChanged(int)), SLOT(slotChangeEdit(int)));
+	connect(slider02, SIGNAL(valueChanged(int)), SLOT(slotChangeEdit(int)));
+	connect(slider03, SIGNAL(valueChanged(int)), SLOT(slotChangeEdit(int)));
+	connect(slider04, SIGNAL(valueChanged(int)), SLOT(slotChangeEdit(int)));
+	connect(slider05, SIGNAL(valueChanged(int)), SLOT(slotChangeEdit(int)));
+	connect(slider06, SIGNAL(valueChanged(int)), SLOT(slotChangeEdit(int)));
+	connect(slider07, SIGNAL(valueChanged(int)), SLOT(slotChangeEdit(int)));
+	connect(slider08, SIGNAL(valueChanged(int)), SLOT(slotChangeEdit(int)));
+	connect(slider09, SIGNAL(valueChanged(int)), SLOT(slotChangeEdit(int)));
+	connect(slider10, SIGNAL(valueChanged(int)), SLOT(slotChangeEdit(int)));
+	connect(slider11, SIGNAL(valueChanged(int)), SLOT(slotChangeEdit(int)));
+	connect(slider12, SIGNAL(valueChanged(int)), SLOT(slotChangeEdit(int)));
+	connect(slider13, SIGNAL(valueChanged(int)), SLOT(slotChangeEdit(int)));
+	connect(slider14, SIGNAL(valueChanged(int)), SLOT(slotChangeEdit(int)));
+	connect(slider15, SIGNAL(valueChanged(int)), SLOT(slotChangeEdit(int)));
+	connect(slider16, SIGNAL(valueChanged(int)), SLOT(slotChangeEdit(int)));
+	connect(slider17, SIGNAL(valueChanged(int)), SLOT(slotChangeEdit(int)));
+	connect(slider18, SIGNAL(valueChanged(int)), SLOT(slotChangeEdit(int)));
 
 	// connect the lineEdits to the corresponding sliders
 	connect(edit01, SIGNAL(textChanged(const QString&)), SLOT(slotChangeSlider(const QString&)));
@@ -116,15 +116,15 @@ MT_IndividualsWidget::MT_IndividualsWidget(QWidget* parent, const char* name, Qt
 
 	// connection for the listbox
 	constantsListBox->setContextMenuPolicy(Qt::CustomContextMenu);
-	connect((const QObject*) constantsListBox, SIGNAL(customContextMenuRequested(const QPoint&)), SLOT(slotRButtonClicked(const QPoint&)));
-	connect((const QObject*) constantsListBox, SIGNAL(currentItemChanged(QListWidgetItem*,QListWidgetItem*)), SLOT(slotSelectionChanged()));
-	connect((const QObject*) constantsListBox, SIGNAL(itemSelectionChanged()), SLOT(slotSelectionChanged()));
-	connect((const QObject*) constantsListBox, SIGNAL(itemActivated(QListWidgetItem*)), SLOT(slotEditConst(QListWidgetItem*)));
+	connect(constantsListBox, SIGNAL(customContextMenuRequested(const QPoint&)), SLOT(slotRButtonClicked(const QPoint&)));
+	connect(constantsListBox, SIGNAL(currentItemChanged(QListWidgetItem*,QListWidgetItem*)), SLOT(slotSelectionChanged()));
+	connect(constantsListBox, SIGNAL(itemSelectionChanged()), SLOT(slotSelectionChanged()));
+	connect(constantsListBox, SIGNAL(itemActivated(QListWidgetItem*)), SLOT(slotEditConst(QListWidgetItem*)));
 
 	// connect the buttons
-	connect((const QObject*)createButton, SIGNAL(clicked()), SLOT(slotCreateConstants()));
-	connect((const QObject*)importButton, SIGNAL(clicked()), SLOT(slotImportConstants()));
-	connect((const QObject*)exportButton, SIGNAL(clicked()), SLOT(slotExportConstants()));
+	connect(createButton, SIGNAL(clicked()), SLOT(slotCreateConstants()));
+	connect(importButton, SIGNAL(clicked()), SLOT(slotImportConstants()));
+	connect(exportButton, SIGNAL(clicked()), SLOT(slotExportConstants()));
 
 	connect(this, SIGNAL(numConstChanged()), SLOT(slotNumConstChanged()));
 
@@ -186,7 +186,7 @@ void MT_IndividualsWidget::onShow(MT_GPManager *manager, subst_cache *subst)
 		for(int i=1; i<10; i++){
 			receivername = com1 + QString("%1").arg(i);
 			actual = functions->at(i-1);
-			valText = QString("%1").arg((int)(actual - previous));
+			valText = QString("%1").arg(static_cast<int>(actual - previous));
 			previous = actual;
 
 			receiverObject = findChild<QLineEdit*>(receivername);
@@ -197,7 +197,7 @@ void MT_IndividualsWidget::onShow(MT_GPManager *manager, subst_cache *subst)
 		for(int i=10; i<19; i++){
 			receivername = com2 + QString("%1").arg(i);
 			actual = functions->at(i-1);
-			valText = QString("%1").arg((int)(actual - previous));
+			valText = QString("%1").arg(static_cast<int>(actual - previous));
 			previous = actual;
 
 			receiverObject = findChild<QLineEdit*>(receivername);
@@ -452,7 +452,7 @@ void MT_IndividualsWidget::slotCreateConstants()
 
 void MT_IndividualsWidget::slotNumConstChanged()
 {
-	numConstantsLCD->display((int) constantsListBox->count());
+	numConstantsLCD->display(constantsListBox->count());
 }
 
 
@@ -482,7 +482,7 @@ void MT_IndividualsWidget::slotChangeEdit(int value)
 void MT_IndividualsWidget::slotChangeSlider(const QString &text)
 {
 	// find out who's sending this signal
-	QLineEdit *senderObject = (QLineEdit*) sender();
+	QLineEdit *senderObject = static_cast<QLineEdit*>(sender());
 	QString senderName(senderObject->objectName());
 
 	// get the appropriate receiver

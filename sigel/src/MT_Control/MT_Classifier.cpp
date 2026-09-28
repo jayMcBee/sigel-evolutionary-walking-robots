@@ -627,7 +627,8 @@ int MT_Classifier::evalNeededTours(QList<SIGEL_GP::SIG_GPTournament *> *  tours,
 	if(RefreshInterval == 0)
 		RefreshInterval = 10;
 
-	int MinNumTours = (int) (((double)ToursSize)/RefreshInterval);
+	const double toursPerRefresh = static_cast<double>(ToursSize) / RefreshInterval;
+	int MinNumTours = static_cast<int>(toursPerRefresh);
 	if (MinNumTours <= 0)
 		MinNumTours =1;
 

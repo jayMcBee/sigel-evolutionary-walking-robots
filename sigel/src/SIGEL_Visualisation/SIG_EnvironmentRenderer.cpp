@@ -424,7 +424,7 @@ namespace SIGEL_Visualisation
   	bytesPerPixel = 4;
   	imageSize     = texture.width * texture.height * bytesPerPixel;
 
-  	texture.imageData = (GLubyte *)malloc(imageSize);
+  	texture.imageData = static_cast<GLubyte*>(malloc(imageSize));
 
   	if(texture.imageData == nullptr) {
   		QMessageBox warn("Warning", "The specified texture file does not contain valid data.\nThe floor is shown without a texture.",QMessageBox::Warning, QMessageBox::Retry, QMessageBox::NoButton,QMessageBox::NoButton, SIGEL_Tools::dialogParent());
@@ -438,7 +438,7 @@ namespace SIGEL_Visualisation
   	// adds the missing (RGB)A information
   	char *currentPixel;
   	int alpha = environment.getTexAlpha();
-  	currentPixel = (char*) texture.imageData;
+  	currentPixel = reinterpret_cast<char*>(texture.imageData);
   	
   	for(int i = 0; i < imageSize; i += bytesPerPixel) {
   		fread(currentPixel, 1, 3, file);

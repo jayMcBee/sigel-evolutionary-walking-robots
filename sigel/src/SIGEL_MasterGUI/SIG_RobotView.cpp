@@ -141,7 +141,7 @@ void SIG_RobotView::getOutOfExperiment()
 		{	case SIGEL_Robot::SIG_Sensor::tJointSensor:     listboxSensors->addItem( new QListWidgetItem( QIcon( QPixmap( sigelRootString + "/pixmaps/sensor-J.xpm" ) ), sensorIt->getName() ) );
 		                                                   break;
 
-			case SIGEL_Robot::SIG_Sensor::tPitchRollSensor: prs = (SIGEL_Robot::SIG_PitchRollSensor *)sensorIt;
+			case SIGEL_Robot::SIG_Sensor::tPitchRollSensor: prs = static_cast<SIGEL_Robot::SIG_PitchRollSensor*>(sensorIt);
                                                          if (prs->IsPitchType())
                                                          {	listboxSensors->addItem( new QListWidgetItem( QIcon( QPixmap( sigelRootString + "/pixmaps/sensor-P.xpm" ) ), sensorIt->getName() ) );
                                                          }

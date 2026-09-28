@@ -165,8 +165,8 @@ void MT_AddConstantsWidget::slotClicked(int id)
 			maxValidator = new Qt2IntValidator(-10000, 10000, this);
 			minValueEdit->setValidator(minValidator);
 			maxValueEdit->setValidator(maxValidator);
-			minValueEdit->setText(tr("%1").arg((int)minValueEdit->text().toDouble()));
-			maxValueEdit->setText(tr("%1").arg((int)maxValueEdit->text().toDouble()));
+			minValueEdit->setText(tr("%1").arg(static_cast<int>(minValueEdit->text().toDouble())));
+			maxValueEdit->setText(tr("%1").arg(static_cast<int>(maxValueEdit->text().toDouble())));
 					{
 				QLocale cLocale = QLocale::c();
 				cLocale.setNumberOptions(QLocale::RejectGroupSeparator);
@@ -183,8 +183,8 @@ void MT_AddConstantsWidget::slotClicked(int id)
 			maxValidator = new Qt2DoubleValidator(-10000.0, 10000.0, 4, this);
 			minValueEdit->setValidator(minValidator);
 			maxValueEdit->setValidator(maxValidator);
-			minValueEdit->setText(tr("%1").arg((double)minValueEdit->text().toInt()));
-			maxValueEdit->setText(tr("%1").arg((double)maxValueEdit->text().toInt()));
+			minValueEdit->setText(tr("%1").arg(static_cast<double>(minValueEdit->text().toInt())));
+			maxValueEdit->setText(tr("%1").arg(static_cast<double>(maxValueEdit->text().toInt())));
 					{
 				QLocale cLocale = QLocale::c();
 				cLocale.setNumberOptions(QLocale::RejectGroupSeparator);

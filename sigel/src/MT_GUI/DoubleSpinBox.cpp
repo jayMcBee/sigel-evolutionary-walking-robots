@@ -61,8 +61,8 @@ DISpinBox::~DISpinBox()
 
 QValidator::State DISpinBox::validate(QString &input, int &pos) const
 {
-	const QValidator *v = (typ == INTTYP) ? (const QValidator *) iValidator
-	                                      : (const QValidator *) dValidator;
+	const QValidator *v = (typ == INTTYP) ? static_cast<const QValidator*>(iValidator)
+	                                      : static_cast<const QValidator*>(dValidator);
 	return v ? v->validate(input, pos) : QValidator::Acceptable;
 }
 
@@ -74,7 +74,7 @@ void DISpinBox::fixup(QString &) const
 int DISpinBox::valueFromText(const QString &t) const
 {
 	if(typ == INTTYP)
-		return int(t.toInt());
+		return t.toInt();
 	else 
 		return int(t.toDouble()*precision);
 }
@@ -100,7 +100,7 @@ void DISpinBox::setIntValue(int value)
 
 double DISpinBox::dblValue()
 {
-	return (double)value() / (double)precision;
+	return static_cast<double>(value()) / static_cast<double>(precision);
 }
 
 int DISpinBox::intValue()
@@ -128,7 +128,7 @@ void DISpinBox::setRange(int decimals, double minVal, double maxVal)
 	setSingleStep(10);
 	dValidator->setRange(minVal, maxVal, decimals);
 	lineEdit()->setValidator(dValidator);
-	QSpinBox::setRange(minVal, (int)(maxVal * precision));
+	QSpinBox::setRange(minVal, static_cast<int>(maxVal * precision));
 }
 
 int DISpinBox::getTyp()

@@ -46,21 +46,21 @@ MT_StatisticsWidget::MT_StatisticsWidget(QMainWindow* parent, const char* name, 
 	QObject::connect(autoUpdateCheckBox, SIGNAL(toggled(bool)), SLOT(slotAutoUpdateChanged(bool)));
 	QObject::connect(updateTimer, SIGNAL(timeout()), SLOT(slotUpdateGUI()));
 
-	QObject::connect((QObject*)SIGGenSpinBox, SIGNAL(valueChanged(int)), SLOT(slotSigEdit(int)));
-	QObject::connect((QObject*)SIGGenSlider, SIGNAL(valueChanged(int)), SLOT(slotSigSlider(int)));
+	QObject::connect(SIGGenSpinBox, SIGNAL(valueChanged(int)), SLOT(slotSigEdit(int)));
+	QObject::connect(SIGGenSlider, SIGNAL(valueChanged(int)), SLOT(slotSigSlider(int)));
 
-	QObject::connect((QObject*)metaGenSpinBox, SIGNAL(valueChanged(int)), SLOT(slotMtEdit(int)));
-	QObject::connect((QObject*)metaGenSlider, SIGNAL(valueChanged(int)), SLOT(slotMtSlider(int)));
+	QObject::connect(metaGenSpinBox, SIGNAL(valueChanged(int)), SLOT(slotMtEdit(int)));
+	QObject::connect(metaGenSlider, SIGNAL(valueChanged(int)), SLOT(slotMtSlider(int)));
 
-	QObject::connect((QObject*)estGraphButton, SIGNAL(clicked()), SLOT(slotEstGButton()));
-	QObject::connect((QObject*)fitnessGraphButton, SIGNAL(clicked()), SLOT(slotFitnessGButton()));
-	QObject::connect((QObject*)searchEffectsGraphButton, SIGNAL(clicked()), SLOT(slotSearchEffectsGButton()));
-	QObject::connect((QObject*)estDataButton, SIGNAL(clicked()), SLOT(slotEstDButton()));
-	QObject::connect((QObject*)fitnessDataButton, SIGNAL(clicked()), SLOT(slotFitnessDButton()));
-	QObject::connect((QObject*)searchEffectsDataButton, SIGNAL(clicked()), SLOT(slotSearchEffectsDButton()));
-	QObject::connect((QObject*)estPSButton, SIGNAL(clicked()), SLOT(slotEstPSExport()));
-	QObject::connect((QObject*)fitnessPSButton, SIGNAL(clicked()), SLOT(slotFitnessPSExport()));
-	QObject::connect((QObject*)searchEffectsPSButton, SIGNAL(clicked()), SLOT(slotSearchEffectsPSExport()));
+	QObject::connect(estGraphButton, SIGNAL(clicked()), SLOT(slotEstGButton()));
+	QObject::connect(fitnessGraphButton, SIGNAL(clicked()), SLOT(slotFitnessGButton()));
+	QObject::connect(searchEffectsGraphButton, SIGNAL(clicked()), SLOT(slotSearchEffectsGButton()));
+	QObject::connect(estDataButton, SIGNAL(clicked()), SLOT(slotEstDButton()));
+	QObject::connect(fitnessDataButton, SIGNAL(clicked()), SLOT(slotFitnessDButton()));
+	QObject::connect(searchEffectsDataButton, SIGNAL(clicked()), SLOT(slotSearchEffectsDButton()));
+	QObject::connect(estPSButton, SIGNAL(clicked()), SLOT(slotEstPSExport()));
+	QObject::connect(fitnessPSButton, SIGNAL(clicked()), SLOT(slotFitnessPSExport()));
+	QObject::connect(searchEffectsPSButton, SIGNAL(clicked()), SLOT(slotSearchEffectsPSExport()));
 }
 
 void MT_StatisticsWidget::onShow(MT_GPManager *manager, subst_cache *subst)
@@ -96,10 +96,10 @@ void MT_StatisticsWidget::updateGUI(int mtGen, int sigGen)
 {
 	MT_StatisticsElement *el=nullptr;
 
-	QObject::disconnect((QObject*)SIGGenSpinBox, SIGNAL(valueChanged(int)), this, SLOT(slotSigEdit(int)));
-	QObject::disconnect((QObject*)SIGGenSlider, SIGNAL(valueChanged(int)), this, SLOT(slotSigSlider(int)));
-	QObject::disconnect((QObject*)metaGenSpinBox, SIGNAL(valueChanged(int)), this, SLOT(slotMtEdit(int)));
-	QObject::disconnect((QObject*)metaGenSlider, SIGNAL(valueChanged(int)), this, SLOT(slotMtSlider(int)));
+	QObject::disconnect(SIGGenSpinBox, SIGNAL(valueChanged(int)), this, SLOT(slotSigEdit(int)));
+	QObject::disconnect(SIGGenSlider, SIGNAL(valueChanged(int)), this, SLOT(slotSigSlider(int)));
+	QObject::disconnect(metaGenSpinBox, SIGNAL(valueChanged(int)), this, SLOT(slotMtEdit(int)));
+	QObject::disconnect(metaGenSlider, SIGNAL(valueChanged(int)), this, SLOT(slotMtSlider(int)));
 
 	/* total page */
 	// Simulation/Estimation
@@ -148,9 +148,9 @@ void MT_StatisticsWidget::updateGUI(int mtGen, int sigGen)
 					totalMaxFit = tmpMax;
 			}
 		}
-		varFitnessTotal->setText(QString::number(totalVarFit / (double)soFarMetIdx));
+		varFitnessTotal->setText(QString::number(totalVarFit / static_cast<double>(soFarMetIdx)));
 		maxFitnessTotal->setText(QString::number(totalMaxFit));
-		averageFitnessTotal->setText(QString::number(totalAvgFit / (double)soFarMetIdx));
+		averageFitnessTotal->setText(QString::number(totalAvgFit / static_cast<double>(soFarMetIdx)));
 
 		// search operator effects
 		int total1 = stat->TotalCrossoverEvent[0];
@@ -159,14 +159,18 @@ void MT_StatisticsWidget::updateGUI(int mtGen, int sigGen)
 		num1ptXOverTotal->setText(QString::number(total1));
 		num2ptXOverTotal->setText(QString::number(total2));
 		num3ptXOverTotal->setText(QString::number(total3));
-		num1ptXOverDestrTotal->setText(QString::number((double)(total1 - stat->TotalCrossoverEvent[1])/(double)total1 * 100.0 , 'f', 2 ));
-		num2ptXOverDestrTotal->setText(QString::number((double)(total2 - stat->TotalCrossoverEvent[3])/(double)total2 * 100.0 , 'f', 2 ));
-		num3ptXOverDestrTotal->setText(QString::number((double)(total3 - stat->TotalCrossoverEvent[5])/(double)total3 * 100.0 , 'f', 2 ));
+		const double destroyedTotal1 = total1 - stat->TotalCrossoverEvent[1];
+		const double destroyedTotal2 = total2 - stat->TotalCrossoverEvent[3];
+		const double destroyedTotal3 = total3 - stat->TotalCrossoverEvent[5];
+		num1ptXOverDestrTotal->setText(QString::number(destroyedTotal1 / total1 * 100.0 , 'f', 2 ));
+		num2ptXOverDestrTotal->setText(QString::number(destroyedTotal2 / total2 * 100.0 , 'f', 2 ));
+		num3ptXOverDestrTotal->setText(QString::number(destroyedTotal3 / total3 * 100.0 , 'f', 2 ));
 
 		reproductionsTotal->setText(QString::number(stat->NumOfSimpleCopyParent));
 		int mutInd = stat->NumOfMutateIndividuals;
 		mutationsTotal->setText(QString::number(mutInd));
-		mutationsDestrTotal->setText(QString::number((double)(mutInd - stat->NumOfMutateImprovingIndividuals)/(double)mutInd * 100.0 , 'f', 2 ));
+		const double mutationsNotImprovingTotal = mutInd - stat->NumOfMutateImprovingIndividuals;
+		mutationsDestrTotal->setText(QString::number(mutationsNotImprovingTotal / mutInd * 100.0 , 'f', 2 ));
 	}
 
 
@@ -205,23 +209,27 @@ void MT_StatisticsWidget::updateGUI(int mtGen, int sigGen)
 		num1ptXOver->setText(QString::number(total1));
 		num2ptXOver->setText(QString::number(total2));
 		num3ptXOver->setText(QString::number(total3));
-		num1ptXOverDestr->setText(QString::number((int)((double)(total1 - el->CrossoverEventParent[1])/(double)total1 * 100.0)));
-		num2ptXOverDestr->setText(QString::number((int)((double)(total2 - el->CrossoverEventParent[3])/(double)total2 * 100.0)));
-		num3ptXOverDestr->setText(QString::number((int)((double)(total3 - el->CrossoverEventParent[5])/(double)total3 * 100.0)));
+		const double destroyed1 = total1 - el->CrossoverEventParent[1];
+		const double destroyed2 = total2 - el->CrossoverEventParent[3];
+		const double destroyed3 = total3 - el->CrossoverEventParent[5];
+		num1ptXOverDestr->setText(QString::number(static_cast<int>(destroyed1 / total1 * 100.0)));
+		num2ptXOverDestr->setText(QString::number(static_cast<int>(destroyed2 / total2 * 100.0)));
+		num3ptXOverDestr->setText(QString::number(static_cast<int>(destroyed3 / total3 * 100.0)));
 
 		int XOverOffspring = total1+total2+total3;
 		crossovers->setText(QString::number(XOverOffspring));
 		reproductions->setText(QString::number(el->NumOfSimpleCopyOffspring));
 		int mutOff = el->NumOfMutateOffspring;
 		mutations->setText(QString::number(mutOff));
-		mutationsDestr->setText(QString::number((int)((double)(mutOff - el->NumOfMutateImprovingIndividuals)/(double)mutOff * 100.0)));
+		const double mutationsNotImproving = mutOff - el->NumOfMutateImprovingIndividuals;
+		mutationsDestr->setText(QString::number(static_cast<int>(mutationsNotImproving / mutOff * 100.0)));
 		elMutations->setText(QString::number(el->NumOfTotalElementMutation));
 	}
 
-	QObject::connect((QObject*)SIGGenSpinBox, SIGNAL(valueChanged(int)), SLOT(slotSigEdit(int)));
-	QObject::connect((QObject*)SIGGenSlider, SIGNAL(valueChanged(int)), SLOT(slotSigSlider(int)));
-	QObject::connect((QObject*)metaGenSpinBox, SIGNAL(valueChanged(int)), SLOT(slotMtEdit(int)));
-	QObject::connect((QObject*)metaGenSlider, SIGNAL(valueChanged(int)), SLOT(slotMtSlider(int)));
+	QObject::connect(SIGGenSpinBox, SIGNAL(valueChanged(int)), SLOT(slotSigEdit(int)));
+	QObject::connect(SIGGenSlider, SIGNAL(valueChanged(int)), SLOT(slotSigSlider(int)));
+	QObject::connect(metaGenSpinBox, SIGNAL(valueChanged(int)), SLOT(slotMtEdit(int)));
+	QObject::connect(metaGenSlider, SIGNAL(valueChanged(int)), SLOT(slotMtSlider(int)));
 }
 
 void MT_StatisticsWidget::slotUpdateGUI()
@@ -460,13 +468,16 @@ void MT_StatisticsWidget::slotSearchEffectsDButton()
 			total1 = el->CrossoverEventParent[0]; 
 			total2 = el->CrossoverEventParent[2];
 			total3 = el->CrossoverEventParent[4]; 
+			const double destroyed1 = total1 - el->CrossoverEventParent[1];
+			const double destroyed2 = total2 - el->CrossoverEventParent[3];
+			const double destroyed3 = total3 - el->CrossoverEventParent[5];
 			pipeStream << i << " "
 				<< total1 << " "
 				<< total2 << " "
 				<< total3 << " "
-				<< (int)((double)(total1 - el->CrossoverEventParent[1])/(double)total1 * 100.0)  << " "
-				<< (int)((double)(total2 - el->CrossoverEventParent[3])/(double)total2 * 100.0)  << " "
-				<< (int)((double)(total3 - el->CrossoverEventParent[5])/(double)total3 * 100.0)  << "\n";
+				<< static_cast<int>(destroyed1 / total1 * 100.0)  << " "
+				<< static_cast<int>(destroyed2 / total2 * 100.0)  << " "
+				<< static_cast<int>(destroyed3 / total3 * 100.0)  << "\n";
 		}
 	}
 	file.close();
@@ -739,7 +750,8 @@ void MT_StatisticsWidget::plotSearchEffects(QString fileName)
 		el = stat->getStatisticElement(l);
 		if(el){
 			total = el->CrossoverEventParent[0];
-			if(el) pipeStream << l << " " << (int)((double)(total - el->CrossoverEventParent[1])/(double)total * 100.0) << "\n";
+			const double destroyed = total - el->CrossoverEventParent[1];
+			if(el) pipeStream << l << " " << static_cast<int>(destroyed / total * 100.0) << "\n";
 		}
 	}
 	pipeStream << "e\n";
@@ -747,7 +759,8 @@ void MT_StatisticsWidget::plotSearchEffects(QString fileName)
 		el = stat->getStatisticElement(m);
 		if(el){
 			total = el->CrossoverEventParent[2];
-			if(el) pipeStream << l << " " << (int)((double)(total - el->CrossoverEventParent[3])/(double)total * 100.0) << "\n";
+			const double destroyed = total - el->CrossoverEventParent[3];
+			if(el) pipeStream << l << " " << static_cast<int>(destroyed / total * 100.0) << "\n";
 		}
 	}
 	pipeStream << "e\n";
@@ -755,7 +768,8 @@ void MT_StatisticsWidget::plotSearchEffects(QString fileName)
 		el = stat->getStatisticElement(n);
 		if(el){
 			total = el->CrossoverEventParent[4];
-			if(el) pipeStream << l << " " << (int)((double)(total - el->CrossoverEventParent[5])/(double)total * 100.0) << "\n";
+			const double destroyed = total - el->CrossoverEventParent[5];
+			if(el) pipeStream << l << " " << static_cast<int>(destroyed / total * 100.0) << "\n";
 		}
 	}
 	pipeStream << "e\nquit\n";

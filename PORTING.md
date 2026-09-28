@@ -909,7 +909,17 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-28 — DONE: LOADING A LARGE POOL IS FAST.** Start here.
+**2026-09-28 — DONE: ITEM 102, C-STYLE CASTS BECAME C++ CASTS.** Start here.
+
+- **Changed:** details are in item 102's entry in "Done".
+- **Baselines:** unchanged.
+- **Review:** no defects; the maintainer reviewed every part.
+- **Gates:** `check.sh` 758 pass, 0 fail; warnings 471, 14 fewer because the
+  dead debug variables went. The other four gates are green.
+- **Next:** the `boss` members and two `tmp` locals get real names; then
+  item 113.
+
+**2026-09-28 — DONE: LOADING A LARGE POOL IS FAST.**
 
 - **Changed:** `SIG_AllIndividualsView::slotCompleteRefreshList` updates its
   progress and processes events every 100 rows, not every row; each update
@@ -6449,6 +6459,19 @@ carried; other items and this file cite them, so they do not change.
   `expstruct selfcheck`, which tested our tool; the syntax compile of the two
   programs; and `real clicks`, with its `xtest` scenario and
   `xtest-baseline.txt`. `check.sh` gives 757 pass.
+
+- [x] **102. C-style casts became C++ casts** — done 2026-09-28, three
+  commits. The 63 `(QObject*)` casts in `connect` and `disconnect` calls
+  were deleted; in `MT_MainWindow` the target was only forward-declared, so
+  that cast had been a silent `reinterpret_cast`, and `MT_Controller.h` is now
+  included instead. Numeric casts and class downcasts became `static_cast`.
+  Socket addresses, texture bytes and the thread functions handed to
+  `pthread_create`, which return `void` rather than `void *`, take
+  `reinterpret_cast`. 25 casts the arithmetic made redundant were removed,
+  nested casts were split with local variables, and
+  `MT_Interpreter::interpret` lost 14 dead debug statements and was
+  formatted. `-Wold-style-cast` is in `SIGCXX`; a clean rebuild of all 185
+  SIGEL files gives no such warning.
 
 - [x] **101. Empty destructors removed** — done 2026-09-27, one commit. 100
   empty destructors went. 84 were deleted with their declaration and doc

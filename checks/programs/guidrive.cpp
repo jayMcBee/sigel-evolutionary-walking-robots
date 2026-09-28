@@ -220,7 +220,7 @@ static void dumpIcons()
         for (QAction *a : m->actions()) {
             if (a->isSeparator()) continue;
             rows.append({ path + "/" + a->text(),
-                          (int)a->icon().availableSizes().count(),
+                          static_cast<int>(a->icon().availableSizes().count()),
                           a->icon().isNull() });
             if (a->menu()) walk(a->menu(), path + ">" + a->text());
         }
@@ -231,14 +231,14 @@ static void dumpIcons()
         for (QAction *a : tb->actions())
             if (!a->isSeparator())
                 rows.append({ "TB:" + tb->objectName() + "/" + a->text(),
-                              (int)a->icon().availableSizes().count(),
+                              static_cast<int>(a->icon().availableSizes().count()),
                               a->icon().isNull() });
     std::sort(rows.begin(), rows.end(),
               [](const Row &x, const Row &y) { return x.key < y.key; });
     int withIcon = 0, empty = 0;
     for (const Row &r : rows) { if (!r.nullIcon) ++withIcon; if (!r.nullIcon && !r.sizes) ++empty; }
     printf("\n== ICONS ==\nactions=%d withIcon=%d loadedNothing=%d\n",
-           (int)rows.count(), withIcon, empty);
+           static_cast<int>(rows.count()), withIcon, empty);
     for (const Row &r : rows)
         printf("  %-56s icon=%d sizes=%d\n", qPrintable(r.key),
                r.nullIcon ? 0 : 1, r.sizes);
@@ -288,7 +288,7 @@ static void dumpIndividuals()
     printf("  [individuals] rows=%d cols=%d headers=", t->topLevelItemCount(), t->columnCount());
     for (int c = 0; c < t->columnCount(); ++c)
         printf("[%s]", qPrintable(t->headerItem()->text(c)));
-    printf(" selected=%d\n", (int)t->selectedItems().count());
+    printf(" selected=%d\n", static_cast<int>(t->selectedItems().count()));
     for (int i = 0; i < t->topLevelItemCount() && i < 6; ++i) {
         QTreeWidgetItem *it = t->topLevelItem(i);
         printf("    row%-2d ", i);
@@ -506,10 +506,10 @@ static void describeMessageBox(QWidget *m)
 {
     QMessageBox *mb = qobject_cast<QMessageBox *>(m);
     if (!mb) return;
-    printf("  [msgbox] text=[%s] icon=%d\n", qPrintable(mb->text()), (int)mb->icon());
+    printf("  [msgbox] text=[%s] icon=%d\n", qPrintable(mb->text()), static_cast<int>(mb->icon()));
     for (QAbstractButton *b : mb->buttons())
         printf("    button [%-18s] role=%d default=%d\n", qPrintable(b->text()),
-               (int)mb->buttonRole(b), b == mb->defaultButton() ? 1 : 0);
+               static_cast<int>(mb->buttonRole(b)), b == mb->defaultButton() ? 1 : 0);
     fflush(stdout);
 }
 
@@ -604,7 +604,7 @@ static void dumpContextMenu(QWidget *target, const QPoint &pos, const char *what
 
     QMenu *m = qobject_cast<QMenu *>(QApplication::activePopupWidget());
     if (!m) { printf("  [ctxmenu %s] NONE appeared\n", what); fflush(stdout); return; }
-    printf("  [ctxmenu %s] entries=%d\n", what, (int)m->actions().count());
+    printf("  [ctxmenu %s] entries=%d\n", what, static_cast<int>(m->actions().count()));
     for (QAction *a : m->actions()) {
         if (a->isSeparator()) { printf("    ---\n"); continue; }
         printf("    %-28s enabled=%d\n", qPrintable(a->text()), a->isEnabled());
@@ -695,12 +695,12 @@ static QString validatorDesc(const QValidator *v)
         return QString("QDoubleValidator bottom=%1 top=%2 decimals=%3 notation=%4 "
                        "locale=[%5] numberOptions=%6")
             .arg(d->bottom()).arg(d->top()).arg(d->decimals())
-            .arg((int)d->notation()).arg(d->locale().name())
-            .arg((int)d->locale().numberOptions().toInt());
+            .arg(static_cast<int>(d->notation())).arg(d->locale().name())
+            .arg(static_cast<int>(d->locale().numberOptions().toInt()));
     if (const QIntValidator *i = qobject_cast<const QIntValidator *>(v))
         return QString("QIntValidator bottom=%1 top=%2 locale=[%3] numberOptions=%4")
             .arg(i->bottom()).arg(i->top()).arg(i->locale().name())
-            .arg((int)i->locale().numberOptions().toInt());
+            .arg(static_cast<int>(i->locale().numberOptions().toInt()));
     return QString::fromLatin1(v->metaObject()->className());
 }
 
@@ -799,7 +799,7 @@ static void probeSpin(QSpinBox *sp, bool commit = true)
 
     sp->selectAll();
     QTest::keyClick(sp, Qt::Key_Delete);
-    QTest::keyClicks(sp, QString::number((long long)sp->maximum() + 1));
+    QTest::keyClicks(sp, QString::number(static_cast<long long>(sp->maximum()) + 1));
     QTest::qWait(10);
     // QAbstractSpinBox::lineEdit() is protected; the editor is the spin
     // box's only QLineEdit child, so ask for it that way.
@@ -856,7 +856,7 @@ static void probeSliderClick(QSlider *sl)
     const int after = sl->value();
     printf("    click  %-36s %d -> %d (delta %+d) focusPolicy=%d hasFocus=%d\n",
            qPrintable(sl->objectName()), start, after, after - start,
-           (int)sl->focusPolicy(), sl->hasFocus() ? 1 : 0);
+           static_cast<int>(sl->focusPolicy()), sl->hasFocus() ? 1 : 0);
     sl->setValue(start);
 }
 
@@ -1020,7 +1020,7 @@ static void dumpContainer(QWidget *c)
             // Column 0 of these tables carries no text; saying WHAT it carries
             // is the difference between "empty" and "the icon went missing".
             printf("| col0icon=%d col0check=%d\n", ti->icon(0).isNull() ? 0 : 1,
-                   (int)ti->checkState(0));
+                   static_cast<int>(ti->checkState(0)));
         }
     }
 }
@@ -1254,9 +1254,9 @@ static void describeFile(const QString &out, const QString &stem)
     // A trailing newline leaves an empty last element; report both so the
     // oracle's `wc -l' and this agree on what is being counted.
     printf("  bytes=%lld sha256=%s newlines=%d endsWithNewline=%d\n",
-           (long long)all.size(), sum.constData(), (int)all.count('\n'),
+           static_cast<long long>(all.size()), sum.constData(), static_cast<int>(all.count('\n')),
            all.endsWith('\n') ? 1 : 0);
-    printf("  crCount=%d\n", (int)all.count('\r'));
+    printf("  crCount=%d\n", static_cast<int>(all.count('\r')));
     for (int i = 0; i < 3 && i < lines.size(); ++i)
         printf("  head%-2d [%s]\n", i, lines.at(i).constData());
     int last = lines.size() - 1;
@@ -1405,7 +1405,7 @@ static void openExperiment(const QString &path)
         QFileDialog *fd = qobject_cast<QFileDialog *>(m);
         if (!fd) { printf("  !! modal is not a QFileDialog\n"); m->close(); return; }
         printf("  [filedialog] title=[%s] mode=%d nameFilters=[%s] labelAccept=[%s]\n",
-               qPrintable(fd->windowTitle()), (int)fd->fileMode(),
+               qPrintable(fd->windowTitle()), static_cast<int>(fd->fileMode()),
                qPrintable(fd->nameFilters().join(" ;; ")),
                qPrintable(fd->labelText(QFileDialog::Accept)));
         acceptFileDialog(fd, path);          // real key events into the dialog
@@ -1650,7 +1650,7 @@ static int guidriveMain(int argc, char **argv)
         printf("\n== DELETE A LARGE BLOCK ==\n");
         clickRow(t, 5);
         clickRow(t, t->topLevelItemCount() - 1, Qt::ShiftModifier);
-        printf("selected=%d\n", (int)t->selectedItems().count());
+        printf("selected=%d\n", static_cast<int>(t->selectedItems().count()));
         whenModal([](QWidget *m) {
             QMessageBox *mb = qobject_cast<QMessageBox *>(m);
             printf("dialog [%s] text=[%s]\n", qPrintable(m->windowTitle()),
@@ -1664,7 +1664,7 @@ static int guidriveMain(int argc, char **argv)
         clickMenu("&Individuals", "&Delete");
         QTest::qWait(6000);
         printf("SURVIVED, rows=%d selected=%d\n", t->topLevelItemCount(),
-               (int)t->selectedItems().count());
+               static_cast<int>(t->selectedItems().count()));
         // 1.3 leaves the DELETED individual's values in the detail pane until
         // the next selection change -- it only calls individualView->clear()
         // when the list becomes empty. The oracle read exactly that off the
@@ -1694,9 +1694,9 @@ static int guidriveMain(int argc, char **argv)
         printf("\n== CONTEXT MENUS ==\nitemAt(empty)=%s\n",
                t->itemAt(empty) ? "a row -- probe is wrong" : "null");
         clickRow(t, 0);
-        printf("selected before=%d\n", (int)t->selectedItems().count());
+        printf("selected before=%d\n", static_cast<int>(t->selectedItems().count()));
         dumpContextMenu(t->viewport(), empty, "empty space");
-        printf("selected after=%d\n", (int)t->selectedItems().count());
+        printf("selected after=%d\n", static_cast<int>(t->selectedItems().count()));
         dumpContextMenu(t->viewport(), t->visualItemRect(t->topLevelItem(0)).center(), "a row");
 
         // 5. the MetaGP disable warning -- three custom button labels, one of
@@ -2067,7 +2067,7 @@ static int guidriveMain(int argc, char **argv)
             { "&Language Parameters",   0, "spinboxNumberOfRegisters", "7"    },
             { "&Environment",           0, "lineeditGravityX",         "3.5"  },
         };
-        for (int i = 0; i < (int)(sizeof(items) / sizeof(items[0])); ++i) {
+        for (int i = 0; i < static_cast<int>(sizeof(items) / sizeof(items[0])); ++i) {
             const Item &it = items[i];
             const QString a = scratch() + "/rt-a-" + QString::fromLatin1(it.ext);
             const QString b = scratch() + "/rt-b-" + QString::fromLatin1(it.ext);
@@ -2089,7 +2089,7 @@ static int guidriveMain(int argc, char **argv)
             // Population has no single field to type into; shrink the pool
             // instead, which is a change the .pop must undo.
             bool mutated = false;
-            if (i < (int)(sizeof(muts) / sizeof(muts[0]))) mutated = mutate(muts[i]);
+            if (i < static_cast<int>(sizeof(muts) / sizeof(muts[0]))) mutated = mutate(muts[i]);
             else {
                 clickMenu("&View", "&Population");
                 QTest::qWait(300);
@@ -2114,8 +2114,8 @@ static int guidriveMain(int argc, char **argv)
             if (fb.isEmpty() || !QFile::exists(fb)) { printf("  !! second export failed\n"); continue; }
             qint64 nb = -1;
             const QString sb = sha256Of(fb, &nb);
-            printf("  export1 %lld bytes  %s\n", (long long)na, qPrintable(sa));
-            printf("  export2 %lld bytes  %s\n", (long long)nb, qPrintable(sb));
+            printf("  export1 %lld bytes  %s\n", static_cast<long long>(na), qPrintable(sa));
+            printf("  export2 %lld bytes  %s\n", static_cast<long long>(nb), qPrintable(sb));
             if (sa == sb) { printf("  ROUND TRIP STABLE (and the import undid the change)\n");
                             fflush(stdout); continue; }
             // Whitespace-only growth is C10's documented history defect, not a
@@ -2136,8 +2136,8 @@ static int guidriveMain(int argc, char **argv)
                      "not a reader/writer disagreement"
                    : "*** CHANGED IN CONTENT ***");
             printf("  delta=%lld bytes  blankLineDelta=%d\n",
-                   (long long)(yb.size() - xa.size()),
-                   (int)(yb.count('\n') - xa.count('\n')));
+                   static_cast<long long>(yb.size() - xa.size()),
+                   static_cast<int>(yb.count('\n') - xa.count('\n')));
             fflush(stdout);
         }
 
@@ -2309,7 +2309,7 @@ static int guidriveMain(int argc, char **argv)
                " firstLine=[%s] sentinelSurvived=%d\n",
                modals, int(stamped.size()),
                stamped.isEmpty() ? -1LL
-                                 : (long long)QFileInfo(scratch() + "/" + stamped.first()).size(),
+                                 : static_cast<long long>(QFileInfo(scratch() + "/" + stamped.first()).size()),
                qPrintable(firstLine()), firstLine() == "SENTINEL" ? 1 : 0);
         fflush(stdout);
 
@@ -2347,7 +2347,7 @@ static int guidriveMain(int argc, char **argv)
                    label, confirmations, childOfDialog);
             printf("    text=[%s]\n", qPrintable(text));
             printf("  [%s] size=%lld firstLine=[%s] sentinelSurvived=%d stampedFiles=%d\n",
-                   label, (long long)QFileInfo(out).size(), qPrintable(firstLine()),
+                   label, static_cast<long long>(QFileInfo(out).size()), qPrintable(firstLine()),
                    firstLine() == "SENTINEL" ? 1 : 0, int(stampedFiles().size()));
             fflush(stdout);
         };
@@ -2586,8 +2586,8 @@ static int guidriveMain(int argc, char **argv)
                        l->pixmap().width(), l->pixmap().height());
             for (QTextBrowser *tb : m->findChildren<QTextBrowser *>()) {
                 const QStringList lines = tb->toPlainText().split('\n');
-                printf("    text lines=%d vScrollPolicy=%d\n", (int)lines.count(),
-                       (int)tb->verticalScrollBarPolicy());
+                printf("    text lines=%d vScrollPolicy=%d\n", static_cast<int>(lines.count()),
+                       static_cast<int>(tb->verticalScrollBarPolicy()));
                 for (const QString &l : lines) printf("    | %s\n", qPrintable(l));
             }
             for (QPushButton *b : m->findChildren<QPushButton *>())
@@ -2614,7 +2614,7 @@ static int guidriveMain(int argc, char **argv)
                        qPrintable(m->windowTitle()));
                 if (mb) {
                     const QStringList lines = mb->text().split('\n');
-                    printf("  text lines=%d\n", (int)lines.count());
+                    printf("  text lines=%d\n", static_cast<int>(lines.count()));
                     for (const QString &l : lines) printf("  | %s\n", qPrintable(l));
                     for (QAbstractButton *b : mb->buttons())
                         printf("  button [%s] default=%d\n", qPrintable(b->text()),
@@ -2649,7 +2649,7 @@ static int guidriveMain(int argc, char **argv)
             QTest::qWait(60);
             QTest::mouseDClick(t5->viewport(), Qt::LeftButton, Qt::NoModifier, r.center());
             QTest::qWait(1200);
-            printf("  itemDoubleClicked emitted %d time(s)\n", (int)dbl.count());
+            printf("  itemDoubleClicked emitted %d time(s)\n", static_cast<int>(dbl.count()));
             // show(), not exec(), so it is a top-level window rather than a modal.
             SIG_IndividualView *view = nullptr;
             for (QWidget *w : QApplication::topLevelWidgets())
@@ -2666,7 +2666,7 @@ static int guidriveMain(int argc, char **argv)
                        qPrintable(view->textlabelShowName->text()),
                        qPrintable(view->textlabelShowAge->text()),
                        qPrintable(view->textlabelShowFitness->text()),
-                       (int)view->multilineeditHistory->toPlainText().split('\n').count());
+                       static_cast<int>(view->multilineeditHistory->toPlainText().split('\n').count()));
                 for (QPushButton *b : view->findChildren<QPushButton *>())
                     printf("  button [%s] default=%d\n", qPrintable(b->text()), b->isDefault());
                 view->close();
@@ -2783,7 +2783,7 @@ static int guidriveMain(int argc, char **argv)
                        "icon=%d sizes=%d\n", qPrintable(a->text()),
                        a->isEnabled() ? 1 : 0, a->isCheckable() ? 1 : 0,
                        a->isChecked() ? 1 : 0, a->icon().isNull() ? 0 : 1,
-                       (int)a->icon().availableSizes().count());
+                       static_cast<int>(a->icon().availableSizes().count()));
             }
         }
         QStackedWidget *ws = mt->findChild<QStackedWidget *>("WidgetStack");
@@ -3275,7 +3275,7 @@ static int guidriveMain(int argc, char **argv)
             printf("  value labels=%d readingERR=%d"
                    "  (1.3 shows ERR here too; these are .ui defaults plus\n"
                    "   two fields onShow() writes -- NOT evidence the action ran)\n",
-                   (int)shown.count(), err);
+                   static_cast<int>(shown.count()), err);
             for (const QString &t : shown) printf("    %s\n", qPrintable(t));
         }
         fflush(stdout);
@@ -3329,7 +3329,7 @@ static int guidriveMain(int argc, char **argv)
             }
             actLines.sort();
             for (const QString &l : actLines) printf("%s\n", qPrintable(l));
-            printf("  widgetsOnToolbars=%d\n", (int)actLines.count());
+            printf("  widgetsOnToolbars=%d\n", static_cast<int>(actLines.count()));
 
             // `manual/timed stop' is a toggle and is the one action that is
             // safe to press twice and leave as it was.
@@ -3363,7 +3363,7 @@ static int guidriveMain(int argc, char **argv)
                 for (QSpinBox *sp : tb) st2 += sp->isEnabled() ? "1" : "0";
                 printf("    toolbar spin boxes=%d enabledWhileTimed=[%s] "
                        "enabledAfterRestore=[%s] slotHadEffect=%d\n",
-                       (int)tb.count(), qPrintable(st), qPrintable(st2),
+                       static_cast<int>(tb.count()), qPrintable(st), qPrintable(st2),
                        st != st2 ? 1 : 0);
             }
 
@@ -3823,7 +3823,7 @@ static int guidriveMain(int argc, char **argv)
             for (QAction *a : locked)
                 if (a->isEnabled()) { ++live; liveNames << whereIs(a); }
             printf("  [locked] every locked action: total=%d stillEnabled=%d\n",
-                   (int)locked.count(), live);
+                   static_cast<int>(locked.count()), live);
             if (live) {
                 printf("!! these stayed clickable during a run: %s\n",
                        qPrintable(liveNames.join(", ")));
@@ -4053,7 +4053,7 @@ static int guidriveMain(int argc, char **argv)
             if (in && !t.isEmpty()) { instr << t; ++thisLen; }
         }
         const QByteArray joined = instr.join(QStringLiteral("\n")).toLatin1();
-        printf("  programs=%d  instructionLines=%d\n", (int)lens.count(), (int)instr.count());
+        printf("  programs=%d  instructionLines=%d\n", static_cast<int>(lens.count()), static_cast<int>(instr.count()));
         QStringList lenTxt;
         for (int n : lens) lenTxt << QString::number(n);
         printf("  perProgramLengths=[%s]\n", qPrintable(lenTxt.join(",")));
@@ -4107,7 +4107,7 @@ static int guidriveMain(int argc, char **argv)
         if (!t) { printf("!! no individuals list\n"); return 1; }
         clickRow(t, 0);
         clickRow(t, 1, Qt::ControlModifier);
-        printf("\n  [selected %d rows before delete]\n", (int)t->selectedItems().count());
+        printf("\n  [selected %d rows before delete]\n", static_cast<int>(t->selectedItems().count()));
         step("2 rows selected", false, false, true);
 
         whenModal([](QWidget *m) { describeMessageBox(m); clickMsgButton(m, QMessageBox::No); });
@@ -4150,7 +4150,7 @@ static int guidriveMain(int argc, char **argv)
             QFileDialog *fd = qobject_cast<QFileDialog *>(m);
             if (!fd) { printf("  !! save modal is not a QFileDialog\n"); m->close(); return; }
             printf("  [savedialog] title=[%s] mode=%d accept=[%s] selectedFile=[%s]\n",
-                   qPrintable(fd->windowTitle()), (int)fd->fileMode(),
+                   qPrintable(fd->windowTitle()), static_cast<int>(fd->fileMode()),
                    qPrintable(fd->labelText(QFileDialog::Accept)),
                    fd->selectedFiles().isEmpty() ? "" : qPrintable(fd->selectedFiles().first()));
             printf("  [savedialog] parentIsTheMainWindow=%d\n", (fd->parentWidget() && fd->parentWidget()->window() == W) ? 1 : 0);
@@ -4281,11 +4281,11 @@ static int guidriveMain(int argc, char **argv)
             describeDialog(m);
             QMessageBox *mb = qobject_cast<QMessageBox *>(m);
             if (mb) {
-                printf("  [msgbox] icon=%d text=[%s]\n", (int)mb->icon(),
+                printf("  [msgbox] icon=%d text=[%s]\n", static_cast<int>(mb->icon()),
                        qPrintable(mb->text()));
                 for (QAbstractButton *b : mb->buttons())
                     printf("    button [%-14s] role=%d default=%d\n",
-                           qPrintable(b->text()), (int)mb->buttonRole(b),
+                           qPrintable(b->text()), static_cast<int>(mb->buttonRole(b)),
                            b == mb->defaultButton() ? 1 : 0);
             }
             fflush(stdout);
@@ -4306,7 +4306,7 @@ static int guidriveMain(int argc, char **argv)
         if (!t) { printf("!! no individuals list\n"); return 1; }
         clickRow(t, 5);
         clickRow(t, t->topLevelItemCount() - 1, Qt::ShiftModifier);
-        printf("\n  [selected for deletion] %d rows\n", (int)t->selectedItems().count());
+        printf("\n  [selected for deletion] %d rows\n", static_cast<int>(t->selectedItems().count()));
         fflush(stdout);
         whenModal([](QWidget *m) { describeMessageBox(m); clickMsgButton(m, QMessageBox::Yes); });
         clickMenu("&Individuals", "&Delete");
@@ -4323,10 +4323,10 @@ static int guidriveMain(int argc, char **argv)
 
         clickRow(t, 0);
         printf("  [selected before empty-space right-click] %d\n",
-               (int)t->selectedItems().count());
+               static_cast<int>(t->selectedItems().count()));
         dumpContextMenu(t->viewport(), empty, "individuals: EMPTY space");
         printf("  [selected after  empty-space right-click] %d\n",
-               (int)t->selectedItems().count());
+               static_cast<int>(t->selectedItems().count()));
 
         dumpContextMenu(t->viewport(), t->visualItemRect(t->topLevelItem(0)).center(),
                         "individuals: a row (for contrast)");
@@ -4347,7 +4347,7 @@ static int guidriveMain(int argc, char **argv)
         clickRow(t, want);
         printf("\n  [exporting] name=%s selected=%d current=%s\n",
                qPrintable(t->topLevelItem(want)->text(0)),
-               (int)t->selectedItems().count(),
+               static_cast<int>(t->selectedItems().count()),
                t->currentItem() ? qPrintable(t->currentItem()->text(0)) : "(none)");
         fflush(stdout);
 
@@ -4450,8 +4450,8 @@ static int guidriveMain(int argc, char **argv)
         if (SIG_GUIGPExperiment *ex = lv->currentlySelectedExperiment()) {
             printf("  [start guard] bodies=%d (needs !=0)  population=%d (needs >=4)  "
                    "fitnessName=[%s] (needs non-empty)\n",
-                   (int)ex->gpExperiment.robot.getBodies().size(),
-                   (int)ex->gpExperiment.population.getSize(),
+                   static_cast<int>(ex->gpExperiment.robot.getBodies().size()),
+                   static_cast<int>(ex->gpExperiment.population.getSize()),
                    qPrintable(ex->gpExperiment.gpParameter.getFitnessName()));
         } else printf("  [start guard] no experiment selected\n");
         fflush(stdout);
@@ -4540,7 +4540,7 @@ static int guidriveMain(int argc, char **argv)
             // again, so read the experiment back rather than trusting the
             // widget: 1 is byGeneration.
             if (SIG_GUIGPExperiment *ex = lv->currentlySelectedExperiment()) {
-                const int gotModel = (int)ex->gpExperiment.gpParameter.getTerminationModel();
+                const int gotModel = static_cast<int>(ex->gpExperiment.gpParameter.getTerminationModel());
                 const int gotGens  = ex->gpExperiment.gpParameter.getTerminationGenerationNo();
                 printf("  [termination in experiment] model=%d (1=byGeneration) generationNo=%d\n",
                        gotModel, gotGens);
@@ -4629,7 +4629,7 @@ static int guidriveMain(int argc, char **argv)
                     cfgEnabled = a->isEnabled();
                 }
             printf("  [metagp] Use MetaGP clicked; Configure System found=%d enabled=%d\n",
-                   (int)cfgFound, (int)cfgEnabled);
+                   static_cast<int>(cfgFound), static_cast<int>(cfgEnabled));
             // Fail HERE, not silently later. An injection into a greyed action
             // produces a run that looks like a clean survival, which is the
             // one outcome this scenario must never manufacture.
@@ -4670,13 +4670,13 @@ static int guidriveMain(int argc, char **argv)
             QWidget *cw = st->currentWidget();
             int gen = -1;
             for (QLCDNumber *l : cw->findChildren<QLCDNumber *>())
-                if (l->objectName() == "lcdnumberGenerations") gen = (int)l->value();
+                if (l->objectName() == "lcdnumberGenerations") gen = static_cast<int>(l->value());
             ++samples;
             // Print every sample for the first few, then only on a CHANGE, so a
             // long run does not bury the transitions it exists to show.
             if (samples <= 3 || gen != lastGen) {
                 printf("  [run t+%5llds] generations=%d Start=%s Stop=%s\n",
-                       (long long)(runClock.elapsed() / 1000), gen,
+                       static_cast<long long>(runClock.elapsed() / 1000), gen,
                        start->isEnabled() ? "enabled" : "GREYED",
                        stop->isEnabled()  ? "ENABLED" : "greyed");
                 fflush(stdout);
@@ -5000,7 +5000,7 @@ static int guidriveMain(int argc, char **argv)
                    " = %lld ms/generation, %d samples taken during the run"
                    " -- valid ONLY if the artefact check below reports"
                    " POOLGENERATION advancing by %d\n",
-                   (long long)runMs, wantGens, (long long)(runMs / wantGens),
+                   static_cast<long long>(runMs), wantGens, static_cast<long long>(runMs / wantGens),
                    samples, wantGens);
         fflush(stdout);
         // Start has returned, so the run is over: print the first sample and
@@ -5012,18 +5012,18 @@ static int guidriveMain(int argc, char **argv)
             if (first || !se || pe) {
                 printf("  [t+%4dms] Start=%s Stop=%s clicked=%d\n", (i + 1) * 100,
                        se ? "enabled" : "GREYED", pe ? "ENABLED" : "greyed",
-                       (int)spy.count());
+                       static_cast<int>(spy.count()));
                 fflush(stdout);
                 first = false;
             }
         }
-        printf("  [clicked() emitted %d time(s)]\n", (int)spy.count());
+        printf("  [clicked() emitted %d time(s)]\n", static_cast<int>(spy.count()));
         // Everything below used to be PRINTED and never asserted, so a dead
         // Start button produced a full, plausible-looking transcript and exit 0.
         if (wantGens > 0) {
             if (spy.count() != 1) {
                 printf("!! Start emitted clicked() %d times, expected 1 --"
-                       " the click path is broken\n", (int)spy.count());
+                       " the click path is broken\n", static_cast<int>(spy.count()));
                 fflush(stdout); return 1;
             }
             if (samples == 0) {
@@ -5033,12 +5033,12 @@ static int guidriveMain(int argc, char **argv)
             }
             if (runMs < 1000) {
                 printf("!! Start returned in %lld ms; a generation costs minutes."
-                       " Nothing was evaluated.\n", (long long)runMs);
+                       " Nothing was evaluated.\n", static_cast<long long>(runMs));
                 fflush(stdout); return 1;
             }
         }
         if (evo) {
-            printf("  [signalEvolutionNotRunning emitted %d time(s)]", (int)evo->count());
+            printf("  [signalEvolutionNotRunning emitted %d time(s)]", static_cast<int>(evo->count()));
             for (int i = 0; i < evo->count(); ++i)
                 printf(" %s", evo->at(i).at(0).toBool() ? "true" : "false");
             printf("\n");
@@ -5151,7 +5151,7 @@ static int guidriveMain(int argc, char **argv)
                qPrintable(t->topLevelItem(want)->text(0)),
                qPrintable(t->topLevelItem(want)->text(1)),
                qPrintable(t->topLevelItem(want)->text(3)),
-               (int)t->selectedItems().count());
+               static_cast<int>(t->selectedItems().count()));
         fflush(stdout);
 
         whenModal([](QWidget *m) {

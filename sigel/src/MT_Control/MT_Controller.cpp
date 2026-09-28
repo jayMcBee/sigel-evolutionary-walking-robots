@@ -28,7 +28,7 @@ DWORD WINAPI StartMetaEvolution(LPVOID inRawSubst)
 #else
 void StartMetaEvolution(void *inRawSubst)
 {
-	MT_Controller *th_contr = (MT_Controller *)inRawSubst;
+	MT_Controller *th_contr = static_cast<MT_Controller*>(inRawSubst);
 	if(th_contr->startWOSigel)
 		th_contr->callMetaEvolutionLoopWOSigel();
 	else
@@ -86,7 +86,7 @@ void MT_Controller::startSingleEvolution()
 		meta_thread = CreateThread(nullptr, 0, &StartMetaEvolution, this, 0, 0);
 //		SetThreadPriority(meta_thread, THREAD_PRIORITY_BELOW_NORMAL);
 #else
-		pthread_create(&meta_thread, nullptr, (void*(*)(void*)) &StartMetaEvolution, (void*) this);
+		pthread_create(&meta_thread, nullptr, reinterpret_cast<void*(*)(void*)>(&StartMetaEvolution), this);
 #endif
 
 }
@@ -114,7 +114,7 @@ void MT_Controller::startTimedEvolution(int minutes)
 		meta_thread = CreateThread(nullptr, 0, &StartMetaEvolution, this, 0, 0);
 //		SetThreadPriority(meta_thread, THREAD_PRIORITY_BELOW_NORMAL);
 #else
-		pthread_create(&meta_thread, nullptr, (void*(*)(void*)) &StartMetaEvolution, (void*) this);
+		pthread_create(&meta_thread, nullptr, reinterpret_cast<void*(*)(void*)>(&StartMetaEvolution), this);
 #endif
 }
 
@@ -168,7 +168,7 @@ bool MT_Controller::startEvolution()
 //		SetThreadPriority(meta_thread, THREAD_PRIORITY_BELOW_NORMAL);
 //		SetThreadPriorityBoost(meta_thread, true);
 #else
-		pthread_create(&meta_thread, nullptr, (void*(*)(void*)) &StartMetaEvolution, (void*) this);
+		pthread_create(&meta_thread, nullptr, reinterpret_cast<void*(*)(void*)>(&StartMetaEvolution), this);
 #endif
 	}
 

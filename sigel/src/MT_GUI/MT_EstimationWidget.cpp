@@ -14,7 +14,7 @@ MT_EstimationWidget::MT_EstimationWidget(QWidget* parent, const char* name, Qt::
 	tol0 = tol1 = 0.0;
 	usedSys = evaluator;
 
-	toleranceSpinBox = new DISpinBox(3, (QWidget*) estimationGroupBox, "toleranceSpinBox");
+	toleranceSpinBox = new DISpinBox(3, estimationGroupBox, "toleranceSpinBox");
 	Layout61->addWidget(toleranceSpinBox, 1, 2);
 
 	QObject::connect(strategyComboBox, SIGNAL(activated(int)), SLOT(slotStrategyChanged(int)));
@@ -83,7 +83,7 @@ void MT_EstimationWidget::slotStrategyChanged(int index)
 		switch(index){
 		case 0 : 
 			toleranceSpinBox->setRange(0, 100);
-			toleranceSpinBox->setIntValue((int)tol0);
+			toleranceSpinBox->setIntValue(static_cast<int>(tol0));
 			break;
 		case 1 :
 			toleranceSpinBox->setRange(0, 100);
@@ -137,7 +137,7 @@ bool MT_EstimationWidget::onHide(MT_GPManager *manager, subst_cache *subst)
 	refInt = intervalSpinBox->value();
 
 	if(toleranceSpinBox->getTyp() == INTTYP)
-		tolerance = (double) toleranceSpinBox->intValue();
+		tolerance = static_cast<double>(toleranceSpinBox->intValue());
 	else
 		tolerance = toleranceSpinBox->dblValue();
 
@@ -243,7 +243,7 @@ void MT_EstimationWidget::onShow(MT_GPManager *manager, subst_cache *subst)
 	// set the values
 	intervalSpinBox->setValue(refInt);
 	if(toleranceSpinBox->getTyp() == INTTYP)
-		toleranceSpinBox->setIntValue((int)tolerance);
+		toleranceSpinBox->setIntValue(static_cast<int>(tolerance));
 	else
 		toleranceSpinBox->setDblValue(tolerance);
 

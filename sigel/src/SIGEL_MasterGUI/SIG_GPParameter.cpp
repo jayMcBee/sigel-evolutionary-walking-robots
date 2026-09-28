@@ -338,7 +338,7 @@ void SIG_GPParameter::getOutOfExperiment()
   sliderTournamentsPerGeneration->setValue( tournamentsPerGeneration );
 
   // display the REAL value, according to the calculations in SIG_GPManager.cpp, also see slotTourPerGen()
-  double tpg = ((double)sliderTournamentsPerGeneration->value() / 1000.0) * (double)theExperiment.population.getSize();
+  double tpg = (sliderTournamentsPerGeneration->value() / 1000.0) * theExperiment.population.getSize();
   lcdnumberTournamentsPerGeneration->display( static_cast<int>( tpg ) );
 
   // get the priority
@@ -736,7 +736,7 @@ void SIG_GPParameter::slotTourPerGenChanged( int newParmTPG )
 
    // display the *Real* value used in SIG_GPManager later on to call
    // CreateTours() and thus the *actual* number of Tournament per generation
-   tpg = ((double)sliderTournamentsPerGeneration->value() / 1000.0) * (double)theExperiment.population.getSize();
+   tpg = (sliderTournamentsPerGeneration->value() / 1000.0) * theExperiment.population.getSize();
    lcdnumberTournamentsPerGeneration->display( static_cast<int>( tpg ) );
 }
 

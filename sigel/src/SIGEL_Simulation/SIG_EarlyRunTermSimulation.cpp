@@ -104,7 +104,9 @@ int SIGEL_Simulation::SIG_EarlyRunTermSimulation::getMaxRecorderSteps(int inRecF
    // get sim.time in seconds
    tts = zeroHour.secsTo(maxT);
 
-   steps = static_cast<int>(tts / (double)(simulationData->simulationParameter.getStepSize()) / (double)inRecFrequency);
+   const double stepSize = simulationData->simulationParameter.getStepSize();
+   const double recFrequency = inRecFrequency;
+   steps = static_cast<int>(tts / stepSize / recFrequency);
 
    // recorder additionally takes a start and finish frame..
    steps += 2;

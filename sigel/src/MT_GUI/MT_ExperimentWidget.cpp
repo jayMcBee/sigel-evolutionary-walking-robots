@@ -44,7 +44,7 @@ void MT_ExperimentWidget::slotCurrentChanged(QTreeWidgetItem *newSelection)
 	// remember the previously selected item to allow reselection
 	if(!newSelection)
 		return;
-	prevSelectedItems.enqueue((MT_ExperimentItem*)newSelection);
+	prevSelectedItems.enqueue(static_cast<MT_ExperimentItem*>(newSelection));
 	if(prevSelectedItems.count() > 2)
 		prevSelectedItems.dequeue();
 };

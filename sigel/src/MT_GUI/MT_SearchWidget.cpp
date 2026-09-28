@@ -12,8 +12,8 @@
 MT_SearchWidget::MT_SearchWidget(QWidget* parent, const char* name, Qt::WindowFlags fl)
 : MT_SearchWidgetBase(parent, name, fl), MT_WidgetBase(parent)
 {
-    powerSpinBox = new DISpinBox( 1, (QWidget*)GroupBox12, "powerSpinBox" );
-    lineProbSpinBox = new DISpinBox( 1, (QWidget*)GroupBox12, "lineProbSpinBox" );
+    powerSpinBox = new DISpinBox( 1, GroupBox12, "powerSpinBox" );
+    lineProbSpinBox = new DISpinBox( 1, GroupBox12, "lineProbSpinBox" );
     Layout44->addWidget( powerSpinBox, 1, 1 );
     Layout44->addWidget( lineProbSpinBox, 0, 1 );
 	powerSpinBox->setRange(1, 0.0, 100.0);
@@ -119,7 +119,7 @@ bool MT_SearchWidget::onHide(MT_GPManager *manager, subst_cache *subst)
 void MT_SearchWidget::slotXOverChanged(int nvalue)
 {
 	disconnectLEs();
-	xOverProbEdit->setText(QString::number((double)nvalue / 10.0));
+	xOverProbEdit->setText(QString::number(nvalue / 10.0));
 
 	int o1, o2;
 	int s1 = nvalue;
@@ -131,8 +131,8 @@ void MT_SearchWidget::slotXOverChanged(int nvalue)
 	QObject::disconnect(mutProbSlider, SIGNAL(valueChanged(int)), this, SLOT(slotMutChanged(int)));
 	QObject::disconnect(reproProbSlider, SIGNAL(valueChanged(int)), this, SLOT(slotReproChanged(int)));
 
-	if(o1 != s2){ mutProbSlider->setValue(s2); mutProbEdit->setText(QString::number((double)s2 / 10.0)); }
-	if(o2 != s3){ reproProbSlider->setValue(s3); reproProbEdit->setText(QString::number((double)s3 / 10.0)); }
+	if(o1 != s2){ mutProbSlider->setValue(s2); mutProbEdit->setText(QString::number(s2 / 10.0)); }
+	if(o2 != s3){ reproProbSlider->setValue(s3); reproProbEdit->setText(QString::number(s3 / 10.0)); }
 
 	QObject::connect(mutProbSlider, SIGNAL(valueChanged(int)), SLOT(slotMutChanged(int)));
 	QObject::connect(reproProbSlider, SIGNAL(valueChanged(int)), SLOT(slotReproChanged(int)));
@@ -142,7 +142,7 @@ void MT_SearchWidget::slotXOverChanged(int nvalue)
 void MT_SearchWidget::slotMutChanged(int nvalue)
 {
 	disconnectLEs();
-	mutProbEdit->setText(QString::number((double)nvalue / 10.0));
+	mutProbEdit->setText(QString::number(nvalue / 10.0));
 
 	int o1, o2;
 	int s1 = o1 = xOverProbSlider->value();
@@ -154,8 +154,8 @@ void MT_SearchWidget::slotMutChanged(int nvalue)
 	QObject::disconnect(xOverProbSlider, SIGNAL(valueChanged(int)), this, SLOT(slotXOverChanged(int)));
 	QObject::disconnect(reproProbSlider, SIGNAL(valueChanged(int)), this, SLOT(slotReproChanged(int)));
 
-	if(o2 != s3){ reproProbSlider->setValue(s3); reproProbEdit->setText(QString::number((double)s3 / 10.0)); }
-	if(o1 != s1){ xOverProbSlider->setValue(s1); xOverProbEdit->setText(QString::number((double)s1 / 10.0)); }
+	if(o2 != s3){ reproProbSlider->setValue(s3); reproProbEdit->setText(QString::number(s3 / 10.0)); }
+	if(o1 != s1){ xOverProbSlider->setValue(s1); xOverProbEdit->setText(QString::number(s1 / 10.0)); }
 
 	QObject::connect(xOverProbSlider, SIGNAL(valueChanged(int)), SLOT(slotXOverChanged(int)));
 	QObject::connect(reproProbSlider, SIGNAL(valueChanged(int)), SLOT(slotReproChanged(int)));
@@ -165,7 +165,7 @@ void MT_SearchWidget::slotMutChanged(int nvalue)
 void MT_SearchWidget::slotReproChanged(int nvalue)
 {
 	disconnectLEs();
-	reproProbEdit->setText(QString::number((double)nvalue / 10.0));
+	reproProbEdit->setText(QString::number(nvalue / 10.0));
 
 	int o1, o2;
 	int s1 = o1 = xOverProbSlider->value();
@@ -177,8 +177,8 @@ void MT_SearchWidget::slotReproChanged(int nvalue)
 	QObject::disconnect(xOverProbSlider, SIGNAL(valueChanged(int)), this, SLOT(slotXOverChanged(int)));
 	QObject::disconnect(mutProbSlider, SIGNAL(valueChanged(int)), this, SLOT(slotMutChanged(int)));
 
-	if(o1 != s1){ xOverProbSlider->setValue(s1); xOverProbEdit->setText(QString::number((double)s1 / 10.0)); }
-	if(o2 != s2){ mutProbSlider->setValue(s2); mutProbEdit->setText(QString::number((double)s2 / 10.0)); }
+	if(o1 != s1){ xOverProbSlider->setValue(s1); xOverProbEdit->setText(QString::number(s1 / 10.0)); }
+	if(o2 != s2){ mutProbSlider->setValue(s2); mutProbEdit->setText(QString::number(s2 / 10.0)); }
 
 	QObject::connect(xOverProbSlider, SIGNAL(valueChanged(int)), SLOT(slotXOverChanged(int)));
 	QObject::connect(mutProbSlider, SIGNAL(valueChanged(int)), SLOT(slotMutChanged(int)));
@@ -190,19 +190,19 @@ void MT_SearchWidget::slotReproChanged(int nvalue)
  ***/
 void MT_SearchWidget::slotXEditChanged(const QString &valText){
 	double dVal = valText.toDouble();
-	int    iVal = (int)(dVal * 10.0);
+	int    iVal = static_cast<int>(dVal * 10.0);
 
 	xOverProbSlider->setValue(iVal);
 }
 void MT_SearchWidget::slotMEditChanged(const QString &valText){
 	double dVal = valText.toDouble();
-	int    iVal = (int)(dVal * 10.0);
+	int    iVal = static_cast<int>(dVal * 10.0);
 
 	mutProbSlider->setValue(iVal);
 }
 void MT_SearchWidget::slotREditChanged(const QString &valText){
 	double dVal = valText.toDouble();
-	int    iVal = (int)(dVal * 10.0);
+	int    iVal = static_cast<int>(dVal * 10.0);
 
 	reproProbSlider->setValue(iVal);
 }
@@ -213,7 +213,7 @@ void MT_SearchWidget::slotREditChanged(const QString &valText){
  ***/
 void MT_SearchWidget::slotpt1Changed(int nvalue)
 {
-	pt1XOverProbLCD->display((double)nvalue / 10.0);
+	pt1XOverProbLCD->display(nvalue / 10.0);
 
 	int o1, o2;
 	int s1 = nvalue;
@@ -225,8 +225,8 @@ void MT_SearchWidget::slotpt1Changed(int nvalue)
 	QObject::disconnect(pt2XOverProbSlider, SIGNAL(valueChanged(int)), this, SLOT(slotpt2Changed(int)));
 	QObject::disconnect(pt3XOverProbSlider, SIGNAL(valueChanged(int)), this, SLOT(slotpt3Changed(int)));
 
-	if(o1 != s2){ pt2XOverProbSlider->setValue(s2); pt2XOverProbLCD->display((double)s2 / 10.0); }
-	if(o2 != s3){ pt3XOverProbSlider->setValue(s3); pt3XOverProbLCD->display((double)s3 / 10.0); }
+	if(o1 != s2){ pt2XOverProbSlider->setValue(s2); pt2XOverProbLCD->display(s2 / 10.0); }
+	if(o2 != s3){ pt3XOverProbSlider->setValue(s3); pt3XOverProbLCD->display(s3 / 10.0); }
 
 	QObject::connect(pt2XOverProbSlider, SIGNAL(valueChanged(int)), SLOT(slotpt2Changed(int)));
 	QObject::connect(pt3XOverProbSlider, SIGNAL(valueChanged(int)), SLOT(slotpt3Changed(int)));
@@ -234,7 +234,7 @@ void MT_SearchWidget::slotpt1Changed(int nvalue)
 
 void MT_SearchWidget::slotpt2Changed(int nvalue)
 {
-	pt2XOverProbLCD->display((double)nvalue / 10.0);
+	pt2XOverProbLCD->display(nvalue / 10.0);
 
 	int o1, o2;
 	int s1 = o1 = pt1XOverProbSlider->value();
@@ -246,8 +246,8 @@ void MT_SearchWidget::slotpt2Changed(int nvalue)
 	QObject::disconnect(pt1XOverProbSlider, SIGNAL(valueChanged(int)), this, SLOT(slotpt1Changed(int)));
 	QObject::disconnect(pt3XOverProbSlider, SIGNAL(valueChanged(int)), this, SLOT(slotpt3Changed(int)));
 
-	if(o2 != s3){ pt3XOverProbSlider->setValue(s3); pt3XOverProbLCD->display((double)s3 / 10.0); }
-	if(o1 != s1){ pt1XOverProbSlider->setValue(s1); pt1XOverProbLCD->display((double)s1 / 10.0); }
+	if(o2 != s3){ pt3XOverProbSlider->setValue(s3); pt3XOverProbLCD->display(s3 / 10.0); }
+	if(o1 != s1){ pt1XOverProbSlider->setValue(s1); pt1XOverProbLCD->display(s1 / 10.0); }
 
 	QObject::connect(pt1XOverProbSlider, SIGNAL(valueChanged(int)), SLOT(slotpt1Changed(int)));
 	QObject::connect(pt3XOverProbSlider, SIGNAL(valueChanged(int)), SLOT(slotpt3Changed(int)));
@@ -255,7 +255,7 @@ void MT_SearchWidget::slotpt2Changed(int nvalue)
 
 void MT_SearchWidget::slotpt3Changed(int nvalue)
 {
-	pt3XOverProbLCD->display((double)nvalue / 10.0);
+	pt3XOverProbLCD->display(nvalue / 10.0);
 
 	int o1, o2;
 	int s1 = o1 = pt1XOverProbSlider->value();
@@ -267,8 +267,8 @@ void MT_SearchWidget::slotpt3Changed(int nvalue)
 	QObject::disconnect(pt1XOverProbSlider, SIGNAL(valueChanged(int)), this, SLOT(slotpt1Changed(int)));
 	QObject::disconnect(pt2XOverProbSlider, SIGNAL(valueChanged(int)), this, SLOT(slotpt2Changed(int)));
 
-	if(o1 != s1){ pt1XOverProbSlider->setValue(s1); pt1XOverProbLCD->display((double)s1 / 10.0); }
-	if(o2 != s2){ pt2XOverProbSlider->setValue(s2); pt2XOverProbLCD->display((double)s2 / 10.0); }
+	if(o1 != s1){ pt1XOverProbSlider->setValue(s1); pt1XOverProbLCD->display(s1 / 10.0); }
+	if(o2 != s2){ pt2XOverProbSlider->setValue(s2); pt2XOverProbLCD->display(s2 / 10.0); }
 
 	QObject::connect(pt1XOverProbSlider, SIGNAL(valueChanged(int)), SLOT(slotpt1Changed(int)));
 	QObject::connect(pt2XOverProbSlider, SIGNAL(valueChanged(int)), SLOT(slotpt2Changed(int)));

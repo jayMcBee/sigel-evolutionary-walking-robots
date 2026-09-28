@@ -13,7 +13,7 @@
 MT_Randomizer::MT_Randomizer()
 {
 	
-	srand( (unsigned)time( nullptr ) );
+	srand( static_cast<unsigned>(time( nullptr )) );
 
 // initialization
 	LastError =0;
@@ -54,7 +54,7 @@ MT_Randomizer::MT_Randomizer()
 MT_Randomizer::MT_Randomizer(QTextStream &File)
 {
 	// set seed for the random method
-	srand( (unsigned)time( nullptr ) );
+	srand( static_cast<unsigned>(time( nullptr )) );
 
 	LastError =0;
 	RandomXPoints.resize(7);
@@ -324,11 +324,11 @@ int MT_Randomizer::getProgLength()
 }
 
 
-void MT_Randomizer::createConstant(int NumOfConstant, bool Integer, double underBoun, double upperBoun)
+void MT_Randomizer::createConstant(int NumOfConstant, bool Integer, double lowerBound, double upperBound)
 {
 	
-	double RangeDouble = upperBoun-underBoun;
-	int RangeInt = upperBoun-underBoun;
+	double RangeDouble = upperBound-lowerBound;
+	int RangeInt = upperBound-lowerBound;
 
 	Constant.resize(NumOfConstant);
 
@@ -336,7 +336,7 @@ void MT_Randomizer::createConstant(int NumOfConstant, bool Integer, double under
 	{
 		// Randomly generate integer constants
 		for(int i=0; i<NumOfConstant; i++)
-			Constant[i]= underBoun+getRandomInteger(RangeInt);
+			Constant[i]= lowerBound+getRandomInteger(RangeInt);
 		
 	}
 	else
@@ -345,7 +345,7 @@ void MT_Randomizer::createConstant(int NumOfConstant, bool Integer, double under
 		// RangeDouble < 65 ... three decimal places
 		for(int i=0; i<NumOfConstant; i++)
 		{	
-			Constant[i]= (double) underBoun + fabs((double)getRandomInteger(RangeDouble*1000) / 1000.0);
+			Constant[i]= lowerBound + fabs(getRandomInteger(RangeDouble*1000) / 1000.0);
 		}
 	}
 }

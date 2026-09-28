@@ -10,8 +10,8 @@ MT_SelectionWidget::MT_SelectionWidget(QWidget* parent, const char* name, Qt::Wi
 {
 	lastParentSize = -1;
 
-	QObject::connect((QObject*)overProductionSpinBox, SIGNAL(valueChanged(int)), SLOT(slotOverProdChanged(int)));
-	QObject::connect((QObject*)tourSizeComboBox, SIGNAL(textActivated(const QString&)), SLOT(slotTourSizeChanged(const QString&)));
+	QObject::connect(overProductionSpinBox, SIGNAL(valueChanged(int)), SLOT(slotOverProdChanged(int)));
+	QObject::connect(tourSizeComboBox, SIGNAL(textActivated(const QString&)), SLOT(slotTourSizeChanged(const QString&)));
 }
 
 /***
@@ -87,8 +87,8 @@ void MT_SelectionWidget::onShow(MT_GPManager *manager, subst_cache *subst)
 	int tsetSize;
 	int tDuration;
 
-	QObject::disconnect((QObject*)overProductionSpinBox, SIGNAL(valueChanged(int)), this, SLOT(slotOverProdChanged(int)));
-	QObject::disconnect((QObject*)tourSizeComboBox, SIGNAL(textActivated(const QString&)), this, SLOT(slotTourSizeChanged(const QString&)));
+	QObject::disconnect(overProductionSpinBox, SIGNAL(valueChanged(int)), this, SLOT(slotOverProdChanged(int)));
+	QObject::disconnect(tourSizeComboBox, SIGNAL(textActivated(const QString&)), this, SLOT(slotTourSizeChanged(const QString&)));
 
 	manager->getSelektionValue(&offspringSize, &tournSize, 
 		&selMethod, &fitFunc, 
@@ -141,8 +141,8 @@ void MT_SelectionWidget::onShow(MT_GPManager *manager, subst_cache *subst)
 	TSetSizeSpinBox->setValue(tsetSize);	// training set size
 	TDurationSpinBox->setValue(tDuration);	// set max interpretation duration
 
-	QObject::connect((QObject*)overProductionSpinBox, SIGNAL(valueChanged(int)), SLOT(slotOverProdChanged(int)));
-	QObject::connect((QObject*)tourSizeComboBox, SIGNAL(textActivated(const QString&)), SLOT(slotTourSizeChanged(const QString&)));
+	QObject::connect(overProductionSpinBox, SIGNAL(valueChanged(int)), SLOT(slotOverProdChanged(int)));
+	QObject::connect(tourSizeComboBox, SIGNAL(textActivated(const QString&)), SLOT(slotTourSizeChanged(const QString&)));
 }
 
 bool MT_SelectionWidget::onHide(MT_GPManager *manager, subst_cache *subst)
@@ -184,7 +184,7 @@ void MT_SelectionWidget::slotOverProdChanged(int nvalue)
 	updateTSizeList(parentSize, poolSize);
 	int tourn = calculateTournSize(parentSize, poolSize, otourn);
 
-	QObject::disconnect((QObject*)tourSizeComboBox, SIGNAL(textActivated(const QString&)), this, SLOT(slotTourSizeChanged(const QString&)));
+	QObject::disconnect(tourSizeComboBox, SIGNAL(textActivated(const QString&)), this, SLOT(slotTourSizeChanged(const QString&)));
 
 	if(tourSizeMap.contains(tourn)){
 		int index = tourSizeMap.find(tourn).value();
@@ -200,7 +200,7 @@ void MT_SelectionWidget::slotOverProdChanged(int nvalue)
 	tourNumLabel->setText(QString::number(tourNum));
 	winNumLabel->setText(QString::number(parentSize / tourNum));
 
-	QObject::connect((QObject*)tourSizeComboBox, SIGNAL(textActivated(const QString&)), SLOT(slotTourSizeChanged(const QString&)));
+	QObject::connect(tourSizeComboBox, SIGNAL(textActivated(const QString&)), SLOT(slotTourSizeChanged(const QString&)));
 }
 
 void MT_SelectionWidget::slotTourSizeChanged(const QString &text)

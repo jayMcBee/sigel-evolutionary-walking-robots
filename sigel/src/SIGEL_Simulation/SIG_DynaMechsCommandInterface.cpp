@@ -130,13 +130,13 @@ void SIGEL_Simulation::SIG_DynaMechsCommandInterface::moveDrive(int driveNo,
 			return;
 		}
 		// get the DynaMechs joint for current angle -- joint limits might be manipulated !
-		intRevLink = (dmRevoluteLink *)dynaMechsLink->dynaMechsLink;
+		intRevLink = static_cast<dmRevoluteLink*>(dynaMechsLink->dynaMechsLink);
 		intRevLink->getJointLimits(&intMin, &intMax, &intSpring, &intDamper);
 
 		// get rel. position within the min-max range we want to turn
 		// in SIGEL (0..360) notation
 		SIGEL_Robot::SIG_RotationalJoint const *myRotJ = dynamic_cast<SIGEL_Robot::SIG_RotationalJoint const *>(myJoint);
-		long double rjointrange = (long double)(myRotJ->getMax()) - (long double)(myRotJ->getMin());
+		long double rjointrange = static_cast<long double>(myRotJ->getMax()) - static_cast<long double>(myRotJ->getMin());
 
 		// but restore limits first; don't trust the manipulated values -> use original values stored in SIG_Joint::getMechsMinPos()
 		intMin = myRotJ->getMechsMinPos();
@@ -157,7 +157,7 @@ void SIGEL_Simulation::SIG_DynaMechsCommandInterface::moveDrive(int driveNo,
     else destAngle = registerValue;
 
     // make it relative, i.e. zero means minimal allowed (defined) joint angle
-    sigelDestAngle = destAngle - (long double)(myRotJ->getMin());
+    sigelDestAngle = destAngle - static_cast<long double>(myRotJ->getMin());
 
 		// transform to a dynamechs position -> 0..2*pi, please ! Add dm-internal min. joint value here, therefore not above ...
 		dmDestAngle = sigelDestAngle * (3.14159265 / 180.0) + intMin;

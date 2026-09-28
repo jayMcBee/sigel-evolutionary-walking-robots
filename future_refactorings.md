@@ -62,13 +62,7 @@ Constructs the language removed. A current compiler rejects them.
   | MT_GPSystem | 17 | SIGEL_Program, SIGEL_SlaveGUI | 3 |
   | SIGEL_CommonGUI | 12 | | |
 
-- [ ] **102. C-style casts: replace them with C++ casts.** Found 2026-09-26.
-  `-Wold-style-cast` finds them all; most are in MT_GUI. The `QObject*` casts
-  in `connect` calls do nothing and are deleted. Numeric casts become
-  `static_cast`. The pointer casts (downcasts and casts for C APIs) each need
-  their own choice of cast. Once the count is zero, add `-Wold-style-cast` to
-  `SIGCXX` so no new ones come in. One round: one build, one gate run, one
-  review, one commit.- [ ] **112. Replace magic numbers with `std::numeric_limits` and named
+- [ ] **112. Replace magic numbers with `std::numeric_limits` and named
   constants.** Found 2026-09-28 in `MT_Interpreter::interpret`, which tests
   for `-2147483648` instead of `std::numeric_limits<int>::min()`, and tests it
   after negating, when the negation has already overflowed. Review the whole

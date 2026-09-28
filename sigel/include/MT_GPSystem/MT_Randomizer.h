@@ -60,8 +60,8 @@ public:
 	int getProgLength();
 
 	/*serve the random creat of NumOfConstant Constnant
-	* of the type int if Type is true else double between underBoun and upperboun */
-	void createConstant (int NumOfConstant, bool Type , double underBoun, double upperBoun);
+	* of the type int if Type is true else double between lowerBound and upperBound */
+	void createConstant (int NumOfConstant, bool Type , double lowerBound, double upperBound);
 	
 	/* method for fitness proportional selection,
 	* supply the position of the winner*/

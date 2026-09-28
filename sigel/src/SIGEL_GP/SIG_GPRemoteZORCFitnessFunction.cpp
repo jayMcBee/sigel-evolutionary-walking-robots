@@ -302,7 +302,7 @@ namespace SIGEL_GP
     */
 	void SIG_GPRemoteZORCFitnessFunction::goZORCMenu(int serIF, char inChoice) const
 	{
-   	write(serIF, (unsigned char *)&inChoice, 1);
+   	write(serIF, &inChoice, 1);
 	   usleep(100 * 1000);
 	}
 }

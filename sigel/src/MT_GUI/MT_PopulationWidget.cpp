@@ -7,7 +7,7 @@ static MT_PopListViewItem *nextSiblingOf(QTreeWidget *tree, QTreeWidgetItem *ite
 	if(!item) return nullptr;
 	int i = tree->indexOfTopLevelItem(item);
 	if(i < 0 || i + 1 >= tree->topLevelItemCount()) return nullptr;
-	return (MT_PopListViewItem *)tree->topLevelItem(i + 1);
+	return static_cast<MT_PopListViewItem*>(tree->topLevelItem(i + 1));
 }
 #include "MT_GUI/MT_AddIndividualsWidget.h"
 #include "MT_GUI/MT_PopListViewItem.h"
@@ -32,7 +32,7 @@ MT_PopulationWidget::MT_PopulationWidget(QMainWindow* parent, const char* name, 
 	: MT_PopulationWidgetBase(parent, name, fl), MT_WidgetBase(parent)
 {
 	oldPopSize = -1;
-	boss = (MT_MainWindow *) parent;
+	boss = static_cast<MT_MainWindow*>(parent);
 
 	QString pixPath = ::getenv("SIGEL_ROOT");
 	pixPath += "/pixmaps/";
@@ -99,9 +99,9 @@ MT_PopulationWidget::MT_PopulationWidget(QMainWindow* parent, const char* name, 
 
 	// establish connections
 	individualListView->setContextMenuPolicy(Qt::CustomContextMenu);
-	QObject::connect((const QObject*) individualListView, SIGNAL(customContextMenuRequested(const QPoint&)), SLOT(slotRButtonClicked(const QPoint&)));
-	QObject::connect((const QObject*) individualListView, SIGNAL(currentItemChanged(QTreeWidgetItem*,QTreeWidgetItem*)), SLOT(slotCurrentChanged(QTreeWidgetItem*)));
-	QObject::connect((const QObject*) individualListView, SIGNAL(itemSelectionChanged()), SLOT(slotSelectionChanged()));
+	QObject::connect(individualListView, SIGNAL(customContextMenuRequested(const QPoint&)), SLOT(slotRButtonClicked(const QPoint&)));
+	QObject::connect(individualListView, SIGNAL(currentItemChanged(QTreeWidgetItem*,QTreeWidgetItem*)), SLOT(slotCurrentChanged(QTreeWidgetItem*)));
+	QObject::connect(individualListView, SIGNAL(itemSelectionChanged()), SLOT(slotSelectionChanged()));
 	QObject::connect(addIndAction, SIGNAL(triggered()), SLOT(slotAddInd()));
 	QObject::connect(delIndAction, SIGNAL(triggered()), SLOT(slotDelInd()));
 	QObject::connect(impIndAction, SIGNAL(triggered()), SLOT(slotImpInd()));
@@ -246,7 +246,7 @@ void MT_PopulationWidget::slotCurrentChanged(QTreeWidgetItem *item)
 	if(!item) return;
 
 	// get the currently selected individual
-	int pos = ((MT_PopListViewItem *) item)->getPos();
+	int pos = static_cast<MT_PopListViewItem*>(item)->getPos();
 	MT_Individual *actInd = population->getIndividual(pos);
 
 	// display the program
@@ -297,7 +297,7 @@ void MT_PopulationWidget::slotDelInd()
 	MT_PopListViewItem* actIndNew =nullptr;
 	
 	MT_PopListViewItem *nextInd=nullptr;
-	MT_PopListViewItem *actInd = (MT_PopListViewItem*) individualListView->topLevelItem(0);
+	MT_PopListViewItem *actInd = static_cast<MT_PopListViewItem*>(individualListView->topLevelItem(0));
 
 	int DelPos =0;
 	int ActPos =0;
@@ -314,7 +314,7 @@ void MT_PopulationWidget::slotDelInd()
 			delete actRInd;
 			emit numChanged();
 			
-			actIndNew = (MT_PopListViewItem*) individualListView->topLevelItem(0);
+			actIndNew = static_cast<MT_PopListViewItem*>(individualListView->topLevelItem(0));
 			while(actIndNew !=nullptr)		// walk over all IndisItem  // for every item with Pos > DelPos --> setPos(Pos-1)
 			{
 				ActPos = actIndNew->getPos();
@@ -520,7 +520,7 @@ QList<MT_PopListViewItem *> * MT_PopulationWidget::getSelectedItems()
 	QTreeWidgetItemIterator it(individualListView);
 	for(; (*it); ++it){
 		if((*it)->isSelected())
-			lst->append((MT_PopListViewItem*)(*it));
+			lst->append(static_cast<MT_PopListViewItem*>(*it));
 	}
 	return lst;
 }

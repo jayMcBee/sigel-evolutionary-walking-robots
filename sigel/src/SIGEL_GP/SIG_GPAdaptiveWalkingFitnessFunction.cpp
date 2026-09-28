@@ -128,7 +128,7 @@ namespace SIGEL_GP
  		}
 
 		// get average height in percent of start height
-		avgHeight = avgHeight / (double)steps;
+		avgHeight = avgHeight / static_cast<double>(steps);
 		avgHeightPercent = avgHeight / startHeight;
 
   	// weight fitness using avg. height, height is more important than distance !

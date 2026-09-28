@@ -2,6 +2,7 @@
 #include <stdlib.h>
 
 #include "MT_GUI/MT_MainWindow.h"
+#include "MT_Control/MT_Controller.h"
 
 MT_MainWindow::MT_MainWindow(MT_Controller *controller, MT_GPManager *manager, subst_cache *substCache, QWidget * parent, const char * name, Qt::WindowFlags f )
  : QMainWindow( parent, f ), gpManager(manager), subst(substCache)
@@ -238,12 +239,12 @@ void MT_MainWindow::closeEvent(QCloseEvent *e)
 	if(topWidget->onHide(gpManager, subst)){		// can we close the window savely ?
 		QObject::disconnect(gpManager, SIGNAL( metaEvolutionRunning(bool) ), this, SLOT( slotEvolutionStatus(bool) ));
 
-		QObject::disconnect(mtStartEvolutionAction, SIGNAL( triggered() ), (QObject*)boss, SLOT( startSingleEvolution() ));
-		QObject::disconnect(mtStopEvolutionAction, SIGNAL( triggered() ), (QObject*)boss, SLOT( stopEvolution() ));
-		QObject::disconnect(mtDefaultAction, SIGNAL( triggered() ), (QObject*)boss, SLOT(slotLoadDefault() ) );
-		QObject::disconnect(mtLoadAction, SIGNAL( triggered() ), (QObject*)boss, SLOT( slotLoadSetup() ) );
-		QObject::disconnect(mtSaveAction, SIGNAL( triggered() ), (QObject*)boss, SLOT( slotSaveSetup() ));
-		QObject::disconnect(evolTimer, SIGNAL( timeout() ), (QObject*)boss, SLOT( stopEvolution() ));
+		QObject::disconnect(mtStartEvolutionAction, SIGNAL( triggered() ), boss, SLOT( startSingleEvolution() ));
+		QObject::disconnect(mtStopEvolutionAction, SIGNAL( triggered() ), boss, SLOT( stopEvolution() ));
+		QObject::disconnect(mtDefaultAction, SIGNAL( triggered() ), boss, SLOT(slotLoadDefault() ) );
+		QObject::disconnect(mtLoadAction, SIGNAL( triggered() ), boss, SLOT( slotLoadSetup() ) );
+		QObject::disconnect(mtSaveAction, SIGNAL( triggered() ), boss, SLOT( slotSaveSetup() ));
+		QObject::disconnect(evolTimer, SIGNAL( timeout() ), boss, SLOT( stopEvolution() ));
 
 		e->accept();	// yeah, close it
 	} else
