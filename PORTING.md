@@ -909,7 +909,17 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-28 — DONE: EXPORT NAMES, PERCENTAGES OF 0, DEAD CODE IN MT_POPULATIONWIDGET.** Start here.
+**2026-09-28 — DONE: ITEM 54, THE EMPTY CATCH BLOCKS LOG THE EXCEPTION. ITEM 54 IS DONE.** Start here.
+
+- **Changed:** details are in item 54's entry in "Done".
+- **Baselines:** unchanged.
+- **Review:** no defects. Only `sigel_slave` calls `evalFitness`, from its
+  one thread, so the shared `SIG_IO::cerr` is safe there.
+- **Gates:** `check.sh` 758 pass, 0 fail; warnings 471. The other four gates
+  are green.
+- **Next:** to be planned with the maintainer.
+
+**2026-09-28 — DONE: EXPORT NAMES, PERCENTAGES OF 0, DEAD CODE IN MT_POPULATIONWIDGET.**
 
 - **Changed:** `MT_PopulationWidget::slotExpInd` names its files `foo0.mind`,
   `foo1.mind`, and so on; the name used to grow with each file. The ten
