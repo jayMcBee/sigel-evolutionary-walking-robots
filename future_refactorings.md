@@ -700,6 +700,41 @@ touched, because changing one changes behaviour against the reference binary.
 
 ---
 
+## 8 · GP engine
+
+Changes to how programs control robots and how evolution changes them. Each
+changes evolution results, so each is judged by whether the best fitness
+improves. Assess published GP approaches first, then decide, then code.
+
+- [ ] **115. Proper conditionals.** Found 2026-09-28 by the language
+  assessment. The robot language has `CMP a,b`, which sets one flag to
+  `a <= b`, and `JMP n`, which jumps `n` lines relative when the flag is set.
+  There is no unconditional jump and no jump on equality, and a jump target
+  moves whenever a line is inserted or deleted before it. Decide what a
+  proper conditional is here, for example an instruction that skips the
+  next line or a block, as linear GP systems use. New commands change
+  `LanguageParameters` and the experiment files.
+
+- [ ] **116. Motor on, motor off.** Found 2026-09-28.
+  `SIG_DynaMechsCommandInterface::moveDrive` applies the torque from R0 for
+  the `MOVE` duration set in the experiment; then the drive goes limp. In
+  tristar that duration is 0.001 s, so every `MOVE` is a single 10 ms
+  step, and few joints carry load at the same time. Give programs explicit
+  control: two commands (motor on with a torque, motor off), or one command
+  with a duration parameter, so a torque holds until the program changes
+  it. New commands change `LanguageParameters` and the experiment files.
+
+- [ ] **117. Mutation that tunes parameters.** Found 2026-09-28.
+  `SIG_GPOperations::mutation` changes an operand only by drawing a fresh
+  value over the whole range, never by a small step. Torque, drive number,
+  jump distance and register numbers can therefore not be tuned. Steps of
+  plus or minus 1 would need far too many attempts. Assess published
+  approaches, for example steps from a distribution scaled to the operand's
+  range, or step sizes that adapt during the run, and choose one before
+  coding.
+
+---
+
 ## Watch out
 
 Not work. Traps that bite whoever edits these files next.
