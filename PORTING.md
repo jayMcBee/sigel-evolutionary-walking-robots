@@ -909,7 +909,18 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-28 — DONE: ITEM 1, THE PRE-STANDARD HEADERS ARE REPLACED; ITEM 3 WAS ALREADY DONE.** Start here.
+**2026-09-28 — DONE: UNUSED INCLUDES AND COMMENTED-OUT CODE REMOVED; ITEM 32 CLOSED.** Start here.
+
+- **Changed:** the `<iostream>` includes that item 1 left unused are gone
+  from `SIG_GPIndividual.cpp`, `MT_GPManager.cpp` and `SIG_RobotScanner.cpp`.
+  `SIG_GUIGPExperiment::slotStopEvolution` loses eight commented-out lines.
+  Item 32 was already done; its entry in "Done" says how.
+- **Baselines:** unchanged.
+- **Gates:** `check.sh` 758 pass, 0 fail; warnings 471. The other four gates
+  are green, after each commit.
+- **Next:** to be planned with the maintainer.
+
+**2026-09-28 — DONE: ITEM 1, THE PRE-STANDARD HEADERS ARE REPLACED; ITEM 3 WAS ALREADY DONE.**
 
 - **Changed:** details are in the entries for items 1 and 3 in "Done".
 - **Baselines:** unchanged.

@@ -445,16 +445,7 @@ void SIG_GUIGPExperiment::slotStopEvolution()
 #ifdef SIG_DEBUG
   SIGEL_Tools::SIG_IO::cout << "Stopping Evolution" << Qt::endl;
 #endif
-  // experimentView->pushbuttonStart->setEnabled( true ); // will be done
   experimentView->pushbuttonStop->setEnabled( false );
-
-  // enable the widgets
-  // gpParameter->setEnabled( true );
-  // simulationParameter->setEnabled( true );
-  // robotView->setEnabled( true );
-  // languageParameters->setEnabled( true );
-  // environmentView->setEnabled( true );
-  // allIndividualsView->setEnabled( true );
 
   guiGPManager->userTerminated = true;
 };
