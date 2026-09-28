@@ -23,7 +23,7 @@
 #include "SIGEL_RobotIO/SIG_RobotScanner.h"
 #include "SIGEL_RobotIO/SIG_RobotIOExceptions.h"
 #ifdef _WINDOWS
-#include <iostream.h>
+#include <iostream>
 #else
 #include <iostream>
 #endif

@@ -16,12 +16,6 @@ Paths are relative to `sigel/`, the source tree.
 
 Constructs the language removed. A current compiler rejects them.
 
-- [ ] **1. Replace the pre-standard headers** `<iostream.h>` and `<vector.h>`
-  in `SIG_GPIndividual.cpp`, `MT_GPManager.cpp`, `MT_Randomizer.cpp`,
-  `SIG_RobotScanner.cpp`, `SIG_SimulationQueries.h` and
-  `SIG_DynaMechsSimulationQueries.h`. This does **not** retire `shim/`: the vendored
-  libraries still include these headers through it.
-
 ---
 
 ## 2 · Let the compiler hunt bugs

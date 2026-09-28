@@ -909,7 +909,17 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-28 — DONE: ITEM 54, THE EMPTY CATCH BLOCKS LOG THE EXCEPTION. ITEM 54 IS DONE.** Start here.
+**2026-09-28 — DONE: ITEM 1, THE PRE-STANDARD HEADERS ARE REPLACED; ITEM 3 WAS ALREADY DONE.** Start here.
+
+- **Changed:** details are in the entries for items 1 and 3 in "Done".
+- **Baselines:** unchanged.
+- **Review:** no defects. The two `fabs` calls in `MT_Randomizer` resolve to
+  the same overloads as before.
+- **Gates:** `check.sh` 758 pass, 0 fail; warnings 471. The other four gates
+  are green.
+- **Next:** to be planned with the maintainer.
+
+**2026-09-28 — DONE: ITEM 54, THE EMPTY CATCH BLOCKS LOG THE EXCEPTION. ITEM 54 IS DONE.**
 
 - **Changed:** details are in item 54's entry in "Done".
 - **Baselines:** unchanged.
@@ -6621,6 +6631,15 @@ carried; other items and this file cite them, so they do not change.
   removed its `INT_MIN` test and such a jump crashed. Every other value gives
   the same target as before; 9,000,099 values were compared. Dropped by
   decision: a named constant for the operand range `32000`.
+
+- [x] **1. The pre-standard headers are replaced** — done 2026-09-28, one
+  commit. `<iostream.h>` and `<vector.h>` became `<iostream>` and `<vector>` in
+  `SIG_GPIndividual.cpp`, `MT_GPManager.cpp`, `MT_Randomizer.cpp`,
+  `SIG_RobotScanner.cpp`, `SIG_SimulationQueries.h` and
+  `SIG_DynaMechsSimulationQueries.h`; three lines in `MT_Randomizer` write
+  `std::cerr` and `std::endl`. SIGEL's own code includes nothing from `shim/`
+  any more; the vendored libraries still do, so `shim/` stays. The two
+  headers still get `using namespace std` through Dynamo's headers.
 
 - [x] **3. Loop-variable scope leaks in `MT_GPSystem`** — done 2026-08-19 by
   115bcf4, which gave each `for` loop its own variable, and 35b460d for

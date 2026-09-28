@@ -22,7 +22,7 @@
 */
 #include "SIGEL_GP/SIG_GPIndividual.h"
 #ifndef _WINDOWS
-#include <iostream.h>
+#include <iostream>
 #endif
 
 

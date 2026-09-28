@@ -31,7 +31,7 @@
 #ifdef _WINDOWS
 #include <vector>
 #else
-#include <vector.h>
+#include <vector>
 #endif
 
 namespace SIGEL_Simulation
