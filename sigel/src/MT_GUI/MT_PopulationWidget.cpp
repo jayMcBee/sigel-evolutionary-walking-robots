@@ -353,7 +353,6 @@ void MT_PopulationWidget::slotImpInd()
 			if(file.open(QIODevice::ReadOnly)){		// file successfully opened
 				QTextStream str(&file);
 
-				//population->importPop(str);
 				MT_Individual *newInd = new MT_Individual(str);
 				population->addIndividual(newInd);
 				new MT_PopListViewItem(individualListView, newInd);
@@ -395,10 +394,10 @@ void MT_PopulationWidget::slotExpInd()
 				QTextStream str(&file);
 				
 				MT_Population npop;
-				npop.changePopSize(0);//list->count());
+				npop.changePopSize(0);
 				for(int i=0; i<list->count(); i++){
 					MT_PopListViewItem *actItem = list->at(i);
-					npop.addIndividual(population->getIndividual(actItem->getPos()));//, i);
+					npop.addIndividual(population->getIndividual(actItem->getPos()));
 				}
 
 				npop.exportPop(str);
@@ -457,16 +456,6 @@ void MT_PopulationWidget::slotLoadPop()
 			} else {
 				// append
 				population->importPop(str);
-				/*
-				MT_Population npop(str);
-				MT_Individual *newInd = new MT_Individual(str);
-				population->changePopSize(population->getSize()+npop.getSize());
-
-				for(int i=0; i<npop.getSize(); i++)
-					population->insertIndividual(npop.getIndividual(i));
-
-				npop.flush();
-				*/
 				onShow(gpManager, nullptr);
 
 			}

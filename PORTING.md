@@ -909,7 +909,25 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-28 — DONE: COMMENTS SAY WHAT THE CODE DOES NOW, NOT ITS HISTORY.** Start here.
+**2026-09-28 — DONE: EXPORT NAMES, PERCENTAGES OF 0, DEAD CODE IN MT_POPULATIONWIDGET.** Start here.
+
+- **Changed:** `MT_PopulationWidget::slotExpInd` names its files `foo0.mind`,
+  `foo1.mind`, and so on; the name used to grow with each file. The ten
+  crossover and mutation percentages in `MT_StatisticsWidget` go through
+  `safePercentage`, which gives 0 when the total is 0; the division by 0 was
+  undefined when converted to `int`. The commented-out import in
+  `MT_PopulationWidget::slotLoadPop` and three commented-out fragments in the
+  same file are deleted. Three commits.
+- **Not changed:** the four percentages on the totals page in
+  `MT_StatisticsWidget::updateGUI` show "nan" or "inf" when a total is 0. They
+  are not converted to `int`, so nothing is undefined.
+- **Baselines:** unchanged.
+- **Review:** no defects.
+- **Gates:** `check.sh` 758 pass, 0 fail; warnings 471. The other four gates
+  are green, after each commit.
+- **Next:** to be planned with the maintainer.
+
+**2026-09-28 — DONE: COMMENTS SAY WHAT THE CODE DOES NOW, NOT ITS HISTORY.**
 
 - **Changed:** 13 comments that named 1.3, "2003" or "preserved" were
   reviewed. Six keep their fact and lose the history:
@@ -931,7 +949,7 @@ classes and leave truncation a hard error. **They are not interchangeable.**
   the result to `int`.
 - **Gates:** `check.sh` 758 pass, 0 fail; warnings 471. The other four gates
   are green.
-- **Next:** the maintainer decides on the file names and the division by 0.
+- **Next:** the file names and the division by 0 are fixed; see above.
 
 **2026-09-28 — DONE: ITEM 114, NESTED IFS WITHOUT ELSE MERGED. ITEM 114 IS DONE.**
 
