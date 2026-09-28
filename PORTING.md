@@ -6290,6 +6290,16 @@ carried; other items and this file cite them, so they do not change.
     would then sleep in the loop.
   - **Not measured:** remote hosts, more than 4 slaves, other experiments, other
     machines. This machine has 4 cores.
+  - **2026-09-28: the wait ran once per tournament, not once per pass.** The
+    `usleep` sat inside the loop over `taskCanDoList`, so every tournament
+    touched cost 5 ms, also those whose individuals were already up to date.
+    That is why the table grows by about 1 s per generation for each ms of
+    wait. Found with `perf` on a real GUI run with 4 slaves: after the first
+    population, each generation evaluated 1 to 4 individuals of about 40 ms
+    each and then waited about 2.65 s. The wait now runs once per pass of the
+    outer loop, in both `evolutionLoop` overloads. Same experiment, 180 s
+    recorded each: 352 evaluations before, 5,624 after; time with no slave
+    running 175.8 s before, 24.3 s after.
 
 - [x] **40. Keep one two-bases experiment; remove the other five, here and on the
   x86 machine.** All six were judged side by side on 1.3 and the port, 2026-09-19,

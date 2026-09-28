@@ -91,6 +91,13 @@ void SIGEL_GP::SIG_GPManager::evolutionLoop() {
     if (stopEvolutionNow)
       return;
 
+    // Poll interval, once per pass: long enough not to spin a core, short
+    // enough that finished results do not wait.
+#ifdef _WINDOWS
+    Sleep(5);
+#else
+    usleep(5000);
+#endif
     processInterfaceEvents();
 
     trainer->sweepToSpawn();
@@ -109,13 +116,6 @@ void SIGEL_GP::SIG_GPManager::evolutionLoop() {
       qsizetype canDoIdx = 0;   // an index, not an iterator: the loop appends to taskCanDoList
 
       while (canDoIdx < taskCanDoList.size()) {
-      // Poll interval: long enough not to spin a core, short enough that
-      // finished results do not wait. Interface events are processed after it.
-#ifdef _WINDOWS
-      Sleep(5);
-#else
-      usleep(5000);
-#endif	
       processInterfaceEvents();
 
       if ((touchsCounter == maxTouchsPerLoop) && (maxTouchsPerLoop != -1)) {
@@ -1328,6 +1328,13 @@ void SIGEL_GP::SIG_GPManager::evolutionLoop(MT_Classifier *MetaClassifier)
       if (stopEvolutionNow)
       	return;
 
+      // Poll interval, once per pass: long enough not to spin a core, short
+      // enough that finished results do not wait.
+#ifdef _WINDOWS
+      Sleep(5);
+#else
+      usleep(5000);
+#endif
       processInterfaceEvents();
 
       trainer->sweepToSpawn();
@@ -1349,13 +1356,6 @@ void SIGEL_GP::SIG_GPManager::evolutionLoop(MT_Classifier *MetaClassifier)
 
   	  while (canDoIdx < taskCanDoList.size())
 	    {
-				// Poll interval: long enough not to spin a core, short enough that
-				// finished results do not wait. Interface events are processed after it.
-#ifdef _WINDOWS
-				Sleep(5);
-#else
-				usleep(5000);
-#endif				
 				processInterfaceEvents();
 
 	      if ((touchsCounter == maxTouchsPerLoop) && (maxTouchsPerLoop != -1))
