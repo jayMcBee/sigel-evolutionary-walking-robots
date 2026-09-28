@@ -218,16 +218,25 @@ touched, because changing one changes behaviour against the reference binary.
 
 - [ ] **111. Enforce a minimum program length of 5 everywhere.** Decided
   2026-09-27. It makes item 110 unreachable.
-  - One constant in `SIG_GPParameter`. The dialog's spin box
-    (`SIG_GPParameterBase.ui`, now 2), the parameter-file loader and
-    `setMinIndLength` all use it. A file value below it throws
-    `SIG_Exception`.
+  - The dialog's spin box (`SIG_GPParameterBase.ui`) goes down to 5, not 2,
+    and a new experiment starts with 5, not 3. Like every other GP
+    parameter, the minimum length is limited only by its dialog field; a
+    check on load belongs to item 118.
   - Loading a pool pads a shorter program with the existing NOP logic
     (`SIG_Program::checkLength`) and records it with
     `addLengthIncreasedInfo`.
   - The active population is not checked again when the parameter changes.
   - Unlikely edge cases, such as a stored fitness after padding, are
     deliberately not handled.
+
+- [ ] **118. Check the GP parameters when a file loads.** Found 2026-09-28.
+  The dialog limits each GP field with its widget's range.
+  `SIG_GPParameter::readFromFile` and the setters check no value: each one
+  goes in as the file gives it, and `TERMINATIONMODEL` and `PRIORITY` are
+  cast from any integer to their enum. An existing file with a value the
+  dialog does not allow, such as a minimum length below 5, loads unchanged.
+  Hand-edited files are not the concern. To decide: the valid range of each
+  parameter, and what a load does with a value outside it.
 
 - [ ] **18. `SIG_GPPVMTask` holds a reference to a host that can be deleted
   under it.** `SIG_GPPVMTask` declares `SIG_GPActivePVMHost &host`;
