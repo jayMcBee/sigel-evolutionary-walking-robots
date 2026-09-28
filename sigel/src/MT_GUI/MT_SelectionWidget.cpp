@@ -110,7 +110,7 @@ void MT_SelectionWidget::onShow(MT_GPManager *manager, subst_cache *subst)
 		tourSizeComboBox->setCurrentIndex(index);
 	} else {
 		QMessageBox::critical(this, "Configure MetaGP System", "The tournament size is invalid.\n"
-			"A default value will be used.", "OK");
+			"A default value will be used.");
 		tourSizeComboBox->setCurrentIndex(0);
 	}
 

@@ -144,7 +144,7 @@ void MT_PopulationWidget::onShow(MT_GPManager *manager, subst_cache *subst)
 	// get the current population
 	population = manager->getParent();
 	if(!population){
-		QMessageBox::critical(this, "Configure MetaGP System", "Couldn't get current population.", "OK");
+		QMessageBox::critical(this, "Configure MetaGP System", "Couldn't get current population.");
 		return;
 	}
 	oldPopSize = population->getSize();
@@ -406,7 +406,7 @@ void MT_PopulationWidget::slotExpInd()
 
 				file.close();
 			} else {
-				QMessageBox::critical(this, "Save Population", "An error occurred while saving the population.\nThe operation is aborted.", "OK");
+				QMessageBox::critical(this, "Save Population", "An error occurred while saving the population.\nThe operation is aborted.");
 			}
 		}
 	} else {
@@ -423,7 +423,7 @@ void MT_PopulationWidget::slotExpInd()
 					population->getIndividual(list->at(i)->getPos())->writeToFileIndi(str);
 					file.close();
 				} else {
-					QMessageBox::critical(this, "Save Individual", "An error occurred while saving the individual.\nThe operation is aborted.", "OK");
+					QMessageBox::critical(this, "Save Individual", "An error occurred while saving the individual.\nThe operation is aborted.");
 				}
 			}
 
@@ -485,7 +485,7 @@ void MT_PopulationWidget::slotSavePop()
 			population->writeToFilePop(str);
 			file.close();
 		} else {
-			QMessageBox::critical(this, "Save Population", "An error occurred while saving the population.\nThe operation is aborted.", "OK");
+			QMessageBox::critical(this, "Save Population", "An error occurred while saving the population.\nThe operation is aborted.");
 		}
 	}
 }

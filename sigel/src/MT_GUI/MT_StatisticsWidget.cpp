@@ -315,7 +315,7 @@ void MT_StatisticsWidget::evolutionRunning(bool running)
 void MT_StatisticsWidget::slotEstGButton()
 {
 	if(sigStat->genNumber < 2){
-		QMessageBox::information(this, "View Graph", "There's not enough data to plot a graph.", 1);
+		QMessageBox::information(this, "View Graph", "There's not enough data to plot a graph.");
 		return;
 	}
 	plotEstimation(QString());
@@ -329,7 +329,7 @@ void MT_StatisticsWidget::slotFitnessGButton()
 		metaGens = stat->StatisticsOfGeneration.count();
 
 	if(!stat || metaGens < 2){
-		QMessageBox::information(this, "View Graph", "There's not enough data to plot a graph.", 1);
+		QMessageBox::information(this, "View Graph", "There's not enough data to plot a graph.");
 		return;
 	}
 	plotFitness(QString());
@@ -343,7 +343,7 @@ void MT_StatisticsWidget::slotSearchEffectsGButton()
 		metaGens = stat->StatisticsOfGeneration.count();
 
 	if(!stat || metaGens < 2){
-		QMessageBox::information(this, "View Graph", "There's not enough data to plot a graph.", 1);
+		QMessageBox::information(this, "View Graph", "There's not enough data to plot a graph.");
 		return;
 	}
 	plotSearchEffects(QString());
@@ -355,7 +355,7 @@ void MT_StatisticsWidget::slotSearchEffectsGButton()
 void MT_StatisticsWidget::slotEstDButton()
 {
 	if(sigStat->genNumber < 2){
-		QMessageBox::information(this, "View Graph", "There's not enough data to plot a graph.", 1);
+		QMessageBox::information(this, "View Graph", "There's not enough data to plot a graph.");
 		return;
 	}
 	QString fileName = QFileDialog::getSaveFileName( this, QString(), QString(),
@@ -392,7 +392,7 @@ void MT_StatisticsWidget::slotFitnessDButton()
 		metaGens = stat->StatisticsOfGeneration.count();
 
 	if(!stat || metaGens < 2){
-		QMessageBox::information(this, "View Graph", "There's not enough data to plot a graph.", 1);
+		QMessageBox::information(this, "View Graph", "There's not enough data to plot a graph.");
 		return;
 	}
 	QString fileName = QFileDialog::getSaveFileName( this, QString(), QString(),
@@ -432,7 +432,7 @@ void MT_StatisticsWidget::slotSearchEffectsDButton()
 		metaGens = stat->StatisticsOfGeneration.count();
 
 	if(!stat || metaGens < 2){
-		QMessageBox::information(this, "View Graph", "There's not enough data to plot a graph.", 1);
+		QMessageBox::information(this, "View Graph", "There's not enough data to plot a graph.");
 		return;
 	}
 	QString fileName = QFileDialog::getSaveFileName( this, QString(), QString(),
@@ -483,7 +483,7 @@ void MT_StatisticsWidget::slotSearchEffectsDButton()
 void MT_StatisticsWidget::slotEstPSExport()
 {
 	if(sigStat->genNumber < 2){
-		QMessageBox::information(this, "View Graph", "There's not enough data to plot a graph.", 1);
+		QMessageBox::information(this, "View Graph", "There's not enough data to plot a graph.");
 		return;
 	}
 	QString fileName = QFileDialog::getSaveFileName( this, QString(), QString(),
@@ -509,7 +509,7 @@ void MT_StatisticsWidget::slotFitnessPSExport()
 		metaGens = stat->StatisticsOfGeneration.count();
 
 	if(!stat || metaGens < 2){
-		QMessageBox::information(this, "View Graph", "There's not enough data to plot a graph.", 1);
+		QMessageBox::information(this, "View Graph", "There's not enough data to plot a graph.");
 		return;
 	}
 	QString fileName = QFileDialog::getSaveFileName( this, QString(), QString(),
@@ -535,7 +535,7 @@ void MT_StatisticsWidget::slotSearchEffectsPSExport()
 		metaGens = stat->StatisticsOfGeneration.count();
 
 	if(!stat || metaGens < 2){
-		QMessageBox::information(this, "View Graph", "There's not enough data to plot a graph.", 1);
+		QMessageBox::information(this, "View Graph", "There's not enough data to plot a graph.");
 		return;
 	}
 	QString fileName = QFileDialog::getSaveFileName( this, QString(), QString(),
@@ -567,7 +567,7 @@ void MT_StatisticsWidget::plotEstimation(QString fileName)
 #else
 	FILE *gnuPlotPipe = popen( "gnuplot -persist -", "w");
 	if(!gnuPlotPipe){
-		QMessageBox::warning( this, "Error", "Couldn't start gnuplot.", "OK");
+		QMessageBox::warning( this, "Error", "Couldn't start gnuplot.");
 		return;
 	}
 
@@ -603,7 +603,7 @@ void MT_StatisticsWidget::plotEstimation(QString fileName)
 	gnuCmdLine.append("\" - ");
 	gnuCmdLine.prepend("gnuplot.exe \"");
 	if(WinExec(gnuCmdLine, SW_SHOW) < 32){
-		QMessageBox::warning( this, "Error", "Couldn't start gnuplot.", "OK");
+		QMessageBox::warning( this, "Error", "Couldn't start gnuplot.");
 		return;
 	}
 #else
@@ -622,7 +622,7 @@ void MT_StatisticsWidget::plotFitness(QString fileName)
 #else
 	FILE *gnuPlotPipe = popen( "gnuplot -persist -", "w");
 	if(!gnuPlotPipe){
-		QMessageBox::warning( this, "Error", "Couldn't start gnuplot.", "OK");
+		QMessageBox::warning( this, "Error", "Couldn't start gnuplot.");
 		return;
 	}
 
@@ -666,7 +666,7 @@ void MT_StatisticsWidget::plotFitness(QString fileName)
 	gnuCmdLine.append("\" - ");
 	gnuCmdLine.prepend("gnuplot.exe \"");
 	if(WinExec(gnuCmdLine, SW_SHOW) < 32){
-		QMessageBox::warning( this, "Error", "Couldn't start gnuplot.", "OK");
+		QMessageBox::warning( this, "Error", "Couldn't start gnuplot.");
 		return;
 	}
 #else
@@ -693,7 +693,7 @@ void MT_StatisticsWidget::plotSearchEffects(QString fileName)
 #else
 	FILE *gnuPlotPipe = popen( "gnuplot -persist -", "w");
 	if(!gnuPlotPipe){
-		QMessageBox::warning( this, "Error", "Couldn't start gnuplot.", "OK");
+		QMessageBox::warning( this, "Error", "Couldn't start gnuplot.");
 		return;
 	}
 
@@ -770,7 +770,7 @@ void MT_StatisticsWidget::plotSearchEffects(QString fileName)
 	gnuCmdLine.append("\" - ");
 	gnuCmdLine.prepend("gnuplot.exe \"");
 	if(WinExec(gnuCmdLine, SW_SHOW) < 32){
-		QMessageBox::warning( this, "Error", "Couldn't start gnuplot.", "OK");
+		QMessageBox::warning( this, "Error", "Couldn't start gnuplot.");
 		return;
 	}
 #else

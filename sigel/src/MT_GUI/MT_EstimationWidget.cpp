@@ -150,7 +150,7 @@ bool MT_EstimationWidget::onHide(MT_GPManager *manager, subst_cache *subst)
 		subst->refreshInt = refInt;
 	}
 	else
-		QMessageBox::critical(this, "Configure MetaGP System", "Couldn't set the information for the current MetaGP system.", "OK");
+		QMessageBox::critical(this, "Configure MetaGP System", "Couldn't set the information for the current MetaGP system.");
 
 	return true;
 }
@@ -168,7 +168,7 @@ void MT_EstimationWidget::onShow(MT_GPManager *manager, subst_cache *subst)
 		tolerance = subst->tolerance;
 	}
 	else {
-		QMessageBox::critical(this, "Configure MetaGP System", "Couldn't retrieve the information for the current MetaGP system.", "OK");
+		QMessageBox::critical(this, "Configure MetaGP System", "Couldn't retrieve the information for the current MetaGP system.");
 		return;
 	}
 

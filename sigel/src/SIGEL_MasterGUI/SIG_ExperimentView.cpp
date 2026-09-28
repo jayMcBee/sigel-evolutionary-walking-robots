@@ -122,7 +122,7 @@ void SIG_ExperimentView::streamToGnuPlot( QTextStream &stream ) {
 void SIG_ExperimentView::slotExportPostScript() {
   if (theExperiment.experimentHistory.isEmpty())
     {
-      QMessageBox::information( this, "Info", "There is no evolution data to plot.", "OK" );
+      QMessageBox::information( this, "Info", "There is no evolution data to plot.");
       return;
     };
 
@@ -168,7 +168,7 @@ void SIG_ExperimentView::slotExportPostScript() {
 
   if (gnuPlotStdInPipe==nullptr)
     {
-      QMessageBox::warning( this, "Error", "Couldn't start gnuplot.", "OK" );
+      QMessageBox::warning( this, "Error", "Couldn't start gnuplot.");
       return;
     };
 
@@ -194,7 +194,7 @@ void SIG_ExperimentView::slotExportPostScript() {
 void SIG_ExperimentView::slotShowFitnesscurve() {
   if (theExperiment.experimentHistory.isEmpty())
     {
-      QMessageBox::information( this, "Info", "There is no evolution data to plot.", "OK" );
+      QMessageBox::information( this, "Info", "There is no evolution data to plot.");
       return;
     };
 
@@ -229,7 +229,7 @@ void SIG_ExperimentView::slotShowFitnesscurve() {
   FILE *gnuPlotStdInPipe = popen( "gnuplot -persist -", "w" );
 
   if (gnuPlotStdInPipe==nullptr ) {
-    QMessageBox::warning( this, "Error", "Couldn't start gnuplot.", "OK" );
+    QMessageBox::warning( this, "Error", "Couldn't start gnuplot.");
     return;
   };
 
@@ -261,7 +261,7 @@ void SIG_ExperimentView::slotIntervallChanged(int value) {
     // this is because a new experiment has no path where it is saved
     // so no autosaving can be done
     sliderIntervall->setValue(0);
-    QMessageBox::warning( this, "Error", "You have to save the experiment first.", "OK" );
+    QMessageBox::warning( this, "Error", "You have to save the experiment first.");
   }
 };
 

@@ -207,7 +207,7 @@ void MT_IndividualsWidget::onShow(MT_GPManager *manager, subst_cache *subst)
 		}
 
 	} else
-		QMessageBox::critical(this, "Configure MetaGP System", "Couldn't get randomizer to set/get settings.", "OK");
+		QMessageBox::critical(this, "Configure MetaGP System", "Couldn't get randomizer to set/get settings.");
 }
 
 bool MT_IndividualsWidget::onHide(MT_GPManager *manager, subst_cache *subst)
@@ -307,14 +307,14 @@ void MT_IndividualsWidget::slotImportConstants()
 			if(!found || !count){
 				QMessageBox::information(this, "Load Constants",
 					"Import operation aborted.\n"
-					"The loaded file is not a valid constants file.",	1, 0);
+					"The loaded file is not a valid constants file.");
 			}
 			file.close();
 
 		} else {
 			QMessageBox::critical(this, "Import Constants",
 				"Couldn't open file.\n"
-				"Constants won't be loaded.", 1, 0);
+				"Constants won't be loaded.");
 		}
 	}
 }
@@ -337,7 +337,7 @@ void MT_IndividualsWidget::slotExportConstants()
 		if(!count){
 			QMessageBox::information(this, "Export Constants",
 				"The list contains no constants.\n"
-				"The constants were not saved.", 1, 0);
+				"The constants were not saved.");
 			return;
 		}
 		str << "[constants]\n";
@@ -350,7 +350,7 @@ void MT_IndividualsWidget::slotExportConstants()
 	} else {
 		QMessageBox::critical(this, "Export Constants",
 			"Couldn't open file for writing.\n"
-			"Constants won't be saved.", 1, 0);
+			"Constants won't be saved.");
 	}
 }
 
