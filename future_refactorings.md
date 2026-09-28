@@ -317,13 +317,6 @@ touched, because changing one changes behaviour against the reference binary.
   and `SIG_GPRemoteZORCFitnessFunction`. Decide for each whether it belongs in
   the interface or goes through the new error reporter.
 
-- [ ] **33. Delete the overwrite prompts D35 wants gone,** rather than
-  re-parent them: after a `getSaveFileName` that already asks, in
-  `MT_StatisticsWidget` (item 25 left these for this item),
-  `MT_PopulationWidget`, `MT_IndividualsWidget` and
-  `MT_Controller::slotSaveSetup`. D33 does not say whether deleting a prompt
-  in `MT_Controller` is outside it.
-
 - [ ] **105. Offer an MP4 when recording stops,** if `ffmpeg` is present, at
   the frame rate the frames were taken at, so the movie plays at simulation
   speed. Image formats only; POV-Ray writes scene files. Hook it into

@@ -909,7 +909,17 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-28 — DONE: QMESSAGEBOX BATCH 2, NO DEPRECATED QMESSAGEBOX CALL IS LEFT.** Start here.
+**2026-09-28 — DONE: ITEM 33, NO DOUBLE OVERWRITE QUESTION IS LEFT.** Start here.
+
+- **Changed:** see item 33 in "Done". A sub-agent review found no problem;
+  its two leftovers (three unused `QFile` lines, two doubled blank lines) are
+  fixed.
+- **Baselines:** unchanged.
+- **Gates:** `check.sh` 758 pass, 0 fail; warnings 421. The other four gates
+  are green.
+- **Next:** to be planned with the maintainer.
+
+**2026-09-28 — DONE: QMESSAGEBOX BATCH 2, NO DEPRECATED QMESSAGEBOX CALL IS LEFT.**
 
 - **Changed:** the four prompts with custom labels build a `QMessageBox`
   with standard buttons and relabel them. Disabling MetaGP: Disable =
@@ -6708,6 +6718,15 @@ carried; other items and this file cite them, so they do not change.
   that hides another name, and a text scan of all of `sigel/src` and
   `sigel/include`, `_WINDOWS` branches included, finds no loop variable used
   after its loop.
+
+- [x] **33. SIGEL's own overwrite prompt after the file dialog is gone** —
+  done 2026-09-28, one commit. Ten prompts in `MT_Controller::slotSaveSetup`,
+  `MT_IndividualsWidget::slotExportConstants`, `MT_PopulationWidget::slotExpInd`
+  and `slotSavePop`, and six `MT_StatisticsWidget` exports: Qt's save dialog
+  already asks, so SIGEL asked twice. When SIGEL adds the extension itself and
+  that file exists, it is overwritten without a question, by decision. The
+  prompt in `slotExpInd`'s `.mind` loop stays: those names never reach the
+  file dialog.
 
 - [x] **54. The empty catch blocks log the exception** — done 2026-09-28,
   one commit. The catch around `simulation->start()` in `evalFitness` of the
