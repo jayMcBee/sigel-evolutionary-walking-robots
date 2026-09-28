@@ -346,6 +346,35 @@ touched, because changing one changes behaviour against the reference binary.
   `SIG_SimulationVisualisationWidget::reportRecordedFrames`; its "frames
   written" message could become one combined message and question.
 
+- [ ] **77. A robot checker.** Idea; the name is open. It reads a robot model
+  and its Language Parameters and warns about what will make evolution fail
+  or mislead:
+  - **Joint-limit stability per joint,** `timestep * sqrt(K / I)` and
+    `timestep * damper / I`. From the x86 session on 1.3, not re-measured: a
+    `JOINTLIMITSK_SPRING` of 25000 moved from a one-joint robot onto a
+    three-joint chain put the limit-spring torque above half the drive torque.
+  - **Drive strength against weight,**
+    `maximalforce / (mass * g * half-length)`. Same source: 0.60 to 0.92 in
+    the shipped models, whose masses span 1.2 to 49.
+  - **Drives MOVE cannot reach,** or reaches unevenly. MOVE picks drive
+    `(register value + 2^(w-1)) % number of drives`, w the register width.
+    From reading 1.3's `SIG_Interpreter::interprete` and
+    `SIG_DynaMechsCommandInterface::moveDrive`, as are the next four; the port
+    is expected to match, not checked yet.
+  - **A register width of 1,** which divides a force drive's torque by 0.
+  - **Too few torque levels** for a small register width: a force drive
+    gives `maximalforce * R0 / (2^(w-1) - 1)`.
+  - **`minimalforce` as a dead band:** above the maximum, or large against
+    one torque step.
+  - **Servo drives** that a narrow register cannot turn through their range:
+    the register value is an angle in degrees, so 8 bits reach -128 to 127.
+  - **Reordered drives:** drive numbers are the order in the model, so a
+    change silently changes which joint an evolved program moves.
+  - **Sensors:** SENSE picks from a register value too; the same checks
+    likely apply.
+  To show beside it: every MOVE takes its torque from R0, and a negative
+  register operand wraps (`MOVE -128` with 24 registers reads R8).
+
 ---
 
 ## 8 · GP engine
@@ -385,35 +414,6 @@ problem; the choice is made before any code is written.
   Every shipped experiment starts it at the terrain's corner. Moving it means
   either `STARTPOSITION` in the `.exp` files, a file change, or the terrain's
   place in DynaMechs, a vendor patch. Positions and fitness move with it.
-
-- [ ] **77. A robot checker.** Idea; the name is open. It reads a robot model
-  and its Language Parameters and warns about what will make evolution fail
-  or mislead:
-  - **Joint-limit stability per joint,** `timestep * sqrt(K / I)` and
-    `timestep * damper / I`. From the x86 session on 1.3, not re-measured: a
-    `JOINTLIMITSK_SPRING` of 25000 moved from a one-joint robot onto a
-    three-joint chain put the limit-spring torque above half the drive torque.
-  - **Drive strength against weight,**
-    `maximalforce / (mass * g * half-length)`. Same source: 0.60 to 0.92 in
-    the shipped models, whose masses span 1.2 to 49.
-  - **Drives MOVE cannot reach,** or reaches unevenly. MOVE picks drive
-    `(register value + 2^(w-1)) % number of drives`, w the register width.
-    From reading 1.3's `SIG_Interpreter::interprete` and
-    `SIG_DynaMechsCommandInterface::moveDrive`, as are the next four; the port
-    is expected to match, not checked yet.
-  - **A register width of 1,** which divides a force drive's torque by 0.
-  - **Too few torque levels** for a small register width: a force drive
-    gives `maximalforce * R0 / (2^(w-1) - 1)`.
-  - **`minimalforce` as a dead band:** above the maximum, or large against
-    one torque step.
-  - **Servo drives** that a narrow register cannot turn through their range:
-    the register value is an angle in degrees, so 8 bits reach -128 to 127.
-  - **Reordered drives:** drive numbers are the order in the model, so a
-    change silently changes which joint an evolved program moves.
-  - **Sensors:** SENSE picks from a register value too; the same checks
-    likely apply.
-  To show beside it: every MOVE takes its torque from R0, and a negative
-  register operand wraps (`MOVE -128` with 24 registers reads R8).
 
 - [ ] **81. Add a fitness function that rewards steady walking.** No existing
   function rewards an even pace. Decided so far, preliminary name "Steady
