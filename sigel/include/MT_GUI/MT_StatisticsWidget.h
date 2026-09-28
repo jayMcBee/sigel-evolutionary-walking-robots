@@ -45,6 +45,7 @@ private:
 	void plotEstimation(QString fileName);
 	void plotFitness(QString fileName);
 	void plotSearchEffects(QString fileName);
+	static int safePercentage(double part, int total);
 
 private slots:
 	void slotSigEdit(int nval);

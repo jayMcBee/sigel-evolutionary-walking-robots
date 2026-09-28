@@ -212,9 +212,9 @@ void MT_StatisticsWidget::updateGUI(int mtGen, int sigGen)
 		const double destroyed1 = total1 - el->CrossoverEventParent[1];
 		const double destroyed2 = total2 - el->CrossoverEventParent[3];
 		const double destroyed3 = total3 - el->CrossoverEventParent[5];
-		num1ptXOverDestr->setText(QString::number(static_cast<int>(destroyed1 / total1 * 100.0)));
-		num2ptXOverDestr->setText(QString::number(static_cast<int>(destroyed2 / total2 * 100.0)));
-		num3ptXOverDestr->setText(QString::number(static_cast<int>(destroyed3 / total3 * 100.0)));
+		num1ptXOverDestr->setText(QString::number(safePercentage(destroyed1, total1)));
+		num2ptXOverDestr->setText(QString::number(safePercentage(destroyed2, total2)));
+		num3ptXOverDestr->setText(QString::number(safePercentage(destroyed3, total3)));
 
 		int XOverOffspring = total1+total2+total3;
 		crossovers->setText(QString::number(XOverOffspring));
@@ -222,7 +222,7 @@ void MT_StatisticsWidget::updateGUI(int mtGen, int sigGen)
 		int mutOff = el->NumOfMutateOffspring;
 		mutations->setText(QString::number(mutOff));
 		const double mutationsNotImproving = mutOff - el->NumOfMutateImprovingIndividuals;
-		mutationsDestr->setText(QString::number(static_cast<int>(mutationsNotImproving / mutOff * 100.0)));
+		mutationsDestr->setText(QString::number(safePercentage(mutationsNotImproving, mutOff)));
 		elMutations->setText(QString::number(el->NumOfTotalElementMutation));
 	}
 
@@ -469,9 +469,9 @@ void MT_StatisticsWidget::slotSearchEffectsDButton()
 				<< total1 << " "
 				<< total2 << " "
 				<< total3 << " "
-				<< static_cast<int>(destroyed1 / total1 * 100.0)  << " "
-				<< static_cast<int>(destroyed2 / total2 * 100.0)  << " "
-				<< static_cast<int>(destroyed3 / total3 * 100.0)  << "\n";
+				<< safePercentage(destroyed1, total1)  << " "
+				<< safePercentage(destroyed2, total2)  << " "
+				<< safePercentage(destroyed3, total3)  << "\n";
 		}
 	}
 	file.close();
@@ -674,6 +674,14 @@ void MT_StatisticsWidget::plotFitness(QString fileName)
 #endif
 }
 
+// A total of 0 gives 0 %.
+int MT_StatisticsWidget::safePercentage(double part, int total)
+{
+	if(total == 0)
+		return 0;
+	return static_cast<int>(part / total * 100.0);
+}
+
 void MT_StatisticsWidget::plotSearchEffects(QString fileName)
 {
 #ifdef _WINDOWS
@@ -733,7 +741,7 @@ void MT_StatisticsWidget::plotSearchEffects(QString fileName)
 		if(el){
 			total = el->CrossoverEventParent[0];
 			const double destroyed = total - el->CrossoverEventParent[1];
-			if(el) pipeStream << l << " " << static_cast<int>(destroyed / total * 100.0) << "\n";
+			pipeStream << l << " " << safePercentage(destroyed, total) << "\n";
 		}
 	}
 	pipeStream << "e\n";
@@ -742,7 +750,7 @@ void MT_StatisticsWidget::plotSearchEffects(QString fileName)
 		if(el){
 			total = el->CrossoverEventParent[2];
 			const double destroyed = total - el->CrossoverEventParent[3];
-			if(el) pipeStream << m << " " << static_cast<int>(destroyed / total * 100.0) << "\n";
+			pipeStream << m << " " << safePercentage(destroyed, total) << "\n";
 		}
 	}
 	pipeStream << "e\n";
@@ -751,7 +759,7 @@ void MT_StatisticsWidget::plotSearchEffects(QString fileName)
 		if(el){
 			total = el->CrossoverEventParent[4];
 			const double destroyed = total - el->CrossoverEventParent[5];
-			if(el) pipeStream << n << " " << static_cast<int>(destroyed / total * 100.0) << "\n";
+			pipeStream << n << " " << safePercentage(destroyed, total) << "\n";
 		}
 	}
 	pipeStream << "e\nquit\n";
