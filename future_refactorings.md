@@ -68,7 +68,14 @@ Constructs the language removed. A current compiler rejects them.
   `static_cast`. The pointer casts (downcasts and casts for C APIs) each need
   their own choice of cast. Once the count is zero, add `-Wold-style-cast` to
   `SIGCXX` so no new ones come in. One round: one build, one gate run, one
-  review, one commit.
+  review, one commit.- [ ] **112. Replace magic numbers with `std::numeric_limits` and named
+  constants.** Found 2026-09-28 in `MT_Interpreter::interpret`, which tests
+  for `-2147483648` instead of `std::numeric_limits<int>::min()`, and tests it
+  after negating, when the negation has already overflowed. Review the whole
+  codebase for hard-coded limits and magic numbers that `numeric_limits` or a
+  named constant would make readable and robust. One round: one build, one
+  gate run, one review, one commit.
+
 ---
 
 ## 3 · Ownership
