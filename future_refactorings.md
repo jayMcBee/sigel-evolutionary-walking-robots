@@ -85,7 +85,7 @@ Constructs the language removed. A current compiler rejects them.
 
 ---
 
-## 5 · Renames and translation — after the port is validated
+## 5 · Renames and translation
 
 - [ ] **10. Rename the two `SIG_GPExperiment` variants.**
   `SIG_GPExperiment.cpp` builds `sigel`, `SIG_GPExperimentClean.cpp` builds
