@@ -75,15 +75,6 @@ Constructs the language removed. A current compiler rejects them.
   - Found by item 113's review, both harmless today: `lum` takes
     `abs(INT_MIN)`, and `lui`, `lud` and `lus` take `% SigProLengthOne`, which
     divides by zero for an empty SIGEL program.
-- [ ] **113. MetaGP converts `double` to `int` without a defined result.**
-  Found 2026-09-28. `MT_Interpreter::interpret` converts its `double`
-  variables to `int` for jump targets, `MOD` and the `lui`/`lud`/`lus`
-  lookups. A value out of range or NaN is undefined behaviour: x86 gives
-  `INT_MIN`, ARM64 saturates and gives 0 for NaN. Decided: one member
-  function `MT_Interpreter::toInt(double)` for every such conversion, giving
-  `INT_MIN` for NaN and out-of-range values as x86 does, and truncating
-  otherwise. MetaGP has no known users, so no results depend on it. Next
-  after item 102.
 - [ ] **114. Merge nested `if`s without `else` into `if (A && B)`.** Found
   2026-09-28: about 31 places where an `if` holds only another `if` and
   neither has an `else`, most in MetaGP. `&&` evaluates `B` only when `A`

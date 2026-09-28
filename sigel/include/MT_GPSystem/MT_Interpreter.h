@@ -38,6 +38,9 @@ private:
 	/* count the Number of instruction, which have done */
 	int ProgramCounter;
 
+	/* Converts a variable to int; NaN and values outside int give INT_MIN, as x86 does. */
+	int toInt(double value) const;
+
 
 public:
 	int getVariableNumber();

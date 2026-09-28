@@ -909,7 +909,16 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-28 — DONE: THE BOSS MEMBERS AND TWO TMP LOCALS HAVE REAL NAMES.** Start here.
+**2026-09-28 — DONE: ITEM 113, METAGP'S DOUBLE TO INT CONVERSION IS DEFINED.** Start here.
+
+- **Changed:** details are in item 113's entry in "Done".
+- **Baselines:** unchanged.
+- **Review:** no defects.
+- **Gates:** `check.sh` 758 pass, 0 fail; warnings 471. The other four gates
+  are green.
+- **Next:** to be planned with the maintainer.
+
+**2026-09-28 — DONE: THE BOSS MEMBERS AND TWO TMP LOCALS HAVE REAL NAMES.**
 
 - **Changed:** `MT_MainWindow::boss` became `controller`,
   `MT_PopulationWidget::boss` became `mainWindow`,
@@ -6471,6 +6480,14 @@ carried; other items and this file cite them, so they do not change.
   `expstruct selfcheck`, which tested our tool; the syntax compile of the two
   programs; and `real clicks`, with its `xtest` scenario and
   `xtest-baseline.txt`. `check.sh` gives 757 pass.
+
+- [x] **113. MetaGP converts `double` to `int` with a defined result** —
+  done 2026-09-28, one commit. `MT_Interpreter::toInt(double)` does all 15
+  conversions in `MT_Interpreter::interpret`: the `MOD` operands, the three
+  jumps, and the `lui`, `lud`, `lus` and `lum` lookups. NaN and values
+  outside `int` give `INT_MIN`, as x86 does; ARM64 used to saturate. Other
+  values truncate as before. The jumps' `INT_MIN` test, which comes after an
+  overflowing negation, is item 112's.
 
 - [x] **102. C-style casts became C++ casts** — done 2026-09-28, three
   commits. The 63 `(QObject*)` casts in `connect` and `disconnect` calls

@@ -4,6 +4,9 @@
 
 #include "MT_GPSystem/MT_Interpreter.h"
 
+#include <cmath>
+#include <limits>
+
 //////////////////////////////////////////////////////////////////////
 // Construction/destruction
 //////////////////////////////////////////////////////////////////////
@@ -29,6 +32,21 @@ MT_Interpreter::MT_Interpreter(int VarNum, int TDuration)
 //////////////////////////////////////////////////////////////////////
 // further methods
 //////////////////////////////////////////////////////////////////////
+
+int MT_Interpreter::toInt(double value) const
+{
+	const double lowest = std::numeric_limits<int>::min();
+	const double highest = std::numeric_limits<int>::max();
+
+	const bool outOfRange = std::isnan(value)
+		|| value <= lowest - 1.0
+		|| value >= highest + 1.0;
+
+	if (outOfRange)
+		return std::numeric_limits<int>::min();
+
+	return static_cast<int>(value);
+}
 
 void MT_Interpreter::resetMachine()
 {
@@ -226,11 +244,11 @@ double MT_Interpreter::interpret(MT_TranslatedIndividual *RobProg)
 				if (1 == ((PresentLine->getTargetOperand())->OPType))
 				{
 					Var = (PresentLine->getTargetOperand())->VariableName;
-					Mod2 = Variables[Var];
+					Mod2 = toInt(Variables[Var]);
 
 					if (Mod2 != 0)
 					{
-						Mod1 = Variables[Source];
+						Mod1 = toInt(Variables[Source]);
 
 						if (Mod2 == -1)
 							if (Mod1 == -2147483648)
@@ -241,11 +259,11 @@ double MT_Interpreter::interpret(MT_TranslatedIndividual *RobProg)
 				}
 				else
 				{
-					Mod2 = (PresentLine->getTargetOperand())->Data;
+					Mod2 = toInt((PresentLine->getTargetOperand())->Data);
 					if (Mod2 != 0)
 					{
 
-						Mod1 = Variables[Source];
+						Mod1 = toInt(Variables[Source]);
 
 						if (Mod2 == -1)
 							if (Mod1 == -2147483648)
@@ -340,7 +358,7 @@ double MT_Interpreter::interpret(MT_TranslatedIndividual *RobProg)
 			case jmp:
 			{
 				Source = (PresentLine->getSourceOperand())->VariableName;
-				Mod1 = Variables[Source];
+				Mod1 = toInt(Variables[Source]);
 				ProgramCounter = Mod1;
 
 				if (ProgramCounter < 0)
@@ -359,7 +377,7 @@ double MT_Interpreter::interpret(MT_TranslatedIndividual *RobProg)
 				if (StatusFlagOne == 1)
 				{
 					Source = (PresentLine->getSourceOperand())->VariableName;
-					Mod1 = Variables[Source];
+					Mod1 = toInt(Variables[Source]);
 					ProgramCounter = Mod1;
 
 					if (ProgramCounter < 0)
@@ -382,7 +400,7 @@ double MT_Interpreter::interpret(MT_TranslatedIndividual *RobProg)
 				if (StatusFlagOne == 2)
 				{
 					Source = (PresentLine->getSourceOperand())->VariableName;
-					Mod1 = Variables[Source];
+					Mod1 = toInt(Variables[Source]);
 					ProgramCounter = Mod1;
 
 					if (ProgramCounter < 0)
@@ -417,7 +435,7 @@ double MT_Interpreter::interpret(MT_TranslatedIndividual *RobProg)
 				{
 					Var = (PresentLine->getTargetOperand())->VariableName;
 
-					const int target = static_cast<int>(Variables[Var]);
+					const int target = toInt(Variables[Var]);
 					if (Offset == 0)
 						Mod1 = abs(target % SigProLengthOne);
 					else
@@ -427,7 +445,7 @@ double MT_Interpreter::interpret(MT_TranslatedIndividual *RobProg)
 				}
 				else
 				{
-					const int target = static_cast<int>(PresentLine->getTargetOperand()->Data);
+					const int target = toInt(PresentLine->getTargetOperand()->Data);
 					if (Offset == 0)
 						Mod1 = abs(target % SigProLengthOne);
 					else
@@ -448,7 +466,7 @@ double MT_Interpreter::interpret(MT_TranslatedIndividual *RobProg)
 				{
 					Var = (PresentLine->getTargetOperand())->VariableName;
 
-					const int target = static_cast<int>(Variables[Var]);
+					const int target = toInt(Variables[Var]);
 					if (Offset == 0)
 						Mod1 = abs(target % SigProLengthOne);
 					else
@@ -458,7 +476,7 @@ double MT_Interpreter::interpret(MT_TranslatedIndividual *RobProg)
 				}
 				else
 				{
-					const int target = static_cast<int>(PresentLine->getTargetOperand()->Data);
+					const int target = toInt(PresentLine->getTargetOperand()->Data);
 					if (Offset == 0)
 						Mod1 = abs(target % SigProLengthOne);
 					else
@@ -479,7 +497,7 @@ double MT_Interpreter::interpret(MT_TranslatedIndividual *RobProg)
 				{
 					Var = (PresentLine->getTargetOperand())->VariableName;
 
-					const int target = static_cast<int>(Variables[Var]);
+					const int target = toInt(Variables[Var]);
 					if (Offset == 0)
 						Mod1 = abs(target % SigProLengthOne);
 					else
@@ -489,7 +507,7 @@ double MT_Interpreter::interpret(MT_TranslatedIndividual *RobProg)
 				}
 				else
 				{
-					const int target = static_cast<int>(PresentLine->getTargetOperand()->Data);
+					const int target = toInt(PresentLine->getTargetOperand()->Data);
 					if (Offset == 0)
 						Mod1 = abs(target % SigProLengthOne);
 					else
@@ -511,7 +529,7 @@ double MT_Interpreter::interpret(MT_TranslatedIndividual *RobProg)
 				{
 					Var = (PresentLine->getTargetOperand())->VariableName;
 
-					Mod1 = abs(static_cast<int>(Variables[Var]));
+					Mod1 = abs(toInt(Variables[Var]));
 					Mod1 = Mod1 % 16; // 0 =< Mod1 <16
 
 					if (Offset != 0)
@@ -522,7 +540,7 @@ double MT_Interpreter::interpret(MT_TranslatedIndividual *RobProg)
 				else
 				{
 
-					Mod1 = abs(static_cast<int>(PresentLine->getTargetOperand()->Data));
+					Mod1 = abs(toInt(PresentLine->getTargetOperand()->Data));
 					Mod1 = Mod1 % 16; // 0 =< Mod1 <16
 
 					if (Offset != 0)
