@@ -76,9 +76,6 @@ Constructs the language removed. A current compiler rejects them.
     negating, when the negation has already overflowed; test first.
   - The operand range `32000` (4 places in `SIG_GPOperations` and
     `SIG_ProgramLine`) becomes a named constant.
-  - The `MOD` case in `MT_Interpreter::interpret` guards `INT_MIN % -1` by
-    setting the divisor to 1. `x % -1` is 0 for every `x`, so the case becomes
-    `if (Mod2 == -1)` giving 0, with no `INT_MIN` at all.
   - Found by item 113's review, both harmless today: `lum` takes
     `abs(INT_MIN)`, and `lui`, `lud` and `lus` take `% SigProLengthOne`, which
     divides by zero for an empty SIGEL program.

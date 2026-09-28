@@ -251,10 +251,9 @@ double MT_Interpreter::interpret(MT_TranslatedIndividual *RobProg)
 						Mod1 = toInt(Variables[Source]);
 
 						if (Mod2 == -1)
-							if (Mod1 == std::numeric_limits<int>::min())
-								Mod2 = 1;
-
-						Variables[Source] = Mod1 % Mod2;
+							Variables[Source] = 0; // x % -1 is 0; INT_MIN % -1 overflows
+						else
+							Variables[Source] = Mod1 % Mod2;
 					}
 				}
 				else
@@ -266,10 +265,9 @@ double MT_Interpreter::interpret(MT_TranslatedIndividual *RobProg)
 						Mod1 = toInt(Variables[Source]);
 
 						if (Mod2 == -1)
-							if (Mod1 == std::numeric_limits<int>::min())
-								Mod2 = 1;
-
-						Variables[Source] = Mod1 % Mod2;
+							Variables[Source] = 0; // x % -1 is 0; INT_MIN % -1 overflows
+						else
+							Variables[Source] = Mod1 % Mod2;
 					}
 				}
 

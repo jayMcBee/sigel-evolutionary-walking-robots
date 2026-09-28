@@ -909,7 +909,17 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-28 — DONE: ITEM 112, PART 2, ISVALID USES STD::ISFINITE.** Start here.
+**2026-09-28 — DONE: ITEM 112, PART 3, MOD BY -1 GIVES 0 DIRECTLY.** Start here.
+
+- **Changed:** `MT_Interpreter::interpret`'s `MOD` sets the result to 0 when
+  the divisor is -1 (2 places), instead of changing the divisor to 1 for
+  `INT_MIN`. Integer `x % -1` is 0 for every `x`; `INT_MIN % -1` overflows.
+- **Baselines:** unchanged.
+- **Gates:** `check.sh` 758 pass, 0 fail; warnings 471. The other four gates
+  are green.
+- **Next:** item 112's remaining parts, each its own change.
+
+**2026-09-28 — DONE: ITEM 112, PART 2, ISVALID USES STD::ISFINITE.**
 
 - **Changed:** `SIG_GPFitnessFunction::isValid` is `std::isfinite( value )`
   instead of comparing with `±HUGE_VAL` and itself. Same result for every
