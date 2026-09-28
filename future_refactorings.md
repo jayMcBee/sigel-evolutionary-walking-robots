@@ -412,8 +412,10 @@ problem; the choice is made before any code is written.
 
 ## 9 · Removals
 
-- [ ] **64. Remove what is left of Dynamo.** PORTING.md, "Dynamo removed,
-  DynaMechs kept", has the background.
+- [ ] **64. Remove what is left of Dynamo.** Decided: it goes completely. It
+  was hardly ever used (https://sigel.sourceforge.net/seiten/links_en.html).
+  PORTING.md, "Dynamo removed, DynaMechs kept", has the background. Three
+  parts, one round each, in this order.
   - **The choice of Dynamo in the interface and the model:** the
     "Dynamo  (not recommended)" radio button and the `DynaMo` tabs in
     `SIG_SimulationParameterBase.ui` and `SIG_EnvironmentBase.ui`;
@@ -425,15 +427,17 @@ problem; the choice is made before any code is written.
     `SIG_SimulationCannotSolveException` and the `stopSimulation` flag that
     only Dynamo sets. Today the interface can make
     an experiment the simulation refuses, which is one way into item 20.
-    Dynamo's settings in the `.exp` files (`MAXIMALERROR`,
+  - **Dynamo's settings in the `.exp` files** (`MAXIMALERROR`,
     `MAXIMALITERATIONS`, `SKIPFRAMES`, `ANALYTICAL`, `MAXIMALCOLLISIONLOOPS`,
     `SOLVEMODE`, `INTEGRATOR`, `MAXIMALSOLIDITERATIONS`) are in every shipped
-    experiment, so removing them changes the file format, and the maintainer
-    decides. `SIMULATIONLIBRARY` loses its Dynamo value only. `STEPSIZE`
-    stays: DynaMechs uses it.
+    experiment. Decided: a load reads them and ignores them; a save no longer
+    writes them. `SIMULATIONLIBRARY` loses its Dynamo value only. `STEPSIZE`
+    stays: DynaMechs uses it. **Open:** what a load does with a file whose
+    `SIMULATIONLIBRARY` is Dynamo.
   - **The maths library `libdynalib.a`,** whose `DL_vector` and `DL_matrix`
     SIGEL is built on. PORTING.md, "Follow-up this change deliberately did not
-    take", point 3, has the plan: a small local header in its place.
+    take", point 3, has the plan: a small local header in its place. Assess
+    first; the replacement is expected to be 1:1. The fitness gates prove it.
   Doc comments that name Dynamo go with the code they describe. The comment on
   the guard in `SIG_SimulationVisualisationWidget::visualizeThis` names Dynamo
   too; the guard stays, for `SIG_CannotMirtich`.
