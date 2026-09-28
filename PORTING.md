@@ -909,7 +909,30 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-28 — DONE: UNUSED INCLUDES AND COMMENTED-OUT CODE REMOVED; ITEM 32 CLOSED.** Start here.
+**2026-09-28 — DONE: QMESSAGEBOX BATCH 1, STANDARD BUTTONS INSTEAD OF BUTTON INDEXES.** Start here.
+
+- **Changed:** 49 `QMessageBox` calls leave the overloads Qt 6.2 deprecated,
+  in four commits. The 11 overwrite prompts had their logic inverted: button 0
+  was "OK" and `0 ==` led to `return`, so OK aborted the save and Cancel
+  overwrote the file. They now test `QMessageBox::Ok`, keep Cancel as the
+  default button, and Esc cancels. Switching the MetaGP System, Quit SIGEL and
+  Continue Deletion? use `Yes | No`; their default and Esc buttons are
+  unchanged. 32 notices with a lone "OK" drop the argument, 3 of them in
+  `_WINDOWS` branches. The three texture warnings in `SIG_EnvironmentRenderer`
+  use the current constructor and keep their Retry button.
+- **Checked by hand under gdb:** Quit SIGEL (No, Esc, Yes), Save Configuration
+  (Cancel does not write), Switching the MetaGP System (No, Yes). Each returned
+  the expected constant and took the expected branch.
+- **Baselines:** unchanged.
+- **Gates:** `check.sh` 758 pass, 0 fail; warnings 425, 46 fewer. The other
+  four gates are green on the final tree; each commit compiles on its own.
+- **Next:** batch 2, the four prompts with custom labels: Disabling MetaGP and
+  Loading Experiment in `MT_Controller`, Save Individuals and Import
+  Population in `MT_PopulationWidget`. Each needs a choice of standard button
+  per label, its Esc button and its button order. Item 33 still deletes the
+  overwrite prompts.
+
+**2026-09-28 — DONE: UNUSED INCLUDES AND COMMENTED-OUT CODE REMOVED; ITEM 32 CLOSED.**
 
 - **Changed:** the `<iostream>` includes that item 1 left unused are gone
   from `SIG_GPIndividual.cpp`, `MT_GPManager.cpp` and `SIG_RobotScanner.cpp`.
