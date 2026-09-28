@@ -17,7 +17,7 @@ tests each program in a physics simulator.
   and Wolfgang Banzhaf's research
   ([CLAWAR 2003](http://www.cs.mun.ca/~banzhaf/papers/ZieglerBanzhaf.pdf));
   it cannot currently start on Linux.
-- Running the 1.3 binaries on today's Linux:
+- The original 1.3 binaries still run on today's Linux: see the
   [Quick Guide](verification-against-sigel-1.3/README.txt).
 
 Third-party libraries: see [LIBRARIES.md](LIBRARIES.md).
