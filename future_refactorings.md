@@ -62,23 +62,6 @@ Constructs the language removed. A current compiler rejects them.
   | MT_GPSystem | 17 | SIGEL_Program, SIGEL_SlaveGUI | 3 |
   | SIGEL_CommonGUI | 12 | | |
 
-- [ ] **112. Replace magic numbers with `std::numeric_limits` and named
-  constants.** Found 2026-09-28 in `MT_Interpreter::interpret`, which tests
-  for `-2147483648` instead of `std::numeric_limits<int>::min()`, and tests it
-  after negating, when the negation has already overflowed. Review the whole
-  codebase for hard-coded limits and magic numbers that `numeric_limits` or a
-  named constant would make readable and robust. One round: one build, one
-  gate run, one review, one commit.
-  **Part 1 done 2026-09-28:** the literal `-2147483648` (5 places) and
-  `DBL_MAX` (3 places) are `std::numeric_limits`. A search for other
-  spellings of type limits found none. Left, each its own change:
-  - The three jumps in `MT_Interpreter::interpret` test for `INT_MIN` after
-    negating, when the negation has already overflowed; test first.
-  - The operand range `32000` (4 places in `SIG_GPOperations` and
-    `SIG_ProgramLine`) becomes a named constant.
-  - Found by item 113's review, both harmless today: `lum` takes
-    `abs(INT_MIN)`, and `lui`, `lud` and `lus` take `% SigProLengthOne`, which
-    divides by zero for an empty SIGEL program.
 - [ ] **114. Merge nested `if`s without `else` into `if (A && B)`.** Found
   2026-09-28: about 31 places where an `if` holds only another `if` and
   neither has an `else`, most in MetaGP. `&&` evaluates `B` only when `A`

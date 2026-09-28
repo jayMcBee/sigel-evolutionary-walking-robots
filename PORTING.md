@@ -909,7 +909,17 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-28 — DONE: ITEM 112, PART 3, MOD BY -1 GIVES 0 DIRECTLY.** Start here.
+**2026-09-28 — DONE: ITEM 112, METAGP'S JUMP TARGET CANNOT OVERFLOW. ITEM 112 IS DONE.** Start here.
+
+- **Changed:** `jmp`, `jeq` and `jle` in `MT_Interpreter::interpret` set
+  `ProgramCounter = abs(Mod1 % NumOfInstruction)`. Details are in item 112's
+  entry in "Done".
+- **Baselines:** unchanged.
+- **Gates:** `check.sh` 758 pass, 0 fail; warnings 471. The other four gates
+  are green.
+- **Next:** to be planned with the maintainer.
+
+**2026-09-28 — DONE: ITEM 112, PART 3, MOD BY -1 GIVES 0 DIRECTLY.**
 
 - **Changed:** `MT_Interpreter::interpret`'s `MOD` sets the result to 0 when
   the divisor is -1 (2 places), instead of changing the divisor to 1 for
@@ -6511,6 +6521,17 @@ carried; other items and this file cite them, so they do not change.
   `expstruct selfcheck`, which tested our tool; the syntax compile of the two
   programs; and `real clicks`, with its `xtest` scenario and
   `xtest-baseline.txt`. `check.sh` gives 757 pass.
+
+- [x] **112. Limit literals and the INT_MIN special cases** — done
+  2026-09-28, four commits. `-2147483648` and `DBL_MAX` became
+  `std::numeric_limits`; a search for other spellings of type limits found
+  none. `SIG_GPFitnessFunction::isValid` is `std::isfinite`. MetaGP's `MOD`
+  gives 0 for a divisor of -1 instead of special-casing `INT_MIN`. MetaGP's
+  three jumps compute their target as `abs(Mod1 % NumOfInstruction)`: the
+  old code negated first, which overflows for `INT_MIN`, so the compiler
+  removed its `INT_MIN` test and such a jump crashed. Every other value gives
+  the same target as before; 9,000,099 values were compared. Dropped by
+  decision: a named constant for the operand range `32000`.
 
 - [x] **113. MetaGP converts `double` to `int` with a defined result** —
   done 2026-09-28, one commit. `MT_Interpreter::toInt(double)` does all 15

@@ -357,16 +357,7 @@ double MT_Interpreter::interpret(MT_TranslatedIndividual *RobProg)
 			{
 				Source = (PresentLine->getSourceOperand())->VariableName;
 				Mod1 = toInt(Variables[Source]);
-				ProgramCounter = Mod1;
-
-				if (ProgramCounter < 0)
-				{
-					ProgramCounter = ProgramCounter * -1;
-					if (ProgramCounter == std::numeric_limits<int>::min())
-						ProgramCounter = 0;
-				}
-				if (ProgramCounter >= NumOfInstruction)
-					ProgramCounter = ProgramCounter % NumOfInstruction;
+				ProgramCounter = abs(Mod1 % NumOfInstruction);
 			}
 			break;
 
@@ -376,17 +367,7 @@ double MT_Interpreter::interpret(MT_TranslatedIndividual *RobProg)
 				{
 					Source = (PresentLine->getSourceOperand())->VariableName;
 					Mod1 = toInt(Variables[Source]);
-					ProgramCounter = Mod1;
-
-					if (ProgramCounter < 0)
-					{
-						ProgramCounter = ProgramCounter * -1;
-						if (ProgramCounter == std::numeric_limits<int>::min())
-							ProgramCounter = 0;
-					}
-
-					if (ProgramCounter >= NumOfInstruction)
-						ProgramCounter = ProgramCounter % NumOfInstruction;
+					ProgramCounter = abs(Mod1 % NumOfInstruction);
 				}
 				else
 					ProgramCounter++;
@@ -399,17 +380,7 @@ double MT_Interpreter::interpret(MT_TranslatedIndividual *RobProg)
 				{
 					Source = (PresentLine->getSourceOperand())->VariableName;
 					Mod1 = toInt(Variables[Source]);
-					ProgramCounter = Mod1;
-
-					if (ProgramCounter < 0)
-					{
-						ProgramCounter = ProgramCounter * -1;
-						if (ProgramCounter == std::numeric_limits<int>::min())
-							ProgramCounter = 0;
-					}
-
-					if (ProgramCounter >= NumOfInstruction)
-						ProgramCounter = ProgramCounter % NumOfInstruction;
+					ProgramCounter = abs(Mod1 % NumOfInstruction);
 				}
 				else
 					ProgramCounter++;
