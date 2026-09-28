@@ -41,8 +41,10 @@ Constructs the language removed. A current compiler rejects them.
   Needs tooling rather than an editor, because base headers must parse. The
   failure shape is a missing `const`, or `int` against `long`.
 
-- [ ] **114. Merge nested `if`s without `else` into `if (A && B)`.** Most are
-  in MetaGP. Leave out places with an `else`, and places where `A` and `B`
+- [ ] **114. Merge nested `if`s without `else` into `if (A && B)`.** Only
+  where an `if` holds nothing but another `if` and neither has an `else`; most
+  are in MetaGP. `&&` evaluates `B` only when `A` holds, so the meaning stays
+  the same. Leave out places with an `else`, and places where `A` and `B`
   are unrelated and the nesting reads better. `clang-tidy` has no check for
   it. One round: one build, one gate run, one review, one commit.
 
@@ -59,11 +61,11 @@ Constructs the language removed. A current compiler rejects them.
   NiceWalking and Force fitness functions, once per evaluation; the elements
   of `MT_Statistics`; the list in `MT_PopulationWidget::slotExpInd`.
 
-- [ ] **36. Delete `SIG_Body::usedByLinks` and make
-  `SIG_Material::FrictionValue` a value type.** `usedByLinks` is written and
-  never read. `FrictionValue` values would drop the `new` and the
+- [ ] **36. Delete `SIG_Body::usedByLinks`; `SIG_Material::FrictionValue`
+  could be a value type.** `usedByLinks` is written and never read.
+  `FrictionValue` values would drop the `new` and the
   `qDeleteAll`, as D8 did for `SIG_Register`; tidiness only. D11 left both as
-  they were because the port moved the Qt API and nothing else; that was a
+  they were, by decision, because the port moved the Qt API and nothing else; that was a
   port-scope rule, not a refusal.
 
 ---
@@ -92,7 +94,10 @@ Constructs the language removed. A current compiler rejects them.
   `sigel_slave`; both define the same class and include guard. It has already
   been misread as an accidental duplicate. **The master keeps
   `SIG_GPExperiment`; the slave's gets the new name,** with its own guard.
-  **Move `$(MASTER_OBJ)` with it:** `guidrive` names it and asserts on it.
+  The Makefile globs `src/<module>/*.cpp` and compiles both into
+  `libSIGEL_GP.a`, where 2003 built separate targets.
+  **Move `$(MASTER_OBJ)` with it:** the Makefile defines it as
+  `SIG_GPExperiment.o`, and `guidrive` names it and asserts on it.
   Linking the Clean variant once produced a convincing false crash.
 
 - [ ] **11. Rename `SIG_GPManager::tours` to `tournaments`,** with the doxygen
@@ -107,9 +112,11 @@ Constructs the language removed. A current compiler rejects them.
   files: "Fitness (Elter 1)" and "(Elter 2)" in `addCrossOverInfo`, "CREATED
   NEW INDIVIDUUM" in the constructor, "INDIVIDUUM IS GENERATED RANDOMLY" in
   `generateRandomIndividual`. The shipped experiments hold the "Elter" lines.
-  Nothing reads it back (`SIG_GPIndividual::readFromFile` parses only `NAME='`,
-  `POOLPOS=`, `FITNESS=`, `AGE=` and `PROGRAM BEGIN{`), so no compiler and no
-  check covers a change.
+  **No compiler and no check covers German strings:** every persisted path is
+  write-only. `SIG_GPIndividual::readFromFile` parses only `NAME='`,
+  `POOLPOS=`, `FITNESS=`, `AGE=` and `PROGRAM BEGIN{`; the `MT_GPManager`
+  block sits after that file's own "is not loaded" marker; the ZORC format
+  carries no German.
   These strings are pure ASCII: a check for German must look for words, not
   bytes above 127.
 
@@ -134,18 +141,20 @@ Constructs the language removed. A current compiler rejects them.
   **Umlauts are Latin-1 bytes;** a UTF-8 grep misses them. Comments first,
   because that phase cannot move a baseline.
   **Do not translate `Sigel.mak`, `sigel_slave.mak`, `manage_dyn_slave.mak` or
-  `Sigel.dsw`:** generated, not built here; item 35 deletes them.
+  `Sigel.dsw`:** generated, not built here; item 35 deletes them. Do not
+  hand-edit generated files.
   **Check after each phase:** `./checks/check.sh`, then
   `./checks/dictorder-dump.sh | diff -u checks/baselines/dictorder-baseline.txt -`
   empty, then `./checks/fitness-check.sh` clean.
 
 - [ ] **15. Rename the `act` prefix to `current`.** German `aktuell`; reads as
-  the verb "act". `actExperiment` is done.
+  the verb "act". `actExperiment`, `actExpChanged` and `slotActExpChanged` are
+  done.
   **Settle the scope first.** Most of it is in `SIGEL_GP`, which D33 keeps
   untouched for behaviour; a rename is not behaviour, but it is a large diff
   in a frozen module, so it needs sign-off first.
   A signal or slot breaks its string-based connect if only one side moves;
-  `check.sh` catches that.
+  `check.sh` catches that. No reference file holds these names.
 
 - [ ] **16. Set the version to 2.0** in `SIGEL_Tools/SIG_Version.h` when it
   is time. To discuss: what to do with `sigel/README`, which still says
@@ -169,12 +178,15 @@ touched, because changing one changes behaviour against the reference binary.
 
 - [ ] **118. Check the GP parameters when a file loads.**
   `SIG_GPParameter::readFromFile` accepts any value, including ones the
-  dialog does not allow, such as a minimum length below 5. Hand-edited files
+  dialog does not allow, such as a minimum length below 5; the setters check
+  nothing either, and `TERMINATIONMODEL` and `PRIORITY` are cast from any
+  integer to their enum. Hand-edited files
   are not the concern. To decide: the valid range of each parameter, and
   what a load does with a value outside it.
   **Loaded programs** are not checked either
-  (`SIG_GPPopulation::readFromFile`, `SIG_GPIndividual::readFromFile`). A
-  program shorter than the minimum could be padded with the NOP logic of
+  (`SIG_GPPopulation::readFromFile`, `SIG_GPIndividual::readFromFile`): a
+  program shorter than the minimum or longer than the maximum loads
+  unchanged. A short one could be padded with the NOP logic of
   `SIG_Program::checkLength` and recorded with `addLengthIncreasedInfo`;
   unlikely edge cases, such as a stored fitness after padding, would not be
   handled.
@@ -192,7 +204,8 @@ touched, because changing one changes behaviour against the reference binary.
 - [ ] **20. Stop `renderRecorder` leaking when
   `SIG_SimulationVisualisation`'s constructor throws.** The other half was
   fixed by nulling `visualisation`. Latent: the only caller that catches the
-  throw, `sigel_slave`'s `main`, returns at once. Three fixes, none changes
+  throw, `sigel_slave`'s `main`, returns at once; it becomes live the moment
+  any caller catches the throw and continues. Three fixes, none changes
   behaviour: a `std::unique_ptr` (the destructor must still delete
   `simulation` first, because it holds a reference to the recorder); a
   try/catch that deletes and throws again; or a value member.
@@ -208,12 +221,14 @@ touched, because changing one changes behaviour against the reference binary.
 
 - [ ] **34. Fix `tearDownPvm()`: `pvm_halt()` never returns.** The daemon
   SIGTERMs this process instead. `guidrive` survives that with
-  `keepExitCodeThroughPvmShutdown`, but then reports 0 for any SIGTERM,
-  including a person killing a wedged `guidrive`. A teardown flag, or
-  preserving only a non-zero status, closes it.
+  `keepExitCodeThroughPvmShutdown`.
+  **Open:** once that handler holds a status of 0, the process reports 0 for
+  any SIGTERM, including a person killing a wedged `guidrive`. A teardown
+  flag, or preserving only a non-zero status, closes it.
   **Do not simply delete the call:** it is what stops the daemon this process
   started; dropping it left `pvmd3` and its slaves running. With a daemon
-  already up there is no halt and no problem. Matters before `check.sh` ever
+  already up there is no halt and no problem. No stray `pvmd3` survives PVM's
+  own shutdown, so today's behaviour is safe, only untidy. Matters before `check.sh` ever
   runs a PVM scenario.
   *Any printf on an early-return path here is lost unless it flushes itself.*
   **Closing `sigel` with SIGTERM does not end it either:** in the one
@@ -224,16 +239,19 @@ touched, because changing one changes behaviour against the reference binary.
   `SIG_Environment::generateTerrain` and DynaMechs'
   `dmEnvironment::loadTerrainData` disagree on row order, so a floor whose X
   and Z sizes differ is misread. Physics and drawing agree, and no shipped
-  experiment sets `FLOORDIMENSION`. A fix changes physics for such floors.
+  experiment sets `FLOORDIMENSION`. A fix changes physics for asymmetric or
+  non-square floors.
 
 - [ ] **73. Fix the latent sensor bugs in
-  `SIG_DynaMechsSimulationQueries::sense`:** a joint with equal limits reads
-  NaN; pitch at 90° or more reads as 1, and `acos`/`asin` get no clamp; with
-  no contact model an uninitialised value is loaded. No shipped robot triggers
+  `SIG_DynaMechsSimulationQueries::sense`:** a joint with equal limits, or
+  limits that normalise to the same angle (0/360, -180/180), reads NaN; pitch
+  at 90° or more reads as 1, and `acos`/`asin` get no clamp; with no contact
+  model, or on the `default:` branch, an uninitialised value is loaded. No shipped robot triggers
   any of them.
 
 - [ ] **74. Decide when to give up on a timed-out individual.**
-  `SIG_GPFitnessTrainer::checkTask` re-spawns it for ever, as 1.0 did; on one
+  `SIG_GPFitnessTrainer::checkTask` re-spawns it for ever, as 1.0 did, and
+  the probe-error branch does the same; on one
   machine it will likely time out every time, and the generation does not
   end. The shipped experiments set 0, 10 or 30 minutes. To decide: when to
   give up, and what score it then gets.
@@ -263,7 +281,8 @@ touched, because changing one changes behaviour against the reference binary.
   - **Time to simulate under 1 s:** the simulated fitness functions divide by
     the run time in whole seconds, which gives `inf`, or `NaN` for a robot
     that does not move. What the GP does with that is not measured.
-  - **Step size of 0 or less:** item 104.
+  - **Step size of 0 or less:** item 104. What a negative step does is not
+    measured.
   **Where to refuse, not decided:** (1) a range on the field, which stops
   typing only; (2) on load, in `SIG_SimulationParameters`, like item 71, but
   any load error kills the interface until item 88 is done; (3) when a run
@@ -285,9 +304,10 @@ touched, because changing one changes behaviour against the reference binary.
   name is unique per process, but `MT_Controller` runs an evolution on its own
   thread.
 
-- [ ] **52. Set `mode` in `SIG_Drive`'s stream constructor for an unknown
-  word.** It is left unset, and `writeToFileTransfer` then writes
-  `invalid_mode`. Only transfer text can bring an unknown word in; the robot
+- [ ] **52. `SIG_Drive`'s stream constructor can leave `mode` unset.** For
+  an unknown word it is left unset, and `writeToFileTransfer` then writes
+  `invalid_mode`, unless the unset value happens to equal a known one. Only
+  transfer text can bring an unknown word in; the robot
   compiler rejects it.
 
 - [ ] **54. Review the empty catch blocks in a round of their own:** the ones
@@ -297,11 +317,12 @@ touched, because changing one changes behaviour against the reference binary.
   experiments, so a change can move fitness values against 1.3. Each site
   needs its own decision.
 
-- [ ] **55. Make the marker checks that do nothing throw. Review with item
-  54.** The stream constructors of `SIG_Geometry`, `SIG_Polygon` and
+- [ ] **55. Review the marker checks that do nothing, with item 54.** The
+  stream constructors of `SIG_Geometry`, `SIG_Polygon` and
   `SIG_CommandParameters` hold only `// ERROR` and read on; `SIG_Robot` and
-  `SIG_LanguageParameters` already throw `SIG_UnstreamingError`. Valid files
-  are not affected. The other empty bodies go in the same round:
+  `SIG_LanguageParameters` already throw `SIG_UnstreamingError`. Throwing
+  would make a malformed transfer text fail at once; valid files are not
+  affected. The other empty bodies go in the same round:
   `if (running) {} else {}` in the `MT_*Widget.cpp` files, empty `else {}` in
   `SIG_GPIndividual.cpp` and `SIG_GPPopulation.cpp`, and `SIG_Robot`'s
   `if (isroot)`, "Something seems to be missing here".
@@ -311,10 +332,13 @@ touched, because changing one changes behaviour against the reference binary.
 ## 7 · The interface
 
 - [ ] **107. Review `SIG_GPPopulation::readFromFile` with the maintainer,**
-  deciding each change before it is made.
+  deciding each change before it is made. The method is long and hard to
+  read.
 
 - [ ] **106. Review `SIG_GPParameter.cpp` with the maintainer,** method by
-  method, deciding each change before it is made.
+  method, deciding each change before it is made. The GP Parameters page is
+  hard to read: long methods, commented-out code, and porting comments that
+  hide the logic of the method they sit in.
 
 - [ ] **29. Give SIGEL a real logging system.** Qt 6's `QTextStream` does not
   flush on a newline, so diagnostics written through `SIG_IO` are lost when
@@ -359,8 +383,8 @@ touched, because changing one changes behaviour against the reference binary.
   - **Drives MOVE cannot reach,** or reaches unevenly. MOVE picks drive
     `(register value + 2^(w-1)) % number of drives`, w the register width.
     From reading 1.3's `SIG_Interpreter::interprete` and
-    `SIG_DynaMechsCommandInterface::moveDrive`, as are the next four; the port
-    is expected to match, not checked yet.
+    `SIG_DynaMechsCommandInterface::moveDrive`, as are the rest of this list;
+    the port is expected to match, not checked yet.
   - **A register width of 1,** which divides a force drive's torque by 0.
   - **Too few torque levels** for a small register width: a force drive
     gives `maximalforce * R0 / (2^(w-1) - 1)`.
@@ -371,7 +395,7 @@ touched, because changing one changes behaviour against the reference binary.
   - **Reordered drives:** drive numbers are the order in the model, so a
     change silently changes which joint an evolved program moves.
   - **Sensors:** SENSE picks from a register value too; the same checks
-    likely apply.
+    likely apply. Not read yet.
   To show beside it: every MOVE takes its torque from R0, and a negative
   register operand wraps (`MOVE -128` with 24 registers reads R8).
 
@@ -386,17 +410,18 @@ problem; the choice is made before any code is written.
 
 - [ ] **115. Give the robot language conditionals that survive evolution.**
   `CMP a,b` sets one flag to `a <= b`; `JMP n` jumps `n` lines when it is set.
-  There is no unconditional jump and no jump on equality. `JMP`'s distance is almost always larger than the program, so any inserted
-  or deleted line moves every jump target, and a useful branch is rarely
+  There is no unconditional jump and no jump on equality. `JMP`'s distance is
+  almost always larger than the program, so any inserted or deleted line
+  moves every jump target, and a useful branch is rarely
   passed on intact. Candidates from linear GP: an instruction that skips the
   next line or a block when a condition fails. New commands change
   `LanguageParameters` and the experiment files.
 
 - [ ] **116. Let drives hold a torque until the program changes it.**
   `SIG_DynaMechsCommandInterface::moveDrive` applies the torque from R0 for
-  the `MOVE` duration, then the drive goes limp. Tristar sets 0.001 s, so every
-  `MOVE` acts for a single 10 ms step, so few joints carry load at the same time. Either two
-  commands, start and stop, or one command with a duration operand. New
+  the `MOVE` duration, then the drive goes limp. Tristar sets 0.001 s, so
+  every `MOVE` acts for a single 10 ms step, and few joints carry load at the
+  same time. Either two commands, start and stop, or one command with a duration operand. New
   commands change `LanguageParameters` and the experiment files.
 
 - [ ] **117. Let mutation tune operands in steps.**
@@ -458,12 +483,13 @@ problem; the choice is made before any code is written.
   - **The maths library `libdynalib.a`,** whose `DL_vector` and `DL_matrix`
     SIGEL is built on. PORTING.md, "Follow-up this change deliberately did not
     take", point 3, has the plan: a small local header in its place.
-  Doc comments that name Dynamo go with the code they describe. The guard in
-  `SIG_SimulationVisualisationWidget::visualizeThis` stays, for
-  `SIG_CannotMirtich`.
+  Doc comments that name Dynamo go with the code they describe. The comment on
+  the guard in `SIG_SimulationVisualisationWidget::visualizeThis` names Dynamo
+  too; the guard stays, for `SIG_CannotMirtich`.
 
 - [ ] **83. Put ZORC support behind a compile-time switch, off by default.**
-  Decided. One global `#define` removes `SIG_GPRemoteZORCFitnessFunction`, its
+  Decided. ZORC is a real robot driven over a serial line; the simulation does
+  not need it. One global `#define` removes `SIG_GPRemoteZORCFitnessFunction`, its
   branches in `sigel_slave.cpp`, and the "Remote ZORC" combo box entry,
   handled like item 82's index shift. Not ZORC:
   `SIG_GPAdaptiveWalkingFitnessFunction`, stored as
@@ -471,9 +497,10 @@ problem; the choice is made before any code is written.
   (the `Makefile` or a header), and what an experiment file naming
   "RemoteZORCFitnessFunction" does when the switch is off.
 
-- [ ] **47. Modernise `sigelDynClient` and build `manage_dyn_slave`.**
+- [ ] **47. `sigelDynClient` and `manage_dyn_slave`.**
   `sigelDynClient` makes a second machine a dynamic slave of `sigel -de`. It
-  is still 1.3's Solaris `tcsh` script with placeholder paths.
+  is still 1.3's Solaris `tcsh` script with placeholder paths, and it runs
+  `manage_dyn_slave`, which 1.3 built and the port does not.
   **Modernise in place, do not replace.** It needs a second machine to prove
   it on; the 1.3 reference machine is not ours to use for tooling, so it waits
   until there is one.
