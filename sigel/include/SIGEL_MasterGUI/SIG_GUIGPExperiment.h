@@ -112,8 +112,7 @@ namespace SIGEL_MasterGUI
 	/**
 	 * Writes every parameter page into the experiment.
 	 *
-	 * DOES NOTHING WHILE AN EVOLUTION IS RUNNING -- a deliberate deviation from
-	 * SIGEL 1.3. See SIG_GUIGPExperiment.cpp, putAllIntoExperiment.
+	 * Does nothing while an evolution is running.
 	 */
 	void putAllIntoExperiment();
       

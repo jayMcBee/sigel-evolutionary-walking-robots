@@ -728,13 +728,7 @@ void MT_StatisticsWidget::plotSearchEffects(QString fileName)
 	pipeStream << "e\n";
 
 	int total=0;
-	// PRE-STANDARD for-SCOPING, PRESERVED. `l' outlived this loop in 2003 and
-	// the two loops further down print it instead of their own index, so
-	// the 5th and 6th gnuplot datasets ('2pt destr.' and '3pt destr.') get a
-	// constant x of metaGens rather than the
-	// generation number. That is a defect and it is reproduced, not fixed.
-	int l;
-	for(l=0; l<metaGens; l++){
+	for(int l=0; l<metaGens; l++){
 		el = stat->getStatisticElement(l);
 		if(el){
 			total = el->CrossoverEventParent[0];
@@ -748,7 +742,7 @@ void MT_StatisticsWidget::plotSearchEffects(QString fileName)
 		if(el){
 			total = el->CrossoverEventParent[2];
 			const double destroyed = total - el->CrossoverEventParent[3];
-			if(el) pipeStream << l << " " << static_cast<int>(destroyed / total * 100.0) << "\n";
+			if(el) pipeStream << m << " " << static_cast<int>(destroyed / total * 100.0) << "\n";
 		}
 	}
 	pipeStream << "e\n";
@@ -757,7 +751,7 @@ void MT_StatisticsWidget::plotSearchEffects(QString fileName)
 		if(el){
 			total = el->CrossoverEventParent[4];
 			const double destroyed = total - el->CrossoverEventParent[5];
-			if(el) pipeStream << l << " " << static_cast<int>(destroyed / total * 100.0) << "\n";
+			if(el) pipeStream << n << " " << static_cast<int>(destroyed / total * 100.0) << "\n";
 		}
 	}
 	pipeStream << "e\nquit\n";

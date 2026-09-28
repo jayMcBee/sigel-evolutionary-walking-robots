@@ -41,9 +41,7 @@ languageP(languageP)
 SIGEL_GP::SIG_GPTournament::~SIG_GPTournament()
 {
   // This class owns the tournament individuals its subclasses build, and frees
-  // them here. In 1.3, setAutoDelete(true) made ~QVector the free; it freed
-  // nothing else, because the three resizes only grow and every insert
-  // lands on a null slot.
+  // them here.
   qDeleteAll( indis );
   indis.clear();
 };

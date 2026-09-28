@@ -104,11 +104,11 @@ void SIGEL_Simulation::SIG_Simulation::start()
   recorder.finish();
   }
   catch (SIGEL_Simulation::SIG_SimulationCannotSolveException &) {
-    throw;                     // the one type the 2003 specification allowed
+    throw;                     // the one type this function lets through
   }
   catch (...) {
-    // Anything else reached terminate() in 2003. Preserved deliberately: the
-    // alternative is a fitness function silently scoring a partial run.
+    // Anything else terminates, deliberately: the alternative is a fitness
+    // function silently scoring a partial run.
     std::terminate();
   }
 };
@@ -141,11 +141,11 @@ void SIGEL_Simulation::SIG_Simulation::makeTimeSteps(int numTimeSteps)
     };
   }
   catch (SIGEL_Simulation::SIG_SimulationCannotSolveException &) {
-    throw;                     // the one type the 2003 specification allowed
+    throw;                     // the one type this function lets through
   }
   catch (...) {
-    // Anything else reached terminate() in 2003. Preserved deliberately: the
-    // alternative is a fitness function silently scoring a partial run.
+    // Anything else terminates, deliberately: the alternative is a fitness
+    // function silently scoring a partial run.
     std::terminate();
   }
 };

@@ -163,9 +163,6 @@ double SIGEL_GP::SIG_GPForceFitnessFunction::evalFitness( SIGEL_Program::SIG_Pro
 
   // now we have to clean up the memory
   // the forces-Array are created with "new" in dmArticulation::getForces()
-  // 1.3 used a do-while that dereferenced before testing, so an evaluation that
-  // recorded no frames dereferenced null here. With frames present the behaviour
-  // is identical; with none this is a no-op.
   for (vector<double*> *usedForceLoes : recorder.listForces) {
     for (unsigned int i=0; i<usedForceLoes->size(); ++i)
       delete[] (*usedForceLoes)[i];

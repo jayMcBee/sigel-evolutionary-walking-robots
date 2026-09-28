@@ -675,11 +675,6 @@ SIG_MainWindow::SIG_MainWindow( QWidget * parent, const char * name, Qt::WindowF
   mtChoiceTypeActionGroup->setEnabled(false);
   QObject::connect(mtChoiceTypeActionGroup, SIGNAL( triggered( QAction * ) ), SLOT( slotMTSwitchSystem(QAction*) ));
 
-  // DELIBERATE DIVERGENCE FROM 1.3. 1.3 put a second "A&bout" here, on the
-  // MetaGP menu, wired to the SAME slotAbout() as Help > About and opening the
-  // identical SIG_InfoBox. It is left out on purpose. The separator before
-  // it is left out too, or the menu would end on one.
-
   noExperimentActions.append( mtUseAction );
 
   // The four MetaGP actions change MetaGP state, which is a run

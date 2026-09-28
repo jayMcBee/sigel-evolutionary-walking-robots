@@ -45,9 +45,8 @@ namespace SIGEL_GP
   {
     qDeleteAll( positions );   positions.clear();
     qDeleteAll( rotations );   rotations.clear();
-    // listForces is NOT freed here and never was, even in 1.3: the force
-    // vectors belong to SIG_GPForceFitnessFunction, which frees them at the
-    // end of its evaluation.
+    // listForces is not freed here: the force vectors belong to
+    // SIG_GPForceFitnessFunction, which frees them at the end of its evaluation.
     listForces.clear();
   };
 

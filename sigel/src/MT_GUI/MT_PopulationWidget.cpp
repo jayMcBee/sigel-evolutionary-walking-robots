@@ -421,11 +421,7 @@ void MT_PopulationWidget::slotExpInd()
 					return;
 				if(file.open(QIODevice::WriteOnly)){
 					QTextStream str(&file);
-					// PRESERVED DEFECT: current() is the QPtrList cursor, which
-					// this loop never advances -- append() left it on the LAST
-					// selected item, so 1.3 writes that same individual into
-					// every one of the N files. last() reproduces it exactly.
-					population->getIndividual(list->last()->getPos())->writeToFileIndi(str);
+					population->getIndividual(list->at(i)->getPos())->writeToFileIndi(str);
 					file.close();
 				} else {
 					QMessageBox::critical(this, "Save Individual", "An error occurred while saving the individual.\nThe operation is aborted.", "OK");

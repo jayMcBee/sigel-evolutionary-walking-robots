@@ -909,7 +909,31 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-28 — DONE: ITEM 114, NESTED IFS WITHOUT ELSE MERGED. ITEM 114 IS DONE.** Start here.
+**2026-09-28 — DONE: COMMENTS SAY WHAT THE CODE DOES NOW, NOT ITS HISTORY.** Start here.
+
+- **Changed:** 13 comments that named 1.3, "2003" or "preserved" were
+  reviewed. Six keep their fact and lose the history:
+  `SIG_DynaMechsSimulationData`'s destructor,
+  `SIG_GUIGPExperiment::putAllIntoExperiment`, the destructors of
+  `SIG_GPFullDataRecorder` and `SIG_GPTournament`, and
+  `SIG_Simulation::start` and `makeTimeSteps`. Two are deleted: the old loop
+  in `SIG_GPForceFitnessFunction::evalFitness` and a menu entry that
+  `SIG_MainWindow` does not have. The ones in `MT_AddConstantsWidget` and
+  `SIG_ExperimentListView` describe Qt today and stay.
+- **Fixed:** `MT_PopulationWidget::slotExpInd` writes each selected
+  individual into its own file, not the last one into all of them.
+  `MT_StatisticsWidget::plotSearchEffects` gives the fifth and sixth gnuplot
+  datasets their generation number as x, not a constant.
+- **Baselines:** unchanged; no check reaches either fix.
+- **Review:** no defects. It found three that were there before: the file
+  names in `slotExpInd` grow with every file; the list in `slotExpInd` leaks
+  (item 8); `plotSearchEffects` divides by a total that can be 0 and converts
+  the result to `int`.
+- **Gates:** `check.sh` 758 pass, 0 fail; warnings 471. The other four gates
+  are green.
+- **Next:** the maintainer decides on the file names and the division by 0.
+
+**2026-09-28 — DONE: ITEM 114, NESTED IFS WITHOUT ELSE MERGED. ITEM 114 IS DONE.**
 
 - **Found:** 28 places where an `if` holds only another `if` and neither has
   an `else`. Two more hits were the `#ifdef _WINDOWS` / `#else` pair of one
@@ -935,9 +959,7 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 - **Review:** no defects, over all four parts.
 - **Gates after each part:** `check.sh` 758 pass, 0 fail; warnings 471. The
   other four gates are green.
-- **Next:** comments that tell the port's history, such as the "PRESERVED
-  DEFECT" note in `MT_PopulationWidget::slotExpInd`, are to be discussed with
-  the maintainer.
+- **Next:** comments that tell the port's history.
 
 **2026-09-28 — DONE: ITEM 111, THE MINIMUM PROGRAM LENGTH IS AT LEAST 5 IN THE DIALOG. ITEM 111 IS DONE.**
 
