@@ -918,7 +918,8 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 - **Baselines:** unchanged.
 - **Gates:** `check.sh` 758 pass, 0 fail; warnings 471. The other four gates
   are green, after each commit.
-- **Next:** to be planned with the maintainer.
+- **Next:** item 64, part 1, in a new session; the item holds the decisions
+  and the one open question.
 
 **2026-09-28 — DONE: ITEM 1, THE PRE-STANDARD HEADERS ARE REPLACED; ITEM 3 WAS ALREADY DONE.**
 
