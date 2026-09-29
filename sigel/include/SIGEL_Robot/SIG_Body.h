@@ -32,7 +32,6 @@ namespace SIGEL_Robot { class SIG_Body; }
 #include <pointvector.h>
 #include <matrix.h>
 #include "SIGEL_Robot/SIG_Robot.h"
-#include "SIGEL_Robot/SIG_Link.h"
 #include "SIGEL_Robot/SIG_Geometry.h"
 
 namespace SIGEL_Robot
