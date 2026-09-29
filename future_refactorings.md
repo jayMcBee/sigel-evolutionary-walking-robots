@@ -513,6 +513,24 @@ problem; the choice is made before any code is written.
     project files. PORTING.md pins that total in §7's per-step exit criterion
     and in the check list, and §7's trail records each step. Move all of them
     in the same commit.
+  - **A trial run was made on 2026-09-28 and is held uncommitted.** A script
+    resolved every group; `check.sh` passed. The open points it raised:
+    - **The object file cannot stay identical.** Removed lines move
+      `__LINE__` in `throw`s and the `"file:line"` text Qt's `SIGNAL` and
+      `SLOT` store. The proof is two builds: first with removed lines left
+      blank, which must match byte for byte outside the debug information,
+      then with the blanks gone, which may differ in line numbers only.
+    - **Groups with no `#else`** go completely. The item's "keeping the
+      `#else` half" does not cover them.
+    - **The `AFX_…_INCLUDED_` names are the include guards themselves.**
+      Decide their new names; the trial used the tree's `DIR_FILE_H` form.
+    - **The MSVC class-wizard banners** (`// X.h: interface for class X.` and
+      its `////` rule) and the "Added from the class view" comments: decide
+      whether they go.
+    - **Docs that still name the Visual Studio files:** §5's `Sigel.mak`
+      item and PORTING.md's log entries.
+    - **The order:** the trial ran before the other items in this section.
+      Decide whether the item waits or goes now.
   **Do not mix it with any other change. When:** after every other item in
   this section, because it touches the whole codebase.
 
