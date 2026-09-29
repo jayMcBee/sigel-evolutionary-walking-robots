@@ -44,6 +44,7 @@ SIG_MovieSettingsDialog::SIG_MovieSettingsDialog( QWidget *view, double stepSize
       stepSize( stepSize )
 {
 	textlabelFrameFit->setForegroundRole( QPalette::PlaceholderText );
+	textlabelMovieLength->setForegroundRole( QPalette::PlaceholderText );
 	textlabelFrameTiming->setForegroundRole( QPalette::PlaceholderText );
 
 	// A maximised window keeps its size, so the resize would do nothing.
@@ -58,12 +59,17 @@ SIG_MovieSettingsDialog::SIG_MovieSettingsDialog( QWidget *view, double stepSize
 	connect( pushbuttonViewSizeToMovie, SIGNAL( clicked() ), this, SLOT( slotViewSizeToMovie() ) );
 	connect( pushbuttonResizeViewToMatch, SIGNAL( clicked() ), this, SLOT( slotResizeViewToMatch() ) );
 	connect( spinboxFrameRate, SIGNAL( valueChanged(int) ), this, SLOT( slotUpdateFrameTiming() ) );
+	connect( spinboxFrameRate, SIGNAL( valueChanged(int) ), this, SLOT( slotUpdateMovieLength() ) );
+	connect( spinboxMaxFrames, SIGNAL( valueChanged(int) ), this, SLOT( slotUpdateMovieLength() ) );
+	connect( pushbutton720p, &QPushButton::clicked, this, [this]() { setOutputSize( 1280, 720 ); } );
+	connect( pushbutton1080p, &QPushButton::clicked, this, [this]() { setOutputSize( 1920, 1080 ); } );
 
 	// The window manager resizes the window later, so the labels follow
 	// the view's own resize events.
 	view->installEventFilter( this );
 	slotUpdateSizeLabels();
 	slotUpdateFrameTiming();
+	slotUpdateMovieLength();
 };
 
 void SIG_MovieSettingsDialog::setSettings( SIG_MovieSettings const &settings )
@@ -156,13 +162,29 @@ void SIG_MovieSettingsDialog::slotUpdateFrameTiming()
     textlabelFrameTiming->setText( QString( "The simulation makes %1 steps per simulated second, so the movie gets at most %1 frames per simulated second." ).arg( stepsPerSecond, 0, 'g', 4 ) );
   else
     textlabelFrameTiming->clear();
+
+  // An empty line would leave a gap between the two rows.
+  textlabelFrameTiming->setVisible( !textlabelFrameTiming->text().isEmpty() );
+};
+
+void SIG_MovieSettingsDialog::setOutputSize( int width, int height )
+{
+  spinboxWidth->setValue( width );
+  spinboxHeight->setValue( height );
+};
+
+// Shows how long the movie is at most, played at the frame rate.
+void SIG_MovieSettingsDialog::slotUpdateMovieLength()
+{
+  int seconds = qRound( double( spinboxMaxFrames->value() ) / spinboxFrameRate->value() );
+
+  textlabelMovieLength->setText( QString( "(Max. length of %1 min %2 s)" ).arg( seconds / 60 ).arg( seconds % 60 ) );
 };
 
 void SIG_MovieSettingsDialog::slotViewSizeToMovie()
 {
   QSize current = viewSize();
-  spinboxWidth->setValue( current.width() );
-  spinboxHeight->setValue( current.height() );
+  setOutputSize( current.width(), current.height() );
 };
 
 /*

@@ -50,12 +50,18 @@ private slots:
     void slotViewSizeToMovie();
     void slotResizeViewToMatch();
     void slotUpdateFrameTiming();
+    void slotUpdateMovieLength();
 
 private:
     /**
      * The view's size in framebuffer pixels, the pixels a frame is copied from.
      */
     QSize viewSize() const;
+
+    /**
+     * Fills the two output size spin boxes.
+     */
+    void setOutputSize( int width, int height );
 
     QWidget *view;
 

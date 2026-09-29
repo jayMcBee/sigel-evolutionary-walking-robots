@@ -909,7 +909,27 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-29 — DONE: THE SIMULATION TIME SHOWS TENTHS OF A SECOND.** Start here.
+**2026-09-29 — DONE: THE MOVIE SETTINGS DIALOG IS TIDIED.** Start here.
+
+- **Changed, in `SIG_MovieSettingsDialogBase.ui` and `SIG_MovieSettingsDialog`:**
+  two buttons, "720p (1280 × 720)" and "1080p (1920 × 1080)", fill in the
+  output size through the new `setOutputSize`; "View Size to Movie" uses it
+  too. The dialog sizes itself; the fixed 600 x 450 cut the second line of
+  the fit note. The frame timing warning is hidden while empty, so the two
+  frame rate rows sit together. A new line, `textlabelMovieLength`, shows
+  the longest movie, "(Max. length of 0 min 40 s)", right-aligned with the
+  spin boxes. Every spacing is 8, where it was 6, and "Frame size" is three
+  blocks, 20 px apart: the size entries, the view size and fit note, the
+  two action buttons. Checked on the desktop.
+- **Found:** "Resize View to Match" works now. It never reached a 576 px
+  view before, because the window's minimum height of 839 was above the
+  736 it needs; the reorganised panel lowered it to 686. It still cannot
+  reach a view below about 526 px high, so 480p is out of reach.
+- **Review:** no defect.
+- **Gates:** `check.sh` 754 pass, 0 fail; warnings 412.
+- **Next:** item 105, the MP4.
+
+**2026-09-29 — DONE: THE SIMULATION TIME SHOWS TENTHS OF A SECOND.**
 
 - **Changed:** `signalSimulationProgress` and
   `SIG_SimulationWidget::slotSetSimulationTime` carry the exact simulated
