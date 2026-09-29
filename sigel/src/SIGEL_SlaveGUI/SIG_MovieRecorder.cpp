@@ -29,6 +29,8 @@
 #include <QDir>
 #include <QPainter>
 
+#include <cmath>
+
 namespace SIGEL_SlaveGUI
 {
 
@@ -36,6 +38,8 @@ namespace SIGEL_SlaveGUI
     : settings(),
       recording( false ),
       framesRecorded( 0 ),
+      recordingStartSeconds( 0.0 ),
+      nextFrame( 0 ),
       lastFileName()
   {
   };
@@ -45,14 +49,29 @@ namespace SIGEL_SlaveGUI
     settings = newSettings;
   };
 
-  void SIG_MovieRecorder::setRecording( bool newRecording )
+  void SIG_MovieRecorder::startRecordingAt( double simulationSeconds )
   {
-    recording = newRecording;
+    recording = true;
+    recordingStartSeconds = simulationSeconds;
+    nextFrame = 0;
   };
 
-  bool SIG_MovieRecorder::writeImage( QImage const &view )
+  void SIG_MovieRecorder::stopRecording()
   {
-    startFrame();
+    recording = false;
+  };
+
+  bool SIG_MovieRecorder::needsToRecordFrameAt( double simulationSeconds ) const
+  {
+    if ( !recording || framesRecorded >= settings.maxFrames )
+      return false;
+
+    return framePosition( simulationSeconds ) >= nextFrame;
+  };
+
+  bool SIG_MovieRecorder::writeImage( QImage const &view, double simulationSeconds )
+  {
+    startFrame( simulationSeconds );
 
     if ( view.isNull() )
       return false;
@@ -75,9 +94,9 @@ namespace SIGEL_SlaveGUI
 		       settings.quality );
   };
 
-  bool SIG_MovieRecorder::writePovray( SIGEL_Visualisation::SIG_SimulationVisualisation &visualisation )
+  bool SIG_MovieRecorder::writePovray( SIGEL_Visualisation::SIG_SimulationVisualisation &visualisation, double simulationSeconds )
   {
-    startFrame();
+    startFrame( simulationSeconds );
 
     return visualisation.exportToPovray( settings.filePrefix + ".inc",
 					 lastFileName );
@@ -109,14 +128,23 @@ namespace SIGEL_SlaveGUI
     return settings.directory + settings.filePrefix + number + "." + settings.format;
   };
 
-  void SIG_MovieRecorder::startFrame()
+  void SIG_MovieRecorder::startFrame( double simulationSeconds )
   {
     lastFileName = nextFrameFileName();
     framesRecorded++;
+    // Frames a Fast Forward jumped over are skipped, not caught up.
+    nextFrame = static_cast< int >( std::floor( framePosition( simulationSeconds ) ) ) + 1;
 #ifdef SIG_DEBUG
     SIGEL_Tools::SIG_IO::cerr << "Writing " << lastFileName << " in format " << settings.width << " x " << settings.height << " in quality " << settings.quality << "." << Qt::endl;
 #endif
     makeDirectory();
+  };
+
+  double SIG_MovieRecorder::framePosition( double simulationSeconds ) const
+  {
+    // A step exactly on a frame time can come out a hair below it; the small
+    // addition keeps that frame on this step.
+    return ( simulationSeconds - recordingStartSeconds ) * settings.frameRate + 1e-6;
   };
 
   void SIG_MovieRecorder::makeDirectory() const

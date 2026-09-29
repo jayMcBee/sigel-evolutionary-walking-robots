@@ -37,8 +37,8 @@ namespace SIGEL_SlaveGUI
 {
 
   /**
-   * Writes the frames of a movie of the simulation: images or POV-Ray
-   * scene files, numbered, into the directory of its settings.
+   * Writes the frames of a movie of the simulation, numbered, at the frame
+   * rate of its settings in simulated time.
    */
   class SIG_MovieRecorder
   {
@@ -52,63 +52,53 @@ namespace SIGEL_SlaveGUI
 
     bool isRecording() const { return recording; }
 
-    void setRecording( bool newRecording );
+    // Starts recording, or restarts the frame timing, at simulationSeconds.
+    void startRecordingAt( double simulationSeconds );
 
-    /**
-     * Saves the view as the next frame of exactly the movie width x height,
-     * pixel for pixel: a larger view is cut to its centre, a smaller one
-     * is centred on black. Returns whether saving was successful.
-     */
-    bool writeImage( QImage const &view );
+    void stopRecording();
 
-    /**
-     * Exports the scene as the next frame, a POV-Ray scene file.
-     * Returns whether exporting was successful.
-     */
-    bool writePovray( SIGEL_Visualisation::SIG_SimulationVisualisation &visualisation );
+    // True if a frame is due at simulationSeconds.
+    bool needsToRecordFrameAt( double simulationSeconds ) const;
 
-    /**
-     * Writes the POV-Ray include file that every scene file of the movie
-     * reads. Returns whether writing was successful.
-     */
+    // Saves the view centred in a frame of the movie size, never scaled.
+    bool writeImage( QImage const &view, double simulationSeconds );
+
+    // Writes the frame as a POV-Ray scene file.
+    bool writePovray( SIGEL_Visualisation::SIG_SimulationVisualisation &visualisation, double simulationSeconds );
+
+    // Writes the include file that every POV-Ray scene file reads.
     bool createPovrayIncludeFile( SIGEL_Visualisation::SIG_SimulationVisualisation &visualisation );
 
-    /**
-     * The number of frames since the last reset, including any that
-     * could not be written.
-     */
+    // Counts a frame that could not be written, too.
     int getFramesRecorded() const { return framesRecorded; }
 
-    /**
-     * The file the last write tried to write.
-     */
     QString getLastFileName() const { return lastFileName; }
 
-    /**
-     * Stops recording and starts the frame numbers at 0 again.
-     */
+    // Stops recording and numbers frames from 0 again.
     void reset();
 
   private:
 
-    /**
-     * The file name of the next frame, with leading zeros if the
-     * settings ask for them.
-     */
     QString nextFrameFileName() const;
 
-    /**
-     * Names and counts the next frame, and makes the directory.
-     */
-    void startFrame();
+    // Names and counts the frame, times the next one, and makes the directory.
+    void startFrame( double simulationSeconds );
 
     void makeDirectory() const;
+
+    // The frame timing's position at simulationSeconds, in frames.
+    double framePosition( double simulationSeconds ) const;
 
     SIG_MovieSettings settings;
 
     bool recording;
 
     int framesRecorded;
+
+    double recordingStartSeconds;
+
+    // The due frame, counted in frames from recordingStartSeconds.
+    int nextFrame;
 
     QString lastFileName;
 

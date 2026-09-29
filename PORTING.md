@@ -909,7 +909,38 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-29 — DONE: `getActualSimulationTime` IS `getCurrentSimulationWholeSeconds`.** Start here.
+**2026-09-30 — DONE: MOVIE FRAMES ARE TIMED BY SIMULATED TIME.** Start here.
+
+- **Changed:** `SIG_MovieRecorder::needsToRecordFrameAt` decides when a frame
+  is due, from `getCurrentSimulationSeconds`: frame k of a recording at k /
+  frame rate seconds after `startRecordingAt`. The movie rate is the frame
+  rate on average; the step between frames varies by at most one step.
+  Before, a frame came every round(1 / (step size × frame rate)) steps, so
+  30 fps at a step of 0.01 gave 33.3 fps. Frames that one Fast Forward call
+  jumps over are skipped, not caught up. Step writes a frame only when one
+  is due; before, every Step press wrote one. OK in the movie settings
+  dialog restarts the timing only if recording was off or the frame rate
+  changed. `setRecording` is `startRecordingAt` and `stopRecording`; the
+  write methods take the simulated seconds. `currentFrame` and
+  `stepsPerFrame` are gone from the widget, and with them the division by
+  zero for a step size of 0. The dialog's `textlabelFrameTiming` warns only
+  when the frame rate is above the steps per simulated second.
+- **Checked:** a scratch program linked against the slave libraries, with
+  frame × step size as the time: 251 frames in 10 s at 25 fps and 10 ms
+  steps; one frame for a 5 s Fast Forward and 25 in the second after it;
+  301 in 10 s at 30 fps; 20 in 1 s at 60 fps with 50 ms steps; stop and
+  the frame limit hold.
+- **Review:** no timing defect. Acted on: a wrong comment in
+  `framePosition`, "per simulated second" in the label, and the restart on
+  every OK.
+- **Gates:** `check.sh` 754 pass, 0 fail; warnings 412. The other gates
+  were not run; the change is in the slave GUI only.
+- **Next:** an `if ( visualisation )` guard in
+  `slotAlterMovieSettingsClicked`. Then a review that nothing is left of the
+  Windows removal, item 35, in the tree, the docs and local files. Then the
+  3-D view's minimum size and the position display, as proposed.
+
+**2026-09-29 — DONE: `getActualSimulationTime` IS `getCurrentSimulationWholeSeconds`.**
 
 - **Changed:** a rename, no change in behaviour. The query that cuts the
   simulated time to whole seconds is `getCurrentSimulationWholeSeconds`, in

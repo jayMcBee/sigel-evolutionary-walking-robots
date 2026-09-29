@@ -64,13 +64,6 @@
 					 Qt::WindowFlags f = Qt::WindowFlags() );
 
       /**
-       * How many simulation steps one movie frame covers, so that frames
-       * come at frameRate per simulated second: round(1 / (stepSize *
-       * frameRate)), and at least 1.
-       */
-      static int stepsPerFrame( double stepSize, int frameRate );
-
-      /**
        * Deletes the possibly existing SIG_SimulationVisualisation object
        * to which the inherited pointer visualisation points and creates
        * a new one with the supplied arguments.
@@ -217,13 +210,6 @@
       QColor planeColor;
 
       SIGEL_SlaveGUI::SIG_MovieRecorder movieRecorder;
-
-      /**
-       * The number of the actual frame (initially 0).
-       *
-       * When the stop button is hit this value has to be resetted to 0.
-       */
-      int currentFrame;
 
       void paintGL();
 

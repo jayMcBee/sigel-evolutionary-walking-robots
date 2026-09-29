@@ -49,7 +49,7 @@ private slots:
     void slotUpdateSizeLabels();
     void slotViewSizeToMovie();
     void slotResizeViewToMatch();
-    void slotUpdateStepsPerFrame();
+    void slotUpdateFrameTiming();
 
 private:
     /**
