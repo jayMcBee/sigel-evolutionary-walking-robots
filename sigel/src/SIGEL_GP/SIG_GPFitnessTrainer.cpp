@@ -90,11 +90,7 @@ SIGEL_GP::SIG_GPFitnessTrainer::SIG_GPFitnessTrainer(SIGEL_GP::SIG_GPExperiment&
 
       int singleInfo = 0;
 
-#ifdef _WINDOWS
 	  int info = pvm_addhosts( const_cast< char** >(&actHostNameCString), 1, &singleInfo );
-#else
-	  int info = pvm_addhosts( const_cast< char** >(&actHostNameCString), 1, &singleInfo );
-#endif
 
       hostCounter++;
     };
@@ -138,11 +134,7 @@ SIGEL_GP::SIG_GPFitnessTrainer::~SIG_GPFitnessTrainer() {
 
       int singleInfo = 0;
 
-#ifdef _WINDOWS
       int info = pvm_delhosts( const_cast< char** >(&actHostNameCString), 1, &singleInfo );
-#else
-      int info = pvm_delhosts( const_cast< char** >(&actHostNameCString), 1, &singleInfo );
-#endif
     };
 
   // The loop above only tells PVM to drop each host. The objects are freed here.
@@ -156,11 +148,7 @@ void SIGEL_GP::SIG_GPFitnessTrainer::addDynHost(QString newHost) {
 
   // make a new host from scratch using 'newHost' hostname;
   // 1 slave, enabled, in "/tmp/_SIGEL_EVOLUTION_TEMP"
-#ifdef _WINDOWS
-	buffer = newHost + " 1 1 \".\"\n";
-#else
   buffer = newHost + " 1 1 \"/tmp/_SIGEL_EVOLUTION_TEMP\"\n";
-#endif
 
   SIGEL_GP::SIG_GPPVMHost *newPVMHost = new SIGEL_GP::SIG_GPPVMHost( buffer );
 
@@ -260,24 +248,11 @@ int SIGEL_GP::SIG_GPFitnessTrainer::spawnTask(SIGEL_GP::SIG_GPIndividual const& 
       char const *hostNameCString = hostNameQCString.constData();
 
       QString executableName;
-#ifdef _WINDOWS
-		// PVM has problems in finding the executable on windows clients
-		// so you have to specify the search path for windows clients in
-		// the hostfile. If no path or just a dot is specified, sigel
-		// assumes that the client is a windows host and doesn't use a
-		// path in the pvm_task call.
-		if(usedHost->executableDir.path() == "."){
-			executableName = "sigel_slave";
-		} else {
-   		executableName = usedHost->executableDir.canonicalPath() + "sigel_slave";
-  		}
-#else
 		// "." asks PVM to find sigel_slave on its own search path.
 		if (usedHost->executableDir.path() == ".")
 			executableName = "sigel_slave";
 		else
 			executableName = usedHost->executableDir.path() + "/sigel_slave";
-#endif		
       const QByteArray executableNameQCString = executableName.toUtf8();
 
       char const *executableNameCString = executableNameQCString.constData();
@@ -509,19 +484,11 @@ void SIGEL_GP::SIG_GPFitnessTrainer::sweepToSpawn()
 	  char const *usedHostNameCString = usedHostNameQCString.constData();
 
 	  QString executableName;
-#ifdef _WINDOWS	
-		if(usedHost->executableDir.path() == "."){
-			executableName = "sigel_slave";
-		} else {
-			executableName = usedHost->executableDir.canonicalPath() + "/sigel_slave";
-		}
-#else
 	  // "." asks PVM to find sigel_slave on its own search path.
 	  if (usedHost->executableDir.path() == ".")
 		executableName = "sigel_slave";
 	  else
 		executableName = usedHost->executableDir.path() + "/sigel_slave";
-#endif	
 	  const QByteArray executableNameQCString = executableName.toUtf8();
 
 	  char const *executableNameCString = executableNameQCString.constData();
@@ -590,20 +557,11 @@ int SIGEL_GP::SIG_GPFitnessTrainer::getNextHost() {
   int result = -1;
   SIG_GPPVMHost   *freshHost;
   char            *cStrName;
-#ifdef _WINDOWS
-	HANDLE 			mutex;
-#else	
   pthread_mutex_t  mutex;
-#endif
 
   // now we make ourself running exclusively to add all new hosts from the freshDynHosts list
-#ifdef _WINDOWS
-	mutex = CreateMutex(nullptr, false, nullptr);	// create a lock if not already created
-	WaitForSingleObject(mutex, INFINITE);
-#else	
   pthread_mutex_init(&mutex, nullptr);
   pthread_mutex_lock( &mutex );
-#endif
 
   cStrName = new char[256];
 
@@ -628,11 +586,7 @@ int SIGEL_GP::SIG_GPFitnessTrainer::getNextHost() {
   freshDynHosts.clear();
   delete[] cStrName;
 
-#ifdef _WINDOWS
-	ReleaseMutex(mutex);		// release the lock
-#else
   pthread_mutex_unlock( &mutex );
-#endif
 
   // nextHostNumber might refer to a host that's no longer available !
   if(pvmHosts.size() != 0)

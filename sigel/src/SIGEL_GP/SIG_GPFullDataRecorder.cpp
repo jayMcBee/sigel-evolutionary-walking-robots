@@ -57,11 +57,7 @@ namespace SIGEL_GP
     // SIG_Simulation's constructor, outside every fitness function's try.
     try {
 
-#ifdef _WINDOWS
-    SIG_Recorder::init();
-#else
     SIGEL_Simulation::SIG_Recorder::init();
-#endif
 
     record();
   
@@ -100,11 +96,7 @@ namespace SIGEL_GP
 
 void SIG_GPFullDataRecorder::finish()
 {
-#ifdef _WINDOWS
-  SIG_Recorder::finish();
-#else
   SIGEL_Simulation::SIG_Recorder::finish();
-#endif
 
   int rootLinkNumber = simulationQueries->getRootNumber();
 

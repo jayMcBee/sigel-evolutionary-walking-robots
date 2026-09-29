@@ -26,11 +26,7 @@
 #include <algorithm>
 #include "SIGEL_GP/SIG_GPManager.h"
 
-#ifndef _WINDOWS
 #include <unistd.h>
-#else
-#include <pvm3.h>
-#endif
 #include <qfile.h>
 #include <qdir.h>
 #include "SIGEL_Tools/SIG_IO.h"
@@ -93,11 +89,7 @@ void SIGEL_GP::SIG_GPManager::evolutionLoop() {
 
     // Poll interval, once per pass: long enough not to spin a core, short
     // enough that finished results do not wait.
-#ifdef _WINDOWS
-    Sleep(5);
-#else
     usleep(5000);
-#endif
     processInterfaceEvents();
 
     trainer->sweepToSpawn();
@@ -674,18 +666,10 @@ void SIGEL_GP::SIG_GPManager::run() {
 	if(toursAreEmpty( tours ) && currentExperiment.getPopulation().getSize() > 3)
 		currentExperiment.mtController->startEvolution();
 
-#ifdef _WINDOWS
-  HANDLE mutex = CreateMutex(nullptr, false, nullptr);
-#else
   pthread_mutex_t     mutex = PTHREAD_MUTEX_INITIALIZER;
-#endif
 
   // init the condition variable
-#ifdef _WINDOWS
-  cond = CreateEvent(nullptr, true, false, nullptr);
-#else
    pthread_cond_init(&cond, nullptr);
-#endif
 
   if (!toursAreEmpty( tours )) {
     SIGEL_Tools::SIG_IO::cerr << "SIG_GPManager::run() was called more than once!" << Qt::endl;
@@ -823,11 +807,7 @@ void SIGEL_GP::SIG_GPManager::run() {
        fprintf(stderr, " Releasing Dynamic SIGEL-Clients:\n");
 
        // make the main thread running exclusively
-#ifdef _WINDOWS
-      WaitForSingleObject(mutex, INFINITE);
-#else
       pthread_mutex_lock( &mutex );
-#endif
       fprintf(stderr, "\t- Flushing all dynamic clients from PVM-Hosts list\n");
       trainer->flushAllDynHosts();
 
@@ -836,18 +816,10 @@ void SIGEL_GP::SIG_GPManager::run() {
       allDisconnected = false;
 
       // let's wait for server thread
-#ifdef _WINDOWS
-      while ( ! allDisconnected ) {
-        WaitForSingleObject(cond, INFINITE);
-      }
-      ResetEvent(cond);
-      ReleaseMutex(mutex);
-#else
       while ( ! allDisconnected ) {
        pthread_cond_wait(&cond, &mutex);
       }
       pthread_mutex_unlock( &mutex );
-#endif
 
       fprintf(stderr, "\n");
     }
@@ -865,30 +837,15 @@ void SIGEL_GP::SIG_GPManager::RegisterDynPVMClients() {
   //struct hostent *ptrh;
   struct protoent *ptrp;
   int i;
-#ifdef _WINDOWS
-  SOCKET socke, sdRecv;
-  char myInt;
-  int alen;
-  HANDLE servMutex = CreateMutex(0, false, 0);
-#else
   int socke, sdRecv, myInt;
   socklen_t alen;
   pthread_mutex_t servMutex = PTHREAD_MUTEX_INITIALIZER;
-#endif
   char clientName[256];
   QString client;
   struct timeval timeOut;
 
   // init some variables
   serverIsUp = true;
-
-#ifdef _WINDOWS
-  WSADATA SocketData;
-  if(WSAStartup(MAKEWORD(1,1), &SocketData)){
-    fprintf(stderr, "Error while negotiating the socket version.\n");
-    exit(1);
-  }
-#endif	
 
   // Make a socket to listen to our clients;
   // init sockaddr struct: using Internet family, port kSigelMasterRegPort
@@ -900,54 +857,27 @@ void SIGEL_GP::SIG_GPManager::RegisterDynPVMClients() {
   // map TCP protocol number
   if ((ptrp = getprotobyname("tcp")) == nullptr) {
     fprintf(stderr, "ERR:   Can't map 'tcp' to a protocol number\n");
-#ifdef _WINDOWS
-    WSACleanup();
-#endif		
     exit(1);
   }
 
   // finally create the socket
   socke = socket(PF_INET, SOCK_STREAM, ptrp->p_proto);
-#ifdef _WINDOWS
-  if (socke == INVALID_SOCKET) {
-    fprintf(stderr, "ERR:   Can't create socket\n");
-    WSACleanup();
-    exit(1);
-  }
-#else
   if (socke < 0) {
     fprintf(stderr, "ERR:   Can't create socket\n");
      exit(1);
   }
-#endif
 
   // let's bind local address & socket
-#ifdef _WINDOWS
-  if ( bind(socke, reinterpret_cast<struct sockaddr *>(&sad), sizeof(sad)) == SOCKET_ERROR ) {
-    fprintf(stderr, "ERR:   Bind reported an error\n");
-    WSACleanup();
-     exit(1);
-  }
-#else
   if ( bind(socke, reinterpret_cast<struct sockaddr *>(&sad), sizeof(sad)) < 0 ) {
     fprintf(stderr, "ERR:   Bind reported an error\n");
      exit(1);
   }
-#endif
 
   // build the queue for incoming requests
-#ifdef _WINDOWS
-  if ( listen(socke, 32) == SOCKET_ERROR ) {
-    fprintf(stderr, "ERR:   Listen failed\n");
-    WSACleanup();
-     exit(1);
-  }
-#else
   if ( listen(socke, 32) < 0 ) {
     fprintf(stderr, "ERR:   Listen failed\n");
      exit(1);
   }
-#endif
 
   // accept() is blocking, but we want to wait in 10 sec. chunks;
   // this allows the main thread to adjust it's active-pvm-host list based on
@@ -970,32 +900,16 @@ void SIGEL_GP::SIG_GPManager::RegisterDynPVMClients() {
 
      // check what caused pselect() to exit
      if ( FD_ISSET(socke, &mySet) ) {
-#ifdef _WINDOWS
-      alen = sizeof(caddr);
-#endif
       sdRecv = accept(socke, reinterpret_cast<sockaddr *>(&caddr), &alen);
 
-#ifdef _WINDOWS
-      if (sdRecv == INVALID_SOCKET) {
-        fprintf(stderr, "ERR:   accept() failed\n");
-        WSACleanup();
-        pvm_halt();
-        exit(1);
-      }
-#else
       if (sdRecv < 0) {
         fprintf(stderr, "ERR:   accept() failed\n");
         exit(1);
       }
-#endif
 
       // store socket for later disconnect
       clientSockets.resize( clientSockets.count()+1 );
-#ifdef _WINDOWS
-      clientSockets[(int)clientSockets.count()-1] = sdRecv;
-#else
       clientSockets[clientSockets.count()-1] = sdRecv;
-#endif
 
       i = recv(sdRecv, clientName, sizeof(clientName), 0);
 
@@ -1010,11 +924,7 @@ void SIGEL_GP::SIG_GPManager::RegisterDynPVMClients() {
    // check if computation is finished and clients need to be disconnected
     if (disconnectClients) {
       // now make us running exclusively
-#ifdef _WINDOWS
-      WaitForSingleObject(servMutex, INFINITE);
-#else
       pthread_mutex_lock( &servMutex );
-#endif
 
       // iterate through list of connected sockets and cut connection;
       // be sure all clients have been removed from the pvmHost list !
@@ -1022,11 +932,7 @@ void SIGEL_GP::SIG_GPManager::RegisterDynPVMClients() {
 
       for (int i=0; i<clientSockets.count(); i++) {
         send( clientSockets[i], &myInt, sizeof(myInt), 0);
-#ifdef _WINDOWS
-        closesocket(clientSockets[i]);
-#else
         close(clientSockets[i]);
-#endif
       }
       fprintf(stderr, "\t(Servertask disconnected %d clients)\n", clientSockets.count());
       clientSockets.resize(0);
@@ -1035,13 +941,8 @@ void SIGEL_GP::SIG_GPManager::RegisterDynPVMClients() {
       disconnectClients = false;
       allDisconnected = true;
 
-#ifdef _WINDOWS
-      SetEvent(cond);
-      ReleaseMutex(servMutex);
-#else
       pthread_cond_broadcast(&cond);
       pthread_mutex_unlock( &servMutex );
-#endif
     }
 
     // prepare next pselect() call
@@ -1053,9 +954,6 @@ void SIGEL_GP::SIG_GPManager::RegisterDynPVMClients() {
     timeOut.tv_usec = 0;
   }
 
-#ifdef _WINDOWS
-  WSACleanup();
-#endif
   fprintf(stderr, "SIGEL_GP::SIG_GPManager::RegisterDynPVMClients -- The server is exiting ! This should never ever happen ! !");
 }
 
@@ -1100,18 +998,10 @@ void SIGEL_GP::SIG_GPManager::run(MT_Classifier *MetaClassifier)
 	 ****/
 
 
-#ifdef _WINDOWS
-	HANDLE mutex = CreateMutex(nullptr, false, nullptr);
-#else
   pthread_mutex_t     mutex = PTHREAD_MUTEX_INITIALIZER;
-#endif
 
    // init the condition variable
-#ifdef _WINDOWS
-	cond = CreateEvent(nullptr, true, false, nullptr);
-#else
    pthread_cond_init(&cond, nullptr);
-#endif
 
     if (!toursAreEmpty( tours ))
     {	SIGEL_Tools::SIG_IO::cerr << "SIG_GPManager::run() was called more than once!" << Qt::endl;
@@ -1270,11 +1160,7 @@ void SIGEL_GP::SIG_GPManager::run(MT_Classifier *MetaClassifier)
            fprintf(stderr, " Releasing Dynamic SIGEL-Clients:\n");
 
            // make the main thread running exclusively
-#ifdef _WINDOWS
-				WaitForSingleObject(mutex, INFINITE);
-#else
            pthread_mutex_lock( &mutex );
-#endif
            fprintf(stderr, "\t- Flushing all dynamic clients from PVM-Hosts list\n");
            trainer->flushAllDynHosts();
 
@@ -1283,19 +1169,10 @@ void SIGEL_GP::SIG_GPManager::run(MT_Classifier *MetaClassifier)
            allDisconnected = false;
 
            // let's wait for server thread..
-#ifdef _WINDOWS
-           while ( ! allDisconnected )
-
-           { WaitForSingleObject(cond, INFINITE);
-           }
-           ResetEvent(cond);
-           ReleaseMutex(mutex);
-#else
            while ( ! allDisconnected )
            { pthread_cond_wait(&cond, &mutex);
            }
            pthread_mutex_unlock( &mutex );
-#endif
 
            fprintf(stderr, "\n");
         }
@@ -1330,11 +1207,7 @@ void SIGEL_GP::SIG_GPManager::evolutionLoop(MT_Classifier *MetaClassifier)
 
       // Poll interval, once per pass: long enough not to spin a core, short
       // enough that finished results do not wait.
-#ifdef _WINDOWS
-      Sleep(5);
-#else
       usleep(5000);
-#endif
       processInterfaceEvents();
 
       trainer->sweepToSpawn();
