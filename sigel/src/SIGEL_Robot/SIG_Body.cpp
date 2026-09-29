@@ -67,13 +67,8 @@ namespace SIGEL_Robot
                 double const z = rotation[2];
                 double const a = rotation[3];
                 
-#ifdef _WINDOWS
-                double const sinA = ::sin(a);
-                double const cosA = ::cos(a);
-#else
                 double const sinA = std::sin(a);
                 double const cosA = std::cos(a);
-#endif
                 double const t = 1 - cosA;
                 
                 rotationMatrix = 0;

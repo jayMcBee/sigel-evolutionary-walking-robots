@@ -41,11 +41,7 @@ namespace SIGEL_Robot {
 	  else if (cosInput < -1)
 	    cosInput = -1;
 
-#ifdef _WINDOWS
-	  return ::acos( cosInput );
-#else
 	  return std::acos( cosInput );
-#endif	
 	};
 
         DL_vector orthogonalVector( DL_vector input )
@@ -75,13 +71,8 @@ namespace SIGEL_Robot {
 
         DL_matrix rotationMatrix(DL_vector v, DL_Scalar phi)
 	{
-#ifdef _WINDOWS	
-	  double sinPhi = ::sin( phi / 2 );
-	  double cosPhi = ::cos( phi / 2 );
-#else
 	  double sinPhi = std::sin( phi / 2 );
 	  double cosPhi = std::cos( phi / 2 );
-#endif
 
 	  Quaternion q;
 	  q[0] = v.x * sinPhi;
@@ -147,21 +138,13 @@ namespace SIGEL_Robot {
 
 	  double const minimalAngleMeasure = 0.00001;
 
-#ifdef _WINDOWS
-	  double const pi = ::atan( 1 ) * 4;
-#else
 	  double const pi = std::atan( 1 ) * 4;
-#endif	
 
 	  double bsAngle = tolerantACos( _winportB.inprod( &otherB ) );
 
 	  if (bsAngle > minimalAngleMeasure)
 	    {
-#ifdef _WINDOWS	
-	      if (::abs( pi - bsAngle ) > minimalAngleMeasure)
-#else
 	      if (std::abs( pi - bsAngle ) > minimalAngleMeasure)
-#endif	
 		{
 		  DL_vector bsNormal;
 
@@ -240,11 +223,7 @@ namespace SIGEL_Robot {
 
           if (csAngle > minimalAngleMeasure)
 	    {
-#ifdef _WINDOWS
-	      if (::abs( pi - csAngle ) > minimalAngleMeasure)
-#else
 	      if (std::abs( pi - csAngle ) > minimalAngleMeasure)
-#endif	
 		{
 		  DL_vector csNormal;
 

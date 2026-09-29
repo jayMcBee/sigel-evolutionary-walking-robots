@@ -28,11 +28,7 @@
 #include <cstdio>
 #include "SIGEL_Tools/SIG_IO.h"
 
-#ifdef _WINDOWS
-using namespace std;
-#else
 #include "stdlib.h"
-#endif
 
 namespace SIGEL_Environment {
 
@@ -403,11 +399,7 @@ namespace SIGEL_Environment {
 	void SIG_Environment::loadDynaMechsEnvironment(){
 		// before loading the DynaMechsEnvironment first generate an actual
    	generateTerrain();
-#ifdef _WINDOWS	
-	  char *sigelRootCString = ::getenv( "SIGEL_ROOT" );
-#else	
 	  char *sigelRootCString = std::getenv( "SIGEL_ROOT" );
-#endif
 
  	 	QString sigelRootString( sigelRootCString );
 
@@ -442,11 +434,7 @@ namespace SIGEL_Environment {
   };
 
 	bool SIG_Environment::generateTerrain() {
-#ifdef _WINDOWS	
-  	char *sigelRootCString = ::getenv( "SIGEL_ROOT" );
-#else  	
   	char *sigelRootCString = std::getenv( "SIGEL_ROOT" );
-#endif  	
 	// std::string(nullptr) is undefined behaviour, and SIGEL_ROOT is genuinely
 	// unset in some launches -- pvm_spawn'd tasks inherit pvmd's environment,
 	// not the master's, which is how this bites in practice.

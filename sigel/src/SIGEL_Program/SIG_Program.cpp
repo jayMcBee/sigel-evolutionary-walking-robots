@@ -31,10 +31,6 @@
 #include "iostream.h" 
 
 
-#ifdef _WINDOWS
-using namespace std;
-#endif
-
 SIGEL_Program::SIG_Program& SIGEL_Program::SIG_Program::operator =(SIGEL_Program::SIG_Program &prg)
 { 
   clear();

@@ -548,11 +548,7 @@ namespace SIGEL_Robot {
 
 		  screwTheta = tolerantACos( realNewXAxis.inprod( &newXAxis ) );
 
-#ifdef _WINDOWS
-			double const pi = ::atan( 1 ) * 4;
-#else
 			double const pi = std::atan( 1 ) * 4;
-#endif			
 
 		  double const maximalParallelityMeasure = 0.00001;
 

@@ -342,11 +342,7 @@ namespace SIGEL_Robot {
 
 	 mdh_a = h.norm();
 
-#ifdef _WINDOWS
-	 double const pi = 4 * ::atan( 1 );
-#else
 	 double const pi = 4 * std::atan( 1 );
-#endif	
 
 #ifdef SIG_DEBUG
 	 SIGEL_Tools::SIG_IO::cerr << "predZAxis:";
@@ -723,17 +719,10 @@ namespace SIGEL_Robot {
 
 		       double const minimalAngleDistance = 0.00001;
 
-#ifdef _WINDOWS
-		       if ( ::abs( mdh_theta - mechsMinPos ) <= minimalAngleDistance ){
-			 mdh_theta = mechsMinPos; }
-		       else if ( ::abs( mdh_theta - mechsMaxPos ) <= minimalAngleDistance ){
-			 mdh_theta = mechsMaxPos;}
-#else		
 		       if ( std::abs( mdh_theta - mechsMinPos ) <= minimalAngleDistance ){
 			 mdh_theta = mechsMinPos; }
 		       else if ( std::abs( mdh_theta - mechsMaxPos ) <= minimalAngleDistance ){
 			 mdh_theta = mechsMaxPos;}
-#endif		
 
 		       if ( mechsMaxPos < mechsMinPos )
 			 if ( mdh_theta <= mechsMaxPos )
@@ -785,11 +774,7 @@ namespace SIGEL_Robot {
 
        double SIG_Joint::normalizeRadAngle( double input )
        {
-#ifdef _WINDOWS
-	 static double const pi = ::atan( 1 ) * 4;
-#else
 	 static double const pi = std::atan( 1 ) * 4;
-#endif	
 
 	 if (input < 0)
 	   return input + (2 * pi);

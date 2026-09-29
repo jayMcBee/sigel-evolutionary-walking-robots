@@ -23,9 +23,6 @@
 // may be ignored so far
 #include "SIGEL_Robot/SIG_Mirtich.h"
 #include <newmatap.h>
-#ifdef _WINDOWS
-#include <float.h>
-#endif
 
 #define X 0
 #define Y 1
@@ -291,11 +288,7 @@ namespace SIGEL_Robot {
                 */
 
                 for (int i = 0; i < 3; i++) {
-#ifdef _WINDOWS
-					    		if (_isnan (r [i])){
-#else
                         if (isnan (r [i])){
-#endif
                                 throw SIG_CannotMirtich (__FILE__, __LINE__, geometryName);
                         }
                         centreOfMass.set (i, r[i]);
@@ -303,21 +296,13 @@ namespace SIGEL_Robot {
 
                 for (int k = 0; k < 3; k++)
                         for (int j = 0; j < 3; j++) {
-#ifdef _WINDOWS
-                                if (_isnan (J[k][j])){
-#else
                                 if (isnan (J[k][j])){
-#endif
                                         throw SIG_CannotMirtich (__FILE__, __LINE__, geometryName);
                                 }
                                 inertiaTensor.set (k, j, J[k][j]);
                         }
 
-#ifdef _WINDOWS
-                if (_isnan (mass)){
-#else
                 if (isnan (mass)){
-#endif
                         throw SIG_CannotMirtich (__FILE__, __LINE__, geometryName);
                 }
                 masse = mass;
