@@ -147,7 +147,7 @@ void SIGEL_Simulation::SIG_DynaMechsSimulationQueries::sense(int sensorNo,
 														pitch = std::acos( myMat.get(1,0) );
 														roll = -std::asin( myMat.get(0,0) );
 
-														// what type (0..360 Grad) ?
+														// what type (0..360 degrees) ?
 														if (prSensor->IsPitchType())
 														{	angle = pitch * (360.0 / (2.0*3.14159265));
 														}
