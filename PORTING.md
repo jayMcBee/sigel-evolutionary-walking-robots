@@ -911,7 +911,7 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 **2026-09-29 — DONE: TRIVIAL GETTERS OF THE MOVIE AND VISUALISER CLASSES ARE INLINE.** Start here.
 
-- **Changed:** 13 one-line getters are defined in their class in the header
+- **Changed:** 15 one-line getters are defined in their class in the header
   instead of the .cpp: `SIG_MovieRecorder` `getSettings`, `isRecording`,
   `getFramesRecorded`, `getLastFileName`; `SIG_VisualSceneObject`
   `getNumber`, `getPosition`, `getRotation`, `getColor`, `getVisible`,
