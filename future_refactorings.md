@@ -345,12 +345,6 @@ touched, because changing one changes behaviour against the reference binary.
   and `SIG_GPRemoteZORCFitnessFunction`. Decide for each whether it belongs in
   the interface or goes through the new error reporter.
 
-- [ ] **105. Offer an MP4 when recording stops,** if `ffmpeg` is present, at
-  the frame rate the frames were taken at, so the movie plays at simulation
-  speed. Image formats only; POV-Ray writes scene files. Hook it into
-  `SIG_SimulationVisualisationWidget::reportRecordedFrames`; its "frames
-  written" message could become one combined message and question.
-
 - [ ] **77. A robot checker.** Idea; the name is open. It reads a robot model
   and its Language Parameters and warns about what will make evolution fail
   or mislead:

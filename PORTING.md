@@ -909,33 +909,26 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-29 — PLANNED: ITEM 105, THE MP4, AGREED WITH THE MAINTAINER.** Start here.
+**2026-09-29 — DONE: ITEM 105, THE MP4.** Start here.
 
-- **Flow:** when recording stops (back-to-start, "Record frames" unticked,
-  the frame limit), `SIG_SimulationVisualisationWidget::reportRecordedFrames`
-  becomes a one-line forward to
-  `SIG_MovieEncoder::encode( settings, frameCount )`. The widget holds no
-  message or ffmpeg logic. Open: rename the forward to `recordingStopped`.
-- **`SIG_MovieEncoder`,** a plain C++ class in `SIGEL_SlaveGUI`, a member of
-  the widget, built with the widget as message parent; it owns a `QProcess`.
-  `encode` shows every message itself: 0 frames, "Recording stopped. No
-  frames were written."; POV-Ray, "N frames written to <folder>"; no ffmpeg
-  (`QStandardPaths::findExecutable`), the same plus "ffmpeg was not found,
-  so no MP4 was made."; otherwise one question, "N frames written to
-  <folder>. Make <prefix>.mp4 from them?", with "(replaces the existing
-  file)" when it exists. On Yes, ffmpeg runs in the background; when it
-  finishes, "Movie written to <file>" or a warning with the end of ffmpeg's
-  error output.
-- **`arguments()`,** const, no UI: `ffmpeg -y -framerate <fps>
-  -start_number 0 -i <folder><prefix>%0<digits>d.<ext> -frames:v <N>
-  -c:v libx264 -pix_fmt yuv420p <folder><prefix>.mp4`; `%d` without
-  leading zeros, digits as in `SIG_MovieRecorder::nextFrameFileName`. The
-  frame rate is the setting, since frames follow simulated time.
-- **Odd sizes:** the output size spin boxes step by 2, in the same change.
-- **Working rules:** small separate commits; the diff for the maintainer's
-  OK before each commit; comments only for reasons, traps or limits; no
-  change to shown text without asking; `check.sh` detached, no edits during
-  a run; a sub-agent review of every code change.
+- **Changed:** `reportRecordedFrames` is renamed `reportAndEncodeRecording`
+  and forwards to the new `SIG_MovieEncoder`, which shows the messages and
+  runs ffmpeg; see item 105 in "Done". `makeTimeSteps` is reformatted, and
+  its frame writing moved to the new `recordFrame`. Checked on the desktop.
+- **Not as planned:** the output size spin boxes still step by 1; the crop
+  filter handles an odd size, typed or from "View Size to Movie". When a
+  recording stops while ffmpeg still runs, the message says "ffmpeg is still
+  making the last movie, so no MP4 was made." The messages put the folder
+  and the question on lines of their own.
+- **Open:** a new recording to the same folder and prefix while ffmpeg runs
+  can overwrite frames it has not read yet; the MP4 then mixes both.
+- **Found:** `sigelLauncher` takes `SIGEL_ROOT` from the current folder, so
+  started from `~/sigel-night` it runs that copy's binaries. Start it from
+  `sigelApp`.
+- **Review:** two defects, fixed before the commit: the frame-name pattern,
+  and a report to a half-destroyed encoder when the window closes during a
+  run.
+- **Gates:** `check.sh` 757 pass, 0 fail; warnings 412.
 
 **2026-09-29 — DONE: RECORDING ALWAYS SAYS WHEN IT STOPS.**
 
@@ -7178,6 +7171,17 @@ carried; other items and this file cite them, so they do not change.
   frames written since the last Reset and their folder. The offer of a
   resized window on OK was replaced by the button; the MP4 offer became
   item 105.
+
+- [x] **105. An MP4 when recording stops** — done 2026-09-29, in steps.
+  `SIG_MovieEncoder` shows every recording-stopped message; the widget's
+  `reportAndEncodeRecording` forwards to it. For image formats, when
+  `ffmpeg` is on the path, it asks whether to make `<prefix>.mp4` from the
+  frames, and says when that replaces an existing file. ffmpeg runs in the
+  background with libx264 and yuv420p, at the frame rate of the settings,
+  so the movie plays at simulation speed; a message gives the file, or the
+  last lines of ffmpeg's error output. A crop filter trims an odd width or
+  height by one pixel, since yuv420p needs even ones. POV-Ray frames get
+  the "frames written" message only.
 
 - [x] **99. The viewer's Stop button is shown as a reset** — done
   2026-09-26. `SIG_SimulationVisualisationWidget::slotStopSimulation`
