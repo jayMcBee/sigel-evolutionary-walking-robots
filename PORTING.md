@@ -909,7 +909,7 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-30 — DONE: THE MOVIE SETTINGS SLOT CHECKS FOR A VISUALISATION; ITEM 35 AUDITED.** Start here.
+**2026-09-29 — DONE: THE MOVIE SETTINGS SLOT CHECKS FOR A VISUALISATION; ITEM 35 AUDITED.** Start here.
 
 - **Changed:** `SIG_SimulationVisualisationWidget::slotAlterMovieSettingsClicked`
   returns when there is no visualisation, as the widget's other slots do.
@@ -923,7 +923,7 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 - **Next:** the 3-D view's minimum size and the position display, as
   proposed; then item 105, the MP4.
 
-**2026-09-30 — DONE: MOVIE FRAMES ARE TIMED BY SIMULATED TIME.**
+**2026-09-29 — DONE: MOVIE FRAMES ARE TIMED BY SIMULATED TIME.**
 
 - **Changed:** `SIG_MovieRecorder::needsToRecordFrameAt` decides when a frame
   is due, from `getCurrentSimulationSeconds`: frame k of a recording at k /
