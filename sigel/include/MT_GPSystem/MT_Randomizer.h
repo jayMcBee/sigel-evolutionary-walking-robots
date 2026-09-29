@@ -2,8 +2,8 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#if !defined(AFX_MT_RANDOMIZER_H__65257FEF_679C_4B32_853B_E2AE4688CAD6__INCLUDED_)
-#define AFX_MT_RANDOMIZER_H__65257FEF_679C_4B32_853B_E2AE4688CAD6__INCLUDED_
+#ifndef MT_GPSYSTEM_MT_RANDOMIZER_H
+#define MT_GPSYSTEM_MT_RANDOMIZER_H
 
 #include <QTextStream>
 #include <QList>
@@ -168,4 +168,4 @@ private:
 
 };
 
-#endif // !defined(AFX_MT_RANDOMIZER_H__65257FEF_679C_4B32_853B_E2AE4688CAD6__INCLUDED_)
+#endif // MT_GPSYSTEM_MT_RANDOMIZER_H

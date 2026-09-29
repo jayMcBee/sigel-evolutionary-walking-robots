@@ -2,8 +2,8 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#if !defined(AFX_MT_OPERAND_H__BE22A5C1_39CA_4C2C_AC08_DE24728F3891__INCLUDED_)
-#define AFX_MT_OPERAND_H__BE22A5C1_39CA_4C2C_AC08_DE24728F3891__INCLUDED_
+#ifndef MT_GPSYSTEM_MT_OPERAND_H
+#define MT_GPSYSTEM_MT_OPERAND_H
 
 
 
@@ -30,4 +30,4 @@ public:
 
 };
 
-#endif // !defined(AFX_MT_OPERAND_H__BE22A5C1_39CA_4C2C_AC08_DE24728F3891__INCLUDED_)
+#endif // MT_GPSYSTEM_MT_OPERAND_H

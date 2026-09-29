@@ -2,8 +2,8 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#if !defined(AFX_MT_INDIVIDUAL_H__630909EE_4F20_4811_94CA_2F9AB46D6046__INCLUDED_)
-#define AFX_MT_INDIVIDUAL_H__630909EE_4F20_4811_94CA_2F9AB46D6046__INCLUDED_
+#ifndef MT_GPSYSTEM_MT_INDIVIDUAL_H
+#define MT_GPSYSTEM_MT_INDIVIDUAL_H
 
 #include <QString>
 #include <QTextStream>
@@ -97,4 +97,4 @@ private:
 	double Fitness;
 };
 
-#endif // !defined(AFX_MT_INDIVIDUAL_H__630909EE_4F20_4811_94CA_2F9AB46D6046__INCLUDED_)
+#endif // MT_GPSYSTEM_MT_INDIVIDUAL_H

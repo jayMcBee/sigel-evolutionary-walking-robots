@@ -2,8 +2,8 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#if !defined(AFX_MT_TRAININGCASE_H__A1E78B17_E63C_4CF7_9AC7_A9BE752FF329__INCLUDED_)
-#define AFX_MT_TRAININGCASE_H__A1E78B17_E63C_4CF7_9AC7_A9BE752FF329__INCLUDED_
+#ifndef MT_GPSYSTEM_MT_TRAININGCASE_H
+#define MT_GPSYSTEM_MT_TRAININGCASE_H
 
 #include "MT_GPSystem/MT_TranslatedIndividual.h"	// Added from the class view
 #include <qstring.h>
@@ -76,4 +76,4 @@ public:
 
 };
 
-#endif // !defined(AFX_MT_TRAININGCASE_H__A1E78B17_E63C_4CF7_9AC7_A9BE752FF329__INCLUDED_)
+#endif // MT_GPSYSTEM_MT_TRAININGCASE_H

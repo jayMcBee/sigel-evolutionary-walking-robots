@@ -2,8 +2,8 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#if !defined(AFX_MT_TRAININGSET_H__EAB6FC95_1FB5_4AF2_851B_A67AFC617337__INCLUDED_)
-#define AFX_MT_TRAININGSET_H__EAB6FC95_1FB5_4AF2_851B_A67AFC617337__INCLUDED_
+#ifndef MT_GPSYSTEM_MT_TRAININGSET_H
+#define MT_GPSYSTEM_MT_TRAININGSET_H
 
 
 #include <QQueue>
@@ -90,4 +90,4 @@ private:
 	int TSize;
 };
 
-#endif // !defined(AFX_MT_TRAININGSET_H__EAB6FC95_1FB5_4AF2_851B_A67AFC617337__INCLUDED_)
+#endif // MT_GPSYSTEM_MT_TRAININGSET_H

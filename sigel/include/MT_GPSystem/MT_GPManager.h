@@ -2,8 +2,8 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#if !defined(AFX_MT_GPMANAGER_H__0590D02D_760F_43CC_B902_EA5EE0196061__INCLUDED_)
-#define AFX_MT_GPMANAGER_H__0590D02D_760F_43CC_B902_EA5EE0196061__INCLUDED_
+#ifndef MT_GPSYSTEM_MT_GPMANAGER_H
+#define MT_GPSYSTEM_MT_GPMANAGER_H
 
 #include <QTextStream>
 #include <QObject>
@@ -162,4 +162,4 @@ protected:
 
 };
 
-#endif // !defined(AFX_MT_GPMANAGER_H__0590D02D_760F_43CC_B902_EA5EE0196061__INCLUDED_)
+#endif // MT_GPSYSTEM_MT_GPMANAGER_H

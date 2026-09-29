@@ -2,8 +2,8 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#if !defined(AFX_MT_POPULATION_H__76BD10AD_932E_42FC_BDD3_85DD57B1D541__INCLUDED_)
-#define AFX_MT_POPULATION_H__76BD10AD_932E_42FC_BDD3_85DD57B1D541__INCLUDED_
+#ifndef MT_GPSYSTEM_MT_POPULATION_H
+#define MT_GPSYSTEM_MT_POPULATION_H
 
 #include <QList>
 #include <QTextStream>
@@ -124,4 +124,4 @@ protected:
 	QList<MT_Individual*> Individuals;
 };
 
-#endif // !defined(AFX_MT_POPULATION_H__76BD10AD_932E_42FC_BDD3_85DD57B1D541__INCLUDED_)
+#endif // MT_GPSYSTEM_MT_POPULATION_H

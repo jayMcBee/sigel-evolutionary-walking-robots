@@ -2,8 +2,8 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#if !defined(AFX_MT_STATISTICS_H__010CEA5A_30F4_406B_93E1_DD5D57975FE5__INCLUDED_)
-#define AFX_MT_STATISTICS_H__010CEA5A_30F4_406B_93E1_DD5D57975FE5__INCLUDED_
+#ifndef MT_GPSYSTEM_MT_STATISTICS_H
+#define MT_GPSYSTEM_MT_STATISTICS_H
 
 #include <QList>
 #include "MT_GPSystem/MT_StatisticsElement.h"
@@ -52,4 +52,4 @@ public:
 
 };
 
-#endif // !defined(AFX_MT_STATISTICS_H__010CEA5A_30F4_406B_93E1_DD5D57975FE5__INCLUDED_)
+#endif // MT_GPSYSTEM_MT_STATISTICS_H

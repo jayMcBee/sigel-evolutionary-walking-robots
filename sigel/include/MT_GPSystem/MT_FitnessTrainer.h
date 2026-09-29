@@ -2,8 +2,8 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#if !defined(AFX_MT_FITNESSTRAINER_H__8C160767_FE7C_4FFF_B2EC_DFA03F1E983A__INCLUDED_)
-#define AFX_MT_FITNESSTRAINER_H__8C160767_FE7C_4FFF_B2EC_DFA03F1E983A__INCLUDED_
+#ifndef MT_GPSYSTEM_MT_FITNESSTRAINER_H
+#define MT_GPSYSTEM_MT_FITNESSTRAINER_H
 
 #include <QQueue>
 #include "MT_GPSystem/MT_TranslatedIndividual.h"
@@ -140,4 +140,4 @@ private:
 
 };
 
-#endif // !defined(AFX_MT_FITNESSTRAINER_H__8C160767_FE7C_4FFF_B2EC_DFA03F1E983A__INCLUDED_)
+#endif // MT_GPSYSTEM_MT_FITNESSTRAINER_H

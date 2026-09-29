@@ -2,8 +2,8 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#if !defined(AFX_MT_TOURNAMENT_H__0A623C55_DEBF_45AE_8F39_4F5AC54F0E85__INCLUDED_)
-#define AFX_MT_TOURNAMENT_H__0A623C55_DEBF_45AE_8F39_4F5AC54F0E85__INCLUDED_
+#ifndef MT_GPSYSTEM_MT_TOURNAMENT_H
+#define MT_GPSYSTEM_MT_TOURNAMENT_H
 
 
 
@@ -50,4 +50,4 @@ private:
 	QList<int> * WinnerLoser;
 };
 
-#endif // !defined(AFX_MT_TOURNAMENT_H__0A623C55_DEBF_45AE_8F39_4F5AC54F0E85__INCLUDED_)
+#endif // MT_GPSYSTEM_MT_TOURNAMENT_H

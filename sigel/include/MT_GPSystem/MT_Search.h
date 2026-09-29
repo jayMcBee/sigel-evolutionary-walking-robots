@@ -2,8 +2,8 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#if !defined(AFX_MT_SEARCH_H__B5BB118D_7ED8_4086_8D30_BFC22C562A0F__INCLUDED_)
-#define AFX_MT_SEARCH_H__B5BB118D_7ED8_4086_8D30_BFC22C562A0F__INCLUDED_
+#ifndef MT_GPSYSTEM_MT_SEARCH_H
+#define MT_GPSYSTEM_MT_SEARCH_H
 
 
 #include <QTextStream>
@@ -68,4 +68,4 @@ private:
 
 };
 
-#endif // !defined(AFX_MT_SEARCH_H__B5BB118D_7ED8_4086_8D30_BFC22C562A0F__INCLUDED_)
+#endif // MT_GPSYSTEM_MT_SEARCH_H

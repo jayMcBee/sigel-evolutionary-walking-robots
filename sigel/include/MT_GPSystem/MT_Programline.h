@@ -2,8 +2,8 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#if !defined(AFX_MT_PROGRAMLINE_H__09232832_11E1_4EEB_9D5A_435DD5D9826A__INCLUDED_)
-#define AFX_MT_PROGRAMLINE_H__09232832_11E1_4EEB_9D5A_435DD5D9826A__INCLUDED_
+#ifndef MT_GPSYSTEM_MT_PROGRAMLINE_H
+#define MT_GPSYSTEM_MT_PROGRAMLINE_H
 
 #include "MT_GPSystem/MT_Instruction.h"
 #include "MT_GPSystem/MT_Operand.h"
@@ -67,4 +67,4 @@ private:
 
 };
 
-#endif // !defined(AFX_MT_PROGRAMLINE_H__09232832_11E1_4EEB_9D5A_435DD5D9826A__INCLUDED_)
+#endif // MT_GPSYSTEM_MT_PROGRAMLINE_H

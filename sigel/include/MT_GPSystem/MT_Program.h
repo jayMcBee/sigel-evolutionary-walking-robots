@@ -2,8 +2,8 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#if !defined(AFX_MT_PROGRAM_H__D3578776_1315_4C75_B00A_E11B559B7314__INCLUDED_)
-#define AFX_MT_PROGRAM_H__D3578776_1315_4C75_B00A_E11B559B7314__INCLUDED_
+#ifndef MT_GPSYSTEM_MT_PROGRAM_H
+#define MT_GPSYSTEM_MT_PROGRAM_H
 
 #include <QTextStream>
 #include <qstring.h>
@@ -89,4 +89,4 @@ private:
 	void resize(int nSize);
 };
 
-#endif // !defined(AFX_MT_PROGRAM_H__D3578776_1315_4C75_B00A_E11B559B7314__INCLUDED_)
+#endif // MT_GPSYSTEM_MT_PROGRAM_H

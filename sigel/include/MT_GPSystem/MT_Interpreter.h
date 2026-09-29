@@ -2,8 +2,8 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#if !defined(AFX_MT_INTERPRETER_H__EFC222FF_DB14_461C_AE1C_69076695F31B__INCLUDED_)
-#define AFX_MT_INTERPRETER_H__EFC222FF_DB14_461C_AE1C_69076695F31B__INCLUDED_
+#ifndef MT_GPSYSTEM_MT_INTERPRETER_H
+#define MT_GPSYSTEM_MT_INTERPRETER_H
 
 
 #include <QList>
@@ -93,4 +93,4 @@ public:
 
 };
 
-#endif // !defined(AFX_MT_INTERPRETER_H__EFC222FF_DB14_461C_AE1C_69076695F31B__INCLUDED_)
+#endif // MT_GPSYSTEM_MT_INTERPRETER_H
