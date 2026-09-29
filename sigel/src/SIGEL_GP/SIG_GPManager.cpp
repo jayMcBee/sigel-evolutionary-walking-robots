@@ -837,7 +837,7 @@ void SIGEL_GP::SIG_GPManager::RegisterDynPVMClients() {
   //struct hostent *ptrh;
   struct protoent *ptrp;
   int i;
-  int socke, sdRecv, myInt;
+  int listenSocket, sdRecv, myInt;
   socklen_t alen;
   pthread_mutex_t servMutex = PTHREAD_MUTEX_INITIALIZER;
   char clientName[256];
@@ -861,20 +861,20 @@ void SIGEL_GP::SIG_GPManager::RegisterDynPVMClients() {
   }
 
   // finally create the socket
-  socke = socket(PF_INET, SOCK_STREAM, ptrp->p_proto);
-  if (socke < 0) {
+  listenSocket = socket(PF_INET, SOCK_STREAM, ptrp->p_proto);
+  if (listenSocket < 0) {
     fprintf(stderr, "ERR:   Can't create socket\n");
      exit(1);
   }
 
   // let's bind local address & socket
-  if ( bind(socke, reinterpret_cast<struct sockaddr *>(&sad), sizeof(sad)) < 0 ) {
+  if ( bind(listenSocket, reinterpret_cast<struct sockaddr *>(&sad), sizeof(sad)) < 0 ) {
     fprintf(stderr, "ERR:   Bind reported an error\n");
      exit(1);
   }
 
   // build the queue for incoming requests
-  if ( listen(socke, 32) < 0 ) {
+  if ( listen(listenSocket, 32) < 0 ) {
     fprintf(stderr, "ERR:   Listen failed\n");
      exit(1);
   }
@@ -888,7 +888,7 @@ void SIGEL_GP::SIG_GPManager::RegisterDynPVMClients() {
 
   // to use select() we need to build a fs_set first
   FD_ZERO(&mySet);
-  FD_SET(socke, &mySet);
+  FD_SET(listenSocket, &mySet);
 
   // (bounded) waiting for requests..
   fprintf(stderr, "Server is awaiting requests from dynamic clients on port %d..\n\n", kSigelMasterRegPort);
@@ -896,11 +896,11 @@ void SIGEL_GP::SIG_GPManager::RegisterDynPVMClients() {
   // the (almost) endless server loop
   while ( true ) {
      // pselect returns zero when timeout occurs..
-     select(socke+1, &mySet, nullptr, nullptr, &timeOut);
+     select(listenSocket+1, &mySet, nullptr, nullptr, &timeOut);
 
      // check what caused pselect() to exit
-     if ( FD_ISSET(socke, &mySet) ) {
-      sdRecv = accept(socke, reinterpret_cast<sockaddr *>(&caddr), &alen);
+     if ( FD_ISSET(listenSocket, &mySet) ) {
+      sdRecv = accept(listenSocket, reinterpret_cast<sockaddr *>(&caddr), &alen);
 
       if (sdRecv < 0) {
         fprintf(stderr, "ERR:   accept() failed\n");
@@ -947,7 +947,7 @@ void SIGEL_GP::SIG_GPManager::RegisterDynPVMClients() {
 
     // prepare next pselect() call
     FD_ZERO(&mySet);
-    FD_SET(socke, &mySet);
+    FD_SET(listenSocket, &mySet);
 
     // set the next time-chunk to another 10 seconds
     timeOut.tv_sec  = 10;

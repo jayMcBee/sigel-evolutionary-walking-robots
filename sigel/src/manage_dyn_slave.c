@@ -43,7 +43,7 @@ int main (int argc, char *argv[])
 { struct sockaddr_in   sad;
   struct hostent      *ptrh;
   struct protoent     *ptrp;
-  int                  socke,
+  int                  masterSocket,
                        msg;
   char                 locHostName[256],
                        sigHostName[256];
@@ -82,26 +82,26 @@ int main (int argc, char *argv[])
   }
 
   /* finally create the socket */
-  socke = socket(PF_INET, SOCK_STREAM, ptrp->p_proto);
-  if (socke < 0)
+  masterSocket = socket(PF_INET, SOCK_STREAM, ptrp->p_proto);
+  if (masterSocket < 0)
   {  fprintf(stderr, "ERR:   Can't create socket\n");
      exit(1);
   }
 
-  if (connect(socke, (struct sockaddr *)&sad, sizeof(sad)) < 0)
+  if (connect(masterSocket, (struct sockaddr *)&sad, sizeof(sad)) < 0)
   {  fprintf(stderr, "ERR:  Can't connect to server\n");
      exit(1);
   }
 
   /* send our local hostname to the master */
-  send(socke, locHostName, sizeof(locHostName), 0);
+  send(masterSocket, locHostName, sizeof(locHostName), 0);
   fprintf(stderr, "Registered local host \"%s\" with SIGEL master server \"%s\".\n", locHostName, sigHostName);
   fprintf(stderr, "Waiting for answer from server to exit..\n\n");
 
   /* now wait for some message; we'll quit automatically when the server has sent something to us
    */
-  recv(socke, &msg, sizeof(msg), 0);
-  close(socke);
+  recv(masterSocket, &msg, sizeof(msg), 0);
+  close(masterSocket);
 
 
   fprintf(stderr, "<manage_dyn_slave> is exiting.\n\n");
