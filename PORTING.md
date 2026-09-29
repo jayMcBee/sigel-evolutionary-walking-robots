@@ -6787,6 +6787,27 @@ carried; other items and this file cite them, so they do not change.
   formatted. `-Wold-style-cast` is in `SIGCXX`; a clean rebuild of all 185
   SIGEL files gives no such warning.
 
+- [x] **35. The Windows and Visual Studio support is removed** — done
+  2026-09-29, in small commits, one area of the code each. The nine Visual
+  Studio files are deleted. Every `_WINDOWS` group is resolved to its Linux
+  half: for `#ifdef` the `#else` half stays, or nothing when there is none;
+  for `#ifndef` the body stays. The MetaGP headers' `AFX_…_INCLUDED_`
+  include guards take the tree's `DIR_FILE_H` form, and the Visual Studio
+  class-wizard comments are gone: the file banners, the
+  `Construction/destruction` blocks and the "Added from the class view"
+  comments. Fusion is the only style SIGEL sets (D22).
+  - **The proof, for every commit:** two builds compared with the build
+    before it, outside the debug information. First with the removed lines
+    left blank, where every object must match; then with the lines removed,
+    where only line numbers may differ: the `__LINE__` passed to exceptions
+    and the `"file:line"` text Qt's `SIGNAL` and `SLOT` store.
+  - **Found on the way and recorded:** items 121 to 125, and a note on item
+    47. Only the Windows half set `alen` before `accept()` in
+    `SIG_GPManager::RegisterDynPVMClients` (item 125).
+  - **One behaviour change, in its own commit:** `MT_GPManager::startEvolution`
+    warns through `SIG_IO::cerr` before its `sleep(10000000)`, which the
+    Windows half had as `Sleep(10000)`. The wait itself stays for item 119.
+
 - [x] **101. Empty destructors removed** — done 2026-09-27, one commit. 100
   empty destructors went. 84 were deleted with their declaration and doc
   comment: their class has a virtual destructor above it, or has no base and
