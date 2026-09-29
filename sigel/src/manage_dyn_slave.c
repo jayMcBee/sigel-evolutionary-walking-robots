@@ -23,15 +23,11 @@
  */
 
 #include <sys/types.h>
-#ifdef _WINDOWS
-#include <winsock.h>
-#else
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <netdb.h>
 
 #include <unistd.h>
-#endif
 
 #include <stdio.h>
 #include <string.h>
@@ -47,24 +43,10 @@ int main (int argc, char *argv[])
 { struct sockaddr_in   sad;
   struct hostent      *ptrh;
   struct protoent     *ptrp;
-#ifdef _WINDOWS
-	int	socke;
-	char	msg[64];
-#else
   int                  socke,
                        msg;
-#endif
   char                 locHostName[256],
                        sigHostName[256];
-
-#ifdef _WINDOWS
-	// negotiate the socket version to use
-	WSADATA	SocketData;
-	if( WSAStartup( MAKEWORD(1,1), &SocketData)){
-		fprintf( stderr, "Error while negotiating the socket version to use." );
-		exit(1);
-	}
-#endif
 
   if ( gethostname(locHostName, 255) )
   { fprintf(stderr, "ERR:   gethostname() failed..\n\n");
@@ -79,9 +61,6 @@ int main (int argc, char *argv[])
   /* now get hostname where the sigel master is running */
   if (argc <= 1)
   { fprintf(stderr, "Please submit the hostname where the sigel master is running !\n\n\tmanage_dyn_slave <master_host_name>\n\n");
-#ifdef _WINDOWS
-	 WSACleanup();
-#endif	
     exit(1);
   }
 
@@ -91,9 +70,6 @@ int main (int argc, char *argv[])
   ptrh = gethostbyname(sigHostName);
   if (ptrh == NULL)
   { fprintf(stderr, "ERR:   invalid host: %s\n", sigHostName);
-#ifdef _WINDOWS
-	 WSACleanup();
-#endif	
     exit(1);
   }
 
@@ -102,9 +78,6 @@ int main (int argc, char *argv[])
   /* map TCP protocol number */
   if (((int)(ptrp = getprotobyname("tcp"))) == 0)
   { fprintf(stderr, "ERR:   Can't map 'tcp' to a protocol number\n");
-#ifdef _WINDOWS
-	 WSACleanup();
-#endif	
     exit(1);
   }
 
@@ -112,17 +85,11 @@ int main (int argc, char *argv[])
   socke = socket(PF_INET, SOCK_STREAM, ptrp->p_proto);
   if (socke < 0)
   {  fprintf(stderr, "ERR:   Can't create socket\n");
-#ifdef _WINDOWS
-	  WSACleanup();
-#endif	
      exit(1);
   }
 
   if (connect(socke, (struct sockaddr *)&sad, sizeof(sad)) < 0)
   {  fprintf(stderr, "ERR:  Can't connect to server\n");
-#ifdef _WINDOWS
-	  WSACleanup();
-#endif	
      exit(1);
   }
 
@@ -133,14 +100,8 @@ int main (int argc, char *argv[])
 
   /* now wait for some message; we'll quit automatically when the server has sent something to us
    */
-#ifdef _WINDOWS
-	recv(socke, msg, 64, 0);
-	closesocket(socke);
-	WSACleanup();
-#else	
   recv(socke, &msg, sizeof(msg), 0);
   close(socke);
-#endif
 
 
   fprintf(stderr, "<manage_dyn_slave> is exiting.\n\n");

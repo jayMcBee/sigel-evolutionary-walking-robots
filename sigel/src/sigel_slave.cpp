@@ -25,10 +25,8 @@
 #include <qstring.h>
 #include <qtextstream.h>
 
-#ifndef _WINDOWS
 #include <sys/time.h>
 #include <sys/resource.h>
-#endif
 #include <csignal>
 
 #include "SIGEL_Tools/SIG_IO.h"
@@ -96,21 +94,12 @@ bool guiEnabled = false;
 
 int main( int argc, char *argv[] ) {
   // Install the sigel standard signal handler
-#ifdef _WINDOWS
-  ::signal( SIGABRT, sigelStandardSignalHandler );
-  ::signal( SIGFPE, sigelStandardSignalHandler );
-  ::signal( SIGILL, sigelStandardSignalHandler );
-  ::signal( SIGINT, sigelStandardSignalHandler );
-  ::signal( SIGSEGV, sigelStandardSignalHandler );
-  ::signal( SIGTERM, sigelStandardSignalHandler );
-#else
   std::signal( SIGABRT, sigelStandardSignalHandler );
   std::signal( SIGFPE, sigelStandardSignalHandler );
   std::signal( SIGILL, sigelStandardSignalHandler );
   std::signal( SIGINT, sigelStandardSignalHandler );
   std::signal( SIGSEGV, sigelStandardSignalHandler );
   std::signal( SIGTERM, sigelStandardSignalHandler );
-#endif
 
   SIGEL_Robot::SIG_Robot *robot = nullptr;
   SIGEL_Environment::SIG_Environment *environment = nullptr;
@@ -176,11 +165,7 @@ int main( int argc, char *argv[] ) {
   else {
     // evolvers must be nice to other concurrently running programs;
     // thus use setpriority OSCall to decrease the priority
-#ifdef _WINDOWS
-    SetPriorityClass(GetCurrentProcess(), IDLE_PRIORITY_CLASS);
-#else
     setpriority(PRIO_PROCESS, 0, 19);
-#endif
 
     robot = new SIGEL_Robot::SIG_Robot();
     environment = new SIGEL_Environment::SIG_Environment();
@@ -256,11 +241,7 @@ int main( int argc, char *argv[] ) {
 
     QApplication a(argc, argv);
 
-#ifdef _WINDOWS
-      QApplication::setStyle( QStyleFactory::create( "Windows" ) );
-#else
       QApplication::setStyle( QStyleFactory::create( "Fusion" ) );
-#endif		
       SIG_SimulationWindow *simWindow = new SIG_SimulationWindow(nullptr, "simWindow");
 
       simWindow->setWindowTitle("Simulation Visualisation");
@@ -299,11 +280,7 @@ int main( int argc, char *argv[] ) {
       const SIGEL_GP::SIG_GPRemoteZORCFitnessFunction remoteZORC;
       if (fitnessFunctionName == remoteZORC.serializedId()) {
    				QApplication *app = new QApplication(argc, argv);
-#ifdef _WINDOWS
-				app->setStyle( QStyleFactory::create( "Windows" ) );
-#else					
 				app->setStyle( QStyleFactory::create( "Fusion" ) );
-#endif			
 	  	}
 
       double fitnessValue = 0;

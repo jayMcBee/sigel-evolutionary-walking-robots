@@ -28,11 +28,9 @@
 
 #include <pvm3.h>
 #include <csignal>
-#ifndef _WINDOWS
 #include <pthread.h>
 #include <sys/time.h>
 #include <sys/resource.h>
-#endif
 
 #include "SIGEL_GP/SIG_GPManager.h"
 #include "SIGEL_MasterGUI/SIG_MainWindow.h"
@@ -86,18 +84,10 @@ extern "C"
 
   // simple wrapper to call experiment.RegisterDynPVMClients()
   // this C function is launched as a thread
-#ifdef _WINDOWS
-  DWORD WINAPI MeJustCallingRegisterDynPVMClients(LPVOID inRawGPM) {
-    SIGEL_GP::SIG_GPManager *gpm = static_cast<SIGEL_GP::SIG_GPManager *>(inRawGPM);
-    gpm->RegisterDynPVMClients();
-    return 0;
-  }
-#else
   void MeJustCallingRegisterDynPVMClients(void *inRawGPM) {
     SIGEL_GP::SIG_GPManager *gpm = static_cast<SIGEL_GP::SIG_GPManager *>(inRawGPM);
     gpm->RegisterDynPVMClients();
   }
-#endif
 
 }
 
@@ -114,22 +104,12 @@ int main( int argc, char *argv[] ) {
   int arg;
 
   // Install the sigel standard signal handler
-#ifdef _WINDOWS
-  ::signal( SIGABRT, sigelStandardSignalHandler );
-  ::signal( SIGFPE, sigelStandardSignalHandler );
-  ::signal( SIGILL, sigelStandardSignalHandler );
-  ::signal( SIGINT, sigelStandardSignalHandler );
-  ::signal( SIGSEGV, sigelStandardSignalHandler );
-  ::signal( SIGTERM, sigelStandardSignalHandler );
-  HANDLE serv_thread;
-#else
   std::signal( SIGABRT, sigelStandardSignalHandler );
   std::signal( SIGFPE, sigelStandardSignalHandler );
   std::signal( SIGILL, sigelStandardSignalHandler );
   std::signal( SIGINT, sigelStandardSignalHandler );
   std::signal( SIGSEGV, sigelStandardSignalHandler );
   std::signal( SIGTERM, sigelStandardSignalHandler );
-#endif
 
   bool mtEvolve=false;
 
@@ -137,38 +117,10 @@ int main( int argc, char *argv[] ) {
   // the background using our batchsystem. Since SIGEL is most of the time waiting for
   // the slaves, set priority even lower.
   // (Don't change this ! Prio.19 was chosen for a very special reason..)
-#ifdef _WINDOWS
-	SetPriorityClass(GetCurrentProcess(), IDLE_PRIORITY_CLASS);
-#else
   setpriority(PRIO_PROCESS, 0, 20);
-#endif
 
   // Start PVM
-#ifdef _WINDOWS
-  // The Windows version of PVM has trouble with paths
-  // on the client hosts. So you have to specify the
-  // search paths of windows clients in a hostfile.
-
-  // The following code searches for the hostfile in
-  // the SIGEL_ROOT dir and starts PVM-daemon with
-  // this hostfile as argument.
-  int info=-1;
-  QDir dir(::getenv("SIGEL_ROOT"));
-  bool useHostFile = dir.exists("hostfile");
-
-  if (useHostFile) { // hostfile found
-    QString fPath = dir.absoluteFilePath("hostfile");
-    char *cfPath  = new char[fPath.length()+1];
-    strcpy(cfPath, fPath.toLatin1().constData());
-    info = pvm_start_pvmd( 1, &cfPath, 0 );	// start PVM daemon with the hostfile as argument
-    delete[] cfPath;
-  }
-  else { // hostfile not found
-    info = pvm_start_pvmd( 0, 0, 0 );  // start PVM daemon normally
-  }
-#else
   int info = pvm_start_pvmd( 0, nullptr, 0 );
-#endif
 
   // Register to PVM
   int myTaskId=pvm_mytid();
@@ -204,11 +156,7 @@ int main( int argc, char *argv[] ) {
   // Start SIGEL with GUI
   if ( guiEnabled ) {
     QApplication app( argc, argv );
-#ifdef _WINDOWS
-    app.setStyle( QStyleFactory::create( "Windows" ) );
-#else		
     app.setStyle( QStyleFactory::create( "Fusion" ) );
-#endif
 
     SIGEL_MasterGUI::SIG_MainWindow *mainWindow = new SIGEL_MasterGUI::SIG_MainWindow( nullptr , "MainWindow" );
     mainWindow->show();
@@ -221,9 +169,6 @@ int main( int argc, char *argv[] ) {
   }
   // Start SIGEL w/o GUI to evolve the given experiment
   else {
-#ifdef _WINDOWS
-    SetPriorityClass( GetCurrentProcess(), IDLE_PRIORITY_CLASS);
-#endif
     SIGEL_Tools::SIG_IO::cerr << "Master is used to evolve." << Qt::endl;
 
     if (argc < 3) {
@@ -254,15 +199,11 @@ int main( int argc, char *argv[] ) {
     // launch the server thread, thus enabling the
     // clients to register all the time while we're running
     if (dynClients) {
-#ifdef _WINDOWS
-      serv_thread = CreateThread( nullptr, 0, &MeJustCallingRegisterDynPVMClients, &gpManager, 0, 0 );
-#else
       pthread_t serv_thread;
       // The function returns void, not void *; nothing reads the thread's result.
       pthread_create(&serv_thread, nullptr, reinterpret_cast<void *(*)(void *)>(&MeJustCallingRegisterDynPVMClients), &gpManager);
 
 
-#endif
     }
 
 	if(mtEvolve){
@@ -311,11 +252,6 @@ int main( int argc, char *argv[] ) {
     experiment.saveExperiment( experimentSaveStream );
     experimentFile.close();
 
-#ifdef _WINDOWS
-    if(dynClients){
-      CloseHandle( serv_thread );
-    }
-#endif
     pvm_halt();
 
     return 0;
