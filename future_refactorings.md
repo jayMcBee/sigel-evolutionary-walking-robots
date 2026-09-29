@@ -491,23 +491,30 @@ problem; the choice is made before any code is written.
 
 - [ ] **35. Remove the Windows and Visual Studio support.** Decided. It does
   not build here, nothing tests it, and it could not build in 2003 either.
-  **Going now, by decision, in six commits** rather than one, so each can be
-  reviewed:
-  1. the nine Visual Studio files, with the `encodings` totals PORTING.md pins
-     and the docs that named the files — done 2026-09-29;
-  2. the `_WINDOWS` groups in the headers;
-  3. the `_WINDOWS` groups in the MetaGP sources: `MT_Control`,
-     `MT_GPSystem`, `MT_GUI`;
-     Its own commit follows: `MT_GPManager::startEvolution` writes a warning
-     through `SIG_IO::cerr` right before its `sleep(10000000)`, saying the
-     training set is below 10 cases or a tenth of the result array and the
-     next check is in 10000000 s, about 115 days. The wait itself stays for
-     item 119;
-  4. the `_WINDOWS` groups in the `SIGEL_*` sources, `sigel.cpp`,
-     `sigel_slave.cpp` and `manage_dyn_slave.c`;
-  5. the `AFX_…_INCLUDED_` include guards, renamed to the tree's `DIR_FILE_H`
-     form, and the "Added from the class view" comments;
-  6. the MSVC class-wizard comments: the `// X.h: interface for class X.`
+  **Going now, by decision, in batches of small commits,** so each can be
+  reviewed. Each commit gets the object proof and a review; `check.sh` runs
+  once per batch.
+  1. The nine Visual Studio files, with the `encodings` totals PORTING.md pins
+     and the docs that named the files. Done.
+  2. The `_WINDOWS` groups in the headers. Done.
+  3. The `_WINDOWS` groups in the MetaGP sources: `MT_Control`,
+     `MT_GPSystem`, `MT_GUI`. Done. Then, in its own commit, a warning
+     through `SIG_IO::cerr` right before `MT_GPManager::startEvolution`'s
+     `sleep(10000000)`; the wait itself stays for item 119. Done.
+  4. The `_WINDOWS` groups in the rest of the sources, one commit each:
+     a. `SIGEL_GP`;
+     b. `SIGEL_Simulation`;
+     c. `SIGEL_Robot`, `SIGEL_Environment`, `SIGEL_Program`;
+     d. `SIGEL_MasterGUI`, `SIGEL_SlaveGUI`, `SIGEL_CommonGUI`,
+        `SIGEL_Visualisation`;
+     e. `sigel.cpp`, `sigel_slave.cpp`, `manage_dyn_slave.c`, with a note in
+        D22 that its Windows half is gone.
+  5. MSVC leftovers in the headers, one commit each:
+     a. the `AFX_…_INCLUDED_` include guards in `MT_Control` and `MT_GUI`,
+        renamed to the tree's `DIR_FILE_H` form;
+     b. the same in `MT_GPSystem`;
+     c. the "Added from the class view" comments.
+  6. The MSVC class-wizard comments: the `// X.h: interface for class X.`
      banners and the `Construction/destruction` blocks.
 
   A trial run on 2026-09-28 resolved every group with a script and passed
