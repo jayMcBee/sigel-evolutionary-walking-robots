@@ -909,7 +909,19 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-29 — DONE: ITEM 105, THE MP4.** Start here.
+**2026-09-29 — NOTE: THE VIEWER'S LIGHTS, FOR LATER.** Start here.
+
+- Even with the ambient slider at 0 the view looks bright. The ambient part
+  is then 0; the three direct lights add up: the headlight `GL_LIGHT0` 1.0
+  and the top light `GL_LIGHT1` 0.6, both in `SIG_Visualisation`'s
+  constructor, and the sun, `sunIntensity` 0.5, in shadow mode. A surface
+  facing both the eye and the sky gets up to 2.1 times its colour, cut at 1.
+- Tried and undone: all three at 90%, then at 80%. By eye, little
+  difference. Look into it later with a temporary debug test: keys that
+  switch between several light settings in the viewer, and a recorded
+  frame of each to compare.
+
+**2026-09-29 — DONE: ITEM 105, THE MP4.**
 
 - **Changed:** `reportRecordedFrames` is renamed `reportAndEncodeRecording`
   and forwards to the new `SIG_MovieEncoder`, which shows the messages and
