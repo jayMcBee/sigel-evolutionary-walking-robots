@@ -8,8 +8,8 @@
 
 
 #include <QQueue>
-#include "MT_GPSystem/MT_Program.h"	// Added from the class view
-#include "MT_GPSystem/MT_Interpreter.h"	// Added from the class view
+#include "MT_GPSystem/MT_Program.h"
+#include "MT_GPSystem/MT_Interpreter.h"
 #include "MT_GPSystem/MT_TranslatedIndividual.h"
 #include "MT_GPSystem/MT_TrainingCase.h"
 #include "MT_GPSystem/MT_TrainingCase.h"

@@ -16,7 +16,7 @@ class MT_Substitute;
 #include "MT_GPSystem/MT_Randomizer.h"
 #include "MT_GPSystem/MT_Search.h"
 #include "MT_GPSystem/MT_FitnessTrainer.h"
-#include "MT_GPSystem/MT_TournamentManager.h"	// Added from the class view
+#include "MT_GPSystem/MT_TournamentManager.h"
 
 #include <pthread.h>
 

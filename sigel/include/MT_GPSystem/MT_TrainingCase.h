@@ -5,7 +5,7 @@
 #ifndef MT_GPSYSTEM_MT_TRAININGCASE_H
 #define MT_GPSYSTEM_MT_TRAININGCASE_H
 
-#include "MT_GPSystem/MT_TranslatedIndividual.h"	// Added from the class view
+#include "MT_GPSystem/MT_TranslatedIndividual.h"
 #include <qstring.h>
 #include <qtextstream.h>
 

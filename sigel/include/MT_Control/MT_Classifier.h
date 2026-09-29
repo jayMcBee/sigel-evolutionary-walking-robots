@@ -15,7 +15,7 @@
 
 #include "SIGEL_Program/SIG_Program.h"
 #include "SIGEL_Program/SIG_ProgramLine.h"
-#include "MT_GPSystem/MT_TranslatedIndividual.h"	// Added from the class view
+#include "MT_GPSystem/MT_TranslatedIndividual.h"
 
 
 
