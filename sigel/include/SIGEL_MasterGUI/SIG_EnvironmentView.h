@@ -85,6 +85,10 @@ public:
   		*	This slot will be envoked when the user check or uncheck the Texture checkbox
   		*/
 		virtual	void slotTextureSelect();
+  	/**
+  		*	Sets the start position's X and Z to the middle of the floor.
+  		*/
+		virtual void slotCenterOnTerrain();
 			
  private:
 

@@ -19,6 +19,7 @@ public:
 
 public slots:
     virtual void slotAlpha() = 0;
+    virtual void slotCenterOnTerrain() = 0;
     virtual void slotFloorSelectionChanged() = 0;
     virtual void slotSelectFile() = 0;
     virtual void slotSelectTextureFile() = 0;

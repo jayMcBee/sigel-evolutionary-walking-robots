@@ -182,6 +182,7 @@ void SIG_EnvironmentView::getOutOfExperiment()
 			lineeditFunction->setEnabled(true);
 			lineeditXDim->setEnabled(true);
 			lineeditZDim->setEnabled(true);
+			pushbuttonCenterOnTerrain->setEnabled(true);
 			lineeditPictureFile->setDisabled(true);
 			pushbuttonSelectFile->setDisabled(true);
 			theExperiment.environment.setFloorFuncSelected(true);
@@ -192,8 +193,17 @@ void SIG_EnvironmentView::getOutOfExperiment()
 			lineeditFunction->setDisabled(true);
 			lineeditXDim->setDisabled(true);
 			lineeditZDim->setDisabled(true);
+			// The picture file sets the floor's size, not the X and Z fields.
+			pushbuttonCenterOnTerrain->setDisabled(true);
 			theExperiment.environment.setFloorFuncSelected(false);
 		}
+	};
+	
+	void SIG_EnvironmentView::slotCenterOnTerrain() {
+		// The floor's grid points are 1 apart and start at 0, so a floor of
+		// X points ends at X - 1.
+		lineeditStartPositionX->setText( QString::number( ( lineeditXDim->text().toInt() - 1 ) / 2.0 ) );
+		lineeditStartPositionZ->setText( QString::number( ( lineeditZDim->text().toInt() - 1 ) / 2.0 ) );
 	};
 	
 	void SIG_EnvironmentView::slotSelectFile() {

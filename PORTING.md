@@ -909,7 +909,15 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-29 — DONE: `SIG_Body::usedByLinks` IS DELETED.** Start here.
+**2026-09-29 — DONE: ITEM 68, "CENTER ON TERRAIN".** Start here.
+
+- **Changed:** a "Center on Terrain" button on the Environment page sets the
+  robot's start X and Z to the floor's middle; see item 68 in "Done".
+  `SIG_Body.h` no longer includes `SIG_Link.h`. Checked on the desktop.
+- **New to-do:** item 128, a Stop that waits for the end of the generation.
+- **Gates:** `check.sh` 757 pass, 0 fail; warnings 412.
+
+**2026-09-29 — DONE: `SIG_Body::usedByLinks` IS DELETED.**
 
 - **Changed:** the member, `SIG_Body::addUsingLink` and its one call are
   gone; see item 36 in "Done". Item 36 was two changes; it now holds only
@@ -7203,6 +7211,16 @@ carried; other items and this file cite them, so they do not change.
   last lines of ffmpeg's error output. A crop filter trims an odd width or
   height by one pixel, since yuv420p needs even ones. POV-Ray frames get
   the "frames written" message only.
+
+- [x] **68. Whether the robot starts in the middle of the terrain** —
+  decided 2026-09-29: the shipped experiments keep their start at the
+  terrain's corner, and the Environment page has a "Center on Terrain"
+  button in the Robot group box. `SIG_EnvironmentView::slotCenterOnTerrain`
+  sets the start position's X and Z to (X − 1) / 2 and (Z − 1) / 2 of the
+  floor size fields, because the grid points are 1 apart and start at 0;
+  Y stays. The button is disabled while a picture file is the floor, whose
+  size comes from the file. No file format changes; `gui behaviour`'s
+  baseline gains the button's greying when "Picture:" is chosen.
 
 - [x] **36, first half. `SIG_Body::usedByLinks` is deleted** — done
   2026-09-29. It was written and never read. Its only writer,

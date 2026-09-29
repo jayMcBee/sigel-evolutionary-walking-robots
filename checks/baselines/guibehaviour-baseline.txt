@@ -889,6 +889,7 @@ we do with the system?]
       side effect: sliderAlpha now ENABLED
     radio  radiobuttonFunction                  text=[Function:] checkable=1 1->1 enabled=1
     radio  radiobuttonPictureFile               text=[Picture:] checkable=1 0->1 enabled=1
+      side effect: pushbuttonCenterOnTerrain now greyed
       side effect: radiobuttonFunction now unchecked
       side effect: lineeditFunction now greyed
       side effect: lineeditPictureFile now ENABLED

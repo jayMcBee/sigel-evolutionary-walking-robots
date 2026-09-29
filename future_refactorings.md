@@ -425,11 +425,6 @@ problem; the choice is made before any code is written.
   step sizes scaled to the operand's range, and step sizes that adapt during
   the run.
 
-- [ ] **68. Decide whether the robot starts in the middle of the terrain.**
-  Every shipped experiment starts it at the terrain's corner. Moving it means
-  either `STARTPOSITION` in the `.exp` files, a file change, or the terrain's
-  place in DynaMechs, a vendor patch. Positions and fitness move with it.
-
 - [ ] **81. Add a fitness function that rewards steady walking.** No existing
   function rewards an even pace. Decided so far, preliminary name "Steady
   Walking", `SteadyWalkingFitnessFunction`, class

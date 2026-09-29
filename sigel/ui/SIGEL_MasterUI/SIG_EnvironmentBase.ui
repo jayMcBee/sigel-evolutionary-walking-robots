@@ -295,6 +295,16 @@
                             </property>
                           </widget>
                         </item>
+                        <item row="3" column="1">
+                          <widget class="QPushButton" name="pushbuttonCenterOnTerrain">
+                            <property name="text">
+                              <string>Center on Terrain</string>
+                            </property>
+                            <property name="toolTip">
+                              <string>Sets X and Z to the middle of the floor. Y stays as it is.</string>
+                            </property>
+                          </widget>
+                        </item>
                       </layout>
                     </item>
                   </layout>
@@ -726,6 +736,7 @@
     <tabstop>lineeditStartPositionX</tabstop>
     <tabstop>lineeditStartPositionY</tabstop>
     <tabstop>lineeditStartPositionZ</tabstop>
+    <tabstop>pushbuttonCenterOnTerrain</tabstop>
     <tabstop>radiobuttonFunction</tabstop>
     <tabstop>lineeditFunction</tabstop>
     <tabstop>lineeditXDim</tabstop>
@@ -749,12 +760,19 @@
   </tabstops>
   <slots>
     <slot>slotAlpha()</slot>
+    <slot>slotCenterOnTerrain()</slot>
     <slot>slotFloorSelectionChanged()</slot>
     <slot>slotSelectFile()</slot>
     <slot>slotSelectTextureFile()</slot>
     <slot>slotTextureSelect()</slot>
   </slots>
   <connections>
+    <connection>
+      <sender>pushbuttonCenterOnTerrain</sender>
+      <signal>clicked()</signal>
+      <receiver>SIG_EnvironmentBase</receiver>
+      <slot>slotCenterOnTerrain()</slot>
+    </connection>
     <connection>
       <sender>radiobuttonFunction</sender>
       <signal>toggled(bool)</signal>
