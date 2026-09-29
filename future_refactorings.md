@@ -148,6 +148,20 @@ Paths are relative to `sigel/`, the source tree.
 All present in 1.3, none introduced here. Each needs a decision before it is
 touched, because changing one changes behaviour against the reference binary.
 
+- [ ] **121. Make the dynamic-client handshake share one mutex.**
+  `SIG_GPManager::run`, both overloads, waits on the member `cond` with its
+  own local `mutex`; `SIG_GPManager::RegisterDynPVMClients` broadcasts under
+  its own local `servMutex`. The two threads never lock the same mutex, so the
+  flags `disconnectClients` and `allDisconnected` race, and a broadcast that
+  lands between the check and the wait is lost, which leaves the master
+  waiting for good. Latent: only the dynamic-client thread reaches it, which
+  only `sigel.cpp` starts. Item 19 is the same kind of fault elsewhere.
+
+- [ ] **122. Destroy MetaGP's mutexes instead of unlocking them.**
+  `MT_Substitute::~MT_Substitute` and `MT_GPManager::~MT_GPManager` call
+  `pthread_mutex_unlock` on mutexes the destroying thread does not hold, which
+  POSIX leaves undefined, and never call `pthread_mutex_destroy`.
+
 - [ ] **119. Make MetaGP able to start on Linux.**
   `MT_GPManager::startEvolution` waits for enough training cases with
   `sleep(10000000)` on POSIX, about 115 days, where Windows waits
@@ -418,6 +432,9 @@ problem; the choice is made before any code is written.
 
 ## 9 · Removals
 
+- [ ] **123. Remove the second `#include "MT_GPSystem/MT_TrainingCase.h"`
+  from `MT_Substitute.h`.** The same line appears twice in a row.
+
 - [ ] **64. Remove what is left of Dynamo.** Decided: it goes completely. It
   was hardly ever used (https://sigel.sourceforge.net/seiten/links_en.html).
   PORTING.md, "Dynamo removed, DynaMechs kept", has the background. Three
@@ -465,6 +482,9 @@ problem; the choice is made before any code is written.
   **Modernise in place, do not replace.** It needs a second machine to prove
   it on; the 1.3 reference machine is not ours to use for tooling, so it waits
   until there is one.
+  - **`manage_dyn_slave.c`, `main`,** tests `getprotobyname` through an
+    `(int)` cast, which keeps only the low 32 bits of the pointer, so a valid
+    pointer can read as a failure.
 
 - [ ] **35. Remove the Windows and Visual Studio support.** Decided. It does
   not build here, nothing tests it, and it could not build in 2003 either.
