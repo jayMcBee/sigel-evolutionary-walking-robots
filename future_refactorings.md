@@ -112,9 +112,6 @@ Paths are relative to `sigel/`, the source tree.
   rotation, not the colour — leave it.
   **Umlauts are Latin-1 bytes;** a UTF-8 grep misses them. Comments first,
   because that phase cannot move a baseline.
-  **Do not translate `Sigel.mak`, `sigel_slave.mak`, `manage_dyn_slave.mak` or
-  `Sigel.dsw`:** generated, not built here; item 35 deletes them. Do not
-  hand-edit generated files.
   **Check after each phase:** `./checks/check.sh`, then
   `./checks/dictorder-dump.sh | diff -u checks/baselines/dictorder-baseline.txt -`
   empty, then `./checks/fitness-check.sh` clean.
@@ -488,16 +485,35 @@ problem; the choice is made before any code is written.
 
 - [ ] **35. Remove the Windows and Visual Studio support.** Decided. It does
   not build here, nothing tests it, and it could not build in 2003 either.
-  Delete the Visual Studio files at the source root first, then take the
-  `#ifdef _WINDOWS` blocks one module at a time, keeping the `#else` half;
-  the object file must not change. MSVC leftovers such as the `AFX_…_INCLUDED_`
-  guard comments go too.
+  **Going now, by decision, in six commits** rather than one, so each can be
+  reviewed:
+  1. the nine Visual Studio files, with the `encodings` totals PORTING.md pins
+     and the docs that named the files — done 2026-09-29;
+  2. the `_WINDOWS` groups in the headers;
+  3. the `_WINDOWS` groups in the MetaGP sources: `MT_Control`,
+     `MT_GPSystem`, `MT_GUI`;
+  4. the `_WINDOWS` groups in the `SIGEL_*` sources, `sigel.cpp`,
+     `sigel_slave.cpp` and `manage_dyn_slave.c`;
+  5. the `AFX_…_INCLUDED_` include guards, renamed to the tree's `DIR_FILE_H`
+     form, and the "Added from the class view" comments;
+  6. the MSVC class-wizard comments: the `// X.h: interface for class X.`
+     banners and the `Construction/destruction` blocks.
+
+  A trial run on 2026-09-28 resolved every group with a script and passed
+  `check.sh`.
+  - **Resolving a group:** for `#ifdef _WINDOWS` keep the `#else` half, or
+    nothing when there is none; for `#ifndef _WINDOWS` keep the body and drop
+    the guard.
+  - **The proof is two builds,** because removed lines move `__LINE__` in
+    `throw`s and the `"file:line"` text Qt's `SIGNAL` and `SLOT` store. First
+    with removed lines left blank: every object must match outside the debug
+    information. Then with the blanks gone: only line numbers may differ.
   - **`src/manage_dyn_slave.c` is easy to miss,** the only `.c` file. Keep
     the file: `sigelDynClient` needs it (item 47). Only its Windows branches
     go.
-  - **The gates cannot see deleted code.** Read every diff. `_WINDOWS` also
-    sits in commented-out code in `MT_GPManager.cpp`.
-  - **`#ifndef _WINDOWS` is reverse polarity:** keep the body, drop the guard.
+  - **The gates cannot see deleted code.** Read every diff: a Windows-only
+    group can hold a line the other half needs. `_WINDOWS` also sits in
+    commented-out code in `MT_GPManager.cpp`, which a script skips.
   - **Headers carry `_WINDOWS` too,** and a mistake in one changes every
     including translation unit: `MT_Controller.h`, `MT_Substitute.h`,
     `MT_GPManager.h`, `SIG_GPManager.h`, `SIG_Program.h`,
@@ -505,34 +521,10 @@ problem; the choice is made before any code is written.
     `SIG_SimulationQueries.h`, `SIG_EnvironmentRenderer.h`, `SIG_Renderer.h`.
     `MT_Controller.h` declares `meta_thread` and the thread entry point twice,
     once as `HANDLE`, once for `pthread`.
-  - **It supersedes D22,** a signed decision: Fusion for the `#else` half, and
-    the `#ifdef` half keeps Windows by name because Qt 6 still creates that
-    style. Its call sites are in `sigel.cpp, main` and `sigel_slave.cpp`.
-    Say that a decision is being overturned.
-  - **It moves a pinned check total:** the `encodings` check counts the
-    project files. PORTING.md pins that total in §7's per-step exit criterion
-    and in the check list, and §7's trail records each step. Move all of them
-    in the same commit.
-  - **A trial run was made on 2026-09-28 and is held uncommitted.** A script
-    resolved every group; `check.sh` passed. The open points it raised:
-    - **The object file cannot stay identical.** Removed lines move
-      `__LINE__` in `throw`s and the `"file:line"` text Qt's `SIGNAL` and
-      `SLOT` store. The proof is two builds: first with removed lines left
-      blank, which must match byte for byte outside the debug information,
-      then with the blanks gone, which may differ in line numbers only.
-    - **Groups with no `#else`** go completely. The item's "keeping the
-      `#else` half" does not cover them.
-    - **The `AFX_…_INCLUDED_` names are the include guards themselves.**
-      Decide their new names; the trial used the tree's `DIR_FILE_H` form.
-    - **The MSVC class-wizard banners** (`// X.h: interface for class X.` and
-      its `////` rule) and the "Added from the class view" comments: decide
-      whether they go.
-    - **Docs that still name the Visual Studio files:** §5's `Sigel.mak`
-      item and PORTING.md's log entries.
-    - **The order:** the trial ran before the other items in this section.
-      Decide whether the item waits or goes now.
-  **Do not mix it with any other change. When:** after every other item in
-  this section, because it touches the whole codebase.
+  - **D22 loses its Windows half.** Fusion stays, as the only style; its call
+    sites are in `sigel.cpp, main` and `sigel_slave.cpp`. Commit 4 notes it in
+    D22.
+  **Do not mix it with any other change.**
 
 ---
 
