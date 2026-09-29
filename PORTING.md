@@ -909,7 +909,21 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-30 — DONE: MOVIE FRAMES ARE TIMED BY SIMULATED TIME.** Start here.
+**2026-09-30 — DONE: THE MOVIE SETTINGS SLOT CHECKS FOR A VISUALISATION; ITEM 35 AUDITED.** Start here.
+
+- **Changed:** `SIG_SimulationVisualisationWidget::slotAlterMovieSettingsClicked`
+  returns when there is no visualisation, as the widget's other slots do.
+  The code went into `2d22b7c`, whose message names only the docs.
+- **Audit of item 35:** nothing Windows-related is left in SIGEL's own
+  code, build files, scripts, forms or `sigelApp/`. Kept on purpose: the
+  vendor originals (PVM's `WIN32/`, newmat's Windows makefiles, two Debian
+  PVM patches), Doxygen's default comments, and the CRLF guard's text.
+  Three stale doc statements were corrected in `2d22b7c`.
+- **Gates:** `check.sh` 754 pass, 0 fail; warnings 412.
+- **Next:** the 3-D view's minimum size and the position display, as
+  proposed; then item 105, the MP4.
+
+**2026-09-30 — DONE: MOVIE FRAMES ARE TIMED BY SIMULATED TIME.**
 
 - **Changed:** `SIG_MovieRecorder::needsToRecordFrameAt` decides when a frame
   is due, from `getCurrentSimulationSeconds`: frame k of a recording at k /
