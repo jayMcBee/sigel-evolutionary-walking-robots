@@ -570,16 +570,15 @@ void SIG_SimulationVisualisationWidget::reportAndEncodeRecording()
     SIGEL_Visualisation::SIG_SimulationVisualisation const *simulationVisualisation =
       static_cast< SIGEL_Visualisation::SIG_SimulationVisualisation const* >( visualisation );
 
-    // The margin leaves room around the robot. The narrower of the two
-    // view angles decides, so the robot fits both ways.
-    double const margin = 1.25;
+    // The robot's enclosing sphere just fits the view. The narrower of the
+    // two view angles decides, so the robot fits both ways.
     double const halfHeightAngle = qDegreesToRadians( SIGEL_Visualisation::SIG_Visualisation::fieldOfView / 2 );
     double halfAngle = halfHeightAngle;
     double const aspectRatio = visualisation->viewSettings.aspectRatio;
     if (aspectRatio < 1)
       halfAngle = std::atan( std::tan( halfHeightAngle ) * aspectRatio );
 
-    return margin * simulationVisualisation->getRobotRadius() / std::sin( halfAngle );
+    return simulationVisualisation->getRobotRadius() / std::sin( halfAngle );
   };
 
   void SIG_SimulationVisualisationWidget::slotNavigateCenter()

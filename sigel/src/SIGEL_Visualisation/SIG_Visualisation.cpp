@@ -28,7 +28,7 @@
 namespace SIGEL_Visualisation
 {
 
-  double const SIG_Visualisation::fieldOfView = 100;
+  double const SIG_Visualisation::fieldOfView = 60;
 
   SIG_Visualisation::SIG_Visualisation()
     : viewSettings(),
