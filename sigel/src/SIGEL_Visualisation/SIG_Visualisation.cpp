@@ -69,6 +69,7 @@ namespace SIGEL_Visualisation
   void SIG_Visualisation::visualize()
   {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    drawSky();
 
     DL_vector finalEyePoint = viewSettings.getAbsoluteEyePoint();
 
@@ -126,6 +127,42 @@ namespace SIGEL_Visualisation
        	break;
       };
   };
+
+	void SIG_Visualisation::drawSky() const
+	{
+		// The render modes before leave flat shading, lighting and line mode on.
+		glPushAttrib( GL_ENABLE_BIT | GL_DEPTH_BUFFER_BIT | GL_LIGHTING_BIT | GL_POLYGON_BIT | GL_CURRENT_BIT );
+		glDisable( GL_DEPTH_TEST );
+		glDisable( GL_LIGHTING );
+		glDisable( GL_TEXTURE_2D );
+		glDisable( GL_CULL_FACE );
+		glDepthMask( GL_FALSE );
+		glShadeModel( GL_SMOOTH );
+		glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+
+		glMatrixMode( GL_PROJECTION );
+		glPushMatrix();
+		glLoadIdentity();
+		glMatrixMode( GL_MODELVIEW );
+		glPushMatrix();
+		glLoadIdentity();
+
+		glBegin( GL_QUADS );
+		glColor3f( skyBottomColor.x(), skyBottomColor.y(), skyBottomColor.z() );
+		glVertex2f( -1, -1 );
+		glVertex2f( 1, -1 );
+		glColor3f( skyTopColor.x(), skyTopColor.y(), skyTopColor.z() );
+		glVertex2f( 1, 1 );
+		glVertex2f( -1, 1 );
+		glEnd();
+
+		glPopMatrix();
+		glMatrixMode( GL_PROJECTION );
+		glPopMatrix();
+		glMatrixMode( GL_MODELVIEW );
+
+		glPopAttrib();
+	};
 
   void SIG_Visualisation::setAmbientSceneColor( double red,
 						double green,

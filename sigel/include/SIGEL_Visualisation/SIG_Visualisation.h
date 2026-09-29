@@ -27,6 +27,7 @@
 #include "SIGEL_Visualisation/SIG_FloatingText.h"
 
 #include <QList>
+#include <QVector3D>
 
 #include <newmat.h>
 
@@ -109,6 +110,14 @@ namespace SIGEL_Visualisation
 
     protected:
       NEWMAT::ColumnVector ambientSceneColor;
+
+    private:
+
+      static constexpr QVector3D skyTopColor = QVector3D( 0.70f, 0.80f, 0.95f );
+
+      static constexpr QVector3D skyBottomColor = QVector3D( 1.0f, 1.0f, 1.0f );
+
+      void drawSky() const;
 
     };
 
