@@ -909,7 +909,25 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-29 — DONE: THE EVOLUTION LOOP'S WAIT, ITEM 35, ITEMS 12 AND 123.** Start here.
+**2026-09-29 — DONE: THE MOVIE SETTINGS ARE ONE VALUE, `SIG_MOVIESETTINGS`.** Start here.
+
+- **Changed:** the nine movie settings members of
+  `SIG_SimulationVisualisationWidget` are one `SIG_MovieSettings` struct,
+  `movieSettings`, in the new header `SIGEL_SlaveGUI/SIG_MovieSettings.h`.
+  `SIG_MovieSettingsDialog::setSettings` and `settings` replace the widget's
+  field-by-field copying in `slotAlterMovieSettingsClicked`. No change in
+  behaviour. First step of taking the movie code out of the widget:
+  `SIG_MovieRecorder` next, then item 105.
+- **New files** keep the 2001 copyright block and add
+  `Copyright 2026 Jan Barnholt (SIGEL 2.0)` below the names, by decision.
+- **Review:** no difference in behaviour.
+- **Gates:** `check.sh` 750 pass, 0 fail; warnings 421. The other four gates
+  were not run; the change is in the slave GUI only.
+- **Next:** extract `SIG_MovieRecorder`, a plain C++ class, with no change in
+  behaviour; then movie frames timed by simulated time,
+  `needsToRecordFrameAt`, in its own commit.
+
+**2026-09-29 — DONE: THE EVOLUTION LOOP'S WAIT, ITEM 35, ITEMS 12 AND 123.**
 
 - **Changed:**
   - The evolution loop waits once per pass instead of once per tournament
@@ -4921,7 +4939,7 @@ else that stops matching 1.3 still needs justifying as a defect.
 | **`.lap` export order.** 1.3 does not round-trip its own order — `Q2Dict::insert` prepends, so re-inserting in iteration order reverses every colliding chain (three pairs and one triple; eight of thirteen commands move). The port is the stable one | §10 already says load and save become order-preserving once the shim goes. Restoring it means reimplementing `Q2Dict`'s bucket permutation on read — writing the defect back in | measured on the running binary, C11b |
 | **The robot block in a saved `.exp` is a fixed point here and an involution on 1.3.** Same cause as the row above, on the larger surface: load and save is the identity for us, and a permutation that undoes itself on the second save for 1.3. Measured over four states of `hammer` 2026-09-08 — our md5 never moves; 1.3's toggles, `state0 == state2` and `state1 == state3`. Three things toggle on hammer: material order, `Body` emission order, and `middle3`'s axis points. On `octopus` it is joint, drive and sensor order, the body order and the command list, from V1 | D3, deliberate. Same answer as the row above — matching it means reimplementing `Q2Dict`'s bucket permutation on read. **It has not bitten anyone yet, and here is when it would:** a robot written by one side and read by the other keeps every name and every mesh, and only their order moves. That order composes with V7's friction rule, so read V6 RESULT before revisiting D3 | `v2 round trip vs 1.3` pins OUR side as a fixed point on both robots; `v8-1.3-gp-blocks.txt` result 6 and `v1-1.3-roundtrip.txt` hold 1.3's |
 | **A newly-allowed command appends** where 1.3 inserts at its **hash position** (allowing JMP lands it sixth, straight after LOAD, on 1.3) | the insertion **point** depends on runtime hashing, so matching it means reimplementing what Phase D removed. *Distinct from the `.lap` case, where the port had a free choice of a **static** order and 1.3's was reproducible for nothing — so that one was fixed* | C11c |
-| **The movie records frame N where 1.3 recorded frame N−1.** Every caller runs `makeTimeSteps(n); update();` with the grab **inside** `makeTimeSteps`, so Qt 2's `grabWindow` captured the last *presented* frame while the simulation stood one step further; `grabFramebuffer()` renders current content | forced, not chosen — Qt 6 removed `QPixmap::grabWindow`, and for a `QOpenGLWidget` it was wrong anyway, reading on-screen pixels where the widget renders into an FBO. **Raster path only**; `fileFormat == "pov"` is a different branch, and per the oracle the POV export produced every published film | nothing can see it |
+| **The movie records frame N where 1.3 recorded frame N−1.** Every caller runs `makeTimeSteps(n); update();` with the grab **inside** `makeTimeSteps`, so Qt 2's `grabWindow` captured the last *presented* frame while the simulation stood one step further; `grabFramebuffer()` renders current content | forced, not chosen — Qt 6 removed `QPixmap::grabWindow`, and for a `QOpenGLWidget` it was wrong anyway, reading on-screen pixels where the widget renders into an FBO. **Raster path only**; `movieSettings.format == "pov"` is a different branch, and per the oracle the POV export produced every published film | nothing can see it |
 | **HiDPI movie frames are resampled.** `grabFramebuffer()` returns device pixels; 1.3's frames are logical | normalised back with `scaled(size(), …)` + `setDevicePixelRatio(1.0)`. At ratio 1.0 the branch does not run and the bytes are unchanged | — |
 | **The Motif look is gone.** Qt 6 ships exactly two styles here (`QStyleFactory::keys()` → `Windows, Fusion`); the X11 branch takes Fusion | unreproducible; recorded rather than papered over | — |
 | **`-geometry` and `-title` are gone from Qt entirely**, so `setMainWidget`'s third job cannot be restored | unreproducible. `quitOnLastWindowClosed` covers the "closing ends the app" half | — |

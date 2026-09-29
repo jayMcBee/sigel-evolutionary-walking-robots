@@ -67,6 +67,36 @@ SIG_MovieSettingsDialog::SIG_MovieSettingsDialog( QWidget *view, double stepSize
 	slotUpdateStepsPerFrame();
 };
 
+void SIG_MovieSettingsDialog::setSettings( SIG_MovieSettings const &settings )
+{
+  spinboxWidth->setValue( settings.width );
+  spinboxHeight->setValue( settings.height );
+  spinboxFrameRate->setValue( settings.frameRate );
+  lineeditDirectory->setText( settings.directory );
+  lineeditFilePrefix->setText( settings.filePrefix );
+  spinboxMaxFrames->setValue( settings.maxFrames );
+  comboboxFormat->setCurrentIndex( comboboxFormat->findText( settings.format.toUpper() ) );
+  spinboxQuality->setValue( settings.quality );
+  checkboxUseLeadingZeros->setChecked( settings.useLeadingZeros );
+};
+
+SIG_MovieSettings SIG_MovieSettingsDialog::settings() const
+{
+  SIG_MovieSettings settings;
+  settings.width = spinboxWidth->value();
+  settings.height = spinboxHeight->value();
+  settings.frameRate = spinboxFrameRate->value();
+  settings.directory = lineeditDirectory->text();
+  if( settings.directory.right(1) != "/" )
+    settings.directory.append( "/" );
+  settings.filePrefix = lineeditFilePrefix->text();
+  settings.format = comboboxFormat->currentText().toLower();
+  settings.maxFrames = spinboxMaxFrames->value();
+  settings.quality = spinboxQuality->value();
+  settings.useLeadingZeros = checkboxUseLeadingZeros->isChecked();
+  return settings;
+};
+
 /* 
  * public slot.
  */

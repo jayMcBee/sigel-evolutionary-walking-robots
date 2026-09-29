@@ -55,17 +55,9 @@
 		       environment(nullptr),
 		       simulationParameters(nullptr),
 		       program(nullptr),
-		       movieWidth(1024),
-		       movieHeight(576),
-		       movieFrameRate(25),
-		       movieMaxFrames(1000),
-		       movieQuality(50),
 		       currentFrame(0),
 		       currentFrameName(0),
-		       movieFilePrefix( "sigel_pic" ),
-		       fileFormat( "png" ),
 		       record(false),
-		       useLeadingZeros( true ),
 		       planeColor( 127, 127, 127 )
   {
     simulationTimer = new QTimer( this );
@@ -84,7 +76,7 @@
     QString temp( sigelRoot );
     if( temp.right(1) != "/" )
       temp.append( "/" );
-    movieDirectory = temp + "movie/";
+    movieSettings.directory = temp + "movie/";
   };
 
   int SIG_SimulationVisualisationWidget::stepsPerFrame( double stepSize, int frameRate )
@@ -238,22 +230,22 @@
 
 	if ( record )
 	  {
-	    int frameSteps = stepsPerFrame( simulationParameters->getStepSize(), movieFrameRate );
+	    int frameSteps = stepsPerFrame( simulationParameters->getStepSize(), movieSettings.frameRate );
 
 	    // only do the stuff every n-th frame if we have not exeeded the maximum frame number.
-	    if( ((currentFrame % frameSteps) == 0) && currentFrameName < movieMaxFrames )
+	    if( ((currentFrame % frameSteps) == 0) && currentFrameName < movieSettings.maxFrames )
 	      {
 		// this string will hold the fileName which has to be build...
 		QString fileName = QString::number( currentFrameName );
 
 		// check if leading zeros are wanted
-		if( useLeadingZeros )
+		if( movieSettings.useLeadingZeros )
 		  {
 		    // O.K. leading zeros wanted
 		    // compute the number of digits of the current frame
 		    int currentLength = fileName.length();
 		    // compute the number of digits of the maximum frames
-		    int maxLength = QString::number( movieMaxFrames ).length();
+		    int maxLength = QString::number( movieSettings.maxFrames ).length();
 		    // compute the difference between the two numbers.
 		    int difference = maxLength - currentLength;
 		    
@@ -262,22 +254,22 @@
 		      fileName.prepend( "0" );
 		  }
 
-		fileName.prepend( movieDirectory + movieFilePrefix );
+		fileName.prepend( movieSettings.directory + movieSettings.filePrefix );
 		// append the format ending (bmp or png)
-		fileName.append( "." + fileFormat );
+		fileName.append( "." + movieSettings.format );
 #ifdef SIG_DEBUG
-		SIGEL_Tools::SIG_IO::cerr << "Writing " << fileName << " in format " << movieWidth << " x " << movieHeight << " in quality " << movieQuality << "." << Qt::endl;
+		SIGEL_Tools::SIG_IO::cerr << "Writing " << fileName << " in format " << movieSettings.width << " x " << movieSettings.height << " in quality " << movieSettings.quality << "." << Qt::endl;
 #endif
 		// check if the directory exists. otherwise create it.
-		QDir movieDir( movieDirectory );
+		QDir movieDir( movieSettings.directory );
 		if(!movieDir.exists() )
-		  movieDir.mkdir( movieDirectory );
+		  movieDir.mkdir( movieSettings.directory );
 
 		bool renderSuccess;
 
-		if ( fileFormat == "pov" )
+		if ( movieSettings.format == "pov" )
 		  {
-		    QString includeFileName = movieFilePrefix + ".inc";
+		    QString includeFileName = movieSettings.filePrefix + ".inc";
 
 		    renderSuccess = simulationVisualisation.exportToPovray( includeFileName,
 									    fileName );
@@ -295,7 +287,7 @@
 		    QMessageBox::warning( this, "File Error", "Unable to write file " + fileName + ".\nPerhaps you don't have permission to write the file.");
 		  };
 		currentFrameName++;
-	      } // end of if( ((currentFrame % frameSteps) == 0) && currentFrameName < movieMaxFrames )
+	      } // end of if( ((currentFrame % frameSteps) == 0) && currentFrameName < movieSettings.maxFrames )
 	    currentFrame++;
 	  } // end of if(record && !automaticRefresh )
       };
@@ -309,18 +301,18 @@
       return false;
     grabbed.setDevicePixelRatio( 1.0 );
 
-    QImage frame( movieWidth, movieHeight, QImage::Format_RGB32 );
+    QImage frame( movieSettings.width, movieSettings.height, QImage::Format_RGB32 );
     frame.fill( Qt::black );
 
     QPainter painter( &frame );
-    painter.drawImage( (movieWidth - grabbed.width()) / 2,
-		       (movieHeight - grabbed.height()) / 2,
+    painter.drawImage( (movieSettings.width - grabbed.width()) / 2,
+		       (movieSettings.height - grabbed.height()) / 2,
 		       grabbed );
     painter.end();
 
     return frame.save( inFName,
-		       fileFormat.toUpper().toUtf8().constData(),
-		       movieQuality );
+		       movieSettings.format.toUpper().toUtf8().constData(),
+		       movieSettings.quality );
   }
 
 
@@ -383,7 +375,7 @@ void SIG_SimulationVisualisationWidget::reportRecordedFrames()
     return;
 
   QMessageBox::information( this, "Recording Stopped",
-			    QString( "%1 frames written to %2" ).arg( currentFrameName ).arg( movieDirectory ) );
+			    QString( "%1 frames written to %2" ).arg( currentFrameName ).arg( movieSettings.directory ) );
 };
 
   bool SIG_SimulationVisualisationWidget::simulationRunning()
@@ -665,26 +657,7 @@ void SIG_SimulationVisualisationWidget::reportRecordedFrames()
   void SIG_SimulationVisualisationWidget::slotAlterMovieSettingsClicked()
   {
     SIGEL_SlaveGUI::SIG_MovieSettingsDialog movieSettingsDialog( this, simulationParameters->getStepSize(), this, "movieSettingsDialog", true );
-    movieSettingsDialog.spinboxWidth->setValue( movieWidth );
-    movieSettingsDialog.spinboxHeight->setValue( movieHeight );
-    movieSettingsDialog.spinboxFrameRate->setValue( movieFrameRate );
-    movieSettingsDialog.lineeditDirectory->setText( movieDirectory );
-    movieSettingsDialog.lineeditFilePrefix->setText( movieFilePrefix );
-    movieSettingsDialog.spinboxMaxFrames->setValue( movieMaxFrames );
-    if( fileFormat == "bmp" )
-      movieSettingsDialog.comboboxFormat->setCurrentIndex(0);
-    if( fileFormat == "png" )
-      movieSettingsDialog.comboboxFormat->setCurrentIndex(1);
-    if( fileFormat == "ppm" )
-      movieSettingsDialog.comboboxFormat->setCurrentIndex(2);
-    if( fileFormat == "xbm" )
-      movieSettingsDialog.comboboxFormat->setCurrentIndex(3);
-    if( fileFormat == "xpm" )
-      movieSettingsDialog.comboboxFormat->setCurrentIndex(4);
-    if( fileFormat == "pov" )
-      movieSettingsDialog.comboboxFormat->setCurrentIndex(5);
-    movieSettingsDialog.spinboxQuality->setValue( movieQuality );
-    movieSettingsDialog.checkboxUseLeadingZeros->setChecked( useLeadingZeros );
+    movieSettingsDialog.setSettings( movieSettings );
     movieSettingsDialog.checkboxEnableMovie->setChecked( record );
 
     switch( movieSettingsDialog.exec() )
@@ -693,31 +666,21 @@ void SIG_SimulationVisualisationWidget::reportRecordedFrames()
 	if ( record && !movieSettingsDialog.checkboxEnableMovie->isChecked() )
 	  reportRecordedFrames();
 
-	movieWidth = movieSettingsDialog.spinboxWidth->value();
-	movieHeight = movieSettingsDialog.spinboxHeight->value();
-	movieFrameRate = movieSettingsDialog.spinboxFrameRate->value();
-	movieDirectory = movieSettingsDialog.lineeditDirectory->text();
-	if( movieDirectory.right(1) != "/" )
-	  movieDirectory.append( "/" );
-	movieFilePrefix = movieSettingsDialog.lineeditFilePrefix->text();
-	fileFormat = movieSettingsDialog.comboboxFormat->currentText().toLower();
-	movieMaxFrames = movieSettingsDialog.spinboxMaxFrames->value();
-	movieQuality = movieSettingsDialog.spinboxQuality->value();
-	useLeadingZeros = movieSettingsDialog.checkboxUseLeadingZeros->isChecked();
+	movieSettings = movieSettingsDialog.settings();
 	record = movieSettingsDialog.checkboxEnableMovie->isChecked();
 
-	if (record && (fileFormat == "pov") )
+	if (record && (movieSettings.format == "pov") )
 	  {
 	    SIGEL_Visualisation::SIG_SimulationVisualisation &simulationVisualisation =
 	      static_cast< SIGEL_Visualisation::SIG_SimulationVisualisation& >( *visualisation );
 
-	    QString fileName = movieDirectory + movieFilePrefix + ".inc";
+	    QString fileName = movieSettings.directory + movieSettings.filePrefix + ".inc";
 
-	    QDir movieDir( movieDirectory );
+	    QDir movieDir( movieSettings.directory );
 	    if(!movieDir.exists() )
-	      movieDir.mkdir( movieDirectory );
+	      movieDir.mkdir( movieSettings.directory );
 
-	    double aspectRatio = double( movieWidth ) / double ( movieHeight );
+	    double aspectRatio = double( movieSettings.width ) / double ( movieSettings.height );
 
 	    if ( !simulationVisualisation.createPovrayIncludeFile( fileName, aspectRatio ) )
 	      {

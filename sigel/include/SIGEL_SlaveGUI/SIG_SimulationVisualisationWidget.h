@@ -27,6 +27,7 @@
 #include <QColor>
 
 #include "SIGEL_CommonGUI/SIG_VisualisationWidget.h"
+#include "SIGEL_SlaveGUI/SIG_MovieSettings.h"
 
 #include "SIGEL_Robot/SIG_Robot.h"
 #include "SIGEL_Environment/SIG_Environment.h"
@@ -220,17 +221,7 @@
        */
       bool record;
 
-      bool useLeadingZeros;
-
-      int movieWidth;
-
-      int movieHeight;
-
-      int movieFrameRate;
-
-      int movieMaxFrames;
-
-      int movieQuality;
+      SIGEL_SlaveGUI::SIG_MovieSettings movieSettings;
 
       /**
        * This is the name for the next frame to be saved (initially 0).
@@ -246,12 +237,6 @@
        */
       int currentFrame;
 
-      QString movieDirectory;
-
-      QString movieFilePrefix;
-
-      QString fileFormat;
-
       void paintGL();
 
       /**
@@ -263,7 +248,7 @@
       void makeTimeSteps(int noOfSteps);
 
 			/**
-			 * Saves the view as one frame of exactly movieWidth x movieHeight,
+			 * Saves the view as one frame of exactly the movie width x height,
 			 * pixel for pixel: a larger view is cut to its centre, a smaller one
 			 * is centred on black. Returns whether saving was successful.
 			 */

@@ -23,6 +23,7 @@
 #ifndef SIGEL_SLAVEGUI_SIG_MOVIESETTINGSDIALOG_H
 #define SIGEL_SLAVEGUI_SIG_MOVIESETTINGSDIALOG_H
 #include "SIGEL_SlaveGUI/SIG_MovieSettingsDialogBase.h"
+#include "SIGEL_SlaveGUI/SIG_MovieSettings.h"
 
 namespace SIGEL_SlaveGUI
 {
@@ -33,6 +34,10 @@ class SIG_MovieSettingsDialog : public SIG_MovieSettingsDialogBase
 
 public:
     SIG_MovieSettingsDialog( QWidget *view, double stepSize, QWidget* parent = nullptr, const char* name = nullptr, bool modal = false, Qt::WindowFlags fl = Qt::WindowFlags() );
+
+    void setSettings( SIG_MovieSettings const &settings );
+
+    SIG_MovieSettings settings() const;
 
 public slots:
     void slotToolButtonClicked();
