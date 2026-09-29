@@ -230,10 +230,17 @@ namespace SIGEL_Visualisation
 
   void SIG_EnvironmentRenderer::renderGridAndPath()
   {
+    // Lines have no normals; lit, they take whatever normal came last.
+    glPushAttrib( GL_ENABLE_BIT );
+    glDisable( GL_LIGHTING );
+    glDisable( GL_TEXTURE_2D );
+
     renderSceneObjects( 1, noOfObjects );
 
     if (showRobotPath)
       renderRobotPath();
+
+    glPopAttrib();
   };
 
   QString SIG_EnvironmentRenderer::exportToPovray()
