@@ -26,13 +26,18 @@
 
 #include "SIGEL_SlaveGUI/SIG_MovieSettings.h"
 
+#include <QProcess>
+#include <QString>
+#include <QStringList>
+
 class QWidget;
 
 namespace SIGEL_SlaveGUI
 {
 
 	/**
-	 * Tells the user what a stopped recording wrote.
+	 * Tells the user what a stopped recording wrote, and makes an MP4 of the
+	 * frames with ffmpeg if the user wants one.
 	 */
 	class SIG_MovieEncoder
 	{
@@ -40,11 +45,21 @@ namespace SIGEL_SlaveGUI
 
 		SIG_MovieEncoder( QWidget *messageParent );
 
+		~SIG_MovieEncoder();
+
 		void encode( SIG_MovieSettings const &settings, int frameCount );
 
 	private:
 
+		QStringList arguments( SIG_MovieSettings const &settings, int frameCount ) const;
+
+		void reportFinished();
+
 		QWidget *messageParent;
+
+		QProcess process;
+
+		QString movieFileName;
 
 	};
 
