@@ -5366,8 +5366,7 @@ and the link fails. `SIG_GPExperimentClean.o` is now named explicitly ahead of
 the archives with an assertion after the link. *Chasing a recurrence, look at
 the environment, not at build freshness.*
 
-**Two blind spots no check reaches.** Three Qt 2 APIs survive in `#ifdef _WINDOWS`
-blocks that **cannot be compiled here** and were read by hand. And **the floating
+**A blind spot no check reaches.** **The floating
 text labels are unverified, not unexercised** — the code runs (1785 `paintGL`
 hits) but the oracle's 3-D view renders nothing, so their absence there is
 equally consistent with "they do not composite over a native GL window" and
@@ -7019,9 +7018,8 @@ carried; other items and this file cite them, so they do not change.
   `0`, which `g++ -Wzero-as-null-pointer-constant` found over every `.cpp`
   and every header. Left: three `PTHREAD_MUTEX_INITIALIZER` sites in
   `SIG_GPManager.cpp`, which are glibc's macro; `NULL` in the C file
-  `manage_dyn_slave.c` and in comments; and any `0` pointer inside
-  `#ifdef _WINDOWS`, which is not compiled here, such as the last argument of
-  `CreateThread` in `main` and in `MT_Controller`.
+  `manage_dyn_slave.c` and in comments. The `#ifdef _WINDOWS` blocks, which
+  were not compiled here and held more `0` pointers, went with item 35.
 
 - [x] **103. The tournaments-per-generation counter went stale** — done
   2026-09-27. Reported by the x86 machine. `SIG_GPParameter` computed the

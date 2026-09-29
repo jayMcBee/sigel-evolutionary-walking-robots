@@ -575,6 +575,9 @@ void SIG_SimulationVisualisationWidget::reportRecordedFrames()
 
   void SIG_SimulationVisualisationWidget::slotAlterMovieSettingsClicked()
   {
+    if ( !visualisation )
+      return;
+
     SIGEL_Visualisation::SIG_SimulationVisualisation &simulationVisualisation =
       static_cast< SIGEL_Visualisation::SIG_SimulationVisualisation& >( *visualisation );
 

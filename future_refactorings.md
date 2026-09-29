@@ -165,8 +165,8 @@ touched, because changing one changes behaviour against the reference binary.
 
 - [ ] **119. Make MetaGP able to start on Linux.**
   `MT_GPManager::startEvolution` waits for enough training cases with
-  `sleep(10000000)` on POSIX, about 115 days, where Windows waits
-  `Sleep(10000)`, 10 s. The first check always finds too few cases, so on
+  `sleep(10000000)` on POSIX, about 115 days, where 1.3's Windows build
+  waited `Sleep(10000)`, 10 s. The first check always finds too few cases, so on
   Linux the meta evolution never starts, in 1.3 as well. MetaGP was published
   with results (Ziegler and Banzhaf, CLAWAR 2003), so it presumably ran on
   Windows only.
