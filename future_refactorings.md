@@ -312,6 +312,14 @@ touched, because changing one changes behaviour against the reference binary.
 
 ## 7 · The interface
 
+- [ ] **128. Evaluate a Stop that waits for the end of the generation.**
+  Stop ends a run at once, in the middle of a generation: the tournaments
+  played so far have already changed the pool, but the generation is not
+  counted and no history entry is written. A first click could stop after the
+  current generation and a second click at once. Suggested: replace the
+  `userTerminated` flag with one stop request that has three values, no stop,
+  after the generation, and now, rather than add a second flag.
+
 - [ ] **107. Review `SIG_GPPopulation::readFromFile` with the maintainer,**
   deciding each change before it is made. The method is long and hard to
   read.
