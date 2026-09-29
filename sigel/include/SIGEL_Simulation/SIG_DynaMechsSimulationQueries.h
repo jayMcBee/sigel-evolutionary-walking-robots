@@ -68,15 +68,8 @@ namespace SIGEL_Simulation
   /** Interprets the SENSE command and writes the results into the registers */
   void sense(int sensorNo,QList<SIG_Register> & registers) const;
 
-  /** gets the actual simulation time which is calculated frame*stepsize
-   * @pre
-   *  none
-   * @post
-   *  none
-   * @return
-   *  the calculated actual simulation time
-   */
-  QTime getActualSimulationTime() const;
+  /** The current simulated time, frame*stepsize, cut to whole seconds. */
+  QTime getCurrentSimulationWholeSeconds() const;
 
   double getCurrentSimulationSeconds() const;
 

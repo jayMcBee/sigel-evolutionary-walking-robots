@@ -909,7 +909,25 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-29 — DONE: THE EXACT SIMULATION TIME IS A QUERY, `getCurrentSimulationSeconds`.** Start here.
+**2026-09-29 — DONE: `getActualSimulationTime` IS `getCurrentSimulationWholeSeconds`.** Start here.
+
+- **Changed:** a rename, no change in behaviour. The query that cuts the
+  simulated time to whole seconds is `getCurrentSimulationWholeSeconds`, in
+  `SIG_SimulationQueries`, `SIG_DynaMechsSimulationQueries` and
+  `SIG_Simulation`. `SIG_RenderRecorder`'s member is
+  `currentSimulationWholeSeconds`, and `SIG_SimulationVisualisation`'s getter
+  has the same name. The two long doc comments are one line. "Actual" was
+  German *aktuell*, current.
+- **Review:** no defect.
+- **Gates:** `check.sh` 754 pass, 0 fail; warnings 415. `fitness-check.sh`
+  green. PVM gates not run.
+- **Next:** movie frames timed by `getCurrentSimulationSeconds`, skipping
+  the frames a Fast Forward jumps over, with shorter comments; its first
+  version, timed by whole seconds, is in `git stash` as "step 2b frame
+  timing". Then an `if ( visualisation )` guard in
+  `slotAlterMovieSettingsClicked`.
+
+**2026-09-29 — DONE: THE EXACT SIMULATION TIME IS A QUERY, `getCurrentSimulationSeconds`.**
 
 - **Changed:** `SIG_SimulationQueries::getCurrentSimulationSeconds`, a
   `double`, frame × step size. `getActualSimulationTime` cuts the same value

@@ -123,7 +123,7 @@ namespace SIGEL_Visualisation
        */
       void makeTimeSteps(int noOfTimeSteps);
 
-      QTime getSimulationTime() const { return renderRecorder->simulationTime; }
+      QTime getCurrentSimulationWholeSeconds() const { return renderRecorder->currentSimulationWholeSeconds; }
 
       double getCurrentSimulationSeconds() const { return renderRecorder->currentSimulationSeconds; }
 

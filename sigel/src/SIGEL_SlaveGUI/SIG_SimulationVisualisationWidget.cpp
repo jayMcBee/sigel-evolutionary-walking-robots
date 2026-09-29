@@ -218,7 +218,7 @@
 	    QMessageBox::warning( this, "Simulation Exception", e.getMessage() );
 	  };
 
-	emit signalSimulationProgress( simulationVisualisation.getSimulationTime() );
+	emit signalSimulationProgress( simulationVisualisation.getCurrentSimulationWholeSeconds() );
 
 	if ( traceRobot )
 	  {

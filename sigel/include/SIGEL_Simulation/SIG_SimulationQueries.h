@@ -62,15 +62,8 @@ class SIG_SimulationQueries {
   /** Interprets the SENSE command and writes the results into the registers */
   virtual void sense(int sensorNo,QList<SIG_Register> & registers) const = 0;
 
-  /** gets the actual simulation time which is calculated frame*stepsize
-   * @pre
-   *  none
-   * @post
-   *  none
-   * @return
-   *  the calculated actual simulation time
-   */
-  virtual QTime getActualSimulationTime() const = 0;
+  /** The current simulated time, frame*stepsize, cut to whole seconds. */
+  virtual QTime getCurrentSimulationWholeSeconds() const = 0;
 
   /** The current simulated time in seconds, frame*stepsize, exact. */
   virtual double getCurrentSimulationSeconds() const = 0;

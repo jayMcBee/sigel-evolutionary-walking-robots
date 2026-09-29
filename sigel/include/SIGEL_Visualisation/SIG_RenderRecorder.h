@@ -90,7 +90,7 @@ namespace SIGEL_Visualisation
        */
       QList<SIG_SceneObject *> robotLinks;
 
-      QTime simulationTime;
+      QTime currentSimulationWholeSeconds;
 
       double currentSimulationSeconds;
 

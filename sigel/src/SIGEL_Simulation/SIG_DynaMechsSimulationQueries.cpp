@@ -268,7 +268,7 @@ void SIGEL_Simulation::SIG_DynaMechsSimulationQueries::sense(int sensorNo,
       registers[0].loadValue( registerValue );
 };
 
-QTime SIGEL_Simulation::SIG_DynaMechsSimulationQueries::getActualSimulationTime() const
+QTime SIGEL_Simulation::SIG_DynaMechsSimulationQueries::getCurrentSimulationWholeSeconds() const
 {
   int secs = static_cast< int >(simulationData.actualFrame * simulationData.simulationParameter.getStepSize());
 
