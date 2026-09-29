@@ -492,6 +492,11 @@ problem; the choice is made before any code is written.
   2. the `_WINDOWS` groups in the headers;
   3. the `_WINDOWS` groups in the MetaGP sources: `MT_Control`,
      `MT_GPSystem`, `MT_GUI`;
+     Its own commit follows: `MT_GPManager::startEvolution` writes a warning
+     through `SIG_IO::cerr` right before its `sleep(10000000)`, saying the
+     training set is below 10 cases or a tenth of the result array and the
+     next check is in 10000000 s, about 115 days. The wait itself stays for
+     item 119;
   4. the `_WINDOWS` groups in the `SIGEL_*` sources, `sigel.cpp`,
      `sigel_slave.cpp` and `manage_dyn_slave.c`;
   5. the `AFX_…_INCLUDED_` include guards, renamed to the tree's `DIR_FILE_H`
