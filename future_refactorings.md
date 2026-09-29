@@ -389,6 +389,19 @@ here changes evolution results, so each is judged only by whether the best
 fitness improves. Each starts with the published GP approaches to the
 problem; the choice is made before any code is written.
 
+- [ ] **126. Move SIGEL to C++20, and define pi and the angle conversions
+  once.** SIGEL writes pi several ways: `std::atan(1) * 4`, `M_PI`, which is
+  POSIX rather than C++, and the literal `3.14159265`. With `-std=c++20` in
+  `SIGCXX`, `std::numbers::pi` replaces them. A math class in `SIGEL_Tools`
+  takes the degree and radian conversions, not Qt's, so model code does not
+  depend on Qt for them, and later other maths that repeats. The vendor
+  libraries stay on their own standard.
+  **To decide:** `3.14159265` is not exact pi. It sits in
+  `SIG_DynaMechsCommandInterface::moveDrive` and
+  `SIG_DynaMechsSimulationQueries::sense`, so exact pi changes drive and
+  sensor angles slightly and moves the fitness baseline. `std::atan(1) * 4`
+  equals exact pi bit for bit here.
+
 - [ ] **124. Find a modern replacement for pthreads.** The MetaGP thread,
   the dynamic-client server thread and their locks use `pthread_create`,
   `pthread_mutex_*` and `pthread_cond_*` directly. Research what should
