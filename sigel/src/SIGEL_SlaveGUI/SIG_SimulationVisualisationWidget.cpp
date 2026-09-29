@@ -282,12 +282,7 @@
     makeCurrent();
 
     delete visualisation;
-    // NOT redundant with the assignment below: the constructor throws
-    // whenever SIMULATIONLIBRARY names the removed Dynamo backend
-    // (SIG_Simulation.cpp, default case), and the throw leaves this
-    // member holding the pointer just freed. Fifteen sites here test
-    // visualisation for null and then dereference it, so the guard passes
-    // and every one is a use-after-free.
+    // Null first: the constructor below can throw, and the slots test for null.
     visualisation = nullptr;
 
     visualisation = new SIGEL_Visualisation::SIG_SimulationVisualisation( *robot,
@@ -407,9 +402,8 @@ void SIG_SimulationVisualisationWidget::reportRecordedFrames()
 
   void SIG_SimulationVisualisationWidget::slotSimulationProgress()
   {
-    // The next step waits until this one is on screen, so the simulation
-    // never runs ahead of what is shown. A widget without a working GL
-    // context shows no frames, so it does not wait.
+    // Wait until the last step is on screen; without a GL context no frame
+    // comes, so don't wait.
     if (!frameShown && isValid())
       return;
 
