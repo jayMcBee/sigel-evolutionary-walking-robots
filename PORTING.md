@@ -920,11 +920,6 @@ classes and leave truncation a hard error. **They are not interchangeable.**
   recording stops while ffmpeg still runs, the message says "ffmpeg is still
   making the last movie, so no MP4 was made." The messages put the folder
   and the question on lines of their own.
-- **Open:** a new recording to the same folder and prefix while ffmpeg runs
-  can overwrite frames it has not read yet; the MP4 then mixes both.
-- **Found:** `sigelLauncher` takes `SIGEL_ROOT` from the current folder, so
-  started from `~/sigel-night` it runs that copy's binaries. Start it from
-  `sigelApp`.
 - **Review:** two defects, fixed before the commit: the frame-name pattern,
   and a report to a half-destroyed encoder when the window closes during a
   run.
