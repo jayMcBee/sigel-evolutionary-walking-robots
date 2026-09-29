@@ -1568,7 +1568,7 @@
                     <item>
                       <widget class="QLabel" name="textlabelByGenerationNumber">
                         <property name="text">
-                          <string>Number of generations to terminate after:</string>
+                          <string>Run for this many generations:</string>
                         </property>
                         <property name="wordWrap">
                           <bool>false</bool>
@@ -1579,6 +1579,9 @@
                       <widget class="QSpinBox" name="spinboxByGenerationNumber">
                         <property name="maximum">
                           <number>99999999</number>
+                        </property>
+                        <property name="toolTip">
+                          <string>Counts from each start of the evolution, not from the population's generation. Example: a population at generation 446 with a value of 3 stops at 449.</string>
                         </property>
                       </widget>
                     </item>

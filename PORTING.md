@@ -909,7 +909,14 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-29 — NOTE: THE VIEWER'S LIGHTS, FOR LATER.** Start here.
+**2026-09-29 — DONE: ITEM 90, THE GENERATION LIMIT.** Start here.
+
+- **Decided:** "By generation" stays a count per start; see item 90 in
+  "Done". Only the label and a new tooltip in `SIG_GPParameterBase.ui`
+  change.
+- **Gates:** `check.sh` 757 pass, 0 fail; warnings 412.
+
+**2026-09-29 — NOTE: THE VIEWER'S LIGHTS, FOR LATER.**
 
 - Even with the ambient slider at 0 the view looks bright. The ambient part
   is then 0; the three direct lights add up: the headlight `GL_LIGHT0` 1.0
@@ -7189,6 +7196,15 @@ carried; other items and this file cite them, so they do not change.
   last lines of ffmpeg's error output. A crop filter trims an odd width or
   height by one pixel, since yuv420p needs even ones. POV-Ray frames get
   the "frames written" message only.
+
+- [x] **90. "Stop at generation N" counts per start** — decided
+  2026-09-29: it stays as it is. `SIG_GPManager::checkTerminationConditions`
+  compares the limit with `currentGenerationNo`, which counts from 0 at each
+  start, not with the pool generation the Experiment page and `.exp` file
+  show. Measured headless on a copy of `shortHammer.exp` with a limit of 3:
+  pool generation 446 went to 449, and a second start went to 452. The label
+  now reads "Run for this many generations:", and the spin box has a tooltip
+  with an example. No file format or baseline changes.
 
 - [x] **99. The viewer's Stop button is shown as a reset** — done
   2026-09-26. `SIG_SimulationVisualisationWidget::slotStopSimulation`

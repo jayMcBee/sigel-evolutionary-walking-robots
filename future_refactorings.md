@@ -266,12 +266,6 @@ touched, because changing one changes behaviour against the reference binary.
   loads and the simulation runs into NaN without a message. A warning at load,
   naming the link and the mesh file, is one option.
 
-- [ ] **90. Decide whether "stop at generation N" counts pool generations.**
-  By reading the code, `SIG_GPManager::checkTerminationConditions` counts from
-  each start, not in the pool generation the Experiment page and `.exp` file
-  show. Changing it changes when a run stops. The text in
-  `SIG_GUIGPExperiment::terminationAlreadyMet` changes with it.
-
 - [ ] **89. Refuse bad simulation parameters.** Needs more thought.
   - **Time to simulate under 1 s:** the simulated fitness functions divide by
     the run time in whole seconds, which gives `inf`, or `NaN` for a robot
