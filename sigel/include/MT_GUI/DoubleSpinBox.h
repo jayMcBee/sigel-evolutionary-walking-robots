@@ -2,8 +2,8 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#if !defined(AFX_DOUBLESPINBOX_H__B948F50E_5AB1_4AD5_8DC5_52FFC791595D__INCLUDED_)
-#define AFX_DOUBLESPINBOX_H__B948F50E_5AB1_4AD5_8DC5_52FFC791595D__INCLUDED_
+#ifndef MT_GUI_DOUBLESPINBOX_H
+#define MT_GUI_DOUBLESPINBOX_H
 
 #include <QSpinBox>
 #include <QValidator>
@@ -45,4 +45,4 @@ private:
 	QDoubleValidator *dValidator;
 };
 
-#endif // !defined(AFX_DOUBLESPINBOX_H__B948F50E_5AB1_4AD5_8DC5_52FFC791595D__INCLUDED_)
+#endif // MT_GUI_DOUBLESPINBOX_H

@@ -2,8 +2,8 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#if !defined(AFX_MT_EXPERIMENTITEM_H__F6ADF263_E73B_40EA_B14B_7D9BEB6D2AAB__INCLUDED_)
-#define AFX_MT_EXPERIMENTITEM_H__F6ADF263_E73B_40EA_B14B_7D9BEB6D2AAB__INCLUDED_
+#ifndef MT_GUI_MT_EXPERIMENTITEM_H
+#define MT_GUI_MT_EXPERIMENTITEM_H
 
 #include <QTreeWidget>
 #include <QPixmap>
@@ -20,4 +20,4 @@ private:
 	int position;
 };
 
-#endif // !defined(AFX_MT_EXPERIMENTITEM_H__F6ADF263_E73B_40EA_B14B_7D9BEB6D2AAB__INCLUDED_)
+#endif // MT_GUI_MT_EXPERIMENTITEM_H

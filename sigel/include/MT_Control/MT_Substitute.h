@@ -2,8 +2,8 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#if !defined(AFX_MT_SUBSTITUTE_H__1103ED83_4D0E_4EC2_BFE5_3D4A0E49FCD6__INCLUDED_)
-#define AFX_MT_SUBSTITUTE_H__1103ED83_4D0E_4EC2_BFE5_3D4A0E49FCD6__INCLUDED_
+#ifndef MT_CONTROL_MT_SUBSTITUTE_H
+#define MT_CONTROL_MT_SUBSTITUTE_H
 
 
 
@@ -129,4 +129,4 @@ protected:
 
 };
 
-#endif // !defined(AFX_MT_SUBSTITUTE_H__1103ED83_4D0E_4EC2_BFE5_3D4A0E49FCD6__INCLUDED_)
+#endif // MT_CONTROL_MT_SUBSTITUTE_H

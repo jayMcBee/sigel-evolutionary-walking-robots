@@ -2,8 +2,8 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#if !defined(AFX_MT_EVALUATOR_H__090E0ACB_93A0_4093_95C2_57A10AEBBAE5__INCLUDED_)
-#define AFX_MT_EVALUATOR_H__090E0ACB_93A0_4093_95C2_57A10AEBBAE5__INCLUDED_
+#ifndef MT_CONTROL_MT_EVALUATOR_H
+#define MT_CONTROL_MT_EVALUATOR_H
 
 
 #include <QList>
@@ -54,4 +54,4 @@ private:
 
 };
 
-#endif // !defined(AFX_MT_EVALUATOR_H__090E0ACB_93A0_4093_95C2_57A10AEBBAE5__INCLUDED_)
+#endif // MT_CONTROL_MT_EVALUATOR_H

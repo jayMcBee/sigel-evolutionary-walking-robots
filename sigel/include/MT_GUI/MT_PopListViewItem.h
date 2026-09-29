@@ -2,8 +2,8 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#if !defined(AFX_MT_POPLISTVIEWITEM_H__2BF5C50C_726A_4564_90DB_3E9CA925E011__INCLUDED_)
-#define AFX_MT_POPLISTVIEWITEM_H__2BF5C50C_726A_4564_90DB_3E9CA925E011__INCLUDED_
+#ifndef MT_GUI_MT_POPLISTVIEWITEM_H
+#define MT_GUI_MT_POPLISTVIEWITEM_H
 
 #include <QTreeWidget>
 #include "MT_GPSystem/MT_Individual.h"
@@ -21,4 +21,4 @@ private:
 					// the position in the listView
 };
 
-#endif // !defined(AFX_MT_POPLISTVIEWITEM_H__2BF5C50C_726A_4564_90DB_3E9CA925E011__INCLUDED_)
+#endif // MT_GUI_MT_POPLISTVIEWITEM_H
