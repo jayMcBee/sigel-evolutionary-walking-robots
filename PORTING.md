@@ -909,7 +909,32 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-29 — DONE: THE MOVIE SETTINGS SLOT CHECKS FOR A VISUALISATION; ITEM 35 AUDITED.** Start here.
+**2026-09-29 — DONE: THE VIEWER'S CONTROL PANEL IS REORGANISED.** Start here.
+
+- **Changed, in `SIG_SimulationWidgetBase.ui`:** the control panel may be
+  300 px wide, where it was 250. The "Navigation" box is 270 x 279; its
+  children sit 12 px lower, so the buttons clear Fusion's title and frame,
+  and the buttons are centred with a 10 px gap between the up and down
+  column and the cross. X, Y and Z share one row, each a caption and a
+  right-aligned value. Simulation time, Render mode, Frame delay, Ambient
+  lighting, and Show plane with its button each take one row. The grid
+  spacing is 8, where it was 6. The button reads "Plane color...".
+- **Changed, in `SIG_SimulationWidget`:** positions show 2 decimals; the
+  simulation time reads "12 min 34 s", the minutes counting past 60; the
+  plane colour button shows the colour as an icon, kept current by the new
+  `SIG_SimulationVisualisationWidget::signalPlaneColorChanged`.
+- **Measured** with Ubuntu Sans 11 pt: the panel's minimum height went from
+  772 to 616 px, so the window's minimum is 780 x 683, where it was 780 x
+  839, and the form's 780 x 596, where it was 780 x 752. The position boxes
+  hold "-8888.88". Checked on the desktop.
+- **Review:** no defect; the colour comment was made singular. Left: the
+  icon has no device pixel ratio for HiDPI screens.
+- **Gates:** `check.sh` 754 pass, 0 fail; warnings 412. No check opens the
+  viewer window.
+- **Next:** the grid colour, chosen like the plane colour, dark grey by
+  default; its own commit.
+
+**2026-09-29 — DONE: THE MOVIE SETTINGS SLOT CHECKS FOR A VISUALISATION; ITEM 35 AUDITED.**
 
 - **Changed:** `SIG_SimulationVisualisationWidget::slotAlterMovieSettingsClicked`
   returns when there is no visualisation, as the widget's other slots do.
@@ -5089,7 +5114,7 @@ else that stops matching 1.3 still needs justifying as a defect.
 | **Play pauses while a modal dialog is open.** 1.3 keeps the simulation running under a dialog | by decision 2026-09-23, item 65: at Frame Delay 0 the dialog was never drawn and the viewer hung. `SIG_SimulationWindow::event`, `SIG_SimulationVisualisationWidget::pauseForDialog` and `resumeAfterDialog` | nothing: no scenario plays the simulation under a dialog |
 | **Play steps once per frame on screen, and waits while the viewer window is minimised or on another workspace.** At Frame Delay 0 it is capped at about the display's refresh rate. 1.3 drew each step with `updateGL()`, not tied to the refresh, and on X11 kept stepping while minimised | by decision 2026-09-23: Play steps once per frame on screen, and a window that is not exposed shows no frames. `SIG_SimulationVisualisationWidget::slotSimulationProgress` and `slotFrameShown` | nothing |
 | **A movie frame that cannot be saved stops the recording with a warning, for every format.** 1.3 warned only for POV-Ray; for the image formats `callRenderPixMap` returned true whatever the save gave | by decision 2026-09-23, item 67. `SIG_SimulationVisualisationWidget::callRenderPixMap` and `makeTimeSteps` | nothing: no scenario records a movie |
-| **The viewer window opens at 1098 x 900, so the 3-D view is square, 740 x 740.** 1.3 opens it at 780 x 810. The minimum is 780 x 839, the smallest height at which the control panel fits | by decision 2026-09-23, item 66; 1098 x 900 on 2026-09-25, when "Show shadows" added a row. `SIG_SimulationWindow`'s constructor | nothing |
+| **The viewer window opens at 1098 x 900.** 1.3 opens it at 780 x 810. The 3-D view was square, 740 x 740, next to a 250 px control panel; the panel may now be 300 px wide, and the start width is still open. The minimum is 780 x 683, the smallest height at which the control panel fits | by decision 2026-09-23, item 66; 1098 x 900 on 2026-09-25, when "Show shadows" added a row. `SIG_SimulationWindow`'s constructor | nothing |
 | **The 3-D view draws the ground on both sides of the start.** 1.3 draws the terrain only from 0 to its size, so the robot starts at its corner. 1.0 drew a flat floor that moved with the camera | by decision 2026-09-23, item 42: the ground on the negative side too, each edge continued outward at the heights the physics uses. `SIG_EnvironmentRenderer::drawInit`, `buildGrid` and `groundDepth` | nothing: no check covers the floor |
 | **A render mode "Hidden lines".** 1.3 has Wireframe, Flatshaded and Gouraudshaded | by decision 2026-09-23, item 63. `SIG_ViewSettings::hiddenLine`, `SIG_SimulationVisualisation::visualize` | nothing: no check covers the render modes |
 | **A render mode "Points", with the back points hidden.** 1.3 has Wireframe, Flatshaded and Gouraudshaded | by decision 2026-09-23, item 63. `SIG_ViewSettings::points`, `SIG_SimulationVisualisation::visualize` | nothing: no check covers the render modes |

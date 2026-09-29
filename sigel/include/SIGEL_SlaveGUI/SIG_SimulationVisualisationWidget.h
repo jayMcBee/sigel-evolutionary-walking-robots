@@ -97,6 +97,8 @@
        */
       bool canShowShadows() const;
 
+      QColor getPlaneColor() const { return planeColor; }
+
       /**
        * Stops the running simulation while a modal dialog is open.
        * Does nothing if the simulation is not running.
@@ -268,6 +270,8 @@
       void signalSimulationAbort();
 
       void signalRecordingAllowed( bool );
+
+      void signalPlaneColorChanged( QColor );
     };
 
 // }

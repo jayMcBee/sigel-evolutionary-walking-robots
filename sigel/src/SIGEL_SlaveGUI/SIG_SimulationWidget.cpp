@@ -27,6 +27,8 @@
 #include <QCheckBox>
 #include <QComboBox>
 #include <QPushButton>
+#include <QPixmap>
+#include <QPainter>
 #include <QTextEdit>
 
 #include <cmath>
@@ -150,6 +152,25 @@ namespace SIGEL_SlaveGUI
 		      visualisationWidget,
 		      SLOT(choosePlaneColor()) );
 
+    // The plane colour button shows the colour as an icon, with a gap
+    // before the text.
+    QSize const swatchSize = planecolorPushButton->iconSize();
+    auto const showColor = [swatchSize]( QPushButton *button, QColor const &color )
+      {
+	QPixmap icon( swatchSize + QSize( 6, 0 ) );
+	icon.fill( Qt::transparent );
+	QPainter painter( &icon );
+	painter.setPen( button->palette().color( QPalette::Dark ) );
+	painter.setBrush( color );
+	painter.drawRect( 0, 0, swatchSize.width() - 1, swatchSize.height() - 1 );
+	painter.end();
+	button->setIconSize( icon.size() );
+	button->setIcon( icon );
+      };
+    showColor( planecolorPushButton, visualisationWidget->getPlaneColor() );
+    QObject::connect( visualisationWidget, &SIG_SimulationVisualisationWidget::signalPlaneColorChanged, this,
+		      [this, showColor]( QColor const &color ) { showColor( planecolorPushButton, color ); } );
+
     QObject::connect( showPlaneCheckBox,
 		      SIGNAL(stateChanged(int)),
 		      visualisationWidget,
@@ -205,7 +226,7 @@ namespace SIGEL_SlaveGUI
   { char txt[256];
   	QString myTime;
 
-  	sprintf(txt, "%d hours  %d min.  %d secs.", simulationTime.hour(), simulationTime.minute(), simulationTime.second());
+  	sprintf(txt, "%d min %d s", simulationTime.hour() * 60 + simulationTime.minute(), simulationTime.second());
 	myTime = txt;
 
 	simulationTimeTextLabel->setText( myTime );
@@ -251,9 +272,9 @@ namespace SIGEL_SlaveGUI
 
   void SIG_SimulationWidget::slotSetPosition( DL_vector position )
   {
-    QString xPosString = QString::number( position.get( 0 ) );
-    QString yPosString = QString::number( position.get( 1 ) );
-    QString zPosString = QString::number( position.get( 2 ) );
+    QString xPosString = QString::number( position.get( 0 ), 'f', 2 );
+    QString yPosString = QString::number( position.get( 1 ), 'f', 2 );
+    QString zPosString = QString::number( position.get( 2 ), 'f', 2 );
 
     xPosTextLabel->setText( xPosString );
     yPosTextLabel->setText( yPosString );

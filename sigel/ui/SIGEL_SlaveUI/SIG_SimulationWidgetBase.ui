@@ -16,7 +16,7 @@
     <property name="minimumSize">
       <size>
         <width>780</width>
-        <height>752</height>
+        <height>596</height>
       </size>
     </property>
     <property name="windowTitle">
@@ -154,7 +154,7 @@
           </property>
           <property name="maximumSize">
             <size>
-              <width>250</width>
+              <width>300</width>
               <height>32767</height>
             </size>
           </property>
@@ -170,88 +170,164 @@
                 <number>11</number>
               </property>
               <property name="spacing">
-                <number>6</number>
+                <number>8</number>
               </property>
               <item row="1" column="0">
-                <widget class="QLabel" name="TextLabel1_3">
-                  <property name="text">
-                    <string>Simulation time:</string>
-                  </property>
-                  <property name="wordWrap">
-                    <bool>false</bool>
-                  </property>
-                </widget>
+                <layout class="QHBoxLayout">
+                  <item>
+                    <widget class="QLabel" name="TextLabel1_3">
+                      <property name="text">
+                        <string>Simulation time:</string>
+                      </property>
+                      <property name="wordWrap">
+                        <bool>false</bool>
+                      </property>
+                    </widget>
+                  </item>
+                  <item>
+                    <widget class="QLabel" name="simulationTimeTextLabel">
+                      <property name="frameShape">
+                        <enum>QFrame::Panel</enum>
+                      </property>
+                      <property name="frameShadow">
+                        <enum>QFrame::Sunken</enum>
+                      </property>
+                      <property name="text">
+                        <string/>
+                      </property>
+                      <property name="alignment">
+                        <set>Qt::AlignVCenter|Qt::AlignRight</set>
+                      </property>
+                      <property name="wordWrap">
+                        <bool>false</bool>
+                      </property>
+                    </widget>
+                  </item>
+                </layout>
               </item>
               <item row="2" column="0">
-                <widget class="QLabel" name="simulationTimeTextLabel">
-                  <property name="frameShape">
-                    <enum>QFrame::Panel</enum>
-                  </property>
-                  <property name="frameShadow">
-                    <enum>QFrame::Sunken</enum>
-                  </property>
-                  <property name="text">
-                    <string/>
-                  </property>
-                  <property name="wordWrap">
-                    <bool>false</bool>
-                  </property>
-                </widget>
+                <layout class="QHBoxLayout">
+                  <item>
+                    <widget class="QLabel" name="TextLabel1">
+                      <property name="text">
+                        <string>Render mode:</string>
+                      </property>
+                      <property name="alignment">
+                        <set>Qt::AlignVCenter|Qt::AlignLeft</set>
+                      </property>
+                      <property name="wordWrap">
+                        <bool>false</bool>
+                      </property>
+                    </widget>
+                  </item>
+                  <item>
+                    <widget class="QComboBox" name="renderModeComboBox">
+                      <property name="enabled">
+                        <bool>true</bool>
+                      </property>
+                      <item>
+                        <property name="text">
+                          <string>Wireframe</string>
+                        </property>
+                      </item>
+                      <item>
+                        <property name="text">
+                          <string>Hidden lines</string>
+                        </property>
+                      </item>
+                      <item>
+                        <property name="text">
+                          <string>Points</string>
+                        </property>
+                      </item>
+                      <item>
+                        <property name="text">
+                          <string>Flat shaded</string>
+                        </property>
+                      </item>
+                      <item>
+                        <property name="text">
+                          <string>Gouraud shaded</string>
+                        </property>
+                      </item>
+                    </widget>
+                  </item>
+                </layout>
               </item>
               <item row="3" column="0">
-                <widget class="QLabel" name="TextLabel1">
-                  <property name="text">
-                    <string>Render mode:</string>
-                  </property>
-                  <property name="alignment">
-                    <set>Qt::AlignVCenter|Qt::AlignLeft</set>
-                  </property>
-                  <property name="wordWrap">
-                    <bool>false</bool>
-                  </property>
-                </widget>
+                <layout class="QHBoxLayout">
+                  <item>
+                    <widget class="QLabel" name="TextLabel1_2">
+                      <property name="text">
+                        <string>Frame delay (ms):</string>
+                      </property>
+                      <property name="wordWrap">
+                        <bool>false</bool>
+                      </property>
+                    </widget>
+                  </item>
+                  <item>
+                    <widget class="QSpinBox" name="frameDelaySpinBox">
+                      <property name="buttonSymbols">
+                        <enum>QAbstractSpinBox::UpDownArrows</enum>
+                      </property>
+                      <property name="maximum">
+                        <number>1000</number>
+                      </property>
+                    </widget>
+                  </item>
+                </layout>
               </item>
               <item row="4" column="0">
-                <widget class="QComboBox" name="renderModeComboBox">
-                  <property name="enabled">
-                    <bool>true</bool>
-                  </property>
+                <layout class="QHBoxLayout">
                   <item>
-                    <property name="text">
-                      <string>Wireframe</string>
-                    </property>
+                    <widget class="QLabel" name="TextLabel1_4">
+                      <property name="text">
+                        <string>Ambient lighting:</string>
+                      </property>
+                      <property name="wordWrap">
+                        <bool>false</bool>
+                      </property>
+                    </widget>
                   </item>
                   <item>
-                    <property name="text">
-                      <string>Hidden lines</string>
-                    </property>
+                    <widget class="QSlider" name="ambientLightingSlider">
+                      <property name="maximum">
+                        <number>100</number>
+                      </property>
+                      <property name="pageStep">
+                        <number>1</number>
+                      </property>
+                      <property name="value">
+                        <number>50</number>
+                      </property>
+                      <property name="orientation">
+                        <enum>Qt::Horizontal</enum>
+                      </property>
+                    </widget>
                   </item>
-                  <item>
-                    <property name="text">
-                      <string>Points</string>
-                    </property>
-                  </item>
-                  <item>
-                    <property name="text">
-                      <string>Flat shaded</string>
-                    </property>
-                  </item>
-                  <item>
-                    <property name="text">
-                      <string>Gouraud shaded</string>
-                    </property>
-                  </item>
-                </widget>
+                </layout>
               </item>
-              <item row="6" column="0">
-                <widget class="QSpinBox" name="frameDelaySpinBox">
-                  <property name="buttonSymbols">
-                    <enum>QAbstractSpinBox::UpDownArrows</enum>
-                  </property>
-                  <property name="maximum">
-                    <number>1000</number>
-                  </property>
-                </widget>
+              <item row="5" column="0">
+                <layout class="QHBoxLayout">
+                  <item>
+                    <widget class="QCheckBox" name="showPlaneCheckBox">
+                      <property name="text">
+                        <string>Show plane</string>
+                      </property>
+                      <property name="checked">
+                        <bool>true</bool>
+                      </property>
+                    </widget>
+                  </item>
+                  <item>
+                    <widget class="QPushButton" name="planecolorPushButton">
+                      <property name="text">
+                        <string>Plane color...</string>
+                      </property>
+                    </widget>
+                  </item>
+                </layout>
               </item>
               <item row="0" column="0">
                 <widget class="QGroupBox" name="GroupBox6">
@@ -263,8 +339,8 @@
                   </property>
                   <property name="minimumSize">
                     <size>
-                      <width>220</width>
-                      <height>331</height>
+                      <width>270</width>
+                      <height>279</height>
                     </size>
                   </property>
                   <property name="title">
@@ -273,14 +349,14 @@
                   <widget class="QLabel" name="TextLabel5">
                     <property name="geometry">
                       <rect>
-                        <x>11</x>
-                        <y>285</y>
-                        <width>86</width>
+                        <x>183</x>
+                        <y>233</y>
+                        <width>12</width>
                         <height>26</height>
                       </rect>
                     </property>
                     <property name="text">
-                      <string>Z-position:</string>
+                      <string>Z</string>
                     </property>
                     <property name="wordWrap">
                       <bool>false</bool>
@@ -290,13 +366,13 @@
                     <property name="geometry">
                       <rect>
                         <x>11</x>
-                        <y>221</y>
-                        <width>86</width>
+                        <y>233</y>
+                        <width>12</width>
                         <height>26</height>
                       </rect>
                     </property>
                     <property name="text">
-                      <string>X-position:</string>
+                      <string>X</string>
                     </property>
                     <property name="alignment">
                       <set>Qt::AlignVCenter|Qt::AlignLeft</set>
@@ -308,14 +384,14 @@
                   <widget class="QLabel" name="TextLabel4">
                     <property name="geometry">
                       <rect>
-                        <x>11</x>
-                        <y>253</y>
-                        <width>86</width>
+                        <x>97</x>
+                        <y>233</y>
+                        <width>12</width>
                         <height>26</height>
                       </rect>
                     </property>
                     <property name="text">
-                      <string>Y-position:</string>
+                      <string>Y</string>
                     </property>
                     <property name="wordWrap">
                       <bool>false</bool>
@@ -324,9 +400,9 @@
                   <widget class="QLabel" name="yPosTextLabel">
                     <property name="geometry">
                       <rect>
-                        <x>103</x>
-                        <y>253</y>
-                        <width>86</width>
+                        <x>111</x>
+                        <y>233</y>
+                        <width>62</width>
                         <height>26</height>
                       </rect>
                     </property>
@@ -338,6 +414,9 @@
                     </property>
                     <property name="text">
                       <string/>
+                    </property>
+                    <property name="alignment">
+                      <set>Qt::AlignVCenter|Qt::AlignRight</set>
                     </property>
                     <property name="wordWrap">
                       <bool>false</bool>
@@ -346,9 +425,9 @@
                   <widget class="QLabel" name="zPosTextLabel">
                     <property name="geometry">
                       <rect>
-                        <x>103</x>
-                        <y>285</y>
-                        <width>86</width>
+                        <x>197</x>
+                        <y>233</y>
+                        <width>62</width>
                         <height>26</height>
                       </rect>
                     </property>
@@ -360,6 +439,9 @@
                     </property>
                     <property name="text">
                       <string/>
+                    </property>
+                    <property name="alignment">
+                      <set>Qt::AlignVCenter|Qt::AlignRight</set>
                     </property>
                     <property name="wordWrap">
                       <bool>false</bool>
@@ -368,9 +450,9 @@
                   <widget class="QLabel" name="xPosTextLabel">
                     <property name="geometry">
                       <rect>
-                        <x>103</x>
-                        <y>221</y>
-                        <width>86</width>
+                        <x>25</x>
+                        <y>233</y>
+                        <width>62</width>
                         <height>26</height>
                       </rect>
                     </property>
@@ -382,6 +464,9 @@
                     </property>
                     <property name="text">
                       <string/>
+                    </property>
+                    <property name="alignment">
+                      <set>Qt::AlignVCenter|Qt::AlignRight</set>
                     </property>
                     <property name="wordWrap">
                       <bool>false</bool>
@@ -393,8 +478,8 @@
                     </property>
                     <property name="geometry">
                       <rect>
-                        <x>10</x>
-                        <y>120</y>
+                        <x>30</x>
+                        <y>132</y>
                         <width>50</width>
                         <height>50</height>
                       </rect>
@@ -412,8 +497,8 @@
                     </property>
                     <property name="geometry">
                       <rect>
-                        <x>10</x>
-                        <y>20</y>
+                        <x>30</x>
+                        <y>32</y>
                         <width>50</width>
                         <height>50</height>
                       </rect>
@@ -431,8 +516,8 @@
                     </property>
                     <property name="geometry">
                       <rect>
-                        <x>110</x>
-                        <y>120</y>
+                        <x>140</x>
+                        <y>132</y>
                         <width>50</width>
                         <height>50</height>
                       </rect>
@@ -450,8 +535,8 @@
                     </property>
                     <property name="geometry">
                       <rect>
-                        <x>160</x>
-                        <y>70</y>
+                        <x>190</x>
+                        <y>82</y>
                         <width>50</width>
                         <height>50</height>
                       </rect>
@@ -469,8 +554,8 @@
                     </property>
                     <property name="geometry">
                       <rect>
-                        <x>110</x>
-                        <y>20</y>
+                        <x>140</x>
+                        <y>32</y>
                         <width>50</width>
                         <height>50</height>
                       </rect>
@@ -488,8 +573,8 @@
                     </property>
                     <property name="geometry">
                       <rect>
-                        <x>110</x>
-                        <y>70</y>
+                        <x>140</x>
+                        <y>82</y>
                         <width>50</width>
                         <height>50</height>
                       </rect>
@@ -507,8 +592,8 @@
                     </property>
                     <property name="geometry">
                       <rect>
-                        <x>60</x>
-                        <y>70</y>
+                        <x>90</x>
+                        <y>82</y>
                         <width>50</width>
                         <height>50</height>
                       </rect>
@@ -527,7 +612,7 @@
                     <property name="geometry">
                       <rect>
                         <x>10</x>
-                        <y>180</y>
+                        <y>192</y>
                         <width>105</width>
                         <height>21</height>
                       </rect>
@@ -542,49 +627,6 @@
                 </widget>
               </item>
               <item row="8" column="0">
-                <widget class="QSlider" name="ambientLightingSlider">
-                  <property name="maximum">
-                    <number>100</number>
-                  </property>
-                  <property name="pageStep">
-                    <number>1</number>
-                  </property>
-                  <property name="value">
-                    <number>50</number>
-                  </property>
-                  <property name="orientation">
-                    <enum>Qt::Horizontal</enum>
-                  </property>
-                </widget>
-              </item>
-              <item row="5" column="0">
-                <widget class="QLabel" name="TextLabel1_2">
-                  <property name="text">
-                    <string>Frame delay (ms):</string>
-                  </property>
-                  <property name="wordWrap">
-                    <bool>false</bool>
-                  </property>
-                </widget>
-              </item>
-              <item row="7" column="0">
-                <widget class="QLabel" name="TextLabel1_4">
-                  <property name="text">
-                    <string>Ambient lighting:</string>
-                  </property>
-                  <property name="wordWrap">
-                    <bool>false</bool>
-                  </property>
-                </widget>
-              </item>
-              <item row="9" column="0">
-                <widget class="QPushButton" name="planecolorPushButton">
-                  <property name="text">
-                    <string>Choose plane color</string>
-                  </property>
-                </widget>
-              </item>
-              <item row="13" column="0">
                 <widget class="QCheckBox" name="showAncorPointsCheckBox">
                   <property name="text">
                     <string>Show anchor points</string>
@@ -594,14 +636,14 @@
                   </property>
                 </widget>
               </item>
-              <item row="12" column="0">
+              <item row="7" column="0">
                 <widget class="QCheckBox" name="showRobotPathCheckBox">
                   <property name="text">
                     <string>Show robot path</string>
                   </property>
                 </widget>
               </item>
-              <item row="14" column="0">
+              <item row="9" column="0">
                 <widget class="QCheckBox" name="showShadowsCheckBox">
                   <property name="text">
                     <string>Show shadows</string>
@@ -611,7 +653,7 @@
                   </property>
                 </widget>
               </item>
-              <item row="15" column="0">
+              <item row="10" column="0">
                 <spacer name="Spacer3">
                   <property name="sizeHint">
                     <size>
@@ -627,20 +669,10 @@
                   </property>
                 </spacer>
               </item>
-              <item row="11" column="0">
+              <item row="6" column="0">
                 <widget class="QCheckBox" name="showGridCheckBox">
                   <property name="text">
                     <string>Show grid</string>
-                  </property>
-                </widget>
-              </item>
-              <item row="10" column="0">
-                <widget class="QCheckBox" name="showPlaneCheckBox">
-                  <property name="text">
-                    <string>Show plane</string>
-                  </property>
-                  <property name="checked">
-                    <bool>true</bool>
                   </property>
                 </widget>
               </item>

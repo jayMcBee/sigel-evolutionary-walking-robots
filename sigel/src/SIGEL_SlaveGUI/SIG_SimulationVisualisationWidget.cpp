@@ -104,7 +104,7 @@
 	  {
 	    planeColor = newPlaneColor;
 	    simulationVisualisation.setPlaneColor( planeColor );
-
+	    emit signalPlaneColorChanged( planeColor );
 
 	    if (automaticRefresh)
 	      update();
