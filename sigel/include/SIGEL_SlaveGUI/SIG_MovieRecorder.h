@@ -46,11 +46,11 @@ namespace SIGEL_SlaveGUI
 
     SIG_MovieRecorder();
 
-    SIG_MovieSettings const &getSettings() const;
+    SIG_MovieSettings const &getSettings() const { return settings; }
 
     void setSettings( SIG_MovieSettings const &newSettings );
 
-    bool isRecording() const;
+    bool isRecording() const { return recording; }
 
     void setRecording( bool newRecording );
 
@@ -77,12 +77,12 @@ namespace SIGEL_SlaveGUI
      * The number of frames since the last reset, including any that
      * could not be written.
      */
-    int getFramesRecorded() const;
+    int getFramesRecorded() const { return framesRecorded; }
 
     /**
      * The file the last write tried to write.
      */
-    QString getLastFileName() const;
+    QString getLastFileName() const { return lastFileName; }
 
     /**
      * Stops recording and starts the frame numbers at 0 again.

@@ -909,7 +909,25 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-29 — DONE: MOVIE FRAME WRITING IS IN `SIG_MOVIERECORDER`.** Start here.
+**2026-09-29 — DONE: TRIVIAL GETTERS OF THE MOVIE AND VISUALISER CLASSES ARE INLINE.** Start here.
+
+- **Changed:** 13 one-line getters are defined in their class in the header
+  instead of the .cpp: `SIG_MovieRecorder` `getSettings`, `isRecording`,
+  `getFramesRecorded`, `getLastFileName`; `SIG_VisualSceneObject`
+  `getNumber`, `getPosition`, `getRotation`, `getColor`, `getVisible`,
+  `getFloatingText`; `SIG_EnvironmentRenderer::getWithTexture`;
+  `SIG_SimulationVisualisation` `canShowShadows`, `getRobotRadius`,
+  `getSimulationTime`; `SIG_SimulationVisualisationWidget::simulationRunning`.
+  `getNumber`, `getVisible`, `getFloatingText` and `simulationRunning` are
+  now `const`. No change in behaviour.
+- **Review:** no defect; it found `getSimulationTime`, which was added. Open,
+  not a getter: the POV-Ray export methods of `SIG_Renderer`, its two
+  renderers and `SIG_SimulationVisualisation` could be `const`.
+- **Gates:** `check.sh` 754 pass, 0 fail; warnings 415. The other four gates
+  were not run.
+- **Next:** movie frames timed by simulated time, `needsToRecordFrameAt`.
+
+**2026-09-29 — DONE: MOVIE FRAME WRITING IS IN `SIG_MOVIERECORDER`.**
 
 - **Changed:** `SIGEL_SlaveGUI::SIG_MovieRecorder`, a plain C++ class with no
   signals, holds the movie settings, the recording flag and the count of

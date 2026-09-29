@@ -40,19 +40,9 @@ namespace SIGEL_SlaveGUI
   {
   };
 
-  SIG_MovieSettings const &SIG_MovieRecorder::getSettings() const
-  {
-    return settings;
-  };
-
   void SIG_MovieRecorder::setSettings( SIG_MovieSettings const &newSettings )
   {
     settings = newSettings;
-  };
-
-  bool SIG_MovieRecorder::isRecording() const
-  {
-    return recording;
   };
 
   void SIG_MovieRecorder::setRecording( bool newRecording )
@@ -101,16 +91,6 @@ namespace SIGEL_SlaveGUI
     double aspectRatio = double( settings.width ) / double( settings.height );
 
     return visualisation.createPovrayIncludeFile( lastFileName, aspectRatio );
-  };
-
-  int SIG_MovieRecorder::getFramesRecorded() const
-  {
-    return framesRecorded;
-  };
-
-  QString SIG_MovieRecorder::getLastFileName() const
-  {
-    return lastFileName;
   };
 
   void SIG_MovieRecorder::reset()

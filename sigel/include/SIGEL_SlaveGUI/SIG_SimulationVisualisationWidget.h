@@ -88,7 +88,7 @@
       /**
        * Is true if the simulation is in running state.
        */
-      bool simulationRunning();
+      bool simulationRunning() const { return simulationTimer->isActive(); }
 
       void resetRecorder();
 

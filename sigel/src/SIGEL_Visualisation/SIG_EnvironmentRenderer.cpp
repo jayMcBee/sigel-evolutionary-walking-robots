@@ -227,11 +227,6 @@ namespace SIGEL_Visualisation
       renderRobotPath();
   };
 
-  bool SIG_EnvironmentRenderer::getWithTexture() const
-  {
-    return withTexture;
-  };
-
   QString SIG_EnvironmentRenderer::exportToPovray()
   {
     QString resultString;

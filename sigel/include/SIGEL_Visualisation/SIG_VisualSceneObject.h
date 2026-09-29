@@ -71,7 +71,7 @@ namespace SIGEL_Visualisation
       /**
        * Gets the objects number.
        */
-      int getNumber();
+      int getNumber() const { return number; }
 
       /**
        * Sets the object's position.
@@ -86,7 +86,7 @@ namespace SIGEL_Visualisation
       /**
        * Gets the object's position.
        */
-      DL_vector getPosition() const;
+      DL_vector getPosition() const { return position; }
 
       /**
        * Sets the object's rotation.
@@ -101,7 +101,7 @@ namespace SIGEL_Visualisation
       /**
        * Gets the object's rotation.
        */
-      DL_matrix getRotation() const;
+      DL_matrix getRotation() const { return rotation; }
 
       /**
        * Sets the object's color.
@@ -114,7 +114,7 @@ namespace SIGEL_Visualisation
       /**
        * Gets the object's color.
        */
-      DL_vector getColor() const;
+      DL_vector getColor() const { return color; }
 
       /**
        * Executes appropriate OpenGL commands
@@ -138,11 +138,11 @@ namespace SIGEL_Visualisation
       /**
        * Gets the attribute visible.
        */
-      bool getVisible();
+      bool getVisible() const { return visible; }
 
       void setFloatingText( SIG_FloatingText *newFloatingText );
 
-      SIG_FloatingText *getFloatingText();
+      SIG_FloatingText *getFloatingText() const { return floatingText; }
 
       /**
        * The name of this SIG_VisualSceneObject.

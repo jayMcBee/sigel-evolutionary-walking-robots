@@ -107,7 +107,7 @@ namespace SIGEL_Visualisation
     /**
      * Returns true if the plane's display list draws the texture.
      */
-    bool getWithTexture() const;
+    bool getWithTexture() const { return withTexture; }
 
     QString exportToPovray();
 

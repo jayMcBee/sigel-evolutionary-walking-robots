@@ -315,11 +315,6 @@ void SIG_SimulationVisualisationWidget::reportRecordedFrames()
 			    QString( "%1 frames written to %2" ).arg( movieRecorder.getFramesRecorded() ).arg( movieRecorder.getSettings().directory ) );
 };
 
-  bool SIG_SimulationVisualisationWidget::simulationRunning()
-  {
-    return simulationTimer->isActive();
-  };
-
   void SIG_SimulationVisualisationWidget::slotStartSimulation()
   {
     if (simulationRunning())

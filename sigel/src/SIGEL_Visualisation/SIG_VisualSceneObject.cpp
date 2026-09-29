@@ -46,20 +46,10 @@ namespace SIGEL_Visualisation
     updateColorInternal();
   };
 
-  int SIG_VisualSceneObject::getNumber()
-  {
-    return number;
-  };
-
   void SIG_VisualSceneObject::setPosition(DL_vector newPosition)
   {
     position = newPosition;
     updatePositionInternal();
-  };
-
-  DL_vector SIG_VisualSceneObject::getPosition() const
-  {
-    return position;
   };
 
   void SIG_VisualSceneObject::setRotation(DL_matrix newRotation)
@@ -68,20 +58,10 @@ namespace SIGEL_Visualisation
     updateRotationInternal();
   };
 
-  DL_matrix SIG_VisualSceneObject::getRotation() const
-  {
-    return rotation;
-  };
-
   void SIG_VisualSceneObject::setColor(DL_vector newColor)
   {
     color = newColor;
     updateColorInternal();
-  };
-
-  DL_vector SIG_VisualSceneObject::getColor() const
-  {
-    return color;
   };
 
   void SIG_VisualSceneObject::applyTransformation()
@@ -118,19 +98,9 @@ namespace SIGEL_Visualisation
     visible = newVisible;
   };
 
-  bool SIG_VisualSceneObject::getVisible()
-  {
-    return visible;
-  };
-
   void SIG_VisualSceneObject::setFloatingText( SIG_FloatingText *newFloatingText )
   {
     floatingText = newFloatingText;
-  };
-
-  SIG_FloatingText *SIG_VisualSceneObject::getFloatingText()
-  {
-    return floatingText;
   };
 
 }

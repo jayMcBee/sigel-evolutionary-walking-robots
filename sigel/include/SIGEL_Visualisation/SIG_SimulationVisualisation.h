@@ -101,7 +101,7 @@ namespace SIGEL_Visualisation
        * Returns false when shadow mapping could not be set up; then
        * setShowShadows has no effect.
        */
-      bool canShowShadows() const;
+      bool canShowShadows() const { return shadowProgram != nullptr; }
 
       /**
        * This method finally initiates the calling
@@ -123,7 +123,7 @@ namespace SIGEL_Visualisation
        */
       void makeTimeSteps(int noOfTimeSteps);
 
-      QTime getSimulationTime() const;
+      QTime getSimulationTime() const { return renderRecorder->simulationTime; }
 
       DL_vector getRobotPosition() const;
 
@@ -139,7 +139,7 @@ namespace SIGEL_Visualisation
       /**
        * Returns the radius of the sphere around that box.
        */
-      double getRobotRadius() const;
+      double getRobotRadius() const { return robotRadius; }
 
       bool exportToPovray( QString includeFilename,
 			   QString fileName );

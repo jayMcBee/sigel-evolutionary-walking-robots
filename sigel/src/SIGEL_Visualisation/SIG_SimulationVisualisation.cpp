@@ -403,11 +403,6 @@ namespace SIGEL_Visualisation
     showShadows = newShowShadows;
   };
 
-  bool SIG_SimulationVisualisation::canShowShadows() const
-  {
-    return shadowProgram != nullptr;
-  };
-
    void SIG_SimulationVisualisation::visualize()
    {
      bool const shadowed = showShadows
@@ -526,11 +521,6 @@ namespace SIGEL_Visualisation
       };
   };
 
-  QTime SIG_SimulationVisualisation::getSimulationTime() const
-  {
-    return renderRecorder->simulationTime;
-  };
-
   DL_vector SIG_SimulationVisualisation::getRobotPosition() const
   {
     int rootLinkNumber = robot.getRootLink()->getNumber();
@@ -555,11 +545,6 @@ namespace SIGEL_Visualisation
     centre.plusis( &position );
 
     return centre;
-  };
-
-  double SIG_SimulationVisualisation::getRobotRadius() const
-  {
-    return robotRadius;
   };
 
   bool SIG_SimulationVisualisation::exportToPovray( QString includeFilename,
