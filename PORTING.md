@@ -909,7 +909,23 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-29 — DONE: THE GRID COLOUR CAN BE CHOSEN.** Start here.
+**2026-09-29 — DONE: THE SIMULATION TIME SHOWS TENTHS OF A SECOND.** Start here.
+
+- **Changed:** `signalSimulationProgress` and
+  `SIG_SimulationWidget::slotSetSimulationTime` carry the exact simulated
+  seconds, from `getCurrentSimulationSeconds`, where they carried a `QTime`
+  cut to whole seconds. The display reads "12 min 34.5 s", tenths cut off,
+  not rounded. No longer used, so removed:
+  `SIG_SimulationVisualisation::getCurrentSimulationWholeSeconds`,
+  `SIG_RenderRecorder::currentSimulationWholeSeconds` and its `<qdatetime.h>`.
+  The simulation's own `getCurrentSimulationWholeSeconds` stays for its end
+  test.
+- **Review:** no defect. A negative step size would show a malformed time;
+  item 104 covers the step size.
+- **Gates:** `check.sh` 754 pass, 0 fail; warnings 412.
+- **Next:** item 105, the MP4.
+
+**2026-09-29 — DONE: THE GRID COLOUR CAN BE CHOSEN.**
 
 - **Changed:** a "Grid color..." button in the "Show grid" row chooses the
   grid's colour, as "Plane color..." does the plane's, and shows it as an
@@ -5130,7 +5146,7 @@ else that stops matching 1.3 still needs justifying as a defect.
 | **Play pauses while a modal dialog is open.** 1.3 keeps the simulation running under a dialog | by decision 2026-09-23, item 65: at Frame Delay 0 the dialog was never drawn and the viewer hung. `SIG_SimulationWindow::event`, `SIG_SimulationVisualisationWidget::pauseForDialog` and `resumeAfterDialog` | nothing: no scenario plays the simulation under a dialog |
 | **Play steps once per frame on screen, and waits while the viewer window is minimised or on another workspace.** At Frame Delay 0 it is capped at about the display's refresh rate. 1.3 drew each step with `updateGL()`, not tied to the refresh, and on X11 kept stepping while minimised | by decision 2026-09-23: Play steps once per frame on screen, and a window that is not exposed shows no frames. `SIG_SimulationVisualisationWidget::slotSimulationProgress` and `slotFrameShown` | nothing |
 | **A movie frame that cannot be saved stops the recording with a warning, for every format.** 1.3 warned only for POV-Ray; for the image formats `callRenderPixMap` returned true whatever the save gave | by decision 2026-09-23, item 67. `SIG_SimulationVisualisationWidget::callRenderPixMap` and `makeTimeSteps` | nothing: no scenario records a movie |
-| **The viewer window opens at 1098 x 900.** 1.3 opens it at 780 x 810. The 3-D view was square, 740 x 740, next to a 250 px control panel; the panel may now be 300 px wide, and the start width is still open. The minimum is 780 x 683, the smallest height at which the control panel fits | by decision 2026-09-23, item 66; 1098 x 900 on 2026-09-25, when "Show shadows" added a row. `SIG_SimulationWindow`'s constructor | nothing |
+| **The viewer window opens at 1098 x 900.** 1.3 opens it at 780 x 810. The 3-D view need not be square; movies are 16:9. The minimum is 780 x 686, the smallest height at which the control panel fits | by decision 2026-09-23, item 66; 1098 x 900 on 2026-09-25, when "Show shadows" added a row. `SIG_SimulationWindow`'s constructor | nothing |
 | **The 3-D view draws the ground on both sides of the start.** 1.3 draws the terrain only from 0 to its size, so the robot starts at its corner. 1.0 drew a flat floor that moved with the camera | by decision 2026-09-23, item 42: the ground on the negative side too, each edge continued outward at the heights the physics uses. `SIG_EnvironmentRenderer::drawInit`, `buildGrid` and `groundDepth` | nothing: no check covers the floor |
 | **A render mode "Hidden lines".** 1.3 has Wireframe, Flatshaded and Gouraudshaded | by decision 2026-09-23, item 63. `SIG_ViewSettings::hiddenLine`, `SIG_SimulationVisualisation::visualize` | nothing: no check covers the render modes |
 | **A render mode "Points", with the back points hidden.** 1.3 has Wireframe, Flatshaded and Gouraudshaded | by decision 2026-09-23, item 63. `SIG_ViewSettings::points`, `SIG_SimulationVisualisation::visualize` | nothing: no check covers the render modes |

@@ -64,8 +64,8 @@ namespace SIGEL_SlaveGUI
 	     SLOT(slotMouseZoom(int)) );
 
     connect( visualisationWidget,
-	     SIGNAL(signalSimulationProgress(QTime)),
-	     SLOT(slotSetSimulationTime(QTime)) );
+	     SIGNAL(signalSimulationProgress(double)),
+	     SLOT(slotSetSimulationTime(double)) );
 
     connect( visualisationWidget,
 	     SIGNAL(signalPosition(DL_vector)),
@@ -230,14 +230,15 @@ namespace SIGEL_SlaveGUI
     distanceSlider->setValue( newDistanceValue );
   };
 
-  void SIG_SimulationWidget::slotSetSimulationTime( QTime simulationTime )
-  { char txt[256];
-  	QString myTime;
+  void SIG_SimulationWidget::slotSetSimulationTime( double simulationSeconds )
+  {
+    // Tenths of a second, cut off, not rounded.
+    int tenths = static_cast< int >( simulationSeconds * 10 + 1e-6 );
 
-  	sprintf(txt, "%d min %d s", simulationTime.hour() * 60 + simulationTime.minute(), simulationTime.second());
-	myTime = txt;
-
-	simulationTimeTextLabel->setText( myTime );
+    simulationTimeTextLabel->setText( QString( "%1 min %2.%3 s" )
+				      .arg( tenths / 600 )
+				      .arg( tenths % 600 / 10 )
+				      .arg( tenths % 10 ) );
   };
 
   void SIG_SimulationWidget::visualizeThis(SIGEL_Robot::SIG_Robot const &robot,

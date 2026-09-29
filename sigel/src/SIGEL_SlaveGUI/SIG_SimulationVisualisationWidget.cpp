@@ -233,7 +233,7 @@
 	    QMessageBox::warning( this, "Simulation Exception", e.getMessage() );
 	  };
 
-	emit signalSimulationProgress( simulationVisualisation.getCurrentSimulationWholeSeconds() );
+	emit signalSimulationProgress( simulationVisualisation.getCurrentSimulationSeconds() );
 
 	if ( traceRobot )
 	  {
@@ -294,7 +294,7 @@
     simulationVisualisation.setPlaneColor( planeColor );
     simulationVisualisation.setGridColor( gridColor );
 
-    emit signalSimulationProgress( QTime( 0, 0 ) );
+    emit signalSimulationProgress( 0.0 );
 
     initFloatingTextWidgets();
 

@@ -28,7 +28,6 @@ namespace SIGEL_Visualisation
   SIG_RenderRecorder::SIG_RenderRecorder(int noOfObjects)
     : SIGEL_Simulation::SIG_Recorder(),
 			robotLinks(noOfObjects),
-			currentSimulationWholeSeconds(),
 			currentSimulationSeconds( 0.0 )
   {
 
@@ -58,7 +57,6 @@ namespace SIGEL_Visualisation
 	robotLinks[i]->rotation = simulationQueries->getLinkOrientation(i);
       };
 
-    currentSimulationWholeSeconds = simulationQueries->getCurrentSimulationWholeSeconds();
     currentSimulationSeconds = simulationQueries->getCurrentSimulationSeconds();
   };
 

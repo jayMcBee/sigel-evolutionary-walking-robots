@@ -125,8 +125,6 @@ namespace SIGEL_Visualisation
        */
       void makeTimeSteps(int noOfTimeSteps);
 
-      QTime getCurrentSimulationWholeSeconds() const { return renderRecorder->currentSimulationWholeSeconds; }
-
       double getCurrentSimulationSeconds() const { return renderRecorder->currentSimulationSeconds; }
 
       DL_vector getRobotPosition() const;

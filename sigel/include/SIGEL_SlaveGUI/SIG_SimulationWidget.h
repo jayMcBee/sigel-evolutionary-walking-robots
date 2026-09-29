@@ -98,7 +98,7 @@ namespace SIGEL_SlaveGUI
      */
     void slotMouseZoom( int deltaY );
 
-    void slotSetSimulationTime( QTime simulationTime );
+    void slotSetSimulationTime( double simulationSeconds );
 
     void slotSetTraceRobot( bool newValue );
 

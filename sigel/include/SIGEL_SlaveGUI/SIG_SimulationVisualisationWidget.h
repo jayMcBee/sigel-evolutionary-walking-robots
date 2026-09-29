@@ -269,7 +269,7 @@
 
     signals:
 
-      void signalSimulationProgress( QTime simulationTime );
+      void signalSimulationProgress( double simulationSeconds );
 
       void signalPosition( DL_vector position );
 

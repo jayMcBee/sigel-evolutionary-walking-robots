@@ -27,7 +27,6 @@
 #include "SIGEL_Simulation/SIG_Recorder.h"
 #include "SIGEL_Simulation/SIG_SimulationCannotSolveException.h"
 #include <QList>
-#include <qdatetime.h>
 
 namespace SIGEL_Visualisation
 {
@@ -89,8 +88,6 @@ namespace SIGEL_Visualisation
        * positions and rotations of the simulated objects.
        */
       QList<SIG_SceneObject *> robotLinks;
-
-      QTime currentSimulationWholeSeconds;
 
       double currentSimulationSeconds;
 
