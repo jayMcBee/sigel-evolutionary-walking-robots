@@ -184,7 +184,7 @@
        * Tells the user that recording stopped, and how many frames were
        * written since the last Reset, and where.
        */
-      void reportRecordedFrames();
+      void reportAndEncodeRecording();
 
       /**
        * The timer that controls the progress of the simulation.

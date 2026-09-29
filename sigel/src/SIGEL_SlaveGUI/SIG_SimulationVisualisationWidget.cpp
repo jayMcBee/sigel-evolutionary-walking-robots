@@ -263,7 +263,7 @@
 	      {
 		movieRecorder.stopRecording();
 		emit signalRecordingAllowed( false );
-		reportRecordedFrames();
+		reportAndEncodeRecording();
 	      };
 	  };
       };
@@ -311,12 +311,12 @@
 void SIG_SimulationVisualisationWidget::resetRecorder()
 {
   if ( movieRecorder.isRecording() )
-    reportRecordedFrames();
+    reportAndEncodeRecording();
 
   movieRecorder.reset();
 };
 
-void SIG_SimulationVisualisationWidget::reportRecordedFrames()
+void SIG_SimulationVisualisationWidget::reportAndEncodeRecording()
 {
   if ( movieRecorder.getFramesRecorded() == 0 )
     {
@@ -614,7 +614,7 @@ void SIG_SimulationVisualisationWidget::reportRecordedFrames()
       {
       case QDialog::Accepted:
 	if ( movieRecorder.isRecording() && !movieSettingsDialog.checkboxEnableMovie->isChecked() )
-	  reportRecordedFrames();
+	  reportAndEncodeRecording();
 
 	{
 	  SIGEL_SlaveGUI::SIG_MovieSettings newSettings = movieSettingsDialog.settings();
