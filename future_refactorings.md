@@ -385,6 +385,12 @@ here changes evolution results, so each is judged only by whether the best
 fitness improves. Each starts with the published GP approaches to the
 problem; the choice is made before any code is written.
 
+- [ ] **124. Find a modern replacement for pthreads.** The MetaGP thread,
+  the dynamic-client server thread and their locks use `pthread_create`,
+  `pthread_mutex_*` and `pthread_cond_*` directly. Research what should
+  replace them, for example what C++17 offers natively, before any code
+  changes. Items 19, 121 and 122 are faults in this code.
+
 - [ ] **116. Let drives hold a torque until the program changes it.**
   `SIG_DynaMechsCommandInterface::moveDrive` applies the torque from R0 for
   the `MOVE` duration, then the drive goes limp. Tristar sets 0.001 s, so
