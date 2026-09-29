@@ -389,6 +389,10 @@ here changes evolution results, so each is judged only by whether the best
 fitness improves. Each starts with the published GP approaches to the
 problem; the choice is made before any code is written.
 
+- [ ] **127. Review `SIG_GPManager.cpp` with the maintainer,** method by
+  method, deciding each change before it is made. Several of its methods are
+  very long and hard to read and maintain.
+
 - [ ] **126. Move SIGEL to C++20, and define pi and the angle conversions
   once.** SIGEL writes pi several ways: `std::atan(1) * 4`, `M_PI`, which is
   POSIX rather than C++, and the literal `3.14159265`. With `-std=c++20` in
