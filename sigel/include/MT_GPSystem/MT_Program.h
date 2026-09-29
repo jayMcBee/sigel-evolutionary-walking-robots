@@ -1,7 +1,3 @@
-// MT_Program.h: interface for class MT_Program.
-//
-//////////////////////////////////////////////////////////////////////
-
 #ifndef MT_GPSYSTEM_MT_PROGRAM_H
 #define MT_GPSYSTEM_MT_PROGRAM_H
 

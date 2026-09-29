@@ -1,7 +1,3 @@
-// MT_Substitute.h: interface for class MT_Substitute.
-//
-//////////////////////////////////////////////////////////////////////
-
 #ifndef MT_CONTROL_MT_SUBSTITUTE_H
 #define MT_CONTROL_MT_SUBSTITUTE_H
 

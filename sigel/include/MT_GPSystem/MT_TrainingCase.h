@@ -1,7 +1,3 @@
-// MT_TrainingCase.h: interface for class MT_TrainingCase.
-//
-//////////////////////////////////////////////////////////////////////
-
 #ifndef MT_GPSYSTEM_MT_TRAININGCASE_H
 #define MT_GPSYSTEM_MT_TRAININGCASE_H
 

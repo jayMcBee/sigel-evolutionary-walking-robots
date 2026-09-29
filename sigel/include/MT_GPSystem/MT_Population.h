@@ -1,7 +1,3 @@
-// MT_Population.h: interface for class MT_Population.
-//
-//////////////////////////////////////////////////////////////////////
-
 #ifndef MT_GPSYSTEM_MT_POPULATION_H
 #define MT_GPSYSTEM_MT_POPULATION_H
 

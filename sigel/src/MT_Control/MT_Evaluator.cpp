@@ -1,7 +1,3 @@
-// MT_Evaluator.cpp: implementation of class MT_Evaluator.
-//
-//////////////////////////////////////////////////////////////////////
-
 #include <QList>
 #include <QString>
 #include <QTextStream>

@@ -1,7 +1,3 @@
-// MT_FitnessTrainer.h: interface for class MT_FitnessTrainer.
-//
-//////////////////////////////////////////////////////////////////////
-
 #ifndef MT_GPSYSTEM_MT_FITNESSTRAINER_H
 #define MT_GPSYSTEM_MT_FITNESSTRAINER_H
 

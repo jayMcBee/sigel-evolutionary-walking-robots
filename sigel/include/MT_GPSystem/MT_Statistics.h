@@ -1,7 +1,3 @@
-// MT_Statistics.h: interface for class MT_Statistics.
-//
-//////////////////////////////////////////////////////////////////////
-
 #ifndef MT_GPSYSTEM_MT_STATISTICS_H
 #define MT_GPSYSTEM_MT_STATISTICS_H
 

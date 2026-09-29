@@ -1,7 +1,3 @@
-// MT_GPManager.h: interface for class MT_GPManager.
-//
-//////////////////////////////////////////////////////////////////////
-
 #ifndef MT_GPSYSTEM_MT_GPMANAGER_H
 #define MT_GPSYSTEM_MT_GPMANAGER_H
 

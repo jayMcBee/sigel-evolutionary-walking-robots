@@ -1,7 +1,3 @@
-// MT_ExperimentItem.h: interface for class MT_ExperimentItem.
-//
-//////////////////////////////////////////////////////////////////////
-
 #ifndef MT_GUI_MT_EXPERIMENTITEM_H
 #define MT_GUI_MT_EXPERIMENTITEM_H
 

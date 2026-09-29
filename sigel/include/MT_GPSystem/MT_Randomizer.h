@@ -1,7 +1,3 @@
-// MT_Randomizer.h: interface for class MT_Randomizer.
-//
-//////////////////////////////////////////////////////////////////////
-
 #ifndef MT_GPSYSTEM_MT_RANDOMIZER_H
 #define MT_GPSYSTEM_MT_RANDOMIZER_H
 

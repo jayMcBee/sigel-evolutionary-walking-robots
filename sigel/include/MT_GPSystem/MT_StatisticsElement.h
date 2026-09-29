@@ -1,7 +1,3 @@
-// MT_StatisticsElement.h: interface for class MT_StatisticsElement.
-//
-//////////////////////////////////////////////////////////////////////
-
 #ifndef MT_GPSYSTEM_MT_STATISTICSELEMENT_H
 #define MT_GPSYSTEM_MT_STATISTICSELEMENT_H
 

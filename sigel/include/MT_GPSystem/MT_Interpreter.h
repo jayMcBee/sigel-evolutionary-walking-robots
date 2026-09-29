@@ -1,7 +1,3 @@
-// MT_Interpreter.h: interface for class MT_Interpreter.
-//
-//////////////////////////////////////////////////////////////////////
-
 #ifndef MT_GPSYSTEM_MT_INTERPRETER_H
 #define MT_GPSYSTEM_MT_INTERPRETER_H
 

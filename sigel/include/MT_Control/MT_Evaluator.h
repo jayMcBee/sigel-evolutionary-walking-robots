@@ -1,7 +1,3 @@
-// MT_Evaluator.h: interface for class MT_Evaluator.
-//
-//////////////////////////////////////////////////////////////////////
-
 #ifndef MT_CONTROL_MT_EVALUATOR_H
 #define MT_CONTROL_MT_EVALUATOR_H
 

@@ -1,7 +1,3 @@
-// MT_TranslatedIndividual.h: interface for class MT_TranslatedIndividual.
-//
-//////////////////////////////////////////////////////////////////////
-
 #ifndef MT_GPSYSTEM_MT_TRANSLATEDINDIVIDUAL_H
 #define MT_GPSYSTEM_MT_TRANSLATEDINDIVIDUAL_H
 

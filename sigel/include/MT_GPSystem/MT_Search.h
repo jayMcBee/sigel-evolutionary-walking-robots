@@ -1,7 +1,3 @@
-// MT_Search.h: interface for class MT_Search.
-//
-//////////////////////////////////////////////////////////////////////
-
 #ifndef MT_GPSYSTEM_MT_SEARCH_H
 #define MT_GPSYSTEM_MT_SEARCH_H
 

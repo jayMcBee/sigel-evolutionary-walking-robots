@@ -1,7 +1,3 @@
-// MT_Operand.h: interface for class MT_Operand.
-//
-//////////////////////////////////////////////////////////////////////
-
 #ifndef MT_GPSYSTEM_MT_OPERAND_H
 #define MT_GPSYSTEM_MT_OPERAND_H
 

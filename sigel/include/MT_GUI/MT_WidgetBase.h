@@ -1,7 +1,3 @@
-// MT_WidgetBase.h: interface for class MT_WidgetBase.
-//
-//////////////////////////////////////////////////////////////////////
-
 #ifndef MT_GUI_WIDGETBASE
 #define MT_GUI_WIDGETBASE
 

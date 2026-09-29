@@ -1,7 +1,3 @@
-// MT_GPManager.cpp: implementation of class MT_GPManager.
-//
-//////////////////////////////////////////////////////////////////////
-
 #include "MT_GPSystem/MT_GPManager.h"
 #include <unistd.h>
 #include "MT_Control/MT_Substitute.h"

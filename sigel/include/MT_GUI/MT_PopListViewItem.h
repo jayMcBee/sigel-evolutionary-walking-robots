@@ -1,7 +1,3 @@
-// MT_PopListViewItem.h: interface for class MT_PopListViewItem.
-//
-//////////////////////////////////////////////////////////////////////
-
 #ifndef MT_GUI_MT_POPLISTVIEWITEM_H
 #define MT_GUI_MT_POPLISTVIEWITEM_H
 

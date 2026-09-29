@@ -1,7 +1,3 @@
-// MT_Individual.h: interface for class MT_Individual.
-//
-//////////////////////////////////////////////////////////////////////
-
 #ifndef MT_GPSYSTEM_MT_INDIVIDUAL_H
 #define MT_GPSYSTEM_MT_INDIVIDUAL_H
 

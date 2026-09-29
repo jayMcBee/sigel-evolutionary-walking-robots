@@ -1,7 +1,3 @@
-// MT_Trainingset.h: interface for class MT_Trainingset.
-//
-//////////////////////////////////////////////////////////////////////
-
 #ifndef MT_GPSYSTEM_MT_TRAININGSET_H
 #define MT_GPSYSTEM_MT_TRAININGSET_H
 

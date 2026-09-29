@@ -1,7 +1,3 @@
-// MT_Programline.h: interface for class MT_Programline.
-//
-//////////////////////////////////////////////////////////////////////
-
 #ifndef MT_GPSYSTEM_MT_PROGRAMLINE_H
 #define MT_GPSYSTEM_MT_PROGRAMLINE_H
 

@@ -1,7 +1,3 @@
-// MT_Classifier.h: interface for class MT_Classifier.
-//
-//////////////////////////////////////////////////////////////////////
-
 #ifndef MT_CONTROL_MT_CLASSIFIER_H
 #define MT_CONTROL_MT_CLASSIFIER_H
 

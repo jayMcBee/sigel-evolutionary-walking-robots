@@ -1,7 +1,3 @@
-// DoubleSpinBox.h: interface for class DoubleSpinBox.
-//
-//////////////////////////////////////////////////////////////////////
-
 #ifndef MT_GUI_DOUBLESPINBOX_H
 #define MT_GUI_DOUBLESPINBOX_H
 

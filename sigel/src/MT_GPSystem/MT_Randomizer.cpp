@@ -1,7 +1,3 @@
-// MT_Randomizer.cpp: implementation of class MT_Randomizer.
-//
-//////////////////////////////////////////////////////////////////////
-
 #include "MT_GPSystem/MT_Randomizer.h"
 #include <iostream>
 

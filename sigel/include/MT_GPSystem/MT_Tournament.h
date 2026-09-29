@@ -1,7 +1,3 @@
-// MT_Tournament.h: interface for class MT_Tournament.
-//
-//////////////////////////////////////////////////////////////////////
-
 #ifndef MT_GPSYSTEM_MT_TOURNAMENT_H
 #define MT_GPSYSTEM_MT_TOURNAMENT_H
 

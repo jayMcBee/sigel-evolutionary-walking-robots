@@ -1,7 +1,3 @@
-// MT_Editor.cpp: implementation of class MT_Editor.
-//
-//////////////////////////////////////////////////////////////////////
-
 #include "MT_GUI/MT_Editor.h"
 
 #include <QApplication>
