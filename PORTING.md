@@ -909,7 +909,35 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-29 — DONE: RECORDING ALWAYS SAYS WHEN IT STOPS.** Start here.
+**2026-09-29 — PLANNED: ITEM 105, THE MP4, AGREED WITH THE MAINTAINER.** Start here.
+
+- **Flow:** when recording stops (back-to-start, "Record frames" unticked,
+  the frame limit), `SIG_SimulationVisualisationWidget::reportRecordedFrames`
+  becomes a one-line forward to
+  `SIG_MovieEncoder::encode( settings, frameCount )`. The widget holds no
+  message or ffmpeg logic. Open: rename the forward to `recordingStopped`.
+- **`SIG_MovieEncoder`,** a plain C++ class in `SIGEL_SlaveGUI`, a member of
+  the widget, built with the widget as message parent; it owns a `QProcess`.
+  `encode` shows every message itself: 0 frames, "Recording stopped. No
+  frames were written."; POV-Ray, "N frames written to <folder>"; no ffmpeg
+  (`QStandardPaths::findExecutable`), the same plus "ffmpeg was not found,
+  so no MP4 was made."; otherwise one question, "N frames written to
+  <folder>. Make <prefix>.mp4 from them?", with "(replaces the existing
+  file)" when it exists. On Yes, ffmpeg runs in the background; when it
+  finishes, "Movie written to <file>" or a warning with the end of ffmpeg's
+  error output.
+- **`arguments()`,** const, no UI: `ffmpeg -y -framerate <fps>
+  -start_number 0 -i <folder><prefix>%0<digits>d.<ext> -frames:v <N>
+  -c:v libx264 -pix_fmt yuv420p <folder><prefix>.mp4`; `%d` without
+  leading zeros, digits as in `SIG_MovieRecorder::nextFrameFileName`. The
+  frame rate is the setting, since frames follow simulated time.
+- **Odd sizes:** the output size spin boxes step by 2, in the same change.
+- **Working rules:** small separate commits; the diff for the maintainer's
+  OK before each commit; comments only for reasons, traps or limits; no
+  change to shown text without asking; `check.sh` detached, no edits during
+  a run; a sub-agent review of every code change.
+
+**2026-09-29 — DONE: RECORDING ALWAYS SAYS WHEN IT STOPS.**
 
 - **Changed, in `SIG_SimulationVisualisationWidget`:** when "Max. # of
   frames to save" is reached, recording stops, the movie button shows it,
