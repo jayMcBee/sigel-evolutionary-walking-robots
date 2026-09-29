@@ -909,7 +909,20 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-29 — DONE: THE MOVIE SETTINGS DIALOG IS TIDIED.** Start here.
+**2026-09-29 — DONE: RECORDING ALWAYS SAYS WHEN IT STOPS.** Start here.
+
+- **Changed, in `SIG_SimulationVisualisationWidget`:** when "Max. # of
+  frames to save" is reached, recording stops, the movie button shows it,
+  and "N frames written to <folder>" appears; before, writing just stopped.
+  When recording stops with no frame written, for example back-to-start
+  before Play, "Recording stopped. No frames were written." appears; before,
+  nothing did. Both reported by the x86 session on stock 3dd229e. Checked on
+  the desktop.
+- **Unchanged:** back-to-start still ends a recording, as in 1.3.
+- **Gates:** `check.sh` 754 pass, 0 fail; warnings 412.
+- **Next:** item 105, the MP4.
+
+**2026-09-29 — DONE: THE MOVIE SETTINGS DIALOG IS TIDIED.**
 
 - **Changed, in `SIG_MovieSettingsDialogBase.ui` and `SIG_MovieSettingsDialog`:**
   two buttons, "720p (1280 × 720)" and "1080p (1920 × 1080)", fill in the

@@ -258,6 +258,12 @@
 		movieRecorder.stopRecording();
 		emit signalRecordingAllowed( false );
 		QMessageBox::warning( this, "File Error", "Unable to write file " + movieRecorder.getLastFileName() + ".\nPerhaps you don't have permission to write the file.");
+	      }
+	    else if ( movieRecorder.getFramesRecorded() >= movieRecorder.getSettings().maxFrames )
+	      {
+		movieRecorder.stopRecording();
+		emit signalRecordingAllowed( false );
+		reportRecordedFrames();
 	      };
 	  };
       };
@@ -318,7 +324,10 @@ void SIG_SimulationVisualisationWidget::resetRecorder()
 void SIG_SimulationVisualisationWidget::reportRecordedFrames()
 {
   if ( movieRecorder.getFramesRecorded() == 0 )
-    return;
+    {
+      QMessageBox::information( this, "Recording Stopped", "Recording stopped. No frames were written." );
+      return;
+    }
 
   QMessageBox::information( this, "Recording Stopped",
 			    QString( "%1 frames written to %2" ).arg( movieRecorder.getFramesRecorded() ).arg( movieRecorder.getSettings().directory ) );

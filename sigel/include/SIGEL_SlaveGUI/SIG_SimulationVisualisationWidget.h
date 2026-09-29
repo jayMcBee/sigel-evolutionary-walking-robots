@@ -181,8 +181,8 @@
     private:
 
       /**
-       * Tells the user how many frames were written since the last Reset,
-       * and where, if there are any. Called when recording stops.
+       * Tells the user that recording stopped, and how many frames were
+       * written since the last Reset, and where.
        */
       void reportRecordedFrames();
 
