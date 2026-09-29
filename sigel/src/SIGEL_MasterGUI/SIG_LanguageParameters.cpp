@@ -46,11 +46,7 @@ namespace SIGEL_MasterGUI
  *  name 'name' and widget flags set to 'f' 
  */
 SIG_LanguageParameters::SIG_LanguageParameters( QWidget* parent,  const char* name, Qt::WindowFlags fl, SIGEL_GP::SIG_GPExperiment &theExperiment )
-#ifdef _WINDOWS
-  : SIG_LanguageParametersBase( parent, name, fl ), theExperiment( theExperiment ), sigelRoot( ::getenv( "SIGEL_ROOT" ) )//, allow( sigelRoot + "/pixmaps/allow.xpm" ), disallow( sigelRoot + "/pixmaps/disallow.xpm" )
-#else
   : SIG_LanguageParametersBase( parent, name, fl ), theExperiment( theExperiment ), sigelRoot( std::getenv( "SIGEL_ROOT" ) )//, allow( sigelRoot + "/pixmaps/allow.xpm" ), disallow( sigelRoot + "/pixmaps/disallow.xpm" )
-#endif
 {
   // sigelRoot = QString( std::getenv( "SIGEL_ROOT") );
   allow = QPixmap( sigelRoot + "/pixmaps/allow.xpm" );

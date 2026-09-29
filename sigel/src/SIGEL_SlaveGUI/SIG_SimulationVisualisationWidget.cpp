@@ -80,11 +80,7 @@
 	     SIGNAL(frameSwapped()),
 	     SLOT(slotFrameShown()) );
 
-#ifdef _WINDOWS
     char *sigelRoot = ::getenv( "SIGEL_ROOT" );
-#else
-    char *sigelRoot = ::getenv( "SIGEL_ROOT" );
-#endif
     QString temp( sigelRoot );
     if( temp.right(1) != "/" )
       temp.append( "/" );
@@ -509,13 +505,8 @@ void SIG_SimulationVisualisationWidget::reportRecordedFrames()
 
 	double radViewDirectionAngle = qDegreesToRadians( viewDirectionAngle );
 
-#ifdef _WINDOWS
-	double newXPos = actXPos + ( ::sin( radViewDirectionAngle ) * distance );
-	double newZPos = actZPos + ( ::cos( radViewDirectionAngle ) * distance );
-#else
 	double newXPos = actXPos + ( std::sin( radViewDirectionAngle ) * distance );
 	double newZPos = actZPos + ( std::cos( radViewDirectionAngle ) * distance );
-#endif	
 
 	visualisation->viewSettings.lookPoint.set( 0 , newXPos );
 	visualisation->viewSettings.lookPoint.set( 2 , newZPos );
@@ -536,13 +527,8 @@ void SIG_SimulationVisualisationWidget::reportRecordedFrames()
 
 	double radViewDirectionAngle = qDegreesToRadians( yaw );
 
-#ifdef _WINDOWS
-	double newXPos = actXPos + ( ::sin( radViewDirectionAngle ) * distance );
-	double newZPos = actZPos + ( ::cos( radViewDirectionAngle ) * distance );
-#else
 	double newXPos = actXPos + ( std::sin( radViewDirectionAngle ) * distance );
 	double newZPos = actZPos + ( std::cos( radViewDirectionAngle ) * distance );
-#endif	
 
 	visualisation->viewSettings.lookPoint.set( 0 , newXPos );
 	visualisation->viewSettings.lookPoint.set( 2 , newZPos );
@@ -568,13 +554,8 @@ void SIG_SimulationVisualisationWidget::reportRecordedFrames()
 
 	double radViewDirectionAngle = qDegreesToRadians( viewDirectionAngle );
 
-#ifdef _WINDOWS
-	double newXPos = actXPos + ( ::sin( radViewDirectionAngle ) * distance );
-	double newZPos = actZPos + ( ::cos( radViewDirectionAngle ) * distance );
-#else
 	double newXPos = actXPos + ( std::sin( radViewDirectionAngle ) * distance );
 	double newZPos = actZPos + ( std::cos( radViewDirectionAngle ) * distance );
-#endif	
 
 	visualisation->viewSettings.lookPoint.set( 0 , newXPos );
 	visualisation->viewSettings.lookPoint.set( 2 , newZPos );
@@ -599,13 +580,8 @@ void SIG_SimulationVisualisationWidget::reportRecordedFrames()
 
 	double radViewDirectionAngle = qDegreesToRadians( viewDirectionAngle );
 
-#ifdef _WINDOWS
-	double newXPos = actXPos + ( ::sin( radViewDirectionAngle ) * distance );
-	double newZPos = actZPos + ( ::cos( radViewDirectionAngle ) * distance );
-#else
 	double newXPos = actXPos + ( std::sin( radViewDirectionAngle ) * distance );
 	double newZPos = actZPos + ( std::cos( radViewDirectionAngle ) * distance );
-#endif	
 
 	visualisation->viewSettings.lookPoint.set( 0 , newXPos );
 	visualisation->viewSettings.lookPoint.set( 2 , newZPos );

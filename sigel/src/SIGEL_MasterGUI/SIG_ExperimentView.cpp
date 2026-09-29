@@ -33,9 +33,7 @@
 #include "SIGEL_GP/SIG_GPExperimentHistoryEntry.h"
 #include "SIGEL_Tools/SIG_IO.h"
 
-#ifndef _WINDOWS
 #include <unistd.h>
-#endif
 
 namespace SIGEL_MasterGUI
 {
@@ -131,39 +129,6 @@ void SIG_ExperimentView::slotExportPostScript() {
   if (fileName.isNull())
     return;
 
-#ifdef _WINDOWS
-/* The windows pipe support doesn't work as expected, so we have to use a
-   a temporary file as input to gnuplot. */
-   if(fileName.indexOf(".eps", -5, Qt::CaseInsensitive) == -1){
-   	fileName += ".eps";
-   }
-
-   QString gnuCmdLine;
-   gnuCmdLine  = ::getenv("SIGEL_ROOT");
-   gnuCmdLine += "\\tmpFStat.plt";
-
-   QFile pipeFile(gnuCmdLine);
-   pipeFile.open(QIODevice::WriteOnly);
-
-   QTextStream pipeStream( &pipeFile );
-
-   pipeStream  << "set terminal postscript\n"
-   				<< "set output \"" << fileName << "\"\n";
-   streamToGnuPlot( pipeStream );
-   pipeStream << "quit\n";
-
-   pipeFile.close();
-
-   gnuCmdLine += "\"";
-   gnuCmdLine.prepend("gnuplot.exe \"");
-   if(WinExec(gnuCmdLine.toLatin1().constData(), SW_SHOW) < 32){
-      QMessageBox::warning(this, "Error", "Couldn't start gnuplot.", QMessageBox::Ok);
-   	return;
-   }
-   pipeFile.remove();
-
-#else
-
   FILE *gnuPlotStdInPipe = popen( "gnuplot -persist -", "w" );
 
   if (gnuPlotStdInPipe==nullptr)
@@ -187,8 +152,6 @@ void SIG_ExperimentView::slotExportPostScript() {
   pipeFile.close();
 
   pclose( gnuPlotStdInPipe );
-
-#endif
 };
 
 void SIG_ExperimentView::slotShowFitnesscurve() {
@@ -198,32 +161,6 @@ void SIG_ExperimentView::slotShowFitnesscurve() {
       return;
     };
 
-#ifdef _WINDOWS
-/* The windows pipe support doesn't work as expected, so we have to use a
-   a temporary file as input to gnuplot.
-*/
-   QString gnuCmdLine;
-   gnuCmdLine  = ::getenv("SIGEL_ROOT");
-   gnuCmdLine += "\\tmpFStat.plt";
-
-   QFile pipeFile(gnuCmdLine);
-   pipeFile.open(QIODevice::WriteOnly);
-
-   QTextStream pipeStream( &pipeFile );
-
-   streamToGnuPlot( pipeStream );
-   pipeStream << "quit\n";
-   pipeFile.close();
-
-   gnuCmdLine += "\" - ";
-   gnuCmdLine.prepend("gnuplot.exe \"");
-   if(WinExec(gnuCmdLine.toLatin1().constData(), SW_SHOW) < 32){
-      QMessageBox::warning(this, "Error", "Couldn't start gnuplot.", QMessageBox::Ok);
-   	return;
-   }
-   pipeFile.remove();
-
-#else
   //errno = 0;
   //signal(SIGPIPE,sigelSignalStandardHandler);
   FILE *gnuPlotStdInPipe = popen( "gnuplot -persist -", "w" );
@@ -245,7 +182,6 @@ void SIG_ExperimentView::slotShowFitnesscurve() {
   pipeFile.close();
 
   pclose( gnuPlotStdInPipe );
-#endif
 };
 
 void SIG_ExperimentView::slotHistory(bool selected) {

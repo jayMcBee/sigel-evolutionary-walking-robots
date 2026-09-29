@@ -135,17 +135,10 @@
 	double const radEyeYaw = qDegreesToRadians( yaw );
 	double const radEyePitch = qDegreesToRadians( pitch );
 
-#ifdef _WINDOWS
-	double const sinEyeYaw = ::sin(radEyeYaw);
-	double const cosEyeYaw = ::cos(radEyeYaw);
-	double const sinEyePitch = ::sin(radEyePitch);
-	double const cosEyePitch = ::cos(radEyePitch);
-#else
 	double const sinEyeYaw = std::sin(radEyeYaw);
 	double const cosEyeYaw = std::cos(radEyeYaw);
 	double const sinEyePitch = std::sin(radEyePitch);
 	double const cosEyePitch = std::cos(radEyePitch);
-#endif
 
 	double eyeX = sinEyeYaw * cosEyePitch * distance;
 	double eyeY = sinEyePitch * distance;
@@ -163,17 +156,10 @@
 	double const radUpYaw = ( radEyeYaw < M_PI ) ? radEyeYaw + M_PI : radEyeYaw - M_PI;
 	double const radUpPitch = (M_PI / 2) - radEyePitch;
 
-#ifdef _WINDOWS	
-	double const sinUpYaw = ::sin(radUpYaw);
-	double const cosUpYaw = ::cos(radUpYaw);
-	double const sinUpPitch = ::sin(radUpPitch);
-	double const cosUpPitch = ::cos(radUpPitch);
-#else
 	double const sinUpYaw = std::sin(radUpYaw);
 	double const cosUpYaw = std::cos(radUpYaw);
 	double const sinUpPitch = std::sin(radUpPitch);
 	double const cosUpPitch = std::cos(radUpPitch);
-#endif
 
 	double upX = sinUpYaw * cosUpPitch;
 	double upY = sinUpPitch;

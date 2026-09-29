@@ -36,11 +36,7 @@ SIG_InfoBox::SIG_InfoBox( QWidget *parent, const char *name, bool modal, Qt::Win
     setObjectName( QString::fromUtf8( name ) );
     setModal( modal );
 
-#ifdef _WINDOWS
-  QString sigelRoot( ::getenv( "SIGEL_ROOT" ) );
-#else
   QString sigelRoot( std::getenv( "SIGEL_ROOT" ) );
-#endif
   this->setWindowTitle( "About SIGEL" );
   QLabel *pixmapLabel = new QLabel( this );
   // The image is 1024 x 1024; the box shows it at 256 x 256.

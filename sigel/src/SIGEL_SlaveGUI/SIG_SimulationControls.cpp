@@ -34,11 +34,7 @@ namespace SIGEL_SlaveGUI
       mainWindow(mainWindow),
       simulationRunning( false )
   {
-#ifdef _WINDOWS
-    char *sigelRootCString = ::getenv( "SIGEL_ROOT" );
-#else
     char *sigelRootCString = std::getenv( "SIGEL_ROOT" );
-#endif
 
     QString sigelRootString( sigelRootCString );
 

@@ -50,11 +50,7 @@ void SIG_RobotView::getOutOfExperiment()
 {  SIGEL_Robot::SIG_PitchRollSensor *prs;
 
    // need to know where we are located for accessing the pixmaps
-#ifdef _WINDOWS
-  char *sigelRootCString = ::getenv( "SIGEL_ROOT" );
-#else
   char *sigelRootCString = std::getenv( "SIGEL_ROOT" );
-#endif
   QString sigelRootString( sigelRootCString );
 
   // first clear the listboxes...

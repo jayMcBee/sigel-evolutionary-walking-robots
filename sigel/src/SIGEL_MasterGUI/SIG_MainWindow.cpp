@@ -44,11 +44,7 @@ SIG_MainWindow::SIG_MainWindow( QWidget * parent, const char * name, Qt::WindowF
   // A toolbar has one icon size. 25 is the largest of the small pixmaps,
   // so no pixmap is drawn larger than its own size.
   setIconSize( QSize( 25, 25 ) );
-#ifdef _WINDOWS
-  QString sigelRoot( ::getenv( "SIGEL_ROOT" ) );
-#else
   QString sigelRoot( std::getenv( "SIGEL_ROOT" ) );
-#endif
 
   resize( 1280, 860 );
   // The Makefile compiles this file again whenever any other SIGEL object is

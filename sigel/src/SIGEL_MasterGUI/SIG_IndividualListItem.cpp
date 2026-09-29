@@ -33,11 +33,7 @@ SIG_IndividualListItem::SIG_IndividualListItem( QTreeWidget *parent )
   : QTreeWidgetItem()
 {
   parent->insertTopLevelItem( 0, this );
-#ifdef _WINDOWS
-  QString sigelRoot( ::getenv( "SIGEL_ROOT" ) );
-#else
   QString sigelRoot( std::getenv( "SIGEL_ROOT" ) );
-#endif
   setIcon( 0, QIcon( QPixmap( sigelRoot + "/pixmaps/individualSmall.xpm" ) ) );
 };
 
@@ -45,11 +41,7 @@ SIG_IndividualListItem::SIG_IndividualListItem( QTreeWidget *parent, int poolPos
   : QTreeWidgetItem(), poolPosition( poolPosition), theIndividual( theIndividual ) 
 {
   parent->insertTopLevelItem( 0, this );
-#ifdef _WINDOWS
-  QString sigelRoot( ::getenv( "SIGEL_ROOT" ) );
-#else
   QString sigelRoot( std::getenv( "SIGEL_ROOT" ) );
-#endif
   if( theIndividual )
     {
       setIcon( 0, QIcon( QPixmap( sigelRoot + "/pixmaps/individualSmall.xpm" ) ) );

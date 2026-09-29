@@ -33,10 +33,8 @@
 #include <qlcdnumber.h>
 
 #include <pvm3.h>
-#ifndef _WINDOWS
 #include <unistd.h>
 #include <cstdlib>
-#endif
 
 #include "SIGEL_MasterGUI/SIG_AllIndividualsView.h"
 #include "SIGEL_MasterGUI/SIG_IndividualListItem.h"
@@ -353,19 +351,11 @@ void SIG_AllIndividualsView::slotVisualize()
 
    	  gethostname( hostNameBuffer.data(), 100 );
 
-#ifdef _WINDOWS   	
-   	  char *sigelRootCString = ::getenv( "SIGEL_ROOT" );
-#else
    	  char *sigelRootCString = std::getenv( "SIGEL_ROOT" );
-#endif
 
    	  QString sigelRootString( sigelRootCString );
 
-#ifdef _WINDOWS   	
-   	  QString executableName = "sigel_slave";
-#else
    	  QString executableName = sigelRootString + "/sigel_slave";
-#endif   	
    	  QByteArray executableNameQCString = executableName.toUtf8();
    	  char const *executableNameCString = executableNameQCString;
 

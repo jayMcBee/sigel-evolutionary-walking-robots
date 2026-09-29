@@ -625,11 +625,7 @@ namespace SIGEL_Visualisation
 
     static double const xAngleRad = qDegreesToRadians( xAngle );
 
-#ifdef _WINDOWS
-    static double const directionLength = 0.5 * 1 / ::tan( xAngleRad / 2 );
-#else
     static double const directionLength = 0.5 * 1 / std::tan( xAngleRad / 2 );
-#endif
 
     stream << environmentRenderer.createPovrayDeclarations()
 	   << "\n"

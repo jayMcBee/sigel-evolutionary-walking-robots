@@ -43,9 +43,7 @@
 
 #include "SIGEL_Tools/SIG_IO.h"
 
-#ifndef _WINDOWS
 #include <cstdlib>
-#endif
 
 namespace SIGEL_MasterGUI
 {
@@ -55,11 +53,7 @@ namespace SIGEL_MasterGUI
  *  name 'name' and widget flags set to 'f' 
  */
 SIG_GPParameter::SIG_GPParameter( QWidget* parent,  const char* name, Qt::WindowFlags fl, SIGEL_GP::SIG_GPExperiment &theExperiment )
-#ifdef _WINDOWS
-  : SIG_GPParameterBase( parent, name, fl ), theExperiment( theExperiment ), sigelRoot( ::getenv( "SIGEL_ROOT" ) )
-#else
   : SIG_GPParameterBase( parent, name, fl ), theExperiment( theExperiment ), sigelRoot( std::getenv( "SIGEL_ROOT" ) )
-#endif
 {
   for ( const SIGEL_GP::SIG_GPFitnessFunction *fitnessFunction : SIGEL_GP::SIG_GPFitnessFunctionRegistry::fitnessFunctions() )
     fitnessFunctionList->addItem( fitnessFunction->name() );
@@ -401,11 +395,7 @@ void SIG_GPParameter::getOutOfExperiment()
       newItem->setText( 1, it->name );
       // set maximal slaves
       newItem->setText( 2, QString::number( it->maxSlaves ) );
-#ifdef _WINDOWS
-      newItem->setText( 3, it->executableDir.path() );
-#else
       newItem->setText( 3, it->executableDir.absolutePath() );
-#endif
     }
 
   // set the timeout

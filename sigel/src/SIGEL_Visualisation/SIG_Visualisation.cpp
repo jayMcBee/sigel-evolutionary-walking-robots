@@ -22,12 +22,8 @@
 */
 #include "SIGEL_Visualisation/SIG_Visualisation.h"
 
-#ifdef _WINDOWS
-#include <GL/glaux.h>
-#else
 #include <GL/gl.h>
 #include <GL/glu.h>
-#endif
 
 namespace SIGEL_Visualisation
 {

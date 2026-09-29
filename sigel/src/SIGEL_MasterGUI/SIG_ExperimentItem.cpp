@@ -28,11 +28,7 @@
 SIGEL_MasterGUI::SIG_ExperimentItem::SIG_ExperimentItem( QTreeWidget * parent, QString name ) : QTreeWidgetItem()
 {
   parent->insertTopLevelItem( 0, this );
-#ifdef _WINDOWS
-  char *sigelRootCString = ::getenv( "SIGEL_ROOT" );
-#else
   char *sigelRootCString = std::getenv( "SIGEL_ROOT" );
-#endif
   
   QString sigelRootString( sigelRootCString );
 

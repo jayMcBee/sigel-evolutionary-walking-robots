@@ -237,13 +237,8 @@ namespace SIGEL_Visualisation
     QString resultString;
     QTextStream stream( &resultString, QIODevice::WriteOnly );
 
-#ifdef _WINDOWS
-    int xPos = static_cast< int >( ::floor( lookPoint.get( 0 ) / fieldEdgeLength ) * fieldEdgeLength );
-    int zPos = - static_cast< int >( ::floor( lookPoint.get( 2 ) / fieldEdgeLength ) * fieldEdgeLength );
-#else
     int xPos = static_cast< int >( std::floor( lookPoint.get( 0 ) / fieldEdgeLength ) * fieldEdgeLength );
     int zPos = - static_cast< int >( std::floor( lookPoint.get( 2 ) / fieldEdgeLength ) * fieldEdgeLength );
-#endif
 
     stream << "union {\n"
 	   << exportSceneObjectsToPovray()
@@ -383,11 +378,7 @@ namespace SIGEL_Visualisation
     robotPathPoints.append( newPointObject );
   };
 
-#ifdef _WINDOWS
-  bool SIG_EnvironmentRenderer::loadPNMTexture(const char *filename) {
-#else
   bool SIG_EnvironmentRenderer::loadPNMTexture(char *filename) {
-#endif
 		// the pnmMagic identifies a pnm file with pixmap (RGB) data
 		// and it is stored in raw data format
 		GLubyte		 pnmMagic[2] = { 'P', '6' };
