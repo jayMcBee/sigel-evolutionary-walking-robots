@@ -369,37 +369,21 @@ int MT_Evaluator::spawnTask(SIGEL_GP::SIG_GPIndividual const& ind)
 	
 	bool useMeta=false;
 
-#ifdef _WINDOWS
-	WaitForSingleObject(fitnessMutex, INFINITE);
-#else
 	pthread_mutex_lock(&fitnessMutex);
-#endif
 
 	useMeta = evaluationTactic();
 
-#ifdef _WINDOWS
-	ReleaseMutex(fitnessMutex);
-#else
 	pthread_mutex_unlock(&fitnessMutex);
-#endif
 
 	if (useMeta)
 	{
 		// lock the interpreter to prevent exchange of the used program
-#ifdef _WINDOWS
-		WaitForSingleObject(interpreterMutex, INFINITE);
-#else
 		pthread_mutex_lock(&interpreterMutex);
-#endif
 
 		double MetaEstimationResult = Interpreter->interpret(translatedSIGProg(&ind.getProgram()));
 
 		// unlock the interpreter so that the program can be updated
-#ifdef _WINDOWS
-		ReleaseMutex(interpreterMutex);
-#else
 		pthread_mutex_unlock(&interpreterMutex);
-#endif
 
 		if (MetaEstimationResult <= 0.0)
 			MetaEstimationResult = 0.00000001;
@@ -483,20 +467,12 @@ double MT_Evaluator::checkTask(int taskId)
 					// TmpBuffer.remove(i);
 
 // lock the TCaseBuffer so that no TCases could be taken from it
-#ifdef _WINDOWS
-					WaitForSingleObject(tCaseBufferMutex, INFINITE);
-#else
 					pthread_mutex_lock(&tCaseBufferMutex);
-#endif
 	
 					TCaseBuffer.enqueue(TCases);
 
 // unlock the TCaseBuffer
-#ifdef _WINDOWS
-					ReleaseMutex(tCaseBufferMutex);
-#else
 					pthread_mutex_unlock(&tCaseBufferMutex);
-#endif
 					break;
 				}
 				else

@@ -16,17 +16,6 @@ extern bool guiEnabled;
 /***
  * this function is just used as the entry point of the meta thread
  ***/
-#ifdef _WINDOWS
-DWORD WINAPI StartMetaEvolution(LPVOID inRawSubst)
-{
-	MT_Controller *th_contr = (MT_Controller *)inRawSubst;
-	if(th_contr->startWOSigel)
-		th_contr->callMetaEvolutionLoopWOSigel();
-	else
-		th_contr->callMetaEvolutionLoop();
-	return 0;
-}
-#else
 void StartMetaEvolution(void *inRawSubst)
 {
 	MT_Controller *th_contr = static_cast<MT_Controller*>(inRawSubst);
@@ -35,7 +24,6 @@ void StartMetaEvolution(void *inRawSubst)
 	else
 		th_contr->callMetaEvolutionLoop();
 }
-#endif
 
 
 MT_Controller::MT_Controller(SIGEL_GP::SIG_GPExperiment &exp)
@@ -57,11 +45,7 @@ MT_Controller::MT_Controller(SIGEL_GP::SIG_GPExperiment &exp)
 	substCache.strategy = -1;
 	substCache.tolerance = 0;
 
-#ifdef _WINDOWS
-	defConfFileName = ::getenv("SIGEL_ROOT");
-#else
 	defConfFileName = std::getenv("SIGEL_ROOT");
-#endif
 	defConfFileName.append("/stdConf.mt");
 }
 
@@ -83,12 +67,7 @@ void MT_Controller::startSingleEvolution()
 {
 	startWOSigel = true;
 
-#ifdef _WINDOWS
-		meta_thread = CreateThread(nullptr, 0, &StartMetaEvolution, this, 0, 0);
-//		SetThreadPriority(meta_thread, THREAD_PRIORITY_BELOW_NORMAL);
-#else
 		pthread_create(&meta_thread, nullptr, reinterpret_cast<void*(*)(void*)>(&StartMetaEvolution), this);
-#endif
 
 }
 
@@ -111,12 +90,7 @@ void MT_Controller::startTimedEvolution(int minutes)
 	evolTimer->start(minutes * 60000);
 
 	QObject::connect(gpManager, SIGNAL(metaEvolutionRunning(bool)), this, SLOT(slotEvolutionRunning(bool)));
-#ifdef _WINDOWS
-		meta_thread = CreateThread(nullptr, 0, &StartMetaEvolution, this, 0, 0);
-//		SetThreadPriority(meta_thread, THREAD_PRIORITY_BELOW_NORMAL);
-#else
 		pthread_create(&meta_thread, nullptr, reinterpret_cast<void*(*)(void*)>(&StartMetaEvolution), this);
-#endif
 }
 
 void MT_Controller::slotEvolutionRunning(bool running)
@@ -162,13 +136,7 @@ bool MT_Controller::startEvolution()
 		}
 
 		// create a thread for the meta-evolution
-#ifdef _WINDOWS
-		meta_thread = CreateThread(nullptr, 0, &StartMetaEvolution, this, 0, 0);
-//		SetThreadPriority(meta_thread, THREAD_PRIORITY_BELOW_NORMAL);
-//		SetThreadPriorityBoost(meta_thread, true);
-#else
 		pthread_create(&meta_thread, nullptr, reinterpret_cast<void*(*)(void*)>(&StartMetaEvolution), this);
-#endif
 	}
 
 	return true;
@@ -534,13 +502,8 @@ void MT_Controller::writeToFile(QTextStream &file, QString name, int autoSave)
 		
 		// wait for the evolution to end before saving the system
 		// to prevent problems with the concurrent threads
-#ifdef _WINDOWS
-		if(gpManager)
-			WaitForSingleObject(gpManager->evolutionMutex, INFINITE);
-#else
 		if(gpManager)
 			pthread_mutex_lock(&gpManager->evolutionMutex);
-#endif
 			
 		// save the meta system
 		if(autoSave){
@@ -553,13 +516,8 @@ void MT_Controller::writeToFile(QTextStream &file, QString name, int autoSave)
 				return;		// oops, something went wrong
 		}
 
-#ifdef _WINDOWS
-		if(gpManager)
-			ReleaseMutex(gpManager->evolutionMutex);
-#else
 		if(gpManager)
 			pthread_mutex_unlock(&gpManager->evolutionMutex);
-#endif
 
 		
 		file << "MetaInUse\n";					// write the file name for the meta experiment

@@ -133,11 +133,7 @@ void MT_Classifier::createNewTCase(SIGEL_Program::SIG_Program const * SigProgOne
 	MT_TranslatedIndividual * TransIndi = createDoubleTransIndi(SigProgOne, SigProgTwo);
 
 // lock the TCaseBuffer so that no TCases could be taken from it
-#ifdef _WINDOWS
-					WaitForSingleObject(tCaseBufferMutex, INFINITE);
-#else
 					pthread_mutex_lock(&tCaseBufferMutex);
-#endif
 	
 					TCaseBuffer.enqueue (new MT_TrainingCase(FitDifference, TransIndi, NumOfCorrectEstimation[GenerationNumber], TransIndi->Boundary));
 
@@ -147,11 +143,7 @@ void MT_Classifier::createNewTCase(SIGEL_Program::SIG_Program const * SigProgOne
 
 
 // unlock the TCaseBuffer
-#ifdef _WINDOWS
-					ReleaseMutex(tCaseBufferMutex);
-#else
 					pthread_mutex_unlock(&tCaseBufferMutex);
-#endif
 
 }
 
@@ -444,30 +436,18 @@ bool MT_Classifier::preEvolution(QList<SIGEL_GP::SIG_GPTournament *> *tours, int
 	int TourSize = tours->size();
 
 
-#ifdef _WINDOWS
-	WaitForSingleObject(fitnessMutex, INFINITE);
-#else
 	pthread_mutex_lock(&fitnessMutex);
-#endif
 
 
 	int NumOfClassi = evaluationTactic(TourSize);
 
-#ifdef _WINDOWS
-	ReleaseMutex(fitnessMutex);
-#else
 	pthread_mutex_unlock(&fitnessMutex);
-#endif
 
 
 	if (NumOfClassi > 0)  // NumOfClassi tournament will run by the Classifier
 	{
 
-#ifdef _WINDOWS
-		WaitForSingleObject(interpreterMutex, INFINITE);
-#else
 		pthread_mutex_lock(&interpreterMutex);
-#endif
 		for(int i=0; i<NumOfClassi; i++)
 		{	
 			Tourna = tours->value(i);
@@ -479,11 +459,7 @@ bool MT_Classifier::preEvolution(QList<SIGEL_GP::SIG_GPTournament *> *tours, int
 		}
 
 // unlock the interpreter so that the program can be updated
-#ifdef _WINDOWS
-		ReleaseMutex(interpreterMutex);
-#else
 		pthread_mutex_unlock(&interpreterMutex);
-#endif
 	
 		for( int i=0; i<TourSize-NumOfClassi; i++)
 		{
@@ -516,11 +492,7 @@ bool MT_Classifier::preEvolution(QList<SIGEL_GP::SIG_GPTournament *> *tours, int
 		if (NewNumOfClassi <=0)			// No tournament is to be classified
 			return Change;  
 
-#ifdef _WINDOWS
-		WaitForSingleObject(interpreterMutex, INFINITE);
-#else
 		pthread_mutex_lock(&interpreterMutex);
-#endif
 		for(int i=0; i<TourSize; i++)
 		{	
 			if(ToursWBestIndi[i] == 0)
@@ -535,11 +507,7 @@ bool MT_Classifier::preEvolution(QList<SIGEL_GP::SIG_GPTournament *> *tours, int
 		}
 
 // unlock the interpreter so that the program can be updated
-#ifdef _WINDOWS
-		ReleaseMutex(interpreterMutex);
-#else
 		pthread_mutex_unlock(&interpreterMutex);
-#endif
 
 		int NumOfTour = TourSize - NewNumOfClassi; // Number of tournaments to be run normally
 		for( int i=0; i<NumOfTour; i++)

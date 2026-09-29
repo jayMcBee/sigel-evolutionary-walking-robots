@@ -20,11 +20,7 @@ MT_ExperimentWidget::MT_ExperimentWidget(QWidget* parent, const char* name, Qt::
 	setColumnCount(1);
 	setHeaderLabels(QStringList("Meta experiment"));
 
-#ifdef _WINDOWS	
-	QString pixPath = ::getenv("SIGEL_ROOT");
-#else
 	QString pixPath = std::getenv("SIGEL_ROOT");
-#endif
 	pixPath.append("/pixmaps/");
 	
 	new MT_ExperimentItem(this, 5, "Statistics", QPixmap( pixPath+"mt_StatSmall.xpm" ));

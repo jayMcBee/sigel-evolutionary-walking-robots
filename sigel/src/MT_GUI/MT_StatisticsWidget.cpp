@@ -19,11 +19,7 @@ MT_StatisticsWidget::MT_StatisticsWidget(QMainWindow* parent, const char* name, 
 		parent->addToolBar(Qt::TopToolBarArea, statToolbar);
 	statToolbar->hide();
 
-#ifdef _WINDOWS
-	QString pixPath = ::getenv("SIGEL_ROOT");
-#else
 	QString pixPath = std::getenv("SIGEL_ROOT");
-#endif
 	pixPath.append("/pixmaps/");
 
 	QIcon icon_updateAction(QPixmap(pixPath+"mt_UpdateSmall.xpm"));
@@ -534,13 +530,6 @@ void MT_StatisticsWidget::slotSearchEffectsPSExport()
  **/
 void MT_StatisticsWidget::plotEstimation(QString fileName)
 {
-#ifdef _WINDOWS
-	QString gnuCmdLine(::getenv("SIGEL_ROOT"));
-	gnuCmdLine.append("\\tmpFStat.plt");
-
-	QFile pipeFile(gnuCmdLine);
-	pipeFile.open(QIODevice::WriteOnly);
-#else
 	FILE *gnuPlotPipe = popen( "gnuplot -persist -", "w");
 	if(!gnuPlotPipe){
 		QMessageBox::warning( this, "Error", "Couldn't start gnuplot.");
@@ -549,7 +538,6 @@ void MT_StatisticsWidget::plotEstimation(QString fileName)
 
 	QFile pipeFile;
 	pipeFile.open(gnuPlotPipe, QIODevice::WriteOnly);
-#endif
 	QTextStream pipeStream(&pipeFile);
 
 	// fill the stream with gnuplot commands and data
@@ -575,27 +563,11 @@ void MT_StatisticsWidget::plotEstimation(QString fileName)
 	pipeStream << "e\nquit\n";
 
 	pipeFile.close();
-#ifdef _WINDOWS
-	gnuCmdLine.append("\" - ");
-	gnuCmdLine.prepend("gnuplot.exe \"");
-	if(WinExec(gnuCmdLine, SW_SHOW) < 32){
-		QMessageBox::warning( this, "Error", "Couldn't start gnuplot.");
-		return;
-	}
-#else
 	pclose( gnuPlotPipe );
-#endif
 }
 
 void MT_StatisticsWidget::plotFitness(QString fileName)
 {
-#ifdef _WINDOWS
-	QString gnuCmdLine(::getenv("SIGEL_ROOT"));
-	gnuCmdLine.append("\\tmpFStat.plt");
-
-	QFile pipeFile(gnuCmdLine);
-	pipeFile.open(QIODevice::WriteOnly);
-#else
 	FILE *gnuPlotPipe = popen( "gnuplot -persist -", "w");
 	if(!gnuPlotPipe){
 		QMessageBox::warning( this, "Error", "Couldn't start gnuplot.");
@@ -604,7 +576,6 @@ void MT_StatisticsWidget::plotFitness(QString fileName)
 
 	QFile pipeFile;
 	pipeFile.open(gnuPlotPipe, QIODevice::WriteOnly);
-#endif
 	QTextStream pipeStream(&pipeFile);
 
 	// fill the stream with gnuplot commands and data
@@ -638,16 +609,7 @@ void MT_StatisticsWidget::plotFitness(QString fileName)
 	// ***
 
 	pipeFile.close();
-#ifdef _WINDOWS
-	gnuCmdLine.append("\" - ");
-	gnuCmdLine.prepend("gnuplot.exe \"");
-	if(WinExec(gnuCmdLine, SW_SHOW) < 32){
-		QMessageBox::warning( this, "Error", "Couldn't start gnuplot.");
-		return;
-	}
-#else
 	pclose( gnuPlotPipe );
-#endif
 }
 
 // A total of 0 gives 0 %.
@@ -660,13 +622,6 @@ int MT_StatisticsWidget::safePercentage(double part, int total)
 
 void MT_StatisticsWidget::plotSearchEffects(QString fileName)
 {
-#ifdef _WINDOWS
-	QString gnuCmdLine(::getenv("SIGEL_ROOT"));
-	gnuCmdLine.append("\\tmpFStat.plt");
-
-	QFile pipeFile(gnuCmdLine);
-	pipeFile.open(QIODevice::WriteOnly);
-#else
 	FILE *gnuPlotPipe = popen( "gnuplot -persist -", "w");
 	if(!gnuPlotPipe){
 		QMessageBox::warning( this, "Error", "Couldn't start gnuplot.");
@@ -675,7 +630,6 @@ void MT_StatisticsWidget::plotSearchEffects(QString fileName)
 
 	QFile pipeFile;
 	pipeFile.open(gnuPlotPipe, QIODevice::WriteOnly);
-#endif
 	QTextStream pipeStream(&pipeFile);
 
 	// fill the stream with gnuplot commands and data
@@ -742,14 +696,5 @@ void MT_StatisticsWidget::plotSearchEffects(QString fileName)
 	// ***
 
 	pipeFile.close();
-#ifdef _WINDOWS
-	gnuCmdLine.append("\" - ");
-	gnuCmdLine.prepend("gnuplot.exe \"");
-	if(WinExec(gnuCmdLine, SW_SHOW) < 32){
-		QMessageBox::warning( this, "Error", "Couldn't start gnuplot.");
-		return;
-	}
-#else
 	pclose( gnuPlotPipe );
-#endif
 }

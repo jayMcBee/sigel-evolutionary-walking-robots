@@ -3,14 +3,8 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "MT_GPSystem/MT_GPManager.h"
-#ifndef _WINDOWS
 #include <unistd.h>
-#endif
 #include "MT_Control/MT_Substitute.h"
-#ifdef _WINDOWS
-#include <windows.h>
-#include <malloc.h>
-#endif
 
 //////////////////////////////////////////////////////////////////////
 // administrative method
@@ -33,11 +27,7 @@ MT_GPManager::MT_GPManager(QTextStream &File) : QObject()
 	FitnessTrainer
 	*/
 
-#ifdef _WINDOWS
-	evolutionMutex = CreateMutex(nullptr, false, nullptr);
-#else
 	pthread_mutex_init(&evolutionMutex, nullptr);
-#endif
 
 	sepEvolPossible = false;
 	Substituter = nullptr;
@@ -162,12 +152,7 @@ MT_GPManager::~MT_GPManager()
 	delete Selector;
 	delete FitnessTrainer;
 
-#ifdef _WINDOWS
-	ReleaseMutex(evolutionMutex);
-	CloseHandle(evolutionMutex);
-#else
 	pthread_mutex_unlock(&evolutionMutex);
-#endif
 }
 
 
@@ -465,10 +450,6 @@ void MT_GPManager::setPopAndTournamentSize(int NewPopSize, int NewTournamentSize
 void MT_GPManager::startEvolution(MT_Substitute *Substitute)
 {
 /*************************** Initialisation ***************************/
-/*	#ifdef _WINDOWS
-	Beep(3500,500);
-	#endif
-*/
 	Substituter = Substitute;
 	// The interpreter's parameters are now updated by the substituter
 	if (Substituter !=nullptr)
@@ -529,11 +510,7 @@ void MT_GPManager::startEvolution(MT_Substitute *Substitute)
 			if ((StartTSetSize >=10) && (StartTSetSize >TenthOfTSet))
 				TSetOK = true;
 			else {
-#ifdef _WINDOWS			
-				Sleep(10000);
-#else
 				sleep(10000000);
-#endif				
 			}
 		}
 	}
@@ -547,11 +524,7 @@ void MT_GPManager::startEvolution(MT_Substitute *Substitute)
 	while (EvolStopped != true)
 	{
 			
-#ifdef _WINDOWS
-	WaitForSingleObject(evolutionMutex, INFINITE);
-#else
 	pthread_mutex_lock(&evolutionMutex);
-#endif
 
 		SElement = new MT_StatisticsElement();
 	
@@ -573,11 +546,7 @@ void MT_GPManager::startEvolution(MT_Substitute *Substitute)
 
 		Statistics->addStatisticElement(SElement);
 	
-#ifdef _WINDOWS
-	ReleaseMutex(evolutionMutex);
-#else
 	pthread_mutex_unlock(&evolutionMutex);
-#endif
 
 	}
 	
@@ -589,11 +558,6 @@ void MT_GPManager::startEvolution(MT_Substitute *Substitute)
 	LastError = Statistics->updateStatistics();
 	
 	EvolStopped = false;
-
-/*#ifdef _WINDOWS	
-Beep(500,500);
-#endif
-*/
 	
 }
 
@@ -637,32 +601,16 @@ void MT_GPManager::exchangeBest()
 				FitnessTrainer->calculateFitness(BestIndividual);
 
 // lock the interpreter so we can safely exchange the program
-#ifdef _WINDOWS
-	WaitForSingleObject(Substituter->interpreterMutex, INFINITE);
-#else
 	pthread_mutex_lock(&(Substituter->interpreterMutex));
-#endif
 				
 				Substituter->changeBest(BestIndividual->getProgram());
 
 // unlock the interpreter so that interpretation of programs can continue
-#ifdef _WINDOWS
-	ReleaseMutex(Substituter->interpreterMutex);
-#else
 	pthread_mutex_unlock(&(Substituter->interpreterMutex));
-#endif
-#ifdef _WINDOWS
-	WaitForSingleObject(Substituter->fitnessMutex, INFINITE);
-#else
 	pthread_mutex_lock(&(Substituter->fitnessMutex));
-#endif
 
 				Substituter->changeErrorInfo(Outcome ,CorrectFit);
-#ifdef _WINDOWS
-	ReleaseMutex(Substituter->fitnessMutex);
-#else
 	pthread_mutex_unlock(&(Substituter->fitnessMutex));
-#endif
 			
 			}
 			else 
@@ -670,21 +618,13 @@ void MT_GPManager::exchangeBest()
 				BestIndividual->increaseAge();
 
 				// lock the interpreter so we can safely exchange the program
-#ifdef _WINDOWS
-	WaitForSingleObject(Substituter->fitnessMutex, INFINITE);
-#else
 	pthread_mutex_lock(&(Substituter->fitnessMutex));
-#endif
 
 				if (ChangeNecessary == true)
 					Substituter->changeErrorInfo(Outcome ,CorrectFit);
 
 				// unlock the interpreter so that interpretation of programs can continue
-#ifdef _WINDOWS
-	ReleaseMutex(Substituter->fitnessMutex);
-#else
 	pthread_mutex_unlock(&(Substituter->fitnessMutex));
-#endif
 			
 			}
 		}
@@ -698,19 +638,11 @@ int  MT_GPManager::checkForNewTCase()
 
 	if (Substituter !=nullptr){
 
-#ifdef _WINDOWS
-		WaitForSingleObject(Substituter->tCaseBufferMutex, INFINITE);
-#else
 		pthread_mutex_lock(&(Substituter->tCaseBufferMutex));
-#endif
 
 	PresentTSetSize = FitnessTrainer->insertNewTCases(Substituter->changeTCases());
 
-#ifdef _WINDOWS
-		ReleaseMutex(Substituter->tCaseBufferMutex);
-#else
 		pthread_mutex_unlock(&(Substituter->tCaseBufferMutex));
-#endif
 	}
 
 	return PresentTSetSize ;

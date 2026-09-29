@@ -12,31 +12,16 @@
 MT_Substitute::MT_Substitute()
 {
  // overloaded method
-#ifdef _WINDOWS
-	interpreterMutex = CreateMutex(nullptr, false, nullptr);
-	tCaseBufferMutex = CreateMutex(nullptr, false, nullptr);
-	fitnessMutex	 = CreateMutex(nullptr, false, nullptr);
-#else
 	pthread_mutex_init(&interpreterMutex, nullptr);
 	pthread_mutex_init(&tCaseBufferMutex, nullptr);
 	pthread_mutex_init(&fitnessMutex, nullptr);
-#endif
 }
 
 MT_Substitute::~MT_Substitute()
 {
-#ifdef _WINDOWS
-	ReleaseMutex(interpreterMutex);
-	ReleaseMutex(tCaseBufferMutex);
-	ReleaseMutex(fitnessMutex);
-	CloseHandle(interpreterMutex);
-	CloseHandle(tCaseBufferMutex);
-	CloseHandle(fitnessMutex);
-#else
 	pthread_mutex_unlock(&interpreterMutex);
 	pthread_mutex_unlock(&tCaseBufferMutex);
 	pthread_mutex_unlock(&fitnessMutex);
-#endif
 }
 
 void MT_Substitute::changeBest(MT_Program * MetaProg)
@@ -133,21 +118,13 @@ MT_TranslatedIndividual * MT_Substitute::translatedSIGProg(SIGEL_Program::SIG_Pr
 void MT_Substitute::setInterpreter(int NumOfVariable, int TimeToInter)
 {
 	// lock the interpreter so we can safely change the interpreter settings
-#ifdef _WINDOWS
-	WaitForSingleObject(interpreterMutex, INFINITE);
-#else
 	pthread_mutex_lock(&interpreterMutex);
-#endif
 
 	Interpreter->setVariableNumber(NumOfVariable);
 	Interpreter->setDuration(TimeToInter);
 
 	// unlock the interpreter so that interpretation of programs can continue
-#ifdef _WINDOWS
-	ReleaseMutex(interpreterMutex);
-#else
 	pthread_mutex_unlock(&interpreterMutex);
-#endif
 }
 
 QQueue<MT_TrainingCase *> * MT_Substitute::changeTCases()
