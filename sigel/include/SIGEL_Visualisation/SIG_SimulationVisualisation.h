@@ -125,6 +125,8 @@ namespace SIGEL_Visualisation
 
       QTime getSimulationTime() const { return renderRecorder->simulationTime; }
 
+      double getCurrentSimulationSeconds() const { return renderRecorder->currentSimulationSeconds; }
+
       DL_vector getRobotPosition() const;
 
       DL_matrix getRobotRotation() const;

@@ -92,6 +92,8 @@ namespace SIGEL_Visualisation
 
       QTime simulationTime;
 
+      double currentSimulationSeconds;
+
     };
 
 }

@@ -28,7 +28,8 @@ namespace SIGEL_Visualisation
   SIG_RenderRecorder::SIG_RenderRecorder(int noOfObjects)
     : SIGEL_Simulation::SIG_Recorder(),
 			robotLinks(noOfObjects),
-			simulationTime()
+			simulationTime(),
+			currentSimulationSeconds( 0.0 )
   {
 
     for (int i=0; i<noOfObjects; i++)
@@ -58,6 +59,7 @@ namespace SIGEL_Visualisation
       };
 
     simulationTime = simulationQueries->getActualSimulationTime();
+    currentSimulationSeconds = simulationQueries->getCurrentSimulationSeconds();
   };
 
 }

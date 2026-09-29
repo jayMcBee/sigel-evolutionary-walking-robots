@@ -78,6 +78,8 @@ namespace SIGEL_Simulation
    */
   QTime getActualSimulationTime() const;
 
+  double getCurrentSimulationSeconds() const;
+
   /** gets the position of link linkNo
    * @pre
    *  none

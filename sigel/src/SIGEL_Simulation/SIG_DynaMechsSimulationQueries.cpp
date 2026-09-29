@@ -277,6 +277,11 @@ QTime SIGEL_Simulation::SIG_DynaMechsSimulationQueries::getActualSimulationTime(
   return time;
 };
 
+double SIGEL_Simulation::SIG_DynaMechsSimulationQueries::getCurrentSimulationSeconds() const
+{
+  return simulationData.actualFrame * simulationData.simulationParameter.getStepSize();
+};
+
 DL_vector SIGEL_Simulation::SIG_DynaMechsSimulationQueries::getLinkPosition(int linkNo) const
 {
   SIG_DynaMechsLink *dynaMechsLink = simulationData.dynaMechsLinks[ linkNo ];

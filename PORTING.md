@@ -909,7 +909,27 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-29 — DONE: TRIVIAL GETTERS OF THE MOVIE AND VISUALISER CLASSES ARE INLINE.** Start here.
+**2026-09-29 — DONE: THE EXACT SIMULATION TIME IS A QUERY, `getCurrentSimulationSeconds`.** Start here.
+
+- **Changed:** `SIG_SimulationQueries::getCurrentSimulationSeconds`, a
+  `double`, frame × step size. `getActualSimulationTime` cuts the same value
+  to whole seconds, since 1.3; the simulation's end test and the time display
+  use it, so it stays. `SIG_RenderRecorder` stores the new value as
+  `currentSimulationSeconds`, and `SIG_SimulationVisualisation` returns it.
+  Nothing reads it yet; the movie frame timing will. No change in behaviour.
+- **Why:** the first version of movie frames timed by simulated time read
+  `getSimulationTime`, which moves once per simulated second, and wrote
+  frames in bursts. Found by review; never committed.
+- **Review:** no defect.
+- **Gates:** `check.sh` 754 pass, 0 fail; warnings 415. `fitness-check.sh`
+  green. PVM gates not run.
+- **Next:** rename `getActualSimulationTime` to
+  `getCurrentSimulationWholeSeconds`, with its members, in its own commit.
+  Then movie frames timed by `getCurrentSimulationSeconds`, which skip the
+  frames a Fast Forward jumps over. Then an `if ( visualisation )` guard in
+  `slotAlterMovieSettingsClicked`.
+
+**2026-09-29 — DONE: TRIVIAL GETTERS OF THE MOVIE AND VISUALISER CLASSES ARE INLINE.**
 
 - **Changed:** 15 one-line getters are defined in their class in the header
   instead of the .cpp: `SIG_MovieRecorder` `getSettings`, `isRecording`,

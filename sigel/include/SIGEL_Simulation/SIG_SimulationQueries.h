@@ -72,6 +72,9 @@ class SIG_SimulationQueries {
    */
   virtual QTime getActualSimulationTime() const = 0;
 
+  /** The current simulated time in seconds, frame*stepsize, exact. */
+  virtual double getCurrentSimulationSeconds() const = 0;
+
   /** gets the position of link linkNo
    * @pre
    *  none
