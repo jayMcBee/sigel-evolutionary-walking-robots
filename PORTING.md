@@ -909,7 +909,30 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-29 — DONE: THE MOVIE SETTINGS ARE ONE VALUE, `SIG_MOVIESETTINGS`.** Start here.
+**2026-09-29 — DONE: MOVIE FRAME WRITING IS IN `SIG_MOVIERECORDER`.** Start here.
+
+- **Changed:** `SIGEL_SlaveGUI::SIG_MovieRecorder`, a plain C++ class with no
+  signals, holds the movie settings, the recording flag and the count of
+  frames recorded. It names the frame files, makes the directory, and writes
+  a frame with `writeImage`, which takes the view as a `QImage`, or
+  `writePovray`; `createPovrayIncludeFile` writes the POV-Ray include file.
+  `SIG_SimulationVisualisationWidget` keeps the message boxes,
+  `signalRecordingAllowed` and, until the next step, the step counting
+  (`currentFrame`, `stepsPerFrame`). `callRenderPixMap` is gone. No change in
+  behaviour.
+- **Review:** no difference in behaviour. Acted on: the `SIG_DEBUG` line
+  moved out of the name builder into `startFrame`, a comment named the
+  caller's API, the counter is `framesRecorded` because a failed write also
+  counts.
+- **Gates:** `check.sh` 752 pass, 0 fail; warnings 415. Two more passes for
+  the two new standalone headers. The other four gates were not run; the
+  change is in the slave GUI only.
+- **Next:** trivial one-line getters of the movie and visualiser classes
+  move inline into their headers, and the non-const ones become `const`;
+  its own commit. Then movie frames timed by simulated time,
+  `needsToRecordFrameAt`.
+
+**2026-09-29 — DONE: THE MOVIE SETTINGS ARE ONE VALUE, `SIG_MOVIESETTINGS`.**
 
 - **Changed:** the nine movie settings members of
   `SIG_SimulationVisualisationWidget` are one `SIG_MovieSettings` struct,

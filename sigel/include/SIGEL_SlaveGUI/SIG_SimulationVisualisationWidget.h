@@ -27,7 +27,7 @@
 #include <QColor>
 
 #include "SIGEL_CommonGUI/SIG_VisualisationWidget.h"
-#include "SIGEL_SlaveGUI/SIG_MovieSettings.h"
+#include "SIGEL_SlaveGUI/SIG_MovieRecorder.h"
 
 #include "SIGEL_Robot/SIG_Robot.h"
 #include "SIGEL_Environment/SIG_Environment.h"
@@ -216,19 +216,7 @@
 
       QColor planeColor;
 
-      /**
-       * Indicates whether simulation shall be recorded.
-       */
-      bool record;
-
-      SIGEL_SlaveGUI::SIG_MovieSettings movieSettings;
-
-      /**
-       * This is the name for the next frame to be saved (initially 0).
-       *
-       * currentFrameName does not have to be equal to current frame as it is possible to save every n-th frame.
-       */
-      int currentFrameName;
+      SIGEL_SlaveGUI::SIG_MovieRecorder movieRecorder;
 
       /**
        * The number of the actual frame (initially 0).
@@ -246,14 +234,6 @@
        * @param noOfSteps The number of timesteps to progress.
        */
       void makeTimeSteps(int noOfSteps);
-
-			/**
-			 * Saves the view as one frame of exactly the movie width x height,
-			 * pixel for pixel: a larger view is cut to its centre, a smaller one
-			 * is centred on black. Returns whether saving was successful.
-			 */
-			bool callRenderPixMap( QString inFName );
-
 
       /**
        * The actual robot to simulate.

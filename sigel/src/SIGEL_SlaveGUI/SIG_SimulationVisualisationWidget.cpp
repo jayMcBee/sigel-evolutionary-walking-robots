@@ -20,7 +20,6 @@
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-#include <QDir>
 #include "SIGEL_SlaveGUI/SIG_SimulationVisualisationWidget.h"
 
 #include "SIGEL_Visualisation/SIG_SimulationVisualisation.h"
@@ -34,7 +33,6 @@
 #include <QComboBox>
 #include <QCheckBox>
 #include <QColorDialog>
-#include <QPainter>
 
 #include <QtMath>
 #include <cmath>
@@ -56,8 +54,6 @@
 		       simulationParameters(nullptr),
 		       program(nullptr),
 		       currentFrame(0),
-		       currentFrameName(0),
-		       record(false),
 		       planeColor( 127, 127, 127 )
   {
     simulationTimer = new QTimer( this );
@@ -76,7 +72,9 @@
     QString temp( sigelRoot );
     if( temp.right(1) != "/" )
       temp.append( "/" );
+    SIGEL_SlaveGUI::SIG_MovieSettings movieSettings;
     movieSettings.directory = temp + "movie/";
+    movieRecorder.setSettings( movieSettings );
   };
 
   int SIG_SimulationVisualisationWidget::stepsPerFrame( double stepSize, int frameRate )
@@ -228,93 +226,33 @@
 	    simulationVisualisation.viewSettings.lookPoint.assign( &robotCentre );
 	  };
 
-	if ( record )
+	if ( movieRecorder.isRecording() )
 	  {
+	    SIGEL_SlaveGUI::SIG_MovieSettings const &movieSettings = movieRecorder.getSettings();
 	    int frameSteps = stepsPerFrame( simulationParameters->getStepSize(), movieSettings.frameRate );
 
-	    // only do the stuff every n-th frame if we have not exeeded the maximum frame number.
-	    if( ((currentFrame % frameSteps) == 0) && currentFrameName < movieSettings.maxFrames )
+	    // A frame every frameSteps steps, up to the maximum number of frames.
+	    if( ((currentFrame % frameSteps) == 0) && movieRecorder.getFramesRecorded() < movieSettings.maxFrames )
 	      {
-		// this string will hold the fileName which has to be build...
-		QString fileName = QString::number( currentFrameName );
-
-		// check if leading zeros are wanted
-		if( movieSettings.useLeadingZeros )
-		  {
-		    // O.K. leading zeros wanted
-		    // compute the number of digits of the current frame
-		    int currentLength = fileName.length();
-		    // compute the number of digits of the maximum frames
-		    int maxLength = QString::number( movieSettings.maxFrames ).length();
-		    // compute the difference between the two numbers.
-		    int difference = maxLength - currentLength;
-		    
-		    // build the fileName
-		    for( int i=1; i<=difference; i++ )
-		      fileName.prepend( "0" );
-		  }
-
-		fileName.prepend( movieSettings.directory + movieSettings.filePrefix );
-		// append the format ending (bmp or png)
-		fileName.append( "." + movieSettings.format );
-#ifdef SIG_DEBUG
-		SIGEL_Tools::SIG_IO::cerr << "Writing " << fileName << " in format " << movieSettings.width << " x " << movieSettings.height << " in quality " << movieSettings.quality << "." << Qt::endl;
-#endif
-		// check if the directory exists. otherwise create it.
-		QDir movieDir( movieSettings.directory );
-		if(!movieDir.exists() )
-		  movieDir.mkdir( movieSettings.directory );
-
-		bool renderSuccess;
+		bool written;
 
 		if ( movieSettings.format == "pov" )
-		  {
-		    QString includeFileName = movieSettings.filePrefix + ".inc";
-
-		    renderSuccess = simulationVisualisation.exportToPovray( includeFileName,
-									    fileName );
-		  }
+		  written = movieRecorder.writePovray( simulationVisualisation );
 		else
-		{
-		  renderSuccess = callRenderPixMap(fileName);
-		}
+		  written = movieRecorder.writeImage( grabFramebuffer() );
 
-		if ( !renderSuccess )
+		if ( !written )
 		  {
 		    // stop the recording, and show it on the movie button
-		    record = false;
+		    movieRecorder.setRecording( false );
 		    emit signalRecordingAllowed( false );
-		    QMessageBox::warning( this, "File Error", "Unable to write file " + fileName + ".\nPerhaps you don't have permission to write the file.");
+		    QMessageBox::warning( this, "File Error", "Unable to write file " + movieRecorder.getLastFileName() + ".\nPerhaps you don't have permission to write the file.");
 		  };
-		currentFrameName++;
-	      } // end of if( ((currentFrame % frameSteps) == 0) && currentFrameName < movieSettings.maxFrames )
+	      };
 	    currentFrame++;
-	  } // end of if(record && !automaticRefresh )
+	  };
       };
   };
-
-  bool SIG_SimulationVisualisationWidget::callRenderPixMap( QString inFName )
-  {
-    // grabFramebuffer returns device pixels; drawn at ratio 1, they stay 1:1.
-    QImage grabbed = grabFramebuffer();
-    if ( grabbed.isNull() )
-      return false;
-    grabbed.setDevicePixelRatio( 1.0 );
-
-    QImage frame( movieSettings.width, movieSettings.height, QImage::Format_RGB32 );
-    frame.fill( Qt::black );
-
-    QPainter painter( &frame );
-    painter.drawImage( (movieSettings.width - grabbed.width()) / 2,
-		       (movieSettings.height - grabbed.height()) / 2,
-		       grabbed );
-    painter.end();
-
-    return frame.save( inFName,
-		       movieSettings.format.toUpper().toUtf8().constData(),
-		       movieSettings.quality );
-  }
-
 
   void SIG_SimulationVisualisationWidget::visualizeThis(SIGEL_Robot::SIG_Robot const &rrobot,
 							SIGEL_Environment::SIG_Environment const &eenvironment,
@@ -361,21 +299,20 @@
 
 void SIG_SimulationVisualisationWidget::resetRecorder()
 {
-  if ( record )
+  if ( movieRecorder.isRecording() )
     reportRecordedFrames();
 
-  record = false;
+  movieRecorder.reset();
   currentFrame = 0;
-  currentFrameName = 0;
 };
 
 void SIG_SimulationVisualisationWidget::reportRecordedFrames()
 {
-  if ( currentFrameName == 0 )
+  if ( movieRecorder.getFramesRecorded() == 0 )
     return;
 
   QMessageBox::information( this, "Recording Stopped",
-			    QString( "%1 frames written to %2" ).arg( currentFrameName ).arg( movieSettings.directory ) );
+			    QString( "%1 frames written to %2" ).arg( movieRecorder.getFramesRecorded() ).arg( movieRecorder.getSettings().directory ) );
 };
 
   bool SIG_SimulationVisualisationWidget::simulationRunning()
@@ -657,39 +594,31 @@ void SIG_SimulationVisualisationWidget::reportRecordedFrames()
   void SIG_SimulationVisualisationWidget::slotAlterMovieSettingsClicked()
   {
     SIGEL_SlaveGUI::SIG_MovieSettingsDialog movieSettingsDialog( this, simulationParameters->getStepSize(), this, "movieSettingsDialog", true );
-    movieSettingsDialog.setSettings( movieSettings );
-    movieSettingsDialog.checkboxEnableMovie->setChecked( record );
+    movieSettingsDialog.setSettings( movieRecorder.getSettings() );
+    movieSettingsDialog.checkboxEnableMovie->setChecked( movieRecorder.isRecording() );
 
     switch( movieSettingsDialog.exec() )
       {
       case QDialog::Accepted:
-	if ( record && !movieSettingsDialog.checkboxEnableMovie->isChecked() )
+	if ( movieRecorder.isRecording() && !movieSettingsDialog.checkboxEnableMovie->isChecked() )
 	  reportRecordedFrames();
 
-	movieSettings = movieSettingsDialog.settings();
-	record = movieSettingsDialog.checkboxEnableMovie->isChecked();
+	movieRecorder.setSettings( movieSettingsDialog.settings() );
+	movieRecorder.setRecording( movieSettingsDialog.checkboxEnableMovie->isChecked() );
 
-	if (record && (movieSettings.format == "pov") )
+	if ( movieRecorder.isRecording() && (movieRecorder.getSettings().format == "pov") )
 	  {
 	    SIGEL_Visualisation::SIG_SimulationVisualisation &simulationVisualisation =
 	      static_cast< SIGEL_Visualisation::SIG_SimulationVisualisation& >( *visualisation );
 
-	    QString fileName = movieSettings.directory + movieSettings.filePrefix + ".inc";
-
-	    QDir movieDir( movieSettings.directory );
-	    if(!movieDir.exists() )
-	      movieDir.mkdir( movieSettings.directory );
-
-	    double aspectRatio = double( movieSettings.width ) / double ( movieSettings.height );
-
-	    if ( !simulationVisualisation.createPovrayIncludeFile( fileName, aspectRatio ) )
+	    if ( !movieRecorder.createPovrayIncludeFile( simulationVisualisation ) )
 	      {
-		record = false;
-		QMessageBox::warning( this, "File Error", "Unable to write file " + fileName + ".\nPerhaps you don't have permission to write the file.");
+		movieRecorder.setRecording( false );
+		QMessageBox::warning( this, "File Error", "Unable to write file " + movieRecorder.getLastFileName() + ".\nPerhaps you don't have permission to write the file.");
 	      };
 	  };
 
-	emit signalRecordingAllowed( record );
+	emit signalRecordingAllowed( movieRecorder.isRecording() );
 	break;
       }
   };
