@@ -79,11 +79,7 @@ SIGEL_Simulation::SIG_DynaMechsSimulationData::SIG_DynaMechsSimulationData( SIGE
     drives( robot.getDrives().count() ),
     driveForcesTimeAccounts( robot.getDrives().count() ),
     sensors( robot.getSensors().count() ),
-#ifdef _WINDOWS
-    pi( ::atan( 1 ) * 4 )
-#else
     pi( std::atan( 1 ) * 4 )
-#endif
 {
   dynaMechsLinks.fill( nullptr );
 
@@ -284,11 +280,7 @@ void SIGEL_Simulation::SIG_DynaMechsSimulationData::initializeEnvironment()
   dynaMechsEnvironment.setFrictionCoeffs( environment.getFrictionCoeff_u_s(),
 					  environment.getFrictionCoeff_u_k() );
 
-#ifdef _WINDOWS
-	char *sigelRootCString = ::getenv( "SIGEL_ROOT" );
-#else
 	char *sigelRootCString = std::getenv( "SIGEL_ROOT" );
-#endif	
 
   QString sigelRootString( sigelRootCString );
 
@@ -532,11 +524,7 @@ void SIGEL_Simulation::SIG_DynaMechsSimulationData::rotationMatrixToQuaternion( 
   tr = rotationMatrix(1,1) + rotationMatrix(2,2) + rotationMatrix(3,3) + 1;
   if (tr > 0.0625)
     {
-#ifdef _WINDOWS
-      s = ::sqrt(tr);
-#else
       s = std::sqrt(tr);
-#endif
       w = s*0.5;
       s = 0.5/s;
 
@@ -549,11 +537,7 @@ void SIGEL_Simulation::SIG_DynaMechsSimulationData::rotationMatrixToQuaternion( 
   tr = -rotationMatrix(1,1) - rotationMatrix(2,2) + rotationMatrix(3,3) + 1;
   if (tr > 0.0625)
     {
-#ifdef _WINDOWS
-      s = ::sqrt(tr);
-#else
       s = std::sqrt(tr);
-#endif
       z = s*0.5;
       s = 0.5/s;
 
@@ -566,11 +550,7 @@ void SIGEL_Simulation::SIG_DynaMechsSimulationData::rotationMatrixToQuaternion( 
   tr = -rotationMatrix(1,1) + rotationMatrix(2,2) - rotationMatrix(3,3) + 1;
   if (tr > 0.0625)
     {
-#ifdef _WINDOWS
-      s = ::sqrt(tr);
-#else
       s = std::sqrt(tr);
-#endif
       y = s*0.5;
       s = 0.5/s;
 
@@ -583,11 +563,7 @@ void SIGEL_Simulation::SIG_DynaMechsSimulationData::rotationMatrixToQuaternion( 
   tr = rotationMatrix(1,1) - rotationMatrix(2,2) - rotationMatrix(3,3) + 1;
   if (tr > 0.0625)
     {
-#ifdef _WINDOWS
-      s = ::sqrt(tr);
-#else
       s = std::sqrt(tr);
-#endif
       x = s*0.5;
       s = 0.5/s;
 

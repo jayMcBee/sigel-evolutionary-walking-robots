@@ -20,8 +20,6 @@
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-#ifdef _WINDOWS
-#endif
 
 #include "SIGEL_Simulation/SIG_Recorder.h"
 
@@ -61,11 +59,7 @@ void SIGEL_Simulation::SIG_Recorder::finish()
   finished = true;
 };
 
-#ifdef _WINDOWS
-void SIGEL_Simulation::SIG_Recorder::setSimulationQueries(SIG_SimulationQueries &newSimulationQueries)
-#else
 void SIGEL_Simulation::SIG_Recorder::setSimulationQueries(SIG_SimulationQueries const &newSimulationQueries)
-#endif
 {
   simulationQueries=&newSimulationQueries;
 };

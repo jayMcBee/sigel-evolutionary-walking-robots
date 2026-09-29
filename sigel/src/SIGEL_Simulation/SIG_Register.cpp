@@ -20,8 +20,6 @@
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-#ifdef _WINDOWS
-#endif
 
 #include "SIGEL_Simulation/SIG_Register.h"
 #include "SIGEL_Robot/SIG_LanguageParameters.h"
@@ -38,11 +36,7 @@ SIGEL_Simulation::SIG_Register::SIG_Register(int size)
 
 void SIGEL_Simulation::SIG_Register::makeValid()
 {
-#ifdef _WINDOWS
-  int max= static_cast<int>(::pow(2,size-1));
-#else
   int max= static_cast<int>(std::pow(2,size-1));
-#endif
 
   if ( max - 1 < value )
     {
@@ -137,18 +131,10 @@ int SIGEL_Simulation::SIG_Register::getSize() const
 
 int SIGEL_Simulation::SIG_Register::getMaxValue() const
 {
-#ifdef _WINDOWS
-  return static_cast<int>( ::pow(2,size-1) - 1);
-#else
   return static_cast<int>( std::pow(2,size-1) - 1);
-#endif
 };
 
 int SIGEL_Simulation::SIG_Register::getMinValue() const
 {
-#ifdef _WINDOWS
-  return static_cast<int>( - ::pow(2,size-1));
-#else
   return static_cast<int>( - std::pow(2,size-1));
-#endif
 };

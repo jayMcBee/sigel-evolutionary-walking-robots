@@ -467,11 +467,7 @@ namespace SIGEL_Simulation
 		    int reg = theLine->getInstructionElement(0) % numberOfRegisters;
 		    int readOut = registers[reg].getValue();
 		    double delayTime = static_cast<double>( readOut ) * 0.001;
-#ifdef _WINDOWS
-		    delayTime = ::abs( delayTime );
-#else
 		    delayTime = std::abs( delayTime );
-#endif		
 		    if( delayTime > maxDelayTime )
 		      delayTime = maxDelayTime;
 		    timeAccountSize -= delayTime;

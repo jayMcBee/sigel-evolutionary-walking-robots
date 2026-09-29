@@ -61,13 +61,8 @@ void SIGEL_Simulation::SIG_DynaMechsCommandInterface::moveDrive(int driveNo,
   // determine what drive to use (if any)
   if (simulationData.drives.size() > 0)
     {
-#ifdef _WINDOWS
-      long double minRegisterValue = - ::pow( static_cast<long double>(2),
-						 static_cast<long double>(registers[0].getSize() - 1) );
-#else
       long double minRegisterValue = - std::pow( static_cast<long double>(2),
 						 static_cast<long double>(registers[0].getSize() - 1) );
-#endif						
 
       int absoluteDriveNo = driveNo - static_cast< int >(minRegisterValue);
 
@@ -91,15 +86,9 @@ void SIGEL_Simulation::SIG_DynaMechsCommandInterface::moveDrive(int driveNo,
       SIGEL_Tools::SIG_IO::cerr << "Drive exists!" << Qt::endl;
 #endif
 
-#ifdef _WINDOWS
-      long double minRegisterValue = - ( ::pow( static_cast<long double>(2),
-						   static_cast<long double>(registers[0].getSize() - 1) )
-	                                 - 1 );
-#else
       long double minRegisterValue = - ( std::pow( static_cast<long double>(2),
 						   static_cast<long double>(registers[0].getSize() - 1) )
 	                                 - 1 );
-#endif	
 
       long double registerValueRange = - minRegisterValue * 2;
 
@@ -221,11 +210,7 @@ void SIGEL_Simulation::SIG_DynaMechsCommandInterface::moveDrive(int driveNo,
 #endif
 
 		// we act only if the force is >min. force applicable
-#ifdef _WINDOWS		
-		if (::abs(force) >= drive->getMinForce())	{
-#else
 		if (std::abs(force) >= drive->getMinForce())	{
-#endif		
 			double jointInput = static_cast< double >(force);
 
 #ifdef SIG_DEBUG

@@ -80,13 +80,8 @@ void SIGEL_Simulation::SIG_DynaMechsSimulationQueries::sense(int sensorNo,
 
   if (simulationData.sensors.size() > 0)
     {
-#ifdef _WINDOWS
-      long double minRegisterValue = ::pow( static_cast<long double>(2),
-					       static_cast<long double>(registers[0].getSize() - 1) );
-#else
       long double minRegisterValue = std::pow( static_cast<long double>(2),
 					       static_cast<long double>(registers[0].getSize() - 1) );
-#endif					
 
       int absoluteSensorNo = sensorNo + static_cast< int >(minRegisterValue);
 
@@ -132,13 +127,8 @@ void SIGEL_Simulation::SIG_DynaMechsSimulationQueries::sense(int sensorNo,
 
 														scaledState = (q - minPos) / posRange;
 
-#ifdef _WINDOWS
-														minRegisterValue = - ::pow( static_cast<long double>(2),
-																			static_cast<long double>(registers[0].getSize() - 1) );
-#else
 														minRegisterValue = - std::pow( static_cast<long double>(2),
 																			static_cast<long double>(registers[0].getSize() - 1) );
-#endif																			
 
 														registerValueRange = - minRegisterValue * 2;
 
@@ -154,13 +144,8 @@ void SIGEL_Simulation::SIG_DynaMechsSimulationQueries::sense(int sensorNo,
 
 														myMat = getLinkOrientation(link->getNumber());
 
-#ifdef _WINDOWS
-														pitch = ::acos( myMat.get(1,0) );
-														roll = -::asin( myMat.get(0,0) );
-#else
 														pitch = std::acos( myMat.get(1,0) );
 														roll = -std::asin( myMat.get(0,0) );
-#endif														
 
 														// what type (0..360 Grad) ?
 														if (prSensor->IsPitchType())
@@ -184,13 +169,8 @@ void SIGEL_Simulation::SIG_DynaMechsSimulationQueries::sense(int sensorNo,
 														// min. pos is -90, see above..
 														scaledState = (angle + 90) / 180;
 
-#ifdef _WINDOWS
-														minRegisterValue = - ::pow( static_cast<long double>(2),
-																			static_cast<long double>(registers[0].getSize() - 1) );
-#else
 														minRegisterValue = - std::pow( static_cast<long double>(2),
 																			static_cast<long double>(registers[0].getSize() - 1) );
-#endif																			
 
 														registerValueRange = - minRegisterValue * 2;
 
@@ -236,13 +216,8 @@ void SIGEL_Simulation::SIG_DynaMechsSimulationQueries::sense(int sensorNo,
 														{	scaledState = 0;
 														}
 
-#ifdef _WINDOWS
-														minRegisterValue = - ::pow( static_cast<long double>(2),
-																			static_cast<long double>(registers[0].getSize() - 1) );
-#else
 														minRegisterValue = - std::pow( static_cast<long double>(2),
 																			static_cast<long double>(registers[0].getSize() - 1) );
-#endif																			
 
 														registerValueRange = - minRegisterValue * 2;
 

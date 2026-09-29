@@ -108,11 +108,7 @@ namespace SIGEL_Simulation
 
     int noOfContactPoints = vertices.size();
 
-#ifdef _WINDOWS
-	CartesianVector *contactPoints = new CartesianVector[ noOfContactPoints ];
-#else
     CartesianVector contactPoints[ noOfContactPoints ];
-#endif
 
     for (int i=0; i<vertices.size(); i++)
       {
@@ -125,10 +121,6 @@ namespace SIGEL_Simulation
 				    contactPoints );
 
     dynaMechsLink->addForce( contactModel );
-
-#ifdef _WINDOWS
-	if( contactPoints ) delete[] contactPoints;
-#endif	
   };
 
   void SIG_DynaMechsLink::forwardKinematics( SIG_DynaMechsLink *caller )
@@ -201,13 +193,8 @@ namespace SIGEL_Simulation
   {
     NEWMAT::Matrix transformation(4, 4);
 
-#ifdef _WINDOWS
-    double sinAngle = ::sin( angle );
-    double cosAngle = ::cos( angle );
-#else
     double sinAngle = std::sin( angle );
     double cosAngle = std::cos( angle );
-#endif
 
     transformation << 1 << 0 << 0 << 0
 		   << 0 << cosAngle << - sinAngle << 0
@@ -232,13 +219,8 @@ namespace SIGEL_Simulation
   {
     NEWMAT::Matrix transformation(4, 4);
 
-#ifdef _WINDOWS
-    double sinAngle = ::sin( angle );
-    double cosAngle = ::cos( angle );
-#else
     double sinAngle = std::sin( angle );
     double cosAngle = std::cos( angle );
-#endif
 
     transformation << cosAngle << - sinAngle << 0 << 0
 		   << sinAngle << cosAngle << 0 << 0
