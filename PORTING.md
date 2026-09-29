@@ -909,7 +909,28 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-28 — DONE: ITEM 33, NO DOUBLE OVERWRITE QUESTION IS LEFT.** Start here.
+**2026-09-29 — DONE: THE EVOLUTION LOOP'S WAIT, ITEM 35, ITEMS 12 AND 123.** Start here.
+
+- **Changed:**
+  - The evolution loop waits once per pass instead of once per tournament
+    (`5af7f6a`); item 38's entry records the profile and the numbers.
+  - Item 35: the Windows and Visual Studio support is gone, in small
+    commits; see item 35 in "Done". One behaviour change, in its own commit:
+    MetaGP warns before its `sleep(10000000)`.
+  - Items 12 and 123; see "Done". The MetaGP slash-box section comments are
+    plain comments. The dynamic-client sockets have readable names.
+- **New to-do items:** 121 to 127, and a note on item 47.
+- **Checked:** every code commit was compared object by object with the
+  build before it, and reviewed by a sub-agent.
+- **Baselines:** unchanged.
+- **Gates:** `check.sh` 749 pass, 0 fail; warnings 421. The pass count is 9
+  lower because the nine Visual Studio files are gone. The other four gates
+  were not run in this session.
+- **`~/sigel-night`** holds the build from `5af7f6a`; every later commit
+  leaves the objects unchanged.
+- **Next:** to be planned with the maintainer.
+
+**2026-09-28 — DONE: ITEM 33, NO DOUBLE OVERWRITE QUESTION IS LEFT.**
 
 - **Changed:** see item 33 in "Done". A sub-agent review found no problem;
   its two leftovers (three unused `QFile` lines, two doubled blank lines) are
