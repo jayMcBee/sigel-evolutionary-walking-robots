@@ -8,7 +8,6 @@
 #include "MT_GPSystem/MT_Interpreter.h"
 #include "MT_GPSystem/MT_TranslatedIndividual.h"
 #include "MT_GPSystem/MT_TrainingCase.h"
-#include "MT_GPSystem/MT_TrainingCase.h"
 
 #include "SIGEL_Program/SIG_Program.h"
 #include "SIGEL_Program/SIG_ProgramLine.h"
