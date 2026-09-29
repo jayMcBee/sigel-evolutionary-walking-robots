@@ -909,7 +909,23 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-29 — DONE: THE VIEWER'S CONTROL PANEL IS REORGANISED.** Start here.
+**2026-09-29 — DONE: THE GRID COLOUR CAN BE CHOSEN.** Start here.
+
+- **Changed:** a "Grid color..." button in the "Show grid" row chooses the
+  grid's colour, as "Plane color..." does the plane's, and shows it as an
+  icon. The default is dark grey, (80, 80, 80), where it was pure red.
+  New: `SIG_EnvironmentRenderer::setGridColor`,
+  `SIG_SimulationVisualisation::setGridColor`, and in
+  `SIG_SimulationVisualisationWidget` `chooseGridColor`, `getGridColor` and
+  `signalGridColorChanged`. The POV-Ray grid uses the chosen colour, where
+  it was `rgb <1,0,0>`. The row is 3 px taller: minimums 780 x 686 and
+  780 x 599. Checked on the desktop.
+- **Review:** no defect.
+- **Gates:** `check.sh` 754 pass, 0 fail; warnings 412.
+- **Next:** item 105, the MP4. Colours and the other viewer options are
+  not saved between runs; saving them with `QSettings` is not yet a to-do.
+
+**2026-09-29 — DONE: THE VIEWER'S CONTROL PANEL IS REORGANISED.**
 
 - **Changed, in `SIG_SimulationWidgetBase.ui`:** the control panel may be
   300 px wide, where it was 250. The "Navigation" box is 270 x 279; its

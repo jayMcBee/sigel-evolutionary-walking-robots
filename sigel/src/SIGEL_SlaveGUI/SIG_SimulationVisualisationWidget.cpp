@@ -53,7 +53,8 @@
 		       environment(nullptr),
 		       simulationParameters(nullptr),
 		       program(nullptr),
-		       planeColor( 127, 127, 127 )
+		       planeColor( 127, 127, 127 ),
+		       gridColor( 80, 80, 80 )
   {
     simulationTimer = new QTimer( this );
     simulationTimer->setObjectName( "simulationTimer" );
@@ -105,6 +106,26 @@
 	    planeColor = newPlaneColor;
 	    simulationVisualisation.setPlaneColor( planeColor );
 	    emit signalPlaneColorChanged( planeColor );
+
+	    if (automaticRefresh)
+	      update();
+	  };
+      };
+  };
+
+  void SIG_SimulationVisualisationWidget::chooseGridColor()
+  {
+    if (visualisation)
+      {
+	SIGEL_Visualisation::SIG_SimulationVisualisation &simulationVisualisation = static_cast<SIGEL_Visualisation::SIG_SimulationVisualisation&>(*visualisation);
+
+	QColor newGridColor = QColorDialog::getColor( gridColor, this );
+
+	if (newGridColor.isValid())
+	  {
+	    gridColor = newGridColor;
+	    simulationVisualisation.setGridColor( gridColor );
+	    emit signalGridColorChanged( gridColor );
 
 	    if (automaticRefresh)
 	      update();
@@ -271,6 +292,7 @@
     SIGEL_Visualisation::SIG_SimulationVisualisation &simulationVisualisation = static_cast<SIGEL_Visualisation::SIG_SimulationVisualisation&>(*visualisation);
 
     simulationVisualisation.setPlaneColor( planeColor );
+    simulationVisualisation.setGridColor( gridColor );
 
     emit signalSimulationProgress( QTime( 0, 0 ) );
 

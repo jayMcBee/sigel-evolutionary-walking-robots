@@ -61,7 +61,7 @@ namespace SIGEL_Visualisation
 
     SIG_VisualSceneObject *grid = new SIG_VisualSceneObject( 1, "Grid" );
 
-    grid->setColor( DL_vector( 1, 0, 0 ) );
+    grid->setColor( DL_vector( 80.0 / 255, 80.0 / 255, 80.0 / 255 ) );
 
     grid->setPosition( DL_vector(0, planeLevel, 0) );
     grid->setRotation( idRotation );
@@ -85,6 +85,15 @@ namespace SIGEL_Visualisation
 					       double blue )
   {
     sceneObjects[ 0 ]->setColor( DL_vector( red,
+					    green,
+					    blue ) );
+  };
+
+  void SIG_EnvironmentRenderer::setGridColor( double red,
+					      double green,
+					      double blue )
+  {
+    sceneObjects[ 1 ]->setColor( DL_vector( red,
 					    green,
 					    blue ) );
   };
@@ -305,6 +314,8 @@ namespace SIGEL_Visualisation
     int const minZ = - fieldEdgeLength * noOfFields;
     int const maxZ =   fieldEdgeLength * noOfFields;
 
+    NEWMAT::ColumnVector gridColorVector = SIG_TypeConverter::toColumnVector( sceneObjects[ 1 ]->getColor() );
+
     stream << "#declare Grid = union {\n";
 
     for (int x=minX; x<=maxX; x+=fieldEdgeLength)
@@ -338,8 +349,8 @@ namespace SIGEL_Visualisation
       };
 
     stream << "\n"
-	   << "  pigment { rgb <1,0,0> }\n"
-	   << "  finish { ambient rgb <1,0,0>\n"
+	   << "  pigment { rgb " << vectorToPovray( gridColorVector ) << " }\n"
+	   << "  finish { ambient rgb " << vectorToPovray( gridColorVector ) << "\n"
 	   << "           diffuse 1 }\n"
 	   << "}\n";
 

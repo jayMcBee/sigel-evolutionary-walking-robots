@@ -101,7 +101,7 @@ namespace SIGEL_SlaveGUI
 		      SLOT( slotStopPressed()) );
 
     this->resize( 1098, 900 );
-    this->setMinimumSize( 780, 683 );
+    this->setMinimumSize( 780, 686 );
   };
 
   bool SIG_SimulationWindow::event( QEvent *e )

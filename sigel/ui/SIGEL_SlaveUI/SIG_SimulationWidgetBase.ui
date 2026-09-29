@@ -16,7 +16,7 @@
     <property name="minimumSize">
       <size>
         <width>780</width>
-        <height>596</height>
+        <height>599</height>
       </size>
     </property>
     <property name="windowTitle">
@@ -670,11 +670,22 @@
                 </spacer>
               </item>
               <item row="6" column="0">
-                <widget class="QCheckBox" name="showGridCheckBox">
-                  <property name="text">
-                    <string>Show grid</string>
-                  </property>
-                </widget>
+                <layout class="QHBoxLayout">
+                  <item>
+                    <widget class="QCheckBox" name="showGridCheckBox">
+                      <property name="text">
+                        <string>Show grid</string>
+                      </property>
+                    </widget>
+                  </item>
+                  <item>
+                    <widget class="QPushButton" name="gridcolorPushButton">
+                      <property name="text">
+                        <string>Grid color...</string>
+                      </property>
+                    </widget>
+                  </item>
+                </layout>
               </item>
             </layout>
           </widget>

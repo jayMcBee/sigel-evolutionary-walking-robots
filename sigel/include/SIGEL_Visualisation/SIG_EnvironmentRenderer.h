@@ -119,6 +119,10 @@ namespace SIGEL_Visualisation
 			double green,
 			double blue );
 
+    void setGridColor( double red,
+		       double green,
+		       double blue );
+
     void setShowPlane( bool newShowPlane );
 
     void setShowGrid( bool newShowGrid );

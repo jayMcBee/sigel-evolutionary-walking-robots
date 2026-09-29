@@ -383,6 +383,13 @@ namespace SIGEL_Visualisation
 				       blue );
   };
 
+  void SIG_SimulationVisualisation::setGridColor( QColor newColor )
+  {
+    environmentRenderer.setGridColor( newColor.redF(),
+				      newColor.greenF(),
+				      newColor.blueF() );
+  };
+
   void SIG_SimulationVisualisation::setShowPlane( bool newShowPlane )
   {
     environmentRenderer.setShowPlane( newShowPlane );

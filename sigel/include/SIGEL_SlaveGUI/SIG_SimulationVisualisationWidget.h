@@ -99,6 +99,8 @@
 
       QColor getPlaneColor() const { return planeColor; }
 
+      QColor getGridColor() const { return gridColor; }
+
       /**
        * Stops the running simulation while a modal dialog is open.
        * Does nothing if the simulation is not running.
@@ -115,6 +117,8 @@
       void setShowAncorPoints( int state );
 
       void choosePlaneColor();
+
+      void chooseGridColor();
 
       void setShowPlane( int state );
 
@@ -211,6 +215,8 @@
 
       QColor planeColor;
 
+      QColor gridColor;
+
       SIGEL_SlaveGUI::SIG_MovieRecorder movieRecorder;
 
       void paintGL();
@@ -272,6 +278,8 @@
       void signalRecordingAllowed( bool );
 
       void signalPlaneColorChanged( QColor );
+
+      void signalGridColorChanged( QColor );
     };
 
 // }

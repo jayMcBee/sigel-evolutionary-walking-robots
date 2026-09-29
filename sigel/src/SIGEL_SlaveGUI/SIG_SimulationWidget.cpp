@@ -152,8 +152,8 @@ namespace SIGEL_SlaveGUI
 		      visualisationWidget,
 		      SLOT(choosePlaneColor()) );
 
-    // The plane colour button shows the colour as an icon, with a gap
-    // before the text.
+    // The colour buttons show their colour as an icon, with a gap before
+    // the text.
     QSize const swatchSize = planecolorPushButton->iconSize();
     auto const showColor = [swatchSize]( QPushButton *button, QColor const &color )
       {
@@ -168,8 +168,16 @@ namespace SIGEL_SlaveGUI
 	button->setIcon( icon );
       };
     showColor( planecolorPushButton, visualisationWidget->getPlaneColor() );
+    showColor( gridcolorPushButton, visualisationWidget->getGridColor() );
     QObject::connect( visualisationWidget, &SIG_SimulationVisualisationWidget::signalPlaneColorChanged, this,
 		      [this, showColor]( QColor const &color ) { showColor( planecolorPushButton, color ); } );
+    QObject::connect( visualisationWidget, &SIG_SimulationVisualisationWidget::signalGridColorChanged, this,
+		      [this, showColor]( QColor const &color ) { showColor( gridcolorPushButton, color ); } );
+
+    QObject::connect( gridcolorPushButton,
+		      SIGNAL(clicked()),
+		      visualisationWidget,
+		      SLOT(chooseGridColor()) );
 
     QObject::connect( showPlaneCheckBox,
 		      SIGNAL(stateChanged(int)),

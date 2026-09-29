@@ -89,6 +89,8 @@ namespace SIGEL_Visualisation
 
       void setPlaneColor( QColor newColor );
 
+      void setGridColor( QColor newColor );
+
       void setShowPlane( bool newShowPlane );
 
       void setShowGrid( bool newShowGrid );
