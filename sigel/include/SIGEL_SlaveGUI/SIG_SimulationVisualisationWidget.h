@@ -231,6 +231,8 @@
        */
       void makeTimeSteps(int noOfSteps);
 
+      void recordFrame( SIGEL_Visualisation::SIG_SimulationVisualisation &simulationVisualisation, double seconds );
+
       /**
        * The actual robot to simulate.
        */

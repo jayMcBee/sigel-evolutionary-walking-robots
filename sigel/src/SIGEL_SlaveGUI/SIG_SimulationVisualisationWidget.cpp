@@ -213,62 +213,67 @@
 
 
 
-  void SIG_SimulationVisualisationWidget::makeTimeSteps(int noOfSteps)
-  {
-    if (visualisation)
-      {
-	SIGEL_Visualisation::SIG_SimulationVisualisation &simulationVisualisation = static_cast<SIGEL_Visualisation::SIG_SimulationVisualisation&>(*visualisation);
+	void SIG_SimulationVisualisationWidget::makeTimeSteps( int noOfSteps )
+	{
+		if ( visualisation )
+		{
+			SIGEL_Visualisation::SIG_SimulationVisualisation &simulationVisualisation =
+				static_cast< SIGEL_Visualisation::SIG_SimulationVisualisation& >( *visualisation );
 
-	try
-	  {
-	    simulationVisualisation.makeTimeSteps( noOfSteps );
-	  }
-	catch (SIGEL_Tools::SIG_Exception &e)
-	  {
-	    if (simulationRunning())
-	      {
-		slotStartSimulation();
-		emit signalSimulationAbort();
-	      };
+			try
+			{
+				simulationVisualisation.makeTimeSteps( noOfSteps );
+			}
+			catch ( SIGEL_Tools::SIG_Exception &e )
+			{
+				if ( simulationRunning() )
+				{
+					slotStartSimulation();
+					emit signalSimulationAbort();
+				}
 
-	    QMessageBox::warning( this, "Simulation Exception", e.getMessage() );
-	  };
+				QMessageBox::warning( this, "Simulation Exception", e.getMessage() );
+			}
 
-	emit signalSimulationProgress( simulationVisualisation.getCurrentSimulationSeconds() );
+			emit signalSimulationProgress( simulationVisualisation.getCurrentSimulationSeconds() );
 
-	if ( traceRobot )
-	  {
-	    DL_vector robotCentre = simulationVisualisation.getRobotCentre();
-	    simulationVisualisation.viewSettings.lookPoint.assign( &robotCentre );
-	  };
+			if ( traceRobot )
+			{
+				DL_vector robotCentre = simulationVisualisation.getRobotCentre();
+				simulationVisualisation.viewSettings.lookPoint.assign( &robotCentre );
+			}
 
-	double seconds = simulationVisualisation.getCurrentSimulationSeconds();
+			double seconds = simulationVisualisation.getCurrentSimulationSeconds();
 
-	if ( movieRecorder.needsToRecordFrameAt( seconds ) )
-	  {
-	    bool written;
+			if ( movieRecorder.needsToRecordFrameAt( seconds ) )
+				recordFrame( simulationVisualisation, seconds );
+		}
+	};
 
-	    if ( movieRecorder.getSettings().format == "pov" )
-	      written = movieRecorder.writePovray( simulationVisualisation, seconds );
-	    else
-	      written = movieRecorder.writeImage( grabFramebuffer(), seconds );
+	void SIG_SimulationVisualisationWidget::recordFrame( SIGEL_Visualisation::SIG_SimulationVisualisation &simulationVisualisation, double seconds )
+	{
+		bool written;
 
-	    if ( !written )
-	      {
-		// stop the recording, and show it on the movie button
-		movieRecorder.stopRecording();
-		emit signalRecordingAllowed( false );
-		QMessageBox::warning( this, "File Error", "Unable to write file " + movieRecorder.getLastFileName() + ".\nPerhaps you don't have permission to write the file.");
-	      }
-	    else if ( movieRecorder.getFramesRecorded() >= movieRecorder.getSettings().maxFrames )
-	      {
-		movieRecorder.stopRecording();
-		emit signalRecordingAllowed( false );
-		reportAndEncodeRecording();
-	      };
-	  };
-      };
-  };
+		if ( movieRecorder.getSettings().format == "pov" )
+			written = movieRecorder.writePovray( simulationVisualisation, seconds );
+		else
+			written = movieRecorder.writeImage( grabFramebuffer(), seconds );
+
+		if ( !written )
+		{
+			// stop the recording, and show it on the movie button
+			movieRecorder.stopRecording();
+			emit signalRecordingAllowed( false );
+			QMessageBox::warning( this, "File Error",
+				"Unable to write file " + movieRecorder.getLastFileName() + ".\nPerhaps you don't have permission to write the file." );
+		}
+		else if ( movieRecorder.getFramesRecorded() >= movieRecorder.getSettings().maxFrames )
+		{
+			movieRecorder.stopRecording();
+			emit signalRecordingAllowed( false );
+			reportAndEncodeRecording();
+		}
+	};
 
   void SIG_SimulationVisualisationWidget::visualizeThis(SIGEL_Robot::SIG_Robot const &rrobot,
 							SIGEL_Environment::SIG_Environment const &eenvironment,
