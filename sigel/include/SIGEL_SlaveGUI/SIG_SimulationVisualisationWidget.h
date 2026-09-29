@@ -28,6 +28,7 @@
 
 #include "SIGEL_CommonGUI/SIG_VisualisationWidget.h"
 #include "SIGEL_SlaveGUI/SIG_MovieRecorder.h"
+#include "SIGEL_SlaveGUI/SIG_MovieEncoder.h"
 
 #include "SIGEL_Robot/SIG_Robot.h"
 #include "SIGEL_Environment/SIG_Environment.h"
@@ -181,8 +182,7 @@
     private:
 
       /**
-       * Tells the user that recording stopped, and how many frames were
-       * written since the last Reset, and where.
+       * Hands the frames written since the last Reset to the movie encoder.
        */
       void reportAndEncodeRecording();
 
@@ -218,6 +218,8 @@
       QColor gridColor;
 
       SIGEL_SlaveGUI::SIG_MovieRecorder movieRecorder;
+
+      SIGEL_SlaveGUI::SIG_MovieEncoder movieEncoder;
 
       void paintGL();
 

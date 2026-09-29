@@ -54,7 +54,8 @@
 		       simulationParameters(nullptr),
 		       program(nullptr),
 		       planeColor( 127, 127, 127 ),
-		       gridColor( 80, 80, 80 )
+		       gridColor( 80, 80, 80 ),
+		       movieEncoder( this )
   {
     simulationTimer = new QTimer( this );
     simulationTimer->setObjectName( "simulationTimer" );
@@ -318,14 +319,7 @@ void SIG_SimulationVisualisationWidget::resetRecorder()
 
 void SIG_SimulationVisualisationWidget::reportAndEncodeRecording()
 {
-  if ( movieRecorder.getFramesRecorded() == 0 )
-    {
-      QMessageBox::information( this, "Recording Stopped", "Recording stopped. No frames were written." );
-      return;
-    }
-
-  QMessageBox::information( this, "Recording Stopped",
-			    QString( "%1 frames written to %2" ).arg( movieRecorder.getFramesRecorded() ).arg( movieRecorder.getSettings().directory ) );
+  movieEncoder.encode( movieRecorder.getSettings(), movieRecorder.getFramesRecorded() );
 };
 
   void SIG_SimulationVisualisationWidget::slotStartSimulation()
