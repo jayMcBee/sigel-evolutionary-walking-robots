@@ -49,7 +49,6 @@ namespace SIGEL_Robot
         class SIG_Body {
         private:
                 SIG_Robot *parent;
-                QList<SIG_Link *> usedByLinks;
                 QString geometryFile, directory;
                 SIG_Geometry *geometry;
    
@@ -69,12 +68,6 @@ namespace SIGEL_Robot
                  * Destructor.
                  */
                 ~SIG_Body ();
-                
-                /**
-                 * Register a link as being formed like the surface described in this
-                 * body object.
-                 */
-                void addUsingLink (SIG_Link* user);
 
                 /**
                  * Loads the geometry from the VRML file.

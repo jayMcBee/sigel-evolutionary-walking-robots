@@ -53,11 +53,6 @@ namespace SIGEL_Robot
         {
                 delete geometry;
         };
-        
-        void SIG_Body::addUsingLink (SIG_Link *user)
-        {  
-                usedByLinks.append (user);
-        };
 
         NEWMAT::Matrix SIG_Body::createRotationMatrix( QList< float > rotation )
         {

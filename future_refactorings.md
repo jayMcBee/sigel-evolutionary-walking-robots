@@ -33,12 +33,11 @@ Paths are relative to `sigel/`, the source tree.
   NiceWalking and Force fitness functions, once per evaluation; the elements
   of `MT_Statistics`; the list in `MT_PopulationWidget::slotExpInd`.
 
-- [ ] **36. Delete `SIG_Body::usedByLinks`; `SIG_Material::FrictionValue`
-  could be a value type.** `usedByLinks` is written and never read.
-  `FrictionValue` values would drop the `new` and the
-  `qDeleteAll`, as D8 did for `SIG_Register`; tidiness only. D11 left both as
-  they were, by decision, because the port moved the Qt API and nothing else; that was a
-  port-scope rule, not a refusal.
+- [ ] **36. `SIG_Material::FrictionValue` could be a value type.**
+  `FrictionValue` values would drop the `new` and the `qDeleteAll`, as D8 did
+  for `SIG_Register`; tidiness only. D11 left it as it was, by decision,
+  because the port moved the Qt API and nothing else; that was a port-scope
+  rule, not a refusal.
 
 ---
 

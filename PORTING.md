@@ -909,7 +909,14 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-29 — DONE: ITEM 90, THE GENERATION LIMIT.** Start here.
+**2026-09-29 — DONE: `SIG_Body::usedByLinks` IS DELETED.** Start here.
+
+- **Changed:** the member, `SIG_Body::addUsingLink` and its one call are
+  gone; see item 36 in "Done". Item 36 was two changes; it now holds only
+  `SIG_Material::FrictionValue` as a value type.
+- **Gates:** `check.sh` 757 pass, 0 fail; warnings 412.
+
+**2026-09-29 — DONE: ITEM 90, THE GENERATION LIMIT.**
 
 - **Decided:** "By generation" stays a count per start; see item 90 in
   "Done". Only the label and a new tooltip in `SIG_GPParameterBase.ui`
@@ -7196,6 +7203,12 @@ carried; other items and this file cite them, so they do not change.
   last lines of ffmpeg's error output. A crop filter trims an odd width or
   height by one pixel, since yuv420p needs even ones. POV-Ray frames get
   the "frames written" message only.
+
+- [x] **36, first half. `SIG_Body::usedByLinks` is deleted** — done
+  2026-09-29. It was written and never read. Its only writer,
+  `SIG_Body::addUsingLink`, and that method's one call in
+  `SIG_RobotCompilerObjects::linkGeometryFile` went with it. The second
+  half, `SIG_Material::FrictionValue` as a value type, stays open as item 36.
 
 - [x] **90. "Stop at generation N" counts per start** — decided
   2026-09-29: it stays as it is. `SIG_GPManager::checkTerminationConditions`

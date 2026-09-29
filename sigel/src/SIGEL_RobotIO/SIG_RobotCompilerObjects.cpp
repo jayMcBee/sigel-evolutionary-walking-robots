@@ -106,7 +106,6 @@ namespace SIGEL_RobotIO {
                         target->addBody (b);
                 }
                 link->setBody (b);
-                b->addUsingLink (link);
         }
 
         void SIG_RobotCompilerObjects::linkMaterial (SIG_Link *link,
