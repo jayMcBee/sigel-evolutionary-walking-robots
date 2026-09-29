@@ -28,11 +28,7 @@
 #include <pointvector.h>
 #include <matrix.h>
 #include <qdatetime.h>
-#ifdef _WINDOWS
 #include <vector>
-#else
-#include <vector>
-#endif
 
 namespace SIGEL_Simulation
 {

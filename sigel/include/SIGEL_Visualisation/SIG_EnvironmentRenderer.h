@@ -137,11 +137,7 @@ namespace SIGEL_Visualisation
     	*		This is the path of the texture file. The file format must be pnm.
     	*
     	*/
-#ifdef _WINDOWS
-    bool loadPNMTexture(const char *filename);
-#else
     bool loadPNMTexture(char *filename);
-#endif
 
     /**
     	* This function loads and initialize the texture. It does all the opengl stuff

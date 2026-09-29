@@ -66,10 +66,6 @@ namespace SIGEL_Program
  * to work with such a list (of program lines). All program lines can be accessed
  * with an index. The first line has the index 0.
  */
-#ifdef _WINDOWS
-using namespace std;
-#endif
-
 class SIG_Program
 {
 

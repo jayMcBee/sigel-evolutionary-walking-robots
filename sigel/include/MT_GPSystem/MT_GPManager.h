@@ -18,11 +18,7 @@ class MT_Substitute;
 #include "MT_GPSystem/MT_FitnessTrainer.h"
 #include "MT_GPSystem/MT_TournamentManager.h"	// Added from the class view
 
-#ifdef _WINDOWS
-#include <windows.h>
-#else
 #include <pthread.h>
-#endif
 
 #include <qstring.h>
 #include <qtextstream.h>
@@ -102,11 +98,7 @@ public:
 	bool separateEvolutionAllowed();
 
 	/* evolution locks */
-#ifdef _WINDOWS
-	HANDLE evolutionMutex;
-#else
 	pthread_mutex_t evolutionMutex;
-#endif
 
 signals:
 	void metaEvolutionRunning(bool);

@@ -17,11 +17,7 @@
 #include "SIGEL_Program/SIG_Program.h"
 #include "SIGEL_Program/SIG_ProgramLine.h"
 
-#ifdef _WINDOWS
-#include <windows.h>
-#else
 #include <pthread.h>
-#endif
 
 #include <qstring.h>
 #include <qtextstream.h>
@@ -52,15 +48,9 @@ public:
 	/*nextSIGGeneration() indicate the evaluator, that a new SIGEL Generation started */
 	void nextSIGGeneration(double AverageSigelFit);
 
-#ifdef _WINDOWS
-	HANDLE interpreterMutex;
-	HANDLE tCaseBufferMutex;
-	HANDLE fitnessMutex;
-#else
 	pthread_mutex_t interpreterMutex;
 	pthread_mutex_t tCaseBufferMutex;
 	pthread_mutex_t fitnessMutex;
-#endif
 
 	// changeTCases() supply the new TrainingCases for the Meta GP-System
 	QQueue<MT_TrainingCase *> * changeTCases();

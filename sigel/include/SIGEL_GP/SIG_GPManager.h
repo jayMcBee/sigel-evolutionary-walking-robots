@@ -35,7 +35,6 @@
 #include <qdatetime.h>
 
 #include <sys/types.h>
-#ifndef _WINDOWS
 #include <sys/select.h>
 #include <sys/time.h>
 #include <sys/socket.h>
@@ -43,7 +42,6 @@
 #include <netdb.h>
 
 #include <pthread.h>
-#endif
 
 namespace SIGEL_GP
 {
@@ -119,11 +117,7 @@ namespace SIGEL_GP
     /**
     * condition variable required to synchronize the threads.
     */
-#ifdef _WINDOWS
-	HANDLE cond;
-#else	
     pthread_cond_t cond;
-#endif
 
   void start();
 

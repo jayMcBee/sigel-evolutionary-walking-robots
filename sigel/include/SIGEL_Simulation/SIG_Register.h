@@ -23,9 +23,6 @@
 #ifndef SIGEL_SIMULATION_SIG_REGISTER_H
 #define SIGEL_SIMULATION_SIG_REGISTER_H
 
-#ifdef _WINDOWS
-#endif
-
 #include "SIGEL_Simulation/SIG_RegisterWrongSizeException.h"
 
 namespace SIGEL_Simulation

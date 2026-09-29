@@ -28,11 +28,7 @@
 #include "SIGEL_Simulation/SIG_Register.h"
 #include "SIGEL_Simulation/SIG_SimulationQueries.h"
 #include <qdatetime.h>
-#ifdef _WINDOWS
 #include <vector>
-#else
-#include <vector>
-#endif
 
 namespace SIGEL_Simulation
 {

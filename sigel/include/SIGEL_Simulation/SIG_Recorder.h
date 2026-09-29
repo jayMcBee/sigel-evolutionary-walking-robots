@@ -23,9 +23,6 @@
 #ifndef SIGEL_SIMULATION_SIG_RECORDER_H
 #define SIGEL_SIMULATION_SIG_RECORDER_H
 
-#ifdef _WINDOWS
-#endif
-
 #include "SIGEL_Simulation/SIG_SimulationQueries.h"
 
 #include "SIGEL_Simulation/SIG_RecorderNoQueriesSetException.h"
@@ -135,11 +132,7 @@ class SIG_Recorder {
    * @post simulationQueries points to the
    *       supplied SIG_SimulationQueries object.
    */
-#ifdef _WINDOWS
-  void setSimulationQueries(SIG_SimulationQueries &newSimulationQueries);
-#else
   void setSimulationQueries(SIG_SimulationQueries const &newSimulationQueries);
-#endif
 
  protected:
 
@@ -149,11 +142,7 @@ class SIG_Recorder {
    * Its methods are the only way for the recorder to collect
    * data about the simulation.
    */
-#ifdef _WINDOWS
-  SIG_SimulationQueries* simulationQueries;
-#else
   SIG_SimulationQueries const* simulationQueries;
-#endif
 
  private:
   /**

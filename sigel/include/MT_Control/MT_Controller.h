@@ -13,11 +13,7 @@ class QWidget;
 #include <qtimer.h>
 #include <qstring.h>
 #include <qtextstream.h>
-#ifdef _WINDOWS
-#include <windows.h>
-#else
 #include <pthread.h>
-#endif
 
 #define NOMETA_SUBST	 0
 #define EVALUATOR_SUBST  1
@@ -31,11 +27,7 @@ class MT_Controller : public QObject
 {
 	Q_OBJECT
 
-#ifdef _WINDOWS	
-	friend DWORD WINAPI StartMetaEvolution(LPVOID inRawSubst);
-#else	
 	friend void StartMetaEvolution(void *inRawSubst);
-#endif
 
 public:
 	MT_Controller(SIGEL_GP::SIG_GPExperiment &exp);
@@ -70,11 +62,7 @@ private:
 	QList<unsigned int> correctEst;
 	QList<unsigned int> metaEst;
 
-#ifdef _WINDOWS
-	HANDLE meta_thread;
-#else
 	pthread_t meta_thread;
-#endif
 
 	int usedSystem;
 	bool metaOn;

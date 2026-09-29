@@ -29,11 +29,7 @@
 
 #include <newmat.h>
 
-#ifdef _WINDOWS
-#include <GL/glaux.h>
-#else
 #include <GL/gl.h>
-#endif
 
 #include "SIGEL_Visualisation/SIG_VisualSceneObject.h"
 
