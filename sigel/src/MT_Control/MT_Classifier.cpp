@@ -106,9 +106,7 @@ void MT_Classifier::writeToFileSetup(QTextStream &File)
 
 }
 
-//////////////////////////////////////////////////////////////////////
-// functionally method 
-//////////////////////////////////////////////////////////////////////
+// functionally method
 
 double MT_Classifier::classifier(SIGEL_Program::SIG_Program const * SigProgOne, SIGEL_Program::SIG_Program const * SigProgTwo)
 {

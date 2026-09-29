@@ -4,9 +4,7 @@
 #include "MT_Control/MT_Evaluator.h"
 
 
-//////////////////////////////////////////////////////////////////////
-// administrative method 
-//////////////////////////////////////////////////////////////////////
+// administrative method
 
 MT_Evaluator::MT_Evaluator(SIGEL_GP::SIG_GPExperiment& exp, QTextStream &File) : MT_Substitute(), SIGEL_GP::SIG_GPFitnessTrainer(exp) 
 {
@@ -120,9 +118,7 @@ void MT_Evaluator::loadSetup(QTextStream &File)
 }
 
 
-//////////////////////////////////////////////////////////////////////
-// functionally method 
-//////////////////////////////////////////////////////////////////////
+// functionally method
 
 MT_TrainingCase * MT_Evaluator::createNewTCase(SIGEL_Program::SIG_Program const * SIGProg, int PVMTaskID)
 {

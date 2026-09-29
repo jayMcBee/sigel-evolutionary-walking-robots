@@ -115,11 +115,9 @@ private:
 	int OffspringSize;
 	int ParentSize;
 
-	//////////////////////////////////////////////////////////////////////////////////////////////////
 	// a lot of array, which contain the relative probability and not the real probability
 	// that mean e.g. the  probability of the Search Operators are 30.5% (Crossover) 22.25% (Mutation)
 	// and 52.75% Reproduction so are the entries in the array: 3050 / 2225/ 5275.
-	//////////////////////////////////////////////////////////////////////////////////////////////////
 
 	/* contain the probability of the SearchOperators, which are desired from the user
 	* ProbSearchOperator[0]= probability of Crossover
