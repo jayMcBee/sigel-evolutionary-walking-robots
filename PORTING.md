@@ -6808,6 +6808,15 @@ carried; other items and this file cite them, so they do not change.
     warns through `SIG_IO::cerr` before its `sleep(10000000)`, which the
     Windows half had as `Sleep(10000)`. The wait itself stays for item 119.
 
+- [x] **123. `MT_Substitute.h` included `MT_TrainingCase.h` twice** — done
+  2026-09-29, one commit. The second `#include` is gone; every object is
+  identical.
+
+- [x] **12. The German comments are translated** — done 2026-09-29. Phase 0
+  had translated them on 2026-09-05; the `NEU NEU NEU` banners were gone,
+  and the German Visual Studio file headers went with item 35. One word was
+  left: "Grad" became "degrees" in `SIG_DynaMechsSimulationQueries::sense`.
+
 - [x] **101. Empty destructors removed** — done 2026-09-27, one commit. 100
   empty destructors went. 84 were deleted with their declaration and doc
   comment: their class has a virtual destructor above it, or has no base and

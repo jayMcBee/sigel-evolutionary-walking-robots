@@ -76,9 +76,6 @@ Paths are relative to `sigel/`, the source tree.
   comments that name it. Crosses both `SIG_GPExperiment` variants, so do it
   with item 10.
 
-- [ ] **12. Translate the German comments,** including the `NEU NEU NEU`
-  banners and the MSVC German file headers. Nothing executes.
-
 - [ ] **13. Translate the German strings.** What is left is **kept, by
   decision:** the history text of `SIG_GPIndividual`, which is saved in `.exp`
   files: "Fitness (Elter 1)" and "(Elter 2)" in `addCrossOverInfo`, "CREATED
@@ -441,9 +438,6 @@ problem; the choice is made before any code is written.
 ---
 
 ## 9 · Removals
-
-- [ ] **123. Remove the second `#include "MT_GPSystem/MT_TrainingCase.h"`
-  from `MT_Substitute.h`.** The same line appears twice in a row.
 
 - [ ] **64. Remove what is left of Dynamo.** Decided: it goes completely. It
   was hardly ever used (https://sigel.sourceforge.net/seiten/links_en.html).
