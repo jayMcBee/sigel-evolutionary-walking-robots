@@ -926,8 +926,8 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 - **Gates:** `check.sh` 749 pass, 0 fail; warnings 421. The pass count is 9
   lower because the nine Visual Studio files are gone. The other four gates
   were not run in this session.
-- **`~/sigel-night`** holds the build from `5af7f6a`; every later commit
-  leaves the objects unchanged.
+- **`~/sigel-night`** holds the build from `5af7f6a`. Of the later commits,
+  only MetaGP's warning changes behaviour; the others change no code.
 - **Next:** to be planned with the maintainer.
 
 **2026-09-28 — DONE: ITEM 33, NO DOUBLE OVERWRITE QUESTION IS LEFT.**
