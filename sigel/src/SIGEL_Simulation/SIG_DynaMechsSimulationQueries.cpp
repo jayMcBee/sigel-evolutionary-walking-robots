@@ -33,7 +33,6 @@
 #include "SIGEL_Robot/SIG_PitchRollSensor.h"
 #include "SIGEL_Robot/SIG_ContactSensor.h"
 #include "SIGEL_Tools/SIG_IO.h"
-#include "SIGEL_Simulation/SIG_SimulationCannotSolveException.h"
 #include "SIGEL_Tools/SIG_TypeConverter.h"
 
 #include <dm.h>

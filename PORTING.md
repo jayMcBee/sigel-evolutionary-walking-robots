@@ -909,7 +909,21 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-30 — DONE: ITEM 64, BATCH 3a, THE LIBRARY CHOICE.** Start here.
+**2026-09-30 — DONE: ITEM 64, BATCH 3b, SIG_SIMULATION'S DYNAMO LEFTOVERS.** Start here.
+
+- **Changed:** `SIG_Simulation` loses `slotDynamoMessage`, `stopSimulation`,
+  the unreachable throw of `SIG_SimulationCannotSolveException` and the catch
+  branches for it in `start` and `makeTimeSteps`; the exception class is
+  deleted. `SIG_Simulation` is no longer a `QObject`: the base existed only
+  for that slot. `virtual ~SIG_Simulation() = default;` keeps the destructor
+  virtual.
+- **Review:** no defect.
+- **Gates:** `check.sh` 754 pass, 0 fail; warnings 402. Three passes fewer:
+  one header and two tracked files are gone. Fitness, dictorder and PVM
+  unchanged.
+- **Next:** batch 3c, the comments.
+
+**2026-09-30 — DONE: ITEM 64, BATCH 3a, THE LIBRARY CHOICE.**
 
 - **Changed:** SIGEL assumes DynaMechs. `SIG_SimulationParameters` loses the
   `SimulationLibrary` enum and its accessors; a load skips

@@ -31,7 +31,6 @@
 #include "SIGEL_Robot/SIG_Robot.h"
 #include "SIGEL_Program/SIG_Program.h"
 #include "SIGEL_Environment/SIG_Environment.h"
-#include "SIGEL_Simulation/SIG_SimulationCannotSolveException.h"
 #include <qstring.h>
 
 /** The Simulation covers the connection to Dynamo and Solid plus an Interpreter.
@@ -55,9 +54,8 @@ namespace SIGEL_Simulation
    * with the same parameters should result in the same simulation
    * run and the same set of recorded data.
    */
-  class SIG_Simulation : public QObject
+  class SIG_Simulation
     { 
-      Q_OBJECT
     public:
       /**
        * The constructor of the SIG_Simulation class.
@@ -76,6 +74,7 @@ namespace SIGEL_Simulation
 		      SIGEL_Program::SIG_Program const & robotProgram,
 		      SIG_SimulationParameters const & simulationParameter,
 		      SIG_Recorder & theRecorder);
+      virtual ~SIG_Simulation() = default;
 		
       /**
        * Starts the simulation.
@@ -83,9 +82,6 @@ namespace SIGEL_Simulation
        * Starts the simulation and calls makeTimeSteps as often as neccessary, so that a complete
        * simulation run is performed. The duration of this run is specified in the simulationParameter
        * object given in the constructor.
-       *
-       * @exception SIGEL_Tools::SIG_SimulatorCannotSolveException
-       *            Some simulation-constraint could'nt be solved by the Dynamo-System.
        *
        * @post The complete simulation is performed.
        */
@@ -96,9 +92,6 @@ namespace SIGEL_Simulation
        *
        * This function will be called several times by the start-function as long as the elapsed
        * time is less than the amount of time that the simulation should run.
-       *
-       * @exception SIGEL_Toolss::SIG_SimulatorCannotSolveException
-       *            Some simulation-constraint could'nt be solved by the Dynamo-System.
        *
        * @param numTimeSteps The number of time steps that are performed.
        * @post numTimeStep time steps are performed.
@@ -115,15 +108,6 @@ namespace SIGEL_Simulation
       virtual bool prematureTermination()  {  return false;  }
 
 
-    public slots:
-      /** ORPHANED. Nothing connects to this slot: its only sender was the
-       * Dynamo backend, which this tree does not have. It is the only slot on
-       * this class and there are no signals, so Q_OBJECT exists for this alone.
-       * It is also the only writer of stopSimulation, which makes makeTimeSteps'
-       * throw of SIG_SimulationCannotSolveException unreachable. */
-      void slotDynamoMessage(QString theMessage);
-
-
     public:
 
       /**
@@ -136,11 +120,6 @@ namespace SIGEL_Simulation
 
 
     protected:
-
-      /**
-       * if this boolean is true, the Simulation will stop
-       */
-      bool stopSimulation;
 
       /**
        * The commandInterface used for example to propagate move commands to the simulation.

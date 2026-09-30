@@ -28,7 +28,6 @@
 #include <cmath>
 #include "NaN.h"
 #include "SIGEL_Tools/SIG_IO.h"
-#include "SIGEL_Simulation/SIG_SimulationCannotSolveException.h"
 
 SIGEL_Simulation::SIG_SimulationQueries::SIG_SimulationQueries()
 { };

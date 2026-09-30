@@ -426,11 +426,8 @@ $(OBJ)/sigel/%.o: $(SRC)/src/%.cpp $(STAMP) | $(UI_HDRS)
 	@mkdir -p $(dir $@)
 	$(SIGCXX) -MMD -MP $(SIGINC) -c $< -o $@
 
-# The Q_OBJECT classes in core. Their vtable and typeinfo live in the generated
-# code, so without these the link fails on SIG_Simulation. SIG_DynaSystem.h was
-# the third entry until the Dynamo backend was deleted (PORTING.md).
-# This was a hand-written list of the two core Q_OBJECT classes. The GUI adds
-# 54 more, and a hand-kept list of 56 is a list that goes stale silently: a
+# The Q_OBJECT classes. Their vtable and typeinfo live in the generated code.
+# A hand-kept list goes stale silently: a
 # missing entry is not a compile error, it is an undefined vtable at link time
 # or -- worse, for a class whose vtable something else emits -- a signal that
 # never fires at run time. Derived from the source instead.

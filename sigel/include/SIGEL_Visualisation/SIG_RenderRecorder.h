@@ -25,7 +25,6 @@
 
 #include "SIGEL_Visualisation/SIG_SceneObject.h"
 #include "SIGEL_Simulation/SIG_Recorder.h"
-#include "SIGEL_Simulation/SIG_SimulationCannotSolveException.h"
 #include <QList>
 
 namespace SIGEL_Visualisation

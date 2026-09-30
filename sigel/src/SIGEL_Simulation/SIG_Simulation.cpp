@@ -26,16 +26,13 @@
 #include "SIGEL_Simulation/SIG_DynaMechsSimulationData.h"
 #include "SIGEL_Simulation/SIG_DynaMechsSimulationQueries.h"
 #include "SIGEL_Simulation/SIG_DynaMechsCommandInterface.h"
-#include "SIGEL_Tools/SIG_IO.h"
 
 SIGEL_Simulation::SIG_Simulation::SIG_Simulation(SIGEL_Robot::SIG_Robot const & robot,
 						 SIGEL_Environment::SIG_Environment const & environment,
 						 SIGEL_Program::SIG_Program const & robotProgram,
 						 SIG_SimulationParameters const & simulationParameter,
 						 SIG_Recorder & theRecorder) :
-  recorder(theRecorder),
-  stopSimulation(false),
-  QObject()
+  recorder(theRecorder)
 {
   SIG_DynaMechsSimulationData *dynaMechsSimulationData = new SIG_DynaMechsSimulationData( robot,
 											  environment,
@@ -80,11 +77,8 @@ void SIGEL_Simulation::SIG_Simulation::start()
 
   recorder.finish();
   }
-  catch (SIGEL_Simulation::SIG_SimulationCannotSolveException &) {
-    throw;                     // the one type this function lets through
-  }
   catch (...) {
-    // Anything else terminates, deliberately: the alternative is a fitness
+    // Any exception terminates, deliberately: the alternative is a fitness
     // function silently scoring a partial run.
     std::terminate();
   }
@@ -105,36 +99,14 @@ void SIGEL_Simulation::SIG_Simulation::makeTimeSteps(int numTimeSteps)
 
       simulationQueries->checkDynas();
 
-      // UNREACHABLE. slotDynamoMessage is the only writer of stopSimulation and
-      // nothing connects to it, so this sole throw site of
-      // SIG_SimulationCannotSolveException cannot fire.
-      if (stopSimulation)
-        throw SIG_SimulationCannotSolveException( __FILE__, __LINE__,
-                                                                                                  "Dynamo produced an Cannot Solve Constraints Error" );
-
       simulationData->actualFrame++;
 
       recorder.record();
     };
   }
-  catch (SIGEL_Simulation::SIG_SimulationCannotSolveException &) {
-    throw;                     // the one type this function lets through
-  }
   catch (...) {
-    // Anything else terminates, deliberately: the alternative is a fitness
+    // Any exception terminates, deliberately: the alternative is a fitness
     // function silently scoring a partial run.
     std::terminate();
   }
 };
-
-void SIGEL_Simulation::SIG_Simulation::slotDynamoMessage(QString theMessage)
-{
-  // Process theMessage; currently it always aborts
-#ifdef SIG_DEBUG
-  SIGEL_Tools::SIG_IO::cout << theMessage << Qt::endl;
-#endif
-
-  stopSimulation=true;
-};
-
-
