@@ -29,7 +29,7 @@ APP=$ROOT/sigelApp
 SL=$ROOT/downloads/supportingLibs
 QTINC=$(qmake6 -query QT_INSTALL_HEADERS)
 
-FLAGS="-fsyntax-only -std=c++17 -Wall -Wextra"
+FLAGS="-fsyntax-only -std=c++20 -Wall -Wextra"
 # The include paths match the Makefile's. A path missing here makes a file
 # fail that the real build compiles.
 INCS="-I$ROOT/shim -I$SRC/include -isystem $QTINC -isystem $QTINC/QtCore"

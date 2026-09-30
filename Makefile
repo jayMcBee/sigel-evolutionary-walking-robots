@@ -276,7 +276,7 @@ SIGINC := -Ishim -I$(SRC)/include -I$(B)/ui -isystem $(QTINC) \
 # as Debian 12's Qt 6.4 is, requires it. With -fPIE the executable gets copy
 # relocations for Qt data such as QCoreApplication::self, and QApplication's
 # constructor crashes in QGuiApplication::screenAdded.
-SIGCXX := g++ -std=c++17 -O1 -g -fPIC -Wall -Wextra -Wold-style-cast \
+SIGCXX := g++ -std=c++20 -O1 -g -fPIC -Wall -Wextra -Wold-style-cast \
               $(SIGSAN)
 
 CORE := SIGEL_Tools SIGEL_Environment MT_GPSystem SIGEL_Robot SIGEL_Program \

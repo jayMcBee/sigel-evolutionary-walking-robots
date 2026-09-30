@@ -7587,6 +7587,14 @@ carried; other items and this file cite them, so they do not change.
   `-Wdelete-non-virtual-dtor` warnings are gone; the gate passed with 382
   warnings.
 
+- [x] **126, first half. SIGEL builds as C++20** — done 2026-09-30.
+  `SIGCXX` and `checks/check.sh` use `-std=c++20`; the vendor libraries stay
+  on C++17. No source changed. GCC 15.2 gives the same warnings under both
+  standards, the gate passed with 758 pass and 382 warnings, and a review
+  found no C++20 rule that changes SIGEL's behaviour. A flag change does not
+  rebuild the objects, so `build/obj/{sigel,moc,qrc}` and
+  `build-asan/obj/{sigel,moc}` were deleted and rebuilt.
+
 #### Not doing
 
 Decisions, not work. Each is settled; reopen only with a reason.
