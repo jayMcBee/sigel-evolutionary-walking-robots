@@ -77,7 +77,7 @@ namespace SIGEL_Robot {
                 virtual ~SIG_Mirtich() = default;
 
                 void computePhysics (double density,
-                                     double & masse,
+                                     double & mass,
                                      SIG_Vector & centreOfMass,
                                      SIG_Matrix & inertiaTensor);
                 void invalidate () { computed = false; }

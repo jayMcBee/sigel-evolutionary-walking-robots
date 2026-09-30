@@ -252,17 +252,17 @@ namespace SIGEL_Robot {
         { }
 
         void SIG_Mirtich::computePhysics (double density,
-                                          double & masse,
+                                          double & mass,
                                           SIG_Vector & centreOfMass,
                                           SIG_Matrix & inertiaTensor)
         {
-                double mass;
+                double computedMass;
                 double r[3];            /* center of mass */
                 double J[3][3];         /* inertia tensor */
 
                 compute ();
 
-                mass = density * T0;
+                computedMass = density * T0;
 
                 r[X] = T1[X] / T0;
                 r[Y] = T1[Y] / T0;
@@ -278,12 +278,12 @@ namespace SIGEL_Robot {
 
                 /* translate inertia tensor to center of mass */
                 /*
-                  J[X][X] -= mass * (r[Y]*r[Y] + r[Z]*r[Z]);
-                  J[Y][Y] -= mass * (r[Z]*r[Z] + r[X]*r[X]);
-                  J[Z][Z] -= mass * (r[X]*r[X] + r[Y]*r[Y]);
-                  J[X][Y] = J[Y][X] += mass * r[X] * r[Y]; 
-                  J[Y][Z] = J[Z][Y] += mass * r[Y] * r[Z]; 
-                  J[Z][X] = J[X][Z] += mass * r[Z] * r[X];
+                  J[X][X] -= computedMass * (r[Y]*r[Y] + r[Z]*r[Z]);
+                  J[Y][Y] -= computedMass * (r[Z]*r[Z] + r[X]*r[X]);
+                  J[Z][Z] -= computedMass * (r[X]*r[X] + r[Y]*r[Y]);
+                  J[X][Y] = J[Y][X] += computedMass * r[X] * r[Y]; 
+                  J[Y][Z] = J[Z][Y] += computedMass * r[Y] * r[Z]; 
+                  J[Z][X] = J[X][Z] += computedMass * r[Z] * r[X];
                 */
 
                 for (int i = 0; i < 3; i++) {
@@ -301,10 +301,10 @@ namespace SIGEL_Robot {
                                 inertiaTensor.set (k, j, J[k][j]);
                         }
 
-                if (isnan (mass)){
+                if (isnan (computedMass)){
                         throw SIG_CannotMirtich (__FILE__, __LINE__, geometryName);
                 }
-                masse = mass;
+                mass = computedMass;
         }
         
 } // namespace
