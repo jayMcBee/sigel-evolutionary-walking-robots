@@ -80,10 +80,6 @@ namespace SIGEL_Robot {
                                      DL_Scalar & masse,
                                      DL_vector & centreOfMass,
                                      DL_matrix & inertiaTensor);
-                void computeMajorAxes (DL_vector & centreOfMass,
-                                       DL_vector & v1, DL_vector & v2, DL_vector & v3);
-                void computeTransformToOriginAndMajorAxes (DL_vector & translation,
-                                                           DL_matrix & rotation);
                 void invalidate () { computed = false; }
  		double getT0()  { return T0; }
         };

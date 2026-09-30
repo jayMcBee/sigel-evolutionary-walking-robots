@@ -265,16 +265,6 @@ namespace SIGEL_Robot {
                         l->instantiateGeometry ();
         }
 
-        void SIG_Robot::prepareDynaMo ()
-        {
-                instantiateGeometries ();
-
-                for (SIG_Link *l : links)
-                        l->transformToDynaMo ();
-
-		initiate();
-        }
-
         void SIG_Robot::prepareDynaMechs ()
         {
 	  instantiateGeometries ();

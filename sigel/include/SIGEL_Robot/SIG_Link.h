@@ -74,7 +74,6 @@ namespace SIGEL_Robot
       int getNrOfPoints () const;
 
       void instantiateGeometry ();
-      void transformToDynaMo ();
       void transformToDynaMechs ( SIG_Joint *predecessor,
 				  DL_vector predBase = DL_vector(0, 0, 0),
 				  DL_vector predDir = DL_vector(0, 0, 0),

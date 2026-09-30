@@ -753,12 +753,6 @@ void SIG_GUIGPExperiment::slotRobotInfo()
 { char robInf[4096];
 
 
-  // need DynaMechs for that..
-  if (gpExperiment.simulationParameter.getSimulationLibrary() != SIGEL_Simulation::SIG_SimulationParameters::DynaMechs)
-  { QMessageBox::information( experimentListView, "Can't Display Robot Information", "<B>DynaMechs is required for this operation to work properly.</B>");
-    return;
-  }
-
   // get info and display
   if( (gpExperiment.robot.getBodies().size() != 0))
   { gpExperiment.robot.getRobotInformation(robInf, 4096);

@@ -325,27 +325,13 @@ void SIG_AllIndividualsView::slotVisualize()
 
    	  SIGEL_Robot::SIG_Robot modifiedRobot( theExperiment.robot );
 
-   	  switch (theExperiment.simulationParameter.getSimulationLibrary())
-   	  {
-   	    case SIGEL_Simulation::SIG_SimulationParameters::DynaMo:
-   	      try {
-       		  modifiedRobot.prepareDynaMo();
-       		}
-       	  catch (SIGEL_Tools::SIG_Exception &e) {
-       		  QMessageBox::warning( this, "Robot Exception", e.getMessage() );
-       		  return;
-       		};
-   	      break;
-   	    case SIGEL_Simulation::SIG_SimulationParameters::DynaMechs:
-   	      try {
-       		  modifiedRobot.prepareDynaMechs();
-       		}
-       	  catch (SIGEL_Tools::SIG_Exception &e) {
-       		  QMessageBox::warning( this, "Robot Exception", e.getMessage() );
-       		  return;
-       		};
-       	  break;
-       };
+   	  try {
+   	    modifiedRobot.prepareDynaMechs();
+   	  }
+   	  catch (SIGEL_Tools::SIG_Exception &e) {
+   	    QMessageBox::warning( this, "Robot Exception", e.getMessage() );
+   	    return;
+   	  };
 
    	  QList< char > hostNameBuffer( 100 );
 

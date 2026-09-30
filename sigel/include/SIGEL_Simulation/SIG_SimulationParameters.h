@@ -40,13 +40,6 @@ namespace SIGEL_Simulation
   class SIG_SimulationParameters
     {
     public:
-      enum SimulationLibrary {
-	/// use DynaMo
-	DynaMo,
-	/// use DynaMechs
-	DynaMechs
-      };
-
       enum DynaMechsIntegrator {
 	/// use Euler
 	Euler,
@@ -108,7 +101,6 @@ namespace SIGEL_Simulation
 			       SolveModeType solveMode,
 			       IntegratorType integrator,
 			       DynaMechsIntegrator dynaMechsIntegrator,
-			       SimulationLibrary simulationLibrary,
 			       int maximalSOLIDIterations,
 			       int randomSeed = 0 );
       /** This constructor gets all the data out of the file */
@@ -263,18 +255,6 @@ namespace SIGEL_Simulation
        */
       DynaMechsIntegrator getDynaMechsIntegrator() const;
 
-      /**
-       * Sets the used simulation library to newSimulationLibrary.
-       * @param newSimulationLibrary The simulation library to use.
-       */
-      void setSimulationLibrary( SimulationLibrary newSimulationLibrary );
-
-      /**
-       * Gets the used simulation library.
-       * @param simulationLibrary The simulation library to use.
-       */
-      SimulationLibrary getSimulationLibrary() const;
-      
       /** Sets the amount of SOLID iterations
        * @param newMaximalSOLIDIterations is the number of iteration the DynaSystem tries to avoid collisions
        */
@@ -364,9 +344,6 @@ namespace SIGEL_Simulation
 
       /** The integrator for dynamo */
       IntegratorType integrator;
-
-      /** The library which is used */
-      SimulationLibrary simulationLibrary;
 
       /**
        * The integrator used in DynaMechs.

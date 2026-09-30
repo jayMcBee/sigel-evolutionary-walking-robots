@@ -47,26 +47,13 @@ SIGEL_GP::SIG_GPFitnessTrainer::SIG_GPFitnessTrainer(SIGEL_GP::SIG_GPExperiment&
    pvmLost(false)
 {
 
-  switch (exp.simulationParameter.getSimulationLibrary()) {
-    case SIGEL_Simulation::SIG_SimulationParameters::DynaMo:
-      try {
-       modifiedRobot.prepareDynaMo();
-      }
-      catch (SIGEL_Tools::SIG_Exception &e) {
-        SIGEL_Tools::SIG_IO::cerr << e.getMessage() << Qt::flush;
-        exit( 1 );
-      };
-      break;
-    case SIGEL_Simulation::SIG_SimulationParameters::DynaMechs:
-      try {
-        modifiedRobot.prepareDynaMechs();
-      }
-            catch (SIGEL_Tools::SIG_Exception &e) {
-        SIGEL_Tools::SIG_IO::cerr << e.getMessage() << Qt::flush;
-        exit( 1 );
-      };
-      break;
-    };
+  try {
+    modifiedRobot.prepareDynaMechs();
+  }
+  catch (SIGEL_Tools::SIG_Exception &e) {
+    SIGEL_Tools::SIG_IO::cerr << e.getMessage() << Qt::flush;
+    exit( 1 );
+  };
 
   pvmTasks.fill( nullptr );
 

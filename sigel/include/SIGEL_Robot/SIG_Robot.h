@@ -252,13 +252,6 @@ namespace SIGEL_Robot
 
     /**
      * Transforms the links' coordinate system to a form
-     * which is suitable for simulation with DynaMo. Also
-     * calculates initial positions.
-     */
-    void prepareDynaMo ();
-
-    /**
-     * Transforms the links' coordinate system to a form
      * which is suitable for simulation with DynaMechs.
      * Also performs calculation of initial positions and
      * modified Denavit-Hartenberg parameters.

@@ -45,7 +45,6 @@
 #include "SIGEL_Simulation/SIG_SimulationParameters.h"
 #include "SIGEL_Tools/SIG_Exception.h"
 
-using SIGEL_Simulation::SIG_SimulationParameters;
 
 // Every robot container whose order reaches the simulation -- PORTING.md
 // Phase D. SIG_Robot holds six (SIG_Robot.h, its private lists); all six are
@@ -408,12 +407,6 @@ int main(int argc, char *argv[])
   if (index < 0 || index >= experiment.population.getSize()) {
     fprintf(stderr, "individual %d is outside 0..%d\n",
             index, experiment.population.getSize() - 1);
-    return 1;
-  }
-
-  if (experiment.simulationParameter.getSimulationLibrary()
-      != SIG_SimulationParameters::DynaMechs) {
-    fprintf(stderr, "%s selects Dynamo; this program runs DynaMechs only\n", argv[1]);
     return 1;
   }
 

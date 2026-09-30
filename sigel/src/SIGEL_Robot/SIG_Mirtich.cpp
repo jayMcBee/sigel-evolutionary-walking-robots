@@ -22,7 +22,6 @@
 */
 // may be ignored so far
 #include "SIGEL_Robot/SIG_Mirtich.h"
-#include <newmatap.h>
 
 #define X 0
 #define Y 1
@@ -306,81 +305,6 @@ namespace SIGEL_Robot {
                         throw SIG_CannotMirtich (__FILE__, __LINE__, geometryName);
                 }
                 masse = mass;
-        }
-
-        void SIG_Mirtich::computeMajorAxes (DL_vector &centreOfMass,
-                                            DL_vector &v1,
-                                            DL_vector &v2,
-                                            DL_vector &v3)
-        {
-                double density = 1.0;
-                
-                double mass;
-                double r[3];            /* center of mass */
-                double J[3][3];         /* inertia tensor */
-
-                NEWMAT::SymmetricMatrix S (3);
-                NEWMAT::DiagonalMatrix D (3);
-                NEWMAT::Matrix V (3, 3);
-                NEWMAT::ColumnVector a1, a2, a3;
-
-                compute ();
-
-                mass = density * T0;
-
-                r[X] = T1[X] / T0;
-                r[Y] = T1[Y] / T0;
-                r[Z] = T1[Z] / T0;
-
-                /* compute inertia tensor */
-                J[X][X] = density * (T2[Y] + T2[Z]);
-                J[Y][Y] = density * (T2[Z] + T2[X]);
-                J[Z][Z] = density * (T2[X] + T2[Y]);
-                J[X][Y] = J[Y][X] = - density * TP[X];
-                J[Y][Z] = J[Z][Y] = - density * TP[Y];
-                J[Z][X] = J[X][Z] = - density * TP[Z];
-
-                /* translate inertia tensor to center of mass */
-                J[X][X] -= mass * (r[Y]*r[Y] + r[Z]*r[Z]);
-                J[Y][Y] -= mass * (r[Z]*r[Z] + r[X]*r[X]);
-                J[Z][Z] -= mass * (r[X]*r[X] + r[Y]*r[Y]);
-                J[X][Y] = J[Y][X] += mass * r[X] * r[Y]; 
-                J[Y][Z] = J[Z][Y] += mass * r[Y] * r[Z]; 
-                J[Z][X] = J[X][Z] += mass * r[Z] * r[X];
-
-                for (int i = 0; i < 3; i++)
-                        centreOfMass.set (i, r[i]);
-
-                for (int k = 0; k < 3; k++)
-                        for (int j = 0; j <= k; j++)
-                                S (k + 1, j + 1) = J [k] [j];
-
-                NEWMAT::Jacobi (S, D, V);
-
-                a1 = V.Column (1);
-                a2 = V.Column (2);
-                a3 = V.Column (3);
-
-                for (int l = 0; l < 3; l++) {
-                        v1.set (l, a1 (l+1));
-                        v2.set (l, a2 (l+1));
-                        v3.set (l, a3 (l+1));
-                }
-                
-                v1.normalize ();
-                v2.normalize ();
-                v3.normalize ();
-        }
-
-        void SIG_Mirtich::computeTransformToOriginAndMajorAxes (DL_vector & translation,
-                                                                DL_matrix & rotation)
-        {
-                DL_matrix axes;
-
-                computeMajorAxes (translation, axes.c0, axes.c1, axes.c2);
-
-                axes.invert (&rotation);
-                translation.timesis (-1.0);
         }
         
 } // namespace

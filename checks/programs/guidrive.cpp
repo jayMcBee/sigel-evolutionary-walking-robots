@@ -5115,8 +5115,8 @@ static int guidriveMain(int argc, char **argv)
                        " the file does not contain the run\n", wantGens);
                 fflush(stdout); return 1;
             }
-            // NOT a fitness comparison -- a liveness one. SIG_Simulation.cpp:66-70
-            // records that under PVM a throw is swallowed by sigel_slave and the
+            // NOT a fitness comparison -- a liveness one. Under PVM a throw is
+            // swallowed by sigel_slave and the
             // individual "scores 0.0 as though it had been evaluated". A whole
             // population of exact zeros is that failure, and it is WORSE than a
             // crash: every `var1 >= var2' is then true, so the run is perfectly

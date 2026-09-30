@@ -35,7 +35,6 @@ SIGEL_Simulation::SIG_SimulationParameters::SIG_SimulationParameters()
     solveMode(smtConjugateGradient),
     integrator(itRungeKutta4),
     dynaMechsIntegrator( RungeKutta4 ),
-    simulationLibrary( DynaMechs ),
     randomSeed(0),
     maximalSOLIDIterations(1),
     jointLimitsK_spring(50),
@@ -53,7 +52,6 @@ SIGEL_Simulation::SIG_SimulationParameters::SIG_SimulationParameters(QTime timeT
 								     SolveModeType solveMode,
 								     IntegratorType integrator,
 								     DynaMechsIntegrator dynaMechsIntegrator,
-								     SimulationLibrary simulationLibrary,
 								     int maximalSOLIDIterations,
 								     int randomSeed )
   : timeToSimulate(timeToSimulate),
@@ -67,7 +65,6 @@ SIGEL_Simulation::SIG_SimulationParameters::SIG_SimulationParameters(QTime timeT
     solveMode(solveMode),
     integrator(integrator),
     dynaMechsIntegrator( dynaMechsIntegrator ),
-    simulationLibrary( simulationLibrary ),
     maximalSOLIDIterations(maximalSOLIDIterations)
 { };
 
@@ -143,11 +140,6 @@ void SIGEL_Simulation::SIG_SimulationParameters::readFromFile(QTextStream& file)
       dynaMechsIntegrator=static_cast<DynaMechsIntegrator>(s.toInt());
 		}
 
-    if ( s == "SIMULATIONLIBRARY") {
-      s=file.readLine();
-      simulationLibrary=static_cast<SimulationLibrary>(s.toInt());
-		}
-
     if ( s == "MAXIMALSOLIDITERATIONS") {
       s=file.readLine();
       maximalSOLIDIterations=s.toInt();
@@ -207,7 +199,7 @@ void SIGEL_Simulation::SIG_SimulationParameters::writeToFile(QTextStream& file)
   file << "DYNAMECHSINTEGRATOR\n";
   file << (static_cast<int>(dynaMechsIntegrator)) << "\n";
   file << "SIMULATIONLIBRARY\n";
-  file << (static_cast<int>(simulationLibrary)) << "\n";
+  file << 1 << "\n";   // DynaMechs, the only library
   file << "MAXIMALSOLIDITERATIONS\n";
   file << maximalSOLIDIterations << "\n";
   file << "JOINTLIMITSK_SPRING\n";
@@ -356,16 +348,6 @@ void SIGEL_Simulation::SIG_SimulationParameters::setDynaMechsIntegrator( DynaMec
 SIGEL_Simulation::SIG_SimulationParameters::DynaMechsIntegrator SIGEL_Simulation::SIG_SimulationParameters::getDynaMechsIntegrator() const
 {
   return dynaMechsIntegrator;
-};
-
-void SIGEL_Simulation::SIG_SimulationParameters::setSimulationLibrary( SimulationLibrary newSimulationLibrary )
-{
-  simulationLibrary = newSimulationLibrary;
-};
-
-SIGEL_Simulation::SIG_SimulationParameters::SimulationLibrary SIGEL_Simulation::SIG_SimulationParameters::getSimulationLibrary() const
-{
-  return simulationLibrary;
 };
 
 void SIGEL_Simulation::SIG_SimulationParameters::setMaximalSOLIDIterations(int newMaximalSOLIDIterations)

@@ -203,17 +203,6 @@ namespace SIGEL_Robot {
                 mirtich = new SIG_Mirtich (geometry, name + "(" + body->getName () + ")");
         }
 
-        void SIG_Link::transformToDynaMo ()
-        {
-                DL_vector v;
-                DL_matrix m;
-                mirtich->computeTransformToOriginAndMajorAxes (v, m);
-                geometry->translate (v);
-                geometry->rotate (m);
-                mirtich->invalidate ();
-                transformPoints (v, m);
-        }
-
         void SIG_Link::transformPoints (DL_vector mov, DL_matrix rot)
         {
                 for (const NamedPoint &p : points) {

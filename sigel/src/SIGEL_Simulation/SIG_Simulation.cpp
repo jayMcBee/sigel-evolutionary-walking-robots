@@ -22,12 +22,10 @@
 */
 #include "SIGEL_Simulation/SIG_Simulation.h"
 #include <exception>
-#include <iostream>
 
 #include "SIGEL_Simulation/SIG_DynaMechsSimulationData.h"
 #include "SIGEL_Simulation/SIG_DynaMechsSimulationQueries.h"
 #include "SIGEL_Simulation/SIG_DynaMechsCommandInterface.h"
-#include "SIGEL_Tools/SIG_Exception.h"
 #include "SIGEL_Tools/SIG_IO.h"
 
 SIGEL_Simulation::SIG_Simulation::SIG_Simulation(SIGEL_Robot::SIG_Robot const & robot,
@@ -39,34 +37,13 @@ SIGEL_Simulation::SIG_Simulation::SIG_Simulation(SIGEL_Robot::SIG_Robot const & 
   stopSimulation(false),
   QObject()
 {
-  switch (simulationParameter.getSimulationLibrary())
-    {
-    case SIG_SimulationParameters::DynaMechs:
-      {
-	SIG_DynaMechsSimulationData *dynaMechsSimulationData = new SIG_DynaMechsSimulationData( robot,
-												environment,
-												simulationParameter );
+  SIG_DynaMechsSimulationData *dynaMechsSimulationData = new SIG_DynaMechsSimulationData( robot,
+											  environment,
+											  simulationParameter );
 
-	simulationData = dynaMechsSimulationData;
-	simulationQueries = new SIG_DynaMechsSimulationQueries( *dynaMechsSimulationData );
-	commandInterface = new SIG_DynaMechsCommandInterface( *dynaMechsSimulationData );
-      };
-      break;
-
-    // Must not fall through: the three interface pointers below would stay
-    // uninitialised. Under PVM the throw is swallowed and the individual scores
-    // 0.0, so this message is the only evidence; std::cerr because SIG_IO buffers.
-    default:
-      std::cerr << "SIG_Simulation: SIMULATIONLIBRARY "
-		<< static_cast<int>( simulationParameter.getSimulationLibrary() )
-		<< " selects the Dynamo backend, which was removed. Only"
-		   " SIMULATIONLIBRARY 1 (DynaMechs) is supported."
-		<< std::endl;
-      throw SIGEL_Tools::SIG_Exception( __FILE__, __LINE__,
-					"SIMULATIONLIBRARY selects the removed Dynamo"
-					" backend; only DynaMechs (SIMULATIONLIBRARY 1)"
-					" is supported" );
-    };
+  simulationData = dynaMechsSimulationData;
+  simulationQueries = new SIG_DynaMechsSimulationQueries( *dynaMechsSimulationData );
+  commandInterface = new SIG_DynaMechsCommandInterface( *dynaMechsSimulationData );
 
   recorder.setSimulationQueries( *simulationQueries );
   recorder.init();
