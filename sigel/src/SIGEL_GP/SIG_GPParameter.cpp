@@ -296,12 +296,10 @@ void SIGEL_GP::SIG_GPParameter::setPriority(priorityLevel prio)
 {
     priority=prio;
 
-    // for each case, a special set of commands is given, depending on
-    // the right configuration of each prioritylevel, which sets the
-    // secondary priority values. these are:
-    // passiveTime unsigned long
-    // maxTouchesPerLoop int
-    // toDoSweepsPerLoop int
+    // Each level sets passiveTime, maxTouchsPerLoop and toDoSweepsPerLoop.
+    // In the past this was changed, for an unknown reason: all levels now set
+    // the same loop values (-1, 1), and only passiveTime differs. The values
+    // in the header's priorityLevel comments are from before that change.
  
     switch (priority)
       {
