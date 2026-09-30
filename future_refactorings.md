@@ -141,6 +141,26 @@ Paths are relative to `sigel/`, the source tree.
 All present in 1.3, none introduced here. Each needs a decision before it is
 touched, because changing one changes behaviour against the reference binary.
 
+- [ ] **131. Let `SIG_SceneObject`'s constructor use its arguments.** The
+  `SIG_Vector` and `SIG_Matrix` parameters have no names, so
+  `position(position)` and `rotation(rotation)` copy each member into
+  itself. The members start undefined, and the values that
+  `SIG_VisualSceneObject` passes in are lost. GCC warns (`-Winit-self`,
+  `-Wuninitialized`).
+
+- [ ] **132. Make the MetaGP autosave rotate.** In `MT_Controller`,
+  `autoSaveCnt = autoSaveCnt++ % 3` writes the old value back, so the
+  counter stays at 0. The `saveName` it builds is also not used: the next
+  line saves to `name`. The planned rotation over three autosave files
+  never happens. GCC warns (`-Wsequence-point`).
+
+- [ ] **133. Give the polymorphic base classes a virtual destructor.**
+  `SIG_Recorder`, `SIG_GPManager` and `SIG_GPFitnessTrainer` have virtual
+  methods but no virtual destructor. Deleting a subclass through a base
+  pointer is undefined behaviour. GCC warns
+  (`-Wdelete-non-virtual-dtor`) in `SIG_GPManager`,
+  `SIG_GUIGPExperiment` and `SIG_SimulationVisualisation`.
+
 - [ ] **125. Give `accept()` a buffer size in
   `SIG_GPManager::RegisterDynPVMClients`.** `alen` is passed to `accept()`
   without being set, so `accept()` reads an arbitrary buffer size. If that
