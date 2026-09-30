@@ -46,7 +46,7 @@ class SIG_Environment {
   /** Default constructor
    *
    * @post
-   *  Sets yPlaneLevel to 0 and gravity to 9.81 downwards.
+   *  Sets gravity to 9.81 downwards.
    */  
   SIG_Environment();
 
@@ -54,13 +54,11 @@ class SIG_Environment {
    *
    * @param newGravity
    *  The vector for the gravity, where the length defines the acceleration.
-   * @param newYPlaneLevel
-   *  The minimal level for object to be (the ground plane).
    * @post
-   *  Sets yPlaneLevel to newYPlaneLevel and gravity to newGravity.
+   *  Sets gravity to newGravity.
    */  
-  SIG_Environment(DL_vector newGravity, double newYPlaneLevel, double newVeloDamping, 
-		  DL_vector newStartPosition, QString newFloorMaterialName, 
+  SIG_Environment(DL_vector newGravity, double newVeloDamping, 
+		  DL_vector newStartPosition, 
 		  double newGroundPlanarSpringConstant, double newGroundNormalSpringConstant,
 		  double newGroundPlanarDamperConstant, double newGroundNormalDamperConstant, 
 		  double newFrictionCoeff_u_s, double newFrictionCoeff_u_k);
@@ -70,7 +68,7 @@ class SIG_Environment {
    * @param file
    *  the filestream to be read from.
    * @post
-   *  Reads yPlaneLevel and gravity from file.
+   *  Reads the environment from file.
    */  
   SIG_Environment(QTextStream& file);
 
@@ -79,7 +77,7 @@ class SIG_Environment {
    * @param file
    *  the filestream to write to.
    * @post
-   *  yPlaneLevel and gravity are witten to file.
+   *  The environment is written to file.
    */  
   void writeToFile(QTextStream& file);
 
@@ -88,7 +86,7 @@ class SIG_Environment {
    * @param file
    *  the filestream to read from.
    * @post
-   *  yPlaneLevel and gravity are read from file.
+   *  The environment is read from file.
    */  
   void readFromFile(QTextStream& file);
 
@@ -123,22 +121,6 @@ class SIG_Environment {
    *  The amount of velo damping must be between 1 (no damping) and 0 (full damping).
    */  
   double getVeloDamping() const;
-
-  /** Sets the yPlaneLevel
-   *
-   * @param newYPlaneLevel
-   *  The minimal level for object to be (the ground plane).
-   * @post
-   *  Sets yPlaneLevel to newYPlaneLevel.
-   */  
-  void setYPlaneLevel(double newYPlaneLevel);
-
-  /** Reads the yPlaneLevel
-   *
-   * @return
-   *  The minimal level for object to be (the ground plane).
-   */  
-  double getYPlaneLevel() const;
 
   /** Sets the startPosition
    *
@@ -263,22 +245,6 @@ class SIG_Environment {
   	*/
  	QString getFloorPictureFile() const;
  	
-  /** Sets the floorMaterialName
-   *
-   * @param newFloorMaterialName
-   *  The name of the Material of the Floor.
-   * @post
-   *  Sets floorMaterialName to newFloorMaterialName.
-   */
-  void setFloorMaterialName(QString newFloorMaterialName);
-
-  /** Reads the floorMaterialName
-   *
-   * @return
-   *  The name of the Material of the Floor.
-   */  
-  QString getFloorMaterialName() const;
-
   /** Sets the ground planar spring constant
    *
    * @param newGroundPlanarSpringConstant
@@ -404,8 +370,6 @@ class SIG_Environment {
 	int getAutosave();
 
  private:
-  /** the storage for the zPlaneLevel */
-  double yPlaneLevel;
   /** the storage for the gravity vector */
   DL_vector gravity;
   /** the storage for the velo-damping */
@@ -422,8 +386,6 @@ class SIG_Environment {
 	QString floorPictureFile;
 	/** determines whether a floorFunction or a floorPictureFile is specified */
 	bool floorFuncSelected;
-  /** the storage for the material name */
-  QString floorMaterialName;
   /** the storage for the texture pixmap */
   QString textureFile;
   /** holds true if the user wants to see the texture else the variable holds false */

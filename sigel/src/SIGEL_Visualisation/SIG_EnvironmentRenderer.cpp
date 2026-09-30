@@ -51,9 +51,7 @@ namespace SIGEL_Visualisation
 
     SIG_VisualSceneObject *plane = new SIG_VisualSceneObject( 0, "Plane" );
 
-    double planeLevel = environment.getYPlaneLevel();
-
-    plane->setPosition( DL_vector(0, planeLevel, 0) );
+    plane->setPosition( DL_vector(0, 0, 0) );
     plane->setRotation( idRotation );
 
     delete sceneObjects[ 0 ];
@@ -63,7 +61,7 @@ namespace SIGEL_Visualisation
 
     grid->setColor( DL_vector( 80.0 / 255, 80.0 / 255, 80.0 / 255 ) );
 
-    grid->setPosition( DL_vector(0, planeLevel, 0) );
+    grid->setPosition( DL_vector(0, 0, 0) );
     grid->setRotation( idRotation );
     grid->setVisible( false );
 

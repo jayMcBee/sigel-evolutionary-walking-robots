@@ -909,7 +909,22 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-30 — DONE: ITEM 64, BATCH 4a, THE EIGHT DYNAMO SETTINGS.** Start here.
+**2026-09-30 — DONE: ITEM 64, BATCH 4b, FLOOR LEVEL AND FLOOR MATERIAL.** Start here.
+
+- **Changed:** `SIG_Environment` loses `yPlaneLevel` and `floorMaterialName`
+  with their accessors. A load skips `YPLANELEVEL` and `FLOORMATERIALNAME`; a
+  save writes them as 0 and "floor". `SIG_EnvironmentRenderer` draws the
+  floor and grid at 0. All 7 shipped experiments hold level 0, so only the
+  material line differs on a resave.
+- **Baselines:** the `.env` export hash and pagesave's material lines
+  ("metal" to "floor"), and the v2 expstruct hash ("plastic" to "floor" in
+  SHAPE). Each proven by putting the old name back.
+- **Review:** no defect. Two old -Wreorder warnings went.
+- **Gates:** `check.sh` 754 pass, 0 fail; warnings 387. Fitness, dictorder and
+  PVM unchanged.
+- **Next:** batch 5, `libdynalib` replaced by two local headers.
+
+**2026-09-30 — DONE: ITEM 64, BATCH 4a, THE EIGHT DYNAMO SETTINGS.**
 
 - **Changed:** `SIG_SimulationParameters` loses `maximalError`,
   `maximalIterations`, `skipFrames`, `analytical`, `maximalCollisionLoops`,

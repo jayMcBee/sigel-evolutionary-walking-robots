@@ -34,14 +34,12 @@ namespace SIGEL_Environment {
 
   SIG_Environment::SIG_Environment()
     : gravity(0,-9.81,0),
-    yPlaneLevel(0),
     veloDamping(0.995),
     startPosition(0,1,0),
     floorDimensionX(50),
     floorDimensionZ(50),
     floorFunction("0"),
     floorFuncSelected(true),
-    floorMaterialName("floor"),
     withTexture(false),
     texAlpha(0xFF),
     groundPlanarSpringConstant(5500),
@@ -55,20 +53,18 @@ namespace SIGEL_Environment {
 		loadDynaMechsEnvironment();
   };
 
-  SIG_Environment::SIG_Environment(DL_vector newGravity, double newYPlaneLevel, 
+  SIG_Environment::SIG_Environment(DL_vector newGravity, 
 				   double newVeloDamping, DL_vector newStartPosition, 
-				   QString newFloorMaterialName, double newGroundPlanarSpringConstant, 
+				   double newGroundPlanarSpringConstant, 
 				   double newGroundNormalSpringConstant, double newGroundPlanarDamperConstant, 
 				   double newGroundNormalDamperConstant, double newFrictionCoeff_u_s, 
 				   double newFrictionCoeff_u_k)
     : gravity(newGravity),
-      yPlaneLevel(newYPlaneLevel),
       veloDamping(newVeloDamping),
       startPosition(newStartPosition),
       floorFuncSelected(true),
       withTexture(false),
       texAlpha(0xFF),
-      floorMaterialName(newFloorMaterialName),
       groundPlanarSpringConstant(newGroundPlanarSpringConstant),
       groundNormalSpringConstant(newGroundNormalSpringConstant),
       groundPlanarDamperConstant(newGroundPlanarDamperConstant),
@@ -85,11 +81,6 @@ namespace SIGEL_Environment {
     QString s;
     while (!file.atEnd()) {
       s=file.readLine();
-
-      if ( s == "YPLANELEVEL") {
-      	s=file.readLine();
-      	yPlaneLevel=s.toDouble();
-      }
 
   		if (s == "VELODAMPING") {
       	s=file.readLine();
@@ -150,7 +141,6 @@ namespace SIGEL_Environment {
   			else withTexture = true;
   		}
   		
-  		if (s == "FLOORMATERIALNAME") floorMaterialName=file.readLine();
 
     	if (s == "AUTOSAVETIME") {
   			s = file.readLine();
@@ -198,8 +188,9 @@ namespace SIGEL_Environment {
 
   void SIG_Environment::writeToFile(QTextStream& file)
   {
+    // Nothing reads YPLANELEVEL or FLOORMATERIALNAME; fixed values keep the file format.
     file << "YPLANELEVEL\n";
-    file << yPlaneLevel << "\n";
+    file << 0 << "\n";
     file << "VELODAMPING\n";
     file << veloDamping << "\n";
     file << "GRAVITY\n";
@@ -226,7 +217,7 @@ namespace SIGEL_Environment {
 		file << "WITHTEXTURE" << Qt::endl;
 		file << withTexture << Qt::endl;
     file << "FLOORMATERIALNAME\n";
-    file << floorMaterialName << "\n";
+    file << "floor\n";
     file << "AUTOSAVETIME\n";
     file << autosave << "\n";
 
@@ -250,14 +241,6 @@ namespace SIGEL_Environment {
   DL_vector SIG_Environment::getGravity() const
   {
     return gravity;
-  };
-  void SIG_Environment::setYPlaneLevel(double newYPlaneLevel)
-  {
-    yPlaneLevel=newYPlaneLevel;
-  };
-  double SIG_Environment::getYPlaneLevel() const
-  {
-    return yPlaneLevel;
   };
   void SIG_Environment::setVeloDamping(double newVeloDamping)
   {
@@ -300,16 +283,6 @@ namespace SIGEL_Environment {
   QString SIG_Environment::getFloorFunction() const
   {
     return floorFunction;
-  };
-
-  void SIG_Environment::setFloorMaterialName(QString newFloorMaterialName)
-  {
-    floorMaterialName=newFloorMaterialName;
-  };
-
-  QString SIG_Environment::getFloorMaterialName() const
-  {
-    return floorMaterialName;
   };
 
   void SIG_Environment::setGroundPlanarSpringConstant(double newGroundPlanarSpringConstant) 

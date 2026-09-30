@@ -894,7 +894,7 @@ history growth 0->1  100 blocks +1
 history growth 1->2  100 blocks +1
 names stable         yes 100 NAME='10443' NAME='10194'
 hammer robot block   identical in all three 70 lines dde685bd78c14a9d
-expstruct ham1==ham2 yes 108 lines 51c948661a826da6
+expstruct ham1==ham2 yes 108 lines 6d41aac125bbef95
 -- first-save keys, ham0
 FLOORDIMENSION     x0
 FLOORFUNCTION      x0

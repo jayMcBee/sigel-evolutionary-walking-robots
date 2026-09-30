@@ -1043,7 +1043,7 @@ selected=17013
   [modal] class=QFileDialog title=[Export Environment]
   [dialog] title=[Export Environment] filters=[Environment Files (*.env) ;; All Files (*)] accept=[&Save]
   [dialog] parentIsTheMainWindow=1
-  bytes=299 sha256=383d1f4f142ff26bff698d9a62e73a441154d8d0329bc36b1ae560935b1f73b1 newlines=43 endsWithNewline=1
+  bytes=299 sha256=d1368f209d8f02e25d0c8d9fd72bbcaac3497ea072d115074d7a881c0c50cdbd newlines=43 endsWithNewline=1
   crCount=0
   head0  [YPLANELEVEL]
   head1  [0]
@@ -1933,8 +1933,8 @@ Do you want to replace it?]
   mutated lineeditGravityX -> [3.5]
   [modal] class=QFileDialog title=[Import Environment]
   [modal] class=QFileDialog title=[Export Environment]
-  export1 299 bytes  383d1f4f142ff26bff698d9a62e73a441154d8d0329bc36b1ae560935b1f73b1
-  export2 299 bytes  383d1f4f142ff26bff698d9a62e73a441154d8d0329bc36b1ae560935b1f73b1
+  export1 299 bytes  d1368f209d8f02e25d0c8d9fd72bbcaac3497ea072d115074d7a881c0c50cdbd
+  export2 299 bytes  d1368f209d8f02e25d0c8d9fd72bbcaac3497ea072d115074d7a881c0c50cdbd
   ROUND TRIP STABLE (and the import undid the change)
 
 -- Population...
