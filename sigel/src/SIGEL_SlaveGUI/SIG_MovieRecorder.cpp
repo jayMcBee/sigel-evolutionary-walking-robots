@@ -74,7 +74,7 @@ namespace SIGEL_SlaveGUI
     return framePosition( simulationSeconds ) >= nextFrame;
   };
 
-  bool SIG_MovieRecorder::writeImage( QImage const &view, double simulationSeconds, double robotCentreHeight )
+  bool SIG_MovieRecorder::writeImage( QImage const &view, double simulationSeconds, double startDistance, double robotCentreHeight )
   {
     startFrame( simulationSeconds );
 
@@ -108,7 +108,7 @@ namespace SIGEL_SlaveGUI
       }
 
     painter.begin( &frame );
-    paintOverlayLabels( painter, simulationSeconds, robotCentreHeight );
+    paintOverlayLabels( painter, simulationSeconds, startDistance, robotCentreHeight );
     painter.end();
 
     return frame.save( lastFileName,
@@ -116,7 +116,7 @@ namespace SIGEL_SlaveGUI
 		       settings.quality );
   };
 
-  void SIG_MovieRecorder::paintOverlayLabels( QPainter &painter, double simulationSeconds, double robotCentreHeight ) const
+  void SIG_MovieRecorder::paintOverlayLabels( QPainter &painter, double simulationSeconds, double startDistance, double robotCentreHeight ) const
   {
     QStringList labels;
     QStringList values;
@@ -125,6 +125,12 @@ namespace SIGEL_SlaveGUI
       {
 	labels << "Simulated time:";
 	values << QString::number( simulationSeconds, 'f', 2 ) + " s";
+      }
+
+    if ( settings.showOverlayStartDistance )
+      {
+	labels << "Distance from start:";
+	values << QString::number( startDistance, 'f', 3 ) + " m";
       }
 
     if ( settings.showOverlayRobotHeight )

@@ -46,6 +46,16 @@
                   </widget>
                 </item>
                 <item>
+                  <widget class="QCheckBox" name="checkboxOverlayStartDistance">
+                    <property name="text">
+                      <string>Distance from start</string>
+                    </property>
+                    <property name="toolTip">
+                      <string>Writes the straight-line distance of the robot centre from its place at the start of the simulation into each saved frame. The view on screen does not change.</string>
+                    </property>
+                  </widget>
+                </item>
+                <item>
                   <widget class="QCheckBox" name="checkboxOverlayRobotHeight">
                     <property name="text">
                       <string>Height of robot centre</string>

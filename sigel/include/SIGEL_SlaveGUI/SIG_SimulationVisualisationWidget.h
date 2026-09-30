@@ -253,6 +253,11 @@
        */
       SIGEL_Program::SIG_Program const *program;
 
+      /**
+       * The robot centre at the start of the simulation.
+       */
+      SIG_Vector startRobotCentre;
+
     private slots:
 
       /**

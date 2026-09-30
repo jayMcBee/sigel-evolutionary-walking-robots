@@ -66,7 +66,7 @@ namespace SIGEL_SlaveGUI
     // Saves the view centred in a frame of the movie size, never scaled,
     // with the overlay labels the settings select. Once per second of movie,
     // it also saves a thumbnail without labels if the settings ask for one.
-    bool writeImage( QImage const &view, double simulationSeconds, double robotCentreHeight );
+    bool writeImage( QImage const &view, double simulationSeconds, double startDistance, double robotCentreHeight );
 
     // Writes the frame as a POV-Ray scene file.
     bool writePovray( SIGEL_Visualisation::SIG_SimulationVisualisation &visualisation, double simulationSeconds );
@@ -94,7 +94,7 @@ namespace SIGEL_SlaveGUI
 
     void makeDirectory() const;
 
-    void paintOverlayLabels( QPainter &painter, double simulationSeconds, double robotCentreHeight ) const;
+    void paintOverlayLabels( QPainter &painter, double simulationSeconds, double startDistance, double robotCentreHeight ) const;
 
     // The frame timing's position at simulationSeconds, in frames.
     double framePosition( double simulationSeconds ) const;

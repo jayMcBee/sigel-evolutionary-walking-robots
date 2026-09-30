@@ -55,7 +55,8 @@
       robot(nullptr),
       environment(nullptr),
       simulationParameters(nullptr),
-      program(nullptr)
+      program(nullptr),
+      startRobotCentre( 0.0, 0.0, 0.0 )
   {
     simulationTimer = new QTimer( this );
     simulationTimer->setObjectName( "simulationTimer" );
@@ -257,7 +258,13 @@
 		if ( movieRecorder.getSettings().format == "pov" )
 			written = movieRecorder.writePovray( simulationVisualisation, seconds );
 		else
-			written = movieRecorder.writeImage( grabFramebuffer(), seconds, simulationVisualisation.getRobotCentre().get( 1 ) );
+		{
+			SIG_Vector robotCentre = simulationVisualisation.getRobotCentre();
+			SIG_Vector fromStart = robotCentre;
+			fromStart.minusis( &startRobotCentre );
+
+			written = movieRecorder.writeImage( grabFramebuffer(), seconds, fromStart.norm(), robotCentre.get( 1 ) );
+		}
 
 		if ( !written )
 		{
@@ -300,6 +307,7 @@
 
     simulationVisualisation.setPlaneColor( planeColor );
     simulationVisualisation.setGridColor( gridColor );
+    startRobotCentre = simulationVisualisation.getRobotCentre();
 
     emit signalSimulationProgress( 0.0 );
 

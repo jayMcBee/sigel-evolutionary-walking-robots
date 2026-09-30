@@ -49,6 +49,8 @@ namespace SIGEL_SlaveGUI
 
     bool showOverlaySimulationTime = false;
 
+    bool showOverlayStartDistance = false;
+
     bool showOverlayRobotHeight = false;
 
     bool saveThumbnails = false;

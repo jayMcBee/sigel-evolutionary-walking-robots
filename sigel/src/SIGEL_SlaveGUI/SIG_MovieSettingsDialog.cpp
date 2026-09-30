@@ -86,6 +86,7 @@ void SIG_MovieSettingsDialog::setSettings( SIG_MovieSettings const &settings )
   spinboxQuality->setValue( settings.quality );
   checkboxUseLeadingZeros->setChecked( settings.useLeadingZeros );
   checkboxOverlaySimulationTime->setChecked( settings.showOverlaySimulationTime );
+  checkboxOverlayStartDistance->setChecked( settings.showOverlayStartDistance );
   checkboxOverlayRobotHeight->setChecked( settings.showOverlayRobotHeight );
   checkboxSaveThumbnails->setChecked( settings.saveThumbnails );
 };
@@ -105,6 +106,7 @@ SIG_MovieSettings SIG_MovieSettingsDialog::settings() const
   settings.quality = spinboxQuality->value();
   settings.useLeadingZeros = checkboxUseLeadingZeros->isChecked();
   settings.showOverlaySimulationTime = checkboxOverlaySimulationTime->isChecked();
+  settings.showOverlayStartDistance = checkboxOverlayStartDistance->isChecked();
   settings.showOverlayRobotHeight = checkboxOverlayRobotHeight->isChecked();
   settings.saveThumbnails = checkboxSaveThumbnails->isChecked();
   return settings;
