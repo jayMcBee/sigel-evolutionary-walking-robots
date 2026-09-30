@@ -11,9 +11,6 @@
 #
 # Vendored headers use -isystem, so their warnings do not hide SIGEL's own.
 # The warning count on the total line is part of the result; read it.
-#
-# -DMINMAX_H empties vendored Dynamo's minmax.h, which defines min/max as
-# macros and breaks libstdc++. No SIGEL code calls unqualified min/max.
 set -e
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
 # ROOT comes from the script's path, so check it: run through a symlink or a
@@ -32,7 +29,7 @@ APP=$ROOT/sigelApp
 SL=$ROOT/downloads/supportingLibs
 QTINC=$(qmake6 -query QT_INSTALL_HEADERS)
 
-FLAGS="-fsyntax-only -std=c++17 -Wall -Wextra -DMINMAX_H"
+FLAGS="-fsyntax-only -std=c++17 -Wall -Wextra"
 # The include paths match the Makefile's. A path missing here makes a file
 # fail that the real build compiles.
 INCS="-I$ROOT/shim -I$SRC/include -isystem $QTINC -isystem $QTINC/QtCore"

@@ -909,7 +909,19 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-30 — DONE: ITEM 64, BATCH 5, THE RENAME.** Start here.
+**2026-09-30 — DONE: ITEM 64, BATCH 5, `-DMINMAX_H` GOES.** Start here.
+
+- **Changed:** the flag is gone from the `Makefile`'s `VCXX` and `SIGCXX` and
+  from `check.sh`. Only Dynamo's `minmax.h` used it.
+- **Proof:** a rebuild from scratch gives identical `.text` for `sigel`,
+  `sigel_slave` and `sigel_eval`.
+- **Also done since the rename:** `SIG_Mirtich::computePhysics`' parameter
+  `masse` is `mass`; the `SIG_DynaMechsLink` constructor is re-indented.
+- **Gates:** `check.sh` 758 pass, 0 fail; warnings 387. Fitness, dictorder and
+  PVM unchanged.
+- **Next:** the docs, closing item 64, and the Dynamo folder on disk.
+
+**2026-09-30 — DONE: ITEM 64, BATCH 5, THE RENAME.**
 
 - **Changed:** `DL_vector` and `DL_matrix` are `SIG_Vector` and
   `SIG_Matrix`, in `SIGEL_Tools/SIG_Vector.h` and `SIG_Matrix.h`, still

@@ -77,7 +77,7 @@ SAN  := -fsanitize=address,undefined -fno-omit-frame-pointer \
 else
 SAN  :=
 endif
-VCXX := g++ -std=c++17 -O1 -g -w -fpermissive -DMINMAX_H $(SAN)
+VCXX := g++ -std=c++17 -O1 -g -w -fpermissive $(SAN)
 VCC  := gcc -std=gnu17 -O1 -g -w $(SAN)
 
 STAMP := $(SL)/.sigel-patched
@@ -277,7 +277,7 @@ SIGINC := -Ishim -I$(SRC)/include -I$(B)/ui -isystem $(QTINC) \
 # relocations for Qt data such as QCoreApplication::self, and QApplication's
 # constructor crashes in QGuiApplication::screenAdded.
 SIGCXX := g++ -std=c++17 -O1 -g -fPIC -Wall -Wextra -Wold-style-cast \
-              -DMINMAX_H $(SIGSAN)
+              $(SIGSAN)
 
 CORE := SIGEL_Tools SIGEL_Environment MT_GPSystem SIGEL_Robot SIGEL_Program \
         SIGEL_RobotIO SIGEL_Simulation MT_Control SIGEL_GP
