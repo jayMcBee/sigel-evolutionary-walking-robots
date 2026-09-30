@@ -27,7 +27,12 @@
 #include "SIGEL_Tools/SIG_IO.h"
 
 #include <QDir>
+#include <QFontDatabase>
+#include <QFontMetricsF>
 #include <QPainter>
+#include <QPainterPath>
+#include <QPen>
+#include <QStringList>
 
 #include <cmath>
 
@@ -69,7 +74,7 @@ namespace SIGEL_SlaveGUI
     return framePosition( simulationSeconds ) >= nextFrame;
   };
 
-  bool SIG_MovieRecorder::writeImage( QImage const &view, double simulationSeconds )
+  bool SIG_MovieRecorder::writeImage( QImage const &view, double simulationSeconds, double robotCentreHeight )
   {
     startFrame( simulationSeconds );
 
@@ -87,11 +92,68 @@ namespace SIGEL_SlaveGUI
     painter.drawImage( (settings.width - image.width()) / 2,
 		       (settings.height - image.height()) / 2,
 		       image );
+    paintOverlayLabels( painter, simulationSeconds, robotCentreHeight );
     painter.end();
 
     return frame.save( lastFileName,
 		       settings.format.toUpper().toUtf8().constData(),
 		       settings.quality );
+  };
+
+  void SIG_MovieRecorder::paintOverlayLabels( QPainter &painter, double simulationSeconds, double robotCentreHeight ) const
+  {
+    QStringList labels;
+    QStringList values;
+
+    if ( settings.showOverlaySimulationTime )
+      {
+	labels << "Simulated time:";
+	values << QString::number( simulationSeconds, 'f', 2 ) + " s";
+      }
+
+    if ( settings.showOverlayRobotHeight )
+      {
+	labels << "Centre height:";
+	values << QString::number( robotCentreHeight, 'f', 3 ) + " m";
+      }
+
+    if ( labels.isEmpty() )
+      return;
+
+    QFont font( "Noto Sans" );
+    font.setWeight( QFont::Bold );
+
+    // Ubuntu Sans comes with every Ubuntu desktop; its SemiBold matches Noto Sans Bold best.
+    if ( !QFontDatabase::hasFamily( "Noto Sans" ) )
+      {
+	font.setFamily( "Ubuntu Sans" );
+	font.setWeight( QFont::DemiBold );
+      }
+
+    double fontSize = settings.height * overlayFontHeight;
+    font.setPixelSize( qMax( 1, qRound( fontSize ) ) );
+
+    QFontMetricsF metrics( font );
+    double labelWidth = 0.0;
+    for ( QString const &label : labels )
+      labelWidth = qMax( labelWidth, metrics.horizontalAdvance( label ) );
+
+    double margin = fontSize * overlayMargin;
+    double valueX = margin + labelWidth + fontSize * overlayValueGap;
+
+    QPainterPath path;
+    for ( int line = 0; line < labels.size(); line++ )
+      {
+	double baseline = margin + fontSize + line * fontSize * overlayLineStep;
+	path.addText( margin, baseline, font, labels[line] );
+	path.addText( valueX, baseline, font, values[line] );
+      }
+
+    // The pen is centred on the glyph edges, and the fill covers its inner half.
+    painter.setRenderHint( QPainter::Antialiasing );
+    painter.strokePath( path, QPen( QColor::fromRgb( overlayOutlineColor ), 2.0 * fontSize * overlayOutlineWidth,
+				    Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin ) );
+    painter.fillPath( path, QColor::fromRgb( overlayTextColor ) );
   };
 
   bool SIG_MovieRecorder::writePovray( SIGEL_Visualisation::SIG_SimulationVisualisation &visualisation, double simulationSeconds )

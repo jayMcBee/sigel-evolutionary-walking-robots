@@ -257,7 +257,7 @@
 		if ( movieRecorder.getSettings().format == "pov" )
 			written = movieRecorder.writePovray( simulationVisualisation, seconds );
 		else
-			written = movieRecorder.writeImage( grabFramebuffer(), seconds );
+			written = movieRecorder.writeImage( grabFramebuffer(), seconds, simulationVisualisation.getRobotCentre().get( 1 ) );
 
 		if ( !written )
 		{

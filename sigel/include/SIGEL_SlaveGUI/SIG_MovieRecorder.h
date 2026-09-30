@@ -25,8 +25,11 @@
 #define SIGEL_SLAVEGUI_SIG_MOVIERECORDER_H
 
 #include "SIGEL_SlaveGUI/SIG_MovieSettings.h"
+#include <QColor>
 #include <QImage>
 #include <QString>
+
+class QPainter;
 
 namespace SIGEL_Visualisation
 {
@@ -60,8 +63,9 @@ namespace SIGEL_SlaveGUI
     // True if a frame is due at simulationSeconds.
     bool needsToRecordFrameAt( double simulationSeconds ) const;
 
-    // Saves the view centred in a frame of the movie size, never scaled.
-    bool writeImage( QImage const &view, double simulationSeconds );
+    // Saves the view centred in a frame of the movie size, never scaled,
+    // with the overlay labels the settings select.
+    bool writeImage( QImage const &view, double simulationSeconds, double robotCentreHeight );
 
     // Writes the frame as a POV-Ray scene file.
     bool writePovray( SIGEL_Visualisation::SIG_SimulationVisualisation &visualisation, double simulationSeconds );
@@ -86,8 +90,29 @@ namespace SIGEL_SlaveGUI
 
     void makeDirectory() const;
 
+    void paintOverlayLabels( QPainter &painter, double simulationSeconds, double robotCentreHeight ) const;
+
     // The frame timing's position at simulationSeconds, in frames.
     double framePosition( double simulationSeconds ) const;
+
+    // The label font size, as a fraction of the frame height.
+    static constexpr double overlayFontHeight = 20.0 / 720.0;
+
+    // The step from one label line to the next, in font sizes.
+    static constexpr double overlayLineStep = 31.0 / 22.0;
+
+    // The distance of the labels from the frame's top and left edges, in font sizes.
+    static constexpr double overlayMargin = 16.0 / 22.0;
+
+    // The space between the widest label and the values, in font sizes.
+    static constexpr double overlayValueGap = 0.5;
+
+    // The width of the outline around the text, in font sizes.
+    static constexpr double overlayOutlineWidth = 1.0 / 20.0;
+
+    static constexpr QRgb overlayTextColor = 0xE8E8E8;
+
+    static constexpr QRgb overlayOutlineColor = 0x404040;
 
     SIG_MovieSettings settings;
 
