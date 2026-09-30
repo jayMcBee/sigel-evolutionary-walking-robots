@@ -337,19 +337,6 @@ namespace SIGEL_GP
   SIG_GPParameter();
 
  /**
- * The constructor for the parameter.
- * @pre
- * The gpmanager or the experiment is initialized and needs an parameter.
- * @post
- * The parameter is created.
- * @param parameter
- * The gpparameter as a QString for the initialization of the SIG_GPParameter
- * object.
- */
- public:
-  SIG_GPParameter(QString parameter);
-
- /**
   *The destructor for a parameter.
   * @pre
   * none

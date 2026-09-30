@@ -55,9 +55,6 @@ SIGEL_GP::SIG_GPParameter::SIG_GPParameter()
   instructionProb.fill( 1000 );
 };
 
-SIGEL_GP::SIG_GPParameter::SIG_GPParameter(QString parameter)
-{ };
-
 SIGEL_GP::SIG_GPParameter::~SIG_GPParameter()
 {
   // This class owns the hosts in hostList.
