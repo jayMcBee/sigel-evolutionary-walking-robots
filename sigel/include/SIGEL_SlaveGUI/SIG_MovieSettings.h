@@ -47,6 +47,10 @@ namespace SIGEL_SlaveGUI
 
     bool useLeadingZeros = true;
 
+    bool showOverlaySimulationTime = false;
+
+    bool showOverlayRobotHeight = false;
+
     /**
      * Ends with a slash once set.
      */

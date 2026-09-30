@@ -61,6 +61,7 @@ SIG_MovieSettingsDialog::SIG_MovieSettingsDialog( QWidget *view, double stepSize
 	connect( spinboxFrameRate, SIGNAL( valueChanged(int) ), this, SLOT( slotUpdateFrameTiming() ) );
 	connect( spinboxFrameRate, SIGNAL( valueChanged(int) ), this, SLOT( slotUpdateMovieLength() ) );
 	connect( spinboxMaxFrames, SIGNAL( valueChanged(int) ), this, SLOT( slotUpdateMovieLength() ) );
+	connect( comboboxFormat, SIGNAL( currentIndexChanged(int) ), this, SLOT( slotUpdateOverlayLabels() ) );
 	connect( pushbutton720p, &QPushButton::clicked, this, [this]() { setOutputSize( 1280, 720 ); } );
 	connect( pushbutton1080p, &QPushButton::clicked, this, [this]() { setOutputSize( 1920, 1080 ); } );
 
@@ -70,6 +71,7 @@ SIG_MovieSettingsDialog::SIG_MovieSettingsDialog( QWidget *view, double stepSize
 	slotUpdateSizeLabels();
 	slotUpdateFrameTiming();
 	slotUpdateMovieLength();
+	slotUpdateOverlayLabels();
 };
 
 void SIG_MovieSettingsDialog::setSettings( SIG_MovieSettings const &settings )
@@ -83,6 +85,8 @@ void SIG_MovieSettingsDialog::setSettings( SIG_MovieSettings const &settings )
   comboboxFormat->setCurrentIndex( comboboxFormat->findText( settings.format.toUpper() ) );
   spinboxQuality->setValue( settings.quality );
   checkboxUseLeadingZeros->setChecked( settings.useLeadingZeros );
+  checkboxOverlaySimulationTime->setChecked( settings.showOverlaySimulationTime );
+  checkboxOverlayRobotHeight->setChecked( settings.showOverlayRobotHeight );
 };
 
 SIG_MovieSettings SIG_MovieSettingsDialog::settings() const
@@ -99,6 +103,8 @@ SIG_MovieSettings SIG_MovieSettingsDialog::settings() const
   settings.maxFrames = spinboxMaxFrames->value();
   settings.quality = spinboxQuality->value();
   settings.useLeadingZeros = checkboxUseLeadingZeros->isChecked();
+  settings.showOverlaySimulationTime = checkboxOverlaySimulationTime->isChecked();
+  settings.showOverlayRobotHeight = checkboxOverlayRobotHeight->isChecked();
   return settings;
 };
 
@@ -179,6 +185,12 @@ void SIG_MovieSettingsDialog::slotUpdateMovieLength()
   int seconds = qRound( double( spinboxMaxFrames->value() ) / spinboxFrameRate->value() );
 
   textlabelMovieLength->setText( QString( "(Max. length of %1 min %2 s)" ).arg( seconds / 60 ).arg( seconds % 60 ) );
+};
+
+// A POV frame is a scene file, so no label can be drawn into it.
+void SIG_MovieSettingsDialog::slotUpdateOverlayLabels()
+{
+  groupboxOverlayLabels->setEnabled( comboboxFormat->currentText() != "POV" );
 };
 
 void SIG_MovieSettingsDialog::slotViewSizeToMovie()

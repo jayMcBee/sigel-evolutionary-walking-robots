@@ -51,6 +51,7 @@ private slots:
     void slotResizeViewToMatch();
     void slotUpdateFrameTiming();
     void slotUpdateMovieLength();
+    void slotUpdateOverlayLabels();
 
 private:
     /**
