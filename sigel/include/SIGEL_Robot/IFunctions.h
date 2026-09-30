@@ -23,8 +23,8 @@
 #ifndef SIGEL_ROBOT_IFUNCTIONS
 #define SIGEL_ROBOT_IFUNCTIONS
 
-#include <pointvector.h>
-#include <matrix.h>
+#include "SIGEL_Tools/DL_vector.h"
+#include "SIGEL_Tools/DL_matrix.h"
 #include <qstring.h>
 
 namespace SIGEL_Robot {

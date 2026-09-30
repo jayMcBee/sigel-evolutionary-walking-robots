@@ -24,7 +24,7 @@
 #define SIGEL_ENVIRONMENT_SIG_ENVIRONMENT_H
 
 // DL_vector only.
-#include <pointvector.h>
+#include "SIGEL_Tools/DL_vector.h"
 #include <qtextstream.h>
 #include <qstring.h>
 #include <dmEnvironment.hpp>

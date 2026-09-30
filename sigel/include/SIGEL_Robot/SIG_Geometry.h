@@ -27,8 +27,8 @@ namespace SIGEL_Robot { class SIG_Geometry; }
 
 #include <QList>
 #include <qstring.h>
-#include <pointvector.h>
-#include <matrix.h>
+#include "SIGEL_Tools/DL_vector.h"
+#include "SIGEL_Tools/DL_matrix.h"
 #include "SIGEL_Robot/SIG_Robot.h"
 #include "SIGEL_Robot/SIG_Polygon.h"
 #include "SIGEL_Robot/SIG_GeometryIterator.h"

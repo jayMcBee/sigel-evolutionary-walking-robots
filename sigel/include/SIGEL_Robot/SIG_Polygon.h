@@ -25,8 +25,8 @@
 
 namespace SIGEL_Robot { class SIG_Polygon; }
 
-#include <pointvector.h>
-#include <matrix.h>
+#include "SIGEL_Tools/DL_vector.h"
+#include "SIGEL_Tools/DL_matrix.h"
 #include <qtextstream.h>
 #include "SIGEL_Robot/SIG_Geometry.h"
 

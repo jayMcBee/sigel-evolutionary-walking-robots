@@ -29,8 +29,8 @@
 #include "SIGEL_Visualisation/SIG_SceneObject.h"
 #include "SIGEL_Visualisation/SIG_FloatingText.h"
 
-#include "pointvector.h"
-#include "matrix.h"
+#include "SIGEL_Tools/DL_vector.h"
+#include "SIGEL_Tools/DL_matrix.h"
 #include "GL/gl.h"
 
 namespace SIGEL_Visualisation

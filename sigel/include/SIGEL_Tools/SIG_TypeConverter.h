@@ -23,8 +23,8 @@
 #ifndef SIGEL_TOOLS_SIG_TYPECONVERTER_H
 #define SIGEL_TOOLS_SIG_TYPECONVERTER_H
 
-#include <pointvector.h>
-#include <matrix.h>
+#include "SIGEL_Tools/DL_vector.h"
+#include "SIGEL_Tools/DL_matrix.h"
 #include <newmat.h>
 #include <dm.h>
 

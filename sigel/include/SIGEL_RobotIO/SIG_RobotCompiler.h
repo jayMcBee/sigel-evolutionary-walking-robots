@@ -41,7 +41,7 @@ namespace SIGEL_RobotIO { class SIG_RobotCompiler; }
 #include "SIGEL_Robot/SIG_ContactSensor.h"
 #include "SIGEL_Robot/SIG_Geometry.h"
 #include "SIGEL_RobotIO/SIG_RobotScanner.h"
-#include <pointvector.h>
+#include "SIGEL_Tools/DL_vector.h"
 
 using SIGEL_Robot::SIG_Body;
 using SIGEL_Robot::SIG_Robot;

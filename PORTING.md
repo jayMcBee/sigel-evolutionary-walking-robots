@@ -909,7 +909,21 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-30 — DONE: ITEM 64, BATCH 5, STEP 1: `DL_Scalar` IS `double`.** Start here.
+**2026-09-30 — DONE: ITEM 64, BATCH 5a, THE LIBRARY SWAP.** Start here.
+
+- **Changed:** `libdynalib.a` is gone. Two local headers,
+  `SIGEL_Tools/DL_vector.h` and `DL_matrix.h`, hold only the members SIGEL
+  uses, header-only, same arithmetic in the same order. 25 include lines
+  switched; the unused `NaN.h` include went. The `Makefile` and `check.sh`
+  drop the archive and the Dynamo include path. No Dynamo symbol is linked.
+- **Review:** no defect. Inlining `DL_matrix` could in principle change FMA
+  fusing on aarch64; the fitness gates show it does not.
+- **Gates:** `check.sh` 756 pass, 0 fail (two new headers); warnings 387.
+  Fitness identical on both builds, dictorder and PVM unchanged.
+- **Next:** rename to `SIG_Vector` and `SIG_Matrix`; `computePhysics`' German
+  `masse` parameter; `-DMINMAX_H`; the docs and the Dynamo folder on disk.
+
+**2026-09-30 — DONE: ITEM 64, BATCH 5, STEP 1: `DL_Scalar` IS `double`.**
 
 - **Changed:** the 240 uses of Dynamo's `DL_Scalar` macro in 24 files are
   plain `double`, which is all the macro was.

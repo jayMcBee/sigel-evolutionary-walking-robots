@@ -29,8 +29,8 @@ namespace SIGEL_Robot { class SIG_Body; }
 #include <CyberVRML97.h>
 #include <newmat.h>
 #include <cstdlib>
-#include <pointvector.h>
-#include <matrix.h>
+#include "SIGEL_Tools/DL_vector.h"
+#include "SIGEL_Tools/DL_matrix.h"
 #include "SIGEL_Robot/SIG_Robot.h"
 #include "SIGEL_Robot/SIG_Geometry.h"
 

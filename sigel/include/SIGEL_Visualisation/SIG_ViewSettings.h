@@ -23,7 +23,7 @@
 #ifndef SIGEL_VISUALISATION_SIG_VIEWSETTINGS_H
 #define SIGEL_VISUALISATION_SIG_VIEWSETTINGS_H
 
-#include "pointvector.h"
+#include "SIGEL_Tools/DL_vector.h"
 
 namespace SIGEL_Visualisation
 {

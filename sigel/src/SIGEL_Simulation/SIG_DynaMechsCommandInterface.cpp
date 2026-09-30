@@ -28,7 +28,7 @@
 
 #include <dmRevoluteLink.hpp>
 
-#include <pointvector.h>
+#include "SIGEL_Tools/DL_vector.h"
 #include <cmath>
 
 

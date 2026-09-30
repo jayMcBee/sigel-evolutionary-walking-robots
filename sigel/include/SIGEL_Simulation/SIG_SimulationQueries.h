@@ -25,8 +25,8 @@
 
 #include <QList>
 #include "SIGEL_Simulation/SIG_Register.h"
-#include <pointvector.h>
-#include <matrix.h>
+#include "SIGEL_Tools/DL_vector.h"
+#include "SIGEL_Tools/DL_matrix.h"
 #include <qdatetime.h>
 #include <vector>
 

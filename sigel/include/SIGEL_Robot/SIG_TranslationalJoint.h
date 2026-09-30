@@ -26,7 +26,7 @@
 namespace SIGEL_Robot { class SIG_TranslationalJoint; }
 
 #include <qstring.h>
-#include <pointvector.h>
+#include "SIGEL_Tools/DL_vector.h"
 
 #include "SIGEL_Robot/SIG_Robot.h"
 #include "SIGEL_Robot/SIG_Joint.h"

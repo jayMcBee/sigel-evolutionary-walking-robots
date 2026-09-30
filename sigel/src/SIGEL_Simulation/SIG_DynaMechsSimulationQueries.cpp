@@ -24,8 +24,8 @@
 #include "SIGEL_Simulation/SIG_DynaMechsSimulationQueries.h"
 
 #include <qdatetime.h>
-#include "matrix.h"
-#include "pointvector.h"
+#include "SIGEL_Tools/DL_matrix.h"
+#include "SIGEL_Tools/DL_vector.h"
 #include <cmath>
 #include <limits>
 

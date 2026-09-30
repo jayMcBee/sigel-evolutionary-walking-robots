@@ -23,8 +23,8 @@
 #ifndef SIGEL_VISUALISATION_SIG_SCENEOBJECT_H
 #define SIGEL_VISUALISATION_SIG_SCENEOBJECT_H
 
-#include "pointvector.h"
-#include "matrix.h"
+#include "SIGEL_Tools/DL_vector.h"
+#include "SIGEL_Tools/DL_matrix.h"
 
 namespace SIGEL_Visualisation
 {

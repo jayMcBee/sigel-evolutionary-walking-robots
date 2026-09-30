@@ -33,7 +33,7 @@
 
 #include "SIGEL_MasterGUI/SIG_EnvironmentView.h"
 
-#include "pointvector.h"
+#include "SIGEL_Tools/DL_vector.h"
 
 namespace SIGEL_MasterGUI
 {

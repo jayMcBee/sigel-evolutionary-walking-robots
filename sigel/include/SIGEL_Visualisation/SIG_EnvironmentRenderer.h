@@ -28,7 +28,7 @@
 #include "SIGEL_Visualisation/SIG_ViewSettings.h"
 
 #include <QList>
-#include <pointvector.h>
+#include "SIGEL_Tools/DL_vector.h"
 
 namespace SIGEL_Visualisation
 {
