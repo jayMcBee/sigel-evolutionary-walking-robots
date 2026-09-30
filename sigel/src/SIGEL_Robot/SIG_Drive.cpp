@@ -85,18 +85,18 @@ namespace SIGEL_Robot {
                 return mode;
         }
 
-        void SIG_Drive::setForces(DL_Scalar mn, DL_Scalar mx)
+        void SIG_Drive::setForces(double mn, double mx)
         {
                 minforce = mn;
                 maxforce = mx;
         }
 
-        DL_Scalar SIG_Drive::getMinForce () const
+        double SIG_Drive::getMinForce () const
         {
                 return minforce;
         }
 
-        DL_Scalar SIG_Drive::getMaxForce () const
+        double SIG_Drive::getMaxForce () const
         {
                 return maxforce;
         }

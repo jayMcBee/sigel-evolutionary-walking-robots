@@ -909,7 +909,21 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-30 — DONE: ITEM 64, BATCH 4b, FLOOR LEVEL AND FLOOR MATERIAL.** Start here.
+**2026-09-30 — DONE: ITEM 64, BATCH 5, STEP 1: `DL_Scalar` IS `double`.** Start here.
+
+- **Changed:** the 240 uses of Dynamo's `DL_Scalar` macro in 24 files are
+  plain `double`, which is all the macro was.
+- **Proof:** the machine code is identical. `sigel_slave` and `sigel_eval`
+  are byte-identical without debug information and build ID; `sigel`'s
+  `.text` is identical and its data differs only in the embedded build time.
+  The debug information differs because it records column numbers.
+- **Gates:** `check.sh` 754 pass, 0 fail; warnings 387. Fitness, dictorder and
+  PVM unchanged.
+- **Next, batch 5 in order:** the swap to two local headers, still named
+  `DL_vector` and `DL_matrix`; the rename to `SIG_Vector` and `SIG_Matrix`;
+  dropping `-DMINMAX_H`; the docs and the Dynamo folder on disk.
+
+**2026-09-30 — DONE: ITEM 64, BATCH 4b, FLOOR LEVEL AND FLOOR MATERIAL.**
 
 - **Changed:** `SIG_Environment` loses `yPlaneLevel` and `floorMaterialName`
   with their accessors. A load skips `YPLANELEVEL` and `FLOORMATERIALNAME`; a

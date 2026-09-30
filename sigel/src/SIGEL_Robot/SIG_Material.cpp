@@ -48,7 +48,7 @@ namespace SIGEL_Robot {
                 tx >> frictionCount;
                 for (int i = 0; i < frictionCount; i++) {
                         QString fname;
-                        DL_Scalar fval;
+                        double fval;
                         SIG_Material *fother;
 
                         tx >> fname;
@@ -71,22 +71,22 @@ namespace SIGEL_Robot {
                 return name;
         }
 
-        void SIG_Material::setDensity (DL_Scalar dens)
+        void SIG_Material::setDensity (double dens)
         {
                 density = dens;
         }
 
-        DL_Scalar SIG_Material::getDensity () const
+        double SIG_Material::getDensity () const
         {
                 return density;
         }
 
-        void SIG_Material::setElasticity (DL_Scalar elas)
+        void SIG_Material::setElasticity (double elas)
         {
                 elasticity = elas;
         }
 
-        DL_Scalar SIG_Material::getElasticity () const
+        double SIG_Material::getElasticity () const
         {
                 return elasticity;
         }
@@ -102,7 +102,7 @@ namespace SIGEL_Robot {
         }
 
         void SIG_Material::setFrictionValue (SIG_Material *otherObj,
-                                             DL_Scalar fricval,
+                                             double fricval,
                                              bool negotiate)
         {
                 FrictionValue *found = nullptr;
@@ -124,7 +124,7 @@ namespace SIGEL_Robot {
                         otherObj->setFrictionValue (this, fricval, false);
         }
 
-        DL_Scalar SIG_Material::getFrictionValue (SIG_Material *otherObj) const
+        double SIG_Material::getFrictionValue (SIG_Material *otherObj) const
         {
                 for (const FrictionValue *fv : friction)
                         if (fv->otherSide == otherObj)

@@ -69,7 +69,7 @@ namespace SIGEL_Robot {
 	  return result;
 	};
 
-        DL_matrix rotationMatrix(DL_vector v, DL_Scalar phi)
+        DL_matrix rotationMatrix(DL_vector v, double phi)
 	{
 	  double sinPhi = std::sin( phi / 2 );
 	  double cosPhi = std::cos( phi / 2 );
@@ -303,7 +303,7 @@ namespace SIGEL_Robot {
         {
                 // Make the points coverable.
                 DL_vector r, zw;
-                DL_Scalar h1;
+                double h1;
                 
                 r.assign (&_winportB);
                 r.minusis (&_winportA);
@@ -360,7 +360,7 @@ namespace SIGEL_Robot {
                 schiebung.timesis (verschiebung);
                 _winport_t.plusis (&schiebung);
 
-                DL_Scalar phi = (winkel / 180.0) * M_PI;
+                double phi = (winkel / 180.0) * M_PI;
 
                 DL_matrix drehmatrix;
 

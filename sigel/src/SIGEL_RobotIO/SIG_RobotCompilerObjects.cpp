@@ -47,28 +47,28 @@ namespace SIGEL_RobotIO {
         }
 
         void SIG_RobotCompilerObjects::materialDensity (SIG_Material *material,
-                                                        DL_Scalar density)
+                                                        double density)
         {
                 material->setDensity (density);
         }
 
         void SIG_RobotCompilerObjects::materialFriction (SIG_Material *material,
                                                          QString otherSide,
-                                                         DL_Scalar frictionconst)
+                                                         double frictionconst)
         {
                 // will be done in pass 2
         }
 
         void SIG_RobotCompilerObjects::materialElasticity (SIG_Material *material,
-                                                           DL_Scalar elasconst)
+                                                           double elasconst)
         {
                 material->setElasticity (elasconst);
         }
 
         void SIG_RobotCompilerObjects::materialColour (SIG_Material *material,
-                                                       DL_Scalar red,
-                                                       DL_Scalar green,
-                                                       DL_Scalar blue)
+                                                       double red,
+                                                       double green,
+                                                       double blue)
         {
                 material->setColour (DL_vector (red, green, blue));
         }
@@ -116,9 +116,9 @@ namespace SIGEL_RobotIO {
 
         void SIG_RobotCompilerObjects::linkPoint (SIG_Link *link,
                                                   QString pointname,
-                                                  DL_Scalar x,
-                                                  DL_Scalar y,
-                                                  DL_Scalar z)
+                                                  double x,
+                                                  double y,
+                                                  double z)
         {
                 link->addPoint (pointname, DL_vector (x, y, z));
         }
@@ -153,7 +153,7 @@ namespace SIGEL_RobotIO {
         }
 
         void SIG_RobotCompilerObjects::rjointExtents (SIG_RotationalJoint *rj,
-                                                      DL_Scalar mn, DL_Scalar mx, DL_Scalar ii)
+                                                      double mn, double mx, double ii)
         {
                 rj->setRange (mn, mx, ii);
         }
@@ -182,7 +182,7 @@ namespace SIGEL_RobotIO {
         }
         
         void SIG_RobotCompilerObjects::tjointExtents (SIG_TranslationalJoint *tj,
-                                                      DL_Scalar mn, DL_Scalar mx, DL_Scalar ii)
+                                                      double mn, double mx, double ii)
         {
                 tj->setRange (mn, mx, ii);
         }
@@ -211,13 +211,13 @@ namespace SIGEL_RobotIO {
         }
         
         void SIG_RobotCompilerObjects::cjointRotExtents (SIG_CylindricalJoint *cj,
-                                                         DL_Scalar mn, DL_Scalar mx, DL_Scalar ii)
+                                                         double mn, double mx, double ii)
         {
                 cj->setRotationalRange (mn, mx, ii);
         }
         
         void SIG_RobotCompilerObjects::cjointTraExtents (SIG_CylindricalJoint *cj,
-                                                         DL_Scalar mn, DL_Scalar mx, DL_Scalar ii)
+                                                         double mn, double mx, double ii)
         {
                 cj->setTranslationalRange (mn, mx, ii);
         }
@@ -280,7 +280,7 @@ namespace SIGEL_RobotIO {
         }
 
         void SIG_RobotCompilerObjects::driveMinMaxForce (SIG_Drive *d,
-                                                         DL_Scalar minf, DL_Scalar maxf)
+                                                         double minf, double maxf)
         {
                 d->setForces (minf, maxf);
         }
@@ -363,9 +363,9 @@ namespace SIGEL_RobotIO {
         }
 
         void SIG_RobotCompilerObjects::surfaceNewPoint (SIG_Polygon *p,
-                                                        DL_Scalar x,
-                                                        DL_Scalar y,
-                                                        DL_Scalar z)
+                                                        double x,
+                                                        double y,
+                                                        double z)
         {
                 p->appendVertex (DL_vector (x, y, z));
         }
@@ -379,7 +379,7 @@ namespace SIGEL_RobotIO {
                 b->setGeometry (g);
         }
 
-        void SIG_RobotCompilerObjects::modifierScaleall (DL_Scalar scalingFactor)
+        void SIG_RobotCompilerObjects::modifierScaleall (double scalingFactor)
         {
                 // target->setOverallScalingFactor (scalingFactor);
         }

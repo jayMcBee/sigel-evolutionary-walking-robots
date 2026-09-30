@@ -386,7 +386,7 @@ namespace SIGEL_Robot {
 
         DL_vector SIG_Robot::streamToVector (QTextStream & tx)
         {
-                DL_Scalar x, y, z;
+                double x, y, z;
                 tx >> x >> y >> z;
                 return DL_vector (x, y, z);
         }
@@ -403,7 +403,7 @@ namespace SIGEL_Robot {
                 DL_matrix mat;
                 for (int i = 0; i < 3; i++) {
                         for (int j = 0; j < 3; j++) {
-                                DL_Scalar v;
+                                double v;
                                 tx >> v;
                                 mat.set (i, j, v);
                         }
@@ -412,7 +412,7 @@ namespace SIGEL_Robot {
         }
 
    void SIG_Robot::getRobotInformation(char *outStr, int maxOutLen)
-	{ DL_Scalar link_mass, tot_mass;
+	{ double link_mass, tot_mass;
 	  DL_vector com;
 	  DL_matrix it;
 	  char   hlp_txt[256];

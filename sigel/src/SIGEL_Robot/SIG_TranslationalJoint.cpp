@@ -61,7 +61,7 @@ namespace SIGEL_Robot {
                 rightFix = _winportF;
         }
 
-        void SIG_TranslationalJoint::setRange (DL_Scalar mn, DL_Scalar mx, DL_Scalar ii)
+        void SIG_TranslationalJoint::setRange (double mn, double mx, double ii)
         {
                 minimum = mn;
                 maximum = mx; 
@@ -98,17 +98,17 @@ namespace SIGEL_Robot {
                 return rightFix;
         }
         
-        DL_Scalar SIG_TranslationalJoint::getMin () const
+        double SIG_TranslationalJoint::getMin () const
         {
                 return minimum;
         }
         
-        DL_Scalar SIG_TranslationalJoint::getMax () const
+        double SIG_TranslationalJoint::getMax () const
         {
                 return maximum;
         }
         
-        DL_Scalar SIG_TranslationalJoint::getIni () const
+        double SIG_TranslationalJoint::getIni () const
         {
                 return initial;
         }

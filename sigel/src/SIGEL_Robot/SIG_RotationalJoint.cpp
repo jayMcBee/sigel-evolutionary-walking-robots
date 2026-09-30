@@ -61,7 +61,7 @@ namespace SIGEL_Robot {
                 rightHand = _winportH;
         }
         
-        void SIG_RotationalJoint::setRange (DL_Scalar mn, DL_Scalar mx, DL_Scalar ii)
+        void SIG_RotationalJoint::setRange (double mn, double mx, double ii)
         {
                 minimum = mn;
                 maximum = mx;
@@ -98,17 +98,17 @@ namespace SIGEL_Robot {
                 return rightHand;
         }
         
-        DL_Scalar SIG_RotationalJoint::getMin () const
+        double SIG_RotationalJoint::getMin () const
         {
                 return minimum;
         }
         
-        DL_Scalar SIG_RotationalJoint::getMax () const
+        double SIG_RotationalJoint::getMax () const
         {
                 return maximum;
         }
         
-        DL_Scalar SIG_RotationalJoint::getIni () const
+        double SIG_RotationalJoint::getIni () const
         {
                 return initial;
         }

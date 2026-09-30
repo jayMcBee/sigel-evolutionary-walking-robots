@@ -43,23 +43,23 @@ namespace SIGEL_Robot
   private:
     DL_vector rightBase, leftBase, rightFix;
     DL_vector leftDir, rightDir, leftFix;
-    DL_Scalar minimum, maximum, initial;
+    double minimum, maximum, initial;
   public:
     SIG_TranslationalJoint (SIG_Robot *par, QString n, int nr = -1);
     SIG_TranslationalJoint (SIG_Robot *par, QTextStream & tx);
     virtual JointType getJointType () const;
     void setLeftPoints (DL_vector _winportB, DL_vector _winportD, DL_vector _winportF);
     void setRightPoints (DL_vector _winportB, DL_vector _winportD, DL_vector _winportF);
-    void setRange (DL_Scalar mn, DL_Scalar mx, DL_Scalar ii);
+    void setRange (double mn, double mx, double ii);
     DL_vector getLeftBase () const;
     DL_vector getLeftDir () const;
     DL_vector getLeftFix () const;
     DL_vector getRightBase () const;
     DL_vector getRightDir () const;
     DL_vector getRightFix () const;
-    DL_Scalar getMin () const;
-    DL_Scalar getMax () const;
-    DL_Scalar getIni () const;
+    double getMin () const;
+    double getMax () const;
+    double getIni () const;
 
     virtual void transformPoints (SIG_Link *side,
                                   DL_vector mov, DL_matrix rot);

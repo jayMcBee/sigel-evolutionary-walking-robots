@@ -58,14 +58,14 @@ namespace SIGEL_Robot {
                 rightHand = _winportH;
         }
 
-        void SIG_CylindricalJoint::setRotationalRange (DL_Scalar mn, DL_Scalar mx, DL_Scalar ii)
+        void SIG_CylindricalJoint::setRotationalRange (double mn, double mx, double ii)
         {
                 rotMin = mn;
                 rotMax = mx;
                 rotIni = ii;
         }
 
-        void SIG_CylindricalJoint::setTranslationalRange (DL_Scalar mn, DL_Scalar mx, DL_Scalar ii)
+        void SIG_CylindricalJoint::setTranslationalRange (double mn, double mx, double ii)
         {
                 traMin = mn;
                 traMax = mx;
@@ -78,12 +78,12 @@ namespace SIGEL_Robot {
         DL_vector SIG_CylindricalJoint::getRightBase () const { return rightBase; }
         DL_vector SIG_CylindricalJoint::getRightDir () const { return rightDir; }
         DL_vector SIG_CylindricalJoint::getRightHand () const { return rightHand; }
-        DL_Scalar SIG_CylindricalJoint::getMinRot () const { return rotMin; }
-        DL_Scalar SIG_CylindricalJoint::getMaxRot () const { return rotMax; }
-        DL_Scalar SIG_CylindricalJoint::getIniRot () const { return rotIni;}
-        DL_Scalar SIG_CylindricalJoint::getMinTrans () const { return traMin; }
-        DL_Scalar SIG_CylindricalJoint::getMaxTrans () const { return traMax; }
-        DL_Scalar SIG_CylindricalJoint::getIniTrans () const { return traIni; }
+        double SIG_CylindricalJoint::getMinRot () const { return rotMin; }
+        double SIG_CylindricalJoint::getMaxRot () const { return rotMax; }
+        double SIG_CylindricalJoint::getIniRot () const { return rotIni;}
+        double SIG_CylindricalJoint::getMinTrans () const { return traMin; }
+        double SIG_CylindricalJoint::getMaxTrans () const { return traMax; }
+        double SIG_CylindricalJoint::getIniTrans () const { return traIni; }
 
         void SIG_CylindricalJoint::transformPoints
         (SIG_Link *side, DL_vector mov, DL_matrix rot)

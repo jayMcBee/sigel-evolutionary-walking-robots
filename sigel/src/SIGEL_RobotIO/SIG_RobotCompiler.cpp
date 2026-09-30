@@ -74,7 +74,7 @@ namespace SIGEL_RobotIO {
                 return sym;
         }
 
-        DL_Scalar SIG_RobotCompiler::expectNumber ()
+        double SIG_RobotCompiler::expectNumber ()
         {
                 int st;
                 QString sym;
@@ -160,7 +160,7 @@ namespace SIGEL_RobotIO {
                                                "'density' expected",
                                                "(unknown)",
                                                myScanner.currentLine ());
-                DL_Scalar density = expectNumber ();
+                double density = expectNumber ();
                 expect (RobotSymbol::semicolon);
                 // Insertion point: the material density is known.
                 materialDensity (mater, density);
@@ -170,7 +170,7 @@ namespace SIGEL_RobotIO {
                        (symstr == "friction")) {
                         myScanner.nextSymbol ();
 
-                        DL_Scalar frictionConstant = expectNumber ();
+                        double frictionConstant = expectNumber ();
 
                         symstr = expectWord ();
                         if (symstr != "on")
@@ -192,7 +192,7 @@ namespace SIGEL_RobotIO {
                     (symstr == "elasticity")) {
                         myScanner.nextSymbol ();
 
-                        DL_Scalar elas = expectNumber ();
+                        double elas = expectNumber ();
                         expect (RobotSymbol::semicolon);
 
                         //Insertion point: elasticity constant given
@@ -204,7 +204,7 @@ namespace SIGEL_RobotIO {
                     (symstr == "colour")) {
                         myScanner.nextSymbol ();
 
-                        DL_Scalar red, green, blue;
+                        double red, green, blue;
 
                         if (expectWord () != "red")
                                 throw SIG_SyntaxError
@@ -286,7 +286,7 @@ namespace SIGEL_RobotIO {
                         myScanner.nextSymbol ();
                         
                         QString pointname;
-                        DL_Scalar xval, yval, zval;
+                        double xval, yval, zval;
 
                         pointname = expectWord ();
                         expect (RobotSymbol::equals);
@@ -372,19 +372,19 @@ namespace SIGEL_RobotIO {
                                 throw SIG_SyntaxError (__FILE__, __LINE__,
                                                        "'minimal' expected",
                                                        "(unknown)", myScanner.currentLine ());
-                        DL_Scalar mn = expectNumber ();
+                        double mn = expectNumber ();
                         expect (RobotSymbol::semicolon);
                         if (expectWord () != "maximal")
                                 throw SIG_SyntaxError (__FILE__, __LINE__,
                                                        "'maximal' expected",
                                                        "(unknown)", myScanner.currentLine ());
-                        DL_Scalar mx = expectNumber ();
+                        double mx = expectNumber ();
                         expect (RobotSymbol::semicolon);
                         if (expectWord () != "init")
                                 throw SIG_SyntaxError (__FILE__, __LINE__,
                                                        "'init' expected",
                                                        "(unknown)", myScanner.currentLine ());
-                        DL_Scalar ii = expectNumber ();
+                        double ii = expectNumber ();
                         expect (RobotSymbol::semicolon);
                         rjointExtents (rj, mn, mx, ii);
                         
@@ -427,19 +427,19 @@ namespace SIGEL_RobotIO {
                                 throw SIG_SyntaxError (__FILE__, __LINE__,
                                                        "'minimal' expected",
                                                        "(unknown)", myScanner.currentLine ());
-                        DL_Scalar mn = expectNumber ();
+                        double mn = expectNumber ();
                         expect (RobotSymbol::semicolon);
                         if (expectWord () != "maximal")
                                 throw SIG_SyntaxError (__FILE__, __LINE__,
                                                        "'maximal' expected",
                                                        "(unknown)", myScanner.currentLine ());
-                        DL_Scalar mx = expectNumber ();
+                        double mx = expectNumber ();
                         expect (RobotSymbol::semicolon);
                         if (expectWord () != "init")
                                 throw SIG_SyntaxError (__FILE__, __LINE__,
                                                        "'init' expected",
                                                        "(unknown)", myScanner.currentLine ());
-                        DL_Scalar ii = expectNumber ();
+                        double ii = expectNumber ();
                         expect (RobotSymbol::semicolon);
                         tjointExtents (tj, mn, mx, ii);
                         
@@ -482,19 +482,19 @@ namespace SIGEL_RobotIO {
                                 throw SIG_SyntaxError (__FILE__, __LINE__,
                                                        "'minimal_rot' expected.",
                                                        "(unknown)", myScanner.currentLine ());
-                        DL_Scalar mn = expectNumber ();
+                        double mn = expectNumber ();
                         expect (RobotSymbol::semicolon);
                         if (expectWord () != "maximal_rot")
                                 throw SIG_SyntaxError (__FILE__, __LINE__,
                                                        "'maximal_rot' expected.",
                                                        "(unknown)", myScanner.currentLine ());
-                        DL_Scalar mx = expectNumber ();
+                        double mx = expectNumber ();
                         expect (RobotSymbol::semicolon);
                         if (expectWord () != "init_rot")
                                 throw SIG_SyntaxError (__FILE__, __LINE__,
                                                        "'init_rot' expected.",
                                                        "(unknown)", myScanner.currentLine ());
-                        DL_Scalar ii = expectNumber ();
+                        double ii = expectNumber ();
                         expect (RobotSymbol::semicolon);
                         cjointRotExtents (cj, mn, mx, ii);
 
@@ -591,7 +591,7 @@ namespace SIGEL_RobotIO {
                         throw SIG_SyntaxError (__FILE__, __LINE__,
                                                "'minimalforce' expected",
                                                "(unknown)", myScanner.currentLine ());
-                DL_Scalar mini = expectNumber ();
+                double mini = expectNumber ();
                 expect (RobotSymbol::semicolon);
                 if (expectWord () != "maximalforce")
                         throw SIG_SyntaxError (__FILE__, __LINE__,
@@ -675,11 +675,11 @@ namespace SIGEL_RobotIO {
                         poly = surfaceNewPoly (geom);
 
                         do {
-                                DL_Scalar x = expectNumber ();
+                                double x = expectNumber ();
                                 expect (RobotSymbol::comma);
-                                DL_Scalar y = expectNumber ();
+                                double y = expectNumber ();
                                 expect (RobotSymbol::comma);
-                                DL_Scalar z = expectNumber ();
+                                double z = expectNumber ();
 
                                 surfaceNewPoint (poly, x, y, z);
 
@@ -703,7 +703,7 @@ namespace SIGEL_RobotIO {
 
         void SIG_RobotCompiler::nextModScaleall ()
         {
-                DL_Scalar sf = expectNumber ();
+                double sf = expectNumber ();
                 expect (RobotSymbol::semicolon);
 
                 modifierScaleall (sf);

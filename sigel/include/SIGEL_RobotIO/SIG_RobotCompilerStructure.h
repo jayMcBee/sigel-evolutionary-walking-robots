@@ -40,16 +40,16 @@ namespace SIGEL_RobotIO {
 
                 virtual SIG_Material *materialFind (QString name);
                 virtual void materialDensity (SIG_Material *material,
-                                              DL_Scalar density);
+                                              double density);
                 virtual void materialFriction (SIG_Material *material,
                                                QString otherSide,
-                                               DL_Scalar frictionconst);
+                                               double frictionconst);
                 virtual void materialElasticity (SIG_Material *material,
-                                                 DL_Scalar elasconst);
+                                                 double elasconst);
                 virtual void materialColour (SIG_Material *material,
-                                             DL_Scalar red,
-                                             DL_Scalar green,
-                                             DL_Scalar blue);
+                                             double red,
+                                             double green,
+                                             double blue);
                 virtual void materialFinish (SIG_Material *material);
 
                 virtual SIG_Link *linkFind (QString name);
@@ -60,9 +60,9 @@ namespace SIGEL_RobotIO {
                                            QString material);
                 virtual void linkPoint (SIG_Link *link,
                                         QString pointname,
-                                        DL_Scalar x,
-                                        DL_Scalar y,
-                                        DL_Scalar z);
+                                        double x,
+                                        double y,
+                                        double z);
                 virtual void linkNoCollide (SIG_Link *link,
                                             QString nocollide);
                 virtual void linkFinish (SIG_Link *link);
@@ -72,7 +72,7 @@ namespace SIGEL_RobotIO {
                                             QString Alink, QString AB, QString AD, QString AH,
                                             QString Blink, QString BB, QString BD, QString BH);
                 virtual void rjointExtents (SIG_RotationalJoint *rj,
-                                            DL_Scalar mn, DL_Scalar mx, DL_Scalar ii);
+                                            double mn, double mx, double ii);
                 virtual void rjointFinish (SIG_RotationalJoint *rj);
 
                 virtual SIG_TranslationalJoint *tjointFind (QString name);
@@ -80,7 +80,7 @@ namespace SIGEL_RobotIO {
                                             QString Alink, QString AB, QString AD, QString AF,
                                             QString Blink, QString BB, QString BD, QString BF);
                 virtual void tjointExtents (SIG_TranslationalJoint *tj,
-                                            DL_Scalar mn, DL_Scalar mx, DL_Scalar ii);
+                                            double mn, double mx, double ii);
                 virtual void tjointFinish (SIG_TranslationalJoint *tj);
 
                 virtual SIG_CylindricalJoint *cjointFind (QString name);
@@ -88,9 +88,9 @@ namespace SIGEL_RobotIO {
                                             QString Alink, QString AB, QString AD, QString AH,
                                             QString Blink, QString BB, QString BD, QString BH);
                 virtual void cjointRotExtents (SIG_CylindricalJoint *cj,
-                                               DL_Scalar mn, DL_Scalar mx, DL_Scalar ii);
+                                               double mn, double mx, double ii);
                 virtual void cjointTraExtents (SIG_CylindricalJoint *cj,
-                                               DL_Scalar mn, DL_Scalar mx, DL_Scalar ii);
+                                               double mn, double mx, double ii);
                 virtual void cjointFinish (SIG_CylindricalJoint *cj);
 
                 virtual SIG_GlueJoint *glueFind (QString name);
@@ -102,7 +102,7 @@ namespace SIGEL_RobotIO {
                 virtual SIG_Drive *driveFind (QString name);
                 virtual void driveMode (SIG_Drive *d, QString mode);
                 virtual void driveJoint (SIG_Drive *d, QString jointname);
-                virtual void driveMinMaxForce (SIG_Drive *d, DL_Scalar minf, DL_Scalar maxf);
+                virtual void driveMinMaxForce (SIG_Drive *d, double minf, double maxf);
                 virtual void driveFinish (SIG_Drive *d);
 
                 virtual SIG_JointSensor *jointSensorFind (QString name);
@@ -120,9 +120,9 @@ namespace SIGEL_RobotIO {
                 virtual SIG_Geometry *surfaceFind (QString name) { return nullptr; }
                 virtual SIG_Polygon *surfaceNewPoly (SIG_Geometry *g) { return nullptr; }
                 virtual void surfaceNewPoint (SIG_Polygon *p,
-                                              DL_Scalar x,
-                                              DL_Scalar y,
-                                              DL_Scalar z) {}
+                                              double x,
+                                              double y,
+                                              double z) {}
                 virtual void surfaceFinish (SIG_Geometry *g, QString name) {}
         };
 }

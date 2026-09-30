@@ -94,7 +94,7 @@ namespace SIGEL_Robot
 
       SIG_Geometry const *getGeometry () const;
       SIG_Mirtich const *getMirtich()  { return mirtich; }
-      void getPhysics (DL_Scalar & m,
+      void getPhysics (double & m,
                        DL_vector & com,
                        DL_matrix & it);
       void propagateInitialLocation (SIG_Link *comingfrom);

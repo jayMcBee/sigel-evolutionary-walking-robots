@@ -252,7 +252,7 @@ namespace SIGEL_Robot {
         { }
 
         void SIG_Mirtich::computePhysics (double density,
-                                          DL_Scalar & masse,
+                                          double & masse,
                                           DL_vector & centreOfMass,
                                           DL_matrix & inertiaTensor)
         {

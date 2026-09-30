@@ -31,7 +31,7 @@ namespace SIGEL_Robot {
 
         double tolerantACos( double cosInput );
 
-        DL_matrix rotationMatrix(DL_vector v, DL_Scalar phi);
+        DL_matrix rotationMatrix(DL_vector v, double phi);
 
         void calculateAnyJoint (DL_vector VD, DL_vector VE, DL_vector VF,
                                 DL_vector VA, DL_vector VB, DL_vector VC,

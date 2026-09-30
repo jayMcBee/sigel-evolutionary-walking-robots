@@ -48,7 +48,7 @@ namespace SIGEL_Robot
     int number;
     SIG_Joint *theJoint;
     DriveMode mode;
-    DL_Scalar minforce, maxforce ;
+    double minforce, maxforce ;
   public:
     SIG_Drive (SIG_Robot *par, QString n, int nr = -1);
     SIG_Drive (SIG_Robot *par, QTextStream & tx);
@@ -58,9 +58,9 @@ namespace SIGEL_Robot
     void setMode (DriveMode dm);
     SIG_Joint const *getJoint () const;
     DriveMode getMode () const;
-    void setForces(DL_Scalar mn, DL_Scalar mx);
-    DL_Scalar getMinForce () const;
-    DL_Scalar getMaxForce () const;
+    void setForces(double mn, double mx);
+    double getMinForce () const;
+    double getMaxForce () const;
     void writeToFileTransfer (QTextStream & tx);
   };
 }

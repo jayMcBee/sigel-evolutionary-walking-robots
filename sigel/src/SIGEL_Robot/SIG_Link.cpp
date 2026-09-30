@@ -244,7 +244,7 @@ namespace SIGEL_Robot {
                 return geometry;
         }
 
-        void SIG_Link::getPhysics (DL_Scalar & m,
+        void SIG_Link::getPhysics (double & m,
                                    DL_vector & com,
                                    DL_matrix & it)
         {
@@ -283,7 +283,7 @@ namespace SIGEL_Robot {
                         
                         propagateInitialLocation (comingfrom);
                 } else {
-                        DL_Scalar const ILnull = 0.000001;
+                        double const ILnull = 0.000001;
                         for (int i = 0; i < 3; i++) {
                                 if (fabs (p.get (i) - initialLocation.get (i)) > ILnull)
                                         throw SIG_InitialLocationError

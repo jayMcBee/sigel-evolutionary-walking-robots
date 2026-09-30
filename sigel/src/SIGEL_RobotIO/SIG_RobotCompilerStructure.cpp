@@ -44,14 +44,14 @@ namespace SIGEL_RobotIO {
         }
 
         void SIG_RobotCompilerStructure::materialDensity (SIG_Material *material,
-                                                        DL_Scalar density)
+                                                        double density)
         {
                 // all done in pass 1
         }
 
         void SIG_RobotCompilerStructure::materialFriction (SIG_Material *material,
                                                          QString otherSide,
-                                                         DL_Scalar frictionconst)
+                                                         double frictionconst)
         {
                 SIG_Material *oppo = target->lookupMaterial (otherSide);
                 if (!oppo)
@@ -64,15 +64,15 @@ namespace SIGEL_RobotIO {
         }
 
         void SIG_RobotCompilerStructure::materialElasticity (SIG_Material *material,
-                                                           DL_Scalar elasconst)
+                                                           double elasconst)
         {
                 // all done in pass 1
         }
 
         void SIG_RobotCompilerStructure::materialColour (SIG_Material *material,
-                                                       DL_Scalar red,
-                                                       DL_Scalar green,
-                                                       DL_Scalar blue)
+                                                       double red,
+                                                       double green,
+                                                       double blue)
         {
                 // all done in pass 1
         }
@@ -112,9 +112,9 @@ namespace SIGEL_RobotIO {
         
         void SIG_RobotCompilerStructure::linkPoint (SIG_Link *link,
                                                     QString pointname,
-                                                    DL_Scalar x,
-                                                    DL_Scalar y,
-                                                    DL_Scalar z)
+                                                    double x,
+                                                    double y,
+                                                    double z)
         {
                 // done in ...Objects
         }
@@ -179,7 +179,7 @@ namespace SIGEL_RobotIO {
         }
 
         void SIG_RobotCompilerStructure::rjointExtents (SIG_RotationalJoint *rj,
-                                                      DL_Scalar mn, DL_Scalar mx, DL_Scalar ii)
+                                                      double mn, double mx, double ii)
         {
                 // already done
         }
@@ -231,7 +231,7 @@ namespace SIGEL_RobotIO {
         }
         
         void SIG_RobotCompilerStructure::tjointExtents (SIG_TranslationalJoint *tj,
-                                                      DL_Scalar mn, DL_Scalar mx, DL_Scalar ii)
+                                                      double mn, double mx, double ii)
         {
                 // already done
         }
@@ -282,13 +282,13 @@ namespace SIGEL_RobotIO {
         }
 
         void SIG_RobotCompilerStructure::cjointRotExtents (SIG_CylindricalJoint *cj,
-                               DL_Scalar mn, DL_Scalar mx, DL_Scalar ii)
+                               double mn, double mx, double ii)
         {
                 // already done
         }
 
         void SIG_RobotCompilerStructure::cjointTraExtents (SIG_CylindricalJoint *cj,
-                               DL_Scalar mn, DL_Scalar mx, DL_Scalar ii)
+                               double mn, double mx, double ii)
         {
                 // already done
         }
@@ -362,7 +362,7 @@ namespace SIGEL_RobotIO {
                 d->setJoint (j);
         }
 
-        void SIG_RobotCompilerStructure::driveMinMaxForce (SIG_Drive *d, DL_Scalar minf, DL_Scalar maxf)
+        void SIG_RobotCompilerStructure::driveMinMaxForce (SIG_Drive *d, double minf, double maxf)
         {
                 // already done in pass 1
         }

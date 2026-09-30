@@ -45,12 +45,12 @@ namespace SIGEL_Robot
   private:
           struct FrictionValue {
                   SIG_Material *otherSide;
-                  DL_Scalar value;
+                  double value;
           };
           
           SIG_Robot *parent;
           QString name;
-          DL_Scalar elasticity, density;
+          double elasticity, density;
           QList<FrictionValue *> friction;
           DL_vector colour;
   public:
@@ -78,22 +78,22 @@ namespace SIGEL_Robot
            * According to the SI system, this has to be in
            * kilograms per cubic meter.
            */
-          void setDensity (DL_Scalar dens);
+          void setDensity (double dens);
           /**
            * Returns the density of the material.
            *
            * This value denotes the kilograms per cubic meter.
            */
-          DL_Scalar getDensity () const;
+          double getDensity () const;
           /**
            * Sets the elasticity value from the robot file.
            * Nothing in the simulation reads it.
            */
-          void setElasticity (DL_Scalar elas);
+          void setElasticity (double elas);
           /**
            * Returns the elasticity of the material.
            */
-          DL_Scalar getElasticity () const;
+          double getElasticity () const;
           /**
            * Sets the colour of the material.
            */
@@ -112,7 +112,7 @@ namespace SIGEL_Robot
            *                 material object.
            */
           void setFrictionValue (SIG_Material *otherObj,
-                                 DL_Scalar fricval,
+                                 double fricval,
                                  bool negotiate = true);
           /**
            * Returns the friction constant between this material
@@ -121,7 +121,7 @@ namespace SIGEL_Robot
            * otherObj->getFrictionValue (this) returns the
            * same value.
            */
-          DL_Scalar getFrictionValue (SIG_Material *otherObj) const;
+          double getFrictionValue (SIG_Material *otherObj) const;
           /**
            * Writes the material object into a stream.
            */

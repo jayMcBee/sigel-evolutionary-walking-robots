@@ -66,7 +66,7 @@ namespace SIGEL_Simulation
 
     SIGEL_Robot::SIG_Mirtich inertiaCalculator( geometry, link->getName() );
 
-    DL_Scalar mass;
+    double mass;
     DL_vector centerOfMass;
     DL_matrix inertiaTensor;
 
