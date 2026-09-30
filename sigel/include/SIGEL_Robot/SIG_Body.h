@@ -41,9 +41,7 @@ namespace SIGEL_Robot
          * of a link.
          * 
          * Methods to analize and normalize the geometrical
-         * data, such as calculation of the inertia tensor,
-         * and transformation to the coordinate system that
-         * Dynamo needs.
+         * data, such as calculation of the inertia tensor.
          */
         class SIG_Body {
         private:

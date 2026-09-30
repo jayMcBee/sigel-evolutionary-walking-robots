@@ -33,7 +33,7 @@
 #include "SIGEL_Environment/SIG_Environment.h"
 #include <qstring.h>
 
-/** The Simulation covers the connection to Dynamo and Solid plus an Interpreter.
+/** The Simulation covers the connection to DynaMechs plus an Interpreter.
  *
  * The Simaultion contains several classes to set up and run a simulation of
  * a robot model in a given environment. It also has classes to interprete the

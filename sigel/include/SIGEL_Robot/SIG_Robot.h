@@ -50,7 +50,7 @@ namespace SIGEL_Robot
    *
    * Note that this is a static model. No values will
    * changed during the simulation. Therefore, a copy
-   * consisting of Dynamo lib objects, the dynamic
+   * consisting of DynaMechs objects, the dynamic
    * model, has to be made.
    */
   class SIG_Robot {
@@ -224,9 +224,6 @@ namespace SIGEL_Robot
     /**
      * initiate calculates the initial positions and orientations
      * of the links.
-     *
-     * Afterwards, all constraints that will be
-     * used in Dynamo are solved in advance.
      *
      * WARNING! If there is a link loop within the robot, there
      * may be constraints that are not solved. This depends on the

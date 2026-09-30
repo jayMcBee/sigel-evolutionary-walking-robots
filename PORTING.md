@@ -909,7 +909,20 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-30 — DONE: ITEM 64, BATCH 3b, SIG_SIMULATION'S DYNAMO LEFTOVERS.** Start here.
+**2026-09-30 — DONE: ITEM 64, BATCH 3c, THE COMMENTS.** Start here.
+
+- **Changed:** comments only, in seven headers: `SIG_SimulationParameters.h`
+  (step size), `SIG_Simulation.h`, `SIG_Robot.h`, `SIG_Body.h`,
+  `SIG_Material.h` (elasticity: nothing in the simulation reads it) and the
+  two recorder exceptions, whose copied comments now name their own message
+  prefix. Only the eight Dynamo settings' comments still name Dynamo; they go
+  with batch 4.
+- **Gates:** `check.sh` 754 pass, 0 fail; warnings 402. Fitness, dictorder and
+  PVM unchanged.
+- **Next:** batch 4, the `.exp` values: ignored on load, written with a fixed
+  value.
+
+**2026-09-30 — DONE: ITEM 64, BATCH 3b, SIG_SIMULATION'S DYNAMO LEFTOVERS.**
 
 - **Changed:** `SIG_Simulation` loses `slotDynamoMessage`, `stopSimulation`,
   the unreachable throw of `SIG_SimulationCannotSolveException` and the catch

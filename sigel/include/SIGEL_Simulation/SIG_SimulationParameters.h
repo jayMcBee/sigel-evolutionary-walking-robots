@@ -81,7 +81,7 @@ namespace SIGEL_Simulation
        * The SIG_SimulationParameter object is instantiated in the
        * constructor of the SIG_Simulation object.
        * @param timeToSimulate Specifies the amount of model time to simulate.
-       * @param stepSize The step size that dynamo has to use for the simulation.
+       * @param stepSize The step size that the simulation has to use.
        * @param maximalError The value of the maximal error to be allowed by dynamo.
        * @param maximalIterations The maximal Iterations of the constraints manager.
        * @param maximalCollisionLoops The maximal number of collision loops used by the constraints manager.
@@ -129,8 +129,8 @@ namespace SIGEL_Simulation
       void setStepSize(double newStepSize);
 
       /**
-       * Returns the step size that that dynamo uses in this simulation run.
-       * @return The step size that that dynamo uses in this simulation run.
+       * Returns the step size that the simulation uses.
+       * @return The step size that the simulation uses.
        */
       double getStepSize() const;
 
@@ -286,7 +286,7 @@ namespace SIGEL_Simulation
       QTime timeToSimulate;
 
       /**
-       * The step size that is used by dynamo for the simulation.
+       * The step size that is used for the simulation.
        */
       double stepSize;
 

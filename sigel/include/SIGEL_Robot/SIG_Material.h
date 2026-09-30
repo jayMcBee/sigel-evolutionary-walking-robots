@@ -86,18 +86,12 @@ namespace SIGEL_Robot
            */
           DL_Scalar getDensity () const;
           /**
-           * Sets the elasticity value that the corresponding
-           * dyna objects should have.
-           *
-           * Please refer to the Dynamo manuals for the
-           * interpretation of this value.
+           * Sets the elasticity value from the robot file.
+           * Nothing in the simulation reads it.
            */
           void setElasticity (DL_Scalar elas);
           /**
            * Returns the elasticity of the material.
-           *
-           * Please refer to the Dynamo manuals for the
-           * interpretation of this value.
            */
           DL_Scalar getElasticity () const;
           /**

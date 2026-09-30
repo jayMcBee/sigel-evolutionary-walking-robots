@@ -38,7 +38,7 @@ namespace SIGEL_Simulation
       /**
        * Calls the superclasses SIG_Exception constructor with
        * this parameter list and prepends
-       * "SimulationCannotSolveException: " to the message.
+       * "RecorderBadRecordingOrderException: " to the message.
        */
       SIG_RecorderBadRecordingOrderException(QString fileName,
 					     int line,
@@ -47,7 +47,7 @@ namespace SIGEL_Simulation
       /**
        * Calls the superclasses SIG_Exception constructor with
        * this parameter list and prepends
-       * "SimulationCannotSolveException: " to the message.
+       * "RecorderBadRecordingOrderException: " to the message.
        */
       SIG_RecorderBadRecordingOrderException(QString fileName,
 					     int line,
