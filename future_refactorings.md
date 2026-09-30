@@ -358,7 +358,7 @@ touched, because changing one changes behaviour against the reference binary.
   `auto`. Commented-out code and porting comments hide the logic of the
   methods they sit in.
   The model class of the same name, `SIGEL_GP::SIG_GPParameter`, was reviewed
-  first. Still open there: `maxFitness`, which nothing uses; `maxAge`, which
+  first. Still open there: `maxAge`, which
   the page shows and the file stores but nothing reads; `saveExit`, which has
   no interface, with item 128.
 

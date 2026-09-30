@@ -279,9 +279,6 @@ namespace SIGEL_GP
   private:
   priorityLevel priority;
   
-  private:
-  double maxFitness;
-
   /**
    * Probability of the instructions (ADD,...) to be created or to be chosen for variation: The 
    * probabilities are given as an integer value that defines the relative probability of this 
@@ -773,12 +770,6 @@ namespace SIGEL_GP
  public:
   void writeToFile(QTextStream & file);
   
-  public:
-  double getMaxFitness() const;
-  
-  public:
-  void setMaxFitness(double maxfit);
-
   public:
   QString getFitnessName() const;
 

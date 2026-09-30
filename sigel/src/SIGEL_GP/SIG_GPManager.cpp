@@ -596,11 +596,6 @@ void SIGEL_GP::SIG_GPManager::stopIfNecessary(bool generationBreak) {
 bool SIGEL_GP::SIG_GPManager::checkTerminationConditions(bool generationBreak) {
   bool exitIsPermitted = (!currentExperiment.gpParameter.getSaveExit() || generationBreak);
 
-  // ToDo: Check for maxFitness
-
-  //The evolution loop is exited depending on the condition,
-  //either on time or on reaching the maximum individual
-
   if (userTerminated)
     return true;
 

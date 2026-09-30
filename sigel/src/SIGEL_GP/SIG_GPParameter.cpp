@@ -43,7 +43,6 @@ SIGEL_GP::SIG_GPParameter::SIG_GPParameter()
   saveExit(true),
   liveUndead(false),
   poolImageGeneration(0),
-  maxFitness(50),
   fitnessName( "SimpleFitnessFunction" ),
   hostList(),
   timeOutMinutes(0)
@@ -334,17 +333,6 @@ void SIGEL_GP::SIG_GPParameter::setPriority(priorityLevel prio)
 SIGEL_GP::SIG_GPParameter::priorityLevel SIGEL_GP::SIG_GPParameter::getPriority() const
 {
    return priority;
-};
-
-double SIGEL_GP::SIG_GPParameter::getMaxFitness() const
-{
-   return maxFitness;
-   
-};
-
-void SIGEL_GP::SIG_GPParameter::setMaxFitness(double maxfit)
-{
-   maxFitness=maxfit;
 };
 
 
