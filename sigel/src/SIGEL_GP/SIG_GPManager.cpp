@@ -594,52 +594,49 @@ void SIGEL_GP::SIG_GPManager::stopIfNecessary(bool generationBreak) {
 };
 
 bool SIGEL_GP::SIG_GPManager::checkTerminationConditions(bool generationBreak) {
-  // The termination by time or generation waits for a generation break.
-  bool exitIsPermitted = generationBreak;
-
   if (userTerminated)
     return true;
 
   if (!fitnessCalculated)
     return false;
 
-  if (exitIsPermitted) {
-    bool timeExpired = false;
-
-    if (currentExperiment.gpParameter.getTerminationUsesDate())
-      timeExpired =  ( currentExperiment.gpParameter.getTerminationTime() <= QDateTime::currentDateTime() );
-    else {
-      int durationHours =   ( currentExperiment.gpParameter.getTerminationDurationDays() * 24)
-                                    + currentExperiment.gpParameter.getTerminationDurationHours();
-      int durationMinutes =   ( durationHours * 60 )
-                                    + currentExperiment.gpParameter.getTerminationDurationMinutes();
-      int durationSeconds =   ( durationMinutes * 60 )
-                                    + currentExperiment.gpParameter.getTerminationDurationSeconds();
-
-      QDateTime terminationTime = startTime.addSecs( durationSeconds );
-
-      timeExpired = ( terminationTime <= QDateTime::currentDateTime() );
-    }
-
-    bool generationsReached = ( currentExperiment.gpParameter.getTerminationGenerationNo() <= currentGenerationNo );
-
-    switch (currentExperiment.gpParameter.getTerminationModel()) {
-      case SIG_GPParameter::byTime:
-        return timeExpired;
-        break;
-      case SIG_GPParameter::byGeneration:
-        return generationsReached;
-        break;
-      case SIG_GPParameter::byTimeGeneration:
-        return timeExpired || generationsReached;
-        break;
-      case SIG_GPParameter::byUser:
-        return false;
-        break;
-    }
-  }
-  else
+  // The termination by time or generation waits for a generation break.
+  if (!generationBreak)
     return false;
+
+  bool timeExpired = false;
+
+  if (currentExperiment.gpParameter.getTerminationUsesDate())
+    timeExpired =  ( currentExperiment.gpParameter.getTerminationTime() <= QDateTime::currentDateTime() );
+  else {
+    int durationHours =   ( currentExperiment.gpParameter.getTerminationDurationDays() * 24)
+                                  + currentExperiment.gpParameter.getTerminationDurationHours();
+    int durationMinutes =   ( durationHours * 60 )
+                                  + currentExperiment.gpParameter.getTerminationDurationMinutes();
+    int durationSeconds =   ( durationMinutes * 60 )
+                                  + currentExperiment.gpParameter.getTerminationDurationSeconds();
+
+    QDateTime terminationTime = startTime.addSecs( durationSeconds );
+
+    timeExpired = ( terminationTime <= QDateTime::currentDateTime() );
+  }
+
+  bool generationsReached = ( currentExperiment.gpParameter.getTerminationGenerationNo() <= currentGenerationNo );
+
+  switch (currentExperiment.gpParameter.getTerminationModel()) {
+    case SIG_GPParameter::byTime:
+      return timeExpired;
+      break;
+    case SIG_GPParameter::byGeneration:
+      return generationsReached;
+      break;
+    case SIG_GPParameter::byTimeGeneration:
+      return timeExpired || generationsReached;
+      break;
+    case SIG_GPParameter::byUser:
+      return false;
+      break;
+  }
 };
 
 
