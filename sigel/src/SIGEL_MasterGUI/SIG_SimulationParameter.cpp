@@ -26,7 +26,6 @@
 #include <qlineedit.h>
 #include <qspinbox.h>
 #include <qcombobox.h>
-#include <qradiobutton.h>
 
 #include "SIGEL_MasterGUI/SIG_SimulationParameter.h"
 
@@ -39,7 +38,6 @@ SIG_SimulationParameter::SIG_SimulationParameter( QWidget* parent,  const char* 
   : SIG_SimulationParameterBase( parent, name, fl ), theExperiment( theExperiment )
 {
   lineeditStepSize->setValidator( new QDoubleValidator( lineeditStepSize ) );
-  lineeditMaximalError->setValidator( new QDoubleValidator( lineeditMaximalError ) );
   lineeditJointlimitsSpringConstant->setValidator( new QDoubleValidator( lineeditJointlimitsSpringConstant ) );
   lineeditJointlimitsDamperConstant->setValidator( new QDoubleValidator( lineeditJointlimitsDamperConstant ) );
   lineeditJointfrictionConstant->setValidator( new QDoubleValidator( lineeditJointfrictionConstant ) );
@@ -68,64 +66,6 @@ void SIG_SimulationParameter::putIntoExperiment()
   int randomSeed = spinboxRandomSeed->value();
   theExperiment.simulationParameter.setRandomSeed( randomSeed );
   
-  // get maximal error out of the widget (lineedit with double validator)
-  double maximalError = lineeditMaximalError->text().toDouble();
-  theExperiment.simulationParameter.setMaximalError( maximalError );
-
-  // get the skipped frames out of the widget (spinbox)
-  theExperiment.simulationParameter.setSkipFrames( spinboxSkippedFrames->value() );
-
-  // get the maximal iterations out of the widget (spinbox)
-  theExperiment.simulationParameter.setMaximalIterations( spinboxMaximalIterations->value() );
-
-  // get the maximal collision loops out of the widget (spinbox)
-  theExperiment.simulationParameter.setMaximalCollisionLoops( spinboxMaximalCollisionLoops->value() );
-
-  // get the integrator out of the widget (combobox)
-  switch( comboboxIntegrator->currentIndex() )
-    {
-    case 0:
-      theExperiment.simulationParameter.setIntegrator( SIGEL_Simulation::SIG_SimulationParameters::itRungeKutta4);
-      break;
-    case 1:
-      theExperiment.simulationParameter.setIntegrator( SIGEL_Simulation::SIG_SimulationParameters::itRungeKutta2);
-      break;
-    case 2:
-      theExperiment.simulationParameter.setIntegrator( SIGEL_Simulation::SIG_SimulationParameters::itDoubleEuler);
-      break;
-    case 3:
-      theExperiment.simulationParameter.setIntegrator( SIGEL_Simulation::SIG_SimulationParameters::itEuler);
-      break;
-    }
-
-  // get the solve mode out of the widget (combobox)
-  switch( comboboxSolveMode->currentIndex() )
-    {
-    case 0:
-      theExperiment.simulationParameter.setSolveMode( SIGEL_Simulation::SIG_SimulationParameters::smtSingleValueDecomposition );
-      break;
-    case 1:
-      theExperiment.simulationParameter.setSolveMode( SIGEL_Simulation::SIG_SimulationParameters::smtConjugateGradient );
-      break;
-    case 2:
-      theExperiment.simulationParameter.setSolveMode( SIGEL_Simulation::SIG_SimulationParameters::smtLUDecomposition );
-      break;
-    }
-  
-  // get the CM mode out of the widget (radiobuttons)
-  if( radiobuttonCMModeAnalytical->isChecked() )
-    theExperiment.simulationParameter.setAnalytical( true );
-  else
-    theExperiment.simulationParameter.setAnalytical( false );
-
-  theExperiment.simulationParameter.setMaximalSOLIDIterations( spinboxMaxSOLIDIterations->value() );
-
-  // Get the simulation library out of the widget
-  if( radiobuttonDynamo->isChecked() )
-    theExperiment.simulationParameter.setSimulationLibrary( SIGEL_Simulation::SIG_SimulationParameters::DynaMo );
-  else
-    theExperiment.simulationParameter.setSimulationLibrary( SIGEL_Simulation::SIG_SimulationParameters::DynaMechs );
-
   // Get the dynaMechs integrator out of the widgets
   switch( comboboxDynaMechsIntegrator->currentIndex() )
     {
@@ -170,65 +110,6 @@ void SIG_SimulationParameter::getOutOfExperiment()
 
   // Set the random seed widget (spinbox)
   spinboxRandomSeed->setValue( theExperiment.simulationParameter.getRandomSeed() );
-
-  // Set the maximal error widget (line edit with double validator)
-  QString maximalError;
-  maximalError.setNum( theExperiment.simulationParameter.getMaximalError() );
-  lineeditMaximalError->setText( maximalError );
-
-  // Set the skipped frames widget (spinbox)
-  spinboxSkippedFrames->setValue( theExperiment.simulationParameter.getSkipFrames() );
-
-  // Set the maximal iterations widget (spinbox)
-  spinboxMaximalIterations->setValue( theExperiment.simulationParameter.getMaximalIterations() );
-
-  // Set the maximal collision loops widget (spinbox)
-  spinboxMaximalCollisionLoops->setValue( theExperiment.simulationParameter.getMaximalCollisionLoops() );
-
-  // Set the integrator combobox
-  switch( theExperiment.simulationParameter.getIntegrator() )
-    {
-    case SIGEL_Simulation::SIG_SimulationParameters::itEuler:
-      comboboxIntegrator->setCurrentIndex( 3 );
-      break;
-    case SIGEL_Simulation::SIG_SimulationParameters::itDoubleEuler:
-      comboboxIntegrator->setCurrentIndex( 2 );
-      break;
-    case SIGEL_Simulation::SIG_SimulationParameters::itRungeKutta2:
-      comboboxIntegrator->setCurrentIndex( 1 );
-      break;
-    case SIGEL_Simulation::SIG_SimulationParameters::itRungeKutta4:
-      comboboxIntegrator->setCurrentIndex( 0 );
-      break;
-    }
-  
-  // Set the solve mode widget (combobox)
-  switch( theExperiment.simulationParameter.getSolveMode() )
-    {
-    case SIGEL_Simulation::SIG_SimulationParameters::smtSingleValueDecomposition:
-      comboboxSolveMode->setCurrentIndex( 0 );
-      break;
-    case SIGEL_Simulation::SIG_SimulationParameters::smtConjugateGradient:
-      comboboxSolveMode->setCurrentIndex( 1 );
-      break;
-    case SIGEL_Simulation::SIG_SimulationParameters::smtLUDecomposition:
-      comboboxSolveMode->setCurrentIndex( 2 );
-      break;
-    }
-
-  // set the CM (Constraints Manager) mode widget (radio button)
-  if( theExperiment.simulationParameter.getAnalytical() )
-    radiobuttonCMModeAnalytical->setChecked( true );
-  else
-    radiobuttonCMModeEmpirical->setChecked( true );
-  
-  spinboxMaxSOLIDIterations->setValue( theExperiment.simulationParameter.getMaximalSOLIDIterations() );
-  
-  // Set the simulation library widgets.
-  if( theExperiment.simulationParameter.getSimulationLibrary() == SIGEL_Simulation::SIG_SimulationParameters::DynaMo )
-    radiobuttonDynamo->setChecked( true );
-  if( theExperiment.simulationParameter.getSimulationLibrary() == SIGEL_Simulation::SIG_SimulationParameters::DynaMechs )
-    radiobuttonDynaMechs->setChecked( true );
 
   // Set the dynaMechs integrator widget
   switch( theExperiment.simulationParameter.getDynaMechsIntegrator() )

@@ -909,7 +909,22 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-29 — DONE: ITEM 68, "CENTER ON TERRAIN".** Start here.
+**2026-09-30 — DONE: ITEM 64, BATCH 1 OF 5, THE SIMULATION PARAMETERS PAGE.** Start here.
+
+- **Changed:** the "Used simulation library" group and the DynaMo tab are
+  gone from `SIG_SimulationParameterBase.ui`, with their code in
+  `SIG_SimulationParameter`. The model is untouched: the Dynamo settings keep
+  the file's values and are still written. Item 64 lists the batches still
+  to come and the decisions: a load ignores Dynamo's values, the file format
+  does not change.
+- **Review:** no defect. A file with `SIMULATIONLIBRARY 0` can no longer be
+  switched to DynaMechs in the window; no such file exists, and batch 3 makes
+  a load ignore that key.
+- **Gates:** `check.sh` 757 pass, 0 fail; warnings 412. Fitness, dictorder and
+  PVM unchanged.
+- **Next:** batch 2, the Environment page's DynaMo tab.
+
+**2026-09-29 — DONE: ITEM 68, "CENTER ON TERRAIN".**
 
 - **Changed:** a "Center on Terrain" button on the Environment page sets the
   robot's start X and Z to the floor's middle; see item 68 in "Done".

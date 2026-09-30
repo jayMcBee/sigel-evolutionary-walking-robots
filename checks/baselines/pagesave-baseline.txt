@@ -15,18 +15,18 @@
 # in exactly one line). So the block below is the port against itself, on
 # proven ground.
 #
-# The EDITED block is the base plus C11a's eleven page edits. C11a measured
+# The EDITED block is the base plus C11a's page edits, ten since the Dynamo tab went. C11a measured
 # those typed values identical on both architectures. The whole edited file
-# differs from the base in exactly twelve lines and no others: eight typed values, the
+# differs from the base in exactly eleven lines and no others: seven typed values, the
 # DYNAMECHSINTEGRATOR and fitness-name combos each moving down one item, the
 # mutation/reproduction interlock pair (250 + 670 + 80 = 1000), and
-# LanguageParameters. 8 + 2 + 2 = 12. *An earlier version said "nine typed
+# LanguageParameters. 7 + 2 + 2 = 11. *An earlier version said "nine typed
 # values" and then listed the fitness-name combo separately, which counted the
 # integrator combo as typed and made the arithmetic work only by accident.*
 #
 # LanguageParameters IS NOT IN THE BLOCK. It lives at line 71650 of the saved
 # file, far below `POPULATION BEGIN{' at 179, so a check over the 178-line
-# block alone covers eleven of the twelve edits and silently misses the
+# block alone covers ten of the eleven edits and silently misses the
 # registers one. It gets its own line here. That was found because the oracle
 # reported where POPULATION BEGIN{ had moved to, not by reading the code.
 #
@@ -230,7 +230,7 @@ TIMETOSIMULATE
 STEPSIZE
 0.02
 MAXIMALERROR
-0.2
+0.1
 RANDOMSEED
 0
 MAXIMALITERATIONS

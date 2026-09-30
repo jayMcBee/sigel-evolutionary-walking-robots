@@ -471,11 +471,13 @@ problem; the choice is made before any code is written.
      `SIG_Mirtich` members only it calls, `SIG_Simulation::slotDynamoMessage`,
      `stopSimulation`, `SIG_SimulationCannotSolveException`, and the `QObject`
      base of `SIG_Simulation`, which exists only for that slot.
-  4. **The `.exp` format:** a load ignores `MAXIMALERROR`,
-     `MAXIMALITERATIONS`, `SKIPFRAMES`, `ANALYTICAL`, `MAXIMALCOLLISIONLOOPS`,
-     `SOLVEMODE`, `INTEGRATOR`, `MAXIMALSOLIDITERATIONS`, `FLOORMATERIALNAME`
-     and `YPLANELEVEL`, and a save no longer writes them. A load also ignores
-     `SIMULATIONLIBRARY`; a save still writes it, as 1. `STEPSIZE` stays:
+  4. **The `.exp` values:** the file format does not change. A load ignores
+     `MAXIMALERROR`, `MAXIMALITERATIONS`, `SKIPFRAMES`, `ANALYTICAL`,
+     `MAXIMALCOLLISIONLOOPS`, `SOLVEMODE`, `INTEGRATOR`,
+     `MAXIMALSOLIDITERATIONS`, `SIMULATIONLIBRARY`, `FLOORMATERIALNAME` and
+     `YPLANELEVEL`; a save still writes each of them, with a fixed value: the
+     current default, which every shipped experiment holds, and "floor" for
+     `FLOORMATERIALNAME`. The members behind them go. `STEPSIZE` stays:
      DynaMechs uses it.
   5. **The maths library `libdynalib.a`:** two local headers,
      `SIGEL_Tools/DL_vector.h` and `DL_matrix.h`, with only the members SIGEL

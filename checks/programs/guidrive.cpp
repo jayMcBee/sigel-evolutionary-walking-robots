@@ -1846,8 +1846,6 @@ static int guidriveMain(int argc, char **argv)
                 printf("  combo comboboxDynaMechsIntegrator -> %d [%s]\n",
                        cb->currentIndex(), qPrintable(cb->currentText()));
             }
-            tab(pg, 2);
-            typeInto(pg, "lineeditMaximalError", "0.2");
 
             pg = page("&GP Parameters");
             tab(pg, 0);
