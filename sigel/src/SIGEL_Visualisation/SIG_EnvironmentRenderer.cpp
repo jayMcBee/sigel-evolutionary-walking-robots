@@ -41,8 +41,8 @@ namespace SIGEL_Visualisation
   SIG_EnvironmentRenderer::SIG_EnvironmentRenderer(SIGEL_Environment::SIG_Environment const &environment)
     : SIG_Renderer( 2, 0),
       environment(environment),
-      lookPoint(0, 0, 0),
       fieldEdgeLength( 1 ),
+      lookPoint(0, 0, 0),
       showRobotPath( false )
   {
 

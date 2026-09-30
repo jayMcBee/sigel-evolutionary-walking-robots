@@ -34,16 +34,16 @@
 						    Qt::WindowFlags f )
     : QOpenGLWidget(parent, f),
       visualisation(nullptr),
-      floatingTextWidgets(),
-      floatingTextsSize(),
-      showAncorPointsState(0),
       yaw(0),
       pitch(30),
       distance(2),
       mouseXPos(0),
       mouseYPos(0),
       automaticRefresh(true),
-      mouseSensity(0.5)
+      mouseSensity(0.5),
+      floatingTextWidgets(),
+      floatingTextsSize(),
+      showAncorPointsState(0)
   {
     if ( name )
       setObjectName( QString::fromUtf8( name ) );

@@ -44,18 +44,18 @@
 									char const *name,
 									Qt::WindowFlags f )
     : SIG_VisualisationWidget( parent, name, f ),
-		       frameDelay(0),
-		       pausedForDialog(false),
-		       frameShown(true),
-		       noOfFFSteps(0),
-		       traceRobot(true),
-		       robot(nullptr),
-		       environment(nullptr),
-		       simulationParameters(nullptr),
-		       program(nullptr),
-		       planeColor( 127, 127, 127 ),
-		       gridColor( 80, 80, 80 ),
-		       movieEncoder( this )
+      frameDelay(0),
+      pausedForDialog(false),
+      frameShown(true),
+      noOfFFSteps(0),
+      traceRobot(true),
+      planeColor( 127, 127, 127 ),
+      gridColor( 80, 80, 80 ),
+      movieEncoder( this ),
+      robot(nullptr),
+      environment(nullptr),
+      simulationParameters(nullptr),
+      program(nullptr)
   {
     simulationTimer = new QTimer( this );
     simulationTimer->setObjectName( "simulationTimer" );

@@ -26,10 +26,10 @@
 
 namespace SIGEL_Robot {
         SIG_LanguageParameters::SIG_LanguageParameters ()
-                : bitsPerRegister (8),
+                : allowedCommands (),
+                  bitsPerRegister (8),
                   memSize (8),
-		  maximalDelayTime(5000),
-                  allowedCommands ()
+                  maximalDelayTime(5000)
         {
 	  // ORDER MATTERS AND IS NOT ALPHABETICAL. A default-constructed object
 	  // writes this order, and it must match what a loaded file writes.

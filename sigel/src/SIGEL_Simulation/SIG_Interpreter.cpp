@@ -35,8 +35,8 @@ namespace SIGEL_Simulation
       langParams(langParams),
       commandInterface(commandInterface),
       simulationQueries(simulationQueries),
-      registers(),
       remainingLastCommandTime(0),
+      registers(),
       programCounter(0),
       compareFlag(false)
   {

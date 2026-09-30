@@ -7614,6 +7614,13 @@ carried; other items and this file cite them, so they do not change.
   lower than before; nothing else changes. The checks do not reach it, for
   the same reason as above; fitness is bit-identical.
 
+- [x] **Initialiser lists in declaration order** — done 2026-09-30. The 14
+  constructors that GCC's `-Wreorder` named list their members in
+  declaration order, one per line; clang's `-Wreorder-ctor` fix-its did the
+  reordering. Members are always initialised in declaration order, so nothing
+  changes: no initialiser reads a member that is not yet set, and fitness is
+  bit-identical. The gate's warnings went from 382 to 325.
+
 #### Not doing
 
 Decisions, not work. Each is settled; reopen only with a reason.

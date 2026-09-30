@@ -27,14 +27,14 @@ SIGEL_GP::SIG_GPTournament::SIG_GPTournament(SIGEL_Tools::SIG_Randomizer& random
 					     SIG_GPPopulation& actPool,
 					     SIG_GPParameter& gpParameter,
 					     SIGEL_Robot::SIG_LanguageParameters &languageP)
-:gpPool(actPool),
-trainer(trainer),
-indis(),
-justWaiting(false),
-depNumber(0),
-gpParameter(gpParameter),
-randomizer(randomizer),
-languageP(languageP)
+: languageP(languageP),
+  randomizer(randomizer),
+  trainer(trainer),
+  indis(),
+  justWaiting(false),
+  depNumber(0),
+  gpPool(actPool),
+  gpParameter(gpParameter)
 {   
 };
 

@@ -37,14 +37,20 @@ using namespace SIGEL_Tools;
 namespace SIGEL_Robot {
 
         SIG_Joint::SIG_Joint (SIG_Robot *par, QString n, int nr)
-                : name (n),
-                  parent (par),
+                : parent (par),
+                  name (n),
                   number (nr),
                   leftLink (nullptr),
                   rightLink (nullptr),
-                  mdh_a (0), mdh_alpha (0), mdh_d (0), mdh_theta (0),
-		  mdh_screw_d(0), mdh_screw_theta(0), mdh_predecessor_is_left (-1),
-		  mechsMinPos(0), mechsMaxPos(0)
+                  mdh_a (0),
+                  mdh_alpha (0),
+                  mdh_d (0),
+                  mdh_theta (0),
+                  mdh_screw_d(0),
+                  mdh_screw_theta(0),
+                  mechsMinPos(0),
+                  mechsMaxPos(0),
+                  mdh_predecessor_is_left (-1)
         { }
 
         SIG_Joint::SIG_Joint (SIG_Robot *par, QTextStream & tx)

@@ -44,11 +44,11 @@ namespace SIGEL_Simulation
                                         double screwTheta )
     : dynaMechsLinkNumber( dynaMechsLinkNumber ),
       link( link ),
-      dynaMechsLink( dynaMechsLink ),
-      transformation( 4, 4 ),
       screwD( screwD ),
       screwTheta( screwTheta ),
-      screwLink( nullptr )
+      screwLink( nullptr ),
+      dynaMechsLink( dynaMechsLink ),
+      transformation( 4, 4 )
   {
     for (int j=1; j<=3; j++)
       transformation( 4, j ) = 0;

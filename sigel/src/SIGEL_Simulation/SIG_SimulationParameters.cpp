@@ -27,11 +27,11 @@
 SIGEL_Simulation::SIG_SimulationParameters::SIG_SimulationParameters()
   : timeToSimulate(0,0,10),
     stepSize(0.02),
-    dynaMechsIntegrator( RungeKutta4 ),
-    randomSeed(0),
     jointLimitsK_spring(50),
     jointLimitsB_damper(5),
-    jointFrictionU_c(0.35)
+    jointFrictionU_c(0.35),
+    randomSeed(0),
+    dynaMechsIntegrator( RungeKutta4 )
 { };
 
 void SIGEL_Simulation::SIG_SimulationParameters::readFromFile(QTextStream& file)

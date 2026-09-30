@@ -27,7 +27,13 @@ void StartMetaEvolution(void *inRawSubst)
 
 
 MT_Controller::MT_Controller(SIGEL_GP::SIG_GPExperiment &exp)
- : QObject(), gpManager(nullptr), mainWindow(nullptr), substitution(nullptr), evolTimer(nullptr), sigExp(exp), autoSaveCnt(0)
+ : QObject(),
+   autoSaveCnt(0),
+   evolTimer(nullptr),
+   gpManager(nullptr),
+   mainWindow(nullptr),
+   substitution(nullptr),
+   sigExp(exp)
 {
 	startWOSigel = false;
 	withGUI = true;

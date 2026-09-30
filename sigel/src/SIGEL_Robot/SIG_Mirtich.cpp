@@ -246,9 +246,9 @@ namespace SIGEL_Robot {
         }
 
         SIG_Mirtich::SIG_Mirtich (SIG_Geometry const *geometr, QString nameOfGeom)
-                : computed (false),
-                  geometryName (nameOfGeom),
-                  geom (geometr)
+                : geom (geometr),
+                  computed (false),
+                  geometryName (nameOfGeom)
         { }
 
         void SIG_Mirtich::computePhysics (double density,

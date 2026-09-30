@@ -34,8 +34,8 @@ namespace SIGEL_GP
 
   SIG_GUIGPManager::SIG_GUIGPManager( SIGEL_MasterGUI::SIG_GUIGPExperiment &guiExperiment )
     : SIG_GPManager( guiExperiment.gpExperiment ),
-      guiExperiment( guiExperiment ),
-      individualItems( guiExperiment.allIndividualsView->individualList->listviewIndividuals->topLevelItemCount() )
+      individualItems( guiExperiment.allIndividualsView->individualList->listviewIndividuals->topLevelItemCount() ),
+      guiExperiment( guiExperiment )
   {
     QTreeWidget *listView = guiExperiment.allIndividualsView->individualList->listviewIndividuals;
     QTreeWidgetItemIterator listIter( listView );
