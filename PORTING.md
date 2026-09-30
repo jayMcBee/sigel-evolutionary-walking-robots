@@ -909,7 +909,20 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-30 — DONE: ITEM 64, BATCH 5, `-DMINMAX_H` GOES.** Start here.
+**2026-09-30 — DONE: ITEM 64 IS CLOSED.** Start here.
+
+- **Changed:** `vendor/supportingLibs.tar.gz` no longer holds Dynamo; its
+  other 386 members are identical in content, mode, owner and time.
+  `downloads/supportingLibs/Dynamo` is deleted; the build compiles nothing
+  more without it. `LIBRARIES.md` drops Dynamo's row, `vendor/README.md`
+  names four libraries. Item 64 is in "Done".
+- **To extract on another clone:** delete `downloads/supportingLibs/Dynamo`
+  by hand; tar never deletes.
+- **Next:** open question from 2026-09-30: `SIG_GPParameter`'s
+  `parsimonyPressure` and `maxFitness` are dead, and `saveExit` is live but
+  has no UI; not yet to-do items.
+
+**2026-09-30 — DONE: ITEM 64, BATCH 5, `-DMINMAX_H` GOES.**
 
 - **Changed:** the flag is gone from the `Makefile`'s `VCXX` and `SIGCXX` and
   from `check.sh`. Only Dynamo's `minmax.h` used it.
@@ -7515,6 +7528,31 @@ carried; other items and this file cite them, so they do not change.
     zero, and `finite()` makes that a score of 0, which is right.
   - Moved to item 89: the time to simulate of 0 and the step size of 0 or
     less.
+
+- [x] **64. What was left of Dynamo is removed** — done 2026-09-30, in
+  small commits. SIGEL assumes DynaMechs: nothing checks for Dynamo, a load
+  ignores what only Dynamo used, and the file format does not change.
+  - The Simulation Parameters page lost the library choice and the DynaMo
+    tab; the Environment page lost its DynaMo tab, Material name and Level.
+    Level only shifted the drawn floor and grid, never the physics.
+  - The model lost the `SimulationLibrary` enum and every switch on it,
+    `SIG_Robot::prepareDynaMo`, `SIG_Link::transformToDynaMo` and the two
+    `SIG_Mirtich` members only it called; `SIG_Simulation` lost
+    `slotDynamoMessage`, `stopSimulation`,
+    `SIG_SimulationCannotSolveException` and its `QObject` base.
+  - A load ignores `MAXIMALERROR`, `MAXIMALITERATIONS`, `SKIPFRAMES`,
+    `ANALYTICAL`, `MAXIMALCOLLISIONLOOPS`, `SOLVEMODE`, `INTEGRATOR`,
+    `MAXIMALSOLIDITERATIONS`, `SIMULATIONLIBRARY`, `YPLANELEVEL` and
+    `FLOORMATERIALNAME`; a save writes each with a fixed value: the old
+    default, which every shipped experiment holds, 1 for the library, 0 for
+    the level and "floor" for the material.
+  - `libdynalib.a` is gone. `SIGEL_Tools/SIG_Vector.h` and `SIG_Matrix.h`
+    hold only the members SIGEL uses, named and computed as in Dynamo's
+    `DL_vector` and `DL_matrix`; `DL_Scalar` is `double`. `-DMINMAX_H` and
+    the Dynamo include path went, `vendor/supportingLibs.tar.gz` no longer
+    holds Dynamo, and `downloads/supportingLibs/Dynamo` is deleted.
+  - Fitness was bit-identical after every commit; warnings went from 412 to
+    387.
 
 #### Not doing
 

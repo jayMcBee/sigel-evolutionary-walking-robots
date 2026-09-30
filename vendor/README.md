@@ -2,12 +2,11 @@
 
 The third-party code SIGEL is built on, and our fixes to it.
 
-`pvm3.4.6.tgz` is the upstream PVM archive. `supportingLibs.tar.gz` is
-SourceForge's archive cut down to the five libraries the build uses: `cv97`,
-`dynamechs`, `Dynamo`, `fparser` and `newmat09`, unchanged. The full archive,
-with Qt 2.3, `qhull`, `SOLID` and PVM 3.4.3, is on SourceForge and in git
-history. Both are tracked here so the project builds without downloading
-anything. From the repo root:
+`pvm3.4.6.tgz` is the upstream PVM archive. `supportingLibs.tar.gz` holds the
+four libraries the build uses, `cv97`, `dynamechs`, `fparser` and
+`newmat09`, unchanged from SIGEL's original supportingLibs archive. Both are
+tracked here so the project builds without downloading anything. From the
+repo root:
 
     mkdir -p downloads
     tar xzf vendor/supportingLibs.tar.gz -C downloads
