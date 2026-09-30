@@ -31,6 +31,7 @@
 #include "SIGEL_Tools/SIG_IO.h"
 
 #include <cmath>
+#include <numbers>
 #include <cstdio>
 
 
@@ -537,8 +538,6 @@ namespace SIGEL_Robot {
 
 		  screwTheta = tolerantACos( realNewXAxis.inprod( &newXAxis ) );
 
-			double const pi = std::atan( 1 ) * 4;
-
 		  double const maximalParallelityMeasure = 0.00001;
 
 		  SIG_Vector xxNormalVector;
@@ -549,7 +548,7 @@ namespace SIGEL_Robot {
 		      xxNormalVector.normalize();
 
 		      if (newZAxis.inprod( &xxNormalVector ) < 0)
-			screwTheta = 2 * pi - screwTheta;
+			screwTheta = 2 * std::numbers::pi - screwTheta;
 		    };
 
 #ifdef SIG_DEBUG

@@ -113,8 +113,6 @@ namespace SIGEL_Simulation
 				       double &z,
 				       double &w );
 
-      double const pi;
-
     };
 
 }

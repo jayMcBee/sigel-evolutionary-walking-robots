@@ -28,6 +28,7 @@
 
 #include <dm.h>
 #include <cmath>
+#include <numbers>
 #include <newmat.h>
 
 using namespace SIGEL_Tools;
@@ -138,13 +139,11 @@ namespace SIGEL_Robot {
 
 	  double const minimalAngleMeasure = 0.00001;
 
-	  double const pi = std::atan( 1 ) * 4;
-
 	  double bsAngle = tolerantACos( _winportB.inprod( &otherB ) );
 
 	  if (bsAngle > minimalAngleMeasure)
 	    {
-	      if (std::abs( pi - bsAngle ) > minimalAngleMeasure)
+	      if (std::abs( std::numbers::pi - bsAngle ) > minimalAngleMeasure)
 		{
 		  SIG_Vector bsNormal;
 
@@ -223,7 +222,7 @@ namespace SIGEL_Robot {
 
           if (csAngle > minimalAngleMeasure)
 	    {
-	      if (std::abs( pi - csAngle ) > minimalAngleMeasure)
+	      if (std::abs( std::numbers::pi - csAngle ) > minimalAngleMeasure)
 		{
 		  SIG_Vector csNormal;
 
@@ -231,7 +230,7 @@ namespace SIGEL_Robot {
 		  csNormal.normalize();
 
 		  if (_winportB.inprod( &csNormal ) < 0)
-		    csAngle = 2 * pi - csAngle;
+		    csAngle = 2 * std::numbers::pi - csAngle;
 		};
 
 	      secondRotation = rotationMatrix( _winportB, csAngle );
@@ -360,7 +359,7 @@ namespace SIGEL_Robot {
                 schiebung.timesis (verschiebung);
                 _winport_t.plusis (&schiebung);
 
-                double phi = (winkel / 180.0) * M_PI;
+                double phi = (winkel / 180.0) * std::numbers::pi;
 
                 SIG_Matrix drehmatrix;
 

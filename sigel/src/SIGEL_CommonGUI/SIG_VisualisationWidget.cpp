@@ -25,6 +25,7 @@
 
 #include <QtMath>
 #include <cmath>
+#include <numbers>
 
 
 
@@ -153,8 +154,8 @@
 	// its pitch, yaw and distance values.
 	// To guarantee that the line of sight is not parallel to
 	// the up-vector, the latter is recalculated.
-	double const radUpYaw = ( radEyeYaw < M_PI ) ? radEyeYaw + M_PI : radEyeYaw - M_PI;
-	double const radUpPitch = (M_PI / 2) - radEyePitch;
+	double const radUpYaw = ( radEyeYaw < std::numbers::pi ) ? radEyeYaw + std::numbers::pi : radEyeYaw - std::numbers::pi;
+	double const radUpPitch = (std::numbers::pi / 2) - radEyePitch;
 
 	double const sinUpYaw = std::sin(radUpYaw);
 	double const cosUpYaw = std::cos(radUpYaw);

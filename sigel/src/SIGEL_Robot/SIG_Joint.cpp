@@ -30,6 +30,7 @@
 #include "SIGEL_Robot/IFunctions.h"
 
 #include <cmath>
+#include <numbers>
 
 using namespace SIGEL_Tools;
 
@@ -342,8 +343,6 @@ namespace SIGEL_Robot {
 
 	 mdh_a = h.norm();
 
-	 double const pi = 4 * std::atan( 1 );
-
 #ifdef SIG_DEBUG
 	 SIGEL_Tools::SIG_IO::cerr << "predZAxis:";
 	 for (int i=0; i<3; i++)
@@ -371,7 +370,7 @@ namespace SIGEL_Robot {
 	     zzNormalVector.normalize();
 
 	     if (rotationDir.inprod( &zzNormalVector ) < 0)
-		 mdh_alpha = 2 * pi - mdh_alpha;
+		 mdh_alpha = 2 * std::numbers::pi - mdh_alpha;
 	   };
 
 	 SIG_Vector distanceVector = succOrigin;
@@ -414,7 +413,7 @@ namespace SIGEL_Robot {
 	     xxNormalVector.normalize();
 
 	     if (rotationDir.inprod( &xxNormalVector) < 0)
-	       mdh_theta = 2 * pi - mdh_theta;
+	       mdh_theta = 2 * std::numbers::pi - mdh_theta;
 	   };
 
 	 switch (getJointType())
@@ -616,7 +615,7 @@ namespace SIGEL_Robot {
 		       predHandProjectedDirPredXAxisNormalVector.normalize();
 
 		       if (rotationDir.inprod( &predHandProjectedDirPredXAxisNormalVector ) < 0)
-			 beta = (2 * pi) - beta;
+			 beta = (2 * std::numbers::pi) - beta;
 		     };
 
 		   double gamma = tolerantACos( succHandProjectedDir.inprod( &succXAxis ) );
@@ -629,7 +628,7 @@ namespace SIGEL_Robot {
 		       succHandProjectedDirSuccXAxisNormalVector.normalize();
 
 		       if (rotationDir.inprod( &succHandProjectedDirSuccXAxisNormalVector ) < 0)
-			 gamma = (2 * pi) - gamma;
+			 gamma = (2 * std::numbers::pi) - gamma;
 		     };
 
 		   if (rotationalJoint->getMax()==rotationalJoint->getMin())
@@ -656,8 +655,8 @@ namespace SIGEL_Robot {
 						 << Qt::endl;
 #endif
 
-		       mechsMinPos = (2 * pi) - ( (sigelMax / 360) * 2 * pi );
-		       mechsMaxPos = (2 * pi) - ( (sigelMin / 360) * 2 * pi );
+		       mechsMinPos = (2 * std::numbers::pi) - ( (sigelMax / 360) * 2 * std::numbers::pi );
+		       mechsMaxPos = (2 * std::numbers::pi) - ( (sigelMin / 360) * 2 * std::numbers::pi );
 
 #ifdef SIG_DEBUG
 		       SIGEL_Tools::SIG_IO::cerr << "mechsMinPos: "
@@ -726,9 +725,9 @@ namespace SIGEL_Robot {
 
 		       if ( mechsMaxPos < mechsMinPos )
 			 if ( mdh_theta <= mechsMaxPos )
-			   mechsMinPos -= 2 * pi;
+			   mechsMinPos -= 2 * std::numbers::pi;
 			 else
-			   mechsMaxPos += 2 * pi;
+			   mechsMaxPos += 2 * std::numbers::pi;
 
 #ifdef SIG_DEBUG
 		       SIGEL_Tools::SIG_IO::cerr << "New mechsMinPos: "
@@ -774,12 +773,10 @@ namespace SIGEL_Robot {
 
        double SIG_Joint::normalizeRadAngle( double input )
        {
-	 static double const pi = std::atan( 1 ) * 4;
-
 	 if (input < 0)
-	   return input + (2 * pi);
-	 else if (input >= (2*pi))
-	   return input - (2 * pi);
+	   return input + (2 * std::numbers::pi);
+	 else if (input >= (2*std::numbers::pi))
+	   return input - (2 * std::numbers::pi);
 
 	 return input;
        };

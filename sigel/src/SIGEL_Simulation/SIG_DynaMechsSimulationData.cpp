@@ -78,8 +78,7 @@ SIGEL_Simulation::SIG_DynaMechsSimulationData::SIG_DynaMechsSimulationData( SIGE
     jointIndices( robot.getJoints().count() ),
     drives( robot.getDrives().count() ),
     driveForcesTimeAccounts( robot.getDrives().count() ),
-    sensors( robot.getSensors().count() ),
-    pi( std::atan( 1 ) * 4 )
+    sensors( robot.getSensors().count() )
 {
   dynaMechsLinks.fill( nullptr );
 

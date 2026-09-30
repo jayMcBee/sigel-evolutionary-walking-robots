@@ -7594,6 +7594,12 @@ carried; other items and this file cite them, so they do not change.
   found no C++20 rule that changes SIGEL's behaviour. A flag change does not
   rebuild the objects, so `build/obj/{sigel,moc,qrc}` and
   `build-asan/obj/{sigel,moc}` were deleted and rebuilt.
+- [x] **126, pi.** `std::atan(1) * 4` and `M_PI` are `std::numbers::pi` in
+  `IFunctions`, `SIG_Link`, `SIG_Joint` and `SIG_VisualisationWidget`;
+  `SIG_DynaMechsSimulationData` lost its unused `pi` member. The object code
+  is the same as before, so fitness is bit-identical on both builds; the
+  C++20 switch is covered by the same run. The literals `3.14159265` and
+  `0.0174533` follow one at a time.
 
 #### Not doing
 
