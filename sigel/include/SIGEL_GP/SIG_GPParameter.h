@@ -152,21 +152,6 @@ namespace SIGEL_GP
    */
    int resEvGen;
 
-   /*
-   * The set of terminals, used for the random creation of a robot controll 
-   * program.
-   *
-   *  private:
-   *  QStringList terminalSet;
-   * 
-   *
-   * The set of functions, used for the random creation of a robot controll 
-   * program.
-   *
-   *  private:
-   *  QStringList functionSet;
-   */
-
   /**
    * The probability of selecting reproduction for a genetic operation.
    */
@@ -420,44 +405,6 @@ namespace SIGEL_GP
 */
  public:
  int getMaxIndLength() const;
-
- /*
- * This function sets the functionset to its demanded value.
- * @post
- * The attribute functionSet is set to the value of the parameters. 
- * @param fuset
- * The set of functions, which can be used by the 
- *
- * public:
- *  void setFunctionSet(QStringList fuset);
- *
- *
- * This function returns the set of functions, which are used for the 
- * randomcreation of robot control programs. 
- * @return
- * The set of functions, given as a QString.
- *
- *  public:
- *  QStringList getFunctionSet() const;
- *
- *
- * This function will set the set of terminals, which is used for the random
- * creation of robot control programs, to the demanded value.
- * @param teset
- * The set of terminals, given as a QString.
- *
- * public:
- *  void setTerminalSet(QStringList teset);
- *
- *
- * This function returns the set of terminals, which are used for the 
- * randomcreation of robot control programs. 
- * @return
- * The set of terminals, given as a QString.
- *
- *  public:
- *  QStringList getTerminalSet() const;
- */
 
  /**
   * This function sets the probability of reproduction of the winner of a tournament, 
