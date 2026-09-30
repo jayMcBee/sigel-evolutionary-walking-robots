@@ -27,45 +27,11 @@
 SIGEL_Simulation::SIG_SimulationParameters::SIG_SimulationParameters()
   : timeToSimulate(0,0,10),
     stepSize(0.02),
-    maximalError(0.1),
-    maximalIterations(100),
-    maximalCollisionLoops(10),
-    analytical(true),
-    skipFrames(0),
-    solveMode(smtConjugateGradient),
-    integrator(itRungeKutta4),
     dynaMechsIntegrator( RungeKutta4 ),
     randomSeed(0),
-    maximalSOLIDIterations(1),
     jointLimitsK_spring(50),
     jointLimitsB_damper(5),
     jointFrictionU_c(0.35)
-{ };
-
-SIGEL_Simulation::SIG_SimulationParameters::SIG_SimulationParameters(QTime timeToSimulate,
-								     double stepSize,
-								     double maximalError,
-								     int maximalIterations,
-			   					     int maximalCollisionLoops,
-        		  					     bool analytical, 
-        							     int skipFrames,
-								     SolveModeType solveMode,
-								     IntegratorType integrator,
-								     DynaMechsIntegrator dynaMechsIntegrator,
-								     int maximalSOLIDIterations,
-								     int randomSeed )
-  : timeToSimulate(timeToSimulate),
-    stepSize(stepSize),
-    maximalError(maximalError),
-    randomSeed(randomSeed),
-    maximalIterations(maximalIterations),
-    maximalCollisionLoops(maximalCollisionLoops),
-    analytical(analytical),
-    skipFrames(skipFrames),
-    solveMode(solveMode),
-    integrator(integrator),
-    dynaMechsIntegrator( dynaMechsIntegrator ),
-    maximalSOLIDIterations(maximalSOLIDIterations)
 { };
 
 void SIGEL_Simulation::SIG_SimulationParameters::readFromFile(QTextStream& file)
@@ -91,58 +57,14 @@ void SIGEL_Simulation::SIG_SimulationParameters::readFromFile(QTextStream& file)
       stepSize=s.toDouble();
 		}
 
-    if ( s == "MAXIMALERROR") {
-      s=file.readLine();
-      maximalError=s.toDouble();
-		}
-
     if ( s == "RANDOMSEED") {
       s=file.readLine();
       randomSeed=s.toInt();
 		}
 
-    if ( s == "MAXIMALITERATIONS") {
-      s=file.readLine();
-      maximalIterations=s.toInt();
-		}
-
-    if ( s == "SKIPFRAMES") {
-      s=file.readLine();
-      skipFrames=s.toInt();
-		}
-
-    if ( s == "ANALYTICAL") {
-      s=file.readLine();
-      int an=s.toInt();
-      if (an==1)
-        analytical=true;
-      else
-        analytical=false;
-		}
-
-    if ( s == "MAXIMALCOLLISIONLOOPS") {
-      s=file.readLine();
-      maximalCollisionLoops=s.toInt();
-		}
-
-    if ( s == "SOLVEMODE") {
-      s=file.readLine();
-      solveMode=static_cast<SolveModeType>(s.toInt());
-		}
-
-    if ( s == "INTEGRATOR") {
-      s=file.readLine();
-      integrator=static_cast<IntegratorType>(s.toInt());
-		}
-
     if ( s == "DYNAMECHSINTEGRATOR") {
       s=file.readLine();
       dynaMechsIntegrator=static_cast<DynaMechsIntegrator>(s.toInt());
-		}
-
-    if ( s == "MAXIMALSOLIDITERATIONS") {
-      s=file.readLine();
-      maximalSOLIDIterations=s.toInt();
 		}
 
     if ( s == "JOINTLIMITSK_SPRING") {
@@ -177,31 +99,31 @@ void SIGEL_Simulation::SIG_SimulationParameters::writeToFile(QTextStream& file)
   file << timeToSimulate.msec() << "\n"; 
   file << "STEPSIZE\n";
   file << stepSize << "\n";
+  // Nothing reads MAXIMALERROR, MAXIMALITERATIONS, SKIPFRAMES, ANALYTICAL,
+  // MAXIMALCOLLISIONLOOPS, SOLVEMODE, INTEGRATOR or MAXIMALSOLIDITERATIONS;
+  // fixed values keep the file format.
   file << "MAXIMALERROR\n";
-  file << maximalError << "\n";
+  file << 0.1 << "\n";
   file << "RANDOMSEED\n";
   file << randomSeed << "\n";
   file << "MAXIMALITERATIONS\n";
-  file << maximalIterations << "\n";
+  file << 100 << "\n";
   file << "SKIPFRAMES\n";
-  file << skipFrames << "\n";
+  file << 0 << "\n";
   file << "ANALYTICAL\n";
-  if (analytical)
-    file << 1 << "\n";
-  else
-    file << 0 << "\n"; 
+  file << 1 << "\n";
   file << "MAXIMALCOLLISIONLOOPS\n";
-  file << maximalCollisionLoops << "\n";
+  file << 10 << "\n";
   file << "SOLVEMODE\n";
-  file << (static_cast<int>(solveMode)) << "\n";
+  file << 1 << "\n";
   file << "INTEGRATOR\n";
-  file << (static_cast<int>(integrator)) << "\n";
+  file << 3 << "\n";
   file << "DYNAMECHSINTEGRATOR\n";
   file << (static_cast<int>(dynaMechsIntegrator)) << "\n";
   file << "SIMULATIONLIBRARY\n";
   file << 1 << "\n";   // DynaMechs, the only library
   file << "MAXIMALSOLIDITERATIONS\n";
-  file << maximalSOLIDIterations << "\n";
+  file << 1 << "\n";
   file << "JOINTLIMITSK_SPRING\n";
   file << jointLimitsK_spring << "\n";
   file << "JOINTLIMITSB_DAMPER\n";
@@ -260,16 +182,6 @@ double SIGEL_Simulation::SIG_SimulationParameters::getJointFrictionU_c() const
   return jointFrictionU_c;
 };
 
-void SIGEL_Simulation::SIG_SimulationParameters::setMaximalError(double newMaximalError)
-{
-  maximalError = newMaximalError;
-};
-
-double SIGEL_Simulation::SIG_SimulationParameters::getMaximalError() const
-{
-  return maximalError;
-};
-
 void SIGEL_Simulation::SIG_SimulationParameters::setRandomSeed(int newRandomSeed)
 {
   randomSeed = newRandomSeed;
@@ -278,66 +190,6 @@ void SIGEL_Simulation::SIG_SimulationParameters::setRandomSeed(int newRandomSeed
 int SIGEL_Simulation::SIG_SimulationParameters::getRandomSeed() const
 {
   return randomSeed;
-};
-
-void SIGEL_Simulation::SIG_SimulationParameters::setAnalytical(bool newAnalytical)
-{
-  analytical=newAnalytical;
-};
-
-bool SIGEL_Simulation::SIG_SimulationParameters::getAnalytical() const
-{
-  return analytical;
-};
-
-void SIGEL_Simulation::SIG_SimulationParameters::setMaximalIterations(int newMaximalIterations)
-{
-  maximalIterations=newMaximalIterations;
-};
-
-int SIGEL_Simulation::SIG_SimulationParameters::getMaximalIterations() const
-{
-  return maximalIterations;
-};
-
-void SIGEL_Simulation::SIG_SimulationParameters::setSkipFrames(int newSkipFrames)
-{
-  skipFrames=newSkipFrames;
-};
-
-int SIGEL_Simulation::SIG_SimulationParameters::getSkipFrames() const
-{
-  return skipFrames;
-};
-
-void SIGEL_Simulation::SIG_SimulationParameters::setMaximalCollisionLoops(int newMaximalCollisionLoops)
-{
-  maximalCollisionLoops=newMaximalCollisionLoops;
-};
-
-int SIGEL_Simulation::SIG_SimulationParameters::getMaximalCollisionLoops() const
-{
-  return maximalCollisionLoops;
-};
-
-void SIGEL_Simulation::SIG_SimulationParameters::setSolveMode(SolveModeType newSolveMode)
-{
-  solveMode=newSolveMode;
-};
-
-SIGEL_Simulation::SIG_SimulationParameters::SolveModeType SIGEL_Simulation::SIG_SimulationParameters::getSolveMode() const
-{
-  return solveMode;
-};
-
-void SIGEL_Simulation::SIG_SimulationParameters::setIntegrator(IntegratorType newIntegrator)
-{
-  integrator=newIntegrator;
-};
-
-SIGEL_Simulation::SIG_SimulationParameters::IntegratorType SIGEL_Simulation::SIG_SimulationParameters::getIntegrator() const
-{
-  return integrator;
 };
 
 void SIGEL_Simulation::SIG_SimulationParameters::setDynaMechsIntegrator( DynaMechsIntegrator newDynaMechsIntegrator )
@@ -350,15 +202,6 @@ SIGEL_Simulation::SIG_SimulationParameters::DynaMechsIntegrator SIGEL_Simulation
   return dynaMechsIntegrator;
 };
 
-void SIGEL_Simulation::SIG_SimulationParameters::setMaximalSOLIDIterations(int newMaximalSOLIDIterations)
-{
-  maximalSOLIDIterations=newMaximalSOLIDIterations;
-};
-
-int SIGEL_Simulation::SIG_SimulationParameters::getMaximalSOLIDIterations() const
-{
-  return maximalSOLIDIterations;
-};
 
 
 void SIGEL_Simulation::SIG_SimulationParameters::setNoise(float _noise) {

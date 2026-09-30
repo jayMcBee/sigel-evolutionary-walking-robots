@@ -49,24 +49,6 @@ namespace SIGEL_Simulation
 	RungeKutta45
       };
 
-      enum SolveModeType {
-       /** Solve using LU decomposition (constant framerate) */
-       smtLUDecomposition,
-       /** Solve using conjugate gradient (very variable framerate, better results, default) */
-       smtConjugateGradient,
-       /** Solve using single value decomposition (slowest but most stable) */
-       smtSingleValueDecomposition
-      };
-      enum IntegratorType {
-       /** use the Euler integrator */
-       itEuler,
-       /** use the DoubleEuler integrator */
-       itDoubleEuler,
-       /** use the RungeKutta2 integrator */
-       itRungeKutta2,
-       /** use the RungeKutta4 integrator */
-       itRungeKutta4
-      };
       /**
        * The standard-constructor of the SIG_SimulationParameter class.
        *
@@ -75,34 +57,6 @@ namespace SIGEL_Simulation
        * the right values should be set by the appropriate methods.
        */
       SIG_SimulationParameters();
-      /**
-       * The constructor of the SIG_SimulationParameter class.
-       *
-       * The SIG_SimulationParameter object is instantiated in the
-       * constructor of the SIG_Simulation object.
-       * @param timeToSimulate Specifies the amount of model time to simulate.
-       * @param stepSize The step size that the simulation has to use.
-       * @param maximalError The value of the maximal error to be allowed by dynamo.
-       * @param maximalIterations The maximal Iterations of the constraints manager.
-       * @param maximalCollisionLoops The maximal number of collision loops used by the constraints manager.
-       * @param analytical The analytical Parameter of the constraints manager.
-       * @param skipFrames The numbers of frames skipped by the constraints manager.
-       * @param solveMode The Solve Mode used by the constraints manager.
-       * @param integrator The Integrator used by Dynamo
-       * @param randomSeed The random seed that should be used for the simulation.
-       */
-      SIG_SimulationParameters(QTime timeToSimulate,
-			       double stepSize,
-			       double maximalError,
-			       int maximalIterations,
-			       int maximalCollisionLoops,
-        		       bool analytical, 
-        		       int skipFrames,
-			       SolveModeType solveMode,
-			       IntegratorType integrator,
-			       DynaMechsIntegrator dynaMechsIntegrator,
-			       int maximalSOLIDIterations,
-			       int randomSeed = 0 );
       /** This constructor gets all the data out of the file */
       SIG_SimulationParameters(QTextStream& file);
       /** All the data is written to a file */
@@ -147,18 +101,6 @@ namespace SIGEL_Simulation
       double getJointFrictionU_c() const;
 
       /**
-       * Sets the maximalError attribute.
-       * @param newMaximalError The new maximal error.
-       */
-      void setMaximalError(double newMaximalError);
-
-      /**
-       * Returns the maximal error that is allowed by dynamo.
-       * @return The maximal error used by dynamo.
-       */
-      double getMaximalError() const;
-
-      /**
        * Sets the randomSeed attribute.
        * @param newRandomSeed The random seed.
        */
@@ -172,78 +114,6 @@ namespace SIGEL_Simulation
 
 
       /**
-       * Sets the analytical attribute.
-       * @param newAnalytical sets the constraint manager to analytical or empirical.
-       */
-      void setAnalytical(bool newAnalytical);
-
-      /**
-       * Returns if the constraint manager is set to analytical or empirical.
-       * @return the analytical attribute.
-       */
-      bool getAnalytical() const;
-
-      /**
-       * Sets the maximalIterations attribute.
-       * @param newMaximalIterations The maximal Iterations used by the constraint manager.
-       */
-      void setMaximalIterations(int newMaximalIterations);
-
-      /**
-       * Returns the maximal iterations used by the constraint manager.
-       * @return the maximalIterations attribute.
-       */
-      int getMaximalIterations() const;
-
-      /**
-       * Sets the skipFrames attribute.
-       * @param newSkipFrames The amount of frames the constraint manager skips.
-       */
-      void setSkipFrames(int newSkipFrames);
-
-      /**
-       * Returns the amount of frames skipped by the constraint manager.
-       * @return the skipFrames attribute.
-       */
-      int getSkipFrames() const;
-
-      /**
-       * Sets the maximalCollisionLoops attribute.
-       * @param newMaximalCollisionLoops the amount of collision loops used by the constraint manager.
-       */
-      void setMaximalCollisionLoops(int newMaximalCollisionLoops);
-
-      /**
-       * Returns the maximal collision loops used by the constraint manager.
-       * @return the maximalCollisionLoops attribute.
-       */
-      int getMaximalCollisionLoops() const;
-
-      /**
-       * Sets the solveMode attribute.
-       * @param newSolveMode this sets the solve mode of the constraint manager.
-       */
-      void setSolveMode(SolveModeType newSolveMode);
-
-      /**
-       * Returns solve Mode of the constraint manager
-       * @return the solveMode attribute.
-       */
-      SolveModeType getSolveMode() const;
-
-      /**
-       * Sets the integrator attribute.
-       * @param newIntegrator the integrator used by dynamos dyna system.
-       */
-      void setIntegrator(IntegratorType newIntegrator);
-
-      /**
-       * Returns the integrator used by dynamos dyna system.
-       * @return the integrator attribute.
-       */
-      IntegratorType getIntegrator() const;
-
-      /**
        * Sets the dynamechs integrator to newDynaMechsIntegrator.
        * @param newDynaMechsIntegrator The integrator to be used by dynaMechs.
        */
@@ -254,16 +124,6 @@ namespace SIGEL_Simulation
        * @return The integrator to be used by dynaMechs.
        */
       DynaMechsIntegrator getDynaMechsIntegrator() const;
-
-      /** Sets the amount of SOLID iterations
-       * @param newMaximalSOLIDIterations is the number of iteration the DynaSystem tries to avoid collisions
-       */
-      void setMaximalSOLIDIterations(int newMaximalSOLIDIterations);
-
-      /** Gets the amount of SOLID iterations
-       * @return is the number of iteration the DynaSystem tries to avoid collisions
-       */
-      int getMaximalSOLIDIterations() const;
 
 		/**
 			*/
@@ -290,11 +150,6 @@ namespace SIGEL_Simulation
        */
       double stepSize;
 
-      /**
-       * The maximal error that is allowed by dynamo.
-       */
-      double maximalError;
-
       double jointLimitsK_spring;
 
       double jointLimitsB_damper;
@@ -306,53 +161,10 @@ namespace SIGEL_Simulation
        */
       int randomSeed;
 
-      /** The method for the constraints manager,
-       *
-       * true = analytical (fast, default)
-       *
-       * false = empirical (slow)
-       *
-       * (additional information is in the dynamo documentation under constraint_manager)
-       */
-      bool analytical;
-
-      /** The maximal iterations for the constraints manager,
-       *
-       * true means analytical, false empirical 
-       * (additional information is in the dynamo documentation under constraint_manager)
-       */
-      int maximalIterations;
-
-      /** The amount of skipped frames for the constraints manager,
-       *
-       * (additional information is in the dynamo documentation under constraint_manager)
-       */
-      int skipFrames;
-
-      /** The maximal number collision loops for the constraints manager,
-       *
-       * true means analytical, false empirical 
-       * (additional information is in the dynamo documentation under constraint_manager)
-       */
-      int maximalCollisionLoops;
-
-      /** The solving mode for the constraints manager
-       * 
-       * (additional information is in the dynamo documentation under constraint_manager)
-       */
-      SolveModeType solveMode;
-
-      /** The integrator for dynamo */
-      IntegratorType integrator;
-
       /**
        * The integrator used in DynaMechs.
        */
       DynaMechsIntegrator dynaMechsIntegrator;
-      
-      /** The maximal iterations, the DynaSystem does to avoid collisions */
-      int maximalSOLIDIterations;
-      
     };
   
 }

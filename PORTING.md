@@ -909,7 +909,22 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-30 — DONE: ITEM 64, BATCH 3c, THE COMMENTS.** Start here.
+**2026-09-30 — DONE: ITEM 64, BATCH 4a, THE EIGHT DYNAMO SETTINGS.** Start here.
+
+- **Changed:** `SIG_SimulationParameters` loses `maximalError`,
+  `maximalIterations`, `skipFrames`, `analytical`, `maximalCollisionLoops`,
+  `solveMode`, `integrator` and `maximalSOLIDIterations`, their accessors, the
+  `SolveModeType` and `IntegratorType` enums and the unused 13-argument
+  constructor. A load skips their keys; `writeToFile` writes each key in its
+  place with a fixed value, the old default, which all 7 shipped experiments
+  hold. Saves and the PVM transfer are byte-identical. Batch 4 is split:
+  4b is `FLOORMATERIALNAME` and `YPLANELEVEL`.
+- **Review:** no defect; one comment made present tense.
+- **Gates:** `check.sh` 754 pass, 0 fail; warnings 396. Fitness, dictorder and
+  PVM unchanged.
+- **Next:** batch 4b.
+
+**2026-09-30 — DONE: ITEM 64, BATCH 3c, THE COMMENTS.**
 
 - **Changed:** comments only, in seven headers: `SIG_SimulationParameters.h`
   (step size), `SIG_Simulation.h`, `SIG_Robot.h`, `SIG_Body.h`,
