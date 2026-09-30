@@ -162,7 +162,7 @@ void SIGEL_Simulation::SIG_DynaMechsCommandInterface::moveDrive(int driveNo,
 		//	Manipulate DynaMechs min./max. limits :-)
 
 		// 1 degrees as 0..2*pi
-		const double onePiDegree = 0.0174533;
+		const double onePiDegree = std::numbers::pi / 180.0;
 
 		// which direction to turn ?
 		if (q > dmDestAngle)

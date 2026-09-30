@@ -7608,6 +7608,11 @@ carried; other items and this file cite them, so they do not change.
   do not change. Fitness is bit-identical, but only because no robot in
   `robots/` has a `simpleservo` drive or a pitch/roll sensor, so the checks
   do not reach either line.
+- [x] **126, `0.0174533`.** `moveDrive`'s one-degree margin is
+  `std::numbers::pi / 180.0`. A servo target exactly one degree below a
+  joint's maximum, turning toward it, can now set a limit up to 2e-15 rad
+  lower than before; nothing else changes. The checks do not reach it, for
+  the same reason as above; fitness is bit-identical.
 
 #### Not doing
 

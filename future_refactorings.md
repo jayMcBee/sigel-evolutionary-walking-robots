@@ -437,18 +437,13 @@ problem; the choice is made before any code is written.
   method, deciding each change before it is made. Several of its methods are
   very long and hard to read and maintain.
 
-- [ ] **126. Define pi and the angle conversions once.** SIGEL writes pi
-  several ways: `std::atan(1) * 4`, `M_PI`, which is POSIX rather than C++,
-  and the literal `3.14159265`. `std::numbers::pi` replaces them. A math
-  class in `SIGEL_Tools` takes the degree and radian conversions, not Qt's,
-  so model code does not depend on Qt for them, and later other maths that
-  repeats.
-  **To decide:** `3.14159265` is not exact pi. It sits in
-  `SIG_DynaMechsCommandInterface::moveDrive` and
-  `SIG_DynaMechsSimulationQueries::sense`, so exact pi changes drive and
-  sensor angles slightly and moves the fitness baseline. The same holds for
-  `onePiDegree = 0.0174533` in `moveDrive`, one degree rounded.
-  `std::atan(1) * 4` equals exact pi bit for bit here.
+- [ ] **126. Decide on a class for the angle conversions.** Pi is
+  `std::numbers::pi` everywhere. A math class in `SIGEL_Tools` was planned
+  for the degree and radian conversions. Model code does not use Qt's
+  `qDegreesToRadians`; only GUI and visualisation code does. The model's two
+  conversions are written differently, `(winkel / 180.0) * pi` in
+  `IFunctions` and `(sigelMax / 360) * 2 * pi` in `SIG_Joint`, so one shared
+  function changes the last bit and moves fitness.
 
 - [ ] **124. Find a modern replacement for pthreads.** The MetaGP thread,
   the dynamic-client server thread and their locks use `pthread_create`,
