@@ -437,14 +437,6 @@ problem; the choice is made before any code is written.
   method, deciding each change before it is made. Several of its methods are
   very long and hard to read and maintain.
 
-- [ ] **126. Decide on a class for the angle conversions.** Pi is
-  `std::numbers::pi` everywhere. A math class in `SIGEL_Tools` was planned
-  for the degree and radian conversions. Model code does not use Qt's
-  `qDegreesToRadians`; only GUI and visualisation code does. The model's two
-  conversions are written differently, `(winkel / 180.0) * pi` in
-  `IFunctions` and `(sigelMax / 360) * 2 * pi` in `SIG_Joint`, so one shared
-  function changes the last bit and moves fitness.
-
 - [ ] **124. Find a modern replacement for pthreads.** The MetaGP thread,
   the dynamic-client server thread and their locks use `pthread_create`,
   `pthread_mutex_*` and `pthread_cond_*` directly. Research what should

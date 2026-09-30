@@ -7618,6 +7618,14 @@ carried; other items and this file cite them, so they do not change.
 
 Decisions, not work. Each is settled; reopen only with a reason.
 
+- **126. A class for the angle conversions.** Dropped 2026-09-30 by
+  decision; the rest of item 126 is done. The model has seven conversions in
+  four files. A shared function keeps the bits for the four in `moveDrive`
+  and `sense`, but not for `IFunctions::calculateAnyJoint` and
+  `SIG_Joint::calculateMDH`, which build every robot's joints, so it would
+  move fitness for readability alone. Interface code keeps Qt's
+  `qDegreesToRadians`.
+
 - **41. The simulation viewer follows the robot from the start.** Dropped
   2026-09-23 by decision: not an issue. Trace Robot stays ticked at start, as
   in 1.3; the start-distance half of the item was done by item 26.
