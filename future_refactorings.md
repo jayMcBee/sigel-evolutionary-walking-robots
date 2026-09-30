@@ -312,6 +312,16 @@ touched, because changing one changes behaviour against the reference binary.
 
 ## 7 · The interface
 
+- [ ] **130. Movie overlays, and clean thumbnails for YouTube.** A new
+  "Overlays" group in Movie Settings: one checkbox turns overlays on, and
+  checkboxes pick what is drawn into the frames: robot name, running
+  simulation time, distance travelled, instructions per second. Overlays
+  spoil any thumbnail cut from the movie, so a "Save thumbnails" checkbox
+  also saves every nth frame at n fps, one per second from 0, without
+  overlays, at the output size. The name carries the time, e.g.
+  `sigel_pic_thumb_046s.png`, and does not match the frame pattern, so
+  ffmpeg never picks it up. The user picks the best one for YouTube.
+
 - [ ] **129. Show a modal progress dialog while ffmpeg makes the movie.**
   Closing the simulation window during the encode kills ffmpeg, and a broken
   MP4 is left behind with no message. A modal `QProgressDialog` keeps the
