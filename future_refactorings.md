@@ -312,6 +312,13 @@ touched, because changing one changes behaviour against the reference binary.
 
 ## 7 · The interface
 
+- [ ] **129. Show a modal progress dialog while ffmpeg makes the movie.**
+  Closing the simulation window during the encode kills ffmpeg, and a broken
+  MP4 is left behind with no message. A modal `QProgressDialog` keeps the
+  event loop running but stops the window from closing; ffmpeg's
+  `-progress pipe:1` output drives the bar. Cancel kills ffmpeg. Any failed
+  or cancelled encode deletes the half-written file and says so.
+
 - [ ] **128. Evaluate a Stop that waits for the end of the generation.**
   Stop ends a run at once, in the middle of a generation: the tournaments
   played so far have already changed the pool, but the generation is not
