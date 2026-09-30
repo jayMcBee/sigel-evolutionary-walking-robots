@@ -350,10 +350,17 @@ touched, because changing one changes behaviour against the reference binary.
   loading one. Found in use; the cause is not known yet
   (`MT_PopulationWidget::slotAddInd` and its dialog look complete).
 
-- [ ] **106. Review `SIG_GPParameter.cpp` with the maintainer,** method by
-  method, deciding each change before it is made. The GP Parameters page is
-  hard to read: long methods, commented-out code, and porting comments that
-  hide the logic of the method they sit in.
+- [ ] **106. Review `SIGEL_MasterGUI::SIG_GPParameter` with the maintainer,**
+  the GP Parameters page, method by method, deciding each change before it is
+  made. Its long methods, `slotItemDoubleClicked` and `slotDeleteHost` above
+  all, have deep nesting and uneven indentation that invite bugs. Split them
+  into smaller methods; make the iterator loops C++11 range-for loops with
+  `auto`. Commented-out code and porting comments hide the logic of the
+  methods they sit in.
+  The model class of the same name, `SIGEL_GP::SIG_GPParameter`, was reviewed
+  first. Still open there: `maxFitness`, which nothing uses; `maxAge`, which
+  the page shows and the file stores but nothing reads; `saveExit`, which has
+  no interface, with item 128.
 
 - [ ] **29. Give SIGEL a real logging system.** Qt 6's `QTextStream` does not
   flush on a newline, so diagnostics written through `SIG_IO` are lost when
