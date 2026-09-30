@@ -909,7 +909,22 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-30 — DONE: ITEM 64, BATCH 1 OF 5, THE SIMULATION PARAMETERS PAGE.** Start here.
+**2026-09-30 — DONE: ITEM 64, BATCH 2 OF 5, THE ENVIRONMENT PAGE.** Start here.
+
+- **Changed:** the DynaMo tab, with Material name and Level, is gone from
+  `SIG_EnvironmentBase.ui`, with its code in `SIG_EnvironmentView`. The model
+  is untouched: both values keep the file's values and are still written.
+- **Found:** before, when the stored floor material was not one of the
+  robot's materials, the page saved the robot's first material instead, on
+  any page switch, for example after Import Robot on a new experiment. The
+  stored name is now kept. No shipped experiment is affected, and nothing in
+  the simulation reads the name.
+- **Review:** no defect.
+- **Gates:** `check.sh` 757 pass, 0 fail; warnings 412. Fitness, dictorder and
+  PVM unchanged.
+- **Next:** batch 3, the model's Dynamo choice.
+
+**2026-09-30 — DONE: ITEM 64, BATCH 1 OF 5, THE SIMULATION PARAMETERS PAGE.**
 
 - **Changed:** the "Used simulation library" group and the DynaMo tab are
   gone from `SIG_SimulationParameterBase.ui`, with their code in

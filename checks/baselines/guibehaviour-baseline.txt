@@ -816,10 +816,9 @@ we do with the system?]
 
 == PAGE &Environment ==
   [class] SIGEL_MasterGUI::SIG_EnvironmentView objectName=[EnvironmentView] enabled=1
-  [tabs] TabWidget2 count=3 current=0
+  [tabs] TabWidget2 count=2 current=0
     tab0  [General] enabled=1
     tab1  [DynaMechs] enabled=1
-    tab2  [DynaMo] enabled=1
   -- tab 0 [General] shown=1 visible=1
   [survey]
     group  [World] enabled=1 checkable=0
@@ -877,16 +876,6 @@ we do with the system?]
     comma  lineeditNormalDamperConstant         type[9,81] -> [981] acceptable=1
     comma  lineeditStaticFrictionCoefficient    type[9,81] -> [981] acceptable=1
     comma  lineeditKineticFrictionCoefficient   type[9,81] -> [981] acceptable=1
-  -- tab 2 [DynaMo] shown=1 visible=1
-  [survey]
-    group  [Floor] enabled=1 checkable=0
-    edit   lineeditYPlaneLevel                  text=[0] enabled=1 validator=QDoubleValidator bottom=-inf top=inf decimals=-1 notation=1 locale=[C] numberOptions=2
-  [drive]
-    comma  lineeditYPlaneLevel                  type[9,81] -> [981] acceptable=1
-    combo  comboboxMaterialName                 count=1 current=0 [metal] editable=0 enabled=1
-      item0  [metal]
-      1 Down clamps at current=0 [metal]
-      1 Up   clamps at current=0 [metal]
   -- outside the tab widget
   [survey]
     button pushbuttonImport                     text=[Import] enabled=1 default=0

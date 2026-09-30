@@ -1834,8 +1834,6 @@ static int guidriveMain(int argc, char **argv)
             tab(pg, 0);
             typeInto(pg, "lineeditGravityX", "1.25");
             typeInto(pg, "lineeditXDim", "77");
-            tab(pg, 2);
-            typeInto(pg, "lineeditYPlaneLevel", "2.5");
 
             pg = page("&Simulation Parameters");
             tab(pg, 0);

@@ -24,7 +24,6 @@
 #include <QLocale>
 #include <QValidator>
 #include <qlineedit.h>
-#include <qcombobox.h>
 #include <qradiobutton.h>
 #include <qmessagebox.h>
 #include <qfiledialog.h>
@@ -49,9 +48,6 @@ SIG_EnvironmentView::SIG_EnvironmentView( QWidget* parent,  const char* name, Qt
   lineeditGravityX->setValidator( new QDoubleValidator( lineeditGravityX ) );
   lineeditGravityY->setValidator( new QDoubleValidator( lineeditGravityY ) );
   lineeditGravityZ->setValidator( new QDoubleValidator( lineeditGravityZ ) );
-
-  // y plane level validators
-  lineeditYPlaneLevel->setValidator( new QDoubleValidator( lineeditYPlaneLevel ) );
 
   // start position validators
   lineeditStartPositionX->setValidator( new QDoubleValidator( lineeditStartPositionX ) );
@@ -94,11 +90,6 @@ void SIG_EnvironmentView::putIntoExperiment()
 	theExperiment.environment.setFloorPictureFile(lineeditPictureFile->text());
 	theExperiment.environment.setTextureFile(lineeditTextureFile->text());
 	theExperiment.environment.setTexAlpha(sliderAlpha->value());
-	
-  // put the floor material into the experiment
-  theExperiment.environment.setFloorMaterialName( comboboxMaterialName->currentText() );
-  // put the y plane level into the experiment ( lineedit )
-  theExperiment.environment.setYPlaneLevel( lineeditYPlaneLevel->text().toDouble() );
 
   DL_vector startPositionVector( lineeditStartPositionX->text().toDouble(),
 				 lineeditStartPositionY->text().toDouble(),
@@ -121,33 +112,6 @@ void SIG_EnvironmentView::getOutOfExperiment()
   lineeditGravityX->setText( QString::number( gravityVector.x) );
   lineeditGravityY->setText( QString::number( gravityVector.y) );
   lineeditGravityZ->setText( QString::number( gravityVector.z) );
-
-  // get the material name
-  // first build the combobox
-  comboboxMaterialName->clear();
-  const QList<SIGEL_Robot::SIG_Material *> &materialIterList = theExperiment.robot.getMaterials();
-  for ( auto *materialIter : materialIterList )
-    {
-      comboboxMaterialName->addItem( materialIter->getName() );
-    }
-  bool wasAlreadyInserted = false;
-  for( int i=0; i < comboboxMaterialName->count(); i++ )
-    {
-      if( comboboxMaterialName->itemText(i) == theExperiment.environment.getFloorMaterialName() )
-	{
-	  comboboxMaterialName->setCurrentIndex( i );
-	  wasAlreadyInserted = true;
-	  break;
-	}
-    }
-  if( !wasAlreadyInserted)
-    comboboxMaterialName->addItem( theExperiment.environment.getFloorMaterialName() );
-
-  //  lineeditMaterialName->setText( theExperiment.environment.getFloorMaterialName() );
-  // get the y plane level
-  QString yPlaneLevel;
-  yPlaneLevel.setNum( theExperiment.environment.getYPlaneLevel() );
-  lineeditYPlaneLevel->setText( yPlaneLevel );
 
   // get the start position
   DL_vector startPositionVector = theExperiment.environment.getStartPosition();

@@ -518,7 +518,7 @@ pass=$((pass+bp)); fail=$((fail+bf))
 #
 # pagesave-baseline.txt holds the port's own save of twoBases.exp. On another
 # experiment, the port's save matched the 2003 i386 binary's byte for byte.
-# The EDITED half is the base plus ten page edits; the file's header says
+# The EDITED half is the base plus nine page edits; the file's header says
 # which.
 #
 # LanguageParameters is checked separately because it is NOT in the block: it
@@ -537,7 +537,7 @@ elif [ ! -f "$BEXP" ]; then
     skipped=$((skipped+1))
 elif guidrive_current; then
     # Same env as guidrive_run above, minus the locale extras. The two runs
-    # differ only in SIGEL_PAGEEDIT, which selects the ten-edit set.
+    # differ only in SIGEL_PAGEEDIT, which selects the nine-edit set.
     psrun() {
         env ${2:+SIGEL_PAGEEDIT=1} SIGEL_ROOT="$APP" SIGEL_EXP="$BEXP" \
             SIGEL_SCRATCH="$PSD" QT_QPA_PLATFORM=offscreen \
