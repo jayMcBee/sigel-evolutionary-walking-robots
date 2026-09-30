@@ -455,33 +455,35 @@ problem; the choice is made before any code is written.
 
 - [ ] **64. Remove what is left of Dynamo.** Decided: it goes completely. It
   was hardly ever used (https://sigel.sourceforge.net/seiten/links_en.html).
-  PORTING.md, "Dynamo removed, DynaMechs kept", has the background. Three
-  parts, one round each, in this order.
-  - **The choice of Dynamo in the interface and the model:** the
-    "Dynamo  (not recommended)" radio button and the `DynaMo` tabs in
-    `SIG_SimulationParameterBase.ui` and `SIG_EnvironmentBase.ui`;
-    `SIG_SimulationParameter::putIntoExperiment` and `getOutOfExperiment`; the
-    `DynaMo` value of `SIG_SimulationParameters::SimulationLibrary` and every
-    case that handles it, with `SIG_Robot::prepareDynaMo`,
-    `SIG_Link::transformToDynaMo` and `SIG_Simulation::slotDynamoMessage`; the
-    DynaMechs check in `SIG_GUIGPExperiment::slotRobotInfo`;
-    `SIG_SimulationCannotSolveException` and the `stopSimulation` flag that
-    only Dynamo sets. Today the interface can make
-    an experiment the simulation refuses, which is one way into item 20.
-  - **Dynamo's settings in the `.exp` files** (`MAXIMALERROR`,
-    `MAXIMALITERATIONS`, `SKIPFRAMES`, `ANALYTICAL`, `MAXIMALCOLLISIONLOOPS`,
-    `SOLVEMODE`, `INTEGRATOR`, `MAXIMALSOLIDITERATIONS`) are in every shipped
-    experiment. Decided: a load reads them and ignores them; a save no longer
-    writes them. `SIMULATIONLIBRARY` loses its Dynamo value only. `STEPSIZE`
-    stays: DynaMechs uses it. **Open:** what a load does with a file whose
-    `SIMULATIONLIBRARY` is Dynamo.
-  - **The maths library `libdynalib.a`,** whose `DL_vector` and `DL_matrix`
-    SIGEL is built on. PORTING.md, "Follow-up this change deliberately did not
-    take", point 3, has the plan: a small local header in its place. Assess
-    first; the replacement is expected to be 1:1. The fitness gates prove it.
-  Doc comments that name Dynamo go with the code they describe. The comment on
-  the guard in `SIG_SimulationVisualisationWidget::visualizeThis` names Dynamo
-  too; the guard stays, for `SIG_CannotMirtich`.
+  PORTING.md, "Dynamo removed, DynaMechs kept", has the background. SIGEL
+  assumes DynaMechs only: nothing new checks for Dynamo, a load just ignores
+  what Dynamo needed. Five batches, one round each, in this order.
+  1. **Simulation Parameters page:** the "Used simulation library" group and
+     the `DynaMo` tab in `SIG_SimulationParameterBase.ui`, with their code in
+     `SIG_SimulationParameter::putIntoExperiment` and `getOutOfExperiment`.
+  2. **Environment page:** the whole `DynaMo` tab in `SIG_EnvironmentBase.ui`,
+     with its code in `SIG_EnvironmentView`. Material name is read by nothing.
+     Level only shifts the drawn floor and grid, so any value but 0 draws the
+     floor where the physics does not have it; it goes too.
+  3. **The model's Dynamo choice:** the `SimulationLibrary` enum and every
+     switch on it, the check in `SIG_GUIGPExperiment::slotRobotInfo`,
+     `SIG_Robot::prepareDynaMo`, `SIG_Link::transformToDynaMo` and the two
+     `SIG_Mirtich` members only it calls, `SIG_Simulation::slotDynamoMessage`,
+     `stopSimulation`, `SIG_SimulationCannotSolveException`, and the `QObject`
+     base of `SIG_Simulation`, which exists only for that slot.
+  4. **The `.exp` format:** a load ignores `MAXIMALERROR`,
+     `MAXIMALITERATIONS`, `SKIPFRAMES`, `ANALYTICAL`, `MAXIMALCOLLISIONLOOPS`,
+     `SOLVEMODE`, `INTEGRATOR`, `MAXIMALSOLIDITERATIONS`, `FLOORMATERIALNAME`
+     and `YPLANELEVEL`, and a save no longer writes them. A load also ignores
+     `SIMULATIONLIBRARY`; a save still writes it, as 1. `STEPSIZE` stays:
+     DynaMechs uses it.
+  5. **The maths library `libdynalib.a`:** two local headers,
+     `SIGEL_Tools/DL_vector.h` and `DL_matrix.h`, with only the members SIGEL
+     uses, take its place. The fitness gates prove the replacement.
+  Doc comments that name Dynamo go with the code they describe, or are
+  reworded where the code stays. The comment on the guard in
+  `SIG_SimulationVisualisationWidget::visualizeThis` stays, for
+  `SIG_CannotMirtich`.
 
 - [ ] **83. Put ZORC support behind a compile-time switch, off by default.**
   Decided. ZORC is a real robot driven over a serial line; the simulation does
