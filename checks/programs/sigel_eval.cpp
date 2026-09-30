@@ -96,7 +96,7 @@ static void dumpOrder(const SIGEL_Robot::SIG_Robot &r, const char *which)
     if (!g) { printf("  %-8s geom      -  %s  (none)\n", which, qPrintable(b->getName())); continue; }
     double sum = 0.0;
     for (int i = 0; i < g->getNumVertices(); ++i) {
-      DL_vector v = g->getVertex(i);
+      SIG_Vector v = g->getVertex(i);
       sum += v.get(0) * 1.0 + v.get(1) * 2.0 + v.get(2) * 3.0;
     }
     printf("  %-8s geom   %4d v %4d p  %+.9e  %s\n", which,
@@ -159,8 +159,8 @@ static int selfcheck()
   }
   {   // SIG_Link::getPoint, same rule.
     SIGEL_Robot::SIG_Link link(0, "L", 0);
-    link.addPoint("P", DL_vector(1, 0, 0));
-    link.addPoint("P", DL_vector(2, 0, 0));
+    link.addPoint("P", SIG_Vector(1, 0, 0));
+    link.addPoint("P", SIG_Vector(2, 0, 0));
     SIG_WANT(link.getPoint("P").x == 2);
   }
   {   // All six of SIG_Robot's lookups. Checking only one left the other five
@@ -475,8 +475,8 @@ int main(int argc, char *argv[])
     }
     double lo = 1e300, hi = -1e300;
     int frames = 0;
-    DL_vector last;
-    for (const DL_vector *p : trace.positions) {
+    SIG_Vector last;
+    for (const SIG_Vector *p : trace.positions) {
       if (p->y < lo) lo = p->y;
       if (p->y > hi) hi = p->y;
       last = *p;

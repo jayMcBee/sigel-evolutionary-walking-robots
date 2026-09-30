@@ -213,7 +213,7 @@ namespace SIGEL_Robot {
                 p.numFaces = geom->getNumPolygons ();
 
                 for (int i = 0; i < p.numVerts; i++) {
-                        DL_vector v = geom->getVertex (i);
+                        SIG_Vector v = geom->getVertex (i);
                         p.verts [i][X] = v.get (X);
                         p.verts [i][Y] = v.get (Y);
                         p.verts [i][Z] = v.get (Z);
@@ -253,8 +253,8 @@ namespace SIGEL_Robot {
 
         void SIG_Mirtich::computePhysics (double density,
                                           double & masse,
-                                          DL_vector & centreOfMass,
-                                          DL_matrix & inertiaTensor)
+                                          SIG_Vector & centreOfMass,
+                                          SIG_Matrix & inertiaTensor)
         {
                 double mass;
                 double r[3];            /* center of mass */

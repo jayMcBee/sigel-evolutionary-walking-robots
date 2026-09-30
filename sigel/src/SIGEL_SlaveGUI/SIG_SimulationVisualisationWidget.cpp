@@ -239,7 +239,7 @@
 
 			if ( traceRobot )
 			{
-				DL_vector robotCentre = simulationVisualisation.getRobotCentre();
+				SIG_Vector robotCentre = simulationVisualisation.getRobotCentre();
 				simulationVisualisation.viewSettings.lookPoint.assign( &robotCentre );
 			}
 
@@ -588,7 +588,7 @@ void SIG_SimulationVisualisationWidget::reportAndEncodeRecording()
 	SIGEL_Visualisation::SIG_SimulationVisualisation *simulationVisualisation =
 	  static_cast< SIGEL_Visualisation::SIG_SimulationVisualisation* >( visualisation );
 
-	DL_vector robotCentre = simulationVisualisation->getRobotCentre();
+	SIG_Vector robotCentre = simulationVisualisation->getRobotCentre();
 	simulationVisualisation->viewSettings.lookPoint.assign( &robotCentre );
 
 	if (automaticRefresh)

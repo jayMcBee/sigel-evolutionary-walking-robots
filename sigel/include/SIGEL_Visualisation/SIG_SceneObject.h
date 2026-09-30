@@ -23,8 +23,8 @@
 #ifndef SIGEL_VISUALISATION_SIG_SCENEOBJECT_H
 #define SIGEL_VISUALISATION_SIG_SCENEOBJECT_H
 
-#include "SIGEL_Tools/DL_vector.h"
-#include "SIGEL_Tools/DL_matrix.h"
+#include "SIGEL_Tools/SIG_Vector.h"
+#include "SIGEL_Tools/SIG_Matrix.h"
 
 namespace SIGEL_Visualisation
 {
@@ -49,8 +49,8 @@ namespace SIGEL_Visualisation
        * @param rotation Initializes the attribute rotation.
        */
       SIG_SceneObject(int number,
-		      DL_vector position = DL_vector(),
-		      DL_matrix rotation = DL_matrix());
+		      SIG_Vector position = SIG_Vector(),
+		      SIG_Matrix rotation = SIG_Matrix());
 
       /**
        * The number of this SIG_SceneObject.
@@ -67,12 +67,12 @@ namespace SIGEL_Visualisation
       /**
        * The current position of the particular object.
        */
-      DL_vector position;
+      SIG_Vector position;
 
       /**
        * The current rotation of the particular object.
        */
-      DL_matrix rotation;
+      SIG_Matrix rotation;
 
     };
 

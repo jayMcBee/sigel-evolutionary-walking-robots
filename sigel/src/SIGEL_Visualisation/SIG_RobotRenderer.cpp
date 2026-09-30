@@ -77,17 +77,17 @@ namespace SIGEL_Visualisation
 	  {
 	    SIGEL_Robot::SIG_Polygon const &actPolygon = actGeoIter.current();
 
-	    DL_vector vertex0 = actPolygon.getVertex( 0 );
-	    DL_vector vertex1 = actPolygon.getVertex( 1 );
-	    DL_vector vertex2 = actPolygon.getVertex( 2 );
+	    SIG_Vector vertex0 = actPolygon.getVertex( 0 );
+	    SIG_Vector vertex1 = actPolygon.getVertex( 1 );
+	    SIG_Vector vertex2 = actPolygon.getVertex( 2 );
 
-	    DL_vector u = vertex0;
+	    SIG_Vector u = vertex0;
 	    u.minusis( &vertex1 );
 
-	    DL_vector v = vertex2;
+	    SIG_Vector v = vertex2;
 	    v.minusis( &vertex1 );
 
-	    DL_vector polygonNormal;
+	    SIG_Vector polygonNormal;
 
 	    v.crossprod( &u, &polygonNormal );
 
@@ -98,7 +98,7 @@ namespace SIGEL_Visualisation
 	    glBegin(GL_POLYGON);
 	    for (int i=0; i<actPolygon.getNumVertices(); i++)
 	      {
-		DL_vector actVertex = actPolygon.getVertex(i);
+		SIG_Vector actVertex = actPolygon.getVertex(i);
 		glVertex3d( static_cast<GLdouble>(actVertex.get(0)),
 			    static_cast<GLdouble>(actVertex.get(1)),
 			    static_cast<GLdouble>(actVertex.get(2)) );
@@ -116,7 +116,7 @@ namespace SIGEL_Visualisation
 
 	    GLuint actListIndex = pointIndex + displayListsOffset;
 
-	    DL_vector pointPosition = *pointEntry.value;
+	    SIG_Vector pointPosition = *pointEntry.value;
 
 	    glNewList( actListIndex, GL_COMPILE );
 	    glPointSize( 5 );
@@ -134,7 +134,7 @@ namespace SIGEL_Visualisation
 
 	    newPointSceneObject->setFloatingText( newFloatingText );
 
-	    DL_vector linkColor = actLink.getMaterial()->getColour();
+	    SIG_Vector linkColor = actLink.getMaterial()->getColour();
 
 	    for (int i=0; i<3; i++)
 	      {

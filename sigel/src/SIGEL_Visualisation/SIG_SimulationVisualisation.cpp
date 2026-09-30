@@ -142,14 +142,14 @@ namespace SIGEL_Visualisation
 
      // The box around every vertex at time 0 gives the robot's centre and size.
      // A robot without vertices keeps a box of size 0 at the origin.
-     DL_vector lowest( 0, 0, 0 ), highest( 0, 0, 0 );
+     SIG_Vector lowest( 0, 0, 0 ), highest( 0, 0, 0 );
      bool anyVertex = false;
      for ( SIGEL_Robot::SIG_Link *link : robot.getLinks() )
        {
 	 SIG_SceneObject *recordedLink = renderRecorder->robotLinks[ link->getNumber() ];
-	 for ( DL_vector *vertex : link->getGeometry()->getVertices() )
+	 for ( SIG_Vector *vertex : link->getGeometry()->getVertices() )
 	   {
-	     DL_vector worldVertex;
+	     SIG_Vector worldVertex;
 	     recordedLink->rotation.times( vertex, &worldVertex );
 	     worldVertex.plusis( &recordedLink->position );
 	     if (!anyVertex)
@@ -168,12 +168,12 @@ namespace SIGEL_Visualisation
 	   };
        };
 
-     DL_vector centre;
+     SIG_Vector centre;
      centre.assign( &lowest );
      centre.plusis( &highest );
      centre.timesis( 0.5 );
 
-     DL_vector diagonal;
+     SIG_Vector diagonal;
      diagonal.assign( &highest );
      diagonal.minusis( &lowest );
      robotRadius = diagonal.norm() / 2;
@@ -289,7 +289,7 @@ namespace SIGEL_Visualisation
     QMatrix4x4 lightView;
     lightView.lookAt( sunDirection, QVector3D( 0, 0, 0 ), QVector3D( 0, 1, 0 ) );
 
-    DL_vector robotCentre = getRobotCentre();
+    SIG_Vector robotCentre = getRobotCentre();
     QVector3D const centre = lightView.map( QVector3D( robotCentre.get(0),
 							robotCentre.get(1),
 							robotCentre.get(2) ) );
@@ -484,15 +484,15 @@ namespace SIGEL_Visualisation
 
 	 if ( frameCounter == 0 )
 	   {
-	     DL_vector realRobotPosition;
+	     SIG_Vector realRobotPosition;
 
-	     DL_vector robotsRealOrigin = robot.initialLocation;
+	     SIG_Vector robotsRealOrigin = robot.initialLocation;
 	     robotsRealOrigin.timesis( -1 );
 
 	     this->getRobotRotation().times( &robotsRealOrigin,
 					     &realRobotPosition );
 
-	     DL_vector robotPosition = this->getRobotPosition();
+	     SIG_Vector robotPosition = this->getRobotPosition();
 
 	     realRobotPosition.plusis( &robotPosition );
 
@@ -528,27 +528,27 @@ namespace SIGEL_Visualisation
       };
   };
 
-  DL_vector SIG_SimulationVisualisation::getRobotPosition() const
+  SIG_Vector SIG_SimulationVisualisation::getRobotPosition() const
   {
     int rootLinkNumber = robot.getRootLink()->getNumber();
 
     return renderRecorder->robotLinks[ rootLinkNumber ]->position;
   };
 
-  DL_matrix SIG_SimulationVisualisation::getRobotRotation() const
+  SIG_Matrix SIG_SimulationVisualisation::getRobotRotation() const
   {
     int rootLinkNumber = robot.getRootLink()->getNumber();
 
     return renderRecorder->robotLinks[ rootLinkNumber ]->rotation;
   };
 
-  DL_vector SIG_SimulationVisualisation::getRobotCentre() const
+  SIG_Vector SIG_SimulationVisualisation::getRobotCentre() const
   {
-    DL_vector offset = centreInRootLink;
-    DL_vector centre;
+    SIG_Vector offset = centreInRootLink;
+    SIG_Vector centre;
     getRobotRotation().times( &offset, &centre );
 
-    DL_vector position = getRobotPosition();
+    SIG_Vector position = getRobotPosition();
     centre.plusis( &position );
 
     return centre;
@@ -564,7 +564,7 @@ namespace SIGEL_Visualisation
 
     QTextStream stream( &file );
 
-    DL_vector finalEyePoint = viewSettings.getAbsoluteEyePoint();
+    SIG_Vector finalEyePoint = viewSettings.getAbsoluteEyePoint();
 
     NEWMAT::ColumnVector finalEyePointColumnVector = SIG_TypeConverter::toColumnVector( finalEyePoint );
 

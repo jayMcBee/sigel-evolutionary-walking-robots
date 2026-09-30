@@ -26,7 +26,7 @@
 namespace SIGEL_Robot { class SIG_CylindricalJoint; }
 
 #include "qstring.h"
-#include "SIGEL_Tools/DL_vector.h"
+#include "SIGEL_Tools/SIG_Vector.h"
 #include "SIGEL_Robot/SIG_Robot.h"
 #include "SIGEL_Robot/SIG_Joint.h"
 
@@ -42,9 +42,9 @@ namespace SIGEL_Robot
  */
   class SIG_CylindricalJoint : public SIG_Joint {
   private:
-    DL_vector leftBase, rightBase;
-    DL_vector leftDir, rightDir;
-    DL_vector leftHand, rightHand;
+    SIG_Vector leftBase, rightBase;
+    SIG_Vector leftDir, rightDir;
+    SIG_Vector leftHand, rightHand;
     double rotMin, rotMax, rotIni;
     double traMin, traMax, traIni;
   public:
@@ -52,17 +52,17 @@ namespace SIGEL_Robot
     SIG_CylindricalJoint (SIG_Robot *par, QTextStream & tx);
     virtual JointType getJointType () const;
 
-    void setLeftPoints (DL_vector VB, DL_vector VD, DL_vector VH);
-    void setRightPoints (DL_vector VB, DL_vector VD, DL_vector VH);
+    void setLeftPoints (SIG_Vector VB, SIG_Vector VD, SIG_Vector VH);
+    void setRightPoints (SIG_Vector VB, SIG_Vector VD, SIG_Vector VH);
     void setRotationalRange (double mn, double mx, double ii);
     void setTranslationalRange (double mn, double mx, double ii);
     
-    DL_vector getLeftBase () const;
-    DL_vector getLeftDir () const;
-    DL_vector getLeftHand () const;
-    DL_vector getRightBase () const;
-    DL_vector getRightDir () const;
-    DL_vector getRightHand () const;
+    SIG_Vector getLeftBase () const;
+    SIG_Vector getLeftDir () const;
+    SIG_Vector getLeftHand () const;
+    SIG_Vector getRightBase () const;
+    SIG_Vector getRightDir () const;
+    SIG_Vector getRightHand () const;
     double getMinRot () const;
     double getMaxRot () const;
     double getIniRot () const;
@@ -71,9 +71,9 @@ namespace SIGEL_Robot
     double getIniTrans () const;
 
     virtual void transformPoints (SIG_Link *side,
-                                  DL_vector mov, DL_matrix rot);
+                                  SIG_Vector mov, SIG_Matrix rot);
     virtual void getGeomRelation
-      (DL_vector &t, DL_matrix &o, SIG_Link *origin);
+      (SIG_Vector &t, SIG_Matrix &o, SIG_Link *origin);
     virtual void writeToFileTransfer (QTextStream & tx);
   };
 }

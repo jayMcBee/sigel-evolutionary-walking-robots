@@ -146,10 +146,10 @@ namespace SIGEL_Robot
                                 if (coordinateNode) {
                                         int noOfVertices = coordinateNode->getNPoints();
                                         int noOfIndices = indexedFaceSetNode->getNCoordIndexes();
-                                        // Held by value, not as owned DL_vector pointers: the NEWMAT multiply and
+                                        // Held by value, not as owned SIG_Vector pointers: the NEWMAT multiply and
                                         // the SIG_Polygon allocations below can throw, and values need no free on the
                                         // unwinding path.
-                                        QList< DL_vector > vertices( noOfVertices );
+                                        QList< SIG_Vector > vertices( noOfVertices );
 
                                         for (int i=0; i < noOfVertices; i++) {
                                                 QList< float > coords(3);

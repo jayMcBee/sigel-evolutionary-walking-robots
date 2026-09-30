@@ -68,8 +68,8 @@ namespace SIGEL_SlaveGUI
 	     SLOT(slotSetSimulationTime(double)) );
 
     connect( visualisationWidget,
-	     SIGNAL(signalPosition(DL_vector)),
-	     SLOT(slotSetPosition(DL_vector)) );
+	     SIGNAL(signalPosition(SIG_Vector)),
+	     SLOT(slotSetPosition(SIG_Vector)) );
 
     connect( traceRobotCheckBox,
 	     SIGNAL(toggled(bool)),
@@ -279,7 +279,7 @@ namespace SIGEL_SlaveGUI
     centerPushButton->setEnabled( manualNavigation );
   };
 
-  void SIG_SimulationWidget::slotSetPosition( DL_vector position )
+  void SIG_SimulationWidget::slotSetPosition( SIG_Vector position )
   {
     QString xPosString = QString::number( position.get( 0 ), 'f', 2 );
     QString yPosString = QString::number( position.get( 1 ), 'f', 2 );

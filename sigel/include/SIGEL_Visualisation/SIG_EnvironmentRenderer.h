@@ -28,7 +28,7 @@
 #include "SIGEL_Visualisation/SIG_ViewSettings.h"
 
 #include <QList>
-#include "SIGEL_Tools/DL_vector.h"
+#include "SIGEL_Tools/SIG_Vector.h"
 
 namespace SIGEL_Visualisation
 {
@@ -113,7 +113,7 @@ namespace SIGEL_Visualisation
 
     QString createPovrayDeclarations();
 
-    void setLookPoint( DL_vector newPosition );
+    void setLookPoint( SIG_Vector newPosition );
 
     void setPlaneColor( double red,
 			double green,
@@ -129,7 +129,7 @@ namespace SIGEL_Visualisation
 
     void setShowRobotPath( bool newShowRobotPath );
 
-    void addRobotPathPoint( DL_vector newPoint );
+    void addRobotPathPoint( SIG_Vector newPoint );
 
     /**
     	*	This functions loads the specified file and writes all the relevant data
@@ -216,13 +216,13 @@ namespace SIGEL_Visualisation
 
     GLint const fieldEdgeLength;
 
-    DL_vector lookPoint;
+    SIG_Vector lookPoint;
 
     bool showRobotPath;
 
     bool withTexture;
 
-    QList< DL_vector * > robotPathPoints;
+    QList< SIG_Vector * > robotPathPoints;
 
     /**
     	*	This variable holds a texture

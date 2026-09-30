@@ -97,7 +97,7 @@ while (git) {
         cout << "With index "
              << poly.getVertexIndex (i)
              << ": ";
-        DL_vector v = poly.getVertex (i);
+        SIG_Vector v = poly.getVertex (i);
         cout << v.get (0) << ","
              << v.get (1) << ","
              << v.get (2) << "\n";

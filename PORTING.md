@@ -909,7 +909,20 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-30 — DONE: ITEM 64, BATCH 5a, THE LIBRARY SWAP.** Start here.
+**2026-09-30 — DONE: ITEM 64, BATCH 5, THE RENAME.** Start here.
+
+- **Changed:** `DL_vector` and `DL_matrix` are `SIG_Vector` and
+  `SIG_Matrix`, in `SIGEL_Tools/SIG_Vector.h` and `SIG_Matrix.h`, still
+  global; `SIG_TypeConverter::toDL_vector` and `toDL_matrix` are
+  `toSIG_Vector` and `toSIG_Matrix`. The class comments name Dynamo's
+  originals, where the member names come from.
+- **Review:** no defect; the diff is the rename and nothing else.
+- **Gates:** `check.sh` 758 pass, 0 fail (the two headers are now tracked);
+  warnings 387. Fitness, dictorder and PVM unchanged.
+- **Next:** `computePhysics`' German `masse` parameter; `-DMINMAX_H`; the docs
+  and the Dynamo folder on disk.
+
+**2026-09-30 — DONE: ITEM 64, BATCH 5a, THE LIBRARY SWAP.**
 
 - **Changed:** `libdynalib.a` is gone. Two local headers,
   `SIGEL_Tools/DL_vector.h` and `DL_matrix.h`, hold only the members SIGEL

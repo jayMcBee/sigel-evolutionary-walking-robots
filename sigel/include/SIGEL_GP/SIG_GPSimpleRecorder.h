@@ -74,11 +74,11 @@ namespace SIGEL_GP
       /**
        * The starting position
        */
-      DL_vector start;
-      DL_vector end;
+      SIG_Vector start;
+      SIG_Vector end;
 
-      DL_matrix startRotation;
-      DL_matrix endRotation;
+      SIG_Matrix startRotation;
+      SIG_Matrix endRotation;
     };
 
 }

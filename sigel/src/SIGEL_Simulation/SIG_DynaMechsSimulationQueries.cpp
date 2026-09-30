@@ -24,8 +24,8 @@
 #include "SIGEL_Simulation/SIG_DynaMechsSimulationQueries.h"
 
 #include <qdatetime.h>
-#include "SIGEL_Tools/DL_matrix.h"
-#include "SIGEL_Tools/DL_vector.h"
+#include "SIGEL_Tools/SIG_Matrix.h"
+#include "SIGEL_Tools/SIG_Vector.h"
 #include <cmath>
 #include <limits>
 
@@ -59,7 +59,7 @@ void SIGEL_Simulation::SIG_DynaMechsSimulationQueries::sense(int sensorNo,
 	dmABForKinStruct *forKinStruct;
 	NEWMAT::Matrix dynaMechsOrientation;
 	long double minRegisterValue,registerValueRange;
-	DL_matrix	myMat;
+	SIG_Matrix	myMat;
 	dmLink			*internalLink;
 	dmContactModel	*contactModel;
 	dmRigidBody		*rBody;
@@ -281,7 +281,7 @@ double SIGEL_Simulation::SIG_DynaMechsSimulationQueries::getCurrentSimulationSec
   return simulationData.actualFrame * simulationData.simulationParameter.getStepSize();
 };
 
-DL_vector SIGEL_Simulation::SIG_DynaMechsSimulationQueries::getLinkPosition(int linkNo) const
+SIG_Vector SIGEL_Simulation::SIG_DynaMechsSimulationQueries::getLinkPosition(int linkNo) const
 {
   SIG_DynaMechsLink *dynaMechsLink = simulationData.dynaMechsLinks[ linkNo ];
 
@@ -312,17 +312,17 @@ DL_vector SIGEL_Simulation::SIG_DynaMechsSimulationQueries::getLinkPosition(int 
       SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 #endif
 
-      return SIG_TypeConverter::toDL_vector( position );
+      return SIG_TypeConverter::toSIG_Vector( position );
     }
   else
     {
-      DL_vector position(0, 0, 0);
+      SIG_Vector position(0, 0, 0);
 
       return position;
     };
 };
 
-DL_matrix SIGEL_Simulation::SIG_DynaMechsSimulationQueries::getLinkOrientation(int linkNo) const
+SIG_Matrix SIGEL_Simulation::SIG_DynaMechsSimulationQueries::getLinkOrientation(int linkNo) const
 {
   SIG_DynaMechsLink *dynaMechsLink = simulationData.dynaMechsLinks[ linkNo ];
 
@@ -358,11 +358,11 @@ DL_matrix SIGEL_Simulation::SIG_DynaMechsSimulationQueries::getLinkOrientation(i
 	  }
 #endif
 
-      return SIG_TypeConverter::toDL_matrix( orientation );
+      return SIG_TypeConverter::toSIG_Matrix( orientation );
     }
   else
     {
-      DL_matrix orientation;
+      SIG_Matrix orientation;
       orientation.makeone();
 
       return orientation;

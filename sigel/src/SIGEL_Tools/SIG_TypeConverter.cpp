@@ -25,9 +25,9 @@
 namespace SIGEL_Tools
 {
 
-  DL_vector SIG_TypeConverter::toDL_vector( NEWMAT::ColumnVector input )
+  SIG_Vector SIG_TypeConverter::toSIG_Vector( NEWMAT::ColumnVector input )
   {
-    DL_vector result;
+    SIG_Vector result;
 
     for (int i=0; i<3; i++)
       result.set( i, input( i+1 ) );
@@ -35,9 +35,9 @@ namespace SIGEL_Tools
     return result;
   };
 
-  DL_vector SIG_TypeConverter::toDL_vector( CartesianVector const input )
+  SIG_Vector SIG_TypeConverter::toSIG_Vector( CartesianVector const input )
   {
-    DL_vector result;
+    SIG_Vector result;
 
     for (int i=0; i<3; i++)
       result.set( i, input[i] );
@@ -45,7 +45,7 @@ namespace SIGEL_Tools
     return result;
   };
 
-  NEWMAT::ColumnVector SIG_TypeConverter::toColumnVector( DL_vector input )
+  NEWMAT::ColumnVector SIG_TypeConverter::toColumnVector( SIG_Vector input )
   {
     NEWMAT::ColumnVector result( 3 );
 
@@ -65,7 +65,7 @@ namespace SIGEL_Tools
     return result;
   };
 
-  void SIG_TypeConverter::toCartesianVector( DL_vector input, CartesianVector result )
+  void SIG_TypeConverter::toCartesianVector( SIG_Vector input, CartesianVector result )
   {
     for (int i=0; i<3; i++)
       result[i] = input.get( i );
@@ -77,9 +77,9 @@ namespace SIGEL_Tools
       result[i] = input( i+1 );
   };
 
-  DL_matrix SIG_TypeConverter::toDL_matrix( NEWMAT::Matrix input )
+  SIG_Matrix SIG_TypeConverter::toSIG_Matrix( NEWMAT::Matrix input )
   {
-    DL_matrix result;
+    SIG_Matrix result;
 
     for (int i=0; i<3; i++)
       for (int j=0; j<3; j++)
@@ -88,9 +88,9 @@ namespace SIGEL_Tools
     return result;
   };
 
-  DL_matrix SIG_TypeConverter::toDL_matrix( RotationMatrix const input )
+  SIG_Matrix SIG_TypeConverter::toSIG_Matrix( RotationMatrix const input )
   {
-    DL_matrix result;
+    SIG_Matrix result;
 
     for (int i=0; i<3; i++)
       for (int j=0; j<3; j++)
@@ -99,7 +99,7 @@ namespace SIGEL_Tools
     return result;
   };
 
-  NEWMAT::Matrix SIG_TypeConverter::toMatrix( DL_matrix input )
+  NEWMAT::Matrix SIG_TypeConverter::toMatrix( SIG_Matrix input )
   {
     NEWMAT::Matrix result( 3, 3 );
 
@@ -128,7 +128,7 @@ namespace SIGEL_Tools
 	result[j][i] = input( i+1, j+1 );
   };
 
-  void SIG_TypeConverter::toRotationMatrix( DL_matrix input, RotationMatrix result )
+  void SIG_TypeConverter::toRotationMatrix( SIG_Matrix input, RotationMatrix result )
   {
     for (int i=0; i<3; i++)
       for (int j=0; j<3; j++)

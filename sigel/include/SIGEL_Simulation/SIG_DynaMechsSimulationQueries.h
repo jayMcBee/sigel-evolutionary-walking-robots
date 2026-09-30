@@ -84,7 +84,7 @@ namespace SIGEL_Simulation
    * @return
    *  the position of the center of mass of link linkNo
    */
-  DL_vector getLinkPosition(int linkNo) const;
+  SIG_Vector getLinkPosition(int linkNo) const;
 
   /** gets the orientation of link linkNo
    * @pre
@@ -97,7 +97,7 @@ namespace SIGEL_Simulation
    * @return
    *  the orientation of the link relativ to the original orientation
    */
-  DL_matrix getLinkOrientation(int linkNo) const;
+  SIG_Matrix getLinkOrientation(int linkNo) const;
 
   /** gets the number of the torso link
    * @pre

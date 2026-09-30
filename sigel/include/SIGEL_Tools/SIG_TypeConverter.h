@@ -23,8 +23,8 @@
 #ifndef SIGEL_TOOLS_SIG_TYPECONVERTER_H
 #define SIGEL_TOOLS_SIG_TYPECONVERTER_H
 
-#include "SIGEL_Tools/DL_vector.h"
-#include "SIGEL_Tools/DL_matrix.h"
+#include "SIGEL_Tools/SIG_Vector.h"
+#include "SIGEL_Tools/SIG_Matrix.h"
 #include <newmat.h>
 #include <dm.h>
 
@@ -36,29 +36,29 @@ class SIG_TypeConverter
 
   public:
 
-    static DL_vector toDL_vector( NEWMAT::ColumnVector input ); /*tested*/
+    static SIG_Vector toSIG_Vector( NEWMAT::ColumnVector input ); /*tested*/
 
-    static DL_vector toDL_vector( CartesianVector const input );
+    static SIG_Vector toSIG_Vector( CartesianVector const input );
 
-    static NEWMAT::ColumnVector toColumnVector( DL_vector input );
+    static NEWMAT::ColumnVector toColumnVector( SIG_Vector input );
 
     static NEWMAT::ColumnVector toColumnVector( CartesianVector const input );
 
-    static void toCartesianVector( DL_vector input, CartesianVector result );
+    static void toCartesianVector( SIG_Vector input, CartesianVector result );
 
     static void toCartesianVector( NEWMAT::ColumnVector input, CartesianVector result );
 
-    static DL_matrix toDL_matrix( NEWMAT::Matrix input );
+    static SIG_Matrix toSIG_Matrix( NEWMAT::Matrix input );
 
-    static DL_matrix toDL_matrix( RotationMatrix const input );
+    static SIG_Matrix toSIG_Matrix( RotationMatrix const input );
 
-    static NEWMAT::Matrix toMatrix( DL_matrix input );
+    static NEWMAT::Matrix toMatrix( SIG_Matrix input );
 
     static NEWMAT::Matrix toMatrix( RotationMatrix const input );
 
     static void toRotationMatrix( NEWMAT::Matrix input, RotationMatrix result );
 
-    static void toRotationMatrix( DL_matrix input, RotationMatrix result );
+    static void toRotationMatrix( SIG_Matrix input, RotationMatrix result );
 
     static NEWMAT::Matrix sigelToDynaMechs();
 

@@ -23,8 +23,8 @@
 #ifndef SIGEL_ENVIRONMENT_SIG_ENVIRONMENT_H
 #define SIGEL_ENVIRONMENT_SIG_ENVIRONMENT_H
 
-// DL_vector only.
-#include "SIGEL_Tools/DL_vector.h"
+// SIG_Vector only.
+#include "SIGEL_Tools/SIG_Vector.h"
 #include <qtextstream.h>
 #include <qstring.h>
 #include <dmEnvironment.hpp>
@@ -57,8 +57,8 @@ class SIG_Environment {
    * @post
    *  Sets gravity to newGravity.
    */  
-  SIG_Environment(DL_vector newGravity, double newVeloDamping, 
-		  DL_vector newStartPosition, 
+  SIG_Environment(SIG_Vector newGravity, double newVeloDamping, 
+		  SIG_Vector newStartPosition, 
 		  double newGroundPlanarSpringConstant, double newGroundNormalSpringConstant,
 		  double newGroundPlanarDamperConstant, double newGroundNormalDamperConstant, 
 		  double newFrictionCoeff_u_s, double newFrictionCoeff_u_k);
@@ -97,14 +97,14 @@ class SIG_Environment {
    * @post
    *  Sets gravity to newGravity.
    */  
-  void setGravity(DL_vector newGravity);
+  void setGravity(SIG_Vector newGravity);
 
   /** Reads the gravity
    *
    * @return
    *  The vector for the gravity, where the length defines the acceleration.
    */  
-  DL_vector getGravity() const;
+  SIG_Vector getGravity() const;
 
   /** Sets the veloDamping
    *
@@ -129,14 +129,14 @@ class SIG_Environment {
    * @post
    *  Sets startPosition to newStartPosition.
    */  
-  void setStartPosition(DL_vector newStartPosition);
+  void setStartPosition(SIG_Vector newStartPosition);
 
   /** Reads the startPositon
    *
    * @return
    *  The starting Position of the Robot in the simulation.
    */  
-  DL_vector getStartPosition() const;
+  SIG_Vector getStartPosition() const;
 
    /** Sets the floorDimensionX
    *
@@ -371,11 +371,11 @@ class SIG_Environment {
 
  private:
   /** the storage for the gravity vector */
-  DL_vector gravity;
+  SIG_Vector gravity;
   /** the storage for the velo-damping */
   double veloDamping;
   /** the storage for the start position */
-  DL_vector startPosition;
+  SIG_Vector startPosition;
 	/** the storage of the x-dimension of the floor */
 	int floorDimensionX;
 	/** the storage of the z-dimension of the floor */

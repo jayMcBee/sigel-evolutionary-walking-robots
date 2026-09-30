@@ -44,7 +44,7 @@ namespace SIGEL_Robot {
 	  return std::acos( cosInput );
 	};
 
-        DL_vector orthogonalVector( DL_vector input )
+        SIG_Vector orthogonalVector( SIG_Vector input )
 	{
 	  int firstIndex;
 
@@ -59,7 +59,7 @@ namespace SIGEL_Robot {
 
 	  int thirdIndex = (secondIndex + 1) % 3;
 
-	  DL_vector result;
+	  SIG_Vector result;
 	  result.set( firstIndex, - input.get( secondIndex ) );
 	  result.set( secondIndex, input.get( firstIndex ) );
 	  result.set( thirdIndex, 0 );
@@ -69,7 +69,7 @@ namespace SIGEL_Robot {
 	  return result;
 	};
 
-        DL_matrix rotationMatrix(DL_vector v, double phi)
+        SIG_Matrix rotationMatrix(SIG_Vector v, double phi)
 	{
 	  double sinPhi = std::sin( phi / 2 );
 	  double cosPhi = std::cos( phi / 2 );
@@ -86,17 +86,17 @@ namespace SIGEL_Robot {
 
 	  buildRotMat( q, result );
 
-	  return SIG_TypeConverter::toDL_matrix( result );
+	  return SIG_TypeConverter::toSIG_Matrix( result );
 	}
 
-        NEWMAT::Matrix phatRockingUpStylinVectorBendingAngleSwingingMasterFunction( DL_vector _winportA,
-										    DL_vector _winportB,
-										    DL_vector _winportC,
-										    DL_vector otherA,
-										    DL_vector otherB,
-										    DL_vector otherC )
+        NEWMAT::Matrix phatRockingUpStylinVectorBendingAngleSwingingMasterFunction( SIG_Vector _winportA,
+										    SIG_Vector _winportB,
+										    SIG_Vector _winportC,
+										    SIG_Vector otherA,
+										    SIG_Vector otherB,
+										    SIG_Vector otherC )
 	{
-	  DL_vector firstTranslationVector = _winportA;
+	  SIG_Vector firstTranslationVector = _winportA;
 	  firstTranslationVector.minusis( &otherA );
 
 	  otherB.plusis( &firstTranslationVector );
@@ -134,7 +134,7 @@ namespace SIGEL_Robot {
 	  SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 #endif
 
-	  DL_matrix firstRotation;
+	  SIG_Matrix firstRotation;
 
 	  double const minimalAngleMeasure = 0.00001;
 
@@ -146,7 +146,7 @@ namespace SIGEL_Robot {
 	    {
 	      if (std::abs( pi - bsAngle ) > minimalAngleMeasure)
 		{
-		  DL_vector bsNormal;
+		  SIG_Vector bsNormal;
 
 		  otherB.crossprod( &_winportB, &bsNormal );
 		  bsNormal.normalize();
@@ -155,7 +155,7 @@ namespace SIGEL_Robot {
 		}
 	      else
 		{
-		  DL_vector rotationAxis = orthogonalVector( _winportB );
+		  SIG_Vector rotationAxis = orthogonalVector( _winportB );
 
 		  firstRotation = rotationMatrix( rotationAxis, bsAngle );
 		};
@@ -163,7 +163,7 @@ namespace SIGEL_Robot {
 	  else
 	    firstRotation.makeone();
 
-	  DL_vector bufferVector = otherB;
+	  SIG_Vector bufferVector = otherB;
 	  firstRotation.times( &bufferVector, &otherB );
 	  bufferVector = otherC;
 	  firstRotation.times( &bufferVector, &otherC );
@@ -191,17 +191,17 @@ namespace SIGEL_Robot {
 	  SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 #endif
 
-	  DL_matrix secondRotation;
+	  SIG_Matrix secondRotation;
 
-	  DL_vector u = orthogonalVector( _winportB );
+	  SIG_Vector u = orthogonalVector( _winportB );
 
-	  DL_vector v;
+	  SIG_Vector v;
 	  _winportB.crossprod( &u, &v );
 	  v.normalize();
 
-	  DL_vector cProjected;
+	  SIG_Vector cProjected;
 
-	  SIG_Joint::calculateCut( DL_vector(0, 0, 0),
+	  SIG_Joint::calculateCut( SIG_Vector(0, 0, 0),
 				   u,
 				   v,
 				   _winportC,
@@ -209,9 +209,9 @@ namespace SIGEL_Robot {
 				   cProjected );
 	  cProjected.normalize();
 
-	  DL_vector otherCProjected;
+	  SIG_Vector otherCProjected;
 
-	  SIG_Joint::calculateCut( DL_vector(0, 0, 0),
+	  SIG_Joint::calculateCut( SIG_Vector(0, 0, 0),
 				   u,
 				   v,
 				   otherC,
@@ -225,7 +225,7 @@ namespace SIGEL_Robot {
 	    {
 	      if (std::abs( pi - csAngle ) > minimalAngleMeasure)
 		{
-		  DL_vector csNormal;
+		  SIG_Vector csNormal;
 
 		  otherCProjected.crossprod( &cProjected, &csNormal );
 		  csNormal.normalize();
@@ -295,14 +295,14 @@ namespace SIGEL_Robot {
 	  return transformation;
 	};
 
-        void calculateAnyJoint (DL_vector _winportA, DL_vector _winportB, DL_vector _winportC,
-                                DL_vector _winportD, DL_vector _winportE, DL_vector _winportF,
+        void calculateAnyJoint (SIG_Vector _winportA, SIG_Vector _winportB, SIG_Vector _winportC,
+                                SIG_Vector _winportD, SIG_Vector _winportE, SIG_Vector _winportF,
                                 double winkel, double verschiebung,
-                                DL_matrix & _winport_o, DL_vector & _winport_t,
+                                SIG_Matrix & _winport_o, SIG_Vector & _winport_t,
                                 QString someIdentifier)
         {
                 // Make the points coverable.
-                DL_vector r, zw;
+                SIG_Vector r, zw;
                 double h1;
                 
                 r.assign (&_winportB);
@@ -350,28 +350,28 @@ namespace SIGEL_Robot {
 													     _winportE,
 													     _winportF );
 
-		_winport_o = SIG_TypeConverter::toDL_matrix( transformation.SubMatrix( 1, 3, 1, 3 ) );
-		_winport_t = SIG_TypeConverter::toDL_vector( transformation.SubMatrix( 1, 3, 4, 4 ) );
+		_winport_o = SIG_TypeConverter::toSIG_Matrix( transformation.SubMatrix( 1, 3, 1, 3 ) );
+		_winport_t = SIG_TypeConverter::toSIG_Vector( transformation.SubMatrix( 1, 3, 4, 4 ) );
 
-                DL_vector v (&_winportB);
+                SIG_Vector v (&_winportB);
                 v.minusis (&_winportA);
 
-                DL_vector schiebung (&v);
+                SIG_Vector schiebung (&v);
                 schiebung.timesis (verschiebung);
                 _winport_t.plusis (&schiebung);
 
                 double phi = (winkel / 180.0) * M_PI;
 
-                DL_matrix drehmatrix;
+                SIG_Matrix drehmatrix;
 
 		drehmatrix=rotationMatrix(v,-phi);
                 _winport_t.minusis (&_winportA);
-                DL_vector stflorianhilf;
+                SIG_Vector stflorianhilf;
                 drehmatrix.times (&_winport_t, &stflorianhilf);
                 _winport_t.assign (&stflorianhilf);
                 _winport_t.plusis (&_winportA);
 
-                DL_matrix hilf;
+                SIG_Matrix hilf;
                 drehmatrix.times (&_winport_o, &hilf);
                 _winport_o.assign (&hilf);
         }

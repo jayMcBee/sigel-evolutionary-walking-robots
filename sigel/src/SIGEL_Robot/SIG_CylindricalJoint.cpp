@@ -44,14 +44,14 @@ namespace SIGEL_Robot {
         SIG_Joint::JointType SIG_CylindricalJoint::getJointType () const
         { return tCylindricalJoint; }
         
-        void SIG_CylindricalJoint::setLeftPoints (DL_vector _winportB, DL_vector _winportD, DL_vector _winportH)
+        void SIG_CylindricalJoint::setLeftPoints (SIG_Vector _winportB, SIG_Vector _winportD, SIG_Vector _winportH)
         {
                 leftBase = _winportB;
                 leftDir = _winportD;
                 leftHand = _winportH;
         }
 
-        void SIG_CylindricalJoint::setRightPoints (DL_vector _winportB, DL_vector _winportD, DL_vector _winportH)
+        void SIG_CylindricalJoint::setRightPoints (SIG_Vector _winportB, SIG_Vector _winportD, SIG_Vector _winportH)
         {
                 rightBase = _winportB;
                 rightDir = _winportD;
@@ -72,12 +72,12 @@ namespace SIGEL_Robot {
                 traIni = ii;
         }
     
-        DL_vector SIG_CylindricalJoint::getLeftBase () const { return leftBase; }
-        DL_vector SIG_CylindricalJoint::getLeftDir () const { return leftDir; }
-        DL_vector SIG_CylindricalJoint::getLeftHand () const { return leftHand; }
-        DL_vector SIG_CylindricalJoint::getRightBase () const { return rightBase; }
-        DL_vector SIG_CylindricalJoint::getRightDir () const { return rightDir; }
-        DL_vector SIG_CylindricalJoint::getRightHand () const { return rightHand; }
+        SIG_Vector SIG_CylindricalJoint::getLeftBase () const { return leftBase; }
+        SIG_Vector SIG_CylindricalJoint::getLeftDir () const { return leftDir; }
+        SIG_Vector SIG_CylindricalJoint::getLeftHand () const { return leftHand; }
+        SIG_Vector SIG_CylindricalJoint::getRightBase () const { return rightBase; }
+        SIG_Vector SIG_CylindricalJoint::getRightDir () const { return rightDir; }
+        SIG_Vector SIG_CylindricalJoint::getRightHand () const { return rightHand; }
         double SIG_CylindricalJoint::getMinRot () const { return rotMin; }
         double SIG_CylindricalJoint::getMaxRot () const { return rotMax; }
         double SIG_CylindricalJoint::getIniRot () const { return rotIni;}
@@ -86,7 +86,7 @@ namespace SIGEL_Robot {
         double SIG_CylindricalJoint::getIniTrans () const { return traIni; }
 
         void SIG_CylindricalJoint::transformPoints
-        (SIG_Link *side, DL_vector mov, DL_matrix rot)
+        (SIG_Link *side, SIG_Vector mov, SIG_Matrix rot)
         {
                 if (side == leftLink) {
                         tfap (mov, rot, &leftBase);
@@ -99,7 +99,7 @@ namespace SIGEL_Robot {
                 }
         }
         
-        void SIG_CylindricalJoint::getGeomRelation (DL_vector &t, DL_matrix &o, SIG_Link *origin)
+        void SIG_CylindricalJoint::getGeomRelation (SIG_Vector &t, SIG_Matrix &o, SIG_Link *origin)
         {
                 if (leftLink == origin) {
                         calculateAnyJoint

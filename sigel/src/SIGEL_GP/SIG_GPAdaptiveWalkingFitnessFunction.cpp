@@ -60,15 +60,15 @@ namespace SIGEL_GP
     // (usually number of elements in recorder-obj., but we may have terminated earlier)
     steps = simulation->getMaxRecorderSteps(100);
 
-    DL_vector realStartPosition = normalizeRobotPosition( *recorder.positions.value( 0 ),
+    SIG_Vector realStartPosition = normalizeRobotPosition( *recorder.positions.value( 0 ),
 							  *recorder.rotations.value( 0 ), rob );
 
-    DL_vector realEndPosition = normalizeRobotPosition( recorder.endPosition,
+    SIG_Vector realEndPosition = normalizeRobotPosition( recorder.endPosition,
 							recorder.endRotation, rob );
 
     double const startHeight = realStartPosition.y;
 
-    DL_vector distanceVector = realStartPosition;
+    SIG_Vector distanceVector = realStartPosition;
     distanceVector.minusis( &realEndPosition );
 
     double distance = distanceVector.norm();
@@ -77,23 +77,23 @@ namespace SIGEL_GP
 
     fitness = distance / simulatedSeconds;
 
-    DL_vector *endPosition = new DL_vector();
+    SIG_Vector *endPosition = new SIG_Vector();
     *endPosition = recorder.endPosition;
 
-    DL_matrix *endRotation = new DL_matrix();
+    SIG_Matrix *endRotation = new SIG_Matrix();
     *endRotation = recorder.endRotation;
 
     recorder.positions.append( endPosition );
     recorder.rotations.append( endRotation );
 
     qsizetype recIdx = 0;
-    DL_vector *actPosition = recorder.positions.value( recIdx );
-    DL_matrix *actRotation = recorder.rotations.value( recIdx );
+    SIG_Vector *actPosition = recorder.positions.value( recIdx );
+    SIG_Matrix *actRotation = recorder.rotations.value( recIdx );
 
         // iterate through recorded positions and evaluate !
     while (actPosition)
 		{
-			DL_vector actRealPosition = normalizeRobotPosition( *actPosition, *actRotation, rob );
+			SIG_Vector actRealPosition = normalizeRobotPosition( *actPosition, *actRotation, rob );
 
 			if ( !(isValid( actRealPosition.x ) && isValid( actRealPosition.y ) && isValid( actRealPosition.z )) )
 	  	{

@@ -152,7 +152,7 @@ namespace SIGEL_RobotIO {
                                                       QString Blink, QString BB, QString BD, QString BH)
         {
                 SIG_Link *leftlink, *rightlink;
-                DL_vector lb, ld, lh, rb, rd, rh;
+                SIG_Vector lb, ld, lh, rb, rd, rh;
 
                 leftlink = target->lookupLink (Alink);
                 if (!leftlink)
@@ -204,7 +204,7 @@ namespace SIGEL_RobotIO {
                                                       QString Blink, QString BB, QString BD, QString BF)
         {
                 SIG_Link *leftlink, *rightlink;
-                DL_vector lb, ld, lh, rb, rd, rh;
+                SIG_Vector lb, ld, lh, rb, rd, rh;
 
                 leftlink = target->lookupLink (Alink);
                 if (!leftlink)

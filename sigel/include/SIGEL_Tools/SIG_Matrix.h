@@ -21,10 +21,10 @@
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-#ifndef SIGEL_TOOLS_DL_MATRIX_H
-#define SIGEL_TOOLS_DL_MATRIX_H
+#ifndef SIGEL_TOOLS_SIG_MATRIX_H
+#define SIGEL_TOOLS_SIG_MATRIX_H
 
-#include "SIGEL_Tools/DL_vector.h"
+#include "SIGEL_Tools/SIG_Vector.h"
 
 /**
  * A 3x3 matrix, stored as three column vectors. Its members are named and
@@ -33,14 +33,14 @@
  *
  * The default constructor leaves the elements uninitialised.
  */
-class DL_matrix
+class SIG_Matrix
 {
 public:
-  DL_vector c0;
-  DL_vector c1;
-  DL_vector c2;
+  SIG_Vector c0;
+  SIG_Vector c1;
+  SIG_Vector c2;
 
-  DL_matrix() {}
+  SIG_Matrix() {}
 
   void makeone()
   {
@@ -48,7 +48,7 @@ public:
     c0.y = c0.z = c1.x = c1.z = c2.x = c2.y = 0.0;
   }
 
-  void assign( DL_matrix *m )
+  void assign( SIG_Matrix *m )
   {
     c0.assign( &m->c0 );
     c1.assign( &m->c1 );
@@ -76,7 +76,7 @@ public:
   }
 
   // nm = this * m
-  void times( DL_matrix *m, DL_matrix *nm )
+  void times( SIG_Matrix *m, SIG_Matrix *nm )
   {
     nm->c0.x = c0.x * m->c0.x + c1.x * m->c0.y + c2.x * m->c0.z;
     nm->c1.x = c0.x * m->c1.x + c1.x * m->c1.y + c2.x * m->c1.z;
@@ -92,7 +92,7 @@ public:
   }
 
   // nv = this * v
-  void times( DL_vector *v, DL_vector *nv )
+  void times( SIG_Vector *v, SIG_Vector *nv )
   {
     nv->x = c0.x * v->x + c1.x * v->y + c2.x * v->z;
     nv->y = c0.y * v->x + c1.y * v->y + c2.y * v->z;
@@ -100,7 +100,7 @@ public:
   }
 
   // nv = transpose(this) * v
-  void transposetimes( DL_vector *v, DL_vector *nv )
+  void transposetimes( SIG_Vector *v, SIG_Vector *nv )
   {
     nv->x = c0.x * v->x + c0.y * v->y + c0.z * v->z;
     nv->y = c1.x * v->x + c1.y * v->y + c1.z * v->z;
@@ -108,4 +108,4 @@ public:
   }
 };
 
-#endif // SIGEL_TOOLS_DL_MATRIX_H
+#endif // SIGEL_TOOLS_SIG_MATRIX_H

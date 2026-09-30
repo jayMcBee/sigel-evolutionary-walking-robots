@@ -44,28 +44,28 @@ namespace SIGEL_Robot {
                 return tGlueJoint;
         }
         
-        void SIG_GlueJoint::setPlaneA (DL_vector p1, DL_vector p2, DL_vector p3)
+        void SIG_GlueJoint::setPlaneA (SIG_Vector p1, SIG_Vector p2, SIG_Vector p3)
         {
                 ptA1 = p1;
                 ptA2 = p2;
                 ptA3 = p3;
         }
         
-        void SIG_GlueJoint::setPlaneB (DL_vector p1, DL_vector p2, DL_vector p3)
+        void SIG_GlueJoint::setPlaneB (SIG_Vector p1, SIG_Vector p2, SIG_Vector p3)
         {
                 ptB1 = p1;
                 ptB2 = p2;
                 ptB3 = p3;
         }
         
-        void SIG_GlueJoint::getPlaneA (DL_vector &p1, DL_vector &p2, DL_vector &p3)
+        void SIG_GlueJoint::getPlaneA (SIG_Vector &p1, SIG_Vector &p2, SIG_Vector &p3)
         {
                 p1 = ptA1;
                 p2 = ptA2;
                 p3 = ptA3;
         }
         
-        void SIG_GlueJoint::getPlaneB (DL_vector &p1, DL_vector &p2, DL_vector &p3)
+        void SIG_GlueJoint::getPlaneB (SIG_Vector &p1, SIG_Vector &p2, SIG_Vector &p3)
         {
                 p1 = ptB1;
                 p2 = ptB2;
@@ -73,7 +73,7 @@ namespace SIGEL_Robot {
         }
         
         void SIG_GlueJoint::transformPoints
-        (SIG_Link *side, DL_vector mov, DL_matrix rot)
+        (SIG_Link *side, SIG_Vector mov, SIG_Matrix rot)
         {
                 if (side == leftLink) {
                         tfap (mov, rot, &ptA1);
@@ -86,7 +86,7 @@ namespace SIGEL_Robot {
                 }
         }
         
-        void SIG_GlueJoint::getGeomRelation (DL_vector &t, DL_matrix &o, SIG_Link *origin)
+        void SIG_GlueJoint::getGeomRelation (SIG_Vector &t, SIG_Matrix &o, SIG_Link *origin)
         {
                 if (leftLink == origin) {
                         calculateAnyJoint

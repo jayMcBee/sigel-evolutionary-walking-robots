@@ -23,8 +23,8 @@
 #include "SIGEL_Simulation/SIG_SimulationQueries.h"
 
 #include <qdatetime.h>
-#include "SIGEL_Tools/DL_matrix.h"
-#include "SIGEL_Tools/DL_vector.h"
+#include "SIGEL_Tools/SIG_Matrix.h"
+#include "SIGEL_Tools/SIG_Vector.h"
 #include <cmath>
 #include "SIGEL_Tools/SIG_IO.h"
 

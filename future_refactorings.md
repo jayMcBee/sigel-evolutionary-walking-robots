@@ -494,8 +494,9 @@ problem; the choice is made before any code is written.
      `FLOORMATERIALNAME`. The members behind them go. `STEPSIZE` stays:
      DynaMechs uses it.
   5. **The maths library `libdynalib.a`:** two local headers,
-     `SIGEL_Tools/DL_vector.h` and `DL_matrix.h`, with only the members SIGEL
-     uses, take its place. The fitness gates prove the replacement.
+     `SIGEL_Tools/SIG_Vector.h` and `SIG_Matrix.h`, with only the members
+     SIGEL uses, take its place. `DL_vector` and `DL_matrix` are renamed
+     `SIG_Vector` and `SIG_Matrix`; `DL_Scalar` is plain `double`. The fitness gates prove the replacement.
   Doc comments that name Dynamo go with the code they describe, or are
   reworded where the code stays. The comment on the guard in
   `SIG_SimulationVisualisationWidget::visualizeThis` stays, for

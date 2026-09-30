@@ -91,12 +91,12 @@ namespace SIGEL_Robot {
                 return elasticity;
         }
 
-        void SIG_Material::setColour (DL_vector col)
+        void SIG_Material::setColour (SIG_Vector col)
         {
                 colour = col;
         }
 
-        DL_vector SIG_Material::getColour () const
+        SIG_Vector SIG_Material::getColour () const
         {
                 return colour;
         }

@@ -52,12 +52,12 @@ double SIGEL_GP::SIG_GPSimpleFitnessFunction::evalFitness( SIGEL_Program::SIG_Pr
 
   // delete simulation;
 
-  DL_vector startPosition = normalizeRobotPosition( recorder.start, recorder.startRotation, rob );
+  SIG_Vector startPosition = normalizeRobotPosition( recorder.start, recorder.startRotation, rob );
 
-  DL_vector endPosition = normalizeRobotPosition( recorder.end, recorder.endRotation, rob );
+  SIG_Vector endPosition = normalizeRobotPosition( recorder.end, recorder.endRotation, rob );
 
   if (isValid( endPosition.x ) && isValid( endPosition.y ) && isValid( endPosition.z )) {
-    DL_vector distanceVector = endPosition;
+    SIG_Vector distanceVector = endPosition;
 
     distanceVector.minusis( &startPosition );
 

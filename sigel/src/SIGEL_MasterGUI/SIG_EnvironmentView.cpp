@@ -33,7 +33,7 @@
 
 #include "SIGEL_MasterGUI/SIG_EnvironmentView.h"
 
-#include "SIGEL_Tools/DL_vector.h"
+#include "SIGEL_Tools/SIG_Vector.h"
 
 namespace SIGEL_MasterGUI
 {
@@ -78,7 +78,7 @@ SIG_EnvironmentView::SIG_EnvironmentView( QWidget* parent,  const char* name, Qt
 void SIG_EnvironmentView::putIntoExperiment()
 {
   // put the gravity values out of the widgets into the experiment ( lineedits )
-  DL_vector gravityVector( lineeditGravityX->text().toDouble(),
+  SIG_Vector gravityVector( lineeditGravityX->text().toDouble(),
 			   lineeditGravityY->text().toDouble(),
 			   lineeditGravityZ->text().toDouble() );
   theExperiment.environment.setGravity( gravityVector );
@@ -91,7 +91,7 @@ void SIG_EnvironmentView::putIntoExperiment()
 	theExperiment.environment.setTextureFile(lineeditTextureFile->text());
 	theExperiment.environment.setTexAlpha(sliderAlpha->value());
 
-  DL_vector startPositionVector( lineeditStartPositionX->text().toDouble(),
+  SIG_Vector startPositionVector( lineeditStartPositionX->text().toDouble(),
 				 lineeditStartPositionY->text().toDouble(),
 				 lineeditStartPositionZ->text().toDouble() );
   theExperiment.environment.setStartPosition( startPositionVector );
@@ -108,13 +108,13 @@ void SIG_EnvironmentView::putIntoExperiment()
 void SIG_EnvironmentView::getOutOfExperiment()
 {
   // set the gravity vector according to the experiment (three lineedits)
-  DL_vector gravityVector = theExperiment.environment.getGravity();
+  SIG_Vector gravityVector = theExperiment.environment.getGravity();
   lineeditGravityX->setText( QString::number( gravityVector.x) );
   lineeditGravityY->setText( QString::number( gravityVector.y) );
   lineeditGravityZ->setText( QString::number( gravityVector.z) );
 
   // get the start position
-  DL_vector startPositionVector = theExperiment.environment.getStartPosition();
+  SIG_Vector startPositionVector = theExperiment.environment.getStartPosition();
   lineeditStartPositionX->setText( QString::number( startPositionVector.x ) );
   lineeditStartPositionY->setText( QString::number( startPositionVector.y ) );
   lineeditStartPositionZ->setText( QString::number( startPositionVector.z ) );

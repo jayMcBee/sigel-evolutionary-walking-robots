@@ -52,14 +52,14 @@ namespace SIGEL_GP
 
       void finish();
 
-      QList< DL_vector * > positions;
-      QList< DL_matrix * > rotations;
+      QList< SIG_Vector * > positions;
+      QList< SIG_Matrix * > rotations;
 
 
     private:
 
-      DL_vector endPosition;
-      DL_matrix endRotation;
+      SIG_Vector endPosition;
+      SIG_Matrix endRotation;
 
       QList< std::vector<double*> * > listForces;
       int numLinks;

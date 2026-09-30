@@ -25,8 +25,8 @@
 
 namespace SIGEL_Robot { class SIG_Polygon; }
 
-#include "SIGEL_Tools/DL_vector.h"
-#include "SIGEL_Tools/DL_matrix.h"
+#include "SIGEL_Tools/SIG_Vector.h"
+#include "SIGEL_Tools/SIG_Matrix.h"
 #include <qtextstream.h>
 #include "SIGEL_Robot/SIG_Geometry.h"
 
@@ -69,7 +69,7 @@ namespace SIGEL_Robot {
                 /**
                  * Appends a vertex to the polygon.
                  */
-                void appendVertex (DL_vector pt);
+                void appendVertex (SIG_Vector pt);
                 /**
                  * Returns the number of vertices.
                  */
@@ -77,7 +77,7 @@ namespace SIGEL_Robot {
                 /**
                  * Returns the ith vertex.
                  */
-                DL_vector getVertex (int nr) const;
+                SIG_Vector getVertex (int nr) const;
                 /**
                  * Returns the index of the ith vertex.
                  *

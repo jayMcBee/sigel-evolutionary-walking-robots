@@ -26,7 +26,7 @@
 namespace SIGEL_Robot { class SIG_TranslationalJoint; }
 
 #include <qstring.h>
-#include "SIGEL_Tools/DL_vector.h"
+#include "SIGEL_Tools/SIG_Vector.h"
 
 #include "SIGEL_Robot/SIG_Robot.h"
 #include "SIGEL_Robot/SIG_Joint.h"
@@ -41,30 +41,30 @@ namespace SIGEL_Robot
    */
   class SIG_TranslationalJoint : public SIG_Joint {
   private:
-    DL_vector rightBase, leftBase, rightFix;
-    DL_vector leftDir, rightDir, leftFix;
+    SIG_Vector rightBase, leftBase, rightFix;
+    SIG_Vector leftDir, rightDir, leftFix;
     double minimum, maximum, initial;
   public:
     SIG_TranslationalJoint (SIG_Robot *par, QString n, int nr = -1);
     SIG_TranslationalJoint (SIG_Robot *par, QTextStream & tx);
     virtual JointType getJointType () const;
-    void setLeftPoints (DL_vector _winportB, DL_vector _winportD, DL_vector _winportF);
-    void setRightPoints (DL_vector _winportB, DL_vector _winportD, DL_vector _winportF);
+    void setLeftPoints (SIG_Vector _winportB, SIG_Vector _winportD, SIG_Vector _winportF);
+    void setRightPoints (SIG_Vector _winportB, SIG_Vector _winportD, SIG_Vector _winportF);
     void setRange (double mn, double mx, double ii);
-    DL_vector getLeftBase () const;
-    DL_vector getLeftDir () const;
-    DL_vector getLeftFix () const;
-    DL_vector getRightBase () const;
-    DL_vector getRightDir () const;
-    DL_vector getRightFix () const;
+    SIG_Vector getLeftBase () const;
+    SIG_Vector getLeftDir () const;
+    SIG_Vector getLeftFix () const;
+    SIG_Vector getRightBase () const;
+    SIG_Vector getRightDir () const;
+    SIG_Vector getRightFix () const;
     double getMin () const;
     double getMax () const;
     double getIni () const;
 
     virtual void transformPoints (SIG_Link *side,
-                                  DL_vector mov, DL_matrix rot);
+                                  SIG_Vector mov, SIG_Matrix rot);
     virtual void getGeomRelation
-      (DL_vector &t, DL_matrix &o, SIG_Link *origin);
+      (SIG_Vector &t, SIG_Matrix &o, SIG_Link *origin);
     virtual void getMDH (SIG_Link * & predecessor,
 			 double & a, double & alpha,
 			 double & d, double & theta,

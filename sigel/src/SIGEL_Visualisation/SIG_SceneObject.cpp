@@ -26,8 +26,8 @@ namespace SIGEL_Visualisation
 {  
 
   SIG_SceneObject::SIG_SceneObject(int number,
-				   DL_vector,
-				   DL_matrix)
+				   SIG_Vector,
+				   SIG_Matrix)
     : number(number),
       position(position),
       rotation(rotation)

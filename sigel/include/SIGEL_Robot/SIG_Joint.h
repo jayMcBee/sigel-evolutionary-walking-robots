@@ -26,7 +26,7 @@
 namespace SIGEL_Robot { class SIG_Joint; }
 
 #include <qstring.h>
-#include "SIGEL_Tools/DL_vector.h"
+#include "SIGEL_Tools/SIG_Vector.h"
 #include "SIGEL_Robot/SIG_Link.h"
 #include "SIGEL_Robot/SIG_Robot.h"
 
@@ -119,7 +119,7 @@ namespace SIGEL_Robot
                  * the given link.
                  */
                 virtual void transformPoints (SIG_Link *side,
-                                              DL_vector mov, DL_matrix rot) =0;
+                                              SIG_Vector mov, SIG_Matrix rot) =0;
                 /**
                  * Returns the initial geometric relation of the
                  * link on the opposite side. t will be filled with
@@ -127,7 +127,7 @@ namespace SIGEL_Robot
                  * matrix.
                  */
                 virtual void getGeomRelation
-                        (DL_vector &t, DL_matrix &o, SIG_Link *origin) = 0;
+                        (SIG_Vector &t, SIG_Matrix &o, SIG_Link *origin) = 0;
 		/**
 		 * If this is a joint with exactly one Degree of Freedom,
 		 * getMDH will return a set of modified Denavit-Hartenberg
@@ -155,12 +155,12 @@ namespace SIGEL_Robot
 
 		void calculateMDH( SIG_Link *caller );
 
-		static void calculateCut( DL_vector a,
-			           	  DL_vector u,
-				   	  DL_vector v,
-				   	  DL_vector b,
-				   	  DL_vector w,
-				  	  DL_vector &cut );
+		static void calculateCut( SIG_Vector a,
+			           	  SIG_Vector u,
+				   	  SIG_Vector v,
+				   	  SIG_Vector b,
+				   	  SIG_Vector w,
+				  	  SIG_Vector &cut );
 
 		static double normalizeRadAngle( double input );
 
@@ -168,7 +168,7 @@ namespace SIGEL_Robot
                 /**
                  * some method to make my living easier.
                  */
-                void tfap (DL_vector mov, DL_matrix rot, DL_vector *p);
+                void tfap (SIG_Vector mov, SIG_Matrix rot, SIG_Vector *p);
         };
 }
 

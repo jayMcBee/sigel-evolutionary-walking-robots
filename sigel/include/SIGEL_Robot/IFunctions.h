@@ -23,20 +23,20 @@
 #ifndef SIGEL_ROBOT_IFUNCTIONS
 #define SIGEL_ROBOT_IFUNCTIONS
 
-#include "SIGEL_Tools/DL_vector.h"
-#include "SIGEL_Tools/DL_matrix.h"
+#include "SIGEL_Tools/SIG_Vector.h"
+#include "SIGEL_Tools/SIG_Matrix.h"
 #include <qstring.h>
 
 namespace SIGEL_Robot {
 
         double tolerantACos( double cosInput );
 
-        DL_matrix rotationMatrix(DL_vector v, double phi);
+        SIG_Matrix rotationMatrix(SIG_Vector v, double phi);
 
-        void calculateAnyJoint (DL_vector VD, DL_vector VE, DL_vector VF,
-                                DL_vector VA, DL_vector VB, DL_vector VC,
+        void calculateAnyJoint (SIG_Vector VD, SIG_Vector VE, SIG_Vector VF,
+                                SIG_Vector VA, SIG_Vector VB, SIG_Vector VC,
                                 double winkel, double verschiebung,
-                                DL_matrix & mo, DL_vector & vt,
+                                SIG_Matrix & mo, SIG_Vector & vt,
                                 QString someIdentifier);
 }
 

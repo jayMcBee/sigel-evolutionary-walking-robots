@@ -26,7 +26,7 @@
 namespace SIGEL_Robot { class SIG_Mirtich; }
 
 #include <math.h>
-#include "SIGEL_Tools/DL_vector.h"
+#include "SIGEL_Tools/SIG_Vector.h"
 #include "SIGEL_Robot/SIG_Geometry.h"
 #include "SIGEL_Robot/SIG_GeometryIterator.h"
 #include "SIGEL_Robot/SIG_Polygon.h"
@@ -78,8 +78,8 @@ namespace SIGEL_Robot {
 
                 void computePhysics (double density,
                                      double & masse,
-                                     DL_vector & centreOfMass,
-                                     DL_matrix & inertiaTensor);
+                                     SIG_Vector & centreOfMass,
+                                     SIG_Matrix & inertiaTensor);
                 void invalidate () { computed = false; }
  		double getT0()  { return T0; }
         };

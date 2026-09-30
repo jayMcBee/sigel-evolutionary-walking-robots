@@ -74,8 +74,8 @@ namespace SIGEL_GP
         int rootLinkNumber = simulationQueries->getRootNumber();
 
         // get the current position and rotation of the root link
-        DL_vector *newPosition = new DL_vector();
-        DL_matrix *newRotation = new DL_matrix();
+        SIG_Vector *newPosition = new SIG_Vector();
+        SIG_Matrix *newRotation = new SIG_Matrix();
 
         *newPosition = simulationQueries->getLinkPosition( rootLinkNumber );
         *newRotation = simulationQueries->getLinkOrientation( rootLinkNumber );

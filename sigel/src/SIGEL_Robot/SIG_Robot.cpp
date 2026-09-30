@@ -71,7 +71,7 @@ namespace SIGEL_Robot {
 
         void SIG_Robot::clear ()
         {
-		initialLocation = DL_vector (0, 0, 0);
+		initialLocation = SIG_Vector (0, 0, 0);
 		initialOrientation.makeone ();
 
                 delete language;
@@ -245,8 +245,8 @@ namespace SIGEL_Robot {
         void SIG_Robot::initiate ()
         {
                 if (rootlink) {
-                        DL_vector rl (0, 0, 0);
-                        DL_matrix ro;
+                        SIG_Vector rl (0, 0, 0);
+                        SIG_Matrix ro;
                         ro.makeone ();
                         
                         rootlink->setInitialLocation (rl, ro);
@@ -377,30 +377,30 @@ namespace SIGEL_Robot {
                         language = nullptr;
         }
 
-        void SIG_Robot::vectorToStream (QTextStream & tx, DL_vector vec)
+        void SIG_Robot::vectorToStream (QTextStream & tx, SIG_Vector vec)
         {
                 tx << vec.get (0) << ' '
                    << vec.get (1) << ' '
                    << vec.get (2) << ' ';
         }
 
-        DL_vector SIG_Robot::streamToVector (QTextStream & tx)
+        SIG_Vector SIG_Robot::streamToVector (QTextStream & tx)
         {
                 double x, y, z;
                 tx >> x >> y >> z;
-                return DL_vector (x, y, z);
+                return SIG_Vector (x, y, z);
         }
 
-        void SIG_Robot::matrixToStream (QTextStream & tx, DL_matrix mat)
+        void SIG_Robot::matrixToStream (QTextStream & tx, SIG_Matrix mat)
         {
                 tx << mat.get (0,0) << ' ' << mat.get (0,1) << ' ' << mat.get (0,2) << ' '
                    << mat.get (1,0) << ' ' << mat.get (1,1) << ' ' << mat.get (1,2) << ' '
                    << mat.get (2,0) << ' ' << mat.get (2,1) << ' ' << mat.get (2,2) << ' ';
         }
 
-        DL_matrix SIG_Robot::streamToMatrix (QTextStream & tx)
+        SIG_Matrix SIG_Robot::streamToMatrix (QTextStream & tx)
         {
-                DL_matrix mat;
+                SIG_Matrix mat;
                 for (int i = 0; i < 3; i++) {
                         for (int j = 0; j < 3; j++) {
                                 double v;
@@ -413,8 +413,8 @@ namespace SIGEL_Robot {
 
    void SIG_Robot::getRobotInformation(char *outStr, int maxOutLen)
 	{ double link_mass, tot_mass;
-	  DL_vector com;
-	  DL_matrix it;
+	  SIG_Vector com;
+	  SIG_Matrix it;
 	  char   hlp_txt[256];
 	  double link_vol,
 	    dens;

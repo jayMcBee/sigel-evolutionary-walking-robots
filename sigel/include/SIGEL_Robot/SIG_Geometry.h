@@ -27,8 +27,8 @@ namespace SIGEL_Robot { class SIG_Geometry; }
 
 #include <QList>
 #include <qstring.h>
-#include "SIGEL_Tools/DL_vector.h"
-#include "SIGEL_Tools/DL_matrix.h"
+#include "SIGEL_Tools/SIG_Vector.h"
+#include "SIGEL_Tools/SIG_Matrix.h"
 #include "SIGEL_Robot/SIG_Robot.h"
 #include "SIGEL_Robot/SIG_Polygon.h"
 #include "SIGEL_Robot/SIG_GeometryIterator.h"
@@ -53,7 +53,7 @@ namespace SIGEL_Robot {
     // dereferences every vertex, and SIG_Geometry(const SIG_Geometry *)
     // and writeToFileTransfer dereference every polygon.
     QList<SIG_Polygon *> polygons;
-    QList<DL_vector *> vertices;
+    QList<SIG_Vector *> vertices;
 
 public:
     // Both lists own raw pointers that ~SIG_Geometry qDeleteAll's, so a
@@ -121,11 +121,11 @@ private:
      * enables us to order the vertices in some manner without
      * having to change the indices.
      */
-    int getOrAddVertex (DL_vector vertex);
+    int getOrAddVertex (SIG_Vector vertex);
     /**
      * Returns the vector of vertices.
      */
-    QList<DL_vector *> const & getVertices () const;
+    QList<SIG_Vector *> const & getVertices () const;
     /**
      * Returns the number of vertices.
      */
@@ -138,7 +138,7 @@ private:
      * their distance is smaller
      * than the zero defined in the implementation.
      */
-    DL_vector getVertex (int i) const;
+    SIG_Vector getVertex (int i) const;
     /**
      * getNumPolygons reports the number of polygons in
      * the geometry object.
@@ -149,7 +149,7 @@ private:
      *
      * By means of moving all vertices.
      */
-    void translate (DL_vector dir);
+    void translate (SIG_Vector dir);
     /**
      * Rotate the geometry.
      *
@@ -158,7 +158,7 @@ private:
      * perform all transformation that can be done with a
      * matrix multiplication.
      */
-    void rotate (DL_matrix mat);
+    void rotate (SIG_Matrix mat);
 
     /**
      * Write the geometry to a stream.

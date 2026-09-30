@@ -275,7 +275,7 @@
 
       void signalSimulationProgress( double simulationSeconds );
 
-      void signalPosition( DL_vector position );
+      void signalPosition( SIG_Vector position );
 
       void signalSimulationAbort();
 

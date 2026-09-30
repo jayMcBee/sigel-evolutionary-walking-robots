@@ -58,7 +58,7 @@ namespace SIGEL_Robot {
                         tx >> vertices [i];
         }
 
-        void SIG_Polygon::appendVertex (DL_vector pt)
+        void SIG_Polygon::appendVertex (SIG_Vector pt)
         {
                 int idx = vertices.size ();
                 vertices.resize (idx + 1);
@@ -70,7 +70,7 @@ namespace SIGEL_Robot {
                 return vertices.size ();
         }
 
-        DL_vector SIG_Polygon::getVertex (int nr) const
+        SIG_Vector SIG_Polygon::getVertex (int nr) const
         {
                 return myGeometry->getVertex (vertices [nr]);
         }

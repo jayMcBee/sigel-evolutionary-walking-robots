@@ -127,16 +127,16 @@ namespace SIGEL_Visualisation
 
       double getCurrentSimulationSeconds() const { return renderRecorder->currentSimulationSeconds; }
 
-      DL_vector getRobotPosition() const;
+      SIG_Vector getRobotPosition() const;
 
-      DL_matrix getRobotRotation() const;
+      SIG_Matrix getRobotRotation() const;
 
       /**
        * Returns the centre of the box around the robot, where the
        * robot is now. The box is measured at time 0 and moves with
        * the root link.
        */
-      DL_vector getRobotCentre() const;
+      SIG_Vector getRobotCentre() const;
 
       /**
        * Returns the radius of the sphere around that box.
@@ -293,7 +293,7 @@ namespace SIGEL_Visualisation
        * The centre of the robot's box at time 0, in the
        * root link's frame.
        */
-      DL_vector centreInRootLink;
+      SIG_Vector centreInRootLink;
 
       /**
        * The radius of the sphere around the robot's box at time 0.

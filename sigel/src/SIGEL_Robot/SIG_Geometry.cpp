@@ -40,8 +40,8 @@ namespace SIGEL_Robot {
 
         SIG_Geometry::SIG_Geometry (const SIG_Geometry *geom)
         {
-                for (DL_vector *v : geom->vertices)
-                        vertices.append (new DL_vector (v));
+                for (SIG_Vector *v : geom->vertices)
+                        vertices.append (new SIG_Vector (v));
 
                 for (SIG_Polygon *p : geom->polygons)
                         polygons.append (new SIG_Polygon (this, p));
@@ -59,8 +59,8 @@ namespace SIGEL_Robot {
 
                 tx >> itemCount;
                 for (int i = 0; i < itemCount; i++) {
-                        DL_vector d = SIG_Robot::streamToVector (tx);
-                        vertices.append (new DL_vector (&d));
+                        SIG_Vector d = SIG_Robot::streamToVector (tx);
+                        vertices.append (new SIG_Vector (&d));
                 }
 
                 tx >> itemCount;
@@ -74,18 +74,18 @@ namespace SIGEL_Robot {
                 qDeleteAll (vertices);
         }
         
-        int SIG_Geometry::getOrAddVertex (DL_vector vertex)
+        int SIG_Geometry::getOrAddVertex (SIG_Vector vertex)
         {
                 int appending_position = vertices.size ();
                 for (int i = 0; i < appending_position; i++) {
                         if (vertex.equal (vertices [i]))
                                 return i;
                 }
-                vertices.append (new DL_vector (&vertex));
+                vertices.append (new SIG_Vector (&vertex));
                 return appending_position;
         }
 
-        QList<DL_vector *> const & SIG_Geometry::getVertices () const
+        QList<SIG_Vector *> const & SIG_Geometry::getVertices () const
         {
                 return vertices;
         }
@@ -95,7 +95,7 @@ namespace SIGEL_Robot {
                 return vertices.size ();
         }
         
-        DL_vector SIG_Geometry::getVertex (int i) const
+        SIG_Vector SIG_Geometry::getVertex (int i) const
         {
                 return *vertices.at (i);
         }
@@ -105,7 +105,7 @@ namespace SIGEL_Robot {
                 return polygons.size ();
         }
         
-        void SIG_Geometry::translate (DL_vector dir)
+        void SIG_Geometry::translate (SIG_Vector dir)
         {
                 int nrofverts = vertices.count ();
                 for (int i = 0; i < nrofverts; i++) {
@@ -113,11 +113,11 @@ namespace SIGEL_Robot {
                 }
         }
         
-        void SIG_Geometry::rotate (DL_matrix mat)
+        void SIG_Geometry::rotate (SIG_Matrix mat)
         {
                 int nrofverts = vertices.count ();
                 for (int i = 0; i < nrofverts; i++) {
-                        DL_vector d (vertices [i]);
+                        SIG_Vector d (vertices [i]);
                         mat.times (&d, vertices [i]);
                 }
         }

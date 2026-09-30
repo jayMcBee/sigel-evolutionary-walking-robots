@@ -47,14 +47,14 @@ namespace SIGEL_Robot {
                 return tTranslationalJoint;
         }
         
-        void SIG_TranslationalJoint::setLeftPoints (DL_vector _winportB, DL_vector _winportD, DL_vector _winportF)
+        void SIG_TranslationalJoint::setLeftPoints (SIG_Vector _winportB, SIG_Vector _winportD, SIG_Vector _winportF)
         {
                 leftBase = _winportB;
                 leftDir = _winportD;
                 leftFix = _winportF;
         }
         
-        void SIG_TranslationalJoint::setRightPoints (DL_vector _winportB, DL_vector _winportD, DL_vector _winportF)
+        void SIG_TranslationalJoint::setRightPoints (SIG_Vector _winportB, SIG_Vector _winportD, SIG_Vector _winportF)
         {
                 rightBase = _winportB;
                 rightDir = _winportD;
@@ -68,32 +68,32 @@ namespace SIGEL_Robot {
                 initial = ii;
         }
         
-        DL_vector SIG_TranslationalJoint::getLeftBase () const
+        SIG_Vector SIG_TranslationalJoint::getLeftBase () const
         {
                 return leftBase;
         }
         
-        DL_vector SIG_TranslationalJoint::getLeftDir () const
+        SIG_Vector SIG_TranslationalJoint::getLeftDir () const
         {
                 return leftDir;
         }
         
-        DL_vector SIG_TranslationalJoint::getLeftFix () const
+        SIG_Vector SIG_TranslationalJoint::getLeftFix () const
         {
                 return leftFix;
         }
         
-        DL_vector SIG_TranslationalJoint::getRightBase () const
+        SIG_Vector SIG_TranslationalJoint::getRightBase () const
         {
                 return rightBase;
         }
         
-        DL_vector SIG_TranslationalJoint::getRightDir () const
+        SIG_Vector SIG_TranslationalJoint::getRightDir () const
         {
                 return rightDir;
         }
         
-        DL_vector SIG_TranslationalJoint::getRightFix () const
+        SIG_Vector SIG_TranslationalJoint::getRightFix () const
         {
                 return rightFix;
         }
@@ -114,7 +114,7 @@ namespace SIGEL_Robot {
         }
 
         void SIG_TranslationalJoint::transformPoints
-        (SIG_Link *side, DL_vector mov, DL_matrix rot)
+        (SIG_Link *side, SIG_Vector mov, SIG_Matrix rot)
         {
                 if (side == leftLink) {
                         tfap (mov, rot, &leftBase);
@@ -127,7 +127,7 @@ namespace SIGEL_Robot {
                 }
         }
         
-        void SIG_TranslationalJoint::getGeomRelation (DL_vector &t, DL_matrix &o, SIG_Link *origin)
+        void SIG_TranslationalJoint::getGeomRelation (SIG_Vector &t, SIG_Matrix &o, SIG_Link *origin)
         {
                 if (leftLink == origin) {
                         calculateAnyJoint

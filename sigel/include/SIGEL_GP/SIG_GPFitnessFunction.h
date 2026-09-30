@@ -101,7 +101,7 @@ class SIG_GPFitnessFunction{
  bool isValid( double value ) const;
 
  protected:
- DL_vector normalizeRobotPosition( DL_vector originalPosition,  DL_matrix actualRobotRotation, const SIGEL_Robot::SIG_Robot &rob ) const;
+ SIG_Vector normalizeRobotPosition( SIG_Vector originalPosition,  SIG_Matrix actualRobotRotation, const SIGEL_Robot::SIG_Robot &rob ) const;
 
 };
 }

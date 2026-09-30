@@ -36,8 +36,8 @@ namespace SIGEL_Robot
    */
   class SIG_GlueJoint : public SIG_Joint {
   private:
-    DL_vector ptA1, ptA2, ptA3;
-    DL_vector ptB1, ptB2, ptB3;
+    SIG_Vector ptA1, ptA2, ptA3;
+    SIG_Vector ptB1, ptB2, ptB3;
 
   public:
     SIG_GlueJoint (SIG_Robot *par, QString n, int nr = -1);
@@ -45,15 +45,15 @@ namespace SIGEL_Robot
 
     virtual JointType getJointType () const;
 
-    void setPlaneA (DL_vector p1, DL_vector p2, DL_vector p3);
-    void setPlaneB (DL_vector p1, DL_vector p2, DL_vector p3);
-    void getPlaneA (DL_vector &p1, DL_vector &p2, DL_vector &p3);
-    void getPlaneB (DL_vector &p1, DL_vector &p2, DL_vector &p3);
+    void setPlaneA (SIG_Vector p1, SIG_Vector p2, SIG_Vector p3);
+    void setPlaneB (SIG_Vector p1, SIG_Vector p2, SIG_Vector p3);
+    void getPlaneA (SIG_Vector &p1, SIG_Vector &p2, SIG_Vector &p3);
+    void getPlaneB (SIG_Vector &p1, SIG_Vector &p2, SIG_Vector &p3);
 
     virtual void transformPoints (SIG_Link *side,
-                                  DL_vector mov, DL_matrix rot);
+                                  SIG_Vector mov, SIG_Matrix rot);
     virtual void getGeomRelation
-      (DL_vector &t, DL_matrix &o, SIG_Link *origin);
+      (SIG_Vector &t, SIG_Matrix &o, SIG_Link *origin);
 
     virtual void writeToFileTransfer (QTextStream & tx);
   };

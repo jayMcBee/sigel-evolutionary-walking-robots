@@ -141,10 +141,10 @@ namespace SIGEL_Robot {
                    << mdh_predecessor_is_left << '\n';
         }
 
-        void SIG_Joint::tfap (DL_vector mov, DL_matrix rot, DL_vector *p)
+        void SIG_Joint::tfap (SIG_Vector mov, SIG_Matrix rot, SIG_Vector *p)
         {
                 p->plusis (&mov);
-                DL_vector v (p);
+                SIG_Vector v (p);
                 rot.times (&v, p);
         }
 
@@ -182,9 +182,9 @@ namespace SIGEL_Robot {
 	      successorIsLeftLink = true;
 	    };
 
-	  DL_vector base;
-	  DL_vector dir;
-	  DL_vector hand;
+	  SIG_Vector base;
+	  SIG_Vector dir;
+	  SIG_Vector hand;
 
 	  switch (getJointType())
 		{
@@ -242,21 +242,21 @@ namespace SIGEL_Robot {
 
 	 SIG_Link *successor = ( leftLink == predecessor ) ? rightLink : leftLink;
 
-	 DL_vector predecessorsInitialPosition;
-	 DL_matrix predecessorsInitialRotation;
+	 SIG_Vector predecessorsInitialPosition;
+	 SIG_Matrix predecessorsInitialRotation;
 
 	 predecessor->getInitialLocation( predecessorsInitialPosition,
 					  predecessorsInitialRotation );
 
-	 DL_vector predOrigin = predecessorsInitialPosition;
+	 SIG_Vector predOrigin = predecessorsInitialPosition;
 
-	 DL_vector successorsInitialPosition;
-	 DL_matrix successorsInitialRotation;
+	 SIG_Vector successorsInitialPosition;
+	 SIG_Matrix successorsInitialRotation;
 
 	 successor->getInitialLocation( successorsInitialPosition,
 					successorsInitialRotation );
 
-	 DL_vector succOrigin = successorsInitialPosition;
+	 SIG_Vector succOrigin = successorsInitialPosition;
 
 #ifdef SIG_DEBUG
 	 SIGEL_Tools::SIG_IO::cerr << "Initial rotation of link "
@@ -270,33 +270,33 @@ namespace SIGEL_Robot {
 	   };
 #endif
 
-	 DL_vector predXAxis = predecessorsInitialRotation.c0;
-	 DL_vector predZAxis = predecessorsInitialRotation.c2;
+	 SIG_Vector predXAxis = predecessorsInitialRotation.c0;
+	 SIG_Vector predZAxis = predecessorsInitialRotation.c2;
 
-	 DL_vector succXAxis = successorsInitialRotation.c0;
-	 DL_vector succYAxis = successorsInitialRotation.c1;
-	 DL_vector succZAxis = successorsInitialRotation.c2;
+	 SIG_Vector succXAxis = successorsInitialRotation.c0;
+	 SIG_Vector succYAxis = successorsInitialRotation.c1;
+	 SIG_Vector succZAxis = successorsInitialRotation.c2;
 
-	 DL_vector screwTranslationVector = predZAxis;
+	 SIG_Vector screwTranslationVector = predZAxis;
 	 screwTranslationVector.timesis( mdh_screw_d );
 
 	 predOrigin.plusis( &screwTranslationVector );
 
-	 DL_matrix screwRotationMatrix = rotationMatrix( predZAxis,
+	 SIG_Matrix screwRotationMatrix = rotationMatrix( predZAxis,
 							 mdh_screw_theta );
 
-	 DL_vector helpPredXAxis = predXAxis;
+	 SIG_Vector helpPredXAxis = predXAxis;
 
 	 screwRotationMatrix.times( &helpPredXAxis, &predXAxis );
 
 	 // The predecessor's X-Axis and the successors Z-Axis must not
 	 // be parallel!
 
-	 DL_vector predXSuccZNormal;
+	 SIG_Vector predXSuccZNormal;
 	 predXAxis.crossprod( &succZAxis, &predXSuccZNormal );
 	 predXSuccZNormal.normalize();
 
-	 DL_vector cut;
+	 SIG_Vector cut;
 
 	 calculateCut( succOrigin,
 		       succZAxis,
@@ -305,7 +305,7 @@ namespace SIGEL_Robot {
 		       predXAxis,
 		       cut );
 
-	 DL_vector h = cut;
+	 SIG_Vector h = cut;
 	 h.minusis( &predOrigin );
 
 #ifdef SIG_DEBUG
@@ -360,10 +360,10 @@ namespace SIGEL_Robot {
 
 	 double const maximalParallelityMeasure = 0.00001;
 
-	 DL_vector rotationDir = h;
+	 SIG_Vector rotationDir = h;
 	 rotationDir.normalize();
 
-	 DL_vector zzNormalVector;
+	 SIG_Vector zzNormalVector;
 	 predZAxis.crossprod( &succZAxis, &zzNormalVector );
 
 	 if (zzNormalVector.norm() > maximalParallelityMeasure)
@@ -374,7 +374,7 @@ namespace SIGEL_Robot {
 		 mdh_alpha = 2 * pi - mdh_alpha;
 	   };
 
-	 DL_vector distanceVector = succOrigin;
+	 SIG_Vector distanceVector = succOrigin;
 
 	 distanceVector.minusis( &cut );
 
@@ -406,7 +406,7 @@ namespace SIGEL_Robot {
 
 	 rotationDir = succZAxis;
 
-	 DL_vector xxNormalVector;
+	 SIG_Vector xxNormalVector;
 	 predXAxis.crossprod( &succXAxis, &xxNormalVector );
 
 	 if (xxNormalVector.norm() > maximalParallelityMeasure)
@@ -429,8 +429,8 @@ namespace SIGEL_Robot {
 		 }
 	       else
 		 {
-		   DL_vector localPredBase;
-		   DL_vector localSuccBase;
+		   SIG_Vector localPredBase;
+		   SIG_Vector localSuccBase;
 
 		   double sigelMin;
 		   double sigelMax;
@@ -452,8 +452,8 @@ namespace SIGEL_Robot {
 		       sigelMax = - translationalJoint->getMin();
 		     };
 
-		   DL_vector predBase;
-		   DL_vector succBase;
+		   SIG_Vector predBase;
+		   SIG_Vector succBase;
 
 		   predecessorsInitialRotation.times( &localPredBase, &predBase );
 		   predBase.plusis( &predecessorsInitialPosition );
@@ -461,10 +461,10 @@ namespace SIGEL_Robot {
 		   successorsInitialRotation.times( &localSuccBase, &succBase );
 		   succBase.plusis( &successorsInitialPosition );
 
-		   DL_vector predBaseOffset = cut;
+		   SIG_Vector predBaseOffset = cut;
 		   predBaseOffset.minusis( &predBase );
 
-		   DL_vector succBaseOffset = succOrigin;
+		   SIG_Vector succBaseOffset = succOrigin;
 		   succBaseOffset.minusis( &succBase );
 
 		   double b = predBaseOffset.norm();
@@ -504,8 +504,8 @@ namespace SIGEL_Robot {
 	       else
 		 {
 
-		   DL_vector localPredHand;
-		   DL_vector localSuccHand;
+		   SIG_Vector localPredHand;
+		   SIG_Vector localSuccHand;
 
 		   double sigelMax;
 		   double sigelMin;
@@ -527,8 +527,8 @@ namespace SIGEL_Robot {
 		       sigelMax = - rotationalJoint->getMin();
 		     };
 
-		   DL_vector predHand;
-		   DL_vector succHand;
+		   SIG_Vector predHand;
+		   SIG_Vector succHand;
 
 		   predecessorsInitialRotation.times( &localPredHand, &predHand );
 		   predHand.plusis( &predecessorsInitialPosition );
@@ -536,7 +536,7 @@ namespace SIGEL_Robot {
 		   successorsInitialRotation.times( &localSuccHand, &succHand );
 		   succHand.plusis( &successorsInitialPosition );
 
-		   DL_vector predHandProjected;
+		   SIG_Vector predHandProjected;
 
 		   calculateCut( succOrigin,
 				 succXAxis,
@@ -545,11 +545,11 @@ namespace SIGEL_Robot {
 				 succZAxis,
 				 predHandProjected );
 
-		   DL_vector predHandProjectedDir = predHandProjected;
+		   SIG_Vector predHandProjectedDir = predHandProjected;
 		   predHandProjectedDir.minusis( &succOrigin );
 		   predHandProjectedDir.normalize();
 
-		   DL_vector succHandProjected;
+		   SIG_Vector succHandProjected;
 
 		   calculateCut( succOrigin,
 				 succXAxis,
@@ -558,7 +558,7 @@ namespace SIGEL_Robot {
 				 succZAxis,
 				 succHandProjected );
 
-		   DL_vector succHandProjectedDir = succHandProjected;
+		   SIG_Vector succHandProjectedDir = succHandProjected;
 		   succHandProjectedDir.minusis( &succOrigin );
 		   succHandProjectedDir.normalize();
 
@@ -608,7 +608,7 @@ namespace SIGEL_Robot {
 
 		   rotationDir = succZAxis;
 
-		   DL_vector predHandProjectedDirPredXAxisNormalVector;
+		   SIG_Vector predHandProjectedDirPredXAxisNormalVector;
 		   predHandProjectedDir.crossprod( &predXAxis, &predHandProjectedDirPredXAxisNormalVector );
 
 		   if (predHandProjectedDirPredXAxisNormalVector.norm() > maximalParallelityMeasure)
@@ -621,7 +621,7 @@ namespace SIGEL_Robot {
 
 		   double gamma = tolerantACos( succHandProjectedDir.inprod( &succXAxis ) );
 
-		   DL_vector succHandProjectedDirSuccXAxisNormalVector;
+		   SIG_Vector succHandProjectedDirSuccXAxisNormalVector;
 		   succHandProjectedDir.crossprod( &succXAxis, &succHandProjectedDirSuccXAxisNormalVector );
 
 		   if (succHandProjectedDirSuccXAxisNormalVector.norm() > maximalParallelityMeasure)
@@ -749,12 +749,12 @@ namespace SIGEL_Robot {
 	   actJoint->calculateMDH( successor );
        };
 
-       void SIG_Joint::calculateCut( DL_vector a,
-				     DL_vector u,
-				     DL_vector v,
-				     DL_vector b,
-				     DL_vector w,
-				     DL_vector &cut )
+       void SIG_Joint::calculateCut( SIG_Vector a,
+				     SIG_Vector u,
+				     SIG_Vector v,
+				     SIG_Vector b,
+				     SIG_Vector w,
+				     SIG_Vector &cut )
        {
 	 NEWMAT::Matrix linEqSystem( 3, 3 );
 

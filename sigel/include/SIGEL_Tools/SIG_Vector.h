@@ -21,8 +21,8 @@
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-#ifndef SIGEL_TOOLS_DL_VECTOR_H
-#define SIGEL_TOOLS_DL_VECTOR_H
+#ifndef SIGEL_TOOLS_SIG_VECTOR_H
+#define SIGEL_TOOLS_SIG_VECTOR_H
 
 #include <cmath>
 
@@ -32,17 +32,17 @@
  *
  * The default constructor leaves x, y and z uninitialised.
  */
-class DL_vector
+class SIG_Vector
 {
 public:
   double x, y, z;
 
-  DL_vector() {}
-  DL_vector( DL_vector *v ) { assign( v ); }
-  DL_vector( double nx, double ny, double nz ) : x( nx ), y( ny ), z( nz ) {}
+  SIG_Vector() {}
+  SIG_Vector( SIG_Vector *v ) { assign( v ); }
+  SIG_Vector( double nx, double ny, double nz ) : x( nx ), y( ny ), z( nz ) {}
 
   void init( double nx, double ny, double nz ) { x = nx; y = ny; z = nz; }
-  void assign( DL_vector *v ) { x = v->x; y = v->y; z = v->z; }
+  void assign( SIG_Vector *v ) { x = v->x; y = v->y; z = v->z; }
 
   double norm() { return std::sqrt( x*x + y*y + z*z ); }
 
@@ -57,13 +57,13 @@ public:
     }
   }
 
-  double inprod( DL_vector *v ) { return x*v->x + y*v->y + z*v->z; }
+  double inprod( SIG_Vector *v ) { return x*v->x + y*v->y + z*v->z; }
 
-  void plusis( DL_vector *v ) { x = x+v->x; y = y+v->y; z = z+v->z; }
-  void minusis( DL_vector *v ) { x = x-v->x; y = y-v->y; z = z-v->z; }
+  void plusis( SIG_Vector *v ) { x = x+v->x; y = y+v->y; z = z+v->z; }
+  void minusis( SIG_Vector *v ) { x = x-v->x; y = y-v->y; z = z-v->z; }
   void timesis( double f ) { x = x*f; y = y*f; z = z*f; }
 
-  bool equal( DL_vector *v ) { return x == v->x && y == v->y && z == v->z; }
+  bool equal( SIG_Vector *v ) { return x == v->x && y == v->y && z == v->z; }
 
   // An index outside 0..2 reads 0 and writes nothing.
   double get( int r )
@@ -86,7 +86,7 @@ public:
   }
 
   // nv = this x v
-  void crossprod( DL_vector *v, DL_vector *nv )
+  void crossprod( SIG_Vector *v, SIG_Vector *nv )
   {
     nv->x = y*v->z - z*v->y;
     nv->y = z*v->x - x*v->z;
@@ -94,4 +94,4 @@ public:
   }
 };
 
-#endif // SIGEL_TOOLS_DL_VECTOR_H
+#endif // SIGEL_TOOLS_SIG_VECTOR_H

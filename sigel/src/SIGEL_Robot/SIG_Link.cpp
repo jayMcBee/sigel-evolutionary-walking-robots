@@ -67,7 +67,7 @@ namespace SIGEL_Robot {
                 tx >> anum;
                 for (int i = 0; i < anum; i++) {
                         tx >> tmpstr;
-                        DL_vector *dl = new DL_vector
+                        SIG_Vector *dl = new SIG_Vector
                                 (SIG_Robot::streamToVector (tx));
                         points.append (NamedPoint{ tmpstr, dl });
                 }
@@ -156,15 +156,15 @@ namespace SIGEL_Robot {
                 return material;
         }
 
-        void SIG_Link::addPoint (QString pointname, DL_vector point)
+        void SIG_Link::addPoint (QString pointname, SIG_Vector point)
         {
-                points.append (NamedPoint{ pointname, new DL_vector (&point) });
+                points.append (NamedPoint{ pointname, new SIG_Vector (&point) });
         }
         
-        DL_vector SIG_Link::getPoint (QString id) const
+        SIG_Vector SIG_Link::getPoint (QString id) const
         {
-                DL_vector tmp;
-                DL_vector *t;
+                SIG_Vector tmp;
+                SIG_Vector *t;
                 // Backwards, for the newest binding -- see SIG_Robot::lookupLink. A
                 // forward loop with a break would find the oldest.
                 t = nullptr;
@@ -203,11 +203,11 @@ namespace SIGEL_Robot {
                 mirtich = new SIG_Mirtich (geometry, name + "(" + body->getName () + ")");
         }
 
-        void SIG_Link::transformPoints (DL_vector mov, DL_matrix rot)
+        void SIG_Link::transformPoints (SIG_Vector mov, SIG_Matrix rot)
         {
                 for (const NamedPoint &p : points) {
                         p.value->plusis (&mov);
-                        DL_vector v (p.value);
+                        SIG_Vector v (p.value);
                         rot.times (&v, p.value);
                 }
 
@@ -245,8 +245,8 @@ namespace SIGEL_Robot {
         }
 
         void SIG_Link::getPhysics (double & m,
-                                   DL_vector & com,
-                                   DL_matrix & it)
+                                   SIG_Vector & com,
+                                   SIG_Matrix & it)
         {
                 mirtich->computePhysics (material->getDensity (), m, com, it);
         }
@@ -259,8 +259,8 @@ namespace SIGEL_Robot {
                 initiated = true;
 
                 for (SIG_Joint *j : adjacentJoints) {
-                        DL_vector transla, fglobtransla;
-                        DL_matrix rota, fglobrota;
+                        SIG_Vector transla, fglobtransla;
+                        SIG_Matrix rota, fglobrota;
 
                         SIG_Link *l = j->otherSide (this);
                         if (l != comingfrom) {
@@ -275,7 +275,7 @@ namespace SIGEL_Robot {
                 }
         }
         
-        void SIG_Link::setInitialLocation (DL_vector p, DL_matrix o, SIG_Link *comingfrom)
+        void SIG_Link::setInitialLocation (SIG_Vector p, SIG_Matrix o, SIG_Link *comingfrom)
         {
                 if (!initiated) {
                         initialLocation = p;
@@ -300,7 +300,7 @@ namespace SIGEL_Robot {
                 }
         }
         
-        void SIG_Link::getInitialLocation (DL_vector & p, DL_matrix & o) const
+        void SIG_Link::getInitialLocation (SIG_Vector & p, SIG_Matrix & o) const
         {
                 p = initialLocation;
                 o = initialOrientation;
@@ -343,9 +343,9 @@ namespace SIGEL_Robot {
 	}
 
         void SIG_Link::transformToDynaMechs ( SIG_Joint *predecessor,
-					      DL_vector predBase,
-					      DL_vector predDir,
-					      DL_vector predHand )
+					      SIG_Vector predBase,
+					      SIG_Vector predDir,
+					      SIG_Vector predHand )
 	{
 #ifdef SIG_DEBUG
 	  SIGEL_Tools::SIG_IO::cerr << "\n\nTransforming link "
@@ -369,11 +369,11 @@ namespace SIGEL_Robot {
 	  bool transformZ = predecessor;
 	  bool transformX = realSuccessor;
 
-	  DL_vector realNewXAxis;
-	  DL_vector realNewYAxis;
-	  DL_vector realNewZAxis;
+	  SIG_Vector realNewXAxis;
+	  SIG_Vector realNewYAxis;
+	  SIG_Vector realNewZAxis;
 
-	  DL_vector realNewOrigin;
+	  SIG_Vector realNewOrigin;
 
 	  qsizetype successorPos = 0;
 	  SIG_Joint *actSuccessor = successors.value( successorPos );
@@ -395,10 +395,10 @@ namespace SIGEL_Robot {
 
 	      bool processingRealSuccessor = (actSuccessor == realSuccessor);
 
-	      DL_vector newXAxis(1, 0, 0);
-	      DL_vector newZAxis(0, 0, 1);
+	      SIG_Vector newXAxis(1, 0, 0);
+	      SIG_Vector newZAxis(0, 0, 1);
 
-	      DL_vector newOrigin(0, 0, 0);
+	      SIG_Vector newOrigin(0, 0, 0);
 
 	      if (transformZ)
 		{
@@ -419,9 +419,9 @@ namespace SIGEL_Robot {
 		{
 		  bool successorsLeftLink = ( this == actSuccessor->getLeftLink() );
 
-		  DL_vector succBase;
-		  DL_vector succDir;
-		  DL_vector succHand;
+		  SIG_Vector succBase;
+		  SIG_Vector succDir;
+		  SIG_Vector succHand;
 
 		  switch (actSuccessor->getJointType())
 		    {
@@ -445,7 +445,7 @@ namespace SIGEL_Robot {
 		      break;
 		    };
 
-		  DL_vector otherAxis = succDir;
+		  SIG_Vector otherAxis = succDir;
 		  otherAxis.minusis( &succBase );
 		  otherAxis.normalize();
 
@@ -518,7 +518,7 @@ namespace SIGEL_Robot {
 		}
 	      else
 		{
-		  DL_vector originDistanceVector = newOrigin;
+		  SIG_Vector originDistanceVector = newOrigin;
 		  originDistanceVector.minusis( &realNewOrigin );
 
 		  screwD = originDistanceVector.norm();
@@ -527,7 +527,7 @@ namespace SIGEL_Robot {
 
 		  if (screwD > minimalDistanceMeasure)
 		    {
-		      DL_vector translationDirectionVector = originDistanceVector;
+		      SIG_Vector translationDirectionVector = originDistanceVector;
 
 		      translationDirectionVector.normalize();
 
@@ -541,7 +541,7 @@ namespace SIGEL_Robot {
 
 		  double const maximalParallelityMeasure = 0.00001;
 
-		  DL_vector xxNormalVector;
+		  SIG_Vector xxNormalVector;
 		  realNewXAxis.crossprod( &newXAxis, &xxNormalVector );
 
 		  if (xxNormalVector.norm() > maximalParallelityMeasure)
@@ -557,29 +557,29 @@ namespace SIGEL_Robot {
 					    << " screwTheta: " << screwTheta
 					    << Qt::endl;
 
-		  DL_vector debugScrewTranslationVector = newZAxis;
+		  SIG_Vector debugScrewTranslationVector = newZAxis;
 		  debugScrewTranslationVector.timesis( screwD );
 
-		  DL_vector debugTranslatedOrigin = realNewOrigin;
+		  SIG_Vector debugTranslatedOrigin = realNewOrigin;
 		  debugTranslatedOrigin.plusis( &debugScrewTranslationVector );
 
-		  DL_matrix debugScrewRotationMatrix = rotationMatrix( newZAxis,
+		  SIG_Matrix debugScrewRotationMatrix = rotationMatrix( newZAxis,
 								       screwTheta );
 
-		  DL_vector debugHelpXAxis = realNewXAxis;
-		  DL_vector debugRotatedXAxis;
+		  SIG_Vector debugHelpXAxis = realNewXAxis;
+		  SIG_Vector debugRotatedXAxis;
 
 		  debugScrewRotationMatrix.times( &debugHelpXAxis, &debugRotatedXAxis );
 
 		  realNewZAxis.crossprod( &realNewXAxis, &realNewYAxis );
 		  realNewYAxis.normalize();
 
-		  DL_vector debugNewYAxis;
+		  SIG_Vector debugNewYAxis;
 		  newZAxis.crossprod( &newXAxis, &debugNewYAxis );
 		  debugNewYAxis.normalize();
 
-		  DL_vector debugHelpYAxis = realNewYAxis;
-		  DL_vector debugRotatedYAxis;
+		  SIG_Vector debugHelpYAxis = realNewYAxis;
+		  SIG_Vector debugRotatedYAxis;
 
 		  debugScrewRotationMatrix.times( &debugHelpYAxis, &debugRotatedYAxis );
 
@@ -650,8 +650,8 @@ namespace SIGEL_Robot {
 
 	      if (this->isRootLink())
 		{
-		  parent->initialLocation = SIG_TypeConverter::toDL_vector( translation * -1 );
-		  parent->initialOrientation = SIG_TypeConverter::toDL_matrix( rotation.i() );
+		  parent->initialLocation = SIG_TypeConverter::toSIG_Vector( translation * -1 );
+		  parent->initialOrientation = SIG_TypeConverter::toSIG_Matrix( rotation.i() );
 
 #ifdef SIG_DEBUG
 		  SIGEL_Tools::SIG_IO::cerr << "Initial robot location: ";
@@ -669,11 +669,11 @@ namespace SIGEL_Robot {
 
 		};
 
-	      geometry->translate( SIG_TypeConverter::toDL_vector( translation ) );
-	      geometry->rotate( SIG_TypeConverter::toDL_matrix( rotation ) );
+	      geometry->translate( SIG_TypeConverter::toSIG_Vector( translation ) );
+	      geometry->rotate( SIG_TypeConverter::toSIG_Matrix( rotation ) );
 
-	      transformPoints( SIG_TypeConverter::toDL_vector( translation ),
-			       SIG_TypeConverter::toDL_matrix( rotation ) );
+	      transformPoints( SIG_TypeConverter::toSIG_Vector( translation ),
+			       SIG_TypeConverter::toSIG_Matrix( rotation ) );
 
 #ifdef SIG_DEBUG
 	      SIGEL_Tools::SIG_IO::cerr << "Rotation matrix:" << Qt::endl;
@@ -706,12 +706,12 @@ namespace SIGEL_Robot {
 #endif
 	}
 
-        void SIG_Link::calculateCommonNormal( DL_vector a,
-					      DL_vector u,
-					      DL_vector b,
-					      DL_vector v,
-					      DL_vector &c,
-					      DL_vector &w )
+        void SIG_Link::calculateCommonNormal( SIG_Vector a,
+					      SIG_Vector u,
+					      SIG_Vector b,
+					      SIG_Vector v,
+					      SIG_Vector &c,
+					      SIG_Vector &w )
 	{
 	  u.normalize();
 	  v.normalize();
@@ -741,7 +741,7 @@ namespace SIGEL_Robot {
 
 	  double const minimalDistanceMeasure = 0.000001;
 
-	  DL_vector uvNormal;
+	  SIG_Vector uvNormal;
 	  u.crossprod( &v, &uvNormal );
 	  double parallelityMeasure = uvNormal.norm();
 
@@ -758,8 +758,8 @@ namespace SIGEL_Robot {
 	      c = a;
 
 	      double t0 = ( u.inprod( &c ) - u.inprod( &b ) ) / u.inprod( &v );
-	      DL_vector p = b;
-	      DL_vector dir = v;
+	      SIG_Vector p = b;
+	      SIG_Vector dir = v;
 	      dir.timesis( t0 );
 	      p.plusis( &dir );
 
@@ -818,11 +818,11 @@ namespace SIGEL_Robot {
 	      c.timesis( solutions( 1 ) );
 	      c.plusis( &a );
 
-	      DL_vector cut = w;
+	      SIG_Vector cut = w;
 	      cut.timesis( solutions( 2 ) );
 	      cut.plusis( &c );
 
-	      DL_vector hDir = cut;
+	      SIG_Vector hDir = cut;
 	      hDir.minusis( &c );
 
 	      if (hDir.norm() < minimalDistanceMeasure)

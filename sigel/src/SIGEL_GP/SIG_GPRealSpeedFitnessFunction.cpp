@@ -56,10 +56,10 @@ namespace SIGEL_GP
 
     // delete simulation;
 
-    DL_vector *endPosition = new DL_vector();
+    SIG_Vector *endPosition = new SIG_Vector();
     *endPosition = recorder.endPosition;
 
-    DL_matrix *endRotation = new DL_matrix();
+    SIG_Matrix *endRotation = new SIG_Matrix();
     *endRotation = recorder.endRotation;
 
     recorder.positions.append( endPosition );
@@ -68,16 +68,16 @@ namespace SIGEL_GP
     double totalDistance = 0;
 
     qsizetype recIdx = 0;
-    DL_vector *actPosition = recorder.positions.value( recIdx );
-    DL_matrix *actRotation = recorder.rotations.value( recIdx );
+    SIG_Vector *actPosition = recorder.positions.value( recIdx );
+    SIG_Matrix *actRotation = recorder.rotations.value( recIdx );
 
-    DL_vector lastRealPosition = normalizeRobotPosition( *actPosition, *actRotation, rob );
+    SIG_Vector lastRealPosition = normalizeRobotPosition( *actPosition, *actRotation, rob );
 
     while (actPosition) {
-      DL_vector actRealPosition = normalizeRobotPosition( *actPosition, *actRotation, rob );
+      SIG_Vector actRealPosition = normalizeRobotPosition( *actPosition, *actRotation, rob );
 
       if (isValid( actRealPosition.x ) && isValid( actRealPosition.y ) && isValid( actRealPosition.z )) {
-        DL_vector localDistanceVector = actRealPosition;
+        SIG_Vector localDistanceVector = actRealPosition;
         localDistanceVector.minusis( &lastRealPosition );
 
         double localDistance = localDistanceVector.norm();

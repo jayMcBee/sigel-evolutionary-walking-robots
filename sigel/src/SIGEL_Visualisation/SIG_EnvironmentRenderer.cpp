@@ -46,12 +46,12 @@ namespace SIGEL_Visualisation
       showRobotPath( false )
   {
 
-    DL_matrix idRotation;
+    SIG_Matrix idRotation;
     idRotation.makeone();
 
     SIG_VisualSceneObject *plane = new SIG_VisualSceneObject( 0, "Plane" );
 
-    plane->setPosition( DL_vector(0, 0, 0) );
+    plane->setPosition( SIG_Vector(0, 0, 0) );
     plane->setRotation( idRotation );
 
     delete sceneObjects[ 0 ];
@@ -59,9 +59,9 @@ namespace SIGEL_Visualisation
 
     SIG_VisualSceneObject *grid = new SIG_VisualSceneObject( 1, "Grid" );
 
-    grid->setColor( DL_vector( 80.0 / 255, 80.0 / 255, 80.0 / 255 ) );
+    grid->setColor( SIG_Vector( 80.0 / 255, 80.0 / 255, 80.0 / 255 ) );
 
-    grid->setPosition( DL_vector(0, 0, 0) );
+    grid->setPosition( SIG_Vector(0, 0, 0) );
     grid->setRotation( idRotation );
     grid->setVisible( false );
 
@@ -82,7 +82,7 @@ namespace SIGEL_Visualisation
 					       double green,
 					       double blue )
   {
-    sceneObjects[ 0 ]->setColor( DL_vector( red,
+    sceneObjects[ 0 ]->setColor( SIG_Vector( red,
 					    green,
 					    blue ) );
   };
@@ -91,7 +91,7 @@ namespace SIGEL_Visualisation
 					      double green,
 					      double blue )
   {
-    sceneObjects[ 1 ]->setColor( DL_vector( red,
+    sceneObjects[ 1 ]->setColor( SIG_Vector( red,
 					    green,
 					    blue ) );
   };
@@ -204,7 +204,7 @@ namespace SIGEL_Visualisation
 	glBegin( GL_LINE_STRIP );
 	for ( qsizetype i = 0; i < robotPathPoints.size(); i++ )
 	  {
-	    DL_vector *actPoint = robotPathPoints.at( i );
+	    SIG_Vector *actPoint = robotPathPoints.at( i );
 	    glVertex3d( GLdouble( actPoint->x ),
 			GLdouble( actPoint->y ),
 			GLdouble( actPoint->z ) );
@@ -264,8 +264,8 @@ namespace SIGEL_Visualisation
 	// One cylinder from each point to the next.
 	for ( qsizetype i = 1; i < robotPathPoints.size(); i++ )
 	  {
-	    DL_vector *prevPoint = robotPathPoints.at( i - 1 );
-	    DL_vector *actPoint  = robotPathPoints.at( i );
+	    SIG_Vector *prevPoint = robotPathPoints.at( i - 1 );
+	    SIG_Vector *actPoint  = robotPathPoints.at( i );
 	    NEWMAT::ColumnVector base =   SIG_TypeConverter::sigelToPovray()
 					* SIG_TypeConverter::toColumnVector( *prevPoint );
 	    NEWMAT::ColumnVector cap =   SIG_TypeConverter::sigelToPovray()
@@ -362,7 +362,7 @@ namespace SIGEL_Visualisation
     return declarationsString;
   };
 
-  void SIG_EnvironmentRenderer::setLookPoint( DL_vector newPosition )
+  void SIG_EnvironmentRenderer::setLookPoint( SIG_Vector newPosition )
   {
     lookPoint = newPosition;
   };
@@ -382,9 +382,9 @@ namespace SIGEL_Visualisation
     showRobotPath = newShowRobotPath;
   };
 
-  void SIG_EnvironmentRenderer::addRobotPathPoint( DL_vector newPoint )
+  void SIG_EnvironmentRenderer::addRobotPathPoint( SIG_Vector newPoint )
   {
-    DL_vector *newPointObject = new DL_vector( newPoint );
+    SIG_Vector *newPointObject = new SIG_Vector( newPoint );
 
     robotPathPoints.append( newPointObject );
   };

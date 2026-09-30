@@ -29,8 +29,8 @@
 #include "SIGEL_Visualisation/SIG_SceneObject.h"
 #include "SIGEL_Visualisation/SIG_FloatingText.h"
 
-#include "SIGEL_Tools/DL_vector.h"
-#include "SIGEL_Tools/DL_matrix.h"
+#include "SIGEL_Tools/SIG_Vector.h"
+#include "SIGEL_Tools/SIG_Matrix.h"
 #include "GL/gl.h"
 
 namespace SIGEL_Visualisation
@@ -64,9 +64,9 @@ namespace SIGEL_Visualisation
        */
       SIG_VisualSceneObject(int number,
 			    QString name,
-			    DL_vector position = DL_vector(),
-			    DL_matrix rotation = DL_matrix(),
-			    DL_vector color = DL_vector());
+			    SIG_Vector position = SIG_Vector(),
+			    SIG_Matrix rotation = SIG_Matrix(),
+			    SIG_Vector color = SIG_Vector());
 
       /**
        * Gets the objects number.
@@ -81,12 +81,12 @@ namespace SIGEL_Visualisation
        * The last task is performed by calling the method
        * updateTransformationInternal.
        */
-      void setPosition(DL_vector newPosition);
+      void setPosition(SIG_Vector newPosition);
 
       /**
        * Gets the object's position.
        */
-      DL_vector getPosition() const { return position; }
+      SIG_Vector getPosition() const { return position; }
 
       /**
        * Sets the object's rotation.
@@ -96,12 +96,12 @@ namespace SIGEL_Visualisation
        * The last task is performed by calling the method
        * updateTransformationInternal.
        */
-      void setRotation(DL_matrix newRotation);
+      void setRotation(SIG_Matrix newRotation);
 
       /**
        * Gets the object's rotation.
        */
-      DL_matrix getRotation() const { return rotation; }
+      SIG_Matrix getRotation() const { return rotation; }
 
       /**
        * Sets the object's color.
@@ -109,12 +109,12 @@ namespace SIGEL_Visualisation
        * Sets the attribute color and
        * updates the attribute colorInternal.
        */
-      void setColor(DL_vector newColor);
+      void setColor(SIG_Vector newColor);
 
       /**
        * Gets the object's color.
        */
-      DL_vector getColor() const { return color; }
+      SIG_Vector getColor() const { return color; }
 
       /**
        * Executes appropriate OpenGL commands
@@ -176,7 +176,7 @@ namespace SIGEL_Visualisation
       /**
        * The current color of this SIG_VisualSceneObject.
        */
-      DL_vector color;
+      SIG_Vector color;
 
       /**
        * Internal representation of the

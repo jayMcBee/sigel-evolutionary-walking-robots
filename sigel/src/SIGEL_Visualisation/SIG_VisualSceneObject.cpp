@@ -26,9 +26,9 @@ namespace SIGEL_Visualisation
 {
   SIG_VisualSceneObject::SIG_VisualSceneObject(int number,
 					       QString name,
-					       DL_vector position,
-					       DL_matrix rotation,
-					       DL_vector color)
+					       SIG_Vector position,
+					       SIG_Matrix rotation,
+					       SIG_Vector color)
     : SIG_SceneObject(number, position, rotation),
       name(name),
       color(color),
@@ -46,19 +46,19 @@ namespace SIGEL_Visualisation
     updateColorInternal();
   };
 
-  void SIG_VisualSceneObject::setPosition(DL_vector newPosition)
+  void SIG_VisualSceneObject::setPosition(SIG_Vector newPosition)
   {
     position = newPosition;
     updatePositionInternal();
   };
 
-  void SIG_VisualSceneObject::setRotation(DL_matrix newRotation)
+  void SIG_VisualSceneObject::setRotation(SIG_Matrix newRotation)
   {
     rotation = newRotation;
     updateRotationInternal();
   };
 
-  void SIG_VisualSceneObject::setColor(DL_vector newColor)
+  void SIG_VisualSceneObject::setColor(SIG_Vector newColor)
   {
     color = newColor;
     updateColorInternal();

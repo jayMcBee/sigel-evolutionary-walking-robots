@@ -71,7 +71,7 @@ namespace SIGEL_Visualisation
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     drawSky();
 
-    DL_vector finalEyePoint = viewSettings.getAbsoluteEyePoint();
+    SIG_Vector finalEyePoint = viewSettings.getAbsoluteEyePoint();
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();

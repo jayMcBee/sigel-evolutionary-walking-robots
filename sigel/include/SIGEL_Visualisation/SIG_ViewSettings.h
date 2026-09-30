@@ -23,7 +23,7 @@
 #ifndef SIGEL_VISUALISATION_SIG_VIEWSETTINGS_H
 #define SIGEL_VISUALISATION_SIG_VIEWSETTINGS_H
 
-#include "SIGEL_Tools/DL_vector.h"
+#include "SIGEL_Tools/SIG_Vector.h"
 
 namespace SIGEL_Visualisation
 {
@@ -47,7 +47,7 @@ namespace SIGEL_Visualisation
        * The eye point in world coordinates: lookPoint + eyePoint when
        * relativeEyePoint is set, else eyePoint.
        */
-      DL_vector getAbsoluteEyePoint() const;
+      SIG_Vector getAbsoluteEyePoint() const;
 
       /**
        * The type of the render Mode.
@@ -103,24 +103,24 @@ namespace SIGEL_Visualisation
       /**
        * The viewers position.
        */
-      DL_vector eyePoint;
+      SIG_Vector eyePoint;
 
       /**
        * The viewers lookpoint.
        */
-      DL_vector lookPoint;
+      SIG_Vector lookPoint;
 
       /**
        * The up vector of the projection.
        *
        * Must not be parallel to the line of sight.
        */
-      DL_vector up;
+      SIG_Vector up;
 
       /**
        * If true, the real eyepoint is
-       * calculated by adding the DL_vector
-       * eyePoint to the DL_vector lookPoint.
+       * calculated by adding the SIG_Vector
+       * eyePoint to the SIG_Vector lookPoint.
        */
       bool relativeEyePoint;
 

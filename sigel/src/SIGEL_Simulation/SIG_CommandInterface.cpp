@@ -22,7 +22,7 @@
 */
 #include "SIGEL_Simulation/SIG_CommandInterface.h"
 #include "SIGEL_Tools/SIG_IO.h"
-#include "SIGEL_Tools/DL_vector.h"
+#include "SIGEL_Tools/SIG_Vector.h"
 #include <cmath>
 
 SIGEL_Simulation::SIG_CommandInterface::SIG_CommandInterface()

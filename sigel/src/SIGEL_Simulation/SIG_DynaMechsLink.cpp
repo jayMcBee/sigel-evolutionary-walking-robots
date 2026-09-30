@@ -67,8 +67,8 @@ namespace SIGEL_Simulation
     SIGEL_Robot::SIG_Mirtich inertiaCalculator( geometry, link->getName() );
 
     double mass;
-    DL_vector centerOfMass;
-    DL_matrix inertiaTensor;
+    SIG_Vector centerOfMass;
+    SIG_Matrix inertiaTensor;
 
     inertiaCalculator.computePhysics( density,
                                       mass,
@@ -104,7 +104,7 @@ namespace SIGEL_Simulation
     dmContactModel *contactModel = new dmContactModel();
 
     // A const reference, not a copy.
-    const QList< DL_vector * > &vertices = geometry->getVertices();
+    const QList< SIG_Vector * > &vertices = geometry->getVertices();
 
     int noOfContactPoints = vertices.size();
 
@@ -112,7 +112,7 @@ namespace SIGEL_Simulation
 
     for (int i=0; i<vertices.size(); i++)
       {
-        DL_vector &vertex = *(vertices[i]);
+        SIG_Vector &vertex = *(vertices[i]);
 
         SIG_TypeConverter::toCartesianVector( vertex, contactPoints[i] );
       };

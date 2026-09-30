@@ -70,7 +70,7 @@ namespace SIGEL_RobotIO {
                                                        double green,
                                                        double blue)
         {
-                material->setColour (DL_vector (red, green, blue));
+                material->setColour (SIG_Vector (red, green, blue));
         }
 
         void SIG_RobotCompilerObjects::materialFinish (SIG_Material *material)
@@ -120,7 +120,7 @@ namespace SIGEL_RobotIO {
                                                   double y,
                                                   double z)
         {
-                link->addPoint (pointname, DL_vector (x, y, z));
+                link->addPoint (pointname, SIG_Vector (x, y, z));
         }
 
         void SIG_RobotCompilerObjects::linkNoCollide (SIG_Link *link,
@@ -367,7 +367,7 @@ namespace SIGEL_RobotIO {
                                                         double y,
                                                         double z)
         {
-                p->appendVertex (DL_vector (x, y, z));
+                p->appendVertex (SIG_Vector (x, y, z));
         }
 
         void SIG_RobotCompilerObjects::surfaceFinish (SIG_Geometry *g, QString name)

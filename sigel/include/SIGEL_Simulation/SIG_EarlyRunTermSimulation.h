@@ -88,8 +88,8 @@ namespace SIGEL_Simulation
        * Stolen from GP_FitnessFunction.
        */
        protected:
-        DL_vector normalizeRobotPosition( DL_vector originalPosition,
-				   DL_matrix actualRobotRotation );
+        SIG_Vector normalizeRobotPosition( SIG_Vector originalPosition,
+				   SIG_Matrix actualRobotRotation );
 
     };
 

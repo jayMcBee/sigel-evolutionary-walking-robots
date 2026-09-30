@@ -28,7 +28,7 @@ namespace SIGEL_Robot { class SIG_Link; }
 #include <QList>
 #include <qstring.h>
 #include <qtextstream.h>
-#include "SIGEL_Tools/DL_vector.h"
+#include "SIGEL_Tools/SIG_Vector.h"
 #include "SIGEL_Robot/SIG_Robot.h"
 #include "SIGEL_Robot/SIG_Material.h"
 #include "SIGEL_Robot/SIG_Body.h"
@@ -52,7 +52,7 @@ namespace SIGEL_Robot
     {
     public:
       /** A significant point on the link, with the name it is declared under. */
-      struct NamedPoint { QString name; DL_vector *value; };
+      struct NamedPoint { QString name; SIG_Vector *value; };
 
     public:
       SIG_Link (SIG_Robot *par, QString n, int nr);
@@ -67,18 +67,18 @@ namespace SIGEL_Robot
       SIG_Body const *getBody () const;
       void setMaterial (SIG_Material *mtrl);
       SIG_Material const *getMaterial () const;
-      void addPoint (QString pointname, DL_vector point);
-      DL_vector getPoint (QString id) const;
+      void addPoint (QString pointname, SIG_Vector point);
+      SIG_Vector getPoint (QString id) const;
       bool hasPoint (QString pointname) const;
       const QList<NamedPoint> &getPoints () const;
       int getNrOfPoints () const;
 
       void instantiateGeometry ();
       void transformToDynaMechs ( SIG_Joint *predecessor,
-				  DL_vector predBase = DL_vector(0, 0, 0),
-				  DL_vector predDir = DL_vector(0, 0, 0),
-				  DL_vector predHand = DL_vector(0, 0, 0) );
-      void transformPoints (DL_vector mov, DL_matrix rot);
+				  SIG_Vector predBase = SIG_Vector(0, 0, 0),
+				  SIG_Vector predDir = SIG_Vector(0, 0, 0),
+				  SIG_Vector predHand = SIG_Vector(0, 0, 0) );
+      void transformPoints (SIG_Vector mov, SIG_Matrix rot);
       /**
        * addNoCollide marks a pair of links, this and the given one,
        * as links for which no collisions should be reported.
@@ -95,19 +95,19 @@ namespace SIGEL_Robot
       SIG_Geometry const *getGeometry () const;
       SIG_Mirtich const *getMirtich()  { return mirtich; }
       void getPhysics (double & m,
-                       DL_vector & com,
-                       DL_matrix & it);
+                       SIG_Vector & com,
+                       SIG_Matrix & it);
       void propagateInitialLocation (SIG_Link *comingfrom);
-      void setInitialLocation (DL_vector p, DL_matrix o, SIG_Link *comingfrom = nullptr);
-      void getInitialLocation (DL_vector & p, DL_matrix & o) const;
+      void setInitialLocation (SIG_Vector p, SIG_Matrix o, SIG_Link *comingfrom = nullptr);
+      void getInitialLocation (SIG_Vector & p, SIG_Matrix & o) const;
       bool isInitiated () const;
       bool isMDHVisited () const;
-      void calculateCommonNormal( DL_vector a,
-				  DL_vector u,
-				  DL_vector b,
-				  DL_vector v,
-				  DL_vector &c,
-				  DL_vector &w );
+      void calculateCommonNormal( SIG_Vector a,
+				  SIG_Vector u,
+				  SIG_Vector b,
+				  SIG_Vector v,
+				  SIG_Vector &c,
+				  SIG_Vector &w );
 
       void writeToFileTransfer (QTextStream & tx) const;
       
@@ -119,13 +119,13 @@ namespace SIGEL_Robot
       SIG_Geometry *geometry;
       SIG_Mirtich *mirtich;
       SIG_Material *material;
-      // A DL_vector has no name of its own, so unlike SIG_Robot's six lists this
+      // A SIG_Vector has no name of its own, so unlike SIG_Robot's six lists this
       // one needs to carry the key.
       QList<NamedPoint> points;
       QList<SIG_Joint *> adjacentJoints;
       QList<SIG_Link *> noCollide;
-      DL_vector initialLocation;
-      DL_matrix initialOrientation;
+      SIG_Vector initialLocation;
+      SIG_Matrix initialOrientation;
       bool initiated, mdh_visited;
     };
 }

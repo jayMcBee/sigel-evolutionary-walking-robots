@@ -102,7 +102,7 @@ namespace SIGEL_SlaveGUI
 
     void slotSetTraceRobot( bool newValue );
 
-    void slotSetPosition( DL_vector position );
+    void slotSetPosition( SIG_Vector position );
 
     void slotStopSimulation();
 

@@ -25,8 +25,8 @@
 
 #include <QList>
 #include "SIGEL_Simulation/SIG_Register.h"
-#include "SIGEL_Tools/DL_vector.h"
-#include "SIGEL_Tools/DL_matrix.h"
+#include "SIGEL_Tools/SIG_Vector.h"
+#include "SIGEL_Tools/SIG_Matrix.h"
 #include <qdatetime.h>
 #include <vector>
 
@@ -79,7 +79,7 @@ class SIG_SimulationQueries {
    * @return
    *  the position of the center of mass of link linkNo
    */
-  virtual DL_vector getLinkPosition(int linkNo) const = 0;
+  virtual SIG_Vector getLinkPosition(int linkNo) const = 0;
 
   /** gets the orientation of link linkNo
    * @pre
@@ -92,7 +92,7 @@ class SIG_SimulationQueries {
    * @return
    *  the orientation of the link relativ to the original orientation
    */
-  virtual DL_matrix getLinkOrientation(int linkNo) const = 0;
+  virtual SIG_Matrix getLinkOrientation(int linkNo) const = 0;
 
   /** gets the number of the torso link
    * @pre

@@ -53,8 +53,8 @@ namespace SIGEL_Environment {
 		loadDynaMechsEnvironment();
   };
 
-  SIG_Environment::SIG_Environment(DL_vector newGravity, 
-				   double newVeloDamping, DL_vector newStartPosition, 
+  SIG_Environment::SIG_Environment(SIG_Vector newGravity, 
+				   double newVeloDamping, SIG_Vector newStartPosition, 
 				   double newGroundPlanarSpringConstant, 
 				   double newGroundNormalSpringConstant, double newGroundPlanarDamperConstant, 
 				   double newGroundNormalDamperConstant, double newFrictionCoeff_u_s, 
@@ -234,11 +234,11 @@ namespace SIGEL_Environment {
     file << "UKFcoeff\n";
     file << frictionCoeff_u_k << "\n";
   };
-  void SIG_Environment::setGravity(DL_vector newGravity)
+  void SIG_Environment::setGravity(SIG_Vector newGravity)
   {
     gravity=newGravity;
   };
-  DL_vector SIG_Environment::getGravity() const
+  SIG_Vector SIG_Environment::getGravity() const
   {
     return gravity;
   };
@@ -250,11 +250,11 @@ namespace SIGEL_Environment {
   {
     return veloDamping;
   };
-  void SIG_Environment::setStartPosition(DL_vector newStartPosition)
+  void SIG_Environment::setStartPosition(SIG_Vector newStartPosition)
   {
     startPosition=newStartPosition;
   };
-  DL_vector SIG_Environment::getStartPosition() const
+  SIG_Vector SIG_Environment::getStartPosition() const
   {
     return startPosition;
   };

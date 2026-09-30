@@ -28,7 +28,7 @@ namespace SIGEL_Robot { class SIG_Material; }
 #include <QList>
 #include <qstring.h>
 #include <qtextstream.h>
-#include "SIGEL_Tools/DL_vector.h"
+#include "SIGEL_Tools/SIG_Vector.h"
 #include "SIGEL_Robot/SIG_Robot.h"
 
 namespace SIGEL_Robot
@@ -52,7 +52,7 @@ namespace SIGEL_Robot
           QString name;
           double elasticity, density;
           QList<FrictionValue *> friction;
-          DL_vector colour;
+          SIG_Vector colour;
   public:
           /**
            * Kind of a standard constructor.
@@ -97,11 +97,11 @@ namespace SIGEL_Robot
           /**
            * Sets the colour of the material.
            */
-          void setColour (DL_vector col);
+          void setColour (SIG_Vector col);
           /**
            * Returns the colour of the material.
            */
-          DL_vector getColour () const;
+          SIG_Vector getColour () const;
           /**
            * setFrictionValue sets or adds a friction constant to the material.
            * @param otherObj the opposite material to which the constant

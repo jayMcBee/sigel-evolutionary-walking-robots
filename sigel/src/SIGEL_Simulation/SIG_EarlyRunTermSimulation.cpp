@@ -53,7 +53,7 @@ bool SIGEL_Simulation::SIG_EarlyRunTermSimulation::prematureTermination()
     // nothing was computed yet, but do we have anything recorded yet ?
     if (ertRecorder->positions.count() > 0)
     {
-       DL_vector realStartPosition = normalizeRobotPosition( *ertRecorder->positions.value( 0 ), *ertRecorder->rotations.value( 0 ) );
+       SIG_Vector realStartPosition = normalizeRobotPosition( *ertRecorder->positions.value( 0 ), *ertRecorder->rotations.value( 0 ) );
        ertStartHeight = realStartPosition.y;
     }
   }
@@ -62,9 +62,9 @@ bool SIGEL_Simulation::SIG_EarlyRunTermSimulation::prematureTermination()
   else
   {
       // check current y-position of robot
-      DL_vector *actPosition = ertRecorder->positions.value( ertRecorder->positions.size() - 1 );
-      DL_matrix *actRotation = ertRecorder->rotations.value( ertRecorder->rotations.size() - 1 );
-      DL_vector actRobPos = normalizeRobotPosition( *actPosition, *actRotation );
+      SIG_Vector *actPosition = ertRecorder->positions.value( ertRecorder->positions.size() - 1 );
+      SIG_Matrix *actRotation = ertRecorder->rotations.value( ertRecorder->rotations.size() - 1 );
+      SIG_Vector actRobPos = normalizeRobotPosition( *actPosition, *actRotation );
 
       // lower than 1/2 of startheight ? Let's stop evaluation here!
       if (actRobPos.y < (ertStartHeight/2.0))
@@ -77,12 +77,12 @@ bool SIGEL_Simulation::SIG_EarlyRunTermSimulation::prematureTermination()
 }
 
 
-DL_vector SIGEL_Simulation::SIG_EarlyRunTermSimulation::normalizeRobotPosition( DL_vector originalPosition, DL_matrix actualRobotRotation )
+SIG_Vector SIGEL_Simulation::SIG_EarlyRunTermSimulation::normalizeRobotPosition( SIG_Vector originalPosition, SIG_Matrix actualRobotRotation )
 {
-  DL_vector robotsRealOrigin = ertRobot->initialLocation;
+  SIG_Vector robotsRealOrigin = ertRobot->initialLocation;
   robotsRealOrigin.timesis( -1 );
 
-  DL_vector normalizedPosition;
+  SIG_Vector normalizedPosition;
 
 
   actualRobotRotation.times( &robotsRealOrigin, &normalizedPosition );

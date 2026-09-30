@@ -94,8 +94,8 @@ namespace SIGEL_Robot
      */
     ~SIG_Robot ();
 
-    DL_vector initialLocation;
-    DL_matrix initialOrientation;
+    SIG_Vector initialLocation;
+    SIG_Matrix initialOrientation;
 
     /**
      * Makes this a fresh and empty robot object.
@@ -276,25 +276,25 @@ namespace SIGEL_Robot
      *
      * Writes a vector to a stream. This is a convenience function.
      */
-    static void vectorToStream (QTextStream & tx, DL_vector vec);
+    static void vectorToStream (QTextStream & tx, SIG_Vector vec);
     /**
      * INTERNAL.
      *
      * Reads a vector from a stream. This is a convenience function.
      */
-    static DL_vector streamToVector (QTextStream & tx);
+    static SIG_Vector streamToVector (QTextStream & tx);
     /**
      * INTERNAL.
      *
      * Writes a matrix to a stream. This is a convenience function.
      */
-    static void matrixToStream (QTextStream & tx, DL_matrix mat);
+    static void matrixToStream (QTextStream & tx, SIG_Matrix mat);
     /**
      * INTERNAL.
      *
      * Reads a matrix from a stream. This is a convenience function.
      */
-    static DL_matrix streamToMatrix (QTextStream & tx);
+    static SIG_Matrix streamToMatrix (QTextStream & tx);
 
    /**
     * return information about the robot in a string
