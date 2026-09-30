@@ -314,8 +314,12 @@ touched, because changing one changes behaviour against the reference binary.
 
 - [ ] **130. Movie overlays, and clean thumbnails for YouTube.** A new
   "Overlays" group in Movie Settings: one checkbox turns overlays on, and
-  checkboxes pick what is drawn into the frames: robot name, running
-  simulation time, distance travelled, instructions per second. Overlays
+  checkboxes pick what is drawn into the frames: running simulation time,
+  straight-line distance from the start, height of the robot centre,
+  experiment name (the file name without `.exp`), fitness function name,
+  and the individual's name with its program length and stored fitness in
+  brackets. The three names and the fitness are not in the simulation
+  window yet; the master and `sigel_slave` must pass them in. Overlays
   spoil any thumbnail cut from the movie, so a "Save thumbnails" checkbox
   also saves every nth frame at n fps, one per second from 0, without
   overlays, at the output size. The name carries the time, e.g.
