@@ -38,10 +38,10 @@ namespace SIGEL_Simulation
 {
 
   SIG_DynaMechsLink::SIG_DynaMechsLink( int dynaMechsLinkNumber,
-					SIGEL_Robot::SIG_Link const *link,
-					dmRigidBody *dynaMechsLink,
-					double screwD,
-					double screwTheta )
+                                        SIGEL_Robot::SIG_Link const *link,
+                                        dmRigidBody *dynaMechsLink,
+                                        double screwD,
+                                        double screwTheta )
     : dynaMechsLinkNumber( dynaMechsLinkNumber ),
       link( link ),
       dynaMechsLink( dynaMechsLink ),
@@ -71,9 +71,9 @@ namespace SIGEL_Simulation
     DL_matrix inertiaTensor;
 
     inertiaCalculator.computePhysics( density,
-				      mass,
-				      centerOfMass,
-				      inertiaTensor );
+                                      mass,
+                                      centerOfMass,
+                                      inertiaTensor );
 
 #ifdef SIG_DEBUG
     SIGEL_Tools::SIG_IO::cerr << "Density: " << density << Qt::endl;
@@ -85,9 +85,9 @@ namespace SIGEL_Simulation
     SIGEL_Tools::SIG_IO::cerr << "Inertia tensor:" << Qt::endl;
     for (int i=0; i<3; i++)
       {
-	for (int j=0; j<3; j++)
-	  SIGEL_Tools::SIG_IO::cerr << inertiaTensor.get( i, j ) << " ";
-	    SIGEL_Tools::SIG_IO::cerr << Qt::endl;
+        for (int j=0; j<3; j++)
+          SIGEL_Tools::SIG_IO::cerr << inertiaTensor.get( i, j ) << " ";
+        SIGEL_Tools::SIG_IO::cerr << Qt::endl;
       };
 #endif
 
@@ -98,8 +98,8 @@ namespace SIGEL_Simulation
     SIG_TypeConverter::toCartesianVector( centerOfMass, dynaMechsCenterOfMass );
 
     dynaMechsLink->setInertiaParameters( mass,
-					 dynaMechsInertiaTensor,
-					 dynaMechsCenterOfMass );
+                                         dynaMechsInertiaTensor,
+                                         dynaMechsCenterOfMass );
 
     dmContactModel *contactModel = new dmContactModel();
 
@@ -112,13 +112,13 @@ namespace SIGEL_Simulation
 
     for (int i=0; i<vertices.size(); i++)
       {
-	DL_vector &vertex = *(vertices[i]);
+        DL_vector &vertex = *(vertices[i]);
 
-	SIG_TypeConverter::toCartesianVector( vertex, contactPoints[i] );
+        SIG_TypeConverter::toCartesianVector( vertex, contactPoints[i] );
       };
 
     contactModel->setContactPoints( noOfContactPoints,
-				    contactPoints );
+                                    contactPoints );
 
     dynaMechsLink->addForce( contactModel );
   };
