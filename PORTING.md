@@ -7600,6 +7600,14 @@ carried; other items and this file cite them, so they do not change.
   is the same as before, so fitness is bit-identical on both builds; the
   C++20 switch is covered by the same run. The literals `3.14159265` and
   `0.0174533` follow one at a time.
+- [x] **126, `3.14159265`.** `SIG_DynaMechsCommandInterface::moveDrive` and
+  `SIG_DynaMechsSimulationQueries::sense` use `std::numbers::pi`. A servo
+  target at the joint's maximum now meets the limit that `SIG_Joint`
+  computes with exact pi; it fell about 1e-9 rad short before. Pitch and
+  roll of exactly 0, 90 and 180 degrees are now exact; their register values
+  do not change. Fitness is bit-identical, but only because no robot in
+  `robots/` has a `simpleservo` drive or a pitch/roll sensor, so the checks
+  do not reach either line.
 
 #### Not doing
 

@@ -30,6 +30,7 @@
 
 #include "SIGEL_Tools/SIG_Vector.h"
 #include <cmath>
+#include <numbers>
 
 
 SIGEL_Simulation::SIG_DynaMechsCommandInterface::SIG_DynaMechsCommandInterface(SIG_DynaMechsSimulationData& theSimulationData)
@@ -149,7 +150,7 @@ void SIGEL_Simulation::SIG_DynaMechsCommandInterface::moveDrive(int driveNo,
     sigelDestAngle = destAngle - static_cast<long double>(myRotJ->getMin());
 
 		// transform to a dynamechs position -> 0..2*pi, please ! Add dm-internal min. joint value here, therefore not above ...
-		dmDestAngle = sigelDestAngle * (3.14159265 / 180.0) + intMin;
+		dmDestAngle = sigelDestAngle * (std::numbers::pi / 180.0) + intMin;
 
 		//	q is our current angle
 		intRevLink->getState( &q, &qd );

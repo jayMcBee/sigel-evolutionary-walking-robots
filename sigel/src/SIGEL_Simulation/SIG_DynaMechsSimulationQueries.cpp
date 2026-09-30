@@ -27,6 +27,7 @@
 #include "SIGEL_Tools/SIG_Matrix.h"
 #include "SIGEL_Tools/SIG_Vector.h"
 #include <cmath>
+#include <numbers>
 #include <limits>
 
 #include "SIGEL_Robot/SIG_JointSensor.h"
@@ -148,10 +149,10 @@ void SIGEL_Simulation::SIG_DynaMechsSimulationQueries::sense(int sensorNo,
 
 														// what type (0..360 degrees) ?
 														if (prSensor->IsPitchType())
-														{	angle = pitch * (360.0 / (2.0*3.14159265));
+														{	angle = pitch * (360.0 / (2.0*std::numbers::pi));
 														}
 														else
-														{	angle = roll * (360.0 / (2.0*3.14159265));
+														{	angle = roll * (360.0 / (2.0*std::numbers::pi));
 														}
 
 														// limit to 0..360 degrees
