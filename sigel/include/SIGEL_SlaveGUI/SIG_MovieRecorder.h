@@ -64,7 +64,8 @@ namespace SIGEL_SlaveGUI
     bool needsToRecordFrameAt( double simulationSeconds ) const;
 
     // Saves the view centred in a frame of the movie size, never scaled,
-    // with the overlay labels the settings select.
+    // with the overlay labels the settings select. Once per second of movie,
+    // it also saves a thumbnail without labels if the settings ask for one.
     bool writeImage( QImage const &view, double simulationSeconds, double robotCentreHeight );
 
     // Writes the frame as a POV-Ray scene file.
@@ -84,6 +85,9 @@ namespace SIGEL_SlaveGUI
   private:
 
     QString nextFrameFileName() const;
+
+    // Names the thumbnail of the frame just started after its second in the movie.
+    QString thumbnailFileName() const;
 
     // Names and counts the frame, times the next one, and makes the directory.
     void startFrame( double simulationSeconds );

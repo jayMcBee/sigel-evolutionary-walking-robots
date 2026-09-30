@@ -87,6 +87,7 @@ void SIG_MovieSettingsDialog::setSettings( SIG_MovieSettings const &settings )
   checkboxUseLeadingZeros->setChecked( settings.useLeadingZeros );
   checkboxOverlaySimulationTime->setChecked( settings.showOverlaySimulationTime );
   checkboxOverlayRobotHeight->setChecked( settings.showOverlayRobotHeight );
+  checkboxSaveThumbnails->setChecked( settings.saveThumbnails );
 };
 
 SIG_MovieSettings SIG_MovieSettingsDialog::settings() const
@@ -105,6 +106,7 @@ SIG_MovieSettings SIG_MovieSettingsDialog::settings() const
   settings.useLeadingZeros = checkboxUseLeadingZeros->isChecked();
   settings.showOverlaySimulationTime = checkboxOverlaySimulationTime->isChecked();
   settings.showOverlayRobotHeight = checkboxOverlayRobotHeight->isChecked();
+  settings.saveThumbnails = checkboxSaveThumbnails->isChecked();
   return settings;
 };
 

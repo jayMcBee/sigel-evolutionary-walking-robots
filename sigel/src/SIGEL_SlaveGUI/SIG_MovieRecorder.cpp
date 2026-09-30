@@ -92,6 +92,22 @@ namespace SIGEL_SlaveGUI
     painter.drawImage( (settings.width - image.width()) / 2,
 		       (settings.height - image.height()) / 2,
 		       image );
+    painter.end();
+
+    // The frame just started is movie frame framesRecorded - 1, so every
+    // frameRate-th one starts a second of the movie.
+    if ( settings.saveThumbnails && (framesRecorded - 1) % settings.frameRate == 0 )
+      {
+	QString thumbnailName = thumbnailFileName();
+
+	if ( !frame.save( thumbnailName, "PNG" ) )
+	  {
+	    lastFileName = thumbnailName;
+	    return false;
+	  }
+      }
+
+    painter.begin( &frame );
     paintOverlayLabels( painter, simulationSeconds, robotCentreHeight );
     painter.end();
 
@@ -188,6 +204,15 @@ namespace SIGEL_SlaveGUI
       number = number.rightJustified( QString::number( settings.maxFrames ).length(), '0' );
 
     return settings.directory + settings.filePrefix + number + "." + settings.format;
+  };
+
+  QString SIG_MovieRecorder::thumbnailFileName() const
+  {
+    int seconds = (framesRecorded - 1) / settings.frameRate;
+
+    // "_thumb_" keeps the name out of the frame pattern that ffmpeg reads.
+    return settings.directory + settings.filePrefix + "_thumb_"
+      + QString::number( seconds ).rightJustified( 3, '0' ) + "s.png";
   };
 
   void SIG_MovieRecorder::startFrame( double simulationSeconds )

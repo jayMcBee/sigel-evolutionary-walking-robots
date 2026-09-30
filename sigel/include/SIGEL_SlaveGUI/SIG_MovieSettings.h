@@ -51,6 +51,8 @@ namespace SIGEL_SlaveGUI
 
     bool showOverlayRobotHeight = false;
 
+    bool saveThumbnails = false;
+
     /**
      * Ends with a slash once set.
      */
