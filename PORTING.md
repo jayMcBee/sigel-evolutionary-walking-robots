@@ -918,8 +918,8 @@ here.
   `maxFitness` was a planned "stop at a target fitness", never built; its ToDo
   in `SIG_GPManager::checkTerminationConditions` went with it. `saveExit` goes:
   nothing could change it, so it was always on. `checkTerminationConditions`
-  now waits for a generation break, as before; a save writes `SAVEEXIT` as 1
-  and a load skips it. The `setPriority` comment says that all levels set the
+  now waits for a generation break, as before, through an early return; a
+  save writes `SAVEEXIT` as 1 and a load skips it. The `setPriority` comment says that all levels set the
   same loop values and that the header's `priorityLevel` comments differ.
 - **Behaviour change, decided:** a new experiment's operator probabilities are
   crossover 300, mutation 650, reproduction 50; a row in "Changes from 1.3".
