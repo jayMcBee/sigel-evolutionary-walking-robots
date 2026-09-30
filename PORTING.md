@@ -7579,6 +7579,14 @@ carried; other items and this file cite them, so they do not change.
   - Fitness was bit-identical after every commit; warnings went from 412 to
     387.
 
+- [x] **133. The polymorphic base classes have a virtual destructor** —
+  done 2026-09-30. `SIG_Recorder`, `SIG_GPManager` and
+  `SIG_GPFitnessTrainer` had virtual methods but a non-virtual destructor,
+  so deleting a subclass through a base pointer was undefined. Every delete
+  already used the real type, so no result changes. GCC's four
+  `-Wdelete-non-virtual-dtor` warnings are gone; the gate passed with 382
+  warnings.
+
 #### Not doing
 
 Decisions, not work. Each is settled; reopen only with a reason.

@@ -190,7 +190,7 @@ namespace SIGEL_GP
    * The gp-manager is destructed.
    */
  public:
-  ~SIG_GPManager();
+  virtual ~SIG_GPManager();
 
   // The destructor deletes the tournaments in tours, so a copy would free them twice.
   SIG_GPManager( SIG_GPManager const & ) = delete;

@@ -120,7 +120,7 @@ SIG_GPFitnessTrainer(SIG_GPExperiment& exp);
    * The GPFitnessTrainer-object is destructed, no PVM-task is running anymore.
    */
  public:
-~SIG_GPFitnessTrainer(); 
+virtual ~SIG_GPFitnessTrainer();
 
   /**
    * This operation spawns a PVM-task. The individual, given by the parameter, contains the

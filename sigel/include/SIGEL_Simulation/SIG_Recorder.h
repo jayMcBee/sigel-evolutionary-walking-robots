@@ -55,6 +55,8 @@ class SIG_Recorder {
    */
   SIG_Recorder();
 
+  virtual ~SIG_Recorder() = default;
+
   /**
    * This method does initialization-work that cannot be done
    * at construction time (because simulationQueries is still 0).

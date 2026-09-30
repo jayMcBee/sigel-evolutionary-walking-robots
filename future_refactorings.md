@@ -154,13 +154,6 @@ touched, because changing one changes behaviour against the reference binary.
   line saves to `name`. The planned rotation over three autosave files
   never happens. GCC warns (`-Wsequence-point`).
 
-- [ ] **133. Give the polymorphic base classes a virtual destructor.**
-  `SIG_Recorder`, `SIG_GPManager` and `SIG_GPFitnessTrainer` have virtual
-  methods but no virtual destructor. Deleting a subclass through a base
-  pointer is undefined behaviour. GCC warns
-  (`-Wdelete-non-virtual-dtor`) in `SIG_GPManager`,
-  `SIG_GUIGPExperiment` and `SIG_SimulationVisualisation`.
-
 - [ ] **125. Give `accept()` a buffer size in
   `SIG_GPManager::RegisterDynPVMClients`.** `alen` is passed to `accept()`
   without being set, so `accept()` reads an arbitrary buffer size. If that
