@@ -40,7 +40,6 @@ SIGEL_GP::SIG_GPParameter::SIG_GPParameter()
   terminationUsesDate(true),
   terminationGenerationNo(0),
   terminationModel(byUser),
-  saveExit(true),
   liveUndead(false),
   poolImageGeneration(0),
   fitnessName( "SimpleFitnessFunction" ),
@@ -240,16 +239,6 @@ SIGEL_GP::SIG_GPParameter::terminationType SIGEL_GP::SIG_GPParameter::getTermina
    return terminationModel;
 };
 
-void SIGEL_GP::SIG_GPParameter::setSaveExit(bool sexit)
-{
-   saveExit=sexit;
-};
-
-bool SIGEL_GP::SIG_GPParameter::getSaveExit() const
-{
-   return saveExit;
-};
-
 void SIGEL_GP::SIG_GPParameter::setGraveYardDirectory(QDir directory)
 {
    graveYardDirectory=directory;
@@ -427,15 +416,6 @@ void SIGEL_GP::SIG_GPParameter::readFromFile(QTextStream & file)
    if ( s == "TERMINATIONMODEL") {
       s=file.readLine();
       terminationModel=static_cast<terminationType>(s.toInt());
-		}
-
-    if ( s == "SAVEEXIT") {
-      s=file.readLine();
-      int se=s.toInt();
-      if (se==1)
-        saveExit=true;
-      else
-        saveExit=false;
 		}
 
     if ( s == "GRAVEYARDDIRECTORY") {
@@ -622,11 +602,9 @@ void SIGEL_GP::SIG_GPParameter::writeToFile(QTextStream & file)
   file << terminationGenerationNo << "\n";
   file << "TERMINATIONMODEL\n";
   file << static_cast<int>(terminationModel) << "\n";
+  // Nothing reads SAVEEXIT; a fixed value keeps the file format.
   file << "SAVEEXIT\n";
-  if (saveExit)
-    file << 1 << "\n";
-  else
-    file << 0 << "\n";  
+  file << 1 << "\n";
   file << "GRAVEYARDDIRECTORY\n";
   file << graveYardDirectory.path() << "\n";
   file << "LIVEUNDEAD\n";

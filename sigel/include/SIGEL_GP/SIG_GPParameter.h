@@ -240,14 +240,6 @@ namespace SIGEL_GP
   terminationType terminationModel;
 
   /**
-   * This attribute indicates the following, if the Sigel-System runs
-   * without GUI and the attribute is true, the program breaks up only
-   * when a new generation is reached.
-   */
-  private:
-  bool saveExit;
-
-  /**
   * The directory for storing the old individuals, deleted from the pool.
   */
   private:
@@ -654,19 +646,6 @@ namespace SIGEL_GP
  */
  public:
   void setGraveYardDirectory(QDir directory);
-
-  /**
-   * This function returns the value of save exit, which means if its enabled, that an exit in the
-   * non GUI task will be only preformed if all tournaments of a generation are play.
-   */
- public:
-  bool getSaveExit() const;
-
-  /**
-   * This function sets the value to the save exit attribute.
-   */
- public:
-  void setSaveExit(bool sexit);
 
  /**
  * This function returns the directory, which is used for storing all indiviuals, which are

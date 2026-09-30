@@ -66,7 +66,7 @@ namespace SIGEL_GP
    * SIG_GPManager has requested the termination of the evolution.
    *
    * The evolution will stop at the next possible moment, independent
-   * from the saveExit GP-Parameter or the termination type.
+   * from the generation break or the termination type.
    */
  public:
   std::atomic<bool> userTerminated;

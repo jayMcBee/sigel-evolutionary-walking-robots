@@ -56,9 +56,9 @@
                     Saves the evolved experiment to $SIGEL_SCRATCH/evolved.exp
                     and asserts the run is in it.
     SIGEL_RUN_LONGER=1  evolution and pvmcrash: terminate after a 5-minute
-                    duration, set through the GUI. With SAVEEXIT 1, as in
-                    experiments/, SIGEL stops only at a generation break, so
-                    the run lasts until the first break after 5 minutes.
+                    duration, set through the GUI. SIGEL stops only at a
+                    generation break, so the run lasts until the first break
+                    after 5 minutes.
                     With neither lever, both scenarios refuse to Start an
                     experiment that ends on a date still to come; the seven in
                     experiments/ end in 2030.

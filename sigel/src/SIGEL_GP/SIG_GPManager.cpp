@@ -594,7 +594,8 @@ void SIGEL_GP::SIG_GPManager::stopIfNecessary(bool generationBreak) {
 };
 
 bool SIGEL_GP::SIG_GPManager::checkTerminationConditions(bool generationBreak) {
-  bool exitIsPermitted = (!currentExperiment.gpParameter.getSaveExit() || generationBreak);
+  // The termination by time or generation waits for a generation break.
+  bool exitIsPermitted = generationBreak;
 
   if (userTerminated)
     return true;
