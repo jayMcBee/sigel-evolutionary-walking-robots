@@ -297,9 +297,6 @@ namespace SIGEL_GP
   private:
   double maxFitness;
 
-  private:
-  bool parsimonyPressure;
-
   /**
    * Probability of the instructions (ADD,...) to be created or to be chosen for variation: The 
    * probabilities are given as an integer value that defines the relative probability of this 
@@ -840,12 +837,6 @@ namespace SIGEL_GP
 
   public:
   void setFitnessName(QString name);
-
-  public:
-  bool getParsimonyPressure();
-  
-  public:
-  void setParsimonyPressure( bool pressure );
 
   public:
   void setProbability( SIGEL_Program::Robotinstruction instruction, int prob );

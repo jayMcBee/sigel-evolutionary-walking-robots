@@ -44,7 +44,6 @@ SIGEL_GP::SIG_GPParameter::SIG_GPParameter()
   liveUndead(false),
   poolImageGeneration(0),
   maxFitness(50),
-  parsimonyPressure(false),
   fitnessName( "SimpleFitnessFunction" ),
   hostList(),
   timeOutMinutes(0)
@@ -70,17 +69,6 @@ void SIGEL_GP::SIG_GPParameter::setRandomSeed (int seed)
 int SIGEL_GP::SIG_GPParameter::getRandomSeed() const
 { 
    return randomSeed;
-};
-
-bool SIGEL_GP::SIG_GPParameter::getParsimonyPressure()
-{
-    return parsimonyPressure;
-};
-  
- 
-void SIGEL_GP::SIG_GPParameter::setParsimonyPressure( bool pressure )
-{
-    parsimonyPressure = pressure;
 };
 
 void SIGEL_GP::SIG_GPParameter::setMinIndLength (int minIndLen)
