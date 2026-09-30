@@ -561,7 +561,7 @@ D20 supersedes D5, D24 supersedes D3.
 | **D39** *(signed off 2026-09-16)* | Dialogs out of sight — the interface half of D36 | **Every dialog in `SIGEL_MasterGUI` has a parent.** 32 sites: 26 static `QMessageBox` and `QFileDialog` calls that passed `0` or `nullptr`, plus three constructed dialogs (`SIG_EditHostDialog` twice, `SIG_InfoBox` once) and three `QMessageBox` calls that passed `this` inside `SIG_GUIGPExperiment` — where `this` is a `QWidget` that never gets a parent and is never shown, which is no better than none. Real widgets use `this`; `SIG_GUIGPExperiment` uses `experimentListView`, as D35's seven export dialogs already did. Confirmed on the real desktop: the main window can no longer cover them. Checked: the `dialogs` scenario prints the parent of Edit Host and of About, and the `exportall` scenario's two `parentIsTheMainWindow` lines moved from 0 to 1. **Still open:** six prompts in `MT_StatisticsWidget` that D35 wants deleted rather than re-parented, item 33. Everything else got a parent on 2026-09-22, item 25, including `SIG_MainWindow::slotChangeFont`'s font dialog, which this list had missed |
 | **D40** *(signed off 2026-09-16)* | The window and splitter at start-up | **1280x860, tree 280 px, splash unscaled.** 1.3's `resize( 900, 750 )` already opened taller than the work area on a 1366x768 screen. The splitter asked for `setSizes( {2, 6} )` meaning a 1:3 split; **measured, Qt gives the tree 71 %** — numbers far below the splitter's width are ignored and the surplus goes by size policy, and `QTreeWidget` expands where the stacked widget does not. Real pixel widths and `setStretchFactor( 0, 0 )` / `( 1, 1 )` fix it and keep it fixed on resize. `widgetBase` had `setScaledContents( true )`, which stretched the square 448x448 `noExperiment.png` across the whole content area; it is centred at its own size instead. All three are deliberate divergences from 1.3. A fixed size, on purpose: no sizing to the screen, for now. Geometry is **not** remembered between sessions; `QSettings` was proposed and rejected as overkill |
 | **D41** *(signed off 2026-09-17)* | The second exception to D33: a run that has lost PVM | **`SIG_GPFitnessTrainer` may REPORT that PVM is unreachable; it may not act on it.** `checkTask` split `pvm_probe`'s three returns — above zero receive, zero wait, below zero give up — because the old `if (info != 0)` sent an error into the receive branch, where `pvm_recv` blocks for a message that cannot come — and **no `TIMEOUTMINUTES` value rescued it**, because the timeout sits in the `else` branch that an error never reaches — or fails and leaves the caller waiting for a task already destroyed. On `PvmSysErr` it sets `pvmLost`; `spawnTask` sets it too, because an unreachable daemon shows up there first and `pvm_spawn` reports that through its own return rather than through `taskId`. `SIG_GPManager::pvmIsLost()` is the only way out, `start()` clears it, and nothing in `SIGEL_GP` acts on it. `SIG_GUIGPExperiment`'s progress timer reads it, ends the run the way `Stop` does and names the reason. **`pvm_mytid` cannot be used to detect this**, and the reason is worth keeping so nobody retries it: `BEATASK` is `( pvmmytid == -1 ? pvmbeatask() : 0 )`, so an enrolled task gets its cached tid back without touching the daemon. **The other option that was measured and rejected:** watching `$PVM_TMP/pvmd.<uid>` disappear — a run completed three further generations with that file removed, because an enrolled task keeps its socket. **Not checked:** no check starts a run; the `evolution` scenario dismisses the new dialog and prints it |
-| **D42** *(signed off 2026-09-17)* | Saying why a run ended | **The interface tells the user when a run ended without doing anything.** `SIG_GUIGPExperiment::slotEvolutionStopped` shows the message when three things hold: the pool generation did not move, `guiGPManager->userTerminated` is false, and `terminationAlreadyMet()` finds the condition already true. The message names the setting — the date, the duration or the generation number — and the tab it is on. 1.3 shows nothing, so this is a deliberate divergence. Decided 2026-09-15: the interface must give feedback in that case. **Nothing in `SIGEL_GP` changes**, so this is not a third exception to D33: `terminationAlreadyMet` reads `gpParameter` and the interface's own copy of the run start time, because `SIG_GPManager::startTime` is private. **That copy is what makes the duration model work** — testing for an all-zero duration, as a first version did, missed every non-zero duration that expires inside the first evaluation, which is the ordinary case at about 98 s per generation. **Two cases not covered:** MetaGP with `SAVEEXIT` — which every experiment in `experiments/` carries — completes its first generation so the branch never runs, and a run that throws says only that an error stopped it. **Not checked:** no check starts a run; the `evolution` scenario dismisses the dialog and prints it, measured for a date and for a duration |
+| **D42** *(signed off 2026-09-17)* | Saying why a run ended | **The interface tells the user when a run ended without doing anything.** `SIG_GUIGPExperiment::slotEvolutionStopped` shows the message when three things hold: the pool generation did not move, `guiGPManager->userTerminated` is false, and `terminationAlreadyMet()` finds the condition already true. The message names the setting — the date, the duration or the generation number — and the tab it is on. 1.3 shows nothing, so this is a deliberate divergence. Decided 2026-09-15: the interface must give feedback in that case. **Nothing in `SIGEL_GP` changes**, so this is not a third exception to D33: `terminationAlreadyMet` reads `gpParameter` and the interface's own copy of the run start time, because `SIG_GPManager::startTime` is private. **That copy is what makes the duration model work** — testing for an all-zero duration, as a first version did, missed every non-zero duration that expires inside the first evaluation, which is the ordinary case at about 98 s per generation. **Two cases not covered:** MetaGP completes its first generation, because the termination waits for a generation break, so the branch never runs, and a run that throws says only that an error stopped it. **Not checked:** no check starts a run; the `evolution` scenario dismisses the dialog and prints it, measured for a date and for a duration |
 | **D43** *(signed off 2026-09-18)* | An exception to D33: the window during a run | **`SIG_GPManager::evolutionLoop` pumps the interface after every wait, not once per pass.** It pumped once per pass of the outer loop and then slept 300 ms before every entry of `taskCanDoList` with no pump, so the window was dead for `300 ms x entries` — **measured 8092 ms**, against about five seconds before a desktop calls a window unresponsive. The wait became 200 ms and `processInterfaceEvents()` follows every one of them, **in both `evolutionLoop` overloads**; the MetaGP one carries the same loop and a change to one only is a half fix. **Item 38 cut the wait to 5 ms on 2026-09-23, by decision, measured in its Done entry.** **Measured after, at 200 ms: 397 ms**, which is one iteration; **on `main` 2026-09-22, 210 ms** worst over 800 gaps, one generation of `twoBases`. Time per generation: 73.3 s at 300 ms, 69.8 s at 200 ms, one seed-0 run each. The headless `sigel <experiment>` run gets the same wait, with no interface to serve. `passive time` now caps every pump, not one per pass. **`haveABreak` is renamed `processInterfaceEvents`**: it takes no break, it gives the interface its only chance to handle input while the run holds the thread. Ten sites. **The risk this accepts:** the pump now runs inside the sweep over `taskCanDoList`, before each entry's tournament is taken. `canDoIdx`, `touchsCounter`, `sweepCounter`, the population and, in the MetaGP overload, `MetaClassifier` are live across it. Nothing the run lock leaves open changes them: during a run Start is refused, 29 actions are greyed, every experiment's individuals list is cut, and the tree menu offers only Stop. **Stop still waits for the end of the pass**, as it did before D43; the inner loop does not test `userTerminated`. Left so by decision 2026-09-22. **Not checked:** no check starts a run; the `evolution` scenario prints the worst gap between pumps and the time per generation. **Confirmed on the real desktop on 2026-09-18: the window answers during a run.** |
 
 
@@ -909,7 +909,31 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
-**2026-09-30 — DONE: ITEM 64 IS CLOSED.** Start here.
+**2026-09-30 — ITEM 106, THE MODEL CLASS `SIGEL_GP::SIG_GPParameter`.** Start
+here.
+
+- **Changed, one commit each:** the unused `SIG_GPParameter(QString)`
+  constructor, `parsimonyPressure` and `maxFitness` go; so does the
+  commented-out code in `setProbability`, `getProbability` and the header.
+  `maxFitness` was a planned "stop at a target fitness", never built; its ToDo
+  in `SIG_GPManager::checkTerminationConditions` went with it. `saveExit` goes:
+  nothing could change it, so it was always on. `checkTerminationConditions`
+  now waits for a generation break, as before; a save writes `SAVEEXIT` as 1
+  and a load skips it. The `setPriority` comment says that all levels set the
+  same loop values and that the header's `priorityLevel` comments differ.
+- **Behaviour change, decided:** a new experiment's operator probabilities are
+  crossover 300, mutation 650, reproduction 50; a row in "Changes from 1.3".
+- **Corrected:** notes that said `SAVEEXIT` makes SIGEL overwrite the `.exp`.
+  `main` in `sigel.cpp` always saves it at the end of a `-evolve` run.
+- **Gates:** `check.sh` 758 pass, 0 fail; warnings 386. Fitness, dictorder and
+  PVM unchanged, after every commit.
+- **`~/sigel-night`** runs `3c8aa9a`; the later commits change no behaviour
+  except the new-experiment defaults.
+- **Next:** item 106 itself, the GP Parameters page
+  `SIGEL_MasterGUI::SIG_GPParameter`. Still open in the model class:
+  `maxAge`, which the page shows and the file stores but nothing reads.
+
+**2026-09-30 — DONE: ITEM 64 IS CLOSED.**
 
 - **Changed:** `vendor/supportingLibs.tar.gz` no longer holds Dynamo; its
   other 386 members are identical in content, mode, owner and time.
@@ -4989,7 +5013,7 @@ information.
 reports false differences, because a `Link` line's text changes when its own
 internal point order permutes.
 
-**V1 has a trap.** `SAVEEXIT=1` rewrites the `.exp` in place, so every run works
+**V1 has a trap.** `sigel -evolve` rewrites the `.exp` in place at the end of the run, so every run works
 on a copy — never on the pristine download. The dead 2003 paths have to be
 repointed first.
 
@@ -5116,7 +5140,7 @@ ADD MOD MAX`, neither alphabetical nor declaration order, so it is hash order to
 - **`twoBases` is a control for the robot containers only.** Its command list
   permuted too, because that dict holds 13 entries whatever the robot's size.
 - **SIGEL traps SIGTERM**, so only SIGKILL stops it — and SIGKILL means
-  `SAVEEXIT` never runs and there is no output file, so a kill-based fallback
+  the final save in `main` never runs and there is no output file, so a kill-based fallback
   yields nothing.
 - All three shipped populations are already fully evaluated with a 2001
   termination date, which is why load/save exits immediately. **With no `pvmd`
@@ -6453,8 +6477,8 @@ carried; other items and this file cite them, so they do not change.
   `SIG_GUIGPExperiment::slotEvolutionStopped` says so when the run completed no
   generation, nobody stopped it, and `terminationAlreadyMet` finds the condition
   already true. It names the setting that caused it and the tab to change it on.
-  **Two cases it deliberately does not cover.** MetaGP with `SAVEEXIT` set —
-  which all 14 shipped experiments carry — completes its first generation, so
+  **Two cases it deliberately does not cover.** MetaGP completes its first
+  generation, because the termination waits for a generation break, so
   the branch never runs and only the counter moves. And a run that ends for any
   other silent reason says nothing rather than guess.
 
@@ -7464,7 +7488,7 @@ carried; other items and this file cite them, so they do not change.
   code 0. Now the first SIGINT or SIGTERM sets `userTerminated`, as the Stop
   button does, so `SIG_GPManager::start` returns and `main` saves the
   experiment and halts PVM. The run stops between tournaments, not at the
-  end of the generation: `userTerminated` does not wait for SAVEEXIT.
+  end of the generation: `userTerminated` does not wait for a generation break.
   Offspring not yet evaluated are saved with fitness -1 and are evaluated at
   the next start; the pool generation does not move. A second signal takes
   the old path and exits without saving, for a master that no longer reads
@@ -8558,7 +8582,7 @@ evaluations). Two limits as a baseline:
 
 - the run is bounded by **wall-clock, not generation count**, so counts and
   timings are machine-specific
-- `SAVEEXIT=1` makes SIGEL **overwrite the experiment file it was given** and
+- `sigel -evolve` **overwrites the experiment file it was given** and
   re-emit defaulted keys, so an evolved `.exp` is not byte-comparable with its
   input
 

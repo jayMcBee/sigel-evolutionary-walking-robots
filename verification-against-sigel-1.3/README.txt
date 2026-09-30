@@ -80,7 +80,7 @@ no container, no multiarch, nothing installed on the host.
 4. Evolving headless
    - cd into the experiment's directory and pass the bare file name
      (sigel -evolve x.exp); an absolute path breaks pool-image file names.
-   - Work on a copy: SAVEEXIT 1 overwrites the .exp.
+   - Work on a copy: sigel -evolve overwrites the .exp.
    - Shipped experiments terminate on load (2001 TERMINATIONTIME); set
      TERMINATIONUSESDATE 0 and a generation limit. TIMETOSIMULATE is
      h m s ms, not seconds.
