@@ -25,13 +25,12 @@
 namespace SIGEL_Visualisation
 {  
 
-  SIG_SceneObject::SIG_SceneObject(int number,
-				   SIG_Vector,
-				   SIG_Matrix)
+  SIG_SceneObject::SIG_SceneObject(int number)
     : number(number),
-      position(position),
-      rotation(rotation)
-  { };
+      position(0, 0, 0)
+  {
+    rotation.makeone();
+  };
 
 }
 

@@ -44,13 +44,12 @@ namespace SIGEL_Visualisation
       /**
        * The constructor of the SIG_SceneObject.
        *
+       * The position starts at the origin and the rotation
+       * at the identity.
+       *
        * @param number Initializes the attribute number.
-       * @param position Initializes the attribute position.
-       * @param rotation Initializes the attribute rotation.
        */
-      SIG_SceneObject(int number,
-		      SIG_Vector position = SIG_Vector(),
-		      SIG_Matrix rotation = SIG_Matrix());
+      SIG_SceneObject(int number);
 
       /**
        * The number of this SIG_SceneObject.

@@ -59,13 +59,10 @@ namespace SIGEL_Visualisation
        *
        * @param number Initializes the attribute number.
        * @param name Initializes the attribute name.
-       * @param position Initializes the attribute position.
        * @param color Initializes the attribute color.
        */
       SIG_VisualSceneObject(int number,
 			    QString name,
-			    SIG_Vector position = SIG_Vector(),
-			    SIG_Matrix rotation = SIG_Matrix(),
 			    SIG_Vector color = SIG_Vector());
 
       /**

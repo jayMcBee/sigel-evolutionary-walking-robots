@@ -26,10 +26,8 @@ namespace SIGEL_Visualisation
 {
   SIG_VisualSceneObject::SIG_VisualSceneObject(int number,
 					       QString name,
-					       SIG_Vector position,
-					       SIG_Matrix rotation,
 					       SIG_Vector color)
-    : SIG_SceneObject(number, position, rotation),
+    : SIG_SceneObject(number),
       name(name),
       color(color),
       transformationInternal(16),
