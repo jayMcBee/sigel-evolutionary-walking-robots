@@ -535,14 +535,11 @@ void SIGEL_GP::SIG_GPFitnessTrainer::sweepToSpawn()
 int SIGEL_GP::SIG_GPFitnessTrainer::getNextHost() {
   int result = -1;
   SIG_GPPVMHost   *freshHost;
-  char            *cStrName;
   pthread_mutex_t  mutex;
 
   // now we make ourself running exclusively to add all new hosts from the freshDynHosts list
   pthread_mutex_init(&mutex, nullptr);
   pthread_mutex_lock( &mutex );
-
-  cStrName = new char[256];
 
   // add all new dynamic hosts to pvmHosts and declare them to PVM
   for (unsigned int i=0; i<freshDynHosts.count(); i++) {
@@ -553,17 +550,17 @@ int SIGEL_GP::SIG_GPFitnessTrainer::getNextHost() {
     delete pvmHosts[ pvmHosts.size()-1 ];
     pvmHosts[ pvmHosts.size()-1 ] = new SIG_GPActivePVMHost(*freshHost);
 
-    sprintf(cStrName, "%s", freshHost->name.toLatin1().constData());
+    const QByteArray freshHostNameQCString = freshHost->name.toLatin1();
+    char const *freshHostNameCString = freshHostNameQCString.constData();
 
     int singleInfo = 0;
-    int info = pvm_addhosts(&cStrName , 1, &singleInfo );
+    int info = pvm_addhosts( const_cast< char** >(&freshHostNameCString), 1, &singleInfo );
 
-    fprintf(stderr, "\to new host added to pvmHosts: \"%s\"\n", cStrName);
+    fprintf(stderr, "\to new host added to pvmHosts: \"%s\"\n", freshHostNameCString);
   }
 
   qDeleteAll( freshDynHosts );
   freshDynHosts.clear();
-  delete[] cStrName;
 
   pthread_mutex_unlock( &mutex );
 
