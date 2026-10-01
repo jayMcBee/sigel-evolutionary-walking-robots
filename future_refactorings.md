@@ -41,24 +41,7 @@ Paths are relative to `sigel/`, the source tree.
 
 ---
 
-## 3 · Program display
-
-- [ ] **9. Syntax-highlight the program view.** New
-  `programToHtml(const SIG_Program &, const SIG_LanguageParameters &)` returning
-  a `QString`, fed to `QTextBrowser::setHtml()` wherever a program is shown.
-  `printToString()` stays as the ZORC serial format and must keep serving
-  `SIG_GPRemoteZORCFitnessFunction::evalFitness`.
-  `<pre>` wrapper, one `<span>` per token, a line number per line. Colour
-  opcodes by group: arithmetic `ADD SUB MUL DIV MOD MIN MAX`, data
-  `COPY LOAD`, control `CMP JMP`, robot `MOVE SENSE DELAY`. Registers print as
-  `R0`–`R7`, computed as `element % getMemorySize()`; `LOAD` operand 2 and
-  `JMP` operand 1 print as literals. Callers: `SIG_SimulationWidget::visualizeThis`,
-  `SIG_IndividualView::SIG_IndividualView`,
-  `SIG_AllIndividualsView::slotVisualize`.
-
----
-
-## 4 · Renames and translation
+## 3 · Renames and translation
 
 - [ ] **10. Rename the two `SIG_GPExperiment` variants.**
   `SIG_GPExperiment.cpp` builds `sigel`, `SIG_GPExperimentClean.cpp` builds
@@ -136,7 +119,7 @@ Paths are relative to `sigel/`, the source tree.
 
 ---
 
-## 5 · Defects preserved by the port
+## 4 · Defects preserved by the port
 
 All present in 1.3, none introduced here. Each needs a decision before it is
 touched, because changing one changes behaviour against the reference binary.
@@ -309,7 +292,7 @@ touched, because changing one changes behaviour against the reference binary.
 
 ---
 
-## 6 · The interface
+## 5 · The interface
 
 - [ ] **128. Evaluate a Stop that waits for the end of the generation.**
   Stop ends a run at once, in the middle of a generation: the tournaments
@@ -375,9 +358,22 @@ touched, because changing one changes behaviour against the reference binary.
   To show beside it: every MOVE takes its torque from R0, and a negative
   register operand wraps (`MOVE -128` with 24 registers reads R8).
 
+- [ ] **9. Syntax-highlight the program view.** New
+  `programToHtml(const SIG_Program &, const SIG_LanguageParameters &)` returning
+  a `QString`, fed to `QTextBrowser::setHtml()` wherever a program is shown.
+  `printToString()` stays as the ZORC serial format and must keep serving
+  `SIG_GPRemoteZORCFitnessFunction::evalFitness`.
+  `<pre>` wrapper, one `<span>` per token, a line number per line. Colour
+  opcodes by group: arithmetic `ADD SUB MUL DIV MOD MIN MAX`, data
+  `COPY LOAD`, control `CMP JMP`, robot `MOVE SENSE DELAY`. Registers print as
+  `R0`–`R7`, computed as `element % getMemorySize()`; `LOAD` operand 2 and
+  `JMP` operand 1 print as literals. Callers: `SIG_SimulationWidget::visualizeThis`,
+  `SIG_IndividualView::SIG_IndividualView`,
+  `SIG_AllIndividualsView::slotVisualize`.
+
 ---
 
-## 7 · MetaGP
+## 6 · MetaGP
 
 - [ ] **132. Make the MetaGP autosave rotate.** In `MT_Controller`,
   `autoSaveCnt = autoSaveCnt++ % 3` writes the old value back, so the
@@ -409,7 +405,7 @@ touched, because changing one changes behaviour against the reference binary.
 
 ---
 
-## 8 · GP engine
+## 7 · GP engine
 
 How programs control a robot, and how evolution changes programs. Every item
 here changes evolution results, so each is judged only by whether the best
@@ -463,7 +459,7 @@ problem; the choice is made before any code is written.
 
 ---
 
-## 9 · Removals
+## 8 · Removals
 
 - [ ] **83. Put ZORC support behind a compile-time switch, off by default.**
   Decided. ZORC is a real robot driven over a serial line; the simulation does
