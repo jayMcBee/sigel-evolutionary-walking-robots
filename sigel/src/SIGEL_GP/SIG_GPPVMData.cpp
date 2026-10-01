@@ -97,13 +97,13 @@ void SIGEL_GP::SIG_GPPVMData::loadPVMDataTransfer(QTextStream & file,
   QString environmentString = cutAfterFiveHashes( file );
   QString programString = cutAfterFiveHashes( file );
   QString robotString = cutAfterFiveHashes( file );
-  QString miscString = cutAfterFiveHashes( file );
+  QString settingsString = cutAfterFiveHashes( file );
 
   QTextStream simParStream( &simParString, QIODeviceBase::ReadOnly );
   QTextStream environmentStream( &environmentString, QIODeviceBase::ReadOnly );
   QTextStream programStream( &programString, QIODeviceBase::ReadOnly );
   QTextStream robotStream( &robotString, QIODeviceBase::ReadOnly );
-  QTextStream miscStream( &miscString, QIODeviceBase::ReadOnly );
+  QTextStream settingsStream( &settingsString, QIODeviceBase::ReadOnly );
 
   simulationParameter.readFromFile( simParStream );
   environment.readFromFile( environmentStream );
@@ -111,24 +111,24 @@ void SIGEL_GP::SIG_GPPVMData::loadPVMDataTransfer(QTextStream & file,
   robot.readFromFileTransfer( robotStream );
 
   QString bufferString;
-  bufferString = miscStream.readLine(); // FITNESSNAME
-  bufferString = miscStream.readLine();
+  bufferString = settingsStream.readLine(); // FITNESSNAME
+  bufferString = settingsStream.readLine();
   fitnessName = bufferString;
-  bufferString = miscStream.readLine(); // ACTGENERATION
-  bufferString = miscStream.readLine();
+  bufferString = settingsStream.readLine(); // ACTUALGENERATION
+  bufferString = settingsStream.readLine();
   actGeneration = bufferString.toInt();
-  bufferString = miscStream.readLine(); // RESETEVERYGENERATION
-  bufferString = miscStream.readLine();
+  bufferString = settingsStream.readLine(); // RESETEVERYGENERATION
+  bufferString = settingsStream.readLine();
   resetEveryGeneration = bufferString.toInt();
-  bufferString = miscStream.readLine(); //VISUALIZE
-  bufferString = miscStream.readLine();
+  bufferString = settingsStream.readLine(); //VISUALIZE
+  bufferString = settingsStream.readLine();
   int visuInt = bufferString.toInt();
   if (visuInt == 1)
     visualize=true;
   else
     visualize=false;
-  bufferString = miscStream.readLine(); // EXPERIMENTNAME
-  bufferString = miscStream.readLine();
+  bufferString = settingsStream.readLine(); // EXPERIMENTNAME
+  bufferString = settingsStream.readLine();
   experimentName = bufferString;
 };
 
