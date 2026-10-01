@@ -153,11 +153,9 @@ void SIGEL_GP::SIG_GPFitnessTrainer::flushAllDynHosts() {
   bool           res;
   int            i,dynDelNum;
   SIG_GPActivePVMHost *pHost;
-  char          *cStrName;
 
   // are there any dynHosts ?
   if (dynHosts.count() > 0) {
-    cStrName = new char[256];
     i = pvmHosts.size()-1;
     dynDelNum = 0;
 
@@ -172,16 +170,11 @@ void SIGEL_GP::SIG_GPFitnessTrainer::flushAllDynHosts() {
 
         if (dHostQstr == pHost->name) {
           res = true;
-          sprintf(cStrName, pHost->name.toLatin1().constData());
         }
       }
 
       // delete the dynamic host from our list and from PVM
       if (res) {
-        // for now this variable is not used
-        // int singleInfo = 0;
-        // int info = pvm_delhosts( &cStrName, 1, &singleInfo );
-
         resizeOwningHosts( pvmHosts, pvmHosts.size()-1 );
         dynDelNum++;
         i--;
@@ -195,7 +188,6 @@ void SIGEL_GP::SIG_GPFitnessTrainer::flushAllDynHosts() {
     // dynHosts has become obsolete
     qDeleteAll( dynHosts );
     dynHosts.clear();
-    delete[] cStrName;
 
     // unfortunately that's it also for our new hosts, else we have a conflict
     // with our server thread cutting _all_ connections, known or unknown to dynHosts
