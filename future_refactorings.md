@@ -157,12 +157,6 @@ touched, because changing one changes behaviour against the reference binary.
   `SIG_VisualSceneObject` passes in are lost. GCC warns (`-Winit-self`,
   `-Wuninitialized`).
 
-- [ ] **132. Make the MetaGP autosave rotate.** In `MT_Controller`,
-  `autoSaveCnt = autoSaveCnt++ % 3` writes the old value back, so the
-  counter stays at 0. The `saveName` it builds is also not used: the next
-  line saves to `name`. The planned rotation over three autosave files
-  never happens. GCC warns (`-Wsequence-point`).
-
 - [ ] **125. Give `accept()` a buffer size in
   `SIG_GPManager::RegisterDynPVMClients`.** `alen` is passed to `accept()`
   without being set, so `accept()` reads an arbitrary buffer size. If that
@@ -178,19 +172,6 @@ touched, because changing one changes behaviour against the reference binary.
   lands between the check and the wait is lost, which leaves the master
   waiting for good. Latent: only the dynamic-client thread reaches it, which
   only `sigel.cpp` starts. Item 19 is the same kind of fault elsewhere.
-
-- [ ] **122. Destroy MetaGP's mutexes instead of unlocking them.**
-  `MT_Substitute::~MT_Substitute` and `MT_GPManager::~MT_GPManager` call
-  `pthread_mutex_unlock` on mutexes the destroying thread does not hold, which
-  POSIX leaves undefined, and never call `pthread_mutex_destroy`.
-
-- [ ] **119. Make MetaGP able to start on Linux.**
-  `MT_GPManager::startEvolution` waits for enough training cases with
-  `sleep(10000000)` on POSIX, about 115 days, where 1.3's Windows build
-  waited `Sleep(10000)`, 10 s. The first check always finds too few cases, so on
-  Linux the meta evolution never starts, in 1.3 as well. MetaGP was published
-  with results (Ziegler and Banzhaf, CLAWAR 2003), so it presumably ran on
-  Windows only.
 
 - [ ] **118. Check the GP parameters when a file loads.**
   `SIG_GPParameter::readFromFile` accepts any value, including ones the
@@ -310,10 +291,6 @@ touched, because changing one changes behaviour against the reference binary.
   - **Open:** the smallest step and its decimals. The shipped experiments use
     0.01 and 0.002; 0.0001 with 4 decimals would keep both.
 
-- [ ] **37. Give each `generateTerrain` call its own partial file name.** The
-  name is unique per process, but `MT_Controller` runs an evolution on its own
-  thread.
-
 - [ ] **52. `SIG_Drive`'s stream constructor can leave `mode` unset.** For
   an unknown word it is left unset, and `writeToFileTransfer` then writes
   `invalid_mode`, unless the unset value happens to equal a known one. Only
@@ -345,11 +322,6 @@ touched, because changing one changes behaviour against the reference binary.
 - [ ] **107. Review `SIG_GPPopulation::readFromFile` with the maintainer,**
   deciding each change before it is made. The method is long and hard to
   read.
-
-- [ ] **120. Make MetaGP's Add work.** On the MetaGP window's population
-  page, Add does not add individuals, so the population can only be filled by
-  loading one. Found in use; the cause is not known yet
-  (`MT_PopulationWidget::slotAddInd` and its dialog look complete).
 
 - [ ] **106. Review `SIGEL_MasterGUI::SIG_GPParameter` with the maintainer,**
   the GP Parameters page, method by method, deciding each change before it is
@@ -405,7 +377,39 @@ touched, because changing one changes behaviour against the reference binary.
 
 ---
 
-## 8 · GP engine
+## 8 · MetaGP
+
+- [ ] **132. Make the MetaGP autosave rotate.** In `MT_Controller`,
+  `autoSaveCnt = autoSaveCnt++ % 3` writes the old value back, so the
+  counter stays at 0. The `saveName` it builds is also not used: the next
+  line saves to `name`. The planned rotation over three autosave files
+  never happens. GCC warns (`-Wsequence-point`).
+
+- [ ] **122. Destroy MetaGP's mutexes instead of unlocking them.**
+  `MT_Substitute::~MT_Substitute` and `MT_GPManager::~MT_GPManager` call
+  `pthread_mutex_unlock` on mutexes the destroying thread does not hold, which
+  POSIX leaves undefined, and never call `pthread_mutex_destroy`.
+
+- [ ] **119. Make MetaGP able to start on Linux.**
+  `MT_GPManager::startEvolution` waits for enough training cases with
+  `sleep(10000000)` on POSIX, about 115 days, where 1.3's Windows build
+  waited `Sleep(10000)`, 10 s. The first check always finds too few cases, so on
+  Linux the meta evolution never starts, in 1.3 as well. MetaGP was published
+  with results (Ziegler and Banzhaf, CLAWAR 2003), so it presumably ran on
+  Windows only.
+
+- [ ] **37. Give each `generateTerrain` call its own partial file name.** The
+  name is unique per process, but `MT_Controller` runs an evolution on its own
+  thread.
+
+- [ ] **120. Make MetaGP's Add work.** On the MetaGP window's population
+  page, Add does not add individuals, so the population can only be filled by
+  loading one. Found in use; the cause is not known yet
+  (`MT_PopulationWidget::slotAddInd` and its dialog look complete).
+
+---
+
+## 9 · GP engine
 
 How programs control a robot, and how evolution changes programs. Every item
 here changes evolution results, so each is judged only by whether the best
@@ -459,7 +463,7 @@ problem; the choice is made before any code is written.
 
 ---
 
-## 9 · Removals
+## 10 · Removals
 
 - [ ] **83. Put ZORC support behind a compile-time switch, off by default.**
   Decided. ZORC is a real robot driven over a serial line; the simulation does
