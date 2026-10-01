@@ -12,7 +12,7 @@ Paths are relative to `sigel/`, the source tree.
 
 ---
 
-## 2 · Let the compiler hunt bugs
+## 1 · Let the compiler hunt bugs
 
 - [ ] **5. Add `override`**, one commit per module. Highest value on this
   list: a method meant to override with a subtly wrong signature silently
@@ -22,7 +22,7 @@ Paths are relative to `sigel/`, the source tree.
 
 ---
 
-## 3 · Ownership
+## 2 · Ownership
 
 - [ ] **8. Smart pointers.** Correct and broken both compile clean, and no
   flag verifies it. Prerequisites in order: one experiment running end to end,
@@ -41,7 +41,7 @@ Paths are relative to `sigel/`, the source tree.
 
 ---
 
-## 4 · Program display
+## 3 · Program display
 
 - [ ] **9. Syntax-highlight the program view.** New
   `programToHtml(const SIG_Program &, const SIG_LanguageParameters &)` returning
@@ -58,7 +58,7 @@ Paths are relative to `sigel/`, the source tree.
 
 ---
 
-## 5 · Renames and translation
+## 4 · Renames and translation
 
 - [ ] **10. Rename the two `SIG_GPExperiment` variants.**
   `SIG_GPExperiment.cpp` builds `sigel`, `SIG_GPExperimentClean.cpp` builds
@@ -136,7 +136,7 @@ Paths are relative to `sigel/`, the source tree.
 
 ---
 
-## 6 · Defects preserved by the port
+## 5 · Defects preserved by the port
 
 All present in 1.3, none introduced here. Each needs a decision before it is
 touched, because changing one changes behaviour against the reference binary.
@@ -309,7 +309,7 @@ touched, because changing one changes behaviour against the reference binary.
 
 ---
 
-## 7 · The interface
+## 6 · The interface
 
 - [ ] **128. Evaluate a Stop that waits for the end of the generation.**
   Stop ends a run at once, in the middle of a generation: the tournaments
@@ -377,7 +377,7 @@ touched, because changing one changes behaviour against the reference binary.
 
 ---
 
-## 8 · MetaGP
+## 7 · MetaGP
 
 - [ ] **132. Make the MetaGP autosave rotate.** In `MT_Controller`,
   `autoSaveCnt = autoSaveCnt++ % 3` writes the old value back, so the
@@ -409,7 +409,7 @@ touched, because changing one changes behaviour against the reference binary.
 
 ---
 
-## 9 · GP engine
+## 8 · GP engine
 
 How programs control a robot, and how evolution changes programs. Every item
 here changes evolution results, so each is judged only by whether the best
@@ -463,7 +463,7 @@ problem; the choice is made before any code is written.
 
 ---
 
-## 10 · Removals
+## 9 · Removals
 
 - [ ] **83. Put ZORC support behind a compile-time switch, off by default.**
   Decided. ZORC is a real robot driven over a serial line; the simulation does
