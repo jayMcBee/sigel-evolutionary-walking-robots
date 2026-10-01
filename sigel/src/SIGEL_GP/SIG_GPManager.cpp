@@ -927,7 +927,7 @@ void SIGEL_GP::SIG_GPManager::RegisterDynPVMClients() {
         send( clientSockets[i], &myInt, sizeof(myInt), 0);
         close(clientSockets[i]);
       }
-      fprintf(stderr, "\t(Servertask disconnected %d clients)\n", clientSockets.count());
+      fprintf(stderr, "\t(Servertask disconnected %d clients)\n", static_cast< int >(clientSockets.count()));
       clientSockets.resize(0);
 
       // tell main thread to continue !
