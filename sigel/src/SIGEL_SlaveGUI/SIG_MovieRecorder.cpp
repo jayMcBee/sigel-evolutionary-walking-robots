@@ -81,18 +81,7 @@ namespace SIGEL_SlaveGUI
     if ( view.isNull() )
       return false;
 
-    // The view is in device pixels; drawn at ratio 1, they stay 1:1.
-    QImage image = view;
-    image.setDevicePixelRatio( 1.0 );
-
-    QImage frame( settings.width, settings.height, QImage::Format_RGB32 );
-    frame.fill( Qt::black );
-
-    QPainter painter( &frame );
-    painter.drawImage( (settings.width - image.width()) / 2,
-		       (settings.height - image.height()) / 2,
-		       image );
-    painter.end();
+    QImage frame = frameWithView( view );
 
     // The frame just started is movie frame framesRecorded - 1, so every
     // frameRate-th one starts a second of the movie.
@@ -109,9 +98,22 @@ namespace SIGEL_SlaveGUI
 
     paintOverlayLabels( frame, simulationSeconds, startDistance, robotCentreHeight );
 
-    return frame.save( lastFileName,
-		       settings.format.toUpper().toUtf8().constData(),
-		       settings.quality );
+    return frame.save( lastFileName, settings.format.toUpper().toUtf8().constData(), settings.quality );
+  };
+
+  QImage SIG_MovieRecorder::frameWithView( QImage const &view ) const
+  {
+    // The view is in device pixels; drawn at ratio 1, they stay 1:1.
+    QImage image = view;
+    image.setDevicePixelRatio( 1.0 );
+
+    QImage frame( settings.width, settings.height, QImage::Format_RGB32 );
+    frame.fill( Qt::black );
+
+    QPainter painter( &frame );
+    painter.drawImage( (settings.width - image.width()) / 2, (settings.height - image.height()) / 2, image );
+
+    return frame;
   };
 
   void SIG_MovieRecorder::paintOverlayLabels( QImage &frame, double simulationSeconds, double startDistance, double robotCentreHeight ) const

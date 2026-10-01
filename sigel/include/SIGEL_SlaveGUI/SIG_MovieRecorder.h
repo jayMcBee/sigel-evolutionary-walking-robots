@@ -91,6 +91,9 @@ namespace SIGEL_SlaveGUI
 
     void makeDirectory() const;
 
+    // The view centred in a black frame of the movie size, never scaled.
+    QImage frameWithView( QImage const &view ) const;
+
     void paintOverlayLabels( QImage &frame, double simulationSeconds, double startDistance, double robotCentreHeight ) const;
 
     // The frame timing's position at simulationSeconds, in frames.
