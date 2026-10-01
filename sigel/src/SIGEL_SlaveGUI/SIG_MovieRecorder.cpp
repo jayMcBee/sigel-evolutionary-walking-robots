@@ -150,6 +150,12 @@ namespace SIGEL_SlaveGUI
         values << staticRunInfo.experimentName;
       }
 
+    if ( settings.showOverlayFitnessFunction && !staticRunInfo.fitnessFunctionName.isEmpty() )
+      {
+        labels << "Fitness function:";
+        values << staticRunInfo.fitnessFunctionName;
+      }
+
     if ( settings.showOverlaySimulationTime )
       {
         labels << "Simulated time:";

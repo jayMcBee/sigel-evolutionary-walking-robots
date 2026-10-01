@@ -42,6 +42,11 @@ namespace SIGEL_SlaveGUI
     QString experimentName;
 
     /**
+     * Empty when the name is not known; its overlay label is then not drawn.
+     */
+    QString fitnessFunctionName;
+
+    /**
      * Takes the experiment name from the experiment's file name: without
      * the directory and without ".exp".
      */

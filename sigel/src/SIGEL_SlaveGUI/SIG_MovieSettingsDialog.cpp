@@ -86,6 +86,7 @@ void SIG_MovieSettingsDialog::setSettings( SIG_MovieSettings const &settings )
   spinboxPngCompression->setValue( settings.pngCompression );
   checkboxUseLeadingZeros->setChecked( settings.useLeadingZeros );
   checkboxOverlayExperimentName->setChecked( settings.showOverlayExperimentName );
+  checkboxOverlayFitnessFunction->setChecked( settings.showOverlayFitnessFunction );
   checkboxOverlaySimulationTime->setChecked( settings.showOverlaySimulationTime );
   checkboxOverlayStartDistance->setChecked( settings.showOverlayStartDistance );
   checkboxOverlayRobotHeight->setChecked( settings.showOverlayRobotHeight );
@@ -107,6 +108,7 @@ SIG_MovieSettings SIG_MovieSettingsDialog::settings() const
   settings.pngCompression = spinboxPngCompression->value();
   settings.useLeadingZeros = checkboxUseLeadingZeros->isChecked();
   settings.showOverlayExperimentName = checkboxOverlayExperimentName->isChecked();
+  settings.showOverlayFitnessFunction = checkboxOverlayFitnessFunction->isChecked();
   settings.showOverlaySimulationTime = checkboxOverlaySimulationTime->isChecked();
   settings.showOverlayStartDistance = checkboxOverlayStartDistance->isChecked();
   settings.showOverlayRobotHeight = checkboxOverlayRobotHeight->isChecked();

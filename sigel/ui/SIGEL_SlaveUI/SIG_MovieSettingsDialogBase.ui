@@ -46,6 +46,16 @@
                   </widget>
                 </item>
                 <item>
+                  <widget class="QCheckBox" name="checkboxOverlayFitnessFunction">
+                    <property name="text">
+                      <string>Fitness function</string>
+                    </property>
+                    <property name="toolTip">
+                      <string>Writes the name of the fitness function into each saved frame. The view on screen does not change.</string>
+                    </property>
+                  </widget>
+                </item>
+                <item>
                   <widget class="QCheckBox" name="checkboxOverlaySimulationTime">
                     <property name="text">
                       <string>Simulation time</string>

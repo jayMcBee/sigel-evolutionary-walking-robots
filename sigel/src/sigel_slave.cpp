@@ -237,6 +237,14 @@ int main( int argc, char *argv[] ) {
 
       SIG_MovieStaticRunInfo staticRunInfo;
       staticRunInfo.setExperimentFileName( experimentFileName );
+
+      // An ID the registry does not know is shown as it is.
+      QString fitnessFunctionId = standAlone ? experiment->gpParameter.getFitnessName() : fitnessFunctionName;
+      const std::optional<int> shownFitnessIndex = SIGEL_GP::SIG_GPFitnessFunctionRegistry::indexOf( fitnessFunctionId );
+      if (shownFitnessIndex)
+        staticRunInfo.fitnessFunctionName = SIGEL_GP::SIG_GPFitnessFunctionRegistry::fitnessFunctions()[*shownFitnessIndex]->name();
+      else
+        staticRunInfo.fitnessFunctionName = fitnessFunctionId;
       simWindow->setStaticRunInfo( staticRunInfo );
       simWindow->show();
 
