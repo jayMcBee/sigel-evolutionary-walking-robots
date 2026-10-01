@@ -22,6 +22,7 @@
 */
 #include "SIGEL_Robot/SIG_Polygon.h"
 #include "SIGEL_Robot/SIG_Robot.h"
+#include "SIGEL_Tools/SIG_IO.h"
 #include <stdio.h>
 
 namespace SIGEL_Robot {
@@ -49,8 +50,7 @@ namespace SIGEL_Robot {
 
                 tx >> tmpstr;
                 if (tmpstr != "Polygon")
-                        // ERROR
-                        ;
+                        SIGEL_Tools::SIG_IO::cerr << "Robot polygon: 'Polygon' expected, found '" << tmpstr << "'" << Qt::endl;
                 
                 tx >> vertexCount;
                 vertices.resize (vertexCount);

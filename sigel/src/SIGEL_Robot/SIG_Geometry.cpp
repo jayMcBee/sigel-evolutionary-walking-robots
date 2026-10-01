@@ -22,6 +22,7 @@
 */
 #include "SIGEL_Robot/SIG_Geometry.h"
 #include "SIGEL_Robot/SIG_Robot.h"
+#include "SIGEL_Tools/SIG_IO.h"
 
 namespace SIGEL_Robot {
         void SIG_Geometry::addPolygon (SIG_Polygon *p)
@@ -54,8 +55,7 @@ namespace SIGEL_Robot {
                 
                 tx >> tmpstr;
                 if (tmpstr != "Geometry")
-                        // ERROR
-                        ;
+                        SIGEL_Tools::SIG_IO::cerr << "Robot geometry: 'Geometry' expected, found '" << tmpstr << "'" << Qt::endl;
 
                 tx >> itemCount;
                 for (int i = 0; i < itemCount; i++) {
