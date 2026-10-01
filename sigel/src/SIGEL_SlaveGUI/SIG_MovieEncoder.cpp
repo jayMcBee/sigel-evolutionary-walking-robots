@@ -105,11 +105,14 @@ namespace SIGEL_SlaveGUI
 
 		input += "." + settings.format;
 
-		// libx264 with yuv420p needs an even width and height.
+		// libx264 with yuv420p needs an even width and height. Players take an
+		// HD movie as BT.709, so the frames are converted and tagged as that.
+		// faststart puts the index first, so the movie plays while it loads.
 		return { "-y", "-framerate", QString::number( settings.frameRate ), "-start_number", "0",
 			"-i", input, "-frames:v", QString::number( frameCount ),
-			"-vf", "crop=trunc(iw/2)*2:trunc(ih/2)*2",
-			"-c:v", "libx264", "-pix_fmt", "yuv420p", settings.directory + settings.filePrefix + ".mp4" };
+			"-vf", "crop=trunc(iw/2)*2:trunc(ih/2)*2,scale=out_color_matrix=bt709,setparams=colorspace=bt709:color_primaries=bt709:color_trc=bt709",
+			"-c:v", "libx264", "-crf", "18", "-pix_fmt", "yuv420p",
+			"-movflags", "+faststart", settings.directory + settings.filePrefix + ".mp4" };
 	};
 
 	void SIG_MovieEncoder::reportFinished()
