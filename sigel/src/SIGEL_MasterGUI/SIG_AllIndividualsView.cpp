@@ -42,6 +42,7 @@
 
 #include "SIGEL_Program/SIG_Program.h"
 #include "SIGEL_GP/SIG_GPPVMData.h"
+#include "SIGEL_MasterGUI/SIG_GUIGPExperiment.h"
 
 #include <SIGEL_Tools/SIG_IO.h>
 
@@ -49,8 +50,8 @@
 namespace SIGEL_MasterGUI
 {
   
-SIG_AllIndividualsView::SIG_AllIndividualsView( QWidget * parent, const char * name, SIGEL_GP::SIG_GPExperiment &theExperiment )
-  : QSplitter( parent ), theExperiment( theExperiment )
+SIG_AllIndividualsView::SIG_AllIndividualsView( QWidget * parent, const char * name, SIGEL_GP::SIG_GPExperiment &theExperiment, SIG_GUIGPExperiment &guiExperiment )
+  : QSplitter( parent ), theExperiment( theExperiment ), guiExperiment( guiExperiment )
 {
   // change some splitter settings
   setOrientation( Qt::Vertical );
@@ -359,6 +360,8 @@ void SIG_AllIndividualsView::slotVisualize()
      			       theExperiment.simulationParameter,
 						 theExperiment.gpParameter.getFitnessName(),
      			       true );
+
+         pvmData.setExperimentName( guiExperiment.getName() );
 
          QString pvmDataString;
          QTextStream pvmDataStream( &pvmDataString, QIODevice::ReadWrite );

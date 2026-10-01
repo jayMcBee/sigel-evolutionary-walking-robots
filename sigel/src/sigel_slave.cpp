@@ -108,6 +108,7 @@ int main( int argc, char *argv[] ) {
   SIGEL_GP::SIG_GPExperiment *experiment = nullptr;
   bool visualize = false;
   QString fitnessFunctionName;
+  QString experimentFileName;
 
   bool standAlone = false;
 
@@ -132,6 +133,7 @@ int main( int argc, char *argv[] ) {
     }
 
     QString experimentName( argv[2] );
+    experimentFileName = experimentName;
     QFile experimentFile( experimentName );
     if (!experimentFile.open( QIODevice::ReadOnly )) {
 	  	SIGEL_Tools::SIG_IO::cerr << "Error opening " << experimentName << "!" << Qt::endl;
@@ -201,6 +203,7 @@ int main( int argc, char *argv[] ) {
 
     visualize = pvmData.getVisualize();
     fitnessFunctionName = pvmData.getFitnessFunctionName();
+    experimentFileName = pvmData.getExperimentName();
   }
 
   int returnValue = 0;
@@ -231,6 +234,10 @@ int main( int argc, char *argv[] ) {
       SIG_SimulationWindow *simWindow = new SIG_SimulationWindow(nullptr, "simWindow");
 
       simWindow->setWindowTitle("Simulation Visualisation");
+
+      SIG_MovieStaticRunInfo staticRunInfo;
+      staticRunInfo.setExperimentFileName( experimentFileName );
+      simWindow->setStaticRunInfo( staticRunInfo );
       simWindow->show();
 
       // if we use the RemoteZORC-Fitnessfunction: run evaluation to transmit the program !

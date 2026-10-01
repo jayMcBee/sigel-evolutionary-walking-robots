@@ -32,6 +32,7 @@
 #include "SIGEL_Program/SIG_Program.h"
 #include "SIGEL_SlaveGUI/SIG_SimulationWidget.h"
 #include "SIGEL_SlaveGUI/SIG_SimulationControls.h"
+#include "SIGEL_SlaveGUI/SIG_MovieStaticRunInfo.h"
 
 /**
  * This namespace (package) contains all widget classes of the
@@ -85,6 +86,11 @@ namespace SIGEL_SlaveGUI
 		       SIGEL_Environment::SIG_Environment const &environment,
 		       SIGEL_Simulation::SIG_SimulationParameters const &simulationParameters,
 		       SIGEL_Program::SIG_Program const &program);
+
+    /**
+     * Sets what recorded movie frames can show about the simulation.
+     */
+    void setStaticRunInfo( SIG_MovieStaticRunInfo const &staticRunInfo );
 
     public slots:
       void slotStopPressed();

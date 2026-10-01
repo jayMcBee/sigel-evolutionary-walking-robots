@@ -87,6 +87,11 @@
       void resetRecorder();
 
       /**
+       * Sets what recorded movie frames can show about the simulation.
+       */
+      void setStaticRunInfo( SIGEL_SlaveGUI::SIG_MovieStaticRunInfo const &staticRunInfo );
+
+      /**
        * Returns the camera distance at which the whole robot
        * fits in the view, with a margin around it.
        */

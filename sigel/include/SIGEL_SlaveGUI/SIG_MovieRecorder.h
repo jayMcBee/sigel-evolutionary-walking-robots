@@ -25,6 +25,7 @@
 #define SIGEL_SLAVEGUI_SIG_MOVIERECORDER_H
 
 #include "SIGEL_SlaveGUI/SIG_MovieSettings.h"
+#include "SIGEL_SlaveGUI/SIG_MovieStaticRunInfo.h"
 #include <QFont>
 #include <QImage>
 #include <QString>
@@ -50,6 +51,8 @@ namespace SIGEL_SlaveGUI
     SIG_MovieSettings const &getSettings() const { return settings; }
 
     void setSettings( SIG_MovieSettings const &newSettings );
+
+    void setStaticRunInfo( SIG_MovieStaticRunInfo const &newStaticRunInfo );
 
     bool isRecording() const { return recording; }
 
@@ -120,6 +123,8 @@ namespace SIGEL_SlaveGUI
     int nextFrame;
 
     QString lastFileName;
+
+    SIG_MovieStaticRunInfo staticRunInfo;
 
   };
 

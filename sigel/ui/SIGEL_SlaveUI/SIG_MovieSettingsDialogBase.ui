@@ -36,6 +36,16 @@
                   <number>8</number>
                 </property>
                 <item>
+                  <widget class="QCheckBox" name="checkboxOverlayExperimentName">
+                    <property name="text">
+                      <string>Experiment name</string>
+                    </property>
+                    <property name="toolTip">
+                      <string>Writes the name of the experiment into each saved frame. The view on screen does not change.</string>
+                    </property>
+                  </widget>
+                </item>
+                <item>
                   <widget class="QCheckBox" name="checkboxOverlaySimulationTime">
                     <property name="text">
                       <string>Simulation time</string>

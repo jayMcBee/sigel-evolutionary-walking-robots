@@ -21,55 +21,39 @@
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-#ifndef SIGEL_SLAVEGUI_SIG_MOVIESETTINGS_H
-#define SIGEL_SLAVEGUI_SIG_MOVIESETTINGS_H
+#ifndef SIGEL_SLAVEGUI_SIG_MOVIESTATICRUNINFO_H
+#define SIGEL_SLAVEGUI_SIG_MOVIESTATICRUNINFO_H
 
+#include <QFileInfo>
 #include <QString>
 
 namespace SIGEL_SlaveGUI
 {
 
   /**
-   * The settings of a movie recording, as the movie settings dialog
-   * edits them.
+   * What a simulation shows, for the overlay labels of a movie. It stays
+   * the same for the whole simulation.
    */
-  struct SIG_MovieSettings
+  struct SIG_MovieStaticRunInfo
   {
-    int width = 1024;
-
-    int height = 576;
-
-    int frameRate = 25;
-
-    int maxFrames = 1000;
-
-    int quality = 50;
-
-    bool useLeadingZeros = true;
-
-    bool showOverlayExperimentName = false;
-
-    bool showOverlaySimulationTime = false;
-
-    bool showOverlayStartDistance = false;
-
-    bool showOverlayRobotHeight = false;
-
-    bool saveThumbnails = false;
+    /**
+     * Empty when the name is not known; its overlay label is then not drawn.
+     */
+    QString experimentName;
 
     /**
-     * Ends with a slash once set.
+     * Takes the experiment name from the experiment's file name: without
+     * the directory and without ".exp".
      */
-    QString directory;
+    void setExperimentFileName( QString const &fileName )
+    {
+      experimentName = QFileInfo( fileName ).fileName();
 
-    QString filePrefix = "sigel_pic";
-
-    /**
-     * The file extension in lower case: bmp, png, ppm, xbm, xpm or pov.
-     */
-    QString format = "png";
+      if ( experimentName.endsWith( ".exp" ) )
+        experimentName.chop( 4 );
+    }
   };
 
 }
 
-#endif // SIGEL_SLAVEGUI_SIG_MOVIESETTINGS_H
+#endif // SIGEL_SLAVEGUI_SIG_MOVIESTATICRUNINFO_H

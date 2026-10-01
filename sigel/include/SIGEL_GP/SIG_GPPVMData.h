@@ -46,6 +46,9 @@ namespace SIGEL_GP
     bool visualize;
     int actGeneration;
     int resetEveryGeneration;
+
+    /** The name of the experiment, only for a displayed simulation. */
+    QString experimentName;
   };
 
   /**
@@ -138,6 +141,12 @@ namespace SIGEL_GP
 
    public:
     void setFitnessFunctionName( QString name );
+
+   public:
+    QString getExperimentName();
+
+   public:
+    void setExperimentName( QString name );
     void setActGeneration( int _actGeneration) { miscParam.actGeneration = _actGeneration; }
     int getActGeneration() { return miscParam.actGeneration; }
     void setResetEveryGeneration(int _resetEveryGeneration) { miscParam.resetEveryGeneration = _resetEveryGeneration; }

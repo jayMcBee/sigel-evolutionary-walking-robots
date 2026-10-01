@@ -85,6 +85,7 @@ void SIG_MovieSettingsDialog::setSettings( SIG_MovieSettings const &settings )
   comboboxFormat->setCurrentIndex( comboboxFormat->findText( settings.format.toUpper() ) );
   spinboxQuality->setValue( settings.quality );
   checkboxUseLeadingZeros->setChecked( settings.useLeadingZeros );
+  checkboxOverlayExperimentName->setChecked( settings.showOverlayExperimentName );
   checkboxOverlaySimulationTime->setChecked( settings.showOverlaySimulationTime );
   checkboxOverlayStartDistance->setChecked( settings.showOverlayStartDistance );
   checkboxOverlayRobotHeight->setChecked( settings.showOverlayRobotHeight );
@@ -105,6 +106,7 @@ SIG_MovieSettings SIG_MovieSettingsDialog::settings() const
   settings.maxFrames = spinboxMaxFrames->value();
   settings.quality = spinboxQuality->value();
   settings.useLeadingZeros = checkboxUseLeadingZeros->isChecked();
+  settings.showOverlayExperimentName = checkboxOverlayExperimentName->isChecked();
   settings.showOverlaySimulationTime = checkboxOverlaySimulationTime->isChecked();
   settings.showOverlayStartDistance = checkboxOverlayStartDistance->isChecked();
   settings.showOverlayRobotHeight = checkboxOverlayRobotHeight->isChecked();

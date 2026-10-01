@@ -122,6 +122,11 @@ namespace SIGEL_SlaveGUI
     simulationWidget->visualizeThis(robot, environment, simulationParameters, program);
   };
 
+  void SIG_SimulationWindow::setStaticRunInfo( SIG_MovieStaticRunInfo const &staticRunInfo )
+  {
+    simulationWidget->visualisationWidget->setStaticRunInfo( staticRunInfo );
+  };
+
   void SIG_SimulationWindow::slotStopPressed()
   {
     // reset the button

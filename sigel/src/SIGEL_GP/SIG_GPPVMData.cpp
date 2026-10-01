@@ -126,6 +126,9 @@ void SIGEL_GP::SIG_GPPVMData::loadPVMDataTransfer(QTextStream & file,
     miscParam.visualize=true;
   else
     miscParam.visualize=false;
+  bufferString = miscStream.readLine(); // EXPERIMENTNAME
+  bufferString = miscStream.readLine();
+  miscParam.experimentName = bufferString;
 };
 
 void SIGEL_GP::SIG_GPPVMData::savePVMDataTransfer(QTextStream & file,
@@ -153,6 +156,8 @@ void SIGEL_GP::SIG_GPPVMData::savePVMDataTransfer(QTextStream & file,
     file << 1 << "\n";
   else
     file << 0 << "\n"; 
+  file << "EXPERIMENTNAME\n";
+  file << miscParam.experimentName << "\n";
   file << fiveHashesLine;
 };
 
@@ -174,4 +179,14 @@ QString SIGEL_GP::SIG_GPPVMData::getFitnessFunctionName()
 void SIGEL_GP::SIG_GPPVMData::setFitnessFunctionName( QString name )
 {
   miscParam.fitnessName = name;
+};
+
+QString SIGEL_GP::SIG_GPPVMData::getExperimentName()
+{
+  return miscParam.experimentName;
+};
+
+void SIGEL_GP::SIG_GPPVMData::setExperimentName( QString name )
+{
+  miscParam.experimentName = name;
 };

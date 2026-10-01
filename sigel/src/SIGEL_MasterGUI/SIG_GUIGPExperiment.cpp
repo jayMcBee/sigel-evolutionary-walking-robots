@@ -71,7 +71,7 @@ namespace SIGEL_MasterGUI
   environmentView = new SIG_EnvironmentView( this, "EnvironmentView", Qt::WindowFlags(), gpExperiment );
   robotView = new SIG_RobotView( this, "RobotView", Qt::WindowFlags(), gpExperiment );
   experimentView = new SIG_ExperimentView( this, "ExperimentView", Qt::WindowFlags(), gpExperiment, *this );
-  allIndividualsView = new SIG_AllIndividualsView( this, "AllIndividualsView", gpExperiment );
+  allIndividualsView = new SIG_AllIndividualsView( this, "AllIndividualsView", gpExperiment, *this );
   languageParameters = new SIG_LanguageParameters( this, "LanguageParametersView", Qt::WindowFlags(), gpExperiment );
   
   // put all the widgets on the stack

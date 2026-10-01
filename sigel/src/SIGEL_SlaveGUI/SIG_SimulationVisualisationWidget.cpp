@@ -322,6 +322,11 @@
     update();
   };
 
+void SIG_SimulationVisualisationWidget::setStaticRunInfo( SIGEL_SlaveGUI::SIG_MovieStaticRunInfo const &staticRunInfo )
+{
+  movieRecorder.setStaticRunInfo( staticRunInfo );
+};
+
 void SIG_SimulationVisualisationWidget::resetRecorder()
 {
   if ( movieRecorder.isRecording() )

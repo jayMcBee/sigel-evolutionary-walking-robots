@@ -41,6 +41,8 @@
 
 namespace SIGEL_MasterGUI
 {
+  class SIG_GUIGPExperiment;
+
   /**
    * This is the class of the widget in which the pool and single programs
    * can be viewed.
@@ -57,8 +59,9 @@ namespace SIGEL_MasterGUI
        * @param parent The parent widget of SIG_AllIndividualsView
        * @param name Internal name for Qt.
        * @param theExperiment A reference to the experiment this view belongs to.
+       * @param guiExperiment The SIG_GUIGPExperiment this view belongs to.
        */
-      SIG_AllIndividualsView( QWidget * parent, const char * name, SIGEL_GP::SIG_GPExperiment &theExperiment );
+      SIG_AllIndividualsView( QWidget * parent, const char * name, SIGEL_GP::SIG_GPExperiment &theExperiment, SIG_GUIGPExperiment &guiExperiment );
 
       /**
        * This function returns the number of selected items in the listview.
@@ -162,6 +165,11 @@ namespace SIGEL_MasterGUI
        * A reference to the experiment object.
        */
       SIGEL_GP::SIG_GPExperiment &theExperiment;
+
+      /**
+       * The SIG_GUIGPExperiment this view belongs to.
+       */
+      SIG_GUIGPExperiment &guiExperiment;
     };
 }
 

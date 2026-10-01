@@ -45,13 +45,19 @@ namespace SIGEL_SlaveGUI
       framesRecorded( 0 ),
       recordingStartSeconds( 0.0 ),
       nextFrame( 0 ),
-      lastFileName()
+      lastFileName(),
+      staticRunInfo()
   {
   };
 
   void SIG_MovieRecorder::setSettings( SIG_MovieSettings const &newSettings )
   {
     settings = newSettings;
+  };
+
+  void SIG_MovieRecorder::setStaticRunInfo( SIG_MovieStaticRunInfo const &newStaticRunInfo )
+  {
+    staticRunInfo = newStaticRunInfo;
   };
 
   void SIG_MovieRecorder::startRecordingAt( double simulationSeconds )
@@ -136,6 +142,12 @@ namespace SIGEL_SlaveGUI
 
     QStringList labels;
     QStringList values;
+
+    if ( settings.showOverlayExperimentName && !staticRunInfo.experimentName.isEmpty() )
+      {
+        labels << "Experiment:";
+        values << staticRunInfo.experimentName;
+      }
 
     if ( settings.showOverlaySimulationTime )
       {
