@@ -32,7 +32,6 @@
 #include <QPainter>
 #include <QPainterPath>
 #include <QPen>
-#include <QStringList>
 
 #include <cmath>
 
@@ -141,6 +140,41 @@ namespace SIGEL_SlaveGUI
     QColor const textColor( 0xE8, 0xE8, 0xE8 );
     QColor const outlineColor( 0x40, 0x40, 0x40 );
 
+    auto const [labels, values] = assembleOverlayLines( simulationSeconds, startDistance, robotCentreHeight );
+
+    if ( labels.isEmpty() )
+      return;
+
+    double fontSize = settings.height * fontHeight;
+    QFont font = overlayFont( fontSize );
+
+    QFontMetricsF metrics( font );
+    double labelWidth = 0.0;
+    for ( QString const &label : labels )
+      labelWidth = qMax( labelWidth, metrics.horizontalAdvance( label ) );
+
+    double marginPixels = fontSize * margin;
+    double valueX = marginPixels + labelWidth + fontSize * valueGap;
+
+    QPainterPath path;
+    for ( int line = 0; line < labels.size(); line++ )
+      {
+        double baseline = marginPixels + fontSize + line * fontSize * lineStep;
+        path.addText( marginPixels, baseline, font, labels[line] );
+        path.addText( valueX, baseline, font, values[line] );
+      }
+
+    QPainter painter( &frame );
+    painter.setRenderHint( QPainter::Antialiasing );
+
+    // The pen is centred on the glyph edges, and the fill covers its inner half.
+    QPen outlinePen( outlineColor, 2.0 * fontSize * outlineWidth, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin );
+    painter.strokePath( path, outlinePen );
+    painter.fillPath( path, textColor );
+  };
+
+  SIG_MovieRecorder::OverlayLines SIG_MovieRecorder::assembleOverlayLines( double simulationSeconds, double startDistance, double robotCentreHeight ) const
+  {
     QStringList labels;
     QStringList values;
 
@@ -183,35 +217,7 @@ namespace SIGEL_SlaveGUI
         values << QString::number( robotCentreHeight, 'f', 3 ) + " m";
       }
 
-    if ( labels.isEmpty() )
-      return;
-
-    double fontSize = settings.height * fontHeight;
-    QFont font = overlayFont( fontSize );
-
-    QFontMetricsF metrics( font );
-    double labelWidth = 0.0;
-    for ( QString const &label : labels )
-      labelWidth = qMax( labelWidth, metrics.horizontalAdvance( label ) );
-
-    double marginPixels = fontSize * margin;
-    double valueX = marginPixels + labelWidth + fontSize * valueGap;
-
-    QPainterPath path;
-    for ( int line = 0; line < labels.size(); line++ )
-      {
-        double baseline = marginPixels + fontSize + line * fontSize * lineStep;
-        path.addText( marginPixels, baseline, font, labels[line] );
-        path.addText( valueX, baseline, font, values[line] );
-      }
-
-    QPainter painter( &frame );
-    painter.setRenderHint( QPainter::Antialiasing );
-
-    // The pen is centred on the glyph edges, and the fill covers its inner half.
-    QPen outlinePen( outlineColor, 2.0 * fontSize * outlineWidth, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin );
-    painter.strokePath( path, outlinePen );
-    painter.fillPath( path, textColor );
+    return { labels, values };
   };
 
   QFont SIG_MovieRecorder::overlayFont( double pixelSize ) const

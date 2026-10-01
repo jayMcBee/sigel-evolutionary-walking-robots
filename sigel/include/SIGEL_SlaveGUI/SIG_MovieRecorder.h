@@ -29,6 +29,7 @@
 #include <QFont>
 #include <QImage>
 #include <QString>
+#include <QStringList>
 
 namespace SIGEL_Visualisation
 {
@@ -104,6 +105,16 @@ namespace SIGEL_SlaveGUI
     bool saveThumbnailOncePerSecond( QImage const &frame );
 
     void paintOverlayLabels( QImage &frame, double simulationSeconds, double startDistance, double robotCentreHeight ) const;
+
+    // The overlay lines: labels[n] and values[n] are the two texts of line n.
+    struct OverlayLines
+    {
+      QStringList labels;
+      QStringList values;
+    };
+
+    // The label and value texts of the overlay lines the settings select.
+    OverlayLines assembleOverlayLines( double simulationSeconds, double startDistance, double robotCentreHeight ) const;
 
     // The font of the overlay labels, at a size in frame pixels.
     QFont overlayFont( double pixelSize ) const;
