@@ -54,7 +54,8 @@ namespace SIGEL_Robot {
                         tx >> fname;
                         tx >> fval;
                         // For the following, see my paper. - Holger
-                        if (fother = parent->lookupMaterial (fname))
+                        fother = parent->lookupMaterial (fname);
+                        if (fother != nullptr)
                                 setFrictionValue (fother, fval);
                 }
                 colour = SIG_Robot::streamToVector (tx);
