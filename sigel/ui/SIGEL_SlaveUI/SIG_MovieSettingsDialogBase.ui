@@ -117,9 +117,9 @@
                     <number>8</number>
                   </property>
                   <item row="2" column="2">
-                    <widget class="QLabel" name="textlabelQuality">
+                    <widget class="QLabel" name="textlabelPngCompression">
                       <property name="text">
-                        <string>Quality:</string>
+                        <string>PNG compression:</string>
                       </property>
                       <property name="wordWrap">
                         <bool>false</bool>
@@ -127,18 +127,18 @@
                     </widget>
                   </item>
                   <item row="2" column="3">
-                    <widget class="QSpinBox" name="spinboxQuality">
+                    <widget class="QSpinBox" name="spinboxPngCompression">
                       <property name="maximum">
                         <number>100</number>
                       </property>
                       <property name="minimum">
-                        <number>1</number>
+                        <number>0</number>
                       </property>
                       <property name="value">
                         <number>50</number>
                       </property>
                       <property name="toolTip">
-                        <string>Set the quality in case a lossy format is used.</string>
+                        <string>Higher values make smaller files but take longer to write. PNG compression is lossless.</string>
                       </property>
                     </widget>
                   </item>

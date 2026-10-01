@@ -43,7 +43,10 @@ namespace SIGEL_SlaveGUI
 
     int maxFrames = 1000;
 
-    int quality = 50;
+    /**
+     * From 0, not compressed, to 100, the smallest files.
+     */
+    int pngCompression = 50;
 
     bool useLeadingZeros = true;
 

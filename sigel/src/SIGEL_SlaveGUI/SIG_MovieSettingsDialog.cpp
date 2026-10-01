@@ -83,7 +83,7 @@ void SIG_MovieSettingsDialog::setSettings( SIG_MovieSettings const &settings )
   lineeditFilePrefix->setText( settings.filePrefix );
   spinboxMaxFrames->setValue( settings.maxFrames );
   comboboxFormat->setCurrentIndex( comboboxFormat->findText( settings.format.toUpper() ) );
-  spinboxQuality->setValue( settings.quality );
+  spinboxPngCompression->setValue( settings.pngCompression );
   checkboxUseLeadingZeros->setChecked( settings.useLeadingZeros );
   checkboxOverlayExperimentName->setChecked( settings.showOverlayExperimentName );
   checkboxOverlaySimulationTime->setChecked( settings.showOverlaySimulationTime );
@@ -104,7 +104,7 @@ SIG_MovieSettings SIG_MovieSettingsDialog::settings() const
   settings.filePrefix = lineeditFilePrefix->text();
   settings.format = comboboxFormat->currentText().toLower();
   settings.maxFrames = spinboxMaxFrames->value();
-  settings.quality = spinboxQuality->value();
+  settings.pngCompression = spinboxPngCompression->value();
   settings.useLeadingZeros = checkboxUseLeadingZeros->isChecked();
   settings.showOverlayExperimentName = checkboxOverlayExperimentName->isChecked();
   settings.showOverlaySimulationTime = checkboxOverlaySimulationTime->isChecked();

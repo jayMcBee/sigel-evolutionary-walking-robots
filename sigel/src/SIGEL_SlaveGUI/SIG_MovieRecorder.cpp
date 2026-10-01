@@ -94,7 +94,8 @@ namespace SIGEL_SlaveGUI
 
     paintOverlayLabels( frame, simulationSeconds, startDistance, robotCentreHeight );
 
-    return frame.save( lastFileName, settings.format.toUpper().toUtf8().constData(), settings.quality );
+    // Qt's quality value runs the other way: 100 does not compress.
+    return frame.save( lastFileName, settings.format.toUpper().toUtf8().constData(), 100 - settings.pngCompression );
   };
 
   QImage SIG_MovieRecorder::frameWithView( QImage const &view ) const
@@ -265,7 +266,7 @@ namespace SIGEL_SlaveGUI
     // Frames a Fast Forward jumped over are skipped, not caught up.
     nextFrame = static_cast< int >( std::floor( framePosition( simulationSeconds ) ) ) + 1;
 #ifdef SIG_DEBUG
-    SIGEL_Tools::SIG_IO::cerr << "Writing " << lastFileName << " in format " << settings.width << " x " << settings.height << " in quality " << settings.quality << "." << Qt::endl;
+    SIGEL_Tools::SIG_IO::cerr << "Writing " << lastFileName << " in format " << settings.width << " x " << settings.height << " with PNG compression " << settings.pngCompression << "." << Qt::endl;
 #endif
     makeDirectory();
   };
