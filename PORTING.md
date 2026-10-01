@@ -909,6 +909,35 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-10-01 — DONE: ITEM 130, MOVIE OVERLAY LABELS AND THUMBNAILS.**
+
+- **Changed:** Movie Settings has an "Overlay labels" box with six
+  checkboxes: experiment name, fitness function, individual (with its stored
+  fitness and program length), simulation time, distance from start, and
+  height of robot centre. `SIG_MovieRecorder::writeImage` draws the chosen
+  lines top left into each saved frame; the view on screen does not change.
+  `SIG_MovieStaticRunInfo` carries the three names and the fitness into the
+  simulation window. The box is disabled for POV, which writes scene files.
+- **Thumbnails:** "Save thumbnails without labels (one per second)" saves
+  one PNG per second of movie at the output size, named like
+  `sigel_pic_thumb_046s.png`, which the frame pattern for ffmpeg does not
+  match.
+- **Differs from the to-do text:** there is no single checkbox that turns
+  all overlay labels on; each label has its own.
+- **Recorder structure:** `assembleOverlayLines` builds the label and value
+  texts and `paintOverlayLabels` draws them. Frames and thumbnails written
+  before and after that split were byte-identical: every checkbox
+  combination, with and without run info, at 1280 × 720 and 1920 × 1080.
+- **Dialog layout:** the vertical gap between the rows of boxes is 16; the
+  six checkboxes sit in two columns; the output size is one row,
+  "Output size: W … × H …"; the fit note is one line and reads "Frames will
+  be clipped and letterboxed."; the overlay tooltips are one sentence each;
+  "PNG compression" is shown only for PNG.
+- **Gates:** `check.sh` 760 pass, 0 fail; warnings 325. Fitness on `build/`
+  and `build-asan/`, dictorder and PVM unchanged.
+- **Open decision:** ffmpeg CRF 18 or 16 in place of the default 23 in
+  `SIG_MovieEncoder::arguments`.
+
 **2026-09-30 — ITEM 106, THE MODEL CLASS `SIGEL_GP::SIG_GPParameter`.** Start
 here.
 
