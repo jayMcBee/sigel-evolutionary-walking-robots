@@ -25,7 +25,7 @@ public:
 	int Generation; 
 
 	/**************** all parameter of the parent population ****************/	
-	double Varianz; 
+	double Variance; 
 	double AverageFitness;
 	double MaxFitness; 
 

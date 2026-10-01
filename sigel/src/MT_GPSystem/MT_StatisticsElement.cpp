@@ -12,7 +12,7 @@ MT_StatisticsElement::MT_StatisticsElement(QTextStream &File)
 	if ((PresentLine == StatisticsE) && !(File.atEnd()))
 	{
 		Generation = (File.readLine()).toInt();
-		Varianz =(File.readLine()).toDouble(); 
+		Variance =(File.readLine()).toDouble(); 
 		AverageFitness= (File.readLine()).toDouble();
 		MaxFitness= (File.readLine()).toDouble();
 		
@@ -43,7 +43,7 @@ MT_StatisticsElement::MT_StatisticsElement()
 {
 
 	Generation = 0;
-	Varianz =0.0 ;
+	Variance =0.0 ;
 	AverageFitness= 0.0;
 	MaxFitness= 0.0;
 	
@@ -69,7 +69,7 @@ void MT_StatisticsElement::writeToFileElement(QTextStream &File)
 	
 	File << ("StatisticsElement:\n");
 	File << Generation <<Qt::endl;
-	File << Varianz <<Qt::endl;
+	File << Variance <<Qt::endl;
 	File << AverageFitness <<Qt::endl;
 	File << MaxFitness <<Qt::endl;
 	File << NumOfSimpleCopyParent <<Qt::endl;

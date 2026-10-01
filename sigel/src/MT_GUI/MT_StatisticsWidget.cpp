@@ -137,7 +137,7 @@ void MT_StatisticsWidget::updateGUI(int mtGen, int sigGen)
 		for(soFarMetIdx; soFarMetIdx<metaGens; soFarMetIdx++){
 			el = stat->getStatisticElement(soFarMetIdx);
 			if(el){
-				totalVarFit += el->Varianz;
+				totalVarFit += el->Variance;
 				totalAvgFit += el->AverageFitness;
 				tmpMax = el->MaxFitness;
 				if(totalMaxFit<tmpMax)
@@ -187,7 +187,7 @@ void MT_StatisticsWidget::updateGUI(int mtGen, int sigGen)
 	if(el && mtGen != -2 && metaGens > 0){
 
 		// Fitness
-		varFitness->setText(QString::number(el->Varianz));
+		varFitness->setText(QString::number(el->Variance));
 		maxFitness->setText(QString::number(el->MaxFitness));
 		averageFitness->setText(QString::number(el->AverageFitness));
 
@@ -409,7 +409,7 @@ void MT_StatisticsWidget::slotFitnessDButton()
 		if(el) pipeStream << i << " " 
 			<< el->MaxFitness << " " 
 			<< el->AverageFitness << " "
-			<< sqrt(el->Varianz) << "\n";
+			<< sqrt(el->Variance) << "\n";
 	}
 	file.close();
 }
@@ -593,7 +593,7 @@ void MT_StatisticsWidget::plotFitness(QString fileName)
 	int metaGens = stat->StatisticsOfGeneration.count();
 	for(int k=0; k<metaGens; k++){
 		el = stat->getStatisticElement(k);
-		if(el) pipeStream << k << " " << el->AverageFitness << " " << sqrt(el->Varianz) << "\n";
+		if(el) pipeStream << k << " " << el->AverageFitness << " " << sqrt(el->Variance) << "\n";
 	}
 	pipeStream << "e\n";
 	for(int j=0; j<metaGens; j++){
