@@ -83,18 +83,8 @@ namespace SIGEL_SlaveGUI
 
     QImage frame = frameWithView( view );
 
-    // The frame just started is movie frame framesRecorded - 1, so every
-    // frameRate-th one starts a second of the movie.
-    if ( settings.saveThumbnails && (framesRecorded - 1) % settings.frameRate == 0 )
-      {
-	QString thumbnailName = thumbnailFileName();
-
-	if ( !frame.save( thumbnailName, "PNG" ) )
-	  {
-	    lastFileName = thumbnailName;
-	    return false;
-	  }
-      }
+    if ( !saveThumbnailOncePerSecond( frame ) )
+      return false;
 
     paintOverlayLabels( frame, simulationSeconds, startDistance, robotCentreHeight );
 
@@ -114,6 +104,23 @@ namespace SIGEL_SlaveGUI
     painter.drawImage( (settings.width - image.width()) / 2, (settings.height - image.height()) / 2, image );
 
     return frame;
+  };
+
+  bool SIG_MovieRecorder::saveThumbnailOncePerSecond( QImage const &frame )
+  {
+    // startFrame has already counted this frame.
+    bool firstFrameOfSecond = (framesRecorded - 1) % settings.frameRate == 0;
+
+    if ( !settings.saveThumbnails || !firstFrameOfSecond )
+      return true;
+
+    QString thumbnailName = thumbnailFileName();
+
+    if ( frame.save( thumbnailName, "PNG" ) )
+      return true;
+
+    lastFileName = thumbnailName;
+    return false;
   };
 
   void SIG_MovieRecorder::paintOverlayLabels( QImage &frame, double simulationSeconds, double startDistance, double robotCentreHeight ) const

@@ -94,6 +94,11 @@ namespace SIGEL_SlaveGUI
     // The view centred in a black frame of the movie size, never scaled.
     QImage frameWithView( QImage const &view ) const;
 
+    // Saves the frame as a thumbnail if the settings ask for thumbnails and it
+    // is the first frame of a second of the movie. False if the save fails;
+    // lastFileName then names the thumbnail.
+    bool saveThumbnailOncePerSecond( QImage const &frame );
+
     void paintOverlayLabels( QImage &frame, double simulationSeconds, double startDistance, double robotCentreHeight ) const;
 
     // The frame timing's position at simulationSeconds, in frames.
