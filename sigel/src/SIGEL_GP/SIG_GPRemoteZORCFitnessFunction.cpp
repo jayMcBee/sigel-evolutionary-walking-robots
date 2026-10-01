@@ -134,7 +134,7 @@ namespace SIGEL_GP
          if (recvPrgLen != program.getProgramLength())
          {  char  errMsg[256];
 
-            snprintf(errMsg, sizeof(errMsg), "<BIG><B>Program length received by ZORC [%d] doesn't match the original SIGEL-Program length [%d].</B></BIG><BR><BR>Please retry..", recvPrgLen, program.getProgramLength());
+            snprintf(errMsg, sizeof(errMsg), "<BIG><B>Program length received by ZORC [%d] doesn't match the original SIGEL-Program length [%ld].</B></BIG><BR><BR>Please retry..", recvPrgLen, program.getProgramLength());
             SIGEL_Tools::SIG_IO::cerr << "Error transmitting program: " << errMsg << Qt::endl;
             fprintf(stderr, "%s", errMsg);
             return -1.0;
