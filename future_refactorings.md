@@ -214,16 +214,6 @@ touched, because changing one changes behaviour against the reference binary.
   end. The shipped experiments set 0, 10 or 30 minutes. To decide: when to
   give up, and what score it then gets.
 
-- [ ] **75. Decide whether the fitness functions should reject physics
-  blow-ups.** `SIG_GPFitnessFunction::isValid` rejects only Inf and NaN, so a
-  finite blow-up that throws the robot far scores high. Any bound is a
-  heuristic and needs more thought. The high 1.3 scores the `sigel-x86`
-  session reported are no evidence: those runs had several slaves on one
-  host, where the `Terrain.ter` race, fixed in 2.0, produced at least one
-  false score (PORTING.md has the measurement).
-  `SIG_GPAdaptiveWalkingFitnessFunction`'s height warnings go to
-  `SIG_IO::cerr` only and do not change the score.
-
 - [ ] **76. Warn when a mesh has negative volume.** Inverted face winding
   gives negative mass and inertia in `SIG_Mirtich::computePhysics`; the robot
   loads and the simulation runs into NaN without a message. A warning at load,
