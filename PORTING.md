@@ -909,6 +909,29 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-10-01 — DONE: ITEM 129, A BUSY DIALOG WHILE FFMPEG MAKES THE MOVIE.**
+
+- **Changed:** `SIG_MovieEncoder::encode` waits until ffmpeg has ended.
+  `runFfmpegWithProgressDialog` starts ffmpeg and shows an application-modal
+  `QProgressDialog` with a busy bar and no button, so the simulation window
+  cannot close and kill ffmpeg. Escape and the close button hide the dialog;
+  the wait loop shows it again. The label names the movie, the frame count
+  and the folder.
+- **An existing movie survives a failed encode:** ffmpeg writes to
+  `<prefix>_unfinished.mp4`. `reportFinished` renames it to `<prefix>.mp4`
+  when ffmpeg has succeeded, and deletes it and says so when ffmpeg has
+  failed.
+- **Removed:** the two `QProcess` signal connections, the destructor, and
+  the "ffmpeg is still making the last movie" message; `encode` cannot be
+  entered while ffmpeg runs.
+- **Differs from the to-do text:** the bar does not show progress and there
+  is no Cancel; both by decision, because the encode is short.
+- **Checked:** a normal encode with Escape pressed, a first frame that is
+  not a picture, no frames at all, and an ffmpeg that cannot start, each
+  with an older movie in the folder.
+- **Gates:** `check.sh` 760 pass, 0 fail; warnings 325. Fitness on `build/`
+  and `build-asan/`, dictorder and PVM unchanged.
+
 **2026-10-01 — DONE: ITEM 130, MOVIE OVERLAY LABELS AND THUMBNAILS.**
 
 - **Changed:** Movie Settings has an "Overlay labels" box with six
