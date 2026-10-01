@@ -158,18 +158,8 @@ namespace SIGEL_SlaveGUI
     if ( labels.isEmpty() )
       return;
 
-    QFont font( "Noto Sans" );
-    font.setWeight( QFont::Bold );
-
-    // Ubuntu Sans comes with every Ubuntu desktop; its SemiBold matches Noto Sans Bold best.
-    if ( !QFontDatabase::hasFamily( "Noto Sans" ) )
-      {
-        font.setFamily( "Ubuntu Sans" );
-        font.setWeight( QFont::DemiBold );
-      }
-
     double fontSize = settings.height * fontHeight;
-    font.setPixelSize( qMax( 1, qRound( fontSize ) ) );
+    QFont font = overlayFont( fontSize );
 
     QFontMetricsF metrics( font );
     double labelWidth = 0.0;
@@ -194,6 +184,23 @@ namespace SIGEL_SlaveGUI
     QPen outlinePen( outlineColor, 2.0 * fontSize * outlineWidth, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin );
     painter.strokePath( path, outlinePen );
     painter.fillPath( path, textColor );
+  };
+
+  QFont SIG_MovieRecorder::overlayFont( double pixelSize ) const
+  {
+    QFont font( "Noto Sans" );
+    font.setWeight( QFont::Bold );
+
+    // Ubuntu Sans comes with every Ubuntu desktop; its SemiBold matches Noto Sans Bold best.
+    if ( !QFontDatabase::hasFamily( "Noto Sans" ) )
+      {
+        font.setFamily( "Ubuntu Sans" );
+        font.setWeight( QFont::DemiBold );
+      }
+
+    font.setPixelSize( qMax( 1, qRound( pixelSize ) ) );
+
+    return font;
   };
 
   bool SIG_MovieRecorder::writePovray( SIGEL_Visualisation::SIG_SimulationVisualisation &visualisation, double simulationSeconds )

@@ -25,6 +25,7 @@
 #define SIGEL_SLAVEGUI_SIG_MOVIERECORDER_H
 
 #include "SIGEL_SlaveGUI/SIG_MovieSettings.h"
+#include <QFont>
 #include <QImage>
 #include <QString>
 
@@ -100,6 +101,9 @@ namespace SIGEL_SlaveGUI
     bool saveThumbnailOncePerSecond( QImage const &frame );
 
     void paintOverlayLabels( QImage &frame, double simulationSeconds, double startDistance, double robotCentreHeight ) const;
+
+    // The font of the overlay labels, at a size in frame pixels.
+    QFont overlayFont( double pixelSize ) const;
 
     // The frame timing's position at simulationSeconds, in frames.
     double framePosition( double simulationSeconds ) const;
