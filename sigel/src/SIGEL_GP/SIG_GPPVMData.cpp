@@ -36,12 +36,13 @@ SIGEL_GP::SIG_GPPVMData::SIG_GPPVMData(SIGEL_Robot::SIG_Robot& robot,
        bool visualize)
   : robot(robot),
   environment(environment),
-  simulationParameter(simulationParameter)
+  simulationParameter(simulationParameter),
+  fitnessName(fitnessName),
+  visualize(visualize),
+  actGeneration(0),
+  resetEveryGeneration(0),
+  experimentName()
 {
-  miscParam.fitnessName=fitnessName;
-  miscParam.visualize=visualize;
-  miscParam.actGeneration=0;
-  miscParam.resetEveryGeneration=0;
 };
 
 void SIGEL_GP::SIG_GPPVMData::sendQStringToPVM(QString str, int taskId, int messageId)
@@ -112,23 +113,23 @@ void SIGEL_GP::SIG_GPPVMData::loadPVMDataTransfer(QTextStream & file,
   QString bufferString;
   bufferString = miscStream.readLine(); // FITNESSNAME
   bufferString = miscStream.readLine();
-  miscParam.fitnessName = bufferString;
+  fitnessName = bufferString;
   bufferString = miscStream.readLine(); // ACTGENERATION
   bufferString = miscStream.readLine();
-  miscParam.actGeneration = bufferString.toInt();
+  actGeneration = bufferString.toInt();
   bufferString = miscStream.readLine(); // RESETEVERYGENERATION
   bufferString = miscStream.readLine();
-  miscParam.resetEveryGeneration = bufferString.toInt();
+  resetEveryGeneration = bufferString.toInt();
   bufferString = miscStream.readLine(); //VISUALIZE
   bufferString = miscStream.readLine();
   int visuInt = bufferString.toInt();
   if (visuInt == 1)
-    miscParam.visualize=true;
+    visualize=true;
   else
-    miscParam.visualize=false;
+    visualize=false;
   bufferString = miscStream.readLine(); // EXPERIMENTNAME
   bufferString = miscStream.readLine();
-  miscParam.experimentName = bufferString;
+  experimentName = bufferString;
 };
 
 void SIGEL_GP::SIG_GPPVMData::savePVMDataTransfer(QTextStream & file,
@@ -146,47 +147,47 @@ void SIGEL_GP::SIG_GPPVMData::savePVMDataTransfer(QTextStream & file,
   robot.writeToFileTransfer(file);
   file << fiveHashesLine;
   file << "FITNESSNAME\n";
-  file << miscParam.fitnessName << "\n";
+  file << fitnessName << "\n";
   file << "ACTUALGENERATION\n";
-  file << miscParam.actGeneration << "\n";
+  file << actGeneration << "\n";
   file << "RESETEVERYGENERATION\n";
-  file << miscParam.resetEveryGeneration << "\n";
+  file << resetEveryGeneration << "\n";
   file << "VISUALIZE\n";
-  if (miscParam.visualize)
+  if (visualize)
     file << 1 << "\n";
   else
     file << 0 << "\n"; 
   file << "EXPERIMENTNAME\n";
-  file << miscParam.experimentName << "\n";
+  file << experimentName << "\n";
   file << fiveHashesLine;
 };
 
 void SIGEL_GP::SIG_GPPVMData::setVisualize(bool visu)
 {
-  miscParam.visualize=visu;
+  visualize=visu;
 };
 
 bool SIGEL_GP::SIG_GPPVMData::getVisualize()
 {
-  return miscParam.visualize;
+  return visualize;
 };
 
 QString SIGEL_GP::SIG_GPPVMData::getFitnessFunctionName()
 {
-  return miscParam.fitnessName;
+  return fitnessName;
 };
 
 void SIGEL_GP::SIG_GPPVMData::setFitnessFunctionName( QString name )
 {
-  miscParam.fitnessName = name;
+  fitnessName = name;
 };
 
 QString SIGEL_GP::SIG_GPPVMData::getExperimentName()
 {
-  return miscParam.experimentName;
+  return experimentName;
 };
 
 void SIGEL_GP::SIG_GPPVMData::setExperimentName( QString name )
 {
-  miscParam.experimentName = name;
+  experimentName = name;
 };

@@ -33,24 +33,6 @@
 namespace SIGEL_GP
 {
 
-  struct miscParameter {
-    /** The name of the fitnessfunction, only necessary for computation of a
-     *  fitnessvalue.. It doesn't be change in one evolution,
-     * therefor it is given as a reference.
-     */
-    QString fitnessName;
-    /** A flag, which indicates if the simulation have to be displayed or not.
-     *  TRUE means show the simulation without fitness computation,
-     *  FALSE means compute fitnessvalue.
-    */
-    bool visualize;
-    int actGeneration;
-    int resetEveryGeneration;
-
-    /** The name of the experiment, only for a displayed simulation. */
-    QString experimentName;
-  };
-
   /**
    * This class represents the functionality of data encoding and decoding
    * for data transfer issues relating to pvm. There is a special need for 
@@ -147,11 +129,10 @@ namespace SIGEL_GP
 
    public:
     void setExperimentName( QString name );
-    void setActGeneration( int _actGeneration) { miscParam.actGeneration = _actGeneration; }
-    int getActGeneration() { return miscParam.actGeneration; }
-    void setResetEveryGeneration(int _resetEveryGeneration) { miscParam.resetEveryGeneration = _resetEveryGeneration; }
-    int getResetEveryGeneration() { return miscParam.resetEveryGeneration; }
-    struct miscParameter getMiscParam() { return miscParam; }
+    void setActGeneration( int _actGeneration) { actGeneration = _actGeneration; }
+    int getActGeneration() { return actGeneration; }
+    void setResetEveryGeneration(int _resetEveryGeneration) { resetEveryGeneration = _resetEveryGeneration; }
+    int getResetEveryGeneration() { return resetEveryGeneration; }
 
     /** The robot for the simulation run. It doesn't be change in one evolution,
      * therefor it is given as a reference.
@@ -171,12 +152,33 @@ namespace SIGEL_GP
    private:
     SIGEL_Simulation::SIG_SimulationParameters& simulationParameter;
 
+    /** The name of the fitnessfunction, only necessary for computation of a
+     *  fitnessvalue.. It doesn't be change in one evolution,
+     * therefor it is given as a reference.
+     */
+   private:
+    QString fitnessName;
+
+    /** A flag, which indicates if the simulation have to be displayed or not.
+     *  TRUE means show the simulation without fitness computation,
+     *  FALSE means compute fitnessvalue.
+    */
+   private:
+    bool visualize;
+
   /**
    *  This variable holds the actual Generation. It can be used for calculating a fitness value, which depends
    *  on the actual fitness-function. For an example look at the forceFitnessFunction.
    */
-    private:
-      struct miscParameter miscParam;
+   private:
+    int actGeneration;
+
+   private:
+    int resetEveryGeneration;
+
+    /** The name of the experiment, only for a displayed simulation. */
+   private:
+    QString experimentName;
 
   };
 }
