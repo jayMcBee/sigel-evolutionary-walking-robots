@@ -62,6 +62,7 @@ SIG_MovieSettingsDialog::SIG_MovieSettingsDialog( QWidget *view, double stepSize
 	connect( spinboxFrameRate, SIGNAL( valueChanged(int) ), this, SLOT( slotUpdateMovieLength() ) );
 	connect( spinboxMaxFrames, SIGNAL( valueChanged(int) ), this, SLOT( slotUpdateMovieLength() ) );
 	connect( comboboxFormat, SIGNAL( currentIndexChanged(int) ), this, SLOT( slotUpdateOverlayLabels() ) );
+	connect( comboboxFormat, SIGNAL( currentIndexChanged(int) ), this, SLOT( slotUpdatePngCompression() ) );
 	connect( pushbutton720p, &QPushButton::clicked, this, [this]() { setOutputSize( 1280, 720 ); } );
 	connect( pushbutton1080p, &QPushButton::clicked, this, [this]() { setOutputSize( 1920, 1080 ); } );
 
@@ -72,6 +73,7 @@ SIG_MovieSettingsDialog::SIG_MovieSettingsDialog( QWidget *view, double stepSize
 	slotUpdateFrameTiming();
 	slotUpdateMovieLength();
 	slotUpdateOverlayLabels();
+	slotUpdatePngCompression();
 };
 
 void SIG_MovieSettingsDialog::setSettings( SIG_MovieSettings const &settings )
@@ -160,11 +162,11 @@ void SIG_MovieSettingsDialog::slotUpdateSizeLabels()
     || current.height() < spinboxHeight->value();
 
   if ( clipped && letterboxed )
-    textlabelFrameFit->setText( "Rendered frames will be clipped and letterboxed." );
+    textlabelFrameFit->setText( "Frames will be clipped and letterboxed." );
   else if ( clipped )
-    textlabelFrameFit->setText( "Rendered frames will be clipped." );
+    textlabelFrameFit->setText( "Frames will be clipped." );
   else if ( letterboxed )
-    textlabelFrameFit->setText( "Rendered frames will be letterboxed." );
+    textlabelFrameFit->setText( "Frames will be letterboxed." );
   else
     textlabelFrameFit->clear();
 };
@@ -201,6 +203,15 @@ void SIG_MovieSettingsDialog::slotUpdateMovieLength()
 void SIG_MovieSettingsDialog::slotUpdateOverlayLabels()
 {
   groupboxOverlayLabels->setEnabled( comboboxFormat->currentText() != "POV" );
+};
+
+// Only the PNG writer uses the compression value.
+void SIG_MovieSettingsDialog::slotUpdatePngCompression()
+{
+  bool png = comboboxFormat->currentText() == "PNG";
+
+  textlabelPngCompression->setVisible( png );
+  spinboxPngCompression->setVisible( png );
 };
 
 void SIG_MovieSettingsDialog::slotViewSizeToMovie()

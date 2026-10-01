@@ -52,6 +52,7 @@ private slots:
     void slotUpdateFrameTiming();
     void slotUpdateMovieLength();
     void slotUpdateOverlayLabels();
+    void slotUpdatePngCompression();
 
 private:
     /**
