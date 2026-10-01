@@ -124,15 +124,6 @@ Paths are relative to `sigel/`, the source tree.
 All present in 1.3, none introduced here. Each needs a decision before it is
 touched, because changing one changes behaviour against the reference binary.
 
-- [ ] **134. Fix the `printf` formats in `SIGEL_GP`.** A wrong format is
-  undefined behaviour and can crash. `SIG_GPFitnessTrainer` copies a host
-  name with `sprintf` and uses the name as the format, so a `%` in it reads
-  arguments that do not exist, and a long name overruns the buffer.
-  `SIG_GPRemoteZORCFitnessFunction` passes a message as the format to
-  `fprintf`, and prints a `long` with `%d`. `SIG_GPManager` prints a
-  `qsizetype` with `%d` when the server task disconnects its clients. GCC
-  warns (`-Wformat=`, `-Wformat-security`).
-
 - [ ] **125. Give `accept()` a buffer size in
   `SIG_GPManager::RegisterDynPVMClients`.** `alen` is passed to `accept()`
   without being set, so `accept()` reads an arbitrary buffer size. If that

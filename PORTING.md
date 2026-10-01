@@ -909,6 +909,26 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-10-01 — DONE: ITEM 134, THE `printf` FORMATS IN `SIGEL_GP`.**
+
+- **`SIG_GPFitnessTrainer::flushAllDynHosts`:** the `sprintf` that used the
+  host name as the format is removed, with its 256-byte buffer and the
+  commented-out `pvm_delhosts` call. Nothing read the copy.
+- **`SIG_GPFitnessTrainer::getNextHost`:** the 256-byte buffer is gone. The
+  bytes from `toLatin1()` go to `pvm_addhosts` and to the log line, with a
+  `const_cast` as in the static-host code of the same file.
+- **`SIG_GPRemoteZORCFitnessFunction`:** the length message is printed with
+  `"%s"`, the `long` program length with `%ld`, and both `sprintf` calls are
+  `snprintf` with the size of their buffer.
+- **`SIG_GPManager::RegisterDynPVMClients`:** the client count is cast to
+  `int` for `%d`.
+- **A user sees:** no difference with normal host names. A dynamic client
+  that sends a name with `%` in it, or a very long name, no longer crashes
+  the master.
+- **Gates:** `check.sh` 760 pass, 0 fail after each fix; warnings 323 to
+  319. Fitness, dictorder and PVM were not run. `check.sh` does not execute
+  the changed lines: they need a dynamic client or a ZORC robot.
+
 **2026-10-01 — DONE: ITEM 131, `SIG_SceneObject` STARTS WITH DEFINED VALUES.**
 
 - **Found:** no caller passed a position or a rotation. All four
