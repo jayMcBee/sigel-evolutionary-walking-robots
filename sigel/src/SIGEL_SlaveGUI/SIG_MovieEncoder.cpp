@@ -23,8 +23,10 @@
 */
 #include "SIGEL_SlaveGUI/SIG_MovieEncoder.h"
 
+#include <QApplication>
 #include <QFile>
 #include <QMessageBox>
+#include <QProgressDialog>
 #include <QStandardPaths>
 
 namespace SIGEL_SlaveGUI
@@ -33,20 +35,6 @@ namespace SIGEL_SlaveGUI
 	SIG_MovieEncoder::SIG_MovieEncoder( QWidget *messageParent )
 		: messageParent( messageParent )
 	{
-		QObject::connect( &process, &QProcess::finished, [this]() { reportFinished(); } );
-
-		// A process that fails to start never sends finished.
-		QObject::connect( &process, &QProcess::errorOccurred, [this]( QProcess::ProcessError error )
-		{
-			if ( error == QProcess::FailedToStart )
-				reportFinished();
-		} );
-	};
-
-	SIG_MovieEncoder::~SIG_MovieEncoder()
-	{
-		// ~QProcess kills a running ffmpeg and sends finished, when this is half destroyed.
-		QObject::disconnect( &process, nullptr, nullptr, nullptr );
 	};
 
 	void SIG_MovieEncoder::encode( SIG_MovieSettings const &settings, int frameCount )
@@ -73,12 +61,6 @@ namespace SIGEL_SlaveGUI
 			return;
 		}
 
-		if ( process.state() != QProcess::NotRunning )
-		{
-			QMessageBox::information( messageParent, "Recording Stopped", written + "\n\nffmpeg is still making the last movie, so no MP4 was made." );
-			return;
-		}
-
 		QString movieName = settings.filePrefix + ".mp4";
 		QString question = written + "\n\nMake " + movieName + " from them?";
 
@@ -89,7 +71,34 @@ namespace SIGEL_SlaveGUI
 			return;
 
 		movieFileName = settings.directory + movieName;
+		unfinishedFileName = settings.directory + settings.filePrefix + "_unfinished.mp4";
+
+		runFfmpegWithProgressDialog( ffmpeg, settings, frameCount );
+		reportFinished();
+	};
+
+	void SIG_MovieEncoder::runFfmpegWithProgressDialog( QString const &ffmpeg, SIG_MovieSettings const &settings, int frameCount )
+	{
 		process.start( ffmpeg, arguments( settings, frameCount ) );
+
+		// No button, and a range of 0 to 0 shows a busy bar. The dialog is modal,
+		// so the window cannot close and kill ffmpeg.
+		QString label = QString( "Making %1.mp4 from %2 frames ...\n(%3)" ).arg( settings.filePrefix ).arg( frameCount ).arg( settings.directory );
+		QProgressDialog progress( label, QString(), 0, 0, messageParent );
+		progress.setWindowTitle( "Making Movie" );
+		progress.setWindowModality( Qt::ApplicationModal );
+
+		while ( process.state() != QProcess::NotRunning )
+		{
+			// Escape and the close button hide the dialog.
+			if ( !progress.isVisible() )
+				progress.show();
+
+			process.waitForFinished( 50 );
+			QApplication::processEvents();
+		}
+
+		progress.close();
 	};
 
 	QStringList SIG_MovieEncoder::arguments( SIG_MovieSettings const &settings, int frameCount ) const
@@ -112,14 +121,21 @@ namespace SIGEL_SlaveGUI
 			"-i", input, "-frames:v", QString::number( frameCount ),
 			"-vf", "crop=trunc(iw/2)*2:trunc(ih/2)*2,scale=out_color_matrix=bt709,setparams=colorspace=bt709:color_primaries=bt709:color_trc=bt709",
 			"-c:v", "libx264", "-crf", "18", "-pix_fmt", "yuv420p",
-			"-movflags", "+faststart", settings.directory + settings.filePrefix + ".mp4" };
+			"-movflags", "+faststart", unfinishedFileName };
 	};
 
 	void SIG_MovieEncoder::reportFinished()
 	{
 		if ( process.error() != QProcess::FailedToStart && process.exitStatus() == QProcess::NormalExit && process.exitCode() == 0 )
 		{
-			QMessageBox::information( messageParent, "Movie Written", "Movie written to:\n" + movieFileName );
+			// The movie gets its name only now, so a failed encode leaves an existing movie as it is.
+			QFile::remove( movieFileName );
+
+			if ( QFile::rename( unfinishedFileName, movieFileName ) )
+				QMessageBox::information( messageParent, "Movie Written", "Movie written to:\n" + movieFileName );
+			else
+				QMessageBox::warning( messageParent, "Movie Error", "The movie was made, but could not be renamed to:\n" + movieFileName + "\n\nIt is in:\n" + unfinishedFileName );
+
 			return;
 		}
 
@@ -129,9 +145,12 @@ namespace SIGEL_SlaveGUI
 			errorOutput = process.errorString();
 
 		QStringList errorLines = errorOutput.split( '\n' );
+		QString message = "ffmpeg could not make:\n" + movieFileName + "\n\n" + errorLines.mid( qMax( 0, errorLines.size() - 5 ) ).join( '\n' );
 
-		QMessageBox::warning( messageParent, "Movie Error",
-			"ffmpeg could not make:\n" + movieFileName + "\n\n" + errorLines.mid( qMax( 0, errorLines.size() - 5 ) ).join( '\n' ) );
+		if ( QFile::remove( unfinishedFileName ) )
+			message += "\n\nThe unfinished file was deleted.";
+
+		QMessageBox::warning( messageParent, "Movie Error", message );
 	};
 
 }

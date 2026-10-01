@@ -45,11 +45,12 @@ namespace SIGEL_SlaveGUI
 
 		SIG_MovieEncoder( QWidget *messageParent );
 
-		~SIG_MovieEncoder();
-
 		void encode( SIG_MovieSettings const &settings, int frameCount );
 
 	private:
+
+		// Runs ffmpeg behind a modal busy dialog and returns when ffmpeg has ended.
+		void runFfmpegWithProgressDialog( QString const &ffmpeg, SIG_MovieSettings const &settings, int frameCount );
 
 		QStringList arguments( SIG_MovieSettings const &settings, int frameCount ) const;
 
@@ -60,6 +61,9 @@ namespace SIGEL_SlaveGUI
 		QProcess process;
 
 		QString movieFileName;
+
+		// ffmpeg writes here; the file is renamed to movieFileName when ffmpeg has succeeded.
+		QString unfinishedFileName;
 
 	};
 
