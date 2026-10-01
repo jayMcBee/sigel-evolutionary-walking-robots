@@ -31,8 +31,8 @@ namespace SIGEL_SlaveGUI
 {
 
   /**
-   * What a simulation shows, for the overlay labels of a movie. It stays
-   * the same for the whole simulation.
+   * Facts about a simulation that the overlay labels of a movie can show.
+   * They stay the same for the whole simulation.
    */
   struct SIG_MovieStaticRunInfo
   {
