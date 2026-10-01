@@ -935,8 +935,12 @@ classes and leave truncation a hard error. **They are not interchangeable.**
   "PNG compression" is shown only for PNG.
 - **Gates:** `check.sh` 760 pass, 0 fail; warnings 325. Fitness on `build/`
   and `build-asan/`, dictorder and PVM unchanged.
-- **Open decision:** ffmpeg CRF 18 or 16 in place of the default 23 in
-  `SIG_MovieEncoder::arguments`.
+- **Encoding:** `SIG_MovieEncoder::arguments` passes `-crf 18`, where ffmpeg
+  used its default 23. On one 900-frame movie at 1280 × 720 the file went
+  from 19.4 MB to 34.5 MB and the average PSNR against the frames from
+  40.7 dB to 45.7 dB; CRF 16 gave 40.2 MB and 47.5 dB. The frames are
+  converted with the BT.709 matrix and the movie is tagged BT.709; before,
+  it was BT.601 with no tag. `-movflags +faststart` puts the index first.
 
 **2026-09-30 — ITEM 106, THE MODEL CLASS `SIGEL_GP::SIG_GPParameter`.** Start
 here.
