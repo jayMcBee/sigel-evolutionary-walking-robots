@@ -87,6 +87,7 @@ void SIG_MovieSettingsDialog::setSettings( SIG_MovieSettings const &settings )
   checkboxUseLeadingZeros->setChecked( settings.useLeadingZeros );
   checkboxOverlayExperimentName->setChecked( settings.showOverlayExperimentName );
   checkboxOverlayFitnessFunction->setChecked( settings.showOverlayFitnessFunction );
+  checkboxOverlayIndividual->setChecked( settings.showOverlayIndividual );
   checkboxOverlaySimulationTime->setChecked( settings.showOverlaySimulationTime );
   checkboxOverlayStartDistance->setChecked( settings.showOverlayStartDistance );
   checkboxOverlayRobotHeight->setChecked( settings.showOverlayRobotHeight );
@@ -109,6 +110,7 @@ SIG_MovieSettings SIG_MovieSettingsDialog::settings() const
   settings.useLeadingZeros = checkboxUseLeadingZeros->isChecked();
   settings.showOverlayExperimentName = checkboxOverlayExperimentName->isChecked();
   settings.showOverlayFitnessFunction = checkboxOverlayFitnessFunction->isChecked();
+  settings.showOverlayIndividual = checkboxOverlayIndividual->isChecked();
   settings.showOverlaySimulationTime = checkboxOverlaySimulationTime->isChecked();
   settings.showOverlayStartDistance = checkboxOverlayStartDistance->isChecked();
   settings.showOverlayRobotHeight = checkboxOverlayRobotHeight->isChecked();

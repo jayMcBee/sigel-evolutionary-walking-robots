@@ -156,6 +156,15 @@ namespace SIGEL_SlaveGUI
         values << staticRunInfo.fitnessFunctionName;
       }
 
+    if ( settings.showOverlayIndividual && !staticRunInfo.individualName.isEmpty() )
+      {
+        labels << "Individual:";
+        values << QString( "%1 (fitness %2, program length %3)" )
+          .arg( staticRunInfo.individualName )
+          .arg( staticRunInfo.individualFitness, 0, 'f', 3 )
+          .arg( staticRunInfo.individualProgramLength );
+      }
+
     if ( settings.showOverlaySimulationTime )
       {
         labels << "Simulated time:";

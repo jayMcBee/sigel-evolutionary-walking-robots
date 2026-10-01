@@ -69,6 +69,10 @@ namespace SIGEL_GP
     void setFitnessFunctionName( QString name );
     QString getExperimentName();
     void setExperimentName( QString name );
+    QString getIndividualName();
+    void setIndividualName( QString name );
+    double getIndividualFitness();
+    void setIndividualFitness( double fitness );
     void setActGeneration( int _actGeneration) { actGeneration = _actGeneration; }
     int getActGeneration() { return actGeneration; }
     void setResetEveryGeneration(int _resetEveryGeneration) { resetEveryGeneration = _resetEveryGeneration; }
@@ -93,6 +97,10 @@ namespace SIGEL_GP
 
     /** The name of the experiment, only for a displayed simulation. */
     QString experimentName;
+
+    /** The name and the stored fitness of the individual, only for a displayed simulation. */
+    QString individualName;
+    double individualFitness;
 
   };
 }

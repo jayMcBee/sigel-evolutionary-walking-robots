@@ -56,6 +56,16 @@
                   </widget>
                 </item>
                 <item>
+                  <widget class="QCheckBox" name="checkboxOverlayIndividual">
+                    <property name="text">
+                      <string>Individual</string>
+                    </property>
+                    <property name="toolTip">
+                      <string>Writes the name of the individual, its stored fitness and its program length into each saved frame. The view on screen does not change.</string>
+                    </property>
+                  </widget>
+                </item>
+                <item>
                   <widget class="QCheckBox" name="checkboxOverlaySimulationTime">
                     <property name="text">
                       <string>Simulation time</string>

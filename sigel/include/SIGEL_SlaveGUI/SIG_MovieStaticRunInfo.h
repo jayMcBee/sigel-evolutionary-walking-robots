@@ -47,6 +47,19 @@ namespace SIGEL_SlaveGUI
     QString fitnessFunctionName;
 
     /**
+     * Empty when the individual is not known; its overlay label is then
+     * not drawn.
+     */
+    QString individualName;
+
+    /**
+     * The fitness stored with the individual.
+     */
+    double individualFitness = 0.0;
+
+    long individualProgramLength = 0;
+
+    /**
      * Takes the experiment name from the experiment's file name: without
      * the directory and without ".exp".
      */

@@ -41,7 +41,9 @@ SIGEL_GP::SIG_GPPVMData::SIG_GPPVMData(SIGEL_Robot::SIG_Robot& robot,
   visualize(visualize),
   actGeneration(0),
   resetEveryGeneration(0),
-  experimentName()
+  experimentName(),
+  individualName(),
+  individualFitness(0)
 {
 };
 
@@ -130,6 +132,12 @@ void SIGEL_GP::SIG_GPPVMData::loadPVMDataTransfer(QTextStream & file,
   bufferString = settingsStream.readLine(); // EXPERIMENTNAME
   bufferString = settingsStream.readLine();
   experimentName = bufferString;
+  bufferString = settingsStream.readLine(); // INDIVIDUALNAME
+  bufferString = settingsStream.readLine();
+  individualName = bufferString;
+  bufferString = settingsStream.readLine(); // INDIVIDUALFITNESS
+  bufferString = settingsStream.readLine();
+  individualFitness = bufferString.toDouble();
 };
 
 void SIGEL_GP::SIG_GPPVMData::savePVMDataTransfer(QTextStream & file,
@@ -159,6 +167,10 @@ void SIGEL_GP::SIG_GPPVMData::savePVMDataTransfer(QTextStream & file,
     file << 0 << "\n"; 
   file << "EXPERIMENTNAME\n";
   file << experimentName << "\n";
+  file << "INDIVIDUALNAME\n";
+  file << individualName << "\n";
+  file << "INDIVIDUALFITNESS\n";
+  file << individualFitness << "\n";
   file << fiveHashesLine;
 };
 
@@ -190,4 +202,24 @@ QString SIGEL_GP::SIG_GPPVMData::getExperimentName()
 void SIGEL_GP::SIG_GPPVMData::setExperimentName( QString name )
 {
   experimentName = name;
+};
+
+QString SIGEL_GP::SIG_GPPVMData::getIndividualName()
+{
+  return individualName;
+};
+
+void SIGEL_GP::SIG_GPPVMData::setIndividualName( QString name )
+{
+  individualName = name;
+};
+
+double SIGEL_GP::SIG_GPPVMData::getIndividualFitness()
+{
+  return individualFitness;
+};
+
+void SIGEL_GP::SIG_GPPVMData::setIndividualFitness( double fitness )
+{
+  individualFitness = fitness;
 };

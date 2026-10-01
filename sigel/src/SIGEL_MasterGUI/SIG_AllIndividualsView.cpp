@@ -362,6 +362,8 @@ void SIG_AllIndividualsView::slotVisualize()
      			       true );
 
          pvmData.setExperimentName( guiExperiment.getName() );
+         pvmData.setIndividualName( theGPIndividual->getName() );
+         pvmData.setIndividualFitness( theGPIndividual->getFitness() );
 
          QString pvmDataString;
          QTextStream pvmDataStream( &pvmDataString, QIODevice::ReadWrite );

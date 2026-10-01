@@ -54,6 +54,8 @@ namespace SIGEL_SlaveGUI
 
     bool showOverlayFitnessFunction = false;
 
+    bool showOverlayIndividual = false;
+
     bool showOverlaySimulationTime = false;
 
     bool showOverlayStartDistance = false;

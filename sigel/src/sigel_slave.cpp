@@ -109,6 +109,8 @@ int main( int argc, char *argv[] ) {
   bool visualize = false;
   QString fitnessFunctionName;
   QString experimentFileName;
+  QString individualName;
+  double individualFitness = 0;
 
   bool standAlone = false;
 
@@ -159,6 +161,8 @@ int main( int argc, char *argv[] ) {
     environment = &experiment->environment;
     simulationParameters = &experiment->simulationParameter;
     program = &experiment->population.getIndividual( 0 ).getProgramVar();
+    individualName = experiment->population.getIndividual( 0 ).getName();
+    individualFitness = experiment->population.getIndividual( 0 ).getFitness();
     visualize = true;
 
   } // MODE:  StandAlone (if end)
@@ -204,6 +208,8 @@ int main( int argc, char *argv[] ) {
     visualize = pvmData.getVisualize();
     fitnessFunctionName = pvmData.getFitnessFunctionName();
     experimentFileName = pvmData.getExperimentName();
+    individualName = pvmData.getIndividualName();
+    individualFitness = pvmData.getIndividualFitness();
   }
 
   int returnValue = 0;
@@ -237,6 +243,9 @@ int main( int argc, char *argv[] ) {
 
       SIG_MovieStaticRunInfo staticRunInfo;
       staticRunInfo.setExperimentFileName( experimentFileName );
+      staticRunInfo.individualName = individualName;
+      staticRunInfo.individualFitness = individualFitness;
+      staticRunInfo.individualProgramLength = program->getProgramLength();
 
       // An ID the registry does not know is shown as it is.
       QString fitnessFunctionId = standAlone ? experiment->gpParameter.getFitnessName() : fitnessFunctionName;
