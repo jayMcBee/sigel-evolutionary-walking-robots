@@ -133,13 +133,6 @@ touched, because changing one changes behaviour against the reference binary.
   `qsizetype` with `%d` when the server task disconnects its clients. GCC
   warns (`-Wformat=`, `-Wformat-security`).
 
-- [ ] **131. Let `SIG_SceneObject`'s constructor use its arguments.** The
-  `SIG_Vector` and `SIG_Matrix` parameters have no names, so
-  `position(position)` and `rotation(rotation)` copy each member into
-  itself. The members start undefined, and the values that
-  `SIG_VisualSceneObject` passes in are lost. GCC warns (`-Winit-self`,
-  `-Wuninitialized`).
-
 - [ ] **125. Give `accept()` a buffer size in
   `SIG_GPManager::RegisterDynPVMClients`.** `alen` is passed to `accept()`
   without being set, so `accept()` reads an arbitrary buffer size. If that

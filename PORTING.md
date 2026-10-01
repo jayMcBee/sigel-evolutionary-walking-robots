@@ -909,6 +909,23 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-10-01 — DONE: ITEM 131, `SIG_SceneObject` STARTS WITH DEFINED VALUES.**
+
+- **Found:** no caller passed a position or a rotation. All four
+  construction sites used the default arguments, which are uninitialised, so
+  no passed-in value was lost. Every reader runs after
+  `SIG_RenderRecorder::record` or after `setPosition` and `setRotation`, so
+  the undefined values never reached the screen or a calculation.
+- **Changed:** the `SIG_SceneObject` constructor takes only the number. The
+  position starts at the origin and the rotation at the identity. The
+  `SIG_VisualSceneObject` constructor lost its position and rotation
+  parameters too.
+- **Differs from the to-do text:** the parameters are removed, not named.
+  Named parameters would still copy uninitialised default arguments.
+- **A user sees:** no difference.
+- **Gates:** `check.sh` 760 pass, 0 fail; warnings 323. Fitness, dictorder
+  and PVM were not run; the change is in `SIGEL_Visualisation` only.
+
 **2026-10-01 — DONE: ITEM 129, A BUSY DIALOG WHILE FFMPEG MAKES THE MOVIE.**
 
 - **Changed:** `SIG_MovieEncoder::encode` waits until ffmpeg has ended.
