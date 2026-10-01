@@ -80,7 +80,6 @@ Paths are relative to `sigel/`, the source tree.
   | `T_Instruktion`, `T_Instruk` | `MT_TranslatedIndividual.h` |
   | `Instruktion` | `MT_Classifier.cpp, createDoubleTransIndi` |
   | `set`/`getSelektionValue` | `MT_FitnessTrainer.h`, `MT_GPManager.h` |
-  | `Varianz` | `MT_StatisticsElement.h` |
   | `winkel`, `verschiebung`, `schiebung`, `drehmatrix`, `hilf`, `stflorianhilf` | `IFunctions.h`, `IFunctions.cpp` |
 
   **Kept, by decision:** `sliderIntervall` and `slotIntervallChanged`. The GUI
