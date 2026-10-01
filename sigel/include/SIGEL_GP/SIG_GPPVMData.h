@@ -40,83 +40,58 @@ namespace SIGEL_GP
    */
 
   class SIG_GPPVMData {
+   public:
 
     /** The program is not held; it is passed to savePVMDataTransfer and loadPVMDataTransfer. */
-   public:
     SIG_GPPVMData(SIGEL_Robot::SIG_Robot& robot, SIGEL_Environment::SIG_Environment& environment, SIGEL_Simulation::SIG_SimulationParameters& simulationParameter, QString fitnessName, bool visualize);
 
 
    /** Sends str to the PVM task taskId, as message messageId. */
-   public:
     void sendQStringToPVM(QString str, int taskId, int messageId);
 
    /** Waits for message messageId from the PVM task taskId and returns its string. */
-   public:
     QString getQStringFromPVM(int taskId, int messageId);
 
    /** Reads the lines up to the next "#####" line, which ends a block of the message. */
-   public:
     QString cutAfterFiveHashes(QTextStream& source);
 
     /** Reads a received message into the robot, the environment, the simulation parameters, the settings and program. */
-   public:
     void loadPVMDataTransfer(QTextStream & file,
   						    SIGEL_Program::SIG_Program & program);
 
     /** Writes the message for a slave, with program as its program. */
-   public:
     void savePVMDataTransfer(QTextStream & file,
   						    SIGEL_Program::SIG_Program const &program);
 
-   public:
     void setVisualize(bool visu);
-
-   public:
     bool getVisualize();
-
-   public:
     QString getFitnessFunctionName();
-
-   public:
     void setFitnessFunctionName( QString name );
-
-   public:
     QString getExperimentName();
-
-   public:
     void setExperimentName( QString name );
     void setActGeneration( int _actGeneration) { actGeneration = _actGeneration; }
     int getActGeneration() { return actGeneration; }
     void setResetEveryGeneration(int _resetEveryGeneration) { resetEveryGeneration = _resetEveryGeneration; }
     int getResetEveryGeneration() { return resetEveryGeneration; }
 
+   private:
+
     /** The robot, the environment and the simulation parameters are held by reference; they do not change during an evolution. */
-   private:
     SIGEL_Robot::SIG_Robot& robot;
-
-   private:
     SIGEL_Environment::SIG_Environment& environment;
-
-   private:
     SIGEL_Simulation::SIG_SimulationParameters& simulationParameter;
 
     /** The id of the fitness function, as experiment files store it. */
-   private:
     QString fitnessName;
 
     /** True shows the simulation; false computes a fitness. */
-   private:
     bool visualize;
 
     /** The pool generation and the reset interval are sent, but no slave code reads them. */
-   private:
     int actGeneration;
-
-   private:
     int resetEveryGeneration;
 
     /** The name of the experiment, only for a displayed simulation. */
-   private:
     QString experimentName;
 
   };
