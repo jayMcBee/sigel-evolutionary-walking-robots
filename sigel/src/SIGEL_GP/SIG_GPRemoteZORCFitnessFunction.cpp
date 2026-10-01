@@ -134,9 +134,9 @@ namespace SIGEL_GP
          if (recvPrgLen != program.getProgramLength())
          {  char  errMsg[256];
 
-            sprintf(errMsg, "<BIG><B>Program length received by ZORC [%d] doesn't match the original SIGEL-Program length [%d].</B></BIG><BR><BR>Please retry..", recvPrgLen, program.getProgramLength());
+            snprintf(errMsg, sizeof(errMsg), "<BIG><B>Program length received by ZORC [%d] doesn't match the original SIGEL-Program length [%d].</B></BIG><BR><BR>Please retry..", recvPrgLen, program.getProgramLength());
             SIGEL_Tools::SIG_IO::cerr << "Error transmitting program: " << errMsg << Qt::endl;
-            fprintf(stderr, errMsg);
+            fprintf(stderr, "%s", errMsg);
             return -1.0;
          }
       }
@@ -160,7 +160,7 @@ namespace SIGEL_GP
       // while ZORC is waiting we can transmit the time to run;
       // first get time to evaluate on ZORC
       timeToRun = QTime( 0, 0 ).secsTo( simparameter.getTimeToSimulate() );
-      sprintf(serTxt, "%d\n", timeToRun);
+      snprintf(serTxt, sizeof(serTxt), "%d\n", timeToRun);
       write(fd, serTxt, strlen(serTxt));
 
       // that's it -- close the serial device
