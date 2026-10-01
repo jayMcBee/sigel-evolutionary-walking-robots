@@ -107,36 +107,43 @@ namespace SIGEL_SlaveGUI
 	  }
       }
 
-    painter.begin( &frame );
-    paintOverlayLabels( painter, simulationSeconds, startDistance, robotCentreHeight );
-    painter.end();
+    paintOverlayLabels( frame, simulationSeconds, startDistance, robotCentreHeight );
 
     return frame.save( lastFileName,
 		       settings.format.toUpper().toUtf8().constData(),
 		       settings.quality );
   };
 
-  void SIG_MovieRecorder::paintOverlayLabels( QPainter &painter, double simulationSeconds, double startDistance, double robotCentreHeight ) const
+  void SIG_MovieRecorder::paintOverlayLabels( QImage &frame, double simulationSeconds, double startDistance, double robotCentreHeight ) const
   {
+    // The font size is a fraction of the frame height; the other sizes are in font sizes.
+    double const fontHeight = 20.0 / 720.0;
+    double const lineStep = 31.0 / 22.0;
+    double const margin = 16.0 / 22.0;
+    double const valueGap = 0.5;
+    double const outlineWidth = 1.0 / 20.0;
+    QColor const textColor( 0xE8, 0xE8, 0xE8 );
+    QColor const outlineColor( 0x40, 0x40, 0x40 );
+
     QStringList labels;
     QStringList values;
 
     if ( settings.showOverlaySimulationTime )
       {
-	labels << "Simulated time:";
-	values << QString::number( simulationSeconds, 'f', 2 ) + " s";
+        labels << "Simulated time:";
+        values << QString::number( simulationSeconds, 'f', 2 ) + " s";
       }
 
     if ( settings.showOverlayStartDistance )
       {
-	labels << "Distance from start:";
-	values << QString::number( startDistance, 'f', 3 ) + " m";
+        labels << "Distance from start:";
+        values << QString::number( startDistance, 'f', 3 ) + " m";
       }
 
     if ( settings.showOverlayRobotHeight )
       {
-	labels << "Centre height:";
-	values << QString::number( robotCentreHeight, 'f', 3 ) + " m";
+        labels << "Centre height:";
+        values << QString::number( robotCentreHeight, 'f', 3 ) + " m";
       }
 
     if ( labels.isEmpty() )
@@ -148,11 +155,11 @@ namespace SIGEL_SlaveGUI
     // Ubuntu Sans comes with every Ubuntu desktop; its SemiBold matches Noto Sans Bold best.
     if ( !QFontDatabase::hasFamily( "Noto Sans" ) )
       {
-	font.setFamily( "Ubuntu Sans" );
-	font.setWeight( QFont::DemiBold );
+        font.setFamily( "Ubuntu Sans" );
+        font.setWeight( QFont::DemiBold );
       }
 
-    double fontSize = settings.height * overlayFontHeight;
+    double fontSize = settings.height * fontHeight;
     font.setPixelSize( qMax( 1, qRound( fontSize ) ) );
 
     QFontMetricsF metrics( font );
@@ -160,22 +167,24 @@ namespace SIGEL_SlaveGUI
     for ( QString const &label : labels )
       labelWidth = qMax( labelWidth, metrics.horizontalAdvance( label ) );
 
-    double margin = fontSize * overlayMargin;
-    double valueX = margin + labelWidth + fontSize * overlayValueGap;
+    double marginPixels = fontSize * margin;
+    double valueX = marginPixels + labelWidth + fontSize * valueGap;
 
     QPainterPath path;
     for ( int line = 0; line < labels.size(); line++ )
       {
-	double baseline = margin + fontSize + line * fontSize * overlayLineStep;
-	path.addText( margin, baseline, font, labels[line] );
-	path.addText( valueX, baseline, font, values[line] );
+        double baseline = marginPixels + fontSize + line * fontSize * lineStep;
+        path.addText( marginPixels, baseline, font, labels[line] );
+        path.addText( valueX, baseline, font, values[line] );
       }
 
-    // The pen is centred on the glyph edges, and the fill covers its inner half.
+    QPainter painter( &frame );
     painter.setRenderHint( QPainter::Antialiasing );
-    painter.strokePath( path, QPen( QColor::fromRgb( overlayOutlineColor ), 2.0 * fontSize * overlayOutlineWidth,
-				    Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin ) );
-    painter.fillPath( path, QColor::fromRgb( overlayTextColor ) );
+
+    // The pen is centred on the glyph edges, and the fill covers its inner half.
+    QPen outlinePen( outlineColor, 2.0 * fontSize * outlineWidth, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin );
+    painter.strokePath( path, outlinePen );
+    painter.fillPath( path, textColor );
   };
 
   bool SIG_MovieRecorder::writePovray( SIGEL_Visualisation::SIG_SimulationVisualisation &visualisation, double simulationSeconds )
