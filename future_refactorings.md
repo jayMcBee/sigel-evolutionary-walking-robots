@@ -82,15 +82,10 @@ Paths are relative to `sigel/`, the source tree.
   | `set`/`getSelektionValue` | `MT_FitnessTrainer.h`, `MT_GPManager.h` |
   | `Varianz` | `MT_StatisticsElement.h` |
   | `winkel`, `verschiebung`, `schiebung`, `drehmatrix`, `hilf`, `stflorianhilf` | `IFunctions.h`, `IFunctions.cpp` |
-  | `masse` | `SIG_Mirtich.h`, `.cpp` |
 
   **Kept, by decision:** `sliderIntervall` and `slotIntervallChanged`. The GUI
   baselines record the widget by name, and the form connects the slot by name.
-  The robot grammar is English, so the German names in `SIG_RobotCompiler.cpp`
-  take the name of the keyword they hold. `rot` in `getMinRot` and `rotMin` is
-  rotation, not the colour — leave it.
-  **Umlauts are Latin-1 bytes;** a UTF-8 grep misses them. Comments first,
-  because that phase cannot move a baseline.
+  `rot` in `getMinRot` and `rotMin` is rotation, not the colour — leave it.
   **Check after each phase:** `./checks/check.sh`, then
   `./checks/dictorder-dump.sh | diff -u checks/baselines/dictorder-baseline.txt -`
   empty, then `./checks/fitness-check.sh` clean.
