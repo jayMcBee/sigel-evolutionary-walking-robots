@@ -406,13 +406,18 @@ int main(int argc, char *argv[])
   }
   file.close();
 
-  // One line per finding, tab-separated: check, kind, part, value, limit, text.
+  // One line per finding, tab-separated: check, kind, part, value, limit, text;
+  // then one line that counts them.
   if (advise) {
     SIGEL_GP::SIG_RobotAdvisor advisor(experiment.robot, experiment.simulationParameter, experiment.environment, experiment.gpParameter);
-    for (const SIGEL_GP::SIG_RobotAdvisor::Finding &finding : advisor.advise())
+    int count[3] = { 0, 0, 0 };
+    for (const SIGEL_GP::SIG_RobotAdvisor::Finding &finding : advisor.advise()) {
+      count[finding.kind]++;
       printf("%d\t%s\t%s\t%.6g\t%.6g\t%s\n", finding.check,
              finding.kind == SIGEL_GP::SIG_RobotAdvisor::tError ? "error" : finding.kind == SIGEL_GP::SIG_RobotAdvisor::tWarning ? "warning" : "suggestion", qPrintable(finding.part),
              finding.value, finding.limit, qPrintable(finding.text));
+    }
+    printf("advisor: errors %d, warnings %d, suggestions %d\n", count[0], count[1], count[2]);
     return 0;
   }
 

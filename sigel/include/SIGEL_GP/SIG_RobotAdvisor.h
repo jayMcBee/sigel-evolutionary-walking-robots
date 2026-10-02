@@ -27,6 +27,7 @@
 #include "SIGEL_Environment/SIG_Environment.h"
 #include "SIGEL_GP/SIG_GPParameter.h"
 #include "SIGEL_Robot/SIG_Robot.h"
+#include "SIGEL_Simulation/SIG_DynaMechsSimulationData.h"
 #include "SIGEL_Simulation/SIG_SimulationParameters.h"
 #include "SIGEL_Tools/SIG_Matrix.h"
 #include "SIGEL_Tools/SIG_Vector.h"
@@ -55,8 +56,8 @@ namespace SIGEL_GP
      * part the robot parts it is about, value the worst that was computed and
      * limit what that was compared with. Check 1 gives both in degrees, checks
      * 2 and 7 as heights, check 4 in percent of the robot's size, check 6 in
-     * the joint's own unit, check 8 in seconds. Check 0 is a robot that cannot
-     * be simulated, check 10 a link without mass.
+     * the joint's own unit, checks 8 and 9 in seconds. Check 0 is a robot
+     * that cannot be simulated, check 10 a link without mass.
      */
     struct Finding { int check; Kind kind; QString part; double value; double limit; QString text; };
 
@@ -69,8 +70,11 @@ namespace SIGEL_GP
 
   private:
 
-    // Where the simulation puts each link at its start, by link number.
-    struct StartPose { QList<SIG_Vector> positions; QList<SIG_Matrix> orientations; };
+    // Where the simulation puts each link at its start, by link number, and
+    // how easily a torque on the joints accelerates them: the largest
+    // eigenvalue of the joints' part of the inverse mass matrix over many
+    // poses. It is 0 for a robot that has a joint that does not turn.
+    struct StartPose { QList<SIG_Vector> positions; QList<SIG_Matrix> orientations; double jointMobility; };
 
     void adviseLimitCannotHoldDrive( QList<Finding> &findings ) const;
     void adviseSenseWithoutSensors( QList<Finding> &findings ) const;
@@ -83,13 +87,15 @@ namespace SIGEL_GP
     void adviseAxisOffEdge( QList<Finding> &findings, const SIGEL_Robot::SIG_Robot &startRobot, const StartPose &startPose ) const;
     void adviseStartHeight( QList<Finding> &findings, const SIGEL_Robot::SIG_Robot &startRobot, const StartPose &startPose ) const;
     void adviseStepForGroundContact( QList<Finding> &findings, const QList<double> &masses, const SIGEL_Robot::SIG_Robot &startRobot ) const;
+    void adviseStepForJoints( QList<Finding> &findings, const StartPose &startPose ) const;
 
     StartPose startPoseOf( const SIGEL_Robot::SIG_Robot &startRobot ) const;
+    double jointMobilityOf( SIGEL_Simulation::SIG_DynaMechsSimulationData &simulationData ) const;
     SIG_Vector atStart( const StartPose &startPose, const SIGEL_Robot::SIG_Link *link, SIG_Vector point ) const;
     double offAxis( const StartPose &startPose, const SIGEL_Robot::SIG_Link *link, SIG_Vector axisPoint, SIG_Vector axis ) const;
     double sizeAtStart( const SIGEL_Robot::SIG_Robot &startRobot, const StartPose &startPose ) const;
 
-    // Measured on the seven shipped robots and one rejected model.
+    // Measured on the seven shipped robots and one rejected model. A joint that is a pin in a fork is above it and sound.
     static constexpr double axisOffEdgePercent = 1.0;
     // Of the seven shipped robots, the two above 8 start heights are thrown; the highest quiet one is at 6.1.
     static constexpr double throwStartHeights = 8.0;
@@ -97,6 +103,10 @@ namespace SIGEL_GP
     static constexpr double floorLevel = 0.0;
     // Single bodies go unstable from 0.5; the shipped robots show the first NaN at 1.5.
     static constexpr double groundContactStability = 0.75;
+    // The simulation goes unstable at 2.785 on every shipped robot; this leaves 10 %.
+    static constexpr double jointStability = 2.5;
+    // The start pose and this many random poses inside the joint ranges.
+    static constexpr int randomPoses = 150;
 
     const SIGEL_Robot::SIG_Robot &robot;
     const SIGEL_Simulation::SIG_SimulationParameters &simulationParameter;

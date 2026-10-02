@@ -28,12 +28,16 @@
 #include "SIGEL_Robot/SIG_Joint.h"
 #include "SIGEL_Robot/SIG_RotationalJoint.h"
 #include "SIGEL_Robot/SIG_TranslationalJoint.h"
-#include "SIGEL_Simulation/SIG_DynaMechsSimulationData.h"
 #include "SIGEL_Simulation/SIG_DynaMechsSimulationQueries.h"
 #include "SIGEL_Tools/SIG_Exception.h"
+#include "SIGEL_Tools/SIG_Randomizer.h"
+
+#include <dmMDHLink.hpp>
+#include <newmatap.h>
 
 #include <algorithm>
 #include <cmath>
+#include <vector>
 
 SIGEL_GP::SIG_RobotAdvisor::SIG_RobotAdvisor( const SIGEL_Robot::SIG_Robot &robot,
                                               const SIGEL_Simulation::SIG_SimulationParameters &simulationParameter,
@@ -53,6 +57,13 @@ QList<SIGEL_GP::SIG_RobotAdvisor::Finding> SIGEL_GP::SIG_RobotAdvisor::advise() 
 
   try
     {
+      // The simulation ends the program on such a joint.
+      for ( SIGEL_Robot::SIG_Joint *joint : robot.getJoints() )
+        {
+          if ( joint->getJointType() == SIGEL_Robot::SIG_Joint::tCylindricalJoint )
+            throw SIGEL_Tools::SIG_Exception( __FILE__, __LINE__, "Joint " + joint->getName() + " is a cylindrical joint." );
+        }
+
       SIGEL_Robot::SIG_Robot startRobot( robot );
       startRobot.prepareDynaMechs();
       StartPose startPose = startPoseOf( startRobot );
@@ -73,12 +84,15 @@ QList<SIGEL_GP::SIG_RobotAdvisor::Finding> SIGEL_GP::SIG_RobotAdvisor::advise() 
       if ( everyLinkHasMass )
         adviseStrokeThrowsRobot( warnings, masses, startRobot );
       adviseSenseWithoutSensors( warnings );
-      adviseAxisOffEdge( warnings, startRobot, startPose );
       adviseStartOutsideRange( warnings );
 
+      adviseAxisOffEdge( suggestions, startRobot, startPose );
       adviseStartHeight( suggestions, startRobot, startPose );
       if ( everyLinkHasMass )
-        adviseStepForGroundContact( suggestions, masses, startRobot );
+        {
+          adviseStepForGroundContact( suggestions, masses, startRobot );
+          adviseStepForJoints( suggestions, startPose );
+        }
     }
   catch ( SIGEL_Tools::SIG_Exception &e )
     {
@@ -256,9 +270,9 @@ void SIGEL_GP::SIG_RobotAdvisor::adviseAxisOffEdge( QList<Finding> &findings, co
   if ( pairs.isEmpty() )
     return;
 
-  QString text = QString( "Joints whose axis does not lie on an edge of a link they join (up to %1 % of the robot's size away): %2. The parts will overlap or float apart when the joint turns." )
+  QString text = QString( "No edge of the link lies on the joint's axis (up to %1 % of the robot's size away): %2. Look at the robot to see that the parts neither overlap nor float apart when the joint turns." )
     .arg( worstOffEdge, 0, 'g', 3 ).arg( pairs.join( ", " ) );
-  findings.append( Finding{ 4, tWarning, pairs.join( ", " ), worstOffEdge, axisOffEdgePercent, text } );
+  findings.append( Finding{ 4, tSuggestion, pairs.join( ", " ), worstOffEdge, axisOffEdgePercent, text } );
 }
 
 void SIGEL_GP::SIG_RobotAdvisor::adviseStartOutsideRange( QList<Finding> &findings ) const
@@ -418,6 +432,8 @@ SIGEL_GP::SIG_RobotAdvisor::StartPose SIGEL_GP::SIG_RobotAdvisor::startPoseOf( c
           startPose.positions.append( simulationQueries.getLinkPosition( i ) );
           startPose.orientations.append( simulationQueries.getLinkOrientation( i ) );
         }
+
+      startPose.jointMobility = jointMobilityOf( simulationData );
     }
   catch ( SIGEL_Tools::SIG_Exception &e )
     {
@@ -427,6 +443,135 @@ SIGEL_GP::SIG_RobotAdvisor::StartPose SIGEL_GP::SIG_RobotAdvisor::startPoseOf( c
 
   dmEnvironment::setEnvironment( environmentBefore );
   return startPose;
+}
+
+void SIGEL_GP::SIG_RobotAdvisor::adviseStepForJoints( QList<Finding> &findings, const StartPose &startPose ) const
+{
+  double mobility = startPose.jointMobility;
+  if ( !( mobility > 0 ) )
+    return;
+
+  // The rates at which joint friction, the limit damper and the limit spring act on the joints.
+  double frictionRate = simulationParameter.getJointFrictionU_c() * mobility;
+  double damperRate = simulationParameter.getJointLimitsB_damper() * mobility;
+  double springRate = std::sqrt( simulationParameter.getJointLimitsK_spring() * mobility );
+
+  double fastestRate = std::max( { frictionRate, damperRate, springRate } );
+  if ( !( fastestRate > 0 ) )
+    return;
+
+  double suggestedStep = jointStability / fastestRate;
+  if ( simulationParameter.getStepSize() <= suggestedStep )
+    return;
+
+  QString text = QString( "Step size %1 is above the suggested %2 for the joints, limited by the joint-limit spring. Runs may still work; the spring acts only past a limit." );
+  if ( fastestRate == damperRate )
+    text = QString( "Step size %1 is above the suggested %2 for the joints, limited by the joint-limit damper. Runs may still work; the damper acts only past a limit." );
+  if ( fastestRate == frictionRate )
+    text = QString( "Step size %1 is above the suggested %2 for the joints, limited by joint friction. Expect scores of 0 from a simulation that breaks down; lower the step size or the joint friction." );
+
+  findings.append( Finding{ 9, tSuggestion, QString(), simulationParameter.getStepSize(), suggestedStep,
+                            text.arg( simulationParameter.getStepSize() ).arg( suggestedStep, 0, 'g', 3 ) } );
+}
+
+double SIGEL_GP::SIG_RobotAdvisor::jointMobilityOf( SIGEL_Simulation::SIG_DynaMechsSimulationData &simulationData ) const
+{
+  for ( SIGEL_Robot::SIG_Joint *joint : robot.getJoints() )
+    {
+      if ( joint->getJointType() != SIGEL_Robot::SIG_Joint::tRotationalJoint )
+        return 0;
+    }
+
+  dmArticulation &system = simulationData.dynaMechsSystem;
+  int stateSize = system.getNumDOFs();
+
+  // Where each joint sits in the system's packed state.
+  QList<dmLink *> jointLinks;
+  QList<int> jointOffsets;
+  int offset = 0;
+  for ( unsigned int i = 0; i < system.getNumLinks(); i++ )
+    {
+      dmLink *link = system.getLink( i );
+      if ( link->getNumDOFs() == 1 )
+        {
+          jointLinks.append( link );
+          jointOffsets.append( offset );
+        }
+      offset += link->getNumDOFs();
+    }
+
+  int jointCount = jointLinks.size();
+  if ( jointCount == 0 )
+    return 0;
+
+  std::vector<Float> position( stateSize );
+  std::vector<Float> velocity( stateSize );
+  system.getState( position.data(), velocity.data() );
+  std::fill( velocity.begin(), velocity.end(), 0 );
+
+  Float noTorque = 0;
+  Float unitTorque = 1;
+  for ( dmLink *link : jointLinks )
+    link->setJointInput( &noTorque );
+
+  // The same poses on every call, so that the advice does not change between calls.
+  SIGEL_Tools::SIG_Randomizer randomizer( 1 );
+  double mobility = 0;
+
+  for ( int pose = 0; pose <= randomPoses; pose++ )
+    {
+      if ( pose > 0 )
+        {
+          for ( int j = 0; j < jointCount; j++ )
+            {
+              Float minimum, maximum, spring, damper;
+              static_cast<dmMDHLink *>( jointLinks[j] )->getJointLimits( &minimum, &maximum, &spring, &damper );
+
+              // A joint without limits can stand at any angle.
+              if ( maximum - minimum > 2 * M_PI )
+                {
+                  minimum = -M_PI;
+                  maximum = M_PI;
+                }
+
+              // SIG_Randomizer gives numbers below 32768.
+              position[ jointOffsets[j] ] = minimum + ( maximum - minimum ) * randomizer.getRandomInt( 32768 ) / 32767.0;
+            }
+        }
+
+      system.setState( position.data(), velocity.data() );
+
+      std::vector<Float> state( position );
+      state.insert( state.end(), velocity.begin(), velocity.end() );
+      std::vector<Float> atRest( 2 * stateSize );
+      system.ABDynamics( state.data(), atRest.data() );
+
+      // One unit of torque on a joint, less the robot at rest, gives one column of the inverse mass matrix.
+      NEWMAT::Matrix inverseMass( jointCount, jointCount );
+      for ( int j = 0; j < jointCount; j++ )
+        {
+          std::vector<Float> pushed( 2 * stateSize );
+          jointLinks[j]->setJointInput( &unitTorque );
+          system.ABDynamics( state.data(), pushed.data() );
+          jointLinks[j]->setJointInput( &noTorque );
+
+          for ( int i = 0; i < jointCount; i++ )
+            inverseMass( i + 1, j + 1 ) = pushed[ stateSize + jointOffsets[i] ] - atRest[ stateSize + jointOffsets[i] ];
+        }
+
+      NEWMAT::SymmetricMatrix symmetric( jointCount );
+      for ( int i = 1; i <= jointCount; i++ )
+        {
+          for ( int j = 1; j <= i; j++ )
+            symmetric( i, j ) = ( inverseMass( i, j ) + inverseMass( j, i ) ) / 2;
+        }
+
+      NEWMAT::DiagonalMatrix eigenvalues( jointCount );
+      NEWMAT::EigenValues( symmetric, eigenvalues );
+      mobility = std::max( mobility, static_cast<double>( eigenvalues( jointCount ) ) );
+    }
+
+  return mobility;
 }
 
 SIG_Vector SIGEL_GP::SIG_RobotAdvisor::atStart( const StartPose &startPose, const SIGEL_Robot::SIG_Link *link, SIG_Vector point ) const
