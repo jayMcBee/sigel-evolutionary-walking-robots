@@ -411,7 +411,7 @@ int main(int argc, char *argv[])
     SIGEL_GP::SIG_RobotAdvisor advisor(experiment.robot, experiment.simulationParameter, experiment.environment, experiment.gpParameter);
     for (const SIGEL_GP::SIG_RobotAdvisor::Finding &finding : advisor.advise())
       printf("%d\t%s\t%s\t%.6g\t%.6g\t%s\n", finding.check,
-             finding.kind == SIGEL_GP::SIG_RobotAdvisor::tWarning ? "warning" : "suggestion", qPrintable(finding.part),
+             finding.kind == SIGEL_GP::SIG_RobotAdvisor::tError ? "error" : finding.kind == SIGEL_GP::SIG_RobotAdvisor::tWarning ? "warning" : "suggestion", qPrintable(finding.part),
              finding.value, finding.limit, qPrintable(finding.text));
     return 0;
   }

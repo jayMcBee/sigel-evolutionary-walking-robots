@@ -162,7 +162,11 @@ void SIG_RobotView::showAdvice( const QList<SIGEL_GP::SIG_RobotAdvisor::Finding>
 
   for ( const SIGEL_GP::SIG_RobotAdvisor::Finding &finding : findings )
     {
-      QString kind = finding.kind == SIGEL_GP::SIG_RobotAdvisor::tWarning ? "Warning: " : "Suggestion: ";
+      QString kind = "Suggestion: ";
+      if ( finding.kind == SIGEL_GP::SIG_RobotAdvisor::tError )
+        kind = "Error: ";
+      if ( finding.kind == SIGEL_GP::SIG_RobotAdvisor::tWarning )
+        kind = "Warning: ";
       listboxAdvice->addItem( kind + finding.text );
     }
 }

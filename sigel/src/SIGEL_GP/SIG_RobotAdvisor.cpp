@@ -84,7 +84,8 @@ QList<SIGEL_GP::SIG_RobotAdvisor::Finding> SIGEL_GP::SIG_RobotAdvisor::advise() 
     {
       warnings.clear();
       suggestions.clear();
-      warnings.append( Finding{ 0, tWarning, QString(), 0, 0, "The robot cannot be simulated: " + e.getMessage() } );
+      // The message's later lines name the source file that threw.
+      warnings.append( Finding{ 0, tError, QString(), 0, 0, "The robot cannot be simulated: " + e.getMessage().section( '\n', 0, 0 ) } );
       adviseLimitCannotHoldDrive( warnings );
       adviseSenseWithoutSensors( warnings );
       adviseStartOutsideRange( warnings );
@@ -113,7 +114,7 @@ bool SIGEL_GP::SIG_RobotAdvisor::adviseLinkWithoutMass( QList<Finding> &findings
 
   QString text = QString( "Links with a mass of 0 or less: %1. The faces of their bodies probably face inwards. The simulation cannot work with them." )
     .arg( links.join( ", " ) );
-  findings.append( Finding{ 10, tWarning, links.join( ", " ), lowest, 0, text } );
+  findings.append( Finding{ 10, tError, links.join( ", " ), lowest, 0, text } );
   return false;
 }
 

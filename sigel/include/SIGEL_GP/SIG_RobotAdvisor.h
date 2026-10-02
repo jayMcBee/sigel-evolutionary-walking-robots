@@ -47,7 +47,8 @@ namespace SIGEL_GP
 
   public:
 
-    enum Kind { tWarning, tSuggestion };
+    // An error is a robot that cannot run at all.
+    enum Kind { tError, tWarning, tSuggestion };
 
     /**
      * One piece of advice. check is the number of the check that found it,
