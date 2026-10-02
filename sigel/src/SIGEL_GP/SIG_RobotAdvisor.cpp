@@ -25,6 +25,7 @@
 
 #include "SIGEL_Robot/SIG_CylindricalJoint.h"
 #include "SIGEL_Robot/SIG_Drive.h"
+#include "SIGEL_Robot/SIG_GeometryIterator.h"
 #include "SIGEL_Robot/SIG_Joint.h"
 #include "SIGEL_Robot/SIG_RotationalJoint.h"
 #include "SIGEL_Robot/SIG_TranslationalJoint.h"
@@ -87,6 +88,8 @@ QList<SIGEL_GP::SIG_RobotAdvisor::Finding> SIGEL_GP::SIG_RobotAdvisor::advise() 
       if ( everyLinkHasMass )
         adviseStrokeThrowsRobot( warnings, masses, startRobot );
       adviseSenseWithoutSensors( warnings );
+      if ( everyLinkHasMass )
+        adviseLinksOverlap( warnings, masses, startRobot, startPose );
       adviseStartOutsideRange( warnings );
 
       adviseAxisOffEdge( suggestions, startRobot, startPose );
@@ -291,6 +294,148 @@ void SIGEL_GP::SIG_RobotAdvisor::adviseAxisOffEdge( QList<Finding> &findings, co
   QString text = QString( "No edge of the link lies on the joint's axis (up to %1 % of the robot's size away): %2. Look at the robot to see that the parts neither overlap nor float apart when the joint turns." )
     .arg( worstOffEdge, 0, 'g', 3 ).arg( pairs.join( ", " ) );
   findings.append( Finding{ 4, tSuggestion, pairs.join( ", " ), worstOffEdge, axisOffEdgePercent, text } );
+}
+
+void SIGEL_GP::SIG_RobotAdvisor::adviseLinksOverlap( QList<Finding> &findings, const QList<double> &masses, const SIGEL_Robot::SIG_Robot &startRobot, const StartPose &startPose ) const
+{
+  const QList<SIGEL_Robot::SIG_Link *> &links = startRobot.getLinks();
+
+  // Each link's triangles and the box around them, in the start pose.
+  QList< QList<Triangle> > triangles;
+  QList<SIG_Vector> lowCorners;
+  QList<SIG_Vector> highCorners;
+  for ( SIGEL_Robot::SIG_Link *link : links )
+    {
+      triangles.append( trianglesAtStart( startPose, link ) );
+
+      SIG_Vector low( 0, 0, 0 );
+      SIG_Vector high( 0, 0, 0 );
+      bool first = true;
+      for ( SIG_Vector *vertex : link->getGeometry()->getVertices() )
+        {
+          SIG_Vector corner = atStart( startPose, link, *vertex );
+          for ( int axis = 0; axis < 3; axis++ )
+            {
+              if ( first || corner.get( axis ) < low.get( axis ) )
+                low.set( axis, corner.get( axis ) );
+              if ( first || corner.get( axis ) > high.get( axis ) )
+                high.set( axis, corner.get( axis ) );
+            }
+          first = false;
+        }
+      lowCorners.append( low );
+      highCorners.append( high );
+    }
+
+  // The same sample points on every call, so that the advice does not change between calls.
+  SIGEL_Tools::SIG_Randomizer randomizer( 1 );
+
+  QStringList pairs;
+  double worstOverlap = 0;
+
+  for ( int i = 0; i < links.size(); i++ )
+    {
+      for ( int j = i + 1; j < links.size(); j++ )
+        {
+          // The box that both links' boxes share.
+          SIG_Vector low( 0, 0, 0 );
+          SIG_Vector high( 0, 0, 0 );
+          double boxVolume = 1;
+          for ( int axis = 0; axis < 3; axis++ )
+            {
+              low.set( axis, std::max( lowCorners[i].get( axis ), lowCorners[j].get( axis ) ) );
+              high.set( axis, std::min( highCorners[i].get( axis ), highCorners[j].get( axis ) ) );
+              boxVolume *= std::max( 0.0, high.get( axis ) - low.get( axis ) );
+            }
+          if ( boxVolume == 0 )
+            continue;
+
+          int insideBoth = 0;
+          for ( int sample = 0; sample < overlapSamples; sample++ )
+            {
+              // SIG_Randomizer gives numbers below 32768.
+              SIG_Vector point( low.x + ( high.x - low.x ) * randomizer.getRandomInt( 32768 ) / 32767.0,
+                                low.y + ( high.y - low.y ) * randomizer.getRandomInt( 32768 ) / 32767.0,
+                                low.z + ( high.z - low.z ) * randomizer.getRandomInt( 32768 ) / 32767.0 );
+              if ( isInside( triangles[i], point ) && isInside( triangles[j], point ) )
+                insideBoth++;
+            }
+
+          double overlapVolume = boxVolume * insideBoth / overlapSamples;
+          double smallerVolume = std::min( masses[i] / links[i]->getMaterial()->getDensity(),
+                                           masses[j] / links[j]->getMaterial()->getDensity() );
+          double overlap = overlapVolume / smallerVolume * 100;
+
+          if ( overlap > overlapPercent )
+            {
+              pairs.append( links[i]->getName() + " and " + links[j]->getName() );
+              worstOverlap = std::max( worstOverlap, overlap );
+            }
+        }
+    }
+
+  if ( pairs.isEmpty() )
+    return;
+
+  QString text = QString( "Links that overlap at the start pose (up to %1 % of the smaller link's volume): %2. The simulation lets links pass through each other, so the robot is not the one that was drawn." )
+    .arg( worstOverlap, 0, 'g', 3 ).arg( pairs.join( ", " ) );
+  findings.append( Finding{ 5, tWarning, pairs.join( ", " ), worstOverlap, overlapPercent, text } );
+}
+
+QList<SIGEL_GP::SIG_RobotAdvisor::Triangle> SIGEL_GP::SIG_RobotAdvisor::trianglesAtStart( const StartPose &startPose, const SIGEL_Robot::SIG_Link *link ) const
+{
+  QList<Triangle> triangles;
+
+  SIGEL_Robot::SIG_GeometryIterator polygons( link->getGeometry() );
+  while ( polygons )
+    {
+      const SIGEL_Robot::SIG_Polygon &polygon = polygons.iterate();
+
+      // A polygon with more than three corners becomes a fan of triangles.
+      for ( int i = 2; i < polygon.getNumVertices(); i++ )
+        {
+          triangles.append( Triangle{ atStart( startPose, link, polygon.getVertex( 0 ) ),
+                                      atStart( startPose, link, polygon.getVertex( i - 1 ) ),
+                                      atStart( startPose, link, polygon.getVertex( i ) ) } );
+        }
+    }
+
+  return triangles;
+}
+
+bool SIGEL_GP::SIG_RobotAdvisor::isInside( const QList<Triangle> &triangles, const SIG_Vector &point ) const
+{
+  // A ray from a point inside a closed mesh leaves through an odd number of triangles.
+  // The ray's direction is slanted so that it does not run along the faces of a box.
+  const double dx = 0.5377, dy = 0.2131, dz = 0.8157;
+
+  int crossings = 0;
+  for ( const Triangle &triangle : triangles )
+    {
+      double e1x = triangle.b.x - triangle.a.x, e1y = triangle.b.y - triangle.a.y, e1z = triangle.b.z - triangle.a.z;
+      double e2x = triangle.c.x - triangle.a.x, e2y = triangle.c.y - triangle.a.y, e2z = triangle.c.z - triangle.a.z;
+
+      double px = dy * e2z - dz * e2y, py = dz * e2x - dx * e2z, pz = dx * e2y - dy * e2x;
+      double determinant = e1x * px + e1y * py + e1z * pz;
+      if ( determinant == 0 )
+        continue;
+
+      double tx = point.x - triangle.a.x, ty = point.y - triangle.a.y, tz = point.z - triangle.a.z;
+      double u = ( tx * px + ty * py + tz * pz ) / determinant;
+      if ( u < 0 || u > 1 )
+        continue;
+
+      double qx = ty * e1z - tz * e1y, qy = tz * e1x - tx * e1z, qz = tx * e1y - ty * e1x;
+      double v = ( dx * qx + dy * qy + dz * qz ) / determinant;
+      if ( v < 0 || u + v > 1 )
+        continue;
+
+      double distance = ( e2x * qx + e2y * qy + e2z * qz ) / determinant;
+      if ( distance > 0 )
+        crossings++;
+    }
+
+  return crossings % 2 == 1;
 }
 
 void SIGEL_GP::SIG_RobotAdvisor::adviseStartOutsideRange( QList<Finding> &findings ) const

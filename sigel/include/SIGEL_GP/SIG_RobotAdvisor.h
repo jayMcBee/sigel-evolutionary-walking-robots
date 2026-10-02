@@ -55,8 +55,8 @@ namespace SIGEL_GP
      * One piece of advice. check is the number of the check that found it,
      * part the robot parts it is about, value the worst that was computed and
      * limit what that was compared with. Check 1 gives both in degrees, checks
-     * 2 and 7 as heights, check 4 in percent of the robot's size, check 6 in
-     * the joint's own unit, checks 8 and 9 in seconds. Check 0 is a robot
+     * 2 and 7 as heights, check 4 in percent of the robot's size, check 5 in
+     * percent of the smaller link's volume, check 6 in the joint's own unit, checks 8 and 9 in seconds. Check 0 is a robot
      * that cannot be simulated, check 10 a link without mass. Check 11 is the
      * robot left alone on the floor, in degrees of joint motion.
      */
@@ -75,6 +75,8 @@ namespace SIGEL_GP
     // how easily a torque on the joints accelerates them: the largest
     // eigenvalue of the joints' part of the inverse mass matrix over many
     // poses. It is 0 for a robot that has a joint that does not turn.
+    struct Triangle { SIG_Vector a, b, c; };
+
     struct StartPose { QList<SIG_Vector> positions; QList<SIG_Matrix> orientations; double jointMobility; };
 
     void adviseLimitCannotHoldDrive( QList<Finding> &findings ) const;
@@ -86,6 +88,7 @@ namespace SIGEL_GP
     bool adviseLinkWithoutMass( QList<Finding> &findings, const QList<double> &masses, const SIGEL_Robot::SIG_Robot &startRobot ) const;
     void adviseStrokeThrowsRobot( QList<Finding> &findings, const QList<double> &masses, const SIGEL_Robot::SIG_Robot &startRobot ) const;
     void adviseAxisOffEdge( QList<Finding> &findings, const SIGEL_Robot::SIG_Robot &startRobot, const StartPose &startPose ) const;
+    void adviseLinksOverlap( QList<Finding> &findings, const QList<double> &masses, const SIGEL_Robot::SIG_Robot &startRobot, const StartPose &startPose ) const;
     void adviseStartHeight( QList<Finding> &findings, const SIGEL_Robot::SIG_Robot &startRobot, const StartPose &startPose ) const;
     void adviseStepForGroundContact( QList<Finding> &findings, const QList<double> &masses, const SIGEL_Robot::SIG_Robot &startRobot ) const;
     void adviseStepForJoints( QList<Finding> &findings, const StartPose &startPose ) const;
@@ -97,10 +100,15 @@ namespace SIGEL_GP
     double offAxis( const StartPose &startPose, const SIGEL_Robot::SIG_Link *link, SIG_Vector axisPoint, SIG_Vector axis ) const;
     double sizeAtStart( const SIGEL_Robot::SIG_Robot &startRobot, const StartPose &startPose ) const;
     void extentAtStart( const SIGEL_Robot::SIG_Robot &startRobot, const StartPose &startPose, int axis, double &lowest, double &highest ) const;
+    QList<Triangle> trianglesAtStart( const StartPose &startPose, const SIGEL_Robot::SIG_Link *link ) const;
+    bool isInside( const QList<Triangle> &triangles, const SIG_Vector &point ) const;
     double turnBetween( SIG_Matrix left, SIG_Matrix right, SIG_Matrix leftAtStart, SIG_Matrix rightAtStart ) const;
 
     // Measured on the seven shipped robots and one rejected model. A joint that is a pin in a fork is above it and sound.
     static constexpr double axisOffEdgePercent = 1.0;
+    // The shipped robots and a robot of pins in forks overlap by 0.03 % at most; a rejected model by 5.8 %.
+    static constexpr double overlapPercent = 1.0;
+    static constexpr int overlapSamples = 20000;
     // Of the seven shipped robots, the two above 8 start heights are thrown; the highest quiet one is at 6.1.
     static constexpr double throwStartHeights = 8.0;
     // The simulation's floor is at 0 whatever YPLANELEVEL says.
