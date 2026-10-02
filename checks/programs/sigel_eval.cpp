@@ -30,7 +30,7 @@
 #include "SIGEL_GP/SIG_GPFitnessFunctionRegistry.h"
 #include "SIGEL_GP/SIG_GPRemoteZORCFitnessFunction.h"
 #include "SIGEL_GP/SIG_GPFullDataRecorder.h"
-#include "SIGEL_GP/SIG_RobotAdvisor.h"
+#include "SIGEL_GP/SIG_RobotChecker.h"
 #include "SIGEL_Robot/SIG_CommandParameters.h"
 #include "SIGEL_Robot/SIG_Joint.h"
 #include "SIGEL_Robot/SIG_LanguageParameters.h"
@@ -364,11 +364,11 @@ int main(int argc, char *argv[])
   bool verbose = false;
   if (argc > 1 && QString(argv[1]) == "-v") { verbose = true; argv++; argc--; }
   if (argc > 1 && QString(argv[1]) == "-selfcheck") return selfcheck();
-  bool advise = false;
-  if (argc > 1 && QString(argv[1]) == "-advise") { advise = true; argv++; argc--; }
+  bool robotCheck = false;
+  if (argc > 1 && QString(argv[1]) == "-check") { robotCheck = true; argv++; argc--; }
 
   if (argc < 2 || argc > 3) {
-    fprintf(stderr, "usage: %s [-v] [-advise] <experiment.exp> [individual, default 0]\n", argv[0]);
+    fprintf(stderr, "usage: %s [-v] [-check] <experiment.exp> [individual, default 0]\n", argv[0]);
     return 2;
   }
 
@@ -406,18 +406,19 @@ int main(int argc, char *argv[])
   }
   file.close();
 
-  // One line per finding, tab-separated: check, kind, part, value, limit, text;
+  // One line per finding, tab-separated: check, kind, part, value, limit, title,
+  // analysis, advice;
   // then one line that counts them.
-  if (advise) {
-    SIGEL_GP::SIG_RobotAdvisor advisor(experiment.robot, experiment.simulationParameter, experiment.environment, experiment.gpParameter);
+  if (robotCheck) {
+    SIGEL_GP::SIG_RobotChecker checker(experiment.robot, experiment.simulationParameter, experiment.environment, experiment.gpParameter);
     int count[3] = { 0, 0, 0 };
-    for (const SIGEL_GP::SIG_RobotAdvisor::Finding &finding : advisor.advise()) {
+    for (const SIGEL_GP::SIG_RobotChecker::Finding &finding : checker.check()) {
       count[finding.kind]++;
-      printf("%d\t%s\t%s\t%.6g\t%.6g\t%s\n", finding.check,
-             finding.kind == SIGEL_GP::SIG_RobotAdvisor::tError ? "error" : finding.kind == SIGEL_GP::SIG_RobotAdvisor::tWarning ? "warning" : "suggestion", qPrintable(finding.part),
-             finding.value, finding.limit, qPrintable(finding.text));
+      printf("%d\t%s\t%s\t%.6g\t%.6g\t%s\t%s\t%s\n", finding.check,
+             finding.kind == SIGEL_GP::SIG_RobotChecker::tError ? "error" : finding.kind == SIGEL_GP::SIG_RobotChecker::tWarning ? "warning" : "suggestion", qPrintable(finding.part),
+             finding.value, finding.limit, qPrintable(finding.title), qPrintable(finding.analysis), qPrintable(finding.advice));
     }
-    printf("advisor: errors %d, warnings %d, suggestions %d\n", count[0], count[1], count[2]);
+    printf("check: errors %d, warnings %d, suggestions %d\n", count[0], count[1], count[2]);
     return 0;
   }
 

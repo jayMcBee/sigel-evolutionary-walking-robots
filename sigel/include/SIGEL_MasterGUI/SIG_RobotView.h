@@ -26,7 +26,7 @@
 #include "SIGEL_MasterGUI/SIG_RobotBase.h"
 
 #include "SIGEL_GP/SIG_GPExperiment.h"
-#include "SIGEL_GP/SIG_RobotAdvisor.h"
+#include "SIGEL_GP/SIG_RobotChecker.h"
 
 namespace SIGEL_MasterGUI
 {
@@ -52,12 +52,20 @@ public:
     void getOutOfExperiment();
 
     /**
-     * Shows the advisor's findings in the advice list.
+     * Shows the checker's findings in the list of findings.
      */
-    void showAdvice( const QList<SIGEL_GP::SIG_RobotAdvisor::Finding> &findings );
+    void showFindings( const QList<SIGEL_GP::SIG_RobotChecker::Finding> &findings );
+
+ private slots:
+    /**
+     * Shows the detail of the finding that is selected in the list of findings.
+     */
+    void slotFindingSelected();
 
  private:
     SIGEL_GP::SIG_GPExperiment &theExperiment;
+
+    QList<SIGEL_GP::SIG_RobotChecker::Finding> shownFindings;
 };
 
 }

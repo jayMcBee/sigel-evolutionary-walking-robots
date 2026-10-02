@@ -245,10 +245,45 @@
         </widget>
       </item>
       <item row="1" column="0">
-        <widget class="QListWidget" name="listboxAdvice">
-          <property name="wordWrap">
-            <bool>true</bool>
+        <widget class="QGroupBox" name="groupboxRobotCheck">
+          <property name="title">
+            <string>Robot check</string>
           </property>
+          <layout class="QVBoxLayout">
+            <property name="margin">
+              <number>11</number>
+            </property>
+            <property name="spacing">
+              <number>6</number>
+            </property>
+            <item>
+              <widget class="QTreeWidget" name="listviewFindings">
+                <property name="rootIsDecorated">
+                  <bool>false</bool>
+                </property>
+                <property name="allColumnsShowFocus">
+                  <bool>true</bool>
+                </property>
+                <column>
+                  <property name="text">
+                    <string>Type</string>
+                  </property>
+                </column>
+                <column>
+                  <property name="text">
+                    <string>Finding</string>
+                  </property>
+                </column>
+              </widget>
+            </item>
+            <item>
+              <widget class="QTextEdit" name="texteditFindingDetail">
+                <property name="readOnly">
+                  <bool>true</bool>
+                </property>
+              </widget>
+            </item>
+          </layout>
         </widget>
       </item>
       <item row="2" column="0">
@@ -316,9 +351,9 @@
             </widget>
           </item>
           <item>
-            <widget class="QPushButton" name="pushbuttonRobAdvise">
+            <widget class="QPushButton" name="pushbuttonRobCheck">
               <property name="text">
-                <string>Advise</string>
+                <string>Check</string>
               </property>
               <property name="toolTip">
                 <string>List what will probably make an evolution with this robot fail or mislead.</string>

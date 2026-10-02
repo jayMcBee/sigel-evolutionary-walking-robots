@@ -192,10 +192,10 @@ namespace SIGEL_MasterGUI
 		    this,
 		    SLOT( slotRobotInfo() ) );
 
-  QObject::connect( robotView->pushbuttonRobAdvise,
+  QObject::connect( robotView->pushbuttonRobCheck,
 		    SIGNAL( clicked() ),
 		    this,
-		    SLOT( slotRobotAdvise() ) );
+		    SLOT( slotRobotCheck() ) );
 
   QObject::connect( allIndividualsView,
 		    SIGNAL( signalDataRefreshNeeded() ),
@@ -768,19 +768,19 @@ void SIG_GUIGPExperiment::slotRobotInfo()
   }
 }
 
-void SIG_GUIGPExperiment::slotRobotAdvise()
+void SIG_GUIGPExperiment::slotRobotCheck()
 {
   if ( gpExperiment.robot.getBodies().size() == 0 )
     {
-      QMessageBox::information( experimentListView, "Robot Advisor", "No robot is loaded. Load a robot first." );
+      QMessageBox::information( experimentListView, "Robot Check", "No robot is loaded. Load a robot first." );
       return;
     }
 
-  // The advisor reads settings that other pages edit.
+  // The checker reads settings that other pages edit.
   putAllIntoExperiment();
 
-  SIGEL_GP::SIG_RobotAdvisor advisor( gpExperiment.robot, gpExperiment.simulationParameter, gpExperiment.environment, gpExperiment.gpParameter );
-  robotView->showAdvice( advisor.advise() );
+  SIGEL_GP::SIG_RobotChecker checker( gpExperiment.robot, gpExperiment.simulationParameter, gpExperiment.environment, gpExperiment.gpParameter );
+  robotView->showFindings( checker.check() );
 }
 
 void SIG_GUIGPExperiment::slotEvolutionStopped()

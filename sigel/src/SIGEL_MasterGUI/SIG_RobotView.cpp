@@ -21,6 +21,7 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 #include <qlabel.h>
+#include <qstyle.h>
 
 #include "SIGEL_MasterGUI/SIG_RobotView.h"
 #include "SIGEL_Robot/SIG_PitchRollSensor.h"
@@ -39,6 +40,10 @@ namespace SIGEL_MasterGUI
 SIG_RobotView::SIG_RobotView( QWidget* parent,  const char* name, Qt::WindowFlags fl, SIGEL_GP::SIG_GPExperiment &theExperiment )
   : SIG_RobotBase( parent, name, fl ), theExperiment( theExperiment )
 {
+  QObject::connect( listviewFindings,
+		    SIGNAL( itemSelectionChanged() ),
+		    this,
+		    SLOT( slotFindingSelected() ) );
 }
 
 void SIG_RobotView::putIntoExperiment()
@@ -60,7 +65,8 @@ void SIG_RobotView::getOutOfExperiment()
   listboxJoints->clear();
   listboxDrives->clear();
   listboxSensors->clear();
-  listboxAdvice->clear();
+  showFindings( QList<SIGEL_GP::SIG_RobotChecker::Finding>() );
+  texteditFindingDetail->clear();
 
    // now fill the 6 listboxes describing the robot properties;
    // Manage the Bodies listbox
@@ -153,22 +159,66 @@ void SIG_RobotView::getOutOfExperiment()
    }
 }
 
-void SIG_RobotView::showAdvice( const QList<SIGEL_GP::SIG_RobotAdvisor::Finding> &findings )
+void SIG_RobotView::showFindings( const QList<SIGEL_GP::SIG_RobotChecker::Finding> &findings )
 {
-  listboxAdvice->clear();
+  shownFindings = findings;
+  listviewFindings->clear();
+  texteditFindingDetail->clear();
 
-  if ( findings.isEmpty() )
-    listboxAdvice->addItem( "The advisor found nothing." );
-
-  for ( const SIGEL_GP::SIG_RobotAdvisor::Finding &finding : findings )
+  if ( shownFindings.isEmpty() )
     {
-      QString kind = "Suggestion: ";
-      if ( finding.kind == SIGEL_GP::SIG_RobotAdvisor::tError )
-        kind = "Error: ";
-      if ( finding.kind == SIGEL_GP::SIG_RobotAdvisor::tWarning )
-        kind = "Warning: ";
-      listboxAdvice->addItem( kind + finding.text );
+      texteditFindingDetail->setPlainText( "The check found nothing." );
+      return;
     }
+
+  for ( const SIGEL_GP::SIG_RobotChecker::Finding &finding : shownFindings )
+    {
+      QTreeWidgetItem *item = new QTreeWidgetItem( listviewFindings );
+
+      switch ( finding.kind )
+        {
+        case SIGEL_GP::SIG_RobotChecker::tError:
+          item->setIcon( 0, style()->standardIcon( QStyle::SP_MessageBoxCritical ) );
+          item->setText( 0, "Error" );
+          break;
+
+        case SIGEL_GP::SIG_RobotChecker::tWarning:
+          item->setIcon( 0, style()->standardIcon( QStyle::SP_MessageBoxWarning ) );
+          item->setText( 0, "Warning" );
+          break;
+
+        case SIGEL_GP::SIG_RobotChecker::tSuggestion:
+          item->setIcon( 0, style()->standardIcon( QStyle::SP_MessageBoxInformation ) );
+          item->setText( 0, "Suggestion" );
+          break;
+        }
+
+      item->setText( 1, finding.title );
+    }
+
+  listviewFindings->resizeColumnToContents( 0 );
+  listviewFindings->setCurrentItem( listviewFindings->topLevelItem( 0 ) );
+}
+
+void SIG_RobotView::slotFindingSelected()
+{
+  int row = listviewFindings->indexOfTopLevelItem( listviewFindings->currentItem() );
+  if ( row < 0 || row >= shownFindings.size() )
+    {
+      texteditFindingDetail->clear();
+      return;
+    }
+
+  const SIGEL_GP::SIG_RobotChecker::Finding &finding = shownFindings[ row ];
+
+  QString detail = "<table cellspacing=\"4\">";
+  if ( !finding.part.isEmpty() )
+    detail += "<tr><td><b>Parts:</b></td><td>" + finding.part.toHtmlEscaped() + "</td></tr>";
+  detail += "<tr><td><b>Analysis:</b></td><td>" + finding.analysis.toHtmlEscaped() + "</td></tr>";
+  detail += "<tr><td><b>Advice:</b></td><td>" + finding.advice.toHtmlEscaped() + "</td></tr>";
+  detail += "</table>";
+
+  texteditFindingDetail->setHtml( detail );
 }
 
 }  //    { namespace SIGEL_MasterGUI }

@@ -21,7 +21,7 @@
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-#include "SIGEL_GP/SIG_RobotAdvisor.h"
+#include "SIGEL_GP/SIG_RobotChecker.h"
 
 #include "SIGEL_Robot/SIG_CylindricalJoint.h"
 #include "SIGEL_Robot/SIG_Drive.h"
@@ -42,7 +42,7 @@
 #include <cmath>
 #include <vector>
 
-SIGEL_GP::SIG_RobotAdvisor::SIG_RobotAdvisor( const SIGEL_Robot::SIG_Robot &robot,
+SIGEL_GP::SIG_RobotChecker::SIG_RobotChecker( const SIGEL_Robot::SIG_Robot &robot,
                                               const SIGEL_Simulation::SIG_SimulationParameters &simulationParameter,
                                               const SIGEL_Environment::SIG_Environment &environment,
                                               const SIGEL_GP::SIG_GPParameter &gpParameter )
@@ -53,7 +53,7 @@ SIGEL_GP::SIG_RobotAdvisor::SIG_RobotAdvisor( const SIGEL_Robot::SIG_Robot &robo
 {
 }
 
-QList<SIGEL_GP::SIG_RobotAdvisor::Finding> SIGEL_GP::SIG_RobotAdvisor::advise() const
+QList<SIGEL_GP::SIG_RobotChecker::Finding> SIGEL_GP::SIG_RobotChecker::check() const
 {
   QList<Finding> errors;
   QList<Finding> warnings;
@@ -82,23 +82,23 @@ QList<SIGEL_GP::SIG_RobotAdvisor::Finding> SIGEL_GP::SIG_RobotAdvisor::advise() 
           masses.append( mass );
         }
 
-      bool everyLinkHasMass = adviseLinkWithoutMass( errors, masses, startRobot );
+      bool everyLinkHasMass = checkLinkWithoutMass( errors, masses, startRobot );
 
-      adviseLimitCannotHoldDrive( warnings );
+      checkLimitCannotHoldDrive( warnings );
       if ( everyLinkHasMass )
-        adviseStrokeThrowsRobot( warnings, masses, startRobot );
-      adviseSenseWithoutSensors( warnings );
+        checkStrokeThrowsRobot( warnings, masses, startRobot );
+      checkSenseWithoutSensors( warnings );
       if ( everyLinkHasMass )
-        adviseLinksOverlap( warnings, masses, startRobot, startPose );
-      adviseStartOutsideRange( warnings );
+        checkLinksOverlap( warnings, masses, startRobot, startPose );
+      checkStartOutsideRange( warnings );
 
-      adviseAxisOffEdge( suggestions, startRobot, startPose );
-      adviseStartHeight( suggestions, startRobot, startPose );
+      checkAxisOffEdge( suggestions, startRobot, startPose );
+      checkStartHeight( suggestions, startRobot, startPose );
       if ( everyLinkHasMass )
         {
-          adviseStepForGroundContact( suggestions, masses, startRobot );
-          adviseStepForJoints( suggestions, startPose );
-          adviseHoldsStartPose( errors, warnings, suggestions, startRobot, startPose );
+          checkStepForGroundContact( suggestions, masses, startRobot );
+          checkStepForJoints( suggestions, startPose );
+          checkHoldsStartPose( errors, warnings, suggestions, startRobot, startPose );
         }
     }
   catch ( SIGEL_Tools::SIG_Exception &e )
@@ -107,16 +107,17 @@ QList<SIGEL_GP::SIG_RobotAdvisor::Finding> SIGEL_GP::SIG_RobotAdvisor::advise() 
       warnings.clear();
       suggestions.clear();
       // The message's later lines name the source file that threw.
-      errors.append( Finding{ 0, tError, QString(), 0, 0, "The robot cannot be simulated: " + e.getMessage().section( '\n', 0, 0 ) } );
-      adviseLimitCannotHoldDrive( warnings );
-      adviseSenseWithoutSensors( warnings );
-      adviseStartOutsideRange( warnings );
+      errors.append( Finding{ 0, tError, "Robot cannot be simulated", QString(), e.getMessage().section( '\n', 0, 0 ) + " No program can be scored.",
+                              "Correct the robot model.", 0, 0 } );
+      checkLimitCannotHoldDrive( warnings );
+      checkSenseWithoutSensors( warnings );
+      checkStartOutsideRange( warnings );
     }
 
   return errors + warnings + suggestions;
 }
 
-bool SIGEL_GP::SIG_RobotAdvisor::adviseLinkWithoutMass( QList<Finding> &findings, const QList<double> &masses, const SIGEL_Robot::SIG_Robot &startRobot ) const
+bool SIGEL_GP::SIG_RobotChecker::checkLinkWithoutMass( QList<Finding> &findings, const QList<double> &masses, const SIGEL_Robot::SIG_Robot &startRobot ) const
 {
   QStringList links;
   double lowest = 0;
@@ -134,18 +135,20 @@ bool SIGEL_GP::SIG_RobotAdvisor::adviseLinkWithoutMass( QList<Finding> &findings
   if ( links.isEmpty() )
     return true;
 
-  QString text = QString( "Links with a mass of 0 or less: %1. The faces of their bodies probably face inwards. The simulation cannot work with them." )
-    .arg( links.join( ", " ) );
-  findings.append( Finding{ 10, tError, links.join( ", " ), lowest, 0, text } );
+  findings.append( Finding{ 10, tError, "Link without mass", links.join( ", " ),
+                            QString( "The mass of these links is 0 or less (lowest %1), so the simulation cannot work with them." ).arg( lowest ),
+                            "The faces of their bodies probably face inwards. Turn them outwards.", lowest, 0 } );
   return false;
 }
 
-void SIGEL_GP::SIG_RobotAdvisor::adviseLimitCannotHoldDrive( QList<Finding> &findings ) const
+void SIGEL_GP::SIG_RobotChecker::checkLimitCannotHoldDrive( QList<Finding> &findings ) const
 {
   double spring = simulationParameter.getJointLimitsK_spring();
   if ( spring <= 0 )
     {
-      findings.append( Finding{ 1, tWarning, QString(), spring, 0, "The joint-limit spring is 0 or less, so no joint limit holds a drive. Raise the joint-limit spring." } );
+      findings.append( Finding{ 1, tWarning, "Joint limit cannot hold its drive", QString(),
+                                QString( "The joint-limit spring is %1, so no joint limit holds a drive." ).arg( spring ),
+                                "Raise the joint-limit spring.", spring, 0 } );
       return;
     }
 
@@ -183,12 +186,12 @@ void SIGEL_GP::SIG_RobotAdvisor::adviseLimitCannotHoldDrive( QList<Finding> &fin
   if ( drives.isEmpty() )
     return;
 
-  QString text = QString( "Drives that can push their joint further past its limit than the joint's range (up to %1 degrees past, range %2): %3. The joint may fold through or spin freely. Lower the drive force or raise the joint-limit spring." )
-    .arg( worstPastLimit, 0, 'f', 0 ).arg( worstRange ).arg( drives.join( ", " ) );
-  findings.append( Finding{ 1, tWarning, drives.join( ", " ), worstPastLimit, worstRange, text } );
+  findings.append( Finding{ 1, tWarning, "Joint limit cannot hold its drive", drives.join( ", " ),
+                            QString( "These drives can push their joint up to %1 degrees past its limit, more than the joint's range of %2 degrees. The joint may fold through or spin freely." ).arg( worstPastLimit, 0, 'f', 0 ).arg( worstRange ),
+                            "Lower the drive force or raise the joint-limit spring.", worstPastLimit, worstRange } );
 }
 
-void SIGEL_GP::SIG_RobotAdvisor::adviseStrokeThrowsRobot( QList<Finding> &findings, const QList<double> &masses, const SIGEL_Robot::SIG_Robot &startRobot ) const
+void SIGEL_GP::SIG_RobotChecker::checkStrokeThrowsRobot( QList<Finding> &findings, const QList<double> &masses, const SIGEL_Robot::SIG_Robot &startRobot ) const
 {
   double totalMass = 0;
   for ( double mass : masses )
@@ -229,21 +232,23 @@ void SIGEL_GP::SIG_RobotAdvisor::adviseStrokeThrowsRobot( QList<Finding> &findin
   if ( drives.isEmpty() )
     return;
 
-  QString text = QString( "Drives strong enough to throw the robot (one stroke can lift it up to %1 high; the start height is %2): %3. Expect random programs to fling it. Lower the drive force." )
-    .arg( highestStroke, 0, 'g', 3 ).arg( startHeight ).arg( drives.join( ", " ) );
-  findings.append( Finding{ 2, tWarning, drives.join( ", " ), highestStroke, throwHeight, text } );
+  findings.append( Finding{ 2, tWarning, "Drive too strong for the robot's weight", drives.join( ", " ),
+                            QString( "At full force, one turn of the joint through its range can lift the whole robot up to %1 high. The robot starts at height %2. Random programs throw it into the air." ).arg( highestStroke, 0, 'g', 3 ).arg( startHeight ),
+                            "Lower the drive force.", highestStroke, throwHeight } );
 }
 
-void SIGEL_GP::SIG_RobotAdvisor::adviseSenseWithoutSensors( QList<Finding> &findings ) const
+void SIGEL_GP::SIG_RobotChecker::checkSenseWithoutSensors( QList<Finding> &findings ) const
 {
   // With probability 0 no program contains a SENSE.
   if (    robot.getSensors().isEmpty()
        && robot.getLangParam()->hasCommand( "SENSE" )
        && gpParameter.getProbability( SIGEL_Program::SENSE ) > 0 )
-    findings.append( Finding{ 3, tWarning, QString(), 0, 0, "The robot has no sensors but SENSE is allowed; every SENSE does nothing." } );
+    findings.append( Finding{ 3, tWarning, "SENSE without sensors", QString(),
+                              "The robot has no sensors but SENSE is allowed, so every SENSE does nothing.",
+                              "Give the robot sensors, or take SENSE out of the language parameters.", 0, 0 } );
 }
 
-void SIGEL_GP::SIG_RobotAdvisor::adviseAxisOffEdge( QList<Finding> &findings, const SIGEL_Robot::SIG_Robot &startRobot, const StartPose &startPose ) const
+void SIGEL_GP::SIG_RobotChecker::checkAxisOffEdge( QList<Finding> &findings, const SIGEL_Robot::SIG_Robot &startRobot, const StartPose &startPose ) const
 {
   double size = sizeAtStart( startRobot, startPose );
 
@@ -291,12 +296,12 @@ void SIGEL_GP::SIG_RobotAdvisor::adviseAxisOffEdge( QList<Finding> &findings, co
   if ( jointsOffEdge == rotationalJoints && rotationalJoints > 1 )
     pairs = QStringList( QString( "all %1 joints" ).arg( rotationalJoints ) );
 
-  QString text = QString( "No edge of the link lies on the joint's axis (up to %1 % of the robot's size away): %2. Look at the robot to see that the parts neither overlap nor float apart when the joint turns." )
-    .arg( worstOffEdge, 0, 'g', 3 ).arg( pairs.join( ", " ) );
-  findings.append( Finding{ 4, tSuggestion, pairs.join( ", " ), worstOffEdge, axisOffEdgePercent, text } );
+  findings.append( Finding{ 4, tSuggestion, "No link edge on the joint's axis", pairs.join( ", " ),
+                            QString( "The joint's axis is up to %1 % of the robot's size away from the nearest edge of the link. The parts may overlap or float apart when the joint turns." ).arg( worstOffEdge, 0, 'g', 3 ),
+                            "Look at the robot. A pin in a fork is sound.", worstOffEdge, axisOffEdgePercent } );
 }
 
-void SIGEL_GP::SIG_RobotAdvisor::adviseLinksOverlap( QList<Finding> &findings, const QList<double> &masses, const SIGEL_Robot::SIG_Robot &startRobot, const StartPose &startPose ) const
+void SIGEL_GP::SIG_RobotChecker::checkLinksOverlap( QList<Finding> &findings, const QList<double> &masses, const SIGEL_Robot::SIG_Robot &startRobot, const StartPose &startPose ) const
 {
   const QList<SIGEL_Robot::SIG_Link *> &links = startRobot.getLinks();
 
@@ -327,7 +332,7 @@ void SIGEL_GP::SIG_RobotAdvisor::adviseLinksOverlap( QList<Finding> &findings, c
       highCorners.append( high );
     }
 
-  // The same sample points on every call, so that the advice does not change between calls.
+  // The same sample points on every call, so that the findings do not change between calls.
   SIGEL_Tools::SIG_Randomizer randomizer( 1 );
 
   QStringList pairs;
@@ -377,12 +382,12 @@ void SIGEL_GP::SIG_RobotAdvisor::adviseLinksOverlap( QList<Finding> &findings, c
   if ( pairs.isEmpty() )
     return;
 
-  QString text = QString( "Links that overlap at the start pose (up to %1 % of the smaller link's volume): %2. The simulation lets links pass through each other, so the robot is not the one that was drawn." )
-    .arg( worstOverlap, 0, 'g', 3 ).arg( pairs.join( ", " ) );
-  findings.append( Finding{ 5, tWarning, pairs.join( ", " ), worstOverlap, overlapPercent, text } );
+  findings.append( Finding{ 5, tWarning, "Links overlap", pairs.join( ", " ),
+                            QString( "At the start pose these links share up to %1 % of the smaller link's volume. The simulation lets links pass through each other." ).arg( worstOverlap, 0, 'g', 3 ),
+                            "Move the links apart in the robot model.", worstOverlap, overlapPercent } );
 }
 
-QList<SIGEL_GP::SIG_RobotAdvisor::Triangle> SIGEL_GP::SIG_RobotAdvisor::trianglesAtStart( const StartPose &startPose, const SIGEL_Robot::SIG_Link *link ) const
+QList<SIGEL_GP::SIG_RobotChecker::Triangle> SIGEL_GP::SIG_RobotChecker::trianglesAtStart( const StartPose &startPose, const SIGEL_Robot::SIG_Link *link ) const
 {
   QList<Triangle> triangles;
 
@@ -403,7 +408,7 @@ QList<SIGEL_GP::SIG_RobotAdvisor::Triangle> SIGEL_GP::SIG_RobotAdvisor::triangle
   return triangles;
 }
 
-bool SIGEL_GP::SIG_RobotAdvisor::isInside( const QList<Triangle> &triangles, const SIG_Vector &point ) const
+bool SIGEL_GP::SIG_RobotChecker::isInside( const QList<Triangle> &triangles, const SIG_Vector &point ) const
 {
   // A ray from a point inside a closed mesh leaves through an odd number of triangles.
   // The ray's direction is slanted so that it does not run along the faces of a box.
@@ -438,7 +443,7 @@ bool SIGEL_GP::SIG_RobotAdvisor::isInside( const QList<Triangle> &triangles, con
   return crossings % 2 == 1;
 }
 
-void SIGEL_GP::SIG_RobotAdvisor::adviseStartOutsideRange( QList<Finding> &findings ) const
+void SIGEL_GP::SIG_RobotChecker::checkStartOutsideRange( QList<Finding> &findings ) const
 {
   QStringList joints;
   double firstInitial = 0;
@@ -508,12 +513,12 @@ void SIGEL_GP::SIG_RobotAdvisor::adviseStartOutsideRange( QList<Finding> &findin
   if ( joints.isEmpty() )
     return;
 
-  QString text = QString( "Joints that start outside their own range: %1. The limit spring kicks them at the first step." )
-    .arg( joints.join( ", " ) );
-  findings.append( Finding{ 6, tWarning, joints.join( ", " ), firstInitial, firstLimit, text } );
+  findings.append( Finding{ 6, tWarning, "Joint starts outside its range", joints.join( ", " ),
+                            "The start angle of these joints is outside their own range, so the limit spring kicks them at the first step.",
+                            "Put init between minimal and maximal.", firstInitial, firstLimit } );
 }
 
-bool SIGEL_GP::SIG_RobotAdvisor::startsOutsideRange( double minimum, double maximum, double initial ) const
+bool SIGEL_GP::SIG_RobotChecker::startsOutsideRange( double minimum, double maximum, double initial ) const
 {
   // A joint whose minimum equals its maximum has no limit.
   if ( minimum == maximum )
@@ -522,7 +527,7 @@ bool SIGEL_GP::SIG_RobotAdvisor::startsOutsideRange( double minimum, double maxi
   return initial < minimum || initial > maximum;
 }
 
-void SIGEL_GP::SIG_RobotAdvisor::adviseStartHeight( QList<Finding> &findings, const SIGEL_Robot::SIG_Robot &startRobot, const StartPose &startPose ) const
+void SIGEL_GP::SIG_RobotChecker::checkStartHeight( QList<Finding> &findings, const SIGEL_Robot::SIG_Robot &startRobot, const StartPose &startPose ) const
 {
   // A face that lies on the floor is below it by rounding only.
   double belowFloor = floorLevel - 1e-9 * sizeAtStart( startRobot, startPose );
@@ -550,12 +555,12 @@ void SIGEL_GP::SIG_RobotAdvisor::adviseStartHeight( QList<Finding> &findings, co
     return;
 
   double startHeight = environment.getStartPosition().y;
-  QString text = QString( "Start height %1 puts %2 vertices below the floor (lowest on link %3); the floor throws the robot up at the first step. The lowest safe start height is %4." )
-    .arg( startHeight ).arg( verticesBelowFloor ).arg( lowestLink ).arg( startHeight + floorLevel - lowest );
-  findings.append( Finding{ 7, tSuggestion, lowestLink, lowest, floorLevel, text } );
+  findings.append( Finding{ 7, tSuggestion, "Robot starts inside the floor", lowestLink,
+                            QString( "Start height %1 puts %2 vertices below the floor, the lowest on this link. The floor throws the robot up at the first step." ).arg( startHeight ).arg( verticesBelowFloor ),
+                            QString( "Set the start height to %1 or more." ).arg( startHeight + floorLevel - lowest ), lowest, floorLevel } );
 }
 
-void SIGEL_GP::SIG_RobotAdvisor::adviseStepForGroundContact( QList<Finding> &findings, const QList<double> &masses, const SIGEL_Robot::SIG_Robot &startRobot ) const
+void SIGEL_GP::SIG_RobotChecker::checkStepForGroundContact( QList<Finding> &findings, const QList<double> &masses, const SIGEL_Robot::SIG_Robot &startRobot ) const
 {
   if ( masses.isEmpty() )
     return;
@@ -573,13 +578,13 @@ void SIGEL_GP::SIG_RobotAdvisor::adviseStepForGroundContact( QList<Finding> &fin
 
   if ( simulationParameter.getStepSize() > suggestedStep )
     {
-      QString text = QString( "Step size %1 is above the suggested %2 for ground contact (lightest link %3, mass %4). Runs may still work; if robots fly off or scores are 0, lower the step size." )
-        .arg( simulationParameter.getStepSize() ).arg( suggestedStep, 0, 'g', 3 ).arg( lightestLink ).arg( lightestMass, 0, 'g', 3 );
-      findings.append( Finding{ 8, tSuggestion, lightestLink, simulationParameter.getStepSize(), suggestedStep, text } );
+      findings.append( Finding{ 8, tSuggestion, "Step size for ground contact", lightestLink,
+                                QString( "Step size %1 is above the suggested %2 for ground contact on the lightest link (mass %3). Runs may still work; if they do not, robots fly off or score 0." ).arg( simulationParameter.getStepSize() ).arg( suggestedStep, 0, 'g', 3 ).arg( lightestMass, 0, 'g', 3 ),
+                                "Lower the step size.", simulationParameter.getStepSize(), suggestedStep } );
     }
 }
 
-SIGEL_GP::SIG_RobotAdvisor::StartPose SIGEL_GP::SIG_RobotAdvisor::startPoseOf( const SIGEL_Robot::SIG_Robot &startRobot ) const
+SIGEL_GP::SIG_RobotChecker::StartPose SIGEL_GP::SIG_RobotChecker::startPoseOf( const SIGEL_Robot::SIG_Robot &startRobot ) const
 {
   // The simulation data makes its own environment the global one; other code still needs the one from before.
   dmEnvironment *environmentBefore = dmEnvironment::getEnvironment();
@@ -608,7 +613,7 @@ SIGEL_GP::SIG_RobotAdvisor::StartPose SIGEL_GP::SIG_RobotAdvisor::startPoseOf( c
   return startPose;
 }
 
-void SIGEL_GP::SIG_RobotAdvisor::adviseStepForJoints( QList<Finding> &findings, const StartPose &startPose ) const
+void SIGEL_GP::SIG_RobotChecker::checkStepForJoints( QList<Finding> &findings, const StartPose &startPose ) const
 {
   double mobility = startPose.jointMobility;
   if ( !( mobility > 0 ) )
@@ -627,21 +632,30 @@ void SIGEL_GP::SIG_RobotAdvisor::adviseStepForJoints( QList<Finding> &findings, 
   if ( simulationParameter.getStepSize() <= suggestedStep )
     return;
 
-  QString text = QString( "Step size %1 is above the suggested %2 for the joints, limited by the joint-limit spring. Runs may still work; the spring acts only past a limit." );
+  QString limitedBy = "the joint-limit spring";
+  QString effect = "Runs may still work; the spring acts only past a limit.";
+  QString advice = "Lower the step size or the joint-limit spring.";
   if ( fastestRate == damperRate )
-    text = QString( "Step size %1 is above the suggested %2 for the joints, limited by the joint-limit damper. Runs may still work; the damper acts only past a limit." );
+    {
+      limitedBy = "the joint-limit damper";
+      effect = "Runs may still work; the damper acts only past a limit.";
+      advice = "Lower the step size or the joint-limit damper.";
+    }
   if ( fastestRate == frictionRate )
     {
-      text = QString( "Step size %1 is above the suggested %2 for the joints, limited by joint friction. It is close to the limit: the simulation works but has no margin." );
+      limitedBy = "joint friction";
+      effect = "The step is close to the limit: the simulation works but has no margin.";
       if ( simulationParameter.getStepSize() * frictionRate > jointFrictionInstability )
-        text = QString( "Step size %1 is above the suggested %2 for the joints, limited by joint friction. Expect scores of 0 from a simulation that breaks down; lower the step size or the joint friction." );
+        effect = "The simulation breaks down, and programs score 0.";
+      advice = "Lower the step size or the joint friction.";
     }
 
-  findings.append( Finding{ 9, tSuggestion, QString(), simulationParameter.getStepSize(), suggestedStep,
-                            text.arg( simulationParameter.getStepSize() ).arg( suggestedStep, 0, 'g', 3 ) } );
+  findings.append( Finding{ 9, tSuggestion, "Step size for the joints", QString(),
+                            QString( "Step size %1 is above the suggested %2 for the joints, limited by %3. " ).arg( simulationParameter.getStepSize() ).arg( suggestedStep, 0, 'g', 3 ).arg( limitedBy ) + effect,
+                            advice, simulationParameter.getStepSize(), suggestedStep } );
 }
 
-double SIGEL_GP::SIG_RobotAdvisor::jointMobilityOf( SIGEL_Simulation::SIG_DynaMechsSimulationData &simulationData ) const
+double SIGEL_GP::SIG_RobotChecker::jointMobilityOf( SIGEL_Simulation::SIG_DynaMechsSimulationData &simulationData ) const
 {
   for ( SIGEL_Robot::SIG_Joint *joint : robot.getJoints() )
     {
@@ -681,7 +695,7 @@ double SIGEL_GP::SIG_RobotAdvisor::jointMobilityOf( SIGEL_Simulation::SIG_DynaMe
   for ( dmLink *link : jointLinks )
     link->setJointInput( &noTorque );
 
-  // The same poses on every call, so that the advice does not change between calls.
+  // The same poses on every call, so that the findings do not change between calls.
   SIGEL_Tools::SIG_Randomizer randomizer( 1 );
   double mobility = 0;
 
@@ -741,7 +755,7 @@ double SIGEL_GP::SIG_RobotAdvisor::jointMobilityOf( SIGEL_Simulation::SIG_DynaMe
   return mobility;
 }
 
-SIG_Vector SIGEL_GP::SIG_RobotAdvisor::atStart( const StartPose &startPose, const SIGEL_Robot::SIG_Link *link, SIG_Vector point ) const
+SIG_Vector SIGEL_GP::SIG_RobotChecker::atStart( const StartPose &startPose, const SIGEL_Robot::SIG_Link *link, SIG_Vector point ) const
 {
   SIG_Matrix orientation = startPose.orientations[ link->getNumber() ];
   SIG_Vector position = startPose.positions[ link->getNumber() ];
@@ -752,7 +766,7 @@ SIG_Vector SIGEL_GP::SIG_RobotAdvisor::atStart( const StartPose &startPose, cons
   return inWorld;
 }
 
-double SIGEL_GP::SIG_RobotAdvisor::offAxis( const StartPose &startPose, const SIGEL_Robot::SIG_Link *link, SIG_Vector axisPoint, SIG_Vector axis ) const
+double SIGEL_GP::SIG_RobotChecker::offAxis( const StartPose &startPose, const SIGEL_Robot::SIG_Link *link, SIG_Vector axisPoint, SIG_Vector axis ) const
 {
   // An axis on an edge has two vertices on it, so the second nearest tells.
   QList<double> distances;
@@ -772,7 +786,7 @@ double SIGEL_GP::SIG_RobotAdvisor::offAxis( const StartPose &startPose, const SI
   return distances[1];
 }
 
-double SIGEL_GP::SIG_RobotAdvisor::sizeAtStart( const SIGEL_Robot::SIG_Robot &startRobot, const StartPose &startPose ) const
+double SIGEL_GP::SIG_RobotChecker::sizeAtStart( const SIGEL_Robot::SIG_Robot &startRobot, const StartPose &startPose ) const
 {
   double size = 0;
 
@@ -786,7 +800,7 @@ double SIGEL_GP::SIG_RobotAdvisor::sizeAtStart( const SIGEL_Robot::SIG_Robot &st
   return size;
 }
 
-void SIGEL_GP::SIG_RobotAdvisor::extentAtStart( const SIGEL_Robot::SIG_Robot &startRobot, const StartPose &startPose, int axis, double &lowest, double &highest ) const
+void SIGEL_GP::SIG_RobotChecker::extentAtStart( const SIGEL_Robot::SIG_Robot &startRobot, const StartPose &startPose, int axis, double &lowest, double &highest ) const
 {
   bool first = true;
   lowest = 0;
@@ -806,7 +820,7 @@ void SIGEL_GP::SIG_RobotAdvisor::extentAtStart( const SIGEL_Robot::SIG_Robot &st
     }
 }
 
-void SIGEL_GP::SIG_RobotAdvisor::adviseHoldsStartPose( QList<Finding> &errors, QList<Finding> &warnings, QList<Finding> &suggestions, const SIGEL_Robot::SIG_Robot &startRobot, const StartPose &startPose ) const
+void SIGEL_GP::SIG_RobotChecker::checkHoldsStartPose( QList<Finding> &errors, QList<Finding> &warnings, QList<Finding> &suggestions, const SIGEL_Robot::SIG_Robot &startRobot, const StartPose &startPose ) const
 {
   double lowest, highest;
   extentAtStart( startRobot, startPose, 1, lowest, highest );
@@ -871,8 +885,9 @@ void SIGEL_GP::SIG_RobotAdvisor::adviseHoldsStartPose( QList<Finding> &errors, Q
 
   if ( brokeAfter >= 0 )
     {
-      QString text = QString( "The robot breaks the simulation after %1 s with no drive active. Lower the step size." ).arg( brokeAfter );
-      errors.append( Finding{ 11, tError, QString(), brokeAfter, 0, text } );
+      errors.append( Finding{ 11, tError, "Simulation breaks at rest", QString(),
+                              QString( "With no drive active the simulation breaks after %1 s, so no program can be scored." ).arg( brokeAfter ),
+                              "Lower the step size.", brokeAfter, 0 } );
       return;
     }
 
@@ -880,19 +895,19 @@ void SIGEL_GP::SIG_RobotAdvisor::adviseHoldsStartPose( QList<Finding> &errors, Q
 
   if ( largestTurn > collapsesDegrees || sinkPercent > collapsesSinkPercent )
     {
-      QString text = QString( "With no drive active the robot does not hold its start pose: joint %1 turns %2 degrees and the body sinks %3 (%4 % of the robot's height). Force drives are limp between MOVEs, so only joint limits hold a stance. Put the start angles on the limits that carry the weight, or use servo drives." )
-        .arg( loosestJoint ).arg( largestTurn, 0, 'f', 0 ).arg( sink, 0, 'g', 3 ).arg( sinkPercent, 0, 'f', 0 );
-      warnings.append( Finding{ 11, tWarning, loosestJoint, largestTurn, collapsesDegrees, text } );
+      warnings.append( Finding{ 11, tWarning, "Robot does not hold its start pose", loosestJoint,
+                                QString( "With no drive active this joint turns %1 degrees and the body sinks %2 (%3 % of the robot's height). Force drives apply no force between MOVEs, so only joint limits hold a stance." ).arg( largestTurn, 0, 'f', 0 ).arg( sink, 0, 'g', 3 ).arg( sinkPercent, 0, 'f', 0 ),
+                                "Put the start angles on the limits that carry the weight, or use servo drives.", largestTurn, collapsesDegrees } );
     }
   else if ( largestTurn > settlesDegrees )
     {
-      QString text = QString( "With no drive active the robot settles before it rests: joint %1 turns %2 degrees." )
-        .arg( loosestJoint ).arg( largestTurn, 0, 'f', 0 );
-      suggestions.append( Finding{ 11, tSuggestion, loosestJoint, largestTurn, settlesDegrees, text } );
+      suggestions.append( Finding{ 11, tSuggestion, "Robot settles before it rests", loosestJoint,
+                                   QString( "With no drive active this joint turns %1 degrees before the robot rests, so every run starts with this motion." ).arg( largestTurn, 0, 'f', 0 ),
+                                   "Put the start angles where the robot rests.", largestTurn, settlesDegrees } );
     }
 }
 
-double SIGEL_GP::SIG_RobotAdvisor::turnBetween( SIG_Matrix left, SIG_Matrix right, SIG_Matrix leftAtStart, SIG_Matrix rightAtStart ) const
+double SIGEL_GP::SIG_RobotChecker::turnBetween( SIG_Matrix left, SIG_Matrix right, SIG_Matrix leftAtStart, SIG_Matrix rightAtStart ) const
 {
   // The trace of the rotation that takes the right link, seen from the left one, from its start to now.
   double trace = 0;
