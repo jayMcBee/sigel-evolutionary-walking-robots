@@ -297,6 +297,11 @@ touched, because changing one changes behaviour against the reference binary.
   and `SIG_GPRemoteZORCFitnessFunction`. Decide for each whether it belongs in
   the interface or goes through the new error reporter.
 
+- [ ] **134. Show the robot information on the Robot page.** The Info button
+  opens a dialog, while the robot advisor of item 77 shows its findings on the
+  page. Both belong on the page: the lower half becomes two tabs, Information
+  and Advice, and the Info dialog and its button go.
+
 - [ ] **77. A robot checker.** Idea; the name is open. It reads a robot model
   and its Language Parameters and warns about what will make evolution fail
   or mislead:
