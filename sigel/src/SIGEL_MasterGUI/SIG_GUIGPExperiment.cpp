@@ -685,7 +685,6 @@ void SIG_GUIGPExperiment::slotRobotImport()
 	{
 	  SIGEL_RobotIO::SIG_RobotBuilder builder( fileName );
 	  builder.buildInto( gpExperiment.robot );
-	  robotView->textlabelUsedRobot->setText( "Used robot: " + fileName );
 	}
       catch( SIGEL_Tools::SIG_Exception e )
 	{
@@ -724,7 +723,6 @@ void SIG_GUIGPExperiment::slotRobotLoad()
 	  try
 	    {
 	      gpExperiment.robot.readFromFileTransfer( theStream );
-	      robotView->textlabelUsedRobot->setText( "Used robot: " + fileName );
 	    }
 	  catch( SIGEL_Tools::SIG_Exception e )
 	    {
