@@ -118,6 +118,15 @@ Paths are relative to `sigel/`, the source tree.
 All present in 1.3, none introduced here. Each needs a decision before it is
 touched, because changing one changes behaviour against the reference binary.
 
+- [ ] **135. `SIG_DynaMechsSimulationData` leaves the global DynaMechs
+  environment dangling.** `initializeEnvironment` points the global at a
+  member of the object, and nothing puts the old pointer back when the object
+  goes. A slave does not notice, because every new simulation sets the global
+  again. The master does: `SIG_EnvironmentRenderer` reads the terrain through
+  the same global. The constructor is to remember the pointer from before and
+  the destructor to put it back, if the global is still its own. The robot
+  check of item 77 builds simulation data in the master and waits for this.
+
 - [ ] **125. Give `accept()` a buffer size in
   `SIG_GPManager::RegisterDynPVMClients`.** `alen` is passed to `accept()`
   without being set, so `accept()` reads an arbitrary buffer size. If that
