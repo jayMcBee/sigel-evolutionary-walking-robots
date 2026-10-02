@@ -32,6 +32,8 @@
 #include "SIGEL_Tools/SIG_Exception.h"
 #include "SIGEL_Tools/SIG_Randomizer.h"
 
+#include <qdatetime.h>
+
 #include <dmMDHLink.hpp>
 #include <newmatap.h>
 
@@ -52,6 +54,7 @@ SIGEL_GP::SIG_RobotAdvisor::SIG_RobotAdvisor( const SIGEL_Robot::SIG_Robot &robo
 
 QList<SIGEL_GP::SIG_RobotAdvisor::Finding> SIGEL_GP::SIG_RobotAdvisor::advise() const
 {
+  QList<Finding> errors;
   QList<Finding> warnings;
   QList<Finding> suggestions;
 
@@ -78,7 +81,7 @@ QList<SIGEL_GP::SIG_RobotAdvisor::Finding> SIGEL_GP::SIG_RobotAdvisor::advise() 
           masses.append( mass );
         }
 
-      bool everyLinkHasMass = adviseLinkWithoutMass( warnings, masses, startRobot );
+      bool everyLinkHasMass = adviseLinkWithoutMass( errors, masses, startRobot );
 
       adviseLimitCannotHoldDrive( warnings );
       if ( everyLinkHasMass )
@@ -92,20 +95,22 @@ QList<SIGEL_GP::SIG_RobotAdvisor::Finding> SIGEL_GP::SIG_RobotAdvisor::advise() 
         {
           adviseStepForGroundContact( suggestions, masses, startRobot );
           adviseStepForJoints( suggestions, startPose );
+          adviseHoldsStartPose( errors, warnings, suggestions, startRobot, startPose );
         }
     }
   catch ( SIGEL_Tools::SIG_Exception &e )
     {
+      errors.clear();
       warnings.clear();
       suggestions.clear();
       // The message's later lines name the source file that threw.
-      warnings.append( Finding{ 0, tError, QString(), 0, 0, "The robot cannot be simulated: " + e.getMessage().section( '\n', 0, 0 ) } );
+      errors.append( Finding{ 0, tError, QString(), 0, 0, "The robot cannot be simulated: " + e.getMessage().section( '\n', 0, 0 ) } );
       adviseLimitCannotHoldDrive( warnings );
       adviseSenseWithoutSensors( warnings );
       adviseStartOutsideRange( warnings );
     }
 
-  return warnings + suggestions;
+  return errors + warnings + suggestions;
 }
 
 bool SIGEL_GP::SIG_RobotAdvisor::adviseLinkWithoutMass( QList<Finding> &findings, const QList<double> &masses, const SIGEL_Robot::SIG_Robot &startRobot ) const
@@ -628,25 +633,138 @@ double SIGEL_GP::SIG_RobotAdvisor::sizeAtStart( const SIGEL_Robot::SIG_Robot &st
 
   for ( int axis = 0; axis < 3; axis++ )
     {
-      bool first = true;
-      double lowest = 0;
-      double highest = 0;
-
-      for ( SIGEL_Robot::SIG_Link *link : startRobot.getLinks() )
-        {
-          for ( SIG_Vector *vertex : link->getGeometry()->getVertices() )
-            {
-              double coordinate = atStart( startPose, link, *vertex ).get( axis );
-              if ( first || coordinate < lowest )
-                lowest = coordinate;
-              if ( first || coordinate > highest )
-                highest = coordinate;
-              first = false;
-            }
-        }
-
+      double lowest, highest;
+      extentAtStart( startRobot, startPose, axis, lowest, highest );
       size = std::max( size, highest - lowest );
     }
 
   return size;
+}
+
+void SIGEL_GP::SIG_RobotAdvisor::extentAtStart( const SIGEL_Robot::SIG_Robot &startRobot, const StartPose &startPose, int axis, double &lowest, double &highest ) const
+{
+  bool first = true;
+  lowest = 0;
+  highest = 0;
+
+  for ( SIGEL_Robot::SIG_Link *link : startRobot.getLinks() )
+    {
+      for ( SIG_Vector *vertex : link->getGeometry()->getVertices() )
+        {
+          double coordinate = atStart( startPose, link, *vertex ).get( axis );
+          if ( first || coordinate < lowest )
+            lowest = coordinate;
+          if ( first || coordinate > highest )
+            highest = coordinate;
+          first = false;
+        }
+    }
+}
+
+void SIGEL_GP::SIG_RobotAdvisor::adviseHoldsStartPose( QList<Finding> &errors, QList<Finding> &warnings, QList<Finding> &suggestions, const SIGEL_Robot::SIG_Robot &startRobot, const StartPose &startPose ) const
+{
+  double lowest, highest;
+  extentAtStart( startRobot, startPose, 1, lowest, highest );
+  double height = highest - lowest;
+
+  // Placed on the floor, so that a fall from the start height does not count as sinking.
+  SIGEL_Robot::SIG_Robot restRobot( robot );
+  restRobot.prepareDynaMechs();
+  // prepareDynaMechs sets the robot's location, so the lift comes after it.
+  restRobot.initialLocation.y += floorLevel - lowest + restClearance;
+
+  QString loosestJoint;
+  double largestTurn = 0;
+  double sink = 0;
+  double brokeAfter = -1;
+
+  // The simulation data makes its own environment the global one; other code still needs the one from before.
+  dmEnvironment *environmentBefore = dmEnvironment::getEnvironment();
+  {
+    SIGEL_Simulation::SIG_DynaMechsSimulationData simulationData( restRobot, environment, simulationParameter );
+    SIGEL_Simulation::SIG_DynaMechsSimulationQueries simulationQueries( simulationData );
+
+    QList<SIG_Matrix> orientationsAtStart;
+    for ( int i = 0; i < simulationQueries.getLinkCount(); i++ )
+      orientationsAtStart.append( simulationQueries.getLinkOrientation( i ) );
+
+    int rootNumber = simulationQueries.getRootNumber();
+    double heightAtStart = simulationQueries.getLinkPosition( rootNumber ).y;
+
+    double seconds = std::min( restSeconds, static_cast<double>( QTime( 0, 0 ).secsTo( simulationParameter.getTimeToSimulate() ) ) );
+
+    // No program runs, so no drive ever moves.
+    while ( simulationQueries.getCurrentSimulationSeconds() < seconds )
+      {
+        simulationData.setNewFrame( true );
+        simulationData.simulationProgress();
+        simulationData.actualFrame++;
+
+        SIG_Vector rootPosition = simulationQueries.getLinkPosition( rootNumber );
+        if ( !std::isfinite( rootPosition.x ) || !std::isfinite( rootPosition.y ) || !std::isfinite( rootPosition.z ) )
+          {
+            brokeAfter = simulationQueries.getCurrentSimulationSeconds();
+            break;
+          }
+        sink = heightAtStart - rootPosition.y;
+
+        for ( SIGEL_Robot::SIG_Joint *joint : restRobot.getJoints() )
+          {
+            int left = joint->getLeftLink()->getNumber();
+            int right = joint->getRightLink()->getNumber();
+            double turn = turnBetween( simulationQueries.getLinkOrientation( left ), simulationQueries.getLinkOrientation( right ),
+                                       orientationsAtStart[ left ], orientationsAtStart[ right ] );
+            if ( turn > largestTurn )
+              {
+                largestTurn = turn;
+                loosestJoint = joint->getName();
+              }
+          }
+      }
+  }
+  dmEnvironment::setEnvironment( environmentBefore );
+
+  if ( brokeAfter >= 0 )
+    {
+      QString text = QString( "The robot breaks the simulation after %1 s with no drive active. Lower the step size." ).arg( brokeAfter );
+      errors.append( Finding{ 11, tError, QString(), brokeAfter, 0, text } );
+      return;
+    }
+
+  double sinkPercent = sink / height * 100;
+
+  if ( largestTurn > collapsesDegrees || sinkPercent > collapsesSinkPercent )
+    {
+      QString text = QString( "With no drive active the robot does not hold its start pose: joint %1 turns %2 degrees and the body sinks %3 (%4 % of the robot's height). Force drives are limp between MOVEs, so only joint limits hold a stance. Put the start angles on the limits that carry the weight, or use servo drives." )
+        .arg( loosestJoint ).arg( largestTurn, 0, 'f', 0 ).arg( sink, 0, 'g', 3 ).arg( sinkPercent, 0, 'f', 0 );
+      warnings.append( Finding{ 11, tWarning, loosestJoint, largestTurn, collapsesDegrees, text } );
+    }
+  else if ( largestTurn > settlesDegrees )
+    {
+      QString text = QString( "With no drive active the robot settles before it rests: joint %1 turns %2 degrees." )
+        .arg( loosestJoint ).arg( largestTurn, 0, 'f', 0 );
+      suggestions.append( Finding{ 11, tSuggestion, loosestJoint, largestTurn, settlesDegrees, text } );
+    }
+}
+
+double SIGEL_GP::SIG_RobotAdvisor::turnBetween( SIG_Matrix left, SIG_Matrix right, SIG_Matrix leftAtStart, SIG_Matrix rightAtStart ) const
+{
+  // The trace of the rotation that takes the right link, seen from the left one, from its start to now.
+  double trace = 0;
+  for ( int i = 0; i < 3; i++ )
+    {
+      for ( int j = 0; j < 3; j++ )
+        {
+          double now = 0;
+          double atStart = 0;
+          for ( int k = 0; k < 3; k++ )
+            {
+              now += left.get( k, i ) * right.get( k, j );
+              atStart += leftAtStart.get( k, i ) * rightAtStart.get( k, j );
+            }
+          trace += now * atStart;
+        }
+    }
+
+  return std::acos( std::clamp( ( trace - 1 ) / 2, -1.0, 1.0 ) ) * 180 / M_PI;
 }

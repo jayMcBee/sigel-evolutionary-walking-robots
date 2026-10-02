@@ -57,7 +57,8 @@ namespace SIGEL_GP
      * limit what that was compared with. Check 1 gives both in degrees, checks
      * 2 and 7 as heights, check 4 in percent of the robot's size, check 6 in
      * the joint's own unit, checks 8 and 9 in seconds. Check 0 is a robot
-     * that cannot be simulated, check 10 a link without mass.
+     * that cannot be simulated, check 10 a link without mass. Check 11 is the
+     * robot left alone on the floor, in degrees of joint motion.
      */
     struct Finding { int check; Kind kind; QString part; double value; double limit; QString text; };
 
@@ -88,12 +89,15 @@ namespace SIGEL_GP
     void adviseStartHeight( QList<Finding> &findings, const SIGEL_Robot::SIG_Robot &startRobot, const StartPose &startPose ) const;
     void adviseStepForGroundContact( QList<Finding> &findings, const QList<double> &masses, const SIGEL_Robot::SIG_Robot &startRobot ) const;
     void adviseStepForJoints( QList<Finding> &findings, const StartPose &startPose ) const;
+    void adviseHoldsStartPose( QList<Finding> &errors, QList<Finding> &warnings, QList<Finding> &suggestions, const SIGEL_Robot::SIG_Robot &startRobot, const StartPose &startPose ) const;
 
     StartPose startPoseOf( const SIGEL_Robot::SIG_Robot &startRobot ) const;
     double jointMobilityOf( SIGEL_Simulation::SIG_DynaMechsSimulationData &simulationData ) const;
     SIG_Vector atStart( const StartPose &startPose, const SIGEL_Robot::SIG_Link *link, SIG_Vector point ) const;
     double offAxis( const StartPose &startPose, const SIGEL_Robot::SIG_Link *link, SIG_Vector axisPoint, SIG_Vector axis ) const;
     double sizeAtStart( const SIGEL_Robot::SIG_Robot &startRobot, const StartPose &startPose ) const;
+    void extentAtStart( const SIGEL_Robot::SIG_Robot &startRobot, const StartPose &startPose, int axis, double &lowest, double &highest ) const;
+    double turnBetween( SIG_Matrix left, SIG_Matrix right, SIG_Matrix leftAtStart, SIG_Matrix rightAtStart ) const;
 
     // Measured on the seven shipped robots and one rejected model. A joint that is a pin in a fork is above it and sound.
     static constexpr double axisOffEdgePercent = 1.0;
@@ -106,6 +110,14 @@ namespace SIGEL_GP
     // With joint friction the simulation goes unstable at 2.785 on every shipped robot; 2.5 leaves 10 %.
     static constexpr double jointStability = 2.5;
     static constexpr double jointFrictionInstability = 2.785;
+    // The robot is left alone for this long, a hair above the floor. All ten measured robots rest by then.
+    static constexpr double restSeconds = 5.0;
+    static constexpr double restClearance = 1e-6;
+    // Provisional. Robots that stand turn a joint by 3.9 degrees at most and sink 2 % of their height;
+    // two that settle turn 19 to 21 degrees; the one that collapses turns 52 degrees and sinks 43 %.
+    static constexpr double settlesDegrees = 10.0;
+    static constexpr double collapsesDegrees = 30.0;
+    static constexpr double collapsesSinkPercent = 25.0;
     // The start pose and this many random poses inside the joint ranges.
     static constexpr int randomPoses = 150;
 
