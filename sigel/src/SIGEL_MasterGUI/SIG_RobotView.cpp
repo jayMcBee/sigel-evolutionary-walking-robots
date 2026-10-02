@@ -65,8 +65,9 @@ void SIG_RobotView::getOutOfExperiment()
   listboxJoints->clear();
   listboxDrives->clear();
   listboxSensors->clear();
-  showFindings( QList<SIGEL_GP::SIG_RobotChecker::Finding>() );
-  texteditFindingDetail->clear();
+  shownFindings.clear();
+  listviewFindings->clear();
+  texteditFindingDetail->setPlainText( "Press Check to examine the robot." );
 
    // now fill the 6 listboxes describing the robot properties;
    // Manage the Bodies listbox

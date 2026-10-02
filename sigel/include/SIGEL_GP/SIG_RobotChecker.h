@@ -27,9 +27,8 @@
 #include "SIGEL_Environment/SIG_Environment.h"
 #include "SIGEL_GP/SIG_GPParameter.h"
 #include "SIGEL_Robot/SIG_Robot.h"
-#include "SIGEL_Simulation/SIG_DynaMechsSimulationData.h"
 #include "SIGEL_Simulation/SIG_SimulationParameters.h"
-#include "SIGEL_Tools/SIG_Matrix.h"
+#include "SIGEL_Simulation/SIG_StartPose.h"
 #include "SIGEL_Tools/SIG_Vector.h"
 
 #include <QList>
@@ -84,38 +83,22 @@ namespace SIGEL_GP
 
   private:
 
-    // Where the simulation puts each link at its start, by link number, and
-    // how easily a torque on the joints accelerates them: the largest
-    // eigenvalue of the joints' part of the inverse mass matrix over many
-    // poses. It is 0 for a robot that has a joint that does not turn.
-    struct Triangle { SIG_Vector a, b, c; };
-
-    struct StartPose { QList<SIG_Vector> positions; QList<SIG_Matrix> orientations; double jointMobility; };
-
     void checkLimitCannotHoldDrive( QList<Finding> &findings ) const;
     void checkSenseWithoutSensors( QList<Finding> &findings ) const;
     void checkStartOutsideRange( QList<Finding> &findings ) const;
     bool startsOutsideRange( double minimum, double maximum, double initial ) const;
 
-    // These take a copy of the robot that is prepared for the simulation.
-    bool checkLinkWithoutMass( QList<Finding> &findings, const QList<double> &masses, const SIGEL_Robot::SIG_Robot &startRobot ) const;
-    void checkStrokeThrowsRobot( QList<Finding> &findings, const QList<double> &masses, const SIGEL_Robot::SIG_Robot &startRobot ) const;
-    void checkAxisOffEdge( QList<Finding> &findings, const SIGEL_Robot::SIG_Robot &startRobot, const StartPose &startPose ) const;
-    void checkLinksOverlap( QList<Finding> &findings, const QList<double> &masses, const SIGEL_Robot::SIG_Robot &startRobot, const StartPose &startPose ) const;
-    void checkStartHeight( QList<Finding> &findings, const SIGEL_Robot::SIG_Robot &startRobot, const StartPose &startPose ) const;
-    void checkStepForGroundContact( QList<Finding> &findings, const QList<double> &masses, const SIGEL_Robot::SIG_Robot &startRobot ) const;
-    void checkStepForJoints( QList<Finding> &findings, const StartPose &startPose ) const;
-    void checkHoldsStartPose( QList<Finding> &errors, QList<Finding> &warnings, QList<Finding> &suggestions, const SIGEL_Robot::SIG_Robot &startRobot, const StartPose &startPose ) const;
+    bool checkLinkWithoutMass( QList<Finding> &findings, const SIGEL_Simulation::SIG_StartPose &startPose ) const;
+    void checkStrokeThrowsRobot( QList<Finding> &findings, const SIGEL_Simulation::SIG_StartPose &startPose ) const;
+    void checkAxisOffEdge( QList<Finding> &findings, const SIGEL_Simulation::SIG_StartPose &startPose ) const;
+    void checkLinksOverlap( QList<Finding> &findings, const SIGEL_Simulation::SIG_StartPose &startPose ) const;
+    void checkStartHeight( QList<Finding> &findings, const SIGEL_Simulation::SIG_StartPose &startPose ) const;
+    void checkStepForGroundContact( QList<Finding> &findings, const SIGEL_Simulation::SIG_StartPose &startPose ) const;
+    void checkStepForJoints( QList<Finding> &findings, const SIGEL_Simulation::SIG_StartPose &startPose ) const;
+    void checkHoldsStartPose( QList<Finding> &errors, QList<Finding> &warnings, QList<Finding> &suggestions, const SIGEL_Simulation::SIG_StartPose &startPose ) const;
 
-    StartPose startPoseOf( const SIGEL_Robot::SIG_Robot &startRobot ) const;
-    double jointMobilityOf( SIGEL_Simulation::SIG_DynaMechsSimulationData &simulationData ) const;
-    SIG_Vector atStart( const StartPose &startPose, const SIGEL_Robot::SIG_Link *link, SIG_Vector point ) const;
-    double offAxis( const StartPose &startPose, const SIGEL_Robot::SIG_Link *link, SIG_Vector axisPoint, SIG_Vector axis ) const;
-    double sizeAtStart( const SIGEL_Robot::SIG_Robot &startRobot, const StartPose &startPose ) const;
-    void extentAtStart( const SIGEL_Robot::SIG_Robot &startRobot, const StartPose &startPose, int axis, double &lowest, double &highest ) const;
-    QList<Triangle> trianglesAtStart( const StartPose &startPose, const SIGEL_Robot::SIG_Link *link ) const;
-    bool isInside( const QList<Triangle> &triangles, const SIG_Vector &point ) const;
-    double turnBetween( SIG_Matrix left, SIG_Matrix right, SIG_Matrix leftAtStart, SIG_Matrix rightAtStart ) const;
+    // The distance from an axis to the second nearest vertex of a link.
+    double offAxis( const SIGEL_Simulation::SIG_StartPose &startPose, const SIGEL_Robot::SIG_Link *link, SIG_Vector axisPoint, SIG_Vector axis ) const;
 
     // Measured on the seven shipped robots and one rejected model. A joint that is a pin in a fork is above it and sound.
     static constexpr double axisOffEdgePercent = 1.0;
@@ -139,8 +122,6 @@ namespace SIGEL_GP
     static constexpr double settlesDegrees = 10.0;
     static constexpr double collapsesDegrees = 30.0;
     static constexpr double collapsesSinkPercent = 25.0;
-    // The start pose and this many random poses inside the joint ranges.
-    static constexpr int randomPoses = 150;
 
     const SIGEL_Robot::SIG_Robot &robot;
     const SIGEL_Simulation::SIG_SimulationParameters &simulationParameter;
