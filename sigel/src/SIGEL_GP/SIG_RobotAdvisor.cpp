@@ -241,11 +241,16 @@ void SIGEL_GP::SIG_RobotAdvisor::adviseAxisOffEdge( QList<Finding> &findings, co
 
   QStringList pairs;
   double worstOffEdge = 0;
+  int jointsOffEdge = 0;
+  int rotationalJoints = 0;
 
   for ( SIGEL_Robot::SIG_Joint *joint : startRobot.getJoints() )
     {
       if ( joint->getJointType() != SIGEL_Robot::SIG_Joint::tRotationalJoint )
         continue;
+
+      rotationalJoints++;
+      bool offAnEdge = false;
 
       SIGEL_Robot::SIG_Link *predecessor;
       double a, alpha, d, theta, screwD, screwTheta;
@@ -263,12 +268,20 @@ void SIGEL_GP::SIG_RobotAdvisor::adviseAxisOffEdge( QList<Finding> &findings, co
             {
               pairs.append( joint->getName() + " on " + link->getName() );
               worstOffEdge = std::max( worstOffEdge, offEdge );
+              offAnEdge = true;
             }
         }
+
+      if ( offAnEdge )
+        jointsOffEdge++;
     }
 
   if ( pairs.isEmpty() )
     return;
+
+  // A robot built this way throughout would give a list of every joint.
+  if ( jointsOffEdge == rotationalJoints && rotationalJoints > 1 )
+    pairs = QStringList( QString( "all %1 joints" ).arg( rotationalJoints ) );
 
   QString text = QString( "No edge of the link lies on the joint's axis (up to %1 % of the robot's size away): %2. Look at the robot to see that the parts neither overlap nor float apart when the joint turns." )
     .arg( worstOffEdge, 0, 'g', 3 ).arg( pairs.join( ", " ) );
@@ -468,7 +481,11 @@ void SIGEL_GP::SIG_RobotAdvisor::adviseStepForJoints( QList<Finding> &findings, 
   if ( fastestRate == damperRate )
     text = QString( "Step size %1 is above the suggested %2 for the joints, limited by the joint-limit damper. Runs may still work; the damper acts only past a limit." );
   if ( fastestRate == frictionRate )
-    text = QString( "Step size %1 is above the suggested %2 for the joints, limited by joint friction. Expect scores of 0 from a simulation that breaks down; lower the step size or the joint friction." );
+    {
+      text = QString( "Step size %1 is above the suggested %2 for the joints, limited by joint friction. It is close to the limit: the simulation works but has no margin." );
+      if ( simulationParameter.getStepSize() * frictionRate > jointFrictionInstability )
+        text = QString( "Step size %1 is above the suggested %2 for the joints, limited by joint friction. Expect scores of 0 from a simulation that breaks down; lower the step size or the joint friction." );
+    }
 
   findings.append( Finding{ 9, tSuggestion, QString(), simulationParameter.getStepSize(), suggestedStep,
                             text.arg( simulationParameter.getStepSize() ).arg( suggestedStep, 0, 'g', 3 ) } );

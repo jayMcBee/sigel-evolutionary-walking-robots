@@ -103,8 +103,9 @@ namespace SIGEL_GP
     static constexpr double floorLevel = 0.0;
     // Single bodies go unstable from 0.5; the shipped robots show the first NaN at 1.5.
     static constexpr double groundContactStability = 0.75;
-    // The simulation goes unstable at 2.785 on every shipped robot; this leaves 10 %.
+    // With joint friction the simulation goes unstable at 2.785 on every shipped robot; 2.5 leaves 10 %.
     static constexpr double jointStability = 2.5;
+    static constexpr double jointFrictionInstability = 2.785;
     // The start pose and this many random poses inside the joint ranges.
     static constexpr int randomPoses = 150;
 
