@@ -406,11 +406,12 @@ int main(int argc, char *argv[])
   }
   file.close();
 
-  // One line per finding, tab-separated: check, part, value, limit, text.
+  // One line per finding, tab-separated: check, kind, part, value, limit, text.
   if (advise) {
     SIGEL_GP::SIG_RobotAdvisor advisor(experiment.robot, experiment.simulationParameter, experiment.environment, experiment.gpParameter);
     for (const SIGEL_GP::SIG_RobotAdvisor::Finding &finding : advisor.advise())
-      printf("%d\t%s\t%.6g\t%.6g\t%s\n", finding.check, qPrintable(finding.part),
+      printf("%d\t%s\t%s\t%.6g\t%.6g\t%s\n", finding.check,
+             finding.kind == SIGEL_GP::SIG_RobotAdvisor::tWarning ? "warning" : "suggestion", qPrintable(finding.part),
              finding.value, finding.limit, qPrintable(finding.text));
     return 0;
   }
