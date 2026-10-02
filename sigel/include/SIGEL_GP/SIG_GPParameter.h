@@ -759,7 +759,7 @@ namespace SIGEL_GP
   void setProbability( SIGEL_Program::Robotinstruction instruction, int prob );
 
   public:
-  int  getProbability( SIGEL_Program::Robotinstruction instruction );
+  int  getProbability( SIGEL_Program::Robotinstruction instruction ) const;
 
   public:
   QList< int > &getInstructionProbabilities();

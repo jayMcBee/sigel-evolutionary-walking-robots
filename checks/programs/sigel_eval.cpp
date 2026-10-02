@@ -30,6 +30,7 @@
 #include "SIGEL_GP/SIG_GPFitnessFunctionRegistry.h"
 #include "SIGEL_GP/SIG_GPRemoteZORCFitnessFunction.h"
 #include "SIGEL_GP/SIG_GPFullDataRecorder.h"
+#include "SIGEL_GP/SIG_RobotAdvisor.h"
 #include "SIGEL_Robot/SIG_CommandParameters.h"
 #include "SIGEL_Robot/SIG_Joint.h"
 #include "SIGEL_Robot/SIG_LanguageParameters.h"
@@ -363,9 +364,11 @@ int main(int argc, char *argv[])
   bool verbose = false;
   if (argc > 1 && QString(argv[1]) == "-v") { verbose = true; argv++; argc--; }
   if (argc > 1 && QString(argv[1]) == "-selfcheck") return selfcheck();
+  bool advise = false;
+  if (argc > 1 && QString(argv[1]) == "-advise") { advise = true; argv++; argc--; }
 
   if (argc < 2 || argc > 3) {
-    fprintf(stderr, "usage: %s [-v] <experiment.exp> [individual, default 0]\n", argv[0]);
+    fprintf(stderr, "usage: %s [-v] [-advise] <experiment.exp> [individual, default 0]\n", argv[0]);
     return 2;
   }
 
@@ -402,6 +405,15 @@ int main(int argc, char *argv[])
     return 1;
   }
   file.close();
+
+  // One line per finding, tab-separated: check, part, value, limit, text.
+  if (advise) {
+    SIGEL_GP::SIG_RobotAdvisor advisor(experiment.robot, experiment.simulationParameter, experiment.environment, experiment.gpParameter);
+    for (const SIGEL_GP::SIG_RobotAdvisor::Finding &finding : advisor.advise())
+      printf("%d\t%s\t%.6g\t%.6g\t%s\n", finding.check, qPrintable(finding.part),
+             finding.value, finding.limit, qPrintable(finding.text));
+    return 0;
+  }
 
   const int index = (argc == 3) ? atoi(argv[2]) : 0;
   if (index < 0 || index >= experiment.population.getSize()) {

@@ -192,6 +192,11 @@ namespace SIGEL_MasterGUI
 		    this,
 		    SLOT( slotRobotInfo() ) );
 
+  QObject::connect( robotView->pushbuttonRobAdvise,
+		    SIGNAL( clicked() ),
+		    this,
+		    SLOT( slotRobotAdvise() ) );
+
   QObject::connect( allIndividualsView,
 		    SIGNAL( signalDataRefreshNeeded() ),
 		    this,
@@ -761,6 +766,21 @@ void SIG_GUIGPExperiment::slotRobotInfo()
   else
   { QMessageBox::information( experimentListView, "Robot Information", "No robot is loaded. Load a robot first.");
   }
+}
+
+void SIG_GUIGPExperiment::slotRobotAdvise()
+{
+  if ( gpExperiment.robot.getBodies().size() == 0 )
+    {
+      QMessageBox::information( experimentListView, "Robot Advisor", "No robot is loaded. Load a robot first." );
+      return;
+    }
+
+  // The advisor reads settings that other pages edit.
+  putAllIntoExperiment();
+
+  SIGEL_GP::SIG_RobotAdvisor advisor( gpExperiment.robot, gpExperiment.simulationParameter, gpExperiment.environment, gpExperiment.gpParameter );
+  robotView->showAdvice( advisor.advise() );
 }
 
 void SIG_GUIGPExperiment::slotEvolutionStopped()

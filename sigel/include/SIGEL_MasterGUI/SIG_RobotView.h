@@ -26,6 +26,7 @@
 #include "SIGEL_MasterGUI/SIG_RobotBase.h"
 
 #include "SIGEL_GP/SIG_GPExperiment.h"
+#include "SIGEL_GP/SIG_RobotAdvisor.h"
 
 namespace SIGEL_MasterGUI
 {
@@ -49,6 +50,11 @@ public:
     void putIntoExperiment();
     
     void getOutOfExperiment();
+
+    /**
+     * Shows the advisor's findings in the advice list.
+     */
+    void showAdvice( const QList<SIGEL_GP::SIG_RobotAdvisor::Finding> &findings );
 
  private:
     SIGEL_GP::SIG_GPExperiment &theExperiment;

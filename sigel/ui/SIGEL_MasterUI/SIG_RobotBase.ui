@@ -245,6 +245,13 @@
         </widget>
       </item>
       <item row="1" column="0">
+        <widget class="QListWidget" name="listboxAdvice">
+          <property name="wordWrap">
+            <bool>true</bool>
+          </property>
+        </widget>
+      </item>
+      <item row="2" column="0">
         <layout class="QHBoxLayout">
           <property name="margin">
             <number>0</number>
@@ -305,6 +312,16 @@
               </property>
               <property name="toolTip">
                 <string>Display information about the current robot.</string>
+              </property>
+            </widget>
+          </item>
+          <item>
+            <widget class="QPushButton" name="pushbuttonRobAdvise">
+              <property name="text">
+                <string>Advise</string>
+              </property>
+              <property name="toolTip">
+                <string>List what will probably make an evolution with this robot fail or mislead.</string>
               </property>
             </widget>
           </item>

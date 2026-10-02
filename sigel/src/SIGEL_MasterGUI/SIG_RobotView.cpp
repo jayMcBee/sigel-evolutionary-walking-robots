@@ -60,6 +60,7 @@ void SIG_RobotView::getOutOfExperiment()
   listboxJoints->clear();
   listboxDrives->clear();
   listboxSensors->clear();
+  listboxAdvice->clear();
 
    // now fill the 6 listboxes describing the robot properties;
    // Manage the Bodies listbox
@@ -152,5 +153,17 @@ void SIG_RobotView::getOutOfExperiment()
    }
 }
 
+void SIG_RobotView::showAdvice( const QList<SIGEL_GP::SIG_RobotAdvisor::Finding> &findings )
+{
+  listboxAdvice->clear();
+
+  if ( findings.isEmpty() )
+    listboxAdvice->addItem( "The advisor found nothing." );
+
+  for ( const SIGEL_GP::SIG_RobotAdvisor::Finding &finding : findings )
+    {
+      listboxAdvice->addItem( finding.text );
+    }
+}
 
 }  //    { namespace SIGEL_MasterGUI }

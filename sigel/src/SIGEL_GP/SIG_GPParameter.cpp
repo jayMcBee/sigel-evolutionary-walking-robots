@@ -695,7 +695,7 @@ void SIGEL_GP::SIG_GPParameter::setProbability( SIGEL_Program::Robotinstruction 
 }
 
   
-int  SIGEL_GP::SIG_GPParameter::getProbability( SIGEL_Program::Robotinstruction instruction )
+int  SIGEL_GP::SIG_GPParameter::getProbability( SIGEL_Program::Robotinstruction instruction ) const
 {
 
   int instructionID = static_cast< int >( instruction );

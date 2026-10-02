@@ -227,6 +227,12 @@ namespace SIGEL_MasterGUI
       void slotRobotInfo();
 
       /**
+       * This slot lists the robot advisor's findings on the robot page.
+       *
+       */
+      void slotRobotAdvise();
+
+      /**
        * This slot load an already processed robot.
        *
        * Only already processed robots can be loaded.
