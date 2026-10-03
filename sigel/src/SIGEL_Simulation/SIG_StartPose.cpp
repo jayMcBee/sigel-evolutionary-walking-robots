@@ -25,7 +25,6 @@
 
 #include "SIGEL_Robot/SIG_GeometryIterator.h"
 #include "SIGEL_Robot/SIG_Joint.h"
-#include "SIGEL_Simulation/SIG_DynaMechsEnvironmentKeeper.h"
 #include "SIGEL_Simulation/SIG_DynaMechsSimulationData.h"
 #include "SIGEL_Simulation/SIG_DynaMechsSimulationQueries.h"
 #include "SIGEL_Tools/SIG_Exception.h"
@@ -56,7 +55,6 @@ SIGEL_Simulation::SIG_StartPose::SIG_StartPose( const SIGEL_Robot::SIG_Robot &ro
       masses.append( mass );
     }
 
-  SIG_DynaMechsEnvironmentKeeper environmentKeeper;
   SIG_DynaMechsSimulationData simulationData( startRobot, environment, simulationParameter );
   SIG_DynaMechsSimulationQueries simulationQueries( simulationData );
 

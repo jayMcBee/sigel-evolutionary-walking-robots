@@ -24,7 +24,6 @@
 #include "SIGEL_Simulation/SIG_RestRun.h"
 
 #include "SIGEL_Robot/SIG_Joint.h"
-#include "SIGEL_Simulation/SIG_DynaMechsEnvironmentKeeper.h"
 #include "SIGEL_Simulation/SIG_DynaMechsSimulationData.h"
 #include "SIGEL_Simulation/SIG_DynaMechsSimulationQueries.h"
 
@@ -45,7 +44,6 @@ SIGEL_Simulation::SIG_RestRun::SIG_RestRun( const SIGEL_Robot::SIG_Robot &robot,
   // prepareDynaMechs sets the robot's location, so the lift comes after it.
   restRobot.initialLocation.y += lift;
 
-  SIG_DynaMechsEnvironmentKeeper environmentKeeper;
   SIG_DynaMechsSimulationData simulationData( restRobot, environment, simulationParameter );
   SIG_DynaMechsSimulationQueries simulationQueries( simulationData );
 

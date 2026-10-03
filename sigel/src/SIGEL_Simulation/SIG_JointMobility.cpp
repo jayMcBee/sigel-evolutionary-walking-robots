@@ -24,7 +24,6 @@
 #include "SIGEL_Simulation/SIG_JointMobility.h"
 
 #include "SIGEL_Robot/SIG_Joint.h"
-#include "SIGEL_Simulation/SIG_DynaMechsEnvironmentKeeper.h"
 #include "SIGEL_Simulation/SIG_DynaMechsSimulationData.h"
 #include "SIGEL_Tools/SIG_Randomizer.h"
 
@@ -46,7 +45,6 @@ SIGEL_Simulation::SIG_JointMobility::SIG_JointMobility( const SIGEL_Robot::SIG_R
         return;
     }
 
-  SIG_DynaMechsEnvironmentKeeper environmentKeeper;
   SIG_DynaMechsSimulationData simulationData( preparedRobot, environment, simulationParameter );
 
   dmArticulation &system = simulationData.dynaMechsSystem;
