@@ -382,12 +382,11 @@ namespace SIGEL_Environment {
 	  char const *terrainDataFileNameCString = terrainDataFileNameQCString.constData();
 
   	dynaMechsEnvironment.loadTerrainData( terrainDataFileNameCString );
-
-  	dmEnvironment::setEnvironment( &dynaMechsEnvironment );
 	};
 	
 	dmEnvironment *SIG_Environment::getDMEnvironment() const {
-		return dmEnvironment::getEnvironment();
+		// dmEnvironment::getTerrainData is not const.
+		return const_cast< dmEnvironment* >( &dynaMechsEnvironment );
 	}
 	
 	int SIG_Environment::getTexAlpha() const {

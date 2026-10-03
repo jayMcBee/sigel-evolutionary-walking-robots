@@ -209,6 +209,10 @@ SIGEL_Simulation::SIG_DynaMechsSimulationData::~SIG_DynaMechsSimulationData()
   // This class owns the links it built; drives and sensors belong to the robot.
   qDeleteAll( dynaMechsLinks );
   dynaMechsLinks.fill( nullptr );
+
+  // DynaMechs must not keep the address of an environment that is gone.
+  if ( dmEnvironment::getEnvironment() == &dynaMechsEnvironment )
+    dmEnvironment::setEnvironment( nullptr );
 };
 
 void SIGEL_Simulation::SIG_DynaMechsSimulationData::simulationProgress()

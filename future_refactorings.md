@@ -118,14 +118,21 @@ Paths are relative to `sigel/`, the source tree.
 All present in 1.3, none introduced here. Each needs a decision before it is
 touched, because changing one changes behaviour against the reference binary.
 
-- [ ] **135. `SIG_DynaMechsSimulationData` leaves the global DynaMechs
-  environment dangling.** `initializeEnvironment` points the global at a
-  member of the object, and nothing puts the old pointer back when the object
-  goes. A slave does not notice, because every new simulation sets the global
-  again. The master does: `SIG_EnvironmentRenderer` reads the terrain through
-  the same global. The constructor is to remember the pointer from before and
-  the destructor to put it back, if the global is still its own. The robot
-  check of item 77 builds simulation data in the master and waits for this.
+- [ ] **136. Keep the terrain in `SIG_Environment` as SIGEL data.**
+  `SIG_Environment` has a `dmEnvironment` member only to load `Terrain.ter`
+  for `SIG_EnvironmentRenderer`. Without it, no class outside
+  `SIGEL_Simulation` uses a DynaMechs environment.
+  `loadDynaMechsEnvironment` also runs `generateTerrain`, which writes the
+  `Terrain.ter` that every simulation reads. That step stays.
+
+- [ ] **137. Refuse a second simulation in one process.** DynaMechs has one
+  current environment. A second `SIG_DynaMechsSimulationData` takes it from
+  the first without a message. The constructor is to throw if one is set.
+  This waits for the simulation data to be deleted: today `SIG_Simulation`
+  never deletes it, so the current environment is never released.
+  The constructor must also release the environment when it throws.
+  Otherwise one robot that fails to build makes every later simulation in
+  that process throw.
 
 - [ ] **125. Give `accept()` a buffer size in
   `SIG_GPManager::RegisterDynPVMClients`.** `alen` is passed to `accept()`

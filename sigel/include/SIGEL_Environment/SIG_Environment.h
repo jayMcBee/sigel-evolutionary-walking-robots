@@ -349,7 +349,8 @@ class SIG_Environment {
   void loadDynaMechsEnvironment();
 
   /**
-  	*  This function returns a reference to the dynaMechsEnvironment.
+  	*  This function returns a reference to the dynaMechsEnvironment. It
+  	*  holds the terrain only; a simulation builds an environment of its own.
   	*/
   dmEnvironment *getDMEnvironment() const;
 

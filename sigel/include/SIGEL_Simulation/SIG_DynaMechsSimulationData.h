@@ -68,7 +68,8 @@ namespace SIGEL_Simulation
 				   SIG_SimulationParameters const & simulationParameter );
 
       /**
-       * Frees the links in dynaMechsLinks, which this class owns.
+       * Frees the links in dynaMechsLinks, which this class owns, and takes
+       * dynaMechsEnvironment out of DynaMechs.
        *
        * NOTE: nothing deletes the SIG_SimulationData object that
        * SIG_Simulation::SIG_Simulation() allocates, so this destructor does
