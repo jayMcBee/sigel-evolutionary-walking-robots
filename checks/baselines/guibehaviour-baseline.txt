@@ -798,6 +798,7 @@ we do with the system?]
   [tabs] none
   [survey]
     group  [Robot information] enabled=1 checkable=0
+    group  [Robot check] enabled=1 checkable=0
     list   listboxLinks                         count=2 current=-1 enabled=1
       item0  [base1] hasIcon=0
       item1  [base2] hasIcon=0
@@ -811,6 +812,7 @@ we do with the system?]
       item0  [hinge1] hasIcon=1
     list   listboxDrives                        count=1 current=-1 enabled=1
       item0  [hinge1Drive] hasIcon=1
+    tree   listviewIssues                       cols=2 rows=0
   [drive]
     (nothing on this container is in C11's scope: no spin box, slider, combo, checkbox, radio or validated field)
 

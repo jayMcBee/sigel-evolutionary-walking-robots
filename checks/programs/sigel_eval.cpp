@@ -30,6 +30,7 @@
 #include "SIGEL_GP/SIG_GPFitnessFunctionRegistry.h"
 #include "SIGEL_GP/SIG_GPRemoteZORCFitnessFunction.h"
 #include "SIGEL_GP/SIG_GPFullDataRecorder.h"
+#include "SIGEL_RobotCheck/SIG_RobotChecker.h"
 #include "SIGEL_Robot/SIG_CommandParameters.h"
 #include "SIGEL_Robot/SIG_Joint.h"
 #include "SIGEL_Robot/SIG_LanguageParameters.h"
@@ -363,9 +364,11 @@ int main(int argc, char *argv[])
   bool verbose = false;
   if (argc > 1 && QString(argv[1]) == "-v") { verbose = true; argv++; argc--; }
   if (argc > 1 && QString(argv[1]) == "-selfcheck") return selfcheck();
+  bool robotCheck = false;
+  if (argc > 1 && QString(argv[1]) == "-check") { robotCheck = true; argv++; argc--; }
 
   if (argc < 2 || argc > 3) {
-    fprintf(stderr, "usage: %s [-v] <experiment.exp> [individual, default 0]\n", argv[0]);
+    fprintf(stderr, "usage: %s [-v] [-check] <experiment.exp> [individual, default 0]\n", argv[0]);
     return 2;
   }
 
@@ -402,6 +405,36 @@ int main(int argc, char *argv[])
     return 1;
   }
   file.close();
+
+  // One line per issue, tab-separated: check, kind, part, title, analysis and
+  // advice. Then one line that counts the issues.
+  if (robotCheck) {
+    SIGEL_RobotCheck::SIG_RobotChecker checker(experiment.robot, experiment.simulationParameter, experiment.environment);
+    int count[3] = { 0, 0, 0 };
+    for (const SIGEL_RobotCheck::SIG_RobotIssue &issue : checker.check()) {
+      count[issue.kind]++;
+      const char *check = "";
+      switch (issue.check) {
+        case SIGEL_RobotCheck::SIG_RobotIssue::tCannotBeSimulated: check = "CannotBeSimulated"; break;
+        case SIGEL_RobotCheck::SIG_RobotIssue::tLimitHoldsDrive:   check = "LimitHoldsDrive"; break;
+        case SIGEL_RobotCheck::SIG_RobotIssue::tDriveStrength:     check = "DriveStrength"; break;
+        case SIGEL_RobotCheck::SIG_RobotIssue::tJointAxis:         check = "JointAxis"; break;
+        case SIGEL_RobotCheck::SIG_RobotIssue::tLinkOverlap:       check = "LinkOverlap"; break;
+        case SIGEL_RobotCheck::SIG_RobotIssue::tJointStart:        check = "JointStart"; break;
+        case SIGEL_RobotCheck::SIG_RobotIssue::tStartHeight:       check = "StartHeight"; break;
+        case SIGEL_RobotCheck::SIG_RobotIssue::tGroundStepSize:    check = "GroundStepSize"; break;
+        case SIGEL_RobotCheck::SIG_RobotIssue::tJointStepSize:     check = "JointStepSize"; break;
+        case SIGEL_RobotCheck::SIG_RobotIssue::tIntegrator:        check = "Integrator"; break;
+        case SIGEL_RobotCheck::SIG_RobotIssue::tLinkMass:          check = "LinkMass"; break;
+        case SIGEL_RobotCheck::SIG_RobotIssue::tStanding:          check = "Standing"; break;
+      }
+      printf("%s\t%s\t%s\t%s\t%s\t%s\n", check,
+             issue.kind == SIGEL_RobotCheck::SIG_RobotIssue::tError ? "error" : issue.kind == SIGEL_RobotCheck::SIG_RobotIssue::tWarning ? "warning" : "suggestion", qPrintable(issue.part),
+             qPrintable(issue.title), qPrintable(issue.analysis), qPrintable(issue.advice));
+    }
+    printf("check: errors %d, warnings %d, suggestions %d\n", count[0], count[1], count[2]);
+    return 0;
+  }
 
   const int index = (argc == 3) ? atoi(argv[2]) : 0;
   if (index < 0 || index >= experiment.population.getSize()) {

@@ -909,6 +909,78 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-10-04 — DONE: ITEM 77, THE ROBOT CHECK.**
+
+- **A user sees:** a group "Robot check" on the Robot page. The Check button
+  examines the robot with the simulation and environment settings of its
+  experiment and lists issues: errors first, then warnings, then suggestions.
+  Selecting an issue shows the parts it is about, an analysis and advice. No
+  issue stops a run. The list is not refreshed when a setting changes on
+  another page; press Check again.
+- **The checks,** one class each in the new module `SIGEL_RobotCheck`:
+  - `SIG_SimulationCheck`, error: the simulation cannot take the robot, for
+    example joint axes that cross, a joint that is neither rotational nor
+    translational, or a step size of 0 or less.
+  - `SIG_LinkMassCheck`, error: a link with a mass of 0 or less.
+  - `SIG_StandingCheck`: the robot is put on the floor and simulated for 5 s
+    with no drive active. An error if the simulation breaks, a warning if a
+    joint turns more than 30 degrees or the body sinks more than 25 % of the
+    robot's height, a suggestion above 10 degrees.
+  - `SIG_LimitHoldsDriveCheck`, warning: drive force divided by the
+    joint-limit spring is more than the joint's range.
+  - `SIG_DriveStrengthCheck`, warning: one turn of a joint at full force can
+    lift the robot more than 8 times its start height on the floor.
+  - `SIG_LinkOverlapCheck`, warning: two links share more than 1 % of the
+    smaller one's volume at the start pose.
+  - `SIG_JointStartCheck`, warning: a joint starts outside its range.
+  - `SIG_JointAxisCheck`, suggestion: no edge of a link lies within 1 % of
+    the robot's size of a joint's axis.
+  - `SIG_StartHeightCheck`, suggestion: a vertex is below the floor at the
+    start; the advice names the lowest safe start height.
+  - `SIG_GroundStepSizeCheck` and `SIG_JointStepSizeCheck`, suggestions: the
+    step size is above what the ground contact of the lightest link, or the
+    joints, allow.
+  - `SIG_IntegratorCheck`, suggestion: the two step size checks run for
+    Runge-Kutta 4 only; with another integrator this check says so.
+- **Structure:** `SIG_RobotChecker` runs the checks as a plain chain and
+  sorts the issues. Each check tests itself whether it can run.
+  `SIG_RobotIssue` is what a check reports. Four classes measure and do not
+  judge: `SIG_RobotStartPose`, `SIG_UnpoweredRun`, `SIG_JointInertia` and
+  `SIG_LinkVolume`. The module uses `SIGEL_Tools`, `SIGEL_Robot`,
+  `SIGEL_Environment` and `SIGEL_Simulation`; only `SIGEL_MasterGUI` uses it.
+- **The start pose comes from the simulation's own data,** not from the
+  model. For `runner` the two differ: its lowest vertex is at 0.023 in the
+  simulation and at 0.071 by the model. The other six shipped robots agree.
+- **Where the limits come from:** measurements on stock 2.0 on a second
+  machine, on the 7 shipped robots, two new robots (a quadruped in metres and
+  a centipede with 28 joints) and models built to trigger each check. Each
+  limit is a named constant in its check, with a comment on what it was
+  measured on. The limits of the standing check rest on one robot that
+  collapses.
+- **Differs from the to-do text:** its language checks are not built; no run
+  showed a failure from them. Also not built: a check for SENSE without
+  sensors, which breaks nothing; a check for a start far above the floor;
+  and link overlap by convex hulls, which reported overlaps on a sound robot
+  whose parts sit in forks. The overlap check uses the real meshes.
+- **Limits:**
+  - The overlap check sees the start pose only.
+  - The standing check sees 5 s. A slow instability shows as "settles".
+  - Four checks skip translational joints and say nothing: limit holds
+    drive, drive strength, joint axis and joint step size.
+  - Drive strength measures the start height from the model's origin. A
+    robot whose origin is at the level of its feet gets the warning on every
+    drive.
+- **Also changed:** the "Used robot" label on the Robot page is gone. Only an
+  import or a load ever filled it.
+- **Checks:** `sigel_eval -check file.exp` prints the issues. `check.sh` has
+  a section "robot check" that compares them on the 7 shipped experiments
+  with `checks/baselines/robotcheck-baseline.txt`. The GUI behaviour baseline
+  has two new lines, for the group and its table.
+- **Gates:** `check.sh` 816 pass, 0 fail; warnings 316, none of them in
+  `SIGEL_RobotCheck`. The same issues on a second machine, over 25
+  experiments there. Fitness, dictorder and PVM were not run; no simulation
+  code changed.
+
 **2026-10-01 — DONE: ITEM 134, THE `printf` FORMATS IN `SIGEL_GP`.**
 
 - **`SIG_GPFitnessTrainer::flushAllDynHosts`:** the `sprintf` that used the

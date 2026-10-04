@@ -32,6 +32,7 @@
 #include "SIGEL_GP/SIG_GPFitnessFunctionRegistry.h"
 #include "SIGEL_GP/SIG_GUIGPManager.h"
 
+#include "SIGEL_RobotCheck/SIG_RobotChecker.h"
 #include "SIGEL_RobotIO/SIG_RobotBuilder.h"
 #include "SIGEL_Robot/SIG_LanguageParameters.h"
 
@@ -191,6 +192,11 @@ namespace SIGEL_MasterGUI
 		    SIGNAL( clicked() ),
 		    this,
 		    SLOT( slotRobotInfo() ) );
+
+  QObject::connect( robotView->pushbuttonRobCheck,
+		    SIGNAL( clicked() ),
+		    this,
+		    SLOT( slotRobotCheck() ) );
 
   QObject::connect( allIndividualsView,
 		    SIGNAL( signalDataRefreshNeeded() ),
@@ -759,6 +765,24 @@ void SIG_GUIGPExperiment::slotRobotInfo()
   else
   { QMessageBox::information( experimentListView, "Robot Information", "No robot is loaded. Load a robot first.");
   }
+}
+
+void SIG_GUIGPExperiment::slotRobotCheck()
+{
+  if ( gpExperiment.robot.getBodies().size() == 0 )
+    {
+      QMessageBox::information( experimentListView, "Robot Check", "No robot is loaded. Load a robot first." );
+      return;
+    }
+
+  // The checker reads settings that other pages edit.
+  putAllIntoExperiment();
+
+  // The check simulates the robot, which takes seconds when the step size is small.
+  QApplication::setOverrideCursor( Qt::WaitCursor );
+  SIGEL_RobotCheck::SIG_RobotChecker checker( gpExperiment.robot, gpExperiment.simulationParameter, gpExperiment.environment );
+  robotView->showIssues( checker.check() );
+  QApplication::restoreOverrideCursor();
 }
 
 void SIG_GUIGPExperiment::slotEvolutionStopped()

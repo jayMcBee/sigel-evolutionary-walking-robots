@@ -26,6 +26,7 @@
 #include "SIGEL_MasterGUI/SIG_RobotBase.h"
 
 #include "SIGEL_GP/SIG_GPExperiment.h"
+#include "SIGEL_RobotCheck/SIG_RobotIssue.h"
 
 namespace SIGEL_MasterGUI
 {
@@ -50,8 +51,21 @@ public:
     
     void getOutOfExperiment();
 
+    /**
+     * Shows the issues that the robot check raised.
+     */
+    void showIssues( const QList<SIGEL_RobotCheck::SIG_RobotIssue> &issues );
+
+ private slots:
+    /**
+     * Shows the detail of the issue that is selected in the list of issues.
+     */
+    void slotIssueSelected();
+
  private:
     SIGEL_GP::SIG_GPExperiment &theExperiment;
+
+    QList<SIGEL_RobotCheck::SIG_RobotIssue> shownIssues;
 };
 
 }

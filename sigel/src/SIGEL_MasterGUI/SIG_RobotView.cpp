@@ -21,6 +21,7 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 #include <qlabel.h>
+#include <qstyle.h>
 
 #include "SIGEL_MasterGUI/SIG_RobotView.h"
 #include "SIGEL_Robot/SIG_PitchRollSensor.h"
@@ -39,6 +40,10 @@ namespace SIGEL_MasterGUI
 SIG_RobotView::SIG_RobotView( QWidget* parent,  const char* name, Qt::WindowFlags fl, SIGEL_GP::SIG_GPExperiment &theExperiment )
   : SIG_RobotBase( parent, name, fl ), theExperiment( theExperiment )
 {
+  QObject::connect( listviewIssues,
+		    SIGNAL( itemSelectionChanged() ),
+		    this,
+		    SLOT( slotIssueSelected() ) );
 }
 
 void SIG_RobotView::putIntoExperiment()
@@ -60,6 +65,9 @@ void SIG_RobotView::getOutOfExperiment()
   listboxJoints->clear();
   listboxDrives->clear();
   listboxSensors->clear();
+  shownIssues.clear();
+  listviewIssues->clear();
+  texteditIssueDetail->setPlainText( "Press Check to examine the robot." );
 
    // now fill the 6 listboxes describing the robot properties;
    // Manage the Bodies listbox
@@ -152,5 +160,66 @@ void SIG_RobotView::getOutOfExperiment()
    }
 }
 
+void SIG_RobotView::showIssues( const QList<SIGEL_RobotCheck::SIG_RobotIssue> &issues )
+{
+  shownIssues = issues;
+  listviewIssues->clear();
+  texteditIssueDetail->clear();
+
+  if ( shownIssues.isEmpty() )
+    {
+      texteditIssueDetail->setPlainText( "The check found nothing." );
+      return;
+    }
+
+  for ( const SIGEL_RobotCheck::SIG_RobotIssue &issue : shownIssues )
+    {
+      QTreeWidgetItem *item = new QTreeWidgetItem( listviewIssues );
+
+      switch ( issue.kind )
+        {
+        case SIGEL_RobotCheck::SIG_RobotIssue::tError:
+          item->setIcon( 0, style()->standardIcon( QStyle::SP_MessageBoxCritical ) );
+          item->setText( 0, "Error" );
+          break;
+
+        case SIGEL_RobotCheck::SIG_RobotIssue::tWarning:
+          item->setIcon( 0, style()->standardIcon( QStyle::SP_MessageBoxWarning ) );
+          item->setText( 0, "Warning" );
+          break;
+
+        case SIGEL_RobotCheck::SIG_RobotIssue::tSuggestion:
+          item->setIcon( 0, style()->standardIcon( QStyle::SP_MessageBoxInformation ) );
+          item->setText( 0, "Suggestion" );
+          break;
+        }
+
+      item->setText( 1, issue.title );
+    }
+
+  listviewIssues->resizeColumnToContents( 0 );
+  listviewIssues->setCurrentItem( listviewIssues->topLevelItem( 0 ) );
+}
+
+void SIG_RobotView::slotIssueSelected()
+{
+  int row = listviewIssues->indexOfTopLevelItem( listviewIssues->currentItem() );
+  if ( row < 0 || row >= shownIssues.size() )
+    {
+      texteditIssueDetail->clear();
+      return;
+    }
+
+  const SIGEL_RobotCheck::SIG_RobotIssue &issue = shownIssues[ row ];
+
+  QString detail = "<table cellspacing=\"4\">";
+  if ( !issue.part.isEmpty() )
+    detail += "<tr><td><b>Parts:</b></td><td>" + issue.part.toHtmlEscaped() + "</td></tr>";
+  detail += "<tr><td><b>Analysis:</b></td><td>" + issue.analysis.toHtmlEscaped() + "</td></tr>";
+  detail += "<tr><td><b>Advice:</b></td><td>" + issue.advice.toHtmlEscaped() + "</td></tr>";
+  detail += "</table>";
+
+  texteditIssueDetail->setHtml( detail );
+}
 
 }  //    { namespace SIGEL_MasterGUI }

@@ -1,0 +1,28 @@
+## hammer.exp
+LimitHoldsDrive	warning	hinge1Drive, hinge3Drive, hinge2Drive, hinge4Drive	Joint limit cannot hold its drive	These drives can push their joint up to 1146 degrees past its limit, more than the joint's range of 180 degrees. The joint may fold through or spin freely.	Lower the drive force or raise the joint-limit spring.
+DriveStrength	warning	hinge1Drive, hinge3Drive, hinge2Drive, hinge4Drive	Drive too strong for the robot's weight	At full force, one turn of the joint through its range can lift the whole robot up to 13.1 high. Standing on the floor, the robot has a start height of 1. Random programs throw it into the air.	Lower the drive force.
+check: errors 0, warnings 2, suggestions 0
+## insect.exp
+GroundStepSize	suggestion	foot1	Step size for ground contact	Step size 0.002 is above the suggested 0.00187 for ground contact on the lightest link (mass 0.0467). Runs may still work; if they do not, robots fly off or score 0.	Lower the step size.
+check: errors 0, warnings 0, suggestions 1
+## octopus.exp
+LimitHoldsDrive	warning	firstLegJoint1Drive, secondLegJoint1Drive, thirdLegJoint1Drive	Joint limit cannot hold its drive	These drives can push their joint up to 57 degrees past its limit, more than the joint's range of 40 degrees. The joint may fold through or spin freely.	Lower the drive force or raise the joint-limit spring.
+JointStart	warning	secondLegJoint1 (init -45, range -90..-50), thirdLegJoint1 (init -45, range -90..-50), firstLegJoint1 (init -45, range -90..-50)	Joint starts outside its range	The start angle of these joints is outside their own range, so the limit spring kicks them at the first step.	Put init between minimal and maximal.
+GroundStepSize	suggestion	firstLegLink1	Step size for ground contact	Step size 0.01 is above the suggested 0.00401 for ground contact on the lightest link (mass 0.268). Runs may still work; if they do not, robots fly off or score 0.	Lower the step size.
+Standing	suggestion	thirdLegJoint3	Robot settles before it rests	With no drive active this joint turns 21 degrees before the robot rests, so every run starts with this motion.	Put the start angles where the robot rests.
+check: errors 0, warnings 2, suggestions 2
+## runner.exp
+JointStart	warning	secondLegJoint1 (init -45, range -90..-50), firstLegJoint1 (init -45, range -90..-50)	Joint starts outside its range	The start angle of these joints is outside their own range, so the limit spring kicks them at the first step.	Put init between minimal and maximal.
+Standing	suggestion	firstLegJoint3	Robot settles before it rests	With no drive active this joint turns 22 degrees before the robot rests, so every run starts with this motion.	Put the start angles where the robot rests.
+check: errors 0, warnings 1, suggestions 1
+## shortHammer.exp
+LimitHoldsDrive	warning	hinge1Drive, hinge3Drive, hinge2Drive	Joint limit cannot hold its drive	These drives can push their joint up to 1146 degrees past its limit, more than the joint's range of 180 degrees. The joint may fold through or spin freely.	Lower the drive force or raise the joint-limit spring.
+DriveStrength	warning	hinge1Drive, hinge3Drive, hinge2Drive	Drive too strong for the robot's weight	At full force, one turn of the joint through its range can lift the whole robot up to 14.9 high. Standing on the floor, the robot has a start height of 1. Random programs throw it into the air.	Lower the drive force.
+check: errors 0, warnings 2, suggestions 0
+## twoBases.exp
+JointStepSize	suggestion		Step size for the joints	Step size 0.01 is above the suggested 0.00863 for the joints, limited by the joint-limit damper. Runs may still work; the damper acts only past a limit.	Lower the step size or the joint-limit damper.
+check: errors 0, warnings 0, suggestions 1
+## walker.exp
+GroundStepSize	suggestion	shoulder5	Step size for ground contact	Step size 0.002 is above the suggested 0.0009 for ground contact on the lightest link (mass 0.0108). Runs may still work; if they do not, robots fly off or score 0.	Lower the step size.
+JointStepSize	suggestion		Step size for the joints	Step size 0.002 is above the suggested 0.00157 for the joints, limited by the joint-limit damper. Runs may still work; the damper acts only past a limit.	Lower the step size or the joint-limit damper.
+check: errors 0, warnings 0, suggestions 2

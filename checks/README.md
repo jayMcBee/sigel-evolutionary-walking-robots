@@ -38,26 +38,28 @@ sigel_eval`, and `make B=build-asan sigel_eval pvm-link`.
    saved twice; the saved files must stay the same.
 8. **Forms.** The form compiler gives no warnings, every image a form uses
    exists, and every form is in the build.
+9. **Robot check.** The issues that the robot check raises on the 7 shipped
+   experiments must match `baselines/robotcheck-baseline.txt`.
 
 It prints one row per check and a total, and exits non-zero if anything fails
 or is skipped. The warning count on the total line is part of the result.
 
 ## Separate scripts
 
-9. **`fitness-check.sh`.** 21 fitness values, 3 for each of the 7
-   experiments, must match `baselines/fitness-baseline.txt`. It also runs the
-   evaluator's self-test. Run it on both builds:
+10. **`fitness-check.sh`.** 21 fitness values, 3 for each of the 7
+    experiments, must match `baselines/fitness-baseline.txt`. It also runs the
+    evaluator's self-test. Run it on both builds:
 
-       ./checks/fitness-check.sh | diff -u checks/baselines/fitness-baseline.txt -
-       ASAN_OPTIONS=detect_leaks=0 ./checks/fitness-check.sh build-asan \
-           | diff -u checks/baselines/fitness-baseline.txt -
+        ./checks/fitness-check.sh | diff -u checks/baselines/fitness-baseline.txt -
+        ASAN_OPTIONS=detect_leaks=0 ./checks/fitness-check.sh build-asan \
+            | diff -u checks/baselines/fitness-baseline.txt -
 
-10. **`dictorder-dump.sh`.** The order in which robot parts reach the
+11. **`dictorder-dump.sh`.** The order in which robot parts reach the
     simulation must match the baseline.
 
         ./checks/dictorder-dump.sh | diff -u checks/baselines/dictorder-baseline.txt -
 
-11. **`pvm-check.sh`.** Starts a PVM daemon, makes one plain PVM round trip,
+12. **`pvm-check.sh`.** Starts a PVM daemon, makes one plain PVM round trip,
     then sends SIGEL's own PVM data through real PVM under AddressSanitizer.
     Pass or fail; no baseline.
 
@@ -65,7 +67,8 @@ or is skipped. The warning count on the total line is part of the result.
 
 ## Other files
 
-- `baselines/`: the four files the checks compare against.
+- `baselines/`: the five files the checks compare against.
 - `programs/`: the check programs. `guidrive.cpp` drives the interface,
-  `sigel_eval.cpp` runs one fitness evaluation, `expstruct.py` fingerprints a
+  `sigel_eval.cpp` runs one fitness evaluation or, with `-check`, lists the
+  issues of the robot check, `expstruct.py` fingerprints a
   saved experiment, `pvm_link.cpp` and `pvm_smoke.c` test PVM.

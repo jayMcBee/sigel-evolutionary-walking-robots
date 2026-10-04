@@ -313,39 +313,10 @@ touched, because changing one changes behaviour against the reference binary.
   and `SIG_GPRemoteZORCFitnessFunction`. Decide for each whether it belongs in
   the interface or goes through the new error reporter.
 
-- [ ] **134. Show the robot information on the Robot page.** The Info button
-  opens a dialog, while the robot advisor of item 77 shows its findings on the
-  page. Both belong on the page: the lower half becomes two tabs, Information
-  and Advice, and the Info dialog and its button go.
-
-- [ ] **77. A robot checker.** Idea; the name is open. It reads a robot model
-  and its Language Parameters and warns about what will make evolution fail
-  or mislead:
-  - **Joint-limit stability per joint,** `timestep * sqrt(K / I)` and
-    `timestep * damper / I`. From the x86 session on 1.3, not re-measured: a
-    `JOINTLIMITSK_SPRING` of 25000 moved from a one-joint robot onto a
-    three-joint chain put the limit-spring torque above half the drive torque.
-  - **Drive strength against weight,**
-    `maximalforce / (mass * g * half-length)`. Same source: 0.60 to 0.92 in
-    the shipped models, whose masses span 1.2 to 49.
-  - **Drives MOVE cannot reach,** or reaches unevenly. MOVE picks drive
-    `(register value + 2^(w-1)) % number of drives`, w the register width.
-    From reading 1.3's `SIG_Interpreter::interprete` and
-    `SIG_DynaMechsCommandInterface::moveDrive`, as are the rest of this list;
-    the port is expected to match, not checked yet.
-  - **A register width of 1,** which divides a force drive's torque by 0.
-  - **Too few torque levels** for a small register width: a force drive
-    gives `maximalforce * R0 / (2^(w-1) - 1)`.
-  - **`minimalforce` as a dead band:** above the maximum, or large against
-    one torque step.
-  - **Servo drives** that a narrow register cannot turn through their range:
-    the register value is an angle in degrees, so 8 bits reach -128 to 127.
-  - **Reordered drives:** drive numbers are the order in the model, so a
-    change silently changes which joint an evolved program moves.
-  - **Sensors:** SENSE picks from a register value too; the same checks
-    likely apply. Not read yet.
-  To show beside it: every MOVE takes its torque from R0, and a negative
-  register operand wraps (`MOVE -128` with 24 registers reads R8).
+- [ ] **138. Show the robot information on the Robot page.** The Info button
+  opens a dialog, while the robot check shows its issues on the page. Both
+  belong on the page: the lower half becomes two tabs, Information and Robot
+  check, and the Info dialog and its button go.
 
 - [ ] **9. Syntax-highlight the program view.** New
   `programToHtml(const SIG_Program &, const SIG_LanguageParameters &)` returning
