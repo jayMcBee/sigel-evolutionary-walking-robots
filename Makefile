@@ -8,7 +8,7 @@
 #   make vendor     the five vendored libraries only
 #   make pvm        libpvm3.a and pvmd3, built by PVM's own make
 #   make pvm-link   build/pvm_link -- SIGEL's PVM code against real PVM
-#   make core       the nine SIGEL core modules only
+#   make core       the ten SIGEL core modules only
 #   make clean      remove build/ and PVM's products; sigelApp/ stays, and
 #                   needs `make' again before SIGEL can start PVM
 #   make unpatch    revert the vendored tree to the tarball contents
@@ -280,7 +280,7 @@ SIGCXX := g++ -std=c++20 -O1 -g -fPIC -Wall -Wextra -Wold-style-cast \
               $(SIGSAN)
 
 CORE := SIGEL_Tools SIGEL_Environment MT_GPSystem SIGEL_Robot SIGEL_Program \
-        SIGEL_RobotIO SIGEL_Simulation MT_Control SIGEL_GP
+        SIGEL_RobotIO SIGEL_Simulation MT_Control SIGEL_GP SIGEL_RobotCheck
 
 CORE_LIBS := $(patsubst %,$(LIB)/lib%.a,$(CORE))
 core: $(CORE_LIBS)
