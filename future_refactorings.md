@@ -32,7 +32,7 @@ Paths are relative to `sigel/`, the source tree.
   Tick a place when it is done.
 
   *Local pointer that can be a local object:*
-  - [ ] `SIG_RobotBuilder::firstPass`: `s`, `c`. They leak when the robot
+  - [x] `SIG_RobotBuilder::firstPass`: `s`, `c`. They leak when the robot
     file has an error.
   - [ ] `SIG_RobotBuilder::secondPass`: `s`, `c`. The same.
   - [ ] `MT_Search::crossover`: `NextProgPartForChildOne`,
