@@ -34,7 +34,8 @@ namespace SIGEL_RobotCheck
 
   /**
    * The volume that a link fills: its closed surface as triangles, and the
-   * box around them. It tells how much of that volume another link shares.
+   * box around them. It tells how much of that volume another link shares,
+   * and how far a line passes from it.
    */
   class SIG_LinkVolume
   {
@@ -51,11 +52,21 @@ namespace SIGEL_RobotCheck
      */
     double sharedWith( const SIG_LinkVolume &other, int samples, SIGEL_Tools::SIG_Randomizer &randomizer ) const;
 
+    /**
+     * The distance from the line through this point in this direction to
+     * the surface. It is 0 for a line that touches or enters the volume.
+     */
+    double distanceToLine( SIG_Vector point, SIG_Vector direction ) const;
+
   private:
 
     struct Triangle { SIG_Vector a, b, c; };
 
     bool contains( const SIG_Vector &point ) const;
+
+    // The distance from the origin to the segment from a to b.
+    double distanceToOrigin( SIG_Vector a, SIG_Vector b ) const;
+
     void widenBox( SIG_Vector corner );
 
     QList<Triangle> triangles;

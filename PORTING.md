@@ -909,6 +909,21 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-10-05 — THE JOINT AXIS CHECK MEASURES THE AXIS LINE AGAINST THE LINK.**
+
+- **Before:** `SIG_JointAxisCheck` asked whether an edge of a link lies on
+  the joint's axis. Only a joint built as a wedge has such an edge, so a
+  robot whose joints are pins through a solid got the issue on every joint.
+- **Now:** the check measures how far the joint's axis line passes from the
+  link's surface. `SIG_LinkVolume::distanceToLine` gives 0 for a line that
+  touches or enters the link. The issue is raised above 1 % of the robot's
+  size, as a suggestion. It finds a link that does not reach its own joint.
+- **Limit:** a link that is moved along the axis is not found.
+- **Measured:** the shipped experiments raise no joint axis issue.
+  `hammer.exp` with one attachment moved outward by 0.26 raises it at
+  1.97 %; moved by 0.13 it is quiet; pushed inward by 0.26 it is quiet and
+  `SIG_LinkOverlapCheck` raises its issue.
+
 **2026-10-05 — DONE: ITEM 138, THE ROBOT INFORMATION IS ON THE ROBOT PAGE.**
 
 - **A user sees:** the Links list of the Robot page is a table with the mass,

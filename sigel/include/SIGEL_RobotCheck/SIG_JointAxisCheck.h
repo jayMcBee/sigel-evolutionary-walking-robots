@@ -33,7 +33,8 @@ namespace SIGEL_RobotCheck
 {
 
   /**
-   * Finds joints whose axis lies on no edge of a link that they join.
+   * Finds joints whose axis passes outside a link that they join.
+   * A link that is moved along the axis is not found.
    */
   class SIG_JointAxisCheck
   {
@@ -46,12 +47,9 @@ namespace SIGEL_RobotCheck
 
   private:
 
-    // The distance from an axis to the second nearest vertex of a link.
-    double offAxis( const SIGEL_Robot::SIG_Link *link, SIG_Vector axisPoint, SIG_Vector axis ) const;
-
-    // The seven shipped robots are at 0.18 % or less; a model with misplaced joints is at 5.2 %.
-    // A joint that is a pin in a fork is above the limit and sound.
-    static constexpr double axisOffEdgePercent = 1.0;
+    // The shipped robots are at 0.08 % or less, and a robot whose axis is off its link on purpose at 0.56 %.
+    // A model whose parts float apart is at 2 %.
+    static constexpr double axisOutsideLinkPercent = 1.0;
 
     const SIG_RobotStartPose &startPose;
 

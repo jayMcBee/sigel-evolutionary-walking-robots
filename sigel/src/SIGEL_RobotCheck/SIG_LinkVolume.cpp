@@ -24,6 +24,7 @@
 #include "SIGEL_RobotCheck/SIG_LinkVolume.h"
 
 #include <algorithm>
+#include <cmath>
 
 SIGEL_RobotCheck::SIG_LinkVolume::SIG_LinkVolume()
   : lowCorner( 0, 0, 0 ),
@@ -119,4 +120,66 @@ double SIGEL_RobotCheck::SIG_LinkVolume::sharedWith( const SIG_LinkVolume &other
     }
 
   return boxVolume * insideBoth / samples;
+}
+
+double SIGEL_RobotCheck::SIG_LinkVolume::distanceToLine( SIG_Vector point, SIG_Vector direction ) const
+{
+  direction.normalize();
+
+  double distance = -1;
+  for ( const Triangle &triangle : triangles )
+    {
+      // Seen along the line, the line is the origin and the triangle is flat.
+      SIG_Vector corners[3] = { triangle.a, triangle.b, triangle.c };
+      for ( SIG_Vector &corner : corners )
+        {
+          corner.minusis( &point );
+          SIG_Vector alongLine = direction;
+          alongLine.timesis( corner.inprod( &direction ) );
+          corner.minusis( &alongLine );
+        }
+
+      // The origin is inside the flat triangle when it is on the same side of all three edges.
+      double sides[3];
+      for ( int i = 0; i < 3; i++ )
+        {
+          SIG_Vector across;
+          corners[i].crossprod( &corners[( i + 1 ) % 3], &across );
+          sides[i] = across.inprod( &direction );
+        }
+
+      // A triangle seen from its edge has no inside, but rounding can give it one.
+      double area = std::abs( sides[0] + sides[1] + sides[2] );
+      double reach = corners[0].inprod( &corners[0] ) + corners[1].inprod( &corners[1] ) + corners[2].inprod( &corners[2] );
+      bool seenFromEdge = area <= 1e-9 * reach;
+
+      bool sameSide = ( sides[0] > 0 && sides[1] > 0 && sides[2] > 0 ) || ( sides[0] < 0 && sides[1] < 0 && sides[2] < 0 );
+      if ( sameSide && !seenFromEdge )
+        return 0;
+
+      for ( int i = 0; i < 3; i++ )
+        {
+          double toEdge = distanceToOrigin( corners[i], corners[( i + 1 ) % 3] );
+          if ( distance < 0 || toEdge < distance )
+            distance = toEdge;
+        }
+    }
+
+  // A volume without triangles is nowhere, so no line misses it.
+  return std::max( 0.0, distance );
+}
+
+double SIGEL_RobotCheck::SIG_LinkVolume::distanceToOrigin( SIG_Vector a, SIG_Vector b ) const
+{
+  SIG_Vector edge = b;
+  edge.minusis( &a );
+
+  double length = edge.inprod( &edge );
+  double fraction = 0;
+  if ( length > 0 )
+    fraction = std::clamp( -a.inprod( &edge ) / length, 0.0, 1.0 );
+
+  edge.timesis( fraction );
+  a.plusis( &edge );
+  return a.norm();
 }
