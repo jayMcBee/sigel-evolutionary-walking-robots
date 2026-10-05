@@ -314,9 +314,16 @@ touched, because changing one changes behaviour against the reference binary.
   the interface or goes through the new error reporter.
 
 - [ ] **138. Show the robot information on the Robot page.** The Info button
-  opens a dialog, while the robot check shows its issues on the page. Both
-  belong on the page: the lower half becomes two tabs, Information and Robot
-  check, and the Info dialog and its button go.
+  opens a dialog, while the robot check shows its issues on the page. The
+  facts of the dialog go onto the page, beside the parts they describe:
+  - The Links list becomes a table with the mass, volume and density of each
+    link. The root link and the other links each get an icon, and the total
+    mass stands in the label of the list.
+  - Bodies and Materials stand beside the Links table. Joints, Drives and
+    Sensors stay in the row below. Both rows have the same height.
+  - The labels above the lists are bold, with the count in brackets.
+  - The Info button, its dialog and `SIG_Robot::getRobotInformation` go. That
+    method leaves links out without a message when its buffer is full.
 
 - [ ] **9. Syntax-highlight the program view.** New
   `programToHtml(const SIG_Program &, const SIG_LanguageParameters &)` returning
