@@ -909,6 +909,26 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-10-05 — A SIMULATION IS FREED WHEN IT ENDS.**
+
+- **Before:** `SIG_Simulation` built its simulation data, queries, command
+  interface and interpreter with `new` and never deleted them. Four of the
+  five fitness functions built the simulation with `new` and never deleted
+  it.
+- **Now:** the four members of `SIG_Simulation` are `std::unique_ptr`,
+  declared in the order they are built, so the simulation data is destroyed
+  last. The simulation data member has the type
+  `SIG_DynaMechsSimulationData`, declared by name only in the header, so
+  `~SIG_Simulation` is in the `.cpp` file. The five fitness functions use a
+  local simulation object. `~SIG_DynaMechsSimulationData` runs after each
+  fitness evaluation and when a visualisation is deleted, and releases the
+  DynaMechs environment.
+- **Measured:** the 21 fitness rows are identical on both builds, and the
+  AddressSanitizer run has no report.
+- **Not known:** why 1.3 had `delete simulation;` commented out in four
+  fitness functions.
+- **Next:** item 137 can now be done.
+
 **2026-10-05 — THE BUILD WARNS ABOUT A MISSING VIRTUAL DESTRUCTOR.**
 
 - **Now:** `SIGCXX` has `-Wnon-virtual-dtor`. `SIG_SimulationData`,
