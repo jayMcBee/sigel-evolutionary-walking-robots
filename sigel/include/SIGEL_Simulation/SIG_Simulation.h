@@ -32,6 +32,7 @@
 #include "SIGEL_Program/SIG_Program.h"
 #include "SIGEL_Environment/SIG_Environment.h"
 #include <qstring.h>
+#include <memory>
 
 /** The Simulation covers the connection to DynaMechs plus an Interpreter.
  *
@@ -43,7 +44,9 @@
 
 namespace SIGEL_Simulation
 {
-  
+
+  class SIG_DynaMechsSimulationData;
+
   /**
    * The class corresponding to one Robot-Simulation.
    *
@@ -74,7 +77,7 @@ namespace SIGEL_Simulation
 		      SIGEL_Program::SIG_Program const & robotProgram,
 		      SIG_SimulationParameters const & simulationParameter,
 		      SIG_Recorder & theRecorder);
-      virtual ~SIG_Simulation() = default;
+      virtual ~SIG_Simulation();
 		
       /**
        * Starts the simulation.
@@ -122,27 +125,27 @@ namespace SIGEL_Simulation
     protected:
 
       /**
-       * The commandInterface used for example to propagate move commands to the simulation.
-       */
-      SIG_CommandInterface *commandInterface;
-
-      /**
        * The representation of the simulation data.
        *
        * The simulation data cannot be access directly by any of the other classes. They have to
        * use the interfaces SIG_SimulationQueries and SIG_CommandInterface to manipulate it.
        */
-      SIG_SimulationData *simulationData;
+      std::unique_ptr< SIG_DynaMechsSimulationData > simulationData;
 
       /**
        * The interface used to query the simulation for example about the actual simulation time.
        */
-      SIG_SimulationQueries *simulationQueries;
+      std::unique_ptr< SIG_SimulationQueries > simulationQueries;
+
+      /**
+       * The commandInterface used for example to propagate move commands to the simulation.
+       */
+      std::unique_ptr< SIG_CommandInterface > commandInterface;
 
       /**
        * The interpreter used to interpret the programs.
        */
-      SIG_Interpreter *interpreter;
+      std::unique_ptr< SIG_Interpreter > interpreter;
     };
 
 }

@@ -34,23 +34,21 @@ SIGEL_Simulation::SIG_Simulation::SIG_Simulation(SIGEL_Robot::SIG_Robot const & 
 						 SIG_Recorder & theRecorder) :
   recorder(theRecorder)
 {
-  SIG_DynaMechsSimulationData *dynaMechsSimulationData = new SIG_DynaMechsSimulationData( robot,
-											  environment,
-											  simulationParameter );
-
-  simulationData = dynaMechsSimulationData;
-  simulationQueries = new SIG_DynaMechsSimulationQueries( *dynaMechsSimulationData );
-  commandInterface = new SIG_DynaMechsCommandInterface( *dynaMechsSimulationData );
+  simulationData = std::make_unique< SIG_DynaMechsSimulationData >( robot, environment, simulationParameter );
+  simulationQueries = std::make_unique< SIG_DynaMechsSimulationQueries >( *simulationData );
+  commandInterface = std::make_unique< SIG_DynaMechsCommandInterface >( *simulationData );
 
   recorder.setSimulationQueries( *simulationQueries );
   recorder.init();
 
-  interpreter = new SIG_Interpreter( *robot.getLangParam(),
-				     robotProgram,
-				     *commandInterface,
-				     *simulationQueries );
+  interpreter = std::make_unique< SIG_Interpreter >( *robot.getLangParam(),
+						     robotProgram,
+						     *commandInterface,
+						     *simulationQueries );
 
 };
+
+SIGEL_Simulation::SIG_Simulation::~SIG_Simulation() = default;
 
 // The boundary below is deliberate. Every caller is a fitness function that
 // catches SIG_Exception, so an escaping one becomes a wrong fitness, not a crash.

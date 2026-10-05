@@ -23,6 +23,7 @@
 
 
 #include "SIGEL_Simulation/SIG_EarlyRunTermSimulation.h"
+#include "SIGEL_Simulation/SIG_DynaMechsSimulationData.h"
 
 
 SIGEL_Simulation::SIG_EarlyRunTermSimulation::SIG_EarlyRunTermSimulation(SIGEL_Robot::SIG_Robot const & robot,
