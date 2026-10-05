@@ -934,7 +934,7 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 - **Checks:** the GUI behaviour baseline shows the Links table with its
   values where the list and the dialog's text were. The `dialogs` scenario
   has five dialogs.
-- **Gates:** `check.sh` 816 pass, 0 fail; warnings 316 to 313. Fitness,
+- **Gates:** `check.sh` 818 pass, 0 fail; warnings 316 to 313. Fitness,
   dictorder and PVM were not run; no simulation code changed.
 
 **2026-10-04 — DONE: ITEM 77, THE ROBOT CHECK.**
@@ -1004,7 +1004,7 @@ classes and leave truncation a hard error. **They are not interchangeable.**
   a section "robot check" that compares them on the 7 shipped experiments
   with `checks/baselines/robotcheck-baseline.txt`. The GUI behaviour baseline
   has two new lines, for the group and its table.
-- **Gates:** `check.sh` 816 pass, 0 fail; warnings 316, none of them in
+- **Gates:** `check.sh` 818 pass, 0 fail; warnings 316, none of them in
   `SIGEL_RobotCheck`. The same issues on a second machine, over 25
   experiments there. Fitness, dictorder and PVM were not run; no simulation
   code changed.

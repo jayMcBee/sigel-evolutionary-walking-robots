@@ -193,7 +193,11 @@ void SIG_RobotView::showLinks( const QString &sigelRootString )
       if ( links[i] == theExperiment.robot.getRootLink() )
         {
           item->setIcon( 0, QIcon( QPixmap( sigelRootString + "/pixmaps/links-R.xpm" ) ) );
-          item->setToolTip( 0, "The root link: the torso, from which the robot is built." );
+          item->setToolTip( 0, "The root link, also called the torso. The robot is built from it." );
+
+          QFont bold = item->font( 0 );
+          bold.setBold( true );
+          item->setFont( 0, bold );
         }
       else
         {
