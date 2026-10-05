@@ -70,10 +70,6 @@ namespace SIGEL_Simulation
       /**
        * Frees the links in dynaMechsLinks, which this class owns, and takes
        * dynaMechsEnvironment out of DynaMechs.
-       *
-       * NOTE: nothing deletes the SIG_SimulationData object that
-       * SIG_Simulation::SIG_Simulation() allocates, so this destructor does
-       * not run.
        */
       ~SIG_DynaMechsSimulationData();
 

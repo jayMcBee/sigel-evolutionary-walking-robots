@@ -120,8 +120,6 @@ touched, because changing one changes behaviour against the reference binary.
 - [ ] **137. Refuse a second simulation in one process.** DynaMechs has one
   current environment. A second `SIG_DynaMechsSimulationData` takes it from
   the first without a message. The constructor is to throw if one is set.
-  This waits for the simulation data to be deleted: today `SIG_Simulation`
-  never deletes it, so the current environment is never released.
   The constructor must also release the environment when it throws.
   Otherwise one robot that fails to build makes every later simulation in
   that process throw.
@@ -187,8 +185,6 @@ touched, because changing one changes behaviour against the reference binary.
   behaviour: a `std::unique_ptr` (the destructor must still delete
   `simulation` first, because it holds a reference to the recorder); a
   try/catch that deletes and throws again; or a value member.
-  *Larger and related:* `SIG_Simulation::~SIG_Simulation` is empty, so every
-  Stop in the viewer leaks the whole simulation — the §10 leak in PORTING.md.
 
 - [ ] **53. DynaMechs returns uninitialised forces for end links.**
   `dmArticulation::getForces` returns `f_star`, which is never written for a
