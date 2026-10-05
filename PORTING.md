@@ -909,6 +909,20 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-10-05 — DONE: ITEM 137, A SECOND SIMULATION IN ONE PROCESS IS REFUSED.**
+
+- **Before:** DynaMechs has one current environment. A second
+  `SIG_DynaMechsSimulationData` took it from the first without a message.
+- **Now:** the constructor throws `SIG_Exception` at its start if a current
+  environment is set, and sets its own environment as its last statement.
+  A constructor that throws has then set nothing, so it has nothing to
+  release.
+- **No code reaches the throw today:** each place that builds simulation
+  data ends it before the next is built.
+- **Measured:** the 21 fitness rows and the robot check baseline are
+  identical. A test by hand built a second object while the first existed:
+  it threw. A third object, built after both were gone, was built.
+
 **2026-10-05 — A SIMULATION IS FREED WHEN IT ENDS.**
 
 - **Before:** `SIG_Simulation` built its simulation data, queries, command

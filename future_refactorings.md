@@ -117,13 +117,6 @@ touched, because changing one changes behaviour against the reference binary.
   `loadDynaMechsEnvironment` also runs `generateTerrain`, which writes the
   `Terrain.ter` that every simulation reads. That step stays.
 
-- [ ] **137. Refuse a second simulation in one process.** DynaMechs has one
-  current environment. A second `SIG_DynaMechsSimulationData` takes it from
-  the first without a message. The constructor is to throw if one is set.
-  The constructor must also release the environment when it throws.
-  Otherwise one robot that fails to build makes every later simulation in
-  that process throw.
-
 - [ ] **139. Assess the report that a simple servo drive goes to the mirrored
   angle.** A robot built with `simpleservo` drives was reported to move its
   joint to minimum + maximum - command instead of to the command. One test
