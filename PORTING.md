@@ -909,6 +909,18 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-10-05 — THE BUILD WARNS ABOUT A MISSING VIRTUAL DESTRUCTOR.**
+
+- **Now:** `SIGCXX` has `-Wnon-virtual-dtor`. `SIG_SimulationData`,
+  `SIG_SimulationQueries` and `SIG_CommandInterface` have a virtual
+  destructor.
+- **Why:** g++ gives no warning when a `std::unique_ptr` deletes an object
+  through a base class that has no virtual destructor, because the `delete`
+  is in a system header. The new flag reports the class itself.
+- **Measured:** 14 distinct warnings in 9 classes before, 5 in 3 classes
+  after. The 5 are `SIG_Renderer`, `SIG_EnvironmentRenderer` and
+  `SIG_RobotRenderer`.
+
 **2026-10-05 — THE JOINT AXIS CHECK MEASURES THE AXIS LINE AGAINST THE LINK.**
 
 - **Before:** `SIG_JointAxisCheck` asked whether an edge of a link lies on

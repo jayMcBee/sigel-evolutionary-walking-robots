@@ -277,7 +277,7 @@ SIGINC := -Ishim -I$(SRC)/include -I$(B)/ui -isystem $(QTINC) \
 # relocations for Qt data such as QCoreApplication::self, and QApplication's
 # constructor crashes in QGuiApplication::screenAdded.
 SIGCXX := g++ -std=c++20 -O1 -g -fPIC -Wall -Wextra -Wold-style-cast \
-              $(SIGSAN)
+              -Wnon-virtual-dtor $(SIGSAN)
 
 CORE := SIGEL_Tools SIGEL_Environment MT_GPSystem SIGEL_Robot SIGEL_Program \
         SIGEL_RobotIO SIGEL_Simulation MT_Control SIGEL_GP SIGEL_RobotCheck

@@ -50,6 +50,8 @@ class SIG_CommandInterface {
    */
   SIG_CommandInterface();
 
+  virtual ~SIG_CommandInterface() = default;
+
   /** Interpretes a "MOVE" from the program.
    * @pre
    *  none

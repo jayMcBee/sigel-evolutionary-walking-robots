@@ -83,6 +83,8 @@ namespace SIGEL_Simulation
 			  SIGEL_Environment::SIG_Environment const & environment,
 			  SIG_SimulationParameters const & simulationParameter);
 
+      virtual ~SIG_SimulationData() = default;
+
       virtual void simulationProgress() = 0;
 
       virtual void setNewFrame( bool newValue ) = 0;
