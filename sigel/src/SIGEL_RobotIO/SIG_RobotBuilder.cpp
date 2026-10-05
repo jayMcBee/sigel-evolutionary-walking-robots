@@ -87,13 +87,9 @@ namespace SIGEL_RobotIO {
                 else
                         homepath = filename.left (occ + 1);
                 
-                SIG_RobotScanner *s = new SIG_RobotScanner
-                        (loadFile (filename));
-                SIG_RobotCompilerStructure *c = new SIG_RobotCompilerStructure
-                        (*s, robot, homepath);
-                c->runPass ();
-                delete c;
-                delete s;
+                SIG_RobotScanner scanner (loadFile (filename));
+                SIG_RobotCompilerStructure compiler (scanner, robot, homepath);
+                compiler.runPass ();
         }
         
 }
