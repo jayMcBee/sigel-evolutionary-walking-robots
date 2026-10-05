@@ -38,7 +38,7 @@ namespace SIGEL_GP
 
     SIGEL_GP::SIG_GPFullDataRecorder recorder( 1 );
 
-    SIGEL_Simulation::SIG_Simulation *simulation = new SIGEL_Simulation::SIG_Simulation( rob,
+    SIGEL_Simulation::SIG_Simulation simulation( rob,
 											 environment,
 											 program,
 											 simparameter,
@@ -48,14 +48,12 @@ namespace SIGEL_GP
 
     try
       {
-	simulation->start();
+	simulation.start();
       }
     catch (SIGEL_Tools::SIG_Exception &e)
       {
 	SIGEL_Tools::SIG_IO::cerr << e.getMessage() << Qt::flush;
       };
-
-    // delete simulation;
 
     SIG_Vector realStartPosition = normalizeRobotPosition( *recorder.positions.value( 0 ),
 							  *recorder.rotations.value( 0 ), rob );

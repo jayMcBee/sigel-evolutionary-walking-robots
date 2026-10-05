@@ -38,7 +38,7 @@ double SIGEL_GP::SIG_GPForceFitnessFunction::evalFitness( SIGEL_Program::SIG_Pro
                                                           SIGEL_Simulation::SIG_SimulationParameters &simparameter ) const {
   SIGEL_GP::SIG_GPFullDataRecorder recorder(1);
 
-  SIGEL_Simulation::SIG_Simulation *simulation = new SIGEL_Simulation::SIG_Simulation( rob, environment, program, simparameter, recorder );
+  SIGEL_Simulation::SIG_Simulation simulation( rob, environment, program, simparameter, recorder );
 
   // For the NiceWalkingFitnessFunction
   double const toleranceBandWidth = 0.5;
@@ -50,13 +50,11 @@ double SIGEL_GP::SIG_GPForceFitnessFunction::evalFitness( SIGEL_Program::SIG_Pro
 
   // start the simulation
   try {
-    simulation->start();
+    simulation.start();
   }
   catch (SIGEL_Tools::SIG_Exception &e) {
     SIGEL_Tools::SIG_IO::cerr << e.getMessage() << Qt::flush;
   };
-
-  // delete simulation;
 
     SIG_Vector realStartPosition = normalizeRobotPosition( *recorder.positions.value( 0 ),  *recorder.rotations.value( 0 ), rob );
     SIG_Vector realEndPosition = normalizeRobotPosition( recorder.endPosition, recorder.endRotation, rob );

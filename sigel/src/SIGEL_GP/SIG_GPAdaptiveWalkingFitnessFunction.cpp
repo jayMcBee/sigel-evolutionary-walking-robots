@@ -46,11 +46,11 @@ namespace SIGEL_GP
 
     // use class SIG_EarlyRunTermSimulation to terminate the simulation when
     // robot height drops below 1/2 of start height to speed up evolutionary progress
-    SIGEL_Simulation::SIG_EarlyRunTermSimulation *simulation = new SIGEL_Simulation::SIG_EarlyRunTermSimulation( rob, environment, program, simparameter, recorder );
+    SIGEL_Simulation::SIG_EarlyRunTermSimulation simulation( rob, environment, program, simparameter, recorder );
 
     // do the simulation
     try
-    {  simulation->start();
+    {  simulation.start();
     }
     catch (SIGEL_Tools::SIG_Exception &e)
     {  SIGEL_Tools::SIG_IO::cerr << e.getMessage() << Qt::flush;
@@ -58,7 +58,7 @@ namespace SIGEL_GP
 
     // calculate how many steps a complete simulation takes
     // (usually number of elements in recorder-obj., but we may have terminated earlier)
-    steps = simulation->getMaxRecorderSteps(100);
+    steps = simulation.getMaxRecorderSteps(100);
 
     SIG_Vector realStartPosition = normalizeRobotPosition( *recorder.positions.value( 0 ),
 							  *recorder.rotations.value( 0 ), rob );
@@ -138,8 +138,6 @@ namespace SIGEL_GP
 
 		// give some information
 		SIGEL_Tools::SIG_IO::cerr << QString::asprintf("fitness: %5.4f  |  avgHeight: %4.1f%%  |  distance: %4.3f  |  steps (calc./total): %d/%d", fitness, avgHeightPercent*100.0, distance, perfSteps, steps) << Qt::endl;
-
-  	delete simulation;
 
   	return fitness;
   }

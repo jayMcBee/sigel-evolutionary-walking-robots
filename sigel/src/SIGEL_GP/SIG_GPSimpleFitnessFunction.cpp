@@ -35,7 +35,7 @@ double SIGEL_GP::SIG_GPSimpleFitnessFunction::evalFitness( SIGEL_Program::SIG_Pr
                                                            SIGEL_Simulation::SIG_SimulationParameters &simparameter ) const {
   SIGEL_GP::SIG_GPSimpleRecorder recorder;
 
-  SIGEL_Simulation::SIG_Simulation *simulation = new SIGEL_Simulation::SIG_Simulation( rob,
+  SIGEL_Simulation::SIG_Simulation simulation( rob,
       environment,
       program,
       simparameter,
@@ -44,13 +44,11 @@ double SIGEL_GP::SIG_GPSimpleFitnessFunction::evalFitness( SIGEL_Program::SIG_Pr
   double fitness = 0;
 
   try {
-    simulation->start();
+    simulation.start();
   }
   catch (SIGEL_Tools::SIG_Exception &e) {
     SIGEL_Tools::SIG_IO::cerr << e.getMessage() << Qt::flush;
   };
-
-  // delete simulation;
 
   SIG_Vector startPosition = normalizeRobotPosition( recorder.start, recorder.startRotation, rob );
 

@@ -39,7 +39,7 @@ namespace SIGEL_GP
 
     SIGEL_GP::SIG_GPFullDataRecorder recorder( recordingFrequency );
 
-    SIGEL_Simulation::SIG_Simulation *simulation = new SIGEL_Simulation::SIG_Simulation( rob,
+    SIGEL_Simulation::SIG_Simulation simulation( rob,
          environment,
          program,
          simparameter,
@@ -48,13 +48,11 @@ namespace SIGEL_GP
     double fitness = 0;
 
     try {
-      simulation->start();
+      simulation.start();
     }
     catch (SIGEL_Tools::SIG_Exception &e) {
       SIGEL_Tools::SIG_IO::cerr << e.getMessage() << Qt::flush;
     };
-
-    // delete simulation;
 
     SIG_Vector *endPosition = new SIG_Vector();
     *endPosition = recorder.endPosition;
