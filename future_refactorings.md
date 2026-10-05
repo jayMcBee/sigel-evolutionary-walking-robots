@@ -54,19 +54,9 @@ Paths are relative to `sigel/`, the source tree.
   `SIG_GPExperiment.o`, and `guidrive` names it and asserts on it.
   Linking the Clean variant once produced a convincing false crash.
 
-- [ ] **11. Write `tour` out as `tournament` in every name.** `tour` is an
-  abbreviation of "tournament" and reads as a round trip. The names are in
-  `SIG_GPManager` (`tours`, `toursAreEmpty`, `createTours`, `calcInitTourSet`
-  and locals), in `SIG_GPParameter` (`slotTourPerGenChanged`,
-  `toursPerRefresh`), and in MetaGP: `MT_Classifier`, `MT_GPSystem` and
-  `MT_GUI` (`tourSizeComboBox`, `slotTourSizeChanged`, `tournSize` and
-  others). The new name for each one is to be decided first, and whether
-  MetaGP's names are part of it.
-  **More than a text change:** `slotTourPerGenChanged` is connected by name
-  in `SIG_GPParameterBase.ui`, `slotTourSizeChanged` by name in
-  `MT_SelectionWidget.cpp`, and the GUI baseline records `tourSizeComboBox`.
-  The comments need a read each: some already say "the tournaments in
-  tours". No saved file and no text in the interface holds these names.
+- [ ] **11. Write `tour` out as `tournament` in every name,** in SIGEL and
+  MetaGP. Two slots are connected by name, and the GUI baseline records one
+  widget name.
 
 - [ ] **13. Translate the German strings.** What is left is **kept, by
   decision:** the history text of `SIG_GPIndividual`, which is saved in `.exp`
