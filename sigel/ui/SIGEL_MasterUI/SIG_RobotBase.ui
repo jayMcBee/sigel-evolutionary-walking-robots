@@ -332,6 +332,16 @@
             <number>6</number>
           </property>
           <item>
+            <widget class="QPushButton" name="pushbuttonRobCheck">
+              <property name="text">
+                <string>Check</string>
+              </property>
+              <property name="toolTip">
+                <string>List what will probably make an evolution with this robot fail or mislead.</string>
+              </property>
+            </widget>
+          </item>
+          <item>
             <spacer name="Spacer1">
               <property name="sizeHint">
                 <size>
@@ -374,16 +384,6 @@
               </property>
               <property name="toolTip">
                 <string>Save this robot as a compiled robot model (*.crb).</string>
-              </property>
-            </widget>
-          </item>
-          <item>
-            <widget class="QPushButton" name="pushbuttonRobCheck">
-              <property name="text">
-                <string>Check</string>
-              </property>
-              <property name="toolTip">
-                <string>List what will probably make an evolution with this robot fail or mislead.</string>
               </property>
             </widget>
           </item>
