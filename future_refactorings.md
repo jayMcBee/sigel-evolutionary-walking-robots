@@ -55,8 +55,7 @@ Paths are relative to `sigel/`, the source tree.
   Linking the Clean variant once produced a convincing false crash.
 
 - [ ] **11. Write `tour` out as `tournament` in every name,** in SIGEL and
-  MetaGP. Two slots are connected by name, and the GUI baseline records one
-  widget name.
+  MetaGP.
 
 - [ ] **13. Translate the German strings.** What is left is **kept, by
   decision:** the history text of `SIG_GPIndividual`, which is saved in `.exp`
