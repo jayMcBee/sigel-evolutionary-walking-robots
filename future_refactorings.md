@@ -24,14 +24,85 @@ Paths are relative to `sigel/`, the source tree.
 
 ## 2 · Ownership
 
-- [ ] **8. Smart pointers.** Correct and broken both compile clean, and no
-  flag verifies it. Prerequisites in order: one experiment running end to end,
-  a fixed seed, a recorded fitness trajectory, then one class at a time with
-  the trajectory bit-identical. Do not start before that exists.
-  Leaks found by item 101's review: `SIG_Simulation`'s constructor members;
-  the `SIG_Simulation` that `evalFitness` allocates in the Simple, RealSpeed,
-  NiceWalking and Force fitness functions, once per evaluation; the elements
-  of `MT_Statistics`; the list in `MT_PopulationWidget::slotExpInd`.
+- [ ] **8. One owner for each object.** Replace a `new` and its `delete`
+  by a local object, a value member or a `std::unique_ptr`, where no other
+  class has to change. One place per commit. Gate for each: the fitness rows
+  are identical on both builds, and the AddressSanitizer run has no report.
+  The places below come from a survey of all SIGEL code on 2026-10-05.
+  Tick a place when it is done.
+
+  *Local pointer that can be a local object:*
+  - [ ] `SIG_RobotBuilder::firstPass`: `s`, `c`. They leak when the robot
+    file has an error.
+  - [ ] `SIG_RobotBuilder::secondPass`: `s`, `c`. The same.
+  - [ ] `MT_Search::crossover`: `NextProgPartForChildOne`,
+    `NextProgPartForChildTwo`.
+  - [ ] `SIG_GPOperations::mutation`, case 2: `newProgLine`.
+  - [ ] `SIG_Mirtich::compute`: the three `new[]` arrays.
+  - [ ] `SIG_Program::readFromFile`: `prgLine`. It leaks when a line does
+    not parse.
+  - [ ] `SIG_Body::load`: `bodyScene`. Never deleted; `~SceneGraph` has
+    never run in SIGEL.
+  - [ ] `SIG_GPPopulation::addRandomIndividuals` and `readFromFile`: the
+    `progress` dialog.
+  - [ ] `SIG_SimulationVisualisation::initShadowMapping`: `program`.
+  - [ ] `SIG_ExperimentListView::openExperimentFile`: `theNewExperiment`.
+  - [ ] `main` in `sigel_slave.cpp`: `simWindow`, `experiment`, `robot`,
+    `environment`, `simulationParameters`, `program`, `modifiedRobot`, `app`.
+  - [ ] `main` in `sigel.cpp`: `mainWindow`. Never deleted;
+    `~SIG_MainWindow` has never run at exit.
+
+  *Pointer member with one owner:*
+  - [ ] `SIG_DynaMechsSimulationData::dynaMechsIntegrator`. Never deleted;
+    the DynaMechs integrator destructors have never run in SIGEL.
+  - [ ] `SIG_DynaMechsLink::screwLink`. Never deleted.
+  - [ ] `SIG_Robot::language`.
+  - [ ] `SIG_Body::geometry`.
+  - [ ] `SIG_Link::geometry`, `mirtich`.
+  - [ ] `SIG_GPExperiment::mtController`.
+  - [ ] `SIG_SimulationVisualisation::simulation`, `renderRecorder`,
+    `shadowProgram`. The simulation must be destroyed before the recorder.
+    This also does item 20.
+  - [ ] `SIG_VisualisationWidget::visualisation`. The old one must be
+    destroyed before the new one is built.
+  - [ ] `SIG_GUIGPExperiment::guiGPManager`.
+  - [ ] `MT_GPManager`: `BestIndividual`, `Randi`, `Statistics`, `Offspring`,
+    `Parent`, `Seeker`, `Selector`, `FitnessTrainer`. Used by the MetaGP
+    thread and the GUI thread.
+  - [ ] `MT_Individual::Program`.
+  - [ ] `MT_Program::Program`, a `new[]` array.
+  - [ ] `MT_Programline::OperandA`, `OperandB`.
+  - [ ] `MT_TrainingCase::TranslateIndividual`.
+  - [ ] `MT_TranslatedIndividual`: `T_Instruktion`, `T_Operand1`,
+    `T_Operand2`, `MetaData`.
+  - [ ] `MT_FitnessTrainer::TSet`.
+  - [ ] `MT_Controller`: `gpManager`, `substitution`, `cacheStrm`. The first
+    two are used by the MetaGP thread; `cacheStrm` leaks.
+  - [ ] `MT_Substitute`: `Interpreter`, `BestMETAProgram`.
+
+  *A `new` that nothing deletes:*
+  - [ ] `MT_Classifier::classifier`: the `MT_TranslatedIndividual` from
+    `createDoubleTransIndi`.
+  - [ ] `MT_Evaluator::spawnTask`: the `MT_TranslatedIndividual` from
+    `translatedSIGProg`.
+  - [ ] `MT_PopulationWidget::getSelectedItems`: the list, used in
+    `slotExpInd`.
+  - [ ] `SIG_GPParameter::slotDeleteHost`: the tree items it takes out.
+  - [ ] `SIG_Robot::readFromFileTransfer`: the language parameters, when the
+    stream has none. Done by `SIG_Robot::language` above.
+  - [ ] `SIG_DynaMechsLink`: the contact model and the DynaMechs link bodies.
+  - [ ] `SIG_EnvironmentRenderer::loadPNMTexture`: the texture image, from
+    `malloc`.
+
+  *Not in this item:* lists of raw pointers, among them the elements of
+  `MT_Statistics`, which are never deleted. `SIG_GPPopulation::randomizer`
+  and `SIG_GPManager::trainer` own their object in one mode and borrow it in
+  another.
+
+- [ ] **140. Assess `DynaMechsLinkGuard`.** It is a hand-written struct in
+  `SIG_DynaMechsSimulationData.cpp` that frees the links when the
+  constructor throws. Review its design, and decide whether a standard
+  C++20 construct does the same job.
 
 - [ ] **36. `SIG_Material::FrictionValue` could be a value type.**
   `FrictionValue` values would drop the `new` and the `qDeleteAll`, as D8 did
