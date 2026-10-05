@@ -363,7 +363,7 @@
                 <string>Import</string>
               </property>
               <property name="toolTip">
-                <string>Import a *.rrb file.</string>
+                <string>Import a raw robot model (*.rrb).</string>
               </property>
             </widget>
           </item>
@@ -373,7 +373,7 @@
                 <string>Load</string>
               </property>
               <property name="toolTip">
-                <string>Load a robot (*.crb format).</string>
+                <string>Load a compiled robot model (*.crb).</string>
               </property>
             </widget>
           </item>
