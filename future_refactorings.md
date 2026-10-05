@@ -134,6 +134,15 @@ touched, because changing one changes behaviour against the reference binary.
   Otherwise one robot that fails to build makes every later simulation in
   that process throw.
 
+- [ ] **139. Assess the report that a simple servo drive goes to the mirrored
+  angle.** A robot built with `simpleservo` drives was reported to move its
+  joint to minimum + maximum - command instead of to the command. One test
+  on one joint agrees with the report. It is not known whether this is a
+  defect, which joints it concerns, or whether 1.3 does the same. The place
+  to read is the `simpleservo` branch of
+  `SIG_DynaMechsCommandInterface::moveDrive`. The shipped robots use force
+  drives, so no shipped experiment shows it.
+
 - [ ] **125. Give `accept()` a buffer size in
   `SIG_GPManager::RegisterDynPVMClients`.** `alen` is passed to `accept()`
   without being set, so `accept()` reads an arbitrary buffer size. If that
