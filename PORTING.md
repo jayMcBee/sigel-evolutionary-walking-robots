@@ -909,6 +909,34 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-10-05 — DONE: ITEM 138, THE ROBOT INFORMATION IS ON THE ROBOT PAGE.**
+
+- **A user sees:** the Links list of the Robot page is a table with the mass,
+  volume and density of each link. The root link has an icon R, every other
+  link an icon L. The label of the list gives the total mass. Bodies and
+  Materials stand beside the table; Joints, Drives and Sensors are in the row
+  below, and both rows have the same height. The labels above the lists are
+  bold, with the count in brackets. The Info button and its dialog are gone;
+  the table holds every fact the dialog gave.
+- **Changed:** `SIG_RobotView::showLinks` fills the table when the page is
+  shown. `SIG_Robot::getLinkMasses` gives the masses; it replaces
+  `SIG_Robot::getRobotInformation`, which wrote the text of the dialog into
+  a buffer of fixed size and left links out without a message when it was
+  full. `SIG_GUIGPExperiment::slotRobotInfo` is gone. Two new icons,
+  `links-R.xpm` and `links-L.xpm`.
+- **A robot whose masses cannot be computed** still shows its links; the
+  label then says why there are no masses.
+- **Volume** is the mass divided by the density of the material, as in the
+  dialog before.
+- **Differs from the first to-do text:** that proposed two tabs,
+  Information and Robot check. The layout was chosen from prototypes of the
+  form; with tabs, the facts and the issues could not be seen together.
+- **Checks:** the GUI behaviour baseline shows the Links table with its
+  values where the list and the dialog's text were. The `dialogs` scenario
+  has five dialogs.
+- **Gates:** `check.sh` 816 pass, 0 fail; warnings 316 to 313. Fitness,
+  dictorder and PVM were not run; no simulation code changed.
+
 **2026-10-04 — DONE: ITEM 77, THE ROBOT CHECK.**
 
 - **A user sees:** a group "Robot check" on the Robot page. The Check button

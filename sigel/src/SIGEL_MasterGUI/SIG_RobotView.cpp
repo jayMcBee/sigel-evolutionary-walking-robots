@@ -20,6 +20,7 @@
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
+#include <qheaderview.h>
 #include <qlabel.h>
 #include <qstyle.h>
 
@@ -28,6 +29,9 @@
 #include "SIGEL_Robot/SIG_Sensor.h"
 #include "SIGEL_Robot/SIG_Joint.h"
 #include "SIGEL_Robot/SIG_Drive.h"
+#include "SIGEL_Robot/SIG_Link.h"
+#include "SIGEL_Robot/SIG_Material.h"
+#include "SIGEL_Tools/SIG_Exception.h"
 
 
 namespace SIGEL_MasterGUI
@@ -40,6 +44,15 @@ namespace SIGEL_MasterGUI
 SIG_RobotView::SIG_RobotView( QWidget* parent,  const char* name, Qt::WindowFlags fl, SIGEL_GP::SIG_GPExperiment &theExperiment )
   : SIG_RobotBase( parent, name, fl ), theExperiment( theExperiment )
 {
+  // The names take the room that the three number columns leave.
+  listviewLinks->header()->setStretchLastSection( false );
+  listviewLinks->header()->setSectionResizeMode( 0, QHeaderView::Stretch );
+  for ( int column = 1; column < listviewLinks->columnCount(); column++ )
+    {
+      listviewLinks->header()->setSectionResizeMode( column, QHeaderView::ResizeToContents );
+      listviewLinks->headerItem()->setTextAlignment( column, Qt::AlignRight | Qt::AlignVCenter );
+    }
+
   QObject::connect( listviewIssues,
 		    SIGNAL( itemSelectionChanged() ),
 		    this,
@@ -61,7 +74,7 @@ void SIG_RobotView::getOutOfExperiment()
   // first clear the listboxes...
   listboxBodies->clear();
   listboxMaterials->clear();
-  listboxLinks->clear();
+  listviewLinks->clear();
   listboxJoints->clear();
   listboxDrives->clear();
   listboxSensors->clear();
@@ -72,7 +85,7 @@ void SIG_RobotView::getOutOfExperiment()
    // now fill the 6 listboxes describing the robot properties;
    // Manage the Bodies listbox
    const QList<SIGEL_Robot::SIG_Body *> &bodyItList = theExperiment.robot.getBodies();
-   textlabelBodies->setText( "Bodies:  " + QString::number( bodyItList.size() ) );
+   textlabelBodies->setText( QString( "Bodies (%1)" ).arg( bodyItList.size() ) );
    for ( auto *bodyIt : bodyItList )
    {
       listboxBodies->addItem( bodyIt->getName() );
@@ -80,23 +93,17 @@ void SIG_RobotView::getOutOfExperiment()
 
    // Manage the Materials listbox
    const QList<SIGEL_Robot::SIG_Material *> &materialItList = theExperiment.robot.getMaterials();
-   textlabelMaterials->setText( "Materials:  " + QString::number( materialItList.size() ) );
+   textlabelMaterials->setText( QString( "Materials (%1)" ).arg( materialItList.size() ) );
    for ( auto *materialIt : materialItList )
    {
       listboxMaterials->addItem( materialIt->getName() );
    }
 
-   // Manage the Links listbox
-   const QList<SIGEL_Robot::SIG_Link *> &linkItList = theExperiment.robot.getLinks();
-   textlabelLinks->setText( "Links:  " + QString::number( linkItList.size() ) );
-   for ( auto *linkIt : linkItList )
-   {
-      listboxLinks->addItem( linkIt->getName() );
-   }
+   showLinks( sigelRootString );
 
    // Manage the Joints listbox
    const QList<SIGEL_Robot::SIG_Joint *> &jointItList = theExperiment.robot.getJoints();
-   textlabelJoints->setText( "Joints:  " + QString::number( jointItList.size() ) );
+   textlabelJoints->setText( QString( "Joints (%1)" ).arg( jointItList.size() ) );
    for ( auto *jointIt : jointItList )
    {
       // put small icons indicating the joint type
@@ -115,7 +122,7 @@ void SIG_RobotView::getOutOfExperiment()
 
    // Manage the Drives Listbox
    const QList<SIGEL_Robot::SIG_Drive *> &driveItList = theExperiment.robot.getDrives();
-   textlabelDrives->setText( "Drives:  " + QString::number( driveItList.size() ) );
+   textlabelDrives->setText( QString( "Drives (%1)" ).arg( driveItList.size() ) );
    for ( auto *driveIt : driveItList )
    {
       // put small icon indicating the type of drive we use
@@ -137,7 +144,7 @@ void SIG_RobotView::getOutOfExperiment()
 
    // Manage the Sensors Listbox
    const QList<SIGEL_Robot::SIG_Sensor *> &sensorItList = theExperiment.robot.getSensors();
-   textlabelSensors->setText( "Sensors:  " + QString::number( sensorItList.size() ) );
+   textlabelSensors->setText( QString( "Sensors (%1)" ).arg( sensorItList.size() ) );
    for ( auto *sensorIt : sensorItList )
    {
 		// insert item with sensor name and pixmap indicating type
@@ -158,6 +165,59 @@ void SIG_RobotView::getOutOfExperiment()
 															            break;
 		}
    }
+}
+
+void SIG_RobotView::showLinks( const QString &sigelRootString )
+{
+  const QList<SIGEL_Robot::SIG_Link *> &links = theExperiment.robot.getLinks();
+  QString label = QString( "Links (%1)" ).arg( links.size() );
+
+  // A robot whose masses cannot be computed still shows its links.
+  QList<double> masses;
+  try
+    {
+      masses = theExperiment.robot.getLinkMasses();
+    }
+  catch ( SIGEL_Tools::SIG_Exception &e )
+    {
+      // The message's later lines name the source file that threw.
+      label += "      No masses: " + e.getMessage().section( '\n', 0, 0 );
+    }
+
+  double totalMass = 0;
+  for ( int i = 0; i < links.size(); i++ )
+    {
+      QTreeWidgetItem *item = new QTreeWidgetItem( listviewLinks );
+      item->setText( 0, links[i]->getName() );
+
+      if ( links[i] == theExperiment.robot.getRootLink() )
+        {
+          item->setIcon( 0, QIcon( QPixmap( sigelRootString + "/pixmaps/links-R.xpm" ) ) );
+          item->setToolTip( 0, "The root link: the torso, from which the robot is built." );
+        }
+      else
+        {
+          item->setIcon( 0, QIcon( QPixmap( sigelRootString + "/pixmaps/links-L.xpm" ) ) );
+          item->setToolTip( 0, "A link." );
+        }
+
+      if ( i < masses.size() )
+        {
+          double density = links[i]->getMaterial()->getDensity();
+          item->setText( 1, QString::number( masses[i], 'f', 2 ) );
+          item->setText( 2, QString::number( masses[i] / density, 'f', 5 ) );
+          item->setText( 3, QString::number( density, 'f', 1 ) );
+          totalMass += masses[i];
+        }
+
+      for ( int column = 1; column < listviewLinks->columnCount(); column++ )
+        item->setTextAlignment( column, Qt::AlignRight | Qt::AlignVCenter );
+    }
+
+  if ( !links.isEmpty() && masses.size() == links.size() )
+    label += QString( "      Total mass: %1 kg" ).arg( totalMass, 0, 'f', 2 );
+
+  textlabelLinks->setText( label );
 }
 
 void SIG_RobotView::showIssues( const QList<SIGEL_RobotCheck::SIG_RobotIssue> &issues )

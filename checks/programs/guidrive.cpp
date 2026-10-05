@@ -2352,7 +2352,7 @@ static int guidriveMain(int argc, char **argv)
         return 0;
     }
 
-    // --- the six dialogs C10 never opened ---------------------------------
+    // --- the five dialogs C10 never opened --------------------------------
     // C11c. Five of the six are modal exec()s and one -- SIG_IndividualView --
     // is a non-modal top-level window opened with show(), so it has to be
     // found among topLevelWidgets() rather than caught by whenModal().
@@ -2593,36 +2593,7 @@ static int guidriveMain(int argc, char **argv)
         clickMenu("&Help", "About");   // no accelerator on this one
         QTest::qWait(2000);
 
-        // ---- 4. Robot Info -----------------------------------------------
-        // Not a SIG_TextView: slotRobotInfo builds a text blob with
-        // getRobotInformation() and shows it in a QMessageBox. The blob is
-        // generated from the robot, so it is byte-comparable across machines.
-        printf("\n== ROBOT INFO ==\n");
-        QWidget *rob = page("&Robot");
-        QPushButton *info = nullptr;
-        if (rob) for (QPushButton *b : rob->findChildren<QPushButton *>())
-            if (b->objectName() == "pushbuttonRobInfo") { info = b; break; }
-        if (!info) printf("  !! Robot Info button missing\n");
-        else {
-            whenModal([](QWidget *m) {
-                QMessageBox *mb = qobject_cast<QMessageBox *>(m);
-                printf("  [dialog] class=%s title=[%s]\n", m->metaObject()->className(),
-                       qPrintable(m->windowTitle()));
-                if (mb) {
-                    const QStringList lines = mb->text().split('\n');
-                    printf("  text lines=%d\n", static_cast<int>(lines.count()));
-                    for (const QString &l : lines) printf("  | %s\n", qPrintable(l));
-                    for (QAbstractButton *b : mb->buttons())
-                        printf("  button [%s] default=%d\n", qPrintable(b->text()),
-                               b == mb->defaultButton());
-                }
-                m->close();
-            }, 6000);
-            QTest::mouseClick(info, Qt::LeftButton, Qt::NoModifier, info->rect().center());
-            QTest::qWait(2000);
-        }
-
-        // ---- 5. IndividualView, which is NOT modal ------------------------
+        // ---- 4. IndividualView, which is NOT modal ------------------------
         printf("\n== INDIVIDUAL VIEW (double-click a population row) ==\n");
         clickMenu("&View", "&Population");
         QTest::qWait(300);
@@ -2671,7 +2642,7 @@ static int guidriveMain(int argc, char **argv)
             }
         }
 
-        // ---- 6. Add Individuals, the Cancel path C10 never took ----------
+        // ---- 5. Add Individuals, the Cancel path C10 never took ----------
         printf("\n== ADD INDIVIDUALS (Cancel) ==\n");
         const int before6 = t5 ? t5->topLevelItemCount() : -1;
         whenModal([](QWidget *m) {

@@ -221,12 +221,6 @@ namespace SIGEL_MasterGUI
 
 
       /**
-       * This slot gives information about the robot.
-       *
-       */
-      void slotRobotInfo();
-
-      /**
        * This slot lists the issues that the robot check raises on the robot page.
        *
        */

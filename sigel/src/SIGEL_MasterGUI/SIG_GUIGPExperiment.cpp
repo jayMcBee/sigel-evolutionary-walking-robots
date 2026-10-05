@@ -188,11 +188,6 @@ namespace SIGEL_MasterGUI
 		    this,
 		    SLOT( slotRobotSave() ) );
 
-  QObject::connect( robotView->pushbuttonRobInfo,
-		    SIGNAL( clicked() ),
-		    this,
-		    SLOT( slotRobotInfo() ) );
-
   QObject::connect( robotView->pushbuttonRobCheck,
 		    SIGNAL( clicked() ),
 		    this,
@@ -752,20 +747,6 @@ void SIG_GUIGPExperiment::slotRobotSave()
       file.close();
     }
 };
-
-void SIG_GUIGPExperiment::slotRobotInfo()
-{ char robInf[4096];
-
-
-  // get info and display
-  if( (gpExperiment.robot.getBodies().size() != 0))
-  { gpExperiment.robot.getRobotInformation(robInf, 4096);
-    QMessageBox::information( experimentListView, "Robot Information", robInf );
-  }
-  else
-  { QMessageBox::information( experimentListView, "Robot Information", "No robot is loaded. Load a robot first.");
-  }
-}
 
 void SIG_GUIGPExperiment::slotRobotCheck()
 {

@@ -411,53 +411,21 @@ namespace SIGEL_Robot {
                 return mat;
         }
 
-   void SIG_Robot::getRobotInformation(char *outStr, int maxOutLen)
-	{ double link_mass, tot_mass;
-	  SIG_Vector com;
-	  SIG_Matrix it;
-	  char   hlp_txt[256];
-	  double link_vol,
-	    dens;
+        QList<double> SIG_Robot::getLinkMasses () const
+        {
+                // The geometries are built in a copy, so that this robot stays as it is.
+                SIG_Robot copy (*this);
+                copy.instantiateGeometries ();
 
-	  // copy robot or it will be shred..
-	  SIG_Robot modRob( *this );
-	  modRob.prepareDynaMechs();
-	  tot_mass = 0;
-	  sprintf(outStr, "<B><U>Link Information</U></B><BR><UL>");
-
-	  // first get the mass for all links
-	  for (SIG_Link *link : modRob.links)
-	    {
-	      // get link info
-	      link->getPhysics(link_mass, com, it);
-	      tot_mass += link_mass;
-
-	      // compute volume
-	      dens = (link->getMaterial())->getDensity();
-	      link_vol = link_mass/dens;
-
-	      // append link info to string
-	      sprintf(hlp_txt, "<LI><B>\"%s\":</B> &nbsp; Mass: %5.2f kg, &nbsp; Volume: %4.5f m^3, &nbsp; Density: %5.1f kg/m^3</LI>",
-		      link->getName().toUtf8().constData(), link_mass, link_vol, dens);
-
-	      // not too long?
-	      if ( strlen(outStr)+strlen(hlp_txt) < maxOutLen)
-	      { strcat(outStr, hlp_txt);
-	      }
-	      else
-	      { break;
-	      }
-	    }
-
-	  if (strlen(outStr)+16 < maxOutLen)
-	  {  strcat(outStr, "</UL><BR>");
-	  }
-
-	  // do something with the information..
-	  if (strlen(outStr)+128 < maxOutLen)
-	  {  sprintf(hlp_txt, "<B><U>Robot Information</U></B><BR><UL><LI><B>Torso link:</B> &nbsp; '%s'</LI><LI><B>Total mass:</B> &nbsp; %7.2f kg</LI></UL>", modRob.rootlink->getName().toUtf8().constData(), tot_mass);
-	     strcat(outStr, hlp_txt);
-	  }
-  }
+                QList<double> masses;
+                for (SIG_Link *link : copy.links) {
+                        double mass;
+                        SIG_Vector centreOfMass;
+                        SIG_Matrix inertia;
+                        link->getPhysics (mass, centreOfMass, inertia);
+                        masses.append (mass);
+                }
+                return masses;
+        }
 
 }

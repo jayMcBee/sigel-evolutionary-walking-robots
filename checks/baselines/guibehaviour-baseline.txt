@@ -799,19 +799,19 @@ we do with the system?]
   [survey]
     group  [Robot information] enabled=1 checkable=0
     group  [Robot check] enabled=1 checkable=0
-    list   listboxLinks                         count=2 current=-1 enabled=1
-      item0  [base1] hasIcon=0
-      item1  [base2] hasIcon=0
-    list   listboxMaterials                     count=1 current=-1 enabled=1
-      item0  [metal] hasIcon=0
     list   listboxBodies                        count=1 current=-1 enabled=1
       item0  [base.wrl] hasIcon=0
-    list   listboxSensors                       count=1 current=-1 enabled=1
-      item0  [hinge1Sensor] hasIcon=1
+    list   listboxMaterials                     count=1 current=-1 enabled=1
+      item0  [metal] hasIcon=0
     list   listboxJoints                        count=1 current=-1 enabled=1
       item0  [hinge1] hasIcon=1
     list   listboxDrives                        count=1 current=-1 enabled=1
       item0  [hinge1Drive] hasIcon=1
+    list   listboxSensors                       count=1 current=-1 enabled=1
+      item0  [hinge1Sensor] hasIcon=1
+    tree   listviewLinks                        cols=4 rows=2
+      row0  | base1                 | 20.00                 | 10.00184              | 2.0                   | col0icon=1 col0check=0
+      row1  | base2                 | 20.00                 | 10.00184              | 2.0                   | col0icon=1 col0check=0
     tree   listviewIssues                       cols=2 rows=0
   [drive]
     (nothing on this container is in C11's scope: no spin box, slider, combo, checkbox, radio or validated field)
@@ -1421,13 +1421,6 @@ Do you want to replace it?]
     | github.com/jayMcBee/sigel-evolutionary-walking-robots
     button [&OK] default=1
 
-== ROBOT INFO ==
-  [modal] class=QMessageBox title=[Robot Information]
-  [dialog] class=QMessageBox title=[Robot Information]
-  text lines=1
-  | <B><U>Link Information</U></B><BR><UL><LI><B>"base1":</B> &nbsp; Mass: 20.00 kg, &nbsp; Volume: 10.00184 m^3, &nbsp; Density:   2.0 kg/m^3</LI><LI><B>"base2":</B> &nbsp; Mass: 20.00 kg, &nbsp; Volume: 10.00184 m^3, &nbsp; Density:   2.0 kg/m^3</LI></UL><BR><B><U>Robot Information</U></B><BR><UL><LI><B>Torso link:</B> &nbsp; 'base1'</LI><LI><B>Total mass:</B> &nbsp;   40.01 kg</LI></UL>
-  button [OK] default=1
-
 == INDIVIDUAL VIEW (double-click a population row) ==
   double-clicking row0 = 16269 at (284,9) itemAt=the row
   itemDoubleClicked emitted 1 time(s)
@@ -1955,12 +1948,11 @@ Do you want to replace it?]
   [modal] class=QFileDialog title=[Export Language Parameters]
   importing robots/twoBases/twoBases.rrb (exists=1)
   [modal] class=QFileDialog title=[Import Robot]
-  list listboxLinks           count=2
-  list listboxMaterials       count=1
   list listboxBodies          count=1
-  list listboxSensors         count=1
+  list listboxMaterials       count=1
   list listboxJoints          count=1
   list listboxDrives          count=1
+  list listboxSensors         count=1
   [modal] class=QFileDialog title=[Export Language Parameters]
   language-parameters before 6828590f91539e7159a6b22dd0aca26815ee24c8cb99deefeed050937df3c718
   language-parameters after  ec7bcab7386a54bd47c3f0362185732be9cff75d105363d05630636834e6a362

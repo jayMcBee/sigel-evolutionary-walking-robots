@@ -296,10 +296,11 @@ namespace SIGEL_Robot
      */
     static SIG_Matrix streamToMatrix (QTextStream & tx);
 
-   /**
-    * return information about the robot in a string
-   */
-   void getRobotInformation(char *outStr, int maxOutLen);
+    /**
+     * The mass of each link, in the order of getLinks(). Throws a
+     * SIG_Exception for a link whose mass cannot be computed.
+     */
+    QList<double> getLinkMasses () const;
   };
 }
 

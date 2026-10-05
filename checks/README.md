@@ -22,7 +22,7 @@ sigel_eval`, and `make B=build-asan sigel_eval pvm-link`.
    - every field on the five parameter pages;
    - all eight exports, byte for byte;
    - exporting over an existing file;
-   - six dialogs;
+   - five dialogs;
    - the MetaGP number fields;
    - export, import and export again, so each importer really reads;
    - the MetaGP editor and statistics;

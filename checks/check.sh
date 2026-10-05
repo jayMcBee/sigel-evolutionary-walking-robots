@@ -308,7 +308,7 @@ elif make -s -C "$ROOT" guidrive sigelApp >/tmp/bdb.$$ 2>&1; then
     #              extension gives a date-stamped file and no prompt. The name
     #              with it raises the file dialog's own confirmation, as a
     #              child of the dialog, and No leaves the file alone.
-    #   dialogs    the six dialogs, their validators, and select-on-focus.
+    #   dialogs    the five dialogs, their validators, and select-on-focus.
     #              Qt 6 selects a pre-filled field when a dialog gives it focus
     #              and Qt 2 did not, so a typed digit would REPLACE the value
     #              instead of appending to it. The load-bearing lines are

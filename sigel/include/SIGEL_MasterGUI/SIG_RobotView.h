@@ -56,6 +56,12 @@ public:
      */
     void showIssues( const QList<SIGEL_RobotCheck::SIG_RobotIssue> &issues );
 
+ private:
+    /**
+     * Fills the table of links with each link's mass, volume and density.
+     */
+    void showLinks( const QString &sigelRootString );
+
  private slots:
     /**
      * Shows the detail of the issue that is selected in the list of issues.
