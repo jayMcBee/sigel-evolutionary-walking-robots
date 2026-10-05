@@ -55,8 +55,8 @@ Paths are relative to `sigel/`, the source tree.
   Linking the Clean variant once produced a convincing false crash.
 
 - [ ] **11. Rename `SIG_GPManager::tours` to `tournaments`,** with the doxygen
-  comments that name it. Crosses both `SIG_GPExperiment` variants, so do it
-  with item 10.
+  comments that name it. Only `SIG_GPManager.h` and `SIG_GPManager.cpp` use
+  the member.
 
 - [ ] **13. Translate the German strings.** What is left is **kept, by
   decision:** the history text of `SIG_GPIndividual`, which is saved in `.exp`
@@ -78,7 +78,7 @@ Paths are relative to `sigel/`, the source tree.
   |---|---|
   | `getRandomInstruktion`, `ProbInstruktion` | `MT_Randomizer.h` |
   | `T_Instruktion`, `T_Instruk` | `MT_TranslatedIndividual.h` |
-  | `Instruktion` | `MT_Classifier.cpp, createDoubleTransIndi` |
+  | `Instruktion` | `MT_Classifier.cpp, createDoubleTransIndi`; `MT_Substitute.cpp, translatedSIGProg` |
   | `set`/`getSelektionValue` | `MT_FitnessTrainer.h`, `MT_GPManager.h` |
   | `winkel`, `verschiebung`, `schiebung`, `drehmatrix`, `hilf`, `stflorianhilf` | `IFunctions.h`, `IFunctions.cpp` |
 
@@ -92,9 +92,6 @@ Paths are relative to `sigel/`, the source tree.
 - [ ] **15. Rename the `act` prefix to `current`.** German `aktuell`; reads as
   the verb "act". `actExperiment`, `actExpChanged` and `slotActExpChanged` are
   done.
-  **Settle the scope first.** Most of it is in `SIGEL_GP`, which D33 keeps
-  untouched for behaviour; a rename is not behaviour, but it is a large diff
-  in a frozen module, so it needs sign-off first.
   A signal or slot breaks its string-based connect if only one side moves;
   `check.sh` catches that. No reference file holds these names.
 
@@ -105,11 +102,7 @@ Paths are relative to `sigel/`, the source tree.
 
 - [ ] **30. Cut comments over two lines that do not earn their place.** A
   longer comment must carry something the code cannot say. **Comments the port
-  itself wrote come first.** File by file, each pass signed off first. The
-  named instance: the comment above `setIconSize( QSize( 25, 25 ) )` in
-  `SIG_MainWindow::SIG_MainWindow`. Two lines carry the whole fact — Qt 6 has
-  one icon size per toolbar, and 25 is the largest of the small pixmaps, so
-  nothing is scaled past what 1.3 drew.
+  itself wrote come first.** File by file, each pass signed off first.
 
 ---
 
@@ -142,6 +135,9 @@ touched, because changing one changes behaviour against the reference binary.
   to read is the `simpleservo` branch of
   `SIG_DynaMechsCommandInterface::moveDrive`. The shipped robots use force
   drives, so no shipped experiment shows it.
+  **WARNING: change nothing here before the original ZORC experiment is
+  tested.** It may use servo drives, and a naive change may break existing
+  experiments.
 
 - [ ] **125. Give `accept()` a buffer size in
   `SIG_GPManager::RegisterDynPVMClients`.** `alen` is passed to `accept()`
@@ -199,8 +195,7 @@ touched, because changing one changes behaviour against the reference binary.
   `dmArticulation::getForces` returns `f_star`, which is never written for a
   link without children, and `SIG_GPForceFitnessFunction` uses it. Only
   experiments that select `ForceFitnessFunction` are affected; no shipped
-  experiment does. The library is unpatched, as SIGEL's `supportingLibs`
-  ships it.
+  experiment does. No patch to the library touches this method.
 
 - [ ] **34. Fix `tearDownPvm()`: `pvm_halt()` never returns.** The daemon
   SIGTERMs this process instead. `guidrive` survives that with
@@ -222,7 +217,8 @@ touched, because changing one changes behaviour against the reference binary.
   `SIG_Environment::generateTerrain` and DynaMechs'
   `dmEnvironment::loadTerrainData` disagree on row order, so a floor whose X
   and Z sizes differ is misread. Physics and drawing agree, and no shipped
-  experiment sets `FLOORDIMENSION`. A fix changes physics for asymmetric or
+  experiment has such a floor: only `runner.exp` sets `FLOORDIMENSION`, to a
+  square floor. A fix changes physics for asymmetric or
   non-square floors.
 
 - [ ] **73. Fix the latent sensor bugs in
@@ -241,8 +237,9 @@ touched, because changing one changes behaviour against the reference binary.
 
 - [ ] **76. Warn when a mesh has negative volume.** Inverted face winding
   gives negative mass and inertia in `SIG_Mirtich::computePhysics`; the robot
-  loads and the simulation runs into NaN without a message. A warning at load,
-  naming the link and the mesh file, is one option.
+  loads and the simulation runs into NaN. The robot check reports it as
+  "Link without mass" and names the link, but only when Check is pressed. A
+  warning at load, naming the link and the mesh file, is one option.
 
 - [ ] **89. Refuse bad simulation parameters.** Needs more thought.
   - **Time to simulate under 1 s:** the simulated fitness functions divide by
@@ -251,8 +248,8 @@ touched, because changing one changes behaviour against the reference binary.
   - **Step size of 0 or less:** item 104. What a negative step does is not
     measured.
   **Where to refuse, not decided:** (1) a range on the field, which stops
-  typing only; (2) on load, in `SIG_SimulationParameters`, like item 71, but
-  any load error kills the interface until item 88 is done; (3) when a run
+  typing only; (2) on load, in `SIG_SimulationParameters`, like item 71;
+  (3) when a run
   starts, with a message box, which catches typed and loaded values and kills
   nothing.
 
@@ -274,8 +271,9 @@ touched, because changing one changes behaviour against the reference binary.
   compiler rejects it.
 
 - [ ] **55. Review the marker checks that do nothing.** The
-  stream constructors of `SIG_Geometry`, `SIG_Polygon` and
-  `SIG_CommandParameters` hold only `// ERROR` and read on; `SIG_Robot` and
+  stream constructor of `SIG_CommandParameters` holds only `// ERROR` and
+  reads on; those of `SIG_Geometry` and `SIG_Polygon` print a message and
+  read on; `SIG_Robot` and
   `SIG_LanguageParameters` already throw `SIG_UnstreamingError`. Throwing
   would make a malformed transfer text fail at once; valid files are not
   affected. The other empty bodies go in the same round:
@@ -324,16 +322,17 @@ touched, because changing one changes behaviour against the reference binary.
 
 - [ ] **9. Syntax-highlight the program view.** New
   `programToHtml(const SIG_Program &, const SIG_LanguageParameters &)` returning
-  a `QString`, fed to `QTextBrowser::setHtml()` wherever a program is shown.
+  a `QString`, fed to `QTextEdit::setHtml()` wherever a program is shown.
   `printToString()` stays as the ZORC serial format and must keep serving
   `SIG_GPRemoteZORCFitnessFunction::evalFitness`.
   `<pre>` wrapper, one `<span>` per token, a line number per line. Colour
   opcodes by group: arithmetic `ADD SUB MUL DIV MOD MIN MAX`, data
-  `COPY LOAD`, control `CMP JMP`, robot `MOVE SENSE DELAY`. Registers print as
+  `COPY LOAD`, control `CMP JMP`, robot `MOVE SENSE DELAY`; `NOP` has no
+  group yet. Registers print as
   `R0`–`R7`, computed as `element % getMemorySize()`; `LOAD` operand 2 and
   `JMP` operand 1 print as literals. Callers: `SIG_SimulationWidget::visualizeThis`,
   `SIG_IndividualView::SIG_IndividualView`,
-  `SIG_AllIndividualsView::slotVisualize`.
+  `SIG_AllIndividualsView::slotSelectionChanged`.
 
 ---
 
@@ -418,8 +417,8 @@ problem; the choice is made before any code is written.
     simulation;
   - 0 when v̄ is 0 or below, or a position is Inf or NaN.
   Records every frame with `SIG_GPFullDataRecorder`. Register it in
-  `SIG_GPFitnessFunctionRegistry::fitnessFunctions()` and in `sigel_slave`'s
-  name mapping. No file format changes.
+  `SIG_GPFitnessFunctionRegistry::fitnessFunctions()`. No file format
+  changes.
 
 ---
 
@@ -428,8 +427,9 @@ problem; the choice is made before any code is written.
 - [ ] **83. Put ZORC support behind a compile-time switch, off by default.**
   Decided. ZORC is a real robot driven over a serial line; the simulation does
   not need it. One global `#define` removes `SIG_GPRemoteZORCFitnessFunction`, its
-  branches in `sigel_slave.cpp`, and the "Remote ZORC" combo box entry,
-  handled like item 82's index shift. Not ZORC:
+  branches in `sigel_slave.cpp`, and its entry in
+  `SIG_GPFitnessFunctionRegistry::fitnessFunctions`, from which the fitness
+  function list in the interface is filled. Not ZORC:
   `SIG_GPAdaptiveWalkingFitnessFunction`, stored as
   "ZorcWalkingFitnessFunction"; it stays. To decide: where the switch lives
   (the `Makefile` or a header), and what an experiment file naming
