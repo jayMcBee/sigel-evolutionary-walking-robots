@@ -33,6 +33,7 @@
 #include "SIGEL_Robot/SIG_ContactSensor.h"
 #include "SIGEL_Tools/SIG_TypeConverter.h"
 #include "SIGEL_Tools/SIG_IO.h"
+#include "SIGEL_Tools/SIG_Exception.h"
 
 #include <dm.h>
 #include <dmContactModel.hpp>
@@ -80,6 +81,10 @@ SIGEL_Simulation::SIG_DynaMechsSimulationData::SIG_DynaMechsSimulationData( SIGE
     driveForcesTimeAccounts( robot.getDrives().count() ),
     sensors( robot.getSensors().count() )
 {
+  // DynaMechs has one current environment; a second simulation would take it from the first.
+  if ( dmEnvironment::getEnvironment() )
+    throw SIGEL_Tools::SIG_Exception( __FILE__, __LINE__, "A simulation already exists in this process." );
+
   dynaMechsLinks.fill( nullptr );
 
   DynaMechsLinkGuard linkGuard = { &dynaMechsLinks };
@@ -199,6 +204,9 @@ SIGEL_Simulation::SIG_DynaMechsSimulationData::SIG_DynaMechsSimulationData( SIGE
   dynaMechsIntegrator->setSystem( &dynaMechsSystem );
 
   linkGuard.links = nullptr;
+
+  // Last, so that a constructor that throws has no environment to release.
+  dmEnvironment::setEnvironment( &dynaMechsEnvironment );
 };
 
 void SIGEL_Simulation::SIG_DynaMechsSimulationData::setNewFrame( bool newValue )
@@ -293,8 +301,6 @@ void SIGEL_Simulation::SIG_DynaMechsSimulationData::initializeEnvironment()
   char const *terrainDataFileNameCString = terrainDataFileNameQCString.constData();
 
   dynaMechsEnvironment.loadTerrainData( terrainDataFileNameCString );
-
-  dmEnvironment::setEnvironment( &dynaMechsEnvironment );
 };
 
 void SIGEL_Simulation::SIG_DynaMechsSimulationData::initializeArticulation()
