@@ -909,6 +909,14 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-10-06 — THE CHECK PROGRAM `sigel_eval` IS NOW `coredrive`.**
+
+- The old name read like one of SIGEL's own programs. `coredrive` drives
+  SIGEL's core without a window, as `guidrive` drives the windows.
+- Renamed: `checks/programs/coredrive.cpp`, the make target `coredrive`,
+  and `build/coredrive`. Older entries in this file keep the name
+  `sigel_eval`; they mean this program.
+
 **2026-10-05 — DONE: ITEM 137, A SECOND SIMULATION IN ONE PROCESS IS REFUSED.**
 
 - **Before:** DynaMechs has one current environment. A second

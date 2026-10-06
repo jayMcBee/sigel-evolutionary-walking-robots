@@ -36,18 +36,18 @@ ROOT=$(cd "$(dirname "$0")/.." && pwd)
 cd "$ROOT" || exit 1
 B=${1:-build}
 [ $# -le 1 ] || { echo "usage: $0 [build-dir] -- it reads experiments/ and robots/" >&2; exit 1; }
-EVAL=$ROOT/$B/sigel_eval
-[ -x "$EVAL" ] || { echo "no $EVAL -- make B=$B sigel_eval" >&2; exit 1; }
+EVAL=$ROOT/$B/coredrive
+[ -x "$EVAL" ] || { echo "no $EVAL -- make B=$B coredrive" >&2; exit 1; }
 
 # A failed `make` stops at the first bad compile and leaves the PREVIOUS
-# sigel_eval in place, so a test-for-existence passes and the gate silently
+# coredrive in place, so a test-for-existence passes and the gate silently
 # scores a stale binary. That happened during D13: the build failed on two
 # sites, the gates were run straight after, and both came back green against
 # the binary from before the change. Gate results mean nothing unless the
 # build that produced them succeeded. pvm-check.sh has carried this guard
 # from the start; these two did not.
-make -q --no-print-directory -C "$ROOT" B="$B" sigel_eval >/dev/null 2>&1 || {
-	echo ""$EVAL" is out of date -- run 'make B=$B sigel_eval'" >&2; exit 1; }
+make -q --no-print-directory -C "$ROOT" B="$B" coredrive >/dev/null 2>&1 || {
+	echo ""$EVAL" is out of date -- run 'make B=$B coredrive'" >&2; exit 1; }
 
 # SIGEL rewrites $SIGEL_ROOT/Terrain.ter on every evaluation, so run it in the
 # folder SIGEL is started from, never in the tracked source.
@@ -77,14 +77,14 @@ for f in $exps $rrbs; do
 	# prints routine diagnostics there ("attempt to read invalid sensor"),
 	# but a sanitizer report would land there too, and an earlier version of
 	# this script sent all of it to /dev/null.
-	# Do NOT pipe sigel_eval straight into sed: the pipeline's status is
-	# sed's, so a segfaulting sigel_eval gave exit 0 and a header-only file.
+	# Do NOT pipe coredrive straight into sed: the pipeline's status is
+	# sed's, so a segfaulting coredrive gave exit 0 and a header-only file.
 	# An earlier version of this script had exactly that hole while claiming
 	# to have closed it. Capture, test the status, then filter.
 	out=$(mktemp); err=$(mktemp)
 	rc=0; "$EVAL" -v "$f" 0 >"$out" 2>"$err" || rc=$?
 	if [ "$rc" -ne 0 ]; then
-		echo "$(basename "$f"): sigel_eval exited $rc" >&2
+		echo "$(basename "$f"): coredrive exited $rc" >&2
 		cat "$err" >&2; rm -f "$out" "$err"; exit 1
 	fi
 	if grep -qE 'AddressSanitizer|LeakSanitizer|runtime error:' "$err"; then

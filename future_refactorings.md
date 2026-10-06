@@ -321,7 +321,7 @@ touched, because changing one changes behaviour against the reference binary.
   loops `SIG_Simulation::start` for ever in the other fitness functions.
   - **On load:** throw `SIG_UnstreamingError` for a `STEPSIZE` of 0 or less,
     as item 71 does for register widths. File > Open shows it (item 88);
-    `sigel -e` and `sigel_eval` refuse the file.
+    `sigel -e` and `coredrive` refuse the file.
   - **When typed:** `lineeditStepSize` becomes a `QDoubleSpinBox` with a
     smallest value above 0.
   - **Open:** the smallest step and its decimals. The shipped experiments use

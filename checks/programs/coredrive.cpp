@@ -10,7 +10,7 @@
   if (qApp), so loading an experiment runs headless.
 
   The experiment file already records the fitness each individual scored in
-  2003, so `sigel_eval <exp> <n>` prints the new value next to the old one.
+  2003, so `coredrive <exp> <n>` prints the new value next to the old one.
 */
 #include <QList>
 #include <QString>

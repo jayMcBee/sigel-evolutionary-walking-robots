@@ -2,7 +2,7 @@
 
 These scripts check SIGEL after a change. Run them from anywhere; each one
 finds the repository by itself. Build first with `make`, `make guidrive
-sigel_eval`, and `make B=build-asan sigel_eval pvm-link`.
+coredrive`, and `make B=build-asan coredrive pvm-link`.
 
 ## `check.sh`, the main check
 
@@ -69,6 +69,6 @@ or is skipped. The warning count on the total line is part of the result.
 
 - `baselines/`: the five files the checks compare against.
 - `programs/`: the check programs. `guidrive.cpp` drives the interface,
-  `sigel_eval.cpp` runs one fitness evaluation or, with `-check`, lists the
+  `coredrive.cpp` runs one fitness evaluation or, with `-check`, lists the
   issues of the robot check, `expstruct.py` fingerprints a
   saved experiment, `pvm_link.cpp` and `pvm_smoke.c` test PVM.

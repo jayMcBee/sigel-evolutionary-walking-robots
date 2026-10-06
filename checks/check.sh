@@ -1016,14 +1016,14 @@ pass=$((pass+fp)); fail=$((fail+ff))
 
 # ---------------------------------------------------------------------------
 # The robot check: the issues that SIGEL_RobotCheck raises on each shipped
-# experiment. sigel_eval -check prints one line per issue and a count line;
+# experiment. coredrive -check prints one line per issue and a count line;
 # all of it must match the baseline. The experiments are taken in C order,
 # because the order of a glob changes with the locale.
 rp=0; rf=0
-if make -s -C "$ROOT" sigel_eval sigelApp >/tmp/rcb.$$ 2>&1; then
+if make -s -C "$ROOT" coredrive sigelApp >/tmp/rcb.$$ 2>&1; then
     for e in $(ls "$ROOT"/experiments/*.exp | LC_ALL=C sort); do
         echo "## $(basename "$e")"
-        SIGEL_ROOT="$APP" "$ROOT/build/sigel_eval" -check "$e" 2>/dev/null || echo "!! sigel_eval failed on $(basename "$e")"
+        SIGEL_ROOT="$APP" "$ROOT/build/coredrive" -check "$e" 2>/dev/null || echo "!! coredrive failed on $(basename "$e")"
     done > /tmp/rc.$$
     if cmp -s /tmp/rc.$$ "$ROOT/checks/baselines/robotcheck-baseline.txt"; then rp=$((rp+1))
     else
@@ -1033,7 +1033,7 @@ if make -s -C "$ROOT" sigel_eval sigelApp >/tmp/rcb.$$ 2>&1; then
     fi
 else
     rf=$((rf+1))
-    echo "  sigel_eval does not build:"
+    echo "  coredrive does not build:"
     tail -6 /tmp/rcb.$$ | sed 's/^/    /'
 fi
 rm -f /tmp/rc.$$ /tmp/rcb.$$

@@ -25,17 +25,17 @@ ROOT=$(cd "$(dirname "$0")/.." && pwd)
 cd "$ROOT" || exit 1
 B=${1:-build}
 [ $# -le 1 ] || { echo "usage: $0 [build-dir] -- it reads experiments/ and robots/" >&2; exit 1; }
-[ -x "$ROOT/$B/sigel_eval" ] || { echo "no $ROOT/$B/sigel_eval" >&2; exit 1; }
+[ -x "$ROOT/$B/coredrive" ] || { echo "no $ROOT/$B/coredrive" >&2; exit 1; }
 
 # A failed `make` stops at the first bad compile and leaves the PREVIOUS
-# sigel_eval in place, so a test-for-existence passes and the gate silently
+# coredrive in place, so a test-for-existence passes and the gate silently
 # scores a stale binary. That happened during D13: the build failed on two
 # sites, the gates were run straight after, and both came back green against
 # the binary from before the change. Gate results mean nothing unless the
 # build that produced them succeeded. pvm-check.sh has carried this guard
 # from the start; these two did not.
-make -q --no-print-directory -C "$ROOT" B="$B" sigel_eval >/dev/null 2>&1 || {
-	echo ""$ROOT/$B/sigel_eval" is out of date -- run 'make B=$B sigel_eval'" >&2; exit 1; }
+make -q --no-print-directory -C "$ROOT" B="$B" coredrive >/dev/null 2>&1 || {
+	echo ""$ROOT/$B/coredrive" is out of date -- run 'make B=$B coredrive'" >&2; exit 1; }
 
 # SIGEL rewrites $SIGEL_ROOT/Terrain.ter on every evaluation, so run it in the
 # folder SIGEL is started from, never in the tracked source.
@@ -59,9 +59,9 @@ export SIGEL_ROOT
 # review. So test the binary rather than assume, and SAY when it is skipped --
 # a check that quietly does nothing is worse than no check, because the
 # operator believes it ran.
-"$ROOT/$B/sigel_eval" -selfcheck >&2 || exit 1
-if nm -C "$ROOT/$B/sigel_eval" 2>/dev/null | grep -q __asan_init; then
-	leaks=$(ASAN_OPTIONS=detect_leaks=1 "$ROOT/$B/sigel_eval" -selfcheck 2>&1 >/dev/null) || {
+"$ROOT/$B/coredrive" -selfcheck >&2 || exit 1
+if nm -C "$ROOT/$B/coredrive" 2>/dev/null | grep -q __asan_init; then
+	leaks=$(ASAN_OPTIONS=detect_leaks=1 "$ROOT/$B/coredrive" -selfcheck 2>&1 >/dev/null) || {
 		echo "selfcheck LEAKED under LeakSanitizer:" >&2
 		echo "$leaks" >&2
 		exit 1
@@ -75,13 +75,13 @@ fi
 tracked() { git -C "$ROOT" ls-files -- "$1" | sed "s|^|$ROOT/|" | sort; }
 n=$(tracked 'experiments/*.exp' | wc -l)
 [ "$n" -eq 7 ] || { echo "expected 7 .exp under experiments/, found $n" >&2; exit 1; }
-# CAPTURE, TEST THE STATUS, THEN FILTER -- do NOT pipe sigel_eval straight into
+# CAPTURE, TEST THE STATUS, THEN FILTER -- do NOT pipe coredrive straight into
 # tail. This line used to read
 #
-#   v=$("$ROOT/$B/sigel_eval" "$f" "$i" 2>/dev/null | tail -1 | awk '{print $3}')
+#   v=$("$ROOT/$B/coredrive" "$f" "$i" 2>/dev/null | tail -1 | awk '{print $3}')
 #
 # which loses BOTH halves of the evidence. A pipeline's status is its LAST
-# command's, so awk's 0 hid a segfaulting, aborting or OOM-killed sigel_eval;
+# command's, so awk's 0 hid a segfaulting, aborting or OOM-killed coredrive;
 # and 2>/dev/null threw away the stderr a sanitizer reports on. That matters
 # most in the one invocation this gate exists for: under
 # `ASAN_OPTIONS=detect_leaks=0 ./checks/fitness-check.sh build-asan' a UBSan
@@ -95,9 +95,9 @@ n=$(tracked 'experiments/*.exp' | wc -l)
 out=$(mktemp); err=$(mktemp)
 for f in $(tracked 'experiments/*.exp'); do
 	for i in 0 1 2; do
-		rc=0; "$ROOT/$B/sigel_eval" "$f" "$i" >"$out" 2>"$err" || rc=$?
+		rc=0; "$ROOT/$B/coredrive" "$f" "$i" >"$out" 2>"$err" || rc=$?
 		if [ "$rc" -ne 0 ]; then
-			echo "$(basename "$f") $i: sigel_eval exited $rc" >&2
+			echo "$(basename "$f") $i: coredrive exited $rc" >&2
 			cat "$err" >&2; rm -f "$out" "$err"; exit 1
 		fi
 		if grep -qE 'AddressSanitizer|LeakSanitizer|runtime error:' "$err"; then

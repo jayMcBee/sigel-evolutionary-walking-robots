@@ -4,7 +4,7 @@
 #
 #   make            sigel and sigel_slave, then sigelApp/ -- the folder SIGEL is
 #                   started from: cd sigelApp && ./sigelLauncher
-#   make sigel_eval build/sigel_eval -- one fitness evaluation, for the checks
+#   make coredrive build/coredrive -- one fitness evaluation, for the checks
 #   make vendor     the five vendored libraries only
 #   make pvm        libpvm3.a and pvmd3, built by PVM's own make
 #   make pvm-link   build/pvm_link -- SIGEL's PVM code against real PVM
@@ -55,7 +55,7 @@
 
 # A recipe that fails AFTER creating its target leaves that target on disk,
 # newer than its prerequisites -- so the next make says "up to date" and the
-# check never runs again. sigel_eval's SIG_GPExperiment assertion is exactly
+# check never runs again. coredrive's SIG_GPExperiment assertion is exactly
 # that shape. Found by the C5 review.
 .DELETE_ON_ERROR:
 
@@ -150,14 +150,14 @@ PVM_DIR  := $(SL)/pvm3
 PVM_LIB  := $(PVM_DIR)/lib/LINUX64/libpvm3.a
 PVM_D    := $(PVM_DIR)/lib/LINUX64/pvmd3
 
-.PHONY: all vendor core clean unpatch pvm pvm-link sigel_eval
+.PHONY: all vendor core clean unpatch pvm pvm-link coredrive
 # sigelApp/ takes the plain build only, so a sanitized `make' does not fill it.
 ifeq ($(B),build)
 all: programs sigelApp
 else
 all: programs
 endif
-sigel_eval: $(B)/sigel_eval
+coredrive: $(B)/coredrive
 vendor: $(VENDOR_LIBS)
 pvm: $(PVM_LIB) $(PVM_D)
 pvm-link: $(B)/pvm_link
@@ -392,7 +392,7 @@ MOC_OBJS := $(patsubst %.h,$(OBJ)/moc/%.o,$(MOC_HDRS))
 # meta-object references MT_MainWindow -- so putting it on the slave's line
 # drags the whole master GUI in behind it. The slave links the Clean
 # SIG_GPExperiment precisely so that it never has an MT_Controller at all.
-# sigel_eval and pvm_link are headless harnesses: they link no GUI archive at
+# coredrive and pvm_link are headless harnesses: they link no GUI archive at
 # all, so they get the core-only meta-objects they always had. Handing them the
 # derived full set drags GUI vtables onto a link line with no GUI library
 # behind it. MT_Control is out for the same reason as in the slave.
@@ -439,7 +439,7 @@ $(TITLE_OBJ): $(filter-out $(TITLE_OBJ),$(patsubst $(SRC)/src/%.cpp,$(OBJ)/sigel
 # NOTHING PINNED IT. §9 records that the class is defined twice on purpose --
 # SIG_GPExperiment.cpp for `sigel', SIG_GPExperimentClean.cpp for the slave,
 # differing in whether the constructor builds an MT_Controller -- and that
-# sigel_eval is the slave's role and must get Clean. But both land in
+# coredrive is the slave's role and must get Clean. But both land in
 # libSIGEL_GP.a, the linker takes the FIRST member that defines the symbol, and
 # $(wildcard) does not sort: a clean build happened to put Clean first, an
 # incremental one put the master first and the link then failed on
@@ -451,7 +451,7 @@ $(TITLE_OBJ): $(filter-out $(TITLE_OBJ),$(patsubst $(SRC)/src/%.cpp,$(OBJ)/sigel
 # TODAY the linker fails first, on the master's undefined MT_Controller, so the
 # assertion is belt-and-braces; it becomes the ONLY guard once C6 ports MT_GUI
 # and MT_Controller links, at which point the master would link silently and
-# sigel_eval would start constructing an MT_Controller per experiment.
+# coredrive would start constructing an MT_Controller per experiment.
 CLEAN_OBJ := $(OBJ)/sigel/SIGEL_GP/SIG_GPExperimentClean.o
 # ...and its opposite. `sigel' needs the MASTER variant, and needs it named just
 # as explicitly: BOTH files define the identical set of symbols for the class,
@@ -470,13 +470,13 @@ MASTER_OBJ := $(OBJ)/sigel/SIGEL_GP/SIG_GPExperiment.o
 # counted 45 and passed while linking exactly the wrong variant.
 ctor_size = nm -C -S $(1) | awk '/SIG_GPExperiment::SIG_GPExperiment\(\)$$/{print $$2; exit}'
 
-$(B)/sigel_eval: checks/programs/sigel_eval.cpp $(MOC_OBJS_CORE) $(CLEAN_OBJ) $(CORE_LIBS) $(VENDOR_LIBS)
+$(B)/coredrive: checks/programs/coredrive.cpp $(MOC_OBJS_CORE) $(CLEAN_OBJ) $(CORE_LIBS) $(VENDOR_LIBS)
 	$(SIGCXX) $(SIGINC) $< $(MOC_OBJS_CORE) $(CLEAN_OBJ) -o $@ \
 	  -Wl,--start-group $(CORE_LIBS) $(VENDOR_LIBS) -Wl,--end-group \
 	  -L$(QTLIB) -lQt6OpenGLWidgets -lQt6OpenGL -lQt6Widgets -lQt6Gui -lQt6Core -lGL -lGLU -lm
 	@want=`$(call ctor_size,$(CLEAN_OBJ))`; got=`$(call ctor_size,$@)`; \
 	 test -n "$$want" && test "$$got" = "$$want" || { \
-	   echo "sigel_eval linked the WRONG SIG_GPExperiment: constructor is $$got," \
+	   echo "coredrive linked the WRONG SIG_GPExperiment: constructor is $$got," \
 	        "Clean's is $$want -- see PORTING.md section 9." >&2; exit 1; }
 
 # ---------------------------------------------------------------------------
@@ -541,7 +541,7 @@ $(B)/pvm_link: checks/programs/pvm_link.cpp $(PVM_OBJS) $(MOC_OBJS_CORE) $(CORE_
 # sigel gets the MASTER SIG_GPExperiment -- the variant whose constructor builds
 # an MT_Controller -- straight out of libSIGEL_GP.a. sigel_slave must get the
 # Clean variant instead, so that object is named explicitly ahead of the
-# archives, exactly as sigel_eval does it. Both are asserted after the link.
+# archives, exactly as coredrive does it. Both are asserted after the link.
 .PHONY: programs
 programs: $(B)/sigel $(B)/sigel_slave
 
