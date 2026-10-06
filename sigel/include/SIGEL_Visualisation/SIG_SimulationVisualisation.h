@@ -125,7 +125,7 @@ namespace SIGEL_Visualisation
        */
       void makeTimeSteps(int noOfTimeSteps);
 
-      double getCurrentSimulationSeconds() const { return renderRecorder->currentSimulationSeconds; }
+      double getCurrentSimulationSeconds() const { return renderRecorder.currentSimulationSeconds; }
 
       SIG_Vector getRobotPosition() const;
 
@@ -270,20 +270,16 @@ namespace SIGEL_Visualisation
       SIGEL_Robot::SIG_Robot const &robot;
 
       /**
-       * The pointer to the SIG_RenderRecorder object that
-       * is used to retrieve acutal information about the
-       * elements of the simulation.
-       *
-       * Is created in the constructor.
+       * The recorder that holds the current position and rotation
+       * of each link of the simulation.
        */
-      SIG_RenderRecorder *renderRecorder;
+      SIG_RenderRecorder renderRecorder;
 
       /**
-       * The pointer to the SIG_Simulation that should
-       * be visualized.
-       * Is created in the constructor.
+       * The simulation that is shown. It keeps a reference to
+       * renderRecorder, so it is declared after it.
        */
-      SIGEL_Simulation::SIG_Simulation *simulation;
+      SIGEL_Simulation::SIG_Simulation simulation;
 
       int frameCounter;
 

@@ -119,21 +119,14 @@ namespace SIGEL_Visualisation
        environmentRenderer(environment),
        robotRenderer(robot),
        robot(robot),
+       renderRecorder( robot.getLinks().size() ),
+       simulation( robot, environment, program, simulationParameter, renderRecorder ),
        frameCounter( 0 )
    {
      robotPathPointAddingRate = static_cast< int >( 0.5 / simulationParameter.getStepSize() );
 
      if (robotPathPointAddingRate == 0)
        robotPathPointAddingRate = 1;
-
-     int noOfLinks = robot.getLinks().size();
-     renderRecorder = new SIG_RenderRecorder(noOfLinks);
-
-     simulation = new SIGEL_Simulation::SIG_Simulation(robot,
-						       environment,
-						       program,
-						       simulationParameter,
-						       *renderRecorder);
 
      // The slot is overwritten deliberately; QList::insert would shift.
      floatingTexts.resize( robot.getNrOfPoints() );
@@ -146,7 +139,7 @@ namespace SIGEL_Visualisation
      bool anyVertex = false;
      for ( SIGEL_Robot::SIG_Link *link : robot.getLinks() )
        {
-	 SIG_SceneObject *recordedLink = renderRecorder->robotLinks[ link->getNumber() ];
+	 SIG_SceneObject *recordedLink = renderRecorder.robotLinks[ link->getNumber() ];
 	 for ( SIG_Vector *vertex : link->getGeometry()->getVertices() )
 	   {
 	     SIG_Vector worldVertex;
@@ -178,7 +171,7 @@ namespace SIGEL_Visualisation
      diagonal.minusis( &lowest );
      robotRadius = diagonal.norm() / 2;
 
-     SIG_SceneObject *recordedRoot = renderRecorder->robotLinks[ robot.getRootLink()->getNumber() ];
+     SIG_SceneObject *recordedRoot = renderRecorder.robotLinks[ robot.getRootLink()->getNumber() ];
      centre.minusis( &recordedRoot->position );
      recordedRoot->rotation.transposetimes( &centre, &centreInRootLink );
 
@@ -190,9 +183,6 @@ namespace SIGEL_Visualisation
 
    SIG_SimulationVisualisation::~SIG_SimulationVisualisation()
    {
-     delete simulation;
-     delete renderRecorder;
-
      // shadowProgram exists only when the framebuffer and texture do.
      // Without its context current the objects go with the context.
      if (shadowProgram && (QOpenGLContext::currentContext() == shadowContext))
@@ -480,7 +470,7 @@ namespace SIGEL_Visualisation
    {
      for (int i=1; i <= noOfTimeSteps; i++)
        {
-	 simulation->makeTimeSteps( 1 );
+	 simulation.makeTimeSteps( 1 );
 
 	 if ( frameCounter == 0 )
 	   {
@@ -512,8 +502,8 @@ namespace SIGEL_Visualisation
     int noOfLinks = robot.getLinks().size();
     for (int i=0; i<noOfLinks; i++)
       {
-	robotRenderer.sceneObjects[i]->setPosition( renderRecorder->robotLinks[i]->position );
-	robotRenderer.sceneObjects[i]->setRotation( renderRecorder->robotLinks[i]->rotation );
+	robotRenderer.sceneObjects[i]->setPosition( renderRecorder.robotLinks[i]->position );
+	robotRenderer.sceneObjects[i]->setRotation( renderRecorder.robotLinks[i]->rotation );
       };
   };
 
@@ -523,8 +513,8 @@ namespace SIGEL_Visualisation
       {
 	int linkNumber = robotRenderer.sceneObjects[i]->getNumber();
 
-	robotRenderer.sceneObjects[i]->setPosition( renderRecorder->robotLinks[ linkNumber ]->position );
-	robotRenderer.sceneObjects[i]->setRotation( renderRecorder->robotLinks[ linkNumber ]->rotation );
+	robotRenderer.sceneObjects[i]->setPosition( renderRecorder.robotLinks[ linkNumber ]->position );
+	robotRenderer.sceneObjects[i]->setRotation( renderRecorder.robotLinks[ linkNumber ]->rotation );
       };
   };
 
@@ -532,14 +522,14 @@ namespace SIGEL_Visualisation
   {
     int rootLinkNumber = robot.getRootLink()->getNumber();
 
-    return renderRecorder->robotLinks[ rootLinkNumber ]->position;
+    return renderRecorder.robotLinks[ rootLinkNumber ]->position;
   };
 
   SIG_Matrix SIG_SimulationVisualisation::getRobotRotation() const
   {
     int rootLinkNumber = robot.getRootLink()->getNumber();
 
-    return renderRecorder->robotLinks[ rootLinkNumber ]->rotation;
+    return renderRecorder.robotLinks[ rootLinkNumber ]->rotation;
   };
 
   SIG_Vector SIG_SimulationVisualisation::getRobotCentre() const

@@ -49,9 +49,6 @@ Paths are relative to `sigel/`, the source tree.
   - [ ] `SIG_DynaMechsSimulationData::dynaMechsIntegrator`. Never deleted;
     the DynaMechs integrator destructors have never run in SIGEL.
   - [ ] `SIG_DynaMechsLink::screwLink`. Never deleted.
-  - [ ] `SIG_SimulationVisualisation::simulation`, `renderRecorder`. The
-    simulation must be destroyed before the recorder. This also does
-    item 20.
   - [ ] `SIG_VisualisationWidget::visualisation`. The old one must be
     destroyed before the new one is built.
   - [ ] `MT_GPManager`: `BestIndividual`, `Randi`, `Statistics`, `Offspring`,
@@ -243,15 +240,6 @@ touched, because changing one changes behaviour against the reference binary.
   something.** It is a function local, so it excludes nothing, and the section
   it guards races the dynamic-client thread. Its comment "now we make ourself
   running exclusively" is false and goes with it.
-
-- [ ] **20. Stop `renderRecorder` leaking when
-  `SIG_SimulationVisualisation`'s constructor throws.** The other half was
-  fixed by nulling `visualisation`. Latent: the only caller that catches the
-  throw, `sigel_slave`'s `main`, returns at once; it becomes live the moment
-  any caller catches the throw and continues. Three fixes, none changes
-  behaviour: a `std::unique_ptr` (the destructor must still delete
-  `simulation` first, because it holds a reference to the recorder); a
-  try/catch that deletes and throws again; or a value member.
 
 - [ ] **53. DynaMechs returns uninitialised forces for end links.**
   `dmArticulation::getForces` returns `f_star`, which is never written for a
