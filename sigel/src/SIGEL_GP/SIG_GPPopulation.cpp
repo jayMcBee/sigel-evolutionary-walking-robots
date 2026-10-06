@@ -22,6 +22,7 @@
 */
 #include <QApplication>   // qApp and QProgressDialog need QtWidgets
 #include <QProgressDialog>   // widget used in this file only
+#include <memory>
 #include "SIGEL_Tools/SIG_DialogParent.h"
 #include "SIGEL_GP/SIG_GPPopulation.h"
 
@@ -196,9 +197,9 @@ int SIGEL_GP::SIG_GPPopulation::addRandomIndividuals(int quantity,
 
    pool.resize( maxPos + quantity );
 
-   QProgressDialog *progress;
+   std::unique_ptr< QProgressDialog > progress;
    
-   if( qApp ) progress = new QProgressDialog( "Progress:", "Cancel", 0, quantity, SIGEL_Tools::dialogParent() );
+   if( qApp ) progress = std::make_unique< QProgressDialog >( "Progress:", "Cancel", 0, quantity, SIGEL_Tools::dialogParent() );
    if( qApp ) progress->setWindowModality( Qt::ApplicationModal );
    if( qApp ) progress->setWindowTitle( "Generating" );
    
@@ -229,8 +230,6 @@ int SIGEL_GP::SIG_GPPopulation::addRandomIndividuals(int quantity,
 	     }
 	 }
      }
-
-    if( qApp ) delete progress;
 
     return quantity;
 };
@@ -360,7 +359,6 @@ void SIGEL_GP::SIG_GPPopulation::readFromFile(QTextStream &file)
   QString          populationStr=file.readAll();
   QString          tmpStr1, indStr;
   long             pos, pos2;
-  QProgressDialog *progress;
 
 #ifdef SIG_DEBUG
 
@@ -381,8 +379,9 @@ void SIGEL_GP::SIG_GPPopulation::readFromFile(QTextStream &file)
 
 #endif
 
+        std::unique_ptr< QProgressDialog > progress;
         if( qApp ) 
-           progress = new QProgressDialog( "Progress:", "Cancel", 0, getSize(), SIGEL_Tools::dialogParent() );
+           progress = std::make_unique< QProgressDialog >( "Progress:", "Cancel", 0, getSize(), SIGEL_Tools::dialogParent() );
         if( qApp ) progress->setWindowModality( Qt::ApplicationModal );
         if( qApp ) progress->setWindowTitle( "Loading" );
 
@@ -458,8 +457,6 @@ void SIGEL_GP::SIG_GPPopulation::readFromFile(QTextStream &file)
         SIGEL_Tools::SIG_IO::cerr << "\n\nREADING POPULATION FINISHED." << Qt::endl;    
      
 #endif
-
-        if( qApp ) delete progress;  
 
     } 
   else 
