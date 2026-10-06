@@ -28,13 +28,8 @@ Paths are relative to `sigel/`, the source tree.
   by a local object, a value member or a `std::unique_ptr`, where no other
   class has to change. One place per commit. Gate for each: the fitness rows
   are identical on both builds, and the AddressSanitizer run has no report.
-  The places below come from a survey of all SIGEL code on 2026-10-05.
-  Tick a place when it is done.
 
   *Local pointer that can be a local object:*
-  - [x] `SIG_RobotBuilder::firstPass`: `s`, `c`. They leak when the robot
-    file has an error.
-  - [x] `SIG_RobotBuilder::secondPass`: `s`, `c`. The same.
   - [ ] `MT_Search::crossover`: `NextProgPartForChildOne`,
     `NextProgPartForChildTwo`.
   - [ ] `SIG_GPOperations::mutation`, case 2: `newProgLine`.
@@ -49,12 +44,11 @@ Paths are relative to `sigel/`, the source tree.
   - [ ] `SIG_ExperimentListView::openExperimentFile`: `theNewExperiment`.
   - [ ] `main` in `sigel_slave.cpp`: `robot`, `environment`,
     `simulationParameters`, `program`, `modifiedRobot`. They wait for
-    item 141. Done: `simWindow`, `experiment`, `app`.
-  - [ ] `main` in `sigel.cpp`: `mainWindow`. Never deleted;
-    `~SIG_MainWindow` has never run at exit. Skipped for now: as a local
-    object it would run the destructors of every open experiment and of
-    `MT_Controller` when SIGEL quits, for the first time. Read that chain
-    first, and test a quit with an open experiment on the ASan build.
+    item 141.
+  - [ ] `main` in `sigel.cpp`: `mainWindow`. Never deleted, so
+    `~SIG_MainWindow` and the destructors of the open experiments have never
+    run at exit. Read that chain first, and test a quit with an open
+    experiment on the AddressSanitizer build.
 
   *Pointer member with one owner:*
   - [ ] `SIG_DynaMechsSimulationData::dynaMechsIntegrator`. Never deleted;
