@@ -69,8 +69,13 @@ if nm -C "$ROOT/$B/coredrive" 2>/dev/null | grep -q __asan_init; then
 		echo "$leaks" >&2
 		exit 1
 	}
+	leaks=$(ASAN_OPTIONS=detect_leaks=1 "$ROOT/$B/coredrive" -metamating 2>&1 >/dev/null) || {
+		echo "metamating LEAKED under LeakSanitizer:" >&2
+		echo "$leaks" >&2
+		exit 1
+	}
 else
-	echo "note: $B has no sanitizer, so the self-check leak test was SKIPPED." >&2
+	echo "note: $B has no sanitizer, so the two leak tests were SKIPPED." >&2
 	echo "      run 'ASAN_OPTIONS=detect_leaks=0 ./checks/fitness-check.sh build-asan' for it." >&2
 fi
 

@@ -479,6 +479,7 @@ static int metamating()
 
   // Mutation.
   const int mutationOnly[3] = { 0, 1000, 1000 };
+  int mutatedChildren = 0;
   for (unsigned seed = 1; seed <= seeds; seed++) {
     MetaMating changed = metaMate(seed, mutationOnly, always, onePoint, startLength, startLength);
     META_CHECK(changed.complete, "mutation", seed);
@@ -486,6 +487,7 @@ static int metamating()
       for (int c = 0; c < 2; c++) {
         META_CHECK(changed.childLines[c].size() == changed.parentLines[changed.childParent[c]].size(), "mutation", seed);
         META_CHECK(changed.childGenesis[c] >= 100, "mutation", seed);
+        if (changed.childLines[c] != changed.parentLines[changed.childParent[c]]) mutatedChildren++;
         META_CHECK(changed.parentLinesAfter[c] == changed.parentLines[c], "mutation", seed);
       }
 
@@ -497,6 +499,9 @@ static int metamating()
         META_CHECK(unchanged.childGenesis[c] == 100, "mutation with rate 0", seed);
       }
   }
+  // A mutated element can get its old value again, so one child may be equal
+  // to its parent. All of them equal means that mutate changes nothing.
+  META_CHECK(mutatedChildren > 0, "mutation, all seeds", seeds);
   printf("metamating mutation: %u seeds\n", seeds);
 
   // Reproduction.
