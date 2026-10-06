@@ -24,6 +24,7 @@
 #define SIGEL_GP_SIG_GPEXPERIMENT_H
 
 #include <QList>
+#include <memory>
 #include "SIGEL_Robot/SIG_Robot.h"
 #include "SIGEL_GP/SIG_GPParameter.h"
 #include "SIGEL_Environment/SIG_Environment.h"
@@ -218,7 +219,7 @@ class SIG_GPExperiment {
 	 *	Definitions for the MetaGP-System
 	 */
 	 public:
-	 	MT_Controller *mtController;	
+	 	std::unique_ptr< MT_Controller > mtController;	
 
 	
  };

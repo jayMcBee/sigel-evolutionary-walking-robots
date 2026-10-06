@@ -33,13 +33,13 @@
 SIGEL_GP::SIG_GPExperiment::SIG_GPExperiment(QString exp) //: mtController(*this)
 {
 	autosavePath = "new";
-	mtController = new MT_Controller(*this);
+	mtController = std::make_unique< MT_Controller >(*this);
 };
 
 SIGEL_GP::SIG_GPExperiment::SIG_GPExperiment() //: mtController(*this)
 {
   autosavePath = "new";
-  mtController = new MT_Controller(*this);
+  mtController = std::make_unique< MT_Controller >(*this);
 };
 
 SIGEL_GP::SIG_GPExperiment::~SIG_GPExperiment()
@@ -47,7 +47,6 @@ SIGEL_GP::SIG_GPExperiment::~SIG_GPExperiment()
 	// This class owns its history entries.
 	qDeleteAll( experimentHistory );
 	experimentHistory.clear();
-	delete mtController;
 };
 
 QString SIGEL_GP::SIG_GPExperiment::cutAfterFiveHashes(QTextStream& source)
