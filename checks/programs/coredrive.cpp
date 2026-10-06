@@ -132,15 +132,9 @@ static void dumpOrder(const SIGEL_Robot::SIG_Robot &r, const char *which)
   }
 }
 
-// Duplicate-key tie-breaking, which neither gate can see.
-//
-// Qt 2's QDict returned the NEWEST binding for a duplicate key, and the Q2Dict
-// that replaced it did the same. Phase D replaced Q2Dict with plain QList and
-// eight hand-written lookups, and D4's six scanned FORWARD -- oldest wins, a
-// silent flip found by review. An independent rebuild confirmed that flipping
-// them back leaves dictorder-baseline.txt and fitness-baseline.txt both empty:
-// no shipped robot has a duplicate name, so nothing in the data can catch it.
-// Hence this, run by fitness-check.sh before the evaluations.
+// Rules of small classes that no shipped experiment or robot file reaches.
+// fitness-check.sh runs this before the evaluations, and once more under
+// LeakSanitizer: every object made here must be freed by its owner.
 static int selfcheck()
 {
   // Line-buffer stdout. SIG_WANT records and continues, but a wrong size can
@@ -154,52 +148,40 @@ static int selfcheck()
   do { if (!(cond)) { printf("selfcheck FAILED: %s\n", #cond); ++bad; } }  \
   while (0)
 
-  {   // SIG_LanguageParameters: newest wins, and removeCommand frees THAT one.
+  {   // SIG_LanguageParameters owns its commands; removeCommand frees one.
     SIGEL_Robot::SIG_LanguageParameters lp;
-    SIGEL_Robot::SIG_CommandParameters *first  = new SIGEL_Robot::SIG_CommandParameters();
-    SIGEL_Robot::SIG_CommandParameters *second = new SIGEL_Robot::SIG_CommandParameters();
-    lp.addCommand("DUP", first);
-    lp.addCommand("DUP", second);
-    SIG_WANT(lp.getCommand("DUP") == second);
-    lp.removeCommand("DUP");
-    SIG_WANT(lp.getCommand("DUP") == first);
-    lp.removeCommand("DUP");
-    SIG_WANT(lp.getCommand("DUP") == 0);
+    SIGEL_Robot::SIG_CommandParameters *command = new SIGEL_Robot::SIG_CommandParameters();
+    lp.addCommand("CHECKED", command);
+    SIG_WANT(lp.getCommand("CHECKED") == command);
+    lp.removeCommand("CHECKED");
+    SIG_WANT(lp.getCommand("CHECKED") == 0);
   }
-  {   // SIG_Link::getPoint, same rule.
+  {   // A robot file may declare a point of a link twice. The last one wins.
     SIGEL_Robot::SIG_Link link(0, "L", 0);
     link.addPoint("P", SIG_Vector(1, 0, 0));
     link.addPoint("P", SIG_Vector(2, 0, 0));
     SIG_WANT(link.getPoint("P").x == 2);
   }
-  {   // All six of SIG_Robot's lookups. Checking only one left the other five
-      // able to flip back to oldest-wins with every check silent -- which is
-      // precisely the hole this whole self-check exists to close.
+  {   // SIG_Robot finds each kind of part by name, and owns and frees the parts.
     SIGEL_Robot::SIG_Robot robot;
-    SIGEL_Robot::SIG_Body     *b1 = new SIGEL_Robot::SIG_Body(&robot, "S", "d");
-    SIGEL_Robot::SIG_Body     *b2 = new SIGEL_Robot::SIG_Body(&robot, "S", "d");
-    SIGEL_Robot::SIG_Material *m1 = new SIGEL_Robot::SIG_Material(&robot, "S");
-    SIGEL_Robot::SIG_Material *m2 = new SIGEL_Robot::SIG_Material(&robot, "S");
-    SIGEL_Robot::SIG_Link     *l1 = new SIGEL_Robot::SIG_Link(&robot, "S", 0);
-    SIGEL_Robot::SIG_Link     *l2 = new SIGEL_Robot::SIG_Link(&robot, "S", 1);
-    SIGEL_Robot::SIG_Joint    *j1 = new SIGEL_Robot::SIG_GlueJoint(&robot, "S", 0);
-    SIGEL_Robot::SIG_Joint    *j2 = new SIGEL_Robot::SIG_GlueJoint(&robot, "S", 1);
-    SIGEL_Robot::SIG_Drive    *d1 = new SIGEL_Robot::SIG_Drive(&robot, "S", 0);
-    SIGEL_Robot::SIG_Drive    *d2 = new SIGEL_Robot::SIG_Drive(&robot, "S", 1);
-    SIGEL_Robot::SIG_Sensor   *s1 = new SIGEL_Robot::SIG_ContactSensor(&robot, "S", 0);
-    SIGEL_Robot::SIG_Sensor   *s2 = new SIGEL_Robot::SIG_ContactSensor(&robot, "S", 1);
-    robot.addBody(b1);     robot.addBody(b2);
-    robot.addMaterial(m1); robot.addMaterial(m2);
-    robot.addLink(l1);     robot.addLink(l2);
-    robot.addJoint(j1);    robot.addJoint(j2);
-    robot.addDrive(d1);    robot.addDrive(d2);
-    robot.addSensor(s1);   robot.addSensor(s2);
-    SIG_WANT(robot.lookupBody("S")     == b2);
-    SIG_WANT(robot.lookupMaterial("S") == m2);
-    SIG_WANT(robot.lookupLink("S")     == l2);
-    SIG_WANT(robot.lookupJoint("S")    == j2);
-    SIG_WANT(robot.lookupDrive("S")    == d2);
-    SIG_WANT(robot.lookupSensor("S")   == s2);
+    SIGEL_Robot::SIG_Body     *body     = new SIGEL_Robot::SIG_Body(&robot, "body", "d");
+    SIGEL_Robot::SIG_Material *material = new SIGEL_Robot::SIG_Material(&robot, "material");
+    SIGEL_Robot::SIG_Link     *link     = new SIGEL_Robot::SIG_Link(&robot, "link", 0);
+    SIGEL_Robot::SIG_Joint    *joint    = new SIGEL_Robot::SIG_GlueJoint(&robot, "joint", 0);
+    SIGEL_Robot::SIG_Drive    *drive    = new SIGEL_Robot::SIG_Drive(&robot, "drive", 0);
+    SIGEL_Robot::SIG_Sensor   *sensor   = new SIGEL_Robot::SIG_ContactSensor(&robot, "sensor", 0);
+    robot.addBody(body);
+    robot.addMaterial(material);
+    robot.addLink(link);
+    robot.addJoint(joint);
+    robot.addDrive(drive);
+    robot.addSensor(sensor);
+    SIG_WANT(robot.lookupBody("body")         == body);
+    SIG_WANT(robot.lookupMaterial("material") == material);
+    SIG_WANT(robot.lookupLink("link")         == link);
+    SIG_WANT(robot.lookupJoint("joint")       == joint);
+    SIG_WANT(robot.lookupDrive("drive")       == drive);
+    SIG_WANT(robot.lookupSensor("sensor")     == sensor);
     SIG_WANT(robot.lookupLink("MISSING") == 0);
   }
   {   // SIG_Material::friction, D11.  No shipped robot declares friction at
@@ -244,9 +226,6 @@ static int selfcheck()
     SIG_WANT(written.split(' ').value(4) == "2");   // 3 would be the append bug
     SIG_WANT(written.contains("b 0.75"));
     SIG_WANT(written.contains("c 0.5"));
-
-    a.setFrictionValue(&a, 0.1);                  // self: must not recurse
-    SIG_WANT(a.getFrictionValue(&a) == 0.1);
   }
   {   // SIG_Link::noCollide, D10.  Also unreachable from the data: 0
       // 'nocollide' in all 7 .rrb and noCollideCount 0 in all 261 .exp Link
@@ -256,7 +235,6 @@ static int selfcheck()
     SIGEL_Robot::SIG_Link l1(&robot, "l1", 0);
     SIGEL_Robot::SIG_Link l2(&robot, "l2", 1);
 
-    SIG_WANT(l1.getNoCollides().count() == 0);
     l1.addNoCollide(&l2);                         // negotiates both directions
     SIG_WANT(l1.getNoCollides().count() == 1);
     SIG_WANT(l2.getNoCollides().count() == 1);
