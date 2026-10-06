@@ -265,7 +265,7 @@ sigel/                                      the repo root
 │   ├── povrayLauncher                      renders the POV-Ray export
 │   └── COPYING  README  kdesigel.doxygen   upstream, 2003
 ├── vendor/                                 third-party code and our fixes to it
-│   ├── patches/                            12 patches, applied by `make`
+│   ├── patches/                            13 patches, applied by `make`
 │   ├── supportingLibs.tar.gz               tracked, so a clone builds offline
 │   └── pvm3.4.6.tgz                        upstream PVM, tracked -- Phase P
 ├── experiments/                            the 7 kept experiments, tracked

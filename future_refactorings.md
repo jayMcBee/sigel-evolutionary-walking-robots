@@ -42,8 +42,6 @@ Paths are relative to `sigel/`, the source tree.
     experiment on the AddressSanitizer build.
 
   *Pointer member with one owner:*
-  - [ ] `SIG_DynaMechsSimulationData::dynaMechsIntegrator`. Never deleted;
-    the DynaMechs integrator destructors have never run in SIGEL.
   - [ ] `SIG_DynaMechsLink::screwLink`. Never deleted.
   - [ ] `MT_GPManager`: `BestIndividual`, `Randi`, `Statistics`, `Offspring`,
     `Parent`, `Seeker`, `Selector`, `FitnessTrainer`. Used by the MetaGP

@@ -27,6 +27,7 @@
 #include "SIGEL_Simulation/SIG_DynaMechsLink.h"
 
 #include <QList>
+#include <memory>
 
 #include <dm.h>
 #include <dmArticulation.hpp>
@@ -81,7 +82,7 @@ namespace SIGEL_Simulation
 
       dmArticulation dynaMechsSystem;
 
-      dmIntegrator *dynaMechsIntegrator;
+      std::unique_ptr< dmIntegrator > dynaMechsIntegrator;
 
       QList< SIG_DynaMechsLink * > dynaMechsLinks;
 

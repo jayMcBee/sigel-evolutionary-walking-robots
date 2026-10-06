@@ -102,13 +102,13 @@ SIGEL_Simulation::SIG_DynaMechsSimulationData::SIG_DynaMechsSimulationData( SIGE
   switch (simulationParameter.getDynaMechsIntegrator())
     {
     case SIG_SimulationParameters::Euler:
-      dynaMechsIntegrator = new dmIntegEuler();
+      dynaMechsIntegrator = std::make_unique< dmIntegEuler >();
       break;
     case SIG_SimulationParameters::RungeKutta4:
-      dynaMechsIntegrator = new dmIntegRK4();
+      dynaMechsIntegrator = std::make_unique< dmIntegRK4 >();
       break;
     case SIG_SimulationParameters::RungeKutta45:
-      dynaMechsIntegrator = new dmIntegRK45();
+      dynaMechsIntegrator = std::make_unique< dmIntegRK45 >();
       break;
     };
 

@@ -1,0 +1,63 @@
+--- a/dynamechs/dm/dmIntegEuler.cpp
++++ b/dynamechs/dm/dmIntegEuler.cpp
+@@ -41,8 +41,8 @@
+       // deallocate any state variables.
+       if (m_qy)
+       {
+-         delete m_qy;
+-         delete m_qdy;
++         delete [] m_qy;
++         delete [] m_qdy;
+       }
+    }
+ }
+--- a/dynamechs/dm/dmIntegRK4.cpp
++++ b/dynamechs/dm/dmIntegRK4.cpp
+@@ -45,12 +45,12 @@
+       // deallocate any state variables.
+       if (m_qy)
+       {
+-         delete m_qy;
+-         delete m_qdy;
+-         delete m_qyt;
+-         delete m_qdyt;
+-         delete m_qdym;
+-         delete m_qdyb;
++         delete [] m_qy;
++         delete [] m_qdy;
++         delete [] m_qyt;
++         delete [] m_qdyt;
++         delete [] m_qdym;
++         delete [] m_qdyb;
+       }
+    }
+ }
+--- a/dynamechs/dm/dmIntegRK45.cpp
++++ b/dynamechs/dm/dmIntegRK45.cpp
+@@ -55,16 +55,16 @@
+       // deallocate any state variables.
+       if (m_qy)
+       {
+-         delete m_qy;
+-         delete m_qdy;
+-         delete m_qdy2;
+-         delete m_qdy3;
+-         delete m_qdy4;
+-         delete m_qdy5;
+-         delete m_qdy6;
+-         delete m_qy_temp;
+-         delete m_qy_error;
+-         delete m_qy_scale;
++         delete [] m_qy;
++         delete [] m_qdy;
++         delete [] m_qdy2;
++         delete [] m_qdy3;
++         delete [] m_qdy4;
++         delete [] m_qdy5;
++         delete [] m_qdy6;
++         delete [] m_qy_temp;
++         delete [] m_qy_error;
++         delete [] m_qy_scale;
+       }
+    }
+ }
