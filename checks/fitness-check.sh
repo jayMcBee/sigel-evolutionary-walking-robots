@@ -60,6 +60,9 @@ export SIGEL_ROOT
 # a check that quietly does nothing is worse than no check, because the
 # operator believes it ran.
 "$ROOT/$B/coredrive" -selfcheck >&2 || exit 1
+# The mating code of MetaGP. Its rules hold for every seed, so it has no
+# baseline; it passes or fails.
+"$ROOT/$B/coredrive" -metamating >&2 || exit 1
 if nm -C "$ROOT/$B/coredrive" 2>/dev/null | grep -q __asan_init; then
 	leaks=$(ASAN_OPTIONS=detect_leaks=1 "$ROOT/$B/coredrive" -selfcheck 2>&1 >/dev/null) || {
 		echo "selfcheck LEAKED under LeakSanitizer:" >&2

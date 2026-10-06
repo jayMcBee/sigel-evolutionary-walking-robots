@@ -48,7 +48,9 @@ or is skipped. The warning count on the total line is part of the result.
 
 10. **`fitness-check.sh`.** 21 fitness values, 3 for each of the 7
     experiments, must match `baselines/fitness-baseline.txt`. It also runs the
-    evaluator's self-test. Run it on both builds:
+    evaluator's self-test, and the MetaGP mating test: crossover, mutation
+    and reproduction for 200 random seeds each, against rules that hold for
+    every seed. Run it on both builds:
 
         ./checks/fitness-check.sh | diff -u checks/baselines/fitness-baseline.txt -
         ASAN_OPTIONS=detect_leaks=0 ./checks/fitness-check.sh build-asan \

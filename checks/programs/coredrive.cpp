@@ -45,6 +45,14 @@
 #include "SIGEL_Simulation/SIG_Simulation.h"
 #include "SIGEL_Simulation/SIG_SimulationParameters.h"
 #include "SIGEL_Tools/SIG_Exception.h"
+#include "MT_GPSystem/MT_Individual.h"
+#include "MT_GPSystem/MT_Population.h"
+#include "MT_GPSystem/MT_Program.h"
+#include "MT_GPSystem/MT_Programline.h"
+#include "MT_GPSystem/MT_Randomizer.h"
+#include "MT_GPSystem/MT_Search.h"
+
+#include <cstdlib>
 
 
 // Every robot container whose order reaches the simulation -- PORTING.md
@@ -355,6 +363,183 @@ static int selfcheck()
   return bad ? 1 : 0;
 }
 
+// ---------------------------------------------------------------------------
+// -metamating: the mating code of MetaGP, MT_Search::startMatingProcess with
+// its private crossover, mutate and reproduce, and MT_Program::insertProg.
+//
+// Every rule here must hold for every random seed, so there is no baseline
+// file. One operator is forced per run through MT_Randomizer's thresholds: a
+// draw is below 1000, so thresholds 1000/1000/1000 always choose the first
+// entry, 0/1000/1000 the second and 0/0/1000 the third.
+//
+// MT_Randomizer seeds rand() from the clock in its constructor. The srand()
+// after it makes a failure repeat.
+
+static QStringList metaLines(MT_Program *program)
+{
+  QStringList lines;
+  for (int i = 0; i < program->getLength(); i++) {
+    QString text;
+    QTextStream stream(&text);
+    program->getProgramLine(i)->writeToFileProgramLine(stream);
+    lines << text.trimmed();
+  }
+  return lines;
+}
+
+static QString metaRandomizerText(const int searchOperator[3], const int mutationPower[2],
+                                  const int crossoverPoints[3], int maxProgramLength)
+{
+  QString text;
+  QTextStream stream(&text);
+  // Parents, offspring, registers, maximum program length.
+  stream << "Randomizer:\n2\n4\n10\n" << maxProgramLength << "\n";
+  for (int i = 0; i < 3; i++) stream << searchOperator[i] << "\n";
+  for (int i = 0; i < 2; i++) stream << mutationPower[i] << "\n";
+  for (int i = 0; i < 3; i++) stream << crossoverPoints[i] << "\n";
+  // The 18 instruction thresholds of stdConf.mt.
+  for (int i = 0; i < 18; i++) stream << i * 1000 << "\n";
+  stream << "\nConstant:\n3\n1\n2\n3\n\n";
+  return text;
+}
+
+struct MetaMating
+{
+  QStringList parentLines[2];       // before the mating
+  QStringList parentLinesAfter[2];
+  QList<QStringList> childLines;
+  QList<int> childGenesis;
+  QList<int> childParent;           // 0 or 1, from getFitnessOfParent
+  int maxProgramLength = 0;
+  bool complete = false;            // every offspring slot is filled, both parents are in it
+};
+
+// Two random parents, four offspring slots: the two parents and two children.
+static MetaMating metaMate(unsigned seed, const int searchOperator[3], const int mutationPower[2],
+                           const int crossoverPoints[3], int startLength, int maxProgramLength)
+{
+  MetaMating result;
+  result.maxProgramLength = maxProgramLength;
+
+  QString text = metaRandomizerText(searchOperator, mutationPower, crossoverPoints, startLength);
+  QTextStream stream(&text);
+  MT_Randomizer randomizer(stream);
+  srand(seed);
+
+  MT_Population parents(&randomizer, 2);
+  parents.setMaxProgLen(maxProgramLength);
+  MT_Individual *parent[2] = { parents.getIndividual(0), parents.getIndividual(1) };
+  for (int i = 0; i < 2; i++) {
+    parent[i]->setFitness(i + 1.0);
+    result.parentLines[i] = metaLines(parent[i]->getProgram());
+  }
+
+  MT_Population offspring;
+  offspring.changePopSize(4);
+  MT_Search search(&parents, &offspring, &randomizer);
+  const int error = search.startMatingProcess();
+
+  int parentsFound = 0;
+  bool allFilled = true;
+  for (int i = 0; i < offspring.getSize(); i++) {
+    MT_Individual *individual = offspring.getIndividual(i);
+    if (!individual) { allFilled = false; continue; }
+    if (individual == parent[0] || individual == parent[1]) { parentsFound++; continue; }
+    result.childLines << metaLines(individual->getProgram());
+    result.childGenesis << individual->getTypOfGenesis();
+    result.childParent << (individual->getFitnessOfParent() == 1.0 ? 0 : 1);
+  }
+  for (int i = 0; i < 2; i++)
+    result.parentLinesAfter[i] = metaLines(parent[i]->getProgram());
+  result.complete = (error == 0) && allFilled && (parentsFound == 2) && (result.childLines.size() == 2);
+  return result;
+}
+
+static int metamating()
+{
+  int bad = 0;
+#define META_CHECK(cond, what, seed)                                          \
+  do { if (!(cond)) { printf("metamating FAILED: %s, seed %u: %s\n", what, seed, #cond); ++bad; } } \
+  while (0)
+
+  const unsigned seeds = 200;
+  const int startLength = 20;       // random programs get 0.66 of this, 13 lines
+  const int always[2] = { 1000, 1000 };
+  const int never[2] = { 0, 0 };
+  const int onePoint[3] = { 1000, 1000, 1000 };
+
+  // Crossover with 1, 2 and 3 points.
+  const int crossoverOnly[3] = { 1000, 1000, 1000 };
+  const int points[3][3] = { { 1000, 1000, 1000 }, { 0, 1000, 1000 }, { 0, 0, 1000 } };
+  const char *pointNames[3] = { "crossover, 1 point", "crossover, 2 points", "crossover, 3 points" };
+  for (int p = 0; p < 3; p++) {
+    for (unsigned seed = 1; seed <= seeds; seed++) {
+      // Room for every line: the children together hold exactly the parents' lines.
+      MetaMating roomy = metaMate(seed, crossoverOnly, never, points[p], startLength, 100);
+      META_CHECK(roomy.complete, pointNames[p], seed);
+      if (!roomy.complete) continue;
+      QStringList fromParents = roomy.parentLines[0] + roomy.parentLines[1];
+      QStringList fromChildren = roomy.childLines[0] + roomy.childLines[1];
+      fromParents.sort();
+      fromChildren.sort();
+      META_CHECK(fromChildren == fromParents, pointNames[p], seed);
+      META_CHECK(roomy.childGenesis[0] == p + 1 && roomy.childGenesis[1] == p + 1, pointNames[p], seed);
+      META_CHECK(roomy.parentLinesAfter[0] == roomy.parentLines[0], pointNames[p], seed);
+      META_CHECK(roomy.parentLinesAfter[1] == roomy.parentLines[1], pointNames[p], seed);
+
+      // No room: a child is cut at the maximum length and is never empty.
+      MetaMating tight = metaMate(seed, crossoverOnly, never, points[p], startLength, startLength);
+      META_CHECK(tight.complete, pointNames[p], seed);
+      if (!tight.complete) continue;
+      for (const QStringList &child : tight.childLines)
+        META_CHECK(child.size() >= 1 && child.size() <= tight.maxProgramLength, pointNames[p], seed);
+      META_CHECK(tight.parentLinesAfter[0] == tight.parentLines[0], pointNames[p], seed);
+      META_CHECK(tight.parentLinesAfter[1] == tight.parentLines[1], pointNames[p], seed);
+    }
+    printf("metamating %s: %u seeds\n", pointNames[p], seeds);
+  }
+
+  // Mutation.
+  const int mutationOnly[3] = { 0, 1000, 1000 };
+  for (unsigned seed = 1; seed <= seeds; seed++) {
+    MetaMating changed = metaMate(seed, mutationOnly, always, onePoint, startLength, startLength);
+    META_CHECK(changed.complete, "mutation", seed);
+    if (changed.complete)
+      for (int c = 0; c < 2; c++) {
+        META_CHECK(changed.childLines[c].size() == changed.parentLines[changed.childParent[c]].size(), "mutation", seed);
+        META_CHECK(changed.childGenesis[c] >= 100, "mutation", seed);
+        META_CHECK(changed.parentLinesAfter[c] == changed.parentLines[c], "mutation", seed);
+      }
+
+    MetaMating unchanged = metaMate(seed, mutationOnly, never, onePoint, startLength, startLength);
+    META_CHECK(unchanged.complete, "mutation with rate 0", seed);
+    if (unchanged.complete)
+      for (int c = 0; c < 2; c++) {
+        META_CHECK(unchanged.childLines[c] == unchanged.parentLines[unchanged.childParent[c]], "mutation with rate 0", seed);
+        META_CHECK(unchanged.childGenesis[c] == 100, "mutation with rate 0", seed);
+      }
+  }
+  printf("metamating mutation: %u seeds\n", seeds);
+
+  // Reproduction.
+  const int reproductionOnly[3] = { 0, 0, 1000 };
+  for (unsigned seed = 1; seed <= seeds; seed++) {
+    MetaMating copied = metaMate(seed, reproductionOnly, never, onePoint, startLength, startLength);
+    META_CHECK(copied.complete, "reproduction", seed);
+    if (copied.complete)
+      for (int c = 0; c < 2; c++) {
+        META_CHECK(copied.childLines[c] == copied.parentLines[copied.childParent[c]], "reproduction", seed);
+        META_CHECK(copied.childGenesis[c] == 4, "reproduction", seed);
+        META_CHECK(copied.parentLinesAfter[c] == copied.parentLines[c], "reproduction", seed);
+      }
+  }
+  printf("metamating reproduction: %u seeds\n", seeds);
+
+#undef META_CHECK
+  printf(bad ? "metamating: %d FAILED\n" : "metamating: ok\n", bad);
+  return bad ? 1 : 0;
+}
+
 int main(int argc, char *argv[])
 {
   // PORTING.md §9. The deleted shim called this during static initialisation;
@@ -364,11 +549,12 @@ int main(int argc, char *argv[])
   bool verbose = false;
   if (argc > 1 && QString(argv[1]) == "-v") { verbose = true; argv++; argc--; }
   if (argc > 1 && QString(argv[1]) == "-selfcheck") return selfcheck();
+  if (argc > 1 && QString(argv[1]) == "-metamating") return metamating();
   bool robotCheck = false;
   if (argc > 1 && QString(argv[1]) == "-check") { robotCheck = true; argv++; argc--; }
 
   if (argc < 2 || argc > 3) {
-    fprintf(stderr, "usage: %s [-v] [-check] <experiment.exp> [individual, default 0]\n", argv[0]);
+    fprintf(stderr, "usage: %s [-v] [-check] <experiment.exp> [individual, default 0]\n       %s -selfcheck | -metamating\n", argv[0], argv[0]);
     return 2;
   }
 
