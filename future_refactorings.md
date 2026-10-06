@@ -105,6 +105,13 @@ Paths are relative to `sigel/`, the source tree.
   constructor throws. Review its design, and decide whether a standard
   C++20 construct does the same job.
 
+- [ ] **141. Untangle `main` in `sigel_slave.cpp`.** One function does three
+  jobs: it shows an experiment file, it shows an individual that PVM sent,
+  and it computes a fitness for PVM. The pointers `robot`, `environment`,
+  `simulationParameters`, `program` and `modifiedRobot` own their object in
+  one mode and point at another owner's object in the other mode, so nothing
+  deletes them. Give each job its own code and each object one owner.
+
 - [ ] **36. `SIG_Material::FrictionValue` could be a value type.**
   `FrictionValue` values would drop the `new` and the `qDeleteAll`, as D8 did
   for `SIG_Register`; tidiness only. D11 left it as it was, by decision,
