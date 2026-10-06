@@ -287,8 +287,9 @@ int main( int argc, char *argv[] ) {
 
       // Remote ZORC needs a GUI for its requesters
       const SIGEL_GP::SIG_GPRemoteZORCFitnessFunction remoteZORC;
+      std::unique_ptr< QApplication > app;
       if (fitnessFunctionName == remoteZORC.serializedId()) {
-   				QApplication *app = new QApplication(argc, argv);
+   				app = std::make_unique< QApplication >(argc, argv);
 				app->setStyle( QStyleFactory::create( "Fusion" ) );
 	  	}
 
