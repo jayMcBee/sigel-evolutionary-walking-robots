@@ -51,7 +51,10 @@ Paths are relative to `sigel/`, the source tree.
     `simulationParameters`, `program`, `modifiedRobot`. They wait for
     item 141. Done: `simWindow`, `experiment`, `app`.
   - [ ] `main` in `sigel.cpp`: `mainWindow`. Never deleted;
-    `~SIG_MainWindow` has never run at exit.
+    `~SIG_MainWindow` has never run at exit. Skipped for now: as a local
+    object it would run the destructors of every open experiment and of
+    `MT_Controller` when SIGEL quits, for the first time. Read that chain
+    first, and test a quit with an open experiment on the ASan build.
 
   *Pointer member with one owner:*
   - [ ] `SIG_DynaMechsSimulationData::dynaMechsIntegrator`. Never deleted;
