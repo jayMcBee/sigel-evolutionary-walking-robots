@@ -369,12 +369,10 @@ namespace SIGEL_Robot {
                 }
 
                 tx >> tmpstr;
-                if (tmpstr == "LanguageParameters") {
-                        delete language;
-                        language = nullptr;   // the constructor below can throw
+                delete language;
+                language = nullptr;   // the constructor below can throw
+                if (tmpstr == "LanguageParameters")
                         language = new SIG_LanguageParameters (tx);
-                } else
-                        language = nullptr;
         }
 
         void SIG_Robot::vectorToStream (QTextStream & tx, SIG_Vector vec)

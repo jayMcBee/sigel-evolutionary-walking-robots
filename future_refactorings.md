@@ -65,8 +65,6 @@ Paths are relative to `sigel/`, the source tree.
     `translatedSIGProg`.
   - [ ] `MT_PopulationWidget::getSelectedItems`: the list, used in
     `slotExpInd`.
-  - [ ] `SIG_Robot::readFromFileTransfer`: the language parameters, when the
-    stream has none.
   - [ ] `SIG_DynaMechsLink`: the contact model and the DynaMechs link bodies.
   - [ ] `SIG_EnvironmentRenderer::loadPNMTexture`: the texture image, from
     `malloc`.
