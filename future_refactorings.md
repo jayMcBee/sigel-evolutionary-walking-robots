@@ -49,8 +49,6 @@ Paths are relative to `sigel/`, the source tree.
   - [ ] `SIG_DynaMechsSimulationData::dynaMechsIntegrator`. Never deleted;
     the DynaMechs integrator destructors have never run in SIGEL.
   - [ ] `SIG_DynaMechsLink::screwLink`. Never deleted.
-  - [ ] `SIG_VisualisationWidget::visualisation`. The old one must be
-    destroyed before the new one is built.
   - [ ] `MT_GPManager`: `BestIndividual`, `Randi`, `Statistics`, `Offspring`,
     `Parent`, `Seeker`, `Selector`, `FitnessTrainer`. Used by the MetaGP
     thread and the GUI thread.
@@ -91,6 +89,9 @@ Paths are relative to `sigel/`, the source tree.
     the old manager before it builds the new one, because the old manager's
     trainer removes the PVM hosts that the new one adds. That needs a
     `reset()`.
+  - `SIG_VisualisationWidget::visualisation`: the old visualisation must be
+    destroyed before the new one is built, which needs a `reset()`, and the
+    derived widget casts the base pointer, which needs `.get()`.
 
 - [ ] **140. Assess `DynaMechsLinkGuard`.** It is a hand-written struct in
   `SIG_DynaMechsSimulationData.cpp` that frees the links when the
