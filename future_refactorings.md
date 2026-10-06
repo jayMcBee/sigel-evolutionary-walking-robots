@@ -34,7 +34,8 @@ Paths are relative to `sigel/`, the source tree.
     `NextProgPartForChildTwo`.
   - [ ] `SIG_Mirtich::compute`: the three `new[]` arrays.
   - [ ] `SIG_Program::readFromFile`: `prgLine`. It leaks when a line does
-    not parse.
+    not parse. It fits when `SIG_Program::lines` no longer holds raw
+    pointers.
   - [ ] `SIG_Body::load`: `bodyScene`. Never deleted; `~SceneGraph` has
     never run in SIGEL.
   - [ ] `SIG_GPPopulation::addRandomIndividuals` and `readFromFile`: the
