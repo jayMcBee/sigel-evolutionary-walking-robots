@@ -39,8 +39,6 @@ Paths are relative to `sigel/`, the source tree.
     never run in SIGEL.
   - [ ] `SIG_GPPopulation::addRandomIndividuals` and `readFromFile`: the
     `progress` dialog.
-  - [ ] `SIG_SimulationVisualisation::initShadowMapping`: `program`.
-  - [ ] `SIG_ExperimentListView::openExperimentFile`: `theNewExperiment`.
   - [ ] `main` in `sigel_slave.cpp`: `robot`, `environment`,
     `simulationParameters`, `program`, `modifiedRobot`. They wait for
     item 141.
@@ -53,25 +51,18 @@ Paths are relative to `sigel/`, the source tree.
   - [ ] `SIG_DynaMechsSimulationData::dynaMechsIntegrator`. Never deleted;
     the DynaMechs integrator destructors have never run in SIGEL.
   - [ ] `SIG_DynaMechsLink::screwLink`. Never deleted.
-  - [ ] `SIG_Robot::language`.
-  - [ ] `SIG_Body::geometry`.
   - [ ] `SIG_Link::geometry`, `mirtich`.
   - [ ] `SIG_GPExperiment::mtController`.
-  - [ ] `SIG_SimulationVisualisation::simulation`, `renderRecorder`,
-    `shadowProgram`. The simulation must be destroyed before the recorder.
-    This also does item 20.
+  - [ ] `SIG_SimulationVisualisation::simulation`, `renderRecorder`. The
+    simulation must be destroyed before the recorder. This also does
+    item 20.
   - [ ] `SIG_VisualisationWidget::visualisation`. The old one must be
     destroyed before the new one is built.
   - [ ] `SIG_GUIGPExperiment::guiGPManager`.
   - [ ] `MT_GPManager`: `BestIndividual`, `Randi`, `Statistics`, `Offspring`,
     `Parent`, `Seeker`, `Selector`, `FitnessTrainer`. Used by the MetaGP
     thread and the GUI thread.
-  - [ ] `MT_Individual::Program`.
   - [ ] `MT_Program::Program`, a `new[]` array.
-  - [ ] `MT_Programline::OperandA`, `OperandB`.
-  - [ ] `MT_TrainingCase::TranslateIndividual`.
-  - [ ] `MT_TranslatedIndividual`: `T_Instruktion`, `T_Operand1`,
-    `T_Operand2`, `MetaData`.
   - [ ] `MT_FitnessTrainer::TSet`.
   - [ ] `MT_Controller`: `gpManager`, `substitution`, `cacheStrm`. The first
     two are used by the MetaGP thread; `cacheStrm` leaks.
@@ -86,15 +77,24 @@ Paths are relative to `sigel/`, the source tree.
     `slotExpInd`.
   - [ ] `SIG_GPParameter::slotDeleteHost`: the tree items it takes out.
   - [ ] `SIG_Robot::readFromFileTransfer`: the language parameters, when the
-    stream has none. Done by `SIG_Robot::language` above.
+    stream has none.
   - [ ] `SIG_DynaMechsLink`: the contact model and the DynaMechs link bodies.
   - [ ] `SIG_EnvironmentRenderer::loadPNMTexture`: the texture image, from
     `malloc`.
 
-  *Not in this item:* lists of raw pointers, among them the elements of
-  `MT_Statistics`, which are never deleted. `SIG_GPPopulation::randomizer`
-  and `SIG_GPManager::trainer` own their object in one mode and borrow it in
-  another.
+  *Not in this item:*
+  - Lists of raw pointers, among them the elements of `MT_Statistics`, which
+    are never deleted.
+  - `SIG_GPPopulation::randomizer` and `SIG_GPManager::trainer`: they own
+    their object in one mode and borrow it in another.
+  - Places where one owner hands the object to another, because the code for
+    the handover is not simpler than the `delete` it replaces:
+    `SIG_SimulationVisualisation::initShadowMapping` with `shadowProgram`,
+    `SIG_ExperimentListView::openExperimentFile`, `SIG_Robot::language`,
+    `SIG_Body::geometry`, `MT_Individual::Program`,
+    `MT_Programline::OperandA` and `OperandB`,
+    `MT_TrainingCase::TranslateIndividual`, and the four lists of
+    `MT_TranslatedIndividual`.
 
 - [ ] **140. Assess `DynaMechsLinkGuard`.** It is a hand-written struct in
   `SIG_DynaMechsSimulationData.cpp` that frees the links when the
@@ -400,6 +400,12 @@ touched, because changing one changes behaviour against the reference binary.
 ---
 
 ## 6 · MetaGP
+
+- [ ] **142. Name the crossover points in `MT_Search::crossover`.** The list
+  `XPoints` from `MT_Randomizer::getRandomXPoints` is read by bare index:
+  `[0]` is the number of crossover points, `[1]` to `[6]` are the first,
+  second and third point in the first and the second individual. Only a
+  comment says so. Use an enum for the indices.
 
 - [ ] **132. Make the MetaGP autosave rotate.** In `MT_Controller`,
   `autoSaveCnt = autoSaveCnt++ % 3` writes the old value back, so the
