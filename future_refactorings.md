@@ -405,6 +405,14 @@ touched, because changing one changes behaviour against the reference binary.
   second and third point in the first and the second individual. Only a
   comment says so. Use an enum for the indices.
 
+- [ ] **143. Name the types of genesis of a MetaGP individual.**
+  `MT_Individual::setTypOfGenesis` takes a bare number: 1, 2 and 3 for a
+  crossover with that many points, 4 for reproduction, 5 for a parent that
+  is carried over, and 100 plus the number of mutated elements for a
+  mutation. `MT_Search` sets it and the statistics in `MT_GPManager` read
+  it. Use a scoped enum. The count of mutated elements is a second value
+  and needs its own member.
+
 - [ ] **132. Make the MetaGP autosave rotate.** In `MT_Controller`,
   `autoSaveCnt = autoSaveCnt++ % 3` writes the old value back, so the
   counter stays at 0. The `saveName` it builds is also not used: the next
