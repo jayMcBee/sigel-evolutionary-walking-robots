@@ -206,7 +206,7 @@ namespace SIGEL_Robot {
                 computed = true;
                 
                 POLYHEDRON p;
-                p.verts = new tridouble [geom->getNumVertices ()];
+                p.verts.resize (geom->getNumVertices ());
                 p.faces.resize (geom->getNumPolygons ());
 
                 p.numVerts = geom->getNumVertices ();
@@ -235,11 +235,6 @@ namespace SIGEL_Robot {
                 }
 
                 compVolumeIntegrals (&p);
-
-                // Great - painstakingly built up, one call, and now
-                // I get to delete the whole damn thing again.
-
-                delete [] p.verts;
         }
 
         SIG_Mirtich::SIG_Mirtich (SIG_Geometry const *geometr, QString nameOfGeom)

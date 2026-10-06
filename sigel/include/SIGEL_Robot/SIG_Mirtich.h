@@ -33,13 +33,14 @@ namespace SIGEL_Robot { class SIG_Mirtich; }
 
 #include "SIGEL_Robot/SIG_RobotExceptions.h"
 #include <qstring.h>
+#include <array>
 #include <vector>
 
 namespace SIGEL_Robot {
 
         class SIG_Mirtich {
                 struct POLYHEDRON;
-                typedef double tridouble [3];
+                typedef std::array< double, 3 > tridouble;
                 struct FACE {
                         int numVerts;
                         double norm[3];
@@ -49,7 +50,7 @@ namespace SIGEL_Robot {
                 };
                 struct POLYHEDRON {
                         int numVerts, numFaces;
-                        tridouble *verts;
+                        std::vector< tridouble > verts;
                         std::vector< FACE > faces;
                 };
         protected:
