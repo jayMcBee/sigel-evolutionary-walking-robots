@@ -1,39 +1,31 @@
 #!/bin/sh
-# End-to-end gate for Phase D -- PORTING.md.
+# Fitness check.
 #
 #   ./checks/fitness-check.sh | diff -u checks/baselines/fitness-baseline.txt -
+#   ASAN_OPTIONS=detect_leaks=0 ./checks/fitness-check.sh build-asan \
+#       | diff -u checks/baselines/fitness-baseline.txt -
 #
-# Three individuals of each of the 7 experiments. This is the check that the
-# shim removal did not move a simulated number: dictorder-dump.sh proves the
-# ordering is preserved, this proves the physics that comes out of it is.
+# Evaluates three individuals of each of the 7 experiments and prints their
+# fitness. It is the only check that compares simulated numbers. Before the
+# evaluations it runs coredrive's self-check and the MetaGP mating check.
 #
-# NOT a cross-machine reference. Fitness is chaotic -- §7 measures a 1-ULP
-# change in start height moving an individual by 45% -- and the 2003 build was
-# i386 x87. These values pin this machine against itself, nothing more.
+# The baseline holds for this machine only. Fitness is chaotic: a change of
+# one unit in the last place of a start height moved one individual by 45 %.
 set -eu
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
-# ROOT is derived, not the script's own directory, so check it: a symlink or
-# a copy left at the old path would point it at the PARENT of the repo, and
-# every path below is built from it.
+# Every path below is built from ROOT, so it must be the repository.
 [ -f "$ROOT/Makefile" ] && [ -d "$ROOT/checks" ] || {
 	echo "$0: $ROOT is not the repo root -- run the script by its real path,"\
 	     "not through a symlink or a copy" >&2; exit 1; }
 
-# Run from the repo root whatever the caller's directory is: guidrive opens
-# robots/twoBases/twoBases.rrb relative to the process, and this script
-# never cd'd before launching it.
+# Run from the repository root, whatever the caller's folder is.
 cd "$ROOT" || exit 1
 B=${1:-build}
 [ $# -le 1 ] || { echo "usage: $0 [build-dir] -- it reads experiments/ and robots/" >&2; exit 1; }
 [ -x "$ROOT/$B/coredrive" ] || { echo "no $ROOT/$B/coredrive" >&2; exit 1; }
 
-# A failed `make` stops at the first bad compile and leaves the PREVIOUS
-# coredrive in place, so a test-for-existence passes and the gate silently
-# scores a stale binary. That happened during D13: the build failed on two
-# sites, the gates were run straight after, and both came back green against
-# the binary from before the change. Gate results mean nothing unless the
-# build that produced them succeeded. pvm-check.sh has carried this guard
-# from the start; these two did not.
+# A failed build leaves the previous coredrive in place. Without this test
+# the check would pass on a program from before the change.
 make -q --no-print-directory -C "$ROOT" B="$B" coredrive >/dev/null 2>&1 || {
 	echo ""$ROOT/$B/coredrive" is out of date -- run 'make B=$B coredrive'" >&2; exit 1; }
 
@@ -42,27 +34,16 @@ make -q --no-print-directory -C "$ROOT" B="$B" coredrive >/dev/null 2>&1 || {
 SIGEL_ROOT=$ROOT/sigelApp
 [ -f "$SIGEL_ROOT/Terrain.ter" ] || { echo "no $SIGEL_ROOT/Terrain.ter -- run 'make'" >&2; exit 1; }
 export SIGEL_ROOT
-# Duplicate-key tie-breaking, which no amount of shipped data can exercise --
-# no robot has a duplicate name, so both baselines stay empty when it breaks.
-# Run the self-check twice. The second run turns LeakSanitizer ON, which the
-# evaluations below cannot afford -- they carry a documented 41 KB baseline
-# leak (PORTING.md D18). The self-check frees everything it allocates, so it
-# CAN be leak-checked, and that is what stands between a dropped qDeleteAll in
-# ~SIG_Material and a clean run. Added after the D11 review found that hole.
-#
-# IT ONLY WORKS ON A SANITIZED BUILD, and the default B is build, which has no
-# sanitizer at all. The first version of this ran
-# there anyway: ASAN_OPTIONS was an ignored environment variable, the "second"
-# run was the first one again with its output thrown away, and deleting the
-# qDeleteAll left ./checks/fitness-check.sh exiting 0 with a byte-identical baseline.
-# It was inert in the exact invocation PORTING.md prescribes. Found by the D12
-# review. So test the binary rather than assume, and SAY when it is skipped --
-# a check that quietly does nothing is worse than no check, because the
-# operator believes it ran.
+# The self-check: rules of small classes that the shipped experiments do not
+# reach.
 "$ROOT/$B/coredrive" -selfcheck >&2 || exit 1
 # The mating code of MetaGP. Its rules hold for every seed, so it has no
 # baseline; it passes or fails.
 "$ROOT/$B/coredrive" -metamating >&2 || exit 1
+# Both again with LeakSanitizer on: every object they make must be freed. The
+# evaluations below cannot run this way, because a simulation does not free
+# all it allocates. A build without a sanitizer ignores ASAN_OPTIONS, so test
+# the program and say when the leak tests are skipped.
 if nm -C "$ROOT/$B/coredrive" 2>/dev/null | grep -q __asan_init; then
 	leaks=$(ASAN_OPTIONS=detect_leaks=1 "$ROOT/$B/coredrive" -selfcheck 2>&1 >/dev/null) || {
 		echo "selfcheck LEAKED under LeakSanitizer:" >&2
@@ -83,23 +64,9 @@ fi
 tracked() { git -C "$ROOT" ls-files -- "$1" | sed "s|^|$ROOT/|" | sort; }
 n=$(tracked 'experiments/*.exp' | wc -l)
 [ "$n" -eq 7 ] || { echo "expected 7 .exp under experiments/, found $n" >&2; exit 1; }
-# CAPTURE, TEST THE STATUS, THEN FILTER -- do NOT pipe coredrive straight into
-# tail. This line used to read
-#
-#   v=$("$ROOT/$B/coredrive" "$f" "$i" 2>/dev/null | tail -1 | awk '{print $3}')
-#
-# which loses BOTH halves of the evidence. A pipeline's status is its LAST
-# command's, so awk's 0 hid a segfaulting, aborting or OOM-killed coredrive;
-# and 2>/dev/null threw away the stderr a sanitizer reports on. That matters
-# most in the one invocation this gate exists for: under
-# `ASAN_OPTIONS=detect_leaks=0 ./checks/fitness-check.sh build-asan' a UBSan
-# `runtime error:' went to /dev/null and the gate read green with every number
-# identical to the baseline. `[ -n "$v" ]' below is not a substitute -- it only
-# catches a crash that printed NOTHING, and a crash after the last fitness line
-# still leaves one to read.
-#
-# dictorder-dump.sh's evaluation loop closed this exact hole and says so; this
-# script did not. Found by review 2026-09-07.
+# Capture the output, test the exit status, then filter. A pipe into tail
+# would report tail's status and hide a crash of coredrive. stderr is kept
+# and searched, because a sanitizer reports there.
 out=$(mktemp); err=$(mktemp)
 for f in $(tracked 'experiments/*.exp'); do
 	for i in 0 1 2; do

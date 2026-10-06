@@ -1,16 +1,21 @@
 /*
-  One fitness evaluation from an experiment file -- PORTING.md §3.
+  coredrive: the check program for SIGEL's core. It links SIGEL's libraries
+  and has no window and no PVM.
 
-  This does what the master does before it ships work to a slave
-  (SIG_GPFitnessTrainer.cpp:41-68): copy the experiment's robot, call
-  prepareDynaMechs on the copy, then hand robot, environment, simulation
-  parameters and one individual's program to a fitness function.
+    coredrive <experiment.exp> [n]   evaluates individual n as the master
+                                     prepares it for a slave: it copies the
+                                     robot, calls prepareDynaMechs on the
+                                     copy, and gives robot, environment,
+                                     simulation parameters and the program
+                                     to the experiment's fitness function
+    coredrive -v ...                 the same, with a trace of the simulation
+    coredrive -order <file>          prints the order of a robot's parts
+    coredrive -check <experiment>    lists the issues of the robot check
+    coredrive -selfcheck             rules of small classes
+    coredrive -metamating            rules of MetaGP's mating code
 
-  No PVM and no QApplication. SIG_GPPopulation guards every dialog with
-  if (qApp), so loading an experiment runs headless.
-
-  The experiment file already records the fitness each individual scored in
-  2003, so `coredrive <exp> <n>` prints the new value next to the old one.
+  SIG_GPPopulation shows a dialog only when a QApplication exists, so an
+  experiment loads here without one.
 */
 #include <QList>
 #include <QString>
@@ -55,18 +60,11 @@
 #include <cstdlib>
 
 
-// Every robot container whose order reaches the simulation -- PORTING.md
-// Phase D. SIG_Robot holds six (SIG_Robot.h, its private lists); all six are
-// written in order by SIG_Robot::writeToFileTransfer, so that is the stream
-// order the next reader sees -- the copy constructor, and a PVM slave. The
-// reader appends each joint to its links' lists in stream order, and
-// SIG_DynaMechsSimulationData numbers the DynaMechs bodies by a depth-first walk
-// over SIG_Link::getJoints(); it does not use the containers' own order. That
-// walk is not printed here. SIG_Link::points is a seventh, one per link.
-//
-// D1 first dumped only links and joints. A review rebuilt the core with a
-// perturbed Q2Dict::hash and found 6 of 14 experiments whose order changed
-// while the diff stayed empty -- the four unwatched dicts were carrying it.
+// The order of SIG_Robot's lists. SIG_Robot::writeToFileTransfer writes all of
+// them in list order, so that is the order the next reader sees: the copy
+// constructor, and a PVM slave. The reader appends each joint to its links'
+// lists in that order, and SIG_DynaMechsSimulationData numbers the DynaMechs
+// bodies by a walk over SIG_Link::getJoints(). That walk is not printed here.
 // SIG_Body and SIG_Material carry no number; the other four do.
 template <typename T> static int SIG_NUMBER_OF(const T *e) { return e->getNumber(); }
 static int SIG_NUMBER_OF(const SIGEL_Robot::SIG_Body *)     { return -1; }
@@ -96,9 +94,9 @@ static void dumpOrder(const SIGEL_Robot::SIG_Robot &r, const char *which)
   SIG_DUMP("sensor",   SIGEL_Robot::SIG_Sensor,   getSensors);
 #undef SIG_DUMP
 
-  // Geometry digest. Review showed that doubling every VRML vertex left both
-  // baselines byte-identical: the .exp path never runs the VRML reader, and the
-  // dump recorded only names and numbers, nothing derived from a coordinate.
+  // Geometry digest: a count and a sum of coordinates per body. Without it
+  // nothing printed here depends on a coordinate, and a fault in the VRML
+  // reader would not show.
   // A count and a checksum per body close that, and cost one line each.
   for (SIGEL_Robot::SIG_Body *b : r.getBodies()) {
     const SIGEL_Robot::SIG_Geometry *g = b->getGeometry();
@@ -112,9 +110,8 @@ static void dumpOrder(const SIGEL_Robot::SIG_Robot &r, const char *which)
            g->getNumVertices(), g->getNumPolygons(), sum, qPrintable(b->getName()));
   }
 
-  // The eighth ordered container, missed by the first enumeration: it rides
-  // inside every .exp and every PVM transfer through writeToFileTransfer.
-  // Nothing numbers commands -- they are looked up by name -- so like bodies
+  // The commands are written with every robot. They are found by name, so
+  // like bodies and materials their order reaches only the written file.
   // and materials its order reaches only the serialised bytes.
   {
     int n = 0;
@@ -123,7 +120,7 @@ static void dumpOrder(const SIGEL_Robot::SIG_Robot &r, const char *which)
       printf("  %-8s command   %2d      %s\n", which, n++, qPrintable(c.name));
   }
 
-  // Each link carries its own dict of significant points, in its own order.
+  // Each link has its own list of points.
   for (SIGEL_Robot::SIG_Link *l : r.getLinks()) {
     int n = 0;
     for (const SIGEL_Robot::SIG_Link::NamedPoint &p : l->getPoints())
@@ -184,11 +181,8 @@ static int selfcheck()
     SIG_WANT(robot.lookupSensor("sensor")     == sensor);
     SIG_WANT(robot.lookupLink("MISSING") == 0);
   }
-  {   // SIG_Material::friction, D11.  No shipped robot declares friction at
-      // all -- 0 in all 7 .rrb, and nfric is 0 on all 31 Material lines -- so
-      // both gates run this list empty and neither can see the conversion.
-      // setFrictionValue's walk decides whether to append, which is exactly
-      // the semantic a careless rewrite drops.
+  {   // SIG_Material::setFrictionValue. No shipped robot declares friction,
+      // so no other check runs this code.
     SIGEL_Robot::SIG_Robot robot;
     SIGEL_Robot::SIG_Material a(&robot, "a");
     SIGEL_Robot::SIG_Material b(&robot, "b");
@@ -208,18 +202,12 @@ static int selfcheck()
     SIG_WANT(a.getFrictionValue(&b) == 0.75);
     SIG_WANT(a.getFrictionValue(&c) == 0.5);
 
-    // The partner must be updated too, not left at 0.25. setFrictionValue's
-    // negotiate call sits OUTSIDE its "if (!found)" block for this reason.
-    // Move it inside -- which reads like a tidy -- and a keeps 0.75 while b
-    // keeps 0.25. Confirmed against the 1.3 binary: verification-against-sigel-1.3/v7.
-    //
-    // This is the ONLY assertion here that can see that failure. The count
-    // and the name both still pass, because the entry is present, correctly
-    // named and symmetric -- only its value is wrong.
+    // The partner is updated too. This is the only check that fails when
+    // setFrictionValue updates one side of a pair that already exists.
     SIG_WANT(b.getFrictionValue(&a) == 0.75);
 
-    // The serialiser is the only public window on the list's length, and
-    // its walk is itself converted code no gate reaches.
+    // The written record shows the length of the list: an update must not
+    // append a second entry.
     // "Material a <elasticity> <density> <nfric> b 0.75 c 0.5 <colour>"
     QString written;
     { QTextStream ts(&written); a.writeToFileTransfer(ts); }
@@ -227,10 +215,8 @@ static int selfcheck()
     SIG_WANT(written.contains("b 0.75"));
     SIG_WANT(written.contains("c 0.5"));
   }
-  {   // SIG_Link::noCollide, D10.  Also unreachable from the data: 0
-      // 'nocollide' in all 7 .rrb and noCollideCount 0 in all 261 .exp Link
-      // records.  addNoCollide's !contains guard is what stops the pair being
-      // added twice, and nothing else tests it.
+  {   // SIG_Link::addNoCollide registers the pair on both links, once. No
+      // shipped robot declares a no-collide pair.
     SIGEL_Robot::SIG_Robot robot;
     SIGEL_Robot::SIG_Link l1(&robot, "l1", 0);
     SIGEL_Robot::SIG_Link l2(&robot, "l2", 1);
@@ -248,11 +234,8 @@ static int selfcheck()
     SIG_WANT(l1.getNoCollides().count() == 1);
     SIG_WANT(l2.getNoCollides().count() == 1);
   }
-  {   // The parser DROPS a friction or no-collide partner that is not loaded
-      // yet, silently. Confirmed against the 1.3 binary (verification-against-sigel-1.3/v7): it is
-      // upstream behaviour, not ours, and nothing warns. Both parsers register
-      // the object only AFTER constructing it, so a name can only refer
-      // backwards. No shipped file exercises this -- none declares either.
+  {   // A material read from a stream keeps a friction partner that is loaded
+      // already, and drops, without a message, one that is not loaded yet.
     SIGEL_Robot::SIG_Robot robot;
     SIGEL_Robot::SIG_Material *known = new SIGEL_Robot::SIG_Material(&robot, "known");
     robot.addMaterial(known);
@@ -273,22 +256,9 @@ static int selfcheck()
       SIG_WANT(early->getFrictionValue(known) == 0.6);
     }
   }
-  {   // THE EVOLUTION LOOP'S OWNING CONTAINER, D15.
-      //
-      // Six of SIG_GPPopulation's nine frees are in functions no gate enters:
-      // setIndividual (12 tournament call sites) and deleteIndividual.
-      // addRandomIndividuals is driven for its allocations, not its frees --
-      // its delete pool[x] is always delete nullptr, because resize() just
-      // created those slots. D15 shipped a real leak in
-      // readFromFile's cancel path and every gate reported it clean -- both
-      // diffs, the sanitized run, the self-check and the 41,254-byte leak
-      // baseline. That baseline comes from the default constructor,
-      // readFromFile on an EMPTY pool, and the destructor, so nothing here
-      // moves it. fitness-check.sh runs the self-check a second time under
-      // LeakSanitizer, and that is what judges these blocks.
-      //
-      // Built on the DEFAULT constructor. The two sized ones are unused and
-      // both defective -- see PORTING.md section 9.
+  {   // SIG_GPPopulation owns its individuals. The run under LeakSanitizer
+      // judges every free in setIndividual, deleteIndividual and the
+      // destructor; the checks below pin positions and values.
     SIGEL_GP::SIG_GPParameter param;
     SIGEL_Robot::SIG_LanguageParameters langParams;
 
@@ -296,10 +266,7 @@ static int selfcheck()
     pop.addRandomIndividuals( 4, param, langParams );
     SIG_WANT(pop.getSize() == 4);
 
-    // deleteIndividual frees the victim and shifts the rest down. The free
-    // is invisible to any assertion, which is why the leak-checked run is
-    // the real judge; these pin the shift, which is what a careless rewrite
-    // breaks.
+    // deleteIndividual frees one individual and shifts the rest down.
     SIGEL_GP::SIG_GPIndividual *third = pop.getIndividualPointer( 2 );
     SIGEL_GP::SIG_GPIndividual *last  = pop.getIndividualPointer( 3 );
     pop.deleteIndividual( 1 );
@@ -319,20 +286,16 @@ static int selfcheck()
     SIG_WANT(pop.getIndividualPointer( 0 ) == winner);
     SIG_WANT(pop.getSize() == 2);
 
-    // Every SIG_GPIndividual constructor already sets fitness to -1, so
-    // asserting -1 on a fresh pool cannot fail. Move one off it first, and
-    // check BOTH slots -- a resetAllFitnessValues that reset only the first
-    // would pass.
+    // A new individual has fitness -1 already, so set other values first,
+    // on two slots.
     pop.getIndividualPointer( 0 )->setFitness( 3.5 );
     pop.getIndividualPointer( 1 )->setFitness( 7.5 );
     pop.resetAllFitnessValues();
     SIG_WANT(pop.getIndividualPointer( 0 )->getFitness() == -1);
     SIG_WANT(pop.getIndividualPointer( 1 )->getFitness() == -1);
 
-    // Leave the pool NON-EMPTY. Draining it made ~SIG_GPPopulation's
-    // qDeleteAll run on an empty list, so removing that free -- the largest
-    // in the class, 4,398,620 bytes per evaluation -- was invisible to every
-    // gate including this one. Found by review of D16 itself.
+    // The pool is left with one individual, so that the destructor has
+    // something to free under LeakSanitizer.
     pop.deleteIndividual( 0 );
     SIG_WANT(pop.getSize() == 1);
   }
@@ -525,8 +488,7 @@ static int metamating()
 
 int main(int argc, char *argv[])
 {
-  // PORTING.md §9. The deleted shim called this during static initialisation;
-  // static initialisation order across translation units is unspecified.
+  // No result may depend on Qt's random hash seed.
   QHashSeed::setDeterministicGlobalSeed();
 
   bool verbose = false;
@@ -543,10 +505,7 @@ int main(int argc, char *argv[])
     return 2;
   }
 
-  // A .rrb is the robot model as SIGEL_RobotIO reads it -- scanner, compiler,
-  // builder, inserting in declaration order, which is not the order the
-  // serialised copy inside an .exp comes back in. Phase D has to migrate both,
-  // so the baseline has to watch both.
+  // A robot file is built by SIGEL_RobotIO: scanner, compiler, builder.
   if (QString(argv[1]).endsWith(".rrb")) {
     try {
       SIGEL_RobotIO::SIG_RobotBuilder builder(argv[1]);

@@ -1,51 +1,37 @@
 #!/bin/sh
-# Every Q2Dict iteration order that reaches the simulation -- PORTING.md Phase D.
-#
-# Q2Dict's hash order set the order of the links, joints, bodies, materials,
-# drives, sensors and each link's significant points. A robot that is copied or
-# sent to a PVM slave is rebuilt from a stream in that order, and DynaMechs
-# numbers its bodies from the joint order that rebuild leaves on each link.
-# Phase D deletes the shim, so the order has to move into the data files.
-# This prints the order the current build produces; dictorder-baseline.txt is that
-# output, committed. The check is a diff:
+# Order check.
 #
 #   ./checks/dictorder-dump.sh | diff -u checks/baselines/dictorder-baseline.txt -
 #
-# Watches all three load paths, because they give three different orders:
-#   loaded   the robot as the .exp deserialises it
-#   copy     after SIG_Robot's copy ctor, which round-trips through
-#            writeToFileTransfer and so reverses every colliding chain
-#   rrb      the standalone model, read in declaration order by SIGEL_RobotIO
+# Prints the parts of each robot in the order of SIG_Robot's lists, with the
+# number each part carries: links, joints, drives, sensors, bodies, materials,
+# commands, the points of each link, and a digest of each geometry.
+# SIG_Robot::writeToFileTransfer writes a robot in that order, to an experiment
+# file and to a PVM slave. A change of container in SIG_Robot shows here.
 #
-# Serial on purpose. SIG_Environment::generateTerrain rewrites
-# $SIGEL_ROOT/Terrain.ter on every evaluation; parallel workers sharing a root
-# used to read it half-written, and the write is now atomic. Serial stays,
-# because the dump is compared line by line and a worker pool would reorder it.
+# Three passes:
+#   loaded   the robot as an experiment file gives it
+#   copy     the copy that SIG_Robot's copy constructor makes, on which the
+#            simulation runs
+#   rrb      the robot as SIGEL_RobotIO builds it from a robot file
+#
+# It evaluates nothing. It is the only check that builds all 7 robot files.
 set -eu
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
-# ROOT is derived, not the script's own directory, so check it: a symlink or
-# a copy left at the old path would point it at the PARENT of the repo, and
-# every path below is built from it.
+# Every path below is built from ROOT, so it must be the repository.
 [ -f "$ROOT/Makefile" ] && [ -d "$ROOT/checks" ] || {
 	echo "$0: $ROOT is not the repo root -- run the script by its real path,"\
 	     "not through a symlink or a copy" >&2; exit 1; }
 
-# Run from the repo root whatever the caller's directory is: guidrive opens
-# robots/twoBases/twoBases.rrb relative to the process, and this script
-# never cd'd before launching it.
+# Run from the repository root, whatever the caller's folder is.
 cd "$ROOT" || exit 1
 B=${1:-build}
 [ $# -le 1 ] || { echo "usage: $0 [build-dir] -- it reads experiments/ and robots/" >&2; exit 1; }
 EVAL=$ROOT/$B/coredrive
 [ -x "$EVAL" ] || { echo "no $EVAL -- make B=$B coredrive" >&2; exit 1; }
 
-# A failed `make` stops at the first bad compile and leaves the PREVIOUS
-# coredrive in place, so a test-for-existence passes and the gate silently
-# scores a stale binary. That happened during D13: the build failed on two
-# sites, the gates were run straight after, and both came back green against
-# the binary from before the change. Gate results mean nothing unless the
-# build that produced them succeeded. pvm-check.sh has carried this guard
-# from the start; these two did not.
+# A failed build leaves the previous coredrive in place. Without this test
+# the check would pass on a program from before the change.
 make -q --no-print-directory -C "$ROOT" B="$B" coredrive >/dev/null 2>&1 || {
 	echo ""$EVAL" is out of date -- run 'make B=$B coredrive'" >&2; exit 1; }
 
@@ -55,9 +41,8 @@ SIGEL_ROOT=$ROOT/sigelApp
 [ -f "$SIGEL_ROOT/Terrain.ter" ] || { echo "no $SIGEL_ROOT/Terrain.ter -- run 'make'" >&2; exit 1; }
 export SIGEL_ROOT
 
-# A silently short dump is the dangerous failure: Phase D re-captures this file
-# at every step, so an empty run that exited 0 would overwrite the baseline and
-# report success. Count what we expect to find and refuse to run if it is off.
+# A short dump must not pass: count the input files and refuse to run if the
+# count is wrong.
 # Tracked files only: an untracked file there must not change what this reads.
 tracked() { git -C "$ROOT" ls-files -- "$1" | sed "s|^|$ROOT/|" | sort; }
 exps=$(tracked 'experiments/*.exp')
@@ -71,14 +56,9 @@ ne=$(echo "$exps" | grep -c . || true); nr=$(echo "$rrbs" | grep -c . || true)
 
 for f in $exps $rrbs; do
 	echo "== $(basename "$f")"
-	# stderr is kept and inspected rather than discarded: the simulation
-	# prints routine diagnostics there ("attempt to read invalid sensor"),
-	# but a sanitizer report would land there too, and an earlier version of
-	# this script sent all of it to /dev/null.
-	# Do NOT pipe coredrive straight into sed: the pipeline's status is
-	# sed's, so a segfaulting coredrive gave exit 0 and a header-only file.
-	# An earlier version of this script had exactly that hole while claiming
-	# to have closed it. Capture, test the status, then filter.
+	# Capture the output, test the exit status, then filter. A pipe into sed
+	# would report sed's status and hide a crash of coredrive. stderr is kept
+	# and searched, because a sanitizer reports there.
 	out=$(mktemp); err=$(mktemp)
 	rc=0; "$EVAL" -order "$f" >"$out" 2>"$err" || rc=$?
 	if [ "$rc" -ne 0 ]; then
