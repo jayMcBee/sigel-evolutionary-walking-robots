@@ -418,13 +418,17 @@ touched, because changing one changes behaviour against the reference binary.
   `pthread_mutex_unlock` on mutexes the destroying thread does not hold, which
   POSIX leaves undefined, and never call `pthread_mutex_destroy`.
 
-- [ ] **119. Make MetaGP able to start on Linux.**
-  `MT_GPManager::startEvolution` waits for enough training cases with
-  `sleep(10000000)` on POSIX, about 115 days, where 1.3's Windows build
-  waited `Sleep(10000)`, 10 s. The first check always finds too few cases, so on
-  Linux the meta evolution never starts, in 1.3 as well. MetaGP was published
-  with results (Ziegler and Banzhaf, CLAWAR 2003), so it presumably ran on
-  Windows only.
+- [ ] **119. Make a fresh MetaGP able to start beside a SIGEL evolution on
+  Linux.** `MT_GPManager::startEvolution` waits for enough training cases
+  with `sleep(10000000)` on POSIX, about 115 days, where 1.3's Windows build
+  waited `Sleep(10000)`, 10 s. The wait is reached only when MetaGP runs
+  with a substituter, and only when the training set has fewer than 10
+  cases or not more than a tenth of the result array. A MetaGP that starts
+  with an empty training set beside a new SIGEL evolution therefore sleeps
+  at its first test, in 1.3 as well. MetaGP on its own, and a MetaGP that
+  is loaded with enough training cases, do not reach the wait. MetaGP was
+  published with results (Ziegler and Banzhaf, CLAWAR 2003), so the fresh
+  start presumably ran on Windows only.
 
 - [ ] **37. Give each `generateTerrain` call its own partial file name.** The
   name is unique per process, but `MT_Controller` runs an evolution on its own
