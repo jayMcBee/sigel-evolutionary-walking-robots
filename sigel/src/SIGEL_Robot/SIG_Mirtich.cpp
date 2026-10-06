@@ -226,7 +226,7 @@ namespace SIGEL_Robot {
                         SIG_Polygon const & pl = it.iterate ();
                         int numv = pl.getNumVertices ();
                         p.faces [k].numVerts = numv;
-                        p.faces [k].verts = new int [numv];
+                        p.faces [k].verts.resize (numv);
 
                         for (int j = 0; j < numv; j++)
                                 p.faces [k].verts [j] = pl.getVertexIndex (j);
@@ -239,8 +239,6 @@ namespace SIGEL_Robot {
                 // Great - painstakingly built up, one call, and now
                 // I get to delete the whole damn thing again.
 
-                for (int j = 0; j < p.numFaces; j++)
-                        delete [] p.faces [j].verts;
                 delete [] p.faces;
                 delete [] p.verts;
         }

@@ -33,6 +33,7 @@ namespace SIGEL_Robot { class SIG_Mirtich; }
 
 #include "SIGEL_Robot/SIG_RobotExceptions.h"
 #include <qstring.h>
+#include <vector>
 
 namespace SIGEL_Robot {
 
@@ -43,7 +44,7 @@ namespace SIGEL_Robot {
                         int numVerts;
                         double norm[3];
                         double w;
-                        int *verts;
+                        std::vector< int > verts;
                         POLYHEDRON *poly;
                 };
                 struct POLYHEDRON {

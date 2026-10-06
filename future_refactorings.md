@@ -32,7 +32,8 @@ Paths are relative to `sigel/`, the source tree.
   *Local pointer that can be a local object:*
   - [ ] `MT_Search::crossover`: `NextProgPartForChildOne`,
     `NextProgPartForChildTwo`.
-  - [ ] `SIG_Mirtich::compute`: the three `new[]` arrays.
+  - [ ] `SIG_Mirtich::compute`: the `new[]` arrays `POLYHEDRON::faces` and
+    `POLYHEDRON::verts`.
   - [ ] `SIG_Program::readFromFile`: `prgLine`. It leaks when a line does
     not parse. It fits when `SIG_Program::lines` no longer holds raw
     pointers.
