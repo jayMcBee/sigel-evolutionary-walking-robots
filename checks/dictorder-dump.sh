@@ -71,8 +71,6 @@ ne=$(echo "$exps" | grep -c . || true); nr=$(echo "$rrbs" | grep -c . || true)
 
 for f in $exps $rrbs; do
 	echo "== $(basename "$f")"
-	# Individual 0 only: the dump happens before experiment.population is
-	# touched, so every individual gives the same order.
 	# stderr is kept and inspected rather than discarded: the simulation
 	# prints routine diagnostics there ("attempt to read invalid sensor"),
 	# but a sanitizer report would land there too, and an earlier version of
@@ -82,7 +80,7 @@ for f in $exps $rrbs; do
 	# An earlier version of this script had exactly that hole while claiming
 	# to have closed it. Capture, test the status, then filter.
 	out=$(mktemp); err=$(mktemp)
-	rc=0; "$EVAL" -v "$f" 0 >"$out" 2>"$err" || rc=$?
+	rc=0; "$EVAL" -order "$f" >"$out" 2>"$err" || rc=$?
 	if [ "$rc" -ne 0 ]; then
 		echo "$(basename "$f"): coredrive exited $rc" >&2
 		cat "$err" >&2; rm -f "$out" "$err"; exit 1

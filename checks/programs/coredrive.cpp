@@ -535,9 +535,11 @@ int main(int argc, char *argv[])
   if (argc > 1 && QString(argv[1]) == "-metamating") return metamating();
   bool robotCheck = false;
   if (argc > 1 && QString(argv[1]) == "-check") { robotCheck = true; argv++; argc--; }
+  bool order = false;
+  if (argc > 1 && QString(argv[1]) == "-order") { order = true; argv++; argc--; }
 
   if (argc < 2 || argc > 3) {
-    fprintf(stderr, "usage: %s [-v] [-check] <experiment.exp> [individual, default 0]\n       %s -selfcheck | -metamating\n", argv[0], argv[0]);
+    fprintf(stderr, "usage: %s [-v] [-check] <experiment.exp> [individual, default 0]\n       %s -order <experiment.exp | robot.rrb>\n       %s -selfcheck | -metamating\n", argv[0], argv[0], argv[0]);
     return 2;
   }
 
@@ -612,13 +614,9 @@ int main(int argc, char *argv[])
     return 1;
   }
 
-  // Both orders, because they are not the same one. SIG_Robot's copy ctor
-  // round-trips through writeToFileTransfer/readFromFileTransfer, and
-  // Q2Dict::insert prepends, so re-inserting in iteration order reverses every
-  // colliding chain. They differ for 4 of the 14 experiments. After the shim
-  // goes, load and save become order-preserving and the two collapse into one,
-  // so a baseline that records only the copy cannot see experiment.robot move.
-  if (verbose)
+  // -order prints the robot's parts as the experiment file gives them, and
+  // again for the copy that the simulation runs on, and evaluates nothing.
+  if (order)
     dumpOrder(experiment.robot, "loaded");
 
   SIGEL_Robot::SIG_Robot robot(experiment.robot);
@@ -641,8 +639,10 @@ int main(int argc, char *argv[])
            robot.getLangParam()->getRegisterWidth());
   }
 
-  if (verbose)
+  if (order) {
     dumpOrder(robot, "copy");
+    return 0;
+  }
 
   SIGEL_GP::SIG_GPIndividual &individual = experiment.population.getIndividual(index);
   const QString name = experiment.gpParameter.getFitnessName();
