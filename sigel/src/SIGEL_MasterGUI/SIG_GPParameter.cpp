@@ -257,7 +257,6 @@ void SIG_GPParameter::getOutOfExperiment()
 	spinboxResEvGen->setValue( theExperiment.gpParameter.getResetEveryGeneration() );
 	spinboxMaxAge->setValue( theExperiment.gpParameter.getMaxAge() );
 
-	// sliderReproduction->setValue( theExperiment.gpParameter.getReproductionProb() );
 	sliderCrossover->setValue( theExperiment.gpParameter.getXoverProb() );
 	sliderMutation->setValue( theExperiment.gpParameter.getMutationProb() );
 	sliderCrossover->setValue( theExperiment.gpParameter.getXoverProb() );
@@ -412,7 +411,7 @@ void SIG_GPParameter::slotAddHost()
 	editDialog.setWindowTitle( "Add Host" );
 	switch ( editDialog.exec() )
 	{
-		// the OK button was pressed
+	// the OK button was pressed
 	case QDialog::Accepted:
 		// lets first see if there is no host under that name...
 		QList<SIGEL_GP::SIG_GPPVMHost *> &hostList = theExperiment.gpParameter.getHostList();
@@ -468,10 +467,6 @@ void SIG_GPParameter::slotDeleteHost()
 	/*
 	 * this is the list of SIG_GPPVMHosts which have to be deleted. we don't
 	 * delete the host directly as the iterator would get confused.
-	 *
-	 * NOTE: the 2003 comment here said setAutoDelete was not true on the host
-	 * list. It was (SIG_GPParameter.cpp, constructor), so remove() below was
-	 * the delete. The delete is written out below.
 	 */
 	QList<SIGEL_GP::SIG_GPPVMHost *> deleteListHosts;
 	QList<QTreeWidgetItem *> deleteListViewItems;
@@ -487,7 +482,6 @@ void SIG_GPParameter::slotDeleteHost()
 
 			// get the name of the host to find it in the host list
 			QString currentName = (*listIt)->text( 1 );
-			// SIGEL_GP::SIG_GPPVMHost *theHost = 0; i think i don't need this anymore
 			QList<SIGEL_GP::SIG_GPPVMHost *> &hostList = theExperiment.gpParameter.getHostList();
 
 			// iterate over the host list to find the SIG_GPPVMHost object belonging to host currentName
@@ -499,10 +493,6 @@ void SIG_GPParameter::slotDeleteHost()
 					break;
 				}
 			}
-			/* if( theHost )
-			 * hostList.remove( theHost );
-			 * listviewHosts->takeTopLevelItem( listviewHosts->indexOfTopLevelItem( listIt ) );
-			 */
 		}
 
 	// now lets break the shit up!
@@ -510,22 +500,22 @@ void SIG_GPParameter::slotDeleteHost()
 
 	for ( SIGEL_GP::SIG_GPPVMHost *hostIt : deleteListHosts )
 	{
-		// deleteListHosts can hold the same pointer twice: the search above
-		// matches on name and breaks at the first hit, and nothing forbids two
-		// hosts with one name. Only the removal that actually unlinked may free.
-		//
-		// The same 2003 defect also orphans the second host of such a pair: both
-		// rows leave the list view, but only the first host leaves hostList, so
-		// the trainer still spawns on it and writeToFile still persists it.
-		// Left as it was -- fixing it means changing what the GUI does.
+		// deleteListHosts can hold the same host twice: the search above
+		// matches on name and stops at the first hit, and two hosts can
+		// have one name. Only the removal that unlinked the host may free it.
+		// The second host of such a pair stays in hostList, though its row
+		// leaves the list view.
 		SIGEL_GP::SIG_GPPVMHost *host = hostIt;
 		if ( hostList2.removeOne( host ) )
 			delete host;
 	}
 
 	for ( QTreeWidgetItem *itemIt : deleteListViewItems )
-		listviewHosts->takeTopLevelItem( listviewHosts->indexOfTopLevelItem( itemIt ) );
-
+	{
+		int itemIndex = listviewHosts->indexOfTopLevelItem( itemIt );
+		QTreeWidgetItem *takenItem = listviewHosts->takeTopLevelItem( itemIndex );
+		delete takenItem;
+	}
 };
 
 void SIG_GPParameter::slotEnableAllHosts()
@@ -560,146 +550,146 @@ void SIG_GPParameter::slotDisableAllHosts()
 
 void SIG_GPParameter::slotItemDoubleClicked( QTreeWidgetItem * theItem )
 {
-	if( theItem )
+	if( !theItem )
+		return;
+
+	// count how many host items are selected, so we can display the dialog the right way
+	int numberOfSelectedHosts = 0;
+	QTreeWidgetItemIterator itemIt( listviewHosts );
+	for ( ; *itemIt; ++itemIt )
 	{
-		// count how many host items are selected, so we can display the dialog the right way
-		int numberOfSelectedHosts = 0;
-		QTreeWidgetItemIterator itemIt( listviewHosts );
-		for ( ; *itemIt; ++itemIt )
+		if( (*itemIt)->isSelected() )
+			++numberOfSelectedHosts;
+	}
+
+	QString currentName = theItem->text( 1 );
+	SIGEL_GP::SIG_GPPVMHost *theHost = nullptr;
+	QList<SIGEL_GP::SIG_GPPVMHost *> &hostList = theExperiment.gpParameter.getHostList();
+
+	for ( SIGEL_GP::SIG_GPPVMHost *it : hostList )
+	{
+		if( it->name == currentName )
 		{
-			if( (*itemIt)->isSelected() )
-				++numberOfSelectedHosts;
+			// we found the host, so save it in the pointer and quit
+			theHost = it;
+			break;
 		}
+	}
 
-		QString currentName = theItem->text( 1 );
-		SIGEL_GP::SIG_GPPVMHost *theHost = nullptr;
-		QList<SIGEL_GP::SIG_GPPVMHost *> &hostList = theExperiment.gpParameter.getHostList();
-
-		for ( SIGEL_GP::SIG_GPPVMHost *it : hostList )
+	SIG_EditHostDialog editDialog( this, "editDialogEditHosts", true, Qt::WindowFlags() );
+	if( numberOfSelectedHosts == 1 )
+	{
+		editDialog.lineeditHostName->setText( theHost->name );
+		editDialog.spinboxMaximalNumberOfProcesses->setValue( theHost->maxSlaves );
+		editDialog.lineeditSlaveDirectory->setText( theHost->executableDir.absolutePath() );
+		if( theHost->enabled )
+			editDialog.checkboxEnableHost->setChecked( true );
+		else
+			editDialog.checkboxEnableHost->setChecked( false );
+		editDialog.lineeditHostName->setFocus();
+		// The name must stay unselected, or a typed character replaces it.
+		// Queued: the selection does not exist until exec() shows the dialog.
 		{
-			if( it->name == currentName )
-			{
-				// we found the host, so save it in the pointer and quit
-				theHost = it;
-				break;
-			}
+			QLineEdit *le = editDialog.lineeditHostName;
+			QTimer::singleShot( 0, le, [le]{ le->end( false ); } );
 		}
+		editDialog.setWindowTitle( "Edit Host \"" + theHost->name + "\"" );
+	}
+	else
+	{
+		editDialog.lineeditHostName->hide();
+		editDialog.lineeditSlaveDirectory->setText( theHost->executableDir.absolutePath() );
+		editDialog.spinboxMaximalNumberOfProcesses->setValue( theHost->maxSlaves );
 
-		SIG_EditHostDialog editDialog( this, "editDialogEditHosts", true, Qt::WindowFlags() );
+		if( theHost->enabled )
+			editDialog.checkboxEnableHost->setChecked( true );
+		else
+			editDialog.checkboxEnableHost->setChecked( false );
+		editDialog.setWindowTitle( "Edit Hosts" );
+		editDialog.resize( QSize() );
+	}
+	switch( editDialog.exec() )
+	{
+	case QDialog::Accepted:
+		/*
+		 * warning! it is important that if one item was selected the hostname can be changed
+		 * but must NOT be changed into an existing name or empty name!!!
+		 */
+
 		if( numberOfSelectedHosts == 1 )
 		{
-			editDialog.lineeditHostName->setText( theHost->name );
-			editDialog.spinboxMaximalNumberOfProcesses->setValue( theHost->maxSlaves );
-			editDialog.lineeditSlaveDirectory->setText( theHost->executableDir.absolutePath() );
-			if( theHost->enabled )
-				editDialog.checkboxEnableHost->setChecked( true );
-			else
-				editDialog.checkboxEnableHost->setChecked( false );
-			editDialog.lineeditHostName->setFocus();
-			// The name must stay unselected, or a typed character replaces it.
-			// Queued: the selection does not exist until exec() shows the dialog.
+			QString newName = editDialog.lineeditHostName->text();
+			bool isThere = false;
+			if( newName != currentName )
 			{
-				QLineEdit *le = editDialog.lineeditHostName;
-				QTimer::singleShot( 0, le, [le]{ le->end( false ); } );
-			}
-			editDialog.setWindowTitle( "Edit Host \"" + theHost->name + "\"" );
-		}
-		else
-		{
-			editDialog.lineeditHostName->hide();
-			editDialog.lineeditSlaveDirectory->setText( theHost->executableDir.absolutePath() );
-			editDialog.spinboxMaximalNumberOfProcesses->setValue( theHost->maxSlaves );
 
-			if( theHost->enabled )
-				editDialog.checkboxEnableHost->setChecked( true );
-			else
-				editDialog.checkboxEnableHost->setChecked( false );
-			editDialog.setWindowTitle( "Edit Hosts" );
-			editDialog.resize( QSize() );
-		}
-		switch( editDialog.exec() )
-		{
-		case QDialog::Accepted:
-			/*
-			 * warning! it is important that if one item was selected the hostname can be changed
-			 * but must NOT be changed into an existing name or empty name!!!
-			 */
-
-			if( numberOfSelectedHosts == 1 )
-			{
-				QString newName = editDialog.lineeditHostName->text();
-				bool isThere = false;
-				if( newName != currentName )
+				for ( SIGEL_GP::SIG_GPPVMHost *it2 : hostList )
 				{
-
-					for ( SIGEL_GP::SIG_GPPVMHost *it2 : hostList )
+					if( it2->name == newName )
 					{
-						if( it2->name == newName )
-						{
-							isThere = true;
-							break;
-						}
+						isThere = true;
+						break;
 					}
 				}
-				if( !isThere && !newName.isEmpty() )
-				{
-					int newMaxSlaves = editDialog.spinboxMaximalNumberOfProcesses->value();
-					bool newEnabled = editDialog.checkboxEnableHost->isChecked();
-					QString newSlaveDirectory = editDialog.lineeditSlaveDirectory->text();
-					theHost->name = newName;
-					theHost->maxSlaves = newMaxSlaves;
-					theHost->enabled = newEnabled;
-					theHost->executableDir = QDir( newSlaveDirectory );
-					if ( newEnabled )
-						theItem->setIcon( 0, QIcon( QPixmap( sigelRoot + "/pixmaps/allow.xpm" ) ) );
-					else
-						theItem->setIcon( 0, QIcon( QPixmap( sigelRoot + "/pixmaps/disallow.xpm" ) ) );
-					// set Hostname
-					theItem->setText( 1, newName );
-					//set maximal slaves
-					theItem->setText( 2, QString::number( newMaxSlaves ) );
-					theItem->setText( 3, newSlaveDirectory );
-				}
-				else
-				{
-					QMessageBox::information( this, "Error", "The host " + editDialog.lineeditHostName->text() + " is either already present or you entered no name." );
-				}
 			}
-			else
+			if( !isThere && !newName.isEmpty() )
 			{
 				int newMaxSlaves = editDialog.spinboxMaximalNumberOfProcesses->value();
 				bool newEnabled = editDialog.checkboxEnableHost->isChecked();
 				QString newSlaveDirectory = editDialog.lineeditSlaveDirectory->text();
-				QTreeWidgetItemIterator itemIt2( listviewHosts );
-				for( ; *itemIt2; ++itemIt2 )
-				{
-					if( (*itemIt2)->isSelected() )
-					{
-						QString currentHostName = (*itemIt2)->text( 1 );
-						for ( SIGEL_GP::SIG_GPPVMHost *hostIt : hostList )
-						{
-							if( hostIt->name == currentHostName )
-							{
-								// set all the stuff according to the dialog
-								hostIt->maxSlaves = newMaxSlaves;
-								hostIt->enabled = newEnabled;
-								hostIt->executableDir = QDir( newSlaveDirectory );
-							}
-						} // for over all
-
-						// set the listviewItems right...
-						if( newEnabled)
-							(*itemIt2)->setIcon( 0, QIcon( QPixmap( sigelRoot + "/pixmaps/allow.xpm" ) ) );
-						else
-							(*itemIt2)->setIcon( 0, QIcon( QPixmap( sigelRoot + "/pixmaps/disallow.xpm" ) ) );
-						(*itemIt2)->setText(2, QString::number( newMaxSlaves ) );
-						(*itemIt2)->setText(3, newSlaveDirectory );
-					} // if( (*itemIt2)->isSelected )
-				}
+				theHost->name = newName;
+				theHost->maxSlaves = newMaxSlaves;
+				theHost->enabled = newEnabled;
+				theHost->executableDir = QDir( newSlaveDirectory );
+				if ( newEnabled )
+					theItem->setIcon( 0, QIcon( QPixmap( sigelRoot + "/pixmaps/allow.xpm" ) ) );
+				else
+					theItem->setIcon( 0, QIcon( QPixmap( sigelRoot + "/pixmaps/disallow.xpm" ) ) );
+				// set Hostname
+				theItem->setText( 1, newName );
+				//set maximal slaves
+				theItem->setText( 2, QString::number( newMaxSlaves ) );
+				theItem->setText( 3, newSlaveDirectory );
 			}
-			break;
-		} // end of switch statement
-	} // end of if( theItem )
+			else
+			{
+				QMessageBox::information( this, "Error", "The host " + editDialog.lineeditHostName->text() + " is either already present or you entered no name." );
+			}
+		}
+		else
+		{
+			int newMaxSlaves = editDialog.spinboxMaximalNumberOfProcesses->value();
+			bool newEnabled = editDialog.checkboxEnableHost->isChecked();
+			QString newSlaveDirectory = editDialog.lineeditSlaveDirectory->text();
+			QTreeWidgetItemIterator itemIt2( listviewHosts );
+			for( ; *itemIt2; ++itemIt2 )
+			{
+				if( (*itemIt2)->isSelected() )
+				{
+					QString currentHostName = (*itemIt2)->text( 1 );
+					for ( SIGEL_GP::SIG_GPPVMHost *hostIt : hostList )
+					{
+						if( hostIt->name == currentHostName )
+						{
+							// set all the stuff according to the dialog
+							hostIt->maxSlaves = newMaxSlaves;
+							hostIt->enabled = newEnabled;
+							hostIt->executableDir = QDir( newSlaveDirectory );
+						}
+					} // for over all
+
+					// set the listviewItems right...
+					if( newEnabled)
+						(*itemIt2)->setIcon( 0, QIcon( QPixmap( sigelRoot + "/pixmaps/allow.xpm" ) ) );
+					else
+						(*itemIt2)->setIcon( 0, QIcon( QPixmap( sigelRoot + "/pixmaps/disallow.xpm" ) ) );
+					(*itemIt2)->setText(2, QString::number( newMaxSlaves ) );
+					(*itemIt2)->setText(3, newSlaveDirectory );
+				} // if( (*itemIt2)->isSelected )
+			}
+		}
+		break;
+	} // end of switch statement
 };
 
 void SIG_GPParameter::slotMutationChanged( int newMutationValue )
