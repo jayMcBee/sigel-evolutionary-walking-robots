@@ -43,8 +43,6 @@ namespace SIGEL_Robot {
                   name (n),
                   number (nr),
                   body (nullptr),
-                  geometry (nullptr),
-                  mirtich (nullptr),
                   material (nullptr),
                   adjacentJoints (),
                   noCollide (),
@@ -55,9 +53,7 @@ namespace SIGEL_Robot {
         }
 
         SIG_Link::SIG_Link (SIG_Robot *par, QTextStream & tx)
-                : parent (par),
-                  geometry (nullptr),
-                  mirtich (nullptr)
+                : parent (par)
         {
                 QString tmpstr;
                 int anum;
@@ -103,8 +99,8 @@ namespace SIGEL_Robot {
 
                 tx >> tmpstr;
                 if (tmpstr == "y") {
-                        geometry = new SIG_Geometry (tx);
-                        mirtich=new SIG_Mirtich (geometry, name + "(" + body->getName () + ")");
+                        geometry = std::make_unique< SIG_Geometry > (tx);
+                        mirtich = std::make_unique< SIG_Mirtich > (geometry.get (), name + "(" + body->getName () + ")");
                 }
                 for (SIG_Link *l : noCollideRead)
                         addNoCollide (l);
@@ -115,11 +111,6 @@ namespace SIGEL_Robot {
                 // Of its lists, SIG_Link owns only points.
                 for (const NamedPoint &p : points) delete p.value;
                 points.clear ();
-
-                if (geometry) {
-                        delete mirtich;
-                        delete geometry;
-                }
         }
 
         QString SIG_Link::getName () const
@@ -195,13 +186,8 @@ namespace SIGEL_Robot {
 
         void SIG_Link::instantiateGeometry ()
         {
-                if (geometry) {
-                        delete mirtich;
-                        delete geometry;
-                }
-                
-                geometry = new SIG_Geometry (body->getGeometry ());
-                mirtich = new SIG_Mirtich (geometry, name + "(" + body->getName () + ")");
+                geometry = std::make_unique< SIG_Geometry > (body->getGeometry ());
+                mirtich = std::make_unique< SIG_Mirtich > (geometry.get (), name + "(" + body->getName () + ")");
         }
 
         void SIG_Link::transformPoints (SIG_Vector mov, SIG_Matrix rot)
@@ -242,7 +228,7 @@ namespace SIGEL_Robot {
 
         SIG_Geometry const *SIG_Link::getGeometry () const
         {
-                return geometry;
+                return geometry.get ();
         }
 
         void SIG_Link::getPhysics (double & m,

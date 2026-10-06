@@ -26,6 +26,7 @@
 namespace SIGEL_Robot { class SIG_Link; }
 
 #include <QList>
+#include <memory>
 #include <qstring.h>
 #include <qtextstream.h>
 #include "SIGEL_Tools/SIG_Vector.h"
@@ -93,7 +94,7 @@ namespace SIGEL_Robot
       QList<SIG_Joint *> getJoints () const;
 
       SIG_Geometry const *getGeometry () const;
-      SIG_Mirtich const *getMirtich()  { return mirtich; }
+      SIG_Mirtich const *getMirtich()  { return mirtich.get(); }
       void getPhysics (double & m,
                        SIG_Vector & com,
                        SIG_Matrix & it);
@@ -116,8 +117,8 @@ namespace SIGEL_Robot
       QString name;
       int number;
       SIG_Body *body;
-      SIG_Geometry *geometry;
-      SIG_Mirtich *mirtich;
+      std::unique_ptr< SIG_Geometry > geometry;
+      std::unique_ptr< SIG_Mirtich > mirtich;
       SIG_Material *material;
       // A SIG_Vector has no name of its own, so unlike SIG_Robot's six lists this
       // one needs to carry the key.

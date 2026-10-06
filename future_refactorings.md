@@ -49,7 +49,6 @@ Paths are relative to `sigel/`, the source tree.
   - [ ] `SIG_DynaMechsSimulationData::dynaMechsIntegrator`. Never deleted;
     the DynaMechs integrator destructors have never run in SIGEL.
   - [ ] `SIG_DynaMechsLink::screwLink`. Never deleted.
-  - [ ] `SIG_Link::geometry`, `mirtich`.
   - [ ] `SIG_GPExperiment::mtController`.
   - [ ] `SIG_SimulationVisualisation::simulation`, `renderRecorder`. The
     simulation must be destroyed before the recorder. This also does
