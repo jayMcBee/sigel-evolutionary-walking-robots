@@ -33,8 +33,6 @@ Paths are relative to `sigel/`, the source tree.
   - [ ] `SIG_Program::readFromFile`: `prgLine`. It leaks when a line does
     not parse. It fits when `SIG_Program::lines` no longer holds raw
     pointers.
-  - [ ] `SIG_Body::load`: `bodyScene`. Never deleted; `~SceneGraph` has
-    never run in SIGEL.
   - [ ] `SIG_GPPopulation::addRandomIndividuals` and `readFromFile`: the
     `progress` dialog.
   - [ ] `main` in `sigel_slave.cpp`: `robot`, `environment`,

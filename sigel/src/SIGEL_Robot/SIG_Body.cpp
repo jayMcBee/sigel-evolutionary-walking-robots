@@ -196,17 +196,17 @@ namespace SIGEL_Robot
                 
                 geometry = new SIG_Geometry ();
                 
-                SceneGraph *bodyScene = new SceneGraph();
+                SceneGraph bodyScene;
                 
                 QByteArray geometryFileBytes = getGeometryFile ().toUtf8();
-                bodyScene->load( geometryFileBytes.data() );
+                bodyScene.load( geometryFileBytes.data() );
                 
                 NEWMAT::Matrix identity(4,4);
                 identity = 0;
                 for (int i=1; i<=4; i++)
                         identity(i,i) = 1;
 
-                for (Node *actNode = bodyScene->getNodes(); actNode; actNode = actNode->next())
+                for (Node *actNode = bodyScene.getNodes(); actNode; actNode = actNode->next())
                         readVRMLNode( actNode,  identity);
         }
 
