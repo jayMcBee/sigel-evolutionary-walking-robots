@@ -33,19 +33,19 @@
 SIGEL_GP::SIG_GPExperiment::SIG_GPExperiment(QString exp)
 {
 	autosavePath = "new";
-};
+}
 
 SIGEL_GP::SIG_GPExperiment::SIG_GPExperiment()
 {
   autosavePath = "new";
-};
+}
 
 SIGEL_GP::SIG_GPExperiment::~SIG_GPExperiment()
 {
   // This class owns its history entries.
   qDeleteAll( experimentHistory );
   experimentHistory.clear();
-};
+}
 
 QString SIGEL_GP::SIG_GPExperiment::cutAfterFiveHashes(QTextStream& source)
 {
@@ -60,7 +60,7 @@ QString SIGEL_GP::SIG_GPExperiment::cutAfterFiveHashes(QTextStream& source)
   }
 
   return resultString;
-};
+}
 
 void SIGEL_GP::SIG_GPExperiment::loadExperiment(QTextStream & file)
 {
@@ -86,7 +86,7 @@ void SIGEL_GP::SIG_GPExperiment::loadExperiment(QTextStream & file)
   readHistoryFromFileTransfer( experimentHistoryStream );
 
   comment = file.readAll();
-};
+}
 
 void SIGEL_GP::SIG_GPExperiment::saveExperiment(QTextStream & file)
 {
@@ -106,14 +106,14 @@ void SIGEL_GP::SIG_GPExperiment::saveExperiment(QTextStream & file)
   file << fiveHashesLine;
 
   file << comment;
-};
+}
 
 
 void SIGEL_GP::SIG_GPExperiment::writeHistoryToFileTransfer( QTextStream &file )
 {
   for (const SIG_GPExperimentHistoryEntry *actEntry : experimentHistory)
     file << actEntry->print();
-};
+}
 
 void SIGEL_GP::SIG_GPExperiment::readHistoryFromFileTransfer( QTextStream &file )
 {
@@ -129,13 +129,13 @@ void SIGEL_GP::SIG_GPExperiment::readHistoryFromFileTransfer( QTextStream &file 
       experimentHistory.append( newEntry );
 
       buffer = file.readLine();
-    };
-};
+    }
+}
 
 double SIGEL_GP::SIG_GPExperiment::calculateFitness(SIGEL_Program::SIG_Program & program)
 {
  return 0;
-};
+}
 
 SIGEL_GP::SIG_GPParameter& SIGEL_GP::SIG_GPExperiment::getGPParameter()
 {
@@ -176,12 +176,12 @@ void SIGEL_GP::SIG_GPExperiment::exportExperimentHistoryToGNUPlot( QString fileN
     SIGEL_Tools::SIG_IO::cerr << "Could not export experiment history under "
 			      << fileName
 			      << "!" << Qt::endl;
-};
+}
 
 QString SIGEL_GP::SIG_GPExperiment::getPath() {
 	return autosavePath;
-};
+}
 
-void SIGEL_GP::SIG_GPExperiment::setPath(QString _autosavePath) {
-	autosavePath = _autosavePath;
-};
+void SIGEL_GP::SIG_GPExperiment::setPath(QString path) {
+	autosavePath = path;
+}

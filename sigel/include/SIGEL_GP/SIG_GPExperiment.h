@@ -38,191 +38,144 @@
 #include <qtextstream.h>
 
 /**
- * The namespace SIGEL_GP represents the classes of genetic programming and
- * artificial evolution. The algorithms in this classes can create and 
- * develope robot control programs in genetic ways. 
+ * The namespace SIGEL_GP holds the classes of genetic programming and
+ * artificial evolution. They create and develop robot control programs.
  */
 
 namespace SIGEL_GP
 {
 
 /**
- * The SIG_GPExperiment represents the main data structure for the evolution
- * preformed with the SIGEL_GP_Package. It contains any nessecary information
- * and data to describe and preform an evolution run.
- *
+ * SIG_GPExperiment is the main data structure of an evolution run. It holds
+ * all the data that describe the run.
  */
 
 class SIG_GPExperiment {
 
-  /**
-   * The used robot architecture. 
-   */
  public:
+  /**
+   * Builds an empty experiment.
+   * @param exp
+   *  Is not used.
+   */
+  SIG_GPExperiment(QString exp);
+
+  /**
+   * Builds an empty experiment.
+   */
+  SIG_GPExperiment();
+  ~SIG_GPExperiment();
+
+  QString cutAfterFiveHashes(QTextStream& source);
+
+  /**
+   * Reads the experiment from a text stream.
+   * @param file
+   *  The stream that holds a saved experiment.
+   */
+  void loadExperiment(QTextStream &file);
+
+  /**
+   * Writes the experiment to a text stream.
+   * @param file
+   *  The stream that receives the experiment.
+   */
+  void saveExperiment(QTextStream & file);
+
+  /**
+   * Calculates nothing.
+   * @param program
+   *  Is not used.
+   * @return
+   *  Always 0.
+   */
+  double calculateFitness(SIGEL_Program::SIG_Program & program);
+
+  /**
+   * @return
+   *  A reference to the GP parameters.
+   */
+  SIGEL_GP::SIG_GPParameter& getGPParameter();
+
+  /**
+   * @return
+   *  A reference to the population.
+   */
+  SIGEL_GP::SIG_GPPopulation& getPopulation();
+
+  /**
+   * @return
+   *  A pointer to the population.
+   */
+  SIGEL_GP::SIG_GPPopulation *getPopulationPointer();
+
+  void exportExperimentHistoryToGNUPlot( QString fileName );
+
+  /** Sets autosavePath. */
+  void setPath(QString path);
+
+  /** Returns autosavePath. */
+  QString getPath();
+
+  /**
+   * The robot of the experiment.
+   */
   SIGEL_Robot::SIG_Robot robot;
 
   /**
-
-   * The used parameter for the genetic programming.
+   * The parameters of the genetic programming.
    */
- public:
   SIG_GPParameter gpParameter;
 
   /**
    * The name of the experiment.
    */
- public:
   QString experimentName;
 
   /**
-   * The used environment.
+   * The environment of the experiment.
    */
- public:
   SIGEL_Environment::SIG_Environment environment;
 
   /**
-   * The name of the used fitnessfunction.
+   * The name of the fitness function.
    */
-   public:
   QString fitnessFunctionName;
 
   /**
    * The population of the experiment.
    */
- public:
   SIG_GPPopulation population;
 
   /**
-   * The used parameter for the simulation.
+   * The parameters of the simulation.
    */
-
- public:
   SIGEL_Simulation::SIG_SimulationParameters simulationParameter;
 
   /**
-   * This QString data content is a describtion of the experiment.
+   * A description of the experiment.
    */
- public:
   QString comment;
 
- public:
   QList< SIG_GPExperimentHistoryEntry * > experimentHistory;
-
- private: 	
- 	/**
- 		*	This variable specifies the path where the autosave function should save the
- 		*	experiment
- 		*/
- 	QString autosavePath;
- 	
-/**
- * The constructor of an experiment
- * @pre
- *  The data of the experiment is given in a QString.
- * @post
- *  The object of an experiment is created correctly.
- * @param exp
- *  The experiment encoded in a QString.
- */
- public:
- SIG_GPExperiment(QString exp);
-
-/**
- * The constructor for an experiment.
- * @pre
- *  An empty experiment has to be constructed. There is no data given in a
- *  QString. Every component of the experiment will be set from the GUI.
- * @post
- *  The experiment has been constructed and its attributes are empty.
- */
- public:
-  SIG_GPExperiment();
-  ~SIG_GPExperiment();
-
- public:
-  QString cutAfterFiveHashes(QTextStream& source);
-
-  /**
-   * This sets experimentdatas from a QDataStream to the attributes of an
-   * experimentobject.
-   * @pre
-   * There are experiment data, encoded in a QDataStream and there is an object of an experiment.
-   * @post
-   * The loaded experiment is set to the attributes.
-   * @param file
-   * The data of an experiment, encoded in a QDataStream.
-   */
-
- public:
-  void loadExperiment(QTextStream &file);
-
-  /**
-   * This encodes the experiment data to a QDataStream.
-   * @pre
-   * There is an object of an experiment.
-   * @param file
-   * The data of the experiment, encoded in a QDataStream.
-   * @post
-   * The experiment data is written, encoded in a QDataStream.
-   * 
-   */
- public:
-  void saveExperiment(QTextStream & file);
 
  private:
   void writeHistoryToFileTransfer( QTextStream &file );
-
- private:
   void readHistoryFromFileTransfer( QTextStream &file );
 
-  /** Starts the FitnessCalculation as a local PVM client 
-   * @param program
-   * The Program to be evaluated.
-   * @return
-   * the calculated Fitness
+  /**
+   * The file the experiment is saved to. It is "new" until the experiment
+   * has a file.
    */
- public:
-  double calculateFitness(SIGEL_Program::SIG_Program & program);
+  QString autosavePath;
 
-  /** This operation returns a reference of the gpparameter.
-   * @return
-   * A reference of the gpgparameter.
+ public:
+  /**
+   * The controller of the MetaGP system. It is the last member, so it is
+   * destroyed first. SIG_GPExperimentClean.h has no such member.
    */
- public:
-  SIGEL_GP::SIG_GPParameter& getGPParameter();
-
-  /** This operation returns a reference of the population.
-   * @return
-   * A reference of the population.
-   */
- public:
-  SIGEL_GP::SIG_GPPopulation& getPopulation();
-
-  /** This operation returns a pointer to the population.
-   * @return
-   * A pointer to the population.
-   */
- public:
-  SIGEL_GP::SIG_GPPopulation *getPopulationPointer();
-
- public:
-  void exportExperimentHistoryToGNUPlot( QString fileName );
-
-	
-  /** This is the set method for the variable autosavePath. */
-  void setPath(QString _autosavePath);
-
-	/** This is the get method for the variable autosavePath. */
-	QString getPath();
-
-	/**
-	 *	Definitions for the MetaGP-System
-	 */
-	 public:
-	 	std::unique_ptr< MT_Controller > mtController;	
-
-	
- };
+  std::unique_ptr< MT_Controller > mtController;
+};
 }
 
 #endif // SIGEL_GP_SIG_GPEXPERIMENT_H
