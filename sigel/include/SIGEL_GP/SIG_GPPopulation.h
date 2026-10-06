@@ -166,17 +166,6 @@ class SIG_GPPopulation
     SIG_GPPopulation &operator=( SIG_GPPopulation const & ) = delete;
 
     /**
-     * The operation sorts the pool, due to the value of the fitness of the
-     * individuals. The individuals with the highest fitness value is placed
-     * on top of the pool, which means position zero, and so on.
-     * @post
-     * The population is sorted, with the individual with the highest 
-     * fitness value on top.
-     */
-  public:
-    void sort();
-
-    /**
      * This operation returns an individual, which is placed in the population
      * on position poolpos.
      * @pre
@@ -426,7 +415,7 @@ class SIG_GPPopulation
     /**
       * This is the set method for the variable history.
       */
-    void setHistory(bool _history);
+    void setHistory(bool newHistory);
     bool getHistory();
 };
 }

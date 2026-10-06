@@ -31,112 +31,113 @@
 #include "SIGEL_Tools/SIG_IO.h"
 
 SIGEL_GP::SIG_GPPopulation::SIG_GPPopulation()
-  : pool(),
-    randomizer( new SIGEL_Tools::SIG_Randomizer() ),
-    nextIdentifier( QString::number( 0 ) ),
-    poolGeneration(0)
-{  
-  history = true;
+	: pool(),
+	  randomizer( new SIGEL_Tools::SIG_Randomizer() ),
+	  nextIdentifier( QString::number( 0 ) ),
+	  poolGeneration(0)
+{
+	history = true;
 };
 
 SIGEL_GP::SIG_GPPopulation::SIG_GPPopulation(int size)
-  : randomizer( nullptr )   // was uninitialised; the guard below reads it
+	: randomizer( nullptr )   // the guard below reads it
 {
-   if( getRandomizerPointer()==nullptr )
-     {
-       SIGEL_Tools::SIG_IO::cerr << "\n\nA randomizer is needed to initialize a population ! Program terminated." << Qt::endl;
-       exit(1); 
-       // ToDo: Exception
-     }
+	if( getRandomizerPointer()==nullptr )
+	{
+		SIGEL_Tools::SIG_IO::cerr << "\n\nA randomizer is needed to initialize a population ! Program terminated." << Qt::endl;
+		exit(1);
+		// ToDo: Exception
+	}
 
-   pool.resize( size );
+	pool.resize( size );
 
-   history = true;
+	history = true;
 
-   setNextIdentifier( QString::number(0) );
-   setPoolGeneration( 0 );
-   
-   for( int x=0; x<getSize(); x++ ) 
-     { 
-       delete pool[ x ];
-       pool[ x ] = new SIGEL_GP::SIG_GPIndividual( *getRandomizerPointer() );
-       getIndividualPointer( x )->setPoolPos( x );
-     }  
+	setNextIdentifier( QString::number(0) );
+	setPoolGeneration( 0 );
+
+	for( int x=0; x<getSize(); x++ )
+	{
+		delete pool[ x ];
+		pool[ x ] = new SIGEL_GP::SIG_GPIndividual( *getRandomizerPointer() );
+		getIndividualPointer( x )->setPoolPos( x );
+	}
 };
 
-    
+
 SIGEL_GP::SIG_GPPopulation::SIG_GPPopulation(QString data)
-  : randomizer( nullptr )   // was uninitialised; the guard below reads it
+	: randomizer( nullptr )   // the guard below reads it
 {
-   QTextStream                 inputFile(&data, QIODeviceBase::ReadOnly);
+	QTextStream                 inputFile(&data, QIODeviceBase::ReadOnly);
 
-   history = true;
+	history = true;
 
 #ifdef SIG_DEBUG
 
-     SIGEL_Tools::SIG_IO::cerr << "\n\nREADING POPULATION DATA FROM FILE:" << Qt::endl;    
-     
+	SIGEL_Tools::SIG_IO::cerr << "\n\nREADING POPULATION DATA FROM FILE:" << Qt::endl;
+
 #endif
 
-   readFromFile(inputFile);
+	readFromFile(inputFile);
 
 #ifdef SIG_DEBUG
 
-     SIGEL_Tools::SIG_IO::cerr << "\n\nREADING FINISHED.\n" << Qt::endl;
-     
+	SIGEL_Tools::SIG_IO::cerr << "\n\nREADING FINISHED.\n" << Qt::endl;
+
 #endif
 
 };
 
 
-SIGEL_GP::SIG_GPPopulation::SIG_GPPopulation(int size, 
-					     SIGEL_Tools::SIG_Randomizer &r, 
-					     SIGEL_GP::SIG_GPParameter& param,
-					     SIGEL_Robot::SIG_LanguageParameters& languageP)
+SIGEL_GP::SIG_GPPopulation::SIG_GPPopulation(int size,
+                                             SIGEL_Tools::SIG_Randomizer &r,
+                                             SIGEL_GP::SIG_GPParameter& param,
+                                             SIGEL_Robot::SIG_LanguageParameters& languageP)
 {
-   setRandomizer( &r );
+	setRandomizer( &r );
 
-   pool.resize( size );
+	pool.resize( size );
 
-   history = true;
+	history = true;
 
-   setNextIdentifier( QString::number(0) );
-   setPoolGeneration( 0 );
+	setNextIdentifier( QString::number(0) );
+	setPoolGeneration( 0 );
 
-   for( int x=0; x<getSize(); x++ )
-     { 
-       delete pool[ x ];
-       pool[ x ] = new SIGEL_GP::SIG_GPIndividual( r, param, languageP );
-       getIndividualPointer( x )->setPoolPos( x );
-     }
-}  
+	for( int x=0; x<getSize(); x++ )
+	{
+		delete pool[ x ];
+		pool[ x ] = new SIGEL_GP::SIG_GPIndividual( r, param, languageP );
+		getIndividualPointer( x )->setPoolPos( x );
+	}
+}
 
-SIGEL_GP::SIG_GPPopulation::SIG_GPPopulation(int size, 
-					     SIGEL_Tools::SIG_Randomizer &r)
+SIGEL_GP::SIG_GPPopulation::SIG_GPPopulation(int size,
+                                             SIGEL_Tools::SIG_Randomizer &r)
 {
-   setRandomizer( &r );
+	setRandomizer( &r );
 
-   pool.resize( size );
+	pool.resize( size );
 
-   history = true;
-   
-   for( int x=0; x<getSize(); x++ )
-     { 
-       delete pool[ x ];
-       pool[ x ] = new SIGEL_GP::SIG_GPIndividual( r );
-       getIndividualPointer( x )->setPoolPos( x );
-     }
-}  
-    
-namespace {
+	history = true;
+
+	for( int x=0; x<getSize(); x++ )
+	{
+		delete pool[ x ];
+		pool[ x ] = new SIGEL_GP::SIG_GPIndividual( r );
+		getIndividualPointer( x )->setPoolPos( x );
+	}
+}
+
+namespace
+{
 
 void resizeOwning( QList< SIGEL_GP::SIG_GPIndividual * > &v, qsizetype want )
 {
-  if (want < 0)
-    want = 0;
-  for (qsizetype i = want; i < v.size(); i++)
-    delete v[ i ];
-  v.resize( want );
+	if (want < 0)
+		want = 0;
+	for (qsizetype i = want; i < v.size(); i++)
+		delete v[ i ];
+	v.resize( want );
 }
 
 }
@@ -144,451 +145,450 @@ void resizeOwning( QList< SIGEL_GP::SIG_GPIndividual * > &v, qsizetype want )
 SIGEL_GP::SIG_GPPopulation::~SIG_GPPopulation()
 {
 
-  qDeleteAll( pool );
-  pool.clear();
-  delete randomizer;
+	qDeleteAll( pool );
+	pool.clear();
+	delete randomizer;
 };
 
-    
-void SIGEL_GP::SIG_GPPopulation::sort()
-{
 
-
-};
-
-    
 SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPPopulation::getIndividual(int poolpos)
 {
-  if( poolpos<getSize() )
-    {
-      return  *pool[poolpos];
-    }
-  else
-    {
-      // Todo: Exception!
-      SIGEL_Tools::SIG_IO::cerr << "Wrong Position requested from Population!" << Qt::endl;
-      exit( 1 );
-    } 
+	if( poolpos<getSize() )
+	{
+		return  *pool[poolpos];
+	}
+	else
+	{
+		// Todo: Exception!
+		SIGEL_Tools::SIG_IO::cerr << "Wrong Position requested from Population!" << Qt::endl;
+		exit( 1 );
+	}
 };
 
-    
-void SIGEL_GP::SIG_GPPopulation::setIndividual(SIG_GPIndividual& indi, 
-					       int poolpos)
+
+void SIGEL_GP::SIG_GPPopulation::setIndividual(SIG_GPIndividual& indi,
+                                               int poolpos)
 {
-  // pool.resize(getSize()+1);
-  // insert() freed the individual already in this slot -- the LOSER of a
-  // tournament. This delete is that free. The pool then owns a pointer the
-  // caller allocated, which is how 2003 wrote it.
-  delete pool[ poolpos ];
-  pool[ poolpos ] = &indi;
+	// The pool owns its individuals: it frees the one in this slot and
+	// takes over the one the caller allocated.
+	delete pool[ poolpos ];
+	pool[ poolpos ] = &indi;
 };
 
-   
 
-int SIGEL_GP::SIG_GPPopulation::addRandomIndividuals(int quantity, 
-						      SIGEL_GP::SIG_GPParameter& param, 
-						      SIGEL_Robot::SIG_LanguageParameters& languageP)
+
+int SIGEL_GP::SIG_GPPopulation::addRandomIndividuals(int quantity,
+                                                      SIGEL_GP::SIG_GPParameter& param,
+                                                      SIGEL_Robot::SIG_LanguageParameters& languageP)
 {
-   int maxPos=getSize();
+	int maxPos=getSize();
 
-   quantity = qMin( quantity, maximumSize - maxPos );
-   if( quantity <= 0 )
-     return 0;
+	quantity = qMin( quantity, maximumSize - maxPos );
+	if( quantity <= 0 )
+		return 0;
 
-   pool.resize( maxPos + quantity );
+	pool.resize( maxPos + quantity );
 
-   std::unique_ptr< QProgressDialog > progress;
-   
-   if( qApp ) progress = std::make_unique< QProgressDialog >( "Progress:", "Cancel", 0, quantity, SIGEL_Tools::dialogParent() );
-   if( qApp ) progress->setWindowModality( Qt::ApplicationModal );
-   if( qApp ) progress->setWindowTitle( "Generating" );
-   
-   for( int x = maxPos; x<maxPos + quantity; x++ )
-     { 
-       SIG_GPIndividual *newInd = new SIG_GPIndividual( *getRandomizerPointer(), param, languageP );
-       newInd->setName( getNextIdentifier() );
-       delete pool[ x ];
-       pool[ x ] = newInd;
-       getIndividualPointer( x )->setPoolPos( x );
+	std::unique_ptr< QProgressDialog > progress;
 
-       if( qApp )
-	 {
-           progress->setValue( x - maxPos );
-           qApp->processEvents(); 
+	if( qApp )
+	{
+		progress = std::make_unique< QProgressDialog >( "Progress:", "Cancel", 0, quantity, SIGEL_Tools::dialogParent() );
+		progress->setWindowModality( Qt::ApplicationModal );
+		progress->setWindowTitle( "Generating" );
+	}
 
-           if( progress->wasCanceled() )
-             {
-	       // The process has been canceled. Because of process preparations the system may crash if
-	       // these preparation are not made undone:
+	for( int x = maxPos; x<maxPos + quantity; x++ )
+	{
+		SIG_GPIndividual *newInd = new SIG_GPIndividual( *getRandomizerPointer(), param, languageP );
+		newInd->setName( getNextIdentifier() );
+		delete pool[ x ];
+		pool[ x ] = newInd;
+		getIndividualPointer( x )->setPoolPos( x );
 
-               // Truncates slots this loop never filled, so it frees nothing
-               // -- but spelled like the other two so no shrink here is a
-               // special case a later reader has to re-derive.
-               resizeOwning( pool, x + 1 );
-  
-               break;
-	     }
-	 }
-     }
+		if( qApp )
+		{
+			progress->setValue( x - maxPos );
+			qApp->processEvents();
 
-    return quantity;
+			if( progress->wasCanceled() )
+			{
+				// The process has been canceled. Because of process preparations the system may crash if
+				// these preparation are not made undone:
+
+				// The slots above x were never filled.
+				resizeOwning( pool, x + 1 );
+
+				break;
+			}
+		}
+	}
+
+	return quantity;
 };
-    
+
 int SIGEL_GP::SIG_GPPopulation::getSize()
 {
-    return int( pool.size() );
+	return int( pool.size() );
 };
 
-    
+
 QString SIGEL_GP::SIG_GPPopulation::getNextIdentifier()
 {
-  QString releasedIdentifier = nextIdentifier;
+	QString releasedIdentifier = nextIdentifier;
 
-  int nextIdentifierNumber = nextIdentifier.toInt() + 1;
+	int nextIdentifierNumber = nextIdentifier.toInt() + 1;
 
-  nextIdentifier = QString::number( nextIdentifierNumber );
+	nextIdentifier = QString::number( nextIdentifierNumber );
 
-  return releasedIdentifier;
+	return releasedIdentifier;
 };
 
 void SIGEL_GP::SIG_GPPopulation::setNextIdentifier(QString identifier)
 {
-    nextIdentifier = identifier;
-}; 
+	nextIdentifier = identifier;
+};
 
 int SIGEL_GP::SIG_GPPopulation::getPoolGeneration()
 {
-    return poolGeneration;
+	return poolGeneration;
 };
 
 void SIGEL_GP::SIG_GPPopulation::setPoolGeneration(int pGen)
 {
-    poolGeneration = pGen;
+	poolGeneration = pGen;
 }
 
 void SIGEL_GP::SIG_GPPopulation::loadPool(QTextStream & pool)
 {
-    readFromFile( pool );
+	readFromFile( pool );
 };
 
 
 
 void SIGEL_GP::SIG_GPPopulation::savePool(QTextStream & pool)
 {
-    writeToFile( pool );
+	writeToFile( pool );
 };
 
 
 SIGEL_GP::SIG_GPIndividual *SIGEL_GP::SIG_GPPopulation::getIndividualPointer(int poolpos)
 {
-    return pool[poolpos];
+	return pool[poolpos];
 }
 
 void SIGEL_GP::SIG_GPPopulation::deleteIndividual(int poolpos)
 {
-  // pool.remove(poolpos);
+	SIGEL_GP::SIG_GPIndividual *tmpInd;
 
-   SIGEL_GP::SIG_GPIndividual *tmpInd;
+	delete pool[ poolpos ];
 
-   delete pool[ poolpos ];
+	for( int x=poolpos; x<getSize()-1; x++ )
+	{
+		tmpInd = getIndividualPointer( x + 1 );
+		tmpInd->setPoolPos( x );
+		pool[ x ] = pool[ x+1 ];
+	}
 
-   for( int x=poolpos; x<getSize()-1; x++ )
-     { 
-       tmpInd = getIndividualPointer( x + 1 );
-       tmpInd->setPoolPos( x );
-       pool[ x ] = pool[ x+1 ];
-     }
-
-   pool.removeLast();
+	pool.removeLast();
 }
 
 
-  
+
 void SIGEL_GP::SIG_GPPopulation::setRandomizer(SIGEL_Tools::SIG_Randomizer *r)
 {
-  randomizer=r;
+	randomizer=r;
 }
 
-  
+
 SIGEL_Tools::SIG_Randomizer SIGEL_GP::SIG_GPPopulation::getRandomizer()
 {
-  return *randomizer;
+	return *randomizer;
 }
 
 SIGEL_Tools::SIG_Randomizer *SIGEL_GP::SIG_GPPopulation::getRandomizerPointer()
 {
-  return randomizer;
+	return randomizer;
 }
 
 bool SIGEL_GP::SIG_GPPopulation::importNewIndividual( QString& filename )
 {
-   int lastPos=getSize();
+	int lastPos=getSize();
 
-   if( lastPos >= maximumSize )
-     return false;
+	if( lastPos >= maximumSize )
+		return false;
 
-   pool.resize( lastPos + 1 );
+	pool.resize( lastPos + 1 );
 
-   SIG_GPIndividual *newInd = new SIG_GPIndividual();
+	SIG_GPIndividual *newInd = new SIG_GPIndividual();
 
-   newInd->importIndividual( filename );
-   newInd->setName( getNextIdentifier() );
-   newInd->setPoolPos( lastPos );
+	newInd->importIndividual( filename );
+	newInd->setName( getNextIdentifier() );
+	newInd->setPoolPos( lastPos );
 
-   // we don't know where this individual came from -> void fitness !
-   newInd->setFitness(-1.0);
+	// we don't know where this individual came from -> void fitness !
+	newInd->setFitness(-1.0);
 
-   delete pool[ lastPos ];
-   pool[ lastPos ] = newInd;
-   return true;
+	delete pool[ lastPos ];
+	pool[ lastPos ] = newInd;
+	return true;
 }
 
 void SIGEL_GP::SIG_GPPopulation::readFromFile(QTextStream &file)
 {
 	// first read the global options for the population
 	QString s=file.readLine(); //WITHHISTORY
-	if (s == "WITHHISTORY") {
+	if (s == "WITHHISTORY")
+	{
 		s=file.readLine();
 		int tmp = s.toInt();
-		if (tmp == 0) {
+		if (tmp == 0)
+		{
 			history = false;
 		}
-		else history = true;
+		else
+			history = true;
 	}
 
-  QString          populationStr=file.readAll();
-  QString          tmpStr1, indStr;
-  long             pos, pos2;
+	QString          populationStr=file.readAll();
+	QString          tmpStr1, indStr;
+	long             pos, pos2;
 
 #ifdef SIG_DEBUG
 
-     SIGEL_Tools::SIG_IO::cerr << "\n\nREADING POPULATION DATA FROM FILE:" << Qt::endl;    
-     
+	SIGEL_Tools::SIG_IO::cerr << "\n\nREADING POPULATION DATA FROM FILE:" << Qt::endl;
+
 #endif
-  
-  if( (pos=populationStr.indexOf("POPULATIONSIZE=", 0, Qt::CaseInsensitive) )!=-1 ) 
-    { 
-        pos2=populationStr.indexOf(";", pos + 16, Qt::CaseInsensitive); 
-        resizeOwning( pool, (populationStr.mid(pos+15,pos2-pos-15)).toLong() );
+
+	if( (pos=populationStr.indexOf("POPULATIONSIZE=", 0, Qt::CaseInsensitive) )!=-1 )
+	{
+		pos2=populationStr.indexOf(";", pos + 16, Qt::CaseInsensitive);
+		resizeOwning( pool, (populationStr.mid(pos+15,pos2-pos-15)).toLong() );
 
 #ifdef SIG_DEBUG
 
-	SIGEL_Tools::SIG_IO::cerr << "<Poolsize loaded:"
-				  << populationStr.mid(pos+15,pos2-pos-15).toLong()
-	                          << ">" << Qt::endl;
+		SIGEL_Tools::SIG_IO::cerr << "<Poolsize loaded:"
+		                          << populationStr.mid(pos+15,pos2-pos-15).toLong()
+		                          << ">" << Qt::endl;
 
 #endif
 
-        std::unique_ptr< QProgressDialog > progress;
-        if( qApp ) 
-           progress = std::make_unique< QProgressDialog >( "Progress:", "Cancel", 0, getSize(), SIGEL_Tools::dialogParent() );
-        if( qApp ) progress->setWindowModality( Qt::ApplicationModal );
-        if( qApp ) progress->setWindowTitle( "Loading" );
+		std::unique_ptr< QProgressDialog > progress;
+		if( qApp )
+		{
+			progress = std::make_unique< QProgressDialog >( "Progress:", "Cancel", 0, getSize(), SIGEL_Tools::dialogParent() );
+			progress->setWindowModality( Qt::ApplicationModal );
+			progress->setWindowTitle( "Loading" );
+		}
 
-        pos2=populationStr.indexOf(";", pos2+1, Qt::CaseInsensitive);
-        if( (pos=populationStr.indexOf("NEXTIDENTIFIER=", 0, Qt::CaseInsensitive))!=-1 )
-          {
+		pos2=populationStr.indexOf(";", pos2+1, Qt::CaseInsensitive);
+		if( (pos=populationStr.indexOf("NEXTIDENTIFIER=", 0, Qt::CaseInsensitive))!=-1 )
+		{
 
 #ifdef SIG_DEBUG
 
-	     SIGEL_Tools::SIG_IO::cerr << "<Identifier loaded:"
-				       << populationStr.mid(pos+15,pos2-pos-15).toLong()
-	                               << ">" << Qt::endl;
+			SIGEL_Tools::SIG_IO::cerr << "<Identifier loaded:"
+			                          << populationStr.mid(pos+15,pos2-pos-15).toLong()
+			                          << ">" << Qt::endl;
 
 #endif
-	     setNextIdentifier(populationStr.mid(pos+15,pos2-pos-15));
-	  }
-        else 
-	     setNextIdentifier(QString::number(0));
-        
+			setNextIdentifier(populationStr.mid(pos+15,pos2-pos-15));
+		}
+		else
+			setNextIdentifier(QString::number(0));
 
-        pos2=populationStr.indexOf(";", pos2+1, Qt::CaseInsensitive);
-        if( (pos=populationStr.indexOf("POOLGENERATION=", 0, Qt::CaseInsensitive))!=-1 ) 
-	  {
+
+		pos2=populationStr.indexOf(";", pos2+1, Qt::CaseInsensitive);
+		if( (pos=populationStr.indexOf("POOLGENERATION=", 0, Qt::CaseInsensitive))!=-1 )
+		{
 #ifdef SIG_DEBUG
 
-	     SIGEL_Tools::SIG_IO::cerr << "<Poolgeneration loaded:"
-				       << populationStr.mid(pos+15,pos2-pos-15)
-	                               << ">\n" << Qt::endl;
+			SIGEL_Tools::SIG_IO::cerr << "<Poolgeneration loaded:"
+			                          << populationStr.mid(pos+15,pos2-pos-15)
+			                          << ">\n" << Qt::endl;
 #endif
-             setPoolGeneration((populationStr.mid(pos+15,pos2-pos-15)).toLong());
-          }
-        else
-             setPoolGeneration(0); 
+			setPoolGeneration((populationStr.mid(pos+15,pos2-pos-15)).toLong());
+		}
+		else
+			setPoolGeneration(0);
 
-        for(long x=0;x<getSize();x++) 
-          {  
-             tmpStr1.setNum(x); 
-	     
-             pos  = populationStr.indexOf("INDIVIDUAL("+tmpStr1+") BEGIN{", pos2, Qt::CaseInsensitive); 
-	     pos2 = populationStr.indexOf("}INDIVIDUAL("+tmpStr1+") END", pos2, Qt::CaseInsensitive); 
-             
-	     
-             delete pool[ x ];
-             pool[ x ] = new SIGEL_GP::SIG_GPIndividual();  
+		for(long x=0;x<getSize();x++)
+		{
+			tmpStr1.setNum(x);
 
-             indStr = populationStr.mid(pos+19+tmpStr1.length(),pos2-pos-20-tmpStr1.length()); 
-             
-             getIndividualPointer(x)->readFromFile(indStr); 
+			pos  = populationStr.indexOf("INDIVIDUAL("+tmpStr1+") BEGIN{", pos2, Qt::CaseInsensitive);
+			pos2 = populationStr.indexOf("}INDIVIDUAL("+tmpStr1+") END", pos2, Qt::CaseInsensitive);
 
-             if( qApp )
-	      {
-                progress->setValue( x );
-                qApp->processEvents(); 
 
-                if ( progress->wasCanceled() )
-		  {
+			delete pool[ x ];
+			pool[ x ] = new SIGEL_GP::SIG_GPIndividual();
 
-		    // The process has been canceled. Because of process preparations the system may crash if
-		    // these preparation are not made undone:
+			indStr = populationStr.mid(pos+19+tmpStr1.length(),pos2-pos-20-tmpStr1.length());
 
-		    // Slots above x still hold the individuals from before this
-		    // load -- the replace loop only reached x -- so this shrink
-		    // frees them.
-		    resizeOwning( pool, x + 1 );
-                    
-		    break;
-		  }
-	      }
+			getIndividualPointer(x)->readFromFile(indStr);
 
-          } 
+			if( qApp )
+			{
+				progress->setValue( x );
+				qApp->processEvents();
+
+				if ( progress->wasCanceled() )
+				{
+
+					// The process has been canceled. Because of process preparations the system may crash if
+					// these preparation are not made undone:
+
+					// Slots above x still hold the individuals from before this
+					// load -- the replace loop only reached x -- so this shrink
+					// frees them.
+					resizeOwning( pool, x + 1 );
+
+					break;
+				}
+			}
+
+		}
 #ifdef SIG_DEBUG
 
-        SIGEL_Tools::SIG_IO::cerr << "\n\nREADING POPULATION FINISHED." << Qt::endl;    
-     
+		SIGEL_Tools::SIG_IO::cerr << "\n\nREADING POPULATION FINISHED." << Qt::endl;
+
 #endif
 
-    } 
-  else 
-    { 
-      
-    }
+	}
 
-  if( getSize() > maximumSize )
-    {
-      QString message = QString( "Warning: the pool has %1 individuals; only the first %2 take part in tournaments reliably." ).arg( getSize() ).arg( maximumSize );
-      SIGEL_Tools::SIG_IO::cerr << message << Qt::endl;
-    }
+	if( getSize() > maximumSize )
+	{
+		QString message = QString( "Warning: the pool has %1 individuals; only the first %2 take part in tournaments reliably." ).arg( getSize() ).arg( maximumSize );
+		SIGEL_Tools::SIG_IO::cerr << message << Qt::endl;
+	}
 }
 
 void SIGEL_GP::SIG_GPPopulation::writeToFile(QTextStream &file)
 {
 	// save the global options for the history
 	file << "WITHHISTORY\n";
- 	file << history << "\n";
+	file << history << "\n";
 
-  file<<"\n// ---------------------------------------";
-  file<<"\n// (C)2001, PG 368, UNIVERSITY OF DORTMUND";
-  file<<"\n// ---------------------------------------";
+	file<<"\n// ---------------------------------------";
+	file<<"\n// (C)2001, PG 368, UNIVERSITY OF DORTMUND";
+	file<<"\n// ---------------------------------------";
 
-  file<<"\n\nPOPULATION BEGIN{ \n"<<"\n  POPULATIONSIZE="<<getSize()<<";";
-  file<<"\n  NEXTIDENTIFIER="<<nextIdentifier<<";";
-  file<<"\n  POOLGENERATION="<<getPoolGeneration()<<";";
+	file<<"\n\nPOPULATION BEGIN{ \n"<<"\n  POPULATIONSIZE="<<getSize()<<";";
+	file<<"\n  NEXTIDENTIFIER="<<nextIdentifier<<";";
+	file<<"\n  POOLGENERATION="<<getPoolGeneration()<<";";
 
-  for( long x=0; x<getSize(); x++ )
-    { 
-	file<<"\n\n  INDIVIDUAL("<<x<<") BEGIN{";
-  
-        getIndividualPointer(x)->writeToFile(file,history);
+	for( long x=0; x<getSize(); x++ )
+	{
+		file<<"\n\n  INDIVIDUAL("<<x<<") BEGIN{";
 
-        file<<"\n  }INDIVIDUAL("<<x<<") END;";
+		getIndividualPointer(x)->writeToFile(file,history);
 
-        if( qApp )
-          {
-            qApp->processEvents();
-          }  
-    }
+		file<<"\n  }INDIVIDUAL("<<x<<") END;";
 
-  file<<"\n\n}POPULATION END";
+		if( qApp )
+		{
+			qApp->processEvents();
+		}
+	}
+
+	file<<"\n\n}POPULATION END";
 }
 
 double SIGEL_GP::SIG_GPPopulation::getBestFitness(bool high)
 {
-  // take only the simulated values into account
-  // the estimated fitness values are < -2
-  if (getSize()>0)
-    {
-      double bestFitness = getIndividualPointer( 0 )->getFitness();
-	  if(bestFitness < 0.0) bestFitness = 0.0;
-
-      for (int i=1; i<getSize(); i++)
+	// take only the simulated values into account
+	// the estimated fitness values are < -2
+	if (getSize()>0)
 	{
-	  double actFitness = getIndividualPointer( i )->getFitness();
+		double bestFitness = getIndividualPointer( 0 )->getFitness();
+		if(bestFitness < 0.0)
+			bestFitness = 0.0;
 
-	  if(actFitness >= 0.0){
-		if (high)
-			bestFitness = ( actFitness > bestFitness ) ? actFitness : bestFitness;
-		else
-			bestFitness = ( actFitness < bestFitness ) ? actFitness : bestFitness;
-	  }
-	};
+		for (int i=1; i<getSize(); i++)
+		{
+			double actFitness = getIndividualPointer( i )->getFitness();
 
-      return bestFitness;
-    }
-  else
-    return 0;
+			if(actFitness >= 0.0)
+			{
+				if (high)
+					bestFitness = ( actFitness > bestFitness ) ? actFitness : bestFitness;
+				else
+					bestFitness = ( actFitness < bestFitness ) ? actFitness : bestFitness;
+			}
+		};
+
+		return bestFitness;
+	}
+	else
+		return 0;
 }
 
 void SIGEL_GP::SIG_GPPopulation::resetAllFitnessValues()
 {
-  for(unsigned int counter = 0; counter < pool.size(); counter++ )
-    pool[ counter ]->setFitness( -1 );
+	for(unsigned int counter = 0; counter < pool.size(); counter++ )
+		pool[ counter ]->setFitness( -1 );
 };
 
 double SIGEL_GP::SIG_GPPopulation::getWorstFitness(bool high)
 {
-  // take only the simulated values into account
-  // the estimated fitness values are < -2
-  if (getSize()>0)
-    {
-      double worstFitness = getIndividualPointer( 0 )->getFitness();
-	  if(worstFitness < 0.0) worstFitness = 0.0;
-
-      for (int i=1; i<getSize(); i++)
+	// take only the simulated values into account
+	// the estimated fitness values are < -2
+	if (getSize()>0)
 	{
-	  double actFitness = getIndividualPointer( i )->getFitness();
+		double worstFitness = getIndividualPointer( 0 )->getFitness();
+		if(worstFitness < 0.0)
+			worstFitness = 0.0;
 
-	  if(actFitness >= 0.0){
-		if (high)
-			worstFitness = ( actFitness < worstFitness ) ? actFitness : worstFitness;
-		else
-			worstFitness = ( actFitness > worstFitness ) ? actFitness : worstFitness;
-	  }
-	};
+		for (int i=1; i<getSize(); i++)
+		{
+			double actFitness = getIndividualPointer( i )->getFitness();
 
-      return worstFitness;
-    }
-  else
-    return 0;
+			if(actFitness >= 0.0)
+			{
+				if (high)
+					worstFitness = ( actFitness < worstFitness ) ? actFitness : worstFitness;
+				else
+					worstFitness = ( actFitness > worstFitness ) ? actFitness : worstFitness;
+			}
+		};
+
+		return worstFitness;
+	}
+	else
+		return 0;
 };
 
 double SIGEL_GP::SIG_GPPopulation::getAverageFitness()
 {
-  double fitnessSum = 0;
-  double actFitness = 0;
-  int size = 0;
+	double fitnessSum = 0;
+	double actFitness = 0;
+	int size = 0;
 
-  // take only the simulated values into account
-  // the estimated fitness values are < -2
-  for (int i=0; i<getSize(); i++){
-	  actFitness = getIndividualPointer( i )->getFitness();
-	  if(actFitness >= 0.0){
-		fitnessSum += actFitness;
-		size++;
-	  }
-  }
+	// take only the simulated values into account
+	// the estimated fitness values are < -2
+	for (int i=0; i<getSize(); i++)
+	{
+		actFitness = getIndividualPointer( i )->getFitness();
+		if(actFitness >= 0.0)
+		{
+			fitnessSum += actFitness;
+			size++;
+		}
+	}
 
-  double averageFitness = 0.0;
-  if(size)
-	  averageFitness = fitnessSum / size;
+	double averageFitness = 0.0;
+	if(size)
+		averageFitness = fitnessSum / size;
 
-  return averageFitness;
+	return averageFitness;
 };
 
-void SIGEL_GP::SIG_GPPopulation::setHistory(bool _history) {
-  history = _history;
+void SIGEL_GP::SIG_GPPopulation::setHistory(bool newHistory)
+{
+	history = newHistory;
 };
 
-bool SIGEL_GP::SIG_GPPopulation::getHistory() {
-  return history;
+bool SIGEL_GP::SIG_GPPopulation::getHistory()
+{
+	return history;
 };
