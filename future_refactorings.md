@@ -49,7 +49,9 @@ Paths are relative to `sigel/`, the source tree.
   - [ ] `SIG_ExperimentListView::openExperimentFile`: `theNewExperiment`.
   - [ ] `main` in `sigel_slave.cpp`: `robot`, `environment`,
     `simulationParameters`, `program`, `modifiedRobot`, `app`. Done:
-    `simWindow`, `experiment`.
+    `simWindow`, `experiment`. The first five need design work first: each
+    owns its object in one mode and points at another owner's object in the
+    other mode.
   - [ ] `main` in `sigel.cpp`: `mainWindow`. Never deleted;
     `~SIG_MainWindow` has never run at exit.
 
