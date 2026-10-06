@@ -560,23 +560,23 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::mutation( SIGEL_GP::SIG_
    
 	     // Create a completely new program line to take the mutated data from:
     
-             newProgLine = new SIGEL_Program::SIG_ProgramLine( randomizer, 
-							       languageP, 
-							       gpParameter.getInstructionProbabilities() );
+             SIGEL_Program::SIG_ProgramLine randomLine( randomizer,
+							languageP,
+							gpParameter.getInstructionProbabilities() );
 
-             if( newProgLine->getRobotinstructionType() != SIGEL_Program::NOP )
+             if( randomLine.getRobotinstructionType() != SIGEL_Program::NOP )
 	       {
 		 // The number of operands must eventually be increased for the new line, 
                  // because the new instruction type requires more operands. In this case
                  // the operand(s) will be taken from the new generated line (s. above):              
 
-                if( ( newProgLine->getNumberOfElements() >= 1 ) && ( op1 == 0 ) )
+                if( ( randomLine.getNumberOfElements() >= 1 ) && ( op1 == 0 ) )
 
-                    op1 = newProgLine->getInstructionElement( 0 );
+                    op1 = randomLine.getInstructionElement( 0 );
    
-                if( ( newProgLine->getNumberOfElements() == 2 ) && ( op2 == 0 ) )
+                if( ( randomLine.getNumberOfElements() == 2 ) && ( op2 == 0 ) )
   
-                    op2 = newProgLine->getInstructionElement( 1 );
+                    op2 = randomLine.getInstructionElement( 1 );
 	       }
              else
                {
@@ -589,13 +589,11 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::mutation( SIGEL_GP::SIG_
              {
                SIGEL_Program::SIG_ProgramLine mutatedLine;
                mutatedLine = *newProgram.getLine( mutPoint );
-               mutatedLine.setRobotinstruction( newProgLine->getRobotinstructionType(),
+               mutatedLine.setRobotinstruction( randomLine.getRobotinstructionType(),
                                                 op1,
                                                 op2 );
                newProgram.setLine( mutPoint, mutatedLine );
              }
-             delete newProgLine;
-
              break;
       }
 

@@ -32,7 +32,6 @@ Paths are relative to `sigel/`, the source tree.
   *Local pointer that can be a local object:*
   - [ ] `MT_Search::crossover`: `NextProgPartForChildOne`,
     `NextProgPartForChildTwo`.
-  - [ ] `SIG_GPOperations::mutation`, case 2: `newProgLine`.
   - [ ] `SIG_Mirtich::compute`: the three `new[]` arrays.
   - [ ] `SIG_Program::readFromFile`: `prgLine`. It leaks when a line does
     not parse.
