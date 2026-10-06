@@ -54,7 +54,6 @@ Paths are relative to `sigel/`, the source tree.
     item 20.
   - [ ] `SIG_VisualisationWidget::visualisation`. The old one must be
     destroyed before the new one is built.
-  - [ ] `SIG_GUIGPExperiment::guiGPManager`.
   - [ ] `MT_GPManager`: `BestIndividual`, `Randi`, `Statistics`, `Offspring`,
     `Parent`, `Seeker`, `Selector`, `FitnessTrainer`. Used by the MetaGP
     thread and the GUI thread.
@@ -91,6 +90,10 @@ Paths are relative to `sigel/`, the source tree.
     `MT_Programline::OperandA` and `OperandB`,
     `MT_TrainingCase::TranslateIndividual`, and the four lists of
     `MT_TranslatedIndividual`.
+  - `SIG_GUIGPExperiment::guiGPManager`: `slotStartEvolution` must destroy
+    the old manager before it builds the new one, because the old manager's
+    trainer removes the PVM hosts that the new one adds. That needs a
+    `reset()`.
 
 - [ ] **140. Assess `DynaMechsLinkGuard`.** It is a hand-written struct in
   `SIG_DynaMechsSimulationData.cpp` that frees the links when the
