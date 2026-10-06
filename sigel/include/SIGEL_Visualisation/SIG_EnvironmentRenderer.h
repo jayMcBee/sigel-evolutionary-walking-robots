@@ -28,6 +28,7 @@
 #include "SIGEL_Visualisation/SIG_ViewSettings.h"
 
 #include <QList>
+#include <vector>
 #include "SIGEL_Tools/SIG_Vector.h"
 
 namespace SIGEL_Visualisation
@@ -38,7 +39,7 @@ namespace SIGEL_Visualisation
   	*/
   typedef struct {
 		// GLubyte will work for images up to 32-bits.
-		GLubyte *imageData;
+		std::vector< GLubyte > imageData;
 
 		// Stores the color depth of the image in bits
 		// per pixel.

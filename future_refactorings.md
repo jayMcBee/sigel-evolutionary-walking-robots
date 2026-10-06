@@ -62,8 +62,6 @@ Paths are relative to `sigel/`, the source tree.
   - [ ] `MT_PopulationWidget::getSelectedItems`: the list, used in
     `slotExpInd`.
   - [ ] `SIG_DynaMechsLink`: the contact model and the DynaMechs link bodies.
-  - [ ] `SIG_EnvironmentRenderer::loadPNMTexture`: the texture image, from
-    `malloc`.
 
   *Not in this item:*
   - Lists of raw pointers, among them the elements of `MT_Statistics`, which
