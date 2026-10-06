@@ -47,9 +47,9 @@ Paths are relative to `sigel/`, the source tree.
     `progress` dialog.
   - [ ] `SIG_SimulationVisualisation::initShadowMapping`: `program`.
   - [ ] `SIG_ExperimentListView::openExperimentFile`: `theNewExperiment`.
-  - [ ] `main` in `sigel_slave.cpp`: `experiment`, `robot`, `environment`,
+  - [ ] `main` in `sigel_slave.cpp`: `robot`, `environment`,
     `simulationParameters`, `program`, `modifiedRobot`, `app`. Done:
-    `simWindow`.
+    `simWindow`, `experiment`.
   - [ ] `main` in `sigel.cpp`: `mainWindow`. Never deleted;
     `~SIG_MainWindow` has never run at exit.
 

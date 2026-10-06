@@ -28,6 +28,7 @@
 #include <sys/time.h>
 #include <sys/resource.h>
 #include <csignal>
+#include <memory>
 
 #include "SIGEL_Tools/SIG_IO.h"
 #include "SIGEL_SlaveGUI/SIG_SimulationWindow.h"
@@ -105,7 +106,7 @@ int main( int argc, char *argv[] ) {
   SIGEL_Environment::SIG_Environment *environment = nullptr;
   SIGEL_Simulation::SIG_SimulationParameters *simulationParameters = nullptr;
   SIGEL_Program::SIG_Program *program = nullptr;
-  SIGEL_GP::SIG_GPExperiment *experiment = nullptr;
+  std::unique_ptr< SIGEL_GP::SIG_GPExperiment > experiment;
   bool visualize = false;
   QString fitnessFunctionName;
   QString experimentFileName;
@@ -143,7 +144,7 @@ int main( int argc, char *argv[] ) {
 	  	return 1;
     }
 
-    experiment = new SIGEL_GP::SIG_GPExperiment();
+    experiment = std::make_unique< SIGEL_GP::SIG_GPExperiment >();
 
     QTextStream experimentStream( &experimentFile );
 
