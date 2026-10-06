@@ -207,7 +207,7 @@ namespace SIGEL_Robot {
                 
                 POLYHEDRON p;
                 p.verts = new tridouble [geom->getNumVertices ()];
-                p.faces = new FACE [geom->getNumPolygons ()];
+                p.faces.resize (geom->getNumPolygons ());
 
                 p.numVerts = geom->getNumVertices ();
                 p.numFaces = geom->getNumPolygons ();
@@ -239,7 +239,6 @@ namespace SIGEL_Robot {
                 // Great - painstakingly built up, one call, and now
                 // I get to delete the whole damn thing again.
 
-                delete [] p.faces;
                 delete [] p.verts;
         }
 

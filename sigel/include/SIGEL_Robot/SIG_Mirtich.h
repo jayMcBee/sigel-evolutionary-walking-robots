@@ -50,7 +50,7 @@ namespace SIGEL_Robot {
                 struct POLYHEDRON {
                         int numVerts, numFaces;
                         tridouble *verts;
-                        FACE *faces;
+                        std::vector< FACE > faces;
                 };
         protected:
                 // this is to what we refer
