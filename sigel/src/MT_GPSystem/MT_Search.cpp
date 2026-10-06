@@ -150,23 +150,17 @@ void MT_Search::crossover(MT_Individual * ParentOne, MT_Individual * ParentTwo)
 
 /* ************************* The remaining program fragment(s) are appended to ChildOne and ChildTwo **************************/
 
-	MT_Program * NextProgPartForChildOne;
-	MT_Program * NextProgPartForChildTwo;
-
 	switch (XPoints[0])
 	{
 
 	// Only 1 crossover point was chosen
 	case 0:
 		{
-			NextProgPartForChildOne = new MT_Program(PTwoProgram, XPoints[2], (PTwoProgram->getLength()-1));
-			NextProgPartForChildTwo = new MT_Program(POneProgram, XPoints[1], (POneProgram->getLength()-1));
+			MT_Program SecondPartForChildOne(PTwoProgram, XPoints[2], (PTwoProgram->getLength()-1));
+			MT_Program SecondPartForChildTwo(POneProgram, XPoints[1], (POneProgram->getLength()-1));
 		
-			ChildOneProgram->insertProg(NextProgPartForChildOne);
-			ChildTwoProgram->insertProg(NextProgPartForChildTwo);
-			
-			delete NextProgPartForChildTwo;
-			delete NextProgPartForChildOne;
+			ChildOneProgram->insertProg(&SecondPartForChildOne);
+			ChildTwoProgram->insertProg(&SecondPartForChildTwo);
 
 			ChildOne->setTypOfGenesis(1);
 			ChildTwo->setTypOfGenesis(1);
@@ -176,23 +170,17 @@ void MT_Search::crossover(MT_Individual * ParentOne, MT_Individual * ParentTwo)
 	// 2 crossover points are used
 	case 1: 
 		{
-			NextProgPartForChildOne = new MT_Program(PTwoProgram, XPoints[2], (XPoints[4]-1));
-			NextProgPartForChildTwo = new MT_Program(POneProgram, XPoints[1], (XPoints[3]-1));
+			MT_Program SecondPartForChildOne(PTwoProgram, XPoints[2], (XPoints[4]-1));
+			MT_Program SecondPartForChildTwo(POneProgram, XPoints[1], (XPoints[3]-1));
 			
-			ChildOneProgram->insertProg(NextProgPartForChildOne);
-			ChildTwoProgram->insertProg(NextProgPartForChildTwo);
-			
-			delete NextProgPartForChildTwo;
-			delete NextProgPartForChildOne;
+			ChildOneProgram->insertProg(&SecondPartForChildOne);
+			ChildTwoProgram->insertProg(&SecondPartForChildTwo);
 
-			NextProgPartForChildOne = new MT_Program(POneProgram, XPoints[3], (POneProgram->getLength()-1));
-			NextProgPartForChildTwo = new MT_Program(PTwoProgram, XPoints[4], (PTwoProgram->getLength()-1));
+			MT_Program ThirdPartForChildOne(POneProgram, XPoints[3], (POneProgram->getLength()-1));
+			MT_Program ThirdPartForChildTwo(PTwoProgram, XPoints[4], (PTwoProgram->getLength()-1));
 			
-			ChildOneProgram->insertProg(NextProgPartForChildOne);
-			ChildTwoProgram->insertProg(NextProgPartForChildTwo);
-			
-			delete NextProgPartForChildTwo;
-			delete NextProgPartForChildOne;
+			ChildOneProgram->insertProg(&ThirdPartForChildOne);
+			ChildTwoProgram->insertProg(&ThirdPartForChildTwo);
 
 			ChildOne->setTypOfGenesis(2);
 			ChildTwo->setTypOfGenesis(2);
@@ -203,32 +191,23 @@ void MT_Search::crossover(MT_Individual * ParentOne, MT_Individual * ParentTwo)
 	// 3 crossover points are used
 	case 2:
 		{
-			NextProgPartForChildOne = new MT_Program(PTwoProgram, XPoints[2], (XPoints[4]-1));
-			NextProgPartForChildTwo = new MT_Program(POneProgram, XPoints[1], (XPoints[3]-1));
+			MT_Program SecondPartForChildOne(PTwoProgram, XPoints[2], (XPoints[4]-1));
+			MT_Program SecondPartForChildTwo(POneProgram, XPoints[1], (XPoints[3]-1));
 			
-			ChildOneProgram->insertProg(NextProgPartForChildOne);
-			ChildTwoProgram->insertProg(NextProgPartForChildTwo);
-			
-			delete NextProgPartForChildTwo;
-			delete NextProgPartForChildOne;
+			ChildOneProgram->insertProg(&SecondPartForChildOne);
+			ChildTwoProgram->insertProg(&SecondPartForChildTwo);
 
-			NextProgPartForChildOne = new MT_Program(POneProgram, XPoints[3], (XPoints[5]-1));
-			NextProgPartForChildTwo = new MT_Program(PTwoProgram, XPoints[4], (XPoints[6]-1));
+			MT_Program ThirdPartForChildOne(POneProgram, XPoints[3], (XPoints[5]-1));
+			MT_Program ThirdPartForChildTwo(PTwoProgram, XPoints[4], (XPoints[6]-1));
 
-			ChildOneProgram->insertProg(NextProgPartForChildOne);
-			ChildTwoProgram->insertProg(NextProgPartForChildTwo);
-						
-			delete NextProgPartForChildTwo;
-			delete NextProgPartForChildOne;
+			ChildOneProgram->insertProg(&ThirdPartForChildOne);
+			ChildTwoProgram->insertProg(&ThirdPartForChildTwo);
 
-			NextProgPartForChildOne = new MT_Program(PTwoProgram, XPoints[6], (PTwoProgram->getLength()-1));
-			NextProgPartForChildTwo = new MT_Program(POneProgram, XPoints[5], (POneProgram->getLength()-1));
+			MT_Program FourthPartForChildOne(PTwoProgram, XPoints[6], (PTwoProgram->getLength()-1));
+			MT_Program FourthPartForChildTwo(POneProgram, XPoints[5], (POneProgram->getLength()-1));
 			
-			ChildOneProgram->insertProg(NextProgPartForChildOne);
-			ChildTwoProgram->insertProg(NextProgPartForChildTwo);
-			
-			delete NextProgPartForChildTwo;
-			delete NextProgPartForChildOne;
+			ChildOneProgram->insertProg(&FourthPartForChildOne);
+			ChildTwoProgram->insertProg(&FourthPartForChildTwo);
 
 			ChildOne->setTypOfGenesis(3);
 			ChildTwo->setTypOfGenesis(3);
