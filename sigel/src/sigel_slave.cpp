@@ -237,9 +237,9 @@ int main( int argc, char *argv[] ) {
     QApplication a(argc, argv);
 
       QApplication::setStyle( QStyleFactory::create( "Fusion" ) );
-      SIG_SimulationWindow *simWindow = new SIG_SimulationWindow(nullptr, "simWindow");
+      SIG_SimulationWindow simWindow(nullptr, "simWindow");
 
-      simWindow->setWindowTitle("Simulation Visualisation");
+      simWindow.setWindowTitle("Simulation Visualisation");
 
       SIG_MovieStaticRunInfo staticRunInfo;
       staticRunInfo.setExperimentFileName( experimentFileName );
@@ -254,8 +254,8 @@ int main( int argc, char *argv[] ) {
         staticRunInfo.fitnessFunctionName = SIGEL_GP::SIG_GPFitnessFunctionRegistry::fitnessFunctions()[*shownFitnessIndex]->name();
       else
         staticRunInfo.fitnessFunctionName = fitnessFunctionId;
-      simWindow->setStaticRunInfo( staticRunInfo );
-      simWindow->show();
+      simWindow.setStaticRunInfo( staticRunInfo );
+      simWindow.show();
 
       // if we use the RemoteZORC-Fitnessfunction: run evaluation to transmit the program !
       const SIGEL_GP::SIG_GPRemoteZORCFitnessFunction remoteZORC;
@@ -263,7 +263,7 @@ int main( int argc, char *argv[] ) {
         remoteZORC.evalFitness( *program, *robot, *environment, *simulationParameters );
 
      try {
-       simWindow->visualizeThis( *modifiedRobot, *environment, *simulationParameters, *program );
+       simWindow.visualizeThis( *modifiedRobot, *environment, *simulationParameters, *program );
      }
      catch (SIGEL_Tools::SIG_Exception &e) {
        SIGEL_Tools::SIG_IO::cerr << e.getMessage() << Qt::flush;
@@ -271,8 +271,6 @@ int main( int argc, char *argv[] ) {
      }
 
      returnValue = a.exec();
-
-       delete simWindow;
 
      if ( !standAlone )
        pvm_exit();
