@@ -96,7 +96,7 @@ MT_GPManager::MT_GPManager(QTextStream &File) : QObject()
 
 
 
-	Selector = new MT_TournamentManager (Parent, Offspring, Randi, File);
+	Selector = std::make_unique< MT_TournamentManager >(Parent, Offspring, Randi, File);
 	if(Selector->getLastError() != 0)
 		LastError = Selector->getLastError();
 	FitnessTrainer = new MT_FitnessTrainer(File);
@@ -124,7 +124,6 @@ MT_GPManager::~MT_GPManager()
 	delete Randi;
 	delete Offspring;
 	delete Parent;
-	delete Selector;
 	delete FitnessTrainer;
 
 	pthread_mutex_unlock(&evolutionMutex);

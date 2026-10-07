@@ -152,7 +152,7 @@ private:
 	std::unique_ptr< MT_Search > Seeker;
 
 	/* responsibly for the selection of the offspring*/
-	MT_TournamentManager * Selector;
+	std::unique_ptr< MT_TournamentManager > Selector;
 
 protected:
 
