@@ -22,7 +22,6 @@
 */
 #include <qapplication.h>
 #include <QCoreApplication>
-#include <QHashSeed>
 #include <QStyleFactory>
 #include <qdir.h>
 
@@ -103,12 +102,6 @@ void installSigelStandardSignalHandler() {
 }
 
 int main( int argc, char *argv[] ) {
-  // Pin the QHash seed so iteration order is the same on every run.
-  // ~SIG_GUIGPExperiment takes each widgetDict widget off the widget stack that
-  // all experiments share, and that order can decide which page is current.
-  // No QHash order reaches a file.
-  QHashSeed::setDeterministicGlobalSeed();
-
   int arg;
 
   installSigelStandardSignalHandler();

@@ -917,6 +917,24 @@ classes and leave truncation a hard error. **They are not interchangeable.**
   and `build/coredrive`. Older entries in this file keep the name
   `sigel_eval`; they mean this program.
 
+**2026-10-07 — `main` IN `sigel.cpp` NO LONGER PINS THE `QHash` SEED.**
+
+- **Removed:** the call `QHashSeed::setDeterministicGlobalSeed()`, its
+  comment and its include. `sigel` runs with Qt's random seed.
+- **Why it did nothing:** the only hash containers in SIGEL are `widgetDict`
+  and `menuDict` in `SIG_GUIGPExperiment` and `experimentDict` in
+  `SIG_ExperimentListView`. The only loop whose order could matter is in
+  `~SIG_GUIGPExperiment`, which takes its pages off the shared widget stack.
+  `SIG_ExperimentListView::slotDeleteExperiment` gives the tree a new current
+  item in the same call, and `slotSelectionChanged` sets the page for it, so
+  the page that the stack picked is never shown.
+- **Tested:** with three experiments open, each tree item of an experiment
+  was selected and that experiment deleted, at each of the three positions.
+  30 runs with a random seed and one with the pinned seed showed the same
+  page in every case.
+- **Superseded:** the two older paragraphs in this file that say the call is
+  in `sigel.cpp`, and that the seed can decide which page is current.
+
 **2026-10-07 — DONE: ITEM 151, `main` IN `sigel.cpp` INSTALLS ITS SIGNAL HANDLER AS `sigel_slave.cpp` DOES.**
 
 - The six `std::signal` calls of `main` are in the function
