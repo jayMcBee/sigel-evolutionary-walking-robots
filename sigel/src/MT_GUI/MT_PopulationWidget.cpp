@@ -473,39 +473,29 @@ void MT_PopulationWidget::exportAsIndividuals(const QList<MT_PopListViewItem *> 
 void MT_PopulationWidget::slotLoadPop()
 {
 	QString fileName( QFileDialog::getOpenFileName(this, QString(), QString(), "Population Files (*.mpop);;All Files (*)") );
+	if(fileName.isEmpty())
+		return;
 
-	if(!fileName.isEmpty())
-	{
-		QFile file( fileName );
+	QFile file( fileName );
+	if(!file.open(QIODevice::ReadOnly))
+		return;
 
-		if(file.open(QIODevice::ReadOnly))
-		{
-			QTextStream str(&file);
+	QMessageBox box(QMessageBox::Warning, "Import Population",
+	        "Shall the current population be deleted or shall we append\n"
+	        "the new individuals?", QMessageBox::Ok | QMessageBox::Discard, this);
+	box.button(QMessageBox::Ok)->setText("Append");
+	box.button(QMessageBox::Discard)->setText("Delete");
+	box.setDefaultButton(QMessageBox::Ok);
+	box.setEscapeButton(QMessageBox::Ok);
 
-			QMessageBox box(QMessageBox::Warning, "Import Population",
-			        "Shall the current population be deleted or shall we append\n"
-			        "the new individuals?", QMessageBox::Ok | QMessageBox::Discard, this);
-			box.button(QMessageBox::Ok)->setText("Append");
-			box.button(QMessageBox::Discard)->setText("Delete");
-			box.setDefaultButton(QMessageBox::Ok);
-			box.setEscapeButton(QMessageBox::Ok);
-			if(box.exec() == QMessageBox::Discard)
-			{
-				// delete
-				population->loadPop(str);
-				onShow(gpManager, nullptr);	// update the GUI
+	QTextStream str(&file);
+	if(box.exec() == QMessageBox::Discard)
+		population->loadPop(str);
+	else
+		population->importPop(str);
 
-			}
-			else
-			{
-				// append
-				population->importPop(str);
-				onShow(gpManager, nullptr);
-
-			}
-			file.close();
-		}
-	}
+	onShow(gpManager, nullptr);	// update the GUI
+	file.close();
 }
 
 /***
@@ -514,24 +504,22 @@ void MT_PopulationWidget::slotLoadPop()
 void MT_PopulationWidget::slotSavePop()
 {
 	QString fileName( QFileDialog::getSaveFileName(this, QString(), QString(), "Population Files (*.mpop);;All Files (*)") );
+	if(fileName.isEmpty())
+		return;
 
-	if(!fileName.isEmpty())
+	if(fileName.right(5) != ".mpop")
+		fileName += ".mpop";
+
+	QFile file( fileName );
+	if(!file.open(QIODevice::WriteOnly))
 	{
-		if(fileName.right(5) != ".mpop")
-			fileName += ".mpop";
-		QFile file( fileName );
-
-		if(file.open(QIODevice::WriteOnly))
-		{
-			QTextStream str(&file);
-			population->writeToFilePop(str);
-			file.close();
-		}
-		else
-		{
-			QMessageBox::critical(this, "Save Population", "An error occurred while saving the population.\nThe operation is aborted.");
-		}
+		QMessageBox::critical(this, "Save Population", "An error occurred while saving the population.\nThe operation is aborted.");
+		return;
 	}
+
+	QTextStream str(&file);
+	population->writeToFilePop(str);
+	file.close();
 }
 
 /***
