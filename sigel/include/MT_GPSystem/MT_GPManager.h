@@ -138,7 +138,7 @@ private:
 
 	/* this individuals is equal to the individual into the Substituter !
 	* after a evolution loop it will updating */
-	MT_Individual * BestIndividual;
+	std::unique_ptr< MT_Individual > BestIndividual;
 	
 	
 	/* appraise the offspring*/

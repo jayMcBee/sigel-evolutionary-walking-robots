@@ -41,12 +41,12 @@ MT_GPManager::MT_GPManager(QTextStream &File) : QObject()
 		LastError = 1;
 	
 	if (GenerationNumber !=0)
-		BestIndividual = new MT_Individual(File);
+		BestIndividual = std::make_unique< MT_Individual >(File);
 		
 	Randi = new MT_Randomizer(File);
 	
 	if (GenerationNumber ==0)
-		BestIndividual = new MT_Individual(-1, Randi);
+		BestIndividual = std::make_unique< MT_Individual >(-1, Randi);
 
 	if(BestIndividual->getLastError()!= 0)
 		LastError = BestIndividual->getLastError();
@@ -120,7 +120,6 @@ MT_GPManager::MT_GPManager() : QObject()
 MT_GPManager::~MT_GPManager()
 {	
 
-	delete BestIndividual;
 	delete Randi;
 	delete Offspring;
 	delete Parent;
@@ -559,7 +558,7 @@ void MT_GPManager::exchangeBest()
 		{
 			MT_Individual * NewBestIndi= Parent->getBestIndividual();
 			
-			ChangeNecessary = FitnessTrainer->calculateFitness(BestIndividual);
+			ChangeNecessary = FitnessTrainer->calculateFitness(BestIndividual.get());
 
 			if ((BestIndividual->getFitness())<(NewBestIndi->getFitness()))
 			{
@@ -569,7 +568,7 @@ void MT_GPManager::exchangeBest()
 		
 				// Recompute so that Outcome/CorrectFit hold correct values, not those of the previous bestIndividual 
 				BestIndividual->setTrainingsSet(-1);
-				FitnessTrainer->calculateFitness(BestIndividual);
+				FitnessTrainer->calculateFitness(BestIndividual.get());
 
 // lock the interpreter so we can safely exchange the program
 	pthread_mutex_lock(&(Substituter->interpreterMutex));
