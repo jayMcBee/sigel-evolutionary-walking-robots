@@ -44,10 +44,10 @@ namespace SIGEL_Simulation
                                         double screwTheta )
     : dynaMechsLinkNumber( dynaMechsLinkNumber ),
       link( link ),
-      screwD( screwD ),
-      screwTheta( screwTheta ),
       dynaMechsLink( dynaMechsLink ),
-      transformation( 4, 4 )
+      transformation( 4, 4 ),
+      screwD( screwD ),
+      screwTheta( screwTheta )
   {
     for (int j=1; j<=3; j++)
       transformation( 4, j ) = 0;
@@ -240,9 +240,7 @@ namespace SIGEL_Simulation
     return transformation;
   };
 
-  NEWMAT::Matrix SIG_DynaMechsLink::buildTranslationMatrix( double x,
-							    double y,
-							    double z )
+  NEWMAT::Matrix SIG_DynaMechsLink::buildTranslationMatrix( double x, double y, double z )
   {
     NEWMAT::Matrix transformation(4, 4);
 

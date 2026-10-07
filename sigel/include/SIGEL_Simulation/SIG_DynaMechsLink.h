@@ -51,10 +51,6 @@ class SIG_DynaMechsLink
 
     SIGEL_Robot::SIG_Link const * const link;
 
-    double const screwD;
-
-    double const screwTheta;
-
     dmRigidBody * const dynaMechsLink;
 
     NEWMAT::Matrix transformation;
@@ -65,15 +61,18 @@ class SIG_DynaMechsLink
 
     dmZScrewTxLink *getScrewLink() const { return screwLink.get(); }
 
+
+  private:
+
     NEWMAT::Matrix buildXRotationMatrix( double angle );
 
     NEWMAT::Matrix buildZRotationMatrix( double angle );
 
-    NEWMAT::Matrix buildTranslationMatrix( double x,
-					   double y,
-					   double z );
+    NEWMAT::Matrix buildTranslationMatrix( double x, double y, double z );
 
-  private:
+    double const screwD;
+
+    double const screwTheta;
 
     std::unique_ptr< dmZScrewTxLink > screwLink;
   };
