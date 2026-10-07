@@ -251,7 +251,7 @@ namespace SIGEL_GP
       int   idx = 0;
 
       // send all data
-      while (txtToSend[idx].toLatin1() != 0)
+      while (idx < txtToSend.size())
       {
          // put next char to serial interface
          c = txtToSend[idx].toLatin1();
