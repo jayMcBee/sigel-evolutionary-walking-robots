@@ -917,6 +917,40 @@ classes and leave truncation a hard error. **They are not interchangeable.**
   and `build/coredrive`. Older entries in this file keep the name
   `sigel_eval`; they mean this program.
 
+**2026-10-07 — DONE: ITEM 141, `main` IN `sigel_slave.cpp` IS SPLIT BY JOB.**
+
+- **Before:** one `main` did three jobs: it showed the first individual of an
+  experiment file, it showed an individual that the master sent over PVM, and
+  it computed a fitness for the master. The pointers `robot`, `environment`,
+  `simulationParameters`, `program` and `modifiedRobot` owned their object in
+  one job and pointed at another owner's object in the other, so nothing
+  deleted them.
+- **Now:** `main` installs the signal handler, reads the arguments and calls
+  `showFirstIndividualOfExperimentFile` or `runPVMJob`. `runPVMJob` receives
+  the job and calls `showIndividualFromPVM` or `computeFitness`. Both show
+  functions call `showSimulation`. `sendFitnessToMaster` sends the fitness for
+  `runPVMJob` and for the signal handler. Each object is a local object of the
+  function that does its job, and is destroyed when that function returns.
+  This also closes the place `main` in `sigel_slave.cpp` of item 8.
+- **Changed order:** in `showIndividualFromPVM` the program goes to Remote
+  ZORC before the simulation window is made, so the distance dialog has no
+  parent window. `pvm_exit()` now also runs when the simulation cannot be
+  built.
+- **Defect found on the way:**
+  `SIG_GPRemoteZORCFitnessFunction::sendOverSerialLine` read one character
+  past the end of its text. Qt aborts on that index, so every Remote ZORC job
+  with a robot that answered ended in the signal handler. The loop now ends
+  at the length of the text.
+- **Measured:** the 21 fitness rows are identical on both builds with no
+  sanitizer report; the part order and the PVM check pass; `check.sh` has 819
+  pass and 0 fail. An evolution with the sanitizer build of `sigel_slave` ran
+  67 slave processes with no report, and all 42 fitness values that the
+  master stored in that run are equal to the values that `coredrive` computes
+  for the same individuals. `showIndividualFromPVM` ran in the sanitizer
+  build with and without Remote ZORC, against a stand-in for the robot on a
+  pseudo-terminal: the dialog came first, the window came after it and
+  stayed, and the slave ended with no report.
+
 **2026-10-05 — DONE: ITEM 137, A SECOND SIMULATION IN ONE PROCESS IS REFUSED.**
 
 - **Before:** DynaMechs has one current environment. A second
