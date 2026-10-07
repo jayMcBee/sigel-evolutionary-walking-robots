@@ -67,6 +67,12 @@ Paths are relative to `sigel/`, the source tree.
   constructor throws. Review its design, and decide whether a standard
   C++20 construct does the same job.
 
+- [ ] **151. `main` in `sigel.cpp`: install the signal handler as
+  `sigel_slave.cpp` does.** `sigel_slave.cpp` has
+  `installSigelStandardSignalHandler`, one function that holds the six
+  `std::signal` calls. `main` in `sigel.cpp` still has its six calls and
+  their comment in line. Give it the same function.
+
 - [ ] **36. `SIG_Material::FrictionValue` could be a value type.**
   `FrictionValue` values would drop the `new` and the `qDeleteAll`, as D8 did
   for `SIG_Register`; tidiness only. D11 left it as it was, by decision,
