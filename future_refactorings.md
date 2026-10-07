@@ -56,8 +56,6 @@ Paths are relative to `sigel/`, the source tree.
     `createDoubleTransIndi`.
   - [ ] `MT_Evaluator::spawnTask`: the `MT_TranslatedIndividual` from
     `translatedSIGProg`.
-  - [ ] `MT_PopulationWidget::getSelectedItems`: the list, used in
-    `slotExpInd`.
 
   *Not in this item:*
   - Lists of raw pointers, among them the elements of `MT_Statistics`, which

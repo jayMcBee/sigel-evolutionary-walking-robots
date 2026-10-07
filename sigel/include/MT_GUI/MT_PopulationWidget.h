@@ -37,7 +37,7 @@ private:
 	MT_Population *population;
 	MT_GPManager  *gpManager;
 	MT_MainWindow *mainWindow;
-	QList<MT_PopListViewItem *>* getSelectedItems();
+	QList<MT_PopListViewItem *> getSelectedItems();
 
 private slots:
 	void slotRButtonClicked(const QPoint &pos);

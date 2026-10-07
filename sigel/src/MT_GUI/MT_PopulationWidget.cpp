@@ -372,11 +372,11 @@ void MT_PopulationWidget::slotImpInd()
  ***/
 void MT_PopulationWidget::slotExpInd()
 {
-	QList<MT_PopListViewItem *> *list = getSelectedItems();
+	QList<MT_PopListViewItem *> list = getSelectedItems();
 
 	bool saveAsPop = false;
 	QString fileName;
-	if(list->count() > 1){
+	if(list.count() > 1){
 		QMessageBox box(QMessageBox::Information, "Save Individuals", "There is more than one individual selected.\n"
 			"Shall we save them as a population?", QMessageBox::Yes | QMessageBox::No, this);
 		box.button(QMessageBox::Yes)->setText("Save as population");
@@ -397,8 +397,8 @@ void MT_PopulationWidget::slotExpInd()
 				
 				MT_Population npop;
 				npop.changePopSize(0);
-				for(int i=0; i<list->count(); i++){
-					MT_PopListViewItem *actItem = list->at(i);
+				for(int i=0; i<list.count(); i++){
+					MT_PopListViewItem *actItem = list.at(i);
 					npop.addIndividual(population->getIndividual(actItem->getPos()));
 				}
 
@@ -415,14 +415,14 @@ void MT_PopulationWidget::slotExpInd()
 		fileName = QFileDialog::getSaveFileName(this, QString(), QString(), "Individual Files (*.mind);;All Files (*)");
 		if(!fileName.isEmpty()){
 
-			for(int i=0; i<list->count(); i++){
+			for(int i=0; i<list.count(); i++){
 				QFile file( fileName + QString("%1.mind").arg(i) );
 				if(file.exists() && QMessageBox::Ok != QMessageBox::warning(this, "Save Population", "There is another file with this name. This will overwrite\n"
 					"the existing file. Do you really want to continue?", QMessageBox::Ok | QMessageBox::Cancel, QMessageBox::Cancel))
 					return;
 				if(file.open(QIODevice::WriteOnly)){
 					QTextStream str(&file);
-					population->getIndividual(list->at(i)->getPos())->writeToFileIndi(str);
+					population->getIndividual(list.at(i)->getPos())->writeToFileIndi(str);
 					file.close();
 				} else {
 					QMessageBox::critical(this, "Save Individual", "An error occurred while saving the individual.\nThe operation is aborted.");
@@ -496,13 +496,13 @@ void MT_PopulationWidget::slotSavePop()
 /***
  * collects all selected items
  ***/
-QList<MT_PopListViewItem *> * MT_PopulationWidget::getSelectedItems()
+QList<MT_PopListViewItem *> MT_PopulationWidget::getSelectedItems()
 {
-	QList<MT_PopListViewItem *> *lst = new QList<MT_PopListViewItem *>;
+	QList<MT_PopListViewItem *> lst;
 	QTreeWidgetItemIterator it(individualListView);
 	for(; (*it); ++it){
 		if((*it)->isSelected())
-			lst->append(static_cast<MT_PopListViewItem*>(*it));
+			lst.append(static_cast<MT_PopListViewItem*>(*it));
 	}
 	return lst;
 }
