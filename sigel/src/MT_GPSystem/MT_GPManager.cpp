@@ -72,11 +72,11 @@ MT_GPManager::MT_GPManager(QTextStream &File) : QObject()
 	if ((PresentLine == PopulationString) && !(File.atEnd()))
 	{
 		if (GenerationNumber !=0)
-			Parent= new MT_Population(File);
+			Parent = std::make_unique< MT_Population >(File);
 		else
 		{
 			int NewParentSize = (File.readLine()).toInt();
-			Parent= new MT_Population(Randi,NewParentSize);
+			Parent = std::make_unique< MT_Population >(Randi,NewParentSize);
 		}
 	}
 	else 
@@ -90,13 +90,13 @@ MT_GPManager::MT_GPManager(QTextStream &File) : QObject()
 		LastError = 3;
 	}
 
-	Seeker = std::make_unique< MT_Search >(Parent, Offspring, Randi, File);
+	Seeker = std::make_unique< MT_Search >(Parent.get(), Offspring, Randi, File);
 	if(Seeker->getLastError() != 0)
 		LastError = Seeker->getLastError();
 
 
 
-	Selector = std::make_unique< MT_TournamentManager >(Parent, Offspring, Randi, File);
+	Selector = std::make_unique< MT_TournamentManager >(Parent.get(), Offspring, Randi, File);
 	if(Selector->getLastError() != 0)
 		LastError = Selector->getLastError();
 	FitnessTrainer = std::make_unique< MT_FitnessTrainer >(File);
@@ -122,7 +122,6 @@ MT_GPManager::~MT_GPManager()
 
 	delete Randi;
 	delete Offspring;
-	delete Parent;
 
 	pthread_mutex_unlock(&evolutionMutex);
 }
@@ -339,7 +338,7 @@ MT_Statistics * MT_GPManager::getGPStatistics()
 MT_Population * MT_GPManager::getParent()
 {
 
-	return Parent;
+	return Parent.get();
 }
 
 MT_Randomizer * MT_GPManager::getRandomizer()
