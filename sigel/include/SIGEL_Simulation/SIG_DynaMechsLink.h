@@ -27,6 +27,7 @@
 
 #include <QList>
 
+#include <memory>
 #include <dm.h>
 #include <dmRigidBody.hpp>
 #include <dmZScrewTxLink.hpp>
@@ -54,7 +55,7 @@ class SIG_DynaMechsLink
 
     double const screwTheta;
 
-    dmZScrewTxLink *screwLink;
+    std::unique_ptr< dmZScrewTxLink > screwLink;
 
     dmRigidBody * const dynaMechsLink;
 

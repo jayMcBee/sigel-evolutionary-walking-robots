@@ -46,7 +46,6 @@ namespace SIGEL_Simulation
       link( link ),
       screwD( screwD ),
       screwTheta( screwTheta ),
-      screwLink( nullptr ),
       dynaMechsLink( dynaMechsLink ),
       transformation( 4, 4 )
   {
@@ -56,7 +55,7 @@ namespace SIGEL_Simulation
     transformation( 4, 4 ) = 1;
 
     if ((screwD != 0 ) || (screwTheta != 0))
-      screwLink = new dmZScrewTxLink( screwD, screwTheta );
+      screwLink = std::make_unique< dmZScrewTxLink >( screwD, screwTheta );
 
     SIGEL_Robot::SIG_Geometry const *geometry = link->getGeometry();
 
