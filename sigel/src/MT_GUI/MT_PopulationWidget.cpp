@@ -277,30 +277,25 @@ void MT_PopulationWidget::slotAddInd()
 	// the number of individuals to create
 	// shows a progressbar
 	MT_AddIndividualsWidgetBase numDialog(this, nullptr, true);
-	int number = 0;
+	if(QDialog::Accepted != numDialog.exec())
+		return;
 
-	if(QDialog::Accepted  == numDialog.exec())
+	int number = numDialog.spinboxNumber->value();
+
+	QProgressDialog progress("Generating individuals", QString(), 0, number, this);
+	progress.setWindowModality(Qt::ApplicationModal);
+
+	MT_Individual *newInd;
+	MT_Randomizer *rand = gpManager->getRandomizer();
+	for(int i=0; i<number; i++)
 	{
-
-		// ok button pressed
-		number = numDialog.spinboxNumber->value();
-
-		QProgressDialog progress("Generating individuals", QString(), 0, number, this);
-		progress.setWindowModality(Qt::ApplicationModal);
-
-		MT_Individual *newInd;
-		MT_Randomizer *rand = gpManager->getRandomizer();
-		for(int i=0; i<number; i++)
-		{
-			progress.setValue(i);
-			int pos = population->createNewIndi(rand);
-			newInd = population->getIndividual(pos);
-			new MT_PopListViewItem(individualListView, newInd);
-			emit numChanged();
-		}
-		progress.setValue(number);
+		progress.setValue(i);
+		int pos = population->createNewIndi(rand);
+		newInd = population->getIndividual(pos);
+		new MT_PopListViewItem(individualListView, newInd);
+		emit numChanged();
 	}
-
+	progress.setValue(number);
 }
 
 /***
