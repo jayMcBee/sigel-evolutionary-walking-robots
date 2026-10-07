@@ -225,7 +225,7 @@ class SIG_Program
  * length will be increased, The new line can now be accessed with an index.
  */
    public:
-   void	appendLine(SIGEL_Program::SIG_ProgramLine *l);
+   void	appendLine(SIGEL_Program::SIG_ProgramLine const &line);
 
 /**
  * This function inserts a program line at position no.
@@ -236,7 +236,7 @@ class SIG_Program
  * be increased. The new line can now be accessed with an index,
  */
    public:
-   void insertLine(long no, SIGEL_Program::SIG_ProgramLine *l);
+   void insertLine(long no, SIGEL_Program::SIG_ProgramLine const &line);
 
 
 /**

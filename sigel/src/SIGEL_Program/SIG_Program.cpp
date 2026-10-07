@@ -45,11 +45,7 @@ SIGEL_Program::SIG_Program& SIGEL_Program::SIG_Program::operator =(SIGEL_Program
 #endif
 
   for( long i=0; i<prg.getProgramLength(); i++ )
-  {
-     SIG_ProgramLine *newProgLine = new SIG_ProgramLine();
-     *newProgLine = *prg.getLine( i );
-     appendLine( newProgLine );
-  }
+     appendLine( *prg.getLine( i ) );
 
 #ifdef SIG_DEBUG
   if( prg.getProgramLength() != lines.size() )
@@ -122,8 +118,7 @@ void SIGEL_Program::SIG_Program::readFromFile( QTextStream &file )
    int                             pos=-1;
    int                             oldpos=0;
    int                             lineCnt=0;
-   SIGEL_Program::SIG_ProgramLine *prgLine;
- 
+
 #ifdef SIG_DEBUG
 
    SIGEL_Tools::SIG_IO::cerr << "Reading Program: ..." << Qt::endl;
@@ -138,8 +133,8 @@ void SIGEL_Program::SIG_Program::readFromFile( QTextStream &file )
    while((pos=prg.indexOf(QChar('\n'), oldpos, Qt::CaseInsensitive))!=-1)
      {
         tmpLine = prg.mid( oldpos, pos - oldpos );
-        prgLine = new SIGEL_Program::SIG_ProgramLine();
-        if( prgLine->readFromFile( tmpLine, prgLine ) )
+        SIGEL_Program::SIG_ProgramLine prgLine;
+        if( prgLine.readFromFile( tmpLine, &prgLine ) )
 	  {
             appendLine( prgLine );
             lineCnt++;
@@ -189,10 +184,10 @@ void SIGEL_Program::SIG_Program::deleteLine( long no )
 }
 
 
-void SIGEL_Program::SIG_Program::appendLine( SIGEL_Program::SIG_ProgramLine *l )
+void SIGEL_Program::SIG_Program::appendLine( SIGEL_Program::SIG_ProgramLine const &line )
 {
   lines.resize( getProgramLength() + 1 );
-  lines[ getProgramLength() - 1 ] = l; 
+  lines[ getProgramLength() - 1 ] = new SIGEL_Program::SIG_ProgramLine( line );
 
 #ifdef SIG_DEBUG
   for ( long int i=0; i<lines.size(); i++ )
@@ -204,14 +199,14 @@ void SIGEL_Program::SIG_Program::appendLine( SIGEL_Program::SIG_ProgramLine *l )
 #endif
 }
 
-void SIGEL_Program::SIG_Program::insertLine( long no, SIGEL_Program::SIG_ProgramLine *l )
+void SIGEL_Program::SIG_Program::insertLine( long no, SIGEL_Program::SIG_ProgramLine const &line )
 {
   lines.resize( getProgramLength() + 1 );
 
   for( long i=lines.size()-1; i>no; i--)
          lines[ i ]=lines[ i - 1 ];  
 
-  lines[no] = l;
+  lines[no] = new SIGEL_Program::SIG_ProgramLine( line );
 }
 
    
@@ -291,14 +286,12 @@ void SIGEL_Program::SIG_Program::checkLength( long minimumLength,
 
      for( long i = 0; i < minimumLength - prgLength; i++ )
        {
-        SIG_ProgramLine *newLine = new SIGEL_Program::SIG_ProgramLine( r, 
-								       languageP,
-								       prob );
+        SIGEL_Program::SIG_ProgramLine newLine( r, languageP, prob );
 
         // If there is a problem during the evolution, try to delete the following
         // instruction:
 
-        newLine->setRobotinstruction( SIGEL_Program::NOP, 0, 0 );
+        newLine.setRobotinstruction( SIGEL_Program::NOP, 0, 0 );
 
         // If the problem is still existing, please try to delete the line 135 (resizeElements( 0 );)
         // within the function SIGEL_Program::SIG_ProgramLine::setRobotinstruction.
@@ -364,9 +357,7 @@ void SIGEL_Program::SIG_Program::generateRandomProgram( SIGEL_GP::SIG_GPParamete
 
     for( long x=0; x<n; x++ )
       {
-        SIG_ProgramLine *newLine = new SIGEL_Program::SIG_ProgramLine( random, 
-								       languageP,
-								       param.getInstructionProbabilities() );
+        SIGEL_Program::SIG_ProgramLine newLine( random, languageP, param.getInstructionProbabilities() );
 
         appendLine( newLine );
 

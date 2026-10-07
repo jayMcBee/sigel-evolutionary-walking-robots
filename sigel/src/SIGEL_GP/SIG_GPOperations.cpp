@@ -127,8 +127,6 @@ QList<SIGEL_GP::SIG_GPIndividual *> SIGEL_GP::SIG_GPOperations::crossOver( SIGEL
 	// has a chance of 3:2 to be selected !
   long const generalRecombinationType = randomizer.getRandomInt(5);
 
-	SIGEL_Program::SIG_ProgramLine *newProgLine = nullptr;
-  SIGEL_Program::SIG_ProgramLine const *sourceProgLine = nullptr;
 
 	// Recombination/Crossover, Variant 1:
 	// (just guessing from the code, obviously nobody thought it was worth commenting..  -jan)
@@ -139,37 +137,25 @@ QList<SIGEL_GP::SIG_GPIndividual *> SIGEL_GP::SIG_GPOperations::crossOver( SIGEL
 		// copy first part of program 1
 		for (long int i = 0; i < crossPoint1; i++)
 		{
-	  	newProgLine = new SIGEL_Program::SIG_ProgramLine();
-	  	sourceProgLine = winnerProgram1.getLine( i );
-	  	*newProgLine = *sourceProgLine;
-	  	newProgram1.appendLine( newProgLine );
+	  	newProgram1.appendLine( *winnerProgram1.getLine( i ) );
 		}
 
 		// append second part of program 2
 		for (long int j = crossPoint2; j < winnerProgram2.getProgramLength(); j++)
 		{
-			newProgLine = new SIGEL_Program::SIG_ProgramLine();
-			sourceProgLine = winnerProgram2.getLine( j );
-			*newProgLine = *sourceProgLine;
-			newProgram1.appendLine( newProgLine );
+			newProgram1.appendLine( *winnerProgram2.getLine( j ) );
 		}
 
 		// the other way round:  copy first part of prog. 2
 		for (long int k = 0; k < crossPoint2; k++)
 		{
-			newProgLine = new SIGEL_Program::SIG_ProgramLine();
-			sourceProgLine = winnerProgram2.getLine( k );
-			*newProgLine = *sourceProgLine;
-			newProgram2.appendLine( newProgLine );
+			newProgram2.appendLine( *winnerProgram2.getLine( k ) );
 		}
 
 		// you might have guessed it: append 2. part of first program
 		for (long int l = crossPoint1; l < winnerProgram1.getProgramLength(); l++)
 		{
-			newProgLine = new SIGEL_Program::SIG_ProgramLine();
-			sourceProgLine = winnerProgram1.getLine( l );
-			*newProgLine = *sourceProgLine;
-			newProgram2.appendLine( newProgLine );
+			newProgram2.appendLine( *winnerProgram1.getLine( l ) );
 		}
 	}
 
@@ -180,38 +166,22 @@ QList<SIGEL_GP::SIG_GPIndividual *> SIGEL_GP::SIG_GPOperations::crossOver( SIGEL
 	{
 		for( long int i = 0; i < crossPoint2; i++ )
 		{
-			newProgLine    = new SIGEL_Program::SIG_ProgramLine();
-			sourceProgLine = winnerProgram2.getLine( i );
-			*newProgLine   = *sourceProgLine;
-
-			newProgram2.appendLine( newProgLine );
+			newProgram2.appendLine( *winnerProgram2.getLine( i ) );
 		}
 
 		for( long int j = crossPoint1; j < winnerProgram1.getProgramLength(); j++ )
 		{
-				newProgLine    = new SIGEL_Program::SIG_ProgramLine();
-				sourceProgLine = winnerProgram1.getLine( j );
-				*newProgLine   = *sourceProgLine;
-
-				newProgram2.appendLine( newProgLine );
+				newProgram2.appendLine( *winnerProgram1.getLine( j ) );
 		}
 
 		for( long int k = 0; k < crossPoint1; k++ )
 		{
-			newProgLine    = new SIGEL_Program::SIG_ProgramLine();
-			sourceProgLine = winnerProgram1.getLine( k );
-			*newProgLine   = *sourceProgLine;
-
-			newProgram1.appendLine( newProgLine );
+			newProgram1.appendLine( *winnerProgram1.getLine( k ) );
 		}
 
 		for( long int m = crossPoint2; m < winnerProgram2.getProgramLength(); m++ )
 		{
-			newProgLine    = new SIGEL_Program::SIG_ProgramLine();
-			sourceProgLine = winnerProgram2.getLine( m );
-			*newProgLine   = *sourceProgLine;
-
-			newProgram1.appendLine( newProgLine );
+			newProgram1.appendLine( *winnerProgram2.getLine( m ) );
 		}
 	}
 
@@ -222,56 +192,37 @@ QList<SIGEL_GP::SIG_GPIndividual *> SIGEL_GP::SIG_GPOperations::crossOver( SIGEL
 		// newprog1 -- copy first part of program 1
 		for (long int i = 0; i < crossPoint1; i++)
 		{
-	  	newProgLine = new SIGEL_Program::SIG_ProgramLine();
-	  	sourceProgLine = winnerProgram1.getLine( i );
-	  	*newProgLine = *sourceProgLine;
-
-	  	newProgram1.appendLine( newProgLine );
+	  	newProgram1.appendLine( *winnerProgram1.getLine( i ) );
 		}
 
 		// newprog1 -- append sequence of program 2
 		for (long int j = crossPoint2; j <= crossPoint2+segLen2; j++)
 		{
-			newProgLine = new SIGEL_Program::SIG_ProgramLine();
-			sourceProgLine = winnerProgram2.getLine( j );
-			*newProgLine = *sourceProgLine;
-			newProgram1.appendLine( newProgLine );
+			newProgram1.appendLine( *winnerProgram2.getLine( j ) );
 		}
 
 		// newprog1 -- eventually append rest of program 1
 		for (long int k = crossPoint1+segLen1; k < winnerProgram1.getProgramLength(); k++)
 		{
-			newProgLine = new SIGEL_Program::SIG_ProgramLine();
-			sourceProgLine = winnerProgram1.getLine( k );
-			*newProgLine = *sourceProgLine;
-			newProgram1.appendLine( newProgLine );
+			newProgram1.appendLine( *winnerProgram1.getLine( k ) );
 		}
 
 		// newprog2 -- program 2, part A
 		for (long int l = 0; l < crossPoint2; l++)
 		{
-	  	newProgLine = new SIGEL_Program::SIG_ProgramLine();
-	  	sourceProgLine = winnerProgram2.getLine( l );
-	  	*newProgLine = *sourceProgLine;
-	  	newProgram2.appendLine( newProgLine );
+	  	newProgram2.appendLine( *winnerProgram2.getLine( l ) );
 		}
 
 		// newprog2 -- program 1 c/o-seq.
 		for (long int m = crossPoint1; m <= crossPoint1+segLen1; m++)
 		{
-			newProgLine = new SIGEL_Program::SIG_ProgramLine();
-			sourceProgLine = winnerProgram1.getLine( m );
-			*newProgLine = *sourceProgLine;
-			newProgram2.appendLine( newProgLine );
+			newProgram2.appendLine( *winnerProgram1.getLine( m ) );
 		}
 
 		// newprog2 -- program 2, part B
 		for (long int n = crossPoint2+segLen2; n < winnerProgram2.getProgramLength(); n++)
 		{
-			newProgLine = new SIGEL_Program::SIG_ProgramLine();
-			sourceProgLine = winnerProgram2.getLine( n );
-			*newProgLine = *sourceProgLine;
-			newProgram2.appendLine( newProgLine );
+			newProgram2.appendLine( *winnerProgram2.getLine( n ) );
 		}
 	}
 
@@ -383,7 +334,6 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::mutation( SIGEL_GP::SIG_
   int        op1                  = 0;
   int        op2                  = 0;
   SIGEL_Program::Robotinstruction instructionType;
-  SIGEL_Program::SIG_ProgramLine  *newProgLine ;
   long int   mutPoint             = 0;
   long int   numberOfOperands     = 0;
   int        historyInfo;
@@ -617,9 +567,7 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::mutation( SIGEL_GP::SIG_
 
 #endif
 
-        newProgLine = new SIGEL_Program::SIG_ProgramLine( randomizer, 
-							languageP, 
-							gpParameter.getInstructionProbabilities() );
+        SIGEL_Program::SIG_ProgramLine newProgLine( randomizer, languageP, gpParameter.getInstructionProbabilities() );
 
         newProgram.insertLine( mutPoint, newProgLine );
 
@@ -651,9 +599,7 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::mutation( SIGEL_GP::SIG_
 
 #endif
 
-            newProgLine = new SIGEL_Program::SIG_ProgramLine( randomizer, 
-							      languageP, 
-							      gpParameter.getInstructionProbabilities() );
+            SIGEL_Program::SIG_ProgramLine newProgLine( randomizer, languageP, gpParameter.getInstructionProbabilities() );
 
             newProgram.insertLine( mutPoint, newProgLine );
           }
