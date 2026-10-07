@@ -300,12 +300,12 @@ MT_TranslatedIndividual * MT_Classifier::createDoubleTransIndi(SIGEL_Program::SI
 		// WARNING: if the SIGEL instruction from SIGProg is JMP X, NOP, Sense ...
 		// a 0 is substituted for the missing operand(s). Any alternative?
 
-		SIGEL_Program::SIG_ProgramLine const &SIG_ProLine = SigProgOne->getLine(i);
-		(*OperandOne)[i]= SIG_ProLine.getElement(0);
-		(*OperandTwo)[i]= SIG_ProLine.getElement(1);
+		SIGEL_Program::SIG_ProgramLine const &programLine = SigProgOne->getLine(i);
+		(*OperandOne)[i]= programLine.getElement(0);
+		(*OperandTwo)[i]= programLine.getElement(1);
 
 
-		switch( SIG_ProLine.getRobotinstructionType() )
+		switch( programLine.getRobotinstructionType() )
 		{
 		case SIGEL_Program::COPY: (*Instruktion)[i]= 1; break;
 		case SIGEL_Program::LOAD: (*Instruktion)[i]= 2; break;
@@ -324,7 +324,7 @@ MT_TranslatedIndividual * MT_Classifier::createDoubleTransIndi(SIGEL_Program::SI
 		case SIGEL_Program::NOP: (*Instruktion)[i]= 15; break;
 		}
 
-		switch( SIG_ProLine.getRobotinstructionType() )
+		switch( programLine.getRobotinstructionType() )
 		{
 		case SIGEL_Program::COPY: (*MData)[1] ++ ; break;
 		case SIGEL_Program::LOAD: (*MData)[2] ++; break;
@@ -351,12 +351,12 @@ MT_TranslatedIndividual * MT_Classifier::createDoubleTransIndi(SIGEL_Program::SI
 		// WARNING: if the SIGEL instruction from SIGProg is JMP X, NOP, Sense ...
 		// a 0 is substituted for the missing operand(s). Any alternative?
 
-		SIGEL_Program::SIG_ProgramLine const &SIG_ProLine = SigProgTwo->getLine(i);
-		(*OperandOne)[i+SigProgOneSize]= SIG_ProLine.getElement(0);
-		(*OperandTwo)[i+SigProgOneSize]= SIG_ProLine.getElement(1);
+		SIGEL_Program::SIG_ProgramLine const &programLine = SigProgTwo->getLine(i);
+		(*OperandOne)[i+SigProgOneSize]= programLine.getElement(0);
+		(*OperandTwo)[i+SigProgOneSize]= programLine.getElement(1);
 
 
-		switch( SIG_ProLine.getRobotinstructionType() )
+		switch( programLine.getRobotinstructionType() )
 		{
 		case SIGEL_Program::COPY: (*Instruktion)[i+SigProgOneSize]= 1; break;
 		case SIGEL_Program::LOAD: (*Instruktion)[i+SigProgOneSize]= 2; break;
@@ -375,7 +375,7 @@ MT_TranslatedIndividual * MT_Classifier::createDoubleTransIndi(SIGEL_Program::SI
 		case SIGEL_Program::NOP: (*Instruktion)[i+SigProgOneSize]= 15; break;
 		}
 	
-		switch( SIG_ProLine.getRobotinstructionType() )
+		switch( programLine.getRobotinstructionType() )
 		{
 		case SIGEL_Program::COPY: (*MData)[17] ++ ; break;
 		case SIGEL_Program::LOAD: (*MData)[18] ++; break;
