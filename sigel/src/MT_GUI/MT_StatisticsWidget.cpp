@@ -120,9 +120,11 @@ void MT_StatisticsWidget::updateGUI(int mtGen, int sigGen)
 			numEstimations->setText(QString::number(sigStat->numMetaEst->at(sigIdx)));
 
 			// calculate the total numbers of Sim/Est
-			for(soFarSigIdx; soFarSigIdx<sigGen; soFarSigIdx++){
+			// soFarSigIdx is a member: the loop adds the generations not yet in the totals, through generation sigGen; it adds nothing when sigGen is -1.
+			while(soFarSigIdx < sigGen){
 				totalSim += sigStat->numCorrectEst->at(soFarSigIdx);
 				totalEst += sigStat->numMetaEst->at(soFarSigIdx);
+				soFarSigIdx++;
 			}
 		}
 		numSimulationsTotal->setText(QString::number(totalSim));
@@ -134,7 +136,7 @@ void MT_StatisticsWidget::updateGUI(int mtGen, int sigGen)
 	if(stat && sigGen == -1 && metaGens > 0){
 		generationsTotal->setText(QString::number(metaGens));
 		double tmpMax;
-		for(soFarMetIdx; soFarMetIdx<metaGens; soFarMetIdx++){
+		while(soFarMetIdx < metaGens){
 			el = stat->getStatisticElement(soFarMetIdx);
 			if(el){
 				totalVarFit += el->Variance;
@@ -143,6 +145,7 @@ void MT_StatisticsWidget::updateGUI(int mtGen, int sigGen)
 				if(totalMaxFit<tmpMax)
 					totalMaxFit = tmpMax;
 			}
+			soFarMetIdx++;
 		}
 		varFitnessTotal->setText(QString::number(totalVarFit / static_cast<double>(soFarMetIdx)));
 		maxFitnessTotal->setText(QString::number(totalMaxFit));
