@@ -497,12 +497,10 @@ SIGEL_Simulation::SIG_DynaMechsLink *SIGEL_Simulation::SIG_DynaMechsSimulationDa
 
   dmLink *internalPredecessor = dynaMechsLinks[ predIndex ]->dynaMechsLink;
 
-  dmZScrewTxLink *screwPredecessor = dynaMechsLink->screwLink.get();
-
-  if (screwPredecessor)
+  if (dynaMechsLink->getScrewLink())
     {
-      dynaMechsSystem.addLink( screwPredecessor, internalPredecessor );
-      dynaMechsSystem.addLink( internalDynaMechsLink, screwPredecessor );
+      dynaMechsSystem.addLink( dynaMechsLink->getScrewLink(), internalPredecessor );
+      dynaMechsSystem.addLink( internalDynaMechsLink, dynaMechsLink->getScrewLink() );
     }
   else
     dynaMechsSystem.addLink( internalDynaMechsLink, internalPredecessor );

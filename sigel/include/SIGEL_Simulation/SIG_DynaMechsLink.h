@@ -55,8 +55,6 @@ class SIG_DynaMechsLink
 
     double const screwTheta;
 
-    std::unique_ptr< dmZScrewTxLink > screwLink;
-
     dmRigidBody * const dynaMechsLink;
 
     NEWMAT::Matrix transformation;
@@ -65,6 +63,8 @@ class SIG_DynaMechsLink
 
     void forwardKinematics( SIG_DynaMechsLink *caller );
 
+    dmZScrewTxLink *getScrewLink() const { return screwLink.get(); }
+
     NEWMAT::Matrix buildXRotationMatrix( double angle );
 
     NEWMAT::Matrix buildZRotationMatrix( double angle );
@@ -72,6 +72,10 @@ class SIG_DynaMechsLink
     NEWMAT::Matrix buildTranslationMatrix( double x,
 					   double y,
 					   double z );
+
+  private:
+
+    std::unique_ptr< dmZScrewTxLink > screwLink;
   };
 
 }
