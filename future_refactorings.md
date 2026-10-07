@@ -45,8 +45,6 @@ Paths are relative to `sigel/`, the source tree.
   - [ ] `MT_GPManager`: `BestIndividual`, `Randi`, `Statistics`, `Offspring`,
     `Parent`, `Seeker`, `Selector`, `FitnessTrainer`. Used by the MetaGP
     thread and the GUI thread.
-  - [ ] `MT_Controller`: `gpManager`, `substitution`. Both are used by the
-    MetaGP thread.
 
   *Not in this item:*
   - Lists of raw pointers, among them the elements of `MT_Statistics`, which
@@ -71,6 +69,9 @@ Paths are relative to `sigel/`, the source tree.
   - The DynaMechs link bodies in `SIG_DynaMechsLink::dynaMechsLink`:
     `SIG_DynaMechsSimulationData` makes and sets up each body, and
     `SIG_DynaMechsLink` keeps it.
+  - `MT_Controller`: `gpManager`, `substitution`. The controller destroys
+    them and makes them again at several points during its life, which
+    needs a `reset()` at each.
 
 - [ ] **140. Assess `DynaMechsLinkGuard`.** It is a hand-written struct in
   `SIG_DynaMechsSimulationData.cpp` that frees the links when the
