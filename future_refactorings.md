@@ -163,6 +163,25 @@ Paths are relative to `sigel/`, the source tree.
   longer comment must carry something the code cannot say. **Comments the port
   itself wrote come first.** File by file, each pass signed off first.
 
+- [ ] **144. Put the 4x4 identity and translation matrix in one helper
+  class.** `SIG_Body::load`, `SIG_Body::readVRMLNode`, the long function in
+  `IFunctions.cpp` and `SIG_DynaMechsLink::buildTranslationMatrix` each write
+  these `NEWMAT::Matrix` values out by hand. A small class in `SIGEL_Tools`
+  with static functions defines them once. The X and Z rotation of
+  `SIG_DynaMechsLink` can move there too; they use no member of a link. The
+  functions only store values, so the fitness rows must stay identical.
+  Review `SIG_Body::createRotationMatrix` with it. Its sine terms have the
+  opposite sign from `rotationMatrix` in `IFunctions.cpp`, so one is the
+  transpose of the other; do not merge the two. If it does not build the
+  usual rotation matrix, the least change is a name that says what it
+  builds.
+
+- [ ] **145. Review `IFunctions.cpp`.** It holds free functions, among them
+  `rotationMatrix` and
+  `phatRockingUpStylinVectorBendingAngleSwingingMasterFunction`, which is
+  very long. Behaviour belongs to a class. Decide which class each function
+  belongs to, and give the long one a name that says what it does.
+
 ---
 
 ## 4 · Defects preserved by the port
