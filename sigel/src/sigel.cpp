@@ -93,6 +93,14 @@ extern "C"
 
 bool guiEnabled = true;
 
+void installSigelStandardSignalHandler() {
+  std::signal( SIGABRT, sigelStandardSignalHandler );
+  std::signal( SIGFPE, sigelStandardSignalHandler );
+  std::signal( SIGILL, sigelStandardSignalHandler );
+  std::signal( SIGINT, sigelStandardSignalHandler );
+  std::signal( SIGSEGV, sigelStandardSignalHandler );
+  std::signal( SIGTERM, sigelStandardSignalHandler );
+}
 
 int main( int argc, char *argv[] ) {
   // Pin the QHash seed so iteration order is the same on every run.
@@ -103,13 +111,7 @@ int main( int argc, char *argv[] ) {
 
   int arg;
 
-  // Install the sigel standard signal handler
-  std::signal( SIGABRT, sigelStandardSignalHandler );
-  std::signal( SIGFPE, sigelStandardSignalHandler );
-  std::signal( SIGILL, sigelStandardSignalHandler );
-  std::signal( SIGINT, sigelStandardSignalHandler );
-  std::signal( SIGSEGV, sigelStandardSignalHandler );
-  std::signal( SIGTERM, sigelStandardSignalHandler );
+  installSigelStandardSignalHandler();
 
   bool mtEvolve=false;
 

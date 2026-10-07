@@ -917,6 +917,12 @@ classes and leave truncation a hard error. **They are not interchangeable.**
   and `build/coredrive`. Older entries in this file keep the name
   `sigel_eval`; they mean this program.
 
+**2026-10-07 — DONE: ITEM 151, `main` IN `sigel.cpp` INSTALLS ITS SIGNAL HANDLER AS `sigel_slave.cpp` DOES.**
+
+- The six `std::signal` calls of `main` are in the function
+  `installSigelStandardSignalHandler`, which has the same text as the one in
+  `sigel_slave.cpp`. `main` calls it at the same point. No behaviour changes.
+
 **2026-10-07 — CLOSED: ITEM 8, ONE OWNER FOR EACH OBJECT.**
 
 - The item replaced a `new` and its `delete` by a local object, a value
