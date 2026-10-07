@@ -142,7 +142,7 @@ private:
 	
 	
 	/* appraise the offspring*/
-	MT_FitnessTrainer * FitnessTrainer;
+	std::unique_ptr< MT_FitnessTrainer > FitnessTrainer;
 
 	/* manage and collected  information for evaluation of a SIGEL&META run*/
 	std::unique_ptr< MT_Statistics > Statistics;
