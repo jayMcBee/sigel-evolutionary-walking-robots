@@ -70,7 +70,7 @@ class SIG_Program
 {
 
  protected:
- std::vector< SIGEL_Program::SIG_ProgramLine* > lines;
+ std::vector< SIGEL_Program::SIG_ProgramLine > lines;
 
 /**
  * This operator copies a complete program.
@@ -107,7 +107,7 @@ class SIG_Program
  * All data will be deleted.
  */
    public:
-   virtual ~SIG_Program();
+   virtual ~SIG_Program() = default;
 
 
 /**
@@ -115,7 +115,7 @@ class SIG_Program
  */
  
  public:
- std::vector< SIGEL_Program::SIG_ProgramLine* > &getPrgLines();
+ std::vector< SIGEL_Program::SIG_ProgramLine > &getPrgLines();
 
 
 /**
@@ -152,14 +152,6 @@ class SIG_Program
  */
    public:
    void printToString(QString &str) const;
-
-/**
- * This function deletes a complete program.
- * @post
- * The program is deleted and contains no program lines.
- */
-   public:
-   void clear();
 
 /**
  * This function has only been implemented for test purposes. It is obsolete.

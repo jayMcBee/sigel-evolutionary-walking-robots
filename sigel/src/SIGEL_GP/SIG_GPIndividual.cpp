@@ -609,7 +609,6 @@ void SIGEL_GP::SIG_GPIndividual::readFromFile(QString indStr)
   if((pos=indStr.indexOf("PROGRAM BEGIN{", 0, Qt::CaseInsensitive))!=-1)
     {
       prgStr=indStr.mid(pos+15,indStr.indexOf("}PROGRAM END", pos+16, Qt::CaseInsensitive)-pos-14);
-      getProgramPointer()->clear();
       getProgramPointer()->readFromFile(inputFile);
  
       

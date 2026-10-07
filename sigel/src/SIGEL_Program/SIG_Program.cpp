@@ -33,16 +33,7 @@
 
 SIGEL_Program::SIG_Program& SIGEL_Program::SIG_Program::operator =(SIGEL_Program::SIG_Program &prg)
 { 
-  clear();
-
-#ifdef SIG_DEBUG
-  for ( long int i=0; i<lines.size(); i++ )
-    if (!lines[i])
-      {
-	SIGEL_Tools::SIG_IO::cerr << "Ouch [1] !!!! " << i << Qt::endl;
-	exit(1);
-      };
-#endif
+  lines.clear();
 
   for( long i=0; i<prg.getProgramLength(); i++ )
      appendLine( *prg.getLine( i ) );
@@ -55,15 +46,6 @@ SIGEL_Program::SIG_Program& SIGEL_Program::SIG_Program::operator =(SIGEL_Program
     };
 #endif
 
-#ifdef SIG_DEBUG
-  for ( long int i=0; i<lines.size(); i++ )
-    if (!lines[i])
-      {
-	SIGEL_Tools::SIG_IO::cerr << "Ouch [3] !!!! " << i << Qt::endl;
-	exit(1);
-      };
-#endif
-
   return *this;
 }
 
@@ -72,7 +54,7 @@ long SIGEL_Program::SIG_Program::getProgramLength() const
      return lines.size();
 }
 
-std::vector< SIGEL_Program::SIG_ProgramLine* > &SIGEL_Program::SIG_Program::getPrgLines()
+std::vector< SIGEL_Program::SIG_ProgramLine > &SIGEL_Program::SIG_Program::getPrgLines()
 {
      return lines;
 }
@@ -83,7 +65,7 @@ void SIGEL_Program::SIG_Program::printToString( QString &str ) const
   for( long i=0; i<lines.size(); i++ )
     {
       QString buffer;
-      lines[i]->printToString(buffer);
+      lines[i].printToString(buffer);
       str += buffer;
     };
 
@@ -93,7 +75,7 @@ void SIGEL_Program::SIG_Program::print() const
 
 {
 
-  for (int i=0; i<lines.size(); i++ ) lines[i]->print();
+  for (int i=0; i<lines.size(); i++ ) lines[i].print();
 
 }
 
@@ -101,15 +83,9 @@ void SIGEL_Program::SIG_Program::writeToFile( QTextStream &file ) const
 {
   for( long i=0; i<getProgramLength(); i++ )
     {
-      lines[i]->writeToFile(file);
+      lines[i].writeToFile(file);
     }
 
-}
-
-void SIGEL_Program::SIG_Program::clear()
-{
-    for (int i=0; i<lines.size(); i++ ) delete lines[i];
-    lines.clear();
 }
 
 void SIGEL_Program::SIG_Program::readFromFile( QTextStream &file )
@@ -125,7 +101,7 @@ void SIGEL_Program::SIG_Program::readFromFile( QTextStream &file )
 
 #endif
 
-   if( getProgramLength() > 0 ) clear();
+   lines.clear();
    
    QString programText = file.readAll();
 
@@ -153,13 +129,13 @@ void SIGEL_Program::SIG_Program::readFromFile( QTextStream &file )
 SIGEL_Program::SIG_ProgramLine const *SIGEL_Program::SIG_Program::getLine( long no ) const
 {
   checkLineNumber( no );
-  return lines[no];
+  return &lines[no];
 }
 
 void SIGEL_Program::SIG_Program::setLine( long no, SIGEL_Program::SIG_ProgramLine const &line )
 {
   checkLineNumber( no );
-  *lines[no] = line;
+  lines[no] = line;
 }
 
 void SIGEL_Program::SIG_Program::checkLineNumber( long no ) const
@@ -171,41 +147,21 @@ void SIGEL_Program::SIG_Program::checkLineNumber( long no ) const
 
 void SIGEL_Program::SIG_Program::deleteLine( long no )
 {
+  // An index past the end deletes nothing; crossOver and checkLength rely on that.
   if( no<lines.size() )
-    {
-      delete lines[no];
-  
-      for( long i=no; i<lines.size()-1; i++)
-         lines[ i ]=lines[ i + 1 ];  
-
-      lines.resize( lines.size() - 1 );
-    }
+    lines.erase( lines.begin() + no );
 }
 
 
 void SIGEL_Program::SIG_Program::appendLine( SIGEL_Program::SIG_ProgramLine const &line )
 {
-  lines.resize( getProgramLength() + 1 );
-  lines[ getProgramLength() - 1 ] = new SIGEL_Program::SIG_ProgramLine( line );
+  lines.push_back( line );
 
-#ifdef SIG_DEBUG
-  for ( long int i=0; i<lines.size(); i++ )
-    if (!lines[i])
-      {
-	SIGEL_Tools::SIG_IO::cerr << "Ouch [5] ! " << i << Qt::endl;
-	exit(1);
-      };
-#endif
 }
 
 void SIGEL_Program::SIG_Program::insertLine( long no, SIGEL_Program::SIG_ProgramLine const &line )
 {
-  lines.resize( getProgramLength() + 1 );
-
-  for( long i=lines.size()-1; i>no; i--)
-         lines[ i ]=lines[ i - 1 ];  
-
-  lines[no] = new SIGEL_Program::SIG_ProgramLine( line );
+  lines.insert( lines.begin() + no, line );
 }
 
    
@@ -215,7 +171,7 @@ void SIGEL_Program::SIG_Program::importProgram( QString& filename )
 
    if( prgFile.open( QIODeviceBase::ReadOnly ) )
      {
-       clear();
+       lines.clear();
        QTextStream buffer( &prgFile );
        readFromFile( buffer );
        prgFile.close();
@@ -248,14 +204,6 @@ SIGEL_Program::SIG_Program::SIG_Program()
   : lines()
 {
 
-#ifdef SIG_DEBUG
-  for ( long int i=0; i<lines.size(); i++ )
-    if (!lines[i])
-      {
-	SIGEL_Tools::SIG_IO::cerr << "Ouch [4] ! " << i << Qt::endl;
-	exit(1);
-      };
-#endif
 }
 
 
@@ -348,7 +296,7 @@ void SIGEL_Program::SIG_Program::generateRandomProgram( SIGEL_GP::SIG_GPParamete
                                                         SIGEL_Robot::SIG_LanguageParameters &languageP, 
 						        SIGEL_Tools::SIG_Randomizer& random )
 {
-    clear();
+    lines.clear();
 
     long n = param.getMinIndLength() + 
              random.getRandomInt( param.getMaxIndLength() - param.getMinIndLength() );
@@ -363,8 +311,3 @@ void SIGEL_Program::SIG_Program::generateRandomProgram( SIGEL_GP::SIG_GPParamete
       }
 }
    
-SIGEL_Program::SIG_Program::~SIG_Program()
-{
-  
-   clear();
-}
