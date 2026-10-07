@@ -55,7 +55,7 @@ MT_GPManager::MT_GPManager(QTextStream &File) : QObject()
 
 	Statistics = std::make_unique< MT_Statistics >(File);
 	
-	Offspring= new MT_Population();
+	Offspring = std::make_unique< MT_Population >();
 	QString OffspringSize ( "OffspringSize:" );
 	while ((PresentLine != OffspringSize) && !(File.atEnd()))
 		PresentLine = File.readLine();
@@ -90,13 +90,13 @@ MT_GPManager::MT_GPManager(QTextStream &File) : QObject()
 		LastError = 3;
 	}
 
-	Seeker = std::make_unique< MT_Search >(Parent.get(), Offspring, Randi, File);
+	Seeker = std::make_unique< MT_Search >(Parent.get(), Offspring.get(), Randi, File);
 	if(Seeker->getLastError() != 0)
 		LastError = Seeker->getLastError();
 
 
 
-	Selector = std::make_unique< MT_TournamentManager >(Parent.get(), Offspring, Randi, File);
+	Selector = std::make_unique< MT_TournamentManager >(Parent.get(), Offspring.get(), Randi, File);
 	if(Selector->getLastError() != 0)
 		LastError = Selector->getLastError();
 	FitnessTrainer = std::make_unique< MT_FitnessTrainer >(File);
@@ -121,7 +121,6 @@ MT_GPManager::~MT_GPManager()
 {	
 
 	delete Randi;
-	delete Offspring;
 
 	pthread_mutex_unlock(&evolutionMutex);
 }
@@ -501,7 +500,7 @@ void MT_GPManager::startEvolution(MT_Substitute *Substitute)
 
 		Seeker->startMatingProcess();
 
-		FitnessTrainer->calculateFitness(Offspring);
+		FitnessTrainer->calculateFitness(Offspring.get());
 
 		collectOffspringParameter(SElement);
 

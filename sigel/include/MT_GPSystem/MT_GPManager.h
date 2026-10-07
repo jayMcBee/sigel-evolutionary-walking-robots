@@ -125,7 +125,7 @@ private:
 	int GenerationNumber;
 
 	/* the Parent and Offspring population*/
-	MT_Population * Offspring;
+	std::unique_ptr< MT_Population > Offspring;
 	std::unique_ptr< MT_Population > Parent;
 	
 	/* the random provider */
