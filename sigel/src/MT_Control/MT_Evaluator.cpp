@@ -1,6 +1,7 @@
 #include <QList>
 #include <QString>
 #include <QTextStream>
+#include <memory>
 #include "MT_Control/MT_Evaluator.h"
 
 
@@ -372,7 +373,8 @@ int MT_Evaluator::spawnTask(SIGEL_GP::SIG_GPIndividual const& ind)
 		// lock the interpreter to prevent exchange of the used program
 		pthread_mutex_lock(&interpreterMutex);
 
-		double MetaEstimationResult = Interpreter->interpret(translatedSIGProg(&ind.getProgram()));
+		std::unique_ptr< MT_TranslatedIndividual > TransIndi( translatedSIGProg(&ind.getProgram()) );
+		double MetaEstimationResult = Interpreter->interpret( TransIndi.get() );
 
 		// unlock the interpreter so that the program can be updated
 		pthread_mutex_unlock(&interpreterMutex);

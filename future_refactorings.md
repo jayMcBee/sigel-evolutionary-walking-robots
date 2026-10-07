@@ -51,10 +51,6 @@ Paths are relative to `sigel/`, the source tree.
     two are used by the MetaGP thread; `cacheStrm` leaks.
   - [ ] `MT_Substitute`: `Interpreter`, `BestMETAProgram`.
 
-  *A `new` that nothing deletes:*
-  - [ ] `MT_Evaluator::spawnTask`: the `MT_TranslatedIndividual` from
-    `translatedSIGProg`.
-
   *Not in this item:*
   - Lists of raw pointers, among them the elements of `MT_Statistics`, which
     are never deleted.
