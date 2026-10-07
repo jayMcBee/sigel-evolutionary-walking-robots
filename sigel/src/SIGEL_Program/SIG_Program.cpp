@@ -114,7 +114,6 @@ void SIGEL_Program::SIG_Program::clear()
 
 void SIGEL_Program::SIG_Program::readFromFile( QTextStream &file )
 { 
-   QString                         tmpLine,prg;
    int                             pos=-1;
    int                             oldpos=0;
    int                             lineCnt=0;
@@ -128,13 +127,13 @@ void SIGEL_Program::SIG_Program::readFromFile( QTextStream &file )
 
    if( getProgramLength() > 0 ) clear();
    
-   prg=file.readAll();
+   QString programText = file.readAll();
 
-   while((pos=prg.indexOf(QChar('\n'), oldpos, Qt::CaseInsensitive))!=-1)
+   while((pos=programText.indexOf(QChar('\n'), oldpos, Qt::CaseInsensitive))!=-1)
      {
-        tmpLine = prg.mid( oldpos, pos - oldpos );
+        QString lineText = programText.mid( oldpos, pos - oldpos );
         SIGEL_Program::SIG_ProgramLine prgLine;
-        if( prgLine.readFromFile( tmpLine, &prgLine ) )
+        if( prgLine.readFromFile( lineText, &prgLine ) )
 	  {
             appendLine( prgLine );
             lineCnt++;
