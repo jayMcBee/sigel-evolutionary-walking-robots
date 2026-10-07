@@ -2,6 +2,7 @@
 #define MT_GPSYSTEM_MT_PROGRAM_H
 
 #include <QTextStream>
+#include <vector>
 #include <qstring.h>
 #include <qtextstream.h>
 #include "MT_GPSystem/MT_Programline.h"
@@ -79,8 +80,7 @@ private:
 	int LastError;
 	int MaxLength;
 	int Length;
-//	QVector<MT_Programline> Program;
-	MT_Programline **Program;
+	std::vector< MT_Programline * > Program;
 
 	void resize(int nSize);
 };

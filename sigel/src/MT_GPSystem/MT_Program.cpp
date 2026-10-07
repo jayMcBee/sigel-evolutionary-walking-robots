@@ -5,7 +5,6 @@
 MT_Program::MT_Program()
 {
 	LastError= 0;
-	Program  = nullptr;
 	Length   = 0;
 }
 
@@ -14,14 +13,12 @@ MT_Program::~MT_Program()
 	LastError=0;
 	for(int i=0; i<Length; i++)
 		delete Program[i];
-	delete []Program;
 }
 
 MT_Program::MT_Program (MT_Randomizer *Randi)
 {
 	LastError= 0;
 	Length   = 0;
-	Program  = nullptr;
 	int nLength = Randi->getProgLength();
 	MaxLength = Randi->getProgramLengthMax();
 	resize(nLength);
@@ -38,7 +35,6 @@ MT_Program::MT_Program(QTextStream &File)
 {
 	LastError= 0;
 	Length   = 0;
-	Program  = nullptr;
 	int nLength = 0;
 	QString ProString ("Program:" );
 	QString PresentLine = File.readLine();
@@ -64,7 +60,6 @@ MT_Program::MT_Program(MT_Program *Prog)
 {
 	LastError=0;
 	Length  = 0;
-	Program = nullptr;
 	int nLength = Prog->Length;
 	MaxLength = Prog->MaxLength;
 	
@@ -80,7 +75,6 @@ MT_Program::MT_Program(MT_Program *Prog, int Start, int End)
 {
 	LastError=0;
 	Length  = 0;
-	Program = nullptr;
 	int nLength = End-Start+1;
 	MaxLength = nLength;
 	resize(nLength);
@@ -97,10 +91,9 @@ void MT_Program::writeToFileProgram(QTextStream &File)
 	File << MaxLength << Qt::endl;
 	File << Length << Qt::endl;
 
-	if (Program != nullptr)
-		for (int i=0; i<Length; i++)
-			if (Program[i] != nullptr)
-				(Program[i])->writeToFileProgramLine(File);
+	for (int i=0; i<Length; i++)
+		if (Program[i] != nullptr)
+			(Program[i])->writeToFileProgramLine(File);
 
 	File << Qt::endl;
 }
@@ -153,7 +146,6 @@ void MT_Program::changeMaxProgLen(int NewLen)
 		resize(MaxLength);
 		Length = MaxLength;
 	}
-//	Program.resize(MaxLength);
 }
 
 
@@ -215,49 +207,13 @@ int MT_Program::getLastError()
 }
 
 /***
- * resizes the data-array
+ * resizes the data-array; deletes the lines that no longer fit
  **/
 void MT_Program::resize(int nSize)
 {
-	if(nSize != Length)
-	{
-		MT_Programline **tmpArray = new MT_Programline*[nSize];	// get memory for the resized array
+	for(int i=nSize; i<Length; i++)
+		delete Program[i];
 
-		if(nSize < Length)
-		{	
-			// delete the data that doesn't fit in the new array
-			for(int i=nSize; i<Length; i++)
-			{
-				delete Program[i];
-				Program[i]=nullptr;
-			}
-			
-			Length = nSize; 
-			// copy the data to the resized array
-			for(int i=0; i<nSize; i++)
-			{
-				tmpArray[i] = Program[i];
-				Program[i] =nullptr;
-			}
-			
-		} 
-		else
-		{			
-			// copy the data to the resized array
-			for(int i=0; i<Length; i++)
-			{
-				tmpArray[i] = Program[i];
-				Program[i] =nullptr;
-			}
-			// initialize the empty slots with null
-			for(int i=Length; i<nSize; i++)
-				tmpArray[i] = nullptr;
-		}
-	
-		
-		// make the resized array the used array
-		delete[]  Program;
-		Program = tmpArray;
-		Length = nSize;
-	}
+	Program.resize(nSize, nullptr);
+	Length = nSize;
 }
