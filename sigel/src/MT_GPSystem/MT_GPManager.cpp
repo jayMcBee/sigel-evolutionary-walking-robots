@@ -90,7 +90,7 @@ MT_GPManager::MT_GPManager(QTextStream &File) : QObject()
 		LastError = 3;
 	}
 
-	Seeker= new MT_Search(Parent, Offspring, Randi, File);
+	Seeker = std::make_unique< MT_Search >(Parent, Offspring, Randi, File);
 	if(Seeker->getLastError() != 0)
 		LastError = Seeker->getLastError();
 
@@ -124,7 +124,6 @@ MT_GPManager::~MT_GPManager()
 	delete Randi;
 	delete Offspring;
 	delete Parent;
-	delete Seeker;
 	delete Selector;
 	delete FitnessTrainer;
 

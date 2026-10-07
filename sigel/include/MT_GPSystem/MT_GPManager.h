@@ -149,7 +149,7 @@ private:
 	MT_StatisticsElement * SElement;
 
 	/* responsibly for the movement in the search space, create a new offspring */
-	MT_Search * Seeker;
+	std::unique_ptr< MT_Search > Seeker;
 
 	/* responsibly for the selection of the offspring*/
 	MT_TournamentManager * Selector;
