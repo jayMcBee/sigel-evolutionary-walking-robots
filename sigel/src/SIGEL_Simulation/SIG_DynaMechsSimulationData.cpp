@@ -353,9 +353,6 @@ void SIGEL_Simulation::SIG_DynaMechsSimulationData::initializeArticulation()
 								0,
 								0 );
 
-  // Two joints between the same pair of links make this free a link that is
-  // still in use. A preserved defect; no shipped robot has such a pair.
-  delete dynaMechsLinks[ rootLink->getNumber() ];
   dynaMechsLinks[ rootLink->getNumber() ] = dynaMechsRootLink;
 
   dynaMechsSystem.addLink( internalRootLink, nullptr );
@@ -397,6 +394,10 @@ SIGEL_Simulation::SIG_DynaMechsLink *SIGEL_Simulation::SIG_DynaMechsSimulationDa
     return nullptr;
 
   SIGEL_Robot::SIG_Link const *link = ( joint->getLeftLink() == caller ) ? joint->getRightLink() : joint->getLeftLink();
+
+  // DynaMechs builds a tree; a second joint to a link would replace a link that is still in use.
+  if ( dynaMechsLinks[ link->getNumber() ] )
+    throw SIGEL_Tools::SIG_Exception( __FILE__, __LINE__, "Link " + link->getName() + " is reached by two joints." );
 
   dmMDHLink *internalDynaMechsLink;
 
@@ -488,7 +489,6 @@ SIGEL_Simulation::SIG_DynaMechsLink *SIGEL_Simulation::SIG_DynaMechsSimulationDa
 							    screwD,
 							    screwTheta );
 
-  delete dynaMechsLinks[ link->getNumber() ];
   dynaMechsLinks[ link->getNumber() ] = dynaMechsLink;
 
   jointIndices[ joint->getNumber() ] = link->getNumber();
