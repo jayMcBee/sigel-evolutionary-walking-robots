@@ -69,7 +69,7 @@ namespace {
 		~DynaMechsLinkGuard() { if (links) { qDeleteAll( *links ); links->fill( nullptr ); } }
 	};
 
-};
+}
 
 SIGEL_Simulation::SIG_DynaMechsSimulationData::SIG_DynaMechsSimulationData( SIGEL_Robot::SIG_Robot const& robot,
                                                           SIGEL_Environment::SIG_Environment const& environment,
@@ -110,7 +110,7 @@ SIGEL_Simulation::SIG_DynaMechsSimulationData::SIG_DynaMechsSimulationData( SIGE
 	case SIG_SimulationParameters::RungeKutta45:
 		dynaMechsIntegrator = std::make_unique< dmIntegRK45 >();
 		break;
-	};
+	}
 
 	initializeArticulation();
 
@@ -143,11 +143,11 @@ SIGEL_Simulation::SIG_DynaMechsSimulationData::SIG_DynaMechsSimulationData( SIGE
 #endif
 
 				drives[ actDrive->getNumber() ] = actDrive;
-			};
-		};
+			}
+		}
 		break;
-		};
-	};
+		}
+	}
 
 	for (SIGEL_Robot::SIG_Sensor *actSensorBase : robot.getSensors())
 	{
@@ -207,10 +207,10 @@ SIGEL_Simulation::SIG_DynaMechsSimulationData::SIG_DynaMechsSimulationData( SIGE
 
 	// Last, so that a constructor that throws has no environment to release.
 	dmEnvironment::setEnvironment( &dynaMechsEnvironment );
-};
+}
 
 void SIGEL_Simulation::SIG_DynaMechsSimulationData::setNewFrame( bool newValue )
-{ };
+{ }
 
 SIGEL_Simulation::SIG_DynaMechsSimulationData::~SIG_DynaMechsSimulationData()
 {
@@ -221,7 +221,7 @@ SIGEL_Simulation::SIG_DynaMechsSimulationData::~SIG_DynaMechsSimulationData()
 	// DynaMechs must not keep the address of an environment that is gone.
 	if ( dmEnvironment::getEnvironment() == &dynaMechsEnvironment )
 		dmEnvironment::setEnvironment( nullptr );
-};
+}
 
 void SIGEL_Simulation::SIG_DynaMechsSimulationData::simulationProgress()
 {
@@ -266,12 +266,12 @@ void SIGEL_Simulation::SIG_DynaMechsSimulationData::simulationProgress()
 				double resetForce = 0;
 
 				dynaMechsLink->dynaMechsLink->setJointInput( &resetForce );
-			};
-		};
-	};
+			}
+		}
+	}
 
 	dynaMechsLinks[ robot.getRootLink()->getNumber() ]->forwardKinematics( nullptr );
-};
+}
 
 void SIGEL_Simulation::SIG_DynaMechsSimulationData::initializeEnvironment()
 {
@@ -301,7 +301,7 @@ void SIGEL_Simulation::SIG_DynaMechsSimulationData::initializeEnvironment()
 	char const *terrainDataFileNameCString = terrainDataFileNameQCString.constData();
 
 	dynaMechsEnvironment.loadTerrainData( terrainDataFileNameCString );
-};
+}
 
 void SIGEL_Simulation::SIG_DynaMechsSimulationData::initializeArticulation()
 {
@@ -340,7 +340,7 @@ void SIGEL_Simulation::SIG_DynaMechsSimulationData::initializeArticulation()
 		for (int j=1; j<=3; j++)
 			SIGEL_Tools::SIG_IO::cerr << startRotation( i, j ) << " ";
 		SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-	};
+	}
 #endif
 
 	SIG_TypeConverter::toCartesianVector( startPosition, initialState + 4 );
@@ -365,10 +365,10 @@ void SIGEL_Simulation::SIG_DynaMechsSimulationData::initializeArticulation()
 
 		if (newDynaMechsLink)
 			dynaMechsRootLink->successors.append( newDynaMechsLink );
-	};
+	}
 
 	dynaMechsRootLink->forwardKinematics( nullptr );
-};
+}
 
 SIGEL_Simulation::SIG_DynaMechsLink *SIGEL_Simulation::SIG_DynaMechsSimulationData::initializeJoint( SIGEL_Robot::SIG_Joint *joint,
                                                                                                      SIGEL_Robot::SIG_Link const *caller )
@@ -412,7 +412,7 @@ SIGEL_Simulation::SIG_DynaMechsLink *SIGEL_Simulation::SIG_DynaMechsSimulationDa
 	default:
 		SIGEL_Tools::SIG_IO::cerr << "Cannot simulate robot with DynaMechs: Joint type not allowed!" << Qt::endl;
 		exit( 1 );
-	};
+	}
 
 	double k_spring = simulationParameter.getJointLimitsK_spring();
 	double b_damper = simulationParameter.getJointLimitsB_damper();
@@ -425,7 +425,7 @@ SIGEL_Simulation::SIG_DynaMechsLink *SIGEL_Simulation::SIG_DynaMechsSimulationDa
 		k_spring = b_damper = 0;
 		minLimit = std::numeric_limits<double>::lowest();
 		maxLimit = std::numeric_limits<double>::max();
-	};
+	}
 
 	double jointFriction = simulationParameter.getJointFrictionU_c();
 
@@ -513,10 +513,10 @@ SIGEL_Simulation::SIG_DynaMechsLink *SIGEL_Simulation::SIG_DynaMechsSimulationDa
 
 		if (newSuccessor)
 			dynaMechsLink->successors.append( newSuccessor );
-	};
+	}
 
 	return dynaMechsLink;
-};
+}
 
 void SIGEL_Simulation::SIG_DynaMechsSimulationData::rotationMatrixToQuaternion( NEWMAT::Matrix rotationMatrix,
                                                                                 double &x,
@@ -539,7 +539,7 @@ void SIGEL_Simulation::SIG_DynaMechsSimulationData::rotationMatrixToQuaternion( 
 		y = (rotationMatrix(3,1) - rotationMatrix(1,3))*s;
 		z = (rotationMatrix(1,2) - rotationMatrix(2,1))*s;
 		return;
-	};
+	}
 
 	tr = -rotationMatrix(1,1) - rotationMatrix(2,2) + rotationMatrix(3,3) + 1;
 	if (tr > 0.0625)
@@ -552,7 +552,7 @@ void SIGEL_Simulation::SIG_DynaMechsSimulationData::rotationMatrixToQuaternion( 
 		y = (rotationMatrix(3,2) + rotationMatrix(2,3))*s;
 		w = (rotationMatrix(1,2) - rotationMatrix(2,1))*s;
 		return;
-	};
+	}
 
 	tr = -rotationMatrix(1,1) + rotationMatrix(2,2) - rotationMatrix(3,3) + 1;
 	if (tr > 0.0625)
@@ -565,7 +565,7 @@ void SIGEL_Simulation::SIG_DynaMechsSimulationData::rotationMatrixToQuaternion( 
 		z = (rotationMatrix(3,2) + rotationMatrix(2,3))*s;
 		w = (rotationMatrix(3,1) - rotationMatrix(1,3))*s;
 		return;
-	};
+	}
 
 	tr = rotationMatrix(1,1) - rotationMatrix(2,2) - rotationMatrix(3,3) + 1;
 	if (tr > 0.0625)
@@ -578,7 +578,7 @@ void SIGEL_Simulation::SIG_DynaMechsSimulationData::rotationMatrixToQuaternion( 
 		z = (rotationMatrix(3,1) - rotationMatrix(1,3))*s;
 		w = (rotationMatrix(2,3) - rotationMatrix(3,2))*s;
 		return;
-	};
-};
+	}
+}
 
 
