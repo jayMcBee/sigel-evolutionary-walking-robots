@@ -37,7 +37,6 @@ MT_Controller::MT_Controller(SIGEL_GP::SIG_GPExperiment &exp)
 {
 	startWOSigel = false;
 	withGUI = true;
-	cacheStrm = nullptr;
 	saveName = QString();
 	usedSystem = NOMETA_SUBST;
 	selectedSystem = EVALUATOR_SUBST;
@@ -128,10 +127,10 @@ bool MT_Controller::startEvolution()
 
 			switch(usedSystem){
 			case EVALUATOR_SUBST :
-				substitution = new MT_Evaluator(sigExp, *cacheStrm);
+				substitution = new MT_Evaluator(sigExp, cacheStrm);
 				break;
 			case CLASSIFIER_SUBST :
-				substitution = new MT_Classifier(*cacheStrm);
+				substitution = new MT_Classifier(cacheStrm);
 				break;
 			}
 			if(!substitution){
@@ -633,7 +632,7 @@ MT_Substitute* MT_Controller::getFitnessTrainer()
 		createGPSystem();
 		if(!substitution){
 			createCacheStrm();
-			substitution = new MT_Evaluator(sigExp, *cacheStrm);
+			substitution = new MT_Evaluator(sigExp, cacheStrm);
 		}
 		return substitution;
 	}
@@ -647,7 +646,7 @@ MT_Substitute* MT_Controller::getClassifier()
 		createGPSystem();
 		if(!substitution){
 			createCacheStrm();
-			substitution = new MT_Classifier(*cacheStrm);
+			substitution = new MT_Classifier(cacheStrm);
 		}
 		return substitution;
 	}
@@ -772,8 +771,7 @@ void MT_Controller::createCacheStrm()
 		}
 	}
 	
-	delete cacheStrm;
-	cacheStrm = new QTextStream(&cacheString, QIODevice::ReadOnly);
+	cacheStrm.setString(&cacheString, QIODevice::ReadOnly);
 }
 
 /***

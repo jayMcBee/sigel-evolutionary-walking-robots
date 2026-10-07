@@ -70,9 +70,9 @@ private:
 	QFile confFile;
 
 	QTextStream confStrm;
-	QTextStream *cacheStrm;
 	QString defConfFileName;
 	QString cacheString;
+	QTextStream cacheStrm;
 
 	QString saveName;
 	QString baseName;
