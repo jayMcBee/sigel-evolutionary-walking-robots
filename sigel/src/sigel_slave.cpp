@@ -93,6 +93,28 @@ extern "C"
 
 bool guiEnabled = false;
 
+int showSimulation( SIGEL_Robot::SIG_Robot const &robot,
+                    SIGEL_Environment::SIG_Environment const &environment,
+                    SIGEL_Simulation::SIG_SimulationParameters const &simulationParameters,
+                    SIGEL_Program::SIG_Program const &program,
+                    SIG_MovieStaticRunInfo const &staticRunInfo ) {
+  SIG_SimulationWindow simWindow(nullptr, "simWindow");
+
+  simWindow.setWindowTitle("Simulation Visualisation");
+  simWindow.setStaticRunInfo( staticRunInfo );
+  simWindow.show();
+
+  try {
+    simWindow.visualizeThis( robot, environment, simulationParameters, program );
+  }
+  catch (SIGEL_Tools::SIG_Exception &e) {
+    SIGEL_Tools::SIG_IO::cerr << e.getMessage() << Qt::flush;
+    return 1;
+  }
+
+  return QApplication::exec();
+}
+
 int main( int argc, char *argv[] ) {
   // Install the sigel standard signal handler
   std::signal( SIGABRT, sigelStandardSignalHandler );
@@ -236,46 +258,32 @@ int main( int argc, char *argv[] ) {
     else modifiedRobot = robot;
 
     QApplication a(argc, argv);
+    QApplication::setStyle( QStyleFactory::create( "Fusion" ) );
 
-      QApplication::setStyle( QStyleFactory::create( "Fusion" ) );
-      SIG_SimulationWindow simWindow(nullptr, "simWindow");
+    SIG_MovieStaticRunInfo staticRunInfo;
+    staticRunInfo.setExperimentFileName( experimentFileName );
+    staticRunInfo.individualName = individualName;
+    staticRunInfo.individualFitness = individualFitness;
+    staticRunInfo.individualProgramLength = program->getProgramLength();
 
-      simWindow.setWindowTitle("Simulation Visualisation");
+    // An ID the registry does not know is shown as it is.
+    QString fitnessFunctionId = standAlone ? experiment->gpParameter.getFitnessName() : fitnessFunctionName;
+    const std::optional<int> shownFitnessIndex = SIGEL_GP::SIG_GPFitnessFunctionRegistry::indexOf( fitnessFunctionId );
+    if (shownFitnessIndex)
+      staticRunInfo.fitnessFunctionName = SIGEL_GP::SIG_GPFitnessFunctionRegistry::fitnessFunctions()[*shownFitnessIndex]->name();
+    else
+      staticRunInfo.fitnessFunctionName = fitnessFunctionId;
 
-      SIG_MovieStaticRunInfo staticRunInfo;
-      staticRunInfo.setExperimentFileName( experimentFileName );
-      staticRunInfo.individualName = individualName;
-      staticRunInfo.individualFitness = individualFitness;
-      staticRunInfo.individualProgramLength = program->getProgramLength();
+    // if we use the RemoteZORC-Fitnessfunction: run evaluation to transmit the program !
+    const SIGEL_GP::SIG_GPRemoteZORCFitnessFunction remoteZORC;
+    if (fitnessFunctionName == remoteZORC.serializedId())
+      remoteZORC.evalFitness( *program, *robot, *environment, *simulationParameters );
 
-      // An ID the registry does not know is shown as it is.
-      QString fitnessFunctionId = standAlone ? experiment->gpParameter.getFitnessName() : fitnessFunctionName;
-      const std::optional<int> shownFitnessIndex = SIGEL_GP::SIG_GPFitnessFunctionRegistry::indexOf( fitnessFunctionId );
-      if (shownFitnessIndex)
-        staticRunInfo.fitnessFunctionName = SIGEL_GP::SIG_GPFitnessFunctionRegistry::fitnessFunctions()[*shownFitnessIndex]->name();
-      else
-        staticRunInfo.fitnessFunctionName = fitnessFunctionId;
-      simWindow.setStaticRunInfo( staticRunInfo );
-      simWindow.show();
+    returnValue = showSimulation( *modifiedRobot, *environment, *simulationParameters, *program, staticRunInfo );
 
-      // if we use the RemoteZORC-Fitnessfunction: run evaluation to transmit the program !
-      const SIGEL_GP::SIG_GPRemoteZORCFitnessFunction remoteZORC;
-      if (fitnessFunctionName == remoteZORC.serializedId())
-        remoteZORC.evalFitness( *program, *robot, *environment, *simulationParameters );
-
-     try {
-       simWindow.visualizeThis( *modifiedRobot, *environment, *simulationParameters, *program );
-     }
-     catch (SIGEL_Tools::SIG_Exception &e) {
-       SIGEL_Tools::SIG_IO::cerr << e.getMessage() << Qt::flush;
-       return 1;
-     }
-
-     returnValue = a.exec();
-
-     if ( !standAlone )
-       pvm_exit();
-     }
+    if ( !standAlone )
+      pvm_exit();
+  }
 
     // launched to compute !! Just evaluate fitness, no window-stuff.
     else {
