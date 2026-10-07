@@ -71,8 +71,8 @@ private:
 
 	QTextStream confStrm;
 	QString defConfFileName;
-	QString cacheString;
-	QTextStream cacheStrm;
+	QString estimationSettingsText;
+	QTextStream estimationSettingsStream;
 
 	QString saveName;
 	QString baseName;
@@ -85,7 +85,7 @@ private:
 
 	void loadCache(QTextStream &File);
 	void saveCache(QTextStream &File);
-	void createCacheStrm();
+	void writeEstimationSettings();
 
 public slots:
 	void stopEvolution();

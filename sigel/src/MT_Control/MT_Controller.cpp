@@ -123,14 +123,14 @@ bool MT_Controller::startEvolution()
 
 		// make sure there's an actually correct substituter
 		if(!substitution){
-			createCacheStrm();
+			writeEstimationSettings();
 
 			switch(usedSystem){
 			case EVALUATOR_SUBST :
-				substitution = new MT_Evaluator(sigExp, cacheStrm);
+				substitution = new MT_Evaluator(sigExp, estimationSettingsStream);
 				break;
 			case CLASSIFIER_SUBST :
-				substitution = new MT_Classifier(cacheStrm);
+				substitution = new MT_Classifier(estimationSettingsStream);
 				break;
 			}
 			if(!substitution){
@@ -631,8 +631,8 @@ MT_Substitute* MT_Controller::getFitnessTrainer()
 	if(UsedSystem() == EVALUATOR_SUBST){
 		createGPSystem();
 		if(!substitution){
-			createCacheStrm();
-			substitution = new MT_Evaluator(sigExp, cacheStrm);
+			writeEstimationSettings();
+			substitution = new MT_Evaluator(sigExp, estimationSettingsStream);
 		}
 		return substitution;
 	}
@@ -645,8 +645,8 @@ MT_Substitute* MT_Controller::getClassifier()
 	if(UsedSystem() == CLASSIFIER_SUBST){
 		createGPSystem();
 		if(!substitution){
-			createCacheStrm();
-			substitution = new MT_Classifier(cacheStrm);
+			writeEstimationSettings();
+			substitution = new MT_Classifier(estimationSettingsStream);
 		}
 		return substitution;
 	}
@@ -754,24 +754,24 @@ void MT_Controller::saveCache(QTextStream &File)
 	}
 }
 
-void MT_Controller::createCacheStrm()
+void MT_Controller::writeEstimationSettings()
 {
 	if(usedSystem == EVALUATOR_SUBST){
-		cacheString = "Evaluator:\n";
+		estimationSettingsText = "Evaluator:\n";
 	} else {
-		cacheString = "Classifier:\n";
+		estimationSettingsText = "Classifier:\n";
 	}
-	cacheString.append(QString("%1\n").arg(substCache.strategy));
-	cacheString.append(QString("%1\n").arg(substCache.tolerance));
-	cacheString.append(QString("%1\n").arg(substCache.refreshInt));
-	cacheString.append(QString("%1\n").arg(substCache.genNumber));
+	estimationSettingsText.append(QString("%1\n").arg(substCache.strategy));
+	estimationSettingsText.append(QString("%1\n").arg(substCache.tolerance));
+	estimationSettingsText.append(QString("%1\n").arg(substCache.refreshInt));
+	estimationSettingsText.append(QString("%1\n").arg(substCache.genNumber));
 	if(substCache.genNumber != 0){
 		for(int i=0; i<substCache.genNumber; i++){
-			cacheString.append(QString("%1\n%2\n").arg(correctEst[i]).arg(metaEst[i]));
+			estimationSettingsText.append(QString("%1\n%2\n").arg(correctEst[i]).arg(metaEst[i]));
 		}
 	}
 	
-	cacheStrm.setString(&cacheString, QIODevice::ReadOnly);
+	estimationSettingsStream.setString(&estimationSettingsText, QIODevice::ReadOnly);
 }
 
 /***
