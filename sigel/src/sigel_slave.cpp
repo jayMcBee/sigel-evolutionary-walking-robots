@@ -219,6 +219,33 @@ double computeFitness( int argc, char *argv[],
   }
 }
 
+int showIndividualFromPVM( int argc, char *argv[],
+                           SIGEL_GP::SIG_GPPVMData &pvmData,
+                           SIGEL_Program::SIG_Program &program,
+                           SIGEL_Robot::SIG_Robot &robot,
+                           SIGEL_Environment::SIG_Environment &environment,
+                           SIGEL_Simulation::SIG_SimulationParameters &simulationParameters ) {
+#ifdef SIG_DEBUG
+  SIGEL_Tools::SIG_IO::cerr << "Slave is used to visualize!" << Qt::endl;
+#endif
+  QApplication a(argc, argv);
+  QApplication::setStyle( QStyleFactory::create( "Fusion" ) );
+
+  SIG_MovieStaticRunInfo staticRunInfo;
+  staticRunInfo.setExperimentFileName( pvmData.getExperimentName() );
+  staticRunInfo.individualName = pvmData.getIndividualName();
+  staticRunInfo.individualFitness = pvmData.getIndividualFitness();
+  staticRunInfo.individualProgramLength = program.getProgramLength();
+  staticRunInfo.fitnessFunctionName = nameOfFitnessFunction( pvmData.getFitnessFunctionName() );
+
+  // if we use the RemoteZORC-Fitnessfunction: run evaluation to transmit the program !
+  const SIGEL_GP::SIG_GPRemoteZORCFitnessFunction remoteZORC;
+  if (pvmData.getFitnessFunctionName() == remoteZORC.serializedId())
+    remoteZORC.evalFitness( program, robot, environment, simulationParameters );
+
+  return showSimulation( robot, environment, simulationParameters, program, staticRunInfo );
+}
+
 int runPVMJob( int argc, char *argv[] ) {
   // evolvers must be nice to other concurrently running programs
   constexpr int lowestPriority = 19;
@@ -256,33 +283,8 @@ int runPVMJob( int argc, char *argv[] ) {
     return 1;
   }
 
-  bool visualize = pvmData.getVisualize();
-  QString fitnessFunctionName = pvmData.getFitnessFunctionName();
-  QString experimentFileName = pvmData.getExperimentName();
-  QString individualName = pvmData.getIndividualName();
-  double individualFitness = pvmData.getIndividualFitness();
-
-  if ( visualize ) {
-#ifdef SIG_DEBUG
-    SIGEL_Tools::SIG_IO::cerr << "Slave is used to visualize!" << Qt::endl;
-#endif
-    QApplication a(argc, argv);
-    QApplication::setStyle( QStyleFactory::create( "Fusion" ) );
-
-    SIG_MovieStaticRunInfo staticRunInfo;
-    staticRunInfo.setExperimentFileName( experimentFileName );
-    staticRunInfo.individualName = individualName;
-    staticRunInfo.individualFitness = individualFitness;
-    staticRunInfo.individualProgramLength = program.getProgramLength();
-
-    staticRunInfo.fitnessFunctionName = nameOfFitnessFunction( fitnessFunctionName );
-
-    // if we use the RemoteZORC-Fitnessfunction: run evaluation to transmit the program !
-    const SIGEL_GP::SIG_GPRemoteZORCFitnessFunction remoteZORC;
-    if (fitnessFunctionName == remoteZORC.serializedId())
-      remoteZORC.evalFitness( program, robot, environment, simulationParameters );
-
-    int returnValue = showSimulation( robot, environment, simulationParameters, program, staticRunInfo );
+  if ( pvmData.getVisualize() ) {
+    int returnValue = showIndividualFromPVM( argc, argv, pvmData, program, robot, environment, simulationParameters );
 
     pvm_exit();
 
@@ -294,7 +296,7 @@ int runPVMJob( int argc, char *argv[] ) {
   SIGEL_Tools::SIG_IO::cerr << "Slave is used to calculate a fitness!" << Qt::endl;
 #endif
 
-  double fitnessValue = computeFitness( argc, argv, fitnessFunctionName, program, robot, environment, simulationParameters );
+  double fitnessValue = computeFitness( argc, argv, pvmData.getFitnessFunctionName(), program, robot, environment, simulationParameters );
 
   pvm_initsend( PvmDataDefault );
   pvm_pkdouble( &fitnessValue, 1, 1 );
