@@ -184,6 +184,15 @@ Paths are relative to `sigel/`, the source tree.
   very long. Behaviour belongs to a class. Decide which class each function
   belongs to, and give the long one a name that says what it does.
 
+- [ ] **146. Rename the `_winport` names.** Locals and parameters such as
+  `_winport_R`, `_winport_near`, `_winportB` are in
+  `SIG_DynaMechsLink::forwardKinematics`, `SIG_Visualisation`, the
+  `setLeftPoints` and `setRightPoints` of the three joint classes, and
+  `IFunctions.cpp`. The prefix says nothing about the value, and most of
+  them are parameters with a leading underscore. Give each a name that says
+  what it holds, in one round. The ones in `IFunctions.cpp` go with
+  item 145.
+
 ---
 
 ## 4 · Defects preserved by the port
