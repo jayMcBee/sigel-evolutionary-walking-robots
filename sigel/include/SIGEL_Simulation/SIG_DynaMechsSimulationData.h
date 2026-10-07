@@ -76,8 +76,6 @@ namespace SIGEL_Simulation
 
       void simulationProgress();
 
-      void setNewFrame( bool newValue );
-
       dmEnvironment dynaMechsEnvironment;
 
       dmArticulation dynaMechsSystem;

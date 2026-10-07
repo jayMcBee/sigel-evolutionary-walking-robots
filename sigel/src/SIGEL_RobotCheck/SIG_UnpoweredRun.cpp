@@ -62,7 +62,6 @@ SIGEL_RobotCheck::SIG_UnpoweredRun::SIG_UnpoweredRun( const SIGEL_Robot::SIG_Rob
   // No interpreter runs, so no drive ever moves.
   while ( simulationQueries.getCurrentSimulationSeconds() < seconds )
     {
-      simulationData.setNewFrame( true );
       simulationData.simulationProgress();
       simulationData.actualFrame++;
 

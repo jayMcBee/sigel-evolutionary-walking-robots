@@ -87,8 +87,6 @@ namespace SIGEL_Simulation
 
       virtual void simulationProgress() = 0;
 
-      virtual void setNewFrame( bool newValue ) = 0;
-
     };
   
 }

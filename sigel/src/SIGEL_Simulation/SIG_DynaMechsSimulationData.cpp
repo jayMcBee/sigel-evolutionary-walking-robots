@@ -209,9 +209,6 @@ SIGEL_Simulation::SIG_DynaMechsSimulationData::SIG_DynaMechsSimulationData( SIGE
 	dmEnvironment::setEnvironment( &dynaMechsEnvironment );
 }
 
-void SIGEL_Simulation::SIG_DynaMechsSimulationData::setNewFrame( bool newValue )
-{ }
-
 SIGEL_Simulation::SIG_DynaMechsSimulationData::~SIG_DynaMechsSimulationData()
 {
 	// This class owns the links it built; drives and sensors belong to the robot.

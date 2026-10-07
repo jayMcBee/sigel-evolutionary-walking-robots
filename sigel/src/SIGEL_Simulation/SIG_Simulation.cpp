@@ -91,8 +91,6 @@ void SIGEL_Simulation::SIG_Simulation::makeTimeSteps(int numTimeSteps)
   for(int i=0;i<numTimeSteps;i++)  {
       interpreter->interprete( simulationData->simulationParameter.getStepSize() );
 
-      simulationData->setNewFrame( true );
-		
       simulationData->simulationProgress();
 
       simulationQueries->checkDynas();
