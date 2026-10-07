@@ -109,24 +109,6 @@ MT_GPManager::MT_GPManager(QTextStream &File) : QObject()
 MT_GPManager::MT_GPManager(MT_Substitute *Substitue) : QObject()
 {
 	// Not usable - use the loading constructor only 
-/*
-	Substituter = _Substitue;
-
-	BestIndividual = 0;
-	EvolStopped = false;
-	GenerationNumber =0;
-
-	Randi = new MT_Randomizer();
-	Statistics = new MT_Statistics();
-	FitnessTrainer = new MT_FitnessTrainer();
-	
-	Parent= new MT_Population(Randi, 10);
-	Offspring= new MT_Population ();
-	Offspring->changePopSize(100);
-	Seeker= new MT_Search(Parent, Offspring, Randi);
-
-	Selector = new MT_TournamentManager (Parent, Offspring, Randi, 1, 10);
-*/
 }
 
 
