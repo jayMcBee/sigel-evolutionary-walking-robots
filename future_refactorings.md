@@ -24,44 +24,6 @@ Paths are relative to `sigel/`, the source tree.
 
 ## 2 · Ownership
 
-- [ ] **8. One owner for each object.** Replace a `new` and its `delete`
-  by a local object, a value member or a `std::unique_ptr`, where no other
-  class has to change. One place per commit. Gate for each: the fitness rows
-  are identical on both builds, and the AddressSanitizer run has no report.
-
-  *Local pointer that can be a local object:*
-  - [ ] `main` in `sigel.cpp`: `mainWindow`. Never deleted, so
-    `~SIG_MainWindow` and the destructors of the open experiments have never
-    run at exit. Read that chain first, and test a quit with an open
-    experiment on the AddressSanitizer build.
-
-  *Not in this item:*
-  - Lists of raw pointers, among them the elements of `MT_Statistics`, which
-    are never deleted.
-  - `SIG_GPPopulation::randomizer` and `SIG_GPManager::trainer`: they own
-    their object in one mode and borrow it in another.
-  - Places where one owner hands the object to another, because the code for
-    the handover is not simpler than the `delete` it replaces:
-    `SIG_SimulationVisualisation::initShadowMapping` with `shadowProgram`,
-    `SIG_ExperimentListView::openExperimentFile`, `SIG_Robot::language`,
-    `SIG_Body::geometry`, `MT_Individual::Program`,
-    `MT_Programline::OperandA` and `OperandB`,
-    `MT_TrainingCase::TranslateIndividual`, and the four lists of
-    `MT_TranslatedIndividual`.
-  - `SIG_GUIGPExperiment::guiGPManager`: `slotStartEvolution` must destroy
-    the old manager before it builds the new one, because the old manager's
-    trainer removes the PVM hosts that the new one adds. That needs a
-    `reset()`.
-  - `SIG_VisualisationWidget::visualisation`: the old visualisation must be
-    destroyed before the new one is built, which needs a `reset()`, and the
-    derived widget casts the base pointer, which needs `.get()`.
-  - The DynaMechs link bodies in `SIG_DynaMechsLink::dynaMechsLink`:
-    `SIG_DynaMechsSimulationData` makes and sets up each body, and
-    `SIG_DynaMechsLink` keeps it.
-  - `MT_Controller`: `gpManager`, `substitution`. The controller destroys
-    them and makes them again at several points during its life, which
-    needs a `reset()` at each.
-
 - [ ] **140. Assess `DynaMechsLinkGuard`.** It is a hand-written struct in
   `SIG_DynaMechsSimulationData.cpp` that frees the links when the
   constructor throws. Review its design, and decide whether a standard

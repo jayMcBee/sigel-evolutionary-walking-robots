@@ -917,6 +917,44 @@ classes and leave truncation a hard error. **They are not interchangeable.**
   and `build/coredrive`. Older entries in this file keep the name
   `sigel_eval`; they mean this program.
 
+**2026-10-07 — CLOSED: ITEM 8, ONE OWNER FOR EACH OBJECT.**
+
+- The item replaced a `new` and its `delete` by a local object, a value
+  member or a `std::unique_ptr`, where no other class had to change. Every
+  such place is done.
+- **Skipped, by decision:** `mainWindow` in `main` in `sigel.cpp`. It is
+  never deleted, so the window and the open experiments are not destroyed
+  at exit. The process ends right after, and no destructor in that chain
+  saves data. `pvm_halt()` does not return when SIGEL started the daemon
+  (item 34), so a local object in the same block would not be destroyed
+  either.
+- **Not changed, by decision:**
+  - Lists of raw pointers, among them the elements of `MT_Statistics`, which
+    are never deleted.
+  - `SIG_GPPopulation::randomizer` and `SIG_GPManager::trainer`: they own
+    their object in one mode and borrow it in another.
+  - Places where one owner hands the object to another, because the code for
+    the handover is not simpler than the `delete` it replaces:
+    `SIG_SimulationVisualisation::initShadowMapping` with `shadowProgram`,
+    `SIG_ExperimentListView::openExperimentFile`, `SIG_Robot::language`,
+    `SIG_Body::geometry`, `MT_Individual::Program`,
+    `MT_Programline::OperandA` and `OperandB`,
+    `MT_TrainingCase::TranslateIndividual`, and the four lists of
+    `MT_TranslatedIndividual`.
+  - `SIG_GUIGPExperiment::guiGPManager`: `slotStartEvolution` must destroy
+    the old manager before it builds the new one, because the old manager's
+    trainer removes the PVM hosts that the new one adds. That needs a
+    `reset()`.
+  - `SIG_VisualisationWidget::visualisation`: the old visualisation must be
+    destroyed before the new one is built, which needs a `reset()`, and the
+    derived widget casts the base pointer, which needs `.get()`.
+  - The DynaMechs link bodies in `SIG_DynaMechsLink::dynaMechsLink`:
+    `SIG_DynaMechsSimulationData` makes and sets up each body, and
+    `SIG_DynaMechsLink` keeps it.
+  - `MT_Controller`: `gpManager`, `substitution`. The controller destroys
+    them and makes them again at several points during its life, which
+    needs a `reset()` at each.
+
 **2026-10-07 — DONE: ITEM 141, `main` IN `sigel_slave.cpp` IS SPLIT BY JOB.**
 
 - **Before:** one `main` did three jobs: it showed the first individual of an
