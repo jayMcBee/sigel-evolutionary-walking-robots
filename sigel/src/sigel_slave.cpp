@@ -188,6 +188,38 @@ int showFirstIndividualOfExperimentFile( int argc, char *argv[], QString const &
   return showSimulation( modifiedRobot, experiment.environment, experiment.simulationParameter, program, staticRunInfo );
 }
 
+double computeFitness( int argc, char *argv[],
+                       QString const &serializedId,
+                       SIGEL_Program::SIG_Program &program,
+                       SIGEL_Robot::SIG_Robot &robot,
+                       SIGEL_Environment::SIG_Environment &environment,
+                       SIGEL_Simulation::SIG_SimulationParameters &simulationParameters ) {
+  const std::optional<int> fitnessIndex = SIGEL_GP::SIG_GPFitnessFunctionRegistry::indexOf( serializedId );
+  if (!fitnessIndex) {
+    SIGEL_Tools::SIG_IO::cerr << "Unknown fitness function \"" << serializedId << "\"; its fitness is 0." << Qt::endl;
+    return 0;
+  }
+
+  // Remote ZORC needs a QApplication for its dialog
+  const SIGEL_GP::SIG_GPRemoteZORCFitnessFunction remoteZORC;
+  std::unique_ptr< QApplication > app;
+  if (serializedId == remoteZORC.serializedId()) {
+    app = std::make_unique< QApplication >(argc, argv);
+    app->setStyle( QStyleFactory::create( "Fusion" ) );
+  }
+
+  const QList<const SIGEL_GP::SIG_GPFitnessFunction *> &fitnessFunctions = SIGEL_GP::SIG_GPFitnessFunctionRegistry::fitnessFunctions();
+  const SIGEL_GP::SIG_GPFitnessFunction *fitnessFunction = fitnessFunctions[*fitnessIndex];
+
+  try {
+    return fitnessFunction->evalFitness( program, robot, environment, simulationParameters );
+  }
+  catch (SIGEL_Tools::SIG_Exception &e) {
+    SIGEL_Tools::SIG_IO::cerr << e.getMessage() << Qt::flush;
+    return 0;
+  }
+}
+
 int main( int argc, char *argv[] ) {
   installSigelStandardSignalHandler();
 
@@ -304,29 +336,7 @@ int main( int argc, char *argv[] ) {
       SIGEL_Tools::SIG_IO::cerr << "Slave is used to calculate a fitness!" << Qt::endl;
 #endif
 
-      const std::optional<int> fitnessIndex = SIGEL_GP::SIG_GPFitnessFunctionRegistry::indexOf( fitnessFunctionName );
-
-      // Remote ZORC needs a GUI for its requesters
-      const SIGEL_GP::SIG_GPRemoteZORCFitnessFunction remoteZORC;
-      std::unique_ptr< QApplication > app;
-      if (fitnessFunctionName == remoteZORC.serializedId()) {
-   				app = std::make_unique< QApplication >(argc, argv);
-				app->setStyle( QStyleFactory::create( "Fusion" ) );
-	  	}
-
-      double fitnessValue = 0;
-      if (fitnessIndex) {
-        try {
-          fitnessValue = SIGEL_GP::SIG_GPFitnessFunctionRegistry::fitnessFunctions()[*fitnessIndex]
-                           ->evalFitness( *program, *robot, *environment, *simulationParameters );
-        }
-        catch (SIGEL_Tools::SIG_Exception &e) {
-          SIGEL_Tools::SIG_IO::cerr << e.getMessage() << Qt::flush;
-          fitnessValue = 0;
-        };
-      }
-      else
-        SIGEL_Tools::SIG_IO::cerr << "Unknown fitness function \"" << fitnessFunctionName << "\"; its fitness is 0." << Qt::endl;
+      double fitnessValue = computeFitness( argc, argv, fitnessFunctionName, *program, *robot, *environment, *simulationParameters );
 
       pvm_initsend( PvmDataDefault );
       pvm_pkdouble( &fitnessValue, 1, 1 );
