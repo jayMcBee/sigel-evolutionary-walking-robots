@@ -183,6 +183,15 @@ Paths are relative to `sigel/`, the source tree.
   what it holds, in one round. The ones in `IFunctions.cpp` go with
   item 145.
 
+- [ ] **149. Clean up the empty lines, one module at a time.** Many
+  functions have an empty line right after their `{` or right before their
+  `}`, and the space between two functions is one line in some places and
+  several in others. The rule: no empty line after the `{` or before the
+  `}` of a function or block, one empty line between two functions, never
+  two empty lines in a row. Decide first what holds for the braces of
+  classes and namespaces. The change touches only empty lines, so the file
+  without white space must stay identical.
+
 ---
 
 ## 4 · Defects preserved by the port
