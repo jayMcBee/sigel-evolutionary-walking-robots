@@ -127,6 +127,58 @@ int showSimulation( SIGEL_Robot::SIG_Robot const &robot,
   return QApplication::exec();
 }
 
+int showFirstIndividualOfExperimentFile( int argc, char *argv[], QString const &experimentFileName ) {
+  QFile experimentFile( experimentFileName );
+  if (!experimentFile.open( QIODevice::ReadOnly )) {
+    SIGEL_Tools::SIG_IO::cerr << "Error opening " << experimentFileName << "!" << Qt::endl;
+    pvm_halt();
+    return 1;
+  }
+
+  SIGEL_GP::SIG_GPExperiment experiment;
+
+  QTextStream experimentStream( &experimentFile );
+
+  try {
+    experiment.loadExperiment( experimentStream );
+  }
+  catch (SIGEL_Tools::SIG_Exception &e) {
+    SIGEL_Tools::SIG_IO::cerr << e.getMessage() << Qt::flush;
+    return 1;
+  }
+
+  experimentFile.close();
+
+#ifdef SIG_DEBUG
+  SIGEL_Tools::SIG_IO::cerr << "Slave is used to visualize!" << Qt::endl;
+#endif
+
+  SIGEL_Robot::SIG_Robot modifiedRobot( experiment.robot );
+
+  try {
+    modifiedRobot.prepareDynaMechs();
+  }
+  catch (SIGEL_Tools::SIG_Exception &e) {
+    SIGEL_Tools::SIG_IO::cerr << e.getMessage() << Qt::flush;
+    return 1;
+  }
+
+  QApplication a(argc, argv);
+  QApplication::setStyle( QStyleFactory::create( "Fusion" ) );
+
+  SIGEL_GP::SIG_GPIndividual &individual = experiment.population.getIndividual( 0 );
+  SIGEL_Program::SIG_Program &program = individual.getProgramVar();
+
+  SIG_MovieStaticRunInfo staticRunInfo;
+  staticRunInfo.setExperimentFileName( experimentFileName );
+  staticRunInfo.individualName = individual.getName();
+  staticRunInfo.individualFitness = individual.getFitness();
+  staticRunInfo.individualProgramLength = program.getProgramLength();
+  staticRunInfo.fitnessFunctionName = nameOfFitnessFunction( experiment.gpParameter.getFitnessName() );
+
+  return showSimulation( modifiedRobot, experiment.environment, experiment.simulationParameter, program, staticRunInfo );
+}
+
 int main( int argc, char *argv[] ) {
   // Install the sigel standard signal handler
   std::signal( SIGABRT, sigelStandardSignalHandler );
@@ -140,7 +192,6 @@ int main( int argc, char *argv[] ) {
   SIGEL_Environment::SIG_Environment *environment = nullptr;
   SIGEL_Simulation::SIG_SimulationParameters *simulationParameters = nullptr;
   SIGEL_Program::SIG_Program *program = nullptr;
-  std::unique_ptr< SIGEL_GP::SIG_GPExperiment > experiment;
   bool visualize = false;
   QString fitnessFunctionName;
   QString experimentFileName;
@@ -169,37 +220,7 @@ int main( int argc, char *argv[] ) {
       return 1;
     }
 
-    QString experimentName( argv[2] );
-    experimentFileName = experimentName;
-    QFile experimentFile( experimentName );
-    if (!experimentFile.open( QIODevice::ReadOnly )) {
-	  	SIGEL_Tools::SIG_IO::cerr << "Error opening " << experimentName << "!" << Qt::endl;
-	  	pvm_halt();
-	  	return 1;
-    }
-
-    experiment = std::make_unique< SIGEL_GP::SIG_GPExperiment >();
-
-    QTextStream experimentStream( &experimentFile );
-
-    try {
-      experiment->loadExperiment( experimentStream );
-    }
-    catch (SIGEL_Tools::SIG_Exception &e) {
-      SIGEL_Tools::SIG_IO::cerr << e.getMessage() << Qt::flush;
-      return 1;
-    }
-
-    experimentFile.close();
-
-    robot = &experiment->robot;
-    environment = &experiment->environment;
-    simulationParameters = &experiment->simulationParameter;
-    program = &experiment->population.getIndividual( 0 ).getProgramVar();
-    individualName = experiment->population.getIndividual( 0 ).getName();
-    individualFitness = experiment->population.getIndividual( 0 ).getFitness();
-    visualize = true;
-
+    return showFirstIndividualOfExperimentFile( argc, argv, QString( argv[2] ) );
   } // MODE:  StandAlone (if end)
 
   // MODE:  Evolve, slave was started via PVM to calc. fitness
@@ -253,22 +274,6 @@ int main( int argc, char *argv[] ) {
 #ifdef SIG_DEBUG
     SIGEL_Tools::SIG_IO::cerr << "Slave is used to visualize!" << Qt::endl;
 #endif
-    // now get the robot data, either via pvm or load from exp file
-    SIGEL_Robot::SIG_Robot *modifiedRobot;
-
-    if (standAlone) {
-      modifiedRobot = new SIGEL_Robot::SIG_Robot( *robot );
-
-      try {
-        modifiedRobot->prepareDynaMechs();
-      }
-      catch (SIGEL_Tools::SIG_Exception &e) {
-        SIGEL_Tools::SIG_IO::cerr << e.getMessage() << Qt::flush;
-        return 1;
-      };
-    } // if(standAlone) - condition
-    else modifiedRobot = robot;
-
     QApplication a(argc, argv);
     QApplication::setStyle( QStyleFactory::create( "Fusion" ) );
 
@@ -278,18 +283,16 @@ int main( int argc, char *argv[] ) {
     staticRunInfo.individualFitness = individualFitness;
     staticRunInfo.individualProgramLength = program->getProgramLength();
 
-    QString fitnessFunctionId = standAlone ? experiment->gpParameter.getFitnessName() : fitnessFunctionName;
-    staticRunInfo.fitnessFunctionName = nameOfFitnessFunction( fitnessFunctionId );
+    staticRunInfo.fitnessFunctionName = nameOfFitnessFunction( fitnessFunctionName );
 
     // if we use the RemoteZORC-Fitnessfunction: run evaluation to transmit the program !
     const SIGEL_GP::SIG_GPRemoteZORCFitnessFunction remoteZORC;
     if (fitnessFunctionName == remoteZORC.serializedId())
       remoteZORC.evalFitness( *program, *robot, *environment, *simulationParameters );
 
-    returnValue = showSimulation( *modifiedRobot, *environment, *simulationParameters, *program, staticRunInfo );
+    returnValue = showSimulation( *robot, *environment, *simulationParameters, *program, staticRunInfo );
 
-    if ( !standAlone )
-      pvm_exit();
+    pvm_exit();
   }
 
     // launched to compute !! Just evaluate fitness, no window-stuff.
