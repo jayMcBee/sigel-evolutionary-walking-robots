@@ -220,18 +220,94 @@ double computeFitness( int argc, char *argv[],
   }
 }
 
+int runPVMJob( int argc, char *argv[] ) {
+  // evolvers must be nice to other concurrently running programs;
+  // thus use setpriority OSCall to decrease the priority
+  setpriority(PRIO_PROCESS, 0, 19);
+
+  SIGEL_Robot::SIG_Robot robot;
+  SIGEL_Environment::SIG_Environment environment;
+  SIGEL_Simulation::SIG_SimulationParameters simulationParameters;
+  SIGEL_Program::SIG_Program program;
+
+  //Register to PVM
+  int myTaskID = pvm_mytid();
+  masterTaskId = pvm_parent();
+
+  if ((masterTaskId==PvmSysErr) || (masterTaskId==PvmNoParent)) {
+    SIGEL_Tools::SIG_IO::cerr << "Program hasn't been started as a PVM slave!" << Qt::endl;
+    exit(1);
+  }
+
+  SIGEL_GP::SIG_GPPVMData pvmData( robot,
+         environment,
+         simulationParameters,
+         "",
+         false );
+
+  QString pvmDataString = pvmData.getQStringFromPVM( masterTaskId, 23 );
+
+  QTextStream pvmDataStream( &pvmDataString, QIODeviceBase::ReadWrite );
+
+  try {
+    pvmData.loadPVMDataTransfer( pvmDataStream, program );
+  }
+  catch (SIGEL_Tools::SIG_Exception &e) {
+    SIGEL_Tools::SIG_IO::cerr << e.getMessage() << Qt::flush;
+    return 1;
+  }
+
+  bool visualize = pvmData.getVisualize();
+  QString fitnessFunctionName = pvmData.getFitnessFunctionName();
+  QString experimentFileName = pvmData.getExperimentName();
+  QString individualName = pvmData.getIndividualName();
+  double individualFitness = pvmData.getIndividualFitness();
+
+  if ( visualize ) {
+#ifdef SIG_DEBUG
+    SIGEL_Tools::SIG_IO::cerr << "Slave is used to visualize!" << Qt::endl;
+#endif
+    QApplication a(argc, argv);
+    QApplication::setStyle( QStyleFactory::create( "Fusion" ) );
+
+    SIG_MovieStaticRunInfo staticRunInfo;
+    staticRunInfo.setExperimentFileName( experimentFileName );
+    staticRunInfo.individualName = individualName;
+    staticRunInfo.individualFitness = individualFitness;
+    staticRunInfo.individualProgramLength = program.getProgramLength();
+
+    staticRunInfo.fitnessFunctionName = nameOfFitnessFunction( fitnessFunctionName );
+
+    // if we use the RemoteZORC-Fitnessfunction: run evaluation to transmit the program !
+    const SIGEL_GP::SIG_GPRemoteZORCFitnessFunction remoteZORC;
+    if (fitnessFunctionName == remoteZORC.serializedId())
+      remoteZORC.evalFitness( program, robot, environment, simulationParameters );
+
+    int returnValue = showSimulation( robot, environment, simulationParameters, program, staticRunInfo );
+
+    pvm_exit();
+
+    return returnValue;
+  }
+
+  // launched to compute !! Just evaluate fitness, no window-stuff.
+#ifdef SIG_DEBUG
+  SIGEL_Tools::SIG_IO::cerr << "Slave is used to calculate a fitness!" << Qt::endl;
+#endif
+
+  double fitnessValue = computeFitness( argc, argv, fitnessFunctionName, program, robot, environment, simulationParameters );
+
+  pvm_initsend( PvmDataDefault );
+  pvm_pkdouble( &fitnessValue, 1, 1 );
+  pvm_send( masterTaskId, 5 );
+
+  pvm_exit();
+
+  return 0;
+}
+
 int main( int argc, char *argv[] ) {
   installSigelStandardSignalHandler();
-
-  SIGEL_Robot::SIG_Robot *robot = nullptr;
-  SIGEL_Environment::SIG_Environment *environment = nullptr;
-  SIGEL_Simulation::SIG_SimulationParameters *simulationParameters = nullptr;
-  SIGEL_Program::SIG_Program *program = nullptr;
-  bool visualize = false;
-  QString fitnessFunctionName;
-  QString experimentFileName;
-  QString individualName;
-  double individualFitness = 0;
 
   bool standAlone = false;
 
@@ -258,94 +334,5 @@ int main( int argc, char *argv[] ) {
     return showFirstIndividualOfExperimentFile( argc, argv, QString( argv[2] ) );
   } // MODE:  StandAlone (if end)
 
-  // MODE:  Evolve, slave was started via PVM to calc. fitness
-  else {
-    // evolvers must be nice to other concurrently running programs;
-    // thus use setpriority OSCall to decrease the priority
-    setpriority(PRIO_PROCESS, 0, 19);
-
-    robot = new SIGEL_Robot::SIG_Robot();
-    environment = new SIGEL_Environment::SIG_Environment();
-    simulationParameters = new SIGEL_Simulation::SIG_SimulationParameters();
-    program = new SIGEL_Program::SIG_Program();
-
-      //Register to PVM
-    int myTaskID = pvm_mytid();
-    masterTaskId = pvm_parent();
-
-    if ((masterTaskId==PvmSysErr) || (masterTaskId==PvmNoParent)) {
-      SIGEL_Tools::SIG_IO::cerr << "Program hasn't been started as a PVM slave!" << Qt::endl;
-      exit(1);
-    }
-
-    SIGEL_GP::SIG_GPPVMData pvmData( *robot,
-           *environment,
-           *simulationParameters,
-           "",
-           false );
-
-    QString pvmDataString = pvmData.getQStringFromPVM( masterTaskId, 23 );
-
-    QTextStream pvmDataStream( &pvmDataString, QIODeviceBase::ReadWrite );
-
-    try {
-      pvmData.loadPVMDataTransfer( pvmDataStream, *program );
-    }
-    catch (SIGEL_Tools::SIG_Exception &e) {
-      SIGEL_Tools::SIG_IO::cerr << e.getMessage() << Qt::flush;
-      return 1;
-    }
-
-    visualize = pvmData.getVisualize();
-    fitnessFunctionName = pvmData.getFitnessFunctionName();
-    experimentFileName = pvmData.getExperimentName();
-    individualName = pvmData.getIndividualName();
-    individualFitness = pvmData.getIndividualFitness();
-  }
-
-  int returnValue = 0;
-
-  if ( visualize ) {
-#ifdef SIG_DEBUG
-    SIGEL_Tools::SIG_IO::cerr << "Slave is used to visualize!" << Qt::endl;
-#endif
-    QApplication a(argc, argv);
-    QApplication::setStyle( QStyleFactory::create( "Fusion" ) );
-
-    SIG_MovieStaticRunInfo staticRunInfo;
-    staticRunInfo.setExperimentFileName( experimentFileName );
-    staticRunInfo.individualName = individualName;
-    staticRunInfo.individualFitness = individualFitness;
-    staticRunInfo.individualProgramLength = program->getProgramLength();
-
-    staticRunInfo.fitnessFunctionName = nameOfFitnessFunction( fitnessFunctionName );
-
-    // if we use the RemoteZORC-Fitnessfunction: run evaluation to transmit the program !
-    const SIGEL_GP::SIG_GPRemoteZORCFitnessFunction remoteZORC;
-    if (fitnessFunctionName == remoteZORC.serializedId())
-      remoteZORC.evalFitness( *program, *robot, *environment, *simulationParameters );
-
-    returnValue = showSimulation( *robot, *environment, *simulationParameters, *program, staticRunInfo );
-
-    pvm_exit();
-  }
-
-    // launched to compute !! Just evaluate fitness, no window-stuff.
-    else {
-#ifdef SIG_DEBUG
-      SIGEL_Tools::SIG_IO::cerr << "Slave is used to calculate a fitness!" << Qt::endl;
-#endif
-
-      double fitnessValue = computeFitness( argc, argv, fitnessFunctionName, *program, *robot, *environment, *simulationParameters );
-
-      pvm_initsend( PvmDataDefault );
-      pvm_pkdouble( &fitnessValue, 1, 1 );
-      pvm_send( masterTaskId, 5 );
-
-      pvm_exit();
-
-    };
-
-  return returnValue;
-
-};
+  return runPVMJob( argc, argv );
+}

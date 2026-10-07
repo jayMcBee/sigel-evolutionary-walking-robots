@@ -30,8 +30,6 @@ Paths are relative to `sigel/`, the source tree.
   are identical on both builds, and the AddressSanitizer run has no report.
 
   *Local pointer that can be a local object:*
-  - [ ] `main` in `sigel_slave.cpp`: `robot`, `environment`,
-    `simulationParameters`, `program`. They wait for item 141.
   - [ ] `main` in `sigel.cpp`: `mainWindow`. Never deleted, so
     `~SIG_MainWindow` and the destructors of the open experiments have never
     run at exit. Read that chain first, and test a quit with an open
