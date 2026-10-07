@@ -221,9 +221,9 @@ double computeFitness( int argc, char *argv[],
 }
 
 int runPVMJob( int argc, char *argv[] ) {
-  // evolvers must be nice to other concurrently running programs;
-  // thus use setpriority OSCall to decrease the priority
-  setpriority(PRIO_PROCESS, 0, 19);
+  // evolvers must be nice to other concurrently running programs
+  constexpr int lowestPriority = 19;
+  setpriority(PRIO_PROCESS, 0, lowestPriority);
 
   SIGEL_Robot::SIG_Robot robot;
   SIGEL_Environment::SIG_Environment environment;
