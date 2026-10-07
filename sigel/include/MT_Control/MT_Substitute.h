@@ -64,7 +64,8 @@ public:
 	virtual void writeToFileSetup(QTextStream &File);
 
 private:
-
+	static constexpr int startNumberOfVariables = 10;
+	static constexpr int startDuration = 100;
 
 protected:
 	

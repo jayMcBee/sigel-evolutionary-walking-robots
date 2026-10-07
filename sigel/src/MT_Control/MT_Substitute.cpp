@@ -2,7 +2,7 @@
 #include "MT_Control/MT_Substitute.h"
 
 MT_Substitute::MT_Substitute()
-	: Interpreter(10,100) // WARNING: parameters still need changing! setInterpreter(int NumOfVariable, int TimeToInter)
+	: Interpreter( startNumberOfVariables, startDuration )
 {
  // overloaded method
 	pthread_mutex_init(&interpreterMutex, nullptr);
