@@ -413,6 +413,13 @@ touched, because changing one changes behaviour against the reference binary.
   it. Use a scoped enum. The count of mutated elements is a second value
   and needs its own member.
 
+- [ ] **148. Name the estimation strategies.** `EstimationStrategy` in
+  `MT_Substitute` is a bare `int`. `MT_Evaluator::evaluationTactic` and
+  `MT_Classifier::evaluationTactic` switch on its numbers, and only the
+  list in `MT_EstimationWidget` gives them names. Use a scoped enum. The
+  number is written into the saved MetaGP file, so each enumerator keeps
+  its value.
+
 - [ ] **147. Remove the `evolutionRunning` methods that do nothing.**
   `MT_PopulationWidget`, `MT_SearchWidget`, `MT_SelectionWidget`,
   `MT_EstimationWidget` and `MT_IndividualsWidget` each have an
