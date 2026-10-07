@@ -93,6 +93,15 @@ extern "C"
 
 bool guiEnabled = false;
 
+void installSigelStandardSignalHandler() {
+  std::signal( SIGABRT, sigelStandardSignalHandler );
+  std::signal( SIGFPE, sigelStandardSignalHandler );
+  std::signal( SIGILL, sigelStandardSignalHandler );
+  std::signal( SIGINT, sigelStandardSignalHandler );
+  std::signal( SIGSEGV, sigelStandardSignalHandler );
+  std::signal( SIGTERM, sigelStandardSignalHandler );
+}
+
 // The name of the fitness function; the ID itself for an unknown ID.
 QString nameOfFitnessFunction( QString const &serializedId ) {
   const std::optional<int> fitnessIndex = SIGEL_GP::SIG_GPFitnessFunctionRegistry::indexOf( serializedId );
@@ -180,13 +189,7 @@ int showFirstIndividualOfExperimentFile( int argc, char *argv[], QString const &
 }
 
 int main( int argc, char *argv[] ) {
-  // Install the sigel standard signal handler
-  std::signal( SIGABRT, sigelStandardSignalHandler );
-  std::signal( SIGFPE, sigelStandardSignalHandler );
-  std::signal( SIGILL, sigelStandardSignalHandler );
-  std::signal( SIGINT, sigelStandardSignalHandler );
-  std::signal( SIGSEGV, sigelStandardSignalHandler );
-  std::signal( SIGTERM, sigelStandardSignalHandler );
+  installSigelStandardSignalHandler();
 
   SIGEL_Robot::SIG_Robot *robot = nullptr;
   SIGEL_Environment::SIG_Environment *environment = nullptr;
