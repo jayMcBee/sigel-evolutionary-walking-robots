@@ -43,10 +43,10 @@ MT_GPManager::MT_GPManager(QTextStream &File) : QObject()
 	if (GenerationNumber !=0)
 		BestIndividual = std::make_unique< MT_Individual >(File);
 		
-	Randi = new MT_Randomizer(File);
+	Randi = std::make_unique< MT_Randomizer >(File);
 	
 	if (GenerationNumber ==0)
-		BestIndividual = std::make_unique< MT_Individual >(-1, Randi);
+		BestIndividual = std::make_unique< MT_Individual >(-1, Randi.get());
 
 	if(BestIndividual->getLastError()!= 0)
 		LastError = BestIndividual->getLastError();
@@ -76,7 +76,7 @@ MT_GPManager::MT_GPManager(QTextStream &File) : QObject()
 		else
 		{
 			int NewParentSize = (File.readLine()).toInt();
-			Parent = std::make_unique< MT_Population >(Randi,NewParentSize);
+			Parent = std::make_unique< MT_Population >(Randi.get(),NewParentSize);
 		}
 	}
 	else 
@@ -90,13 +90,13 @@ MT_GPManager::MT_GPManager(QTextStream &File) : QObject()
 		LastError = 3;
 	}
 
-	Seeker = std::make_unique< MT_Search >(Parent.get(), Offspring.get(), Randi, File);
+	Seeker = std::make_unique< MT_Search >(Parent.get(), Offspring.get(), Randi.get(), File);
 	if(Seeker->getLastError() != 0)
 		LastError = Seeker->getLastError();
 
 
 
-	Selector = std::make_unique< MT_TournamentManager >(Parent.get(), Offspring.get(), Randi, File);
+	Selector = std::make_unique< MT_TournamentManager >(Parent.get(), Offspring.get(), Randi.get(), File);
 	if(Selector->getLastError() != 0)
 		LastError = Selector->getLastError();
 	FitnessTrainer = std::make_unique< MT_FitnessTrainer >(File);
@@ -120,7 +120,6 @@ MT_GPManager::MT_GPManager() : QObject()
 MT_GPManager::~MT_GPManager()
 {	
 
-	delete Randi;
 
 	pthread_mutex_unlock(&evolutionMutex);
 }
@@ -343,7 +342,7 @@ MT_Population * MT_GPManager::getParent()
 MT_Randomizer * MT_GPManager::getRandomizer()
 {
 
-	return Randi;
+	return Randi.get();
 }
 
 void MT_GPManager::setSelektionValue(int _OffspringSize, int _TournamentSize, int _SMethod, int _FitnessFunction, int _TrainingSetSize, int _TrainingDuration)

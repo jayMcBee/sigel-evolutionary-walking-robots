@@ -41,11 +41,6 @@ Paths are relative to `sigel/`, the source tree.
     run at exit. Read that chain first, and test a quit with an open
     experiment on the AddressSanitizer build.
 
-  *Pointer member with one owner:*
-  - [ ] `MT_GPManager`: `BestIndividual`, `Randi`, `Statistics`, `Offspring`,
-    `Parent`, `Seeker`, `Selector`, `FitnessTrainer`. Used by the MetaGP
-    thread and the GUI thread.
-
   *Not in this item:*
   - Lists of raw pointers, among them the elements of `MT_Statistics`, which
     are never deleted.

@@ -129,7 +129,7 @@ private:
 	std::unique_ptr< MT_Population > Parent;
 	
 	/* the random provider */
-	MT_Randomizer * Randi;
+	std::unique_ptr< MT_Randomizer > Randi;
 
 	/* a pointer of the META Substituter; for updating the Fitnesscases
 	* and the momentary  best Meta Individual
