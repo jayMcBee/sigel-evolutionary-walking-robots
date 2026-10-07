@@ -93,6 +93,18 @@ extern "C"
 
 bool guiEnabled = false;
 
+// The name of the fitness function; the ID itself for an unknown ID.
+QString nameOfFitnessFunction( QString const &serializedId ) {
+  const std::optional<int> fitnessIndex = SIGEL_GP::SIG_GPFitnessFunctionRegistry::indexOf( serializedId );
+  if (!fitnessIndex)
+    return serializedId;
+
+  const QList<const SIGEL_GP::SIG_GPFitnessFunction *> &fitnessFunctions = SIGEL_GP::SIG_GPFitnessFunctionRegistry::fitnessFunctions();
+  const SIGEL_GP::SIG_GPFitnessFunction *fitnessFunction = fitnessFunctions[*fitnessIndex];
+
+  return fitnessFunction->name();
+}
+
 int showSimulation( SIGEL_Robot::SIG_Robot const &robot,
                     SIGEL_Environment::SIG_Environment const &environment,
                     SIGEL_Simulation::SIG_SimulationParameters const &simulationParameters,
@@ -266,13 +278,8 @@ int main( int argc, char *argv[] ) {
     staticRunInfo.individualFitness = individualFitness;
     staticRunInfo.individualProgramLength = program->getProgramLength();
 
-    // An ID the registry does not know is shown as it is.
     QString fitnessFunctionId = standAlone ? experiment->gpParameter.getFitnessName() : fitnessFunctionName;
-    const std::optional<int> shownFitnessIndex = SIGEL_GP::SIG_GPFitnessFunctionRegistry::indexOf( fitnessFunctionId );
-    if (shownFitnessIndex)
-      staticRunInfo.fitnessFunctionName = SIGEL_GP::SIG_GPFitnessFunctionRegistry::fitnessFunctions()[*shownFitnessIndex]->name();
-    else
-      staticRunInfo.fitnessFunctionName = fitnessFunctionId;
+    staticRunInfo.fitnessFunctionName = nameOfFitnessFunction( fitnessFunctionId );
 
     // if we use the RemoteZORC-Fitnessfunction: run evaluation to transmit the program !
     const SIGEL_GP::SIG_GPRemoteZORCFitnessFunction remoteZORC;
