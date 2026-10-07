@@ -52,8 +52,6 @@ Paths are relative to `sigel/`, the source tree.
   - [ ] `MT_Substitute`: `Interpreter`, `BestMETAProgram`.
 
   *A `new` that nothing deletes:*
-  - [ ] `MT_Classifier::classifier`: the `MT_TranslatedIndividual` from
-    `createDoubleTransIndi`.
   - [ ] `MT_Evaluator::spawnTask`: the `MT_TranslatedIndividual` from
     `translatedSIGProg`.
 

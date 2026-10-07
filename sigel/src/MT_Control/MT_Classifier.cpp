@@ -1,6 +1,7 @@
 #include <QList>
 #include <QString>
 #include <QTextStream>
+#include <memory>
 #include "MT_Control/MT_Classifier.h"
 
 MT_Classifier::MT_Classifier(QTextStream &File) : MT_Substitute()
@@ -110,11 +111,9 @@ void MT_Classifier::writeToFileSetup(QTextStream &File)
 
 double MT_Classifier::classifier(SIGEL_Program::SIG_Program const * SigProgOne, SIGEL_Program::SIG_Program const * SigProgTwo)
 {
+	std::unique_ptr< MT_TranslatedIndividual > TransIndi( createDoubleTransIndi(SigProgOne, SigProgTwo) );
 
-		double MetaEstimationResult = Interpreter->interpret(createDoubleTransIndi(SigProgOne, SigProgTwo));
-
-		return MetaEstimationResult;
-
+	return Interpreter->interpret( TransIndi.get() );
 }
 
 void MT_Classifier::createNewTCase(SIGEL_Program::SIG_Program const * SigProgOne, SIGEL_Program::SIG_Program const * SigProgTwo, double FitDifference)
