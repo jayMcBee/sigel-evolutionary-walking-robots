@@ -53,160 +53,160 @@ using namespace SIGEL_Tools;
 
 namespace {
 
-  /*
-   * Frees the links if the constructor throws. A constructor that throws does
-   * not run its own destructor, and ~QList frees no pointer.
-   *
-   * This happens: SIG_Mirtich::computePhysics throws SIG_CannotMirtich on a NaN
-   * mass or inertia, and the SIG_DynaMechsLink constructor calls it.
-   *
-   * Disarm by clearing 'links' once the object is fully built.
-   */
-  struct DynaMechsLinkGuard
-    {
-      QList< SIGEL_Simulation::SIG_DynaMechsLink * > *links;
+	/*
+	 * Frees the links if the constructor throws. A constructor that throws does
+	 * not run its own destructor, and ~QList frees no pointer.
+	 *
+	 * This happens: SIG_Mirtich::computePhysics throws SIG_CannotMirtich on a NaN
+	 * mass or inertia, and the SIG_DynaMechsLink constructor calls it.
+	 *
+	 * Disarm by clearing 'links' once the object is fully built.
+	 */
+	struct DynaMechsLinkGuard
+	{
+		QList< SIGEL_Simulation::SIG_DynaMechsLink * > *links;
 
-      ~DynaMechsLinkGuard() { if (links) { qDeleteAll( *links ); links->fill( nullptr ); } }
-    };
+		~DynaMechsLinkGuard() { if (links) { qDeleteAll( *links ); links->fill( nullptr ); } }
+	};
 
 };
 
 SIGEL_Simulation::SIG_DynaMechsSimulationData::SIG_DynaMechsSimulationData( SIGEL_Robot::SIG_Robot const& robot,
-							  SIGEL_Environment::SIG_Environment const& environment,
-							  SIGEL_Simulation::SIG_SimulationParameters const& simulationParameter)
-  : SIG_SimulationData( robot, environment, simulationParameter ),
-    dynaMechsLinks( robot.getLinks().count() ),
-    jointIndices( robot.getJoints().count() ),
-    drives( robot.getDrives().count() ),
-    driveForcesTimeAccounts( robot.getDrives().count() ),
-    sensors( robot.getSensors().count() )
+                                                          SIGEL_Environment::SIG_Environment const& environment,
+                                                          SIGEL_Simulation::SIG_SimulationParameters const& simulationParameter)
+	: SIG_SimulationData( robot, environment, simulationParameter ),
+	  dynaMechsLinks( robot.getLinks().count() ),
+	  jointIndices( robot.getJoints().count() ),
+	  drives( robot.getDrives().count() ),
+	  driveForcesTimeAccounts( robot.getDrives().count() ),
+	  sensors( robot.getSensors().count() )
 {
-  // DynaMechs has one current environment; a second simulation would take it from the first.
-  if ( dmEnvironment::getEnvironment() )
-    throw SIGEL_Tools::SIG_Exception( __FILE__, __LINE__, "A simulation already exists in this process." );
+	// DynaMechs has one current environment; a second simulation would take it from the first.
+	if ( dmEnvironment::getEnvironment() )
+		throw SIGEL_Tools::SIG_Exception( __FILE__, __LINE__, "A simulation already exists in this process." );
 
-  dynaMechsLinks.fill( nullptr );
+	dynaMechsLinks.fill( nullptr );
 
-  DynaMechsLinkGuard linkGuard = { &dynaMechsLinks };
+	DynaMechsLinkGuard linkGuard = { &dynaMechsLinks };
 
-  jointIndices.fill( 0 );
+	jointIndices.fill( 0 );
 
-  driveForcesTimeAccounts.fill( 0 );
+	driveForcesTimeAccounts.fill( 0 );
 
-  drives.fill( nullptr );
+	drives.fill( nullptr );
 
-  sensors.fill( nullptr );
+	sensors.fill( nullptr );
 
-  initializeEnvironment();
+	initializeEnvironment();
 
-  switch (simulationParameter.getDynaMechsIntegrator())
-    {
-    case SIG_SimulationParameters::Euler:
-      dynaMechsIntegrator = std::make_unique< dmIntegEuler >();
-      break;
-    case SIG_SimulationParameters::RungeKutta4:
-      dynaMechsIntegrator = std::make_unique< dmIntegRK4 >();
-      break;
-    case SIG_SimulationParameters::RungeKutta45:
-      dynaMechsIntegrator = std::make_unique< dmIntegRK45 >();
-      break;
-    };
-
-  initializeArticulation();
-
-  for (SIGEL_Robot::SIG_Drive *actDrive : robot.getDrives())
-    {
-
-      switch (actDrive->getMode())
+	switch (simulationParameter.getDynaMechsIntegrator())
 	{
-		//	should work for both, simple-servo and force drives..
-	  case SIGEL_Robot::SIG_Drive::tForceMode:
-	  case SIGEL_Robot::SIG_Drive::tServoSimpleMode:
-	  {
-	    int jointNumber = actDrive->getJoint()->getNumber();
+	case SIG_SimulationParameters::Euler:
+		dynaMechsIntegrator = std::make_unique< dmIntegEuler >();
+		break;
+	case SIG_SimulationParameters::RungeKutta4:
+		dynaMechsIntegrator = std::make_unique< dmIntegRK4 >();
+		break;
+	case SIG_SimulationParameters::RungeKutta45:
+		dynaMechsIntegrator = std::make_unique< dmIntegRK45 >();
+		break;
+	};
 
-	    int linkNumber = jointIndices[ jointNumber ];
+	initializeArticulation();
 
-	    if (dynaMechsLinks[ linkNumber ])
-	      {
+	for (SIGEL_Robot::SIG_Drive *actDrive : robot.getDrives())
+	{
+
+		switch (actDrive->getMode())
+		{
+			//	should work for both, simple-servo and force drives..
+		case SIGEL_Robot::SIG_Drive::tForceMode:
+		case SIGEL_Robot::SIG_Drive::tServoSimpleMode:
+		{
+			int jointNumber = actDrive->getJoint()->getNumber();
+
+			int linkNumber = jointIndices[ jointNumber ];
+
+			if (dynaMechsLinks[ linkNumber ])
+			{
 
 #ifdef SIG_DEBUG
-		SIGEL_Tools::SIG_IO::cerr << "Inserting drive "
-					  << actDrive->getName()
-					  << " at joint "
-					  << jointNumber
-					  << " corresponding to link "
-					  << linkNumber
-					  << ": "
-					  << dynaMechsLinks[ linkNumber ]->link->getName()
-					  << "." << Qt::endl;
+				SIGEL_Tools::SIG_IO::cerr << "Inserting drive "
+				                          << actDrive->getName()
+				                          << " at joint "
+				                          << jointNumber
+				                          << " corresponding to link "
+				                          << linkNumber
+				                          << ": "
+				                          << dynaMechsLinks[ linkNumber ]->link->getName()
+				                          << "." << Qt::endl;
 #endif
 
-		drives[ actDrive->getNumber() ] = actDrive;
-	      };
-	  };
-	  break;
+				drives[ actDrive->getNumber() ] = actDrive;
+			};
+		};
+		break;
+		};
 	};
-    };
 
-  for (SIGEL_Robot::SIG_Sensor *actSensorBase : robot.getSensors())
-  {
-	switch (actSensorBase->getSensorType())
+	for (SIGEL_Robot::SIG_Sensor *actSensorBase : robot.getSensors())
 	{
+		switch (actSensorBase->getSensorType())
+		{
 
-	 // tJointSensor:
-	  case SIGEL_Robot::SIG_Sensor::tJointSensor:
-	  {
-	    SIGEL_Robot::SIG_JointSensor *actSensor = static_cast< SIGEL_Robot::SIG_JointSensor* >(actSensorBase);
+			// tJointSensor:
+		case SIGEL_Robot::SIG_Sensor::tJointSensor:
+		{
+			SIGEL_Robot::SIG_JointSensor *actSensor = static_cast< SIGEL_Robot::SIG_JointSensor* >(actSensorBase);
 
-	    SIGEL_Robot::SIG_Joint const *joint = actSensor->getJoint();
+			SIGEL_Robot::SIG_Joint const *joint = actSensor->getJoint();
 
-	    int linkNumber = jointIndices[ joint->getNumber() ];
+			int linkNumber = jointIndices[ joint->getNumber() ];
 
-	    if (dynaMechsLinks[ linkNumber ])
-		{	sensors[ actSensor->getNumber() ] = actSensor;
+			if (dynaMechsLinks[ linkNumber ])
+			{	sensors[ actSensor->getNumber() ] = actSensor;
+			}
+			else SIGEL_Tools::SIG_IO::cerr << "Houston, we've got a problem here !  No link, no fun in  SIG_DynaMechsSimulationData (1)" << Qt::endl;
 		}
-		else SIGEL_Tools::SIG_IO::cerr << "Houston, we've got a problem here !  No link, no fun in  SIG_DynaMechsSimulationData (1)" << Qt::endl;
-	  }
-	  break;
+		break;
 
-	 // tPitchRollSensor
-	  case SIGEL_Robot::SIG_Sensor::tPitchRollSensor:
-	  {
-	    SIGEL_Robot::SIG_PitchRollSensor *actSensor = static_cast< SIGEL_Robot::SIG_PitchRollSensor* >(actSensorBase);
-	    SIGEL_Robot::SIG_Link const *link = actSensor->getLink();
+			// tPitchRollSensor
+		case SIGEL_Robot::SIG_Sensor::tPitchRollSensor:
+		{
+			SIGEL_Robot::SIG_PitchRollSensor *actSensor = static_cast< SIGEL_Robot::SIG_PitchRollSensor* >(actSensorBase);
+			SIGEL_Robot::SIG_Link const *link = actSensor->getLink();
 
-	    if (dynaMechsLinks[ link->getNumber() ])
-		{	sensors[ actSensor->getNumber() ] = actSensor;
+			if (dynaMechsLinks[ link->getNumber() ])
+			{	sensors[ actSensor->getNumber() ] = actSensor;
+			}
+			else SIGEL_Tools::SIG_IO::cerr << "Houston, we've got a problem here !  No link, no fun in  SIG_DynaMechsSimulationData (2)" << Qt::endl;
+
 		}
-		else SIGEL_Tools::SIG_IO::cerr << "Houston, we've got a problem here !  No link, no fun in  SIG_DynaMechsSimulationData (2)" << Qt::endl;
+		break;
 
-	  }
-	  break;
+			// tContactSensor
+		case SIGEL_Robot::SIG_Sensor::tContactSensor:
+		{
+			SIGEL_Robot::SIG_ContactSensor *actSensor = static_cast< SIGEL_Robot::SIG_ContactSensor* >(actSensorBase);
+			SIGEL_Robot::SIG_Link const *link = actSensor->getLink();
 
-	 // tContactSensor
-	  case SIGEL_Robot::SIG_Sensor::tContactSensor:
-	  {
-	    SIGEL_Robot::SIG_ContactSensor *actSensor = static_cast< SIGEL_Robot::SIG_ContactSensor* >(actSensorBase);
-	    SIGEL_Robot::SIG_Link const *link = actSensor->getLink();
+			if (dynaMechsLinks[ link->getNumber() ])
+			{	sensors[ actSensor->getNumber() ] = actSensor;
+			}
+			else SIGEL_Tools::SIG_IO::cerr << "Houston, we've got a problem here !  No link, no fun in  SIG_DynaMechsSimulationData (3)" << Qt::endl;
 
-	    if (dynaMechsLinks[ link->getNumber() ])
-		{	sensors[ actSensor->getNumber() ] = actSensor;
 		}
-		else SIGEL_Tools::SIG_IO::cerr << "Houston, we've got a problem here !  No link, no fun in  SIG_DynaMechsSimulationData (3)" << Qt::endl;
+		break;
+		}
 
-	  }
-	  break;
-}
+	}
 
-  }
+	dynaMechsIntegrator->setSystem( &dynaMechsSystem );
 
-  dynaMechsIntegrator->setSystem( &dynaMechsSystem );
+	linkGuard.links = nullptr;
 
-  linkGuard.links = nullptr;
-
-  // Last, so that a constructor that throws has no environment to release.
-  dmEnvironment::setEnvironment( &dynaMechsEnvironment );
+	// Last, so that a constructor that throws has no environment to release.
+	dmEnvironment::setEnvironment( &dynaMechsEnvironment );
 };
 
 void SIGEL_Simulation::SIG_DynaMechsSimulationData::setNewFrame( bool newValue )
@@ -214,371 +214,371 @@ void SIGEL_Simulation::SIG_DynaMechsSimulationData::setNewFrame( bool newValue )
 
 SIGEL_Simulation::SIG_DynaMechsSimulationData::~SIG_DynaMechsSimulationData()
 {
-  // This class owns the links it built; drives and sensors belong to the robot.
-  qDeleteAll( dynaMechsLinks );
-  dynaMechsLinks.fill( nullptr );
+	// This class owns the links it built; drives and sensors belong to the robot.
+	qDeleteAll( dynaMechsLinks );
+	dynaMechsLinks.fill( nullptr );
 
-  // DynaMechs must not keep the address of an environment that is gone.
-  if ( dmEnvironment::getEnvironment() == &dynaMechsEnvironment )
-    dmEnvironment::setEnvironment( nullptr );
+	// DynaMechs must not keep the address of an environment that is gone.
+	if ( dmEnvironment::getEnvironment() == &dynaMechsEnvironment )
+		dmEnvironment::setEnvironment( nullptr );
 };
 
 void SIGEL_Simulation::SIG_DynaMechsSimulationData::simulationProgress()
 {
-  Float stepSize = static_cast< Float >(simulationParameter.getStepSize());
+	Float stepSize = static_cast< Float >(simulationParameter.getStepSize());
 
-  // The actual simulation process happens here
-  // The ABDynamics algorithm in dmSystem is also invoked here.
-  dynaMechsIntegrator->simulate( stepSize );
+	// The actual simulation process happens here
+	// The ABDynamics algorithm in dmSystem is also invoked here.
+	dynaMechsIntegrator->simulate( stepSize );
 
-  for (int i = 0; i < drives.size(); i++) {
-      SIGEL_Robot::SIG_Drive *actDrive = drives[ i ];
+	for (int i = 0; i < drives.size(); i++) {
+		SIGEL_Robot::SIG_Drive *actDrive = drives[ i ];
 
-      if (actDrive)
-	{
-	  driveForcesTimeAccounts[ i ] -= simulationParameter.getStepSize();
+		if (actDrive)
+		{
+			driveForcesTimeAccounts[ i ] -= simulationParameter.getStepSize();
 
 #ifdef SIG_DEBUG
-	  SIGEL_Tools::SIG_IO::cerr << "driveForcesTimeAccount[ "
-				    << i
-				    << " ], drive "
-				    << actDrive->getName()
-				    << ": "
-				    << driveForcesTimeAccounts[ i ]
-				    << Qt::endl;
+			SIGEL_Tools::SIG_IO::cerr << "driveForcesTimeAccount[ "
+			                          << i
+			                          << " ], drive "
+			                          << actDrive->getName()
+			                          << ": "
+			                          << driveForcesTimeAccounts[ i ]
+			                          << Qt::endl;
 #endif
 
-	  if (driveForcesTimeAccounts[ i ] <= 0)
-	    {
+			if (driveForcesTimeAccounts[ i ] <= 0)
+			{
 #ifdef SIG_DEBUG
-	      SIGEL_Tools::SIG_IO::cerr << "Resetting drive "
-					<< actDrive->getName()
-					<< "." << Qt::endl;
+				SIGEL_Tools::SIG_IO::cerr << "Resetting drive "
+				                          << actDrive->getName()
+				                          << "." << Qt::endl;
 #endif
-	      driveForcesTimeAccounts[ i ] = 0;
+				driveForcesTimeAccounts[ i ] = 0;
 
-	      int jointNumber = actDrive->getJoint()->getNumber();
+				int jointNumber = actDrive->getJoint()->getNumber();
 
-	      int linkNumber = jointIndices[ jointNumber ];
+				int linkNumber = jointIndices[ jointNumber ];
 
-	      SIG_DynaMechsLink *dynaMechsLink = dynaMechsLinks[ linkNumber ];
+				SIG_DynaMechsLink *dynaMechsLink = dynaMechsLinks[ linkNumber ];
 
-	      double resetForce = 0;
+				double resetForce = 0;
 
-	      dynaMechsLink->dynaMechsLink->setJointInput( &resetForce );
-	    };
+				dynaMechsLink->dynaMechsLink->setJointInput( &resetForce );
+			};
+		};
 	};
-    };
 
-  dynaMechsLinks[ robot.getRootLink()->getNumber() ]->forwardKinematics( nullptr );
+	dynaMechsLinks[ robot.getRootLink()->getNumber() ]->forwardKinematics( nullptr );
 };
 
 void SIGEL_Simulation::SIG_DynaMechsSimulationData::initializeEnvironment()
 {
-  NEWMAT::ColumnVector gravity( 3 );
-  gravity = SIG_TypeConverter::toColumnVector( environment.getGravity() );
+	NEWMAT::ColumnVector gravity( 3 );
+	gravity = SIG_TypeConverter::toColumnVector( environment.getGravity() );
 
-  gravity = SIG_TypeConverter::sigelToDynaMechs() * gravity;
+	gravity = SIG_TypeConverter::sigelToDynaMechs() * gravity;
 
-  CartesianVector dynaMechsGravity;
-  SIG_TypeConverter::toCartesianVector( gravity, dynaMechsGravity );
-  dynaMechsEnvironment.setGravity( dynaMechsGravity );
+	CartesianVector dynaMechsGravity;
+	SIG_TypeConverter::toCartesianVector( gravity, dynaMechsGravity );
+	dynaMechsEnvironment.setGravity( dynaMechsGravity );
 
-  dynaMechsEnvironment.setGroundPlanarSpringConstant( environment.getGroundPlanarSpringConstant() );
-  dynaMechsEnvironment.setGroundNormalSpringConstant( environment.getGroundNormalSpringConstant() );
-  dynaMechsEnvironment.setGroundPlanarDamperConstant( environment.getGroundPlanarDamperConstant() );
-  dynaMechsEnvironment.setGroundNormalDamperConstant( environment.getGroundNormalDamperConstant() );
-  dynaMechsEnvironment.setFrictionCoeffs( environment.getFrictionCoeff_u_s(),
-					  environment.getFrictionCoeff_u_k() );
+	dynaMechsEnvironment.setGroundPlanarSpringConstant( environment.getGroundPlanarSpringConstant() );
+	dynaMechsEnvironment.setGroundNormalSpringConstant( environment.getGroundNormalSpringConstant() );
+	dynaMechsEnvironment.setGroundPlanarDamperConstant( environment.getGroundPlanarDamperConstant() );
+	dynaMechsEnvironment.setGroundNormalDamperConstant( environment.getGroundNormalDamperConstant() );
+	dynaMechsEnvironment.setFrictionCoeffs( environment.getFrictionCoeff_u_s(),
+	                                        environment.getFrictionCoeff_u_k() );
 
 	char *sigelRootCString = std::getenv( "SIGEL_ROOT" );
 
-  QString sigelRootString( sigelRootCString );
+	QString sigelRootString( sigelRootCString );
 
-  QString terrainDataFileName = sigelRootString + "/Terrain.ter";
+	QString terrainDataFileName = sigelRootString + "/Terrain.ter";
 
-  const QByteArray terrainDataFileNameQCString = terrainDataFileName.toUtf8();
-  char const *terrainDataFileNameCString = terrainDataFileNameQCString.constData();
+	const QByteArray terrainDataFileNameQCString = terrainDataFileName.toUtf8();
+	char const *terrainDataFileNameCString = terrainDataFileNameQCString.constData();
 
-  dynaMechsEnvironment.loadTerrainData( terrainDataFileNameCString );
+	dynaMechsEnvironment.loadTerrainData( terrainDataFileNameCString );
 };
 
 void SIGEL_Simulation::SIG_DynaMechsSimulationData::initializeArticulation()
 {
-  SIGEL_Robot::SIG_Link const *rootLink = robot.getRootLink();
+	SIGEL_Robot::SIG_Link const *rootLink = robot.getRootLink();
 
-  dmMobileBaseLink *internalRootLink = new dmMobileBaseLink();
+	dmMobileBaseLink *internalRootLink = new dmMobileBaseLink();
 
 
-  SpatialVector velocity = { 0, 0, 0, 0, 0, 0 };
+	SpatialVector velocity = { 0, 0, 0, 0, 0, 0 };
 
-  Float initialState[7];
+	Float initialState[7];
 
-  NEWMAT::Matrix startRotation =   SIG_TypeConverter::sigelToDynaMechs()
-                                 * SIG_TypeConverter::toMatrix( robot.initialOrientation );
+	NEWMAT::Matrix startRotation =   SIG_TypeConverter::sigelToDynaMechs()
+	                               * SIG_TypeConverter::toMatrix( robot.initialOrientation );
 
-  rotationMatrixToQuaternion( startRotation,
-			      initialState[0],
-			      initialState[1],
-			      initialState[2],
-			      initialState[3] );
+	rotationMatrixToQuaternion( startRotation,
+	                            initialState[0],
+	                            initialState[1],
+	                            initialState[2],
+	                            initialState[3] );
 
-  normalizeQuat( initialState );
+	normalizeQuat( initialState );
 
-  NEWMAT::ColumnVector startPosition =   SIG_TypeConverter::sigelToDynaMechs()
-                                       * (   SIG_TypeConverter::toColumnVector( environment.getStartPosition() )
-					   + SIG_TypeConverter::toColumnVector( robot.initialLocation ) );
+	NEWMAT::ColumnVector startPosition =   SIG_TypeConverter::sigelToDynaMechs()
+	                                     * (   SIG_TypeConverter::toColumnVector( environment.getStartPosition() )
+	                                         + SIG_TypeConverter::toColumnVector( robot.initialLocation ) );
 
 #ifdef SIG_DEBUG
-  SIGEL_Tools::SIG_IO::cerr << "Setting initial robot location: ";
-  for (int i=1; i<=3; i++)
-    SIGEL_Tools::SIG_IO::cerr << " " << startPosition( i );
-  SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-  SIGEL_Tools::SIG_IO::cerr << "Setting initial robot orientation:" << Qt::endl;
-  for (int i=1; i<=3; i++)
-    {
-      for (int j=1; j<=3; j++)
-	SIGEL_Tools::SIG_IO::cerr << startRotation( i, j ) << " ";
-      SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-    };
+	SIGEL_Tools::SIG_IO::cerr << "Setting initial robot location: ";
+	for (int i=1; i<=3; i++)
+		SIGEL_Tools::SIG_IO::cerr << " " << startPosition( i );
+	SIGEL_Tools::SIG_IO::cerr << Qt::endl;
+	SIGEL_Tools::SIG_IO::cerr << "Setting initial robot orientation:" << Qt::endl;
+	for (int i=1; i<=3; i++)
+	{
+		for (int j=1; j<=3; j++)
+			SIGEL_Tools::SIG_IO::cerr << startRotation( i, j ) << " ";
+		SIGEL_Tools::SIG_IO::cerr << Qt::endl;
+	};
 #endif
 
-  SIG_TypeConverter::toCartesianVector( startPosition, initialState + 4 );
+	SIG_TypeConverter::toCartesianVector( startPosition, initialState + 4 );
 
-  internalRootLink->setState( initialState, velocity );
+	internalRootLink->setState( initialState, velocity );
 
-  SIG_DynaMechsLink *dynaMechsRootLink = new SIG_DynaMechsLink( 0,
-								rootLink,
-								internalRootLink,
-								0,
-								0 );
+	SIG_DynaMechsLink *dynaMechsRootLink = new SIG_DynaMechsLink( 0,
+	                                                              rootLink,
+	                                                              internalRootLink,
+	                                                              0,
+	                                                              0 );
 
-  dynaMechsLinks[ rootLink->getNumber() ] = dynaMechsRootLink;
+	dynaMechsLinks[ rootLink->getNumber() ] = dynaMechsRootLink;
 
-  dynaMechsSystem.addLink( internalRootLink, nullptr );
+	dynaMechsSystem.addLink( internalRootLink, nullptr );
 
-  const QList< SIGEL_Robot::SIG_Joint * > rootJoints = rootLink->getJoints();
+	const QList< SIGEL_Robot::SIG_Joint * > rootJoints = rootLink->getJoints();
 
-  for (SIGEL_Robot::SIG_Joint *actJoint : rootJoints)
-    {
-      SIG_DynaMechsLink *newDynaMechsLink = initializeJoint( actJoint, rootLink );
+	for (SIGEL_Robot::SIG_Joint *actJoint : rootJoints)
+	{
+		SIG_DynaMechsLink *newDynaMechsLink = initializeJoint( actJoint, rootLink );
 
-      if (newDynaMechsLink)
-	dynaMechsRootLink->successors.append( newDynaMechsLink );
-    };
+		if (newDynaMechsLink)
+			dynaMechsRootLink->successors.append( newDynaMechsLink );
+	};
 
-  dynaMechsRootLink->forwardKinematics( nullptr );
+	dynaMechsRootLink->forwardKinematics( nullptr );
 };
 
 SIGEL_Simulation::SIG_DynaMechsLink *SIGEL_Simulation::SIG_DynaMechsSimulationData::initializeJoint( SIGEL_Robot::SIG_Joint *joint,
-												     SIGEL_Robot::SIG_Link const *caller )
+                                                                                                     SIGEL_Robot::SIG_Link const *caller )
 {
-  double a;
-  double alpha;
-  double d;
-  double theta;
+	double a;
+	double alpha;
+	double d;
+	double theta;
 
-  double screwD;
-  double screwTheta;
+	double screwD;
+	double screwTheta;
 
-  SIGEL_Robot::SIG_Link *predecessor;
-  joint->getMDH( predecessor,
-		 a,
-		 alpha,
-		 d,
-		 theta,
-		 screwD,
-		 screwTheta );
+	SIGEL_Robot::SIG_Link *predecessor;
+	joint->getMDH( predecessor,
+	               a,
+	               alpha,
+	               d,
+	               theta,
+	               screwD,
+	               screwTheta );
 
-  if (predecessor!=caller)
-    return nullptr;
+	if (predecessor!=caller)
+		return nullptr;
 
-  SIGEL_Robot::SIG_Link const *link = ( joint->getLeftLink() == caller ) ? joint->getRightLink() : joint->getLeftLink();
+	SIGEL_Robot::SIG_Link const *link = ( joint->getLeftLink() == caller ) ? joint->getRightLink() : joint->getLeftLink();
 
-  // DynaMechs builds a tree; a second joint to a link would replace a link that is still in use.
-  if ( dynaMechsLinks[ link->getNumber() ] )
-    throw SIGEL_Tools::SIG_Exception( __FILE__, __LINE__, "Link " + link->getName() + " is reached by two joints." );
+	// DynaMechs builds a tree; a second joint to a link would replace a link that is still in use.
+	if ( dynaMechsLinks[ link->getNumber() ] )
+		throw SIGEL_Tools::SIG_Exception( __FILE__, __LINE__, "Link " + link->getName() + " is reached by two joints." );
 
-  dmMDHLink *internalDynaMechsLink;
+	dmMDHLink *internalDynaMechsLink;
 
-  switch (joint->getJointType())
-    {
-    case SIGEL_Robot::SIG_Joint::tTranslationalJoint:
-      internalDynaMechsLink = new dmPrismaticLink();
-      break;
-    case SIGEL_Robot::SIG_Joint::tRotationalJoint:
-      internalDynaMechsLink = new dmRevoluteLink();
-      break;
-    default:
-      SIGEL_Tools::SIG_IO::cerr << "Cannot simulate robot with DynaMechs: Joint type not allowed!" << Qt::endl;
-      exit( 1 );
-    };
+	switch (joint->getJointType())
+	{
+	case SIGEL_Robot::SIG_Joint::tTranslationalJoint:
+		internalDynaMechsLink = new dmPrismaticLink();
+		break;
+	case SIGEL_Robot::SIG_Joint::tRotationalJoint:
+		internalDynaMechsLink = new dmRevoluteLink();
+		break;
+	default:
+		SIGEL_Tools::SIG_IO::cerr << "Cannot simulate robot with DynaMechs: Joint type not allowed!" << Qt::endl;
+		exit( 1 );
+	};
 
-  double k_spring = simulationParameter.getJointLimitsK_spring();
-  double b_damper = simulationParameter.getJointLimitsB_damper();
+	double k_spring = simulationParameter.getJointLimitsK_spring();
+	double b_damper = simulationParameter.getJointLimitsB_damper();
 
-  double minLimit = joint->getMechsMinPos();
-  double maxLimit = joint->getMechsMaxPos();
+	double minLimit = joint->getMechsMinPos();
+	double maxLimit = joint->getMechsMaxPos();
 
-  if (minLimit==maxLimit)
-    {
-      k_spring = b_damper = 0;
-      minLimit = std::numeric_limits<double>::lowest();
-      maxLimit = std::numeric_limits<double>::max();
-    };
+	if (minLimit==maxLimit)
+	{
+		k_spring = b_damper = 0;
+		minLimit = std::numeric_limits<double>::lowest();
+		maxLimit = std::numeric_limits<double>::max();
+	};
 
-  double jointFriction = simulationParameter.getJointFrictionU_c();
+	double jointFriction = simulationParameter.getJointFrictionU_c();
 
-  internalDynaMechsLink->setJointFriction( jointFriction );
+	internalDynaMechsLink->setJointFriction( jointFriction );
 
-  internalDynaMechsLink->setMDHParameters( a,
-					   alpha,
-					   d,
-					   theta);
+	internalDynaMechsLink->setMDHParameters( a,
+	                                         alpha,
+	                                         d,
+	                                         theta);
 
-  // Raw bit patterns, because decimal printing hides the last few bits, and
-  // keyed by joint name so the comparison does not depend on container order.
-  if (getenv("SIGEL_MDH")) {
-    const double mdh[4] = { a, alpha, d, theta };
-    printf("mdh %-20s", qPrintable(joint->getName()));
-    for (int q = 0; q < 4; ++q) {
-      unsigned long long bits;
-      memcpy(&bits, &mdh[q], sizeof bits);
-      printf(" %016llx", bits);
-    }
-    printf("\n");
-    fflush(stdout);
-  }
+	// Raw bit patterns, because decimal printing hides the last few bits, and
+	// keyed by joint name so the comparison does not depend on container order.
+	if (getenv("SIGEL_MDH")) {
+		const double mdh[4] = { a, alpha, d, theta };
+		printf("mdh %-20s", qPrintable(joint->getName()));
+		for (int q = 0; q < 4; ++q) {
+			unsigned long long bits;
+			memcpy(&bits, &mdh[q], sizeof bits);
+			printf(" %016llx", bits);
+		}
+		printf("\n");
+		fflush(stdout);
+	}
 
 #ifdef SIG_DEBUG
-  SIGEL_Tools::SIG_IO::cerr << "MDH Parameters of joint "
-			    << joint->getName()
-			    << ": a: "
-			    << a
-			    << " alpha: "
-			    << alpha
-			    << " d: "
-			    << d
-			    << " theta: "
-			    << theta
-			    << " screwD: "
-			    << screwD
-			    << " screwTheta: "
-			    << screwTheta
-			    << "\n"
-			    << "Joint limits: Min: "
-			    << minLimit
-			    << " Max: "
-			    << maxLimit
-			    << Qt::endl;
+	SIGEL_Tools::SIG_IO::cerr << "MDH Parameters of joint "
+	                          << joint->getName()
+	                          << ": a: "
+	                          << a
+	                          << " alpha: "
+	                          << alpha
+	                          << " d: "
+	                          << d
+	                          << " theta: "
+	                          << theta
+	                          << " screwD: "
+	                          << screwD
+	                          << " screwTheta: "
+	                          << screwTheta
+	                          << "\n"
+	                          << "Joint limits: Min: "
+	                          << minLimit
+	                          << " Max: "
+	                          << maxLimit
+	                          << Qt::endl;
 #endif
 
-  internalDynaMechsLink->setJointLimits( minLimit,
-					 maxLimit,
-					 k_spring,
-					 b_damper );
+	internalDynaMechsLink->setJointLimits( minLimit,
+	                                       maxLimit,
+	                                       k_spring,
+	                                       b_damper );
 
-  int dynaMechsLinkIndex = dynaMechsSystem.getNumLinks();
+	int dynaMechsLinkIndex = dynaMechsSystem.getNumLinks();
 
-  if ((screwD!=0) || (screwTheta!=0))
-    dynaMechsLinkIndex++;
+	if ((screwD!=0) || (screwTheta!=0))
+		dynaMechsLinkIndex++;
 
-  SIG_DynaMechsLink *dynaMechsLink = new SIG_DynaMechsLink( dynaMechsLinkIndex,
-							    link,
-							    internalDynaMechsLink,
-							    screwD,
-							    screwTheta );
+	SIG_DynaMechsLink *dynaMechsLink = new SIG_DynaMechsLink( dynaMechsLinkIndex,
+	                                                          link,
+	                                                          internalDynaMechsLink,
+	                                                          screwD,
+	                                                          screwTheta );
 
-  dynaMechsLinks[ link->getNumber() ] = dynaMechsLink;
+	dynaMechsLinks[ link->getNumber() ] = dynaMechsLink;
 
-  jointIndices[ joint->getNumber() ] = link->getNumber();
+	jointIndices[ joint->getNumber() ] = link->getNumber();
 
-  int predIndex = predecessor->getNumber();
+	int predIndex = predecessor->getNumber();
 
-  dmLink *internalPredecessor = dynaMechsLinks[ predIndex ]->dynaMechsLink;
+	dmLink *internalPredecessor = dynaMechsLinks[ predIndex ]->dynaMechsLink;
 
-  if (dynaMechsLink->getScrewLink())
-    {
-      dynaMechsSystem.addLink( dynaMechsLink->getScrewLink(), internalPredecessor );
-      dynaMechsSystem.addLink( internalDynaMechsLink, dynaMechsLink->getScrewLink() );
-    }
-  else
-    dynaMechsSystem.addLink( internalDynaMechsLink, internalPredecessor );
+	if (dynaMechsLink->getScrewLink())
+	{
+		dynaMechsSystem.addLink( dynaMechsLink->getScrewLink(), internalPredecessor );
+		dynaMechsSystem.addLink( internalDynaMechsLink, dynaMechsLink->getScrewLink() );
+	}
+	else
+		dynaMechsSystem.addLink( internalDynaMechsLink, internalPredecessor );
 
-  const QList< SIGEL_Robot::SIG_Joint * > joints = link->getJoints();
+	const QList< SIGEL_Robot::SIG_Joint * > joints = link->getJoints();
 
-  for (SIGEL_Robot::SIG_Joint *actJoint : joints)
-    {
-      SIG_DynaMechsLink *newSuccessor = initializeJoint( actJoint, link );
+	for (SIGEL_Robot::SIG_Joint *actJoint : joints)
+	{
+		SIG_DynaMechsLink *newSuccessor = initializeJoint( actJoint, link );
 
-      if (newSuccessor)
-	dynaMechsLink->successors.append( newSuccessor );
-    };
+		if (newSuccessor)
+			dynaMechsLink->successors.append( newSuccessor );
+	};
 
-  return dynaMechsLink;
+	return dynaMechsLink;
 };
 
 void SIGEL_Simulation::SIG_DynaMechsSimulationData::rotationMatrixToQuaternion( NEWMAT::Matrix rotationMatrix,
-										double &x,
-										double &y,
-										double &z,
-										double &w )
+                                                                                double &x,
+                                                                                double &y,
+                                                                                double &z,
+                                                                                double &w )
 {
-  rotationMatrix = rotationMatrix.t();
+	rotationMatrix = rotationMatrix.t();
 
-  double tr, s;
+	double tr, s;
 
-  tr = rotationMatrix(1,1) + rotationMatrix(2,2) + rotationMatrix(3,3) + 1;
-  if (tr > 0.0625)
-    {
-      s = std::sqrt(tr);
-      w = s*0.5;
-      s = 0.5/s;
+	tr = rotationMatrix(1,1) + rotationMatrix(2,2) + rotationMatrix(3,3) + 1;
+	if (tr > 0.0625)
+	{
+		s = std::sqrt(tr);
+		w = s*0.5;
+		s = 0.5/s;
 
-      x = (rotationMatrix(2,3) - rotationMatrix(3,2))*s;
-      y = (rotationMatrix(3,1) - rotationMatrix(1,3))*s;
-      z = (rotationMatrix(1,2) - rotationMatrix(2,1))*s;
-      return;
-    };
+		x = (rotationMatrix(2,3) - rotationMatrix(3,2))*s;
+		y = (rotationMatrix(3,1) - rotationMatrix(1,3))*s;
+		z = (rotationMatrix(1,2) - rotationMatrix(2,1))*s;
+		return;
+	};
 
-  tr = -rotationMatrix(1,1) - rotationMatrix(2,2) + rotationMatrix(3,3) + 1;
-  if (tr > 0.0625)
-    {
-      s = std::sqrt(tr);
-      z = s*0.5;
-      s = 0.5/s;
+	tr = -rotationMatrix(1,1) - rotationMatrix(2,2) + rotationMatrix(3,3) + 1;
+	if (tr > 0.0625)
+	{
+		s = std::sqrt(tr);
+		z = s*0.5;
+		s = 0.5/s;
 
-      x = (rotationMatrix(3,1) - rotationMatrix(1,3))*s;
-      y = (rotationMatrix(3,2) + rotationMatrix(2,3))*s;
-      w = (rotationMatrix(1,2) - rotationMatrix(2,1))*s;
-      return;
-    };
- 
-  tr = -rotationMatrix(1,1) + rotationMatrix(2,2) - rotationMatrix(3,3) + 1;
-  if (tr > 0.0625)
-    {
-      s = std::sqrt(tr);
-      y = s*0.5;
-      s = 0.5/s;
+		x = (rotationMatrix(3,1) - rotationMatrix(1,3))*s;
+		y = (rotationMatrix(3,2) + rotationMatrix(2,3))*s;
+		w = (rotationMatrix(1,2) - rotationMatrix(2,1))*s;
+		return;
+	};
 
-      x = (rotationMatrix(2,1) + rotationMatrix(1,2))*s;
-      z = (rotationMatrix(3,2) + rotationMatrix(2,3))*s;
-      w = (rotationMatrix(3,1) - rotationMatrix(1,3))*s;
-      return;
-    };
+	tr = -rotationMatrix(1,1) + rotationMatrix(2,2) - rotationMatrix(3,3) + 1;
+	if (tr > 0.0625)
+	{
+		s = std::sqrt(tr);
+		y = s*0.5;
+		s = 0.5/s;
 
-  tr = rotationMatrix(1,1) - rotationMatrix(2,2) - rotationMatrix(3,3) + 1;
-  if (tr > 0.0625)
-    {
-      s = std::sqrt(tr);
-      x = s*0.5;
-      s = 0.5/s;
+		x = (rotationMatrix(2,1) + rotationMatrix(1,2))*s;
+		z = (rotationMatrix(3,2) + rotationMatrix(2,3))*s;
+		w = (rotationMatrix(3,1) - rotationMatrix(1,3))*s;
+		return;
+	};
 
-      y = (rotationMatrix(2,1) + rotationMatrix(1,2))*s;
-      z = (rotationMatrix(3,1) - rotationMatrix(1,3))*s;
-      w = (rotationMatrix(2,3) - rotationMatrix(3,2))*s;
-      return;
-    };
+	tr = rotationMatrix(1,1) - rotationMatrix(2,2) - rotationMatrix(3,3) + 1;
+	if (tr > 0.0625)
+	{
+		s = std::sqrt(tr);
+		x = s*0.5;
+		s = 0.5/s;
+
+		y = (rotationMatrix(2,1) + rotationMatrix(1,2))*s;
+		z = (rotationMatrix(3,1) - rotationMatrix(1,3))*s;
+		w = (rotationMatrix(2,3) - rotationMatrix(3,2))*s;
+		return;
+	};
 };
 
 
