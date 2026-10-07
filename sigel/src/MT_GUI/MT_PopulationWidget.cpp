@@ -394,7 +394,6 @@ void MT_PopulationWidget::slotExpInd()
 		return;
 
 	bool saveAsPop = false;
-	QString fileName;
 	if(selectedItems.count() > 1)
 	{
 		QMessageBox box(QMessageBox::Information, "Save Individuals", "There is more than one individual selected.\n"
@@ -405,66 +404,73 @@ void MT_PopulationWidget::slotExpInd()
 		box.setEscapeButton(QMessageBox::No);
 		saveAsPop = box.exec() == QMessageBox::Yes;
 	}
+
 	if(saveAsPop)
-	{
-		fileName = QFileDialog::getSaveFileName(this, QString(), QString(), "Population Files (*.mpop);;All Files (*)");
-		if(!fileName.isEmpty())
-		{
-			if(fileName.right(5) != ".mpop")
-				fileName += ".mpop";
-			QFile file( fileName );
-
-			if(file.open(QIODevice::WriteOnly))
-			{
-				QTextStream str(&file);
-
-				MT_Population npop;
-				npop.changePopSize(0);
-				for(int i=0; i<selectedItems.count(); i++)
-				{
-					MT_PopListViewItem *actItem = selectedItems.at(i);
-					npop.addIndividual(population->getIndividual(actItem->getPos()));
-				}
-
-				npop.exportPop(str);
-				npop.flush();
-
-
-				file.close();
-			}
-			else
-			{
-				QMessageBox::critical(this, "Save Population", "An error occurred while saving the population.\nThe operation is aborted.");
-			}
-		}
-	}
+		exportAsPopulation(selectedItems);
 	else
+		exportAsIndividuals(selectedItems);
+}
+
+/***
+ * writes the selected individuals into one population file
+ ***/
+void MT_PopulationWidget::exportAsPopulation(const QList<MT_PopListViewItem *> &selectedItems)
+{
+	QString fileName = QFileDialog::getSaveFileName(this, QString(), QString(), "Population Files (*.mpop);;All Files (*)");
+	if(fileName.isEmpty())
+		return;
+
+	if(fileName.right(5) != ".mpop")
+		fileName += ".mpop";
+
+	QFile file( fileName );
+	if(!file.open(QIODevice::WriteOnly))
 	{
-		fileName = QFileDialog::getSaveFileName(this, QString(), QString(), "Individual Files (*.mind);;All Files (*)");
-		if(!fileName.isEmpty())
-		{
-
-			for(int i=0; i<selectedItems.count(); i++)
-			{
-				QFile file( fileName + QString("%1.mind").arg(i) );
-				if(file.exists() && QMessageBox::Ok != QMessageBox::warning(this, "Save Population", "There is another file with this name. This will overwrite\n"
-				        "the existing file. Do you really want to continue?", QMessageBox::Ok | QMessageBox::Cancel, QMessageBox::Cancel))
-					return;
-				if(file.open(QIODevice::WriteOnly))
-				{
-					QTextStream str(&file);
-					population->getIndividual(selectedItems.at(i)->getPos())->writeToFileIndi(str);
-					file.close();
-				}
-				else
-				{
-					QMessageBox::critical(this, "Save Individual", "An error occurred while saving the individual.\nThe operation is aborted.");
-				}
-			}
-
-		}
+		QMessageBox::critical(this, "Save Population", "An error occurred while saving the population.\nThe operation is aborted.");
+		return;
 	}
 
+	MT_Population npop;
+	npop.changePopSize(0);
+	for(int i=0; i<selectedItems.count(); i++)
+	{
+		MT_PopListViewItem *actItem = selectedItems.at(i);
+		npop.addIndividual(population->getIndividual(actItem->getPos()));
+	}
+
+	QTextStream str(&file);
+	npop.exportPop(str);
+	npop.flush();
+
+	file.close();
+}
+
+/***
+ * writes each selected individual into its own file
+ ***/
+void MT_PopulationWidget::exportAsIndividuals(const QList<MT_PopListViewItem *> &selectedItems)
+{
+	QString fileName = QFileDialog::getSaveFileName(this, QString(), QString(), "Individual Files (*.mind);;All Files (*)");
+	if(fileName.isEmpty())
+		return;
+
+	for(int i=0; i<selectedItems.count(); i++)
+	{
+		QFile file( fileName + QString("%1.mind").arg(i) );
+		if(file.exists() && QMessageBox::Ok != QMessageBox::warning(this, "Save Population", "There is another file with this name. This will overwrite\n"
+		        "the existing file. Do you really want to continue?", QMessageBox::Ok | QMessageBox::Cancel, QMessageBox::Cancel))
+			return;
+
+		if(!file.open(QIODevice::WriteOnly))
+		{
+			QMessageBox::critical(this, "Save Individual", "An error occurred while saving the individual.\nThe operation is aborted.");
+			continue;
+		}
+
+		QTextStream str(&file);
+		population->getIndividual(selectedItems.at(i)->getPos())->writeToFileIndi(str);
+		file.close();
+	}
 }
 
 /***

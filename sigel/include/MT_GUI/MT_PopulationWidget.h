@@ -38,6 +38,8 @@ private:
 	MT_GPManager  *gpManager;
 	MT_MainWindow *mainWindow;
 	QList<MT_PopListViewItem *> getSelectedItems();
+	void exportAsPopulation(const QList<MT_PopListViewItem *> &selectedItems);
+	void exportAsIndividuals(const QList<MT_PopListViewItem *> &selectedItems);
 
 private slots:
 	void slotRButtonClicked(const QPoint &pos);
