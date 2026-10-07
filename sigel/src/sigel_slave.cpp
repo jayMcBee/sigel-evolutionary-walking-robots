@@ -73,7 +73,6 @@ extern "C"
       case SIGSEGV:
         SIGEL_Tools::SIG_IO::cerr << "Invalid storage access" << Qt::endl;
         break;
-#include <qapplication.h>
       case SIGTERM:
         result = 0;
         break;
