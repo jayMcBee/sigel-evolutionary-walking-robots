@@ -917,6 +917,21 @@ classes and leave truncation a hard error. **They are not interchangeable.**
   and `build/coredrive`. Older entries in this file keep the name
   `sigel_eval`; they mean this program.
 
+**2026-10-08 — TWO KINDS OF COMPILER WARNING ARE GONE: `-Wunused-value` AND `-Wendif-labels`.**
+
+- **`-Wunused-value`:** the two loops in `MT_StatisticsWidget::updateGUI`
+  had a bare member name where a `for` sets its start value. They are
+  `while` loops now, with the increment at the end of the body. The
+  counters `soFarSigIdx` and `soFarMetIdx` are members and keep their value
+  between two calls.
+- **Seen on the way, not changed:** the first loop runs only when the user
+  selects a generation with the spin box or the slider. A refresh passes -1
+  and adds nothing, so the two totals for simulations and estimations show
+  the sum through the highest generation selected so far.
+- **`-Wendif-labels`:** the last line of `SIG_ExperimentListView.h` had the
+  guard name as a bare word after `#endif`. It is a comment now, as in the
+  other headers.
+
 **2026-10-07 — THE MOUSE HANDLERS USE `QMouseEvent::position()`.**
 
 - Qt 6 marks `QMouseEvent::x()` and `y()` as deprecated. The eight calls in

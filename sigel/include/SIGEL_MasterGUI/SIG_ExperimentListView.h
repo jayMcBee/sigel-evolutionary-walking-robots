@@ -322,4 +322,4 @@ class SIG_ExperimentListView : public QTreeWidget
 
 }
 
-#endif SIGEL_MASTERGUI_SIG_EXPERIMENTLISTVIEW_H
+#endif // SIGEL_MASTERGUI_SIG_EXPERIMENTLISTVIEW_H
