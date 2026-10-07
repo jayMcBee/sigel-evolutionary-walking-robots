@@ -169,9 +169,9 @@ Paths are relative to `sigel/`, the source tree.
   class.** `SIG_Body::load`, `SIG_Body::readVRMLNode`, the long function in
   `IFunctions.cpp` and `SIG_DynaMechsLink::buildTranslationMatrix` each write
   these `NEWMAT::Matrix` values out by hand. A small class in `SIGEL_Tools`
-  with static functions defines them once. The X and Z rotation of
-  `SIG_DynaMechsLink` can move there too; they use no member of a link. The
-  functions only store values, so the fitness rows must stay identical.
+  with static functions defines them once. The three `build...` methods of
+  `SIG_DynaMechsLink` move there: they build general matrices and use no
+  member of a link. The fitness rows must stay identical.
   Review `SIG_Body::createRotationMatrix` with it. Its sine terms have the
   opposite sign from `rotationMatrix` in `IFunctions.cpp`, so one is the
   transpose of the other; do not merge the two. If it does not build the
