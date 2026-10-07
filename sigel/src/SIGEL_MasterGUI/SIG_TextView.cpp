@@ -38,7 +38,7 @@ SIG_TextView::SIG_TextView( QWidget *parent, const char *name )
 
 void SIG_TextView::viewportMousePressEvent( QMouseEvent *e )
 {
-  oldY = e->y();
+  oldY = e->position().toPoint().y();
   scroll = false;
 };
 
@@ -49,7 +49,7 @@ void SIG_TextView::viewportMouseReleaseEvent( QMouseEvent * )
 
 void SIG_TextView::viewportMouseMoveEvent( QMouseEvent *e )
 {
-  int newPos = e->y();
+  int newPos = e->position().toPoint().y();
   int toMove = oldY - newPos;
   verticalScrollBar()->setValue( verticalScrollBar()->value() + toMove );
   oldY = newPos;

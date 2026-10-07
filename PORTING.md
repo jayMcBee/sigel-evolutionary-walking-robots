@@ -917,6 +917,17 @@ classes and leave truncation a hard error. **They are not interchangeable.**
   and `build/coredrive`. Older entries in this file keep the name
   `sigel_eval`; they mean this program.
 
+**2026-10-07 — THE MOUSE HANDLERS USE `QMouseEvent::position()`.**
+
+- Qt 6 marks `QMouseEvent::x()` and `y()` as deprecated. The eight calls in
+  `SIG_VisualisationWidget::mousePressEvent` and `mouseMoveEvent` and in
+  `SIG_TextView::viewportMousePressEvent` and `viewportMouseMoveEvent` now
+  use `position().toPoint()`.
+- The integers are the same: `x()` is `qRound(position().x())`, and
+  `toPoint()` rounds with the same function.
+- `event->pos()` in `MT_Editor::mousePressEvent` is not marked deprecated
+  and stays.
+
 **2026-10-07 — THE AUTOSAVE SLIDER OF THE EXPERIMENT PAGE HAS ENGLISH NAMES.**
 
 - `sliderIntervall` is now `sliderAutosave`, and `slotIntervallChanged` is

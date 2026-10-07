@@ -196,14 +196,15 @@
 
   void SIG_VisualisationWidget::mousePressEvent( QMouseEvent *event )
   {
-    mouseXPos = event->x();
-    mouseYPos = event->y();
+    mouseXPos = event->position().toPoint().x();
+    mouseYPos = event->position().toPoint().y();
   };
 
   void SIG_VisualisationWidget::mouseMoveEvent( QMouseEvent *event )
   {
-    int deltaX = static_cast<int>( (event->x() - mouseXPos) * mouseSensity );
-    int deltaY = static_cast<int>( (event->y() - mouseYPos) * mouseSensity );
+    const QPoint mousePosition = event->position().toPoint();
+    int deltaX = static_cast<int>( (mousePosition.x() - mouseXPos) * mouseSensity );
+    int deltaY = static_cast<int>( (mousePosition.y() - mouseYPos) * mouseSensity );
 
     if (event->buttons() & Qt::LeftButton)
       emit signalMouseRotation( deltaX, deltaY );
@@ -211,8 +212,8 @@
     if (event->buttons() & Qt::RightButton)
       emit signalMouseZoom( deltaY );
 
-    mouseXPos = event->x();
-    mouseYPos = event->y();
+    mouseXPos = mousePosition.x();
+    mouseYPos = mousePosition.y();
   };
 
   void SIG_VisualisationWidget::initializeGL()
