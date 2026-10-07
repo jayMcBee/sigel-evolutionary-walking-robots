@@ -53,6 +53,12 @@ extern "C"
 {
   int masterTaskId = 0;
 
+  void sendFitnessToMaster( double fitnessValue ) {
+    pvm_initsend( PvmDataDefault );
+    pvm_pkdouble( &fitnessValue, 1, 1 );
+    pvm_send( masterTaskId, 5 );
+  }
+
   void sigelStandardSignalHandler(int signal) {
 
     int result = 1;
@@ -78,11 +84,7 @@ extern "C"
         break;
     };
 
-    double fitnessValue = 0;
-
-    pvm_initsend( PvmDataDefault );
-    pvm_pkdouble( &fitnessValue, 1, 1 );
-    pvm_send( masterTaskId, 5 );
+    sendFitnessToMaster( 0 );
 
     pvm_exit();
 
@@ -298,9 +300,7 @@ int runPVMJob( int argc, char *argv[] ) {
 
   double fitnessValue = computeFitness( argc, argv, pvmData.getFitnessFunctionName(), program, robot, environment, simulationParameters );
 
-  pvm_initsend( PvmDataDefault );
-  pvm_pkdouble( &fitnessValue, 1, 1 );
-  pvm_send( masterTaskId, 5 );
+  sendFitnessToMaster( fitnessValue );
 
   pvm_exit();
 
