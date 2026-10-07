@@ -36,7 +36,7 @@ SIGEL_Program::SIG_Program& SIGEL_Program::SIG_Program::operator =(SIGEL_Program
   lines.clear();
 
   for( long i=0; i<prg.getProgramLength(); i++ )
-     appendLine( *prg.getLine( i ) );
+     appendLine( prg.getLine( i ) );
 
 #ifdef SIG_DEBUG
   if( prg.getProgramLength() != lines.size() )
@@ -126,10 +126,10 @@ void SIGEL_Program::SIG_Program::readFromFile( QTextStream &file )
 }
 
 
-SIGEL_Program::SIG_ProgramLine const *SIGEL_Program::SIG_Program::getLine( long no ) const
+SIGEL_Program::SIG_ProgramLine const &SIGEL_Program::SIG_Program::getLine( long no ) const
 {
   checkLineNumber( no );
-  return &lines[no];
+  return lines[no];
 }
 
 void SIGEL_Program::SIG_Program::setLine( long no, SIGEL_Program::SIG_ProgramLine const &line )

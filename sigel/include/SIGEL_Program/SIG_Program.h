@@ -177,7 +177,7 @@ class SIG_Program
  * SIGEL_Tools::SIG_Exception.
  */
    public:
-   SIGEL_Program::SIG_ProgramLine const *getLine(long no) const;
+   SIGEL_Program::SIG_ProgramLine const &getLine(long no) const;
 
 /**
  * This function overwrites the line with the index no by a copy of line.

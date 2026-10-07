@@ -137,25 +137,25 @@ QList<SIGEL_GP::SIG_GPIndividual *> SIGEL_GP::SIG_GPOperations::crossOver( SIGEL
 		// copy first part of program 1
 		for (long int i = 0; i < crossPoint1; i++)
 		{
-	  	newProgram1.appendLine( *winnerProgram1.getLine( i ) );
+	  	newProgram1.appendLine( winnerProgram1.getLine( i ) );
 		}
 
 		// append second part of program 2
 		for (long int j = crossPoint2; j < winnerProgram2.getProgramLength(); j++)
 		{
-			newProgram1.appendLine( *winnerProgram2.getLine( j ) );
+			newProgram1.appendLine( winnerProgram2.getLine( j ) );
 		}
 
 		// the other way round:  copy first part of prog. 2
 		for (long int k = 0; k < crossPoint2; k++)
 		{
-			newProgram2.appendLine( *winnerProgram2.getLine( k ) );
+			newProgram2.appendLine( winnerProgram2.getLine( k ) );
 		}
 
 		// you might have guessed it: append 2. part of first program
 		for (long int l = crossPoint1; l < winnerProgram1.getProgramLength(); l++)
 		{
-			newProgram2.appendLine( *winnerProgram1.getLine( l ) );
+			newProgram2.appendLine( winnerProgram1.getLine( l ) );
 		}
 	}
 
@@ -166,22 +166,22 @@ QList<SIGEL_GP::SIG_GPIndividual *> SIGEL_GP::SIG_GPOperations::crossOver( SIGEL
 	{
 		for( long int i = 0; i < crossPoint2; i++ )
 		{
-			newProgram2.appendLine( *winnerProgram2.getLine( i ) );
+			newProgram2.appendLine( winnerProgram2.getLine( i ) );
 		}
 
 		for( long int j = crossPoint1; j < winnerProgram1.getProgramLength(); j++ )
 		{
-				newProgram2.appendLine( *winnerProgram1.getLine( j ) );
+				newProgram2.appendLine( winnerProgram1.getLine( j ) );
 		}
 
 		for( long int k = 0; k < crossPoint1; k++ )
 		{
-			newProgram1.appendLine( *winnerProgram1.getLine( k ) );
+			newProgram1.appendLine( winnerProgram1.getLine( k ) );
 		}
 
 		for( long int m = crossPoint2; m < winnerProgram2.getProgramLength(); m++ )
 		{
-			newProgram1.appendLine( *winnerProgram2.getLine( m ) );
+			newProgram1.appendLine( winnerProgram2.getLine( m ) );
 		}
 	}
 
@@ -192,37 +192,37 @@ QList<SIGEL_GP::SIG_GPIndividual *> SIGEL_GP::SIG_GPOperations::crossOver( SIGEL
 		// newprog1 -- copy first part of program 1
 		for (long int i = 0; i < crossPoint1; i++)
 		{
-	  	newProgram1.appendLine( *winnerProgram1.getLine( i ) );
+	  	newProgram1.appendLine( winnerProgram1.getLine( i ) );
 		}
 
 		// newprog1 -- append sequence of program 2
 		for (long int j = crossPoint2; j <= crossPoint2+segLen2; j++)
 		{
-			newProgram1.appendLine( *winnerProgram2.getLine( j ) );
+			newProgram1.appendLine( winnerProgram2.getLine( j ) );
 		}
 
 		// newprog1 -- eventually append rest of program 1
 		for (long int k = crossPoint1+segLen1; k < winnerProgram1.getProgramLength(); k++)
 		{
-			newProgram1.appendLine( *winnerProgram1.getLine( k ) );
+			newProgram1.appendLine( winnerProgram1.getLine( k ) );
 		}
 
 		// newprog2 -- program 2, part A
 		for (long int l = 0; l < crossPoint2; l++)
 		{
-	  	newProgram2.appendLine( *winnerProgram2.getLine( l ) );
+	  	newProgram2.appendLine( winnerProgram2.getLine( l ) );
 		}
 
 		// newprog2 -- program 1 c/o-seq.
 		for (long int m = crossPoint1; m <= crossPoint1+segLen1; m++)
 		{
-			newProgram2.appendLine( *winnerProgram1.getLine( m ) );
+			newProgram2.appendLine( winnerProgram1.getLine( m ) );
 		}
 
 		// newprog2 -- program 2, part B
 		for (long int n = crossPoint2+segLen2; n < winnerProgram2.getProgramLength(); n++)
 		{
-			newProgram2.appendLine( *winnerProgram2.getLine( n ) );
+			newProgram2.appendLine( winnerProgram2.getLine( n ) );
 		}
 	}
 
@@ -370,11 +370,11 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::mutation( SIGEL_GP::SIG_
 
   // Get instruction type of line that is to be mutated:
 
-  instructionType   = newProgram.getLine( mutPoint )->getRobotinstructionType();
+  instructionType   = newProgram.getLine( mutPoint ).getRobotinstructionType();
 
   // Get number of operands of line that is to be mutated:
 
-  numberOfOperands  = newProgram.getLine( mutPoint )->getNumberOfElements();
+  numberOfOperands  = newProgram.getLine( mutPoint ).getNumberOfElements();
 
   // Get operands (op1, op2) of line that is to be mutated:
 
@@ -385,11 +385,11 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::mutation( SIGEL_GP::SIG_
     }
   else
     { // Number of operands is >=1:   
-     op1 = newProgram.getLine( mutPoint )->getInstructionElement( 0 );
+     op1 = newProgram.getLine( mutPoint ).getInstructionElement( 0 );
 
      if( numberOfOperands == 2 )
         // If number of operands = 2: 
-        op2 = newProgram.getLine( mutPoint )->getInstructionElement( 1 );
+        op2 = newProgram.getLine( mutPoint ).getInstructionElement( 1 );
 
       else
 	// If number of operands = 1: 
@@ -407,7 +407,7 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::mutation( SIGEL_GP::SIG_
 
       SIGEL_Tools::SIG_IO::cerr << "<TYPE 0>" << Qt::endl;
       SIGEL_Tools::SIG_IO::cerr << "line to mutate: [";
-      newProgram.getLine( mutPoint )->print();
+      newProgram.getLine( mutPoint ).print();
       SIGEL_Tools::SIG_IO::cerr << "]" << Qt::endl;
 
 #endif
@@ -431,7 +431,7 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::mutation( SIGEL_GP::SIG_
 
              {
                SIGEL_Program::SIG_ProgramLine mutatedLine;
-               mutatedLine = *newProgram.getLine( mutPoint );
+               mutatedLine = newProgram.getLine( mutPoint );
                mutatedLine.randomRobotinstruction( languageP,
                                                    randomizer,
                                                    gpParameter.getInstructionProbabilities() );
@@ -457,13 +457,13 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::mutation( SIGEL_GP::SIG_
 
                    op1 = randomizer.getRandomInt( 32000 );
                    if( randomizer.getRandomInt( 2 ) == 1 ) op1 = (-1) * op1;
-                   op2 = newProgram.getLine( mutPoint )->getInstructionElement( 1 );
+                   op2 = newProgram.getLine( mutPoint ).getInstructionElement( 1 );
                   }
                  else                                            
                   {
                    // Operand 2 will be varied:
 
-                   op1 = newProgram.getLine( mutPoint )->getInstructionElement( 0 );
+                   op1 = newProgram.getLine( mutPoint ).getInstructionElement( 0 );
                    op2 = randomizer.getRandomInt( 32000 );
                    if( randomizer.getRandomInt( 2 ) == 1 ) op2 = (-1) * op2;
                   }
@@ -490,7 +490,7 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::mutation( SIGEL_GP::SIG_
 
              {
                SIGEL_Program::SIG_ProgramLine mutatedLine;
-               mutatedLine = *newProgram.getLine( mutPoint );
+               mutatedLine = newProgram.getLine( mutPoint );
                mutatedLine.setRobotinstruction( instructionType,
                                                 op1,
                                                 op2 );
@@ -538,7 +538,7 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::mutation( SIGEL_GP::SIG_
 
              {
                SIGEL_Program::SIG_ProgramLine mutatedLine;
-               mutatedLine = *newProgram.getLine( mutPoint );
+               mutatedLine = newProgram.getLine( mutPoint );
                mutatedLine.setRobotinstruction( randomLine.getRobotinstructionType(),
                                                 op1,
                                                 op2 );
@@ -550,7 +550,7 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::mutation( SIGEL_GP::SIG_
 #ifdef SIG_DEBUG
 
      SIGEL_Tools::SIG_IO::cerr << "result: [";
-     newProgram.getLine( mutPoint )->print();
+     newProgram.getLine( mutPoint ).print();
      SIGEL_Tools::SIG_IO::cerr << "]" << Qt::endl;
 
 #endif

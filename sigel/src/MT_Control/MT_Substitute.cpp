@@ -65,19 +65,18 @@ MT_TranslatedIndividual * MT_Substitute::translatedSIGProg(SIGEL_Program::SIG_Pr
 	for (int k=1; k<16; k++)
 		(*MData)[k] =0;
 	
-	SIGEL_Program::SIG_ProgramLine const * SIG_ProLine;
 		
 	for (int i=0; i<ProgSize;i++)
 	{
 		// WARNING: if the SIGEL instruction from SIGProg is JMP X, NOP, Sense ...
 		// a 0 is substituted for the missing operand(s). Any alternative?
 
-		SIG_ProLine= SIGProg->getLine(i);
-		(*OperandOne)[i]= SIG_ProLine->getElement(0);
-		(*OperandTwo)[i]= SIG_ProLine->getElement(1);
+		SIGEL_Program::SIG_ProgramLine const &SIG_ProLine = SIGProg->getLine(i);
+		(*OperandOne)[i]= SIG_ProLine.getElement(0);
+		(*OperandTwo)[i]= SIG_ProLine.getElement(1);
 
 
-		switch( SIG_ProLine->getRobotinstructionType() )
+		switch( SIG_ProLine.getRobotinstructionType() )
 		{
 		case SIGEL_Program::COPY: (*Instruktion)[i]= 1; (*MData)[1]++; break;
 		case SIGEL_Program::LOAD: (*Instruktion)[i]= 2; (*MData)[2]++; break;

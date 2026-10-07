@@ -77,7 +77,7 @@ namespace SIGEL_Simulation
 	while ( timeAccountSize > 0)
 	  {
 	    // fetch the next command
-	    SIGEL_Program::SIG_ProgramLine const *theLine = robotProgram.getLine( programCounter );
+	    SIGEL_Program::SIG_ProgramLine const &theLine = robotProgram.getLine( programCounter );
 	    
 	    /*
 	     * ONLY FOR DEBUGGING-PURPOSES!
@@ -91,7 +91,7 @@ namespace SIGEL_Simulation
 	    else
 	      SIGEL_Tools::SIG_IO::cerr << "CF: 0" << Qt::endl;
 	    QString theQLine;
-	    theLine->printToString( theQLine );
+	    theLine.printToString( theQLine );
 	    SIGEL_Tools::SIG_IO::cerr << theQLine;
 	    SIGEL_Tools::SIG_IO::cerr << "Registers:" << Qt::endl;
 	    for( int loop=0; loop < numberOfRegisters; loop++ )
@@ -102,15 +102,15 @@ namespace SIGEL_Simulation
 #endif
 
 	    // what command was fetched?
-	    switch ( theLine->getRobotinstructionType() )
+	    switch ( theLine.getRobotinstructionType() )
 	      {
 	      case SIGEL_Program::COPY:
 		// is the command allowed?
 		if ( langParams.hasCommand( "COPY" ) )
 		  {
 		    // do it!
-		    int reg0 = theLine->getInstructionElement(0) % numberOfRegisters;
-		    int reg1 = theLine->getInstructionElement(1) % numberOfRegisters;
+		    int reg0 = theLine.getInstructionElement(0) % numberOfRegisters;
+		    int reg1 = theLine.getInstructionElement(1) % numberOfRegisters;
 		    registers[reg0].copyReg( registers[reg1] );
 		    programCounter = (programCounter + 1) % programLength;
 		    
@@ -137,8 +137,8 @@ namespace SIGEL_Simulation
 		if ( langParams.hasCommand( "LOAD" ) )
 		  {
 		    // do it!
-		    int reg0 = theLine->getInstructionElement(0) % numberOfRegisters;
-		    int value = theLine->getInstructionElement(1);
+		    int reg0 = theLine.getInstructionElement(0) % numberOfRegisters;
+		    int value = theLine.getInstructionElement(1);
 		    registers[reg0].loadValue( value );
 		    programCounter = (programCounter + 1) % programLength;
 
@@ -163,8 +163,8 @@ namespace SIGEL_Simulation
 		if ( langParams.hasCommand( "ADD" ) )
 		  {
 		    // do it!
-		    int reg0 = theLine->getInstructionElement(0) % numberOfRegisters;
-		    int reg1 = theLine->getInstructionElement(1) % numberOfRegisters;
+		    int reg0 = theLine.getInstructionElement(0) % numberOfRegisters;
+		    int reg1 = theLine.getInstructionElement(1) % numberOfRegisters;
 		    registers[reg0].addReg( registers[reg1] );
 		    programCounter = (programCounter + 1) % programLength;
 
@@ -189,8 +189,8 @@ namespace SIGEL_Simulation
 		if ( langParams.hasCommand( "SUB" ) )
 		  {
 		    // do it!
-		    int reg0 = theLine->getInstructionElement(0) % numberOfRegisters;
-		    int reg1 = theLine->getInstructionElement(1) % numberOfRegisters;
+		    int reg0 = theLine.getInstructionElement(0) % numberOfRegisters;
+		    int reg1 = theLine.getInstructionElement(1) % numberOfRegisters;
 		    registers[reg0].subReg( registers[reg1] );
 		    programCounter = (programCounter + 1) % programLength;
 
@@ -215,8 +215,8 @@ namespace SIGEL_Simulation
 		if ( langParams.hasCommand( "MUL" ) )
 		  {
 		    // do it!
-		    int reg0 = theLine->getInstructionElement(0) % numberOfRegisters;
-		    int reg1 = theLine->getInstructionElement(1) % numberOfRegisters;
+		    int reg0 = theLine.getInstructionElement(0) % numberOfRegisters;
+		    int reg1 = theLine.getInstructionElement(1) % numberOfRegisters;
 		    registers[reg0].mulReg( registers[reg1] );
 		    programCounter = (programCounter + 1) % programLength;
 
@@ -241,8 +241,8 @@ namespace SIGEL_Simulation
 		if ( langParams.hasCommand( "DIV" ) )
 		  {
 		    // do it!
-		    int reg0 = theLine->getInstructionElement(0) % numberOfRegisters;
-		    int reg1 = theLine->getInstructionElement(1) % numberOfRegisters;
+		    int reg0 = theLine.getInstructionElement(0) % numberOfRegisters;
+		    int reg1 = theLine.getInstructionElement(1) % numberOfRegisters;
 		    registers[reg0].divReg( registers[reg1] );
 		    programCounter = (programCounter + 1) % programLength;
 
@@ -267,8 +267,8 @@ namespace SIGEL_Simulation
 		if ( langParams.hasCommand( "MOD" ) )
 		  {
 		    // do it!
-		    int reg0 = theLine->getInstructionElement(0) % numberOfRegisters;
-		    int reg1 = theLine->getInstructionElement(1) % numberOfRegisters;
+		    int reg0 = theLine.getInstructionElement(0) % numberOfRegisters;
+		    int reg1 = theLine.getInstructionElement(1) % numberOfRegisters;
 		    registers[reg0].modReg( registers[reg1] );
 		    programCounter = (programCounter + 1) % programLength;
 
@@ -293,8 +293,8 @@ namespace SIGEL_Simulation
 		if ( langParams.hasCommand( "MIN" ) )
 		  {
 		    // do it!
-		    int reg0 = theLine->getInstructionElement(0) % numberOfRegisters;
-		    int reg1 = theLine->getInstructionElement(1) % numberOfRegisters;
+		    int reg0 = theLine.getInstructionElement(0) % numberOfRegisters;
+		    int reg1 = theLine.getInstructionElement(1) % numberOfRegisters;
 		    registers[reg0].minReg( registers[reg1] );
 		    programCounter = (programCounter + 1) % programLength;
 
@@ -319,8 +319,8 @@ namespace SIGEL_Simulation
 		if ( langParams.hasCommand( "MAX" ) )
 		  {
 		    // do it!
-		    int reg0 = theLine->getInstructionElement(0) % numberOfRegisters;
-		    int reg1 = theLine->getInstructionElement(1) % numberOfRegisters;
+		    int reg0 = theLine.getInstructionElement(0) % numberOfRegisters;
+		    int reg1 = theLine.getInstructionElement(1) % numberOfRegisters;
 		    registers[reg0].maxReg( registers[reg1] );
 		    programCounter = (programCounter + 1) % programLength;
 
@@ -345,8 +345,8 @@ namespace SIGEL_Simulation
 		if ( langParams.hasCommand( "CMP" ) )
 		  {
 		    // do it!
-		    int reg0 = theLine->getInstructionElement(0) % numberOfRegisters;
-		    int reg1 = theLine->getInstructionElement(1) % numberOfRegisters;
+		    int reg0 = theLine.getInstructionElement(0) % numberOfRegisters;
+		    int reg1 = theLine.getInstructionElement(1) % numberOfRegisters;
 		    if ( registers[reg0].getValue() <= registers[reg1].getValue() )
 		      compareFlag = true;
 		    else
@@ -377,7 +377,7 @@ namespace SIGEL_Simulation
 		if ( langParams.hasCommand( "JMP" ) )
 		  {
 		    // do it!
-		    int reg0 = theLine->getInstructionElement(0);
+		    int reg0 = theLine.getInstructionElement(0);
 		    if( compareFlag )
 		      programCounter = ( programCounter + 1 + reg0 ) % programLength;
 		    else
@@ -406,7 +406,7 @@ namespace SIGEL_Simulation
 		if ( langParams.hasCommand( "SENSE" ) )
 		  {
 		    // do it!
-		    int reg0 = theLine->getInstructionElement(0) % numberOfRegisters;
+		    int reg0 = theLine.getInstructionElement(0) % numberOfRegisters;
 
 		    int numberOfSensor = registers[reg0].getValue();
 		    simulationQueries.sense( numberOfSensor, registers );
@@ -433,7 +433,7 @@ namespace SIGEL_Simulation
 		if ( langParams.hasCommand( "MOVE" ) )
 		  {
 		    // do it!
-		    int reg0 = theLine->getInstructionElement(0) % numberOfRegisters;
+		    int reg0 = theLine.getInstructionElement(0) % numberOfRegisters;
 		    int numberOfJoint = registers[reg0].getValue();
 #ifdef SIG_DEBUG
 		    SIGEL_Tools::SIG_IO::cerr << "Moving drive " << numberOfJoint << "." << Qt::endl;
@@ -462,9 +462,9 @@ namespace SIGEL_Simulation
 		if ( langParams.hasCommand( "DELAY" ) )
 		  {
 		    // do it!
-		    // int readOut = theLine->getInstructionElement(0);
+		    // int readOut = theLine.getInstructionElement(0);
 		    // get the register
-		    int reg = theLine->getInstructionElement(0) % numberOfRegisters;
+		    int reg = theLine.getInstructionElement(0) % numberOfRegisters;
 		    int readOut = registers[reg].getValue();
 		    double delayTime = static_cast<double>( readOut ) * 0.001;
 		    delayTime = std::abs( delayTime );
