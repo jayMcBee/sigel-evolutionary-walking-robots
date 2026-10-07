@@ -2,6 +2,7 @@
 #define MT_GPSYSTEM_MT_FITNESSTRAINER_H
 
 #include <QQueue>
+#include <memory>
 #include "MT_GPSystem/MT_TranslatedIndividual.h"
 #include "MT_GPSystem/MT_TrainingCase.h"
 #include "MT_GPSystem/MT_Interpreter.h"	
@@ -43,7 +44,7 @@ private:
 	QList<double> ResultIst;
 
 	/* the Tset contain the T-cases*/
-	MT_Trainingset * TSet;
+	std::unique_ptr< MT_Trainingset > TSet;
 	
 	/* the PresentTSize represent the Number of T-cases in the T-Set  */
 	int PresentTSize;
@@ -76,7 +77,7 @@ public:
 	*/
 
 	MT_FitnessTrainer();
-	virtual ~MT_FitnessTrainer();
+	virtual ~MT_FitnessTrainer() = default;
 	MT_FitnessTrainer (QTextStream &File);
 
 	/* calculate the fitness of a given MT_Population

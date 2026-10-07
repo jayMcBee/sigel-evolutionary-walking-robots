@@ -28,7 +28,7 @@ MT_FitnessTrainer::MT_FitnessTrainer(QTextStream &File)
 		Interpreter.setDuration((File.readLine()).toInt());
 		Interpreter.setVariableNumber((File.readLine()).toInt());
 	
-		TSet = new MT_Trainingset(File);
+		TSet = std::make_unique< MT_Trainingset >(File);
 
 	}
 	else
@@ -47,13 +47,7 @@ MT_FitnessTrainer::MT_FitnessTrainer()
 	Result.resize(TSetSize);
 	ResultIst.resize(TSetSize);
 	
-	TSet = new MT_Trainingset(TSetSize,1);
-}
-
-MT_FitnessTrainer::~MT_FitnessTrainer()
-{
-	delete TSet;
-
+	TSet = std::make_unique< MT_Trainingset >(TSetSize,1);
 }
 
 
