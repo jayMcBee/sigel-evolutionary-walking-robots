@@ -105,7 +105,7 @@ void SIGEL_Program::SIG_Program::readFromFile( QTextStream &file )
    
    QString programText = file.readAll();
 
-   while((pos=programText.indexOf(QChar('\n'), oldpos, Qt::CaseInsensitive))!=-1)
+   while((pos=programText.indexOf(QChar('\n'), oldpos))!=-1)
      {
         QString lineText = programText.mid( oldpos, pos - oldpos );
         SIGEL_Program::SIG_ProgramLine prgLine;
