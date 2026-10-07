@@ -47,7 +47,7 @@ Paths are relative to `sigel/`, the source tree.
     thread and the GUI thread.
   - [ ] `MT_Controller`: `gpManager`, `substitution`, `cacheStrm`. The first
     two are used by the MetaGP thread; `cacheStrm` leaks.
-  - [ ] `MT_Substitute`: `Interpreter`, `BestMETAProgram`.
+  - [ ] `MT_Substitute::BestMETAProgram`.
 
   *Not in this item:*
   - Lists of raw pointers, among them the elements of `MT_Statistics`, which

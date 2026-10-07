@@ -95,7 +95,7 @@ protected:
 	QQueue<MT_TrainingCase *> TCaseBuffer;
 
 	// to interpret a SigelProgram on the BestMETAProgram
-	MT_Interpreter * Interpreter;
+	MT_Interpreter Interpreter;
 
 	/*inidcate the Typ of Substitute
 	* 1:= Evaluator 2:= classifier  

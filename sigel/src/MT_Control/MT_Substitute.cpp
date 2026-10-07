@@ -2,6 +2,7 @@
 #include "MT_Control/MT_Substitute.h"
 
 MT_Substitute::MT_Substitute()
+	: Interpreter(10,100) // WARNING: parameters still need changing! setInterpreter(int NumOfVariable, int TimeToInter)
 {
  // overloaded method
 	pthread_mutex_init(&interpreterMutex, nullptr);
@@ -23,7 +24,7 @@ void MT_Substitute::changeBest(MT_Program * MetaProg)
 	
 	BestMETAProgram = new MT_Program(MetaProg);
 
-	Interpreter->loadProgram(BestMETAProgram);
+	Interpreter.loadProgram(BestMETAProgram);
 }
 
 void MT_Substitute::changeErrorInfo(QList<double> * OutCome, QList<double> * CorrectFit)
@@ -112,8 +113,8 @@ void MT_Substitute::setInterpreter(int NumOfVariable, int TimeToInter)
 	// lock the interpreter so we can safely change the interpreter settings
 	pthread_mutex_lock(&interpreterMutex);
 
-	Interpreter->setVariableNumber(NumOfVariable);
-	Interpreter->setDuration(TimeToInter);
+	Interpreter.setVariableNumber(NumOfVariable);
+	Interpreter.setDuration(TimeToInter);
 
 	// unlock the interpreter so that interpretation of programs can continue
 	pthread_mutex_unlock(&interpreterMutex);

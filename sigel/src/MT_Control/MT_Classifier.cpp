@@ -8,7 +8,6 @@ MT_Classifier::MT_Classifier(QTextStream &File) : MT_Substitute()
 {
 	Typ=2;
 	AverageSigelFitness = 0.01;
-	Interpreter= new MT_Interpreter(10,100); // WARNING: parameters still need changing! setInterpreter(int NumOfVariable, int TimeToInter)
 	BestMETAProgram =nullptr;
 	CorrectFitness.resize(0);
 	AssumedFitness.resize(0);
@@ -57,7 +56,6 @@ MT_Classifier::MT_Classifier(QTextStream &File) : MT_Substitute()
 MT_Classifier::~MT_Classifier()
 {
 	
-	delete Interpreter;
 	if (BestMETAProgram !=nullptr)
 		delete BestMETAProgram;
 
@@ -113,7 +111,7 @@ double MT_Classifier::classifier(SIGEL_Program::SIG_Program const * SigProgOne, 
 {
 	std::unique_ptr< MT_TranslatedIndividual > TransIndi( createDoubleTransIndi(SigProgOne, SigProgTwo) );
 
-	return Interpreter->interpret( TransIndi.get() );
+	return Interpreter.interpret( TransIndi.get() );
 }
 
 void MT_Classifier::createNewTCase(SIGEL_Program::SIG_Program const * SigProgOne, SIGEL_Program::SIG_Program const * SigProgTwo, double FitDifference)

@@ -12,7 +12,6 @@ MT_Evaluator::MT_Evaluator(SIGEL_GP::SIG_GPExperiment& exp, QTextStream &File) :
 	
 	Typ=1;
 	AverageSigelFitness = 0.01; 
-	Interpreter= new MT_Interpreter(10,100); // WARNING: parameters still need changing! setInterpreter(int NumOfVariable, int TimeToInter)
 	BestMETAProgram =nullptr;
 	CorrectFitness.resize(0);
 	AssumedFitness.resize(0);
@@ -69,7 +68,6 @@ MT_Evaluator::MT_Evaluator(SIGEL_GP::SIG_GPExperiment& exp, QTextStream &File) :
 
 MT_Evaluator::~MT_Evaluator()
 {
-	delete Interpreter;
 	if (BestMETAProgram !=nullptr)
 		delete BestMETAProgram;
 }
@@ -374,7 +372,7 @@ int MT_Evaluator::spawnTask(SIGEL_GP::SIG_GPIndividual const& ind)
 		pthread_mutex_lock(&interpreterMutex);
 
 		std::unique_ptr< MT_TranslatedIndividual > TransIndi( translatedSIGProg(&ind.getProgram()) );
-		double MetaEstimationResult = Interpreter->interpret( TransIndi.get() );
+		double MetaEstimationResult = Interpreter.interpret( TransIndi.get() );
 
 		// unlock the interpreter so that the program can be updated
 		pthread_mutex_unlock(&interpreterMutex);
