@@ -1,16 +1,5 @@
 #include "MT_GUI/MT_PopulationWidget.h"
 
-// Every item in this view is top level, so the next sibling is the next
-// top-level index.
-static MT_PopListViewItem *nextSiblingOf(QTreeWidget *tree, QTreeWidgetItem *item)
-{
-	if(!item)
-		return nullptr;
-	int i = tree->indexOfTopLevelItem(item);
-	if(i < 0 || i + 1 >= tree->topLevelItemCount())
-		return nullptr;
-	return static_cast<MT_PopListViewItem*>(tree->topLevelItem(i + 1));
-}
 #include "MT_GUI/MT_AddIndividualsWidget.h"
 #include "MT_GUI/MT_PopListViewItem.h"
 #include "MT_GUI/MT_MainWindow.h"
@@ -304,43 +293,33 @@ void MT_PopulationWidget::slotAddInd()
  ***/
 void MT_PopulationWidget::slotDelInd()
 {
-	MT_PopListViewItem* actIndNew =nullptr;
-
-	MT_PopListViewItem *nextInd=nullptr;
-	MT_PopListViewItem *actInd = static_cast<MT_PopListViewItem*>(individualListView->topLevelItem(0));
-
-	int DelPos =0;
-	int ActPos =0;
-
-	// iterate over all items, check if they are selected
-	// and delete the selected ones
-	MT_Individual *actRInd =nullptr;
-	while(actInd)
+	int row = 0;
+	while(row < individualListView->topLevelItemCount())
 	{
-		nextInd = nextSiblingOf(individualListView, actInd);	// get next individual in list
-		if (( actInd->isSelected()) && (individualListView->topLevelItemCount() != 1) )
+		MT_PopListViewItem *item = static_cast<MT_PopListViewItem*>(individualListView->topLevelItem(row));
+
+		// The last individual stays, also when it is selected.
+		if(!item->isSelected() || individualListView->topLevelItemCount() == 1)
 		{
-			DelPos = actInd->getPos();
-			actRInd = population->delIndividual(DelPos);
-			delete actRInd;
-			emit numChanged();
-
-			actIndNew = static_cast<MT_PopListViewItem*>(individualListView->topLevelItem(0));
-			while(actIndNew !=nullptr)		// walk over all IndisItem  // for every item with Pos > DelPos --> setPos(Pos-1)
-			{
-				ActPos = actIndNew->getPos();
-				if (ActPos > DelPos)
-					actIndNew->setPos(ActPos-1);
-
-				actIndNew = nextSiblingOf(individualListView, actIndNew);	// get next individual in list
-			}
-
-			delete actInd;					// delete actual individual if selected
+			row++;
+			continue;
 		}
 
-		actInd = nextInd;
-	}
+		int deletedPos = item->getPos();
+		delete population->delIndividual(deletedPos);
+		emit numChanged();
 
+		// The individuals behind the deleted one move up by one.
+		for(int i=0; i<individualListView->topLevelItemCount(); i++)
+		{
+			MT_PopListViewItem *otherItem = static_cast<MT_PopListViewItem*>(individualListView->topLevelItem(i));
+			if(otherItem->getPos() > deletedPos)
+				otherItem->setPos(otherItem->getPos() - 1);
+		}
+
+		// The next row takes this row's index, so row stays.
+		delete item;
+	}
 }
 
 /***
