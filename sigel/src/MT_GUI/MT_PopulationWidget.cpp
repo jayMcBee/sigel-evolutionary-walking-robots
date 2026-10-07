@@ -4,9 +4,11 @@
 // top-level index.
 static MT_PopListViewItem *nextSiblingOf(QTreeWidget *tree, QTreeWidgetItem *item)
 {
-	if(!item) return nullptr;
+	if(!item)
+		return nullptr;
 	int i = tree->indexOfTopLevelItem(item);
-	if(i < 0 || i + 1 >= tree->topLevelItemCount()) return nullptr;
+	if(i < 0 || i + 1 >= tree->topLevelItemCount())
+		return nullptr;
 	return static_cast<MT_PopListViewItem*>(tree->topLevelItem(i + 1));
 }
 #include "MT_GUI/MT_AddIndividualsWidget.h"
@@ -117,9 +119,12 @@ MT_PopulationWidget::MT_PopulationWidget(QMainWindow* parent, const char* name, 
  ***/
 void MT_PopulationWidget::evolutionRunning(bool running)
 {
-	if(running){
+	if(running)
+	{
 
-	} else {
+	}
+	else
+	{
 
 	}
 }
@@ -144,7 +149,8 @@ void MT_PopulationWidget::onShow(MT_GPManager *manager, subst_cache *subst)
 
 	// get the current population
 	population = manager->getParent();
-	if(!population){
+	if(!population)
+	{
 		QMessageBox::critical(this, "Configure MetaGP System", "Couldn't get current population.");
 		return;
 	}
@@ -152,7 +158,8 @@ void MT_PopulationWidget::onShow(MT_GPManager *manager, subst_cache *subst)
 
 	// list all individuals
 	MT_Individual *actInd;
-	for(int i=0; i<population->getSize(); i++){
+	for(int i=0; i<population->getSize(); i++)
+	{
 		actInd = population->getIndividual(i);
 		new MT_PopListViewItem(individualListView, actInd);
 		emit numChanged();
@@ -169,7 +176,8 @@ bool MT_PopulationWidget::onHide(MT_GPManager *manager, subst_cache *subst)
 {
 	int popSize = individualListView->topLevelItemCount();
 
-	if(oldPopSize != popSize){
+	if(oldPopSize != popSize)
+	{
 		int offspringSize;
 		int tournSize;
 		int selMethod;
@@ -177,9 +185,9 @@ bool MT_PopulationWidget::onHide(MT_GPManager *manager, subst_cache *subst)
 		int tsetSize;
 		int tDuration;
 
-		manager->getSelektionValue(&offspringSize, &tournSize, 
-			&selMethod, &fitFunc, 
-			&tsetSize, &tDuration);
+		manager->getSelektionValue(&offspringSize, &tournSize,
+		        &selMethod, &fitFunc,
+		        &tsetSize, &tDuration);
 
 		// calculate the new offspring size
 		int overProdFac = offspringSize / oldPopSize;
@@ -190,8 +198,8 @@ bool MT_PopulationWidget::onHide(MT_GPManager *manager, subst_cache *subst)
 
 		// ... and finally set it
 		manager->setSelektionValue(offspringSize, tournSize,
-			selMethod, fitFunc,
-			tsetSize, tDuration);
+		        selMethod, fitFunc,
+		        tsetSize, tDuration);
 
 		manager->setPopAndTournamentSize(popSize, tournSize);
 	}
@@ -210,7 +218,7 @@ void MT_PopulationWidget::slotNumChanged()
 
 /***
  * displays the context menu if a right click on a individual occurs
- ***/ 
+ ***/
 void MT_PopulationWidget::slotRButtonClicked(const QPoint &pos)
 {
 	// customContextMenuRequested gives viewport coordinates, and a click on
@@ -230,7 +238,9 @@ void MT_PopulationWidget::slotSelectionChanged()
 	if(individualListView->topLevelItemCount() != 1 && actItem && actItem->isSelected())
 	{
 		delIndAction->setEnabled(true);
-	} else {
+	}
+	else
+	{
 		delIndAction->setEnabled(false);
 	}
 }
@@ -244,14 +254,16 @@ void MT_PopulationWidget::slotCurrentChanged(QTreeWidgetItem *item)
 	// clean the display
 	individualProgramView->clear();
 
-	if(!item) return;
+	if(!item)
+		return;
 
 	// get the currently selected individual
 	int pos = static_cast<MT_PopListViewItem*>(item)->getPos();
 	MT_Individual *actInd = population->getIndividual(pos);
 
 	// display the program
-	for(int i=0; i<actInd->getProgram()->getLength(); i++){
+	for(int i=0; i<actInd->getProgram()->getLength(); i++)
+	{
 		individualProgramView->append(actInd->printProgramLine(i));
 	}
 }
@@ -267,7 +279,8 @@ void MT_PopulationWidget::slotAddInd()
 	MT_AddIndividualsWidgetBase numDialog(this, nullptr, true);
 	int number = 0;
 
-	if(QDialog::Accepted  == numDialog.exec()){
+	if(QDialog::Accepted  == numDialog.exec())
+	{
 
 		// ok button pressed
 		number = numDialog.spinboxNumber->value();
@@ -277,7 +290,8 @@ void MT_PopulationWidget::slotAddInd()
 
 		MT_Individual *newInd;
 		MT_Randomizer *rand = gpManager->getRandomizer();
-		for(int i=0; i<number; i++){
+		for(int i=0; i<number; i++)
+		{
 			progress.setValue(i);
 			int pos = population->createNewIndi(rand);
 			newInd = population->getIndividual(pos);
@@ -296,7 +310,7 @@ void MT_PopulationWidget::slotAddInd()
 void MT_PopulationWidget::slotDelInd()
 {
 	MT_PopListViewItem* actIndNew =nullptr;
-	
+
 	MT_PopListViewItem *nextInd=nullptr;
 	MT_PopListViewItem *actInd = static_cast<MT_PopListViewItem*>(individualListView->topLevelItem(0));
 
@@ -306,7 +320,8 @@ void MT_PopulationWidget::slotDelInd()
 	// iterate over all items, check if they are selected
 	// and delete the selected ones
 	MT_Individual *actRInd =nullptr;
-	while(actInd){
+	while(actInd)
+	{
 		nextInd = nextSiblingOf(individualListView, actInd);	// get next individual in list
 		if (( actInd->isSelected()) && (individualListView->topLevelItemCount() != 1) )
 		{
@@ -314,17 +329,17 @@ void MT_PopulationWidget::slotDelInd()
 			actRInd = population->delIndividual(DelPos);
 			delete actRInd;
 			emit numChanged();
-			
+
 			actIndNew = static_cast<MT_PopListViewItem*>(individualListView->topLevelItem(0));
 			while(actIndNew !=nullptr)		// walk over all IndisItem  // for every item with Pos > DelPos --> setPos(Pos-1)
 			{
 				ActPos = actIndNew->getPos();
 				if (ActPos > DelPos)
 					actIndNew->setPos(ActPos-1);
-				
+
 				actIndNew = nextSiblingOf(individualListView, actIndNew);	// get next individual in list
 			}
-			
+
 			delete actInd;					// delete actual individual if selected
 		}
 
@@ -340,15 +355,17 @@ void MT_PopulationWidget::slotImpInd()
 {
 	QStringList files( QFileDialog::getOpenFileNames( this, "Import Individuals", QString(), "Individuals (*.mind);;All Files (*)"));
 
-	if(!files.isEmpty()){
-	
+	if(!files.isEmpty())
+	{
+
 		// iterate over all selected files
 		QStringList::Iterator it = files.begin();
 		uint i = 0;
 		uint count = files.count();
 		QProgressDialog progress("Importing individuals", QString(), 0, count, this);
 		progress.setWindowModality(Qt::ApplicationModal);
-		for( ; it != files.end(); ++it){
+		for( ; it != files.end(); ++it)
+		{
 			QFile file(*it);
 			progress.setValue(i++);
 			if(file.open(QIODevice::ReadOnly)){		// file successfully opened
@@ -357,8 +374,8 @@ void MT_PopulationWidget::slotImpInd()
 				MT_Individual *newInd = new MT_Individual(str);
 				population->addIndividual(newInd);
 				new MT_PopListViewItem(individualListView, newInd);
-				
-				 emit numChanged();
+
+				emit numChanged();
 				file.close();
 			}
 		}
@@ -372,59 +389,75 @@ void MT_PopulationWidget::slotImpInd()
  ***/
 void MT_PopulationWidget::slotExpInd()
 {
-	QList<MT_PopListViewItem *> list = getSelectedItems();
+	QList<MT_PopListViewItem *> selectedItems = getSelectedItems();
+	if(selectedItems.isEmpty())
+		return;
 
 	bool saveAsPop = false;
 	QString fileName;
-	if(list.count() > 1){
+	if(selectedItems.count() > 1)
+	{
 		QMessageBox box(QMessageBox::Information, "Save Individuals", "There is more than one individual selected.\n"
-			"Shall we save them as a population?", QMessageBox::Yes | QMessageBox::No, this);
+		        "Shall we save them as a population?", QMessageBox::Yes | QMessageBox::No, this);
 		box.button(QMessageBox::Yes)->setText("Save as population");
 		box.button(QMessageBox::No)->setText("Save separately");
 		box.setDefaultButton(QMessageBox::Yes);
 		box.setEscapeButton(QMessageBox::No);
 		saveAsPop = box.exec() == QMessageBox::Yes;
 	}
-	if(saveAsPop){
+	if(saveAsPop)
+	{
 		fileName = QFileDialog::getSaveFileName(this, QString(), QString(), "Population Files (*.mpop);;All Files (*)");
-		if(!fileName.isEmpty()){
+		if(!fileName.isEmpty())
+		{
 			if(fileName.right(5) != ".mpop")
 				fileName += ".mpop";
 			QFile file( fileName );
 
-			if(file.open(QIODevice::WriteOnly)){
+			if(file.open(QIODevice::WriteOnly))
+			{
 				QTextStream str(&file);
-				
+
 				MT_Population npop;
 				npop.changePopSize(0);
-				for(int i=0; i<list.count(); i++){
-					MT_PopListViewItem *actItem = list.at(i);
+				for(int i=0; i<selectedItems.count(); i++)
+				{
+					MT_PopListViewItem *actItem = selectedItems.at(i);
 					npop.addIndividual(population->getIndividual(actItem->getPos()));
 				}
 
 				npop.exportPop(str);
 				npop.flush();
-				
+
 
 				file.close();
-			} else {
+			}
+			else
+			{
 				QMessageBox::critical(this, "Save Population", "An error occurred while saving the population.\nThe operation is aborted.");
 			}
 		}
-	} else {
+	}
+	else
+	{
 		fileName = QFileDialog::getSaveFileName(this, QString(), QString(), "Individual Files (*.mind);;All Files (*)");
-		if(!fileName.isEmpty()){
+		if(!fileName.isEmpty())
+		{
 
-			for(int i=0; i<list.count(); i++){
+			for(int i=0; i<selectedItems.count(); i++)
+			{
 				QFile file( fileName + QString("%1.mind").arg(i) );
 				if(file.exists() && QMessageBox::Ok != QMessageBox::warning(this, "Save Population", "There is another file with this name. This will overwrite\n"
-					"the existing file. Do you really want to continue?", QMessageBox::Ok | QMessageBox::Cancel, QMessageBox::Cancel))
+				        "the existing file. Do you really want to continue?", QMessageBox::Ok | QMessageBox::Cancel, QMessageBox::Cancel))
 					return;
-				if(file.open(QIODevice::WriteOnly)){
+				if(file.open(QIODevice::WriteOnly))
+				{
 					QTextStream str(&file);
-					population->getIndividual(list.at(i)->getPos())->writeToFileIndi(str);
+					population->getIndividual(selectedItems.at(i)->getPos())->writeToFileIndi(str);
 					file.close();
-				} else {
+				}
+				else
+				{
 					QMessageBox::critical(this, "Save Individual", "An error occurred while saving the individual.\nThe operation is aborted.");
 				}
 			}
@@ -441,15 +474,17 @@ void MT_PopulationWidget::slotLoadPop()
 {
 	QString fileName( QFileDialog::getOpenFileName(this, QString(), QString(), "Population Files (*.mpop);;All Files (*)") );
 
-	if(!fileName.isEmpty()){
+	if(!fileName.isEmpty())
+	{
 		QFile file( fileName );
 
-		if(file.open(QIODevice::ReadOnly)){
+		if(file.open(QIODevice::ReadOnly))
+		{
 			QTextStream str(&file);
 
 			QMessageBox box(QMessageBox::Warning, "Import Population",
-				"Shall the current population be deleted or shall we append\n"
-				"the new individuals?", QMessageBox::Ok | QMessageBox::Discard, this);
+			        "Shall the current population be deleted or shall we append\n"
+			        "the new individuals?", QMessageBox::Ok | QMessageBox::Discard, this);
 			box.button(QMessageBox::Ok)->setText("Append");
 			box.button(QMessageBox::Discard)->setText("Delete");
 			box.setDefaultButton(QMessageBox::Ok);
@@ -460,7 +495,9 @@ void MT_PopulationWidget::slotLoadPop()
 				population->loadPop(str);
 				onShow(gpManager, nullptr);	// update the GUI
 
-			} else {
+			}
+			else
+			{
 				// append
 				population->importPop(str);
 				onShow(gpManager, nullptr);
@@ -478,16 +515,20 @@ void MT_PopulationWidget::slotSavePop()
 {
 	QString fileName( QFileDialog::getSaveFileName(this, QString(), QString(), "Population Files (*.mpop);;All Files (*)") );
 
-	if(!fileName.isEmpty()){
+	if(!fileName.isEmpty())
+	{
 		if(fileName.right(5) != ".mpop")
 			fileName += ".mpop";
 		QFile file( fileName );
 
-		if(file.open(QIODevice::WriteOnly)){
+		if(file.open(QIODevice::WriteOnly))
+		{
 			QTextStream str(&file);
 			population->writeToFilePop(str);
 			file.close();
-		} else {
+		}
+		else
+		{
 			QMessageBox::critical(this, "Save Population", "An error occurred while saving the population.\nThe operation is aborted.");
 		}
 	}
@@ -500,7 +541,8 @@ QList<MT_PopListViewItem *> MT_PopulationWidget::getSelectedItems()
 {
 	QList<MT_PopListViewItem *> lst;
 	QTreeWidgetItemIterator it(individualListView);
-	for(; (*it); ++it){
+	for(; (*it); ++it)
+	{
 		if((*it)->isSelected())
 			lst.append(static_cast<MT_PopListViewItem*>(*it));
 	}
