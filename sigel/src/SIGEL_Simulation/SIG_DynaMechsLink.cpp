@@ -27,7 +27,6 @@
 #include "SIGEL_Tools/SIG_IO.h"
 
 #include <dm.h>
-#include <dmContactModel.hpp>
 #include <dmMDHLink.hpp>
 
 #include <cmath>
@@ -100,8 +99,6 @@ namespace SIGEL_Simulation
                                          dynaMechsInertiaTensor,
                                          dynaMechsCenterOfMass );
 
-    dmContactModel *contactModel = new dmContactModel();
-
     // A const reference, not a copy.
     const QList< SIG_Vector * > &vertices = geometry->getVertices();
 
@@ -116,10 +113,9 @@ namespace SIGEL_Simulation
         SIG_TypeConverter::toCartesianVector( vertex, contactPoints[i] );
       };
 
-    contactModel->setContactPoints( noOfContactPoints,
-                                    contactPoints );
+    contactModel.setContactPoints( noOfContactPoints, contactPoints );
 
-    dynaMechsLink->addForce( contactModel );
+    dynaMechsLink->addForce( &contactModel );
   };
 
   void SIG_DynaMechsLink::forwardKinematics( SIG_DynaMechsLink *caller )

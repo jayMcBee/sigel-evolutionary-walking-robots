@@ -30,6 +30,7 @@
 #include <memory>
 #include <dm.h>
 #include <dmRigidBody.hpp>
+#include <dmContactModel.hpp>
 #include <dmZScrewTxLink.hpp>
 
 
@@ -75,6 +76,8 @@ class SIG_DynaMechsLink
     double const screwTheta;
 
     std::unique_ptr< dmZScrewTxLink > screwLink;
+
+    dmContactModel contactModel;
   };
 
 }
