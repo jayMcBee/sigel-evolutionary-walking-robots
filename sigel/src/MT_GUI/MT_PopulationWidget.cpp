@@ -354,33 +354,32 @@ void MT_PopulationWidget::slotDelInd()
 void MT_PopulationWidget::slotImpInd()
 {
 	QStringList files( QFileDialog::getOpenFileNames( this, "Import Individuals", QString(), "Individuals (*.mind);;All Files (*)"));
+	if(files.isEmpty())
+		return;
 
-	if(!files.isEmpty())
+	// iterate over all selected files
+	QStringList::Iterator it = files.begin();
+	uint i = 0;
+	uint count = files.count();
+	QProgressDialog progress("Importing individuals", QString(), 0, count, this);
+	progress.setWindowModality(Qt::ApplicationModal);
+	for( ; it != files.end(); ++it)
 	{
+		QFile file(*it);
+		progress.setValue(i++);
+		if(!file.open(QIODevice::ReadOnly))
+			continue;
 
-		// iterate over all selected files
-		QStringList::Iterator it = files.begin();
-		uint i = 0;
-		uint count = files.count();
-		QProgressDialog progress("Importing individuals", QString(), 0, count, this);
-		progress.setWindowModality(Qt::ApplicationModal);
-		for( ; it != files.end(); ++it)
-		{
-			QFile file(*it);
-			progress.setValue(i++);
-			if(file.open(QIODevice::ReadOnly)){		// file successfully opened
-				QTextStream str(&file);
+		QTextStream str(&file);
 
-				MT_Individual *newInd = new MT_Individual(str);
-				population->addIndividual(newInd);
-				new MT_PopListViewItem(individualListView, newInd);
+		MT_Individual *newInd = new MT_Individual(str);
+		population->addIndividual(newInd);
+		new MT_PopListViewItem(individualListView, newInd);
 
-				emit numChanged();
-				file.close();
-			}
-		}
-		progress.setValue(count);
+		emit numChanged();
+		file.close();
 	}
+	progress.setValue(count);
 }
 
 /***
