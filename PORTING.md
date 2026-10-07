@@ -917,6 +917,26 @@ classes and leave truncation a hard error. **They are not interchangeable.**
   and `build/coredrive`. Older entries in this file keep the name
   `sigel_eval`; they mean this program.
 
+**2026-10-07 — DONE: ITEM 13, THE LAST FOUR GERMAN STRINGS ARE TRANSLATED.**
+
+- **Changed,** all in the history text of `SIG_GPIndividual`:
+  `Fitness (Elter 1)` and `(Elter 2)` in `addCrossOverInfo` are now
+  `Fitness (Parent 1)` and `(Parent 2)`; `CREATED NEW INDIVIDUUM` in the
+  constructor and `INDIVIDUUM IS GENERATED RANDOMLY` in
+  `generateRandomIndividual` now say `INDIVIDUAL`.
+- **This reverses an older decision.** Earlier entries in this file say the
+  four strings are kept. They are superseded.
+- **What the history text is:** it is saved in the `.exp` file, loaded back
+  as one block, shown in the individual view and copied to the offspring. No
+  code searches or splits it. The search for `INDIVIDUAL(n) BEGIN{` in
+  `SIG_GPPopulation::readFromFile` cannot match the new headings.
+- **Old files:** the six shipped experiments that hold `Elter` lines load and
+  show as before. A new crossover on such a pool writes `Parent`, so one
+  history can hold both words. No shipped file holds `INDIVIDUUM`.
+- **How the search was done:** every string literal of the `.cpp`, `.h` and
+  `.ui` files was searched for German words and for letters outside ASCII.
+  A check for German must look for words; these strings are pure ASCII.
+
 **2026-10-07 — `main` IN `sigel.cpp` NO LONGER PINS THE `QHash` SEED.**
 
 - **Removed:** the call `QHashSeed::setDeterministicGlobalSeed()`, its

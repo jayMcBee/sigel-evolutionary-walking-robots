@@ -54,7 +54,7 @@ SIGEL_GP::SIG_GPIndividual::SIG_GPIndividual(SIG_GPParameter& param,
   QString fitTmp     = "Fitness Value: " + str.number(getFitness(),'g',6);
 
   //history.append( "\n--- History of the Individual in the Generation Number: "+ str.number(getAge(),10) + " ---");
-  history.append("CREATED NEW INDIVIDUUM:\n======================="); 
+  history.append("CREATED NEW INDIVIDUAL:\n======================="); 
   history.append(nameTmp);
   history.append(birthdTmp);
   history.append(poolposTmp);
@@ -167,7 +167,7 @@ void SIGEL_GP::SIG_GPIndividual::generateRandomIndividual(SIGEL_Tools::SIG_Rando
    QString fitTmp     = "Fitness Value: " + str.number(getFitness(),'g',6);     
 
    //history.append( "\n--- History of the Individual in the Generation Number: "+ str.number(getAge(),10) + " ---");
-   history.append("INDIVIDUUM IS GENERATED RANDOMLY:\n---------------------------------");
+   history.append("INDIVIDUAL IS GENERATED RANDOMLY:\n---------------------------------");
    history.append(nameTmp);
    history.append(birthdTmp);
    history.append(poolposTmp);
@@ -368,8 +368,8 @@ void SIGEL_GP::SIG_GPIndividual::addCrossOverInfo(QString name1,
    QString mutdTmp    = "Date of CrossOver: " + time.toString();
    QString nameTmp    = "Parents: " + name1 +" + "+name2;
    QString cpointTmp  = "Crossover Points: " + str.number(xoverpnt1) + " + " + str.number(xoverpnt2);
-   QString fitTmp1    = "Fitness (Elter 1): " + str.number(fitness1,'g',6);
-   QString fitTmp2    = "Fitness (Elter 2): " + str.number(fitness2,'g',6);
+   QString fitTmp1    = "Fitness (Parent 1): " + str.number(fitness1,'g',6);
+   QString fitTmp2    = "Fitness (Parent 2): " + str.number(fitness2,'g',6);
    QString poolposTmp = "Current Pool Position: " + str.number(getPoolPos(),10);
 
    history.append("\nCROSSOVER:\n----------");

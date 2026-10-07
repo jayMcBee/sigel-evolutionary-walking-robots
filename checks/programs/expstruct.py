@@ -18,7 +18,7 @@ claim the reader can verify rather than take on trust.
 import hashlib, re, sys
 
 # Anything matching these never reaches the fingerprint. FITNESS= is the
-# obvious one; the HISTORY block carries "Fitness (Elter 1): 3.9e-05" too, and
+# obvious one; the HISTORY block carries "Fitness (Parent 1): 3.9e-05" too, and
 # a date is wall-clock rather than structure, so a fresh run would differ on it
 # for a reason that says nothing about the port.
 #

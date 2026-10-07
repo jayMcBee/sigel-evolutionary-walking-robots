@@ -53,19 +53,6 @@ Paths are relative to `sigel/`, the source tree.
 - [ ] **11. Write `tour` out as `tournament` in every name,** in SIGEL and
   MetaGP.
 
-- [ ] **13. Translate the German strings.** What is left is **kept, by
-  decision:** the history text of `SIG_GPIndividual`, which is saved in `.exp`
-  files: "Fitness (Elter 1)" and "(Elter 2)" in `addCrossOverInfo`, "CREATED
-  NEW INDIVIDUUM" in the constructor, "INDIVIDUUM IS GENERATED RANDOMLY" in
-  `generateRandomIndividual`. The shipped experiments hold the "Elter" lines.
-  **No compiler and no check covers German strings:** every persisted path is
-  write-only. `SIG_GPIndividual::readFromFile` parses only `NAME='`,
-  `POOLPOS=`, `FITNESS=`, `AGE=` and `PROGRAM BEGIN{`; the `MT_GPManager`
-  block sits after that file's own "is not loaded" marker; the ZORC format
-  carries no German.
-  These strings are pure ASCII: a check for German must look for words, not
-  bytes above 127.
-
 - [ ] **14. Translate the German symbols.** Every miss is a compile error,
   so `check.sh` verifies it.
 
