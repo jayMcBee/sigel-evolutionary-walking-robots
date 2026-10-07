@@ -3529,7 +3529,7 @@ static int guidriveMain(int argc, char **argv)
             SIG_ExperimentView *ev = e->experimentView;
             const int start = ev->pushbuttonStart->isEnabled() ? 1 : 0;
             const int hist  = ev->checkboxHistory->isEnabled() ? 1 : 0;
-            const int autos = ev->sliderIntervall->isEnabled() ? 1 : 0;
+            const int autos = ev->sliderAutosave->isEnabled() ? 1 : 0;
             const int comm  = ev->multilineeditComment->isEnabled() ? 1 : 0;
             const int ps    = ev->pushbuttonPostscript->isEnabled() ? 1 : 0;
             const int curve = ev->pushbuttonShowFitnessCurve->isEnabled() ? 1 : 0;

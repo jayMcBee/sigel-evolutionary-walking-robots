@@ -20,7 +20,7 @@ public:
 public slots:
     virtual void slotExportPostScript() = 0;
     virtual void slotHistory(bool) = 0;
-    virtual void slotIntervallChanged(int) = 0;
+    virtual void slotAutosaveChanged(int) = 0;
     virtual void slotShowFitnesscurve() = 0;
 
 protected:

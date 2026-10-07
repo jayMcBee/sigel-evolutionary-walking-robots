@@ -64,8 +64,6 @@ Paths are relative to `sigel/`, the source tree.
   | `set`/`getSelektionValue` | `MT_FitnessTrainer.h`, `MT_GPManager.h` |
   | `winkel`, `verschiebung`, `schiebung`, `drehmatrix`, `hilf`, `stflorianhilf` | `IFunctions.h`, `IFunctions.cpp` |
 
-  **Kept, by decision:** `sliderIntervall` and `slotIntervallChanged`. The GUI
-  baselines record the widget by name, and the form connects the slot by name.
   `rot` in `getMinRot` and `rotMin` is rotation, not the colour — leave it.
   **Check after each phase:** `./checks/check.sh`, then
   `./checks/dictorder-dump.sh | diff -u checks/baselines/dictorder-baseline.txt -`

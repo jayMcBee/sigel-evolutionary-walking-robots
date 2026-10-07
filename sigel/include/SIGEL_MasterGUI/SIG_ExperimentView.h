@@ -73,7 +73,7 @@ public:
       /**
       	*	This slot will be envoked when the user moves the autosave slider.
       	*/
-      void slotIntervallChanged(int value);
+      void slotAutosaveChanged(int value);
 
  private:
     

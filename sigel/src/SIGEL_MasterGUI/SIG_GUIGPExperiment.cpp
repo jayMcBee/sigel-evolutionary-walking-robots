@@ -327,7 +327,7 @@ void SIG_GUIGPExperiment::slotEvolutionNotRunning( bool isNotRunning )
   // Start and Stop are on this page too, and a disabled parent takes its
   // children with it, so the page is locked widget by widget.
   experimentView->checkboxHistory->setEnabled( isNotRunning );
-  experimentView->sliderIntervall->setEnabled( isNotRunning );
+  experimentView->sliderAutosave->setEnabled( isNotRunning );
   experimentView->multilineeditComment->setEnabled( isNotRunning );
   experimentView->pushbuttonPostscript->setEnabled( isNotRunning );
   experimentView->pushbuttonShowFitnessCurve->setEnabled( isNotRunning );

@@ -411,7 +411,7 @@ class SIG_Environment {
   dmEnvironment dynaMechsEnvironment;
 
  	/**
- 		*	This variable specifies the intervall (in generations) in which the experiment
+ 		*	This variable specifies the interval (in generations) in which the experiment
  		*	is automatically saved to disk.
  		*	For now the range is from 0 to 100 generations, where 0 disables autosave.
  		*/

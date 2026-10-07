@@ -203,7 +203,7 @@
                       <number>6</number>
                     </property>
                     <item>
-                      <widget class="QSlider" name="sliderIntervall">
+                      <widget class="QSlider" name="sliderAutosave">
                         <property name="enabled">
                           <bool>true</bool>
                         </property>
@@ -304,7 +304,7 @@
   <slots>
     <slot>slotExportPostScript()</slot>
     <slot>slotHistory(bool)</slot>
-    <slot>slotIntervallChanged(int)</slot>
+    <slot>slotAutosaveChanged(int)</slot>
     <slot>slotShowFitnesscurve()</slot>
   </slots>
   <connections>
@@ -327,10 +327,10 @@
       <slot>slotHistory(bool)</slot>
     </connection>
     <connection>
-      <sender>sliderIntervall</sender>
+      <sender>sliderAutosave</sender>
       <signal>valueChanged(int)</signal>
       <receiver>SIG_ExperimentViewBase</receiver>
-      <slot>slotIntervallChanged(int)</slot>
+      <slot>slotAutosaveChanged(int)</slot>
     </connection>
   </connections>
 </ui>

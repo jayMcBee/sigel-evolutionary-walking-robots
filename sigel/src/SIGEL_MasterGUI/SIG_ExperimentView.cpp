@@ -49,7 +49,7 @@ SIG_ExperimentView::SIG_ExperimentView( QWidget* parent,  const char* name, Qt::
 
 
 void SIG_ExperimentView::putIntoExperiment() {
-  // slotHistory and slotIntervallChanged reach this function without going
+  // slotHistory and slotAutosaveChanged reach this function without going
   // through putAllIntoExperiment, so it needs its own check. The LCD read
   // below is display-only and sits ahead of it.
 
@@ -188,7 +188,7 @@ void SIG_ExperimentView::slotHistory(bool selected) {
   putIntoExperiment();
 };
 
-void SIG_ExperimentView::slotIntervallChanged(int value) {
+void SIG_ExperimentView::slotAutosaveChanged(int value) {
   if (theExperiment.getPath()!="new") {
     lcdnumberAutosave->display(value);
     putIntoExperiment();
@@ -196,7 +196,7 @@ void SIG_ExperimentView::slotIntervallChanged(int value) {
   else {
     // this is because a new experiment has no path where it is saved
     // so no autosaving can be done
-    sliderIntervall->setValue(0);
+    sliderAutosave->setValue(0);
     QMessageBox::warning( this, "Error", "You have to save the experiment first.");
   }
 };

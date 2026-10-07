@@ -917,6 +917,20 @@ classes and leave truncation a hard error. **They are not interchangeable.**
   and `build/coredrive`. Older entries in this file keep the name
   `sigel_eval`; they mean this program.
 
+**2026-10-07 — THE AUTOSAVE SLIDER OF THE EXPERIMENT PAGE HAS ENGLISH NAMES.**
+
+- `sliderIntervall` is now `sliderAutosave`, and `slotIntervallChanged` is
+  now `slotAutosaveChanged`. The names fit the neighbours
+  `textlabelAutosave` and `lcdnumberAutosave`.
+- Changed together: the form `SIG_ExperimentViewBase.ui` (widget, slot list
+  and connection), `SIG_ExperimentViewBase`, `SIG_ExperimentView` and
+  `SIG_GUIGPExperiment::slotEvolutionNotRunning`.
+- **This reverses an older decision** of item 14, which kept the two names.
+  The reasons then were that the GUI baseline records the widget by name and
+  that the form connects the slot by name. Neither is a reason of SIGEL.
+- The GUI baseline differs in the name of this widget, in 11 lines, and in
+  nothing else.
+
 **2026-10-07 — DONE: ITEM 13, THE LAST FOUR GERMAN STRINGS ARE TRANSLATED.**
 
 - **Changed,** all in the history text of `SIG_GPIndividual`:

@@ -283,7 +283,7 @@
     check    [Save the history] enabled=1 checkable=1 checked=1
     lcd      [lcdnumberGenerations] value=203 digits=4
     lcd      [lcdnumberAutosave] value=0 digits=4
-    slider   [sliderIntervall] value=0 min=0 max=100 enabled=1
+    slider   [sliderAutosave] value=0 min=0 max=100 enabled=1
     progress [generationProgBar] value=-1 min=0 max=100
   [action changes]
     &File/&Clone Experiment (Empty Pool)...                    ENABLED
@@ -507,7 +507,7 @@ we do with the system?]
     check    [Save the history] enabled=1 checkable=1 checked=1
     lcd      [lcdnumberGenerations] value=203 digits=4
     lcd      [lcdnumberAutosave] value=0 digits=4
-    slider   [sliderIntervall] value=0 min=0 max=100 enabled=1
+    slider   [sliderAutosave] value=0 min=0 max=100 enabled=1
     progress [generationProgBar] value=-1 min=0 max=100
   [action changes]
     &File/&Clone Experiment (Empty Pool)...                    ENABLED
@@ -929,7 +929,7 @@ we do with the system?]
     check    [Save the history] enabled=1 checkable=1 checked=1
     lcd      [lcdnumberGenerations] value=203 digits=4
     lcd      [lcdnumberAutosave] value=0 digits=4
-    slider   [sliderIntervall] value=0 min=0 max=100 enabled=1
+    slider   [sliderAutosave] value=0 min=0 max=100 enabled=1
     progress [generationProgBar] value=-1 min=0 max=100
   [action changes]
     &File/&Clone Experiment (Empty Pool)...                    ENABLED
@@ -1137,7 +1137,7 @@ selected=17013
     check    [Save the history] enabled=1 checkable=1 checked=1
     lcd      [lcdnumberGenerations] value=203 digits=4
     lcd      [lcdnumberAutosave] value=0 digits=4
-    slider   [sliderIntervall] value=0 min=0 max=100 enabled=1
+    slider   [sliderAutosave] value=0 min=0 max=100 enabled=1
     progress [generationProgBar] value=-1 min=0 max=100
   [action changes]
     &File/&Clone Experiment (Empty Pool)...                    ENABLED
@@ -1260,7 +1260,7 @@ Do you want to replace it?]
     check    [Save the history] enabled=1 checkable=1 checked=1
     lcd      [lcdnumberGenerations] value=203 digits=4
     lcd      [lcdnumberAutosave] value=0 digits=4
-    slider   [sliderIntervall] value=0 min=0 max=100 enabled=1
+    slider   [sliderAutosave] value=0 min=0 max=100 enabled=1
     progress [generationProgBar] value=-1 min=0 max=100
   [action changes]
     &File/&Clone Experiment (Empty Pool)...                    ENABLED
@@ -1472,7 +1472,7 @@ Do you want to replace it?]
     check    [Save the history] enabled=1 checkable=1 checked=1
     lcd      [lcdnumberGenerations] value=203 digits=4
     lcd      [lcdnumberAutosave] value=0 digits=4
-    slider   [sliderIntervall] value=0 min=0 max=100 enabled=1
+    slider   [sliderAutosave] value=0 min=0 max=100 enabled=1
     progress [generationProgBar] value=-1 min=0 max=100
   [action changes]
     &File/&Clone Experiment (Empty Pool)...                    ENABLED
@@ -1824,7 +1824,7 @@ Do you want to replace it?]
     check    [Save the history] enabled=1 checkable=1 checked=1
     lcd      [lcdnumberGenerations] value=203 digits=4
     lcd      [lcdnumberAutosave] value=0 digits=4
-    slider   [sliderIntervall] value=0 min=0 max=100 enabled=1
+    slider   [sliderAutosave] value=0 min=0 max=100 enabled=1
     progress [generationProgBar] value=-1 min=0 max=100
   [action changes]
     &File/&Clone Experiment (Empty Pool)...                    ENABLED
@@ -2005,7 +2005,7 @@ Do you want to replace it?]
     check    [Save the history] enabled=1 checkable=1 checked=1
     lcd      [lcdnumberGenerations] value=203 digits=4
     lcd      [lcdnumberAutosave] value=0 digits=4
-    slider   [sliderIntervall] value=0 min=0 max=100 enabled=1
+    slider   [sliderAutosave] value=0 min=0 max=100 enabled=1
     progress [generationProgBar] value=-1 min=0 max=100
   [action changes]
     &File/&Clone Experiment (Empty Pool)...                    ENABLED
@@ -2236,7 +2236,7 @@ Do you want to replace it?]
     check    [Save the history] enabled=1 checkable=1 checked=1
     lcd      [lcdnumberGenerations] value=203 digits=4
     lcd      [lcdnumberAutosave] value=0 digits=4
-    slider   [sliderIntervall] value=0 min=0 max=100 enabled=1
+    slider   [sliderAutosave] value=0 min=0 max=100 enabled=1
     progress [generationProgBar] value=-1 min=0 max=100
   [action changes]
     &File/&Clone Experiment (Empty Pool)...                    ENABLED
@@ -2415,7 +2415,7 @@ Do you want to replace it?]
     check    [Save the history] enabled=1 checkable=1 checked=1
     lcd      [lcdnumberGenerations] value=203 digits=4
     lcd      [lcdnumberAutosave] value=0 digits=4
-    slider   [sliderIntervall] value=0 min=0 max=100 enabled=1
+    slider   [sliderAutosave] value=0 min=0 max=100 enabled=1
     progress [generationProgBar] value=-1 min=0 max=100
   [action changes]
     &File/&Clone Experiment (Empty Pool)...                    ENABLED
@@ -2540,7 +2540,7 @@ Do you want to replace it?]
     check    [Save the history] enabled=1 checkable=1 checked=1
     lcd      [lcdnumberGenerations] value=203 digits=4
     lcd      [lcdnumberAutosave] value=0 digits=4
-    slider   [sliderIntervall] value=0 min=0 max=100 enabled=1
+    slider   [sliderAutosave] value=0 min=0 max=100 enabled=1
     progress [generationProgBar] value=-1 min=0 max=100
   [action changes]
     &File/&Clone Experiment (Empty Pool)...                    ENABLED
