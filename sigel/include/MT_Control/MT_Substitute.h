@@ -4,6 +4,7 @@
 
 
 #include <QQueue>
+#include <memory>
 #include "MT_GPSystem/MT_Program.h"
 #include "MT_GPSystem/MT_Interpreter.h"
 #include "MT_GPSystem/MT_TranslatedIndividual.h"
@@ -76,7 +77,7 @@ protected:
 	MT_TranslatedIndividual * translatedSIGProg(SIGEL_Program::SIG_Program const *SIGProg);
 
 	// the Program of the present best Meta Individuals 
-	MT_Program * BestMETAProgram;
+	std::unique_ptr< MT_Program > BestMETAProgram;
 	
 	// for EstimationStrategy: count the Meta Estimation between the calibrationsteps   
 	int NumOfMeta;

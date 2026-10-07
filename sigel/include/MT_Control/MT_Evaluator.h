@@ -15,7 +15,7 @@ public:
 
 	// administrative method 
 	MT_Evaluator(SIGEL_GP::SIG_GPExperiment& exp, QTextStream &File);
-	virtual ~MT_Evaluator();
+	virtual ~MT_Evaluator() = default;
 	void loadSetup(QTextStream & File);
    void writeToFile(QTextStream & File);
 	void writeToFileSetup(QTextStream & File);

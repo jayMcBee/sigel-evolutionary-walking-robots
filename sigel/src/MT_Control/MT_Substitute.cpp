@@ -19,12 +19,9 @@ MT_Substitute::~MT_Substitute()
 
 void MT_Substitute::changeBest(MT_Program * MetaProg)
 {
-	if (BestMETAProgram !=nullptr)
-		delete BestMETAProgram;
-	
-	BestMETAProgram = new MT_Program(MetaProg);
+	BestMETAProgram = std::make_unique< MT_Program >(MetaProg);
 
-	Interpreter.loadProgram(BestMETAProgram);
+	Interpreter.loadProgram(BestMETAProgram.get());
 }
 
 void MT_Substitute::changeErrorInfo(QList<double> * OutCome, QList<double> * CorrectFit)

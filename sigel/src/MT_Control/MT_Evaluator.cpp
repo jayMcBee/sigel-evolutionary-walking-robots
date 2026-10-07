@@ -12,7 +12,6 @@ MT_Evaluator::MT_Evaluator(SIGEL_GP::SIG_GPExperiment& exp, QTextStream &File) :
 	
 	Typ=1;
 	AverageSigelFitness = 0.01; 
-	BestMETAProgram =nullptr;
 	CorrectFitness.resize(0);
 	AssumedFitness.resize(0);
 	MetaProgError =-1.0;
@@ -64,12 +63,6 @@ MT_Evaluator::MT_Evaluator(SIGEL_GP::SIG_GPExperiment& exp, QTextStream &File) :
 		}
 
 	}	
-}
-
-MT_Evaluator::~MT_Evaluator()
-{
-	if (BestMETAProgram !=nullptr)
-		delete BestMETAProgram;
 }
 
 

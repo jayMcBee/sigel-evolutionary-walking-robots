@@ -8,7 +8,6 @@ MT_Classifier::MT_Classifier(QTextStream &File) : MT_Substitute()
 {
 	Typ=2;
 	AverageSigelFitness = 0.01;
-	BestMETAProgram =nullptr;
 	CorrectFitness.resize(0);
 	AssumedFitness.resize(0);
 	MetaProgError =-1.0;
@@ -52,14 +51,6 @@ MT_Classifier::MT_Classifier(QTextStream &File) : MT_Substitute()
 	}
 }
 
-
-MT_Classifier::~MT_Classifier()
-{
-	
-	if (BestMETAProgram !=nullptr)
-		delete BestMETAProgram;
-
-}
 
 void MT_Classifier::loadSetup(QTextStream &File)
 {

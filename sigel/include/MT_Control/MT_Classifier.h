@@ -22,7 +22,7 @@ public:
 	
 	// administrative method 
 	MT_Classifier(QTextStream &File);
-	virtual ~MT_Classifier();
+	virtual ~MT_Classifier() = default;
 	void writeToFileSetup(QTextStream &File);
 	void writeToFile(QTextStream &File);
 	void loadSetup(QTextStream &File);
