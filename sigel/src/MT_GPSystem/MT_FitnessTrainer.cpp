@@ -170,8 +170,6 @@ bool MT_FitnessTrainer::calculateFitness(MT_Individual *Indi)
 	if (false == Indi->toBeEvaluated(TSet->getName()))
 	{
 
-//double DebugInfo1=0.0;
-//double DebugInfo2=0.0;
 		NewEvaluated = true;
 		double Fit= -1.5;
 		if((Indi->getProgram()->getLength()) > 3)
@@ -187,12 +185,10 @@ bool MT_FitnessTrainer::calculateFitness(MT_Individual *Indi)
 				{
 					InstantTCase = TSet->getTCase(i); 
 					
-	//				DebugInfo1 = 
 
 					Result[i] = InstantTCase->getFitness();
 
 
-	//				DebugInfo2 = 
 			
 					ResultIst[i]= Interpreter.interpret(InstantTCase->getIndividual());
 				}
@@ -234,17 +230,6 @@ double MT_FitnessTrainer::fitSquareError()
 		Fitness = Fitness + (ResultIst[i]-Result[i]) * (ResultIst[i]-Result[i]);
 
 	Fitness = 1.0 / (1.0 + Fitness);
-/*	
-	Fitness *= 10000.0;
-	
-	if(Fitness <0.0)
-		Fitness = 0.0;
-	else 
-		if(Fitness<0.0001)
-			Fitness = 1000;
-		else
-			Fitness = 0.1/Fitness; 
-*/
 	return Fitness;
  
 }
@@ -260,15 +245,6 @@ double MT_FitnessTrainer::fitSimpleError()
 	// fit error into interval [0, 1]
 	Fitness = 1.0 / (1.0 + Fitness);
 
-/*
-	if(Fitness <0.0)
-		Fitness = 0.0;
-	else 
-		if(Fitness<0.0001)
-			Fitness = 1000;
-		else
-			Fitness = 0.1/Fitness;  
-*/
 
 	return Fitness;
 }
