@@ -53,7 +53,7 @@ MT_GPManager::MT_GPManager(QTextStream &File) : QObject()
 	if(Randi->getLastError() != 0)
 		LastError = Randi->getLastError();
 
-	Statistics = new MT_Statistics(File);
+	Statistics = std::make_unique< MT_Statistics >(File);
 	
 	Offspring= new MT_Population();
 	QString OffspringSize ( "OffspringSize:" );
@@ -122,7 +122,6 @@ MT_GPManager::~MT_GPManager()
 
 	delete BestIndividual;
 	delete Randi;
-	delete Statistics;
 	delete Offspring;
 	delete Parent;
 	delete Seeker;
@@ -338,7 +337,7 @@ void MT_GPManager::writeToFilePop(QTextStream &File)
 MT_Statistics * MT_GPManager::getGPStatistics()
 {
 
-	return Statistics;
+	return Statistics.get();
 }
 
 MT_Population * MT_GPManager::getParent()

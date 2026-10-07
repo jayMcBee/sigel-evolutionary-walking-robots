@@ -3,6 +3,7 @@
 
 #include <QTextStream>
 #include <QObject>
+#include <memory>
 class MT_Substitute;
 
 #include "MT_GPSystem/MT_Population.h"
@@ -144,7 +145,7 @@ private:
 	MT_FitnessTrainer * FitnessTrainer;
 
 	/* manage and collected  information for evaluation of a SIGEL&META run*/
-	MT_Statistics * Statistics;
+	std::unique_ptr< MT_Statistics > Statistics;
 	MT_StatisticsElement * SElement;
 
 	/* responsibly for the movement in the search space, create a new offspring */
