@@ -32,9 +32,6 @@
 #include "SIGEL_GP/SIG_GPParameter.h"
 #include "SIGEL_Robot/SIG_LanguageParameters.h"
 
-//#include "MT_Control/MT_Classifier.h"
-
-
 class MT_Classifier;
 
 namespace SIGEL_GP
