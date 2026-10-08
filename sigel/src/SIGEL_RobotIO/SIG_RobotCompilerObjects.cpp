@@ -27,6 +27,7 @@
 using SIGEL_Robot::SIG_Body;
 
 namespace SIGEL_RobotIO {
+
         SIG_RobotCompilerObjects::SIG_RobotCompilerObjects
         (SIG_RobotScanner &sc, SIG_Robot *tg, QString homepath)
                 : SIG_RobotCompiler (sc, tg, homepath),
@@ -330,7 +331,6 @@ namespace SIGEL_RobotIO {
                 // there is nothing to do
         }
 
-
         SIG_ContactSensor *SIG_RobotCompilerObjects::contactSensorFind (QString name)
         {
                 if (target->lookupSensor (name))
@@ -350,7 +350,6 @@ namespace SIGEL_RobotIO {
         {
                 // there is nothing to do
         }
-
 
         SIG_Geometry *SIG_RobotCompilerObjects::surfaceFind (QString name)
         {
@@ -383,4 +382,5 @@ namespace SIGEL_RobotIO {
         {
                 // target->setOverallScalingFactor (scalingFactor);
         }
+
 }

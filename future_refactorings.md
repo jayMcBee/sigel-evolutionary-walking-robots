@@ -131,8 +131,8 @@ Paths are relative to `sigel/`, the source tree.
   must stay identical. One change covers at most 20 files, also inside one
   module. Modules still to do: `MT_Control`, `MT_GPSystem`, `MT_GUI`,
   `SIGEL_GP`,
-  `SIGEL_MasterGUI`, `SIGEL_Program`, `SIGEL_Robot`,
-  `SIGEL_RobotCheck`, `SIGEL_RobotIO`, `SIGEL_Simulation`, `SIGEL_SlaveGUI`,
+  `SIGEL_MasterGUI`, `SIGEL_Robot`,
+  `SIGEL_RobotCheck`, `SIGEL_Simulation`, `SIGEL_SlaveGUI`,
   `SIGEL_Visualisation`, and `sigel.cpp`, `sigel_slave.cpp`,
   `manage_dyn_slave.c`.
 

@@ -29,7 +29,9 @@ namespace SIGEL_RobotIO { class SIG_RobotScanner; }
 #include "SIGEL_RobotIO/SIG_Scanner.h"
 
 namespace SIGEL_RobotIO {
+
         namespace RobotSymbol {
+
                 extern int const openingBrace;
                 extern int const closingBrace;
                 extern int const openingParen;
@@ -41,6 +43,7 @@ namespace SIGEL_RobotIO {
                 extern int const comma;
                 extern int const equals;
                 extern int const slash;
+
         }
         
         class SIG_RobotScanner : public SIG_Scanner {
@@ -48,6 +51,7 @@ namespace SIGEL_RobotIO {
                 SIG_RobotScanner (QString sourceText);
                 virtual void nextSymbol ();
         };
+
 }
 
 #endif

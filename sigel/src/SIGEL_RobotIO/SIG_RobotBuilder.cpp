@@ -25,6 +25,7 @@
 #include <qtextstream.h>
 
 namespace SIGEL_RobotIO {
+
         SIG_RobotBuilder::SIG_RobotBuilder (QString file)
                 : SIG_RobotFactory (),
                   filename (file)

@@ -23,6 +23,7 @@
 #include "SIGEL_RobotIO/SIG_RobotCompilerStructure.h"
 
 namespace SIGEL_RobotIO {
+
 	bool checkLinkHasPoint (SIG_Link *l, QString pn, SIG_Joint *j)
         {
                 if (!l->hasPoint (pn))
@@ -33,6 +34,7 @@ namespace SIGEL_RobotIO {
                                                  j->getName ());
                 return true;
         }
+
         SIG_RobotCompilerStructure::SIG_RobotCompilerStructure
         (SIG_RobotScanner &sc, SIG_Robot *tg, QString homepath)
                 : SIG_RobotCompiler (sc, tg, homepath)
@@ -345,7 +347,6 @@ namespace SIGEL_RobotIO {
         SIG_Drive *SIG_RobotCompilerStructure::driveFind (QString name)
         {
                 return target->lookupDrive (name);
-                        
         }
 
         void SIG_RobotCompilerStructure::driveMode (SIG_Drive *d, QString mode)
@@ -419,7 +420,6 @@ namespace SIGEL_RobotIO {
                 // there is nothing to do
         }
 
-
         SIG_ContactSensor *SIG_RobotCompilerStructure::contactSensorFind (QString name)
         {
                 SIG_Sensor *s = target->lookupSensor (name);
@@ -442,4 +442,5 @@ namespace SIGEL_RobotIO {
         {
                 // there is nothing to do
         }
+
 }

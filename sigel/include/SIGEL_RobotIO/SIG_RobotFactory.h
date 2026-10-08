@@ -30,6 +30,7 @@ namespace SIGEL_RobotIO { class SIG_RobotFactory; }
 using SIGEL_Robot::SIG_Robot;
 
 namespace SIGEL_RobotIO {
+
         class SIG_RobotFactory {
         protected:
                 SIG_Robot *robot;
@@ -38,6 +39,7 @@ namespace SIGEL_RobotIO {
                 virtual ~SIG_RobotFactory() = default;
                 virtual SIG_Robot *getModel ();
         };
+
 }
 
 #endif

@@ -23,6 +23,7 @@
 #include "SIGEL_RobotIO/SIG_RobotFactory.h"
 
 namespace SIGEL_RobotIO {
+
         SIG_RobotFactory::SIG_RobotFactory ()
                 : robot (nullptr)
         { }
@@ -31,4 +32,5 @@ namespace SIGEL_RobotIO {
         {
                 return robot;
         }
+
 }

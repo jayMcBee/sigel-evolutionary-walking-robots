@@ -32,6 +32,7 @@ namespace SIGEL_RobotIO { class SIG_RobotCompilerStructure; }
 #include "SIGEL_RobotIO/SIG_RobotIOExceptions.h"
 
 namespace SIGEL_RobotIO {
+
         class SIG_RobotCompilerStructure : public SIG_RobotCompiler {
         public:
                 SIG_RobotCompilerStructure (SIG_RobotScanner &sc,
@@ -125,6 +126,7 @@ namespace SIGEL_RobotIO {
                                               double z) {}
                 virtual void surfaceFinish (SIG_Geometry *g, QString name) {}
         };
+
 }
 
 #endif

@@ -27,11 +27,8 @@
 /*            export member functions.                                     */
 /* ----------------------------------------------------------------------- */
 
-
-
 #if !defined(SIGEL_PROGRAMPACKAGE_SIG_PROGRAM_H) 
 #define SIGEL_PROGRAMPACKAGE_SIG_PROGRAM_H
-
 
 #include <QList>
 #include <QString>
@@ -47,13 +44,10 @@ namespace SIGEL_GP { class SIG_GPParameter; }
 #include "SIGEL_Robot/SIG_LanguageParameters.h"
 #include "SIGEL_Tools/SIG_IO.h"
 
-
-
 /**
  * This namespace represents all classes that are needed to evolve programs with
  * a Genetic Programming System.
  */
-
 
 namespace SIGEL_Program
    {
@@ -68,7 +62,6 @@ namespace SIGEL_Program
  */
 class SIG_Program
 {
-
  protected:
  std::vector< SIGEL_Program::SIG_ProgramLine > lines;
 
@@ -109,14 +102,12 @@ class SIG_Program
    public:
    virtual ~SIG_Program() = default;
 
-
 /**
  * This function returns the list of programlines.
  */
  
  public:
  std::vector< SIGEL_Program::SIG_ProgramLine > &getPrgLines();
-
 
 /**
  * This functions write a complete program to a text stream.
@@ -160,7 +151,6 @@ class SIG_Program
  */
    public:
    void print() const;
-
 
 /**
  * This function returns the length of the current program.
@@ -230,7 +220,6 @@ class SIG_Program
    public:
    void insertLine(long no, SIGEL_Program::SIG_ProgramLine const &line);
 
-
 /**
  * This constructor creates a program that contains randomly generated program lines. This constructor
  * needs a randomizer because a program does not have an own randomizer. All parameters are simulated
@@ -243,7 +232,6 @@ class SIG_Program
  */
    public:
    SIG_Program(int length, int nop, SIGEL_Tools::SIG_Randomizer &randomizer);
-
 
 /**
   * This function generates a random program using the language and GP definitions.

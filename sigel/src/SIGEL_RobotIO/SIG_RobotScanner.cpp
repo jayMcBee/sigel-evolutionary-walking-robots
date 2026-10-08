@@ -24,7 +24,9 @@
 #include "SIGEL_RobotIO/SIG_RobotIOExceptions.h"
 
 namespace SIGEL_RobotIO {
+
         namespace RobotSymbol {
+
         int const openingBrace = 1;
         int const closingBrace = 2;
         int const openingParen = 3;
@@ -36,6 +38,7 @@ namespace SIGEL_RobotIO {
         int const comma = 9;
         int const equals = 10;
         int const slash = 11;
+
         }
         
         SIG_RobotScanner::SIG_RobotScanner (QString sourceText)
@@ -143,4 +146,5 @@ namespace SIGEL_RobotIO {
                                                "(unknown)", lineposition);
                 }
         }
+
 }

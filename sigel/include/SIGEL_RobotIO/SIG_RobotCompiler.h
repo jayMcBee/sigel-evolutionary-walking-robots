@@ -61,6 +61,7 @@ using SIGEL_Robot::SIG_PitchRollSensor;
 using SIGEL_Robot::SIG_ContactSensor;
 
 namespace SIGEL_RobotIO {
+
         class SIG_RobotCompiler {
         protected:
                 SIG_Scanner &myScanner;
@@ -182,6 +183,7 @@ namespace SIGEL_RobotIO {
                 bool compileNextEntity ();
                 void runPass ();
         };
+
 }
 
 #endif

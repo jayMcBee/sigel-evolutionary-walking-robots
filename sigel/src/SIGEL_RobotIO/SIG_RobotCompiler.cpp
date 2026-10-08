@@ -24,6 +24,7 @@
 #include "SIGEL_RobotIO/SIG_RobotIOExceptions.h"
 
 namespace SIGEL_RobotIO {
+
         SIG_RobotCompiler::SIG_RobotCompiler (SIG_RobotScanner &sc,
                                               SIG_Robot *tg,
                                               QString homepath)
@@ -654,7 +655,6 @@ namespace SIGEL_RobotIO {
 
         void SIG_RobotCompiler::nextIsSurface ()
         {
-
                 QString symstr;
                 int symtype;
 
@@ -713,4 +713,5 @@ namespace SIGEL_RobotIO {
         {
                 while (compileNextEntity ());
         }
+
 }

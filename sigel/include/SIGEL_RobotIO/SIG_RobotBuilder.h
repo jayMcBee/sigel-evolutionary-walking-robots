@@ -38,6 +38,7 @@ namespace SIGEL_RobotIO { class SIG_RobotBuilder; }
  * formats (modelling format / transfer format).
  */
 namespace SIGEL_RobotIO {
+
         class SIG_RobotBuilder : public SIG_RobotFactory {
         private:
                 QString filename;
@@ -51,6 +52,7 @@ namespace SIGEL_RobotIO {
                 void firstPass ();
                 void secondPass ();
         };
+
 }
 
 #endif

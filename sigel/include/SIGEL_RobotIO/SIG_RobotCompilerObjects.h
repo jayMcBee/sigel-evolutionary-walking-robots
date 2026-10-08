@@ -31,6 +31,7 @@ namespace SIGEL_RobotIO { class SIG_RobotCompilerObjects; }
 #include "SIGEL_RobotIO/SIG_RobotCompiler.h"
 
 namespace SIGEL_RobotIO {
+
         class SIG_RobotCompilerObjects : public SIG_RobotCompiler {
         private:
                 int linknumber, jointnumber, drivenumber, sensornumber;
@@ -128,6 +129,7 @@ namespace SIGEL_RobotIO {
 
                 virtual void modifierScaleall (double scalingFactor);
         };
+
 }
 
 #endif

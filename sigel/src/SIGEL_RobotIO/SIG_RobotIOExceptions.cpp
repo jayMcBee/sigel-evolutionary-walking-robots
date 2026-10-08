@@ -23,6 +23,7 @@
 #include "SIGEL_RobotIO/SIG_RobotIOExceptions.h"
 
 namespace SIGEL_RobotIO {
+
         SIG_FileNotFoundError::SIG_FileNotFoundError (QString file,
                                                       int line,
                                                       QString unfound)
@@ -71,4 +72,5 @@ namespace SIGEL_RobotIO {
                                  "Robot kinematics error after initiation: " +
                                  msg)
         { }
+
 }

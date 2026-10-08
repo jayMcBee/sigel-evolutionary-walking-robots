@@ -167,7 +167,6 @@ int SIGEL_Program::SIG_ProgramLine::getInstructionElement( int no ) const
     }
   else
     {
-
 #ifdef SIG_DEBUG
 
       SIGEL_Tools::SIG_IO::cerr << "\n[ProgramLine.cpp<getInstructionElement>]: Invalid access, no="
@@ -193,7 +192,6 @@ int SIGEL_Program::SIG_ProgramLine::getElement( int no ) const
     }
   else
     {
-
 #ifdef SIG_DEBUG
 
       SIGEL_Tools::SIG_IO::cerr << "\n[ProgramLine.cpp<getInstructionElement>]: Invalid access, no="
@@ -226,7 +224,6 @@ void SIGEL_Program::SIG_ProgramLine::setElement(int no, int value)
 				<< getNumberOfElements() << Qt::endl;
      
 #endif
-
     }
 }
 
@@ -241,12 +238,10 @@ void SIGEL_Program::SIG_ProgramLine::print() const
 
   printToString( prgLine );
   SIGEL_Tools::SIG_IO::cerr << prgLine << Qt::flush;
-
 }
 
 void SIGEL_Program::SIG_ProgramLine::printToString(QString &lineStr) const
 {
-  
   bool ok = false;
 
    lineStr="";
@@ -337,7 +332,6 @@ void SIGEL_Program::SIG_ProgramLine::printToString(QString &lineStr) const
           lineStr = "NOP\n";
 	  ok = true;
           break;
-
      }
 
   if( !ok ) lineStr = "#INVALID LINE#\n";  
@@ -361,7 +355,6 @@ void SIGEL_Program::SIG_ProgramLine::readOneRegister(QString &str, int &reg)
 
      regStr1 = str.mid( pos1 + 1, pos2 - pos1 - 1 );
      reg     = regStr1.toInt( &ok, 10 );
-
 }
 
 void SIGEL_Program::SIG_ProgramLine::readOneRegisterAndIntegerConstant(QString &str,int &reg1,int &cnst)
@@ -384,7 +377,6 @@ void SIGEL_Program::SIG_ProgramLine::readOneRegisterAndIntegerConstant(QString &
 
      cnstStr1 = str.mid( pos3 + 1, pos4 - pos3 - 1 );         
      cnst     = cnstStr1.toInt( &ok, 10 );
-
 }
 
 void SIGEL_Program::SIG_ProgramLine::readTwoRegisters(QString &str,int &reg1,int &reg2)
@@ -408,9 +400,7 @@ void SIGEL_Program::SIG_ProgramLine::readTwoRegisters(QString &str,int &reg1,int
 
      regStr2 = str.mid( pos3 + 1, pos4 - pos3 - 1 );         
      reg2    = regStr2.toInt( &ok, 10 );
-
 }
-
 
 bool SIGEL_Program::SIG_ProgramLine::readFromFile(QString &str, SIGEL_Program::SIG_ProgramLine *line)
 {
@@ -511,11 +501,8 @@ bool SIGEL_Program::SIG_ProgramLine::readFromFile(QString &str, SIGEL_Program::S
      return lineOK;
 }
 
-
-
 void  SIGEL_Program::SIG_ProgramLine::writeToFile(QTextStream &file) const
 {
-
    file<<"       ";
 
    switch( getRobotinstructionType() )
@@ -605,7 +592,6 @@ void  SIGEL_Program::SIG_ProgramLine::writeToFile(QTextStream &file) const
            break;
       }
 }
-
 
 void SIGEL_Program::SIG_ProgramLine::randomRobotinstruction(SIGEL_Robot::SIG_LanguageParameters &languageParameters,
 							    SIGEL_Tools::SIG_Randomizer &randomizer,
@@ -759,8 +745,6 @@ void SIGEL_Program::SIG_ProgramLine::randomRobotinstruction(SIGEL_Robot::SIG_Lan
          n++;
        }
        
-     
-
      // iType = instr[randomizer.getRandomInt( instr.size() )]; 
 
      switch( iType )
@@ -796,7 +780,6 @@ void SIGEL_Program::SIG_ProgramLine::randomRobotinstruction(SIGEL_Robot::SIG_Lan
         case 14:setRobotinstruction( SIGEL_Program::NOP, op1, op2 );
                 break;
        }
-
 }
 
 void SIGEL_Program::SIG_ProgramLine::generateRandomRobotInstruction(SIGEL_Robot::SIG_LanguageParameters &languageParameters,
@@ -806,17 +789,7 @@ void SIGEL_Program::SIG_ProgramLine::generateRandomRobotInstruction(SIGEL_Robot:
      randomRobotinstruction(languageParameters, randomizer, prob);
 }
 
-
 void SIGEL_Program::SIG_ProgramLine::copyLine(SIGEL_Program::SIG_ProgramLine *source,SIGEL_Program::SIG_ProgramLine *destination)
 {
    *destination=*source;
 };
-
-
-
-
-
-
-
-
-

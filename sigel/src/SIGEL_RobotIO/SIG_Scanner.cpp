@@ -24,9 +24,12 @@
 #include <stdio.h>
 
 namespace SIGEL_RobotIO {
+
         namespace Symbol {
+
                 int const None = -1;
                 int const EOS = -2;
+
         }
         
         SIG_Scanner::SIG_Scanner (QString sourceText)
@@ -73,4 +76,5 @@ namespace SIGEL_RobotIO {
         {
                 return lineposition;
         }
+
 }

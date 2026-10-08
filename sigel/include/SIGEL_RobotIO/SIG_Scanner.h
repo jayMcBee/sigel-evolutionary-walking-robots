@@ -28,9 +28,12 @@ namespace SIGEL_RobotIO { class SIG_Scanner; }
 #include <qstring.h>
 
 namespace SIGEL_RobotIO {
+
         namespace Symbol {
+
                 extern int const None;
                 extern int const EOS;
+
         }
 
         class SIG_Scanner {
@@ -49,6 +52,7 @@ namespace SIGEL_RobotIO {
                 void readSymbol (int & symType, QString & symbol);
                 int currentLine () const;
         };
+
 }
 
 #endif

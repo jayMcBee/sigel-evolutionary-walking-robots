@@ -61,22 +61,18 @@ std::vector< SIGEL_Program::SIG_ProgramLine > &SIGEL_Program::SIG_Program::getPr
 
 void SIGEL_Program::SIG_Program::printToString( QString &str ) const
 {
-  
   for( long i=0; i<lines.size(); i++ )
     {
       QString buffer;
       lines[i].printToString(buffer);
       str += buffer;
     };
-
 }
 
 void SIGEL_Program::SIG_Program::print() const
 
 {
-
   for (int i=0; i<lines.size(); i++ ) lines[i].print();
-
 }
 
 void SIGEL_Program::SIG_Program::writeToFile( QTextStream &file ) const
@@ -85,7 +81,6 @@ void SIGEL_Program::SIG_Program::writeToFile( QTextStream &file ) const
     {
       lines[i].writeToFile(file);
     }
-
 }
 
 void SIGEL_Program::SIG_Program::readFromFile( QTextStream &file )
@@ -98,7 +93,6 @@ void SIGEL_Program::SIG_Program::readFromFile( QTextStream &file )
 
    SIGEL_Tools::SIG_IO::cerr << "Reading Program: ..." << Qt::endl;
    
-
 #endif
 
    lines.clear();
@@ -122,9 +116,7 @@ void SIGEL_Program::SIG_Program::readFromFile( QTextStream &file )
    SIGEL_Tools::SIG_IO::cerr << lineCnt << " LINES READ." << Qt::endl;
 
 #endif
-   
 }
-
 
 SIGEL_Program::SIG_ProgramLine const &SIGEL_Program::SIG_Program::getLine( long no ) const
 {
@@ -144,7 +136,6 @@ void SIGEL_Program::SIG_Program::checkLineNumber( long no ) const
     throw SIGEL_Tools::SIG_Exception( __FILE__, __LINE__, QString( "Program line %1 does not exist; the program has %2 lines." ).arg( no ).arg( lines.size() ) );
 }
 
-
 void SIGEL_Program::SIG_Program::deleteLine( long no )
 {
   // An index past the end deletes nothing; crossOver and checkLength rely on that.
@@ -152,11 +143,9 @@ void SIGEL_Program::SIG_Program::deleteLine( long no )
     lines.erase( lines.begin() + no );
 }
 
-
 void SIGEL_Program::SIG_Program::appendLine( SIGEL_Program::SIG_ProgramLine const &line )
 {
   lines.push_back( line );
-
 }
 
 void SIGEL_Program::SIG_Program::insertLine( long no, SIGEL_Program::SIG_ProgramLine const &line )
@@ -164,7 +153,6 @@ void SIGEL_Program::SIG_Program::insertLine( long no, SIGEL_Program::SIG_Program
   lines.insert( lines.begin() + no, line );
 }
 
-   
 void SIGEL_Program::SIG_Program::importProgram( QString& filename )
 {
    QFile prgFile( filename );
@@ -180,7 +168,6 @@ void SIGEL_Program::SIG_Program::importProgram( QString& filename )
      SIGEL_Tools::SIG_IO::cerr << "Could not import program from "
 			       << filename
 			       << "!" << Qt::endl;  
-
 }
 
 void SIGEL_Program::SIG_Program::exportProgram( QString& filename ) const
@@ -199,13 +186,10 @@ void SIGEL_Program::SIG_Program::exportProgram( QString& filename ) const
 			       << "!" << Qt::endl;  
 }
 
-
 SIGEL_Program::SIG_Program::SIG_Program()
   : lines()
 {
-
 }
-
 
 void SIGEL_Program::SIG_Program::checkLength( long minimumLength, 
 					      long maximumLength, 
@@ -219,7 +203,6 @@ void SIGEL_Program::SIG_Program::checkLength( long minimumLength,
 
   if( minimumLength > 0 && prgLength < minimumLength )
     {
-
 #ifdef SIG_DEBUG
 
      SIGEL_Tools::SIG_IO::cerr << "\n\n--> PROGRAM LENGTH ("
@@ -252,14 +235,12 @@ void SIGEL_Program::SIG_Program::checkLength( long minimumLength,
 			       << getProgramLength()
 			       << " lines." << Qt::endl;
 #endif
-       
     }
 
   prgLength = getProgramLength();
 
   if( maximumLength > 0 && prgLength > maximumLength )
     {
-
 #ifdef SIG_DEBUG
 
      SIGEL_Tools::SIG_IO::cerr << "\n\n--> PROGRAM LENGTH ("
@@ -301,13 +282,10 @@ void SIGEL_Program::SIG_Program::generateRandomProgram( SIGEL_GP::SIG_GPParamete
     long n = gpParameter.getMinIndLength() + 
              randomizer.getRandomInt( gpParameter.getMaxIndLength() - gpParameter.getMinIndLength() );
 
-
     for( long x=0; x<n; x++ )
       {
         SIGEL_Program::SIG_ProgramLine newLine( randomizer, languageParameters, gpParameter.getInstructionProbabilities() );
 
         appendLine( newLine );
-
       }
 }
-   

@@ -29,6 +29,7 @@
 using SIGEL_Tools::SIG_Exception;
 
 namespace SIGEL_RobotIO {
+
         /**
          * SIG_FileNotFoundError will be thrown if a file that
          * contains urgently needed information could for some
@@ -165,6 +166,7 @@ namespace SIGEL_RobotIO {
                                          int line,
                                          QString msg);
         };
+
 }
 
 #endif

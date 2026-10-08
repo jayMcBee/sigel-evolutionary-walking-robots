@@ -28,8 +28,6 @@
 /*            depended on the line's type.                                 */
 /* ----------------------------------------------------------------------- */
 
-
-
 #if !defined(SIGEL_PROGRAMPACKAGE_SIG_PROGRAMLINE_H) 
 #define SIGEL_PROGRAMPACKAGE_SIG_PROGRAMLINE_H
 
@@ -57,7 +55,6 @@ namespace SIGEL_Program
  */
 
 enum Robotinstruction {
-
      COPY,
      LOAD,
      ADD,
@@ -75,7 +72,6 @@ enum Robotinstruction {
      NOP,
 };
 
-
 /**
  * This class represents a program line that contains robot instructions (and more).
  * A program line is a set of elements. The meaning of the elements is dependend on
@@ -85,7 +81,6 @@ enum Robotinstruction {
 
 class SIG_ProgramLine
 {
-
 /**
  *  The type of the current robot inbstruction, e.g. LOAD, COPY, ...
  */
@@ -102,7 +97,6 @@ class SIG_ProgramLine
    protected:
    QList< int > element;
    
-
 /**
  * This constructor initializes an empty program line that does not contain any elements.
  * @post
@@ -131,7 +125,6 @@ class SIG_ProgramLine
    public:
    virtual ~SIG_ProgramLine() = default;
 
-					    
 /**
  * This function generates a random instruction that is dependend on the language 
  * parameters. The probability to be chosen randomly is dependend on the given probabilities (prob).
@@ -200,7 +193,6 @@ class SIG_ProgramLine
    public:
    void resizeElements( int size );
 
-
 /**
  * This function writes a program line into a QTextStream.
  * @post
@@ -246,7 +238,6 @@ class SIG_ProgramLine
 
    public:
    QList< int > getElementsArray() const;
-
 
 /**
  * This function returns the type of the current robotinstruction.
@@ -332,7 +323,6 @@ class SIG_ProgramLine
  
    protected:
    void readOneRegister(QString &str,int &reg);   
-   
    };
 
 };
