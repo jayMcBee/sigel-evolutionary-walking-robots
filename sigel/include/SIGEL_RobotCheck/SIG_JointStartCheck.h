@@ -37,7 +37,6 @@ namespace SIGEL_RobotCheck
    */
   class SIG_JointStartCheck
   {
-
   public:
 
     SIG_JointStartCheck( const SIGEL_Robot::SIG_Robot &robot );
@@ -49,7 +48,6 @@ namespace SIGEL_RobotCheck
     bool startsOutsideRange( double minimum, double maximum, double initial ) const;
 
     const SIGEL_Robot::SIG_Robot &robot;
-
   };
 
 }

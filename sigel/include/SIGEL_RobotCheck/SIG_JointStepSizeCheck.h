@@ -39,7 +39,6 @@ namespace SIGEL_RobotCheck
    */
   class SIG_JointStepSizeCheck
   {
-
   public:
 
     SIG_JointStepSizeCheck( const SIG_RobotStartPose &startPose,
@@ -57,7 +56,6 @@ namespace SIGEL_RobotCheck
     const SIG_RobotStartPose &startPose;
     const SIGEL_Environment::SIG_Environment &environment;
     const SIGEL_Simulation::SIG_SimulationParameters &simulationParameter;
-
   };
 
 }

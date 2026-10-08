@@ -38,7 +38,6 @@ namespace SIGEL_RobotCheck
    */
   class SIG_IntegratorCheck
   {
-
   public:
 
     SIG_IntegratorCheck( const SIGEL_Simulation::SIG_SimulationParameters &simulationParameter );
@@ -48,7 +47,6 @@ namespace SIGEL_RobotCheck
   private:
 
     const SIGEL_Simulation::SIG_SimulationParameters &simulationParameter;
-
   };
 
 }

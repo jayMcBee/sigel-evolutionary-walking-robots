@@ -38,7 +38,6 @@ namespace SIGEL_RobotCheck
    */
   class SIG_JointAxisCheck
   {
-
   public:
 
     SIG_JointAxisCheck( const SIG_RobotStartPose &startPose );
@@ -52,7 +51,6 @@ namespace SIGEL_RobotCheck
     static constexpr double axisOutsideLinkPercent = 1.0;
 
     const SIG_RobotStartPose &startPose;
-
   };
 
 }

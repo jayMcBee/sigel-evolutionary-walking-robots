@@ -38,7 +38,6 @@ namespace SIGEL_RobotCheck
    */
   class SIG_DriveStrengthCheck
   {
-
   public:
 
     SIG_DriveStrengthCheck( const SIG_RobotStartPose &startPose,
@@ -54,7 +53,6 @@ namespace SIGEL_RobotCheck
 
     const SIG_RobotStartPose &startPose;
     const SIGEL_Environment::SIG_Environment &environment;
-
   };
 
 }

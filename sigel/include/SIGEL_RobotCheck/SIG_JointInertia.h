@@ -41,7 +41,6 @@ namespace SIGEL_RobotCheck
    */
   class SIG_JointInertia
   {
-
   public:
 
     SIG_JointInertia( const SIGEL_Robot::SIG_Robot &preparedRobot,
@@ -56,7 +55,6 @@ namespace SIGEL_RobotCheck
     static constexpr int randomPoses = 150;
 
     double smallest;
-
   };
 
 }

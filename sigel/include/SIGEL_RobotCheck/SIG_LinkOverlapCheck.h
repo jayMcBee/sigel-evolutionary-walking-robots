@@ -37,7 +37,6 @@ namespace SIGEL_RobotCheck
    */
   class SIG_LinkOverlapCheck
   {
-
   public:
 
     SIG_LinkOverlapCheck( const SIG_RobotStartPose &startPose );
@@ -51,7 +50,6 @@ namespace SIGEL_RobotCheck
     static constexpr int overlapSamples = 20000;
 
     const SIG_RobotStartPose &startPose;
-
   };
 
 }

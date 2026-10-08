@@ -138,7 +138,6 @@ SIGEL_RobotCheck::SIG_JointInertia::SIG_JointInertia( const SIGEL_Robot::SIG_Rob
       // The largest eigenvalue of the inverse mass matrix is the inverse of the smallest inertia.
       smallest = std::min( smallest, 1 / static_cast<double>( eigenvalues( jointCount ) ) );
     }
-
 }
 
 double SIGEL_RobotCheck::SIG_JointInertia::getSmallest() const
