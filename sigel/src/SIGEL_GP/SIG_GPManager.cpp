@@ -824,7 +824,6 @@ void SIGEL_GP::SIG_GPManager::run() {
 void SIGEL_GP::SIG_GPManager::RegisterDynPVMClients() {
   enum { kSigelMasterRegPort = 6789, kSuicidalRequest   = 13 };
 
-  fd_set listenSet;
   struct sockaddr_in  sad;
   QList<int> clientSockets(0);
   //struct hostent *ptrh;
@@ -834,7 +833,6 @@ void SIGEL_GP::SIG_GPManager::RegisterDynPVMClients() {
   pthread_mutex_t servMutex = PTHREAD_MUTEX_INITIALIZER;
   char clientName[256];
   QString client;
-  struct timeval timeOut;
 
   // init some variables
   serverIsUp = true;
@@ -871,22 +869,24 @@ void SIGEL_GP::SIG_GPManager::RegisterDynPVMClients() {
      exit(1);
   }
 
-  // accept() is blocking, but we want to wait in 10 sec. chunks;
-  // this allows the main thread to adjust it's active-pvm-host list based on
-  // our freshly registered clients. Also check all 10 seconds if the main
-  // thread wants us to cancel all connections.
-  timeOut.tv_sec  = 10;
-  timeOut.tv_usec = 0;
-
-  // to use select() we need to build a fs_set first
-  FD_ZERO(&listenSet);
-  FD_SET(listenSocket, &listenSet);
-
   // (bounded) waiting for requests..
   fprintf(stderr, "Server is awaiting requests from dynamic clients on port %d..\n\n", kSigelMasterRegPort);
 
   // the (almost) endless server loop
   while ( true ) {
+    // to use select() we need to build a fs_set first
+    fd_set listenSet;
+    FD_ZERO(&listenSet);
+    FD_SET(listenSocket, &listenSet);
+
+    // accept() is blocking, but we want to wait in 10 sec. chunks;
+    // this allows the main thread to adjust it's active-pvm-host list based on
+    // our freshly registered clients. Also check all 10 seconds if the main
+    // thread wants us to cancel all connections.
+    struct timeval timeOut;
+    timeOut.tv_sec  = 10;
+    timeOut.tv_usec = 0;
+
      // pselect returns zero when timeout occurs..
      select(listenSocket+1, &listenSet, nullptr, nullptr, &timeOut);
 
@@ -936,14 +936,6 @@ void SIGEL_GP::SIG_GPManager::RegisterDynPVMClients() {
       pthread_cond_broadcast(&cond);
       pthread_mutex_unlock( &servMutex );
     }
-
-    // prepare next pselect() call
-    FD_ZERO(&listenSet);
-    FD_SET(listenSocket, &listenSet);
-
-    // set the next time-chunk to another 10 seconds
-    timeOut.tv_sec  = 10;
-    timeOut.tv_usec = 0;
   }
 
   fprintf(stderr, "SIGEL_GP::SIG_GPManager::RegisterDynPVMClients -- The server is exiting ! This should never ever happen ! !");
