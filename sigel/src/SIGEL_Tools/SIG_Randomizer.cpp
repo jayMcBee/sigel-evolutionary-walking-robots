@@ -62,7 +62,3 @@ long SIGEL_Tools::SIG_Randomizer::getRandomLong(long maximum)
 {
   return getRandomInt( static_cast<int>(maximum) );
 }
-
-
-
-

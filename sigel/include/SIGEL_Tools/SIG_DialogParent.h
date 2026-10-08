@@ -7,6 +7,7 @@
 
 namespace SIGEL_Tools
 {
+
   // The window a dialog belongs to, for code that holds no window of its own.
   // A dialog with no parent can open behind the main window and block it.
   // The open modal dialog comes first, then the active window. activeWindow()
@@ -25,6 +26,7 @@ namespace SIGEL_Tools
         return w;
     return nullptr;
   }
+
 }
 
 #endif

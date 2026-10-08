@@ -38,7 +38,6 @@ class SIG_Randomizer
   * genetic programming.
   */
 
-
 public:   
 
    /**
@@ -52,10 +51,7 @@ public:
      * This constructor initializes the generator with seed.
      */
 
-
    SIG_Randomizer(int seed);
-
-
 
     /**
      * This operation returns a randomly generated integer number between 0 and maximum.
@@ -83,19 +79,7 @@ public:
 
  private:
    unsigned long int next;
-
 };
 
 }
 #endif //  SIGEL_TOOLS_SIG_RANDOMIZER_H
-
-
-
-
-
-
-
-
-
-
-

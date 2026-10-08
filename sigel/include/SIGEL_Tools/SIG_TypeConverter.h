@@ -33,7 +33,6 @@ namespace SIGEL_Tools
 
 class SIG_TypeConverter
   {
-
   public:
 
     static SIG_Vector toSIG_Vector( NEWMAT::ColumnVector input ); /*tested*/

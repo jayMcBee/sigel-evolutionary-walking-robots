@@ -141,7 +141,6 @@ namespace SIGEL_Environment {
   			else withTexture = true;
   		}
   		
-
     	if (s == "AUTOSAVETIME") {
   			s = file.readLine();
      		autosave = s.toInt();
@@ -178,7 +177,6 @@ namespace SIGEL_Environment {
       }
 		}
     loadDynaMechsEnvironment();
-
   };
   
   SIG_Environment::SIG_Environment(QTextStream& file)
@@ -234,26 +232,32 @@ namespace SIGEL_Environment {
     file << "UKFcoeff\n";
     file << frictionCoeff_u_k << "\n";
   };
+
   void SIG_Environment::setGravity(SIG_Vector newGravity)
   {
     gravity=newGravity;
   };
+
   SIG_Vector SIG_Environment::getGravity() const
   {
     return gravity;
   };
+
   void SIG_Environment::setVeloDamping(double newVeloDamping)
   {
     veloDamping=newVeloDamping;
   };
+
   double SIG_Environment::getVeloDamping() const
   {
     return veloDamping;
   };
+
   void SIG_Environment::setStartPosition(SIG_Vector newStartPosition)
   {
     startPosition=newStartPosition;
   };
+
   SIG_Vector SIG_Environment::getStartPosition() const
   {
     return startPosition;

@@ -23,7 +23,6 @@
 #ifndef SIGEL_REALINTERFACE_SIG_REALINTERFACE_H
 #define SIGEL_REALINTERFACE_SIG_REALINTERFACE_H
 
-
 /**
  * This namespace contains all classes involved in the
  * conversion from the SIGEL standard robot control program format

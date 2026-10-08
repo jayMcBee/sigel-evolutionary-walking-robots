@@ -29,7 +29,6 @@
 #include <qstring.h>
 #include <dmEnvironment.hpp>
 
-
 /** This namespace just holds the environment for now */
 namespace SIGEL_Environment
 {
@@ -233,7 +232,6 @@ class SIG_Environment {
  	*/
   void setTexAlpha(int _texAlpha);
 
-
  	bool getWithTexture() const;
 
   void setWithTexture(bool _withTexture);
@@ -421,5 +419,3 @@ class SIG_Environment {
 }
 
 #endif // SIGEL_ENVIRONMENT_SIG_ENVIRONMENT_H
-
-
