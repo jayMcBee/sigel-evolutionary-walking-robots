@@ -35,7 +35,6 @@
 #include <qtextstream.h>
 #include <qfile.h>
 
-
 namespace SIGEL_GP
 {
 
@@ -46,7 +45,6 @@ namespace SIGEL_GP
  *
  */
 class SIG_GPIndividual{
-
 /**
  * The age of an individal, which depends on the time, counted by the number of played
  * tournaments, an individual is still a  poolmember.
@@ -81,7 +79,6 @@ class SIG_GPIndividual{
  */
  private:
   int poolPos;
-
 
 /**
  * This attribute holds the fitnessvalue of the robot controll program. At the 
@@ -121,7 +118,6 @@ class SIG_GPIndividual{
  public:
  SIG_GPIndividual();
 
-
  public:
  SIG_GPIndividual( SIG_GPParameter& gpParameter, 
 		   SIGEL_Tools::SIG_Randomizer& randomizer, 
@@ -153,7 +149,6 @@ class SIG_GPIndividual{
 		   QString name, 
 		   QDateTime birthtime, 
 		   int poolpos );
-
 
 /**
  * The constructor of an individual that shall contain a randomly generated program.
@@ -208,8 +203,6 @@ class SIG_GPIndividual{
  */
  public:
  SIG_GPIndividual(QString data);
-
-
 
  /**
   * This function increases the age value of an individual at the end of an generation by one.
@@ -319,8 +312,6 @@ class SIG_GPIndividual{
  public:
  SIGEL_Program::SIG_Program& getProgramVar();
 
-
-
   //SIGEL_Program::SIG_Program const& SIGEL_GP::SIG_GPIndividual::getProgram() const{};
 
   /**
@@ -416,8 +407,6 @@ class SIG_GPIndividual{
 						  double fitness1,
 						  double fitness2 );
 
-
-
  /**
   * This function will add an info to the history if the program length needed to be increased,
   * e.g. in case of an imported program.
@@ -434,11 +423,9 @@ class SIG_GPIndividual{
  public:
  void addLengthDecreasedInfo( QDateTime time, long lgth );
  
-
  /**
   * This constructor imports a program PROG while it is initializing the individual.
   */
-
 
  public:
  SIG_GPIndividual( SIGEL_Program::SIG_Program const& prog, 
@@ -544,7 +531,6 @@ class SIG_GPIndividual{
   * The individual is written to the given QTextStream.
   */ 
  
-
  public:
  void writeToFile(QTextStream &file,bool _history);
 
@@ -554,11 +540,9 @@ class SIG_GPIndividual{
   * An individual is created as defined in the given QTextStream.
   */ 
  
-
  public:
  void readFromFile(QString indStr);
  
-
  /** 
   * This operator (I1=I2) copies an individual I2 into individual I1.
   * @post
@@ -623,7 +607,6 @@ public:
 public:
  void setNameInfo();
 
- 
 /**
  * This function imports a complete individual out of an existing file.
  */
@@ -668,20 +651,8 @@ public:
 
 public:
  void setHistory( QStringList hist );
-
 };
+
 }
 
 #endif // SIGEL_GP_SIG_GPINDIVIDUAL_H
-
-
-
-
-
-
-
-
-
-
-
-

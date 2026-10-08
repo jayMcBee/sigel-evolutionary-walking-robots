@@ -64,7 +64,6 @@ SIGEL_GP::SIG_GPPopulation::SIG_GPPopulation(int size)
 	}
 };
 
-
 SIGEL_GP::SIG_GPPopulation::SIG_GPPopulation(QString data)
 	: randomizer( nullptr )   // the guard below reads it
 {
@@ -85,9 +84,7 @@ SIGEL_GP::SIG_GPPopulation::SIG_GPPopulation(QString data)
 	SIGEL_Tools::SIG_IO::cerr << "\n\nREADING FINISHED.\n" << Qt::endl;
 
 #endif
-
 };
-
 
 SIGEL_GP::SIG_GPPopulation::SIG_GPPopulation(int size,
                                              SIGEL_Tools::SIG_Randomizer &newRandomizer,
@@ -144,12 +141,10 @@ void resizeOwning( QList< SIGEL_GP::SIG_GPIndividual * > &v, qsizetype want )
 
 SIGEL_GP::SIG_GPPopulation::~SIG_GPPopulation()
 {
-
 	qDeleteAll( pool );
 	pool.clear();
 	delete randomizer;
 };
-
 
 SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPPopulation::getIndividual(int poolpos)
 {
@@ -165,7 +160,6 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPPopulation::getIndividual(int poolpo
 	}
 };
 
-
 void SIGEL_GP::SIG_GPPopulation::setIndividual(SIG_GPIndividual& indi,
                                                int poolpos)
 {
@@ -174,8 +168,6 @@ void SIGEL_GP::SIG_GPPopulation::setIndividual(SIG_GPIndividual& indi,
 	delete pool[ poolpos ];
 	pool[ poolpos ] = &indi;
 };
-
-
 
 int SIGEL_GP::SIG_GPPopulation::addRandomIndividuals(int quantity,
                                                       SIGEL_GP::SIG_GPParameter& gpParameter,
@@ -232,7 +224,6 @@ int SIGEL_GP::SIG_GPPopulation::getSize()
 	return int( pool.size() );
 };
 
-
 QString SIGEL_GP::SIG_GPPopulation::getNextIdentifier()
 {
 	QString releasedIdentifier = nextIdentifier;
@@ -264,13 +255,10 @@ void SIGEL_GP::SIG_GPPopulation::loadPool(QTextStream & pool)
 	readFromFile( pool );
 };
 
-
-
 void SIGEL_GP::SIG_GPPopulation::savePool(QTextStream & pool)
 {
 	writeToFile( pool );
 };
-
 
 SIGEL_GP::SIG_GPIndividual *SIGEL_GP::SIG_GPPopulation::getIndividualPointer(int poolpos)
 {
@@ -293,13 +281,10 @@ void SIGEL_GP::SIG_GPPopulation::deleteIndividual(int poolpos)
 	pool.removeLast();
 }
 
-
-
 void SIGEL_GP::SIG_GPPopulation::setRandomizer(SIGEL_Tools::SIG_Randomizer *newRandomizer)
 {
 	randomizer=newRandomizer;
 }
-
 
 SIGEL_Tools::SIG_Randomizer SIGEL_GP::SIG_GPPopulation::getRandomizer()
 {
@@ -384,7 +369,6 @@ void SIGEL_GP::SIG_GPPopulation::readFromFile(QTextStream &file)
 		pos2=populationStr.indexOf(";", pos2+1, Qt::CaseInsensitive);
 		if( (pos=populationStr.indexOf("NEXTIDENTIFIER=", 0, Qt::CaseInsensitive))!=-1 )
 		{
-
 #ifdef SIG_DEBUG
 
 			SIGEL_Tools::SIG_IO::cerr << "<Identifier loaded:"
@@ -396,7 +380,6 @@ void SIGEL_GP::SIG_GPPopulation::readFromFile(QTextStream &file)
 		}
 		else
 			setNextIdentifier(QString::number(0));
-
 
 		pos2=populationStr.indexOf(";", pos2+1, Qt::CaseInsensitive);
 		if( (pos=populationStr.indexOf("POOLGENERATION=", 0, Qt::CaseInsensitive))!=-1 )
@@ -419,7 +402,6 @@ void SIGEL_GP::SIG_GPPopulation::readFromFile(QTextStream &file)
 			pos  = populationStr.indexOf("INDIVIDUAL("+tmpStr1+") BEGIN{", pos2, Qt::CaseInsensitive);
 			pos2 = populationStr.indexOf("}INDIVIDUAL("+tmpStr1+") END", pos2, Qt::CaseInsensitive);
 
-
 			delete pool[ x ];
 			pool[ x ] = new SIGEL_GP::SIG_GPIndividual();
 
@@ -434,7 +416,6 @@ void SIGEL_GP::SIG_GPPopulation::readFromFile(QTextStream &file)
 
 				if ( progress->wasCanceled() )
 				{
-
 					// The process has been canceled. Because of process preparations the system may crash if
 					// these preparation are not made undone:
 
@@ -446,14 +427,12 @@ void SIGEL_GP::SIG_GPPopulation::readFromFile(QTextStream &file)
 					break;
 				}
 			}
-
 		}
 #ifdef SIG_DEBUG
 
 		SIGEL_Tools::SIG_IO::cerr << "\n\nREADING POPULATION FINISHED." << Qt::endl;
 
 #endif
-
 	}
 
 	if( getSize() > maximumSize )

@@ -279,7 +279,6 @@ int SIGEL_GP::SIG_GPParameter::getPoolImageGeneration() const
    return poolImageGeneration;
 };
 
-
 void SIGEL_GP::SIG_GPParameter::setPriority(priorityLevel prio)
 {
     priority=prio;
@@ -323,7 +322,6 @@ SIGEL_GP::SIG_GPParameter::priorityLevel SIGEL_GP::SIG_GPParameter::getPriority(
 {
    return priority;
 };
-
 
 QString SIGEL_GP::SIG_GPParameter::getFitnessName() const
 {
@@ -566,9 +564,7 @@ void SIGEL_GP::SIG_GPParameter::readFromFile(QTextStream & file)
       SIGEL_GP::SIG_GPPVMHost *newHost = new SIGEL_GP::SIG_GPPVMHost( s );
       hostList.append( newHost );
 		}
-
   }
-
 };
 
 void SIGEL_GP::SIG_GPParameter::writeToFile(QTextStream & file)
@@ -672,9 +668,7 @@ void SIGEL_GP::SIG_GPParameter::writeToFile(QTextStream & file)
       file << "PVMHOST\n";
       file << actHost->print();
     };
-
 };
-
 
 QList< SIGEL_GP::SIG_GPPVMHost * > const &SIGEL_GP::SIG_GPParameter::getHostList() const
 {
@@ -686,24 +680,18 @@ QList< SIGEL_GP::SIG_GPPVMHost * > &SIGEL_GP::SIG_GPParameter::getHostList()
   return hostList;
 };
 
-  
 void SIGEL_GP::SIG_GPParameter::setProbability( SIGEL_Program::Robotinstruction instruction, int prob )
 {
     int instructionID = static_cast< int >( instruction ); 
     instructionProb[instructionID] = prob;
-
 }
 
-  
 int  SIGEL_GP::SIG_GPParameter::getProbability( SIGEL_Program::Robotinstruction instruction )
 {
-
   int instructionID = static_cast< int >( instruction );
   int prob          = instructionProb[instructionID];
   
-
     return prob;
-
 }
 
 QList< int >& SIGEL_GP::SIG_GPParameter::getInstructionProbabilities()
@@ -730,4 +718,3 @@ void SIGEL_GP::SIG_GPParameter::setTimeOutMinutes( int newValue )
 {
   timeOutMinutes = newValue;
 };
-

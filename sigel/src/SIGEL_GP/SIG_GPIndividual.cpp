@@ -34,7 +34,6 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPIndividual::operator =(SIG_GPIndivid
      return *this;
    }
  
-
 SIGEL_GP::SIG_GPIndividual::SIG_GPIndividual(SIG_GPParameter& gpParameter,
 					     SIGEL_Tools::SIG_Randomizer& randomizer,
 					     QString name, QDateTime birthtime,
@@ -123,7 +122,6 @@ SIGEL_GP::SIG_GPIndividual::SIG_GPIndividual(SIGEL_Tools::SIG_Randomizer &random
    history.append(poolposTmp);
    history.append(ageTmp);
    history.append(fitTmp);
-
 }
 
 SIGEL_GP::SIG_GPIndividual::SIG_GPIndividual(SIGEL_Tools::SIG_Randomizer &randomizer, 
@@ -173,7 +171,6 @@ void SIGEL_GP::SIG_GPIndividual::generateRandomIndividual(SIGEL_Tools::SIG_Rando
    history.append(poolposTmp);
    history.append(ageTmp);
    history.append(fitTmp);
-
 }
 
 void SIGEL_GP::SIG_GPIndividual::increaseAge()
@@ -211,7 +208,6 @@ void SIGEL_GP::SIG_GPIndividual::exportProgram( QString& filename )
 {
    getProgram().exportProgram( filename );
 }
-
 
 QString SIGEL_GP::SIG_GPIndividual::getName()
 {
@@ -277,7 +273,6 @@ void SIGEL_GP::SIG_GPIndividual::setFitnessInfo()
   QString str;
   history.append( "\nNEW FITNESS VALUE SET:\n----------------------");
   history.append( "Evaluated fitness value: " + str.number( getFitness(), 'g', 6 ) );
- 
 };
 
 double SIGEL_GP::SIG_GPIndividual::getFitness() const
@@ -289,7 +284,6 @@ QStringList SIGEL_GP::SIG_GPIndividual::getHistory() const
 {
    return history;
 };
-
 
 void SIGEL_GP::SIG_GPIndividual::addMutationInfo(QString name, 
                                                  QDateTime time, 
@@ -355,7 +349,6 @@ void SIGEL_GP::SIG_GPIndividual::addCrossOverInfo(QString name1,
    history.append(fitTmp);
 };
 
-
 void SIGEL_GP::SIG_GPIndividual::addCrossOverInfo(QString name1, 
                                                   QString name2, 
                                                   QDateTime time, 
@@ -398,7 +391,6 @@ void SIGEL_GP::SIG_GPIndividual::addReproductionInfo(QString name,
    history.append(fitTmp);
 };
 
-
 void SIGEL_GP::SIG_GPIndividual::addPreparationOfHistoryInfo()
 {
    history.append( "\n-----------------------------" );
@@ -436,12 +428,10 @@ void SIGEL_GP::SIG_GPIndividual::addLengthDecreasedInfo( QDateTime time, long lg
     history.append( "Removed Length: " + str.number( lgth ) );
 }
 
-
 bool SIGEL_GP::SIG_GPIndividual::upToDate()const
 {
   return ( getFitness() != -1 ); 
 };
-
 
 void SIGEL_GP::SIG_GPIndividual::importIndividual( QString& filename )
 {   
@@ -464,7 +454,6 @@ void SIGEL_GP::SIG_GPIndividual::importIndividual( QString& filename )
 					<< "!" << Qt::endl;   
 }
 
-
 void SIGEL_GP::SIG_GPIndividual::exportIndividual( QString& filename )
 {
    QFile indFile( filename );
@@ -480,7 +469,6 @@ void SIGEL_GP::SIG_GPIndividual::exportIndividual( QString& filename )
 			       << filename
 			       << "!" << Qt::endl;   
 }
-
 
 SIGEL_Program::SIG_Program *SIGEL_GP::SIG_GPIndividual::getProgramPointer()
 {
@@ -511,7 +499,6 @@ void SIGEL_GP::SIG_GPIndividual::setNameInfo()
    history.append( "New Name: " + str.number( getAge(), 10 ) );
 };
 
-
 void SIGEL_GP::SIG_GPIndividual::print()
 {
   SIGEL_Tools::SIG_IO::cerr << "\nCurrent individual's data:\n--------------------------"
@@ -526,9 +513,7 @@ void SIGEL_GP::SIG_GPIndividual::print()
                             << "\n- Program:\n" << Qt::endl;
 
   getProgram().print();
-  
 }
-
 
 void SIGEL_GP::SIG_GPIndividual::writeToFile(QTextStream &file, bool _history)
 {
@@ -562,7 +547,6 @@ void SIGEL_GP::SIG_GPIndividual::setHistory( QStringList hist )
 
 void SIGEL_GP::SIG_GPIndividual::readFromFile(QString indStr)
 {
-
   long                        pos;
 
   QString                     prgStr;
@@ -576,7 +560,6 @@ void SIGEL_GP::SIG_GPIndividual::readFromFile(QString indStr)
     }
   else
     {
-      
     }
 
   if((pos=indStr.indexOf("POOLPOS=", 0, Qt::CaseInsensitive))!=-1)
@@ -585,7 +568,6 @@ void SIGEL_GP::SIG_GPIndividual::readFromFile(QString indStr)
     }
   else
     {
-      
     }  
 
   if((pos=indStr.indexOf("FITNESS=", 0, Qt::CaseInsensitive))!=-1)
@@ -594,7 +576,6 @@ void SIGEL_GP::SIG_GPIndividual::readFromFile(QString indStr)
     }
   else
     {
-      
     }
 
   if((pos=indStr.indexOf("AGE=", 0, Qt::CaseInsensitive))!=-1)
@@ -603,19 +584,15 @@ void SIGEL_GP::SIG_GPIndividual::readFromFile(QString indStr)
     }
   else
     {
-      
     }  
   
   if((pos=indStr.indexOf("PROGRAM BEGIN{", 0, Qt::CaseInsensitive))!=-1)
     {
       prgStr=indStr.mid(pos+15,indStr.indexOf("}PROGRAM END", pos+16, Qt::CaseInsensitive)-pos-14);
       getProgramPointer()->readFromFile(inputFile);
- 
-      
     }
   else
     {
-      
     } 
   
   if((pos=indStr.indexOf("HISTORY BEGIN{", 0, Qt::CaseInsensitive))!=-1)
@@ -626,8 +603,5 @@ void SIGEL_GP::SIG_GPIndividual::readFromFile(QString indStr)
     }
   else
     {
-
-
     } 
-   
 }

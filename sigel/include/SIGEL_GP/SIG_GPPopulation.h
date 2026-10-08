@@ -29,12 +29,12 @@
 #include"../SIGEL_GP/SIG_GPParameter.h"
 #include"SIGEL_Robot/SIG_LanguageParameters.h"
 
-
 #include <qstring.h>
 #include <qtextstream.h>
 
 namespace SIGEL_GP
 {
+
 /**
 * The SIG_GPPopulation class defines the datastructure of the population of 
 * the individuals in the genetic programming system. It uses the randomizer
@@ -46,7 +46,6 @@ namespace SIGEL_GP
 
 class SIG_GPPopulation
   {
-
     /**
      * This is the main datastructure in the SIG_GPPopulation. This QList
      * holds the individual objects, which contains the robot control program.
@@ -103,7 +102,6 @@ class SIG_GPPopulation
   public:
     SIG_GPPopulation();
 
-    
     /**
      * The constructor of a population, which builds a pool with a number
      * of randomly created individuals.
@@ -130,7 +128,6 @@ class SIG_GPPopulation
      * A population consisting of SIZE individuals is created. Each individual contains a randomly
      * created program.
      */
-
 
   public:
     SIG_GPPopulation(int size, 
@@ -193,8 +190,6 @@ class SIG_GPPopulation
      */
   public:
     void setIndividual(SIG_GPIndividual& indi, int poolpos);
-
-
 
     /**
      * This operation returns the number of individuals, which are members of
@@ -274,7 +269,6 @@ class SIG_GPPopulation
      * complete programs.
      */
 
-
   public:
     SIG_GPPopulation(int size, SIGEL_Tools::SIG_Randomizer &newRandomizer);
 
@@ -283,7 +277,6 @@ class SIG_GPPopulation
      * @return
      * The pointer to the current individual will be returned.
      */  
-
 
   public:
     SIGEL_GP::SIG_GPIndividual *getIndividualPointer(int poolpos);
@@ -322,7 +315,6 @@ class SIG_GPPopulation
      * The pointer of the randomizer will be returned.
      */
 
-
   public:
     SIGEL_Tools::SIG_Randomizer getRandomizer();
 
@@ -341,10 +333,8 @@ class SIG_GPPopulation
      * The current population will be written to the given text stream.
      */
 
-
   public:
     void readFromFile(QTextStream &file);
-
 
     /**
      * This function reads a complete population out of a given text stream.
@@ -378,7 +368,6 @@ class SIG_GPPopulation
      * @return
      * How many individuals were to be added after that limit.
      */
-
 
   public:
     int addRandomIndividuals(int quantity, 
@@ -418,15 +407,6 @@ class SIG_GPPopulation
     void setHistory(bool newHistory);
     bool getHistory();
 };
+
 }
 #endif //  SIGEL_GP_SIG_GPPOPULATION_H
-
-
-
-
-
-
-
-
-
-

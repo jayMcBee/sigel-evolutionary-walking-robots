@@ -34,7 +34,6 @@ namespace SIGEL_GP
     : SIGEL_Simulation::SIG_Recorder(), recordingFrequency( recordingFrequency ),
     frameCounter( 0 )
   {
-
     if (recordingFrequency <= 0) {
       this->recordingFrequency = 1;
     }
@@ -50,23 +49,19 @@ namespace SIGEL_GP
     listForces.clear();
   };
 
-
   void SIG_GPFullDataRecorder::init()
   {
     // See SIG_GPSimpleRecorder::init -- this one is also reached from
     // SIG_Simulation's constructor, outside every fitness function's try.
     try {
-
     SIGEL_Simulation::SIG_Recorder::init();
 
     record();
-  
     }
     catch (SIGEL_Simulation::SIG_RecorderNoQueriesSetException &) { throw; }
     catch (SIGEL_Simulation::SIG_RecorderBadRecordingOrderException &) { throw; }
     catch (...) { std::terminate(); }
   };
-
 
   void SIG_GPFullDataRecorder::record()
   {
@@ -92,7 +87,6 @@ namespace SIGEL_GP
     frameCounter++;
     frameCounter %= recordingFrequency;
   }
-
 
 void SIG_GPFullDataRecorder::finish()
 {

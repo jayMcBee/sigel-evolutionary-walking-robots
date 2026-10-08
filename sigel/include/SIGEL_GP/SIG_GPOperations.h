@@ -30,7 +30,6 @@
 #include "SIGEL_Robot/SIG_LanguageParameters.h"
 #include <qstring.h>
 
-
 namespace SIGEL_GP
 {
 
@@ -42,7 +41,6 @@ namespace SIGEL_GP
 
 class SIG_GPOperations
 {
-
 /**
 * This operation performes crossover of the robot control programs
 * of two individuals. Via variations 1 point as well as 2 point crossover
@@ -126,7 +124,6 @@ class SIG_GPOperations
 						  SIGEL_Tools::SIG_Randomizer& randomizer,
 						  SIGEL_GP::SIG_GPParameter& gpParameter,
 						  SIGEL_Robot::SIG_LanguageParameters &languageParameters );
-
 };
 
 }

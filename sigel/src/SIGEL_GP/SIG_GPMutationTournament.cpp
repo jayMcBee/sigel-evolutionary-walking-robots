@@ -106,7 +106,6 @@ bool SIGEL_GP::SIG_GPMutationTournament::run()
    return true;
 };
 
-  
 bool SIGEL_GP::SIG_GPMutationTournament::run(MT_Classifier *MetaClassifier)
 {
   SIG_GPIndividual &ind1 = gpPool.getIndividual( indis[0]->indNumber );
@@ -144,7 +143,6 @@ bool SIGEL_GP::SIG_GPMutationTournament::run(MT_Classifier *MetaClassifier)
        winnerPos = popos2;
      };
 
-
    SIG_GPIndividual& mind = SIG_GPOperations::mutation(*winner,
 						       looserPos,
 						       name,
@@ -158,14 +156,11 @@ bool SIGEL_GP::SIG_GPMutationTournament::run(MT_Classifier *MetaClassifier)
 
    gpPool.setIndividual(mind, looserPos);
 
-
    return true;
 };
 
 bool  SIGEL_GP::SIG_GPMutationTournament::classify(MT_Classifier *MetaClassifier)
 {
-
-
   SIG_GPIndividual &ind1 = gpPool.getIndividual( indis[0]->indNumber );
   SIG_GPIndividual &ind2 = gpPool.getIndividual( indis[1]->indNumber );
 
@@ -196,7 +191,6 @@ bool  SIGEL_GP::SIG_GPMutationTournament::classify(MT_Classifier *MetaClassifier
        winnerPos = popos2;
      };
 
-
    SIG_GPIndividual& mind = SIG_GPOperations::mutation(*winner,
 						       looserPos,
 						       name,
@@ -209,7 +203,6 @@ bool  SIGEL_GP::SIG_GPMutationTournament::classify(MT_Classifier *MetaClassifier
    inhume( looser );
 
    gpPool.setIndividual(mind, looserPos);
-
 
    return true;
 };

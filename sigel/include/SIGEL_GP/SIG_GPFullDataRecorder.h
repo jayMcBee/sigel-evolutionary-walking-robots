@@ -26,13 +26,11 @@
 #include <QList>
 #include "SIGEL_Simulation/SIG_Recorder.h"
 
-
 namespace SIGEL_GP
 {
 
   class SIG_GPFullDataRecorder : public SIGEL_Simulation::SIG_Recorder
     {
-
       friend class SIG_GPRealSpeedFitnessFunction;
       friend class SIG_GPNiceWalkingFitnessFunction;
       friend class SIG_GPAdaptiveWalkingFitnessFunction;
@@ -54,7 +52,6 @@ namespace SIGEL_GP
 
       QList< SIG_Vector * > positions;
       QList< SIG_Matrix * > rotations;
-
 
     private:
 

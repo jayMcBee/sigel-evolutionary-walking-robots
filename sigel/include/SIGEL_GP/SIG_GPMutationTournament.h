@@ -41,8 +41,6 @@ namespace SIGEL_GP
 
 class SIG_GPMutationTournament : public SIGEL_GP::SIG_GPTournament
 { 
-
-	
 /**
 * The constructor of the mutationtournament.
 * @pre
@@ -70,7 +68,6 @@ SIG_GPMutationTournament(SIGEL_Tools::SIG_Randomizer& randomizer,
 private:
  QString name;
 
-
 /**
 * The virtual function effects the tournament to start.
 * @pre
@@ -83,7 +80,6 @@ private:
 */
  public:
 virtual bool run();
-
 
 /**
 * see above run(); 
@@ -102,10 +98,7 @@ virtual bool run(MT_Classifier *MetaClassifier);
 */
 public:
 virtual bool classify(MT_Classifier *MetaClassifier);
-
-
 };
 
 }
 #endif //  SIGEL_GP_SIG_GPMUTATIONTOURNAMENT_H
-

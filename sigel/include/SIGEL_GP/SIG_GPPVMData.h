@@ -45,7 +45,6 @@ namespace SIGEL_GP
     /** The program is not held; it is passed to savePVMDataTransfer and loadPVMDataTransfer. */
     SIG_GPPVMData(SIGEL_Robot::SIG_Robot& robot, SIGEL_Environment::SIG_Environment& environment, SIGEL_Simulation::SIG_SimulationParameters& simulationParameter, QString fitnessName, bool visualize);
 
-
    /** Sends str to the PVM task taskId, as message messageId. */
     void sendQStringToPVM(QString str, int taskId, int messageId);
 
@@ -101,9 +100,8 @@ namespace SIGEL_GP
     /** The name and the stored fitness of the individual, only for a displayed simulation. */
     QString individualName;
     double individualFitness;
-
   };
+
 }
 
 #endif // SIGEL_GP_SIG_GPPVMDATA_H
-

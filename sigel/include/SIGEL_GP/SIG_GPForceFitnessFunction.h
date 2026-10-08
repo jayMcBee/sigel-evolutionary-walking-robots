@@ -23,7 +23,6 @@
 #ifndef SIGEL_GP_SIG_GPFORCEFITNESSFUNCTION_H
 #define SIGEL_GP_SIG_GPFORCEFITNESSFUNCTION_H
 
-
 #include "SIGEL_GP/SIG_GPFitnessFunction.h"
 
 namespace SIGEL_GP
@@ -36,8 +35,6 @@ namespace SIGEL_GP
  */
 class SIG_GPForceFitnessFunction : public SIG_GPFitnessFunction
 {
-
-
 /**
  * This operation activates the computation of the fitnessvalue. It is virtual, this means
  * that the implemantation is for every fitnessfunction different.
@@ -58,8 +55,8 @@ double evalFitness( SIGEL_Program::SIG_Program &program,
 QString serializedId() const { return "ForceFitnessFunction"; }
 QString name() const { return "Force"; }
 QString description() const { return "Average speed from start to end, divided by how unevenly the joints share the load; 0 as soon as the body is more than 0.5 above or below its start height."; }
-
 };
+
 }
 
 #endif // SIGEL_GP_SIG_GPFORCEFITNESSFUNCTION_H

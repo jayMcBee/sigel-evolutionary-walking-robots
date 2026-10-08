@@ -35,6 +35,7 @@
  
 namespace SIGEL_GP
 {
+
 /**
 * This class represents the data structure of the parameters for the
 * genetic programs evolution. The parameters for the designers are
@@ -44,7 +45,6 @@ namespace SIGEL_GP
 * More flexibility will be implemented in future.
 */
   class SIG_GPParameter{
-
   public:
     /**
      * The type of termination condition of the GPManager.
@@ -124,7 +124,6 @@ namespace SIGEL_GP
     */
    veryHigh
   };
-
 
    /**
    *The integer, which is used to initializes the randomizer.
@@ -251,7 +250,6 @@ namespace SIGEL_GP
   private:
   bool liveUndead;
 
-
   /**
   * The directory, where to place the complete copy of the pool, the poolImages.
   */
@@ -293,9 +291,6 @@ namespace SIGEL_GP
   int timeOutMinutes;
 
   /* end of the attribute declaration */
-
-
-
 
  /**
  * The constructor for the parameter.
@@ -770,15 +765,10 @@ namespace SIGEL_GP
   public:
   void setTimeOutMinutes( int newValue );
 
-
   public:
   void setResetEveryGeneration(int _resEvGen) { resEvGen = _resEvGen; }
   int getResetEveryGeneration() { return resEvGen; }
 };
+
 }
 #endif //  SIGEL_GP_SIG_GPPARAMETER_H
-
-
-
-
-

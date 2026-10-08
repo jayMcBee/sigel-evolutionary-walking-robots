@@ -30,7 +30,6 @@ namespace SIGEL_GP
 
   class SIG_GPNiceWalkingFitnessFunction : public SIG_GPFitnessFunction
     {
-
     public: 
 
       double evalFitness( SIGEL_Program::SIG_Program &program,
@@ -41,7 +40,6 @@ namespace SIGEL_GP
       QString serializedId() const { return "NiceWalkingFitnessFunction"; }
       QString name() const { return "Nice Walking"; }
       QString description() const { return "Average speed from start to end; 0 as soon as the body is more than 0.5 above or below its start height."; }
-
     };
 
 }

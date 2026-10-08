@@ -127,13 +127,11 @@ QList<SIGEL_GP::SIG_GPIndividual *> SIGEL_GP::SIG_GPOperations::crossOver( SIGEL
 	// has a chance of 3:2 to be selected !
 	long const generalRecombinationType = randomizer.getRandomInt(5);
 
-
 	// Recombination/Crossover, Variant 1:
 	// (just guessing from the code, obviously nobody thought it was worth commenting..  -jan)
 	// Simple 1 point crossover, create two new programs
 	if( generalRecombinationType == 0 )
 	{
-
 		// copy first part of program 1
 		for (long int i = 0; i < crossPoint1; i++)
 		{
@@ -232,7 +230,6 @@ QList<SIGEL_GP::SIG_GPIndividual *> SIGEL_GP::SIG_GPOperations::crossOver( SIGEL
 
 	if ((maxLength > 0) && (prgLength1 > maxLength))
 	{
-
 #ifdef SIG_DEBUG
 		SIGEL_Tools::SIG_IO::cerr << "\n-> new program (1) too long (length=" << newProgram1.getProgramLength() << ") -> length decreased" << Qt::endl;
 #endif
@@ -248,7 +245,6 @@ QList<SIGEL_GP::SIG_GPIndividual *> SIGEL_GP::SIG_GPOperations::crossOver( SIGEL
 
 	if ((maxLength > 0) && (prgLength2 > maxLength))
 	{
-
 #ifdef SIG_DEBUG
 		SIGEL_Tools::SIG_IO::cerr << "\n-> new program (2) too long (length=" << newProgram2.getProgramLength() << ") -> length decreased" << Qt::endl;
 #endif
@@ -312,9 +308,6 @@ QList<SIGEL_GP::SIG_GPIndividual *> SIGEL_GP::SIG_GPOperations::crossOver( SIGEL
 	return crossedInds;
 };
 
-
-
-
 /*------------------------------------------Mutation-----------------------------------------*/
 
 SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::mutation( SIGEL_GP::SIG_GPIndividual& winner,
@@ -343,7 +336,6 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::mutation( SIGEL_GP::SIG_
 	SIGEL_Tools::SIG_IO::cerr << "<MUTATION>" << Qt::endl;
 
 #endif            
-
 
 	SIG_GPIndividual *mutatedInd = new SIG_GPIndividual( SIG_GPParameter(),
 	                                                     winner.getHistory(),
@@ -402,7 +394,6 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::mutation( SIGEL_GP::SIG_
 
 	if( generalMutationType == 0 )
 	{
-
 #ifdef SIG_DEBUG
 
 		SIGEL_Tools::SIG_IO::cerr << "<TYPE 0>" << Qt::endl;
@@ -420,7 +411,6 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::mutation( SIGEL_GP::SIG_
 		SIGEL_Tools::SIG_IO::cerr << "<SUBTYPE " << specializedMutation << ">" << Qt::endl;
 
 #endif
-
 
 		switch( specializedMutation )
 		{
@@ -554,14 +544,12 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::mutation( SIGEL_GP::SIG_
 		SIGEL_Tools::SIG_IO::cerr << "]" << Qt::endl;
 
 #endif
-
 	}
 
 	if( generalMutationType == 1 )
 	{
 		if( newProgram.getProgramLength() + 1 <= maxLength )
 		{
-
 #ifdef SIG_DEBUG
 
 			SIGEL_Tools::SIG_IO::cerr << "<TYPE 1>" << Qt::endl;
@@ -571,18 +559,15 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::mutation( SIGEL_GP::SIG_
 			SIGEL_Program::SIG_ProgramLine newProgLine( randomizer, languageParameters, gpParameter.getInstructionProbabilities() );
 
 			newProgram.insertLine( mutPoint, newProgLine );
-
 		}
 		else
 			generalMutationType = 2;
 	}
 
-
 	if( generalMutationType == 2 )
 	{
 		if( newProgram.getProgramLength() - 1 >= minLength )
 		{
-
 #ifdef SIG_DEBUG
 
 			SIGEL_Tools::SIG_IO::cerr << "<TYPE 2>" << Qt::endl;
@@ -595,7 +580,6 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::mutation( SIGEL_GP::SIG_
 		{
 			if( newProgram.getProgramLength() + 1 <= maxLength )
 			{
-
 #ifdef SIG_DEBUG
 
 				SIGEL_Tools::SIG_IO::cerr << "<TYPE 1>" << Qt::endl;
@@ -615,7 +599,6 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::mutation( SIGEL_GP::SIG_
 
 #endif
 
-
 	QDateTime actTime = QDateTime::currentDateTime();
 
 	if( historyInfo > 0 ) mutatedInd->addLengthIncreasedInfo( actTime, historyInfo );
@@ -625,8 +608,6 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::mutation( SIGEL_GP::SIG_
 
 	return  *mutatedInd;
 };
-
-
 
 /*------------------------------------------Reproduction-----------------------------------------*/
 
