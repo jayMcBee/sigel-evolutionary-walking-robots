@@ -389,14 +389,6 @@ void MT_GPManager::startEvolution(MT_Substitute *Substitute)
 	else
 		LastError = 7;
 
-/***************
-	QFile file("DebugParent.mt");
-	file.open(IO_WriteOnly);
-	QTextStream strm(&file);
-	writeToFileGPSystem(strm);
-	file.close();
-**************/
-	
 	int GreatestName =0; 
 	for (int i=0; i<Parent->getSize(); i++)
 		if(GreatestName<Parent->getIndividual(i)->getName())

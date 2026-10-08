@@ -4,7 +4,6 @@
 #include <QList>
 #include "MT_Control/MT_Substitute.h"
 #include "SIGEL_GP/SIG_GPFitnessTrainer.h"
-//#include <pvm3.h>
 
 using namespace SIGEL_GP;
 

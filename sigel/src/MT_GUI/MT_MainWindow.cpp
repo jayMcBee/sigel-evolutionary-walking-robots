@@ -377,5 +377,4 @@ void MT_MainWindow::slotStopEvolution()
 	mtStopEvolutionAction->setEnabled(false);
 	if(!evolRunning)
 		mtStartEvolutionAction->setEnabled(true);
-	//controller->stopEvolution();
 }

@@ -234,7 +234,6 @@ int MT_Search::startMatingProcess()
 	{
 		Parent = SourcePop->getIndividual(FreePos);
 		Parent->setTypOfGenesis(5);
-//		Parent->setFitnessOfParent(Parent->getFitness());
 
 		RandomPos = Randi->getRandomInteger(OffspringSize);
 	

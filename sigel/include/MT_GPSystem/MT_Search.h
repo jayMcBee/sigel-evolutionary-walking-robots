@@ -32,9 +32,6 @@ public:
 	MT_Search(MT_Population * ParentPop, MT_Population * OffspringPop, MT_Randomizer * _Randi);
 	MT_Search();
 	virtual ~MT_Search() = default;
-	/* For brood search (see BrutSize/setBrutSize)
-	*	MT_Search(MT_Population * ParentPop, MT_Population * OffspringPop, MT_Randomizer * Randi, MT_FitnessTrainer * Fit Trainer);
-	*/
 
 private:
 	
@@ -51,6 +48,7 @@ private:
 	MT_Population * SourcePop;
 	MT_Randomizer * Randi;
 
+	// The brood size. It is loaded and saved; no search reads it.
 	int BrutSize;
 	int LastError;
 

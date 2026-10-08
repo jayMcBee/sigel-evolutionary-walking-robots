@@ -397,27 +397,22 @@ double MT_Evaluator::checkTask(int taskId)
 	}
 	else
 	{
-//int DebugInfo =0;
 		MetaFitness =  SIG_GPFitnessTrainer::checkTask(taskId);
 		if(MetaFitness != -1)
 		{
 			NumOfCorrectEstimation[GenerationNumber]=NumOfCorrectEstimation[GenerationNumber]+1;
-//DebugInfo = NumOfCorrectEstimation[GenerationNumber];
 		
 			MT_TrainingCase * TCases;
 			int TmpBufferSize = int( TmpBuffer.size() );
 
 			for (int i=0; i< TmpBufferSize; i++) 
 			{
-//DebugInfo= TmpBuffer.count();
 				TCases=TmpBuffer.takeAt(i);
-//DebugInfo= TmpBuffer.count();
 
 				if(TCases->getName() == taskId)
 				{
 					TmpBufferSize--;
 					TCases->setFitness(MetaFitness);
-					// TmpBuffer.remove(i);
 
 // lock the TCaseBuffer so that no TCases could be taken from it
 					pthread_mutex_lock(&tCaseBufferMutex);
@@ -431,10 +426,7 @@ double MT_Evaluator::checkTask(int taskId)
 				else
 					TmpBuffer.insert(i,TCases);		
 			}
-
-//DebugInfo= TmpBuffer.count();
 		}
-//DebugInfo= TmpBuffer.count();
 	
 	return MetaFitness;
 	}

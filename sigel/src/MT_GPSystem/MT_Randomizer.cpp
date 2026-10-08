@@ -411,8 +411,6 @@ MT_Instruction MT_Randomizer::getRandomInstruktion()
 	int Choice =1;
 	MT_Instruction NewInstruction;
 
-//	ProbInstruktion[17] = ProbInstruktion[16]+1000.0;
-
 	unsigned long  Random = getRandomInteger(ProbInstruktion[17]);
 
 	for (int i=0; i<18; i++)

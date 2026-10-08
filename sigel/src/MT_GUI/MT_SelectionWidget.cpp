@@ -42,8 +42,7 @@ int MT_SelectionWidget::calculateTournSize(int pSize, int oSize, int oTSize)
 {
 	typedef QMap<int,int> intMap;
 
-//	if(pSize != lastParentSize)
-		updateTSizeList(pSize, oSize);
+	updateTSizeList(pSize, oSize);
 
 	if(tourSizeMap.contains(oTSize))
 		return oTSize;

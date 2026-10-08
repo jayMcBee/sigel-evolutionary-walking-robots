@@ -386,7 +386,6 @@ void MT_IndividualsWidget::slotDelConst()
 			actInd--;		// the indices of the following items were decreased !!
 			emit numConstChanged();
 		}
-		//numConstants->setMinValue(constantsListBox->count());
 	}
 }
 

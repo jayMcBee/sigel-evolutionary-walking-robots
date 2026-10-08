@@ -862,9 +862,6 @@ void MT_Controller::slotSaveSetup()
 		mainWindow->enforceUpdate(false);		// enforce an update of the gp-system
 
 		// save the substituter / the substituter settings
-		/*if(substitution){
-			substitution->writeToFile(strm);
-		} else*/
 		if(substCache.inUse){
 			saveCache(strm);
 		}

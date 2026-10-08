@@ -194,7 +194,6 @@ void MT_StatisticsWidget::updateGUI(int mtGen, int sigGen)
 
 		// composition of the parent pool
 		reproductionsParents->setText(QString::number(el->NumOfSimpleCopyParent));
-//		crossoversParents->setText(QString::number(mng->getParent()->getSize() - el->NumOfSimpleCopyParent - el->NumOfMutateIndividuals));
 		crossoversParents->setText(QString::number(el->NumOfCrossoverEvent));
 		mutationsParents->setText(QString::number(el->NumOfMutateIndividuals));
 		elMutationsParents->setText(QString::number(el->NumOfElementMutationParent));
@@ -552,12 +551,8 @@ void MT_StatisticsWidget::plotEstimation(QString fileName)
 		<< "set title \"Simulation - Estimation Relationship\"\n"
 		<< "set xlabel 'Generation'\n"
 		<< "set ylabel\n"
-		<< "plot '-' title 'estimations'\n"; //, '-' title 'simulations'\n";
+		<< "plot '-' title 'estimations'\n";
 
-/*	for(int i=0; i<sigStat->genNumber; i++){
-		pipeStream << i << " " << sigStat->numCorrectEst->at(i) << "\n";
-	}
-	pipeStream << "e\n";*/
 	for(int j=0; j<sigStat->genNumber; j++){
 		pipeStream << j << " " << sigStat->numMetaEst->at(j) << "\n";
 	}

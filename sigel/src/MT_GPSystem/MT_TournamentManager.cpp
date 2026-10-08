@@ -132,26 +132,13 @@ void MT_TournamentManager::performTournaments()
 	// fetch a correct partition for separate the offspring into tournaments
 	QList<int>	*Partition = Randi->getRandomTournamentPartition(TournamentNumber);
 
-//int DebugInfo =0;
-//for (int g=0; g < OffspringSize;g++)
-//	DebugInfo = Partition->at(g);
-
-//MT_Individual *DebugIndi = 0;
-
 	// Now insert all offspring individuals into a tournament 
 	for (int i=0; i<OffspringSize; i++)
 	{
-//		DebugIndi = OffspringPop->getIndividual(i); 
 		Tournaments[Partition->at(i)]->insertIndividual(OffspringPop->getIndividual(i));
 	}
 
-//DebugIndi =0;
-
 	OffspringPop->flush();
-
-//for(int i=0;i<TournamentNumber; i++)
-//		for (g=0; g<WinnerLoser.size();g++)
-//			DebugIndi= Tournaments[i]->getIndividual(g);
 
 // ************************ Run the tournaments / update the parents  ************************ //
 
@@ -166,16 +153,9 @@ void MT_TournamentManager::performTournaments()
 
 			for(int k=0;k<WinnerLoser.size();k++)
 			{
-				/* if (WinnerLoser[k]==0)
-				{
-					delete (Tournaments[i]->getIndividual(k));
-				}
-				else */
-			
 				if (WinnerLoser[k]!=0)
 				{
-					// Winner = (Tournaments[i]->getIndividual(k));
-					 // New: transfer ownership to the winner
+					// The winner leaves the tournament.
 				
 					Winner = Tournaments[i]->insertAtPos(nullptr,k);
 				

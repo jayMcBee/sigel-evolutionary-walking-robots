@@ -12,8 +12,6 @@
 #include <time.h>
 #include <math.h>
 
-// #define RAND_MAX 65534
-
 /* the Randomizer supply "correct" Coincidence to the whole GP-System 
 * it's contain a lot of GP parameters 
 */

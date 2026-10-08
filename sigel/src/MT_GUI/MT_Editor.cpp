@@ -33,13 +33,6 @@ void MT_Editor::focusOutEvent(QFocusEvent *event)
 void MT_Editor::mousePressEvent(QMouseEvent *event)
 {
 	if(! rect().contains(event->pos())){
-/*		QMouseEvent me(QEvent::MouseButtonPress, event->pos(), 
-			event->globalPos(), event->button(),
-			event->state());
-		QWidget *receiver = QApplication::widgetAt(event->globalPos(), true);
-		if(receiver){
-			QApplication::sendEvent(receiver, &me);
-		}*/
 		hide();
 	}
 }
