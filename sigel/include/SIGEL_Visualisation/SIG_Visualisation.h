@@ -125,7 +125,6 @@ namespace SIGEL_Visualisation
 
       /** Sets the fog's range and gives it the sky's colour at the horizon. */
       void setFog( SIG_Vector const &eyePoint ) const;
-
     };
 
 }

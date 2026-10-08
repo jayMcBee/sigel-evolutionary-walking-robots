@@ -33,4 +33,3 @@ namespace SIGEL_Visualisation
   };
 
 }
-

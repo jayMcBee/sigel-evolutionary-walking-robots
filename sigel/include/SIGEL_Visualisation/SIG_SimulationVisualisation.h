@@ -314,7 +314,6 @@ namespace SIGEL_Visualisation
 		 * Is called in makeTimeSteps.
 		 */
 		void updateRobotPoints();
-
 	};
 
 }

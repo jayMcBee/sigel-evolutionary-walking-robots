@@ -45,7 +45,6 @@ namespace SIGEL_Visualisation
       lookPoint(0, 0, 0),
       showRobotPath( false )
   {
-
     SIG_Matrix idRotation;
     idRotation.makeone();
 
@@ -134,7 +133,6 @@ namespace SIGEL_Visualisation
 
   void SIG_EnvironmentRenderer::buildPlane(GLuint number)
   {
-
     glNewList(number, GL_COMPILE);
 
     glFrontFace( GL_CCW );
@@ -146,8 +144,6 @@ namespace SIGEL_Visualisation
     drawInit();
 
     glEndList();
-
-
   };
 
 	void SIG_EnvironmentRenderer::buildGrid(GLuint number)
@@ -164,10 +160,8 @@ namespace SIGEL_Visualisation
 	 	glRotated(180,1,0,0);
 
    	for (z=1-z_dim; z<z_dim-1; ++z) {
-
       glBegin(GL_LINES);
     	for (x=1-x_dim; x<x_dim-1; ++x) {
-          	
       	setTerrainVertex( vertex[0], x,   z, depth, x_dim, z_dim );
       	setTerrainVertex( vertex[1], x+1, z, depth, x_dim, z_dim );
 	
@@ -178,10 +172,8 @@ namespace SIGEL_Visualisation
     }
     	
     for (x=1-x_dim; x<x_dim-1; ++x) {
-
       glBegin(GL_LINES);
       for (z=1-z_dim; z<z_dim-1; ++z) {
-          	
       	setTerrainVertex( vertex[0], x, z,   depth, x_dim, z_dim );
       	setTerrainVertex( vertex[1], x, z+1, depth, x_dim, z_dim );
         	
@@ -282,7 +274,6 @@ namespace SIGEL_Visualisation
 		   << "  finish { ambient rgb <1,1,0>\n"
 		   << "           diffuse 1 }\n"
 		   << "}\n";
-
 	  };
 
 	stream << "\n";
@@ -445,7 +436,6 @@ namespace SIGEL_Visualisation
   };
 
   bool SIG_EnvironmentRenderer::initTexture() {
-
     // Load up our textures.
     QString texFile = environment.getTextureFile();
 

@@ -36,6 +36,7 @@ using namespace SIGEL_Tools;
 
 namespace SIGEL_Visualisation
 {
+
 	// Lighting per vertex, as GL_LIGHT0 and GL_LIGHT1 give it. The sun goes
 	// out in the secondary colour, so the fragment shader shadows only it.
 	char const *const SIG_SimulationVisualisation::shadowVertexShaderSource =
@@ -639,4 +640,5 @@ namespace SIGEL_Visualisation
 
 		return true;
 	};
+
 }

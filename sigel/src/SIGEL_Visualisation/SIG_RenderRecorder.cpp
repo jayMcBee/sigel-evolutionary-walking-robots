@@ -30,7 +30,6 @@ namespace SIGEL_Visualisation
 			robotLinks(noOfObjects),
 			currentSimulationSeconds( 0.0 )
   {
-
     for (int i=0; i<noOfObjects; i++)
       robotLinks[i] = new SIG_SceneObject(i);
   };

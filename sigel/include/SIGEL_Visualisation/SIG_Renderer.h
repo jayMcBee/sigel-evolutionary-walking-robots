@@ -74,7 +74,6 @@ namespace SIGEL_Visualisation
     SIG_Renderer( const SIG_Renderer & ) = delete;
     SIG_Renderer &operator=( const SIG_Renderer & ) = delete;
 
-
     /**
      * This method finally starts the rendering
      * into the current OpenGL context.

@@ -134,7 +134,6 @@ namespace SIGEL_Visualisation
        * the window width x and height y.
        */
       double aspectRatio;
-
     };
 
 }

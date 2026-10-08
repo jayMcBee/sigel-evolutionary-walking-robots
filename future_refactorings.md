@@ -132,8 +132,7 @@ Paths are relative to `sigel/`, the source tree.
   module. Modules still to do: `MT_GPSystem`, `MT_GUI`,
   `SIGEL_GP`,
   `SIGEL_MasterGUI`, `SIGEL_Robot`,
-  `SIGEL_RobotCheck`, `SIGEL_Simulation`, `SIGEL_SlaveGUI`,
-  `SIGEL_Visualisation`.
+  `SIGEL_RobotCheck`, `SIGEL_Simulation`, `SIGEL_SlaveGUI`.
 
 ---
 

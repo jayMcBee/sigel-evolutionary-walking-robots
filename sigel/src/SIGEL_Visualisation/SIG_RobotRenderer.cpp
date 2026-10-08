@@ -45,7 +45,6 @@ namespace SIGEL_Visualisation
 
 	delete sceneObjects[ number ];
 	sceneObjects[ number ] = newSceneObject;
-
       };
 
     buildDisplayLists();
@@ -154,9 +153,7 @@ namespace SIGEL_Visualisation
 	    nextPointIndex++;
 	    nextFloatingIndex++;
 	  };
-
       };
-
   };
 
   void SIG_RobotRenderer::render()
@@ -228,7 +225,6 @@ namespace SIGEL_Visualisation
 	       << "           diffuse 1 }\n"
 	       << "}\n"
 	       << "\n";
-
       };
 
     QString pointDataString;
@@ -308,7 +304,6 @@ namespace SIGEL_Visualisation
 			    << "  }\n"
 			    << "}\n"
 			    << "\n";
-
 	  };
 
 	stream << polygonDataString

@@ -72,7 +72,6 @@ namespace SIGEL_Visualisation
        * The current rotation of the particular object.
        */
       SIG_Matrix rotation;
-
     };
 
 }

@@ -90,7 +90,6 @@ namespace SIGEL_Visualisation
      * by this SIG_RobotRenderer.
      */
     SIGEL_Robot::SIG_Robot const &robot;
-
   };
 
 }

@@ -24,6 +24,7 @@
 
 namespace SIGEL_Visualisation
 {
+
   SIG_VisualSceneObject::SIG_VisualSceneObject(int number,
 					       QString name,
 					       SIG_Vector color)

@@ -116,5 +116,4 @@ namespace SIGEL_Visualisation
     return resultString;
   };
 
-
 }

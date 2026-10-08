@@ -49,7 +49,6 @@ namespace SIGEL_Visualisation
    */
   class SIG_VisualSceneObject : private SIG_SceneObject
     {
-
     public:
 
       /**
@@ -207,7 +206,6 @@ namespace SIGEL_Visualisation
       bool visible;
 
       SIG_FloatingText *floatingText;
-
     };
 
 }

@@ -42,7 +42,6 @@ namespace SIGEL_Visualisation
       QString textLabel;
 
       bool rendered;
-
     };
 
 }

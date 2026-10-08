@@ -59,7 +59,6 @@ namespace SIGEL_Visualisation
       SIG_RenderRecorder( const SIG_RenderRecorder & ) = delete;
       SIG_RenderRecorder &operator=( const SIG_RenderRecorder & ) = delete;
 
-
       /**
        * Initalizes the start positions and rotations of
        * the elements of robotLinks taken from the
@@ -89,10 +88,8 @@ namespace SIGEL_Visualisation
       QList<SIG_SceneObject *> robotLinks;
 
       double currentSimulationSeconds;
-
     };
 
 }
-
 
 #endif // SIGEL_VISUALISATION_SIG_RENDERRECORDER_H

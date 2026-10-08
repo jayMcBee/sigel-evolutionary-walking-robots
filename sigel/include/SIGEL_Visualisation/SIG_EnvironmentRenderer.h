@@ -49,7 +49,6 @@ namespace SIGEL_Visualisation
 		GLuint   height;
 
 		GLuint   texID;     // For texture objects; more later.
-
 	} Texture;
 	
   /**
@@ -79,7 +78,6 @@ namespace SIGEL_Visualisation
     // destructor, so a copy would free them twice.
     SIG_EnvironmentRenderer( const SIG_EnvironmentRenderer & ) = delete;
     SIG_EnvironmentRenderer &operator=( const SIG_EnvironmentRenderer & ) = delete;
-
 
     /**
      * Calls the inherited method renderSceneObjects and
@@ -158,7 +156,6 @@ namespace SIGEL_Visualisation
 			*
 			*/
     void drawInit();
-
 
   private:
 
