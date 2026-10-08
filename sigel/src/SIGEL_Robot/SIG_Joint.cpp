@@ -36,755 +36,755 @@ using namespace SIGEL_Tools;
 
 namespace SIGEL_Robot {
 
-        SIG_Joint::SIG_Joint (SIG_Robot *par, QString n, int nr)
-                : parent (par),
-                  name (n),
-                  number (nr),
-                  leftLink (nullptr),
-                  rightLink (nullptr),
-                  mdh_a (0),
-                  mdh_alpha (0),
-                  mdh_d (0),
-                  mdh_theta (0),
-                  mdh_screw_d(0),
-                  mdh_screw_theta(0),
-                  mechsMinPos(0),
-                  mechsMaxPos(0),
-                  mdh_predecessor_is_left (-1)
-        { }
+	SIG_Joint::SIG_Joint (SIG_Robot *par, QString n, int nr)
+	        : parent (par),
+	          name (n),
+	          number (nr),
+	          leftLink (nullptr),
+	          rightLink (nullptr),
+	          mdh_a (0),
+	          mdh_alpha (0),
+	          mdh_d (0),
+	          mdh_theta (0),
+	          mdh_screw_d(0),
+	          mdh_screw_theta(0),
+	          mechsMinPos(0),
+	          mechsMaxPos(0),
+	          mdh_predecessor_is_left (-1)
+	{ }
 
-        SIG_Joint::SIG_Joint (SIG_Robot *par, QTextStream & tx)
-                : parent (par),
-                  number (-1),
-                  leftLink (nullptr),
-                  rightLink (nullptr)
-        {
-                QString n1, n2;
+	SIG_Joint::SIG_Joint (SIG_Robot *par, QTextStream & tx)
+	        : parent (par),
+	          number (-1),
+	          leftLink (nullptr),
+	          rightLink (nullptr)
+	{
+		QString n1, n2;
 
-                tx >> n1  // Read away the "Joint" keyword.
-                   >> name
-                   >> number;
-                tx >> n1 >> n2; // read da names o' da links.
-                SIG_Link *l1 = parent->lookupLink (n1);
-                SIG_Link *l2 = parent->lookupLink (n2);
-                if (!l1 || !l2)
-                        throw SIG_UnstreamingError (__FILE__, __LINE__, "joint '" + name + "' names unknown link '" + (l1 ? n2 : n1) + "'");
-                setLeftLink (l1);
-                setRightLink (l2);
-                tx >> mdh_a >> mdh_alpha >> mdh_d >> mdh_theta
+		tx >> n1  // Read away the "Joint" keyword.
+		   >> name
+		   >> number;
+		tx >> n1 >> n2; // read da names o' da links.
+		SIG_Link *l1 = parent->lookupLink (n1);
+		SIG_Link *l2 = parent->lookupLink (n2);
+		if (!l1 || !l2)
+			throw SIG_UnstreamingError (__FILE__, __LINE__, "joint '" + name + "' names unknown link '" + (l1 ? n2 : n1) + "'");
+		setLeftLink (l1);
+		setRightLink (l2);
+		tx >> mdh_a >> mdh_alpha >> mdh_d >> mdh_theta
 		   >> mdh_screw_d >> mdh_screw_theta
 		   >> mechsMinPos >> mechsMaxPos
-                   >> mdh_predecessor_is_left;
-        }
+		   >> mdh_predecessor_is_left;
+	}
 
-        QString SIG_Joint::getName () const
-        {
-                return name;
-        }
+	QString SIG_Joint::getName () const
+	{
+		return name;
+	}
 
-        int SIG_Joint::getNumber () const
-        {
-                return number;
-        }
+	int SIG_Joint::getNumber () const
+	{
+		return number;
+	}
 
-        //
-        // SIG_Joint::JointType SIG_Joint::getJointType () const
-        // { /* Please implement this! */ }
-        // Someone out there evidently failed to grasp that this
-        // method is ABSTRACT. *giggle*
-        //
+	//
+	// SIG_Joint::JointType SIG_Joint::getJointType () const
+	// { /* Please implement this! */ }
+	// Someone out there evidently failed to grasp that this
+	// method is ABSTRACT. *giggle*
+	//
 
-        void SIG_Joint::setLeftLink (SIG_Link *theLink)
-        {
-                leftLink = theLink;
-                leftLink->addJoint (this);
-        }
+	void SIG_Joint::setLeftLink (SIG_Link *theLink)
+	{
+		leftLink = theLink;
+		leftLink->addJoint (this);
+	}
 
-        void SIG_Joint::setRightLink (SIG_Link *theLink)
-        {
-                rightLink = theLink;
-                rightLink->addJoint (this);
-        }
+	void SIG_Joint::setRightLink (SIG_Link *theLink)
+	{
+		rightLink = theLink;
+		rightLink->addJoint (this);
+	}
 
-        SIG_Link const *SIG_Joint::getLeftLink () const
-        {
-                return leftLink;
-        }
+	SIG_Link const *SIG_Joint::getLeftLink () const
+	{
+		return leftLink;
+	}
 
-        SIG_Link const *SIG_Joint::getRightLink () const
-        {
-                return rightLink;
-        }
+	SIG_Link const *SIG_Joint::getRightLink () const
+	{
+		return rightLink;
+	}
 
-        SIG_Link *SIG_Joint::otherSide (SIG_Link *myself) const
-        {
-                return myself == leftLink ? rightLink : leftLink;
-        }
+	SIG_Link *SIG_Joint::otherSide (SIG_Link *myself) const
+	{
+		return myself == leftLink ? rightLink : leftLink;
+	}
 
-        // getGeomRelation is ABSTRACT too!
-        // Thank God nobody has asked for it yet.
+	// getGeomRelation is ABSTRACT too!
+	// Thank God nobody has asked for it yet.
 
 	void SIG_Joint::getMDH (SIG_Link * & predecessor,
-				double & a, double & alpha,
-				double & d, double & theta,
-				double & screwD, double & screwTheta)
+	                        double & a, double & alpha,
+	                        double & d, double & theta,
+	                        double & screwD, double & screwTheta)
 	{
 		throw SIG_Exception (__FILE__, __LINE__,
-			QString ("Joint ") + name +
-			" has no MDH parameters.");
+		        QString ("Joint ") + name +
+		        " has no MDH parameters.");
 	}
 
-        void SIG_Joint::writeToFileTransfer (QTextStream & tx)
-        {
-                tx << "Joint "
-                   << getName () << ' '
-                   << getNumber () << ' '
-                   << getLeftLink ()->getName () << ' '
-                   << getRightLink ()->getName () << ' '
-                   << mdh_a << ' ' << mdh_alpha << ' '
-                   << mdh_d << ' ' << mdh_theta << ' '
+	void SIG_Joint::writeToFileTransfer (QTextStream & tx)
+	{
+		tx << "Joint "
+		   << getName () << ' '
+		   << getNumber () << ' '
+		   << getLeftLink ()->getName () << ' '
+		   << getRightLink ()->getName () << ' '
+		   << mdh_a << ' ' << mdh_alpha << ' '
+		   << mdh_d << ' ' << mdh_theta << ' '
 		   << mdh_screw_d << ' ' << mdh_screw_theta << ' '
 		   << mechsMinPos << ' ' << mechsMaxPos << ' '
-                   << mdh_predecessor_is_left << '\n';
-        }
-
-        void SIG_Joint::tfap (SIG_Vector mov, SIG_Matrix rot, SIG_Vector *p)
-        {
-                p->plusis (&mov);
-                SIG_Vector v (p);
-                rot.times (&v, p);
-        }
-
-        double SIG_Joint::getMechsMinPos() const
-	{
-	  return mechsMinPos;
-	};
-
-        double SIG_Joint::getMechsMaxPos() const
-	{
-	  return mechsMaxPos;
-	};
-
-        void SIG_Joint::transformToDynaMechs( SIG_Link *predecessor,
-					      double screwD,
-					      double screwTheta )
-	{
-	  mdh_screw_d = screwD;
-	  mdh_screw_theta = screwTheta;
-
-	  SIG_Link *successor;
-
-	  bool successorIsLeftLink;
-
-	  if (predecessor == leftLink)
-	    {
-	      successor = rightLink;
-	      mdh_predecessor_is_left = 1;
-	      successorIsLeftLink = false;
-	    }
-	  else
-	    {
-	      successor = leftLink;
-	      mdh_predecessor_is_left = 0;
-	      successorIsLeftLink = true;
-	    };
-
-	  SIG_Vector base;
-	  SIG_Vector dir;
-	  SIG_Vector hand;
-
-	  switch (getJointType())
-		{
-		case tTranslationalJoint:
-		  {
-		    SIG_TranslationalJoint *translationalJoint = static_cast< SIG_TranslationalJoint* >(this);
-
-		    base = ( successorIsLeftLink ) ? translationalJoint->getLeftBase() : translationalJoint->getRightBase();
-		    dir = ( successorIsLeftLink ) ? translationalJoint->getLeftDir() : translationalJoint->getRightDir();
-		    hand = ( successorIsLeftLink ) ? translationalJoint->getLeftFix() : translationalJoint->getRightFix();
-		  };
-		  break;
-		case tRotationalJoint:
-		  {
-		    SIG_RotationalJoint *rotationalJoint = static_cast< SIG_RotationalJoint* >(this);
-
-		    base = ( successorIsLeftLink ) ? rotationalJoint->getLeftBase() : rotationalJoint->getRightBase();
-		    dir = ( successorIsLeftLink ) ? rotationalJoint->getLeftDir() : rotationalJoint->getRightDir();
-		    hand = ( successorIsLeftLink ) ? rotationalJoint->getLeftHand() : rotationalJoint->getRightHand();
-		  };
-		  break;
-		};
-
-	  successor->transformToDynaMechs( this,
-					   base,
-					   dir,
-					   hand );
+		   << mdh_predecessor_is_left << '\n';
 	}
 
-        bool SIG_Joint::continuable( SIG_Link *predecessor ) const
+	void SIG_Joint::tfap (SIG_Vector mov, SIG_Matrix rot, SIG_Vector *p)
 	{
-	  SIG_Link *successor = ( predecessor == leftLink ) ? rightLink : leftLink;
+		p->plusis (&mov);
+		SIG_Vector v (p);
+		rot.times (&v, p);
+	}
 
-	  return ( !((mdh_predecessor_is_left==0) || (mdh_predecessor_is_left==1)) && !successor->isMDHVisited());
+	double SIG_Joint::getMechsMinPos() const
+	{
+		return mechsMinPos;
 	};
 
-       void SIG_Joint::calculateMDH( SIG_Link *caller )
-       {
-	 SIG_Link *predecessor;
+	double SIG_Joint::getMechsMaxPos() const
+	{
+		return mechsMaxPos;
+	};
 
-	 switch (mdh_predecessor_is_left)
-	   {
-	   case 0:
-	     predecessor = rightLink;
-	     break;
-	   case 1:
-	     predecessor = leftLink;
-	     break;
-	   default:
-	     predecessor = nullptr;
-	   };
+	void SIG_Joint::transformToDynaMechs( SIG_Link *predecessor,
+	                                      double screwD,
+	                                      double screwTheta )
+	{
+		mdh_screw_d = screwD;
+		mdh_screw_theta = screwTheta;
 
-	 if (predecessor!=caller)
-	   return;
+		SIG_Link *successor;
 
-	 SIG_Link *successor = ( leftLink == predecessor ) ? rightLink : leftLink;
+		bool successorIsLeftLink;
 
-	 SIG_Vector predecessorsInitialPosition;
-	 SIG_Matrix predecessorsInitialRotation;
+		if (predecessor == leftLink)
+		{
+			successor = rightLink;
+			mdh_predecessor_is_left = 1;
+			successorIsLeftLink = false;
+		}
+		else
+		{
+			successor = leftLink;
+			mdh_predecessor_is_left = 0;
+			successorIsLeftLink = true;
+		};
 
-	 predecessor->getInitialLocation( predecessorsInitialPosition,
-					  predecessorsInitialRotation );
+		SIG_Vector base;
+		SIG_Vector dir;
+		SIG_Vector hand;
 
-	 SIG_Vector predOrigin = predecessorsInitialPosition;
+		switch (getJointType())
+		{
+		case tTranslationalJoint:
+		{
+			SIG_TranslationalJoint *translationalJoint = static_cast< SIG_TranslationalJoint* >(this);
 
-	 SIG_Vector successorsInitialPosition;
-	 SIG_Matrix successorsInitialRotation;
+			base = ( successorIsLeftLink ) ? translationalJoint->getLeftBase() : translationalJoint->getRightBase();
+			dir = ( successorIsLeftLink ) ? translationalJoint->getLeftDir() : translationalJoint->getRightDir();
+			hand = ( successorIsLeftLink ) ? translationalJoint->getLeftFix() : translationalJoint->getRightFix();
+		};
+		break;
+		case tRotationalJoint:
+		{
+			SIG_RotationalJoint *rotationalJoint = static_cast< SIG_RotationalJoint* >(this);
 
-	 successor->getInitialLocation( successorsInitialPosition,
-					successorsInitialRotation );
+			base = ( successorIsLeftLink ) ? rotationalJoint->getLeftBase() : rotationalJoint->getRightBase();
+			dir = ( successorIsLeftLink ) ? rotationalJoint->getLeftDir() : rotationalJoint->getRightDir();
+			hand = ( successorIsLeftLink ) ? rotationalJoint->getLeftHand() : rotationalJoint->getRightHand();
+		};
+		break;
+		};
 
-	 SIG_Vector succOrigin = successorsInitialPosition;
+		successor->transformToDynaMechs( this,
+		                                 base,
+		                                 dir,
+		                                 hand );
+	}
 
-#ifdef SIG_DEBUG
-	 SIGEL_Tools::SIG_IO::cerr << "Initial rotation of link "
-				   << successor->getName()
-				   << ":" << Qt::endl;
-	 for (int i=0; i<3; i++)
-	   {
-	     for (int j=0; j<3; j++)
-	       SIGEL_Tools::SIG_IO::cerr << successorsInitialRotation.get( i, j ) << " ";
-	     SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-	   };
-#endif
+	bool SIG_Joint::continuable( SIG_Link *predecessor ) const
+	{
+		SIG_Link *successor = ( predecessor == leftLink ) ? rightLink : leftLink;
 
-	 SIG_Vector predXAxis = predecessorsInitialRotation.c0;
-	 SIG_Vector predZAxis = predecessorsInitialRotation.c2;
+		return ( !((mdh_predecessor_is_left==0) || (mdh_predecessor_is_left==1)) && !successor->isMDHVisited());
+	};
 
-	 SIG_Vector succXAxis = successorsInitialRotation.c0;
-	 SIG_Vector succYAxis = successorsInitialRotation.c1;
-	 SIG_Vector succZAxis = successorsInitialRotation.c2;
+	void SIG_Joint::calculateMDH( SIG_Link *caller )
+	{
+		SIG_Link *predecessor;
 
-	 SIG_Vector screwTranslationVector = predZAxis;
-	 screwTranslationVector.timesis( mdh_screw_d );
+		switch (mdh_predecessor_is_left)
+		{
+		case 0:
+			predecessor = rightLink;
+			break;
+		case 1:
+			predecessor = leftLink;
+			break;
+		default:
+			predecessor = nullptr;
+		};
 
-	 predOrigin.plusis( &screwTranslationVector );
+		if (predecessor!=caller)
+			return;
 
-	 SIG_Matrix screwRotationMatrix = rotationMatrix( predZAxis,
-							 mdh_screw_theta );
+		SIG_Link *successor = ( leftLink == predecessor ) ? rightLink : leftLink;
 
-	 SIG_Vector helpPredXAxis = predXAxis;
+		SIG_Vector predecessorsInitialPosition;
+		SIG_Matrix predecessorsInitialRotation;
 
-	 screwRotationMatrix.times( &helpPredXAxis, &predXAxis );
+		predecessor->getInitialLocation( predecessorsInitialPosition,
+		                                 predecessorsInitialRotation );
 
-	 // The predecessor's X-Axis and the successors Z-Axis must not
-	 // be parallel!
+		SIG_Vector predOrigin = predecessorsInitialPosition;
 
-	 SIG_Vector predXSuccZNormal;
-	 predXAxis.crossprod( &succZAxis, &predXSuccZNormal );
-	 predXSuccZNormal.normalize();
+		SIG_Vector successorsInitialPosition;
+		SIG_Matrix successorsInitialRotation;
 
-	 SIG_Vector cut;
+		successor->getInitialLocation( successorsInitialPosition,
+		                               successorsInitialRotation );
 
-	 calculateCut( succOrigin,
-		       succZAxis,
-		       predXSuccZNormal,
-		       predOrigin,
-		       predXAxis,
-		       cut );
-
-	 SIG_Vector h = cut;
-	 h.minusis( &predOrigin );
-
-#ifdef SIG_DEBUG
-	 SIGEL_Tools::SIG_IO::cerr << "succOrigin: ";
-	 for (int i=0; i<3; i++)
-	   SIGEL_Tools::SIG_IO::cerr << " " << succOrigin.get( i );
-	 SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-
-	 SIGEL_Tools::SIG_IO::cerr << "succZAxis: ";
-	 for (int i=0; i<3; i++)
-	   SIGEL_Tools::SIG_IO::cerr << " " << succZAxis.get( i );
-	 SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-
-	 SIGEL_Tools::SIG_IO::cerr << "predXSuccZNormal: ";
-	 for (int i=0; i<3; i++)
-	   SIGEL_Tools::SIG_IO::cerr << " " << predXSuccZNormal.get( i );
-	 SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-
-	 SIGEL_Tools::SIG_IO::cerr << "predOrigin: ";
-	 for (int i=0; i<3; i++)
-	   SIGEL_Tools::SIG_IO::cerr << " " << predOrigin.get( i );
-	 SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-
-	 SIGEL_Tools::SIG_IO::cerr << "predXAxis: ";
-	 for (int i=0; i<3; i++)
-	   SIGEL_Tools::SIG_IO::cerr << " " << predXAxis.get( i );
-	 SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-
-	 SIGEL_Tools::SIG_IO::cerr << "Cut: ";
-	 for (int i=0; i<3; i++)
-	   SIGEL_Tools::SIG_IO::cerr << " " << cut.get( i );
-	 SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-#endif
-
-	 mdh_a = h.norm();
+		SIG_Vector succOrigin = successorsInitialPosition;
 
 #ifdef SIG_DEBUG
-	 SIGEL_Tools::SIG_IO::cerr << "predZAxis:";
-	 for (int i=0; i<3; i++)
-	   SIGEL_Tools::SIG_IO::cerr << " " << predZAxis.get( i );
-	 SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-
-	 SIGEL_Tools::SIG_IO::cerr << "succZAxis:";
-	 for (int i=0; i<3; i++)
-	   SIGEL_Tools::SIG_IO::cerr << " " << succZAxis.get( i );
-	 SIGEL_Tools::SIG_IO::cerr << Qt::endl;
+		SIGEL_Tools::SIG_IO::cerr << "Initial rotation of link "
+		                          << successor->getName()
+		                          << ":" << Qt::endl;
+		for (int i=0; i<3; i++)
+		{
+			for (int j=0; j<3; j++)
+				SIGEL_Tools::SIG_IO::cerr << successorsInitialRotation.get( i, j ) << " ";
+			SIGEL_Tools::SIG_IO::cerr << Qt::endl;
+		};
 #endif
 
-	 mdh_alpha = tolerantACos( predZAxis.inprod( &succZAxis ) );
+		SIG_Vector predXAxis = predecessorsInitialRotation.c0;
+		SIG_Vector predZAxis = predecessorsInitialRotation.c2;
 
-	 double const maximalParallelityMeasure = 0.00001;
+		SIG_Vector succXAxis = successorsInitialRotation.c0;
+		SIG_Vector succYAxis = successorsInitialRotation.c1;
+		SIG_Vector succZAxis = successorsInitialRotation.c2;
 
-	 SIG_Vector rotationDir = h;
-	 rotationDir.normalize();
+		SIG_Vector screwTranslationVector = predZAxis;
+		screwTranslationVector.timesis( mdh_screw_d );
 
-	 SIG_Vector zzNormalVector;
-	 predZAxis.crossprod( &succZAxis, &zzNormalVector );
+		predOrigin.plusis( &screwTranslationVector );
 
-	 if (zzNormalVector.norm() > maximalParallelityMeasure)
-	   {
-	     zzNormalVector.normalize();
+		SIG_Matrix screwRotationMatrix = rotationMatrix( predZAxis,
+		                                                mdh_screw_theta );
 
-	     if (rotationDir.inprod( &zzNormalVector ) < 0)
-		 mdh_alpha = 2 * std::numbers::pi - mdh_alpha;
-	   };
+		SIG_Vector helpPredXAxis = predXAxis;
 
-	 SIG_Vector distanceVector = succOrigin;
+		screwRotationMatrix.times( &helpPredXAxis, &predXAxis );
 
-	 distanceVector.minusis( &cut );
+		// The predecessor's X-Axis and the successors Z-Axis must not
+		// be parallel!
 
-	 mdh_d = distanceVector.norm();
+		SIG_Vector predXSuccZNormal;
+		predXAxis.crossprod( &succZAxis, &predXSuccZNormal );
+		predXSuccZNormal.normalize();
 
-	 double const minimalDistanceMeasure = 0.00001;
+		SIG_Vector cut;
 
-	 if (mdh_d > minimalDistanceMeasure)
-	   {
-	     distanceVector.normalize();
+		calculateCut( succOrigin,
+		              succZAxis,
+		              predXSuccZNormal,
+		              predOrigin,
+		              predXAxis,
+		              cut );
 
-	     if (distanceVector.inprod( &succZAxis ) < 0)
-	       mdh_d *= -1;
-	   };
+		SIG_Vector h = cut;
+		h.minusis( &predOrigin );
 
 #ifdef SIG_DEBUG
-	 SIGEL_Tools::SIG_IO::cerr << "Predecessor's X-Axis:";
-	 for (int i=0; i<3; i++)
-	   SIGEL_Tools::SIG_IO::cerr << " " << predXAxis.get( i );
-	 SIGEL_Tools::SIG_IO::cerr << Qt::endl;
+		SIGEL_Tools::SIG_IO::cerr << "succOrigin: ";
+		for (int i=0; i<3; i++)
+			SIGEL_Tools::SIG_IO::cerr << " " << succOrigin.get( i );
+		SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 
-	 SIGEL_Tools::SIG_IO::cerr << "Successor's X-Axis:";
-	 for (int i=0; i<3; i++)
-	   SIGEL_Tools::SIG_IO::cerr << " " << succXAxis.get( i );
-	 SIGEL_Tools::SIG_IO::cerr << Qt::endl;
+		SIGEL_Tools::SIG_IO::cerr << "succZAxis: ";
+		for (int i=0; i<3; i++)
+			SIGEL_Tools::SIG_IO::cerr << " " << succZAxis.get( i );
+		SIGEL_Tools::SIG_IO::cerr << Qt::endl;
+
+		SIGEL_Tools::SIG_IO::cerr << "predXSuccZNormal: ";
+		for (int i=0; i<3; i++)
+			SIGEL_Tools::SIG_IO::cerr << " " << predXSuccZNormal.get( i );
+		SIGEL_Tools::SIG_IO::cerr << Qt::endl;
+
+		SIGEL_Tools::SIG_IO::cerr << "predOrigin: ";
+		for (int i=0; i<3; i++)
+			SIGEL_Tools::SIG_IO::cerr << " " << predOrigin.get( i );
+		SIGEL_Tools::SIG_IO::cerr << Qt::endl;
+
+		SIGEL_Tools::SIG_IO::cerr << "predXAxis: ";
+		for (int i=0; i<3; i++)
+			SIGEL_Tools::SIG_IO::cerr << " " << predXAxis.get( i );
+		SIGEL_Tools::SIG_IO::cerr << Qt::endl;
+
+		SIGEL_Tools::SIG_IO::cerr << "Cut: ";
+		for (int i=0; i<3; i++)
+			SIGEL_Tools::SIG_IO::cerr << " " << cut.get( i );
+		SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 #endif
 
-	 mdh_theta = tolerantACos( predXAxis.inprod( &succXAxis ) );
-
-	 rotationDir = succZAxis;
-
-	 SIG_Vector xxNormalVector;
-	 predXAxis.crossprod( &succXAxis, &xxNormalVector );
-
-	 if (xxNormalVector.norm() > maximalParallelityMeasure)
-	   {
-	     xxNormalVector.normalize();
-
-	     if (rotationDir.inprod( &xxNormalVector) < 0)
-	       mdh_theta = 2 * std::numbers::pi - mdh_theta;
-	   };
-
-	 switch (getJointType())
-	   {
-	   case tTranslationalJoint:
-	     {
-	       SIG_TranslationalJoint *translationalJoint = static_cast< SIG_TranslationalJoint* >(this);
-
-	       if (translationalJoint->getMax()==translationalJoint->getMin())
-		 {
-		   mechsMinPos = mechsMaxPos = 0;
-		 }
-	       else
-		 {
-		   SIG_Vector localPredBase;
-		   SIG_Vector localSuccBase;
-
-		   double sigelMin;
-		   double sigelMax;
-
-		   if (mdh_predecessor_is_left==1)
-		     {
-		       localPredBase = translationalJoint->getLeftBase();
-		       localSuccBase = translationalJoint->getRightBase();
-
-		       sigelMin = translationalJoint->getMin();
-		       sigelMax = translationalJoint->getMax();
-		     }
-		   else
-		     {
-		       localPredBase = translationalJoint->getRightBase();
-		       localSuccBase = translationalJoint->getLeftBase();
-
-		       sigelMin = - translationalJoint->getMax();
-		       sigelMax = - translationalJoint->getMin();
-		     };
-
-		   SIG_Vector predBase;
-		   SIG_Vector succBase;
-
-		   predecessorsInitialRotation.times( &localPredBase, &predBase );
-		   predBase.plusis( &predecessorsInitialPosition );
-
-		   successorsInitialRotation.times( &localSuccBase, &succBase );
-		   succBase.plusis( &successorsInitialPosition );
-
-		   SIG_Vector predBaseOffset = cut;
-		   predBaseOffset.minusis( &predBase );
-
-		   SIG_Vector succBaseOffset = succOrigin;
-		   succBaseOffset.minusis( &succBase );
-
-		   double b = predBaseOffset.norm();
-
-		   if (b > minimalDistanceMeasure)
-		     {
-		       predBaseOffset.normalize();
-
-		       if (succZAxis.inprod( &predBaseOffset ) < 0)
-			 b *= -1;
-		     };
-
-		   double c = succBaseOffset.norm();
-
-		   if (c > minimalDistanceMeasure)
-		     {
-		       succBaseOffset.normalize();
-
-		       if (succZAxis.inprod( &succBaseOffset ) < 0)
-			 c *= -1;
-		     };
-
-		   mechsMinPos = sigelMin - b + c;
-		   mechsMaxPos = sigelMax - b + c;
-		 };
-	     };
-	     break;
-	   case tRotationalJoint:
-	     {
-	       SIG_RotationalJoint *rotationalJoint = static_cast< SIG_RotationalJoint* >(this);
-
-
-	       if (rotationalJoint->getMax()==rotationalJoint->getMin())
-		 {
-		   mechsMinPos = mechsMaxPos = 0;
-		 }
-	       else
-		 {
-
-		   SIG_Vector localPredHand;
-		   SIG_Vector localSuccHand;
-
-		   double sigelMax;
-		   double sigelMin;
-
-		   if (mdh_predecessor_is_left==1)
-		     {
-		       localPredHand = rotationalJoint->getLeftHand();
-		       localSuccHand = rotationalJoint->getRightHand();
-
-		       sigelMin = rotationalJoint->getMin();
-		       sigelMax = rotationalJoint->getMax();
-		     }
-		   else
-		     {
-		       localPredHand = rotationalJoint->getRightHand();
-		       localSuccHand = rotationalJoint->getLeftHand();
-
-		       sigelMin = - rotationalJoint->getMax();
-		       sigelMax = - rotationalJoint->getMin();
-		     };
-
-		   SIG_Vector predHand;
-		   SIG_Vector succHand;
-
-		   predecessorsInitialRotation.times( &localPredHand, &predHand );
-		   predHand.plusis( &predecessorsInitialPosition );
-
-		   successorsInitialRotation.times( &localSuccHand, &succHand );
-		   succHand.plusis( &successorsInitialPosition );
-
-		   SIG_Vector predHandProjected;
-
-		   calculateCut( succOrigin,
-				 succXAxis,
-				 succYAxis,
-				 predHand,
-				 succZAxis,
-				 predHandProjected );
-
-		   SIG_Vector predHandProjectedDir = predHandProjected;
-		   predHandProjectedDir.minusis( &succOrigin );
-		   predHandProjectedDir.normalize();
-
-		   SIG_Vector succHandProjected;
-
-		   calculateCut( succOrigin,
-				 succXAxis,
-				 succYAxis,
-				 succHand,
-				 succZAxis,
-				 succHandProjected );
-
-		   SIG_Vector succHandProjectedDir = succHandProjected;
-		   succHandProjectedDir.minusis( &succOrigin );
-		   succHandProjectedDir.normalize();
+		mdh_a = h.norm();
 
 #ifdef SIG_DEBUG
-		   SIGEL_Tools::SIG_IO::cerr << "predHand:";
-		   for (int i=0; i<3; i++)
-		     SIGEL_Tools::SIG_IO::cerr << " " << predHand.get( i );
-		   SIGEL_Tools::SIG_IO::cerr << Qt::endl;
+		SIGEL_Tools::SIG_IO::cerr << "predZAxis:";
+		for (int i=0; i<3; i++)
+			SIGEL_Tools::SIG_IO::cerr << " " << predZAxis.get( i );
+		SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 
-		   SIGEL_Tools::SIG_IO::cerr << "predHandProjected:";
-		   for (int i=0; i<3; i++)
-		     SIGEL_Tools::SIG_IO::cerr << " " << predHandProjected.get( i );
-		   SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-
-		   SIGEL_Tools::SIG_IO::cerr << "predHandProjectedDir:";
-		   for (int i=0; i<3; i++)
-		     SIGEL_Tools::SIG_IO::cerr << " " << predHandProjectedDir.get( i );
-		   SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-
-		   SIGEL_Tools::SIG_IO::cerr << "Predecessors X-Axis:";
-		   for (int i=0; i<3; i++)
-		     SIGEL_Tools::SIG_IO::cerr << " " << predXAxis.get( i );
-		   SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-
-		   SIGEL_Tools::SIG_IO::cerr << "succHand:";
-		   for (int i=0; i<3; i++)
-		     SIGEL_Tools::SIG_IO::cerr << " " << succHand.get( i );
-		   SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-
-		   SIGEL_Tools::SIG_IO::cerr << "succHandProjected:";
-		   for (int i=0; i<3; i++)
-		     SIGEL_Tools::SIG_IO::cerr << " " << succHandProjected.get( i );
-		   SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-
-		   SIGEL_Tools::SIG_IO::cerr << "succHandProjectedDir:";
-		   for (int i=0; i<3; i++)
-		     SIGEL_Tools::SIG_IO::cerr << " " << succHandProjectedDir.get( i );
-		   SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-
-		   SIGEL_Tools::SIG_IO::cerr << "Successor's X-Axis:";
-		   for (int i=0; i<3; i++)
-		     SIGEL_Tools::SIG_IO::cerr << " " << succXAxis.get( i );
-		   SIGEL_Tools::SIG_IO::cerr << Qt::endl;
+		SIGEL_Tools::SIG_IO::cerr << "succZAxis:";
+		for (int i=0; i<3; i++)
+			SIGEL_Tools::SIG_IO::cerr << " " << succZAxis.get( i );
+		SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 #endif
 
-		   double beta = tolerantACos( predHandProjectedDir.inprod( &predXAxis ) );
+		mdh_alpha = tolerantACos( predZAxis.inprod( &succZAxis ) );
 
-		   rotationDir = succZAxis;
+		double const maximalParallelityMeasure = 0.00001;
 
-		   SIG_Vector predHandProjectedDirPredXAxisNormalVector;
-		   predHandProjectedDir.crossprod( &predXAxis, &predHandProjectedDirPredXAxisNormalVector );
+		SIG_Vector rotationDir = h;
+		rotationDir.normalize();
 
-		   if (predHandProjectedDirPredXAxisNormalVector.norm() > maximalParallelityMeasure)
-		     {
-		       predHandProjectedDirPredXAxisNormalVector.normalize();
+		SIG_Vector zzNormalVector;
+		predZAxis.crossprod( &succZAxis, &zzNormalVector );
 
-		       if (rotationDir.inprod( &predHandProjectedDirPredXAxisNormalVector ) < 0)
-			 beta = (2 * std::numbers::pi) - beta;
-		     };
+		if (zzNormalVector.norm() > maximalParallelityMeasure)
+		{
+			zzNormalVector.normalize();
 
-		   double gamma = tolerantACos( succHandProjectedDir.inprod( &succXAxis ) );
+			if (rotationDir.inprod( &zzNormalVector ) < 0)
+				mdh_alpha = 2 * std::numbers::pi - mdh_alpha;
+		};
 
-		   SIG_Vector succHandProjectedDirSuccXAxisNormalVector;
-		   succHandProjectedDir.crossprod( &succXAxis, &succHandProjectedDirSuccXAxisNormalVector );
+		SIG_Vector distanceVector = succOrigin;
 
-		   if (succHandProjectedDirSuccXAxisNormalVector.norm() > maximalParallelityMeasure)
-		     {
-		       succHandProjectedDirSuccXAxisNormalVector.normalize();
+		distanceVector.minusis( &cut );
 
-		       if (rotationDir.inprod( &succHandProjectedDirSuccXAxisNormalVector ) < 0)
-			 gamma = (2 * std::numbers::pi) - gamma;
-		     };
+		mdh_d = distanceVector.norm();
 
-		   if (rotationalJoint->getMax()==rotationalJoint->getMin())
-		     {
-		       mechsMinPos = mechsMaxPos = 0;
-		     }
-		   else
-		     {
-		       if (sigelMax < 0)
-			 sigelMax += 360;
-		       else if (sigelMax >= 360)
-			 sigelMax -= 360;
+		double const minimalDistanceMeasure = 0.00001;
 
-		       if (sigelMin < 0)
-			 sigelMin += 360;
-		       else if (sigelMin >= 360)
-			 sigelMin -= 360;
+		if (mdh_d > minimalDistanceMeasure)
+		{
+			distanceVector.normalize();
+
+			if (distanceVector.inprod( &succZAxis ) < 0)
+				mdh_d *= -1;
+		};
 
 #ifdef SIG_DEBUG
-		       SIGEL_Tools::SIG_IO::cerr << "sigelMax: "
-						 << sigelMax
-						 << ", sigelMin: "
-						 << sigelMin
-						 << Qt::endl;
+		SIGEL_Tools::SIG_IO::cerr << "Predecessor's X-Axis:";
+		for (int i=0; i<3; i++)
+			SIGEL_Tools::SIG_IO::cerr << " " << predXAxis.get( i );
+		SIGEL_Tools::SIG_IO::cerr << Qt::endl;
+
+		SIGEL_Tools::SIG_IO::cerr << "Successor's X-Axis:";
+		for (int i=0; i<3; i++)
+			SIGEL_Tools::SIG_IO::cerr << " " << succXAxis.get( i );
+		SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 #endif
 
-		       mechsMinPos = (2 * std::numbers::pi) - ( (sigelMax / 360) * 2 * std::numbers::pi );
-		       mechsMaxPos = (2 * std::numbers::pi) - ( (sigelMin / 360) * 2 * std::numbers::pi );
+		mdh_theta = tolerantACos( predXAxis.inprod( &succXAxis ) );
+
+		rotationDir = succZAxis;
+
+		SIG_Vector xxNormalVector;
+		predXAxis.crossprod( &succXAxis, &xxNormalVector );
+
+		if (xxNormalVector.norm() > maximalParallelityMeasure)
+		{
+			xxNormalVector.normalize();
+
+			if (rotationDir.inprod( &xxNormalVector) < 0)
+				mdh_theta = 2 * std::numbers::pi - mdh_theta;
+		};
+
+		switch (getJointType())
+		{
+		case tTranslationalJoint:
+		{
+			SIG_TranslationalJoint *translationalJoint = static_cast< SIG_TranslationalJoint* >(this);
+
+			if (translationalJoint->getMax()==translationalJoint->getMin())
+			{
+				mechsMinPos = mechsMaxPos = 0;
+			}
+			else
+			{
+				SIG_Vector localPredBase;
+				SIG_Vector localSuccBase;
+
+				double sigelMin;
+				double sigelMax;
+
+				if (mdh_predecessor_is_left==1)
+				{
+					localPredBase = translationalJoint->getLeftBase();
+					localSuccBase = translationalJoint->getRightBase();
+
+					sigelMin = translationalJoint->getMin();
+					sigelMax = translationalJoint->getMax();
+				}
+				else
+				{
+					localPredBase = translationalJoint->getRightBase();
+					localSuccBase = translationalJoint->getLeftBase();
+
+					sigelMin = - translationalJoint->getMax();
+					sigelMax = - translationalJoint->getMin();
+				};
+
+				SIG_Vector predBase;
+				SIG_Vector succBase;
+
+				predecessorsInitialRotation.times( &localPredBase, &predBase );
+				predBase.plusis( &predecessorsInitialPosition );
+
+				successorsInitialRotation.times( &localSuccBase, &succBase );
+				succBase.plusis( &successorsInitialPosition );
+
+				SIG_Vector predBaseOffset = cut;
+				predBaseOffset.minusis( &predBase );
+
+				SIG_Vector succBaseOffset = succOrigin;
+				succBaseOffset.minusis( &succBase );
+
+				double b = predBaseOffset.norm();
+
+				if (b > minimalDistanceMeasure)
+				{
+					predBaseOffset.normalize();
+
+					if (succZAxis.inprod( &predBaseOffset ) < 0)
+						b *= -1;
+				};
+
+				double c = succBaseOffset.norm();
+
+				if (c > minimalDistanceMeasure)
+				{
+					succBaseOffset.normalize();
+
+					if (succZAxis.inprod( &succBaseOffset ) < 0)
+						c *= -1;
+				};
+
+				mechsMinPos = sigelMin - b + c;
+				mechsMaxPos = sigelMax - b + c;
+			};
+		};
+		break;
+		case tRotationalJoint:
+		{
+			SIG_RotationalJoint *rotationalJoint = static_cast< SIG_RotationalJoint* >(this);
+
+
+			if (rotationalJoint->getMax()==rotationalJoint->getMin())
+			{
+				mechsMinPos = mechsMaxPos = 0;
+			}
+			else
+			{
+
+				SIG_Vector localPredHand;
+				SIG_Vector localSuccHand;
+
+				double sigelMax;
+				double sigelMin;
+
+				if (mdh_predecessor_is_left==1)
+				{
+					localPredHand = rotationalJoint->getLeftHand();
+					localSuccHand = rotationalJoint->getRightHand();
+
+					sigelMin = rotationalJoint->getMin();
+					sigelMax = rotationalJoint->getMax();
+				}
+				else
+				{
+					localPredHand = rotationalJoint->getRightHand();
+					localSuccHand = rotationalJoint->getLeftHand();
+
+					sigelMin = - rotationalJoint->getMax();
+					sigelMax = - rotationalJoint->getMin();
+				};
+
+				SIG_Vector predHand;
+				SIG_Vector succHand;
+
+				predecessorsInitialRotation.times( &localPredHand, &predHand );
+				predHand.plusis( &predecessorsInitialPosition );
+
+				successorsInitialRotation.times( &localSuccHand, &succHand );
+				succHand.plusis( &successorsInitialPosition );
+
+				SIG_Vector predHandProjected;
+
+				calculateCut( succOrigin,
+				              succXAxis,
+				              succYAxis,
+				              predHand,
+				              succZAxis,
+				              predHandProjected );
+
+				SIG_Vector predHandProjectedDir = predHandProjected;
+				predHandProjectedDir.minusis( &succOrigin );
+				predHandProjectedDir.normalize();
+
+				SIG_Vector succHandProjected;
+
+				calculateCut( succOrigin,
+				              succXAxis,
+				              succYAxis,
+				              succHand,
+				              succZAxis,
+				              succHandProjected );
+
+				SIG_Vector succHandProjectedDir = succHandProjected;
+				succHandProjectedDir.minusis( &succOrigin );
+				succHandProjectedDir.normalize();
 
 #ifdef SIG_DEBUG
-		       SIGEL_Tools::SIG_IO::cerr << "mechsMinPos: "
-						 << mechsMinPos
-						 << ", mechsMaxPos: "
-						 << mechsMaxPos
-						 << "\n"
-						 << "beta: "
-						 << beta
-						 << Qt::endl;
+				SIGEL_Tools::SIG_IO::cerr << "predHand:";
+				for (int i=0; i<3; i++)
+					SIGEL_Tools::SIG_IO::cerr << " " << predHand.get( i );
+				SIGEL_Tools::SIG_IO::cerr << Qt::endl;
+
+				SIGEL_Tools::SIG_IO::cerr << "predHandProjected:";
+				for (int i=0; i<3; i++)
+					SIGEL_Tools::SIG_IO::cerr << " " << predHandProjected.get( i );
+				SIGEL_Tools::SIG_IO::cerr << Qt::endl;
+
+				SIGEL_Tools::SIG_IO::cerr << "predHandProjectedDir:";
+				for (int i=0; i<3; i++)
+					SIGEL_Tools::SIG_IO::cerr << " " << predHandProjectedDir.get( i );
+				SIGEL_Tools::SIG_IO::cerr << Qt::endl;
+
+				SIGEL_Tools::SIG_IO::cerr << "Predecessors X-Axis:";
+				for (int i=0; i<3; i++)
+					SIGEL_Tools::SIG_IO::cerr << " " << predXAxis.get( i );
+				SIGEL_Tools::SIG_IO::cerr << Qt::endl;
+
+				SIGEL_Tools::SIG_IO::cerr << "succHand:";
+				for (int i=0; i<3; i++)
+					SIGEL_Tools::SIG_IO::cerr << " " << succHand.get( i );
+				SIGEL_Tools::SIG_IO::cerr << Qt::endl;
+
+				SIGEL_Tools::SIG_IO::cerr << "succHandProjected:";
+				for (int i=0; i<3; i++)
+					SIGEL_Tools::SIG_IO::cerr << " " << succHandProjected.get( i );
+				SIGEL_Tools::SIG_IO::cerr << Qt::endl;
+
+				SIGEL_Tools::SIG_IO::cerr << "succHandProjectedDir:";
+				for (int i=0; i<3; i++)
+					SIGEL_Tools::SIG_IO::cerr << " " << succHandProjectedDir.get( i );
+				SIGEL_Tools::SIG_IO::cerr << Qt::endl;
+
+				SIGEL_Tools::SIG_IO::cerr << "Successor's X-Axis:";
+				for (int i=0; i<3; i++)
+					SIGEL_Tools::SIG_IO::cerr << " " << succXAxis.get( i );
+				SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 #endif
 
-		       mechsMinPos -= beta;
-		       mechsMaxPos -= beta;
+				double beta = tolerantACos( predHandProjectedDir.inprod( &predXAxis ) );
+
+				rotationDir = succZAxis;
+
+				SIG_Vector predHandProjectedDirPredXAxisNormalVector;
+				predHandProjectedDir.crossprod( &predXAxis, &predHandProjectedDirPredXAxisNormalVector );
+
+				if (predHandProjectedDirPredXAxisNormalVector.norm() > maximalParallelityMeasure)
+				{
+					predHandProjectedDirPredXAxisNormalVector.normalize();
+
+					if (rotationDir.inprod( &predHandProjectedDirPredXAxisNormalVector ) < 0)
+						beta = (2 * std::numbers::pi) - beta;
+				};
+
+				double gamma = tolerantACos( succHandProjectedDir.inprod( &succXAxis ) );
+
+				SIG_Vector succHandProjectedDirSuccXAxisNormalVector;
+				succHandProjectedDir.crossprod( &succXAxis, &succHandProjectedDirSuccXAxisNormalVector );
+
+				if (succHandProjectedDirSuccXAxisNormalVector.norm() > maximalParallelityMeasure)
+				{
+					succHandProjectedDirSuccXAxisNormalVector.normalize();
+
+					if (rotationDir.inprod( &succHandProjectedDirSuccXAxisNormalVector ) < 0)
+						gamma = (2 * std::numbers::pi) - gamma;
+				};
+
+				if (rotationalJoint->getMax()==rotationalJoint->getMin())
+				{
+					mechsMinPos = mechsMaxPos = 0;
+				}
+				else
+				{
+					if (sigelMax < 0)
+						sigelMax += 360;
+					else if (sigelMax >= 360)
+						sigelMax -= 360;
+
+					if (sigelMin < 0)
+						sigelMin += 360;
+					else if (sigelMin >= 360)
+						sigelMin -= 360;
 
 #ifdef SIG_DEBUG
-		       SIGEL_Tools::SIG_IO::cerr << "New mechsMinPos: "
-						 << mechsMinPos
-						 << ", new mechsMaxPos: "
-						 << mechsMaxPos
-						 << Qt::endl;
+					SIGEL_Tools::SIG_IO::cerr << "sigelMax: "
+					                          << sigelMax
+					                          << ", sigelMin: "
+					                          << sigelMin
+					                          << Qt::endl;
 #endif
 
-		       mechsMinPos = normalizeRadAngle( mechsMinPos );
-		       mechsMaxPos = normalizeRadAngle( mechsMaxPos );
+					mechsMinPos = (2 * std::numbers::pi) - ( (sigelMax / 360) * 2 * std::numbers::pi );
+					mechsMaxPos = (2 * std::numbers::pi) - ( (sigelMin / 360) * 2 * std::numbers::pi );
 
 #ifdef SIG_DEBUG
-		       SIGEL_Tools::SIG_IO::cerr << "New mechsMinPos: "
-						 << mechsMinPos
-						 << ", new mechsMaxPos: "
-						 << mechsMaxPos
-						 << "\n"
-						 << "gamma: "
-						 << gamma
-						 << Qt::endl;
+					SIGEL_Tools::SIG_IO::cerr << "mechsMinPos: "
+					                          << mechsMinPos
+					                          << ", mechsMaxPos: "
+					                          << mechsMaxPos
+					                          << "\n"
+					                          << "beta: "
+					                          << beta
+					                          << Qt::endl;
 #endif
 
-		       mechsMinPos += gamma;
-		       mechsMaxPos += gamma;
+					mechsMinPos -= beta;
+					mechsMaxPos -= beta;
 
 #ifdef SIG_DEBUG
-		       SIGEL_Tools::SIG_IO::cerr << "New mechsMinPos: "
-						 << mechsMinPos
-						 << ", new mechsMaxPos: "
-						 << mechsMaxPos
-						 << Qt::endl;
+					SIGEL_Tools::SIG_IO::cerr << "New mechsMinPos: "
+					                          << mechsMinPos
+					                          << ", new mechsMaxPos: "
+					                          << mechsMaxPos
+					                          << Qt::endl;
 #endif
 
-		       mechsMinPos = normalizeRadAngle( mechsMinPos );
-		       mechsMaxPos = normalizeRadAngle( mechsMaxPos );
+					mechsMinPos = normalizeRadAngle( mechsMinPos );
+					mechsMaxPos = normalizeRadAngle( mechsMaxPos );
 
 #ifdef SIG_DEBUG
-		       SIGEL_Tools::SIG_IO::cerr << "New mechsMinPos: "
-						 << mechsMinPos
-						 << ", new mechsMaxPos: "
-						 << mechsMaxPos
-						 << Qt::endl;
+					SIGEL_Tools::SIG_IO::cerr << "New mechsMinPos: "
+					                          << mechsMinPos
+					                          << ", new mechsMaxPos: "
+					                          << mechsMaxPos
+					                          << "\n"
+					                          << "gamma: "
+					                          << gamma
+					                          << Qt::endl;
 #endif
 
-		       double const minimalAngleDistance = 0.00001;
-
-		       if ( std::abs( mdh_theta - mechsMinPos ) <= minimalAngleDistance ){
-			 mdh_theta = mechsMinPos; }
-		       else if ( std::abs( mdh_theta - mechsMaxPos ) <= minimalAngleDistance ){
-			 mdh_theta = mechsMaxPos;}
-
-		       if ( mechsMaxPos < mechsMinPos ) {
-			 if ( mdh_theta <= mechsMaxPos )
-			   mechsMinPos -= 2 * std::numbers::pi;
-			 else
-			   mechsMaxPos += 2 * std::numbers::pi;
-		       }
+					mechsMinPos += gamma;
+					mechsMaxPos += gamma;
 
 #ifdef SIG_DEBUG
-		       SIGEL_Tools::SIG_IO::cerr << "New mechsMinPos: "
-						 << mechsMinPos
-						 << ", new mechsMaxPos: "
-						 << mechsMaxPos
-						 << Qt::endl;
+					SIGEL_Tools::SIG_IO::cerr << "New mechsMinPos: "
+					                          << mechsMinPos
+					                          << ", new mechsMaxPos: "
+					                          << mechsMaxPos
+					                          << Qt::endl;
 #endif
-		     };
-		 };
-	     };
-	     break;
-	   };
 
-	 const QList< SIG_Joint * > joints = successor->getJoints();
+					mechsMinPos = normalizeRadAngle( mechsMinPos );
+					mechsMaxPos = normalizeRadAngle( mechsMaxPos );
 
-	 for (SIG_Joint *actJoint : joints)
-	   actJoint->calculateMDH( successor );
-       };
+#ifdef SIG_DEBUG
+					SIGEL_Tools::SIG_IO::cerr << "New mechsMinPos: "
+					                          << mechsMinPos
+					                          << ", new mechsMaxPos: "
+					                          << mechsMaxPos
+					                          << Qt::endl;
+#endif
 
-       void SIG_Joint::calculateCut( SIG_Vector a,
-				     SIG_Vector u,
-				     SIG_Vector v,
-				     SIG_Vector b,
-				     SIG_Vector w,
-				     SIG_Vector &cut )
-       {
-	 NEWMAT::Matrix linEqSystem( 3, 3 );
+					double const minimalAngleDistance = 0.00001;
 
-	 linEqSystem.Column( 1 ) = SIG_TypeConverter::toColumnVector( u );
-	 linEqSystem.Column( 2 ) = SIG_TypeConverter::toColumnVector( v );
-	 linEqSystem.Column( 3 ) = SIG_TypeConverter::toColumnVector( w ) * -1;
+					if ( std::abs( mdh_theta - mechsMinPos ) <= minimalAngleDistance ){
+						mdh_theta = mechsMinPos; }
+					else if ( std::abs( mdh_theta - mechsMaxPos ) <= minimalAngleDistance ){
+						mdh_theta = mechsMaxPos;}
 
-	 NEWMAT::ColumnVector rightSide =   SIG_TypeConverter::toColumnVector( b )
-	                                  - SIG_TypeConverter::toColumnVector( a );
+					if ( mechsMaxPos < mechsMinPos ) {
+						if ( mdh_theta <= mechsMaxPos )
+							mechsMinPos -= 2 * std::numbers::pi;
+						else
+							mechsMaxPos += 2 * std::numbers::pi;
+					}
 
-	 NEWMAT::ColumnVector solution = linEqSystem.i() * rightSide;
+#ifdef SIG_DEBUG
+					SIGEL_Tools::SIG_IO::cerr << "New mechsMinPos: "
+					                          << mechsMinPos
+					                          << ", new mechsMaxPos: "
+					                          << mechsMaxPos
+					                          << Qt::endl;
+#endif
+				};
+			};
+		};
+		break;
+		};
 
-	 cut = w;
-	 cut.timesis( solution( 3 ) );
-	 cut.plusis( &b );
-       };
+		const QList< SIG_Joint * > joints = successor->getJoints();
 
-       double SIG_Joint::normalizeRadAngle( double input )
-       {
-	 if (input < 0)
-	   return input + (2 * std::numbers::pi);
-	 else if (input >= (2*std::numbers::pi))
-	   return input - (2 * std::numbers::pi);
+		for (SIG_Joint *actJoint : joints)
+			actJoint->calculateMDH( successor );
+	};
 
-	 return input;
-       };
+	void SIG_Joint::calculateCut( SIG_Vector a,
+	                              SIG_Vector u,
+	                              SIG_Vector v,
+	                              SIG_Vector b,
+	                              SIG_Vector w,
+	                              SIG_Vector &cut )
+	{
+		NEWMAT::Matrix linEqSystem( 3, 3 );
+
+		linEqSystem.Column( 1 ) = SIG_TypeConverter::toColumnVector( u );
+		linEqSystem.Column( 2 ) = SIG_TypeConverter::toColumnVector( v );
+		linEqSystem.Column( 3 ) = SIG_TypeConverter::toColumnVector( w ) * -1;
+
+		NEWMAT::ColumnVector rightSide =   SIG_TypeConverter::toColumnVector( b )
+		                                 - SIG_TypeConverter::toColumnVector( a );
+
+		NEWMAT::ColumnVector solution = linEqSystem.i() * rightSide;
+
+		cut = w;
+		cut.timesis( solution( 3 ) );
+		cut.plusis( &b );
+	};
+
+	double SIG_Joint::normalizeRadAngle( double input )
+	{
+		if (input < 0)
+			return input + (2 * std::numbers::pi);
+		else if (input >= (2*std::numbers::pi))
+			return input - (2 * std::numbers::pi);
+
+		return input;
+	};
 }
