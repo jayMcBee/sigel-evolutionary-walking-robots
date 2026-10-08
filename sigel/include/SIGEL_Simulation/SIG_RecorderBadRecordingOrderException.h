@@ -27,6 +27,7 @@
 
 namespace SIGEL_Simulation
 {
+
   /**
    * The SIG_Recorder throws this method if the methods
    * init, record and finish are called in a bad order.
@@ -53,7 +54,6 @@ namespace SIGEL_Simulation
 					     int line,
 					     QString message,
 					     SIGEL_Tools::SIG_Exception const& prevException);
-
     };
 
 }

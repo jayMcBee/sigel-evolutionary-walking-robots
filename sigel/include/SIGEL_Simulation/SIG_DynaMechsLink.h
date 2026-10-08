@@ -33,13 +33,11 @@
 #include <dmContactModel.hpp>
 #include <dmZScrewTxLink.hpp>
 
-
 namespace SIGEL_Simulation
 {
 
 class SIG_DynaMechsLink
   {
-
   public:
 
     SIG_DynaMechsLink( int dynaMechsLinkNumber,
@@ -61,7 +59,6 @@ class SIG_DynaMechsLink
     void forwardKinematics( SIG_DynaMechsLink *caller );
 
     dmZScrewTxLink *getScrewLink() const { return screwLink.get(); }
-
 
   private:
 

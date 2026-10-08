@@ -32,7 +32,6 @@
 #include <math.h>
 #include <cmath>
 
-
 namespace SIGEL_Simulation
 {
 
@@ -44,7 +43,6 @@ namespace SIGEL_Simulation
    */
   class SIG_EarlyRunTermSimulation : public SIG_Simulation
   {
-
     public:
       /**
        * The constructor of SIG_EarlyRunTermSimulation
@@ -90,7 +88,6 @@ namespace SIGEL_Simulation
        protected:
         SIG_Vector normalizeRobotPosition( SIG_Vector originalPosition,
 				   SIG_Matrix actualRobotRotation );
-
     };
 
 }

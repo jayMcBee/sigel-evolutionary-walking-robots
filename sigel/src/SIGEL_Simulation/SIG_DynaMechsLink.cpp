@@ -177,7 +177,6 @@ namespace SIGEL_Simulation
 				SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 			};
 #endif
-
 		};
 
 		for (SIG_DynaMechsLink *actSuccessor : successors)
@@ -258,4 +257,5 @@ namespace SIGEL_Simulation
 
 		return transformation;
 	};
+
 }

@@ -116,7 +116,6 @@ SIGEL_Simulation::SIG_DynaMechsSimulationData::SIG_DynaMechsSimulationData( SIGE
 
 	for (SIGEL_Robot::SIG_Drive *actDrive : robot.getDrives())
 	{
-
 		switch (actDrive->getMode())
 		{
 			//	should work for both, simple-servo and force drives..
@@ -129,7 +128,6 @@ SIGEL_Simulation::SIG_DynaMechsSimulationData::SIG_DynaMechsSimulationData( SIGE
 
 			if (dynaMechsLinks[ linkNumber ])
 			{
-
 #ifdef SIG_DEBUG
 				SIGEL_Tools::SIG_IO::cerr << "Inserting drive "
 				                          << actDrive->getName()
@@ -153,7 +151,6 @@ SIGEL_Simulation::SIG_DynaMechsSimulationData::SIG_DynaMechsSimulationData( SIGE
 	{
 		switch (actSensorBase->getSensorType())
 		{
-
 			// tJointSensor:
 		case SIGEL_Robot::SIG_Sensor::tJointSensor:
 		{
@@ -180,7 +177,6 @@ SIGEL_Simulation::SIG_DynaMechsSimulationData::SIG_DynaMechsSimulationData( SIGE
 			{	sensors[ actSensor->getNumber() ] = actSensor;
 			}
 			else SIGEL_Tools::SIG_IO::cerr << "Houston, we've got a problem here !  No link, no fun in  SIG_DynaMechsSimulationData (2)" << Qt::endl;
-
 		}
 		break;
 
@@ -194,11 +190,9 @@ SIGEL_Simulation::SIG_DynaMechsSimulationData::SIG_DynaMechsSimulationData( SIGE
 			{	sensors[ actSensor->getNumber() ] = actSensor;
 			}
 			else SIGEL_Tools::SIG_IO::cerr << "Houston, we've got a problem here !  No link, no fun in  SIG_DynaMechsSimulationData (3)" << Qt::endl;
-
 		}
 		break;
 		}
-
 	}
 
 	dynaMechsIntegrator->setSystem( &dynaMechsSystem );
@@ -305,7 +299,6 @@ void SIGEL_Simulation::SIG_DynaMechsSimulationData::initializeArticulation()
 	SIGEL_Robot::SIG_Link const *rootLink = robot.getRootLink();
 
 	dmMobileBaseLink *internalRootLink = new dmMobileBaseLink();
-
 
 	SpatialVector velocity = { 0, 0, 0, 0, 0, 0 };
 
@@ -577,5 +570,3 @@ void SIGEL_Simulation::SIG_DynaMechsSimulationData::rotationMatrixToQuaternion( 
 		return;
 	}
 }
-
-

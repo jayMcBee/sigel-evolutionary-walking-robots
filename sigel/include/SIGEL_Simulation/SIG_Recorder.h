@@ -161,4 +161,3 @@ class SIG_Recorder {
 }
 
 #endif // SIGEL_SIMULATION_SIG_RECORDER_H
-

@@ -40,7 +40,6 @@
 #include "dmContactModel.hpp"
 #include "dmArticulation.hpp"
 
-
 using namespace SIGEL_Tools;
 
 SIGEL_Simulation::SIG_DynaMechsSimulationQueries::SIG_DynaMechsSimulationQueries(SIG_DynaMechsSimulationData& theSimulationData)
@@ -71,7 +70,6 @@ void SIGEL_Simulation::SIG_DynaMechsSimulationQueries::sense(int sensorNo,
 			roll, pitch, angle;
 	bool 	hasContact;
 
-
 #ifdef SIG_DEBUG
 	for (int iInt=0; iInt<simulationData.sensors.size(); iInt++)
 	{	SIGEL_Tools::SIG_IO::cerr << "Sensor #" << iInt << ": \"" << simulationData.sensors[iInt]->getName() << "\"" << Qt::endl;
@@ -90,7 +88,6 @@ void SIGEL_Simulation::SIG_DynaMechsSimulationQueries::sense(int sensorNo,
 
       sensor = simulationData.sensors[ sensorIndex ];
     }
-
 
   if (!sensor)
 	{	SIGEL_Tools::SIG_IO::cerr << "attempt to read invalid sensor (sensorNo=" << sensorNo << ") in 'SIG_DynaMechsSimulationQueries::sense()'" << Qt::endl;
@@ -370,26 +367,22 @@ SIG_Matrix SIGEL_Simulation::SIG_DynaMechsSimulationQueries::getLinkOrientation(
     };
 }
 
-
 int SIGEL_Simulation::SIG_DynaMechsSimulationQueries::getRootNumber() const
 {
   return simulationData.robot.getRootLink()->getNumber();
 }
 
 std::vector<double*>* SIGEL_Simulation::SIG_DynaMechsSimulationQueries::getUsedForces() const {
-
 	std::vector<double*>* forceList = simulationData.dynaMechsSystem.getForces();
 
   return forceList;
 }
-
 
 int SIGEL_Simulation::SIG_DynaMechsSimulationQueries::getLinkCount() const
 {
   //return simulationData.dynaMechsSystem.getNumLinks();
   return simulationData.robot.getLinks().count();
 }
-
 
 void SIGEL_Simulation::SIG_DynaMechsSimulationQueries::checkDynas() const
 {

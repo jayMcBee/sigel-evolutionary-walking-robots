@@ -52,7 +52,6 @@ void SIGEL_Simulation::SIG_DynaMechsCommandInterface::moveDrive(int driveNo,
                   dmDestAngle;
   int 		  driveIndex = 0;
 
-
 #ifdef SIG_DEBUG
 	for (int iInt=0; iInt<simulationData.drives.size(); iInt++)
 	{	SIGEL_Tools::SIG_IO::cerr << "Drive #" << iInt << ": \"" << simulationData.drives[iInt]->getName() << "\"" << Qt::endl;
@@ -70,7 +69,6 @@ void SIGEL_Simulation::SIG_DynaMechsCommandInterface::moveDrive(int driveNo,
       // Unsigned on purpose: a negative absoluteDriveNo must never index
       // drives[] or driveForcesTimeAccounts[] -- the second is a write.
       driveIndex = absoluteDriveNo % static_cast< uint >(simulationData.drives.size());
-
 
 #ifdef SIG_DEBUG
       SIGEL_Tools::SIG_IO::cerr << "Drive index: " << driveIndex << Qt::endl;
@@ -96,7 +94,6 @@ void SIGEL_Simulation::SIG_DynaMechsCommandInterface::moveDrive(int driveNo,
       int registerValue = registers[0].getValue();
 
       long double absoluteRegisterValue = registerValue - minRegisterValue;
-
 
 	  // SERVO-TYPE:  Interprete register value as angle
 	  // THIS IS HOW WE INTERPRETE THIS TYPE OF MOTOR:

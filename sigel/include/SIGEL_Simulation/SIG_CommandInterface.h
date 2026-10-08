@@ -36,7 +36,6 @@ namespace SIGEL_Simulation
  * this class. This is the class needed to change the simulation.
  */
 class SIG_CommandInterface {
-
  public:
 
   /** The constructor
@@ -66,11 +65,8 @@ class SIG_CommandInterface {
    */
   virtual void moveDrive(int driveNo,
 			 QList<SIG_Register> const& registers) = 0;
-
 };
 
 }
 
 #endif // SIGEL_SIMULATION_SIG_COMMANDINTERFACE_H
-
-

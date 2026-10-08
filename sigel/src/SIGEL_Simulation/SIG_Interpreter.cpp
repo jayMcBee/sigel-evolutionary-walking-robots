@@ -527,7 +527,3 @@ namespace SIGEL_Simulation
   };
 
 }
-
-
-
-

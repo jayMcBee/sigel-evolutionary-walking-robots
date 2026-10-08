@@ -75,11 +75,8 @@ namespace SIGEL_Simulation
    */
   void moveDrive(int driveNo,
 		 QList<SIG_Register> const& registers);
-
 };
 
 }
 
 #endif // SIGEL_SIMULATION_SIG_DYNAMECHSCOMMANDINTERFACE_H
-
-

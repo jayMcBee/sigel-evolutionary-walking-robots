@@ -21,7 +21,6 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-
 #include "SIGEL_Simulation/SIG_EarlyRunTermSimulation.h"
 #include "SIGEL_Simulation/SIG_DynaMechsSimulationData.h"
 
@@ -42,7 +41,6 @@ SIGEL_Simulation::SIG_EarlyRunTermSimulation::SIG_EarlyRunTermSimulation(SIGEL_R
   {   SIGEL_Tools::SIG_IO::cerr << "SIG_EarlyRunTermSimulation needs a recorder of type SIG_GPFullDataRecorder to work !" << Qt::endl;
   }
 }
-
 
 bool SIGEL_Simulation::SIG_EarlyRunTermSimulation::prematureTermination()
 {
@@ -77,7 +75,6 @@ bool SIGEL_Simulation::SIG_EarlyRunTermSimulation::prematureTermination()
   return false;
 }
 
-
 SIG_Vector SIGEL_Simulation::SIG_EarlyRunTermSimulation::normalizeRobotPosition( SIG_Vector originalPosition, SIG_Matrix actualRobotRotation )
 {
   SIG_Vector robotsRealOrigin = ertRobot->initialLocation;
@@ -85,14 +82,11 @@ SIG_Vector SIGEL_Simulation::SIG_EarlyRunTermSimulation::normalizeRobotPosition(
 
   SIG_Vector normalizedPosition;
 
-
   actualRobotRotation.times( &robotsRealOrigin, &normalizedPosition );
   normalizedPosition.plusis( &originalPosition );
 
   return normalizedPosition;
 }
-
-
 
 int SIGEL_Simulation::SIG_EarlyRunTermSimulation::getMaxRecorderSteps(int inRecFrequency)
 {  QTime zeroHour( 0, 0 );   // midnight; a default QTime is null and secsTo() on it gives 0

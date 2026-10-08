@@ -35,7 +35,6 @@
 #include <dmLink.hpp>
 #include <dmIntegrator.hpp>
 
-
 namespace SIGEL_Simulation
 {
 
@@ -48,7 +47,6 @@ namespace SIGEL_Simulation
    */
   class SIG_DynaMechsSimulationData : public SIG_SimulationData
     { 
-
     public:
 
       /**
@@ -108,10 +106,8 @@ namespace SIGEL_Simulation
 				       double &y,
 				       double &z,
 				       double &w );
-
     };
 
 }
 
 #endif // SIGEL_SIMULATION_SIG_DYNAMECHSSIMULATIONDATA_H
-
