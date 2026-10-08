@@ -24,7 +24,6 @@
 #define SIGEL_GP_SIG_GPSIMPLETOURNAMENT_H
 
 #include "SIGEL_Tools/SIG_Randomizer.h"
-#include "SIGEL_GP/SIG_GPFitnessTrainer.h"
 #include "SIGEL_GP/SIG_GPPopulation.h"
 #include "SIGEL_GP/SIG_GPTournament.h"
 #include "SIGEL_GP/SIG_GPParameter.h"
@@ -36,7 +35,7 @@ namespace SIGEL_GP
 
 /**
 * This class defineds the tournament with a reproduction of the winner as the tournament price. It uses
-* the randomizer and the fitnesstrainer for randompoint creation and fitnessvalue computation.
+* the randomizer for randompoint creation.
 * It inherits from SIG_GPTournament, so see there for further details.
 */
 
@@ -53,8 +52,6 @@ class SIG_GPSimpleTournament : public SIGEL_GP::SIG_GPTournament
 * execution of the tournament
 * @param randomizer
 * The reference to the randomizer object of the GPManager.
-* @param trainer
-* The reference to the fitnesstrainer object of the GPManager.
 * @param actPool
 * The actual population of the pool.
 * @param ppos1
@@ -64,7 +61,6 @@ class SIG_GPSimpleTournament : public SIGEL_GP::SIG_GPTournament
 */
  public:
 SIG_GPSimpleTournament( SIGEL_Tools::SIG_Randomizer& randomizer,
-		        SIG_GPFitnessTrainer& trainer, 
 		        SIG_GPPopulation& actPool, 
 			SIG_GPParameter& gpParameter,
 			SIGEL_Robot::SIG_LanguageParameters &languageParameters,

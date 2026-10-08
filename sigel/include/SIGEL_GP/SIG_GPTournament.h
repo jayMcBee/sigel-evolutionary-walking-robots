@@ -25,7 +25,6 @@
 
 #include <QList>
 #include "SIGEL_Tools/SIG_Randomizer.h"
-#include "SIGEL_GP/SIG_GPFitnessTrainer.h"
 #include "SIGEL_GP/SIG_GPTournamentIndividual.h"
 #include "SIGEL_GP/SIG_GPPopulation.h"
 #include "SIGEL_GP/SIG_GPOperations.h"
@@ -40,11 +39,10 @@ namespace SIGEL_GP
 
 	/**
 	 * This class is the parent class which all other GPTournament-classes will inherite from. It has a randomizer
-	 * reference, for creation of random number in the genetic operator. It has an fitnesstrainer reference for
-	 * controlling the fitnesscomputation preformed by pvm. The GPTournament-class includes QList for a datastructure
-	 * of the envolved tournamentindividuals. The class has a reference of the actual individual pool, a flag for
-	 * indicating if the tournament is ready to play and an integer value, which shows how many of its individuals
-	 * are still in an earlier tournament.
+	 * reference, for creation of random number in the genetic operator. The GPTournament-class includes QList
+	 * for a datastructure of the envolved tournamentindividuals. The class has a reference of the actual individual
+	 * pool, a flag for indicating if the tournament is ready to play and an integer value, which shows how many of
+	 * its individuals are still in an earlier tournament.
 	 */
 
 	class SIG_GPTournament
@@ -58,13 +56,10 @@ namespace SIGEL_GP
 		 * All attributes are set to the parameters an a topological sorting is expected.
 		 * @param randomizer
 		 * The reference to the randomizer object of the GPManager.
-		 * @param trainer
-		 * The reference to the GPFitnesstrainer of the GPManager.
 		 * @param actPool
 		 * The reference to the actual pool object.
 		 */
 		SIG_GPTournament(SIGEL_Tools::SIG_Randomizer& randomizer,
-		                 SIG_GPFitnessTrainer& trainer,
 		                 SIG_GPPopulation& actPool,
 		                 SIG_GPParameter& gpParameter,
 		                 SIGEL_Robot::SIG_LanguageParameters &languageParameters);
@@ -97,12 +92,6 @@ namespace SIGEL_GP
 		 * The randomizer, which is needed to create the randompoint used for the genetic operations.
 		 */
 		SIGEL_Tools::SIG_Randomizer& randomizer;
-
-		/**
-		 * The fitnesstrainer controls the computations of fitnessvalues after the genetic mutation of
-		 * the winner of the tournament.
-		 */
-		SIG_GPFitnessTrainer& trainer;
 
 		/**
 		 * The tournamentindividual is used record the positions of the tournament members and the

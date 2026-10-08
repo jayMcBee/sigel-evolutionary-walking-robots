@@ -469,14 +469,6 @@ problem; the choice is made before any code is written.
   (the `Makefile` or a header), and what an experiment file naming
   "RemoteZORCFitnessFunction" does when the switch is off.
 
-- [ ] **154. Remove the fitness trainer from the tournament classes.**
-  `SIG_GPTournament` stores the trainer in its member `trainer`, and nothing
-  reads it. The constructors of `SIG_GPTournament`, `SIG_GPSimpleTournament`,
-  `SIG_GPMutationTournament` and `SIG_GPCrossOverTournament` take it only to
-  pass it on, and `SIG_GPManager::createTours` hands it in. Without the
-  member, the parameter and the include of `SIG_GPFitnessTrainer.h` go from
-  all four classes.
-
 - [ ] **47. `sigelDynClient` and `manage_dyn_slave`.**
   `sigelDynClient` makes a second machine a dynamic slave of `sigel -de`. It
   is still 1.3's Solaris `tcsh` script with placeholder paths, and it runs

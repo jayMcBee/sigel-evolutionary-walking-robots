@@ -27,7 +27,6 @@
 #include "MT_Control/MT_Classifier.h"
 
 SIGEL_GP::SIG_GPCrossOverTournament::SIG_GPCrossOverTournament(SIGEL_Tools::SIG_Randomizer& randomizer,
-							       SIGEL_GP::SIG_GPFitnessTrainer& fitTrain,
 							       SIGEL_GP::SIG_GPPopulation& actPool,
 							       SIGEL_GP::SIG_GPParameter& gpParameter,
 							       SIGEL_Robot::SIG_LanguageParameters &languageParameters,
@@ -35,7 +34,7 @@ SIGEL_GP::SIG_GPCrossOverTournament::SIG_GPCrossOverTournament(SIGEL_Tools::SIG_
 							       int indPos2,
 							       int indPos3,
 							       int indPos4)
-  : SIG_GPTournament(randomizer,fitTrain,actPool,gpParameter,languageParameters),
+  : SIG_GPTournament(randomizer,actPool,gpParameter,languageParameters),
     name1( actPool.getNextIdentifier() ),
     name2( actPool.getNextIdentifier() )
 {

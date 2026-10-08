@@ -23,13 +23,11 @@
 #include "SIGEL_GP/SIG_GPTournament.h"
 
 SIGEL_GP::SIG_GPTournament::SIG_GPTournament(SIGEL_Tools::SIG_Randomizer& randomizer,
-					     SIG_GPFitnessTrainer& trainer, 
 					     SIG_GPPopulation& actPool,
 					     SIG_GPParameter& gpParameter,
 					     SIGEL_Robot::SIG_LanguageParameters &languageParameters)
 : languageParameters(languageParameters),
   randomizer(randomizer),
-  trainer(trainer),
   indis(),
   justWaiting(false),
   waitCounter(0),

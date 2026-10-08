@@ -25,7 +25,6 @@
 
 #include "SIGEL_GP/SIG_GPPopulation.h"
 #include "SIGEL_Tools/SIG_Randomizer.h"
-#include "SIGEL_GP/SIG_GPFitnessTrainer.h"
 #include "SIGEL_GP/SIG_GPTournament.h"
 #include "SIGEL_GP/SIG_GPIndividual.h"
 #include "SIGEL_GP/SIG_GPParameter.h"
@@ -53,8 +52,6 @@ class SIG_GPMutationTournament : public SIGEL_GP::SIG_GPTournament
 * The mutationtournament object is created.
 * @param randomizer
 * The randomizer which creates the random mutation point.
-* @param fitTrain
-* The fitnesstrainer, who controls the fitness computation process.
 * @param actPool
 * The pool, which contains the possible members of the tournament. 
 * @param indPool1
@@ -64,7 +61,6 @@ class SIG_GPMutationTournament : public SIGEL_GP::SIG_GPTournament
 */
  public:
 SIG_GPMutationTournament(SIGEL_Tools::SIG_Randomizer& randomizer,
-			 SIG_GPFitnessTrainer& fitTrain, 
 			 SIG_GPPopulation& actPool,
 			 SIG_GPParameter& gpParameter,
 			 SIGEL_Robot::SIG_LanguageParameters &languageParameters,

@@ -26,13 +26,12 @@
 #include "MT_Control/MT_Classifier.h"
 
 SIGEL_GP::SIG_GPSimpleTournament::SIG_GPSimpleTournament(SIGEL_Tools::SIG_Randomizer& randomizer,
-							 SIG_GPFitnessTrainer& trainer,
 							 SIG_GPPopulation& actPool,
 							 SIG_GPParameter& gpParameter,
 							 SIGEL_Robot::SIG_LanguageParameters &languageParameters,
 							 int ppos1,
 							 int ppos2)
-  : SIG_GPTournament(randomizer,trainer,actPool,gpParameter,languageParameters),
+  : SIG_GPTournament(randomizer,actPool,gpParameter,languageParameters),
     name(actPool.getNextIdentifier())
 {
   indis.resize( 2 );

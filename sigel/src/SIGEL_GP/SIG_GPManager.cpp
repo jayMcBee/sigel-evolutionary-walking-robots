@@ -327,7 +327,6 @@ void SIGEL_GP::SIG_GPManager::createTours(int quantity)
 #endif
 
 			actTour = new SIG_GPSimpleTournament(randomizer,
-			  *trainer,
 			  pop,
 			  currentExperiment.gpParameter,
 			  *currentExperiment.robot.getLangParam(),
@@ -347,7 +346,6 @@ void SIGEL_GP::SIG_GPManager::createTours(int quantity)
 #endif
 
 			actTour = new SIG_GPMutationTournament(randomizer,
-			  *trainer,
 			  pop,
 			  currentExperiment.gpParameter,
 			  *currentExperiment.robot.getLangParam(),
@@ -390,7 +388,6 @@ void SIGEL_GP::SIG_GPManager::createTours(int quantity)
 #endif
 
 			actTour = new SIG_GPCrossOverTournament(randomizer,
-			  *trainer,
 			  pop,
 			  currentExperiment.gpParameter,
 			  *currentExperiment.robot.getLangParam(),
