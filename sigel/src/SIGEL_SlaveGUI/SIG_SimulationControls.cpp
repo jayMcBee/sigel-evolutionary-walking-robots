@@ -98,7 +98,6 @@ namespace SIGEL_SlaveGUI
 		      SIGNAL(triggered()),
 		      qApp,
 		      SLOT(quit()) );
-
   };
 
   void SIG_SimulationControls::slotPlayPressed()
@@ -131,4 +130,5 @@ namespace SIGEL_SlaveGUI
     else
       alterMovieSettingsAction->setIcon( recordingDisallowedIcons );
   };
+
 }

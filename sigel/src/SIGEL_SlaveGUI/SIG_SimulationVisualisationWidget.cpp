@@ -212,8 +212,6 @@
       };
   };
 
-
-
 	void SIG_SimulationVisualisationWidget::makeTimeSteps( int noOfSteps )
 	{
 		if ( visualisation )

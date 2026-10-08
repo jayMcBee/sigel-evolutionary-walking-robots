@@ -27,8 +27,6 @@ protected:
 
 protected slots:
     virtual void languageChange();
-
-
 };
 
 #endif // SIGEL_SLAVEGUI_SIG_MOVIESETTINGSDIALOGBASE_H

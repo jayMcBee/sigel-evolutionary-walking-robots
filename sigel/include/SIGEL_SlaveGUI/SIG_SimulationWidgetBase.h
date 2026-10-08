@@ -24,7 +24,6 @@ protected:
 
 protected slots:
     virtual void languageChange();
-
 };
 
 #endif // SIGEL_SLAVEGUI_SIG_SIMULATIONWIDGETBASE_H

@@ -64,7 +64,6 @@ namespace SIGEL_SlaveGUI
 
 		// ffmpeg writes here; the file is renamed to movieFileName when ffmpeg has succeeded.
 		QString unfinishedFileName;
-
 	};
 
 }

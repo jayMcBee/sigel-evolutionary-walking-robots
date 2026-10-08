@@ -115,7 +115,6 @@ namespace SIGEL_SlaveGUI
 		       SIGEL_Environment::SIG_Environment const &environment,
 		       SIGEL_Simulation::SIG_SimulationParameters const &simulationParameters,
 		       SIGEL_Program::SIG_Program const &program);
-
   };
 
 }

@@ -33,7 +33,9 @@
 
 namespace SIGEL_Visualisation
 {
+
   class SIG_SimulationVisualisation;
+
 }
 
 namespace SIGEL_SlaveGUI
@@ -136,7 +138,6 @@ namespace SIGEL_SlaveGUI
     QString lastFileName;
 
     SIG_MovieStaticRunInfo staticRunInfo;
-
   };
 
 }

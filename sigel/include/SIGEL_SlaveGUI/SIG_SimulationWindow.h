@@ -120,7 +120,6 @@ namespace SIGEL_SlaveGUI
      * The simulation controls that are attached in the toolbar and the menubar.
      */
     SIG_SimulationControls *simulationControls;
-
   };
 
 }

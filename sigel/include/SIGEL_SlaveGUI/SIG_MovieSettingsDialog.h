@@ -68,7 +68,6 @@ private:
     QWidget *view;
 
     double stepSize;
-
 };
 
 }

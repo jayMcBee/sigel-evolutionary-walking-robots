@@ -44,7 +44,6 @@ namespace SIGEL_SlaveGUI
    */
   class SIG_SimulationControls : public QActionGroup
     {
-
       Q_OBJECT
 
     public:
