@@ -575,7 +575,7 @@ int SIGEL_GP::SIG_GPFitnessTrainer::getNextHost() {
       if (nextHost->noOfSlaves < nextHost->maxSlaves)
 	   result = nextHostNumber;
 
-      nextHostNumber = ++nextHostNumber % static_cast< uint >(pvmHosts.size());
+      nextHostNumber = (nextHostNumber + 1) % static_cast< uint >(pvmHosts.size());
 
       if (result != -1)
         break;
