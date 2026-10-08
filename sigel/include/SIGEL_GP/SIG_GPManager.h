@@ -184,13 +184,9 @@ namespace SIGEL_GP
 		 * Runs a tournament. An individual that has its fitness advances to its
 		 * next tournament. A fitness task is started for each new individual, and
 		 * 'justWaiting' of the tournament is then true.
-		 */
-		void runTournament( SIG_GPTournament &tournament );
-
-		/**
-		 * Runs a tournament with the classifier of the Meta system. It does what
-		 * the other runTournament does, but a new individual without a next
-		 * tournament gets no fitness task.
+		 * @param metaClassifier
+		 * The classifier of the Meta system, or null in a run without it. With it,
+		 * a new individual without a next tournament gets no fitness task.
 		 */
 		void runTournament( SIG_GPTournament &tournament, MT_Classifier *metaClassifier );
 
@@ -211,15 +207,10 @@ namespace SIGEL_GP
 		 * @post
 		 * The evolution process, which is called genetic programming, has occurred.
 		 * It runed until a terminationcondition was fulfilled.
+		 * @param metaClassifier
+		 * The classifier of the Meta system, or null in a run without it.
 		 */
-		void evolutionLoop();
-
-		/*
-		 * see above evolutionLoop();
-		 * difference: the tournaments are executed by a Classifier
-		 * @pre: there is a Meta Classifier System
-		 */
-		void evolutionLoop(MT_Classifier *MetaClassifier);
+		void evolutionLoop( MT_Classifier *metaClassifier );
 
 		/**
 		 * This function creates a set of tournaments.

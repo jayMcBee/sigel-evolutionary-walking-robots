@@ -91,49 +91,18 @@ void SIGEL_GP::SIG_GPManager::advanceToNextTournament( int tournament )
 	}
 }
 
-void SIGEL_GP::SIG_GPManager::runTournament( SIG_GPTournament &tournament )
-{
-	SIG_GPPopulation &population = currentExperiment.population;
-
-	tournament.run();
-
-	for (int i = 0; i < tournament.indis.size(); i++)
-	{
-		SIG_GPTournamentIndividual &tournamentIndividual = *tournament.indis[i];
-		SIG_GPIndividual &individual = population.getIndividual( tournamentIndividual.indNumber );
-
-		if (individual.upToDate())
-		{
-#ifdef SIG_DEBUG
-			SIGEL_Tools::SIG_IO::cerr << "Individual "
-			  << individual.getPoolPos()
-			  << " is up to date." << Qt::endl;
-#endif
-
-			advanceToNextTournament( tournamentIndividual.successor );
-		}
-		else
-		{
-#ifdef SIG_DEBUG
-			SIGEL_Tools::SIG_IO::cerr << "Individual "
-			  << individual.getPoolPos()
-			  << " is not up to date." << Qt::endl;
-#endif
-
-			tournament.justWaiting = true;
-			tournamentIndividual.fitTaskId = trainer->spawnTask( individual );
-			updateIndividualView( tournamentIndividual.indNumber );
-		}
-
-		updateIndividualView( tournamentIndividual.indNumber );
-	}
-}
-
 void SIGEL_GP::SIG_GPManager::runTournament( SIG_GPTournament &tournament, MT_Classifier *metaClassifier )
 {
 	SIG_GPPopulation &population = currentExperiment.population;
 
-	tournament.run( metaClassifier );
+	if (metaClassifier)
+	{
+		tournament.run( metaClassifier );
+	}
+	else
+	{
+		tournament.run();
+	}
 
 	for (int i = 0; i < tournament.indis.size(); i++)
 	{
@@ -158,8 +127,8 @@ void SIGEL_GP::SIG_GPManager::runTournament( SIG_GPTournament &tournament, MT_Cl
 			  << " is not up to date." << Qt::endl;
 #endif
 
-			// An individual without a next tournament gets no fitness task.
-			if (tournamentIndividual.successor != -1)
+			// With the Meta classifier, an individual without a next tournament gets no fitness task.
+			if (!metaClassifier || tournamentIndividual.successor != -1)
 			{
 				tournament.justWaiting = true;
 				tournamentIndividual.fitTaskId = trainer->spawnTask( individual );
@@ -203,7 +172,7 @@ void SIGEL_GP::SIG_GPManager::gatherFitnessResults( SIG_GPTournament &tournament
 	}
 }
 
-void SIGEL_GP::SIG_GPManager::evolutionLoop()
+void SIGEL_GP::SIG_GPManager::evolutionLoop( MT_Classifier *metaClassifier )
 {
 	int maxTouchsPerLoop = currentExperiment.gpParameter.getMaxTouchsPerLoop();
 	int toDoSweepsPerLoop = currentExperiment.gpParameter.getToDoSweepsPerLoop();
@@ -282,7 +251,7 @@ void SIGEL_GP::SIG_GPManager::evolutionLoop()
 					  << Qt::endl;
 #endif
 
-					runTournament( actTour );
+					runTournament( actTour, metaClassifier );
 				}
 				else
 				{
@@ -864,7 +833,7 @@ void SIGEL_GP::SIG_GPManager::run()
 		// sorts the tournaments, how they should evolve on the pvm clients
 		calcInitTourSet();
 		// the heart of the genetic algorithm, it executes the tournaments
-		evolutionLoop();
+		evolutionLoop( nullptr );
 
 		if (stopEvolutionNow)
 		{
@@ -1155,7 +1124,7 @@ void SIGEL_GP::SIG_GPManager::run(MT_Classifier *MetaClassifier)
 		3) calcInitTourSet()
 		4) evalNeededIndis() --> new method: compute fitness only for those SIGEL individuals
 		which still appear in tours!
-		5) evolutionLoop(MT_Classifier) ------> new method: compute fitness only for those SIGEL individuals
+		5) evolutionLoop(MetaClassifier): compute fitness only for those SIGEL individuals
 		which still appear in tours! Use MT_Classifier for tournaments!
 		6) MT_Classifier.nextSIGGeneration()
 		7) determine average fitness only from exactly computed SIGEL individuals
@@ -1370,120 +1339,6 @@ void SIGEL_GP::SIG_GPManager::run(MT_Classifier *MetaClassifier)
 		}
 	}
 }
-
-//*****************************************************************
-//**************************** META method ************************
-//*****************************************************************
-void SIGEL_GP::SIG_GPManager::evolutionLoop(MT_Classifier *MetaClassifier)
-{
-	/**
-	 *	Changes relative to the "normal" evolutionLoop():
-	 *	1) actTour.run(MetaClassifier); instead of actTour.run();
-	 *	2) if a tournament participant takes part in no further tournament,
-	 *		its fitness no longer needs computing.
-	 */
-
-
-	int maxTouchsPerLoop = currentExperiment.gpParameter.getMaxTouchsPerLoop();
-	int toDoSweepsPerLoop = currentExperiment.gpParameter.getToDoSweepsPerLoop();
-
-	while ( !taskCanDoList.isEmpty() )
-	{
-		stopIfNecessary( false );
-
-		if (stopEvolutionNow)
-		{
-			return;
-		}
-
-		// Poll interval, once per pass: long enough not to spin a core, short
-		// enough that finished results do not wait.
-		usleep(5000);
-		processInterfaceEvents();
-
-		trainer->sweepToSpawn();
-
-		for (int sweepCounter = 0;
-		     (sweepCounter < toDoSweepsPerLoop) && (!taskCanDoList.isEmpty());
-		     sweepCounter++)
-		{
-
-#ifdef SIG_DEBUG
-			SIGEL_Tools::SIG_IO::cerr << "SIG_GPManager sweeping the taskCanDoList (sweepCounter: "
-			                          << sweepCounter
-			                          << ")." << Qt::endl;
-#endif
-
-			int touchsCounter = 0;
-
-			qsizetype canDoIdx = 0;   // an index, not an iterator: the loop appends to taskCanDoList
-
-			while (canDoIdx < taskCanDoList.size())
-			{
-				processInterfaceEvents();
-
-				if ((touchsCounter == maxTouchsPerLoop) && (maxTouchsPerLoop != -1))
-				{
-					break;
-				}
-
-				SIG_GPTournament &actTour=*tours[ taskCanDoList.at( canDoIdx ) ];
-
-#ifdef SIG_DEBUG
-				SIGEL_Tools::SIG_IO::cerr << "SIG_GPManager inspecting tournament No. "
-				                          << taskCanDoList.at( canDoIdx )
-				                          << ".\n"
-				                          << "justWaiting: "
-				                          << actTour.justWaiting
-				                          << "\n"
-				                          << "waitCounter: "
-				                          << actTour.waitCounter
-				                          << "\n"
-				                          << "indis:" << Qt::endl;
-				for (int i = 0; i < actTour.indis.size(); i++)
-				{
-					SIGEL_Tools::SIG_IO::cerr << "  indNumber: "
-					                          << (*actTour.indis[ i ]).indNumber
-					                          << "\n"
-					                          << "    successor: "
-					                          << (*actTour.indis[ i ]).successor
-					                          << "\n"
-					                          << "    fitTaskId: "
-					                          << (*actTour.indis[ i ]).fitTaskId
-					                          << Qt::endl;
-				}
-
-#endif
-
-				if (!actTour.justWaiting)
-				{
-#ifdef SIG_DEBUG
-					SIGEL_Tools::SIG_IO::cerr << "Playing tournament "
-					                          << taskCanDoList.at( canDoIdx )
-					                          << Qt::endl;
-#endif
-
-					runTournament( actTour, MetaClassifier );
-				}
-				else
-				{
-					gatherFitnessResults( actTour );
-				};
-				if (!actTour.justWaiting)
-				{
-					taskCanDoList.removeAt( canDoIdx );   // next slides into canDoIdx
-				}
-				else
-				{
-					++canDoIdx;
-				}
-
-				touchsCounter++;
-			};
-		};
-	};
-};
-
 
 void SIGEL_GP::SIG_GPManager::evalNeededIndis()
 {
