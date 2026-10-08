@@ -27,12 +27,12 @@
 namespace SIGEL_Simulation
 {
 
-  SIG_Interpreter::SIG_Interpreter(SIGEL_Robot::SIG_LanguageParameters const &langParams,
+  SIG_Interpreter::SIG_Interpreter(SIGEL_Robot::SIG_LanguageParameters const &languageParameters,
 				   SIGEL_Program::SIG_Program const &robotProgram,
 				   SIG_CommandInterface &commandInterface,
 				   SIG_SimulationQueries const &simulationQueries)
     : robotProgram(robotProgram),
-      langParams(langParams),
+      languageParameters(languageParameters),
       commandInterface(commandInterface),
       simulationQueries(simulationQueries),
       remainingLastCommandTime(0),
@@ -40,8 +40,8 @@ namespace SIGEL_Simulation
       programCounter(0),
       compareFlag(false)
   {
-    int numberOfRegisters = langParams.getMemorySize();
-    int registerWidth = langParams.getRegisterWidth();
+    int numberOfRegisters = languageParameters.getMemorySize();
+    int registerWidth = languageParameters.getRegisterWidth();
     // Held by value: SIG_Register is two ints with no destructor and no pointers.
     // It has no default constructor, hence append rather than resize.
     registers.reserve( numberOfRegisters );
@@ -59,7 +59,7 @@ namespace SIGEL_Simulation
     uint numberOfRegisters = registers.size();
 
     // save the maximalDelayTime
-    double maxDelayTime = static_cast<double>( langParams.getMaximalDelayTime() ) * 0.001 ;
+    double maxDelayTime = static_cast<double>( languageParameters.getMaximalDelayTime() ) * 0.001 ;
 
     if ( timeAccountSize <= remainingLastCommandTime )
       {
@@ -106,7 +106,7 @@ namespace SIGEL_Simulation
 	      {
 	      case SIGEL_Program::COPY:
 		// is the command allowed?
-		if ( langParams.hasCommand( "COPY" ) )
+		if ( languageParameters.hasCommand( "COPY" ) )
 		  {
 		    // do it!
 		    int reg0 = programLine.getInstructionElement(0) % numberOfRegisters;
@@ -115,7 +115,7 @@ namespace SIGEL_Simulation
 		    programCounter = (programCounter + 1) % programLength;
 		    
 		    // subtract the needed time for the command
-		    timeAccountSize -= langParams.getCommand( "COPY" )->getDuration();
+		    timeAccountSize -= languageParameters.getCommand( "COPY" )->getDuration();
 
 		    /*
 		     * have we exeeded the allowed time? if so, set remainingLastCommandTime to the amout
@@ -134,7 +134,7 @@ namespace SIGEL_Simulation
 
 	      case SIGEL_Program::LOAD:
 		// is the command allowed?
-		if ( langParams.hasCommand( "LOAD" ) )
+		if ( languageParameters.hasCommand( "LOAD" ) )
 		  {
 		    // do it!
 		    int reg0 = programLine.getInstructionElement(0) % numberOfRegisters;
@@ -143,7 +143,7 @@ namespace SIGEL_Simulation
 		    programCounter = (programCounter + 1) % programLength;
 
 		    // subtract the needed time for the command
-		    timeAccountSize -= langParams.getCommand( "LOAD" )->getDuration();
+		    timeAccountSize -= languageParameters.getCommand( "LOAD" )->getDuration();
 		    
 		    /*
 		     * have we exeeded the allowed time? if so, set remainingLastCommandTime to the amout
@@ -160,7 +160,7 @@ namespace SIGEL_Simulation
 		
 	      case SIGEL_Program::ADD:
 		// is the command allowed?
-		if ( langParams.hasCommand( "ADD" ) )
+		if ( languageParameters.hasCommand( "ADD" ) )
 		  {
 		    // do it!
 		    int reg0 = programLine.getInstructionElement(0) % numberOfRegisters;
@@ -169,7 +169,7 @@ namespace SIGEL_Simulation
 		    programCounter = (programCounter + 1) % programLength;
 
 		    // subtract the needed time for the command
-		    timeAccountSize -= langParams.getCommand( "ADD" )->getDuration();
+		    timeAccountSize -= languageParameters.getCommand( "ADD" )->getDuration();
 		    
 		    /*
 		     * have we exeeded the allowed time? if so, set remainingLastCommandTime to the amout
@@ -186,7 +186,7 @@ namespace SIGEL_Simulation
 
 	      case SIGEL_Program::SUB:
 		// is the command allowed?
-		if ( langParams.hasCommand( "SUB" ) )
+		if ( languageParameters.hasCommand( "SUB" ) )
 		  {
 		    // do it!
 		    int reg0 = programLine.getInstructionElement(0) % numberOfRegisters;
@@ -195,7 +195,7 @@ namespace SIGEL_Simulation
 		    programCounter = (programCounter + 1) % programLength;
 
 		    // subtract the needed time for the command
-		    timeAccountSize -= langParams.getCommand( "SUB" )->getDuration();
+		    timeAccountSize -= languageParameters.getCommand( "SUB" )->getDuration();
 		    
 		    /*
 		     * have we exeeded the allowed time? if so, set remainingLastCommandTime to the amout
@@ -212,7 +212,7 @@ namespace SIGEL_Simulation
 
 	      case SIGEL_Program::MUL:
 		// is the command allowed?
-		if ( langParams.hasCommand( "MUL" ) )
+		if ( languageParameters.hasCommand( "MUL" ) )
 		  {
 		    // do it!
 		    int reg0 = programLine.getInstructionElement(0) % numberOfRegisters;
@@ -221,7 +221,7 @@ namespace SIGEL_Simulation
 		    programCounter = (programCounter + 1) % programLength;
 
 		    // subtract the needed time for the command
-		    timeAccountSize -= langParams.getCommand( "MUL" )->getDuration();
+		    timeAccountSize -= languageParameters.getCommand( "MUL" )->getDuration();
 		    
 		    /*
 		     * have we exeeded the allowed time? if so, set remainingLastCommandTime to the amout
@@ -238,7 +238,7 @@ namespace SIGEL_Simulation
 		
 	      case SIGEL_Program::DIV:
 		// is the command allowed?
-		if ( langParams.hasCommand( "DIV" ) )
+		if ( languageParameters.hasCommand( "DIV" ) )
 		  {
 		    // do it!
 		    int reg0 = programLine.getInstructionElement(0) % numberOfRegisters;
@@ -247,7 +247,7 @@ namespace SIGEL_Simulation
 		    programCounter = (programCounter + 1) % programLength;
 
 		    // subtract the needed time for the command
-		    timeAccountSize -= langParams.getCommand( "DIV" )->getDuration();
+		    timeAccountSize -= languageParameters.getCommand( "DIV" )->getDuration();
 		    
 		    /*
 		     * have we exeeded the allowed time? if so, set remainingLastCommandTime to the amout
@@ -264,7 +264,7 @@ namespace SIGEL_Simulation
 
 	      case SIGEL_Program::MOD:
 		// is the command allowed?
-		if ( langParams.hasCommand( "MOD" ) )
+		if ( languageParameters.hasCommand( "MOD" ) )
 		  {
 		    // do it!
 		    int reg0 = programLine.getInstructionElement(0) % numberOfRegisters;
@@ -273,7 +273,7 @@ namespace SIGEL_Simulation
 		    programCounter = (programCounter + 1) % programLength;
 
 		    // subtract the needed time for the command
-		    timeAccountSize -= langParams.getCommand( "MOD" )->getDuration();
+		    timeAccountSize -= languageParameters.getCommand( "MOD" )->getDuration();
 		    
 		    /*
 		     * have we exeeded the allowed time? if so, set remainingLastCommandTime to the amout
@@ -290,7 +290,7 @@ namespace SIGEL_Simulation
 
 	      case SIGEL_Program::MIN:
 		// is the command allowed?
-		if ( langParams.hasCommand( "MIN" ) )
+		if ( languageParameters.hasCommand( "MIN" ) )
 		  {
 		    // do it!
 		    int reg0 = programLine.getInstructionElement(0) % numberOfRegisters;
@@ -299,7 +299,7 @@ namespace SIGEL_Simulation
 		    programCounter = (programCounter + 1) % programLength;
 
 		    // subtract the needed time for the command
-		    timeAccountSize -= langParams.getCommand( "MIN" )->getDuration();
+		    timeAccountSize -= languageParameters.getCommand( "MIN" )->getDuration();
 		    
 		    /*
 		     * have we exeeded the allowed time? if so, set remainingLastCommandTime to the amout
@@ -316,7 +316,7 @@ namespace SIGEL_Simulation
 
 	      case SIGEL_Program::MAX:
 		// is the command allowed?
-		if ( langParams.hasCommand( "MAX" ) )
+		if ( languageParameters.hasCommand( "MAX" ) )
 		  {
 		    // do it!
 		    int reg0 = programLine.getInstructionElement(0) % numberOfRegisters;
@@ -325,7 +325,7 @@ namespace SIGEL_Simulation
 		    programCounter = (programCounter + 1) % programLength;
 
 		    // subtract the needed time for the command
-		    timeAccountSize -= langParams.getCommand( "MAX" )->getDuration();
+		    timeAccountSize -= languageParameters.getCommand( "MAX" )->getDuration();
 
 		    /*
 		     * have we exeeded the allowed time? if so, set remainingLastCommandTime to the amout
@@ -342,7 +342,7 @@ namespace SIGEL_Simulation
 
 	      case SIGEL_Program::CMP:
 		// is the command allowed?
-		if ( langParams.hasCommand( "CMP" ) )
+		if ( languageParameters.hasCommand( "CMP" ) )
 		  {
 		    // do it!
 		    int reg0 = programLine.getInstructionElement(0) % numberOfRegisters;
@@ -357,7 +357,7 @@ namespace SIGEL_Simulation
 		    programCounter = (programCounter + 1) % programLength;
 
 		    // subtract the needed time for the command
-		    timeAccountSize -= langParams.getCommand( "CMP" )->getDuration();
+		    timeAccountSize -= languageParameters.getCommand( "CMP" )->getDuration();
 
 		    /*
 		     * have we exeeded the allowed time? if so, set remainingLastCommandTime to the amout
@@ -374,7 +374,7 @@ namespace SIGEL_Simulation
 
 	      case SIGEL_Program::JMP:
 		// is the command allowed?
-		if ( langParams.hasCommand( "JMP" ) )
+		if ( languageParameters.hasCommand( "JMP" ) )
 		  {
 		    // do it!
 		    int reg0 = programLine.getInstructionElement(0);
@@ -386,7 +386,7 @@ namespace SIGEL_Simulation
 		      programCounter = -programCounter;
 		    // subtract the needed time for the command
 
-		    timeAccountSize -= langParams.getCommand( "JMP" )->getDuration();
+		    timeAccountSize -= languageParameters.getCommand( "JMP" )->getDuration();
 
 		    /*
 		     * have we exeeded the allowed time? if so, set remainingLastCommandTime to the amout
@@ -403,7 +403,7 @@ namespace SIGEL_Simulation
 
 	      case SIGEL_Program::SENSE:
 		// is the command allowed?
-		if ( langParams.hasCommand( "SENSE" ) )
+		if ( languageParameters.hasCommand( "SENSE" ) )
 		  {
 		    // do it!
 		    int reg0 = programLine.getInstructionElement(0) % numberOfRegisters;
@@ -413,7 +413,7 @@ namespace SIGEL_Simulation
 		    programCounter = (programCounter + 1) % programLength;
 
 		    // subtract the needed time for the command
-		    timeAccountSize -= langParams.getCommand( "SENSE" )->getDuration();
+		    timeAccountSize -= languageParameters.getCommand( "SENSE" )->getDuration();
 
 		    /*
 		     * have we exeeded the allowed time? if so, set remainingLastCommandTime to the amout
@@ -430,7 +430,7 @@ namespace SIGEL_Simulation
 
 	      case SIGEL_Program::MOVE:
 		// is the command allowed?
-		if ( langParams.hasCommand( "MOVE" ) )
+		if ( languageParameters.hasCommand( "MOVE" ) )
 		  {
 		    // do it!
 		    int reg0 = programLine.getInstructionElement(0) % numberOfRegisters;
@@ -442,7 +442,7 @@ namespace SIGEL_Simulation
 		    programCounter = (programCounter + 1) % programLength;
 
 		    // subtract the needed time for the command
-		    timeAccountSize -= langParams.getCommand( "MOVE" )->getDuration();
+		    timeAccountSize -= languageParameters.getCommand( "MOVE" )->getDuration();
 		    
 		    /*
 		     * have we exeeded the allowed time? if so, set remainingLastCommandTime to the amout
@@ -459,7 +459,7 @@ namespace SIGEL_Simulation
 
 	      case SIGEL_Program::DELAY:
 		// is the command allowed?
-		if ( langParams.hasCommand( "DELAY" ) )
+		if ( languageParameters.hasCommand( "DELAY" ) )
 		  {
 		    // do it!
 		    // int readOut = programLine.getInstructionElement(0);
@@ -474,7 +474,7 @@ namespace SIGEL_Simulation
 		    programCounter = (programCounter + 1) % programLength;
 
 		    // subtract the needed time for the command
-		    timeAccountSize -= langParams.getCommand( "DELAY" )->getDuration();
+		    timeAccountSize -= languageParameters.getCommand( "DELAY" )->getDuration();
 		    
 		    /*
 		     * have we exeeded the allowed time? if so, set remainingLastCommandTime to the amout
@@ -491,13 +491,13 @@ namespace SIGEL_Simulation
 
 	      case SIGEL_Program::NOP:
 		// is the command allowed?
-		if ( langParams.hasCommand( "NOP" ) )
+		if ( languageParameters.hasCommand( "NOP" ) )
 		  {
 		    // do it!
 		    programCounter = (programCounter + 1) % programLength;
 
 		    // subtract the needed time for the command
-		    timeAccountSize -= langParams.getCommand( "NOP" )->getDuration();
+		    timeAccountSize -= languageParameters.getCommand( "NOP" )->getDuration();
 		    
 		    /*
 		     * have we exeeded the allowed time? if so, set remainingLastCommandTime to the amout

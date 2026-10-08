@@ -30,12 +30,12 @@ SIGEL_GP::SIG_GPCrossOverTournament::SIG_GPCrossOverTournament(SIGEL_Tools::SIG_
 							       SIGEL_GP::SIG_GPFitnessTrainer& fitTrain,
 							       SIGEL_GP::SIG_GPPopulation& actPool,
 							       SIGEL_GP::SIG_GPParameter& gpParameter,
-							       SIGEL_Robot::SIG_LanguageParameters &languageP,
+							       SIGEL_Robot::SIG_LanguageParameters &languageParameters,
 							       int indPos1,
 							       int indPos2,
 							       int indPos3,
 							       int indPos4)
-  : SIG_GPTournament(randomizer,fitTrain,actPool,gpParameter,languageP),
+  : SIG_GPTournament(randomizer,fitTrain,actPool,gpParameter,languageParameters),
     name1( actPool.getNextIdentifier() ),
     name2( actPool.getNextIdentifier() )
 {
@@ -133,7 +133,7 @@ bool SIGEL_GP::SIG_GPCrossOverTournament::run()
 								   name2,
 								   randomizer,
 								   gpParameter,
-								   languageP);
+								   languageParameters);
 
 #ifdef SIG_DEBUG
    SIGEL_Tools::SIG_IO::cerr <<"the Individuals have been crossed and inserted at the Pool Positions " <<looserPos1<<" and "<<looserPos2<<" ." << Qt::endl;
@@ -221,7 +221,7 @@ bool SIGEL_GP::SIG_GPCrossOverTournament::run(MT_Classifier *MetaClassifier)
 								   name2,
 								   randomizer,
 								   gpParameter,
-								   languageP);
+								   languageParameters);
 
    SIG_GPIndividual &looser1 = gpPool.getIndividual( looserPos1 );
    SIG_GPIndividual &looser2 = gpPool.getIndividual( looserPos2 );
@@ -299,7 +299,7 @@ bool  SIGEL_GP::SIG_GPCrossOverTournament::classify(MT_Classifier *MetaClassifie
 								   name2,
 								   randomizer,
 								   gpParameter,
-								   languageP);
+								   languageParameters);
 
    SIG_GPIndividual &looser1 = gpPool.getIndividual( looserPos1 );
    SIG_GPIndividual &looser2 = gpPool.getIndividual( looserPos2 );

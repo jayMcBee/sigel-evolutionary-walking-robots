@@ -29,10 +29,10 @@ SIGEL_GP::SIG_GPSimpleTournament::SIG_GPSimpleTournament(SIGEL_Tools::SIG_Random
 							 SIG_GPFitnessTrainer& trainer,
 							 SIG_GPPopulation& actPool,
 							 SIG_GPParameter& gpParameter,
-							 SIGEL_Robot::SIG_LanguageParameters &languageP,
+							 SIGEL_Robot::SIG_LanguageParameters &languageParameters,
 							 int ppos1,
 							 int ppos2)
-  : SIG_GPTournament(randomizer,trainer,actPool,gpParameter,languageP),
+  : SIG_GPTournament(randomizer,trainer,actPool,gpParameter,languageParameters),
     name(actPool.getNextIdentifier())
 {
   indis.resize( 2 );
@@ -94,7 +94,7 @@ bool SIGEL_GP::SIG_GPSimpleTournament::run()
 							       looserPos,
 							       randomizer,
 							       gpParameter,
-							       languageP );
+							       languageParameters );
 
      rind.setFitness( winner->getFitness() );
 
@@ -157,7 +157,7 @@ bool SIGEL_GP::SIG_GPSimpleTournament::run(MT_Classifier *MetaClassifier)
 							       looserPos,
 							       randomizer,
 							       gpParameter,
-							       languageP );
+							       languageParameters );
 
      rind.setFitness( winner->getFitness() );
 
@@ -209,7 +209,7 @@ bool SIGEL_GP::SIG_GPSimpleTournament::classify(MT_Classifier *MetaClassifier)
 							       looserPos,
 							       randomizer,
 							       gpParameter,
-							       languageP );
+							       languageParameters );
 
      rind.setFitness( winner->getFitness() );
 

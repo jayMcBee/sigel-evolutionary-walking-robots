@@ -128,11 +128,11 @@ namespace SIGEL_Robot {
                 sensors.append (s);
         }
 
-        void SIG_Robot::setLangParam (SIG_LanguageParameters *lp, int delprev)
+        void SIG_Robot::setLangParam (SIG_LanguageParameters *languageParameters, int delprev)
         {
                 if (delprev)
                         delete language;
-                language = lp;
+                language = languageParameters;
         }
 
         SIG_LanguageParameters *SIG_Robot::getLangParam () const

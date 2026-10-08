@@ -167,7 +167,7 @@ class SIG_GPIndividual{
  public:
  SIG_GPIndividual( SIGEL_Tools::SIG_Randomizer &random,
 		   SIGEL_GP::SIG_GPParameter& param, 
-		   SIGEL_Robot::SIG_LanguageParameters& languageP );
+		   SIGEL_Robot::SIG_LanguageParameters& languageParameters );
 
  /**
  * The constructor of an individual, used for adding an individual to the pool, with a special 
@@ -572,7 +572,7 @@ class SIG_GPIndividual{
  public:
  void generateRandomIndividual(SIGEL_Tools::SIG_Randomizer& random,
                                SIGEL_GP::SIG_GPParameter& param, 
-                               SIGEL_Robot::SIG_LanguageParameters& languageP);
+                               SIGEL_Robot::SIG_LanguageParameters& languageParameters);
 /**
   * This function append new Information about the current increased Age 
   * of the individual to the History.

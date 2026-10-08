@@ -49,10 +49,10 @@ void SIGEL_Program::SIG_ProgramLine::clearLine()
 }
 
 SIGEL_Program::SIG_ProgramLine::SIG_ProgramLine(SIGEL_Tools::SIG_Randomizer &r, 
-					        SIGEL_Robot::SIG_LanguageParameters &languageP,
+					        SIGEL_Robot::SIG_LanguageParameters &languageParameters,
 						QList< int > &prob )
 {
-   generateRandomRobotInstruction(languageP, r, prob );
+   generateRandomRobotInstruction(languageParameters, r, prob );
 }
 
 void SIGEL_Program::SIG_ProgramLine::setRobotinstructionType( Robotinstruction instr )
@@ -607,7 +607,7 @@ void  SIGEL_Program::SIG_ProgramLine::writeToFile(QTextStream &file) const
 }
 
 
-void SIGEL_Program::SIG_ProgramLine::randomRobotinstruction(SIGEL_Robot::SIG_LanguageParameters &languageP,
+void SIGEL_Program::SIG_ProgramLine::randomRobotinstruction(SIGEL_Robot::SIG_LanguageParameters &languageParameters,
 							    SIGEL_Tools::SIG_Randomizer &r,
 							    QList< int > &prob   )
 {
@@ -627,7 +627,7 @@ void SIGEL_Program::SIG_ProgramLine::randomRobotinstruction(SIGEL_Robot::SIG_Lan
      hasCommand.resize( 15 );
      hasCommand.fill( false );
 
-     // getAllowedRobotinstructionsWithProb( instr, languageP, prob );
+     // getAllowedRobotinstructionsWithProb( instr, languageParameters, prob );
      
      op1 = r.getRandomInt( maximum );
      op2 = r.getRandomInt( maximum );
@@ -635,91 +635,91 @@ void SIGEL_Program::SIG_ProgramLine::randomRobotinstruction(SIGEL_Robot::SIG_Lan
      if( r.getRandomInt(2) == 1 ) op1 = (-1) * op1;
      if( r.getRandomInt(2) == 1 ) op2 = (-1) * op2;
 
-     if( languageP.hasCommand("COPY") )
+     if( languageParameters.hasCommand("COPY") )
        {
          maximumValue += prob[0];
          hasCommand[0] = true;
        }
          
-     if( languageP.hasCommand("LOAD") )
+     if( languageParameters.hasCommand("LOAD") )
        { 
          maximumValue += prob[1];
 	 hasCommand[1] = true;
        }
 
-     if( languageP.hasCommand("ADD") ) 
+     if( languageParameters.hasCommand("ADD") ) 
        {
 	 maximumValue += prob[2];
 	 hasCommand[2] = true;
        }
 
-     if( languageP.hasCommand("SUB") ) 
+     if( languageParameters.hasCommand("SUB") ) 
        {
 	 maximumValue += prob[3];
 	 hasCommand[3] = true;
        }
 
-     if( languageP.hasCommand("MUL") )
+     if( languageParameters.hasCommand("MUL") )
        {
 	 maximumValue +=  prob[4];
 	 hasCommand[4] = true;
        }
 
-     if( languageP.hasCommand("DIV") )
+     if( languageParameters.hasCommand("DIV") )
        {
 	 maximumValue += prob[5];
 	 hasCommand[5] = true;
        }
 
-     if( languageP.hasCommand("MOD") )
+     if( languageParameters.hasCommand("MOD") )
        {
 	 maximumValue += prob[6];
 	 hasCommand[6] = true;
        }
 
-     if( languageP.hasCommand("MIN") ) 
+     if( languageParameters.hasCommand("MIN") ) 
        {
 	 maximumValue += prob[7];
 	 hasCommand[7] = true;
        }
 
-     if( languageP.hasCommand("MAX") ) 
+     if( languageParameters.hasCommand("MAX") ) 
        {
 	 maximumValue +=  prob[8];
          hasCommand[8] = true;
        }
 
-     if( languageP.hasCommand("CMP") )
+     if( languageParameters.hasCommand("CMP") )
        {
 	 maximumValue +=  prob[9];
          hasCommand[9] = true;
        }
 
-     if( languageP.hasCommand("JMP") ) 
+     if( languageParameters.hasCommand("JMP") ) 
        {
 	 maximumValue +=  prob[10];
          hasCommand[10] = true;
        }
 
-     if( languageP.hasCommand("SENSE") ) 
+     if( languageParameters.hasCommand("SENSE") ) 
        {
 	 maximumValue +=  prob[11];
 	 hasCommand[11] = true;
        }
 
-     if( languageP.hasCommand("MOVE") )
+     if( languageParameters.hasCommand("MOVE") )
        {
 	 maximumValue +=  prob[12];
 	 hasCommand[12] = true;
        }
 
-     if( languageP.hasCommand("DELAY") )
+     if( languageParameters.hasCommand("DELAY") )
        {
 	 maximumValue +=  prob[13];
 	 hasCommand[13] = true;
        }
 
-     if( languageP.hasCommand("NOP") )
+     if( languageParameters.hasCommand("NOP") )
        {
 	 maximumValue += prob[14];
          hasCommand[14] = true;
@@ -799,11 +799,11 @@ void SIGEL_Program::SIG_ProgramLine::randomRobotinstruction(SIGEL_Robot::SIG_Lan
 
 }
 
-void SIGEL_Program::SIG_ProgramLine::generateRandomRobotInstruction(SIGEL_Robot::SIG_LanguageParameters &languageP,
+void SIGEL_Program::SIG_ProgramLine::generateRandomRobotInstruction(SIGEL_Robot::SIG_LanguageParameters &languageParameters,
 								    SIGEL_Tools::SIG_Randomizer &r,
 								    QList< int > &prob   )
 {
-     randomRobotinstruction(languageP, r, prob);
+     randomRobotinstruction(languageParameters, r, prob);
 }
 
 

@@ -67,7 +67,7 @@ SIG_GPSimpleTournament( SIGEL_Tools::SIG_Randomizer& randomizer,
 		        SIG_GPFitnessTrainer& trainer, 
 		        SIG_GPPopulation& actPool, 
 			SIG_GPParameter& gpParameter,
-			SIGEL_Robot::SIG_LanguageParameters &languageP,
+			SIGEL_Robot::SIG_LanguageParameters &languageParameters,
 		        int ppos1, 
 		        int ppos2 );
 

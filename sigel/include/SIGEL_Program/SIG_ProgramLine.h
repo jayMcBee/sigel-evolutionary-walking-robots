@@ -119,7 +119,7 @@ class SIG_ProgramLine
 
    public:
    SIG_ProgramLine( SIGEL_Tools::SIG_Randomizer &r, 
-		    SIGEL_Robot::SIG_LanguageParameters &languageP,
+		    SIGEL_Robot::SIG_LanguageParameters &languageParameters,
 		    QList< int > &prob );
  
 /**
@@ -138,7 +138,7 @@ class SIG_ProgramLine
  */   
 
    public:
-   void generateRandomRobotInstruction( SIGEL_Robot::SIG_LanguageParameters &languageP,
+   void generateRandomRobotInstruction( SIGEL_Robot::SIG_LanguageParameters &languageParameters,
 				        SIGEL_Tools::SIG_Randomizer &r,
                                         QList< int > &prob  );
           
@@ -170,7 +170,7 @@ class SIG_ProgramLine
  */
  
    public:
-   void randomRobotinstruction( SIGEL_Robot::SIG_LanguageParameters &languageP,
+   void randomRobotinstruction( SIGEL_Robot::SIG_LanguageParameters &languageParameters,
 			        SIGEL_Tools::SIG_Randomizer &r,
 			        QList< int > &prob );
 /**

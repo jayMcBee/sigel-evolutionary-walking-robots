@@ -135,7 +135,7 @@ namespace SIGEL_Robot
      * Sets a new language parameters object. If delprev
      * is set to zero, the previous one will not be deleted.
      */
-    void setLangParam (SIG_LanguageParameters *lp, int delprev = 1);
+    void setLangParam (SIG_LanguageParameters *languageParameters, int delprev = 1);
     /**
      * Returns the language parameter object.
      */

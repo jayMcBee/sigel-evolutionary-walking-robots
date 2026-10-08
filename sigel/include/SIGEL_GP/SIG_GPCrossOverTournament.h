@@ -69,7 +69,7 @@ class SIG_GPCrossOverTournament : public SIGEL_GP::SIG_GPTournament
 			    SIG_GPFitnessTrainer& fitTrain, 
 			    SIG_GPPopulation& actPool, 
 			    SIG_GPParameter& gpParameter,
-			    SIGEL_Robot::SIG_LanguageParameters &languageP,
+			    SIGEL_Robot::SIG_LanguageParameters &languageParameters,
 			    int indPos1, 
 			    int indPos2, 
 			    int indPos3, 

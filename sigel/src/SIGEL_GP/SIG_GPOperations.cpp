@@ -37,7 +37,7 @@ QList<SIGEL_GP::SIG_GPIndividual *> SIGEL_GP::SIG_GPOperations::crossOver( SIGEL
                                                                            QString newName2,
                                                                            SIGEL_Tools::SIG_Randomizer& randomizer,
                                                                            SIGEL_GP::SIG_GPParameter& gpParameter,
-                                                                           SIGEL_Robot::SIG_LanguageParameters &languageP)
+                                                                           SIGEL_Robot::SIG_LanguageParameters &languageParameters)
 {
 	SIGEL_GP::SIG_GPIndividual *crossoverInd1 = new SIGEL_GP::SIG_GPIndividual( SIGEL_Program::SIG_Program(),
 	                                                                            newName1,
@@ -272,7 +272,7 @@ QList<SIGEL_GP::SIG_GPIndividual *> SIGEL_GP::SIG_GPOperations::crossOver( SIGEL
 	newProgram1.checkLength( minLength,
 	                         maxLength,
 	                         randomizer,
-	                         languageP,
+	                         languageParameters,
 	                         gpParameter.getInstructionProbabilities(),
 	                         historyInfo );
 
@@ -282,7 +282,7 @@ QList<SIGEL_GP::SIG_GPIndividual *> SIGEL_GP::SIG_GPOperations::crossOver( SIGEL
 	newProgram2.checkLength( minLength,
 	                         maxLength,
 	                         randomizer,
-	                         languageP,
+	                         languageParameters,
 	                         gpParameter.getInstructionProbabilities(),
 	                         historyInfo );
 
@@ -322,7 +322,7 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::mutation( SIGEL_GP::SIG_
                                                                   QString newName,
                                                                   SIGEL_Tools::SIG_Randomizer& randomizer,
                                                                   SIGEL_GP::SIG_GPParameter& gpParameter,
-                                                                  SIGEL_Robot::SIG_LanguageParameters &languageP)
+                                                                  SIGEL_Robot::SIG_LanguageParameters &languageParameters)
 {
 	double     winnerFitness        = winner.getFitness();
 	int        generalMutationType  = randomizer.getRandomInt( 3 );  // 0: Variation of existing program line
@@ -360,7 +360,7 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::mutation( SIGEL_GP::SIG_
 	newProgram.checkLength( minLength,
 	                        maxLength,
 	                        randomizer,
-	                        languageP,
+	                        languageParameters,
 	                        gpParameter.getInstructionProbabilities(),
 	                        historyInfo );
 
@@ -432,7 +432,7 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::mutation( SIGEL_GP::SIG_
 			{
 				SIGEL_Program::SIG_ProgramLine mutatedLine;
 				mutatedLine = newProgram.getLine( mutPoint );
-				mutatedLine.randomRobotinstruction( languageP,
+				mutatedLine.randomRobotinstruction( languageParameters,
 				                                    randomizer,
 				                                    gpParameter.getInstructionProbabilities() );
 				newProgram.setLine( mutPoint, mutatedLine );
@@ -511,7 +511,7 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::mutation( SIGEL_GP::SIG_
 			// Create a completely new program line to take the mutated data from:
 
 			SIGEL_Program::SIG_ProgramLine randomLine( randomizer,
-			                                           languageP,
+			                                           languageParameters,
 			                                           gpParameter.getInstructionProbabilities() );
 
 			if( randomLine.getRobotinstructionType() != SIGEL_Program::NOP )
@@ -568,7 +568,7 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::mutation( SIGEL_GP::SIG_
 
 #endif
 
-			SIGEL_Program::SIG_ProgramLine newProgLine( randomizer, languageP, gpParameter.getInstructionProbabilities() );
+			SIGEL_Program::SIG_ProgramLine newProgLine( randomizer, languageParameters, gpParameter.getInstructionProbabilities() );
 
 			newProgram.insertLine( mutPoint, newProgLine );
 
@@ -602,7 +602,7 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::mutation( SIGEL_GP::SIG_
 
 #endif
 
-				SIGEL_Program::SIG_ProgramLine newProgLine( randomizer, languageP, gpParameter.getInstructionProbabilities() );
+				SIGEL_Program::SIG_ProgramLine newProgLine( randomizer, languageParameters, gpParameter.getInstructionProbabilities() );
 
 				newProgram.insertLine( mutPoint, newProgLine );
 			}
@@ -635,7 +635,7 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::reproduction( SIGEL_GP::
                                                                       int poolPos,
                                                                       SIGEL_Tools::SIG_Randomizer& randomizer,
                                                                       SIGEL_GP::SIG_GPParameter& gpParameter,
-                                                                      SIGEL_Robot::SIG_LanguageParameters &languageP )
+                                                                      SIGEL_Robot::SIG_LanguageParameters &languageParameters )
 {
 	SIGEL_GP::SIG_GPIndividual *reproducedInd = new SIGEL_GP::SIG_GPIndividual( SIG_GPParameter(),
 	                                                                            winner.getHistory(),
@@ -666,7 +666,7 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::reproduction( SIGEL_GP::
 	reproducedInd->getProgramVar().checkLength( minLength,
 	                                            maxLength,
 	                                            randomizer,
-	                                            languageP,
+	                                            languageParameters,
 	                                            gpParameter.getInstructionProbabilities(),
 	                                            historyInfo );
 

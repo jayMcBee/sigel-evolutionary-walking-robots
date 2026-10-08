@@ -57,14 +57,14 @@ class SIG_Interpreter
   /**
    * The constructor of a SIG_Interpreter object.
    *
-   * @param langParams        The language-parameters of the robot to control.
+   * @param languageParameters        The language-parameters of the robot to control.
    * @param robotProgram      The robot-program to interprete.
    * @param commandInterface  The object offering the methods to manipulate
    *                          the simulation.
    * @param simulationQueries The object offering the methods to query
    *                          actual simulation information.
    */
-  SIG_Interpreter(SIGEL_Robot::SIG_LanguageParameters const &langParams,
+  SIG_Interpreter(SIGEL_Robot::SIG_LanguageParameters const &languageParameters,
 		  SIGEL_Program::SIG_Program const &robotProgram,
 		  SIG_CommandInterface &commandInterface,
 		  SIG_SimulationQueries const &simulationQueries);
@@ -99,7 +99,7 @@ class SIG_Interpreter
    * The language-parameters of the robot to control
    * (set of forbidden commands for example).
    */
-  SIGEL_Robot::SIG_LanguageParameters const &langParams;
+  SIGEL_Robot::SIG_LanguageParameters const &languageParameters;
 
   /**
    * The object that contains the methos used to

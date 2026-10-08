@@ -128,8 +128,8 @@ SIGEL_GP::SIG_GPIndividual::SIG_GPIndividual(SIGEL_Tools::SIG_Randomizer &random
 
 SIGEL_GP::SIG_GPIndividual::SIG_GPIndividual(SIGEL_Tools::SIG_Randomizer &random, 
                                              SIGEL_GP::SIG_GPParameter& param, 
-                                             SIGEL_Robot::SIG_LanguageParameters& languageP)
-  :prog( param, languageP,random )
+                                             SIGEL_Robot::SIG_LanguageParameters& languageParameters)
+  :prog( param, languageParameters,random )
 { 
    setName( "No name" );
    setFitness( -1 );
@@ -151,9 +151,9 @@ SIGEL_GP::SIG_GPIndividual::SIG_GPIndividual(QString data)
 
 void SIGEL_GP::SIG_GPIndividual::generateRandomIndividual(SIGEL_Tools::SIG_Randomizer& random,
                                                           SIGEL_GP::SIG_GPParameter& param, 
-                                                          SIGEL_Robot::SIG_LanguageParameters& languageP )
+                                                          SIGEL_Robot::SIG_LanguageParameters& languageParameters )
 {
-   prog.generateRandomProgram(param,languageP,random);
+   prog.generateRandomProgram(param,languageParameters,random);
    setName("No Name");
    setPoolPos(0);
    setFitness(-1);

@@ -67,7 +67,7 @@ namespace SIGEL_GP
 		                 SIG_GPFitnessTrainer& trainer,
 		                 SIG_GPPopulation& actPool,
 		                 SIG_GPParameter& gpParameter,
-		                 SIGEL_Robot::SIG_LanguageParameters &languageP);
+		                 SIGEL_Robot::SIG_LanguageParameters &languageParameters);
 
 		/**
 		 * The destructor of the tournament.
@@ -91,7 +91,7 @@ namespace SIGEL_GP
 		/**
 		 * The current language parameter settings.
 		 */
-		SIGEL_Robot::SIG_LanguageParameters &languageP;
+		SIGEL_Robot::SIG_LanguageParameters &languageParameters;
 
 		/**
 		 * The randomizer, which is needed to create the randompoint used for the genetic operations.

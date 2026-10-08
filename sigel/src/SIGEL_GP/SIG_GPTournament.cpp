@@ -26,8 +26,8 @@ SIGEL_GP::SIG_GPTournament::SIG_GPTournament(SIGEL_Tools::SIG_Randomizer& random
 					     SIG_GPFitnessTrainer& trainer, 
 					     SIG_GPPopulation& actPool,
 					     SIG_GPParameter& gpParameter,
-					     SIGEL_Robot::SIG_LanguageParameters &languageP)
-: languageP(languageP),
+					     SIGEL_Robot::SIG_LanguageParameters &languageParameters)
+: languageParameters(languageParameters),
   randomizer(randomizer),
   trainer(trainer),
   indis(),

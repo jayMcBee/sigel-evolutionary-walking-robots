@@ -98,7 +98,7 @@ class SIG_Program
 
    public:
    SIG_Program(SIGEL_GP::SIG_GPParameter &param, 
-	       SIGEL_Robot::SIG_LanguageParameters &languageP, 
+	       SIGEL_Robot::SIG_LanguageParameters &languageParameters, 
 	       SIGEL_Tools::SIG_Randomizer& random);
 
 /**
@@ -254,7 +254,7 @@ class SIG_Program
 
    public:
    void generateRandomProgram(SIGEL_GP::SIG_GPParameter &param, 
-                              SIGEL_Robot::SIG_LanguageParameters &languageP, 
+                              SIGEL_Robot::SIG_LanguageParameters &languageParameters, 
 			      SIGEL_Tools::SIG_Randomizer& random);
 
 /**
@@ -282,7 +282,7 @@ class SIG_Program
    void checkLength( long minimum,
 		     long maximum,
 		     SIGEL_Tools::SIG_Randomizer &r, 
-		     SIGEL_Robot::SIG_LanguageParameters &languageP,
+		     SIGEL_Robot::SIG_LanguageParameters &languageParameters,
 		     QList< int > &prob,
 		     int &historyInfo );
    };

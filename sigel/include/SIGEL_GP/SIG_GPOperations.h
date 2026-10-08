@@ -78,7 +78,7 @@ class SIG_GPOperations
 							QString newName2,
 							SIGEL_Tools::SIG_Randomizer& randomizer,
 							SIGEL_GP::SIG_GPParameter& gpParameter,
-							SIGEL_Robot::SIG_LanguageParameters &languageP );
+							SIGEL_Robot::SIG_LanguageParameters &languageParameters );
 
 /** This Operation mutate the Individual
 * @pre
@@ -102,7 +102,7 @@ class SIG_GPOperations
 					       QString newName,
 					       SIGEL_Tools::SIG_Randomizer& randomizer,
 					       SIGEL_GP::SIG_GPParameter& gpParameter,
-					       SIGEL_Robot::SIG_LanguageParameters &languageP);
+					       SIGEL_Robot::SIG_LanguageParameters &languageParameters);
 
 /** This operation gets the winner of an played tournament with reproduction. 
 * It returns the same Individual without any changes.
@@ -125,7 +125,7 @@ class SIG_GPOperations
 						  int poolPos,
 						  SIGEL_Tools::SIG_Randomizer& randomizer,
 						  SIGEL_GP::SIG_GPParameter& gpParameter,
-						  SIGEL_Robot::SIG_LanguageParameters &languageP );
+						  SIGEL_Robot::SIG_LanguageParameters &languageParameters );
 
 };
 

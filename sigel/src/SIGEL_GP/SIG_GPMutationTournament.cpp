@@ -29,10 +29,10 @@ SIGEL_GP::SIG_GPMutationTournament::SIG_GPMutationTournament(SIGEL_Tools::SIG_Ra
 							     SIG_GPFitnessTrainer& fitTrain,
 							     SIG_GPPopulation& actPool,
 							     SIG_GPParameter& gpParameter,
-							     SIGEL_Robot::SIG_LanguageParameters &languageP,
+							     SIGEL_Robot::SIG_LanguageParameters &languageParameters,
 							     int ppos1,
 							     int ppos2)
-  :SIG_GPTournament(randomizer,fitTrain,actPool,gpParameter,languageP),
+  :SIG_GPTournament(randomizer,fitTrain,actPool,gpParameter,languageParameters),
    name(actPool.getNextIdentifier())
    {
      indis.resize( 2 );
@@ -92,7 +92,7 @@ bool SIGEL_GP::SIG_GPMutationTournament::run()
 						       name,
 						       randomizer,
 						       gpParameter,
-						       languageP);
+						       languageParameters);
 
 #ifdef SIG_DEBUG
    SIGEL_Tools::SIG_IO::cerr <<"the Individual " <<winnerPos<<" have been mutated and inserted at the Pool Position " << looserPos << " ." << Qt::endl;
@@ -151,7 +151,7 @@ bool SIGEL_GP::SIG_GPMutationTournament::run(MT_Classifier *MetaClassifier)
 						       name,
 						       randomizer,
 						       gpParameter,
-						       languageP);
+						       languageParameters);
 
    SIG_GPIndividual &looser = gpPool.getIndividual( looserPos );
 
@@ -203,7 +203,7 @@ bool  SIGEL_GP::SIG_GPMutationTournament::classify(MT_Classifier *MetaClassifier
 						       name,
 						       randomizer,
 						       gpParameter,
-						       languageP);
+						       languageParameters);
 
    SIG_GPIndividual &looser = gpPool.getIndividual( looserPos );
 

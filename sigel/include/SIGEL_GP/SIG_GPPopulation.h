@@ -136,7 +136,7 @@ class SIG_GPPopulation
     SIG_GPPopulation(int size, 
 		     SIGEL_Tools::SIG_Randomizer &r, 
 		     SIGEL_GP::SIG_GPParameter& param, 
-		     SIGEL_Robot::SIG_LanguageParameters& languageP);
+		     SIGEL_Robot::SIG_LanguageParameters& languageParameters);
 
     /**
      * The constructor of an population, which is constructed from a QString. 
@@ -383,7 +383,7 @@ class SIG_GPPopulation
   public:
     int addRandomIndividuals(int quantity, 
 			      SIGEL_GP::SIG_GPParameter& param, 
-			      SIGEL_Robot::SIG_LanguageParameters& languageP);
+			      SIGEL_Robot::SIG_LanguageParameters& languageParameters);
     
     /** 
      * This function searches for the best fitness within the population. It returns the best found fitness and the position

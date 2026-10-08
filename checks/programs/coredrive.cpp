@@ -146,12 +146,12 @@ static int selfcheck()
   while (0)
 
   {   // SIG_LanguageParameters owns its commands; removeCommand frees one.
-    SIGEL_Robot::SIG_LanguageParameters lp;
+    SIGEL_Robot::SIG_LanguageParameters languageParameters;
     SIGEL_Robot::SIG_CommandParameters *command = new SIGEL_Robot::SIG_CommandParameters();
-    lp.addCommand("CHECKED", command);
-    SIG_WANT(lp.getCommand("CHECKED") == command);
-    lp.removeCommand("CHECKED");
-    SIG_WANT(lp.getCommand("CHECKED") == 0);
+    languageParameters.addCommand("CHECKED", command);
+    SIG_WANT(languageParameters.getCommand("CHECKED") == command);
+    languageParameters.removeCommand("CHECKED");
+    SIG_WANT(languageParameters.getCommand("CHECKED") == 0);
   }
   {   // A robot file may declare a point of a link twice. The last one wins.
     SIGEL_Robot::SIG_Link link(0, "L", 0);
@@ -260,10 +260,10 @@ static int selfcheck()
       // judges every free in setIndividual, deleteIndividual and the
       // destructor; the checks below pin positions and values.
     SIGEL_GP::SIG_GPParameter param;
-    SIGEL_Robot::SIG_LanguageParameters langParams;
+    SIGEL_Robot::SIG_LanguageParameters languageParameters;
 
     SIGEL_GP::SIG_GPPopulation pop;
-    pop.addRandomIndividuals( 4, param, langParams );
+    pop.addRandomIndividuals( 4, param, languageParameters );
     SIG_WANT(pop.getSize() == 4);
 
     // deleteIndividual frees one individual and shifts the rest down.
