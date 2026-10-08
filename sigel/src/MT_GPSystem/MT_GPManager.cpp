@@ -244,7 +244,8 @@ void MT_GPManager::writeToFileGPSystem(QTextStream &File)
 				FitnessTrainer->calculateFitness(NewBestIndi);
 				ErrorCorrect = ((0.1/NewBestIndi->getFitness())/PresentTSize);
 				
-			} break;
+			}
+			break;
 			
 		case 2: 
 			{
@@ -252,14 +253,16 @@ void MT_GPManager::writeToFileGPSystem(QTextStream &File)
 				FitnessTrainer->calculateFitness(NewBestIndi);
 				ErrorCorrect = ((0.1/NewBestIndi->getFitness())/PresentTSize);
 
-			}break;
+			}
+			break;
 			
 		case 3:
 			{
 				FitnessTrainer->calculateFitness(NewBestIndi);
 				ErrorCorrect = (NewBestIndi->getFitness()/10.0);
 
-			} break;
+			}
+			break;
 
 
 		case 4:
@@ -268,7 +271,8 @@ void MT_GPManager::writeToFileGPSystem(QTextStream &File)
 				FitnessTrainer->calculateFitness(NewBestIndi);
 				ErrorCorrect = (NewBestIndi->getFitness()/10.0);
 				
-			}break;
+			}
+			break;
 	}
 
 	QList<double> * Outcome =FitnessTrainer->getResultIstArray();
@@ -639,26 +643,31 @@ void MT_GPManager::collectOffspringParameter(MT_StatisticsElement * SElement)
 					SElement->CrossoverEventParent[0]++;
 					if ( ((Offspring->getIndividual(i))->getFitness()) >= ((Offspring->getIndividual(i))->getFitnessOfParent()))
 						SElement->CrossoverEventParent[1] ++;
-				} break;
+				}
+				break;
 			case 2: 
 				{	SElement->CrossoverEventParent[2]++;
 					if ( ((Offspring->getIndividual(i))->getFitness())>=((Offspring->getIndividual(i))->getFitnessOfParent()))
 						SElement->CrossoverEventParent[3]++;
-				} break;
+				}
+				break;
 			case 3: 
 				{	SElement->CrossoverEventParent[4]++;
 					if ( ((Offspring->getIndividual(i))->getFitness())>=((Offspring->getIndividual(i))->getFitnessOfParent()))
 						SElement->CrossoverEventParent[5]++;
-				} break;
+				}
+				break;
 
 			case 4: 
 				{
 					SElement->NumOfSimpleCopyOffspring++;
-				} break;
+				}
+				break;
 			case 5: 
 				{
 					SElement->NumOfSimpleCopyOffspring++;
-				} break;
+				}
+				break;
 			}
 		}
 

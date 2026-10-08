@@ -526,7 +526,8 @@ QList<int> * MT_Randomizer::getRandomXPoints(int SizeIndi1, int SizeIndi2)
 				RandomXPoints[1]= getRandomInteger(SizeIndi1)+1;
 				RandomXPoints[2]= getRandomInteger(SizeIndi2)+1;
 
-			}break;
+			}
+			break;
 		case 1: 
 			{
 				// 2 XPoints
@@ -536,7 +537,8 @@ QList<int> * MT_Randomizer::getRandomXPoints(int SizeIndi1, int SizeIndi2)
 				RandomXPoints[3]= RandomXPoints[1] + 1 + getRandomInteger(SizeIndi1-RandomXPoints[1]-1);
 				RandomXPoints[4]= RandomXPoints[2] + 1 + getRandomInteger(SizeIndi2-RandomXPoints[2]-1);
 
-			}break;
+			}
+			break;
 		case 2:
 			{
 				// 3 XPoints
@@ -549,7 +551,8 @@ QList<int> * MT_Randomizer::getRandomXPoints(int SizeIndi1, int SizeIndi2)
 				RandomXPoints[5]= RandomXPoints[3] + 1 + getRandomInteger(SizeIndi1-RandomXPoints[3]-1);
 				RandomXPoints[6]= RandomXPoints[4] + 1 + getRandomInteger(SizeIndi2-RandomXPoints[4]-1);
 
-			}break;
+			}
+			break;
 	}
 
 

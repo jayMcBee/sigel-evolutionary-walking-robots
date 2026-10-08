@@ -150,7 +150,8 @@ bool MT_Evaluator::evaluationTactic()
 				UseMeta =false;
 				NumOfMeta =0;
 			}
-		} break;
+		}
+		break;
 
 	case 2: 
 		{
@@ -214,7 +215,8 @@ bool MT_Evaluator::evaluationTactic()
 				UseMeta =false;
 				NumOfMeta =0;
 			}
-		} break;
+		}
+		break;
 		
 	case 9:
 		{
@@ -262,7 +264,8 @@ bool MT_Evaluator::evaluationTactic()
 				UseMeta =false;
 				NumOfMeta =0;
 			}
-		} break;
+		}
+		break;
 
 	case 10:
 		{
@@ -308,7 +311,8 @@ bool MT_Evaluator::evaluationTactic()
 				UseMeta =false;
 				NumOfMeta =0;
 			}
-		} break;
+		}
+		break;
 
 	case 13: UseMeta=false; break;
 	}

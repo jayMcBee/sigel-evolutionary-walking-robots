@@ -86,21 +86,24 @@ MT_Individual * MT_Search::mutate(MT_Individual * Progenitor)
 						{
 							// Mutate instruction!
 							(ChildProgram->getProgramLine(i))->setInstruction(Randi->getRandomInstruktion());
-						} break;
+						}
+						break;
 
 					case 1:
 						{
 							// Mutate Variable - 1.Operand
 							(ChildProgram->getProgramLine(i))->setOperandA(Randi->getRandomVariable());
 						
-						} break;
+						}
+						break;
 
 					case 2:
 						{
 							// Mutate 2. Operand!
 							(ChildProgram->getProgramLine(i))->setOperandB(Randi->getRandomOperand());
 						
-						} break;
+						}
+						break;
 					}
 				}
 			}
@@ -165,7 +168,8 @@ void MT_Search::crossover(MT_Individual * ParentOne, MT_Individual * ParentTwo)
 			ChildOne->setTypOfGenesis(1);
 			ChildTwo->setTypOfGenesis(1);
 
-		} break;
+		}
+		break;
 	
 	// 2 crossover points are used
 	case 1: 
@@ -186,7 +190,8 @@ void MT_Search::crossover(MT_Individual * ParentOne, MT_Individual * ParentTwo)
 			ChildTwo->setTypOfGenesis(2);
 
 			
-		} break;
+		}
+		break;
 
 	// 3 crossover points are used
 	case 2:
@@ -212,7 +217,8 @@ void MT_Search::crossover(MT_Individual * ParentOne, MT_Individual * ParentTwo)
 			ChildOne->setTypOfGenesis(3);
 			ChildTwo->setTypOfGenesis(3);
 
-		} break;
+		}
+		break;
 
 	}
 }
@@ -289,7 +295,8 @@ int MT_Search::startMatingProcess()
 					FreePos++;
 				}
 
-			} break;
+			}
+			break;
 		
 		
 		/* Mutation of the parent */
@@ -309,7 +316,8 @@ int MT_Search::startMatingProcess()
 					FreePos++;
 				}
 
-			} break;
+			}
+			break;
 		
 		/*Recombination with the parent, if a "partner" is available */
 		case 1 :
@@ -353,7 +361,8 @@ int MT_Search::startMatingProcess()
 					CrossOver = true;
 					FirstXOverParent = SourcePop->getIndividual(ParentPos);
 				}
-			} break;
+			}
+			break;
 		} // end of switch
 		
 		ParentPos++;

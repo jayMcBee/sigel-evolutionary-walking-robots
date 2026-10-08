@@ -152,7 +152,8 @@ int MT_Classifier::evaluationTactic(int ToursSize)
 
 				NumOfClassi = ToursSize-NumOfMeta;
 			}
-		}break;
+		}
+		break;
 	
 	case 4: 
 		{
@@ -188,7 +189,8 @@ int MT_Classifier::evaluationTactic(int ToursSize)
 
 				NumOfClassi = ToursSize-NumOfMeta;
 			}
-		}break;
+		}
+		break;
 	case 5: 
 		{
 			// Evaluation strategy weighted by SIGEL fitness
@@ -226,11 +228,13 @@ int MT_Classifier::evaluationTactic(int ToursSize)
 
 				NumOfClassi = ToursSize-NumOfMeta;
 			}
-		}break;
+		}
+		break;
 	case 8: 
 		{
 			NumOfClassi =0;
-		}break;
+		}
+		break;
 
 	case 6: 
 		{
@@ -246,7 +250,8 @@ int MT_Classifier::evaluationTactic(int ToursSize)
 			
 			if(MetaProgError< Tolerance)
 				NumOfClassi =-1;
-		}break;
+		}
+		break;
 	}
 	
 return NumOfClassi; 
