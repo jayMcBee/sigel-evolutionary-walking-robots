@@ -30,7 +30,8 @@
 #include "SIGEL_Tools/SIG_IO.h"
 
 SIGEL_GP::SIG_GPFitnessTrainer::SIG_GPFitnessTrainer(SIGEL_GP::SIG_GPExperiment& exp)
-  :exp(exp),
+  :pvmLost(false),
+   exp(exp),
    pvmTasks( exp.population.getSize() ),
    pvmHosts(),
    dynHosts(),
@@ -43,8 +44,7 @@ SIGEL_GP::SIG_GPFitnessTrainer::SIG_GPFitnessTrainer(SIGEL_GP::SIG_GPExperiment&
      exp.gpParameter.getFitnessName(),
      false),
    modifiedRobot( exp.robot ),
-   nextFreeNumber(0),
-   pvmLost(false)
+   nextFreeNumber(0)
 {
   pthread_mutex_init(&dynHostsMutex, nullptr);
 

@@ -44,65 +44,7 @@ namespace SIGEL_GP
 
 	class SIG_GPFitnessTrainer
 	{
-		/**
-		 * A refernce to the actual experiment datas.
-		 */
-	private:
-		SIG_GPExperiment& exp;
-
-		/**
-		 * The array of TIDs from PVM, to identify the PVMtasks.
-		 */
-	private:
-		QList< SIG_GPPVMTask * > pvmTasks;
-
-		/**
-		 * our hosts participating in fitness calculations
-		 */
-	private:
-		QList< SIG_GPActivePVMHost * > pvmHosts;
-
-		/**
-		 * Names of all dynamic hosts, which are valid for a single evaluation period
-		 */
-		QList< QString * > dynHosts;
-
-		/**
-		 * New dynamic hosts that have registered but were not yet added to 'pvmHosts'.
-		 */
-		QList< SIG_GPPVMHost * > freshDynHosts;
-
-		/**
-		 * Guards 'dynHosts' and 'freshDynHosts'.
-		 */
-		pthread_mutex_t dynHostsMutex;
-
-	private:
-		int nextHostNumber;
-
-		/**
-		 * The array of indices, representing the position of the individual in the pool, which is to simulate.
-		 */
-	private:
-		QList< QList<int> * > toSpawnList;
-
-
-		/**
-		 * This is an object of the class, which contains the data encode and decode
-		 * routines, related to pvmdatatransfer.
-		 */
-	private:
-		SIG_GPPVMData PVMData;
-
-	private:
-		SIGEL_Robot::SIG_Robot modifiedRobot;
-
-		/**
-		 * This attribute contains the next free number, which is no indice in the array of the slaves.
-		 */
-	private:
-		int nextFreeNumber ;
-
+	public:
 		/**
 		 * The constructor of the object of a GPFitnesstrainer.
 		 * @pre
@@ -115,7 +57,6 @@ namespace SIGEL_GP
 		 * @param exp
 		 * The actual experiment data of the GPManager.
 		 */
-	public:
 		SIG_GPFitnessTrainer(SIG_GPExperiment& exp);
 
 		/**
@@ -125,7 +66,6 @@ namespace SIGEL_GP
 		 * @post
 		 * The GPFitnessTrainer-object is destructed, no PVM-task is running anymore.
 		 */
-	public:
 		virtual ~SIG_GPFitnessTrainer();
 
 		/**
@@ -143,7 +83,6 @@ namespace SIGEL_GP
 		 * An integer, which represents the TID of the PVM-task. If an error occurred at the spawning
 		 * process, the returned integer has the value -1.
 		 */
-	public:
 		virtual int spawnTask(SIG_GPIndividual const& ind);
 
 		/** This operation checks a PVM-task, if the computation continues or not. This happens by
@@ -161,17 +100,7 @@ namespace SIGEL_GP
 		 * The fitnessvalue of the evaluated robot controll program or -1 as a sign that an error
 		 * occurred.
 		 */
-	public:
 		virtual double checkTask(int task);
-
-		/**
-		 * True once PVM has reported that it can no longer be reached. checkTask is
-		 * the only place that sees this, because pvm_probe is the only call on the
-		 * run path that touches the daemon. Nothing here acts on it: the environment
-		 * that owns the evolution reads it and decides.
-		 */
-	public:
-		bool pvmLost;
 
 		/**
 		 * This operation will stop all PVM-tasks.
@@ -181,7 +110,6 @@ namespace SIGEL_GP
 		 * @post
 		 * No PVM-task is running anymore.
 		 */
-	public:
 		void stopTrainersSlaves();
 
 		/**
@@ -191,10 +119,8 @@ namespace SIGEL_GP
 		 * @post
 		 * The toSpawnArray is updated.
 		 */
-	public:
 		void sweepToSpawn();
 
-	public:
 		int getNextHost();
 
 		/** This methods adds a dynamic PVM host, which will used
@@ -209,6 +135,65 @@ namespace SIGEL_GP
 		 * they'll be no longer used for fitness evaluations.
 		 */
 		void flushAllDynHosts();
+
+		/**
+		 * True once PVM has reported that it can no longer be reached. checkTask is
+		 * the only place that sees this, because pvm_probe is the only call on the
+		 * run path that touches the daemon. Nothing here acts on it: the environment
+		 * that owns the evolution reads it and decides.
+		 */
+		bool pvmLost;
+
+	private:
+		/**
+		 * A refernce to the actual experiment datas.
+		 */
+		SIG_GPExperiment& exp;
+
+		/**
+		 * The array of TIDs from PVM, to identify the PVMtasks.
+		 */
+		QList< SIG_GPPVMTask * > pvmTasks;
+
+		/**
+		 * our hosts participating in fitness calculations
+		 */
+		QList< SIG_GPActivePVMHost * > pvmHosts;
+
+		/**
+		 * Names of all dynamic hosts, which are valid for a single evaluation period
+		 */
+		QList< QString * > dynHosts;
+
+		/**
+		 * New dynamic hosts that have registered but were not yet added to 'pvmHosts'.
+		 */
+		QList< SIG_GPPVMHost * > freshDynHosts;
+
+		/**
+		 * Guards 'dynHosts' and 'freshDynHosts'.
+		 */
+		pthread_mutex_t dynHostsMutex;
+
+		int nextHostNumber;
+
+		/**
+		 * The array of indices, representing the position of the individual in the pool, which is to simulate.
+		 */
+		QList< QList<int> * > toSpawnList;
+
+		/**
+		 * This is an object of the class, which contains the data encode and decode
+		 * routines, related to pvmdatatransfer.
+		 */
+		SIG_GPPVMData PVMData;
+
+		SIGEL_Robot::SIG_Robot modifiedRobot;
+
+		/**
+		 * This attribute contains the next free number, which is no indice in the array of the slaves.
+		 */
+		int nextFreeNumber ;
 	};
 
 }
