@@ -46,8 +46,6 @@ namespace SIGEL_SlaveGUI
     stepAction->setObjectName( "stepAction" );
     fForwardAction = new QAction( this );
     fForwardAction->setObjectName( "fForwardAction" );
-    // recordAction = new QAction( this );
-    // recordAction->setObjectName( "recordAction" );
     alterMovieSettingsAction = new QAction( this );
     alterMovieSettingsAction->setObjectName( "alterMovieSettingsAction" );
     quitAction = new QAction( this );
@@ -58,7 +56,6 @@ namespace SIGEL_SlaveGUI
     stepIcons.addFile( sigelRootString + "/pixmaps/stepButton.xpm" );
     pauseIcons.addFile( sigelRootString + "/pixmaps/pauseButton.xpm" );
     fForwardIcons.addFile( sigelRootString + "/pixmaps/ffButton.xpm" );
-    // recordIcons.addFile( sigelRootString + "/pixmaps/videoallow.xpm" );
     recordingAllowedIcons.addFile( sigelRootString + "/pixmaps/videoallow.xpm" );
     recordingDisallowedIcons.addFile( sigelRootString + "/pixmaps/videodisallow.xpm" ); 
     quitIcons.addFile( sigelRootString + "/pixmaps/quitApplicationSmall.xpm" );
@@ -67,7 +64,6 @@ namespace SIGEL_SlaveGUI
     playAction->setIcon( playIcons );
     stepAction->setIcon( stepIcons );
     fForwardAction->setIcon( fForwardIcons );
-    // recordAction->setIcon( recordIcons );
     alterMovieSettingsAction->setIcon( recordingDisallowedIcons );
     quitAction->setIcon( quitIcons );
 
@@ -82,7 +78,6 @@ namespace SIGEL_SlaveGUI
     playAction->setStatusTip( "Starts/pauses the simulation." );
     stepAction->setStatusTip( "Lets the simulation progress by one time step." );
     fForwardAction->setStatusTip( "Lets the simulation progress by 5 seconds." );
-    // recordAction->setStatusTip( "Toggle the recording of the simulation." );
     alterMovieSettingsAction->setStatusTip( "Alters the movie settings." );
     quitAction->setStatusTip( "Closes the simulation visualization." );
 

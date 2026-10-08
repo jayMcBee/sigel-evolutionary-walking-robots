@@ -43,7 +43,6 @@ SIG_InfoBox::SIG_InfoBox( QWidget *parent, const char *name, bool modal, Qt::Win
   pixmapLabel->setPixmap( QPixmap( sigelRoot + "/pixmaps/newLogoNoVersion.png" )
 			  .scaled( 256, 256, Qt::KeepAspectRatio, Qt::SmoothTransformation ) );
   pixmapLabel->setFrameStyle( QFrame::Box | QFrame::Sunken );
-  // pixmapLabel->setScaledContents( true );
 
   QHBoxLayout *hL = new QHBoxLayout( this );
   hL->setContentsMargins( 6, 6, 6, 6 );

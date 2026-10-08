@@ -453,16 +453,6 @@ void SIG_ExperimentListView::selectItem( QString label )
 	      break;
 	    }
 	}
-
-      /* QTreeWidgetItemIterator it( theItem );
-       * for ( ; *it; it++ )
-       * 	{
-       *	  if( (*it)->text( 0 ) == label )
-       *    {
-       *	      setSelected( (*it), true );
-       *	      break;
-       *	    }
-       *	} */
     }
   else
     {

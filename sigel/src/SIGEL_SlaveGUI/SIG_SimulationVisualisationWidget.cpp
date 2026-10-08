@@ -37,9 +37,6 @@
 #include <QtMath>
 #include <cmath>
 
-// namespace SIGEL_SlaveGUI
-// {
-
   SIG_SimulationVisualisationWidget::SIG_SimulationVisualisationWidget( QWidget *parent,
 									char const *name,
 									Qt::WindowFlags f )
@@ -661,5 +658,3 @@ void SIG_SimulationVisualisationWidget::reportAndEncodeRecording()
 	emit signalPosition( visualisation->viewSettings.lookPoint );
       };
   };
-
-// }

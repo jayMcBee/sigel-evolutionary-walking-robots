@@ -41,9 +41,6 @@ SIGEL_MasterGUI::SIG_ExperimentItem::SIG_ExperimentItem( QTreeWidget * parent, Q
   newItem->setText(0, "Environment");
   newItem->setIcon( 0, QIcon( QPixmap( sigelRootString + "/pixmaps/environSmall.xpm" ) ) );
   
-  // newItem = new QTreeWidgetItem( this );
-  // newItem->setText( 0, "Parameters");
-
   // language parameters
   
   newItem = new QTreeWidgetItem();

@@ -472,7 +472,6 @@ SIG_MainWindow::SIG_MainWindow( QWidget * parent, const char * name, Qt::WindowF
 		    SLOT( slotShowEnvironment() ) );
   viewEnvironmentAction->setStatusTip( "Shows the environment." );
 
-  // viewMenu->addSeparator();
   optionsMenu = new QMenu( this );
   optionsMenu->setObjectName( "optionsMenu" );
   bigPixmapAction = optionsMenu->addAction( "Use Big Pixmaps", this, SLOT( slotUseBigPixmaps() ) );
@@ -683,8 +682,6 @@ SIG_MainWindow::SIG_MainWindow( QWidget * parent, const char * name, Qt::WindowF
 	  SIGNAL( currentExperimentChanged() ),
 	  this,
 	  SLOT( slotCurrentExperimentChanged() ));
-//  noExperimentActions.append( mtChoiceTypeActionGroup );
-//  noExperimentActions.append( mtConfigureAction );
 
   /**
    * Meta-GP menu and toolbar definition
@@ -712,7 +709,7 @@ SIG_MainWindow::SIG_MainWindow( QWidget * parent, const char * name, Qt::WindowF
 		    SLOT( slotEnableNoExperimentActions( bool ) ) );
 
   widgetBase = new QLabel( this );
-  widgetBase->setObjectName( "baseWidget" ); // new QLabel( "I am the void", this );
+  widgetBase->setObjectName( "baseWidget" );
   widgetBase->setPixmap( QPixmap( sigelRoot + "/pixmaps/noExperiment.png" ) );
   // The image is square. Scaling it to the widget stretches it.
   widgetBase->setAlignment( Qt::AlignCenter );
@@ -733,8 +730,6 @@ SIG_MainWindow::SIG_MainWindow( QWidget * parent, const char * name, Qt::WindowF
 
 void SIG_MainWindow::slotAbout()
 {
-  //QMessageBox::about( this, "Sigel", "Sigel Version 1.0\nDeveloped by:\n\tChristian 'Krasstexta' Aue\n\tAbdeladim 'Silent Ad' Benkacem\n\tMichael 'CJ QT' Gregorius\n\tAndree 'MC Overload' Ross\n\tAbdallah 'The Raiyan' Salah Raiyan\n\tDaniel 'Tabmaster Ispell' Sawitzki\n\tVolker 'SEXmaschine' Strunk\n\tHolger 'DJ NOOP' Tuerk\n\tChris 'MC Royal' Varcol" );
-
   SIG_InfoBox theInfoBox( this, "InfoBox", true );
   theInfoBox.resize( 600, -1 );
   theInfoBox.exec();

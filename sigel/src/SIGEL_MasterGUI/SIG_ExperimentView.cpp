@@ -159,8 +159,6 @@ void SIG_ExperimentView::slotShowFitnesscurve() {
       return;
     };
 
-  //errno = 0;
-  //signal(SIGPIPE,sigelSignalStandardHandler);
   FILE *gnuPlotStdInPipe = popen( "gnuplot -persist -", "w" );
 
   if (gnuPlotStdInPipe==nullptr ) {

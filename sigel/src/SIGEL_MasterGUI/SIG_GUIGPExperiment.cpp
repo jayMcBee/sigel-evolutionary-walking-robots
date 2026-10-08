@@ -789,14 +789,6 @@ void SIG_GUIGPExperiment::slotEvolutionStopped()
       QMessageBox::warning( experimentListView, "Evolution Stopped", endedBecause );
       endedBecause = QString();
     }
-
-  /*
-  if( guiGPManager )
-    {
-      delete guiGPManager;
-      guiGPManager = 0;
-    }
-  */
 };
 
 }

@@ -20,7 +20,6 @@
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-// #include <QTimer>
 #include <qpixmap.h>
 #include <QTreeWidget>
 #include <qspinbox.h>
@@ -46,9 +45,8 @@ namespace SIGEL_MasterGUI
  *  name 'name' and widget flags set to 'f' 
  */
 SIG_LanguageParameters::SIG_LanguageParameters( QWidget* parent,  const char* name, Qt::WindowFlags fl, SIGEL_GP::SIG_GPExperiment &theExperiment )
-  : SIG_LanguageParametersBase( parent, name, fl ), theExperiment( theExperiment ), sigelRoot( std::getenv( "SIGEL_ROOT" ) )//, allow( sigelRoot + "/pixmaps/allow.xpm" ), disallow( sigelRoot + "/pixmaps/disallow.xpm" )
+  : SIG_LanguageParametersBase( parent, name, fl ), theExperiment( theExperiment ), sigelRoot( std::getenv( "SIGEL_ROOT" ) )
 {
-  // sigelRoot = QString( std::getenv( "SIGEL_ROOT") );
   allow = QPixmap( sigelRoot + "/pixmaps/allow.xpm" );
   disallow = QPixmap( sigelRoot + "/pixmaps/disallow.xpm" );
   // get the language parameters out of the experiment
@@ -209,8 +207,6 @@ SIG_LanguageParameters::SIG_LanguageParameters( QWidget* parent,  const char* na
   
   spinboxNumberOfRegisters->setValue( languageParameters->getMemorySize() );
   spinboxRegisterWidth->setValue( languageParameters->getRegisterWidth() );
-
-  // editCommandDialog = new SIG_EditCommandDialog( this, "EditCommandDialog", true );
 
   QObject::connect( listviewCommands,
 		    SIGNAL( itemDoubleClicked( QTreeWidgetItem *, int ) ),

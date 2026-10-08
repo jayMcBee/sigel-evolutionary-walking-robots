@@ -79,21 +79,6 @@ SIG_AllIndividualsView::SIG_AllIndividualsView( QWidget * parent, const char * n
   listviewMenu->addAction( "Import Individual...", this, SLOT( slotImportIndividual() ) )->setShortcut( Qt::CTRL | Qt::SHIFT | Qt::Key_L );
 
   // connect some stuff
-  /* QObject::connect( individualList->pushbuttonAdd,
-		    SIGNAL( clicked() ),
-		    this,
-		    SLOT( slotAddIndividuals() ) );
-
-  QObject::connect( individualList->pushbuttonDelete,
-		    SIGNAL( clicked() ),
-		    this,
-		    SLOT( slotDeleteIndividuals() ) );
-
-  QObject::connect( individualList->pushbuttonStats,
-		    SIGNAL( clicked() ),
-		    this,
-		    SLOT( slotStatsClicked() ) ); */
-  
   individualList->listviewIndividuals->setContextMenuPolicy( Qt::CustomContextMenu );
   QObject::connect( individualList->listviewIndividuals,
 		    SIGNAL( customContextMenuRequested( const QPoint & ) ),
@@ -375,9 +360,6 @@ void SIG_AllIndividualsView::slotVisualize()
 
 void SIG_AllIndividualsView::slotSelectionChanged()
 {
-  /* QTreeWidgetItemIterator it( individualList->listviewIndividuals );
-  for ( ; *it; ++it )
-  { */
   QTreeWidgetItem *currentItem = individualList->listviewIndividuals->currentItem();
   if( currentItem )
     {

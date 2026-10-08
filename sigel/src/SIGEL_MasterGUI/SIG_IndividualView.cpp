@@ -62,10 +62,4 @@ void SIG_IndividualView::clear()
   multilineeditHistory->clear();
 };
 
-/* void SIG_IndividualView::closeEvent( QCloseEvent *e )
-{
-  QWidget::closeEvent( e );
-  delete this;
-}; */
-
 }
