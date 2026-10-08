@@ -828,7 +828,6 @@ void SIGEL_GP::SIG_GPManager::RegisterDynPVMClients() {
   QList<int> clientSockets(0);
   //struct hostent *ptrh;
   struct protoent *ptrp;
-  int i;
   int listenSocket, sdRecv;
   pthread_mutex_t servMutex = PTHREAD_MUTEX_INITIALIZER;
   char clientName[256];
@@ -899,11 +898,17 @@ void SIGEL_GP::SIG_GPManager::RegisterDynPVMClients() {
         exit(1);
       }
 
+      const ssize_t receivedBytes = recv(sdRecv, clientName, sizeof(clientName), 0);
+
+      if (receivedBytes <= 0) {
+        fprintf(stderr, "ERR:   a dynamic client sent no host name; it is not registered\n");
+        close(sdRecv);
+        continue;
+      }
+
       // store socket for later disconnect
       clientSockets.resize( clientSockets.count()+1 );
       clientSockets[clientSockets.count()-1] = sdRecv;
-
-      i = recv(sdRecv, clientName, sizeof(clientName), 0);
 
       // remember client locally for later disconnect
       client = clientName;
