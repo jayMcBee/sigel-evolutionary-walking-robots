@@ -523,7 +523,7 @@ class SIG_GPIndividual{
   * This function writes an individual to a QTextStream.
 	*	@param &file
 	*		specifies a pointer to the output stream
-  * @param history
+  * @param withHistory
   *		select true if you want to save the history, else select false
   * @post
   * The individual is written to the given QTextStream.
