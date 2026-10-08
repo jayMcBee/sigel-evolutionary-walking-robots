@@ -201,7 +201,6 @@ class SIG_Register {
    * The size of this SIG_Register in bits.
    */
   int size;
-
 };
 
 }

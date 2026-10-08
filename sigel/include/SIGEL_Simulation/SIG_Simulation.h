@@ -110,7 +110,6 @@ namespace SIGEL_Simulation
        */
       virtual bool prematureTermination()  {  return false;  }
 
-
     public:
 
       /**
@@ -120,7 +119,6 @@ namespace SIGEL_Simulation
        * the end of the simulation.
        */
       SIG_Recorder & recorder;
-
 
     protected:
 

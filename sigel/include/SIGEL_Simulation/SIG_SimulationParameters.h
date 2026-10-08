@@ -112,7 +112,6 @@ namespace SIGEL_Simulation
        */
       int getRandomSeed() const;
 
-
       /**
        * Sets the dynamechs integrator to newDynaMechsIntegrator.
        * @param newDynaMechsIntegrator The integrator to be used by dynaMechs.

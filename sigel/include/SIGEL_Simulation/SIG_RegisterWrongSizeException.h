@@ -54,7 +54,6 @@ namespace SIGEL_Simulation
 					int line,
 					QString message,
 					SIGEL_Tools::SIG_Exception const& prevException);
-
     };
 
 }

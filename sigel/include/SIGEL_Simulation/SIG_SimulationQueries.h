@@ -45,7 +45,6 @@ namespace SIGEL_Simulation
  * position of each robot link.
  */
 class SIG_SimulationQueries { 
-
  public:
 
   /** the constructor

@@ -86,10 +86,8 @@ namespace SIGEL_Simulation
       virtual ~SIG_SimulationData() = default;
 
       virtual void simulationProgress() = 0;
-
     };
   
 }
 
 #endif // SIGEL_SIMULATION_SIG_SIMULATIONDATA_H
-

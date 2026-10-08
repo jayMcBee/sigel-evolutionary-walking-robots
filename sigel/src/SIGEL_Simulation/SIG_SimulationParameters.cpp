@@ -82,7 +82,6 @@ void SIGEL_Simulation::SIG_SimulationParameters::readFromFile(QTextStream& file)
       jointFrictionU_c=s.toDouble();
 	  }
   }
-
 };
 
 SIGEL_Simulation::SIG_SimulationParameters::SIG_SimulationParameters(QTextStream& file)
@@ -201,8 +200,6 @@ SIGEL_Simulation::SIG_SimulationParameters::DynaMechsIntegrator SIGEL_Simulation
 {
   return dynaMechsIntegrator;
 };
-
-
 
 void SIGEL_Simulation::SIG_SimulationParameters::setNoise(float _noise) {
 	noise = _noise;
