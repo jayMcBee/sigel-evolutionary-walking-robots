@@ -171,11 +171,6 @@ touched, because changing one changes behaviour against the reference binary.
   unlikely edge cases, such as a stored fitness after padding, would not be
   handled.
 
-- [ ] **18. Stop `SIG_GPPVMTask` from using a deleted host.**
-  `SIG_GPFitnessTrainer::flushAllDynHosts` can delete the host a task holds a
-  reference to. Latent: only the dynamic-client thread reaches it, which only
-  `sigel.cpp` starts, and `guidrive` does not.
-
 - [ ] **19. Make `SIG_GPFitnessTrainer::getNextHost`'s mutex lock
   something.** It is a function local, so it excludes nothing, and the section
   it guards races the dynamic-client thread. Its comment "now we make ourself

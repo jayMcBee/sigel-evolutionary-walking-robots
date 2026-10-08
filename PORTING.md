@@ -1051,6 +1051,25 @@ classes and leave truncation a hard error. **They are not interchangeable.**
     them and makes them again at several points during its life, which
     needs a `reset()` at each.
 
+**2026-10-08 — DONE: ITEM 18, A HOST REMOVED WITH A LIVE TASK IS REPORTED.**
+
+- **The concern:** a `SIG_GPPVMTask` holds a reference to its host, and
+  `SIG_GPFitnessTrainer::flushAllDynHosts` deletes the dynamic hosts.
+  `checkTask` would then write to a deleted host.
+- **Found:** it does not occur. `SIG_GPManager::run` calls the flush only at
+  the end of a generation, after `evalNewIndis` and `evolutionLoop` have
+  returned, and both return only when every task is collected and deleted. A
+  stop returns before the flush. The server thread does not touch
+  `pvmHosts`. `MT_Evaluator`, which overrides `spawnTask` and `checkTask`,
+  was not read for this.
+- **Now:** `flushAllDynHosts` prints a warning when it removes a host whose
+  `noOfSlaves` is above 0. It still removes the host; the warning reports a
+  broken order of calls and prevents nothing.
+- **Measured:** on one machine, `sigel -de` on a copy of `twoBases.exp` with
+  one `manage_dyn_slave`, 25 generations: the release at generation 20
+  removed the dynamic host with no warning, and the run went on. The case
+  that prints the warning was not produced.
+
 **2026-10-08 — DONE: ITEM 125, `accept()` FOR DYNAMIC CLIENTS GETS NO UNSET SIZE.**
 
 - **Before:** `SIG_GPManager::RegisterDynPVMClients` passed the local `alen`
