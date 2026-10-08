@@ -63,8 +63,6 @@ public:
     SIG_Geometry (const SIG_Geometry &) = delete;
     SIG_Geometry &operator= (const SIG_Geometry &) = delete;
 
-private:
-
   protected:
     /**
      * Adds a polygon.

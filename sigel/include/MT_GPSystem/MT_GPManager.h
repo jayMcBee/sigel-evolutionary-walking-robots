@@ -150,8 +150,6 @@ private:
 
 	/* responsibly for the selection of the offspring*/
 	std::unique_ptr< MT_TournamentManager > Selector;
-
-protected:
 };
 
 #endif // MT_GPSYSTEM_MT_GPMANAGER_H

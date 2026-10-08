@@ -70,19 +70,6 @@ public:
      * This method clear the individual view.
      */
     void clear();
-
- protected:
-    
-    /**
-     * This event needed to be reimplemented.
-     *
-     * As individual list windows can be created dynamically
-     * by double clicking on an individual in the individual
-     * list they have to take care for themselves, so that
-     * they are destroyed when no longer needed. This
-     * reimplementation takes care of this.
-     */
-    // void closeEvent( QCloseEvent *e);
 };
 
 }

@@ -248,7 +248,6 @@ namespace SIGEL_MasterGUI
     signals:
       void signalEvolutionNotRunning( bool );
 
-    private:
     public:
       /**
        * Warns if the pool is larger than SIG_GPPopulation::maximumSize.

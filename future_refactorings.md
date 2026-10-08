@@ -115,26 +115,6 @@ Paths are relative to `sigel/`, the source tree.
   `_winport` parameters and locals in the file, such as `_winportA` and
   `_winport_t`, get names that say what they hold.
 
-- [ ] **149. Clean up the empty lines, one module at a time.** The rules:
-  - No empty line after the `{` or before the `}` of a function, of a block,
-    or of a class, struct or enum.
-  - Exactly one empty line after the `{` and before the `}` of a namespace.
-  - Never two empty lines in a row, inside a function body or outside one.
-    The one exception: two empty lines may stand above a class declaration
-    and above the first method of a class in a `.cpp` file.
-  - No empty line at the end of a file.
-  - One empty line between two functions. Add it where there is none.
-  - Empty lines next to a comment and inside a class body stay as they are,
-    apart from the rule on two in a row.
-
-  The change touches only empty lines, so the non-empty lines of each file
-  must stay identical. One change covers at most 20 files, also inside one
-  module. All modules are done.
-
-  Still to do: a last, separate pass removes the access labels that have no
-  declaration under them: `protected:` in `MT_GPManager.h` and `SIG_IndividualView.h`,
-  `private:` in `SIG_Geometry.h` and `SIG_GUIGPExperiment.h`.
-
 ---
 
 ## 4 · Defects preserved by the port
