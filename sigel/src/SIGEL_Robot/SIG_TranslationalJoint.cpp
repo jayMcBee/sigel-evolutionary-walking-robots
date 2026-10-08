@@ -26,6 +26,7 @@
 #include "SIGEL_Robot/IFunctions.h"
 
 namespace SIGEL_Robot {
+
         SIG_TranslationalJoint::SIG_TranslationalJoint (SIG_Robot *par, QString n, int nr)
                 : SIG_Joint (par, n, nr)
         { }
@@ -176,4 +177,5 @@ namespace SIGEL_Robot {
                 SIG_Robot::vectorToStream (tx, rightFix);
                 tx << minimum << ' ' << maximum << ' ' << initial << '\n';
         }
+
 }

@@ -30,7 +30,6 @@ namespace SIGEL_Robot
 
   class SIG_WrongKinematicsException : public SIGEL_Tools::SIG_Exception
     {
-
     public:
 
       SIG_WrongKinematicsException( QString fileName,
@@ -41,7 +40,6 @@ namespace SIGEL_Robot
 				    int line,
 				    QString message,
 				    SIGEL_Tools::SIG_Exception const& prevException );
-
     };
 
 }

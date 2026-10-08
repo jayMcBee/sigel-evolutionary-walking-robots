@@ -29,6 +29,7 @@ namespace SIGEL_Robot { class SIG_Sensor; }
 #include "SIGEL_Robot/SIG_Robot.h"
 
 namespace SIGEL_Robot {
+
   /**
    * This class is a framework for different types of sensors.
    * Any sensor type class should be derived from this class, the
@@ -57,6 +58,7 @@ namespace SIGEL_Robot {
 
     virtual void writeToFileTransfer (QTextStream & tx);
   }; 
+
 }
 
 #endif //  SIGEL_ROBOT_SIG_SENSOR_H

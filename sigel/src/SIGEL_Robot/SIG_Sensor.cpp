@@ -52,4 +52,5 @@ namespace SIGEL_Robot {
         {
                 tx << "Sensor " << name << ' ' << number << '\n';
         }
+
 }
