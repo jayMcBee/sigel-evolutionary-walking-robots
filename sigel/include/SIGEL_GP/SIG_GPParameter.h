@@ -766,7 +766,7 @@ namespace SIGEL_GP
   void setTimeOutMinutes( int newValue );
 
   public:
-  void setResetEveryGeneration(int _resEvGen) { resEvGen = _resEvGen; }
+  void setResetEveryGeneration(int newResEvGen) { resEvGen = newResEvGen; }
   int getResetEveryGeneration() { return resEvGen; }
 };
 

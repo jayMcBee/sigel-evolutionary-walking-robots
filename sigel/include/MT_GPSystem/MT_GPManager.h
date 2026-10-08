@@ -33,7 +33,7 @@ public:
 	MT_GPManager (QTextStream & File ); // the only correct constructor 
 
 	MT_GPManager(); // not used 
-	MT_GPManager (MT_Substitute * _Substitue); // not used
+	MT_GPManager (MT_Substitute * Substitue); // not used
 	
 	virtual ~MT_GPManager();	
 
@@ -56,12 +56,12 @@ public:
 	/* update the Gp-System with the given SelektionValue
 	* there are involved the class 
 	* @pre: the Offspring must be empty! Flush it first.*/
-	void setSelektionValue( int _OffspringSize, int _TournamentSize, int _SMethod, int _FitnessFunction, int _TrainingSetSize, int _TrainingDuration);
+	void setSelektionValue( int OffspringSize, int TournamentSize, int SMethod, int FitnessFunction, int TrainingSetSize, int TrainingDuration);
 	
 	/* for update the Selection window;
 	* the GP-System will change direct the value in the GUI-class 
 	*/
-	void getSelektionValue (int *_OffspringSize, int  * _TournamentSize, int * _SMethod, int * _FitnessFunction, int *_TrainingSetSize, int * _TrainingDuration);
+	void getSelektionValue (int *OffspringSize, int  * TournamentSize, int * SMethod, int * FitnessFunction, int *TrainingSetSize, int * TrainingDuration);
 	
 	/*change the BrutSize*/
 	void setBrutSize(int NewSize);

@@ -530,7 +530,7 @@ class SIG_GPIndividual{
   */ 
  
  public:
- void writeToFile(QTextStream &file,bool _history);
+ void writeToFile(QTextStream &file,bool withHistory);
 
  /**
   * This function reads an individual out of a QString.

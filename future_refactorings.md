@@ -111,9 +111,7 @@ Paths are relative to `sigel/`, the source tree.
   `rotationMatrix` and
   `phatRockingUpStylinVectorBendingAngleSwingingMasterFunction`, which is
   very long. Behaviour belongs to a class. Decide which class each function
-  belongs to, and give the long one a name that says what it does. The
-  `_winport` parameters and locals in the file, such as `_winportA` and
-  `_winport_t`, get names that say what they hold.
+  belongs to, and give the long one a name that says what it does.
 
 ---
 

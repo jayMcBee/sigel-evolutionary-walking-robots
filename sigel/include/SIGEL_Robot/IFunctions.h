@@ -33,10 +33,10 @@ namespace SIGEL_Robot {
 
         SIG_Matrix rotationMatrix(SIG_Vector v, double phi);
 
-        void calculateAnyJoint (SIG_Vector VD, SIG_Vector VE, SIG_Vector VF,
-                                SIG_Vector VA, SIG_Vector VB, SIG_Vector VC,
+        void calculateAnyJoint (SIG_Vector pointA, SIG_Vector pointB, SIG_Vector pointC,
+                                SIG_Vector otherA, SIG_Vector otherB, SIG_Vector otherC,
                                 double winkel, double verschiebung,
-                                SIG_Matrix & mo, SIG_Vector & vt,
+                                SIG_Matrix & orientation, SIG_Vector & translation,
                                 QString someIdentifier);
 
 }

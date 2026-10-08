@@ -41,8 +41,8 @@ public:
 
 	void writeToFileSetup(QTextStream & File);
 	
-	MT_TournamentManager(MT_Population * PPop, MT_Population * OPop, MT_Randomizer* _Randi, QTextStream &File);
-	MT_TournamentManager(MT_Population * PPop, MT_Population * OPop, MT_Randomizer* _Randi, int Method, int TSize);
+	MT_TournamentManager(MT_Population * PPop, MT_Population * OPop, MT_Randomizer* NewRandi, QTextStream &File);
+	MT_TournamentManager(MT_Population * PPop, MT_Population * OPop, MT_Randomizer* NewRandi, int Method, int TSize);
 	MT_TournamentManager();
 	virtual ~MT_TournamentManager();
 

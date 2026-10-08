@@ -90,38 +90,38 @@ namespace SIGEL_Robot {
 	  return SIG_TypeConverter::toSIG_Matrix( result );
 	}
 
-        NEWMAT::Matrix phatRockingUpStylinVectorBendingAngleSwingingMasterFunction( SIG_Vector _winportA,
-										    SIG_Vector _winportB,
-										    SIG_Vector _winportC,
+        NEWMAT::Matrix phatRockingUpStylinVectorBendingAngleSwingingMasterFunction( SIG_Vector pointA,
+										    SIG_Vector pointB,
+										    SIG_Vector pointC,
 										    SIG_Vector otherA,
 										    SIG_Vector otherB,
 										    SIG_Vector otherC )
 	{
-	  SIG_Vector firstTranslationVector = _winportA;
+	  SIG_Vector firstTranslationVector = pointA;
 	  firstTranslationVector.minusis( &otherA );
 
 	  otherB.plusis( &firstTranslationVector );
 	  otherC.plusis( &firstTranslationVector );
 
-	  _winportB.minusis( &_winportA );
-	  _winportC.minusis( &_winportA );
-	  otherB.minusis( &_winportA );
-	  otherC.minusis( &_winportA );
+	  pointB.minusis( &pointA );
+	  pointC.minusis( &pointA );
+	  otherB.minusis( &pointA );
+	  otherC.minusis( &pointA );
 
-	  _winportB.normalize();
-	  _winportC.normalize();
+	  pointB.normalize();
+	  pointC.normalize();
 	  otherB.normalize();
 	  otherC.normalize();
 
 #ifdef SIG_DEBUG
 	  SIGEL_Tools::SIG_IO::cerr << "B:";
 	  for (int i=0; i<3; i++)
-	    SIGEL_Tools::SIG_IO::cerr << " " << _winportB.get( i );
+	    SIGEL_Tools::SIG_IO::cerr << " " << pointB.get( i );
 	  SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 
 	  SIGEL_Tools::SIG_IO::cerr << "C:";
 	  for (int i=0; i<3; i++)
-	    SIGEL_Tools::SIG_IO::cerr << " " << _winportC.get( i );
+	    SIGEL_Tools::SIG_IO::cerr << " " << pointC.get( i );
 	  SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 
 	  SIGEL_Tools::SIG_IO::cerr << "otherB:";
@@ -139,7 +139,7 @@ namespace SIGEL_Robot {
 
 	  double const minimalAngleMeasure = 0.00001;
 
-	  double bsAngle = tolerantACos( _winportB.inprod( &otherB ) );
+	  double bsAngle = tolerantACos( pointB.inprod( &otherB ) );
 
 	  if (bsAngle > minimalAngleMeasure)
 	    {
@@ -147,14 +147,14 @@ namespace SIGEL_Robot {
 		{
 		  SIG_Vector bsNormal;
 
-		  otherB.crossprod( &_winportB, &bsNormal );
+		  otherB.crossprod( &pointB, &bsNormal );
 		  bsNormal.normalize();
 
 		  firstRotation = rotationMatrix( bsNormal, bsAngle );
 		}
 	      else
 		{
-		  SIG_Vector rotationAxis = orthogonalVector( _winportB );
+		  SIG_Vector rotationAxis = orthogonalVector( pointB );
 
 		  firstRotation = rotationMatrix( rotationAxis, bsAngle );
 		};
@@ -171,12 +171,12 @@ namespace SIGEL_Robot {
 	  SIGEL_Tools::SIG_IO::cerr << "otherB and otherC have been rotated." << Qt::endl;
 	  SIGEL_Tools::SIG_IO::cerr << "B:";
 	  for (int i=0; i<3; i++)
-	    SIGEL_Tools::SIG_IO::cerr << " " << _winportB.get( i );
+	    SIGEL_Tools::SIG_IO::cerr << " " << pointB.get( i );
 	  SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 
 	  SIGEL_Tools::SIG_IO::cerr << "C:";
 	  for (int i=0; i<3; i++)
-	    SIGEL_Tools::SIG_IO::cerr << " " << _winportC.get( i );
+	    SIGEL_Tools::SIG_IO::cerr << " " << pointC.get( i );
 	  SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 
 	  SIGEL_Tools::SIG_IO::cerr << "otherB:";
@@ -192,10 +192,10 @@ namespace SIGEL_Robot {
 
 	  SIG_Matrix secondRotation;
 
-	  SIG_Vector u = orthogonalVector( _winportB );
+	  SIG_Vector u = orthogonalVector( pointB );
 
 	  SIG_Vector v;
-	  _winportB.crossprod( &u, &v );
+	  pointB.crossprod( &u, &v );
 	  v.normalize();
 
 	  SIG_Vector cProjected;
@@ -203,8 +203,8 @@ namespace SIGEL_Robot {
 	  SIG_Joint::calculateCut( SIG_Vector(0, 0, 0),
 				   u,
 				   v,
-				   _winportC,
-				   _winportB,
+				   pointC,
+				   pointB,
 				   cProjected );
 	  cProjected.normalize();
 
@@ -214,7 +214,7 @@ namespace SIGEL_Robot {
 				   u,
 				   v,
 				   otherC,
-				   _winportB,
+				   pointB,
 				   otherCProjected );
 	  otherCProjected.normalize();
 
@@ -229,11 +229,11 @@ namespace SIGEL_Robot {
 		  otherCProjected.crossprod( &cProjected, &csNormal );
 		  csNormal.normalize();
 
-		  if (_winportB.inprod( &csNormal ) < 0)
+		  if (pointB.inprod( &csNormal ) < 0)
 		    csAngle = 2 * std::numbers::pi - csAngle;
 		};
 
-	      secondRotation = rotationMatrix( _winportB, csAngle );
+	      secondRotation = rotationMatrix( pointB, csAngle );
 	    }
 	  else
 	    secondRotation.makeone();
@@ -247,12 +247,12 @@ namespace SIGEL_Robot {
 	  SIGEL_Tools::SIG_IO::cerr << "otherB and otherC have been rotated." << Qt::endl;
 	  SIGEL_Tools::SIG_IO::cerr << "B:";
 	  for (int i=0; i<3; i++)
-	    SIGEL_Tools::SIG_IO::cerr << " " << _winportB.get( i );
+	    SIGEL_Tools::SIG_IO::cerr << " " << pointB.get( i );
 	  SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 
 	  SIGEL_Tools::SIG_IO::cerr << "C:";
 	  for (int i=0; i<3; i++)
-	    SIGEL_Tools::SIG_IO::cerr << " " << _winportC.get( i );
+	    SIGEL_Tools::SIG_IO::cerr << " " << pointC.get( i );
 	  SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 
 	  SIGEL_Tools::SIG_IO::cerr << "otherB:";
@@ -284,7 +284,7 @@ namespace SIGEL_Robot {
 
 	  thirdTransformation.SubMatrix( 1, 3, 1, 3 ) = SIG_TypeConverter::toMatrix( secondRotation );
 
-	  fourthTransformation.SubMatrix( 1, 3, 4, 4 ) = SIG_TypeConverter::toColumnVector( _winportA );
+	  fourthTransformation.SubMatrix( 1, 3, 4, 4 ) = SIG_TypeConverter::toColumnVector( pointA );
 
 	  transformation =   fourthTransformation
                            * thirdTransformation
@@ -294,45 +294,45 @@ namespace SIGEL_Robot {
 	  return transformation;
 	};
 
-        void calculateAnyJoint (SIG_Vector _winportA, SIG_Vector _winportB, SIG_Vector _winportC,
-                                SIG_Vector _winportD, SIG_Vector _winportE, SIG_Vector _winportF,
+        void calculateAnyJoint (SIG_Vector pointA, SIG_Vector pointB, SIG_Vector pointC,
+                                SIG_Vector otherA, SIG_Vector otherB, SIG_Vector otherC,
                                 double winkel, double verschiebung,
-                                SIG_Matrix & _winport_o, SIG_Vector & _winport_t,
+                                SIG_Matrix & orientation, SIG_Vector & translation,
                                 QString someIdentifier)
         {
                 // Make the points coverable.
                 SIG_Vector r, zw;
                 double h1;
                 
-                r.assign (&_winportB);
-                r.minusis (&_winportA);
+                r.assign (&pointB);
+                r.minusis (&pointA);
                 r.normalize ();
-                _winportB.assign (&_winportA);
-                _winportB.plusis (&r);
+                pointB.assign (&pointA);
+                pointB.plusis (&r);
 
-                zw.assign (&_winportC);
-                zw.minusis (&_winportA);
+                zw.assign (&pointC);
+                zw.minusis (&pointA);
                 h1 = zw.inprod (&r);
                 r.timesis (h1);
                 zw.minusis (&r);
                 zw.normalize ();
-                _winportC.assign (&_winportA);
-                _winportC.plusis (&zw);
+                pointC.assign (&pointA);
+                pointC.plusis (&zw);
                 
-                r.assign (&_winportE);
-                r.minusis (&_winportD);
+                r.assign (&otherB);
+                r.minusis (&otherA);
                 r.normalize ();
-                _winportE.assign (&_winportD);
-                _winportE.plusis (&r);
+                otherB.assign (&otherA);
+                otherB.plusis (&r);
 
-                zw.assign (&_winportF);
-                zw.minusis (&_winportD);
+                zw.assign (&otherC);
+                zw.minusis (&otherA);
                 h1 = zw.inprod (&r);
                 r.timesis (h1);
                 zw.minusis (&r);
                 zw.normalize ();
-                _winportF.assign (&_winportD);
-                _winportF.plusis (&zw);
+                otherC.assign (&otherA);
+                otherC.plusis (&zw);
                 // End of the covering construction
 
 #ifdef SIG_DEBUG
@@ -341,37 +341,37 @@ namespace SIGEL_Robot {
 					  << Qt::endl;
 #endif
 
-		NEWMAT::Matrix transformation = phatRockingUpStylinVectorBendingAngleSwingingMasterFunction( _winportA,
-													     _winportB,
-													     _winportC,
-													     _winportD,
-													     _winportE,
-													     _winportF );
+		NEWMAT::Matrix transformation = phatRockingUpStylinVectorBendingAngleSwingingMasterFunction( pointA,
+													     pointB,
+													     pointC,
+													     otherA,
+													     otherB,
+													     otherC );
 
-		_winport_o = SIG_TypeConverter::toSIG_Matrix( transformation.SubMatrix( 1, 3, 1, 3 ) );
-		_winport_t = SIG_TypeConverter::toSIG_Vector( transformation.SubMatrix( 1, 3, 4, 4 ) );
+		orientation = SIG_TypeConverter::toSIG_Matrix( transformation.SubMatrix( 1, 3, 1, 3 ) );
+		translation = SIG_TypeConverter::toSIG_Vector( transformation.SubMatrix( 1, 3, 4, 4 ) );
 
-                SIG_Vector v (&_winportB);
-                v.minusis (&_winportA);
+                SIG_Vector v (&pointB);
+                v.minusis (&pointA);
 
                 SIG_Vector schiebung (&v);
                 schiebung.timesis (verschiebung);
-                _winport_t.plusis (&schiebung);
+                translation.plusis (&schiebung);
 
                 double phi = (winkel / 180.0) * std::numbers::pi;
 
                 SIG_Matrix drehmatrix;
 
 		drehmatrix=rotationMatrix(v,-phi);
-                _winport_t.minusis (&_winportA);
+                translation.minusis (&pointA);
                 SIG_Vector stflorianhilf;
-                drehmatrix.times (&_winport_t, &stflorianhilf);
-                _winport_t.assign (&stflorianhilf);
-                _winport_t.plusis (&_winportA);
+                drehmatrix.times (&translation, &stflorianhilf);
+                translation.assign (&stflorianhilf);
+                translation.plusis (&pointA);
 
                 SIG_Matrix hilf;
-                drehmatrix.times (&_winport_o, &hilf);
-                _winport_o.assign (&hilf);
+                drehmatrix.times (&orientation, &hilf);
+                orientation.assign (&hilf);
         }
 
 } // namespace

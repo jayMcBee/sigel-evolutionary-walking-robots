@@ -126,7 +126,7 @@ namespace SIGEL_Simulation
 
 		/**
 			*/
-		void setNoise(float _noise);
+		void setNoise(float newNoise);
 
 		/**
 			*/

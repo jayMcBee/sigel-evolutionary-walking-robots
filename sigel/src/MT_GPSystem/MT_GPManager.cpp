@@ -320,37 +320,37 @@ MT_Randomizer * MT_GPManager::getRandomizer()
 	return Randi.get();
 }
 
-void MT_GPManager::setSelektionValue(int _OffspringSize, int _TournamentSize, int _SMethod, int _FitnessFunction, int _TrainingSetSize, int _TrainingDuration)
+void MT_GPManager::setSelektionValue(int OffspringSize, int TournamentSize, int SMethod, int FitnessFunction, int TrainingSetSize, int TrainingDuration)
 {
-	if ((_OffspringSize !=0)&&(_TournamentSize!=0) && (_TrainingSetSize !=0))
+	if ((OffspringSize !=0)&&(TournamentSize!=0) && (TrainingSetSize !=0))
 	{
-		if (_OffspringSize != Offspring->getSize())
+		if (OffspringSize != Offspring->getSize())
 		{
-			Randi->setOffspringSize(_OffspringSize);
-			Offspring->changePopSize(_OffspringSize);
+			Randi->setOffspringSize(OffspringSize);
+			Offspring->changePopSize(OffspringSize);
 		}
-		if ( _OffspringSize < Parent->getSize())
+		if ( OffspringSize < Parent->getSize())
 		{
 			Offspring->changePopSize(Parent->getSize());
 			Randi->setOffspringSize(Parent->getSize());
 			LastError = 3;
 		}
 
-		Selector->setTournamentSize(_TournamentSize); // does more!!
-		Selector->setSelectionMethod(_SMethod);
-		FitnessTrainer->setSelektionValue(_FitnessFunction, _TrainingDuration, _TrainingSetSize);
+		Selector->setTournamentSize(TournamentSize); // does more!!
+		Selector->setSelectionMethod(SMethod);
+		FitnessTrainer->setSelektionValue(FitnessFunction, TrainingDuration, TrainingSetSize);
 	}
 	else
 		LastError =13;
 }
 
-void MT_GPManager::getSelektionValue(int *_OffspringSize, int *_TournamentSize, int *_SMethod, int *_FitnessFunction, int *_TrainingSetSize, int *_TrainingDuration)
+void MT_GPManager::getSelektionValue(int *OffspringSize, int *TournamentSize, int *SMethod, int *FitnessFunction, int *TrainingSetSize, int *TrainingDuration)
 {
-	*_OffspringSize = Offspring->getSize();
-	*_TournamentSize = Selector->getTournamentSize();
-	*_SMethod = Selector->getSelectionMethod();
+	*OffspringSize = Offspring->getSize();
+	*TournamentSize = Selector->getTournamentSize();
+	*SMethod = Selector->getSelectionMethod();
 
-	 FitnessTrainer->getSelektionValue(_FitnessFunction, _TrainingDuration, _TrainingSetSize);
+	 FitnessTrainer->getSelektionValue(FitnessFunction, TrainingDuration, TrainingSetSize);
 }
 
 void MT_GPManager::setBrutSize(int NewSize)

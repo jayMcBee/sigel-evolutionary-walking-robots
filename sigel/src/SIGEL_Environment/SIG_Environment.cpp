@@ -349,8 +349,8 @@ namespace SIGEL_Environment {
     return frictionCoeff_u_k;
   };
 
-	void SIG_Environment::setFloorFuncSelected(bool _floorFuncSelected) {
-		floorFuncSelected = _floorFuncSelected;
+	void SIG_Environment::setFloorFuncSelected(bool newFloorFuncSelected) {
+		floorFuncSelected = newFloorFuncSelected;
 	};
 	
   bool SIG_Environment::getFloorFuncSelected() {
@@ -369,8 +369,8 @@ namespace SIGEL_Environment {
  		return textureFile;
  	};
 
-  void SIG_Environment::setTextureFile(QString _textureFile) {
-		textureFile = _textureFile;
+  void SIG_Environment::setTextureFile(QString newTextureFile) {
+		textureFile = newTextureFile;
   };
 
 	void SIG_Environment::loadDynaMechsEnvironment(){
@@ -397,16 +397,16 @@ namespace SIGEL_Environment {
 		return texAlpha;
 	};
 
-  void SIG_Environment::setTexAlpha(int _texAlpha) {
-		texAlpha = _texAlpha;
+  void SIG_Environment::setTexAlpha(int newTexAlpha) {
+		texAlpha = newTexAlpha;
   };
 
   bool SIG_Environment::getWithTexture() const {
 		return withTexture;
   };
 
-  void SIG_Environment::setWithTexture(bool _withTexture) {
-		withTexture = _withTexture;
+  void SIG_Environment::setWithTexture(bool newWithTexture) {
+		withTexture = newWithTexture;
   };
 
 	bool SIG_Environment::generateTerrain() {
@@ -534,8 +534,8 @@ namespace SIGEL_Environment {
   	return true;
 	};
 
-	void SIG_Environment::setAutosave(int _autosave) {
-		autosave = _autosave;
+	void SIG_Environment::setAutosave(int newAutosave) {
+		autosave = newAutosave;
 	};
 
 	int SIG_Environment::getAutosave() {

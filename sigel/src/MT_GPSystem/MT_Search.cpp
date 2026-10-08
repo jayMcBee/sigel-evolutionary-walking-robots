@@ -5,24 +5,24 @@ MT_Search::MT_Search()
 {
 }
 
-MT_Search::MT_Search(MT_Population *ParentPop, MT_Population *OffspringPop, MT_Randomizer *_Randi)
+MT_Search::MT_Search(MT_Population *ParentPop, MT_Population *OffspringPop, MT_Randomizer *NewRandi)
 {
 	LastError =0;
 	TargetPop = OffspringPop;
 	SourcePop = ParentPop;
-	Randi = _Randi;
+	Randi = NewRandi;
 	ChildOne =nullptr;
 	ChildTwo =nullptr;
 	Parent=nullptr;
 	FirstXOverParent=nullptr;
 }
 
-MT_Search::MT_Search(MT_Population *ParentPop, MT_Population *OffspringPop, MT_Randomizer *_Randi, QTextStream &File)
+MT_Search::MT_Search(MT_Population *ParentPop, MT_Population *OffspringPop, MT_Randomizer *NewRandi, QTextStream &File)
 {
 	LastError =0;
 	TargetPop = OffspringPop;
 	SourcePop = ParentPop;
-	Randi = _Randi;
+	Randi = NewRandi;
 	
 	ChildOne =nullptr;
 	ChildTwo =nullptr;

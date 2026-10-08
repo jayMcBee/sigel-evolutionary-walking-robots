@@ -511,7 +511,7 @@ void SIGEL_GP::SIG_GPIndividual::print()
   getProgram().print();
 }
 
-void SIGEL_GP::SIG_GPIndividual::writeToFile(QTextStream &file, bool _history)
+void SIGEL_GP::SIG_GPIndividual::writeToFile(QTextStream &file, bool withHistory)
 {
   // HISTORY IS MISSING !!!!
 
@@ -521,7 +521,7 @@ void SIGEL_GP::SIG_GPIndividual::writeToFile(QTextStream &file, bool _history)
   file<<"\n      AGE="<<getAge()<<";";
 
   // you select whether the history should be saved or not.
-  if (_history) {
+  if (withHistory) {
   	file<<"\n      HISTORY BEGIN{";
   	file<<history.join("\n");
   	file<<"\n      }HISTORY END;";

@@ -188,7 +188,7 @@ class SIG_Environment {
   /** set the boolean variable floorFuncSelected.
   	*	it is used to determine how the terrain.ter should be produced
   	*/
-	void setFloorFuncSelected(bool _floorFuncSelected);
+	void setFloorFuncSelected(bool newFloorFuncSelected);
 	
 	/**	reads the floorFuncSelected variable.
 		*
@@ -213,10 +213,10 @@ class SIG_Environment {
 
 	/**	Sets the TextureFile.
  		*
- 		*	@param _FloorPictureFile
+ 		*	@param newTextureFile
  		*		The path of the file.
  	*/
-  void setTextureFile(QString _textureFile);
+  void setTextureFile(QString newTextureFile);
 
   /**	Reads the alpha value for the texture.
   	*
@@ -227,14 +227,14 @@ class SIG_Environment {
 
 	/**	Sets the alpha value for the texture.
  		*
- 		*	@param _texAlpha
+ 		*	@param newTexAlpha
  		*		The alpha value for the texture.
  	*/
-  void setTexAlpha(int _texAlpha);
+  void setTexAlpha(int newTexAlpha);
 
  	bool getWithTexture() const;
 
-  void setWithTexture(bool _withTexture);
+  void setWithTexture(bool newWithTexture);
 
   /**	Reads the FloorPictureFile.
   	*
@@ -363,7 +363,7 @@ class SIG_Environment {
   bool generateTerrain();
 
   /** This is the set method for the variable autosave. */
-  void setAutosave(int _autosave);
+  void setAutosave(int newAutosave);
 	
 	/** This is the get method for the variable autosave. */
 	int getAutosave();

@@ -6,24 +6,24 @@ MT_TournamentManager::MT_TournamentManager()
 {
 }
 
-MT_TournamentManager::MT_TournamentManager(MT_Population *PPop, MT_Population *OPop, MT_Randomizer * _Randi, int Method, int TSize)
+MT_TournamentManager::MT_TournamentManager(MT_Population *PPop, MT_Population *OPop, MT_Randomizer * NewRandi, int Method, int TSize)
 {
 	LastError=0;
 	ParentPop = PPop;
 	OffspringPop = OPop;
-	Randi = _Randi;
+	Randi = NewRandi;
 	SMethod =Method;
 	NameForNewParent =PPop->getSize();
 		
 	setTournamentSize(TSize);
 }
 
-MT_TournamentManager::MT_TournamentManager(MT_Population *PPop, MT_Population *OPop, MT_Randomizer *_Randi, QTextStream &File)
+MT_TournamentManager::MT_TournamentManager(MT_Population *PPop, MT_Population *OPop, MT_Randomizer *NewRandi, QTextStream &File)
 {
 	LastError=0;
 	ParentPop = PPop;
 	OffspringPop = OPop;
-	Randi = _Randi;
+	Randi = NewRandi;
 	TournamentSize =0;
 	NameForNewParent =PPop->getSize();
 	 
