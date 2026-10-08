@@ -25,6 +25,7 @@
 
 #include <QList>
 #include <QString>
+#include <pthread.h>
 #include "SIGEL_GP/SIG_GPExperiment.h"
 #include "SIGEL_GP/SIG_GPIndividual.h"
 #include "SIGEL_GP/SIG_GPPVMData.h"
@@ -70,6 +71,11 @@ class SIG_GPFitnessTrainer
   * New dynamic hosts that have registered but were not yet added to 'pvmHosts'.
   */
   QList< SIG_GPPVMHost * > freshDynHosts;
+
+ /**
+  * Guards 'dynHosts' and 'freshDynHosts'.
+  */
+  pthread_mutex_t dynHostsMutex;
 
  private:
   int nextHostNumber;

@@ -46,6 +46,7 @@ SIGEL_GP::SIG_GPFitnessTrainer::SIG_GPFitnessTrainer(SIGEL_GP::SIG_GPExperiment&
    nextFreeNumber(0),
    pvmLost(false)
 {
+  pthread_mutex_init(&dynHostsMutex, nullptr);
 
   try {
     modifiedRobot.prepareDynaMechs();
@@ -139,12 +140,16 @@ void SIGEL_GP::SIG_GPFitnessTrainer::addDynHost(QString newHost) {
 
   SIGEL_GP::SIG_GPPVMHost *newPVMHost = new SIGEL_GP::SIG_GPPVMHost( buffer );
 
+  pthread_mutex_lock( &dynHostsMutex );
+
   // need to remember that this host is dynamic to delete/free it after evaluation
   dynHosts.append( new QString(newHost) );
 
   // the freshDynHost list just contains hosts not yet added to the pvmHosts
   // list; this is the job of SIGEL_GP::SIG_GPFitnessTrainer::getNextHost()
   freshDynHosts.append(newPVMHost);
+
+  pthread_mutex_unlock( &dynHostsMutex );
 }
 
 
@@ -153,6 +158,8 @@ void SIGEL_GP::SIG_GPFitnessTrainer::flushAllDynHosts() {
   bool           res;
   int            i,dynDelNum;
   SIG_GPActivePVMHost *pHost;
+
+  pthread_mutex_lock( &dynHostsMutex );
 
   // are there any dynHosts ?
   if (dynHosts.count() > 0) {
@@ -199,6 +206,8 @@ void SIGEL_GP::SIG_GPFitnessTrainer::flushAllDynHosts() {
 
     SIGEL_Tools::SIG_IO::cerr << "\t(all " << dynDelNum << " dynamic hosts removed | " <<  pvmHosts.size() << " static hosts remaining)\n" << Qt::endl;
   }
+
+  pthread_mutex_unlock( &dynHostsMutex );
 }
 
 
@@ -538,11 +547,9 @@ void SIGEL_GP::SIG_GPFitnessTrainer::sweepToSpawn()
 int SIGEL_GP::SIG_GPFitnessTrainer::getNextHost() {
   int result = -1;
   SIG_GPPVMHost   *freshHost;
-  pthread_mutex_t  mutex;
 
   // now we make ourself running exclusively to add all new hosts from the freshDynHosts list
-  pthread_mutex_init(&mutex, nullptr);
-  pthread_mutex_lock( &mutex );
+  pthread_mutex_lock( &dynHostsMutex );
 
   // add all new dynamic hosts to pvmHosts and declare them to PVM
   for (unsigned int i=0; i<freshDynHosts.count(); i++) {
@@ -565,7 +572,7 @@ int SIGEL_GP::SIG_GPFitnessTrainer::getNextHost() {
   qDeleteAll( freshDynHosts );
   freshDynHosts.clear();
 
-  pthread_mutex_unlock( &mutex );
+  pthread_mutex_unlock( &dynHostsMutex );
 
   // nextHostNumber might refer to a host that's no longer available !
   if(pvmHosts.size() != 0)
