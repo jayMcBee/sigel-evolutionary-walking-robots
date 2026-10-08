@@ -16,7 +16,6 @@ public:
 
 	void onShow(MT_GPManager *manager, subst_cache *subst);
 	bool onHide(MT_GPManager *manager, subst_cache *subst);
-	void evolutionRunning(bool running);
 
 private slots:
 	void slotXOverChanged(int nvalue);

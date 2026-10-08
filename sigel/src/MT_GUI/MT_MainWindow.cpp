@@ -351,11 +351,6 @@ void MT_MainWindow::slotEvolutionStatus(bool running)
 		mtSaveAction->setEnabled(false);
 		mtLoadAction->setEnabled(false);
 		mtDefaultAction->setEnabled(false);
-		searchWidget->evolutionRunning(true);
-		selectionWidget->evolutionRunning(true);
-		estimationWidget->evolutionRunning(true);
-		populationWidget->evolutionRunning(true);
-		individualsWidget->evolutionRunning(true);
 		statisticsWidget->evolutionRunning(true);
 	} else {
 		evolRunning = false;
@@ -367,11 +362,6 @@ void MT_MainWindow::slotEvolutionStatus(bool running)
 		mtSaveAction->setEnabled(true);
 		mtLoadAction->setEnabled(true);
 		mtDefaultAction->setEnabled(true);
-		searchWidget->evolutionRunning(false);
-		selectionWidget->evolutionRunning(false);
-		estimationWidget->evolutionRunning(false);
-		populationWidget->evolutionRunning(false);
-		individualsWidget->evolutionRunning(false);
 		statisticsWidget->evolutionRunning(false);
 	}
 }

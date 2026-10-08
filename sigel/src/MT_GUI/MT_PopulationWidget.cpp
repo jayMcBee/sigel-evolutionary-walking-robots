@@ -104,21 +104,6 @@ MT_PopulationWidget::MT_PopulationWidget(QMainWindow* parent, const char* name, 
 };
 
 /***
- * enables/disables widgets during evolution
- ***/
-void MT_PopulationWidget::evolutionRunning(bool running)
-{
-	if(running)
-	{
-
-	}
-	else
-	{
-
-	}
-}
-
-/***
  * reads information from the gp-system and displays it
  ***/
 void MT_PopulationWidget::onShow(MT_GPManager *manager, subst_cache *subst)

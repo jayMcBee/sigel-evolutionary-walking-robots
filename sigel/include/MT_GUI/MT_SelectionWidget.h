@@ -14,7 +14,6 @@ class MT_SelectionWidget : public MT_SelectionWidgetBase, public MT_WidgetBase
 public:
 	MT_SelectionWidget(QWidget* parent=nullptr, const char* name=nullptr, Qt::WindowFlags fl = Qt::WindowFlags());
 
-	void evolutionRunning(bool running);
 	void onShow(MT_GPManager *manager, subst_cache *subst);
 	bool onHide(MT_GPManager *manager, subst_cache *subst);
 

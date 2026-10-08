@@ -360,14 +360,6 @@ touched, because changing one changes behaviour against the reference binary.
   header, and write the member names out. Do it in one round. Plan it with
   item 148, which changes its `strategy` member.
 
-- [ ] **147. Remove the `evolutionRunning` methods that do nothing.**
-  `MT_PopulationWidget`, `MT_SearchWidget`, `MT_SelectionWidget`,
-  `MT_EstimationWidget` and `MT_IndividualsWidget` each have an
-  `evolutionRunning( bool )` with an empty `if` and an empty `else`.
-  `MT_MainWindow` calls each of them when a MetaGP run starts and when it
-  ends. Remove the methods and their calls. The one in
-  `MT_StatisticsWidget` does real work and stays.
-
 - [ ] **132. Make the MetaGP autosave rotate.** In `MT_Controller`,
   `autoSaveCnt = autoSaveCnt++ % 3` writes the old value back, so the
   counter stays at 0. The `saveName` it builds is also not used: the next

@@ -14,18 +14,6 @@ MT_SelectionWidget::MT_SelectionWidget(QWidget* parent, const char* name, Qt::Wi
 	QObject::connect(tourSizeComboBox, SIGNAL(textActivated(const QString&)), SLOT(slotTourSizeChanged(const QString&)));
 }
 
-/***
- * enables/disables widgets during evolution
- ***/
-void MT_SelectionWidget::evolutionRunning(bool running)
-{
-	if(running){
-
-	} else {
-
-	}
-}
-
 void MT_SelectionWidget::updateTSizeList(int pSize, int oSize)
 {
 	tourSizeComboBox->clear();

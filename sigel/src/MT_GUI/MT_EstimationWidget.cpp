@@ -20,18 +20,6 @@ MT_EstimationWidget::MT_EstimationWidget(QWidget* parent, const char* name, Qt::
 	QObject::connect(strategyComboBox, SIGNAL(activated(int)), SLOT(slotStrategyChanged(int)));
 }
 
-/***
- * enables/disables widgets during evolution
- ***/
-void MT_EstimationWidget::evolutionRunning(bool running)
-{
-	if(running){
-
-	} else {
-
-	}
-}
-
 void MT_EstimationWidget::slotStrategyChanged(int index)
 {
 

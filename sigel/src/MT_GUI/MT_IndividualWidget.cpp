@@ -133,18 +133,6 @@ MT_IndividualsWidget::MT_IndividualsWidget(QWidget* parent, const char* name, Qt
 	connect(editor, SIGNAL(newText(const QString &)), SLOT(slotChangeConstant(const QString &)));
 }
 
-/***
- * enables/disables widgets during evolution
- ***/
-void MT_IndividualsWidget::evolutionRunning(bool running)
-{
-	if(running){
-
-	} else {
-
-	}
-}
-
 void MT_IndividualsWidget::onShow(MT_GPManager *manager, subst_cache *subst)
 {
 	randomizer = manager->getRandomizer();
