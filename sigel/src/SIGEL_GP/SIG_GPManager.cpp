@@ -825,13 +825,12 @@ void SIGEL_GP::SIG_GPManager::RegisterDynPVMClients() {
   enum { kSigelMasterRegPort = 6789, kSuicidalRequest   = 13 };
 
   fd_set mySet;
-  struct sockaddr_in  sad, caddr;
+  struct sockaddr_in  sad;
   QList<int> clientSockets(0);
   //struct hostent *ptrh;
   struct protoent *ptrp;
   int i;
   int listenSocket, sdRecv, myInt;
-  socklen_t alen;
   pthread_mutex_t servMutex = PTHREAD_MUTEX_INITIALIZER;
   char clientName[256];
   QString client;
@@ -893,7 +892,7 @@ void SIGEL_GP::SIG_GPManager::RegisterDynPVMClients() {
 
      // check what caused pselect() to exit
      if ( FD_ISSET(listenSocket, &mySet) ) {
-      sdRecv = accept(listenSocket, reinterpret_cast<sockaddr *>(&caddr), &alen);
+      sdRecv = accept(listenSocket, nullptr, nullptr);
 
       if (sdRecv < 0) {
         fprintf(stderr, "ERR:   accept() failed\n");
