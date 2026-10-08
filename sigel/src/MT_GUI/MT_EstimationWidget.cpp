@@ -22,7 +22,6 @@ MT_EstimationWidget::MT_EstimationWidget(QWidget* parent, const char* name, Qt::
 
 void MT_EstimationWidget::slotStrategyChanged(int index)
 {
-
 	// remember the last set value
 	if(toleranceSpinBox->getTyp() == INTTYP){
 		switch(lastIndex){
@@ -92,7 +91,6 @@ void MT_EstimationWidget::slotStrategyChanged(int index)
 			break;
 		}
 	}
-
 }
 
 bool MT_EstimationWidget::onHide(MT_GPManager *manager, subst_cache *subst)
@@ -194,7 +192,6 @@ void MT_EstimationWidget::onShow(MT_GPManager *manager, subst_cache *subst)
 		default:
 			strategyComboBox->setCurrentIndex(4);
 		}
-
 	} else {						
 		// of type classifier
 		estimationGroupBox->setTitle("Classification");
@@ -234,5 +231,4 @@ void MT_EstimationWidget::onShow(MT_GPManager *manager, subst_cache *subst)
 		toleranceSpinBox->setIntValue(static_cast<int>(tolerance));
 	else
 		toleranceSpinBox->setDblValue(tolerance);
-
 }

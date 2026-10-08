@@ -11,6 +11,7 @@
 
 namespace
 {
+
   // Own validators, not Qt's. Qt's reject some keystrokes, so typing -50000
   // leaves "-5000". The text goes into the generated constants unchecked.
 
@@ -41,7 +42,6 @@ namespace
     // Must stay empty. QLineEdit calls fixup on focus-out, and the inherited
     // one rewrites the text in its own number format.
     void fixup( QString & ) const override {}
-
   };
 
   // Keeps any number that is typed, also with an exponent. Out of range or too
@@ -99,8 +99,8 @@ namespace
     // Must stay empty. Qt 6 calls fixup on focus-out, and the inherited one
     // rewrites 123.456789 to "1.2346e+02".
     void fixup( QString & ) const override {}
-
   };
+
 }
 
 MT_AddConstantsWidget::MT_AddConstantsWidget(MT_IndividualsWidget *parent, const char *name, bool modal, Qt::WindowFlags fl)

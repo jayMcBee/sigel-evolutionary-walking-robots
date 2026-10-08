@@ -79,7 +79,6 @@ QString DISpinBox::textFromValue(int value) const
 		return QString::number(value/precision).append(".").append(QString::number(value%precision).rightJustified(iDecimals, '0'));
 }
 
-
 void DISpinBox::setDblValue(double value)
 {
 	setValue(value * precision);
