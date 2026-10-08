@@ -76,6 +76,21 @@ SIGEL_GP::SIG_GPExperiment &SIGEL_GP::SIG_GPManager::getCurrentExperiment()
 	return currentExperiment;
 };
 
+void SIGEL_GP::SIG_GPManager::advanceToNextTournament( int tournament )
+{
+	if (tournament == -1)
+	{
+		return;
+	}
+
+	tours[ tournament ]->depNumber -= 1;
+
+	if (tours[ tournament ]->depNumber == 0)
+	{
+		taskCanDoList << tournament;
+	}
+}
+
 void SIGEL_GP::SIG_GPManager::evolutionLoop()
 {
 	int maxTouchsPerLoop = currentExperiment.gpParameter.getMaxTouchsPerLoop();
@@ -172,15 +187,7 @@ void SIGEL_GP::SIG_GPManager::evolutionLoop()
 							  << " is up to date." << Qt::endl;
 #endif
 
-							int actSuccessor = actTour.indis[i]->successor;
-							if (actSuccessor != -1)
-							{
-								tours[ actSuccessor ]->depNumber -= 1;
-								if( tours[ actSuccessor ]->depNumber == 0 )
-								{
-									taskCanDoList << actSuccessor;
-								};
-							};
+							advanceToNextTournament( actTour.indis[i]->successor );
 						}
 						else
 						{
@@ -216,15 +223,7 @@ void SIGEL_GP::SIG_GPManager::evolutionLoop()
 								updateIndividualView( actTourInd.indNumber );
 								actTourInd.fitTaskId = -1;
 
-								int actSuccessor = actTourInd.successor;
-								if (actSuccessor != -1)
-								{
-									tours[ actSuccessor ]->depNumber -= 1;
-									if (tours[ actSuccessor ]->depNumber == 0)
-									{
-										taskCanDoList << actSuccessor;
-									}
-								}; // if(actSucessor) -condition
+								advanceToNextTournament( actTourInd.successor );
 							} // if(actFitness) -condition
 							else
 							{
@@ -1425,15 +1424,7 @@ void SIGEL_GP::SIG_GPManager::evolutionLoop(MT_Classifier *MetaClassifier)
 							                          << " is up to date." << Qt::endl;
 #endif
 
-							int actSuccessor = actTour.indis[i]->successor;
-							if (actSuccessor != -1)
-							{
-								tours[ actSuccessor ]->depNumber -= 1;
-								if( tours[ actSuccessor ]->depNumber == 0 )
-								{
-									taskCanDoList << actSuccessor;
-								};
-							};
+							advanceToNextTournament( actTour.indis[i]->successor );
 						}
 						else
 						{
@@ -1474,15 +1465,7 @@ void SIGEL_GP::SIG_GPManager::evolutionLoop(MT_Classifier *MetaClassifier)
 								updateIndividualView( actTourInd.indNumber );
 								actTourInd.fitTaskId = -1;
 
-								int actSuccessor = actTourInd.successor;
-								if (actSuccessor != -1)
-								{
-									tours[ actSuccessor ]->depNumber -= 1;
-									if (tours[ actSuccessor ]->depNumber == 0)
-									{
-										taskCanDoList << actSuccessor;
-									}
-								};
+								advanceToNextTournament( actTourInd.successor );
 							}
 							else
 							{

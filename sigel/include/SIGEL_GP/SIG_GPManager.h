@@ -203,6 +203,14 @@ namespace SIGEL_GP
 		SIG_GPManager &operator=( SIG_GPManager const & ) = delete;
 
 		/**
+		 * An individual is finished in one tournament and goes on to its next
+		 * one, 'tournament'. That tournament goes into taskCanDoList when all
+		 * its participants have arrived. -1 means that there is no next one.
+		 */
+	private:
+		void advanceToNextTournament( int tournament );
+
+		/**
 		 * The evolutionLoop is the heart of the genetic programming algorithm.
 		 * It determine how the evolution works.
 		 * @pre
