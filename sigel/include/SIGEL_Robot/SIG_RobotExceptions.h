@@ -32,6 +32,21 @@ using SIGEL_Tools::SIG_Exception;
 
 namespace SIGEL_Robot {
 
+        /*
+        class SIG_MultipleRootsError : public SIG_Exception {
+	public:
+                SIG_MultipleRootsError (QString file,
+                                        int line,
+                                        QString olderone,
+                                        QString newerone)
+                        : SIG_Exception (file, line,
+                                         "\"" + newerone +
+                                         "\" redefines previous root link \"" +
+                                         olderone + "\".")
+                        { }
+        };
+        */
+
         class SIG_UnstreamingError : public SIG_Exception {
         public:
                 SIG_UnstreamingError (QString file, int line,

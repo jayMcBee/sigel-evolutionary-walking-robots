@@ -87,6 +87,13 @@ namespace SIGEL_Robot {
 		return number;
 	}
 
+	//
+	// SIG_Joint::JointType SIG_Joint::getJointType () const
+	// { /* Please implement this! */ }
+	// Someone out there evidently failed to grasp that this
+	// method is ABSTRACT. *giggle*
+	//
+
 	void SIG_Joint::setLeftLink (SIG_Link *theLink)
 	{
 		leftLink = theLink;
