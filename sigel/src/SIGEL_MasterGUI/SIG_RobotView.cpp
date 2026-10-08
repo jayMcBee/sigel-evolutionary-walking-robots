@@ -33,7 +33,6 @@
 #include "SIGEL_Robot/SIG_Material.h"
 #include "SIGEL_Tools/SIG_Exception.h"
 
-
 namespace SIGEL_MasterGUI
 {
 
@@ -61,7 +60,6 @@ SIG_RobotView::SIG_RobotView( QWidget* parent,  const char* name, Qt::WindowFlag
 
 void SIG_RobotView::putIntoExperiment()
 {
-
 }
 
 void SIG_RobotView::getOutOfExperiment()

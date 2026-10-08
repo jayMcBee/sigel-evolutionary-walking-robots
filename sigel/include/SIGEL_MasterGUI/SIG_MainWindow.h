@@ -42,6 +42,7 @@
 
 namespace SIGEL_MasterGUI
 {
+
   /**
    * The class of the main window of the application.
    *
@@ -221,12 +222,8 @@ namespace SIGEL_MasterGUI
 		  void slotMTConfigureSystem();
 		  void slotMTSwitchSystem(QAction *selSystem);
 		  void slotCurrentExperimentChanged();
-
     };
   
 }
 
 #endif // SIGEL_MASTERGUI_SIG_MAINWINDOW_H
-
-
-

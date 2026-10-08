@@ -129,11 +129,10 @@ Paths are relative to `sigel/`, the source tree.
 
   The change touches only empty lines, so the non-empty lines of each file
   must stay identical. One change covers at most 20 files, also inside one
-  module. Still to do: `SIGEL_MasterGUI` from
-  `SIG_LanguageParametersBase` on, in the order of the file names.
+  module. All modules are done.
 
-  A last, separate pass removes the access labels that have no declaration
-  under them: `protected:` in `MT_GPManager.h` and `SIG_IndividualView.h`,
+  Still to do: a last, separate pass removes the access labels that have no
+  declaration under them: `protected:` in `MT_GPManager.h` and `SIG_IndividualView.h`,
   `private:` in `SIG_Geometry.h` and `SIG_GUIGPExperiment.h`.
 
 ---

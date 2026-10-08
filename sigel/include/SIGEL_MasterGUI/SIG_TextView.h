@@ -56,5 +56,3 @@ class SIG_TextView : public QTextBrowser
  private slots:
   void updateScroll();
 };
-
-

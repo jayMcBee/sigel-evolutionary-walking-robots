@@ -852,7 +852,6 @@ void SIG_MainWindow::slotCurrentExperimentChanged()
 	SIG_GUIGPExperiment *currentExperiment = experimentListView->currentlySelectedExperiment();
 	if(currentExperiment){
 		if(currentExperiment->gpExperiment.mtController->IsEnabled()){
-
 			// currently selected experiment use meta gp-system
 			//
 			// NOT while a run is going. This slot fires one line after the
@@ -869,18 +868,14 @@ void SIG_MainWindow::slotCurrentExperimentChanged()
 			} else {
 				mtChoiceClassifierAction->setChecked(true);
 			}
-
 		} else {
-
 			// no meta gp-system is used
 			mtChoiceTypeActionGroup->setEnabled(false);
 			mtConfigureAction->setEnabled(false);
 			mtUseAction->setChecked(false);
-
 		}
 	}
 };
-
 
 void SIG_MainWindow::slotEnableNoExperimentActions( bool enable )
 {
@@ -899,7 +894,6 @@ void SIG_MainWindow::slotEnableEvolutionRunningActions( bool enable )
   for ( QAction *a : evolutionRunningActions )
     a->setEnabled( enable );
 };
-
 
 void SIG_MainWindow::closeEvent( QCloseEvent *event )
 {

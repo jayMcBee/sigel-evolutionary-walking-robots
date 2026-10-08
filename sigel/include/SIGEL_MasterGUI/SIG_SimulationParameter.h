@@ -29,6 +29,7 @@
 
 namespace SIGEL_MasterGUI
 {
+
   /**
    * The class of the window, where the simulation parameters can be altered.
    *

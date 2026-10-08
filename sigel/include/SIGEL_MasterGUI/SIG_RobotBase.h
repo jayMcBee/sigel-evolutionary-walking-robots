@@ -24,7 +24,6 @@ protected:
 
 protected slots:
     virtual void languageChange();
-
 };
 
 #endif // SIGEL_MASTERGUI_SIG_ROBOTBASE_H

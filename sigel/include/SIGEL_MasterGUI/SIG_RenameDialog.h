@@ -42,6 +42,7 @@ class QPushButton;
 
 namespace SIGEL_MasterGUI
 {
+
   /**
    * This is the class of the dialog which is used to rename the experiment.
    */
