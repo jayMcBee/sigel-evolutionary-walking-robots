@@ -39,8 +39,8 @@ enum { kSigelMasterRegPort = 6789,
 
 int main (int argc, char *argv[])
 { struct sockaddr_in   sad;
-  struct hostent      *ptrh;
-  struct protoent     *ptrp;
+  struct hostent      *masterHost;
+  struct protoent     *tcpProtocol;
   int                  masterSocket,
                        msg;
   char                 locHostName[256],
@@ -65,23 +65,23 @@ int main (int argc, char *argv[])
   strncpy(sigHostName, argv[1], 255);
 
   /* make IP-Address with hostname */
-  ptrh = gethostbyname(sigHostName);
-  if (ptrh == NULL)
+  masterHost = gethostbyname(sigHostName);
+  if (masterHost == NULL)
   { fprintf(stderr, "ERR:   invalid host: %s\n", sigHostName);
     exit(1);
   }
 
-  memcpy(&sad.sin_addr, ptrh->h_addr, ptrh->h_length);
+  memcpy(&sad.sin_addr, masterHost->h_addr, masterHost->h_length);
 
   /* map TCP protocol number */
-  ptrp = getprotobyname("tcp");
-  if (ptrp == NULL)
+  tcpProtocol = getprotobyname("tcp");
+  if (tcpProtocol == NULL)
   { fprintf(stderr, "ERR:   Can't map 'tcp' to a protocol number\n");
     exit(1);
   }
 
   /* finally create the socket */
-  masterSocket = socket(PF_INET, SOCK_STREAM, ptrp->p_proto);
+  masterSocket = socket(PF_INET, SOCK_STREAM, tcpProtocol->p_proto);
   if (masterSocket < 0)
   {  fprintf(stderr, "ERR:   Can't create socket\n");
      exit(1);

@@ -959,7 +959,7 @@ void SIGEL_GP::SIG_GPManager::RegisterDynPVMClients()
 
 	struct sockaddr_in  sad;
 	QList<int> clientSockets(0);
-	struct protoent *ptrp;
+	struct protoent *tcpProtocol;
 	int listenSocket, sdRecv;
 	char clientName[256];
 	QString client;
@@ -975,14 +975,14 @@ void SIGEL_GP::SIG_GPManager::RegisterDynPVMClients()
 	sad.sin_addr.s_addr = INADDR_ANY;
 
 	// map TCP protocol number
-	if ((ptrp = getprotobyname("tcp")) == nullptr)
+	if ((tcpProtocol = getprotobyname("tcp")) == nullptr)
 	{
 		fprintf(stderr, "ERR:   Can't map 'tcp' to a protocol number\n");
 		exit(1);
 	}
 
 	// finally create the socket
-	listenSocket = socket(PF_INET, SOCK_STREAM, ptrp->p_proto);
+	listenSocket = socket(PF_INET, SOCK_STREAM, tcpProtocol->p_proto);
 	if (listenSocket < 0)
 	{
 		fprintf(stderr, "ERR:   Can't create socket\n");
