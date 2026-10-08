@@ -162,11 +162,6 @@ touched, because changing one changes behaviour against the reference binary.
   unlikely edge cases, such as a stored fitness after padding, would not be
   handled.
 
-- [ ] **19. Make `SIG_GPFitnessTrainer::getNextHost`'s mutex lock
-  something.** It is a function local, so it excludes nothing, and the section
-  it guards races the dynamic-client thread. Its comment "now we make ourself
-  running exclusively" is false and goes with it.
-
 - [ ] **53. DynaMechs returns uninitialised forces for end links.**
   `dmArticulation::getForces` returns `f_star`, which is never written for a
   link without children, and `SIG_GPForceFitnessFunction` uses it. Only
@@ -412,7 +407,7 @@ problem; the choice is made before any code is written.
   the dynamic-client server thread and their locks use `pthread_create`,
   `pthread_mutex_*` and `pthread_cond_*` directly. Research what should
   replace them, for example what C++20 offers natively, before any code
-  changes. Items 19 and 122 are faults in this code.
+  changes. Item 122 is a fault in this code.
 
 - [ ] **116. Let drives hold a torque until the program changes it.**
   `SIG_DynaMechsCommandInterface::moveDrive` applies the torque from R0 for

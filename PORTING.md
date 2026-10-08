@@ -1051,6 +1051,25 @@ classes and leave truncation a hard error. **They are not interchangeable.**
     them and makes them again at several points during its life, which
     needs a `reset()` at each.
 
+**2026-10-08 — DONE: ITEM 19, THE LISTS OF DYNAMIC HOSTS HAVE ONE MUTEX.**
+
+- **Before:** the server thread appended to `dynHosts` and `freshDynHosts`
+  in `SIG_GPFitnessTrainer::addDynHost`. The main thread read and emptied
+  them in `getNextHost` and `flushAllDynHosts`. The mutex in `getNextHost`
+  was made inside each call, so it excluded nothing, and a client that
+  registered at the wrong moment could damage a list.
+- **Now:** the member `dynHostsMutex` guards both lists in all three
+  methods. It is set up in the constructor and never destroyed. The main
+  thread takes `disconnectMutex` of `SIG_GPManager` first and this one
+  second; the server thread never holds both. `getNextHost` holds it across
+  `pvm_addhosts`, so a client that registers then waits for that call. It
+  is a pthread mutex; item 124 moves all pthread code to C++20 in one step.
+- **Measured:** on one machine, `sigel -de` on a copy of `twoBases.exp`
+  with eight `manage_dyn_slave` started at the same moment, 33 generations:
+  eight clients were registered, eight hosts were added, and the release at
+  generation 20 removed eight hosts and disconnected eight clients. Such a
+  run does not show a race; the review of the locking is the evidence.
+
 **2026-10-08 — DONE: ITEM 121, THE RELEASE OF THE CLIENTS USES ONE MUTEX.**
 
 - **Before:** at the end of a generation `SIG_GPManager::run`, both
