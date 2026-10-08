@@ -23,13 +23,10 @@
 #ifndef SIGEL_GP_SIG_GPFITNESSFUNCTION_H
 #define SIGEL_GP_SIG_GPFITNESSFUNCTION_H
 
-
-
 #include "SIGEL_Program/SIG_Program.h"
 #include "SIGEL_Robot/SIG_Robot.h"
 #include "SIGEL_Environment/SIG_Environment.h"
 #include "SIGEL_Simulation/SIG_SimulationParameters.h"
-
 
 #include <qstring.h>
 
@@ -42,7 +39,6 @@ namespace SIGEL_GP
  *
  */
 class SIG_GPFitnessFunction{
-
 /**
  * The destructor of the fitnessfunction.
  * @pre 
@@ -52,7 +48,6 @@ class SIG_GPFitnessFunction{
  */
  public:
  virtual ~SIG_GPFitnessFunction() = default;
-
 
 /**
  * This operation activates the computation of the fitnessvalue. It is virtual, this means 
@@ -102,8 +97,8 @@ class SIG_GPFitnessFunction{
 
  protected:
  SIG_Vector normalizeRobotPosition( SIG_Vector originalPosition,  SIG_Matrix actualRobotRotation, const SIGEL_Robot::SIG_Robot &rob ) const;
-
 };
+
 }
 
 #endif // SIGEL_GP_SIG_GPFITNESSFUNCTION_H

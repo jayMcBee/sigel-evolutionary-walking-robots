@@ -129,7 +129,6 @@ void SIGEL_GP::SIG_GPExperiment::saveExperiment(QTextStream & file)
   file << comment;
 }
 
-
 void SIGEL_GP::SIG_GPExperiment::writeHistoryToFileTransfer( QTextStream &file )
 {
   for (const SIG_GPExperimentHistoryEntry *actEntry : experimentHistory)

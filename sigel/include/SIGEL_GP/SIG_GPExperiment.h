@@ -51,7 +51,6 @@ namespace SIGEL_GP
  */
 
 class SIG_GPExperiment {
-
  public:
   /**
    * Builds an empty experiment.
@@ -176,7 +175,7 @@ class SIG_GPExperiment {
    */
   std::unique_ptr< MT_Controller > mtController;
 };
+
 }
 
 #endif // SIGEL_GP_SIG_GPEXPERIMENT_H
-

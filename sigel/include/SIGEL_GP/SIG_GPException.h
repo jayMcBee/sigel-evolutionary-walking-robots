@@ -35,7 +35,6 @@ namespace SIGEL_GP
 */
 
 	class SIG_GPException : public SIGEL_Tools::SIG_Exception{
-		
 		public: 
 			SIG_GPException (QString file, int line, QString msg);		
 	};
@@ -55,8 +54,5 @@ namespace SIGEL_GP
                                        		      QString msg);					
 	};
 
-
 }
 #endif //  SIGEL_GP_SIG_GPEXCEPTION_H
-
-

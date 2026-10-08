@@ -30,7 +30,6 @@ namespace SIGEL_GP
 
   class SIG_GPActivePVMHost : public SIG_GPPVMHost
     {
-
     public:
 
       SIG_GPActivePVMHost( SIG_GPPVMHost const &origin );
@@ -42,7 +41,6 @@ namespace SIGEL_GP
       SIG_GPActivePVMHost();
 
       QString print() const;
-
     };
 
 }

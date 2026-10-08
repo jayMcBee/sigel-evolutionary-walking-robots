@@ -129,7 +129,9 @@ Paths are relative to `sigel/`, the source tree.
 
   The change touches only empty lines, so the non-empty lines of each file
   must stay identical. One change covers at most 20 files, also inside one
-  module. Modules still to do: `SIGEL_GP`, `SIGEL_MasterGUI`.
+  module. Modules still to do: `SIGEL_GP` from
+  `SIG_GPForceFitnessFunction` on, in the order of the file names, and
+  `SIGEL_MasterGUI`.
 
   A last, separate pass removes the access labels that have no declaration
   under them: `protected:` in `MT_GPManager.h` and `SIG_IndividualView.h`,

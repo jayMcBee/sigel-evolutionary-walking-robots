@@ -30,7 +30,6 @@ namespace SIGEL_GP
 
 class SIG_GPExperimentHistoryEntry
   {
-
   public:
 
     SIG_GPExperimentHistoryEntry( int generationNo,
@@ -64,7 +63,6 @@ class SIG_GPExperimentHistoryEntry
     double minFitness;
 
     double averageFitness;
-
   };
 
 }

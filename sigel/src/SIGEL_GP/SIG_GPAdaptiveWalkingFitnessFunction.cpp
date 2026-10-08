@@ -26,7 +26,6 @@
 #include "SIGEL_Simulation/SIG_EarlyRunTermSimulation.h"
 #include "SIGEL_Tools/SIG_IO.h"
 
-
 namespace SIGEL_GP
 {
 

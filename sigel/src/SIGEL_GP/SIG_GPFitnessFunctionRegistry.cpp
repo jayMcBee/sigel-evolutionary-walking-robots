@@ -12,6 +12,7 @@
 
 namespace SIGEL_GP
 {
+
   const QList<const SIG_GPFitnessFunction *> &SIG_GPFitnessFunctionRegistry::fitnessFunctions()
   {
     static const SIG_GPSimpleFitnessFunction simple;
@@ -42,4 +43,5 @@ namespace SIGEL_GP
       return std::nullopt;
     return int( std::distance( functions.begin(), found ) );
   }
+
 }

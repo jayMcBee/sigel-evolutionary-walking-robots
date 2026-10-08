@@ -40,7 +40,6 @@ namespace SIGEL_GP
 
 class SIG_GPCrossOverTournament : public SIGEL_GP::SIG_GPTournament
 { 
-	
 /**
 * The constructor of the crossovertournament.
 * @pre
@@ -71,14 +70,10 @@ class SIG_GPCrossOverTournament : public SIGEL_GP::SIG_GPTournament
 			    int indPos3, 
 			    int indPos4);
 
-     
  private:
   QString name1;
   QString name2;
    
-
-
-
 /**
 * The virtual function effects the tournament to start.
 * @pre
@@ -109,9 +104,6 @@ virtual bool run(MT_Classifier *MetaClassifier);
 */
 public:
 virtual bool classify(MT_Classifier *MetaClassifier);
-
-
-
 };
 
 }

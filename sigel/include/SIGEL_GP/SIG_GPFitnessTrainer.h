@@ -32,8 +32,6 @@
 #include "SIGEL_GP/SIG_GPActivePVMHost.h"
 #include "SIGEL_GP/SIG_GPPVMTask.h"
 
-
-
 namespace SIGEL_GP
 {
 

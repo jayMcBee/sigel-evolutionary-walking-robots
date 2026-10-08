@@ -40,4 +40,3 @@ SIGEL_GP::SIG_GPIndIsTooOldException::SIG_GPIndIsTooOldException (QString file, 
 { 
 	this->message = "Individual is too Old: " + this->message;
 }
-				

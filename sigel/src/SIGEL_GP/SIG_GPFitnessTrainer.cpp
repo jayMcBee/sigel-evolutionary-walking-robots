@@ -130,7 +130,6 @@ SIGEL_GP::SIG_GPFitnessTrainer::~SIG_GPFitnessTrainer() {
   pvmHosts.clear();
 };
 
-
 void SIGEL_GP::SIG_GPFitnessTrainer::addDynHost(QString newHost) {
   QString buffer;
 
@@ -151,7 +150,6 @@ void SIGEL_GP::SIG_GPFitnessTrainer::addDynHost(QString newHost) {
 
   pthread_mutex_unlock( &dynHostsMutex );
 }
-
 
 void SIGEL_GP::SIG_GPFitnessTrainer::flushAllDynHosts() {
   QString        dHostQstr;
@@ -209,7 +207,6 @@ void SIGEL_GP::SIG_GPFitnessTrainer::flushAllDynHosts() {
 
   pthread_mutex_unlock( &dynHostsMutex );
 }
-
 
 int SIGEL_GP::SIG_GPFitnessTrainer::spawnTask(SIGEL_GP::SIG_GPIndividual const& ind) {
   int hostNumber = getNextHost();
@@ -317,7 +314,6 @@ int SIGEL_GP::SIG_GPFitnessTrainer::spawnTask(SIGEL_GP::SIG_GPIndividual const& 
         //warn.exec();
         SIGEL_Tools::SIG_IO::cerr << "pvm_spawn() failed on \"" << hostNameQCString << "\"   (" << spawnInfo << "/" << taskId << ") - " << errorText.toUtf8() << Qt::endl;
       }
-
   };
 
   if (!success) {
@@ -331,7 +327,6 @@ int SIGEL_GP::SIG_GPFitnessTrainer::spawnTask(SIGEL_GP::SIG_GPIndividual const& 
 
   return actId;
 };
-
 
 double SIGEL_GP::SIG_GPFitnessTrainer::checkTask(int taskId)
 {

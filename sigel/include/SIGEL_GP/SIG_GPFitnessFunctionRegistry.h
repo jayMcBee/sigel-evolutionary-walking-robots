@@ -9,6 +9,7 @@
 
 namespace SIGEL_GP
 {
+
   // The one list of fitness functions. The registry owns the objects.
   class SIG_GPFitnessFunctionRegistry
   {
@@ -18,6 +19,7 @@ namespace SIGEL_GP
     // Position in fitnessFunctions(); empty for an unknown ID.
     static std::optional<int> indexOf( const QString &serializedId );
   };
+
 }
 
 #endif // SIGEL_GP_SIG_GPFITNESSFUNCTIONREGISTRY_H

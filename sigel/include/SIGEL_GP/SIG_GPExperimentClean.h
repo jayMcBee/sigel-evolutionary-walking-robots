@@ -50,7 +50,6 @@ namespace SIGEL_GP
  */
 
 class SIG_GPExperiment {
-
  public:
   /**
    * Builds an empty experiment.
@@ -168,7 +167,7 @@ class SIG_GPExperiment {
    */
   QString autosavePath;
 };
+
 }
 
 #endif // SIGEL_GP_SIG_GPEXPERIMENT_H
-

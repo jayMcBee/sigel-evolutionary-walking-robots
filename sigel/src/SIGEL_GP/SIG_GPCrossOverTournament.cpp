@@ -66,7 +66,6 @@ bool SIGEL_GP::SIG_GPCrossOverTournament::run()
    double fitness2_1=ind2_1.getFitness();
    double fitness2_2=ind2_2.getFitness();
  
-   
 // META META META META META META META 
 	if( fitness1_1 < -2.0 )
 		fitness1_1 = (fitness1_1 + 2.0) * -1.0;
@@ -82,8 +81,6 @@ bool SIGEL_GP::SIG_GPCrossOverTournament::run()
 
 // META META META META META META META 
    
-
-   
    SIG_GPIndividual *winner1 = nullptr;
    SIG_GPIndividual *winner2 = nullptr;
    int looserPos1 = 0;
@@ -93,7 +90,6 @@ bool SIGEL_GP::SIG_GPCrossOverTournament::run()
 
    //The tournament action
    
-
    if (fitness1_1 >= fitness1_2)
      {
        winner1 = &ind1_1;
@@ -150,10 +146,8 @@ bool SIGEL_GP::SIG_GPCrossOverTournament::run()
    return true;
 };
 
-
 bool SIGEL_GP::SIG_GPCrossOverTournament::run(MT_Classifier *MetaClassifier)
 {
-
   SIG_GPIndividual &ind1_1 = gpPool.getIndividual( indis[0]->indNumber );
   SIG_GPIndividual &ind1_2 = gpPool.getIndividual( indis[1]->indNumber );
   SIG_GPIndividual &ind2_1 = gpPool.getIndividual( indis[2]->indNumber );
@@ -232,12 +226,10 @@ bool SIGEL_GP::SIG_GPCrossOverTournament::run(MT_Classifier *MetaClassifier)
    gpPool.setIndividual(*cinds[1],looserPos2);
    
    return true;
-
 };
 
 bool  SIGEL_GP::SIG_GPCrossOverTournament::classify(MT_Classifier *MetaClassifier)
 {
- 
   SIG_GPIndividual &ind1_1 = gpPool.getIndividual( indis[0]->indNumber );
   SIG_GPIndividual &ind1_2 = gpPool.getIndividual( indis[1]->indNumber );
   SIG_GPIndividual &ind2_1 = gpPool.getIndividual( indis[2]->indNumber );
@@ -310,5 +302,4 @@ bool  SIGEL_GP::SIG_GPCrossOverTournament::classify(MT_Classifier *MetaClassifie
    gpPool.setIndividual(*cinds[1],looserPos2);
    
    return true;
-
 };

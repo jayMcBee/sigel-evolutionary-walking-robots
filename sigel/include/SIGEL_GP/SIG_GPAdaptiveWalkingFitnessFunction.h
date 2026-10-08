@@ -27,6 +27,7 @@
 
 namespace SIGEL_GP
 {
+
 /**
  * The 'SIG_GPAdaptiveWalkingFitnessFunction' calculates the fitness by averaging
  * the height of the torso joint throughout the evolution and using the average
@@ -34,7 +35,6 @@ namespace SIGEL_GP
  */
   class SIG_GPAdaptiveWalkingFitnessFunction : public SIG_GPFitnessFunction
     {
-
     public:
 
       double evalFitness( SIGEL_Program::SIG_Program &program,
@@ -46,7 +46,6 @@ namespace SIGEL_GP
       QString serializedId() const { return "ZorcWalkingFitnessFunction"; }
       QString name() const { return "Adaptive Walking"; }
       QString description() const { return "Average speed from start to end, weighted by how high the body stays compared with its start height."; }
-
     };
 
 }
