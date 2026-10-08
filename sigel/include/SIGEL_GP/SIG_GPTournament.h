@@ -49,63 +49,7 @@ namespace SIGEL_GP
 
 	class SIG_GPTournament
 	{
-		/**
-		 * The current language parameter settings.
-		 */
-
 	public:
-		SIGEL_Robot::SIG_LanguageParameters &languageP;
-
-		/**
-		 * The randomizer, which is needed to create the randompoint used for the genetic operations.
-		 */
-	public:
-		SIGEL_Tools::SIG_Randomizer& randomizer;
-
-		/**
-		 * The fitnesstrainer controls the computations of fitnessvalues after the genetic mutation of
-		 * the winner of the tournament.
-		 */
-	public:
-		SIG_GPFitnessTrainer& trainer;
-
-		/**
-		 * The tournamentindividual is used record the positions of the tournament members and the
-		 * next tournament in which the tournamentindividual is member of, plus the taskid of the
-		 * pvm-task given from the fitnesstrainer.
-		 */
-	public:
-		QList<SIG_GPTournamentIndividual *> indis;
-
-		/**
-		 * The flag signals if the tournament can be played or have to wait for earlier tournaments.
-		 *
-		 */
-	public:
-		bool justWaiting ;
-
-		/**
-		 * The number of individuals of this tournament that are still in an earlier tournament.
-		 * The tournament can be played when it is 0.
-		 */
-	public:
-		int waitCounter;
-
-		/**
-		 * The actual individual pool.
-		 *
-		 */
-	public:
-		SIG_GPPopulation &gpPool;
-
-		/**
-		 * The current GP settings that contain neccessary information for some GP operations.
-		 */
-
-	public:
-		SIG_GPParameter& gpParameter;
-
-
 		/**
 		 * The constructor of the GPTournament.
 		 * @pre
@@ -119,7 +63,6 @@ namespace SIGEL_GP
 		 * @param actPool
 		 * The reference to the actual pool object.
 		 */
-	public:
 		SIG_GPTournament(SIGEL_Tools::SIG_Randomizer& randomizer,
 		                 SIG_GPFitnessTrainer& trainer,
 		                 SIG_GPPopulation& actPool,
@@ -134,21 +77,62 @@ namespace SIGEL_GP
 		 * @post
 		 * The object is destructed.
 		 */
-	public:
 		virtual ~SIG_GPTournament();
 
 		/**
 		 * This method is virtual, for definition in the inherited class.
 		 */
-	public:
 		virtual bool run();
 
-	public:
 		virtual bool run(MT_Classifier * MetaClassifier);
 
-	public:
 		virtual bool classify(MT_Classifier * MetaClassifier);
 
+		/**
+		 * The current language parameter settings.
+		 */
+		SIGEL_Robot::SIG_LanguageParameters &languageP;
+
+		/**
+		 * The randomizer, which is needed to create the randompoint used for the genetic operations.
+		 */
+		SIGEL_Tools::SIG_Randomizer& randomizer;
+
+		/**
+		 * The fitnesstrainer controls the computations of fitnessvalues after the genetic mutation of
+		 * the winner of the tournament.
+		 */
+		SIG_GPFitnessTrainer& trainer;
+
+		/**
+		 * The tournamentindividual is used record the positions of the tournament members and the
+		 * next tournament in which the tournamentindividual is member of, plus the taskid of the
+		 * pvm-task given from the fitnesstrainer.
+		 */
+		QList<SIG_GPTournamentIndividual *> indis;
+
+		/**
+		 * The flag signals if the tournament can be played or have to wait for earlier tournaments.
+		 *
+		 */
+		bool justWaiting ;
+
+		/**
+		 * The number of individuals of this tournament that are still in an earlier tournament.
+		 * The tournament can be played when it is 0.
+		 */
+		int waitCounter;
+
+		/**
+		 * The actual individual pool.
+		 *
+		 */
+		SIG_GPPopulation &gpPool;
+
+		/**
+		 * The current GP settings that contain neccessary information for some GP operations.
+		 */
+		SIG_GPParameter& gpParameter;
 
 	protected:
 		void inhume( SIG_GPIndividual &corps );
