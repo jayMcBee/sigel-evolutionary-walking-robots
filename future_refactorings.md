@@ -35,6 +35,16 @@ Paths are relative to `sigel/`, the source tree.
   because the port moved the Qt API and nothing else; that was a port-scope
   rule, not a refusal.
 
+- [ ] **153. Hold the jobs in `toSpawnList` by value.**
+  `SIG_GPFitnessTrainer::toSpawnList` is a list of pointers to lists of two
+  numbers: the task number and the pool position of an individual that waits
+  for a free host. Nothing needs the pointer. A small class with two named
+  members, held by value, drops the `new`, the `delete` and the unnamed `[0]`
+  and `[1]`. `sweepToSpawn` ends its pass by comparing two pointers; the new
+  loop must still give each job one try per pass, because each try calls
+  `getNextHost`. `fitTaskList` in `evalNewIndis` and `evalNeededIndis`, and
+  `dynHosts`, have the same form.
+
 ---
 
 ## 3 · Renames and translation
