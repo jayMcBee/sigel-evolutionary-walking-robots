@@ -826,7 +826,6 @@ void SIGEL_GP::SIG_GPManager::RegisterDynPVMClients() {
 
   struct sockaddr_in  sad;
   QList<int> clientSockets(0);
-  //struct hostent *ptrh;
   struct protoent *ptrp;
   int listenSocket, sdRecv;
   pthread_mutex_t servMutex = PTHREAD_MUTEX_INITIALIZER;
@@ -1064,7 +1063,6 @@ void SIGEL_GP::SIG_GPManager::run(MT_Classifier *MetaClassifier)
 	double bestFitness = currentExperiment.population.getBestFitness( true );
 	double minFitness = currentExperiment.population.getWorstFitness( true );
 
-	// double averageFitness = currentExperiment.population.getAverageFitness();
 	// In the meta-classifier approach the average fitness is computed over those
 	// SIG_Individuals whose fitness was computed exactly, by simulation
 	double averageFitness = 0.0;
