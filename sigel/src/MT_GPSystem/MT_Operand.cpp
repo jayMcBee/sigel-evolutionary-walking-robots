@@ -2,7 +2,6 @@
 
 MT_Operand::MT_Operand()
 {
-
 	OPType=1;
 	VariableName=0;
 	Data =-1;
@@ -17,7 +16,6 @@ MT_Operand::MT_Operand(MT_Operand *Original)
 
 MT_Operand::MT_Operand(int Op, double Da, int na)
 {
-
 	OPType = Op;
 
 	if (OPType == 1)  // if Operand is a variable 
@@ -30,8 +28,4 @@ MT_Operand::MT_Operand(int Op, double Da, int na)
 		Data= Da;
 		VariableName = -1;
 	}
-	
-
 }
-
-

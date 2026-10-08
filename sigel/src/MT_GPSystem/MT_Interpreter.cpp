@@ -5,7 +5,6 @@
 
 MT_Interpreter::MT_Interpreter()
 {
-
 	Error =0;
 	Program =nullptr;
 }
@@ -40,7 +39,6 @@ int MT_Interpreter::toInt(double value) const
 
 void MT_Interpreter::resetMachine()
 {
-	
 	for(int i=0; i<Variables.size(); i++)
 		Variables[i]=0;
 
@@ -49,7 +47,6 @@ void MT_Interpreter::resetMachine()
 	
 	ProgramCounter=0;
 }
-
 
 int MT_Interpreter::getLastError()
 {
@@ -101,7 +98,6 @@ double MT_Interpreter::interpret(MT_TranslatedIndividual *RobProg)
 
 	for (int i = 0; i < DurationToInterpret; i++)
 	{
-
 		PresentLine = Program->getProgramLine(ProgramCounter);
 		PresentInstruction = PresentLine->getInstruction();
 
@@ -110,7 +106,6 @@ double MT_Interpreter::interpret(MT_TranslatedIndividual *RobProg)
 
 		switch (PresentInstruction)
 		{
-
 			/* instruction to change the scanning SIGEL Robot by to individuals, */
 			case swi:
 			{
@@ -251,7 +246,6 @@ double MT_Interpreter::interpret(MT_TranslatedIndividual *RobProg)
 					Mod2 = toInt((PresentLine->getTargetOperand())->Data);
 					if (Mod2 != 0)
 					{
-
 						Mod1 = toInt(Variables[Source]);
 
 						if (Mod2 == -1)
@@ -498,7 +492,6 @@ double MT_Interpreter::interpret(MT_TranslatedIndividual *RobProg)
 				}
 				else
 				{
-
 					Mod1 = abs(toInt(PresentLine->getTargetOperand()->Data));
 					Mod1 = Mod1 % 16; // 0 =< Mod1 <16
 
@@ -540,14 +533,10 @@ void MT_Interpreter::setVariableNumber(int NumVariable)
 
 int MT_Interpreter::getDuration()
 {
-
 	return DurationToInterpret;
 }
-
-
 
 int MT_Interpreter::getVariableNumber()
 {
 	return NumberVariable;
-
 }

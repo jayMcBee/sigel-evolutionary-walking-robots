@@ -27,9 +27,7 @@ MT_Program::MT_Program (MT_Randomizer *Randi)
 	{
 		Program[i] = new MT_Programline(Randi);
 	}
-
 }
-
 
 MT_Program::MT_Program(QTextStream &File)
 {
@@ -53,7 +51,6 @@ MT_Program::MT_Program(QTextStream &File)
 	}
 	else
 		LastError=360;
-	
 }
 
 MT_Program::MT_Program(MT_Program *Prog)
@@ -66,10 +63,7 @@ MT_Program::MT_Program(MT_Program *Prog)
 	resize(nLength);
 	for(int i=0; i<Length; i++)
 		Program[i] = new MT_Programline(Prog->getProgramLine(i));
-
 }
-
-
 
 MT_Program::MT_Program(MT_Program *Prog, int Start, int End)
 {
@@ -113,12 +107,10 @@ int MT_Program::getLength()
 	return Length;
 }
 
-
 int MT_Program::getMaxLength()
 {
 	return MaxLength;
 }
-
 
 // get method
 
@@ -127,9 +119,6 @@ void MT_Program::changeMaxNumVariable(int NewNum)
 	for(int i=0; i<Length; i++)
 		(*Program[i]).changeMaxNumVariable(NewNum);	
 }
-
-
-
 
 void MT_Program::changeMaxProgLen(int NewLen)
 {
@@ -148,7 +137,6 @@ void MT_Program::changeMaxProgLen(int NewLen)
 	}
 }
 
-
 /* append the given program to the present program.
 * If the Lenght of the Program > MaxLen then the program will be reduced
 * and the excess programline will delete!
@@ -158,7 +146,6 @@ void MT_Program::changeMaxProgLen(int NewLen)
 
 void MT_Program::insertProg(MT_Program *Part)
 {
-	
 	int NewLength = Length+Part->getLength();
 	if (NewLength <= MaxLength)
 	{
@@ -185,7 +172,6 @@ void MT_Program::insertProg(MT_Program *Part)
 			delete (Part->getProgramLine(i));
 		
 		Part->clearProgram();
-		
 	}
 }
 
@@ -194,7 +180,6 @@ void MT_Program::insertProg(MT_Program *Part)
  ***/
 void MT_Program::clearProgram()
 {
-
 	for(int i=0; i<Length; i++){
 		Program[i] = nullptr;
 	}
@@ -203,7 +188,6 @@ void MT_Program::clearProgram()
 int MT_Program::getLastError()
 {
 	return LastError;
-
 }
 
 /***

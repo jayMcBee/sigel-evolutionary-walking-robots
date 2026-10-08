@@ -1,7 +1,6 @@
 #ifndef MT_GPSYSTEM_MT_INTERPRETER_H
 #define MT_GPSYSTEM_MT_INTERPRETER_H
 
-
 #include <QList>
 #include "MT_GPSystem/MT_TranslatedIndividual.h"
 #include "MT_GPSystem/MT_Program.h"
@@ -20,7 +19,6 @@ private:
 
 	int NumberVariable;
 	
-
 	/* indicate by a pointer the MT_Program, which should be interpret */ 
 	MT_Program * Program;
 
@@ -37,11 +35,9 @@ private:
 	/* Converts a variable to int; NaN and values outside int give INT_MIN, as x86 does. */
 	int toInt(double value) const;
 
-
 public:
 	int getVariableNumber();
 
-		
 	/* the constructor receive the VariableNumber and the training duration 
 	*/
 	MT_Interpreter (int VarNum, int TDuration);
@@ -85,8 +81,6 @@ public:
 	* @post: the Flag's, instruction counter and the Variables are setting of zero
 	*/
 	void resetMachine();
-
-
 };
 
 #endif // MT_GPSYSTEM_MT_INTERPRETER_H

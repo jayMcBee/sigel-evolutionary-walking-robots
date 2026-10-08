@@ -6,7 +6,6 @@
 
 MT_Randomizer::MT_Randomizer()
 {
-	
 	srand( static_cast<unsigned>(time( nullptr )) );
 
 // initialization
@@ -26,7 +25,6 @@ MT_Randomizer::MT_Randomizer()
 	for (int i=0; i<3; i++)
 		ProbSearchOperator[i]=0;	
 		
-
 	ProbMutationPower.resize(2);
 	for (int i=0; i<2; i++)
 		ProbMutationPower[i]=0;
@@ -40,9 +38,6 @@ MT_Randomizer::MT_Randomizer()
 		ProbInstruktion[i]=0;
 
 	createConstant (50, true , 0, 1000);
-	
-
-
 }
 
 MT_Randomizer::MT_Randomizer(QTextStream &File)
@@ -125,25 +120,17 @@ MT_Randomizer::MT_Randomizer(QTextStream &File)
 					PresentLine = File.readLine();	
 					Constant[i]= PresentLine.toDouble();
 				}
-					
-
 			}
-				
 		}
 		else
 			LastError =261;
-		
 	}
 	else
 		LastError =260;
-
-	
 }
-
 
 void MT_Randomizer::loadSetup(QTextStream &File)
 {
-	
 	QString Randomizer( "Randomizer:" );
 	QString PresentLine = File.readLine();
 	
@@ -212,11 +199,8 @@ void MT_Randomizer::loadSetup(QTextStream &File)
 		LastError =262;
 }
 
-
-
 void MT_Randomizer::writeToFileRandi(QTextStream &File)
 {
-
 	File << ("Randomizer:\n");
 	File << ParentSize << Qt::endl;
 	File << OffspringSize << Qt::endl;
@@ -245,20 +229,17 @@ void MT_Randomizer::writeToFileRandi(QTextStream &File)
 		File << Constant[i] << Qt::endl;
 
 	File << Qt::endl;
-
 }
 
 // normal set/ get method
 
 void MT_Randomizer::returnIndividualsValue(int **Length, int **NumOfVar, QList<double> **Con, QList<double> **ProbOfFu)
 {
-
 	*Length= &ProgramLengthMax;
 	*NumOfVar= &NumberOfVariables;
 
 	*Con = &Constant;
 	*ProbOfFu = &ProbInstruktion;
-
 }
 
 void MT_Randomizer::returnSearchValue(QList<double> **ProbMPower, QList<double> **ProbSOperator, QList<double> **ProbXPoints)
@@ -303,20 +284,16 @@ unsigned long MT_Randomizer::getRandomInteger(unsigned long upperBoundary)
 	return Random;
 }
 
-
 int MT_Randomizer::getProgLength()
 {
-
 	double d= ProgramLengthMax * 0.66;
 	int StartLength = d;
 
 	return StartLength;
 }
 
-
 void MT_Randomizer::createConstant(int NumOfConstant, bool Integer, double lowerBound, double upperBound)
 {
-	
 	double RangeDouble = upperBound-lowerBound;
 	int RangeInt = upperBound-lowerBound;
 
@@ -327,7 +304,6 @@ void MT_Randomizer::createConstant(int NumOfConstant, bool Integer, double lower
 		// Randomly generate integer constants
 		for(int i=0; i<NumOfConstant; i++)
 			Constant[i]= lowerBound+getRandomInteger(RangeInt);
-		
 	}
 	else
 	{
@@ -364,7 +340,6 @@ bool MT_Randomizer::answerMutateElement()
 	return Answer;
 }
 
-
 QList<int> * MT_Randomizer::getRandomTournamentPartition(int NumberOfTour)
 {
 	// Array holding the current number of players per tournament
@@ -378,7 +353,6 @@ QList<int> * MT_Randomizer::getRandomTournamentPartition(int NumberOfTour)
 	// Number of players per tournament, i.e. the tournament size
 	int MaxPlayers = (OffspringSize/ NumberOfTour);
 
-
 	for (int i=0; i<OffspringSize; i++)
 	{
 		IndexOfTour = getRandomInteger(NumberOfTour);
@@ -388,7 +362,6 @@ QList<int> * MT_Randomizer::getRandomTournamentPartition(int NumberOfTour)
 			// There is still a free slot in tournament "IndexOfTour"
 			TournamentPartition[i]=IndexOfTour;
 			Index[IndexOfTour]++;
-		
 		}
 		else 
 		{
@@ -429,15 +402,12 @@ int MT_Randomizer::getProportionalWinner(QList<int> * Players)
 		{
 			Winner = i; break;
 		}
-	
 	}
 	return Winner;
 }
 
-
 MT_Instruction MT_Randomizer::getRandomInstruktion()
 {
-	
 	int Choice =1;
 	MT_Instruction NewInstruction;
 
@@ -479,7 +449,6 @@ MT_Instruction MT_Randomizer::getRandomInstruktion()
 	return NewInstruction;
 }
 
-
 int MT_Randomizer::getRandomSOperator()
 {
 	int Choice =0;
@@ -515,7 +484,6 @@ QList<int> * MT_Randomizer::getRandomXPoints(int SizeIndi1, int SizeIndi2)
 	else 
 		NumberofXPoints =0; // Since the individuals are so small, only one crossover point is chosen
 
-
 	RandomXPoints[0]=NumberofXPoints;
 
 	switch (NumberofXPoints)
@@ -525,7 +493,6 @@ QList<int> * MT_Randomizer::getRandomXPoints(int SizeIndi1, int SizeIndi2)
 				// 1 XPoint
 				RandomXPoints[1]= getRandomInteger(SizeIndi1)+1;
 				RandomXPoints[2]= getRandomInteger(SizeIndi2)+1;
-
 			}
 			break;
 		case 1: 
@@ -536,7 +503,6 @@ QList<int> * MT_Randomizer::getRandomXPoints(int SizeIndi1, int SizeIndi2)
 
 				RandomXPoints[3]= RandomXPoints[1] + 1 + getRandomInteger(SizeIndi1-RandomXPoints[1]-1);
 				RandomXPoints[4]= RandomXPoints[2] + 1 + getRandomInteger(SizeIndi2-RandomXPoints[2]-1);
-
 			}
 			break;
 		case 2:
@@ -550,16 +516,12 @@ QList<int> * MT_Randomizer::getRandomXPoints(int SizeIndi1, int SizeIndi2)
 
 				RandomXPoints[5]= RandomXPoints[3] + 1 + getRandomInteger(SizeIndi1-RandomXPoints[3]-1);
 				RandomXPoints[6]= RandomXPoints[4] + 1 + getRandomInteger(SizeIndi2-RandomXPoints[4]-1);
-
 			}
 			break;
 	}
 
-
-
 	return &RandomXPoints;
 }
-
 
 MT_Operand *  MT_Randomizer::getRandomOperand()
 {
@@ -575,15 +537,12 @@ MT_Operand *  MT_Randomizer::getRandomOperand()
 	return NewOperand;
 }
 
-
-
 MT_Operand * MT_Randomizer::getRandomVariable()
 {
 	MT_Operand *NewOperand;
 	NewOperand = new MT_Operand(1,-1.0,getRandomInteger(NumberOfVariables));
 	return NewOperand;
 }
-
 
 int MT_Randomizer::getNumOfVari()
 {

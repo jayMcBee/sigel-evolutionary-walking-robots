@@ -2,8 +2,6 @@
 #define MT_GPSYSTEM_MT_OPERAND_H
 
 
-
-
 /*This class represent a Operand in a MT_Program. 
 * Attention: a Operand is a variable xor a constant.
  */
@@ -23,7 +21,6 @@ public:
 	MT_Operand(int Op, double Da, int na);
 	MT_Operand();
 	virtual ~MT_Operand() = default;
-
 };
 
 #endif // MT_GPSYSTEM_MT_OPERAND_H

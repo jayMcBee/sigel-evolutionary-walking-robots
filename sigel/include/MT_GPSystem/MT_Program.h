@@ -8,7 +8,6 @@
 #include "MT_GPSystem/MT_Programline.h"
 #include "MT_GPSystem/MT_Randomizer.h"	
 
-
 /*
 * This class are the main part of a META Individual. 
 * It's the Program that represent a META Evaluator resp. the META Classifier.
@@ -39,7 +38,6 @@ public:
 	virtual ~MT_Program();
 
 	void writeToFileProgram(QTextStream &File);
-
 
 	/* append the given program to the present program.
 	* If the Lenght of the Program > MaxLen then the program will be reduced
@@ -73,8 +71,6 @@ public:
 	void changeMaxProgLen(int NewLen);
 
 	int getLastError();
-
-
 
 private:
 	int LastError;

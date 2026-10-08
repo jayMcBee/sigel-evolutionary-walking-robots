@@ -68,7 +68,6 @@ public:
 	*/
 	QList<int> * getRandomTournamentPartition(int NumberOfTour);
 
-
 	/******* normal set/ get method *******/
 	
 	/* method for changing information between GUI and Randomizer; this two method bend the given pointer
@@ -105,7 +104,6 @@ private:
 	*/
 	QList<int> RandomXPoints;
 
-	
 	/* this array serve for indicate the tournament member of a tournament */
 	QList<int> TournamentPartition;
 	
@@ -158,8 +156,6 @@ private:
  	* ProbInstruktion[16] = probability of LUT ; ProbInstruktion[17] = probability of LUM ;
 	*/
 	QList<double> ProbInstruktion;
-
-
 };
 
 #endif // MT_GPSYSTEM_MT_RANDOMIZER_H

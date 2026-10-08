@@ -8,14 +8,12 @@ MT_Population::MT_Population()
 	Individuals[0]=nullptr;
 	LastError =0;
 	Change =false;
-
 }
 
 MT_Population::~MT_Population()
 {
 	for (int i=0; i<FirstFreePos; i++)
 		delete Individuals[i]; 
-
 }
 
 MT_Population::MT_Population(MT_Randomizer *Randi, int n)
@@ -27,7 +25,6 @@ MT_Population::MT_Population(MT_Randomizer *Randi, int n)
 
 	createNewIndis(n, Randi);
 	LastError=Randi->getLastError();
-
 }
 
 MT_Population::MT_Population(QTextStream &File)
@@ -42,14 +39,12 @@ MT_Population::MT_Population(QTextStream &File)
 
 	for (int i=0; i<FirstFreePos; i++)
 		Individuals[i]= new MT_Individual(File);
-
 }
 
 // load/store method
 
 void MT_Population::writeToFilePop(QTextStream &File)
 {
-	
 	File << ("Population:\n");
 	File << PopSize << Qt::endl;
 	File << FirstFreePos << Qt::endl << Qt::endl;
@@ -61,7 +56,6 @@ void MT_Population::writeToFilePop(QTextStream &File)
 
 int MT_Population::loadPop(QTextStream &File)
 {
-
 	QString PopulationString ("Population:");
 	QString PresentLine= File.readLine();
 
@@ -97,7 +91,6 @@ int MT_Population::exportPop(QTextStream &File)
 
 int MT_Population::importPop(QTextStream &File)
 {
-		
 	QString PopulationString ("Population:");
 	QString PresentLine= File.readLine();
 
@@ -120,7 +113,6 @@ int MT_Population::importPop(QTextStream &File)
 	else
 		LastError= 320;
 
-
 	return LastError;
 }
 
@@ -128,13 +120,11 @@ int MT_Population::importPop(QTextStream &File)
 
 int MT_Population::getSize()
 {
-
 	return PopSize;
 }
 
 int MT_Population::getLastError()
 {
-
 	return LastError;
 }
 
@@ -159,13 +149,10 @@ void MT_Population::createNewIndis(int NumberOfNewIndi, MT_Randomizer *Randi)
 	{
 		Individuals[i]= new MT_Individual(i,Randi);
 		Individuals[i]->setPosition(i);
-
 	}
 		
 	FirstFreePos= FirstFreePos+NumberOfNewIndi;
-
 }
-
 
 int MT_Population::createNewIndi(MT_Randomizer *Randi)
 {
@@ -177,17 +164,13 @@ int MT_Population::createNewIndi(MT_Randomizer *Randi)
 	Individuals[FirstFreePos]= new MT_Individual(FirstFreePos,Randi);
 	Individuals[FirstFreePos]->setPosition(FirstFreePos);
 
-		
 	FirstFreePos ++;
 
 	return (FirstFreePos-1);
-
 }
-
 
 void MT_Population::createNewPop(int PSize, MT_Randomizer *Randi)
 {
-
 	for (int i=0; i<FirstFreePos; i++)
 		delete Individuals[i]; 
 	
@@ -195,7 +178,6 @@ void MT_Population::createNewPop(int PSize, MT_Randomizer *Randi)
 	FirstFreePos = 0;
 	PopSize = 0;
 	createNewIndis(PSize,Randi);
-
 }
 
 int MT_Population::insertIndividual(MT_Individual *NewIndividual)
@@ -216,7 +198,6 @@ int MT_Population::insertIndividual(MT_Individual *NewIndividual)
 
 MT_Individual * MT_Population::insertAtPos(MT_Individual *NewIndividual, int Pos)
 {
-
 	MT_Individual *Indi = Individuals[Pos];
 
 	if(NewIndividual != nullptr){
@@ -285,9 +266,7 @@ void MT_Population::flush()
 		Individuals[i] = nullptr;
 
 	FirstFreePos=0;
-
 }
-
 
 void MT_Population::setMaxProgLen(int NewLen)
 {
@@ -301,18 +280,14 @@ void MT_Population::changeMaxNumVariable(int NewNum)
 		Individuals[i]->changeMaxNumVariable(NewNum);
 }
 
-
 void MT_Population::setFreePos(int Pos)
 {
-
 	FirstFreePos = Pos;
 }
 
 int MT_Population::getFreePos()
 {
-
 	return FirstFreePos;
-	
 }
 
 bool MT_Population::changePopSize(int NewPopSize)
@@ -347,7 +322,6 @@ bool MT_Population::changePopSize(int NewPopSize)
 			PopSize=NewPopSize;		
 			Change = true;
 		}
-	
 	}
 
 	return Change;
@@ -369,4 +343,3 @@ MT_Individual * MT_Population::getBestIndividual()
 
 	return (Individuals[PositionOfBestIndividual]);
 }
-

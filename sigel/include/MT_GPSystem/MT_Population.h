@@ -45,7 +45,6 @@ public:
 	* ATTENTION: of orphaned Object*/
 	void flush ();
 
-
 	/* take out the individual at the given position out the population, supply a pointer of this and 
 	* dosen't reduced the size of the population */
 	MT_Individual * removeIndividual(int Pos);

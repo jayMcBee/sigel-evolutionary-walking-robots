@@ -11,12 +11,10 @@ MT_Individual::MT_Individual()
 
 	FitnessOfParent =-1.0;
 	TspOfGenesis = -1;
-
 }
 
 MT_Individual::~MT_Individual()
 {
-
 	delete Program;
 }
 
@@ -32,8 +30,6 @@ MT_Individual::MT_Individual(int Na, MT_Randomizer *Randi)
 	TspOfGenesis = 0;
 
 	Program = new MT_Program(Randi);
-
-
 }
 
 MT_Individual::MT_Individual(QTextStream &File)
@@ -82,12 +78,10 @@ MT_Individual::MT_Individual(MT_Program *Prog, bool copy)
 	{
 		Program = Prog;
 	}
-	
 }
 
 void MT_Individual::writeToFileIndi(QTextStream &File)
 {
-
 	File << "Individual:\n";
 	File << Name << Qt::endl;
 	File << Age << Qt::endl;
@@ -104,64 +98,52 @@ void MT_Individual::writeToFileIndi(QTextStream &File)
 
 MT_Program * MT_Individual::getProgram()
 {
-	
 	return Program;
 }
 
-
 MT_Programline* MT_Individual::getProgramLine(int Line)
 {
-
 	return Program->getProgramLine(Line);
 }
 
 int MT_Individual::getAge()
 {
-
 	return Age;
 }
 
 int MT_Individual::getName()
 {
-
 	return Name;
 }
 
 double MT_Individual::getFitness()
 {
-
 	return Fitness;
 }
 
 int MT_Individual::getPosition()
 {
-
 	return Position;
 }
 
 void MT_Individual::setPosition(int Pos)
 {
-
 	Position = Pos;
-
 }
 
 void MT_Individual::setFitness(double NewFitness)
 {
 	Fitness=NewFitness;
-
 }
 
 void MT_Individual::setTrainingsSet(int TName)
 {
 	TSetName=TName;
-		
 }
 
 void MT_Individual::increaseAge()
 {
 	Age =Age +1;
-
 }
 
 bool MT_Individual::toBeEvaluated(int TSet)
@@ -170,12 +152,10 @@ bool MT_Individual::toBeEvaluated(int TSet)
 		return true;
 	else 
 		return false;
-
 }
 
 void MT_Individual::createProgram(MT_Randomizer *Randi)
 {
-	
 	delete Program;
 	Program = new MT_Program(Randi); 
 	TspOfGenesis =0;
@@ -184,17 +164,13 @@ void MT_Individual::createProgram(MT_Randomizer *Randi)
 
 void MT_Individual::setMaxProgLen(int NewLen)
 {
-
 		Program->changeMaxProgLen(NewLen);
 }
 
 void MT_Individual::changeMaxNumVariable(int NewNum)
 {
-
 		Program->changeMaxNumVariable(NewNum);
 }
-
-
 
 double MT_Individual::getFitnessOfParent()
 {
@@ -221,26 +197,20 @@ void MT_Individual::setTypOfGenesis(int Typ)
 	TspOfGenesis = Typ;
 }
 
-
 void MT_Individual::setNewProgram(MT_Program *NewProg)
 {
-
 	delete Program;
 	Program =  new MT_Program(NewProg);
-
-
 }
 
 void MT_Individual::setNewAge(int NewAge)
 {
 	Age = NewAge;
-
 }
 
 void MT_Individual::setNewName(int NewName)
 {
 	Name = NewName;
-
 }
 
 QString MT_Individual::printProgramLine(int index)
@@ -288,7 +258,6 @@ QString MT_Individual::printProgramLine(int index)
 	if (Instruction == lum)
 		LineAsString = ("lum");
 
-	
 	LineAsString += " ";
 	QString OpA;
 	OpA.setNum((Line->getSourceOperand())->VariableName);
@@ -301,16 +270,13 @@ QString MT_Individual::printProgramLine(int index)
 		OpB.setNum((Line->getTargetOperand())->VariableName);
 		LineAsString += "  V ";
 		LineAsString +=  OpB.leftJustified(5,' ', true);
-
 	}
 	else
 	{
 		OpB.setNum((Line->getTargetOperand())->Data);
 		LineAsString += "  C ";
 		LineAsString += OpB;
-
 	}
 
 	return (LineAsString);
-
 }

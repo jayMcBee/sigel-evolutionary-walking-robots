@@ -2,23 +2,19 @@
 
 MT_Programline::MT_Programline()
 {
-
 }
 
 MT_Programline::~MT_Programline()
 {
 	delete OperandA;
 	delete OperandB;
-
 }
 
 MT_Programline::MT_Programline(MT_Randomizer *Randi)
 {
-
 	Instruction = Randi->getRandomInstruktion();
 	OperandA = Randi->getRandomVariable();
 	OperandB = Randi->getRandomOperand();
-
 }
 
 MT_Programline::MT_Programline (const QString & File)
@@ -78,22 +74,17 @@ MT_Programline::MT_Programline (const QString & File)
 		PartOfLine = File.mid(11,20);
 		OperandB = new MT_Operand(0,PartOfLine.toDouble(),0);
 	}
-
 }
 
 MT_Programline::MT_Programline(MT_Programline *Line)
 {
-
 	 Instruction = Line->getInstruction();
 	 OperandA = new MT_Operand(Line->getSourceOperand());
 	 OperandB = new MT_Operand(Line->getTargetOperand());
-
-
 }
 
 void MT_Programline::writeToFileProgramLine(QTextStream &File)
 {
-
 	// program line layout, example"
 	//"swp 4    V 5"  or  "cop 1245 C 12.34565567"
 
@@ -134,7 +125,6 @@ void MT_Programline::writeToFileProgramLine(QTextStream &File)
 	if (Instruction == lum)
 			File << "lum";
 
-
 	File <<" ";
 
 	QString OpA;
@@ -149,31 +139,26 @@ void MT_Programline::writeToFileProgramLine(QTextStream &File)
 		OpB.setNum(OperandB->VariableName);
 		OpB = OpB.leftJustified(5,' ', true);
 		File <<"V " << OpB << Qt::endl;
-
 	}
 	else
 	{
 		OpB.setNum(OperandB->Data);
 		File <<"C " << OpB << Qt::endl;
 	}
-
 }
 
 MT_Instruction MT_Programline::getInstruction()
 {
-
 	return Instruction;
 }
 
 MT_Operand * MT_Programline::getSourceOperand()
 {
-
 	return OperandA;
 }
 
 MT_Operand * MT_Programline::getTargetOperand()
 {
-
 	return OperandB;
 }
 
@@ -187,19 +172,15 @@ void MT_Programline::changeMaxNumVariable(int NewNum)
 	
 	if ((OperandB->OPType ==1)&& (OperandB->VariableName>NewNum))
 		OperandB->VariableName = OperandB->VariableName % NewNum;
-
-
 }
 
 void MT_Programline::setInstruction(MT_Instruction NewInstruc)
 {
 	Instruction = NewInstruc;
-
 }
 
 void MT_Programline::setOperandA(MT_Operand *NewOpA)
 {
-	
 	delete OperandA;
 	OperandA = NewOpA;
 }

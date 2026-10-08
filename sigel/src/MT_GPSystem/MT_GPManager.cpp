@@ -7,7 +7,6 @@
 
 MT_GPManager::MT_GPManager(QTextStream &File) : QObject()
 {
-
 	/* 
 	Order of initialisation:
 	Substituter
@@ -64,8 +63,6 @@ MT_GPManager::MT_GPManager(QTextStream &File) : QObject()
 	else
 		LastError = 200;
 	
-
-
 	QString PopulationString ("Population:");
 	while ((PresentLine != PopulationString) && !(File.atEnd()))
 		PresentLine = File.readLine();
@@ -82,7 +79,6 @@ MT_GPManager::MT_GPManager(QTextStream &File) : QObject()
 	else 
 		LastError = 300;
 
-
 	if (Offspring->getSize()< Parent->getSize())
 	{
 		Offspring->changePopSize(Parent->getSize());
@@ -94,36 +90,27 @@ MT_GPManager::MT_GPManager(QTextStream &File) : QObject()
 	if(Seeker->getLastError() != 0)
 		LastError = Seeker->getLastError();
 
-
-
 	Selector = std::make_unique< MT_TournamentManager >(Parent.get(), Offspring.get(), Randi.get(), File);
 	if(Selector->getLastError() != 0)
 		LastError = Selector->getLastError();
 	FitnessTrainer = std::make_unique< MT_FitnessTrainer >(File);
 	if(FitnessTrainer->getLastError() != 0)
 		LastError = FitnessTrainer->getLastError();
-
 }
-
 
 MT_GPManager::MT_GPManager(MT_Substitute *Substitue) : QObject()
 {
 	// Not usable - use the loading constructor only 
 }
 
-
 MT_GPManager::MT_GPManager() : QObject()
 {
-
 }
 
 MT_GPManager::~MT_GPManager()
 {	
-
-
 	pthread_mutex_unlock(&evolutionMutex);
 }
-
 
 void MT_GPManager::loadSetup(QTextStream &File)
 {
@@ -157,7 +144,6 @@ void MT_GPManager::loadSetup(QTextStream &File)
 	
 	Parent->changeMaxNumVariable(Randi->getNumOfVari());
 
-
 	if (Offspring->getSize()< Parent->getSize())
 	{
 		Offspring->changePopSize(Parent->getSize());
@@ -190,7 +176,6 @@ void MT_GPManager::loadSetup(QTextStream &File)
 	FitnessTrainer->loadSetup(File);
 	if(FitnessTrainer->getLastError() != 0)
 		LastError = FitnessTrainer->getLastError();
-
 }
 
 void MT_GPManager::writeToFileGPSystem(QTextStream &File)
@@ -217,7 +202,6 @@ void MT_GPManager::writeToFileGPSystem(QTextStream &File)
 
 	FitnessTrainer->writeToFileTrainer(File);
 
-
 	//**************************
 	// Additional information about the fitness computation ... is not loaded  
 	//**************************
@@ -236,14 +220,12 @@ void MT_GPManager::writeToFileGPSystem(QTextStream &File)
 
 	NewBestIndi->setTrainingsSet(-1);
 
-
 	switch (fitFct)
 	{
 		case 1:
 			{
 				FitnessTrainer->calculateFitness(NewBestIndi);
 				ErrorCorrect = ((0.1/NewBestIndi->getFitness())/PresentTSize);
-				
 			}
 			break;
 			
@@ -252,7 +234,6 @@ void MT_GPManager::writeToFileGPSystem(QTextStream &File)
 				FitnessTrainer->setSelektionValue(1, tDur, tSize);
 				FitnessTrainer->calculateFitness(NewBestIndi);
 				ErrorCorrect = ((0.1/NewBestIndi->getFitness())/PresentTSize);
-
 			}
 			break;
 			
@@ -260,17 +241,14 @@ void MT_GPManager::writeToFileGPSystem(QTextStream &File)
 			{
 				FitnessTrainer->calculateFitness(NewBestIndi);
 				ErrorCorrect = (NewBestIndi->getFitness()/10.0);
-
 			}
 			break;
-
 
 		case 4:
 			{
 				FitnessTrainer->setSelektionValue(3, tDur, tSize);
 				FitnessTrainer->calculateFitness(NewBestIndi);
 				ErrorCorrect = (NewBestIndi->getFitness()/10.0);
-				
 			}
 			break;
 	}
@@ -298,10 +276,8 @@ void MT_GPManager::writeToFileGPSystem(QTextStream &File)
 	File << "avg. Fitness: " << Statistics->getStatisticElement(GenerationNumber-2)->AverageFitness << Qt::endl;
 	File << "average Error/ Percent of Correct Estimation: " << ErrorCorrect << Qt::endl;
 
-	
 	FitnessTrainer->setSelektionValue(fitFct, tDur, tSize);
 	NewBestIndi->setFitness(corFitValue);
-
 }
 
 void MT_GPManager::writeToFileSetup(QTextStream &File)
@@ -314,14 +290,12 @@ void MT_GPManager::writeToFileSetup(QTextStream &File)
 	File << ("Population:\n");
 	File << (Parent->getSize()) << Qt::endl << Qt::endl;
 
-
 	File << ("BrutSize:\n");
 	File << (Seeker->getBrutSize()) << Qt::endl << Qt::endl;
 
 	Selector->writeToFileSetup(File);
 
 	FitnessTrainer->writeToFileSetup(File);
-
 }
 
 void MT_GPManager::writeToFilePop(QTextStream &File)
@@ -333,25 +307,21 @@ void MT_GPManager::writeToFilePop(QTextStream &File)
 
 MT_Statistics * MT_GPManager::getGPStatistics()
 {
-
 	return Statistics.get();
 }
 
 MT_Population * MT_GPManager::getParent()
 {
-
 	return Parent.get();
 }
 
 MT_Randomizer * MT_GPManager::getRandomizer()
 {
-
 	return Randi.get();
 }
 
 void MT_GPManager::setSelektionValue(int _OffspringSize, int _TournamentSize, int _SMethod, int _FitnessFunction, int _TrainingSetSize, int _TrainingDuration)
 {
-
 	if ((_OffspringSize !=0)&&(_TournamentSize!=0) && (_TrainingSetSize !=0))
 	{
 		if (_OffspringSize != Offspring->getSize())
@@ -372,20 +342,16 @@ void MT_GPManager::setSelektionValue(int _OffspringSize, int _TournamentSize, in
 	}
 	else
 		LastError =13;
-
 }
 
 void MT_GPManager::getSelektionValue(int *_OffspringSize, int *_TournamentSize, int *_SMethod, int *_FitnessFunction, int *_TrainingSetSize, int *_TrainingDuration)
 {
-
 	*_OffspringSize = Offspring->getSize();
 	*_TournamentSize = Selector->getTournamentSize();
 	*_SMethod = Selector->getSelectionMethod();
 
 	 FitnessTrainer->getSelektionValue(_FitnessFunction, _TrainingDuration, _TrainingSetSize);
-
 }
-
 
 void MT_GPManager::setBrutSize(int NewSize)
 {
@@ -409,12 +375,9 @@ void MT_GPManager::setPopAndTournamentSize(int NewPopSize, int NewTournamentSize
 	}
 	else
 		LastError = 13;
-
 }
 
 // special method
-
-		
 
 void MT_GPManager::startEvolution(MT_Substitute *Substitute)
 {
@@ -457,7 +420,6 @@ void MT_GPManager::startEvolution(MT_Substitute *Substitute)
 	else 
 		Selector->setTypOfIndividual(1); // Classifier Meta System;
 
-
 	bool TSetOK = false;
 
 	int StartTSetSize =0;
@@ -494,7 +456,6 @@ void MT_GPManager::startEvolution(MT_Substitute *Substitute)
 
 	while (EvolStopped != true)
 	{
-			
 	pthread_mutex_lock(&evolutionMutex);
 
 		SElement = new MT_StatisticsElement();
@@ -518,25 +479,20 @@ void MT_GPManager::startEvolution(MT_Substitute *Substitute)
 		Statistics->addStatisticElement(SElement);
 	
 	pthread_mutex_unlock(&evolutionMutex);
-
 	}
 	
 //*************************** Post-processing   ***************************
-
 
 	emit metaEvolutionRunning(false);
 
 	LastError = Statistics->updateStatistics();
 	
 	EvolStopped = false;
-	
 }
-
 
 void MT_GPManager::stopEvolution()
 {
 	EvolStopped =true;
-
 }
 
 void MT_GPManager::exchangeBest()
@@ -549,7 +505,6 @@ void MT_GPManager::exchangeBest()
 		QList<double> * CorrectFit =FitnessTrainer->getResultArray();
 		int PresentTSize = FitnessTrainer->getPresentTSize();
 
-		
 		// BestMETAProgram can only be replaced once the training set is completely filled
 		// until then BestMETAProgram in the substituter points to 0, so no estimation happens
 		// PresentTSize := current number of training cases in the training set
@@ -582,7 +537,6 @@ void MT_GPManager::exchangeBest()
 
 				Substituter->changeErrorInfo(Outcome ,CorrectFit);
 	pthread_mutex_unlock(&(Substituter->fitnessMutex));
-			
 			}
 			else 
 			{
@@ -596,11 +550,9 @@ void MT_GPManager::exchangeBest()
 
 				// unlock the interpreter so that interpretation of programs can continue
 	pthread_mutex_unlock(&(Substituter->fitnessMutex));
-			
 			}
 		}
 	}
-	
 }
 
 int  MT_GPManager::checkForNewTCase()
@@ -608,7 +560,6 @@ int  MT_GPManager::checkForNewTCase()
 	int PresentTSetSize =0;
 
 	if (Substituter !=nullptr){
-
 		pthread_mutex_lock(&(Substituter->tCaseBufferMutex));
 
 	PresentTSetSize = FitnessTrainer->insertNewTCases(Substituter->changeTCases());
@@ -617,7 +568,6 @@ int  MT_GPManager::checkForNewTCase()
 	}
 
 	return PresentTSetSize ;
-
 }
 
 void MT_GPManager::collectOffspringParameter(MT_StatisticsElement * SElement)
@@ -637,7 +587,6 @@ void MT_GPManager::collectOffspringParameter(MT_StatisticsElement * SElement)
 		{
 			switch (TypOfGenesis)
 			{
-
 			case 1: 
 				{
 					SElement->CrossoverEventParent[0]++;
@@ -670,9 +619,7 @@ void MT_GPManager::collectOffspringParameter(MT_StatisticsElement * SElement)
 				break;
 			}
 		}
-
 	}
-	
 }
 
 void MT_GPManager::collectParentParameter(MT_StatisticsElement * SElement)
@@ -700,29 +647,24 @@ void MT_GPManager::collectParentParameter(MT_StatisticsElement * SElement)
 		SElement->AverageFitness= SElement->AverageFitness + (Parent->getIndividual(i))->getFitness();
 	}
 
-
 	SElement->AverageFitness= (SElement->AverageFitness)/Parent->getSize();
 
 	for (int i=0; i<ParentSize; i++)
 		SElement->Variance = SElement->Variance + (((Parent->getIndividual(i))->getFitness()) - SElement->AverageFitness)*(((Parent->getIndividual(i))->getFitness()) - SElement->AverageFitness);
 
 	SElement->Variance = SElement->Variance/ Parent->getSize();
-
 }
-
 
 void MT_GPManager::setInterpreterNumVar(int NewSize)
 {
 	FitnessTrainer->setNumberOfVariables(NewSize);
 	if (Substituter !=nullptr)
 		Substituter->setInterpreter(NewSize, FitnessTrainer->getTDuration());
-
 }
 
 int MT_GPManager::getLastError()
 {
 	return LastError;
-
 }
 
 bool MT_GPManager::separateEvolutionAllowed()

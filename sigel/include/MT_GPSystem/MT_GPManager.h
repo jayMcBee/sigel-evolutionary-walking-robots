@@ -28,7 +28,6 @@ class MT_GPManager : public QObject
 
 public:
 
-	
 	/******************** administrative method ********************/
 
 	MT_GPManager (QTextStream & File ); // the only correct constructor 
@@ -43,7 +42,6 @@ public:
 	void writeToFilePop(QTextStream &File); 
 	void writeToFileSetup(QTextStream &File);
 	void writeToFileGPSystem(QTextStream &File);
-
 
 	/******************** set/ get method: ********************/
 	/* primary to update the GUI after Start/load or to update the GP-System after change by the user*/
@@ -140,7 +138,6 @@ private:
 	* after a evolution loop it will updating */
 	std::unique_ptr< MT_Individual > BestIndividual;
 	
-	
 	/* appraise the offspring*/
 	std::unique_ptr< MT_FitnessTrainer > FitnessTrainer;
 
@@ -155,8 +152,6 @@ private:
 	std::unique_ptr< MT_TournamentManager > Selector;
 
 protected:
-
-
 };
 
 #endif // MT_GPSYSTEM_MT_GPMANAGER_H

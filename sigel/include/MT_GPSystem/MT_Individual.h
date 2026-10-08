@@ -8,7 +8,6 @@
 #include "MT_GPSystem/MT_Program.h"
 #include "MT_GPSystem/MT_Randomizer.h"	
 
-
 /*This class represent a Meta Individual, which contain especially the program 
 * for Interpreting  
 */
@@ -16,12 +15,10 @@
 class MT_Individual  
 
 {
-
 public:
 	
 	QString printProgramLine(int index);
 	
-
 	/* change the max Numbers of Variable, which can use by the Interpreter
 	* if a variable name > NewNum so it will set of (variable name) mod NewNum
 	*@post: all variable names are between 0 and NewNum-1 of all program lines */
@@ -44,7 +41,6 @@ public:
 	void setNewProgram(MT_Program * NewProg);
 	void setNewAge(int NewAge);
 	void setNewName(int NewName);
-
 
 	int getTypOfGenesis();
 	double getFitnessOfParent ();

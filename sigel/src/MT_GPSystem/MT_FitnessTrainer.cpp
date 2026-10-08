@@ -29,13 +29,10 @@ MT_FitnessTrainer::MT_FitnessTrainer(QTextStream &File)
 		Interpreter.setVariableNumber((File.readLine()).toInt());
 	
 		TSet = std::make_unique< MT_Trainingset >(File);
-
 	}
 	else
 		LastError =601;
 }
-
-
 
 MT_FitnessTrainer::MT_FitnessTrainer()
 {
@@ -50,12 +47,10 @@ MT_FitnessTrainer::MT_FitnessTrainer()
 	TSet = std::make_unique< MT_Trainingset >(TSetSize,1);
 }
 
-
 // further methods
 
 void MT_FitnessTrainer::loadSetup(QTextStream &File)
 {
-	
 	QString FitTrainer( "FitnessTranier:" );
 	QString PresentLine = File.readLine();
 	while ((PresentLine != FitTrainer) && !(File.atEnd()))
@@ -76,7 +71,6 @@ void MT_FitnessTrainer::loadSetup(QTextStream &File)
 	}
 	else
 		LastError =602;
-
 }
 
 void MT_FitnessTrainer::writeToFileSetup(QTextStream &File)
@@ -89,10 +83,8 @@ void MT_FitnessTrainer::writeToFileSetup(QTextStream &File)
 	File << Interpreter.getVariableNumber() << Qt::endl << Qt::endl;
 }
 
-
 void MT_FitnessTrainer::writeToFileTrainer(QTextStream &File)
 {
-	
 	File << ("FitnessTranier:\n");
 	File << FitnessFunction << Qt::endl;
 	File << PresentTSize << Qt::endl;
@@ -101,7 +93,6 @@ void MT_FitnessTrainer::writeToFileTrainer(QTextStream &File)
 	File << Interpreter.getVariableNumber() << Qt::endl << Qt::endl;
 
 	TSet->writeToFileTSet(File);
-
 }
 
 int MT_FitnessTrainer::getLastError()
@@ -114,17 +105,15 @@ void MT_FitnessTrainer::getSelektionValue(int *FitFunction, int *TDuration, int 
 	*FitFunction = FitnessFunction;
 	*TDuration = Interpreter.getDuration();
 	*TSize = TSetSize;
-	
 }
+
 int MT_FitnessTrainer::getTDuration()
 {
 	return Interpreter.getDuration();
-
 }
 
 void MT_FitnessTrainer::setSelektionValue(int FitFunction, int TDuration, int TSize)
 {
-
 	FitnessFunction =FitFunction;
 	TSetSize =TSize;
 	TSet->changeTSize(TSize);
@@ -133,7 +122,6 @@ void MT_FitnessTrainer::setSelektionValue(int FitFunction, int TDuration, int TS
 	Interpreter.setDuration(TDuration);
 	
 	PresentTSize = TSet->getPresentTSize(); 
-	
 }
 
 void MT_FitnessTrainer::setNumberOfVariables(int varNumber)
@@ -146,13 +134,10 @@ int MT_FitnessTrainer::insertNewTCases(QQueue<MT_TrainingCase *> *NewTCase)
 	TSet->updateTSet(NewTCase);
 	
 	return TSet->getPresentTSize();
-
 }
-
 
 void MT_FitnessTrainer::calculateFitness(MT_Population *Pop)
 {
-
 	MT_Individual *PresentIndi;
 
 	for (int i=0; i<Pop->getSize(); i++)
@@ -162,14 +147,12 @@ void MT_FitnessTrainer::calculateFitness(MT_Population *Pop)
 	}
 }
 
-
 bool MT_FitnessTrainer::calculateFitness(MT_Individual *Indi)
 {
 	bool NewEvaluated = false;
 
 	if (false == Indi->toBeEvaluated(TSet->getName()))
 	{
-
 		NewEvaluated = true;
 		double Fit= -1.5;
 		if((Indi->getProgram()->getLength()) > 3)
@@ -185,11 +168,8 @@ bool MT_FitnessTrainer::calculateFitness(MT_Individual *Indi)
 				{
 					InstantTCase = TSet->getTCase(i); 
 					
-
 					Result[i] = InstantTCase->getFitness();
 
-
-			
 					ResultIst[i]= Interpreter.interpret(InstantTCase->getIndividual());
 				}
 				
@@ -213,9 +193,7 @@ bool MT_FitnessTrainer::calculateFitness(MT_Individual *Indi)
 		{
 			Indi->setFitness(0.0);
 			Indi->setTrainingsSet(TSet->getName());
-		
 		}
-		
 	}
 
 	return NewEvaluated;
@@ -223,7 +201,6 @@ bool MT_FitnessTrainer::calculateFitness(MT_Individual *Indi)
 
 double MT_FitnessTrainer::fitSquareError()
 {
-
 	double Fitness=0.0;
 
 	for (int i=0; i<PresentTSize; i++)	
@@ -231,7 +208,6 @@ double MT_FitnessTrainer::fitSquareError()
 
 	Fitness = 1.0 / (1.0 + Fitness);
 	return Fitness;
- 
 }
 
 double MT_FitnessTrainer::fitSimpleError()
@@ -244,7 +220,6 @@ double MT_FitnessTrainer::fitSimpleError()
 
 	// fit error into interval [0, 1]
 	Fitness = 1.0 / (1.0 + Fitness);
-
 
 	return Fitness;
 }
@@ -264,7 +239,6 @@ QList<double> * MT_FitnessTrainer::getResultArray()
 	return &Result;
 }
 
-
 double MT_FitnessTrainer::simpleYesNo()
 {
 	double Fitness=0.0;
@@ -272,7 +246,6 @@ double MT_FitnessTrainer::simpleYesNo()
 	for (int i=0; i<PresentTSize; i++)
 		if( ((ResultIst[i]<0.0)&&(Result[i]<0.0)) || ((ResultIst[i]>=0.0)&&(Result[i]>=0.0)) )
 			Fitness++;
-
 
 	Fitness = Fitness/PresentTSize;
 	Fitness = Fitness * 1000.0;
@@ -309,7 +282,6 @@ double MT_FitnessTrainer::weightYesNo()
 		}
 	}
 	
-
 	if (TotalWeight <=0.0)
 		TotalWeight =1.0;
 
@@ -320,5 +292,4 @@ double MT_FitnessTrainer::weightYesNo()
 		Fitness = 0.0;
 
 	return  Fitness;
-
 }

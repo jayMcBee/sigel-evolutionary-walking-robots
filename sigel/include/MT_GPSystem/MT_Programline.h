@@ -8,8 +8,6 @@
 #include <qstring.h>
 #include <qtextstream.h>
 
-
-
 /*
 * This class represent a Programline of the META Evaluator resp. the META Classifier.
 * It's contain of an instruction and two operand. 
@@ -22,7 +20,6 @@ public:
 	void setOperandA(MT_Operand * NewOpA);
 	void setInstruction(MT_Instruction NewInstruc);
 
-	
 	/* change the max Numbers of Variable, which can use by the Interpreter
 	* if  a variable name > NewNum so it will set of (variable name) mod NewNum
 	*@post: all variable names are between 0 and NewNum-1 ! */
@@ -36,7 +33,6 @@ public:
 	MT_Operand * getSourceOperand();
 	MT_Instruction getInstruction();
 
-	
 	/* This function writes an individual to a QTextStream.
 	*/ 
 	void writeToFileProgramLine (QTextStream &File);
@@ -60,7 +56,6 @@ private:
 	MT_Operand * OperandA;
 	// the second Operand
 	MT_Operand * OperandB;
-
 };
 
 #endif // MT_GPSYSTEM_MT_PROGRAMLINE_H

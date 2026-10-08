@@ -20,7 +20,6 @@
 */
 class MT_FitnessTrainer  
 {
-
 private:
 
 	int LastError;
@@ -55,7 +54,6 @@ private:
 	/* the Interpret peform the MT_Program 
 	* on the SIGLE translated Individual */
 	MT_Interpreter Interpreter;
-
 
 public:
 
@@ -134,7 +132,6 @@ private:
 	// fitnessfunction for the evaluator  approach  
 	double fitSimpleError();
 	double fitSquareError();
-
 };
 
 #endif // MT_GPSYSTEM_MT_FITNESSTRAINER_H
