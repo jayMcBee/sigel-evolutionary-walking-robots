@@ -29,6 +29,7 @@
 
 namespace SIGEL_MasterGUI
 {
+
   /**
    * The class of the widget, in which the individuals will be shown.
    *

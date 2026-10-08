@@ -47,7 +47,6 @@ SIG_ExperimentView::SIG_ExperimentView( QWidget* parent,  const char* name, Qt::
 {
 }
 
-
 void SIG_ExperimentView::putIntoExperiment() {
   // slotHistory and slotAutosaveChanged reach this function without going
   // through putAllIntoExperiment, so it needs its own check. The LCD read
@@ -67,7 +66,6 @@ void SIG_ExperimentView::putIntoExperiment() {
   theExperiment.environment.setAutosave(lcdnumberAutosave->intValue());
   // history checkbox
   theExperiment.population.setHistory(checkboxHistory->isChecked());
-
 };
 
 void SIG_ExperimentView::getOutOfExperiment() {

@@ -29,6 +29,7 @@
 
 namespace SIGEL_MasterGUI
 {
+
   /**
    * The class representing an individual in the GUI.
    *

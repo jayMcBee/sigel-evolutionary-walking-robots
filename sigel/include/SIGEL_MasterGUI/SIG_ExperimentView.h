@@ -27,9 +27,9 @@
 
 #include "SIGEL_GP/SIG_GPExperiment.h"
 
-
 namespace SIGEL_MasterGUI
 {
+
 class SIG_GUIGPExperiment;
 
 /**
@@ -88,7 +88,6 @@ public:
     SIG_GUIGPExperiment &guiExperiment;
 
     void streamToGnuPlot( QTextStream &stream );
-
 };
 
 }

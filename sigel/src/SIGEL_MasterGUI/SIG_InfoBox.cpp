@@ -91,6 +91,4 @@ SIG_InfoBox::SIG_InfoBox( QWidget *parent, const char *name, bool modal, Qt::Win
 	   this,
 	   SLOT( accept() ) );
   okLayout->addWidget( okPushButton );
-
 };
-

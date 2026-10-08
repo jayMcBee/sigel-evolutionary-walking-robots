@@ -46,6 +46,7 @@ namespace SIGEL_GP
 
 namespace SIGEL_MasterGUI
 {
+
   class SIG_ExperimentListView;
 
   /**
@@ -219,7 +220,6 @@ namespace SIGEL_MasterGUI
 
       void slotGNUPlotExport();
 
-
       /**
        * This slot lists the issues that the robot check raises on the robot page.
        *
@@ -263,7 +263,6 @@ namespace SIGEL_MasterGUI
        */
       bool isRunning();
 
-
       /**
        * Returns fileName with the given ending.
        *
@@ -276,7 +275,6 @@ namespace SIGEL_MasterGUI
        * @param ending The ending, without the point.
        */
       QString checkEnding( QString fileName, QString ending );
-
 
     private:
       /**
@@ -436,4 +434,3 @@ namespace SIGEL_MasterGUI
   
 }
 #endif // SIGEL_MASTERGUI_SIG_GUIGPEXPERIMENT_H
-

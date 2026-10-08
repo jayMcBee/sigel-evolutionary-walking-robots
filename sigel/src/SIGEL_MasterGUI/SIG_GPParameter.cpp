@@ -378,8 +378,6 @@ void SIG_GPParameter::getOutOfExperiment()
 	listviewHosts->clear();
 	QList<SIGEL_GP::SIG_GPPVMHost *> &hostList = theExperiment.gpParameter.getHostList();
 
-
-
 	for ( SIGEL_GP::SIG_GPPVMHost *it : hostList )
 	{
 		// create a new listview item for each found host
@@ -622,7 +620,6 @@ void SIG_GPParameter::slotItemDoubleClicked( QTreeWidgetItem * theItem )
 			bool isThere = false;
 			if( newName != currentName )
 			{
-
 				for ( SIGEL_GP::SIG_GPPVMHost *it2 : hostList )
 				{
 					if( it2->name == newName )

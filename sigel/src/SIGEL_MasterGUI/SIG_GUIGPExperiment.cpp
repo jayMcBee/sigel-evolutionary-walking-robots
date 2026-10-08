@@ -38,7 +38,6 @@
 
 #include "SIGEL_Tools/SIG_IO.h"
 
-
 namespace SIGEL_MasterGUI
 {
 
@@ -791,7 +790,6 @@ void SIG_GUIGPExperiment::slotEvolutionStopped()
       endedBecause = QString();
     }
 
-
   /*
   if( guiGPManager )
     {
@@ -802,4 +800,3 @@ void SIG_GUIGPExperiment::slotEvolutionStopped()
 };
 
 }
-
