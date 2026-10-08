@@ -824,13 +824,13 @@ void SIGEL_GP::SIG_GPManager::run() {
 void SIGEL_GP::SIG_GPManager::RegisterDynPVMClients() {
   enum { kSigelMasterRegPort = 6789, kSuicidalRequest   = 13 };
 
-  fd_set mySet;
+  fd_set listenSet;
   struct sockaddr_in  sad;
   QList<int> clientSockets(0);
   //struct hostent *ptrh;
   struct protoent *ptrp;
   int i;
-  int listenSocket, sdRecv, myInt;
+  int listenSocket, sdRecv;
   pthread_mutex_t servMutex = PTHREAD_MUTEX_INITIALIZER;
   char clientName[256];
   QString client;
@@ -879,8 +879,8 @@ void SIGEL_GP::SIG_GPManager::RegisterDynPVMClients() {
   timeOut.tv_usec = 0;
 
   // to use select() we need to build a fs_set first
-  FD_ZERO(&mySet);
-  FD_SET(listenSocket, &mySet);
+  FD_ZERO(&listenSet);
+  FD_SET(listenSocket, &listenSet);
 
   // (bounded) waiting for requests..
   fprintf(stderr, "Server is awaiting requests from dynamic clients on port %d..\n\n", kSigelMasterRegPort);
@@ -888,10 +888,10 @@ void SIGEL_GP::SIG_GPManager::RegisterDynPVMClients() {
   // the (almost) endless server loop
   while ( true ) {
      // pselect returns zero when timeout occurs..
-     select(listenSocket+1, &mySet, nullptr, nullptr, &timeOut);
+     select(listenSocket+1, &listenSet, nullptr, nullptr, &timeOut);
 
      // check what caused pselect() to exit
-     if ( FD_ISSET(listenSocket, &mySet) ) {
+     if ( FD_ISSET(listenSocket, &listenSet) ) {
       sdRecv = accept(listenSocket, nullptr, nullptr);
 
       if (sdRecv < 0) {
@@ -920,10 +920,10 @@ void SIGEL_GP::SIG_GPManager::RegisterDynPVMClients() {
 
       // iterate through list of connected sockets and cut connection;
       // be sure all clients have been removed from the pvmHost list !
-      myInt = kSuicidalRequest;
+      const int disconnectMessage = kSuicidalRequest;
 
       for (int i=0; i<clientSockets.count(); i++) {
-        send( clientSockets[i], &myInt, sizeof(myInt), 0);
+        send( clientSockets[i], &disconnectMessage, sizeof(disconnectMessage), 0);
         close(clientSockets[i]);
       }
       fprintf(stderr, "\t(Servertask disconnected %d clients)\n", static_cast< int >(clientSockets.count()));
@@ -938,8 +938,8 @@ void SIGEL_GP::SIG_GPManager::RegisterDynPVMClients() {
     }
 
     // prepare next pselect() call
-    FD_ZERO(&mySet);
-    FD_SET(listenSocket, &mySet);
+    FD_ZERO(&listenSet);
+    FD_SET(listenSocket, &listenSet);
 
     // set the next time-chunk to another 10 seconds
     timeOut.tv_sec  = 10;
