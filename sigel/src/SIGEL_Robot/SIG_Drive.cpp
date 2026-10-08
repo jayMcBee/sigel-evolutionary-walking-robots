@@ -24,8 +24,8 @@
 #include "SIGEL_Robot/SIG_RobotExceptions.h"
 #include "SIGEL_Tools/SIG_IO.h"
 
-
 namespace SIGEL_Robot {
+
         SIG_Drive::SIG_Drive (SIG_Robot *par, QString n, int nr)
                 : parent (par),
                   name (n),
@@ -128,4 +128,5 @@ namespace SIGEL_Robot {
                    << minforce << ' ' << maxforce << ' '
                    << theJoint->getName () << '\n';
         }
+
 }

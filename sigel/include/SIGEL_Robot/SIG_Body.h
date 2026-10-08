@@ -36,6 +36,7 @@ namespace SIGEL_Robot { class SIG_Body; }
 
 namespace SIGEL_Robot
 {
+
         /**
          * The class SIG_Body represents the geometrical data
          * of a link.
@@ -125,6 +126,7 @@ namespace SIGEL_Robot
                  */
                 QString getName () const;
         };
+
 }
 
 #endif // SIGEL_ROBOT_SIG_BODY_H

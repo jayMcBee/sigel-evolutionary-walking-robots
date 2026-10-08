@@ -27,6 +27,7 @@
 
 namespace SIGEL_Robot
 {
+
         SIG_Body::SIG_Body(SIG_Robot *par, QString f, QString d)
                 : parent(par),
                   geometryFile(f),
@@ -248,36 +249,5 @@ namespace SIGEL_Robot
                 } else
                         tx << "n\n";
         };
+
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

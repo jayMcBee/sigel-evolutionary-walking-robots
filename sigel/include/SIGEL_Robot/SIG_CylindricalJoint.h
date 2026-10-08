@@ -76,6 +76,7 @@ namespace SIGEL_Robot
       (SIG_Vector &t, SIG_Matrix &o, SIG_Link *origin);
     virtual void writeToFileTransfer (QTextStream & tx);
   };
+
 }
 
 #endif // SIGEL_ROBOT_SIG_CYLINDRICALJOINT_H

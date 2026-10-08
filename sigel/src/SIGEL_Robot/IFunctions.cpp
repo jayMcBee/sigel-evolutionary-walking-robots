@@ -341,7 +341,6 @@ namespace SIGEL_Robot {
 					  << Qt::endl;
 #endif
 
-
 		NEWMAT::Matrix transformation = phatRockingUpStylinVectorBendingAngleSwingingMasterFunction( _winportA,
 													     _winportB,
 													     _winportC,
@@ -374,4 +373,5 @@ namespace SIGEL_Robot {
                 drehmatrix.times (&_winport_o, &hilf);
                 _winport_o.assign (&hilf);
         }
+
 } // namespace

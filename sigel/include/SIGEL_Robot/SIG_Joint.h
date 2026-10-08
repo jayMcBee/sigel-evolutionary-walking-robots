@@ -32,6 +32,7 @@ namespace SIGEL_Robot { class SIG_Joint; }
 
 namespace SIGEL_Robot
 {
+
   /**
    * SIG_Joint is an abstract class modelling a joint.
    *
@@ -170,6 +171,7 @@ namespace SIGEL_Robot
                  */
                 void tfap (SIG_Vector mov, SIG_Matrix rot, SIG_Vector *p);
         };
+
 }
 
 #endif // SIGEL_ROBOT_SIG_JOINT_H

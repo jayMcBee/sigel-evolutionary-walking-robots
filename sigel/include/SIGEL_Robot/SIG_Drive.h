@@ -63,6 +63,7 @@ namespace SIGEL_Robot
     double getMaxForce () const;
     void writeToFileTransfer (QTextStream & tx);
   };
+
 }
 
 #endif // SIGEL_ROBOT_SIG_DRIVE_H

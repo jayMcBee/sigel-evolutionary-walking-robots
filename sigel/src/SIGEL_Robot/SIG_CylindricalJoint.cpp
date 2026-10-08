@@ -24,6 +24,7 @@
 #include "SIGEL_Robot/IFunctions.h"
 
 namespace SIGEL_Robot {
+
         SIG_CylindricalJoint::SIG_CylindricalJoint (SIG_Robot *par, QString n, int nr)
                 : SIG_Joint (par, n, nr)
         { }
@@ -73,16 +74,27 @@ namespace SIGEL_Robot {
         }
     
         SIG_Vector SIG_CylindricalJoint::getLeftBase () const { return leftBase; }
+
         SIG_Vector SIG_CylindricalJoint::getLeftDir () const { return leftDir; }
+
         SIG_Vector SIG_CylindricalJoint::getLeftHand () const { return leftHand; }
+
         SIG_Vector SIG_CylindricalJoint::getRightBase () const { return rightBase; }
+
         SIG_Vector SIG_CylindricalJoint::getRightDir () const { return rightDir; }
+
         SIG_Vector SIG_CylindricalJoint::getRightHand () const { return rightHand; }
+
         double SIG_CylindricalJoint::getMinRot () const { return rotMin; }
+
         double SIG_CylindricalJoint::getMaxRot () const { return rotMax; }
+
         double SIG_CylindricalJoint::getIniRot () const { return rotIni;}
+
         double SIG_CylindricalJoint::getMinTrans () const { return traMin; }
+
         double SIG_CylindricalJoint::getMaxTrans () const { return traMax; }
+
         double SIG_CylindricalJoint::getIniTrans () const { return traIni; }
 
         void SIG_CylindricalJoint::transformPoints
@@ -131,4 +143,5 @@ namespace SIGEL_Robot {
                 tx << rotMin << ' ' << rotMax << ' ' << rotIni << ' '
                    << traMin << ' ' << traMax << ' ' << traIni << '\n';
         }
+
 }

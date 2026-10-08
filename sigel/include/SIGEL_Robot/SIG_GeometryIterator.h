@@ -29,6 +29,7 @@ namespace SIGEL_Robot { class SIG_GeometryIterator; }
 #include "SIGEL_Robot/SIG_Polygon.h"
 
 namespace SIGEL_Robot {
+
   /**
    * A geometry iterator can be used to easily iterate over
    * all polygons in a surface description.
@@ -76,6 +77,7 @@ namespace SIGEL_Robot {
     inline SIG_Polygon const & iterate ()
       { SIG_Polygon const & a = current (); next (); return a; }
   };
+
 }
 
 /* 

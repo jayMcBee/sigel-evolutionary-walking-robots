@@ -23,6 +23,7 @@
 #include "SIGEL_Robot/SIG_GeometryIterator.h"
 
 namespace SIGEL_Robot {
+
         SIG_GeometryIterator::SIG_GeometryIterator (SIG_Geometry const *over)
                 : iterating (over),
                   iteration (0)
@@ -42,4 +43,5 @@ namespace SIGEL_Robot {
         {
                 iteration++;
         }  
+
 }

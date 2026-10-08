@@ -501,14 +501,12 @@ namespace SIGEL_Robot {
 		{
 			SIG_RotationalJoint *rotationalJoint = static_cast< SIG_RotationalJoint* >(this);
 
-
 			if (rotationalJoint->getMax()==rotationalJoint->getMin())
 			{
 				mechsMinPos = mechsMaxPos = 0;
 			}
 			else
 			{
-
 				SIG_Vector localPredHand;
 				SIG_Vector localSuccHand;
 
@@ -787,4 +785,5 @@ namespace SIGEL_Robot {
 
 		return input;
 	};
+
 }

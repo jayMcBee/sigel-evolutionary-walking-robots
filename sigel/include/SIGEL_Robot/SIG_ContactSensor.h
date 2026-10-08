@@ -30,6 +30,7 @@ namespace SIGEL_Robot { class SIG_ContactSensor; }
 #include "SIGEL_Robot/SIG_Joint.h"
 
 namespace SIGEL_Robot {
+
   /**
    * SIG_ContactSensor models a sensor attached to a link.
    * When the link has contact to the ground the sensor write
@@ -59,6 +60,7 @@ namespace SIGEL_Robot {
 
     virtual void writeToFileTransfer (QTextStream & tx);
   };
+
 }
 
 #endif

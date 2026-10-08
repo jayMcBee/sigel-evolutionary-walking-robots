@@ -25,6 +25,7 @@
 #include "SIGEL_Tools/SIG_IO.h"
 
 namespace SIGEL_Robot {
+
         void SIG_Geometry::addPolygon (SIG_Polygon *p)
         {
 	  polygons.append (p);
@@ -135,4 +136,5 @@ namespace SIGEL_Robot {
                 for (int j = 0; j < nrofpolys; j++)
                         polygons [j]->writeToFileTransfer (tx);
         }
+
 }

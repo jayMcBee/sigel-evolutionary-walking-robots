@@ -30,6 +30,7 @@ namespace SIGEL_Robot { class SIG_CommandParameters; }
 #include <qstring.h>
 
 namespace SIGEL_Robot {
+
         /**
          * This class contains some information about the
          * behaviour of commands of the robot control
@@ -74,6 +75,7 @@ namespace SIGEL_Robot {
                  */
                 void writeToFileTransfer (QTextStream & tx) const;
         };
+
 }
 
 #endif

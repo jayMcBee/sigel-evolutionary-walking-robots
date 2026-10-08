@@ -131,7 +131,8 @@ Paths are relative to `sigel/`, the source tree.
   must stay identical. One change covers at most 20 files, also inside one
   module. Modules still to do: `MT_GPSystem`, `MT_GUI`,
   `SIGEL_GP`,
-  `SIGEL_MasterGUI`, `SIGEL_Robot`.
+  `SIGEL_MasterGUI`, `SIGEL_Robot` from
+  `SIG_JointSensor` on, in the order of the file names.
 
 ---
 

@@ -38,6 +38,7 @@ namespace SIGEL_Robot {
                                 double winkel, double verschiebung,
                                 SIG_Matrix & mo, SIG_Vector & vt,
                                 QString someIdentifier);
+
 }
 
 #endif

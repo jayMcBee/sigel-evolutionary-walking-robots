@@ -35,6 +35,7 @@ namespace SIGEL_Robot { class SIG_Geometry; }
 #include "SIGEL_Robot/SIG_Body.h"
 
 namespace SIGEL_Robot {
+
   /**
    * This is a representation of the surface of a link body.
    *
@@ -165,6 +166,7 @@ private:
      */
     void writeToFileTransfer (QTextStream & tx) const;
   };
+
 }
 
 #endif

@@ -29,6 +29,7 @@ namespace SIGEL_Robot { class SIG_GlueJoint; }
 
 namespace SIGEL_Robot
 {
+
   /**
    * The class SIG_GlueJoint models a static connection
    * between two links. To be precise: There will be
@@ -57,6 +58,7 @@ namespace SIGEL_Robot
 
     virtual void writeToFileTransfer (QTextStream & tx);
   };
+
 }
 
 #endif // SIGEL_ROBOT_SIG_GLUEJOINT_H

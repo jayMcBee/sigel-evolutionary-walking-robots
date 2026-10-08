@@ -24,6 +24,7 @@
 #include <math.h>
 
 namespace SIGEL_Robot {
+
         SIG_CommandParameters::SIG_CommandParameters ()
                 : duration (0.000001)
         { }
@@ -54,4 +55,5 @@ namespace SIGEL_Robot {
         {
                 tx << "CommandParameters " << duration << '\n';
         }
+
 }
