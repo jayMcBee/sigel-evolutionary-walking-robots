@@ -511,6 +511,9 @@ void SIGEL_GP::SIG_GPManager::evalNewIndis()
 			return;
 		}
 
+		// Poll interval, once per pass, as in evolutionLoop: without it this
+		// loop uses a full core while the slaves compute the fitness values.
+		usleep(5000);
 		processInterfaceEvents();
 
 		trainer->sweepToSpawn();
@@ -1417,6 +1420,9 @@ void SIGEL_GP::SIG_GPManager::evalNeededIndis()
 			return;
 		}
 
+		// Poll interval, once per pass, as in evolutionLoop: without it this
+		// loop uses a full core while the slaves compute the fitness values.
+		usleep(5000);
 		processInterfaceEvents();
 
 		trainer->sweepToSpawn();
