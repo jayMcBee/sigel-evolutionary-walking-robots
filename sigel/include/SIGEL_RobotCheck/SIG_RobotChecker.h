@@ -42,7 +42,6 @@ namespace SIGEL_RobotCheck
    */
   class SIG_RobotChecker
   {
-
   public:
 
     SIG_RobotChecker( const SIGEL_Robot::SIG_Robot &robot,
@@ -56,7 +55,6 @@ namespace SIGEL_RobotCheck
     const SIGEL_Robot::SIG_Robot &robot;
     const SIGEL_Simulation::SIG_SimulationParameters &simulationParameter;
     const SIGEL_Environment::SIG_Environment &environment;
-
   };
 
 }

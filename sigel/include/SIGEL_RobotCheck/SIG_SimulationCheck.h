@@ -37,7 +37,6 @@ namespace SIGEL_RobotCheck
    */
   class SIG_SimulationCheck
   {
-
   public:
 
     SIG_SimulationCheck( const SIG_RobotStartPose &startPose );
@@ -47,7 +46,6 @@ namespace SIGEL_RobotCheck
   private:
 
     const SIG_RobotStartPose &startPose;
-
   };
 
 }

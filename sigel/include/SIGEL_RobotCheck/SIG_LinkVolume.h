@@ -39,7 +39,6 @@ namespace SIGEL_RobotCheck
    */
   class SIG_LinkVolume
   {
-
   public:
 
     SIG_LinkVolume();
@@ -72,7 +71,6 @@ namespace SIGEL_RobotCheck
     QList<Triangle> triangles;
     SIG_Vector lowCorner;
     SIG_Vector highCorner;
-
   };
 
 }

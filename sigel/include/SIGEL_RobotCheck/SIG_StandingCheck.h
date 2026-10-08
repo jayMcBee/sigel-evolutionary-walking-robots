@@ -41,7 +41,6 @@ namespace SIGEL_RobotCheck
    */
   class SIG_StandingCheck
   {
-
   public:
 
     SIG_StandingCheck( const SIGEL_Robot::SIG_Robot &robot,
@@ -68,7 +67,6 @@ namespace SIGEL_RobotCheck
     const SIG_RobotStartPose &startPose;
     const SIGEL_Environment::SIG_Environment &environment;
     const SIGEL_Simulation::SIG_SimulationParameters &simulationParameter;
-
   };
 
 }

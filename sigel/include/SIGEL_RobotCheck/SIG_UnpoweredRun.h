@@ -42,7 +42,6 @@ namespace SIGEL_RobotCheck
    */
   class SIG_UnpoweredRun
   {
-
   public:
 
     SIG_UnpoweredRun( const SIGEL_Robot::SIG_Robot &robot,
@@ -70,7 +69,6 @@ namespace SIGEL_RobotCheck
     QString loosestJoint;
     double sink;
     double brokeAfter;
-
   };
 
 }

@@ -45,7 +45,6 @@ namespace SIGEL_RobotCheck
    */
   class SIG_RobotStartPose
   {
-
   public:
 
     // The floor of the simulation is at height 0, whatever YPLANELEVEL says.
@@ -92,7 +91,6 @@ namespace SIGEL_RobotCheck
     QList<SIG_Matrix> orientations;
     QString refusal;
     double startHeight;
-
   };
 
 }
